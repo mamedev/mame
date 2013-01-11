@@ -140,6 +140,7 @@
          39k - pin 10
          82k - pin 12
          It looks like they have Sx2 and Sx4 the wrong way round on a latter page of the schematics."
+           Thanks to Andy Raven for getting this information.
 
       4. The "Hard" mode bug can be fixed with a single byte patch: ROM_FILL( 0x47e5, 1, 0xc3)
 
