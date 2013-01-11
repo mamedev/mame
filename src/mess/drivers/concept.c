@@ -135,7 +135,6 @@ static MACHINE_CONFIG_START( concept, concept_state )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-
 	/* no sound? */
 
 	MCFG_HARDDISK_ADD( "harddisk1" )
@@ -145,6 +144,10 @@ static MACHINE_CONFIG_START( concept, concept_state )
 
 	/* via */
 	MCFG_VIA6522_ADD("via6522_0", 1022750, concept_via6522_intf)
+
+	/* ACIAs */
+	MCFG_ACIA6551_ADD(ACIA_0_TAG)
+	MCFG_ACIA6551_ADD(ACIA_1_TAG)
 
 	MCFG_FD1793_ADD("wd179x", concept_wd17xx_interface )
 

@@ -6,9 +6,7 @@
 
 #include "emu.h"
 #include "includes/concept.h"
-#include "machine/6522via.h"
 #include "machine/mm58274c.h"	/* mm58274 seems to be compatible with mm58174 */
-//#include "machine/6551acia.h"
 #include "machine/wd17xx.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/corvushd.h"
@@ -337,13 +335,15 @@ READ16_MEMBER(concept_state::concept_io_r)
 				break;
 			}
 			break;
+
 		case 1:
 			/* NSR0 data comm port 0 */
+			return m_acia0->read(space, (offset & 3));
+			break;
+
 		case 2:
 			/* NSR1 data comm port 1 */
-			LOG(("concept_io_r: Data comm port read at address 0x03%4.4x\n", offset << 1));
-			if ((offset & 0xf) == 1)
-				return 0x10;
+			return m_acia1->read(space, (offset & 3));
 			break;
 
 		case 3:
@@ -453,11 +453,16 @@ WRITE16_MEMBER(concept_state::concept_io_w)
 		{
 		case 0:
 			/* NKBP keyboard */
+			break;
+
 		case 1:
 			/* NSR0 data comm port 0 */
+			m_acia0->write(space, (offset & 3), data);
+			break;
+
 		case 2:
 			/* NSR1 data comm port 1 */
-			/*acia_6551_w((offset >> 4) & 7, offset & 0x3, data);*/
+			m_acia1->write(space, (offset & 3), data);
 			break;
 
 		case 3:

@@ -13,6 +13,10 @@
 
 #include "machine/6522via.h"
 #include "machine/wd17xx.h"
+#include "machine/6551acia.h"
+
+#define ACIA_0_TAG	"acia0"
+#define ACIA_1_TAG	"acia1"
 
 /* keyboard interface */
 enum
@@ -35,8 +39,12 @@ class concept_state : public driver_device
 public:
 	concept_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_acia0(*this, ACIA_0_TAG),
+		m_acia1(*this, ACIA_1_TAG),
 		m_videoram(*this,"videoram") { }
 
+	required_device<acia6551_device> m_acia0;
+	required_device<acia6551_device> m_acia1;
 	required_shared_ptr<UINT16> m_videoram;
 	UINT8 m_pending_interrupts;
 	char m_clock_enable;
