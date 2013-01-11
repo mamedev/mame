@@ -137,6 +137,35 @@ WRITE_LINE_MEMBER(odyssey2_state::irq_callback)
 }
 
 
+WRITE8_MEMBER(odyssey2_state::lum_write)
+{
+	m_lum = ( data & 0x01 ) << 3;
+}
+
+
+WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
+{
+	int vpos = data;
+	bitmap_ind16 *bitmap = m_i8244->get_bitmap();
+
+	// apply external LUM setting
+	for ( int x = i8244_device::START_ACTIVE_SCAN; x < i8244_device::END_ACTIVE_SCAN; x++ )
+	{
+		bitmap->pix16( vpos, x ) |= ( m_lum ^ 0x08 );
+	}
+}
+
+
+READ8_MEMBER(odyssey2_state::t1_read_g7400)
+{
+	if ( m_i8244->vblank() || m_i8244->hblank() )
+	{
+		return 1;
+	}
+	return 0;
+}
+
+
 static const gfx_layout odyssey2_graphicslayout =
 {
 	8,1,
