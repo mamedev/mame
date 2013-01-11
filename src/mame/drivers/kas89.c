@@ -1,6 +1,7 @@
 /*************************************************************************************
 
-  /\/\<< Kasino '89 >>/\/
+  /\/\<< Kasino '89 >>/\/\
+
   6-players electronic roulette.
   Video field + phisical LEDs roulette.
 
