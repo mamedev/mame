@@ -48,7 +48,7 @@ Notes:
 
     TODO:
 
-	- floppy broken
+    - floppy broken
     - z80dart wait/ready
     - Winchester hard disk
     - revision E model
@@ -287,7 +287,7 @@ WRITE8_MEMBER( bullet_state::hdcon_w )
 
 	*/
 
-   	if (BIT(data, 4))
+	if (BIT(data, 4))
 	{
 		m_hdcon_sw = true;
 	}

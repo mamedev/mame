@@ -10,7 +10,7 @@
 
     TODO:
 
-	- floppy broken
+    - floppy broken
     - keyboard CPU ROM
     - graphics board
     - Tandy 6000 HD
