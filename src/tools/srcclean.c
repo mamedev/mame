@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
 	int removed_tabs = 0;
 	int added_tabs = 0;
 	int removed_spaces = 0;
+	int removed_continuations = 0;
 	int fixed_mac_style = 0;
 	int fixed_nix_style = 0;
 	int added_newline = 0;
@@ -203,11 +204,30 @@ int main(int argc, char *argv[])
 		/* if we hit a CR or LF, clean up from there */
 		else if (ch == 0x0d || ch == 0x0a)
 		{
-			/* remove all extra spaces/tabs at the end */
-			while (dst > 0 && (modified[dst-1] == ' ' || modified[dst-1] == 0x09))
+			while (true)
 			{
-				removed_spaces++;
-				dst--;
+				/* remove all extra spaces/tabs at the end */
+				if (dst > 0 && (modified[dst-1] == ' ' || modified[dst-1] == 0x09))
+				{
+					removed_spaces++;
+					dst--;
+				}
+				/* remove extraneous line continuation followed by a blank line */
+				else if (is_c_file && dst > 2 && modified[dst-3] == '\\' && modified[dst-2] == 0x0d && modified[dst-1]==0x0a)
+				{
+					removed_continuations++;
+					dst -= 3;
+				}
+				/* remove blank lines following an opening brace */
+				else if (is_c_file && !in_multiline_comment && dst > 2 && modified[dst-3] == '{' && modified[dst-2] == 0x0d && modified[dst-1]==0x0a)
+				{
+					removed_newlines++;
+					dst -= 2;
+				}
+				else
+				{
+					break;
+				}
 			}
 
 			/* insert a proper CR/LF */
@@ -339,8 +359,9 @@ int main(int argc, char *argv[])
 		/* explain what we did */
 		printf("Cleaned up %s:", argv[1]);
 		if (added_newline) printf(" added newline at end of file");
-		if (removed_newlines) printf(" removed %d newline(s) at end of file", removed_newlines);
+		if (removed_newlines) printf(" removed %d newline(s)", removed_newlines);
 		if (removed_spaces) printf(" removed %d space(s)", removed_spaces);
+		if (removed_continuations) printf(" removed %d continuation(s)", removed_continuations);
 		if (removed_tabs) printf(" removed %d tab(s)", removed_tabs);
 		if (added_tabs) printf(" added %d tab(s)", added_tabs);
 		if (hichars) printf(" fixed %d high-ASCII char(s)", hichars);
