@@ -47,7 +47,7 @@ static ADDRESS_MAP_START( g7400_io , AS_IO, 8, odyssey2_state )
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_READWRITE(p2_read, p2_write)
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READWRITE(bus_read, bus_write)
 	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0)   AM_READ(t0_read)
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(t1_read_g7400)
+	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(t1_read)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w);
 ADDRESS_MAP_END
 
@@ -137,12 +137,6 @@ WRITE_LINE_MEMBER(odyssey2_state::irq_callback)
 }
 
 
-WRITE8_MEMBER(odyssey2_state::lum_write)
-{
-	m_lum = ( data & 0x01 ) << 3;
-}
-
-
 WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
 {
 	int vpos = data;
@@ -156,13 +150,150 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
 }
 
 
-READ8_MEMBER(odyssey2_state::t1_read_g7400)
+READ8_MEMBER(odyssey2_state::t1_read)
 {
 	if ( m_i8244->vblank() || m_i8244->hblank() )
 	{
 		return 1;
 	}
 	return 0;
+}
+
+
+READ8_MEMBER(odyssey2_state::p1_read)
+{
+	UINT8 data = m_p1;
+
+	logerror("%.9f p1 read %.2x\n", machine().time().as_double(), data);
+	return data;
+}
+
+
+WRITE8_MEMBER(odyssey2_state::p1_write)
+{
+	m_p1 = data;
+	m_lum = ( data & 0x80 ) >> 4;
+
+	switch_banks();
+
+	logerror("%.6f p1 written %.2x\n", machine().time().as_double(), data);
+}
+
+
+READ8_MEMBER(odyssey2_state::p2_read)
+{
+	UINT8 h = 0xFF;
+	int i, j;
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
+
+	if (!(m_p1 & P1_KEYBOARD_SCAN_ENABLE))
+	{
+		if ((m_p2 & P2_KEYBOARD_SELECT_MASK) <= 5)  /* read keyboard */
+		{
+			h &= ioport(keynames[m_p2 & P2_KEYBOARD_SELECT_MASK])->read();
+		}
+
+		for (i= 0x80, j = 0; i > 0; i >>= 1, j++)
+		{
+			if (!(h & i))
+			{
+				m_p2 &= ~0x10;                   /* set key was pressed indicator */
+				m_p2 = (m_p2 & ~0xE0) | (j << 5);  /* column that was pressed */
+
+				break;
+			}
+		}
+
+		if (h == 0xFF)  /* active low inputs, so no keypresses */
+		{
+			m_p2 = m_p2 | 0xF0;
+		}
+	}
+	else
+	{
+		m_p2 = m_p2 | 0xF0;
+	}
+
+	logerror("%.6f p2 read %.2x\n", machine().time().as_double(), m_p2);
+	return m_p2;
+}
+
+
+WRITE8_MEMBER(odyssey2_state::p2_write)
+{
+	m_p2 = data;
+
+	if ( m_i8243 )
+	{
+		m_i8243->i8243_p2_w( space, 0, m_p2 & 0x0f );
+	}
+
+	logerror("%.6f p2 written %.2x\n", machine().time().as_double(), data);
+}
+
+
+READ8_MEMBER(odyssey2_state::bus_read)
+{
+	UINT8 data = 0xff;
+
+	if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 1)
+	{
+		data &= ioport("JOY0")->read();       /* read joystick 1 */
+	}
+
+	if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 0)
+	{
+		data &= ioport("JOY1")->read();       /* read joystick 2 */
+	}
+
+	logerror("%.6f bus read %.2x\n", machine().time().as_double(), data);
+	return data;
+}
+
+
+WRITE8_MEMBER(odyssey2_state::bus_write)
+{
+	logerror("%.6f bus written %.2x\n", machine().time().as_double(), data);
+}
+
+
+/*
+    i8243 in the g7400
+*/
+
+WRITE8_MEMBER(odyssey2_state::i8243_port_w)
+{
+	switch ( offset & 3 )
+	{
+		case 0: // "port 4"
+			m_g7400_ic674_decode[4] = BIT(data,0);
+			m_g7400_ic674_decode[5] = BIT(data,1);
+			m_g7400_ic674_decode[6] = BIT(data,2);
+			m_g7400_ic674_decode[7] = BIT(data,3);
+			break;
+
+		case 1: // "port 5"
+			m_g7400_ic674_decode[0] = BIT(data,0);
+			m_g7400_ic674_decode[1] = BIT(data,1);
+			m_g7400_ic674_decode[2] = BIT(data,2);
+			m_g7400_ic674_decode[3] = BIT(data,3);
+			break;
+
+		case 2: // "port 6"
+			m_g7400_ic678_decode[4] = BIT(data,0);
+			m_g7400_ic678_decode[5] = BIT(data,1);
+			m_g7400_ic678_decode[6] = BIT(data,2);
+			m_g7400_ic678_decode[7] = BIT(data,3);
+			break;
+
+		case 3: // "port 7"
+			m_g7400_ic678_decode[0] = BIT(data,0);
+			m_g7400_ic678_decode[1] = BIT(data,1);
+			m_g7400_ic678_decode[2] = BIT(data,2);
+			m_g7400_ic678_decode[3] = BIT(data,3);
+			break;
+
+	}
 }
 
 
@@ -234,7 +365,7 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL_7_15909MHz/2, I824X_LINE_CLOCKS, I824X_START_ACTIVE_SCAN, I824X_END_ACTIVE_SCAN, 262, I824X_START_Y, I824X_START_Y + I824X_SCREEN_HEIGHT )
+	MCFG_SCREEN_RAW_PARAMS( XTAL_7_15909MHz/2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
 	MCFG_GFXDECODE( odyssey2 )
@@ -242,7 +373,7 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", ODYSSEY2, XTAL_7_15909MHz/2)
+	MCFG_I8244_ADD( "i8244", XTAL_17_73447MHz/5, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
@@ -263,7 +394,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( XTAL_17_73447MHz/5, I824X_LINE_CLOCKS, I824X_START_ACTIVE_SCAN, I824X_END_ACTIVE_SCAN, 312, I824X_START_Y, I824X_START_Y + I824X_SCREEN_HEIGHT )
+	MCFG_SCREEN_RAW_PARAMS( XTAL_17_73447MHz/5, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
 	MCFG_GFXDECODE( odyssey2 )
@@ -271,7 +402,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("custom", ODYSSEY2, XTAL_17_73447MHz/5)
+	MCFG_I8245_ADD( "i8244", XTAL_17_73447MHz/5, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
@@ -302,7 +433,7 @@ static MACHINE_CONFIG_START( g7400, odyssey2_state )
 	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(odyssey2_state,i8243_port_w))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8244_ADD( "i8244", 3540000, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess ) )
+	MCFG_I8245_ADD( "i8244", 3540000, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)

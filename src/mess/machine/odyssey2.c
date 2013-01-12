@@ -97,6 +97,8 @@ void odyssey2_state::machine_start()
 
 void odyssey2_state::machine_reset()
 {
+	m_lum = 0;
+
 	/* jump to "last" bank, will work for all sizes due to being mirrored */
 	m_p1 = 0xFF;
 	m_p2 = 0xFF;
@@ -115,7 +117,7 @@ READ8_MEMBER(odyssey2_state::io_read)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
-		return video_read(space, offset); /* seems to have higher priority than ram??? */
+		return m_i8244->read(space, offset); /* seems to have higher priority than ram??? */
 	}
 	if (!(m_p1 & P1_EXT_RAM_ENABLE))
 	{
@@ -146,7 +148,7 @@ WRITE8_MEMBER(odyssey2_state::io_write)
 	}
 	else if (!(m_p1 & P1_VDC_ENABLE))
 	{
-		video_write(space, offset, data);
+		m_i8244->write(space, offset, data);
 	}
 }
 
@@ -186,101 +188,3 @@ WRITE8_MEMBER(odyssey2_state::g7400_io_write)
 	}
 }
 
-/***** 8048 Ports ************************/
-
-READ8_MEMBER(odyssey2_state::p1_read)
-{
-	UINT8 data = m_p1;
-
-	logerror("%.9f p1 read %.2x\n", machine().time().as_double(), data);
-	return data;
-}
-
-
-WRITE8_MEMBER(odyssey2_state::p1_write)
-{
-	m_p1 = data;
-
-	switch_banks();
-
-	lum_write(space, 0, m_p1 >> 7);
-
-	logerror("%.6f p1 written %.2x\n", machine().time().as_double(), data);
-}
-
-
-READ8_MEMBER(odyssey2_state::p2_read)
-{
-	UINT8 h = 0xFF;
-	int i, j;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
-
-	if (!(m_p1 & P1_KEYBOARD_SCAN_ENABLE))
-	{
-		if ((m_p2 & P2_KEYBOARD_SELECT_MASK) <= 5)  /* read keyboard */
-		{
-			h &= ioport(keynames[m_p2 & P2_KEYBOARD_SELECT_MASK])->read();
-		}
-
-		for (i= 0x80, j = 0; i > 0; i >>= 1, j++)
-		{
-			if (!(h & i))
-			{
-				m_p2 &= ~0x10;                   /* set key was pressed indicator */
-				m_p2 = (m_p2 & ~0xE0) | (j << 5);  /* column that was pressed */
-
-				break;
-			}
-		}
-
-		if (h == 0xFF)  /* active low inputs, so no keypresses */
-		{
-			m_p2 = m_p2 | 0xF0;
-		}
-	}
-	else
-	{
-		m_p2 = m_p2 | 0xF0;
-	}
-
-	logerror("%.6f p2 read %.2x\n", machine().time().as_double(), m_p2);
-	return m_p2;
-}
-
-
-WRITE8_MEMBER(odyssey2_state::p2_write)
-{
-	m_p2 = data;
-
-	if ( m_i8243 )
-	{
-		m_i8243->i8243_p2_w( space, 0, m_p2 & 0x0f );
-	}
-
-	logerror("%.6f p2 written %.2x\n", machine().time().as_double(), data);
-}
-
-
-READ8_MEMBER(odyssey2_state::bus_read)
-{
-	UINT8 data = 0xff;
-
-	if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 1)
-	{
-		data &= ioport("JOY0")->read();       /* read joystick 1 */
-	}
-
-	if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 0)
-	{
-		data &= ioport("JOY1")->read();       /* read joystick 2 */
-	}
-
-	logerror("%.6f bus read %.2x\n", machine().time().as_double(), data);
-	return data;
-}
-
-
-WRITE8_MEMBER(odyssey2_state::bus_write)
-{
-	logerror("%.6f bus written %.2x\n", machine().time().as_double(), data);
-}
