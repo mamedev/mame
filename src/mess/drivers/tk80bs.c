@@ -12,6 +12,10 @@ TK80 (Training Kit 80) considered to be Japan's first home computer.
 It consisted of 25 keys and 8 LED digits, and was programmed in hex.
 The Mikrolab is a Russian clone which appears to be almost completely identical.
 
+TK85 seems to be the same as TK80, except is has a larger ROM. No
+schematics etc are available. Thanks to 'Nama' who dumped the rom.
+It has 25 keys, so a few aren't defined yet.
+
 When booted, the system begins at 0000 which is ROM. You need to change the
 address to 8000 before entering a program. Here is a test to paste in:
 8000-11^22^33^44^55^66^77^88^99^8000-
@@ -58,12 +62,9 @@ public:
 	tk80bs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_ppi8255_2(*this, "ppi8255_2")
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+	m_ppi8255_2(*this, "ppi8255_2"),
+	m_p_videoram(*this, "videoram"){ }
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<i8255_device> m_ppi8255_2;
 	DECLARE_READ8_MEMBER(ppi_custom_r);
 	DECLARE_WRITE8_MEMBER(ppi_custom_w);
 	DECLARE_READ8_MEMBER(key_matrix_r);
@@ -76,7 +77,6 @@ public:
 	DECLARE_READ8_MEMBER(port_a_r);
 	DECLARE_READ8_MEMBER(port_b_r);
 	UINT8 m_term_data;
-	optional_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_keyb_press;
 	UINT8 m_keyb_press_flag;
 	UINT8 m_shift_press_flag;
@@ -86,6 +86,9 @@ public:
 	DECLARE_MACHINE_RESET(tk80bs);
 	DECLARE_VIDEO_START(tk80bs);
 	UINT32 screen_update_tk80bs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_device<cpu_device> m_maincpu;
+	optional_device<i8255_device> m_ppi8255_2;
+	optional_shared_ptr<UINT8> m_p_videoram;
 };
 
 /************************************************* TK80 ******************************************/
@@ -106,6 +109,14 @@ static ADDRESS_MAP_START(tk80_mem, AS_PROGRAM, 8, tk80bs_state)
 	AM_RANGE(0x0000, 0x02ff) AM_ROM
 	AM_RANGE(0x0300, 0x03ff) AM_RAM // EEPROM
 	AM_RANGE(0x8000, 0x83f7) AM_RAM // RAM
+	AM_RANGE(0x83f8, 0x83ff) AM_RAM AM_READWRITE(display_r,display_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(tk85_mem, AS_PROGRAM, 8, tk80bs_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x87ff) // A10-14 not connected
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x8000, 0x83f7) AM_RAM
 	AM_RANGE(0x83f8, 0x83ff) AM_RAM AM_READWRITE(display_r,display_w)
 ADDRESS_MAP_END
 
@@ -248,10 +259,16 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mikrolab, tk80 )
 	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tk85_mem)
 	MCFG_CPU_IO_MAP(mikrolab_io)
 	/* Devices */
 	MCFG_DEVICE_REMOVE("ppi8255_0")
 	MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( tk85, tk80 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tk85_mem)
 MACHINE_CONFIG_END
 
 /************************************************* TK80BS ****************************************/
@@ -315,7 +332,7 @@ static ADDRESS_MAP_START(tk80bs_mem, AS_PROGRAM, 8, tk80bs_state)
 //  AM_RANGE(0x0c00, 0x7bff) AM_ROM // ext
 	AM_RANGE(0x7df8, 0x7df9) AM_NOP // i8251 sio
 	AM_RANGE(0x7dfc, 0x7dff) AM_READWRITE(ppi_custom_r,ppi_custom_w)
-	AM_RANGE(0x7e00, 0x7fff) AM_RAM AM_SHARE("p_videoram") // video ram
+	AM_RANGE(0x7e00, 0x7fff) AM_RAM AM_SHARE("videoram") // video ram
 	AM_RANGE(0x8000, 0xcfff) AM_RAM // RAM
 	AM_RANGE(0xd000, 0xefff) AM_ROM // BASIC
 	AM_RANGE(0xf000, 0xffff) AM_ROM // BSMON
@@ -433,6 +450,11 @@ ROM_START( mikrolab )
 	ROM_LOAD( "rom-2.bin", 0x0200, 0x0200, BAD_DUMP CRC(726a224f) SHA1(7ed8d2c6dd4fb7836475e207e1972e33a6a91d2f))
 ROM_END
 
+ROM_START( nectk85 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "tk85.bin",  0x0000, 0x0800, CRC(8a0b6d7e) SHA1(6acc8c04990692b08929043ccf638761b7301def))
+ROM_END
+
 ROM_START( tk80bs )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	/* all of these aren't taken from an original machine*/
@@ -461,6 +483,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     INIT     COMPANY                        FULLNAME       FLAGS */
-COMP( 1976, tk80,     0,      0,       tk80,      tk80, driver_device,     0,       "Nippon Electronic Company", "TK-80", GAME_NO_SOUND_HW)
-COMP( 1980, tk80bs,   tk80,   0,       tk80bs,    tk80bs, driver_device,   0,       "Nippon Electronic Company", "TK-80BS", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
-COMP( 19??, mikrolab, tk80,   0,       mikrolab,  mikrolab, driver_device, 0,       "<unknown>", "Mikrolab KR580IK80", GAME_NO_SOUND_HW)
+COMP( 1976, tk80,     0,      0,       tk80,      tk80,     driver_device, 0, "Nippon Electronic Company", "TK-80", GAME_NO_SOUND_HW)
+COMP( 1980, tk80bs,   tk80,   0,       tk80bs,    tk80bs,   driver_device, 0, "Nippon Electronic Company", "TK-80BS", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 19??, nectk85,  tk80,   0,       tk85,      tk80,     driver_device, 0, "Nippon Electronic Company", "TK-85", GAME_NO_SOUND_HW)
+COMP( 19??, mikrolab, tk80,   0,       mikrolab,  mikrolab, driver_device, 0, "<unknown>", "Mikrolab KR580IK80", GAME_NO_SOUND_HW)
