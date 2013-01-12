@@ -9,17 +9,80 @@
 
   TODO:
   - Reimplement the cartridge slot, and thus also the voice, as a slot device
-  - In case any more machines (TVs?) turn up using the EF9340 and/or EF9341,
-    reimplement as a real device.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
-#include "includes/odyssey2.h"
 #include "imagedev/cartslot.h"
 #include "sound/sp0256.h"
 #include "video/i8244.h"
+#include "machine/i8243.h"
+#include "video/ef9340_1.h"
+
+
+class odyssey2_state : public driver_device
+{
+public:
+	odyssey2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_i8243(*this, "i8243")
+		, m_i8244(*this, "i8244")
+		, m_ef9340_1(*this, "ef9340_1")
+		{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	optional_device<i8243_device> m_i8243;
+	required_device<i8244_device> m_i8244;
+	optional_device<ef9340_1_device> m_ef9340_1;
+
+	int m_the_voice_lrq_state;
+	UINT8 *m_ram;
+	UINT8 m_p1;
+	UINT8 m_p2;
+	size_t m_cart_size;
+	UINT8 m_lum;
+	DECLARE_READ8_MEMBER(t0_read);
+	DECLARE_READ8_MEMBER(io_read);
+	DECLARE_WRITE8_MEMBER(io_write);
+	DECLARE_READ8_MEMBER(bus_read);
+	DECLARE_WRITE8_MEMBER(bus_write);
+	DECLARE_READ8_MEMBER(g7400_io_read);
+	DECLARE_WRITE8_MEMBER(g7400_io_write);
+	DECLARE_READ8_MEMBER(p1_read);
+	DECLARE_WRITE8_MEMBER(p1_write);
+	DECLARE_READ8_MEMBER(p2_read);
+	DECLARE_WRITE8_MEMBER(p2_write);
+	DECLARE_READ8_MEMBER(t1_read);
+	DECLARE_DRIVER_INIT(odyssey2);
+	virtual void machine_reset();
+	virtual void palette_init();
+	UINT32 screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(the_voice_lrq_callback);
+	DECLARE_WRITE8_MEMBER(i8243_port_w);
+	DECLARE_WRITE_LINE_MEMBER(irq_callback);
+
+	DECLARE_WRITE16_MEMBER(scanline_postprocess);
+	DECLARE_WRITE16_MEMBER(scanline_postprocess_g7400);
+
+protected:
+	/* constants */
+	static const UINT8 P1_BANK_LO_BIT          = 0x01;
+	static const UINT8 P1_BANK_HI_BIT          = 0x02;
+	static const UINT8 P1_KEYBOARD_SCAN_ENABLE = 0x04; /* active low */
+	static const UINT8 P1_VDC_ENABLE           = 0x08; /* active low */
+	static const UINT8 P1_EXT_RAM_ENABLE       = 0x10; /* active low */
+	static const UINT8 P1_VDC_COPY_MODE_ENABLE = 0x40;
+	static const UINT8 P2_KEYBOARD_SELECT_MASK = 0x07; /* select row to scan */
+
+	UINT8   m_g7400_ic674_decode[8];
+	UINT8   m_g7400_ic678_decode[8];
+
+	void switch_banks();
+};
 
 
 static ADDRESS_MAP_START( odyssey2_mem , AS_PROGRAM, 8, odyssey2_state )
@@ -263,22 +326,6 @@ DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
 }
 
 
-void odyssey2_state::machine_start()
-{
-	save_item(NAME(m_ef934x_ram_a));
-	save_item(NAME(m_ef934x_ram_b));
-	save_item(NAME(m_ef9340.X));
-	save_item(NAME(m_ef9340.Y));
-	save_item(NAME(m_ef9340.Y0));
-	save_item(NAME(m_ef9340.R));
-	save_item(NAME(m_ef9340.M));
-	save_item(NAME(m_ef9341.TA));
-	save_item(NAME(m_ef9341.TB));
-	save_item(NAME(m_ef9341.busy));
-	save_item(NAME(m_ef934x_ext_char_ram));
-}
-
-
 void odyssey2_state::machine_reset()
 {
 	m_lum = 0;
@@ -349,7 +396,7 @@ READ8_MEMBER(odyssey2_state::g7400_io_read)
 	}
 	else
 	{
-		return ef9341_r( offset & 0x02, offset & 0x01 );
+		return m_ef9340_1->ef9341_read( offset & 0x02, offset & 0x01 );
 	}
 
 	return 0;
@@ -368,7 +415,7 @@ WRITE8_MEMBER(odyssey2_state::g7400_io_write)
 	}
 	else
 	{
-		ef9341_w( offset & 0x02, offset & 0x01, data );
+		m_ef9340_1->ef9341_write( offset & 0x02, offset & 0x01, data );
 	}
 }
 
@@ -385,6 +432,18 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
 	}
 }
 
+
+WRITE16_MEMBER(odyssey2_state::scanline_postprocess_g7400)
+{
+	int vpos = data;
+	bitmap_ind16 *bitmap = m_i8244->get_bitmap();
+
+	// apply external LUM setting
+	for ( int x = i8244_device::START_ACTIVE_SCAN; x < i8244_device::END_ACTIVE_SCAN; x++ )
+	{
+		bitmap->pix16( vpos, x ) |= ( m_lum ^ 0x08 );
+	}
+}
 
 UINT32 odyssey2_state::screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -667,15 +726,15 @@ static MACHINE_CONFIG_START( g7400, odyssey2_state )
 	MCFG_SCREEN_RAW_PARAMS( 3540000*2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
-	MCFG_VIDEO_START_OVERRIDE(odyssey2_state,g7400)
-
 	MCFG_GFXDECODE( odyssey2 )
 	MCFG_PALETTE_LENGTH(32)
 
 	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(odyssey2_state,i8243_port_w))
 
+	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
+
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8245_ADD( "i8244", 3540000, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess ) )
+	MCFG_I8245_ADD( "i8244", 3540000, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess_g7400 ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)

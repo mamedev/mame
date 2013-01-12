@@ -1,71 +1,66 @@
 /***************************************************************************
 
-  video/odyssey2.c
+    ef9340_1.h
 
-  2012-02-04 DanBoris
-    - Changed color of background grid color 0 to match sprite color 0 (Fixes KTAA title screen)
-    - Fixed Odyssey2_video_w so that m_o2_vdc.reg[] is always updated (Fixes Blockout)
-    - Changed quad character generation so character height is always taken from 4th character (KTAA level 2)
-
+    Thomson EF9340 + EF9341 teletext graphics chips with 1KB external
+    character ram.
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "includes/odyssey2.h"
-#include "video/ef9341_chargen.h"
+#include "ef9340_1.h"
+#include "ef9341_chargen.h"
 
 
-#define I824X_START_ACTIVE_SCAN         6
-#define I824X_END_ACTIVE_SCAN           (6 + 160)
-#define I824X_START_Y                   1
-#define I824X_SCREEN_HEIGHT             243
-#define I824X_LINE_CLOCKS               228
+// device type definition
+const device_type EF9340_1 = &device_creator<ef9340_1_device>;
 
 
-void odyssey2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+static const UINT8 bgr2rgb[8] =
 {
-	int vpos = m_screen->vpos();
+    0x00, 0x04, 0x02, 0x06, 0x01, 0x05, 0x03, 0x07
+};
 
-	switch ( id )
-	{
-		case TIMER_LINE:
-			if ( m_g7400 )
-			{
-				ef9340_scanline(vpos);
-			}
-			break;
 
-		case TIMER_HBLANK:
-			break;
-	}
+ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, EF9340_1, "EF9340+EF9341", tag, owner, clock)
+	, m_screen_tag(NULL)
+	, m_screen(NULL)
+	//, m_start_vpos(START_Y)
+	//, m_start_vblank(START_Y + SCREEN_HEIGHT)
+	//, m_screen_lines(LINES)
+{
 }
 
 
-/***************************************************************************
-
-  Start the video hardware emulation.
-
-***************************************************************************/
-
-void odyssey2_state::video_start()
+void ef9340_1_device::device_start()
 {
-	m_start_vpos = I824X_START_Y;
-	m_start_vblank = I824X_START_Y + I824X_SCREEN_HEIGHT;
+	assert( m_screen_tag != NULL );
+	m_screen = machine().device<screen_device>(m_screen_tag);
+	assert( m_screen != NULL );
 
+	// Let the screen create our temporary bitmap with the screen's dimensions
 	m_screen->register_screen_bitmap(m_tmp_bitmap);
 
 	m_line_timer = timer_alloc(TIMER_LINE);
-	m_line_timer->adjust( m_screen->time_until_pos(1, I824X_START_ACTIVE_SCAN ), 0,  m_screen->scan_period() );
+	m_line_timer->adjust( m_screen->time_until_pos(0, 0), 0,  m_screen->scan_period() );
 
-	m_hblank_timer = timer_alloc(TIMER_HBLANK);
-	m_hblank_timer->adjust( m_screen->time_until_pos(1, I824X_END_ACTIVE_SCAN + 18 ), 0, m_screen->scan_period() );
+	// register our state
+	save_item(NAME(m_ef9341.TA));
+	save_item(NAME(m_ef9341.TB));
+	save_item(NAME(m_ef9341.busy));
+	save_item(NAME(m_ef9340.X));
+	save_item(NAME(m_ef9340.Y));
+	save_item(NAME(m_ef9340.Y0));
+	save_item(NAME(m_ef9340.R));
+	save_item(NAME(m_ef9340.M));
+	save_pointer(NAME(m_ef934x_ram_a), 1024);
+	save_pointer(NAME(m_ef934x_ram_b), 1024);
+	save_pointer(NAME(m_ef934x_ext_char_ram), 1024);
 }
 
 
-void odyssey2_state::video_start_g7400()
+void ef9340_1_device::device_reset()
 {
-	video_start();
-
 	m_ef9340.X = 0;
 	m_ef9340.Y = 0;
 	m_ef9340.Y0 = 0;
@@ -74,17 +69,21 @@ void odyssey2_state::video_start_g7400()
 	m_ef9341.TA = 0;
 	m_ef9341.TB = 0;
 	m_ef9341.busy = 0;
-
-	m_g7400 = true;
 }
 
 
+void ef9340_1_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch ( id )
+	{
+		case TIMER_LINE:
+			ef9340_scanline(m_screen->vpos());
+			break;
+	}
+}
 
-/*
-    Thomson EF9340/EF9341 extra chips in the g7400
- */
 
-UINT16 odyssey2_state::ef9340_get_c_addr(UINT8 x, UINT8 y)
+UINT16 ef9340_1_device::ef9340_get_c_addr(UINT8 x, UINT8 y)
 {
 	if ( ( y & 0x18 ) == 0x18 )
 	{
@@ -98,7 +97,7 @@ UINT16 odyssey2_state::ef9340_get_c_addr(UINT8 x, UINT8 y)
 }
 
 
-void odyssey2_state::ef9340_inc_c()
+void ef9340_1_device::ef9340_inc_c()
 {
 	m_ef9340.X++;
 	if ( m_ef9340.X >= 40 )
@@ -109,7 +108,7 @@ void odyssey2_state::ef9340_inc_c()
 }
 
 
-UINT16 odyssey2_state::external_chargen_address(UINT8 b, UINT8 slice)
+UINT16 ef9340_1_device::external_chargen_address(UINT8 b, UINT8 slice)
 {
 	UINT8 cc = b & 0x7f;
 
@@ -123,7 +122,7 @@ UINT16 odyssey2_state::external_chargen_address(UINT8 b, UINT8 slice)
 }
 
 
-void odyssey2_state::ef9341_w( UINT8 command, UINT8 b, UINT8 data )
+void ef9340_1_device::ef9341_write( UINT8 command, UINT8 b, UINT8 data )
 {
 	logerror("ef9341 %s write, t%s, data %02X\n", command ? "command" : "data", b ? "B" : "A", data );
 
@@ -226,7 +225,7 @@ void odyssey2_state::ef9341_w( UINT8 command, UINT8 b, UINT8 data )
 }
 
 
-UINT8 odyssey2_state::ef9341_r( UINT8 command, UINT8 b )
+UINT8 ef9340_1_device::ef9341_read( UINT8 command, UINT8 b )
 {
 	UINT8   data = 0xFF;
 
@@ -257,16 +256,11 @@ UINT8 odyssey2_state::ef9341_r( UINT8 command, UINT8 b )
 }
 
 
-void odyssey2_state::ef9340_scanline(int vpos)
+void ef9340_1_device::ef9340_scanline(int vpos)
 {
-	if ( vpos < m_start_vpos )
+	if ( vpos < 250 )
 	{
-		return;
-	}
-
-	if ( vpos < m_start_vblank )
-	{
-		int y = vpos - m_start_vpos;
+		int y = vpos - 0;
 		int y_row, slice;
 
 		if ( y < 10 )
@@ -286,7 +280,7 @@ void odyssey2_state::ef9340_scanline(int vpos)
 
 				for ( int i = 0; i < 40 * 8; i++ )
 				{
-					m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN*2 + i ) = 24;
+					m_tmp_bitmap.pix16(vpos, 0 + i ) = 24;
 				}
 				return;
 			}
@@ -303,8 +297,8 @@ void odyssey2_state::ef9340_scanline(int vpos)
 			UINT16 addr = ef9340_get_c_addr( x, y_row );
 			UINT8 a = m_ef934x_ram_a[addr];
 			UINT8 b = m_ef934x_ram_b[addr];
-			UINT8 fg = 24;
-			UINT8 bg = 24;
+			UINT8 fg = 0;
+			UINT8 bg = 0;
 			UINT8 char_data = 0x00;
 
 			if ( a & 0x80 )
@@ -322,13 +316,13 @@ void odyssey2_state::ef9340_scanline(int vpos)
 				{
 					// Normal
 					char_data = ef9341_char_set[0][b & 0x7f][slice];
-					fg = 24 + ( a & 0x07 );
+					fg = bgr2rgb[ a & 0x07 ];
 				}
 			}
 
 			for ( int i = 0; i < 8; i++ )
 			{
-				m_tmp_bitmap.pix16(vpos, I824X_START_ACTIVE_SCAN*2 + x*8 + i ) = (char_data & 0x80) ? fg : bg;
+				m_tmp_bitmap.pix16(vpos, 0 + x*8 + i ) = (char_data & 0x80) ? fg : bg;
 				char_data <<= 1;
 			}
 		}

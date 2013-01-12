@@ -1302,7 +1302,6 @@ $(MESSOBJ)/luxor.a:             \
 	$(MESS_MACHINE)/s1410.o     \
 
 $(MESSOBJ)/magnavox.a:          \
-	$(MESS_VIDEO)/odyssey2.o    \
 	$(MESS_DRIVERS)/odyssey2.o  \
 
 $(MESSOBJ)/mattel.a:            \
