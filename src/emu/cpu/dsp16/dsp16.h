@@ -55,7 +55,7 @@ protected:
 
 	// CPU registers
 	// ROM Address Arithmetic Unit (XAAU)
-	UINT16 m_i;     // 12 bits
+	UINT16 m_i;		// 12 bits
 	UINT16 m_pc;
 	UINT16 m_pt;
 	UINT16 m_pr;
@@ -73,15 +73,16 @@ protected:
 	UINT16 m_x;
 	UINT32 m_y;
 	UINT32 m_p;
-	UINT64 m_a0;    // 36 bits
-	UINT64 m_a1;    // 36 bits
-	UINT8 m_auc;    // 6 bits
+	UINT64 m_a0;	// 36 bits
+	UINT64 m_a1;	// 36 bits
+	UINT8 m_auc;	// 6 bits
 	UINT16 m_psw;
 	UINT8 m_c0;
 	UINT8 m_c1;
 	UINT8 m_c2;
 	// Serial and parallel interfaces
 	UINT16 m_sioc;
+	UINT16 m_srta;
 	UINT16 m_pioc;
 
 	// internal stuff
@@ -123,6 +124,7 @@ protected:
 	// helpers
 	void* addressYL();
 	void writeRegister(void* reg, const UINT16& value);
+	bool conditionTest(const UINT8& CON);
 };
 
 
@@ -136,12 +138,12 @@ extern const device_type DSP16;
 
 enum
 {
-	DSP16_I,        // ROM Address Arithmetic Unit (XAAU)
+	DSP16_I,		// ROM Address Arithmetic Unit (XAAU)
 	DSP16_PC,
 	DSP16_PT,
 	DSP16_PR,
 	DSP16_PI,
-	DSP16_J,        // RAM Address Arithmetic Unit (YAAU)
+	DSP16_J,		// RAM Address Arithmetic Unit (YAAU)
 	DSP16_K,
 	DSP16_RB,
 	DSP16_RE,
@@ -149,7 +151,7 @@ enum
 	DSP16_R1,
 	DSP16_R2,
 	DSP16_R3,
-	DSP16_X,        // Data Arithmetic Unit (DAU)
+	DSP16_X,		// Data Arithmetic Unit (DAU)
 	DSP16_Y,
 	DSP16_P,
 	DSP16_A0,
@@ -160,6 +162,7 @@ enum
 	DSP16_C1,
 	DSP16_C2,
 	DSP16_SIOC,
+	DSP16_SRTA,
 	DSP16_PIOC
 };
 

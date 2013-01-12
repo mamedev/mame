@@ -30,42 +30,43 @@ const device_type DSP16 = &device_creator<dsp16_device>;
 
 dsp16_device::dsp16_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, DSP16, "DSP16", tag, owner, clock),
-		m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1),
-		m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1),
-		m_i(0),
-		m_pc(0),
-		m_pt(0),
-		m_pr(0),
-		m_pi(0),
-		m_j(0),
-		m_k(0),
-		m_rb(0),
-		m_re(0),
-		m_r0(0),
-		m_r1(0),
-		m_r2(0),
-		m_r3(0),
-		m_x(0),
-		m_y(0),
-		m_p(0),
-		m_a0(0),
-		m_a1(0),
-		m_auc(0),
-		m_psw(0),
-		m_c0(0),
-		m_c1(0),
-		m_c2(0),
-		m_sioc(0),
-		m_pioc(0),
-		m_ppc(0),
-		m_cacheStart(CACHE_INVALID),
-		m_cacheEnd(CACHE_INVALID),
-		m_cacheRedoNextPC(CACHE_INVALID),
-		m_cacheIterations(0),
-		m_program(NULL),
-		m_data(NULL),
-		m_direct(NULL),
-		m_icount(0)
+	  m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1),
+	  m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1),
+	  m_i(0),
+	  m_pc(0),
+	  m_pt(0),
+	  m_pr(0),
+	  m_pi(0),
+	  m_j(0),
+	  m_k(0),
+	  m_rb(0),
+	  m_re(0),
+	  m_r0(0),
+	  m_r1(0),
+	  m_r2(0),
+	  m_r3(0),
+	  m_x(0),
+	  m_y(0),
+	  m_p(0),
+	  m_a0(0),
+	  m_a1(0),
+	  m_auc(0),
+	  m_psw(0),
+	  m_c0(0),
+	  m_c1(0),
+	  m_c2(0),
+	  m_sioc(0),
+	  m_srta(0),
+	  m_pioc(0),
+	  m_ppc(0),
+	  m_cacheStart(CACHE_INVALID),
+	  m_cacheEnd(CACHE_INVALID),
+	  m_cacheRedoNextPC(CACHE_INVALID),
+	  m_cacheIterations(0),
+	  m_program(NULL),
+	  m_data(NULL),
+	  m_direct(NULL),
+	  m_icount(0)
 {
 	// Allocate & setup
 }
@@ -106,6 +107,7 @@ void dsp16_device::device_start()
 	state_add(DSP16_C1,       "C1",        m_c1);
 	state_add(DSP16_C2,       "C2",        m_c2);
 	state_add(DSP16_SIOC,     "SIOC",      m_sioc).formatstr("%16s");
+	state_add(DSP16_SRTA,     "SRTA",      m_srta);
 	state_add(DSP16_PIOC,     "PIOC",      m_pioc); //.formatstr("%16s");
 
 	// register our state for saving
@@ -133,6 +135,7 @@ void dsp16_device::device_start()
 	save_item(NAME(m_c1));
 	save_item(NAME(m_c2));
 	save_item(NAME(m_sioc));
+	save_item(NAME(m_srta));
 	save_item(NAME(m_pioc));
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_cacheStart));
@@ -159,6 +162,7 @@ void dsp16_device::device_reset()
 	// Page 7-5
 	m_pc = 0x0000;
 	m_sioc = 0x0000;
+	// SRTA is unaltered by reset
 	m_pioc = 0x0008;
 	m_rb = 0x0000;
 	m_re = 0x0000;
@@ -182,8 +186,8 @@ void dsp16_device::device_reset()
 const address_space_config *dsp16_device::memory_space_config(address_spacenum spacenum) const
 {
 	return (spacenum == AS_PROGRAM) ? &m_program_config :
-			(spacenum == AS_DATA) ? &m_data_config :
-			NULL;
+		   (spacenum == AS_DATA) ? &m_data_config :
+		   NULL;
 }
 
 
@@ -312,7 +316,7 @@ void dsp16_device::execute_run()
 	do
 	{
 		// debugging
-		m_ppc = m_pc;   // copy PC to previous PC
+		m_ppc = m_pc;	// copy PC to previous PC
 		debugger_instruction_hook(this, m_pc);
 
 		// instruction fetch & execute
