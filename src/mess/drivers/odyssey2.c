@@ -9,8 +9,6 @@
 
   TODO:
   - Reimplement the cartridge slot, and thus also the voice, as a slot device
-  - In case any more machines turn up using the i8245, reimplemnt it as a
-    real device.
   - In case any more machines (TVs?) turn up using the EF9340 and/or EF9341,
     reimplement as a real device.
 
