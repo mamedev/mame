@@ -1,8 +1,526 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.1" blue="0.1" />
+		</led7seg>
+	</element>
+
+	<element name="static_black">
+		<rect>
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="static_gray">
+		<rect>
+			<color red="0.6" green="0.6" blue="0.6" />
+		</rect>
+	</element>
+
+	<element name="static_white">
+		<rect>
+			<color red="0.95" green="0.95" blue="0.95" />
+		</rect>
+	</element>
+	<element name="disk_white">
+		<disk>
+			<color red="0.95" green="0.95" blue="0.95" />
+		</disk>
+	</element>
+
+	<element name="static_red">
+		<rect>
+			<color red="0.8" green="0.1" blue="0.0" />
+		</rect>
+	</element>
+	<element name="disk_red">
+		<disk>
+			<color red="0.8" green="0.1" blue="0.0" />
+		</disk>
+	</element>
+
+	<element name="static_green">
+		<rect>
+			<color red="0.15" green="0.8" blue="0.1" />
+		</rect>
+	</element>
+	<element name="disk_green">
+		<disk>
+			<color red="0.15" green="0.8" blue="0.1" />
+		</disk>
+	</element>
+
+	<element name="static_yellow">
+		<rect>
+			<color red="0.8" green="0.75" blue="0.1" />
+		</rect>
+	</element>
+	<element name="disk_yellow">
+		<disk>
+			<color red="0.8" green="0.75" blue="0.1" />
+		</disk>
+	</element>
+
+
+<!-- define text -->
+
+	<element name="text_result">
+		<text string="result" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_credits">
+		<text string="credits" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_time">
+		<text string="TIME">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_s">
+		<text string="S">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_c">
+		<text string="C">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_o">
+		<text string="O">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_r">
+		<text string="R">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_e">
+		<text string="E">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_i">
+		<text string="I">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_n">
+		<text string="N">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_f">
+		<text string="F">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_h">
+		<text string="H">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_g">
+		<text string="G">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_1">
+		<text string="1" align="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_2">
+		<text string="2" align="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_3">
+		<text string="3" align="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_4">
+		<text string="4" align="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_5">
+		<text string="5" align="2">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<element name="text_st">
+		<text string="st" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_nd">
+		<text string="nd" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_rd">
+		<text string="rd" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="text_th">
+		<text string="th" align="1">
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+
+
 	<view name="Simple LEDs">
+		<bounds left="0" top="-124" right="300" bottom="325" />
+
+<!-- NOTE: visible screen is not 3:4, partially cut from view horizontally -->
+<!-- (see imolagp.c MCFG_SCREEN_VISIBLE_AREA) -->
+
 		<screen index="0">
-			<bounds left="0" top="0" right="3" bottom="4" />
+			<bounds left="0" top="0" right="300" bottom="325" />
 		</screen>
+
+
+<!-- color bars -->
+
+		<bezel element="static_green">
+			<bounds x="0" y="-120" width="8" height="116" />
+		</bezel>
+		<bezel element="disk_green">
+			<bounds x="0" y="-124" width="8" height="8" />
+		</bezel>
+
+		<bezel element="static_red">
+			<bounds x="10" y="-120" width="8" height="116" />
+		</bezel>
+		<bezel element="disk_red">
+			<bounds x="10" y="-124" width="8" height="8" />
+		</bezel>
+
+		<bezel element="static_red">
+			<bounds x="26" y="-60" width="8" height="56" />
+		</bezel>
+		<bezel element="disk_red">
+			<bounds x="26" y="-64" width="8" height="8" />
+		</bezel>
+
+		<bezel element="static_green">
+			<bounds x="95" y="-60" width="8" height="56" />
+		</bezel>
+		<bezel element="disk_green">
+			<bounds x="95" y="-64" width="8" height="8" />
+		</bezel>
+
+		<bezel element="static_yellow">
+			<bounds x="105" y="-60" width="8" height="56" />
+		</bezel>
+		<bezel element="disk_yellow">
+			<bounds x="105" y="-64" width="8" height="8" />
+		</bezel>
+
+		<bezel element="static_red">
+			<bounds x="115" y="-60" width="8" height="56" />
+		</bezel>
+		<bezel element="disk_red">
+			<bounds x="115" y="-64" width="8" height="8" />
+		</bezel>
+
+		<bezel element="static_white">
+			<bounds x="177" y="-60" width="8" height="56" />
+		</bezel>
+		<bezel element="disk_white">
+			<bounds x="177" y="-64" width="8" height="8" />
+		</bezel>
+
+		<bezel element="static_green">
+			<bounds x="187" y="-60" width="8" height="56" />
+		</bezel>
+		<bezel element="disk_green">
+			<bounds x="187" y="-64" width="8" height="8" />
+		</bezel>
+
+		<bezel element="static_yellow">
+			<bounds x="282" y="-120" width="8" height="116" />
+		</bezel>
+		<bezel element="disk_yellow">
+			<bounds x="282" y="-124" width="8" height="8" />
+		</bezel>
+
+		<bezel element="static_green">
+			<bounds x="292" y="-120" width="8" height="116" />
+		</bezel>
+		<bezel element="disk_green">
+			<bounds x="292" y="-124" width="8" height="8" />
+		</bezel>
+
+
+<!-- score -->
+
+		<bezel element="text_s">
+			<bounds x="10" y="-122" width="8" height="9" />
+		</bezel>
+		<bezel element="text_c">
+			<bounds x="10" y="-112.5" width="8" height="9" />
+		</bezel>
+		<bezel element="text_o">
+			<bounds x="10" y="-103" width="8" height="9" />
+		</bezel>
+		<bezel element="text_r">
+			<bounds x="10" y="-93.5" width="8" height="9" />
+		</bezel>
+		<bezel element="text_e">
+			<bounds x="10" y="-84" width="8" height="9" />
+		</bezel>
+
+		<bezel element="static_gray">
+			<bounds x="20" y="-117" width="73" height="31" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="22" y="-115" width="69" height="27" />
+		</bezel>
+
+		<bezel name="digit0" element="digit">
+			<bounds x="26.5" y="-113" width="15" height="23" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="41.5" y="-113" width="15" height="23" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="56.5" y="-113" width="15" height="23" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="71.5" y="-113" width="15" height="23" />
+		</bezel>
+
+
+<!-- result/credits -->
+
+		<bezel element="text_i">
+			<bounds x="26" y="-54" width="8" height="9" />
+		</bezel>
+		<bezel element="text_n">
+			<bounds x="26" y="-44.5" width="8" height="9" />
+		</bezel>
+		<bezel element="text_f">
+			<bounds x="26" y="-35" width="8" height="9" />
+		</bezel>
+		<bezel element="text_o">
+			<bounds x="26" y="-25.5" width="8" height="9" />
+		</bezel>
+
+		<bezel element="static_gray">
+			<bounds x="36" y="-57" width="57" height="43" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="38" y="-55" width="53" height="39" />
+		</bezel>
+
+		<bezel name="digit10" element="digit">
+			<bounds x="42" y="-53" width="10" height="15" />
+		</bezel>
+		<bezel name="digit11" element="digit">
+			<bounds x="52" y="-53" width="10" height="15" />
+		</bezel>
+
+		<bezel name="digit12" element="digit">
+			<bounds x="42" y="-33" width="10" height="15" />
+		</bezel>
+		<bezel name="digit13" element="digit">
+			<bounds x="52" y="-33" width="10" height="15" />
+		</bezel>
+
+		<bezel element="text_result">
+			<bounds x="65" y="-54" width="40" height="10" />
+		</bezel>
+		<bezel element="text_credits">
+			<bounds x="65" y="-34" width="40" height="10" />
+		</bezel>
+
+
+<!-- time -->
+
+<!-- (the area above TIME has a racecar drawn on the cab) -->
+
+		<bezel element="static_green">
+			<bounds x="125" y="-64" width="50" height="55" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="129" y="-59" width="42" height="30" />
+		</bezel>
+		<bezel element="static_gray">
+			<bounds x="129" y="-45" width="42" height="31" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="131" y="-43" width="38" height="27" />
+		</bezel>
+
+		<bezel element="text_time">
+			<bounds x="129" y="-60" width="42" height="15" />
+		</bezel>
+
+		<bezel name="digit4" element="digit">
+			<bounds x="135" y="-41" width="15" height="23" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds x="150" y="-41" width="15" height="23" />
+		</bezel>
+
+
+<!-- highscores -->
+
+		<bezel element="static_gray">
+			<bounds x="197" y="-117" width="83" height="103" />
+		</bezel>
+		<bezel element="static_black">
+			<bounds x="199" y="-115" width="79" height="99" />
+		</bezel>
+
+		<bezel element="text_1">
+			<bounds x="212" y="-114" width="10" height="15" />
+		</bezel>
+		<bezel element="text_st">
+			<bounds x="222.5" y="-114" width="10" height="10" />
+		</bezel>
+		<bezel name="digit32" element="digit">
+			<bounds x="234" y="-113" width="10" height="15" />
+		</bezel>
+		<bezel name="digit33" element="digit">
+			<bounds x="244" y="-113" width="10" height="15" />
+		</bezel>
+		<bezel name="digit34" element="digit">
+			<bounds x="254" y="-113" width="10" height="15" />
+		</bezel>
+		<bezel name="digit35" element="digit">
+			<bounds x="264" y="-113" width="10" height="15" />
+		</bezel>
+
+		<bezel element="text_2">
+			<bounds x="212" y="-94" width="10" height="15" />
+		</bezel>
+		<bezel element="text_nd">
+			<bounds x="222.5" y="-94" width="10" height="10" />
+		</bezel>
+		<bezel name="digit36" element="digit">
+			<bounds x="234" y="-93" width="10" height="15" />
+		</bezel>
+		<bezel name="digit37" element="digit">
+			<bounds x="244" y="-93" width="10" height="15" />
+		</bezel>
+		<bezel name="digit24" element="digit">
+			<bounds x="254" y="-93" width="10" height="15" />
+		</bezel>
+		<bezel name="digit25" element="digit">
+			<bounds x="264" y="-93" width="10" height="15" />
+		</bezel>
+
+		<bezel element="text_3">
+			<bounds x="212" y="-74" width="10" height="15" />
+		</bezel>
+		<bezel element="text_rd">
+			<bounds x="222.5" y="-74" width="10" height="10" />
+		</bezel>
+		<bezel name="digit26" element="digit">
+			<bounds x="234" y="-73" width="10" height="15" />
+		</bezel>
+		<bezel name="digit27" element="digit">
+			<bounds x="244" y="-73" width="10" height="15" />
+		</bezel>
+		<bezel name="digit28" element="digit">
+			<bounds x="254" y="-73" width="10" height="15" />
+		</bezel>
+		<bezel name="digit29" element="digit">
+			<bounds x="264" y="-73" width="10" height="15" />
+		</bezel>
+
+		<bezel element="text_4">
+			<bounds x="212" y="-54" width="10" height="15" />
+		</bezel>
+		<bezel element="text_th">
+			<bounds x="222.5" y="-54" width="10" height="10" />
+		</bezel>
+		<bezel name="digit16" element="digit">
+			<bounds x="234" y="-53" width="10" height="15" />
+		</bezel>
+		<bezel name="digit17" element="digit">
+			<bounds x="244" y="-53" width="10" height="15" />
+		</bezel>
+		<bezel name="digit18" element="digit">
+			<bounds x="254" y="-53" width="10" height="15" />
+		</bezel>
+		<bezel name="digit19" element="digit">
+			<bounds x="264" y="-53" width="10" height="15" />
+		</bezel>
+
+		<bezel element="text_5">
+			<bounds x="212" y="-34" width="10" height="15" />
+		</bezel>
+		<bezel element="text_th">
+			<bounds x="222.5" y="-34" width="10" height="10" />
+		</bezel>
+		<bezel name="digit20" element="digit">
+			<bounds x="234" y="-33" width="10" height="15" />
+		</bezel>
+		<bezel name="digit21" element="digit">
+			<bounds x="244" y="-33" width="10" height="15" />
+		</bezel>
+		<bezel name="digit8" element="digit">
+			<bounds x="254" y="-33" width="10" height="15" />
+		</bezel>
+		<bezel name="digit9" element="digit">
+			<bounds x="264" y="-33" width="10" height="15" />
+		</bezel>
+
+		<bezel element="static_red">
+			<bounds x="199" y="-115" width="14" height="99" />
+		</bezel>
+		<bezel element="text_h">
+			<bounds x="199" y="-113" width="14" height="9" />
+		</bezel>
+		<bezel element="text_i">
+			<bounds x="199" y="-103.5" width="14" height="9" />
+		</bezel>
+		<bezel element="text_g">
+			<bounds x="199" y="-94" width="14" height="9" />
+		</bezel>
+		<bezel element="text_h">
+			<bounds x="199" y="-84.5" width="14" height="9" />
+		</bezel>
+		<bezel element="text_s">
+			<bounds x="199" y="-75" width="14" height="9" />
+		</bezel>
+		<bezel element="text_c">
+			<bounds x="199" y="-65.5" width="14" height="9" />
+		</bezel>
+		<bezel element="text_o">
+			<bounds x="199" y="-56" width="14" height="9" />
+		</bezel>
+		<bezel element="text_r">
+			<bounds x="199" y="-46.5" width="14" height="9" />
+		</bezel>
+		<bezel element="text_e">
+			<bounds x="199" y="-37" width="14" height="9" />
+		</bezel>
+		<bezel element="text_s">
+			<bounds x="199" y="-27.5" width="14" height="9" />
+		</bezel>
+
+
 	</view>
 </mamelayout>
