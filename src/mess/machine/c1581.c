@@ -11,7 +11,9 @@
 
     TODO:
 
-    - wd_fdc drops the busy bit too soon, c1581 aborts reading the sector ID after the first CRC byte @CD17
+	- drive not ready if ready_r() is connected to CIA
+	- format fails (seeks to directory track and reports BAD DISK error)
+    - save fails (no error message, but no file added to directory either)
 
 */
 
@@ -117,7 +119,7 @@ const rom_entry *base_c1581_device::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( c1581_mem, AS_PROGRAM, 8, base_c1581_device )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, mos8520_device, read, write)
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1772_TAG, wd1772_t, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
@@ -162,7 +164,7 @@ READ8_MEMBER( base_c1581_device::cia_pa_r )
 	UINT8 data = 0;
 
 	// ready
-	data |= !m_floppy->ready_r() << 1;
+	//data |= !m_floppy->ready_r() << 1;
 
 	// device number
 	data |= (m_address - 8) << 3;

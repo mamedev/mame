@@ -135,76 +135,48 @@ const d81_format::format d81_format::formats[] = {
 	{}
 };
 
-bool d81_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+floppy_image_format_t::desc_e* d81_format::get_desc_mfm(const format &f, int &current_size, int &end_gap_index)
 {
-	int type = find_size(io, form_factor);
-	if(type == -1)
-		return false;
+  static floppy_image_format_t::desc_e desc[25] = {
+    /* 00 */ { MFM, 0x4e, f.gap_1 },
+    /* 01 */ { SECTOR_LOOP_START, 0, f.sector_count-1 },
+    /* 02 */ {   MFM, 0x00, 12 },
+    /* 03 */ {   CRC_CCITT_START, 1 },
+    /* 04 */ {     RAW, 0x4489, 3 },
+    /* 05 */ {     MFM, 0xfe, 1 },
+    /* 06 */ {     TRACK_ID },
+    /* 07 */ {     HEAD_ID_SWAP },
+    /* 08 */ {     SECTOR_ID },
+    /* 09 */ {     SIZE_ID },
+    /* 10 */ {   CRC_END, 1 },
+    /* 11 */ {   CRC, 1 },
+    /* 12 */ {   MFM, 0x4e, f.gap_2 },
+    /* 13 */ {   MFM, 0x00, 12 },
+    /* 14 */ {   CRC_CCITT_START, 2 },
+    /* 15 */ {     RAW, 0x4489, 3 },
+    /* 16 */ {     MFM, 0xfb, 1 },
+    /* 17 */ {     SECTOR_DATA, -1 },
+    /* 18 */ {   CRC_END, 2 },
+    /* 19 */ {   CRC, 2 },
+    /* 20 */ {   MFM, 0x4e, f.gap_3 },
+    /* 21 */ { SECTOR_LOOP_END },
+    /* 22 */ { MFM, 0x4e, 0 },
+    /* 23 */ { RAWBITS, 0x9254, 0 },
+    /* 24 */ { END }
+  };
 
-	const format &f = formats[type];
+  current_size = f.gap_1*16;
+  if(f.sector_base_size)
+    current_size += f.sector_base_size * f.sector_count * 16;
+  else {
+    for(int j=0; j != f.sector_count; j++)
+      current_size += f.per_sector_size[j] * 16;
+  }
+  current_size += (12+3+1+4+2+f.gap_2+12+3+1+2+f.gap_3) * f.sector_count * 16;
 
-	floppy_image_format_t::desc_e desc[] = {
-		/* 00 */ { MFM, 0x4e, f.gap_1 },
-		/* 01 */ { SECTOR_LOOP_START, 0, f.sector_count-1 },
-		/* 02 */ {   MFM, 0x00, 12 },
-		/* 03 */ {   CRC_CCITT_START, 1 },
-		/* 04 */ {     RAW, 0x4489, 3 },
-		/* 05 */ {     MFM, 0xfe, 1 },
-		/* 06 */ {     TRACK_ID },
-		/* 07 */ {     HEAD_ID_SWAP },
-		/* 08 */ {     SECTOR_ID },
-		/* 09 */ {     SIZE_ID },
-		/* 10 */ {   CRC_END, 1 },
-		/* 11 */ {   CRC, 1 },
-		/* 12 */ {   MFM, 0x4e, f.gap_2 },
-		/* 13 */ {   MFM, 0x00, 12 },
-		/* 14 */ {   CRC_CCITT_START, 2 },
-		/* 15 */ {     RAW, 0x4489, 3 },
-		/* 16 */ {     MFM, 0xfb, 1 },
-		/* 17 */ {     SECTOR_DATA, -1 },
-		/* 18 */ {   CRC_END, 2 },
-		/* 19 */ {   CRC, 2 },
-		/* 20 */ {   MFM, 0x4e, f.gap_3 },
-		/* 21 */ { SECTOR_LOOP_END },
-		/* 22 */ { MFM, 0x4e, 0 },
-		/* 23 */ { RAWBITS, 0x9254, 0 },
-		/* 24 */ { END }
-	};
+  end_gap_index = 22;
 
-	int current_size = f.gap_1*16;
-	if(f.sector_base_size)
-		current_size += f.sector_base_size * f.sector_count * 16;
-	else {
-		for(int j=0; j != f.sector_count; j++)
-			current_size += f.per_sector_size[j] * 16;
-	}
-	current_size += (12+3+1+4+2+f.gap_2+12+3+1+2+f.gap_3) * f.sector_count * 16;
-
-	int total_size = 200000000/f.cell_size;
-	int remaining_size = total_size - current_size;
-	if(remaining_size < 0)
-		throw emu_fatalerror("d81_format: Incorrect track layout, max_size=%d, current_size=%d", total_size, current_size);
-
-	// Fixup the end gap
-	desc[22].p2 = remaining_size / 16;
-	desc[23].p2 = remaining_size & 15;
-	desc[23].p1 >>= 16-(remaining_size & 15);
-
-	int track_size = compute_track_size(f);
-
-	UINT8 sectdata[40*512];
-	desc_s sectors[40];
-	build_sector_description(f, sectdata, sectors);
-
-	for(int track=0; track < f.track_count; track++)
-		for(int head=0; head < f.head_count; head++) {
-			io_generic_read(io, sectdata, (track*f.head_count + !head)*track_size, track_size);
-			generate_track(desc, track, head, sectors, f.sector_count, total_size, image);
-		}
-
-	image->set_variant(f.variant);
-
-	return true;
+  return desc;
 }
 
 const floppy_format_type FLOPPY_D81_FORMAT = &floppy_image_format_creator<d81_format>;

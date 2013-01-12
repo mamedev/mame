@@ -19,7 +19,7 @@ public:
 	virtual const char *description() const;
 	virtual const char *extensions() const;
 
-	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
+	virtual floppy_image_format_t::desc_e* get_desc_mfm(const format &f, int &current_size, int &end_gap_index);
 
 private:
 	static const format formats[];
