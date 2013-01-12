@@ -243,6 +243,9 @@ static MACHINE_CONFIG_START( prof180x, prof180x_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 	MCFG_RAM_EXTRA_OPTIONS("256K,512K")
+
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "prof180")
 MACHINE_CONFIG_END
 
 /* ROM definition */
