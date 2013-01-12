@@ -7249,7 +7249,6 @@ src/mess/machine/nubus_image.c svneol=native#text/plain
 src/mess/machine/nubus_image.h svneol=native#text/plain
 src/mess/machine/null_modem.c svneol=native#text/plain
 src/mess/machine/null_modem.h svneol=native#text/plain
-src/mess/machine/odyssey2.c svneol=native#text/plain
 src/mess/machine/omti8621.c svneol=native#text/plain
 src/mess/machine/omti8621.h svneol=native#text/plain
 src/mess/machine/ondra.c svneol=native#text/plain
