@@ -602,6 +602,26 @@ WRITE8_MEMBER( sega315_5124_device::register_write )
 			if (reg_num == 1)
 			{
 				m_check_vint_timer->adjust( m_screen->time_until_pos( m_screen->vpos(), VINT_HPOS) );
+
+				//
+				// When running eagles5 on the ssm2kr driver the irq_state is 1 because of some
+				// previos HINTs that occured. eagles5 sets register 01 to 0x02 and expects
+				// the irq state to be cleared after that.
+				// The following bit of code takes care of that.
+				//
+				if ((m_status & STATUS_VINT) && !(m_reg[0x01] & 0x20))
+				{
+					if (m_irq_state == 1)
+					{
+						m_irq_state = 0;
+
+						if ( !m_cb_int.isnull() )
+						{
+							m_cb_int(CLEAR_LINE);
+						}
+					}
+				}
+
 			}
 			m_addrmode = 0;
 			break;

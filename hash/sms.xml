@@ -1777,7 +1777,7 @@
 		</part>
 	</software>
 
-	<software name="eagles5" supported="no">
+	<software name="eagles5">
 		<description>Eagles 5 (Kor)</description>
 		<year>1990</year>
 		<publisher>Zemina</publisher>
