@@ -154,6 +154,7 @@ public:
 	virtual void call_display() { }
 	virtual void call_display_info() { }
 	virtual device_image_partialhash_func get_partial_hash() const { return NULL; }
+	virtual bool core_opens_image_file() const { return TRUE; }
 	virtual iodevice_t image_type()  const = 0;
 	virtual bool is_readable()  const = 0;
 	virtual bool is_writeable() const = 0;

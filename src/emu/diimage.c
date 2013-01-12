@@ -936,47 +936,50 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 	if (m_err)
 		goto done;
 
-	/* Check if there's a software list defined for this device and use that if we're not creating an image */
-	if (!filename_has_period && !just_load)
+	if (core_opens_image_file())
 	{
-		softload = load_software_part( device().machine().options(), this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name, &m_software_list_name );
-		// if we had launched from softlist with a specified part, e.g. "shortname:part"
-		// we would have recorded the wrong name, so record it again based on software_info
-		if (m_software_info_ptr && m_full_software_name)
-			m_err = set_image_filename(m_full_software_name);
-
-		m_from_swlist = TRUE;
-	}
-
-	if (is_create || filename_has_period)
-	{
-		/* determine open plan */
-		determine_open_plan(is_create, open_plan);
-
-		/* attempt to open the file in various ways */
-		for (i = 0; !m_file && open_plan[i]; i++)
+		/* Check if there's a software list defined for this device and use that if we're not creating an image */
+		if (!filename_has_period && !just_load)
 		{
-			/* open the file */
-			m_err = load_image_by_path(open_plan[i], path);
-			if (m_err && (m_err != IMAGE_ERROR_FILENOTFOUND))
-				goto done;
+			softload = load_software_part( device().machine().options(), this, path, &m_software_info_ptr, &m_software_part_ptr, &m_full_software_name, &m_software_list_name );
+			// if we had launched from softlist with a specified part, e.g. "shortname:part"
+			// we would have recorded the wrong name, so record it again based on software_info
+			if (m_software_info_ptr && m_full_software_name)
+				m_err = set_image_filename(m_full_software_name);
+
+			m_from_swlist = TRUE;
 		}
-	}
 
-	/* Copy some image information when we have been loaded through a software list */
-	if ( m_software_info_ptr )
-	{
-		m_longname = m_software_info_ptr->longname;
-		m_manufacturer = m_software_info_ptr->publisher;
-		m_year = m_software_info_ptr->year;
-		//m_playable = m_software_info_ptr->supported;
-	}
+		if (is_create || filename_has_period)
+		{
+			/* determine open plan */
+			determine_open_plan(is_create, open_plan);
 
-	/* did we fail to find the file? */
-	if (!is_loaded() && !softload)
-	{
-		m_err = IMAGE_ERROR_FILENOTFOUND;
-		goto done;
+			/* attempt to open the file in various ways */
+			for (i = 0; !m_file && open_plan[i]; i++)
+			{
+				/* open the file */
+				m_err = load_image_by_path(open_plan[i], path);
+				if (m_err && (m_err != IMAGE_ERROR_FILENOTFOUND))
+					goto done;
+			}
+		}
+
+		/* Copy some image information when we have been loaded through a software list */
+		if ( m_software_info_ptr )
+		{
+			m_longname = m_software_info_ptr->longname;
+			m_manufacturer = m_software_info_ptr->publisher;
+			m_year = m_software_info_ptr->year;
+			//m_playable = m_software_info_ptr->supported;
+		}
+
+		/* did we fail to find the file? */
+		if (!is_loaded() && !softload)
+		{
+			m_err = IMAGE_ERROR_FILENOTFOUND;
+			goto done;
+		}
 	}
 
 	/* call device load or create */
