@@ -425,8 +425,11 @@ const char *ui_menu_slot_devices::slot_get_prev(device_slot_interface *slot)
 -------------------------------------------------*/
 const char *ui_menu_slot_devices::get_slot_device(device_slot_interface *slot)
 {
-	astring temp;
-	return machine().options().main_value(temp,slot->device().tag()+1);
+	int idx = slot_get_current_index(slot);
+	if (idx == -1)
+		return "";
+	else
+		return slot->get_slot_interfaces()[idx].name;
 }
 
 
