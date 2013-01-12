@@ -600,4 +600,19 @@
 		</part>
 	</software>
 
+	<!-- Test/Demo disks -->
+
+	<software name="1581demo">
+		<description>Commodore 1581 3.5" Disk Drive Demo/Utilities</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="354011-07" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="1581demo.d81" size="819200" crc="1c3d6a09" sha1="680ef0511586976bcd90367a41320d35728193fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
