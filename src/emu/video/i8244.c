@@ -94,7 +94,7 @@ static const UINT8 bgr2rgb[8] =
 
 
 //-------------------------------------------------
-//  i8243_device - constructor
+//  i8244_device - constructor
 //-------------------------------------------------
 
 i8244_device::i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
