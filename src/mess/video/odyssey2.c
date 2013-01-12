@@ -15,75 +15,11 @@
 #include "video/ef9341_chargen.h"
 
 
-#define COLLISION_SPRITE_0          0x01
-#define COLLISION_SPRITE_1          0x02
-#define COLLISION_SPRITE_2          0x04
-#define COLLISION_SPRITE_3          0x08
-#define COLLISION_VERTICAL_GRID     0x10
-#define COLLISION_HORIZ_GRID_DOTS   0x20
-#define COLLISION_EXTERNAL_UNUSED   0x40
-#define COLLISION_CHARACTERS        0x80
-
-/* character sprite colors
-   dark grey, red, green, orange, blue, violet, light grey, white
-   dark back / grid colors
-   black, dark blue, dark green, light green, red, violet, orange, light grey
-   light back / grid colors
-   black, blue, green, light green, red, violet, orange, light grey */
-
-const UINT8 odyssey2_colors[] =
-{
-	/* Background,Grid Dim */
-	0x00,0x00,0x00,						// i r g b
-	0x00,0x00,0xFF,   /* Blue */		// i r g B
-	0x00,0x80,0x00,   /* DK Green */	// i r G b
-	0xff,0x9b,0x60,						// i r G B
-	0xCC,0x00,0x00,   /* Red */			// i R g b
-	0xa9,0x80,0xff,						// i R g B
-	0x82,0xfd,0xdb,						// i R G b
-	0xFF,0xFF,0xFF,						// i R G B
-
-	/* Background,Grid Bright */
-	0x80,0x80,0x80,						// I r g b
-	0x50,0xAE,0xFF,   /* Blue */		// I r g B
-	0x00,0xFF,0x00,   /* Dk Green */	// I r G b
-	0x82,0xfb,0xdb,   /* Lt Grey */		// I r G B
-	0xEC,0x02,0x60,   /* Red */			// I R g b
-	0xa9,0x80,0xff,   /* Violet */		// I R g B
-	0xff,0x9b,0x60,   /* Orange */		// I R G b
-	0xFF,0xFF,0xFF,						// I R G B
-
-	/* Character,Sprite colors */
-	0x80,0x80,0x80,   /* Dark Grey */	// I r g b 
-	0xFF,0x80,0x80,   /* Red */			// I R g b
-	0x00,0xC0,0x00,   /* Green */		// I r G b
-	0xff,0x9b,0x60,   /* Orange */		// I R G b
-	0x50,0xAE,0xFF,   /* Blue */		// I r g B
-	0xa9,0x80,0xff,   /* Violet */		// I R g B
-	0x82,0xfb,0xdb,   /* Lt Grey */		// I r G B
-	0xff,0xff,0xff,   /* White */		// I R G B
-
-	/* EF9340/EF9341 colors */
-	0x00, 0x00, 0x00,
-	0x00, 0x00, 0xFF,
-	0x00, 0xFF, 0x00,
-	0x00, 0xFF, 0xFF,
-	0xFF, 0x00, 0x00,
-	0xFF, 0x00, 0xFF,
-	0xFF, 0xFF, 0x00,
-	0xFF, 0xFF, 0xFF
-};
-
-
-void odyssey2_state::palette_init()
-{
-	int i;
-
-	for ( i = 0; i < 32; i++ )
-	{
-		palette_set_color_rgb( machine(), i, odyssey2_colors[i*3], odyssey2_colors[i*3+1], odyssey2_colors[i*3+2] );
-	}
-}
+#define I824X_START_ACTIVE_SCAN         6
+#define I824X_END_ACTIVE_SCAN           (6 + 160)
+#define I824X_START_Y                   1
+#define I824X_SCREEN_HEIGHT             243
+#define I824X_LINE_CLOCKS               228
 
 
 void odyssey2_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -142,17 +78,6 @@ void odyssey2_state::video_start_g7400()
 	m_g7400 = true;
 }
 
-
-/***************************************************************************
-
-  Refresh the video screen
-
-***************************************************************************/
-
-UINT32 odyssey2_state::screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return m_i8244->screen_update(screen, bitmap, cliprect);
-}
 
 
 /*

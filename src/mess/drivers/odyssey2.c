@@ -129,6 +129,68 @@ static INPUT_PORTS_START( odyssey2 )
 INPUT_PORTS_END
 
 
+/* character sprite colors
+   dark grey, red, green, orange, blue, violet, light grey, white
+   dark back / grid colors
+   black, dark blue, dark green, light green, red, violet, orange, light grey
+   light back / grid colors
+   black, blue, green, light green, red, violet, orange, light grey */
+
+const UINT8 odyssey2_colors[] =
+{
+	/* Background,Grid Dim */
+	0x00,0x00,0x00,						// i r g b
+	0x00,0x00,0xFF,   /* Blue */		// i r g B
+	0x00,0x80,0x00,   /* DK Green */	// i r G b
+	0xff,0x9b,0x60,						// i r G B
+	0xCC,0x00,0x00,   /* Red */			// i R g b
+	0xa9,0x80,0xff,						// i R g B
+	0x82,0xfd,0xdb,						// i R G b
+	0xFF,0xFF,0xFF,						// i R G B
+
+	/* Background,Grid Bright */
+	0x80,0x80,0x80,						// I r g b
+	0x50,0xAE,0xFF,   /* Blue */		// I r g B
+	0x00,0xFF,0x00,   /* Dk Green */	// I r G b
+	0x82,0xfb,0xdb,   /* Lt Grey */		// I r G B
+	0xEC,0x02,0x60,   /* Red */			// I R g b
+	0xa9,0x80,0xff,   /* Violet */		// I R g B
+	0xff,0x9b,0x60,   /* Orange */		// I R G b
+	0xFF,0xFF,0xFF,						// I R G B
+
+	/* Character,Sprite colors */
+	0x80,0x80,0x80,   /* Dark Grey */	// I r g b 
+	0xFF,0x80,0x80,   /* Red */			// I R g b
+	0x00,0xC0,0x00,   /* Green */		// I r G b
+	0xff,0x9b,0x60,   /* Orange */		// I R G b
+	0x50,0xAE,0xFF,   /* Blue */		// I r g B
+	0xa9,0x80,0xff,   /* Violet */		// I R g B
+	0x82,0xfb,0xdb,   /* Lt Grey */		// I r G B
+	0xff,0xff,0xff,   /* White */		// I R G B
+
+	/* EF9340/EF9341 colors */
+	0x00, 0x00, 0x00,
+	0x00, 0x00, 0xFF,
+	0x00, 0xFF, 0x00,
+	0x00, 0xFF, 0xFF,
+	0xFF, 0x00, 0x00,
+	0xFF, 0x00, 0xFF,
+	0xFF, 0xFF, 0x00,
+	0xFF, 0xFF, 0xFF
+};
+
+
+void odyssey2_state::palette_init()
+{
+	int i;
+
+	for ( i = 0; i < 32; i++ )
+	{
+		palette_set_color_rgb( machine(), i, odyssey2_colors[i*3], odyssey2_colors[i*3+1], odyssey2_colors[i*3+2] );
+	}
+}
+
+
 WRITE_LINE_MEMBER(odyssey2_state::irq_callback)
 {
 	m_maincpu->set_input_line(0, state);
@@ -321,6 +383,12 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
 	{
 		bitmap->pix16( vpos, x ) |= ( m_lum ^ 0x08 );
 	}
+}
+
+
+UINT32 odyssey2_state::screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	return m_i8244->screen_update(screen, bitmap, cliprect);
 }
 
 

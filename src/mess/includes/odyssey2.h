@@ -11,21 +11,6 @@
 #include "video/i8244.h"
 
 
-#define P1_BANK_LO_BIT            (0x01)
-#define P1_BANK_HI_BIT            (0x02)
-#define P1_KEYBOARD_SCAN_ENABLE   (0x04)  /* active low */
-#define P1_VDC_ENABLE             (0x08)  /* active low */
-#define P1_EXT_RAM_ENABLE         (0x10)  /* active low */
-#define P1_VDC_COPY_MODE_ENABLE   (0x40)
-
-#define P2_KEYBOARD_SELECT_MASK   (0x07)  /* select row to scan */
-
-#define I824X_START_ACTIVE_SCAN         6
-#define I824X_END_ACTIVE_SCAN           (6 + 160)
-#define I824X_START_Y                   1
-#define I824X_SCREEN_HEIGHT             243
-#define I824X_LINE_CLOCKS               228
-
 struct ef9341_t
 {
 	UINT8   TA;
@@ -97,6 +82,15 @@ public:
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
 
 protected:
+	/* constants */
+	static const UINT8 P1_BANK_LO_BIT          = 0x01;
+	static const UINT8 P1_BANK_HI_BIT          = 0x02;
+	static const UINT8 P1_KEYBOARD_SCAN_ENABLE = 0x04; /* active low */
+	static const UINT8 P1_VDC_ENABLE           = 0x08; /* active low */
+	static const UINT8 P1_EXT_RAM_ENABLE       = 0x10; /* active low */
+	static const UINT8 P1_VDC_COPY_MODE_ENABLE = 0x40;
+	static const UINT8 P2_KEYBOARD_SELECT_MASK = 0x07; /* select row to scan */
+
 	ef9340_t m_ef9340;
 	ef9341_t m_ef9341;
 	UINT8   m_ef934x_ram_a[1024];
