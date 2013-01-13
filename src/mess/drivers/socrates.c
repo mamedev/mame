@@ -1107,8 +1107,9 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT       COMPANY                     FULLNAME                            FLAGS */
-COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates_state, socrates, "Video Technology",        "Socrates Educational Video System", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // English NTSC
-COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates_state, socrates, "Video Technology",        "Socrates SAITOUT", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // French Canandian NTSC
-COMP( 1988, profweis,   socrates,   0,      socrates_pal,   socrates, socrates_state, socrates, "Video Technology/Yeno",        "Professor Weiss-Alles", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // German PAL
+COMP( 1988, socrates,   0,          0,      socrates,   socrates, socrates_state, socrates, "Video Technology",        "Socrates Educational Video System", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // English NTSC, no title copyright
+COMP( 1988, socratfc,   socrates,   0,      socrates,   socrates, socrates_state, socrates, "Video Technology",        "Socrates SAITOUT", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // French Canandian NTSC, 1988 title copyright
+COMP( 1988, profweis,   socrates,   0,      socrates_pal,   socrates, socrates_state, socrates, "Video Technology/Yeno",        "Professor Weiss-Alles", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND ) // German PAL, 1988 title copyright
+// there exists a later version of professor weiss-alles with a 1989 titlescreen copyright
 // Yeno Professeur Saitout goes here (french SECAM)
 // ? goes here (spanish PAL)
