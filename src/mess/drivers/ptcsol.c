@@ -17,10 +17,11 @@
     Note that the CONSOL rom is basically a dumb terminal program and doesn't
     do anything useful unless the MODE key (whatever that is) is pressed.
 
-    CUTER is a relocatable cassette-based alternative to SOLOS.
+    CUTER is a relocatable cassette-based alternative to SOLOS. According
+    to the manual, it should work if the sense switches are set to on. But,
+    it continuously reads port 00 and does nothing.
 
-    Need a dump of BOOTLOAD. Need a tape of CUTER. Need orginal dumps of
-    SOLOS, DPMON and CONSOL.
+    Need original dumps of all roms.
 
     The character roms are built by a script from the Solace source, then the
     characters moved back to the original 7x9 matrix positions, as shown in
@@ -129,7 +130,7 @@ public:
 	m_cass2(*this, CASSETTE2_TAG),
 	m_uart(*this, "uart"),
 	m_uart_s(*this, "uart_s"),
-	m_p_videoram(*this, "p_videoram"),
+	m_p_videoram(*this, "videoram"),
 	m_iop_arrows(*this, "ARROWS"),
 	m_iop_config(*this, "CONFIG"),
 	m_iop_s1(*this, "S1"),
@@ -407,7 +408,7 @@ static ADDRESS_MAP_START( sol20_mem, AS_PROGRAM, 8, sol20_state)
 	AM_RANGE(0X0800, 0Xbfff) AM_RAM // optional s100 ram
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0Xc800, 0Xcbff) AM_RAM // system ram
-	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0Xd000, 0Xffff) AM_RAM // optional s100 ram
 ADDRESS_MAP_END
 
@@ -622,9 +623,9 @@ UINT32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	UINT16 sy=0,ma,x,inv;
 	UINT8 polarity = (s1 & 8) ? 0xff : 0;
 
-	UINT8 cursor_inv = FALSE;
+	bool cursor_inv = false;
 	if (((s1 & 0x30) == 0x20) || (((s1 & 0x30) == 0x10) && (m_framecnt & 0x08)))
-		cursor_inv = TRUE;
+		cursor_inv = true;
 
 	m_framecnt++;
 
@@ -642,7 +643,7 @@ UINT32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				chr = m_p_videoram[x & 0x3ff];
 
 				// cursor
-				if (BIT(chr, 7) && cursor_inv)
+				if (BIT(chr, 7) & cursor_inv)
 					inv ^= 0xff;
 
 				chr &= 0x7f;
@@ -674,7 +675,7 @@ UINT32 sol20_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 				*p++ = BIT(gfx, 2);
 				*p++ = BIT(gfx, 1);
 				*p++ = BIT(gfx, 0);
-				*p++ = (inv) ? 1 : 0;
+				*p++ = BIT(inv, 0);
 			}
 		}
 		ma+=64;
@@ -757,6 +758,11 @@ ROM_START( sol20 )
 	ROMX_LOAD( "consol.bin", 0xc000, 0x0400, BAD_DUMP CRC(80bf6d85) SHA1(84b81c60bb08a3a5435ec1be56a67aa695bce099), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "Solos2", "Solos Patched")
 	ROMX_LOAD( "solos2.bin", 0xc000, 0x0800, CRC(7776cc7d) SHA1(c4739a9ea7e8146ce7ae3305ed526b6045efa9d6), ROM_BIOS(4) ) // from Nama
+	ROM_SYSTEM_BIOS(4, "BOOTLOAD", "BOOTLOAD")
+	ROMX_LOAD( "bootload.bin", 0xc000, 0x0800, BAD_DUMP CRC(4261ac71) SHA1(4752408ac85d88857e8e9171c7f42bd623c9271e), ROM_BIOS(5) ) // from Nama
+//        This one doesn't work
+	ROM_SYSTEM_BIOS(5, "CUTER", "CUTER")
+	ROMX_LOAD( "cuter.bin", 0xc000, 0x0800, BAD_DUMP CRC(39cca901) SHA1(33725d6da63e295552ee13f0a735d33aee8f0d17), ROM_BIOS(6) ) // from Nama
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "6574.bin", 0x0000, 0x0800, BAD_DUMP CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
@@ -764,5 +770,5 @@ ROM_START( sol20 )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT               COMPANY                 FULLNAME  FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT               COMPANY                 FULLNAME  FLAGS */
 COMP( 1976, sol20,  0,      0,      sol20,   sol20, sol20_state, sol20, "Processor Technology Corporation", "SOL-20", 0 )
