@@ -110,7 +110,7 @@ static const cassette_interface interact_cassette_interface =
 	hector_cassette_formats,
 	&interact_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
-	NULL,
+	"interact_cass",
 	NULL
 };
 
@@ -173,6 +173,7 @@ static MACHINE_CONFIG_START( interact, interact_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, interact_cassette_interface )
+	MCFG_SOFTWARE_LIST_ADD("cass_list","interact")
 
 	/* printer */
 	MCFG_PRINTER_ADD("printer")

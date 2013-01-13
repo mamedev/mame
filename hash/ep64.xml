@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="enterp" description="Enterprise 64 / 128 floppies">
+
+	<software name="isdos" supported="no">
+		<description>IS-DOS v1.0</description>
+		<year>1985</year>
+		<publisher>Intelligent Software Ltd</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="isdos3_5.img" size="737280" crc="19db0f63" sha1="3842ff90a0930013e23b6e24a770ca1e8694855d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- TOSEC -->
+<!-- These have a WinImage bootsector, and contain traces of other files that are on the other disks -->
+
+	<software name="base" supported="no">
+		<description>The Base</description>
+		<year>1985</year>
+		<publisher>The Adventure Workshop</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="base, the (1985)(the adventure workshop)(part 1 of 2)[req isdos].img" size="737280" crc="ce0f0d3e" sha1="6978202b1de2415795df7fac9f395d12321b3a27" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="base, the (1985)(the adventure workshop)(part 2 of 2)[req isdos].img" size="737280" crc="3ce872f3" sha1="a467299ed78b40686795ddf13820c98ebbe9d81a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="deadline" supported="no">
+		<description>Deadline</description>
+		<year>1986</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="deadline (1986)(infocom)[req isdos].img" size="737280" crc="e194e5c8" sha1="8d810e43fa07808883e3aa85cee702e41629856d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="island" supported="no">
+		<description>The Island</description>
+		<year>1985</year>
+		<publisher>The Adventure Workshop</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="island, the (1985)(the adventure workshop)[req isdos].img" size="737280" crc="691ab47c" sha1="aaa84c8d8484dee798eff4c0e3a445b165073d3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="seastlkr" supported="no">
+		<description>Seastalker</description>
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="seastalker (1984)(infocom)[req isdos].img" size="737280" crc="105f8a24" sha1="56f2c90e07664c73345630b98c7ae3de61649196" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="zork1" supported="no">
+		<description>Zork 1 - The Great Underground Empire</description><!-- why is com file ork1.com? -->
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="zork 1 - the great underground empire (1984)(infocom)[req isdos].img" size="737280" crc="d41c0936" sha1="63fd32ef6b907bba1d7e0b36bb662e415f3fdc1c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="zork2" supported="no">
+		<description>Zork 2 - The Wizard of Frobozz</description><!-- why is com file ork2.com? -->
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="zork 2 - the wizard of frobozz (1984)(infocom)[req isdos].img" size="737280" crc="0a1d32ac" sha1="61ed70c927ea584ee57aef62fb1af011dff11927" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="zork3" supported="no">
+		<description>Zork 3 - The Dungeon Master</description><!-- why is com file ork3.com? -->
+		<year>1984</year>
+		<publisher>Infocom</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="737280">
+				<rom name="zork 3 - the dungeon master (1984)(infocom)[req isdos].img" size="737280" crc="696cb95d" sha1="e94ca5e044e82a44af45d40aa382cfab8055cfda" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+</softwarelist>
