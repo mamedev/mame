@@ -21,28 +21,63 @@ class alphasmart_state : public driver_device
 public:
 	alphasmart_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+			m_maincpu(*this, "maincpu"),
+			m_lcdc(*this, "hd44780"),
+			m_rambank(*this, "rambank")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<hd44780_device> m_lcdc;
+	required_memory_bank m_rambank;
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 
 	virtual void machine_start();
+	virtual void machine_reset();
 	virtual void palette_init();
-//  virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_READ8_MEMBER(port_a_r);
+	DECLARE_WRITE8_MEMBER(port_a_w);
+	DECLARE_READ8_MEMBER(port_d_r);
+	DECLARE_WRITE8_MEMBER(port_d_w);
+
+private:
+	UINT8   m_port_a;
 };
+
+READ8_MEMBER(alphasmart_state::port_a_r)
+{
+	return m_port_a;
+}
+
+WRITE8_MEMBER(alphasmart_state::port_a_w)
+{
+	m_rambank->set_entry(((data>>3) & 0x01) | ((data>>4) & 0x02));
+	m_port_a = data;
+}
+
+READ8_MEMBER(alphasmart_state::port_d_r)
+{
+	return 0;
+}
+
+WRITE8_MEMBER(alphasmart_state::port_d_w)
+{
+
+}
 
 
 static ADDRESS_MAP_START(alphasmart_mem, AS_PROGRAM, 8, alphasmart_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x7fff ) AM_RAM
+	AM_RANGE( 0x0000, 0x7fff ) AM_RAMBANK("rambank")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM   AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(alphasmart_io, AS_IO, 8, alphasmart_state)
 //  AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_DEVREADWRITE("hd44780", hd44780_device, control_read, control_write)
 //  AM_RANGE(MC68HC11_IO_PORTD, MC68HC11_IO_PORTD) AM_DEVREADWRITE("hd44780", hd44780_device, data_read, data_write)
+	AM_RANGE( MC68HC11_IO_PORTA, MC68HC11_IO_PORTA ) AM_READWRITE(port_a_r, port_a_w)
+	AM_RANGE( MC68HC11_IO_PORTD, MC68HC11_IO_PORTD ) AM_READWRITE(port_d_r, port_d_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -57,6 +92,12 @@ void alphasmart_state::palette_init()
 
 void alphasmart_state::machine_start()
 {
+	m_rambank->configure_entries(0, 4, (UINT8*)(*memregion("mainram")), 0x8000);
+}
+
+void alphasmart_state::machine_reset()
+{
+	m_rambank->set_entry(0);
 }
 
 static const hc11_config alphasmart_hc11_config =
@@ -98,6 +139,8 @@ MACHINE_CONFIG_END
 ROM_START( alphasma )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "alphasmartpro212.rom",  0x0000, 0x8000, CRC(896ddf1c) SHA1(c3c6a421c9ced92db97431d04b4a3f09a39de716) )   // Checksum 8D24 on label
+
+	ROM_REGION( 0x20000, "mainram", ROMREGION_ERASE )
 
 	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
 	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
