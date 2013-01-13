@@ -1013,12 +1013,13 @@
 		</part>
 	</software>
 
-	<software name="cso" supported="no">
+	<software name="cso">
 		<description>C_So! (Kor)</description>
 		<year>198?</year>
 		<publisher>Joy Soft</publisher>
 		<info name="alt_title" value="시소" />
 		<part name="cart" interface="sms_cart">
+			<feature name="pcb" value="korean_nobank" />
 			<dataarea name="rom" size="32768">
 				<rom name="c_so! [msx] (kr).bin" size="32768" crc="0918fba0" sha1="e7fefabd7a920fd71e87509d065080855b5b233c" offset="000000" />
 			</dataarea>
