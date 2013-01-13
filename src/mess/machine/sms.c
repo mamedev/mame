@@ -1927,6 +1927,22 @@ MACHINE_START_MEMBER(sms_state,sms)
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(sms_state::lightgun_tick),this));
+
+	// alibaba and blockhol are ports of games for the MSX system. The
+	// MSX bios usually initializes callback "vectors" at the top of RAM.
+	// The code in alibaba does not do this so the IRQ vector only contains
+	// the "call $4010" without a following RET statement. That is basically
+	// a bug in the program code. The only way this cartridge could have run
+	// successfully on a real unit is if the RAM would be initialized with
+	// a F0 pattern on power up; F0 = RET P.
+	//
+	// alibaba and blockhol SMS cartridges rely on uninitialized RAM,
+	// then fill it with a F0 pattern ("RET P"), but only for consoles
+	// in Japan region (including KR), until confirmed on other consoles.
+	if (m_is_region_japan)
+	{
+		memset((UINT8*)m_space->get_write_ptr(0xc000), 0xf0, 0x1FF0);
+	}
 }
 
 MACHINE_RESET_MEMBER(sms_state,sms)

@@ -329,7 +329,7 @@
 		</part>
 	</software>
 
-	<software name="alibaba" supported="no">
+	<software name="alibaba">
 		<description>Alibaba and 40 Thieves (Kor)</description>
 		<year>1989</year>
 		<publisher>HiCom</publisher>
@@ -851,7 +851,7 @@
 		</part>
 	</software>
 
-	<software name="blockhol" supported="no">
+	<software name="blockhol">
 		<description>Block Hole (Kor)</description>
 		<year>1990</year>
 		<publisher>Zemina</publisher>
