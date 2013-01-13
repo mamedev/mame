@@ -6,9 +6,7 @@
 
     Info from: http://www.sol20.org/
 
-    Note that the SOLOS dump comes from the Solace emu. Not being sure if
-    it has been verified with a real SOL-20 (even if I think it has been), I
-    marked it as a BAD_DUMP.
+    Note that the SOLOS dump comes from the Solace emu. Confirmed as ok.
 
     The roms DPMON and CONSOL are widely available on the net as ENT files,
     which can be loaded into memory with the Paste option, then exported to
@@ -752,11 +750,13 @@ MACHINE_CONFIG_END
 ROM_START( sol20 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_SYSTEM_BIOS(0, "SOLOS", "SOLOS")
-	ROMX_LOAD( "solos.bin", 0xc000, 0x0800, BAD_DUMP CRC(4d0af383) SHA1(ac4510c3380ed4a31ccf4f538af3cb66b76701ef), ROM_BIOS(1) )    // from solace emu
+	ROMX_LOAD( "solos.bin", 0xc000, 0x0800, CRC(4d0af383) SHA1(ac4510c3380ed4a31ccf4f538af3cb66b76701ef), ROM_BIOS(1) )    // from solace emu
 	ROM_SYSTEM_BIOS(1, "DPMON", "DPMON")
 	ROMX_LOAD( "dpmon.bin", 0xc000, 0x0800, BAD_DUMP CRC(2a84f099) SHA1(60ff6e38082c50afcf0f40707ef65668a411008b), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS(2, "CONSOL", "CONSOL")
 	ROMX_LOAD( "consol.bin", 0xc000, 0x0400, BAD_DUMP CRC(80bf6d85) SHA1(84b81c60bb08a3a5435ec1be56a67aa695bce099), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(3, "Solos2", "Solos Patched")
+	ROMX_LOAD( "solos2.bin", 0xc000, 0x0800, CRC(7776cc7d) SHA1(c4739a9ea7e8146ce7ae3305ed526b6045efa9d6), ROM_BIOS(4) ) // from Nama
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "6574.bin", 0x0000, 0x0800, BAD_DUMP CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
