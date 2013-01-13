@@ -16,6 +16,9 @@ TK85 seems to be the same as TK80, except is has a larger ROM. No
 schematics etc are available. Thanks to 'Nama' who dumped the rom.
 It has 25 keys, so a few aren't defined yet.
 
+ND-80Z : http://www.alles.or.jp/~thisida/nd80z3syokai.html (newer version)
+Like the TK85, it has a 2KB rom. Thanks again to 'Nama' who dumped it.
+
 When booted, the system begins at 0000 which is ROM. You need to change the
 address to 8000 before entering a program. Here is a test to paste in:
 8000-11^22^33^44^55^66^77^88^99^8000-
@@ -68,6 +71,7 @@ public:
 	DECLARE_READ8_MEMBER(ppi_custom_r);
 	DECLARE_WRITE8_MEMBER(ppi_custom_w);
 	DECLARE_READ8_MEMBER(key_matrix_r);
+	DECLARE_READ8_MEMBER(nd80z_key_r);
 	DECLARE_READ8_MEMBER(serial_r);
 	DECLARE_WRITE8_MEMBER(serial_w);
 	DECLARE_WRITE8_MEMBER(mikrolab_serial_w);
@@ -132,6 +136,12 @@ static ADDRESS_MAP_START(mikrolab_io, AS_IO, 8, tk80bs_state)
 	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(nd80z_io, AS_IO, 8, tk80bs_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff) // possibly should be 3
+	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE("ppi8255_3", i8255_device, read, write)
+ADDRESS_MAP_END
+
 /* Input ports */
 static INPUT_PORTS_START( tk80 )
 	PORT_START("X0") /* KEY ROW 0 */
@@ -187,11 +197,29 @@ READ8_MEMBER( tk80bs_state::key_matrix_r )
 // PA0-7 keyscan in
 
 	UINT8 data = 0xff;
+	
 	if (BIT(m_ppi_portc, 4))
 		data &= ioport("X0")->read();
 	if (BIT(m_ppi_portc, 5))
 		data &= ioport("X1")->read();
 	if (BIT(m_ppi_portc, 6))
+		data &= ioport("X2")->read();
+
+	return data;
+}
+
+READ8_MEMBER( tk80bs_state::nd80z_key_r )
+{
+// PA0-7 keyscan in
+
+	UINT8 data = 0xff, row = m_ppi_portc & 7;
+	if (row == 6)
+		data &= ioport("X0")->read();
+	else
+	if (row == 5)
+		data &= ioport("X1")->read();
+	else
+	if (row == 3)
 		data &= ioport("X2")->read();
 
 	return data;
@@ -241,6 +269,16 @@ static I8255_INTERFACE( ppi8255_intf_1 )
 	DEVCB_DRIVER_MEMBER(tk80bs_state, mikrolab_serial_w)        /* Port C write */
 };
 
+static I8255_INTERFACE( ppi8255_intf_3 )
+{
+	DEVCB_DRIVER_MEMBER(tk80bs_state, nd80z_key_r),        /* Port A read */
+	DEVCB_NULL,                         /* Port A write */
+	DEVCB_DRIVER_MEMBER(tk80bs_state, serial_r),            /* Port B read */
+	DEVCB_NULL,                         /* Port B write */
+	DEVCB_NULL,                         /* Port C read */
+	DEVCB_DRIVER_MEMBER(tk80bs_state, mikrolab_serial_w)        /* Port C write */
+};
+
 
 static MACHINE_CONFIG_START( tk80, tk80bs_state )
 	/* basic machine hardware */
@@ -264,6 +302,15 @@ static MACHINE_CONFIG_DERIVED( mikrolab, tk80 )
 	/* Devices */
 	MCFG_DEVICE_REMOVE("ppi8255_0")
 	MCFG_I8255_ADD( "ppi8255_1", ppi8255_intf_1 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( nd80z, tk80 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tk85_mem)
+	MCFG_CPU_IO_MAP(nd80z_io)
+	/* Devices */
+	MCFG_DEVICE_REMOVE("ppi8255_0")
+	MCFG_I8255_ADD( "ppi8255_3", ppi8255_intf_3 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tk85, tk80 )
@@ -455,6 +502,11 @@ ROM_START( nectk85 )
 	ROM_LOAD( "tk85.bin",  0x0000, 0x0800, CRC(8a0b6d7e) SHA1(6acc8c04990692b08929043ccf638761b7301def))
 ROM_END
 
+ROM_START( nd80z )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "nd80z.bin",  0x0000, 0x0800, CRC(fe829f1d) SHA1(6fff31884b8d984076d4450ca3a3e48efadeb648))
+ROM_END
+
 ROM_START( tk80bs )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	/* all of these aren't taken from an original machine*/
@@ -486,4 +538,5 @@ ROM_END
 COMP( 1976, tk80,     0,      0,       tk80,      tk80,     driver_device, 0, "Nippon Electronic Company", "TK-80", GAME_NO_SOUND_HW)
 COMP( 1980, tk80bs,   tk80,   0,       tk80bs,    tk80bs,   driver_device, 0, "Nippon Electronic Company", "TK-80BS", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
 COMP( 19??, nectk85,  tk80,   0,       tk85,      tk80,     driver_device, 0, "Nippon Electronic Company", "TK-85", GAME_NO_SOUND_HW)
+COMP( 19??, nd80z,    tk80,   0,       nd80z,     tk80,     driver_device, 0, "Chunichi", "ND-80Z", GAME_NO_SOUND_HW)
 COMP( 19??, mikrolab, tk80,   0,       mikrolab,  mikrolab, driver_device, 0, "<unknown>", "Mikrolab KR580IK80", GAME_NO_SOUND_HW)
