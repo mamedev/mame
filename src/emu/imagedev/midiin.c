@@ -40,7 +40,6 @@ void midiin_device::device_reset()
 {
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;
-	m_timer->adjust(attotime::from_hz(1500), 0, attotime::from_hz(1500));
 
 	// we don't Rx, we Tx at 31250 8-N-1
 	set_rcv_rate(0);
@@ -101,6 +100,8 @@ bool midiin_device::call_load(void)
 	{
 		return IMAGE_INIT_FAIL;
 	}
+
+	m_timer->adjust(attotime::from_hz(1500), 0, attotime::from_hz(1500));
 
 	return IMAGE_INIT_PASS;
 }

@@ -48,7 +48,7 @@ public:
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 0; }
 	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
 	virtual const char *file_extensions() const { return "mid"; }
 	virtual bool core_opens_image_file() const { return FALSE; }
