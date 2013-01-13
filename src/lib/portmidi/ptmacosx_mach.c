@@ -47,7 +47,7 @@ static void *Pt_CallbackProc(void *p)
 								(thread_policy_t)&extendedPolicy,
 								THREAD_EXTENDED_POLICY_COUNT);
 	if (error != KERN_SUCCESS) {
-		mach_error("Couldn't set thread timeshare policy", error);
+		mach_error((char *)"Couldn't set thread timeshare policy", error);
 	}
 
 	precedencePolicy.importance = THREAD_IMPORTANCE;
@@ -55,7 +55,7 @@ static void *Pt_CallbackProc(void *p)
 								(thread_policy_t)&precedencePolicy,
 								THREAD_PRECEDENCE_POLICY_COUNT);
 	if (error != KERN_SUCCESS) {
-		mach_error("Couldn't set thread precedence policy", error);
+		mach_error((char *)"Couldn't set thread precedence policy", error);
 	}
 
 
