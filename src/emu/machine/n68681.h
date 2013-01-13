@@ -55,6 +55,8 @@ public:
 
 	UINT8 read_rx_fifo();
 
+	void ACR_updated();
+
 private:
 	/* Registers */
 	UINT8 CR;  /* Command register */

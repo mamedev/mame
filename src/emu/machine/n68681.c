@@ -375,8 +375,8 @@ WRITE8_MEMBER( duartn68681_device::write )
 				}
 			}
 
-			m_chanA->write_chan_reg(1, data);
-			m_chanB->write_chan_reg(1, data);
+			m_chanA->ACR_updated();
+			m_chanB->ACR_updated();
 			m_chanA->update_interrupts(); // need to add ACR checking for IP delta ints
 			m_chanB->update_interrupts();
 			update_interrupts();
@@ -540,7 +540,7 @@ void duart68681_channel::rcv_complete()
 	{
 		if ( rx_fifo_num >= MC68681_RX_FIFO_SIZE )
 		{
-			LOG(( "68681: FIFO overflow\n" ));
+			logerror("68681: FIFO overflow\n");
 			SR |= STATUS_OVERRUN_ERROR;
 			return;
 		}
@@ -751,7 +751,7 @@ void duart68681_channel::write_chan_reg(int reg, UINT8 data)
 		CSR = data;
 		tx_baud_rate = m_uart->calc_baud(m_ch, data & 0xf);
 		rx_baud_rate = m_uart->calc_baud(m_ch, (data>>4) & 0xf);
-//      printf("ch %d Tx baud %d Rx baud %d\n", m_ch, tx_baud_rate, rx_baud_rate);
+		//printf("ch %d CSR %02x Tx baud %d Rx baud %d\n", m_ch, data, tx_baud_rate, rx_baud_rate);
 		set_rcv_rate(rx_baud_rate);
 		set_tra_rate(tx_baud_rate);
 		break;
@@ -834,7 +834,7 @@ void duart68681_channel::recalc_framing()
 			break;
 	}
 
-//  printf("ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
+	//printf("ch %d MR1 %02x MR2 %02x => %d bits / char, %d stop bits, parity %d\n", m_ch, MR1, MR2, (MR1 & 3)+5, stopbits, parity);
 
 	set_data_frame((MR1 & 3)+5, stopbits, parity);
 }
@@ -971,3 +971,9 @@ void duart68681_channel::write_TX(UINT8 data)
 
 	update_interrupts();
 };
+
+void duart68681_channel::ACR_updated()
+{
+	write_chan_reg(1, CSR);
+}
+
