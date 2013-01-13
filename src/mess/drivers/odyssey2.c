@@ -436,14 +436,34 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
 WRITE16_MEMBER(odyssey2_state::scanline_postprocess_g7400)
 {
 	int vpos = data;
+	int y = vpos - i8244_device::START_Y;
 	bitmap_ind16 *bitmap = m_i8244->get_bitmap();
+	bitmap_ind16 *ef934x_bitmap = m_ef9340_1->get_bitmap();
 
 	// apply external LUM setting
 	for ( int x = i8244_device::START_ACTIVE_SCAN; x < i8244_device::END_ACTIVE_SCAN; x++ )
 	{
-		bitmap->pix16( vpos, x ) |= ( m_lum ^ 0x08 );
+		UINT16 d = bitmap->pix16( vpos, x );
+
+		if ( ! m_g7400_ic678_decode[ d & 0x07 ] )
+		{
+			// Use EF934x input
+			d = ef934x_bitmap->pix16( y, x - i8244_device::START_ACTIVE_SCAN ) & 0x07;
+
+			if ( ! m_g7400_ic674_decode[ d & 0x07 ] )
+			{
+				d |= 0x08;
+			}
+		}
+		else
+		{
+			// Use i8245 input
+			d |= ( m_lum ^ 0x08 );
+		}
+		bitmap->pix16( vpos, x ) = d;
 	}
 }
+
 
 UINT32 odyssey2_state::screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
