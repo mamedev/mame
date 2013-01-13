@@ -2009,6 +2009,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/ax20.o      \
 	$(MESS_DRIVERS)/babbage.o   \
 	$(MESS_DRIVERS)/beehive.o   \
+	$(MESS_DRIVERS)/binbug.o    \
 	$(MESS_DRIVERS)/bob85.o     \
 	$(MESS_DRIVERS)/br8641.o    \
 	$(MESS_DRIVERS)/busicom.o   \
