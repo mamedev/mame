@@ -696,7 +696,7 @@ static MACHINE_CONFIG_START( odyssey2, odyssey2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8244_ADD( "i8244", XTAL_17_73447MHz/5, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess ) )
+	MCFG_I8244_ADD( "i8244", XTAL_7_15909MHz/2 * 2, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
@@ -725,7 +725,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8245_ADD( "i8244", XTAL_17_73447MHz/5, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess ) )
+	MCFG_I8245_ADD( "i8244", XTAL_17_73447MHz/5 * 2, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
@@ -745,7 +745,7 @@ static MACHINE_CONFIG_START( g7400, odyssey2_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS( 3540000*2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
+	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8245_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
 	MCFG_GFXDECODE( odyssey2 )
@@ -756,7 +756,7 @@ static MACHINE_CONFIG_START( g7400, odyssey2_state )
 	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8245_ADD( "i8244", 3540000, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess_g7400 ) )
+	MCFG_I8245_ADD( "i8244", 3540000 * 2, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess_g7400 ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
