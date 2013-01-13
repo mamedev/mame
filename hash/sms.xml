@@ -952,12 +952,13 @@
 		</part>
 	</software>
 
-	<software name="bublboky" supported="no">
+	<software name="bublboky">
 		<description>Bubble Bobble (Kor, YM Soft)</description>
 		<year>1990</year>
 		<publisher>YM Soft</publisher>
 		<info name="alt_title" value="파워 보글 보글 (Power Boggle Boggle, Box)" />
 		<part name="cart" interface="sms_cart">
+			<feature name="pcb" value="korean_nobank" />
 			<dataarea name="rom" size="32768">
 				<rom name="power boggle boggle (kr).bin" size="32768" crc="6d309ac5" sha1="d7e67d15ccc12e9bf40611dc91a080a99716ca6e" offset="000000" />
 			</dataarea>
