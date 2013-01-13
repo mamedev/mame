@@ -133,6 +133,30 @@ static ADDRESS_MAP_START( sms_io, AS_IO, 8, sms_state )
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ(sms_input_port_1_r)
 ADDRESS_MAP_END
 
+
+// I/O ports $3E and $3F do not exist o Mark-III
+static ADDRESS_MAP_START( sms_no3e3f_io, AS_IO, 8, sms_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x40, 0x7f)                 AM_READ(sms_count_r)
+	AM_RANGE(0x40, 0x7f)                 AM_DEVWRITE("segapsg", segapsg_device, write)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1e) AM_READ(sms_input_port_0_r)
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x1e) AM_READ(sms_input_port_1_r)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0e) AM_READ(sms_input_port_0_r)
+	AM_RANGE(0xe1, 0xe1) AM_MIRROR(0x0e) AM_READ(sms_input_port_1_r)
+	AM_RANGE(0xf0, 0xf0)                 AM_READWRITE(sms_input_port_0_r, sms_ym2413_register_port_0_w)
+	AM_RANGE(0xf1, 0xf1)                 AM_READWRITE(sms_input_port_1_r, sms_ym2413_data_port_0_w)
+	AM_RANGE(0xf2, 0xf2)                 AM_READWRITE(sms_fm_detect_r, sms_fm_detect_w)
+	AM_RANGE(0xf3, 0xf3)                 AM_READ(sms_input_port_1_r)
+	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0x02) AM_READ(sms_input_port_0_r)
+	AM_RANGE(0xf5, 0xf5) AM_MIRROR(0x02) AM_READ(sms_input_port_1_r)
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0x06) AM_READ(sms_input_port_0_r)
+	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x06) AM_READ(sms_input_port_1_r)
+ADDRESS_MAP_END
+
+
 // It seems the Korean version does some more strict decoding on the I/O
 // addresses.
 // At least the mirrors for I/O ports $3E/$3F don't seem to exist there.
@@ -587,6 +611,8 @@ static MACHINE_CONFIG_DERIVED( sms_fm, sms1_ntsc )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sg1000m3, sms_fm )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(sms_no3e3f_io)
 
 	MCFG_CARTSLOT_MODIFY("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("sms,bin,sg")
