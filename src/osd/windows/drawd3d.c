@@ -217,8 +217,7 @@ INLINE void set_texture(d3d_info *d3d, d3d_texture_info *texture)
 		d3d->last_texture = texture;
 		d3d->last_texture_flags = (texture == NULL ? 0 : texture->flags);
 		result = (*d3dintf->device.set_texture)(d3d->device, 0, (texture == NULL) ? d3d->default_texture->d3dfinaltex : texture->d3dfinaltex);
-		if (d3d->hlsl != NULL)
-			d3d->hlsl->set_texture(texture);
+		d3d->hlsl->set_texture(texture);
 		if (result != D3D_OK) mame_printf_verbose("Direct3D: Error %08X during device set_texture call\n", (int)result);
 	}
 }
@@ -348,6 +347,7 @@ static void drawd3d_window_destroy(win_window_info *window);
 static render_primitive_list *drawd3d_window_get_primitives(win_window_info *window);
 static void drawd3d_window_save(win_window_info *window);
 static void drawd3d_window_record(win_window_info *window);
+static void drawd3d_window_toggle_fsfx(win_window_info *window);
 static int drawd3d_window_draw(win_window_info *window, HDC dc, int update);
 
 // devices
@@ -412,6 +412,7 @@ int drawd3d_init(running_machine &machine, win_draw_callbacks *callbacks)
 	callbacks->window_draw = drawd3d_window_draw;
 	callbacks->window_save = drawd3d_window_save;
 	callbacks->window_record = drawd3d_window_record;
+	callbacks->window_toggle_fsfx = drawd3d_window_toggle_fsfx;
 	callbacks->window_destroy = drawd3d_window_destroy;
 	return 0;
 }
@@ -440,6 +441,7 @@ static int drawd3d_window_init(win_window_info *window)
 
 	// allocate memory for our structures
 	d3d = global_alloc_clear(d3d_info);
+	d3d->restarting = false;
 	window->drawdata = d3d;
 	d3d->window = window;
 	d3d->hlsl = NULL;
@@ -475,20 +477,25 @@ error:
 
 
 
+static void drawd3d_window_toggle_fsfx(win_window_info *window)
+{
+	d3d_info *d3d = (d3d_info *)window->drawdata;
+
+	d3d->restarting = true;
+}
+
 static void drawd3d_window_record(win_window_info *window)
 {
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 
-	if (d3d->hlsl != NULL)
-		d3d->hlsl->window_record();
+	d3d->hlsl->window_record();
 }
 
 static void drawd3d_window_save(win_window_info *window)
 {
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 
-	if (d3d->hlsl != NULL)
-		d3d->hlsl->window_save();
+	d3d->hlsl->window_save();
 }
 
 
@@ -550,6 +557,18 @@ static int drawd3d_window_draw(win_window_info *window, HDC dc, int update)
 	// if we're in the middle of resizing, leave things alone
 	if (window->resize_state == RESIZE_STATE_RESIZING)
 		return 0;
+
+	// if we're restarting the renderer, leave things alone
+	if (d3d->restarting)
+	{
+		d3d->hlsl->toggle();
+
+		// free all existing resources and re-create
+		device_delete_resources(d3d);
+		device_create_resources(d3d);
+
+		d3d->restarting = false;
+	}
 
 	// if we haven't been created, just punt
 	if (d3d == NULL)
@@ -811,7 +830,7 @@ static int device_create_resources(d3d_info *d3d)
 				VERTEX_BASE_FORMAT | ((d3d->hlsl->enabled() && d3dintf->post_fx_available) ? D3DFVF_XYZW : D3DFVF_XYZRHW), D3DPOOL_DEFAULT, &d3d->vertexbuf);
 	if (result != D3D_OK)
 	{
-		mame_printf_error("Error creating vertex buffer (%08X)", (UINT32)result);
+		printf("Error creating vertex buffer (%08X)", (UINT32)result);
 		return 1;
 	}
 

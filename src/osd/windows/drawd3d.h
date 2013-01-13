@@ -134,6 +134,8 @@ struct d3d_info
 	d3d_poly_info           poly[VERTEX_BUFFER_SIZE/3]; // array to hold polygons as they are created
 	int                     numpolys;                   // number of accumulated polygons
 
+	bool					restarting;					// if we're restarting
+
 	d3d_texture_info *      texlist;                    // list of active textures
 	int                     dynamic_supported;          // are dynamic textures supported?
 	int                     stretch_supported;          // is StretchRect with point filtering supported?

@@ -116,6 +116,7 @@ public:
 	void init_fsfx_quad(void *vertbuf);
 
 	bool enabled() { return master_enable; }
+	void toggle();
 
 	bool vector_enabled() { return vector_enable && (bool)HLSL_VECTOR; }
 	d3d_render_target* get_vector_target(d3d_info *d3d);
@@ -205,6 +206,8 @@ private:
 	int                     snap_width;                 // snapshot width
 	int                     snap_height;                // snapshot height
 	bool                    lines_pending;              // whether or not we have lines to flush on the next quad
+
+	bool					initialized;				// whether or not we're initialize
 
 	// HLSL effects
 	d3d_surface *           backbuffer;                 // pointer to our device's backbuffer

@@ -374,6 +374,10 @@ static void check_osd_inputs(running_machine &machine)
 	// check for taking fullscreen video
 	if (ui_input_pressed(machine, IPT_OSD_3))
 		winwindow_take_video();
+
+	// check for taking fullscreen video
+	if (ui_input_pressed(machine, IPT_OSD_4))
+		winwindow_toggle_fsfx();
 }
 
 

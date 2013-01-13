@@ -779,13 +779,19 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 			// alt-F12 for fullscreen snap
 			case IPT_OSD_2:
 				entry->configure_osd("RENDER_SNAP", "Take Rendered Snapshot");
-				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_LALT, KEYCODE_F12);
+				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_LALT, KEYCODE_F12, input_seq::not_code, KEYCODE_LCONTROL);
 				break;
 
 			// alt-F11 for fullscreen video
 			case IPT_OSD_3:
 				entry->configure_osd("RENDER_AVI", "Record Rendered Video");
 				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_LALT, KEYCODE_F11);
+				break;
+
+			// ctrl-alt-F12 to toggle post-processing
+			case IPT_OSD_4:
+				entry->configure_osd("POST_PROCESS", "Toggle Post-Processing");
+				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_LALT, KEYCODE_LCONTROL, KEYCODE_F12);
 				break;
 
 			// leave everything else alone

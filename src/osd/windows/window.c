@@ -522,6 +522,29 @@ void winwindow_take_snap(void)
 
 
 //============================================================
+//  winwindow_toggle_fsfx
+//  (main thread)
+//============================================================
+
+void winwindow_toggle_fsfx(void)
+{
+	if (draw.window_toggle_fsfx == NULL)
+		return;
+
+	win_window_info *window;
+
+	assert(GetCurrentThreadId() == main_threadid);
+
+	// iterate over windows and request a snap
+	for (window = win_window_list; window != NULL; window = window->next)
+	{
+		(*draw.window_toggle_fsfx)(window);
+	}
+}
+
+
+
+//============================================================
 //  winwindow_take_video
 //  (main thread)
 //============================================================
