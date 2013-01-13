@@ -380,7 +380,29 @@ value_ptr bplist_read_file(char *filename)
 	return value;
 }
 
+// use old Carbon method on PPC
+#ifdef OSX_PPC
+value_ptr bplist_read_pref(char *filename, OSType folder_type)
+{
+    FSRef prefdir;
+    char cstr[MAXPATHLEN];
 
+    OSErr err = FSFindFolder(kOnAppropriateDisk, folder_type,
+                             FALSE, &prefdir);
+    if (err) {
+        bplist_log("Error finding preferences folder: %d\n", err);
+        return NULL;
+    }
+    err = FSRefMakePath(&prefdir, (UInt8 *) cstr, (UInt32) (MAXPATHLEN - 1));
+    if (err) {
+        bplist_log("Error making path name for preferences folder: %d\n", err);
+        return NULL;
+    }
+    strlcat(cstr, "/", MAXPATHLEN);
+    strlcat(cstr, filename, MAXPATHLEN);
+    return bplist_read_file(cstr);
+}
+#else
 value_ptr bplist_read_pref(char *filename, OSType folder_type)
 {
 	char cstr[MAXPATHLEN];
@@ -414,7 +436,7 @@ value_ptr bplist_read_pref(char *filename, OSType folder_type)
 
 	return bplist_read_file(cstr);
 }
-
+#endif
 
 value_ptr bplist_read_system_pref(char *filename) {
 	return bplist_read_pref(filename, kSystemPreferencesFolderType);

@@ -251,6 +251,7 @@ endif
 ifndef USE_QTDEBUG
 DEBUGOBJS = $(SDLOBJ)/debugosx.o
 endif
+
 SYNC_IMPLEMENTATION = ntc
 SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
 SDLUTILMAIN = $(SDLOBJ)/SDLMain_tmpl.o
@@ -259,6 +260,7 @@ MAINLDFLAGS = -Xlinker -all_load
 NO_X11 = 1
 NO_USE_XINPUT = 1
 ifdef BIGENDIAN
+DEFS += -DOSX_PPC=1
 ifdef SYMBOLS
 CCOMFLAGS += -mlong-branch
 endif   # SYMBOLS

@@ -7,6 +7,7 @@
 #include "osxsupport.h"
 
 // convert an NSString to a C string
+#ifndef OSX_PPC
 static char *StringToChar(NSString *str)
 {
 	const char *charstr = [str UTF8String];
@@ -25,6 +26,7 @@ char *FindPrefsDir(void)
 	{
 		resstr = StringToChar([paths objectAtIndex:0]) ;
 	}
-
 	return resstr;
 }
+#endif
+
