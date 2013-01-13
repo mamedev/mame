@@ -26,7 +26,10 @@ public:
 
 public:
 	sms_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		, m_mainram(*this, "mainram")
+	{
+	}
 
 	// device_ts
 	device_t *m_main_cpu;
@@ -45,7 +48,6 @@ public:
 	int m_paused;
 	UINT8 m_bios_port;
 	UINT8 *m_BIOS;
-	UINT8 *m_mapper_ram;
 	UINT8 m_mapper[4];
 	// we are going to use 1-6, same as bank numbers. Notice, though, that most mappers
 	// only work on 16K banks and, hence, banks 4-6 are not always directly set
@@ -195,6 +197,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sms_int_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
+
+protected:
+	required_shared_ptr<UINT8> m_mainram;
 };
 
 

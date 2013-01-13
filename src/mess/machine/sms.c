@@ -868,29 +868,47 @@ READ8_MEMBER(sms_state::gg_input_port_2_r)
 
 READ8_MEMBER(sms_state::sms_sscope_r)
 {
-	return m_sscope_state;
+	int sscope = machine().root_device().ioport("SEGASCOPE")->read_safe(0x00);
+
+	if ( sscope )
+	{
+		// Scope is attached
+		return m_sscope_state;
+	}
+
+	return m_mainram[0x1FF8 + offset];
 }
 
 
 WRITE8_MEMBER(sms_state::sms_sscope_w)
 {
-	screen_device *screen = machine().first_screen();
+	m_mainram[0x1FF8 + offset] = data;
 
-	m_sscope_state = data;
+	int sscope = machine().root_device().ioport("SEGASCOPE")->read_safe(0x00);
 
-	// There are occurrences when Sega Scope's state changes after VBLANK, or at
-	// active screen. Most cases are solid-color frames of scene transitions, but
-	// one exception is the first frame of Zaxxon 3-D's title screen. In that
-	// case, this method is enough for setting the intended state for the frame.
-	// No information found about a minimum time need for switch open/closed lens.
-	if (screen->vpos() < (screen->height() >> 1))
-		m_frame_sscope_state = m_sscope_state;
+	if ( sscope )
+	{
+		// Scope is attached
+		screen_device *screen = machine().first_screen();
+
+		m_sscope_state = data;
+
+		// There are occurrences when Sega Scope's state changes after VBLANK, or at
+		// active screen. Most cases are solid-color frames of scene transitions, but
+		// one exception is the first frame of Zaxxon 3-D's title screen. In that
+		// case, this method is enough for setting the intended state for the frame.
+		// No information found about a minimum time need for switch open/closed lens.
+		if (screen->vpos() < (screen->height() >> 1))
+		{
+			m_frame_sscope_state = m_sscope_state;
+		}
+	}
 }
 
 
 READ8_MEMBER(sms_state::sms_mapper_r)
 {
-	return m_mapper[offset];
+	return m_mainram[0x1FFC + offset];
 }
 
 /* Terebi Oekaki */
@@ -960,7 +978,7 @@ WRITE8_MEMBER(sms_state::sms_mapper_w)
 	offset &= 3;
 
 	m_mapper[offset] = data;
-	m_mapper_ram[offset] = data;
+	m_mainram[0x1FFC + offset] = data;
 
 	if (m_bios_port & IO_BIOS_ROM || (m_is_gamegear && m_BIOS == NULL))
 	{
@@ -1941,7 +1959,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 	// in Japan region (including KR), until confirmed on other consoles.
 	if (m_is_region_japan)
 	{
-		memset((UINT8*)m_space->get_write_ptr(0xc000), 0xf0, 0x1FF0);
+		memset((UINT8*)m_space->get_write_ptr(0xc000), 0xf0, 0x1FFF);
 	}
 }
 
@@ -1952,8 +1970,6 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 	m_ctrl_reg = 0xff;
 	if (m_has_fm)
 		m_fm_detect = 0x01;
-
-	m_mapper_ram = (UINT8*)space.get_write_ptr(0xdffc);
 
 	m_bios_port = 0;
 
