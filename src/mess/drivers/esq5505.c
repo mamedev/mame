@@ -106,9 +106,10 @@
 #include "machine/wd_fdc.h"
 #include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
 #include "formats/esq16_dsk.h"
-
 #include "machine/esqvfd.h"
 #include "machine/esqpanel.h"
+#include "machine/serial.h"
+#include "machine/midiinport.h"
 
 #define GENERIC (0)
 #define EPS     (1)
@@ -756,6 +757,23 @@ static const esqpanel_interface esqpanel_config =
 	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_b_w)
 };
 
+static SLOT_INTERFACE_START(midiin_slot)
+	SLOT_INTERFACE("midiin", MIDIIN_PORT)
+SLOT_INTERFACE_END
+
+static const serial_port_interface midiin_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_a_w)	// route MIDI Tx send directly to 68681 channel A Rx
+};
+
+static SLOT_INTERFACE_START(midiout_slot)
+SLOT_INTERFACE_END
+
+static const serial_port_interface midiout_intf =
+{
+	DEVCB_NULL	// midi out ports don't transmit inward
+};
+
 static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP(vfx_map)
@@ -763,6 +781,9 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
 
 	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
+
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, NULL, NULL)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_10MHz)
@@ -800,6 +821,9 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_ESQPANEL2x40_ADD("panel", esqpanel_config)
 
 	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
+
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, NULL, NULL)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_30_4761MHz / 2)
