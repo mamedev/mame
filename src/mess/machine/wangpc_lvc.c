@@ -117,9 +117,10 @@ WRITE_LINE_MEMBER( wangpc_lvc_device::vsync_w )
 	}
 }
 
-static const mc6845_interface crtc_intf =
+static MC6845_INTERFACE( crtc_intf )
 {
 	SCREEN_TAG,
+	false,
 	8,
 	NULL,
 	wangpc_lvc_update_row,

@@ -379,9 +379,11 @@ void alphatro_state::palette_init()
 	palette_set_color_rgb(machine(), 8, 0xf7, 0xaa, 0x00);
 }
 
-static const mc6845_interface alphatro_crtc6845_interface =
+
+static MC6845_INTERFACE( alphatro_crtc6845_interface )
 {
 	"screen",
+	false,
 	8,
 	NULL,
 	alphatro_update_row,

@@ -226,9 +226,11 @@ static MC6845_UPDATE_ROW( zrt80_update_row )
 	}
 }
 
-static const mc6845_interface zrt80_crtc6845_interface =
+
+static MC6845_INTERFACE( zrt80_crtc6845_interface )
 {
 	"screen",
+	false,
 	8 /*?*/,
 	NULL,
 	zrt80_update_row,

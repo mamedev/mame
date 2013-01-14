@@ -48,9 +48,10 @@ const device_type A2BUS_VTC2 = &device_creator<a2bus_vtc2_device>;
 
 static MC6845_UPDATE_ROW( videoterm_update_row );
 
-static const mc6845_interface mc6845_mda_intf =
+static MC6845_INTERFACE( mc6845_mda_intf )
 {
 	VIDEOTERM_SCREEN_NAME, /* screen number */
+	false,				/* show border area */
 	8,                  /* number of pixels per video memory address */
 	NULL,               /* begin_update */
 	videoterm_update_row,       /* update_row */

@@ -180,17 +180,18 @@ static VIDEO_START( cga_poisk2 );
 static SCREEN_UPDATE_RGB32( cga_poisk2 );
 static VIDEO_START( cga_mc1502 );
 
-static const mc6845_interface mc6845_cga_intf =
+static MC6845_INTERFACE( mc6845_cga_intf )
 {
-	CGA_SCREEN_NAME,    /* screen number */
-	8,                  /* numbers of pixels per video memory address */
-	NULL,               /* begin_update */
-	cga_update_row,     /* update_row */
-	NULL,               /* end_update */
-	DEVCB_NULL,             /* on_de_changed */
-	DEVCB_NULL,             /* on_cur_changed */
-	DEVCB_LINE(cga_hsync_changed),  /* on_hsync_changed */
-	DEVCB_LINE(cga_vsync_changed),  /* on_vsync_changed */
+	CGA_SCREEN_NAME,				/* screen number */
+	false,							/* show border area */
+	8,								/* numbers of pixels per video memory address */
+	NULL,							/* begin_update */
+	cga_update_row,					/* update_row */
+	NULL,               			/* end_update */
+	DEVCB_NULL,             		/* on_de_changed */
+	DEVCB_NULL,             		/* on_cur_changed */
+	DEVCB_LINE(cga_hsync_changed),	/* on_hsync_changed */
+	DEVCB_LINE(cga_vsync_changed),	/* on_vsync_changed */
 	NULL
 };
 

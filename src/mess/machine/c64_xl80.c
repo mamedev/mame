@@ -110,9 +110,10 @@ static MC6845_UPDATE_ROW( c64_xl80_update_row )
 	xl80->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,param);
 }
 
-static const mc6845_interface crtc_intf =
+static MC6845_INTERFACE( crtc_intf )
 {
 	MC6845_SCREEN_TAG,
+	false,
 	8,
 	NULL,
 	c64_xl80_update_row,

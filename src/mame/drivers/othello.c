@@ -364,9 +364,10 @@ static INPUT_PORTS_START( othello )
 
 INPUT_PORTS_END
 
-static const mc6845_interface h46505_intf =
+static MC6845_INTERFACE( h46505_intf )
 {
 	"screen",   /* screen we are acting on */
+	false,		/* show border area */
 	TILE_WIDTH, /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	update_row, /* row update callback */

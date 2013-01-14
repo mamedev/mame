@@ -385,8 +385,11 @@ WRITE8_MEMBER( hp9k_state::kbd_put )
 	kbdBit=data;
 }
 
-static const mc6845_interface hp9k_mc6845_intf = {
+
+static MC6845_INTERFACE( hp9k_mc6845_intf )
+{
 	"screen",           /* name of screen */
+	false,
 	8,          /* number of dots per character */
 	NULL,
 	NULL,       /* handler to display a scanline */

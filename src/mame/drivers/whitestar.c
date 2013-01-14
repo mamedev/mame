@@ -244,9 +244,10 @@ MC6845_UPDATE_ROW( whitestar_update_row )
 	}
 }
 
-static const mc6845_interface whitestar_crtc6845_interface =
+static MC6845_INTERFACE( whitestar_crtc6845_interface )
 {
 	NULL,
+	false,		/* show border area */
 	1,
 	NULL,
 	whitestar_update_row,

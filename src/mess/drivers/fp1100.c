@@ -381,9 +381,11 @@ GFXDECODE_END
 static const UPD7810_CONFIG fp1100_slave_cpu_config = { TYPE_7801, NULL };
 //static const upd1771_interface scv_upd1771c_config = { DEVCB_LINE( scv_upd1771_ack_w ) };
 
-static const mc6845_interface mc6845_intf =
+
+static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
+	false,		/* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	fp1100_update_row,      /* row update callback */

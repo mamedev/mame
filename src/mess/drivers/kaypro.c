@@ -147,8 +147,12 @@ static const z80_daisy_config kaypro2x_daisy_chain[] =
 	{ NULL }
 };
 
-static const mc6845_interface kaypro2x_crtc = {
+
+
+static MC6845_INTERFACE( kaypro2x_crtc )
+{
 	"screen",           /* name of screen */
+	false,
 	7,              /* number of dots per character */
 	NULL,
 	kaypro2x_update_row,        /* handler to display a scanline */

@@ -350,9 +350,11 @@ static const ins8250_interface h19_ace_interface =
 	DEVCB_NULL
 };
 
-static const mc6845_interface h19_crtc6845_interface =
+
+static MC6845_INTERFACE( h19_crtc6845_interface )
 {
 	"screen",
+	false,
 	8 /*?*/,
 	NULL,
 	h19_update_row,

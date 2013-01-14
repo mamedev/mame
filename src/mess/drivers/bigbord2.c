@@ -662,8 +662,10 @@ MC6845_UPDATE_ROW( bigbord2_update_row )
 	}
 }
 
-static const mc6845_interface bigbord2_crtc = {
+static MC6845_INTERFACE( bigbord2_crtc )
+{
 	SCREEN_TAG,         /* name of screen */
+	false,
 	8,          /* number of dots per character */
 	NULL,
 	bigbord2_update_row,        /* handler to display a scanline */

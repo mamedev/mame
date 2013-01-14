@@ -313,9 +313,10 @@ WRITE_LINE_MEMBER(merit_state::vsync_changed)
 	machine().device("maincpu")->execute().set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const mc6845_interface mc6845_intf =
+static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",                   /* screen we are acting on */
+	false,						/* show border area */
 	8,                          /* number of pixels per video memory address */
 	begin_update,               /* before pixel update callback */
 	update_row,                 /* row update callback */

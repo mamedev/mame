@@ -616,8 +616,10 @@ static const cassette_interface super80_cassette_interface =
 };
 
 
-static const mc6845_interface super80v_crtc = {
+static MC6845_INTERFACE( super80v_crtc )
+{
 	"screen",           /* name of screen */
+	false,
 	SUPER80V_DOTS,          /* number of dots per character */
 	NULL,
 	super80v_update_row,        /* handler to display a scanline */

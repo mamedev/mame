@@ -992,9 +992,10 @@ static const ay8910_interface ay8912_interface =
 	DEVCB_NULL
 };
 
-static const mc6845_interface h46505_intf =
+static MC6845_INTERFACE( h46505_intf )
 {
 	"screen",   /* screen we are acting on */
+	false,		/* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

@@ -283,8 +283,10 @@ static GFXDECODE_START( dim68k )
 	GFXDECODE_ENTRY( "chargen", 0x0000, dim68k_charlayout, 0, 1 )
 GFXDECODE_END
 
-static const mc6845_interface dim68k_crtc = {
+static MC6845_INTERFACE( dim68k_crtc )
+{
 	"screen",           /* name of screen */
+	false,
 	8,          /* number of dots per character - switchable 7 or 8 */
 	NULL,
 	dim68k_update_row,      /* handler to display a scanline */

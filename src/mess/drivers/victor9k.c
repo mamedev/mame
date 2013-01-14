@@ -107,9 +107,11 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 	}
 }
 
-static const mc6845_interface hd46505s_intf =
+
+static MC6845_INTERFACE( hd46505s_intf )
 {
 	SCREEN_TAG,
+	false,
 	10,
 	NULL,
 	victor9k_update_row,

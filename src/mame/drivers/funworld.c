@@ -2457,9 +2457,10 @@ static const ay8910_interface funquiz_ay8910_intf =
 *    CRTC Interface    *
 ************************/
 
-static const mc6845_interface mc6845_intf =
+static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
+	false,		/* show border area */
 	4,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

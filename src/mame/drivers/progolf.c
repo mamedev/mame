@@ -86,7 +86,6 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_progolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(progolf_interrupt);
 };
 
 
@@ -369,15 +368,10 @@ static GFXDECODE_START( progolf )
 GFXDECODE_END
 
 
-//#ifdef UNUSED_FUNCTION
-INTERRUPT_GEN_MEMBER(progolf_state::progolf_interrupt)
-{
-}
-//#endif
-
-static const mc6845_interface mc6845_intf =
+static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
+	false,		/* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -423,7 +417,6 @@ static MACHINE_CONFIG_START( progolf, progolf_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", DECO_222, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", progolf_state,  progolf_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", M6502, 500000)
 	MCFG_CPU_PROGRAM_MAP(sound_cpu)
@@ -457,7 +450,6 @@ static MACHINE_CONFIG_DERIVED( progolfa, progolf )
 	MCFG_DEVICE_REMOVE("maincpu") /* different encrypted cpu to progolf */
 	MCFG_CPU_ADD("maincpu", DECO_CPU6, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MCFG_CPU_PROGRAM_MAP(main_cpu)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", progolf_state,  progolf_interrupt)
 MACHINE_CONFIG_END
 
 

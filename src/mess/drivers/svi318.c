@@ -386,9 +386,11 @@ static MACHINE_CONFIG_DERIVED( svi328n, svi318n )
 	MCFG_RAM_EXTRA_OPTIONS("96K,160K")
 MACHINE_CONFIG_END
 
-static const mc6845_interface svi806_crtc6845_interface =
+
+static MC6845_INTERFACE( svi806_crtc6845_interface )
 {
 	"svi806",
+	false,
 	8 /*?*/,
 	NULL,
 	svi806_crtc6845_update_row,

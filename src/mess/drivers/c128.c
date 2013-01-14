@@ -788,9 +788,11 @@ static GFXDECODE_START( c128 )
 	GFXDECODE_ENTRY( "charom", 0x0000, gfx_8x8x1, 0, 1 )
 GFXDECODE_END
 
-static const mc6845_interface vdc_intf =
+
+static MC6845_INTERFACE( vdc_intf )
 {
 	SCREEN_VDC_TAG,
+	false,
 	8,
 	NULL,
 	NULL,

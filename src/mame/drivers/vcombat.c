@@ -564,9 +564,10 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 	machine().device("soundcpu")->execute().set_input_line(M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const mc6845_interface mc6845_intf =
+static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",                   /* screen we are acting on */
+	false,						/* show border area */
 	16,                         /* number of pixels per video memory address */
 	NULL,                       /* before pixel update callback */
 	NULL,                       /* row update callback */

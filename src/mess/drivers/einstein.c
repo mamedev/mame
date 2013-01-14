@@ -713,9 +713,10 @@ static const centronics_interface einstein_centronics_config =
 	DEVCB_NULL
 };
 
-static const mc6845_interface einstein_crtc6845_interface =
+static MC6845_INTERFACE( einstein_crtc6845_interface )
 {
 	"80column",
+	false,
 	8,
 	NULL,
 	einstein_6845_update_row,

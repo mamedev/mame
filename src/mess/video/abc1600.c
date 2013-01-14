@@ -1024,9 +1024,10 @@ static MC6845_ON_UPDATE_ADDR_CHANGED( crtc_update )
 {
 }
 
-static const mc6845_interface crtc_intf =
+static MC6845_INTERFACE( crtc_intf )
 {
 	SCREEN_TAG,
+	false,
 	32,
 	NULL,
 	abc1600_update_row,

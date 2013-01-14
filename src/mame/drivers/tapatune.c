@@ -359,9 +359,10 @@ WRITE_LINE_MEMBER(tapatune_state::crtc_vsync)
 	machine().device("maincpu")->execute().set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const mc6845_interface h46505_intf =
+static MC6845_INTERFACE( h46505_intf )
 {
 	"screen",   /* screen we are acting on */
+	false,		/* show border area */
 	5,          /* number of pixels per video memory address */
 	begin_update,/* before pixel update callback */
 	update_row, /* row update callback */

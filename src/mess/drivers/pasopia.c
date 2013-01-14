@@ -301,18 +301,19 @@ static Z80PIO_INTERFACE( z80pio_intf )
 	DEVCB_NULL
 };
 
-static const mc6845_interface mc6845_intf =
+static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
-	8,      /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
+	"screen",   			/* screen we are acting on */
+	false,					/* show border area */
+	8,		    			/* number of pixels per video memory address */
+	NULL,       			/* before pixel update callback */
 	pasopia_update_row,     /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
+	NULL,       			/* after pixel update callback */
+	DEVCB_NULL, 			/* callback for display state changes */
+	DEVCB_NULL, 			/* callback for cursor state changes */
+	DEVCB_NULL, 			/* HSYNC callback */
+	DEVCB_NULL, 			/* VSYNC callback */
+	NULL        			/* update address callback */
 };
 
 static const gfx_layout p7_chars_8x8 =

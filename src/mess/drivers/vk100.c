@@ -947,9 +947,10 @@ static MC6845_UPDATE_ROW( vk100_update_row )
 }
 
 
-static const mc6845_interface mc6845_intf =
+static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",
+	false,
 	12,
 	NULL,
 	vk100_update_row,

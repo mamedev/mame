@@ -614,8 +614,11 @@ static const floppy_interface mbee_floppy_interface =
 	NULL
 };
 
-static const mc6845_interface mbee_crtc = {
+
+static MC6845_INTERFACE( mbee_crtc )
+{
 	"screen",           /* name of screen */
+	false,
 	8,          /* number of dots per character */
 	NULL,
 	mbee_update_row,        /* handler to display a scanline */
@@ -627,8 +630,11 @@ static const mc6845_interface mbee_crtc = {
 	mbee_update_addr        /* handler to process transparent mode */
 };
 
-static const mc6845_interface mbeeic_crtc = {
+
+static MC6845_INTERFACE( mbeeic_crtc )
+{
 	"screen",           /* name of screen */
+	false,
 	8,          /* number of dots per character */
 	NULL,
 	mbeeic_update_row,      /* handler to display a scanline */
@@ -640,8 +646,10 @@ static const mc6845_interface mbeeic_crtc = {
 	mbee_update_addr        /* handler to process transparent mode */
 };
 
-static const mc6845_interface mbeeppc_crtc = {
+static MC6845_INTERFACE( mbeeppc_crtc )
+{
 	"screen",           /* name of screen */
+	false,
 	8,          /* number of dots per character */
 	NULL,
 	mbeeppc_update_row,     /* handler to display a scanline */
@@ -653,8 +661,10 @@ static const mc6845_interface mbeeppc_crtc = {
 	mbee_update_addr        /* handler to process transparent mode */
 };
 
-static const mc6845_interface mbee256_crtc = {
+static MC6845_INTERFACE( mbee256_crtc )
+{
 	"screen",           /* name of screen */
+	false,
 	8,          /* number of dots per character */
 	NULL,
 	mbeeppc_update_row,     /* handler to display a scanline */

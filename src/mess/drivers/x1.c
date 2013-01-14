@@ -1897,9 +1897,10 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_DRIVER_MEMBER(x1_state, x1_portc_w)                       /* Port C write */
 };
 
-static const mc6845_interface mc6845_intf =
+static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
+	false,		/* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

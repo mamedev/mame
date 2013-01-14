@@ -409,9 +409,10 @@ WRITE_LINE_MEMBER( abc806_state::vs_w )
 //  mc6845_interface crtc_intf
 //-------------------------------------------------
 
-static const mc6845_interface crtc_intf =
+static MC6845_INTERFACE( crtc_intf )
 {
 	SCREEN_TAG,
+	false,
 	ABC800_CHAR_WIDTH,
 	NULL,
 	abc806_update_row,

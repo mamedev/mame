@@ -1662,9 +1662,11 @@ WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq5)
 	machine().device("maincpu")->execute().set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-const mc6845_interface mc6845_intf_irq1 =
+
+static MC6845_INTERFACE( mc6845_intf_irq1 )
 {
 	"screen",   /* screen we are acting on */
+	false,		/* show border area */
 	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -1676,9 +1678,10 @@ const mc6845_interface mc6845_intf_irq1 =
 	crtc_addr               /* update address callback */
 };
 
-const mc6845_interface mc6845_intf_irq3 =
+static MC6845_INTERFACE( mc6845_intf_irq3 )
 {
 	"screen",   /* screen we are acting on */
+	false,		/* show border area */
 	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -1690,9 +1693,10 @@ const mc6845_interface mc6845_intf_irq3 =
 	crtc_addr               /* update address callback */
 };
 
-const mc6845_interface mc6845_intf_irq5 =
+static MC6845_INTERFACE( mc6845_intf_irq5 )
 {
 	"screen",   /* screen we are acting on */
+	false,		/* show border area */
 	4,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

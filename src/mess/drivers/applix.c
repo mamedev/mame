@@ -189,8 +189,10 @@ MC6845_UPDATE_ROW( applix_update_row )
 #endif
 }
 
-static const mc6845_interface applix_crtc = {
+static MC6845_INTERFACE( applix_crtc )
+{
 	"screen",           /* name of screen */
+	false,
 	8,          /* number of dots per character */
 	NULL,
 	applix_update_row,      /* handler to display a scanline */

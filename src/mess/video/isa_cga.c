@@ -604,9 +604,10 @@ static MC6845_UPDATE_ROW( cga_update_row )
 }
 
 
-static const mc6845_interface mc6845_cga_intf =
+static MC6845_INTERFACE( mc6845_cga_intf )
 {
 	CGA_SCREEN_NAME,    /* screen number */
+	false,				/* show border area */
 	8,                  /* numbers of pixels per video memory address */
 	NULL,               /* begin_update */
 	cga_update_row,     /* update_row */

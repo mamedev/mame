@@ -631,9 +631,11 @@ static QUICKLOAD_LOAD(tvc64)
 	}
 }
 
-static const mc6845_interface tvc_crtc6845_interface =
+
+static MC6845_INTERFACE( tvc_crtc6845_interface )
 {
 	"screen",
+	false,
 	8 /*?*/,
 	NULL,
 	tvc_update_row,

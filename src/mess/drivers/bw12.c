@@ -355,9 +355,11 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 	}
 }
 
-static const mc6845_interface bw12_mc6845_interface =
+
+static MC6845_INTERFACE( bw12_mc6845_interface )
 {
 	SCREEN_TAG,
+	false,
 	8,
 	NULL,
 	bw12_update_row,

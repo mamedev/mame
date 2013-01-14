@@ -27,6 +27,23 @@
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 
+#define mc6845_h_char_total     (m_crtc_vreg[0]+1)
+#define mc6845_h_display        (m_crtc_vreg[1])
+#define mc6845_h_sync_pos       (m_crtc_vreg[2])
+#define mc6845_sync_width       (m_crtc_vreg[3])
+#define mc6845_v_char_total     (m_crtc_vreg[4]+1)
+#define mc6845_v_total_adj      (m_crtc_vreg[5])
+#define mc6845_v_display        (m_crtc_vreg[6])
+#define mc6845_v_sync_pos       (m_crtc_vreg[7])
+#define mc6845_mode_ctrl        (m_crtc_vreg[8])
+#define mc6845_tile_height      (m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start   (m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end     (m_crtc_vreg[0x0b])
+#define mc6845_start_addr       (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
+
 class smc777_state : public driver_device
 {
 public:
@@ -50,14 +67,11 @@ public:
 	UINT8 *m_gvram;
 	UINT8 *m_pcg;
 
-	UINT16 m_cursor_addr;
-	UINT16 m_cursor_raster;
 	UINT8 m_keyb_press;
 	UINT8 m_keyb_press_flag;
 	UINT8 m_shift_press_flag;
 	UINT8 m_backdrop_pen;
 	UINT8 m_display_reg;
-	int m_addr_latch;
 	UINT8 m_fdc_irq_flag;
 	UINT8 m_fdc_drq_flag;
 	UINT8 m_system_data;
@@ -68,6 +82,8 @@ public:
 	UINT8 m_keyb_direct;
 	UINT8 m_pal_mode;
 	UINT8 m_keyb_cmd;
+	UINT8 m_crtc_vreg[0x20];
+	UINT8 m_crtc_addr;
 	DECLARE_WRITE8_MEMBER(smc777_6845_w);
 	DECLARE_READ8_MEMBER(smc777_vram_r);
 	DECLARE_READ8_MEMBER(smc777_attr_r);
@@ -107,9 +123,9 @@ public:
 };
 
 
-
-#define CRTC_MIN_X 10
-#define CRTC_MIN_Y 10
+/* TODO: correct numbers, calculable thru mc6845 regs */
+#define CRTC_MIN_X 24*8
+#define CRTC_MIN_Y 4*8
 
 void smc777_state::video_start()
 {
@@ -121,9 +137,11 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 	UINT16 count;
 	int x_width;
 
+//	popmessage("%d %d %d %d",mc6845_v_char_total,mc6845_v_total_adj,mc6845_v_display,mc6845_v_sync_pos);
+
 	bitmap.fill(machine().pens[m_backdrop_pen], cliprect);
 
-	x_width = (m_display_reg & 0x80) ? 2 : 4;
+	x_width = ((m_display_reg & 0x80) >> 7);
 
 	count = 0x0000;
 
@@ -137,26 +155,26 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 
 				color = (m_gvram[count] & 0xf0) >> 4;
 				/* todo: clean this up! */
-				if(x_width == 2)
-				{
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = machine().pens[color];
-				}
-				else
+				//if(x_width)
 				{
 					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = machine().pens[color];
 					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = machine().pens[color];
 				}
+				//else
+				//{
+				//	bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+0+CRTC_MIN_X) = machine().pens[color];
+				//}
 
 				color = (m_gvram[count] & 0x0f) >> 0;
-				if(x_width == 2)
-				{
-					bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = machine().pens[color];
-				}
-				else
+				//if(x_width)
 				{
 					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = machine().pens[color];
 					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = machine().pens[color];
 				}
+				//else
+				//{
+				//	bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = machine().pens[color];
+				//}
 
 				count++;
 
@@ -167,11 +185,9 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 
 	count = 0x0000;
 
-	x_width = (m_display_reg & 0x80) ? 40 : 80;
-
 	for(y=0;y<25;y++)
 	{
-		for(x=0;x<x_width;x++)
+		for(x=0;x<80/(x_width+1);x++)
 		{
 			/*
 			-x-- ---- blink
@@ -207,17 +223,25 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 					pen = ((m_pcg[tile*8+yi]>>(7-xi)) & 1) ? (color+m_pal_mode) : bk_pen;
 
 					if (pen != -1)
-						bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = machine().pens[pen];
+					{
+						if(x_width)
+						{
+							bitmap.pix16(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+0+CRTC_MIN_X) = machine().pens[pen];
+							bitmap.pix16(y*8+CRTC_MIN_Y+yi, (x*8+xi)*2+1+CRTC_MIN_X) = machine().pens[pen];
+						}
+						else
+							bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = machine().pens[pen];
+					}
 				}
 			}
 
 			// draw cursor
-			if(m_cursor_addr == count)
+			if(mc6845_cursor_addr == count)
 			{
 				int xc,yc,cursor_on;
 
 				cursor_on = 0;
-				switch(m_cursor_raster & 0x60)
+				switch(mc6845_cursor_y_start & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
@@ -227,11 +251,17 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(m_cursor_raster & 7));yc++)
+					for(yc=0;yc<(8-(mc6845_cursor_y_start & 7));yc++)
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = machine().pens[0x7];
+							if(x_width)
+							{
+								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+0+CRTC_MIN_X) = machine().pens[0x7];
+								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, (x*8+xc)*2+1+CRTC_MIN_X) = machine().pens[0x7];
+							}
+							else
+								bitmap.pix16(y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = machine().pens[0x7];
 						}
 					}
 				}
@@ -248,19 +278,13 @@ WRITE8_MEMBER(smc777_state::smc777_6845_w)
 {
 	if(offset == 0)
 	{
-		m_addr_latch = data;
-		//mc6845_address_w(m_crtc, 0,data);
+		m_crtc_addr = data;
+		m_crtc->address_w(space, 0,data);
 	}
 	else
 	{
-		if(m_addr_latch == 0x0a)
-			m_cursor_raster = data;
-		else if(m_addr_latch == 0x0e)
-			m_cursor_addr = ((data<<8) & 0x3f00) | (m_cursor_addr & 0xff);
-		else if(m_addr_latch == 0x0f)
-			m_cursor_addr = (m_cursor_addr & 0x3f00) | (data & 0xff);
-
-		//mc6845_register_w(m_crtc, 0,data);
+		m_crtc_vreg[m_crtc_addr] = data;
+		m_crtc->register_w(space, 0,data);
 	}
 }
 
@@ -552,20 +576,6 @@ WRITE8_MEMBER(smc777_state::display_reg_w)
 	x--- ---- width 80 / 40 switch (0 = 640 x 200 1 = 320 x 200)
 	---- -x-- mode select?
 	*/
-
-	{
-		if((m_display_reg & 0x80) != (data & 0x80))
-		{
-			rectangle visarea = machine().primary_screen->visible_area();
-			int x_width;
-
-			x_width = (data & 0x80) ? 320 : 640;
-
-			visarea.set(0, (x_width+(CRTC_MIN_X*2)) - 1, 0, (200+(CRTC_MIN_Y*2)) - 1);
-
-			machine().primary_screen->configure(660, 220, visarea, machine().primary_screen->frame_period().attoseconds);
-		}
-	}
 
 	m_display_reg = data;
 }
@@ -984,9 +994,10 @@ void smc777_state::machine_reset()
 }
 
 
-static const mc6845_interface mc6845_intf =
+static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
+	true,		/* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

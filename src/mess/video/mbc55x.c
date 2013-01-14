@@ -158,9 +158,10 @@ WRITE_LINE_MEMBER( mbc55x_state::vid_vsync_changed )
 {
 }
 
-const mc6845_interface mb55x_mc6845_intf =
+MC6845_INTERFACE( mb55x_mc6845_intf )
 {
 	SCREEN_TAG,                     /* screen number */
+	false,							/* show border area */
 	8,                              /* numbers of pixels per video memory address */
 	NULL,                           /* begin_update */
 	vid_update_row,                 /* update_row */

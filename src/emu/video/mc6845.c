@@ -26,6 +26,9 @@
 
     TODO:
 
+    - Change device video emulation x/y offsets when "show border color"
+      is true
+
     - mos8563
 
         - horizontal scroll
@@ -95,6 +98,7 @@ void mc6845_device::device_config_complete()
 	else
 	{
 		m_screen_tag = NULL;
+		m_show_border_area = false;
 		m_hpixels_per_column = 0;
 		m_begin_update = NULL;
 		m_update_row = NULL;
@@ -506,7 +510,10 @@ void mc6845_device::recompute_parameters(bool postload)
 
 			attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_clock) * (m_horiz_char_total + 1) * vert_pix_total;
 
-			visarea.set(0, max_visible_x, 0, max_visible_y);
+			if(m_show_border_area)
+				visarea.set(0, horiz_pix_total+1, 0, vert_pix_total+1);
+			else
+				visarea.set(0, max_visible_x, 0, max_visible_y);
 
 			if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
@@ -1041,6 +1048,7 @@ void mc6845_device::device_start()
 	m_line_address = 0;
 	m_current_disp_addr = 0;
 
+	save_item(NAME(m_show_border_area));
 	save_item(NAME(m_hpixels_per_column));
 	save_item(NAME(m_register_address_latch));
 	save_item(NAME(m_horiz_char_total));

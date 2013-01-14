@@ -66,9 +66,11 @@ static MC6845_UPDATE_ROW( a6809_update_row )
 {
 }
 
-static const mc6845_interface a6809_crtc6845_interface =
+
+static MC6845_INTERFACE( a6809_crtc6845_interface )
 {
 	"screen",
+	false,
 	12 /*?*/,
 	NULL,
 	a6809_update_row,

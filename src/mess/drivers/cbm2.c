@@ -1103,9 +1103,10 @@ static MC6845_UPDATE_ROW( crtc_update_row )
 	}
 }
 
-static const mc6845_interface crtc_intf =
+static MC6845_INTERFACE( crtc_intf )
 {
 	SCREEN_TAG,
+	false,
 	9,
 	NULL,
 	crtc_update_row,

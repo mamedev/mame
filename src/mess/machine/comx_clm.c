@@ -129,9 +129,10 @@ static MC6845_UPDATE_ROW( comx_clm_update_row )
 	clm->crtc_update_row(device,bitmap,cliprect,ma,ra,y,x_count,cursor_x,param);
 }
 
-static const mc6845_interface crtc_intf =
+static MC6845_INTERFACE( crtc_intf )
 {
 	MC6845_SCREEN_TAG,
+	false,
 	8,
 	NULL,
 	comx_clm_update_row,

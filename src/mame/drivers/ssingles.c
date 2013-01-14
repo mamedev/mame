@@ -265,9 +265,11 @@ static MC6845_UPDATE_ROW( atamanot_update_row )
 	}
 }
 
-static const mc6845_interface ssingles_mc6845_intf =
+
+static MC6845_INTERFACE( ssingles_mc6845_intf )
 {
 	"screen",
+	false,
 	8,
 	NULL,                       /* before pixel update callback */
 	ssingles_update_row,        /* row update callback */
@@ -279,9 +281,10 @@ static const mc6845_interface ssingles_mc6845_intf =
 	NULL                        /* update address callback */
 };
 
-static const mc6845_interface atamanot_mc6845_intf =
+static MC6845_INTERFACE( atamanot_mc6845_intf )
 {
 	"screen",
+	false,
 	8,
 	NULL,                       /* before pixel update callback */
 	atamanot_update_row,        /* row update callback */

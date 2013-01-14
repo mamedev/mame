@@ -831,9 +831,11 @@ void m20_state::machine_reset()
 	m_maincpu->reset();     // reset the CPU to ensure it picks up the new vector
 }
 
-static const mc6845_interface mc6845_intf =
+
+static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
+	false,		/* show border area */
 	16,         /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

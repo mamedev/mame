@@ -463,9 +463,11 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 }
 
 
-static const mc6845_interface pyl601_crtc6845_interface =
+
+static MC6845_INTERFACE( pyl601_crtc6845_interface )
 {
 	"screen",
+	false,
 	8 /*?*/,
 	NULL,
 	pyl601_update_row,
@@ -477,9 +479,10 @@ static const mc6845_interface pyl601_crtc6845_interface =
 	NULL
 };
 
-static const mc6845_interface pyl601a_crtc6845_interface =
+static MC6845_INTERFACE( pyl601a_crtc6845_interface )
 {
 	"screen",
+	false,
 	8 /*?*/,
 	NULL,
 	pyl601a_update_row,

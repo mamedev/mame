@@ -235,9 +235,11 @@ WRITE_LINE_MEMBER( apricot_state::apricot_mc6845_de )
 	m_display_enabled = state;
 }
 
-static const mc6845_interface apricot_mc6845_intf =
+
+static MC6845_INTERFACE( apricot_mc6845_intf )
 {
 	"screen",
+	false,
 	10,
 	NULL,
 	apricot_update_row,

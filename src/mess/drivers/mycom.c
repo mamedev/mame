@@ -331,18 +331,19 @@ static GFXDECODE_START( mycom )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mycom_charlayout, 0, 1 )
 GFXDECODE_END
 
-static const mc6845_interface mc6845_intf =
+static MC6845_INTERFACE( mc6845_intf )
 {
-	"screen",   /* screen we are acting on */
-	8,      /* number of pixels per video memory address */
-	NULL,       /* before pixel update callback */
-	mycom_update_row,       /* row update callback */
-	NULL,       /* after pixel update callback */
-	DEVCB_NULL, /* callback for display state changes */
-	DEVCB_NULL, /* callback for cursor state changes */
-	DEVCB_NULL, /* HSYNC callback */
-	DEVCB_NULL, /* VSYNC callback */
-	NULL        /* update address callback */
+	"screen",   		/* screen we are acting on */
+	false,				/* show border area */
+	8,      			/* number of pixels per video memory address */
+	NULL,      			/* before pixel update callback */
+	mycom_update_row,	/* row update callback */
+	NULL,       		/* after pixel update callback */
+	DEVCB_NULL, 		/* callback for display state changes */
+	DEVCB_NULL, 		/* callback for cursor state changes */
+	DEVCB_NULL, 		/* HSYNC callback */
+	DEVCB_NULL, 		/* VSYNC callback */
+	NULL        		/* update address callback */
 };
 
 WRITE8_MEMBER( mycom_state::mycom_04_w )

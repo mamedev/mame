@@ -211,9 +211,11 @@ static MC6845_UPDATE_ROW( ec65_update_row )
 	}
 }
 
-static const mc6845_interface ec65_crtc6845_interface =
+
+static MC6845_INTERFACE( ec65_crtc6845_interface )
 {
 	"screen",
+	false,
 	8 /*?*/,
 	NULL,
 	ec65_update_row,

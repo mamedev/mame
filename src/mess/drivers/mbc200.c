@@ -134,8 +134,11 @@ MC6845_UPDATE_ROW( mbc200_update_row )
 {
 }
 
-static const mc6845_interface mbc200_crtc = {
+
+static MC6845_INTERFACE( mbc200_crtc )
+{
 	"screen",           /* name of screen */
+	false,
 	8,          /* number of dots per character */
 	NULL,
 	mbc200_update_row,      /* handler to display a scanline */

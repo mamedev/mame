@@ -29,8 +29,10 @@ static WRITE_LINE_DEVICE_HANDLER( t1000_vsync_changed );
 static WRITE_LINE_DEVICE_HANDLER( pcjr_vsync_changed );
 
 
-static const mc6845_interface mc6845_t1000_intf = {
+static MC6845_INTERFACE( mc6845_t1000_intf )
+{
 	T1000_SCREEN_NAME,      /* screen number */
+	false,					/* show border area */
 	8,                      /* numbers of pixels per video memory address */
 	NULL,                   /* begin_update */
 	t1000_update_row,       /* update_row */
@@ -57,8 +59,10 @@ MACHINE_CONFIG_FRAGMENT( pcvideo_t1000 )
 MACHINE_CONFIG_END
 
 
-static const mc6845_interface mc6845_pcjr_intf = {
+static MC6845_INTERFACE( mc6845_pcjr_intf )
+{
 	T1000_SCREEN_NAME,      /* screen number */
+	false,					/* show border area */
 	8,                      /* numbers of pixels per video memory address */
 	NULL,                   /* begin_update */
 	t1000_update_row,       /* update_row */

@@ -1545,13 +1545,14 @@ static const pia6821_interface aristmk4_pia1_intf =
 	DEVCB_NULL  // IRQB
 };
 
-static const mc6845_interface mc6845_intf =
+static MC6845_INTERFACE( mc6845_intf )
 {
 	/* in fact is a mc6845 driving 4 pixels by memory address.
 	that's why the big horizontal parameters */
 
 	"screen",   /* screen we are acting on */
-	4,      /* number of pixels per video memory address */
+	false,		/* show border area */
+	4,			/* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
 	NULL,       /* after pixel update callback */

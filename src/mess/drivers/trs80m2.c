@@ -616,9 +616,10 @@ WRITE_LINE_MEMBER( trs80m2_state::vsync_w )
 	}
 }
 
-static const mc6845_interface mc6845_intf =
+static MC6845_INTERFACE( mc6845_intf )
 {
 	SCREEN_TAG,
+	false,
 	8,
 	NULL,
 	trs80m2_update_row,

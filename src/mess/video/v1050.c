@@ -93,9 +93,10 @@ WRITE_LINE_MEMBER( v1050_state::crtc_vs_w )
 	set_interrupt(INT_VSYNC, state);
 }
 
-static const mc6845_interface crtc_intf =
+static MC6845_INTERFACE( crtc_intf )
 {
 	SCREEN_TAG,
+	false,
 	8,
 	NULL,
 	v1050_update_row,
