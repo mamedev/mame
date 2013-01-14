@@ -97,6 +97,7 @@ public:
 	UINT16 *m_paletteram16;
 	UINT32 *m_poly_rom;
 	UINT32 *m_poly_ram;
+	UINT16 m_lamp_state;
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_READ16_MEMBER(fifoin_status_r);

@@ -645,6 +645,9 @@ READ16_MEMBER(model1_state::io_r)
 	if(offset < 0x8)
 		return ioport(analognames[offset])->read_safe(0x00);
 
+	if(offset == 0x0f)
+		return m_lamp_state;
+
 	if(offset < 0x10)
 	{
 		offset -= 0x8;
@@ -660,12 +663,14 @@ READ16_MEMBER(model1_state::io_r)
 WRITE16_MEMBER(model1_state::io_w)
 {
 	if(offset == 0x0f){
-		// tested in vf, swa, wingwar
+		// tested in vr, vf, swa, wingwar
 		set_led_status(machine(), 0, data & 0x4);   // START (1)
 		set_led_status(machine(), 1, data & 0x8);   // VIEW1 (START2 - VF)
 		set_led_status(machine(), 2, data & 0x10);  // VIEW2 (VIEW - SWA)
 		set_led_status(machine(), 3, data & 0x20);  // VIEW3
 		set_led_status(machine(), 4, data & 0x40);  // VIEW4
+		set_led_status(machine(), 5, data & 0x80);  // RACE LEADER
+		m_lamp_state = data;
 		return;
 	}
 	logerror("IOW: %02x %02x\n", offset, data);
@@ -965,7 +970,7 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_SHARE("paletteram")
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_SHARE("color_xlat")
 
-	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP
+	AM_RANGE(0xc00000, 0xc0003f) AM_READWRITE(io_r, io_w)
 
 	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
 
