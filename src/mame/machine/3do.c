@@ -51,6 +51,10 @@ Expansion bus stuff:
 00022ba4 - init exp bus, write 17x 00 to the selection register to let all expansion devices determine their id on the bus.
 00022bd0 - write 0x8f to the selection register to determine if there are too many devices attached.
 
+(11-jan-2013)
+"Error, could not open cdrom device"
+- ARM finally uploads a program to DSPP, wants something back out of it (reads EO 0xee and unmasks DSPP irq).
+
 */
 
 #include "emu.h"
@@ -611,6 +615,7 @@ WRITE32_MEMBER(_3do_state::_3do_madam_w){
 	case 0x05d0/4: case 0x05d4/4: case 0x05d8/4: case 0x05dc/4:
 	case 0x05e0/4: case 0x05e4/4: case 0x05e8/4: case 0x05ec/4:
 	case 0x05f0/4: case 0x05f4/4: case 0x05f8/4: case 0x05fc/4:
+		printf("%08x %08x\n",offset*4,data);
 		m_madam.dma[(offset/4) & 0x1f][offset & 0x03] = data;
 		return;
 
@@ -935,6 +940,11 @@ WRITE32_MEMBER(_3do_state::_3do_clio_w)
 		m_clio.slack = data & 0x000003ff;
 		break;
 
+	case 0x0304/4:
+		if(data)
+			printf("DMA %08x\n",data);
+
+		break;
 
 	case 0x0308/4:
 		m_clio.dmareqdis = data;

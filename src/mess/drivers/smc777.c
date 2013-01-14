@@ -190,6 +190,8 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 
 			if(blink && machine().primary_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
 				color = bk_pen;
+			else
+				color+=m_pal_mode;
 
 			for(yi=0;yi<8;yi++)
 			{
@@ -197,9 +199,9 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 				{
 					int pen;
 
-					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+m_pal_mode) : bk_pen;
+					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color) : bk_pen;
 
-					if ((pen != -1) && (pen < SMC777_NUMPENS))
+					if (pen != -1)
 						bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = machine().pens[pen];
 				}
 			}
@@ -1083,7 +1085,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
 	MCFG_SCREEN_UPDATE_DRIVER(smc777_state, screen_update_smc777)
 
-	MCFG_PALETTE_LENGTH(SMC777_NUMPENS) 
+	MCFG_PALETTE_LENGTH(SMC777_NUMPENS)
 	MCFG_GFXDECODE(smc777)
 
 	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
