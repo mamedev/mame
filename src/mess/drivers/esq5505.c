@@ -110,6 +110,7 @@
 #include "machine/esqpanel.h"
 #include "machine/serial.h"
 #include "machine/midiinport.h"
+#include "machine/midioutport.h"
 
 #define GENERIC (0)
 #define EPS     (1)
@@ -137,7 +138,8 @@ public:
 		m_epspanel(*this, "epspanel"),
 		m_sq1panel(*this, "sq1panel"),
 		m_panel(*this, "panel"),
-		m_dmac(*this, "mc68450")
+		m_dmac(*this, "mc68450"),
+		m_mdout(*this, "mdout")
 	{ }
 
 	required_device<m68000_device> m_maincpu;
@@ -147,6 +149,7 @@ public:
 	optional_device<esqpanel2x40_sq1_device> m_sq1panel;
 	optional_device<esqpanel2x40_device> m_panel;
 	optional_device<hd63450_device> m_dmac;
+	required_device<serial_port_device> m_mdout;
 
 	virtual void machine_reset();
 
@@ -527,6 +530,7 @@ WRITE8_MEMBER(esq5505_state::duart_output)
 // MIDI send, we don't care yet
 WRITE_LINE_MEMBER(esq5505_state::duart_tx_a)
 {
+	m_mdout->tx(state);
 }
 
 WRITE_LINE_MEMBER(esq5505_state::duart_tx_b)
@@ -767,6 +771,7 @@ static const serial_port_interface midiin_intf =
 };
 
 static SLOT_INTERFACE_START(midiout_slot)
+	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
 SLOT_INTERFACE_END
 
 static const serial_port_interface midiout_intf =
@@ -783,7 +788,7 @@ static MACHINE_CONFIG_START( vfx, esq5505_state )
 	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, NULL, NULL)
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_10MHz)
@@ -823,7 +828,7 @@ static MACHINE_CONFIG_START(vfx32, esq5505_state)
 	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
 
 	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
-	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, NULL, NULL)
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5505, XTAL_30_4761MHz / 2)

@@ -16,7 +16,8 @@ struct osd_midi_device
 	PortMidiStream *pmStream;
 	PmEvent rx_evBuf[20];		// up to 20 events
 	#endif
-	UINT8 xmit_in[3]; // Pm_Messages mean we can at most have 3 residue bytes
+	UINT8 xmit_in[4]; // Pm_Messages mean we can at most have 3 residue bytes
+	int xmit_cnt;
 };
 
 void osd_list_midi_devices(void)
@@ -231,6 +232,60 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 	return bytesOut;
 	#else
 	return 0;
+	#endif
+}
+
+void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
+{
+	#ifndef DISABLE_MIDI
+	int bytes_needed = 0;
+
+	dev->xmit_in[dev->xmit_cnt++] = data;
+
+	// are we there yet?
+	switch ((dev->xmit_in[0]>>4) & 0xf)
+	{
+		case 0xc:	// 2-byte messages
+		case 0xd:
+			bytes_needed = 2;
+			break;
+
+		case 0xf:	// system common
+			switch (dev->xmit_in[0] & 0xf)
+			{
+				case 0:	// System Exclusive
+					printf("No SEx please!\n");
+					break;
+
+				case 7:	// End of System Exclusive
+					bytes_needed = 1;
+					break;
+
+				case 2:	// song pos
+				case 3:	// song select
+					bytes_needed = 3;
+					break;
+
+				default:	// all other defined Fx messages are 1 byte
+					bytes_needed = 1;
+					break;
+			}
+			break;
+
+		default:
+			bytes_needed = 3;
+			break;
+	}
+
+	if (dev->xmit_cnt == bytes_needed)
+	{
+		PmEvent ev;
+		ev.message = Pm_Message(dev->xmit_in[0], dev->xmit_in[1], dev->xmit_in[2]);
+		ev.timestamp = 0;	// use the current time
+		Pm_Write(dev->pmStream, &ev, 1);
+		dev->xmit_cnt = 0;
+	}
+
 	#endif
 }
 

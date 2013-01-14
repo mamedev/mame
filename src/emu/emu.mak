@@ -346,6 +346,7 @@ EMUIMAGEDEVOBJS = \
 	$(EMUIMAGEDEV)/floppy.o     \
 	$(EMUIMAGEDEV)/harddriv.o   \
 	$(EMUIMAGEDEV)/midiin.o     \
+	$(EMUIMAGEDEV)/midiout.o     \
 	$(EMUIMAGEDEV)/printer.o    \
 	$(EMUIMAGEDEV)/serial.o     \
 	$(EMUIMAGEDEV)/snapquik.o   \
