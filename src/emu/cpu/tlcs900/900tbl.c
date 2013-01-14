@@ -1530,7 +1530,7 @@ static void _BITBIM(tlcs900_state *cpustate)
 static void _BITBIR(tlcs900_state *cpustate)
 {
 	cpustate->sr.b.l &= ~ ( FLAG_ZF | FLAG_NF );
-	if ( *cpustate->p2_reg8 & ( 1 << ( cpustate->imm1.b.l & 0x07 ) ) )
+	if ( *cpustate->p2_reg8 & ( 1 << ( cpustate->imm1.b.l & 0x0f ) ) )
 		cpustate->sr.b.l |= FLAG_HF;
 	else
 		cpustate->sr.b.l |= FLAG_HF | FLAG_ZF;
