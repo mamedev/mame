@@ -27,6 +27,7 @@
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 
+#define SMC777_NUMPENS (0x10+8) //16 palette entries + 8 special colors
 
 class smc777_state : public driver_device
 {
@@ -109,6 +110,8 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 	UINT8 *vram = machine().root_device().memregion("vram")->base();
 	UINT8 *attr = machine().root_device().memregion("attr")->base();
 	UINT8 *gram = memregion("fbuf")->base();
+	UINT8 *gfx_data = machine().root_device().memregion("pcg")->base();
+
 	int x_width;
 
 	bitmap.fill(machine().pens[m_backdrop_pen], cliprect);
@@ -192,12 +195,11 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					UINT8 *gfx_data = machine().root_device().memregion("pcg")->base();
 					int pen;
 
 					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color+m_pal_mode) : bk_pen;
 
-					if(pen != -1)
+					if ((pen != -1) && (pen < SMC777_NUMPENS))
 						bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = machine().pens[pen];
 				}
 			}
@@ -1052,6 +1054,7 @@ INTERRUPT_GEN_MEMBER(smc777_state::smc777_vblank_irq)
  *************************************/
 
 
+
 //-------------------------------------------------
 //  sn76496_config psg_intf
 //-------------------------------------------------
@@ -1080,7 +1083,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
 	MCFG_SCREEN_UPDATE_DRIVER(smc777_state, screen_update_smc777)
 
-	MCFG_PALETTE_LENGTH(0x10+8) //16 palette entries + 8 special colors
+	MCFG_PALETTE_LENGTH(SMC777_NUMPENS) 
 	MCFG_GFXDECODE(smc777)
 
 	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
