@@ -8,7 +8,7 @@ Pocket emulation. The 900 and 900/M modes are not supported yet.
 
 TODO:
 - review cycle counts
-- implement the remaining internal mcu features
+- implement the remaining internal mcu features (serial transfer, etc)
 - add support for 900 and 900/M modes
 
 *******************************************************************/
@@ -1084,6 +1084,11 @@ static WRITE8_HANDLER( tlcs900_internal_w )
 	case TLCS900_MAMR0:
 	case TLCS900_MSAR1:
 	case TLCS900_MAMR1:
+		break;
+
+	case TLCS900_SC0BUF:
+		// Fake finish sending data
+		cpustate->reg[TLCS900_INTES0] |= 0x80;
 		break;
 
 	case TLCS900_ADMOD:
