@@ -1,3 +1,158 @@
+/***************************************************************************
+
+    Copyright Olivier Galibert
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+****************************************************************************/
+
+/*********************************************************************
+
+    formats/g64_dsk.c
+
+    Commodore 1541 GCR disk image format
+
+*********************************************************************/
+
+#include "emu.h"
+#include "formats/g64_dsk.h"
+
+#define G64_FORMAT_HEADER 	"GCR-1541"
+
+g64_format::g64_format()
+{
+}
+
+const char *g64_format::name() const
+{
+	return "g64";
+}
+
+const char *g64_format::description() const
+{
+	return "Commodore 1541 GCR disk image";
+}
+
+const char *g64_format::extensions() const
+{
+	return "g64";
+}
+
+const UINT32 g64_format::c1541_cell_size[] =
+{
+	4000, // 16MHz/16/4
+	3750, // 16MHz/15/4
+	3500, // 16MHz/14/4
+	3250  // 16MHz/13/4
+};
+
+int g64_format::identify(io_generic *io, UINT32 form_factor)
+{
+	UINT8 header[8];
+
+	io_generic_read(io, &header, 0, sizeof(header));
+	if ( memcmp( header, G64_FORMAT_HEADER, 8 ) ==0) {
+		return 100;
+	}
+	return 0;
+}
+
+bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+{
+	int size = io_generic_size(io);
+	UINT8 *img = global_alloc_array(UINT8, size);
+	io_generic_read(io, img, 0, size);
+
+	int track_count = pick_integer_le(img, 9, 2);
+
+	int pos = 0x0c;
+	int track_offset[track_count];
+	for(int track = 0; track < track_count; track++) {
+		track_offset[track] = pick_integer_le(img, pos, 4);
+		pos += 4;
+	}
+
+	int speed_zone_offset[track_count];
+	for(int track = 0; track < track_count; track++) {
+		speed_zone_offset[track] = pick_integer_le(img, pos, 4);
+		pos += 4;
+	}
+
+	for(int track = 0; track < track_count; track++) {
+		int track_size = 0;
+		pos = track_offset[track];
+		if (pos > 0) {
+			track_size = pick_integer_le(img, pos, 2);
+			pos +=2;
+		}
+		
+		if (speed_zone_offset[track] > 3)
+			throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
+
+		UINT32 cell_size = c1541_cell_size[speed_zone_offset[track]];
+		int total_size = 200000000/cell_size;
+		UINT32 *buffer = global_alloc_array_clear(UINT32, total_size);
+		int offset = 0;
+
+		if (pos > 0) {
+			for (int i=0; i<track_size; i++) {
+				raw_w(buffer, offset, 8, img[pos++], cell_size);
+			}
+
+			if (offset >= total_size)
+				throw emu_fatalerror("g64_format: Too many cells for track %d", track);
+		}
+
+		generate_track_from_levels(track, 0, buffer, total_size, 0, image);
+		global_free(buffer);
+	}
+
+	image->set_variant(floppy_image::SSSD);
+
+	return true;
+}
+
+bool g64_format::save(io_generic *io, floppy_image *image)
+{
+	return false;
+}
+
+bool g64_format::supports_save() const
+{
+	return false;
+}
+
+const floppy_format_type FLOPPY_G64_FORMAT = &floppy_image_format_creator<g64_format>;
+
+
+// ------ LEGACY -----
+
+
 /*********************************************************************
 
     formats/g64_dsk.c

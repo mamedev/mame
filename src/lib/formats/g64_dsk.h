@@ -2,19 +2,37 @@
 
     formats/g64_dsk.h
 
-    Floppy format code for Commodore 1541 GCR disk images
+    Commodore 1541 GCR disk image format
 
 *********************************************************************/
 
-#ifndef __G64_DSK__
-#define __G64_DSK__
+#ifndef G64_DSK_H_
+#define G64_DSK_H_
 
 #include "flopimg.h"
+#include "imageutl.h"
 
-/***************************************************************************
-    MACROS / CONSTANTS
-***************************************************************************/
+class g64_format : public floppy_image_format_t {
+public:
+	g64_format();
 
+	virtual const char *name() const;
+	virtual const char *description() const;
+	virtual const char *extensions() const;
+
+	virtual int identify(io_generic *io, UINT32 form_factor);
+	virtual bool load(io_generic *io, UINT32 form_factor, floppy_image *image);
+	virtual bool save(io_generic *io, floppy_image *image);
+	virtual bool supports_save() const;
+
+protected:
+	static const UINT32 c1541_cell_size[];
+};
+
+extern const floppy_format_type FLOPPY_G64_FORMAT;
+
+
+// legacy
 #define G64_SYNC_MARK           0x3ff       /* 10 consecutive 1-bits */
 
 #define G64_BUFFER_SIZE         16384
@@ -35,10 +53,6 @@ const int C8050_BITRATE[] =
 	XTAL_12MHz/2/14,    /* tracks 54-65 */
 	XTAL_12MHz/2/13     /* tracks 65-84 */
 };
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
 
 FLOPPY_IDENTIFY( g64_dsk_identify );
 FLOPPY_CONSTRUCT( g64_dsk_construct );

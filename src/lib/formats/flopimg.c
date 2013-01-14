@@ -1104,6 +1104,7 @@ bool floppy_image_format_t::type_no_data(int type) const
 	return type == CRC_CCITT_START ||
 		type == CRC_CCITT_FM_START ||
 		type == CRC_AMIGA_START ||
+		type == CRC_CBM_START ||
 		type == CRC_MACHEAD_START ||
 		type == CRC_END ||
 		type == SECTOR_LOOP_START ||
@@ -1136,6 +1137,9 @@ void floppy_image_format_t::collect_crcs(const desc_e *desc, gen_crc_info *crcs)
 		case CRC_AMIGA_START:
 			crcs[desc[i].p1].type = CRC_AMIGA;
 			break;
+		case CRC_CBM_START:
+			crcs[desc[i].p1].type = CRC_CBM;
+			break;
 		case CRC_MACHEAD_START:
 			crcs[desc[i].p1].type = CRC_MACHEAD;
 			break;
@@ -1155,6 +1159,7 @@ int floppy_image_format_t::crc_cells_size(int type) const
 	case CRC_CCITT: return 32;
 	case CRC_CCITT_FM: return 32;
 	case CRC_AMIGA: return 64;
+	case CRC_CBM: return 10;
 	case CRC_MACHEAD: return 8;
 	default: return 0;
 	}
@@ -1215,6 +1220,14 @@ void floppy_image_format_t::mfm_half_w(UINT32 *buffer, int &offset, int start_bi
 	}
 }
 
+void floppy_image_format_t::gcr5_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size)
+{
+	UINT32 e0 = gcr5fw_tb[val >> 4];
+	UINT32 e1 = gcr5fw_tb[val & 0x0f];
+	raw_w(buffer, offset, 5, e0, size);
+	raw_w(buffer, offset, 5, e1, size);
+}
+
 void floppy_image_format_t::fixup_crc_amiga(UINT32 *buffer, const gen_crc_info *crc)
 {
 	UINT16 res = 0;
@@ -1225,6 +1238,17 @@ void floppy_image_format_t::fixup_crc_amiga(UINT32 *buffer, const gen_crc_info *
 	int offset = crc->write;
 	mfm_w(buffer, offset, 16, 0);
 	mfm_w(buffer, offset, 16, res);
+}
+
+void floppy_image_format_t::fixup_crc_cbm(UINT32 *buffer, const gen_crc_info *crc)
+{
+	UINT8 v = 0;
+	for(int o = crc->start; o < crc->end; o+=10) {
+		v = v ^ (gcr5bw_tb[bitn_r(buffer, o, 5)] << 4);
+		v = v ^ gcr5bw_tb[bitn_r(buffer, o+5, 5)];
+	}
+	int offset = crc->write;
+	gcr5_w(buffer, offset, 8, v);
 }
 
 UINT16 floppy_image_format_t::calc_crc_ccitt(const UINT32 *buffer, int start, int end)
@@ -1268,6 +1292,7 @@ void floppy_image_format_t::fixup_crcs(UINT32 *buffer, gen_crc_info *crcs)
 		if(crcs[i].write != -1) {
 			switch(crcs[i].type) {
 			case CRC_AMIGA:   fixup_crc_amiga(buffer, crcs+i); break;
+			case CRC_CBM:     fixup_crc_cbm(buffer, crcs+i); break;
 			case CRC_CCITT:   fixup_crc_ccitt(buffer, crcs+i); break;
 			case CRC_CCITT_FM:fixup_crc_ccitt_fm(buffer, crcs+i); break;
 			case CRC_MACHEAD: fixup_crc_machead(buffer, crcs+i); break;
@@ -1365,9 +1390,19 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			mfm_w(buffer, offset, desc[index].p2, desc[index].p1);
 			break;
 
+		case GCR5:
+			for(int i=0; i<desc[index].p2; i++)
+				gcr5_w(buffer, offset, 8, desc[index].p1);
+			break;
+
 		case RAW:
 			for(int i=0; i<desc[index].p2; i++)
 				raw_w(buffer, offset, 16, desc[index].p1);
+			break;
+
+		case RAWBYTE:
+			for(int i=0; i<desc[index].p2; i++)
+				raw_w(buffer, offset, 8, desc[index].p1);
 			break;
 
 		case RAWBITS:
@@ -1408,6 +1443,10 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 
 		case SECTOR_ID_FM:
 			fm_w(buffer, offset, 8, sect[sector_idx].sector_id);
+			break;
+
+		case SECTOR_ID_GCR5:
+			gcr5_w(buffer, offset, 8, sect[sector_idx].sector_id);
 			break;
 
 		case SECTOR_ID_GCR6:
@@ -1482,6 +1521,7 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			break;
 
 		case CRC_AMIGA_START:
+		case CRC_CBM_START:
 		case CRC_CCITT_START:
 		case CRC_CCITT_FM_START:
 		case CRC_MACHEAD_START:
@@ -1522,6 +1562,13 @@ void floppy_image_format_t::generate_track(const desc_e *desc, int track, int he
 			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
 			for(int i=0; i != csect->size; i++)
 				mfm_half_w(buffer, offset, 6, csect->data[i]);
+			break;
+		}
+
+		case SECTOR_DATA_GCR5: {
+			const desc_s *csect = sect + (desc[index].p1 >= 0 ? desc[index].p1 : sector_idx);
+			for(int i=0; i != csect->size; i++)
+				gcr5_w(buffer, offset, 8, csect->data[i]);
 			break;
 		}
 
@@ -1695,6 +1742,20 @@ void floppy_image_format_t::generate_track_from_levels(int track, int head, UINT
 	image->set_track_size(track, head, size);
 	image->set_write_splice_position(track, head, splice_angular_pos);
 }
+
+const UINT8 floppy_image_format_t::gcr5fw_tb[0x10] =
+{
+	0x0a, 0x0b, 0x12, 0x13, 0x0e, 0x0f, 0x16, 0x17,
+	0x09, 0x19, 0x1a, 0x1b, 0x0d, 0x1d, 0x1e, 0x15
+};
+
+const UINT8 floppy_image_format_t::gcr5bw_tb[0x20] =
+{
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x08, 0x00, 0x01, 0x00, 0x0c, 0x04, 0x05,
+	0x00, 0x00, 0x02, 0x03, 0x00, 0x0f, 0x06, 0x07,
+	0x00, 0x09, 0x0a, 0x0b, 0x00, 0x0d, 0x0e, 0x00
+};
 
 const UINT8 floppy_image_format_t::gcr6fw_tb[0x40] =
 {

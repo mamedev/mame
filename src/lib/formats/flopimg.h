@@ -301,7 +301,9 @@ protected:
 		FM,                     //!< One byte in p1 to be fm-encoded, msb first, repeated p2 times
 		MFM,                    //!< One byte in p1 to be mfm-encoded, msb first, repeated p2 times
 		MFMBITS,                //!< A value of p2 bits in p1 to be mfm-encoded, msb first
+		GCR5,					//!< One byte in p1 to be gcr5-encoded, repeated p2 times
 		RAW,                    //!< One 16 bits word in p1 to be written raw, msb first, repeated p2 times
+		RAWBYTE,                //!< One 8 bit byte in p1 to be written raw, msb first, repeated p2 times
 		RAWBITS,                //!< A value of p2 bits in p1 to be copied as-is, msb first
 		TRACK_ID,               //!< Track id byte, mfm-encoded
 		TRACK_ID_FM,            //!< Track id byte, fm-encoded
@@ -312,6 +314,7 @@ protected:
 		TRACK_HEAD_ID_GCR6,     //!< Track id 7th bit + head, gc6-encoded
 		SECTOR_ID,              //!< Sector id byte, mfm-encoded
 		SECTOR_ID_FM,           //!< Sector id byte, fm-encoded
+		SECTOR_ID_GCR5,         //!< Sector id byte, gcr5-encoded
 		SECTOR_ID_GCR6,         //!< Sector id byte, gcr6-encoded
 		SIZE_ID,                //!< Sector size code on one byte [log2(size/128)], mfm-encoded
 		SIZE_ID_FM,             //!< Sector size code on one byte [log2(size/128)], fm-encoded
@@ -327,11 +330,13 @@ protected:
 		SECTOR_DATA_FM,         //!< Sector data to fm-encode, which in p1, -1 for the current one per the sector id
 		SECTOR_DATA_O,          //!< Sector data to mfm-encode, odd bits only, which in p1, -1 for the current one per the sector id
 		SECTOR_DATA_E,          //!< Sector data to mfm-encode, even bits only, which in p1, -1 for the current one per the sector id
+		SECTOR_DATA_GCR5,		//!< Sector data to gcr5-encode, which in p1, -1 for the current one per the sector id
 		SECTOR_DATA_MAC,        //!< Transformed sector data + checksum, mac style, id in p1, -1 for the current one per the sector id
 
 		CRC_CCITT_START,        //!< Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id
 		CRC_CCITT_FM_START,     //!< Start a CCITT CRC calculation, with the usual x^16 + x^12 + x^5 + 1 (11021) polynomial, p1 = crc id
 		CRC_AMIGA_START,        //!< Start an amiga checksum calculation, p1 = crc id
+		CRC_CBM_START,			//<! Start a CBM checksum calculation (xor of original data values, gcr5-encoded), p1 = crc id
 		CRC_MACHEAD_START,      //!< Start of the mac gcr6 sector header checksum calculation (xor of pre-encode 6-bits values, gcr6-encoded)
 		CRC_END,                //!< End the checksum, p1 = crc id
 		CRC,                    //!< Write a checksum in the apporpriate format, p1 = crc id
@@ -391,7 +396,7 @@ protected:
 	void normalize_times(UINT32 *buffer, int bitlen);
 
 	// Some conversion tables for gcr
-	static const UINT8 gcr5fw_tb[0x20], gcr5bw_tb[0x100];
+	static const UINT8 gcr5fw_tb[0x10], gcr5bw_tb[0x20];
 	static const UINT8 gcr6fw_tb[0x40], gcr6bw_tb[0x100];
 
 	// Some useful descriptions shared by multiple formats
@@ -536,6 +541,8 @@ protected:
 	void mfm_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
 	//! MFM-encode every two bits and write
 	void mfm_half_w(UINT32 *buffer, int &offset, int start_bit, UINT32 val, UINT32 size = 1000);
+	//! GCR5-encode and write a series of bits
+	void gcr5_w(UINT32 *buffer, int &offset, int n, UINT32 val, UINT32 size = 1000);
 	//! GCR4 encode (Apple II sector header)
 	UINT16 gcr4_encode(UINT8 va);
 	//! GCR4 decode
@@ -546,7 +553,7 @@ protected:
 	void gcr6_decode(UINT8 e0, UINT8 e1, UINT8 e2, UINT8 e3, UINT8 &va, UINT8 &vb, UINT8 &vc);
 
 private:
-	enum { CRC_NONE, CRC_AMIGA, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD };
+	enum { CRC_NONE, CRC_AMIGA, CRC_CBM, CRC_CCITT, CRC_CCITT_FM, CRC_MACHEAD };
 	enum { MAX_CRC_COUNT = 64 };
 
 	//! Holds data used internally for generating CRCs.
@@ -563,6 +570,7 @@ private:
 
 	int crc_cells_size(int type) const;
 	void fixup_crc_amiga(UINT32 *buffer, const gen_crc_info *crc);
+	void fixup_crc_cbm(UINT32 *buffer, const gen_crc_info *crc);
 	void fixup_crc_ccitt(UINT32 *buffer, const gen_crc_info *crc);
 	void fixup_crc_ccitt_fm(UINT32 *buffer, const gen_crc_info *crc);
 	void fixup_crc_machead(UINT32 *buffer, const gen_crc_info *crc);
