@@ -1409,8 +1409,6 @@ static MACHINE_CONFIG_DERIVED( to9, to7 )
 	MCFG_MC6846_MODIFY( "mc6846", to9_timer )
 
 
-	MCFG_DEVICE_REMOVE("cart_list")
-
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("192K")
@@ -1627,8 +1625,6 @@ static MACHINE_CONFIG_DERIVED( to8, to7 )
 
 	MCFG_MC6846_MODIFY( "mc6846", to8_timer )
 
-	MCFG_DEVICE_REMOVE("cart_list")
-
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
@@ -1775,8 +1771,6 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 	MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 
 	MCFG_MC6846_MODIFY( "mc6846", to9p_timer )
-
-	MCFG_DEVICE_REMOVE("cart_list")
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -2115,8 +2109,6 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 	MCFG_CARTSLOT_EXTENSION_LIST("m5,rom")
 	MCFG_CARTSLOT_LOAD(mo5_cartridge)
 
-	MCFG_DEVICE_REMOVE("cart_list")
-
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
@@ -2341,8 +2333,6 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("m5,rom")
 	MCFG_CARTSLOT_LOAD(mo5_cartridge)
-
-	MCFG_DEVICE_REMOVE("cart_list")
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
