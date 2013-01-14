@@ -32,9 +32,15 @@ class smc777_state : public driver_device
 public:
 	smc777_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_crtc(*this, "crtc"),
+	m_fdc(*this, "fdc"),
 	m_sn(*this, "sn1")
 	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	required_device<mb8876_device> m_fdc;
 	optional_device<sn76489a_device> m_sn;
 
 	UINT8 *m_ipl_rom;
@@ -243,7 +249,7 @@ WRITE8_MEMBER(smc777_state::smc777_6845_w)
 	if(offset == 0)
 	{
 		m_addr_latch = data;
-		//mc6845_address_w(machine().device("crtc"), 0,data);
+		//mc6845_address_w(m_crtc, 0,data);
 	}
 	else
 	{
@@ -254,7 +260,7 @@ WRITE8_MEMBER(smc777_state::smc777_6845_w)
 		else if(m_addr_latch == 0x0f)
 			m_cursor_addr = (m_cursor_addr & 0x3f00) | (data & 0xff);
 
-		//mc6845_register_w(machine().device("crtc"), 0,data);
+		//mc6845_register_w(m_crtc, 0,data);
 	}
 }
 
@@ -358,20 +364,18 @@ static void check_floppy_inserted(running_machine &machine)
 
 READ8_MEMBER(smc777_state::smc777_fdc1_r)
 {
-	device_t* dev = machine().device("fdc");
-
 	check_floppy_inserted(machine());
 
 	switch(offset)
 	{
 		case 0x00:
-			return wd17xx_status_r(dev,space, offset) ^ 0xff;
+			return wd17xx_status_r(m_fdc,space, offset) ^ 0xff;
 		case 0x01:
-			return wd17xx_track_r(dev,space, offset) ^ 0xff;
+			return wd17xx_track_r(m_fdc,space, offset) ^ 0xff;
 		case 0x02:
-			return wd17xx_sector_r(dev,space, offset) ^ 0xff;
+			return wd17xx_sector_r(m_fdc,space, offset) ^ 0xff;
 		case 0x03:
-			return wd17xx_data_r(dev,space, offset) ^ 0xff;
+			return wd17xx_data_r(m_fdc,space, offset) ^ 0xff;
 		case 0x04: //irq / drq status
 			//popmessage("%02x %02x\n",m_fdc_irq_flag,m_fdc_drq_flag);
 
@@ -383,28 +387,26 @@ READ8_MEMBER(smc777_state::smc777_fdc1_r)
 
 WRITE8_MEMBER(smc777_state::smc777_fdc1_w)
 {
-	device_t* dev = machine().device("fdc");
-
 	check_floppy_inserted(machine());
 
 	switch(offset)
 	{
 		case 0x00:
-			wd17xx_command_w(dev,space, offset,data ^ 0xff);
+			wd17xx_command_w(m_fdc,space, offset,data ^ 0xff);
 			break;
 		case 0x01:
-			wd17xx_track_w(dev,space, offset,data ^ 0xff);
+			wd17xx_track_w(m_fdc,space, offset,data ^ 0xff);
 			break;
 		case 0x02:
-			wd17xx_sector_w(dev,space, offset,data ^ 0xff);
+			wd17xx_sector_w(m_fdc,space, offset,data ^ 0xff);
 			break;
 		case 0x03:
-			wd17xx_data_w(dev,space, offset,data ^ 0xff);
+			wd17xx_data_w(m_fdc,space, offset,data ^ 0xff);
 			break;
 		case 0x04:
 			// ---- xxxx select floppy drive (yes, 15 of them, A to P)
-			wd17xx_set_drive(dev,data & 0x01);
-			//  wd17xx_set_side(dev,(data & 0x10)>>4);
+			wd17xx_set_drive(m_fdc,data & 0x01);
+			//  wd17xx_set_side(m_fdc,(data & 0x10)>>4);
 			if(data & 0xf0)
 				printf("floppy access %02x\n",data);
 			break;
@@ -955,11 +957,11 @@ static const gfx_layout smc777_charlayout =
 void smc777_state::machine_start()
 {
 	m_ipl_rom = memregion("ipl")->base();
-	m_work_ram = auto_alloc_array(machine(), UINT8, 0x10000);
-	m_vram = auto_alloc_array(machine(), UINT8, 0x800);
-	m_attr = auto_alloc_array(machine(), UINT8, 0x800);
-	m_gvram = auto_alloc_array(machine(), UINT8, 0x8000);
-	m_pcg = auto_alloc_array(machine(), UINT8, 0x800);
+	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
+	m_vram = auto_alloc_array_clear(machine(), UINT8, 0x800);
+	m_attr = auto_alloc_array_clear(machine(), UINT8, 0x800);
+	m_gvram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
+	m_pcg = auto_alloc_array_clear(machine(), UINT8, 0x800);
 
 	state_save_register_global_pointer(machine(), m_work_ram, 0x10000);
 	state_save_register_global_pointer(machine(), m_vram, 0x800);
