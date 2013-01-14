@@ -134,6 +134,7 @@ public:
 	UINT8 *m_tvram;
 	UINT8 *m_avram;
 	UINT8 *m_kvram;
+	int m_xstart,m_ystart;
 	UINT8 m_hres_320;
 	UINT8 m_io_switch;
 	UINT8 m_io_sys;
@@ -206,6 +207,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_cmt_wind_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(x1_keyboard_callback);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+
+	void x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height);
+	void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect);
+	void draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri);
+	UINT8 check_prev_height(running_machine &machine,int x,int y,int x_size);
+	UINT8 check_line_valid_height(running_machine &machine,int y,int x_size,int height);
+
 };
 
 /*----------- defined in machine/x1.c -----------*/

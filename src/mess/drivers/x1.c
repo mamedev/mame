@@ -38,7 +38,6 @@
     - Might & Magic: uses 0xe80-3 kanji ports, should be a good test case for that;
     - "newtype": trips a z80dma assert, worked around for now;
     - Saziri: doesn't re-initialize the tilemap attribute vram when you start a play, making it to have missing colors if you don't start a play in time;
-    - Shilver Ghost: changes the vertical visible area during scrolling, and that doesn't work too well with current mc6845 core.
     - Suikoden: shows a JP message error (DFJustin: "Problem with the disk device !! Please set a floppy disk properly and press the return key. Retrying.")
     - Super Billiards (X1 Pack 14): has a slight PCG timing bug, that happens randomly;
     - Trivia-Q: dunno what to do on the selection screen, missing inputs?
@@ -62,8 +61,8 @@
       0xff16 - 0xff17 start-up vector
       In theory, you can convert your tape / floppy games into ROM format easily, provided that you know what's the pinout of the
       cartridge slot and it doesn't exceed 64k (0x10000) of size.
-    - Gruppe: shows a random bitmap graphic then returns "program load error" ... it wants that the floppy has write protection enabled (btanb)
-    - Maidum: you need to load BOTH disk without write protection disabled, otherwise it refuses to run. (btanb)
+    - Gruppe: shows a random bitmap graphic then returns "program load error" ... it wants that the floppy has write protection enabled (!) (btanb)
+    - Maidum: you need to load BOTH disk with write protection disabled, otherwise it refuses to run. (btanb)
     - Marvelous: needs write protection disabled (btanb)
     - Chack'n Pop: to load this game, do a files command on the "Jodan Dos" prompt then move the cursor up at the "Chack'n Pop" file.
       Substitute bin with load and press enter. Finally, do a run once that it loaded correctly.
@@ -230,51 +229,52 @@ VIDEO_START_MEMBER(x1_state,x1)
 	m_pal_4096 = auto_alloc_array_clear(machine(), UINT8, 0x1000*3);
 }
 
-static void x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
+void x1_state::x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int y,int x,UINT16 pen,UINT8 width,UINT8 height)
 {
 	if(!machine.primary_screen->visible_area().contains(x, y))
 		return;
 
 	if(width && height)
 	{
-		bitmap.pix32(y+0, x+0) = machine.pens[pen];
-		bitmap.pix32(y+0, x+1) = machine.pens[pen];
-		bitmap.pix32(y+1, x+0) = machine.pens[pen];
-		bitmap.pix32(y+1, x+1) = machine.pens[pen];
+		bitmap.pix32(y+0+m_ystart, x+0+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+0+m_ystart, x+1+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+1+m_ystart, x+0+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+1+m_ystart, x+1+m_xstart) = machine.pens[pen];
 	}
 	else if(width)
 	{
-		bitmap.pix32(y, x+0) = machine.pens[pen];
-		bitmap.pix32(y, x+1) = machine.pens[pen];
+		bitmap.pix32(y+m_ystart, x+0+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+m_ystart, x+1+m_xstart) = machine.pens[pen];
 	}
 	else if(height)
 	{
-		bitmap.pix32(y+0, x) = machine.pens[pen];
-		bitmap.pix32(y+1, x) = machine.pens[pen];
+		bitmap.pix32(y+0+m_ystart, x+m_xstart) = machine.pens[pen];
+		bitmap.pix32(y+1+m_ystart, x+m_xstart) = machine.pens[pen];
 	}
 	else
-		bitmap.pix32(y, x) = machine.pens[pen];
+		bitmap.pix32(y+m_ystart, x+m_xstart) = machine.pens[pen];
 }
 
-#define mc6845_h_char_total     (state->m_crtc_vreg[0])
-#define mc6845_h_display        (state->m_crtc_vreg[1])
-#define mc6845_h_sync_pos       (state->m_crtc_vreg[2])
-#define mc6845_sync_width       (state->m_crtc_vreg[3])
-#define mc6845_v_char_total     (state->m_crtc_vreg[4])
-#define mc6845_v_total_adj      (state->m_crtc_vreg[5])
-#define mc6845_v_display        (state->m_crtc_vreg[6])
-#define mc6845_v_sync_pos       (state->m_crtc_vreg[7])
-#define mc6845_mode_ctrl        (state->m_crtc_vreg[8])
-#define mc6845_tile_height      (state->m_crtc_vreg[9]+1)
-#define mc6845_cursor_y_start   (state->m_crtc_vreg[0x0a])
-#define mc6845_cursor_y_end     (state->m_crtc_vreg[0x0b])
-#define mc6845_start_addr       (((state->m_crtc_vreg[0x0c]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0d] & 0xff))
-#define mc6845_cursor_addr      (((state->m_crtc_vreg[0x0e]<<8) & 0x3f00) | (state->m_crtc_vreg[0x0f] & 0xff))
-#define mc6845_light_pen_addr   (((state->m_crtc_vreg[0x10]<<8) & 0x3f00) | (state->m_crtc_vreg[0x11] & 0xff))
-#define mc6845_update_addr      (((state->m_crtc_vreg[0x12]<<8) & 0x3f00) | (state->m_crtc_vreg[0x13] & 0xff))
+#define mc6845_h_char_total     (m_crtc_vreg[0])
+#define mc6845_h_display        (m_crtc_vreg[1])
+#define mc6845_h_sync_pos       (m_crtc_vreg[2])
+#define mc6845_sync_width       (m_crtc_vreg[3])
+#define mc6845_v_char_total     (m_crtc_vreg[4])
+#define mc6845_v_total_adj      (m_crtc_vreg[5])
+#define mc6845_v_display        (m_crtc_vreg[6])
+#define mc6845_v_sync_pos       (m_crtc_vreg[7])
+#define mc6845_mode_ctrl        (m_crtc_vreg[8])
+#define mc6845_tile_height      (m_crtc_vreg[9]+1)
+#define mc6845_cursor_y_start   (m_crtc_vreg[0x0a])
+#define mc6845_cursor_y_end     (m_crtc_vreg[0x0b])
+#define mc6845_start_addr       (((m_crtc_vreg[0x0c]<<8) & 0x3f00) | (m_crtc_vreg[0x0d] & 0xff))
+#define mc6845_cursor_addr      (((m_crtc_vreg[0x0e]<<8) & 0x3f00) | (m_crtc_vreg[0x0f] & 0xff))
+#define mc6845_light_pen_addr   (((m_crtc_vreg[0x10]<<8) & 0x3f00) | (m_crtc_vreg[0x11] & 0xff))
+#define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
+
 
 /* adjust tile index when we are under double height condition */
-static UINT8 check_prev_height(running_machine &machine,int x,int y,int x_size)
+UINT8 x1_state::check_prev_height(running_machine &machine,int x,int y,int x_size)
 {
 	x1_state *state = machine.driver_data<x1_state>();
 	UINT8 prev_tile = state->m_tvram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
@@ -289,7 +289,7 @@ static UINT8 check_prev_height(running_machine &machine,int x,int y,int x_size)
 }
 
 /* Exoa II - Warroid: if double height isn't enabled on the first tile of the line then double height is disabled on everything else. */
-static UINT8 check_line_valid_height(running_machine &machine,int y,int x_size,int height)
+UINT8 x1_state::check_line_valid_height(running_machine &machine,int y,int x_size,int height)
 {
 	x1_state *state = machine.driver_data<x1_state>();
 	UINT8 line_attr = state->m_avram[(0+(y*x_size)+mc6845_start_addr) & 0x7ff];
@@ -300,7 +300,7 @@ static UINT8 check_line_valid_height(running_machine &machine,int y,int x_size,i
 	return height;
 }
 
-static void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect)
+void x1_state::draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
 	/*
 	    attribute table:
@@ -318,7 +318,6 @@ static void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 	    ---- xxxx Kanji upper 4 bits
 	*/
 
-	x1_state *state = machine.driver_data<x1_state>();
 	int y,x,res_x,res_y;
 	UINT32 tile_offset;
 	UINT8 x_size,y_size;
@@ -336,26 +335,26 @@ static void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 	{
 		for (x=0;x<x_size;x++)
 		{
-			int tile = state->m_tvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff];
-			int color = state->m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x1f;
-			int width = BIT(state->m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 7);
-			int height = BIT(state->m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 6);
-			int pcg_bank = BIT(state->m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
+			int tile = m_tvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff];
+			int color = m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x1f;
+			int width = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 7);
+			int height = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 6);
+			int pcg_bank = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
 			UINT8 *gfx_data = machine.root_device().memregion(pcg_bank ? "pcg" : "cgrom")->base();
 			int knj_enable = 0;
 			int knj_side = 0;
 			int knj_bank = 0;
 			int knj_uline = 0;
-			if(state->m_is_turbo)
+			if(m_is_turbo)
 			{
-				knj_enable = BIT(state->m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 7);
-				knj_side = BIT(state->m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 6);
-				knj_uline = BIT(state->m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
-				//knj_lv2 = BIT(state->m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 4);
-				knj_bank = state->m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x0f;
+				knj_enable = BIT(m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 7);
+				knj_side = BIT(m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 6);
+				knj_uline = BIT(m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
+				//knj_lv2 = BIT(m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 4);
+				knj_bank = m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x0f;
 				if(knj_enable)
 				{
-					gfx_data = state->memregion("kanji")->base();
+					gfx_data = memregion("kanji")->base();
 					tile = ((tile + (knj_bank << 8)) << 1) + (knj_side & 1);
 				}
 			}
@@ -382,7 +381,7 @@ static void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 						if(knj_enable) //kanji select
 						{
 							tile_offset  = tile * 16;
-							tile_offset += (yi+dy*(state->m_scrn_reg.v400_mode+1)) >> (height+state->m_scrn_reg.v400_mode);
+							tile_offset += (yi+dy*(m_scrn_reg.v400_mode+1)) >> (height+m_scrn_reg.v400_mode);
 							pen[0] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
 							pen[1] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 2)>>1;
 							pen[2] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 4)>>2;
@@ -394,38 +393,38 @@ static void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 								pen[2] = (pen_mask & 4)>>2;
 							}
 
-							if((yi >= 16 && state->m_scrn_reg.v400_mode == 0) || (yi >= 32 && state->m_scrn_reg.v400_mode == 1))
+							if((yi >= 16 && m_scrn_reg.v400_mode == 0) || (yi >= 32 && m_scrn_reg.v400_mode == 1))
 								pen[0] = pen[1] = pen[2] = 0;
 						}
 						else if(pcg_bank) // PCG
 						{
 							tile_offset  = tile * 8;
-							tile_offset += (yi+dy*(state->m_scrn_reg.v400_mode+1)) >> (height+state->m_scrn_reg.v400_mode);
+							tile_offset += (yi+dy*(m_scrn_reg.v400_mode+1)) >> (height+m_scrn_reg.v400_mode);
 
 							pen[0] = gfx_data[tile_offset+0x0000]>>(7-xi) & (pen_mask & 1)>>0;
 							pen[1] = gfx_data[tile_offset+0x0800]>>(7-xi) & (pen_mask & 2)>>1;
 							pen[2] = gfx_data[tile_offset+0x1000]>>(7-xi) & (pen_mask & 4)>>2;
 
-							if((yi >= 8 && state->m_scrn_reg.v400_mode == 0) || (yi >= 16 && state->m_scrn_reg.v400_mode == 1))
+							if((yi >= 8 && m_scrn_reg.v400_mode == 0) || (yi >= 16 && m_scrn_reg.v400_mode == 1))
 								pen[0] = pen[1] = pen[2] = 0;
 						}
 						else
 						{
-							tile_offset  = tile * (8*(state->m_scrn_reg.ank_sel+1));
-							tile_offset += (yi+dy*(state->m_scrn_reg.v400_mode+1)) >> (height+state->m_scrn_reg.v400_mode);
+							tile_offset  = tile * (8*(m_scrn_reg.ank_sel+1));
+							tile_offset += (yi+dy*(m_scrn_reg.v400_mode+1)) >> (height+m_scrn_reg.v400_mode);
 
-							pen[0] = gfx_data[tile_offset+state->m_scrn_reg.ank_sel*0x0800]>>(7-xi) & (pen_mask & 1)>>0;
-							pen[1] = gfx_data[tile_offset+state->m_scrn_reg.ank_sel*0x0800]>>(7-xi) & (pen_mask & 2)>>1;
-							pen[2] = gfx_data[tile_offset+state->m_scrn_reg.ank_sel*0x0800]>>(7-xi) & (pen_mask & 4)>>2;
+							pen[0] = gfx_data[tile_offset+m_scrn_reg.ank_sel*0x0800]>>(7-xi) & (pen_mask & 1)>>0;
+							pen[1] = gfx_data[tile_offset+m_scrn_reg.ank_sel*0x0800]>>(7-xi) & (pen_mask & 2)>>1;
+							pen[2] = gfx_data[tile_offset+m_scrn_reg.ank_sel*0x0800]>>(7-xi) & (pen_mask & 4)>>2;
 
-							if(state->m_scrn_reg.ank_sel)
+							if(m_scrn_reg.ank_sel)
 							{
-								if((yi >= 16 && state->m_scrn_reg.v400_mode == 0) || (yi >= 32 && state->m_scrn_reg.v400_mode == 1))
+								if((yi >= 16 && m_scrn_reg.v400_mode == 0) || (yi >= 32 && m_scrn_reg.v400_mode == 1))
 									pen[0] = pen[1] = pen[2] = 0;
 							}
 							else
 							{
-								if((yi >=  8 && state->m_scrn_reg.v400_mode == 0) || (yi >= 16 && state->m_scrn_reg.v400_mode == 1))
+								if((yi >=  8 && m_scrn_reg.v400_mode == 0) || (yi >= 16 && m_scrn_reg.v400_mode == 1))
 									pen[0] = pen[1] = pen[2] = 0;
 							}
 						}
@@ -441,7 +440,7 @@ static void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 						if(color & 8) //revert the used color pen
 							pcg_pen^=7;
 
-						if((state->m_scrn_reg.blackclip & 8) && (color == (state->m_scrn_reg.blackclip & 7)))
+						if((m_scrn_reg.blackclip & 8) && (color == (m_scrn_reg.blackclip & 7)))
 							pcg_pen = 0; // clip the pen to black
 
 						res_x = x*8+xi*(width+1);
@@ -489,9 +488,8 @@ static int priority_mixer_pri(running_machine &machine,int color)
 	return pri_mask_calc;
 }
 
-static void draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri)
+void x1_state::draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect, int plane,int pri)
 {
-	x1_state *state = machine.driver_data<x1_state>();
 	int xi,yi,x,y;
 	int pen_r,pen_g,pen_b,color;
 	int pri_mask_val;
@@ -518,17 +516,17 @@ static void draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 				for(xi=0;xi<8;xi++)
 				{
 					gfx_offset = ((x+(y*x_size)) + mc6845_start_addr) & 0x7ff;
-					gfx_offset+= ((yi >> state->m_scrn_reg.v400_mode) * 0x800) & 0x3fff;
-					pen_b = (state->m_gfx_bitmap_ram[gfx_offset+0x0000+plane*0xc000]>>(7-xi)) & 1;
-					pen_r = (state->m_gfx_bitmap_ram[gfx_offset+0x4000+plane*0xc000]>>(7-xi)) & 1;
-					pen_g = (state->m_gfx_bitmap_ram[gfx_offset+0x8000+plane*0xc000]>>(7-xi)) & 1;
+					gfx_offset+= ((yi >> m_scrn_reg.v400_mode) * 0x800) & 0x3fff;
+					pen_b = (m_gfx_bitmap_ram[gfx_offset+0x0000+plane*0xc000]>>(7-xi)) & 1;
+					pen_r = (m_gfx_bitmap_ram[gfx_offset+0x4000+plane*0xc000]>>(7-xi)) & 1;
+					pen_g = (m_gfx_bitmap_ram[gfx_offset+0x8000+plane*0xc000]>>(7-xi)) & 1;
 
 					color =  (pen_g<<2 | pen_r<<1 | pen_b<<0) | 8;
 
 					pri_mask_val = priority_mixer_pri(machine,color);
 					if(pri_mask_val & pri) continue;
 
-					if((color == 8 && state->m_scrn_reg.blackclip & 0x10) || (color == 9 && state->m_scrn_reg.blackclip & 0x20)) // bitmap color clip to black conditions
+					if((color == 8 && m_scrn_reg.blackclip & 0x10) || (color == 9 && m_scrn_reg.blackclip & 0x20)) // bitmap color clip to black conditions
 						color = 0;
 
 					if(y*(mc6845_tile_height)+yi < cliprect.min_y || y*(mc6845_tile_height)+yi > cliprect.max_y) // partial update TODO: optimize
@@ -544,6 +542,12 @@ static void draw_gfxbitmap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 UINT32 x1_state::screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(MAKE_ARGB(0xff,0x00,0x00,0x00), cliprect);
+
+	/* TODO: correct calculation thru mc6845 regs */
+	m_xstart = ((mc6845_h_char_total - mc6845_h_sync_pos) * 8) / 2;
+	m_ystart = ((mc6845_v_char_total - mc6845_v_sync_pos) * 8) / 2;
+
+//	popmessage("%d %d %d %d",mc6845_h_sync_pos,mc6845_v_sync_pos,mc6845_h_char_total,mc6845_v_char_total);
 
 	draw_gfxbitmap(machine(),bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri);
 	draw_fgtilemap(machine(),bitmap,cliprect);
@@ -1900,7 +1904,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
-	false,		/* show border area */
+	true,		/* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

@@ -123,7 +123,7 @@ public:
 };
 
 
-/* TODO: correct numbers, calculable thru mc6845 regs */
+/* TODO: correct calculation thru mc6845 regs */
 #define CRTC_MIN_X 24*8
 #define CRTC_MIN_Y 4*8
 
