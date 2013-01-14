@@ -38,6 +38,14 @@ public:
 	{ }
 
 	optional_device<sn76489a_device> m_sn;
+
+	UINT8 *m_ipl_rom;
+	UINT8 *m_work_ram;
+	UINT8 *m_vram;
+	UINT8 *m_attr;
+	UINT8 *m_gvram;
+	UINT8 *m_pcg;
+
 	UINT16 m_cursor_addr;
 	UINT16 m_cursor_raster;
 	UINT8 m_keyb_press;
@@ -107,11 +115,6 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 {
 	int x,y,yi;
 	UINT16 count;
-	UINT8 *vram = machine().root_device().memregion("vram")->base();
-	UINT8 *attr = machine().root_device().memregion("attr")->base();
-	UINT8 *gram = memregion("fbuf")->base();
-	UINT8 *gfx_data = machine().root_device().memregion("pcg")->base();
-
 	int x_width;
 
 	bitmap.fill(machine().pens[m_backdrop_pen], cliprect);
@@ -128,7 +131,7 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 			{
 				UINT16 color;
 
-				color = (gram[count] & 0xf0) >> 4;
+				color = (m_gvram[count] & 0xf0) >> 4;
 				/* todo: clean this up! */
 				if(x_width == 2)
 				{
@@ -140,7 +143,7 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 					bitmap.pix16(y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = machine().pens[color];
 				}
 
-				color = (gram[count] & 0x0f) >> 0;
+				color = (m_gvram[count] & 0x0f) >> 0;
 				if(x_width == 2)
 				{
 					bitmap.pix16(y+yi+CRTC_MIN_Y, x*2+1+CRTC_MIN_X) = machine().pens[color];
@@ -171,10 +174,10 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 			--xx x--- bg color (00 transparent, 01 white, 10 black, 11 complementary to fg color
 			---- -xxx fg color
 			*/
-			int tile = vram[count];
-			int color = attr[count] & 7;
-			int bk_color = (attr[count] & 0x18) >> 3;
-			int blink = attr[count] & 0x40;
+			int tile = m_vram[count];
+			int color = m_attr[count] & 7;
+			int bk_color = (m_attr[count] & 0x18) >> 3;
+			int blink = m_attr[count] & 0x40;
 			int xi;
 			int bk_pen;
 			//int bk_struct[4] = { -1, 0x10, 0x11, (color & 7) ^ 8 };
@@ -199,7 +202,7 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 				{
 					int pen;
 
-					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? (color) : bk_pen;
+					pen = ((m_pcg[tile*8+yi]>>(7-xi)) & 1) ? (color) : bk_pen;
 
 					if (pen != -1)
 						bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = machine().pens[pen];
@@ -261,92 +264,84 @@ WRITE8_MEMBER(smc777_state::smc777_6845_w)
 
 READ8_MEMBER(smc777_state::smc777_vram_r)
 {
-	UINT8 *vram = memregion("vram")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
 
-	return vram[vram_index];
+	return m_vram[vram_index];
 }
 
 READ8_MEMBER(smc777_state::smc777_attr_r)
 {
-	UINT8 *attr = memregion("attr")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
 
-	return attr[vram_index];
+	return m_attr[vram_index];
 }
 
 READ8_MEMBER(smc777_state::smc777_pcg_r)
 {
-	UINT8 *pcg = memregion("pcg")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
 
-	return pcg[vram_index];
+	return m_pcg[vram_index];
 }
 
 WRITE8_MEMBER(smc777_state::smc777_vram_w)
 {
-	UINT8 *vram = memregion("vram")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
 
-	vram[vram_index] = data;
+	m_vram[vram_index] = data;
 }
 
 WRITE8_MEMBER(smc777_state::smc777_attr_w)
 {
-	UINT8 *attr = memregion("attr")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
 
-	attr[vram_index] = data;
+	m_attr[vram_index] = data;
 }
 
 WRITE8_MEMBER(smc777_state::smc777_pcg_w)
 {
-	UINT8 *pcg = memregion("pcg")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x0007) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
 
-	pcg[vram_index] = data;
+	m_pcg[vram_index] = data;
 
 	machine().gfx[0]->mark_dirty(vram_index >> 3);
 }
 
 READ8_MEMBER(smc777_state::smc777_fbuf_r)
 {
-	UINT8 *fbuf = memregion("fbuf")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x007f) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
 
-	return fbuf[vram_index];
+	return m_gvram[vram_index];
 }
 
 WRITE8_MEMBER(smc777_state::smc777_fbuf_w)
 {
-	UINT8 *fbuf = memregion("fbuf")->base();
 	UINT16 vram_index;
 
 	vram_index  = ((offset & 0x00ff) << 8);
 	vram_index |= ((offset & 0xff00) >> 8);
 
-	fbuf[vram_index] = data;
+	m_gvram[vram_index] = data;
 }
 
 
@@ -579,8 +574,6 @@ WRITE8_MEMBER(smc777_state::display_reg_w)
 
 READ8_MEMBER(smc777_state::smc777_mem_r)
 {
-	UINT8 *wram = memregion("wram")->base();
-	UINT8 *bios = memregion("bios")->base();
 	UINT8 z80_r;
 
 	if(m_raminh_prefetch != 0xff) //do the bankswitch AFTER that the prefetch instruction is executed (FIXME: this is an hackish implementation)
@@ -595,16 +588,14 @@ READ8_MEMBER(smc777_state::smc777_mem_r)
 	}
 
 	if(m_raminh == 1 && ((offset & 0xc000) == 0))
-		return bios[offset];
+		return m_ipl_rom[offset];
 
-	return wram[offset];
+	return m_work_ram[offset];
 }
 
 WRITE8_MEMBER(smc777_state::smc777_mem_w)
 {
-	UINT8 *wram = memregion("wram")->base();
-
-	wram[offset] = data;
+	m_work_ram[offset] = data;
 }
 
 READ8_MEMBER(smc777_state::smc777_irq_mask_r)
@@ -954,10 +945,36 @@ TIMER_DEVICE_CALLBACK_MEMBER(smc777_state::keyboard_callback)
 	}
 }
 
+static const gfx_layout smc777_charlayout =
+{
+	8, 8,
+	0x800 / 8,
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
 void smc777_state::machine_start()
 {
+	m_ipl_rom = memregion("ipl")->base();
+	m_work_ram = auto_alloc_array(machine(), UINT8, 0x10000);
+	m_vram = auto_alloc_array(machine(), UINT8, 0x800);
+	m_attr = auto_alloc_array(machine(), UINT8, 0x800);
+	m_gvram = auto_alloc_array(machine(), UINT8, 0x8000);
+	m_pcg = auto_alloc_array(machine(), UINT8, 0x800);
+
 	beep_set_frequency(machine().device(BEEPER_TAG),300); //guesswork
 	beep_set_state(machine().device(BEEPER_TAG),0);
+
+	state_save_register_global_pointer(machine(), m_work_ram, 0x10000);
+	state_save_register_global_pointer(machine(), m_vram, 0x800);
+	state_save_register_global_pointer(machine(), m_attr, 0x800);
+	state_save_register_global_pointer(machine(), m_gvram, 0x8000);
+	state_save_register_global_pointer(machine(), m_pcg, 0x800);
+
+	machine().gfx[0] = auto_alloc(machine(), gfx_element(machine(), smc777_charlayout, (UINT8 *)m_pcg, 8, 0));
 }
 
 void smc777_state::machine_reset()
@@ -967,20 +984,6 @@ void smc777_state::machine_reset()
 	m_raminh_prefetch = 0xff;
 }
 
-static const gfx_layout smc777_charlayout =
-{
-	8, 8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static GFXDECODE_START( smc777 )
-	GFXDECODE_ENTRY( "pcg", 0x0000, smc777_charlayout, 0, 8 )
-GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
 {
@@ -1076,7 +1079,6 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_CPU_IO_MAP(smc777_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", smc777_state, smc777_vblank_irq)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1086,10 +1088,8 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_SCREEN_UPDATE_DRIVER(smc777_state, screen_update_smc777)
 
 	MCFG_PALETTE_LENGTH(SMC777_NUMPENS)
-	MCFG_GFXDECODE(smc777)
 
 	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
-
 
 	MCFG_MB8876_ADD("fdc",smc777_mb8876_interface)
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(smc777_floppy_interface)
@@ -1109,10 +1109,8 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( smc777 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-
 	/* shadow ROM */
-	ROM_REGION( 0x10000, "bios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "ipl", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS(0, "1st", "1st rev.")
 	ROMX_LOAD( "smcrom.dat", 0x0000, 0x4000, CRC(b2520d31) SHA1(3c24b742c38bbaac85c0409652ba36e20f4687a1), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "2nd", "2nd rev.")
@@ -1120,16 +1118,6 @@ ROM_START( smc777 )
 
 	ROM_REGION( 0x800, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i80xx", 0x000, 0x800, NO_DUMP ) // keyboard mcu, needs decapping
-
-	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x800, "vram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x800, "attr", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x800, "pcg", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x8000,"fbuf", ROMREGION_ERASE00 )
 ROM_END
 
 /* Driver */
