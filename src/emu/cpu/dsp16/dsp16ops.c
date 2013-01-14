@@ -49,24 +49,24 @@ bool dsp16_device::conditionTest(const UINT8& CON)
 {
 	switch (CON)
 	{
-		case 0x00: return (m_psw & 0x8000);
-		case 0x01: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x02: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x03: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x04: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x05: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x06: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x07: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x08: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x09: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x0a: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x0b: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x0c: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x0d: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x0e: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x0f: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x10: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
-		case 0x11: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;
+		case 0x00: return (m_psw & 0x8000);		// mi (negative result)
+		case 0x01: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// pl (positive result)
+		case 0x02: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// eq (result == 0)
+		case 0x03: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// ne (result != 0)
+		case 0x04: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// lvs (logical overflow set)
+		case 0x05: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// lvc (logical overflow clear)
+		case 0x06: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// mvs (math. overflow set)
+		case 0x07: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// mvc (math. overflow clear)
+		case 0x08: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// heads (random bit set)
+		case 0x09: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// tails (random bit clear)
+		case 0x0a: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// c0ge (counter0 >= 0)
+		case 0x0b: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// c0lt (counter0 < 0)
+		case 0x0c: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// c1ge (counter1 >= 0)
+		case 0x0d: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// c1lt (counter1 < 0)
+		case 0x0e: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// true (always)
+		case 0x0f: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// false (never)
+		case 0x10: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// gt (result > 0
+		case 0x11: printf("UNIMPLEMENTED condition check @ PC 0x%04x\n", m_pc); return false;	// le (result <= 0)
 		default: logerror("Unrecognized condition at PC=0x%04x\n", m_pc); break;
 	}
 	return false;
@@ -303,13 +303,24 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		}
 		case 0x19: case 0x1b:
 		{
-			// NEXT!
 			// F1, y = a0|1, x = *pt++[i]  :  (page 3-48)
-			//const UINT8 Y = (op & 0x000f);
-			//const UINT8 X = (op & 0x0010) >> 4;
-			//const UINT8 S = (op & 0x0200) >> 9;
-			//const UINT8 D = (op & 0x0400) >> 10;
-			//const UINT8 F1 = (op & 0x01e0) >> 5;
+			const UINT8 Y = (op & 0x000f);
+			const UINT8 X = (op & 0x0010) >> 4;
+			const UINT8 S = (op & 0x0200) >> 9;
+			const UINT8 D = (op & 0x0400) >> 10;
+			const UINT8 F1 = (op & 0x01e0) >> 5;
+			bool useA1 = (opcode == 0x1b);
+			if (Y != 0x00) printf("Unknown opcode @ PC=0x%04x", m_pc);
+			m_y = (useA1) ? (m_a1 & 0xffffffff) : (m_a0 & 0xffffffff);		// TODO: What happens to Ax when it goes 32 bit (pc=3f & pc=47)?
+			executeF1Field(F1, D, S);
+			m_x = data_read(m_pt);											// TODO: EXM Pin & internal/external ROM?  Research.
+			switch (X)
+			{
+				case 0x00: m_pt++;      break;
+				case 0x01: m_pt += m_i; break;
+			}
+			cycles = 2;		// TODO: 1 if cached
+			pcAdvance = 1;
 			break;
 		}
 		case 0x14:
@@ -457,17 +468,31 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 		// Format 6: Contitional Branch Qualifier/Software Interrupt (icall)
 		case 0x1a:
 		{
-			// if CON [goto/call/return]
-			//const UINT8 CON = (op & 0x001f);
+			// if CON [goto/call/return]  :  (page 3-22)
+			const UINT8 CON = (op & 0x001f);
+			bool conditionFulfilled = conditionTest(CON);
+			cycles = 3;					// TODO: This may need to interact with the next opcode to make sure it doesn't exceed 3?
+			switch (conditionFulfilled)
+			{
+				case true:  pcAdvance = 1; break;
+				case false: pcAdvance = 2; break;
+			}
 			break;
 		}
 
 		// Format 7: Data Move Group
 		case 0x09: case 0x0b:
 		{
-			// R = aS
-			//const UINT8 R = (op & 0x03f0) >> 4;
-			//const UINT8 S = (op & 0x1000) >> 12;
+			// TODO: Fix register pdxX (pc=338)
+			// R = aS  :  (page 3-29)
+			const UINT8 R = (op & 0x03f0) >> 4;
+			const UINT8 S = (op & 0x1000) >> 12;
+			void* destinationReg = registerFromRTable(R);
+			UINT64* sourceReg = (S) ? &m_a1 : &m_a0;
+			UINT16 sourceValue = (*sourceReg & U64(0x0ffff0000)) >> 16;
+			writeRegister(destinationReg, sourceValue);
+			cycles = 2;
+			pcAdvance = 1;
 			break;
 		}
 		case 0x08:
