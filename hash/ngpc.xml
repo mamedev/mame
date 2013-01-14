@@ -644,7 +644,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<!-- Developer: SNK -->
-	<software name="mezase" supported="no"> <!-- it freezes -->
+	<software name="mezase">
 		<!-- NGPC only -->
 		<description>Mezase! Kanji Ou (Jpn)</description>
 		<year>2000</year>
@@ -1393,7 +1393,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		</part>
 	</software>
 
-	<software name="snkgals" supported="partial"> <!-- link fails and the game complains -->
+	<software name="snkgals">
 		<description>SNK Gals' Fighters (Euro, USA)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
@@ -1406,7 +1406,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 	</software>
 
 	<!-- Developer: Yumekobo - Notes: also re-released in "NeoGeo Pocket Best Collection" (Id NeoP00657) -->
-	<software name="snkgalsj" cloneof="snkgals" supported="partial"> <!-- link fails and the game complains -->
+	<software name="snkgalsj" cloneof="snkgals">
 		<!-- NGPC only -->
 		<description>SNK Gals' Fighters (Jpn)</description>
 		<year>2000</year>
