@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="cdtv" description="Amiga CDTV CD-ROM list">
+<softwarelist name="cdtv" description="Amiga CDTV CD-ROMs">
 
 	<!-- Below titles were read with the cdrdao options "-read-raw -read-subchan rw_raw" -->
 

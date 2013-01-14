@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="saturn" description="Sega Saturn CD-ROM list">
+<softwarelist name="saturn" description="Sega Saturn CD-ROMs">
 
 	<!-- Sega Saturn lists -->
 	<!-- The initial goal of this list is to aggregate the images from various sources to get the most complete picture

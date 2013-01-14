@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="special_flop" description="Specialist MX disks list">
+<softwarelist name="special_flop" description="Specialist MX disk images">
 
 	<software name="bstcpm0">
 		<description>BST_CPM0</description>

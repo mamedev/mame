@@ -11,7 +11,7 @@ CP/M-80 2.22 Single Sided Disk
 
 -->
 
-<softwarelist name="svi318_flop" description="Spectravision SVI-318 Disks">
+<softwarelist name="svi318_flop" description="Spectravision SVI-318 disk images">
 
 	<software name="cpm224dd">
 		<description>CP/M-80 version 2.24</description>

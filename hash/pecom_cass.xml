@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="pecom_cass" description="Pecom32 tapes list">
+<softwarelist name="pecom_cass" description="Pecom32 cassettes">
 
 	<software name="adresar">
 		<description>Adresar</description>

@@ -9,7 +9,7 @@
 -->
 
 
-<softwarelist name="amigaecs_flop" description="Amiga ECS Floppy Disks list">
+<softwarelist name="amigaecs_flop" description="Amiga ECS disk images">
 
 	<software name="cm2s9697" supported="no">
 	<!-- SPS (CAPS) release 1997 -->

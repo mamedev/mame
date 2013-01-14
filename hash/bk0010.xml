@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="bk0010" description="Elektronika BK-0010 tapes list">
+<softwarelist name="bk0010" description="Elektronika BK-0010 cassettes">
 
 	<software name="aljur">
 		<description>ALJUR .COD</description>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="ibm5140" description="IBM PC 5140 Convertible Disk Images">
+<softwarelist name="ibm5140" description="IBM PC 5140 Convertible disk images">
 
 	<software name="starter">
 		<description>5140 Starter Disk with App Selector</description>

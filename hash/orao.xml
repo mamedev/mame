@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="orao" description="PEL Varazdin Orao tapes list">
+<softwarelist name="orao" description="PEL Varazdin Orao cassettes">
 
 	<software name="6502step">
 		<description>6502Step</description>

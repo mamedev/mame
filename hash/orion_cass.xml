@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="orion_cass" description="Orion 128 tapes list">
+<softwarelist name="orion_cass" description="Orion 128 cassettes">
 
 	<software name="21">
 		<description>21$</description>

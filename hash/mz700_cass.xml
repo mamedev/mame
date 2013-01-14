@@ -16,7 +16,7 @@ Symbolic Debugger 5Z-011D
 Easidata (English Version)
 -->
 
-<softwarelist name="mz700_cass" description="Sharp MZ-700 cassette images">
+<softwarelist name="mz700_cass" description="Sharp MZ-700 cassettes">
 
 	<software name="1z013b">
 		<description>BASIC Interpreter 1Z-013B V1.0A / Applications V1.0A</description>

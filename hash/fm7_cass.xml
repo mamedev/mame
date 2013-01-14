@@ -22,7 +22,7 @@ Titles, serial #s, publishers and release dates taken from:
     If you are using a disk version of F-Basic, then put CAS0: in the quotes.  Note that this is case-sensitive.
 -->
 
-<softwarelist name="fm7_cass" description="Fujitsu FM-7 cassette images">
+<softwarelist name="fm7_cass" description="Fujitsu FM-7 cassettes">
 
 	<software name="alde">
 		<description>Aldebaran</description>

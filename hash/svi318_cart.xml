@@ -10,7 +10,7 @@ Amoured Assault SD233C // Was availible on Cartridge and/or Tape
 
 -->
 
-<softwarelist name="svi318_cart" description="Spectravision SVI-318 Cartridge">
+<softwarelist name="svi318_cart" description="Spectravision SVI-318 cartridges">
 
 	<software name="flipper">
 		<description>Flipper Slipper</description>

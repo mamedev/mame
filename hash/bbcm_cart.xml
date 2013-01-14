@@ -8,7 +8,7 @@
       Hold down the SHIFT key and SPACEbar and press and release the BREAK key.
 -->
 
-<softwarelist name="bbcm_cart" description="BBC Master Cartridges">
+<softwarelist name="bbcm_cart" description="BBC Master cartridges">
 
 	<software name="demo">
 		<description>BBC Master Demonstration Cartridge</description>

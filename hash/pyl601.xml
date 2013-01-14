@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="pyl601" description="Pyldin-601 disks list">
+<softwarelist name="pyl601" description="Pyldin-601 disk images">
 
 	<software name="arch1">
 		<description>arch1</description>

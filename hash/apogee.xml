@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="apogee" description="Apogee BK-01 tapes list">
+<softwarelist name="apogee" description="Apogee BK-01 cassettes">
 
 <!-- Games -->
 	<software name="badroad">

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="ondra" description="Ondra &amp; Ondra ViLi tapes list">
+<softwarelist name="ondra" description="Ondra &amp; Ondra ViLi cassettes">
 
 	<software name="copyfile">
 		<description>COPYFILE</description>

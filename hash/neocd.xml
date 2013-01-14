@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="neocd" description="SNK NeoGeo CD CD-ROM list">
+<softwarelist name="neocd" description="SNK NeoGeo CD CD-ROMs">
 
 	<!-- Most of the images listed are converted from an old TOSEC set and should probably be replaced with TruRip dumps once we can import CCD files -->
 	<!-- A small number of images are from the TruRip set, converted using .cue files created with CDMage, the sub-data however is not converted -->

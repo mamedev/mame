@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="orion_flop" description="Orion 128 floppy disks list">
+<softwarelist name="orion_flop" description="Orion 128 disk images">
 
 	<software name="disk1">
 		<description>DISK1</description>

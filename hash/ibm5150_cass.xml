@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="ibm5150_cass" description="IBM PC/XT tape images">
+<softwarelist name="ibm5150_cass" description="IBM PC/XT cassettes">
 
 	<software name="diag">
 		<description>IBM Advanced Diagnostics for the IBM PC 5150</description>

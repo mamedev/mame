@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 
-<softwarelist name="mz2000_cass" description="MZ-2000 tape images">
+<softwarelist name="mz2000_cass" description="MZ-2000 cassettes">
 
 	<software name="mz1z001">
 		<description>BASIC MZ-1Z001 v1.0c</description>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="orionpro_flop" description="OrionPro floppy disks list">
+<softwarelist name="orionpro_flop" description="OrionPro disk images">
 
 	<software name="disk01p">
 		<description>DISK01P</description>

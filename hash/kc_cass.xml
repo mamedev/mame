@@ -11,7 +11,7 @@
     - KC85/2 doesn't have BASIC ROM and requires the M006 module for run BASIC games.
 -->
 
-<softwarelist name="kc_cass" description="VEB Mikroelektronik KC 85 cassette images">
+<softwarelist name="kc_cass" description="VEB Mikroelektronik KC 85 cassettes">
 	<software name="vorstell">
 		<!-- C0184 Demo 85/4 -->
 		<description>Vorstell/4</description>

@@ -9,7 +9,7 @@
 -->
 
 
-<softwarelist name="amigaaga_flop" description="Amiga AGA Floppy Disks list">
+<softwarelist name="amigaaga_flop" description="Amiga AGA disk images">
 
 	<software name="1869" supported="no">
 	<!-- SPS (CAPS) release 1653 -->

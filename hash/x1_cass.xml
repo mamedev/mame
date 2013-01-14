@@ -10,7 +10,7 @@ Titles, publishers and release dates taken from:
 
 -->
 
-<softwarelist name="x1_cass" description="Sharp X1 tape images">
+<softwarelist name="x1_cass" description="Sharp X1 cassettes">
 
 	<software name="blckonyx" supported="no">
 		<description>The Black Onyx</description>

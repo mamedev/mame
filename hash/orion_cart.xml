@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="orion_cart" description="Orion-128 &amp; Pro cartridge list">
+<softwarelist name="orion_cart" description="Orion-128 &amp; Pro cartridges">
 
 	<software name="romdisk">
 		<description>ROMDISK</description>

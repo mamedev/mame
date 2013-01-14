@@ -12,7 +12,7 @@
       To start/stop the tape you must use the MESS menus, so you'll have to turn full keyboard mode off with Scroll Lock, then navigate the menus, turning Scroll Lock back on when you're finished.
 -->
 
-<softwarelist name="bbcm_cass" description="BBC Master Cassette Images">
+<softwarelist name="bbcm_cass" description="BBC Master cassettes">
 
 	<!-- Games -->
 
