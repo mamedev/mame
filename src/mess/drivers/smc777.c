@@ -27,8 +27,6 @@
 #include "formats/basicdsk.h"
 #include "imagedev/flopdrv.h"
 
-#define SMC777_NUMPENS (0x10+8) //16 palette entries + 8 special colors
-
 class smc777_state : public driver_device
 {
 public:
@@ -193,8 +191,6 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 
 			if(blink && machine().primary_screen->frame_number() & 0x10) //blinking, used by Dragon's Alphabet
 				color = bk_pen;
-			else
-				color+=m_pal_mode;
 
 			for(yi=0;yi<8;yi++)
 			{
@@ -202,7 +198,7 @@ UINT32 smc777_state::screen_update_smc777(screen_device &screen, bitmap_ind16 &b
 				{
 					int pen;
 
-					pen = ((m_pcg[tile*8+yi]>>(7-xi)) & 1) ? (color) : bk_pen;
+					pen = ((m_pcg[tile*8+yi]>>(7-xi)) & 1) ? (color+m_pal_mode) : bk_pen;
 
 					if (pen != -1)
 						bitmap.pix16(y*8+CRTC_MIN_Y+yi, x*8+CRTC_MIN_X+xi) = machine().pens[pen];
@@ -965,9 +961,6 @@ void smc777_state::machine_start()
 	m_gvram = auto_alloc_array(machine(), UINT8, 0x8000);
 	m_pcg = auto_alloc_array(machine(), UINT8, 0x800);
 
-	beep_set_frequency(machine().device(BEEPER_TAG),300); //guesswork
-	beep_set_state(machine().device(BEEPER_TAG),0);
-
 	state_save_register_global_pointer(machine(), m_work_ram, 0x10000);
 	state_save_register_global_pointer(machine(), m_vram, 0x800);
 	state_save_register_global_pointer(machine(), m_attr, 0x800);
@@ -982,6 +975,10 @@ void smc777_state::machine_reset()
 	m_raminh = 1;
 	m_raminh_pending_change = 1;
 	m_raminh_prefetch = 0xff;
+	m_pal_mode = 0x10;
+
+	beep_set_frequency(machine().device(BEEPER_TAG),300); //TODO: correct frequency
+	beep_set_state(machine().device(BEEPER_TAG),0);
 }
 
 
@@ -999,6 +996,7 @@ static const mc6845_interface mc6845_intf =
 	NULL        /* update address callback */
 };
 
+/* set-up SMC-70 mode colors */
 void smc777_state::palette_init()
 {
 	int i;
@@ -1012,6 +1010,7 @@ void smc777_state::palette_init()
 		b = (i & 1) >> 0;
 
 		palette_set_color_rgb(machine(), i, pal1bit(r),pal1bit(g),pal1bit(b));
+		palette_set_color_rgb(machine(), i+8, pal1bit(0),pal1bit(0),pal1bit(0));
 	}
 }
 
@@ -1087,7 +1086,7 @@ static MACHINE_CONFIG_START( smc777, smc777_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
 	MCFG_SCREEN_UPDATE_DRIVER(smc777_state, screen_update_smc777)
 
-	MCFG_PALETTE_LENGTH(SMC777_NUMPENS)
+	MCFG_PALETTE_LENGTH(0x20) // 16 + 8 colors (SMC-777 + SMC-70) + 8 empty entries (SMC-70)
 
 	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/2, mc6845_intf)    /* unknown clock, hand tuned to get ~60 fps */
 
