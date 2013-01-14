@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="enterp" description="Enterprise 64 / 128 floppies">
+<softwarelist name="enterp" description="Enterprise 64 / 128 disk images">
 
 	<software name="isdos" supported="no">
 		<description>IS-DOS v1.0</description>
@@ -31,6 +31,7 @@
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="deadline" supported="no">
 		<description>Deadline</description>
 		<year>1986</year>
@@ -41,6 +42,7 @@
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="island" supported="no">
 		<description>The Island</description>
 		<year>1985</year>
@@ -51,6 +53,7 @@
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="seastlkr" supported="no">
 		<description>Seastalker</description>
 		<year>1984</year>
@@ -61,6 +64,7 @@
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="zork1" supported="no">
 		<description>Zork 1 - The Great Underground Empire</description><!-- why is com file ork1.com? -->
 		<year>1984</year>
@@ -71,6 +75,7 @@
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="zork2" supported="no">
 		<description>Zork 2 - The Wizard of Frobozz</description><!-- why is com file ork2.com? -->
 		<year>1984</year>
@@ -81,6 +86,7 @@
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="zork3" supported="no">
 		<description>Zork 3 - The Dungeon Master</description><!-- why is com file ork3.com? -->
 		<year>1984</year>

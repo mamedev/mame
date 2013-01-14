@@ -33,7 +33,7 @@ Interpol (USA)
 
 -->
 
-<softwarelist name="vg7400" description="Phillips Videopac Plus G7400 carts">
+<softwarelist name="vg7400" description="Philips Videopac Plus G7400 cartridges">
 
 <!-- Phillips Videopac+ G7400 carts -->
 
@@ -62,18 +62,6 @@ Interpol (USA)
 		</part>
 	</software>
 
-	<software name="billiard" cloneof="billard" supported="no">
-		<description>Billiard (Euro, Prototype)</description>
-		<year>198?</year>
-		<publisher>Phillips</publisher>
-		<info name="programmer" value="Ed Averett"/>
-		<part name="cart" interface="odyssey_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="billiard (europe).bin" size="8192" crc="3c949a57" sha1="4c7f1dc569e9abe829e36dbe42d91d39419bfd60" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="billard" supported="no">
 		<description>Billard+ (Fra)</description>
 		<year>1983</year>
@@ -87,6 +75,18 @@ Interpol (USA)
 		</part>
 	</software>
 
+	<software name="billiard" cloneof="billard" supported="no">
+		<description>Billiard (Euro, Prototype)</description>
+		<year>198?</year>
+		<publisher>Phillips</publisher>
+		<info name="programmer" value="Ed Averett"/>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="billiard (europe).bin" size="8192" crc="3c949a57" sha1="4c7f1dc569e9abe829e36dbe42d91d39419bfd60" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="flipper" supported="no">
 		<description>Flipper+ (Fra)</description>
 		<year>198?</year>
@@ -94,6 +94,17 @@ Interpol (USA)
 		<part name="cart" interface="odyssey_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="billard electrique (france).bin" size="8192" crc="ac5c74e6" sha1="215439c1044b93888b71bd6a210ebfda93d97c22" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flippera" cloneof="flipper" supported="no">
+		<description>Flipper+ (Fra, Alt?)</description>
+		<year>198?</year>
+		<publisher>Jopac</publisher>
+		<part name="cart" interface="odyssey_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="flipper (europe).bin" size="8192" crc="2fce9245" sha1="6510b54e3e9bf9bc7ae558d1d16fa73294701ddb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -155,23 +166,12 @@ Interpol (USA)
 
 	<!-- possibly only the pal converted dump is available  -->
 	<software name="flashp" supported="no">
-		<description>Flashpoint (USA, Prototype)(PAL Conversion)</description>
+		<description>Flashpoint (USA, Prototype, PAL Conversion)</description>
 		<year>2004</year>
 		<publisher>Phillips</publisher>
 		<part name="cart" interface="odyssey_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="flashpoint (usa)(proto)(pal conversion).bin" size="8192" crc="06861a9c" sha1="6810ccc1508244216860271417a866618a731ae2" offset="0"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="flippera" supported="no">
-		<description>Flipper+ (Fra)(Alt?)</description>
-		<year>198?</year>
-		<publisher>Jopac</publisher>
-		<part name="cart" interface="odyssey_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="flipper (europe).bin" size="8192" crc="2fce9245" sha1="6510b54e3e9bf9bc7ae558d1d16fa73294701ddb" offset="0"/>
 			</dataarea>
 		</part>
 	</software>

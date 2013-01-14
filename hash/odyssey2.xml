@@ -50,7 +50,7 @@ Chess needs emulation of the C7010 Chess Module, which had a NSC800 CMOS micropr
 The C7420 Home Computer Module, which contains a Z80 microprocessor running at 3.574 MHz,
 adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 -->
-<softwarelist name="odyssey2" description="Magnavox Odyssey2 carts">
+<softwarelist name="odyssey2" description="Magnavox Odyssey2 cartridges">
 <!-- Philips Videopac G7000/Magnavox Odyssey² carts -->
 
 <!-- Applications -->
@@ -65,6 +65,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="compintr" cloneof="compprog">
 		<description>Computer Intro (USA)</description>
 		<year>1980</year>
@@ -76,6 +77,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="newscast">
 		<description>Newscaster (Euro)</description>
 		<year>1980</year>
@@ -87,6 +89,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="keyboard" cloneof="newscast">
 		<description>Keyboard Creations! (USA)</description>
 		<year>1980</year>
@@ -98,6 +101,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="musician">
 		<description>Musician (Euro)</description>
 		<year>1981</year>
@@ -109,6 +113,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="typetell">
 		<description>Type &amp; Tell! (USA)</description>
 		<year>1982</year>
@@ -134,6 +139,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2mthecho">
 		<description>Mathematician/Echo (Euro) ~ Math-a-Magic!/Echo! (USA)</description>
 		<year>1978</year>
@@ -146,6 +152,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2mthechf" cloneof="2mthecho">
 		<description>Mathématicien/Echo (Fra)</description>
 		<year>1980</year>
@@ -157,6 +164,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="morse">
 		<description>Morse (Euro)</description>
 		<year>1982</year>
@@ -168,6 +176,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="morsef" cloneof="morse">
 		<description>Morse (Fra)</description>
 		<year>1983</year>
@@ -178,6 +187,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="nimble">
 		<description>Nimble Numbers Ned! (USA)</description>
 		<year>1982</year>
@@ -190,6 +200,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="sidspell">
 		<description>Sid the Spellbinder (USA)</description>
 		<year>1982</year>
@@ -202,6 +213,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="vrkrspl1">
 		<description>Verkehrsspiele 1 (Ger)</description>
 		<year>1982</year>
@@ -212,6 +224,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kndrvrkr" cloneof="vrkrspl1">
 		<description>Kinder im Verkehr 1 (Ger)</description>
 		<year>1982</year>
@@ -222,6 +235,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="vrkrspl2">
 		<description>Verkehrsspiele 2 (Ger)</description>
 		<year>1982</year>
@@ -245,6 +259,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="4en1" cloneof="4in1">
 		<description>4 en 1 Ligne (Fra)</description>
 		<year>1982</year>
@@ -255,6 +270,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="alieninv">
 		<description>Space Monster (Euro) ~ Alien Invaders - Plus! (USA)</description>
 		<year>1980</year>
@@ -266,6 +282,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="alpine">
 		<description>Skiing (Euro) ~ Alpine Skiing! (USA)</description>
 		<year>1979</year>
@@ -277,6 +294,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="ski" cloneof="alpine">
 		<description>Ski (Fra)</description>
 		<year>1979</year>
@@ -287,6 +305,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2armrsub">
 		<description>Air-Sea War/Battle (Euro) ~ Armored Encounter!/Sub Chase! (USA)</description>
 		<year>1978</year>
@@ -299,8 +318,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="atlantis">
-		<description>Atlantis (USA, Euro)</description>
+		<description>Atlantis (Euro, USA)</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
 		<info name="programmer" value="Jeff Ronnie" />
@@ -310,6 +330,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="timelord">
 		<description>Attack of the Timelord! (USA)</description><!-- possibly also "Terrahawks (Euro)[Videopac 51]"? -->
 		<year>1983</year>
@@ -321,6 +342,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="baseball">
 		<description>Baseball (Euro) ~ Baseball! (USA)</description>
 		<year>1980</year>
@@ -332,6 +354,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="blobbers">
 		<description>Blobbers (Euro)</description>
 		<year>1983</year>
@@ -343,6 +366,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2blckbrk">
 		<description>Dam Buster (Euro) ~ Blockout!/Breakdown! (USA)</description>
 		<year>1980</year>
@@ -355,6 +379,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 				</dataarea>
 		</part>
 	</software>
+
 	<software name="magique" cloneof="2blckbrk">
 		<description>Le Mûr Magique (Fra)</description>
 		<year>1981</year>
@@ -365,6 +390,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2bwlbskt">
 		<description>Ten Pin Bowling/Basketball (Euro) ~ Bowling!/Basketball! (USA)</description>
 		<year>1978</year>
@@ -377,6 +403,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2qllbskt" cloneof="2bwlbskt">
 		<description>Jeu de Quilles/Basketball (Fra)</description>
 		<year>1978</year>
@@ -388,8 +415,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="buraco">
-		<description>Buraco Negro! (Brazil)</description>
+		<description>Buraco Negro! (Bra)</description>
 		<year>1984</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -398,6 +426,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="neutron" cloneof="buraco">
 		<description>Neutron Star (Euro, Prototype)</description>
 		<year>1983</year>
@@ -408,6 +437,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="casino">
 		<description>Las Vegas Gambling (Euro) ~ Casino Slot Machine! (USA)</description>
 		<year>1980</year>
@@ -419,6 +449,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="lasvegas" cloneof="casino">
 		<description>Las Vegas (Fra)</description>
 		<year>1980</year>
@@ -429,6 +460,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2bllcrss">
 		<description>Catch the Ball/Noughts and Crosses (Euro)</description>
 		<year>1979</year>
@@ -441,8 +473,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2mlajogo" cloneof="2bllcrss">
-		<description>O Malabarista!/Jogo da Velha! (Brazil)</description>
+		<description>O Malabarista!/Jogo da Velha! (Bra)</description>
 		<year>1979</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for O Malabarista, press 7 for Jogo da Velha" />
@@ -452,6 +485,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="chess" supported="no"><!-- needs chess module emulation -->
 		<description>Chess (Euro)</description>
 		<year>198?</year>
@@ -463,6 +497,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="chezmxme"><!-- I know it's a clone of something... -->
 		<description>Chez Maxime (Fra)</description>
 		<year>198?</year>
@@ -473,6 +508,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="chinese">
 		<description>Chinese Logic (Euro)</description>
 		<year>1980</year>
@@ -484,8 +520,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="desafio" cloneof="chinese">
-		<description>Desafio Chinês! (Brazil)</description>
+		<description>Desafio Chinês! (Bra)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -494,8 +531,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="claypig">
-		<description>Clay Pigeon! (Brazil)</description>
+		<description>Clay Pigeon! (Bra)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -504,8 +542,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="comando">
-		<description>Comando Noturno! (Brazil)</description>
+		<description>Comando Noturno! (Bra)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -514,6 +553,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="night" cloneof="comando">
 		<description>Nightfighter (Euro, Prototype)</description>
 		<year>198?</year>
@@ -524,8 +564,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="conquest">
-		<description>Conquest of the World (USA, Euro)</description>
+		<description>Conquest of the World (Euro, USA)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AB9431 (USA) ~ 41 (Euro)"/>
@@ -535,6 +576,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="cosmic">
 		<description>Cosmic Conflict (Euro)</description>
 		<year>1980</year>
@@ -547,6 +589,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="conflit" cloneof="cosmic">
 		<description>Conflit Cosmique (Can, Fra?)</description>
 		<year>1980</year>
@@ -558,6 +601,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="cosmica" cloneof="cosmic">
 		<description>Cosmic Conflict (Euro, Alt)</description>
 		<year>1980</year>
@@ -569,6 +613,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="cosmicu" cloneof="cosmic">
 		<description>Cosmic Conflict! (USA)</description>
 		<year>1980</year>
@@ -581,8 +626,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="demon">
-		<description>Demon Attack (USA, Euro)</description>
+		<description>Demon Attack (Euro, USA)</description>
 		<year>1983</year>
 		<publisher>Imagic</publisher>
 		<info name="programmer" value="Dave Johnson" />
@@ -592,6 +638,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2dpthmrk" supported="partial">
 		<description>Depth Charge/Marksman (Euro)</description>
 		<year>1980</year>
@@ -605,8 +652,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2bmbalvo" cloneof="2dpthmrk">
-		<description>Bombardeio Submarino!/Tiro ao Alvo! (Brazil)</description>
+		<description>Bombardeio Submarino!/Tiro ao Alvo! (Bra)</description>
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for Depth Charge, press 2 for Marksman; Uses the 2nd joystick" />
@@ -617,6 +665,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="soccer">
 		<description>Electronic Table Football (Euro) ~ Electronic Table Soccer (USA)</description>
 		<year>1980</year>
@@ -628,6 +677,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="football">
 		<description>American Football (Euro) ~ Football! (USA)</description>
 		<year>1980</year>
@@ -639,6 +689,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="freedom">
 		<description>Freedom Fighters (Euro) ~ Freedom Fighters! (USA)</description>
 		<year>1982</year>
@@ -650,6 +701,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="frogger">
 		<description>Frogger (Euro)</description>
 		<year>1983</year>
@@ -662,8 +714,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="froggerb" cloneof="frogger">
-		<description>Frogger (Brazil)</description>
+		<description>Frogger (Bra)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="usage" value="Uses the 2nd joystick" />
@@ -673,6 +726,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="golf">
 		<description>Golf (Euro)</description>
 		<year>1980</year>
@@ -684,6 +738,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="compgolf" cloneof="golf">
 		<description>Computer Golf! (USA)</description>
 		<year>1980</year>
@@ -695,8 +750,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="gtwallst">
-		<description>The Great Wall Street Fortune Hunt (USA, Euro)</description>
+		<description>The Great Wall Street Fortune Hunt (Euro, USA)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<info name="serial" value="AC9434 (USA) ~ 46 (Euro)"/>
@@ -706,8 +762,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="wallst" cloneof="gtwallst">
-		<description>Wall Street (Brazil)</description>
+		<description>Wall Street (Bra)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -716,6 +773,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="gunfight">
 		<description>Gunfighter (Euro)</description>
 		<year>1980</year>
@@ -727,6 +785,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="showdown" cloneof="gunfight">
 		<description>Showdown in 2100 A.D. (USA)</description>
 		<year>1980</year>
@@ -738,6 +797,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2hckyscr">
 		<description>Electronic Ice Hockey/Electronic Soccer (Euro) ~ Hockey!/Soccer! (USA)</description>
 		<year>1981</year>
@@ -750,6 +810,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2fblhcky" cloneof="2hckyscr">
 		<description>Football Electronique/Hockey Electronique (Fra)</description>
 		<year>1981</year>
@@ -761,6 +822,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="interpol">
 		<description>Interpol (Euro, Prototype)</description>
 		<year>198?</year>
@@ -772,6 +834,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="acrobat">
 		<description>Jumping Acrobats (Euro)</description>
 		<year>1981</year>
@@ -784,6 +847,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="acrobata" cloneof="acrobat">
 		<description>Jumping Acrobats (Euro, Alt)</description>
 		<year>1981</year>
@@ -795,6 +859,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="ptbarnum" cloneof="acrobat">
 		<description>P.T. Barnum's Acrobats! (USA)</description>
 		<year>1982</year>
@@ -807,6 +872,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kckrazy">
 		<description>Crazy Chase (Euro) ~ K.C.'s Krazy Chase! (USA)</description>
 		<year>1982</year>
@@ -818,6 +884,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="bees">
 		<description>Killer Bees! (USA)</description><!-- also "Killer Bees (Euro)[Videopac 52]"? -->
 		<year>1983</year>
@@ -830,6 +897,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2lbsprmd">
 		<description>A Labyrinth Game/Supermind (Euro)</description>
 		<year>1981</year>
@@ -841,6 +909,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="lsvsblck">
 		<description>Blackjack (Euro) ~ Las Vegas Blackjack! (USA)</description>
 		<year>1980</year>
@@ -852,6 +921,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="blackjck" cloneof="lsvsblck">
 		<description>Blackjack (Fra)</description>
 		<year>1980</year>
@@ -862,6 +932,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="laser">
 		<description>Laser War (Euro)</description>
 		<year>1980</year>
@@ -873,6 +944,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="guerre" cloneof="laser">
 		<description>Guerre Lazer (Fra)</description>
 		<year>1980</year>
@@ -883,6 +955,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="invaders" cloneof="laser">
 		<description>Invaders from Hyperspace! (USA)</description>
 		<year>1980</year>
@@ -894,8 +967,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="balao">
-		<description>Balão Travesso! (Brazil)</description>
+		<description>Balão Travesso! (Bra)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -904,6 +978,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="loony" cloneof="balao">
 		<description>Loony Balloon (Euro, Prototype)</description>
 		<year>1983</year>
@@ -914,6 +989,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="martian">
 		<description>Martian Threat (Euro, Prototype)</description>
 		<year>198?</year>
@@ -925,6 +1001,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="3prspclg">
 		<description>Pairs/Space Rendezvous/Logic (Euro)</description>
 		<year>1978</year>
@@ -937,6 +1014,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="3mkrbzlg" cloneof="3prspclg">
 		<description>Matchmaker!/Buzzword!/Logix! (USA)</description>
 		<year>1978</year>
@@ -949,6 +1027,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2missprg">
 		<description>Missão Impossível/Viagem Programada (Bra)</description><!-- limited release -->
 		<year>198?</year>
@@ -960,6 +1039,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="monkey">
 		<description>Monkeyshines (Euro) ~ Monkeyshines! (USA)</description>
 		<year>1981</year>
@@ -972,6 +1052,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="mousing">
 		<description>The Mousing Cat (Euro)</description>
 		<year>1982</year>
@@ -983,6 +1064,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="chat" cloneof="mousing">
 		<description>Chat et Souris (Fra)</description>
 		<year>1983</year>
@@ -993,6 +1075,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="munchkin">
 		<description>Munchkin (Euro)</description>
 		<year>1982</year>
@@ -1005,6 +1088,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="kcmunch">
 		<description>K.C. Munchkin! (USA)</description>
 		<year>1981</year>
@@ -1017,6 +1101,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="phantom">
 		<description>Phantom House (Euro, Prototype)</description>
 		<year>1983</year>
@@ -1027,6 +1112,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="2wrldrsc">
 		<description>Out of this World!/Helicopter Rescue! (USA)</description>
 		<year>1979</year>
@@ -1039,6 +1125,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="pachinko">
 		<description>Basket Game (Euro) ~ Pachinko! (USA)</description>
 		<year>1981</year>
@@ -1051,6 +1138,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="pickaxe">
 		<description>Pickaxe Pete (Euro) ~ Pick Axe Pete! (USA)</description>
 		<year>1980</year>
@@ -1062,6 +1150,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="pinball">
 		<description>Pinball! (USA, Prototype)</description>
 		<year>1979</year><!-- re-released at Classic Games Expo (2004 in Philidelphia) with Ralph Baer's autograph (as he was designer)  -->
@@ -1073,6 +1162,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="playtag">
 		<description>Plantage ~ Play Tag (Euro, Prototype)</description>
 		<year>198?</year>
@@ -1083,6 +1173,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="billiard">
 		<description>Electronic Billiards (Euro) ~ Pocket Billiards! (USA)</description>
 		<year>1978</year>
@@ -1095,6 +1186,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="billamer" cloneof="billiard">
 		<description>Billard Américain (Fra)</description>
 		<year>1978</year>
@@ -1106,6 +1198,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="popeye">
 		<description>Popeye (Euro)</description>
 		<year>1983</year>
@@ -1117,8 +1210,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="popeyeb" cloneof="popeye">
-		<description>Popeye (Brazil)</description>
+		<description>Popeye (Bra)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<info name="programmer" value="Gil Williamson and Charles Dear" />
@@ -1128,6 +1222,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="powerlrd">
 		<description>Power Lords (USA)</description>
 		<year>1983</year>
@@ -1140,6 +1235,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="qbert">
 		<description>Q*bert (Euro)</description>
 		<year>1983</year>
@@ -1151,8 +1247,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="quest">
-		<description>Quest for the Rings (USA, Euro)</description>
+		<description>Quest for the Rings (Euro, USA)</description>
 		<year>1981</year>
 		<publisher>Philips</publisher>
 		<info name="programmer" value="Ed Averett"/>
@@ -1163,8 +1260,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="laquete" cloneof="quest">
-		<description>La Quête Des Anneux (Fra)</description>
+		<description>La Quête des Anneux (Fra)</description>
 		<year>1982</year>
 		<publisher>Radiola</publisher>
 		<info name="programmer" value="Ed Averett"/>
@@ -1174,8 +1272,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="battle">
-		<description>Barão Vermelho! (Brazil)</description>
+		<description>Barão Vermelho! (Bra)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -1184,6 +1283,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="baron" cloneof="battle">
 		<description>Red Baron (Euro, Prototype)</description>
 		<year>198?</year>
@@ -1194,6 +1294,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="robot">
 		<description>Robot City (Euro, Prototype)</description>
 		<year>198?</year>
@@ -1204,6 +1305,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="samurai">
 		<description>Samurai (Euro)</description>
 		<year>1980</year>
@@ -1216,6 +1318,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="dynasty" cloneof="samurai">
 		<description>Dynasty! (USA)</description>
 		<year>1979</year>
@@ -1228,6 +1331,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="satellit">
 		<description>Satellite Attack (Euro)</description>
 		<year>1981</year>
@@ -1240,6 +1344,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="ufo" cloneof="satellit">
 		<description>UFO! (USA)</description>
 		<year>1982</year>
@@ -1252,6 +1357,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="syracuse">
 		<description>Syracuse (Fra)</description>
 		<year>1981</year>
@@ -1262,6 +1368,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="pharaohs">
 		<description>Secret of the Pharaohs (Euro)</description>
 		<year>1981</year>
@@ -1273,8 +1380,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="farao" cloneof="pharaohs">
-		<description>O Segredo do Faraó! (Brazil)</description>
+		<description>O Segredo do Faraó! (Bra)</description>
 		<year>198?</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -1283,6 +1391,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="shark">
 		<description>Shark Hunter (Euro, Prototype)</description>
 		<year>198?</year>
@@ -1294,6 +1403,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="3rcsocpt">
 		<description>Race/Spin-Out/Cryptogram (Euro) ~ Speedway/Spin-Out/Crypto-logic (USA)</description>
 		<year>1978</year>
@@ -1306,6 +1416,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="3csaucpt" cloneof="3rcsocpt">
 		<description>Course de Voitures/Autodrome/Cryptogramme (Fra)</description>
 		<year>1978</year>
@@ -1317,6 +1428,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="spider">
 		<description>Spider-Man (Euro, Prototype)</description>
 		<year>198?</year>
@@ -1327,6 +1439,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="stone">
 		<description>Stone Sling (Euro)</description>
 		<year>1981</year>
@@ -1339,6 +1452,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="smither" cloneof="stone">
 		<description>Smithereens! (USA)</description>
 		<year>1982</year>
@@ -1351,6 +1465,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="superbee">
 		<description>Super Bee (Euro)</description>
 		<year>1983</year>
@@ -1363,8 +1478,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="superbeeb" cloneof="superbee">
-		<description>Super Bee! (Brazil)</description>
+		<description>Super Bee! (Bra)</description>
 		<year>1983</year>
 		<publisher>Philips</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -1373,6 +1489,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="cobra">
 		<description>Super Cobra (Euro)</description>
 		<year>1983</year>
@@ -1383,8 +1500,9 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="cobrab" cloneof="cobra">
-		<description>Super Cobra (Brazil)</description>
+		<description>Super Cobra (Bra)</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="odyssey_cart">
@@ -1393,6 +1511,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="moneyrun">
 		<description>Take the Money and Run (Euro) ~ Take the Money and Run! (USA)</description>
 		<year>1978</year>
@@ -1405,6 +1524,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="prendre" cloneof="moneyrun">
 		<description>Prendre l'Argent et Fuir (Fra)</description>
 		<year>1978</year>
@@ -1416,6 +1536,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="flipper">
 		<description>Flipper Game (Euro) ~ Thunderball! (USA)</description>
 		<year>1979</year>
@@ -1427,6 +1548,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="flipperf">
 		<description>Flipper (Fra)</description>
 		<year>1980</year>
@@ -1437,6 +1559,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="turtles">
 		<description>Turtles (Euro)</description>
 		<year>1982</year>
@@ -1449,6 +1572,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="turtlesu" cloneof="turtles">
 		<description>Turtles (USA)</description>
 		<year>1983</year>
@@ -1461,6 +1585,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="tutank">
 		<description>Tutankham (Euro, Prototype)</description>
 		<year>198?</year>
@@ -1472,6 +1597,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="volley">
 		<description>Electronic Volleyball (Euro) ~ Volleyball! (USA)</description>
 		<year>1979</year>
@@ -1484,6 +1610,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="volleyf" cloneof="volley">
 		<description>Volleyball (Fra)</description>
 		<year>1979</year>
@@ -1495,6 +1622,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 			</dataarea>
 		</part>
 	</software>
+
 	<software name="battlef">
 		<description>Battlefield (Euro) ~ War of Nerves! (USA)</description>
 		<year>1979</year>

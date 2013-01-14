@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="kayproii" description="Kaypro II floppies list">
+<softwarelist name="kayproii" description="Kaypro II disk images">
 
 <!-- Operating systems -->
 
@@ -105,7 +105,7 @@
 		</part>
 	</software>
 
-	<software name="work">
+	<software name="workproc">
 		<description>Select - Work Processor</description>
 		<year>1981</year>
 		<publisher>Select Information Systems</publisher>

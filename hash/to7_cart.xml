@@ -87,7 +87,7 @@
 		</part>
 	</software>
 	
-	<software name="caractor" cloneof="caractr2">
+	<software name="caractor">
 		<description>Caractor</description>
 		<year>1983</year>
 		<publisher>To Tek</publisher>
@@ -171,7 +171,7 @@
 		</part>
 	</software>	
 	
-	<software name="gerez">
+	<software name="gerfiche">
 		<description>Gerez vos Fiches</description>
 		<year>1983</year>
 		<publisher>Answare</publisher>
@@ -183,7 +183,7 @@
 		</part>
 	</software>	
 	
-	<software name="gerezvot">
+	<software name="gerteque">
 		<description>Gerez Votre Bibliotheque-Discotheque-Videotheque</description>
 		<year>1983</year>
 		<publisher>Answare</publisher>
@@ -195,8 +195,8 @@
 		</part>
 	</software>	
 	
-	<software name="chiffres">
-		<description>Les Chiffres et Les Lettres</description>
+	<software name="chiflett">
+		<description>Les Chiffres et les Lettres</description>
 		<year>198?</year>
 		<publisher>Vifi Nathan</publisher>
 
@@ -315,7 +315,7 @@
 		</part>
 	</software>
 	
-	<software name="threshf">
+	<software name="threshld">
 		<description>Threshold</description>
 		<year>1984</year>
 		<publisher>To Tek</publisher>
@@ -327,7 +327,7 @@
 		</part>
 	</software>
 
-	<software name="threshe" cloneof="threshf">
+	<software name="threshlde" cloneof="threshld">
 		<description>Threshold (English)</description>
 		<year>1984</year>
 		<publisher>To Tek</publisher>
@@ -339,8 +339,8 @@
 		</part>
 	</software>
 
-	<software name="thresha" cloneof="threshf">
-		<description>Threshold (English) (Alt)</description>
+	<software name="threshldea" cloneof="threshld">
+		<description>Threshold (English, Alt)</description>
 		<year>1984</year>
 		<publisher>To Tek</publisher>
 
@@ -376,7 +376,7 @@
 	</software>
 
 	<software name="videotex">
-		<description>Vidoetex Interactif</description>
+		<description>Videotex Interactif</description>
 		<year>1984</year>
 		<publisher>To Tek</publisher>
 

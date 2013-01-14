@@ -116,7 +116,7 @@ Alignment Tape (Micro Video)
 	</software>
 
 	<!-- Tape 105 -->
-	<software name="vidchess">
+	<software name="videochs">
 		<description>Video Chess</description>
 		<year>19??</year>
 		<publisher>Interact Electronics</publisher>
