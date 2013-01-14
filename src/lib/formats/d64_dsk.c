@@ -78,10 +78,10 @@ const d64_format::format d64_format::formats[] = {
 		floppy_image::FF_525, floppy_image::DSSD, DOS_2, 683, 35, 2, 9, 8
 	},
 	{ // d80, dos 2.5, 77 tracks
-		floppy_image::FF_525, floppy_image::SSQD, DOS_25, 2083, 77, 15, 9, 8
+		floppy_image::FF_525, floppy_image::SSQD, DOS_25, 2083, 77, 1, 9, 8
 	},
 	{ // d82, dos 2.5, 77 tracks, 2 heads
-		floppy_image::FF_525, floppy_image::DSQD, DOS_25, 2083, 77, 15, 9, 8
+		floppy_image::FF_525, floppy_image::DSQD, DOS_25, 2083, 77, 2, 9, 8
 	},
 	{}
 };
@@ -222,7 +222,7 @@ int d64_format::get_sectors_per_track(const format &f, int track)
 
 	switch (f.dos) {
 	case DOS_1: sector_count = dos1_sectors_per_track[track]; break;
-	case DOS_2: sector_count = dos1_sectors_per_track[track]; break;
+	case DOS_2: sector_count = dos2_sectors_per_track[track]; break;
 	case DOS_25: sector_count = dos25_sectors_per_track[track]; break;
 	}
 
@@ -1167,15 +1167,9 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	for d80 & d82 they are at track 39 bytes 0x18 & 0x19
 	*/
 	if (dos == DOS25)
-	{
-		printf("dos25 id offset %u\n", tag->track_offset[0][38] + 0x18);
 		floppy_image_read(floppy, id, tag->track_offset[0][38] + 0x18, 2);
-	}
 	else
-	{
-		printf("dos2 id offset %u\n", tag->track_offset[0][38] + 0x18);
 		floppy_image_read(floppy, id, tag->track_offset[0][34] + 0xa2, 2);
-	}
 
 	tag->id1 = id[0];
 	tag->id2 = id[1];
