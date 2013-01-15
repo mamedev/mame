@@ -299,16 +299,27 @@ class pc8801_state : public driver_device
 public:
 	pc8801_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
 			m_fdccpu(*this, "fdccpu"),
 			m_pic(*this, I8214_TAG),
 			m_rtc(*this, UPD1990A_TAG),
 			m_cassette(*this, CASSETTE_TAG)
 	{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdccpu;
 	optional_device<i8214_device> m_pic;
 	required_device<upd1990a_device> m_rtc;
 	required_device<cassette_image_device> m_cassette;
+	UINT8 *m_work_ram;
+	UINT8 *m_hi_work_ram;
+	UINT8 *m_ext_work_ram;
+	UINT8 *m_gvram;
+	UINT8 *m_n80rom;
+	UINT8 *m_n88rom;
+	UINT8 *m_kanji_rom;
+	UINT8 *m_cg_rom;
+
 	UINT8 m_i8255_0_pc;
 	UINT8 m_i8255_1_pc;
 	UINT8 m_fdc_irq_opcode;
@@ -520,7 +531,6 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 {
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *gvram = machine().root_device().memregion("gvram")->base();
 	UINT16 y_size;
 	UINT16 y_double;
 
@@ -540,9 +550,9 @@ void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 				pen = 0;
 
 				/* note: layer masking doesn't occur in 3bpp mode, Bug Attack relies on this */
-				pen |= ((gvram[count+0x0000] >> (7-xi)) & 1) << 0;
-				pen |= ((gvram[count+0x4000] >> (7-xi)) & 1) << 1;
-				pen |= ((gvram[count+0x8000] >> (7-xi)) & 1) << 2;
+				pen |= ((m_gvram[count+0x0000] >> (7-xi)) & 1) << 0;
+				pen |= ((m_gvram[count+0x4000] >> (7-xi)) & 1) << 1;
+				pen |= ((m_gvram[count+0x8000] >> (7-xi)) & 1) << 2;
 
 				if(y_double)
 				{
@@ -568,7 +578,6 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 {
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *gvram = machine().root_device().memregion("gvram")->base();
 	UINT8 color;
 	UINT8 is_cursor;
 
@@ -587,7 +596,7 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 			{
 				int pen;
 
-				pen = ((gvram[count+0x0000] >> (7-xi)) & 1);
+				pen = ((m_gvram[count+0x0000] >> (7-xi)) & 1);
 				if(is_cursor)
 					pen^=1;
 
@@ -625,7 +634,7 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 				{
 					int pen;
 
-					pen = ((gvram[count+0x4000] >> (7-xi)) & 1);
+					pen = ((m_gvram[count+0x4000] >> (7-xi)) & 1);
 					if(is_cursor)
 						pen^=1;
 
@@ -667,7 +676,7 @@ UINT8 pc8801_state::calc_cursor_pos(int x,int y,int yi)
 
 UINT8 pc8801_state::extract_text_attribute(UINT32 address,int x, UINT8 width, UINT8 &non_special)
 {
-	UINT8 *vram = machine().root_device().memregion("wram")->base();
+	UINT8 *vram = m_work_ram;
 	int i;
 	int fifo_size;
 	int offset;
@@ -706,8 +715,7 @@ UINT8 pc8801_state::extract_text_attribute(UINT32 address,int x, UINT8 width, UI
 void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int width, UINT8 non_special)
 {
 	int xi,yi;
-	UINT8 *vram = machine().root_device().memregion("wram")->base();
-	UINT8 *gfx_rom = machine().root_device().memregion("gfx1")->base();
+	UINT8 *vram = m_work_ram;
 	UINT8 is_cursor;
 	UINT8 y_height, y_double;
 	UINT8 y_step;
@@ -757,7 +765,7 @@ void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UIN
 					if(yi >= (1 << (y_double+3)) || secret || blink_mask)
 						char_data = 0;
 					else
-						char_data = (gfx_rom[tile*8+(yi >> y_double)] >> (7-xi)) & 1;
+						char_data = (m_cg_rom[tile*8+(yi >> y_double)] >> (7-xi)) & 1;
 
 					if(yi == 0 && upper)
 						char_data = 1;
@@ -874,16 +882,15 @@ UINT32 pc8801_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap,
 READ8_MEMBER(pc8801_state::pc8801_alu_r)
 {
 	int i;
-	UINT8 *gvram = memregion("gvram")->base();
 	UINT8 b,r,g;
 
 	/* store data to ALU regs */
 	for(i=0;i<3;i++)
-		m_alu_reg[i] = gvram[i*0x4000 + offset];
+		m_alu_reg[i] = m_gvram[i*0x4000 + offset];
 
-	b = gvram[offset + 0x0000];
-	r = gvram[offset + 0x4000];
-	g = gvram[offset + 0x8000];
+	b = m_gvram[offset + 0x0000];
+	r = m_gvram[offset + 0x4000];
+	g = m_gvram[offset + 0x8000];
 	if(!(m_alu_ctrl2 & 1)) { b^=0xff; }
 	if(!(m_alu_ctrl2 & 2)) { r^=0xff; }
 	if(!(m_alu_ctrl2 & 4)) { g^=0xff; }
@@ -894,7 +901,6 @@ READ8_MEMBER(pc8801_state::pc8801_alu_r)
 WRITE8_MEMBER(pc8801_state::pc8801_alu_w)
 {
 	int i;
-	UINT8 *gvram = memregion("gvram")->base();
 
 	switch(m_alu_ctrl2 & 0x30) // alu write mode
 	{
@@ -908,9 +914,9 @@ WRITE8_MEMBER(pc8801_state::pc8801_alu_w)
 
 				switch(logic_op)
 				{
-					case 0x00: { gvram[i*0x4000 + offset] &= ~data; } break;
-					case 0x01: { gvram[i*0x4000 + offset] |= data; } break;
-					case 0x10: { gvram[i*0x4000 + offset] ^= data; } break;
+					case 0x00: { m_gvram[i*0x4000 + offset] &= ~data; } break;
+					case 0x01: { m_gvram[i*0x4000 + offset] |= data; } break;
+					case 0x10: { m_gvram[i*0x4000 + offset] ^= data; } break;
 					case 0x11: break; // NOP
 				}
 			}
@@ -920,16 +926,16 @@ WRITE8_MEMBER(pc8801_state::pc8801_alu_w)
 		case 0x10: // restore data from ALU regs
 		{
 			for(i=0;i<3;i++)
-				gvram[i*0x4000 + offset] = m_alu_reg[i];
+				m_gvram[i*0x4000 + offset] = m_alu_reg[i];
 		}
 		break;
 
 		case 0x20: // swap ALU reg 1 into R GVRAM
-			gvram[0x0000 + offset] = m_alu_reg[1];
+			m_gvram[0x0000 + offset] = m_alu_reg[1];
 			break;
 
 		case 0x30: // swap ALU reg 0 into B GVRAM
-			gvram[0x4000 + offset] = m_alu_reg[0];
+			m_gvram[0x4000 + offset] = m_alu_reg[0];
 			break;
 	}
 }
@@ -937,76 +943,56 @@ WRITE8_MEMBER(pc8801_state::pc8801_alu_w)
 
 READ8_MEMBER(pc8801_state::pc8801_wram_r)
 {
-	UINT8 *work_ram = memregion("wram")->base();
-
-	return work_ram[offset];
+	return m_work_ram[offset];
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_wram_w)
 {
-	UINT8 *work_ram = memregion("wram")->base();
-
-	work_ram[offset] = data;
+	m_work_ram[offset] = data;
 }
 
 READ8_MEMBER(pc8801_state::pc8801_ext_wram_r)
 {
-	UINT8 *ext_work_ram = memregion("ewram")->base();
-
 	if(offset < m_extram_size)
-		return ext_work_ram[offset];
+		return m_ext_work_ram[offset];
 
 	return 0xff;
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_ext_wram_w)
 {
-	UINT8 *ext_work_ram = memregion("ewram")->base();
-
 	if(offset < m_extram_size)
-		ext_work_ram[offset] = data;
+		m_ext_work_ram[offset] = data;
 }
 
 READ8_MEMBER(pc8801_state::pc8801_nbasic_rom_r)
 {
-	UINT8 *n80_rom = memregion("n80rom")->base();
-
-	return n80_rom[offset];
+	return m_n80rom[offset];
 }
 
 READ8_MEMBER(pc8801_state::pc8801_n88basic_rom_r)
 {
-	UINT8 *n88_rom = memregion("n88rom")->base();
-
-	return n88_rom[offset];
+	return m_n88rom[offset];
 }
 
 READ8_MEMBER(pc8801_state::pc8801_gvram_r)
 {
-	UINT8 *gvram = memregion("gvram")->base();
-
-	return gvram[offset];
+	return m_gvram[offset];
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_gvram_w)
 {
-	UINT8 *gvram = memregion("gvram")->base();
-
-	gvram[offset] = data;
+	m_gvram[offset] = data;
 }
 
 READ8_MEMBER(pc8801_state::pc8801_high_wram_r)
 {
-	UINT8 *hi_work_ram = memregion("hiwram")->base();
-
-	return hi_work_ram[offset];
+	return m_hi_work_ram[offset];
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_high_wram_w)
 {
-	UINT8 *hi_work_ram = memregion("hiwram")->base();
-
-	hi_work_ram[offset] = data;
+	m_hi_work_ram[offset] = data;
 }
 
 READ8_MEMBER(pc8801_state::pc8801ma_dic_r)
@@ -1341,7 +1327,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_mask_w)
 		m_vrtc_irq_latch = 0;
 
 	if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
-		machine().device("maincpu")->execute().set_input_line(0,CLEAR_LINE);
+		m_maincpu->set_input_line(0,CLEAR_LINE);
 
 //  IRQ_LOG(("%02x MASK (%02x %02x)\n",data,m_timer_irq_latch,m_vrtc_irq_latch));
 
@@ -1389,11 +1375,11 @@ WRITE8_MEMBER(pc8801_state::pc8801_misc_ctrl_w)
 		m_sound_irq_latch = 0;
 
 	if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
-		machine().device("maincpu")->execute().set_input_line(0,CLEAR_LINE);
+		m_maincpu->set_input_line(0,CLEAR_LINE);
 
 	if(m_sound_irq_mask && m_sound_irq_pending)
 	{
-		machine().device("maincpu")->execute().set_input_line(0,HOLD_LINE);
+		m_maincpu->set_input_line(0,HOLD_LINE);
 		m_sound_irq_latch = 1;
 		m_sound_irq_pending = 0;
 	}
@@ -1608,9 +1594,8 @@ WRITE8_MEMBER(pc8801_state::pc8801_txt_cmt_ctrl_w)
 
 READ8_MEMBER(pc8801_state::pc8801_kanji_r)
 {
-	UINT8 *knj_rom = memregion("kanji")->base();
 	if((offset & 2) == 0)
-		return knj_rom[m_knj_addr[0]*2+((offset & 1) ^ 1)];
+		return m_kanji_rom[m_knj_addr[0]*2+((offset & 1) ^ 1)];
 
 	return 0xff;
 }
@@ -1623,9 +1608,8 @@ WRITE8_MEMBER(pc8801_state::pc8801_kanji_w)
 
 READ8_MEMBER(pc8801_state::pc8801_kanji_lv2_r)
 {
-	UINT8 *knj_rom = memregion("kanji")->base() + 0x20000;
 	if((offset & 2) == 0)
-		return knj_rom[m_knj_addr[1]*2+((offset & 1) ^ 1)];
+		return m_kanji_rom[m_knj_addr[1]*2+((offset & 1) ^ 1)];
 
 	return 0xff;
 }
@@ -1740,11 +1724,11 @@ WRITE8_MEMBER(pc8801_state::pc8801_opna_w)
 			m_sound_irq_latch = 0;
 
 		if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
-			machine().device("maincpu")->execute().set_input_line(0,CLEAR_LINE);
+			m_maincpu->set_input_line(0,CLEAR_LINE);
 
 		if(m_sound_irq_mask && m_sound_irq_pending)
 		{
-			machine().device("maincpu")->execute().set_input_line(0,HOLD_LINE);
+			m_maincpu->set_input_line(0,HOLD_LINE);
 			m_sound_irq_latch = 1;
 			m_sound_irq_pending = 0;
 		}
@@ -2253,7 +2237,7 @@ static const gfx_layout kanji_layout =
 
 /* debugging only */
 static GFXDECODE_START( pc8801 )
-	GFXDECODE_ENTRY( "gfx1",  0, char_layout,  0, 8 )
+	GFXDECODE_ENTRY( "cgrom", 0, char_layout,  0, 8 )
 	GFXDECODE_ENTRY( "kanji", 0, kanji_layout, 0, 8 )
 GFXDECODE_END
 
@@ -2292,13 +2276,13 @@ void pc8801_raise_irq(running_machine &machine,UINT8 irq,UINT8 state)
 
 		drvstate->m_pic->r_w(~irq);
 
-		machine.device("maincpu")->execute().set_input_line(0,ASSERT_LINE);
+		m_maincpu->set_input_line(0,ASSERT_LINE);
 	}
 	else
 	{
 		//drvstate->m_int_state &= ~irq;
 
-		//machine.device("maincpu")->execute().set_input_line(0,CLEAR_LINE);
+		//m_maincpu->set_input_line(0,CLEAR_LINE);
 	}
 }
 
@@ -2330,7 +2314,7 @@ static IRQ_CALLBACK( pc8801_irq_callback )
 	UINT8 vector = (7 - state->m_pic->a_r());
 
 	state->m_int_state &= ~(1<<vector);
-	device->machine().device("maincpu")->execute().set_input_line(0,CLEAR_LINE);
+	m_maincpu->set_input_line(0,CLEAR_LINE);
 
 	return vector << 1;
 }
@@ -2411,7 +2395,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::pc8801_rtc_irq)
 	{
 		m_timer_irq_latch = 1;
 		//IRQ_LOG(("timer\n"));
-		machine().device("maincpu")->execute().set_input_line(0,HOLD_LINE);
+		m_maincpu->set_input_line(0,HOLD_LINE);
 	}
 }
 
@@ -2421,14 +2405,14 @@ INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 	{
 		m_vrtc_irq_latch = 1;
 		//IRQ_LOG(("vrtc\n"));
-		device.execute().set_input_line(0,HOLD_LINE);
+		m_maincpu->set_input_line(0,HOLD_LINE);
 	}
 }
 #endif
 
 void pc8801_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc8801_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(pc8801_irq_callback);
 	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc8801_state::fdc_irq_w), this));
 
 	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(300);
@@ -2437,6 +2421,20 @@ void pc8801_state::machine_start()
 
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
+
+	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000);
+	m_hi_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x1000);
+	m_ext_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x8000*0x100);
+	m_gvram = auto_alloc_array_clear(machine(), UINT8, 0xc000);
+	m_n80rom = memregion("n80rom")->base();
+	m_n88rom = memregion("n88rom")->base();
+	m_kanji_rom = memregion("kanji")->base();
+	m_cg_rom = memregion("cgrom")->base();
+
+	state_save_register_global_pointer(machine(), m_work_ram, 0x10000);
+	state_save_register_global_pointer(machine(), m_hi_work_ram, 0x1000);
+	state_save_register_global_pointer(machine(), m_ext_work_ram, 0x8000*0x100);
+	state_save_register_global_pointer(machine(), m_gvram, 0xc000);
 }
 
 void pc8801_state::machine_reset()
@@ -2530,8 +2528,8 @@ MACHINE_RESET_MEMBER(pc8801_state,pc8801_clock_speed)
 	m_has_clock_speed = 1;
 	m_clock_setting = machine().root_device().ioport("CFG")->read() & 0x80;
 
-	machine().device("maincpu")->set_unscaled_clock(m_clock_setting ?  XTAL_4MHz : XTAL_8MHz);
-	machine().device("fdccpu")->set_unscaled_clock(m_clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
+	m_maincpu->set_unscaled_clock(m_clock_setting ?  XTAL_4MHz : XTAL_8MHz);
+	m_fdccpu->set_unscaled_clock(m_clock_setting ?  XTAL_4MHz : XTAL_8MHz); // correct?
 	m_baudrate_val = 0;
 }
 
@@ -2732,13 +2730,8 @@ static MACHINE_CONFIG_DERIVED( pc8801mc, pc8801 )
 MACHINE_CONFIG_END
 
 
-/* ROMs */
+/* TODO: clean this up */
 #define PC8801_MEM_LOAD \
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF ) \
-	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 ) \
-	ROM_REGION( 0x1000, "hiwram", ROMREGION_ERASE00 ) \
-	ROM_REGION( 0x8000*0x100, "ewram", ROMREGION_ERASE00 ) \
-	ROM_REGION( 0xc000, "gvram", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0x100000, "opna", ROMREGION_ERASE00 )
 
 
@@ -2758,7 +2751,7 @@ ROM_START( pc8801 )
 	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF)
 	ROM_LOAD_OPTIONAL( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 
-	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_REGION( 0x800, "cgrom", 0)
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(56653188) SHA1(84b90f69671d4b72e8f219e1fe7cd667e976cf7f) )
 ROM_END
 
@@ -2780,7 +2773,7 @@ ROM_START( pc8801mk2 )
 	ROM_REGION( 0x40000, "kanji", ROMREGION_ERASEFF)
 	ROM_LOAD_OPTIONAL( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 
-	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_REGION( 0x800, "cgrom", 0)
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x800 )
 ROM_END
 
@@ -2808,7 +2801,7 @@ ROM_START( pc8801mk2sr )
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "kanji2.rom", 0x20000, 0x20000, CRC(154803cc) SHA1(7e6591cd465cbb35d6d3446c5a83b46d30fafe95) )    // it should not be here
 
-	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_REGION( 0x800, "cgrom", 0)
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x800 )
 ROM_END
 
@@ -2835,7 +2828,7 @@ ROM_START( pc8801mk2fr )
 	ROM_REGION( 0x40000, "kanji", 0)
 	ROM_LOAD( "kanji1.rom", 0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 
-	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_REGION( 0x800, "cgrom", 0)
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x800 )
 ROM_END
 
@@ -2863,7 +2856,7 @@ ROM_START( pc8801mk2mr )
 	ROM_LOAD( "kanji1.rom",      0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "m2mr_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
-	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_REGION( 0x800, "cgrom", 0)
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x800 )
 ROM_END
 
@@ -2891,7 +2884,7 @@ ROM_START( pc8801mh )
 	ROM_LOAD( "kanji1.rom",    0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "mh_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
-	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_REGION( 0x800, "cgrom", 0)
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 ROM_END
 
@@ -2919,7 +2912,7 @@ ROM_START( pc8801fa )
 	ROM_LOAD( "kanji1.rom",    0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "fa_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
-	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_REGION( 0x800, "cgrom", 0)
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 ROM_END
 
@@ -2947,7 +2940,7 @@ ROM_START( pc8801ma ) // newer floppy BIOS and Jisyo (dictionary) ROM
 	ROM_LOAD( "kanji1.rom",    0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "ma_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
-	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_REGION( 0x800, "cgrom", 0)
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 
 	/* 32 banks, to be loaded at 0xc000 - 0xffff */
@@ -2979,7 +2972,7 @@ ROM_START( pc8801ma2 )
 	ROM_LOAD( "kanji1.rom",     0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "ma2_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
-	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_REGION( 0x800, "cgrom", 0)
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x80000, "dictionary", 0 )
@@ -3013,7 +3006,7 @@ ROM_START( pc8801mc )
 	ROM_LOAD( "kanji1.rom",    0x00000, 0x20000, CRC(6178bd43) SHA1(82e11a177af6a5091dd67f50a2f4bafda84d6556) )
 	ROM_LOAD( "mc_kanji2.rom", 0x20000, 0x20000, CRC(376eb677) SHA1(bcf96584e2ba362218b813be51ea21573d1a2a78) )
 
-	ROM_REGION( 0x800, "gfx1", 0)
+	ROM_REGION( 0x800, "cgrom", 0)
 	ROM_COPY( "kanji", 0x1000, 0x0000, 0x0800 )
 
 	ROM_REGION( 0x80000, "dictionary", 0 )
