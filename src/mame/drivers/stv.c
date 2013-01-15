@@ -1973,6 +1973,11 @@ ROM_START( magzun )
 	ROM_LOAD( "magzun.nv", 0x0000, 0x0080, CRC(42700321) SHA1(1f2ba760c410312539c8677223edcd1cda3b51d4) )
 ROM_END
 
+// The internal ROM checks on these Atlus Print Club / Name clubs aren't very good
+//  they test the ROM space, but usually test multiple ROMs under one IC label in
+//  the test, and that IC label doesn't even relate to the actual cartridge at all.
+//  furthermore several sets use blank roms, and even test that they're present!
+
 
 ROM_START( stress )
 	STV_BIOS
@@ -2023,7 +2028,7 @@ ROM_START( techbowl ) // set to 1p
 	ROM_LOAD16_WORD_SWAP( "ic24",    0x0400000, 0x0200000, CRC(34090f6d) SHA1(b8bc344ab826d5c9584afb01dba1c720b8dbc74d) ) // OK
 	ROM_LOAD16_WORD_SWAP( "ic26",    0x0600000, 0x0200000, CRC(fb073352) SHA1(a5164aa5854ab3095f704ab73b6e4fb9ed0e0785) ) // OK
 	ROM_LOAD16_WORD_SWAP( "ic28",    0x0800000, 0x0200000, CRC(530e0ceb) SHA1(8d14eb9dbf253a4563587d256a15492384e7ca5c) ) // OK
-	ROM_LOAD16_WORD_SWAP( "ic30",    0x0a00000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic30",    0x0a00000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // 00 Fill, OK
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "techbowl.nv", 0x0000, 0x0080, CRC(5bebc2b7) SHA1(e189e891e1753059fbaad4ce82ddf191d5e8176a) )
@@ -2040,8 +2045,8 @@ ROM_START( micrombc ) // set to 1p
 	ROM_LOAD16_WORD_SWAP( "ic28",    0x0800000, 0x0200000, CRC(0c3db354) SHA1(c4d43da7cea1b4d5ca3ac545afde10344a4a385b) ) // OK
 	ROM_LOAD16_WORD_SWAP( "ic30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) ) // OK
 	ROM_LOAD16_WORD_SWAP( "ic32",    0x0c00000, 0x0200000, CRC(62c10626) SHA1(58cb0ca0330fa7a62b277ab0ff84bff65b81bb23) ) // OK
-	ROM_LOAD16_WORD_SWAP( "ic34",    0x1000000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // OK
-	ROM_LOAD16_WORD_SWAP( "ic36",    0x1200000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // OK
+	ROM_LOAD16_WORD_SWAP( "ic34",    0x1000000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // 00 Fill. OK
+	ROM_LOAD16_WORD_SWAP( "ic36",    0x1200000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // 00 Fill, OK
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "micrombc.nv", 0x0000, 0x0080, CRC(6e89815f) SHA1(4478f614fb61859f4ee7bf55462f737387887e6f) )
@@ -2057,7 +2062,7 @@ ROM_START( pclub2 ) // set to 1p / runs with the USA bios
 	ROM_LOAD16_WORD_SWAP( "pclub2_ic24",    0x0400000, 0x0200000, CRC(0e968c2d) SHA1(fbcc7533fcb6b87cd8255fc2d307ae618301ea64) ) // OK
 	ROM_LOAD16_WORD_SWAP( "pclub2_ic26",    0x0600000, 0x0200000, CRC(ab51da70) SHA1(85214aa805ffc9de59900dc0cd4e19e5ab756bf7) ) // OK
 	ROM_LOAD16_WORD_SWAP( "pclub2_ic28",    0x0800000, 0x0200000, CRC(3a654b2a) SHA1(7398e25836bfbdeab6350759f25c420c3b496172) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclub2_ic30",    0x0a00000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // OK
+	ROM_LOAD16_WORD_SWAP( "pclub2_ic30",    0x0a00000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // 00 Fill, OK
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclub2.nv", 0x0000, 0x0080, CRC(00d0f04e) SHA1(8b5a3e1c52e34443f83fd4a8948a00cacb5071d0) )
@@ -2070,7 +2075,7 @@ ROM_START( pclub2fc ) // set to 1p
 
 	ROM_LOAD16_WORD_SWAP( "pclub2fc_ic22",    0x0200000, 0x0200000, CRC(109c61a5) SHA1(bfb3e014e49064443ef290bc068ffcd459ae132d) ) // OK
 	ROM_LOAD16_WORD_SWAP( "pclub2fc_ic24",    0x0400000, 0x0200000, CRC(0ccc5538) SHA1(15133fc9c85f0a384d49841d874a0fe9a76057ce) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclub2fc_ic26",    0x0600000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // OK
+	ROM_LOAD16_WORD_SWAP( "pclub2fc_ic26",    0x0600000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // 00 Fill, OK
 	ROM_LOAD16_WORD_SWAP( "pclub2fc_ic28",    0x0800000, 0x0200000, CRC(ff9643ca) SHA1(3309f970f87324b06cc48add386019f769abcd89) ) // OK
 	ROM_LOAD16_WORD_SWAP( "pclub2fc_ic30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) ) // OK
 
@@ -2078,19 +2083,43 @@ ROM_START( pclub2fc ) // set to 1p
 	ROM_LOAD( "pclub2fc.nv", 0x0000, 0x0080, CRC(c8082326) SHA1(d24ad66eb01a58d3a117a49606003522b6f1feba) )
 ROM_END
 
+
+ROM_START( pclb297w ) // set to 1p
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "game0", ROMREGION_ERASE00 ) /* SH2 code */
+
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic22",    0x0200000, 0x0200000, CRC(589f6705) SHA1(d10897ab26c3ecdd518087562207de131133646c) ) // OK - IC7?
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic24",    0x0400000, 0x0200000, CRC(4bd706d1) SHA1(e3c52c63bb93d9fa836c300865423a226bf74586) ) // OK - IC2?
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic26",    0x0600000, 0x0200000, CRC(417e182a) SHA1(4df04a390523e52e48efcc48891bc54452f351c9) ) // OK - IC2?
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic28",    0x0800000, 0x0200000, CRC(73da594e) SHA1(936b0af4a32d5b93847bbf2ecfc8d334290059c0) ) // OK - IC3?
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) ) // OK - IC3?
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic32",    0x0c00000, 0x0200000, CRC(20437e93) SHA1(dfd2026bec6b2f418cd1cbfa7266717211d013b6) ) // OK - IC4?
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic34",    0x0e00000, 0x0200000, CRC(9639b003) SHA1(8f95b024ad19151e1e642d58aa785d14ae3a0661) ) // OK - IC4?
+
+	// the internal test mode then tests IC5, IC6, but we only have this rom to fill it? some mirroring (not basic + 0x1000000, tested) or just fail on real HW? or misisng 3 roms?
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic36",    0x1000000, 0x0200000, BAD_DUMP CRC(dd1b57b6) SHA1(8450355ec6cdc9718f8579f8702f3900f686c3f8) ) // BAD? - IC5 ??
+	// 0x1200000 ROM IC23 - (test IC5? pt 2)
+	// 0x1400000 ROM IC25 - (test IC6? pt 1)
+	// 0x1600000 ROM IC?? - (test IC6? pt 2)
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
+	ROM_LOAD( "eeprom", 0x0000, 0x0080, CRC(9ba58358) SHA1(555ac21321b3051f7083cd72176ddc0fef2d4155) )
+ROM_END
+
 ROM_START( pclub298 ) // set to 1p
 	STV_BIOS
 
 	ROM_REGION32_BE( 0x3000000, "game0", ROMREGION_ERASE00 ) /* SH2 code */
 
-	ROM_LOAD16_WORD_SWAP( "pclub298_ic22",    0x0200000, 0x0200000, CRC(cb0ec98a) SHA1(efef536cb3bc71207936b26b87f04641baded10b) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclub298_ic24",    0x0400000, 0x0200000, CRC(645e7e24) SHA1(7362b0c4b500639c20ec27002f543a0b4390eaa8) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclub298_ic26",    0x0600000, 0x0200000, CRC(9d3ad85d) SHA1(71fe330594ab58be331aa5311472855be07cb44c) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclub298_ic28",    0x0800000, 0x0200000, CRC(877e73cc) SHA1(dd9928a3fe0ed759611e1b7be8ea10b45084e392) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclub298_ic30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclub298_ic32",    0x0c00000, 0x0200000, CRC(62c10626) SHA1(58cb0ca0330fa7a62b277ab0ff84bff65b81bb23) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclub298_ic34",    0x0e00000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclub298_ic36",    0x1000000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // OK
+	ROM_LOAD16_WORD_SWAP( "pclub298_ic22",    0x0200000, 0x0200000, CRC(cb0ec98a) SHA1(efef536cb3bc71207936b26b87f04641baded10b) ) // OK? - tested as IC7?
+	ROM_LOAD16_WORD_SWAP( "pclub298_ic24",    0x0400000, 0x0200000, CRC(645e7e24) SHA1(7362b0c4b500639c20ec27002f543a0b4390eaa8) ) // OK - tested as IC2
+	ROM_LOAD16_WORD_SWAP( "pclub298_ic26",    0x0600000, 0x0200000, CRC(9d3ad85d) SHA1(71fe330594ab58be331aa5311472855be07cb44c) ) // OK - tested as IC2
+	ROM_LOAD16_WORD_SWAP( "pclub298_ic28",    0x0800000, 0x0200000, CRC(877e73cc) SHA1(dd9928a3fe0ed759611e1b7be8ea10b45084e392) ) // OK - tested as IC3
+	ROM_LOAD16_WORD_SWAP( "pclub298_ic30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) ) // OK - tested as IC3
+	ROM_LOAD16_WORD_SWAP( "pclub298_ic32",    0x0c00000, 0x0200000, CRC(62c10626) SHA1(58cb0ca0330fa7a62b277ab0ff84bff65b81bb23) ) // OK - tested as IC4
+	ROM_LOAD16_WORD_SWAP( "pclub298_ic34",    0x0e00000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // 00 fill. OK - tested as IC4
+	ROM_LOAD16_WORD_SWAP( "pclub298_ic36",    0x1000000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // 00 fill, OK - tested as IC5
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclub298.nv", 0x0000, 0x0080, CRC(a23dd0f2) SHA1(457282b5d40a17477b95330bba91e05c603f951e) )
@@ -2162,7 +2191,7 @@ ROM_START( pclub2v3 ) // set to 1p / runs with the USA bios
 	ROM_LOAD16_WORD_SWAP( "pclub2v3_ic24",    0x0400000, 0x0200000, CRC(b5871198) SHA1(10d187eebcca5d70c5ae10d1a144685a96491126) ) // OK
 	ROM_LOAD16_WORD_SWAP( "pclub2v3_ic26",    0x0600000, 0x0200000, CRC(d97034ed) SHA1(a7a0f659eefd539b2a1fd70ef394eed30ea54c0c) ) // OK
 	ROM_LOAD16_WORD_SWAP( "pclub2v3_ic28",    0x0800000, 0x0200000, CRC(f1421506) SHA1(c384b695338144e5f051134bda73b059b678a7df) ) // OK
-	ROM_LOAD16_WORD_SWAP( "pclub2v3_ic30",    0x0a00000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // OK (rom is blank?!)
+	ROM_LOAD16_WORD_SWAP( "pclub2v3_ic30",    0x0a00000, 0x0200000, CRC(8d89877e) SHA1(7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6) ) // 00 Fill, OK
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "pclub2v3.nv", 0x0000, 0x0080, CRC(a8a2d30c) SHA1(bdde3d62ff21190a23698058ff66e476a75a09aa) )
@@ -2273,6 +2302,7 @@ GAME( 1998, stress,    stvbios, stv,      stv, saturn_state,        stv,        
 GAME( 1997, nclubv3,   stvbios, stv,      stv, saturn_state,        nameclv3,   ROT0,   "Sega",                         "Name Club Ver.3 (J 970723 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 GAME( 1997, pclub2,    stvbios, stv,      stv, saturn_state,        stv,        ROT0,   "Atlus",                        "Print Club 2 (U 970921 V1.000)", GAME_NOT_WORKING )
 GAME( 1999, pclub2fc,  pclub2,  stv,      stv, saturn_state,      stv,        ROT0,   "Atlus",                        "Print Club 2 Felix The Cat (Rev. A) (J 970415 V1.100)", GAME_NOT_WORKING )
+GAME( 1997, pclb297w,  pclub2,  stv,      stv, saturn_state,      stv,        ROT0,   "Atlus",                        "Print Club 2 '97 Winter Ver (J 971017 V1.100)", GAME_NOT_WORKING )
 GAME( 1997, pclub298,  pclub2,  stv,      stv, saturn_state,      stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Spring Ver (J 971017 V1.100)", GAME_NOT_WORKING )
 GAME( 1998, pclb298a,  pclub2,  stv,      stv, saturn_state,      stv,        ROT0,   "Atlus",                        "Print Club 2 '98 Autumn Ver (J 980827 V1.000)", GAME_NOT_WORKING )
 GAME( 1999, pclubor,   stvbios, stv,      stv, saturn_state,      stv,        ROT0,   "Atlus",                        "Print Club Goukakenran (J 991104 V1.000)", GAME_NOT_WORKING )
