@@ -658,6 +658,12 @@
     DRIVER UPDATES:
 
 
+    [2013-01-15]
+
+    - Added another set of Lucky'74 (reclassified as bootleg set 2). This one has
+	  a different payrate table that match 100% the one from the manual...
+
+
     [2012-06-05]
 
     - Added Exciting Black Jack. The first SEGA satellite system supported.
@@ -1076,6 +1082,181 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPSETTING(    0x68, "51%" )   /* 58% in the instruction sheet */
 	PORT_DIPSETTING(    0x70, "48%" )   /* 54% in the instruction sheet */
 	PORT_DIPSETTING(    0x78, "45%" )   /* 50% in the instruction sheet */
+	PORT_DIPNAME( 0x80, 0x80, "Panties" )               PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x00, "Without" )
+	PORT_DIPSETTING(    0x80, "With" )
+
+	PORT_START("DSW2")
+	/* DIPs 1-4 handle the harcoded coinage for Coin A, B and Remote credits (B = A x 5; R = A x 10) */
+	PORT_DIPNAME( 0x0f, 0x0f, "Coinage A, B & Remote" ) PORT_DIPLOCATION("DSW2:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "A: 20 Coins/1 Credit; B: 4 Coins/1 Credit;   R: 2 Pulses/1 Credit   " )
+	PORT_DIPSETTING(    0x01, "A: 15 Coins/1 Credit; B: 3 Coins/1 Credit;   R: 15 Pulses/10 Credits" )
+	PORT_DIPSETTING(    0x02, "A: 10 Coins/1 Credit; B: 2 Coins/1 Credit;   R: 1 Pulse/1 Credit    " )
+	PORT_DIPSETTING(    0x03, "A: 4 Coins/1 Credit;  B: 5 Coins/5 Credits;  R: 4 Pulses/10 Credits " )
+	PORT_DIPSETTING(    0x04, "A: 3 Coins/2 Credits; B: 3 Coins/10 Credits; R: 3 Pulses/20 Credits " )
+	PORT_DIPSETTING(    0x05, "A: 3 Coins/1 Credit;  B: 3 Coins/5 Credits;  R: 3 Pulses/10 Credits " )
+	PORT_DIPSETTING(    0x06, "A: 2 Coins/1 Credit;  B: 2 Coins/5 Credits;  R: 1 Pulse/5 Credits   " )
+	PORT_DIPSETTING(    0x07, "A: 5 Coins/1 Credit;  B: 1 Coin/1 Credit;    R: 1 Pulse/2 Credits   " )
+	PORT_DIPSETTING(    0x08, "A: 5 Coins/2 Credits; B: 1 Coin/2 Credits;   R: 1 Pulse/4 Credits   " )
+	PORT_DIPSETTING(    0x09, "A: 5 Coins/3 Credits; B: 1 Coin/3 Credits;   R: 1 Pulse/6 Credits   " )
+	PORT_DIPSETTING(    0x0a, "A: 5 Coins/4 Credits; B: 1 Coin/4 Credits;   R: 1 Pulse/8 Credits   " )
+	PORT_DIPSETTING(    0x0b, "A: 1 Coin/1 Credit;   B: 1 Coin/5 Credits;   R: 1 Pulse/10 Credits  " )
+	PORT_DIPSETTING(    0x0c, "A: 5 Coins/6 Credits; B: 1 Coin/6 Credits;   R: 1 Pulse/12 Credits  " )
+	PORT_DIPSETTING(    0x0d, "A: 1 Coin/2 Credits;  B: 1 Coin/10 Credits;  R: 1 Pulse/20 Credits  " )
+	PORT_DIPSETTING(    0x0e, "A: 1 Coin/5 Credits;  B: 1 Coin/25 Credits;  R: 1 Pulse/50 Credits  " )
+	PORT_DIPSETTING(    0x0f, "A: 1 Coin/10 Credits; B: 1 Coin/50 Credits;  R: 1 Pulse/100 Credits " )
+	/* DIPs 5-8 handle the Coin C coinage */
+	PORT_DIPNAME( 0xf0, 0xf0, "Coinage C" )             PORT_DIPLOCATION("DSW2:5,6,7,8")
+	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, "5 Coins/2 Credits" )     /* 2.5 coins per credit */
+	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xb0, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0xc0, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0xd0, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0xe0, "1 Coin/40 Credits" )
+	PORT_DIPSETTING(    0xf0, "1 Coin/50 Credits" )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x00, "Bet Max" )                       PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPSETTING(    0x01, "20" )
+	PORT_DIPSETTING(    0x00, "40" )
+	PORT_DIPNAME( 0x06, 0x06, "Minimum Bet" )                   PORT_DIPLOCATION("DSW3:2,3")    /* Bet Min */
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x02, "8" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x18, 0x18, "Limit" )                         PORT_DIPLOCATION("DSW3:4,5")
+	PORT_DIPSETTING(    0x18, "No Limit" )
+	PORT_DIPSETTING(    0x10, "10000" )
+	PORT_DIPSETTING(    0x08, "15000" )
+	PORT_DIPSETTING(    0x00, "20000" )
+	PORT_DIPNAME( 0x20, 0x20, "Woman's figure in Main Game" )   PORT_DIPLOCATION("DSW3:6")  /* see note 6 */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "Type of Poker" )                 PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPSETTING(    0x40, "A - Without Wild Card" ) /* see the game notes */
+	PORT_DIPSETTING(    0x00, "B - Joker Wild Poker" )  /* see the game notes */
+	PORT_DIPNAME( 0x80, 0x80, "Kinds of Poker" )                PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPSETTING(    0x80, "A - Hold" )
+	PORT_DIPSETTING(    0x00, "B - Discard" )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "Hopper Coin SW" )                PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPSETTING(    0x01, "Active Low" )
+	PORT_DIPSETTING(    0x00, "Active High" )
+	PORT_DIPNAME( 0x02, 0x02, "Coin Payment" )                  PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPSETTING(    0x00, "Auto" )
+	PORT_DIPSETTING(    0x02, "Auto by PAYOUT SW" )
+	PORT_DIPNAME( 0x04, 0x00, "Hopper Capacity" )               PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPSETTING(    0x04, "700" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPNAME( 0x08, 0x08, "Woman's figure in D-UP game" )   PORT_DIPLOCATION("DSW4:4")  /* doesn't seems to work */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, "Double-Up game" )                PORT_DIPLOCATION("DSW4:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Stop by 6th Double-Up" )         PORT_DIPLOCATION("DSW4:6")  /* see note 7 */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0xC0, 0xC0, "Double-Up difficulty" )          PORT_DIPLOCATION("DSW4:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )  /* easy      (from instruction sheet) */
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )     /* ....      (from instruction sheet) */
+	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )   /* ....      (from instruction sheet) */
+	PORT_DIPSETTING(    0xC0, DEF_STR( Easy ) )     /* difficult (from instruction sheet) */
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( lucky74a )
+
+/*  Player buttons are the same for players 1 & 2.
+    Test mode shows them as dupes. Maybe are multiplexed?
+*/
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    /* 'A' in test mode */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    /* 'B' in test mode */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    /* 'C' in test mode */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    /* 'D' in test mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    /* 'E' in test mode */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")  /* 'F' in test mode */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Flip SC Off") PORT_CODE(KEYCODE_O)  /* 'G' in test mode (normal screen) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )      PORT_NAME("Input H") PORT_CODE(KEYCODE_K)  /* 'H' in test mode */
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     /* 'I' in test mode */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )     PORT_NAME("Start")  /* 'J' in test mode */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   /* 'K' in test mode */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )        /* 'L' in test mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )        /* 'M' & 'Q' in test mode */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")   /* 'N' & 'P' in test mode */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Flip SC On")  PORT_CODE(KEYCODE_I)  /* 'O' in test mode (inverted screen) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* not in test mode */
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )    PORT_NAME("Test Mode") PORT_CODE(KEYCODE_F2) PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")   /* YM2149, port A */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_IMPULSE(2)   /* Coin A */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_IMPULSE(2)   /* Coin B */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )    PORT_IMPULSE(2)   /* Coin C */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )  PORT_NAME("Service")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Memory Reset Switch") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Auto Hold" )             PORT_DIPLOCATION("DSW1:1")  /* see note 1 */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "Jackpot" )               PORT_DIPLOCATION("DSW1:2")  /* see note 2 */
+	PORT_DIPSETTING(    0x02, "Bet x 100" )
+	PORT_DIPSETTING(    0x00, "Bet x 150" )
+	PORT_DIPNAME( 0x04, 0x04, "Ceiling Bonus Point" )   PORT_DIPLOCATION("DSW1:3")  /* see note 3 */
+	PORT_DIPSETTING(    0x04, "Bet x 40"  )
+	PORT_DIPSETTING(    0x00, "Bet x 50"  )
+	PORT_DIPNAME( 0x78, 0x40, "Percentage" )            PORT_DIPLOCATION("DSW1:4,5,6,7")    /* see note 4 */
+	PORT_DIPSETTING(    0x00, "110%" )   /* 110% in the instruction sheet */
+	PORT_DIPSETTING(    0x08, "106%" )   /* 106% in the instruction sheet */
+	PORT_DIPSETTING(    0x10, "102%" )   /* 102% in the instruction sheet */
+	PORT_DIPSETTING(    0x18, "98%" )   /* 98% in the instruction sheet */
+	PORT_DIPSETTING(    0x20, "94%" )   /* 94% in the instruction sheet */
+	PORT_DIPSETTING(    0x28, "90%" )   /* 90% in the instruction sheet */
+	PORT_DIPSETTING(    0x30, "86%" )   /* 86% in the instruction sheet */
+	PORT_DIPSETTING(    0x38, "82%" )   /* 82% in the instruction sheet */
+	PORT_DIPSETTING(    0x40, "78%" )   /* 78% in the instruction sheet */
+	PORT_DIPSETTING(    0x48, "74%" )   /* 74% in the instruction sheet */
+	PORT_DIPSETTING(    0x50, "70%" )   /* 70% in the instruction sheet */
+	PORT_DIPSETTING(    0x58, "66%" )   /* 66% in the instruction sheet */
+	PORT_DIPSETTING(    0x60, "62%" )   /* 62% in the instruction sheet */
+	PORT_DIPSETTING(    0x68, "58%" )   /* 58% in the instruction sheet */
+	PORT_DIPSETTING(    0x70, "54%" )   /* 54% in the instruction sheet */
+	PORT_DIPSETTING(    0x78, "50%" )   /* 50% in the instruction sheet */
 	PORT_DIPNAME( 0x80, 0x80, "Panties" )               PORT_DIPLOCATION("DSW1:8")
 	PORT_DIPSETTING(    0x00, "Without" )
 	PORT_DIPSETTING(    0x80, "With" )
@@ -1771,8 +1952,8 @@ ROM_END
 *                Game Drivers                *
 **********************************************
 
-       YEAR  NAME      PARENT   MACHINE  INPUT    STATS           INIT  ROT    COMPANY           FULLNAME                    FLAGS             LAYOUT  */
-GAMEL( 1988, lucky74,  0,       lucky74, lucky74, driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                layout_lucky74 )
-GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74, driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 3)", 0,                layout_lucky74 )
-GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74, driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", GAME_NOT_WORKING, layout_lucky74 )
-GAME(  1989, excitbj,  0,       lucky74, excitbj, driver_device,  0,    ROT0, "Sega",           "Exciting Black Jack",       GAME_NOT_WORKING )
+       YEAR  NAME      PARENT   MACHINE  INPUT     STATS           INIT  ROT    COMPANY           FULLNAME                    FLAGS             LAYOUT  */
+GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                layout_lucky74 )
+GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74a, driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 3)", 0,                layout_lucky74 )
+GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74,  driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", GAME_NOT_WORKING, layout_lucky74 )
+GAME(  1989, excitbj,  0,       lucky74, excitbj,  driver_device,  0,    ROT0, "Sega",           "Exciting Black Jack",       GAME_NOT_WORKING )
