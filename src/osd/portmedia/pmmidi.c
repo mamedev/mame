@@ -10,11 +10,13 @@
 #include "portmidi/portmidi.h"
 #include "osdcore.h"
 
+static const int RX_EVENT_BUF_SIZE = 512;
+
 struct osd_midi_device
 {
 	#ifndef DISABLE_MIDI
 	PortMidiStream *pmStream;
-	PmEvent rx_evBuf[20];		// up to 20 events
+	PmEvent rx_evBuf[RX_EVENT_BUF_SIZE];
 	#endif
 	UINT8 xmit_in[4]; // Pm_Messages mean we can at most have 3 residue bytes
 	int xmit_cnt;
@@ -85,7 +87,7 @@ osd_midi_device *osd_open_midi_input(const char *devname)
 
 	if (found_dev >= 0)
 	{
-		if (Pm_OpenInput(&stm, found_dev, NULL, 20, NULL, NULL) == pmNoError)
+		if (Pm_OpenInput(&stm, found_dev, NULL, RX_EVENT_BUF_SIZE, NULL, NULL) == pmNoError)
 		{
 			ret = (osd_midi_device *)osd_malloc(sizeof(osd_midi_device));
 			memset(ret, 0, sizeof(osd_midi_device));
@@ -132,7 +134,7 @@ osd_midi_device *osd_open_midi_output(const char *devname)
 
 	if (found_dev >= 0)
 	{
-		if (Pm_OpenOutput(&stm, found_dev, NULL, 20, NULL, NULL, 0) == pmNoError)
+		if (Pm_OpenOutput(&stm, found_dev, NULL, 100, NULL, NULL, 0) == pmNoError)
 		{
 			ret = (osd_midi_device *)osd_malloc(sizeof(osd_midi_device));
 			memset(ret, 0, sizeof(osd_midi_device));
@@ -175,7 +177,7 @@ bool osd_poll_midi_channel(osd_midi_device *dev)
 int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 {
 	#ifndef DISABLE_MIDI
-	int msgsRead = Pm_Read(dev->pmStream, dev->rx_evBuf, 20);
+	int msgsRead = Pm_Read(dev->pmStream, dev->rx_evBuf, RX_EVENT_BUF_SIZE);
 	int bytesOut = 0;
 
 	if (msgsRead <= 0)

@@ -32,6 +32,7 @@ midiout_device::midiout_device(const machine_config &mconfig, const char *tag, d
 
 void midiout_device::device_start()
 {
+	m_midi = NULL;
 }
 
 void midiout_device::device_reset()
@@ -73,7 +74,10 @@ bool midiout_device::call_load(void)
 
 void midiout_device::call_unload(void)
 {
-	osd_close_midi_channel(m_midi);
+	if (m_midi)
+	{
+		osd_close_midi_channel(m_midi);
+	}
 }
 
 void midiout_device::rcv_complete()    // Rx completed receiving byte
@@ -81,7 +85,10 @@ void midiout_device::rcv_complete()    // Rx completed receiving byte
 	receive_register_extract();
 	UINT8 data = get_received_char();
 
-	osd_write_midi_channel(m_midi, data);
+	if (m_midi)
+	{
+		osd_write_midi_channel(m_midi, data);
+	}
 }
 
 void midiout_device::input_callback(UINT8 state)

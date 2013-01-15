@@ -34,6 +34,7 @@ void midiin_device::device_start()
 {
 	m_input_func.resolve(m_input_callback, *this);
 	m_timer = timer_alloc(0);
+	m_midi = NULL;
 }
 
 void midiin_device::device_reset()
@@ -71,10 +72,10 @@ void midiin_device::device_config_complete(void)
 
 void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	UINT8 buf[256];
+	UINT8 buf[8192*4];
 	int bytesRead;
 
-	if (osd_poll_midi_channel(m_midi))
+	while (osd_poll_midi_channel(m_midi))
 	{
 		bytesRead = osd_read_midi_channel(m_midi, buf);
 
@@ -112,7 +113,10 @@ bool midiin_device::call_load(void)
 
 void midiin_device::call_unload(void)
 {
-	osd_close_midi_channel(m_midi);
+	if (m_midi)
+	{
+		osd_close_midi_channel(m_midi);
+	}
 }
 
 void midiin_device::tra_complete()

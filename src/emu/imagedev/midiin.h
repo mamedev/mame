@@ -68,7 +68,7 @@ protected:
 	void input_callback(UINT8 state);
 
 private:
-	static const int XMIT_RING_SIZE = 64;
+	static const int XMIT_RING_SIZE = (8192*4*4);
 
 	void xmit_char(UINT8 data);
 

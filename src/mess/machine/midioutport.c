@@ -13,12 +13,12 @@ const device_type MIDIOUT_PORT = &device_creator<midiout_port_device>;
 midiout_port_device::midiout_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDIOUT_PORT, "MIDI Out port", tag, owner, clock),
 		device_serial_port_interface(mconfig, *this),
-		m_midiout(*this, "midiout")
+		m_midiout(*this, "midioutimg")
 {
 }
 
 static MACHINE_CONFIG_FRAGMENT(midiout_port_config)
-	MCFG_MIDIOUT_ADD("midiout")
+	MCFG_MIDIOUT_ADD("midioutimg")
 MACHINE_CONFIG_END
 
 machine_config_constructor midiout_port_device::device_mconfig_additions() const
