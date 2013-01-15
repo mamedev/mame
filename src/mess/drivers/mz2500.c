@@ -925,10 +925,10 @@ void mz2500_state::mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num)
 			else //PCG RAM
 			{
 				m_pcg_ram[offset] = data;
-				//if((offset & 0x1800) == 0x0000)
-				//	machine().gfx[3]->mark_dirty((offset) >> 3);
-				//else
-				//	machine().gfx[4]->mark_dirty((offset & 0x7ff) >> 3);
+				if((offset & 0x1800) == 0x0000)
+					machine().gfx[3]->mark_dirty((offset) >> 3);
+				else
+					machine().gfx[4]->mark_dirty((offset & 0x7ff) >> 3);
 			}
 			break;
 		}
@@ -1746,7 +1746,7 @@ static const gfx_layout mz2500_pcg_layout_3bpp =
 	8, 8,
 	0x100,
 	3,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4) },
+	{ 0x1800*8, 0x1000*8, 0x800*8 },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8 * 8
@@ -1770,8 +1770,8 @@ void mz2500_state::machine_start()
 	state_save_register_global_pointer(machine(), m_emm_ram, 0x100000);
 
 	/* TODO: gfx[4] crashes as per now */
-//	machine().gfx[3] = auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_1bpp, (UINT8 *)m_pcg_ram, 0x10, 0));
-//	machine().gfx[4] = auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_3bpp, (UINT8 *)m_pcg_ram, 4, 0));
+	machine().gfx[3] = auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_1bpp, (UINT8 *)m_pcg_ram, 0x10, 0));
+	machine().gfx[4] = auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_3bpp, (UINT8 *)m_pcg_ram, 4, 0));
 }
 
 void mz2500_state::machine_reset()

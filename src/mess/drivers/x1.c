@@ -338,7 +338,7 @@ void x1_state::draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,con
 			int width = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 7);
 			int height = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 6);
 			int pcg_bank = BIT(m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
-			UINT8 *gfx_data = machine.root_device().memregion(pcg_bank ? "pcg" : "cgrom")->base();
+			UINT8 *gfx_data = pcg_bank ? m_pcg_ram : m_cg_rom; //machine.root_device().memregion(pcg_bank ? "pcg" : "cgrom")->base();
 			int knj_enable = 0;
 			int knj_side = 0;
 			int knj_bank = 0;
@@ -352,7 +352,7 @@ void x1_state::draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,con
 				knj_bank = m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x0f;
 				if(knj_enable)
 				{
-					gfx_data = memregion("kanji")->base();
+					gfx_data = m_kanji_rom;
 					tile = ((tile + (knj_bank << 8)) << 1) + (knj_side & 1);
 				}
 			}
@@ -1119,7 +1119,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 
 	if(addr == 0 && m_scrn_reg.pcg_mode) // Kanji ROM read, X1Turbo only
 	{
-		gfx_data = memregion("kanji")->base();
+		gfx_data = m_kanji_rom;
 		pcg_offset = (m_tvram[check_chr_addr()]+(m_kvram[check_chr_addr()]<<8)) & 0xfff;
 		pcg_offset*=0x20;
 		pcg_offset+=(offset & 0x0f);
@@ -1132,7 +1132,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 		UINT8 y_char_size;
 
 		/* addr == 0 reads from the ANK rom */
-		gfx_data = memregion((addr == 0) ? "cgrom" : "pcg")->base();
+		gfx_data = addr == 0 ? m_cg_rom : m_pcg_ram;
 		y_char_size = ((m_crtc_vreg[9]+1) > 8) ? 8 : m_crtc_vreg[9]+1;
 		if(y_char_size == 0) { y_char_size = 1; }
 		pcg_offset = m_tvram[get_pcg_addr(m_crtc_vreg[1], y_char_size)]*8;
@@ -1147,7 +1147,6 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 WRITE8_MEMBER( x1_state::x1_pcg_w )
 {
 	int addr,pcg_offset;
-	UINT8 *PCG_RAM = memregion("pcg")->base();
 
 	addr = (offset & 0x300) >> 8;
 
@@ -1163,11 +1162,11 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 			pcg_offset = m_tvram[check_pcg_addr()]*8;
 			pcg_offset+= (offset & 0xe) >> 1;
 			pcg_offset+=((addr-1)*0x800);
-			PCG_RAM[pcg_offset] = data;
+			m_pcg_ram[pcg_offset] = data;
 
 			pcg_offset &= 0x7ff;
 
-			machine().gfx[1]->mark_dirty(pcg_offset >> 3);
+			machine().gfx[3]->mark_dirty(pcg_offset >> 3);
 		}
 		else // Compatible Mode
 		{
@@ -1180,11 +1179,11 @@ WRITE8_MEMBER( x1_state::x1_pcg_w )
 			pcg_offset+= machine().primary_screen->vpos() & (y_char_size-1);
 			pcg_offset+= ((addr-1)*0x800);
 
-			PCG_RAM[pcg_offset] = data;
+			m_pcg_ram[pcg_offset] = data;
 
 			pcg_offset &= 0x7ff;
 
-			machine().gfx[1]->mark_dirty(pcg_offset >> 3);
+			machine().gfx[3]->mark_dirty(pcg_offset >> 3);
 		}
 	}
 }
@@ -1442,10 +1441,9 @@ static UINT16 jis_convert(int kanji_addr)
 
 READ8_MEMBER( x1_state::x1_kanji_r )
 {
-	UINT8 *kanji_rom = memregion("kanji")->base();
 	UINT8 res;
 
-	res = kanji_rom[jis_convert(m_kanji_addr & 0xfff0)+(offset*0x10)+(m_kanji_addr & 0xf)];
+	res = m_kanji_rom[jis_convert(m_kanji_addr & 0xfff0)+(offset*0x10)+(m_kanji_addr & 0xf)];
 
 	if(offset == 1)
 		m_kanji_addr_latch++;
@@ -1485,7 +1483,6 @@ WRITE8_MEMBER( x1_state::x1_kanji_w )
 
 READ8_MEMBER( x1_state::x1_emm_r )
 {
-	UINT8 *emm_ram = memregion("emm")->base();
 	UINT8 res;
 
 	if(offset & ~3)
@@ -1501,7 +1498,7 @@ READ8_MEMBER( x1_state::x1_emm_r )
 
 	if(offset == 3)
 	{
-		res = emm_ram[m_emm_addr];
+		res = m_emm_ram[m_emm_addr];
 		m_emm_addr++;
 	}
 
@@ -1510,8 +1507,6 @@ READ8_MEMBER( x1_state::x1_emm_r )
 
 WRITE8_MEMBER( x1_state::x1_emm_w )
 {
-	UINT8 *emm_ram = memregion("emm")->base();
-
 	if(offset & ~3)
 	{
 		printf("Warning: write EMM BASIC area [%02x] %02x\n",offset & 0xff,data);
@@ -1524,7 +1519,7 @@ WRITE8_MEMBER( x1_state::x1_emm_w )
 		case 1: m_emm_addr = (m_emm_addr & 0xff00ff) | (data << 8);   break;
 		case 2: m_emm_addr = (m_emm_addr & 0x00ffff) | (data << 16);  break; //TODO: this has a max size limit, check exactly how much
 		case 3:
-			emm_ram[m_emm_addr] = data;
+			m_emm_ram[m_emm_addr] = data;
 			m_emm_addr++;
 			break;
 	}
@@ -1555,32 +1550,23 @@ WRITE8_MEMBER( x1_state::x1turbo_bank_w )
 /* TODO: waitstate penalties */
 READ8_MEMBER( x1_state::x1_mem_r )
 {
-	UINT8 *wram = memregion("wram")->base();
-
 	if((offset & 0x8000) == 0 && (m_ram_bank == 0))
 	{
-		UINT8 *ipl = memregion("ipl")->base();
-		return ipl[offset]; //ROM
+		return m_ipl_rom[offset]; //ROM
 	}
 
-	return wram[offset]; //RAM
+	return m_work_ram[offset]; //RAM
 }
 
 WRITE8_MEMBER( x1_state::x1_mem_w )
 {
-	UINT8 *wram = memregion("wram")->base();
-
-	wram[offset] = data; //RAM
+	m_work_ram[offset] = data; //RAM
 }
 
 READ8_MEMBER( x1_state::x1turbo_mem_r )
 {
 	if((m_ex_bank & 0x10) == 0)
-	{
-		UINT8 *wram = memregion("wram")->base();
-
-		return wram[offset+((m_ex_bank & 0xf)*0x10000)];
-	}
+		return m_work_ram[offset+((m_ex_bank & 0xf)*0x10000)];
 
 	return x1_mem_r(space,offset);
 }
@@ -1588,11 +1574,7 @@ READ8_MEMBER( x1_state::x1turbo_mem_r )
 WRITE8_MEMBER( x1_state::x1turbo_mem_w )
 {
 	if((m_ex_bank & 0x10) == 0)
-	{
-		UINT8 *wram = memregion("wram")->base();
-
-		wram[offset+((m_ex_bank & 0xf)*0x10000)] = data; //RAM
-	}
+		m_work_ram[offset+((m_ex_bank & 0xf)*0x10000)] = data; //RAM
 	else
 		x1_mem_w(space,offset,data);
 }
@@ -2241,17 +2223,6 @@ static const gfx_layout x1_chars_8x16 =
 	8*16
 };
 
-static const gfx_layout x1_pcg_8x8 =
-{
-	8,8,
-	RGN_FRAC(1,3),
-	3,
-	{ RGN_FRAC(2,3),RGN_FRAC(1,3),RGN_FRAC(0,3) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 static const gfx_layout x1_chars_16x16 =
 {
 	8,16,
@@ -2266,9 +2237,9 @@ static const gfx_layout x1_chars_16x16 =
 /* decoded for debugging purpose, this will be nuked in the end... */
 static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0, 1 )
-	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0, 1 )
 	GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0, 1 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0, 1 )
+//	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0, 1 )
 GFXDECODE_END
 
 /*************************************
@@ -2457,15 +2428,14 @@ TIMER_CALLBACK_MEMBER(x1_state::x1_rtc_increment)
 MACHINE_RESET_MEMBER(x1_state,x1)
 {
 	//UINT8 *ROM = machine().root_device().memregion("x1_cpu")->base();
-	UINT8 *PCG_RAM = memregion("pcg")->base();
 	int i;
 
 	memset(m_gfx_bitmap_ram,0x00,0xc000*2);
 
 	for(i=0;i<0x1800;i++)
 	{
-		PCG_RAM[i] = 0;
-		machine().gfx[1]->mark_dirty(i >> 3);
+		m_pcg_ram[i] = 0;
+		machine().gfx[3]->mark_dirty(i >> 3);
 	}
 
 	m_is_turbo = 0;
@@ -2508,6 +2478,17 @@ MACHINE_RESET_MEMBER(x1_state,x1turbo)
 	m_scrn_reg.blackclip = 0;
 }
 
+static const gfx_layout x1_pcg_8x8 =
+{
+	8,8,
+	0x100,
+	3,
+	{ 0x1000*8,0x800*8, 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
 MACHINE_START_MEMBER(x1_state,x1)
 {
 	/* set up RTC */
@@ -2525,6 +2506,19 @@ MACHINE_START_MEMBER(x1_state,x1)
 
 		m_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(x1_state::x1_rtc_increment),this));
 	}
+
+	m_ipl_rom = memregion("ipl")->base();
+	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0x10000*0x10);
+	m_emm_ram = auto_alloc_array_clear(machine(), UINT8, 0x1000000);
+	m_pcg_ram = auto_alloc_array_clear(machine(), UINT8, 0x1800);
+	m_cg_rom = memregion("cgrom")->base();
+	m_kanji_rom = memregion("kanji")->base();
+
+	state_save_register_global_pointer(machine(), m_work_ram, 0x10000*0x10);
+	state_save_register_global_pointer(machine(), m_emm_ram, 0x1000000);
+	state_save_register_global_pointer(machine(), m_pcg_ram, 0x1800);
+
+	machine().gfx[3] = auto_alloc(machine(), gfx_element(machine(), x1_pcg_8x8, (UINT8 *)m_pcg_ram, 1, 0));
 }
 
 PALETTE_INIT_MEMBER(x1_state,x1)
@@ -2644,19 +2638,11 @@ MACHINE_CONFIG_END
  *************************************/
 
 	ROM_START( x1 )
-	ROM_REGION( 0x10000, "x1_cpu", ROMREGION_ERASEFF )
-
 	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.x1", 0x0000, 0x1000, CRC(7b28d9de) SHA1(c4db9a6e99873808c8022afd1c50fef556a8b44d) )
 
-	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
-
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x1000000, "emm", ROMREGION_ERASEFF )
-
-	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
 	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, BAD_DUMP CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
@@ -2674,21 +2660,11 @@ MACHINE_CONFIG_END
 ROM_END
 
 ROM_START( x1turbo )
-	ROM_REGION( 0x10000, "x1_cpu", ROMREGION_ERASEFF )
-
 	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.x1t", 0x0000, 0x8000, CRC(2e8b767c) SHA1(44620f57a25f0bcac2b57ca2b0f1ebad3bf305d3) )
 
-	ROM_REGION( 0x10000*0x10, "wram", ROMREGION_ERASE00 )
-
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
-
-	ROM_REGION( 0x1000000, "emm", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x10000*2, "bank_ram", ROMREGION_ERASEFF )
-
-	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
 	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
@@ -2710,19 +2686,11 @@ ROM_START( x1turbo )
 ROM_END
 
 ROM_START( x1turbo40 )
-	ROM_REGION( 0x10000, "x1_cpu", ROMREGION_ERASEFF )
-
 	ROM_REGION( 0x8000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.bin", 0x0000, 0x8000, CRC(112f80a2) SHA1(646cc3fb5d2d24ff4caa5167b0892a4196e9f843) )
 
-	ROM_REGION( 0x10000*0x10, "wram", ROMREGION_ERASE00 )
-
 	ROM_REGION(0x1000, "mcu", ROMREGION_ERASEFF) //MCU for the Keyboard, "sub cpu"
 	ROM_LOAD( "80c48", 0x0000, 0x1000, NO_DUMP )
-
-	ROM_REGION(0x1800, "pcg", ROMREGION_ERASEFF)
-
-	ROM_REGION( 0x1000000, "emm", ROMREGION_ERASEFF )
 
 	ROM_REGION(0x2000, "font", 0) //TODO: this contains 8x16 charset only, maybe it's possible that it derivates a 8x8 charset by skipping gfx lines?
 	ROM_LOAD( "ank.fnt", 0x0000, 0x2000, CRC(19689fbd) SHA1(0d4e072cd6195a24a1a9b68f1d37500caa60e599) )
