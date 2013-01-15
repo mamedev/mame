@@ -83,7 +83,10 @@ protected:
 	// Serial and parallel interfaces
 	UINT16 m_sioc;
 	UINT16 m_srta;
+	UINT16 m_sdx;
 	UINT16 m_pioc;
+	UINT16 m_pdx0;	// pdx0 & pdx1 refer to the same physical register (page 6-1)
+	UINT16 m_pdx1;	//   but we keep them seperate for logic's sake.
 
 	// internal stuff
 	UINT16 m_ppc;
@@ -120,6 +123,8 @@ protected:
 	// execution
 	void executeF1Field(const UINT8& F1, const UINT8& D, const UINT8& S);
 	void executeYFieldPost(const UINT8& Y);
+	void executeZFieldPartOne(const UINT8& Z, UINT16* rN);
+	void executeZFieldPartTwo(const UINT8& Z, UINT16* rN);
 
 	// helpers
 	void* addressYL();
@@ -163,7 +168,10 @@ enum
 	DSP16_C2,
 	DSP16_SIOC,
 	DSP16_SRTA,
-	DSP16_PIOC
+	DSP16_SDX,
+	DSP16_PIOC,
+    DSP16_PDX0,
+    DSP16_PDX1
 };
 
 

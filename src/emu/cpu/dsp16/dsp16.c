@@ -57,7 +57,10 @@ dsp16_device::dsp16_device(const machine_config &mconfig, const char *tag, devic
 	  m_c2(0),
 	  m_sioc(0),
 	  m_srta(0),
+	  m_sdx(0),
 	  m_pioc(0),
+	  m_pdx0(0),
+	  m_pdx1(0),
 	  m_ppc(0),
 	  m_cacheStart(CACHE_INVALID),
 	  m_cacheEnd(CACHE_INVALID),
@@ -108,7 +111,10 @@ void dsp16_device::device_start()
 	state_add(DSP16_C2,       "C2",        m_c2);
 	state_add(DSP16_SIOC,     "SIOC",      m_sioc).formatstr("%16s");
 	state_add(DSP16_SRTA,     "SRTA",      m_srta);
-	state_add(DSP16_PIOC,     "PIOC",      m_pioc); //.formatstr("%16s");
+	state_add(DSP16_SDX,      "SDX",       m_sdx);
+	state_add(DSP16_PIOC,     "PIOC",      m_pioc);
+	state_add(DSP16_PDX0,     "PDX0",      m_pdx0);
+	state_add(DSP16_PDX1,     "PDX1",      m_pdx1);
 
 	// register our state for saving
 	save_item(NAME(m_i));
@@ -136,7 +142,10 @@ void dsp16_device::device_start()
 	save_item(NAME(m_c2));
 	save_item(NAME(m_sioc));
 	save_item(NAME(m_srta));
+	save_item(NAME(m_sdx));
 	save_item(NAME(m_pioc));
+	save_item(NAME(m_pdx0));
+	save_item(NAME(m_pdx1));
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_cacheStart));
 	save_item(NAME(m_cacheEnd));
