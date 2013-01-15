@@ -276,11 +276,10 @@ void x1_state::x1_draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,int 
 /* adjust tile index when we are under double height condition */
 UINT8 x1_state::check_prev_height(running_machine &machine,int x,int y,int x_size)
 {
-	x1_state *state = machine.driver_data<x1_state>();
-	UINT8 prev_tile = state->m_tvram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
-	UINT8 cur_tile = state->m_tvram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
-	UINT8 prev_attr = state->m_avram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
-	UINT8 cur_attr = state->m_avram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
+	UINT8 prev_tile = m_tvram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
+	UINT8 cur_tile = m_tvram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
+	UINT8 prev_attr = m_avram[(x+((y-1)*x_size)+mc6845_start_addr) & 0x7ff];
+	UINT8 cur_attr = m_avram[(x+(y*x_size)+mc6845_start_addr) & 0x7ff];
 
 	if(prev_tile == cur_tile && prev_attr == cur_attr)
 		return 8;
@@ -291,8 +290,7 @@ UINT8 x1_state::check_prev_height(running_machine &machine,int x,int y,int x_siz
 /* Exoa II - Warroid: if double height isn't enabled on the first tile of the line then double height is disabled on everything else. */
 UINT8 x1_state::check_line_valid_height(running_machine &machine,int y,int x_size,int height)
 {
-	x1_state *state = machine.driver_data<x1_state>();
-	UINT8 line_attr = state->m_avram[(0+(y*x_size)+mc6845_start_addr) & 0x7ff];
+	UINT8 line_attr = m_avram[(0+(y*x_size)+mc6845_start_addr) & 0x7ff];
 
 	if((line_attr & 0x40) == 0)
 		return 0;

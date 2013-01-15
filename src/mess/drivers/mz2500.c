@@ -64,10 +64,22 @@ class mz2500_state : public driver_device
 public:
 	mz2500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_rtc(*this, RP5C15_TAG)
+		m_maincpu(*this, "maincpu"),
+		m_rtc(*this, RP5C15_TAG)
 	{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<rp5c15_device> m_rtc;
+
+	UINT8 *m_main_ram;
+	UINT8 *m_ipl_rom;
+	UINT8 *m_kanji_rom;
+	UINT8 *m_kanji2_rom;
+	UINT8 *m_pcg_ram;
+	UINT8 *m_emm_ram;
+	UINT8 *m_dic_rom;
+	UINT8 *m_phone_rom;
+	UINT8 *m_iplpro_rom;
 
 	UINT8 m_bank_val[8];
 	UINT8 m_bank_addr;
@@ -162,6 +174,7 @@ public:
 	UINT8 mz2500_cg_latch_compare();
 	UINT8 mz2500_ram_read(UINT16 offset, UINT8 bank_num);
 	void mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num);
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
@@ -182,6 +195,15 @@ public:
 	DECLARE_WRITE8_MEMBER(opn_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_clk0_irq);
 	DECLARE_WRITE_LINE_MEMBER(mz2500_rtc_alarm_irq);
+
+	void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr);
+	void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr);
+	void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
+	void draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri);
+	void draw_cg256_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri);
+	void draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_cg_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
+
 };
 
 
@@ -237,10 +259,9 @@ static void mz2500_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int
 		bitmap.pix16(y, x) = machine.pens[pen];
 }
 
-static void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr)
+void mz2500_state::draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr)
 {
-	mz2500_state *state = machine.driver_data<mz2500_state>();
-	UINT8 *vram = machine.root_device().memregion("maincpu")->base();
+	UINT8 *vram = m_main_ram; // TODO
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
 	UINT8 y_step;
@@ -249,9 +270,9 @@ static void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 
 	count = (map_addr & 0x7ff);
 
-	y_step = (state->m_text_font_reg) ? 1 : 2;
-	y_height = (state->m_text_reg[0] & 0x10) ? 10 : 8;
-	s_y = state->m_text_reg[9] & 0xf;
+	y_step = (m_text_font_reg) ? 1 : 2;
+	y_height = (m_text_reg[0] & 0x10) ? 10 : 8;
+	s_y = m_text_reg[9] & 0xf;
 
 	for (y=0;y<26*y_step;y+=y_step)
 	{
@@ -265,17 +286,17 @@ static void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 			int inv_col = (attr & 0x40) >> 6;
 
 			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
-				gfx_data = machine.root_device().memregion("pcg")->base();
+				gfx_data = m_pcg_ram;
 			else if(gfx_sel == 0x80)
 			{
-				gfx_data = state->memregion("kanji")->base();
+				gfx_data = m_kanji_rom;
 				tile|= tile_bank << 8;
 				if(y_step == 2)
 					tile &= 0x3ffe;
 			}
 			else if(gfx_sel == 0xc0)
 			{
-				gfx_data = machine.root_device().memregion("kanji")->base();
+				gfx_data = m_kanji_rom;
 				tile|= (tile_bank << 8);
 				if(y_step == 2)
 					tile &= 0x3ffe;
@@ -283,7 +304,7 @@ static void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 			}
 			else
 			{
-				gfx_data = machine.root_device().memregion("pcg")->base();
+				gfx_data = m_pcg_ram;
 			}
 
 			for(yi=0;yi<8*y_step;yi++)
@@ -291,14 +312,13 @@ static void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 				for(xi=0;xi<8;xi++)
 				{
 					UINT8 pen_bit[3],pen;
-
 					int res_x,res_y;
 
 					res_x = x*8+xi;
 					res_y = y*y_height+yi-s_y;
 
 					/* check TV window boundaries */
-					if(res_x < state->m_tv_hs || res_x >= state->m_tv_he || res_y < state->m_tv_vs || res_y >= state->m_tv_ve)
+					if(res_x < m_tv_hs || res_x >= m_tv_he || res_y < m_tv_vs || res_y >= m_tv_ve)
 						continue;
 
 					if(gfx_sel & 0x8)
@@ -317,7 +337,7 @@ static void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 					if(pen)
 					{
 						if((res_y) >= 0 && (res_y) < 200*y_step)
-							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(state->m_pal_select ? 0x00 : 0x10),0,0);
+							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(m_pal_select ? 0x00 : 0x10),0,0);
 					}
 				}
 			}
@@ -328,10 +348,9 @@ static void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	}
 }
 
-static void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr)
+void mz2500_state::draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr)
 {
-	mz2500_state *state = machine.driver_data<mz2500_state>();
-	UINT8 *vram = machine.root_device().memregion("maincpu")->base();
+	UINT8 *vram = m_main_ram; // TODO
 	int x,y,count,xi,yi;
 	UINT8 *gfx_data;
 	UINT8 y_step;
@@ -340,9 +359,9 @@ static void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 
 	count = (((plane * 0x400) + map_addr) & 0x7ff);
 
-	y_step = (state->m_text_font_reg) ? 1 : 2;
-	y_height = (state->m_text_reg[0] & 0x10) ? 10 : 8;
-	s_y = state->m_text_reg[9] & 0xf;
+	y_step = (m_text_font_reg) ? 1 : 2;
+	y_height = (m_text_reg[0] & 0x10) ? 10 : 8;
+	s_y = m_text_reg[9] & 0xf;
 
 	for (y=0;y<26*y_step;y+=y_step)
 	{
@@ -357,17 +376,17 @@ static void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 			int inv_col = (attr & 0x40) >> 6;
 
 			if(gfx_sel & 8) // Xevious, PCG 8 colors have priority above kanji roms
-				gfx_data = machine.root_device().memregion("pcg")->base();
+				gfx_data = m_pcg_ram;
 			else if(gfx_sel == 0x80)
 			{
-				gfx_data = state->memregion("kanji")->base();
+				gfx_data = m_kanji_rom;
 				tile|= tile_bank << 8;
 				if(y_step == 2)
 					tile &= 0x3ffe;
 			}
 			else if(gfx_sel == 0xc0)
 			{
-				gfx_data = machine.root_device().memregion("kanji")->base();
+				gfx_data = m_kanji_rom;
 				tile|= (tile_bank << 8);
 				if(y_step == 2)
 					tile &= 0x3ffe;
@@ -375,7 +394,7 @@ static void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 			}
 			else
 			{
-				gfx_data = machine.root_device().memregion("pcg")->base();
+				gfx_data = m_pcg_ram;
 			}
 
 			for(yi=0;yi<8*y_step;yi++)
@@ -389,7 +408,7 @@ static void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 					res_y = y*y_height+yi-s_y;
 
 					/* check TV window boundaries */
-					if(res_x < state->m_tv_hs || res_x >= state->m_tv_he || res_y < state->m_tv_vs || res_y >= state->m_tv_ve)
+					if(res_x < m_tv_hs || res_x >= m_tv_he || res_y < m_tv_vs || res_y >= m_tv_ve)
 						continue;
 
 					if(gfx_sel & 0x8)
@@ -408,7 +427,7 @@ static void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 					if(pen)
 					{
 						if((res_y) >= 0 && (res_y) < 200*y_step)
-							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(state->m_pal_select ? 0x00 : 0x10),state->m_scr_x_size == 640,0);
+							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(m_pal_select ? 0x00 : 0x10),m_scr_x_size == 640,0);
 					}
 				}
 			}
@@ -419,11 +438,10 @@ static void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	}
 }
 
-static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
+void mz2500_state::draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
-	mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT32 count;
-	UINT8 *vram = state->memregion("maincpu")->base();
+	UINT8 *vram = m_main_ram; // TODO
 	UINT8 pen,pen_bit[2];
 	int x,y,xi,pen_i;
 	int res_x,res_y;
@@ -440,7 +458,7 @@ static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const
 				res_y = y;
 
 				/* check window boundaries */
-				//if(res_x < state->m_cg_hs || res_x >= state->m_cg_he || res_y < state->m_cg_vs || res_y >= state->m_cg_ve)
+				//if(res_x < m_cg_hs || res_x >= m_cg_he || res_y < m_cg_vs || res_y >= m_cg_ve)
 				//  continue;
 
 				/* TODO: very preliminary, just Yukar K2 uses this so far*/
@@ -452,7 +470,7 @@ static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const
 					pen |= pen_bit[pen_i];
 
 				{
-					//if(pri == ((state->m_clut256[pen] & 0x100) >> 8))
+					//if(pri == ((m_clut256[pen] & 0x100) >> 8))
 					mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen,0,0);
 				}
 			}
@@ -461,11 +479,10 @@ static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const
 	}
 }
 
-static void draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri)
+void mz2500_state::draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri)
 {
-	mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT32 count;
-	UINT8 *vram = state->memregion("maincpu")->base();
+	UINT8 *vram = m_main_ram; //TODO
 	UINT8 pen,pen_bit[4];
 	int x,y,xi,pen_i;
 	UINT32 wa_reg;
@@ -477,14 +494,14 @@ static void draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitmap,cons
 
 	base_mask = (x_size == 640) ? 0x3f : 0x1f;
 
-	count = (state->m_cg_reg[0x10]) | ((state->m_cg_reg[0x11] & base_mask) << 8);
-	wa_reg = (state->m_cg_reg[0x12]) | ((state->m_cg_reg[0x13] & base_mask) << 8);
+	count = (m_cg_reg[0x10]) | ((m_cg_reg[0x11] & base_mask) << 8);
+	wa_reg = (m_cg_reg[0x12]) | ((m_cg_reg[0x13] & base_mask) << 8);
 	/* TODO: layer 2 scrolling */
-	s_x = (state->m_cg_reg[0x0f] & 0xf);
-	cg_interlace = state->m_text_font_reg ? 1 : 2;
-	pen_mask = (state->m_cg_reg[0x18] >> ((plane & 1) * 4)) & 0x0f;
+	s_x = (m_cg_reg[0x0f] & 0xf);
+	cg_interlace = m_text_font_reg ? 1 : 2;
+	pen_mask = (m_cg_reg[0x18] >> ((plane & 1) * 4)) & 0x0f;
 
-//  popmessage("%d %d %d %d",state->m_cg_hs,state->m_cg_he,state->m_cg_vs,state->m_cg_ve);
+//  popmessage("%d %d %d %d",m_cg_hs,m_cg_he,m_cg_vs,m_cg_ve);
 
 	for(y=0;y<200;y++)
 	{
@@ -496,7 +513,7 @@ static void draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitmap,cons
 				res_y = y;
 
 				/* check window boundaries */
-				if(res_x < state->m_cg_hs || res_x >= state->m_cg_he || res_y < state->m_cg_vs || res_y >= state->m_cg_ve)
+				if(res_x < m_cg_hs || res_x >= m_cg_he || res_y < m_cg_vs || res_y >= m_cg_ve)
 					continue;
 
 				pen_bit[0] = (vram[count+0x40000+((plane & 1) * 0x2000)+(((plane & 2)>>1) * 0x10000)]>>(xi)) & 1 ? (pen_mask & 0x01) : 0; //B
@@ -508,8 +525,8 @@ static void draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitmap,cons
 				for(pen_i=0;pen_i<4;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(pri == ((state->m_clut16[pen] & 0x10) >> 4) && state->m_clut16[pen] != 0x00 && pen_mask) //correct?
-					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(state->m_clut16[pen] & 0x0f)+0x10,(x_size == 320 && state->m_scr_x_size == 640),cg_interlace == 2);
+				if(pri == ((m_clut16[pen] & 0x10) >> 4) && m_clut16[pen] != 0x00 && pen_mask) //correct?
+					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(m_clut16[pen] & 0x0f)+0x10,(x_size == 320 && m_scr_x_size == 640),cg_interlace == 2);
 			}
 			count++;
 			count&=((base_mask<<8) | 0xff);
@@ -519,11 +536,10 @@ static void draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitmap,cons
 	}
 }
 
-static void draw_cg256_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri)
+void mz2500_state::draw_cg256_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri)
 {
-	mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT32 count;
-	UINT8 *vram = state->memregion("maincpu")->base();
+	UINT8 *vram = m_main_ram;
 	UINT8 pen,pen_bit[8];
 	int x,y,xi,pen_i;
 	UINT32 wa_reg;
@@ -534,11 +550,11 @@ static void draw_cg256_screen(running_machine &machine, bitmap_ind16 &bitmap,con
 
 	base_mask = 0x3f; //no x_size == 640
 
-	count = (state->m_cg_reg[0x10]) | ((state->m_cg_reg[0x11] & base_mask) << 8);
-	wa_reg = (state->m_cg_reg[0x12]) | ((state->m_cg_reg[0x13] & base_mask) << 8);
+	count = (m_cg_reg[0x10]) | ((m_cg_reg[0x11] & base_mask) << 8);
+	wa_reg = (m_cg_reg[0x12]) | ((m_cg_reg[0x13] & base_mask) << 8);
 	/* TODO: layer 2 scrolling */
-	s_x = (state->m_cg_reg[0x0f] & 0xf);
-	cg_interlace = state->m_text_font_reg ? 1 : 2;
+	s_x = (m_cg_reg[0x0f] & 0xf);
+	cg_interlace = m_text_font_reg ? 1 : 2;
 
 	for(y=0;y<200;y++)
 	{
@@ -550,24 +566,24 @@ static void draw_cg256_screen(running_machine &machine, bitmap_ind16 &bitmap,con
 				res_y = y;
 
 				/* check window boundaries */
-				if(res_x < state->m_cg_hs || res_x >= state->m_cg_he || res_y < state->m_cg_vs || res_y >= state->m_cg_ve)
+				if(res_x < m_cg_hs || res_x >= m_cg_he || res_y < m_cg_vs || res_y >= m_cg_ve)
 					continue;
 
-				pen_bit[0] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x2000]>>(xi)) & 1 ? (state->m_cg_reg[0x18] & 0x10) : 0; // B1
-				pen_bit[1] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x0000]>>(xi)) & 1 ? (state->m_cg_reg[0x18] & 0x01) : 0; // B0
-				pen_bit[2] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x6000]>>(xi)) & 1 ? (state->m_cg_reg[0x18] & 0x20) : 0; // R1
-				pen_bit[3] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x4000]>>(xi)) & 1 ? (state->m_cg_reg[0x18] & 0x02) : 0; // R0
-				pen_bit[4] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xa000]>>(xi)) & 1 ? (state->m_cg_reg[0x18] & 0x40) : 0; // G1
-				pen_bit[5] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x8000]>>(xi)) & 1 ? (state->m_cg_reg[0x18] & 0x04) : 0; // G0
-				pen_bit[6] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xe000]>>(xi)) & 1 ? (state->m_cg_reg[0x18] & 0x80) : 0; // I1
-				pen_bit[7] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xc000]>>(xi)) & 1 ? (state->m_cg_reg[0x18] & 0x08) : 0; // I0
+				pen_bit[0] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x2000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x10) : 0; // B1
+				pen_bit[1] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x0000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x01) : 0; // B0
+				pen_bit[2] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x6000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x20) : 0; // R1
+				pen_bit[3] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x4000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x02) : 0; // R0
+				pen_bit[4] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xa000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x40) : 0; // G1
+				pen_bit[5] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0x8000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x04) : 0; // G0
+				pen_bit[6] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xe000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x80) : 0; // I1
+				pen_bit[7] = (vram[count + 0x40000 + (((plane & 2)>>1) * 0x10000) + 0xc000]>>(xi)) & 1 ? (m_cg_reg[0x18] & 0x08) : 0; // I0
 
 				pen = 0;
 				for(pen_i=0;pen_i<8;pen_i++)
 					pen |= pen_bit[pen_i];
 
-				if(pri == ((state->m_clut256[pen] & 0x100) >> 8))
-					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(state->m_clut256[pen] & 0xff)+0x100,state->m_scr_x_size == 640,cg_interlace == 2);
+				if(pri == ((m_clut256[pen] & 0x100) >> 8))
+					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(m_clut256[pen] & 0xff)+0x100,m_scr_x_size == 640,cg_interlace == 2);
 			}
 			count++;
 			count&=((base_mask<<8) | 0xff);
@@ -577,23 +593,22 @@ static void draw_cg256_screen(running_machine &machine, bitmap_ind16 &bitmap,con
 	}
 }
 
-static void draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void mz2500_state::draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	mz2500_state *state = machine.driver_data<mz2500_state>();
 	UINT16 base_addr;
 
-	base_addr = state->m_text_reg[1] | ((state->m_text_reg[2] & 0x7) << 8);
+	base_addr = m_text_reg[1] | ((m_text_reg[2] & 0x7) << 8);
 
-//  popmessage("%02x",state->m_clut16[0]);
-//  popmessage("%d %d %d %d",state->m_tv_hs,(state->m_tv_he),state->m_tv_vs,(state->m_tv_ve));
+//  popmessage("%02x",m_clut16[0]);
+//  popmessage("%d %d %d %d",m_tv_hs,(m_tv_he),m_tv_vs,(m_tv_ve));
 
-	if(state->m_text_col_size)
+	if(m_text_col_size)
 		draw_80x25(machine,bitmap,cliprect,base_addr);
 	else
 	{
 		int tv_mode;
 
-		tv_mode = state->m_text_reg[0] >> 2;
+		tv_mode = m_text_reg[0] >> 2;
 
 		switch(tv_mode & 3)
 		{
@@ -610,17 +625,16 @@ static void draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const 
 				draw_40x25(machine,bitmap,cliprect,1,base_addr);
 				draw_40x25(machine,bitmap,cliprect,0,base_addr);
 				break;
-			//default: popmessage("%02x %02x %02x",tv_mode & 3,state->m_text_reg[1],state->m_text_reg[2]); break;
+			//default: popmessage("%02x %02x %02x",tv_mode & 3,m_text_reg[1],m_text_reg[2]); break;
 		}
 	}
 }
 
-static void draw_cg_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
+void mz2500_state::draw_cg_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
-	mz2500_state *state = machine.driver_data<mz2500_state>();
-	//popmessage("%02x %02x",state->m_cg_reg[0x0e],state->m_cg_reg[0x18]);
+	//popmessage("%02x %02x",m_cg_reg[0x0e],m_cg_reg[0x18]);
 
-	switch(state->m_cg_reg[0x0e])
+	switch(m_cg_reg[0x0e])
 	{
 		case 0x00:
 			break;
@@ -645,7 +659,7 @@ static void draw_cg_screen(running_machine &machine, bitmap_ind16 &bitmap,const 
 			draw_cg16_screen(machine,bitmap,cliprect,2,640,pri);
 			break;
 		default:
-			popmessage("Unsupported CG mode %02x, contact MESS dev",state->m_cg_reg[0x0e]);
+			popmessage("Unsupported CG mode %02x, contact MESS dev",m_cg_reg[0x0e]);
 			break;
 	}
 }
@@ -757,7 +771,7 @@ UINT8 mz2500_state::mz2500_cg_latch_compare()
 
 UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 {
-	UINT8 *ram = memregion("maincpu")->base();
+	UINT8 *ram = m_main_ram; // TODO
 	UINT8 cur_bank = m_bank_val[bank_num];
 
 	switch(cur_bank)
@@ -791,24 +805,14 @@ UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 		case 0x39:
 		{
 			if(m_kanji_bank & 0x80) //kanji ROM
-			{
-				UINT8 *knj_rom = memregion("kanji")->base();
-
-				return knj_rom[(offset & 0x7ff)+((m_kanji_bank & 0x7f)*0x800)];
-			}
+				return m_kanji_rom[(offset & 0x7ff)+((m_kanji_bank & 0x7f)*0x800)];
 			else //PCG RAM
-			{
-				UINT8 *pcg_ram = memregion("pcg")->base();
-
-				return pcg_ram[offset];
-			}
+				return m_pcg_ram[offset];
 		}
 		break;
 		case 0x3a:
 		{
-			UINT8 *dic_rom = memregion("dictionary")->base();
-
-			return dic_rom[(offset & 0x1fff) + ((m_dic_bank & 0x1f)*0x2000)];
+			return m_dic_rom[(offset & 0x1fff) + ((m_dic_bank & 0x1f)*0x2000)];
 		}
 		break;
 		case 0x3c:
@@ -816,9 +820,7 @@ UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 		case 0x3e:
 		case 0x3f:
 		{
-			UINT8 *phone_rom = memregion("phone")->base();
-
-			return phone_rom[offset+(cur_bank & 3)*0x2000];
+			return m_phone_rom[offset+(cur_bank & 3)*0x2000];
 		}
 		break;
 		default: return ram[offset+cur_bank*0x2000];
@@ -829,7 +831,7 @@ UINT8 mz2500_state::mz2500_ram_read(UINT16 offset, UINT8 bank_num)
 
 void mz2500_state::mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num)
 {
-	UINT8 *ram = memregion("maincpu")->base();
+	UINT8 *ram = m_main_ram; // TODO
 	UINT8 cur_bank = m_bank_val[bank_num];
 
 //  if(cur_bank >= 0x30 && cur_bank <= 0x33)
@@ -922,12 +924,11 @@ void mz2500_state::mz2500_ram_write(UINT16 offset, UINT8 data, UINT8 bank_num)
 			}
 			else //PCG RAM
 			{
-				UINT8 *pcg_ram = memregion("pcg")->base();
-				pcg_ram[offset] = data;
-				if((offset & 0x1800) == 0x0000)
-					machine().gfx[3]->mark_dirty((offset) >> 3);
-				else
-					machine().gfx[4]->mark_dirty((offset & 0x7ff) >> 3);
+				m_pcg_ram[offset] = data;
+				//if((offset & 0x1800) == 0x0000)
+				//	machine().gfx[3]->mark_dirty((offset) >> 3);
+				//else
+				//	machine().gfx[4]->mark_dirty((offset & 0x7ff) >> 3);
 			}
 			break;
 		}
@@ -991,7 +992,6 @@ READ8_MEMBER(mz2500_state::mz2500_bank_data_r)
 
 WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
 {
-//  UINT8 *ROM = memregion("maincpu")->base();
 //  static const char *const bank_name[] = { "bank0", "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7" };
 
 	m_bank_val[m_bank_addr] = data & 0x3f;
@@ -999,7 +999,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_bank_data_w)
 //  if((data*2) >= 0x70)
 //  printf("%s %02x\n",bank_name[m_bank_addr],m_bank_val[m_bank_addr]*2);
 
-//  membank(bank_name[m_bank_addr])->set_base(&ROM[m_bank_val[m_bank_addr]*0x2000]);
+//  membank(bank_name[m_bank_addr])->set_base(&m_main_ram[m_bank_val[m_bank_addr]*0x2000]);
 
 	m_bank_addr++;
 	m_bank_addr&=7;
@@ -1231,21 +1231,16 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(mz2500_state::mz2500_rom_r)
 {
-	UINT8 *rom = memregion("rom")->base();
-	UINT8 res;
-
-	m_lrom_index = (machine().device("maincpu")->state().state_int(Z80_B));
+	m_lrom_index = (m_maincpu->state_int(Z80_B));
 
 	m_rom_index = (m_rom_index & 0xffff00) | (m_lrom_index & 0xff);
 
-	res = rom[m_rom_index];
-
-	return res;
+	return m_iplpro_rom[m_rom_index];
 }
 
 WRITE8_MEMBER(mz2500_state::mz2500_rom_w)
 {
-	m_hrom_index = (machine().device("maincpu")->state().state_int(Z80_B));
+	m_hrom_index = (m_maincpu->state_int(Z80_B));
 
 	m_rom_index = (data << 8) | (m_rom_index & 0x0000ff) | ((m_hrom_index & 0xff)<<16);
 	//printf("%02x\n",data);
@@ -1257,7 +1252,7 @@ WRITE8_MEMBER(mz2500_state::palette4096_io_w)
 	UINT8 pal_index;
 	UINT8 pal_entry;
 
-	pal_index = machine().device("maincpu")->state().state_int(Z80_B);
+	pal_index = m_maincpu->state_int(Z80_B);
 	pal_entry = (pal_index & 0x1e) >> 1;
 
 	if(pal_index & 1)
@@ -1364,7 +1359,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 	if((m_cg_reg_index & 0x1f) == 0x05 && (m_cg_reg[0x05] & 0xc0) == 0x80) //clear bitmap buffer
 	{
 		UINT32 i;
-		UINT8 *vram = memregion("maincpu")->base();
+		UINT8 *vram = m_main_ram; // TODO
 		UINT32 layer_bank;
 
 		layer_bank = (m_cg_reg[0x0e] & 0x80) ? 0x10000 : 0x00000;
@@ -1450,11 +1445,9 @@ WRITE8_MEMBER(mz2500_state::mz2500_joystick_w)
 
 READ8_MEMBER(mz2500_state::mz2500_kanji_r)
 {
-	UINT8 *knj2_rom = memregion("kanji2")->base();
-
 	printf("Read from kanji 2 ROM\n");
 
-	return knj2_rom[(m_kanji_index << 1) | (offset & 1)];
+	return m_kanji2_rom[(m_kanji_index << 1) | (offset & 1)];
 }
 
 WRITE8_MEMBER(mz2500_state::mz2500_kanji_w)
@@ -1464,14 +1457,14 @@ WRITE8_MEMBER(mz2500_state::mz2500_kanji_w)
 
 READ8_MEMBER(mz2500_state::rp5c15_8_r)
 {
-	UINT8 rtc_index = (machine().device("maincpu")->state().state_int(Z80_B));
+	UINT8 rtc_index = (m_maincpu->state_int(Z80_B));
 
 	return m_rtc->read(space, rtc_index);
 }
 
 WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
 {
-	UINT8 rtc_index = (machine().device("maincpu")->state().state_int(Z80_B));
+	UINT8 rtc_index = (m_maincpu->state_int(Z80_B));
 
 	m_rtc->write(space, rtc_index, data);
 }
@@ -1479,15 +1472,14 @@ WRITE8_MEMBER(mz2500_state::rp5c15_8_w)
 
 READ8_MEMBER(mz2500_state::mz2500_emm_data_r)
 {
-	UINT8 *emm_ram = memregion("emm")->base();
 	UINT8 emm_lo_index;
 
-	emm_lo_index = (machine().device("maincpu")->state().state_int(Z80_B));
+	emm_lo_index = (m_maincpu->state_int(Z80_B));
 
 	m_emm_offset = (m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
 
 	if(m_emm_offset < 0x100000) //emm max size
-		return emm_ram[m_emm_offset];
+		return m_emm_ram[m_emm_offset];
 
 	return 0xff;
 }
@@ -1496,22 +1488,21 @@ WRITE8_MEMBER(mz2500_state::mz2500_emm_addr_w)
 {
 	UINT8 emm_hi_index;
 
-	emm_hi_index = (machine().device("maincpu")->state().state_int(Z80_B));
+	emm_hi_index = (m_maincpu->state_int(Z80_B));
 
 	m_emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (m_emm_offset & 0xff);
 }
 
 WRITE8_MEMBER(mz2500_state::mz2500_emm_data_w)
 {
-	UINT8 *emm_ram = memregion("emm")->base();
 	UINT8 emm_lo_index;
 
-	emm_lo_index = (machine().device("maincpu")->state().state_int(Z80_B));
+	emm_lo_index = (m_maincpu->state_int(Z80_B));
 
 	m_emm_offset = (m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
 
 	if(m_emm_offset < 0x100000) //emm max size
-		emm_ram[m_emm_offset] = data;
+		m_emm_ram[m_emm_offset] = data;
 }
 
 static ADDRESS_MAP_START(mz2500_io, AS_IO, 8, mz2500_state )
@@ -1739,10 +1730,52 @@ static void mz2500_reset(mz2500_state *state, UINT8 type)
 		state->m_bank_val[i] = bank_reset_val[type][i];
 }
 
+static const gfx_layout mz2500_pcg_layout_1bpp =
+{
+	8, 8,
+	0x100,
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8 * 8
+};
+
+static const gfx_layout mz2500_pcg_layout_3bpp =
+{
+	8, 8,
+	0x100,
+	3,
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8 * 8
+};
+
+void mz2500_state::machine_start()
+{
+	/* TODO: main RAM actually needs to be splitted */
+	m_main_ram = auto_alloc_array_clear(machine(), UINT8, 0x80000);
+	m_pcg_ram = auto_alloc_array_clear(machine(), UINT8, 0x2000);
+	m_ipl_rom = memregion("ipl")->base();
+	m_kanji_rom = memregion("kanji")->base();
+	m_kanji2_rom = memregion("kanji2")->base();
+	m_emm_ram = auto_alloc_array_clear(machine(), UINT8, 0x100000);
+	m_dic_rom = memregion("dictionary")->base();
+	m_phone_rom = memregion("phone")->base();
+	m_iplpro_rom = memregion("iplpro")->base();
+
+	state_save_register_global_pointer(machine(), m_main_ram, 0x80000);
+	state_save_register_global_pointer(machine(), m_pcg_ram, 0x2000);
+	state_save_register_global_pointer(machine(), m_emm_ram, 0x100000);
+
+	/* TODO: gfx[4] crashes as per now */
+//	machine().gfx[3] = auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_1bpp, (UINT8 *)m_pcg_ram, 0x10, 0));
+//	machine().gfx[4] = auto_alloc(machine(), gfx_element(machine(), mz2500_pcg_layout_3bpp, (UINT8 *)m_pcg_ram, 4, 0));
+}
+
 void mz2500_state::machine_reset()
 {
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
-	UINT8 *IPL = memregion("ipl")->base();
 	UINT32 i;
 
 	mz2500_reset(this, IPL_RESET);
@@ -1755,13 +1788,13 @@ void mz2500_state::machine_reset()
 	/* copy IPL to its natural bank ROM/RAM position */
 	for(i=0;i<0x8000;i++)
 	{
-		//RAM[i] = IPL[i];
-		RAM[i+0x68000] = IPL[i];
+		//m_main_ram[i] = IPL[i];
+		m_main_ram[i+0x68000] = m_ipl_rom[i];
 	}
 
 	/* clear CG RAM */
 	for(i=0;i<0x20000;i++)
-		RAM[i+0x40000] = 0x00;
+		m_main_ram[i+0x40000] = 0x00;
 
 	/* disable IRQ */
 	for(i=0;i<4;i++)
@@ -1811,35 +1844,13 @@ static const gfx_layout mz2500_16_layout =
 	16 * 16     /* code takes 16 times 16 bits */
 };
 
-static const gfx_layout mz2500_pcg_layout_1bpp =
-{
-	8, 8,
-	RGN_FRAC(1,4),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8 * 8
-};
-
-static const gfx_layout mz2500_pcg_layout_3bpp =
-{
-	8, 8,
-	RGN_FRAC(1,4),
-	3,
-	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4) },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8 * 8
-};
-
 /* these are just for viewer sake, actually they aren't used in drawing routines */
 static GFXDECODE_START( mz2500 )
 	GFXDECODE_ENTRY("kanji", 0, mz2500_cg_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0x4400, mz2500_8_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0, mz2500_16_layout, 0, 256)
-	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_1bpp, 0, 0x10)
-	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_3bpp, 0, 4)
+//	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_1bpp, 0, 0x10)
+//	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_3bpp, 0, 4)
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(mz2500_state::mz2500_vbl)
@@ -1897,7 +1908,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 	{
 		mz2500_reset(this, WRAM_RESET);
 		/* correct? */
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* bit 2 is speaker */
@@ -2060,7 +2071,7 @@ void mz2500_state::palette_init()
 WRITE_LINE_MEMBER(mz2500_state::pit8253_clk0_irq)
 {
 	if(m_irq_mask[1]/* && state & 1*/)
-		machine().device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,m_irq_vector[1]);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,m_irq_vector[1]);
 }
 
 static const struct pit8253_config mz2500_pit8253_intf =
@@ -2088,7 +2099,7 @@ WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
 {
 	/* TODO: doesn't work yet */
 //  if(m_irq_mask[3] && state & 1)
-//      device.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]);
+//      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]);
 }
 
 static RP5C15_INTERFACE( rtc_intf )
@@ -2152,12 +2163,6 @@ MACHINE_CONFIG_END
 
 /* ROM definition */
 ROM_START( mz2500 )
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x100000, "emm", ROMREGION_ERASEFF )
-
 	ROM_REGION( 0x08000, "ipl", 0 )
 	ROM_LOAD( "ipl.rom", 0x00000, 0x8000, CRC(7a659f20) SHA1(ccb3cfdf461feea9db8d8d3a8815f7e345d274f7) )
 
@@ -2174,7 +2179,7 @@ ROM_START( mz2500 )
 	ROM_REGION( 0x40000, "dictionary", 0 )
 	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
 
-	ROM_REGION( 0x8000, "rom", ROMREGION_ERASEFF ) //iplpro
+	ROM_REGION( 0x8000, "iplpro", ROMREGION_ERASEFF )
 	ROM_LOAD( "sasi.rom", 0x00000, 0x8000, CRC(a7bf39ce) SHA1(3f4a237fc4f34bac6fe2bbda4ce4d16d42400081) )
 
 	ROM_REGION( 0x8000, "phone", ROMREGION_ERASEFF )
@@ -2182,12 +2187,6 @@ ROM_START( mz2500 )
 ROM_END
 
 ROM_START( mz2520 )
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x100000, "emm", ROMREGION_ERASEFF )
-
 	ROM_REGION( 0x08000, "ipl", 0 )
 	ROM_LOAD( "ipl2520.rom", 0x00000, 0x8000, CRC(0a126eb2) SHA1(faf71236b3ad82d30184adea951d43d10ced663d) )
 
@@ -2204,7 +2203,7 @@ ROM_START( mz2520 )
 	ROM_REGION( 0x40000, "dictionary", 0 )
 	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
 
-	ROM_REGION( 0x8000, "rom", ROMREGION_ERASEFF ) //iplpro
+	ROM_REGION( 0x8000, "iplpro", ROMREGION_ERASEFF )
 	ROM_LOAD( "sasi.rom", 0x00000, 0x8000, CRC(a7bf39ce) SHA1(3f4a237fc4f34bac6fe2bbda4ce4d16d42400081) )
 
 	ROM_REGION( 0x8000, "phone", ROMREGION_ERASEFF )
