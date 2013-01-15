@@ -1053,6 +1053,9 @@ int hlsl_info::create_resources(bool reset)
 {
 	initialized = true;
 
+	if (!master_enable || !d3dintf->post_fx_available)
+		return 0;
+
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 
 	HRESULT result = (*d3dintf->device.create_texture)(d3d->device, (int)snap_width, (int)snap_height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &avi_copy_texture);
