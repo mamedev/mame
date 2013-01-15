@@ -10,7 +10,8 @@
 
     * Lucky 74 (bootleg, set 1), 1988, Wing Co.,Ltd.
     * Lucky 74 (bootleg, set 2), 1988, Wing Co.,Ltd.
-    * Exciting Black Jack,       198?, Sega.
+    * Lucky 74 (bootleg, set 3), 1988, Wing Co.,Ltd.
+    * Exciting Black Jack,       1989, Sega.
 
 
     Special thanks to Grull Osgo that helped a lot with the whole audio system and custom IC's
@@ -31,9 +32,9 @@
            1x Yamaha YM-2149F @ 1.5 MHz.
            1x OKI M5205 (4-bit ADPCM samples @ 8kHz).
 
-    ROMs: 1x 27C512 (program).
-          1x 27C512 (sound samples).
-          8x 27C256 (graphics).
+    ROMs: 1x 27C512 for program (inside the CPU box, or into bootleg daughterboard).
+          1x 27C512 for sound samples.
+          8x 27C256 for graphics.
 
     PROMs: 6x 24s10 (color system).
 
@@ -86,7 +87,7 @@
     |           01       10    8       |6 oooooo 1|  | HD74LS02P | |HD74LS157P| |HD74LS157P| |HD74LS245P | | 6116ALSP-12 |   | 6116ALSP-12 |  A |
     |                                  '----------'  '-----------' '----------' '----------' '-----------' '-------------'   '-------------'    |
     '--.                 .------.      .-----. conn  .-----------. .----------. .----------. .-----------. .-------------.   .-------------.    |
-       |                 |S12MD3|      | ??? |       |HD74LS161AP| |HD74LS86P | |HD74LS157P| |HD74LS245P | | 6116ALSP-12 |   | 6116ALSP-12 |  B |
+       |                 |S12MD3|      |PC817|       |HD74LS161AP| |HD74LS86P | |HD74LS157P| |HD74LS245P | | 6116ALSP-12 |   | 6116ALSP-12 |  B |
        |                 '------'      '-----'       '-----------' '----------' '----------' '-----------' '-------------'   '-------------'    |
     .--' 36              .-----------. .-----------. .-----------. .----------. .----------. .-----------. .--------------.  .--------------.   |
     |--                  |HD74LS174P | | TBP24S10N | | TBP24S10N | |HD74LS86P | |HD74LS86P | |HD74LS273P | |              |  |              | C |
@@ -99,45 +100,39 @@
     |--                  '-----------' '-----------' '-----------' '----------' '----------' '-----------' '--------------'  '--------------'   |
     |--                  .-----------. .-----------. .-----------. .----------. .----------. .-----------. .--------------.  .--------------.   |
     |--                  |HD74LS367AP| | HD74LS08P | |  HD7425P  | |HD74LS138P| |HD74LS138P| |HD74LS245P | |11            |  |16            | F |
-    |--                  '-----------' '-----------' '-----------' '----------' '----------' '-----------' |    M27512    |  |    M27512    |   |
+    |--                  '-----------' '-----------' '-----------' '----------' '----------' '-----------' |   M27C256    |  |   M27C256    |   |
     |--                  .-----------. .-----------. .-----------. .----------. .----------. .-----------. |              |  |              |   |
     |--                  |HD74LS174AP| | HD74LS10P | | HD74LS04P | |HD74LS138P| |HD74LS138P| |HD74LS245P | >--------------<  >--------------< H |
     |--                  '-----------' '-----------' '-----------' '----------' '----------' '-----------' |12            |  |17            |   |
-    |--                  .-----------. .-----------. .-----------. .----------. .----------. .-----------. |    M27512    |  |    M27512    |   |
+    |--                  .-----------. .-----------. .-----------. .----------. .----------. .-----------. |   M27C256    |  |   M27C256    |   |
     |--                  |HD74LS174AP| | HD74LS10P | |HD74LS139P | |HD74LS32P | |HD74LS08P | |HD74LS273P | |              |  |              | J |
     |--                  '-----------' '-----------' '-----------' '----------' '----------' '-----------' >--------------<  >--------------<   |
     |--                      .-------------------------------.     .----------. .----------. .-----------. |13            |  |18            |   |
-    |--                      |                               |     | SW1 (x8) | |HD74LS157P| |HD74LS240P | |    M27512    |  |    M27512    | K |
+    |--                      |                               |     | SW1 (x8) | |HD74LS157P| |HD74LS240P | |   M27C256    |  |   M27C256    | K |
     |--                      |          MITSUBISHI           |     '----------' '----------' '-----------' |              |  |              |   |
     |--                      |         M5M82C255ASP          |     .----------. .----------. .-----------. >--------------<  >--------------<   |
     |--                      |                               |     | SW2 (x8) | |HD74LS32P | |HD74LS240P | |14            |  |19            | L |
-    |--                      '-------------------------------'     '----------' '----------' '-----------' |    M27512    |  |    M27512    |   |
+    |--                      '-------------------------------'     '----------' '----------' '-----------' |   M27C256    |  |   M27C256    |   |
     |--                      .-------------------------------.     .----------. .----------. .-----------. |              |  |              |   |
     |--                      |                               |     | SW3 (x8) | |HD74LS32P | |HD74LS244P | >--------------<  >--------------< M |
     |--                      |          MITSUBISHI           |     '----------' '----------' '-----------' |15            |  |EMPTY         |   |
-    |--                      |         M5M82C255ASP          |     .----------. .----------. .-----------. |    M27512    |  |     (M27512) |   |
+    |--                      |         M5M82C255ASP          |     .----------. .----------. .-----------. |   M27C512    |  |     (M27512) |   |
     |--                      |                               |     | SW4 (x8) | | TC4019BP | |HD74LS240P | |              |  |              | N |
     |--                      '-------------------------------'     '----------' '----------' '-----------' '--------------'  '--------------'   |
     |--                  .-----------. .-----------. .-----------. .----------. .------------------------. .--------------------------------.   |
-    |--                  |HD74LS244P | |HD74LS368? | |HD74LS32P? | |HD74LS32P | |        YAMAHA          | |   B 0L2                        | P |
+    |--                  |HD74LS244P | | HD74LS368 | | HD73LS32  | |HD74LS32P | |        YAMAHA          | |   B 0L2                        | P |
     |--                  '-----------' '-----------' '-----------' '----------' |        YM2149F         | |   .-------+--------------+-.   |   |
     |--                  .-----------. .-----------. .-----------. .----------. '------------------------' |\  | WING  |              | |  /|   |
-    |--                  |HD74LS244P | |   ?????   | |HD74LS08P? | |HD74LS00P | .------------------------. | | | CPU   +--+--+--+--+--+ | | | R |
+    |--                  |HD74LS244P | |  TD62003  | | HD74LS08  | |HD74LS00P | .------------------------. | | | CPU   +--+--+--+--+--+ | | | R |
     |--                  '-----------' '-----------' '-----------' '----------' |         09R81P         | |o| | A001  |  |  |  |  |  | | |o|   |
     '--. 01  .---------. .---------.   .-----------. .-----------. .----------. |                        | |o| '-------+--+--+--+--+--+-' |o|   |
-       |     |   NEC   | |OKI M5205|   |   ?????   | | SN76489AN | |SN76489AN | '------------------------' | | .---+--------------------. | | S |
-       |     |UPC 1241H| '---------'   '-----------' '-----------' '----------' .------------.  .--------. |/  | 7 |  WE8703  1992.10   |  \|   |
+       |     |   NEC   | |OKI M5205|   |HD14069UBP | | SN76489AN | |SN76489AN | '------------------------' | | .---+--------------------. | | S |
+       |     |uPC 1241H| '---------'   '-----------' '-----------' '----------' .------------.  .--------. |/  | 7 |  WE8703  1992.10   |  \|   |
     .--'     '---------' .-----------.                             .----------. |    NPC     |  |  XTAL  | |   |   |  LUCKY 74-7        |   |   |
-    |  .---. .---------. |   ?????   |                             |SN76489AN | |   SM7831   |  | 12 MHZ | |   '---+--------------------'   | T |
+    |  .---. .---------. | HA17324P  |                             |SN76489AN | |   SM7831   |  | 12 MHZ | |   '---+--------------------'   | T |
     | =|RES| | BATTERY | '-----------'                             '----------' '------------'  '--------' '--------------------------------'   |
     |  '---' '---------'       8             7             6             5            4            3              2                  1          |
     '-------------------------------------------------------------------------------------------------------------------------------------------'
-
-    To confirm:
-
-    - 8T
-    - 7B - 7P - 7R - 7S
-    - 6P - 6R
 
 
     Exciting Black Jack CPU box:
@@ -1175,7 +1170,159 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( excitbj )
-	PORT_INCLUDE( lucky74 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("1BET")	// Bet 1
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("10BET")	// Bet 10
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("CNT")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("HIT")	// Hit
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5) PORT_NAME("SND")	// Sound?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6) PORT_NAME("DWN")	// Double Down?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7) PORT_NAME("SPT")	// Split?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8) PORT_NAME("INS")	// Insurance?
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("HCN")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("EMP")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("BOK")	// Bookkeeping
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	PORT_NAME("Test Mode") PORT_CODE(KEYCODE_F2) PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("PAY")	// Payout
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("KSW")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("IN2-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("IN2-8")
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Z) PORT_NAME("CIN")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_X) PORT_NAME("KIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_C) PORT_NAME("SVC")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_V) PORT_NAME("IN3-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_B) PORT_NAME("IN3-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_N) PORT_NAME("IN3-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_M) PORT_NAME("IN3-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("IN3-8")
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN4-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN4-2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("IN4-3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("IN4-4")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("IN4-5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("IN4-6")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("IN4-7")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("IN4-8")
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1456,7 +1603,77 @@ ROM_START( lucky74 )
 ROM_END
 
 /*
-    Bootleg, set 2.
+  Another bootleg set. Same as the parent, but with
+  program hacked to set different payrates up to 110%.
+
+  Same payrate table is present in luckygde program.
+
+  Differences:
+
+  Offset   luckychi  10.cpu
+
+  6193     00 90     01 10 -
+  6197     00 87     01 06   \
+  619B     00 84     01 02    |
+  619F     00 81     00 98    |
+  61A3     00 78     00 94    |
+  61A7     00 75     00 90    |
+  61AB     00 72     00 86    |
+  61AF     00 69     00 82    |> Pay Rate Table...
+  61B3     00 66     00 78    |
+  61B7     00 63     00 74    |
+  61BB     00 60     00 70    |
+  61BF     00 57     00 66    |
+  61C3     00 54     00 62    |
+  61C7     00 51     00 58    |
+  61CB     00 48     00 54   /
+  61CF     00 45     00 50 -
+
+  Other diff's...
+
+  3EB8     00        01
+  3EBA     05        00
+  3EBE     80        99
+  3EC1     00 70     01 27
+  3F19     7A        7F
+  3F1F     0B C0     BB 3E
+  3F59     0F C0     6D C7
+  3FB1     FF        E3
+
+  Need more analysis....
+
+*/
+ROM_START( lucky74a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "10.cpu",	0x0000, 0x10000, CRC(663d139e) SHA1(259c36d741c13bf06f317dc893f46e2cfca15ace) )
+
+	ROM_REGION( 0x20000, "fgtiles", 0 )
+	ROM_LOAD( "2.2j",	0x00000, 0x8000, CRC(ff934c20) SHA1(07cd2225dfc0e5b74be2e1b379c6b180e37660db) )
+	ROM_LOAD( "1.2f",	0x08000, 0x8000, CRC(2fd6fb8a) SHA1(1a910e0a2e6db22a8d9a65d7b932f9ca39601e9c) )
+	ROM_LOAD( "3.2k",	0x10000, 0x8000, CRC(c70a6da3) SHA1(195772ef649e21a5c54c5871e7b858967b6ebee8) )
+	ROM_LOAD( "4.2m",	0x18000, 0x8000, CRC(b5813b67) SHA1(cce38e33a5218d6839d956174807d88e7c070d5a) )
+
+	ROM_REGION( 0x20000, "bgtiles", 0 )
+	ROM_LOAD( "7.1j",	0x00000, 0x8000, CRC(010ffa4a) SHA1(8856d61b71e951509073bc359851f47c39c4274d) )
+	ROM_LOAD( "6.1f",	0x08000, 0x8000, CRC(15104810) SHA1(586df734740209e2a05932e31d2a301d330e8cbd) )
+	ROM_LOAD( "8.1k",	0x10000, 0x8000, CRC(f2d45e76) SHA1(46df7bf98434c836fd38539575a35bf67c9ec2c6) )
+	ROM_LOAD( "9.1m",	0x18000, 0x8000, CRC(6b0196f3) SHA1(277049279dcfcf07189dbdb20935c2a71b2f6061) )
+
+	ROM_REGION( 0x20000, "adpcm", 0 )	/* 4-bits ADPCM samples @ 8kHz */
+	ROM_LOAD( "5.2n",	0x00000, 0x10000, CRC(b896c87f) SHA1(985e625a937abd6353218f0cace14d3adec4c1bf) )	/* location 2n */
+	ROM_FILL(			0x10000, 0x10000, 0xff )															/* empty socket @ 1n */
+
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "82s129.e6",	0x0000, 0x0100, CRC(ae793fef) SHA1(e4e2d2dccabad7d756811fb2d5e123bf30f106f3) )
+	ROM_LOAD( "82s129.e7",	0x0100, 0x0100, CRC(7c772d0c) SHA1(9c99daa01ca56c7ebd48945505fcbae184998b13) )
+	ROM_LOAD( "82s129.d6",	0x0200, 0x0100, CRC(61716584) SHA1(7a3e17f47ce173d79c12b2394edb8f32b7509e39) )
+	ROM_LOAD( "82s129.d7",	0x0300, 0x0100, CRC(4003bc8f) SHA1(f830203c22a4f94b8b9f0b24e287204a742a8322) )
+	ROM_LOAD( "82s129.c6",	0x0400, 0x0100, CRC(a8d2b3db) SHA1(7b346797bedc627fb2d49f19b18860a81c69e122) )
+	ROM_LOAD( "82s129.c7",	0x0500, 0x0100, CRC(e62fd192) SHA1(86a189df2e2ccef6bd2a4e6d969e777fbba8cdf7) )
+ROM_END
+
+/*
+    Bootleg, set 3.
 
     - All the co-processor routines were erased.
 
@@ -1465,9 +1682,9 @@ ROM_END
       part of the program is inside the original CPU box...
 
 */
-ROM_START( lucky74a )
+ROM_START( lucky74b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "luckygde.00",    0x0000, 0x10000, CRC(e3f7db99) SHA1(5c7d9d3fed9eb19d3d666c8c08b34968a9996a96) ) /* bad dump? */
+	ROM_LOAD( "luckygde.00",    0x0000, 0x10000, CRC(e3f7db99) SHA1(5c7d9d3fed9eb19d3d666c8c08b34968a9996a96) )	/* bad dump? */
 
 	ROM_REGION( 0x20000, "fgtiles", 0 )
 	ROM_LOAD( "luckygde.12",    0x00000, 0x8000, CRC(7127465b) SHA1(3f72f91652fcab52c073744b1651fdfe772c584a) )
@@ -1482,8 +1699,8 @@ ROM_START( lucky74a )
 	ROM_LOAD( "luckygde.19",    0x18000, 0x8000, CRC(bb4608ae) SHA1(cc8ec596f445fe0364f254241227de368f309ebb) )
 
 	ROM_REGION( 0x20000, "adpcm", 0 )   /* 4-bits ADPCM samples @ 8kHz */
-	ROM_LOAD( "luckyson.15",    0x00000, 0x10000, CRC(b896c87f) SHA1(985e625a937abd6353218f0cace14d3adec4c1bf) )    /* location 2n */
-	ROM_FILL(                   0x10000, 0x10000, 0xff )                                                            /* empty socket @ 1n */
+	ROM_LOAD( "luckyson.15",    0x00000, 0x10000, CRC(b896c87f) SHA1(985e625a937abd6353218f0cace14d3adec4c1bf) )	/* location 2n */
+	ROM_FILL(                   0x10000, 0x10000, 0xff )															/* empty socket @ 1n */
 
 	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "luckyprom.e6",   0x0000, 0x0100, CRC(ae793fef) SHA1(e4e2d2dccabad7d756811fb2d5e123bf30f106f3) )
@@ -1537,8 +1754,8 @@ ROM_START( excitbj )
 	ROM_LOAD( "ebj_s9.1l",  0x30000, 0x10000, CRC(79ba7d75) SHA1(7301143a019d5e79eff7941a1a34fe96036acffa) )
 
 	ROM_REGION( 0x20000, "adpcm", 0 )   /* 4-bits ADPCM samples @ 8kHz */
-	ROM_LOAD( "ebj_s5.2n",  0x00000, 0x10000, CRC(9b4a10a2) SHA1(843ab5955ba96bb1b1a5367652d0f6424ba23bdf) )    /* location 2n */
-	ROM_LOAD( "ebj_s10.1n", 0x10000, 0x10000, CRC(2fa7401d) SHA1(80a5dfd2b7c183acd2fc124d220de4a4921178b2) )    /* location 1n */
+	ROM_LOAD( "ebj_s5.2n",  0x00000, 0x10000, CRC(9b4a10a2) SHA1(843ab5955ba96bb1b1a5367652d0f6424ba23bdf) )	/* location 2n */
+	ROM_LOAD( "ebj_s10.1n", 0x10000, 0x10000, CRC(2fa7401d) SHA1(80a5dfd2b7c183acd2fc124d220de4a4921178b2) )	/* location 1n */
 
 	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "6e-a.6e",    0x0000, 0x0100, CRC(bcaa7a0d) SHA1(75554d539bf67effb862234cdf89e4df4e2193ed) )
@@ -1554,7 +1771,8 @@ ROM_END
 *                Game Drivers                *
 **********************************************
 
-       YEAR  NAME      PARENT   MACHINE  INPUT     INIT  ROT    COMPANY           FULLNAME                    FLAGS             LAYOUT  */
+       YEAR  NAME      PARENT   MACHINE  INPUT    STATS           INIT  ROT    COMPANY           FULLNAME                    FLAGS             LAYOUT  */
 GAMEL( 1988, lucky74,  0,       lucky74, lucky74, driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 1)", 0,                layout_lucky74 )
-GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74, driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", GAME_NOT_WORKING, layout_lucky74 )
+GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74, driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 3)", 0,                layout_lucky74 )
+GAMEL( 1988, lucky74b, lucky74, lucky74, lucky74, driver_device,  0,    ROT0, "Wing Co., Ltd.", "Lucky 74 (bootleg, set 2)", GAME_NOT_WORKING, layout_lucky74 )
 GAME(  1989, excitbj,  0,       lucky74, excitbj, driver_device,  0,    ROT0, "Sega",           "Exciting Black Jack",       GAME_NOT_WORKING )
