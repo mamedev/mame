@@ -4153,6 +4153,7 @@ wbmljo          // (c) 1987 Sega/Westone (S2)
 wbmljb          // (c) 1987 Sega/Westone (S2)
 wbmlb           // bootleg? (S2)
 wbmlbg          // bootleg (Galaxy Electronics)
+wbmlbge			// bootleg (Gecas)
 dakkochn        // 836-6483 (S2)
 ufosensi        // 834-6659 (S2)
 ufosensib       // bootleg
@@ -8284,6 +8285,7 @@ netwars         // (c) 1983 Orca + Esco Trading Co license
 // the name "Orca"
 vastar          // (c) 1983 Sesame Japan
 vastar2         // (c) 1983 Sesame Japan
+vastar3			// (c) 1983 Sesame Japan
 /*
   other Orca games:
   82 Battle Cross                         Kit 2P

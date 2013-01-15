@@ -529,6 +529,50 @@ ROM_START( vastar2 )
 	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    /* ???? */
 ROM_END
 
+ROM_START( vastar3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "vst_2.4f",         0x0000, 0x2000, CRC(ad4e512a) SHA1(aee11703fb386067dea809b09466719a9675448e) )
+	ROM_LOAD( "vst_3.4h",         0x2000, 0x2000, CRC(2276c5d0) SHA1(1070a952c4e8a8d97036511b48656602ce8e6848) )
+	ROM_LOAD( "vst_4.4j",         0x4000, 0x2000, CRC(deca2aa1) SHA1(88920ae4c4094a748d3f3c37093186e05f1ed284) )
+	ROM_LOAD( "vst_5.6n",         0x6000, 0x2000, CRC(743ed1c7) SHA1(34b2e952113c6c2137dc0c8916276ae344a7c9df) )
+	/* same roms but split??
+	ROM_LOAD( "e_f4.rom",     0x0000, 0x1000, CRC(fecb46d6) SHA1(2d03af431f44ff13f535e1659c1cb15cd99da4a8) )
+	ROM_LOAD( "e_k4.rom",     0x1000, 0x1000, CRC(cd45a64d) SHA1(dd08f12df013c36218a827b6423acd33b7aa6cbf) )
+	ROM_LOAD( "e_h4.rom",     0x2000, 0x1000, CRC(9b0aee71) SHA1(0439706e5f7029dea316a497fb2a0c60a358c9f5) )
+	ROM_LOAD( "e_l4.rom",     0x3000, 0x1000, CRC(d0a79879) SHA1(ec22a9f1de1f536d2eeda99a050a55b8b5078673) )
+	ROM_LOAD( "e_j4.rom",     0x4000, 0x1000, CRC(d44c72ca) SHA1(6b4c0f29a9c12a64bfdbfd6ee2e5ca43bd94b01f) )
+	ROM_LOAD( "e_n4.rom",     0x5000, 0x1000, CRC(03f68cad) SHA1(f2b09e9091d580cf1f90cd45968942fc6486a9b5) )
+	ROM_LOAD( "e_n7.rom",     0x6000, 0x1000, CRC(1e88270d) SHA1(2ef20d781ed87928553cb6142ac5acb2ea700474) )
+	ROM_LOAD( "e_n5.rom",     0x7000, 0x1000, CRC(896af6c8) SHA1(b262ee3b161ec00541d629f02ece6f978beea0ac) )
+	*/
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
+	ROM_LOAD( "vst_0.2f",     0x0000, 0x1000, CRC(713478d8) SHA1(9cbd1fb689d93a8964f48e59d4effaa4878b2945) )
+	ROM_LOAD( "vst_1.2j",     0x1000, 0x1000, CRC(e4535442) SHA1(280d93bec5cf6183250827ce70ed5ddff968bba5) ) 
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "c_c9.rom",     0x0000, 0x2000, CRC(34f067b6) SHA1(45d7f8be5bd1dc9e5e511aa2e99c216c5ff12273) )
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "c_f7.rom",     0x0000, 0x2000, CRC(edbf3b13) SHA1(9d6ddf16e83c68c831fec28607584471b5cbcbd2) )
+	ROM_LOAD( "c_f9.rom",     0x2000, 0x2000, CRC(8f309e22) SHA1(f5bbc5cf70687415061a0674e273e20fbfcc1f8f) )
+
+	ROM_REGION( 0x2000, "gfx3", 0 )
+	ROM_LOAD( "c_n4.rom",     0x0000, 0x2000, CRC(b5f9c866) SHA1(17fc38cd40638e4f5d25c0cae70df3b8f03425dd) )
+
+	ROM_REGION( 0x2000, "gfx4", 0 )
+	ROM_LOAD( "c_s4.rom",     0x0000, 0x2000, CRC(c9fbbfc9) SHA1(7c6ace0e2eae8420a31d9054ad5dd94924273d5f) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "tbp24s10.6p",  0x0000, 0x0100, CRC(a712d73a) SHA1(a65fa5928431d8631fb04e01ad0a0d2de849bf1d) )    /* red component */
+	ROM_LOAD( "tbp24s10.6s",  0x0100, 0x0100, CRC(0a7d48ec) SHA1(400e0b271c241712e7b7502e96e4f8a609e078e1) )    /* green component */
+	ROM_LOAD( "tbp24s10.6m",  0x0200, 0x0100, CRC(4c3db907) SHA1(03bcbc4763dcf49f4a06f499042e36183aa8b762) )    /* blue component */
+
+	ROM_REGION( 0x0100, "unkprom", 0 )
+	ROM_LOAD( "tbp24s10.8n",  0x0000, 0x0100, CRC(b5297a3b) SHA1(a5a512f86097b7d892f6d11e8492e8a379c07f60) )    /* ???? */
+ROM_END
+
+
 ROM_START( pprobe )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pb2.bin",   0x0000, 0x2000, CRC(a88592aa) SHA1(98e8e6233b85e678718f532708d57ec946b9fd88) )
@@ -564,4 +608,5 @@ ROM_END
 
 GAME( 1983, vastar,  0,      vastar, vastar, driver_device, 0, ROT90, "Sesame Japan", "Vastar (set 1)", 0 )
 GAME( 1983, vastar2, vastar, vastar, vastar, driver_device, 0, ROT90, "Sesame Japan", "Vastar (set 2)", 0 )
+GAME( 1983, vastar3, vastar, vastar, vastar, driver_device, 0, ROT90, "Sesame Japan", "Vastar (set 3)", 0 )
 GAME( 1985, pprobe,  0,      vastar, pprobe, driver_device, 0, ROT90, "Crux / Kyugo?", "Planet Probe (prototype?)", 0 ) // has no Copyright, probably because Crux didn't have a trading name at this point?
