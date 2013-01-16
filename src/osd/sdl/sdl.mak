@@ -635,6 +635,7 @@ DEBUGOBJS = \
 	$(SDLOBJ)/debugqtdasmwindow.o \
 	$(SDLOBJ)/debugqtmainwindow.o \
 	$(SDLOBJ)/debugqtmemorywindow.o \
+	$(SDLOBJ)/debugqtview.moc.o \
 	$(SDLOBJ)/debugqtwindow.moc.o \
 	$(SDLOBJ)/debugqtlogwindow.moc.o \
 	$(SDLOBJ)/debugqtdasmwindow.moc.o \
