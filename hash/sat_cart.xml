@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
+<!-- Note: a Chinese pirate mahjong game is rumored to exist -->
 <!-- Kof95 and Ultraman require additional ROM cartridges to work! -->
 
 <softwarelist name="sat_cart" description="Sega Saturn Cartridges">
@@ -40,7 +41,7 @@
 		</part>
 	</software>
 
-	<!-- weird size... is it a bad dump? -->
+	<!-- Flash ROM actually -->
 	<software name="ar">
 		<description>Action Replay</description>
 		<year>199?</year>
