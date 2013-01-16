@@ -19,7 +19,7 @@
         video output. Method of output is through a DG640 board (sold by
         Applied Technology) which uses a MCM6574 as a character generator.
         The DG640 also supports blinking, reverse-video, and LORES graphics.
-        It is a S100 card.
+        It is a S100 card, also known as ETI-640.
 
         Keyboard input, like PIPBUG, is via a serial device.
         The baud rate is 300, 8N1.
@@ -36,8 +36,8 @@
         - 5.2 ACOS tape system, 1200 baud terminal
 
 
-	Status:
-	- DG640 is completely emulated, even though BINBUG doesn't use most
+        Status:
+        - DG640 is completely emulated, even though BINBUG doesn't use most
           of its features.
         - BINBUG works except that the cassette interface isn't the same as
           real hardware. But you can save, and load it back.
@@ -73,8 +73,8 @@ public:
 	UINT8 m_framecnt;
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<serial_keyboard_device> m_keyboard;
-	required_device<cassette_image_device> m_cass;
+	optional_device<serial_keyboard_device> m_keyboard;
+	optional_device<cassette_image_device> m_cass;
 	required_shared_ptr<const UINT8> m_p_videoram;
 	required_shared_ptr<const UINT8> m_p_attribram;
 };
@@ -330,3 +330,144 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, driver_device, 0,  "MicroByte", "BINBUG 3.6", 0 )
+
+
+
+/******************************************************************************************************************/
+
+/*
+
+DGOS-Z80 (ETI-680)
+
+ROM is a bad dump, corrections are being made.
+*/
+
+
+#include "cpu/z80/z80.h"
+#include "machine/z80ctc.h"
+#include "machine/z80pio.h"
+
+class dgosz80_state : public binbug_state
+{
+public:
+	dgosz80_state(const machine_config &mconfig, device_type type, const char *tag)
+		: binbug_state(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_ctc(*this, "z80ctc"),
+	m_pio(*this, "z80pio")
+	{ }
+
+	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_WRITE8_MEMBER(kbd_put);
+	UINT8 m_term_data;
+	virtual void machine_reset();
+	required_device<cpu_device> m_maincpu;
+	required_device<z80ctc_device> m_ctc;
+	required_device<z80pio_device> m_pio;
+};
+
+static ADDRESS_MAP_START(dgosz80_mem, AS_PROGRAM, 8, dgosz80_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE( 0x0000, 0xcfff) AM_RAM
+	AM_RANGE( 0xd000, 0xd7ff) AM_ROM
+	AM_RANGE( 0xd800, 0xefff) AM_RAM
+	AM_RANGE( 0xf000, 0xf3ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE( 0xf400, 0xf7ff) AM_RAM AM_SHARE("attribram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(dgosz80_io, AS_IO, 8, dgosz80_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00,0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x04,0x07) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
+	//AM_RANGE(0x08,0x08) SWP Control and Status
+	//AM_RANGE(0x09,0x09) parallel input port
+	// Optional AM9519 Programmable Interrupt Controller (port c = data, port d = control)
+	//AM_RANGE(0x0c,0x0d) AM_DEVREADWRITE("am9519", am9519_device, read, write)
+ADDRESS_MAP_END
+
+void dgosz80_state::machine_reset()
+{
+	m_maincpu->set_pc(0xd000);
+}
+
+/* Input ports */
+static INPUT_PORTS_START( dgosz80 )
+INPUT_PORTS_END
+
+WRITE8_MEMBER( dgosz80_state::kbd_put )
+{
+	m_term_data = data;
+	m_pio->port_a_write(data);//keyb_r(generic_space(),0,0xff));
+}
+
+static ASCII_KEYBOARD_INTERFACE( dgosz80_keyboard_intf )
+{
+	DEVCB_DRIVER_MEMBER(dgosz80_state, kbd_put)
+};
+
+READ8_MEMBER( dgosz80_state::porta_r )
+{
+	UINT8 data = m_term_data;
+	m_term_data = 0;
+	return data;
+}
+
+static Z80PIO_INTERFACE( z80pio_intf )
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //IRQ
+	DEVCB_DRIVER_MEMBER(dgosz80_state, porta_r),  // in port A
+	DEVCB_NULL,  // out port A
+	DEVCB_NULL,
+	DEVCB_NULL, // in port B
+	DEVCB_NULL,                 // out port B
+	DEVCB_NULL
+};
+
+static Z80CTC_INTERFACE( z80ctc_intf )
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),       // interrupt handler
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),        // ZC/TO0 callback
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),        // ZC/TO1 callback, beep interface
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)     // ZC/TO2 callback
+};
+
+static MACHINE_CONFIG_START( dgosz80, dgosz80_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(dgosz80_mem)
+	MCFG_CPU_IO_MAP(dgosz80_io)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
+	MCFG_GFXDECODE(dg640)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(monochrome_amber)
+
+	/* Keyboard */
+	MCFG_ASCII_KEYBOARD_ADD("keyb", dgosz80_keyboard_intf)
+
+	/* Devices */
+	MCFG_Z80CTC_ADD( "z80ctc", XTAL_8MHz / 4, z80ctc_intf )
+	MCFG_Z80PIO_ADD( "z80pio", XTAL_8MHz / 4, z80pio_intf )
+MACHINE_CONFIG_END
+
+
+/* ROM definition */
+ROM_START( dgosz80 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dgosz80.rom", 0xd000, 0x0800, NO_DUMP) //CRC(2cb1ac6e) SHA1(a969883fc767484d6b0fa103cfa4b4129b90441b) )
+
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "6574.bin", 0x0000, 0x0800, CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
+ROM_END
+
+/* Driver */
+
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY            FULLNAME       FLAGS */
+COMP( 1980, dgosz80, 0,      0,       dgosz80,   dgosz80, driver_device, 0,  "David Griffiths", "DGOS-Z80 1.4", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
