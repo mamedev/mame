@@ -1,6 +1,6 @@
 /***************************************************************************
 
-        BINBUG
+        BINBUG and DG640
 
         2013-01-14 Driver created
 
@@ -10,22 +10,22 @@
         A - See and alter memory
         B - Set breakpoint (2 permitted)
         C - Clear breakpoint
-        D - Dump memory to paper tape
+        D - cassette save
         G - Go to address, run
-        L - Load memory from paper tape
+        L - cassette load
         S - See and alter registers
 
         BINBUG is an alternate bios to PIPBUG, however it uses its own
         video output. Method of output is through a DG640 board (sold by
-        Applied Technology) which one can suppose a character generator
-        rom would be used; therefore undumped.
+        Applied Technology) which uses a MCM6574 as a character generator.
+        The DG640 also supports blinking, reverse-video, and LORES graphics.
+        It is a S100 card.
 
         Keyboard input, like PIPBUG, is via a serial device.
         The baud rate is 300, 8N1.
 
-        The terminal output (via D command) seems to contain binary
-        data, so it is disabled for now. It is most likely the tape
-        output mentioned below.
+        The SENSE and FLAG lines are used for 300 baud cassette, in
+        conjunction with unknown hardware.
 
         There are 3 versions of BINBUG:
 
@@ -36,16 +36,23 @@
         - 5.2 ACOS tape system, 1200 baud terminal
 
 
+	Status:
+	- DG640 is completely emulated, even though BINBUG doesn't use most
+          of its features.
+        - BINBUG works except that the cassette interface isn't the same as
+          real hardware. But you can save, and load it back.
+
         ToDo:
-        - Need dumps of 4.4 and 5.2, also the DG640 CGEN.
-        - Add cassette
+        - Need dumps of 4.4 and 5.2.
+        - Fix cassette
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
-#include "machine/terminal.h"
 #include "machine/keyboard.h"
+#include "imagedev/cassette.h"
+#include "sound/wave.h"
 #include "imagedev/snapquik.h"
 
 
@@ -55,18 +62,21 @@ public:
 	binbug_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_keyboard(*this, KEYBOARD_TAG),
-//	m_terminal(*this, TERMINAL_TAG),
-	m_p_videoram(*this, "videoram") { }
+	m_cass(*this, CASSETTE_TAG),
+	m_p_videoram(*this, "videoram"),
+	m_p_attribram(*this, "attribram") { }
 
 	DECLARE_WRITE8_MEMBER(binbug_ctrl_w);
 	DECLARE_READ8_MEMBER(binbug_serial_r);
 	DECLARE_WRITE8_MEMBER(binbug_serial_w);
 	const UINT8 *m_p_chargen;
+	UINT8 m_framecnt;
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<serial_keyboard_device> m_keyboard;
-//	required_device<serial_terminal_device> m_terminal;
+	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<const UINT8> m_p_videoram;
+	required_shared_ptr<const UINT8> m_p_attribram;
 };
 
 WRITE8_MEMBER( binbug_state::binbug_ctrl_w )
@@ -75,19 +85,20 @@ WRITE8_MEMBER( binbug_state::binbug_ctrl_w )
 
 READ8_MEMBER( binbug_state::binbug_serial_r )
 {
-	return m_keyboard->tx_r();
+	return m_keyboard->tx_r() & (m_cass->input() < 0.03);
 }
 
 WRITE8_MEMBER( binbug_state::binbug_serial_w )
 {
-//	m_terminal->rx_w(data);
+	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 }
 
 static ADDRESS_MAP_START(binbug_mem, AS_PROGRAM, 8, binbug_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff) AM_ROM
 	AM_RANGE( 0x0400, 0x77ff) AM_RAM
-	AM_RANGE( 0x7800, 0x7fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE( 0x7800, 0x7bff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE( 0x7c00, 0x7fff) AM_RAM AM_SHARE("attribram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(binbug_io, AS_IO, 8, binbug_state)
@@ -100,7 +111,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( binbug )
 INPUT_PORTS_END
 
-static const serial_terminal_interface terminal_intf =
+static const serial_keyboard_interface keyboard_intf =
 {
 	DEVCB_NULL
 };
@@ -112,39 +123,97 @@ void binbug_state::video_start()
 
 UINT32 binbug_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
+// attributes bit 0 = flash, bit 1 = lores. Also bit 7 of the character = reverse-video (text only).
+	UINT8 y,ra,chr,gfx,attr,inv,gfxbit;
 	UINT16 sy=0,ma=0,x;
+	bool flash;
+	m_framecnt++;
 
 	for (y = 0; y < 16; y++)
 	{
-		for (ra = 0; ra < 10; ra++)
+		for (ra = 0; ra < 16; ra++)
 		{
 			UINT16 *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x++)
 			{
-				gfx = 0;
-				if (ra < 9)
-				{
-					chr = m_p_videoram[x];
-					gfx = m_p_chargen[(chr<<4) | ra ] ^ (BIT(chr, 7) ? 0xff : 0);
-				}
+				attr = m_p_attribram[x];
+				chr = m_p_videoram[x];
+				flash = BIT(m_framecnt, 4) & BIT(attr, 0);
 
-				/* Display a scanline of a character */
-				*p++ = BIT(gfx, 7);
-				*p++ = BIT(gfx, 6);
-				*p++ = BIT(gfx, 5);
-				*p++ = BIT(gfx, 4);
-				*p++ = BIT(gfx, 3);
-				*p++ = BIT(gfx, 2);
-				*p++ = BIT(gfx, 1);
-				*p++ = BIT(gfx, 0);
+				if (BIT(attr, 1)) // lores gfx - can flash
+				{
+					if (flash) chr = 0; // blank part of flashing
+
+					gfxbit = (ra & 0x0c)>>1;
+					/* Display one line of a lores character (8 pixels) */
+					*p++ = BIT(chr, gfxbit);
+					*p++ = BIT(chr, gfxbit);
+					*p++ = BIT(chr, gfxbit);
+					*p++ = BIT(chr, gfxbit);
+					gfxbit++;
+					*p++ = BIT(chr, gfxbit);
+					*p++ = BIT(chr, gfxbit);
+					*p++ = BIT(chr, gfxbit);
+					*p++ = BIT(chr, gfxbit);
+				}
+				else
+				{
+					gfx = 0;
+
+					if (!flash)
+					{
+						inv = BIT(chr, 7) ? 0xff : 0; // text with bit 7 high is reversed
+						chr &= 0x7f;
+						gfx = inv;
+
+						// if g,j,p,q,y; lower the descender
+						if ((chr==0x2c)||(chr==0x3b)||(chr==0x67)||(chr==0x6a)||(chr==0x70)||(chr==0x71)||(chr==0x79))
+						{
+							if (ra > 6)
+								gfx = m_p_chargen[(chr<<4) | (ra-7) ] ^ inv;
+						}
+						else
+						{
+							if ((ra > 3) & (ra < 13))
+								gfx = m_p_chargen[(chr<<4) | (ra-4) ] ^ inv;
+						}
+					}
+
+					/* Display a scanline of a character */
+					*p++ = BIT(gfx, 7);
+					*p++ = BIT(gfx, 6);
+					*p++ = BIT(gfx, 5);
+					*p++ = BIT(gfx, 4);
+					*p++ = BIT(gfx, 3);
+					*p++ = BIT(gfx, 2);
+					*p++ = BIT(gfx, 1);
+					*p++ = BIT(gfx, 0);
+				}
 			}
 		}
 		ma+=64;
 	}
 	return 0;
 }
+
+/* F4 Character Displayer */
+static const gfx_layout dg640_charlayout =
+{
+	7, 9,                   /* 7 x 9 characters */
+	128,                  /* 128 characters */
+	1,                  /* 1 bits per pixel */
+	{ 0 },                  /* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8, 8*8 },
+	8*16                    /* every char takes 16 bytes */
+};
+
+static GFXDECODE_START( dg640 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, dg640_charlayout, 0, 1 )
+GFXDECODE_END
 
 QUICKLOAD_LOAD( binbug )
 {
@@ -227,13 +296,20 @@ static MACHINE_CONFIG_START( binbug, binbug_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
-	MCFG_SCREEN_SIZE(512, 160)
-	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 159)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 255)
+	MCFG_GFXDECODE(dg640)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(monochrome_amber)
 
-	MCFG_SERIAL_KEYBOARD_ADD(KEYBOARD_TAG, terminal_intf, 300)
-//	MCFG_SERIAL_TERMINAL_ADD(TERMINAL_TAG, terminal_intf, 300)
+	/* Keyboard */
+	MCFG_SERIAL_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf, 300)
+
+	/* Cassette */
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", binbug, "pgm", 1)
@@ -245,13 +321,12 @@ ROM_START( binbug )
 	ROM_REGION( 0x8000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "binbug.rom", 0x0000, 0x0400, CRC(2cb1ac6e) SHA1(a969883fc767484d6b0fa103cfa4b4129b90441b) )
 
-	/* character generator not dumped, using the one from 'c10' for now */
-	ROM_REGION( 0x2000, "chargen", 0 )
-	ROM_LOAD( "c10_char.bin", 0x0000, 0x2000, BAD_DUMP CRC(cb530b6f) SHA1(95590bbb433db9c4317f535723b29516b9b9fcbf))
+	ROM_REGION( 0x0800, "chargen", 0 )
+	ROM_LOAD( "6574.bin", 0x0000, 0x0800, CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
 	ROM_FILL(0, 16, 0)
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   CLASS         INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, driver_device, 0,  "MicroByte", "BINBUG 3.6", GAME_NO_SOUND_HW )
+COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, driver_device, 0,  "MicroByte", "BINBUG 3.6", 0 )
