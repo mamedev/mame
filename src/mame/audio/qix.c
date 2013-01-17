@@ -99,18 +99,16 @@ WRITE8_MEMBER(qix_state::sndpia_2_warning_w)
 }
 
 
-static TIMER_CALLBACK( deferred_sndpia1_porta_w )
+TIMER_CALLBACK_MEMBER(qix_state::deferred_sndpia1_porta_w)
 {
-	pia6821_device *device = (pia6821_device *)ptr;
-	device->porta_w(param);
+	m_sndpia1->porta_w(param);
 }
 
 
 WRITE8_MEMBER(qix_state::sync_sndpia1_porta_w)
 {
-	device_t *device = machine().device("sndpia1");
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
-	machine().scheduler().synchronize(FUNC(deferred_sndpia1_porta_w), data, (void *)downcast<pia6821_device *>(device));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(qix_state::deferred_sndpia1_porta_w), this), data);
 }
 
 
@@ -130,18 +128,16 @@ WRITE8_MEMBER(qix_state::slither_coinctl_w)
 
 WRITE_LINE_MEMBER(qix_state::qix_pia_dint)
 {
-	pia6821_device *pia = downcast<pia6821_device *>(machine().device("sndpia0"));
-	int combined_state = pia->irq_a_state() | pia->irq_b_state();
+	int combined_state = m_sndpia0->irq_a_state() | m_sndpia0->irq_b_state();
 
 	/* DINT is connected to the data CPU's IRQ line */
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 WRITE_LINE_MEMBER(qix_state::qix_pia_sint)
 {
-	pia6821_device *pia = downcast<pia6821_device *>(machine().device("sndpia1"));
-	int combined_state = pia->irq_a_state() | pia->irq_b_state();
+	int combined_state = m_sndpia1->irq_a_state() | m_sndpia1->irq_b_state();
 
 	/* SINT is connected to the sound CPU's IRQ line */
 	machine().device("audiocpu")->execute().set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);

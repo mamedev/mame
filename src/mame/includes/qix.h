@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "sound/sn76496.h"
@@ -25,6 +26,14 @@ class qix_state : public driver_device
 public:
 	qix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+		m_maincpu(*this, "maincpu"),
+		m_videocpu(*this, "videocpu"),
+		m_pia0(*this, "pia0"),
+		m_pia1(*this, "pia1"),
+		m_pia2(*this, "pia2"),
+		m_sndpia0(*this, "sndpia0"),
+		m_sndpia1(*this, "sndpia1"),
+		m_sndpia2(*this, "sndpia2"),
 		m_sn1 (*this, "sn1"),
 		m_sn2 (*this, "sn2"),
 		m_68705_port_out(*this, "68705_port_out"),
@@ -37,6 +46,14 @@ public:
 		m_discrete(*this, "discrete") { }
 
 	/* devices */
+	required_device<m6809_device> m_maincpu;
+	required_device<m6809_device> m_videocpu;
+	required_device<pia6821_device> m_pia0;
+	required_device<pia6821_device> m_pia1;
+	required_device<pia6821_device> m_pia2;
+	required_device<pia6821_device> m_sndpia0;
+	optional_device<pia6821_device> m_sndpia1;
+	optional_device<pia6821_device> m_sndpia2;
 	optional_device<sn76489_device> m_sn1;
 	optional_device<sn76489_device> m_sn2;
 
@@ -87,6 +104,7 @@ public:
 	DECLARE_MACHINE_START(qixmcu);
 	DECLARE_VIDEO_START(qix);
 	TIMER_CALLBACK_MEMBER(pia_w_callback);
+	TIMER_CALLBACK_MEMBER(deferred_sndpia1_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(qix_vsync_changed);
 	DECLARE_READ8_MEMBER(qixmcu_coin_r);
 	DECLARE_WRITE8_MEMBER(qixmcu_coin_w);

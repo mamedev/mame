@@ -1256,8 +1256,8 @@ static int kram3_decrypt(int address, int value)
 
 DRIVER_INIT_MEMBER(qix_state,kram3)
 {
-	address_space &mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	address_space &videospace = machine().device("videocpu")->memory().space(AS_PROGRAM);
+	address_space &mainspace = m_maincpu->space(AS_PROGRAM);
+	address_space &videospace = m_videocpu->space(AS_PROGRAM);
 	//const UINT8 *patch;
 	UINT8 *rom, *decrypted;
 	int i;
