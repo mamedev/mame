@@ -339,13 +339,25 @@ COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, driver_device, 0,  "Micr
 
 DGOS-Z80 (ETI-680)
 
-ROM is a bad dump, corrections are being made.
+This is a S100 card.
+
+ROM is a bad dump, scanned from a pdf. It is being worked on.
+
+No schematic available, most of this is guesswork.
+
+ToDo:
+- dips
+- leds
+- need schematic to find out what else is missing
+
 */
 
 
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
+#include "cpu/z80/z80daisy.h"
+
 
 class dgosz80_state : public binbug_state
 {
@@ -391,6 +403,15 @@ void dgosz80_state::machine_reset()
 	m_maincpu->set_pc(0xd000);
 }
 
+// this is a guess there is no information available
+static const z80_daisy_config dgosz80_daisy_chain[] =
+{
+	{ "z80ctc" },
+	{ "z80pio" },
+	{ NULL }
+};
+
+
 /* Input ports */
 static INPUT_PORTS_START( dgosz80 )
 INPUT_PORTS_END
@@ -398,7 +419,9 @@ INPUT_PORTS_END
 WRITE8_MEMBER( dgosz80_state::kbd_put )
 {
 	m_term_data = data;
-	m_pio->port_a_write(data);//keyb_r(generic_space(),0,0xff));
+	/* strobe in keyboard data */
+	m_pio->strobe_a(0);
+	m_pio->strobe_a(1);
 }
 
 static ASCII_KEYBOARD_INTERFACE( dgosz80_keyboard_intf )
@@ -418,7 +441,7 @@ static Z80PIO_INTERFACE( z80pio_intf )
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //IRQ
 	DEVCB_DRIVER_MEMBER(dgosz80_state, porta_r),  // in port A
 	DEVCB_NULL,  // out port A
-	DEVCB_NULL,
+	DEVCB_NULL, // ready line port A - this activates to ask for kbd data but not known if actually used
 	DEVCB_NULL, // in port B
 	DEVCB_NULL,                 // out port B
 	DEVCB_NULL
@@ -428,7 +451,7 @@ static Z80CTC_INTERFACE( z80ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),       // interrupt handler
 	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),        // ZC/TO0 callback
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),        // ZC/TO1 callback, beep interface
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),        // ZC/TO1 callback
 	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)     // ZC/TO2 callback
 };
 
@@ -437,6 +460,7 @@ static MACHINE_CONFIG_START( dgosz80, dgosz80_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(dgosz80_mem)
 	MCFG_CPU_IO_MAP(dgosz80_io)
+	MCFG_CPU_CONFIG(dgosz80_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -461,10 +485,13 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( dgosz80 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dgosz80.rom", 0xd000, 0x0800, NO_DUMP) //CRC(2cb1ac6e) SHA1(a969883fc767484d6b0fa103cfa4b4129b90441b) )
+	ROM_LOAD( "dgosz80.rom", 0xd000, 0x0800, NO_DUMP)
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "6574.bin", 0x0000, 0x0800, CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.bin", 0x0000, 0x0020, NO_DUMP )
 ROM_END
 
 /* Driver */
