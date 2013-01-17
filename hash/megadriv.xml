@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
     UNDUMPED / TO BE REDUMPED LIST
@@ -27651,6 +27651,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
+
+
+	<software name="smario64">
+		<description>Super Mario World 64 (Unl)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="super mario world 64 (unl).bin" size="1048576" crc="e7ac4161" sha1="2ccf970fffd173f1984e69617c330a8f297f3481" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="mgs" cloneof="crkdown">
 		<description>Metal Gear Solid (Rus)</description>
