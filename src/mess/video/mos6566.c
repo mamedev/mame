@@ -789,6 +789,7 @@ void mos6566_device::device_reset()
 
 	m_cycle = 14;
 	m_raster_x = 0x004;
+	m_graphic_x = 0;
 
 	m_on = 1;
 
