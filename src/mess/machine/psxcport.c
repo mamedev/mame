@@ -1,201 +1,197 @@
 /* PAD emulation */
 
-#include "psxcport.h"
-#include "machine/psxcard.h"
+#include "machine/psxcport.h"
+#include "machine/psxanalog.h"
 
-#define PAD_STATE_IDLE ( 0 )
-#define PAD_STATE_LISTEN ( 1 )
-#define PAD_STATE_ACTIVE ( 2 )
-#define PAD_STATE_READ ( 3 )
-#define PAD_STATE_UNLISTEN ( 4 )
-#define PAD_STATE_MEMCARD ( 5 )
+const device_type PSX_CONTROLLER_PORT = &device_creator<psx_controller_port_device>;
 
-#define PAD_TYPE_STANDARD ( 4 )
-#define PAD_BYTES_STANDARD ( 2 )
+psx_controller_port_device::psx_controller_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		device_t(mconfig, PSX_CONTROLLER_PORT, "Playstation Controller Port", tag, owner, clock),
+		device_slot_interface(mconfig, *this),
+		m_card(*this, "card")
+{
+}
 
-#define PAD_CMD_START ( 0x01 )
-#define PAD_CMD_READ  ( 0x42 ) /* B */
+void psx_controller_port_device::device_config_complete()
+{
+	m_dev = dynamic_cast<device_psx_controller_interface *>(get_card_device());
+}
 
-#define PAD_DATA_OK   ( 0x5a ) /* Z */
-#define PAD_DATA_IDLE ( 0xff )
+static MACHINE_CONFIG_FRAGMENT( psx_memory_card )
+	MCFG_PSXCARD_ADD("card")
+MACHINE_CONFIG_END
+
+machine_config_constructor psx_controller_port_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( psx_memory_card );
+}
 
 const device_type PSXCONTROLLERPORTS = &device_creator<psxcontrollerports_device>;
 
 psxcontrollerports_device::psxcontrollerports_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	psxsiodev_device(mconfig, PSXCONTROLLERPORTS, "PSXCONTROLLERPORTS", tag, owner, clock)
+		psxsiodev_device(mconfig, PSXCONTROLLERPORTS, "PSXCONTROLLERPORTS", tag, owner, clock)
 {
 }
 
 void psxcontrollerports_device::device_start()
 {
+	m_port0 = machine().device<psx_controller_port_device>("port1");
+	m_port1 = machine().device<psx_controller_port_device>("port2");
+	m_port0->setup_ack_cb(psx_controller_port_device::void_cb(FUNC(psxcontrollerports_device::ack), this));
+	m_port1->setup_ack_cb(psx_controller_port_device::void_cb(FUNC(psxcontrollerports_device::ack), this));
 	psxsiodev_device::device_start();
-
-	m_ack_timer = timer_alloc( 0 );
 }
 
-void psxcontrollerports_device::device_timer(emu_timer &timer, device_timer_id tid, int param, void *ptr)
-{
-	int n_port = param;
-	pad_t *pad = &m_pad[ n_port ];
-
-	if( pad->n_state != PAD_STATE_IDLE )
-	{
-		data_out( pad->b_ack * PSX_SIO_IN_DSR, PSX_SIO_IN_DSR );
-
-		if( !pad->b_ack )
-		{
-			pad->b_ack = 1;
-			m_ack_timer->adjust( attotime::from_usec( 2 ), n_port );
-		}
-	}
-}
-
-void psxcontrollerports_device::psx_pad( int n_port, int n_data )
-{
-	pad_t *pad = &m_pad[ n_port ];
-	int b_sel;
-	int b_clock;
-	int b_data;
-	int b_ack;
-	int b_ready;
-	static const char *const portnames[] = { ":IN0", ":IN1", ":IN2", ":IN3" };
-	psxcard_device *psxcard = NULL;
-
-	if (n_port == 0)
-	{
-		psxcard = machine().device<psxcard_device>(":card1");
-	}
-	else
-	{
-		psxcard = machine().device<psxcard_device>(":card2");
-	}
-
-	b_sel = ( n_data & PSX_SIO_OUT_DTR ) / PSX_SIO_OUT_DTR;
-	b_clock = ( n_data & PSX_SIO_OUT_CLOCK ) / PSX_SIO_OUT_CLOCK;
-	b_data = ( n_data & PSX_SIO_OUT_DATA ) / PSX_SIO_OUT_DATA;
-	b_ready = 0;
-	b_ack = 0;
-
-	if( b_sel )
-	{
-		pad->n_state = PAD_STATE_IDLE;
-	}
-
-	switch( pad->n_state )
-	{
-	case PAD_STATE_LISTEN:
-	case PAD_STATE_ACTIVE:
-	case PAD_STATE_READ:
-	case PAD_STATE_MEMCARD:
-		if( pad->b_lastclock && !b_clock )
-		{
-			data_out( ( pad->n_shiftout & 1 ) * PSX_SIO_IN_DATA, PSX_SIO_IN_DATA );
-			pad->n_shiftout >>= 1;
-		}
-		if( !pad->b_lastclock && b_clock )
-		{
-			pad->n_shiftin >>= 1;
-			pad->n_shiftin |= b_data << 7;
-			pad->n_bits++;
-
-			if( pad->n_bits == 8 )
-			{
-				pad->n_bits = 0;
-				b_ready = 1;
-			}
-		}
-		break;
-	}
-
-	pad->b_lastclock = b_clock;
-
-	switch( pad->n_state )
-	{
-	case PAD_STATE_IDLE:
-		if( !b_sel )
-		{
-			pad->n_state = PAD_STATE_LISTEN;
-			pad->n_shiftout = PAD_DATA_IDLE;
-			pad->n_bits = 0;
-		}
-		break;
-	case PAD_STATE_LISTEN:
-		if( b_ready )
-		{
-			if( pad->n_shiftin == PAD_CMD_START )
-			{
-				pad->n_state = PAD_STATE_ACTIVE;
-				pad->n_shiftout = ( PAD_TYPE_STANDARD << 4 ) | ( PAD_BYTES_STANDARD >> 1 );
-				b_ack = 1;
-			}
-			else if( psxcard->transfer(pad->n_shiftin, &pad->n_shiftout) )
-			{
-				pad->n_state = PAD_STATE_MEMCARD;
-				b_ack = 1;
-			}
-			else
-			{
-				pad->n_state = PAD_STATE_UNLISTEN;
-			}
-		}
-		break;
-	case PAD_STATE_MEMCARD:
-		if( b_ready )
-		{
-			if( psxcard->transfer(pad->n_shiftin, &pad->n_shiftout) )
-			{
-				b_ack = 1;
-			}
-			else
-			{
-				b_ack = 0;
-				pad->n_state = PAD_STATE_IDLE;
-			}
-		}
-		break;
-	case PAD_STATE_ACTIVE:
-		if( b_ready )
-		{
-			if( pad->n_shiftin == PAD_CMD_READ )
-			{
-				pad->n_state = PAD_STATE_READ;
-				pad->n_shiftout = PAD_DATA_OK;
-				pad->n_byte = 0;
-				b_ack = 1;
-			}
-			else
-			{
-				pad->n_state = PAD_STATE_UNLISTEN;
-			}
-		}
-		break;
-	case PAD_STATE_READ:
-		if( b_ready )
-		{
-			if( pad->n_byte < PAD_BYTES_STANDARD )
-			{
-				pad->n_shiftout = ioport(portnames[pad->n_byte + ( n_port * PAD_BYTES_STANDARD )])->read();
-				pad->n_byte++;
-				b_ack = 1;
-			}
-			else
-			{
-				pad->n_state = PAD_STATE_LISTEN;
-			}
-		}
-		break;
-	}
-
-	if( b_ack )
-	{
-		pad->b_ack = 0;
-		m_ack_timer->adjust( attotime::from_usec( 10 ), n_port );
-	}
-}
+SLOT_INTERFACE_START(psx_controllers)
+	SLOT_INTERFACE("digital_pad", PSX_STANDARD_CONTROLLER)
+	SLOT_INTERFACE("analog_pad", PSX_ANALOG_CONTROLLER)
+SLOT_INTERFACE_END
 
 void psxcontrollerports_device::data_in( int data, int mask )
 {
-	/* todo: raise data & ack when nothing is driving it low */
-	psx_pad( 0, data );
-	psx_pad( 1, data ^ PSX_SIO_OUT_DTR );
+	m_port0->sel_w((data & PSX_SIO_OUT_DTR)?1:0);
+	m_port0->tx_w((data & PSX_SIO_OUT_DATA)?1:0);
+	m_port0->clock_w((data & PSX_SIO_OUT_CLOCK)?1:0); // clock must be last
+
+	m_port1->tx_w((data & PSX_SIO_OUT_DATA)?1:0);
+	m_port1->sel_w((data & PSX_SIO_OUT_DTR)?0:1); // not dtr
+	m_port1->clock_w((data & PSX_SIO_OUT_CLOCK)?1:0);
+
+	data_out(((m_port0->rx_r() && m_port1->rx_r()) * PSX_SIO_IN_DATA), PSX_SIO_IN_DATA);
+}
+
+void psxcontrollerports_device::ack()
+{
+	data_out((!(m_port0->ack_r() && m_port1->ack_r()) * PSX_SIO_IN_DSR), PSX_SIO_IN_DSR);
+}
+
+device_psx_controller_interface::device_psx_controller_interface(const machine_config &mconfig, device_t &device) :
+		device_slot_card_interface(mconfig, device)
+{
+}
+
+device_psx_controller_interface::~device_psx_controller_interface()
+{
+}
+
+void device_psx_controller_interface::interface_pre_reset()
+{
+	m_bit = 0;
+	m_count = 0;
+	m_idata = 0;
+	m_memcard = false;
+
+	m_clock = true;
+	m_sel = true;
+	m_rx = true;
+	m_ack = true;
+	m_owner->ack();
+}
+
+void device_psx_controller_interface::interface_pre_start()
+{
+	m_owner = dynamic_cast<psx_controller_port_device *>(device().owner());
+	m_ack_timer = device().machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(device_psx_controller_interface::ack_timer), this));
+}
+
+void device_psx_controller_interface::ack_timer(void *ptr, int param)
+{
+	m_ack = param;
+	m_owner->ack();
+
+	if(!param)
+		m_ack_timer->adjust(attotime::from_usec(2), 1);
+}
+
+void device_psx_controller_interface::do_pad()
+{
+	if(!m_bit)
+	{
+		if(!m_count)
+			m_odata = 0xff;
+		m_idata = 0;
+	}
+
+	m_rx = (m_odata & (1 << m_bit)) ? true : false;
+	m_idata |= (m_owner->tx_r()?1:0) << m_bit;
+	m_bit = (m_bit + 1) % 8;
+
+	if(!m_bit)
+	{
+		if((!m_count) && (m_idata & 0x80))
+		{
+				m_memcard = true;
+				return;
+		}
+
+		if(get_pad(m_count++, &m_odata, m_idata))
+			m_ack_timer->adjust(attotime::from_usec(10), 0);
+		else
+			m_count = 0;
+	}
+}
+
+void device_psx_controller_interface::sel_w(bool state) {
+	if(state && !m_sel)
+		interface_pre_reset(); // don't reset the controller, just the interface
+	m_sel = state;
+}
+
+const device_type PSX_STANDARD_CONTROLLER = &device_creator<psx_standard_controller_device>;
+
+psx_standard_controller_device::psx_standard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+		device_t(mconfig, PSX_STANDARD_CONTROLLER, "Playstation Standard Controller", tag, owner, clock),
+		device_psx_controller_interface(mconfig, *this)
+{
+}
+
+bool psx_standard_controller_device::get_pad(int count, UINT8 *odata, UINT8 idata)
+{
+	switch(count)
+	{
+		case 0:
+			*odata = 0x41;
+			break;
+		case 1:
+			if(idata != QUERY_PAD_STATE)
+				return false;
+			*odata = 0x5a;
+			break;
+		case 2:
+			*odata = ioport("PSXPAD0")->read();
+			break;
+		case 3:
+			*odata = ioport("PSXPAD1")->read();
+			break;
+		case 4:
+			return false;
+	}
+	return true;
+}
+
+static INPUT_PORTS_START( psx_standard_controller )
+	PORT_START("PSXPAD0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SELECT )
+
+	PORT_START("PSXPAD1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Square")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Cross")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Circle")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Triangle")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("R1")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("L1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("R2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("L2")
+INPUT_PORTS_END
+
+ioport_constructor psx_standard_controller_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(psx_standard_controller);
 }
