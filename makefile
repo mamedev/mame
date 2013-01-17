@@ -518,6 +518,14 @@ COBJFLAGS += \
 CPPONLYFLAGS += \
 	-Woverloaded-virtual
 
+ifneq (,$(findstring clang,$(CC)))
+CCOMFLAGS += \
+	-Wno-cast-align \
+	-Wno-tautological-compare \
+	-Wno-constant-logical-operand \
+	-Wno-format-security
+endif
+
 
 #-------------------------------------------------
 # include paths
