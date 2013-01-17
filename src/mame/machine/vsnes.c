@@ -657,7 +657,7 @@ static void mapper4_irq( device_t *device, int scanline, int vblank, int blanked
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
 		int priorCount = state->m_IRQ_count;
-		if ((state->m_IRQ_count == 0))
+		if (state->m_IRQ_count == 0)
 		{
 			state->m_IRQ_count = state->m_IRQ_count_latch;
 		}

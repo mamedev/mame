@@ -427,7 +427,7 @@ static int check_sprite_left_goal_collision(running_machine &machine, int x1, in
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
-				if ((state->m_sprite_goal_collision_bitmap1->pix16(y, x) == 1))
+				if (state->m_sprite_goal_collision_bitmap1->pix16(y, x) == 1)
 				{
 					pen_t pix = state->m_sprite_goal_collision_bitmap2->pix16(y, x);
 
@@ -485,7 +485,7 @@ static int check_sprite_right_goal_collision(running_machine &machine, int x1, i
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
-				if ((state->m_sprite_goal_collision_bitmap1->pix16(y, x) == 1))
+				if (state->m_sprite_goal_collision_bitmap1->pix16(y, x) == 1)
 				{
 					pen_t pix = state->m_sprite_goal_collision_bitmap2->pix16(y, x);
 
@@ -525,7 +525,7 @@ static int check_sprite_border_collision(running_machine &machine, UINT8 x1, UIN
 
 	for (x = 0; x < SPRITE_WIDTH; x++)
 		for (y = 0; y < SPRITE_HEIGHT; y++)
-			if ((state->m_sprite_border_collision_bitmap->pix16(y, x) == 1))
+			if (state->m_sprite_border_collision_bitmap->pix16(y, x) == 1)
 			{
 				if (((UINT8)(x1 + x) == LEFT_BORDER) ||
 					((UINT8)(x1 + x) == RIGHT_BORDER))

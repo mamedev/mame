@@ -277,7 +277,7 @@ static void lamp_extend_small(mpu4_state *state, int data)
 
 	lamp_ext_data = 0x1f - ((data & 0xf8) >> 3);//remove the mux lines from the data
 
-	if ((state->m_lamp_strobe_ext_persistence == 0))
+	if (state->m_lamp_strobe_ext_persistence == 0)
 	//One write to reset the drive lines, one with the data, one to clear the lines, so only the 2nd write does anything
 	//Once again, lamp persistences would take care of this, but we can't do that
 	{
