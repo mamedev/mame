@@ -262,7 +262,7 @@
 
     This is the only explanation I found to allow a normal boot, and seems to be
     created as a protection method that don't allow owners to use a ROM-swap on
-    his boards, converting one game to another.
+    their boards, converting from one game to another.
 
 
 *******************************************************************************
@@ -320,6 +320,17 @@
     In the double-up game, a covered card should be shown. Press BIG or SMALL to get
     your chance...
 
+
+    * Bonne Chance!
+
+    This is a French/English poker game and maybe the hardware was meant for it.
+    Seems to be the prototype or prequel of the well known Bonanza's 'Golden Poker'
+    and 'Jack Potten Poker' (Good Luck!). Also some Cal Omega poker games are based
+    on this poker game.
+
+    With the default DIP switches positions, the game is totally in French, and is
+    titled 'BONNE CHANCE!'. Turning the 4th DIP switch ON, the game switch to English,
+	and the title changes to 'GOOD LUCK!' (as the above mentioned games).
 
 
 *******************************************************************************
@@ -400,11 +411,13 @@
     [2013-01-17]
     - Added Bonne Chance!. A French/English poker game prototype of
 	   the well known 'Golden Poker' and 'Jack Potten Poker'.
+    - Worked complete inputs from the scratch. Promoted to working.
+    - Added some notes.
 
 
     TODO:
 
-    - Inputs and palette for Bonne Chance!.
+    - Palette for Bonne Chance!.
     - Simplify the gfx banks to avoid a custom palette.
     - Document the correct pinout.
     - Analyze the PLD. Try to reconstruct the original equations.
@@ -745,6 +758,76 @@ static INPUT_PORTS_START( 7mezzo )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bchance )
+/*  Multiplexed 4 x 5 bits.
+    Code accept only bits 0, 1, 2, 3 and 5 as valid.
+
+    Input Test grid...
+
+        C1 C2 C3 C4 C5
+
+    R1  0  0  0  0  0
+    R2  0  0  0  0  0
+    R3  0  0  0  0  0
+    R4  0  0  0  0  0
+*/
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )											// input test R1C1 (coin 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )											// input test R1C2 (coin 2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN0-3")	// input test R1C3 (unknown)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN0-4")	// input test R1C4 (unknown)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN0-6")	// input test R1C5 (unknown)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )	   PORT_NAME("Small")				// input test R2C1 (small)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )   PORT_NAME("Big")					// input test R2C2 (big)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Payout")				// input test R2C3 (payout)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )									// input test R2C4 (take)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN1-6")	// input test R2C5 (unknown)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	// input test R3C1 (hold 4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	// input test R3C2 (hold 5)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	// input test R3C3 (hold 2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	// input test R3C4 (hold 3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	// input test R3C5 (hold 1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )	// input test R4C1 (start/deal)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL	)	// input test R4C2 (cancel)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )	// input test R4C3 (service/test)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )	// input test R4C4 (d-up)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )		// input test R4C5 (bet)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW0")
+/*  Only 4 phisical DIP switches
+    (valid bits = 4, 6, 7)
+*/
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, "Bet Max" )
+	PORT_DIPSETTING(    0x10, "20" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Language" )
+	PORT_DIPSETTING(    0x80, "French" )
+	PORT_DIPSETTING(    0x00, "English" )
 INPUT_PORTS_END
 
 
@@ -889,9 +972,9 @@ ROM_START( 7mezzo )
 	ROM_COPY( "gfx",    0x1800, 0x0000, 0x0800 )    /* chars */
 
 	ROM_REGION( 0x1800, "gfxbnk1", 0 )
-	ROM_COPY( "gfx",    0x1000, 0x0000, 0x0800 )    /* sprites, bitplane 1 */
-	ROM_COPY( "gfx",    0x3800, 0x0800, 0x0800 )    /* sprites, bitplane 2 */
-	ROM_COPY( "gfx",    0x5800, 0x1000, 0x0800 )    /* sprites, bitplane 3 */
+	ROM_COPY( "gfx",    0x1000, 0x0000, 0x0800 )    /* 3bpp tiles, bitplane 1 */
+	ROM_COPY( "gfx",    0x3800, 0x0800, 0x0800 )    /* 3bpp tiles, bitplane 2 */
+	ROM_COPY( "gfx",    0x5800, 0x1000, 0x0800 )    /* 3bpp tiles, bitplane 3 */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16r4a-7mezzo.bin",    0x0000, 0x0104, BAD_DUMP CRC(61ac7372) SHA1(7560506468a7409075094787182ded24e2d0c0a3) )
@@ -911,9 +994,9 @@ ROM_START( bchance )
 	ROM_COPY( "gfx",	0x1800, 0x0000, 0x0800 )	/* chars */
 
 	ROM_REGION( 0x1800, "gfxbnk1", 0 )
-	ROM_COPY( "gfx",	0x1000, 0x0000, 0x0800 )	/* sprites, bitplane 1 */
-	ROM_COPY( "gfx",	0x3800, 0x0800, 0x0800 )	/* sprites, bitplane 2 */
-	ROM_COPY( "gfx",	0x5800, 0x1000, 0x0800 )	/* sprites, bitplane 3 */
+	ROM_COPY( "gfx",	0x1000, 0x0000, 0x0800 )	/* 3bpp tiles, bitplane 1 */
+	ROM_COPY( "gfx",	0x3800, 0x0800, 0x0800 )	/* 3bpp tiles, bitplane 2 */
+	ROM_COPY( "gfx",	0x5800, 0x1000, 0x0800 )	/* 3bpp tiles, bitplane 3 */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "gal16v8-bchance.bin",	0x0000, 0x0104, NO_DUMP )	// protected.
@@ -927,4 +1010,4 @@ ROM_END
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT   ROT    COMPANY      FULLNAME                         FLAGS... */
 GAME( 198?, magicfly, 0,      magicfly, magicfly, driver_device, 0,     ROT0, "P&A Games", "Magic Fly",                      0 )
 GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo,   driver_device, 0,     ROT0, "<unknown>", "7 e Mezzo",                      0 )
-GAME( 198?, bchance,  0,      magicfly, bchance,  driver_device, 0,     ROT0, "<unknown>", "Bonne Chance! (French/English)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 198?, bchance,  0,      magicfly, bchance,  driver_device, 0,     ROT0, "<unknown>", "Bonne Chance! (French/English)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS )
