@@ -10157,8 +10157,6 @@ sexyboom        // (c) 1992 Sang Ho Soft
 sfkick          // (c) 1988 Haesung/HJ Corp
 sfkicka         // (c) 198? Haesung
 spinkick        // (c) 1988 Haesung/Seojin
-7mezzo          // (c) 198? Unknown
-magicfly        // (c) 198? P&A GAMES
 dynabomb        // (c) 2000 Limenko
 legendoh        // (c) 2000 Limenko
 sb2003          // (c) 2003 Limenko
@@ -10166,6 +10164,11 @@ sb2003a         // (c) 2003 Limenko
 spotty          // (c) 2001 Prince Co.
 carrera         // (c) 19?? BS Electronics
 chance32        // (c) 19?? PAL Company
+
+// Magic Fly hardware
+magicfly        // (c) 198? P&A GAMES
+7mezzo          // 198? Unknown
+bchance         // 198? Unknown
 
 // Golden Poker / Potten's Poker / Witch Card hardware
 goldnpkr        // (c) 1981 Bonanza

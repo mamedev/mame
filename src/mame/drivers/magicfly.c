@@ -8,8 +8,9 @@
 
     Games running on this hardware:
 
-    * Magic Fly (P&A Games),    198?
-    * 7 e Mezzo (Unknown),      198?
+    * Magic Fly (P&A Games),          198?
+    * 7 e Mezzo (Unknown),            198?
+    * Bonne Chance! (French/English), 198?
 
 
     **** NOTE ****
@@ -396,12 +397,17 @@
     - Created and minimized the color palette for both gfx banks.
     - Fixed colors for magicfly and 7mezzo.
 
+    [2013-01-17]
+    - Added Bonne Chance!. A French/English poker game prototype of
+	   the well known 'Golden Poker' and 'Jack Potten Poker'.
+
 
     TODO:
 
+    - Inputs and palette for Bonne Chance!.
     - Simplify the gfx banks to avoid a custom palette.
     - Document the correct pinout.
-    - Analyze the PLD. Try to reconstruct.
+    - Analyze the PLD. Try to reconstruct the original equations.
     - Split the driver.
 
 
@@ -738,6 +744,9 @@ static INPUT_PORTS_START( 7mezzo )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( bchance )
+INPUT_PORTS_END
+
 
 /*************************
 *    Graphics Layouts    *
@@ -888,11 +897,34 @@ ROM_START( 7mezzo )
 	ROM_LOAD( "pal16r4a-7mezzo.bin",    0x0000, 0x0104, BAD_DUMP CRC(61ac7372) SHA1(7560506468a7409075094787182ded24e2d0c0a3) )
 ROM_END
 
+ROM_START( bchance )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v-pk-4gag.bin",	0xc000, 0x4000, CRC(7c2dd908) SHA1(97b1390fb4c8c838a0d5b78d6904d597a9abe27f) )
+
+	ROM_REGION( 0x6000, "gfx", 0 )
+	ROM_LOAD( "n-pk-2.bin",	0x0000, 0x2000, BAD_DUMP CRC(462c3dd7) SHA1(fb30d6147e0d607b3fb631d8bdca35e98eccfd2d) )	// from an exhaustive analysis of 25 different bad dumps
+	ROM_LOAD( "n-pk-1.bin",	0x2000, 0x2000, CRC(e35cebd6) SHA1(b0dd86fd4c06f98e486b04e09808985bfa4f0e9c) )
+	ROM_LOAD( "n-pk-0.bin",	0x4000, 0x2000, CRC(3c64edc4) SHA1(97b677b7c4999b502ab4b4f70c33b40050843796) )
+
+	ROM_REGION( 0x0800, "gfxbnk0", 0 )
+//  ROM_FILL(           0x0000, 0x1000, 0 )         /* filling the R-G bitplanes */
+	ROM_COPY( "gfx",	0x1800, 0x0000, 0x0800 )	/* chars */
+
+	ROM_REGION( 0x1800, "gfxbnk1", 0 )
+	ROM_COPY( "gfx",	0x1000, 0x0000, 0x0800 )	/* sprites, bitplane 1 */
+	ROM_COPY( "gfx",	0x3800, 0x0800, 0x0800 )	/* sprites, bitplane 2 */
+	ROM_COPY( "gfx",	0x5800, 0x1000, 0x0800 )	/* sprites, bitplane 3 */
+
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "gal16v8-bchance.bin",	0x0000, 0x0104, NO_DUMP )	// protected.
+ROM_END
+
 
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY      FULLNAME    FLAGS... */
-GAME( 198?, magicfly, 0,      magicfly, magicfly, driver_device, 0,     ROT0, "P&A Games", "Magic Fly", 0 )
-GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo, driver_device,   0,     ROT0, "<unknown>", "7 e Mezzo", 0 )
+/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT   ROT    COMPANY      FULLNAME                         FLAGS... */
+GAME( 198?, magicfly, 0,      magicfly, magicfly, driver_device, 0,     ROT0, "P&A Games", "Magic Fly",                      0 )
+GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo,   driver_device, 0,     ROT0, "<unknown>", "7 e Mezzo",                      0 )
+GAME( 198?, bchance,  0,      magicfly, bchance,  driver_device, 0,     ROT0, "<unknown>", "Bonne Chance! (French/English)", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
