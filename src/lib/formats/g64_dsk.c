@@ -95,13 +95,13 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	int track_count = img[0x09];
 
 	int pos = 0x0c;
-	int track_offset[track_count];
+	int track_offset[84*2];
 	for(int track = 0; track < track_count; track++) {
 		track_offset[track] = pick_integer_le(img, pos, 4);
 		pos += 4;
 	}
 
-	int speed_zone_offset[track_count];
+	int speed_zone_offset[84*2];
 	for(int track = 0; track < track_count; track++) {
 		speed_zone_offset[track] = pick_integer_le(img, pos, 4);
 		pos += 4;
