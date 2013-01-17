@@ -134,7 +134,7 @@ public:
 	virtual void abcbus_xmemw(offs_t offset, UINT8 data) { };
 
 public:
-	abcbus_slot_device  *m_bus;
+	abcbus_slot_device  *m_slot;
 };
 
 

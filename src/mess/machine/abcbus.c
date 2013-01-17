@@ -30,6 +30,7 @@ const device_type ABCBUS_SLOT = &device_creator<abcbus_slot_device>;
 device_abcbus_card_interface::device_abcbus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 {
+	m_slot = dynamic_cast<abcbus_slot_device *>(device.owner());
 }
 
 

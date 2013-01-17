@@ -26,22 +26,22 @@ const device_type ABC850 = &device_creator<abc850_device>;
 
 WRITE_LINE_MEMBER( abc890_device::int_w )
 {
-	m_bus->int_w(state);
+	m_slot->int_w(state);
 }
 
 WRITE_LINE_MEMBER( abc890_device::nmi_w )
 {
-	m_bus->nmi_w(state);
+	m_slot->nmi_w(state);
 }
 
 WRITE_LINE_MEMBER( abc890_device::rdy_w )
 {
-	m_bus->rdy_w(state);
+	m_slot->rdy_w(state);
 }
 
 WRITE_LINE_MEMBER( abc890_device::resin_w )
 {
-	m_bus->resin_w(state);
+	m_slot->resin_w(state);
 }
 
 static ABCBUS_INTERFACE( abcbus_intf )

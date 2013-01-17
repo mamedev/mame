@@ -663,7 +663,7 @@ WRITE8_MEMBER( luxor_55_10828_device::status_w )
 	m_status = data & 0xfe;
 
 	// interrupt
-	m_bus->int_w(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+	m_slot->int_w(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
