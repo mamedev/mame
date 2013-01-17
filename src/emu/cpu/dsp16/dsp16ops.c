@@ -540,10 +540,10 @@ void dsp16_device::execute_one(const UINT16& op, UINT8& cycles, UINT8& pcAdvance
 			const UINT8 CON = (op & 0x001f);
 			bool conditionFulfilled = conditionTest(CON);
 			cycles = 3;					// TODO: This may need to interact with the next opcode to make sure it doesn't exceed 3?
-			switch (conditionFulfilled)
+			pcAdvance = 1;
+			if (!conditionFulfilled)
 			{
-				case true:  pcAdvance = 1; break;
-				case false: pcAdvance = 2; break;
+				pcAdvance = 2;
 			}
 			break;
 		}
