@@ -35,7 +35,7 @@
 
     formats/g64_dsk.c
 
-    Commodore 1541 GCR disk image format
+    Commodore 1541/1571 GCR disk image format
 
 *********************************************************************/
 
@@ -60,7 +60,7 @@ const char *g64_format::description() const
 
 const char *g64_format::extensions() const
 {
-	return "g64";
+	return "g64,g41,g71";
 }
 
 const UINT32 g64_format::c1541_cell_size[] =
@@ -76,7 +76,7 @@ int g64_format::identify(io_generic *io, UINT32 form_factor)
 	UINT8 header[8];
 
 	io_generic_read(io, &header, 0, sizeof(header));
-	if ( memcmp( header, G64_FORMAT_HEADER, 8 ) ==0) {
+	if ( memcmp( header, G64_FORMAT_HEADER, 8 ) == 0) {
 		return 100;
 	}
 	return 0;
@@ -88,7 +88,11 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	UINT8 *img = global_alloc_array(UINT8, size);
 	io_generic_read(io, img, 0, size);
 
-	int track_count = pick_integer_le(img, 9, 2);
+	int version = img[0x08];
+	if (version)
+		throw emu_fatalerror("g64_format: Unsupported version %u", version);
+
+	int track_count = img[0x09];
 
 	int pos = 0x0c;
 	int track_offset[track_count];
@@ -109,27 +113,36 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		if (pos > 0) {
 			track_size = pick_integer_le(img, pos, 2);
 			pos +=2;
-		}
 		
-		if (speed_zone_offset[track] > 3)
-			throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
+			if (speed_zone_offset[track] > 3)
+				throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
 
-		UINT32 cell_size = c1541_cell_size[speed_zone_offset[track]];
-		int total_size = 200000000/cell_size;
-		UINT32 *buffer = global_alloc_array_clear(UINT32, total_size);
-		int offset = 0;
+			UINT32 cell_size = c1541_cell_size[speed_zone_offset[track]];
+			int total_size = 200000000/cell_size;
+			UINT32 *buffer = global_alloc_array_clear(UINT32, total_size);
+			int offset = 0;
 
-		if (pos > 0) {
-			for (int i=0; i<track_size; i++) {
-				raw_w(buffer, offset, 8, img[pos++], cell_size);
+			for (int i=0; i<track_size; i++, pos++) {
+				for (int bit=7; bit>=0; bit--) {
+					bit_w(buffer, offset++, BIT(img[pos], bit), cell_size);
+					if (offset == total_size) break;
+				}
 			}
 
-			if (offset >= total_size)
-				throw emu_fatalerror("g64_format: Too many cells for track %d", track);
-		}
+			if (offset < total_size) {
+				// pad the remainder of the track with sync
+				int count = (total_size-offset);
+				for (int i=0; i<count;i++) {
+					bit_w(buffer, offset++, 1, cell_size);
+				}
+			}
 
-		generate_track_from_levels(track, 0, buffer, total_size, 0, image);
-		global_free(buffer);
+			int physical_track = track >= 84 ? track - 84 : track;
+			int head = track >= 84;
+
+			generate_track_from_levels(physical_track, head, buffer, total_size, 0, image);
+			global_free(buffer);
+		}
 	}
 
 	image->set_variant(floppy_image::SSSD);

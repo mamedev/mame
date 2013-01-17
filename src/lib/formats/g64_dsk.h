@@ -2,7 +2,7 @@
 
     formats/g64_dsk.h
 
-    Commodore 1541 GCR disk image format
+    Commodore 1541/1571 GCR disk image format
 
 *********************************************************************/
 
