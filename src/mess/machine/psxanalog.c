@@ -19,7 +19,7 @@ void psx_analog_controller_device::device_reset()
 
 UINT8 psx_analog_controller_device::pad_data(int count, bool analog)
 {
-	UINT8 data;
+	UINT8 data = 0;
 	switch(count)
 	{
 		case 2:
@@ -236,5 +236,5 @@ ioport_constructor psx_analog_controller_device::device_input_ports() const
 INPUT_CHANGED_MEMBER(psx_analog_controller_device::change_mode)
 {
 	if(!m_analoglock)
-		m_analogmode = ioport("PSXPAD1")->read();
+		m_analogmode = ioport("PSXMISC")->read();
 }
