@@ -354,28 +354,35 @@ static void pm_dm_ureg(int g, int d, int i, int m, int ureg, int update)
 
 static void pm_dm_imm_dreg(int g, int d, int i, int data, int dreg, int update)
 {
+	const char *sign = "";
+	if (data & 0x20)
+	{
+		/* negative sign */
+		data = (data ^ 0x3f) + 1;
+		sign = "-";
+	}
 	if (update)     // post-modify
 	{
 		if (d)
 		{
 			if (g)
 			{
-				print("PM(%s, 0x%02X) = %s", GET_DAG2_I(i), data, GET_DREG(dreg));
+				print("PM(%s, %s0x%02X) = %s", GET_DAG2_I(i), sign, data, GET_DREG(dreg));
 			}
 			else
 			{
-				print("DM(%s, 0x%02X) = %s", GET_DAG1_I(i), data, GET_DREG(dreg));
+				print("DM(%s, %s0x%02X) = %s", GET_DAG1_I(i), sign, data, GET_DREG(dreg));
 			}
 		}
 		else
 		{
 			if (g)
 			{
-				print("%s = PM(%s, 0x%02X)", GET_DREG(dreg), GET_DAG2_I(i), data);
+				print("%s = PM(%s, %s0x%02X)", GET_DREG(dreg), GET_DAG2_I(i), sign, data);
 			}
 			else
 			{
-				print("%s = DM(%s, 0x%02X)", GET_DREG(dreg), GET_DAG1_I(i), data);
+				print("%s = DM(%s, %s0x%02X)", GET_DREG(dreg), GET_DAG1_I(i), sign, data);
 			}
 		}
 	}
@@ -385,22 +392,22 @@ static void pm_dm_imm_dreg(int g, int d, int i, int data, int dreg, int update)
 		{
 			if (g)
 			{
-				print("PM(0x%02X, %s) = %s", data, GET_DAG2_I(i), GET_DREG(dreg));
+				print("PM(%s0x%02X, %s) = %s", sign, data, GET_DAG2_I(i), GET_DREG(dreg));
 			}
 			else
 			{
-				print("DM(0x%02X, %s) = %s", data, GET_DAG1_I(i), GET_DREG(dreg));
+				print("DM(%s0x%02X, %s) = %s", sign, data, GET_DAG1_I(i), GET_DREG(dreg));
 			}
 		}
 		else
 		{
 			if (g)
 			{
-				print("%s = PM(0x%02X, %s)", GET_DREG(dreg), data, GET_DAG2_I(i));
+				print("%s = PM(%s0x%02X, %s)", GET_DREG(dreg), sign, data, GET_DAG2_I(i));
 			}
 			else
 			{
-				print("%s = DM(0x%02X, %s)", GET_DREG(dreg), data, GET_DAG1_I(i));
+				print("%s = DM(%s0x%02X, %s)", GET_DREG(dreg), sign, data, GET_DAG1_I(i));
 			}
 		}
 	}
@@ -478,14 +485,30 @@ static UINT32 dasm_compute_dreg_dmpm(UINT32 pc, UINT64 opcode)
 	int dmdreg = (opcode >> 33) & 0xf;
 	int pmdreg = (opcode >> 23) & 0xf;
 	int comp = opcode & 0x7fffff;
+	int dmd = (opcode >> 44) & 0x1;
+	int pmd = (opcode >> 37) & 0x1;
 
 	if (comp)
 	{
 		compute(comp);
 		print(",  ");
 	}
-	print("DM(%s, %s) = R%d, ", GET_DAG1_I(dmi), GET_DAG1_M(dmm), dmdreg);
-	print("PM(%s, %s) = R%d", GET_DAG2_I(pmi), GET_DAG2_M(pmm), pmdreg);
+	if (dmd) 
+	{
+		print("DM(%s, %s) = R%d, ", GET_DAG1_I(dmi), GET_DAG1_M(dmm), dmdreg);
+	}
+	else
+	{
+		print("R%d = DM(%s, %s), ", dmdreg, GET_DAG1_I(dmi), GET_DAG1_M(dmm));
+	}
+	if (pmd)
+	{
+		print("PM(%s, %s) = R%d", GET_DAG2_I(pmi), GET_DAG2_M(pmm), pmdreg);
+	}
+	else
+	{
+		print("R%d = PM(%s, %s)", pmdreg, GET_DAG2_I(pmi), GET_DAG2_M(pmm));
+	}
 	return 0;
 }
 
