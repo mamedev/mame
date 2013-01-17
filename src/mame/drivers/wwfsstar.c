@@ -596,7 +596,7 @@ ROM_END
 ROM_START( wwfsstarj )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* Main CPU  (68000) */
 	ROM_LOAD16_BYTE( "24ac-0_j-1_japan.34", 0x00000, 0x20000, CRC(f872e968) SHA1(e52298817348601ed88c369018d3110e467cf602) )
-	ROM_LOAD16_BYTE( "24ad-0_j-1_japan.35", 0x00001, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "24ad-0_j-1_japan.35", 0x00001, 0x20000, CRC(c70bcd23) SHA1(b6128b051b68fcca05da34b42ced01916b18a139) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "b.12",    0x00000, 0x08000, CRC(1e44f8aa) SHA1(e03857d6954e9b9b6073b211e2d6570032af8807) )
@@ -607,9 +607,7 @@ ROM_START( wwfsstarj )
 	ROM_LOAD( "wwfs05.bin",    0x30000, 0x10000, CRC(6df08962) SHA1(e3dec81644fe5867024a2fcf34a67924622f3a5b) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
-	/* this rom may not be correct for this set.. the rom in the set had half the data missing and only a 99%
-	   match with wwfsstau for the first part */
-	ROM_LOAD( "24a4-0.58",    0x00000, 0x20000, BAD_DUMP CRC(cb12ba40) SHA1(2d39f778d9daf0d3606b63975bd6cfc45847a265) )
+	ROM_LOAD( "24a4-0.58",    0x00000, 0x20000, CRC(b9201b36) SHA1(743b86528f6936eb6a4e37d5a23c347ae9d68fa0) )
 
 	/* these are bootleg roms ...  the original has mask roms */
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* SPR Tiles (16x16) */
@@ -662,4 +660,4 @@ ROM_END
 GAME( 1989, wwfsstar,  0,        wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Europe)", 0 )
 GAME( 1989, wwfsstaru, wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (US)", 0 )
 GAME( 1989, wwfsstara, wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (US, Newer)", 0 )
-GAME( 1989, wwfsstarj, wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Japan)",GAME_NOT_WORKING ) // missing a program rom
+GAME( 1989, wwfsstarj, wwfsstar, wwfsstar, wwfsstar, driver_device,  0, ROT0, "Technos Japan", "WWF Superstars (Japan)",0 )
