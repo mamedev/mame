@@ -3,89 +3,4574 @@
 
 <softwarelist name="ti99_cart" description="TI-99/4A cartridges">
 
-	<!--
-	    This is just the start of the software list for the TI. About 350
-	    cartridges wait to be inserted here.
-
-	    Currently we only support the cartridge types "standard" and "paged"
-	    which is the type of the majority of cartridges. The RAM-based cartridges
-	    (with NVRAM) may follow later (in particular MiniMemory).
-
-	    Alternatively, RPK support will continue to be available for all
-	    cartridges.
-
-	    Note that the sizes of the grom data areas should not be bigger than
-	    the included dump, as the region size determines how many GROMs are
-	    included as subdevices. (OTOH, the additional GROMs would just be
-	    empty, so no big trouble expected.)
-
-	    MAME/MESS policy requires the names of the software to be at max 8
-	    characters, so this means the RPKs need to be renamed to <name>.zip for
-	    each cartridge to be used.
-	-->
-
-	<!-- Common type -->
-	<software name="invaders">
-		<description>TI Invaders</description>
-		<year>1981</year>
-		<publisher>Texas Instruments</publisher>
-		<info name="id" value="PHM 3053"/>
-		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard" />
-			<dataarea name="rom_socket" size="0x2000">
-				<rom name="phm3053c.bin" size="0x2000" crc="e7463430" sha1="b1cc3454aa5437447edb1fc1f48ec7da20e87377" offset="0x0000" />
-			</dataarea>
-			<dataarea name="grom_socket" size="0x2000">
-				<rom name="phm3053g.bin" size="0x2000" crc="9d1d9eaa" sha1="afb31bd69eed1e7e5e08a6fed98c8babed509fa9" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- GROM-only -->
-	<software name="wumpus">
-		<description>Hunt the wumpus</description>
-		<year>1980</year>
-		<publisher>Texas Instruments</publisher>
-		<info name="id" value="PHM 3023"/>
-		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard" />
-			<dataarea name="grom_socket" size="0x2000">
-				<rom name="phm3023g.bin" size="0x2000" crc="6a5a3f97" sha1="4569d2f1eaba7b1736b1146c3863bd8c3d231040" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- ROM-only -->
-	<software name="defender">
-		<description>Defender</description>
-		<year>1983</year>
-		<publisher>Atarisoft</publisher>
-		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard" />
-			<dataarea name="rom_socket" size="0x2000">
-				<rom name="defendc.bin" size="0x2000" crc="c51b0a8b" sha1="df4c3dd9ee5195a768a11721d86f6a164faa87a5" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- With paging (PCB type "paged") -->
-	<software name="exbasic">
-		<description>TI Extended Basic</description>
-		<year>1981</year>
-		<publisher>Texas Instruments</publisher>
-		<info name="id" value="PHM 3026"/>
-		<info name="version" value="110"/>
-		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="paged" />
-			<dataarea name="rom_socket" size="0x2000">
-				<rom name="phm3026c.bin" size="0x2000" crc="bd8addb9" sha1="d0be337b61552f7ac49d52872f66eb6ef549a774" offset="0x0000" />
-			</dataarea>
-			<dataarea name="rom2_socket" size="0x2000">
-				<rom name="phm3026d.bin" size="0x2000" crc="44c4d8a8" sha1="db2850db78431d89de85dd573e6df76151b25aba" offset="0x0000" />
-			</dataarea>
-			<dataarea name="grom_socket" size="0x8000">
-				<rom name="phm3026g.bin" size="0x8000" crc="1a977b8c" sha1="ac30cc0ba075661b9c853b3fda47b4f4accbe25c" offset="0x0000" />
-			</dataarea>
-		</part>
-	</software>
+<!-- Softlist entry for 4A DOS -->
+<software name="4ados">
+	<description>4A DOS</description>
+	<publisher>Schmidt</publisher>
+	<info name="comment" value="Requires disk"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="4ADOSc.bin" size="0x2000" crc="97bf6e41" sha1="4b82d4859721b4812c31bccd516a137f74bb2012" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for 4A Flyer -->
+<software name="4aflyer">
+	<description>4A Flyer</description>
+	<year>1986</year>
+	<publisher>Triton</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="4aflyerc.bin" size="0x2000" crc="fad327d1" sha1="beb68b40f359225a62a94941395543b28e38127b" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="4aflyerd.bin" size="0x2000" crc="fad327d1" sha1="beb68b40f359225a62a94941395543b28e38127b" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Adventure -->
+<software name="advent">
+	<description>Adventure</description>
+	<year>1981</year>
+	<publisher>Scott Adams</publisher>
+	<info name="serial" value="PHM 3041"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3041g.bin" size="0x2000" crc="fb186f7b" sha1="faaee8ae49ca97ab7b8efb35d8a3a52f101b2acd" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Edu-Pack -->
+<software name="edupack">
+	<description>Edu-Pack</description>
+	<year>1990</year>
+	<publisher>Asgard</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="edupackc.bin" size="0x2000" crc="75ea58c0" sha1="29f389b72dc1e4b5c322d18af18cdb1eef611364" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Link v0.99 -->
+<software name="asglink">
+	<description>Link v0.99</description>
+	<year>1990</year>
+	<publisher>Asgard</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="linkc.bin" size="0x2000" crc="fdd70eb3" sha1="a0c5f2eeef5f434db32508a1264f62876c19b33c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Alpiner -->
+<software name="alpiner">
+	<description>Alpiner</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3056"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="phm3056g.bin" size="0x8000" crc="ed5c818a" sha1="d59c0453bc5cdd1c1116e9ea860234c33ad89ec1" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3056c.bin" size="0x2000" crc="1917fb23" sha1="412486c1f373ed123b30aa5f947a24a4c6525809" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for A-Maze-Ing -->
+<software name="amazeing">
+	<description>A-Maze-Ing</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3030"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3030g.bin" size="0x2000" crc="b890076f" sha1="b4df72d960f2abc009a302581fd094112456ecb4" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Centipede -->
+<software name="centipd">
+	<description>Centipede</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="centipec.bin" size="0x2000" crc="60dca323" sha1="ffbc9ad53f675f39a975ba2f7c59fca747591315" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Defender -->
+<software name="defender">
+	<description>Defender</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="defendc.bin" size="0x2000" crc="c51b0a8b" sha1="df4c3dd9ee5195a768a11721d86f6a164faa87a5" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Dig Dug -->
+<software name="digdug">
+	<description>Dig Dug</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="digdugc.bin" size="0x2000" crc="27a453ad" sha1="011d2a011c2bca56ad3cab158ad9af2a7de7c2b2" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="digdugd.bin" size="0x2000" crc="782dad02" sha1="4c39c0d4de49d7c745d1efc6c05d1425ff938393" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Jungle Hunt -->
+<software name="jungleht">
+	<description>Jungle Hunt</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="junglec.bin" size="0x2000" crc="182d4f33" sha1="3090db9b6b9f7420b84412d1461fb0e82b1aee0a" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="jungled.bin" size="0x2000" crc="61c2166f" sha1="496337d3bf12729585b019b862b847dd85142bd5" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Moon Patrol -->
+<software name="moonpatr">
+	<description>Moon Patrol</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="moonpatc.bin" size="0x2000" crc="036052c9" sha1="3f8b7566b79dfb4f2155f02d9584700cd2947194" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="moonpatd.bin" size="0x2000" crc="fba58be2" sha1="3faece9120c9ac8710f9acd8d532b22e2c56dcb3" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Ms. Pac-Man -->
+<software name="mspacman">
+	<description>Ms. Pac-Man</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="mspacc.bin" size="0x2000" crc="ec99c8dc" sha1="5dd53bd140288c8fdcfdc9738fe903f6fdc2cece" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="mspacd.bin" size="0x2000" crc="4210ae10" sha1="00862a9ae42a302aae939e2baf1495d568f60ef2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Pac-Man -->
+<software name="pacman">
+	<description>Pac-Man</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="pacmanc.bin" size="0x2000" crc="558d5c72" sha1="f20ee2594990aba9a9bc3428a3c5fe2ebbadf81f" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="pacmand.bin" size="0x2000" crc="1460afd9" sha1="5992cb1c909a5e70b4aa6aec1e42c99a7ecfeab6" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Picnic Paranoia -->
+<software name="picnicpr">
+	<description>Picnic Paranoia</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="picparnc.bin" size="0x2000" crc="ced82140" sha1="1f00d548133efa224c75a545f1d2b4ba8a8c204e" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="picparnd.bin" size="0x2000" crc="1994aac4" sha1="8361fbedd95e6aab5ab8517801f73ecb29b403c4" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Pole Position -->
+<software name="polepos">
+	<description>Pole Position</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="poleposc.bin" size="0x2000" crc="c95ffd9b" sha1="6b6a2ea214c45b53ba9f1874dd4b8440482cb2ca" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="poleposd.bin" size="0x2000" crc="41a163c2" sha1="9470f6d79b929ebe5e8c26f54f422a0d9c91193a" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Protector II -->
+<software name="protectr">
+	<description>Protector II</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="protectc.bin" size="0x2000" crc="800ce949" sha1="0e157340e414b5d951802f6dbb268c22e6ad1b11" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="protectd.bin" size="0x2000" crc="8cb3c9ae" sha1="17f811ae2d12252594d155d158e561e73ca4c7d9" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Robotron:2084 -->
+<software name="robotron">
+	<description>Robotron:2084</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x20fa">
+			<rom name="robotronc.bin" size="0x20fa" crc="1db94ac8" sha1="097bf90e2f7d5188a4e77fc176f1857e2cbfeee9" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x20fa">
+			<rom name="robotrond.bin" size="0x20fa" crc="086065c7" sha1="d30e45741bfae2a412ff94cd9698990566d53a1c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Shamus -->
+<software name="shamus">
+	<description>Shamus</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="shamusc.bin" size="0x2000" crc="1bd63686" sha1="b2e9ee83dbd6f40e543e22d549f897110c915a91" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="shamusd.bin" size="0x2000" crc="aaeb7e53" sha1="f9471fd1dcc64c2bac0ebd38344470f32214672f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Super Storm -->
+<software name="superst">
+	<description>Super Storm</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="superstormc.bin" size="0x2000" crc="e14a871f" sha1="bc5fdae75761d92684f935bb628543cc93f3b85c" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="superstormd.bin" size="0x2000" crc="c15298ea" sha1="5ddd12ffd9537c0be6fb930038cba9a0248c2bfb" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Computer Math Games I -->
+<software name="mathgm1">
+	<description>Computer Math Games I</description>
+	<year>1983</year>
+	<publisher>Addison-Wesley</publisher>
+	<info name="serial" value="PHM 3084"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="phm3084g.bin" size="0x7800" crc="f6af5fc8" sha1="abff864abf0580590c3de71a05541f88da20d618" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3084c.bin" size="0x2000" crc="04bb7ce9" sha1="0b36b09377222c73bda1b9cda608d949ba00d812" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Computer Math Games II -->
+<software name="mathgm2">
+	<description>Computer Math Games II</description>
+	<year>1982</year>
+	<publisher>Addison-Wesley</publisher>
+	<info name="serial" value="PHM 3083"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3083g.bin" size="0x6000" crc="96c804df" sha1="283e73a20c343c424c3d447663f0e6b6e50454d9" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Computer Math Games III -->
+<software name="mathgm3">
+	<description>Computer Math Games III</description>
+	<year>1983</year>
+	<publisher>Addison-Wesley</publisher>
+	<info name="serial" value="PHM 3085"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="phm3085g.bin" size="0x7800" crc="babb5aeb" sha1="4d554eafc9ab540251856485d25cd3b7e5fb6e29" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Computer Math Games IV -->
+<software name="mathgm4">
+	<description>Computer Math Games IV</description>
+	<year>1983</year>
+	<publisher>Addison-Wesley</publisher>
+	<info name="serial" value="PHM 3086"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="phm3086g.bin" size="0x7800" crc="f25d0799" sha1="ff8f7080a8f185dd1b8d7ecbcfca64dcb4acc8ca" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Computer Math Games VI -->
+<software name="mathgm6">
+	<description>Computer Math Games VI</description>
+	<year>1982</year>
+	<publisher>Addison-Wesley</publisher>
+	<info name="serial" value="PHM 3088"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3088g.bin" size="0x4000" crc="a46a4eb0" sha1="266293e6a8c1291262e321c96319fd0e3bad6cb3" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Beginning Grammar -->
+<software name="bgrammar">
+	<description>Beginning Grammar</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3003"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3003g.bin" size="0x6000" crc="9d4df330" sha1="426f8f53c0e7dd32a8f60367a7f221b36bc59697" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Beyond Space -->
+<software name="beyspace">
+	<description>Beyond Space</description>
+	<info name="comment" value="Beyond Parsec clone or copy"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="BEYONDSc.bin" size="0x2000" crc="eaf92e6a" sha1="7b2d6798c63e020a300faec9a141328d666f6a7c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Blackjack and Poker -->
+<software name="bljpoker">
+	<description>Blackjack and Poker</description>
+	<year>1980</year>
+	<publisher>Milton Bradley</publisher>
+	<info name="serial" value="PHM 3033"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3033g.bin" size="0x2000" crc="285954b4" sha1="90184daddf23f778309bf5b44bd06fe93ebd1148" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Car Wars -->
+<software name="carwars">
+	<description>Car Wars</description>
+	<year>1981</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3054"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3054g.bin" size="0x2000" crc="a19f5140" sha1="9e757a895e55ee5e4dbbbecc67e7b4c8b54dcabe" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Chisholm Trail -->
+<software name="chisholm">
+	<description>Chisholm Trail</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3110"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3110g.bin" size="0x2000" crc="b259f38d" sha1="34e3e0b1971bf780499e424006689ecb092d9793" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3110c.bin" size="0x2000" crc="6fd908cf" sha1="ae5e1b50e7ac54709e5b0e2d674d9bc53fff3eda" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for 99 Home Sentry -->
+<software name="homesent">
+	<description>99 Home Sentry</description>
+	<year>1986</year>
+	<publisher>Corcomp</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="64f42900" sha1="5fa3e4a2130c594610b79a71170fe7d49a473cdc" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Peripheral Diagnostic Module -->
+<software name="pertest">
+	<description>Peripheral Diagnostic Module</description>
+	<year>1985</year>
+	<publisher>Corcomp</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="2050904e" sha1="0511fb72fd13ce1e005fc3066f4498d98686f8ac" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for TI-IBM Copier -->
+<software name="ibmcopy">
+	<description>TI-IBM Copier</description>
+	<year>1987</year>
+	<publisher>Corcomp</publisher>
+	<info name="comment" value="Copies data from TI to PC disks and back."/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="TI2IBMc.bin" size="0x2000" crc="e5653657" sha1="9899be5a16d9a9f5a3814474636bd235ba0774b6" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Escape -->
+<software name="escape">
+	<description>Escape</description>
+	<year>1984</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="escapec.bin" size="0x2000" crc="6d5c7744" sha1="272f6e9b8ee4dfb86ea8e4ff4e6dab87ee98c04f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for King of the Castle -->
+<software name="kingcast">
+	<description>King of the Castle</description>
+	<year>1984</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="2aa544ad" sha1="9b2025db5381801d604fc660f4112c2e9ca05041" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Beyond Parsec -->
+<software name="bparsec">
+	<description>Beyond Parsec</description>
+	<year>1988</year>
+	<publisher>John Phillips</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="beyparsc.bin" size="0x2000" crc="bc483e69" sha1="fee745babe5b3a0ca80c26e6b3b3ea02a217a11e" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="beyparsd.bin" size="0x2000" crc="511ed035" sha1="5e68d737ee0fba2d85c3a45840c22156e8eede86" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Black Hole -->
+<software name="blackhl">
+	<description>Black Hole</description>
+	<year>1983</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="blakholc.bin" size="0x2000" crc="fc46c765" sha1="40a88d537fb87073bbd60183a47edd438457e15e" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Break Thru -->
+<software name="breakth">
+	<description>Break Thru</description>
+	<year>1989</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="breakc.bin" size="0x2000" crc="deb96260" sha1="604ef77992002c3ec29dd3f75ac771c8d66448bc" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Burger Builder -->
+<software name="burgerbd">
+	<description>Burger Builder</description>
+	<year>1983</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="burgbldc.bin" size="0x2000" crc="1ecc49a5" sha1="f9fc32fae1a549dec05359e07c0a35c5aee10dd7" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Desk Top Publisher -->
+<software name="dtpub">
+	<description>Desk Top Publisher</description>
+	<year>1988</year>
+	<publisher>DataBioTics</publisher>
+	<info name="version" value="1.3"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="DESKc.bin" size="0x2000" crc="189fd665" sha1="a478686eab71808fbc14ce5032bcb446853d8c34" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for D-Station I -->
+<software name="dstatn1">
+	<description>D-Station I</description>
+	<year>1988</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dstatn1c.bin" size="0x2000" crc="4d4a28d3" sha1="3db30a4e80c858b4d946657b17f2631a7fe72915" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for D-Station II - The Conflict Continues! -->
+<software name="dstatn2">
+	<description>D-Station II - The Conflict Continues!</description>
+	<year>1988</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dstatn2c.bin" size="0x2000" crc="5e59e1da" sha1="b9046e8737b53305be9f0c63d37872c7c533fe3c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Junkman Junior -->
+<software name="junkmnj">
+	<description>Junkman Junior</description>
+	<year>1986</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="junkmanc.bin" size="0x2000" crc="6d3a2da8" sha1="59c79194ba2363471f0fdfb32782c2f66fa82e37" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="junkmand.bin" size="0x2000" crc="17ab7e62" sha1="3cec5cafad4f5b3359f9cc69db339e711174a8e8" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Mancala -->
+<software name="mancala">
+	<description>Mancala</description>
+	<year>1983</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="mancalag.bin" size="0xa000" crc="7e64b353" sha1="c3d4866c218e87a31b4dceff53083fa39f60822c" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="mancalac.bin" size="0x2000" crc="52735266" sha1="79150a6c5beb3ea1bb1872c6fc7b6c43ec411a76" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Micro Pinball -->
+<software name="micropb">
+	<description>Micro Pinball</description>
+	<year>1984</year>
+	<publisher>Software Specialties</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="pinballc.bin" size="0x2000" crc="5b8a61af" sha1="d77f95a2e7eb68ac1d98e618a7c2da3310cfd1df" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="pinballd.bin" size="0x2000" crc="b9144e38" sha1="88e12565761a9145d9855da94e6ebb69848a2924" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Miniwriter II -->
+<software name="miniwr">
+	<description>Miniwriter II</description>
+	<year>1985</year>
+	<publisher>DataBioTics</publisher>
+	<info name="version" value="1.0"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="MINIW10c.bin" size="0x2000" crc="ba701402" sha1="1022336e1770bbff114671132bbca925e4e65d18" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Pro Typer -->
+<software name="protyper">
+	<description>Pro Typer</description>
+	<year>1987</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="protypec.bin" size="0x2000" crc="238d5bbe" sha1="bba12601a5d945df13beb35f5f99a10b33b32c57" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Star Runner -->
+<software name="starrun">
+	<description>Star Runner</description>
+	<year>1987</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="starrunc.bin" size="0x2000" crc="c04f6634" sha1="fd9756d962c576cef225f8c6c1bf60ad86539724" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="starrund.bin" size="0x2000" crc="453189d8" sha1="d5894d350bd559c17cebf3daf45c08be7f8348ce" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Micro Tennis -->
+<software name="tennis">
+	<description>Micro Tennis</description>
+	<year>1983</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="mtennisc.bin" size="0x2000" crc="b4a1e499" sha1="4cdca6f9e045f023d8ae057411fa920b7b31c979" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="mtennisd.bin" size="0x2000" crc="88c10112" sha1="d1acebdad81189f3badc191de29e86ee8b5bcc82" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for TI Planner -->
+<software name="tiplanr">
+	<description>TI Planner</description>
+	<year>1987</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="tiplanc.bin" size="0x2000" crc="a47ce52e" sha1="21d08d141f38086f33198df2683bcac5a9207f4c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Angler Dangler -->
+<software name="anglerdg">
+	<description>Angler Dangler</description>
+	<year>1983</year>
+	<publisher>Deco</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x5278">
+			<rom name="anglerg.bin" size="0x5278" crc="02e420fd" sha1="20de9f1199cfca10decf36196c5074a14f198d0f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Astro Fighter -->
+<software name="astroftr">
+	<description>Astro Fighter</description>
+	<year>1983</year>
+	<publisher>Deco</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x575a">
+			<rom name="astrofg.bin" size="0x575a" crc="0a2175b7" sha1="fa86e7c114ece4727ee4057985814324a758cb61" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Burgertime -->
+<software name="burgertb">
+	<description>Burgertime</description>
+	<year>1983</year>
+	<publisher>Data East USA</publisher>
+	<info name="serial" value="PHM 3233"/>
+	<info name="version" value="beta"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4d0c">
+			<rom name="burgerbetag.bin" size="0x4d0c" crc="523311a2" sha1="130827e00af5bd8f68cba2623ff97a073dad6abe" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Burgertime -->
+<software name="burgertm">
+	<description>Burgertime</description>
+	<year>1983</year>
+	<publisher>Data East USA</publisher>
+	<info name="serial" value="PHM 3233"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3233g.bin" size="0x4000" crc="8c1e3030" sha1="5f6e4e3c57374fcf5eba30974003566892fb530d" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3233c.bin" size="0x2000" crc="ed7ef022" sha1="8959a44c9ca8aaf15da5ba49d4d26656e8175554" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Mission X -->
+<software name="missionx">
+	<description>Mission X</description>
+	<year>1983</year>
+	<publisher>Data East USA</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4f3e">
+			<rom name="missiong.bin" size="0x4f3e" crc="09735bf4" sha1="b65a3d635530c9eb48872e33ca7ec826840686ce" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Demonstration -->
+<software name="demode">
+	<description>Demonstration</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3001"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="phm3001g.bin" size="0x7800" crc="a529a215" sha1="8bdc098ed368615067ea2ccf4ce11eebd9d67b4d" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Demonstration -->
+<software name="demo">
+	<description>Demonstration</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3001"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8100">
+			<rom name="phm3001g.bin" size="0x8100" crc="1e8fecb7" sha1="191b01ee7e9173b95d4805f18e4d53f7a320d10b" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Treasure Island -->
+<software name="treaislb">
+	<description>Treasure Island</description>
+	<year>1983</year>
+	<publisher>Deco</publisher>
+	<info name="serial" value="PHM 3168"/>
+	<info name="version" value="beta"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x51ca">
+			<rom name="treasurebetag.bin" size="0x51ca" crc="97d745ee" sha1="c9ddcf47c7aa77e3e8a0743615eebd3b29b44aaa" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Treasure Island -->
+<software name="treasure">
+	<description>Treasure Island</description>
+	<year>1983</year>
+	<publisher>Data East USA</publisher>
+	<info name="serial" value="PHM 3168"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x5800">
+			<rom name="phm3168g.bin" size="0x5800" crc="d7f58843" sha1="70af21bd1cdb782a95fd3e8d41b85398b3362732" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3168c.bin" size="0x2000" crc="4a8d6272" sha1="7ef9641d8344e703ae5561a198506d378a01612f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Diagnostic -->
+<software name="diagfr">
+	<description>Diagnostic</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3000"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3000g.bin" size="0x4000" crc="a46dd40a" sha1="b61a88e931cf5a8957740e767f8224418b1ab53d" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Diagnostic -->
+<software name="diag">
+	<description>Diagnostic</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3000"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3000g.bin" size="0x2000" crc="e3ce581e" sha1="fd6fa7301a1127392efae5300975da5cf9a189cf" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Disk Manager -->
+<software name="diskmn1i">
+	<description>Disk Manager</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3019"/>
+	<info name="version" value="1.0"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3019g.bin" size="0x4000" crc="05697f12" sha1="7efafd13011535b4176ceee04242d5a0a7d9ecd2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Disk Manager -->
+<software name="diskman1">
+	<description>Disk Manager</description>
+	<info name="serial" value="PHM3019"/>
+	<info name="version" value="1.0"/>
+	<info name="comment" value="English-only version"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="MAXDMg.bin" size="0x4000" crc="97c39796" sha1="c023b03a0149aea17bb44b2857277172eae7f06c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Disk Manager -->
+<software name="diskman2">
+	<description>Disk Manager</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3089"/>
+	<info name="version" value="2.0"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3089g.bin" size="0x4000" crc="3ebc8398" sha1="445b2ee2eb83485440e9243881c9fc25c9b52b46" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Disk Manager v3.0 -->
+<software name="diskman3">
+	<description>Disk Manager v3.0</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x3800">
+			<rom name="phm3230g.bin" size="0x3800" crc="a24617e6" sha1="ab25fae02413b31fc5b8195d1d8af2b93c23a3ae" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Alien Addition -->
+<software name="alienadd">
+	<description>Alien Addition</description>
+	<year>1982</year>
+	<publisher>DLM Academics</publisher>
+	<info name="serial" value="PHM 3115"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3115g.bin" size="0x4000" crc="a3bd770f" sha1="173504d5a59c9b5e35da8110fa1557a1ecf33111" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Alligator Mix -->
+<software name="alligmix">
+	<description>Alligator Mix</description>
+	<year>1982</year>
+	<publisher>DLM Academics</publisher>
+	<info name="serial" value="PHM 3114"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3114g.bin" size="0xa000" crc="612aaeb1" sha1="be72023788b91398247d8158a094c21e90e631b5" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3114c.bin" size="0x2000" crc="7a503b69" sha1="63e88c598bad3d452cb98d47affaf18ce1607c4c" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="phm3114d.bin" size="0x2000" crc="38a97183" sha1="7361e4837a116dcbe38c7af2e92951b989694444" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Demolition Division -->
+<software name="demoldiv">
+	<description>Demolition Division</description>
+	<year>1982</year>
+	<publisher>DLM Academics</publisher>
+	<info name="serial" value="PHM 3116"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x3800">
+			<rom name="phm3116g.bin" size="0x3800" crc="1159710c" sha1="5d784fab8adba8a343ad8fc4b1db11fec0ed3e80" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Dragon Mix -->
+<software name="dragonmx">
+	<description>Dragon Mix</description>
+	<year>1982</year>
+	<publisher>DLM Academics</publisher>
+	<info name="serial" value="PHM 3117"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3117g.bin" size="0x4000" crc="9f8604b7" sha1="a03b414520c78632748662b76556974c52ec6d79" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3117c.bin" size="0x2000" crc="97941d83" sha1="d56aaff2ff008b198cb59dda11077f8dfe8e12cc" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Meteor Multiplication -->
+<software name="meteormt">
+	<description>Meteor Multiplication</description>
+	<year>1982</year>
+	<publisher>DLM Academics</publisher>
+	<info name="serial" value="PHM 3119"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3119g.bin" size="0x4000" crc="0b917275" sha1="c2f64c224df3772234dac4ba9fae2289a303a720" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Minus Mission -->
+<software name="minusmis">
+	<description>Minus Mission</description>
+	<year>1982</year>
+	<publisher>DLM Academics</publisher>
+	<info name="serial" value="PHM 3118"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3118g.bin" size="0x4000" crc="b6ed3371" sha1="f288bfc9e4caea3a954cfebcb82146ecaf40399f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Verb Viper -->
+<software name="verbvip">
+	<description>Verb Viper</description>
+	<year>1982</year>
+	<publisher>DLM Academics</publisher>
+	<info name="serial" value="PHM 3120"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x3800">
+			<rom name="phm3120g.bin" size="0x3800" crc="f4825259" sha1="ff4f3e4e45f762fe2e9f87b5f1ace735e09745b0" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Word Invasion -->
+<software name="wordinva">
+	<description>Word Invasion</description>
+	<year>1982</year>
+	<publisher>DLM Academics</publisher>
+	<info name="serial" value="PHM 3169"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x3800">
+			<rom name="phm3169g.bin" size="0x3800" crc="90ba7d7a" sha1="ad293509968b6d011a714f7cb8afc3914baca569" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Word Radar -->
+<software name="wordradr">
+	<description>Word Radar</description>
+	<year>1982</year>
+	<publisher>DLM Academics</publisher>
+	<info name="serial" value="PHM 3185"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x1800">
+			<rom name="phm3185g.bin" size="0x1800" crc="3dee496c" sha1="bb1c892a2d75a1eed6cb7cff1602d53a8a62307a" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3185c.bin" size="0x2000" crc="1bdc7349" sha1="33d75181e460375cec0f9e31aee296dc0d2e409c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Berlin -->
+<software name="berlin">
+	<description>Berlin</description>
+	<year>19xx</year>
+	<publisher>Iain Johnson</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="berling.bin" size="0xa000" crc="46bfb55e" sha1="15fcad7a7ca427f12b4f92fc31feaf25ac1ff92f" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="berlinc.bin" size="0x2000" crc="f135be05" sha1="7f58480eb9506707c6b09b989bcca6540e7ea7d9" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="berlind.bin" size="0x2000" crc="7f39ca4f" sha1="f1d4ecf341d215f3102d273c24281664ac6f077d" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Boxer -->
+<software name="boxer">
+	<description>Boxer</description>
+	<year>1987</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="boxerc.bin" size="0x2000" crc="48aa0e48" sha1="c0aa268d1818c3dac756c93ecf26a944df262434" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Cannonball Blitz -->
+<software name="canballb">
+	<description>Cannonball Blitz</description>
+	<year>1982</year>
+	<publisher>Jlando</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4c08">
+			<rom name="cannonballg.bin" size="0x4c08" crc="ecc2d30f" sha1="1a80244cc54021a41a402117c21fe8e025a053b7" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Disk Utilities v4.2 -->
+<software name="diskutil">
+	<description>Disk Utilities v4.2</description>
+	<year>19xx</year>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="dump_g.bin" size="0x8000" crc="efa80d98" sha1="9fd4efb966beb34d2cecf05904b74dc5101a8587" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for BASIC games -->
+<software name="gmsbasic">
+	<description>BASIC games</description>
+	<info name="comment" value="BASIC programs stored in GROM: MotoCross-Awari-Carres-Hanoi. Allow for 20 seconds for games to start."/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="MAXBASGg.bin" size="0xa000" crc="5318530d" sha1="12a378996ef61c6725cdf7f31042792de5374aa3" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Nature's Way -->
+<software name="nature">
+	<description>Nature's Way</description>
+	<year>19xx</year>
+	<publisher>unknown</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x1ffa">
+			<rom name="naturec.bin" size="0x1ffa" crc="8938e53e" sha1="efb7b8fc71eecb4410a5620e6ac2b3bd578fac72" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for One Pass Copy SSSD -->
+<software name="opcopy">
+	<description>One Pass Copy SSSD</description>
+	<info name="comment" value="Disk copier"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="copy5g.bin" size="0x6000" crc="eb7d6a85" sha1="4776f391be8ec17a940ac266f8d6df246058e05e" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Othello -->
+<software name="othello">
+	<description>Othello</description>
+	<year>1982</year>
+	<publisher>CBS Video</publisher>
+	<info name="serial" value="PHM 3067"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x1800">
+			<rom name="phm3067g.bin" size="0x1800" crc="63bbea59" sha1="ddc821d461871e33515eafe799140fc483dbcad5" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3067c.bin" size="0x2000" crc="b23a1193" sha1="2380f163bb5b0c4b6e085cafa6fa0795e9028c8f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Simon Says -->
+<software name="simon">
+	<description>Simon Says</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x1800">
+			<rom name="simong.bin" size="0x1800" crc="2fdf1df9" sha1="2a3df9392b62a1d036a46a7aa06d11262c453659" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Snake plissken -->
+<software name="snakepl">
+	<description>Snake plissken</description>
+	<info name="comment" value="Simple Hustle clone."/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="snakc.bin" size="0x2000" crc="db780890" sha1="4e19da1e9efff62ab8d7feba16eeba2d0a15c745" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Sorgan II -->
+<software name="sorgan2">
+	<description>Sorgan II</description>
+	<year>1988</year>
+	<publisher>DaTaBioTics</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="sorgan2c.bin" size="0x2000" crc="6c719224" sha1="ad82c1cc353bbc1e24be9c3ffffcfbb8c2e9960c" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="sorgan2d.bin" size="0x2000" crc="3d621c24" sha1="d9689759b59c2264de7b7497cffcc79b71e2fa0d" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Space Patrol -->
+<software name="spacepat">
+	<description>Space Patrol</description>
+	<year>1983</year>
+	<publisher>Sunware</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="SPACEPAc.bin" size="0x2000" crc="ea02ed46" sha1="c3cf45cfd361417e2eb24705eb9aafb2acbf807c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Spy's Demise -->
+<software name="spiesdem">
+	<description>Spy's Demise</description>
+	<year>1987</year>
+	<publisher>CSI Design Group</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="spydemic.bin" size="0x2000" crc="82875c2d" sha1="924108b1c56fe07b2a442bfff075010a48fb0bea" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Super Disk Manager -->
+<software name="sdiskmn">
+	<description>Super Disk Manager</description>
+	<year>1984</year>
+	<info name="version" value="4.0"/>
+	<info name="comment" value="Similar to TI Disk Manager"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="dump_g.bin" size="0x4000" crc="dcd3433d" sha1="21fcba8e662786def43c94350459d2233377feb1" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Super Sketch - Model G2400 -->
+<software name="supersk">
+	<description>Super Sketch - Model G2400</description>
+	<year>1984</year>
+	<publisher>Personal Peripherals</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="62488163" sha1="67abd46723a3e7509b808f7162eb8072b6eaff30" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Tennis -->
+<software name="tennisv">
+	<description>Tennis</description>
+	<year>1983</year>
+	<publisher>Nicesoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="tennisc.bin" size="0x2000" crc="b4a1e499" sha1="4cdca6f9e045f023d8ae057411fa920b7b31c979" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="tennisd.bin" size="0x2000" crc="a3a62ff2" sha1="e5547cfbaf423fbfd0767b8a8c2fd80ab94f6c76" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Tile Breaker -->
+<software name="tilebrk">
+	<description>Tile Breaker</description>
+	<publisher>Magic Software</publisher>
+	<info name="comment" value="Breakout clone"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="TILEBREc.bin" size="0x2000" crc="99a920f7" sha1="145a72fffab8e3058969b47ac351a7fd17d09cf3" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for U-Boat Jagd -->
+<software name="uboatde">
+	<description>U-Boat Jagd</description>
+	<year>1984</year>
+	<publisher>Saurus</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="u-boatg.bin" size="0xa000" crc="c4309c0d" sha1="e0374fbe36ebf3ed44ef6e0f5963096cd321b178" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="u-boatc.bin" size="0x2000" crc="f135be05" sha1="7f58480eb9506707c6b09b989bcca6540e7ea7d9" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="u-boatd.bin" size="0x2000" crc="7f39ca4f" sha1="f1d4ecf341d215f3102d273c24281664ac6f077d" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Early Learning Fun -->
+<software name="earlylf">
+	<description>Early Learning Fun</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3002"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3002g.bin" size="0x4000" crc="b1ba3c6c" sha1="e587cc8db114933bb599d3acf51f22c3b9e5d229" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Early LOGO Learning Fun -->
+<software name="earlylog">
+	<description>Early LOGO Learning Fun</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3144"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3144g.bin" size="0x2000" crc="17cf25dd" sha1="ba3eec5fe584206d0ca5044729093e6bf110c114" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3144c.bin" size="0x2000" crc="b99bebd4" sha1="bfeca0c26a562f74589df523406cf6e4a49485ed" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Early Reading -->
+<software name="earlyrd">
+	<description>Early Reading</description>
+	<year>1980</year>
+	<publisher>Scott, Foresman</publisher>
+	<info name="serial" value="PHM 3015"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="phm3015g.bin" size="0x9800" crc="f4198175" sha1="bfd90786f3f43638c7167ab5fe27960f21291f39" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Editor/Assembler -->
+<software name="editass">
+	<description>Editor/Assembler</description>
+	<year>1981</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3055"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3055g.bin" size="0x2000" crc="de8deb4d" sha1="49ff490a2ceeff70dd4d3513e548c4b672e34f8f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for SMU Electrical Engineering Library -->
+<software name="eleceng">
+	<description>SMU Electrical Engineering Library</description>
+	<year>1981</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3045"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x3800">
+			<rom name="phm3045g.bin" size="0x3800" crc="3d8486dd" sha1="1a8130c226e81729a68e8758c5db7d730ca026b5" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for E.T. In His Adventure at Sea -->
+<software name="etatsea">
+	<description>E.T. In His Adventure at Sea</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="etseag.bin" size="0xa000" crc="4b2f1c3e" sha1="d1ccbd5f91d3b48e860015a66f7132477da4c66a" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="etseac.bin" size="0x2000" crc="3e70d0e4" sha1="338f97815a140ddab67cc547dc8a10b401158baf" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for E.T. -->
+<software name="et">
+	<description>E.T.</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3125"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3125g.bin" size="0x4000" crc="fd33bbe7" sha1="69884a66a1ef9054c017f7891e167168751441b4" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3125c.bin" size="0x2000" crc="16fe7b6d" sha1="142df70bc339c929675583eb71a533a32654edf8" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="phm3125d.bin" size="0x2000" crc="31a83f3c" sha1="60a350dcb9fdf21ce3057d909268f68a70f091c4" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Extended Basic v100 -->
+<software name="exbasic1">
+	<description>Extended Basic v100</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3026"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="phm3026g.bin" size="0x7800" crc="188e71aa" sha1="c5337a6677c7087788017b5a21712645de1a6803" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3026c.bin" size="0x2000" crc="2e65925b" sha1="523d166f6a23b4ca82156d5a2378490d6a192aff" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="phm3026d.bin" size="0x2000" crc="31d9bf70" sha1="c0a9f0d7c479435470b0aac4183bd626dbd88aa1" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Extended Basic v2.5 -->
+<software name="exbas25">
+	<description>Extended Basic v2.5</description>
+	<year>198x</year>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="xb25g.bin" size="0xa000" crc="80b33ca1" sha1="664ae7f2810df6942480634288df31b9567df72c" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="xb25c.bin" size="0x2000" crc="bd8addb9" sha1="d0be337b61552f7ac49d52872f66eb6ef549a774" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="xb25d.bin" size="0x2000" crc="d5a91251" sha1="dfa33094b67c31691b0396ea116c9da8d134bbc2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Extended Basic Plus -->
+<software name="exbaspl">
+	<description>Extended Basic Plus</description>
+	<year>19xx</year>
+	<info name="comment" value="Standard Exbasic with additional functions. Maybe @apesoft."/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="XBAPEg.bin" size="0xa000" crc="a27f2f5e" sha1="d9614cd24eb04cb61ecf7c29e42029adfd4bbafc" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="XBAPEc.bin" size="0x2000" crc="bd8addb9" sha1="d0be337b61552f7ac49d52872f66eb6ef549a774" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="XBAPEd.bin" size="0x2000" crc="44c4d8a8" sha1="db2850db78431d89de85dd573e6df76151b25aba" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Extended Basic -->
+<software name="exbasic">
+	<description>Extended Basic</description>
+	<year>1981</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3026"/>
+	<info name="version" value="110"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="phm3026g.bin" size="0x8000" crc="1a977b8c" sha1="ac30cc0ba075661b9c853b3fda47b4f4accbe25c" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3026c.bin" size="0x2000" crc="bd8addb9" sha1="d0be337b61552f7ac49d52872f66eb6ef549a774" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="phm3026d.bin" size="0x2000" crc="44c4d8a8" sha1="db2850db78431d89de85dd573e6df76151b25aba" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Fantasy -->
+<software name="fantasy">
+	<description>Fantasy</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="fantasyg.bin" size="0xa000" crc="80955e64" sha1="cbdca5653d56cdd1a5159862947b903bfabbb6eb" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="fantasyc.bin" size="0x2000" crc="6b365095" sha1="ca4abe8a4137330cc2d2236ec822d735a9cf222c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for fig FORTH -->
+<software name="figforth">
+	<description>fig FORTH</description>
+	<year>1986</year>
+	<publisher>Weiand</publisher>
+	<info name="version" value="2.0"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="FFORTHc.bin" size="0x2000" crc="b0475514" sha1="7269c5980df586fe4b06e553c9aea01539cf55fe" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Football -->
+<software name="football">
+	<description>Football</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3009"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3009g.bin" size="0x4000" crc="e423f735" sha1="cf9d982a9a97417b3dc6ff8735ee47fcc7f75b27" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Ambulance -->
+<software name="ambulnc">
+	<description>Ambulance</description>
+	<year>1983</year>
+	<publisher>Funware</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="ambulncc.bin" size="0x2000" crc="94bdc45c" sha1="a1b2f8535c39ad70ea65a388c4ad77b2d5df007f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Ant Colony -->
+<software name="antcolb">
+	<description>Ant Colony</description>
+	<year>1983</year>
+	<publisher>Funware</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="antc.bin" size="0x2000" crc="f0c6b27b" sha1="384050171f74518f33415261e3d021704bc49b54" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Cave Creatures -->
+<software name="cavecrt">
+	<description>Cave Creatures</description>
+	<year>1983</year>
+	<publisher>Funware</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x28c6">
+			<rom name="cavecretg.bin" size="0x28c6" crc="13f93824" sha1="ea6d3adbdbdfe143b2ddd50653aef6c5bea7f1e7" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Driving Demon -->
+<software name="drvdemon">
+	<description>Driving Demon</description>
+	<year>1983</year>
+	<publisher>Funware - Romox</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="drivdemc.bin" size="0x2000" crc="e5f31cc0" sha1="c4ef09b554ff3661d9c39158f85cb1c1563ea657" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Henhouse -->
+<software name="henhouse">
+	<description>Henhouse</description>
+	<year>1982</year>
+	<publisher>Funware</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="d0d0bcec" sha1="9f03ad0b472afd2394e023f21bf717c28748d1d9" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Lobster Bay -->
+<software name="lobster">
+	<description>Lobster Bay</description>
+	<year>1983</year>
+	<publisher>Funware</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="lobsterg.bin" size="0x6000" crc="9c7e3a04" sha1="7a86662c00e8aaec17238bcd7973410500c1e4fd" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Rabbit Trail -->
+<software name="rabbit">
+	<description>Rabbit Trail</description>
+	<year>1983</year>
+	<publisher>Funware - Romox</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="rabbittc.bin" size="0x2000" crc="f5ad228b" sha1="b5c72aa4a61d36fc6aa80ae41c0f2b4b34fcdbe7" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Schnoz-ola -->
+<software name="schnoz">
+	<description>Schnoz-ola</description>
+	<year>1983</year>
+	<publisher>Funware</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="schnozc.bin" size="0x2000" crc="a7cf7660" sha1="dbb30a41d687bd2345f528c91b95325cf66ae4c2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Shanghai -->
+<software name="shanghai">
+	<description>Shanghai</description>
+	<year>1983</year>
+	<publisher>Funware</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="a484fbf6" sha1="3d7ac024e9bc918bcc9b19d7a34da862dcbf2f1a" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for St. Nick -->
+<software name="stnick">
+	<description>St. Nick</description>
+	<year>1983</year>
+	<publisher>Funware</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="stnickg.bin" size="0x2000" crc="f16b9f55" sha1="62c45071961dd1950f7c2cdb3ea6f3ab714ffef4" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="stnickc.bin" size="0x2000" crc="615b272d" sha1="3b3df5038b7d42a839a4230dd5b2354dc96cd205" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Video Vegas -->
+<software name="videovg">
+	<description>Video Vegas</description>
+	<year>1982</year>
+	<publisher>Funware - Romox</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="a0eea1cd" sha1="60d0cbd2599f0e7d77dc5e533e417915c66bf170" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Germ Patrol -->
+<software name="germpat">
+	<description>Germ Patrol</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="germptlg.bin" size="0xa000" crc="7cb317e2" sha1="117acd840527b033f0ef415874c23ea2ff56ef72" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="germptlc.bin" size="0x2000" crc="0a37b9b6" sha1="9e92451482807407e31da183e93448e88f4183df" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Gestion Privee -->
+<software name="gestprv">
+	<description>Gestion Privee</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x5800">
+			<rom name="dump_g.bin" size="0x5800" crc="3111a9e9" sha1="399612c29fccac18e7f977d5bbbdacb5c8d3ad6a" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for GRAM-based Disassembler -->
+<software name="gramdisn">
+	<description>GRAM-based Disassembler</description>
+	<year>1992</year>
+	<publisher>Thierry Nouspikel</publisher>
+	<info name="version" value="1.0"/>
+	<info name="comment" value="Does not include help texts"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="DISASNHg.bin" size="0x2000" crc="fe2130f2" sha1="b3aab6b2725e2f4949d58c1f1d2d1012c0d2913f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for GRAM-based Disassembler -->
+<software name="gramdis">
+	<description>GRAM-based Disassembler</description>
+	<year>1992</year>
+	<publisher>Thierry Nouspikel</publisher>
+	<info name="version" value="1.0"/>
+	<info name="comment" value="Includes help texts"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="DISASSg.bin" size="0x4000" crc="d446984a" sha1="4b7c8294cfe69c3d7fe991b9bd064aee74c645cd" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Home Financial Decisions -->
+<software name="homefin">
+	<description>Home Financial Decisions</description>
+	<year>1978</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3006"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3006g.bin" size="0x4000" crc="15b29e69" sha1="6c157c69e6679a4b668c599e3ee2abde57e6d9e6" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Hopper -->
+<software name="hopper">
+	<description>Hopper</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3229"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3229g.bin" size="0x2000" crc="17cf25dd" sha1="ba3eec5fe584206d0ca5044729093e6bf110c114" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3229c.bin" size="0x2000" crc="94710cfb" sha1="82e396b96b5b7538f77249e9881ae4fcd7ac6b46" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Household Budget Management -->
+<software name="hbudgetf">
+	<description>Household Budget Management</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3007"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="BUDGETg.bin" size="0x4000" crc="5b509254" sha1="34e44aaff7428fa03dcd731473ecb1178e44b701" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Household Budget Management -->
+<software name="hbudget">
+	<description>Household Budget Management</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3007"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3007g.bin" size="0x4000" crc="4f06f1b8" sha1="90a24c834dbd05f3de98ac72421b05c670ad8c98" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Hunt The Wumpus -->
+<software name="wumpus">
+	<description>Hunt The Wumpus</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3023"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3023g.bin" size="0x2000" crc="6a5a3f97" sha1="4569d2f1eaba7b1736b1146c3863bd8c3d231040" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Hustle -->
+<software name="hustle">
+	<description>Hustle</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3034"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3034g.bin" size="0x2000" crc="8e7d5b68" sha1="7ec86dd2150d25d26b4ed4ecd696097a2730e5af" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Demon Attack -->
+<software name="demonatb">
+	<description>Demon Attack</description>
+	<year>1983</year>
+	<publisher>Imagic</publisher>
+	<info name="serial" value="PHM 3219"/>
+	<info name="version" value="beta"/>
+	<info name="comment" value="with speech"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x87aa">
+			<rom name="demonbetag.bin" size="0x87aa" crc="2e54e078" sha1="c5d1da313adb1319226a4aedcf2d8067dacc9534" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Super Demon Attack -->
+<software name="demonat">
+	<description>Super Demon Attack</description>
+	<year>1983</year>
+	<publisher>Imagic</publisher>
+	<info name="serial" value="PHM 3219"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3219g.bin" size="0x6000" crc="0a80afc7" sha1="6d41e1e2178b346a540f66068e3aeb5731a58d42" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3219c.bin" size="0x2000" crc="cadb08a6" sha1="09f8c02baf570cfec232dac9bae07ecc0908ca74" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Fathom -->
+<software name="fathomb">
+	<description>Fathom</description>
+	<year>1983</year>
+	<publisher>Imagic</publisher>
+	<info name="serial" value="PHM 3222"/>
+	<info name="version" value="beta"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x80bc">
+			<rom name="fathombetag.bin" size="0x80bc" crc="db17fd3a" sha1="649541503c367a170de5c5d94d65425dad159121" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Fathom -->
+<software name="fathom">
+	<description>Fathom</description>
+	<year>1983</year>
+	<publisher>Imagic</publisher>
+	<info name="serial" value="PHM 3222"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3222g.bin" size="0x6000" crc="b893af9a" sha1="bd1f4b1f332f2c0dc899185a3d1fef098046e3a4" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3222c.bin" size="0x2000" crc="ddb86aa1" sha1="6aec673aef66013bb71ed1f67048853d0a9d28bd" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="phm3222d.bin" size="0x2000" crc="ddb86aa1" sha1="6aec673aef66013bb71ed1f67048853d0a9d28bd" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Microsurgeon -->
+<software name="microsur">
+	<description>Microsurgeon</description>
+	<year>1983</year>
+	<publisher>Imagic</publisher>
+	<info name="serial" value="PHM 3220"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3220g.bin" size="0x6000" crc="a123c577" sha1="2936c6b3c6abc393bb53ef7167cd881891bbfb09" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3220c.bin" size="0x2000" crc="51b2a37f" sha1="df90b30f241c317d579f7f843b6e9b9ec8c1d3c1" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Moonsweeper -->
+<software name="moonswp">
+	<description>Moonsweeper</description>
+	<year>1983</year>
+	<publisher>Imagic</publisher>
+	<info name="serial" value="PHM 3224"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3224g.bin" size="0xa000" crc="17cbbf7b" sha1="442a3b7c46a48992065c9afe1c5afa90cdc4c631" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3224c.bin" size="0x2000" crc="abdaf510" sha1="4f02bfa71f47943b0313eba8e5662e9effdabbf8" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="phm3224d.bin" size="0x2000" crc="4212fba2" sha1="63cc1a441fabdafb15422c3fa481b573491b9c38" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Wing War -->
+<software name="windwarb">
+	<description>Wing War</description>
+	<year>1983</year>
+	<publisher>Imagic</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x80c6">
+			<rom name="wingwarbetag.bin" size="0x80c6" crc="1510196d" sha1="164639164efdfafa51bb9cb449b54598262b061a" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Wing War -->
+<software name="wingwar">
+	<description>Wing War</description>
+	<year>1983</year>
+	<publisher>Imagic</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x5800">
+			<rom name="phm3223g.bin" size="0x5800" crc="4d7ef6f3" sha1="48b03bb75e1c9d6aa18052da71f06baf44a868d1" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3223c.bin" size="0x2000" crc="179a6759" sha1="2dd3ac18f70d2ca97391e3e239152ff0db20a5a0" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Star Wars -->
+<software name="starwars">
+	<description>Star Wars</description>
+	<year>1984</year>
+	<publisher>John Phillips</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="7dc6324a" sha1="0b4b01c86970022b5b894695d5bb10678ea4f076" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Strike Three! -->
+<software name="strike3">
+	<description>Strike Three!</description>
+	<year>1988</year>
+	<publisher>John Phillips</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="strike3c.bin" size="0x2000" crc="2096414c" sha1="df37c00f415eb10821ec689a68dbefc660167a4a" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="strike3d.bin" size="0x2000" crc="abda506c" sha1="5728a247f90cc846aa7fc6589de6abba4ca13560" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Jumpy -->
+<software name="jumpy">
+	<description>Jumpy</description>
+	<year>1983</year>
+	<publisher>Sofmachine</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="jumpyc.bin" size="0x2000" crc="d98c0581" sha1="64bacb174fafe9989452b8a87b51af62abc05f03" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="jumpyd.bin" size="0x2000" crc="70733313" sha1="f364eadc0ba0e99173bc4f6348925eba06c7bc99" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Lasso -->
+<software name="lasso">
+	<description>Lasso</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8168">
+			<rom name="lassog.bin" size="0x8168" crc="4a4a169d" sha1="ce9bcfb914f402f61cc7c809274e24f573d42169" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for M.A.S.H -->
+<software name="mash">
+	<description>M.A.S.H</description>
+	<year>1983</year>
+	<publisher>Fox</publisher>
+	<info name="serial" value="PHM 3158"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x5800">
+			<rom name="phm3158g.bin" size="0x5800" crc="9aec130d" sha1="4a5edc043127ecb9508863d7fb244eee0a765bd3" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3158c.bin" size="0x2000" crc="f3d1eec4" sha1="59d19f4e3514f73d4cb2d4c28c946dc654539951" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Maximem Utilities -->
+<software name="maximem">
+	<description>Maximem Utilities</description>
+	<info name="comment" value="GROM only"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="MAXTESUg.bin" size="0xa000" crc="e0ec4769" sha1="eba0c151044a5962b4ce380b84c3314f8dafb05a" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Bigfoot -->
+<software name="bigfoot">
+	<description>Bigfoot</description>
+	<year>1983</year>
+	<publisher>Milton Bradley</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6bba">
+			<rom name="bigfootg.bin" size="0x6bba" crc="e43b586c" sha1="a9605bef5a023b2feb1daab9ab834208e9aaa4e0" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Blasto -->
+<software name="blasto">
+	<description>Blasto</description>
+	<year>1980</year>
+	<publisher>Milton Bradley</publisher>
+	<info name="serial" value="PHM 3032"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3032g.bin" size="0x2000" crc="2a5882d7" sha1="7baafca039d5b585c68c38d5518eb8cffb41dc20" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Card Sharp -->
+<software name="cardshp">
+	<description>Card Sharp</description>
+	<year>198x</year>
+	<publisher>Milton Bradley</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="cardsg.bin" size="0x2000" crc="241604fa" sha1="906958e9c0c6b575489881a27e2f5aee7b8c7f38" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Connect Four -->
+<software name="connect4">
+	<description>Connect Four</description>
+	<year>1980</year>
+	<publisher>Milton Bradley</publisher>
+	<info name="serial" value="PHM 3038"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3038g.bin" size="0x4000" crc="12ede291" sha1="10aa560a6ec231f6742700532e356cbeb03331bb" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milton Bradley Gamevision -->
+<software name="gamevis">
+	<description>Milton Bradley Gamevision</description>
+	<year>198x</year>
+	<publisher>Milton Bradley</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="mbgamesg.bin" size="0x9800" crc="77e444d3" sha1="126e87e52ea7ea7655da4fe08472e2610f5927f1" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Hangman -->
+<software name="hangman">
+	<description>Hangman</description>
+	<year>1981</year>
+	<publisher>Milton Bradley</publisher>
+	<info name="serial" value="PHM 3037"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3037g.bin" size="0xa000" crc="7a5ac86f" sha1="b444981e83792877949c8505a8dd41cb97430914" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3037c.bin" size="0x2000" crc="20832307" sha1="de2db3166ffff1c5067fe405ee09d78ff850033f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Honey Hunt -->
+<software name="honeyhnt">
+	<description>Honey Hunt</description>
+	<year>1983</year>
+	<publisher>Milton Bradley</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7c90">
+			<rom name="honeyhuntg.bin" size="0x7c90" crc="6cbc9fca" sha1="bf0177a526e94a403a95f74f179e4ad0cf1126be" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Meteor Belt -->
+<software name="meteorbt">
+	<description>Meteor Belt</description>
+	<year>1983</year>
+	<publisher>Milton Bradley</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6fba">
+			<rom name="meteorbeltg.bin" size="0x6fba" crc="bb2f3568" sha1="68b750edd8c5b2262d215d1a4dfcf856bdd93948" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Soundtrack Trolley -->
+<software name="soundtro">
+	<description>Soundtrack Trolley</description>
+	<year>1983</year>
+	<publisher>Milton Bradley</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x73ba">
+			<rom name="soundtrackg.bin" size="0x73ba" crc="af6744e9" sha1="8807130a16bad369a2e7a11402d723ab8b0bcea1" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Starship Pegasus -->
+<software name="pegasus">
+	<description>Starship Pegasus</description>
+	<year>1983</year>
+	<publisher>Milton Bradley</publisher>
+	<info name="serial" value="PHM 3147"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3147g.bin" size="0x4000" crc="3ad80563" sha1="14b1b0b27b0507dc127f797e7d8c3a41c5a589dc" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3147c.bin" size="0x2000" crc="0813e7dc" sha1="9597ba9f9b551f486b7195de804cc22280909dfa" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Championship Baseball -->
+<software name="baseball">
+	<description>Championship Baseball</description>
+	<year>1983</year>
+	<publisher>Milton Bradley</publisher>
+	<info name="serial" value="PHM 3148"/>
+	<info name="comment" value="MBX"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3148g.bin" size="0x6000" crc="83c08f7b" sha1="7c17aa467a0933cda91c113df60544a5d264ee6d" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3148c.bin" size="0x2000" crc="63a5574a" sha1="450b67cf38d56c98e927537d0ad6d061b45f00e7" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for I'm Hiding -->
+<software name="hiding">
+	<description>I'm Hiding</description>
+	<year>1983</year>
+	<publisher>Milton Bradley</publisher>
+	<info name="serial" value="PHM 3155"/>
+	<info name="comment" value="MBX"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3155g.bin" size="0x4000" crc="0579968f" sha1="18def018c6373641f9d1c543728365bc114fbeb6" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3155c.bin" size="0x2000" crc="72dfc2c2" sha1="ee653ee56684729301816889bdd2b89b7d3bed10" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Zero Zap -->
+<software name="zerozap">
+	<description>Zero Zap</description>
+	<year>1981</year>
+	<publisher>Milton Bradley</publisher>
+	<info name="serial" value="PHM 3036"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3036g.bin" size="0xa000" crc="1e0cb9b2" sha1="69bfc517923717e895875c5115c2b4de27995c7d" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Mechatronic/PS Extended Basic -->
+<software name="exbasm">
+	<description>Mechatronic/PS Extended Basic</description>
+	<publisher>Mechatronic</publisher>
+	<info name="comment" value="Extended Basic with additional functions"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="XBPLUSg.bin" size="0xa000" crc="75818782" sha1="f3a158b224cab3091b7a1149617f548008378107" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="XBPLUSc.bin" size="0x2000" crc="bd8addb9" sha1="d0be337b61552f7ac49d52872f66eb6ef549a774" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="XBPLUSd.bin" size="0x2000" crc="44c4d8a8" sha1="db2850db78431d89de85dd573e6df76151b25aba" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Math Sequences - Addition -->
+<software name="addseq">
+	<description>Milliken Math Sequences - Addition</description>
+	<year>1982</year>
+	<publisher>Milliken</publisher>
+	<info name="serial" value="PHM 3090"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3090g.bin" size="0x6000" crc="9e2f66e3" sha1="94871826c0d4ee80f371e62883b06d84b6bc23d5" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Math Sequences - Decimals -->
+<software name="decseq">
+	<description>Milliken Math Sequences - Decimals</description>
+	<year>1982</year>
+	<publisher>Milliken</publisher>
+	<info name="serial" value="PHM 3096"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3096g.bin" size="0x6000" crc="5d055113" sha1="112b153b09ec10a50b0b109ed553d807c022f241" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Math Sequences - Division -->
+<software name="divseq">
+	<description>Milliken Math Sequences - Division</description>
+	<year>1982</year>
+	<publisher>Milliken</publisher>
+	<info name="serial" value="PHM 3093"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="divseqg.bin" size="0x4000" crc="b05871e9" sha1="8a421c33af71292f4bf7e22fbc8d95a37f975fbf" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Math Sequences - Equations -->
+<software name="equseq">
+	<description>Milliken Math Sequences - Equations</description>
+	<year>1982</year>
+	<publisher>Milliken</publisher>
+	<info name="serial" value="PHM 3100"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3100g.bin" size="0x4000" crc="5a20abda" sha1="7844d9ce0d95975c5f9dc2069917dfe6e93382e0" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Math Sequences - Fractional Numbers -->
+<software name="fracseq">
+	<description>Milliken Math Sequences - Fractional Numbers</description>
+	<year>1982</year>
+	<publisher>Milliken</publisher>
+	<info name="serial" value="PHM 3095"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="fractiog.bin" size="0x8000" crc="2863ea6e" sha1="d53d5882d150df673487b65068ebdeaac8dd2961" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Math Sequences - Integers -->
+<software name="intseq">
+	<description>Milliken Math Sequences - Integers</description>
+	<year>1982</year>
+	<publisher>Milliken</publisher>
+	<info name="serial" value="PHM 3094"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x3800">
+			<rom name="phm3094g.bin" size="0x3800" crc="997fedf6" sha1="586566fac5ea121bc9732bafaa678b4679061cd6" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Math Sequences - Laws of Arithmetic -->
+<software name="arithseq">
+	<description>Milliken Math Sequences - Laws of Arithmetic</description>
+	<year>1982</year>
+	<publisher>Milliken</publisher>
+	<info name="serial" value="PHM 3099"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3099g.bin" size="0x6000" crc="fa310e85" sha1="0d296f0b5b62c66e2331033791175dfa3c96bb85" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Manager -->
+<software name="manager">
+	<description>Milliken Manager</description>
+	<year>1982</year>
+	<publisher>Milliken</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="dump_g.bin" size="0xa000" crc="0ea9770f" sha1="e4e46638a4315e8e008974e26b4c432314fca2f4" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Math Sequences - Measurement Formulas -->
+<software name="measseq">
+	<description>Milliken Math Sequences - Measurement Formulas</description>
+	<year>1982</year>
+	<publisher>Milliken</publisher>
+	<info name="serial" value="PHM 3101"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3101g.bin" size="0xa000" crc="ef8b915a" sha1="a1737e05cee01385d15ee039bed2acab12e13cf1" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3101c.bin" size="0x2000" crc="7a503b69" sha1="63e88c598bad3d452cb98d47affaf18ce1607c4c" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="phm3101d.bin" size="0x2000" crc="38a97183" sha1="7361e4837a116dcbe38c7af2e92951b989694444" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Math Sequences - Multiplication -->
+<software name="multseq">
+	<description>Milliken Math Sequences - Multiplication</description>
+	<year>1982</year>
+	<publisher>Milliken</publisher>
+	<info name="serial" value="PHM 3092"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3092g.bin" size="0x6000" crc="a40fa3b7" sha1="00d89fd8cf19b1be0663a67a49c6884db4b4bad9" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Math Sequences - Number Readiness -->
+<software name="nbrdyseq">
+	<description>Milliken Math Sequences - Number Readiness</description>
+	<year>1984</year>
+	<publisher>Milliken</publisher>
+	<info name="serial" value="PHM 3098"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x3800">
+			<rom name="phm3098g.bin" size="0x3800" crc="91a2a7f5" sha1="9840fc543ae8602e3b1046dbceb3a57f6d072cea" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Math Sequences - Percents -->
+<software name="percseq">
+	<description>Milliken Math Sequences - Percents</description>
+	<year>1982</year>
+	<publisher>Milliken</publisher>
+	<info name="serial" value="PHM 3097"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3097g.bin" size="0xa000" crc="ed1901a1" sha1="4849ae2fb026cb2eacb438f0f68dbfc6a8a28d3f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Milliken Math Sequences - Subtraction -->
+<software name="subseq">
+	<description>Milliken Math Sequences - Subtraction</description>
+	<year>1982</year>
+	<publisher>Milliken</publisher>
+	<info name="serial" value="PHM 3091"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3091g.bin" size="0x4000" crc="7a24106a" sha1="cda1aa1d2f5ec7f5a2e7858eb98da3829ad02d43" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Moon Mine -->
+<software name="moonmine">
+	<description>Moon Mine</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3131"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3131g.bin" size="0xa000" crc="07adddb3" sha1="36047452fddf5a4558375c092294762819188de7" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3131c.bin" size="0x2000" crc="e91dbbb2" sha1="86ed6167a2f342636cf3ada09a8d6fde1378be6e" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Microsoft Multiplan -->
+<software name="multipln">
+	<description>Microsoft Multiplan</description>
+	<year>1981</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3113"/>
+	<info name="version" value="1.04"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3113g.bin" size="0xa000" crc="7318f573" sha1="da69e12124c701dcd967e13ac655176d4ec6bb55" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Munch Man II -->
+<software name="munchmn2">
+	<description>Munch Man II</description>
+	<year>1987</year>
+	<publisher>John Phillips</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="munch2c.bin" size="0x2000" crc="20121eec" sha1="2ff6b8504fac59e295afe5d34e229815478f50f2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Munch Man -->
+<software name="munchmnb">
+	<description>Munch Man</description>
+	<year>1981</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3057"/>
+	<info name="version" value="beta"/>
+	<info name="comment" value="Different layout, Pacman-like (eats points)"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x36fa">
+			<rom name="munchbetag.bin" size="0x36fa" crc="62579bbf" sha1="96ac81bfd840b8cd8a91d8fa4e706b2b74911544" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Munch Man -->
+<software name="munchman">
+	<description>Munch Man</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3057"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3057g.bin" size="0x2000" crc="4890758f" sha1="e0620c5642bf234649703624b161ec390086f7fc" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3057c.bin" size="0x2000" crc="b60b0301" sha1="d97e4c8fd32846cd887f6761b14126c29b9e1ccb" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Munchmobile -->
+<software name="munchmob">
+	<description>Munchmobile</description>
+	<year>1983</year>
+	<publisher>SNK Electronics</publisher>
+	<info name="serial" value="PHM 3146"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3146g.bin" size="0x6000" crc="eacf398c" sha1="68a1bffbc58a7ff9310db23fed47b4cfb06270e7" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3146c.bin" size="0x2000" crc="2aba3240" sha1="c958001956097801914215ba8d7390c68b1d5ea1" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Music Maker -->
+<software name="musicmak">
+	<description>Music Maker</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3020"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3020g.bin" size="0x6000" crc="f362f861" sha1="aa05d233894d02344cceb5782761a98f26cd4780" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Music SDA -->
+<software name="musicsda">
+	<description>Music SDA</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="mmsdag.bin" size="0x9800" crc="56bd5a35" sha1="654e2cae7545746efbac94ce55dd84816ce6ca04" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Chicken Coop -->
+<software name="chickenc">
+	<description>Chicken Coop</description>
+	<year>1986</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="chicoopc.bin" size="0x2000" crc="041c34fa" sha1="82b38e070b5b2d78ef12dae6ac1304bce450b3a9" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Console Writer -->
+<software name="conswr1">
+	<description>Console Writer</description>
+	<year>1984</year>
+	<publisher>Navarone</publisher>
+	<info name="version" value="1.1"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="CW11c.bin" size="0x2000" crc="39bd4c89" sha1="fa0f9a5bfd5a74887d7c448bd4851198c5a59a04" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Console Writer v2.1 -->
+<software name="conswr2">
+	<description>Console Writer v2.1</description>
+	<year>1984</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="7f9060ed" sha1="dd7de1d082b385393d6e4287f159453fb11ea1d1" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Data Base Management System v2.0 -->
+<software name="dmbsys">
+	<description>Data Base Management System v2.0</description>
+	<year>1984</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="databmc.bin" size="0x2000" crc="2f0e6ded" sha1="28dc6d6eb1369e9c5e73e2c56f5436800ac71e04" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Disk Fixer v2.0 -->
+<software name="diskfx20">
+	<description>Disk Fixer v2.0</description>
+	<year>1984</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="diskfixc.bin" size="0x2000" crc="26734df3" sha1="b685fd43e1e20103b4d783f1116868e82bce2b33" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Disk Fixer -->
+<software name="diskfx21">
+	<description>Disk Fixer</description>
+	<year>1984</year>
+	<publisher>Navarone</publisher>
+	<info name="version" value="2.1"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="DFIX21c.bin" size="0x2000" crc="39d3e2ba" sha1="ed973e60576f2037dd39f9930feed2e13474edc1" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Frog Stickers -->
+<software name="frogstk">
+	<description>Frog Stickers</description>
+	<year>1982</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="720429b3" sha1="63bf43f810851166659345944aea24c217162b05" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Homework Helper+ -->
+<software name="homework">
+	<description>Homework Helper+</description>
+	<year>1984</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="homhelpc.bin" size="0x2000" crc="11179fe9" sha1="1cb5e7a61da47711d54194e13712a563eaf1367a" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Speed Reading A -->
+<software name="speedrda">
+	<description>Speed Reading A</description>
+	<year>1984</year>
+	<publisher>Navarone</publisher>
+	<info name="comment" value="adults"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="spdreadc.bin" size="0x2000" crc="a595b6f5" sha1="d1a59be5b53b70994ab47a04a3072b86a1b148f2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Speed Reading B -->
+<software name="speedrdb">
+	<description>Speed Reading B</description>
+	<year>1984</year>
+	<publisher>Navarone</publisher>
+	<info name="comment" value="children"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="cfff822e" sha1="33d5a7685dd67bc54b97275228f962a03ea20d1d" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Super Duper v1.1 -->
+<software name="supduper">
+	<description>Super Duper v1.1</description>
+	<year>1984</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="suprdupc.bin" size="0x2000" crc="56ec84e3" sha1="ad868398d78e9648536815ae28431505553590bc" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Super Sort -->
+<software name="supsort">
+	<description>Super Sort</description>
+	<year>1983</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="SORTc.bin" size="0x2000" crc="5661a4e2" sha1="0b78c97c0623fb2c2147307e4b84326bacc5afcc" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Topper -->
+<software name="topper83">
+	<description>Topper</description>
+	<year>1983</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="topperc.bin" size="0x2000" crc="3c124691" sha1="f24c9d176b3dfba680488f138577e613d5a1daa1" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Topper -->
+<software name="topper86">
+	<description>Topper</description>
+	<year>1986</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="topperc.bin" size="0x2000" crc="0c0d3375" sha1="26c3d00c6fb0106625fae4d980f405a1d2d87962" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Donkey Kong -->
+<software name="donkeykg">
+	<description>Donkey Kong</description>
+	<year>1983</year>
+	<publisher>Atarisoft</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="donkeyc.bin" size="0x2000" crc="924353d1" sha1="9dcca770c327b7795ae85e02805c6fb141ef99d3" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="donkeyd.bin" size="0x2000" crc="5f305760" sha1="87df2ac848f470718a2b7bde18be61401a11cd63" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Number Magic -->
+<software name="numbmagi">
+	<description>Number Magic</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3004"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x3800">
+			<rom name="phm3004g.bin" size="0x3800" crc="627a0cf6" sha1="c7a76a939a4674c5aa76e24869d8a4e630a44398" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Number Magic -->
+<software name="numbmag">
+	<description>Number Magic</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3004"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3004g.bin" size="0x2000" crc="8910b4df" sha1="674f92100ad6877281238c836a5ce7881225a93b" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for OS/99 -->
+<software name="os9940">
+	<description>OS/99</description>
+	<info name="version" value="4.0"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="OS994Ag.bin" size="0xa000" crc="4577b197" sha1="631f932fdfb274a627b9c44289cdd0c15d57354a" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Paddleball -->
+<software name="paddlebl">
+	<description>Paddleball</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2076">
+			<rom name="paddlebg.bin" size="0x2076" crc="c2fedd1f" sha1="15bcae8ca99c2ae84a4a2d3b6785707fd2f2c49a" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Paint 'N' Print A -->
+<software name="ptprgp">
+	<description>Paint 'N' Print A</description>
+	<year>1985</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="pntprntc.bin" size="0x2000" crc="9cf8aca3" sha1="816a64db004ae9dab53c61d3ef1bed2a7545d19f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Paint 'N' Print C -->
+<software name="ptpribm">
+	<description>Paint 'N' Print C</description>
+	<year>1985</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="cf634405" sha1="4c726d6dac5cee06caac35ffab1eeacbb5518116" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Parsec -->
+<software name="parsec">
+	<description>Parsec</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3112"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3112g.bin" size="0x6000" crc="6913f1e4" sha1="b349bc7345a3f3dbc0d0eabde1a254fa1609fd66" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3112c.bin" size="0x2000" crc="d1309fbe" sha1="adf70cd8894e7cba1de862dc2fb9e35eb7e4a5b3" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for UCSD Pascal Development System -->
+<software name="pascdeb">
+	<description>UCSD Pascal Development System</description>
+	<year>198x</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="dump_g.bin" size="0x2000" crc="c42d66aa" sha1="e39e783385b01dddbeec18c185d97999ef6f1e0e" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="7c6fcf79" sha1="a8faac5d4750b9fbf695d4d13b5770e657d74d9f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Frogger -->
+<software name="frogger">
+	<description>Frogger</description>
+	<year>1984</year>
+	<publisher>Parker Brothers</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="froggerg.bin" size="0x9800" crc="5f053fea" sha1="680adacf5bc305fb7c8b5266bd3fd63aed5f9fe7" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="froggerc.bin" size="0x2000" crc="b2d6a6f1" sha1="3f4f3c39b81222ebd881f1d6bdc8f9764078d040" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Popeye -->
+<software name="popeye">
+	<description>Popeye</description>
+	<year>1984</year>
+	<publisher>Parker Brothers</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="popeyeg.bin" size="0x9800" crc="85acb508" sha1="db07839c9e4ce838ee377210aebb4630b978c070" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="popeyec.bin" size="0x2000" crc="028a1813" sha1="d0fe518ee32daa6b7ff83e0e2b6d009c0566740e" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Q-Bert -->
+<software name="qbert">
+	<description>Q-Bert</description>
+	<year>1984</year>
+	<publisher>Parker Brothers</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="qbertg.bin" size="0x9800" crc="8192e78a" sha1="3f82a8a6ec742b49d8cac2698a2cf85468a3b39e" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="qbertc.bin" size="0x2000" crc="f939439d" sha1="db7fa093fde7b465e0eb75682c645b1678174acf" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Personal Real Estate -->
+<software name="prestate">
+	<description>Personal Real Estate</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3022"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="phm3022g.bin" size="0x8000" crc="4868b7d1" sha1="eed78bc10535086d1fd8d2e6262c2fc2f6651367" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Personal Record Keeping -->
+<software name="perrecdi">
+	<description>Personal Record Keeping</description>
+	<year>1981</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="dump_g.bin" size="0x9800" crc="6f94eada" sha1="7f45d0d455fef0e16583c6837bebcf481ecdf168" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Personal Record Keeping -->
+<software name="perrec">
+	<description>Personal Record Keeping</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3013"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="phm3013g.bin" size="0x8000" crc="d16853ee" sha1="997f68ced3017d4ce064bc3fd5636ed0353a0786" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Personal Report Generator -->
+<software name="perrep">
+	<description>Personal Report Generator</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3044"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3044g.bin" size="0x4000" crc="631ab007" sha1="ebfdfb4eba7eee6b8182fd1cda2707fc56249aa6" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Physical Fitness -->
+<software name="fitness">
+	<description>Physical Fitness</description>
+	<year>1978</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3010"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x3800">
+			<rom name="phm3010g.bin" size="0x3800" crc="e64d5412" sha1="11f7ef857cc90ca53ef2c0d7946f84461650b796" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Introduction to Plant Genetics -->
+<software name="genetics">
+	<description>Introduction to Plant Genetics</description>
+	<year>1984</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3173"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="phm3173g.bin" size="0x7800" crc="19affdb3" sha1="e6d8686132283d95708f2cf175544b9803511cbd" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3173c.bin" size="0x2000" crc="2c6a88a7" sha1="2b4628d36cfc8ad805fd8bb873467156df0a7882" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Plato Interpreter -->
+<software name="plato">
+	<description>Plato Interpreter</description>
+	<year>1982</year>
+	<publisher>Control Data</publisher>
+	<info name="serial" value="PHM 3122"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="phm3122g.bin" size="0x7800" crc="3c9819cd" sha1="2dbbadb059fd8e3c30e9467f3e2f679502bcdb9c" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3122c.bin" size="0x2000" crc="653258dc" sha1="e95b81b30f21d0a7d8e41fac9f2f76b53c427bf2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Return to Pirate's Isle -->
+<software name="retpirat">
+	<description>Return to Pirate's Isle</description>
+	<year>1983</year>
+	<publisher>Scott Adams</publisher>
+	<info name="serial" value="PHM 3189"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3189g.bin" size="0xa000" crc="852d79fd" sha1="9c610db21aa1061410475831230421a0586dd308" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3189c.bin" size="0x2000" crc="8eadb535" sha1="f50c6de9474b353305fda5941088cb1e57737cea" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Ant-Eater -->
+<software name="anteater">
+	<description>Ant-Eater</description>
+	<year>1983</year>
+	<publisher>Romox</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="anteatc.bin" size="0x2000" crc="1b5a541e" sha1="ad9d28109ab7263b49e2ccb511e6e8587d859ab9" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Hen Pecked -->
+<software name="henpeck">
+	<description>Hen Pecked</description>
+	<year>1983</year>
+	<publisher>Romox</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="henpeckc.bin" size="0x2000" crc="4925b1d9" sha1="5923c8e8b3e4c0331385b5b92c6a387deab9ac20" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Princess and Frog -->
+<software name="prfrog">
+	<description>Princess and Frog</description>
+	<year>1982</year>
+	<publisher>Romox</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="prnfrogc.bin" size="0x2000" crc="c230b531" sha1="d8c7f7edbe2e8172bf25e77b63d0791d1d1f83bb" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Rotor Raiders -->
+<software name="rotorrd">
+	<description>Rotor Raiders</description>
+	<year>1983</year>
+	<publisher>Romox</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="rotraidc.bin" size="0x2000" crc="8bb54122" sha1="6f6a704935edb6482270182c2db22e6d1b2ddaed" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Typo II -->
+<software name="typo2">
+	<description>Typo II</description>
+	<year>1983</year>
+	<publisher>Romox</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="typoiic.bin" size="0x2000" crc="2b669918" sha1="d57d2cfe6a4c22e92228cebd742b3b652f85b1ff" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Typoman -->
+<software name="typoman">
+	<description>Typoman</description>
+	<year>1987</year>
+	<publisher>Navarone</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="typomanc.bin" size="0x2000" crc="20fd0e2a" sha1="db6928f35555474a80e0a12729678d45f09bfd5b" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Romox Demo -->
+<software name="vidgamlb">
+	<description>Romox Demo</description>
+	<year>1983</year>
+	<publisher>Romox</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="romoxc.bin" size="0x2000" crc="0d6eab2a" sha1="a24504ec6ad649c18567a30be1e7fa9d322278d4" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for RXB + Super Editor Assembler -->
+<software name="rxb1002">
+	<description>RXB + Super Editor Assembler</description>
+	<year>19xx</year>
+	<publisher>Western Horizon</publisher>
+	<info name="version" value="1002"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="RXBV2g.bin" size="0xa000" crc="8e07abd2" sha1="ad12ccd39d2a8d0a65d6b1a82fbaddafa1a1f89d" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="RXBV2c.bin" size="0x2000" crc="d5a91251" sha1="dfa33094b67c31691b0396ea116c9da8d134bbc2" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="RXBV2d.bin" size="0x2000" crc="b43ee777" sha1="3868b19845d4276658898cd278aede6257f524d6" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for RXB + Super Editor Assembler -->
+<software name="rxb2002">
+	<description>RXB + Super Editor Assembler</description>
+	<publisher>Rich Gilbertson</publisher>
+	<info name="version" value="2002"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="RXB2K2g.bin" size="0xa000" crc="350c4945" sha1="f1417afe7841146903a5182beeeebaf154d21e06" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="RXB2K2c.bin" size="0x2000" crc="b43ee777" sha1="3868b19845d4276658898cd278aede6257f524d6" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="RXB2K2d.bin" size="0x2000" crc="d5a91251" sha1="dfa33094b67c31691b0396ea116c9da8d134bbc2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for RXB -->
+<software name="rxb237">
+	<description>RXB</description>
+	<publisher>Rich Gilbertson</publisher>
+	<info name="version" value="2.37"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="RXB237g.bin" size="0xa000" crc="34cb2778" sha1="2368f8aeb810ce198180e0da31ac7a5b548bb2b2" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="RXB237c.bin" size="0x2000" crc="bd8addb9" sha1="d0be337b61552f7ac49d52872f66eb6ef549a774" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="RXB237d.bin" size="0x2000" crc="d5a91251" sha1="dfa33094b67c31691b0396ea116c9da8d134bbc2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Extended Basic -->
+<software name="rxb24">
+	<description>Extended Basic</description>
+	<year>19xx</year>
+	<publisher>Rich Gilbertson</publisher>
+	<info name="version" value="2.4"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="RXB24g.bin" size="0xa000" crc="15b3406b" sha1="aa04abd00f16a08ee336d788a5cc0fc0a9a9a917" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="RXB24c.bin" size="0x2000" crc="5553c490" sha1="0b3f9ba37ef43d04874aa6fdea54097e82718c73" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="RXB24d.bin" size="0x2000" crc="3d700b78" sha1="427352e39297c53402b97a3211ea13f8f1d68965" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Extended Basic -->
+<software name="rxb26">
+	<description>Extended Basic</description>
+	<year>19xx</year>
+	<publisher>Rich Gilbertson</publisher>
+	<info name="version" value="2.6"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="RXB26g.bin" size="0xa000" crc="fb887f39" sha1="26df9cc148b7827d4fc65a117a1fe254febdc388" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="RXB26c.bin" size="0x2000" crc="5553c490" sha1="0b3f9ba37ef43d04874aa6fdea54097e82718c73" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="RXB26d.bin" size="0x2000" crc="3d700b78" sha1="427352e39297c53402b97a3211ea13f8f1d68965" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for RXB v1005 -->
+<software name="rxb">
+	<description>RXB v1005</description>
+	<year>19xx</year>
+	<publisher>Rich Gilbertson</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="rxbg.bin" size="0xa000" crc="8700ecb5" sha1="ca19389a99d4928f570f8c708787daa0a557ba8a" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="rxbc.bin" size="0x2000" crc="708d9482" sha1="44044d4adec4512a952bd062b96efdbf99f73343" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="rxbd.bin" size="0x2000" crc="18ae5b6a" sha1="103aa8119e4c13d2b83cffc81145a106d796679e" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for RXB v2000 -->
+<software name="rxbv2000">
+	<description>RXB v2000</description>
+	<year>19xx</year>
+	<publisher>Rich Gilbertson</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="dump_g.bin" size="0xa000" crc="3bbaba2c" sha1="8b55e7c5f20b1e6366fd7047b0630b6d22af31f0" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="708d9482" sha1="44044d4adec4512a952bd062b96efdbf99f73343" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="dump_d.bin" size="0x2000" crc="18ae5b6a" sha1="103aa8119e4c13d2b83cffc81145a106d796679e" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for RXB v2001 &amp; Super Editor Assembler -->
+<software name="rxbv2001">
+	<description>RXB v2001 &amp; Super Editor Assembler</description>
+	<year>19xx</year>
+	<publisher>Rich Gilbertson</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="dump_g.bin" size="0xa000" crc="e8c04156" sha1="4145c28c252dc6d8f94164fb5a9f501f633587eb" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="b43ee777" sha1="3868b19845d4276658898cd278aede6257f524d6" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="dump_d.bin" size="0x2000" crc="d5a91251" sha1="dfa33094b67c31691b0396ea116c9da8d134bbc2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for RXB v5.55 -->
+<software name="rxbv555">
+	<description>RXB v5.55</description>
+	<year>1992</year>
+	<publisher>Cadd Electronics - Rich Gilbertson</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="dump_g.bin" size="0xa000" crc="0d3ff2bd" sha1="de686366ff69892fa2e801f8364f2b09a71f4d5e" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="b43ee777" sha1="3868b19845d4276658898cd278aede6257f524d6" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="dump_d.bin" size="0x2000" crc="d5a91251" sha1="dfa33094b67c31691b0396ea116c9da8d134bbc2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Saguaro City -->
+<software name="saguaro">
+	<description>Saguaro City</description>
+	<year>1981</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3052"/>
+	<info name="version" value="beta"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x1642">
+			<rom name="saguarog.bin" size="0x1642" crc="f73bb5e4" sha1="ad6e11450d8b97e7ec29aa825938364033d527dd" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Scholastic Spelling - Level 3 -->
+<software name="scholsp3">
+	<description>Scholastic Spelling - Level 3</description>
+	<year>1982</year>
+	<publisher>Scholastic</publisher>
+	<info name="serial" value="PHM 3059"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3059g.bin" size="0xa000" crc="cf96b1ea" sha1="d50374028d9a16c93c1dc55c436026d51fb424c0" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3059c.bin" size="0x2000" crc="d2008761" sha1="05d4bf80e9299f0f9af6442b61a2779935604762" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Scholastic Spelling - Level 4 -->
+<software name="scholsp4">
+	<description>Scholastic Spelling - Level 4</description>
+	<year>1982</year>
+	<publisher>Scholastic</publisher>
+	<info name="serial" value="PHM 3060"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3060g.bin" size="0xa000" crc="7c2c247e" sha1="d4c3b68fad8ef3bc668f76249dd46bd3fc81b55d" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3060c.bin" size="0x2000" crc="d2008761" sha1="05d4bf80e9299f0f9af6442b61a2779935604762" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Scholastic Spelling - Level 5 -->
+<software name="scholsp5">
+	<description>Scholastic Spelling - Level 5</description>
+	<year>1982</year>
+	<publisher>Scholastic</publisher>
+	<info name="serial" value="PHM 3061"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3061g.bin" size="0xa000" crc="5f814f20" sha1="36dbe3304168dcd85aa0b93d7d2973856458b6b4" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3061c.bin" size="0x2000" crc="a00811f3" sha1="3968b37f4ea7481702523643770aa3629b9368d7" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="phm3061d.bin" size="0x2000" crc="cabc5be5" sha1="ee307b0a1dd5a1bb6c3887058d1639004c5e6e14" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Scholastic Spelling - Level 6 -->
+<software name="scholsp6">
+	<description>Scholastic Spelling - Level 6</description>
+	<year>1982</year>
+	<publisher>Scholastic</publisher>
+	<info name="serial" value="PHM 3062"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3062g.bin" size="0xa000" crc="2ab917cf" sha1="304850c9b47af87c353b6de256dceacd6df34a47" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3062c.bin" size="0x2000" crc="d2008761" sha1="05d4bf80e9299f0f9af6442b61a2779935604762" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="phm3062d.bin" size="0x2000" crc="44c4d8a8" sha1="db2850db78431d89de85dd573e6df76151b25aba" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Buck Rogers - Planet of Zoom -->
+<software name="buckrog">
+	<description>Buck Rogers - Planet of Zoom</description>
+	<year>1983</year>
+	<publisher>Sega Enterprises</publisher>
+	<info name="serial" value="PHM 3226"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3226g.bin" size="0x4000" crc="663b0c3d" sha1="9898acc48d44a78ba6ddf0d0dd3c831d89b33a3c" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3226c.bin" size="0x2000" crc="0b9ad832" sha1="b5861843738c357459b3156a872a9904d2d1e31c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Congo Bongo -->
+<software name="congobng">
+	<description>Congo Bongo</description>
+	<year>1983</year>
+	<publisher>Sega Enterprises</publisher>
+	<info name="serial" value="PHM 3227"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3227g.bin" size="0x4000" crc="0cb4b327" sha1="aa63318a4d3c61c88fbf34080bcdd3d0acf642ca" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3227c.bin" size="0x2000" crc="478d9835" sha1="b0700b43199c55da986125628c2763b90a351eb8" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Securities Analysis -->
+<software name="securana">
+	<description>Securities Analysis</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3012"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="phm3012g.bin" size="0x8000" crc="09c36fb6" sha1="d1f4fffebe04b2e57ff848e1d71dbe24226721a8" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Star Trek -->
+<software name="startrek">
+	<description>Star Trek</description>
+	<year>1983</year>
+	<publisher>Sega Enterprises</publisher>
+	<info name="serial" value="PHM 3225"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3225g.bin" size="0x4000" crc="402166e8" sha1="989601a50750e2f131e8c67f17add9e4af00cb43" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3225c.bin" size="0x2000" crc="742f88ce" sha1="b12d2c8e4efd86bcbe619e16bcaf58d7ace18cff" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Accounting Assistant -->
+<software name="accasst">
+	<description>Accounting Assistant</description>
+	<year>1981</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="dump_g.bin" size="0xa000" crc="2ad92b71" sha1="ca1e8d3a6d82fa4eb9901f7be65b2b68ef20565f" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Activity Accountant -->
+<software name="actacct">
+	<description>Activity Accountant</description>
+	<year>1981</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="actvactg.bin" size="0x6000" crc="f40406f4" sha1="af152a8887a42693823e68493aaeb7f7533299ae" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Addition and Subtraction 1 -->
+<software name="addsub1">
+	<description>Addition and Subtraction 1</description>
+	<year>1981</year>
+	<publisher>Scott, Foresman</publisher>
+	<info name="serial" value="PHM 3027"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3027g.bin" size="0x6000" crc="872738d4" sha1="7aedcdce07a027455732f2660ad58ac8cdfe2130" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Addition and Subtraction 2 -->
+<software name="addsub2">
+	<description>Addition and Subtraction 2</description>
+	<year>1981</year>
+	<publisher>Scott, Foresman</publisher>
+	<info name="serial" value="PHM 3028"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3028g.bin" size="0x6000" crc="bae92e8f" sha1="b7bc545601c44f146a7836f296259b7a35c1c194" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Addition and Subtraction 3 -->
+<software name="addsub3">
+	<description>Addition and Subtraction 3</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="dump_g.bin" size="0x7800" crc="9f8e7898" sha1="71a3e9e838b1361ff8f01bfe77cdc3d6f4e71270" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Attendance Recorder -->
+<software name="attrec">
+	<description>Attendance Recorder</description>
+	<year>1982</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="dump_g.bin" size="0xa000" crc="9422492f" sha1="1cd445aeaef361faf84617106730d717962e59cf" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Class Data Recorder -->
+<software name="cldata">
+	<description>Class Data Recorder</description>
+	<year>1981</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="clasdatg.bin" size="0x9800" crc="f5273127" sha1="4704db70cb040a86b4e84324e6fbe77095d2e5c3" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Course Manager -->
+<software name="coursem">
+	<description>Course Manager</description>
+	<year>1981</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="crsmang.bin" size="0xa000" crc="73df377d" sha1="956f3f83bb3028ea1615f50d25f4c121a2ab1aa3" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Decimals 2 -->
+<software name="decdeli2">
+	<description>Decimals 2</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="decdel2g.bin" size="0x7800" crc="b3c75bba" sha1="0074c33acf88b565edadd4ce7761aa7b68103e24" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Division 1 -->
+<software name="divis1">
+	<description>Division 1</description>
+	<year>1982</year>
+	<publisher>Scott, Foresman</publisher>
+	<info name="serial" value="PHM 3049"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="phm3049g.bin" size="0x7800" crc="4a5e824b" sha1="50c19d7f93dce548e568668da1e6e08bfeeae916" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Fractions 2 -->
+<software name="fract2">
+	<description>Fractions 2</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="dump_g.bin" size="0x7800" crc="87a7b421" sha1="335871f5779cac0155cb43e963157deab3102c96" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Fractions 1 -->
+<software name="fract1">
+	<description>Fractions 1</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="fanfracg.bin" size="0x9800" crc="0f7fbdae" sha1="a910affdd80535d55bd05e4e75f83d726a337ee6" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Frog Jump -->
+<software name="frogjump">
+	<description>Frog Jump</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="frogjmpg.bin" size="0x4000" crc="f4c7beb0" sha1="2cd5ad0a726703c0d316e8673832703c13028618" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Multiplication 2 -->
+<software name="mimult">
+	<description>Multiplication 2</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="mitmultg.bin" size="0x8000" crc="9d7d72f6" sha1="486d91ac994dab64cf5a4aaf1daf940904c1c968" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Multiplication 1 -->
+<software name="multip1">
+	<description>Multiplication 1</description>
+	<year>1981</year>
+	<publisher>Scott, Foresman</publisher>
+	<info name="serial" value="PHM 3029"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x5800">
+			<rom name="phm3029g.bin" size="0x5800" crc="2fa5f0b8" sha1="389218ce5e062694162b7ef8b5e696ca4ecbe2fa" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Number Bowling -->
+<software name="numbbwl">
+	<description>Number Bowling</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="numbowlg.bin" size="0x4000" crc="b374a166" sha1="577d9b9dbc521ddd1d7680d0dcb58696c37b2660" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Numeration 1 -->
+<software name="numerat1">
+	<description>Numeration 1</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<info name="serial" value="PHM 3050"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="phm3050g.bin" size="0x7800" crc="9a810966" sha1="0755d1fe5301a76285c2f1d73643ea7d64c3a6e4" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Numeration 2 -->
+<software name="numerat2">
+	<description>Numeration 2</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<info name="serial" value="PHM 3051"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3051g.bin" size="0x6000" crc="c37e0373" sha1="75e245be1d383a797109d721a457fbcbb9facccd" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Payroll Assistant -->
+<software name="payroll">
+	<description>Payroll Assistant</description>
+	<year>1982</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="payasstg.bin" size="0xa000" crc="ef4fe4d1" sha1="cdb20888c06c98a2982099af6e2bef82fd4cea6b" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Picture Parts -->
+<software name="picparts">
+	<description>Picture Parts</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="dump_g.bin" size="0x7800" crc="b543e4a3" sha1="754235dca84af3a17ec28aa2c14bd1b88f709ce2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Pyramid Puzzler -->
+<software name="pyramidp">
+	<description>Pyramid Puzzler</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="pyramidg.bin" size="0x9800" crc="2b9e394a" sha1="ba10cfb488edad9fa53cbae679ba1069a3cae0a7" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Reading Adventures -->
+<software name="readadv">
+	<description>Reading Adventures</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="readadvg.bin" size="0x9800" crc="e7068e26" sha1="669dcb40d2d9c975755a99e59054f731973d37f8" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Reading Cheers -->
+<software name="readchrs">
+	<description>Reading Cheers</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="rdcheerg.bin" size="0x9800" crc="e458be8e" sha1="96e793169d14e50c25261715d140862b637e51f0" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Reading Flight -->
+<software name="readflt">
+	<description>Reading Flight</description>
+	<year>1982</year>
+	<publisher>Scott, Foresman</publisher>
+	<info name="serial" value="PHM 3082"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="phm3082g.bin" size="0x9800" crc="32beb7fa" sha1="9e854f6cb4f4e0f0735ff742d0056a988a15dd68" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Reading Fun -->
+<software name="readfun">
+	<description>Reading Fun</description>
+	<year>1982</year>
+	<publisher>Scott, Foresman</publisher>
+	<info name="serial" value="PHM 3043"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3043g.bin" size="0xa000" crc="b8951ba5" sha1="28bc82c278c5975aab30090ac24d53c395806f7e" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Reading On -->
+<software name="readon">
+	<description>Reading On</description>
+	<year>1982</year>
+	<publisher>Scott, Foresman</publisher>
+	<info name="serial" value="PHM 3046"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3046g.bin" size="0xa000" crc="30fd86e2" sha1="c5c29028ecbc9573614276938ff5f5f481d01b79" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Reading Power -->
+<software name="readpow">
+	<description>Reading Power</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="rdpowerg.bin" size="0x9800" crc="b839f8ff" sha1="ada5d1e59792108f9de9a56718e246eee36ea86c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Reading Rainbows -->
+<software name="readrbow">
+	<description>Reading Rainbows</description>
+	<year>1982</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="dump_g.bin" size="0xa000" crc="9b1319a4" sha1="452d61f1b817511e338bee0a530d9c2ee5f966ae" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Reading Rally -->
+<software name="readrly">
+	<description>Reading Rally</description>
+	<year>1982</year>
+	<publisher>Scott, Foresman</publisher>
+	<info name="serial" value="PHM 3048"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="phm3048g.bin" size="0x9800" crc="174fcdd3" sha1="76c6e58703a96712cffd32d44512dc53dd7cdd2c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Reading Roundup -->
+<software name="readrnd">
+	<description>Reading Roundup</description>
+	<year>1982</year>
+	<publisher>Scott, Foresman</publisher>
+	<info name="serial" value="PHM 3047"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="phm3047g.bin" size="0x9800" crc="c971fb28" sha1="77a687c05211b4ed4e2a12737c24adaa8ca64fb4" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Reading Trail -->
+<software name="readtrl">
+	<description>Reading Trail</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="rdtrailg.bin" size="0x9800" crc="6ab268eb" sha1="06576bce7b5b2994c8ab65bb5c1493378e60c755" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Reading Wonders -->
+<software name="readwon">
+	<description>Reading Wonders</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="rdwondrg.bin" size="0x9800" crc="0e716875" sha1="ff0d17c6588c5ca1978ed9675745278d97443573" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Salary Planner -->
+<software name="salaryp">
+	<description>Salary Planner</description>
+	<year>1980</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="salplang.bin" size="0x8000" crc="9b49bcfe" sha1="082b3337f46fd8b7c2810c140b9dee7b0b641e1b" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for School Mailer -->
+<software name="schoolm">
+	<description>School Mailer</description>
+	<year>1981</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="schmailg.bin" size="0x8000" crc="3ab421c6" sha1="12d03f39f10d445a811447af934422de60738668" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Space Journey -->
+<software name="spcjourn">
+	<description>Space Journey</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="spajourg.bin" size="0x7800" crc="50bbdfab" sha1="9da98477c453a389556f1259b11dedd70db605a5" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Star Maze -->
+<software name="starmaze">
+	<description>Star Maze</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="starmazg.bin" size="0x7800" crc="b2dd0d77" sha1="be9b2dd774ad4705d70b40bb4613d0359a06e976" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Decimals 1 -->
+<software name="windec">
+	<description>Decimals 1</description>
+	<year>1983</year>
+	<publisher>Scott, Foresman</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="dump_g.bin" size="0x7800" crc="58cf4d74" sha1="6b11e5c4d03474f92d878ab920a6539bd7fe5daa" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Slymoids -->
+<software name="slymoids">
+	<description>Slymoids</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3197"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3197g.bin" size="0x2000" crc="52012adf" sha1="ef4980e92b28e5b707e0566a5d77ac167d112b55" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3197c.bin" size="0x2000" crc="3013b0dc" sha1="922afeade8b456e279749a9846ed4f546b38dd07" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Barrage -->
+<software name="barrage">
+	<description>Barrage</description>
+	<year>1983</year>
+	<publisher>Sofmachine</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="barragec.bin" size="0x2000" crc="39aef623" sha1="691670bc8cc8427951711b8289b57adff3ee242f" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="barraged.bin" size="0x2000" crc="10ba17ee" sha1="2222f9c8e204d56c18331512d48360808c25191a" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Sneggit -->
+<software name="sneggit">
+	<description>Sneggit</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3145"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3145g.bin" size="0x2000" crc="17cf25dd" sha1="ba3eec5fe584206d0ca5044729093e6bf110c114" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3145c.bin" size="0x2000" crc="01d36619" sha1="c3cf4315ea7d56357c9ec29bdbdc2312b04f5869" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Soccer -->
+<software name="soccer">
+	<description>Soccer</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3024"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3024g.bin" size="0x4000" crc="d9ba4b60" sha1="f2c27a537459bd37e6a7ba56dcc864f042769f28" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Crossfire -->
+<software name="crossfr">
+	<description>Crossfire</description>
+	<year>1983</year>
+	<publisher>Sierra On-Line</publisher>
+	<info name="serial" value="PHM 3207"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="crossfireg.bin" size="0x2000" crc="54d93919" sha1="734ebd4ebc9ae131f66596dd6fd5de2f0baf4d38" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="crossfirec.bin" size="0x2000" crc="c40449d6" sha1="c5043ddbe82b9848ae57fad3b6b14bfc4c6425a5" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Soduko -->
+<software name="soduko">
+	<description>Soduko</description>
+	<info name="comment" value="Inverse Sudoku?"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="soduc.bin" size="0x2000" crc="055c674b" sha1="5e1f05825a9ae24802232e22ccdb8954e4c7ab1b" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Jawbreaker II -->
+<software name="jawbreak">
+	<description>Jawbreaker II</description>
+	<year>1983</year>
+	<publisher>Sierra On-Line</publisher>
+	<info name="serial" value="PHM 3194"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x1800">
+			<rom name="phm3194g.bin" size="0x1800" crc="11d8694b" sha1="b816c9b4b96d64c1239df7cd4a02fd9609cabf28" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3194c.bin" size="0x2000" crc="c54858cc" sha1="3ec721efcb2d264907e85e1bed89c28bff1bc2e6" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Mousk-Attack -->
+<software name="mouskat">
+	<description>Mousk-Attack</description>
+	<year>1983</year>
+	<publisher>Sierra On-Line</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="phm3208g.bin" size="0x8000" crc="2fbf9896" sha1="849937384bf10887e45901f6effbf7826e9b4fa6" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3208c.bin" size="0x2000" crc="adb49f5d" sha1="bf33c497775a9afd64131f0f2343491b2bd522f5" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Speech Editor -->
+<software name="speeched">
+	<description>Speech Editor</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3011"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3011g.bin" size="0x2000" crc="6a24d715" sha1="4559bff96f7d7711289eee104575aff50ee91edd" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Facemaker -->
+<software name="facemake">
+	<description>Facemaker</description>
+	<year>1983</year>
+	<publisher>Spinnaker</publisher>
+	<info name="serial" value="PHM 3177"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3177g.bin" size="0x4000" crc="b8eebb05" sha1="290a6485e948107d114ad4a460a5048f48246e08" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3177c.bin" size="0x2000" crc="7969b265" sha1="471136f40d60e317c6bd1c2a97e8cceb1a1b0f2a" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Story Machine v1.4 -->
+<software name="storymch">
+	<description>Story Machine v1.4</description>
+	<year>1983</year>
+	<publisher>Spinnaker</publisher>
+	<info name="serial" value="PHM 3178"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3178g.bin" size="0x6000" crc="3d6b030f" sha1="d502e8ec591feb0773eb98f9f07b18a7f0705224" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3178c.bin" size="0x2000" crc="d9addba8" sha1="2768d01ebea41ebae56234587b784cbc8da79baf" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Midnite Mason -->
+<software name="midnitem">
+	<description>Midnite Mason</description>
+	<year>1984</year>
+	<publisher>Software Specialties</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="midmasoc.bin" size="0x2000" crc="1dcb4615" sha1="1ddd518afcf5cff58e261c75ee1462bb55dc69bc" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for TI-Toad -->
+<software name="titoad">
+	<description>TI-Toad</description>
+	<year>1982</year>
+	<publisher>Software Specialties</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="titoadc.bin" size="0x2000" crc="c480b973" sha1="ad7f3a0f2f6eab27377c5097d90ea2a6cd01d4a1" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Statistik -->
+<software name="statisd">
+	<description>Statistik</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3014"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="statistikg.bin" size="0xa000" crc="6f07de8a" sha1="4a0685ee5784b3560dc2481082b35a0a0505f8a8" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Statistics -->
+<software name="statistc">
+	<description>Statistics</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3014"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3014g.bin" size="0xa000" crc="16369f1f" sha1="e7fe0e8b1f47aa8d5db060856477499d6b05d502" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Submarine Battle -->
+<software name="submarin">
+	<description>Submarine Battle</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x3034">
+			<rom name="subbattleg.bin" size="0x3034" crc="6af0bb2b" sha1="6df68be57ded22e5486e97684259301109b7a1c2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Sudoku -->
+<software name="sudoku">
+	<description>Sudoku</description>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="sudoc.bin" size="0x2000" crc="7939a481" sha1="32b7076dcbb8aaaba19679bd0136f39b47dcf224" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Super Extended Basic -->
+<software name="superxb">
+	<description>Super Extended Basic</description>
+	<year>1987</year>
+	<publisher>Triton</publisher>
+	<info name="version" value="120"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="superxbg.bin" size="0xa000" crc="a94cfd99" sha1="12f1871c8e2dc39a474a78739dd2bd243b755eaf" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="superxbc.bin" size="0x2000" crc="bd8addb9" sha1="d0be337b61552f7ac49d52872f66eb6ef549a774" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="superxbd.bin" size="0x2000" crc="d5a91251" sha1="dfa33094b67c31691b0396ea116c9da8d134bbc2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Tax Investment Record Keeping -->
+<software name="taxrec">
+	<description>Tax Investment Record Keeping</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3016"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3016g.bin" size="0xa000" crc="2ab99064" sha1="0d013a86d826b9044b1544b2a91dbaed4a24748a" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3016c.bin" size="0x2000" crc="2c1a7a01" sha1="0de73430edf5ec00d08d29876b624ac8c5c7d0de" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="phm3016d.bin" size="0x2000" crc="d0e317dd" sha1="c1c7a14e227aecdd9dc7e3581a74259d55d7bb96" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Terminal Emulator I -->
+<software name="termemu1">
+	<description>Terminal Emulator I</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3017"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x3800">
+			<rom name="phm3017g.bin" size="0x3800" crc="3c1a3f90" sha1="72923009a9bbae62dbd2698ce7ccbe5b480512aa" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Terminal Emulator II -->
+<software name="termemu2">
+	<description>Terminal Emulator II</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3035"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3035g.bin" size="0xa000" crc="96c61e19" sha1="92cda19ba15d6644a68739a35d23cb223ee56924" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3035c.bin" size="0x2000" crc="d2008761" sha1="05d4bf80e9299f0f9af6442b61a2779935604762" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Testtrainer 1 -->
+<software name="testtrai">
+	<description>Testtrainer 1</description>
+	<year>1981</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="comment" value="Requires additional tape or disk"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="testtrainerg.bin" size="0x4000" crc="8ddabb85" sha1="7fb4c51c4af213712d122ac83eb6473df7f0a065" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Computer War -->
+<software name="compwar">
+	<description>Computer War</description>
+	<year>1983</year>
+	<publisher>Micropal - Thorn EMI Video</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="compwarc.bin" size="0x2000" crc="a85efdb3" sha1="8f1163e0365b44156678096fbe58bbe169c3b057" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="compward.bin" size="0x2000" crc="922751c3" sha1="ac7a4aa830511ce50cdcd62a4ca10bda00df7710" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for The Attack -->
+<software name="attackb">
+	<description>The Attack</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3031"/>
+	<info name="version" value="beta"/>
+	<info name="comment" value="Different sound track"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x20fa">
+			<rom name="attackbetag.bin" size="0x20fa" crc="a116a67a" sha1="abbe63adc5f3c3243b305cd1db5dbbc4c69d6693" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Attack, The -->
+<software name="attack">
+	<description>Attack, The</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3031"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3031g.bin" size="0x2000" crc="46a115d4" sha1="442f8cc4c0ca87fe7123af35fa023bc36ceb4078" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for The Castle -->
+<software name="castlep">
+	<description>The Castle</description>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="castc.bin" size="0x2000" crc="8cb35c78" sha1="43f4cd598178292150764efe2b45346ea2a66ef1" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for River Rescue -->
+<software name="riverres">
+	<description>River Rescue</description>
+	<year>1983</year>
+	<publisher>Micropal - Thorn EMI Video</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x40b0">
+			<rom name="riverrescueg.bin" size="0x40b0" crc="f84a45da" sha1="4090aa10829585e45450a4825c6d2519172def02" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Submarine Commander -->
+<software name="subcomm">
+	<description>Submarine Commander</description>
+	<year>1983</year>
+	<publisher>Thorn EMI Video</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x50b0">
+			<rom name="subcomg.bin" size="0x50b0" crc="9a3d7c4a" sha1="a25f96572b80fc9cef61512653af54a4f1fae206" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for TI Invaders -->
+<software name="invaders">
+	<description>TI Invaders</description>
+	<year>1981</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3053"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3053g.bin" size="0x2000" crc="9d1d9eaa" sha1="afb31bd69eed1e7e5e08a6fed98c8babed509fa9" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3053c.bin" size="0x2000" crc="e7463430" sha1="b1cc3454aa5437447edb1fc1f48ec7da20e87377" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for TI LOGO II -->
+<software name="logo2d">
+	<description>TI LOGO II</description>
+	<year>1984</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3109"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="LOGODEg.bin" size="0x8000" crc="65f09a7e" sha1="95002be206523cd9cf2d4ddc252717f48e7bdb73" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="LOGODEc.bin" size="0x2000" crc="ef4a2dd1" sha1="548e76f87ea6f51b3160c4f73301053b31adb023" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for TI LOGO II -->
+<software name="logo2i">
+	<description>TI LOGO II</description>
+	<year>198x</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="dump_g.bin" size="0x9800" crc="fcda9f87" sha1="97539fd33a176bab0c0f57ca40168c088a95b950" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="5a9d8f24" sha1="4df7bf9fa6ff44bab560e22234746ef4276f6636" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for TI LOGO II -->
+<software name="logo2">
+	<description>TI LOGO II</description>
+	<year>1984</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3109"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3109g.bin" size="0x6000" crc="72ed8f7a" sha1="6823d8a3f3166aca89ddf5ecc24ee1ca34e36fc2" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3109c.bin" size="0x2000" crc="5a9d8f24" sha1="4df7bf9fa6ff44bab560e22234746ef4276f6636" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for TI LOGO -->
+<software name="logo1">
+	<description>TI LOGO</description>
+	<year>1981</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3040"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="phm3040g.bin" size="0x8000" crc="0a7cdd26" sha1="c9f0db656cfedec0a25805e498e622b77f0fdfd6" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for TI Writer Gram Disk -->
+<software name="writerg">
+	<description>TI Writer Gram Disk</description>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="TIWGDg.bin" size="0x8000" crc="16aad346" sha1="ff140b842886c191aaefdb2652589e3c5a0817ef" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for TI-Writer -->
+<software name="writer">
+	<description>TI-Writer</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3111"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3111g.bin" size="0x2000" crc="9b07778d" sha1="6e750106659f40c91f19d6b27c463ddaad13f9d4" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Tombstone City - 21st Century -->
+<software name="tombstn">
+	<description>Tombstone City - 21st Century</description>
+	<year>1981</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3052"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3052g.bin" size="0x2000" crc="922b5817" sha1="78aff0e51ae41e255d2aef371529f84684ab6a90" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3052c.bin" size="0x2000" crc="e8a48284" sha1="6609ce17556fe3f202e86b9a80136d6fddef3a11" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Touch Typing Tutor -->
+<software name="touchtyp">
+	<description>Touch Typing Tutor</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3064"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x6000">
+			<rom name="phm3064g.bin" size="0x6000" crc="4b94743b" sha1="f2096aafac564a2a454c60ad7186f4f9265ac30b" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Tunnels of Doom -->
+<software name="tundoom">
+	<description>Tunnels of Doom</description>
+	<year>1982</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3042"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3042g.bin" size="0xa000" crc="163caf9b" sha1="8e7fd331fc0390262482c572ce03bfff2abcbfc4" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Espial -->
+<software name="espial">
+	<description>Espial</description>
+	<year>1983</year>
+	<publisher>Tigervision</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x5098">
+			<rom name="espialg.bin" size="0x5098" crc="5637ea0c" sha1="7dcb8c5a841fcbac0a44c7c64d82e4725812ad54" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Miner 2049er -->
+<software name="miner">
+	<description>Miner 2049er</description>
+	<year>1983</year>
+	<publisher>Tigervision</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x5192">
+			<rom name="miner2049g.bin" size="0x5192" crc="e2d3c824" sha1="f5c3e204af749f352cd25559cf2534e7f7e2647c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Springer -->
+<software name="springer">
+	<description>Springer</description>
+	<year>1983</year>
+	<publisher>Tigervision</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x33e8">
+			<rom name="springerg.bin" size="0x33e8" crc="b9815bb9" sha1="14aaf7cd88f918ce2fcdfa2253563ca0eab748b0" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for VAT Accounting -->
+<software name="vatacct">
+	<description>VAT Accounting</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3066"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="phm3066g.bin" size="0x7800" crc="7d7d9f1d" sha1="605e2ed33936cc6fe693e380304251bb7c4b412e" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Schachmeister -->
+<software name="chessd">
+	<description>Schachmeister</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3008"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="schachg.bin" size="0x8000" crc="77a54a1a" sha1="ab85d8e861f472403851fad94036468af28ad90b" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="schachc.bin" size="0x2000" crc="b9a64fef" sha1="eb1f8bb87184472c51d7b0509295a4db0d2e243c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Echecs -->
+<software name="chessf">
+	<description>Echecs</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3008"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x7800">
+			<rom name="phm3008g.bin" size="0x7800" crc="9d0ee982" sha1="fc14a0a8a81cafb197615e16d8b0f4eec7827d7a" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3008c.bin" size="0x2000" crc="b9a64fef" sha1="eb1f8bb87184472c51d7b0509295a4db0d2e243c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Video Chess -->
+<software name="chess">
+	<description>Video Chess</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3008"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x8000">
+			<rom name="phm3008g.bin" size="0x8000" crc="ca051402" sha1="9479890dff577da244a2bd33a469cbd4b2898ed8" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3008c.bin" size="0x2000" crc="b9a64fef" sha1="eb1f8bb87184472c51d7b0509295a4db0d2e243c" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Video Games 1 -->
+<software name="vgames1">
+	<description>Video Games 1</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3018"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x4000">
+			<rom name="phm3018g.bin" size="0x4000" crc="8489b5c7" sha1="15fecf13a83fd4081a20073f4506106d638594cf" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Mind Challengers -->
+<software name="vgames2">
+	<description>Mind Challengers</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3025"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3025g.bin" size="0x2000" crc="a8e6b0f7" sha1="22213629efec9101f1f1073a92dcbdbe10f27f01" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Video-Graphs -->
+<software name="vgraphs">
+	<description>Video-Graphs</description>
+	<year>1979</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3005"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x2000">
+			<rom name="phm3005g.bin" size="0x2000" crc="d974cd5a" sha1="ffc1f73bb114b7f7d4756f7bee10e40ebd92a2d8" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Face Chase -->
+<software name="facechs">
+	<description>Face Chase</description>
+	<year>1984</year>
+	<publisher>Video Magic</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="FACECHAc.bin" size="0x2000" crc="f2de63f2" sha1="3a2eead7173f444e82e5a49b2d4db5914a2c4f0e" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Star Gazer I -->
+<software name="stargz1">
+	<description>Star Gazer I</description>
+	<year>1984</year>
+	<publisher>Video Magic</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="sgaze1c.bin" size="0x2000" crc="48d3ddef" sha1="58d020095dceb99d566e7d604fb300ad0aec5c38" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Star Gazer II -->
+<software name="stargz2">
+	<description>Star Gazer II</description>
+	<year>1984</year>
+	<publisher>Video Magic</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="sgaze2c.bin" size="0x2000" crc="4b18899c" sha1="d942f03d9bcb4095ed4a797e4eaaedb09271a725" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Star Gazer III -->
+<software name="stargz3">
+	<description>Star Gazer III</description>
+	<year>1984</year>
+	<publisher>Video Magic</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="sgaze3c.bin" size="0x2000" crc="b0e63f6f" sha1="91d6441477459048f8d5d6056e0df64e29dffcee" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Peter Pan's Space Odyssey -->
+<software name="ppspcod">
+	<description>Peter Pan's Space Odyssey</description>
+	<year>1984</year>
+	<publisher>Walt Disney</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="phm3132g.bin" size="0x9800" crc="768ee8f6" sha1="00f64fb640141d76cf9e4d8b0aa63750e1c2520e" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3132c.bin" size="0x2000" crc="9d68f114" sha1="8ffbc20c39c9d8e5b50eb8fe13e9a35faff1d5f9" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Pinocchio's Great Escape -->
+<software name="greatesc">
+	<description>Pinocchio's Great Escape</description>
+	<year>1984</year>
+	<publisher>Walt Disney</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="phm3135g.bin" size="0x9800" crc="8e3a7dd0" sha1="c712cded8fee7851749558db79ac2c85155fbe84" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3135c.bin" size="0x2000" crc="ce16e333" sha1="381f6f344a1708e4dd64916b105574f1d5dc4a7a" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Von Drake's Molecular Mission -->
+<software name="molmiss">
+	<description>Von Drake's Molecular Mission</description>
+	<year>1984</year>
+	<publisher>Walt Disney</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x9800">
+			<rom name="phm3133g.bin" size="0x9800" crc="3e79bf73" sha1="d8d249c4f27a21a936f63d39145025b200ea5056" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3133c.bin" size="0x2000" crc="abdeceaf" sha1="7d9e593939d4c575b56c0c25aa0ca685d082239a" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Weight Control &amp; Nutrition -->
+<software name="weight">
+	<description>Weight Control &amp; Nutrition</description>
+	<year>1980</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3021"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="paged"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3021g.bin" size="0xa000" crc="d9c4d7a1" sha1="c01ae2ff8b9fa0d14901907902ef44e245300539" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3021c.bin" size="0x2000" crc="05dff099" sha1="ee05ef9bdc3dd04e0919ad14c09c270011d5775b" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="phm3021d.bin" size="0x2000" crc="4212fba2" sha1="63cc1a441fabdafb15422c3fa481b573491b9c38" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Key to Spanish 1 -->
+<software name="span12">
+	<description>Key to Spanish 1</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<info name="serial" value="PHM 3126"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3126g.bin" size="0xa000" crc="4098684a" sha1="712a1b9fff27e6527ca88dd745971c359b49b8c0" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="phm3126c.bin" size="0x2000" crc="28f15b33" sha1="c04a2cceb8dbe9166f965d012b3758192f1a6162" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Key to Spanish 3 -->
+<software name="span34">
+	<description>Key to Spanish 3</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="dump_g.bin" size="0xa000" crc="4a6f8439" sha1="c119e86ed8bb3917b8f5c8de28a5018c1bccd141" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="28f15b33" sha1="c04a2cceb8dbe9166f965d012b3758192f1a6162" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Key to Spanish 4 -->
+<software name="span56">
+	<description>Key to Spanish 4</description>
+	<year>1983</year>
+	<publisher>Texas Instruments</publisher>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="dump_g.bin" size="0xa000" crc="98f48f1c" sha1="bd8f902690b8c5f0cd52982f712bc6351d675408" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="dump_c.bin" size="0x2000" crc="28f15b33" sha1="c04a2cceb8dbe9166f965d012b3758192f1a6162" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Editor Assembler 1987 / Easy Debugger 2.1 -->
+<software name="edasseb">
+	<description>Editor Assembler 1987 / Easy Debugger 2.1</description>
+	<year>1987</year>
+	<publisher>Winfried Winkler/TI</publisher>
+	<info name="comment" value="Modified Editor/Assembler"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0x88fc">
+			<rom name="EAWg.bin" size="0x88fc" crc="b90ec2d8" sha1="8ed65ef207bebe0a62bb2d3a841dacda6c91ba40" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
+<!-- Softlist entry for Yahtzee -->
+<software name="yathzee">
+	<description>Yahtzee</description>
+	<year>1980</year>
+	<publisher>Milton Bradley</publisher>
+	<info name="serial" value="PHM 3039"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="standard"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="phm3039g.bin" size="0xa000" crc="09d3aa61" sha1="36ef5515b6ce8b306993fca72a578af6382cf954" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
 </softwarelist>
