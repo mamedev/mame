@@ -11,6 +11,7 @@
     - video emulation is pratically non-existant;
     - SCSP;
     - Many SH-1 ports needs investigations;
+    - i8237 purpose is unknown, might even not be at the right place ...
     - IRQ generation
     - Understand & remove the hacks at the bottom;
     - IC1/IC10 are currently unused, might contain sprite data / music data for the SCSP / chars for the
@@ -90,7 +91,7 @@ Notes: (All IC's shown)
       JP*     - 3x 2-pin jumpers. JP1 shorted, other jumpers open
       MB84256 - Fujitsu MB84256 32k x8 SRAM (NDIP28)
       MB89374 - Fujitsu MB89374 Data Link Controller (SDIP42)
-      MB89237A- Fujitsu MB89237A 8-Bit Proprietary Microcontroller (?) (DIP40)
+      MB89237A- Fujitsu MB89237A 8-Bit Proprietary DMAC (?) (DIP40)
       SN75179 - Texas Instruments SN75179 Differential Driver and Receiver Pair (DIP8)
 
 
@@ -250,6 +251,7 @@ Note: This hardware appears to have been designed as a test-bed for a new RLE ba
 #include "cpu/sh2/sh2.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/scsp.h"
+#include "machine/am9517a.h"
 
 
 class coolridr_state : public driver_device
@@ -269,13 +271,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this,"sub"),
 		m_soundcpu(*this,"soundcpu"),
+		m_dmac(*this, "i8237"),
 		m_h1_vram(*this, "h1_vram"),
 		m_h1_charram(*this, "h1_charram"),
 		m_framebuffer_vram(*this, "fb_vram"),
 		m_txt_vram(*this, "txt_vram"),
 		m_sysh1_txt_blit(*this, "sysh1_txt_blit"),
 		m_sysh1_workram_h(*this, "sysh1_workrah"),
-		m_h1_unk(*this, "h1_unk"){ }
+		m_h1_unk(*this, "h1_unk")
+		{ }
 
 	// Blitter state
 	UINT16 m_textBytesToWrite;
@@ -291,6 +295,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
+	required_device<am9517a_device> m_dmac;
 
 	required_shared_ptr<UINT32> m_h1_vram;
 	required_shared_ptr<UINT32> m_h1_charram;
@@ -401,20 +406,7 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 /* unknown purpose */
 READ32_MEMBER(coolridr_state::sysh1_unk_r)
 {
-	switch(offset)
-	{
-		case 0x08/4:
-		{
-			m_vblank^=1;
-
-			return (m_h1_unk[offset] & 0xfdffffff) | (m_vblank<<25);
-		}
-		case 0x14/4:
-			return m_h1_unk[offset];
-		//case 0x20/4:
-	}
-
-	return 0xffffffff;//m_h1_unk[offset];
+	return m_h1_unk[offset];
 }
 
 WRITE32_MEMBER(coolridr_state::sysh1_unk_w)
@@ -726,14 +718,15 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x03208900, 0x03208903) AM_RAM /*???*/
 	AM_RANGE(0x03300400, 0x03300403) AM_RAM /*irq enable?*/
 
-	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_unk_r,sysh1_unk_w) AM_SHARE("h1_unk")
-	AM_RANGE(0x04200000, 0x0420003f) AM_RAM /*???*/
+	AM_RANGE(0x04000000, 0x0400001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xffffffff)
+	AM_RANGE(0x04000020, 0x0400003f) AM_READWRITE(sysh1_unk_r,sysh1_unk_w) AM_SHARE("h1_unk")
+	AM_RANGE(0x04200000, 0x0420003f) AM_RAM /* hi-word for DMA? */
 
 	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
 	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
 	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x05ff0000, 0x05ffffff) AM_RAM /*???*/
-	AM_RANGE(0x06000000, 0x06000fff) AM_RAM //UART TX/RX ports
+	AM_RANGE(0x06000000, 0x06000fff) AM_RAM //?
 	AM_RANGE(0x06100000, 0x06100003) AM_READ_PORT("IN0") AM_WRITENOP
 	AM_RANGE(0x06100004, 0x06100007) AM_READ_PORT("IN1")
 	AM_RANGE(0x06100008, 0x0610000b) AM_READ_PORT("IN5")
@@ -1161,8 +1154,25 @@ void coolridr_state::machine_reset()
 	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 }
 
+
+static I8237_INTERFACE( dmac_intf )
+{
+	DEVCB_NULL, //DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dma_hrq_changed),
+	DEVCB_NULL, //DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_tc_w),
+	DEVCB_NULL, //DEVCB_DRIVER_MEMBER(coolridr_state, coolridr_dma_read_byte),
+	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(coolridr_state, coolridr_dma_write_byte),
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
+	{ DEVCB_NULL /*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack0_w)*/,
+	  DEVCB_NULL/*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack1_w)*/,
+	  DEVCB_NULL/*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack2_w)*/,
+	  DEVCB_NULL/*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack3_w)*/ }
+};
+
+#define MAIN_CLOCK XTAL_28_63636MHz
+
 static MACHINE_CONFIG_START( coolridr, coolridr_state )
-	MCFG_CPU_ADD("maincpu", SH2, 28000000)  // 28 mhz
+	MCFG_CPU_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz
 	MCFG_CPU_PROGRAM_MAP(system_h1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", coolridr_state, system_h1)
 
@@ -1172,6 +1182,8 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_CPU_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 mhz
 	MCFG_CPU_PROGRAM_MAP(coolridr_submap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_sub, "screen", 0, 1)
+
+	MCFG_I8237_ADD("i8237", MAIN_CLOCK, dmac_intf)
 
 	MCFG_GFXDECODE(coolridr)
 
