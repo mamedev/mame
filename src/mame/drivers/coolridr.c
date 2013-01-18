@@ -1183,7 +1183,7 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_CPU_PROGRAM_MAP(coolridr_submap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_sub, "screen", 0, 1)
 
-	MCFG_I8237_ADD("i8237", MAIN_CLOCK, dmac_intf)
+	MCFG_I8237_ADD("i8237", 16000000, dmac_intf)
 
 	MCFG_GFXDECODE(coolridr)
 
