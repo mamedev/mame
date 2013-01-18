@@ -114,6 +114,11 @@ void floppy_image_device::setup_ready_cb(ready_cb cb)
 	cur_ready_cb = cb;
 }
 
+void floppy_image_device::setup_wpt_cb(wpt_cb cb)
+{
+	cur_wpt_cb = cb;
+}
+
 void floppy_image_device::set_formats(const floppy_format_type *formats)
 {
 	image_device_format **formatptr;
@@ -287,16 +292,21 @@ bool floppy_image_device::call_load()
 
 	image = global_alloc(floppy_image(tracks, sides, form_factor));
 	best_format->load(&io, form_factor, image);
-
-	if(!is_readonly())
-		output_format = best_format;
+	output_format = is_readonly() ? 0 : best_format;
 
 	revolution_start_time = motor_always_on ? machine().time() : attotime::never;
 	revolution_count = 0;
 
 	index_resync();
 	image_dirty = false;
-	output_format = 0;
+
+	wpt = 1; // disk sleeve is covering the sensor
+	if (!cur_wpt_cb.isnull())
+		cur_wpt_cb(this, wpt);
+
+	wpt = is_readonly();
+	if (!cur_wpt_cb.isnull())
+		cur_wpt_cb(this, wpt);
 
 	if (!cur_load_cb.isnull())
 		return cur_load_cb(this);
@@ -317,6 +327,15 @@ void floppy_image_device::call_unload()
 		global_free(image);
 		image = 0;
 	}
+
+	wpt = 1; // disk sleeve is covering the sensor
+	if (!cur_wpt_cb.isnull())
+		cur_wpt_cb(this, wpt);
+
+	wpt = 0; // sensor is uncovered
+	if (!cur_wpt_cb.isnull())
+		cur_wpt_cb(this, wpt);
+
 	if (!cur_unload_cb.isnull())
 		cur_unload_cb(this);
 	if(!ready) {
