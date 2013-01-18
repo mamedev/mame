@@ -10,13 +10,27 @@ class psx_controller_port_device;
 #define MCFG_PSXCARD_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, PSXCARD, 0)
 
-class psxcard_device : public device_t
+class psxcard_device :	public device_t,
+						public device_image_interface
 {
 public:
 	psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	virtual iodevice_t image_type() const { return IO_MEMCARD; }
+
+	virtual bool is_readable()  const { return 1; }
+	virtual bool is_writeable() const { return 1; }
+	virtual bool is_creatable() const { return 1; }
+	virtual bool must_be_loaded() const { return 0; }
+	virtual bool is_reset_on_load() const { return 0; }
+	virtual const char *file_extensions() const { return "mc"; }
+	virtual const option_guide *create_option_guide() const { return NULL; }
+
+	virtual bool call_load();
+	virtual bool call_create(int format_type, option_resolution *format_options);
+
 private:
-	unsigned char pkt[0x8b], pkt_ptr, pkt_sz, cmd, *cache;
+	unsigned char pkt[0x8b], pkt_ptr, pkt_sz, cmd;
 	unsigned short addr;
 	int state;
 
@@ -44,6 +58,7 @@ private:
 public:
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_config_complete();
 
 	void clock_w(bool state) { if(m_clock && !m_sel && !state && !m_pad) do_card(); m_clock = state; }
 	void sel_w(bool state);

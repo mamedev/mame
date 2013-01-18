@@ -19,6 +19,9 @@
 //
 //
 
+static const int block_size = 128;
+static const int card_size = block_size * 1024;
+
 const device_type PSXCARD = &device_creator<psxcard_device>;
 
 enum transfer_states
@@ -37,16 +40,13 @@ enum transfer_states
 };
 
 psxcard_device::psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, PSXCARD, "Sony PSX Memory Card", tag, owner, clock)
+	: device_t(mconfig, PSXCARD, "Sony PSX Memory Card", tag, owner, clock),
+	device_image_interface(mconfig, *this)
 {
 }
 
 void psxcard_device::device_start()
 {
-	cache=new unsigned char [128*1024];
-
-	memset(cache, 0, 128*1024);
-
 	m_owner = dynamic_cast<psx_controller_port_device *>(owner());
 	m_ack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(psxcard_device::ack_timer), this));
 
@@ -77,6 +77,11 @@ void psxcard_device::device_reset()
 	m_owner->ack();
 }
 
+void psxcard_device::device_config_complete()
+{
+	update_names(PSXCARD, "memcard", "mc");
+}
+
 //
 //
 //
@@ -88,7 +93,7 @@ bool psxcard_device::transfer(UINT8 to, UINT8 *from)
 	switch (state)
 	{
 		case state_illegal:
-			if (to == 0x81)
+			if ((to == 0x81) && is_loaded())
 			{
 //              printf("CARD: begin\n");
 				state = state_command;
@@ -233,12 +238,13 @@ void psxcard_device::read_card(const unsigned short addr, unsigned char *buf)
 		printf("card: read block %d\n",addr);
 	#endif
 
-	if (addr<1024)
+	if (addr<(card_size/block_size))
 	{
-		memcpy(buf,cache+(addr*128),128);
+		fseek(addr*block_size, SEEK_SET);
+		fread(buf, block_size);
 	} else
 	{
-		memset(buf,0,128);
+		memset(buf,0,block_size);
 	}
 }
 
@@ -252,15 +258,12 @@ void psxcard_device::write_card(const unsigned short addr, unsigned char *buf)
 		printf("card: write block %d\n",addr);
 	#endif
 
-	if (addr<1024)
+	if (addr<(card_size/block_size))
 	{
-		memcpy(cache+(addr*128),buf,128);
+		fseek(addr*block_size, SEEK_SET);
+		fwrite(buf, block_size);
 	}
 }
-
-//
-//
-//
 
 unsigned char psxcard_device::checksum_data(const unsigned char *buf, const unsigned int sz)
 {
@@ -268,6 +271,28 @@ unsigned char psxcard_device::checksum_data(const unsigned char *buf, const unsi
 	int left=sz;
 	while (--left) chk^=*buf++;
 	return chk;
+}
+
+bool psxcard_device::call_load()
+{
+	if(length() != card_size)
+		return IMAGE_INIT_FAIL;
+	return IMAGE_INIT_PASS;
+}
+
+bool psxcard_device::call_create(int format_type, option_resolution *format_options)
+{
+	UINT8 block[block_size];
+	int i, ret;
+
+	memset(block, '\0', block_size);
+	for(i = 0; i < (card_size/block_size); i++)
+	{
+		ret = fwrite(block, block_size);
+		if(ret != block_size)
+			return IMAGE_INIT_FAIL;
+	}
+	return IMAGE_INIT_PASS;
 }
 
 void psxcard_device::do_card()
