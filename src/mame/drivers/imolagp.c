@@ -5,9 +5,11 @@
 TODO:
 - document remaining dips
 - need better mappings for shifter, currently 3 buttons
-- improve analog steering
-- correct timing (cpu and video) - see sprites disappear partially
-- vreg[0xf] autosteering
+- cpu/audio clocks, the XTAL on pcb is unlabeled
+- correct video timing, see sprites disappear partially
+- vreg[0xf] autosteering, the car should probably only auto-steer when
+  it gets on the grass(road edges) at high speed. How does the hardware
+  know the sprite position then?
 - verify colors
 
 ========================================
@@ -89,11 +91,15 @@ public:
 	imolagp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_slavecpu(*this, "slave")
+		m_slavecpu(*this, "slave"),
+		m_steer_pot_timer(*this, "pot"),
+		m_steer_inp(*this, "STEER")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_slavecpu;
+	required_device<timer_device> m_steer_pot_timer;
+	required_ioport m_steer_inp;
 
 	UINT8 m_videoram[2][0x4000]; // 2 layers of 16KB
 	UINT8 m_comms_latch[2];
@@ -102,7 +108,6 @@ public:
 	UINT8 m_scroll;
 	UINT8 m_steerlatch;
 	UINT8 m_draw_mode;
-	UINT8 m_oldsteer;
 
 	DECLARE_WRITE8_MEMBER(transmit_data_w);
 	DECLARE_READ8_MEMBER(trigger_slave_nmi_r);
@@ -115,6 +120,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vreg_data_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -133,6 +139,7 @@ public:
 void imolagp_state::palette_init()
 {
 	// palette seems like 3bpp + intensity
+	// this still needs to be verified
 	for (int i = 0; i < 8; i++)
 	{
 		palette_set_color_rgb(machine(), i*4+0, 0, 0, 0);
@@ -184,12 +191,49 @@ UINT32 imolagp_state::screen_update_imolagp(screen_device &screen, bitmap_ind16 
 
 /***************************************************************************
 
+  Interrupts
+
+***************************************************************************/
+
+TIMER_DEVICE_CALLBACK_MEMBER(imolagp_state::imolagp_pot_callback)
+{
+	int steer = m_steer_inp->read();
+	if (steer & 0x7f)
+	{
+		if (~steer & 0x80)
+		{
+			// shift register when steering left
+			steer = -steer;
+			m_steerlatch = (m_steerlatch << 1) | (~m_steerlatch >> 1 & 1);
+		}
+		
+		// steering speed is determined by timer period
+		// these values(in usec) may need tweaking:
+		const int base = 6500;
+		const int range = 100000;
+		m_steer_pot_timer->adjust(attotime::from_usec(base + range * (1.0 / (double)(steer & 0x7f))));
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	}
+	else
+		m_steer_pot_timer->adjust(attotime::from_msec(20));
+}
+
+INTERRUPT_GEN_MEMBER(imolagp_state::slave_vblank_irq)
+{
+	m_scroll = m_vreg[0xe]; // latch scroll
+	device.execute().set_input_line(0, HOLD_LINE);
+}
+
+
+
+/***************************************************************************
+
   I/O and Memory Maps
 
 ***************************************************************************/
 
 /* The master CPU transmits data to the slave CPU one word at a time using a rapid sequence of triggered NMIs.
- * The slave CPU pauses as it enters its irq, awaiting this burst of data.
+ * The slave CPU pauses as it enters its vblank irq, awaiting this burst of data.
  * Handling the NMI takes more time than triggering the NMI, implying that the slave CPU either runs at
  * a higher clock, or has a way to force the main CPU to wait.
  */
@@ -238,6 +282,7 @@ WRITE8_MEMBER(imolagp_state::vreg_control_w)
 
 READ8_MEMBER(imolagp_state::vreg_data_r)
 {
+	// auto-steer related
 	return 0;
 	//return 0xf7; // -> go left?
 	//return 0x17; // it checks for this too
@@ -388,7 +433,7 @@ static INPUT_PORTS_START( imolagp )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("STEER")
-	PORT_BIT( 0x0f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(24)
 INPUT_PORTS_END
 
 
@@ -417,30 +462,21 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static TIMER_DEVICE_CALLBACK ( imolagp_nmi_cb )
+void imolagp_state::machine_start()
 {
-	imolagp_state *state = timer.machine().driver_data<imolagp_state>();
-	int newsteer = timer.machine().root_device().ioport("STEER")->read() & 0xf;
-	if (newsteer != state->m_oldsteer)
-	{
-		if ((newsteer - state->m_oldsteer) & 0x8)
-		{
-			// shift
-			state->m_steerlatch = (state->m_steerlatch << 1) | (~state->m_steerlatch >> 1 & 1);
-			state->m_oldsteer = (state->m_oldsteer - 1) & 0xf;
-		}
-		else
-		{
-			state->m_oldsteer = (state->m_oldsteer + 1) & 0xf;
-		}
-		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	save_item(NAME(m_vcontrol));
+	save_item(NAME(m_vreg));
+	save_item(NAME(m_scroll));
+	save_item(NAME(m_steerlatch));
+	save_item(NAME(m_draw_mode));
+	save_item(NAME(m_comms_latch));
 }
 
-INTERRUPT_GEN_MEMBER(imolagp_state::slave_vblank_irq)
+void imolagp_state::machine_reset()
 {
-	m_scroll = m_vreg[0xe]; // latch scroll
-	device.execute().set_input_line(0, HOLD_LINE);
+	// reset steering wheel
+	m_steerlatch = 0;
+	m_steer_pot_timer->adjust(attotime::from_msec(20));
 }
 
 
@@ -455,22 +491,6 @@ static I8255A_INTERFACE( ppi8255_intf )
 	DEVCB_NULL
 };
 
-
-void imolagp_state::machine_start()
-{
-	save_item(NAME(m_vcontrol));
-	save_item(NAME(m_vreg));
-	save_item(NAME(m_scroll));
-	save_item(NAME(m_steerlatch));
-	save_item(NAME(m_draw_mode));
-	save_item(NAME(m_oldsteer));
-	save_item(NAME(m_comms_latch));
-}
-
-void imolagp_state::machine_reset()
-{
-}
-
 static MACHINE_CONFIG_START( imolagp, imolagp_state )
 
 	/* basic machine hardware */
@@ -478,7 +498,7 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_CPU_PROGRAM_MAP(imolagp_master_map)
 	MCFG_CPU_IO_MAP(imolagp_master_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", imolagp_state, irq0_line_hold)
-	MCFG_TIMER_ADD_PERIODIC("pot_irq", imolagp_nmi_cb, attotime::from_hz(60*3))
+	MCFG_TIMER_DRIVER_ADD("pot", imolagp_state, imolagp_pot_callback) // maincpu nmi
 
 	MCFG_CPU_ADD("slave", Z80, 4000000) // ?
 	MCFG_CPU_PROGRAM_MAP(imolagp_slave_map)
