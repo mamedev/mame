@@ -23,12 +23,6 @@ of the games were clocked at around 500KHz, 550KHz, or 300KHz.
 
 #define LOG 0
 
-enum cpu_type
-{
-	CPU_TYPE_I8021,
-	CPU_TYPE_TMS1100
-};
-
 
 class microvision_state : public driver_device
 {
@@ -60,7 +54,33 @@ public:
 	DECLARE_WRITE16_MEMBER(tms1100_write_o);
 	DECLARE_WRITE16_MEMBER(tms1100_write_r);
 
+	// enums
+	enum cpu_type
+	{
+		CPU_TYPE_I8021,
+		CPU_TYPE_TMS1100
+	};
+
+	enum pcb_type
+	{
+		PCB_TYPE_4952_REV_A,
+		PCB_TYPE_4952_9_REV_B,
+		PCB_TYPE_4971_REV_C,
+		PCB_TYPE_7924952D02,
+		PCB_TYPE_UNKNOWN
+	};
+
+	enum rc_type
+	{
+		RC_TYPE_100PF_21_0K,
+		RC_TYPE_100PF_23_2K,
+		RC_TYPE_100PF_39_4K,
+		RC_TYPE_UNKNOWN
+	};
+
 	cpu_type    m_cpu_type;
+	pcb_type	m_pcb_type;
+	rc_type		m_rc_type;
 
 protected:
 	required_device<dac_device> m_dac;
@@ -162,6 +182,22 @@ MACHINE_RESET_MEMBER(microvision_state, microvision)
 		case CPU_TYPE_TMS1100:
 			m_i8021->suspend( SUSPEND_REASON_DISABLE, 0 );
 			m_tms1100->resume( SUSPEND_REASON_DISABLE );
+
+			switch ( m_rc_type )
+			{
+				case RC_TYPE_100PF_21_0K:
+					static_set_clock( m_tms1100, 550000 );
+					break;
+
+				case RC_TYPE_100PF_23_2K:
+				case RC_TYPE_UNKNOWN:	// Default to most occuring setting
+					static_set_clock( m_tms1100, 500000 );
+					break;
+
+				case RC_TYPE_100PF_39_4K:
+					static_set_clock( m_tms1100, 300000 );
+					break;
+			}
 			break;
 	}
 }
@@ -450,8 +486,58 @@ static DEVICE_IMAGE_LOAD(microvision_cart)
 	}
 	else
 	{
+		// Copy rom contents
 		memcpy(rom1, image.get_software_region("rom"), file_size);
+
+		// Set default setting for PCB type and RC type
+		state->m_pcb_type = microvision_state::PCB_TYPE_UNKNOWN;
+		state->m_rc_type = microvision_state::RC_TYPE_UNKNOWN;
+
+		// Detect settings for PCB type
+		const char *pcb = software_part_get_feature((software_part*)image.part_entry(), "pcb");
+
+		if ( pcb != NULL )
+		{
+			static const struct { const char *pcb_name; microvision_state::pcb_type pcbtype; } pcb_types[] =
+				{
+					{ "4952 REV-A", microvision_state::PCB_TYPE_4952_REV_A },
+					{ "4952-79 REV-B", microvision_state::PCB_TYPE_4952_9_REV_B },
+					{ "4971-REV-C", microvision_state::PCB_TYPE_4971_REV_C },
+					{ "7924952D02", microvision_state::PCB_TYPE_7924952D02 }
+				};
+
+			for (int i = 0; i < ARRAY_LENGTH(pcb_types) && state->m_pcb_type == microvision_state::PCB_TYPE_UNKNOWN; i++ )
+			{
+				if (!mame_stricmp(pcb, pcb_types[i].pcb_name))
+				{
+					state->m_pcb_type = pcb_types[i].pcbtype;
+				}
+			}
+		}
+
+		// Detect settings for RC types
+		const char *rc = software_part_get_feature((software_part*)image.part_entry(), "rc");
+
+		if ( rc != NULL )
+		{
+			static const struct { const char *rc_name; microvision_state::rc_type rctype; } rc_types[] =
+				{
+					{ "100pf/21.0K", microvision_state::RC_TYPE_100PF_21_0K },
+					{ "100pf/23.2K", microvision_state::RC_TYPE_100PF_23_2K },
+					{ "100pf/39.4K", microvision_state::RC_TYPE_100PF_39_4K }
+				};
+
+			for ( int i = 0; i < ARRAY_LENGTH(rc_types) && state->m_rc_type == microvision_state::RC_TYPE_UNKNOWN; i++ )
+			{
+				if (!mame_stricmp(rc, rc_types[i].rc_name))
+				{
+					state->m_rc_type = rc_types[i].rctype;
+				}
+			}
+		}
 	}
+
+	// Mirror rom data to maincpu2 region
 	memcpy( rom2, rom1, file_size );
 
 	// Based on file size select cpu:
@@ -461,11 +547,11 @@ static DEVICE_IMAGE_LOAD(microvision_cart)
 	switch ( file_size )
 	{
 		case 1024:
-			state->m_cpu_type = CPU_TYPE_I8021;
+			state->m_cpu_type = microvision_state::CPU_TYPE_I8021;
 			break;
 
 		case 2048:
-			state->m_cpu_type = CPU_TYPE_TMS1100;
+			state->m_cpu_type = microvision_state::CPU_TYPE_TMS1100;
 			break;
 	}
 	return IMAGE_INIT_PASS;
@@ -555,6 +641,9 @@ static MACHINE_CONFIG_START( microvision, microvision_state )
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("microvision_cart")
 	MCFG_CARTSLOT_LOAD(microvision_cart)
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("cart_list","microvision")
 MACHINE_CONFIG_END
 
 
