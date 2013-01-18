@@ -100,9 +100,13 @@ UINT16 ef9340_1_device::ef9340_get_c_addr(UINT8 x, UINT8 y)
 void ef9340_1_device::ef9340_inc_c()
 {
 	m_ef9340.X++;
-	if ( m_ef9340.X >= 40 )
+	if ( m_ef9340.X == 40 || m_ef9340.X == 48 || m_ef9340.X == 56 || m_ef9340.X == 64 )
 	{
-		m_ef9340.Y = ( m_ef9340.Y + 1 ) % 24;
+		m_ef9340.Y = ( m_ef9340.Y + 1 ) & 0x1f;
+		if ( m_ef9340.Y == 24 )
+		{
+			m_ef9340.Y = 0;
+		}
 		m_ef9340.X = 0;
 	}
 }

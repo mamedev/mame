@@ -105,6 +105,7 @@ public:
 
 	// Global constants 
 	static const int START_ACTIVE_SCAN = 42;
+	static const int BORDER_SIZE       = 10;
 	static const int END_ACTIVE_SCAN   = 42 + 10 + 320 + 10;
 	static const int START_Y           = 1;
 	static const int SCREEN_HEIGHT     = 243;

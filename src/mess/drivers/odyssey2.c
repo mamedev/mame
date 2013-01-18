@@ -441,14 +441,16 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess_g7400)
 	bitmap_ind16 *ef934x_bitmap = m_ef9340_1->get_bitmap();
 
 	// apply external LUM setting
+	int x_real_start = i8244_device::START_ACTIVE_SCAN + i8244_device::BORDER_SIZE;
+	int x_real_end = i8244_device::END_ACTIVE_SCAN - i8244_device::BORDER_SIZE;
 	for ( int x = i8244_device::START_ACTIVE_SCAN; x < i8244_device::END_ACTIVE_SCAN; x++ )
 	{
 		UINT16 d = bitmap->pix16( vpos, x );
 
-		if ( ! m_g7400_ic678_decode[ d & 0x07 ] )
+		if ( ( ! m_g7400_ic678_decode[ d & 0x07 ] ) && x >= x_real_start && x < x_real_end )
 		{
 			// Use EF934x input
-			d = ef934x_bitmap->pix16( y, x - i8244_device::START_ACTIVE_SCAN ) & 0x07;
+			d = ef934x_bitmap->pix16( y, x - x_real_start ) & 0x07;
 
 			if ( ! m_g7400_ic674_decode[ d & 0x07 ] )
 			{
