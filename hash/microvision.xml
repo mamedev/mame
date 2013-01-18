@@ -57,7 +57,7 @@ The "rc" feature is used to indicate the source of the clock signal
 			<feature name="paddle" value="yes" />
 			<feature name="rc" value="100pf/23.2K" />
 			<dataarea name="rom" size="2048">
-				<rom name="mp3450a" size="2048" crc="ifd18ea6d" sha1="30203278d7f2b0817e59bdf7e451be2d64a90f5a" offset="0" />
+				<rom name="mp3450a" size="2048" crc="fd18ea6d" sha1="30203278d7f2b0817e59bdf7e451be2d64a90f5a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
