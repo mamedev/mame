@@ -1185,6 +1185,30 @@ ROM_START( junglers )
 	ROM_LOAD( "6331-1.10a",   0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) ) /* video timing (not used) */
 ROM_END
 
+ROM_START( jackler ) /* Board ID SL-HA-2061-21-B */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jackler_j1.r1",0x0000, 0x1000, CRC(3fc0d149) SHA1(d2d8273d57e26ebc97158549d5c7dada78bf2ae4) )
+	ROM_LOAD( "jackler_j2.r2",0x1000, 0x1000, CRC(5f482c7d) SHA1(5111f114c8427271d4641a55c88e54853e82aa50) )
+	ROM_LOAD( "jungr3",       0x2000, 0x1000, CRC(3dcc03da) SHA1(2c328a46511c4c9eec6515b9316a586de6503152) ) // jackler_j2.r2
+	ROM_LOAD( "jungr4",       0x3000, 0x1000, CRC(f92e9940) SHA1(d72a4d0a0ab7c9a1dcbb7925eb8530052640a234) ) // jackler_j3.r3
+
+	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_LOAD( "1b",           0x0000, 0x1000, CRC(f86999c3) SHA1(4660bd7826219b1bad7d9178918823196d4fd8d6) ) // jackler_j7_sound.1b
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_LOAD( "jackler_j5.r9", 0x0000, 0x1000, CRC(4190c6c0) SHA1(ebd3b5b0e6660045f1ee84006536fa31cb3d5f8e) ) // Both are 2x original
+	ROM_LOAD( "jackler_j6.r10",0x0800, 0x1000, CRC(5c001c66) SHA1(aab8342131f831cb9bab4258488a0f666c35ee4d) ) // so mapped to overlap
+
+	ROM_REGION( 0x0100, "gfx2", 0 )
+	ROM_LOAD( "82s129.10g",   0x0000, 0x0100, CRC(c59c51b7) SHA1(e8ac60fed9ba16c61a4c3c09e27f8c3f4e254014) ) /* dots */
+
+	ROM_REGION( 0x0160, "proms", 0 )
+	ROM_LOAD( "18s030.8b",    0x0000, 0x0020, CRC(55a7e6d1) SHA1(f9e4ff3b165235db2fd8dab94c43bc686c3ad29b) ) /* palette */
+	ROM_LOAD( "tbp24s10.9d",  0x0020, 0x0100, CRC(d223f7b8) SHA1(87b62f09d4eda09c16d99d1554017d18e52b5886) ) /* loookup table */
+	ROM_LOAD( "18s030.7a",    0x0120, 0x0020, CRC(8f574815) SHA1(4f84162db9d58b64742c67dc689eb665b9862fb3) ) /* video layout (not used) */
+	ROM_LOAD( "6331-1.10a",   0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) ) /* video timing (not used) */
+ROM_END
+
 ROM_START( savanna )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sav1.bin",     0x0000, 0x1000, CRC(958c57eb) SHA1(b804ef99bb2f5658de508d3f9f83ca491012a51f) )
@@ -1408,7 +1432,8 @@ GAME( 1981, nrallyx,  0,        rallyx,   nrallyx, driver_device,  0, ROT0,  "Na
 GAME( 1981, nrallyxb, nrallyx,  rallyx,   nrallyx, driver_device,  0, ROT0,  "Namco", "New Rally X (bootleg?) ", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, jungler,  0,        jungler,  jungler, driver_device,  0, ROT90, "Konami", "Jungler", GAME_SUPPORTS_SAVE )
 GAME( 1981, junglers, jungler,  jungler,  jungler, driver_device,  0, ROT90, "Konami (Stern Electronics license)", "Jungler (Stern Electronics)", GAME_SUPPORTS_SAVE )
-GAME( 1981, savanna,  jungler,  jungler,  jungler, driver_device,  0, ROT90, "bootleg (Olympia)", "Savanna (Jungler bootleg)", GAME_SUPPORTS_SAVE ) // or licensed from Konami?
+GAME( 1982, jackler,  jungler,  jungler,  jungler, driver_device,  0, ROT90, "bootleg", "Jackler (Jungler bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1982, savanna,  jungler,  jungler,  jungler, driver_device,  0, ROT90, "bootleg (Olympia)", "Savanna (Jungler bootleg)", GAME_SUPPORTS_SAVE ) // or licensed from Konami?
 GAME( 1982, tactcian, 0,        tactcian, tactcian, driver_device, 0, ROT90, "Konami (Sega license)", "Tactician (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, tactcian2,tactcian, tactcian, tactcian, driver_device, 0, ROT90, "Konami (Sega license)", "Tactician (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, locomotn, 0,        locomotn, locomotn, driver_device, 0, ROT90, "Konami (Centuri license)", "Loco-Motion", GAME_SUPPORTS_SAVE )
