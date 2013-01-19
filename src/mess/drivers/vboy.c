@@ -184,13 +184,12 @@ public:
 	DECLARE_WRITE32_MEMBER(sram_w);
 
 	void put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal);
-	void put_char(int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal);
 	void fill_ovr_char(UINT16 code, bool flipx, bool flipy, UINT8 pal);
-	void fill_bg_map(int num, UINT16 scx, UINT16 scy);
+	INT8 get_bg_map_pixel(int num, int xpos, int ypos);
 	void draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my,int h, int w,
-											UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right);
+											UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num);
 	void draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int gx, int gp, int gy, int h, int w,
-												UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right);
+												UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num);
 	UINT8 display_world(int num, bitmap_ind16 &bitmap, const rectangle &cliprect, bool right, int &cur_spt);
 	void m_set_brightness(void);
 	virtual void machine_start();
@@ -259,40 +258,7 @@ void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,
 	}
 }
 
-void vboy_state::put_char(int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal)
-{
-	UINT16 data;
-	UINT8 yi, xi, dat;
-	int col;
 
-	for (yi = 0; yi < 8; yi++)
-	{
-		if (!flipy)
-				data = READ_FONT(code * 8 + yi);
-		else
-				data = READ_FONT(code * 8 + (7-yi));
-
-		for (xi = 0; xi < 8; xi++)
-		{
-			int res_x,res_y;
-
-			if (!flipx)
-				dat = ((data >> (xi << 1)) & 0x03);
-			else
-				dat = ((data >> ((7-xi) << 1)) & 0x03);
-
-			res_x = x + xi;
-			res_y = y + yi;
-
-			col = (pal >> (dat*2)) & 3;
-
-			if(dat == 0)
-				col = -1;
-
-			WRITE_BG_TEMPDRAW_MAP(res_y*0x1000+res_x, col);
-		}
-	}
-}
 
 void vboy_state::fill_ovr_char(UINT16 code, bool flipx, bool flipy, UINT8 pal)
 {
@@ -324,26 +290,72 @@ void vboy_state::fill_ovr_char(UINT16 code, bool flipx, bool flipy, UINT8 pal)
 	}
 }
 
-void vboy_state::fill_bg_map(int num, UINT16 scx, UINT16 scy)
+INT8 vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
 {
 	int x, y;
 	UINT8 stepx, stepy;
 
+	y = ypos >>3;
+	x = xpos >>3;
+
 	// Fill background map
-	for (y = 0; y < scy; y++)
+//	for (y = 0; y < scy; y++)
 	{
-		for (x = 0; x < scx; x++)
+//		for (x = 0; x < scx; x++)
 		{
 			stepx = (x & 0x1c0) >> 6;
 			stepy = ((y & 0x1c0) >> 6) * (stepx+1);
 			UINT16 val = READ_BGMAP((x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000));
-			put_char(x * 8, y * 8, val & 0x7ff, BIT(val,13), BIT(val,12), m_vip_regs.GPLT[(val >> 14) & 3]);
+			int flipx = BIT(val,13);
+			int flipy = BIT(val,12);
+			int pal = m_vip_regs.GPLT[(val >> 14) & 3];
+			int code = val & 0x7ff;
+
+			//put_char(x * 8, y * 8, , , , );
+			{
+				UINT16 data;
+				UINT8 yi, xi, dat;
+				int col;
+
+			//	for (yi = 0; yi < 8; yi++)
+				yi = ypos & 7;
+
+				{
+					if (!flipy)
+							data = READ_FONT(code * 8 + yi);
+					else
+							data = READ_FONT(code * 8 + (7-yi));
+
+					//for (xi = 0; xi < 8; xi++)
+					xi = xpos & 7;
+					{
+						//int res_x,res_y;
+
+						if (!flipx)
+							dat = ((data >> (xi << 1)) & 0x03);
+						else
+							dat = ((data >> ((7-xi) << 1)) & 0x03);
+
+						//res_x = x + xi;
+						//res_y = y + yi;
+
+						col = (pal >> (dat*2)) & 3;
+
+						if(dat == 0)
+							col = -1;
+
+						return col;
+						//WRITE_BG_TEMPDRAW_MAP(res_y*0x1000+res_x, col);
+					}
+				}
+			}
+
 		}
 	}
 }
 
 void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w,
-													UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right)
+													UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num)
 {
 	int x,y;
 
@@ -371,7 +383,7 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UI
 			}
 			else
 			{
-				pix = READ_BG_TEMPDRAW_MAP((src_y & y_mask)*0x1000+(src_x & x_mask));
+				pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask);
 			}
 
 			if(pix != -1)
@@ -382,7 +394,7 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UI
 }
 
 void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int gx, int gp, int gy, int h, int w,
-														UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right)
+														UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num)
 {
 	int x,y;
 
@@ -414,7 +426,7 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 			}
 			else
 			{
-				pix = READ_BG_TEMPDRAW_MAP((src_y & y_mask)*0x1000+(src_x & x_mask));
+				pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask);
 			}
 
 			if(pix != -1)
@@ -470,14 +482,14 @@ UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle &
 
 		if (lon && (!right))
 		{
-			fill_bg_map(bg_map_num, scx, scy);
-			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right);
+			//fill_bg_map(bg_map_num, scx, scy);
+			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
 		}
 
 		if (ron && (right))
 		{
-			fill_bg_map(bg_map_num, scx, scy);
-			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right);
+			//fill_bg_map(bg_map_num, scx, scy);
+			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
 		}
 	}
 	else if (mode==2) // Affine Mode
@@ -487,14 +499,14 @@ UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle &
 
 		if (lon && (!right))
 		{
-			fill_bg_map(bg_map_num, scx, scy);
-			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right);
+			//fill_bg_map(bg_map_num, scx, scy);
+			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
 		}
 
 		if (ron && (right))
 		{
-			fill_bg_map(bg_map_num, scx, scy);
-			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right);
+			//fill_bg_map(bg_map_num, scx, scy);
+			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
 		}
 	}
 	else if (mode==3) // OBJ Mode
