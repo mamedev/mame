@@ -2538,7 +2538,7 @@ void spu_device::generate_cdda(void *ptr, const unsigned int sz)
 		if (! cdda_buffer->get_bytes_in())
 			cdda_playing=false;
 
-		if (n>0) printf("cdda buffer underflow (n=%d cdda_in=%d spf=%d)\n",n,cdda_buffer->get_bytes_in(),cdda_spf);
+//		if (n>0) printf("cdda buffer underflow (n=%d cdda_in=%d spf=%d)\n",n,cdda_buffer->get_bytes_in(),cdda_spf);
 	}
 }
 
@@ -3062,6 +3062,15 @@ bool spu_device::play_cdda(const unsigned int sector, const unsigned char *cdda)
 
 	signed short *dp=(signed short *)cdda_buffer->add_sector(sector);
 	memcpy(dp,cdda,cdda_sector_size);
+
+	// data coming in in MAME is big endian as stored on the CD
+	unsigned char *flip = (unsigned char *)dp;
+	for (int i = 0; i < cdda_sector_size; i+= 2)
+	{
+		unsigned char temp = flip[i];
+		flip[i] = flip[i+1];
+		flip[i+1] = temp;
+	}
 
 	return true;
 }

@@ -1251,31 +1251,9 @@ void psxcd_device::read_sector()
 //
 //
 
-bool psxcd_device::play_cdda_sector(const unsigned int sector,
-																	unsigned char *rawsec)
+bool psxcd_device::play_cdda_sector(const unsigned int sector, unsigned char *rawsec)
 {
-	bool isdata=true;
-
-	if (rawsec[0]!=0)
-	{
-		isdata=false;
-	} else
-	{
-		for (int i=0; i<10; i++)
-			if (rawsec[i+1]!=0xff)
-			{
-				isdata=false;
-				break;
-			}
-	}
-
-	if (! isdata)
-	{
-		return machine().device<spu_device>("spu")->play_cdda(sector,rawsec);
-	} else
-	{
-		return true;
-	}
+	return machine().device<spu_device>("spu")->play_cdda(sector,rawsec);
 }
 
 //
@@ -1385,7 +1363,7 @@ void psxcd_device::play_sector()
 		ev->t=next_sector_t - machine().device<cpu_device>("maincpu")->total_cycles();
 		ev->type=event_play_sector;
 
-		next_sector_t+=cyc;
+		next_sector_t+=cyc>>1;
 
 		next_read_event=ev;
 		add_system_event(ev);
@@ -1523,7 +1501,7 @@ void psxcd_device::start_play()
 	ev->t=next_sector_t - machine().device<cpu_device>("maincpu")->total_cycles();
 	ev->type=event_play_sector;
 
-	next_sector_t+=cyc;
+	next_sector_t+=cyc>>1;
 
 	next_read_event=ev;
 	add_system_event(ev);
@@ -1678,7 +1656,7 @@ void psxcd_device::add_system_event(event *ev)
 
 	// ev->t is in maincpu clock cycles
 	UINT32 hz = m_sysclock / ev->t;
-//  printf("add_system_event: event type %d for %d hz (using timer %d)\n", ev->type, hz, tnum);
+//	printf("add_system_event: event type %d for %d hz (using timer %d)\n", ev->type, hz, tnum);
 	timer->adjust(attotime::from_hz(hz), tnum, attotime::never);
 
 	// back-reference the timer from the event
