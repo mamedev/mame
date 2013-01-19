@@ -304,7 +304,7 @@ bool floppy_image_device::call_load()
 	if (!cur_wpt_cb.isnull())
 		cur_wpt_cb(this, wpt);
 
-	wpt = is_readonly();
+	wpt = is_readonly() || (output_format == 0);
 	if (!cur_wpt_cb.isnull())
 		cur_wpt_cb(this, wpt);
 
