@@ -356,22 +356,31 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UI
 
 	for(y=0;y<=h;y++)
 	{
+		INT32 y1 = (y+gy);
+
+		if ((y1 < cliprect.min_y) || (y1 > cliprect.max_y))
+			continue;
+
+		int src_y = y+my;
+
 		for(x=0;x<=w;x++)
 		{
-			int src_x,src_y;
-			INT32 y1 = (y+gy);
 			INT32 x1 = (x+gx);
-			int pix = 0;
 
 			x1 += right ? -gp : gp;
 
+			if ((x1 < cliprect.min_x) || (x1 > cliprect.max_x))
+				continue;
+
+			int src_x;
 			src_x = x+mx;
 			if (mode==1)
 				src_x += (INT16)READ_BGMAP(param_base + (y*2+(right ^ 1)));
 
-			src_y = y+my;
 			src_x += right ? -mp : mp;
 
+
+			int pix = 0;
 			if(ovr && (src_x > x_mask || src_y > y_mask || src_x < 0 || src_y < 0))
 			{
 				pix = READ_OVR_TEMPDRAW_MAP((src_y & 7)*8+(src_x & 7));
@@ -382,8 +391,7 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UI
 			}
 
 			if(pix != -1)
-				if (cliprect.contains(x1, y1))
-					bitmap.pix16(y1, x1) = machine().pens[pix & 3];
+				bitmap.pix16(y1, x1) = machine().pens[pix & 3];
 		}
 	}
 }
