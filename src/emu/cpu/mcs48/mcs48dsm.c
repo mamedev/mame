@@ -292,6 +292,7 @@ static UINT32 common_dasm(device_t *device, char *buffer, offs_t pc, const UINT8
 		case 0xfd:      sprintf(buffer, "mov  a,r5");                                           break;
 		case 0xfe:      sprintf(buffer, "mov  a,r6");                                           break;
 		case 0xff:      sprintf(buffer, "mov  a,r7");                                           break;
+		default:        sprintf(buffer, "illegal");                                             break;
 	}
 
 	return (opram - startram) | flags | DASMFLAG_SUPPORTED;
