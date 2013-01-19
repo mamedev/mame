@@ -111,7 +111,7 @@ READ16_MEMBER( pcfx_state::pad_r )
 		if(((offset<<1) & 0x02) == 0)
 		{
 			m_pad.status[port_type] &= ~8; // clear latch on LSB read according to docs
-			//set_irq_line(11, 0);
+			set_irq_line(11, 0);
 		}
 	}
 
@@ -126,7 +126,7 @@ TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 	m_pad.status[param] |= 8;
 	m_pad.ctrl[param] &= ~1; // ack TX line
 	// TODO: pad IRQ
-//  set_irq_line(11, 1);
+	set_irq_line(11, 1);
 }
 
 WRITE16_MEMBER( pcfx_state::pad_w )
