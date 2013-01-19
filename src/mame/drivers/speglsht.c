@@ -326,13 +326,6 @@ static const st0016_interface st0016_config =
 	&st0016_charram
 };
 
-static const r3000_cpu_core r3000_config =
-{
-	0,
-	4096,   /* code cache size */
-	2048    /* data cache size */
-};
-
 MACHINE_RESET_MEMBER(speglsht_state,speglsht)
 {
 	memset(m_shared,0,0x1000);
@@ -393,8 +386,8 @@ static MACHINE_CONFIG_START( speglsht, speglsht_state )
 
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", speglsht_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", R3000LE, 25000000)
-	MCFG_CPU_CONFIG(r3000_config)
+	MCFG_CPU_ADD("sub", R3051, 25000000)
+	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_CPU_PROGRAM_MAP(speglsht_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", speglsht_state,  irq4_line_assert)
 

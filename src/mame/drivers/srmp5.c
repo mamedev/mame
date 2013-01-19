@@ -501,13 +501,6 @@ static const st0016_interface st0016_config =
 	&st0016_charram
 };
 
-static const r3000_cpu_core r3000_config =
-{
-	1,  /* 1 if we have an FPU, 0 otherwise */
-	4096,   /* code cache size */
-	4096    /* data cache size */
-};
-
 static const gfx_layout tile_16x8x8_layout =
 {
 	16,8,
@@ -545,8 +538,8 @@ static MACHINE_CONFIG_START( srmp5, srmp5_state )
 	MCFG_CPU_IO_MAP(st0016_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp5_state,  irq0_line_hold)
 
-	MCFG_CPU_ADD("sub", R3000LE, 25000000)
-	MCFG_CPU_CONFIG(r3000_config)
+	MCFG_CPU_ADD("sub", R3051, 25000000)
+	MCFG_R3000_ENDIANNESS(ENDIANNESS_LITTLE)
 	MCFG_CPU_PROGRAM_MAP(srmp5_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", srmp5_state,  irq4_line_assert)
 

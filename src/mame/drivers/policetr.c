@@ -402,19 +402,11 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const r3000_cpu_core r3000_config =
-{
-	0,      /* 1 if we have an FPU, 0 otherwise */
-	4096,   /* code cache size */
-	4096    /* data cache size */
-};
-
-
 static MACHINE_CONFIG_START( policetr, policetr_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3000BE, MASTER_CLOCK/2)
-	MCFG_CPU_CONFIG(r3000_config)
+	MCFG_CPU_ADD("maincpu", R3041, MASTER_CLOCK/2)
+	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_PROGRAM_MAP(policetr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", policetr_state,  irq4_gen)
 

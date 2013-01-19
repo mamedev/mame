@@ -115,19 +115,12 @@ static INPUT_PORTS_START( turrett )
 INPUT_PORTS_END
 
 
-static const r3000_cpu_core r3000_config =
-{
-	0,      /* 1 if we have an FPU, 0 otherwise */
-	2048,   /* code cache size */
-	512     /* data cache size */
-};
-
 
 static MACHINE_CONFIG_START( turrett, turrett_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3041BE, R3041_CLOCK)
+	MCFG_CPU_ADD("maincpu", R3041, R3041_CLOCK)
+	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_CONFIG(r3000_config)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

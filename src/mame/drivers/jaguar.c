@@ -1545,15 +1545,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const r3000_cpu_core r3000_config =
-{
-	0,      /* 1 if we have an FPU, 0 otherwise */
-	4096,   /* code cache size */
-	4096    /* data cache size */
-};
-
-
-static const jaguar_cpu_config gpu_config =
+ static const jaguar_cpu_config gpu_config =
 {
 	&jaguar_state::gpu_cpu_int
 };
@@ -1567,8 +1559,8 @@ static const jaguar_cpu_config dsp_config =
 static MACHINE_CONFIG_START( cojagr3k, jaguar_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", R3041BE, R3000_CLOCK)
-	MCFG_CPU_CONFIG(r3000_config)
+	MCFG_CPU_ADD("maincpu", R3041, R3000_CLOCK)
+	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_PROGRAM_MAP(r3000_map)
 
 	MCFG_CPU_ADD("gpu", JAGUARGPU, COJAG_CLOCK/2)
@@ -2263,7 +2255,7 @@ void jaguar_state::cojag_common_init(UINT16 gpu_jump_offs, UINT16 spin_pc)
 	m_is_cojag = true;
 
 	/* copy over the ROM */
-	m_is_r3000 = (m_main_cpu->type() == R3041BE);
+	m_is_r3000 = (m_main_cpu->type() == R3041);
 
 	/* install synchronization hooks for GPU */
 	if (m_is_r3000)
