@@ -4,6 +4,14 @@ Vega by Olympia
 
 preliminary WIP driver by Tomasz Slanina
 
+hardware seems like an evolution of Olympia's Monza GP
+
+I8035 (MCU)
+AY 3-8910 (Sound)
+PPI 8255 (I/O)
+INS 8154 (I/O + RAM)
+DP8350 (CRT controller)
+
 TODO:
 - proper scanline (with 2x scaling when needed) based renderer
 - color mixer
