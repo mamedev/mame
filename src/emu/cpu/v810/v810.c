@@ -1314,7 +1314,9 @@ static CPU_EXECUTE( v810 )
 		debugger_instruction_hook(device, cpustate->PC);
 		op=R_OP(cpustate,cpustate->PC);
 		cpustate->PC+=2;
-		cpustate->icount-= OpCodeTable[op>>10](cpustate,op);
+		int cnt;
+		cnt = OpCodeTable[op>>10](cpustate,op);
+		cpustate->icount-= cnt;
 	}
 }
 
