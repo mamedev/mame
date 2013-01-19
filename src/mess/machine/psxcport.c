@@ -118,7 +118,7 @@ void device_psx_controller_interface::do_pad()
 
 	if(!m_bit)
 	{
-		if((!m_count) && (m_idata & 0x80))
+		if((!m_count) && (m_idata & 0xf0))
 		{
 				m_memcard = true;
 				return;
