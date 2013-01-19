@@ -2377,11 +2377,11 @@ void spu_device::key_on(const int v)
 void spu_device::set_xa_format(const float _freq, const int channels)
 {
 	// Adjust frequency to compensate for slightly slower/faster frame rate
-	float freq=44100.0; //(_freq*get_adjusted_frame_rate())/ps1hw.rcnt->get_vertical_refresh();
+//	float freq=44100.0; //(_freq*get_adjusted_frame_rate())/ps1hw.rcnt->get_vertical_refresh();
 
-	xa_freq=(unsigned int)((freq/44100.0)*4096.0f);
+	xa_freq=(unsigned int)((_freq/44100.0)*4096.0f);
 	xa_channels=channels;
-	xa_spf=(unsigned int)(freq/60.0)*channels;
+	xa_spf=(unsigned int)(_freq/60.0)*channels;
 }
 
 //
