@@ -3,7 +3,6 @@
         Hitachi HD44780 LCD controller
 
         TODO:
-        - 4-bit mode
         - 5x10 chars
         - dump internal CGROM
 
@@ -87,7 +86,8 @@ void hd44780_device::device_start()
 	save_item( NAME(m_blink));
 	save_item( NAME(m_ddram));
 	save_item( NAME(m_cgram));
-
+	save_item( NAME(m_nibble));
+	save_item( NAME(m_data_latch));
 }
 
 
@@ -115,6 +115,8 @@ void hd44780_device::device_reset()
 	m_char_size = 0;
 	m_disp_shift = 0;
 	m_blink = 0;
+	m_nibble = false;
+	m_data_latch = 0;
 
 	set_busy_flag(1520);
 }
@@ -223,34 +225,53 @@ UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 WRITE8_MEMBER(hd44780_device::control_write)
 {
-	if (BIT(data, 7)) // Set DDRAM Address
+	if (m_data_len == 0)
+	{
+		m_nibble = !m_nibble;
+
+		if (m_nibble)
+		{
+			m_data_latch = data & 0xf0;
+			return;
+		}
+		else
+		{
+			m_data_latch |= ((data>>4) & 0x0f);
+		}
+	}
+	else
+	{
+		m_data_latch = data;
+	}
+
+	if (BIT(m_data_latch, 7)) // Set DDRAM Address
 	{
 		m_ac_mode = 0;
-		m_ac = data & 0x7f;
+		m_ac = m_data_latch & 0x7f;
 		m_cursor_pos = m_ac;
 		set_busy_flag(37);
 	}
-	else if (BIT(data, 6)) // Set CGRAM Address
+	else if (BIT(m_data_latch, 6)) // Set CGRAM Address
 	{
 		m_ac_mode = 1;
-		m_ac = data & 0x3f;
+		m_ac = m_data_latch & 0x3f;
 		set_busy_flag(37);
 	}
-	else if (BIT(data, 5)) // Function Set
+	else if (BIT(m_data_latch, 5)) // Function Set
 	{
 		// datasheet says you can't change char size after first function set without altering 4/8 bit mode
-		if (BIT(data, 4) != m_data_len)
-			m_char_size = BIT(data, 2);
+		if (BIT(m_data_latch, 4) != m_data_len)
+			m_char_size = BIT(m_data_latch, 2);
 
-		m_data_len = BIT(data, 4);
-		m_num_line = BIT(data, 3);
+		m_data_len = BIT(m_data_latch, 4);
+		m_num_line = BIT(m_data_latch, 3);
 		set_busy_flag(37);
 	}
-	else if (BIT(data, 4)) // Cursor or display shift
+	else if (BIT(m_data_latch, 4)) // Cursor or display shift
 	{
-		UINT8 direct = (BIT(data, 2)) ? +1 : -1;
+		UINT8 direct = (BIT(m_data_latch, 2)) ? +1 : -1;
 
-		if (BIT(data, 3))
+		if (BIT(m_data_latch, 3))
 			m_disp_shift += direct;
 		else
 		{
@@ -260,23 +281,23 @@ WRITE8_MEMBER(hd44780_device::control_write)
 
 		set_busy_flag(37);
 	}
-	else if (BIT(data, 3)) // Display on/off Control
+	else if (BIT(m_data_latch, 3)) // Display on/off Control
 	{
-		m_display_on = BIT(data, 2);
-		m_cursor_on = BIT(data, 1);
-		m_blink_on = BIT(data, 0);
+		m_display_on = BIT(m_data_latch, 2);
+		m_cursor_on = BIT(m_data_latch, 1);
+		m_blink_on = BIT(m_data_latch, 0);
 
 		set_busy_flag(37);
 	}
-	else if (BIT(data, 2)) // Entry Mode set
+	else if (BIT(m_data_latch, 2)) // Entry Mode set
 	{
-		m_direction = (BIT(data, 1)) ? +1 : -1;
+		m_direction = (BIT(m_data_latch, 1)) ? +1 : -1;
 
-		m_shift_on = BIT(data, 0);
+		m_shift_on = BIT(m_data_latch, 0);
 
 		set_busy_flag(37);
 	}
-	else if (BIT(data, 1)) // return home
+	else if (BIT(m_data_latch, 1)) // return home
 	{
 		m_ac = 0;
 		m_cursor_pos = 0;
@@ -285,7 +306,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		m_disp_shift = 0;
 		set_busy_flag(1520);
 	}
-	else if (BIT(data, 0)) // clear display
+	else if (BIT(m_data_latch, 0)) // clear display
 	{
 		m_ac = 0;
 		m_cursor_pos = 0;
@@ -299,7 +320,19 @@ WRITE8_MEMBER(hd44780_device::control_write)
 
 READ8_MEMBER(hd44780_device::control_read)
 {
-	return (m_busy_flag << 7) | (m_ac & 0x7f);
+	if (m_data_len == 0)
+	{
+		m_nibble = !m_nibble;
+
+		if (m_nibble)
+			return (m_busy_flag << 7) | (m_ac & 0x70);
+		else
+			return (m_ac<<4) & 0xf0;
+	}
+	else
+	{
+		return (m_busy_flag << 7) | (m_ac & 0x7f);
+	}
 }
 
 void hd44780_device::update_ac(void) // m_data_bus_flag was left as global so old savestates will work
@@ -324,10 +357,29 @@ WRITE8_MEMBER(hd44780_device::data_write)
 		return;
 	}
 
-	if (m_ac_mode == 0)
-		m_ddram[m_ac] = data;
+	if (m_data_len == 0)
+	{
+		m_nibble = !m_nibble;
+
+		if (m_nibble)
+		{
+			m_data_latch = data & 0xf0;
+			return;
+		}
+		else
+		{
+			m_data_latch |= ((data>>4) & 0x0f);
+		}
+	}
 	else
-		m_cgram[m_ac] = data;
+	{
+		m_data_latch = data;
+	}
+
+	if (m_ac_mode == 0)
+		m_ddram[m_ac] = m_data_latch;
+	else
+		m_cgram[m_ac] = m_data_latch;
 
 	m_data_bus_flag = 1;
 	update_ac();
@@ -342,6 +394,16 @@ READ8_MEMBER(hd44780_device::data_read)
 		data = m_ddram[m_ac];
 	else
 		data = m_cgram[m_ac];
+
+	if (m_data_len == 0)
+	{
+		m_nibble = !m_nibble;
+
+		if (m_nibble)
+			return data & 0xf0;
+		else
+			data = (data<<4) & 0xf0;
+	}
 
 	m_data_bus_flag = 2;
 	update_ac();

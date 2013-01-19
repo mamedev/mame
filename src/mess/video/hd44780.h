@@ -96,6 +96,9 @@ protected:
 	UINT8 m_char_size;      //char size 5x8 or 5x10
 
 	UINT8 m_blink;
+
+	bool m_nibble;
+	UINT8 m_data_latch;
 };
 
 // device type definition
