@@ -99,7 +99,7 @@ UINT8 generic_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_lin
 			if (i>=2 && i<=4 && (shift ^ caps)==1 && ctrl==0) {
 				key_code = 0x40 + row_number(code) + (i-2)*8; // for big letters
 			}
-			if (i>=2 && i<=4 && ctrl==1) {
+			if (i>=2 && i<=5 && ctrl==1) {
 				key_code = 0x00 + row_number(code) + (i-2)*8; // for CTRL + letters
 			}
 			if (i==5 && shift==1 && ctrl==0) {
@@ -124,9 +124,7 @@ UINT8 generic_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_lin
 					key_code = 0x60 + row_number(code) + (i-2)*8; // for DEL it is switched
 				}
 			}
-			if (i==5 && shift==1 && ctrl==1) {
-				key_code = 0x00 + row_number(code) + (i-2)*8; // for letters + ctrl
-			}
+
 			if (i==6) {
 				switch(row_number(code))
 				{
