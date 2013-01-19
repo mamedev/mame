@@ -178,7 +178,7 @@ The "rc" feature is used to indicate the source of the clock signal
 <!--
 	<software name="sprblock">
 		<description>Super Blockbuster</description>
-		<year>1979</year>
+		<year>1982</year>
 		<publisher>Milton Bradley</publisher>
 
 		<part name="cart" interface="microvision_cart">
@@ -193,7 +193,7 @@ The "rc" feature is used to indicate the source of the clock signal
 -->
 
 	<software name="vegasslt">
-		<description>Veags Slots</description>
+		<description>Vegas Slots</description>
 		<year>1979</year>
 		<publisher>Milton Bradley</publisher>
 
