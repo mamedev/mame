@@ -179,6 +179,7 @@ public:
 	DECLARE_WRITE8_MEMBER(qsound_banksw_w);
 	DECLARE_READ16_MEMBER(sf2rb_prot_r);
 	DECLARE_READ16_MEMBER(sf2rb2_prot_r);
+	DECLARE_READ16_MEMBER(sf2dongb_prot_r);
 	DECLARE_READ16_MEMBER(cps1_dsw_r);
 	DECLARE_WRITE16_MEMBER(cps1_coinctrl_w);
 	DECLARE_READ16_MEMBER(qsound_sharedram1_r);
@@ -217,6 +218,7 @@ public:
 	DECLARE_DRIVER_INIT(pzloop2);
 	DECLARE_DRIVER_INIT(singbrd);
 	DECLARE_DRIVER_INIT(gigaman2);
+	DECLARE_DRIVER_INIT(sf2dongb);
 	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap1_scan);
 	TILEMAP_MAPPER_MEMBER(tilemap2_scan);
@@ -238,6 +240,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
 	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
+
 
 	/* fcrash handlers */
 	DECLARE_DRIVER_INIT(kodb);
