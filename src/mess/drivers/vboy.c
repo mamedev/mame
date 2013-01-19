@@ -39,7 +39,26 @@
 #define WRITE_OVR_TEMPDRAW_MAP(woffs, wdat) m_ovr_tempdraw_map[(woffs) & 0x3f] = wdat;
 #define READ_OVR_TEMPDRAW_MAP(roffs) m_ovr_tempdraw_map[(roffs) & 0x3f];
 
-#define READ_FONT(roffs) m_font[(roffs) & 0x3fff]
+#define READ_FONT(roffs) m_font[(roffs)&0x1ffff]
+
+// bit of magic here, we also write pre-flipped copies of the data to extra ram we've allocated
+// to simplify the draw loop (we can just pass the flip / unused bits as the upper character bits)
+// (all TILE words are in the format of ccxy -ttt tttt tttt 
+//   where 'c' = palette, 'x/y' are flips, '-' is unused(?) and 't' is your basic tile number
+
+#define WRITE_FONT(woffs) \
+	COMBINE_DATA(&m_font[woffs]); /* normal */ \
+	UINT16 dat = m_font[woffs]; \
+	m_font[((woffs) + 0x4000)] = dat;     /* normal */ \
+	m_font[((woffs) + 0x8000) ^ 7] = dat; /* flip y */ \
+	m_font[((woffs) + 0xc000) ^ 7] = dat; /* flip y */ \
+	dat = BITSWAP16(dat,1,0,3,2,5,4,7,6,9,8,11,10,13,12,15,14);  \
+	m_font[((woffs) + 0x10000)] = dat;     /* flip x */ \
+	m_font[((woffs) + 0x14000)] = dat;     /* flip x */ \
+	m_font[((woffs) + 0x18000) ^ 7] = dat; /* flip x+y */ \
+	m_font[((woffs) + 0x1c000) ^ 7] = dat; /* flip x+y */ \
+
+
 
 /* FIXME: most if not all of these must be UINT8 */
 struct vboy_regs_t
@@ -179,8 +198,8 @@ public:
 	DECLARE_READ32_MEMBER(sram_r);
 	DECLARE_WRITE32_MEMBER(sram_w);
 
-	void put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal);
-	void fill_ovr_char(UINT16 code, bool flipx, bool flipy, UINT8 pal);
+	void put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, UINT16 code, UINT8 pal);
+	void fill_ovr_char(UINT16 code, UINT8 pal);
 	INT8 get_bg_map_pixel(int num, int xpos, int ypos);
 	void draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my,int h, int w,
 											UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num);
@@ -214,30 +233,24 @@ void vboy_state::video_start()
 	m_r_frame_0 = auto_alloc_array_clear(machine(), UINT8, 0x6000);
 	m_r_frame_1 = auto_alloc_array_clear(machine(), UINT8, 0x6000);
 
-	m_font  = auto_alloc_array_clear(machine(), UINT16, 0x8000 >> 1);
+	m_font  = auto_alloc_array_clear(machine(), UINT16, (0x8000 >> 1)*4 * 2);
 	m_bgmap = auto_alloc_array(machine(), UINT16, 0x20000 >> 1);
 }
 
-void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal)
+void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, UINT16 code, UINT8 pal)
 {
 	UINT16 data;
 	UINT8 yi, xi, dat, col;
 
 	for (yi = 0; yi < 8; yi++)
 	{
-		if (!flipy)
-				data = READ_FONT(code * 8 + yi);
-		else
-				data = READ_FONT(code * 8 + (7-yi));
+		data = READ_FONT(code * 8 + yi);
 
 		for (xi = 0; xi < 8; xi++)
 		{
 			int res_x,res_y;
 
-			if (!flipx)
-				dat = ((data >> (xi << 1)) & 0x03);
-			else
-				dat = ((data >> ((7-xi) << 1)) & 0x03);
+			dat = ((data >> (xi << 1)) & 0x03);
 
 			res_x = x + xi;
 			res_y = y + yi;
@@ -255,7 +268,7 @@ void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,
 
 
 
-void vboy_state::fill_ovr_char(UINT16 code, bool flipx, bool flipy, UINT8 pal)
+void vboy_state::fill_ovr_char(UINT16 code, UINT8 pal)
 {
 	UINT16 data;
 	UINT8 yi, xi, dat;
@@ -263,18 +276,11 @@ void vboy_state::fill_ovr_char(UINT16 code, bool flipx, bool flipy, UINT8 pal)
 
 	for (yi = 0; yi < 8; yi++)
 	{
-		if (!flipy)
-				data = READ_FONT(code * 8 + yi);
-		else
-				data = READ_FONT(code * 8 + (7-yi));
+		data = READ_FONT(code * 8 + yi);
 
 		for (xi = 0; xi < 8; xi++)
 		{
-			if (!flipx)
-				dat = ((data >> (xi << 1)) & 0x03);
-			else
-				dat = ((data >> ((7-xi) << 1)) & 0x03);
-
+			dat = ((data >> (xi << 1)) & 0x03);
 			col = (pal >> (dat*2)) & 3;
 
 			if(dat == 0)
@@ -285,73 +291,42 @@ void vboy_state::fill_ovr_char(UINT16 code, bool flipx, bool flipy, UINT8 pal)
 	}
 }
 
-INT8 vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
+inline INT8 vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
 {
+//	g_profiler.start(PROFILER_USER1);
 	int x, y;
 	UINT8 stepx, stepy;
 
 	y = ypos >>3;
 	x = xpos >>3;
 
-	// Fill background map
-//	for (y = 0; y < scy; y++)
+	stepx = (x & 0x1c0) >> 6;
+	stepy = ((y & 0x1c0) >> 6) * (stepx+1);
+	UINT16 val = READ_BGMAP((x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000));
+	int pal = m_vip_regs.GPLT[(val >> 14) & 3];
+	int code = val & 0x3fff;
+
+	UINT16 data;
+	UINT8 yi, xi, dat;
+
+	yi = ypos & 7;
+	data = READ_FONT(code * 8 + yi);
+	xi = xpos & 7;
+	dat = ((data >> (xi << 1)) & 0x03);
+
+	if(dat == 0)
 	{
-//		for (x = 0; x < scx; x++)
-		{
-			stepx = (x & 0x1c0) >> 6;
-			stepy = ((y & 0x1c0) >> 6) * (stepx+1);
-			UINT16 val = READ_BGMAP((x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000));
-			int flipx = BIT(val,13);
-			int flipy = BIT(val,12);
-			int pal = m_vip_regs.GPLT[(val >> 14) & 3];
-			int code = val & 0x7ff;
-
-			//put_char(x * 8, y * 8, , , , );
-			{
-				UINT16 data;
-				UINT8 yi, xi, dat;
-				int col;
-
-			//	for (yi = 0; yi < 8; yi++)
-				yi = ypos & 7;
-
-				{
-					if (!flipy)
-							data = READ_FONT(code * 8 + yi);
-					else
-							data = READ_FONT(code * 8 + (7-yi));
-
-					//for (xi = 0; xi < 8; xi++)
-					xi = xpos & 7;
-					{
-						//int res_x,res_y;
-
-						if (!flipx)
-							dat = ((data >> (xi << 1)) & 0x03);
-						else
-							dat = ((data >> ((7-xi) << 1)) & 0x03);
-
-						//res_x = x + xi;
-						//res_y = y + yi;
-
-						col = (pal >> (dat*2)) & 3;
-
-						if(dat == 0)
-							col = -1;
-
-						return col;
-						//WRITE_BG_TEMPDRAW_MAP(res_y*0x1000+res_x, col);
-					}
-				}
-			}
-
-		}
+		//g_profiler.stop();
+		return -1;
 	}
+	//	g_profiler.stop();
+	return (pal >> (dat*2)) & 3;
 }
 
 void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w,
 													UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num)
 {
+//	g_profiler.start(PROFILER_USER2);
 	int x,y;
 
 	for(y=0;y<=h;y++)
@@ -381,9 +356,18 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UI
 
 
 			int pix = 0;
-			if(ovr && (src_x > x_mask || src_y > y_mask || src_x < 0 || src_y < 0))
+			if(ovr)
 			{
-				pix = READ_OVR_TEMPDRAW_MAP((src_y & 7)*8+(src_x & 7));
+				if ((src_x > x_mask || src_y > y_mask || src_x < 0 || src_y < 0))
+				{
+					g_profiler.start(PROFILER_USER3);
+					pix = READ_OVR_TEMPDRAW_MAP((src_y & 7)*8+(src_x & 7));
+					g_profiler.stop();
+				}
+				else
+				{
+					pix = get_bg_map_pixel(bg_map_num, src_x & x_mask, src_y & y_mask);
+				}
 			}
 			else
 			{
@@ -394,11 +378,13 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UI
 				bitmap.pix16(y1, x1) = machine().pens[pix & 3];
 		}
 	}
+//	g_profiler.stop();
 }
 
 void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int gx, int gp, int gy, int h, int w,
 														UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num)
 {
+//	g_profiler.start(PROFILER_USER3);
 	int x,y;
 
 	for(y=0;y<=h;y++)
@@ -437,6 +423,7 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 					bitmap.pix16(y1, x1) = machine().pens[pix & 3];
 		}
 	}
+//	g_profiler.stop();
 }
 
 /*
@@ -481,34 +468,30 @@ UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle &
 	if (mode < 2) // Normal / HBias Mode
 	{
 		if(ovr)
-			fill_ovr_char(ovr_char & 0x7ff,BIT(ovr_char,13), BIT(ovr_char,12), m_vip_regs.GPLT[(ovr_char >> 14) & 3]);
+			fill_ovr_char(ovr_char & 0x3fff, m_vip_regs.GPLT[(ovr_char >> 14) & 3]);
 
 		if (lon && (!right))
 		{
-			//fill_bg_map(bg_map_num, scx, scy);
 			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
 		}
 
 		if (ron && (right))
 		{
-			//fill_bg_map(bg_map_num, scx, scy);
 			draw_bg_map(bitmap, cliprect, param_base, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
 		}
 	}
 	else if (mode==2) // Affine Mode
 	{
 		if(ovr)
-			fill_ovr_char(ovr_char & 0x7ff,BIT(ovr_char,13), BIT(ovr_char,12), m_vip_regs.GPLT[(ovr_char >> 14) & 3]);
+			fill_ovr_char(ovr_char & 0x3fff, m_vip_regs.GPLT[(ovr_char >> 14) & 3]);
 
 		if (lon && (!right))
 		{
-			//fill_bg_map(bg_map_num, scx, scy);
 			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
 		}
 
 		if (ron && (right))
 		{
-			//fill_bg_map(bg_map_num, scx, scy);
 			draw_affine_map(bitmap, cliprect, param_base, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right, bg_map_num);
 		}
 	}
@@ -540,10 +523,10 @@ UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle &
 			UINT8 jron = (READ_OBJECTS(start_ndx+1) & 0x4000) >> 14;
 
 			if (!right && jlon)
-				put_obj(bitmap, cliprect, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), m_vip_regs.JPLT[(val>>14) & 3]);
+				put_obj(bitmap, cliprect, (jx-jp) & 0x1ff, jy, val & 0x3fff, m_vip_regs.JPLT[(val>>14) & 3]);
 
 			if(right && jron)
-				put_obj(bitmap, cliprect, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), m_vip_regs.JPLT[(val>>14) & 3]);
+				put_obj(bitmap, cliprect, (jx+jp) & 0x1ff, jy, val & 0x3fff, m_vip_regs.JPLT[(val>>14) & 3]);
 
 			i --;
 			i &= 0x3ff;
@@ -1044,22 +1027,22 @@ WRITE16_MEMBER( vboy_state::vip_w )
 
 WRITE16_MEMBER( vboy_state::vboy_font0_w )
 {
-	COMBINE_DATA(&m_font[offset]);
+	WRITE_FONT(offset);
 }
 
 WRITE16_MEMBER( vboy_state::vboy_font1_w )
 {
-	COMBINE_DATA(&m_font[offset+0x1000]);
+	WRITE_FONT(offset+0x1000);
 }
 
 WRITE16_MEMBER( vboy_state::vboy_font2_w )
 {
-	COMBINE_DATA(&m_font[offset+0x2000]);
+	WRITE_FONT(offset+0x2000);
 }
 
 WRITE16_MEMBER( vboy_state::vboy_font3_w )
 {
-	COMBINE_DATA(&m_font[offset+0x3000]);
+	WRITE_FONT(offset+0x3000);
 }
 
 READ16_MEMBER( vboy_state::vboy_font0_r )
