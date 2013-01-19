@@ -2096,12 +2096,10 @@ ROM_START( pclb297w ) // set to 1p
 	ROM_LOAD16_WORD_SWAP( "pclb297w_ic30",    0x0a00000, 0x0200000, CRC(03b9eacf) SHA1(d69c10f7613d9f52042dd6cce64e74e2b1ecc2d8) ) // OK - IC3?
 	ROM_LOAD16_WORD_SWAP( "pclb297w_ic32",    0x0c00000, 0x0200000, CRC(20437e93) SHA1(dfd2026bec6b2f418cd1cbfa7266717211d013b6) ) // OK - IC4?
 	ROM_LOAD16_WORD_SWAP( "pclb297w_ic34",    0x0e00000, 0x0200000, CRC(9639b003) SHA1(8f95b024ad19151e1e642d58aa785d14ae3a0661) ) // OK - IC4?
-
-	// the internal test mode then tests IC5, IC6, but we only have this rom to fill it? some mirroring (not basic + 0x1000000, tested) or just fail on real HW? or misisng 3 roms?
-	ROM_LOAD16_WORD_SWAP( "pclb297w_ic36",    0x1000000, 0x0200000, BAD_DUMP CRC(dd1b57b6) SHA1(8450355ec6cdc9718f8579f8702f3900f686c3f8) ) // BAD? - IC5 ??
-	// 0x1200000 ROM IC23 - (test IC5? pt 2)
-	// 0x1400000 ROM IC25 - (test IC6? pt 1)
-	// 0x1600000 ROM IC?? - (test IC6? pt 2)
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic36",    0x1000000, 0x0200000, CRC(dd1b57b6) SHA1(8450355ec6cdc9718f8579f8702f3900f686c3f8) ) // BAD? - IC5 ?? (will need rom below to pass)
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic23",    0x1200000, 0x0200000, NO_DUMP) // IC5 ??
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic25",    0x1400000, 0x0200000, NO_DUMP) // IC6 ??
+	ROM_LOAD16_WORD_SWAP( "pclb297w_ic27",    0x1600000, 0x0200000, NO_DUMP) // IC6 ??
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "eeprom", 0x0000, 0x0080, CRC(9ba58358) SHA1(555ac21321b3051f7083cd72176ddc0fef2d4155) )
