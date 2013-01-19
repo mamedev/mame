@@ -74,7 +74,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	optional_device<serial_keyboard_device> m_keyboard;
-	optional_device<cassette_image_device> m_cass;
+	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<const UINT8> m_p_videoram;
 	required_shared_ptr<const UINT8> m_p_attribram;
 };
@@ -337,18 +337,58 @@ COMP( 1980, binbug, pipbug,   0,     binbug,    binbug, driver_device, 0,  "Micr
 
 /*
 
-DGOS-Z80 (ETI-680)
+DG680 (ETI-680), using the DGOS-Z80 operating system.
 
 This is a S100 card.
 
-ROM is a bad dump, scanned from a pdf. It is being worked on.
+In some ways, this system is the ancestor of the original Microbee.
+
+ROM is typed in from a PDF, therefore marked a bad dump.
 
 No schematic available, most of this is guesswork.
+
+Port 0 is the input from an ascii keyboard.
+
+Port 2 is the cassette interface.
+
+Port 8 controls some kind of memory protection scheme.
+The code indicates that B is the page to protect, and
+A is the code (0x08 = inhibit; 0x0B = unprotect;
+0x0C = enable; 0x0E = protect). There are 256 pages so
+each page is 256 bytes. 
+
+To turn the clock on (if it was working), put a non-zero
+into D80D.
+
+Monitor Commands:
+C (compare)*
+E (edit)*
+F (fill)*
+G - Go to address
+I - Inhibit CTC
+M (move)*
+P (clear screen)*
+R (read tape)*
+S (search)*
+T hhmm [ss] - Set the time
+W (write tape)*
+X - protection status
+XC - clear ram
+XD - same as X
+XE - enable facilities
+XF - disable facilities
+XP - protect block
+XU - unprotect block
+Z - go to 0000.
+
+* These commands are identical to the Microbee ones.
 
 ToDo:
 - dips
 - leds
 - need schematic to find out what else is missing
+- cassette
+- ctc / clock
 
 */
 
@@ -359,10 +399,10 @@ ToDo:
 #include "cpu/z80/z80daisy.h"
 
 
-class dgosz80_state : public binbug_state
+class dg680_state : public binbug_state
 {
 public:
-	dgosz80_state(const machine_config &mconfig, device_type type, const char *tag)
+	dg680_state(const machine_config &mconfig, device_type type, const char *tag)
 		: binbug_state(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_ctc(*this, "z80ctc"),
@@ -370,15 +410,21 @@ public:
 	{ }
 
 	DECLARE_READ8_MEMBER(porta_r);
+	DECLARE_READ8_MEMBER(portb_r);
+	DECLARE_WRITE8_MEMBER(portb_w);
+	DECLARE_READ8_MEMBER(port08_r);
+	DECLARE_WRITE8_MEMBER(port08_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	UINT8 m_pio_b;
 	UINT8 m_term_data;
+	UINT8 m_protection[0x100];
 	virtual void machine_reset();
 	required_device<cpu_device> m_maincpu;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80pio_device> m_pio;
 };
 
-static ADDRESS_MAP_START(dgosz80_mem, AS_PROGRAM, 8, dgosz80_state)
+static ADDRESS_MAP_START(dg680_mem, AS_PROGRAM, 8, dg680_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xcfff) AM_RAM
 	AM_RANGE( 0xd000, 0xd7ff) AM_ROM
@@ -387,24 +433,24 @@ static ADDRESS_MAP_START(dgosz80_mem, AS_PROGRAM, 8, dgosz80_state)
 	AM_RANGE( 0xf400, 0xf7ff) AM_RAM AM_SHARE("attribram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(dgosz80_io, AS_IO, 8, dgosz80_state)
+static ADDRESS_MAP_START(dg680_io, AS_IO, 8, dg680_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x04,0x07) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	//AM_RANGE(0x08,0x08) SWP Control and Status
+	AM_RANGE(0x08,0x08) AM_READWRITE(port08_r,port08_w) //SWP Control and Status
 	//AM_RANGE(0x09,0x09) parallel input port
 	// Optional AM9519 Programmable Interrupt Controller (port c = data, port d = control)
 	//AM_RANGE(0x0c,0x0d) AM_DEVREADWRITE("am9519", am9519_device, read, write)
 ADDRESS_MAP_END
 
-void dgosz80_state::machine_reset()
+void dg680_state::machine_reset()
 {
 	m_maincpu->set_pc(0xd000);
 }
 
 // this is a guess there is no information available
-static const z80_daisy_config dgosz80_daisy_chain[] =
+static const z80_daisy_config dg680_daisy_chain[] =
 {
 	{ "z80ctc" },
 	{ "z80pio" },
@@ -413,10 +459,10 @@ static const z80_daisy_config dgosz80_daisy_chain[] =
 
 
 /* Input ports */
-static INPUT_PORTS_START( dgosz80 )
+static INPUT_PORTS_START( dg680 )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( dgosz80_state::kbd_put )
+WRITE8_MEMBER( dg680_state::kbd_put )
 {
 	m_term_data = data;
 	/* strobe in keyboard data */
@@ -424,26 +470,50 @@ WRITE8_MEMBER( dgosz80_state::kbd_put )
 	m_pio->strobe_a(1);
 }
 
-static ASCII_KEYBOARD_INTERFACE( dgosz80_keyboard_intf )
+static ASCII_KEYBOARD_INTERFACE( dg680_keyboard_intf )
 {
-	DEVCB_DRIVER_MEMBER(dgosz80_state, kbd_put)
+	DEVCB_DRIVER_MEMBER(dg680_state, kbd_put)
 };
 
-READ8_MEMBER( dgosz80_state::porta_r )
+READ8_MEMBER( dg680_state::porta_r )
 {
 	UINT8 data = m_term_data;
 	m_term_data = 0;
 	return data;
 }
 
+READ8_MEMBER( dg680_state::portb_r )
+{
+	return m_pio_b | (m_cass->input() > 0.03);
+}
+
+// bit 1 = cassout; bit 2 = motor on
+WRITE8_MEMBER( dg680_state::portb_w )
+{
+	m_pio_b = data & 0xfe;
+	m_cass->output(BIT(data, 1) ? -1.0 : +1.0);
+}
+
+READ8_MEMBER( dg680_state::port08_r )
+{
+	UINT8 breg = m_maincpu->state_int(Z80_B);
+	return m_protection[breg];
+}
+
+WRITE8_MEMBER( dg680_state::port08_w )
+{
+	UINT8 breg = m_maincpu->state_int(Z80_B);
+	m_protection[breg] = data;
+}
+
 static Z80PIO_INTERFACE( z80pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //IRQ
-	DEVCB_DRIVER_MEMBER(dgosz80_state, porta_r),  // in port A
+	DEVCB_DRIVER_MEMBER(dg680_state, porta_r),  // in port A
 	DEVCB_NULL,  // out port A
 	DEVCB_NULL, // ready line port A - this activates to ask for kbd data but not known if actually used
-	DEVCB_NULL, // in port B
-	DEVCB_NULL,                 // out port B
+	DEVCB_DRIVER_MEMBER(dg680_state, portb_r), // in port B
+	DEVCB_DRIVER_MEMBER(dg680_state, portb_w),                 // out port B
 	DEVCB_NULL
 };
 
@@ -455,12 +525,12 @@ static Z80CTC_INTERFACE( z80ctc_intf )
 	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)     // ZC/TO2 callback
 };
 
-static MACHINE_CONFIG_START( dgosz80, dgosz80_state )
+static MACHINE_CONFIG_START( dg680, dg680_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_8MHz / 4)
-	MCFG_CPU_PROGRAM_MAP(dgosz80_mem)
-	MCFG_CPU_IO_MAP(dgosz80_io)
-	MCFG_CPU_CONFIG(dgosz80_daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(dg680_mem)
+	MCFG_CPU_IO_MAP(dg680_io)
+	MCFG_CPU_CONFIG(dg680_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -474,7 +544,13 @@ static MACHINE_CONFIG_START( dgosz80, dgosz80_state )
 	MCFG_PALETTE_INIT(monochrome_amber)
 
 	/* Keyboard */
-	MCFG_ASCII_KEYBOARD_ADD("keyb", dgosz80_keyboard_intf)
+	MCFG_ASCII_KEYBOARD_ADD("keyb", dg680_keyboard_intf)
+
+	/* Cassette */
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* Devices */
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_8MHz / 4, z80ctc_intf )
@@ -483,9 +559,9 @@ MACHINE_CONFIG_END
 
 
 /* ROM definition */
-ROM_START( dgosz80 )
+ROM_START( dg680 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dgosz80.rom", 0xd000, 0x0800, NO_DUMP)
+	ROM_LOAD( "dg680.rom", 0xd000, 0x0800, CRC(c1aaef6a) SHA1(1508ca8315452edfb984718e795ccbe79a0c0b58) )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "6574.bin", 0x0000, 0x0800, CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
@@ -496,5 +572,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY            FULLNAME       FLAGS */
-COMP( 1980, dgosz80, 0,      0,       dgosz80,   dgosz80, driver_device, 0,  "David Griffiths", "DGOS-Z80 1.4", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+/*    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT    CLASS       INIT    COMPANY            FULLNAME       FLAGS */
+COMP( 1980, dg680, 0,      0,       dg680,   dg680, driver_device, 0,  "David Griffiths", "DGOS-Z80 1.4", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
