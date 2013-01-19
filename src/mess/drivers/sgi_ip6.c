@@ -223,15 +223,9 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const r3000_cpu_core config =
-{
-	0,      /* 1 if we have an FPU, 0 otherwise */
-	4096,   /* code cache size */
-	4096    /* data cache size */
-};
-
 static MACHINE_CONFIG_START( sgi_ip6, sgi_ip6_state )
-	MCFG_CPU_ADD( "maincpu", R3000BE, 20000000 ) // FIXME: Should be R2000
+	MCFG_CPU_ADD( "maincpu", R3041, 20000000 ) // FIXME: Should be R2000
+	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
 	MCFG_CPU_CONFIG( config )
 	MCFG_CPU_PROGRAM_MAP( sgi_ip6_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sgi_ip6_state,  sgi_ip6_vbl)
