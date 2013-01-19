@@ -5,13 +5,17 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "cpu/m68000/m68000.h"
 
 class atarig42_state : public atarigen_state
 {
 public:
 	atarig42_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
 			m_mo_command(*this, "mo_command") { }
+
+	required_device<m68000_device> m_maincpu;
 
 	UINT16          m_playfield_base;
 
@@ -57,7 +61,3 @@ public:
 	UINT32 screen_update_atarig42(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_atarig42(screen_device &screen, bool state);
 };
-
-/*----------- defined in video/atarig42.c -----------*/
-DECLARE_WRITE16_HANDLER( atarig42_mo_control_w );
-void atarig42_scanline_update(screen_device &screen, int scanline);

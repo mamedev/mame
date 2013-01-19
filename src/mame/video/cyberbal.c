@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(cyberbal_state::get_playfield2_tile_info)
  *
  *************************************/
 
-static void video_start_cyberbal_common(running_machine &machine, int screens)
+void cyberbal_state::video_start_common(int screens)
 {
 	static const atarimo_desc mo0desc =
 	{
@@ -138,47 +138,46 @@ static void video_start_cyberbal_common(running_machine &machine, int screens)
 		0,                  /* resulting value to indicate "special" */
 		0                   /* callback routine for special entries */
 	};
-	cyberbal_state *state = machine.driver_data<cyberbal_state>();
 
 	/* initialize the playfield */
-	state->m_playfield_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_playfield_tile_info),state), TILEMAP_SCAN_ROWS,  16,8, 64,64);
+	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_playfield_tile_info),this), TILEMAP_SCAN_ROWS,  16,8, 64,64);
 
 	/* initialize the motion objects */
-	atarimo_init(machine, 0, &mo0desc);
-	atarimo_set_slipram(0, &state->m_current_slip[0]);
+	atarimo_init(machine(), 0, &mo0desc);
+	atarimo_set_slipram(0, &m_current_slip[0]);
 
 	/* initialize the alphanumerics */
-	state->m_alpha_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_alpha_tile_info),state), TILEMAP_SCAN_ROWS,  16,8, 64,32);
-	state->m_alpha_tilemap->set_transparent_pen(0);
+	m_alpha_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_alpha_tile_info),this), TILEMAP_SCAN_ROWS,  16,8, 64,32);
+	m_alpha_tilemap->set_transparent_pen(0);
 
 	/* allocate the second screen if necessary */
 	if (screens == 2)
 	{
 		/* initialize the playfield */
-		state->m_playfield2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_playfield2_tile_info),state), TILEMAP_SCAN_ROWS,  16,8, 64,64);
-		state->m_playfield2_tilemap->set_scrollx(0, 0);
+		m_playfield2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_playfield2_tile_info),this), TILEMAP_SCAN_ROWS,  16,8, 64,64);
+		m_playfield2_tilemap->set_scrollx(0, 0);
 
 		/* initialize the motion objects */
-		atarimo_init(machine, 1, &mo1desc);
-		atarimo_set_slipram(1, &state->m_current_slip[1]);
+		atarimo_init(machine(), 1, &mo1desc);
+		atarimo_set_slipram(1, &m_current_slip[1]);
 
 		/* initialize the alphanumerics */
-		state->m_alpha2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_alpha2_tile_info),state), TILEMAP_SCAN_ROWS,  16,8, 64,32);
-		state->m_alpha2_tilemap->set_scrollx(0, 0);
-		state->m_alpha2_tilemap->set_transparent_pen(0);
+		m_alpha2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(cyberbal_state::get_alpha2_tile_info),this), TILEMAP_SCAN_ROWS,  16,8, 64,32);
+		m_alpha2_tilemap->set_scrollx(0, 0);
+		m_alpha2_tilemap->set_transparent_pen(0);
 	}
 
 	/* save states */
-	state->save_item(NAME(state->m_current_slip));
-	state->save_item(NAME(state->m_playfield_palette_bank));
-	state->save_item(NAME(state->m_playfield_xscroll));
-	state->save_item(NAME(state->m_playfield_yscroll));
+	save_item(NAME(m_current_slip));
+	save_item(NAME(m_playfield_palette_bank));
+	save_item(NAME(m_playfield_xscroll));
+	save_item(NAME(m_playfield_yscroll));
 }
 
 
 VIDEO_START_MEMBER(cyberbal_state,cyberbal)
 {
-	video_start_cyberbal_common(machine(), 2);
+	video_start_common(2);
 
 	/* adjust the sprite positions */
 	atarimo_set_xscroll(0, 4);
@@ -188,7 +187,7 @@ VIDEO_START_MEMBER(cyberbal_state,cyberbal)
 
 VIDEO_START_MEMBER(cyberbal_state,cyberbal2p)
 {
-	video_start_cyberbal_common(machine(), 1);
+	video_start_common(1);
 
 	/* adjust the sprite positions */
 	atarimo_set_xscroll(0, 5);
@@ -221,31 +220,27 @@ INLINE void set_palette_entry(running_machine &machine, int entry, UINT16 value)
  *
  *************************************/
 
-WRITE16_HANDLER( cyberbal_paletteram_0_w )
+WRITE16_HANDLER(cyberbal_state::paletteram_0_w)
 {
-	cyberbal_state *state = space.machine().driver_data<cyberbal_state>();
-	COMBINE_DATA(&state->m_paletteram_0[offset]);
-	set_palette_entry(space.machine(), offset, state->m_paletteram_0[offset]);
+	COMBINE_DATA(&m_paletteram_0[offset]);
+	set_palette_entry(machine(), offset, m_paletteram_0[offset]);
 }
 
-READ16_HANDLER( cyberbal_paletteram_0_r )
+READ16_HANDLER(cyberbal_state::paletteram_0_r)
 {
-	cyberbal_state *state = space.machine().driver_data<cyberbal_state>();
-	return state->m_paletteram_0[offset];
+	return m_paletteram_0[offset];
 }
 
 
-WRITE16_HANDLER( cyberbal_paletteram_1_w )
+WRITE16_HANDLER(cyberbal_state::paletteram_1_w)
 {
-	cyberbal_state *state = space.machine().driver_data<cyberbal_state>();
-	COMBINE_DATA(&state->m_paletteram_1[offset]);
-	set_palette_entry(space.machine(), offset + 0x800, state->m_paletteram_1[offset]);
+	COMBINE_DATA(&m_paletteram_1[offset]);
+	set_palette_entry(machine(), offset + 0x800, m_paletteram_1[offset]);
 }
 
-READ16_HANDLER( cyberbal_paletteram_1_r )
+READ16_HANDLER(cyberbal_state::paletteram_1_r)
 {
-	cyberbal_state *state = space.machine().driver_data<cyberbal_state>();
-	return state->m_paletteram_1[offset];
+	return m_paletteram_1[offset];
 }
 
 
@@ -328,9 +323,8 @@ void cyberbal_state::scanline_update(screen_device &screen, int scanline)
  *
  *************************************/
 
-static UINT32 update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
+UINT32 cyberbal_state::update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
 {
-	cyberbal_state *state = screen.machine().driver_data<cyberbal_state>();
 	atarimo_rect_list rectlist;
 	rectangle tempclip = cliprect;
 	bitmap_ind16 *mobitmap;
@@ -338,7 +332,7 @@ static UINT32 update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, con
 	rectangle visarea = screen.visible_area();
 
 	/* draw the playfield */
-	((index == 0) ? state->m_playfield_tilemap : state->m_playfield2_tilemap)->draw(bitmap, cliprect, 0, 0);
+	((index == 0) ? m_playfield_tilemap : m_playfield2_tilemap)->draw(bitmap, cliprect, 0, 0);
 
 	/* draw the MOs -- note some kludging to get this to work correctly for 2 screens */
 	mooffset = 0;
@@ -371,7 +365,7 @@ static UINT32 update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, con
 		}
 
 	/* add the alpha on top */
-	((index == 0) ? state->m_alpha_tilemap : state->m_alpha2_tilemap)->draw(bitmap, cliprect, 0, 0);
+	((index == 0) ? m_alpha_tilemap : m_alpha2_tilemap)->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
 

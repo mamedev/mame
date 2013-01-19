@@ -5,17 +5,23 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "cpu/m6502/m6502.h"
+#include "cpu/t11/t11.h"
 
 class atarisy2_state : public atarigen_state
 {
 public:
 	atarisy2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atarigen_state(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
+			m_audiocpu(*this, "audiocpu"),
 			m_slapstic_base(*this, "slapstic_base"),
 			m_bankselect(*this, "bankselect"),
 			m_rombank1(*this, "rombank1"),
 			m_rombank2(*this, "rombank2") { }
 
+	required_device<t11_device> m_maincpu;
+	required_device<m6502_device> m_audiocpu;
 	required_shared_ptr<UINT16> m_slapstic_base;
 
 	UINT8           m_interrupt_enable;
@@ -49,6 +55,9 @@ public:
 	UINT32          m_spin_center_count;
 
 	UINT16          m_vram[0x8000/2];
+
+	virtual void device_post_load();
+
 	virtual void update_interrupts();
 	virtual void scanline_update(screen_device &screen, int scanline);
 	DECLARE_WRITE16_MEMBER(int0_ack_w);
@@ -84,16 +93,11 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	TIMER_CALLBACK_MEMBER(delayed_int_enable_w);
 	TIMER_CALLBACK_MEMBER(reset_yscroll_callback);
+	DECLARE_READ16_MEMBER(slapstic_r);
+	DECLARE_READ16_MEMBER(videoram_r);
+	DECLARE_WRITE16_MEMBER(slapstic_w);
+	DECLARE_WRITE16_MEMBER(yscroll_w);
+	DECLARE_WRITE16_MEMBER(xscroll_w);
+	DECLARE_WRITE16_MEMBER(videoram_w);
+	DECLARE_WRITE16_MEMBER(paletteram_w);
 };
-
-
-/*----------- defined in video/atarisy2.c -----------*/
-
-DECLARE_READ16_HANDLER( atarisy2_slapstic_r );
-DECLARE_READ16_HANDLER( atarisy2_videoram_r );
-
-DECLARE_WRITE16_HANDLER( atarisy2_slapstic_w );
-DECLARE_WRITE16_HANDLER( atarisy2_yscroll_w );
-DECLARE_WRITE16_HANDLER( atarisy2_xscroll_w );
-DECLARE_WRITE16_HANDLER( atarisy2_videoram_w );
-DECLARE_WRITE16_HANDLER( atarisy2_paletteram_w );

@@ -38,10 +38,10 @@ public:
 
 	required_shared_ptr<UINT32> m_mo_command;
 
-	void            (*m_protection_w)(address_space &space, offs_t offset, UINT16 data);
-	void            (*m_protection_r)(address_space &space, offs_t offset, UINT16 *data);
+	void            (atarigt_state::*m_protection_w)(address_space &space, offs_t offset, UINT16 data);
+	void            (atarigt_state::*m_protection_r)(address_space &space, offs_t offset, UINT16 *data);
 
-	UINT8           m_ignore_writes;
+	bool            m_ignore_writes;
 	offs_t          m_protaddr[ADDRSEQ_COUNT];
 	UINT8           m_protmode;
 	UINT16          m_protresult;
@@ -75,7 +75,13 @@ public:
 	DECLARE_VIDEO_START(atarigt);
 	UINT32 screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_atarigt(screen_device &screen, bool state);
+private:
+	void tmek_update_mode(offs_t offset);
+	void tmek_protection_w(address_space &space, offs_t offset, UINT16 data);
+	void tmek_protection_r(address_space &space, offs_t offset, UINT16 *data);
+	void primrage_update_mode(offs_t offset);
+	void primrage_protection_w(address_space &space, offs_t offset, UINT16 data);
+	void primrage_protection_r(address_space &space, offs_t offset, UINT16 *data);
+	void primrage_init_common(offs_t cage_speedup);
+	void compute_fake_pots(int *pots);
 };
-
-/*----------- defined in video/atarigt.c -----------*/
-void atarigt_scanline_update(screen_device &screen, int scanline);

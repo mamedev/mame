@@ -20,10 +20,7 @@
 
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/m6502/m6502.h"
 #include "sound/2151intf.h"
-#include "sound/dac.h"
 #include "rendlay.h"
 #include "audio/atarijsa.h"
 #include "video/atarimo.h"
@@ -38,15 +35,15 @@
 
 void cyberbal_state::update_interrupts()
 {
-	if (subdevice("extra") != NULL)
+	if (m_extracpu != NULL)
 	{
-		subdevice("maincpu")->execute().set_input_line(1, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
-		subdevice("extra")->execute().set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(1, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+		m_extracpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
-		subdevice("maincpu")->execute().set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-		subdevice("maincpu")->execute().set_input_line(3, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(3, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -69,10 +66,10 @@ MACHINE_RESET_MEMBER(cyberbal_state,cyberbal)
 	atarigen_state::machine_reset();
 	scanline_timer_reset(*machine().primary_screen, 8);
 
-	cyberbal_sound_reset(machine());
+	cyberbal_sound_reset();
 
 	/* Extra CPU (second M68k) doesn't run until reset */
-	machine().device("extra")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_extracpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -124,7 +121,7 @@ READ16_MEMBER(cyberbal_state::sound_state_r)
 
 WRITE16_MEMBER(cyberbal_state::p2_reset_w)
 {
-	machine().device("extra")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_extracpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
@@ -146,8 +143,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0xfd8000, 0xfd9fff) AM_WRITE8(sound_w, 0xff00)
 	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ(special_port0_r)
 	AM_RANGE(0xfe1000, 0xfe1fff) AM_READ_PORT("IN1")
-	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_WRITE_LEGACY(cyberbal_paletteram_1_w) AM_SHARE("paletteram_1")
-	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE_LEGACY(cyberbal_paletteram_0_w) AM_SHARE("paletteram_0")
+	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_WRITE(paletteram_1_w) AM_SHARE("paletteram_1")
+	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(paletteram_0_w) AM_SHARE("paletteram_0")
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(playfield2_w)   AM_SHARE("playfield2")
 	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(alpha2_w)       AM_SHARE("alpha2")
 	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE_LEGACY(atarimo_1_spriteram_r, atarimo_1_spriteram_w)
@@ -173,8 +170,8 @@ static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0xfc0000, 0xfdffff) AM_WRITE(video_int_ack_w)
 	AM_RANGE(0xfe0000, 0xfe0fff) AM_READ(special_port0_r)
 	AM_RANGE(0xfe1000, 0xfe1fff) AM_READ_PORT("IN1")
-	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_WRITE_LEGACY(cyberbal_paletteram_1_w) AM_SHARE("paletteram_1")
-	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE_LEGACY(cyberbal_paletteram_0_w) AM_SHARE("paletteram_0")
+	AM_RANGE(0xfe8000, 0xfe8fff) AM_RAM_WRITE(paletteram_1_w) AM_SHARE("paletteram_1")
+	AM_RANGE(0xfec000, 0xfecfff) AM_RAM_WRITE(paletteram_0_w) AM_SHARE("paletteram_0")
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(playfield2_w)   AM_SHARE("playfield2")
 	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(alpha2_w)       AM_SHARE("alpha2")
 	AM_RANGE(0xff3000, 0xff37ff) AM_READWRITE_LEGACY(atarimo_1_spriteram_r, atarimo_1_spriteram_w)
@@ -198,14 +195,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cyberbal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x2800, 0x2801) AM_WRITE(cyberbal_sound_68k_6502_w)
+	AM_RANGE(0x2800, 0x2801) AM_WRITE(sound_68k_6502_w)
 	AM_RANGE(0x2802, 0x2803) AM_READWRITE(m6502_irq_ack_r, m6502_irq_ack_w)
 	AM_RANGE(0x2804, 0x2805) AM_WRITE(m6502_sound_w)
-	AM_RANGE(0x2806, 0x2807) AM_WRITE(cyberbal_sound_bank_select_w)
+	AM_RANGE(0x2806, 0x2807) AM_WRITE(sound_bank_select_w)
 	AM_RANGE(0x2c00, 0x2c01) AM_READ(m6502_sound_r)
-	AM_RANGE(0x2c02, 0x2c03) AM_READ(cyberbal_special_port3_r)
-	AM_RANGE(0x2c04, 0x2c05) AM_READ(cyberbal_sound_68k_6502_r)
-	AM_RANGE(0x2c06, 0x2c07) AM_READ(cyberbal_sound_6502_stat_r)
+	AM_RANGE(0x2c02, 0x2c03) AM_READ(special_port3_r)
+	AM_RANGE(0x2c04, 0x2c05) AM_READ(sound_68k_6502_r)
+	AM_RANGE(0x2c06, 0x2c07) AM_READ(sound_6502_stat_r)
 	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("soundbank")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -220,10 +217,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_68k_map, AS_PROGRAM, 16, cyberbal_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xff8000, 0xff87ff) AM_READ(cyberbal_sound_68k_r)
-	AM_RANGE(0xff8800, 0xff8fff) AM_WRITE(cyberbal_sound_68k_w)
-	AM_RANGE(0xff9000, 0xff97ff) AM_WRITE(cyberbal_io_68k_irq_ack_w)
-	AM_RANGE(0xff9800, 0xff9fff) AM_WRITE(cyberbal_sound_68k_dac_w)
+	AM_RANGE(0xff8000, 0xff87ff) AM_READ(sound_68k_r)
+	AM_RANGE(0xff8800, 0xff8fff) AM_WRITE(sound_68k_w)
+	AM_RANGE(0xff9000, 0xff97ff) AM_WRITE(io_68k_irq_ack_w)
+	AM_RANGE(0xff9800, 0xff9fff) AM_WRITE(sound_68k_dac_w)
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -420,7 +417,7 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 
 	MCFG_CPU_ADD("dac", M68000, ATARI_CLOCK_14MHz/2)
 	MCFG_CPU_PROGRAM_MAP(sound_68k_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(cyberbal_state, cyberbal_sound_68k_irq_gen,  10000)
+	MCFG_CPU_PERIODIC_INT_DRIVER(cyberbal_state, sound_68k_irq_gen,  10000)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
@@ -981,13 +978,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cyberbal_state,cyberbal)
 {
-	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x018000, 0, 0);
+	slapstic_configure(*m_maincpu, 0x018000, 0, 0);
 }
 
 
 DRIVER_INIT_MEMBER(cyberbal_state,cyberbalt)
 {
-	slapstic_configure(*machine().device<cpu_device>("maincpu"), 0x018000, 0, 116);
+	slapstic_configure(*m_maincpu, 0x018000, 0, 116);
 }
 
 

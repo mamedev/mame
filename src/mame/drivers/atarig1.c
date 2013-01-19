@@ -19,7 +19,6 @@
 
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "audio/atarijsa.h"
 #include "video/atarirle.h"
 #include "includes/atarig1.h"
@@ -34,8 +33,8 @@
 
 void atarig1_state::update_interrupts()
 {
-	machine().device("maincpu")->execute().set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine().device("maincpu")->execute().set_input_line(2, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(1, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(2, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -139,12 +138,14 @@ void atarig1_state::update_bank(int bank)
 }
 
 
-static void pitfightb_state_postload(running_machine &machine)
+void atarig1_state::device_post_load()
 {
-	atarig1_state *state = machine.driver_data<atarig1_state>();
-	int bank = state->m_bslapstic_bank;
-	state->m_bslapstic_bank = -1;
-	state->update_bank(bank);
+	if (m_bslapstic_base != NULL)
+	{
+		int bank = m_bslapstic_bank;
+		m_bslapstic_bank = -1;
+		update_bank(bank);
+	}
 }
 
 
@@ -157,37 +158,35 @@ READ16_MEMBER(atarig1_state::pitfightb_cheap_slapstic_r)
 
 	/* offset 0 primes the chip */
 	if (offset == 0)
-		m_bslapstic_primed = TRUE;
+		m_bslapstic_primed = true;
 
 	/* one of 4 bankswitchers produces the result */
 	else if (m_bslapstic_primed)
 	{
 		if (offset == 0x42)
-			update_bank(0), m_bslapstic_primed = FALSE;
+			update_bank(0), m_bslapstic_primed = false;
 		else if (offset == 0x52)
-			update_bank(1), m_bslapstic_primed = FALSE;
+			update_bank(1), m_bslapstic_primed = false;
 		else if (offset == 0x62)
-			update_bank(2), m_bslapstic_primed = FALSE;
+			update_bank(2), m_bslapstic_primed = false;
 		else if (offset == 0x72)
-			update_bank(3), m_bslapstic_primed = FALSE;
+			update_bank(3), m_bslapstic_primed = false;
 	}
 	return result;
 }
 
 
-static void pitfightb_cheap_slapstic_init(running_machine &machine)
+void atarig1_state::pitfightb_cheap_slapstic_init()
 {
-	atarig1_state *state = machine.driver_data<atarig1_state>();
-
 	/* install a read handler */
-	state->m_bslapstic_base = machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16_delegate(FUNC(atarig1_state::pitfightb_cheap_slapstic_r),state));
+	m_bslapstic_base = m_maincpu->space(AS_PROGRAM).install_read_handler(0x038000, 0x03ffff, read16_delegate(FUNC(atarig1_state::pitfightb_cheap_slapstic_r),this));
 
 	/* allocate memory for a copy of bank 0 */
-	state->m_bslapstic_bank0 = auto_alloc_array(machine, UINT8, 0x2000);
-	memcpy(state->m_bslapstic_bank0, state->m_bslapstic_base, 0x2000);
+	m_bslapstic_bank0 = auto_alloc_array(machine(), UINT8, 0x2000);
+	memcpy(m_bslapstic_bank0, m_bslapstic_base, 0x2000);
 
 	/* not primed by default */
-	state->m_bslapstic_primed = FALSE;
+	m_bslapstic_primed = false;
 }
 
 
@@ -1205,33 +1204,30 @@ ROM_END
  *
  *************************************/
 
-static void init_g1_common(running_machine &machine, offs_t slapstic_base, int slapstic, int is_pitfight)
+void atarig1_state::init_common(offs_t slapstic_base, int slapstic, bool is_pitfight)
 {
-	atarig1_state *state = machine.driver_data<atarig1_state>();
-
-	state->m_eeprom_default = NULL;
+	m_eeprom_default = NULL;
 	if (slapstic == -1)
 	{
-		pitfightb_cheap_slapstic_init(machine);
-		state->save_item(NAME(state->m_bslapstic_bank));
-		state->save_item(NAME(state->m_bslapstic_primed));
-		machine.save().register_postload(save_prepost_delegate(FUNC(pitfightb_state_postload), &machine));
+		pitfightb_cheap_slapstic_init();
+		save_item(NAME(m_bslapstic_bank));
+		save_item(NAME(m_bslapstic_primed));
 	}
 	else if (slapstic != 0)
-		state->slapstic_configure(*machine.device<cpu_device>("maincpu"), slapstic_base, 0, slapstic);
-	atarijsa_init(machine, "IN0", 0x4000);
+		slapstic_configure(*m_maincpu, slapstic_base, 0, slapstic);
+	atarijsa_init(machine(), "IN0", 0x4000);
 
-	state->m_is_pitfight = is_pitfight;
+	m_is_pitfight = is_pitfight;
 }
 
-DRIVER_INIT_MEMBER(atarig1_state,hydra)     { init_g1_common(machine(), 0x078000, 116, 0); }
-DRIVER_INIT_MEMBER(atarig1_state,hydrap)    { init_g1_common(machine(), 0x000000,   0, 0); }
+DRIVER_INIT_MEMBER(atarig1_state,hydra)     { init_common(0x078000, 116, 0); }
+DRIVER_INIT_MEMBER(atarig1_state,hydrap)    { init_common(0x000000,   0, 0); }
 
-DRIVER_INIT_MEMBER(atarig1_state,pitfight9)  { init_g1_common(machine(), 0x038000, 114, 1); }
-DRIVER_INIT_MEMBER(atarig1_state,pitfight7)  { init_g1_common(machine(), 0x038000, 112, 1); }
-DRIVER_INIT_MEMBER(atarig1_state,pitfight)   { init_g1_common(machine(), 0x038000, 111, 1); }
-DRIVER_INIT_MEMBER(atarig1_state,pitfightj)  { init_g1_common(machine(), 0x038000, 113, 1); }
-DRIVER_INIT_MEMBER(atarig1_state,pitfightb)  { init_g1_common(machine(), 0x038000,  -1, 1); }
+DRIVER_INIT_MEMBER(atarig1_state,pitfight9)  { init_common(0x038000, 114, 1); }
+DRIVER_INIT_MEMBER(atarig1_state,pitfight7)  { init_common(0x038000, 112, 1); }
+DRIVER_INIT_MEMBER(atarig1_state,pitfight)   { init_common(0x038000, 111, 1); }
+DRIVER_INIT_MEMBER(atarig1_state,pitfightj)  { init_common(0x038000, 113, 1); }
+DRIVER_INIT_MEMBER(atarig1_state,pitfightb)  { init_common(0x038000,  -1, 1); }
 
 
 /*************************************

@@ -13,16 +13,6 @@
 
 /*************************************
  *
- *  Prototypes
- *
- *************************************/
-
-
-
-
-
-/*************************************
- *
  *  Tilemap callbacks
  *
  *************************************/
@@ -124,10 +114,9 @@ VIDEO_START_MEMBER(atarisy2_state,atarisy2)
  *
  *************************************/
 
-WRITE16_HANDLER( atarisy2_xscroll_w )
+WRITE16_HANDLER( atarisy2_state::xscroll_w )
 {
-	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
-	UINT16 oldscroll = *state->m_xscroll;
+	UINT16 oldscroll = *m_xscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
@@ -136,17 +125,17 @@ WRITE16_HANDLER( atarisy2_xscroll_w )
 		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
-	state->m_playfield_tilemap->set_scrollx(0, newscroll >> 6);
+	m_playfield_tilemap->set_scrollx(0, newscroll >> 6);
 
 	/* update the playfield banking */
-	if (state->m_playfield_tile_bank[0] != (newscroll & 0x0f) * 0x400)
+	if (m_playfield_tile_bank[0] != (newscroll & 0x0f) * 0x400)
 	{
-		state->m_playfield_tile_bank[0] = (newscroll & 0x0f) * 0x400;
-		state->m_playfield_tilemap->mark_all_dirty();
+		m_playfield_tile_bank[0] = (newscroll & 0x0f) * 0x400;
+		m_playfield_tilemap->mark_all_dirty();
 	}
 
 	/* update the data */
-	*state->m_xscroll = newscroll;
+	*m_xscroll = newscroll;
 }
 
 
@@ -156,10 +145,9 @@ TIMER_CALLBACK_MEMBER(atarisy2_state::reset_yscroll_callback)
 }
 
 
-WRITE16_HANDLER( atarisy2_yscroll_w )
+WRITE16_HANDLER( atarisy2_state::yscroll_w )
 {
-	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
-	UINT16 oldscroll = *state->m_yscroll;
+	UINT16 oldscroll = *m_yscroll;
 	UINT16 newscroll = oldscroll;
 	COMBINE_DATA(&newscroll);
 
@@ -169,19 +157,19 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	if (!(newscroll & 0x10))
-		state->m_playfield_tilemap->set_scrolly(0, (newscroll >> 6) - space.machine().primary_screen->vpos());
+		m_playfield_tilemap->set_scrolly(0, (newscroll >> 6) - space.machine().primary_screen->vpos());
 	else
-		state->m_yscroll_reset_timer->adjust(space.machine().primary_screen->time_until_pos(0), newscroll >> 6);
+		m_yscroll_reset_timer->adjust(space.machine().primary_screen->time_until_pos(0), newscroll >> 6);
 
 	/* update the playfield banking */
-	if (state->m_playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
+	if (m_playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
 	{
-		state->m_playfield_tile_bank[1] = (newscroll & 0x0f) * 0x400;
-		state->m_playfield_tilemap->mark_all_dirty();
+		m_playfield_tile_bank[1] = (newscroll & 0x0f) * 0x400;
+		m_playfield_tilemap->mark_all_dirty();
 	}
 
 	/* update the data */
-	*state->m_yscroll = newscroll;
+	*m_yscroll = newscroll;
 }
 
 
@@ -192,7 +180,7 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
  *
  *************************************/
 
-WRITE16_HANDLER( atarisy2_paletteram_w )
+WRITE16_HANDLER( atarisy2_state::paletteram_w )
 {
 	static const int intensity_table[16] =
 	{
@@ -209,9 +197,8 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 
 	int newword, inten, red, green, blue;
 
-	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
-	newword = state->m_generic_paletteram_16[offset];
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	newword = m_generic_paletteram_16[offset];
 
 	inten = intensity_table[newword & 15];
 	red = (color_table[(newword >> 12) & 15] * inten) >> 4;
@@ -228,26 +215,23 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
  *
  *************************************/
 
-READ16_HANDLER( atarisy2_slapstic_r )
+READ16_HANDLER( atarisy2_state::slapstic_r )
 {
-	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
-	int result = state->m_slapstic_base[offset];
+	int result = m_slapstic_base[offset];
 	slapstic_tweak(space, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	state->m_videobank = slapstic_tweak(space, 0x1234) * 0x1000;
+	m_videobank = slapstic_tweak(space, 0x1234) * 0x1000;
 	return result;
 }
 
 
-WRITE16_HANDLER( atarisy2_slapstic_w )
+WRITE16_HANDLER( atarisy2_state::slapstic_w )
 {
-	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
-
 	slapstic_tweak(space, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	state->m_videobank = slapstic_tweak(space, 0x1234) * 0x1000;
+	m_videobank = slapstic_tweak(space, 0x1234) * 0x1000;
 }
 
 
@@ -258,29 +242,27 @@ WRITE16_HANDLER( atarisy2_slapstic_w )
  *
  *************************************/
 
-READ16_HANDLER( atarisy2_videoram_r )
+READ16_HANDLER( atarisy2_state::videoram_r )
 {
-	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
-	int offs = offset | state->m_videobank;
+	int offs = offset | m_videobank;
 	if (offs >= 0xc00 && offs < 0x1000)
 	{
 		return atarimo_0_spriteram_r(space, offs - 0x0c00, mem_mask);
 	}
 
-	return state->m_vram[offs];
+	return m_vram[offs];
 }
 
 
-WRITE16_HANDLER( atarisy2_videoram_w )
+WRITE16_HANDLER( atarisy2_state::videoram_w )
 {
-	atarisy2_state *state = space.machine().driver_data<atarisy2_state>();
-	int offs = offset | state->m_videobank;
+	int offs = offset | m_videobank;
 
 	/* alpharam? */
 	if (offs < 0x0c00)
 	{
-		COMBINE_DATA(&state->m_alpha[offs]);
-		state->m_alpha_tilemap->mark_tile_dirty(offs);
+		COMBINE_DATA(&m_alpha[offs]);
+		m_alpha_tilemap->mark_tile_dirty(offs);
 	}
 
 	/* spriteram? */
@@ -288,7 +270,7 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 	{
 		/* force an update if the link of object 0 is about to change */
 		if (offs == 0x0c03)
-			space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
+			space.machine().primary_screen->update_partial(machine().primary_screen->vpos());
 		atarimo_0_spriteram_w(space, offs - 0x0c00, data, mem_mask);
 	}
 
@@ -296,14 +278,14 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 	else if (offs >= 0x2000)
 	{
 		offs -= 0x2000;
-		COMBINE_DATA(&state->m_playfield[offs]);
-		state->m_playfield_tilemap->mark_tile_dirty(offs);
+		COMBINE_DATA(&m_playfield[offs]);
+		m_playfield_tilemap->mark_tile_dirty(offs);
 	}
 
 	/* generic case */
 	else
 	{
-		COMBINE_DATA(&state->m_vram[offs]);
+		COMBINE_DATA(&m_vram[offs]);
 	}
 }
 

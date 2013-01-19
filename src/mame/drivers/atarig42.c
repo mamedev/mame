@@ -18,7 +18,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "machine/asic65.h"
 #include "audio/atarijsa.h"
 #include "video/atarirle.h"
@@ -33,8 +32,8 @@
 
 void atarig42_state::update_interrupts()
 {
-	machine().device("maincpu")->execute().set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	machine().device("maincpu")->execute().set_input_line(5, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(4, m_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(5, m_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -782,7 +781,7 @@ DRIVER_INIT_MEMBER(atarig42_state,roadriot)
 
 	m_playfield_base = 0x400;
 
-	address_space &main = machine().device<m68000_device>("maincpu")->space(AS_PROGRAM);
+	address_space &main = m_maincpu->space(AS_PROGRAM);
 	m_sloop_base = main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::roadriot_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::roadriot_sloop_data_w),this));
 	main.set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), this));
 
@@ -820,7 +819,7 @@ DRIVER_INIT_MEMBER(atarig42_state,guardian)
 	/* put an RTS there so we don't die */
 	*(UINT16 *)&memregion("maincpu")->base()[0x80000] = 0x4E75;
 
-	address_space &main = machine().device<m68000_device>("maincpu")->space(AS_PROGRAM);
+	address_space &main = m_maincpu->space(AS_PROGRAM);
 	m_sloop_base = main.install_readwrite_handler(0x000000, 0x07ffff, read16_delegate(FUNC(atarig42_state::guardians_sloop_data_r),this), write16_delegate(FUNC(atarig42_state::guardians_sloop_data_w),this));
 	main.set_direct_update_handler(direct_update_delegate(FUNC(atarig42_state::atarig42_sloop_direct_handler), this));
 
