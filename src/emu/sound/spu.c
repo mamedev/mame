@@ -2416,8 +2416,8 @@ void spu_device::generate_xa(void *ptr, const unsigned int sz)
 
 		int voll=spureg.cdvol_l,
 				volr=spureg.cdvol_r;
-		voll=(voll*xa_voll)>>15;
-		volr=(volr*xa_volr)>>15;
+		voll=(voll*xa_voll)>>14;
+		volr=(volr*xa_volr)>>14;
 
 		// Generate requested number of XA samples
 
