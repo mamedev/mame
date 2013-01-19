@@ -788,6 +788,7 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/igs011.o \
 	$(DRIVERS)/igs017.o \
 	$(DRIVERS)/igs_m027.o \
+	$(DRIVERS)/igs_m036.o \
 	$(DRIVERS)/iqblock.o $(VIDEO)/iqblock.o \
 	$(DRIVERS)/lordgun.o $(VIDEO)/lordgun.o \
 	$(DRIVERS)/pgm.o $(VIDEO)/pgm.o \

@@ -2969,6 +2969,7 @@ src/mame/drivers/igs009.c svneol=native#text/plain
 src/mame/drivers/igs011.c svneol=native#text/plain
 src/mame/drivers/igs017.c svneol=native#text/plain
 src/mame/drivers/igs_m027.c svneol=native#text/plain
+src/mame/drivers/igs_m036.c svneol=native#text/plain
 src/mame/drivers/igspc.c svneol=native#text/plain
 src/mame/drivers/igspoker.c svneol=native#text/plain
 src/mame/drivers/ikki.c svneol=native#text/plain

@@ -9168,7 +9168,7 @@ tarzan          // (c) 1999?
 tarzana         // (c) 1999?
 starzan         // (c) 2000?
 
-// IGS027A Games
+// IGS027A Cpu Games
 bigd2           // (c) 2000
 sdwx            // (c) 2002
 sddz            // (c) 200?
@@ -9180,6 +9180,14 @@ gonefsh2        // (c) 200?
 chessc2         // (c) 200?
 haunthig        // (c) 200?
 fearless        // (c) 2006
+
+// IGS036 Cpu Games
+cjdh2			// (c) 200?
+cjdh2a			// (c) 200?
+cjdh2b			// (c) 200?
+cjdh2c			// (c) 200?
+cjddzsp			// (c) 200?
+igsm312			// (c) 200?
 
 // IGS PGM System Games
 pgm             // Base Unit
