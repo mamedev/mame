@@ -415,6 +415,8 @@ public:
 	DECLARE_READ8_MEMBER(port08_r);
 	DECLARE_WRITE8_MEMBER(port08_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	TIMER_DEVICE_CALLBACK_MEMBER(time_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(uart_tick);
 	UINT8 m_pio_b;
 	UINT8 m_term_data;
 	UINT8 m_protection[0x100];
@@ -517,12 +519,29 @@ static Z80PIO_INTERFACE( z80pio_intf )
 	DEVCB_NULL
 };
 
+TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::time_tick)
+{
+// ch0 is for the clock
+	m_ctc->trg0(1);
+	m_ctc->trg0(0);
+// no idea about ch2
+	m_ctc->trg2(1);
+	m_ctc->trg2(0);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
+{
+// ch3 is for cassette
+	m_ctc->trg3(1);
+	m_ctc->trg3(0);
+}
+
 static Z80CTC_INTERFACE( z80ctc_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),       // interrupt handler
 	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),        // ZC/TO0 callback
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),        // ZC/TO1 callback
-	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)     // ZC/TO2 callback
+	DEVCB_NULL,        // ZC/TO1 callback
+	DEVCB_NULL     // ZC/TO2 callback
 };
 
 static MACHINE_CONFIG_START( dg680, dg680_state )
@@ -555,13 +574,15 @@ static MACHINE_CONFIG_START( dg680, dg680_state )
 	/* Devices */
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_8MHz / 4, z80ctc_intf )
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_8MHz / 4, z80pio_intf )
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc0", dg680_state, time_tick, attotime::from_hz(200))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc3", dg680_state, uart_tick, attotime::from_hz(4800))
 MACHINE_CONFIG_END
 
 
 /* ROM definition */
 ROM_START( dg680 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dg680.rom", 0xd000, 0x0800, CRC(c1aaef6a) SHA1(1508ca8315452edfb984718e795ccbe79a0c0b58) )
+	ROM_LOAD( "dg680.rom", 0xd000, 0x0800, BAD_DUMP CRC(c1aaef6a) SHA1(1508ca8315452edfb984718e795ccbe79a0c0b58) )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "6574.bin", 0x0000, 0x0800, CRC(fd75df4f) SHA1(4d09aae2f933478532b7d3d1a2dee7123d9828ca) )
@@ -573,4 +594,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT   MACHINE  INPUT    CLASS       INIT    COMPANY            FULLNAME       FLAGS */
-COMP( 1980, dg680, 0,      0,       dg680,   dg680, driver_device, 0,  "David Griffiths", "DGOS-Z80 1.4", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1980, dg680, 0,      0,       dg680,   dg680, driver_device, 0,  "David Griffiths", "DG680 with DGOS-Z80 1.4", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
