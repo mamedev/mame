@@ -36,10 +36,7 @@
 #define READ_COLTAB2(wldoffs) READ_BGMAP((0x1de00 >> 1) + wldoffs)
 #define READ_OBJECTS(wldoffs) READ_BGMAP((0x1e000 >> 1) + wldoffs)
 
-#define WRITE_BG_TEMPDRAW_MAP(woffs, wdat) m_bg_tempdraw_map[(woffs) & 0xffffff] = wdat;
 #define WRITE_OVR_TEMPDRAW_MAP(woffs, wdat) m_ovr_tempdraw_map[(woffs) & 0x3f] = wdat;
-
-#define READ_BG_TEMPDRAW_MAP(roffs) m_bg_tempdraw_map[(roffs) & 0xffffff];
 #define READ_OVR_TEMPDRAW_MAP(roffs) m_ovr_tempdraw_map[(roffs) & 0x3f];
 
 #define READ_FONT(roffs) m_font[(roffs) & 0x3fff]
@@ -167,7 +164,6 @@ public:
 	vboy_regs_t m_vboy_regs;
 	vip_regs_t m_vip_regs;
 	vboy_timer_t m_vboy_timer;
-	INT32 *m_bg_tempdraw_map;
 	INT32 *m_ovr_tempdraw_map;
 	UINT16 m_frame_count;
 	UINT8 m_displayfb;
@@ -210,7 +206,6 @@ void vboy_state::video_start()
 	//int i;
 
 	// Allocate memory for temporary screens
-	m_bg_tempdraw_map = auto_alloc_array_clear(machine(), INT32, 0x1000000);
 	m_ovr_tempdraw_map = auto_alloc_array_clear(machine(), INT32, 0x40);
 
 	// Allocate memory for framebuffers
