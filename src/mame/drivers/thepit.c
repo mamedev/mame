@@ -821,7 +821,7 @@ ROM_END
 ROM_START( fitterbl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic38(__bootleg).bin",  0x0000, 0x1000, CRC(805c6974) SHA1(b1a41df746a347df6f47578fc59a7393e5195ada) )
-	ROM_LOAD( "ic39(__bootleg).bin",  0x1000, 0x1000, CRC(37bf554b) SHA1(773279fb21c56221d5f29fd31c2149e68dcf3909) )
+	ROM_LOAD( "roundup.u39",          0x1000, 0x1000, CRC(37bf554b) SHA1(773279fb21c56221d5f29fd31c2149e68dcf3909) )
 	ROM_LOAD( "ic40(__bootleg).bin",  0x2000, 0x1000, CRC(c5f7156e) SHA1(3702a0eb4c395217a8f761133dba7871a96b7f38) )
 	ROM_LOAD( "ic41(__bootleg).bin",  0x3000, 0x1000, CRC(a67d5bda) SHA1(86d1628d4f0bcd3c3099f99ab92b3ac758ffec71) )
 	ROM_LOAD( "ic33(__bootleg).bin",  0x4000, 0x1000, CRC(1f3c78ee) SHA1(961b6ba8d08ddcbeda52b98a2f181f37beed5fb1) )
@@ -836,6 +836,27 @@ ROM_START( fitterbl )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "roundup.clr",  0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) )
+ROM_END
+
+ROM_START( ttfitter ) /* originally dumped with "roundup.uxx" labels - changed to "ttfitter.uxx" to lessen confusion between parent */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ttfitter.u38", 0x0000, 0x1000, CRC(2ccd60d4) SHA1(2eb4f72e371578a0eda54a75074c0a0c3ccfefea) )
+	ROM_LOAD( "roundup.u39",  0x1000, 0x1000, CRC(37bf554b) SHA1(773279fb21c56221d5f29fd31c2149e68dcf3909) ) // ttfitter.u39
+	ROM_LOAD( "ttfitter.u40", 0x2000, 0x1000, CRC(572e2157) SHA1(030ad888d7fc9b61df6749592934d55de449de8c) )
+	ROM_LOAD( "roundup.u41",  0x3000, 0x1000, CRC(1c5ed660) SHA1(6729ecb8072b1ea0bd8557fd0b484d086b94c4b1) ) // ttfitter.u41
+	ROM_LOAD( "ttfitter.u33", 0x4000, 0x1000, CRC(d6fc9d0c) SHA1(558cad013b4adee226eb1ddf4ee5860a381197b1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ttfitter.u30", 0x0000, 0x0800, CRC(4055b5ca) SHA1(abf8f9e830b1190fb87896e1fb3adca8f9e18df1) )
+	ROM_LOAD( "ttfitter.u31", 0x0800, 0x0800, CRC(c9d8c1cc) SHA1(66d0840182ede356c53cd1f930ea8abf86094ab7) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 ) /* chars and sprites */
+	ROM_LOAD( "ttfitter.u9",  0x0000, 0x0800, CRC(a6799a37) SHA1(7864cb255bff976630b6e03b1683f7d3ccd0a80f) )
+	ROM_LOAD( "ttfitter.u8",  0x1000, 0x0800, CRC(a8256dfe) SHA1(b3dfb915ba4367c8c73a8cc6fb02d98ec148f5a1) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "roundup.clr",  0x0000, 0x0020, CRC(a758b567) SHA1(d188c90dba10fe3abaae92488786b555b35218c5) ) // ttfitter.clr
+
 ROM_END
 
 ROM_START( intrepid )
@@ -1095,7 +1116,8 @@ DRIVER_INIT_MEMBER(thepit_state,rtriv)
 
 GAME( 1981, roundup,  0,        thepit,   roundup, driver_device,  0,     ROT90, "Taito Corporation (Amenip/Centuri license)", "Round-Up", 0 )
 GAME( 1981, fitter,   roundup,  thepit,   fitter, driver_device,   0,     ROT90, "Taito Corporation", "Fitter", 0 )
-GAME( 1981, fitterbl, roundup,  thepit,   fitter, driver_device,   0,     ROT90, "bootleg", "Fitter (bootleg)", 0 )
+GAME( 1981, fitterbl, roundup,  thepit,   fitter, driver_device,   0,     ROT90, "bootleg", "Fitter (bootleg of Roundup)", 0 )
+GAME( 1981, ttfitter, roundup,  thepit,   fitter, driver_device,   0,     ROT90, "bootleg", "T.T.Fitter (bootleg of Roundup))", 0 )
 GAME( 1982, thepit,   0,        thepit,   thepit, driver_device,   0,     ROT90, "Zilec Electronics", "The Pit", 0 ) // AW == Andy Walker
 GAME( 1982, thepitu1, thepit,   thepit,   thepit, driver_device,   0,     ROT90, "Zilec Electronics (Centuri license)", "The Pit (US, set 1)", 0 )
 GAME( 1982, thepitu2, thepit,   thepit,   thepit, driver_device,   0,     ROT90, "Zilec Electronics (Centuri license)", "The Pit (US, set 2)", 0 ) // Bally PCB
