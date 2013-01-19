@@ -6,6 +6,7 @@
 <!-- Softlist entry for 4A DOS -->
 <software name="4ados">
 	<description>4A DOS</description>
+	<year>unknown</year>
 	<publisher>Schmidt</publisher>
 	<info name="comment" value="Requires disk"/>
 	<part name="cart" interface="ti99_cart">
@@ -369,6 +370,7 @@
 <!-- Softlist entry for Beyond Space -->
 <software name="beyspace">
 	<description>Beyond Space</description>
+	<year>unknown</year>
 	<info name="comment" value="Beyond Parsec clone or copy"/>
 	<part name="cart" interface="ti99_cart">
 		<feature name="pcb" value="standard"/>
@@ -845,6 +847,7 @@
 <!-- Softlist entry for Disk Manager -->
 <software name="diskman1">
 	<description>Disk Manager</description>
+	<year>unknown</year>
 	<info name="serial" value="PHM3019"/>
 	<info name="version" value="1.0"/>
 	<info name="comment" value="English-only version"/>
@@ -1066,6 +1069,7 @@
 <!-- Softlist entry for BASIC games -->
 <software name="gmsbasic">
 	<description>BASIC games</description>
+	<year>unknown</year>
 	<info name="comment" value="BASIC programs stored in GROM: MotoCross-Awari-Carres-Hanoi. Allow for 20 seconds for games to start."/>
 	<part name="cart" interface="ti99_cart">
 		<feature name="pcb" value="standard"/>
@@ -1089,6 +1093,7 @@
 <!-- Softlist entry for One Pass Copy SSSD -->
 <software name="opcopy">
 	<description>One Pass Copy SSSD</description>
+	<year>unknown</year>
 	<info name="comment" value="Disk copier"/>
 	<part name="cart" interface="ti99_cart">
 		<feature name="pcb" value="standard"/>
@@ -1128,6 +1133,7 @@
 <!-- Softlist entry for Snake plissken -->
 <software name="snakepl">
 	<description>Snake plissken</description>
+	<year>unknown</year>
 	<info name="comment" value="Simple Hustle clone."/>
 	<part name="cart" interface="ti99_cart">
 		<feature name="pcb" value="standard"/>
@@ -1218,6 +1224,7 @@
 <!-- Softlist entry for Tile Breaker -->
 <software name="tilebrk">
 	<description>Tile Breaker</description>
+	<year>unknown</year>
 	<publisher>Magic Software</publisher>
 	<info name="comment" value="Breakout clone"/>
 	<part name="cart" interface="ti99_cart">
@@ -1932,6 +1939,7 @@
 <!-- Softlist entry for Maximem Utilities -->
 <software name="maximem">
 	<description>Maximem Utilities</description>
+	<year>unknown</year>
 	<info name="comment" value="GROM only"/>
 	<part name="cart" interface="ti99_cart">
 		<feature name="pcb" value="standard"/>
@@ -2120,6 +2128,7 @@
 <!-- Softlist entry for Mechatronic/PS Extended Basic -->
 <software name="exbasm">
 	<description>Mechatronic/PS Extended Basic</description>
+	<year>unknown</year>
 	<publisher>Mechatronic</publisher>
 	<info name="comment" value="Extended Basic with additional functions"/>
 	<part name="cart" interface="ti99_cart">
@@ -2639,6 +2648,7 @@
 <!-- Softlist entry for OS/99 -->
 <software name="os9940">
 	<description>OS/99</description>
+	<year>unknown</year>
 	<info name="version" value="4.0"/>
 	<part name="cart" interface="ti99_cart">
 		<feature name="pcb" value="standard"/>
@@ -2977,6 +2987,7 @@
 <!-- Softlist entry for RXB + Super Editor Assembler -->
 <software name="rxb2002">
 	<description>RXB + Super Editor Assembler</description>
+	<year>unknown</year>
 	<publisher>Rich Gilbertson</publisher>
 	<info name="version" value="2002"/>
 	<part name="cart" interface="ti99_cart">
@@ -2995,6 +3006,7 @@
 <!-- Softlist entry for RXB -->
 <software name="rxb237">
 	<description>RXB</description>
+	<year>unknown</year>
 	<publisher>Rich Gilbertson</publisher>
 	<info name="version" value="2.37"/>
 	<part name="cart" interface="ti99_cart">
@@ -3799,6 +3811,7 @@
 <!-- Softlist entry for Soduko -->
 <software name="soduko">
 	<description>Soduko</description>
+	<year>unknown</year>
 	<info name="comment" value="Inverse Sudoku?"/>
 	<part name="cart" interface="ti99_cart">
 		<feature name="pcb" value="standard"/>
@@ -3948,6 +3961,7 @@
 <!-- Softlist entry for Sudoku -->
 <software name="sudoku">
 	<description>Sudoku</description>
+	<year>unknown</year>
 	<part name="cart" interface="ti99_cart">
 		<feature name="pcb" value="standard"/>
 		<dataarea name="rom_socket" size="0x2000">
@@ -4081,6 +4095,7 @@
 <!-- Softlist entry for The Castle -->
 <software name="castlep">
 	<description>The Castle</description>
+	<year>unknown</year>
 	<part name="cart" interface="ti99_cart">
 		<feature name="pcb" value="standard"/>
 		<dataarea name="rom_socket" size="0x2000">
@@ -4191,6 +4206,7 @@
 <!-- Softlist entry for TI Writer Gram Disk -->
 <software name="writerg">
 	<description>TI Writer Gram Disk</description>
+	<year>unknown</year>
 	<part name="cart" interface="ti99_cart">
 		<feature name="pcb" value="standard"/>
 		<dataarea name="grom_socket" size="0x8000">
