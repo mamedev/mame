@@ -3708,12 +3708,12 @@ Contcirc, Dblaxle sound sample rom order is uncertain as sound imperfect
 
 ROM_START( contcirc )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 256K for 68000 code (CPU A) */
-	ROM_LOAD16_BYTE( "ic25", 0x00000, 0x20000, CRC(f5c92e42) SHA1(42dfa1895e601df76d7022b83f05c4e5c843fd12) )
-	ROM_LOAD16_BYTE( "ic26", 0x00001, 0x20000, CRC(e7c1d1fa) SHA1(75e851629a54facb8804ee8a953ab3265633bbf4) )
+	ROM_LOAD16_BYTE( "b33-ww.ic25", 0x00000, 0x20000, CRC(f5c92e42) SHA1(42dfa1895e601df76d7022b83f05c4e5c843fd12) ) /* Needs actual Taito ID number here */
+	ROM_LOAD16_BYTE( "b33-xx.ic26", 0x00001, 0x20000, CRC(e7c1d1fa) SHA1(75e851629a54facb8804ee8a953ab3265633bbf4) ) /* Needs actual Taito ID number here */
 
 	ROM_REGION( 0x40000, "sub", 0 ) /* 256K for 68000 code (CPU B) */
-	ROM_LOAD16_BYTE( "ic35",      0x00000, 0x20000, CRC(16522f2d) SHA1(1d2823d61518936d342df3ed712da5bdfdf6e55a) )
-	ROM_LOAD16_BYTE( "cc_36.bin", 0x00001, 0x20000, CRC(a1732ea5) SHA1(b773add433c20633e7acbc99d5cfeb7ccde83371) )
+	ROM_LOAD16_BYTE( "b33-yy.ic35", 0x00000, 0x20000, CRC(16522f2d) SHA1(1d2823d61518936d342df3ed712da5bdfdf6e55a) ) /* Needs actual Taito ID number here */
+	ROM_LOAD16_BYTE( "cc_36.bin",   0x00001, 0x20000, CRC(a1732ea5) SHA1(b773add433c20633e7acbc99d5cfeb7ccde83371) ) /* Needs actual Taito ID number here */
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "b33-30.11", 0x00000, 0x04000, CRC(d8746234) SHA1(39132eedfe2ff4e3133f8020304da0d04dd757db) )
@@ -3750,12 +3750,12 @@ ROM_END
 
 ROM_START( contcircu )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 256K for 68000 code (CPU A) */
-	ROM_LOAD16_BYTE( "ic25", 0x00000, 0x20000, CRC(f5c92e42) SHA1(42dfa1895e601df76d7022b83f05c4e5c843fd12) )
-	ROM_LOAD16_BYTE( "ic26", 0x00001, 0x20000, CRC(e7c1d1fa) SHA1(75e851629a54facb8804ee8a953ab3265633bbf4) )
+	ROM_LOAD16_BYTE( "b33-ww.ic25", 0x00000, 0x20000, CRC(f5c92e42) SHA1(42dfa1895e601df76d7022b83f05c4e5c843fd12) ) /* Needs actual Taito ID number here */
+	ROM_LOAD16_BYTE( "b33-xx.ic26", 0x00001, 0x20000, CRC(e7c1d1fa) SHA1(75e851629a54facb8804ee8a953ab3265633bbf4) ) /* Needs actual Taito ID number here */
 
 	ROM_REGION( 0x40000, "sub", 0 ) /* 256K for 68000 code (CPU B) */
-	ROM_LOAD16_BYTE( "ic35", 0x00000, 0x20000, CRC(16522f2d) SHA1(1d2823d61518936d342df3ed712da5bdfdf6e55a) )
-	ROM_LOAD16_BYTE( "ic36", 0x00001, 0x20000, CRC(d6741e33) SHA1(8e86789e1664a34ceed85434fd3186f2571f0c4a) )
+	ROM_LOAD16_BYTE( "b33-yy.ic35", 0x00000, 0x20000, CRC(16522f2d) SHA1(1d2823d61518936d342df3ed712da5bdfdf6e55a) ) /* Needs actual Taito ID number here */
+	ROM_LOAD16_BYTE( "b33-zz.ic36", 0x00001, 0x20000, CRC(d6741e33) SHA1(8e86789e1664a34ceed85434fd3186f2571f0c4a) ) /* Needs actual Taito ID number here */
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "b33-30.11", 0x00000, 0x04000, CRC(d8746234) SHA1(39132eedfe2ff4e3133f8020304da0d04dd757db) )
@@ -3796,8 +3796,8 @@ ROM_START( contcircua )
 	ROM_LOAD16_BYTE( "b33-33.ic26", 0x00001, 0x20000, CRC(f539d44b) SHA1(1b77d97376f9bf3bbd728d459f0a0afbadc6d756) )
 
 	ROM_REGION( 0x40000, "sub", 0 ) /* 256K for 68000 code (CPU B) */
-	ROM_LOAD16_BYTE( "21-2.ic35", 0x00000, 0x20000, CRC(2723f9e3) SHA1(18a86e352bb0aeec6ad6c537294ddd0d33823ea6) )
-	ROM_LOAD16_BYTE( "31-1.ic36", 0x00001, 0x20000, CRC(438431f7) SHA1(9be4ac6526d5aee01c3691f189583a2cfdad0e45) )
+	ROM_LOAD16_BYTE( "b33-21-2.ic35", 0x00000, 0x20000, CRC(2723f9e3) SHA1(18a86e352bb0aeec6ad6c537294ddd0d33823ea6) )
+	ROM_LOAD16_BYTE( "b33-31-1.ic36", 0x00001, 0x20000, CRC(438431f7) SHA1(9be4ac6526d5aee01c3691f189583a2cfdad0e45) ) /* Is this really B33 31-2 ?? */
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "b33-30.11", 0x00000, 0x04000, CRC(d8746234) SHA1(39132eedfe2ff4e3133f8020304da0d04dd757db) )
@@ -3838,8 +3838,8 @@ ROM_START( contcircj )
 	ROM_LOAD16_BYTE( "b33-20.ic26", 0x00001, 0x20000, CRC(9f88378b) SHA1(dc4f3dbeb98031ced0591623a2ba7a2653cb6ff4) )
 
 	ROM_REGION( 0x40000, "sub", 0 ) /* 256K for 68000 code (CPU B) */
-	ROM_LOAD16_BYTE( "21-2.ic35", 0x00000, 0x20000, CRC(2723f9e3) SHA1(18a86e352bb0aeec6ad6c537294ddd0d33823ea6) )
-	ROM_LOAD16_BYTE( "22-2.ic36", 0x00001, 0x20000, CRC(da8d604d) SHA1(31a4b686d12511a2522c7047a39aa09c0778f230) )
+	ROM_LOAD16_BYTE( "b33-21-2.ic35", 0x00000, 0x20000, CRC(2723f9e3) SHA1(18a86e352bb0aeec6ad6c537294ddd0d33823ea6) )
+	ROM_LOAD16_BYTE( "b33-22-2.ic36", 0x00001, 0x20000, CRC(da8d604d) SHA1(31a4b686d12511a2522c7047a39aa09c0778f230) )
 
 	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* Z80 sound cpu */
 	ROM_LOAD( "b33-30.11", 0x00000, 0x04000, CRC(d8746234) SHA1(39132eedfe2ff4e3133f8020304da0d04dd757db) )
