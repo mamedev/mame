@@ -208,7 +208,7 @@ static const floppy_interface osborne1_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD_40,
 	LEGACY_FLOPPY_OPTIONS_NAME(osborne1),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 
@@ -268,6 +268,7 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(osborne1_floppy_interface)
 	MCFG_IEEE488_BUS_ADD(ieee488_intf)
+	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1_flop")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

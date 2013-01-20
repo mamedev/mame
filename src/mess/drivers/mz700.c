@@ -402,6 +402,9 @@ static MACHINE_CONFIG_DERIVED( mz800, mz700 )
 	MCFG_SOUND_CONFIG(psg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	MCFG_DEVICE_REMOVE("cass_list")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","mz800_cass")
+
 	/* devices */
 	MCFG_DEVICE_REMOVE("pit8253")
 	MCFG_PIT8253_ADD("pit8253", mz800_pit8253_config)

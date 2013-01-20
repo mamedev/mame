@@ -401,7 +401,7 @@ static const cassette_interface sorcerer_cassette_interface =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL,
+	"sorcerer_cass",
 	NULL
 };
 
@@ -414,7 +414,7 @@ static const floppy_interface sorcerer_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_8_SSSD,
 	LEGACY_FLOPPY_OPTIONS_NAME(sorcerer),
-	NULL,
+	"floppy_8",
 	NULL
 };
 
@@ -465,7 +465,7 @@ static MACHINE_CONFIG_START( sorcerer, sorcerer_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sorcerer_cart")
-	//MCFG_SOFTWARE_LIST_ADD("cass_list","sorcerer_cass") not created yet
+	MCFG_SOFTWARE_LIST_ADD("cass_list","sorcerer_cass")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -479,7 +479,7 @@ static MACHINE_CONFIG_DERIVED( sorcererd, sorcerer )
 	MCFG_MACHINE_START_OVERRIDE(sorcerer_state, sorcererd )
 	MCFG_MICROPOLIS_ADD("fdc", default_micropolis_interface )
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(sorcerer_floppy_interface)
-	//MCFG_SOFTWARE_LIST_ADD("flop_list","sorcerer_flop") not created yet
+	MCFG_SOFTWARE_LIST_ADD("flop_list","sorcerer_flop")
 MACHINE_CONFIG_END
 
 
