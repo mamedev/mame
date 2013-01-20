@@ -120,7 +120,8 @@
     317-0167  FD1089A [2] Aurail               400030 010000-ffffff
     317-0168  FD1089B [1] Aurail               400030 010000-ffffff
     317-????  FD1089A [2] Wonder Boy III       400043 ?
-    317-5021  FD1089B [2] Sukeban Jansi Ryuko  40004b ?
+    317-5021  FD1089B [1] Sukeban Jansi Ryuko  40004b 000000-00ffff
+
 
     [1] Complete
     [2] Partial
