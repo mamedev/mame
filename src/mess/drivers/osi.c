@@ -874,12 +874,19 @@ ROM_START( sb2m600b )
 	ROM_LOAD( "basus02.u10", 0xa800, 0x0800, CRC(0039ef6a) SHA1(1397f0dc170c16c8e0c7d02e63099e986e86385b) )
 	ROM_LOAD( "basus03.u11", 0xb000, 0x0800, CRC(ca25f8c1) SHA1(f5e8ee93a5e0656657d0cc60ef44e8a24b8b0a80) )
 	ROM_LOAD( "basus04.u12", 0xb800, 0x0800, CRC(8ee6030e) SHA1(71f210163e4268cba2dd78a97c4d8f5dcebf980e) )
-	ROM_LOAD( "monde01.u13", 0xf800, 0x0800, CRC(95a44d2e) SHA1(4a0241c4015b94c436d0f0f58b3dd9d5207cd847) )
+	ROM_LOAD( "monde01.u13", 0xf800, 0x0800, CRC(95a44d2e) SHA1(4a0241c4015b94c436d0f0f58b3dd9d5207cd847) ) // also known as syn600.rom
 
 	ROM_REGION( 0x800, "chargen",0)
 	ROM_LOAD( "chgsup2.u41", 0x0000, 0x0800, CRC(735f5e0a) SHA1(87c6271497c5b00a974d905766e91bb965180594) )
+
+	ROM_REGION( 0x1000, "user1",0)
+	// This is to fix a major bug with garbage collection which would crash the system
+	ROM_LOAD( "basic3.rom", 0x0000, 0x0800, CRC(ac37d575) SHA1(11407eb24d1ba7afb889b7677c987e8be1a61aab) )
+	// Another bios rom
+	ROM_LOAD( "c2 c4 synmon.rom", 0x0800, 0x0800, CRC(03cdbcc5) SHA1(5426ae14522ef485b6089472011db0ae1d192630) )
 ROM_END
 
+// same roms are used in Challenger 2P and 4P
 #define rom_c1p rom_sb2m600b
 #define rom_c1pmf rom_sb2m600b
 
