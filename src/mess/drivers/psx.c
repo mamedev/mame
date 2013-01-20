@@ -495,10 +495,9 @@ static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_MIRROR(0x00e00000) AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f801800, 0x1f801803) AM_READWRITE8(psx_cd_r, psx_cd_w, 0xffffffff)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
-	AM_RANGE(0x80000000, 0x801fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
-	AM_RANGE(0x80600000, 0x807fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
+	AM_RANGE(0x80000000, 0x801fffff) AM_RAM AM_MIRROR(0x00e00000) AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
-	AM_RANGE(0xa0000000, 0xa01fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
+	AM_RANGE(0xa0000000, 0xa01fffff) AM_RAM AM_MIRROR(0x00e00000) AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0xbfc00000, 0xbfc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
 ADDRESS_MAP_END
 
