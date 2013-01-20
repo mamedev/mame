@@ -10686,14 +10686,42 @@
 		</part>
 	</software>
 
-	<software name="mani4in1" cloneof="varpack">
-		<description>Mani 4 in 1 (Chi)</description>
+	<software name="4in1ta" cloneof="varpack">
+		<description>Mani 4 in 1 (Chi, DMG-602 CHN)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Mani</publisher>
+		<info name="serial" value="DMG-602-CHN"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="MBC1" />
+			<feature name="mapper" value="MMM01" />
 			<dataarea name="rom" size="524288">
 				<rom name="mani 4 in 1 (china).bin" size="524288" crc="5bfc3ef5" sha1="c0639d6c993690022200f2fa4b3094249b9335c0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1to" supported="no">
+		<description>Mani 4 in 1 (Chi, DMG-603 CHN)</description>
+		<year>19??</year>
+		<publisher>Mani</publisher>
+		<info name="serial" value="DMG-603-CHN"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MMM01" />
+			<dataarea name="rom" size="524288">
+				<rom name="4 in 1 (dmg-603 chn) [raw dump].bin" size="524288" crc="c373ac09" sha1="0030295574e4c518ff5cdf20febf6b6737426468" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Menu moved to the beginning of the dump. We should handle differently the banking for the original dump to work? -->
+	<software name="4in1toh" cloneof="4in1to">
+		<description>Mani 4 in 1 (Chi, DMG-603 CHN, Hacked)</description>
+		<year>19??</year>
+		<publisher>Mani</publisher>
+		<info name="serial" value="DMG-603-CHN"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MMM01" />
+			<dataarea name="rom" size="524288">
+				<rom name="4 in 1 (dmg-603 chn) [raw dump].bin" size="524288" crc="a997c237" sha1="0c8fb3700512fd6b98cda2df1cb2e650bacfc217" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -958,8 +958,8 @@
 		<description>Double Pack: Sonic Advance + ChuChu Rocket! (Jpn)</description>
 		<year>2006</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="20060126"/>
-		<info name="release" value="AGB-BW3J-JPN"/>
+		<info name="serial" value="AGB-BW3J-JPN"/>
+		<info name="release" value="20060126"/>
 		<info name="alt_title" value="ダブルパック ソニックアドバンス&amp;チューチューロケット!"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH-512" />
@@ -987,8 +987,8 @@
 		<description>Double Pack: Sonic Advance + Sonic Battle (Jpn)</description>
 		<year>2006</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="20060126"/>
-		<info name="release" value="AGB-BW4J-JPN"/>
+		<info name="serial" value="AGB-BW4J-JPN"/>
+		<info name="release" value="20060126"/>
 		<info name="alt_title" value="ダブルパック ソニックバトル&amp;ソニックアドバンス"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-FLASH-512" />
@@ -1997,8 +1997,8 @@
 		<description>Advance Guardian Heroes (Jpn)</description>
 		<year>2004</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="20040922"/>
-		<info name="release" value="AGB-BAGJ"/>
+		<info name="serial" value="AGB-BAGJ"/>
+		<info name="release" value="20040922"/>
 		<info name="alt_title" value="アドバンス ガーディアンヒーローズ"/>
 		<part name="cart" interface="gba_cart">
 			<feature name="pcb_type" value="GBA-EEPROM-4K" />

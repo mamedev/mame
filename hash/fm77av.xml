@@ -1011,6 +1011,19 @@ Titles, serial #s, publishers and release dates taken from:
 
 <!-- Misc -->
 
+	<software name="pacris" supported="partial">
+		<description>Pacris</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load F-BASIC first, then LOADM &quot;CALLEB&quot; and RUN &quot;MAIN&quot;"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="473776">
+				<rom name="pacris.d77" size="473776" crc="caf9666a" sha1="895446e7622c02362429fe43cfa7e119cf5d5b66" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- FM-77AV Demo program -->
 	<software name="avdemo" supported="no">
 		<description>FM-77AV Demo</description>

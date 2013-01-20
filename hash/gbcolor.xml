@@ -7,7 +7,6 @@ To investigate:
   - Shanghai Pocket by Sunsoft: are serial and release date correct or do they refer to the GB version?
 
 Undumped:
-- 102 Dalmatas Cachorros Al Rescate CGB-B99S-ESP
 - Elmo's ABCs DMG-AEAP-EUR
 - Mary-Kate and Ashley - Crush Course CGB-BCVP-UKV
 - Mary-Kate and Ashley - Pocket Planner DMG-BMAP-EUR
@@ -108,6 +107,20 @@ Undumped Pirates:
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="1048576">
 				<rom name="102 dalmatiner (germany).bin" size="1048576" crc="725a3483" sha1="69109b87dae04fcb9b65374165527d03845a2dc3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="102dalmas" cloneof="102dalma">
+		<!-- Notes: GBC only -->
+		<description>102 Dalmatas de Disney: Cachorros al Rescate (Spa)</description>
+		<year>2000</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="CGB-B99S-ESP"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="dalmatiansb99s.bin" size="1048576" crc="f2128908" sha1="eaf3bd27cf7cb084068c5a139da5383a74105ffa" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -22840,7 +22853,7 @@ Undumped Pirates:
 	</software>
 
 <!-- This is a title hack of the undumped 'Zook Hero 2' -->
-	<software name="rockmnd3">
+	<software name="rockmnx3">
 		<description>Rockman X3 (Chi)</description>
 		<year>20??</year>
 		<publisher>V.Fame ~ Guangzhou Li Cheng</publisher>
@@ -22849,6 +22862,19 @@ Undumped Pirates:
 			<feature name="mapper" value="MBC5" />
 			<dataarea name="rom" size="524288">
 				<rom name="rockman x3 (chi).bin" size="524288" crc="7f4112a3" sha1="6c1d24162f2682bb6e82fb09639f2e311fda5aff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rockmnx3a" cloneof="rockmnx3">
+		<description>Rockman X3 (Chi, Alt)</description>
+		<year>20??</year>
+		<publisher>V.Fame ~ Guangzhou Li Cheng</publisher>
+		<info name="alt_title" value="Rockman DX3 (Box)"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<dataarea name="rom" size="1048576">
+				<rom name="rockman x3 (chi).bin" size="1048576" crc="46c5b31d" sha1="70e5c1dae3bf0aee8dc901aba9e66751f2c1fc01" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
