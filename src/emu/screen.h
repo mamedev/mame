@@ -234,7 +234,7 @@ public:
 	void update_burnin();
 
 	// globally accessible constants
-	static const int DEFAULT_FRAME_RATE = 60;
+	static const int DEFAULT_FRAME_RATE = 1000;
 	static const attotime DEFAULT_FRAME_PERIOD;
 
 private:
