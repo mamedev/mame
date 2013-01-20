@@ -1898,6 +1898,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/rgum.o \
 	$(DRIVERS)/roul.o \
 	$(DRIVERS)/savquest.o \
+	$(DRIVERS)/sanremo.o \
 	$(DRIVERS)/sfbonus.o \
 	$(DRIVERS)/shangkid.o $(VIDEO)/shangkid.o \
 	$(DRIVERS)/skeetsht.o \
