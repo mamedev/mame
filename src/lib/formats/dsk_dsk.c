@@ -340,7 +340,7 @@ struct sector_header
 
 bool dsk_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 {
-	UINT8 header[100];
+	UINT8 header[0x100];
 	bool extendformat = FALSE;
 
 	int image_size = io_generic_size(io);
