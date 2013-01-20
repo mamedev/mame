@@ -201,6 +201,18 @@ Notes:
 
 */
 
+/* Notes added 2013-01-20
+      Added a modified basic rom, which fixes the garbage collection problem.
+      Try the following program with -bios 0 and -bios 1. It will work only
+      with bios 1. You can copy/paste this code, but make sure you include the
+      trailing blank line.
+
+10 DIM A$(3)
+RUN
+PRINT FRE(0)
+
+*/
+
 
 #include "includes/osi.h"
 
@@ -868,22 +880,25 @@ MACHINE_CONFIG_END
 
 /* ROMs */
 
+
+
 ROM_START( sb2m600b )
 	ROM_REGION( 0x10000, M6502_TAG, 0 )
 	ROM_LOAD( "basus01.u9",  0xa000, 0x0800, CRC(f4f5dec0) SHA1(b41bf24b4470b6e969d32fe48d604637276f846e) )
 	ROM_LOAD( "basus02.u10", 0xa800, 0x0800, CRC(0039ef6a) SHA1(1397f0dc170c16c8e0c7d02e63099e986e86385b) )
-	ROM_LOAD( "basus03.u11", 0xb000, 0x0800, CRC(ca25f8c1) SHA1(f5e8ee93a5e0656657d0cc60ef44e8a24b8b0a80) )
 	ROM_LOAD( "basus04.u12", 0xb800, 0x0800, CRC(8ee6030e) SHA1(71f210163e4268cba2dd78a97c4d8f5dcebf980e) )
 	ROM_LOAD( "monde01.u13", 0xf800, 0x0800, CRC(95a44d2e) SHA1(4a0241c4015b94c436d0f0f58b3dd9d5207cd847) ) // also known as syn600.rom
+	ROM_SYSTEM_BIOS(0, "original", "Original")
+	ROMX_LOAD("basus03.u11", 0xb000, 0x0800, CRC(ca25f8c1) SHA1(f5e8ee93a5e0656657d0cc60ef44e8a24b8b0a80), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "fixed", "Fixed")
+	ROMX_LOAD( "basic3.rom", 0xb000, 0x0800, CRC(ac37d575) SHA1(11407eb24d1ba7afb889b7677c987e8be1a61aab), ROM_BIOS(2) )
 
-	ROM_REGION( 0x800, "chargen",0)
+	ROM_REGION( 0x0800, "chargen",0)
 	ROM_LOAD( "chgsup2.u41", 0x0000, 0x0800, CRC(735f5e0a) SHA1(87c6271497c5b00a974d905766e91bb965180594) )
 
-	ROM_REGION( 0x1000, "user1",0)
-	// This is to fix a major bug with garbage collection which would crash the system
-	ROM_LOAD( "basic3.rom", 0x0000, 0x0800, CRC(ac37d575) SHA1(11407eb24d1ba7afb889b7677c987e8be1a61aab) )
+	ROM_REGION( 0x0800, "user1",0)
 	// Another bios rom
-	ROM_LOAD( "c2 c4 synmon.rom", 0x0800, 0x0800, CRC(03cdbcc5) SHA1(5426ae14522ef485b6089472011db0ae1d192630) )
+	ROM_LOAD( "c2 c4 synmon.rom", 0x0000, 0x0800, CRC(03cdbcc5) SHA1(5426ae14522ef485b6089472011db0ae1d192630) )
 ROM_END
 
 // same roms are used in Challenger 2P and 4P
