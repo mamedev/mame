@@ -334,6 +334,28 @@
 		</part>
 	</software>
 
+	<software name="olitutor" supported="no">
+		<description>OliTutor (Ita)</description>
+		<year>19??</year>
+		<publisher>Olivetti</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="246997">
+				<rom name="olitu01.imd" size="246997" crc="b1182d9a" sha1="91e6dfba1df8757cf99354246e02a354393f9c89" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="249800">
+				<rom name="olitu02.imd" size="249800" crc="9185a40f" sha1="dd12ee4fb5571d36de2386378ff7aa80ddbf5f1b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="264592">
+				<rom name="olitu03.imd" size="264592" crc="17830cc7" sha1="3c779ce97d95d2f620ff94002083cd71e747d78e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="oliword" supported="no">
 		<description>OliWord (UK)</description>
 		<year>19??</year>
