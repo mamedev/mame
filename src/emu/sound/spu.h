@@ -13,6 +13,9 @@
 	devcb = &spu_device::set_irq_handler(*device, DEVCB2_##_devcb);
 
 #define MCFG_SPU_ADD(_tag, _clock) \
+	MCFG_DEVICE_MODIFY( "maincpu" ) \
+	MCFG_PSX_SPU_READ_HANDLER(DEVREAD16(_tag, spu_device, read)) \
+	MCFG_PSX_SPU_WRITE_HANDLER(DEVWRITE16(_tag, spu_device, write)) \
 	MCFG_DEVICE_ADD(_tag, SPU, _clock) \
 	MCFG_SPU_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin9)) \
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 4, psx_dma_read_delegate( FUNC( spu_device::dma_read ), (spu_device *) device ) ) \
@@ -234,21 +237,15 @@ public:
 	void flush_xa(const unsigned int sector=0);
 	void flush_cdda(const unsigned int sector=0);
 
-	unsigned char read_byte(const unsigned int addr);
-	unsigned short read_word(const unsigned int addr);
-	void write_byte(const unsigned int addr, const unsigned char byte);
-	void write_word(const unsigned int addr, const unsigned short word);
-
 	sound_stream *m_stream;
+
+	DECLARE_READ16_MEMBER( read );
+	DECLARE_WRITE16_MEMBER( write );
 };
 
 extern reverb_params *spu_reverb_cfg;
 
 // device type definition
 extern const device_type SPU;
-
-// MAME old-style interface
-DECLARE_READ16_HANDLER( spu_r );
-DECLARE_WRITE16_HANDLER( spu_w );
 
 #endif

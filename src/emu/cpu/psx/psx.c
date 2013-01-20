@@ -1538,7 +1538,7 @@ static ADDRESS_MAP_START( psxcpu_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	AM_RANGE(0x1f801800, 0x1f801803) AM_READWRITE8( cd_r, cd_w, 0xffffffff )
 	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE( gpu_r, gpu_w )
 	AM_RANGE(0x1f801820, 0x1f801827) AM_DEVREADWRITE( "mdec", psxmdec_device, read, write )
-	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16_LEGACY( spu_r, spu_w, 0xffffffff )
+	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16( spu_r, spu_w, 0xffffffff )
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	/* 1f802030 int 2000 */
 	/* 1f802040 dip switches */
@@ -1566,7 +1566,7 @@ static ADDRESS_MAP_START( cxd8661r_internal_map, AS_PROGRAM, 32, psxcpu_device )
 	AM_RANGE(0x1f801800, 0x1f801803) AM_READWRITE8( cd_r, cd_w, 0xffffffff )
 	AM_RANGE(0x1f801810, 0x1f801817) AM_READWRITE( gpu_r, gpu_w )
 	AM_RANGE(0x1f801820, 0x1f801827) AM_DEVREADWRITE( "mdec", psxmdec_device, read, write )
-	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16_LEGACY( spu_r, spu_w, 0xffffffff )
+	AM_RANGE(0x1f801c00, 0x1f801dff) AM_READWRITE16( spu_r, spu_w, 0xffffffff )
 	AM_RANGE(0x1f802020, 0x1f802033) AM_RAM /* ?? */
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x20000000, 0x7fffffff) AM_READWRITE( berr_r, berr_w )
@@ -1590,6 +1590,8 @@ psxcpu_device::psxcpu_device(const machine_config &mconfig, device_type type, co
 	m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, internal_map),
 	m_gpu_read_handler(*this),
 	m_gpu_write_handler(*this),
+	m_spu_read_handler(*this),
+	m_spu_write_handler(*this),
 	m_cd_read_handler(*this),
 	m_cd_write_handler(*this)
 {
@@ -1778,6 +1780,8 @@ void psxcpu_device::device_start()
 
 	m_gpu_read_handler.resolve_safe(0);
 	m_gpu_write_handler.resolve_safe();
+	m_spu_read_handler.resolve_safe(0);
+	m_spu_write_handler.resolve_safe();
 	m_cd_read_handler.resolve_safe(0);
 	m_cd_write_handler.resolve_safe();
 }
@@ -3176,6 +3180,16 @@ READ32_HANDLER( psxcpu_device::gpu_r )
 WRITE32_HANDLER( psxcpu_device::gpu_w )
 {
 	m_gpu_write_handler( space, offset, data, mem_mask );
+}
+
+READ16_HANDLER( psxcpu_device::spu_r )
+{
+	return m_spu_read_handler( space, offset, mem_mask );
+}
+
+WRITE16_HANDLER( psxcpu_device::spu_w )
+{
+	m_spu_write_handler( space, offset, data, mem_mask );
 }
 
 READ8_HANDLER( psxcpu_device::cd_r )

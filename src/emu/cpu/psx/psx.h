@@ -115,6 +115,11 @@ enum
 #define MCFG_PSX_GPU_WRITE_HANDLER(_devcb) \
 	devcb = &psxcpu_device::set_gpu_write_handler(*device, DEVCB2_##_devcb);
 
+#define MCFG_PSX_SPU_READ_HANDLER(_devcb) \
+	devcb = &psxcpu_device::set_spu_read_handler(*device, DEVCB2_##_devcb);
+#define MCFG_PSX_SPU_WRITE_HANDLER(_devcb) \
+	devcb = &psxcpu_device::set_spu_write_handler(*device, DEVCB2_##_devcb);
+
 #define MCFG_PSX_CD_READ_HANDLER(_devcb) \
 	devcb = &psxcpu_device::set_cd_read_handler(*device, DEVCB2_##_devcb);
 #define MCFG_PSX_CD_WRITE_HANDLER(_devcb) \
@@ -135,6 +140,8 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb2_base &set_gpu_read_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_gpu_read_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_gpu_write_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_gpu_write_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_spu_read_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_spu_read_handler.set_callback(object); }
+	template<class _Object> static devcb2_base &set_spu_write_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_spu_write_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_cd_read_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_cd_read_handler.set_callback(object); }
 	template<class _Object> static devcb2_base &set_cd_write_handler(device_t &device, _Object object) { return downcast<psxcpu_device &>(device).m_cd_write_handler.set_callback(object); }
 
@@ -146,6 +153,9 @@ public:
 
 	DECLARE_WRITE32_MEMBER( gpu_w );
 	DECLARE_READ32_MEMBER( gpu_r );
+
+	DECLARE_WRITE16_MEMBER( spu_w );
+	DECLARE_READ16_MEMBER( spu_r );
 
 	DECLARE_WRITE8_MEMBER( cd_w );
 	DECLARE_READ8_MEMBER( cd_r );
@@ -291,6 +301,8 @@ protected:
 
 	devcb2_read32 m_gpu_read_handler;
 	devcb2_write32 m_gpu_write_handler;
+	devcb2_read16 m_spu_read_handler;
+	devcb2_write16 m_spu_write_handler;
 	devcb2_read8 m_cd_read_handler;
 	devcb2_write8 m_cd_write_handler;
 };
