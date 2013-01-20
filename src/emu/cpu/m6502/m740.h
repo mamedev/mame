@@ -70,8 +70,8 @@ protected:
 	O(reset740);
 	O(seb_biz); O(seb_acc);
 	O(clb_biz); O(clb_acc);
-	O(bbc_biz); O(bbc_acc);
-	O(bbs_biz); O(bbs_acc);
+	O(bbc_bzr); O(bbc_acc);
+	O(bbs_bzr); O(bbs_acc);
 	O(rrf_zpg);
 	O(bra_rel);
 

@@ -127,7 +127,8 @@ protected:
 		DASM_zpy,    /* zero page + Y */
 		DASM_imz,    /* load immediate byte, store to zero page address (M740) */
 		DASM_spg,    /* "special page": implied FF00 plus immediate value (M740)*/
-		DASM_biz     /* bit, zero page (M740) */
+		DASM_biz,    /* bit, zero page (M740) */
+		DASM_bzr	 /* bit, zero page, relative offset (M740) */
 	};
 
 	enum {

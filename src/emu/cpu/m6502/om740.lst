@@ -50,7 +50,7 @@ seb_biz
 	write(TMP, TMP2);
 	prefetch();
 
-bbc_biz
+bbc_bzr
 	TMP = read_pc();
 	TMP2 = read(TMP);
 	TMP = read_pc();
@@ -60,7 +60,7 @@ bbc_biz
 	}
 	prefetch();
 
-bbs_biz
+bbs_bzr
 	TMP = read_pc();
 	TMP2 = read(TMP);
 	TMP = read_pc();

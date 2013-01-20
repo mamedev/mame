@@ -617,6 +617,11 @@ offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const UINT8 *o
 		flags |= 2;
 		break;
 
+	case DASM_bzr:
+		sprintf(buffer, " %d, $%02x, $%04x", (opram[0] >> 5) & 7, opram[1], (pc & 0xf0000) | UINT16(pc + 1 + INT8(opram[2])));
+		flags |= 3;
+		break;
+
 	default:
 		fprintf(stderr, "Unhandled dasm mode %d\n", e.mode);
 		abort();
