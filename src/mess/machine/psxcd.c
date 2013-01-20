@@ -194,11 +194,11 @@ void psxcd_device::device_reset()
 //
 //
 
-unsigned char psxcd_device::read_byte(const unsigned int addr)
+READ8_MEMBER( psxcd_device::read )
 {
 	unsigned char ret = 0;
 
-	switch (addr&3)
+	switch (offset&3)
 	{
 		case 0: ret=sr; break;
 		case 1:
@@ -233,16 +233,16 @@ unsigned char psxcd_device::read_byte(const unsigned int addr)
 //
 //
 
-void psxcd_device::write_byte(const unsigned int addr, const unsigned char byte)
+WRITE8_MEMBER( psxcd_device::write )
 {
 	#ifdef debug_cdrom_registers
 		printf("cdrom: write byte %08x = %02x (PC=%x)\n",addr,byte,machine().device("maincpu")->safe_pc());
 	#endif
 
-	switch (addr&3)
+	switch (offset&3)
 	{
 		case 0:
-			cmdmode=byte&1;
+			cmdmode=data&1;
 			if (cmdmode==0)
 			{
 				cbp=cmdbuf;
@@ -295,14 +295,14 @@ void psxcd_device::write_byte(const unsigned int addr, const unsigned char byte)
 		case 1:
 			if (cmdmode==0)
 			{
-				write_command(byte);
+				write_command(data);
 			}
 			break;
 
 		case 2:
 			if (cmdmode==0)
 			{
-				*cbp++=byte;
+				*cbp++=data;
 			} else
 			{
 				// ?flush buffer?
@@ -310,7 +310,7 @@ void psxcd_device::write_byte(const unsigned int addr, const unsigned char byte)
 			break;
 
 		case 3:
-			if (byte==0x07)
+			if (data==0x07)
 			{
 				if (cur_res)
 				{

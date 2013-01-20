@@ -33,6 +33,7 @@ const int num_commands=0x20;
 
 #define MCFG_PSXCD_DEVNAME(_name) \
 	psxcd_device::static_set_devname(*device, _name);
+
 struct psxcd_interface
 {
 };
@@ -154,8 +155,8 @@ public:
 
 	void start_dma(UINT8 *mainram, UINT32 size);
 
-	unsigned char read_byte(const unsigned int addr);
-	void write_byte(const unsigned int addr, const unsigned char byte);
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( read );
 
 private:
 	emu_timer *m_timer;
