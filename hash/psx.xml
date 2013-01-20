@@ -26,6 +26,25 @@ A few comments on these:
    be verified with the original media, and are marked as bad dumps.
 -->
 
+
+<!-- Pirate disks -->
+
+	<software name="ddrdmp" supported="no">
+		<!-- Original images (Kaylee)
+		<rom name="Dance Dance Revolution - Disney Mix.bin" size="251367648" crc="553c50d8"/>
+		<rom name="Dance Dance Revolution - Disney Mix.cue" size="101"      crc="aef8f018"/>
+		-->
+		<description>Dance Dance Revolution - Disney Mix (Pirate)</description>
+		<year>2001</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cdrom" interface="psx_cdrom">
+			<diskarea name="cdrom">
+				<disk name="ddrdmp" sha1="914d1980a4a46574adfedac1e3335ac2738ae5c1" />
+			</diskarea>
+		</part>
+	</software>
+
+
 <!-- Prototype disks -->
 
 	<software name="baldgate" supported="no">
