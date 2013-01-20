@@ -10,7 +10,7 @@ Undumped cards:
 
 -->
 
-<softwarelist name="x07_card" description="Canon X-07 Memory Cards">
+<softwarelist name="x07_card" description="Canon X-07 memory cards">
 	<software name="xp140">
 		<description>XP-140 Monitor</description>
 		<year>1983</year>

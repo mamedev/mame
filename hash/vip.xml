@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="vip" description="RCA VIP tape images">
+<softwarelist name="vip" description="RCA VIP cassettes">
 
 	<software name="fpbasic">
 		<!--

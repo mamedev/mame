@@ -3,7 +3,7 @@
 <!--
 NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
 -->
-<softwarelist name="pippin" description="Pippin CD-ROM list">
+<softwarelist name="pippin" description="Pippin CD-ROMs">
 
 <!-- Todo: Some (maybe all?) Pippin discs are compatible with macs
 

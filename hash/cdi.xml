@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="cdi" description="CD-i CD-ROM list">
+<softwarelist name="cdi" description="CD-i CD-ROMs">
 
 <software name="frogfeas">
 	<description>Frog Feast (Demo)</description>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="enterp" description="Enterprise 64 / 128 disk images">
+<softwarelist name="ep64" description="Enterprise 64 / 128 disk images">
 
 	<software name="isdos" supported="no">
 		<description>IS-DOS v1.0</description>

@@ -3,7 +3,7 @@
 <!--
 NOTE: This list is here only to document available dumps and it's not used (yet) by MESS!
 -->
-<softwarelist name="pc8801_cass" description="NEC PC-8801 tape images">
+<softwarelist name="pc8801_cass" description="NEC PC-8801 cassettes">
 
 
 <!-- CASSETTES -->
@@ -498,7 +498,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="hitsuyai">
+	<software name="hitsuji">
 		<description>Hitsuji-Ya</description>
 		<year>1983</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>

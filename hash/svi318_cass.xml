@@ -932,7 +932,7 @@ SD-292T Ninja
 		</part>
 	</software>
 
-	<software name="comibake">
+	<software name="comicbak">
 		<description>Comic Bakery</description>
 		<!--RC 714-->
 		<year>1984</year>
@@ -1127,7 +1127,7 @@ SD-292T Ninja
 		</part>
 	</software>
 
-	<software name="roadf">
+	<software name="roadfght">
 		<description>Road Fighter</description>
 		<!--RC 730-->
 		<year>1985</year>
@@ -1140,7 +1140,7 @@ SD-292T Ninja
 		</part>
 	</software>
 
-	<software name="skyjguar">
+	<software name="skyjag">
 		<description>Sky Jaguar</description>
 		<!--RC 721-->
 		<year>1984</year>

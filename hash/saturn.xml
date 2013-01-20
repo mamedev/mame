@@ -3116,7 +3116,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 1)... -->
 	<!-- Identifying Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Japan) (Disc 2)... -->
 	<software name="cmacross" supported="no">
-		<description>Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Jpn)</description>
+		<description>Choujikuu Yousai Macross - Ai Oboete Imasu ka (Jpn)</description>
 		<year>1997</year>
 		<publisher>Bandai Visual</publisher>
 		<info name="serial" value="T-23403G"/>
@@ -9943,7 +9943,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Choujikuu Yousai Macross (Disc 1 of 2) (JAP) (DW0183)... -->
 	<!-- Identifying Choujikuu Yousai Macross (Disc 2 of 2) (JAP) (DW0183)... -->
 	<software name="cmacrossa" cloneof="cmacross" supported="no">
-		<description>Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Jpn, Alt)</description>
+		<description>Choujikuu Yousai Macross - Ai Oboete Imasu ka (Jpn, Alt)</description>
 		<year>1997</year>
 		<publisher>Bandai Visual</publisher>
 		<info name="serial" value="T-23403G"/>
@@ -15668,7 +15668,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying Choujikuu Yousei Macross - Ai Oboete Imasu ka Disc 1 (T-23403G)... -->
 	<!-- Identifying Choujikuu Yousei Macross - Ai Oboete Imasu ka Disc 2 (T-23403G)... -->
 	<software name="cmacrossb" cloneof="cmacross" supported="no">
-		<description>Chou Jikuu Yousai Macross - Ai Oboete Imasu ka (Jpn, Alt 2)</description>
+		<description>Choujikuu Yousai Macross - Ai Oboete Imasu ka (Jpn, Alt 2)</description>
 		<year>1997</year>
 		<publisher>Bandai Visual</publisher>
 		<info name="serial" value="T-23403G"/>

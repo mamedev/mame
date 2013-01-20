@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="apple1" description="Apple 1 tape images">
+<softwarelist name="apple1" description="Apple 1 cassettes">
 
 	<software name="basic">
 		<description>Apple I Basic</description>

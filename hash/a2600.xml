@@ -8501,7 +8501,7 @@ Info from Atariage and Atarimania
 		</part>
 	</software>
 
-	<software name="marinwra" cloneof="marinwar">
+	<software name="marinware" cloneof="marinwar">
 		<description>Marine Wars (PAL)</description>
 		<year>1983</year>
 		<publisher>Konami</publisher>

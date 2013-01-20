@@ -11289,7 +11289,7 @@
 	</software>
 
 	<software name="train9f2" supported="partial">
-		<description>Family Trainer 9 - Totsugeki! Fuun Takeshi-Jou 2 (Jpn)</description>
+		<description>Family Trainer 9 - Totsugeki! Fuuun Takeshi-Jou 2 (Jpn)</description>
 		<year>1988</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="FT-09"/>
@@ -17963,7 +17963,7 @@
 	</software>
 
 	<software name="legkagej" cloneof="legkage">
-		<description>Kage no Densetsu (Jpn)</description>
+		<description>Kage no Densetsu - The Legend of Kage (Jpn)</description>
 		<year>1986</year>
 		<publisher>Taito</publisher>
 		<info name="serial" value="TFC-KD-4900 (07)"/>
@@ -28292,7 +28292,7 @@
 	</software>
 
 	<software name="childqst">
-		<description>Rasaaru Ishii no Childs Quest (Jpn)</description>
+		<description>Lasalle Ishii no Childs Quest (Jpn)</description>
 		<year>1989</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="NAM-CQ-5500"/>
@@ -53513,10 +53513,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="WAIXING-E" />
 			<dataarea name="chr" size="262144">
-				<rom name="[es-1095] tian shi zhi yi (c).chr" size="262144" crc="8bba0d40" sha1="7ef1463a62841b27f6d4446659f5bb4e5aa64d0c" offset="00000" status="baddump" />
+				<rom name="[es-1095] tian shi zhi yi (c) (a).chr" size="262144" crc="8bba0d40" sha1="7ef1463a62841b27f6d4446659f5bb4e5aa64d0c" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="524288">
-				<rom name="[es-1095] tian shi zhi yi (c).prg" size="524288" crc="06f2ecf4" sha1="7bf4171d33e4c760bc2669e6cb932ea20743a010" offset="00000" status="baddump" />
+				<rom name="[es-1095] tian shi zhi yi (c) (a).prg" size="524288" crc="06f2ecf4" sha1="7bf4171d33e4c760bc2669e6cb932ea20743a010" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -60576,7 +60576,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 	</software>
 
 	<software name="legkageh" cloneof="legkage">
-		<description>Kage no Densetsu (FMG pirate)</description>
+		<description>Kage no Densetsu - The Legend of Kage (FMG pirate)</description>
 		<year>1987</year>
 		<publisher>FMG</publisher>
 		<part name="cart" interface="nes_cart">

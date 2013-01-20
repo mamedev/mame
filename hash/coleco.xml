@@ -102,7 +102,7 @@
 	</software>
 
 <!-- 16 Kb cartridges (110 : 91 main sets + 19 clones) -->
-	<software name="antaradv">
+	<software name="antarct">
 		<!-- Antarctic Adventure (1984)(Coleco).bin -->
 		<description>Antarctic Adventure</description>
 		<year>1984</year>

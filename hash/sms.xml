@@ -1967,6 +1967,7 @@
 		<description>FA Tetris (Kor)</description>
 		<year>1989</year>
 		<publisher>FA Soft</publisher>
+		<info name="alt_title" value="에프에이 테트리스" />
 		<part name="cart" interface="sms_cart">
 			<feature name="pcb" value="korean_nobank" />
 			<dataarea name="rom" size="32768">

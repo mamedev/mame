@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<softwarelist name="alice32" description="Matra Alice 32 Cassette">
+<softwarelist name="alice32" description="Matra Alice 32 cassettes">
 	<software name="alberthe">
 		<description>Al*berthe</description>
 		<year>1985</year>

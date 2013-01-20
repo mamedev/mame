@@ -6500,8 +6500,8 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		</part>
 	</software>
 
-	<software name="csoldir2">
-		<description>Cosmic Soldier 2 - Psychic War</description>
+	<software name="psychwar">
+		<description>Psychic War - Cosmic Soldier 2</description>
 		<year>1987</year>
 		<publisher>工画堂スタジオ (Kogado Studio)</publisher>
 		<!-- PC8801mk2SR -->
@@ -7569,7 +7569,7 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 	</software>
 
 	<software name="daidasso">
-		<description>Daidasso</description>
+		<description>Dai Dassou</description>
 		<year>1985</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<!-- PC8801 -->
@@ -7583,7 +7583,7 @@ ExtractDisk  [02]"Disk 2          " -> "cranston_manor_v80_02.d88"
 	</software>
 
 	<software name="daidassoa" cloneof="daidasso">
-		<description>Daidasso (Alt)</description>
+		<description>Dai Dassou (Alt)</description>
 		<year>1985</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<!-- PC8801 -->
@@ -20604,7 +20604,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 	</software>
 
 	<software name="macross">
-		<description>Chou Jikuu Yousai Macross - Countdown</description>
+		<description>Choujikuu Yousai Macross - Countdown</description>
 		<year>1985</year>
 		<publisher>ボーステック (Bothtec)</publisher>
 		<!-- PC8801 -->
@@ -23851,7 +23851,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="ninjakmb">
-		<description>Ninja-kun Majo no Boken</description>
+		<description>Ninja-kun - Majou no Bouken</description>
 		<year>1986</year>
 		<publisher>日本デクスタ (Nihon Dexter)</publisher>
 		<!-- PC8801 -->
@@ -32946,7 +32946,7 @@ ExtractDisk  [03]"ﾃﾞｰﾀﾃﾞｨｽｸ      " -> "super daisenryaku_03.d8
 		</part>
 	</software>
 
-	<software name="shogish2">
+	<software name="tkshogi2">
 		<description>Tanigawa Kouji no Shougi Shinan 2</description>
 		<year>1987</year>
 		<publisher>ポニカ (Pony Canyon)</publisher>

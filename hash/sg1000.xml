@@ -142,7 +142,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="bankpani">
+	<software name="bankp">
 		<description>Bank Panic (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Sanritsu</publisher>
@@ -155,7 +155,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="bilidada" cloneof="bankpani">
+	<software name="bilidada" cloneof="bankp">
 		<description>Bi Li Da Dao (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -1439,7 +1439,7 @@ A135 : 森林歷險記 / Sēnlín lìxiǎn jì -> Pitfall II (same as R-049 by A
 		</part>
 	</software>
 
-	<software name="magkidwz">
+	<software name="mkidwiz">
 		<description>Magical Kid Wiz (Tw)</description>
 		<year>198?</year>
 		<publisher>Aaronix</publisher>

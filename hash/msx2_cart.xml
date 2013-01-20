@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="msx2_cart" description="MSX2 Cartridges">
+<softwarelist name="msx2_cart" description="MSX2 cartridges">
 
 <!--
 Information in this list was taken from sources like: the GOODTools, http://gigamix.jp/rom/rom.php
@@ -74,7 +74,7 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="arkanoi2">
+	<software name="arknoid2">
 		<description>Arkanoid 2 (Jpn)</description>
 		<year>1987</year>
 		<publisher>Nidecom</publisher>
@@ -898,7 +898,7 @@ LZ93A13 (32 pin) - 8KB banks
 	</software>
 
 	<software name="ninjakun">
-		<description>Ninja Kun - Ashura no Shou (Jpn)</description>
+		<description>Ninja-kun - Ashura no Shou (Jpn)</description>
 		<year>1987</year>
 		<publisher>HAL Kenkyuujo</publisher>
 		<info name="alt_title" value="忍者くん 阿修羅の章" />

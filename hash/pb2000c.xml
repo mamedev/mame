@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="pb2000c" description="Casio PB-2000C Memory card">
+<softwarelist name="pb2000c" description="Casio PB-2000C memory cards">
 	<software name="prolog">
 		<description>PROLOG interpreter (OM-51P)</description>
 		<year>1989</year>

@@ -4,7 +4,7 @@
 <!-- Note: a Chinese pirate mahjong game is rumored to exist -->
 <!-- Kof95 and Ultraman require additional ROM cartridges to work! -->
 
-<softwarelist name="sat_cart" description="Sega Saturn Cartridges">
+<softwarelist name="sat_cart" description="Sega Saturn cartridges">
 
 	<!-- The header would indicate this is the same for both regions -->
 	<software name="kof95" supported="no">

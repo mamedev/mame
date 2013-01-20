@@ -584,11 +584,11 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="megamit">
-		<description>Digital Devil Story - Megami Tensei</description>
+		<description>Digital Devil Monogatari - Megami Tensei</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="release" value="198705xx"/>
-		<info name="alt_title" value="デジタル・デビル・ストーリー 女神転生"/>
+		<info name="alt_title" value="デジタル・デビル・物語 女神転生"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="414992">
 				<rom name="dds_a.d88" size="414992" crc="b4d6d461" sha1="d42c398e983d2f14b3960cd6504a98c3361a1985" offset="0" />
@@ -602,11 +602,11 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="megamitb" cloneof="megamit">
-		<description>Digital Devil Story - Megami Tensei (Alt Disk 1)</description>
+		<description>Digital Devil Monogatari - Megami Tensei (Alt Disk 1)</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="release" value="198705xx"/>
-		<info name="alt_title" value="デジタル・デビル・ストーリー 女神転生"/>
+		<info name="alt_title" value="デジタル・デビル・物語 女神転生"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="414992">
 				<rom name="dds_a (alt).d88" size="414992" crc="3b4ede0e" sha1="1892e0f16afb13cc88ae5562d281f41f3d8f0a90" offset="0" />
@@ -620,11 +620,11 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 	</software>
 
 	<software name="megamita" cloneof="megamit">
-		<description>Digital Devil Story - Megami Tensei (Alt)</description>
+		<description>Digital Devil Monogatari - Megami Tensei (Alt)</description>
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="release" value="198705xx"/>
-		<info name="alt_title" value="デジタル・デビル・ストーリー 女神転生"/>
+		<info name="alt_title" value="デジタル・デビル・物語 女神転生"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="414992">
 				<rom name="megat_a.d88" size="414992" crc="bca112b8" sha1="e20ca20804b3b3a88d8c37cf3362e693f1dbdac6" offset="0" />
@@ -1236,7 +1236,7 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
-	<software name="lkage">
+	<software name="legkage">
 		<description>Kage no Densetsu - The Legend of Kage</description>
 		<year>1987</year>
 		<publisher>ニデコム (Nidecom)</publisher>
