@@ -2759,7 +2759,6 @@ bool d3d_cache_target::init(d3d_info *d3d, d3d_base *d3dintf, int width, int hei
         int bloom_height = height * prescale_y;
         for (; bloom_size >= 2 && bloom_index < 11; bloom_size >>= 1)
         {
-            printf("%d: %d, %d\n", bloom_index, bloom_width, bloom_height);
             bloom_width >>= 1;
             bloom_height >>= 1;
             HRESULT result = (*d3dintf->device.create_texture)(d3d->device, bloom_width, bloom_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &bloom_texture[bloom_index]);
