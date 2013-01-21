@@ -1552,10 +1552,10 @@ DRIVER_INIT_MEMBER(jack_state,striv)
  *
  *************************************/
 
-GAME( 1982, jack,      0,        jack,     jack,     jack_state, jack,     ROT90,  "Cinematronics", "Jack the Giantkiller (set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, jack2,     jack,     jack,     jack2,    jack_state, jack,     ROT90,  "Cinematronics", "Jack the Giantkiller (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1982, jack3,     jack,     jack,     jack3,    jack_state, jack,     ROT90,  "Cinematronics", "Jack the Giantkiller (set 3)", GAME_SUPPORTS_SAVE )
-GAME( 1982, treahunt,  jack,     jack,     treahunt, jack_state, treahunt, ROT90,  "bootleg? (Hara Industries)", "Treasure Hunt (bootleg?)", GAME_SUPPORTS_SAVE )
+GAME( 1982, jack,      0,        jack,     jack,     jack_state, jack,     ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1982, jack2,     jack,     jack,     jack2,    jack_state, jack,     ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, jack3,     jack,     jack,     jack3,    jack_state, jack,     ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 3)", GAME_SUPPORTS_SAVE )
+GAME( 1982, treahunt,  jack,     jack,     treahunt, jack_state, treahunt, ROT90,  "Hara Industries", "Treasure Hunt", GAME_SUPPORTS_SAVE )
 GAME( 1982, zzyzzyxx,  0,        jack,     zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1982, zzyzzyxx2, zzyzzyxx, jack,     zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1982, brix,      zzyzzyxx, jack,     zzyzzyxx, jack_state, zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Brix", GAME_SUPPORTS_SAVE )
