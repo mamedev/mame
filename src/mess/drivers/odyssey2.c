@@ -75,6 +75,7 @@ protected:
 	static const UINT8 P1_KEYBOARD_SCAN_ENABLE = 0x04; /* active low */
 	static const UINT8 P1_VDC_ENABLE           = 0x08; /* active low */
 	static const UINT8 P1_EXT_RAM_ENABLE       = 0x10; /* active low */
+	static const UINT8 P1_VPP_ENABLE           = 0x20; /* active low */
 	static const UINT8 P1_VDC_COPY_MODE_ENABLE = 0x40;
 	static const UINT8 P2_KEYBOARD_SELECT_MASK = 0x07; /* select row to scan */
 
@@ -216,7 +217,7 @@ const UINT8 odyssey2_colors[] =
 	0x50,0xAE,0xFF,   /* Blue */		// I r g B
 	0x00,0xFF,0x00,   /* Dk Green */	// I r G b
 	0x82,0xfb,0xdb,   /* Lt Grey */		// I r G B
-	0xEC,0x02,0x60,   /* Red */			// I R g b
+	0xff,0x80,0x80,   /* Red */			// I R g b
 	0xa9,0x80,0xff,   /* Violet */		// I R g B
 	0xff,0x9b,0x60,   /* Orange */		// I R G b
 	0xFF,0xFF,0xFF,						// I R G B
@@ -348,7 +349,7 @@ READ8_MEMBER(odyssey2_state::io_read)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
-		return m_i8244->read(space, offset); /* seems to have higher priority than ram??? */
+		return m_i8244->read(space, offset);
 	}
 	if (!(m_p1 & P1_EXT_RAM_ENABLE))
 	{
@@ -388,13 +389,13 @@ READ8_MEMBER(odyssey2_state::g7400_io_read)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
-		return m_i8244->read(space, offset); /* seems to have higher priority than ram??? */
+		return m_i8244->read(space, offset);
 	}
 	else if (!(m_p1 & P1_EXT_RAM_ENABLE))
 	{
 		return m_ram[offset];
 	}
-	else
+	else if (!(m_p1 & P1_VPP_ENABLE))
 	{
 		return m_ef9340_1->ef9341_read( offset & 0x02, offset & 0x01 );
 	}
@@ -413,7 +414,7 @@ WRITE8_MEMBER(odyssey2_state::g7400_io_write)
 	{
 		m_i8244->write(space, offset, data);
 	}
-	else
+	else if (!(m_p1 & P1_VPP_ENABLE))
 	{
 		m_ef9340_1->ef9341_write( offset & 0x02, offset & 0x01, data );
 	}
@@ -424,6 +425,11 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
 {
 	int vpos = data;
 	bitmap_ind16 *bitmap = m_i8244->get_bitmap();
+
+	if ( vpos < i8244_device::START_Y || vpos >= i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
+	{
+		return;
+	}
 
 	// apply external LUM setting
 	for ( int x = i8244_device::START_ACTIVE_SCAN; x < i8244_device::END_ACTIVE_SCAN; x++ )
@@ -440,6 +446,11 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess_g7400)
 	bitmap_ind16 *bitmap = m_i8244->get_bitmap();
 	bitmap_ind16 *ef934x_bitmap = m_ef9340_1->get_bitmap();
 
+	if ( vpos < i8244_device::START_Y || vpos >= i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
+	{
+		return;
+	}
+
 	// apply external LUM setting
 	int x_real_start = i8244_device::START_ACTIVE_SCAN + i8244_device::BORDER_SIZE;
 	int x_real_end = i8244_device::END_ACTIVE_SCAN - i8244_device::BORDER_SIZE;
@@ -447,7 +458,7 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess_g7400)
 	{
 		UINT16 d = bitmap->pix16( vpos, x );
 
-		if ( ( ! m_g7400_ic678_decode[ d & 0x07 ] ) && x >= x_real_start && x < x_real_end )
+		if ( ( ! m_g7400_ic678_decode[ d & 0x07 ] ) && x >= x_real_start && x < x_real_end && y < 240 )
 		{
 			// Use EF934x input
 			d = ef934x_bitmap->pix16( y, x - x_real_start ) & 0x07;
@@ -487,7 +498,6 @@ READ8_MEMBER(odyssey2_state::p1_read)
 {
 	UINT8 data = m_p1;
 
-	logerror("%.9f p1 read %.2x\n", machine().time().as_double(), data);
 	return data;
 }
 
@@ -498,8 +508,6 @@ WRITE8_MEMBER(odyssey2_state::p1_write)
 	m_lum = ( data & 0x80 ) >> 4;
 
 	switch_banks();
-
-	logerror("%.6f p1 written %.2x\n", machine().time().as_double(), data);
 }
 
 
@@ -537,7 +545,6 @@ READ8_MEMBER(odyssey2_state::p2_read)
 		m_p2 = m_p2 | 0xF0;
 	}
 
-	logerror("%.6f p2 read %.2x\n", machine().time().as_double(), m_p2);
 	return m_p2;
 }
 
@@ -550,8 +557,6 @@ WRITE8_MEMBER(odyssey2_state::p2_write)
 	{
 		m_i8243->i8243_p2_w( space, 0, m_p2 & 0x0f );
 	}
-
-	logerror("%.6f p2 written %.2x\n", machine().time().as_double(), data);
 }
 
 
@@ -569,7 +574,6 @@ READ8_MEMBER(odyssey2_state::bus_read)
 		data &= ioport("JOY1")->read();       /* read joystick 2 */
 	}
 
-	logerror("%.6f bus read %.2x\n", machine().time().as_double(), data);
 	return data;
 }
 
@@ -589,6 +593,7 @@ WRITE8_MEMBER(odyssey2_state::i8243_port_w)
 	switch ( offset & 3 )
 	{
 		case 0: // "port 4"
+logerror("setting ef-port4 to %02x\n", data);
 			m_g7400_ic674_decode[4] = BIT(data,0);
 			m_g7400_ic674_decode[5] = BIT(data,1);
 			m_g7400_ic674_decode[6] = BIT(data,2);
@@ -596,6 +601,7 @@ WRITE8_MEMBER(odyssey2_state::i8243_port_w)
 			break;
 
 		case 1: // "port 5"
+logerror("setting ef-port5 to %02x\n", data);
 			m_g7400_ic674_decode[0] = BIT(data,0);
 			m_g7400_ic674_decode[1] = BIT(data,1);
 			m_g7400_ic674_decode[2] = BIT(data,2);
@@ -603,6 +609,7 @@ WRITE8_MEMBER(odyssey2_state::i8243_port_w)
 			break;
 
 		case 2: // "port 6"
+logerror("setting vdc-port6 to %02x\n", data);
 			m_g7400_ic678_decode[4] = BIT(data,0);
 			m_g7400_ic678_decode[5] = BIT(data,1);
 			m_g7400_ic678_decode[6] = BIT(data,2);
@@ -610,6 +617,7 @@ WRITE8_MEMBER(odyssey2_state::i8243_port_w)
 			break;
 
 		case 3: // "port 7"
+logerror("setting vdc-port7 to %02x\n", data);
 			m_g7400_ic678_decode[0] = BIT(data,0);
 			m_g7400_ic678_decode[1] = BIT(data,1);
 			m_g7400_ic678_decode[2] = BIT(data,2);
