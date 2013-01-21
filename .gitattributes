@@ -4648,6 +4648,7 @@ src/mame/layout/s7.lay svneol=native#text/plain
 src/mame/layout/s8.lay svneol=native#text/plain
 src/mame/layout/s9.lay svneol=native#text/plain
 src/mame/layout/saiyukip.lay svneol=native#text/plain
+src/mame/layout/sanremo.lay svneol=native#text/plain
 src/mame/layout/sbrkout.lay svneol=native#text/plain
 src/mame/layout/sc1_vfd.lay svneol=native#text/plain
 src/mame/layout/sc1_vid.lay svneol=native#text/plain

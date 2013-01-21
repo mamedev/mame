@@ -2266,6 +2266,8 @@ $(DRIVERS)/s11a.o:  $(LAYOUT)/s11a.lh
 $(DRIVERS)/s11b.o:  $(LAYOUT)/s11b.lh
 $(DRIVERS)/s11c.o:  $(LAYOUT)/s11c.lh
 
+$(DRIVERS)/sanremo.o:   $(LAYOUT)/sanremo.lh
+
 $(DRIVERS)/sbrkout.o:   $(LAYOUT)/sbrkout.lh
 
 $(DRIVERS)/sderby.o:    $(LAYOUT)/sderby.lh \
