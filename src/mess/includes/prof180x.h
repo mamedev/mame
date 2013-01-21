@@ -19,15 +19,17 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
 	DECLARE_WRITE8_MEMBER( flr_w );
 	DECLARE_READ8_MEMBER( status0_r );
 	DECLARE_READ8_MEMBER( status1_r );
 	DECLARE_READ8_MEMBER( status_r );
 
-	void bankswitch();
 	void ls259_w(int flag, int value);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	int m_c0;
 	int m_c1;
