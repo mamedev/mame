@@ -375,6 +375,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_FLOOR";fs_floor",                               "0.0,0.0,0.0",OPTION_STRING,    "signal floor level" },
 	{ WINOPTION_PHOSPHOR";fs_phosphor",                         "0.0,0.0,0.0",OPTION_STRING,    "phosphorescence decay rate (0.0 is instant, 1.0 is forever)" },
 	/* NTSC simulation below this line */
+    { NULL,                                                     NULL,        OPTION_HEADER,     "NTSC POST-PROCESSING OPTIONS" },
 	{ WINOPTION_YIQ_ENABLE";yiq",                               "0",         OPTION_BOOLEAN,    "enable YIQ-space HLSL post-processing" },
 	{ WINOPTION_YIQ_CCVALUE";yiqcc",                            "3.59754545",OPTION_FLOAT,      "Color Carrier frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_AVALUE";yiqa",                              "0.5",       OPTION_FLOAT,      "A value for NTSC signal processing" },
@@ -387,6 +388,14 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_YIQ_QVALUE";yiqq",                              "0.6",       OPTION_FLOAT,      "Q filter cutoff frequency for NTSC signal processing" },
 	{ WINOPTION_YIQ_SCAN_TIME";yiqsc",                          "52.6",      OPTION_FLOAT,      "Horizontal scanline duration for NTSC signal processing (in usec)" },
 	{ WINOPTION_YIQ_PHASE_COUNT";yiqp",                         "2",         OPTION_INTEGER,    "Phase Count value for NTSC signal processing" },
+    { WINOPTION_YIQ_SCAN_TIME";yiqsc",                          "52.6",      OPTION_FLOAT,      "Horizontal scanline duration for NTSC signal processing (in usec)" },
+    { WINOPTION_YIQ_PHASE_COUNT";yiqp",                         "2",         OPTION_INTEGER,    "Phase Count value for NTSC signal processing" },
+    /* Vector simulation below this line */
+    { NULL,                                                     NULL,        OPTION_HEADER,     "VECTOR POST-PROCESSING OPTIONS" },
+    { WINOPTION_VECTOR_TIME_SCALE";vectime",                    "0.0",       OPTION_FLOAT,      "How much the fade rate affects vector fade" },
+    { WINOPTION_VECTOR_TIME_PERIOD";vecperiod",                 "0.1",       OPTION_FLOAT,      "Vector fade rate versus screen refresh rate" },
+    { WINOPTION_VECTOR_LENGTH_SCALE";veclength",                "0.9",       OPTION_FLOAT,      "How much length affects vector fade" },
+    { WINOPTION_VECTOR_LENGTH_RATIO";vecsize",                  "4.0",       OPTION_FLOAT,      "Vector fade length (4.0 - vectors fade the most at and above 4 pixels, etc.)" },
 
 	// per-window options
 	{ NULL,                                           NULL,       OPTION_HEADER,     "PER-WINDOW VIDEO OPTIONS" },

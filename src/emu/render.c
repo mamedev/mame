@@ -1766,7 +1766,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 
 				// scale the width by the minimum of X/Y scale factors
 				prim->width = curitem->width() * MIN(container_xform.xscale, container_xform.yscale);
-				prim->flags = curitem->flags();
+				prim->flags |= curitem->flags();
 
 				// clip the primitive
 				clipped = render_clip_line(&prim->bounds, &cliprect);
@@ -1819,7 +1819,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 
 					// no texture -- set the basic flags
 					prim->texture.base = NULL;
-					prim->flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
+					prim->flags = (curitem->flags() &~ PRIMFLAG_BLENDMODE_MASK) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA);
 
 					// apply clipping
 					clipped = render_clip_quad(&prim->bounds, &cliprect, NULL);

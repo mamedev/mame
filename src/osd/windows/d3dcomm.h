@@ -86,6 +86,8 @@ struct d3d_poly_info
 		UINT32                  flags;                      // rendering flags
 		DWORD                   modmode;                    // texture modulation mode
 		d3d_texture_info *      texture;                    // pointer to texture info
+        float                   line_time;                  // used by vectors
+        float                   line_length;                // used by vectors
 };
 
 

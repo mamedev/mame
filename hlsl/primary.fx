@@ -47,6 +47,7 @@ uniform float TargetWidth;
 uniform float TargetHeight;
 uniform float PostPass;
 uniform float FixedAlpha;
+uniform float Brighten;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -72,7 +73,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 BaseTexel = tex2D(DiffuseSampler, Input.TexCoord);
-	return BaseTexel * Input.Color;
+	return BaseTexel * (Input.Color + float4(Brighten, Brighten, Brighten, 0.0f));
 }
 
 //-----------------------------------------------------------------------------

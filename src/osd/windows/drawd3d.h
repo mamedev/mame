@@ -67,10 +67,13 @@ public:
 	d3d_cache_target() { }
 	~d3d_cache_target();
 
-	bool init(d3d_info *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y);
+	bool init(d3d_info *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y, bool bloom);
 
 	d3d_surface *last_target;
 	d3d_texture *last_texture;
+
+    int target_width;
+    int target_height;
 
 	int width;
 	int height;
@@ -79,6 +82,9 @@ public:
 
 	d3d_cache_target *next;
 	d3d_cache_target *prev;
+
+    d3d_surface *bloom_target[11];
+    d3d_texture *bloom_texture[11];
 };
 
 /* d3d_render_target is the information about a Direct3D render target chain */
@@ -89,7 +95,7 @@ public:
 	d3d_render_target() { }
 	~d3d_render_target();
 
-	bool init(d3d_info *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y);
+	bool init(d3d_info *d3d, d3d_base *d3dintf, int width, int height, int prescale_x, int prescale_y, bool bloom = false);
 
 	int target_width;
 	int target_height;
@@ -109,6 +115,9 @@ public:
 
 	d3d_render_target *next;
 	d3d_render_target *prev;
+
+    d3d_surface *bloom_target[11];
+    d3d_texture *bloom_texture[11];
 };
 
 /* d3d_info is the information about Direct3D for the current screen */

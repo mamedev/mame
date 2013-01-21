@@ -60,11 +60,7 @@ struct PS_INPUT
 uniform float TargetWidth;
 uniform float TargetHeight;
 
-uniform float WidthRatio;
-uniform float HeightRatio;
-
 uniform float2 Defocus = float2(0.0f, 0.0f);
-uniform float FocusEnable;
 
 float2 Coord0Offset = float2( 0.0f,  0.0f);
 float2 Coord1Offset = float2(-0.2f, -0.6f);

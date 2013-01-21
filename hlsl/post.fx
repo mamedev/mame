@@ -180,6 +180,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	Output.r = pow(Output.r, Power.r);
 	Output.g = pow(Output.g, Power.g);
 	Output.b = pow(Output.b, Power.b);
+	Output.a = 1.0f;
 
 	return Output;
 }
