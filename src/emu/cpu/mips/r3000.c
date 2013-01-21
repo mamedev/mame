@@ -496,7 +496,7 @@ offs_t r3000_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
     MEMORY ACCESSORS
 ***************************************************************************/
 
-inline UINT32 r3000_device::readop(off_t pc)
+inline UINT32 r3000_device::readop(offs_t pc)
 {
 	return m_direct->read_decrypted_dword(pc);
 }

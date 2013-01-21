@@ -142,7 +142,7 @@ protected:
 		void	(r3000_device::*m_write_dword)(offs_t byteaddress, UINT32 data);
 	};
 
-	UINT32 readop(off_t pc);
+	UINT32 readop(offs_t pc);
 	UINT8 readmem(offs_t offset);
 	UINT16 readmem_word(offs_t offset);
 	UINT32 readmem_dword(offs_t offset);
