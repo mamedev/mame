@@ -198,7 +198,7 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( poly1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS(0, "BIOS0", "Standalone")
+	ROM_SYSTEM_BIOS(0, "bios0", "Standalone")
 	ROMX_LOAD( "v3bas1.bin", 0xa000, 0x1000, CRC(2c5276cb) SHA1(897cb9c2456ddb0f316a8c3b8aa56706056cc1dd), ROM_BIOS(1) )
 	// next 3 roms could be at the wrong location
 	ROMX_LOAD( "v3bas2.bin", 0xb000, 0x1000, CRC(30f99447) SHA1(a26170113a968ccd8df7db1b0f256a2198054037), ROM_BIOS(1) )
@@ -207,7 +207,7 @@ ROM_START( poly1 )
 	// boot rom
 	ROMX_LOAD( "plrt16v3e9.bin", 0xf000, 0x1000, CRC(453c10a0) SHA1(edfbc3d83710539c01093e89fe1b47dfe1e68acd), ROM_BIOS(1) )
 
-	ROM_SYSTEM_BIOS(1, "BIOS1", "Terminal")
+	ROM_SYSTEM_BIOS(1, "bios1", "Terminal")
 	// supplied by Andrew Trotman, author of Poly1 emulator (PolyROM v3.4)
 	ROMX_LOAD( "v2bas1.bin", 0xa000, 0x1000, CRC(f8c5adc4) SHA1(b1a16d7d996909185495b15a52afa697324e1f8d), ROM_BIOS(2) )
 	ROMX_LOAD( "v2bas2.bin", 0xb000, 0x1000, CRC(a2b0fa4d) SHA1(05ab723eb2e2b09325380a1a72da5ade401847d1), ROM_BIOS(2) )
