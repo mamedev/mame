@@ -319,8 +319,8 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,    pc,         ibm5150,    0,      pccga,      pccga, driver_device,       0,          "<generic>",  "PC (CGA)" , GAME_NO_SOUND)
-COMP(  1987,    pcega,      ibm5150,    0,      pcega,      pccga, driver_device,       0,          "<generic>",  "PC (EGA)" , GAME_NO_SOUND)
-COMP ( 1987,    pcmda,      ibm5150,    0,      pcmda,      pcgen, driver_device,       0,          "<generic>",  "PC (MDA)" , GAME_NO_SOUND)
-COMP ( 1987,    pcherc,     ibm5150,    0,      pcherc,     pcgen, driver_device,      0,       "<generic>",  "PC (Hercules)" , GAME_NO_SOUND)
-COMP ( 1987,    xtvga,      ibm5150,    0,      xtvga,      pcgen, driver_device,       0,          "<generic>",  "PC (VGA)" , GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP(  1987,    pc,         ibm5150,    0,      pccga,      pccga, driver_device,       0,          "<generic>",  "PC (CGA)" , 0)
+COMP(  1987,    pcega,      ibm5150,    0,      pcega,      pccga, driver_device,       0,          "<generic>",  "PC (EGA)" , 0)
+COMP ( 1987,    pcmda,      ibm5150,    0,      pcmda,      pcgen, driver_device,       0,          "<generic>",  "PC (MDA)" , 0)
+COMP ( 1987,    pcherc,     ibm5150,    0,      pcherc,     pcgen, driver_device,      0,       "<generic>",  "PC (Hercules)" , 0)
+COMP ( 1987,    xtvga,      ibm5150,    0,      xtvga,      pcgen, driver_device,       0,          "<generic>",  "PC (VGA)" , GAME_NOT_WORKING)
