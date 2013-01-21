@@ -1156,7 +1156,7 @@ READ16_MEMBER( spu_device::read )
 {
 	unsigned short ret=0, *rp=(unsigned short *)(reg+((offset*2)&0x1ff));
 
-	assert((addr&1)==0);
+	//assert((addr&1)==0);
 
 	m_stream->update();
 
