@@ -2093,7 +2093,14 @@ WRITE8_MEMBER(sms_state::sms_store_control_w)
 
 WRITE_LINE_MEMBER(sms_state::sms_store_int_callback)
 {
-	(m_store_control & 0x01 ? m_control_cpu : m_main_cpu)->set_input_line(0, state);
+	if ( m_store_control & 0x01 )
+	{
+		m_control_cpu->set_input_line( 0, state );
+	}
+	else
+	{
+		m_main_cpu->set_input_line( 0, state );
+	}
 }
 
 
