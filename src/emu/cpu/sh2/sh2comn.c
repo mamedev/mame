@@ -26,35 +26,43 @@ static const int div_tab[4] = { 3, 5, 7, 0 };
 
 INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 {
-	if (A >= 0xe0000000)
+	if (A >= 0xe0000000) /* I/O */
 		return sh2_internal_r(*sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
-	if (A >= 0xc0000000)
+	if (A >= 0xc0000000) /* Cache Data Array */
 		return sh2->program->read_dword(A);
 
-	if (A >= 0x40000000)
+	/*	0x60000000 Cache Address Data Array */
+
+	if (A >= 0x40000000) /* Cache Associative Purge Area */
 		return 0xa5a5a5a5;
 
+	/* 0x20000000 no Cache */
+	/* 0x00000000 read thru Cache if CE bit is 1 */
 	return sh2->program->read_dword(A & AM);
 }
 
 INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
 {
-	if (A >= 0xe0000000)
+	if (A >= 0xe0000000) /* I/O */
 	{
 		sh2_internal_w(*sh2->internal, (A & 0x1fc)>>2, V, 0xffffffff);
 		return;
 	}
 
-	if (A >= 0xc0000000)
+	if (A >= 0xc0000000) /* Cache Data Array */
 	{
 		sh2->program->write_dword(A,V);
 		return;
 	}
 
-	if (A >= 0x40000000)
+	/*	0x60000000 Cache Address Data Array */
+
+	if (A >= 0x40000000) /* Cache Associative Purge Area */
 		return;
 
+	/* 0x20000000 no Cache */
+	/* 0x00000000 read thru Cache if CE bit is 1 */
 	sh2->program->write_dword(A & AM,V);
 }
 
@@ -566,6 +574,15 @@ WRITE32_HANDLER( sh2_internal_w )
 
 		// Standby and cache
 	case 0x24: // SBYCR, CCR
+		/*
+			CCR
+			xx-- ---- ---- ---- Way 0/1
+			---x ---- ---- ---- Cache Purge (CP)
+			---- x--- ---- ---- Two-Way Mode (TW)
+			---- -x-- ---- ---- Data Replacement Disable (OD)
+			---- --x- ---- ---- Instruction Replacement Disable (ID)
+			---- ---x ---- ---- Cache Enable (CE)
+		*/
 		break;
 
 		// Interrupt vectors cont.
@@ -710,6 +727,9 @@ READ32_HANDLER( sh2_internal_r )
 			return (sh2->ocra << 16) | (sh2->m[5] & 0xffff);
 	case 0x06: // ICR
 		return sh2->icr << 16;
+
+	case 0x24: // SBYCR, CCR
+		return sh2->m[0x24] & ~0x3000; /* bit 4-5 of CCR are always zero */
 
 	case 0x38: // ICR, IPRA
 		return (sh2->m[0x38] & 0x7fffffff) | (sh2->nmi_line_state == ASSERT_LINE ? 0 : 0x80000000);
