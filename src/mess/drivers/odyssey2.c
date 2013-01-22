@@ -210,7 +210,7 @@ const UINT8 odyssey2_colors[] =
 	0xCC,0x00,0x00,   /* Red */			// i R g b
 	0xa9,0x80,0xff,						// i R g B
 	0x82,0xfd,0xdb,						// i R G b
-	0xFF,0xFF,0xFF,						// i R G B
+	0xcc,0xcc,0xcc,						// i R G B
 
 	/* Background,Grid Bright */
 	0x80,0x80,0x80,						// I r g b
@@ -442,7 +442,7 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
 WRITE16_MEMBER(odyssey2_state::scanline_postprocess_g7400)
 {
 	int vpos = data;
-	int y = vpos - i8244_device::START_Y;
+	int y = vpos - i8244_device::START_Y - 5;
 	bitmap_ind16 *bitmap = m_i8244->get_bitmap();
 	bitmap_ind16 *ef934x_bitmap = m_ef9340_1->get_bitmap();
 
@@ -452,8 +452,8 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess_g7400)
 	}
 
 	// apply external LUM setting
-	int x_real_start = i8244_device::START_ACTIVE_SCAN + i8244_device::BORDER_SIZE;
-	int x_real_end = i8244_device::END_ACTIVE_SCAN - i8244_device::BORDER_SIZE;
+	int x_real_start = i8244_device::START_ACTIVE_SCAN + i8244_device::BORDER_SIZE + 2;
+	int x_real_end = i8244_device::END_ACTIVE_SCAN - i8244_device::BORDER_SIZE + 2;
 	for ( int x = i8244_device::START_ACTIVE_SCAN; x < i8244_device::END_ACTIVE_SCAN; x++ )
 	{
 		UINT16 d = bitmap->pix16( vpos, x );
