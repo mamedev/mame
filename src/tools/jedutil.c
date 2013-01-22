@@ -3338,7 +3338,10 @@ static int command_convert(int argc, char *argv[])
 	/* read the source file */
 	err = read_source_file(srcfile);
 	if (err != 0)
+	{
+		free(srcbuf);
 		return 1;
+	}
 
 	memset(&jed, 0, sizeof(jed));
 
@@ -3374,6 +3377,7 @@ static int command_convert(int argc, char *argv[])
 		if (!dstbuf)
 		{
 			fprintf(stderr, "Unable to allocate %d bytes for the target buffer!\n", (int)dstbuflen);
+			free(srcbuf);
 			return 1;
 		}
 		dstbuflen = jedbin_output(&jed, dstbuf, dstbuflen);
@@ -3401,6 +3405,7 @@ static int command_convert(int argc, char *argv[])
 		if (!dstbuf)
 		{
 			fprintf(stderr, "Unable to allocate %d bytes for the target buffer!\n", (int)dstbuflen);
+			free(srcbuf);
 			return 1;
 		}
 		dstbuflen = jed_output(&jed, dstbuf, dstbuflen);
@@ -3408,6 +3413,7 @@ static int command_convert(int argc, char *argv[])
 
 	/* write the destination file */
 	err = write_dest_file(dstfile);
+	free(srcbuf);
 	if (err != 0)
 		return 1;
 
@@ -3453,7 +3459,10 @@ static int command_view(int argc, char *argv[])
 	/* read the source file */
 	err = read_source_file(srcfile);
 	if (err != 0)
+	{
+		free(srcbuf);
 		return 1;
+	}
 
 	/* if the source is JED, convert to binary */
 	if (is_jed)
@@ -3488,10 +3497,11 @@ static int command_view(int argc, char *argv[])
 	else
 	{
 		fprintf(stderr, "Viewing product terms not supported for this pal type.");
-
+		free(srcbuf);
 		return 1;
 	}
 
+	free(srcbuf);
 	return 0;
 }
 
