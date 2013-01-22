@@ -268,7 +268,7 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(osborne1_floppy_interface)
 	MCFG_IEEE488_BUS_ADD(ieee488_intf)
-	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
