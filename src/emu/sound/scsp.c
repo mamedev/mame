@@ -222,6 +222,9 @@ struct scsp_state
 
 	UINT16 dma_regs[3];
 
+	UINT16 mcieb;
+	UINT16 mcipd;
+
 	int ARTABLE[64], DRTABLE[64];
 
 	SCSPDSP DSP;
@@ -307,6 +310,14 @@ static void CheckPendingIRQ(scsp_state *scsp)
 		}
 
 	scsp->Int68kCB(scsp->device, 0);
+}
+
+static void MainCheckPendingIRQ(scsp_state *scsp, UINT16 irq_type)
+{
+	scsp->mcipd |= irq_type;
+
+	if(scsp->mcipd & scsp->mcieb)
+		scsp->main_irq(1);
 }
 
 static void ResetInterrupts(scsp_state *scsp)
@@ -789,6 +800,14 @@ static void SCSP_UpdateReg(scsp_state *scsp, address_space &space, int reg)
 				}
 			}
 			break;
+		case 0x1e:
+		case 0x1f:
+			if(scsp->Master)
+			{
+				if(scsp->udata.data[0x1e/2] & 0x630)
+					popmessage("SCSP SCIEB enabled %04x, contact MAMEdev",scsp->udata.data[0x1e/2]);
+			}
+			break;
 		case 0x22:  //SCIRE
 		case 0x23:
 
@@ -826,6 +845,25 @@ static void SCSP_UpdateReg(scsp_state *scsp, address_space &space, int reg)
 				scsp->IrqMidi=DecodeSCI(scsp,SCIMID);
 			}
 			break;
+		case 0x2a:
+		case 0x2b:
+			scsp->mcieb = scsp->udata.data[0x2a/2];
+
+			MainCheckPendingIRQ(scsp, 0);
+			if(scsp->mcieb & ~0x20)
+				popmessage("SCSP MCIEB enabled %04x, contact MAMEdev",scsp->mcieb);
+			break;
+		case 0x2c:
+		case 0x2d:
+			if(scsp->udata.data[0x2c/2] & 0x20)
+				MainCheckPendingIRQ(scsp, 0x20);
+			break;
+		case 0x2e:
+		case 0x2f:
+			scsp->mcipd &= ~scsp->udata.data[0x2e/2];
+			MainCheckPendingIRQ(scsp, 0);
+			break;
+
 	}
 }
 
@@ -877,6 +915,16 @@ static void SCSP_UpdateRegR(scsp_state *scsp, address_space &space, int reg)
 
 		case 0x1c:
 		case 0x1d:
+			break;
+
+		case 0x2a:
+		case 0x2b:
+			scsp->udata.data[0x2a/2] = scsp->mcieb;
+			break;
+
+		case 0x2c:
+		case 0x2d:
+			scsp->udata.data[0x2c/2] = scsp->mcipd;
 			break;
 	}
 }
@@ -1321,13 +1369,6 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 			COMBINE_DATA(&scsp->dma_regs[((offset-0x412)/2) & 3]);
 			if(ACCESSING_BITS_8_15 && offset*2 == 0x416)
 				dma_scsp(space, scsp);
-			break;
-		case 0x42a:     //check main cpu IRQ
-			scsp->main_irq(1);
-			break;
-		case 0x42c:
-			break;
-		case 0x42e:
 			break;
 	}
 }
