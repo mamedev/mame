@@ -1,5 +1,4 @@
 /*----------- defined in drivers/stv.c -----------*/
-#define NEW_VIDEO_CODE 0
 
 class saturn_state : public driver_device
 {
@@ -297,8 +296,3 @@ DECLARE_WRITE32_HANDLER ( saturn_vdp2_vram_w );
 DECLARE_WRITE32_HANDLER ( saturn_vdp2_cram_w );
 DECLARE_WRITE16_HANDLER ( saturn_vdp2_regs_w );
 
-
-
-#if NEW_VIDEO_CODE
-
-#endif
