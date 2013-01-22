@@ -750,18 +750,18 @@ MACHINE_CONFIG_END
 /* ROM definition */
 ROM_START( sol20 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_SYSTEM_BIOS(0, "SOLOS", "SOLOS")
+	ROM_SYSTEM_BIOS(0, "solos", "SOLOS")
 	ROMX_LOAD( "solos.bin", 0xc000, 0x0800, CRC(4d0af383) SHA1(ac4510c3380ed4a31ccf4f538af3cb66b76701ef), ROM_BIOS(1) )    // from solace emu
-	ROM_SYSTEM_BIOS(1, "DPMON", "DPMON")
+	ROM_SYSTEM_BIOS(1, "dpmon", "DPMON")
 	ROMX_LOAD( "dpmon.bin", 0xc000, 0x0800, BAD_DUMP CRC(2a84f099) SHA1(60ff6e38082c50afcf0f40707ef65668a411008b), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS(2, "CONSOL", "CONSOL")
+	ROM_SYSTEM_BIOS(2, "consol", "CONSOL")
 	ROMX_LOAD( "consol.bin", 0xc000, 0x0400, BAD_DUMP CRC(80bf6d85) SHA1(84b81c60bb08a3a5435ec1be56a67aa695bce099), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS(3, "Solos2", "Solos Patched")
+	ROM_SYSTEM_BIOS(3, "solos2", "Solos Patched")
 	ROMX_LOAD( "solos2.bin", 0xc000, 0x0800, CRC(7776cc7d) SHA1(c4739a9ea7e8146ce7ae3305ed526b6045efa9d6), ROM_BIOS(4) ) // from Nama
-	ROM_SYSTEM_BIOS(4, "BOOTLOAD", "BOOTLOAD")
+	ROM_SYSTEM_BIOS(4, "bootload", "BOOTLOAD")
 	ROMX_LOAD( "bootload.bin", 0xc000, 0x0800, BAD_DUMP CRC(4261ac71) SHA1(4752408ac85d88857e8e9171c7f42bd623c9271e), ROM_BIOS(5) ) // from Nama
 //        This one doesn't work
-	ROM_SYSTEM_BIOS(5, "CUTER", "CUTER")
+	ROM_SYSTEM_BIOS(5, "cuter", "CUTER")
 	ROMX_LOAD( "cuter.bin", 0xc000, 0x0800, BAD_DUMP CRC(39cca901) SHA1(33725d6da63e295552ee13f0a735d33aee8f0d17), ROM_BIOS(6) ) // from Nama
 
 	ROM_REGION( 0x1000, "chargen", 0 )
