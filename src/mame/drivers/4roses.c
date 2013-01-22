@@ -456,6 +456,30 @@ ROM_START( 4rosesa )
 	ROM_LOAD( "palce22v10h.u29", 0x0000, 0x02dd, BAD_DUMP CRC(5c4e9024) SHA1(e9d1e4df3d79c21f4ce053a84bb7b7a43d650f91) )
 ROM_END
 
+/*
+2x 6821
+6845
+AY-3-8910
+
+no cpu... cpu seem a 44 plcc chip with name scratched off...
+
+pcb is almost the same as "Four Roses"
+*/
+ROM_START( rugby )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* encrypted program ROM...*/
+	ROM_LOAD( "rugby1.u15", 0x00000, 0x10000, CRC(6ac45fa7) SHA1(dba936d236d57172e56143a9858e5052009e4346) )
+
+	ROM_REGION( 0x0400,  "mcu", 0 ) /* protected... no dump available */
+	ROM_LOAD( "ep87c750ebpn_no_dump.u41", 0x0000, 0x0400, NO_DUMP )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "rugby2.u17", 0x00000, 0x40000, CRC(822eb316) SHA1(8568f5a67f6a54858841e6832dc987f72dd911e2) )
+	ROM_LOAD( "rugby3.u18", 0x40000, 0x40000, CRC(536c56c1) SHA1(a7812f0a854c5138fb7412d656de128ff094010f) )
+
+	ROM_REGION( 0x10000, "proms", 0 )
+	ROM_LOAD( "rugby4.u5", 0x00000, 0x10000, CRC(dc1eb4cd) SHA1(fb7b933a6e4307ee693c4f4bb3630b98a0c60f16) )
+ROM_END
+
 
 /**************************
 *  Driver Initialization  *
@@ -470,6 +494,7 @@ DRIVER_INIT_MEMBER(_4roses_state,4roses)
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT   INIT    ROT    COMPANY    FULLNAME                        FLAGS  */
+/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT    ROT    COMPANY      FULLNAME                        FLAGS  */
 GAME( 1999, 4roses,  0,      4roses,  4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 1)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 1999, 4rosesa, 4roses, 4roses,  4roses, _4roses_state, 4roses, ROT0, "<unknown>", "Four Roses (encrypted, set 2)", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1999, rugby,   0,      4roses,  4roses, _4roses_state, 4roses, ROT0, "C.M.C.",    "Rugby? (four roses hardware)",  GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
