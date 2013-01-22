@@ -7858,7 +7858,6 @@ src/mess/video/pocketc.c svneol=native#text/plain
 src/mess/video/poly88.c svneol=native#text/plain
 src/mess/video/pp01.c svneol=native#text/plain
 src/mess/video/primo.c svneol=native#text/plain
-src/mess/video/psion.c svneol=native#text/plain
 src/mess/video/radio86.c svneol=native#text/plain
 src/mess/video/rm380z.c svneol=native#text/plain
 src/mess/video/rmnimbus.c svneol=native#text/plain

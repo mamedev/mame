@@ -68,10 +68,7 @@ WRITE8_MEMBER( alesis_state::p3_w )
 
 WRITE8_MEMBER( alesis_state::sr16_lcd_w )
 {
-	if (m_kb_matrix & 0x80)
-		m_lcdc->data_write(space, offset, data);
-	else
-		m_lcdc->control_write(space, offset, data);
+	m_lcdc->write(space, BIT(m_kb_matrix,7), data);
 }
 
 static ADDRESS_MAP_START(hr16_mem, AS_PROGRAM, 8, alesis_state)
@@ -84,8 +81,7 @@ static ADDRESS_MAP_START(hr16_io, AS_IO, 8, alesis_state)
 	AM_RANGE(0x0000, 0x0000) AM_READ(kb_r)
 	AM_RANGE(0x0002, 0x0002) AM_DEVWRITE("dm3ag", alesis_dm3ag_device, write)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(led_w)
-	AM_RANGE(0x0006, 0x0006) AM_DEVREADWRITE("hd44780", hd44780_device, control_read, control_write)
-	AM_RANGE(0x0007, 0x0007) AM_DEVREADWRITE("hd44780", hd44780_device, data_read, data_write)
+	AM_RANGE(0x0006, 0x0007) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
 	AM_RANGE(0x0008, 0x0008) AM_WRITE(kb_matrix_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("SELECT")   AM_WRITENOP
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITENOP
@@ -234,29 +230,16 @@ void alesis_state::machine_reset()
 	memset(m_lcd_digits, 0, sizeof(m_lcd_digits));
 }
 
-static HD44780_INTERFACE( hr16_display )
-{
-	2,                  // number of lines
-	16,                 // chars for line
-	NULL                // pixel update callback
-};
 
 static HD44780_PIXEL_UPDATE(sr16_pixel_update)
 {
 	alesis_state *driv_state = device.machine().driver_data<alesis_state>();
 
-	if (line == 1 && pos >= 6)  // last 2 characters of the second line are used to control the LCD symbols
+	if (line == 1 && pos >= 6 && pos < 8)  // last 2 characters of the second line are used to control the LCD symbols
 		driv_state->update_lcd_symbols(bitmap, pos, y, x, state);
-	else
+	else if (pos < 8)
 		bitmap.pix16(line*9 + y, pos*6 + x) = state;
 }
-
-static HD44780_INTERFACE( sr16_display )
-{
-	2,                  // number of lines
-	8,                  // chars for line
-	sr16_pixel_update   // pixel update callback
-};
 
 static const cassette_interface hr16_cassette_interface =
 {
@@ -286,7 +269,8 @@ static MACHINE_CONFIG_START( hr16, alesis_state )
 
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, hr16_cassette_interface )
 
-	MCFG_HD44780_ADD("hd44780", hr16_display)
+	MCFG_HD44780_ADD("hd44780")
+	MCFG_HD44780_LCD_SIZE(2, 16)
 
 	/* sound hardware */
 	MCFG_ALESIS_DM3AG_ADD("dm3ag", XTAL_12MHz/2)
@@ -308,7 +292,9 @@ static MACHINE_CONFIG_DERIVED( sr16, hr16 )
 
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_HD44780_REPLACE("hd44780", sr16_display)
+	MCFG_DEVICE_MODIFY("hd44780")
+	MCFG_HD44780_LCD_SIZE(2, 8)
+	MCFG_HD44780_PIXEL_UPDATE_CB(sr16_pixel_update)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -329,9 +315,6 @@ ROM_START( hr16 )
 	ROM_REGION( 0x100000, "dm3ag", 0 )
 	ROM_LOAD( "2-27-0004.u16", 0x00000, 0x80000, CRC(8e103536) SHA1(092e1cf649fbef171cfaf91e20707d89998b7a1e))
 	ROM_LOAD( "2-27-0003.u15", 0x80000, 0x80000, CRC(82e9b78c) SHA1(89728cb38ae172b5e347a03018617c94a087dce0))
-
-	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
-	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
 ROM_START( hr16b )
@@ -344,9 +327,6 @@ ROM_START( hr16b )
 	ROM_REGION( 0x100000, "dm3ag", 0 )
 	ROM_LOAD( "2-27-0008.u16", 0x00000, 0x80000, CRC(11ca930e) SHA1(2f57fdd02f9b2146a551370a74cab1fa800145ab))
 	ROM_LOAD( "2-27-0007.u15", 0x80000, 0x80000, CRC(319746db) SHA1(46b32a3ab2fbad67fb4566f607f578a2e9defd63))
-
-	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
-	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
 ROM_START( sr16 )
@@ -357,9 +337,6 @@ ROM_START( sr16 )
 	ROM_REGION( 0x100000, "dm3ag", ROMREGION_ERASEFF )
 	ROM_LOAD( "sr16.u6", 0x00000, 0x80000, CRC(6da96987) SHA1(3ec8627d440bc73841e1408a19def09a8b0b77f7))
 	ROM_LOAD( "sr16.u5", 0x80000, 0x80000, CRC(8bb25cfa) SHA1(273ad59d017b54a7e8d5e1ec61c8cd807a0e4af3))
-
-	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
-	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
 

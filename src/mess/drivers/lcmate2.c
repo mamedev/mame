@@ -203,13 +203,6 @@ void lcmate2_state::machine_start()
 	membank("rombank")->configure_entries(0, 0x10, (UINT8*)machine().root_device().memregion("maincpu")->base(), 0x4000);
 }
 
-static HD44780_INTERFACE( lcmate2_display )
-{
-	2,                  // number of lines
-	20,                 // chars for line
-	NULL                // pixel update callback
-};
-
 static const gfx_layout lcmate2_charlayout =
 {
 	5, 8,   /* 5 x 8 characters */
@@ -222,7 +215,7 @@ static const gfx_layout lcmate2_charlayout =
 };
 
 static GFXDECODE_START( lcmate2 )
-	GFXDECODE_ENTRY( "hd44780", 0x0000, lcmate2_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, lcmate2_charlayout, 0, 1 )
 GFXDECODE_END
 
 
@@ -249,7 +242,8 @@ static MACHINE_CONFIG_START( lcmate2, lcmate2_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_GFXDECODE(lcmate2)
 
-	MCFG_HD44780_ADD("hd44780", lcmate2_display)
+	MCFG_HD44780_ADD("hd44780")
+	MCFG_HD44780_LCD_SIZE(2, 20)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -267,9 +261,6 @@ ROM_START( lcmate2 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "u2.bin",  0x00000, 0x08000, CRC(521931b9) SHA1(743a6e2928c4365fbf5ed9a173e2c1bfe695850f) )
 	ROM_LOAD( "u3.bin",  0x20000, 0x20000, CRC(84fe767a) SHA1(8dd306f203e1220f0eab1a284be3095e2642c5b6) ) // spell library
-
-	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
-	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
 /* Driver */

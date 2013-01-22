@@ -114,8 +114,7 @@ static ADDRESS_MAP_START( pc2000_io , AS_IO, 8, pc2000_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITE(rombank1_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(rombank2_w)
-	AM_RANGE(0x0a, 0x0a) AM_DEVREADWRITE("hd44780", hd44780_device, control_read, control_write)
-	AM_RANGE(0x0b, 0x0b) AM_DEVREADWRITE("hd44780", hd44780_device, data_read, data_write)
+	AM_RANGE(0x0a, 0x0b) AM_DEVREADWRITE("hd44780", hd44780_device, read, write)
 	AM_RANGE(0x10, 0x11) AM_READWRITE(key_matrix_r, key_matrix_w)
 	AM_RANGE(0x12, 0x12) AM_READWRITE(beep_r, beep_w)
 ADDRESS_MAP_END
@@ -314,15 +313,8 @@ static const gfx_layout hd44780_charlayout =
 };
 
 static GFXDECODE_START( pc2000 )
-	GFXDECODE_ENTRY( "hd44780", 0x0000, hd44780_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
-
-static HD44780_INTERFACE( pc2000_display )
-{
-	2,                  // number of lines
-	20,                 // chars for line
-	NULL                // pixel update callback
-};
 
 static MACHINE_CONFIG_START( pc2000, pc2000_state )
 	/* basic machine hardware */
@@ -343,7 +335,8 @@ static MACHINE_CONFIG_START( pc2000, pc2000_state )
 	MCFG_GFXDECODE(pc2000)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
-	MCFG_HD44780_ADD("hd44780", pc2000_display)
+	MCFG_HD44780_ADD("hd44780")
+	MCFG_HD44780_LCD_SIZE(2, 20)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO( "mono" )
@@ -359,9 +352,6 @@ MACHINE_CONFIG_END
 ROM_START( pc2000 )
 	ROM_REGION( 0x40000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD( "lh532hee_9344_d.u4", 0x000000, 0x040000, CRC(0b03bf33) SHA1(cb344b94b14975c685041d3e669f386e8a21909f))
-
-	ROM_REGION( 0x0860, "hd44780", ROMREGION_ERASE )
-	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 
 	ROM_REGION( 0x4000, "cart", ROMREGION_ERASEFF )
 	ROM_CART_LOAD( "cart", 0, 0x4000, 0 )

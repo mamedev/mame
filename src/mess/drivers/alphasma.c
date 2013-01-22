@@ -100,19 +100,10 @@ WRITE8_MEMBER(alphasmart_state::port_a_w)
 		UINT8 lcdc_data = 0;
 
 		if ((m_port_a ^ data) & 0x80)
-		{
-			if ((m_matrix[1] & 0x02))
-				lcdc_data |= m_lcdc0->data_read(space, 0);
-			else
-				lcdc_data |= m_lcdc0->control_read(space, 0);
-		}
+			lcdc_data |= m_lcdc0->read(space, BIT(m_matrix[1], 1));
+
 		if ((m_port_a ^ data) & 0x20)
-		{
-			if ((m_matrix[1] & 0x02))
-				lcdc_data |= m_lcdc1->data_read(space, 0);
-			else
-				lcdc_data |= m_lcdc1->control_read(space, 0);
-		}
+			lcdc_data |= m_lcdc1->read(space, BIT(m_matrix[1], 1));
 
 		m_port_d = (m_port_d & 0xc3) | (lcdc_data>>2);
 	}
@@ -121,19 +112,10 @@ WRITE8_MEMBER(alphasmart_state::port_a_w)
 		UINT8 lcdc_data = (m_port_d<<2) & 0xf0;
 
 		if ((m_port_a ^ data) & data & 0x80)
-		{
-			if ((m_matrix[1] & 0x02))
-				m_lcdc0->data_write(space, 0, lcdc_data);
-			else
-				m_lcdc0->control_write(space, 0, lcdc_data);
-		}
+			m_lcdc0->write(space, BIT(m_matrix[1], 1), lcdc_data);
+
 		if ((m_port_a ^ data) & data & 0x20)
-		{
-			if ((m_matrix[1] & 0x02))
-				m_lcdc1->data_write(space, 0, lcdc_data);
-			else
-				m_lcdc1->control_write(space, 0, lcdc_data);
-		}
+			m_lcdc1->write(space, BIT(m_matrix[1], 1), lcdc_data);
 	}
 
 	m_rambank->set_entry(((data>>3) & 0x01) | ((data>>4) & 0x02));
@@ -334,13 +316,6 @@ static const hc11_config alphasmart_hc11_config =
 	0x00   //registers are at 0-0x3f
 };
 
-static HD44780_INTERFACE( alphasmart_4line_display )
-{
-	2,                  // number of lines
-	40,                 // chars for line
-	NULL                // pixel update callback
-};
-
 static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", MC68HC11, XTAL_8MHz/2)  // MC68HC11D0, XTAL is 8 Mhz, unknown divider
@@ -348,8 +323,10 @@ static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	MCFG_CPU_IO_MAP(alphasmart_io)
 	MCFG_CPU_CONFIG(alphasmart_hc11_config)
 
-	MCFG_HD44780_ADD("ks0066_0", alphasmart_4line_display)
-	MCFG_HD44780_ADD("ks0066_1", alphasmart_4line_display)
+	MCFG_HD44780_ADD("ks0066_0")
+	MCFG_HD44780_LCD_SIZE(2, 40)
+	MCFG_HD44780_ADD("ks0066_1")
+	MCFG_HD44780_LCD_SIZE(2, 40)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -368,12 +345,6 @@ ROM_START( alphasma )
 	ROM_LOAD( "alphasmartpro212.rom",  0x0000, 0x8000, CRC(896ddf1c) SHA1(c3c6a421c9ced92db97431d04b4a3f09a39de716) )   // Checksum 8D24 on label
 
 	ROM_REGION( 0x20000, "mainram", ROMREGION_ERASE )
-
-	ROM_REGION( 0x0860, "ks0066_0", ROMREGION_ERASE )
-	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
-
-	ROM_REGION( 0x0860, "ks0066_1", ROMREGION_ERASE )
-	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
 ROM_END
 
 
