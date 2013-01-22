@@ -223,7 +223,7 @@ READ8_MEMBER( psxcd_device::read )
 	}
 
 	#ifdef debug_cdrom_registers
-		printf("cdrom: read byte %08x = %02x (PC=%x)\n",addr,ret,machine().device("maincpu")->safe_pc());
+		printf("cdrom: read byte %08x = %02x (PC=%x)\n",offset,ret,machine().device("maincpu")->safe_pc());
 	#endif
 
 	return ret;
@@ -236,7 +236,7 @@ READ8_MEMBER( psxcd_device::read )
 WRITE8_MEMBER( psxcd_device::write )
 {
 	#ifdef debug_cdrom_registers
-		printf("cdrom: write byte %08x = %02x (PC=%x)\n",addr,byte,machine().device("maincpu")->safe_pc());
+		printf("cdrom: write byte %08x = %02x (PC=%x)\n",offset,data,machine().device("maincpu")->safe_pc());
 	#endif
 
 	switch (offset&3)
