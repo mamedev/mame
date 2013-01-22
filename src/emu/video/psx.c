@@ -3663,7 +3663,7 @@ void psxgpu_device::gpu_read( UINT32 *p_ram, INT32 n_size )
 			for( n_pixel = 0; n_pixel < 2; n_pixel++ )
 			{
 				data.w.l = data.w.h;
-				data.w.h = *( p_p_vram[ n_vramy + ( m_packet.n_entry[ 1 ] >> 16 ) ] + n_vramx + ( m_packet.n_entry[ 1 ] & 0xffff ) );
+				data.w.h = *( p_p_vram[ ( n_vramy + ( m_packet.n_entry[ 1 ] >> 16 ) ) & 0x3ff ] + ( ( n_vramx + ( m_packet.n_entry[ 1 ] & 0xffff ) ) & 0x3ff ) );
 				n_vramx++;
 				if( n_vramx >= ( m_packet.n_entry[ 2 ] & 0xffff ) )
 				{
