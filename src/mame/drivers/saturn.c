@@ -1175,6 +1175,11 @@ static INPUT_PORTS_START( saturn )
 	PORT_CONFSETTING(0x70,"Megadrive 6B Pad")
 	PORT_CONFSETTING(0x80,"Saturn Mouse")
 	PORT_CONFSETTING(0x90,"<unconnected>")
+
+	PORT_START("fake")
+	PORT_CONFNAME(0x01,0x01,"Master-Slave Comms Hack")
+	PORT_CONFSETTING(0x00,"No")
+	PORT_CONFSETTING(0x01,"Yes")
 INPUT_PORTS_END
 
 #define STV_PLAYER_INPUTS(_n_, _b1_, _b2_, _b3_,_b4_)                       \
@@ -2348,6 +2353,24 @@ static MACHINE_CONFIG_DERIVED( stv_slot, stv )
 MACHINE_CONFIG_END
 
 
+/* we use a clever hack here. Basically 0x60ffc13 is used for master slave comms, synching there should avoid crashes in several spots. */
+READ32_MEMBER(saturn_state::workram_h_comms_r)
+{
+	if(m_fake_comms->read() & 1)
+		machine().scheduler().synchronize(); // force resync
+
+	return m_workram_h[0x0ffc10/4];
+}
+
+WRITE32_MEMBER(saturn_state::workram_h_comms_w)
+{
+	if(m_fake_comms->read() & 1)
+		machine().scheduler().synchronize(); // force resync
+
+	COMBINE_DATA(&m_workram_h[0x0ffc10/4]);
+}
+
+
 void saturn_state::saturn_init_driver(int rgn)
 {
 	m_saturn_region = rgn;
@@ -2356,6 +2379,11 @@ void saturn_state::saturn_init_driver(int rgn)
 	// set compatible options
 	sh2drc_set_options(machine().device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 	sh2drc_set_options(machine().device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x060ffc10, 0x060ffc13, read32_delegate(FUNC(saturn_state::workram_h_comms_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x060ffc10, 0x060ffc13, write32_delegate(FUNC(saturn_state::workram_h_comms_w),this));
+	machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x060ffc10, 0x060ffc13, read32_delegate(FUNC(saturn_state::workram_h_comms_r),this));
+	machine().device("slave")->memory().space(AS_PROGRAM).install_write_handler(0x060ffc10, 0x060ffc13, write32_delegate(FUNC(saturn_state::workram_h_comms_w),this));
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	m_minit_boost = 400;

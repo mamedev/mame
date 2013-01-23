@@ -7,14 +7,18 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_workram_l(*this, "workram_l"),
 			m_workram_h(*this, "workram_h"),
-			m_sound_ram(*this, "sound_ram") { }
+			m_sound_ram(*this, "sound_ram"),
+			m_fake_comms(*this, "fake")
+			{ }
 
 	required_shared_ptr<UINT32> m_workram_l;
 	required_shared_ptr<UINT32> m_workram_h;
+	required_shared_ptr<UINT16> m_sound_ram;
+	optional_ioport m_fake_comms;
+
 	UINT8     *m_backupram;
 	UINT8     *m_cart_backupram;
 	UINT32    *m_scu_regs;
-	required_shared_ptr<UINT16> m_sound_ram;
 	UINT16    *m_scsp_regs;
 	UINT16    *m_vdp2_regs;
 	UINT32    *m_vdp2_vram;
@@ -24,6 +28,7 @@ public:
 
 	UINT8     m_NMI_reset;
 	UINT8     m_en_68k;
+
 
 	struct {
 		UINT32    src[3];       /* Source DMA lv n address*/
@@ -228,6 +233,8 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_cart_dram1_w);
 	DECLARE_READ32_MEMBER(saturn_cs1_r);
 	DECLARE_WRITE32_MEMBER(saturn_cs1_w);
+	DECLARE_READ32_MEMBER(workram_h_comms_r);
+	DECLARE_WRITE32_MEMBER(workram_h_comms_w);
 	WRITE_LINE_MEMBER(scsp_to_main_irq);
 	void saturn_init_driver(int rgn);
 
