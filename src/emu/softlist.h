@@ -48,6 +48,9 @@ enum softlist_type
 	MCFG_DEVICE_MODIFY( _tag ) \
 	software_list_device::static_set_filter(*device, _filter);
 
+#define MCFG_SOFTWARE_LIST_REMOVE( _tag ) \
+	MCFG_DEVICE_REMOVE( _tag )
+
 
 // ======================> software_list_device
 

@@ -221,7 +221,7 @@ static const floppy_interface kayproii_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(kayproii),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 

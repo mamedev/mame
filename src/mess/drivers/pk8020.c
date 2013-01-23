@@ -168,7 +168,7 @@ static const floppy_interface pk8020_floppy_interface =
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_DSHD,
 	LEGACY_FLOPPY_OPTIONS_NAME(pk8020),
-	NULL,
+	"floppy_5_25",
 	NULL
 };
 

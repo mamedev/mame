@@ -973,9 +973,6 @@ static MACHINE_CONFIG_START( next_base, next_state )
 	MCFG_NEXTMO_ADD("mo",
 					line_cb_t(FUNC(next_state::mo_irq), static_cast<next_state *>(owner)),
 					line_cb_t(FUNC(next_state::mo_drq), static_cast<next_state *>(owner)))
-
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( next, next_base )
@@ -986,6 +983,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( next_fdc_base, next_base )
 	MCFG_N82077AA_ADD("fdc", n82077aa_device::MODE_PS2)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", next_floppies, "35ed", 0, next_state::floppy_formats)
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "next")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nexts, next_fdc_base )
