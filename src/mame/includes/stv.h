@@ -102,6 +102,7 @@ public:
 		UINT8 SMEM[4];
 		UINT8 intback;
 		UINT8 rtc_data[7];
+		UINT8 slave_on;
 	}m_smpc;
 
 	struct {

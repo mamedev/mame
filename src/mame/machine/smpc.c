@@ -225,6 +225,8 @@ static TIMER_CALLBACK( smpc_slave_enable )
 	state->m_slave->set_input_line(INPUT_LINE_RESET, param ? ASSERT_LINE : CLEAR_LINE);
 	state->m_smpc.OREG[31] = param + 0x02; //read-back for last command issued
 	state->m_smpc.SF = 0x00; //clear hand-shake flag
+	state->m_smpc.slave_on = param;
+//	printf("%d %d\n",machine.primary_screen->hpos(),machine.primary_screen->vpos());
 }
 
 static TIMER_CALLBACK( smpc_sound_enable )
@@ -612,11 +614,17 @@ static void smpc_nmi_req(running_machine &machine)
 	state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void smpc_nmi_set(running_machine &machine,UINT8 cmd)
+static TIMER_CALLBACK( smpc_nmi_set )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	state->m_NMI_reset = cmd;
+//	printf("%d %d\n",machine.primary_screen->hpos(),machine.primary_screen->vpos());
+	state->m_NMI_reset = param;
+	/* put issued command in OREG31 */
+	state->m_smpc.OREG[31] = 0x19 + param;
+	/* clear hand-shake flag */
+	state->m_smpc.SF = 0x00;
+
 	//state->m_smpc.OREG[0] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 }
 
@@ -640,8 +648,11 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 		//case 0x01: Master OFF?
 		case 0x02:
 		case 0x03:
-			if(LOG_SMPC) printf ("SMPC: Slave %s\n",(data & 1) ? "off" : "on");
-			space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_slave_enable),data & 1);
+			if(LOG_SMPC) printf ("SMPC: Slave %s %d %d\n",(data & 1) ? "off" : "on",space.machine().primary_screen->hpos(),space.machine().primary_screen->vpos());
+			if((data & 1) != (state->m_smpc.slave_on & 1))
+				space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_slave_enable),data & 1);
+			else /* guess: if Slave state is equal to the previous one, just execute less code. ask Greatest Nine '97. Unless SMPC is really so fast ... */
+				space.machine().scheduler().timer_set(attotime::from_usec(5), FUNC(smpc_slave_enable),data & 1);
 			break;
 		case 0x06:
 		case 0x07:
@@ -712,8 +723,8 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 			break;
 		case 0x19:
 		case 0x1a:
-			if(LOG_SMPC) printf ("SMPC: NMI %sable\n",data & 1 ? "Dis" : "En");
-			smpc_nmi_set(space.machine(),data & 1);
+			if(LOG_SMPC) printf ("SMPC: NMI %sable %d %d\n",data & 1 ? "Dis" : "En",space.machine().primary_screen->hpos(),space.machine().primary_screen->vpos());
+			space.machine().scheduler().timer_set(attotime::from_usec(100), FUNC(smpc_nmi_set),data & 1);
 			break;
 		default:
 			printf ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space.device().tag(), space.device().safe_pc(), data);
@@ -769,7 +780,7 @@ WRITE8_HANDLER( stv_SMPC_w )
 		smpc_comreg_exec(space,data,1);
 
 		// we've processed the command, clear status flag
-		if(data != 0x10 && data != 0x02 && data != 0x03 && data != 0xe && data != 0xf)
+		if(data != 0x10 && data != 0x02 && data != 0x03 && data != 0xe && data != 0xf && data != 0x19 && data != 0x1a)
 		{
 			state->m_smpc.OREG[31] = data; //read-back command
 			state->m_smpc.SF = 0x00;
@@ -856,7 +867,10 @@ READ8_HANDLER( saturn_SMPC_r )
 		return_data = state->m_smpc.SR;
 
 	if (offset == 0x63)
+	{
+		//printf("SF %d %d\n",space.machine().primary_screen->hpos(),space.machine().primary_screen->vpos());
 		return_data = state->m_smpc.SF;
+	}
 
 	if (offset == 0x75 || offset == 0x77)//PDR1/2 read
 	{
@@ -926,7 +940,7 @@ WRITE8_HANDLER( saturn_SMPC_w )
 		smpc_comreg_exec(space,data,0);
 
 		// we've processed the command, clear status flag
-		if(data != 0x10 && data != 2 && data != 3 && data != 6 && data != 7 && data != 0x0e && data != 0x0f)
+		if(data != 0x10 && data != 2 && data != 3 && data != 6 && data != 7 && data != 0x0e && data != 0x0f && data != 0x19 && data != 0x1a)
 		{
 			state->m_smpc.OREG[31] = data; //read-back for last command issued
 			state->m_smpc.SF = 0x00; //clear hand-shake flag
