@@ -60,7 +60,6 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="disk_serial" value="1113" />
 			<feature name="part_number" value="2B50002-00" />
-			<feature name="disk_label" value="" />
 			<dataarea name="flop" size="71587">
 				<rom name="amcall.imd" size="71587" crc="9f767e1d" sha1="aef5a9496312f2380d3f8b8bec22bb07fe51c76b" offset="0" />
 			</dataarea>
@@ -72,9 +71,8 @@
 		<year>1983</year>
 		<publisher>Drive C:</publisher>
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="disk_serial" value="" />
 			<feature name="part_number" value="162880" />
-			<feature name="disk_label" value="Loader & Archive" />
+			<feature name="disk_label" value="Loader &amp; Archive" />
 			<dataarea name="flop" size="78223">
 				<rom name="drive_c.imd" size="78223" crc="eb70fcef" sha1="f3b743f61c6e84a6f970d63ca4a9f614df03d9d6" offset="0" />
 			</dataarea>
