@@ -1178,7 +1178,7 @@ static INPUT_PORTS_START( saturn )
 	PORT_CONFSETTING(0x90,"<unconnected>")
 
 	PORT_START("fake")
-	PORT_CONFNAME(0x01,0x01,"Master-Slave Comms Hack")
+	PORT_CONFNAME(0x01,0x00,"Master-Slave Comms Hack")
 	PORT_CONFSETTING(0x00,"No")
 	PORT_CONFSETTING(0x01,"Yes")
 INPUT_PORTS_END
