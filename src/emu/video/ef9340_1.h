@@ -74,7 +74,7 @@ protected:
 	} m_ef9340;
 	UINT8   m_ef934x_ram_a[1024];
 	UINT8   m_ef934x_ram_b[1024];
-	UINT8   m_ef934x_ext_char_ram[1024];
+	UINT8   m_ef934x_ext_char_ram[2048];   /* The G7400 has 2KB of external ram hooked up. The datasheet only describes how to hookup 1KB. */
 };
 
 
