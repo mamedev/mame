@@ -239,7 +239,7 @@ WRITE8_MEMBER(sms_state::sms_input_write)
 		case 0x04:  /* Sports Pad */
 			if (data != m_sports_pad_last_data_1)
 			{
-				UINT32 cpu_cycles = downcast<cpu_device *>(&space.device())->total_cycles();
+				UINT32 cpu_cycles = m_main_cpu->total_cycles();
 
 				m_sports_pad_last_data_1 = data;
 				if (cpu_cycles - m_last_sports_pad_time_1 > 512)
@@ -261,7 +261,7 @@ WRITE8_MEMBER(sms_state::sms_input_write)
 		case 0x40:  /* Sports Pad */
 			if (data != m_sports_pad_last_data_2)
 			{
-				UINT32 cpu_cycles = downcast<cpu_device *>(&space.device())->total_cycles();
+				UINT32 cpu_cycles = m_main_cpu->total_cycles();
 
 				m_sports_pad_last_data_2 = data;
 				if (cpu_cycles - m_last_sports_pad_time_2 > 2048)
@@ -856,7 +856,7 @@ READ8_MEMBER(sms_state::gg_input_port_2_r)
 
 READ8_MEMBER(sms_state::sms_sscope_r)
 {
-	int sscope = machine().root_device().ioport("SEGASCOPE")->read_safe(0x00);
+	int sscope = ioport("SEGASCOPE")->read_safe(0x00);
 
 	if ( sscope )
 	{
@@ -872,7 +872,7 @@ WRITE8_MEMBER(sms_state::sms_sscope_w)
 {
 	m_mainram[0x1FF8 + offset] = data;
 
-	int sscope = machine().root_device().ioport("SEGASCOPE")->read_safe(0x00);
+	int sscope = ioport("SEGASCOPE")->read_safe(0x00);
 
 	if ( sscope )
 	{
@@ -1919,7 +1919,7 @@ MACHINE_START_MEMBER(sms_state,sms)
 	m_ym = machine().device("ym2413");
 	m_left_lcd = machine().device("left_lcd");
 	m_right_lcd = machine().device("right_lcd");
-	m_space = &machine().device("maincpu")->memory().space(AS_PROGRAM);
+	m_space = &m_main_cpu->space(AS_PROGRAM);
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(sms_state::lightgun_tick),this));
@@ -2080,13 +2080,13 @@ WRITE8_MEMBER(sms_state::sms_store_control_w)
 	logerror("0x%04X: sms_store_control write 0x%02X\n", space.device().safe_pc(), data);
 	if (data & 0x02)
 	{
-		machine().device<cpu_device>("maincpu")->resume(SUSPEND_REASON_HALT);
+		m_main_cpu->resume(SUSPEND_REASON_HALT);
 	}
 	else
 	{
 		/* Pull reset line of CPU #0 low */
-		machine().device("maincpu")->reset();
-		machine().device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
+		m_main_cpu->reset();
+		m_main_cpu->suspend(SUSPEND_REASON_HALT, 1);
 	}
 	m_store_control = data;
 }
@@ -2186,7 +2186,7 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 
 	if (&screen != m_main_scr)
 	{
-		sscope = machine().root_device().ioport("SEGASCOPE")->read_safe(0x00);
+		sscope = ioport("SEGASCOPE")->read_safe(0x00);
 		if (!sscope)
 		{
 			// without SegaScope, both LCDs for glasses go black
@@ -2214,7 +2214,7 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 		// save a copy of current bitmap for the binocular hack
 		if (sscope)
 		{
-			sscope_binocular_hack = machine().root_device().ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
+			sscope_binocular_hack = ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
 
 			if (&screen == m_left_lcd)
 			{
@@ -2234,7 +2234,7 @@ UINT32 sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitmap
 		// use the copied bitmap for the binocular hack
 		if (sscope)
 		{
-			sscope_binocular_hack = machine().root_device().ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
+			sscope_binocular_hack = ioport("SSCOPE_BINOCULAR")->read_safe(0x00);
 
 			if (&screen == m_left_lcd)
 			{
