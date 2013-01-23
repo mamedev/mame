@@ -68,7 +68,7 @@ static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(data, i)) bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[1];
+		if (BIT(data, 7-i)) bitmap.pix32(y, x + i) = RGB_MONOCHROME_GREEN_HIGHLIGHT[1];
 	}
 }
 
