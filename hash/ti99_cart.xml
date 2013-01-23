@@ -707,9 +707,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Burgertime -->
+<!-- Softlist entry for Burgertime (beta) -->
 <software name="burgertb">
-	<description>Burgertime</description>
+	<description>Burgertime (beta)</description>
 	<year>1983</year>
 	<publisher>Data East USA</publisher>
 	<info name="serial" value="PHM 3233"/>
@@ -723,7 +723,7 @@
 </software>
 <!-- Softlist entry for Burgertime -->
 <software name="burgertm">
-	<description>Burgertime (Alt)</description>
+	<description>Burgertime</description>
 	<year>1983</year>
 	<publisher>Data East USA</publisher>
 	<info name="serial" value="PHM 3233"/>
@@ -749,9 +749,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Demonstration -->
+<!-- Softlist entry for Demonstration (German) -->
 <software name="demode">
-	<description>Demonstration</description>
+	<description>Demonstration (German)</description>
 	<year>1979</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3001"/>
@@ -764,7 +764,7 @@
 </software>
 <!-- Softlist entry for Demonstration -->
 <software name="demo">
-	<description>Demonstration (Alt)</description>
+	<description>Demonstration</description>
 	<year>1979</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3001"/>
@@ -775,9 +775,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Treasure Island -->
+<!-- Softlist entry for Treasure Island (beta) -->
 <software name="treaislb">
-	<description>Treasure Island</description>
+	<description>Treasure Island (beta)</description>
 	<year>1983</year>
 	<publisher>Deco</publisher>
 	<info name="serial" value="PHM 3168"/>
@@ -791,7 +791,7 @@
 </software>
 <!-- Softlist entry for Treasure Island -->
 <software name="treasure">
-	<description>Treasure Island (Alt)</description>
+	<description>Treasure Island</description>
 	<year>1983</year>
 	<publisher>Data East USA</publisher>
 	<info name="serial" value="PHM 3168"/>
@@ -805,9 +805,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Diagnostic -->
+<!-- Softlist entry for Diagnostic (French) -->
 <software name="diagfr">
-	<description>Diagnostic</description>
+	<description>Diagnostic (French)</description>
 	<year>1979</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3000"/>
@@ -820,7 +820,7 @@
 </software>
 <!-- Softlist entry for Diagnostic -->
 <software name="diag">
-	<description>Diagnostic (Alt)</description>
+	<description>Diagnostic</description>
 	<year>1979</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3000"/>
@@ -831,9 +831,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Disk Manager -->
+<!-- Softlist entry for Disk Manager 1 (multilingual) -->
 <software name="diskmn1i">
-	<description>Disk Manager</description>
+	<description>Disk Manager 1 (multilingual)</description>
 	<year>1980</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3019"/>
@@ -845,9 +845,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Disk Manager -->
+<!-- Softlist entry for Disk Manager 1 -->
 <software name="diskman1">
-	<description>Disk Manager (Alt)</description>
+	<description>Disk Manager 1</description>
 	<year>19??</year>
 	<publisher>&lt;unknown&gt;</publisher>
 	<info name="serial" value="PHM3019"/>
@@ -860,9 +860,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Disk Manager -->
+<!-- Softlist entry for Disk Manager 2 -->
 <software name="diskman2">
-	<description>Disk Manager (Alt 2)</description>
+	<description>Disk Manager 2</description>
 	<year>1982</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3089"/>
@@ -1086,7 +1086,7 @@
 <software name="nature">
 	<description>Nature's Way</description>
 	<year>19??</year>
-	<publisher>&lt;unknown&gt;</publisher>
+	<publisher>unknown</publisher>
 	<part name="cart" interface="ti99_cart">
 		<feature name="pcb" value="standard"/>
 		<dataarea name="rom_socket" size="0x1ffa">
@@ -1640,9 +1640,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for GRAM-based Disassembler -->
+<!-- Softlist entry for GRAM-based Disassembler (w/o help) -->
 <software name="gramdisn">
-	<description>GRAM-based Disassembler</description>
+	<description>GRAM-based Disassembler (w/o help)</description>
 	<year>1992</year>
 	<publisher>Thierry Nouspikel</publisher>
 	<info name="version" value="1.0"/>
@@ -1656,7 +1656,7 @@
 </software>
 <!-- Softlist entry for GRAM-based Disassembler -->
 <software name="gramdis">
-	<description>GRAM-based Disassembler (Alt)</description>
+	<description>GRAM-based Disassembler</description>
 	<year>1992</year>
 	<publisher>Thierry Nouspikel</publisher>
 	<info name="version" value="1.0"/>
@@ -1697,9 +1697,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Household Budget Management -->
+<!-- Softlist entry for Household Budget Management (French) -->
 <software name="hbudgetf">
-	<description>Household Budget Management</description>
+	<description>Household Budget Management (French)</description>
 	<year>1979</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3007"/>
@@ -1712,7 +1712,7 @@
 </software>
 <!-- Softlist entry for Household Budget Management -->
 <software name="hbudget">
-	<description>Household Budget Management (Alt)</description>
+	<description>Household Budget Management</description>
 	<year>1979</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3007"/>
@@ -1780,9 +1780,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Fathom -->
+<!-- Softlist entry for Fathom (beta) -->
 <software name="fathomb">
-	<description>Fathom</description>
+	<description>Fathom (beta)</description>
 	<year>1983</year>
 	<publisher>Imagic</publisher>
 	<info name="serial" value="PHM 3222"/>
@@ -1796,7 +1796,7 @@
 </software>
 <!-- Softlist entry for Fathom -->
 <software name="fathom">
-	<description>Fathom (Alt)</description>
+	<description>Fathom</description>
 	<year>1983</year>
 	<publisher>Imagic</publisher>
 	<info name="serial" value="PHM 3222"/>
@@ -1848,9 +1848,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Wing War -->
+<!-- Softlist entry for Wing War (beta) -->
 <software name="windwarb">
-	<description>Wing War</description>
+	<description>Wing War (beta)</description>
 	<year>1983</year>
 	<publisher>Imagic</publisher>
 	<part name="cart" interface="ti99_cart">
@@ -1862,7 +1862,7 @@
 </software>
 <!-- Softlist entry for Wing War -->
 <software name="wingwar">
-	<description>Wing War (Alt)</description>
+	<description>Wing War</description>
 	<year>1983</year>
 	<publisher>Imagic</publisher>
 	<part name="cart" interface="ti99_cart">
@@ -2370,9 +2370,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Munch Man -->
+<!-- Softlist entry for Munch Man (beta) -->
 <software name="munchmnb">
-	<description>Munch Man</description>
+	<description>Munch Man (beta)</description>
 	<year>1981</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3057"/>
@@ -2387,7 +2387,7 @@
 </software>
 <!-- Softlist entry for Munch Man -->
 <software name="munchman">
-	<description>Munch Man (Alt)</description>
+	<description>Munch Man</description>
 	<year>1982</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3057"/>
@@ -2590,9 +2590,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Topper -->
+<!-- Softlist entry for Topper v1 -->
 <software name="topper83">
-	<description>Topper</description>
+	<description>Topper v1</description>
 	<year>1983</year>
 	<publisher>Navarone</publisher>
 	<part name="cart" interface="ti99_cart">
@@ -2602,9 +2602,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Topper -->
+<!-- Softlist entry for Topper v2 -->
 <software name="topper86">
-	<description>Topper (Alt)</description>
+	<description>Topper v2</description>
 	<year>1986</year>
 	<publisher>Navarone</publisher>
 	<part name="cart" interface="ti99_cart">
@@ -2629,9 +2629,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Number Magic -->
+<!-- Softlist entry for Number Magic (multilingual) -->
 <software name="numbmagi">
-	<description>Number Magic</description>
+	<description>Number Magic (multilingual)</description>
 	<year>1979</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3004"/>
@@ -2644,7 +2644,7 @@
 </software>
 <!-- Softlist entry for Number Magic -->
 <software name="numbmag">
-	<description>Number Magic (Alt)</description>
+	<description>Number Magic</description>
 	<year>1979</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3004"/>
@@ -2793,9 +2793,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Personal Record Keeping -->
+<!-- Softlist entry for Personal Record Keeping (German/Italian) -->
 <software name="perrecdi">
-	<description>Personal Record Keeping</description>
+	<description>Personal Record Keeping (German/Italian)</description>
 	<year>1981</year>
 	<publisher>Texas Instruments</publisher>
 	<part name="cart" interface="ti99_cart">
@@ -2807,7 +2807,7 @@
 </software>
 <!-- Softlist entry for Personal Record Keeping -->
 <software name="perrec">
-	<description>Personal Record Keeping (Alt)</description>
+	<description>Personal Record Keeping</description>
 	<year>1979</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3013"/>
@@ -2976,9 +2976,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for RXB + Super Editor Assembler -->
+<!-- Softlist entry for RXB + Super Editor Assembler v1002 -->
 <software name="rxb1002">
-	<description>RXB + Super Editor Assembler</description>
+	<description>RXB + Super Editor Assembler v1002</description>
 	<year>19??</year>
 	<publisher>Western Horizon</publisher>
 	<info name="version" value="1002"/>
@@ -2995,9 +2995,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for RXB + Super Editor Assembler -->
+<!-- Softlist entry for RXB + Super Editor Assembler v2002 -->
 <software name="rxb2002">
-	<description>RXB + Super Editor Assembler (Alt)</description>
+	<description>RXB + Super Editor Assembler v2002</description>
 	<year>19??</year>
 	<publisher>Rich Gilbertson</publisher>
 	<info name="version" value="2002"/>
@@ -3014,9 +3014,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for RXB -->
+<!-- Softlist entry for RXB v2.37 -->
 <software name="rxb237">
-	<description>RXB</description>
+	<description>RXB v2.37</description>
 	<year>19??</year>
 	<publisher>Rich Gilbertson</publisher>
 	<info name="version" value="2.37"/>
@@ -3033,9 +3033,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Extended Basic -->
+<!-- Softlist entry for RXB v2.4 -->
 <software name="rxb24">
-	<description>Extended Basic (Alt)</description>
+	<description>RXB v2.4</description>
 	<year>19??</year>
 	<publisher>Rich Gilbertson</publisher>
 	<info name="version" value="2.4"/>
@@ -3052,9 +3052,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for Extended Basic -->
+<!-- Softlist entry for RXB v2.6 -->
 <software name="rxb26">
-	<description>Extended Basic (Alt 2)</description>
+	<description>RXB v2.6</description>
 	<year>19??</year>
 	<publisher>Rich Gilbertson</publisher>
 	<info name="version" value="2.6"/>
@@ -3107,9 +3107,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for RXB v2001 &amp; Super Editor Assembler -->
+<!-- Softlist entry for RXB + Super Editor Assembler v2001 -->
 <software name="rxbv2001">
-	<description>RXB v2001 &amp; Super Editor Assembler</description>
+	<description>RXB + Super Editor Assembler v2001</description>
 	<year>19??</year>
 	<publisher>Rich Gilbertson</publisher>
 	<part name="cart" interface="ti99_cart">
@@ -4157,9 +4157,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for TI LOGO II -->
+<!-- Softlist entry for TI LOGO II (German) -->
 <software name="logo2d">
-	<description>TI LOGO II</description>
+	<description>TI LOGO II (German)</description>
 	<year>1984</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3109"/>
@@ -4173,9 +4173,9 @@
 		</dataarea>
 	</part>
 </software>
-<!-- Softlist entry for TI LOGO II -->
+<!-- Softlist entry for TI LOGO II (Italian) -->
 <software name="logo2i">
-	<description>TI LOGO II (Alt)</description>
+	<description>TI LOGO II (Italian)</description>
 	<year>198?</year>
 	<publisher>Texas Instruments</publisher>
 	<part name="cart" interface="ti99_cart">
@@ -4190,7 +4190,7 @@
 </software>
 <!-- Softlist entry for TI LOGO II -->
 <software name="logo2">
-	<description>TI LOGO II (Alt 2)</description>
+	<description>TI LOGO II</description>
 	<year>1984</year>
 	<publisher>Texas Instruments</publisher>
 	<info name="serial" value="PHM 3109"/>
