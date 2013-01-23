@@ -2060,7 +2060,7 @@
 	  #                                                                                     |
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	3 Free Games Pack (USA) [81606]
-	3D Baseball (USA) [T-15906H]
+	3D Baseball: The Majors (USA) [T-15906H]
 
 A
 
@@ -14680,7 +14680,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying 3D Baseball (J) (T-18003G)... -->
 	<software name="3dbballj" cloneof="3dbball" supported="no">
-		<description>3D Baseball (Jpn)</description>
+		<description>3D Baseball: The Majors (Jpn)</description>
 		<year>1997</year>
 		<publisher>BMG Japan</publisher>
 		<info name="serial" value="T-18003G"/>
@@ -34544,7 +34544,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying dw-sat-0842-3D_Baseball-usa... -->
 	<software name="3dbball" supported="no">
-		<description>3D Baseball (USA)</description>
+		<description>3D Baseball: The Majors (USA)</description>
 		<year>1996</year>
 		<publisher>Crystal Dynamics</publisher>
 		<info name="serial" value="T-15906H"/>
