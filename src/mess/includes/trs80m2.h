@@ -10,6 +10,7 @@
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/ctronics.h"
+#include "machine/keyboard.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
 #include "machine/trs80m2kb.h"
@@ -98,8 +99,7 @@ public:
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);
 	DECLARE_WRITE_LINE_MEMBER( kb_clock_w );
-
-	void scan_keyboard();
+	DECLARE_WRITE8_MEMBER( kbd_w );
 
 	// memory state
 	int m_boot_rom;
@@ -121,7 +121,7 @@ public:
 	int m_de;
 	int m_rtc_int;
 	int m_enable_rtc_int;
-	TIMER_DEVICE_CALLBACK_MEMBER(trs80m2_keyboard_tick);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 };
 
