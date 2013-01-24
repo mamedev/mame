@@ -70,6 +70,23 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 			m_ieee(*this, IEEE488_TAG),
+			m_pa0(*this, "PA0"),
+			m_pa1(*this, "PA1"),
+			m_pa2(*this, "PA2"),
+			m_pa3(*this, "PA3"),
+			m_pa4(*this, "PA4"),
+			m_pa5(*this, "PA5"),
+			m_pa6(*this, "PA6"),
+			m_pa7(*this, "PA7"),
+			m_pb0(*this, "PB0"),
+			m_pb1(*this, "PB1"),
+			m_pb2(*this, "PB2"),
+			m_pb3(*this, "PB3"),
+			m_pb4(*this, "PB4"),
+			m_pb5(*this, "PB5"),
+			m_pb6(*this, "PB6"),
+			m_pb7(*this, "PB7"),
+			m_lock(*this, "LOCK"),
 			m_ext_cpu(*this, EXT_I8088_TAG),
 			m_ext_pic(*this, EXT_I8259A_TAG),
 			m_ext_cia(*this, EXT_MOS6526_TAG),
@@ -105,6 +122,23 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<pet_datassette_port_device> m_cassette;
 	required_device<ieee488_device> m_ieee;
+	required_ioport m_pa0;
+	required_ioport m_pa1;
+	required_ioport m_pa2;
+	required_ioport m_pa3;
+	required_ioport m_pa4;
+	required_ioport m_pa5;
+	required_ioport m_pa6;
+	required_ioport m_pa7;
+	required_ioport m_pb0;
+	required_ioport m_pb1;
+	required_ioport m_pb2;
+	required_ioport m_pb3;
+	required_ioport m_pb4;
+	required_ioport m_pb5;
+	required_ioport m_pb6;
+	required_ioport m_pb7;
+	required_ioport m_lock;
 
 	optional_device<cpu_device> m_ext_cpu;
 	optional_device<pic8259_device> m_ext_pic;

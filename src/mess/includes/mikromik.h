@@ -44,6 +44,17 @@ public:
 			m_floppy1(*this, UPD765_TAG ":1:525qd"),
 			m_ram(*this, RAM_TAG),
 			m_video_ram(*this, "video_ram"),
+			m_y0(*this, "Y0"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2"),
+			m_y3(*this, "Y3"),
+			m_y4(*this, "Y4"),
+			m_y5(*this, "Y5"),
+			m_y6(*this, "Y6"),
+			m_y7(*this, "Y7"),
+			m_y8(*this, "Y8"),
+			m_y9(*this, "Y9"),
+			m_special(*this, "SPECIAL"),
 			m_a8(0),
 			m_recall(0),
 			m_dack3(1),
@@ -64,6 +75,17 @@ public:
 	required_device<floppy_image_device> m_floppy1;
 	required_device<ram_device> m_ram;
 	required_shared_ptr<UINT8> m_video_ram;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_y8;
+	required_ioport m_y9;
+	required_ioport m_special;
 
 	virtual void machine_start();
 	virtual void machine_reset();

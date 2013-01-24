@@ -48,6 +48,7 @@ public:
 			m_cassette(*this, CASSETTE_TAG),
 			m_ram(*this, RAM_TAG),
 			m_exp(*this, EXPANSION_TAG),
+			m_modifiers(*this, "MODIFIERS"),
 			m_char_ram(*this, "char_ram")
 	{ }
 
@@ -57,6 +58,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<comx_expansion_slot_device> m_exp;
+	required_ioport m_modifiers;
 	optional_shared_ptr<UINT8> m_char_ram;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

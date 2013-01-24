@@ -106,6 +106,18 @@ protected:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_sound_device> m_discrete;
+	required_ioport m_x0;
+	required_ioport m_x1;
+	required_ioport m_x2;
+	required_ioport m_x3;
+	required_ioport m_x4;
+	required_ioport m_x5;
+	required_ioport m_x6;
+	required_ioport m_x7;
+	required_ioport m_x8;
+	required_ioport m_x9;
+	required_ioport m_x10;
+	required_ioport m_x11;
 
 	int m_txd;                      // transmit data
 	int m_keylatch;                 // keyboard row latch

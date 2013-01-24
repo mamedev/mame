@@ -39,7 +39,7 @@
 
 inline void c128_state::check_interrupts()
 {
-	int restore = BIT(ioport("SPECIAL")->read(), 7);
+	int restore = BIT(m_special->read(), 7);
 
 	int irq = m_cia1_irq || m_vic_irq || m_exp_irq;
 	int nmi = m_cia2_irq || restore || m_exp_nmi;
@@ -767,7 +767,7 @@ READ_LINE_MEMBER( c128_state::mmu_exrom_r )
 
 READ_LINE_MEMBER( c128_state::mmu_sense40_r )
 {
-	return BIT(ioport("SPECIAL")->read(), 4);
+	return BIT(m_special->read(), 4);
 }
 
 static MOS8722_INTERFACE( mmu_intf )
@@ -933,9 +933,9 @@ READ8_MEMBER( c128_state::cia1_pb_r )
 
 	data &= cbm_common_cia0_port_b_r(m_cia1, cia0porta);
 
-	if (!BIT(m_vic_k, 0)) data &= ~ioport("K0")->read();
-	if (!BIT(m_vic_k, 1)) data &= ~ioport("K1")->read();
-	if (!BIT(m_vic_k, 2)) data &= ~ioport("K2")->read();
+	if (!BIT(m_vic_k, 0)) data &= ~m_k0->read();
+	if (!BIT(m_vic_k, 1)) data &= ~m_k1->read();
+	if (!BIT(m_vic_k, 2)) data &= ~m_k2->read();
 
 	return data;
 }

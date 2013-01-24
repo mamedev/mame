@@ -58,6 +58,10 @@ public:
 			m_user(*this, C64_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+			m_special(*this, "SPECIAL"),
+			m_k0(*this, "K0"),
+			m_k1(*this, "K1"),
+			m_k2(*this, "K2"),
 			m_z80en(0),
 			m_loram(1),
 			m_hiram(1),
@@ -104,6 +108,10 @@ public:
 	required_device<c64_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	required_device<pet_datassette_port_device> m_cassette;
+	required_ioport m_special;
+	required_ioport m_k0;
+	required_ioport m_k1;
+	required_ioport m_k2;
 
 	virtual void machine_start();
 	virtual void machine_reset();

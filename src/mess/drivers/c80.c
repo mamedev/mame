@@ -2,8 +2,6 @@
 
     C-80
 
-    12/05/2009 Skeleton driver.
-
     Pasting:
         0-F : as is
         + (inc) : ^
@@ -109,9 +107,9 @@ READ8_MEMBER( c80_state::pio1_pa_r )
 	{
 		if (!BIT(m_keylatch, i))
 		{
-			if (!BIT(ioport("ROW0")->read(), i)) data &= ~0x01;
-			if (!BIT(ioport("ROW1")->read(), i)) data &= ~0x02;
-			if (!BIT(ioport("ROW2")->read(), i)) data &= ~0x04;
+			if (!BIT(m_row0->read(), i)) data &= ~0x01;
+			if (!BIT(m_row1->read(), i)) data &= ~0x02;
+			if (!BIT(m_row2->read(), i)) data &= ~0x04;
 		}
 	}
 

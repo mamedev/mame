@@ -358,6 +358,18 @@ inline void abc800_keyboard_device::key_down(int state)
 abc800_keyboard_device::abc800_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ABC800_KEYBOARD, "ABC-800 Keyboard", tag, owner, clock),
 		m_maincpu(*this, I8048_TAG),
+		m_x0(*this, "X0"),
+		m_x1(*this, "X1"),
+		m_x2(*this, "X2"),
+		m_x3(*this, "X3"),
+		m_x4(*this, "X4"),
+		m_x5(*this, "X5"),
+		m_x6(*this, "X6"),
+		m_x7(*this, "X7"),
+		m_x8(*this, "X8"),
+		m_x9(*this, "X9"),
+		m_x10(*this, "X10"),
+		m_x11(*this, "X11"),
 		m_row(0),
 		m_txd(1),
 		m_clk(0),
@@ -435,12 +447,25 @@ READ_LINE_MEMBER( abc800_keyboard_device::txd_r )
 
 READ8_MEMBER( abc800_keyboard_device::kb_p1_r )
 {
-	static const char *const ABC800_KEY_ROW[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7", "X8", "X9", "X10", "X11" };
 	UINT8 data = 0xff;
 
-	if (m_stb && m_row < 12)
+	if (m_stb)
 	{
-		data = ioport(ABC800_KEY_ROW[m_row])->read();
+		switch (m_row)
+		{
+		case 0: data = m_x0->read(); break;
+		case 1: data = m_x1->read(); break;
+		case 2: data = m_x2->read(); break;
+		case 3: data = m_x3->read(); break;
+		case 4: data = m_x4->read(); break;
+		case 5: data = m_x5->read(); break;
+		case 6: data = m_x6->read(); break;
+		case 7: data = m_x7->read(); break;
+		case 8: data = m_x8->read(); break;
+		case 9: data = m_x9->read(); break;
+		case 10: data = m_x10->read(); break;
+		case 11: data = m_x11->read(); break;
+		}
 	}
 
 	return data;

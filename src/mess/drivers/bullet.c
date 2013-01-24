@@ -327,7 +327,7 @@ READ8_MEMBER( bullet_state::info_r )
 	UINT8 data = 0;
 
 	// DIP switches
-	data |= ioport("SW1")->read() & 0x0f;
+	data |= m_sw1->read() & 0x0f;
 
 	// floppy
 	data |= m_fdc->hld_r() << 4;
@@ -579,7 +579,7 @@ READ8_MEMBER( bulletf_state::hwsts_r )
 	data |= m_centronics->busy_r();
 
 	// DIP switches
-	data |= ioport("SW1")->read() & 0x06;
+	data |= m_sw1->read() & 0x06;
 
 	// floppy
 	data |= (m_floppy ? m_floppy->twosid_r() : 1) << 3;

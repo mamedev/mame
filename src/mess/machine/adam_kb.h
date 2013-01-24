@@ -54,6 +54,19 @@ protected:
 	virtual void adamnet_reset_w(int state);
 
 	required_device<cpu_device> m_maincpu;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_y8;
+	required_ioport m_y9;
+	required_ioport m_y10;
+	required_ioport m_y11;
+	required_ioport m_y12;
 
 	UINT16 m_key_y;
 };

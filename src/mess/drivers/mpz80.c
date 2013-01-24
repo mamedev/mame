@@ -468,7 +468,7 @@ READ8_MEMBER( mpz80_state::switch_r )
 	data |= m_int_pend << 1;
 
 	// boot address
-	data |= ioport("16C")->read() & 0xfc;
+	data |= m_16c->read() & 0xfc;
 
 	return data;
 }

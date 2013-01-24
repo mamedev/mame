@@ -357,12 +357,12 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 READ_LINE_MEMBER( comx35_state::shift_r )
 {
-	return BIT(ioport("MODIFIERS")->read(), 0);
+	return BIT(m_modifiers->read(), 0);
 }
 
 READ_LINE_MEMBER( comx35_state::control_r )
 {
-	return BIT(ioport("MODIFIERS")->read(), 1);
+	return BIT(m_modifiers->read(), 1);
 }
 
 static CDP1871_INTERFACE( kbc_intf )

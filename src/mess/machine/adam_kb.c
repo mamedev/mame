@@ -227,6 +227,19 @@ adam_keyboard_device::adam_keyboard_device(const machine_config &mconfig, const 
 	: device_t(mconfig, ADAM_KB, "Adam keyboard", tag, owner, clock),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),
+		m_y0(*this, "Y0"),
+		m_y1(*this, "Y1"),
+		m_y2(*this, "Y2"),
+		m_y3(*this, "Y3"),
+		m_y4(*this, "Y4"),
+		m_y5(*this, "Y5"),
+		m_y6(*this, "Y6"),
+		m_y7(*this, "Y7"),
+		m_y8(*this, "Y8"),
+		m_y9(*this, "Y9"),
+		m_y10(*this, "Y10"),
+		m_y11(*this, "Y11"),
+		m_y12(*this, "Y12"),
 		m_key_y(0x1ff)
 {
 }
@@ -276,19 +289,19 @@ READ8_MEMBER( adam_keyboard_device::p1_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(m_key_y, 0)) data &= ioport("Y0")->read();
-	if (!BIT(m_key_y, 1)) data &= ioport("Y1")->read();
-	if (!BIT(m_key_y, 2)) data &= ioport("Y2")->read();
-	if (!BIT(m_key_y, 3)) data &= ioport("Y3")->read();
-	if (!BIT(m_key_y, 4)) data &= ioport("Y4")->read();
-	if (!BIT(m_key_y, 5)) data &= ioport("Y5")->read();
-	if (!BIT(m_key_y, 6)) data &= ioport("Y6")->read();
-	if (!BIT(m_key_y, 7)) data &= ioport("Y7")->read();
-	if (!BIT(m_key_y, 8)) data &= ioport("Y8")->read();
-	if (!BIT(m_key_y, 9)) data &= ioport("Y9")->read();
-	if (!BIT(m_key_y, 10)) data &= ioport("Y10")->read();
-	if (!BIT(m_key_y, 11)) data &= ioport("Y11")->read();
-	if (!BIT(m_key_y, 12)) data &= ioport("Y12")->read();
+	if (!BIT(m_key_y, 0)) data &= m_y0->read();
+	if (!BIT(m_key_y, 1)) data &= m_y1->read();
+	if (!BIT(m_key_y, 2)) data &= m_y2->read();
+	if (!BIT(m_key_y, 3)) data &= m_y3->read();
+	if (!BIT(m_key_y, 4)) data &= m_y4->read();
+	if (!BIT(m_key_y, 5)) data &= m_y5->read();
+	if (!BIT(m_key_y, 6)) data &= m_y6->read();
+	if (!BIT(m_key_y, 7)) data &= m_y7->read();
+	if (!BIT(m_key_y, 8)) data &= m_y8->read();
+	if (!BIT(m_key_y, 9)) data &= m_y9->read();
+	if (!BIT(m_key_y, 10)) data &= m_y10->read();
+	if (!BIT(m_key_y, 11)) data &= m_y11->read();
+	if (!BIT(m_key_y, 12)) data &= m_y12->read();
 
 	return data;
 }

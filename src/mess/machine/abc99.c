@@ -527,6 +527,8 @@ abc99_device::abc99_device(const machine_config &mconfig, const char *tag, devic
 		m_maincpu(*this, I8035_Z2_TAG),
 		m_mousecpu(*this, I8035_Z5_TAG),
 		m_speaker(*this, SPEAKER_TAG),
+		m_z14(*this, "Z14"),
+		m_mouseb(*this, "MOUSEB"),
 		m_si(1),
 		m_si_en(1),
 		m_so(1),
@@ -691,7 +693,7 @@ READ8_MEMBER( abc99_device::z2_p2_r )
 
 	*/
 
-	UINT8 data = ioport("Z14")->read() << 5;
+	UINT8 data = m_z14->read() << 5;
 
 	return data;
 }
@@ -741,7 +743,7 @@ READ8_MEMBER( abc99_device::z5_p1_r )
 	UINT8 data = 0;
 
 	// mouse buttons
-	data |= (ioport("MOUSEB")->read() & 0x07) << 4;
+	data |= (m_mouseb->read() & 0x07) << 4;
 
 	// serial input
 	data |= m_si << 7;

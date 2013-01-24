@@ -47,6 +47,7 @@ public:
 			m_floppy0(*this, UPD765_TAG ":1:525dd"),
 			m_floppy1(*this, UPD765_TAG ":2:525dd"),
 			m_floppy_timer(*this, FLOPPY_TIMER_TAG),
+			m_modifiers(*this, "MODIFIERS"),
 			m_video_ram(*this, "video_ram")
 	{ }
 
@@ -61,6 +62,7 @@ public:
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	required_device<timer_device> m_floppy_timer;
+	required_ioport m_modifiers;
 
 	virtual void machine_start();
 	virtual void machine_reset();

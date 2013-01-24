@@ -34,16 +34,15 @@ public:
 			m_usart1(*this, I8251_1_TAG),
 			m_fdc(*this, UPD765_TAG),
 			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, UPD765_TAG ":0:525dd"),
-			m_floppy1(*this, UPD765_TAG ":1:525dd"),
+			m_floppy0(*this, UPD765_TAG ":0"),
+			m_floppy1(*this, UPD765_TAG ":1"),
+			m_floppy(NULL),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_ieee488(*this, IEEE488_TAG),
 			m_terminal(*this, TERMINAL_TAG),
 			m_reset(1),
 			m_fdc_int(0),
-			m_fdie(0),
-			m_sl0(1),
-			m_sl1(1)
+			m_fdie(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -52,8 +51,9 @@ public:
 	required_device<i8251_device> m_usart1;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	floppy_image_device *m_floppy;
 	required_device<centronics_device> m_centronics;
 	required_device<ieee488_device> m_ieee488;
 	required_device<generic_terminal_device> m_terminal;
@@ -63,8 +63,8 @@ public:
 
 	void update_fdc_int();
 
-	DECLARE_READ8_MEMBER( mmu_r );
-	DECLARE_WRITE8_MEMBER( mmu_w );
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( br1_w );
 	DECLARE_WRITE_LINE_MEMBER( br2_w );
 	DECLARE_WRITE8_MEMBER( ppi0_pc_w );
@@ -78,12 +78,11 @@ public:
 
 	void fdc_irq(bool state);
 
+	const UINT8 *m_rom;
 	int m_reset;
 
 	// floppy state
 	int m_fdc_int;
 	int m_fdie;
-	int m_sl0;
-	int m_sl1;
 	DECLARE_DRIVER_INIT(sage2);
 };

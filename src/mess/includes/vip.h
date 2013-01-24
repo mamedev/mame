@@ -31,6 +31,8 @@ public:
 			m_byteio(*this, VIP_BYTEIO_PORT_TAG),
 			m_exp(*this, VIP_EXPANSION_SLOT_TAG),
 			m_ram(*this, RAM_TAG),
+			m_run(*this, "RUN"),
+			m_keypad(*this, "KEYPAD"),
 			m_8000(1),
 			m_vdc_int(CLEAR_LINE),
 			m_vdc_dma_out(CLEAR_LINE),
@@ -52,6 +54,8 @@ public:
 	required_device<vip_byteio_port_device> m_byteio;
 	required_device<vip_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
+	required_ioport m_run;
+	required_ioport m_keypad;
 
 	virtual void machine_start();
 	virtual void machine_reset();

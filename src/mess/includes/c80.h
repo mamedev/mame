@@ -21,12 +21,18 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
 			m_pio1(*this, Z80PIO1_TAG),
-			m_cassette(*this, CASSETTE_TAG)
+			m_cassette(*this, CASSETTE_TAG),
+			m_row0(*this, "ROW0"),
+			m_row1(*this, "ROW1"),
+			m_row2(*this, "ROW2")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio1;
 	required_device<cassette_image_device> m_cassette;
+	required_ioport m_row0;
+	required_ioport m_row1;
+	required_ioport m_row2;
 
 	virtual void machine_start();
 

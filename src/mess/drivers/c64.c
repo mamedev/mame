@@ -47,7 +47,7 @@
 
 void c64_state::check_interrupts()
 {
-	int restore = BIT(ioport("SPECIAL")->read(), 7);
+	int restore = BIT(m_special->read(), 7);
 
 	int irq = m_cia1_irq || m_vic_irq || m_exp_irq;
 	int nmi = m_cia2_irq || restore || m_exp_nmi;

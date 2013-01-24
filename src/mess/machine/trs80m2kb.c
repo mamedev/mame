@@ -93,8 +93,7 @@ machine_config_constructor trs80m2_keyboard_device::device_mconfig_additions() c
 //-------------------------------------------------
 
 INPUT_PORTS_START( trs80m2_keyboard )
-/*
-    PORT_START("X0")
+    PORT_START("Y0")
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -104,7 +103,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("X1")
+    PORT_START("Y1")
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
@@ -114,7 +113,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("X2")
+    PORT_START("Y2")
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REPEAT")
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Right SHIFT") PORT_CODE(KEYCODE_RSHIFT)
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
@@ -124,7 +123,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("X3")
+    PORT_START("Y3")
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("cannot read label")
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
@@ -134,7 +133,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
 
-    PORT_START("X4")
+    PORT_START("Y4")
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BACKSPACE") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
@@ -144,7 +143,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
-    PORT_START("X5")
+    PORT_START("Y5")
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("HOLD")
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
@@ -154,7 +153,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 2") PORT_CODE(KEYCODE_2_PAD)
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 
-    PORT_START("X6")
+    PORT_START("Y6")
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
@@ -164,7 +163,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 7") PORT_CODE(KEYCODE_7_PAD)
 
-    PORT_START("X7")
+    PORT_START("Y7")
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
@@ -174,7 +173,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD)
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)
 
-    PORT_START("X8")
+    PORT_START("Y8")
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
@@ -184,7 +183,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 8") PORT_CODE(KEYCODE_8_PAD)
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 1") PORT_CODE(KEYCODE_1_PAD)
 
-    PORT_START("X9")
+    PORT_START("Y9")
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
@@ -194,7 +193,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("XA")
+    PORT_START("YA")
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
@@ -204,7 +203,7 @@ INPUT_PORTS_START( trs80m2_keyboard )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
-    PORT_START("XB")
+    PORT_START("YB")
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
@@ -213,7 +212,6 @@ INPUT_PORTS_START( trs80m2_keyboard )
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("TAB") PORT_CODE(KEYCODE_TAB) PORT_CHAR('\t')
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-*/
 INPUT_PORTS_END
 
 
@@ -239,6 +237,18 @@ ioport_constructor trs80m2_keyboard_device::device_input_ports() const
 trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TRS80M2_KEYBOARD, "TRS-80 Model II Keyboard", tag, owner, clock),
 		m_maincpu(*this, I8021_TAG),
+		m_y0(*this, "Y0"),
+		m_y1(*this, "Y1"),
+		m_y2(*this, "Y2"),
+		m_y3(*this, "Y3"),
+		m_y4(*this, "Y4"),
+		m_y5(*this, "Y5"),
+		m_y6(*this, "Y6"),
+		m_y7(*this, "Y7"),
+		m_y8(*this, "Y8"),
+		m_y9(*this, "Y9"),
+		m_ya(*this, "YA"),
+		m_yb(*this, "YB"),
 		m_busy(1),
 		m_data(1),
 		m_clk(0)
@@ -311,18 +321,18 @@ READ8_MEMBER( trs80m2_keyboard_device::kb_p0_r )
 
 	switch (m_y)
 	{
-		case 0: data &= ioport("X0")->read(); break;
-		case 1: data &= ioport("X1")->read(); break;
-		case 2: data &= ioport("X2")->read(); break;
-		case 3: data &= ioport("X3")->read(); break;
-		case 4: data &= ioport("X4")->read(); break;
-		case 5: data &= ioport("X5")->read(); break;
-		case 6: data &= ioport("X6")->read(); break;
-		case 7: data &= ioport("X7")->read(); break;
-		case 8: data &= ioport("X8")->read(); break;
-		case 9: data &= ioport("X9")->read(); break;
-		case 0xa: data &= ioport("XA")->read(); break;
-		case 0xb: data &= ioport("XB")->read(); break;
+        case 0: data &= m_y0->read(); break;
+        case 1: data &= m_y1->read(); break;
+        case 2: data &= m_y2->read(); break;
+        case 3: data &= m_y3->read(); break;
+        case 4: data &= m_y4->read(); break;
+        case 5: data &= m_y5->read(); break;
+        case 6: data &= m_y6->read(); break;
+        case 7: data &= m_y7->read(); break;
+        case 8: data &= m_y8->read(); break;
+        case 9: data &= m_y9->read(); break;
+        case 0xa: data &= m_ya->read(); break;
+        case 0xb: data &= m_yb->read(); break;
 	}
 
 	return data;

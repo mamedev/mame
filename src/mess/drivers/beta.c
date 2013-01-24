@@ -113,14 +113,14 @@ READ8_MEMBER( beta_state::riot_pa_r )
 
 	switch (m_ls145_p)
 	{
-	case 6: data &= ioport("Q6")->read(); break;
-	case 7: data &= ioport("Q7")->read(); break;
-	case 8: data &= ioport("Q8")->read(); break;
-	case 9: data &= ioport("Q9")->read(); break;
+	case 6: data &= m_q6->read(); break;
+	case 7: data &= m_q7->read(); break;
+	case 8: data &= m_q8->read(); break;
+	case 9: data &= m_q9->read(); break;
 	default:
 		if (!m_eprom_oe && !m_eprom_ce)
 		{
-			data = memregion(EPROM_TAG)->base()[m_eprom_addr & 0x7ff];
+			data = m_eprom[m_eprom_addr & 0x7ff];
 			popmessage("EPROM read %04x = %02x\n", m_eprom_addr & 0x7ff, data);
 		}
 	}
@@ -207,7 +207,7 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 	if (BIT(data, 6) && (!BIT(m_old_data, 7) && BIT(data, 7)))
 	{
 		popmessage("EPROM write %04x = %02x\n", m_eprom_addr & 0x7ff, m_eprom_data);
-		memregion(EPROM_TAG)->base()[m_eprom_addr & 0x7ff] &= m_eprom_data;
+		m_eprom[m_eprom_addr & 0x7ff] &= m_eprom_data;
 	}
 
 	m_old_data = data;
@@ -237,7 +237,10 @@ void beta_state::machine_start()
 {
 	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beta_state::led_refresh),this));
 
-	/* register for state saving */
+	// find memory regions
+	m_eprom = memregion(EPROM_TAG)->base();
+
+	// state saving
 	save_item(NAME(m_eprom_oe));
 	save_item(NAME(m_eprom_ce));
 	save_item(NAME(m_eprom_addr));

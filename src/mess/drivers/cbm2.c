@@ -1376,22 +1376,22 @@ UINT8 cbm2_state::read_keyboard()
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_tpi2_pa, 0)) data &= ioport("PA0")->read();
-	if (!BIT(m_tpi2_pa, 1)) data &= ioport("PA1")->read();
-	if (!BIT(m_tpi2_pa, 2)) data &= ioport("PA2")->read();
-	if (!BIT(m_tpi2_pa, 3)) data &= ioport("PA3")->read();
-	if (!BIT(m_tpi2_pa, 4)) data &= ioport("PA4")->read();
-	if (!BIT(m_tpi2_pa, 5)) data &= ioport("PA5")->read();
-	if (!BIT(m_tpi2_pa, 6)) data &= ioport("PA6")->read();
-	if (!BIT(m_tpi2_pa, 7)) data &= ioport("PA7")->read();
-	if (!BIT(m_tpi2_pb, 0)) data &= ioport("PB0")->read() & ioport("LOCK")->read();
-	if (!BIT(m_tpi2_pb, 1)) data &= ioport("PB1")->read();
-	if (!BIT(m_tpi2_pb, 2)) data &= ioport("PB2")->read();
-	if (!BIT(m_tpi2_pb, 3)) data &= ioport("PB3")->read();
-	if (!BIT(m_tpi2_pb, 4)) data &= ioport("PB4")->read();
-	if (!BIT(m_tpi2_pb, 5)) data &= ioport("PB5")->read();
-	if (!BIT(m_tpi2_pb, 6)) data &= ioport("PB6")->read();
-	if (!BIT(m_tpi2_pb, 7)) data &= ioport("PB7")->read();
+	if (!BIT(m_tpi2_pa, 0)) data &= m_pa0->read();
+	if (!BIT(m_tpi2_pa, 1)) data &= m_pa1->read();
+	if (!BIT(m_tpi2_pa, 2)) data &= m_pa2->read();
+	if (!BIT(m_tpi2_pa, 3)) data &= m_pa3->read();
+	if (!BIT(m_tpi2_pa, 4)) data &= m_pa4->read();
+	if (!BIT(m_tpi2_pa, 5)) data &= m_pa5->read();
+	if (!BIT(m_tpi2_pa, 6)) data &= m_pa6->read();
+	if (!BIT(m_tpi2_pa, 7)) data &= m_pa7->read();
+	if (!BIT(m_tpi2_pb, 0)) data &= m_pb0->read() & m_lock->read();
+	if (!BIT(m_tpi2_pb, 1)) data &= m_pb1->read();
+	if (!BIT(m_tpi2_pb, 2)) data &= m_pb2->read();
+	if (!BIT(m_tpi2_pb, 3)) data &= m_pb3->read();
+	if (!BIT(m_tpi2_pb, 4)) data &= m_pb4->read();
+	if (!BIT(m_tpi2_pb, 5)) data &= m_pb5->read();
+	if (!BIT(m_tpi2_pb, 6)) data &= m_pb6->read();
+	if (!BIT(m_tpi2_pb, 7)) data &= m_pb7->read();
 
 	return data;
 }

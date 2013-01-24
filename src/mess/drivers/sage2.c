@@ -38,16 +38,16 @@
 //**************************************************************************
 
 //-------------------------------------------------
-//  mmu_r -
+//  read -
 //-------------------------------------------------
 
-READ8_MEMBER( sage2_state::mmu_r )
+READ8_MEMBER( sage2_state::read )
 {
 	UINT8 data = 0xff;
 
 	if (m_reset || (offset >= 0xfe0000))
 	{
-		data = memregion(M68000_TAG)->base()[offset & 0x1fff];
+		data = m_rom[offset & 0x1fff];
 	}
 	else if (offset < 0x080000)
 	{
@@ -59,10 +59,10 @@ READ8_MEMBER( sage2_state::mmu_r )
 
 
 //-------------------------------------------------
-//  mmu_w -
+//  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( sage2_state::mmu_w )
+WRITE8_MEMBER( sage2_state::write )
 {
 	if (offset < 0x080000)
 	{
@@ -82,9 +82,9 @@ WRITE8_MEMBER( sage2_state::mmu_w )
 
 static ADDRESS_MAP_START( sage2_mem, AS_PROGRAM, 16, sage2_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0xfeffff) AM_READWRITE8(mmu_r, mmu_w, 0xffff)
+	AM_RANGE(0x000000, 0xfeffff) AM_READWRITE8(read, write, 0xffff)
 	AM_RANGE(0xffc000, 0xffc007) AM_DEVREADWRITE8_LEGACY(I8253_1_TAG, pit8253_r, pit8253_w, 0x00ff)
-//  AM_RANGE(0xffc010, 0xffc01f) AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
+	AM_RANGE(0xffc010, 0xffc01f) AM_NOP //AM_DEVREADWRITE8(TMS9914_TAG, tms9914_device, read, write, 0x00ff)
 	AM_RANGE(0xffc020, 0xffc027) AM_DEVREADWRITE8(I8255A_0_TAG, i8255_device, read, write, 0x00ff) // i8255, DIPs + Floppy ctrl port
 	AM_RANGE(0xffc030, 0xffc031) AM_DEVREADWRITE8(I8251_1_TAG, i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xffc032, 0xffc033) AM_DEVREADWRITE8(I8251_1_TAG, i8251_device, status_r, control_w, 0x00ff)
@@ -246,23 +246,18 @@ WRITE8_MEMBER( sage2_state::ppi0_pc_w )
 	update_fdc_int();
 
 	// drive select
-	m_sl0 = BIT(data, 3);
-	m_sl1 = BIT(data, 4);
+	m_floppy = NULL;
 
-	if(m_sl0)
-		m_fdc->set_floppy(m_floppy0);
-	else if(m_sl1)
-		m_fdc->set_floppy(m_floppy1);
-	else
-		m_fdc->set_floppy(NULL);
+	if (BIT(data, 3)) m_floppy = m_floppy0->get_device();
+	if (BIT(data, 4)) m_floppy = m_floppy1->get_device();
+
+	m_fdc->set_floppy(m_floppy);
 
 	// floppy motor
-	m_floppy0->mon_w(BIT(data, 5));
-	m_floppy1->mon_w(BIT(data, 5));
-
+	if (m_floppy) m_floppy->mon_w(BIT(data, 5));
+	
 	// FDC reset
-	if(BIT(data, 7))
-		m_fdc->reset();
+	if(BIT(data, 7)) m_fdc->reset();
 }
 
 static I8255A_INTERFACE( ppi0_intf )
@@ -303,8 +298,7 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 	data = m_fdc->get_irq();
 
 	// floppy write protected
-	if (!m_sl0) data |= m_floppy0->wpt_r() << 1;
-	if (!m_sl1) data |= m_floppy1->wpt_r() << 1;
+	data = (m_floppy ? m_floppy->wpt_r() : 1) << 1;
 
 	// RS-232 ring indicator
 
@@ -477,12 +471,12 @@ static const i8251_interface usart1_intf =
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( sage2_floppies )
-		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD ) // Mitsubishi M4859
 SLOT_INTERFACE_END
 
 void sage2_state::update_fdc_int()
 {
-	m_maincpu->set_input_line(M68K_IRQ_6, m_fdie & m_fdc_int);
+	m_maincpu->set_input_line(M68K_IRQ_6, m_fdie && m_fdc_int);
 }
 
 void sage2_state::fdc_irq(bool state)
@@ -491,10 +485,6 @@ void sage2_state::fdc_irq(bool state)
 	update_fdc_int();
 }
 
-void sage2_state::machine_start()
-{
-	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(sage2_state::fdc_irq), this));
-}
 
 //-------------------------------------------------
 //  centronics_interface centronics_intf
@@ -554,6 +544,20 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //**************************************************************************
 
 //-------------------------------------------------
+//  MACHINE_START( sage2 )
+//-------------------------------------------------
+
+void sage2_state::machine_start()
+{
+	// find memory regions
+	m_rom = memregion(M68000_TAG)->base();
+
+	// setup floppy callbacks
+	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(sage2_state::fdc_irq), this));
+}
+
+
+//-------------------------------------------------
 //  MACHINE_RESET( sage2 )
 //-------------------------------------------------
 
@@ -590,8 +594,8 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_I8251_ADD(I8251_1_TAG, usart1_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, false, false)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sage2_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", sage2_floppies, "525dd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sage2_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", sage2_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_IEEE488_BUS_ADD(ieee488_intf)
 
 	// internal ram

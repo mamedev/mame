@@ -42,6 +42,16 @@ public:
 			m_floppy0(*this, WD2797_TAG":0"),
 			m_floppy1(*this, WD2797_TAG":1"),
 			m_floppy(NULL),
+			m_y0(*this, "Y0"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2"),
+			m_y3(*this, "Y3"),
+			m_y4(*this, "Y4"),
+			m_y5(*this, "Y5"),
+			m_y6(*this, "Y6"),
+			m_y7(*this, "Y7"),
+			m_y8(*this, "Y8"),
+			m_y9(*this, "Y9"),
 			m_video_ram(*this, "videoram")
 	{ }
 
@@ -55,6 +65,16 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_y8;
+	required_ioport m_y9;
 
 	virtual void machine_start();
 

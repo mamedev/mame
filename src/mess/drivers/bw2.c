@@ -433,13 +433,20 @@ READ8_MEMBER( bw2_state::ppi_pb_r )
 
 	*/
 
-	static const char *const rownames[] = { "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9" };
-
 	UINT8 data = 0xff;
 
-	if (m_kb <= 9)
+	switch (m_kb)
 	{
-		data = ioport(rownames[m_kb])->read();
+	case 0: data = m_y0->read(); break;
+	case 1: data = m_y1->read(); break;
+	case 2: data = m_y2->read(); break;
+	case 3: data = m_y3->read(); break;
+	case 4: data = m_y4->read(); break;
+	case 5: data = m_y5->read(); break;
+	case 6: data = m_y6->read(); break;
+	case 7: data = m_y7->read(); break;
+	case 8: data = m_y8->read(); break;
+	case 9: data = m_y9->read(); break;
 	}
 
 	return data;

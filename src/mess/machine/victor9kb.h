@@ -86,6 +86,19 @@ private:
 	devcb_resolved_write_line   m_out_kbrdy_func;
 
 	required_device<cpu_device> m_maincpu;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_y8;
+	required_ioport m_y9;
+	required_ioport m_ya;
+	required_ioport m_yb;
+	required_ioport m_yc;
 
 	UINT8 m_y;
 	int m_kbrdy;
