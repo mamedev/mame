@@ -12,6 +12,11 @@
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
 #include "machine/wd17xx.h"
+#include "imagedev/cassette.h"
+#include "sound/dac.h"
+#include "machine/ram.h"
+#include "machine/ctronics.h"
+
 
 struct SVI_318
 {
@@ -50,7 +55,29 @@ class svi318_state : public driver_device
 {
 public:
 	svi318_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cassette(*this, CASSETTE_TAG)
+		, m_dac(*this, "dac")
+		, m_ppi(*this, "ppi8255")
+		, m_ram(*this, RAM_TAG)
+		, m_centronics(*this, "centronics")
+		, m_ins8250_0(*this, "ins8250_0")
+		, m_ins8250_1(*this, "ins8250_1")
+		, m_line0(*this, "LINE0")
+		, m_line1(*this, "LINE1")
+		, m_line2(*this, "LINE2")
+		, m_line3(*this, "LINE3")
+		, m_line4(*this, "LINE4")
+		, m_line5(*this, "LINE5")
+		, m_line6(*this, "LINE6")
+		, m_line7(*this, "LINE7")
+		, m_line8(*this, "LINE8")
+		, m_line9(*this, "LINE9")
+		, m_line10(*this, "LINE10")
+		, m_joysticks(*this, "JOYSTICKS")
+		, m_buttons(*this, "BUTTONS")
+	{ }
 
 	SVI_318 m_svi;
 	UINT8 *m_pcart;
@@ -82,6 +109,31 @@ public:
 	DECLARE_WRITE8_MEMBER(svi318_ppi_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(svi_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(svi_fdc_drq_w);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
+	required_device<dac_device> m_dac;
+	required_device<i8255_device> m_ppi;
+	required_device<ram_device> m_ram;
+	required_device<centronics_device> m_centronics;
+	required_device<ins8250_device> m_ins8250_0;
+	required_device<ins8250_device> m_ins8250_1;
+	required_ioport m_line0;
+	required_ioport m_line1;
+	required_ioport m_line2;
+	required_ioport m_line3;
+	required_ioport m_line4;
+	required_ioport m_line5;
+	required_ioport m_line6;
+	required_ioport m_line7;
+	required_ioport m_line8;
+	required_ioport m_line9;
+	required_ioport m_line10;
+	required_ioport m_joysticks;
+	required_ioport m_buttons;
+
+	void svi318_set_banks();
 };
 
 
