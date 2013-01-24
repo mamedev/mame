@@ -6,6 +6,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "cpu/i86/i86.h"
 #include "machine/com8116.h"
+#include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "machine/sa1403d.h"
 #include "machine/scsibus.h"
@@ -77,8 +78,8 @@ public:
 	DECLARE_READ8_MEMBER( kbpio_pb_r );
 	DECLARE_WRITE_LINE_MEMBER( intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	DECLARE_WRITE8_MEMBER( kbd_w );
 
-	void scan_keyboard();
 	void bankswitch(int bank);
 	void update_nmi();
 	void fdc_intrq_w(bool state);
@@ -103,7 +104,6 @@ public:
 	int m_8n5;                          /* 5.25" / 8" drive select */
 	int m_400_460;                      /* double sided disk detect */
 
-	TIMER_DEVICE_CALLBACK_MEMBER(xerox820_keyboard_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 };
 
