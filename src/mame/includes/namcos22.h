@@ -38,6 +38,7 @@ public:
 		m_master(*this,"master"),
 		m_slave(*this,"slave"),
 		m_mcu(*this,"mcu"),
+		m_iomcu(*this,"iomcu"),
 		m_spriteram(*this,"spriteram"),
 		m_shareram(*this,"shareram"),
 		m_system_controller(*this,"syscontrol"),
@@ -59,6 +60,7 @@ public:
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
 	required_device<cpu_device> m_mcu;
+	optional_device<cpu_device> m_iomcu;
 	optional_shared_ptr<UINT32> m_spriteram;
 	required_shared_ptr<UINT32> m_shareram;
 	required_shared_ptr<UINT32> m_system_controller;
