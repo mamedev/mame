@@ -15300,7 +15300,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
-				<rom name="magic touch.rom" size="32768" crc="381bcb71" sha1="b9d5ec448d5de19c62dc09ffe3b257e0cef610d2" offset="0" />
+				<rom name="magic touch (a).rom" size="32768" crc="381bcb71" sha1="b9d5ec448d5de19c62dc09ffe3b257e0cef610d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
