@@ -3,6 +3,7 @@
 
 #include "imagedev/chd_cd.h"
 #include "psxcddrv.h"
+#include "sound/spu.h"
 
 #define MAX_PSXCD_TIMERS    (4)
 
@@ -171,6 +172,8 @@ private:
 	void add_system_event(event *ev);
 
 	devcb2_write_line m_irq_handler;
+	cpu_device *m_maincpu;
+	spu_device *m_spu;
 };
 
 
