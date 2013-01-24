@@ -4,7 +4,13 @@ const device_type PSX_ANALOG_CONTROLLER = &device_creator<psx_analog_controller_
 
 psx_analog_controller_device::psx_analog_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PSX_ANALOG_CONTROLLER, "Playstation Analog Controller", tag, owner, clock),
-		device_psx_controller_interface(mconfig, *this)
+		device_psx_controller_interface(mconfig, *this),
+		m_pad0(*this, "PSXPAD0"),
+		m_pad1(*this, "PSXPAD1"),
+		m_rstickx(*this, "PSXRSTICKX"),
+		m_rsticky(*this, "PSXRSTICKY"),
+		m_lstickx(*this, "PSXLSTICKX"),
+		m_lsticky(*this, "PSXLSTICKY")
 {
 }
 
@@ -23,24 +29,24 @@ UINT8 psx_analog_controller_device::pad_data(int count, bool analog)
 	switch(count)
 	{
 		case 2:
-			data = ioport("PSXPAD0")->read();
+			data = m_pad0->read();
 			if(!analog)
-				data |= 6;
+				data |= 6; // l3/r3
 			break;
 		case 3:
-			data = ioport("PSXPAD1")->read();
+			data = m_pad1->read();
 			break;
 		case 4:
-			data = ioport("PSXRSTICKX")->read();
+			data = m_rstickx->read();
 			break;
 		case 5:
-			data = ioport("PSXRSTICKY")->read();
+			data = m_rsticky->read();
 			break;
 		case 6:
-			data = ioport("PSXLSTICKX")->read();
+			data = m_lstickx->read();
 			break;
 		case 7:
-			data = ioport("PSXLSTICKY")->read();
+			data = m_lsticky->read();
 			break;
 	}
 	return data;
@@ -236,5 +242,5 @@ ioport_constructor psx_analog_controller_device::device_input_ports() const
 INPUT_CHANGED_MEMBER(psx_analog_controller_device::change_mode)
 {
 	if(!m_analoglock)
-		m_analogmode = ioport("PSXMISC")->read();
+		m_analogmode = newval;
 }

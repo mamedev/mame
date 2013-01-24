@@ -141,7 +141,9 @@ const device_type PSX_STANDARD_CONTROLLER = &device_creator<psx_standard_control
 
 psx_standard_controller_device::psx_standard_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PSX_STANDARD_CONTROLLER, "Playstation Standard Controller", tag, owner, clock),
-		device_psx_controller_interface(mconfig, *this)
+		device_psx_controller_interface(mconfig, *this),
+		m_pad0(*this,"PSXPAD0"),
+		m_pad1(*this,"PSXPAD1")
 {
 }
 
@@ -158,10 +160,10 @@ bool psx_standard_controller_device::get_pad(int count, UINT8 *odata, UINT8 idat
 			*odata = 0x5a;
 			break;
 		case 2:
-			*odata = ioport("PSXPAD0")->read();
+			*odata = m_pad0->read();
 			break;
 		case 3:
-			*odata = ioport("PSXPAD1")->read();
+			*odata = m_pad1->read();
 			break;
 		case 4:
 			return false;

@@ -27,6 +27,13 @@ private:
 
 	UINT8 m_temp;
 	UINT8 m_cmd;
+
+	required_ioport m_pad0;
+	required_ioport m_pad1;
+	required_ioport m_rstickx;
+	required_ioport m_rsticky;
+	required_ioport m_lstickx;
+	required_ioport m_lsticky;
 };
 
 #endif /* PSXANALOG_H_ */
