@@ -275,9 +275,10 @@ static STREAM_UPDATE( svision_update )
 			state->dma.pos += state->dma.step;
 			if (state->dma.pos >= state->dma.size)
 			{
+				svision_state *sv_state = device->machine().driver_data<svision_state>();
 				state->dma.finished = TRUE;
 				state->dma.on = FALSE;
-				svision_irq(device->machine());
+				sv_state->svision_irq();
 			}
 		}
 	}

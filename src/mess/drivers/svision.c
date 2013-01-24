@@ -19,9 +19,9 @@
 
 
 // in pixel
-#define XSIZE (state->m_reg[0]&~3)
-#define XPOS state->m_reg[2]
-#define YPOS state->m_reg[3]
+#define XSIZE (m_reg[0]&~3)
+#define XPOS m_reg[2]
+#define YPOS m_reg[3]
 #define BANK m_reg[0x26]
 
 TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
@@ -29,14 +29,17 @@ TIMER_CALLBACK_MEMBER(svision_state::svision_pet_timer)
 	switch (m_pet.state)
 	{
 		case 0:
-			m_pet.input = machine().root_device().ioport("JOY2")->read();
+			if ( m_joy2 )
+			{
+				m_pet.input = m_joy2->read();
+			}
 			/* fall through */
 
 		case 2: case 4: case 6: case 8:
 		case 10: case 12: case 14:
-			m_pet.clock=m_pet.state&2;
-			m_pet.data=m_pet.input&1;
-			m_pet.input>>=1;
+			m_pet.clock = m_pet.state & 2;
+			m_pet.data = m_pet.input & 1;
+			m_pet.input >>= 1;
 			m_pet.state++;
 			break;
 
@@ -55,20 +58,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(svision_state::svision_pet_timer_dev)
 	svision_pet_timer(ptr,param);
 }
 
-void svision_irq(running_machine &machine)
+void svision_state::svision_irq()
 {
-	svision_state *state = machine.driver_data<svision_state>();
-	int irq = state->m_svision.timer_shot && (state->BANK & 2);
-	irq = irq || (*state->m_dma_finished && (state->BANK & 4));
+	int irq = m_svision.timer_shot && (BANK & 2);
+	irq = irq || (*m_dma_finished && (BANK & 4));
 
-	machine.device("maincpu")->execute().set_input_line(M65C02_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(M65C02_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(svision_state::svision_timer)
 {
 	m_svision.timer_shot = TRUE;
 	m_svision.timer1->enable(FALSE);
-	svision_irq( machine() );
+	svision_irq();
 }
 
 READ8_MEMBER(svision_state::svision_r)
@@ -77,34 +79,47 @@ READ8_MEMBER(svision_state::svision_r)
 	switch (offset)
 	{
 		case 0x20:
-			data = ioport("JOY")->read();
+			data = m_joy->read();
 			break;
+
 		case 0x21:
 			data &= ~0xf;
 			data |= m_reg[0x22] & 0xf;
 			if (m_pet.on)
 			{
 				if (!m_pet.clock)
+				{
 					data &= ~4;
+				}
 				if (!m_pet.data)
+				{
 					data &= ~8;
+				}
 			}
 			break;
+
 		case 0x27:
 			data &= ~3;
 			if (m_svision.timer_shot)
+			{
 				data|=1;
+			}
 			if (*m_dma_finished)
+			{
 				data|=2;
+			}
 			break;
+
 		case 0x24:
 			m_svision.timer_shot = FALSE;
-			svision_irq(machine());
+			svision_irq();
 			break;
+
 		case 0x25:
 			*m_dma_finished = FALSE;
-			svision_irq(machine());
+			svision_irq();
 			break;
+
 		default:
 			logerror("%.6f svision read %04x %02x\n", machine().time().as_double(),offset,data);
 			break;
@@ -125,34 +140,47 @@ WRITE8_MEMBER(svision_state::svision_w)
 		case 2:
 		case 3:
 			break;
+
 		case 0x26: /* bits 5,6 memory management for a000? */
 			logerror("%.6f svision write %04x %02x\n", machine().time().as_double(),offset,data);
-			membank("bank1")->set_base(machine().root_device().memregion("user1")->base() + ((m_reg[0x26] & 0xe0) << 9));
-			svision_irq(machine());
+			m_bank1->set_base(m_user1->base() + ((m_reg[0x26] & 0xe0) << 9));
+			svision_irq();
 			break;
+
 		case 0x23: /* delta hero irq routine write */
 			value = data;
 			if (!data)
+			{
 				value = 0x100;
+			}
 			if (BANK & 0x10)
+			{
 				delay = 16384;
+			}
 			else
+			{
 				delay = 256;
+			}
 			m_svision.timer1->enable(TRUE);
-			m_svision.timer1->reset(machine().device<cpu_device>("maincpu")->cycles_to_attotime(value * delay));
+			m_svision.timer1->reset(m_maincpu->cycles_to_attotime(value * delay));
 			break;
+
 		case 0x10: case 0x11: case 0x12: case 0x13:
 			svision_soundport_w(m_sound, 0, offset & 3, data);
 			break;
+
 		case 0x14: case 0x15: case 0x16: case 0x17:
 			svision_soundport_w(m_sound, 1, offset & 3, data);
 			break;
+
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c:
 			svision_sounddma_w(m_sound, space, offset - 0x18, data);
 			break;
+
 		case 0x28: case 0x29: case 0x2a:
 			svision_noise_w(m_sound, space, offset - 0x28, data);
 			break;
+
 		default:
 			logerror("%.6f svision write %04x %02x\n", machine().time().as_double(), offset, data);
 			break;
@@ -350,7 +378,6 @@ PALETTE_INIT_MEMBER(svision_state,svisionp)
 
 UINT32 svision_state::screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	svision_state *state = machine().driver_data<svision_state>();
 	int x, y, i, j=XPOS/4+YPOS*0x30;
 	UINT8 *videoram = m_videoram;
 
@@ -382,7 +409,6 @@ UINT32 svision_state::screen_update_svision(screen_device &screen, bitmap_ind16 
 
 UINT32 svision_state::screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	svision_state *state = machine().driver_data<svision_state>();
 	int x, y, i, j = XPOS/4+YPOS*0x30;
 	UINT8 *videoram = m_videoram;
 
@@ -426,7 +452,10 @@ DRIVER_INIT_MEMBER(svision_state,svision)
 	m_sound = machine().device("custom");
 	m_dma_finished = svision_dma_finished(m_sound);
 	m_pet.on = FALSE;
-	membank("bank2")->set_base(memregion("user1")->base() + 0x1c000);
+	m_user1 = memregion("user1");
+	m_bank1 = membank("bank1");
+	m_bank2 = membank("bank2");
+	m_bank2->set_base(m_user1->base() + 0x1c000);
 }
 
 DRIVER_INIT_MEMBER(svision_state,svisions)
@@ -434,8 +463,10 @@ DRIVER_INIT_MEMBER(svision_state,svisions)
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_sound = machine().device("custom");
 	m_dma_finished = svision_dma_finished(m_sound);
-	membank("bank2")->set_base(memregion("user1")->base() + 0x1c000);
-	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
+	m_user1 = memregion("user1");
+	m_bank1 = membank("bank1");
+	m_bank2 = membank("bank2");
+	m_bank2->set_base(m_user1->base() + 0x1c000);
 	m_pet.on = TRUE;
 	m_pet.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_pet_timer),this));
 }
@@ -476,7 +507,9 @@ static DEVICE_IMAGE_LOAD( svision_cart )
 
 	/* With the following, we mirror the cart in the whole "user1" memory region */
 	for (i = 0; i < mirror; i++)
+	{
 		memcpy(image.device().machine().root_device().memregion("user1")->base() + i * size, temp_copy, size);
+	}
 
 	auto_free(image.device().machine(), temp_copy);
 
@@ -487,7 +520,7 @@ void svision_state::machine_reset()
 {
 	m_svision.timer_shot = FALSE;
 	*m_dma_finished = FALSE;
-	membank("bank1")->set_base(memregion("user1")->base());
+	m_bank1->set_base(m_user1->base());
 }
 
 
@@ -495,7 +528,7 @@ MACHINE_RESET_MEMBER(svision_state,tvlink)
 {
 	m_svision.timer_shot = FALSE;
 	*m_dma_finished = FALSE;
-	membank("bank1")->set_base(memregion("user1")->base());
+	m_bank1->set_base(m_user1->base());
 	m_tvlink.palette_on = FALSE;
 
 	memset(m_reg + 0x800, 0xff, 0x40); // normally done from m_tvlink microcontroller
