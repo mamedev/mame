@@ -860,7 +860,7 @@ ApplyGamma( running_machine &machine, bitmap_rgb32 &bitmap )
 	}
 	else
 	{ /* system 22 */
-		const UINT8 *rlut = 0x000+(const UINT8 *)machine.root_device().memregion("user1")->base();
+		const UINT8 *rlut = 0x000+(const UINT8 *)machine.root_device().memregion("gamma_proms")->base();
 		const UINT8 *glut = 0x100+rlut;
 		const UINT8 *blut = 0x200+rlut;
 		for( y=0; y<bitmap.height(); y++ )

@@ -1178,7 +1178,7 @@ nthbyte( const UINT32 *pSource, int offs )
 	PORT_START("STEER") \
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 
-/* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
+/* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
 static void
 ReadAnalogDrivingPorts( running_machine &machine, UINT16 *gas, UINT16 *brake, UINT16 *steer )
 {
@@ -1187,7 +1187,7 @@ ReadAnalogDrivingPorts( running_machine &machine, UINT16 *gas, UINT16 *brake, UI
 	*steer = machine.root_device().ioport("STEER")->read();
 }
 
-/* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
+/* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
 static UINT16
 AnalogAsDigital( running_machine &machine )
 {
@@ -1239,7 +1239,7 @@ AnalogAsDigital( running_machine &machine )
 	return result;
 } /* AnalogAsDigital */
 
-/* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
+/* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
 static void
 HandleCoinage(running_machine &machine, int slots, int address_is_odd)
 {
@@ -1269,7 +1269,7 @@ HandleCoinage(running_machine &machine, int slots, int address_is_odd)
 	}
 } /* HandleCoinage */
 
-/* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
+/* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
 static void
 HandleDrivingIO( running_machine &machine )
 {
@@ -1327,7 +1327,7 @@ HandleDrivingIO( running_machine &machine )
 	}
 } /* HandleDrivingIO */
 
-/* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
+/* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
 static void
 HandleCyberCommandoIO( running_machine &machine )
 {
@@ -2580,10 +2580,10 @@ WRITE16_MEMBER(namcos22_state::s22mcu_shared_w)
 static ADDRESS_MAP_START( mcu_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE(s22mcu_shared_r, s22mcu_shared_w )
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("user4", 0xc000)
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user4", 0)
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("user4", 0)
-	AM_RANGE(0x280000, 0x2fffff) AM_ROM AM_REGION("user4", 0)
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu", 0xc000)
+	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mcu", 0)
+	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("mcu", 0)
+	AM_RANGE(0x280000, 0x2fffff) AM_ROM AM_REGION("mcu", 0)
 	AM_RANGE(0x301000, 0x301001) AM_NOP // watchdog? LEDs?
 	AM_RANGE(0x308000, 0x308003) AM_NOP // volume control IC?
 ADDRESS_MAP_END
@@ -2592,10 +2592,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mcu_s22_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE(s22mcu_shared_r, s22mcu_shared_w )
-	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu", 0)
-	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user4", 0)
-	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("user4", 0)
-	AM_RANGE(0x280000, 0x2fffff) AM_ROM AM_REGION("user4", 0)
+	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu_c74", 0)
+	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mcu", 0)
+	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("mcu", 0)
+	AM_RANGE(0x280000, 0x2fffff) AM_ROM AM_REGION("mcu", 0)
 	AM_RANGE(0x301000, 0x301001) AM_NOP // watchdog? LEDs?
 	AM_RANGE(0x308000, 0x308003) AM_NOP // volume control IC?
 ADDRESS_MAP_END
@@ -3321,9 +3321,7 @@ ROM_START( airco22b )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", ROMREGION_ERASE00 ) /* S22-BIOS ver1.30 */
-
-	ROM_REGION( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.20 */
 	ROM_LOAD( "acs1data.8k", 0, 0x080000, CRC(33824bc9) SHA1(80ec63883770e5eec1f5f1ddc16a85ef8f22a48b) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -3378,9 +3376,7 @@ ROM_START( alpinerc )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", ROMREGION_ERASE00 ) /* S22-BIOS ver1.30 */
-
-	ROM_REGION( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.30 */
 	ROM_LOAD( "ar1datab.8k", 0, 0x080000, CRC(c26306f8) SHA1(6d8d993c076d5ced523143a86bd0938b3794478d) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -3437,9 +3433,7 @@ ROM_START( alpinerd )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", ROMREGION_ERASE00 ) /* S22-BIOS ver1.30 */
-
-	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.30 */
 	ROM_LOAD( "ar1datab.8k", 0, 0x080000, CRC(c26306f8) SHA1(6d8d993c076d5ced523143a86bd0938b3794478d) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -3496,9 +3490,7 @@ ROM_START( alpinr2b )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", ROMREGION_ERASE00 ) /* S22-BIOS ver1.30 */
-
-	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.30 */
 	ROM_LOAD( "ars2data.8k",  0x000000, 0x080000, CRC(29b36dcb) SHA1(70fde130c11789c822829493a70ecefb077c0c15) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -3553,9 +3545,7 @@ ROM_START( alpinr2a )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", ROMREGION_ERASE00 ) /* S22-BIOS ver1.30 */
-
-	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.30 */
 	ROM_LOAD( "ars2data.8k",  0x000000, 0x080000, CRC(29b36dcb) SHA1(70fde130c11789c822829493a70ecefb077c0c15) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -3610,9 +3600,7 @@ ROM_START( alpinesa )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", ROMREGION_ERASE00 ) /* S22-BIOS ver1.41 */
-
-	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
 	ROM_LOAD( "af1data.8k",   0x000000, 0x080000, CRC(ef13ebe8) SHA1(5d3f697994d4b5b19ee7fea1e2aef8e39449b68e) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -3657,11 +3645,14 @@ ROM_START( cybrcomm )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", ROMREGION_ERASE00 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* MCU BIOS */
-	ROM_LOAD( "cy1data.6r", 0, 0x020000, CRC(10d0005b) SHA1(10508eeaf74d24a611b44cd3bb12417ceb78904f) )
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
+	ROM_LOAD( "cy1data.6r", 0x00000, 0x20000, CRC(10d0005b) SHA1(10508eeaf74d24a611b44cd3bb12417ceb78904f) )
+	ROM_RELOAD(             0x20000, 0x20000)
+	ROM_RELOAD(             0x40000, 0x20000)
+	ROM_RELOAD(             0x60000, 0x20000)
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
 	ROM_LOAD( "cyc1cg0.1a", 0x200000*0x4, 0x200000,CRC(e839b9bd) SHA1(fee43d37dcca7f1fb952a6bfb886b7ee30b7d75c) ) /* cyc1cg0.6a */
@@ -3694,7 +3685,7 @@ ROM_START( cybrcomm )
 	ROM_LOAD( "cy1wav2.10n", 0x100000, 0x100000, CRC(b98c1ca6) SHA1(4b66aa05f82be5ef3315acc30031872698ff4391) )
 	ROM_LOAD( "cy1wav3.10l", 0x300000, 0x100000, CRC(43dbac19) SHA1(83fd4ae4e7ec264fc217ed18caf59bf438af0c3d) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -3716,9 +3707,7 @@ ROM_START( cybrcycc )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", ROMREGION_ERASE00 ) /* S22-BIOS ver1.30 */
-
-	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.30 */
 	ROM_LOAD( "cb1datab.8k", 0, 0x080000, CRC(e2404221) SHA1(b88810dd45aee8a5475c30806cdfded25fa14e0e) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -3772,9 +3761,7 @@ ROM_START( propcycl )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", ROMREGION_ERASE00 ) /* SS22-BIOS ver1.41 */
-
-	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* SS22-BIOS ver1.41 */
 	ROM_LOAD( "pr1data.8k", 0, 0x080000, CRC(2e5767a4) SHA1(390bf05c90044d841fe2dd4a427177fa1570b9a6) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -3837,10 +3824,10 @@ ROM_START( acedrvrw )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "ad1data.6r", 0, 0x080000, CRC(82024f74) SHA1(711ab0c4f027716aeab18e3a5d3d06fa82af8007) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
@@ -3867,7 +3854,7 @@ ROM_START( acedrvrw )
 	ROM_LOAD( "ad1wave2.10n", 0x100000*1, 0x100000,CRC(365a6831) SHA1(ddaa44a4436d6de120b64a5d130b1ee18f872e19) )
 	ROM_LOAD( "ad1wave3.10l", 0x100000*3, 0x100000,CRC(cd8ecb0b) SHA1(7950b5a3a81f5554f57accabc7a623b8265a21a1) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -3886,10 +3873,10 @@ ROM_START( victlapw )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "adv1data.6r", 0, 0x080000, CRC(10eecdb4) SHA1(aaedeed166614e6670e765e0d7e4e9eb5f38ad10) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
@@ -3923,7 +3910,7 @@ ROM_START( victlapw )
 	ROM_LOAD( "adv1wav2.10n", 0x100000, 0x100000, CRC(c1a5ca5e) SHA1(27e6f9256d5fe5966e91d6be1e6e80900a764af1) )
 	ROM_LOAD( "adv1wav3.10l", 0x300000, 0x100000, CRC(fc6b8004) SHA1(5c9e0805895931ec2b6a43376059bdbf5777222f) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -3942,10 +3929,10 @@ ROM_START( raveracw )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x80000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rv1data.6r", 0, 0x080000, CRC(d358ec20) SHA1(140c513349240417bb546dd2d151f3666b818e91) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
@@ -3982,7 +3969,7 @@ ROM_START( raveracw )
 	ROM_LOAD( "rv1wav2.10n", 0x100000, 0x100000, CRC(5af9dc83) SHA1(9aeb7f8217b806a6f3ed93056513af9fbcb6b372) )
 	ROM_LOAD( "rv1wav3.10l", 0x300000, 0x100000, CRC(ffb9ad75) SHA1(a9a61a597bd3bbe9732f92747d82264fe4d9af48) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -4004,10 +3991,10 @@ ROM_START( raveracj )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x80000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rv1data.6r", 0, 0x080000, CRC(d358ec20) SHA1(140c513349240417bb546dd2d151f3666b818e91) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
@@ -4044,7 +4031,7 @@ ROM_START( raveracj )
 	ROM_LOAD( "rv1wav2.10n", 0x100000, 0x100000, CRC(5af9dc83) SHA1(9aeb7f8217b806a6f3ed93056513af9fbcb6b372) )
 	ROM_LOAD( "rv1wav3.10l", 0x300000, 0x100000, CRC(ffb9ad75) SHA1(a9a61a597bd3bbe9732f92747d82264fe4d9af48) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -4066,10 +4053,10 @@ ROM_START( raveracja )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x80000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rv1data.6r", 0, 0x080000, CRC(d358ec20) SHA1(140c513349240417bb546dd2d151f3666b818e91) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
@@ -4106,7 +4093,7 @@ ROM_START( raveracja )
 	ROM_LOAD( "rv1wav2.10n", 0x100000, 0x100000, CRC(5af9dc83) SHA1(9aeb7f8217b806a6f3ed93056513af9fbcb6b372) )
 	ROM_LOAD( "rv1wav3.10l", 0x300000, 0x100000, CRC(ffb9ad75) SHA1(a9a61a597bd3bbe9732f92747d82264fe4d9af48) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -4128,10 +4115,10 @@ ROM_START( ridgera2 )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x80000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rrs1data.6r", 0, 0x080000, CRC(b7063aa8) SHA1(08ff689e8dd529b91eee423c93f084945c6de417) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
@@ -4158,7 +4145,7 @@ ROM_START( ridgera2 )
 	ROM_LOAD( "rrs1wav2.10n", 0x100000*1, 0x100000,CRC(6f0d4619) SHA1(cd3d57f2ea21497f388ffa29ec7d2665647a01c0) )
 	ROM_LOAD( "rrs1wav3.10l", 0x100000*3, 0x100000,CRC(106e761f) SHA1(97f47b857bdcbc79b0aface53dd385e67fcc9108) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -4177,10 +4164,10 @@ ROM_START( ridgera2j )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x80000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rrs1data.6r", 0, 0x080000, CRC(b7063aa8) SHA1(08ff689e8dd529b91eee423c93f084945c6de417) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
@@ -4207,7 +4194,7 @@ ROM_START( ridgera2j )
 	ROM_LOAD( "rrs1wav2.10n", 0x100000*1, 0x100000,CRC(6f0d4619) SHA1(cd3d57f2ea21497f388ffa29ec7d2665647a01c0) )
 	ROM_LOAD( "rrs1wav3.10l", 0x100000*3, 0x100000,CRC(106e761f) SHA1(97f47b857bdcbc79b0aface53dd385e67fcc9108) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -4226,10 +4213,10 @@ ROM_START( ridgera2ja )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x80000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rrs1data.6r", 0, 0x080000, CRC(b7063aa8) SHA1(08ff689e8dd529b91eee423c93f084945c6de417) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
@@ -4256,7 +4243,7 @@ ROM_START( ridgera2ja )
 	ROM_LOAD( "rrs1wav2.10n", 0x100000*1, 0x100000,CRC(6f0d4619) SHA1(cd3d57f2ea21497f388ffa29ec7d2665647a01c0) )
 	ROM_LOAD( "rrs1wav3.10l", 0x100000*3, 0x100000,CRC(106e761f) SHA1(97f47b857bdcbc79b0aface53dd385e67fcc9108) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -4275,10 +4262,10 @@ ROM_START( ridgerac )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
@@ -4305,7 +4292,7 @@ ROM_START( ridgerac )
 	ROM_LOAD( "rr1wav2.10n", 0x100000*1, 0x100000,CRC(3244cb59) SHA1(b3283b30cfafbfdcbc6d482ecc4ed6a47a527ca4) )
 	ROM_LOAD( "rr1wav3.10l", 0x100000*3, 0x100000,CRC(c4cda1a7) SHA1(60bc96880ec79efdff3cc70c09e848692a40bea4) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -4324,10 +4311,10 @@ ROM_START( ridgeracb )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
@@ -4354,7 +4341,7 @@ ROM_START( ridgeracb )
 	ROM_LOAD( "rr1wav2.10n", 0x100000*1, 0x100000,CRC(3244cb59) SHA1(b3283b30cfafbfdcbc6d482ecc4ed6a47a527ca4) )
 	ROM_LOAD( "rr1wav3.10l", 0x100000*3, 0x100000,CRC(c4cda1a7) SHA1(60bc96880ec79efdff3cc70c09e848692a40bea4) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -4373,10 +4360,10 @@ ROM_START( ridgeracj )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
@@ -4403,7 +4390,7 @@ ROM_START( ridgeracj )
 	ROM_LOAD( "rr1wav2.10n", 0x100000*1, 0x100000,CRC(3244cb59) SHA1(b3283b30cfafbfdcbc6d482ecc4ed6a47a527ca4) )
 	ROM_LOAD( "rr1wav3.10l", 0x100000*3, 0x100000,CRC(c4cda1a7) SHA1(60bc96880ec79efdff3cc70c09e848692a40bea4) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -4422,10 +4409,10 @@ ROM_START( ridgerac3 )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rr1data.6r", 0, 0x080000, CRC(18f5f748) SHA1(e0d149a66de36156edd9b55f604c9a9801aaefa8) )
 
 	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
@@ -4452,7 +4439,7 @@ ROM_START( ridgerac3 )
 	ROM_LOAD( "rr1wav2.10n", 0x100000*1, 0x100000,CRC(3244cb59) SHA1(b3283b30cfafbfdcbc6d482ecc4ed6a47a527ca4) )
 	ROM_LOAD( "rr1wav3.10l", 0x100000*3, 0x100000,CRC(c4cda1a7) SHA1(60bc96880ec79efdff3cc70c09e848692a40bea4) )
 
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rr1gam.2d",   0x0000, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.3d",   0x0100, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rr1gam.4d",   0x0200, 0x0100, CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -4471,10 +4458,10 @@ ROM_START( ridgeracf )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x080000, "mcu", 0 ) /* BIOS */
+	ROM_REGION16_LE( 0x4000, "mcu_c74", 0 ) /* BIOS */
 	ROM_LOAD( "c74.bin", 0x0000, 0x4000, CRC(a3dce360) SHA1(8f3248b1890abb2e649927240ae46f73bb171e3b) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data */
+	ROM_REGION16_LE( 0x80000, "mcu", 0 ) /* sound data */
 	ROM_LOAD( "rrf1data.6r", 0, 0x080000, CRC(ce3c6ed6) SHA1(23e033364bc967c10c49fd1d5413dda837670633) )
 
 	ROM_REGION( 0x80000*6, "pointrom", 0 ) /* 3d model data */
@@ -4492,7 +4479,7 @@ ROM_START( ridgeracf )
 	ROM_LOAD( "rrf1wave3.10l", 0x100000*3, 0x100000,CRC(c4cda1a7) SHA1(60bc96880ec79efdff3cc70c09e848692a40bea4) )
 
 	/* this stuff was missing from this version, and shouldn't be the same (bad textures if we use these roms) */
-	ROM_REGION( 0x300, "user1", 0 )
+	ROM_REGION( 0x300, "gamma_proms", 0 )
 	ROM_LOAD( "rrf1gam.2d",   0x0000, 0x0100, BAD_DUMP CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rrf1gam.3d",   0x0100, 0x0100, BAD_DUMP CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
 	ROM_LOAD( "rrf1gam.4d",   0x0200, 0x0100, BAD_DUMP CRC(b2161bce) SHA1(d2681cc0cf8e68df0d942d392b4eb4458c4bb356) )
@@ -4521,9 +4508,7 @@ ROM_START( timecris )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x80000, "mcu", ROMREGION_ERASE00 ) /* BIOS */
-
-	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.30 */
 	ROM_LOAD( "ts1data.8k", 0, 0x080000, CRC(e68aa973) SHA1(663e80d249be5d5841139d98a9d72e2396851272) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -4574,9 +4559,7 @@ ROM_START( timecrisa )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x80000, "mcu", ROMREGION_ERASE00 ) /* BIOS */
-
-	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.30 */
 	ROM_LOAD( "ts1data.8k", 0, 0x080000, CRC(e68aa973) SHA1(663e80d249be5d5841139d98a9d72e2396851272) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -4629,9 +4612,7 @@ ROM_START( tokyowar )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x80000, "mcu", ROMREGION_ERASE00 ) /* BIOS */
-
-	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
 	ROM_LOAD( "tw1data.8k",   0x000000, 0x080000, CRC(bd046e4b) SHA1(162bc4ab69959ccab49fd69de291d34d472fb1c8) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -4686,9 +4667,7 @@ ROM_START( dirtdash )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x80000, "mcu", ROMREGION_ERASE00 ) /* BIOS */
-
-	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
 	ROM_LOAD( "dt1dataa.8k",  0x000000, 0x080000, CRC(9bcdea21) SHA1(26ae025cf746d3a703a82495eb2bb515b828a650) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -4738,9 +4717,7 @@ ROM_START( aquajet )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x80000, "mcu", ROMREGION_ERASE00 ) /* BIOS */
-
-	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
 	ROM_LOAD( "aj1data.8k",   0x000000, 0x080000, CRC(52bcc6d5) SHA1(25319ea6db35cc9bdcb39cc83d597a2a9f1690f3) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
@@ -4797,9 +4774,7 @@ ROM_START( adillor )
 	ROM_REGION( 0x10000*2, "slave", 0 ) /* Slave DSP */
 	ROM_LOAD16_WORD( "c71.bin", 0,0x1000*2, CRC(47c623ab) SHA1(e363ac50f5556f83308d4cc191b455e9b62bcfc8) )
 
-	ROM_REGION( 0x80000, "mcu", ROMREGION_ERASE00 ) /* BIOS */
-
-	ROM_REGION16_LE( 0x080000, "user4", 0 ) /* MCU BIOS */
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
 	ROM_LOAD( "am1data.8k", 0x000000, 0x080000, CRC(3c176589) SHA1(fabf8debfa118893449f6086986fd1aa012daf27) )
 
 	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
