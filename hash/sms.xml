@@ -54,7 +54,8 @@
 	<software name="3dragon">
 		<description>The Three Dragon Story (Kor)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Zemina?</publisher>
+		<info name="alt_title" value="용의 전설" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="three dragon story, the (k).bin" size="32768" crc="8640e7e8" sha1="a05a7a41295c38add5dfc71032d2d83b96f518b1" offset="000000" />
@@ -6359,6 +6360,7 @@
 		<description>Wonsiin (Kor)</description>
 		<year>1991</year>
 		<publisher>Zemina</publisher>
+		<info name="alt_title" value="원시인"/>
 		<part name="cart" interface="sms_cart">
 			<feature name="mapper" value="zemina" />
 			<dataarea name="rom" size="131072">

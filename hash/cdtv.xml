@@ -10,7 +10,7 @@
 		<publisher>Dominion</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="advanced_military_systems" sha1="4b362db61f9bb8e8b78b09303c0b41c6e7338bdd"/>
+				<disk name="advanced_military_systems" sha1="4b362db61f9bb8e8b78b09303c0b41c6e7338bdd" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -21,7 +21,7 @@
 		<publisher>Microdeal</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cdremix_ii" sha1="f6f482ce6b53b5cb0fc3df0bbb447abea7d5a8ff"/>
+				<disk name="cdremix_ii" sha1="f6f482ce6b53b5cb0fc3df0bbb447abea7d5a8ff" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -32,7 +32,7 @@
 		<publisher>On-Line</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="chaos_in_andromeda" sha1="573b8b81c336e3a72460ccca226d3ec69993c90e"/>
+				<disk name="chaos_in_andromeda" sha1="573b8b81c336e3a72460ccca226d3ec69993c90e" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -43,7 +43,7 @@
 		<publisher>Software 2000</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="cubulus_magic_serpent" sha1="14dcce3ec0536d54d4832ff8acaf3805808b45e2"/>
+				<disk name="cubulus_magic_serpent" sha1="14dcce3ec0536d54d4832ff8acaf3805808b45e2" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -54,7 +54,7 @@
 		<publisher>Optonica</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="pandoras_cd" sha1="1962d53ddf8aefa684fc5b74920432073ceb0699"/>
+				<disk name="pandoras_cd" sha1="1962d53ddf8aefa684fc5b74920432073ceb0699" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -66,7 +66,7 @@
 		<publisher>Software 2000</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="shiftrix_lettrix" sha1="696acf15b0e9c30d95195db7c99029692978827d"/>
+				<disk name="shiftrix_lettrix" sha1="696acf15b0e9c30d95195db7c99029692978827d" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -77,7 +77,7 @@
 		<publisher>On-Line</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="town_with_no_name" sha1="6591cde09a5a24dd3b4f22af98ee6727c1714861"/>
+				<disk name="town_with_no_name" sha1="6591cde09a5a24dd3b4f22af98ee6727c1714861" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -89,7 +89,7 @@
 		<publisher>Rainbow Arts</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="turrican" sha1="58caee214235e499d94f89f7ef6246cd548a9bd3"/>
+				<disk name="turrican" sha1="58caee214235e499d94f89f7ef6246cd548a9bd3" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -100,7 +100,7 @@
 		<publisher>Rainbow Arts</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="turrican2" sha1="f7d371e43e5f82314330972a3ce531c4b9ae811e"/>
+				<disk name="turrican2" sha1="f7d371e43e5f82314330972a3ce531c4b9ae811e" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
