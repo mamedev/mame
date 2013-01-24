@@ -195,7 +195,7 @@ static ADDRESS_MAP_START(pc8_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,            pc_page_w)
 	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(pc_nmi_enable_w )
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE_LEGACY(pc_JOY_r,              pc_JOY_w)
+	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE(pc_rtc_r,             pc_rtc_w)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE_LEGACY("lpt_2", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE("ins8250_3", ins8250_device, ins8250_r, ins8250_w)
@@ -221,7 +221,7 @@ static ADDRESS_MAP_START(pc16_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0070, 0x007f) AM_RAM // needed for Poisk-2
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8(pc_nmi_enable_w, 0x00ff )
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE8_LEGACY(pc_JOY_r, pc_JOY_w, 0xffff)
+	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE8(pc_rtc_r,                pc_rtc_w, 0xffff)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8_LEGACY("lpt_2", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_READWRITE8(unk_r, pc_nmi_enable_w, 0x00ff )
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE8_LEGACY(pc_JOY_r, pc_JOY_w, 0xffff)
+	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE8(pc_rtc_r,                pc_rtc_w, 0xffff)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE8_LEGACY("lpt_2", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
@@ -327,7 +327,7 @@ static ADDRESS_MAP_START(europc_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE_LEGACY(europc_pio_r,          europc_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,            pc_page_w)
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE_LEGACY(pc_JOY_r,              pc_JOY_w)
+	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x0250, 0x025f) AM_READWRITE_LEGACY(europc_jim_r,          europc_jim_w)
 	AM_RANGE(0x0278, 0x027b) AM_DEVREADWRITE_LEGACY("lpt_2", pc_lpt_r, pc_lpt_w)
 	AM_RANGE(0x02e0, 0x02e0) AM_READ_LEGACY(europc_jim2_r)
@@ -362,7 +362,7 @@ static ADDRESS_MAP_START(tandy1000_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE_LEGACY(tandy1000_pio_r,           tandy1000_pio_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(pc_page_r,                pc_page_w)
 	AM_RANGE(0x00c0, 0x00c0) AM_DEVWRITE("sn76496", ncr7496_device, write)
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE_LEGACY(pc_JOY_r,                  pc_JOY_w)
+	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE_LEGACY(pc_t1t_p37x_r,         pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w)
@@ -392,7 +392,7 @@ static ADDRESS_MAP_START(tandy1000_16_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8_LEGACY(tandy1000_pio_r,          tandy1000_pio_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
 	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496",    ncr7496_device, write, 0xffff)
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE8_LEGACY(pc_JOY_r,                 pc_JOY_w, 0xffff)
+	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8_LEGACY(pc_t1t_p37x_r,            pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
@@ -423,7 +423,7 @@ static ADDRESS_MAP_START(tandy1000_286_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8_LEGACY(tandy1000_pio_r,         tandy1000_pio_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
 	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496", ncr7496_device, write, 0xffff)
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE8_LEGACY(pc_JOY_r,                    pc_JOY_w, 0xffff)
+	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE8_LEGACY(pc_t1t_p37x_r,           pc_t1t_p37x_w, 0xffff)
 	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
@@ -455,7 +455,7 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pc_state )
 	AM_RANGE(0x00c0, 0x00c0) AM_DEVWRITE("sn76496", sn76496_device, write)
 	AM_RANGE(0x00f2, 0x00f2) AM_WRITE(pcjr_fdc_dor_w)
 	AM_RANGE(0x00f4, 0x00f5) AM_DEVICE("upd765", upd765a_device, map)
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE_LEGACY(pc_JOY_r,                  pc_JOY_w)
+	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE("joy", pc_joy_device, joy_port_r, joy_port_w)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE("ins8250_1", ins8250_device, ins8250_r, ins8250_w)
 	AM_RANGE(0x0378, 0x037f) AM_READWRITE_LEGACY(pc_t1t_p37x_r,         pc_t1t_p37x_w)
 	AM_RANGE(0x03bc, 0x03be) AM_DEVREADWRITE_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w)
@@ -538,7 +538,6 @@ static INPUT_PORTS_START( pccga )
 	PORT_BIT( 0x02, 0x02,   IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
 
-	PORT_INCLUDE( pc_joystick )         /* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
@@ -607,7 +606,6 @@ static INPUT_PORTS_START( pcega )
 	PORT_BIT( 0x02, 0x02,   IPT_UNUSED ) /* no turbo switch */
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
 
-	PORT_INCLUDE( pc_joystick )         /* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
@@ -658,7 +656,6 @@ static INPUT_PORTS_START( europc )
 
 	EUROPC_KEYBOARD
 
-	PORT_INCLUDE( pc_joystick )         /* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
@@ -730,7 +727,6 @@ static INPUT_PORTS_START( bondwell )
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
 
 //  PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
-	PORT_INCLUDE( pc_joystick )         /* IN15 - IN19 */
 	PORT_INCLUDE( pcvideo_cga )
 INPUT_PORTS_END
 
@@ -770,7 +766,6 @@ static INPUT_PORTS_START( tandy1t )
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
 
 	PORT_INCLUDE( t1000_keyboard )
-	PORT_INCLUDE( pc_joystick )         /* IN15 - IN19 */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ibmpcjr )
@@ -999,6 +994,7 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_PC_JOY_ADD("joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
@@ -1064,6 +1060,7 @@ static MACHINE_CONFIG_START( europc, pc_state )
 	MCFG_RS232_PORT_ADD( "serport1", ibm5150_serport_config[1], ibm5150_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport2", ibm5150_serport_config[2], ibm5150_com, NULL, NULL )
 	MCFG_RS232_PORT_ADD( "serport3", ibm5150_serport_config[3], ibm5150_com, NULL, NULL )
+	MCFG_PC_JOY_ADD("joy")
 
 	/* video hardware */
 	MCFG_FRAGMENT_ADD( pcvideo_aga )
@@ -1130,6 +1127,7 @@ static MACHINE_CONFIG_START( t1000hx, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_PC_JOY_ADD("joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
@@ -1183,6 +1181,7 @@ static MACHINE_CONFIG_START( t1000_16, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_PC_JOY_ADD("joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", 0, pc_state::floppy_formats)
@@ -1231,6 +1230,7 @@ static MACHINE_CONFIG_START( t1000_286, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_PC_JOY_ADD("joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "35dd", 0, pc_state::floppy_formats)
@@ -1299,6 +1299,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_PC_JOY_ADD("joy")
 
 	/* cassette */
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, ibm5150_cassette_interface )
@@ -1539,6 +1540,7 @@ static MACHINE_CONFIG_START( iskr3104, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_PC_JOY_ADD("joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
@@ -1594,6 +1596,7 @@ static MACHINE_CONFIG_START( poisk2, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_PC_JOY_ADD("joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
@@ -1648,6 +1651,7 @@ static MACHINE_CONFIG_START( zenith, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_PC_JOY_ADD("joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
@@ -1702,6 +1706,7 @@ static MACHINE_CONFIG_START( olivetti, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_PC_JOY_ADD("joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
@@ -1756,6 +1761,7 @@ static MACHINE_CONFIG_START( ibm5550, pc_state )
 	MCFG_PC_LPT_ADD("lpt_0", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_1", pc_lpt_config)
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
+	MCFG_PC_JOY_ADD("joy")
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 

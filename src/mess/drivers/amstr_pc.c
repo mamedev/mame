@@ -88,7 +88,7 @@ static ADDRESS_MAP_START(ppc512_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE8_LEGACY(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
 	AM_RANGE(0x007a, 0x007b) AM_READWRITE8_LEGACY(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r, pc_page_w, 0xffff)
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE8_LEGACY(pc_JOY_r, pc_JOY_w, 0xffff)
+	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x0278, 0x027b) AM_READ8_LEGACY(pc200_port278_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_2", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
@@ -116,7 +116,7 @@ static ADDRESS_MAP_START(pc200_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0078, 0x0079) AM_READWRITE8_LEGACY(pc1640_mouse_x_r, pc1640_mouse_x_w, 0xffff)
 	AM_RANGE(0x007a, 0x007b) AM_READWRITE8_LEGACY(pc1640_mouse_y_r, pc1640_mouse_y_w, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r, pc_page_w, 0xffff)
-	AM_RANGE(0x0200, 0x0207) AM_READWRITE8_LEGACY(pc_JOY_r, pc_JOY_w, 0xffff)
+	AM_RANGE(0x0200, 0x0207) AM_DEVREADWRITE8("joy", pc_joy_device, joy_port_r, joy_port_w, 0xffff)
 	AM_RANGE(0x0278, 0x027b) AM_READ8_LEGACY(pc200_port278_r, 0xffff) AM_DEVWRITE8_LEGACY("lpt_2", pc_lpt_w, 0x00ff)
 	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_device, ins8250_r,  ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
@@ -196,7 +196,6 @@ Since pc200 is anyway NOT_WORKING, I comment out this one */
 	PORT_BIT( 0x01, 0x01,   IPT_UNUSED )
 
 	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
-	PORT_INCLUDE( pc_joystick )         /* IN15 - IN19 */
 
 	PORT_START("VIDEO") /* IN20 */
 	PORT_CONFNAME( 0x03, 0x03, "IDA character set")
@@ -299,6 +298,8 @@ static MACHINE_CONFIG_START( pc200, pc_state )
 
 	MCFG_PC_FDC_XT_ADD("fdc")
 
+	MCFG_PC_JOY_ADD("joy")
+
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 
@@ -369,6 +370,8 @@ static MACHINE_CONFIG_START( ppc512, pc_state )
 	MCFG_PC_LPT_ADD("lpt_2", pc_lpt_config)
 
 	MCFG_PC_FDC_XT_ADD("fdc")
+
+	MCFG_PC_JOY_ADD("joy")
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("fdc:1", ibmpc_floppies, "525dd", 0, ibmpc_floppy_formats)
