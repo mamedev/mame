@@ -17,6 +17,7 @@
 #include "machine/abcbus.h"
 #include "machine/abc80kb.h"
 #include "machine/abc830.h"
+#include "machine/keyboard.h"
 #include "machine/ram.h"
 #include "machine/serial.h"
 #include "machine/z80pio.h"
@@ -93,7 +94,6 @@ public:
 		TIMER_ID_BLINK,
 		TIMER_ID_VSYNC_ON,
 		TIMER_ID_VSYNC_OFF,
-		TIMER_ID_FAKE_KEYBOARD_SCAN,
 		TIMER_ID_FAKE_KEYBOARD_CLEAR
 	};
 
@@ -106,8 +106,6 @@ public:
 
 	void update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void scan_keyboard();
-
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -118,6 +116,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
 
 	DECLARE_WRITE_LINE_MEMBER( keydown_w );
+	DECLARE_WRITE8_MEMBER( kbd_w );
 
 	// keyboard state
 	int m_key_data;
@@ -146,7 +145,6 @@ public:
 	emu_timer *m_blink_timer;
 	emu_timer *m_vsync_on_timer;
 	emu_timer *m_vsync_off_timer;
-	emu_timer *m_kb_timer;
 };
 
 //----------- defined in video/abc80.c -----------
