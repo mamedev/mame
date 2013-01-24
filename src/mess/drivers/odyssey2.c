@@ -458,7 +458,7 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess_g7400)
 	{
 		UINT16 d = bitmap->pix16( vpos, x );
 
-		if ( ( ! m_g7400_ic678_decode[ d & 0x07 ] ) && x >= x_real_start && x < x_real_end && y < 240 )
+		if ( ( ! m_g7400_ic678_decode[ d & 0x07 ] ) && x >= x_real_start && x < x_real_end && y >= 0 && y < 240 )
 		{
 			// Use EF934x input
 			d = ef934x_bitmap->pix16( y, x - x_real_start ) & 0x07;
