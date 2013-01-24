@@ -15,8 +15,25 @@ class scv_state : public driver_device
 {
 public:
 	scv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_videoram(*this,"videoram")        { }
+		: driver_device(mconfig, type, tag)
+		, m_videoram(*this,"videoram")
+		, m_maincpu(*this, "maincpu")
+		, m_upd1771c(*this, "upd1771c")
+		, m_pa0(*this, "PA0")
+		, m_pa1(*this, "PA1")
+		, m_pa2(*this, "PA2")
+		, m_pa3(*this, "PA3")
+		, m_pa4(*this, "PA4")
+		, m_pa5(*this, "PA5")
+		, m_pa6(*this, "PA6")
+		, m_pa7(*this, "PA7")
+		, m_pc0(*this, "PC0")
+		, m_bank0(NULL)
+		, m_bank1(NULL)
+		, m_bank2(NULL)
+		, m_bank3(NULL)
+		, m_bank4(NULL)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(scv_porta_w);
 	DECLARE_READ8_MEMBER(scv_portb_r);
@@ -39,9 +56,28 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scv_vb_callback);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<upd1771c_device> m_upd1771c;
+	required_ioport m_pa0;
+	required_ioport m_pa1;
+	required_ioport m_pa2;
+	required_ioport m_pa3;
+	required_ioport m_pa4;
+	required_ioport m_pa5;
+	required_ioport m_pa6;
+	required_ioport m_pa7;
+	required_ioport m_pc0;
+	memory_bank *m_bank0;
+	memory_bank *m_bank1;
+	memory_bank *m_bank2;
+	memory_bank *m_bank3;
+	memory_bank *m_bank4;
+	UINT8 *m_charrom;
+
+	void scv_set_banks();
 };
-
-
 
 
 static ADDRESS_MAP_START( scv_mem, AS_PROGRAM, 8, scv_state )
@@ -157,7 +193,9 @@ WRITE8_MEMBER( scv_state::scv_cart_ram_w )
 {
 	/* Check if cartridge ram is enabled */
 	if ( m_cart_ram_enabled )
+	{
 		m_cart_ram[offset] = data;
+	}
 }
 
 
@@ -167,7 +205,9 @@ WRITE8_MEMBER( scv_state::scv_cart_ram2_w )
 	if ( m_cart_ram_enabled )
 	{
 		if ( m_cart_ram_size > 0x1000 )
+		{
 			offset += 0x1000;
+		}
 
 		m_cart_ram[offset] = data;
 	}
@@ -185,28 +225,44 @@ READ8_MEMBER( scv_state::scv_portb_r )
 	UINT8 data = 0xff;
 
 	if ( ! ( m_porta & 0x01 ) )
-		data &= ioport( "PA0" )->read();
+	{
+		data &= m_pa0->read();
+	}
 
 	if ( ! ( m_porta & 0x02 ) )
-		data &= ioport( "PA1" )->read();
+	{
+		data &= m_pa1->read();
+	}
 
 	if ( ! ( m_porta & 0x04 ) )
-		data &= ioport( "PA2" )->read();
+	{
+		data &= m_pa2->read();
+	}
 
 	if ( ! ( m_porta & 0x08 ) )
-		data &= ioport( "PA3" )->read();
+	{
+		data &= m_pa3->read();
+	}
 
 	if ( ! ( m_porta & 0x10 ) )
-		data &= ioport( "PA4" )->read();
+	{
+		data &= m_pa4->read();
+	}
 
 	if ( ! ( m_porta & 0x20 ) )
-		data &= ioport( "PA5" )->read();
+	{
+		data &= m_pa5->read();
+	}
 
 	if ( ! ( m_porta & 0x40 ) )
-		data &= ioport( "PA6" )->read();
+	{
+		data &= m_pa6->read();
+	}
 
 	if ( ! ( m_porta & 0x80 ) )
-		data &= ioport( "PA7" )->read();
+	{
+		data &= m_pa7->read();
+	}
 
 	return data;
 }
@@ -216,78 +272,76 @@ READ8_MEMBER( scv_state::scv_portc_r )
 {
 	UINT8 data = m_portc;
 
-	data = ( data & 0xfe ) | ( ioport( "PC0" )->read() & 0x01 );
+	data = ( data & 0xfe ) | ( m_pc0->read() & 0x01 );
 
 	return data;
 }
 
 
-static void scv_set_banks( running_machine &machine )
+void scv_state::scv_set_banks()
 {
-	scv_state *state = machine.driver_data<scv_state>();
+	m_cart_ram_enabled = false;
 
-	state->m_cart_ram_enabled = false;
-
-	switch( state->m_cart_rom_size )
+	switch( m_cart_rom_size )
 	{
 	case 0:
 	case 0x2000:
-		state->membank( "bank0" )->set_base( state->m_cart_rom );
-		state->membank( "bank1" )->set_base( state->m_cart_rom );
-		state->membank( "bank2" )->set_base( state->m_cart_rom );
-		state->membank( "bank3" )->set_base( state->m_cart_rom );
-		state->membank( "bank4" )->set_base( state->m_cart_rom + 0x1000 );
+		m_bank0->set_base( m_cart_rom );
+		m_bank1->set_base( m_cart_rom );
+		m_bank2->set_base( m_cart_rom );
+		m_bank3->set_base( m_cart_rom );
+		m_bank4->set_base( m_cart_rom + 0x1000 );
 		break;
 	case 0x4000:
-		state->membank( "bank0" )->set_base( state->m_cart_rom );
-		state->membank( "bank1" )->set_base( state->m_cart_rom + 0x2000 );
-		state->membank( "bank2" )->set_base( state->m_cart_rom );
-		state->membank( "bank3" )->set_base( state->m_cart_rom + 0x2000 );
-		state->membank( "bank4" )->set_base( state->m_cart_rom + 0x3000 );
+		m_bank0->set_base( m_cart_rom );
+		m_bank1->set_base( m_cart_rom + 0x2000 );
+		m_bank2->set_base( m_cart_rom );
+		m_bank3->set_base( m_cart_rom + 0x2000 );
+		m_bank4->set_base( m_cart_rom + 0x3000 );
 		break;
 	case 0x8000:
-		state->membank( "bank0" )->set_base( state->m_cart_rom );
-		state->membank( "bank1" )->set_base( state->m_cart_rom + 0x2000 );
-		state->membank( "bank2" )->set_base( state->m_cart_rom + 0x4000 );
-		state->membank( "bank3" )->set_base( state->m_cart_rom + 0x6000 );
-		state->membank( "bank4" )->set_base( state->m_cart_rom + 0x7000 );
+		m_bank0->set_base( m_cart_rom );
+		m_bank1->set_base( m_cart_rom + 0x2000 );
+		m_bank2->set_base( m_cart_rom + 0x4000 );
+		m_bank3->set_base( m_cart_rom + 0x6000 );
+		m_bank4->set_base( m_cart_rom + 0x7000 );
 		break;
 	case 0x10000:
-		state->membank( "bank0" )->set_base( state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0x8000 : 0 ) );
-		state->membank( "bank1" )->set_base( state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xa000 : 0x2000 ) );
-		state->membank( "bank2" )->set_base( state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xc000 : 0x4000 ) );
-		state->membank( "bank3" )->set_base( state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xe000 : 0x6000 ) );
-		state->membank( "bank4" )->set_base( state->m_cart_rom + ( ( state->m_portc & 0x20 ) ? 0xf000 : 0x7000 ) );
+		m_bank0->set_base( m_cart_rom + ( ( m_portc & 0x20 ) ? 0x8000 : 0 ) );
+		m_bank1->set_base( m_cart_rom + ( ( m_portc & 0x20 ) ? 0xa000 : 0x2000 ) );
+		m_bank2->set_base( m_cart_rom + ( ( m_portc & 0x20 ) ? 0xc000 : 0x4000 ) );
+		m_bank3->set_base( m_cart_rom + ( ( m_portc & 0x20 ) ? 0xe000 : 0x6000 ) );
+		m_bank4->set_base( m_cart_rom + ( ( m_portc & 0x20 ) ? 0xf000 : 0x7000 ) );
 		break;
 	case 0x20000:   /* Pole Position 2 */
-		int base = ( ( state->m_portc >> 5 ) & 0x03 ) * 0x8000 ;
-		state->membank( "bank0" )->set_base( state->m_cart_rom + base + 0 );
-		state->membank( "bank1" )->set_base( state->m_cart_rom + base + 0x2000 );
-		state->membank( "bank2" )->set_base( state->m_cart_rom + base + 0x4000 );
-		state->membank( "bank3" )->set_base( state->m_cart_rom + base + 0x6000 );
-		state->membank( "bank4" )->set_base( state->m_cart_rom + base + 0x7000 );
+		int base = ( ( m_portc >> 5 ) & 0x03 ) * 0x8000 ;
+		m_bank0->set_base( m_cart_rom + base + 0 );
+		m_bank1->set_base( m_cart_rom + base + 0x2000 );
+		m_bank2->set_base( m_cart_rom + base + 0x4000 );
+		m_bank3->set_base( m_cart_rom + base + 0x6000 );
+		m_bank4->set_base( m_cart_rom + base + 0x7000 );
 		/* On-cart RAM is enabled when PC6 is high */
-		if ( state->m_cart_ram && state->m_portc & 0x40 )
+		if ( m_cart_ram && m_portc & 0x40 )
 		{
-			state->m_cart_ram_enabled = true;
-			state->membank( "bank4" )->set_base( state->m_cart_ram );
+			m_cart_ram_enabled = true;
+			m_bank4->set_base( m_cart_ram );
 		}
 		break;
 	}
 
 	/* Check if cartridge RAM is available and should be enabled */
-	if ( state->m_cart_rom_size < 0x20000 && state->m_cart_ram && state->m_cart_ram_size && ( state->m_portc & 0x20 ) )
+	if ( m_cart_rom_size < 0x20000 && m_cart_ram && m_cart_ram_size && ( m_portc & 0x20 ) )
 	{
-		if ( state->m_cart_ram_size == 0x1000 )
+		if ( m_cart_ram_size == 0x1000 )
 		{
-			state->membank( "bank4" )->set_base( state->m_cart_ram );
+			m_bank4->set_base( m_cart_ram );
 		}
 		else
 		{
-			state->membank( "bank3" )->set_base( state->m_cart_ram );
-			state->membank( "bank4" )->set_base( state->m_cart_ram + 0x1000 );
+			m_bank3->set_base( m_cart_ram );
+			m_bank4->set_base( m_cart_ram + 0x1000 );
 		}
-		state->m_cart_ram_enabled = true;
+		m_cart_ram_enabled = true;
 	}
 
 }
@@ -295,11 +349,11 @@ static void scv_set_banks( running_machine &machine )
 
 WRITE8_MEMBER( scv_state::scv_portc_w )
 {
-	//logerror("%04x: scv_portc_w: data = 0x%02x\n", machine().device("maincpu")->safe_pc(), data );
+	//logerror("%04x: scv_portc_w: data = 0x%02x\n", m_maincpu->pc(), data );
 	m_portc = data;
 
-	scv_set_banks( machine() );
-	upd1771_pcm_w( machine().device( "upd1771c" ), m_portc & 0x08 );
+	scv_set_banks();
+	upd1771_pcm_w( m_upd1771c, m_portc & 0x08 );
 }
 
 
@@ -311,8 +365,6 @@ static DEVICE_START( scv_cart )
 	state->m_cart_rom_size = 0;
 	state->m_cart_ram = NULL;
 	state->m_cart_ram_size = 0;
-
-	scv_set_banks( device->machine() );
 }
 
 
@@ -349,8 +401,6 @@ static DEVICE_IMAGE_LOAD( scv_cart )
 		state->m_cart_ram = image.get_software_region( "ram" );
 		state->m_cart_ram_size = image.get_software_region_length( "ram" );
 	}
-
-	scv_set_banks( image.device().machine() );
 
 	return IMAGE_INIT_PASS;
 }
@@ -415,10 +465,10 @@ TIMER_CALLBACK_MEMBER(scv_state::scv_vb_callback)
 	switch( vpos )
 	{
 	case 240:
-		machine().device("maincpu")->execute().set_input_line(UPD7810_INTF2, ASSERT_LINE);
+		m_maincpu->set_input_line(UPD7810_INTF2, ASSERT_LINE);
 		break;
 	case 0:
-		machine().device("maincpu")->execute().set_input_line(UPD7810_INTF2, CLEAR_LINE);
+		m_maincpu->set_input_line(UPD7810_INTF2, CLEAR_LINE);
 		break;
 	}
 
@@ -611,7 +661,7 @@ UINT32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap,
 			if ( text_x && text_y )
 			{
 				/* Text mode */
-				UINT8 *char_data = memregion( "charrom" )->base() + ( d & 0x7f ) * 8;
+				UINT8 *char_data = m_charrom + ( d & 0x7f ) * 8;
 				draw_text( bitmap, x * 8, y * 16, char_data, fg, bg );
 			}
 			else
@@ -744,19 +794,26 @@ UINT32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap,
 
 WRITE_LINE_MEMBER( scv_state::scv_upd1771_ack_w )
 {
-	machine().device("maincpu")->execute().set_input_line(UPD7810_INTF1, (state) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(UPD7810_INTF1, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 void scv_state::machine_start()
 {
 	m_vb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scv_state::scv_vb_callback),this));
+	m_charrom = memregion( "charrom" )->base();
+	m_bank0 = membank( "bank0" );
+	m_bank1 = membank( "bank1" );
+	m_bank2 = membank( "bank2" );
+	m_bank3 = membank( "bank3" );
+	m_bank4 = membank( "bank4" );
 }
 
 
 void scv_state::machine_reset()
 {
 	m_vb_timer->adjust( machine().primary_screen->time_until_pos(0, 0 ) );
+	scv_set_banks();
 }
 
 
