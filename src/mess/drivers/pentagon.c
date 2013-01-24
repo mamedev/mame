@@ -13,17 +13,25 @@ class pentagon_state : public spectrum_state
 {
 public:
 	pentagon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_state(mconfig, type, tag) { }
+		: spectrum_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	DECLARE_DIRECT_UPDATE_MEMBER(pentagon_direct);
 	DECLARE_WRITE8_MEMBER(pentagon_port_7ffd_w);
 	DECLARE_MACHINE_RESET(pentagon);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	UINT8 *m_maincpu_rom;
+
+	void pentagon_update_memory();
 };
 
 DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
 {
 	device_t *beta = machine().device(BETA_DISK_TAG);
-	UINT16 pc = machine().device("maincpu")->safe_pcbase();
+	UINT16 pc = m_maincpu->pcbase();
 
 	if (beta->started() && betadisk_is_active(beta))
 	{
@@ -31,7 +39,7 @@ DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
 		{
 			m_ROMSelection = ((m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
-			membank("bank1")->set_base(memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
+			membank("bank1")->set_base(m_maincpu_rom + 0x010000 + (m_ROMSelection<<14));
 		}
 	} else if (((pc & 0xff00) == 0x3d00) && (m_ROMSelection==1))
 	{
@@ -48,38 +56,37 @@ DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
 				membank("bank1")->set_base(machine().root_device().memregion("beta:beta")->base());
 			}
 		} else {
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine().root_device().memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
-			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
+			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, m_maincpu_rom + 0x010000 + (m_ROMSelection<<14));
+			membank("bank1")->set_base(m_maincpu_rom + 0x010000 + (m_ROMSelection<<14));
 		}
 		return ~0;
 	}
 	return address;
 }
 
-static void pentagon_update_memory(running_machine &machine)
+void pentagon_state::pentagon_update_memory()
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	device_t *beta = machine.device(BETA_DISK_TAG);
-	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
-	state->m_screen_location = messram + ((state->m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
+	device_t *beta = machine().device(BETA_DISK_TAG);
+	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
+	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	state->membank("bank4")->set_base(messram + ((state->m_port_7ffd_data & 0x07) * 0x4000));
+	membank("bank4")->set_base(messram + ((m_port_7ffd_data & 0x07) * 0x4000));
 
-	if (beta->started() && betadisk_is_active(beta) && !( state->m_port_7ffd_data & 0x10 ) )
+	if (beta->started() && betadisk_is_active(beta) && !( m_port_7ffd_data & 0x10 ) )
 	{
 		/* GLUK */
-		if (strcmp(machine.system().name, "pent1024")==0) {
-			state->m_ROMSelection = 2;
+		if (strcmp(machine().system().name, "pent1024")==0) {
+			m_ROMSelection = 2;
 		} else {
-			state->m_ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01) ;
+			m_ROMSelection = ((m_port_7ffd_data>>4) & 0x01) ;
 		}
 	}
 	else {
 		/* ROM switching */
-		state->m_ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01) ;
+		m_ROMSelection = ((m_port_7ffd_data>>4) & 0x01) ;
 	}
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+	membank("bank1")->set_base(m_maincpu_rom + 0x010000 + (m_ROMSelection<<14));
 }
 
 WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
@@ -92,7 +99,7 @@ WRITE8_MEMBER(pentagon_state::pentagon_port_7ffd_w)
 	m_port_7ffd_data = data;
 
 	/* update memory */
-	pentagon_update_memory(machine());
+	pentagon_update_memory();
 }
 
 static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
@@ -112,7 +119,9 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 {
 	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
 	device_t *beta = machine().device(BETA_DISK_TAG);
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	m_maincpu_rom = memregion("maincpu")->base();
 
 	space.install_read_bank(0x0000, 0x3fff, "bank1");
 	space.unmap_write(0x0000, 0x3fff);
@@ -133,7 +142,7 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
-	pentagon_update_memory(machine());
+	pentagon_update_memory();
 }
 
 /* F4 Character Displayer */
