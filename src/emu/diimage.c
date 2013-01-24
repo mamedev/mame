@@ -970,6 +970,11 @@ bool device_image_interface::load_internal(const char *path, bool is_create, int
 		/* Copy some image information when we have been loaded through a software list */
 		if ( m_software_info_ptr )
 		{
+			// sanitize
+			if (!m_software_info_ptr->longname || !m_software_info_ptr->publisher || !m_software_info_ptr->year)
+				fatalerror("Each entry in an XML list must have all of the following fields: description, publisher, year!\n");
+
+			// store
 			m_longname = m_software_info_ptr->longname;
 			m_manufacturer = m_software_info_ptr->publisher;
 			m_year = m_software_info_ptr->year;
