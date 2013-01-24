@@ -997,6 +997,17 @@ static unsigned short SCSP_r16(scsp_state *scsp, address_space &space, unsigned 
 	}
 	else if(addr<0x700)
 		v=scsp->RINGBUF[(addr-0x600)/2];
+	else
+	{
+		//DSP
+		if(addr<0x780)  //COEF
+			v= *((unsigned short *) (scsp->DSP.COEF+(addr-0x700)/2));
+		else if(addr<0x800)
+			v= *((unsigned short *) (scsp->DSP.MADRS+(addr-0x780)/2));
+		else if(addr<0xC00)
+			v= *((unsigned short *) (scsp->DSP.MPRO+(addr-0x800)/2));
+
+	}
 	return v;
 }
 
