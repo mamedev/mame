@@ -66,7 +66,7 @@ const char *tiki100_format::extensions() const
 const tiki100_format::format tiki100_format::formats[] = {
 	{   //  90K 5 1/4 inch single density single sided
 		floppy_image::FF_525, floppy_image::SSSD, floppy_image::FM,
-		4000, 18, 40, 1, 128, {}, 1, {}, 80, 22, 20
+		4000, 18, 40, 1, 128, {}, 1, {}, 40, 11, 10
 	},
 	{   //  200K 5 1/4 inch double density single sided
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,
