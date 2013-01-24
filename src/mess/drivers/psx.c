@@ -72,7 +72,7 @@ static void psxexe_conv32( UINT32 *p_uint32 )
 		( p_uint8[ 3 ] << 24 );
 }
 
-static int load_psxexe( device_t *cpu, unsigned char *p_n_file, int n_len )
+static int load_psxexe( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 {
 	struct PSXEXE_HEADER
 	{
@@ -151,13 +151,13 @@ static int load_psxexe( device_t *cpu, unsigned char *p_n_file, int n_len )
 			n_size--;
 		}
 
-		cpu->state().set_state_int( PSXCPU_PC, psxexe_header->pc0 );
-		cpu->state().set_state_int( PSXCPU_R28, psxexe_header->gp0 );
+		cpu->set_state_int( PSXCPU_PC, psxexe_header->pc0 );
+		cpu->set_state_int( PSXCPU_R28, psxexe_header->gp0 );
 		n_stack = psxexe_header->s_addr + psxexe_header->s_size;
 		if( n_stack != 0 )
 		{
-			cpu->state().set_state_int( PSXCPU_R29, n_stack );
-			cpu->state().set_state_int( PSXCPU_R30, n_stack );
+			cpu->set_state_int( PSXCPU_R29, n_stack );
+			cpu->set_state_int( PSXCPU_R30, n_stack );
 		}
 
 		return 1;
@@ -165,42 +165,42 @@ static int load_psxexe( device_t *cpu, unsigned char *p_n_file, int n_len )
 	return 0;
 }
 
-static void cpe_set_register( device_t *cpu, int n_reg, int n_value )
+static void cpe_set_register( cpu_device *cpu, int n_reg, int n_value )
 {
 	if( n_reg < 0x80 && ( n_reg % 4 ) == 0 )
 	{
 		logerror( "psx_exe_load: r%-2d   %08x\n", n_reg / 4, n_value );
-		cpu->state().set_state_int( PSXCPU_R0 + ( n_reg / 4 ), n_value );
+		cpu->set_state_int( PSXCPU_R0 + ( n_reg / 4 ), n_value );
 	}
 	else if( n_reg == 0x80 )
 	{
 		logerror( "psx_exe_load: lo    %08x\n", n_value );
-		cpu->state().set_state_int( PSXCPU_LO, n_value );
+		cpu->set_state_int( PSXCPU_LO, n_value );
 	}
 	else if( n_reg == 0x84 )
 	{
 		logerror( "psx_exe_load: hi    %08x\n", n_value );
-		cpu->state().set_state_int( PSXCPU_HI, n_value );
+		cpu->set_state_int( PSXCPU_HI, n_value );
 	}
 	else if( n_reg == 0x88 )
 	{
 		logerror( "psx_exe_load: sr    %08x\n", n_value );
-		cpu->state().set_state_int( PSXCPU_CP0R12, n_value );
+		cpu->set_state_int( PSXCPU_CP0R12, n_value );
 	}
 	else if( n_reg == 0x8c )
 	{
 		logerror( "psx_exe_load: cause %08x\n", n_value );
-		cpu->state().set_state_int( PSXCPU_CP0R13, n_value );
+		cpu->set_state_int( PSXCPU_CP0R13, n_value );
 	}
 	else if( n_reg == 0x90 )
 	{
 		logerror( "psx_exe_load: pc    %08x\n", n_value );
-		cpu->state().set_state_int( PSXCPU_PC, n_value );
+		cpu->set_state_int( PSXCPU_PC, n_value );
 	}
 	else if( n_reg == 0x94 )
 	{
 		logerror( "psx_exe_load: prid  %08x\n", n_value );
-		cpu->state().set_state_int( PSXCPU_CP0R15, n_value );
+		cpu->set_state_int( PSXCPU_CP0R15, n_value );
 	}
 	else
 	{
@@ -208,7 +208,7 @@ static void cpe_set_register( device_t *cpu, int n_reg, int n_value )
 	}
 }
 
-static int load_cpe( device_t *cpu, unsigned char *p_n_file, int n_len )
+static int load_cpe( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 {
 	if( n_len >= 4 &&
 		memcmp( p_n_file, "CPE\001", 4 ) == 0 )
@@ -343,7 +343,7 @@ static int load_cpe( device_t *cpu, unsigned char *p_n_file, int n_len )
 	return 0;
 }
 
-static int load_psf( device_t *cpu, unsigned char *p_n_file, int n_len )
+static int load_psf( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 {
 	int n_return;
 	unsigned long n_crc;
@@ -415,9 +415,9 @@ DIRECT_UPDATE_MEMBER(psx1_state::psx_setopbase)
 {
 	if( address == 0x80030000 )
 	{
-		device_t *cpu = machine().device("maincpu");
+		cpu_device *cpu = machine().device<cpu_device>("maincpu");
 
-		machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(psx1_state::psx_default), this));
+		cpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(psx1_state::psx_default), this));
 
 		if( load_psxexe( cpu, m_exe_buffer, m_exe_size ) ||
 			load_cpe( cpu, m_exe_buffer, m_exe_size ) ||
@@ -425,7 +425,7 @@ DIRECT_UPDATE_MEMBER(psx1_state::psx_setopbase)
 		{
 /*          DEBUGGER_BREAK; */
 
-			address = cpu->state().state_int( PSXCPU_PC );
+			address = cpu->state_int( PSXCPU_PC );
 		}
 		else
 		{
