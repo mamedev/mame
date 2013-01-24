@@ -736,6 +736,11 @@ static void SCSP_UpdateReg(scsp_state *scsp, address_space &space, int reg)
 		case 0x7:
 			scsp_midi_in(space.machine().device("scsp"), space, 0, scsp->udata.data[0x6/2]&0xff, 0);
 			break;
+		case 8:
+		case 9:
+			/* Only MSLC could be written. */
+			scsp->udata.data[0x8/2] &= 0x7800;
+			break;
 		case 0x12:
 		case 0x13:
 		case 0x14:
@@ -901,7 +906,8 @@ static void SCSP_UpdateRegR(scsp_state *scsp, address_space &space, int reg)
 				unsigned int SGC = (slot->EG.state) & 3;
 				unsigned int CA = (slot->cur_addr>>(SHIFT+12)) & 0xf;
 				unsigned int EG = (0x1f - (slot->EG.volume>>(EG_SHIFT+5))) & 0x1f;
-				scsp->udata.data[0x8/2] =  (MSLC << 11) | (CA << 7) | (SGC << 5) | EG;
+				/* note: according to the manual MSLC is write only, CA, SGC and EG read only.  */
+				scsp->udata.data[0x8/2] =  /*(MSLC << 11) |*/ (CA << 7) | (SGC << 5) | EG;
 			}
 			break;
 

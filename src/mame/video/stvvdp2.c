@@ -3927,14 +3927,14 @@ static void stv_vdp2_check_tilemap_with_linescroll(running_machine &machine, bit
 	int i;
 	int scroll_values_equal;
 	int lines;
-	INT16 scrollx, scrolly;
+	INT16 main_scrollx, main_scrolly;
 //  INT32 incx;
 	int linescroll_enable, vertical_linescroll_enable, linezoom_enable;
 	int vertical_linescroll_index = -1;
 
 	// read original scroll values
-	scrollx = stv2_current_tilemap.scrollx;
-	scrolly = stv2_current_tilemap.scrolly;
+	main_scrollx = stv2_current_tilemap.scrollx;
+	main_scrolly = stv2_current_tilemap.scrolly;
 //  incx = stv2_current_tilemap.incx;
 
 	// prepare linescroll flags
@@ -4019,13 +4019,13 @@ static void stv_vdp2_check_tilemap_with_linescroll(running_machine &machine, bit
 		{
 			prev_scroll_values[i] &= 0x07ffff00;
 			if ( prev_scroll_values[i] & 0x04000000 ) prev_scroll_values[i] |= 0xf8000000;
-			stv2_current_tilemap.scrollx = scrollx + (prev_scroll_values[i] >> 16);
+			stv2_current_tilemap.scrollx = main_scrollx + (prev_scroll_values[i] >> 16);
 			i++;
 		}
 		// vertical line scroll
 		if ( vertical_linescroll_enable )
 		{
-			stv2_current_tilemap.scrolly = scrolly + (prev_scroll_values[i] >> 16);
+			stv2_current_tilemap.scrolly = main_scrolly + (prev_scroll_values[i] >> 16);
 			i++;
 		}
 
@@ -4040,7 +4040,20 @@ static void stv_vdp2_check_tilemap_with_linescroll(running_machine &machine, bit
 
 //      if ( LOG_VDP2 ) logerror( "Linescroll: y < %d, %d >, scrollx = %d, scrolly = %d, incx = %f\n", mycliprect.min_y, mycliprect.max_y, stv2_current_tilemap.scrollx, stv2_current_tilemap.scrolly, (float)stv2_current_tilemap.incx/65536.0 );
 		// render current tilemap portion
-		stv_vdp2_check_tilemap(machine, bitmap, mycliprect );
+		stv_vdp2_apply_window_on_layer(machine,mycliprect);
+
+		if (stv2_current_tilemap.bitmap_enable) // this layer is a bitmap
+		{
+			/*elandore doesn't like current cliprect code,will be worked on...*/
+			//if ( window_applied && stv2_current_tilemap.colour_depth != 4)
+			//  stv2_current_tilemap.window_control = 0;
+
+			stv_vdp2_draw_basic_bitmap(machine, bitmap, mycliprect);
+		}
+		else
+		{
+			stv_vdp2_draw_basic_tilemap(machine, bitmap, mycliprect);
+		}
 
 		// update parameters for next iteration
 		memcpy( prev_scroll_values, scroll_values, sizeof(scroll_values));
