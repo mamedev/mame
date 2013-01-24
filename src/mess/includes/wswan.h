@@ -13,25 +13,6 @@
 #define WSWAN_X_PIXELS  (28*8)
 #define WSWAN_Y_PIXELS  (18*8)
 
-/* Interrupt flags */
-#define WSWAN_IFLAG_STX    0x1
-#define WSWAN_IFLAG_KEY    0x2
-#define WSWAN_IFLAG_RTC    0x4
-#define WSWAN_IFLAG_SRX    0x8
-#define WSWAN_IFLAG_LCMP   0x10
-#define WSWAN_IFLAG_VBLTMR 0x20
-#define WSWAN_IFLAG_VBL    0x40
-#define WSWAN_IFLAG_HBLTMR 0x80
-/* Interrupts */
-#define WSWAN_INT_STX    0
-#define WSWAN_INT_KEY    1
-#define WSWAN_INT_RTC    2
-#define WSWAN_INT_SRX    3
-#define WSWAN_INT_LCMP   4
-#define WSWAN_INT_VBLTMR 5
-#define WSWAN_INT_VBL    6
-#define WSWAN_INT_HBLTMR 7
-
 #define INTERNAL_EEPROM_SIZE    1024
 
 #include "emu.h"
@@ -123,8 +104,11 @@ class wswan_state : public driver_device
 {
 public:
 	wswan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cursx(*this, "CURSX")
+		, m_cursy(*this, "CURSY")
+		, m_buttons(*this, "BUTTONS")
 	{ }
 
 	virtual void video_start();
@@ -159,6 +143,35 @@ public:
 	DECLARE_PALETTE_INIT(wscolor);
 	TIMER_CALLBACK_MEMBER(wswan_rtc_callback);
 	TIMER_CALLBACK_MEMBER(wswan_scanline_interrupt);
+
+protected:
+	/* Interrupt flags */
+	static const UINT8 WSWAN_IFLAG_STX    = 0x01;
+	static const UINT8 WSWAN_IFLAG_KEY    = 0x02;
+	static const UINT8 WSWAN_IFLAG_RTC    = 0x04;
+	static const UINT8 WSWAN_IFLAG_SRX    = 0x08;
+	static const UINT8 WSWAN_IFLAG_LCMP   = 0x10;
+	static const UINT8 WSWAN_IFLAG_VBLTMR = 0x20;
+	static const UINT8 WSWAN_IFLAG_VBL    = 0x40;
+	static const UINT8 WSWAN_IFLAG_HBLTMR = 0x80;
+
+	/* Interrupts */
+	static const UINT8 WSWAN_INT_STX    = 0;
+	static const UINT8 WSWAN_INT_KEY    = 1;
+	static const UINT8 WSWAN_INT_RTC    = 2;
+	static const UINT8 WSWAN_INT_SRX    = 3;
+	static const UINT8 WSWAN_INT_LCMP   = 4;
+	static const UINT8 WSWAN_INT_VBLTMR = 5;
+	static const UINT8 WSWAN_INT_VBL    = 6;
+	static const UINT8 WSWAN_INT_HBLTMR = 7;
+
+	required_ioport m_cursx;
+	required_ioport m_cursy;
+	required_ioport m_buttons;
+
+	void wswan_setup_bios();
+	void wswan_handle_irqs();
+	void wswan_set_irq_line(int irq);
 };
 
 

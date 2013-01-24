@@ -83,44 +83,59 @@ static const UINT8 ws_fake_bios_code[] = {
 	0xea, 0xc0, 0xff, 0x00, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static void wswan_handle_irqs( running_machine &machine )
+void wswan_state::wswan_handle_irqs()
 {
-	wswan_state *state = machine.driver_data<wswan_state>();
-	if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_HBLTMR ) {
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_HBLTMR );
-	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_VBL ) {
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_VBL );
-	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_VBLTMR ) {
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_VBLTMR );
-	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_LCMP ) {
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_LCMP );
-	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_SRX ) {
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_SRX );
-	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_RTC ) {
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_RTC );
-	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_KEY ) {
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_KEY );
-	} else if ( state->m_ws_portram[0xb2] & state->m_ws_portram[0xb6] & WSWAN_IFLAG_STX ) {
-		machine.device("maincpu")->execute().set_input_line_and_vector(0, HOLD_LINE, state->m_ws_portram[0xb0] + WSWAN_INT_STX );
-	} else {
-		machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE );
+	if ( m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_HBLTMR )
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_HBLTMR );
+	}
+	else if ( m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_VBL )
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_VBL );
+	}
+	else if ( m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_VBLTMR )
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_VBLTMR );
+	}
+	else if ( m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_LCMP )
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_LCMP );
+	}
+	else if ( m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_SRX )
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_SRX );
+	}
+	else if ( m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_RTC )
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_RTC );
+	}
+	else if ( m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_KEY )
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_KEY );
+	}
+	else if ( m_ws_portram[0xb2] & m_ws_portram[0xb6] & WSWAN_IFLAG_STX )
+	{
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, m_ws_portram[0xb0] + WSWAN_INT_STX );
+	}
+	else
+	{
+		m_maincpu->set_input_line(0, CLEAR_LINE );
 	}
 }
 
-static void wswan_set_irq_line( running_machine &machine, int irq)
+void wswan_state::wswan_set_irq_line(int irq)
 {
-	wswan_state *state = machine.driver_data<wswan_state>();
-	if ( state->m_ws_portram[0xb2] & irq )
+	if ( m_ws_portram[0xb2] & irq )
 	{
-		state->m_ws_portram[0xb6] |= irq;
-		wswan_handle_irqs( machine );
+		m_ws_portram[0xb6] |= irq;
+		wswan_handle_irqs();
 	}
 }
 
 void wswan_state::wswan_clear_irq_line(int irq)
 {
 	m_ws_portram[0xb6] &= ~irq;
-	wswan_handle_irqs( machine() );
+	wswan_handle_irqs();
 }
 
 TIMER_CALLBACK_MEMBER(wswan_state::wswan_rtc_callback)
@@ -176,13 +191,12 @@ static void wswan_machine_stop( running_machine &machine )
 	}
 }
 
-static void wswan_setup_bios( running_machine &machine )
+void wswan_state::wswan_setup_bios()
 {
-	wswan_state *state = machine.driver_data<wswan_state>();
-	if ( state->m_ws_bios_bank == NULL )
+	if ( m_ws_bios_bank == NULL )
 	{
-		state->m_ws_bios_bank = auto_alloc_array(machine, UINT8, 0x10000 );
-		memcpy( state->m_ws_bios_bank + 0xffc0, ws_fake_bios_code, 0x40 );
+		m_ws_bios_bank = auto_alloc_array(machine(), UINT8, 0x10000 );
+		memcpy( m_ws_bios_bank + 0xffc0, ws_fake_bios_code, 0x40 );
 	}
 }
 
@@ -194,7 +208,7 @@ void wswan_state::machine_start()
 	m_vdp.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wswan_state::wswan_scanline_interrupt),this), &m_vdp );
 	m_vdp.timer->adjust( attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
-	wswan_setup_bios(machine());
+	wswan_setup_bios();
 
 	/* Set up RTC timer */
 	if ( m_rtc.present )
@@ -211,7 +225,7 @@ MACHINE_START_MEMBER(wswan_state,wscolor)
 	m_vdp.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wswan_state::wswan_scanline_interrupt),this), &m_vdp );
 	m_vdp.timer->adjust( attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
-	wswan_setup_bios(machine());
+	wswan_setup_bios();
 
 	/* Set up RTC timer */
 	if ( m_rtc.present )
@@ -222,7 +236,7 @@ MACHINE_START_MEMBER(wswan_state,wscolor)
 
 void wswan_state::machine_reset()
 {
-	address_space &space = machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &space = m_maincpu->space( AS_PROGRAM );
 
 	/* Intialize ports */
 	memcpy( m_ws_portram, ws_portram_init, 256 );
@@ -285,7 +299,7 @@ READ8_MEMBER( wswan_state::wswan_port_r )
 	UINT8 value = m_ws_portram[offset];
 
 	if ( offset != 2 )
-		logerror( "PC=%X: port read %02X\n", machine().device("maincpu") ->safe_pc( ), offset );
+		logerror( "PC=%X: port read %02X\n", m_maincpu->pc(), offset );
 	switch( offset )
 	{
 		case 0x02:      /* Current line */
@@ -354,9 +368,8 @@ READ8_MEMBER( wswan_state::wswan_port_r )
 WRITE8_MEMBER( wswan_state::wswan_port_w )
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	wswan_state *state = machine().driver_data<wswan_state>();
 	UINT8 input;
-	logerror( "PC=%X: port write %02X <- %02X\n", mem.device().safe_pc(), offset, data );
+	logerror( "PC=%X: port write %02X <- %02X\n", m_maincpu->pc(), offset, data );
 	switch( offset )
 	{
 		case 0x00:  /* Display control
@@ -953,8 +966,8 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 			switch( data )
 			{
 				case 0x10:  /* Read Y cursors: Y1 - Y2 - Y3 - Y4 */
-					input = ioport("CURSY")->read();
-					if (state->m_rotate) // reorient controls if the console is rotated
+					input = m_cursy->read();
+					if (m_rotate) // reorient controls if the console is rotated
 					{
 						if (input & 0x01) data |= 0x02;
 						if (input & 0x02) data |= 0x04;
@@ -965,8 +978,8 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 						data = data | input;
 				break;
 				case 0x20:  /* Read X cursors: X1 - X2 - X3 - X4 */
-					input = ioport("CURSX")->read();
-					if (state->m_rotate) // reorient controls if the console is rotated
+					input = m_cursx->read();
+					if (m_rotate) // reorient controls if the console is rotated
 					{
 						if (input & 0x01) data |= 0x02;
 						if (input & 0x02) data |= 0x04;
@@ -977,7 +990,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
 						data = data | input;
 				break;
 				case 0x40:  /* Read buttons: START - A - B */
-					data = data | ioport("BUTTONS")->read();
+					data = data | m_buttons->read();
 				break;
 			}
 			break;
@@ -1349,7 +1362,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	else
 		size = image.get_software_region_length("rom");
 
-	state->m_ws_ram = (UINT8*) image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(0);
+	state->m_ws_ram = (UINT8*) state->m_maincpu->space(AS_PROGRAM).get_read_ptr(0);
 	memset(state->m_ws_ram, 0, 0xffff);
 	state->m_ROMBanks = size / 65536;
 
@@ -1450,14 +1463,14 @@ TIMER_CALLBACK_MEMBER(wswan_state::wswan_scanline_interrupt)
 				m_vdp.timer_hblank_reload = 0;
 			}
 			logerror( "trigerring hbltmr interrupt\n" );
-			wswan_set_irq_line( machine(), WSWAN_IFLAG_HBLTMR );
+			wswan_set_irq_line( WSWAN_IFLAG_HBLTMR );
 		}
 	}
 
 	/* Handle Sound DMA */
 	if ( ( m_sound_dma.enable & 0x88 ) == 0x80 )
 	{
-		address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM );
+		address_space &space = m_maincpu->space(AS_PROGRAM );
 		/* TODO: Output sound DMA byte */
 		wswan_port_w( space, 0x89, space.read_byte(m_sound_dma.source ) );
 		m_sound_dma.size--;
@@ -1479,7 +1492,7 @@ TIMER_CALLBACK_MEMBER(wswan_state::wswan_scanline_interrupt)
 
 	if( m_vdp.current_line == 144 )
 	{
-		wswan_set_irq_line( machine(), WSWAN_IFLAG_VBL );
+		wswan_set_irq_line( WSWAN_IFLAG_VBL );
 		/* Decrement 75Hz (VBlank) counter */
 		if ( m_vdp.timer_vblank_enable && m_vdp.timer_vblank_reload != 0 )
 		{
@@ -1496,7 +1509,7 @@ TIMER_CALLBACK_MEMBER(wswan_state::wswan_scanline_interrupt)
 					m_vdp.timer_vblank_reload = 0;
 				}
 				logerror( "triggering vbltmr interrupt\n" );
-				wswan_set_irq_line( machine(), WSWAN_IFLAG_VBLTMR );
+				wswan_set_irq_line( WSWAN_IFLAG_VBLTMR );
 			}
 		}
 	}
@@ -1505,7 +1518,7 @@ TIMER_CALLBACK_MEMBER(wswan_state::wswan_scanline_interrupt)
 
 	if ( m_vdp.current_line == m_vdp.line_compare )
 	{
-		wswan_set_irq_line( machine(), WSWAN_IFLAG_LCMP );
+		wswan_set_irq_line( WSWAN_IFLAG_LCMP );
 	}
 
 	m_vdp.current_line = (m_vdp.current_line + 1) % 159;
