@@ -5,16 +5,1530 @@
     for +3 machines etc.
 -->
 
-
 <softwarelist name="spectrum_flop" description="ZX Spectrum Disc Images">
 
 	<software name="pacmania" >
-		<description>Pac-Mania (Europe / Australia)</description>
+		<description>Pac-Mania (Euro, Aus)</description>
 		<year>1988</year>
-		<publisher>Namco / Grandslam</publisher>
+		<publisher>Grandslam Entertainments</publisher>
 		<part name="flop1" interface="floppy_3">
 			<dataarea name="flop" size="195328">
 				<rom name="pac-mania.dsk" size="195328" crc="88f5506b" sha1="827c95935dd3a1dd919989fc6d7a0efa4e5aebc1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actforce" >
+		<description>Action Force: International Heroes</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom   name="3500 - action force - international heroes (europe).ipf" size="236460" crc="1a2bb165" sha1="9b9b44e1118c40bbb9c6a32d4ffc6e61f8c5fd3b"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="adidchtb">
+		<description>adidas Championship Tie-Break</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="123445">
+				<rom name="3501 - adidas championship tie break (europe).ipf" size="123445" crc="6e2e4951" sha1="a50e132cb68cc406e59485b617fc384288762d7f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bhcop">
+		<description>Beverly Hills Cop</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3502 - beverly hills cop (europe).ipf" size="236460" crc="81fbf5ad" sha1="2022531eba845cfcd19a2fb2b69d54e007979592"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbrg">
+		<description>Buffalo Bill's Rodeo Games</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3503 - buffalo bill's rodeo games (unknown).ipf" size="234180" crc="74650740" sha1="cdf81f26af4e013726a288c3a27a1765b254c267"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carrierc">
+		<description>Carrier Command</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236140">
+				<rom name="3504 - carrier command (europe).ipf" size="236140" crc="3596b16d" sha1="842715907902c7d15a28e92db6e66e2f435f8781"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dandare3">
+		<description>Dan Dare III: The Escape</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="71100">
+				<rom name="3505 - dan dare iii - the escape (europe).ipf" size="71100" crc="e949bc77" sha1="6074056cd0ef8aaf103d36fde1e5a1fba356904f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deep">
+		<description>The deep</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="266891">
+				<rom name="3506 - deep, the (europe).ipf" size="266891" crc="e4844d2b" sha1="95dee7ccae5613c9b04efdbde5e2bc6c69a1e735"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dominator">
+		<description>Dominator</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="250612">
+				<rom name="3507 - dominator (europe).ipf" size="250612" crc="e6c6f9eb" sha1="22d46cc0cabba10b0d58bba86b5123fdcf73a731"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f16comb">
+		<description>F-16 Combat Pilot</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="161607">
+				<rom name="3508 - f-16 combat pilot (europe).ipf" size="161607" crc="49f2d22d" sha1="1336f27de5c4c1aad734f83aa6c2ffca9efe6747"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="footdir2">
+		<description>Football Director II</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3509 - football director ii (europe).ipf" size="234180" crc="f98bb0e1" sha1="0eab5d91a1ab220fbc22ae76485fa19beec36adb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hewson4">
+		<description>Four Smash Hits From Hewson</description>
+		<year>198?</year>
+		<publisher>Hewson</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="238800">
+				<rom name="3510 - four smash hits from hewson - exolon + zynaps + rana rama + uridium plus (europe).ipf" size="238800" crc="0e708293" sha1="85d7346aff7b7d63a290a828da0445ab73aa9855"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garfield">
+		<description>Garfield - Big, Fat, Hairy Deal</description>
+		<year>1988</year>
+		<publisher>The Edge</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3511 - garfield - big, fat, hairy deal (europe).ipf" size="236460" crc="ffb8008d" sha1="f9f314b1d26c58340a962b7d6f35fdc5cf65768c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="herotl">
+		<description>Heroes of the Lance</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="237465">
+				<rom name="3513 - heroes of the lance (europe).ipf" size="237465" crc="d25d5414" sha1="2caf612f85dc9b790102df5f6a76d90c3408c8db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heroq">
+		<description>Heroquest</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="239805">
+				<rom name="3514 - heroquest (europe).ipf" size="239805" crc="fc8bb800" sha1="96538aa2fd28b7ae66916590479b0596afcc495c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kenydalm">
+		<description>Kenny Dalglish Soccer Match</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3515 - kenny dalglish soccer match (europe).ipf" size="234180" crc="faeb7b0f" sha1="263e1fcb8bb77632cd83ab1dd2ce8d960bed9270"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kickoff">
+		<description>Kick Off</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3516 - kick off (europe).ipf" size="234180" crc="152e807b" sha1="855dc66c697484083c729d2183035dfb9166aacc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lightcor">
+		<description>The Light Corridor</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="125316">
+				<rom name="3517 - light corridor, the (europe).ipf" size="125316" crc="ef3b80cd" sha1="568f29ba7d1a498432737543af07ba57c4adb26c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lmidnght">
+		<description>Loads of Midnight</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3518 - loads of midnight (europe).ipf" size="236460" crc="a74f1114" sha1="2ab72f52fa499be8810f67e14aa477a114d37c29"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marauder (europe)">
+		<description>Marauder</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="237460">
+				<rom name="3519 - marauder (europe).ipf" size="237460" crc="2b61f4db" sha1="6896d9424b64b0ce2239485f28da9d49c7952e84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midnight">
+		<description>Midnight Resistance</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="146161">
+				<rom name="3520 - midnight resistance (europe).ipf" size="146161" crc="62943f46" sha1="369f6ed76e6b8c7d60949754b49f939d0747bd46"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="montypyt">
+		<description>Monty Python's Flying Circus</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="262692">
+				<rom name="3521 - monty python's flying circus (europe).ipf" size="262692" crc="8d7630b6" sha1="31495c6cf185cb00ff83eb3dc8f8b126118cf1b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjawar">
+		<description>The Ninja Warriors</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="241110">
+				<rom name="3522 - ninja warriors, the (europe).ipf" size="241110" crc="4eb0abeb" sha1="e1ef8de2788953c9399515796ee1309ea33ccd3f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pang">
+		<description>Pang</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="196735">
+				<rom name="3523 - pang (europe).ipf" size="196735" crc="604502ad" sha1="a7f22304e0deae1a25f23ea7f73570dbcfe2bbd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="passings">
+		<description>Passing Shot</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="77364">
+				<rom name="3524 - passing shot (europe).ipf" size="77364" crc="f987b804" sha1="d5537ad6d7670725396d63022fe4fa3a4c3b6aa7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pawn">
+		<description>The Pawn</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3525 - pawn, the (europe).ipf" size="236460" crc="468012a2" sha1="1402a94935992789fdbffa1aa07140d56eeba435"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="platoon">
+		<description>Platoon</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="159198">
+				<rom name="3526 - platoon (europe).ipf" size="159198" crc="56fe10dc" sha1="d844dabecb043d8c16bd8864b7146de456cda369"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="predatr2">
+		<description>Predator 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3527 - predator 2 (europe).ipf" size="234180" crc="2cdff17b" sha1="c691b6cca52aced2790f7e99f27cc6b3e8040c4e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robocop2">
+		<description>Robocop 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="139905">
+				<rom name="3528 - robocop 2 (europe).ipf" size="139905" crc="dcedfec7" sha1="80535591f4d93e2df41481df64673571d93b1809"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quescrup">
+		<description>A Question of Scruples: The Computer Edition</description>
+		<year>1987</year>
+		<publisher>Leisure Genius</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3529 - question of scruples, a - the computer edition (europe).ipf" size="236460" crc="34d8887c" sha1="2e402eb208ce6695930a8d7e042c4b1f0f7e6944"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="simcity">
+		<description>Sim City</description>
+		<year>19??</year>
+		<publisher>Maxis</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="12e901e">
+				<rom name="3530 - sim city (europe).ipf" size="126717" crc="12e901ee" sha1="7fd665f19a290994dfbf8ba02da19ac1905581be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snoopy">
+		<description>Snoopy: The Cool Computer Game</description>
+		<year>1991</year>
+		<publisher>The Edge</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="195328">
+				<rom name="3531 - snoopy - the cool computer game (europe).ipf" size="236460" crc="acdfe6d4" sha1="4ab0bd91d893964d957bf8c7ab3fa79d534220dc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soldiero">
+		<description>Soldier of Light</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3532 - soldier of light (europe).ipf" size="236460" crc="bffdd16e" sha1="948cf81086d9093da6cd08be61f60d46caf4e933"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacecru">
+		<description>Space Crusade</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="239805">
+				<rom name="3533 - space crusade (europe).ipf" size="239805" crc="9c96fd7b" sha1="a1e5864217fe7f5617d21e005f53752af0238f92"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sportdsk">
+		<description>Sportacular Disk 1</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+		<info name="games" value="soccer boss, olympic spectacular, indoor soccer" />
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3534 - sportacular disk 1 - soccer boss + olympic spectacular + indoor soccer (europe).ipf" size="234180" crc="6945a61b" sha1="bf3f411cbb998a0af1274154f1761e753eb6a92f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stalngrd">
+		<description>Stalingrad</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3535 - stalingrad (europe).ipf" size="236460" crc="cb347afc" sha1="cb584de6c08d12788e8ef8c2b5e74e06ffbb2c12"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starglid">
+		<description>Starglider</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3536 - starglider (europe).ipf" size="236460" crc="8bfbfec7" sha1="68b7e4ba0c50cb750926623f513d436a00f73581"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supercar">
+		<description>Super Cars</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="212085">
+				<rom name="3537 - super cars (europe).ipf" size="212085" crc="20a43fbb" sha1="de410ab9d0fc172e58d523f4e22088694306f407"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="offroad">
+		<description>Ivan 'Ironman' Stewart's Super Off Road</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="64845">
+				<rom name="3538 - ivan ironman stewart's super off road (unknown).ipf" size="64845" crc="38cb136b" sha1="5b633c7551b168d13d1c4d96637858fbcc027740"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ssi">
+		<description>Super Space Invaders</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3539 - super space invaders (europe).ipf" size="234180" crc="3f3b3a3e" sha1="eeed9c991f06819e3a1aed01d42cd0ec364fac6c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmht">
+		<description>Teenage Mutant Hero Turtles</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3540 - teenage mutant hero turtles (europe).ipf" size="234180" crc="5cba9f99" sha1="920b8203c466a578d73aef39e0b54931e42b359d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmht3" cloneof="tmht">
+		<description>Teenage Mutant Hero Turtles (three inch)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3541 - teenage mutant hero turtles (europe) (three inch).ipf" size="236460" crc="1125e88f" sha1="ee807ed179cb748403f94d7aa4b6e7ae8a9b033b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="totrecalgh" cloneof="totrecal">
+		<description>Total recall (Guild Home Video Advert)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="184315">
+				<rom name="3542 - total recall (europe) (guild home video advert).ipf" size="184315" crc="48eb67ce" sha1="66005b0a98851cdd784798a94e25b3eee8e3007f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="totrecal">
+		<description>Total Recall</description>
+		<year>1991</year>
+		<publisher>Ocean Software Ltd</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="184315">
+				<rom name="3543 - total recall (europe).ipf" size="184315" crc="9e5325a8" sha1="1748281e2a811580c3af086e59e9d5302c2c766b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tbrookwc">
+		<description>Trevor Brooking's World Cup Glory</description>
+		<year>1990</year>
+		<publisher>Challenge Software</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3544 - trevor brooking's world cup glory (europe).ipf" size="234180" crc="98358646" sha1="4ddc2a1dfb6e0c6c1e9d209f74d62dba6182f5e8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vixen">
+		<description>Vixen</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3545 - vixen (europe).ipf" size="236460" crc="2ebf7637" sha1="8435d9b04b7fe9bcd04679022aa01c85461c3f75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warmidle">
+		<description>J.R.R. Tolkien's War in Middle Earth</description>
+		<year>1989</year>
+		<publisher>Krome Studios Melbourne</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3546 - j.r.r. tolkien's war in middle earth (europe).ipf" size="234180" crc="f66db1bb" sha1="e3b62c9c01a49068a6f57abbdea93dd6013b6858"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="welltris">
+		<description>Welltris</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3547 - welltris (europe).ipf" size="236460" crc="18f7df7f" sha1="626b5fbef66aee9fab753eaf4ff95d844ae49efa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="italia90">
+		<description>Italia '90 - World Cup Soccer</description>
+		<year>1989</year>
+		<publisher>Virgin Games</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="71100">
+				<rom name="3548 - italia '90 - world cup soccer (europe).ipf" size="71100" crc="78fa8fd0" sha1="ff5c8308544f24e428e877c3ea8c803f432468bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenon">
+		<description>Xenon</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3549 - xenon (europe).ipf" size="234180" crc="01daebfa" sha1="5ae00774d2da999b95b29142d11a01311b2cf07c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xout">
+		<description>X-out</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="259471">
+				<rom name="3550 - x-out (europe).ipf" size="259471" crc="12540648" sha1="4f3650e4739c1eca40d56360b16fd7460d37ac75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aforce2">
+		<description>Action Force II: International Heroes</description>
+		<year>1988</year>
+		<publisher>Virgin Games</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="238175">
+				<rom name="3551 - action force ii - international heroes (europe).ipf" size="238175" crc="caa251a2" sha1="9c02f116d5a61d5d064d3a5643e70542f1e01bf9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artura">
+		<description>Artura</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="237460">
+				<rom name="3552 - artura (europe).ipf" size="237460" crc="bcc6e00c" sha1="8781e6b1e1bf98a1fc6b8ffb77f5671780c5e402"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="badlands">
+		<description>Badlands</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3553 - badlands (europe).ipf" size="234180" crc="93f1c3b6" sha1="9da5ab7e607dad7fd5b605997929eff43c20abb7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bloodwych">
+		<description>Bloodwych</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3554 - bloodwych (europe).ipf" size="236460" crc="cb66aed6" sha1="b7bab317718a478e48a689a8ebd125a498504ebe"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boggit">
+		<description>The Boggit: Bored Too</description>
+		<year>1986</year>
+		<publisher>CRL Group</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3555 - boggit, the - bored too (europe).ipf" size="236460" crc="c9dc8d41" sha1="ae1aff98a4e60bf6272c8955a224a7b0e890c40e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bookdead">
+		<description>Book of the Dead</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3556 - book of the dead (europe).ipf" size="236460" crc="b1030311" sha1="6ddbe67cbba260b6ec80ee0bc7e557f88bf08a23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="butchill">
+		<description>Butcher Hill</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="237460">
+				<rom name="3557 - butcher hill (europe).ipf" size="237460" crc="5ae072b5" sha1="96e89f1229f2d8306965b925145ae0ab454def6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chicago">
+		<description>Chicago 30's</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="266892">
+				<rom name="3558 - chicago 30's (unknown).ipf" size="266892" crc="50f0a090" sha1="a0be8b20605834f29e59ded94786ed90d07b235b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="combtschol">
+		<description>Combat School</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="238800">
+				<rom name="3559 - combat school (europe).ipf" size="238800" crc="ba69a18a" sha1="581b183c20d6cf33e0965ff00c5b077a9618d872"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="corupton">
+		<description>Corruption</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3560 - corruption (europe).ipf" size="236460" crc="cfbb80af" sha1="ed489e12913c2bb7fbb48fed0c9644b7cfceb59e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cybernod">
+		<description>Cybernoid - The Fighting Machine</description>
+		<year>1989</year>
+		<publisher>Acclaim Entertainment</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="212085">
+				<rom name="3561 - cybernoid - the fighting machine (europe).ipf" size="212085" crc="3733ffa8" sha1="2a0b2f4c29a568e6e4ac287e679f6b4a4e6ae742"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cyberno2">
+		<description>Cybernoid II: The Revenge</description>
+		<year>19??</year>
+		<publisher>Acclaim Entertainment</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3562 - cybernoid ii - the revenge (europe).ipf" size="236460" crc="417b84f6" sha1="a2c8753121df65bd95a0d31e7ee6101a2d74ea61"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darkfusn">
+		<description>Dark Fusion</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="260585">
+				<rom name="3563 - dark fusion (europe).ipf" size="260585" crc="9495182c" sha1="bb94b445a9909ba39f21119dcc43dbd1497aed20"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deflekto">
+		<description>Deflektor</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="212085">
+				<rom name="3564 - deflektor (europe).ipf" size="212085" crc="2483f8c7" sha1="032b18abb2eb903ded8b32a59b003a68d784d996"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="echelon">
+		<description>Echelon</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="237460">
+				<rom name="3565 - echelon (europe).ipf" size="237460" crc="94c24ad3" sha1="cae1aa9d3897ec2027120afd1e4d3370b78de3cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="erik">
+		<description>Erik: The Phantom of the Opera</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3566 - erik - the phantom of the opera (europe).ipf" size="236460" crc="77098dc3" sha1="619babc59ea1816a4ea8e2d2030c25205fd65735"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="escaplrm">
+		<description>Escape From the Planet of the Robot Monsters</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3567 - escape from the planet of the robot monsters (europe).ipf" size="234180" crc="ba153a21" sha1="4bb529af057b9cc5ab547cf754a3e4c21d0f34c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="espionag">
+		<description>Espionage: The Computer Game</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="99180">
+				<rom name="3568 - espionage - the computer game (europe).ipf" size="99180" crc="893495d8" sha1="eac0b7dcd91d628bf85938327ec15b833dd6f1d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="federati">
+		<description>Federation</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3569 - federation (europe).ipf" size="236460" crc="091f3f4f" sha1="fb0f360417ef35fcf5bb59b2c9822ffb7d834015"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="firefly">
+		<description>Firefly</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="238800">
+				<rom name="3570 - firefly (europe).ipf" size="238800" crc="e1961552" sha1="b3b3d1ebd5f6d5ce7ed104ffa63d1bac97b51db8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fish">
+		<description>Fish!</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3571 - fish! (europe).ipf" size="236460" crc="880592d1" sha1="7522893bfa42a8b25bf98af8b54a83568df72bd3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="foty2">
+		<description>Footballer of the Year 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="259471">
+				<rom name="3572 - footballer of the year 2 (europe).ipf" size="259471" crc="96979e7f" sha1="a559adafcda492756da509ed22d62a53dbba2a16"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garyshot">
+		<description>Gary Lineker's Hot-shot!</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="266892">
+				<rom name="3573 - gary lineker's hot-shot! (unknown).ipf" size="266892" crc="17963acf" sha1="22a8985076b7c1743e9431e071940c49efe217f5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garyskil">
+		<description>Gary Lineker's Superskills</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="237460">
+				<rom name="3574 - gary lineker's superskills (unknown).ipf" size="237460" crc="2f0ed1da" sha1="589cf6b337347218814a4a697353be4af5024c8a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="garysocr">
+		<description>Gary Lineker's Superstar Soccer</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="212085">
+				<rom name="3575 - gary lineker's superstar soccer (unknown).ipf" size="212085" crc="2a1c53f7" sha1="f4c24b1e01312d4f9b2241be14d243e723035499"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gauntlet">
+		<description>Gauntlet</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="212085">
+				<rom name="3576 - gauntlet (europe).ipf" size="212085" crc="4c4c4cc2" sha1="c04e3233166fe888a96b2ea98a6a96f33fb19728"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gauntl2">
+		<description>Gauntlet II</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="212085">
+				<rom name="3577 - gauntlet ii (europe).ipf" size="212085" crc="7d156d4d" sha1="0d296b611c817203bf59a3710c87d0d5d39c16cf"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gazza2">
+		<description>Gazza II</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="225096">
+				<rom name="3578 - gazza ii (europe).ipf" size="225096" crc="59a83634" sha1="c43b421f8b0c32858d6bc9668b3b60ef4704f756"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gazzasso">
+		<description>Gazza's Super Soccer</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3579 - gazza's super soccer (unknown).ipf" size="236460" crc="3c8cb09d" sha1="19a06b4732fefb4d5a8898d415afde39aa8a8495"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hate">
+		<description>H.A.T.E.: Hostile All Terrain Encounter</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="266892">
+				<rom name="3580 - h.a.t.e. - hostile all terrain encounter (europe).ipf" size="266892" crc="2aa400b2" sha1="3d847b6f91d0264900e6f2d28bb30574806613ae"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hkm">
+		<description>H.K.M.: Human Killing Machine</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="266892">
+				<rom name="3581 - h.k.m. - human killing machine (europe).ipf" size="266892" crc="2793e98f" sha1="ef4b8fcfb530a6b1edcc8820a3fdc00dbc79ec9d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ironlord">
+		<description>Iron Lord</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="259180">
+				<rom name="3582 - iron lord (europe).ipf" size="259180" crc="de0e3c7f" sha1="792d58267e8ca7e00b0946a78b7c6b0574ccc942"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jackrip">
+		<description>Jack the Ripper</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3583 - jack the ripper (europe).ipf" size="236460" crc="d2f3019f" sha1="30a0e536578ca62133666b2a710ceef505140215"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lmohican">
+		<description>The Last Mohican</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3584 - last mohican, the (europe).ipf" size="236460" crc="ed3f624d" sha1="222b93b8e83987c8e5b83f4eb68dee8227bffc64"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lonewolf">
+		<description>Lone Wolf: The Mirror of Death</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3586 - lone wolf - the mirror of death (europe).ipf" size="236460" crc="8943aba3" sha1="c6c810341c40a099858678ea63d701feca7d611f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lotus">
+		<description>Lotus Esprit Turbo Challenge</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="239805">
+				<rom name="3587 - lotus esprit turbo challenge (europe).ipf" size="239805" crc="7c19c332" sha1="9756acef2e504b898894eef464c2496d60fbc862"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mask3">
+		<description>Mask III: Venom Strikes Back</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="212085">
+				<rom name="3588 - mask iii - venom strikes back (europe).ipf" size="212085" crc="d36cea11" sha1="e4f73b8b32cf20802462997bc8f0adae38039e73"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="munivers">
+		<description>Masters of the Universe: The Movie</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="212085">
+				<rom name="3589 - masters of the universe - the movie (europe).ipf" size="212085" crc="dc32481a" sha1="66ebeed6e635b019f6cdea6c4b1a7f8305f5e7d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="megapclp">
+		<description>Mega-apocalypse</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3590 - mega-apocalypse (europe).ipf" size="236460" crc="802fa03e" sha1="0db41124887381927e87c9b294de53b5b0e0443d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmouse">
+		<description>Mickey Mouse</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="212085">
+				<rom name="3591 - mickey mouse (europe).ipf" size="212085" crc="a788f7e3" sha1="9a89ba9da2a65acbe909e1be4ace922fb52ad28c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="northstar">
+		<description>North Star</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="212085">
+				<rom name="3592 - north star (europe).ipf" size="212085" crc="3c78a485" sha1="a8e47ac46b9d6396d422fee1ec91d753ccf66ec6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="oblitera">
+		<description>Obliterator</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3593 - obliterator (unknown).ipf" size="234180" crc="2ecaeee7" sha1="5e414ccba57f2fb0d384dac268b7f6f7b1fc48d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="p47thun">
+		<description>P-47 Thunderbolt</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3594 - p-47 thunderbolt (europe).ipf" size="236460" crc="5e7c8a54" sha1="077718f2e94cef68e57114249e869d6cb897a616"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacland">
+		<description>Pac-land</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="114805">
+				<rom name="3595 - pac-land (europe).ipf" size="114805" crc="93e4fc20" sha1="58a070edfbc9d28e9a1a25674867433e7e22e214"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phmpegas">
+		<description>PHM Pegasus: Patrol Hydrofoil Missile Craft Simulation</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="238800">
+				<rom name="3596 - phm pegasus - patrol hydrofoil missile craft simulation (europe).ipf" size="238800" crc="ef9157eb" sha1="ae18a271c03fee31a70fa55b80ad4b991fab156e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipemania">
+		<description>Pipe Mania</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3597 - pipe mania (europe).ipf" size="234180" crc="c42e0870" sha1="70623591fbef78e5562ac88418ad61df1ba9a811"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pirate33">
+		<description>Pirate 3+3</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+		<info name="games" value="Holiday in Sumaria + Call Me Psycho + Smash Out!" />
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3598 - pirate 3+3 - holiday in sumaria + call me psycho + smash out! (europe).ipf" size="236460" crc="95e093a6" sha1="c6bb5c0c3fd92c8d666b3493ca8fdc55a8f1d35d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ptt">
+		<description>Pro Tennis Tour</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3599 - pro tennis tour (europe).ipf" size="236460" crc="e1e4448b" sha1="b8abc334bf1604934e293c133fdbe3946e744975"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rainbow">
+		<description>Rainbow Islands</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="211680">
+				<rom name="3600 - rainbow islands (europe).ipf" size="211680" crc="d7db38ed" sha1="acfc70b4ecb3a4493321541a86585aaf85aed12c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quessprt">
+		<description>A Question of Sport</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3601 - question of sport, a (europe).ipf" size="236460" crc="8402bbeb" sha1="0f47e7c7326ad484f2222579c6395e29031a0115"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rbibb2">
+		<description>R.B.I. Baseball Two</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3602 - r.b.i. baseball two (europe).ipf" size="234180" crc="87c57f24" sha1="5558cfb938091ab469bbec5a3323d69a73186bfd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="renegade">
+		<description>Renegade</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3603 - renegade (europe).ipf" size="236460" crc="84a1fc8e" sha1="bcf794a5ab09f3febd58e26a4e4fa31f5e1941f9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jedi">
+		<description>Star Wars: Return of the Jedi</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3604 - star wars - return of the jedi (europe).ipf" size="236460" crc="6f6134a2" sha1="7f04c19c145dc216736d8daadba0641277170d4c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rex">
+		<description>Rex</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3605 - rex (europe).ipf" size="236460" crc="ee04c2c3" sha1="8bd98191db385647c808453ec50813dd93d72b0c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rblasters">
+		<description>Road Blasters</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="238800">
+				<rom name="3606 - road blasters (europe).ipf" size="238800" crc="95160028" sha1="f0359902f4687a30aa98a2b11e1eee1e170daa15"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rthunder">
+		<description>Rolling Thunder</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="237460">
+				<rom name="3608 - rolling thunder (europe).ipf" size="237460" crc="ddd2f964" sha1="5a910fc46cef7b545bb817128048de41357e6991"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="runthega">
+		<description>Run the Gauntlet</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="212085">
+				<rom name="3609 - run the gauntlet (europe).ipf" size="212085" crc="e1a23873" sha1="191d4c4f0beef6e4fd4cd47edda058092e2374a5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sntgrev">
+		<description>Saint and Greavsie</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="267142">
+				<rom name="3610 - saint and greavsie (europe).ipf" size="267142" crc="8e3df69a" sha1="671ed674a6f05d0db8e3e437de87ee2298a43769"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrbdlx">
+		<description>Scrabble Deluxe</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="233852">
+				<rom name="3611 - scrabble deluxe (europe).ipf" size="233852" crc="fd27626b" sha1="06f09b5a89ddd32fff07eb5aeae40bad96d8275e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shootdsk">
+		<description>Shootacular Disk 2</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+		<info name="game" value="Combat Zone, Firestorm, Dead or Alive" />
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3612 - shootacular disk 2 - combat zone + firestorm + dead or alive (europe).ipf" size="234180" crc="9fbe4d56" sha1="ce4ae2c4e57f68da942249b204ec28a23ae1760c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skatball">
+		<description>Skateball</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3613 - skateball (europe).ipf" size="236460" crc="00cb42ee" sha1="f3a0c02215f9ea679bcb338b9f5a9d7cc61ab235"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skullxbo">
+		<description>Skull & Crossbones</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="271685">
+				<rom name="3614 - skull &amp; crossbones (europe).ipf" size="271685" crc="a6c33f24" sha1="91c9b414d4ac1bd44657dd68d4ef2c8d911b45db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spylovme">
+		<description>The Spy Who Loved Me</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3615 - spy who loved me, the (europe).ipf" size="234180" crc="6d638747" sha1="30763ad2f43935d7b63fdec20e62858357742b77"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cchaplin">
+		<description>Starring Charlie Chaplin</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="237460">
+				<rom name="3616 - starring charlie chaplin (europe).ipf" size="237460" crc="93bc0467" sha1="02bc05b02a6880deb03db12e658f65d9b46f9a6f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwars">
+		<description>Star Wars</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3617 - star wars (europe).ipf" size="236460" crc="f7406cf3" sha1="892d00becdc045a5289c4ae172291486e3107c76"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subbuteo">
+		<description>Subbuteo - The Computer Game</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3618 - subbuteo - the computer game (europe).ipf" size="236460" crc="2bc39232" sha1="b4933dd0e5420e1f8c977192cef1dc09dcc0ec81"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scxwordv1">
+		<description>The Sun Computer Crosswords Volume 1</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3619 - sun computer crosswords volume 1, the (europe).ipf" size="236460" crc="e87a9910" sha1="5c3c7cc4c1d3ae851a1631bfb5a25ec324b33783"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="suprcycl">
+		<description>Super Cycle</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="237460">
+				<rom name="3620 - super cycle (europe).ipf" size="237460" crc="4349a0e1" sha1="297c1aedb313a8344f9e7489f7d282e1260506c6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taipan">
+		<description>Tai-pan</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="236460">
+				<rom name="3621 - tai-pan (europe).ipf" size="236460" crc="aef0bdf1" sha1="467dfa30fa1a1f7278b83d27bd9a1a1a9bfa0bdd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="term2">
+		<description>Terminator 2 - Judgment Day</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="259185">
+				<rom name="3622 - terminator 2 - judgment day (europe).ipf" size="259185" crc="da207f08" sha1="04ae9ac360b9fbe23c76a4d380cde9ca9903b0e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tblade">
+		<description>Thunder Blade</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="237460">
+				<rom name="3623 - thunder blade (europe).ipf" size="237460" crc="c83cc174" sha1="eba2cc3c53a1634e48098a431f73dee3169c78d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thdrcats">
+		<description>Thundercats</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3624 - thundercats (europe).ipf" size="234180" crc="459999a2" sha1="af7f670ffaf05bc36bb7997849d446770ed7a4b3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vigilant">
+		<description>Vigilante</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="266892">
+				<rom name="3626 - vigilante (europe).ipf" size="266892" crc="4df85c44" sha1="0f13d51918c0df0a07ef13e22b23f49c17007219"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcbox">
+		<description>World Championship Boxing Manager</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="234180">
+				<rom name="3627 - world championship boxing manager (europe).ipf" size="234180" crc="20b95f60" sha1="ac43afcf09a27828b503328f236ce40c1842c2a8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xybots">
+		<description>Xybots</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="209805">
+				<rom name="3628 - xybots (europe).ipf" size="209805" crc="51a0d849" sha1="86461e526a4cf5c7731f1e1067433ca9c8d57dec"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="maktril">
+		<description>Magic Knight Trilogy</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+		<info name="game" value="Finders Keepers + Spellbound + Knight Tyme" />
+
+		<part name="flop1" interface="floppy_3">
+			<dataarea name="flop" size="463740">
+				<rom name="3629 - magic knight trilogy - finders keepers + spellbound + knight tyme (europe).ipf" size="463740" crc="079c89bd" sha1="d90d4d25300795b8cc4ba383c680784b3050ef40"/>
 			</dataarea>
 		</part>
 	</software>
