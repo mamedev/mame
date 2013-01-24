@@ -8,9 +8,13 @@
 DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
 	WindowQt(machine, parent)
 {
-	QPoint parentPos = parent->pos();
-	setGeometry(parentPos.x()+100, parentPos.y()+100, 800, 400);
 	setWindowTitle("Debug: Disassembly View");
+
+	if (parent != NULL)
+	{
+		QPoint parentPos = parent->pos();
+		setGeometry(parentPos.x()+100, parentPos.y()+100, 800, 400);
+	}
 
 	//
 	// The main frame and its input and log widgets

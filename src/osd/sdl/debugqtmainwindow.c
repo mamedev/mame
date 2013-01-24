@@ -4,9 +4,7 @@
 #include "debug/dvdisasm.h"
 
 
-MainWindow::MainWindow(device_t* processor, 
-                       running_machine* machine, 
-                       QWidget* parent) : 
+MainWindow::MainWindow(running_machine* machine, QWidget* parent) : 
     WindowQt(machine, parent),
     m_historyIndex(0),
     m_inputHistory()
@@ -100,11 +98,6 @@ MainWindow::MainWindow(device_t* processor,
 
     addDockWidget(Qt::TopDockWidgetArea, dasmDock);
     dockMenu->addAction(dasmDock->toggleViewAction());
-
-    // Window title
-    astring title;
-    title.printf("Debug: %s - %s '%s'", m_machine->system().name, processor->name(), processor->tag());
-    setWindowTitle(title.cstr());
 }
 
 
@@ -261,18 +254,32 @@ void MainWindow::rightBarChanged(QAction* changedTo)
 
 void MainWindow::executeCommand(bool withClear)
 {
-    if (m_inputEdit->text() == "")
+    QString command = m_inputEdit->text();
+    
+    // A blank command is a "silent step"
+    if (command == "")
     {
         debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
         return;
     }
     
+    // If the user asked for help on a specific command, enhance the call
+    if (command.trimmed().startsWith("help", Qt::CaseInsensitive))
+    {
+        if (command.split(" ", QString::SkipEmptyParts).length() == 2)
+        {
+            const int width = m_consoleView->view()->visible_size().x;
+            command.append(QString(", %1").arg(width, 1, 16));
+        }
+    }
+    
+    // Send along the command
     debug_console_execute_command(*m_machine, 
-                                  m_inputEdit->text().toLocal8Bit().data(), 
+                                  command.toLocal8Bit().data(), 
                                   true);
 
     // Add history & set the index to be the top of the stack
-    addToHistory(m_inputEdit->text());
+    addToHistory(command);
 
     // Clear out the text and reset the history pointer only if asked
     if (withClear)
@@ -285,6 +292,12 @@ void MainWindow::executeCommand(bool withClear)
     m_consoleView->viewport()->update();
     m_procFrame->view()->update();
     m_dasmFrame->view()->update();
+}
+
+
+void MainWindow::debugActClose()
+{
+    m_machine->schedule_exit();
 }
 
 

@@ -89,6 +89,10 @@ void DebuggerView::paintEvent(QPaintEvent* event)
                 {
                     bgColor.setRgb(0xff, 0xff, 0x00);
                 }
+                if ((textAttr & DCA_SELECTED) && (textAttr & DCA_CURRENT))
+                {
+                    bgColor.setRgb(0xff,0xc0,0x80);
+                }
                 if(textAttr & DCA_CHANGED)
                 {
                     fgColor.setRgb(0xff, 0x00, 0x00);

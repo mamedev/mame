@@ -9,12 +9,15 @@
 #include "debugqtmemorywindow.h"
 
 bool WindowQt::s_refreshAll = false;
+bool WindowQt::s_hideAll = false;
 
 
 WindowQt::WindowQt(running_machine* machine, QWidget* parent) :
 	QMainWindow(parent),
 	m_machine(machine)
 {
+	//setAttribute(Qt::WA_DeleteOnClose, true);
+
 	// The Debug menu bar
 	QAction* debugActOpenMemory = new QAction("New &Memory Window", this);
 	debugActOpenMemory->setShortcut(QKeySequence("Ctrl+M"));
@@ -83,6 +86,7 @@ WindowQt::WindowQt(running_machine* machine, QWidget* parent) :
 	debugMenu->addAction(debugActOpenLog);
 	debugMenu->addSeparator();
 	debugMenu->addAction(dbgActRun);
+	debugMenu->addAction(dbgActRunAndHide);
 	debugMenu->addAction(dbgActRunToNextCpu);
 	debugMenu->addAction(dbgActRunNextInt);
 	debugMenu->addAction(dbgActRunNextVBlank);
@@ -137,7 +141,7 @@ void WindowQt::debugActRun()
 void WindowQt::debugActRunAndHide()
 {
 	debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
-	// TODO: figure out hide
+	hideAll();
 }
 
 void WindowQt::debugActRunToNextCpu()
@@ -173,13 +177,12 @@ void WindowQt::debugActStepOut()
 void WindowQt::debugActSoftReset()
 {
 	m_machine->schedule_soft_reset();
+	debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
 }
 
 void WindowQt::debugActHardReset()
 {
-	// TODO: Figure out segfault
 	m_machine->schedule_hard_reset();
-	debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
 }
 
 void WindowQt::debugActClose()
@@ -190,5 +193,4 @@ void WindowQt::debugActClose()
 void WindowQt::debugActQuit()
 {
 	m_machine->schedule_exit();
-	qApp->closeAllWindows();
 }

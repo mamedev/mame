@@ -21,9 +21,7 @@ class MainWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	MainWindow(device_t* processor,
-				running_machine* machine,
-				QWidget* parent=NULL);
+	MainWindow(running_machine* machine, QWidget* parent=NULL);
 	virtual ~MainWindow() {}
 
 	void setProcessor(device_t* processor);
@@ -43,6 +41,9 @@ private slots:
 	void rightBarChanged(QAction* changedTo);
 
 	void executeCommand(bool withClear=true);
+
+	// Closing the main window actually exits the program
+	void debugActClose();
 
 
 private:

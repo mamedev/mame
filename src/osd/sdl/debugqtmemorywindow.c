@@ -1,7 +1,6 @@
 #include "debugqtmemorywindow.h"
 
 #include "debug/dvmemory.h"
-#include "debug/debugvw.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
 
@@ -9,9 +8,13 @@
 MemoryWindow::MemoryWindow(running_machine* machine, QWidget* parent) :
 	WindowQt(machine, parent)
 {
-	QPoint parentPos = parent->pos();
-	setGeometry(parentPos.x()+100, parentPos.y()+100, 800, 400);
 	setWindowTitle("Debug: Memory View");
+
+	if (parent != NULL)
+	{
+		QPoint parentPos = parent->pos();
+		setGeometry(parentPos.x()+100, parentPos.y()+100, 800, 400);
+	}
 
 	//
 	// The main frame and its input and log widgets
