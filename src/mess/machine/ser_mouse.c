@@ -15,7 +15,10 @@ const device_type MSYSTEM_SERIAL_MOUSE = &device_creator<mouse_systems_mouse_dev
 serial_mouse_device::serial_mouse_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock),
 		device_rs232_port_interface(mconfig, *this),
-		device_serial_interface(mconfig, *this)
+		device_serial_interface(mconfig, *this),
+		m_x(*this, "ser_mouse_x"),
+		m_y(*this, "ser_mouse_y"),
+		m_btn(*this, "ser_mouse_btn")
 {
 }
 
@@ -77,21 +80,21 @@ void serial_mouse_device::device_timer(emu_timer &timer, device_timer_id id, int
 	/* Do not get deltas or send packets if queue is not empty (Prevents drifting) */
 	if (m_head==m_tail)
 	{
-		nx = ioport("ser_mouse_x")->read();
+		nx = m_x->read();
 
 		dx = nx - ox;
 		if (dx<=-0x800) dx = nx + 0x1000 - ox; /* Prevent jumping */
 		if (dx>=0x800) dx = nx - 0x1000 - ox;
 		ox = nx;
 
-		ny = ioport("ser_mouse_y")->read();
+		ny = m_y->read();
 
 		dy = ny - oy;
 		if (dy<=-0x800) dy = ny + 0x1000 - oy;
 		if (dy>=0x800) dy = ny - 0x1000 - oy;
 		oy = ny;
 
-		nb = ioport("ser_mouse_btn")->read();
+		nb = m_btn->read();
 		mbc = nb^m_mb;
 		m_mb = nb;
 
