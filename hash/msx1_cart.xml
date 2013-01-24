@@ -242,9 +242,6 @@ Pairs (Kor) - Qnix
 ==Known undumped Arabic carts==
 
 =Al Alamiah=
-- dump probably existing already (emu snaps exist)
-Information Race - [P079] Al Alamiah
-
 - undumped originals
 Alpha-Cobol - [C080] Al Alamiah
 Alpha-Fortran - [C069] Al Alamiah
@@ -14556,7 +14553,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="albasic">
-		<description>Arabic Learn BASIC (Arab)</description>
+		<description>Arabic Learn BASIC (Arab, v1.10)</description>
 		<year>1986</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="C047" />
@@ -14565,6 +14562,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="a_basic.rom" size="32768" crc="ce684d05" sha1="0cc58a60e35303442abf82f28b7030ac1ae4e538" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="albasica" cloneof="albasic">
+		<description>Arabic Learn BASIC (Arab, v1.09)</description>
+		<year>1986</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="C047" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="learn sakhr basic.rom" size="32768" crc="fd691ad1" sha1="bf3d9433bf32d3af7a7adc0ba77b9690ac754daa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -14777,6 +14788,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="energya" cloneof="energy">
+		<description>The Energy (Arab, Alt)</description>
+		<year>1986</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="S065" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="energy.rom" size="32768" crc="6e1120ff" sha1="ad2e1e957ee469d51faa07a99a20dbf00003dacf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="equation">
 		<description>Equations (Arab)</description>
 		<year>1985</year>
@@ -14805,8 +14830,22 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="exinfo1a" cloneof="exinfo1">
+		<description>Examine Your Information 1 (Arab, Alt)</description>
+		<year>1985</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="E035" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="test knowledge 1.rom" size="32768" crc="2771df26" sha1="33352b5e33057bebe0c9b989afe90f178aba7243" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="exinfo2">
-		<description>Examine Your Information 2 (Arab)</description>
+		<description>Examine Your Information 2 (Arab, v2.07)</description>
 		<year>1986</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="E077" />
@@ -14819,8 +14858,36 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="exinfo2a" cloneof="exinfo2">
+		<description>Examine Your Information 2 (Arab, v2.05)</description>
+		<year>1986</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="E077" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="test knowledge 2.rom" size="32768" crc="893ef583" sha1="82bf80166e77f99a6f1e091f97f8ab167373dc60" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="exinfo3">
-		<description>Examine Your Information 3 (Arab)</description>
+		<description>Examine Your Information 3 (Arab, v1.12)</description>
+		<year>1988</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="E086" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="131072">
+				<rom name="test knowledge 3.rom" size="131072" crc="34eba5d3" sha1="16f06109c57de5a39fbe150de9c25754483ee9fb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="exinfo3a" cloneof="exinfo3">
+		<description>Examine Your Information 3 (Arab, v1.10)</description>
 		<year>1988</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="E086" />
@@ -15057,6 +15124,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="inforace">
+		<description>Info Race (Arab)</description>
+		<year>1990</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="P079" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="131072">
+				<rom name="info race.rom" size="131072" crc="97330c37" sha1="217b21d10d80fe2d5d04636ee8c2f97f6edfe34a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="islam5">
 		<description>Islam Built on Five (Arab)</description>
 		<year>1986</year>
@@ -15081,6 +15162,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="a_islam.rom" size="32768" crc="8e3ce8d5" sha1="eb164a0a65077687c6e71f3ba2f3956f3aea6bb3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="islam5b" cloneof="islam5">
+		<description>Islam Built on Five (Arab, Alt 2)</description>
+		<year>1986</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="R059" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="islam pillars.rom" size="32768" crc="b7aba96d" sha1="4a28e8bc5ff7b57c63ce810972c3ffc2683ee3d4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15196,6 +15291,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="magtoucha" cloneof="magtouch">
+		<description>Magic Touch (Arab, Alt)</description>
+		<year>1985</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="C016" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="magic touch.rom" size="32768" crc="381bcb71" sha1="b9d5ec448d5de19c62dc09ffe3b257e0cef610d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="magtune">
 		<description>Magic Tune (Arab, v1.02)</description>
 		<year>1985</year>
@@ -15252,6 +15361,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="magnetica" cloneof="magnetic">
+		<description>Magnetics (Arab, Alt)</description>
+		<year>1986</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="S056" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="magnetics.rom" size="32768" crc="166d5599" sha1="4998d34b559f4a531843cebd2302212658d953f7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="memory">
 		<description>Memory (Arab)</description>
 		<year>1984</year>
@@ -15266,6 +15389,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="memorya" cloneof="memory">
+		<description>Memory (Arab, Alt)</description>
+		<year>1984</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="K004" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="memory.rom" size="32768" crc="9f40b15e" sha1="6523381fa5012b45a69af0e351f239c97afd4be7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="multdiv">
 		<description>Multiply &amp; Divide (Arab)</description>
 		<year>1986</year>
@@ -15276,6 +15413,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="a_m&amp;d.rom" size="32768" crc="241623f9" sha1="860f5180c9028cbf675d9b1e59b7e7487c59ea0c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="multdiva" cloneof="multdiv">
+		<description>Multiply &amp; Divide (Arab, Alt)</description>
+		<year>1986</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="M055" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="mult &amp; div.rom" size="32768" crc="f7c40d1f" sha1="20effe093026e9209bd3327114e9ad51676cf807" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15308,6 +15459,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="myclocka" cloneof="myclock">
+		<description>My Clock (Arab, Alt)</description>
+		<year>1987</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="P025" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="my watch.rom" size="32768" crc="3a336af1" sha1="d9195b9a24f6e7c5b99eca046908915bfe369d46" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mydict" supported="no">
 		<description>My Small Dictionary (Arab)</description>
 		<year>1989</year>
@@ -15332,6 +15497,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="number &amp; target (al alamiah, 1986).rom" size="32768" crc="424bf9d6" sha1="ddfb953e6c6d9c1be15362b9a0299259a66a2c98" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="numbtarga" cloneof="numbtarg">
+		<description>Number &amp; Target (Arab, Alt)</description>
+		<year>1986</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="E082" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="16384">
+				<rom name="num &amp; target.rom" size="16384" crc="fa7543bb" sha1="ce493944b6b57ffa56e7eb09df76e73b65dcb800" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15364,6 +15543,20 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
+	<software name="arabwrlda" cloneof="arabwrld">
+		<description>Our Arabic World (Arab, Alt)</description>
+		<year>1987</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="H060" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="our arab world.rom" size="32768" crc="8207ee57" sha1="6918679b2be2d014b60b4025a3877dee9ad5f407" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pertabla">
 		<description>Periodic Table (Arab, Al Alamiah)</description>
 		<year>1985</year>
@@ -15374,6 +15567,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="a_table.rom" size="32768" crc="d43fa7c2" sha1="823b638419dc81767a8511db190212607908cece" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pertablaa" cloneof="pertabla">
+		<description>Periodic Table (Arab, Al Alamiah, Alt)</description>
+		<year>1985</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="S030" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="periodic table.rom" size="32768" crc="a4901bbf" sha1="7033c47a3b20fd04054ef37d209e1545ac053865" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15561,7 +15768,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="sets">
-		<description>Sets (Arab)</description>
+		<description>Sets (Arab, v1.23)</description>
 		<year>1985</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="M011" />
@@ -15570,6 +15777,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="sets (al alamiah, 1985).rom" size="32768" crc="654ba5bf" sha1="7c811f87fc2c61b5622b75ffa37fa43b9f2a1503" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="setsa" cloneof="sets">
+		<description>Sets (Arab)</description>
+		<year>1985</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="M011" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="sets.rom" size="32768" crc="9a21c20a" sha1="98f3eec607cae92e01c1310f25d980f2859b88cd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15673,7 +15894,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="who">
-		<description>Who?</description>
+		<description>Who? (Arab)</description>
 		<year>1987</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="E083" />
@@ -15682,6 +15903,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="a_mn.rom" size="32768" crc="da3ca043" sha1="d2c5c19ad327149f029a72e1834b97761e570f02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="whoa" cloneof="who">
+		<description>Who? (Arab, Alt)</description>
+		<year>1987</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="E083" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="who.rom" size="32768" crc="9cbc0c03" sha1="b815cb222a6314c1adad0945af7be759a14c200a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -15738,6 +15973,20 @@ kept for now until finding out what those bytes affect...
 			<feature name="mapper" value="NOMAPPER" />
 			<dataarea name="rom" size="32768">
 				<rom name="a_makka.rom" size="32768" crc="4702de34" sha1="01e58fa57a8590595cb3cf5370e60ed53302e93d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meccab" cloneof="mecca">
+		<description>Voyage to Mecca (Arab, Alt 2)</description>
+		<year>1985</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="R008" />
+		<info name="usage" value="Requires an Arabic MSX" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="32768">
+				<rom name="mecca trip.rom" size="32768" crc="5c18eabd" sha1="09d2563fd5d9df095aa48be5ead7771c23c50ad2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
