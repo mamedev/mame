@@ -661,7 +661,7 @@ WRITE8_MEMBER(i8251_device::data_w)
 {
 	m_data = data;
 
-	logerror("write data: %02x\n",data);
+	//logerror("write data: %02x\n",data);
 
 	/* writing clears */
 	m_status &=~I8251_STATUS_TX_READY;
@@ -680,7 +680,7 @@ WRITE8_MEMBER(i8251_device::data_w)
 
 void i8251_device::receive_character(UINT8 ch)
 {
-	logerror("i8251 receive char: %02x\n",ch);
+	//logerror("i8251 receive char: %02x\n",ch);
 
 	m_data = ch;
 
@@ -702,7 +702,7 @@ void i8251_device::receive_character(UINT8 ch)
 
 READ8_MEMBER(i8251_device::data_r)
 {
-	logerror("read data: %02x, STATUS=%02x\n",m_data,m_status);
+	//logerror("read data: %02x, STATUS=%02x\n",m_data,m_status);
 	/* reading clears */
 	m_status &= ~I8251_STATUS_RX_READY;
 
