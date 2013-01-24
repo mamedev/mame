@@ -164,20 +164,6 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
-	<software name="borfes">
-		<description>Borfes to 5-nin no Akuma - An Adventure Story (Jpn)</description>
-		<year>1987</year>
-		<publisher>Xtal Soft</publisher>
-		<info name="alt_title" value="ボルフェスと5人の悪魔" />
-		<part name="cart" interface="msx_cart">
-			<feature name="pcb" value="TA-1M" />
-			<feature name="mapper" value="M60002-0125SP-16" />
-			<dataarea name="rom" size="131072">
-				<rom name="lh231066" size="131072" crc="e040e8a1" sha1="16c3ced0fb2e360bc7c43d372a0a30eb6bd3963d" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<!-- does not seem to work in the generic msx2 driver, works fine on some Japanese machines, like hbf1 or hbf12 -->
 	<!-- TODO: investigate better which machine supports this -->
 	<software name="bublbobl">
@@ -1182,6 +1168,7 @@ LZ93A13 (32 pin) - 8KB banks
 		<year>1987</year>
 		<publisher>Taito</publisher>
 		<info name="alt_title" value="スクランブルフォーメーション" />
+		<info name="usage" value="Requires a Japanese system" />
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA6228" />
 			<feature name="mapper" value="M60002-0125SP" />
@@ -1531,6 +1518,18 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="1942k" cloneof="1942">
+		<description>1942 (Kor)</description>
+		<year>1987</year>
+		<publisher>Zemina</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="KONAMI" />
+			<dataarea name="rom" size="131072">
+				<rom name="1942-2.rom" size="131072" crc="d5d79f15" sha1="2fc15ef2c728a2472cfa3a34053e07f821dc18d4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="acrojet">
 		<description>AcroJet (Jpn)</description>
 		<year>1988</year>
@@ -1557,6 +1556,20 @@ LZ93A13 (32 pin) - 8KB banks
 		</part>
 	</software>
 
+	<software name="alibaba">
+		<description>Ali Baba (Arab)</description>
+		<year>1989</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="L093" />
+		<info name="usage" value="Requires an Arabic MSX2" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="131072">
+				<rom name="ali baba (al-alamiah, 1989).rom" size="131072" crc="f5427547" sha1="f9e8cc6e47d5632e3b28500197f8e9187295c52b" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amesoccr">
 		<description>American Soccer (Jpn)</description>
 		<year>1987</year>
@@ -1579,6 +1592,19 @@ LZ93A13 (32 pin) - 8KB banks
 			<feature name="mapper" value="M60002-0125SP-16" />
 			<dataarea name="rom" size="262144">
 				<rom name="han seimei senki andorogynus (japan) (alt 1).rom" size="262144" crc="eaf2bfcd" sha1="ae3c3c2c022f566d2e790aba193470d5826f36cf" status="baddump" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="arabpoet">
+		<description>Arab Poetry (Arab)</description>
+		<year>1989</year>
+		<publisher>Al Alamiah</publisher>
+		<info name="serial" value="A094" />
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="M60002-0125SP" />
+			<dataarea name="rom" size="131072">
+				<rom name="arab poetry (al alamiah, 1989).rom" size="131072" crc="36477f60" sha1="b20e02cbffef692c7aee6281eb36729ee1e928ef" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2099,21 +2125,6 @@ LZ93A13 (32 pin) - 8KB banks
 				<rom name="jansei (japan) (alt 1).rom" size="131072" crc="2c2924ed" sha1="d78293133b075f48c9dc5c4cf0c4a985ae964b08" status="baddump" offset="0" />
 			</dataarea>
 			<dataarea name="sram" size="8192" >
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- the Japanese text only works fine on Japanese machines, like hbf1 or hbf12 -->
-	<software name="janyu">
-		<description>Janyuu (Jpn)</description>
-		<year>1987</year>
-		<publisher>Technosoft</publisher>
-		<info name="alt_title" value="雀友" />
-		<info name="usage" value="Requires a Japanese system" />
-		<part name="cart" interface="msx_cart">
-			<feature name="mapper" value="NOMAPPER" />
-			<dataarea name="rom" size="32768">
-				<rom name="janyuu (japan).rom" size="32768" crc="c8ff3829" sha1="c6227431bfbc3aa921120ec3da7f6429a1a799a0" status="baddump" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2858,6 +2869,18 @@ LZ93A13 (32 pin) - 8KB banks
 
 
 	<!-- Non-Games -->
+
+	<software name="testcart" supported="no">
+		<description>Service Test Cart MSX2 (Euro?)</description>
+		<year>19??</year>
+		<publisher>Philips</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="mapper" value="NOMAPPER" />
+			<dataarea name="rom" size="16384">
+				<rom name="stcmsx2p.bin" size="16384" crc="4e4fbe2a" sha1="f29cef9d13d50d9e3158064c6bb381def6ff384d" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="cheese2">
 		<description>Cheese 2 (Jpn)</description>
