@@ -226,10 +226,26 @@ ROM_START( microsoft_natural )
 ROM_END
 
 
-pc_kbd_microsoft_natural_device::pc_kbd_microsoft_natural_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, PC_KBD_MICROSOFT_NATURAL, "Microsoft Natural Keyboard", tag, owner, clock ),
-	device_pc_kbd_interface(mconfig, *this),
-	m_cpu(*this, "ms_natrl_cpu")
+pc_kbd_microsoft_natural_device::pc_kbd_microsoft_natural_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, PC_KBD_MICROSOFT_NATURAL, "Microsoft Natural Keyboard", tag, owner, clock )
+	, device_pc_kbd_interface(mconfig, *this)
+	, m_cpu(*this, "ms_natrl_cpu")
+	, m_p2_0(*this, "P2.0")
+	, m_p2_1(*this, "P2.1")
+	, m_p2_2(*this, "P2.2")
+	, m_p2_3(*this, "P2.3")
+	, m_p2_4(*this, "P2.4")
+	, m_p2_5(*this, "P2.5")
+	, m_p2_6(*this, "P2.6")
+	, m_p2_7(*this, "P2.7")
+	, m_p1_0(*this, "P1.0")
+	, m_p1_1(*this, "P1.1")
+	, m_p1_2(*this, "P1.2")
+	, m_p1_3(*this, "P1.3")
+	, m_p1_4(*this, "P1.4")
+	, m_p1_5(*this, "P1.5")
+	, m_p1_6(*this, "P1.6")
+	, m_p1_7(*this, "P1.7")
 {
 	m_shortname = "ms_natural";
 }
@@ -305,82 +321,82 @@ READ8_MEMBER( pc_kbd_microsoft_natural_device::p0_read )
 
 	if ( ! ( m_p2 & 0x01 ) )
 	{
-		data &= ioport( "P2.0" )->read();
+		data &= m_p2_0->read();
 	}
 
 	if ( ! ( m_p2 & 0x02 ) )
 	{
-		data &= ioport( "P2.1" )->read();
+		data &= m_p2_1->read();
 	}
 
 	if ( ! ( m_p2 & 0x04 ) )
 	{
-		data &= ioport( "P2.2" )->read();
+		data &= m_p2_2->read();
 	}
 
 	if ( ! ( m_p2 & 0x08 ) )
 	{
-		data &= ioport( "P2.3" )->read();
+		data &= m_p2_3->read();
 	}
 
 	if ( ! ( m_p2 & 0x10 ) )
 	{
-		data &= ioport( "P2.4" )->read();
+		data &= m_p2_4->read();
 	}
 
 	if ( ! ( m_p2 & 0x20 ) )
 	{
-		data &= ioport( "P2.5" )->read();
+		data &= m_p2_5->read();
 	}
 
 	if ( ! ( m_p2 & 0x40 ) )
 	{
-		data &= ioport( "P2.6" )->read();
+		data &= m_p2_6->read();
 	}
 
 	if ( ! ( m_p2 & 0x80 ) )
 	{
-		data &= ioport( "P2.7" )->read();
+		data &= m_p2_7->read();
 	}
 
 	if ( ! ( m_p1 & 0x01 ) )
 	{
-		data &= ioport( "P1.0" )->read();
+		data &= m_p1_0->read();
 	}
 
 	if ( ! ( m_p1 & 0x02 ) )
 	{
-		data &= ioport( "P1.1" )->read();
+		data &= m_p1_1->read();
 	}
 
 	if ( ! ( m_p1 & 0x04 ) )
 	{
-		data &= ioport( "P1.2" )->read();
+		data &= m_p1_2->read();
 	}
 
 	if ( ! ( m_p1 & 0x08 ) )
 	{
-		data &= ioport( "P1.3" )->read();
+		data &= m_p1_3->read();
 	}
 
 	if ( ! ( m_p1 & 0x10 ) )
 	{
-		data &= ioport( "P1.4" )->read();
+		data &= m_p1_4->read();
 	}
 
 	if ( ! ( m_p1 & 0x20 ) )
 	{
-		data &= ioport( "P1.5" )->read();
+		data &= m_p1_5->read();
 	}
 
 	if ( ! ( m_p1 & 0x40 ) )
 	{
-		data &= ioport( "P1.6" )->read();
+		data &= m_p1_6->read();
 	}
 
 	if ( ! ( m_p1 & 0x80 ) )
 	{
-		data &= ioport( "P1.7" )->read();
+		data &= m_p1_7->read();
 	}
 
 	return data;

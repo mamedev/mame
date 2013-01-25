@@ -39,6 +39,23 @@ public:
 	DECLARE_WRITE8_MEMBER(p3_write);
 
 protected:
+	required_ioport m_p2_0;
+	required_ioport m_p2_1;
+	required_ioport m_p2_2;
+	required_ioport m_p2_3;
+	required_ioport m_p2_4;
+	required_ioport m_p2_5;
+	required_ioport m_p2_6;
+	required_ioport m_p2_7;
+	required_ioport m_p1_0;
+	required_ioport m_p1_1;
+	required_ioport m_p1_2;
+	required_ioport m_p1_3;
+	required_ioport m_p1_4;	
+	required_ioport m_p1_5;
+	required_ioport m_p1_6;
+	required_ioport m_p1_7;
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
