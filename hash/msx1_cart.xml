@@ -15432,7 +15432,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="museuman">
-		<description>Museum &am; Ancient (Arab)</description>
+		<description>Museum &amp; Ancient (Arab)</description>
 		<year>1990</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="E071" />
