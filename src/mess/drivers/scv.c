@@ -28,11 +28,12 @@ public:
 		, m_pa6(*this, "PA6")
 		, m_pa7(*this, "PA7")
 		, m_pc0(*this, "PC0")
-		, m_bank0(NULL)
-		, m_bank1(NULL)
-		, m_bank2(NULL)
-		, m_bank3(NULL)
-		, m_bank4(NULL)
+		, m_bank0(*this, "bank0")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_charrom(*this, "charrom")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(scv_porta_w);
@@ -69,12 +70,12 @@ protected:
 	required_ioport m_pa6;
 	required_ioport m_pa7;
 	required_ioport m_pc0;
-	memory_bank *m_bank0;
-	memory_bank *m_bank1;
-	memory_bank *m_bank2;
-	memory_bank *m_bank3;
-	memory_bank *m_bank4;
-	UINT8 *m_charrom;
+	required_memory_bank m_bank0;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	required_memory_bank m_bank4;
+	required_memory_region m_charrom;
 
 	void scv_set_banks();
 };
@@ -661,7 +662,7 @@ UINT32 scv_state::screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap,
 			if ( text_x && text_y )
 			{
 				/* Text mode */
-				UINT8 *char_data = m_charrom + ( d & 0x7f ) * 8;
+				UINT8 *char_data = m_charrom->base() + ( d & 0x7f ) * 8;
 				draw_text( bitmap, x * 8, y * 16, char_data, fg, bg );
 			}
 			else
@@ -801,12 +802,6 @@ WRITE_LINE_MEMBER( scv_state::scv_upd1771_ack_w )
 void scv_state::machine_start()
 {
 	m_vb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scv_state::scv_vb_callback),this));
-	m_charrom = memregion( "charrom" )->base();
-	m_bank0 = membank( "bank0" );
-	m_bank1 = membank( "bank1" );
-	m_bank2 = membank( "bank2" );
-	m_bank3 = membank( "bank3" );
-	m_bank4 = membank( "bank4" );
 }
 
 
