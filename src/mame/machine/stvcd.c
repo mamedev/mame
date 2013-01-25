@@ -225,6 +225,7 @@ static int get_track_index(void)
 
 static void cr_standard_return(UINT16 cur_status)
 {
+	cd_stat |= CD_STAT_PERI;
 	cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
 	cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track); // TODO: fix current track
 	cr3 = (get_track_index()<<8) | (cd_curfad>>16); //index & 0xff00
@@ -281,19 +282,19 @@ static void cd_exec_command(running_machine &machine)
 			switch (cr1 & 0xff)
 			{
 				case 0: // get total session info / disc end
-					cr3 = 0x0100 | tocbuf[(101*4)+1];
-					cr4 = tocbuf[(101*4)+2]<<8 | tocbuf[(101*4)+3];
 					cd_stat = CD_STAT_PAUSE;
 					cr1 = cd_stat;
 					cr2 = 0;
+					cr3 = 0x0100 | tocbuf[(101*4)+1];
+					cr4 = tocbuf[(101*4)+2]<<8 | tocbuf[(101*4)+3];
 					break;
 
 				case 1: // get total session info / disc start
-					cr3 = 0x0100;   // sessions in high byte, session start in lower
-					cr4 = 0;
 					cd_stat = CD_STAT_PAUSE;
 					cr1 = cd_stat;
 					cr2 = 0;
+					cr3 = 0x0100;   // sessions in high byte, session start in lower
+					cr4 = 0;
 					break;
 
 				default:
@@ -999,7 +1000,6 @@ static void cd_exec_command(running_machine &machine)
 
 		case 0x6000:    // set sector length
 			CDROM_LOG(("%s:CD: Set sector length\n",   machine.describe_context()))
-			hirqreg |= (CMOK|ESEL);
 
 			switch (cr1 & 0xff)
 			{
@@ -1032,6 +1032,8 @@ static void cd_exec_command(running_machine &machine)
 					sectlenout = 2352;
 					break;
 			}
+			hirqreg |= (CMOK|ESEL);
+			cr_standard_return(cd_stat);
 			break;
 
 		case 0x6100:    // get sector data
@@ -1354,11 +1356,12 @@ static void cd_exec_command(running_machine &machine)
 			CDROM_LOG(("%s:CD: Verify copy protection\n",   machine.describe_context()))
 			if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 				cd_stat = CD_STAT_PAUSE;
-			cr1 = cd_stat;  // necessary to pass
-			cr2 = 0x4;
+//			cr1 = cd_stat;  // necessary to pass
+//			cr2 = 0x4;
 //          hirqreg |= (CMOK|EFLS|CSCT);
 			sectorstore = 1;
 			hirqreg = 0xfc5;
+			cr_standard_return(cd_stat);
 			break;
 
 		case 0xe100:    // get disc region
@@ -1367,7 +1370,10 @@ static void cd_exec_command(running_machine &machine)
 				cd_stat = CD_STAT_PAUSE;
 			cr1 = cd_stat;  // necessary to pass
 			cr2 = 0x4;      // (must return this value to pass bios checks)
+			cr3 = 0;
+			cr4 = 0;
 			hirqreg |= (CMOK);
+//			cr_standard_return(cd_stat);
 			break;
 
 		default:
@@ -1387,13 +1393,14 @@ TIMER_DEVICE_CALLBACK( stv_sh1_sim )
 		return;
 	}
 
-	cd_stat |= CD_STAT_PERI;
+	if(cd_stat & CD_STAT_PERI)
+	{
+		/* TODO: doesn't boot if a disk isn't in? */
+		//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
+			hirqreg |= SCDQ;
 
-	/* TODO: doesn't boot if a disk isn't in? */
-	//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-		hirqreg |= SCDQ;
-
-	cr_standard_return(cd_stat);
+		cr_standard_return(cd_stat);
+	}
 }
 
 TIMER_DEVICE_CALLBACK( stv_sector_cb )
@@ -1422,6 +1429,7 @@ void stvcd_reset(running_machine &machine)
 	cr3 = ('L'<<8) | 'O';
 	cr4 = ('C'<<8) | 'K';
 	cd_stat = CD_STAT_PAUSE;
+	cd_stat |= CD_STAT_PERI;
 	cur_track = 0xff;
 
 	if (curdir != (direntryT *)NULL)
@@ -1637,6 +1645,7 @@ static UINT16 cd_readWord(UINT32 addr)
 //          CDROM_LOG(("RW CR4: %04x\n", cr4))
 			//popmessage("%04x %04x %04x %04x",cr1,cr2,cr3,cr4);
 			cmd_pending = 0;
+			cd_stat |= CD_STAT_PERI;
 			return cr4;
 
 		case 0x8000:
