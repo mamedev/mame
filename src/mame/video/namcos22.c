@@ -83,22 +83,19 @@ static void Dump( address_space &space, FILE *f, unsigned addr1, unsigned addr2,
 #endif
 
 
-static UINT8
-nthbyte( const UINT32 *pSource, int offs )
+static UINT8 nthbyte( const UINT32 *pSource, int offs )
 {
 	pSource += offs/4;
 	return (pSource[0]<<((offs&3)*8))>>24;
 }
 
-static UINT16
-nthword( const UINT32 *pSource, int offs )
+static UINT16 nthword( const UINT32 *pSource, int offs )
 {
 	pSource += offs/2;
 	return (pSource[0]<<((offs&1)*16))>>16;
 }
 
-INLINE UINT8
-Clamp256( int v )
+INLINE UINT8 Clamp256( int v )
 {
 	if( v<0 )
 	{
@@ -109,7 +106,7 @@ Clamp256( int v )
 		v = 255;
 	}
 	return v;
-} /* Clamp256 */
+}
 
 
 static struct
@@ -135,8 +132,7 @@ static struct
 	int palBase;
 } mixer;
 
-static void
-UpdateVideoMixer( running_machine &machine )
+static void UpdateVideoMixer( running_machine &machine )
 {
 	int i;
 	namcos22_state *state = machine.driver_data<namcos22_state>();
@@ -284,8 +280,7 @@ static struct
 	rectangle scissor;
 } mClip;
 
-static void
-poly3d_Clip( float vx, float vy, float vw, float vh )
+static void poly3d_Clip( float vx, float vy, float vw, float vh )
 {
 	int cx = 320+vx;
 	int cy = 240+vy;
@@ -298,8 +293,7 @@ poly3d_Clip( float vx, float vy, float vw, float vh )
 	if( mClip.scissor.max_y>479 ) mClip.scissor.max_y = 479;
 }
 
-static void
-sprite_Clip( int min_x, int max_x, int min_y, int max_y )
+static void sprite_Clip( int min_x, int max_x, int min_y, int max_y )
 {
 	// cx/cy not used
 	mClip.scissor.set(min_x, max_x, min_y, max_y);
@@ -309,8 +303,7 @@ sprite_Clip( int min_x, int max_x, int min_y, int max_y )
 	if( mClip.scissor.max_y>479 ) mClip.scissor.max_y = 479;
 }
 
-static void
-poly3d_NoClip( void )
+static void poly3d_NoClip( void )
 {
 	mClip.cx = 320;
 	mClip.cy = 240;
@@ -332,7 +325,7 @@ INLINE unsigned texel( namcos22_state *state, unsigned x, unsigned y )
 	unsigned offs = ((y&0xfff0)<<4)|((x&0xff0)>>4);
 	unsigned tile = state->m_pTextureTileMap16[offs];
 	return state->m_pTextureTileData[(tile<<8)|state->m_XYAttrToPixel[state->m_pTextureTileMapAttr[offs]][x&0xf][y&0xf]];
-} /* texel */
+}
 
 
 
@@ -508,7 +501,7 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 			z += dz;
 		}
 	}
-} /* renderscanline_uvi_full */
+}
 
 static void poly3d_DrawQuad(running_machine &machine, bitmap_rgb32 &bitmap, int textureBank, int color, Poly3dVertex pv[4], int flags, int cz_adjust, int direct, int cmode )
 {
@@ -765,11 +758,7 @@ static void renderscanline_sprite(void *destbase, INT32 scanline, const poly_ext
 }
 
 
-static void
-poly3d_DrawSprite(
-	bitmap_rgb32 &dest_bmp, gfx_element *gfx, UINT32 code,
-	UINT32 color, int flipx, int flipy, int sx, int sy,
-	int scalex, int scaley, int cz_factor, int prioverchar, int alpha )
+static void poly3d_DrawSprite(bitmap_rgb32 &dest_bmp, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int cz_factor, int prioverchar, int alpha)
 {
 	namcos22_state *state = gfx->machine().driver_data<namcos22_state>();
 	int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
@@ -833,15 +822,15 @@ poly3d_DrawSprite(
 
 		poly_render_triangle_fan(state->m_poly, &dest_bmp, mClip.scissor, renderscanline_sprite, 2, 4, vert);
 	}
-} /* poly3d_DrawSprite */
+}
 
-static void
-ApplyGamma( running_machine &machine, bitmap_rgb32 &bitmap )
+static void ApplyGamma( running_machine &machine, bitmap_rgb32 &bitmap )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int x,y;
 	if( state->m_bSuperSystem22 )
-	{ /* super system 22 */
+	{
+		/* super system 22 */
 		const UINT8 *rlut = (const UINT8 *)&state->m_gamma[0x100/4];
 		const UINT8 *glut = (const UINT8 *)&state->m_gamma[0x200/4];
 		const UINT8 *blut = (const UINT8 *)&state->m_gamma[0x300/4];
@@ -859,7 +848,8 @@ ApplyGamma( running_machine &machine, bitmap_rgb32 &bitmap )
 		}
 	}
 	else
-	{ /* system 22 */
+	{
+		/* system 22 */
 		const UINT8 *rlut = 0x000+(const UINT8 *)machine.root_device().memregion("gamma_proms")->base();
 		const UINT8 *glut = 0x100+rlut;
 		const UINT8 *blut = 0x200+rlut;
@@ -876,7 +866,7 @@ ApplyGamma( running_machine &machine, bitmap_rgb32 &bitmap )
 			}
 		}
 	}
-} /* ApplyGamma */
+}
 
 
 #define DSP_FIXED_TO_FLOAT( X ) (((INT16)(X))/(float)0x7fff)
@@ -885,8 +875,7 @@ ApplyGamma( running_machine &machine, bitmap_rgb32 &bitmap )
 #define NUM_CG_CHARS ((CGRAM_SIZE*8)/(64*16)) /* 0x3c0 */
 
 /* modal rendering properties */
-static void
-matrix3d_Multiply( float A[4][4], float B[4][4] )
+static void matrix3d_Multiply( float A[4][4], float B[4][4] )
 {
 	float temp[4][4];
 	int row,col;
@@ -905,10 +894,9 @@ matrix3d_Multiply( float A[4][4], float B[4][4] )
 		}
 	}
 	memcpy( A, temp, sizeof(temp) );
-} /* matrix3d_Multiply */
+}
 
-static void
-matrix3d_Identity( float M[4][4] )
+static void matrix3d_Identity( float M[4][4] )
 {
 	int r,c;
 
@@ -919,10 +907,9 @@ matrix3d_Identity( float M[4][4] )
 			M[r][c] = (r==c)?1.0:0.0;
 		}
 	}
-} /* matrix3d_Identity */
+}
 
-static void
-TransformPoint( float *vx, float *vy, float *vz, float m[4][4] )
+static void TransformPoint( float *vx, float *vy, float *vz, float m[4][4] )
 {
 	float x = *vx;
 	float y = *vy;
@@ -932,8 +919,7 @@ TransformPoint( float *vx, float *vy, float *vz, float m[4][4] )
 	*vz = m[0][2]*x + m[1][2]*y + m[2][2]*z + m[3][2];
 }
 
-static void
-TransformNormal( float *nx, float *ny, float *nz, float m[4][4] )
+static void TransformNormal( float *nx, float *ny, float *nz, float m[4][4] )
 {
 	float x = *nx;
 	float y = *ny;
@@ -1005,19 +991,18 @@ struct SceneNode
 static struct SceneNode mSceneRoot;
 static struct SceneNode *mpFreeSceneNode;
 
-static void
-FreeSceneNode( struct SceneNode *node )
+static void FreeSceneNode( struct SceneNode *node )
 {
 	node->nextInBucket = mpFreeSceneNode;
 	mpFreeSceneNode = node;
-} /* FreeSceneNode */
+}
 
-static struct SceneNode *
-MallocSceneNode( running_machine &machine )
+static struct SceneNode *MallocSceneNode( running_machine &machine )
 {
 	struct SceneNode *node = mpFreeSceneNode;
 	if( node )
-	{ /* use free pool */
+	{
+		/* use free pool */
 		mpFreeSceneNode = node->nextInBucket;
 	}
 	else
@@ -1026,10 +1011,9 @@ MallocSceneNode( running_machine &machine )
 	}
 	memset( node, 0, sizeof(*node) );
 	return node;
-} /* MallocSceneNode */
+}
 
-static struct SceneNode *
-NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type )
+static struct SceneNode *NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type )
 {
 	struct SceneNode *node = &mSceneRoot;
 	struct SceneNode *prev = NULL;
@@ -1039,7 +1023,8 @@ NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type 
 		hash = (zsortvalue24>>20)&RADIX_MASK;
 		struct SceneNode *next = node->data.nonleaf.next[hash];
 		if( !next )
-		{ /* lazily allocate tree node for this radix */
+		{
+			/* lazily allocate tree node for this radix */
 			next = MallocSceneNode(machine);
 			next->type = eSCENENODE_NONLEAF;
 			node->data.nonleaf.next[hash] = next;
@@ -1050,7 +1035,8 @@ NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type 
 	}
 
 	if( node->type == eSCENENODE_NONLEAF )
-	{ /* first leaf allocation on this branch */
+	{
+		/* first leaf allocation on this branch */
 		node->type = type;
 		return node;
 	}
@@ -1062,7 +1048,7 @@ NewSceneNode( running_machine &machine, UINT32 zsortvalue24, SceneNodeType type 
 		prev->data.nonleaf.next[hash] = leaf;
 		return leaf;
 	}
-} /* NewSceneNode */
+}
 
 
 static void RenderSprite(running_machine &machine, bitmap_rgb32 &bitmap, struct SceneNode *node )
@@ -1097,9 +1083,9 @@ static void RenderSprite(running_machine &machine, bitmap_rgb32 &bitmap, struct 
 				0xff - node->data.sprite.translucency
 			);
 			i++;
-		} /* next col */
-	} /* next row */
-} /* RenderSprite */
+		}
+	}
+}
 
 static void RenderSceneHelper(running_machine &machine, bitmap_rgb32 &bitmap, struct SceneNode *node )
 {
@@ -1160,7 +1146,7 @@ static void RenderSceneHelper(running_machine &machine, bitmap_rgb32 &bitmap, st
 			}
 		}
 	}
-} /* RenderSceneHelper */
+}
 
 static void RenderScene(running_machine &machine, bitmap_rgb32 &bitmap )
 {
@@ -1174,10 +1160,9 @@ static void RenderScene(running_machine &machine, bitmap_rgb32 &bitmap )
 	}
 	poly3d_NoClip();
 	poly_wait(state->m_poly, "DrawPolygons");
-} /* RenderScene */
+}
 
-static float
-DspFloatToNativeFloat( UINT32 iVal )
+static float DspFloatToNativeFloat( UINT32 iVal )
 {
 	INT16 mantissa = (INT16)iVal;
 	float result = mantissa;//?((float)mantissa):((float)0x10000);
@@ -1188,10 +1173,9 @@ DspFloatToNativeFloat( UINT32 iVal )
 		exponent++;
 	}
 	return result;
-} /* DspFloatToNativeFloat */
+}
 
-static INT32
-GetPolyData( namcos22_state *state, INT32 addr )
+static INT32 GetPolyData( namcos22_state *state, INT32 addr )
 {
 	UINT32 result;
 	if( addr<0 || addr>=state->m_PtRomSize )
@@ -1217,10 +1201,9 @@ GetPolyData( namcos22_state *state, INT32 addr )
 	if( result&0x00800000 )
 		result |= 0xff000000; /* sign extend */
 	return result;
-} /* GetPolyData */
+}
 
-UINT32
-namcos22_point_rom_r( running_machine &machine, offs_t offs )
+UINT32 namcos22_point_rom_r( running_machine &machine, offs_t offs )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	return GetPolyData(state, offs & 0x00ffffff);
@@ -1314,8 +1297,7 @@ static void namcos22s_recalc_czram( running_machine &machine )
 }
 
 
-static void
-InitXYAttrToPixel( namcos22_state *state )
+static void InitXYAttrToPixel( namcos22_state *state )
 {
 	unsigned attr,x,y,ix,iy,temp;
 	for( attr=0; attr<16; attr++ )
@@ -1332,10 +1314,9 @@ InitXYAttrToPixel( namcos22_state *state )
 			}
 		}
 	}
-} /* InitXYAttrToPixel */
+}
 
-static void
-PatchTexture( namcos22_state *state )
+static void PatchTexture( namcos22_state *state )
 {
 	int i;
 	switch( state->m_gametype )
@@ -1359,10 +1340,9 @@ PatchTexture( namcos22_state *state )
 		default:
 			break;
 	}
-} /* PatchTexture */
+}
 
-void
-namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
+void namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 {
 	if (machine.video().skip_this_frame()) return;
 	namcos22_state *state = machine.driver_data<namcos22_state>();
@@ -1462,15 +1442,15 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 	node->data.quad3d.vy = 0;
 	node->data.quad3d.vw = -320;
 	node->data.quad3d.vh = -240;
-} /* namcos22_draw_direct_poly */
+}
 
-static void
-Prepare3dTexture( running_machine &machine, void *pTilemapROM, const void *pTextureROM )
+static void Prepare3dTexture( running_machine &machine, void *pTilemapROM, const void *pTextureROM )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int i;
 	assert( pTilemapROM && pTextureROM );
-	{ /* following setup is Namco System 22 specific */
+	{
+		/* following setup is Namco System 22 specific */
 		const UINT8 *pPackedTileAttr = 0x200000 + (UINT8 *)pTilemapROM;
 		UINT8 *pUnpackedTileAttr = auto_alloc_array(machine, UINT8, 0x080000*2);
 		{
@@ -1487,20 +1467,9 @@ Prepare3dTexture( running_machine &machine, void *pTilemapROM, const void *pText
 			PatchTexture(state);
 		}
 	}
-} /* Prepare3dTexture */
+}
 
-static void
-DrawSpritesHelper(
-	running_machine &machine,
-	bitmap_rgb32 &bitmap,
-	const rectangle &cliprect,
-	UINT32 *pBase,
-	const UINT32 *pSource,
-	const UINT32 *pPal,
-	int num_sprites,
-	int deltax,
-	int deltay,
-	int y_lowres )
+static void DrawSpritesHelper(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 *pBase, const UINT32 *pSource, const UINT32 *pPal, int num_sprites, int deltax, int deltay, int y_lowres)
 {
 	for( int i=0; i<num_sprites; i++ )
 	{
@@ -1624,10 +1593,9 @@ DrawSpritesHelper(
 		pSource += 4;
 		pPal += 2;
 	}
-} /* DrawSpritesHelper */
+}
 
-static void
-DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
@@ -1738,7 +1706,7 @@ DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cl
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x78/4]&0xffff)/4];
 		DrawSpritesHelper( machine, bitmap, cliprect, spriteram32, pSource, pPal, num_sprites, deltax, deltay, y_lowres );
 	}
-} /* DrawSprites */
+}
 
 READ32_MEMBER(namcos22_state::namcos22s_vics_control_r)
 {
@@ -1789,7 +1757,7 @@ static void UpdatePalette(running_machine &machine)
 			state->m_dirtypal[i] = 0;
 		}
 	}
-} /* UpdatePalette */
+}
 
 
 TILE_GET_INFO_MEMBER(namcos22_state::TextTilemapGetInfo)
@@ -2100,12 +2068,12 @@ static void DrawCharacterLayer(running_machine &machine, bitmap_rgb32 &bitmap, c
 /*********************************************************************************************/
 
 
-static INT32
-Signed18( UINT32 value )
+static INT32 Signed18( UINT32 value )
 {
 	INT32 offset = value&0x03ffff;
 	if( offset&0x20000 )
-	{ /* sign extend */
+	{
+		/* sign extend */
 		offset |= ~0x03ffff;
 	}
 	return offset;
@@ -2144,16 +2112,7 @@ Signed18( UINT32 value )
  *    0x07350 - guardrail
  *    0x061a8 - red car
  */
-static void
-BlitQuadHelper(
-		running_machine &machine,
-		bitmap_rgb32 &bitmap,
-		unsigned color,
-		unsigned addr,
-		float m[4][4],
-		INT32 polygonShiftValue22, /* 22 bits */
-		int flags,
-		int packetFormat )
+static void BlitQuadHelper(running_machine &machine, bitmap_rgb32 &bitmap, unsigned color, unsigned addr, float m[4][4], INT32 polygonShiftValue22, int flags, int packetFormat)
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int absolutePriority = state->m_AbsolutePriority;
@@ -2292,10 +2251,9 @@ BlitQuadHelper(
 	node->data.quad3d.vy = mCamera.vy;
 	node->data.quad3d.vw = mCamera.vw;
 	node->data.quad3d.vh = mCamera.vh;
-} /* BlitQuadHelper */
+}
 
-static void
-RegisterNormals( namcos22_state *state, INT32 addr, float m[4][4] )
+static void RegisterNormals( namcos22_state *state, INT32 addr, float m[4][4] )
 {
 	int i;
 	for( i=0; i<4; i++ )
@@ -2312,10 +2270,9 @@ RegisterNormals( namcos22_state *state, INT32 addr, float m[4][4] )
 			dotproduct = 0.0f;
 		state->m_LitSurfaceInfo[state->m_LitSurfaceCount++] = mCamera.ambient + mCamera.power*dotproduct;
 	}
-} /* RegisterNormals */
+}
 
-static void
-BlitQuads( running_machine &machine, bitmap_rgb32 &bitmap, INT32 addr, float m[4][4], INT32 base )
+static void BlitQuads( running_machine &machine, bitmap_rgb32 &bitmap, INT32 addr, float m[4][4], INT32 base )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 //  int numAdditionalNormals = 0;
@@ -2403,10 +2360,9 @@ BlitQuads( running_machine &machine, bitmap_rgb32 &bitmap, INT32 addr, float m[4
 		}
 		addr += packetLength;
 	}
-} /* BlitQuads */
+}
 
-static void
-BlitPolyObject( running_machine &machine, bitmap_rgb32 &bitmap, int code, float M[4][4] )
+static void BlitPolyObject( running_machine &machine, bitmap_rgb32 &bitmap, int code, float M[4][4] )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	unsigned addr1 = GetPolyData(state, code);
@@ -2419,7 +2375,7 @@ BlitPolyObject( running_machine &machine, bitmap_rgb32 &bitmap, int code, float 
 			break;
 		BlitQuads( machine, bitmap, addr2, M, code );
 	}
-} /* BlitPolyObject */
+}
 
 /*******************************************************************************/
 
@@ -2484,8 +2440,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_dspram_w)
  * 0x5: transform
  * >=0x45: draw primitive
  */
-static void
-HandleBB0003( namcos22_state *state, const INT32 *pSource )
+static void HandleBB0003( namcos22_state *state, const INT32 *pSource )
 {
 	/*
 	    bb0003 or 3b0003
@@ -2532,10 +2487,9 @@ HandleBB0003( namcos22_state *state, const INT32 *pSource )
 	state->m_ViewMatrix[2][2] = DSP_FIXED_TO_FLOAT(pSource[0x14]);
 
 	TransformNormal( &mCamera.lx, &mCamera.ly, &mCamera.lz, state->m_ViewMatrix );
-} /* HandleBB0003 */
+}
 
-static void
-Handle200002( running_machine &machine, bitmap_rgb32 &bitmap, const INT32 *pSource )
+static void Handle200002( running_machine &machine, bitmap_rgb32 &bitmap, const INT32 *pSource )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	if( state->m_PrimitiveID>=0x45 )
@@ -2568,10 +2522,9 @@ Handle200002( running_machine &machine, bitmap_rgb32 &bitmap, const INT32 *pSour
 		logerror( "Handle200002:unk code=0x%x\n", state->m_PrimitiveID );
 		// ridgerac title screen waving flag: 0x5
 	}
-} /* Handle200002 */
+}
 
-static void
-Handle300000( namcos22_state *state, const INT32 *pSource )
+static void Handle300000( namcos22_state *state, const INT32 *pSource )
 {
 	state->m_ViewMatrix[0][0] = DSP_FIXED_TO_FLOAT(pSource[1]);
 	state->m_ViewMatrix[1][0] = DSP_FIXED_TO_FLOAT(pSource[2]);
@@ -2586,8 +2539,7 @@ Handle300000( namcos22_state *state, const INT32 *pSource )
 	state->m_ViewMatrix[2][2] = DSP_FIXED_TO_FLOAT(pSource[9]);
 } /* Handle300000 */
 
-static void
-Handle233002( namcos22_state *state, const INT32 *pSource )
+static void Handle233002( namcos22_state *state, const INT32 *pSource )
 {
 	/*
 	00233002
@@ -2601,10 +2553,9 @@ Handle233002( namcos22_state *state, const INT32 *pSource )
 	*/
 	state->m_cz_adjust = (pSource[1] & 0x00800000) ? pSource[1] | 0xff000000 : pSource[1] & 0x00ffffff;
 	state->m_ObjectShiftValue22 = pSource[2];
-} /* Handle233002 */
+}
 
-static void
-SimulateSlaveDSP( running_machine &machine, bitmap_rgb32 &bitmap )
+static void SimulateSlaveDSP( running_machine &machine, bitmap_rgb32 &bitmap )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	const INT32 *pSource = 0x300 + (INT32 *)state->m_polygonram.target();
@@ -2663,14 +2614,14 @@ SimulateSlaveDSP( running_machine &machine, bitmap_rgb32 &bitmap )
 		pSource++; /* always 0xffff */
 		next = (INT16)*pSource++; /* link to next command */
 		if( (next&0x7fff) != (pSource - (INT32 *)state->m_polygonram.target()) )
-		{ /* end of list */
+		{
+			/* end of list */
 			break;
 		}
-	} /* for(;;) */
-} /* SimulateSlaveDSP */
+	}
+}
 
-static void
-DrawPolygons( running_machine &machine, bitmap_rgb32 &bitmap )
+static void DrawPolygons( running_machine &machine, bitmap_rgb32 &bitmap )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	if( state->m_bDSPisActive )
@@ -2678,10 +2629,9 @@ DrawPolygons( running_machine &machine, bitmap_rgb32 &bitmap )
 		SimulateSlaveDSP( machine, bitmap );
 		poly_wait(state->m_poly, "DrawPolygons");
 	}
-} /* DrawPolygons */
+}
 
-void
-namcos22_enable_slave_simulation( running_machine &machine, int enable )
+void namcos22_enable_slave_simulation( running_machine &machine, int enable )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	state->m_bDSPisActive = enable;
@@ -2921,7 +2871,7 @@ READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 		break;
 	}
 	return (UINT16)value;
-} /* namcos22_dspram16_r */
+}
 
 WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
 {
@@ -2947,4 +2897,4 @@ WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
 		break;
 	}
 	m_polygonram[offset] = (hi<<16)|lo;
-} /* namcos22_dspram16_w */
+}
