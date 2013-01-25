@@ -80,17 +80,13 @@ The manual defines the controls as 4 push buttons:
  lev 6 : 0x78 : 0000 1ab2 - writes to 90031
  lev 7 : 0x7c : ffff ffff - invalid
 
- I can't use tilemap routines because they don't work with tiles having a
- greater height than width, which is the case on this game once its rotated.
-
 TODO : (also check the notes from the galspnbl.c driver)
 
   - coin insertion is not recognized consistenly.
-  - sprite/tile priority is sometimes wrong (see 1st table when ball in bumpers).
-  - lots of unknown writes, what are they meant to do
-  - verify some of the code which is from the other drivers such as sprite
-    drawing as priorities are questionable in places
-  - add support for blended sprites.
+  - rewrite video, do single pass sprite render, move sprite code to device, share with gaiden.c etc.
+  - convert to tilemaps
+  - all the unknown regs
+
 
 Unmapped writes (P.O.S.T.)
 
@@ -195,6 +191,20 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0xa0202, 0xa0203) AM_WRITENOP
 	AM_RANGE(0xa0204, 0xa0205) AM_WRITENOP
 	AM_RANGE(0xa0206, 0xa0207) AM_WRITENOP
+ADDRESS_MAP_END
+
+
+
+static ADDRESS_MAP_START( spbactnp_map, AS_PROGRAM, 16, spbactn_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROM
+	AM_RANGE(0x40000, 0x43fff) AM_RAM   // main ram
+	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
+	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_SHARE("fgvideoram")
+	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_SHARE("bgvideoram")
+	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_word_w) AM_SHARE("paletteram") // yes R and G are swapped vs. the released version
+
+	AM_RANGE(0x90000, 0x900ff) AM_READ(temp_read_handler_r) // temp
+
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spbactn_sound_map, AS_PROGRAM, 8, spbactn_state )
@@ -334,6 +344,42 @@ static GFXDECODE_START( spbactn )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0x0000, 16 + 384 )
 GFXDECODE_END
 
+
+static const gfx_layout proto_fgtilelayout =
+{
+	16,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0, 1, 2, 3 },
+	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4,  64*4, 65*4, 66*4, 67*4, 68*4, 69*4, 70*4, 71*4 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	64*8
+};
+
+
+
+static const gfx_layout proto_spr_layout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 0, 1, 2, 3 },
+	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8
+};
+
+
+static GFXDECODE_START( spbactnp )
+	GFXDECODE_ENTRY( "gfx1", 0, proto_fgtilelayout,   0x0200, 16 + 240 )
+	GFXDECODE_ENTRY( "gfx2", 0, proto_fgtilelayout,   0x0300, 16 + 128 ) // wrong
+	GFXDECODE_ENTRY( "gfx3", 0, proto_spr_layout,   0x0000, 16 + 384 )
+
+	GFXDECODE_ENTRY( "gfx4", 0, proto_spr_layout,   0x0000, 16 + 384 ) // more sprites maybe?
+
+GFXDECODE_END
+
+
 static void irqhandler(device_t *device, int linestate)
 {
 	device->machine().device("audiocpu")->execute().set_input_line(0, linestate);
@@ -376,6 +422,43 @@ static MACHINE_CONFIG_START( spbactn, spbactn_state )
 	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH) /* Was 1.056MHz, a common clock, but no way to generate via on PCB OSCs. clock frequency & pin 7 not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( spbactnp, spbactn_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_PROGRAM_MAP(spbactnp_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_hold)
+
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map) // wrong
+
+	// there is a rom for another Z80??
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactnp)
+
+	MCFG_GFXDECODE(spbactnp)
+	MCFG_PALETTE_LENGTH(0x2800/2)
+
+
+	/* sound hardware  - different? */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_4MHz/4, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+MACHINE_CONFIG_END
+
 
 ROM_START( spbactn )
 	/* Board 9002-A (CPU Board) */
@@ -429,5 +512,47 @@ ROM_START( spbactnj )
 	ROM_LOAD( "b-u111",  0x40000, 0x40000, CRC(1cc1379a) SHA1(44fdab8cb5ab1488688f1ac52f005454e835efee) )
 ROM_END
 
+
+ROM_START( spbactnp )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "spa.18k", 0x00000, 0x10000, CRC(40f6a1e6) SHA1(533e1eb96f54b976f50d5b8927160b46b2740c83) )
+	ROM_LOAD16_BYTE( "spa.22k", 0x00001, 0x10000, CRC(ce31871e) SHA1(8670c051d775fee6dcd2aa82cdb6f3fcc4338bd5) )
+	ROM_LOAD16_BYTE( "spa.17k", 0x20000, 0x10000, CRC(c9860ae9) SHA1(3c2479be75ee84165470e9ca0a9d3b2ce679703d) )
+	ROM_LOAD16_BYTE( "spa.21k", 0x20001, 0x10000, CRC(8226f644) SHA1(2d3e32368fbfec7437bd972096fd92972f52f6b0) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "6204_6-6.29c",   0x00000, 0x10000, CRC(e8250c26) SHA1(9b669878790c8e3c5d80f165b5ffa1d6830f4696) )
+
+	
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "spa_data_2-21-a10.8e",   0x00000, 0x20000,  CRC(87427d7d) SHA1(f76b0dc3f0d87deb0f0c81084aff9756b236e867) ) // same as regular
+
+	ROM_REGION( 0x080000, "gfx1", 0 ) /* 16x8 FG Tiles */
+	ROM_LOAD16_BYTE( "spa_back0_split0_5-17-p-1.27b",  0x00000, 0x20000, CRC(37922110) SHA1(8edb6745ab6b6937f1365d35bfcdbe86198de668) )
+	ROM_LOAD16_BYTE( "spa_back0_split1_5-17-p-1.27c",  0x00001, 0x20000, CRC(9d6ef9ab) SHA1(338ff1bd9d30a61d782616cccb4108daac6a8612) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* 16x8 BG Tiles */ // it only ever draws the background from the rocket level, for all levels??
+	ROM_LOAD16_BYTE( "spa_back1_split0_3-14-a-11.26b",  0x00000, 0x20000, CRC(6953fd62) SHA1(fb6061f5ad48e0d91d3dad96afbac2d64908f0a7) )
+	ROM_LOAD16_BYTE( "spa_back1_split1_3-14-a-11.26c",  0x00001, 0x20000, CRC(b4123511) SHA1(c65b912238bab74bf46b5d5486c1d998813ef511) )
+
+	ROM_REGION( 0x040000, "gfx3", 0 ) /* 8x8 Sprite Tiles */
+	ROM_LOAD( "spa_sp0_4-18-p-8.5m",  0x00000, 0x20000, CRC(cd6ba360) SHA1(a01f65a678b6987ae877c381f74515efee4b492e) )
+	ROM_LOAD( "spa_sp1_3-14-a-10.4m", 0x20000, 0x20000, CRC(86406336) SHA1(bf091dc13404535e6baee990f5e957d3538841ac) )
+
+
+
+	ROM_REGION( 0x10000, "otherz80", 0 ) // what? it's annother z80 rom... unused for now
+	ROM_LOAD( "spa.17g", 0x00000, 0x10000, CRC(445fc2c5) SHA1(c0e40496cfcaa0a8c90fb05111fadee74582f91a) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* 8x8 BG Tiles */ // more 8x8 tiles, with the girl graphics? unused for now .. for horizontal orientation?? 
+	ROM_LOAD( "spa.25c", 0x00000, 0x20000, CRC(02b69ab9) SHA1(368e774693a6fab756faaeec4ffd42406816e6e2) )
+
+	ROM_REGION( 0x10000, "misc", 0 ) //misc
+	ROM_LOAD( "p109.18d", 0x00000, 0x100, CRC(2297a725) SHA1(211ebae11ca55cc67df29291c3e0916836550bfb) )
+	ROM_LOAD( "pin.b.sub.23g", 0x00000, 0x100, CRC(3a0c70ed) SHA1(9be38c421e9a14f6811752a4464dd5dbf037e385) )
+	ROM_LOAD( "tcm1.19g.bin", 0x00000, 0x53, CRC(2c54354a) SHA1(11d8b6cdaf052b5a9fbcf6b6fbf99c5f89575cfa) )
+ROM_END
+
 GAME( 1991, spbactn, 0,        spbactn, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (US)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1991, spbactnj, spbactn, spbactn, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, spbactnp, spbactn, spbactnp, spbactn, driver_device, 0, ROT90, "Tecmo", "Super Pinball Action (prototype)", GAME_NOT_WORKING ) // early proto, (c) date is 2 years earlier!

@@ -1,5 +1,3 @@
-/* video/spbactn.c - see drivers/spbactn.c for more info */
-/* rather similar to galspnbl.c */
 
 #include "emu.h"
 #include "includes/spbactn.h"
@@ -35,7 +33,7 @@ static void blendbitmaps(running_machine &machine,
 
 
 /* from gals pinball (which was in turn from ninja gaiden) */
-static int draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
+static int draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, bool alt_sprites)
 {
 	static const UINT8 layout[8][8] =
 	{
@@ -59,16 +57,29 @@ static int draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const re
 		int col, row;
 
 		attr = state->m_spvideoram[offs];
+
+		int pri = (state->m_spvideoram[offs] & 0x0030);
+//		int pri = (state->m_spvideoram[offs+2] & 0x0030);
+
+
 		if ((attr & 0x0004) &&
-			((attr & 0x0030) >> 4) == priority)
+			((pri & 0x0030) >> 4) == priority)
 		{
 			flipx = attr & 0x0001;
 			flipy = attr & 0x0002;
 
 			code = state->m_spvideoram[offs + 1];
 
-			color = state->m_spvideoram[offs + 2];
-			size = 1 << (color & 0x0003);               /* 1,2,4,8 */
+			if (alt_sprites)
+			{
+				color = state->m_spvideoram[offs + 0];
+			}
+			else
+			{
+				color = state->m_spvideoram[offs + 2];
+			}
+
+			size = 1 << (state->m_spvideoram[offs + 2] & 0x0003);               /* 1,2,4,8 */
 			color = (color & 0x00f0) >> 4;
 
 			sx = state->m_spvideoram[offs + 4];
@@ -113,7 +124,7 @@ void spbactn_state::video_start()
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
 }
 
-UINT32 spbactn_state::screen_update_spbactn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites)
 {
 	int offs, sx, sy;
 
@@ -144,7 +155,7 @@ UINT32 spbactn_state::screen_update_spbactn(screen_device &screen, bitmap_rgb32 
 		}
 	}
 
-	if (draw_sprites(machine(), m_tile_bitmap_bg, cliprect, 0))
+	if (draw_sprites(machine(), m_tile_bitmap_bg, cliprect, 0, alt_sprites))
 	{
 		/* kludge: draw table bg gfx again if priority 0 sprites are enabled */
 		for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
@@ -172,7 +183,7 @@ UINT32 spbactn_state::screen_update_spbactn(screen_device &screen, bitmap_rgb32 
 		}
 	}
 
-	draw_sprites(machine(), m_tile_bitmap_bg, cliprect, 1);
+	draw_sprites(machine(), m_tile_bitmap_bg, cliprect, 1, alt_sprites);
 
 	/* draw table fg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
@@ -205,10 +216,20 @@ UINT32 spbactn_state::screen_update_spbactn(screen_device &screen, bitmap_rgb32 
 		}
 	}
 
-	draw_sprites(machine(), m_tile_bitmap_fg, cliprect, 2);
-	draw_sprites(machine(), m_tile_bitmap_fg, cliprect, 3);
+	draw_sprites(machine(), m_tile_bitmap_fg, cliprect, 2, alt_sprites);
+	draw_sprites(machine(), m_tile_bitmap_fg, cliprect, 3, alt_sprites);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
 	blendbitmaps(machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, cliprect);
 	return 0;
+}
+
+UINT32 spbactn_state::screen_update_spbactn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return draw_video(screen,bitmap,cliprect,false);
+}
+
+UINT32 spbactn_state::screen_update_spbactnp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return draw_video(screen,bitmap,cliprect,true);
 }
