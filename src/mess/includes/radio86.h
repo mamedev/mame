@@ -17,6 +17,8 @@ public:
 	radio86_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	virtual void video_start();
+
 	UINT8 m_tape_value;
 	UINT8 m_mikrosha_font_page;
 	int m_keyboard_mask;
@@ -24,6 +26,7 @@ public:
 	UINT8 m_romdisk_lsb;
 	UINT8 m_romdisk_msb;
 	UINT8 m_disk_sel;
+	const UINT8 *m_charmap;
 	DECLARE_READ8_MEMBER(radio_cpu_state_r);
 	DECLARE_READ8_MEMBER(radio_io_r);
 	DECLARE_WRITE8_MEMBER(radio_io_w);
