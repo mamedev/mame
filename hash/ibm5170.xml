@@ -748,6 +748,17 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="rylvania">
+		<description>Horror of Rylvania</description>
+		<year>1993</year>
+		<publisher>Adventions</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="rylvania.img" size="737280" crc="ea106aa8" sha1="4fe870233b521ccdc912e5a4476e52bdc03d6f5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hook">
 		<description>Hook</description>
 		<year>1992</year>
@@ -821,6 +832,17 @@ Missing files come here
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="1720320">
 				<rom name="disk3.img" size="1720320" crc="9ad15a6c" sha1="3eeb07612f20bbfccca4343ed213d3c8f1371450" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ptombs">
+		<description>Pharaoh's Tomb (Shareware)</description>
+		<year>1994</year>
+		<publisher>Apogee</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="pharaoh's tomb (shareware).img" size="368640" crc="b1f4dbf6" sha1="d3c4ae0b6ac6b5233c4970805c8e4f2b89f9c57a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1030,6 +1052,45 @@ Missing files come here
 		<part name="flop5" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="swtiefgtd5.img" size="1474560" crc="7751ed1f" sha1="4fc14b87a62ab1db717227ef3ad9343ce3aa7193" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unnkulia">
+		<description>Unnkulia Zero: The Search for Amanda</description>
+		<year>1993</year>
+		<publisher>Adventions</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="unnkulia.img" size="737280" crc="b5332f4b" sha1="052d7068981bfef95fb6b6bd1d35e6f3e3c22e61" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vanslug">
+		<!-- Marked as bad, could do with another dump to make sure it's correct-->
+		<description>Vanslug: X Mission - The Way of Super Warrior</description>
+		<year>1995</year>
+		<publisher>Soft Action</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk 1.img" size="1228800" crc="646b7e83" sha1="d9b54170f5eedf00fc71aa7461f97b22191ded21" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk 2.img" size="1228800" crc="d2ca67ec" sha1="6e5bf5e88ddc12cd0758807054a84586ad66e334" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk 3.img" size="1228800" crc="a31fc22a" sha1="ea64dfd20e491a0f2bfce762e34af849ac1524ad" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="1228800">
+				<rom name="disk 4.img" size="1228800" crc="caf1057e" sha1="bff9d7c21675da1197cbcf039823982e69d9c6c0" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
