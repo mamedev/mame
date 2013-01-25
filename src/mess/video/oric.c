@@ -18,115 +18,114 @@ TIMER_CALLBACK_MEMBER(oric_state::oric_vh_timer_callback)
 	m_vh_state.flash_count++;
 }
 
-static void oric_vh_update_flash(oric_state *state)
+void oric_state::oric_vh_update_flash()
 {
 	/* flash active? */
-	if (BIT(state->m_vh_state.text_attributes, 2))
+	if (BIT(m_vh_state.text_attributes, 2))
 	{
 		/* yes */
 
 		/* show or hide text? */
-		if (BIT(state->m_vh_state.flash_count, 4))
+		if (BIT(m_vh_state.flash_count, 4))
 		{
 			/* hide */
 			/* set foreground and background to be the same */
-			state->m_vh_state.active_foreground_colour = state->m_vh_state.background_colour;
-			state->m_vh_state.active_background_colour = state->m_vh_state.background_colour;
+			m_vh_state.active_foreground_colour = m_vh_state.background_colour;
+			m_vh_state.active_background_colour = m_vh_state.background_colour;
 			return;
 		}
 	}
 
 
 	/* show */
-	state->m_vh_state.active_foreground_colour = state->m_vh_state.foreground_colour;
-	state->m_vh_state.active_background_colour = state->m_vh_state.background_colour;
+	m_vh_state.active_foreground_colour = m_vh_state.foreground_colour;
+	m_vh_state.active_background_colour = m_vh_state.background_colour;
 }
 
 /* the alternate charset follows from the standard charset.
 Each charset holds 128 chars with 8 bytes for each char.
 
 The start address for the standard charset is dependant on the video mode */
-static void oric_refresh_charset(oric_state *state)
+void oric_state::oric_refresh_charset()
 {
 	/* alternate char set? */
-	if (BIT(state->m_vh_state.text_attributes, 0))
+	if (BIT(m_vh_state.text_attributes, 0))
 	{
 		/* yes */
-		state->m_vh_state.char_data = state->m_vh_state.char_base + (128*8);
+		m_vh_state.char_data = m_vh_state.char_base + (128*8);
 	}
 	else
 	{
 		/* no */
-		state->m_vh_state.char_data = state->m_vh_state.char_base;
+		m_vh_state.char_data = m_vh_state.char_base;
 	}
 }
 
 /* update video hardware state depending on the new attribute */
-static void oric_vh_update_attribute(running_machine &machine, UINT8 c)
+void oric_state::oric_vh_update_attribute(UINT8 c)
 {
-	oric_state *state = machine.driver_data<oric_state>();
 	/* attribute */
 	UINT8 attribute = c & 0x03f;
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	switch ((attribute>>3) & 0x03)
 	{
 		case 0:
 		{
 			/* set foreground colour 00-07 = black,red,green,yellow,blue,magenta,cyan,white */
-			state->m_vh_state.foreground_colour = attribute & 0x07;
-			oric_vh_update_flash(state);
+			m_vh_state.foreground_colour = attribute & 0x07;
+			oric_vh_update_flash();
 		}
 		break;
 
 		case 1:
 		{
-			state->m_vh_state.text_attributes = attribute & 0x07;
+			m_vh_state.text_attributes = attribute & 0x07;
 
-			oric_refresh_charset(state);
+			oric_refresh_charset();
 
 			/* text attributes */
-			oric_vh_update_flash(state);
+			oric_vh_update_flash();
 		}
 		break;
 
 		case 2:
 		{
 			/* set background colour */
-			state->m_vh_state.background_colour = attribute & 0x07;
-			oric_vh_update_flash(state);
+			m_vh_state.background_colour = attribute & 0x07;
+			oric_vh_update_flash();
 		}
 		break;
 
 		case 3:
 		{
 			/* set video mode */
-			state->m_vh_state.mode = attribute & 0x07;
+			m_vh_state.mode = attribute & 0x07;
 
 			// a different charset base is used depending on the video mode
 			// hires takes all the data from 0x0a000 through to about 0x0bf68,
 			// so the charset is moved to 0x09800 */
 			// text mode starts at 0x0bb80 and so the charset is in a different location
-			if (BIT(state->m_vh_state.mode, 2))
+			if (BIT(m_vh_state.mode, 2))
 			{
 				/* set screen memory base and standard charset location for this mode */
-				state->m_vh_state.read_addr = 0x0a000;
-				if (state->m_ram)
-					state->m_vh_state.char_base = state->m_ram + (offs_t)0x09800;
+				m_vh_state.read_addr = 0x0a000;
+				if (m_ram)
+					m_vh_state.char_base = m_ram + (offs_t)0x09800;
 				else
-					state->m_vh_state.char_base = (UINT8 *)space.get_read_ptr(0x09800);
+					m_vh_state.char_base = (UINT8 *)space.get_read_ptr(0x09800);
 			}
 			else
 			{
 				/* set screen memory base and standard charset location for this mode */
-				state->m_vh_state.read_addr = 0x0bb80;
-				if (state->m_ram)
-					state->m_vh_state.char_base = state->m_ram + (offs_t)0x0b400;
+				m_vh_state.read_addr = 0x0bb80;
+				if (m_ram)
+					m_vh_state.char_base = m_ram + (offs_t)0x0b400;
 				else
-					state->m_vh_state.char_base = (UINT8 *)space.get_read_ptr(0x0b400);
+					m_vh_state.char_base = (UINT8 *)space.get_read_ptr(0x0b400);
 			}
 			/* changing the mode also changes the position of the standard charset and alternative charset */
-			oric_refresh_charset(state);
+			oric_refresh_charset();
 		}
 		break;
 
@@ -167,6 +166,7 @@ UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_ind16 &bitma
 	UINT8 *RAM, y;
 	offs_t byte_offset, read_addr_base;
 	bool hires_active;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	RAM = m_ram;
 
@@ -181,10 +181,10 @@ UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_ind16 &bitma
 		int x = 0;
 
 		/* foreground colour white */
-		oric_vh_update_attribute(machine(),7);
+		oric_vh_update_attribute(7);
 		/* background colour black */
-		oric_vh_update_attribute(machine(),(1<<3));
-		oric_vh_update_attribute(machine(),(1<<4));
+		oric_vh_update_attribute((1<<3));
+		oric_vh_update_attribute((1<<4));
 
 		for (byte_offset=0; byte_offset<40; byte_offset++)
 		{
@@ -212,12 +212,12 @@ UINT32 oric_state::screen_update_oric(screen_device &screen, bitmap_ind16 &bitma
 			}
 
 			/* fetch data */
-			c = RAM ? RAM[read_addr] : machine().device("maincpu")->memory().space(AS_PROGRAM).read_byte(read_addr);
+			c = RAM ? RAM[read_addr] : space.read_byte(read_addr);
 
 			/* if bits 6 and 5 are zero, the byte contains a serial attribute */
 			if ((c & ((1 << 6) | (1 << 5))) == 0)
 			{
-				oric_vh_update_attribute(machine(), c);
+				oric_vh_update_attribute(c);
 
 				/* display background colour when attribute has been found */
 				oric_vh_render_6pixels(bitmap, x, y, m_vh_state.active_foreground_colour, m_vh_state.active_background_colour, 0, (c & 0x080));
@@ -300,5 +300,5 @@ void oric_state::video_start()
 	m_vh_state.flash_count = 0;
 	machine().scheduler().timer_pulse(attotime::from_hz(50), timer_expired_delegate(FUNC(oric_state::oric_vh_timer_callback),this));
 	/* mode */
-	oric_vh_update_attribute(machine(),(1<<3)|(1<<4));
+	oric_vh_update_attribute((1<<3)|(1<<4));
 }
