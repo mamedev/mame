@@ -41,16 +41,13 @@ X3: 2.4576Mhz, used by the modem chip AMI S35213 at IC37
 ToDo:
 * Canon Cat
 - Find the mirrors for the write-only video control register and figure out
-  what the writes actually do
+  what the writes actually do; hook these up properly to screen timing etc
 - The 2.40 (bios 0) firmware gets annoyed and thinks it has a phone call at
   random.
   (hit ctrl a few times to make it shut up for a bit or go into forth mode);
   The 1.74 (bios 1) firmware doesn't have this issue.
-  Figure out what causes it and make it stop.
-  (This MIGHT be related to the mysterious HK0NT line connecting gate array 2
-  to a toggle latch connecting to IP2 on the DUART; It may be necessary to
-  actually probe that line with a meter to see what address/bit causes it to
-  toggle, if the call can't be found in the cat source code)
+  Figure out what causes it and make it stop. May be OFFHOOK or more likely
+  the DUART thinks the phone is ringing constantly.
 - Floppy drive (3.5", Single Sided Double Density MFM, ~400kb)
   * Cat has very low level control of data being read or written, much like
     the Amiga does
@@ -71,9 +68,14 @@ ToDo:
 - Centronics port
 - RS232C port and Modem "port" connected to the DUART's two ports
 - DTMF generator chip (connected to DUART 'user output' pins OP4,5,6,7)
-- 6ms timer at 0x83xxxx
+- Hook duart IP2 up to the 6ms timer
+- Correctly hook the duart interrupt to the 68k, including autovector using the vector register on the duart
 - Watchdog timer/powerfail at 0x85xxxx
 - Canon Cat released versions known: 1.74 (dumped), 2.40 (dumped), 2.42 (NEED DUMP)
+- Known Spellcheck roms: NH7-0684 (US, dumped); NH7-0724 (UK, NEED DUMP);
+  NH7-0813/0814 (Quebec/France, NEED DUMP); NH7-1019/1020/1021 (Germany, NEED DUMP)
+  It is possible the non-US roms were never officially released.
+  Wordlist sources: American Heritage (US and UK), Librarie Larousse (FR), Langenscheidt (DE)
 
 * Swyft
 - Figure out the keyboard (interrupts are involved? or maybe an NMI on a
@@ -87,7 +89,7 @@ ToDo:
 
 // Defines
 
-#undef DEBUG_VIDEO_STATUS_W
+#undef DEBUG_VIDEO_ENABLE_W
 #undef DEBUG_VIDEO_CONTROL_W
 
 #undef DEBUG_FLOPPY_CONTROL_W
@@ -121,10 +123,10 @@ public:
 	cat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		//m_nvram(*this, "nvram"), // merge with p_sram?
+		//m_nvram(*this, "nvram"), // merge with svram?
 		//m_duart(*this, "duart68681"),
 		//m_speaker(*this, "speaker"),
-		m_p_sram(*this, "p_sram"), // nvram
+		m_svram(*this, "svram"), // nvram
 		m_p_videoram(*this, "p_videoram"),
 		m_y0(*this, "Y0"),
 		m_y1(*this, "Y1"),
@@ -141,7 +143,7 @@ public:
 	//optional_device<nvram_device> m_nvram;
 	//required_device<68681_device> m_duart;
 	//required_device<speaker_sound_device> m_speaker;
-	optional_shared_ptr<UINT16> m_p_sram;
+	optional_shared_ptr<UINT16> m_svram;
 	required_shared_ptr<UINT16> m_p_videoram;
 	optional_ioport m_y0;
 	optional_ioport m_y1;
@@ -153,6 +155,7 @@ public:
 	optional_ioport m_y7;
 	optional_ioport m_dipsw;
 	emu_timer *m_keyboard_timer;
+	emu_timer *m_6ms_timer;
 
 	DECLARE_MACHINE_START(cat);
 	DECLARE_MACHINE_RESET(cat);
@@ -165,10 +168,6 @@ public:
 	UINT32 screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE16_MEMBER(cat_video_status_w);
-	DECLARE_WRITE16_MEMBER(cat_test_mode_w);
-	DECLARE_READ16_MEMBER(cat_s35213_r);
-	DECLARE_WRITE16_MEMBER(cat_s35213_w);
 	DECLARE_READ16_MEMBER(cat_floppy_control_r);
 	DECLARE_WRITE16_MEMBER(cat_floppy_control_w);
 	DECLARE_WRITE16_MEMBER(cat_printer_data_w);
@@ -180,16 +179,30 @@ public:
 	DECLARE_READ16_MEMBER(cat_floppy_status_r);
 	DECLARE_READ16_MEMBER(cat_battery_r);
 	DECLARE_WRITE16_MEMBER(cat_printer_control_w);
+	DECLARE_READ16_MEMBER(cat_modem_r);
+	DECLARE_WRITE16_MEMBER(cat_modem_w);
+	DECLARE_READ16_MEMBER(cat_6ms_counter_r);
+	DECLARE_WRITE16_MEMBER(cat_video_enable_w);
+	DECLARE_WRITE16_MEMBER(cat_test_mode_w);
 	DECLARE_READ16_MEMBER(cat_2e80_r);
 	DECLARE_READ16_MEMBER(cat_0080_r);
 	DECLARE_READ16_MEMBER(cat_0000_r);
 
 	UINT8 m_duart_inp;// = 0x0e;
+	/* gate array 2 has a 16-bit counter inside which counts at 10mhz and
+	   rolls over at FFFF->0000; on rollover (or maybe at FFFF terminal count)
+	   it triggers the KTOBF output. It does this every 6.5535ms, which causes
+	   a 74LS74 d-latch at IC100 to switch the state of the DUART IP2 line;
+	   this causes the DUART to fire an interrupt, which makes the 68000 read
+	   the keyboard.
+	 */
+	UINT16 m_6ms_counter; 
 	UINT8 m_video_enable;
 	UINT16 m_pr_cont;
 	UINT8 m_keyboard_line;
 
 	TIMER_CALLBACK_MEMBER(keyboard_callback);
+	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
 	TIMER_CALLBACK_MEMBER(swyft_reset);
 };
 
@@ -210,30 +223,6 @@ DRIVER_INIT_MEMBER( cat_state,cat )
 		svrom[i+1] = 0x80;
 	}
 }*/
-
-WRITE16_MEMBER( cat_state::cat_test_mode_w )
-{
-#ifdef DEBUG_TEST_W
-	fprintf(stderr, "Test mode reg write: offset %06X, data %04X\n", 0x860000+(offset<<1), data);
-#endif
-}
-
-// AMI S35213 300/1200 Single Chip Modem (datasheet found at http://bitsavers.trailing-edge.com/pdf/ami/_dataBooks/1985_AMI_MOS_Products_Catalog.pdf on pdf page 243)
-READ16_MEMBER( cat_state::cat_s35213_r )
-{
-#ifdef DEBUG_MODEM_R
-	fprintf(stderr,"Read from s35213 modem address %06X\n", 0x820000+(offset<<1));
-#endif
-// HACK: return default 'sane' modem state
-	return 0x00;
-}
-
-WRITE16_MEMBER( cat_state::cat_s35213_w )
-{
-#ifdef DEBUG_MODEM_W
-	fprintf(stderr,"Write to s35213 modem address %06X, data %04X\n", 0x820000+(offset<<1), data);
-#endif
-}
 
 /* 0x600000-0x65ffff Write: Video Generator (AKA NH4-5001 AKA Gate Array #1 @ IC30)
  writing to the video generator is done by putting the register number in the high 3 bits
@@ -334,7 +323,6 @@ WRITE16_MEMBER( cat_state::cat_floppy_data_w )
 #endif
 }
 
-
 // 0x800008-0x800009: Floppy status register (called fd.status in the cat source code)
 	/* FEDCBA98 (76543210 is ignored)
 	 * |||||||\-- ? always low
@@ -343,10 +331,9 @@ WRITE16_MEMBER( cat_state::cat_floppy_data_w )
 	 * ||||\----- /WRITE PROTECT: 1 = writable, 0 = protected (verified)
 	 * |||\------ /TRACK0: 0 = on track 0, 1 = not on track 0 (verified)
 	 * ||\------- /INDEX: 0 = index sensor active, 1 = index sensor inactive (verified)
-	 * |\-------- ? low on drive 1, high on drive 0?
-	 * \--------- ? usually high but occasionally low?
-	 stuff that needs to be found here:
-	 ready sense
+	 * |\-------- ? this bit may indicate which drive is selected, i.e. same as floppy control bit 7; low on drive 1, high on drive 0?
+	 * \--------- ? this bit may indicate 'data separator overflow'; it is usually low but becomes high if you manually select the floppy drive
+	 ALL of these bits except bit 7 seem to be reset when the selected drive in floppy control is switched
 	 */
 READ16_MEMBER( cat_state::cat_floppy_status_r )
 {
@@ -415,24 +402,56 @@ WRITE16_MEMBER( cat_state::cat_printer_control_w )
 	m_pr_cont = data;
 }
 
-WRITE16_MEMBER( cat_state::cat_video_status_w )
+// 0x820000: AMI S35213 300/1200 Single Chip Modem (datasheet found at http://bitsavers.trailing-edge.com/pdf/ami/_dataBooks/1985_AMI_MOS_Products_Catalog.pdf on pdf page 243)
+READ16_MEMBER( cat_state::cat_modem_r )
+{
+#ifdef DEBUG_MODEM_R
+	fprintf(stderr,"Read from s35213 modem address %06X\n", 0x820000+(offset<<1));
+#endif
+// HACK: return default 'sane' modem state
+	return 0x00;
+}
+
+WRITE16_MEMBER( cat_state::cat_modem_w )
+{
+#ifdef DEBUG_MODEM_W
+	fprintf(stderr,"Write to s35213 modem address %06X, data %04X\n", 0x820000+(offset<<1), data);
+#endif
+}
+
+// 0x830000: 6ms counter (used for KTOBF)
+READ16_MEMBER( cat_state::cat_6ms_counter_r )
+{
+	return m_6ms_counter;
+}
+
+// 0x840000: video enable (also controls hsync/vsync?)
+WRITE16_MEMBER( cat_state::cat_video_enable_w )
 {
 	/*
 	 * 76543210
 	 * |||||||\-- ?
 	 * ||||||\--- ?
 	 * |||||\---- Video enable (1 = video on, 0 = video off/screen black)
-	 * ||||\----- ? (always written as 1?)
-	 * |||\------ ? (always written as 1?)
+	 * ||||\----- ? (always written as 1?) maybe hsync
+	 * |||\------ ? (always written as 1?) maybe vsync
 	 * ||\------- ?
 	 * |\-------- ?
 	 * \--------- ?
 	 */
 
-#ifdef DEBUG_VIDEO_STATUS_W
-	fprintf(stderr, "Video status reg write: offset %06X, data %04X\n", 0x840000+(offset<<1), data);
+#ifdef DEBUG_VIDEO_ENABLE_W
+	fprintf(stderr, "Video enable reg write: offset %06X, data %04X\n", 0x840000+(offset<<1), data);
 #endif
 	m_video_enable = BIT( data, 2 );
+}
+
+// 0x850000: test mode registers
+WRITE16_MEMBER( cat_state::cat_test_mode_w )
+{
+#ifdef DEBUG_TEST_W
+	fprintf(stderr, "Test mode reg write: offset %06X, data %04X\n", 0x860000+(offset<<1), data);
+#endif
 }
 
 // open bus etc handlers
@@ -455,7 +474,7 @@ READ16_MEMBER( cat_state::cat_0080_r )
 /* Canon cat memory map, based on a 16MB dump of the entire address space of a running unit using forth "1000000 0 do i c@ semit loop"
 68k address map:
 a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  (a0 via UDS/LDS)
-0   0   *   x   x   *   *   *   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       *GATE ARRAY 2 DECODES THESE LINES TO ENABLE THIS AREA*
+*i  *i  *   x   x   *   *   *   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       *GATE ARRAY 2 DECODES THESE LINES TO ENABLE THIS AREA* (a23 and a22 are indirectly decoded via the /RAMROMCS and /IOCS lines from gate array 1)
 0   0   0   0   x   0   a   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   b       R   ROM (ab: 00=ic4 01=ic2 10=ic5 11=ic3) (EPROM 27C512 x 4) [controlled via GA2 /ROMCS]
 0   0   0   0   x   1   0   0   x   x   *   *   *   *   *   *   *   *   *   *   *   *   *   0       RW  SVRAM ic11 d4364 (battery backed) [controlled via GA2 /RAMCS]
 0   0   0   0   x   1   x   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   0       O   OPEN BUS (reads as 0x2e) [may be controlled via GA2 /RAMCS?]
@@ -485,8 +504,8 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
                                                                             1   x   x   x   0       W?  Unknown (reads as 0x00)
 1   0   0   x   x   0   0   1   x   x   x   x   x   x   x   x   x   x   x   *   *   *   *   1       RW  68681 DUART at ic34 [controlled via GA2 /DUARTCS]
 1   0   0   x   x   0   1   0   x   x   x   x   x   x   x   x   x   x   *   *   *   *   *   0       RW  Modem Chip AMI S35213 @ IC37 DATA BIT 7 ONLY [controlled via GA2 /SMCS]
-1   0   0   x   x   0   1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       RW  Read: Fixed 16-bit counter. increments once per frame? Write: Modem Chip?
-1   0   0   x   x   1   0   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       W?  Video Control register? (screen enable on bit 3?) (reads as 0x2e80)
+1   0   0   x   x   0   1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R   Read: Fixed 16-bit counter from ga2. increments once another 16-bit counter clocked at 10mhz overflows
+1   0   0   x   x   1   0   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       W?  Video/Sync enable register? (screen enable on bit 3?) (reads as 0x2e80)
 1   0   0   x   x   1   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R?  reads as 0x0100 0x0101 or 0x0102, some sort of test register or video status register? 
 1   0   0   x   x   1   1   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       W?  Test register? (reads as 0x0000)
 1   0   0   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       ?   Unknown (reads as 0x2e80)
@@ -499,7 +518,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x080000) // 256 KB ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("p_sram") AM_MIRROR(0x08C000)// SRAM powered by battery
+	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("svram") AM_MIRROR(0x08C000)// SRAM powered by battery
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("svrom",0x0000) AM_MIRROR(0x180000) // SV ROM
 	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_SHARE("p_videoram") AM_MIRROR(0x180000) // 512 KB RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_READWRITE(cat_2e80_r,cat_video_control_w) AM_MIRROR(0x180000) // Gate Array #1: Video
@@ -513,9 +532,9 @@ static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	AM_RANGE(0x80000e, 0x80000f) AM_READWRITE(cat_battery_r,cat_printer_control_w) AM_MIRROR(0x18FFE0) // Centronics Printer Control, keyboard led and country code enable
 	AM_RANGE(0x800010, 0x80001f) AM_READ(cat_0080_r) AM_MIRROR(0x18FFE0) // Open bus?
 	AM_RANGE(0x810000, 0x81001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff ) AM_MIRROR(0x18FFE0)
-	AM_RANGE(0x820000, 0x82003f) AM_READWRITE(cat_s35213_r,cat_s35213_w) AM_MIRROR(0x18FFC0) // AMI S35213 Modem Chip, all access is on bit 7
-	//AM_RANGE(0x830000, 0x830001) AM_READ(cat_6ms_counter) AM_MIRROR(0x18FFFE) // 6ms counter?
-	AM_RANGE(0x840000, 0x840001) AM_READWRITE(cat_2e80_r,cat_video_status_w) AM_MIRROR(0x18FFFE) // Video status/Output port register
+	AM_RANGE(0x820000, 0x82003f) AM_READWRITE(cat_modem_r,cat_modem_w) AM_MIRROR(0x18FFC0) // AMI S35213 Modem Chip, all access is on bit 7
+	AM_RANGE(0x830000, 0x830001) AM_READ(cat_6ms_counter_r) AM_MIRROR(0x18FFFE) // 16bit 6ms counter clocked by output of another 16bit counter clocked at 10mhz
+	AM_RANGE(0x840000, 0x840001) AM_READWRITE(cat_2e80_r,cat_video_enable_w) AM_MIRROR(0x18FFFE) // Video status/Output port register
 	//AM_RANGE(0x850000, 0x850001) AM_READ(cat_video_status) AM_MIRROR(0x18FFFE) // video status read: hblank, vblank or draw?
 	AM_RANGE(0x860000, 0x860001) AM_READWRITE(cat_0000_r, cat_test_mode_w) AM_MIRROR(0x18FFFE) // Test mode
 	AM_RANGE(0x870000, 0x870001) AM_READ(cat_2e80_r) AM_MIRROR(0x18FFFE) // Open bus?
@@ -646,6 +665,13 @@ TIMER_CALLBACK_MEMBER(cat_state::keyboard_callback)
 	machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
 
+// This is effectively also the KTOBF line to the d-latch before the duart
+TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
+{
+	// TODO: emulate the d-latch here and poke the duart's input ports
+	m_6ms_counter++;
+}
+
 static IRQ_CALLBACK(cat_int_ack)
 {
 	device->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1,CLEAR_LINE);
@@ -655,14 +681,18 @@ static IRQ_CALLBACK(cat_int_ack)
 MACHINE_START_MEMBER(cat_state,cat)
 {
 	m_duart_inp = 0x0e;
+	m_6ms_counter = 0;
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cat_state::keyboard_callback),this));
-	machine().device<nvram_device>("nvram")->set_base(m_p_sram, 0x4000);
+	m_6ms_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cat_state::counter_6ms_callback),this));
+	machine().device<nvram_device>("nvram")->set_base(m_svram, 0x4000);
 }
 
 MACHINE_RESET_MEMBER(cat_state,cat)
 {
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(cat_int_ack);
+	m_6ms_counter = 0;
 	m_keyboard_timer->adjust(attotime::zero, 0, attotime::from_hz(120));
+	m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL_19_968MHz/2)/65536));
 }
 
 VIDEO_START_MEMBER(cat_state,cat)
@@ -735,6 +765,12 @@ UINT32 cat_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
+/* TODO: the duart is the only thing actually connected to the cpu IRQ pin
+ * The KTOBF output of the gate array 2 (itself the terminal count output
+ * of a 16-bit counter clocked at ~10mhz, hence 6.5536ms period) goes to a
+ * d-latch and inputs on ip2 of the duart, causing the duart to fire an irq;
+ * this is used by the cat to read the keyboard.
+ */
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
 #ifdef DEBUG_DUART_IRQ_HANDLER
@@ -860,7 +896,7 @@ ROM_START( cat )
 	// since ROM_FILL16BE(0x0, 0x80000, 0x2e80) doesn't exist, the even bytes and latter chunk of the svrom space are filled in in DRIVER_INIT
 	// Romspace here is a little strange: there are 3 rom sockets on the board:
 	// svrom-0 maps to 200000-21ffff every ODD byte (d8-d0)
-	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00000, 0x20000, CRC(229CA210) SHA1(564B57647A34ACDD82159993A3990A412233DA14), ROM_SKIP(1)) // this is a 28pin tc531000 mask rom, 128KB long
+	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00000, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask rom, 128KB long
 	// svrom-1 maps to 200000-21ffff every EVEN byte (d15-d7)
 	// no rom is in the socket; it reads as open bus 0x2E
 	// svrom-2 maps to 240000-25ffff every ODD byte (d8-d0)
