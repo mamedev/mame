@@ -138,6 +138,7 @@ hash/mo5_cart.xml svneol=native#text/xml
 hash/mpz80.xml svneol=native#text/xml
 hash/msx.hsi svneol=native#text/plain
 hash/msx1_cart.xml svneol=native#text/xml
+hash/msx1_cass.xml svneol=native#text/xml
 hash/msx2.hsi svneol=native#text/plain
 hash/msx2_cart.xml svneol=native#text/xml
 hash/mz2000_cass.xml svneol=native#text/xml

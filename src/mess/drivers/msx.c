@@ -1031,7 +1031,7 @@ static const cassette_interface msx_cassette_interface =
 	fmsx_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_PLAY),
-	NULL,
+	"msx_cass",
 	NULL
 };
 
@@ -1104,6 +1104,7 @@ static MACHINE_CONFIG_START( msx, msx_state )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","msx1_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","msx1_cass")
 MACHINE_CONFIG_END
 
 
@@ -1202,6 +1203,8 @@ static MACHINE_CONFIG_START( msx2, msx_state )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","msx2_cart")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("msx1_list","msx1_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list","msx1_cass")
 MACHINE_CONFIG_END
 
 
