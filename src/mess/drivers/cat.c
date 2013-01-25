@@ -182,8 +182,8 @@ public:
 	DECLARE_READ16_MEMBER(cat_modem_r);
 	DECLARE_WRITE16_MEMBER(cat_modem_w);
 	DECLARE_READ16_MEMBER(cat_6ms_counter_r);
-	DECLARE_WRITE16_MEMBER(cat_video_enable_w);
-	DECLARE_WRITE16_MEMBER(cat_test_mode_w);
+	DECLARE_WRITE16_MEMBER(cat_opr_w);
+	DECLARE_WRITE16_MEMBER(cat_tcb_w);
 	DECLARE_READ16_MEMBER(cat_2e80_r);
 	DECLARE_READ16_MEMBER(cat_0080_r);
 	DECLARE_READ16_MEMBER(cat_0000_r);
@@ -198,6 +198,7 @@ public:
 	 */
 	UINT16 m_6ms_counter; 
 	UINT8 m_video_enable;
+	UINT8 m_video_invert;
 	UINT16 m_pr_cont;
 	UINT8 m_keyboard_line;
 
@@ -425,32 +426,40 @@ READ16_MEMBER( cat_state::cat_6ms_counter_r )
 	return m_6ms_counter;
 }
 
-// 0x840000: video enable (also controls hsync/vsync?)
-WRITE16_MEMBER( cat_state::cat_video_enable_w )
+/* 0x840001: 'opr' Output Port Register
+ * writing 0x1c (or possibly anything) here resets the watchdog
+ * if the watchdog expires an NMI is sent to the cpu
+ */
+WRITE16_MEMBER( cat_state::cat_opr_w )
 {
 	/*
-	 * 76543210
+	 * 76543210 (FEDCBA98 are ignored)
 	 * |||||||\-- ?
 	 * ||||||\--- ?
 	 * |||||\---- Video enable (1 = video on, 0 = video off/screen black)
-	 * ||||\----- ? (always written as 1?) maybe hsync
-	 * |||\------ ? (always written as 1?) maybe vsync
+	 * ||||\----- Watchdog reset?
+	 * |||\------ Video invert (1 = black-on-white video; 0 = white-on-black)
 	 * ||\------- ?
 	 * |\-------- ?
 	 * \--------- ?
 	 */
-
 #ifdef DEBUG_VIDEO_ENABLE_W
+	//if ((data&0xef)!= 0x0c)
 	fprintf(stderr, "Video enable reg write: offset %06X, data %04X\n", 0x840000+(offset<<1), data);
 #endif
 	m_video_enable = BIT( data, 2 );
+	m_video_invert = 1-BIT( data, 4 );
 }
 
-// 0x850000: test mode registers
-WRITE16_MEMBER( cat_state::cat_test_mode_w )
+// 0x850000: watchdog timer/video status
+// implement me!
+
+// 0x860000: test regitser
+// the power fail status reset bit also lives here somewhere?
+WRITE16_MEMBER( cat_state::cat_tcb_w )
 {
 #ifdef DEBUG_TEST_W
-	fprintf(stderr, "Test mode reg write: offset %06X, data %04X\n", 0x860000+(offset<<1), data);
+	fprintf(stderr, "Test reg write: offset %06X, data %04X\n", 0x860000+(offset<<1), data);
 #endif
 }
 
@@ -491,23 +500,23 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
                                                                                                     *NOTE: DRAM rows 2 and 3 above are only usually populated in cat developer units!*
 0   1   1   ?   ?   *   *   *   ?   ?   ?   ?   ?   ?   ?   *   *   *   *   *   *   *   *   x       W   VIDEO CONTRL REGISTERS (reads as 0x2e80)
 1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *   *   *   *   *       *GATE ARRAY 3 DECODES THIS AREA, GA3 IS ENABLED BY /IOCS1 FROM GA2*
-1   0   0   Y   Y   0   0   0   x   x   x   x   x   x   x   x   x   x   x   *   *   *   *   0       *IO AREA* Note byte reads in this area behave erratically if both Y bits are set while word reads work fine always
+1   0   0   Y   Y   0   0   0   x   x   x   x   x   x   x   x   x   x   x   *   *   *   *   0       {'ga3'} *IO AREA* Note byte reads in this area behave erratically if both Y bits are set while word reads work fine always
                                                                             x   x   x   x   1       O   OPEN BUS (reads as 0x80)
-                                                                            0   0   0   0   0       RW  Floppy control lines (drive select, motor on, direction, step, side select, ?write gate?)
-                                                                            0   0   0   1   0       W   Keyboard Row Select (reads as 0x00)
-                                                                            0   0   1   0   0       W   Centronics Printer Data W (reads as 0x00)
-                                                                            0   0   1   1   0       RW  Floppy data register
-                                                                            0   1   0   0   0       R   Floppy status lines (write protect, ready, index, track0)
+                                                                            0   0   0   0   0       RW  {'fd.cont'} Floppy control lines (drive select, motor on, direction, step, side select, ?write gate?)
+                                                                            0   0   0   1   0       W   {'kb.wr'} Keyboard Row Select (reads as 0x00)
+                                                                            0   0   1   0   0       W   {'pr.data'} Centronics Printer Data W (reads as 0x00)
+                                                                            0   0   1   1   0       RW  {'fd.dwr' and 'fd.drd'} Floppy data read/write register; maybe the write gate value in fd.cont chooses which?
+                                                                            0   1   0   0   0       R   {'fd.status'} Floppy status lines (write protect, ready, index, track0)
                                                                             0   1   0   1   0       R   Keyboard Column Read
                                                                             0   1   1   0   0       W?  Unknown (reads as 0x00)
                                                                             0   1   1   1   0       RW  Read: Battery status (MSB bit, 0 = ok, 1 = dead, other bits read as 0)/Write: Centronics Printer and Keyboard LED/Country Code Related
                                                                             1   x   x   x   0       W?  Unknown (reads as 0x00)
-1   0   0   x   x   0   0   1   x   x   x   x   x   x   x   x   x   x   x   *   *   *   *   1       RW  68681 DUART at ic34 [controlled via GA2 /DUARTCS]
-1   0   0   x   x   0   1   0   x   x   x   x   x   x   x   x   x   x   *   *   *   *   *   0       RW  Modem Chip AMI S35213 @ IC37 DATA BIT 7 ONLY [controlled via GA2 /SMCS]
-1   0   0   x   x   0   1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R   Read: Fixed 16-bit counter from ga2. increments once another 16-bit counter clocked at 10mhz overflows
-1   0   0   x   x   1   0   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       W?  Video/Sync enable register? (screen enable on bit 3?) (reads as 0x2e80)
-1   0   0   x   x   1   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R?  reads as 0x0100 0x0101 or 0x0102, some sort of test register or video status register? 
-1   0   0   x   x   1   1   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       W?  Test register? (reads as 0x0000)
+1   0   0   x   x   0   0   1   x   x   x   x   x   x   x   x   x   x   x   *   *   *   *   1       RW  {'duart'} 68681 DUART at ic34 [controlled via GA2 /DUARTCS]
+1   0   0   x   x   0   1   0   x   x   x   x   x   x   x   x   x   x   *   *   *   *   *   0       RW  {'modem'} Modem Chip AMI S35213 @ IC37 DATA BIT 7 ONLY [controlled via GA2 /SMCS]
+1   0   0   x   x   0   1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R   {'timer'} Read: Fixed 16-bit counter from ga2. increments every 6.5535ms when another 16-bit counter clocked at 10mhz overflows
+1   0   0   x   x   1   0   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       W   {'opr'} Output Port (Video/Sync enable and watchdog reset?) register (screen enable on bit 3?) (reads as 0x2e80)
+1   0   0   x   x   1   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R   {'wdt'} Watchdog timer reads as 0x0100 0x0101 or 0x0102, some sort of test register or video status register? 
+1   0   0   x   x   1   1   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R?W {'tcb'} test control bits: powerfail status in bit <?> (reads as 0x0000)
 1   0   0   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       ?   Unknown (reads as 0x2e80)
 
 1   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       O   OPEN BUS (reads as 0x2e80)
@@ -534,9 +543,9 @@ static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	AM_RANGE(0x810000, 0x81001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff ) AM_MIRROR(0x18FFE0)
 	AM_RANGE(0x820000, 0x82003f) AM_READWRITE(cat_modem_r,cat_modem_w) AM_MIRROR(0x18FFC0) // AMI S35213 Modem Chip, all access is on bit 7
 	AM_RANGE(0x830000, 0x830001) AM_READ(cat_6ms_counter_r) AM_MIRROR(0x18FFFE) // 16bit 6ms counter clocked by output of another 16bit counter clocked at 10mhz
-	AM_RANGE(0x840000, 0x840001) AM_READWRITE(cat_2e80_r,cat_video_enable_w) AM_MIRROR(0x18FFFE) // Video status/Output port register
-	//AM_RANGE(0x850000, 0x850001) AM_READ(cat_video_status) AM_MIRROR(0x18FFFE) // video status read: hblank, vblank or draw?
-	AM_RANGE(0x860000, 0x860001) AM_READWRITE(cat_0000_r, cat_test_mode_w) AM_MIRROR(0x18FFFE) // Test mode
+	AM_RANGE(0x840000, 0x840001) AM_READWRITE(cat_2e80_r,cat_opr_w) AM_MIRROR(0x18FFFE) // Output port register (video enable, invert, watchdog reset)
+	//AM_RANGE(0x850000, 0x850001) AM_READ(cat_video_status) AM_MIRROR(0x18FFFE) // video status and watchdog read: hblank, vblank or draw?
+	AM_RANGE(0x860000, 0x860001) AM_READWRITE(cat_0000_r, cat_tcb_w) AM_MIRROR(0x18FFFE) // Test mode
 	AM_RANGE(0x870000, 0x870001) AM_READ(cat_2e80_r) AM_MIRROR(0x18FFFE) // Open bus?
 	AM_RANGE(0xA00000, 0xA00001) AM_READ(cat_2e80_r) AM_MIRROR(0x1FFFFE) // Open bus?
 	AM_RANGE(0xC00000, 0xC00001) AM_READ(cat_2e80_r) AM_MIRROR(0x3FFFFE) // Open bus?
@@ -682,6 +691,8 @@ MACHINE_START_MEMBER(cat_state,cat)
 {
 	m_duart_inp = 0x0e;
 	m_6ms_counter = 0;
+	m_video_enable = 1;
+	m_video_invert = 0;
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cat_state::keyboard_callback),this));
 	m_6ms_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cat_state::counter_6ms_callback),this));
 	machine().device<nvram_device>("nvram")->set_base(m_svram, 0x4000);
@@ -715,7 +726,7 @@ UINT32 cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap,
 				code = m_p_videoram[addr++];
 				for (b = 15; b >= 0; b--)
 				{
-					bitmap.pix16(y, horpos++) = (code >> b) & 0x01;
+					bitmap.pix16(y, horpos++) = ((code >> b) & 0x01) ^ m_video_invert;
 				}
 			}
 		}
