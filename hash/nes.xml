@@ -50131,6 +50131,26 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="fengyun">
+		<description>FengYun - Traitor Legend (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<info name="serial" value="ES-1046"/>
+		<info name="alt_title" value="风云"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="WAIXING-A" />
+			<dataarea name="chr" size="262144">
+				<rom name="[es-1046] fengyun (c).chr" size="262144" crc="f618a544" sha1="047547b137f334634e55b71a81bf9c62884ca243" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="[es-1046] fengyun (c).prg" size="524288" crc="a9b36a7d" sha1="31485d8e05fb6309f98bc3b0590599e22589544e" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fengyun1" cloneof="fengyun">
 		<description>FengYun - Traitor Legend (Chi, Decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -50150,7 +50170,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="fengyun1" cloneof="fengyun">
+	<software name="fengyun2" cloneof="fengyun">
 		<description>FengYun - Traitor Legend (Chi, Decrypted WXN, Alt)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -50393,6 +50413,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="xichubw" supported="partial">
+		<description>Xi Chu BaWang (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<info name="serial" value="ES-1066"/>
+		<info name="alt_title" value="西楚霸王"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HENGGEDIANZI-XJZB" /> <!-- Header says mapper 176, but shows gray screen, this PCB is not precise (glitches) but it's closer! -->
+			<dataarea name="prg" size="1048576">
+				<rom name="[es-1066] xi chu bawang (c).prg" size="1048576" crc="f9863adf" sha1="22f015e08159f7e5d5b3778ed2adea896ca7afb0" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xichubwa" cloneof="xichubw" supported="partial">
 		<description>Xi Chu BaWang (Chi, Decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -50446,6 +50483,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="sanxiawy" supported="no">
+		<description>San Xia Wu Yi (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<info name="serial" value="ES-1071"/>
+		<info name="alt_title" value="三侠五义"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="HENGGEDIANZI-XJZB" /> <!-- Header says mapper 176, but shows gray screen, this PCB is not precise (glitched sprites) but it's closer! -->
+			<dataarea name="prg" size="1048576">
+				<rom name="[es-1071] san xia wu yi (c).prg" size="1048576" crc="b511c04b" sha1="e6ba3f9d8248a6c4d0f21647b7b1818064d701c1" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sanxiawya" cloneof="sanxiawy"   supported="no">
 		<description>San Xia Wu Yi (Chi, Decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -50462,7 +50516,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sanxiawya" cloneof="sanxiawy"   supported="no">
+	<software name="sanxiawyb" cloneof="sanxiawy"   supported="no">
 		<description>San Xia Wu Yi (Chi, Alt?)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -50480,6 +50534,23 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="dongzlgz" supported="no">
+		<description>DongZhou Lie GuoZhi (Chi)</description>
+		<year>19??</year>
+		<publisher>Waixing</publisher>
+		<info name="serial" value="ES-1072"/>
+		<info name="alt_title" value="东周列国志"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="chr" size="262144">
+				<rom name="[es-1072] dongzhou lie guozhi (c).chr" size="262144" crc="520cb158" sha1="f4e212f605af9cfdeb940bc74bbcd0260b769907" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="262144">
+				<rom name="[es-1072] dongzhou lie guozhi (c).prg" size="262144" crc="5c596937" sha1="15a0b191a3fc46f8eb50af93499e7026fd3307c4" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dongzlgza" cloneof="dongzlgz" supported="no">
 		<description>DongZhou Lie GuoZhi (Chi, Decrypted WXN)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -50633,8 +50704,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="shuihuss">
-		<description>Shui Hu Shen Shou (Chi, Decrypted WXN)</description>
+<!-- Apparently the Decrypted WXN file coincide with the real dump -->
+	<software name="shssw">
+		<description>Shui Hu Shen Shou (Chi, Waixing)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
 		<info name="serial" value="ES-1087"/>
@@ -50642,7 +50714,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="HENGGEDIANZI-XJZB" />
 			<dataarea name="prg" size="1048576">
-				<rom name="[es-1087] shui hu shen shou (c) (wxn decrypted).prg" size="1048576" crc="1923a8c5" sha1="91e51788e980a8ad5a8a829e270504c9571b72cf" offset="00000" status="baddump" />
+				<rom name="[es-1087] shui hu shen shou (c).prg" size="1048576" crc="1923a8c5" sha1="91e51788e980a8ad5a8a829e270504c9571b72cf" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -51375,9 +51447,9 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="shss">
+	<software name="shssn">
 		<!-- Notes: port of the GBC game by Vast Fame -->
-		<description>Shui Hu Shen Shou (Chi)</description>
+		<description>Shui Hu Shen Shou (Chi, Nanjing)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ019"/>
@@ -51471,7 +51543,24 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- [NJ025] 农场小精灵 ~ Nong Chang Xiao Jing Ling -->
 <!-- [NJ026] 倚天屠龙记 ~ Yi Tian Tu Long Ji (Heavenly Sword &amp; Dragon Saber) -->
 <!-- [NJ027] 逐鹿三国 ~ Zhu Lu San Guo -->
-<!-- [NJ028] 水浒3 ~ Shuihu 3 -->
+
+	<software name="shuihu3">
+		<description>Shui Hu 3 (Chi)</description>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ028"/>
+		<info name="alt_title" value="水浒3"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-NANJING" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="1048576">
+				<rom name="shui hu iii (nj028) (c).prg" size="1048576" crc="d0807fd2" sha1="efb0c34026627efa0de504d34f570692b4d28ea0" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="qgdz">
 		<description>Qi Guo Da Zhan (Chi)</description>
@@ -52192,11 +52281,11 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- [NJ083] 三国志-刘备传 ~ San Guo Zhi - Liu Bei Zhuan -->
 
 	<software name="sseiyac2">
-		<!-- Alternative Title: 圣斗士星矢2-北欧突击篇 ~ Sheng Dou Shi Xing Shi 2  Beiou Tuji Pian (Saint Seiya 2  Nordic chapter) -->
 		<description>Saint Seiya - Beiou Tuji Pian (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ084"/>
+		<info name="alt_title" value="圣斗士星矢2-北欧突击篇 ~ Sheng Dou Shi Xing Shi 2  Beiou Tuji Pian (Saint Seiya 2  Nordic chapter)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-NANJING" />
 			<feature name="mirroring" value="vertical" />
@@ -52236,14 +52325,32 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 <!-- [NJ091] 仙剑问情 ~ Xian Jian Wen Qing -->
 <!-- [NJ092] 游戏宝贝 ~ You Xi Bao Bei -->
 <!-- [NJ093] 鹿鼎记 ~ Lu Ding Ji -->
-<!-- [NJ094] 王者无双 ~ Whang Zhe Wu Shuang -->
+
+<!-- rom with crc 3cf783af is hacked to run on mapper 241 -->
+	<software name="whangzws" supported="no">
+		<description>Whang Zhe Wu Shuang (Chi)</description>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ094"/>
+		<info name="alt_title" value="王者无双"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNKNOWN" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="524288">
+				<rom name="[nj094] wang zhe wu shuang (c).prg" size="524288" crc="1dcc4a14" sha1="ca7366f3a4b80952d7690b02bd8b9c2a0d52bbae" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="dballc">
-		<!-- Alternative Title: 七龙珠大冒险 ~ Qi Long Zhu Da Mao Xian (Dragon Ball Adventure) -->
 		<description>Dragonball (Chi)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ095"/>
+		<info name="alt_title" value="七龙珠大冒险 ~ Qi Long Zhu Da Mao Xian (Dragon Ball Adventure)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-NANJING" />
 			<feature name="mirroring" value="vertical" />
@@ -52256,8 +52363,41 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- [NJ096] 武侠天地 ~ Wu Xia Tian Di -->
-<!-- [NJ097] 魔兽世界-恶魔猎人 ~ Mo Shou Shi Jie - Emo Lie Ren (World of Warcraft - Demon Hunter) -->
+	<software name="wuxiatd" supported="no">
+		<description>Wu Xia Tian Di (Chi)</description>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ096"/>
+		<info name="alt_title" value="武侠天地"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-NANJING" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="1048576">
+				<rom name="[nj096] wu xia tian di (c).prg" size="1048576" crc="57414fb6" sha1="872750e5dc53c86bd3bc99488479e8ce56e3c352" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wow">
+		<description>Mo Shou Shi Jie E Mo Lie Ren (Chi)</description>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ097"/>
+		<info name="alt_title" value="魔兽世界-恶魔猎人 ~ Mo Shou Shi Jie - Emo Lie Ren (World of Warcraft - Demon Hunter)"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="UNL-NANJING" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="1048576">
+				<rom name="[nj097] mo shou shi jie e mo lie ren (c).prg" size="1048576" crc="eff96e8a" sha1="0f40d08e1d685f863b4e70b66780c2134d02209a" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="zzhx4">
 		<description>Zui Zhong Huan Xiang IV - Guang Yu An Shui Jing Fen Zheng (Chi)</description>
@@ -52312,8 +52452,39 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- [NJ101] 合金风暴 ~ He Jin Feng Bao -->
-<!-- [NJ102] 魔道劫 ~ Mo Dao Jie -->
+	<software name="hejinfb">
+		<description>He Jin Feng Bao (Chi)</description>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ101"/>
+		<info name="alt_title" value="合金风暴"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="524288">
+				<rom name="[nj101] he jin feng bao (c).prg" size="524288" crc="3f2b0e2f" sha1="2ea01d732de4137bbb221cc124a7cd790ed77763" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="modaojie">
+		<description>Mo Dao Jie (Chi)</description>
+		<year>19??</year>
+		<publisher>Nanjing</publisher>
+		<info name="serial" value="NJ102"/>
+		<info name="alt_title" value="魔道劫"/>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="1048576">
+				<rom name="[nj102] mo dao jie (c).prg" size="1048576" crc="f65a99b8" sha1="b6da463bb661191b96433e50b7bfae7cfaf18a94" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="xscq" supported="no">
 		<description>Xiang Shuai Chuan Qi (Chi)</description>
@@ -52372,7 +52543,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	<software name="koudaigs" supported="partial">
 		<description>Kou Dai Guai Shou (Chi)</description>
 		<year>19??</year>
-		<publisher>Henggedianzi?</publisher>
+		<publisher>HengGedianzi?</publisher>
 		<info name="alt_title" value="口袋怪兽 ~ Pokemon (Title screen) / Pokemon Diamond II (Box?)"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-TLROM" /> <!-- a lot of unmapped accesses, probably wrong mapper! -->
@@ -57147,6 +57318,21 @@ We don't include these hacks because they were not burned into real carts nor so
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="you ling xing dong (china) (unl).prg" size="524288" crc="ff93eff0" sha1="b0a171730179818628fa1ed8cebbaf8c3e690a69" offset="00000" status="baddump" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ffant3ca">
+		<description>Zui Zhong Huan Xiang 3 - Zhong Jie Pian (Chi)</description>
+		<year>19??</year>
+		<publisher>HengGedianzi?</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="NES-TLROM" />
+			<dataarea name="prg" size="1048576">
+				<rom name="[hengge] zui zhong huan xiang 3 - zhong jie pian (c).prg" size="1048576" crc="9f028fc5" sha1="fb03d0514487dfc0f7781350b96597e0ff651781" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
@@ -68031,6 +68217,21 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
+	<software name="mc_18kd">
+		<description>18 in 1 (KD-1512)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-FK23C" />
+			<dataarea name="chr" size="65536">
+				<rom name="16 in 1 (kd-1512).chr" size="65536" crc="366bfd38" sha1="413b1aca0ee40dfcef2c96b07b26eca1fedb98a4" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="131072">
+				<rom name="16 in 1 (kd-1512).prg" size="131072" crc="03cf81b4" sha1="782312a48bbacd8819a19b8d91668d2191c2927c" offset="00000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mc_180sj" supported="no">
 		<description>180 in 1 (SJ-0027)</description>
 		<year>19??</year>
@@ -68620,6 +68821,21 @@ be better to redump them properly. -->
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4k899">
+		<description>4 in 1 (KG-899A)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
+			<dataarea name="chr" size="524288">
+				<rom name="4in1-kg899a.chr" size="524288" crc="74084afa" sha1="0f85442630a4fece355f732218a21aca4978fb25" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="4in1-kg899a.prg" size="524288" crc="79673aa0" sha1="da69f9ba20e362d54a9f18651d9fcf2f1debcc28" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -70977,6 +71193,21 @@ to check why this is different -->
 			</dataarea>
 			<dataarea name="prg" size="524288">
 				<rom name="super tv game 3-in-1 (vt-414 pcb)[p1][!].prg" size="524288" crc="e30e458e" sha1="6299182f53a7ef77e902d563407a47f40c5dc1e0" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_svt5">
+		<description>Super VT Game 5 in 1 (VT-414 PCB)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="pcb" value="BMC-SUPERHIK8IN1" />
+			<dataarea name="chr" size="524288">
+				<rom name="vt414-5in1.chr" size="524288" crc="2ae79c35" sha1="9223938b1c7598af2230a26490f4945012b37346" offset="00000" status="baddump" />
+			</dataarea>
+			<dataarea name="prg" size="524288">
+				<rom name="vt414-5in1.prg" size="524288" crc="322f9b34" sha1="11fd4022a37fcd5e12f9547ce10048799da64aac" offset="00000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

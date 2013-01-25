@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
     UNDUMPED / TO BE REDUMPED LIST
@@ -3802,6 +3802,20 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
+	<software name="bodycob" cloneof="bodyco">
+		<!-- the same checksum is shared by the "prototype - mar 09, 1994", released by drx, i.e. that proto build is what Tec Toy released in Brazil -->
+		<description>Body Count (Bra)</description>
+		<year>1994</year>
+		<publisher>Tec Toy</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5978B" />
+			<feature name="ic1" value="MPR-16252 W51" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-16252 w51.ic1" size="1048576" crc="649607d1" sha1="d881a5281c619d3b80bc740a2783634818a8fc4c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bodycop" cloneof="bodyco">
 		<description>Body Count (Euro, Prototype)</description>
 		<year>1994</year>
@@ -3877,17 +3891,6 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="body count (prototype - mar 08, 1994).bin" size="1048576" crc="8965213f" sha1="dbd4fec001f61c6a8414b2035e884ebfbf48b899" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bodycop1" cloneof="bodyco">
-		<description>Body Count (USA, Prototype, 19940309)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="body count (prototype - mar 09, 1994).bin" size="1048576" crc="649607d1" sha1="d881a5281c619d3b80bc740a2783634818a8fc4c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -6724,6 +6727,19 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="donald in maui mallard (euro).bin" size="3145728" crc="b2dd857f" sha1="cd3c50b7f9c2f97d7bb0042e4239a05066ae72e0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mauimallb" cloneof="mauimall">
+		<description>Donald in Maui Mallard (Bra)</description>
+		<year>1995</year>
+		<publisher>Tec Toy</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-7147A" />
+			<feature name="ic1" value="MPR-19625-U" />
+			<dataarea name="rom" size="3145728">
+				<rom name="mpr-19625-u.ic1" size="3145728" crc="5f9b9a48" sha1="bb3c799bb9834c0c76616b39e6893e01c1887d85" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -20373,13 +20389,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sportg" cloneof="wcs2">
+<!-- The cart contains no menu, the second game is probably accessed thorugh reset... -->
+	<software name="sportg" supported="partial">
 		<description>Sport Games (Bra)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="sport games (bra).bin" size="2097152" crc="7e3ecabf" sha1="41604a07b0ac7dff9e01e6829cf84ca911620729" offset="000000" loadflag="load16_word_swap" />
+			<dataarea name="rom" size="4194304">
+				<rom name="mpr-19945-mx.ic1" size="4194304" crc="25da0747" sha1="52bcdeb464aba7da82cbb8ed07242e0910082342" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

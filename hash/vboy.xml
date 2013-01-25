@@ -5,7 +5,6 @@
 According to Planet Virtual Boy, the following undumped protos exist
 
   - Dragon Hopper,
-  - Faceball,
   - Mansion of Insmouse (USA),
   - Polygo Block,
   - Virtual Block,
@@ -161,6 +160,19 @@ According to Planet Virtual Boy, the following undumped protos exist
 		<part name="cart" interface="vboy_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="nester's funky bowling (usa).bin" size="2097152" crc="df4d56b4" sha1="f4a4c7928f15102cf14c90c5f044e5f7cc7c32f9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nikochan">
+		<description>Niko-chan Battle (Jpn, Prototype)</description>
+		<year>1996</year>
+		<publisher>Bullet-Proof Software</publisher>
+		<info name="alt_title" value="ニコちゃんバトル"/>
+		<part name="cart" interface="vboy_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="nikochan battle (j)(prototype).bin" size="1048576" crc="f3cd40dd" sha1="217ca062f65d4e8b2848085918af5ac4b33b12d4" offset="000000" />
+				<rom size="1048576" offset="0x100000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>

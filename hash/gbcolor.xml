@@ -22089,6 +22089,21 @@ Undumped Pirates:
 
 <!-- Other Asian Pirate dumps to sort -->
 
+	<software name="sswy">
+		<description>Sheng Shou Wu Yu - Shen Long Chuan Shuo (Chi, Ripped from 12 in 1 multicart)</description>
+		<year>2001</year>
+		<publisher>V.Fame</publisher>
+		<info name="alt_title" value="聖獸物語 - 神龍傳說"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<!-- cartridge ram -->
+			<feature name="battery_backed" value="yes" />   <!-- This should be 8k even if the internal header says 2k -->
+			<dataarea name="rom" size="1048576">
+				<rom name="sheng shou wu yu - shen long chuan shuo (multicart rip) (unl).bin" size="1048576" crc="99a6e58a" sha1="13bd97249b68eb824858a9d7a6061edf94140ac3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pokeruby" supported="no">
 		<description>Pocket Monster Ruby (Chi)</description>
 		<year>200?</year>
