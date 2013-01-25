@@ -25,8 +25,8 @@ In MESS, to activate it as above:
 * when the Cat boots, type (without quotes) "Enable Forth Language"
 * hold left-alt(leap left) and type E n a, release left-alt (the left cursor is now at the first character)
 * simultaneously press both alt keys for a moment and release both (the whole "Enable Forth Language" line will be selected)
-* press either Ctri(use front) key and press backspace(Erase) (If beeping actually worked the cat would beep here)
-* press ctrl(use front), shift, and space (the cursor should stop blinking)
+* press control(use front) and press backspace(Erase) (If beeping actually worked the cat would beep here)
+* press control(use front), shift, and space (the cursor should stop blinking)
 * press enter and the forth "ok" prompt should appear. you can type 'page' and enter to clear the screen  
 
 Canon Cat:
@@ -40,29 +40,44 @@ X3: 2.4576Mhz, used by the modem chip AMI S35213 at IC37
 
 ToDo:
 * Canon Cat
-- Find the mirrors for the write-only video control register and figure out what the writes actually do
-- The 2.40 (bios 0) firmware gets annoyed and thinks it has a phone call at random
-  (hit ctrl to make it shut up for a bit or go into forth mode);
+- Find the mirrors for the write-only video control register and figure out
+  what the writes actually do
+- The 2.40 (bios 0) firmware gets annoyed and thinks it has a phone call at
+  random.
+  (hit ctrl a few times to make it shut up for a bit or go into forth mode);
   The 1.74 (bios 1) firmware doesn't have this issue.
   Figure out what causes it and make it stop.
+  (This MIGHT be related to the mysterious HK0NT line connecting gate array 2
+  to a toggle latch connecting to IP2 on the DUART; It may be necessary to
+  actually probe that line with a meter to see what address/bit causes it to
+  toggle, if the call can't be found in the cat source code)
 - Floppy drive (3.5", Single Sided Double Density MFM, ~400kb)
-  * Cat has very low level control of data being read or written, much like the Amiga does
-  * first sector is id ZERO which is unusual since most formats are base 1 for sectors
-  * sectors are 512 bytes, standard MFM with usual address and data marks and ccitt crc16
-  * track 0 contains sector zero repeated identically 10 times; the cat SEEMS to use this as a disk/document ID
-  * tracks 1-79 contain sectors  0x0 thru 0x9 ('normal' mfm parlance: sectors -1, 0, 1, ... 7, 8)
-  * this means the whole disk effectively contains 512*10*80 = 409600 bytes of data, though track 0 is just a disk "number" identifier for the cat meaning 404480 usable bytes
-  * (Once this is done I'd declare the system working)
-- Beeper/speaker; this is connected to the DUART 'user output' pin OP3 and probably depends on an accurate implementation of the duart counters/timers
+  * Cat has very low level control of data being read or written, much like
+    the Amiga does
+  * first sector is id ZERO which is unusual since most MFM formats are base-1
+    for sector numbering
+  * sectors are 512 bytes, standard MFM with usual address and data marks and
+    ccitt crc16
+  * track 0 contains sector zero repeated identically 10 times; the cat SEEMS
+    to use this as a disk/document ID
+  * tracks 1-79 each contain ten sectors, id 0x0 thru 0x9
+    ('normal' mfm parlance: sectors -1, 0, 1, ... 7, 8)
+  * this means the whole disk effectively contains 512*10*80 = 409600 bytes of
+    data, though track 0 is just a disk "unique" identifier for the cat
+    meaning 404480 usable bytes
+  * (Once the floppy is working I'd declare the system working)
+- Beeper/speaker; this is connected to the DUART 'user output' pin OP3 and
+  probably depends on an accurate implementation of the duart counters/timers
 - Centronics port
 - RS232C port and Modem "port" connected to the DUART's two ports
-- DTMF generator chip (connected to DUART ports OP4,5,6,7)
+- DTMF generator chip (connected to DUART 'user output' pins OP4,5,6,7)
 - 6ms timer at 0x83xxxx
 - Watchdog timer/powerfail at 0x85xxxx
 - Canon Cat released versions known: 1.74 (dumped), 2.40 (dumped), 2.42 (NEED DUMP)
 
 * Swyft
-- Figure out the keyboard (unlike the cat interrupts are involved? or maybe an NMI on a timer/vblank?)
+- Figure out the keyboard (interrupts are involved? or maybe an NMI on a
+  timer/vblank?)
 - Communications ports (Duart? or some other plain UART?)
 - Floppy (probably similar to the Cat)
 - Centronics port (probably similar to the Cat)
@@ -88,6 +103,9 @@ ToDo:
 #undef DEBUG_MODEM_W
 
 #undef DEBUG_DUART_OUTPUT_LINES
+#undef DEBUG_DUART_INPUT_LINES
+#undef DEBUG_DUART_TXD
+#undef DEBUG_DUART_IRQ_HANDLER
 
 #undef DEBUG_TEST_W
 
@@ -102,9 +120,50 @@ class cat_state : public driver_device
 public:
 	cat_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_p_sram(*this, "p_sram"),
-		m_p_videoram(*this, "p_videoram")
+		m_maincpu(*this, "maincpu"),
+		//m_nvram(*this, "nvram"), // merge with p_sram?
+		//m_duart(*this, "duart68681"),
+		//m_speaker(*this, "speaker"),
+		m_p_sram(*this, "p_sram"), // nvram
+		m_p_videoram(*this, "p_videoram"),
+		m_y0(*this, "Y0"),
+		m_y1(*this, "Y1"),
+		m_y2(*this, "Y2"),
+		m_y3(*this, "Y3"),
+		m_y4(*this, "Y4"),
+		m_y5(*this, "Y5"),
+		m_y6(*this, "Y6"),
+		m_y7(*this, "Y7"),
+		m_dipsw(*this, "DIPSW1")
 		{ }
+
+	required_device<cpu_device> m_maincpu;
+	//optional_device<nvram_device> m_nvram;
+	//required_device<68681_device> m_duart;
+	//required_device<speaker_sound_device> m_speaker;
+	optional_shared_ptr<UINT16> m_p_sram;
+	required_shared_ptr<UINT16> m_p_videoram;
+	optional_ioport m_y0;
+	optional_ioport m_y1;
+	optional_ioport m_y2;
+	optional_ioport m_y3;
+	optional_ioport m_y4;
+	optional_ioport m_y5;
+	optional_ioport m_y6;
+	optional_ioport m_y7;
+	optional_ioport m_dipsw;
+	emu_timer *m_keyboard_timer;
+
+	DECLARE_MACHINE_START(cat);
+	DECLARE_MACHINE_RESET(cat);
+	DECLARE_VIDEO_START(cat);
+	DECLARE_DRIVER_INIT(cat);
+	DECLARE_MACHINE_START(swyft);
+	DECLARE_MACHINE_RESET(swyft);
+	DECLARE_VIDEO_START(swyft);
+
+	UINT32 screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE16_MEMBER(cat_video_status_w);
 	DECLARE_WRITE16_MEMBER(cat_test_mode_w);
@@ -124,22 +183,12 @@ public:
 	DECLARE_READ16_MEMBER(cat_2e80_r);
 	DECLARE_READ16_MEMBER(cat_0080_r);
 	DECLARE_READ16_MEMBER(cat_0000_r);
-	optional_shared_ptr<UINT16> m_p_sram;
-	required_shared_ptr<UINT16> m_p_videoram;
+
 	UINT8 m_duart_inp;// = 0x0e;
 	UINT8 m_video_enable;
 	UINT16 m_pr_cont;
 	UINT8 m_keyboard_line;
-	emu_timer *m_keyboard_timer;
-	DECLARE_MACHINE_START(cat);
-	DECLARE_MACHINE_RESET(cat);
-	DECLARE_VIDEO_START(cat);
-	DECLARE_DRIVER_INIT(cat);
-	DECLARE_MACHINE_START(swyft);
-	DECLARE_MACHINE_RESET(swyft);
-	DECLARE_VIDEO_START(swyft);
-	UINT32 screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
 	TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(swyft_reset);
 };
@@ -313,7 +362,7 @@ READ16_MEMBER( cat_state::cat_keyboard_r )
 	UINT16 retVal = 0;
 	// Read country code
 	if (m_pr_cont == 0x0900)
-		retVal = ioport("DIPSW1")->read();
+		retVal = m_dipsw->read();
 
 	// Regular keyboard read
 	if (m_pr_cont == 0x0800 || m_pr_cont == 0x0a00)
@@ -321,14 +370,14 @@ READ16_MEMBER( cat_state::cat_keyboard_r )
 		retVal=0xff00;
 		switch(m_keyboard_line)
 		{
-			case 0x01: retVal = ioport("LINE0")->read() << 8; break;
-			case 0x02: retVal = ioport("LINE1")->read() << 8; break;
-			case 0x04: retVal = ioport("LINE2")->read() << 8; break;
-			case 0x08: retVal = ioport("LINE3")->read() << 8; break;
-			case 0x10: retVal = ioport("LINE4")->read() << 8; break;
-			case 0x20: retVal = ioport("LINE5")->read() << 8; break;
-			case 0x40: retVal = ioport("LINE6")->read() << 8; break;
-			case 0x80: retVal = ioport("LINE7")->read() << 8; break;
+			case 0x01: retVal = m_y0->read() << 8; break;
+			case 0x02: retVal = m_y1->read() << 8; break;
+			case 0x04: retVal = m_y2->read() << 8; break;
+			case 0x08: retVal = m_y3->read() << 8; break;
+			case 0x10: retVal = m_y4->read() << 8; break;
+			case 0x20: retVal = m_y5->read() << 8; break;
+			case 0x40: retVal = m_y6->read() << 8; break;
+			case 0x80: retVal = m_y7->read() << 8; break;
 		}
 	}
 	return retVal;
@@ -507,7 +556,7 @@ static INPUT_PORTS_START( cat )
 	PORT_DIPSETTING(    0x7100, "Switzerland" )
 	PORT_DIPSETTING(    0x7000, "ASCII" )
 
-	PORT_START("LINE0")
+	PORT_START("Y0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
@@ -517,7 +566,7 @@ static INPUT_PORTS_START( cat )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('\xa2')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
 
-	PORT_START("LINE1")
+	PORT_START("Y1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('n') PORT_CHAR('B')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
@@ -527,7 +576,7 @@ static INPUT_PORTS_START( cat )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
 
-	PORT_START("LINE2")
+	PORT_START("Y2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR(':')
@@ -537,7 +586,7 @@ static INPUT_PORTS_START( cat )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('*')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
 
-	PORT_START("LINE3")
+	PORT_START("Y3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left USE FRONT") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR('\'') PORT_CHAR('"')
@@ -547,7 +596,7 @@ static INPUT_PORTS_START( cat )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR('(')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINE4")
+	PORT_START("Y4")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right USE FRONT") PORT_CODE(KEYCODE_RCONTROL)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Shift") PORT_CODE(KEYCODE_F12) PORT_CHAR(UCHAR_SHIFT_1)
@@ -557,7 +606,7 @@ static INPUT_PORTS_START( cat )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(')')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('@')
 
-	PORT_START("LINE5")
+	PORT_START("Y5")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
@@ -567,7 +616,7 @@ static INPUT_PORTS_START( cat )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('_')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
 
-	PORT_START("LINE6")
+	PORT_START("Y6")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left Shift") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Left LEAP") PORT_CODE(KEYCODE_LALT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
@@ -577,7 +626,7 @@ static INPUT_PORTS_START( cat )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=') PORT_CHAR('+')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
-	PORT_START("LINE7")
+	PORT_START("Y7")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_RSHIFT) PORT_CODE(KEYCODE_LSHIFT)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Right Leap") PORT_CODE(KEYCODE_RALT)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Page") PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_PGDN)
@@ -688,17 +737,24 @@ UINT32 cat_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bitma
 
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
-	//logerror("duart_irq_handler\n");
+#ifdef DEBUG_DUART_IRQ_HANDLER
+	fprintf(stderr, "Duart IRQ handler called; vector: %06X\n", vector);
+#endif
 }
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
 {
+#ifdef DEBUG_DUART_TXD
+	fprintf(stderr, "Duart TXD: data %02X\n", data);
+#endif
 }
 
 static UINT8 duart_input(device_t *device)
 {
 	cat_state *state = device->machine().driver_data<cat_state>();
-
+#ifdef DEBUG_DUART_INPUT_LINES
+	fprintf(stderr, "Duart input lines read!\n");
+#endif
 	if (state->m_duart_inp != 0)
 	{
 		state->m_duart_inp = 0;
