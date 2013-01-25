@@ -91,7 +91,7 @@ UINT32 gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 {
-	machine().device("maincpu")->execute().set_input_line(LCDC_INT, ASSERT_LINE );
+	m_maincpu->set_input_line(LCDC_INT, ASSERT_LINE );
 }
 
 static MACHINE_CONFIG_START( gamecom, gamecom_state )

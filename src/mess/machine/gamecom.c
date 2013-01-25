@@ -7,37 +7,49 @@ static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32
 
 TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_clock_timer_callback)
 {
-	UINT8 * RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8 * RAM = m_region_maincpu->base();
 	UINT8 val = ( ( RAM[SM8521_CLKT] & 0x3F ) + 1 ) & 0x3F;
 	RAM[SM8521_CLKT] = ( RAM[SM8521_CLKT] & 0xC0 ) | val;
-	machine().device("maincpu")->execute().set_input_line(CK_INT, ASSERT_LINE );
+	m_maincpu->set_input_line(CK_INT, ASSERT_LINE );
 }
 
 void gamecom_state::machine_reset()
 {
-	UINT8 *rom = memregion("kernel")->base();
-	membank( "bank1" )->set_base( rom );
-	membank( "bank2" )->set_base( rom );
-	membank( "bank3" )->set_base( rom );
-	membank( "bank4" )->set_base( rom );
+	UINT8 *rom = m_region_kernel->base();
+	m_bank1->set_base( rom );
+	m_bank2->set_base( rom );
+	m_bank3->set_base( rom );
+	m_bank4->set_base( rom );
 
 	m_cartridge = NULL;
 }
 
 void gamecom_state::gamecom_set_mmu(UINT8 mmu, UINT8 data )
 {
-	char bank[8];
-	sprintf(bank,"bank%d",mmu);
 	if (data < 0x20)
 	{
 		/* select internal ROM bank */
-		membank( bank )->set_base( memregion("kernel")->base() + (data << 13) );
+		switch ( mmu )
+		{
+			case 1: m_bank1->set_base( m_region_kernel->base() + (data << 13) ); break;
+			case 2: m_bank2->set_base( m_region_kernel->base() + (data << 13) ); break;
+			case 3: m_bank3->set_base( m_region_kernel->base() + (data << 13) ); break;
+			case 4: m_bank4->set_base( m_region_kernel->base() + (data << 13) ); break;
+		}
 	}
 	else
 	{
 		/* select cartridge bank */
 		if ( m_cartridge )
-			membank( bank )->set_base( m_cartridge + ( data << 13 ) );
+		{
+			switch ( mmu )
+			{
+				case 1: m_bank1->set_base( m_cartridge + ( data << 13 ) ); break;
+				case 2: m_bank2->set_base( m_cartridge + ( data << 13 ) ); break;
+				case 3: m_bank3->set_base( m_cartridge + ( data << 13 ) ); break;
+				case 4: m_bank4->set_base( m_cartridge + ( data << 13 ) ); break;
+			}
+		}
 	}
 }
 
@@ -47,10 +59,10 @@ void gamecom_state::handle_stylus_press( int column )
 
 	if ( column == 0 )
 	{
-		if ( !BIT( ioport("IN2")->read(), 2) )
+		if ( !BIT( m_io_in2->read(), 2) )
 		{
-			m_stylus_x = ioport("STYX")->read() >> 4;
-			m_stylus_y = ioport("STYY")->read() >> 4;
+			m_stylus_x = m_io_styx->read() >> 4;
+			m_stylus_y = m_io_styy->read() >> 4;
 		}
 		else
 		{
@@ -139,8 +151,8 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 						/* P0 bit 7 cleared => 8B (button A) */
 						/* P1 bit 0 cleared => 8C (button B) */
 						/* P1 bit 1 cleared => 8D (button C) */
-					m_p_ram[SM8521_P0] = ioport("IN0")->read();
-					m_p_ram[SM8521_P1] = (m_p_ram[SM8521_P1] & 0xFC) | ( ioport("IN1")->read() & 3 );
+					m_p_ram[SM8521_P0] = m_io_in0->read();
+					m_p_ram[SM8521_P1] = (m_p_ram[SM8521_P1] & 0xFC) | ( m_io_in1->read() & 3 );
 					break;
 				case 0xFFFF:    /* keys #2 */
 						/* P0 bit 0 cleared => 88 (power) */
@@ -153,7 +165,7 @@ WRITE8_MEMBER( gamecom_state::gamecom_pio_w )
 						/* P0 bit 7 cleared => A0 */
 						/* P1 bit 0 cleared => A0 */
 						/* P1 bit 1 cleared => A0 */
-					m_p_ram[SM8521_P0] = (m_p_ram[SM8521_P0] & 0xFC) | ( ioport("IN2")->read() & 3 );
+					m_p_ram[SM8521_P0] = (m_p_ram[SM8521_P0] & 0xFC) | ( m_io_in2->read() & 3 );
 					m_p_ram[SM8521_P1] = 0xFF;
 					break;
 				}
@@ -537,7 +549,7 @@ void gamecom_update_timers( device_t *device, int cycles )
 DRIVER_INIT_MEMBER(gamecom_state,gamecom)
 {
 	m_clock_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gamecom_state::gamecom_clock_timer_callback),this));
-	m_p_ram = memregion("maincpu")->base(); // required here because pio_w gets called before machine_reset
+	m_p_ram = m_region_maincpu->base(); // required here because pio_w gets called before machine_reset
 }
 
 DEVICE_IMAGE_LOAD( gamecom_cart1 )
