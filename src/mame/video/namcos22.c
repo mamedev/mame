@@ -151,7 +151,7 @@ UpdateVideoMixer( running_machine &machine )
 		strcat(msg1,msg2);
 	}
 	if (1) // + other non-super regs
-	if (!state->m_mbSuperSystem22)
+	if (!state->m_bSuperSystem22)
 	{
 		strcat(msg1,"\n");
 		for (i=8;i<=0x20;i+=8)
@@ -163,7 +163,7 @@ UpdateVideoMixer( running_machine &machine )
 	popmessage("%s",msg1);
 #endif
 
-	if( state->m_mbSuperSystem22 )
+	if( state->m_bSuperSystem22 )
 	{
 /*
            0 1 2 3  4 5 6 7  8 9 a b  c d e f 10       14       18       1c
@@ -330,8 +330,8 @@ struct Poly3dVertex
 INLINE unsigned texel( namcos22_state *state, unsigned x, unsigned y )
 {
 	unsigned offs = ((y&0xfff0)<<4)|((x&0xff0)>>4);
-	unsigned tile = state->m_mpTextureTileMap16[offs];
-	return state->m_mpTextureTileData[(tile<<8)|state->m_mXYAttrToPixel[state->m_mpTextureTileMapAttr[offs]][x&0xf][y&0xf]];
+	unsigned tile = state->m_pTextureTileMap16[offs];
+	return state->m_pTextureTileData[(tile<<8)|state->m_XYAttrToPixel[state->m_pTextureTileMapAttr[offs]][x&0xf][y&0xf]];
 } /* texel */
 
 
@@ -415,7 +415,7 @@ static void renderscanline_uvi_full(void *destbase, INT32 scanline, const poly_e
 	// slight differences between super and non-super, do the branch here for optimization
 	// normal: 1 fader, no alpha, shading after fog
 	// super:  2 faders, alpha, shading before fog
-	if (state->m_mbSuperSystem22)
+	if (state->m_bSuperSystem22)
 	{
 		for( x=extent->startx; x<extent->stopx; x++ )
 		{
@@ -530,7 +530,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_rgb32 &bitmap, int 
 	extra->flags = flags;
 	extra->cz_adjust = cz_adjust;
 	extra->cmode = cmode;
-	extra->prioverchar = (state->m_mbSuperSystem22 << 1) | ((cmode & 7) == 1);
+	extra->prioverchar = (state->m_bSuperSystem22 << 1) | ((cmode & 7) == 1);
 
 	/* non-direct case: project and z-clip */
 	if (!direct)
@@ -576,7 +576,7 @@ static void poly3d_DrawQuad(running_machine &machine, bitmap_rgb32 &bitmap, int 
 		}
 	}
 
-	if( state->m_mbSuperSystem22 )
+	if( state->m_bSuperSystem22 )
 	{
 		// global fade
 		if (mixer.flags&1)
@@ -840,7 +840,7 @@ ApplyGamma( running_machine &machine, bitmap_rgb32 &bitmap )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	int x,y;
-	if( state->m_mbSuperSystem22 )
+	if( state->m_bSuperSystem22 )
 	{ /* super system 22 */
 		const UINT8 *rlut = (const UINT8 *)&state->m_gamma[0x100/4];
 		const UINT8 *glut = (const UINT8 *)&state->m_gamma[0x200/4];
@@ -1194,25 +1194,25 @@ static INT32
 GetPolyData( namcos22_state *state, INT32 addr )
 {
 	UINT32 result;
-	if( addr<0 || addr>=state->m_mPtRomSize )
+	if( addr<0 || addr>=state->m_PtRomSize )
 	{
 		// point ram, only used in ram test?
-		if( state->m_mbSuperSystem22 )
+		if( state->m_bSuperSystem22 )
 		{
 			if( addr>=0xf80000 && addr<=0xf9ffff )
-				result = state->m_mpPointRAM[addr-0xf80000];
+				result = state->m_pPointRAM[addr-0xf80000];
 			else return -1;
 		}
 		else
 		{
 			if( addr>=0xf00000 && addr<=0xf1ffff )
-				result = state->m_mpPointRAM[addr-0xf00000];
+				result = state->m_pPointRAM[addr-0xf00000];
 			else return -1;
 		}
 	}
 	else
 	{
-		result = (state->m_mpPolyH[addr]<<16)|(state->m_mpPolyM[addr]<<8)|state->m_mpPolyL[addr];
+		result = (state->m_pPolyH[addr]<<16)|(state->m_pPolyM[addr]<<8)|state->m_pPolyL[addr];
 	}
 	if( result&0x00800000 )
 		result |= 0xff000000; /* sign extend */
@@ -1328,7 +1328,7 @@ InitXYAttrToPixel( namcos22_state *state )
 				if( attr&4 ) ix = 15-ix;
 				if( attr&2 ) iy = 15-iy;
 				if( attr&8 ){ temp = ix; ix = iy; iy = temp; }
-				state->m_mXYAttrToPixel[attr][x][y] = (iy<<4)|ix;
+				state->m_XYAttrToPixel[attr][x][y] = (iy<<4)|ix;
 			}
 		}
 	}
@@ -1346,12 +1346,12 @@ PatchTexture( namcos22_state *state )
 		case NAMCOS22_CYBER_COMMANDO:
 			for( i=0; i<0x100000; i++ )
 			{
-				int tile = state->m_mpTextureTileMap16[i];
-				int attr = state->m_mpTextureTileMapAttr[i];
+				int tile = state->m_pTextureTileMap16[i];
+				int attr = state->m_pTextureTileMapAttr[i];
 				if( (attr&0x1)==0 )
 				{
 					tile = (tile&0x3fff)|0x8000;
-					state->m_mpTextureTileMap16[i] = tile;
+					state->m_pTextureTileMap16[i] = tile;
 				}
 			}
 			break;
@@ -1366,7 +1366,7 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 {
 	if (machine.video().skip_this_frame()) return;
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	int polys_enabled = state->m_mbSuperSystem22 ? nthbyte(state->m_gamma,0x1f)&1 : 1;
+	int polys_enabled = state->m_bSuperSystem22 ? nthbyte(state->m_gamma,0x1f)&1 : 1;
 	if (!polys_enabled) return;
 	/**
 	* word#0:
@@ -1396,7 +1396,7 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 	UINT32 zsortvalue24 = ((pSource[1]&0xfff)<<12)|(pSource[0]&0xfff);
 	struct SceneNode *node = NewSceneNode(machine, zsortvalue24, eSCENENODE_QUAD3D);
 	int i, cztype = pSource[3]&3;
-	if( state->m_mbSuperSystem22 )
+	if( state->m_bSuperSystem22 )
 	{
 		cztype ^= 3; // ? not sure, but this makes testmode look like on a pcb (only 1 pcb checked)
 		node->data.quad3d.cmode       = (pSource[2]&0x00f0)>>4;
@@ -1414,7 +1414,7 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 	for( i=0; i<4; i++ )
 	{
 		Poly3dVertex *p = &node->data.quad3d.v[i];
-		if( state->m_mbSuperSystem22 )
+		if( state->m_bSuperSystem22 )
 		{
 			p->u = pSource[0] >> 4;
 			p->v = pSource[1] >> 4;
@@ -1435,7 +1435,7 @@ namcos22_draw_direct_poly( running_machine &machine, const UINT16 *pSource )
 				zf /= 2.0;
 				exponent++;
 			}
-			if( state->m_mbSuperSystem22 )
+			if( state->m_bSuperSystem22 )
 				p->z = zf;
 			else
 				p->z = 1.0f/zf;
@@ -1475,15 +1475,15 @@ Prepare3dTexture( running_machine &machine, void *pTilemapROM, const void *pText
 		UINT8 *pUnpackedTileAttr = auto_alloc_array(machine, UINT8, 0x080000*2);
 		{
 			InitXYAttrToPixel(state);
-			state->m_mpTextureTileMapAttr = pUnpackedTileAttr;
+			state->m_pTextureTileMapAttr = pUnpackedTileAttr;
 			for( i=0; i<0x80000; i++ )
 			{
 				*pUnpackedTileAttr++ = (*pPackedTileAttr)>>4;
 				*pUnpackedTileAttr++ = (*pPackedTileAttr)&0xf;
 				pPackedTileAttr++;
 			}
-			state->m_mpTextureTileMap16 = (UINT16 *)pTilemapROM;
-			state->m_mpTextureTileData = (UINT8 *)pTextureROM;
+			state->m_pTextureTileMap16 = (UINT16 *)pTilemapROM;
+			state->m_pTextureTileData = (UINT8 *)pTextureROM;
 			PatchTexture(state);
 		}
 	}
@@ -2085,7 +2085,7 @@ static void DrawCharacterLayer(running_machine &machine, bitmap_rgb32 &bitmap, c
 	state->m_bgtilemap->set_scrolly(0, scroll_y & 0x3ff );
 	state->m_bgtilemap->set_palette_offset(mixer.palBase*256 );
 
-	if (state->m_mbSuperSystem22)
+	if (state->m_bSuperSystem22)
 	{
 		state->m_bgtilemap->draw(*state->m_mix_bitmap, cliprect, 0, 4, 4);
 		namcos22s_mix_textlayer(machine, bitmap, cliprect, 4);
@@ -2156,7 +2156,7 @@ BlitQuadHelper(
 		int packetFormat )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	int absolutePriority = state->m_mAbsolutePriority;
+	int absolutePriority = state->m_AbsolutePriority;
 	INT32 zsortvalue24;
 	float zmin = 0.0f;
 	float zmax = 0.0f;
@@ -2196,19 +2196,19 @@ BlitQuadHelper(
 		if( i==0 || pVerTex->z > zmax ) zmax = pVerTex->z;
 		if( i==0 || pVerTex->z < zmin ) zmin = pVerTex->z;
 
-		if( state->m_mLitSurfaceCount )
+		if( state->m_LitSurfaceCount )
 		{
 			// lighting (prelim)
-			bri = state->m_mLitSurfaceInfo[state->m_mLitSurfaceIndex%state->m_mLitSurfaceCount];
-			if( state->m_mSurfaceNormalFormat == 0x6666 )
+			bri = state->m_LitSurfaceInfo[state->m_LitSurfaceIndex%state->m_LitSurfaceCount];
+			if( state->m_SurfaceNormalFormat == 0x6666 )
 			{
 				if( i==3 )
-					state->m_mLitSurfaceIndex++;
+					state->m_LitSurfaceIndex++;
 			}
-			else if( state->m_mSurfaceNormalFormat == 0x4000 )
-				state->m_mLitSurfaceIndex++;
+			else if( state->m_SurfaceNormalFormat == 0x4000 )
+				state->m_LitSurfaceIndex++;
 			else
-				logerror( "unknown normal format: 0x%x\n", state->m_mSurfaceNormalFormat );
+				logerror( "unknown normal format: 0x%x\n", state->m_SurfaceNormalFormat );
 		}
 		else if( packetFormat & 0x40 )
 		{
@@ -2255,12 +2255,12 @@ BlitQuadHelper(
 		absolutePriority += (polygonShiftValue22&0x1c0000)>>18;
 	}
 
-	if( state->m_mObjectShiftValue22 & 0x200000 )
-		zsortvalue24 = state->m_mObjectShiftValue22 & 0x1fffff;
+	if( state->m_ObjectShiftValue22 & 0x200000 )
+		zsortvalue24 = state->m_ObjectShiftValue22 & 0x1fffff;
 	else
 	{
-		zsortvalue24 += Signed18( state->m_mObjectShiftValue22 );
-		absolutePriority += (state->m_mObjectShiftValue22&0x1c0000)>>18;
+		zsortvalue24 += Signed18( state->m_ObjectShiftValue22 );
+		absolutePriority += (state->m_ObjectShiftValue22&0x1c0000)>>18;
 	}
 
 	if (zsortvalue24 < 0) zsortvalue24 = 0;
@@ -2310,7 +2310,7 @@ RegisterNormals( namcos22_state *state, INT32 addr, float m[4][4] )
 		dotproduct = nx*mCamera.lx + ny*mCamera.ly + nz*mCamera.lz;
 		if( dotproduct<0.0f )
 			dotproduct = 0.0f;
-		state->m_mLitSurfaceInfo[state->m_mLitSurfaceCount++] = mCamera.ambient + mCamera.power*dotproduct;
+		state->m_LitSurfaceInfo[state->m_LitSurfaceCount++] = mCamera.ambient + mCamera.power*dotproduct;
 	}
 } /* RegisterNormals */
 
@@ -2381,9 +2381,9 @@ BlitQuads( running_machine &machine, bitmap_rgb32 &bitmap, INT32 addr, float m[4
 				000000  000000  007fff // normal vector
 				*/
 //              numAdditionalNormals = GetPolyData(state, addr+2);
-				state->m_mSurfaceNormalFormat = GetPolyData(state, addr+3);
-				state->m_mLitSurfaceCount = 0;
-				state->m_mLitSurfaceIndex = 0;
+				state->m_SurfaceNormalFormat = GetPolyData(state, addr+3);
+				state->m_LitSurfaceCount = 0;
+				state->m_LitSurfaceIndex = 0;
 				RegisterNormals( state, addr+4, m );
 				break;
 
@@ -2410,8 +2410,8 @@ BlitPolyObject( running_machine &machine, bitmap_rgb32 &bitmap, int code, float 
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	unsigned addr1 = GetPolyData(state, code);
-	state->m_mLitSurfaceCount = 0;
-	state->m_mLitSurfaceIndex = 0;
+	state->m_LitSurfaceCount = 0;
+	state->m_LitSurfaceIndex = 0;
 	for(;;)
 	{
 		INT32 addr2 = GetPolyData(state, addr1++);
@@ -2512,33 +2512,33 @@ HandleBB0003( namcos22_state *state, const INT32 *pSource )
 	mCamera.ly       = DSP_FIXED_TO_FLOAT(pSource[0x3]);
 	mCamera.lz       = DSP_FIXED_TO_FLOAT(pSource[0x4]);
 
-	state->m_mAbsolutePriority = pSource[0x3]>>16;
+	state->m_AbsolutePriority = pSource[0x3]>>16;
 	mCamera.vx      = (INT16)(pSource[5]>>16);
 	mCamera.vy      = (INT16)pSource[5];
 	mCamera.zoom    = DspFloatToNativeFloat(pSource[6]);
 	mCamera.vw      = DspFloatToNativeFloat(pSource[7])*mCamera.zoom;
 	mCamera.vh      = DspFloatToNativeFloat(pSource[9])*mCamera.zoom;
 
-	state->m_mViewMatrix[0][0] = DSP_FIXED_TO_FLOAT(pSource[0x0c]);
-	state->m_mViewMatrix[1][0] = DSP_FIXED_TO_FLOAT(pSource[0x0d]);
-	state->m_mViewMatrix[2][0] = DSP_FIXED_TO_FLOAT(pSource[0x0e]);
+	state->m_ViewMatrix[0][0] = DSP_FIXED_TO_FLOAT(pSource[0x0c]);
+	state->m_ViewMatrix[1][0] = DSP_FIXED_TO_FLOAT(pSource[0x0d]);
+	state->m_ViewMatrix[2][0] = DSP_FIXED_TO_FLOAT(pSource[0x0e]);
 
-	state->m_mViewMatrix[0][1] = DSP_FIXED_TO_FLOAT(pSource[0x0f]);
-	state->m_mViewMatrix[1][1] = DSP_FIXED_TO_FLOAT(pSource[0x10]);
-	state->m_mViewMatrix[2][1] = DSP_FIXED_TO_FLOAT(pSource[0x11]);
+	state->m_ViewMatrix[0][1] = DSP_FIXED_TO_FLOAT(pSource[0x0f]);
+	state->m_ViewMatrix[1][1] = DSP_FIXED_TO_FLOAT(pSource[0x10]);
+	state->m_ViewMatrix[2][1] = DSP_FIXED_TO_FLOAT(pSource[0x11]);
 
-	state->m_mViewMatrix[0][2] = DSP_FIXED_TO_FLOAT(pSource[0x12]);
-	state->m_mViewMatrix[1][2] = DSP_FIXED_TO_FLOAT(pSource[0x13]);
-	state->m_mViewMatrix[2][2] = DSP_FIXED_TO_FLOAT(pSource[0x14]);
+	state->m_ViewMatrix[0][2] = DSP_FIXED_TO_FLOAT(pSource[0x12]);
+	state->m_ViewMatrix[1][2] = DSP_FIXED_TO_FLOAT(pSource[0x13]);
+	state->m_ViewMatrix[2][2] = DSP_FIXED_TO_FLOAT(pSource[0x14]);
 
-	TransformNormal( &mCamera.lx, &mCamera.ly, &mCamera.lz, state->m_mViewMatrix );
+	TransformNormal( &mCamera.lx, &mCamera.ly, &mCamera.lz, state->m_ViewMatrix );
 } /* HandleBB0003 */
 
 static void
 Handle200002( running_machine &machine, bitmap_rgb32 &bitmap, const INT32 *pSource )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	if( state->m_mPrimitiveID>=0x45 )
+	if( state->m_PrimitiveID>=0x45 )
 	{
 		float m[4][4]; /* row major */
 
@@ -2560,12 +2560,12 @@ Handle200002( running_machine &machine, bitmap_rgb32 &bitmap, const INT32 *pSour
 		m[3][1] = pSource[0xb]; /* ypos */
 		m[3][2] = pSource[0xc]; /* zpos */
 
-		matrix3d_Multiply( m, state->m_mViewMatrix );
-		BlitPolyObject( machine, bitmap, state->m_mPrimitiveID, m );
+		matrix3d_Multiply( m, state->m_ViewMatrix );
+		BlitPolyObject( machine, bitmap, state->m_PrimitiveID, m );
 	}
-	else if( state->m_mPrimitiveID !=0 && state->m_mPrimitiveID !=2 )
+	else if( state->m_PrimitiveID !=0 && state->m_PrimitiveID !=2 )
 	{
-		logerror( "Handle200002:unk code=0x%x\n", state->m_mPrimitiveID );
+		logerror( "Handle200002:unk code=0x%x\n", state->m_PrimitiveID );
 		// ridgerac title screen waving flag: 0x5
 	}
 } /* Handle200002 */
@@ -2573,17 +2573,17 @@ Handle200002( running_machine &machine, bitmap_rgb32 &bitmap, const INT32 *pSour
 static void
 Handle300000( namcos22_state *state, const INT32 *pSource )
 {
-	state->m_mViewMatrix[0][0] = DSP_FIXED_TO_FLOAT(pSource[1]);
-	state->m_mViewMatrix[1][0] = DSP_FIXED_TO_FLOAT(pSource[2]);
-	state->m_mViewMatrix[2][0] = DSP_FIXED_TO_FLOAT(pSource[3]);
+	state->m_ViewMatrix[0][0] = DSP_FIXED_TO_FLOAT(pSource[1]);
+	state->m_ViewMatrix[1][0] = DSP_FIXED_TO_FLOAT(pSource[2]);
+	state->m_ViewMatrix[2][0] = DSP_FIXED_TO_FLOAT(pSource[3]);
 
-	state->m_mViewMatrix[0][1] = DSP_FIXED_TO_FLOAT(pSource[4]);
-	state->m_mViewMatrix[1][1] = DSP_FIXED_TO_FLOAT(pSource[5]);
-	state->m_mViewMatrix[2][1] = DSP_FIXED_TO_FLOAT(pSource[6]);
+	state->m_ViewMatrix[0][1] = DSP_FIXED_TO_FLOAT(pSource[4]);
+	state->m_ViewMatrix[1][1] = DSP_FIXED_TO_FLOAT(pSource[5]);
+	state->m_ViewMatrix[2][1] = DSP_FIXED_TO_FLOAT(pSource[6]);
 
-	state->m_mViewMatrix[0][2] = DSP_FIXED_TO_FLOAT(pSource[7]);
-	state->m_mViewMatrix[1][2] = DSP_FIXED_TO_FLOAT(pSource[8]);
-	state->m_mViewMatrix[2][2] = DSP_FIXED_TO_FLOAT(pSource[9]);
+	state->m_ViewMatrix[0][2] = DSP_FIXED_TO_FLOAT(pSource[7]);
+	state->m_ViewMatrix[1][2] = DSP_FIXED_TO_FLOAT(pSource[8]);
+	state->m_ViewMatrix[2][2] = DSP_FIXED_TO_FLOAT(pSource[9]);
 } /* Handle300000 */
 
 static void
@@ -2600,7 +2600,7 @@ Handle233002( namcos22_state *state, const INT32 *pSource )
 	   00000000 00000000 00000000
 	*/
 	state->m_cz_adjust = (pSource[1] & 0x00800000) ? pSource[1] | 0xff000000 : pSource[1] & 0x00ffffff;
-	state->m_mObjectShiftValue22 = pSource[2];
+	state->m_ObjectShiftValue22 = pSource[2];
 } /* Handle233002 */
 
 static void
@@ -2610,9 +2610,9 @@ SimulateSlaveDSP( running_machine &machine, bitmap_rgb32 &bitmap )
 	const INT32 *pSource = 0x300 + (INT32 *)state->m_polygonram.target();
 	INT16 len;
 
-	matrix3d_Identity( state->m_mViewMatrix );
+	matrix3d_Identity( state->m_ViewMatrix );
 
-	if( state->m_mbSuperSystem22 )
+	if( state->m_bSuperSystem22 )
 	{
 		pSource += 4; /* FFFE 0400 */
 	}
@@ -2624,7 +2624,7 @@ SimulateSlaveDSP( running_machine &machine, bitmap_rgb32 &bitmap )
 	for(;;)
 	{
 		INT16 next;
-		state->m_mPrimitiveID = *pSource++;
+		state->m_PrimitiveID = *pSource++;
 		len  = (INT16)*pSource++;
 
 		switch( len )
@@ -2673,7 +2673,7 @@ static void
 DrawPolygons( running_machine &machine, bitmap_rgb32 &bitmap )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	if( state->m_mbDSPisActive )
+	if( state->m_bDSPisActive )
 	{
 		SimulateSlaveDSP( machine, bitmap );
 		poly_wait(state->m_poly, "DrawPolygons");
@@ -2684,7 +2684,7 @@ void
 namcos22_enable_slave_simulation( running_machine &machine, int enable )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	state->m_mbDSPisActive = enable;
+	state->m_bDSPisActive = enable;
 }
 
 /*********************************************************************************************/
@@ -2731,7 +2731,7 @@ VIDEO_START_MEMBER(namcos22_state,common)
 	m_bgtilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(namcos22_state::TextTilemapGetInfo),this),TILEMAP_SCAN_ROWS,16,16,64,64 );
 	m_bgtilemap->set_transparent_pen(0xf);
 
-	m_mbDSPisActive = 0;
+	m_bDSPisActive = 0;
 	memset( m_polygonram, 0xcc, 0x20000 );
 
 	for (code = 0; code < machine().gfx[GFX_TEXTURE_TILE]->elements(); code++)
@@ -2739,10 +2739,10 @@ VIDEO_START_MEMBER(namcos22_state,common)
 
 	Prepare3dTexture(machine(), memregion("textilemap")->base(), machine().gfx[GFX_TEXTURE_TILE]->get_data(0) );
 	m_dirtypal = auto_alloc_array(machine(), UINT8, NAMCOS22_PALETTE_SIZE/4);
-	m_mPtRomSize = memregion("pointrom")->bytes()/3;
-	m_mpPolyL = memregion("pointrom")->base();
-	m_mpPolyM = m_mpPolyL + m_mPtRomSize;
-	m_mpPolyH = m_mpPolyM + m_mPtRomSize;
+	m_PtRomSize = memregion("pointrom")->bytes()/3;
+	m_pPolyL = memregion("pointrom")->base();
+	m_pPolyM = m_pPolyL + m_PtRomSize;
+	m_pPolyH = m_pPolyM + m_PtRomSize;
 
 	m_poly = poly_alloc(machine(), 4000, sizeof(poly_extra_data), 0);
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(namcos22_reset), &machine()));
@@ -2753,13 +2753,13 @@ VIDEO_START_MEMBER(namcos22_state,common)
 
 VIDEO_START_MEMBER(namcos22_state,namcos22)
 {
-	m_mbSuperSystem22 = 0;
+	m_bSuperSystem22 = 0;
 	VIDEO_START_CALL_MEMBER(common);
 }
 
 VIDEO_START_MEMBER(namcos22_state,namcos22s)
 {
-	m_mbSuperSystem22 = 1;
+	m_bSuperSystem22 = 1;
 
 	// init spotram
 	m_spotram = auto_alloc_array(machine(), UINT16, SPOTRAM_SIZE);
@@ -2913,7 +2913,7 @@ READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 		break;
 
 	case 2:
-		m_mUpperWordLatch = value>>16;
+		m_UpperWordLatch = value>>16;
 		value &= 0xffff;
 		break;
 
@@ -2940,7 +2940,7 @@ WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
 
 	case 2:
 		COMBINE_DATA( &lo );
-		hi = m_mUpperWordLatch;
+		hi = m_UpperWordLatch;
 		break;
 
 	default:

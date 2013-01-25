@@ -1362,21 +1362,21 @@ InitDSP( running_machine &machine )
 
 READ16_MEMBER(namcos22_state::pdp_status_r)
 {
-	return m_mMasterBIOZ;
+	return m_MasterBIOZ;
 } /* pdp_status_r */
 
 void namcos22_state::WriteToPointRAM(offs_t offs, UINT32 data )
 {
 	offs &= 0xffffff; /* 24 bit addressing */
-	if( m_mbSuperSystem22 )
+	if( m_bSuperSystem22 )
 	{
 		if( offs>=0xf80000 && offs<=0xf9ffff )
-			m_mpPointRAM[offs-0xf80000] = data & 0x00ffffff;
+			m_pPointRAM[offs-0xf80000] = data & 0x00ffffff;
 	}
 	else
 	{
 		if( offs>=0xf00000 && offs<=0xf1ffff )
-			m_mpPointRAM[offs-0xf00000] = data & 0x00ffffff;
+			m_pPointRAM[offs-0xf00000] = data & 0x00ffffff;
 	}
 } /* WriteToPointRAM */
 
@@ -1394,10 +1394,10 @@ void namcos22_state::WriteToCommRAM(offs_t offs, UINT32 data )
 READ16_MEMBER(namcos22_state::pdp_begin_r)
 {
 	/* this feature appears to be only used on Super System22 hardware */
-	if( m_mbSuperSystem22 )
+	if( m_bSuperSystem22 )
 	{
 		UINT16 offs = m_polygonram[0x20000/4-1];
-		m_mMasterBIOZ = 1;
+		m_MasterBIOZ = 1;
 		for(;;)
 		{
 			UINT16 start = offs;
@@ -1495,18 +1495,18 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 				return 0;
 			}
 		} /* for(;;) */
-	} /* m_mbSuperSystem22 */
+	} /* m_bSuperSystem22 */
 	return 0;
 } /* pdp_begin_r */
 
 READ16_MEMBER(namcos22_state::slave_external_ram_r)
 {
-	return m_mpSlaveExternalRAM[offset];
+	return m_pSlaveExternalRAM[offset];
 }
 
 WRITE16_MEMBER(namcos22_state::slave_external_ram_w)
 {
-	COMBINE_DATA( &m_mpSlaveExternalRAM[offset] );
+	COMBINE_DATA( &m_pSlaveExternalRAM[offset] );
 }
 
 static void HaltSlaveDSP( running_machine &machine )
@@ -1540,29 +1540,29 @@ WRITE16_MEMBER(namcos22_state::dsp_XF_output_w)
 
 WRITE16_MEMBER(namcos22_state::point_ram_idx_w)
 {
-	m_mPointAddr<<=16;
-	m_mPointAddr |= data;
+	m_PointAddr<<=16;
+	m_PointAddr |= data;
 }
 
 WRITE16_MEMBER(namcos22_state::point_ram_loword_iw)
 {
-	m_mPointData |= data;
-	WriteToPointRAM(m_mPointAddr++, m_mPointData );
+	m_PointData |= data;
+	WriteToPointRAM(m_PointAddr++, m_PointData );
 }
 
 WRITE16_MEMBER(namcos22_state::point_ram_hiword_w)
 {
-	m_mPointData = (data<<16);
+	m_PointData = (data<<16);
 }
 
 READ16_MEMBER(namcos22_state::point_ram_loword_r)
 {
-	return namcos22_point_rom_r(machine(), m_mPointAddr)&0xffff;
+	return namcos22_point_rom_r(machine(), m_PointAddr)&0xffff;
 }
 
 READ16_MEMBER(namcos22_state::point_ram_hiword_ir)
 {
-	return namcos22_point_rom_r(machine(), m_mPointAddr++)>>16;
+	return namcos22_point_rom_r(machine(), m_PointAddr++)>>16;
 }
 
 WRITE16_MEMBER(namcos22_state::dsp_unk2_w)
@@ -1585,14 +1585,14 @@ enum
 
 READ16_MEMBER(namcos22_state::dsp_unk_port3_r)
 {
-	m_mMasterBIOZ = 0;
-	m_mDspUploadState = eDSP_UPLOAD_READY;
+	m_MasterBIOZ = 0;
+	m_DspUploadState = eDSP_UPLOAD_READY;
 	return 0;
 }
 
 WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 {
-	switch( m_mDspUploadState )
+	switch( m_DspUploadState )
 	{
 	case eDSP_UPLOAD_READY:
 		logerror( "UPLOAD_READY; cmd = 0x%x\n", data );
@@ -1602,7 +1602,7 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 				HaltSlaveDSP(machine());
 				break;
 			case 1:
-				m_mDspUploadState = eDSP_UPLOAD_DEST;
+				m_DspUploadState = eDSP_UPLOAD_DEST;
 				break;
 			case 2:
 				/* custom IC poke */
@@ -1624,13 +1624,13 @@ WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 		break;
 
 	case eDSP_UPLOAD_DEST:
-		m_mUploadDestIdx = data;
-		m_mDspUploadState = eDSP_UPLOAD_DATA;
+		m_UploadDestIdx = data;
+		m_DspUploadState = eDSP_UPLOAD_DATA;
 		break;
 
 	case eDSP_UPLOAD_DATA:
-		m_mpSlaveExternalRAM[m_mUploadDestIdx&0x1fff] = data;
-		m_mUploadDestIdx++;
+		m_pSlaveExternalRAM[m_UploadDestIdx&0x1fff] = data;
+		m_UploadDestIdx++;
 		break;
 
 	default:
@@ -1661,34 +1661,34 @@ READ16_MEMBER(namcos22_state::dsp_upload_status_r)
 
 READ16_MEMBER(namcos22_state::master_external_ram_r)
 {
-	return m_mpMasterExternalRAM[offset];
+	return m_pMasterExternalRAM[offset];
 }
 
 WRITE16_MEMBER(namcos22_state::master_external_ram_w)
 {
-	COMBINE_DATA( &m_mpMasterExternalRAM[offset] );
+	COMBINE_DATA( &m_pMasterExternalRAM[offset] );
 }
 
 WRITE16_MEMBER(namcos22_state::slave_serial_io_w)
 {
-	m_mSerialDataSlaveToMasterNext = data;
+	m_SerialDataSlaveToMasterNext = data;
 	logerror( "slave_serial_io_w(%04x)\n", data );
 }
 
 READ16_MEMBER(namcos22_state::master_serial_io_r)
 {
 	logerror( "master_serial_io_r() == %04x\n",
-		m_mSerialDataSlaveToMasterCurrent );
-	return m_mSerialDataSlaveToMasterCurrent;
+		m_SerialDataSlaveToMasterCurrent );
+	return m_SerialDataSlaveToMasterCurrent;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_master_serial_irq)
 {
 	int scanline = param;
 
-	if( m_mbEnableDspIrqs )
+	if( m_bEnableDspIrqs )
 	{
-		m_mSerialDataSlaveToMasterCurrent = m_mSerialDataSlaveToMasterNext;
+		m_SerialDataSlaveToMasterCurrent = m_SerialDataSlaveToMasterNext;
 
 		if(scanline == 480)
 			m_master->set_input_line(TMS32025_INT0, HOLD_LINE);
@@ -1704,7 +1704,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_slave_serial_irq)
 {
 	int scanline = param;
 
-	if( m_mbEnableDspIrqs )
+	if( m_bEnableDspIrqs )
 	{
 		if((scanline % 2) == 0)
 		{
@@ -1761,17 +1761,17 @@ WRITE16_MEMBER(namcos22_state::dsp_led_w)
  */
 WRITE16_MEMBER(namcos22_state::dsp_unk8_w)
 {
-	m_mRenderBufSize = 0;
+	m_RenderBufSize = 0;
 }
 
 WRITE16_MEMBER(namcos22_state::master_render_device_w)
 {
-	if( m_mRenderBufSize<MAX_RENDER_CMD_SEQ )
+	if( m_RenderBufSize<MAX_RENDER_CMD_SEQ )
 	{
-		m_mRenderBufData[m_mRenderBufSize++] = data;
-		if( m_mRenderBufSize == MAX_RENDER_CMD_SEQ )
+		m_RenderBufData[m_RenderBufSize++] = data;
+		if( m_RenderBufSize == MAX_RENDER_CMD_SEQ )
 		{
-			namcos22_draw_direct_poly( machine(), m_mRenderBufData );
+			namcos22_draw_direct_poly( machine(), m_RenderBufData );
 		}
 	}
 }
@@ -2146,18 +2146,18 @@ WRITE32_MEMBER(namcos22_state::namcos22s_system_controller_w)
 				m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); /* master DSP */
 				m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); /* slave DSP */
 				namcos22_enable_slave_simulation(machine(), 0);
-				m_mbEnableDspIrqs = 0;
+				m_bEnableDspIrqs = 0;
 			}
 			else if( newreg == 1 )
 			{ /* enable dsp and rendering subsystem */
 				m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				namcos22_enable_slave_simulation(machine(), 1);
-				m_mbEnableDspIrqs = 1;
+				m_bEnableDspIrqs = 1;
 			}
 			else if( newreg == 0xff )
 			{ /* used to upload game-specific code to master/slave dsps */
 				m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-				m_mbEnableDspIrqs = 0;
+				m_bEnableDspIrqs = 0;
 			}
 		}
 	}
@@ -2274,18 +2274,18 @@ WRITE32_MEMBER(namcos22_state::namcos22_system_controller_w)
 				m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); /* master DSP */
 				m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); /* slave DSP */
 				namcos22_enable_slave_simulation(machine(), 0);
-				m_mbEnableDspIrqs = 0;
+				m_bEnableDspIrqs = 0;
 			}
 			else if( newreg == 1 )
 			{ /* enable dsp and rendering subsystem */
 				m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				namcos22_enable_slave_simulation(machine(), 1);
-				m_mbEnableDspIrqs = 1;
+				m_bEnableDspIrqs = 1;
 			}
 			else if( newreg == 0xff )
 			{ /* used to upload game-specific code to master/slave dsps */
 				m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-				m_mbEnableDspIrqs = 0;
+				m_bEnableDspIrqs = 0;
 			}
 		}
 	}
@@ -2403,15 +2403,15 @@ WRITE32_MEMBER(namcos22_state::namcos22_keycus_w)
  */
 READ32_MEMBER(namcos22_state::namcos22_portbit_r)
 {
-	UINT32 data = m_mSys22PortBits;
-	m_mSys22PortBits>>=1;
+	UINT32 data = m_Sys22PortBits;
+	m_Sys22PortBits>>=1;
 	return data&0x10001;
 }
 WRITE32_MEMBER(namcos22_state::namcos22_portbit_w)
 {
 	unsigned dat50000008 = AnalogAsDigital(machine());
 	unsigned dat5000000a = 0xffff;
-	m_mSys22PortBits = (dat50000008<<16)|dat5000000a;
+	m_Sys22PortBits = (dat50000008<<16)|dat5000000a;
 }
 
 READ32_MEMBER(namcos22_state::namcos22_dipswitch_r)
@@ -2462,7 +2462,7 @@ WRITE32_MEMBER(namcos22_state::namcos22_cpuleds_w)
 
 READ32_MEMBER(namcos22_state::alpinesa_prot_r)
 {
-	return m_mAlpineSurferProtData;
+	return m_AlpineSurferProtData;
 } /* alpinesa_prot_r */
 
 WRITE32_MEMBER(namcos22_state::alpinesa_prot_w)
@@ -2470,13 +2470,13 @@ WRITE32_MEMBER(namcos22_state::alpinesa_prot_w)
 	switch( data )
 	{
 		case 0:
-			m_mAlpineSurferProtData = 0;
+			m_AlpineSurferProtData = 0;
 			break;
 		case 1:
-			m_mAlpineSurferProtData = 1;
+			m_AlpineSurferProtData = 1;
 			break;
 		case 3:
-			m_mAlpineSurferProtData = 2;
+			m_AlpineSurferProtData = 2;
 			break;
 		default:
 			break;
@@ -5688,7 +5688,7 @@ static void namcos22_init( running_machine &machine, int game_type )
 	state->m_old_coin_state = 0;
 	state->m_credits1 = state->m_credits2 = 0;
 
-	state->m_mpPointRAM = auto_alloc_array(machine, UINT32, 0x20000);
+	state->m_pPointRAM = auto_alloc_array(machine, UINT32, 0x20000);
 }
 
 static void alpine_init_common( running_machine &machine, int game_type )
