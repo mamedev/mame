@@ -835,7 +835,10 @@ Missing files come here
 			</dataarea>
 		</part>
 	</software>
-
+	
+<!--
+	This is not a real dump, it was constructed using WinImage for use with MESS
+	Also circulating with CRC fb591430
 	<software name="ptombs">
 		<description>Pharaoh's Tomb (Shareware)</description>
 		<year>1994</year>
@@ -846,6 +849,7 @@ Missing files come here
 			</dataarea>
 		</part>
 	</software>
+-->
 
 	<software name="raptor12">
 		<description>Raptor - Call of the Shadows</description>
