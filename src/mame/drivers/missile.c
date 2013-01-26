@@ -358,12 +358,31 @@ public:
 	missile_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_videoram(*this, "videoram")
+		m_videoram(*this, "videoram"),
+		m_pokey(*this, "pokey"),
+		m_in0(*this, "IN0"),
+		m_in1(*this, "IN1"),
+		m_r10(*this, "R10"),
+		m_r8(*this, "R8"),
+		m_track0_x(*this, "TRACK0_X"),
+		m_track0_y(*this, "TRACK0_Y"),
+		m_track1_x(*this, "TRACK1_X"),
+		m_track1_y(*this, "TRACK1_Y")
 	{ }
 
 	required_device<m6502_device> m_maincpu;
 	required_shared_ptr<UINT8> m_videoram;
+	required_device<pokey_device> m_pokey;
+	required_ioport m_in0;
+	required_ioport m_in1;
+	required_ioport m_r10;
+	required_ioport m_r8;
+	required_ioport m_track0_x;
+	required_ioport m_track0_y;
+	required_ioport m_track1_x;
+	required_ioport m_track1_y;
 
+	const UINT8 *m_mainrom;
 	const UINT8 *m_writeprom;
 	emu_timer *m_irq_timer;
 	emu_timer *m_cpu_timer;
@@ -494,6 +513,7 @@ TIMER_CALLBACK_MEMBER(missile_state::adjust_cpu_speed)
 void missile_state::machine_start()
 {
 	/* initialize globals */
+	m_mainrom = memregion("maincpu")->base();	
 	m_writeprom = memregion("proms")->base();
 	m_flipscreen = 0;
 
@@ -696,8 +716,7 @@ WRITE8_MEMBER(missile_state::missile_w)
 	/* POKEY */
 	else if (offset < 0x4800)
 	{
-		pokey_device *pokey_dev = downcast<pokey_device *>(machine().device("pokey"));
-		pokey_dev->write(machine().firstcpu->space(), offset, data, 0xff);
+		m_pokey->write(m_maincpu->space(), offset, data, 0xff);
 	}
 
 	/* OUT0 */
@@ -754,14 +773,11 @@ READ8_MEMBER(missile_state::missile_r)
 
 	/* ROM */
 	else if (offset >= 0x5000)
-		result = memregion("maincpu")->base()[offset];
+		result = m_mainrom[offset];
 
 	/* POKEY */
 	else if (offset < 0x4800)
-	{
-		pokey_device *pokey_dev = downcast<pokey_device *>(machine().device("pokey"));
-		result = pokey_dev->read(machine().firstcpu->space(), offset & 0x0f, 0xff);
-	}
+		result = m_pokey->read(m_maincpu->space(), offset & 0x0f, 0xff);
 
 	/* IN0 */
 	else if (offset < 0x4900)
@@ -769,21 +785,21 @@ READ8_MEMBER(missile_state::missile_r)
 		if (m_ctrld)    /* trackball */
 		{
 			if (!m_flipscreen)
-				result = ((ioport("TRACK0_Y")->read() << 4) & 0xf0) | (ioport("TRACK0_X")->read() & 0x0f);
+				result = ((m_track0_y->read() << 4) & 0xf0) | (m_track0_x->read() & 0x0f);
 			else
-				result = ((ioport("TRACK1_Y")->read() << 4) & 0xf0) | (ioport("TRACK1_X")->read() & 0x0f);
+				result = ((m_track1_y->read() << 4) & 0xf0) | (m_track1_x->read() & 0x0f);
 		}
 		else    /* buttons */
-			result = ioport("IN0")->read();
+			result = m_in0->read();
 	}
 
 	/* IN1 */
 	else if (offset < 0x4a00)
-		result = ioport("IN1")->read();
+		result = m_in1->read();
 
 	/* IN2 */
 	else if (offset < 0x4b00)
-		result = ioport("R10")->read();
+		result = m_r10->read();
 
 	/* anything else */
 	else
