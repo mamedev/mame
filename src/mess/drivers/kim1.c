@@ -106,11 +106,17 @@ class kim1_state : public driver_device
 {
 public:
 	kim1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_riot2(*this, "miot_u2"),
-	m_cass(*this, CASSETTE_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_riot2(*this, "miot_u2")
+		, m_cass(*this, CASSETTE_TAG)
+		, m_line0(*this, "LINE0")
+		, m_line1(*this, "LINE1")
+		, m_line2(*this, "LINE2")
+		, m_line3(*this, "LINE3")
 	{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<mos6530_device> m_riot2;
 	required_device<cassette_image_device> m_cass;
 	DECLARE_READ8_MEMBER(kim1_u2_read_a);
@@ -126,6 +132,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(kim1_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
 	TIMER_DEVICE_CALLBACK_MEMBER(kim1_update_leds);
+
+protected:
+	required_ioport m_line0;
+	required_ioport m_line1;
+	required_ioport m_line2;
+	required_ioport m_line3;
 };
 
 
@@ -146,7 +158,7 @@ ADDRESS_MAP_END
 INPUT_CHANGED_MEMBER(kim1_state::kim1_reset)
 {
 	if (newval == 0)
-		machine().firstcpu->reset();
+		m_maincpu->reset();
 }
 
 
@@ -202,13 +214,13 @@ READ8_MEMBER( kim1_state::kim1_u2_read_a )
 	switch( ( m_u2_port_b >> 1 ) & 0x0f )
 	{
 	case 0:
-		data = ioport("LINE0")->read();
+		data = m_line0->read();
 		break;
 	case 1:
-		data = ioport("LINE1")->read();
+		data = m_line1->read();
 		break;
 	case 2:
-		data = ioport("LINE2")->read();
+		data = m_line2->read();
 		break;
 	}
 	return data;
