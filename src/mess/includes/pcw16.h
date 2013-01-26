@@ -7,7 +7,17 @@
 #ifndef PCW16_H_
 #define PCW16_H_
 
+#include "emu.h"
+#include "cpu/z80/z80.h"
 #include "machine/upd765.h"     /* FDC superio */
+#include "machine/pc_lpt.h"     /* PC-Parallel Port */
+#include "machine/pckeybrd.h"   /* PC-AT keyboard */
+#include "machine/upd765.h"     /* FDC superio */
+#include "machine/ins8250.h"    /* pc com port */
+#include "sound/beep.h"         /* pcw/pcw16 beeper */
+#include "machine/intelfsh.h"
+#include "formats/pc_dsk.h"
+#include "machine/ram.h"
 
 #define PCW16_BORDER_HEIGHT 8
 #define PCW16_BORDER_WIDTH 8
@@ -23,7 +33,27 @@ class pcw16_state : public driver_device
 {
 public:
 	pcw16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
+		  m_flash0(*this, "flash0"),
+		  m_flash1(*this, "flash1"),
+		  m_fdc(*this, "fdc"),
+		  m_uart2(*this, "ns16550_2"),
+		  m_speaker(*this, BEEPER_TAG),
+		  m_ram(*this, RAM_TAG),
+		  m_region_rom(*this, "maincpu"),
+		  m_io_extra(*this, "EXTRA")
+	{ }
+
+	required_device<legacy_cpu_device> m_maincpu;
+	required_device<intel_e28f008sa_device> m_flash0;
+	required_device<intel_e28f008sa_device> m_flash1;
+	required_device<pc_fdc_superio_device> m_fdc;
+	required_device<ns16550_device> m_uart2;
+	required_device<beep_device> m_speaker;
+	required_device<ram_device> m_ram;
+	required_memory_region m_region_rom;
+	required_ioport m_io_extra;
 
 	unsigned long m_interrupt_counter;
 	int m_banks[4];
