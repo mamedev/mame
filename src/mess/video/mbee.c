@@ -211,15 +211,26 @@ WRITE8_MEMBER ( mbee_state::mbeeppc_high_w )
 /* The direction keys are used by the pc85 menu. Do not know what uses the "insert" key. */
 void mbee_state::keyboard_matrix_r(int offs)
 {
-	char kbdrow[6];
 	UINT8 port = (offs >> 7) & 7;
 	UINT8 bit = (offs >> 4) & 7;
-	sprintf(kbdrow,"X%d",port);
-	UINT8 data = (ioport(kbdrow)->read() >> bit) & 1;
+	UINT8 data = 0;
+
+	switch ( port )
+	{
+		case 0: data = m_io_x0->read(); break;
+		case 1: data = m_io_x1->read(); break;
+		case 2: data = m_io_x2->read(); break;
+		case 3: data = m_io_x3->read(); break;
+		case 4: data = m_io_x4->read(); break;
+		case 5: data = m_io_x5->read(); break;
+		case 6: data = m_io_x6->read(); break;
+		case 7: data = m_io_x7->read(); break;
+	}
+	data  = ( data >> bit ) & 1;
 
 	if ((data | m_is_premium) == 0)
 	{
-		UINT8 extra = ioport("EXTRA")->read();
+		UINT8 extra = m_io_extra->read();
 
 		if( extra & 0x01 )  /* extra: cursor up */
 		{
