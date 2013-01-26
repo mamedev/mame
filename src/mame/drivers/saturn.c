@@ -283,34 +283,34 @@ READ32_MEMBER(saturn_state::saturn_scu_r)
 	{
 		case 0x5c/4:
 		//  Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
-			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
+			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
 			res = m_scu_regs[0x7c/4];
 			break;
 		case 0x7c/4:
-			if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
+			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
 			res = m_scu_regs[offset];
 			break;
 		case 0x80/4:
 			res = dsp_prg_ctrl_r(space);
 			break;
 		case 0x8c/4:
-			if(LOG_SCU) logerror( "DSP mem read at %08X\n", m_scu_regs[34]);
+			if(LOG_SCU && !space.debugger_access()) logerror( "DSP mem read at %08X\n", m_scu_regs[34]);
 			res = dsp_ram_addr_r();
 			break;
 		case 0xa0/4:
-			if(LOG_SCU) logerror("(PC=%08x) IRQ mask reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,m_scu_regs[0xa0/4]);
+			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) IRQ mask reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,m_scu_regs[0xa0/4]);
 			res = m_scu.ism;
 			break;
 		case 0xa4/4:
-			if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,m_scu_regs[0xa0/4]);
+			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) IRQ status reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,m_scu_regs[0xa0/4]);
 			res = m_scu.ist;
 			break;
 		case 0xc8/4:
-			logerror("(PC=%08x) SCU version reg read\n",space.device().safe_pc());
+			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) SCU version reg read\n",space.device().safe_pc());
 			res = 0x00000004;/*SCU Version 4, OK? */
 			break;
 		default:
-			if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",space.device().safe_pc(),offset,m_scu_regs[offset]);
+			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) SCU reg read at %d = %08x\n",space.device().safe_pc(),offset,m_scu_regs[offset]);
 			res = m_scu_regs[offset];
 			break;
 	}
