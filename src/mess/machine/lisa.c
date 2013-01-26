@@ -36,13 +36,7 @@
     Raphael Nabet, 2000-2003
 */
 
-#include "emu.h"
 #include "includes/lisa.h"
-#include "machine/6522via.h"
-#include "machine/applefdc.h"
-#include "devices/sonydriv.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/speaker.h"
 
 
 /*
@@ -91,9 +85,6 @@ the drive type (TWIGGY or 3.5'')) */
     a hard disk
 */
 
-static void COPS_via_irq_func(device_t *device, int val);
-
-
 const via6522_interface lisa_via6522_0_intf =
 {
 	/* COPS via */
@@ -103,7 +94,7 @@ const via6522_interface lisa_via6522_0_intf =
 	DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_out_a), DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_out_b),
 	DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_out_ca2), DEVCB_DRIVER_MEMBER(lisa_state,COPS_via_out_cb2),
 	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_LINE(COPS_via_irq_func),
+	DEVCB_DRIVER_LINE_MEMBER(lisa_state,COPS_via_irq_func)
 };
 
 const via6522_interface lisa_via6522_1_intf =
@@ -114,7 +105,7 @@ const via6522_interface lisa_via6522_1_intf =
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_NULL,
 	DEVCB_NULL, DEVCB_NULL,
-	DEVCB_NULL, DEVCB_NULL,
+	DEVCB_NULL, DEVCB_NULL
 };
 
 /*
@@ -149,75 +140,72 @@ enum lisa_model_t
     Interrupt handling
 */
 
-static void lisa_field_interrupts(running_machine &machine)
+void lisa_state::field_interrupts()
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
-	if (state->m_parity_error_pending)
+	if (m_parity_error_pending)
 		return; /* don't touch anything... */
 
 #if 0
 	if (RSIR)
 		// serial interrupt
-		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_6, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int0)
 		// external interrupt
-		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int1)
 		// external interrupt
-		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_4, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else if (int2)
 		// external interrupt
-		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else
 #endif
-	if (state->m_KBIR)
+	if (m_KBIR)
 		/* COPS VIA interrupt */
-		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
-	else if (state->m_FDIR || state->m_VTIR)
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+	else if (m_FDIR || m_VTIR)
 		/* floppy disk or VBl */
-		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	else
 		/* clear all interrupts */
-		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_1, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
-static void set_parity_error_pending(running_machine &machine, int value)
+void lisa_state::set_parity_error_pending(int value)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
 #if 1
 	/* does not work well due to bugs in 68k cores */
-	state->m_parity_error_pending = value;
-	if (state->m_parity_error_pending)
+	m_parity_error_pending = value;
+	if (m_parity_error_pending)
 	{
-		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_7, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	}
 	else
 	{
-		machine.device("maincpu")->execute().set_input_line(M68K_IRQ_7, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
 	}
 #else
 	/* work-around... */
-	if ((! state->m_parity_error_pending) && value)
+	if ((! m_parity_error_pending) && value)
 	{
-		state->m_parity_error_pending = 1;
-		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_7, PULSE_LINE, M68K_INT_ACK_AUTOVECTOR);
+		m_parity_error_pending = 1;
+		m_maincpu->set_input_line_and_vector(M68K_IRQ_7, PULSE_LINE, M68K_INT_ACK_AUTOVECTOR);
 	}
-	else if (state->m_parity_error_pending && (! value))
+	else if (m_parity_error_pending && (! value))
 	{
-		state->m_parity_error_pending = 0;
-		lisa_field_interrupts(machine);
+		m_parity_error_pending = 0;
+		field_interrupts();
 	}
 #endif
 }
 
-INLINE void set_VTIR(running_machine &machine, int value)
+void lisa_state::set_VTIR(int value)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
-	if (state->m_VTIR != value)
+	if (m_VTIR != value)
 	{
-		state->m_VTIR = value;
-		if (state->m_VTIR==1)
-			lisa_field_interrupts(machine);
+		m_VTIR = value;
+		if (m_VTIR==1)
+			field_interrupts();
 	}
 }
 
@@ -227,40 +215,37 @@ INLINE void set_VTIR(running_machine &machine, int value)
     keyboard interface (COPS simulation; our COPS CPU core is too broken and too esoteric to emulate this correctly, I tried)
 */
 
-INLINE void COPS_send_data_if_possible(running_machine &machine)
+void lisa_state::COPS_send_data_if_possible()
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
-	via6522_device *via_0 = machine.device<via6522_device>("via6522_0");
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	if ((! state->m_hold_COPS_data) && state->m_fifo_size && (! state->m_COPS_Ready))
+	if ((! m_hold_COPS_data) && m_fifo_size && (! m_COPS_Ready))
 	{
-//        printf("COPsim: sending %02x to VIA\n", state->m_fifo_data[state->m_fifo_head]);
+//        printf("COPsim: sending %02x to VIA\n", m_fifo_data[m_fifo_head]);
 
-		via_0->write_porta(space, 0, state->m_fifo_data[state->m_fifo_head]);   /* output data */
-		if (state->m_fifo_head == state->m_mouse_data_offset)
-			state->m_mouse_data_offset = -1;    /* we just phased out the mouse data in buffer */
-		state->m_fifo_head = (state->m_fifo_head+1) & 0x7;
-		state->m_fifo_size--;
-		via_0->write_ca1(1);        /* pulse ca1 so that VIA reads it */
-		via_0->write_ca1(0);        /* BTW, I have no idea how a real COPS does it ! */
+		m_via0->write_porta(space, 0, m_fifo_data[m_fifo_head]);   /* output data */
+		if (m_fifo_head == m_mouse_data_offset)
+			m_mouse_data_offset = -1;    /* we just phased out the mouse data in buffer */
+		m_fifo_head = (m_fifo_head+1) & 0x7;
+		m_fifo_size--;
+		m_via0->write_ca1(1);        /* pulse ca1 so that VIA reads it */
+		m_via0->write_ca1(0);        /* BTW, I have no idea how a real COPS does it ! */
 	}
 }
 
 /* send data (queue it into the FIFO if needed) */
-static void COPS_queue_data(running_machine &machine, const UINT8 *data, int len)
+void lisa_state::COPS_queue_data(const UINT8 *data, int len)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
 #if 0
-	if (state->m_fifo_size + len <= 8)
+	if (m_fifo_size + len <= 8)
 #else
 	/* trash old data */
-	while (state->m_fifo_size > 8 - len)
+	while (m_fifo_size > 8 - len)
 	{
-		if (state->m_fifo_head == state->m_mouse_data_offset)
-			state->m_mouse_data_offset = -1;    /* we just phased out the mouse data in buffer */
-		state->m_fifo_head = (state->m_fifo_head+1) & 0x7;
-		state->m_fifo_size--;
+		if (m_fifo_head == m_mouse_data_offset)
+			m_mouse_data_offset = -1;    /* we just phased out the mouse data in buffer */
+		m_fifo_head = (m_fifo_head+1) & 0x7;
+		m_fifo_size--;
 	}
 #endif
 
@@ -269,13 +254,13 @@ static void COPS_queue_data(running_machine &machine, const UINT8 *data, int len
 
 		while (len--)
 		{
-			state->m_fifo_data[state->m_fifo_tail] = * (data++);
-			state->m_fifo_tail = (state->m_fifo_tail+1) & 0x7;
-			state->m_fifo_size++;
+			m_fifo_data[m_fifo_tail] = * (data++);
+			m_fifo_tail = (m_fifo_tail+1) & 0x7;
+			m_fifo_size++;
 		}
 
 		/*logerror("COPS_queue_data : trying to send data to VIA\n");*/
-		COPS_send_data_if_possible(machine);
+		COPS_send_data_if_possible();
 	}
 }
 
@@ -288,44 +273,41 @@ static void COPS_queue_data(running_machine &machine, const UINT8 *data, int len
 
 /* keyboard matrix to detect transition */
 
-static void scan_keyboard(running_machine &machine)
+void lisa_state::scan_keyboard()
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
 	int i, j;
-	int keybuf;
 	UINT8 keycode;
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+	UINT8 keybuf[8] = { m_io_line0->read(), m_io_line1->read(), m_io_line2->read(), m_io_line3->read(), 
+						m_io_line4->read(), m_io_line5->read(), m_io_line6->read(), m_io_line7->read() };
 
-	if (! state->m_COPS_force_unplug)
+	if (! m_COPS_force_unplug)
 		for (i=0; i<8; i++)
 		{
-			keybuf = machine.root_device().ioport(keynames[i])->read();
-
-			if (keybuf != state->m_key_matrix[i])
+			if (keybuf[i] != m_key_matrix[i])
 			{   /* if state has changed, find first bit which has changed */
 				/*logerror("keyboard state changed, %d %X\n", i, keybuf);*/
 
 				for (j=0; j<16; j++)
 				{
-					if (((keybuf ^ state->m_key_matrix[i]) >> j) & 1)
+					if (((keybuf[i] ^ m_key_matrix[i]) >> j) & 1)
 					{
 						/* update key_matrix */
-						state->m_key_matrix[i] = (state->m_key_matrix[i] & ~ (1 << j)) | (keybuf & (1 << j));
+						m_key_matrix[i] = (m_key_matrix[i] & ~ (1 << j)) | (keybuf[i] & (1 << j));
 
 						/* create key code */
 						keycode = (i << 4) | j;
-						if (keybuf & (1 << j))
+						if (keybuf[i] & (1 << j))
 						{   /* key down */
 							keycode |= 0x80;
 						}
 #if 0
-						if (keycode == state->m_NMIcode)
+						if (keycode == m_NMIcode)
 						{   /* generate NMI interrupt */
-							machine.device("maincpu")->execute().set_input_line(M68K_IRQ_7, PULSE_LINE);
-							machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
+							m_maincpu->set_input_line(M68K_IRQ_7, PULSE_LINE);
+							m_maincpu->set_input_line_vector(M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
 						}
 #endif
-						COPS_queue_data(machine, & keycode, 1);
+						COPS_queue_data(&keycode, 1);
 					}
 				}
 			}
@@ -344,8 +326,8 @@ TIMER_CALLBACK_MEMBER(lisa_state::handle_mouse)
 		return; /* ???? */
 #endif
 
-	new_mx = machine().root_device().ioport("MOUSE_X")->read();
-	new_my = machine().root_device().ioport("MOUSE_Y")->read();
+	new_mx = m_io_mouse_x->read();
+	new_my = m_io_mouse_y->read();
 
 	/* see if it moved in the x coord */
 	if (new_mx != m_last_mx)
@@ -407,7 +389,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::handle_mouse)
 				m_fifo_size += 3;
 
 				/*logerror("handle_mouse : trying to send data to VIA\n");*/
-				COPS_send_data_if_possible(machine());
+				COPS_send_data_if_possible();
 			}
 			/* else, mouse data is lost forever (correct ??) */
 		}
@@ -418,16 +400,15 @@ TIMER_CALLBACK_MEMBER(lisa_state::handle_mouse)
 TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
 {
 	int command;
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	m_COPS_Ready = 0;
 
 	/*logerror("read_COPS_command : trying to send data to VIA\n");*/
-	COPS_send_data_if_possible(machine());
+	COPS_send_data_if_possible();
 
 	/* some pull-ups allow the COPS to read 1s when the VIA port is not set as output */
-	command = (m_COPS_command | (~ via_0->read(space, VIA_DDRA))) & 0xff;
+	command = (m_COPS_command | (~ m_via0->read(space, VIA_DDRA))) & 0xff;
 
 //    printf("Dropping Ready, command = %02x\n", command);
 
@@ -581,7 +562,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
 				reply[5] = (m_clock_regs.minutes2 << 4) | m_clock_regs.seconds1;
 				reply[6] = (m_clock_regs.seconds2 << 4) | m_clock_regs.tenths;
 
-				COPS_queue_data(machine(), reply, 7);
+				COPS_queue_data(reply, 7);
 			}
 			break;
 		}
@@ -597,22 +578,22 @@ TIMER_CALLBACK_MEMBER(lisa_state::set_COPS_ready)
 	machine().scheduler().timer_set(attotime::from_usec(20), timer_expired_delegate(FUNC(lisa_state::read_COPS_command),this));
 }
 
-static void reset_COPS(lisa_state *state)
+void lisa_state::reset_COPS()
 {
 	int i;
 
-	state->m_fifo_size = 0;
-	state->m_fifo_head = 0;
-	state->m_fifo_tail = 0;
-	state->m_mouse_data_offset = -1;
+	m_fifo_size = 0;
+	m_fifo_head = 0;
+	m_fifo_tail = 0;
+	m_mouse_data_offset = -1;
 
 	for (i=0; i<8; i++)
-		state->m_key_matrix[i] = 0;
+		m_key_matrix[i] = 0;
 
-	state->m_mouse_timer->reset();
+	m_mouse_timer->reset();
 }
 
-static void unplug_keyboard(running_machine &machine)
+void lisa_state::unplug_keyboard()
 {
 	static const UINT8 cmd[2] =
 	{
@@ -620,11 +601,10 @@ static void unplug_keyboard(running_machine &machine)
 		0xFD    /* keyboard unplugged */
 	};
 
-	COPS_queue_data(machine, cmd, 2);
+	COPS_queue_data(cmd, 2);
 }
 
-
-static void plug_keyboard(running_machine &machine)
+void lisa_state::plug_keyboard()
 {
 	/*
 	    possible keyboard IDs according to Lisa Hardware Manual and boot ROM source code
@@ -648,17 +628,16 @@ static void plug_keyboard(running_machine &machine)
 		0x3f    /* keyboard ID - US for now */
 	};
 
-	COPS_queue_data(machine, cmd, 2);
+	COPS_queue_data(cmd, 2);
 }
 
 
 /* called at power-up */
-static void init_COPS(running_machine &machine)
+void lisa_state::init_COPS()
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
-	state->m_COPS_Ready = 0;
+	m_COPS_Ready = 0;
 
-	reset_COPS(state);
+	reset_COPS();
 }
 
 
@@ -683,7 +662,7 @@ WRITE8_MEMBER(lisa_state::COPS_via_out_ca2)
 	/*logerror("COPS CA2 line state : %d\n", val);*/
 
 	/*logerror("COPS_via_out_ca2 : trying to send data to VIA\n");*/
-	COPS_send_data_if_possible(machine());
+	COPS_send_data_if_possible();
 }
 
 /*
@@ -715,17 +694,15 @@ READ8_MEMBER(lisa_state::COPS_via_in_b)
 
 WRITE8_MEMBER(lisa_state::COPS_via_out_b)
 {
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-
 	/* pull-up */
-	data |= (~ via_0->read(space,VIA_DDRA)) & 0x01;
+	data |= (~ m_via0->read(space,VIA_DDRA)) & 0x01;
 
 	if (data & 0x01)
 	{
 		if (m_COPS_force_unplug)
 		{
 			m_COPS_force_unplug = 0;
-			plug_keyboard(machine());
+			plug_keyboard();
 		}
 	}
 	else
@@ -733,7 +710,7 @@ WRITE8_MEMBER(lisa_state::COPS_via_out_b)
 		if (! m_COPS_force_unplug)
 		{
 			m_COPS_force_unplug = 1;
-			unplug_keyboard(machine());
+			unplug_keyboard();
 			//reset_COPS(state);
 		}
 	}
@@ -741,17 +718,15 @@ WRITE8_MEMBER(lisa_state::COPS_via_out_b)
 
 WRITE8_MEMBER(lisa_state::COPS_via_out_cb2)
 {
-	device_t *speaker = machine().device(SPEAKER_TAG);
-	speaker_level_w(speaker, data);
+	speaker_level_w(m_speaker, data);
 }
 
-static void COPS_via_irq_func(device_t *device, int val)
+void lisa_state::COPS_via_irq_func(int val)
 {
-	lisa_state *state = device->machine().driver_data<lisa_state>();
-	if (state->m_KBIR != val)
+	if (m_KBIR != val)
 	{
-		state->m_KBIR = val;
-		lisa_field_interrupts(device->machine());
+		m_KBIR = val;
+		field_interrupts();
 	}
 }
 
@@ -835,13 +810,13 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 	lisa_state *state = machine.driver_data<lisa_state>();
 	/* upper 7 bits -> segment # */
 	int segment = (address >> 17) & 0x7f;
-	int the_seg = state->m_seg;
+	int the_seg = m_seg;
 
 	address &= 0xffffff;
 
 	printf("lisa: logical address %x\n", address);
 
-	if (state->m_setup)
+	if (m_setup)
 	{
 		if (address & 0x004000)
 		{
@@ -855,7 +830,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 			}
 			else
 			{   /* system ROMs */
-				direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, state->m_rom_ptr - (address & 0x3fff));
+				direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, m_rom_ptr - (address & 0x3fff));
 			}
 
 			return -1;
@@ -863,7 +838,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 
 	}
 
-	if (machine.device("maincpu")->state().state_int(M68K_SR) & 0x2000)
+	if (m_maincpu->state_int(M68K_SR) & 0x2000)
 	{
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
@@ -873,18 +848,18 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 		int seg_offset = address & 0x01ffff;
 
 		/* add revelant origin -> address */
-		offs_t mapped_address = (state->m_mmu_regs[the_seg][segment].sorg + seg_offset) & 0x1fffff;
+		offs_t mapped_address = (m_mmu_regs[the_seg][segment].sorg + seg_offset) & 0x1fffff;
 
-		switch ((mmu_entry_t)state->m_mmu_regs[the_seg][segment].type)
+		switch ((mmu_entry_t)m_mmu_regs[the_seg][segment].type)
 		{
 		case RAM_r:
 		case RAM_rw:
-			if (seg_offset > state->m_mmu_regs[the_seg][segment].slim)
+			if (seg_offset > m_mmu_regs[the_seg][segment].slim)
 			{
 				/* out of segment limits : bus error */
 				printf("illegal opbase address%lX\n", (long) address);
 			}
-			direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, state->m_ram_ptr + mapped_address - address);
+			direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, m_ram_ptr + mapped_address - address);
 			printf("RAM\n");
 			break;
 
@@ -897,7 +872,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 			break;
 
 		case special_IO:
-			direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, state->m_rom_ptr + (mapped_address & 0x003fff) - address);
+			direct.explicit_configure((address & 0xffc000), (address & 0xffc000) + 0x003fff, 0xffffff, m_rom_ptr + (mapped_address & 0x003fff) - address);
 			printf("ROM\n");
 			break;
 		}
@@ -912,6 +887,7 @@ DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 NVRAM_HANDLER(lisa)
 {
 	lisa_state *state = machine.driver_data<lisa_state>();
+
 	if (read_or_write)
 	{
 		file->write(state->m_fdc_ram, 1024);
@@ -950,16 +926,16 @@ NVRAM_HANDLER(lisa)
 #if 0
 	UINT32 temp32;
 	SINT8 temp8;
-	temp32 = (state->m_clock_regs.alarm << 12) | (state->m_clock_regs.years << 8) | (state->m_clock_regs.days1 << 4)
-			| state->m_clock_regs.days2;
+	temp32 = (m_clock_regs.alarm << 12) | (m_clock_regs.years << 8) | (m_clock_regs.days1 << 4)
+			| m_clock_regs.days2;
 
-	temp32 = (state->m_clock_regs.days3 << 28) | (state->m_clock_regs.hours1 << 24) | (state->m_clock_regs.hours2 << 20)
-			| (state->m_clock_regs.minutes1 << 16) | (state->m_clock_regs.minutes2 << 12)
-			| (state->m_clock_regs.seconds1 << 8) | (state->m_clock_regs.seconds2 << 4) | state->m_clock_regs.tenths;
+	temp32 = (m_clock_regs.days3 << 28) | (m_clock_regs.hours1 << 24) | (m_clock_regs.hours2 << 20)
+			| (m_clock_regs.minutes1 << 16) | (m_clock_regs.minutes2 << 12)
+			| (m_clock_regs.seconds1 << 8) | (m_clock_regs.seconds2 << 4) | m_clock_regs.tenths;
 
 	temp8 = clock_mode;         /* clock mode */
 
-	temp8 = state->m_clock_regs.clock_write_ptr;    /* clock byte to be written next (-1 if clock write disabled) */
+	temp8 = m_clock_regs.clock_write_ptr;    /* clock byte to be written next (-1 if clock write disabled) */
 #endif
 }
 
@@ -967,17 +943,17 @@ NVRAM_HANDLER(lisa)
 void init_lisa1(void)
 {
 	lisa_state *state = machine.driver_data<lisa_state>();
-	state->m_model = lisa1;
-	state->m_features.has_fast_timers = 0;
-	state->m_features.floppy_hardware = twiggy;
-	state->m_features.has_double_sided_floppy = 1;
-	state->m_features.has_mac_xl_video = 0;
+	m_model = lisa1;
+	m_features.has_fast_timers = 0;
+	m_features.floppy_hardware = twiggy;
+	m_features.has_double_sided_floppy = 1;
+	m_features.has_mac_xl_video = 0;
 }
 #endif
 
 DRIVER_INIT_MEMBER(lisa_state,lisa2)
 {
-	m_ram_ptr = machine().root_device().memregion("maincpu")->base() + RAM_OFFSET;
+	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
 	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
 	m_model = lisa2;
 	m_features.has_fast_timers = 0;
@@ -990,7 +966,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa2)
 
 DRIVER_INIT_MEMBER(lisa_state,lisa210)
 {
-	m_ram_ptr = machine().root_device().memregion("maincpu")->base() + RAM_OFFSET;
+	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
 	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
 	m_model = lisa210;
 	m_features.has_fast_timers = 1;
@@ -1003,7 +979,7 @@ DRIVER_INIT_MEMBER(lisa_state,lisa210)
 
 DRIVER_INIT_MEMBER(lisa_state,mac_xl)
 {
-	m_ram_ptr = machine().root_device().memregion("maincpu")->base() + RAM_OFFSET;
+	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
 	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
 	m_model = mac_xl;
 	m_features.has_fast_timers = 1;
@@ -1024,12 +1000,12 @@ void lisa_state::machine_start()
 
 void lisa_state::machine_reset()
 {
-	m_ram_ptr = machine().root_device().memregion("maincpu")->base() + RAM_OFFSET;
-	m_rom_ptr = machine().root_device().memregion("maincpu")->base() + ROM_OFFSET;
+	m_ram_ptr = memregion("maincpu")->base() + RAM_OFFSET;
+	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
 	m_videoROM_ptr = memregion("gfx1")->base();
 
-//  machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine()));
-//  m68k_set_reset_callback(machine().device("maincpu"), /*lisa_reset_instr_callback*/NULL);
+//  m_maincpu->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate_create_static(lisa_OPbaseoverride, *machine()));
+//  m68k_set_reset_callback(m_maincpu, /*lisa_reset_instr_callback*/NULL);
 
 	/* init MMU */
 	m_setup = 1;
@@ -1046,13 +1022,13 @@ void lisa_state::machine_reset()
 	/* init video */
 
 	m_VTMSK = 0;
-	set_VTIR(machine(), 0);
+	set_VTIR(0);
 
 	m_video_address_latch = 0;
 	m_videoram_ptr = (UINT16 *) m_ram_ptr;
 
 	/* reset COPS keyboard/mouse controller */
-	init_COPS(machine());
+	init_COPS();
 
 	{
 		COPS_via_out_ca2(generic_space(), 0, 0);    /* VIA core forgets to do so */
@@ -1062,12 +1038,12 @@ void lisa_state::machine_reset()
 	{
 		if (m_features.floppy_hardware == sony_lisa2)
 		{
-			sony_set_enable_lines(machine().device("fdc"),1);   /* on lisa2, drive unit 1 is always selected (?) */
+			sony_set_enable_lines(m_fdc, 1);   /* on lisa2, drive unit 1 is always selected (?) */
 		}
 	}
 
 	/* reset 68k to pick up proper vectors from MMU */
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 INTERRUPT_GEN_MEMBER(lisa_state::lisa_interrupt)
@@ -1092,7 +1068,7 @@ INTERRUPT_GEN_MEMBER(lisa_state::lisa_interrupt)
 							0x80,   /* RESET code */
 							0xFC    /* timer time-out */
 						};
-						COPS_queue_data(machine(), cmd, 2);
+						COPS_queue_data(cmd, 2);
 
 						m_clock_regs.alarm = 0xfffffL;
 					}
@@ -1159,12 +1135,12 @@ INTERRUPT_GEN_MEMBER(lisa_state::lisa_interrupt)
 
 	/* set VBI */
 	if (m_VTMSK)
-		set_VTIR(machine(), 1);
+		set_VTIR(1);
 	else
-		set_VTIR(machine(), 0);
+		set_VTIR(0);
 
 	/* do keyboard scan */
-	scan_keyboard(machine());
+	scan_keyboard();
 }
 
 /*
@@ -1174,9 +1150,8 @@ INTERRUPT_GEN_MEMBER(lisa_state::lisa_interrupt)
     cannot support 2 floppy drives)...
 */
 
-INLINE void lisa_fdc_ttl_glue_access(running_machine &machine, offs_t offset)
+void lisa_state::lisa_fdc_ttl_glue_access(offs_t offset)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
 	switch ((offset & 0x000E) >> 1)
 	{
 	case 0:
@@ -1189,22 +1164,20 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine &machine, offs_t offset)
 		/* enable/disable the motor on Lisa 1 */
 		/* can disable the motor on Lisa 2/10, too (although it is not useful) */
 		/* On lisa 2, commands the loading of the speed register on lisalite board */
-		if (state->m_features.floppy_hardware == sony_lisa2)
+		if (m_features.floppy_hardware == sony_lisa2)
 		{
-			int oldMT1 = state->m_MT1;
-			state->m_MT1 = offset & 1;
-			if (state->m_MT1 && ! oldMT1)
+			int oldMT1 = m_MT1;
+			m_MT1 = offset & 1;
+			if (m_MT1 && ! oldMT1)
 			{
-				applefdc_base_device *fdc = machine.device<applefdc_base_device>("fdc");
-
-				state->m_PWM_floppy_motor_speed = (state->m_PWM_floppy_motor_speed << 1) & 0xff;
-				if (fdc->get_lines() & APPLEFDC_PH0)
-					state->m_PWM_floppy_motor_speed |= 1;
-				sony_set_speed(((256-state->m_PWM_floppy_motor_speed) * 1.3) + 237);
+				m_PWM_floppy_motor_speed = (m_PWM_floppy_motor_speed << 1) & 0xff;
+				if (m_fdc->get_lines() & APPLEFDC_PH0)
+					m_PWM_floppy_motor_speed |= 1;
+				sony_set_speed(((256-m_PWM_floppy_motor_speed) * 1.3) + 237);
 			}
 		}
 		/*else
-		    state->m_MT1 = offset & 1;*/
+		    m_MT1 = offset & 1;*/
 		break;
 	case 4:
 		/*DIS = offset & 1;*/   /* forbids access from the 68000 to our RAM */
@@ -1212,19 +1185,19 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine &machine, offs_t offset)
 	case 5:
 		/*HDS = offset & 1;*/       /* head select (-> disk side) on twiggy */
 #if 0
-		if (state->m_features.floppy_hardware == twiggy)
+		if (m_features.floppy_hardware == twiggy)
 			twiggy_set_head_line(offset & 1);
 		else
 #endif
-		if (state->m_features.floppy_hardware == sony_lisa210)
-			sony_set_sel_line(machine.device("fdc"), offset & 1);
+		if (m_features.floppy_hardware == sony_lisa210)
+			sony_set_sel_line(m_fdc, offset & 1);
 		break;
 	case 6:
-		state->m_DISK_DIAG = offset & 1;
+		m_DISK_DIAG = offset & 1;
 		break;
 	case 7:
-		state->m_FDIR = offset & 1; /* Interrupt request to 68k */
-		lisa_field_interrupts(machine);
+		m_FDIR = offset & 1; /* Interrupt request to 68k */
+		field_interrupts();
 		break;
 	}
 }
@@ -1232,16 +1205,15 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine &machine, offs_t offset)
 READ8_MEMBER(lisa_state::lisa_fdc_io_r)
 {
 	int answer=0;
-	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	switch ((offset & 0x0030) >> 4)
 	{
 	case 0: /* IWM */
-		answer = fdc->read(offset);
+		answer = m_fdc->read(offset);
 		break;
 
 	case 1: /* TTL glue */
-		lisa_fdc_ttl_glue_access(machine(), offset);
+		lisa_fdc_ttl_glue_access(offset);
 		answer = 0; /* ??? */
 		break;
 
@@ -1259,16 +1231,14 @@ READ8_MEMBER(lisa_state::lisa_fdc_io_r)
 
 WRITE8_MEMBER(lisa_state::lisa_fdc_io_w)
 {
-	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
-
 	switch ((offset & 0x0030) >> 4)
 	{
 	case 0: /* IWM */
-		fdc->write(offset, data);
+		m_fdc->write(offset, data);
 		break;
 
 	case 1: /* TTL glue */
-		lisa_fdc_ttl_glue_access(machine(), offset);
+		lisa_fdc_ttl_glue_access(offset);
 		break;
 
 	case 2: /* writes the PWM register */
@@ -1391,7 +1361,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 		}
 	}
 
-	if (machine().device("maincpu")->state().state_int(M68K_SR) & 0x2000)
+	if (m_maincpu->state_int(M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1420,7 +1390,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 					&& (m_bad_parity_table[address >> 3] & (0x3 << (address & 0x7))))
 			{
 				m_mem_err_addr_latch = address >> 5;
-				set_parity_error_pending(machine(), 1);
+				set_parity_error_pending(1);
 			}
 
 			break;
@@ -1438,7 +1408,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 					&& (m_bad_parity_table[address >> 3] & (0x3 << (address & 0x7))))
 			{
 				m_mem_err_addr_latch = address >> 5;
-				set_parity_error_pending(machine(), 1);
+				set_parity_error_pending(1);
 			}
 
 			break;
@@ -1493,12 +1463,12 @@ READ16_MEMBER(lisa_state::lisa_r)
 					if ((time_in_frame >= 364) && (time_in_frame <= 375))
 					{
 						answer = m_videoROM_ptr[m_videoROM_address|0x80] << 8;
-				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer, machine().device("maincpu")->safe_pc(), time_in_frame);
+				logerror("reading1 %06X=%04x %s time=%d\n", address, answer, machine().describe_context(), time_in_frame);
 					}
 					else
 					{
 						answer = m_videoROM_ptr[m_videoROM_address] << 8;
-				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer, machine().device("maincpu")->safe_pc(), time_in_frame);
+				logerror("reading2 %06X=%04x %s time=%d\n", address, answer, machine().describe_context(), time_in_frame);
 					}
 				}
 
@@ -1597,7 +1567,7 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 		}
 	}
 
-	if (machine().device("maincpu")->state().state_int(M68K_SR) & 0x2000)
+	if (m_maincpu->state_int(M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1728,70 +1698,67 @@ WRITE16_MEMBER(lisa_state::lisa_w)
 *                                                                                      *
 \**************************************************************************************/
 
-INLINE void cpu_board_control_access(running_machine &machine, offs_t offset)
+void lisa_state::cpu_board_control_access(offs_t offset)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
 	switch ((offset & 0x03ff) << 1)
 	{
 	case 0x0002:    /* Set DIAG1 Latch */
 	case 0x0000:    /* Reset DIAG1 Latch */
 		break;
 	case 0x0006:    /* Set Diag2 Latch */
-		state->m_diag2 = 1;
+		m_diag2 = 1;
 		break;
 	case 0x0004:    /* ReSet Diag2 Latch */
-		state->m_diag2 = 0;
+		m_diag2 = 0;
 		break;
 	case 0x000A:    /* SEG1 Context Selection bit SET */
 		/*logerror("seg bit 0 set\n");*/
-		state->m_seg |= 1;
+		m_seg |= 1;
 		break;
 	case 0x0008:    /* SEG1 Context Selection bit RESET */
 		/*logerror("seg bit 0 clear\n");*/
-		state->m_seg &= ~1;
+		m_seg &= ~1;
 		break;
 	case 0x000E:    /* SEG2 Context Selection bit SET */
 		/*logerror("seg bit 1 set\n");*/
-		state->m_seg |= 2;
+		m_seg |= 2;
 		break;
 	case 0x000C:    /* SEG2 Context Selection bit RESET */
 		/*logerror("seg bit 1 clear\n");*/
-		state->m_seg &= ~2;
+		m_seg &= ~2;
 		break;
 	case 0x0010:    /* SETUP register SET */
-		logerror("setup SET PC=%x\n", machine.device("maincpu")->safe_pc());
-		state->m_setup = 1;
+		logerror("setup SET %s\n", machine().describe_context());
+		m_setup = 1;
 		break;
 	case 0x0012:    /* SETUP register RESET */
-		logerror("setup UNSET PC=%x\n", machine.device("maincpu")->safe_pc());
-		state->m_setup = 0;
+		logerror("setup UNSET %s\n", machine().describe_context());
+		m_setup = 0;
 		break;
 	case 0x001A:    /* Enable Vertical Retrace Interrupt */
-		logerror("enable retrace PC=%x\n", machine.device("maincpu")->safe_pc());
-		state->m_VTMSK = 1;
+		logerror("enable retrace %s\n", machine().describe_context());
+		m_VTMSK = 1;
 		break;
 	case 0x0018:    /* Disable Vertical Retrace Interrupt */
-		logerror("disable retrace PC=%x\n", machine.device("maincpu")->safe_pc());
-		state->m_VTMSK = 0;
-		set_VTIR(machine, 2);
+		logerror("disable retrace %s\n", machine().describe_context());
+		m_VTMSK = 0;
+		set_VTIR(2);
 		break;
 	case 0x0016:    /* Enable Soft Error Detect. */
 	case 0x0014:    /* Disable Soft Error Detect. */
 		break;
 	case 0x001E:    /* Enable Hard Error Detect */
-		state->m_test_parity = 1;
+		m_test_parity = 1;
 		break;
 	case 0x001C:    /* Disable Hard Error Detect */
-		state->m_test_parity = 0;
-		set_parity_error_pending(machine, 0);
+		m_test_parity = 0;
+		set_parity_error_pending(0);
 		break;
 	}
 }
 
 READ16_MEMBER(lisa_state::lisa_IO_r)
 {
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-	via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
 	int answer=0;
 
 	switch ((offset & 0x7000) >> 12)
@@ -1841,13 +1808,13 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 			case 2: /* parallel port */
 				/* 1 VIA located at 0xD901 */
 				if (ACCESSING_BITS_0_7)
-					answer = via_1->read(space, (offset >> 2) & 0xf);
+					answer = m_via1->read(space, (offset >> 2) & 0xf);
 				break;
 
 			case 3: /* keyboard/mouse cops via */
 				/* 1 VIA located at 0xDD81 */
 				if (ACCESSING_BITS_0_7)
-					answer = via_0->read(space, offset & 0xf);
+					answer = m_via0->read(space, offset & 0xf);
 				break;
 			}
 		}
@@ -1858,7 +1825,7 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 		switch ((offset & 0x0C00) >> 10)
 		{
 		case 0x0:   /* cpu board control */
-			cpu_board_control_access(machine(), offset & 0x03ff);
+			cpu_board_control_access(offset & 0x03ff);
 			break;
 
 		case 0x1:   /* Video Address Latch */
@@ -1905,7 +1872,7 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 			else
 						answer |= 0x04;
 			/* huh... we need to emulate some other bits */
-			logerror("read status PC=%x val=%x\n", machine().device("maincpu")->safe_pc(), answer);
+			logerror("read status %s val=%x\n", machine().describe_context(), answer);
 
 			break;
 		}
@@ -1917,9 +1884,6 @@ READ16_MEMBER(lisa_state::lisa_IO_r)
 
 WRITE16_MEMBER(lisa_state::lisa_IO_w)
 {
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-	via6522_device *via_1 = machine().device<via6522_device>("via6522_1");
-
 	switch ((offset & 0x7000) >> 12)
 	{
 	case 0x0:
@@ -1967,12 +1931,12 @@ WRITE16_MEMBER(lisa_state::lisa_IO_w)
 
 			case 2: /* paralel port */
 				if (ACCESSING_BITS_0_7)
-					via_1->write(space, (offset >> 2) & 0xf, data & 0xff);
+					m_via1->write(space, (offset >> 2) & 0xf, data & 0xff);
 				break;
 
 			case 3: /* keyboard/mouse cops via */
 				if (ACCESSING_BITS_0_7)
-					via_0->write(space, offset & 0xf, data & 0xff);
+					m_via0->write(space, offset & 0xf, data & 0xff);
 				break;
 			}
 		}
@@ -1983,7 +1947,7 @@ WRITE16_MEMBER(lisa_state::lisa_IO_w)
 		switch ((offset & 0x0C00) >> 10)
 		{
 		case 0x0:   /* cpu board control */
-			cpu_board_control_access(machine(), offset & 0x03ff);
+			cpu_board_control_access(offset & 0x03ff);
 			break;
 
 		case 0x1:   /* Video Address Latch */

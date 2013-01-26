@@ -9,8 +9,14 @@
 #ifndef LISA_H_
 #define LISA_H_
 
+#include "emu.h"
 #include "machine/6522via.h"
 #include "machine/8530scc.h"
+#include "machine/6522via.h"
+#include "machine/applefdc.h"
+#include "devices/sonydriv.h"
+#include "cpu/m68000/m68000.h"
+#include "sound/speaker.h"
 
 #define COP421_TAG      "u9f"
 #define KB_COP421_TAG   "kbcop"
@@ -95,15 +101,46 @@ public:
 	lisa_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_via0(*this, "via6522_0"),
+		m_via1(*this, "via6522_1"),
+		m_fdc(*this, "fdc"),
 		m_scc(*this, "scc"),
+		m_speaker(*this, SPEAKER_TAG),
 		m_fdc_rom(*this,"fdc_rom"),
-		m_fdc_ram(*this,"fdc_ram") { }
+		m_fdc_ram(*this,"fdc_ram"),
+		m_io_line0(*this, "LINE0"),
+		m_io_line1(*this, "LINE1"),
+		m_io_line2(*this, "LINE2"),
+		m_io_line3(*this, "LINE3"),
+		m_io_line4(*this, "LINE4"),
+		m_io_line5(*this, "LINE5"),
+		m_io_line6(*this, "LINE6"),
+		m_io_line7(*this, "LINE7"),
+		m_io_mouse_x(*this, "MOUSE_X"),
+		m_io_mouse_y(*this, "MOUSE_Y")
+	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<legacy_cpu_device> m_maincpu;
+	required_device<via6522_device> m_via0;
+	required_device<via6522_device> m_via1;
+	optional_device<applefdc_base_device> m_fdc;
 	required_device<scc8530_t> m_scc;
+	required_device<speaker_sound_device> m_speaker;
 
 	required_shared_ptr<UINT8> m_fdc_rom;
 	required_shared_ptr<UINT8> m_fdc_ram;
+
+	required_ioport m_io_line0;
+	required_ioport m_io_line1;
+	required_ioport m_io_line2;
+	required_ioport m_io_line3;
+	required_ioport m_io_line4;
+	required_ioport m_io_line5;
+	required_ioport m_io_line6;
+	required_ioport m_io_line7;
+	required_ioport m_io_mouse_x;
+	required_ioport m_io_mouse_y;
+
 	UINT8 *m_ram_ptr;
 	UINT8 *m_rom_ptr;
 	UINT8 *m_videoROM_ptr;
@@ -174,6 +211,20 @@ public:
 	DECLARE_WRITE8_MEMBER(COPS_via_out_b);
 	DECLARE_WRITE8_MEMBER(COPS_via_out_cb2);
 	DECLARE_READ8_MEMBER(parallel_via_in_b);
+
+	void field_interrupts();
+	void set_parity_error_pending(int value);
+	void set_VTIR(int value);
+	void cpu_board_control_access(offs_t offset);
+	void init_COPS();
+	void reset_COPS();
+	void lisa_fdc_ttl_glue_access(offs_t offset);
+	void COPS_send_data_if_possible();
+	void COPS_queue_data(const UINT8 *data, int len);
+	void COPS_via_irq_func(int val);
+	void scan_keyboard();
+	void unplug_keyboard();
+	void plug_keyboard();
 };
 
 
