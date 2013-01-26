@@ -48,9 +48,10 @@ class ip20_state : public driver_device
 public:
 	ip20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_wd33c93(*this, "scsi:wd33c93"){ }
-
-	required_device<wd33c93_device> m_wd33c93;
+	m_wd33c93(*this, "scsi:wd33c93"),
+	m_scc(*this, "scc"),
+	m_eeprom(*this, "eeprom")
+	{ }
 
 	HPC_t m_HPC;
 	RTC_t m_RTC;
@@ -63,6 +64,9 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_ip204415(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(ip20_timer);
+	required_device<wd33c93_device> m_wd33c93;
+	required_device<scc8530_t> m_scc;
+	required_device<eeprom_device> m_eeprom;
 };
 
 
@@ -115,7 +119,6 @@ static const eeprom_interface eeprom_interface_93C56 =
 
 READ32_MEMBER(ip20_state::hpc_r)
 {
-	scc8530_t *scc;
 	offset <<= 2;
 	if( offset >= 0x0e00 && offset <= 0x0e7c )
 	{
@@ -156,7 +159,7 @@ READ32_MEMBER(ip20_state::hpc_r)
 		return m_HPC.nMiscStatus;
 	case 0x01bc:
 //      verboselog(machine, 2, "HPC CPU Serial EEPROM Read\n" );
-		return ( (machine().device<eeprom_device>("eeprom")->read_bit() << 4 ) );
+		return m_eeprom->read_bit() << 4;
 	case 0x01c4:
 		verboselog(machine(), 2, "HPC Local IO Register 0 Mask Read: %08x (%08x)\n", m_HPC.nLocalIOReg0Mask, mem_mask );
 		return m_HPC.nLocalIOReg0Mask;
@@ -172,21 +175,19 @@ READ32_MEMBER(ip20_state::hpc_r)
 	case 0x0d00:
 		verboselog(machine(), 2, "HPC DUART0 Channel B Control Read\n" );
 //      return 0x00000004;
-		return 0x7c; //scc->reg_r(space, 0);
+		return 0x7c; //m_scc->reg_r(space, 0);
 	case 0x0d04:
 		verboselog(machine(), 2, "HPC DUART0 Channel B Data Read\n" );
 //      return 0;
-		scc = machine().device<scc8530_t>("scc");
-		return scc->reg_r(space, 2);
+		return m_scc->reg_r(space, 2);
 	case 0x0d08:
 		verboselog(machine(), 2, "HPC DUART0 Channel A Control Read (%08x)\n", mem_mask  );
 //      return 0x40;
-		return 0x7c; //scc->reg_r(space, 1);
+		return 0x7c; //m_scc->reg_r(space, 1);
 	case 0x0d0c:
 		verboselog(machine(), 2, "HPC DUART0 Channel A Data Read\n" );
 //      return 0;
-		scc = machine().device<scc8530_t>("scc");
-		return scc->reg_r(space, 3);
+		return m_scc->reg_r(space, 3);
 	case 0x0d10:
 //      verboselog(machine, 2, "HPC DUART1 Channel B Control Read\n" );
 		return 0x00000004;
@@ -230,9 +231,6 @@ READ32_MEMBER(ip20_state::hpc_r)
 
 WRITE32_MEMBER(ip20_state::hpc_w)
 {
-	scc8530_t *scc;
-	eeprom_device *eeprom;
-	eeprom = machine().device<eeprom_device>("eeprom");
 	offset <<= 2;
 	if( offset >= 0x0e00 && offset <= 0x0e7c )
 	{
@@ -345,9 +343,9 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 		{
 			verboselog(machine(), 2, "    CPU board LED on\n" );
 		}
-		eeprom->write_bit((data & 0x00000008) ? 1 : 0 );
-		eeprom->set_cs_line((data & 0x00000002) ? ASSERT_LINE : CLEAR_LINE );
-		eeprom->set_clock_line((data & 0x00000004) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->write_bit((data & 0x00000008) ? 1 : 0 );
+		m_eeprom->set_cs_line((data & 0x00000002) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->set_clock_line((data & 0x00000004) ? CLEAR_LINE : ASSERT_LINE );
 		break;
 	case 0x01c4:
 		verboselog(machine(), 2, "HPC Local IO Register 0 Mask Write: %08x (%08x)\n", data, mem_mask );
@@ -367,23 +365,19 @@ WRITE32_MEMBER(ip20_state::hpc_w)
 		break;
 	case 0x0d00:
 		verboselog(machine(), 2, "HPC DUART0 Channel B Control Write: %08x (%08x)\n", data, mem_mask );
-		scc = machine().device<scc8530_t>("scc");
-		scc->reg_w(space, 0, data);
+		m_scc->reg_w(space, 0, data);
 		break;
 	case 0x0d04:
 		verboselog(machine(), 2, "HPC DUART0 Channel B Data Write: %08x (%08x)\n", data, mem_mask );
-		scc = machine().device<scc8530_t>("scc");
-		scc->reg_w(space, 2, data);
+		m_scc->reg_w(space, 2, data);
 		break;
 	case 0x0d08:
 		verboselog(machine(), 2, "HPC DUART0 Channel A Control Write: %08x (%08x)\n", data, mem_mask );
-		scc = machine().device<scc8530_t>("scc");
-		scc->reg_w(space, 1, data);
+		m_scc->reg_w(space, 1, data);
 		break;
 	case 0x0d0c:
 		verboselog(machine(), 2, "HPC DUART0 Channel A Data Write: %08x (%08x)\n", data, mem_mask );
-		scc = machine().device<scc8530_t>("scc");
-		scc->reg_w(space, 3, data);
+		m_scc->reg_w(space, 3, data);
 		break;
 	case 0x0d10:
 		if( ( data & 0x000000ff ) >= 0x00000020 )
