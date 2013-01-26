@@ -78,13 +78,13 @@ READ8_MEMBER(sym1_state::sym1_riot_a_r)
 	int data = 0x7f;
 
 	/* scan keypad rows */
-	if (!(m_riot_port_a & 0x80)) data &= machine().root_device().ioport("ROW-0")->read();
-	if (!(m_riot_port_b & 0x01)) data &= machine().root_device().ioport("ROW-1")->read();
-	if (!(m_riot_port_b & 0x02)) data &= machine().root_device().ioport("ROW-2")->read();
-	if (!(m_riot_port_b & 0x04)) data &= machine().root_device().ioport("ROW-3")->read();
+	if (!(m_riot_port_a & 0x80)) data &= m_row0->read();
+	if (!(m_riot_port_b & 0x01)) data &= m_row1->read();
+	if (!(m_riot_port_b & 0x02)) data &= m_row2->read();
+	if (!(m_riot_port_b & 0x04)) data &= m_row3->read();
 
 	/* determine column */
-	if ( ((m_riot_port_a ^ 0xff) & (ioport("ROW-0")->read() ^ 0xff)) & 0x7f )
+	if ( ((m_riot_port_a ^ 0xff) & (m_row0->read() ^ 0xff)) & 0x7f )
 		data &= ~0x80;
 
 	return data;
@@ -96,13 +96,13 @@ READ8_MEMBER(sym1_state::sym1_riot_b_r)
 	int data = 0xff;
 
 	/* determine column */
-	if ( ((m_riot_port_a ^ 0xff) & (machine().root_device().ioport("ROW-1")->read() ^ 0xff)) & 0x7f )
+	if ( ((m_riot_port_a ^ 0xff) & (m_row1->read() ^ 0xff)) & 0x7f )
 		data &= ~0x01;
 
-	if ( ((m_riot_port_a ^ 0xff) & (machine().root_device().ioport("ROW-2")->read() ^ 0xff)) & 0x3f )
+	if ( ((m_riot_port_a ^ 0xff) & (m_row2->read() ^ 0xff)) & 0x3f )
 		data &= ~0x02;
 
-	if ( ((m_riot_port_a ^ 0xff) & (ioport("ROW-3")->read() ^ 0xff)) & 0x1f )
+	if ( ((m_riot_port_a ^ 0xff) & (m_row3->read() ^ 0xff)) & 0x1f )
 		data &= ~0x04;
 
 	data &= ~0x80; // else hangs 8b02
@@ -113,7 +113,7 @@ READ8_MEMBER(sym1_state::sym1_riot_b_r)
 
 WRITE8_MEMBER(sym1_state::sym1_riot_a_w)
 {
-	logerror("%x: riot_a_w 0x%02x\n", machine().device("maincpu") ->safe_pc( ), data);
+	logerror("%x: riot_a_w 0x%02x\n", m_maincpu->pc(), data);
 
 	/* save for later use */
 	m_riot_port_a = data;
@@ -122,13 +122,13 @@ WRITE8_MEMBER(sym1_state::sym1_riot_a_w)
 
 WRITE8_MEMBER(sym1_state::sym1_riot_b_w)
 {
-	logerror("%x: riot_b_w 0x%02x\n", machine().device("maincpu") ->safe_pc( ), data);
+	logerror("%x: riot_b_w 0x%02x\n", m_maincpu->pc(), data);
 
 	/* save for later use */
 	m_riot_port_b = data;
 
 	/* first 4 pins are connected to the 74145 */
-	machine().device<ttl74145_device>("ttl74145")->write(data & 0x0f);
+	m_ttl74145->write(data & 0x0f);
 }
 
 
@@ -161,9 +161,9 @@ const ttl74145_interface sym1_ttl74145_intf =
 ******************************************************************************/
 
 
-static void sym1_irq(device_t *device, int level)
+WRITE_LINE_MEMBER(sym1_state::sym1_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, level);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, state);
 }
 
 
@@ -186,26 +186,26 @@ WRITE8_MEMBER(sym1_state::sym1_via0_b_w)
  */
 WRITE8_MEMBER(sym1_state::sym1_via2_a_w)
 {
-	address_space &cpu0space = machine().device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &cpu0space = m_maincpu->space( AS_PROGRAM );
 
 	logerror("SYM1 VIA2 W 0x%02x\n", data);
 
-	if ((machine().root_device().ioport("WP")->read() & 0x01) && !(data & 0x01)) {
+	if ((m_wp->read() & 0x01) && !(data & 0x01)) {
 		cpu0space.nop_write(0xa600, 0xa67f);
 	} else {
 		cpu0space.install_write_bank(0xa600, 0xa67f, "bank5");
 	}
-	if ((machine().root_device().ioport("WP")->read() & 0x02) && !(data & 0x02)) {
+	if ((m_wp->read() & 0x02) && !(data & 0x02)) {
 		cpu0space.nop_write(0x0400, 0x07ff);
 	} else {
 		cpu0space.install_write_bank(0x0400, 0x07ff, "bank2");
 	}
-	if ((machine().root_device().ioport("WP")->read() & 0x04) && !(data & 0x04)) {
+	if ((m_wp->read() & 0x04) && !(data & 0x04)) {
 		cpu0space.nop_write(0x0800, 0x0bff);
 	} else {
 		cpu0space.install_write_bank(0x0800, 0x0bff, "bank3");
 	}
-	if ((machine().root_device().ioport("WP")->read() & 0x08) && !(data & 0x08)) {
+	if ((m_wp->read() & 0x08) && !(data & 0x08)) {
 		cpu0space.nop_write(0x0c00, 0x0fff);
 	} else {
 		cpu0space.install_write_bank(0x0c00, 0x0fff, "bank4");
@@ -227,7 +227,7 @@ const via6522_interface sym1_via0 =
 	DEVCB_NULL,           /* VIA Port CB1 Output */
 	DEVCB_NULL,           /* VIA Port CA2 Output */
 	DEVCB_NULL,           /* VIA Port CB2 Output */
-	DEVCB_LINE(sym1_irq)        /* VIA IRQ Callback */
+	DEVCB_DRIVER_LINE_MEMBER(sym1_state,sym1_irq)        /* VIA IRQ Callback */
 };
 
 
@@ -245,7 +245,7 @@ const via6522_interface sym1_via1 =
 	DEVCB_NULL,           /* VIA Port CB1 Output */
 	DEVCB_NULL,           /* VIA Port CA2 Output */
 	DEVCB_NULL,           /* VIA Port CB2 Output */
-	DEVCB_LINE(sym1_irq)        /* VIA IRQ Callback */
+	DEVCB_DRIVER_LINE_MEMBER(sym1_state,sym1_irq)        /* VIA IRQ Callback */
 };
 
 
@@ -263,7 +263,7 @@ const via6522_interface sym1_via2 =
 	DEVCB_NULL,           /* VIA Port CB1 Output */
 	DEVCB_NULL,           /* VIA Port CA2 Output */
 	DEVCB_NULL,           /* VIA Port CB2 Output */
-	DEVCB_LINE(sym1_irq)        /* VIA IRQ Callback */
+	DEVCB_DRIVER_LINE_MEMBER(sym1_state,sym1_irq)        /* VIA IRQ Callback */
 };
 
 
@@ -276,10 +276,9 @@ const via6522_interface sym1_via2 =
 DRIVER_INIT_MEMBER(sym1_state,sym1)
 {
 	/* wipe expansion memory banks that are not installed */
-	if (machine().device<ram_device>(RAM_TAG)->size() < 4*1024)
+	if (m_ram->size() < 4*1024)
 	{
-		machine().device( "maincpu")->memory().space( AS_PROGRAM ).nop_readwrite(
-			machine().device<ram_device>(RAM_TAG)->size(), 0x0fff);
+		m_maincpu->space(AS_PROGRAM).nop_readwrite(m_ram->size(), 0x0fff);
 	}
 
 	/* allocate a timer to refresh the led display */
@@ -291,8 +290,8 @@ void sym1_state::machine_reset()
 {
 	/* make 0xf800 to 0xffff point to the last half of the monitor ROM
 	   so that the CPU can find its reset vectors */
-	machine().device( "maincpu")->memory().space( AS_PROGRAM ).install_read_bank(0xf800, 0xffff, "bank1");
-	machine().device( "maincpu")->memory().space( AS_PROGRAM ).nop_write(0xf800, 0xffff);
+	m_maincpu->space( AS_PROGRAM ).install_read_bank(0xf800, 0xffff, "bank1");
+	m_maincpu->space( AS_PROGRAM ).nop_write(0xf800, 0xffff);
 	membank("bank1")->set_base(m_monitor + 0x800);
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
