@@ -69,8 +69,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_post_load() { }
-	virtual void device_clock_changed() { }
 
 	// internal callbacks
 	TIMER_CALLBACK_MEMBER( audio_sample_trigger );
@@ -118,7 +116,6 @@ private:
 	UINT32 increment_cdda_sector_bcd(UINT32 bcd);
 	void decode_audio_sector(const UINT8 *xa, INT32 triggered);
 };
-
 
 // device type definition
 extern const device_type MACHINE_CDICDIC;

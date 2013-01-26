@@ -28,7 +28,8 @@ public:
 		m_slave(*this, "slave"),
 		m_scc(*this, "scc68070"),
 		m_cdic(*this, "cdic"),
-		m_cdda(*this, "cdda"){ }
+		m_cdda(*this, "cdda"),
+		m_mcd212(*this, "mcd212"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT16> m_planea;
@@ -42,6 +43,7 @@ public:
 	required_device<cdi68070_device> m_scc;
 	required_device<cdicdic_device> m_cdic;
 	required_device<cdda_device> m_cdda;
+	required_device<mcd212_device> m_mcd212;
 
 	dmadac_sound_device *m_dmadac[2];
 
@@ -50,8 +52,6 @@ public:
 	UINT8 m_timer_set;
 	emu_timer *m_test_timer;
 	bitmap_rgb32 m_lcdbitmap;
-	mcd212_regs_t m_mcd212_regs;
-	mcd212_ab_t m_mcd212_ab;
 	DECLARE_INPUT_CHANGED_MEMBER(mcu_input);
 	virtual void machine_start();
 	virtual void video_start();

@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
 	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
 	AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8_LEGACY("mk48t08", timekeeper_r, timekeeper_w, 0xff00)    /* nvram (only low bytes used) */
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE_LEGACY(mcd212_r, mcd212_w)
+	AM_RANGE(0x004fffe0, 0x004fffff) AM_DEVREADWRITE("mcd212", mcd212_device, regs_r, regs_w)
 	//AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
 	AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
 	//AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
@@ -325,6 +325,7 @@ static MACHINE_CONFIG_START( cdi, cdi_state )
 	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
 	MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
 
+	MCFG_MCD212_ADD("mcd212")
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))

@@ -24,55 +24,6 @@ TODO:
 
 #include "emu.h"
 
-struct mcd212_channel_t
-{
-	UINT8 csrr;
-	UINT16 csrw;
-	UINT16 dcr;
-	UINT16 vsr;
-	UINT16 ddr;
-	UINT16 dcp;
-	UINT32 dca;
-	UINT8 clut_r[256];
-	UINT8 clut_g[256];
-	UINT8 clut_b[256];
-	UINT32 image_coding_method;
-	UINT32 transparency_control;
-	UINT32 plane_order;
-	UINT32 clut_bank;
-	UINT32 transparent_color_a;
-	UINT32 reserved0;
-	UINT32 transparent_color_b;
-	UINT32 mask_color_a;
-	UINT32 reserved1;
-	UINT32 mask_color_b;
-	UINT32 dyuv_abs_start_a;
-	UINT32 dyuv_abs_start_b;
-	UINT32 reserved2;
-	UINT32 cursor_position;
-	UINT32 cursor_control;
-	UINT32 cursor_pattern[16];
-	UINT32 region_control[8];
-	UINT32 backdrop_color;
-	UINT32 mosaic_hold_a;
-	UINT32 mosaic_hold_b;
-	UINT8 weight_factor_a[768];
-	UINT8 weight_factor_b[768];
-};
-
-struct mcd212_regs_t
-{
-	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
-
-	mcd212_channel_t channel[2];
-	emu_timer *scan_timer;
-	UINT8 region_flag_0[768];
-	UINT8 region_flag_1[768];
-
-	running_machine *m_machine;
-	bitmap_rgb32 m_bitmap;
-};
-
 #define MCD212_CURCNT_COLOR         0x00000f    // Cursor color
 #define MCD212_CURCNT_CUW           0x008000    // Cursor width
 #define MCD212_CURCNT_COF           0x070000    // Cursor off time
@@ -155,41 +106,145 @@ typedef INT16 SWORD68K;
 
 #define BYTE68K_MAX 255
 
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_MCD212_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MACHINE_MCD212, 0)
+#define MCFG_MCD212_REPLACE(_tag) \
+	MCFG_DEVICE_REPLACE(_tag, MACHINE_MCD212, 0)
 
 
-struct mcd212_ab_t
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> mcd212_device
+
+class mcd212_device : public device_t
 {
-	//* Color limit array.
-	BYTE68K limit[3 * BYTE68K_MAX];
+public:
+	// construction/destruction
+	mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	//* Color clamp array.
-	BYTE68K clamp[3 * BYTE68K_MAX];
+	// device members
+	DECLARE_READ16_MEMBER( regs_r );
+	DECLARE_WRITE16_MEMBER( regs_w );
+	TIMER_CALLBACK_MEMBER( perform_scan );
 
-	//* U-to-B matrix array.
-	SWORD68K matrixUB[BYTE68K_MAX + 1];
+	void ab_init();
 
-	//* U-to-G matrix array.
-	SWORD68K matrixUG[BYTE68K_MAX + 1];
+	bitmap_rgb32& get_bitmap() { return m_bitmap; }
 
-	//* V-to-G matrix array.
-	SWORD68K matrixVG[BYTE68K_MAX + 1];
+	struct channel_t
+	{
+		UINT8 csrr;
+		UINT16 csrw;
+		UINT16 dcr;
+		UINT16 vsr;
+		UINT16 ddr;
+		UINT16 dcp;
+		UINT32 dca;
+		UINT8 clut_r[256];
+		UINT8 clut_g[256];
+		UINT8 clut_b[256];
+		UINT32 image_coding_method;
+		UINT32 transparency_control;
+		UINT32 plane_order;
+		UINT32 clut_bank;
+		UINT32 transparent_color_a;
+		UINT32 reserved0;
+		UINT32 transparent_color_b;
+		UINT32 mask_color_a;
+		UINT32 reserved1;
+		UINT32 mask_color_b;
+		UINT32 dyuv_abs_start_a;
+		UINT32 dyuv_abs_start_b;
+		UINT32 reserved2;
+		UINT32 cursor_position;
+		UINT32 cursor_control;
+		UINT32 cursor_pattern[16];
+		UINT32 region_control[8];
+		UINT32 backdrop_color;
+		UINT32 mosaic_hold_a;
+		UINT32 mosaic_hold_b;
+		UINT8 weight_factor_a[768];
+		UINT8 weight_factor_b[768];
+	};
 
-	//* V-to-R matrix array.
-	SWORD68K matrixVR[BYTE68K_MAX + 1];
+	struct ab_t
+	{
+		//* Color limit array.
+		BYTE68K limit[3 * BYTE68K_MAX];
 
-	//* Delta-Y decoding array.
-	BYTE68K deltaY[BYTE68K_MAX + 1];
+		//* Color clamp array.
+		BYTE68K clamp[3 * BYTE68K_MAX];
 
-	//* Delta-U/V decoding array.
-	BYTE68K deltaUV[BYTE68K_MAX + 1];
+		//* U-to-B matrix array.
+		SWORD68K matrixUB[BYTE68K_MAX + 1];
+
+		//* U-to-G matrix array.
+		SWORD68K matrixUG[BYTE68K_MAX + 1];
+
+		//* V-to-G matrix array.
+		SWORD68K matrixVG[BYTE68K_MAX + 1];
+
+		//* V-to-R matrix array.
+		SWORD68K matrixVR[BYTE68K_MAX + 1];
+
+		//* Delta-Y decoding array.
+		BYTE68K deltaY[BYTE68K_MAX + 1];
+
+		//* Delta-U/V decoding array.
+		BYTE68K deltaUV[BYTE68K_MAX + 1];
+	};
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
+	// internal state
+	channel_t m_channel[2];
+	emu_timer *m_scan_timer;
+	UINT8 m_region_flag_0[768];
+	UINT8 m_region_flag_1[768];
+
+	bitmap_rgb32 m_bitmap;
+
+	static const UINT32 s_4bpp_color[16];
+
+	ab_t m_ab;
+
+	void update_region_arrays();
+
+	void set_vsr(int channel, UINT32 value);
+	UINT32 get_vsr(int channel);
+
+	void set_dcp(int channel, UINT32 value);
+	UINT32 get_dcp(int channel);
+
+	void set_display_parameters(int channel, UINT8 value);
+	void update_visible_area();
+	UINT32 get_screen_width();
+
+	void process_ica(int channel);
+	void process_dca(int channel);
+	void process_vsr(int channel, UINT8 *pixels_r, UINT8 *pixels_g, UINT8 *pixels_b);
+
+	void set_register(int channel, UINT8 reg, UINT32 value);
+
+	void mix_lines(UINT8 *plane_a_r, UINT8 *plane_a_g, UINT8 *plane_a_b, UINT8 *plane_b_r, UINT8 *plane_b_g, UINT8 *plane_b_b, UINT32 *out);
+
+	void draw_cursor(UINT32 *scanline, int y);
+	void draw_scanline(int y);
+
+	void draw_lcd(int y);
 };
 
-// Member functions
-DECLARE_READ16_HANDLER( mcd212_r );
-DECLARE_WRITE16_HANDLER( mcd212_w );
-TIMER_CALLBACK( mcd212_perform_scan );
-VIDEO_START( cdimono1 );
-SCREEN_UPDATE_RGB32( cdimono1 );
-SCREEN_UPDATE_RGB32( cdimono1_lcd );
+// device type definition
+extern const device_type MACHINE_MCD212;
 
 #endif // _VIDEO_MCD212_H_
