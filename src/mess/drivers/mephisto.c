@@ -72,9 +72,25 @@ class mephisto_state : public mboard_state
 {
 public:
 	mephisto_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mboard_state(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_beep(*this, BEEPER_TAG)
+		: mboard_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_beep(*this, BEEPER_TAG)
+		, m_key1_0(*this, "KEY1_0")
+		, m_key1_1(*this, "KEY1_1")
+		, m_key1_2(*this, "KEY1_2")
+		, m_key1_3(*this, "KEY1_3")
+		, m_key1_4(*this, "KEY1_4")
+		, m_key1_5(*this, "KEY1_5")
+		, m_key1_6(*this, "KEY1_6")
+		, m_key1_7(*this, "KEY1_7")
+		, m_key2_0(*this, "KEY2_0")
+		, m_key2_1(*this, "KEY2_1")
+		, m_key2_2(*this, "KEY2_2")
+		, m_key2_3(*this, "KEY2_3")
+		, m_key2_4(*this, "KEY2_4")
+		, m_key2_5(*this, "KEY2_5")
+		, m_key2_6(*this, "KEY2_6")
+		, m_key2_7(*this, "KEY2_7")
 	{ }
 
 	required_device<m65c02_device> m_maincpu;
@@ -96,6 +112,24 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi_r5);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_irq);
+
+protected:
+	required_ioport m_key1_0;
+	required_ioport m_key1_1;
+	required_ioport m_key1_2;
+	required_ioport m_key1_3;
+	required_ioport m_key1_4;
+	required_ioport m_key1_5;
+	required_ioport m_key1_6;
+	required_ioport m_key1_7;
+	required_ioport m_key2_0;
+	required_ioport m_key2_1;
+	required_ioport m_key2_2;
+	required_ioport m_key2_3;
+	required_ioport m_key2_4;
+	required_ioport m_key2_5;
+	required_ioport m_key2_6;
+	required_ioport m_key2_7;
 };
 
 
@@ -115,19 +149,38 @@ WRITE8_MEMBER( mephisto_state::mephisto_NMI )
 
 READ8_MEMBER( mephisto_state::read_keys )
 {
-	UINT8 data;
-	static const char *const keynames[2][8] =
-			{
-				{ "KEY1_0", "KEY1_1", "KEY1_2", "KEY1_3", "KEY1_4", "KEY1_5", "KEY1_6", "KEY1_7" },
-				{ "KEY2_0", "KEY2_1", "KEY2_2", "KEY2_3", "KEY2_4", "KEY2_5", "KEY2_6", "KEY2_7" }
-			};
+	UINT8 data = 0;
 
 	if (((m_led_status & 0x80) == 0x00))
-		data=ioport(keynames[0][offset])->read();
+	{
+		switch ( offset )
+		{
+			case 0: data = m_key1_0->read(); break;
+			case 1: data = m_key1_1->read(); break;
+			case 2: data = m_key1_2->read(); break;
+			case 3: data = m_key1_3->read(); break;
+			case 4: data = m_key1_4->read(); break;
+			case 5: data = m_key1_5->read(); break;
+			case 6: data = m_key1_6->read(); break;
+			case 7: data = m_key1_7->read(); break;
+		}
+	}
 	else
-		data=ioport(keynames[1][offset])->read();
+	{
+		switch ( offset )
+		{
+			case 0: data = m_key2_0->read(); break;
+			case 1: data = m_key2_1->read(); break;
+			case 2: data = m_key2_2->read(); break;
+			case 3: data = m_key2_3->read(); break;
+			case 4: data = m_key2_4->read(); break;
+			case 5: data = m_key2_5->read(); break;
+			case 6: data = m_key2_6->read(); break;
+			case 7: data = m_key2_7->read(); break;
+		}
+	}
 
-	logerror("Keyboard Port = %s Data = %d\n  ", ((m_led_status & 0x80) == 0x00) ? keynames[0][offset] : keynames[1][offset], data);
+	logerror("Keyboard Port = %d-%d Data = %d\n  ", ((m_led_status & 0x80) == 0x00) ? 0 : 1, offset, data);
 	return data | 0x7f;
 }
 
@@ -338,22 +391,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi)
 	if (m_allowNMI)
 	{
 		m_allowNMI = 0;
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	}
 	beep_set_state(m_beep, m_led_status&64?1:0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi_r5)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	beep_set_state(m_beep, m_led_status&64?1:0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_irq)//only mm2
 {
 	// That will not work
-	machine().device("maincpu")->execute().set_input_line(M65C02_IRQ_LINE, ASSERT_LINE);
-	machine().device("maincpu")->execute().set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M65C02_IRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
 
 	beep_set_state(m_beep, m_led_status&64?1:0);
 }
