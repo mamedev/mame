@@ -17,9 +17,12 @@ class bob85_state : public driver_device
 {
 public:
 	bob85_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_cass(*this, CASSETTE_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, CASSETTE_TAG)
+		, m_line0(*this, "LINE0")
+		, m_line1(*this, "LINE1")
+		, m_line2(*this, "LINE2")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -31,6 +34,11 @@ public:
 	UINT8 m_prev_key;
 	UINT8 m_count_key;
 	virtual void machine_reset();
+
+protected:
+	required_ioport m_line0;
+	required_ioport m_line1;
+	required_ioport m_line2;
 };
 
 
@@ -38,9 +46,9 @@ public:
 READ8_MEMBER(bob85_state::bob85_keyboard_r)
 {
 	UINT8 retVal = 0;
-	UINT8 line0 = ioport("LINE0")->read();
-	UINT8 line1 = ioport("LINE1")->read();
-	UINT8 line2 = ioport("LINE2")->read();
+	UINT8 line0 = m_line0->read();
+	UINT8 line1 = m_line1->read();
+	UINT8 line2 = m_line2->read();
 
 	if (line0)
 	{
@@ -183,7 +191,7 @@ WRITE_LINE_MEMBER( bob85_state::sod_w )
 
 READ_LINE_MEMBER( bob85_state::sid_r )
 {
-	return (m_cass)->input() > 0.0;
+	return m_cass->input() > 0.0;
 }
 
 static I8085_CONFIG( cpu_config )
