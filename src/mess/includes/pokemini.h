@@ -48,10 +48,13 @@ class pokemini_state : public driver_device
 {
 public:
 	pokemini_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
-	,
-		m_p_ram(*this, "p_ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_p_ram(*this, "p_ram")
+		, m_speaker(*this, SPEAKER_TAG)
+		, m_i2cmem(*this, "i2cmem")
+		, m_inputs(*this, "INPUTS")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT8> m_p_ram;
@@ -75,6 +78,14 @@ public:
 	TIMER_CALLBACK_MEMBER(pokemini_prc_counter_callback);
 	DECLARE_WRITE8_MEMBER(pokemini_hwreg_w);
 	DECLARE_READ8_MEMBER(pokemini_hwreg_r);
+
+protected:
+	required_device<speaker_sound_device> m_speaker;
+	required_device<i2cmem_device> m_i2cmem;
+	required_ioport m_inputs;
+
+	void pokemini_check_irqs();
+	void pokemini_update_sound();
 };
 
 
