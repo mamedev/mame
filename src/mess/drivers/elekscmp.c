@@ -31,11 +31,24 @@ class elekscmp_state : public driver_device
 {
 public:
 	elekscmp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_x0(*this, "X0")
+		, m_x1(*this, "X1")
+		, m_x2(*this, "X2")
+		, m_x3(*this, "X3")
+	{ }
 
 	DECLARE_READ8_MEMBER(keyboard_r);
 	DECLARE_WRITE8_MEMBER(hex_display_w);
 	UINT8 convert_key(UINT8 data);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_ioport m_x0;
+	required_ioport m_x1;
+	required_ioport m_x2;
+	required_ioport m_x3;
 };
 
 
@@ -58,25 +71,25 @@ READ8_MEMBER(elekscmp_state::keyboard_r)
 {
 	UINT8 data;
 
-	data = ioport("X0")->read();
+	data = m_x0->read();
 
 	if (data)
 		return 0x80 | convert_key(data);
 
-	data = ioport("X1")->read();
+	data = m_x1->read();
 
 	if (data)
 		return 0x88 | convert_key(data);
 
-	data = ioport("X2")->read();
+	data = m_x2->read();
 
 	if (data)
 		return 0x80 | (convert_key(data) << 4);
 
-	data = ioport("X3")->read();
+	data = m_x3->read();
 
 	if (data)
-		machine().device("maincpu")->reset();
+		m_maincpu->reset();
 
 	return 0;
 }
