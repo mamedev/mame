@@ -95,13 +95,15 @@ class ip22_state : public driver_device
 public:
 	ip22_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_wd33c93(*this, "scsi:wd33c93"),
-		m_unkpbus0(*this, "unkpbus0"),
-		m_mainram(*this, "mainram") { }
+	m_maincpu(*this, "maincpu"),
+	m_wd33c93(*this, "scsi:wd33c93"),
+	m_unkpbus0(*this, "unkpbus0"),
+	m_mainram(*this, "mainram"),
+	m_lpt0(*this, "lpt_0"),
+	m_pit(*this, "pit8254"),
+	m_dac(*this, "dac")
+	{ }
 
-	required_device<wd33c93_device> m_wd33c93;
-	required_shared_ptr<UINT32> m_unkpbus0;
-	required_shared_ptr<UINT32> m_mainram;
 	RTC_t m_RTC;
 	UINT32 m_int3_regs[64];
 	UINT32 m_nIOC_ParReadCnt;
@@ -134,6 +136,13 @@ public:
 	INTERRUPT_GEN_MEMBER(ip22_vbl);
 	TIMER_CALLBACK_MEMBER(ip22_dma);
 	TIMER_CALLBACK_MEMBER(ip22_timer);
+	required_device<cpu_device> m_maincpu;
+	required_device<wd33c93_device> m_wd33c93;
+	required_shared_ptr<UINT32> m_unkpbus0;
+	required_shared_ptr<UINT32> m_mainram;
+	required_device<device_t> m_lpt0;
+	required_device<pit8254_device> m_pit;
+	required_device<dac_device> m_dac;
 };
 
 
@@ -208,9 +217,7 @@ static void int3_raise_local0_irq(running_machine &machine, UINT8 source_mask)
 
 	// if it's not masked, also assert it now at the CPU
 	if (state->m_int3_regs[1] & source_mask)
-	{
-		machine.device("maincpu")->execute().set_input_line(MIPS3_IRQ0, ASSERT_LINE);
-	}
+		state->m_maincpu->set_input_line(MIPS3_IRQ0, ASSERT_LINE);
 }
 
 // lower a local0 interrupt
@@ -229,9 +236,7 @@ static void int3_raise_local1_irq(running_machine &machine, UINT8 source_mask)
 
 	// if it's not masked, also assert it now at the CPU
 	if (state->m_int3_regs[2] & source_mask)
-	{
-		machine.device("maincpu")->execute().set_input_line(MIPS3_IRQ1, ASSERT_LINE);
-	}
+		state->m_maincpu->set_input_line(MIPS3_IRQ1, ASSERT_LINE);
 }
 
 // lower a local1 interrupt
@@ -244,16 +249,15 @@ static void int3_lower_local1_irq(UINT8 source_mask)
 
 READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 {
-	device_t *lpt = machine().device("lpt_0");
 	UINT8 ret8;
 	switch( offset )
 	{
 	case 0x004/4:
-		ret8 = pc_lpt_control_r(lpt, space, 0) ^ 0x0d;
+		ret8 = pc_lpt_control_r(m_lpt0, space, 0) ^ 0x0d;
 		//verboselog(( machine, 0, "Parallel Control Read: %02x\n", ret8 );
 		return ret8;
 	case 0x008/4:
-		ret8 = pc_lpt_status_r(lpt, space, 0) ^ 0x80;
+		ret8 = pc_lpt_status_r(m_lpt0, space, 0) ^ 0x80;
 		//verboselog(( machine, 0, "Parallel Status Read: %02x\n", ret8 );
 		return ret8;
 	case 0x030/4:
@@ -293,19 +297,19 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 //      mame_printf_info("INT3: r @ %x mask %08x (PC=%x)\n", offset*4, mem_mask, activecpu_get_pc());
 		return m_int3_regs[offset-0x80/4];
 	case 0xb0/4:
-		ret8 = pit8253_r(machine().device("pit8254"), space, 0);
+		ret8 = pit8253_r(m_pit, space, 0);
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb4/4:
-		ret8 = pit8253_r(machine().device("pit8254"), space, 1);
+		ret8 = pit8253_r(m_pit, space, 1);
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb8/4:
-		ret8 = pit8253_r(machine().device("pit8254"), space, 2);
+		ret8 = pit8253_r(m_pit, space, 2);
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xbc/4:
-		ret8 = pit8253_r(machine().device("pit8254"), space, 3);
+		ret8 = pit8253_r(m_pit, space, 3);
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	default:
@@ -317,14 +321,13 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 
 WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 {
-	device_t *lpt = machine().device("lpt_0");
 	char cChar;
 
 	switch( offset )
 	{
 	case 0x004/4:
 		//verboselog(( machine, 0, "Parallel Control Write: %08x\n", data );
-		pc_lpt_control_w(lpt, space, 0, data ^ 0x0d);
+		pc_lpt_control_w(m_lpt0, space, 0, data ^ 0x0d);
 		//m_nIOC_ParCntl = data;
 		break;
 	case 0x030/4:
@@ -378,39 +381,32 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 
 		// if no local0 interrupts now, clear the input to the CPU
 		if ((m_int3_regs[0] & m_int3_regs[1]) == 0)
-		{
-			machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ0, CLEAR_LINE);
-		}
+			m_maincpu->set_input_line(MIPS3_IRQ0, CLEAR_LINE);
 		else
-		{
-			machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ0, ASSERT_LINE);
-		}
+			m_maincpu->set_input_line(MIPS3_IRQ0, ASSERT_LINE);
 
 		// if no local1 interrupts now, clear the input to the CPU
 		if ((m_int3_regs[2] & m_int3_regs[3]) == 0)
-		{
-			machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, CLEAR_LINE);
-		}
+			m_maincpu->set_input_line(MIPS3_IRQ1, CLEAR_LINE);
 		else
-		{
-			machine().device("maincpu")->execute().set_input_line(MIPS3_IRQ1, ASSERT_LINE);
-		}
+			m_maincpu->set_input_line(MIPS3_IRQ1, ASSERT_LINE);
+
 		break;
 	case 0xb0/4:
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(machine().device("pit8254"), space, 0, data & 0x000000ff);
+		pit8253_w(m_pit, space, 0, data & 0x000000ff);
 		return;
 	case 0xb4/4:
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(machine().device("pit8254"), space, 1, data & 0x000000ff);
+		pit8253_w(m_pit, space, 1, data & 0x000000ff);
 		return;
 	case 0xb8/4:
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(machine().device("pit8254"), space, 2, data & 0x000000ff);
+		pit8253_w(m_pit, space, 2, data & 0x000000ff);
 		return;
 	case 0xbc/4:
 		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(machine().device("pit8254"), space, 3, data & 0x000000ff);
+		pit8253_w(m_pit, space, 3, data & 0x000000ff);
 		return;
 	default:
 		//verboselog(( machine, 0, "Unknown HPC PBUS6 Write: 0x%08x: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), data, mem_mask );
@@ -418,14 +414,8 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 	}
 }
 
-//UINT32 nHPC3_hd0_register;
-//UINT32 nHPC3_hd0_regs[0x20];
-//UINT32 nHPC3_hd1_regs[0x20];
-
 READ32_MEMBER(ip22_state::hpc3_hd_enet_r)
 {
-	//running_machine &machine = machine();
-
 	switch( offset )
 	{
 	case 0x0004/4:
@@ -449,8 +439,6 @@ READ32_MEMBER(ip22_state::hpc3_hd_enet_r)
 
 WRITE32_MEMBER(ip22_state::hpc3_hd_enet_w)
 {
-	//running_machine &machine = machine();
-
 	switch( offset )
 	{
 	case 0x0004/4:
@@ -477,8 +465,6 @@ WRITE32_MEMBER(ip22_state::hpc3_hd_enet_w)
 
 READ32_MEMBER(ip22_state::hpc3_hd0_r)
 {
-	//running_machine &machine = machine();
-
 	switch( offset )
 	{
 	case 0x0000/4:
@@ -512,8 +498,6 @@ READ32_MEMBER(ip22_state::hpc3_hd0_r)
 
 WRITE32_MEMBER(ip22_state::hpc3_hd0_w)
 {
-	//running_machine &machine = machine();
-
 	switch( offset )
 	{
 	case 0x0000/4:
@@ -541,8 +525,6 @@ WRITE32_MEMBER(ip22_state::hpc3_hd0_w)
 
 READ32_MEMBER(ip22_state::hpc3_pbus4_r)
 {
-	//running_machine &machine = machine();
-
 	switch( offset )
 	{
 	case 0x0004/4:
@@ -563,8 +545,6 @@ READ32_MEMBER(ip22_state::hpc3_pbus4_r)
 
 WRITE32_MEMBER(ip22_state::hpc3_pbus4_w)
 {
-	//running_machine &machine = machine();
-
 	switch( offset )
 	{
 	case 0x0004/4:
@@ -621,8 +601,6 @@ READ32_MEMBER(ip22_state::rtc_r)
 {
 	ip22_state *state = machine().driver_data<ip22_state>();
 
-//  mame_printf_info("RTC_R: offset %x = %x (PC=%x)\n", offset, m_RTC.nRegs[offset], activecpu_get_pc());
-
 	if( offset <= 0x0d )
 	{
 		switch( offset )
@@ -674,14 +652,13 @@ READ32_MEMBER(ip22_state::rtc_r)
 			return 0;
 		}
 	}
+
 	if( offset >= 0x0e && offset < 0x40 )
-	{
 		return m_RTC.nRegs[offset];
-	}
+
 	if( offset >= 0x40 && offset < 0x80 && !( RTC_REGISTERA & 0x10 ) )
-	{
 		return m_RTC.nUserRAM[offset - 0x40];
-	}
+
 	if( offset >= 0x40 && offset < 0x80 && ( RTC_REGISTERA & 0x10 ) )
 	{
 		switch( offset )
@@ -743,16 +720,15 @@ READ32_MEMBER(ip22_state::rtc_r)
 			return 0;
 		}
 	}
+
 	if( offset >= 0x80 )
-	{
 		return m_RTC.nUserRAM[ offset - 0x80 ];
-	}
+
 	return 0;
 }
 
 WRITE32_MEMBER(ip22_state::rtc_w)
 {
-	//running_machine &machine = machine();
 	ip22_state *state = machine().driver_data<ip22_state>();
 	RTC_WRITECNT++;
 
@@ -928,8 +904,6 @@ WRITE32_MEMBER(ip22_state::ip22_write_ram)
 
 READ32_MEMBER(ip22_state::hal2_r)
 {
-	//running_machine &machine = machine();
-
 	switch( offset )
 	{
 	case 0x0010/4:
@@ -945,8 +919,6 @@ READ32_MEMBER(ip22_state::hal2_r)
 
 WRITE32_MEMBER(ip22_state::hal2_w)
 {
-	//running_machine &machine = machine();
-
 	switch( offset )
 	{
 	case 0x0010/4:
@@ -1084,7 +1056,7 @@ TIMER_CALLBACK_MEMBER(ip22_state::ip22_dma)
 		UINT16 temp16 = ( m_mainram[(m_PBUS_DMA.nCurPtr - 0x08000000)/4] & 0xffff0000 ) >> 16;
 		INT16 stemp16 = (INT16)((temp16 >> 8) | (temp16 << 8));
 
-		machine().device<dac_device>("dac")->write_signed16(stemp16 ^ 0x8000);
+		m_dac->write_signed16(stemp16 ^ 0x8000);
 
 		m_PBUS_DMA.nCurPtr += 4;
 
@@ -1238,7 +1210,7 @@ void ip22_state::machine_reset()
 
 	m_PBUS_DMA.nActive = 0;
 
-	mips3drc_set_options(machine().device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
+	mips3drc_set_options(state->m_maincpu, MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
 static void dump_chain(address_space &space, UINT32 ch_base)
@@ -1261,7 +1233,7 @@ static void dump_chain(address_space &space, UINT32 ch_base)
 static void scsi_irq(running_machine &machine, int state)
 {
 	ip22_state *drvstate = machine.driver_data<ip22_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = drvstate->m_maincpu->space(AS_PROGRAM);
 
 	if (state)
 	{
@@ -1508,8 +1480,10 @@ static void ip225015_exit(running_machine &machine)
 {
 }
 
-static int ip22_get_out2(running_machine &machine) {
-	return pit8253_get_output(machine.device("pit8254"), 2 );
+static int ip22_get_out2(running_machine &machine)
+{
+	ip22_state *state = machine.driver_data<ip22_state>();
+	return pit8253_get_output(state->m_pit, 2 );
 }
 
 void ip22_state::machine_start()
