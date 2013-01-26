@@ -2440,12 +2440,14 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<description>IBM COBOL Compiler v 1.00</description>
 		<year>1982</year>
 		<publisher>IBM</publisher>
-		<part name="compiler" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Compiler" />
 			<dataarea name="flop" size="163840">
 				<rom name="ibm cobol v 1.00 compiler.img" size="163840" crc="ef5629c4" sha1="95f997fc50ba7e629a8afbb70c6dc439ce8acf4f" offset="0" />
 			</dataarea>
 		</part>
-		<part name="library" interface="floppy_5_25">
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Library" />
 			<dataarea name="flop" size="163840">
 				<rom name="ibm cobol v 1.00 library.img" size="163840" crc="6987e3a7" sha1="ac6c78c3c55a0faac00e108f13df8574efae25f2" offset="0" />
 			</dataarea>
