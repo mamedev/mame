@@ -27,9 +27,28 @@ class supercon_state : public driver_device
 {
 public:
 	supercon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_beep(*this, BEEPER_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_beep(*this, BEEPER_TAG)
+		, m_b_white(*this, "B_WHITE")
+		, m_b_black(*this, "B_BLACK")
+		, m_b_clr(*this, "B_CLR")
+		, m_status_1(*this, "STATUS_1")
+		, m_status_2(*this, "STATUS_2")
+		, m_status_3(*this, "STATUS_3")
+		, m_status_4(*this, "STATUS_4")
+		, m_status_5(*this, "STATUS_5")
+		, m_status_6(*this, "STATUS_6")
+		, m_status_7(*this, "STATUS_7")
+		, m_status_8(*this, "STATUS_8")
+		, m_board_1(*this, "BOARD_1")
+		, m_board_2(*this, "BOARD_2")
+		, m_board_3(*this, "BOARD_3")
+		, m_board_4(*this, "BOARD_4")
+		, m_board_5(*this, "BOARD_5")
+		, m_board_6(*this, "BOARD_6")
+		, m_board_7(*this, "BOARD_7")
+		, m_board_8(*this, "BOARD_8")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -74,6 +93,30 @@ public:
 	TIMER_CALLBACK_MEMBER(mouse_click);
 	TIMER_CALLBACK_MEMBER(update_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(update_artwork);
+	void board_presave();
+	void board_postload();
+
+protected:
+	required_ioport m_b_white;
+	required_ioport m_b_black;
+	required_ioport m_b_clr;
+	required_ioport m_status_1;
+	required_ioport m_status_2;
+	required_ioport m_status_3;
+	required_ioport m_status_4;
+	required_ioport m_status_5;
+	required_ioport m_status_6;
+	required_ioport m_status_7;
+	required_ioport m_status_8;
+	required_ioport m_board_1;
+	required_ioport m_board_2;
+	required_ioport m_board_3;
+	required_ioport m_board_4;
+	required_ioport m_board_5;
+	required_ioport m_board_6;
+	required_ioport m_board_7;
+	required_ioport m_board_8;
+	void mouse_update();
 };
 
 
@@ -202,41 +245,40 @@ void supercon_state::update_leds()
 	}
 }
 
-static void mouse_update(running_machine &machine)
+void supercon_state::mouse_update()
 {
-	supercon_state *state = machine.driver_data<supercon_state>();
 	UINT8 port_input; // m_left;
 	int i;
 
 /* border pieces and moving piece */
 
-	port_input=machine.root_device().ioport("B_WHITE")->read();
+	port_input = m_b_white->read();
 	if (port_input)
 	{
-		i=get_first_bit(port_input);
-		state->m_moving_piece=state->m_border_pieces[i];
-		output_set_value("MOVING",state->m_moving_piece);
+		i = get_first_bit(port_input);
+		m_moving_piece = m_border_pieces[i];
+		output_set_value("MOVING", m_moving_piece);
 		return;
 	}
 
 
-	port_input=machine.root_device().ioport("B_BLACK")->read();
+	port_input = m_b_black->read();
 	if (port_input)
 	{
-		i=get_first_bit(port_input);
-		state->m_moving_piece=state->m_border_pieces[6+i];
-		output_set_value("MOVING",state->m_moving_piece);
+		i = get_first_bit(port_input);
+		m_moving_piece = m_border_pieces[6+i];
+		output_set_value("MOVING", m_moving_piece);
 		return;
 	}
 
 
-	port_input=machine.root_device().ioport("B_CLR")->read();
+	port_input = m_b_clr->read();
 	if (port_input)
 	{
-		if (state->m_moving_piece)
+		if (m_moving_piece)
 		{
-			state->m_moving_piece=0;
-			output_set_value("MOVING",state->m_moving_piece);
+			m_moving_piece=0;
+			output_set_value("MOVING", m_moving_piece);
 			return;
 		}
 	}
@@ -332,7 +374,17 @@ READ8_MEMBER( supercon_state::supercon_port3_r )
 	if (i==NOT_VALID)
 		return 0xff;
 
-	key_data=ioport(status_lines[i])->read();
+	switch ( i )
+	{
+		case 0: m_status_1->read(); break;
+		case 1: m_status_2->read(); break;
+		case 2: m_status_3->read(); break;
+		case 3: m_status_4->read(); break;
+		case 4: m_status_5->read(); break;
+		case 5: m_status_6->read(); break;
+		case 6: m_status_7->read(); break;
+		case 7: m_status_8->read(); break;
+	}
 
 	if (key_data != 0xc0)
 	{
@@ -388,7 +440,17 @@ READ8_MEMBER( supercon_state::supercon_port4_r )
 		output_set_value("MOVING",m_moving_piece);
 	}
 
-	key_data=ioport(board_lines[i_18])->read();
+	switch ( i_18 )
+	{
+		case 0: m_board_1->read(); break;
+		case 1: m_board_2->read(); break;
+		case 2: m_board_3->read(); break;
+		case 3: m_board_4->read(); break;
+		case 4: m_board_5->read(); break;
+		case 5: m_board_6->read(); break;
+		case 6: m_board_7->read(); break;
+		case 7: m_board_8->read(); break;
+	}
 
 	if (key_data != 0xff)
 	{
@@ -511,31 +573,33 @@ TIMER_CALLBACK_MEMBER(supercon_state::mouse_click)
 
 TIMER_DEVICE_CALLBACK_MEMBER(supercon_state::update_artwork)
 {
-	mouse_update(machine());
+	mouse_update();
 }
 
 TIMER_CALLBACK_MEMBER(supercon_state::update_irq)
 {
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 /* Save state call backs */
 
-static void board_presave(supercon_state *state)
+void supercon_state::board_presave()
 {
-	int i;
-	for (i=0;i<64;i++)
-		state->m_save_board[i]=state->m_board[i];
+	for (int i=0;i<64;i++)
+	{
+		m_save_board[i] = m_board[i];
+	}
 }
 
-static void board_postload(supercon_state *state)
+void supercon_state::board_postload()
 {
-	int i;
-	for (i=0;i<64;i++)
-		state->m_board[i]=state->m_save_board[i];
+	for (int i=0;i<64;i++)
+	{
+		m_board[i] = m_save_board[i];
+	}
 
-	state->set_pieces();
+	set_pieces();
 }
 
 void supercon_state::machine_start()
@@ -544,8 +608,8 @@ void supercon_state::machine_start()
 	m_timer_update_irq->adjust( attotime::zero, 0, attotime::from_hz(1000) );
 	m_timer_mouse_click =  machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(supercon_state::mouse_click),this),NULL);
 	save_item(NAME(m_save_board));
-	machine().save().register_postload(save_prepost_delegate(FUNC(board_postload),this));
-	machine().save().register_presave(save_prepost_delegate(FUNC(board_presave),this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(supercon_state::board_postload),this));
+	machine().save().register_presave(save_prepost_delegate(FUNC(supercon_state::board_presave),this));
 }
 
 void supercon_state::machine_reset()
