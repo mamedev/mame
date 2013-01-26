@@ -559,7 +559,7 @@ void mac_state::set_memory_overlay(int overlay)
 static int scan_keyboard(running_machine &machine)
 {
 	int i, j;
-	int keybuf;
+	int keybuf = 0;
 	int keycode;
 	mac_state *mac = machine.driver_data<mac_state>();
 
