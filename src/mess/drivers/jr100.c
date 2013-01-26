@@ -25,17 +25,32 @@ class jr100_state : public driver_device
 {
 public:
 	jr100_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_ram(*this, "ram"),
-		m_pcg(*this, "pcg"),
-		m_vram(*this, "vram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_ram(*this, "ram")
+		, m_pcg(*this, "pcg")
+		, m_vram(*this, "vram")
+		, m_via(*this, "via")
+		, m_cassette(*this, CASSETTE_TAG)
+		, m_beeper(*this, BEEPER_TAG)
+		, m_speaker(*this, SPEAKER_TAG)
+		, m_region_maincpu(*this, "maincpu")
+		, m_line0(*this, "LINE0")
+		, m_line1(*this, "LINE1")
+		, m_line2(*this, "LINE2")
+		, m_line3(*this, "LINE3")
+		, m_line4(*this, "LINE4")
+		, m_line5(*this, "LINE5")
+		, m_line6(*this, "LINE6")
+		, m_line7(*this, "LINE7")
+		, m_line8(*this, "LINE8")
+	{ }
 
 	required_shared_ptr<UINT8> m_ram;
 	required_shared_ptr<UINT8> m_pcg;
 	required_shared_ptr<UINT8> m_vram;
 	UINT8 m_keyboard_line;
 	bool m_use_pcg;
-	UINT8 m_speaker;
+	UINT8 m_speaker_data;
 	UINT16 m_t1latch;
 	UINT8 m_beep_en;
 	DECLARE_WRITE8_MEMBER(jr100_via_w);
@@ -48,6 +63,22 @@ public:
 	DECLARE_WRITE8_MEMBER(jr100_via_write_a);
 	DECLARE_WRITE8_MEMBER(jr100_via_write_b);
 	DECLARE_WRITE_LINE_MEMBER(jr100_via_write_cb2);
+
+protected:
+	required_device<via6522_device> m_via;
+	required_device<cassette_image_device> m_cassette;
+	required_device<device_t> m_beeper;
+	required_device<device_t> m_speaker;
+	required_memory_region m_region_maincpu;
+	required_ioport m_line0;
+	required_ioport m_line1;
+	required_ioport m_line2;
+	required_ioport m_line3;
+	required_ioport m_line4;
+	required_ioport m_line5;
+	required_ioport m_line6;
+	required_ioport m_line7;
+	required_ioport m_line8;
 };
 
 
@@ -62,7 +93,7 @@ WRITE8_MEMBER(jr100_state::jr100_via_w)
 		m_beep_en = ((data & 0xe0) == 0xe0);
 
 		if(!m_beep_en)
-			beep_set_state(machine().device(BEEPER_TAG),0);
+			beep_set_state(m_beeper,0);
 	}
 
 	/* T1L-L */
@@ -81,12 +112,11 @@ WRITE8_MEMBER(jr100_state::jr100_via_w)
 		/* writing here actually enables the beeper, if above masking condition is satisfied */
 		if(m_beep_en)
 		{
-			beep_set_state(machine().device(BEEPER_TAG),1);
-			beep_set_frequency(machine().device(BEEPER_TAG),894886.25 / (double)(m_t1latch) / 2.0);
+			beep_set_state(m_beeper,1);
+			beep_set_frequency(m_beeper,894886.25 / (double)(m_t1latch) / 2.0);
 		}
 	}
-	via6522_device *via = machine().device<via6522_device>("via");
-	via->write(space,offset,data);
+	m_via->write(space,offset,data);
 }
 
 static ADDRESS_MAP_START(jr100_mem, AS_PROGRAM, 8, jr100_state )
@@ -167,8 +197,8 @@ INPUT_PORTS_END
 
 void jr100_state::machine_start()
 {
-	beep_set_frequency(machine().device(BEEPER_TAG),0);
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	beep_set_frequency(m_beeper,0);
+	beep_set_state(m_beeper,0);
 }
 
 void jr100_state::machine_reset()
@@ -183,7 +213,7 @@ UINT32 jr100_state::screen_update_jr100(screen_device &screen, bitmap_ind16 &bit
 {
 	int x,y,xi,yi;
 
-	UINT8 *rom_pcg = memregion("maincpu")->base() + 0xe000;
+	UINT8 *rom_pcg = m_region_maincpu->base() + 0xe000;
 	for (y = 0; y < 24; y++)
 	{
 		for (x = 0; x < 32; x++)
@@ -226,17 +256,20 @@ static GFXDECODE_START( jr100 )
 	GFXDECODE_ENTRY( "maincpu", 0xe000, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
 
-static const char *const keynames[] = {
-	"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
-	"LINE8", NULL, NULL, NULL, NULL, NULL, NULL, NULL
-};
-
-
 READ8_MEMBER(jr100_state::jr100_via_read_b)
 {
 	UINT8 val = 0x1f;
-	if (keynames[m_keyboard_line]) {
-		val = ioport(keynames[m_keyboard_line])->read();
+	switch ( m_keyboard_line )
+	{
+		case 0: val = m_line0->read(); break;
+		case 1: val = m_line1->read(); break;
+		case 2: val = m_line2->read(); break;
+		case 3: val = m_line3->read(); break;
+		case 4: val = m_line4->read(); break;
+		case 5: val = m_line5->read(); break;
+		case 6: val = m_line6->read(); break;
+		case 7: val = m_line7->read(); break;
+		case 8: val = m_line8->read(); break;
 	}
 	return val;
 }
@@ -249,12 +282,12 @@ WRITE8_MEMBER(jr100_state::jr100_via_write_a)
 WRITE8_MEMBER(jr100_state::jr100_via_write_b)
 {
 	m_use_pcg = (data & 0x20) ? TRUE : FALSE;
-	m_speaker = data>>7;
+	m_speaker_data = data>>7;
 }
 
 WRITE_LINE_MEMBER(jr100_state::jr100_via_write_cb2)
 {
-	machine().device<cassette_image_device>(CASSETTE_TAG)->output(state ? -1.0 : +1.0);
+	m_cassette->output(state ? -1.0 : +1.0);
 }
 static const via6522_interface jr100_via_intf =
 {
@@ -283,21 +316,17 @@ static const cassette_interface jr100_cassette_interface =
 
 TIMER_DEVICE_CALLBACK_MEMBER(jr100_state::sound_tick)
 {
-	device_t *speaker = machine().device(SPEAKER_TAG);
-	speaker_level_w(speaker,m_speaker);
-	m_speaker = 0;
+	speaker_level_w(m_speaker,m_speaker_data);
+	m_speaker_data = 0;
 
-	via6522_device *via = machine().device<via6522_device>("via");
-	double level = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+	double level = (m_cassette->input());
 	if (level > 0.0) {
-		via->write_ca1(0);
-		via->write_cb1(0);
+		m_via->write_ca1(0);
+		m_via->write_cb1(0);
 	} else {
-		via->write_ca1(1);
-		via->write_cb1(1);
+		m_via->write_ca1(1);
+		m_via->write_cb1(1);
 	}
-
-
 }
 
 static UINT32 readByLittleEndian(UINT8 *buf,int pos)
