@@ -198,6 +198,17 @@ public:
 		m_ncr5380(*this, "scsi:ncr5380"),
 		m_mackbd(*this, MACKBD_TAG),
 		m_rtc(*this,"rtc"),
+		m_mouse0(*this, "MOUSE0"),
+		m_mouse1(*this, "MOUSE1"),
+		m_mouse2(*this, "MOUSE2"),
+		m_key0(*this, "KEY0"),
+		m_key1(*this, "KEY1"),
+		m_key2(*this, "KEY2"),
+		m_key3(*this, "KEY3"),
+		m_key4(*this, "KEY4"),
+		m_key5(*this, "KEY5"),
+		m_key6(*this, "KEY6"),
+		m_montype(*this, "MONTYPE"),
 		m_vram(*this,"vram"),
 		m_vram16(*this,"vram16")
 		{ }
@@ -216,6 +227,10 @@ public:
 	optional_device<ncr5380_device> m_ncr5380;
 	optional_device<mackbd_device> m_mackbd;
 	optional_device<rtc3430042_device> m_rtc;
+
+	required_ioport m_mouse0, m_mouse1, m_mouse2;
+	required_ioport m_key0, m_key1, m_key2, m_key3, m_key4, m_key5;
+	optional_ioport m_key6, m_montype;
 
 	virtual void machine_start();
 	virtual void machine_reset();

@@ -561,7 +561,6 @@ static int scan_keyboard(running_machine &machine)
 	int i, j;
 	int keybuf;
 	int keycode;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6" };
 	mac_state *mac = machine.driver_data<mac_state>();
 
 	if (mac->m_keycode_buf_index)
@@ -571,7 +570,30 @@ static int scan_keyboard(running_machine &machine)
 
 	for (i=0; i<7; i++)
 	{
-		keybuf = machine.root_device().ioport(keynames[i])->read();
+		switch (i)
+		{
+			case 0:
+				keybuf = mac->m_key0->read();
+				break;
+			case 1:
+				keybuf = mac->m_key1->read();
+				break;
+			case 2:
+				keybuf = mac->m_key2->read();
+				break;
+			case 3:
+				keybuf = mac->m_key3->read();
+				break;
+			case 4:
+				keybuf = mac->m_key4->read();
+				break;
+			case 5:
+				keybuf = mac->m_key5->read();
+				break;
+			case 6:
+				keybuf = mac->m_key6->read();
+				break;   
+		}
 
 		if (keybuf != mac->m_key_matrix[i])
 		{
@@ -839,8 +861,8 @@ void mac_state::mouse_callback()
 	int     x_needs_update = 0, y_needs_update = 0;
 	mac_state *mac = machine().driver_data<mac_state>();
 
-	new_mx = ioport("MOUSE1")->read();
-	new_my = ioport("MOUSE2")->read();
+	new_mx = m_mouse1->read();
+	new_my = m_mouse2->read();
 
 	/* see if it moved in the x coord */
 	if (new_mx != last_mx)
@@ -1353,7 +1375,7 @@ READ8_MEMBER(mac_state::mac_via_in_b)
 				val |= 0x20;
 			if (m_mouse_bit_x)  /* Mouse X2 */
 				val |= 0x10;
-			if ((machine().root_device().ioport("MOUSE0")->read() & 0x01) == 0)
+			if ((m_mouse0->read() & 0x01) == 0)
 				val |= 0x08;
 
 			if (!ADB_IS_PM_CLASS)
