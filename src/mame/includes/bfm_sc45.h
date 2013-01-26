@@ -20,8 +20,19 @@ public:
 			m_ymz(*this, "ymz"),
 			m_maincpu(*this, "maincpu"),
 			m_vfd0(*this, "vfd0"),
-			m_nvram(*this, "nvram")
-
+			m_nvram(*this, "nvram"),
+			m_io1(*this, "IN-0"),
+			m_io2(*this, "IN-1"),
+			m_io3(*this, "IN-2"),
+			m_io4(*this, "IN-3"),
+			m_io5(*this, "IN-4"),
+			m_io6(*this, "IN-5"),
+			m_io7(*this, "IN-6"),
+			m_io8(*this, "IN-7"),
+			m_io9(*this, "IN-8"),
+			m_io10(*this, "IN-9"),
+			m_io11(*this, "IN-A"),
+			m_io12(*this, "IN-B")
 	{
 		m_chk41addr = -1;
 		m_dochk41 = false;
@@ -59,6 +70,7 @@ public:
 
 	UINT16 m_mainram[0x10000/2];
 
+	UINT8 read_input_matrix(running_machine &machine, int row);
 
 	DECLARE_WRITE8_MEMBER(mux_output_w);
 	DECLARE_WRITE8_MEMBER(mux_output2_w);
@@ -484,6 +496,20 @@ public:
 
 	DECLARE_MACHINE_START(sc4);
 	DECLARE_MACHINE_RESET(sc4);
+
+protected:
+	required_ioport m_io1;
+	required_ioport m_io2;
+	required_ioport m_io3;
+	required_ioport m_io4;
+	required_ioport m_io5;
+	required_ioport m_io6;
+	required_ioport m_io7;
+	required_ioport m_io8;
+	required_ioport m_io9;
+	required_ioport m_io10;
+	required_ioport m_io11;
+	required_ioport m_io12;
 };
 
 class sc4_adder4_state : public sc4_state

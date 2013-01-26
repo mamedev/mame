@@ -42,18 +42,18 @@
 #include "sc4_dmd.lh"
 
 
-UINT8 read_input_matrix(running_machine &machine, int row)
+UINT8 sc4_state::read_input_matrix(running_machine &machine, int row)
 {
-	static const char *const portnames[16] = { "IN-0", "IN-1", "IN-2", "IN-3", "IN-4", "IN-5", "IN-6", "IN-7", "IN-8", "IN-9", "IN-A", "IN-B" };
+	ioport_port* portnames[16] = { m_io1, m_io2, m_io3, m_io4, m_io5, m_io6, m_io7, m_io8, m_io9, m_io10, m_io11, m_io12 };
 	UINT8 value;
 
 	if (row<4)
 	{
-		value = (machine.root_device().ioport(portnames[row])->read_safe(0x00) & 0x1f) + ((machine.root_device().ioport(portnames[row+8])->read_safe(0x00) & 0x07) << 5);
+		value = ((portnames[row])->read_safe(0x00) & 0x1f) + (((portnames[row+8])->read_safe(0x00) & 0x07) << 5);
 	}
 	else
 	{
-		value = (machine.root_device().ioport(portnames[row])->read_safe(0x00) & 0x1f) + ((machine.root_device().ioport(portnames[row+4])->read_safe(0x00) & 0x18) << 2);
+		value = ((portnames[row])->read_safe(0x00) & 0x1f) + (((portnames[row+4])->read_safe(0x00) & 0x18) << 2);
 	}
 
 	return value;
@@ -934,7 +934,7 @@ INPUT_PORTS_START( sc4_base )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 
 
-	PORT_START("IN-a")
+	PORT_START("IN-A")
 	PORT_DIPNAME( 0x01, 0x00, "IN-a:0" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -952,7 +952,7 @@ INPUT_PORTS_START( sc4_base )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 
 
-	PORT_START("IN-b")
+	PORT_START("IN-B")
 	PORT_DIPNAME( 0x01, 0x00, "IN-b:0" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
