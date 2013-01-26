@@ -72,6 +72,9 @@ for root, dirs, files in os.walk(inputPath):
 			f.close()
 			params = paramsstr.split(" ")
 			cmd = [chdmanBin, "createhd", "-f", "-o", tempFile] + params
+		elif d.startswith("copy"):
+			inFile += ".chd"
+			cmd = [chdmanBin, "copy", "-f", "-i", inFile, "-o", tempFile]
 		else:
 			print "unsupported mode"
 			continue

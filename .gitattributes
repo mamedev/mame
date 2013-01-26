@@ -8107,6 +8107,11 @@ src/osd/windows/winutil.c svneol=native#text/plain
 src/osd/windows/winutil.h svneol=native#text/plain
 src/osd/windows/winwork.c svneol=native#text/plain
 src/regtests/chdman/chdtest.py svneol=native#text/plain
+src/regtests/chdman/input/copy_cd_cue_audio_silence_wav_20_tracks_v4/in.chd -text
+src/regtests/chdman/input/copy_cd_cue_audio_silence_wav_v4/in.chd -text
+src/regtests/chdman/input/copy_cd_cue_empty_v4/in.chd -text
+src/regtests/chdman/input/copy_cd_nrg_empty_v4/in.chd -text
+src/regtests/chdman/input/copy_cd_toc_empty_v4/in.chd -text
 src/regtests/chdman/input/createcd_cue_audio_silence_wav/in.cue svneol=native#text/plain
 src/regtests/chdman/input/createcd_cue_audio_silence_wav/silence.wav -text
 src/regtests/chdman/input/createcd_cue_audio_silence_wav_20_tracks/in.cue svneol=native#text/plain
@@ -8118,6 +8123,11 @@ src/regtests/chdman/input/createcd_nrg_empty/in.nrg -text
 src/regtests/chdman/input/createcd_toc_empty/data.bin -text
 src/regtests/chdman/input/createcd_toc_empty/in.toc svneol=native#text/plain
 src/regtests/chdman/input/createhd_1/in.params svneol=native#text/plain
+src/regtests/chdman/output/copy_cd_cue_audio_silence_wav_20_tracks_v4/out.chd -text
+src/regtests/chdman/output/copy_cd_cue_audio_silence_wav_v4/out.chd -text
+src/regtests/chdman/output/copy_cd_cue_empty_v4/out.chd -text
+src/regtests/chdman/output/copy_cd_nrg_empty_v4/out.chd -text
+src/regtests/chdman/output/copy_cd_toc_empty_v4/out.chd -text
 src/regtests/chdman/output/createcd_cue_audio_silence_wav/out.chd -text
 src/regtests/chdman/output/createcd_cue_audio_silence_wav_20_tracks/out.chd -text
 src/regtests/chdman/output/createcd_cue_empty/out.chd -text
