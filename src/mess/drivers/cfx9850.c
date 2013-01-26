@@ -25,9 +25,22 @@ class cfx9850_state : public driver_device
 {
 public:
 	cfx9850_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_video_ram(*this, "video_ram"),
-		m_display_ram(*this, "display_ram") { }
+		: driver_device(mconfig, type, tag)
+		, m_video_ram(*this, "video_ram")
+		, m_display_ram(*this, "display_ram")
+		, m_ko1(*this, "KO1")
+		, m_ko2(*this, "KO2")
+		, m_ko3(*this, "KO3")
+		, m_ko4(*this, "KO4")
+		, m_ko5(*this, "KO5")
+		, m_ko6(*this, "KO6")
+		, m_ko7(*this, "KO7")
+		, m_ko8(*this, "KO8")
+		, m_ko9(*this, "KO9")
+		, m_ko10(*this, "KO10")
+		, m_ko11(*this, "KO11")
+		, m_ko12(*this, "KO12")
+	{ }
 
 	DECLARE_WRITE8_MEMBER(cfx9850_kol_w);
 	DECLARE_WRITE8_MEMBER(cfx9850_koh_w);
@@ -38,6 +51,20 @@ public:
 	UINT16 m_ko;                /* KO lines KO1 - KO14 */
 	virtual void palette_init();
 	UINT32 screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	required_ioport m_ko1;
+	required_ioport m_ko2;
+	required_ioport m_ko3;
+	required_ioport m_ko4;
+	required_ioport m_ko5;
+	required_ioport m_ko6;
+	required_ioport m_ko7;
+	required_ioport m_ko8;
+	required_ioport m_ko9;
+	required_ioport m_ko10;
+	required_ioport m_ko11;
+	required_ioport m_ko12;
 };
 
 
@@ -66,17 +93,20 @@ WRITE8_MEMBER( cfx9850_state::cfx9850_koh_w )
 
 READ8_MEMBER( cfx9850_state::cfx9850_ki_r )
 {
-	UINT8 i, data = 0;
-	char kbdrow[8];
+	UINT8 data = 0;
 
-	for (i = 0; i < 13; i++)
-	{
-		if (BIT(m_ko, i))
-		{
-			sprintf(kbdrow,"KO%d", i+1);
-			data |= ioport(kbdrow)->read();
-		}
-	}
+	if ( m_ko & ( 1 << 0 ) ) data |= m_ko1->read();
+	if ( m_ko & ( 1 << 1 ) ) data |= m_ko2->read();
+	if ( m_ko & ( 1 << 2 ) ) data |= m_ko3->read();
+	if ( m_ko & ( 1 << 3 ) ) data |= m_ko4->read();
+	if ( m_ko & ( 1 << 4 ) ) data |= m_ko5->read();
+	if ( m_ko & ( 1 << 5 ) ) data |= m_ko6->read();
+	if ( m_ko & ( 1 << 6 ) ) data |= m_ko7->read();
+	if ( m_ko & ( 1 << 7 ) ) data |= m_ko8->read();
+	if ( m_ko & ( 1 << 8 ) ) data |= m_ko9->read();
+	if ( m_ko & ( 1 << 9 ) ) data |= m_ko10->read();
+	if ( m_ko & ( 1 << 10 ) ) data |= m_ko11->read();
+	if ( m_ko & ( 1 << 11 ) ) data |= m_ko12->read();
 
 	return data;
 }
