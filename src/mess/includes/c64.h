@@ -6,7 +6,6 @@
 #include "emu.h"
 #include "cpu/m6502/m6510.h"
 #include "formats/cbm_snqk.h"
-#include "includes/cbm.h"
 #include "machine/c64exp.h"
 #include "machine/c64user.h"
 #include "machine/cbmiec.h"
@@ -49,7 +48,16 @@ public:
 			m_user(*this, C64_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-			m_special(*this, "SPECIAL"),
+			m_row0(*this, "ROW0"),
+			m_row1(*this, "ROW1"),
+			m_row2(*this, "ROW2"),
+			m_row3(*this, "ROW3"),
+			m_row4(*this, "ROW4"),
+			m_row5(*this, "ROW5"),
+			m_row6(*this, "ROW6"),
+			m_row7(*this, "ROW7"),
+			m_restore(*this, "RESTORE"),
+			m_lock(*this, "LOCK"),
 			m_loram(1),
 			m_hiram(1),
 			m_charen(1),
@@ -78,7 +86,16 @@ public:
 	required_device<c64_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
-	required_ioport m_special;
+	optional_ioport m_row0;
+	optional_ioport m_row1;
+	optional_ioport m_row2;
+	optional_ioport m_row3;
+	optional_ioport m_row4;
+	optional_ioport m_row5;
+	optional_ioport m_row6;
+	optional_ioport m_row7;
+	optional_ioport m_restore;
+	optional_ioport m_lock;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -91,7 +108,6 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	INTERRUPT_GEN_MEMBER( frame_interrupt );
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_READ8_MEMBER( vic_colorram_r );
 	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
@@ -181,6 +197,9 @@ public:
 
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
+
+	DECLARE_READ8_MEMBER( cia1_pa_r );
+	DECLARE_READ8_MEMBER( cia1_pb_r );
 };
 
 
