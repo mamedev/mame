@@ -7,10 +7,15 @@
 #ifndef EINSTEIN_H_
 #define EINSTEIN_H_
 
+#include "emu.h"
 #include "video/mc6845.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
+#include "video/tms9928a.h"
+#include "machine/ram.h"
+#include "machine/i8251.h"
+#include "machine/ctronics.h"
 
 /***************************************************************************
     CONSTANTS
@@ -43,13 +48,40 @@ class einstein_state : public driver_device
 {
 public:
 	einstein_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_fdc(*this, IC_I042)
-			{ }
+		: driver_device(mconfig, type, tag)
+		, m_fdc(*this, IC_I042)
+		, m_color_screen(*this, "screen")
+		, m_ctc(*this, IC_I058)
+		, m_tms9929a(*this, "tms9929a")
+		, m_region_gfx1(*this, "gfx1")
+		, m_mc6845(*this, "crtc")
+		, m_crtc_screen(*this, "80column")
+		, m_uart(*this, IC_I060)
+		, m_ram(*this, RAM_TAG)
+		, m_centronics(*this, "centronics")
+		, m_region_bios(*this, "bios")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_line0(*this, "LINE0")
+		, m_line1(*this, "LINE1")
+		, m_line2(*this, "LINE2")
+		, m_line3(*this, "LINE3")
+		, m_line4(*this, "LINE4")
+		, m_line5(*this, "LINE5")
+		, m_line6(*this, "LINE6")
+		, m_line7(*this, "LINE7")
+		, m_extra(*this, "EXTRA")
+		, m_buttons(*this, "BUTTONS")
+		, m_config(*this, "config")
+		, m_80column_dips(*this, "80column_dips")
+	{ }
 
 	required_device<wd1770_t> m_fdc;
-	device_t *m_color_screen;
-	z80ctc_device *m_ctc;
+	required_device<screen_device> m_color_screen;
+	required_device<z80ctc_device> m_ctc;
+	required_device<tms9929a_device> m_tms9929a;
+	optional_memory_region m_region_gfx1;
 
 	int m_rom_enabled;
 	int m_interrupt;
@@ -61,8 +93,8 @@ public:
 	UINT8 m_keyboard_data;
 
 	/* 80 column device */
-	mc6845_device *m_mc6845;
-	screen_device *m_crtc_screen;
+	optional_device<mc6845_device> m_mc6845;
+	optional_device<screen_device> m_crtc_screen;
 	UINT8 *m_crtc_ram;
 	UINT8   m_de;
 
@@ -88,6 +120,30 @@ public:
 	DECLARE_WRITE8_MEMBER(einstein_drsel_w);
 	DECLARE_WRITE_LINE_MEMBER(einstein_serial_transmit_clock);
 	DECLARE_WRITE_LINE_MEMBER(einstein_serial_receive_clock);
+
+protected:
+	required_device<i8251_device> m_uart;
+	required_device<ram_device> m_ram;
+	required_device<centronics_device> m_centronics;
+	required_memory_region m_region_bios;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	required_ioport m_line0;
+	required_ioport m_line1;
+	required_ioport m_line2;
+	required_ioport m_line3;
+	required_ioport m_line4;
+	required_ioport m_line5;
+	required_ioport m_line6;
+	required_ioport m_line7;
+	required_ioport m_extra;
+	required_ioport m_buttons;
+	required_ioport m_config;
+	optional_ioport m_80column_dips;
+
+	void einstein_scan_keyboard();
+	void einstein_page_rom();
 };
 
 

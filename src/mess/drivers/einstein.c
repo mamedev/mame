@@ -55,20 +55,13 @@
  ******************************************************************************/
 
 #include "emu.h"
-#include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 #include "machine/z80sio.h"
-#include "video/tms9928a.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
-#include "machine/wd_fdc.h"
 #include "formats/dsk_dsk.h"
-#include "machine/ctronics.h"
-#include "machine/i8251.h"
 #include "sound/ay8910.h"
-#include "video/mc6845.h"
 #include "rendlay.h"
-#include "machine/ram.h"
 #include "includes/einstein.h"
 
 #define VERBOSE_KEYBOARD    0
@@ -108,7 +101,7 @@ static MC6845_UPDATE_ROW( einstein_6845_update_row )
 {
 	einstein_state *einstein = device->machine().driver_data<einstein_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT8 *data = device->machine().root_device().memregion("gfx1")->base();
+	UINT8 *data = einstein->m_region_gfx1->base();
 	UINT8 char_code, data_byte;
 	int i, x;
 
@@ -143,7 +136,7 @@ READ8_MEMBER(einstein_state::einstein_80col_state_r)
 	UINT8 result = 0;
 
 	result |= m_de;
-	result |= ioport("80column_dips")->read() & 0x06;
+	result |= m_80column_dips->read() & 0x06;
 
 	return result;
 }
@@ -166,30 +159,29 @@ static const z80_daisy_config einstein_daisy_chain[] =
 ***************************************************************************/
 
 /* refresh keyboard data. It is refreshed when the keyboard line is written */
-static void einstein_scan_keyboard(running_machine &machine)
+void einstein_state::einstein_scan_keyboard()
 {
-	einstein_state *einstein = machine.driver_data<einstein_state>();
 	UINT8 data = 0xff;
 
-	if (!BIT(einstein->m_keyboard_line, 0)) data &= machine.root_device().ioport("LINE0")->read();
-	if (!BIT(einstein->m_keyboard_line, 1)) data &= machine.root_device().ioport("LINE1")->read();
-	if (!BIT(einstein->m_keyboard_line, 2)) data &= machine.root_device().ioport("LINE2")->read();
-	if (!BIT(einstein->m_keyboard_line, 3)) data &= machine.root_device().ioport("LINE3")->read();
-	if (!BIT(einstein->m_keyboard_line, 4)) data &= machine.root_device().ioport("LINE4")->read();
-	if (!BIT(einstein->m_keyboard_line, 5)) data &= machine.root_device().ioport("LINE5")->read();
-	if (!BIT(einstein->m_keyboard_line, 6)) data &= machine.root_device().ioport("LINE6")->read();
-	if (!BIT(einstein->m_keyboard_line, 7)) data &= machine.root_device().ioport("LINE7")->read();
+	if (!BIT(m_keyboard_line, 0)) data &= m_line0->read();
+	if (!BIT(m_keyboard_line, 1)) data &= m_line1->read();
+	if (!BIT(m_keyboard_line, 2)) data &= m_line2->read();
+	if (!BIT(m_keyboard_line, 3)) data &= m_line3->read();
+	if (!BIT(m_keyboard_line, 4)) data &= m_line4->read();
+	if (!BIT(m_keyboard_line, 5)) data &= m_line5->read();
+	if (!BIT(m_keyboard_line, 6)) data &= m_line6->read();
+	if (!BIT(m_keyboard_line, 7)) data &= m_line7->read();
 
-	einstein->m_keyboard_data = data;
+	m_keyboard_data = data;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_keyboard_timer_callback)
 {
 	/* re-scan keyboard */
-	einstein_scan_keyboard(machine());
+	einstein_scan_keyboard();
 
 	/* if /fire1 or /fire2 is 0, signal a fire interrupt */
-	if ((machine().root_device().ioport("BUTTONS")->read() & 0x03) != 0)
+	if ((m_buttons->read() & 0x03) != 0)
 	{
 		m_interrupt |= EINSTEIN_FIRE_INT;
 	}
@@ -210,13 +202,13 @@ WRITE8_MEMBER(einstein_state::einstein_keyboard_line_write)
 	m_keyboard_line = data;
 
 	/* re-scan the keyboard */
-	einstein_scan_keyboard(machine());
+	einstein_scan_keyboard();
 }
 
 READ8_MEMBER(einstein_state::einstein_keyboard_data_read)
 {
 	/* re-scan the keyboard */
-	einstein_scan_keyboard(machine());
+	einstein_scan_keyboard();
 
 	if (VERBOSE_KEYBOARD)
 		logerror("einstein_keyboard_data_read: %02x\n", m_keyboard_data);
@@ -246,7 +238,7 @@ WRITE8_MEMBER(einstein_state::einstein_drsel_w)
 	}
 
 	/* double sided drive connected? */
-	if (machine().root_device().ioport("config")->read() & data)
+	if (m_config->read() & data)
 	{
 		/* bit 4 selects the side then */
 		//floppy->ss_w(BIT(data, 4));
@@ -277,14 +269,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_ctc_trigger_callback)
 
 WRITE_LINE_MEMBER(einstein_state::einstein_serial_transmit_clock)
 {
-	i8251_device *uart = machine().device<i8251_device>(IC_I060);
-	uart->transmit_clock();
+	m_uart->transmit_clock();
 }
 
 WRITE_LINE_MEMBER(einstein_state::einstein_serial_receive_clock)
 {
-	i8251_device *uart = machine().device<i8251_device>(IC_I060);
-	uart->receive_clock();
+	m_uart->receive_clock();
 }
 
 
@@ -292,17 +282,16 @@ WRITE_LINE_MEMBER(einstein_state::einstein_serial_receive_clock)
     MEMORY BANKING
 ***************************************************************************/
 
-static void einstein_page_rom(running_machine &machine)
+void einstein_state::einstein_page_rom()
 {
-	einstein_state *state = machine.driver_data<einstein_state>();
-	state->membank("bank1")->set_base(state->m_rom_enabled ? machine.root_device().memregion("bios")->base() : machine.device<ram_device>(RAM_TAG)->pointer());
+	m_bank1->set_base(m_rom_enabled ? m_region_bios->base() : m_ram->pointer());
 }
 
 /* writing to this port is a simple trigger, and switches between RAM and ROM */
 WRITE8_MEMBER(einstein_state::einstein_rom_w)
 {
 	m_rom_enabled ^= 1;
-	einstein_page_rom(machine());
+	einstein_page_rom();
 }
 
 
@@ -312,22 +301,21 @@ WRITE8_MEMBER(einstein_state::einstein_rom_w)
 
 READ8_MEMBER(einstein_state::einstein_kybintmsk_r)
 {
-	centronics_device *centronics = machine().device<centronics_device>("centronics");
 	UINT8 data = 0;
 
 	/* clear key int. a read of this I/O port will do this or a reset */
 	m_interrupt &= ~EINSTEIN_KEY_INT;
 
 	/* bit 0 and 1: fire buttons on the joysticks */
-	data |= ioport("BUTTONS")->read();
+	data |= m_buttons->read();
 
 	/* bit 2 to 4: printer status */
-	data |= centronics->busy_r() << 2;
-	data |= centronics->pe_r() << 3;
-	data |= centronics->fault_r() << 4;
+	data |= m_centronics->busy_r() << 2;
+	data |= m_centronics->pe_r() << 3;
+	data |= m_centronics->fault_r() << 4;
 
 	/* bit 5 to 7: graph, control and shift key */
-	data |= ioport("EXTRA")->read();
+	data |= m_extra->read();
 
 	if(VERBOSE_KEYBOARD)
 		logerror("%s: einstein_kybintmsk_r %02x\n", machine().describe_context(), data);
@@ -407,17 +395,13 @@ void einstein_state::machine_start()
 void einstein_state::machine_reset()
 {
 	//device_t *floppy;
-	//UINT8 config = machine().root_device().ioport("config")->read();
-
-	/* save pointers to our devices */
-	m_color_screen = machine().device("screen");
-	m_ctc = machine().device<z80ctc_device>(IC_I058);
+	//UINT8 config = m_config->read();
 
 	/* initialize memory mapping */
-	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
-	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x8000);
+	m_bank2->set_base(m_ram->pointer());
+	m_bank3->set_base(m_ram->pointer() + 0x8000);
 	m_rom_enabled = 1;
-	einstein_page_rom(machine());
+	einstein_page_rom();
 
 	/* a reset causes the fire int, adc int, keyboard int mask
 	to be set to 1, which causes all these to be DISABLED */
@@ -444,10 +428,6 @@ MACHINE_RESET_MEMBER(einstein_state,einstein2)
 	/* call standard initialization first */
 	einstein_state::machine_reset();
 
-	/* get 80 column specific devices */
-	m_mc6845 = machine().device<mc6845_device>("crtc");
-	m_crtc_screen = machine().device<screen_device>("80column");
-
 	/* 80 column card palette */
 	palette_set_color(machine(), TMS9928A_PALETTE_SIZE, RGB_BLACK);
 	palette_set_color(machine(), TMS9928A_PALETTE_SIZE + 1, MAKE_RGB(0, 224, 0));
@@ -468,8 +448,7 @@ UINT32 einstein_state::screen_update_einstein2(screen_device &screen, bitmap_rgb
 {
 	if (&screen == m_color_screen)
 	{
-		tms9929a_device *tms9929a = machine().device<tms9929a_device>( "tms9929a" );
-		bitmap_rgb32 &src = tms9929a->get_bitmap();
+		bitmap_rgb32 &src = m_tms9929a->get_bitmap();
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 				bitmap.pix32(y, x) = src.pix32(y, x);
