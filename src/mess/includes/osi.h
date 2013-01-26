@@ -30,24 +30,27 @@ class sb2m600_state : public driver_device
 public:
 	sb2m600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, M6502_TAG),
-			m_cassette(*this, CASSETTE_TAG),
-			m_discrete(*this, DISCRETE_TAG),
-			m_ram(*this, RAM_TAG),
-			m_video_ram(*this, "video_ram"),
-			m_color_ram(*this, "color_ram")
+	m_maincpu(*this, M6502_TAG),
+	m_cassette(*this, CASSETTE_TAG),
+	m_discrete(*this, DISCRETE_TAG),
+	m_ram(*this, RAM_TAG),
+	m_video_ram(*this, "video_ram"),
+	m_color_ram(*this, "color_ram"),
+	m_io_row0(*this, "ROW0"),
+	m_io_row1(*this, "ROW1"),
+	m_io_row2(*this, "ROW2"),
+	m_io_row3(*this, "ROW3"),
+	m_io_row4(*this, "ROW4"),
+	m_io_row5(*this, "ROW5"),
+	m_io_row6(*this, "ROW6"),
+	m_io_row7(*this, "ROW7"),
+	m_io_sound(*this, "Sound"),
+	m_io_reset(*this, "Reset")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cassette;
-	optional_device<discrete_sound_device> m_discrete;
-	required_device<ram_device> m_ram;
-
 	virtual void machine_start();
-
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_WRITE8_MEMBER( keyboard_w );
 	DECLARE_WRITE8_MEMBER( ctrl_w );
@@ -60,13 +63,29 @@ public:
 	/* video state */
 	int m_32;
 	int m_coloren;
-	required_shared_ptr<UINT8> m_video_ram;
-	optional_shared_ptr<UINT8> m_color_ram;
+	UINT8 *m_p_chargen;
 
 	/* floppy state */
 	int m_fdc_index;
 	TIMER_CALLBACK_MEMBER(setup_beep);
 	DECLARE_WRITE_LINE_MEMBER(osi470_index_callback);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
+	optional_device<discrete_sound_device> m_discrete;
+	required_device<ram_device> m_ram;
+	required_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<UINT8> m_color_ram;
+	required_ioport m_io_row0;
+	required_ioport m_io_row1;
+	required_ioport m_io_row2;
+	required_ioport m_io_row3;
+	required_ioport m_io_row4;
+	required_ioport m_io_row5;
+	required_ioport m_io_row6;
+	required_ioport m_io_row7;
+	required_ioport m_io_sound;
+	required_ioport m_io_reset;
 };
 
 class c1p_state : public sb2m600_state

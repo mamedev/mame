@@ -261,18 +261,27 @@ DISCRETE_SOUND_END
 
 READ8_MEMBER( sb2m600_state::keyboard_r )
 {
-	if (ioport("Reset")->read())
-		machine().device(M6502_TAG)->reset();
-
-	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
+	if (m_io_reset->read())
+		m_maincpu->reset();
 
 	UINT8 data = 0xff;
-	int bit;
 
-	for (bit = 0; bit < 8; bit++)
-	{
-		if (!BIT(m_keylatch, bit)) data &= ioport(keynames[bit])->read();
-	}
+	if (!BIT(m_keylatch, 0))
+		data &= m_io_row0->read();
+	if (!BIT(m_keylatch, 1))
+		data &= m_io_row1->read();
+	if (!BIT(m_keylatch, 2))
+		data &= m_io_row2->read();
+	if (!BIT(m_keylatch, 3))
+		data &= m_io_row3->read();
+	if (!BIT(m_keylatch, 4))
+		data &= m_io_row4->read();
+	if (!BIT(m_keylatch, 5))
+		data &= m_io_row5->read();
+	if (!BIT(m_keylatch, 6))
+		data &= m_io_row6->read();
+	if (!BIT(m_keylatch, 7))
+		data &= m_io_row7->read();
 
 	return data;
 }
@@ -281,7 +290,7 @@ WRITE8_MEMBER( sb2m600_state::keyboard_w )
 {
 	m_keylatch = data;
 
-	if (ioport("Sound")->read())
+	if (m_io_sound->read())
 		discrete_sound_w(m_discrete, space, NODE_01, (data >> 2) & 0x0f);
 }
 
