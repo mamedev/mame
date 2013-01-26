@@ -30,15 +30,23 @@ class mini2440_state : public driver_device
 {
 public:
 	mini2440_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_s3c2440(*this, "s3c2440")
+		, m_nand(*this, "nand")
+		, m_dac1(*this, "dac1")
+		, m_dac2(*this, "dac2")
+		, m_penx(*this, "PENX")
+		, m_peny(*this, "PENY")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-
-	device_t *m_s3c2440;
-	nand_device *m_nand;
-	dac_device *m_dac[2];
+	required_device<device_t> m_s3c2440;
+	required_device<nand_device> m_nand;
+	required_device<dac_device> m_dac1;
+	required_device<dac_device> m_dac2;
+	required_ioport m_penx;
+	required_ioport m_peny;
 
 	UINT32 m_port[9];
 	DECLARE_DRIVER_INIT(mini2440);
@@ -140,18 +148,23 @@ static WRITE8_DEVICE_HANDLER( s3c2440_nand_data_w )
 static WRITE16_DEVICE_HANDLER( s3c2440_i2s_data_w )
 {
 	mini2440_state *state = space.machine().driver_data<mini2440_state>();
-	state->m_dac[offset]->write_signed16(data + 0x8000);
+	if ( offset )
+		state->m_dac1->write_signed16(data + 0x8000);
+	else
+		state->m_dac2->write_signed16(data + 0x8000);
 }
 
 // ADC
 
 static READ32_DEVICE_HANDLER( s3c2440_adc_data_r )
 {
+	mini2440_state *state = space.machine().driver_data<mini2440_state>();
+
 	UINT32 data = 0;
 	switch (offset)
 	{
-		case 2 + 0 : data = space.machine().root_device().ioport( "PENX")->read(); break;
-		case 2 + 1 : data = 915 - space.machine().root_device().ioport( "PENY")->read() + 90; break;
+		case 2 + 0 : data = state->m_penx->read(); break;
+		case 2 + 1 : data = 915 - state->m_peny->read() + 90; break;
 	}
 	verboselog( space.machine(), 5,  "s3c2440_adc_data_r %08X\n", data);
 	return data;
@@ -168,16 +181,12 @@ INPUT_CHANGED_MEMBER(mini2440_state::mini2440_input_changed)
 
 void mini2440_state::machine_start()
 {
-	m_s3c2440 = machine().device("s3c2440");
-	m_nand = machine().device<nand_device>("nand");
-	m_dac[0] = machine().device<dac_device>("dac1");
-	m_dac[1] = machine().device<dac_device>("dac2");
 	m_nand->set_data_ptr(memregion("nand")->base());
 }
 
 void mini2440_state::machine_reset()
 {
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 	memset( m_port, 0, sizeof( m_port));
 }
 
