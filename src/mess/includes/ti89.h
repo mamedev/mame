@@ -15,19 +15,37 @@ public:
 	ti68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
-			m_flash(*this, "flash")
+			m_flash(*this, "flash"),
+			m_io_bit0(*this, "BIT0"),
+			m_io_bit1(*this, "BIT1"),
+			m_io_bit2(*this, "BIT2"),
+			m_io_bit3(*this, "BIT3"),
+			m_io_bit4(*this, "BIT4"),
+			m_io_bit5(*this, "BIT5"),
+			m_io_bit6(*this, "BIT6"),
+			m_io_bit7(*this, "BIT7")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<sharp_unk128mbit_device> m_flash;
+	required_ioport m_io_bit0;
+	required_ioport m_io_bit1;
+	required_ioport m_io_bit2;
+	required_ioport m_io_bit3;
+	required_ioport m_io_bit4;
+	required_ioport m_io_bit5;
+	required_ioport m_io_bit6;
+	required_ioport m_io_bit7;
 
 	// hardware versions
-	enum { m_HW1=1, m_HW2, m_HW3, m_HW4 };
+	enum { HW1=1, HW2, HW3, HW4 };
 
 	// HW specifications
 	UINT8 m_hw_version;
 	bool m_flash_mem;
 	UINT32 m_initial_pc;
+
+	UINT16 *m_rom_base;
 
 	// keyboard
 	UINT16 m_kb_mask;

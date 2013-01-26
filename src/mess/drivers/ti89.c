@@ -25,13 +25,23 @@
 
 UINT8 ti68k_state::keypad_r (running_machine &machine)
 {
-	UINT8 port, bit, data = 0xff;
-	static const char *const bitnames[] = {"BIT0", "BIT1", "BIT2", "BIT3", "BIT4", "BIT5", "BIT6", "BIT7"};
+	UINT8 bit, data = 0xff;
 
 	for (bit = 0; bit < 10; bit++)
+	{
 		if (~m_kb_mask & (0x01 << bit))
-			for (port = 0; port < 8; port++)
-				data ^= machine.root_device().ioport(bitnames[port])->read() & (0x01 << bit) ? 0x01 << port : 0x00;
+		{
+			data ^= m_io_bit0->read() & (0x01 << bit) ? 0x01 : 0x00;
+			data ^= m_io_bit1->read() & (0x01 << bit) ? 0x02 : 0x00;
+			data ^= m_io_bit2->read() & (0x01 << bit) ? 0x04 : 0x00;
+			data ^= m_io_bit3->read() & (0x01 << bit) ? 0x08 : 0x00;
+			data ^= m_io_bit4->read() & (0x01 << bit) ? 0x10 : 0x00;
+			data ^= m_io_bit5->read() & (0x01 << bit) ? 0x20 : 0x00;
+			data ^= m_io_bit6->read() & (0x01 << bit) ? 0x40 : 0x00;
+			data ^= m_io_bit7->read() & (0x01 << bit) ? 0x80 : 0x00;
+		}		
+	}
+
 	return data;
 }
 
@@ -145,9 +155,7 @@ READ16_MEMBER ( ti68k_state::flash_r )
 	}
 	else
 	{
-		UINT16 *rom_base = (UINT16 *)(*space.machine().root_device().memregion("flash"));
-
-		return rom_base[offset];
+		return m_rom_base[offset];
 	}
 }
 
@@ -166,7 +174,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ti68k_state::ti68k_timer_callback)
 				m_timer_val = (m_io_hw1[0x0b]) & 0xff;
 		}
 
-		if (!BIT(m_io_hw1[0x0a], 7) && ((m_hw_version == m_HW1) || (!BIT(m_io_hw1[0x0f], 2) && !BIT(m_io_hw1[0x0f], 1))))
+		if (!BIT(m_io_hw1[0x0a], 7) && ((m_hw_version == HW1) || (!BIT(m_io_hw1[0x0f], 2) && !BIT(m_io_hw1[0x0f], 1))))
 		{
 			if (!(m_timer & 0x003f))
 				m_maincpu->set_input_line(M68K_IRQ_1, HOLD_LINE);
@@ -416,31 +424,31 @@ INPUT_PORTS_END
 
 void ti68k_state::machine_start()
 {
-	UINT16 *rom = (UINT16 *)(*machine().root_device().memregion("flash"));
+	m_rom_base = (UINT16 *)(*memregion("flash"));
 	int i;
 
-	m_flash_mem = !((rom[0x32] & 0x0f) != 0);
+	m_flash_mem = !((m_rom_base[0x32] & 0x0f) != 0);
 
 	if (m_flash_mem)
 	{
-		UINT32 base = ((((rom[0x82]) << 16) | rom[0x83]) & 0xffff)>>1;
+		UINT32 base = ((((m_rom_base[0x82]) << 16) | m_rom_base[0x83]) & 0xffff)>>1;
 
-		if (rom[base] >= 8)
-			m_hw_version = ((rom[base + 0x0b]) << 16) | rom[base + 0x0c];
+		if (m_rom_base[base] >= 8)
+			m_hw_version = ((m_rom_base[base + 0x0b]) << 16) | m_rom_base[base + 0x0c];
 
 		if (!m_hw_version)
-			m_hw_version = m_HW1;
+			m_hw_version = HW1;
 
 		for (i = 0x9000; i < 0x100000; i++)
-			if (rom[i] == 0xcccc && rom[i + 1] == 0xcccc)
+			if (m_rom_base[i] == 0xcccc && m_rom_base[i + 1] == 0xcccc)
 				break;
 
-		m_initial_pc = ((rom[i + 4]) << 16) | rom[i + 5];
+		m_initial_pc = ((m_rom_base[i + 4]) << 16) | m_rom_base[i + 5];
 	}
 	else
 	{
-		m_hw_version = m_HW1;
-		m_initial_pc = ((rom[2]) << 16) | rom[3];
+		m_hw_version = HW1;
+		m_initial_pc = ((m_rom_base[2]) << 16) | m_rom_base[3];
 
 		m_maincpu->space(AS_PROGRAM).unmap_read(0x200000, 0x5fffff);
 
