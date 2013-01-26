@@ -8,14 +8,7 @@
         - IRQ (WRONG $DC0D)
         - NMI (WRONG $DD0D)
         - some CIA tests
-
     - 64C PLA dump
-    - Multiscreen crashes on boot
-
-        805A: lda  $01
-        805C: and  #$FE
-        805E: sta  $01
-        8060: m6502_brk#$00 <-- BOOM!
 
 */
 
@@ -512,7 +505,20 @@ READ8_MEMBER( c64_state::sid_potx_r )
 	{
 	case 1: data = m_joy1->pot_x_r(); break;
 	case 2: data = m_joy2->pot_x_r(); break;
-	case 3: break; // TODO pot1 and pot2 in series
+	case 3:
+		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
+		{
+			data = 1 / (1 / m_joy1->pot_x_r() + 1 / m_joy2->pot_x_r());
+		}
+		else if (m_joy1->has_pot_x())
+		{
+			data = m_joy1->pot_x_r();
+		}
+		else if (m_joy2->has_pot_x())
+		{
+			data = m_joy2->pot_x_r();
+		}
+		break;
 	}
 
 	return data;
@@ -526,7 +532,20 @@ READ8_MEMBER( c64_state::sid_poty_r )
 	{
 	case 1: data = m_joy1->pot_y_r(); break;
 	case 2: data = m_joy2->pot_y_r(); break;
-	case 3: break; // TODO pot1 and pot2 in series
+	case 3:
+		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
+		{
+			data = 1 / (1 / m_joy1->pot_y_r() + 1 / m_joy2->pot_y_r());
+		}
+		else if (m_joy1->has_pot_y())
+		{
+			data = m_joy1->pot_y_r();
+		}
+		else if (m_joy2->has_pot_y())
+		{
+			data = m_joy2->pot_y_r();
+		}
+		break;
 	}
 
 	return data;

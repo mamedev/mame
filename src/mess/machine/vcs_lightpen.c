@@ -58,7 +58,10 @@ ioport_constructor vcs_lightpen_device::device_input_ports() const
 
 vcs_lightpen_device::vcs_lightpen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VCS_LIGHTPEN, "Light Pen", tag, owner, clock),
-	device_vcs_control_port_interface(mconfig, *this)
+	device_vcs_control_port_interface(mconfig, *this),
+	m_joy(*this, "JOY"),
+	m_lightx(*this, "LIGHTX"),
+	m_lighty(*this, "LIGHTY")
 {
 }
 
@@ -78,5 +81,5 @@ void vcs_lightpen_device::device_start()
 
 UINT8 vcs_lightpen_device::vcs_joy_r()
 {
-	return ioport("JOY")->read();
+	return m_joy->read();
 }

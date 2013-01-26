@@ -43,6 +43,14 @@ protected:
 	virtual UINT8 vcs_joy_r();
 	virtual UINT8 vcs_pot_x_r();
 	virtual UINT8 vcs_pot_y_r();
+
+	virtual bool has_pot_x() { return true; }
+	virtual bool has_pot_y() { return true; }
+
+private:
+	required_ioport m_joy;
+	required_ioport m_potx;
+	required_ioport m_poty;
 };
 
 

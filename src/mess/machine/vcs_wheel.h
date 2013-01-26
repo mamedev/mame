@@ -41,6 +41,10 @@ protected:
 
 	// device_vcs_control_port_interface overrides
 	virtual UINT8 vcs_joy_r();
+
+private:
+	required_ioport m_joy;
+	required_ioport m_wheel;
 };
 
 

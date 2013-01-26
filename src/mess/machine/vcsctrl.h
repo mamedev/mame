@@ -68,6 +68,10 @@ public:
 	void joy_w( UINT8 data );
 	DECLARE_WRITE8_MEMBER( joy_w );
 
+	bool exists();
+	bool has_pot_x();
+	bool has_pot_y();
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -90,6 +94,9 @@ public:
 	virtual UINT8 vcs_pot_x_r() { return 0xff; };
 	virtual UINT8 vcs_pot_y_r() { return 0xff; };
 	virtual void vcs_joy_w(UINT8 data) { };
+
+	virtual bool has_pot_x() { return false; }
+	virtual bool has_pot_y() { return false; }
 
 protected:
 	vcs_control_port_device *m_port;

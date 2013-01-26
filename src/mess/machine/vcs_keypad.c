@@ -56,7 +56,8 @@ ioport_constructor vcs_keypad_device::device_input_ports() const
 
 vcs_keypad_device::vcs_keypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VCS_KEYPAD, "Keypad", tag, owner, clock),
-	device_vcs_control_port_interface(mconfig, *this)
+	device_vcs_control_port_interface(mconfig, *this),
+	m_keypad(*this, "KEYPAD")
 {
 }
 
@@ -82,7 +83,7 @@ UINT8 vcs_keypad_device::vcs_joy_r()
 	{
 		if ( ! ( ( m_column >> i ) & 0x01 ) )
 		{
-			if ( ( ioport("KEYPAD")->read() >> 3*i ) & 0x04 )
+			if ( ( m_keypad->read() >> 3*i ) & 0x04 )
 			{
 				return 0xff;
 			}
@@ -106,7 +107,7 @@ UINT8 vcs_keypad_device::vcs_pot_x_r()
 	{
 		if ( ! ( ( m_column >> i ) & 0x01 ) )
 		{
-			if ( ( ioport("KEYPAD")->read() >> 3*i ) & 0x01 )
+			if ( ( m_keypad->read() >> 3*i ) & 0x01 )
 			{
 				return 0;
 			}
@@ -125,7 +126,7 @@ UINT8 vcs_keypad_device::vcs_pot_y_r()
 	{
 		if ( ! ( ( m_column >> i ) & 0x01 ) )
 		{
-			if ( ( ioport("KEYPAD")->read() >> 3*i ) & 0x02 )
+			if ( ( m_keypad->read() >> 3*i ) & 0x02 )
 			{
 				return 0;
 			}

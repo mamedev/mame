@@ -59,7 +59,10 @@ ioport_constructor vcs_joystick_booster_device::device_input_ports() const
 
 vcs_joystick_booster_device::vcs_joystick_booster_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VCS_JOYSTICK_BOOSTER, "Digital joystick with Boostergrip", tag, owner, clock),
-	device_vcs_control_port_interface(mconfig, *this)
+	device_vcs_control_port_interface(mconfig, *this),
+	m_joy(*this, "JOY"),
+	m_potx(*this, "POTX"),
+	m_poty(*this, "POTY")
 {
 }
 
@@ -79,15 +82,15 @@ void vcs_joystick_booster_device::device_start()
 
 UINT8 vcs_joystick_booster_device::vcs_joy_r()
 {
-	return ioport("JOY")->read();
+	return m_joy->read();
 }
 
 UINT8 vcs_joystick_booster_device::vcs_pot_x_r()
 {
-	return ioport("POTX")->read();
+	return m_potx->read();
 }
 
 UINT8 vcs_joystick_booster_device::vcs_pot_y_r()
 {
-	return ioport("POTY")->read();
+	return m_poty->read();
 }

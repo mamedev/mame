@@ -48,6 +48,12 @@
     TODO:
 
     - M6802 board
+    - crashes on boot
+
+        805A: lda  $01
+        805C: and  #$FE
+        805E: sta  $01
+        8060: m6502_brk#$00 <-- BOOM!
 
 */
 

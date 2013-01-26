@@ -50,7 +50,8 @@ ioport_constructor vcs_joystick_device::device_input_ports() const
 
 vcs_joystick_device::vcs_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VCS_JOYSTICK, "Digital joystick", tag, owner, clock),
-	device_vcs_control_port_interface(mconfig, *this)
+	device_vcs_control_port_interface(mconfig, *this),
+	m_joy(*this, "JOY")
 {
 }
 
@@ -70,5 +71,5 @@ void vcs_joystick_device::device_start()
 
 UINT8 vcs_joystick_device::vcs_joy_r()
 {
-	return ioport("JOY")->read();
+	return m_joy->read();
 }
