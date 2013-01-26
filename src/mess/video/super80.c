@@ -5,7 +5,6 @@
     2. Undocumented cursor start and end-lines is not supported by MMD, so we do it here. */
 
 
-#include "emu.h"
 #include "includes/super80.h"
 
 
@@ -76,7 +75,7 @@ void super80_state::screen_eof_super80m(screen_device &screen, bool state)
 	if (state)
 	{
 		/* if we chose another palette or colour mode, enable it */
-		UINT8 chosen_palette = (machine().root_device().ioport("CONFIG")->read() & 0x60)>>5;                // read colour dipswitches
+		UINT8 chosen_palette = (m_io_config->read() & 0x60)>>5;                // read colour dipswitches
 
 		if (chosen_palette != m_current_palette)                        // any changes?
 		{
@@ -93,11 +92,10 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 {
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=m_vidpg,x;
-	UINT8 *RAM = memregion("maincpu")->base();
 
-	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
+	output_set_value("cass_led",BIT(m_shared, 5));
 
-	if ((m_shared & 4) || (!(machine().root_device().ioport("CONFIG")->read() & 4)))    /* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((BIT(m_shared, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -109,7 +107,7 @@ UINT32 super80_state::screen_update_super80(screen_device &screen, bitmap_ind16 
 			for (x = 0; x < 32; x++)    // done this way to avoid x overflowing on page FF
 			{
 				if (screen_on)
-					chr = RAM[ma | x] & 0x3f;
+					chr = m_p_ram[ma | x] & 0x3f;
 
 				/* get pattern of pixels for that character scanline */
 				gfx = m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
@@ -134,11 +132,10 @@ UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16
 {
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=m_vidpg,x;
-	UINT8 *RAM = memregion("maincpu")->base();
 
-	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
+	output_set_value("cass_led",BIT(m_shared, 5));
 
-	if ((m_shared & 4) || (!(machine().root_device().ioport("CONFIG")->read() & 4)))    /* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((BIT(m_shared, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -150,7 +147,7 @@ UINT32 super80_state::screen_update_super80d(screen_device &screen, bitmap_ind16
 			for (x = 0; x < 32; x++)
 			{
 				if (screen_on)
-					chr = RAM[ma | x];
+					chr = m_p_ram[ma | x];
 
 				/* get pattern of pixels for that character scanline */
 				gfx = m_p_chargen[((chr & 0x7f)<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)] ^ ((chr & 0x80) ? 0xff : 0);
@@ -175,11 +172,10 @@ UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16
 {
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=m_vidpg,x;
-	UINT8 *RAM = memregion("maincpu")->base();
 
-	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
+	output_set_value("cass_led",BIT(m_shared, 5));
 
-	if ((m_shared & 4) || (!(machine().root_device().ioport("CONFIG")->read() & 4)))    /* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((BIT(m_shared, 2)) | (!BIT(m_io_config->read(), 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	for (y = 0; y < 16; y++)
@@ -191,7 +187,7 @@ UINT32 super80_state::screen_update_super80e(screen_device &screen, bitmap_ind16
 			for (x = 0; x < 32; x++)
 			{
 				if (screen_on)
-					chr = RAM[ma | x];
+					chr = m_p_ram[ma | x];
 
 				/* get pattern of pixels for that character scanline */
 				gfx = m_p_chargen[(chr<<4) | ((ra & 8) >> 3) | ((ra & 7) << 1)];
@@ -216,15 +212,14 @@ UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16
 {
 	UINT8 y,ra,chr=32,gfx,screen_on=0;
 	UINT16 sy=0,ma=m_vidpg,x;
-	UINT8 col, bg=0, fg=0, options=machine().root_device().ioport("CONFIG")->read();
-	UINT8 *RAM = memregion("maincpu")->base();
+	UINT8 col, bg=0, fg=0, options=m_io_config->read();
 
 	/* get selected character generator */
 	UINT8 cgen = m_current_charset ^ ((options & 0x10)>>4); /* bit 0 of port F1 and cgen config switch */
 
-	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
+	output_set_value("cass_led",BIT(m_shared, 5));
 
-	if ((m_shared & 4) || (!(options & 4))) /* bit 2 of port F0 is high, OR user turned on config switch */
+	if ((BIT(m_shared, 2)) | (!BIT(options, 2)))    /* bit 2 of port F0 is high, OR user turned on config switch */
 		screen_on++;
 
 	if (screen_on)
@@ -244,11 +239,11 @@ UINT32 super80_state::screen_update_super80m(screen_device &screen, bitmap_ind16
 			for (x = 0; x < 32; x++)
 			{
 				if (screen_on)
-					chr = RAM[ma | x];
+					chr = m_p_ram[ma | x];
 
 				if (!(options & 0x40))
 				{
-					col = RAM[0xfe00 | ma | x]; /* byte of colour to display */
+					col = m_p_ram[0xfe00 | ma | x]; /* byte of colour to display */
 					fg = col & 0x0f;
 					bg = (col & 0xf0) >> 4;
 				}
@@ -279,6 +274,7 @@ VIDEO_START_MEMBER(super80_state,super80)
 {
 	m_vidpg = 0xfe00;
 	m_p_chargen = memregion("chargen")->base();
+	m_p_ram = memregion("maincpu")->base();
 }
 
 /**************************** I/O PORTS *****************************************************************/
@@ -384,8 +380,8 @@ UINT32 super80_state::screen_update_super80v(screen_device &screen, bitmap_rgb32
 	m_framecnt++;
 	m_speed = m_mc6845_reg[10]&0x20, m_flash = m_mc6845_reg[10]&0x40; // cursor modes
 	m_cursor = (m_mc6845_reg[14]<<8) | m_mc6845_reg[15]; // get cursor position
-	m_s_options=machine().root_device().ioport("CONFIG")->read();
-	output_set_value("cass_led",(m_shared & 0x20) ? 1 : 0);
+	m_s_options=m_io_config->read();
+	output_set_value("cass_led",BIT(m_shared, 5));
 	m_6845->screen_update(screen, bitmap, cliprect);
 	return 0;
 }

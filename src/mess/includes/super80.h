@@ -1,3 +1,4 @@
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "sound/wave.h"
@@ -28,16 +29,19 @@ public:
 			m_wave(*this, WAVE_TAG),
 			m_speaker(*this, SPEAKER_TAG),
 			m_centronics(*this, "centronics"),
-			m_6845(*this, "crtc")
+			m_6845(*this, "crtc"),
+			m_io_dsw(*this, "DSW"),
+			m_io_x0(*this, "X0"),
+			m_io_x1(*this, "X1"),
+			m_io_x2(*this, "X2"),
+			m_io_x3(*this, "X3"),
+			m_io_x4(*this, "X4"),
+			m_io_x5(*this, "X5"),
+			m_io_x6(*this, "X6"),
+			m_io_x7(*this, "X7"),
+			m_io_config(*this, "CONFIG")
 	{ }
 
-	required_device<cpu_device> m_maincpu;
-	required_device<z80pio_device> m_pio;
-	required_device<cassette_image_device> m_cass;
-	required_device<wave_device> m_wave;
-	required_device<speaker_sound_device> m_speaker;
-	required_device<centronics_device> m_centronics;
-	optional_device<mc6845_device> m_6845;
 	DECLARE_READ8_MEMBER( super80v_low_r );
 	DECLARE_READ8_MEMBER( super80v_high_r );
 	DECLARE_WRITE8_MEMBER( super80v_low_w );
@@ -52,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER( super80r_f0_w );
 	DECLARE_READ8_MEMBER( super80_read_ff );
 	DECLARE_WRITE8_MEMBER( pio_port_a_w );
-	//DECLARE_READ8_MEMBER( pio_port_b_r );
+	DECLARE_READ8_MEMBER( pio_port_b_r );
 	virtual void machine_reset();
 	UINT8 m_shared;
 	UINT8 m_keylatch;
@@ -74,6 +78,7 @@ public:
 	UINT8 *m_p_videoram;
 	UINT8 *m_p_colorram;
 	UINT8 *m_p_pcgram;
+	UINT8 *m_p_ram;
 	void mc6845_cursor_configure();
 	DECLARE_DRIVER_INIT(super80);
 	DECLARE_DRIVER_INIT(super80v);
@@ -89,7 +94,23 @@ public:
 	TIMER_CALLBACK_MEMBER(super80_timer);
 	TIMER_CALLBACK_MEMBER(super80_reset);
 	TIMER_CALLBACK_MEMBER(super80_halfspeed);
-	DECLARE_READ8_MEMBER(pio_port_b_r);
+	required_device<cpu_device> m_maincpu;
+	required_device<z80pio_device> m_pio;
+	required_device<cassette_image_device> m_cass;
+	required_device<wave_device> m_wave;
+	required_device<speaker_sound_device> m_speaker;
+	required_device<centronics_device> m_centronics;
+	optional_device<mc6845_device> m_6845;
+	required_ioport m_io_dsw;
+	required_ioport m_io_x0;
+	required_ioport m_io_x1;
+	required_ioport m_io_x2;
+	required_ioport m_io_x3;
+	required_ioport m_io_x4;
+	required_ioport m_io_x5;
+	required_ioport m_io_x6;
+	required_ioport m_io_x7;
+	required_ioport m_io_config;
 };
 
 

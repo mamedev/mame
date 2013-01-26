@@ -181,20 +181,18 @@ hardware.
 
 ***********************************************************************************************************/
 
-#include "emu.h"
 #include "super80.lh"
 #include "includes/super80.h"
-
 #include "formats/z80bin.h"
 
-#define MASTER_CLOCK            (XTAL_12MHz)
-#define PIXEL_CLOCK         (MASTER_CLOCK/2)
-#define HTOTAL              (384)
-#define HBEND               (0)
-#define HBSTART             (256)
-#define VTOTAL              (240)
-#define VBEND               (0)
-#define VBSTART             (160)
+#define MASTER_CLOCK	(XTAL_12MHz)
+#define PIXEL_CLOCK	(MASTER_CLOCK/2)
+#define HTOTAL		(384)
+#define HBEND		(0)
+#define HBSTART		(256)
+#define VTOTAL		(240)
+#define VBEND		(0)
+#define VBSTART		(160)
 
 #define SUPER80V_SCREEN_WIDTH       (560)
 #define SUPER80V_SCREEN_HEIGHT      (300)
