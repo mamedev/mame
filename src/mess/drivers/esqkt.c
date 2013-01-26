@@ -24,11 +24,13 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/es5506.h"
-#include "machine/68681.h"
+#include "machine/n68681.h"
+#include "machine/esqpanel.h"
+#include "machine/serial.h"
+#include "machine/midiinport.h"
+#include "machine/midioutport.h"
 
-#include "machine/esqvfd.h"
-
-#define KEYBOARD_HACK (1)   // turn on to play: Z and X are program up/down, A/S/D/F/G/H/J/K/L and Q/W/E/R/T/Y/U play notes
+#define KEYBOARD_HACK (0)   // turn on to play: Z and X are program up/down, A/S/D/F/G/H/J/K/L and Q/W/E/R/T/Y/U play notes
 #define HACK_VIA_MIDI (1)
 
 #if KEYBOARD_HACK
@@ -46,21 +48,27 @@ public:
 	: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
-		m_sq1vfd(*this, "sq1vfd")
+		m_sq1panel(*this, "sq1panel"),
+		m_mdout(*this, "mdout")
 	{ }
 
 	required_device<m68ec020_device> m_maincpu;
-	required_device<duart68681_device> m_duart;
-	required_device<esq2x40_sq1_t> m_sq1vfd;
+	required_device<duartn68681_device> m_duart;
+	required_device<esqpanel2x40_sq1_device> m_sq1panel;
+	required_device<serial_port_device> m_mdout;
 
 	virtual void machine_reset();
 
 	DECLARE_READ16_MEMBER(es5510_dsp_r);
 	DECLARE_WRITE16_MEMBER(es5510_dsp_w);
-	DECLARE_READ16_MEMBER(mc68681_r);
-	DECLARE_WRITE16_MEMBER(mc68681_w);
 	DECLARE_READ32_MEMBER(lower_r);
 	DECLARE_WRITE32_MEMBER(lower_w);
+
+	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
+	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
+	DECLARE_READ8_MEMBER(duart_input);
+	DECLARE_WRITE8_MEMBER(duart_output);
 
 	UINT8 m_duart_io;
 	bool  m_bCalibSecondByte;
@@ -229,7 +237,7 @@ static ADDRESS_MAP_START( kt_map, AS_PROGRAM, 32, esqkt_state )
 	AM_RANGE(0x200000, 0x20003f) AM_DEVREADWRITE8_LEGACY("ensoniq", es5506_r, es5506_w, 0xffffffff)
 	AM_RANGE(0x240000, 0x24003f) AM_DEVREADWRITE8_LEGACY("ensoniq2", es5506_r, es5506_w, 0xffffffff)
 	AM_RANGE(0x280000, 0x2801ff) AM_READWRITE16(es5510_dsp_r, es5510_dsp_w, 0xffffffff)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8_LEGACY("duart", duart68681_r, duart68681_w, 0xffffffff)
+	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE8("duart", duartn68681_device, read, write, 0xffffffff)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
@@ -267,63 +275,45 @@ static UINT16 esq5506_read_adc(device_t *device)
 	}
 }
 
-static void duart_irq_handler(device_t *device, int state, UINT8 vector)
+WRITE_LINE_MEMBER(esqkt_state::duart_irq_handler)
 {
-	esqkt_state *esq5505 = device->machine().driver_data<esqkt_state>();
-
-	esq5505->m_maincpu->set_input_line(M68K_IRQ_3, state);
+	m_maincpu->set_input_line(M68K_IRQ_3, state);
 };
 
-static UINT8 duart_input(device_t *device)
+READ8_MEMBER(esqkt_state::duart_input)
 {
 	UINT8 result = 0;   // DUART input lines are separate from the output lines
 
 	return result;
 }
 
-static void duart_output(device_t *device, UINT8 data)
+WRITE8_MEMBER(esqkt_state::duart_output)
 {
-	esqkt_state *state = device->machine().driver_data<esqkt_state>();
+	m_duart_io = data;
 
-	state->m_duart_io = data;
-
-//    printf("DUART output: %02x (PC=%x)\n", data, state->m_maincpu->pc());
+//    printf("DUART output: %02x (PC=%x)\n", data, m_maincpu->pc());
 }
 
-static void duart_tx(device_t *device, int channel, UINT8 data)
+WRITE_LINE_MEMBER(esqkt_state::duart_tx_a)
 {
-	esqkt_state *state = device->machine().driver_data<esqkt_state>();
-
-	if (channel == 1)
-	{
-//        printf("ch %d: [%02x] (PC=%x)\n", channel, data, state->m_maincpu->pc());
-
-		state->m_sq1vfd->write_char(data);
-
-		if (state->m_bCalibSecondByte)
-		{
-			if (data == 0xfd)   // calibration request
-			{
-				duart68681_rx_data(state->m_duart, 1, (UINT8)(FPTR)0xff);   // this is the correct response for "calibration OK"
-			}
-			state->m_bCalibSecondByte = false;
-		}
-		else if (data == 0xfb)   // request calibration
-		{
-			state->m_bCalibSecondByte = true;
-		}
-	}
+	m_mdout->tx(state);
 }
 
-static const duart68681_config duart_config =
+WRITE_LINE_MEMBER(esqkt_state::duart_tx_b)
 {
-	duart_irq_handler,
-	duart_tx,
-	duart_input,
-	duart_output,
+	m_sq1panel->rx_w(state);
+}
 
-	1000000, 500000,    // IP3, IP4
-	500000, 1000000, // IP5, IP6
+static const duartn68681_config duart_config =
+{
+	DEVCB_DRIVER_LINE_MEMBER(esqkt_state, duart_irq_handler),
+	DEVCB_DRIVER_LINE_MEMBER(esqkt_state, duart_tx_a),
+	DEVCB_DRIVER_LINE_MEMBER(esqkt_state, duart_tx_b),
+	DEVCB_DRIVER_MEMBER(esqkt_state, duart_input),
+	DEVCB_DRIVER_MEMBER(esqkt_state, duart_output),
+
+	500000, 500000,    // IP3, IP4
+	1000000, 1000000, // IP5, IP6
 };
 
 #if KEYBOARD_HACK
@@ -434,13 +424,38 @@ static const es5506_interface es5506_2_config =
 	NULL
 };
 
+static const esqpanel_interface esqpanel_config =
+{
+	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_b_w)
+};
+
+static SLOT_INTERFACE_START(midiin_slot)
+	SLOT_INTERFACE("midiin", MIDIIN_PORT)
+SLOT_INTERFACE_END
+
+static const serial_port_interface midiin_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_a_w)	// route MIDI Tx send directly to 68681 channel A Rx
+};
+
+static SLOT_INTERFACE_START(midiout_slot)
+	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
+SLOT_INTERFACE_END
+
+static const serial_port_interface midiout_intf =
+{
+	DEVCB_NULL	// midi out ports don't transmit inward
+};
+
 static MACHINE_CONFIG_START( kt, esqkt_state )
 	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(kt_map)
 
-	MCFG_ESQ2x40_SQ1_ADD("sq1vfd")
+	MCFG_ESQPANEL2x40_SQ1_ADD("sq1panel", esqpanel_config)
 
-	MCFG_DUART68681_ADD("duart", 4000000, duart_config)
+	MCFG_DUARTN68681_ADD("duart", 4000000, duart_config)
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ensoniq", ES5506, XTAL_16MHz)

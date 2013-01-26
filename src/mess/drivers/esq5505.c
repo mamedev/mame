@@ -135,8 +135,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
 		m_fdc(*this, "wd1772"),
-		m_epspanel(*this, "epspanel"),
-		m_sq1panel(*this, "sq1panel"),
 		m_panel(*this, "panel"),
 		m_dmac(*this, "mc68450"),
 		m_mdout(*this, "mdout")
@@ -145,9 +143,7 @@ public:
 	required_device<m68000_device> m_maincpu;
 	required_device<duartn68681_device> m_duart;
 	optional_device<wd1772_t> m_fdc;
-	optional_device<esqpanel1x22_device> m_epspanel;
-	optional_device<esqpanel2x40_sq1_device> m_sq1panel;
-	optional_device<esqpanel2x40_device> m_panel;
+	required_device<esqpanel_device> m_panel;
 	optional_device<hd63450_device> m_dmac;
 	required_device<serial_port_device> m_mdout;
 
@@ -155,8 +151,6 @@ public:
 
 	DECLARE_READ16_MEMBER(es5510_dsp_r);
 	DECLARE_WRITE16_MEMBER(es5510_dsp_w);
-	DECLARE_READ16_MEMBER(mc68681_r);
-	DECLARE_WRITE16_MEMBER(mc68681_w);
 	DECLARE_READ16_MEMBER(lower_r);
 	DECLARE_WRITE16_MEMBER(lower_w);
 
@@ -182,10 +176,6 @@ private:
 	UINT8   es5510_ram_sel;
 
 	UINT16  *m_rom, *m_ram;
-
-#if KEYBOARD_HACK
-	void send_through_panel(UINT8 data);
-#endif
 
 public:
 	DECLARE_DRIVER_INIT(eps);
@@ -527,7 +517,7 @@ WRITE8_MEMBER(esq5505_state::duart_output)
 //    printf("DUART output: %02x (PC=%x)\n", data, m_maincpu->pc());
 }
 
-// MIDI send, we don't care yet
+// MIDI send
 WRITE_LINE_MEMBER(esq5505_state::duart_tx_a)
 {
 	m_mdout->tx(state);
@@ -535,56 +525,7 @@ WRITE_LINE_MEMBER(esq5505_state::duart_tx_a)
 
 WRITE_LINE_MEMBER(esq5505_state::duart_tx_b)
 {
-//  printf("Tx B: %d\n", state);
-	switch (m_system_type)
-	{
-		case GENERIC:
-			m_panel->rx_w(state);
-			break;
-
-		case EPS:
-			m_epspanel->rx_w(state);
-			break;
-
-		case SQ1:
-			m_sq1panel->rx_w(state);
-			break;
-	}
-
-#if 0
-	if (m_bCalibSecondByte)
-	{
-		if (data == 0xfd)   // calibration request
-		{
-			m_duart->duart68681_rx_data(1, (UINT8)(FPTR)0xff);   // this is the correct response for "calibration OK"
-		}
-		m_bCalibSecondByte = false;
-	}
-	else if (data == 0xfb)   // request calibration
-	{
-		m_bCalibSecondByte = true;
-	}
-	else
-	{
-		// EPS wants a throwaway reply byte for each byte sent to the KPC
-		// VFX-SD and SD-1 definitely don't :)
-		if (m_system_type == EPS)
-		{
-			if (data == 0xe7)
-			{
-				m_duart->duart68681_rx_data(1, (UINT8)(FPTR)0x00);   // actual value of response is never checked
-			}
-			else if (data == 0x71)
-			{
-				m_duart->duart68681_rx_data(1, (UINT8)(FPTR)0x00);   // actual value of response is never checked
-			}
-			else
-			{
-				m_duart->duart68681_rx_data(1, data);   // actual value of response is never checked
-			}
-		}
-	}
-#endif
+	m_panel->rx_w(state);
 }
 
 static const duartn68681_config duart_config =
@@ -632,24 +573,6 @@ static void esq_fdc_write_byte(running_machine &machine, int addr, int data)
 }
 
 #if KEYBOARD_HACK
-void esq5505_state::send_through_panel(UINT8 data)
-{
-	switch (m_system_type)
-	{
-		case GENERIC:
-			m_panel->xmit_char(data);
-			break;
-
-		case EPS:
-			m_epspanel->xmit_char(data);
-			break;
-
-		case SQ1:
-			m_sq1panel->xmit_char(data);
-			break;
-	}
-}
-
 INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 {
 	#if HACK_VIA_MIDI
@@ -723,14 +646,14 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 		if (oldval == 0 && newval == 1)
 		{
 			printf("key pressed %d\n", val&0x7f);
-			send_through_panel(val);
-			send_through_panel(0x00);
+			m_panel->xmit_char(val);
+			m_panel->xmit_char(0x00);
 		}
 		else if (oldval == 1 && newval == 0)
 		{
 	//        printf("key off %x\n", (UINT8)(FPTR)param);
-			send_through_panel(val&0x7f);
-			send_through_panel(0x00);
+			m_panel->xmit_char(val&0x7f);
+			m_panel->xmit_char(0x00);
 		}
 	}
 	#endif
@@ -802,7 +725,7 @@ static MACHINE_CONFIG_DERIVED(eps, vfx)
 	MCFG_CPU_PROGRAM_MAP(eps_map)
 
 	MCFG_ESQPANEL_2x40_REMOVE("panel")
-	MCFG_ESQPANEL1x22_ADD("epspanel", esqpanel_config)
+	MCFG_ESQPANEL1x22_ADD("panel", esqpanel_config)
 
 	MCFG_WD1772x_ADD("wd1772", 8000000)
 	MCFG_FLOPPY_DRIVE_ADD("wd1772:0", ensoniq_floppies, "35dd", 0, esq5505_state::floppy_formats)
@@ -845,7 +768,7 @@ static MACHINE_CONFIG_DERIVED(sq1, vfx32)
 	MCFG_CPU_PROGRAM_MAP(sq1_map)
 
 	MCFG_ESQPANEL_2x40_REMOVE("panel")
-	MCFG_ESQPANEL2x40_SQ1_ADD("sq1panel", esqpanel_config)
+	MCFG_ESQPANEL2x40_SQ1_ADD("panel", esqpanel_config)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( vfx )
