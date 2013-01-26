@@ -5,7 +5,6 @@
 
 #include "emu.h"
 #include "formats/cbm_snqk.h"
-#include "includes/cbm.h"
 #include "cpu/m6502/m8502.h"
 #include "machine/6526cia.h"
 #include "machine/c64exp.h"
@@ -58,10 +57,21 @@ public:
 			m_user(*this, C64_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-			m_special(*this, "SPECIAL"),
+			m_row0(*this, "ROW0"),
+			m_row1(*this, "ROW1"),
+			m_row2(*this, "ROW2"),
+			m_row3(*this, "ROW3"),
+			m_row4(*this, "ROW4"),
+			m_row5(*this, "ROW5"),
+			m_row6(*this, "ROW6"),
+			m_row7(*this, "ROW7"),
 			m_k0(*this, "K0"),
 			m_k1(*this, "K1"),
 			m_k2(*this, "K2"),
+			m_restore(*this, "RESTORE"),
+			m_lock(*this, "LOCK"),
+			m_caps(*this, "CAPS"),
+			m_40_80(*this, "40_80"),
 			m_z80en(0),
 			m_loram(1),
 			m_hiram(1),
@@ -108,10 +118,21 @@ public:
 	required_device<c64_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	required_device<pet_datassette_port_device> m_cassette;
-	required_ioport m_special;
+	required_ioport m_row0;
+	required_ioport m_row1;
+	required_ioport m_row2;
+	required_ioport m_row3;
+	required_ioport m_row4;
+	required_ioport m_row5;
+	required_ioport m_row6;
+	required_ioport m_row7;
 	required_ioport m_k0;
 	required_ioport m_k1;
 	required_ioport m_k2;
+	required_ioport m_restore;
+	required_ioport m_lock;
+	required_ioport m_caps;
+	required_ioport m_40_80;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -139,7 +160,6 @@ public:
 	DECLARE_READ_LINE_MEMBER( mmu_exrom_r );
 	DECLARE_READ_LINE_MEMBER( mmu_sense40_r );
 
-	INTERRUPT_GEN_MEMBER( frame_interrupt );
 	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
 	DECLARE_WRITE8_MEMBER( vic_k_w );
 

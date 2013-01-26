@@ -439,7 +439,8 @@ static INPUT_PORTS_START( c64 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESTORE") PORT_CODE(KEYCODE_PRTSCR)
 
 	PORT_START( "LOCK" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -576,10 +577,8 @@ READ8_MEMBER( c64_state::cia1_pa_r )
 
 	// keyboard
 	UINT8 cia1_pb = m_cia1->pb_r();
-	UINT8 row[8] = { m_row0->read(), m_row1->read(), m_row2->read(), m_row3->read(),
+	UINT8 row[8] = { m_row0->read(), m_row1->read() & m_lock->read(), m_row2->read(), m_row3->read(),
 					 m_row4->read(), m_row5->read(), m_row6->read(), m_row7->read() };
-	int lock = BIT(m_lock->read(), 0);
-	row[1] &= (lock << 7 | 0x7f);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -626,10 +625,8 @@ READ8_MEMBER( c64_state::cia1_pb_r )
 
 	// keyboard
 	UINT8 cia1_pa = m_cia1->pa_r();
-	UINT8 row[8] = { m_row0->read(), m_row1->read(), m_row2->read(), m_row3->read(),
+	UINT8 row[8] = { m_row0->read(), m_row1->read() & m_lock->read(), m_row2->read(), m_row3->read(),
 					 m_row4->read(), m_row5->read(), m_row6->read(), m_row7->read() };
-	int lock = BIT(m_lock->read(), 0);
-	row[1] &= (lock << 7 | 0x7f);
 
 	if (!BIT(cia1_pa, 7)) data &= row[7];
 	if (!BIT(cia1_pa, 6)) data &= row[6];
