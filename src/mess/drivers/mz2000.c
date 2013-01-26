@@ -38,9 +38,34 @@ class mz2000_state : public driver_device
 {
 public:
 	mz2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_cass(*this, CASSETTE_TAG)
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_cass(*this, CASSETTE_TAG)
+		, m_maincpu(*this, "maincpu")
+		, m_mb8877a(*this, "mb8877a")
+		, m_pit8253(*this, "pit")
+		, m_beeper(*this, BEEPER_TAG)
+		, m_region_tvram(*this, "tvram")
+		, m_region_gvram(*this, "gvram")
+		, m_region_chargen(*this, "chargen")
+		, m_region_ipl(*this, "ipl")
+		, m_region_wram(*this, "wram")
+		, m_io_key0(*this, "KEY0")
+		, m_io_key1(*this, "KEY1")
+		, m_io_key2(*this, "KEY2")
+		, m_io_key3(*this, "KEY3")
+		, m_io_key4(*this, "KEY4")
+		, m_io_key5(*this, "KEY5")
+		, m_io_key6(*this, "KEY6")
+		, m_io_key7(*this, "KEY7")
+		, m_io_key8(*this, "KEY8")
+		, m_io_key9(*this, "KEY9")
+		, m_io_keya(*this, "KEYA")
+		, m_io_keyb(*this, "KEYB")
+		, m_io_keyc(*this, "KEYC")
+		, m_io_keyd(*this, "KEYD")
+		, m_io_unused(*this, "UNUSED")
+		, m_io_config(*this, "CONFIG")
+	{ }
 
 	required_device<cassette_image_device> m_cass;
 
@@ -90,6 +115,33 @@ public:
 	DECLARE_WRITE8_MEMBER(mz2000_pio1_porta_w);
 	DECLARE_READ8_MEMBER(mz2000_pio1_portb_r);
 	DECLARE_READ8_MEMBER(mz2000_pio1_porta_r);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_mb8877a;
+	required_device<device_t> m_pit8253;
+	required_device<device_t> m_beeper;
+	required_memory_region m_region_tvram;
+	required_memory_region m_region_gvram;
+	required_memory_region m_region_chargen;
+	required_memory_region m_region_ipl;
+	required_memory_region m_region_wram;
+	required_ioport m_io_key0;
+	required_ioport m_io_key1;
+	required_ioport m_io_key2;
+	required_ioport m_io_key3;
+	required_ioport m_io_key4;
+	required_ioport m_io_key5;
+	required_ioport m_io_key6;
+	required_ioport m_io_key7;
+	required_ioport m_io_key8;
+	required_ioport m_io_key9;
+	required_ioport m_io_keya;
+	required_ioport m_io_keyb;
+	required_ioport m_io_keyc;
+	required_ioport m_io_keyd;
+	required_ioport m_io_unused;
+	required_ioport m_io_config;
 };
 
 void mz2000_state::video_start()
@@ -98,9 +150,9 @@ void mz2000_state::video_start()
 
 UINT32 mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *tvram = machine().root_device().memregion("tvram")->base();
-	UINT8 *gvram = machine().root_device().memregion("gvram")->base();
-	UINT8 *gfx_data = memregion("chargen")->base();
+	UINT8 *tvram = m_region_tvram->base();
+	UINT8 *gvram = m_region_gvram->base();
+	UINT8 *gfx_data = m_region_chargen->base();
 	int x,y,xi,yi;
 	UINT8 x_size;
 	UINT32 count;
@@ -194,51 +246,37 @@ UINT32 mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &b
 
 READ8_MEMBER(mz2000_state::mz2000_ipl_r)
 {
-	UINT8 *ipl = memregion("ipl")->base();
-
-	return ipl[offset];
+	return m_region_ipl->base()[offset];
 }
 
 READ8_MEMBER(mz2000_state::mz2000_wram_r)
 {
-	UINT8 *wram = memregion("wram")->base();
-
-	return wram[offset];
+	return m_region_wram->base()[offset];
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_wram_w)
 {
-	UINT8 *wram = memregion("wram")->base();
-
-	wram[offset] = data;
+	m_region_wram->base()[offset] = data;
 }
 
 READ8_MEMBER(mz2000_state::mz2000_tvram_r)
 {
-	UINT8 *tvram = memregion("tvram")->base();
-
-	return tvram[offset];
+	return m_region_tvram->base()[offset];
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_tvram_w)
 {
-	UINT8 *tvram = memregion("tvram")->base();
-
-	tvram[offset] = data;
+	m_region_tvram->base()[offset] = data;
 }
 
 READ8_MEMBER(mz2000_state::mz2000_gvram_r)
 {
-	UINT8 *gvram = memregion("gvram")->base();
-
-	return gvram[offset+m_gvram_bank*0x4000];
+	return m_region_gvram->base()[offset+m_gvram_bank*0x4000];
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_gvram_w)
 {
-	UINT8 *gvram = memregion("gvram")->base();
-
-	gvram[offset+m_gvram_bank*0x4000] = data;
+	m_region_gvram->base()[offset+m_gvram_bank*0x4000] = data;
 }
 
 
@@ -301,49 +339,41 @@ WRITE8_MEMBER(mz2000_state::mz2000_gvram_bank_w)
 
 READ8_MEMBER(mz2000_state::mz2000_wd17xx_r)
 {
-	device_t *device = machine().device("mb8877a");
-
 	if(m_has_fdc)
-		return wd17xx_r(device, space, offset) ^ 0xff;
+		return wd17xx_r(m_mb8877a, space, offset) ^ 0xff;
 
 	return 0xff;
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_wd17xx_w)
 {
-	device_t *device = machine().device("mb8877a");
-
 	if(m_has_fdc)
-		wd17xx_w(device, space, offset, data ^ 0xff);
+		wd17xx_w(m_mb8877a, space, offset, data ^ 0xff);
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_fdc_w)
 {
-	device_t* dev = machine().device("mb8877a");
-
 	switch(offset+0xdc)
 	{
 		case 0xdc:
-			wd17xx_set_drive(dev,data & 3);
+			wd17xx_set_drive(m_mb8877a,data & 3);
 			floppy_mon_w(floppy_get_device(machine(), data & 3), (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			floppy_drive_set_ready_state(floppy_get_device(machine(), data & 3), 1,0);
 			break;
 		case 0xdd:
-			wd17xx_set_side(dev,(data & 1));
+			wd17xx_set_side(m_mb8877a,(data & 1));
 			break;
 	}
 }
 
 WRITE8_MEMBER(mz2000_state::timer_w)
 {
-	device_t *pit8253 = machine().device("pit");
-
-	pit8253_gate0_w(pit8253, 1);
-	pit8253_gate1_w(pit8253, 1);
-	pit8253_gate0_w(pit8253, 0);
-	pit8253_gate1_w(pit8253, 0);
-	pit8253_gate0_w(pit8253, 1);
-	pit8253_gate1_w(pit8253, 1);
+	pit8253_gate0_w(m_pit8253, 1);
+	pit8253_gate1_w(m_pit8253, 1);
+	pit8253_gate0_w(m_pit8253, 0);
+	pit8253_gate1_w(m_pit8253, 0);
+	pit8253_gate0_w(m_pit8253, 1);
+	pit8253_gate1_w(m_pit8253, 1);
 }
 
 WRITE8_MEMBER(mz2000_state::mz2000_tvram_attr_w)
@@ -525,12 +555,12 @@ void mz2000_state::machine_reset()
 	m_tvram_enable = 0;
 	m_gvram_enable = 0;
 
-	beep_set_frequency(machine().device(BEEPER_TAG),4096);
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	beep_set_frequency(m_beeper,4096);
+	beep_set_state(m_beeper,0);
 
-	m_color_mode = machine().root_device().ioport("CONFIG")->read() & 1;
-	m_has_fdc = (machine().root_device().ioport("CONFIG")->read() & 2) >> 1;
-	m_hi_mode = (machine().root_device().ioport("CONFIG")->read() & 4) >> 2;
+	m_color_mode = m_io_config->read() & 1;
+	m_has_fdc = (m_io_config->read() & 2) >> 1;
+	m_hi_mode = (m_io_config->read() & 4) >> 2;
 
 	{
 		int i;
@@ -699,10 +729,10 @@ WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
 	{
 		m_ipl_enable = 0;
 		/* correct? */
-		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
-	beep_set_state(machine().device(BEEPER_TAG),data & 0x04);
+	beep_set_state(m_beeper,data & 0x04);
 
 	m_old_portc = data;
 }
@@ -729,10 +759,10 @@ WRITE8_MEMBER(mz2000_state::mz2000_pio1_porta_w)
 
 READ8_MEMBER(mz2000_state::mz2000_pio1_portb_r)
 {
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
-											"KEY4", "KEY5", "KEY6", "KEY7",
-											"KEY8", "KEY9", "KEYA", "KEYB",
-											"KEYC", "KEYD", "UNUSED", "UNUSED" };
+	ioport_port* keynames[] = { m_io_key0, m_io_key1, m_io_key2, m_io_key3,
+								m_io_key4, m_io_key5, m_io_key6, m_io_key7,
+								m_io_key8, m_io_key9, m_io_keya, m_io_keyb,
+								m_io_keyc, m_io_keyd, m_io_unused, m_io_unused };
 
 	if(((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
 	{
@@ -740,12 +770,12 @@ READ8_MEMBER(mz2000_state::mz2000_pio1_portb_r)
 
 		res = 0xff;
 		for(i=0;i<0xe;i++)
-			res &= machine().root_device().ioport(keynames[i])->read();
+			res &= keynames[i]->read();
 
 		return res;
 	}
 
-	return machine().root_device().ioport(keynames[m_key_mux & 0xf])->read();
+	return keynames[m_key_mux & 0xf]->read();
 }
 
 READ8_MEMBER(mz2000_state::mz2000_pio1_porta_r)
