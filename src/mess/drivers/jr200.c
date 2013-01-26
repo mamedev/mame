@@ -24,10 +24,26 @@ class jr200_state : public driver_device
 {
 public:
 	jr200_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_vram(*this, "vram"),
-		m_cram(*this, "cram"),
-		m_mn1271_ram(*this, "mn1271_ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_vram(*this, "vram")
+		, m_cram(*this, "cram")
+		, m_mn1271_ram(*this, "mn1271_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_beeper(*this, BEEPER_TAG)
+		, m_pcg(*this, "pcg")
+		, m_gfx_rom(*this, "gfx_rom")
+		, m_gfx_ram(*this, "gfx_ram")
+		, m_row0(*this, "ROW0")
+		, m_row1(*this, "ROW1")
+		, m_row2(*this, "ROW2")
+		, m_row3(*this, "ROW3")
+		, m_row4(*this, "ROW4")
+		, m_row5(*this, "ROW5")
+		, m_row6(*this, "ROW6")
+		, m_row7(*this, "ROW7")
+		, m_row8(*this, "ROW8")
+		, m_row9(*this, "ROW9")
+	{ }
 
 	required_shared_ptr<UINT8> m_vram;
 	required_shared_ptr<UINT8> m_cram;
@@ -54,6 +70,23 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(timer_d_callback);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_beeper;
+	required_memory_region m_pcg;
+	required_memory_region m_gfx_rom;
+	required_memory_region m_gfx_ram;
+	required_ioport m_row0;
+	required_ioport m_row1;
+	required_ioport m_row2;
+	required_ioport m_row3;
+	required_ioport m_row4;
+	required_ioport m_row5;
+	required_ioport m_row6;
+	required_ioport m_row7;
+	required_ioport m_row8;
+	required_ioport m_row9;
 };
 
 
@@ -159,7 +192,7 @@ UINT32 jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &bit
 					}
 					else // tile mode
 					{
-						gfx_data = machine().root_device().memregion(attr & 0x40 ? "pcg" : "gfx_ram")->base();
+						gfx_data = (attr & 0x40) ? m_pcg->base() : m_gfx_ram->base();
 
 						pen = (gfx_data[(tile*8)+yi]>>(7-xi) & 1) ? (attr & 0x7) : ((attr & 0x38) >> 3);
 					}
@@ -175,48 +208,36 @@ UINT32 jr200_state::screen_update_jr200(screen_device &screen, bitmap_ind16 &bit
 
 READ8_MEMBER(jr200_state::jr200_pcg_1_r)
 {
-	UINT8 *pcg = memregion("pcg")->base();
-
-	return pcg[offset+0x000];
+	return m_pcg->base()[offset+0x000];
 }
 
 READ8_MEMBER(jr200_state::jr200_pcg_2_r)
 {
-	UINT8 *pcg = memregion("pcg")->base();
-
-	return pcg[offset+0x400];
+	return m_pcg->base()[offset+0x400];
 }
 
 WRITE8_MEMBER(jr200_state::jr200_pcg_1_w)
 {
-	UINT8 *pcg = memregion("pcg")->base();
-
-	pcg[offset+0x000] = data;
+	m_pcg->base()[offset+0x000] = data;
 	machine().gfx[1]->mark_dirty((offset+0x000) >> 3);
 }
 
 WRITE8_MEMBER(jr200_state::jr200_pcg_2_w)
 {
-	UINT8 *pcg = memregion("pcg")->base();
-
-	pcg[offset+0x400] = data;
+	m_pcg->base()[offset+0x400] = data;
 	machine().gfx[1]->mark_dirty((offset+0x400) >> 3);
 }
 
 READ8_MEMBER(jr200_state::jr200_bios_char_r)
 {
-	UINT8 *gfx = memregion("gfx_ram")->base();
-
-	return gfx[offset];
+	return m_gfx_ram->base()[offset];
 }
 
 
 WRITE8_MEMBER(jr200_state::jr200_bios_char_w)
 {
-//  UINT8 *gfx = memregion("gfx_ram")->base();
-
 	/* TODO: writing is presumably controlled by an I/O bit */
-//  gfx[offset] = data;
+//  m_gfx_ram->base()[offset] = data;
 //  machine().gfx[0]->mark_dirty(offset >> 3);
 }
 
@@ -230,9 +251,8 @@ READ8_MEMBER(jr200_state::mcu_keyb_r)
 {
 	int row, col, table = 0;
 	UINT8 keydata = 0;
-	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 
-	if (ioport("ROW9")->read() & 0x07)
+	if (m_row9->read() & 0x07)
 	{
 		/* shift, upper case */
 		table = 1;
@@ -241,7 +261,20 @@ READ8_MEMBER(jr200_state::mcu_keyb_r)
 	/* scan keyboard */
 	for (row = 0; row < 9; row++)
 	{
-		UINT8 data = ioport(keynames[row])->read();
+		UINT8 data = 0xff;
+
+		switch ( row )
+		{
+			case 0: data = m_row0->read(); break;
+			case 1: data = m_row1->read(); break;
+			case 2: data = m_row2->read(); break;
+			case 3: data = m_row3->read(); break;
+			case 4: data = m_row4->read(); break;
+			case 5: data = m_row5->read(); break;
+			case 6: data = m_row6->read(); break;
+			case 7: data = m_row7->read(); break;
+			case 8: data = m_row8->read(); break;
+		}
 
 		for (col = 0; col < 8; col++)
 		{
@@ -264,7 +297,7 @@ READ8_MEMBER(jr200_state::mcu_keyb_r)
 WRITE8_MEMBER(jr200_state::jr200_beep_w)
 {
 	/* writing 0x0e enables the beeper, writing anything else disables it */
-	beep_set_state(machine().device(BEEPER_TAG),((data & 0xf) == 0x0e) ? 1 : 0);
+	beep_set_state(m_beeper,((data & 0xf) == 0x0e) ? 1 : 0);
 }
 
 WRITE8_MEMBER(jr200_state::jr200_beep_freq_w)
@@ -275,7 +308,7 @@ WRITE8_MEMBER(jr200_state::jr200_beep_freq_w)
 
 	beep_freq = ((m_freq_reg[0]<<8) | (m_freq_reg[1] & 0xff)) + 1;
 
-	beep_set_frequency(machine().device(BEEPER_TAG),84000 / beep_freq);
+	beep_set_frequency(m_beeper,84000 / beep_freq);
 }
 
 WRITE8_MEMBER(jr200_state::jr200_border_col_w)
@@ -286,7 +319,7 @@ WRITE8_MEMBER(jr200_state::jr200_border_col_w)
 
 TIMER_CALLBACK_MEMBER(jr200_state::timer_d_callback)
 {
-	machine().firstcpu->set_input_line(0, HOLD_LINE);
+	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(jr200_state::mn1271_io_r)
@@ -483,15 +516,15 @@ GFXDECODE_END
 
 void jr200_state::machine_start()
 {
-	beep_set_frequency(machine().device(BEEPER_TAG),0);
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	beep_set_frequency(m_beeper,0);
+	beep_set_state(m_beeper,0);
 	m_timer_d = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jr200_state::timer_d_callback),this));
 }
 
 void jr200_state::machine_reset()
 {
-	UINT8 *gfx_rom = machine().root_device().memregion("gfx_rom")->base();
-	UINT8 *gfx_ram = memregion("gfx_ram")->base();
+	UINT8 *gfx_rom = m_gfx_rom->base();
+	UINT8 *gfx_ram = m_gfx_ram->base();
 	int i;
 	memset(m_mn1271_ram,0,0x800);
 
