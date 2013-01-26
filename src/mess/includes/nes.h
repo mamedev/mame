@@ -125,6 +125,20 @@ public:
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
 
+	ioport_port       *m_io_ctrlsel;
+	ioport_port       *m_io_fckey[9];
+	ioport_port       *m_io_subkey[13];
+	ioport_port       *m_io_pad[4];
+	ioport_port       *m_io_cc_left;
+	ioport_port       *m_io_cc_right;
+	ioport_port       *m_io_zapper1_t;
+	ioport_port       *m_io_zapper1_x;
+	ioport_port       *m_io_zapper1_y;
+	ioport_port       *m_io_zapper2_t;
+	ioport_port       *m_io_zapper2_x;
+	ioport_port       *m_io_zapper2_y;
+	ioport_port       *m_io_paddle;
+	
 private:
 	/* devices */
 //  cpu_device        *m_maincpu;
@@ -132,7 +146,6 @@ private:
 //  device_t          *m_sound;
 	device_t          *m_cart;
 //  emu_timer         *m_irq_timer;
-	ioport_port       *m_io_ctrlsel;
 	memory_bank       *m_prg_bank_mem[5];
 };
 
