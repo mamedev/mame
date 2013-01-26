@@ -61,10 +61,9 @@ static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
 #if ENABLE_UART_PRINTING
 	AM_RANGE(0x00301400, 0x00301403) AM_READ_LEGACY(uart_loopback_enable)
 #endif
-	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE_LEGACY("cdic", cdic_ram_r, cdic_ram_w)
-	//AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_SHARE("cdic_regs.ram")
-	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE_LEGACY("cdic", cdic_r, cdic_w)
-	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE_LEGACY("slave", slave_r, slave_w)
+	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdicdic_device, ram_r, ram_w)
+	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdicdic_device, regs_r, regs_w)
+	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave", cdislave_device, slave_r, slave_w)
 	//AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
 	AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8_LEGACY("mk48t08", timekeeper_r, timekeeper_w, 0xff00)    /* nvram (only low bytes used) */
 	AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
@@ -72,7 +71,7 @@ static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
 	//AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
 	AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
 	//AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
-	AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE_LEGACY(scc68070_periphs_r, scc68070_periphs_w)
+	AM_RANGE(0x80000000, 0x8000807f) AM_DEVREADWRITE("scc68070", cdi68070_device, periphs_r, periphs_w)
 ADDRESS_MAP_END
 
 /*************************
@@ -81,48 +80,47 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 {
-	scc68070_regs_t *scc68070 = &m_scc68070_regs;
 	bool send = false;
 
 	switch((FPTR)param)
 	{
 		case 0x39:
-			if(ioport("INPUT1")->read() & 0x01) send = true;
+			if(m_input1->read() & 0x01) send = true;
 			break;
 		case 0x37:
-			if(ioport("INPUT1")->read() & 0x02) send = true;
+			if(m_input1->read() & 0x02) send = true;
 			break;
 		case 0x31:
-			if(ioport("INPUT1")->read() & 0x04) send = true;
+			if(m_input1->read() & 0x04) send = true;
 			break;
 		case 0x32:
-			if(ioport("INPUT1")->read() & 0x08) send = true;
+			if(m_input1->read() & 0x08) send = true;
 			break;
 		case 0x33:
-			if(ioport("INPUT1")->read() & 0x10) send = true;
+			if(m_input1->read() & 0x10) send = true;
 			break;
 
 		case 0x30:
-			if(ioport("INPUT2")->read() & 0x01) send = true;
+			if(m_input2->read() & 0x01) send = true;
 			break;
 		case 0x38:
-			if(ioport("INPUT2")->read() & 0x02) send = true;
+			if(m_input2->read() & 0x02) send = true;
 			break;
 		case 0x34:
-			if(ioport("INPUT2")->read() & 0x04) send = true;
+			if(m_input2->read() & 0x04) send = true;
 			break;
 		case 0x35:
-			if(ioport("INPUT2")->read() & 0x08) send = true;
+			if(m_input2->read() & 0x08) send = true;
 			break;
 		case 0x36:
-			if(ioport("INPUT2")->read() & 0x10) send = true;
+			if(m_input2->read() & 0x10) send = true;
 			break;
 	}
 
 	if(send)
 	{
 		UINT8 data = (UINT8)((FPTR)param & 0x000000ff);
-		scc68070_quizard_rx(machine(), scc68070, data);
+		m_scc->quizard_rx(data);
 	}
 }
 
@@ -191,7 +189,11 @@ INPUT_PORTS_END
 
 void cdi_state::machine_start()
 {
-	scc68070_register_globals(machine(), &m_scc68070_regs);
+}
+
+INTERRUPT_GEN_MEMBER( cdi_state::mcu_frame )
+{
+	m_scc->mcu_frame();
 }
 
 MACHINE_RESET_MEMBER(cdi_state,cdi)
@@ -201,9 +203,7 @@ MACHINE_RESET_MEMBER(cdi_state,cdi)
 	//device_t *cdrom_dev = machine().device("cdrom");
 	memcpy(dst, src, 0x8);
 
-	scc68070_init(machine(), &m_scc68070_regs);
-
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 
 	m_dmadac[0] = machine().device<dmadac_sound_device>("dac1");
 	m_dmadac[1] = machine().device<dmadac_sound_device>("dac2");
@@ -213,16 +213,16 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd12)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	scc68070_set_quizard_mcu_value(machine(), 0x021f);
-	scc68070_set_quizard_mcu_ack(machine(), 0x5a);
+	m_scc->set_quizard_mcu_value(0x021f);
+	m_scc->set_quizard_mcu_ack(0x5a);
 }
 
 MACHINE_RESET_MEMBER(cdi_state,quizrd17)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	scc68070_set_quizard_mcu_value(machine(), 0x021f);
-	scc68070_set_quizard_mcu_ack(machine(), 0x5a);
+	m_scc->set_quizard_mcu_value(0x021f);
+	m_scc->set_quizard_mcu_ack(0x5a);
 }
 
 /* Untested - copied from quizrd17 */
@@ -230,8 +230,8 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd18)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	scc68070_set_quizard_mcu_value(machine(), 0x021f);
-	scc68070_set_quizard_mcu_ack(machine(), 0x5a);
+	m_scc->set_quizard_mcu_value(0x021f);
+	m_scc->set_quizard_mcu_ack(0x5a);
 }
 
 MACHINE_RESET_MEMBER(cdi_state,quizrd22)
@@ -242,8 +242,8 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd22)
 	// 0x001: French
 	// 0x188: German
 
-	scc68070_set_quizard_mcu_value(machine(), 0x188);
-	scc68070_set_quizard_mcu_ack(machine(), 0x59);
+	m_scc->set_quizard_mcu_value(0x188);
+	m_scc->set_quizard_mcu_ack(0x59);
 }
 
 /* Untested - copied from quizrd22 */
@@ -255,16 +255,16 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd23)
 	// 0x001: French
 	// 0x188: German
 
-	scc68070_set_quizard_mcu_value(machine(), 0x188);
-	scc68070_set_quizard_mcu_ack(machine(), 0x59);
+	m_scc->set_quizard_mcu_value(0x188);
+	m_scc->set_quizard_mcu_ack(0x59);
 }
 
 MACHINE_RESET_MEMBER(cdi_state,quizrd32)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	scc68070_set_quizard_mcu_value(machine(), 0x00ae);
-	scc68070_set_quizard_mcu_ack(machine(), 0x58);
+	m_scc->set_quizard_mcu_value(0x00ae);
+	m_scc->set_quizard_mcu_ack(0x58);
 }
 
 /* Untested - copied from quizrd32 */
@@ -272,8 +272,8 @@ MACHINE_RESET_MEMBER(cdi_state,quizrd34)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	scc68070_set_quizard_mcu_value(machine(), 0x00ae);
-	scc68070_set_quizard_mcu_ack(machine(), 0x58);
+	m_scc->set_quizard_mcu_value(0x00ae);
+	m_scc->set_quizard_mcu_ack(0x58);
 }
 
 /* Untested - copied from quizrr41 */
@@ -281,26 +281,26 @@ MACHINE_RESET_MEMBER(cdi_state,quizrr40)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	//scc68070_set_quizard_mcu_value(machine(), 0x0139);
-	scc68070_set_quizard_mcu_value(machine(), 0x011f);
-	scc68070_set_quizard_mcu_ack(machine(), 0x57);
+	//m_scc->set_quizard_mcu_value(0x0139);
+	m_scc->set_quizard_mcu_value(0x011f);
+	m_scc->set_quizard_mcu_ack(0x57);
 }
 
 MACHINE_RESET_MEMBER(cdi_state,quizrr41)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	//scc68070_set_quizard_mcu_value(machine(), 0x0139);
-	scc68070_set_quizard_mcu_value(machine(), 0x011f);
-	scc68070_set_quizard_mcu_ack(machine(), 0x57);
+	//m_scc->set_quizard_mcu_value(0x0139);
+	m_scc->set_quizard_mcu_value(0x011f);
+	m_scc->set_quizard_mcu_ack(0x57);
 }
 
 MACHINE_RESET_MEMBER(cdi_state,quizrr42)
 {
 	MACHINE_RESET_CALL_MEMBER( cdi );
 
-	scc68070_set_quizard_mcu_value(machine(), 0x01ae);
-	scc68070_set_quizard_mcu_ack(machine(), 0x57);
+	m_scc->set_quizard_mcu_value(0x01ae);
+	m_scc->set_quizard_mcu_ack(0x57);
 }
 
 static DEVICE_IMAGE_DISPLAY_INFO(cdi_cdinfo)
@@ -343,10 +343,9 @@ static MACHINE_CONFIG_START( cdi, cdi_state )
 
 	MCFG_DEFAULT_LAYOUT(layout_cdi)
 
-
-
-	MCFG_CDICDIC_ADD( "cdic" )
-	MCFG_CDISLAVE_ADD( "slave" )
+	MCFG_CDI68070_ADD("scc68070")
+	MCFG_CDICDIC_ADD("cdic")
+	MCFG_CDISLAVE_ADD("slave")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -384,7 +383,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( quizard, cdi_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cdimono1_mem)
-	MCFG_CPU_VBLANK_INT("screen", scc68070_mcu_frame)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cdi_state, mcu_frame)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizrd12, quizard )

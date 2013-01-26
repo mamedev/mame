@@ -50,17 +50,13 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 //  MEMBER FUNCTIONS
 //**************************************************************************
 
-TIMER_CALLBACK( cdislave_device::trigger_readback_int )
+TIMER_CALLBACK_MEMBER( cdislave_device::trigger_readback_int )
 {
-	cdislave_device *slave = static_cast<cdislave_device *>(machine.device("slave"));
-	slave->readback_trigger();
-}
+	cdi_state *state = machine().driver_data<cdi_state>();
 
-void cdislave_device::readback_trigger()
-{
 	verboselog(machine(), 0, "Asserting IRQ2\n" );
-	machine().device("maincpu")->execute().set_input_line_vector(M68K_IRQ_2, 26);
-	machine().device("maincpu")->execute().set_input_line(M68K_IRQ_2, ASSERT_LINE);
+	state->m_maincpu->set_input_line_vector(M68K_IRQ_2, 26);
+	state->m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE);
 	m_interrupt_timer->adjust(attotime::never);
 }
 
@@ -79,9 +75,11 @@ void cdislave_device::prepare_readback(attotime delay, UINT8 channel, UINT8 coun
 
 void cdislave_device::perform_mouse_update()
 {
-	UINT16 x = machine().root_device().ioport("MOUSEX")->read();
-	UINT16 y = machine().root_device().ioport("MOUSEY")->read();
-	UINT8 buttons = machine().root_device().ioport("MOUSEBTN")->read();
+	cdi_state *state = machine().driver_data<cdi_state>();
+
+	UINT16 x = state->m_mousex->read();
+	UINT16 y = state->m_mousey->read();
+	UINT8 buttons = state->m_mousebtn->read();
 
 	UINT16 old_mouse_x = m_real_mouse_x;
 	UINT16 old_mouse_y = m_real_mouse_y;
@@ -122,13 +120,10 @@ INPUT_CHANGED_MEMBER( cdislave_device::mouse_update )
 	perform_mouse_update();
 }
 
-READ16_DEVICE_HANDLER( slave_r )
+READ16_MEMBER( cdislave_device::slave_r )
 {
-	return downcast<cdislave_device *>(device)->register_read(offset, mem_mask);
-}
+	cdi_state *state = machine().driver_data<cdi_state>();
 
-UINT16 cdislave_device::register_read(const UINT32 offset, const UINT16 mem_mask)
-{
 	if(m_channel[offset].m_out_count)
 	{
 		UINT8 ret = m_channel[offset].m_out_buf[m_channel[offset].m_out_index];
@@ -144,7 +139,7 @@ UINT16 cdislave_device::register_read(const UINT32 offset, const UINT16 mem_mask
 				case 0xf4:
 				case 0xf7:
 					verboselog(machine(), 0, "slave_r: De-asserting IRQ2\n" );
-					machine().device("maincpu")->execute().set_input_line(M68K_IRQ_2, CLEAR_LINE);
+					state->m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 					break;
 			}
 		}
@@ -180,12 +175,7 @@ void cdislave_device::set_mouse_position()
 	}
 }
 
-WRITE16_DEVICE_HANDLER( slave_w )
-{
-	downcast<cdislave_device *>(device)->register_write(offset, data, mem_mask);
-}
-
-void cdislave_device::register_write(const UINT32 offset, const UINT16 data, const UINT16 mem_mask)
+WRITE16_MEMBER( cdislave_device::slave_w )
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
@@ -429,7 +419,6 @@ void cdislave_device::register_write(const UINT32 offset, const UINT16 data, con
 cdislave_device::cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MACHINE_CDISLAVE, "CDISLAVE", tag, owner, clock)
 {
-	init();
 }
 
 //-------------------------------------------------
@@ -437,53 +426,6 @@ cdislave_device::cdislave_device(const machine_config &mconfig, const char *tag,
 //-------------------------------------------------
 
 void cdislave_device::device_start()
-{
-	register_globals();
-
-	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(trigger_readback_int));
-	m_interrupt_timer->adjust(attotime::never);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void cdislave_device::device_reset()
-{
-	init();
-}
-
-void cdislave_device::init()
-{
-	for(INT32 index = 0; index < 4; index++)
-	{
-		m_channel[index].m_out_buf[0] = 0;
-		m_channel[index].m_out_buf[1] = 0;
-		m_channel[index].m_out_buf[2] = 0;
-		m_channel[index].m_out_buf[3] = 0;
-		m_channel[index].m_out_index = 0;
-		m_channel[index].m_out_count = 0;
-		m_channel[index].m_out_cmd = 0;
-	}
-
-	memset(m_in_buf, 0, 17);
-	m_in_index = 0;
-	m_in_count = 0;
-
-	m_polling_active = 0;
-
-	m_xbus_interrupt_enable = 0;
-
-	memset(m_lcd_state, 0, 16);
-
-	m_real_mouse_x = 0xffff;
-	m_real_mouse_y = 0xffff;
-
-	m_fake_mouse_x = 0;
-	m_fake_mouse_y = 0;
-}
-
-void cdislave_device::register_globals()
 {
 	save_item(NAME(m_channel[0].m_out_buf[0]));
 	save_item(NAME(m_channel[0].m_out_buf[1]));
@@ -529,4 +471,41 @@ void cdislave_device::register_globals()
 
 	save_item(NAME(m_fake_mouse_x));
 	save_item(NAME(m_fake_mouse_y));
+
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdislave_device::trigger_readback_int), this));
+	m_interrupt_timer->adjust(attotime::never);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void cdislave_device::device_reset()
+{
+	for(INT32 index = 0; index < 4; index++)
+	{
+		m_channel[index].m_out_buf[0] = 0;
+		m_channel[index].m_out_buf[1] = 0;
+		m_channel[index].m_out_buf[2] = 0;
+		m_channel[index].m_out_buf[3] = 0;
+		m_channel[index].m_out_index = 0;
+		m_channel[index].m_out_count = 0;
+		m_channel[index].m_out_cmd = 0;
+	}
+
+	memset(m_in_buf, 0, 17);
+	m_in_index = 0;
+	m_in_count = 0;
+
+	m_polling_active = 0;
+
+	m_xbus_interrupt_enable = 0;
+
+	memset(m_lcd_state, 0, 16);
+
+	m_real_mouse_x = 0xffff;
+	m_real_mouse_y = 0xffff;
+
+	m_fake_mouse_x = 0;
+	m_fake_mouse_y = 0;
 }

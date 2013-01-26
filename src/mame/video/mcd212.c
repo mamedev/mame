@@ -620,11 +620,11 @@ static void mcd212_process_ica(mcd212_regs_t *mcd212, int channel)
 				mcd212->channel[1].csrr |= 1 << (2 - channel);
 				if(mcd212->channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
 				{
-					UINT8 interrupt = (state->m_scc68070_regs.lir >> 4) & 7;
+					UINT8 interrupt = (state->m_scc->get_lir() >> 4) & 7;
 					if(interrupt)
 					{
-						machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
-						machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
+						state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+						state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
 #if 0
@@ -633,8 +633,8 @@ static void mcd212_process_ica(mcd212_regs_t *mcd212, int channel)
 					UINT8 interrupt = state->m_scc68070_regs.lir & 7;
 					if(interrupt)
 					{
-						machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
-						machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
+						state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
+						state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
 #endif
@@ -711,11 +711,11 @@ static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
 				mcd212->channel[1].csrr |= 1 << (2 - channel);
 				if(mcd212->channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
 				{
-					UINT8 interrupt = (state->m_scc68070_regs.lir >> 4) & 7;
+					UINT8 interrupt = (state->m_scc->get_lir() >> 4) & 7;
 					if(interrupt)
 					{
-						machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
-						machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
+						state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+						state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
 #if 0
@@ -724,8 +724,8 @@ static void mcd212_process_dca(mcd212_regs_t *mcd212, int channel)
 					UINT8 interrupt = state->m_scc68070_regs.lir & 7;
 					if(interrupt)
 					{
-						machine.device("maincpu")->execute().set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
-						machine.device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
+						state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
+						state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
 #endif
@@ -1371,16 +1371,16 @@ READ16_HANDLER( mcd212_r )
 				else
 				{
 					UINT8 old_csr = mcd212->channel[1].csrr;
-					UINT8 interrupt1 = (state->m_scc68070_regs.lir >> 4) & 7;
+					UINT8 interrupt1 = (state->m_scc->get_lir() >> 4) & 7;
 					//UINT8 interrupt2 = state->m_scc68070_regs.lir & 7;
 					mcd212->channel[1].csrr &= ~(MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2);
 					if(interrupt1)
 					{
-						space.machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt1 - 1), CLEAR_LINE);
+						state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt1 - 1), CLEAR_LINE);
 					}
 					//if(interrupt2)
 					//{
-					//  space.machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1 + (interrupt2 - 1), CLEAR_LINE);
+					//  state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt2 - 1), CLEAR_LINE);
 					//}
 					return old_csr;
 				}

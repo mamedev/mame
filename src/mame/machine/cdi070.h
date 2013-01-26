@@ -19,24 +19,10 @@ TODO:
 
 *******************************************************************************/
 
-#ifndef _MACHINE_CDI070_H_
-#define _MACHINE_CDI070_H_
+#ifndef _MACHINE_CDI68070_H_
+#define _MACHINE_CDI68070_H_
 
 #include "emu.h"
-
-struct scc68070_i2c_regs_t
-{
-	UINT8 reserved0;
-	UINT8 data_register;
-	UINT8 reserved1;
-	UINT8 address_register;
-	UINT8 reserved2;
-	UINT8 status_register;
-	UINT8 reserved3;
-	UINT8 control_register;
-	UINT8 reserved;
-	UINT8 clock_control_register;
-};
 
 #define ISR_MST     0x80    // Master
 #define ISR_TRX     0x40    // Transmitter
@@ -46,30 +32,6 @@ struct scc68070_i2c_regs_t
 #define ISR_AAS     0x04    // Addressed As Slave
 #define ISR_AD0     0x02    // Address Zero
 #define ISR_LRB     0x01    // Last Received Bit
-
-struct scc68070_uart_regs_t
-{
-	UINT8 reserved0;
-	UINT8 mode_register;
-	UINT8 reserved1;
-	UINT8 status_register;
-	UINT8 reserved2;
-	UINT8 clock_select;
-	UINT8 reserved3;
-	UINT8 command_register;
-	UINT8 reserved4;
-	UINT8 transmit_holding_register;
-	UINT8 reserved5;
-	UINT8 receive_holding_register;
-
-	INT16 receive_pointer;
-	UINT8 receive_buffer[32768];
-	emu_timer* rx_timer;
-
-	INT16 transmit_pointer;
-	UINT8 transmit_buffer[32768];
-	emu_timer* tx_timer;
-};
 
 #define UMR_OM          0xc0
 #define UMR_OM_NORMAL   0x00
@@ -89,17 +51,6 @@ struct scc68070_uart_regs_t
 #define USR_TXEMT       0x08
 #define USR_TXRDY       0x04
 #define USR_RXRDY       0x01
-
-struct scc68070_timer_regs_t
-{
-	UINT8 timer_status_register;
-	UINT8 timer_control_register;
-	UINT16 reload_register;
-	UINT16 timer0;
-	UINT16 timer1;
-	UINT16 timer2;
-	emu_timer* timer0_timer;
-};
 
 #define TSR_OV0         0x80
 #define TSR_MA1         0x40
@@ -129,31 +80,6 @@ struct scc68070_timer_regs_t
 #define TCR_M2_MATCH    0x01
 #define TCR_M2_CAPTURE  0x02
 #define TCR_M2_COUNT    0x03
-
-struct scc68070_dma_channel_t
-{
-	UINT8 channel_status;
-	UINT8 channel_error;
-
-	UINT8 reserved0[2];
-
-	UINT8 device_control;
-	UINT8 operation_control;
-	UINT8 sequence_control;
-	UINT8 channel_control;
-
-	UINT8 reserved1[3];
-
-	UINT16 transfer_counter;
-
-	UINT32 memory_address_counter;
-
-	UINT8 reserved2[4];
-
-	UINT32 device_address_counter;
-
-	UINT8 reserved3[40];
-};
 
 #define CSR_COC         0x80
 #define CSR_NDT         0x20
@@ -193,61 +119,186 @@ struct scc68070_dma_channel_t
 #define CCR_INE         0x08
 #define CCR_IPL         0x07
 
-struct scc68070_dma_regs_t
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_CDI68070_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MACHINE_CDI68070, 0)
+#define MCFG_CDI68070_REPLACE(_tag) \
+	MCFG_DEVICE_REPLACE(_tag, MACHINE_CDI68070, 0)
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> cdi68070_device
+
+class cdi68070_device : public device_t
 {
-	scc68070_dma_channel_t channel[2];
+public:
+	// construction/destruction
+	cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// external callbacks
+	void init();
+	void uart_rx(UINT8 data);
+	void uart_tx(UINT8 data);
+
+	// UART Access for Quizard
+	void set_quizard_mcu_value(UINT16 value);
+	void set_quizard_mcu_ack(UINT8 ack);
+	void quizard_rx(UINT8 data);
+
+	void mcu_frame();
+
+	DECLARE_READ16_MEMBER(periphs_r);
+	DECLARE_WRITE16_MEMBER(periphs_w);
+
+	TIMER_CALLBACK_MEMBER( timer0_callback );
+	TIMER_CALLBACK_MEMBER( rx_callback );
+	TIMER_CALLBACK_MEMBER( tx_callback );
+
+	// register structures
+	struct i2c_regs_t
+	{
+		UINT8 reserved0;
+		UINT8 data_register;
+		UINT8 reserved1;
+		UINT8 address_register;
+		UINT8 reserved2;
+		UINT8 status_register;
+		UINT8 reserved3;
+		UINT8 control_register;
+		UINT8 reserved;
+		UINT8 clock_control_register;
+	};
+
+	struct uart_regs_t
+	{
+		UINT8 reserved0;
+		UINT8 mode_register;
+		UINT8 reserved1;
+		UINT8 status_register;
+		UINT8 reserved2;
+		UINT8 clock_select;
+		UINT8 reserved3;
+		UINT8 command_register;
+		UINT8 reserved4;
+		UINT8 transmit_holding_register;
+		UINT8 reserved5;
+		UINT8 receive_holding_register;
+
+		INT16 receive_pointer;
+		UINT8 receive_buffer[32768];
+		emu_timer* rx_timer;
+
+		INT16 transmit_pointer;
+		UINT8 transmit_buffer[32768];
+		emu_timer* tx_timer;
+	};
+
+	struct timer_regs_t
+	{
+		UINT8 timer_status_register;
+		UINT8 timer_control_register;
+		UINT16 reload_register;
+		UINT16 timer0;
+		UINT16 timer1;
+		UINT16 timer2;
+		emu_timer* timer0_timer;
+	};
+
+	struct dma_channel_t
+	{
+		UINT8 channel_status;
+		UINT8 channel_error;
+
+		UINT8 reserved0[2];
+
+		UINT8 device_control;
+		UINT8 operation_control;
+		UINT8 sequence_control;
+		UINT8 channel_control;
+
+		UINT8 reserved1[3];
+
+		UINT16 transfer_counter;
+
+		UINT32 memory_address_counter;
+
+		UINT8 reserved2[4];
+
+		UINT32 device_address_counter;
+
+		UINT8 reserved3[40];
+	};
+
+	struct dma_regs_t
+	{
+		dma_channel_t channel[2];
+	};
+
+	struct mmu_desc_t
+	{
+		UINT16 attr;
+		UINT16 length;
+		UINT8  undefined;
+		UINT8  segment;
+		UINT16 base;
+	};
+
+	struct mmu_regs_t
+	{
+		UINT8 status;
+		UINT8 control;
+
+		UINT8 reserved[0x3e];
+
+		mmu_desc_t desc[8];
+	};
+
+	dma_regs_t& dma() { return m_dma; }
+
+	UINT16 get_lir() { return m_lir; }
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+private:
+
+	void uart_rx_check();
+	void uart_tx_check();
+	void set_timer_callback(int channel);
+
+	// internal state
+	emu_timer *m_interrupt_timer;
+
+	UINT16 m_seeds[10];
+	UINT8 m_state[8];
+
+	UINT16 m_mcu_value;
+	UINT8 m_mcu_ack;
+
+	UINT16 m_lir;
+	UINT8 m_picr1;
+	UINT8 m_picr2;
+
+	i2c_regs_t m_i2c;
+	uart_regs_t m_uart;
+	timer_regs_t m_timers;
+	dma_regs_t m_dma;
+	mmu_regs_t m_mmu;
+
+	// non-static internal members
+	void quizard_calculate_state();
+	void quizard_set_seeds(UINT8 *rx);
+	void quizard_handle_byte_tx();
 };
 
-struct scc68070_mmu_desc_t
-{
-	UINT16 attr;
-	UINT16 length;
-	UINT8  undefined;
-	UINT8  segment;
-	UINT16 base;
-};
+// device type definition
+extern const device_type MACHINE_CDI68070;
 
-struct scc68070_mmu_regs_t
-{
-	UINT8 status;
-	UINT8 control;
-
-	UINT8 reserved[0x3e];
-
-	scc68070_mmu_desc_t desc[8];
-};
-
-struct scc68070_regs_t
-{
-	UINT16 lir;
-	UINT8 picr1;
-	UINT8 picr2;
-
-	scc68070_i2c_regs_t i2c;
-	scc68070_uart_regs_t uart;
-	scc68070_timer_regs_t timers;
-	scc68070_dma_regs_t dma;
-	scc68070_mmu_regs_t mmu;
-};
-
-// Member functions
-TIMER_CALLBACK( scc68070_timer0_callback );
-TIMER_CALLBACK( scc68070_rx_callback );
-TIMER_CALLBACK( scc68070_tx_callback );
-DECLARE_READ16_HANDLER( scc68070_periphs_r );
-DECLARE_WRITE16_HANDLER( scc68070_periphs_w );
-//DECLARE_READ16_HANDLER( uart_loopback_enable );
-
-void scc68070_init(running_machine &machine, scc68070_regs_t *scc68070);
-void scc68070_uart_rx(running_machine &machine, scc68070_regs_t *scc68070, UINT8 data);
-void scc68070_uart_tx(running_machine &machine, scc68070_regs_t *scc68070, UINT8 data);
-void scc68070_register_globals(running_machine &machine, scc68070_regs_t *scc68070);
-
-// UART Access for Quizard
-void scc68070_set_quizard_mcu_value(running_machine &machine, UINT16 value);
-void scc68070_set_quizard_mcu_ack(running_machine &machine, UINT8 ack);
-void scc68070_quizard_rx(running_machine &machine, scc68070_regs_t *scc68070, UINT8 data);
-
-INTERRUPT_GEN( scc68070_mcu_frame );
-
-#endif // _MACHINE_CDI070_H_
+#endif // _MACHINE_CDI68070_H_

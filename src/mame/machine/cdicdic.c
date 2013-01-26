@@ -530,14 +530,15 @@ void cdicdic_device::decode_audio_sector(const UINT8 *xa, INT32 triggered)
 }
 
 // After an appropriate delay for decoding to take place...
-TIMER_CALLBACK( cdicdic_device::audio_sample_trigger )
+TIMER_CALLBACK_MEMBER( cdicdic_device::audio_sample_trigger )
 {
-	cdicdic_device *cdic = static_cast<cdicdic_device *>(machine.device("cdic"));
-	cdic->sample_trigger();
+	sample_trigger();
 }
 
 void cdicdic_device::sample_trigger()
 {
+	cdi_state *state = machine().driver_data<cdi_state>();
+
 	if(m_decode_addr == 0xffff)
 	{
 		verboselog(machine(), 0, "Decode stop requested, stopping playback\n" );
@@ -553,8 +554,8 @@ void cdicdic_device::sample_trigger()
 
 		// Set the CDIC interrupt line
 		verboselog(machine(), 0, "Setting CDIC interrupt line for soundmap decode\n" );
-		machine().device("maincpu")->execute().set_input_line_vector(M68K_IRQ_4, 128);
-		machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
+		state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
+		state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 	}
 	else
 	{
@@ -590,14 +591,15 @@ void cdicdic_device::sample_trigger()
 	}
 }
 
-TIMER_CALLBACK( cdicdic_device::trigger_readback_int )
+TIMER_CALLBACK_MEMBER( cdicdic_device::trigger_readback_int )
 {
-	cdicdic_device *cdic = static_cast<cdicdic_device *>(machine.device("cdic"));
-	cdic->process_delayed_command();
+	process_delayed_command();
 }
 
 void cdicdic_device::process_delayed_command()
 {
+	cdi_state *state = machine().driver_data<cdi_state>();
+
 	switch(m_command)
 	{
 		case 0x23: // Reset Mode 1
@@ -707,8 +709,8 @@ void cdicdic_device::process_delayed_command()
 
 					//printf( "Setting CDIC interrupt line\n" );
 					verboselog(machine(), 0, "Setting CDIC interrupt line for audio sector\n" );
-					machine().device("maincpu")->execute().set_input_line_vector(M68K_IRQ_4, 128);
-					machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
+					state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
+					state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 				}
 				else if((buffer[CDIC_SECTOR_SUBMODE2] & (CDIC_SUBMODE_DATA | CDIC_SUBMODE_AUDIO | CDIC_SUBMODE_VIDEO)) == 0x00)
 				{
@@ -726,8 +728,8 @@ void cdicdic_device::process_delayed_command()
 					{
 						//printf( "Setting CDIC interrupt line\n" );
 						verboselog(machine(), 0, "Setting CDIC interrupt line for message sector\n" );
-						machine().device("maincpu")->execute().set_input_line_vector(M68K_IRQ_4, 128);
-						machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
+						state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
+						state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 					}
 					else
 					{
@@ -746,8 +748,8 @@ void cdicdic_device::process_delayed_command()
 
 					//printf( "Setting CDIC interrupt line\n" );
 					verboselog(machine(), 0, "Setting CDIC interrupt line for data sector\n" );
-					machine().device("maincpu")->execute().set_input_line_vector(M68K_IRQ_4, 128);
-					machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
+					state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
+					state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 				}
 
 				if((buffer[CDIC_SECTOR_SUBMODE2] & CDIC_SUBMODE_EOF) == 0 && m_command != 0x23)
@@ -803,7 +805,7 @@ void cdicdic_device::process_delayed_command()
 
 			if(!cdrom_read_data(m_cd, lba, buffer, CD_TRACK_RAW_DONTCARE))
 			{
-				printf( "liajfoaijsdofiaodf\n");
+				mame_printf_verbose("Unable to read CD-ROM data.\n");
 			}
 
 			if(!(msf & 0x0000ff))
@@ -811,7 +813,7 @@ void cdicdic_device::process_delayed_command()
 //              next_lba = next_nybbles[0] + next_nybbles[1]*10 + ((next_nybbles[2] + next_nybbles[3]*10)*75) + ((next_nybbles[4] + next_nybbles[5]*10)*75*60);
 				verboselog(machine(), 0, "Playing CDDA sector from MSF location %06x\n", m_time | 2 );
 
-				cdda_start_audio(machine().device("cdda"), lba, rounded_next_msf);
+				cdda_start_audio(state->m_cdda, lba, rounded_next_msf);
 			}
 
 			m_ram[(m_data_buffer & 5) * (0xa00/2) + 0x924/2] = 0x0001;                      //  CTRL
@@ -841,8 +843,8 @@ void cdicdic_device::process_delayed_command()
 			}
 
 			verboselog(machine(), 0, "Setting CDIC interrupt line for CDDA sector\n" );
-			machine().device("maincpu")->execute().set_input_line_vector(M68K_IRQ_4, 128);
-			machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
+			state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
+			state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 			break;
 		}
 		case 0x2c: // Seek
@@ -892,20 +894,16 @@ void cdicdic_device::process_delayed_command()
 			m_time = next_msf << 8;
 
 			verboselog(machine(), 0, "Setting CDIC interrupt line for Seek sector\n" );
-			machine().device("maincpu")->execute().set_input_line_vector(M68K_IRQ_4, 128);
-			machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
+			state->m_maincpu->set_input_line_vector(M68K_IRQ_4, 128);
+			state->m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 			break;
 		}
 	}
 }
 
-READ16_DEVICE_HANDLER( cdic_r )
+READ16_MEMBER( cdicdic_device::regs_r )
 {
-	return downcast<cdicdic_device *>(device)->register_read(offset, mem_mask);
-}
-
-UINT16 cdicdic_device::register_read(const UINT32 offset, const UINT16 mem_mask)
-{
+	cdi_state *state = machine().driver_data<cdi_state>();
 	UINT32 addr = offset + 0x3c00/2;
 
 	switch(addr)
@@ -944,7 +942,7 @@ UINT16 cdicdic_device::register_read(const UINT32 offset, const UINT16 mem_mask)
 			m_audio_buffer &= 0x7fff;
 			if(!((m_audio_buffer | m_x_buffer) & 0x8000))
 			{
-				machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, CLEAR_LINE);
+				state->m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 				verboselog(machine(), 0, "Clearing CDIC interrupt line\n" );
 				////printf("Clearing CDIC interrupt line\n" );
 			}
@@ -958,7 +956,7 @@ UINT16 cdicdic_device::register_read(const UINT32 offset, const UINT16 mem_mask)
 			m_x_buffer &= 0x7fff;
 			if(!((m_audio_buffer | m_x_buffer) & 0x8000))
 			{
-				machine().device("maincpu")->execute().set_input_line(M68K_IRQ_4, CLEAR_LINE);
+				state->m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 				verboselog(machine(), 0, "Clearing CDIC interrupt line\n" );
 				////printf("Clearing CDIC interrupt line\n" );
 			}
@@ -987,12 +985,7 @@ UINT16 cdicdic_device::register_read(const UINT32 offset, const UINT16 mem_mask)
 	}
 }
 
-WRITE16_DEVICE_HANDLER( cdic_w )
-{
-	downcast<cdicdic_device *>(device)->register_write(offset, data, mem_mask);
-}
-
-void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, const UINT16 mem_mask)
+WRITE16_MEMBER( cdicdic_device::regs_w )
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
@@ -1051,9 +1044,8 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 
 		case 0x3ff8/2:
 		{
-			scc68070_regs_t *scc68070 = &state->m_scc68070_regs;
-			UINT32 start = scc68070->dma.channel[0].memory_address_counter;
-			UINT32 count = scc68070->dma.channel[0].transfer_counter;
+			UINT32 start = state->m_scc->dma().channel[0].memory_address_counter;
+			UINT32 count = state->m_scc->dma().channel[0].transfer_counter;
 			UINT32 index = 0;
 			UINT32 device_index = (data & 0x3fff) >> 1;
 			UINT16 *memory = state->m_planea;
@@ -1068,7 +1060,7 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 			}
 			for(index = start / 2; index < (start / 2 + count); index++)
 			{
-				if(scc68070->dma.channel[0].operation_control & OCR_D)
+				if(state->m_scc->dma().channel[0].operation_control & OCR_D)
 				{
 					memory[index] = m_ram[device_index++];
 				}
@@ -1077,7 +1069,7 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 					m_ram[device_index++] = memory[index];
 				}
 			}
-			scc68070->dma.channel[0].memory_address_counter += scc68070->dma.channel[0].transfer_counter * 2;
+			state->m_scc->dma().channel[0].memory_address_counter += state->m_scc->dma().channel[0].transfer_counter * 2;
 			break;
 		}
 
@@ -1123,7 +1115,7 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 						break;
 					}
 					case 0x2b: // Stop CDDA
-						cdda_stop_audio(machine().device("cdda"));
+						cdda_stop_audio(state->m_cdda);
 						m_interrupt_timer->adjust(attotime::never);
 						break;
 					case 0x23: // Reset Mode 1
@@ -1171,7 +1163,6 @@ void cdicdic_device::register_write(const UINT32 offset, const UINT16 data, cons
 cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MACHINE_CDICDIC, "CDICDIC", tag, owner, clock)
 {
-	init();
 }
 
 //-------------------------------------------------
@@ -1180,12 +1171,25 @@ cdicdic_device::cdicdic_device(const machine_config &mconfig, const char *tag, d
 
 void cdicdic_device::device_start()
 {
-	register_globals();
+	save_item(NAME(m_command));
+	save_item(NAME(m_time));
+	save_item(NAME(m_file));
+	save_item(NAME(m_channel));
+	save_item(NAME(m_audio_channel));
+	save_item(NAME(m_audio_buffer));
+	save_item(NAME(m_x_buffer));
+	save_item(NAME(m_dma_control));
+	save_item(NAME(m_z_buffer));
+	save_item(NAME(m_interrupt_vector));
+	save_item(NAME(m_data_buffer));
 
-	m_interrupt_timer = machine().scheduler().timer_alloc(FUNC(trigger_readback_int));
+	save_item(NAME(m_audio_sample_freq));
+	save_item(NAME(m_audio_sample_size));
+
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdicdic_device::trigger_readback_int), this));
 	m_interrupt_timer->adjust(attotime::never);
 
-	m_audio_sample_timer = machine().scheduler().timer_alloc(FUNC(audio_sample_trigger));
+	m_audio_sample_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cdicdic_device::audio_sample_trigger), this));
 	m_audio_sample_timer->adjust(attotime::never);
 
 	m_ram = auto_alloc_array(machine(), UINT16, 0x3c00/2);
@@ -1197,25 +1201,8 @@ void cdicdic_device::device_start()
 
 void cdicdic_device::device_reset()
 {
-	init();
+	cdi_state *state = machine().driver_data<cdi_state>();
 
-	cdrom_image_device *cdrom_dev = machine().device<cdrom_image_device>("cdrom");
-	if( cdrom_dev )
-	{
-		// MESS case (has CDROM device)
-		m_cd = cdrom_dev->get_cdrom_file();
-		cdda_set_cdrom(machine().device("cdda"), m_cd);
-	}
-	else
-	{
-		// MAME case
-		m_cd = cdrom_open(get_disk_handle(machine(), ":cdrom"));
-		cdda_set_cdrom(machine().device("cdda"), m_cd);
-	}
-}
-
-void cdicdic_device::init()
-{
 	m_command = 0;
 	m_time = 0;
 	m_file = 0;
@@ -1233,44 +1220,28 @@ void cdicdic_device::init()
 
 	m_decode_addr = 0;
 	m_decode_delay = 0;
+
+	cdrom_image_device *cdrom_dev = machine().device<cdrom_image_device>("cdrom");
+	if( cdrom_dev )
+	{
+		// MESS case (has CDROM device)
+		m_cd = cdrom_dev->get_cdrom_file();
+		cdda_set_cdrom(state->m_cdda, m_cd);
+	}
+	else
+	{
+		// MAME case
+		m_cd = cdrom_open(get_disk_handle(machine(), ":cdrom"));
+		cdda_set_cdrom(state->m_cdda, m_cd);
+	}
 }
 
-void cdicdic_device::register_globals()
+WRITE16_MEMBER( cdicdic_device::ram_w )
 {
-	save_item(NAME(m_command));
-	save_item(NAME(m_time));
-	save_item(NAME(m_file));
-	save_item(NAME(m_channel));
-	save_item(NAME(m_audio_channel));
-	save_item(NAME(m_audio_buffer));
-	save_item(NAME(m_x_buffer));
-	save_item(NAME(m_dma_control));
-	save_item(NAME(m_z_buffer));
-	save_item(NAME(m_interrupt_vector));
-	save_item(NAME(m_data_buffer));
-
-	save_item(NAME(m_audio_sample_freq));
-	save_item(NAME(m_audio_sample_size));
-}
-
-WRITE16_DEVICE_HANDLER( cdic_ram_w )
-{
-	downcast<cdicdic_device *>(device)->ram_write(offset, data, mem_mask);
-}
-
-void cdicdic_device::ram_write(const UINT32 offset, const UINT16 data, const UINT16 mem_mask)
-{
-	verboselog(machine(), 5, "cdic_ram_w: %08x = %04x & %04x\n", 0x00300000 + offset*2, data, mem_mask);
 	COMBINE_DATA(&m_ram[offset]);
 }
 
-READ16_DEVICE_HANDLER( cdic_ram_r )
+READ16_MEMBER( cdicdic_device::ram_r )
 {
-	return downcast<cdicdic_device *>(device)->ram_read(offset, mem_mask);
-}
-
-UINT16 cdicdic_device::ram_read(const UINT32 offset, const UINT16 mem_mask)
-{
-	verboselog(machine(), 5, "cdic_ram_r: %08x = %04x & %04x\n", 0x00300000 + offset * 2, m_ram[offset], mem_mask);
 	return m_ram[offset];
 }
