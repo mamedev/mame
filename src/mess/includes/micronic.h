@@ -22,14 +22,23 @@ class micronic_state : public driver_device
 {
 public:
 	micronic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, Z80_TAG),
-			m_lcdc(*this, HD61830_TAG),
-			m_beep(*this, BEEPER_TAG),
-			m_rtc(*this, MC146818_TAG),
-			m_ram(*this, RAM_TAG)
-		,
-		m_ram_base(*this, "ram_base"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, Z80_TAG)
+		, m_lcdc(*this, HD61830_TAG)
+		, m_beep(*this, BEEPER_TAG)
+		, m_rtc(*this, MC146818_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_ram_base(*this, "ram_base")
+		, m_bank1(*this, "bank1")
+		, m_bit0(*this, "BIT0")
+		, m_bit1(*this, "BIT1")
+		, m_bit2(*this, "BIT2")
+		, m_bit3(*this, "BIT3")
+		, m_bit4(*this, "BIT4")
+		, m_bit5(*this, "BIT5")
+		, m_backbattery(*this, "BACKBATTERY")
+		, m_mainbattery(*this, "MAINBATTERY")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<hd61830_device> m_lcdc;
@@ -61,6 +70,17 @@ public:
 	bool m_lcd_backlight;
 	UINT8 m_status_flag;
 	virtual void palette_init();
+
+protected:
+	required_memory_bank m_bank1;
+	required_ioport m_bit0;
+	required_ioport m_bit1;
+	required_ioport m_bit2;
+	required_ioport m_bit3;
+	required_ioport m_bit4;
+	required_ioport m_bit5;
+	required_ioport m_backbattery;
+	required_ioport m_mainbattery;
 };
 
 #endif
