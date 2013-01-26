@@ -8,14 +8,28 @@
 #define POLY88_H_
 
 #include "machine/i8251.h"
+#include "imagedev/cassette.h"
 #include "imagedev/snapquik.h"
 
 class poly88_state : public driver_device
 {
 public:
 	poly88_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_video_ram(*this, "video_ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_video_ram(*this, "video_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_uart(*this, "uart")
+		, m_sercas(*this, "sercas")
+		, m_cassette(*this, CASSETTE_TAG)
+		, m_linec(*this, "LINEC")
+		, m_line0(*this, "LINE0")
+		, m_line1(*this, "LINE1")
+		, m_line2(*this, "LINE2")
+		, m_line3(*this, "LINE3")
+		, m_line4(*this, "LINE4")
+		, m_line5(*this, "LINE5")
+		, m_line6(*this, "LINE6")
+	{ }
 
 	required_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_FNT;
@@ -40,6 +54,20 @@ public:
 	TIMER_CALLBACK_MEMBER(poly88_cassette_timer_callback);
 	TIMER_CALLBACK_MEMBER(setup_machine_state);
 	DECLARE_WRITE_LINE_MEMBER(poly88_usart_rxready);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<i8251_device> m_uart;
+	required_device<serial_source_device> m_sercas;
+	required_device<cassette_image_device> m_cassette;
+	required_ioport m_linec;
+	required_ioport m_line0;
+	required_ioport m_line1;
+	required_ioport m_line2;
+	required_ioport m_line3;
+	required_ioport m_line4;
+	required_ioport m_line5;
+	required_ioport m_line6;
 };
 
 
