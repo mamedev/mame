@@ -263,6 +263,11 @@ WRITE32_MEMBER( psxsio_device::write )
 				verboselog( machine(), 1, "psx_sio_w reset\n" );
 				m_status |= SIO_STATUS_TX_EMPTY | SIO_STATUS_TX_RDY;
 				m_status &= ~( SIO_STATUS_RX_RDY | SIO_STATUS_OVERRUN | SIO_STATUS_IRQ );
+
+				// toggle DTR to reset controllers, Star Ocean 2, at least, requires it
+				// the precise mechanism of the reset is unknown
+				// maybe it's related to the bottom 2 bits of control which are usually set
+				output( m_tx ^ PSX_SIO_OUT_DTR, PSX_SIO_OUT_DTR );
 			}
 			if( ( m_control & SIO_CONTROL_IACK ) != 0 )
 			{
