@@ -120,55 +120,53 @@ TIMER_CALLBACK_MEMBER(zx_state::zx_ula_irq)
 	}
 }
 
-void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT8 param)
+void zx_state::zx_ula_r(int offs, memory_region *region, const UINT8 param)
 {
-	zx_state *state = machine.driver_data<zx_state>();
-	screen_device *screen = machine.first_screen();
 	int offs0 = offs & 0x7fff;
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = m_region_maincpu->base();
 	UINT8 chr = rom[offs0];
 
-	if ((!state->m_ula_irq_active) && (chr == 0x76))
+	if ((!m_ula_irq_active) && (chr == 0x76))
 	{
-		bitmap_ind16 &bitmap = state->m_bitmap;
+		bitmap_ind16 &bitmap = m_bitmap;
 		UINT16 y, *scanline;
-		UINT16 ireg = machine.device("maincpu")->state().state_int(Z80_I) << 8;
+		UINT16 ireg = m_maincpu->state_int(Z80_I) << 8;
 		UINT8 data, *chrgen, creg;
 
 		if (param)
-			creg = machine.device("maincpu")->state().state_int(Z80_B);
+			creg = m_maincpu->state_int(Z80_B);
 		else
-			creg = machine.device("maincpu")->state().state_int(Z80_C);
+			creg = m_maincpu->state_int(Z80_C);
 
-		chrgen = state->memregion(region)->base();
+		chrgen = region->base();
 
-		if ((++state->m_ula_scanline_count == screen->height()) || (creg == 32))
+		if ((++m_ula_scanline_count == m_screen->height()) || (creg == 32))
 		{
-			state->m_ula_scanline_count = 0;
-			state->m_offs1 = offs0;
+			m_ula_scanline_count = 0;
+			m_offs1 = offs0;
 		}
 
-		state->m_ula_frame_vsync = 3;
+		m_ula_frame_vsync = 3;
 
-		state->m_charline_ptr = 0;
+		m_charline_ptr = 0;
 
-		for (y = state->m_offs1+1; ((y < offs0) && (state->m_charline_ptr < ARRAY_LENGTH(state->m_charline))); y++)
+		for (y = m_offs1+1; ((y < offs0) && (m_charline_ptr < ARRAY_LENGTH(m_charline))); y++)
 		{
-			state->m_charline[state->m_charline_ptr] = rom[y];
-			state->m_charline_ptr++;
+			m_charline[m_charline_ptr] = rom[y];
+			m_charline_ptr++;
 		}
-		for (y = state->m_charline_ptr; y < ARRAY_LENGTH(state->m_charline); y++)
-			state->m_charline[y] = 0;
+		for (y = m_charline_ptr; y < ARRAY_LENGTH(m_charline); y++)
+			m_charline[y] = 0;
 
-		machine.scheduler().timer_set(machine.device<cpu_device>("maincpu")->cycles_to_attotime(((32 - state->m_charline_ptr) << 2)), timer_expired_delegate(FUNC(zx_state::zx_ula_irq),state));
-		state->m_ula_irq_active++;
+		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(((32 - m_charline_ptr) << 2)), timer_expired_delegate(FUNC(zx_state::zx_ula_irq),this));
+		m_ula_irq_active++;
 
-		scanline = &bitmap.pix16(state->m_ula_scanline_count);
+		scanline = &bitmap.pix16(m_ula_scanline_count);
 		y = 0;
 
-		for (state->m_charline_ptr = 0; state->m_charline_ptr < ARRAY_LENGTH(state->m_charline); state->m_charline_ptr++)
+		for (m_charline_ptr = 0; m_charline_ptr < ARRAY_LENGTH(m_charline); m_charline_ptr++)
 		{
-			chr = state->m_charline[state->m_charline_ptr];
+			chr = m_charline[m_charline_ptr];
 			data = chrgen[ireg | ((chr & 0x3f) << 3) | ((8 - creg)&7) ];
 			if (chr & 0x80) data ^= 0xff;
 
@@ -180,10 +178,10 @@ void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT
 			scanline[y++] = (data >> 2) & 1;
 			scanline[y++] = (data >> 1) & 1;
 			scanline[y++] = (data >> 0) & 1;
-			state->m_charline[state->m_charline_ptr] = 0;
+			m_charline[m_charline_ptr] = 0;
 		}
 
-		if (creg == 1) state->m_offs1 = offs0;
+		if (creg == 1) m_offs1 = offs0;
 	}
 }
 
@@ -191,7 +189,7 @@ void zx_state::video_start()
 {
 	m_ula_nmi = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zx_state::zx_ula_nmi),this));
 	m_ula_irq_active = 0;
-	machine().primary_screen->register_screen_bitmap(m_bitmap);
+	m_screen->register_screen_bitmap(m_bitmap);
 }
 
 void zx_state::screen_eof_zx(screen_device &screen, bool state)

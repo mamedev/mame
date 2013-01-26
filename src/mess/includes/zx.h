@@ -20,7 +20,24 @@ class zx_state : public driver_device
 {
 public:
 	zx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_screen(*this, "screen")
+		, m_cassette(*this, CASSETTE_TAG)
+		, m_speaker(*this, SPEAKER_TAG)
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_gfx1(*this, "gfx1")
+		, m_io_row0(*this, "ROW0")
+		, m_io_row1(*this, "ROW1")
+		, m_io_row2(*this, "ROW2")
+		, m_io_row3(*this, "ROW3")
+		, m_io_row4(*this, "ROW4")
+		, m_io_row5(*this, "ROW5")
+		, m_io_row6(*this, "ROW6")
+		, m_io_row7(*this, "ROW7")
+		, m_io_config(*this, "CONFIG")
+	{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -61,10 +78,26 @@ public:
 	TIMER_CALLBACK_MEMBER(zx_tape_pulse);
 	TIMER_CALLBACK_MEMBER(zx_ula_nmi);
 	TIMER_CALLBACK_MEMBER(zx_ula_irq);
-};
-/*----------- defined in video/zx.c -----------*/
 
-void zx_ula_bkgnd(running_machine &machine, int color);
-void zx_ula_r(running_machine &machine, int offs, const char *region, const UINT8 param);
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<ram_device> m_ram;
+	required_device<screen_device> m_screen;
+	required_device<cassette_image_device> m_cassette;
+	required_device<device_t> m_speaker;
+	required_memory_region m_region_maincpu;
+	optional_memory_region m_region_gfx1;
+	required_ioport m_io_row0;
+	required_ioport m_io_row1;
+	required_ioport m_io_row2;
+	required_ioport m_io_row3;
+	required_ioport m_io_row4;
+	required_ioport m_io_row5;
+	required_ioport m_io_row6;
+	required_ioport m_io_row7;
+	optional_ioport m_io_config;
+
+	void zx_ula_r(int offs, memory_region *region, const UINT8 param);
+};
 
 #endif /* ZX_H_ */
