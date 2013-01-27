@@ -34,17 +34,19 @@
 
 static WRITE8_DEVICE_HANDLER( mquake_cia_0_porta_w )
 {
+	amiga_state *sta = device->machine().driver_data<amiga_state>();
+
 	/* switch banks as appropriate */
-	space.machine().root_device().membank("bank1")->set_entry(data & 1);
+	sta->m_bank1->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		space.machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(0x000000, 0x07ffff, "bank1");
+		sta->m_maincpu->space(AS_PROGRAM).install_write_bank(0x000000, 0x07ffff, "bank1");
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		space.machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x000000, 0x07ffff);
+		sta->m_maincpu->space(AS_PROGRAM).unmap_write(0x000000, 0x07ffff);
 }
 
 
@@ -439,8 +441,8 @@ DRIVER_INIT_MEMBER(amiga_state,mquake)
 	amiga_machine_config(machine(), &mquake_intf);
 
 	/* set up memory */
-	membank("bank1")->configure_entry(0, m_chip_ram);
-	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(0, m_chip_ram);
+	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
 }
 
 

@@ -232,7 +232,7 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_holster_r)
 WRITE8_MEMBER(alg_state::alg_cia_0_porta_w)
 {
 	/* switch banks as appropriate */
-	machine().root_device().membank("bank1")->set_entry(data & 1);
+	m_bank1->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
@@ -704,8 +704,8 @@ static void alg_init(running_machine &machine)
 	amiga_machine_config(machine, &alg_intf);
 
 	/* set up memory */
-	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
+	state->m_bank1->configure_entry(0, state->m_chip_ram);
+	state->m_bank1->configure_entry(1, machine.root_device().memregion("user1")->base());
 }
 
 

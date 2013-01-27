@@ -93,16 +93,16 @@ static void upscope_reset(running_machine &machine)
 WRITE8_MEMBER(upscope_state::upscope_cia_0_porta_w)
 {
 	/* switch banks as appropriate */
-	machine().root_device().membank("bank1")->set_entry(data & 1);
+	m_bank1->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(0x000000, 0x07ffff, "bank1");
+		m_maincpu->space(AS_PROGRAM).install_write_bank(0x000000, 0x07ffff, "bank1");
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x000000, 0x07ffff);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0x000000, 0x07ffff);
 }
 
 
@@ -403,8 +403,8 @@ DRIVER_INIT_MEMBER(upscope_state,upscope)
 	machine().device<nvram_device>("nvram")->set_base(m_nvram, sizeof(m_nvram));
 
 	/* set up memory */
-	membank("bank1")->configure_entry(0, m_chip_ram);
-	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(0, m_chip_ram);
+	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
 }
 
 

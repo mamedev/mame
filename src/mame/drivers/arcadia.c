@@ -117,16 +117,16 @@ WRITE16_MEMBER(arcadia_amiga_state::arcadia_multibios_change_game)
 WRITE8_MEMBER(arcadia_amiga_state::arcadia_cia_0_porta_w)
 {
 	/* switch banks as appropriate */
-	machine().root_device().membank("bank1")->set_entry(data & 1);
+	m_bank1->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(0x000000, 0x07ffff, "bank1");
+		m_maincpu->space(AS_PROGRAM).install_write_bank(0x000000, 0x07ffff, "bank1");
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x000000, 0x07ffff);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0x000000, 0x07ffff);
 
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(machine(), 0, (data & 2) ? 0 : 1);
@@ -817,8 +817,8 @@ static void arcadia_init(running_machine &machine)
 	amiga_machine_config(machine, &arcadia_intf);
 
 	/* set up memory */
-	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
+	state->m_bank1->configure_entry(0, state->m_chip_ram);
+	state->m_bank1->configure_entry(1, machine.root_device().memregion("user1")->base());
 
 	/* OnePlay bios is encrypted, TenPlay is not */
 	biosrom = (UINT16 *)machine.root_device().memregion("user2")->base();

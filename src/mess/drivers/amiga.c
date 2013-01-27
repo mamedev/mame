@@ -364,7 +364,7 @@ WRITE32_MEMBER(a1200_state::aga_overlay_w)
 		data = (data >> 16) & 1;
 
 		/* switch banks as appropriate */
-		membank("bank1")->set_entry(data & 1);
+		m_bank1->set_entry(data & 1);
 
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
@@ -1033,7 +1033,7 @@ static WRITE8_DEVICE_HANDLER( amiga_cia_0_portA_w )
 {
 	amiga_state *state = space.machine().driver_data<amiga_state>();
 	/* switch banks as appropriate */
-	state->membank("bank1")->set_entry(data & 1);
+	state->m_bank1->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0) {
@@ -1117,8 +1117,8 @@ DRIVER_INIT_MEMBER(amiga_state,amiga)
 	amiga_machine_config(machine(), &amiga_intf);
 
 	/* set up memory */
-	membank("bank1")->configure_entry(0, m_chip_ram);
-	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(0, m_chip_ram);
+	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
 
 	/* initialize cartridge (if present) */
 	amiga_cart_init(machine());
@@ -1143,8 +1143,8 @@ DRIVER_INIT_MEMBER(amiga_state,cdtv)
 	amiga_machine_config(machine(), &amiga_intf);
 
 	/* set up memory */
-	membank("bank1")->configure_entry(0, m_chip_ram);
-	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(0, m_chip_ram);
+	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
 }
 
 DRIVER_INIT_MEMBER(a1200_state,a1200)
@@ -1165,8 +1165,8 @@ DRIVER_INIT_MEMBER(a1200_state,a1200)
 	amiga_machine_config(machine(), &cd32_intf);
 
 	/* set up memory */
-	membank("bank1")->configure_entry(0, m_chip_ram);
-	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(0, m_chip_ram);
+	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
 }
 
 DRIVER_INIT_MEMBER(amiga_state,a3000)
@@ -1187,8 +1187,8 @@ DRIVER_INIT_MEMBER(amiga_state,a3000)
 	amiga_machine_config(machine(), &a3000_intf);
 
 	/* set up memory */
-	membank("bank1")->configure_entry(0, m_chip_ram);
-	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(0, m_chip_ram);
+	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
 }
 
 
