@@ -562,6 +562,7 @@ static int scan_keyboard(running_machine &machine)
 	int keybuf = 0;
 	int keycode;
 	mac_state *mac = machine.driver_data<mac_state>();
+	ioport_port *ports[7] = { mac->m_key0, mac->m_key1,	mac->m_key2, mac->m_key3, mac->m_key4, mac->m_key5,	mac->m_key6 };
 
 	if (mac->m_keycode_buf_index)
 	{
@@ -570,30 +571,7 @@ static int scan_keyboard(running_machine &machine)
 
 	for (i=0; i<7; i++)
 	{
-		switch (i)
-		{
-			case 0:
-				keybuf = mac->m_key0->read();
-				break;
-			case 1:
-				keybuf = mac->m_key1->read();
-				break;
-			case 2:
-				keybuf = mac->m_key2->read();
-				break;
-			case 3:
-				keybuf = mac->m_key3->read();
-				break;
-			case 4:
-				keybuf = mac->m_key4->read();
-				break;
-			case 5:
-				keybuf = mac->m_key5->read();
-				break;
-			case 6:
-				keybuf = mac->m_key6->read();
-				break;   
-		}
+		keybuf = ports[i]->read();
 
 		if (keybuf != mac->m_key_matrix[i])
 		{

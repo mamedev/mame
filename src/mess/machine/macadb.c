@@ -76,14 +76,14 @@ static const char *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 int mac_state::adb_pollkbd(int update)
 {
 	int i, j, keybuf, report, codes[2], result;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
+	ioport_port *ports[6] = { m_key0, m_key1,	m_key2, m_key3, m_key4, m_key5 };
 
 	codes[0] = codes[1] = 0xff; // key up
 	report = result = 0;
 
 	for (i = 0; i < 6; i++)
 	{
-		keybuf = ioport(keynames[i])->read();
+		keybuf = ports[i]->read();
 
 		// any changes in this row?
 		if ((keybuf != m_key_matrix[i]) && (report < 2))
@@ -211,9 +211,9 @@ int mac_state::adb_pollmouse()
 		return 0;
 	}
 
-	NewButton = ioport("MOUSE0")->read() & 0x01;
-	NewX = ioport("MOUSE2")->read();
-	NewY = ioport("MOUSE1")->read();
+	NewButton = m_mouse0->read() & 0x01;
+	NewX = m_mouse2->read();
+	NewY = m_mouse1->read();
 
 	if ((NewX != m_adb_lastmousex) || (NewY != m_adb_lastmousey) || (NewButton != m_adb_lastbutton))
 	{
@@ -261,7 +261,7 @@ void mac_state::adb_accummouse( UINT8 *MouseX, UINT8 *MouseY )
 		m_adb_lastmousey = NewY;
 	}
 
-	m_adb_lastbutton = ioport("MOUSE0")->read() & 0x01;
+	m_adb_lastbutton = m_mouse0->read() & 0x01;
 
 	*MouseX = (UINT8)MouseCountX;
 	*MouseY = (UINT8)MouseCountY;
