@@ -15,11 +15,16 @@ class cd32_state : public amiga_state
 public:
 	cd32_state(const machine_config &mconfig, device_type type, const char *tag)
 		: amiga_state(mconfig, type, tag),
-			m_microtouch(*this, "microtouch")
+			m_microtouch(*this, "microtouch"),
+			m_p1_port(*this, "P1"),
+			m_p2_port(*this, "P2")
+
 	{
 	}
 
 	required_device<microtouch_device> m_microtouch;
+	optional_ioport m_p1_port;
+	optional_ioport m_p2_port;
 
 	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	UINT16 m_potgo_value;

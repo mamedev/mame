@@ -12,6 +12,8 @@ Ernesto Corvi & Mariusz Wojcieszek
 
 #include "devlegcy.h"
 
+#include "machine/6526cia.h"
+#include "machine/amigafdc.h"
 
 /*************************************
  *
@@ -373,13 +375,35 @@ class amiga_state : public driver_device
 public:
 	amiga_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"), /* accelerator cards may present an interesting challenge because the maincpu will be the one on the card instead */
+			m_cia_0(*this, "cia_0"),
+			m_cia_1(*this, "cia_1"),
+			m_fdc(*this, "fdc"),
 			m_chip_ram(*this, "chip_ram", 0),
-			m_custom_regs(*this, "custom_regs", 0) { }
+			m_custom_regs(*this, "custom_regs", 0),
+			m_joy0dat_port(*this, "JOY0DAT"),
+			m_joy1dat_port(*this, "JOY1DAT"),
+			m_potgo_port(*this, "POTGO"),
+			m_pot0dat_port(*this, "POT0DAT"),
+			m_pot1dat_port(*this, "POT1DAT")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<legacy_mos6526_device> m_cia_0;
+	required_device<legacy_mos6526_device> m_cia_1;
+	optional_device<amiga_fdc> m_fdc;
 	required_shared_ptr<UINT16> m_chip_ram;
 	UINT16 (*m_chip_ram_r)(amiga_state *state, offs_t offset);
 	void (*m_chip_ram_w)(amiga_state *state, offs_t offset, UINT16 data);
 	required_shared_ptr<UINT16> m_custom_regs;
+
+	optional_ioport m_joy0dat_port;
+	optional_ioport m_joy1dat_port;
+	optional_ioport m_potgo_port;
+	optional_ioport m_pot0dat_port;
+	optional_ioport m_pot1dat_port;
+
+	
 
 	const amiga_machine_interface *m_intf;
 	autoconfig_device *m_autoconfig_list;
