@@ -31,7 +31,18 @@ public:
 		, m_i8243(*this, "i8243")
 		, m_i8244(*this, "i8244")
 		, m_ef9340_1(*this, "ef9340_1")
-		{ }
+		, m_user1(*this, "user1")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_key0(*this, "KEY0")
+		, m_key1(*this, "KEY1")
+		, m_key2(*this, "KEY2")
+		, m_key3(*this, "KEY3")
+		, m_key4(*this, "KEY4")
+		, m_key5(*this, "KEY5")
+		, m_joy0(*this, "JOY0")
+		, m_joy1(*this, "JOY1")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -79,6 +90,20 @@ protected:
 	static const UINT8 P1_VDC_COPY_MODE_ENABLE = 0x40;
 	static const UINT8 P2_KEYBOARD_SELECT_MASK = 0x07; /* select row to scan */
 
+	required_memory_region m_user1;
+
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+
+	required_ioport m_key0;
+	required_ioport m_key1;
+	required_ioport m_key2;
+	required_ioport m_key3;
+	required_ioport m_key4;
+	required_ioport m_key5;
+	required_ioport m_joy0;
+	required_ioport m_joy1;
+	
 	UINT8   m_g7400_ic674_decode[8];
 	UINT8   m_g7400_ic678_decode[8];
 
@@ -267,19 +292,19 @@ void odyssey2_state::switch_banks()
 	{
 		case 12288:
 			/* 12KB cart support (for instance, KTAA as released) */
-			membank( "bank1" )->set_base( memregion("user1")->base() + (m_p1 & 0x03) * 0xC00 );
-			membank( "bank2" )->set_base( memregion("user1")->base() + (m_p1 & 0x03) * 0xC00 + 0x800 );
+			m_bank1->set_base( m_user1->base() + (m_p1 & 0x03) * 0xC00 );
+			m_bank2->set_base( m_user1->base() + (m_p1 & 0x03) * 0xC00 + 0x800 );
 			break;
 
 		case 16384:
 			/* 16KB cart support (for instance, full sized version KTAA) */
-			membank( "bank1" )->set_base( memregion("user1")->base() + (m_p1 & 0x03) * 0x1000 + 0x400 );
-			membank( "bank2" )->set_base( memregion("user1")->base() + (m_p1 & 0x03) * 0x1000 + 0xC00 );
+			m_bank1->set_base( m_user1->base() + (m_p1 & 0x03) * 0x1000 + 0x400 );
+			m_bank2->set_base( m_user1->base() + (m_p1 & 0x03) * 0x1000 + 0xC00 );
 			break;
 
 		default:
-			membank("bank1")->set_base(memregion("user1")->base() + (m_p1 & 0x03) * 0x800);
-			membank("bank2")->set_base(memregion("user1")->base() + (m_p1 & 0x03) * 0x800 );
+			m_bank1->set_base( m_user1->base() + (m_p1 & 0x03) * 0x800 );
+			m_bank2->set_base( m_user1->base() + (m_p1 & 0x03) * 0x800 );
 			break;
 	}
 }
@@ -515,13 +540,13 @@ READ8_MEMBER(odyssey2_state::p2_read)
 {
 	UINT8 h = 0xFF;
 	int i, j;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
+	ioport_port* ioports[] = { m_key0, m_key1, m_key2, m_key3, m_key4, m_key5 };
 
 	if (!(m_p1 & P1_KEYBOARD_SCAN_ENABLE))
 	{
 		if ((m_p2 & P2_KEYBOARD_SELECT_MASK) <= 5)  /* read keyboard */
 		{
-			h &= ioport(keynames[m_p2 & P2_KEYBOARD_SELECT_MASK])->read();
+			h &= ioports[m_p2 & P2_KEYBOARD_SELECT_MASK]->read();
 		}
 
 		for (i= 0x80, j = 0; i > 0; i >>= 1, j++)
@@ -566,12 +591,12 @@ READ8_MEMBER(odyssey2_state::bus_read)
 
 	if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 1)
 	{
-		data &= ioport("JOY0")->read();       /* read joystick 1 */
+		data &= m_joy0->read();       /* read joystick 1 */
 	}
 
 	if ((m_p2 & P2_KEYBOARD_SELECT_MASK) == 0)
 	{
-		data &= ioport("JOY1")->read();       /* read joystick 2 */
+		data &= m_joy1->read();       /* read joystick 2 */
 	}
 
 	return data;
