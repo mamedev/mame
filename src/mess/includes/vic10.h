@@ -3,10 +3,8 @@
 #ifndef __VIC10__
 #define __VIC10__
 
-
 #include "emu.h"
 #include "cpu/m6502/m6510.h"
-#include "includes/cbm.h"
 #include "machine/cbmipt.h"
 #include "machine/mos6526.h"
 #include "machine/petcass.h"
@@ -40,6 +38,16 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 			m_color_ram(*this, "color_ram"),
+			m_row0(*this, "ROW0"),
+			m_row1(*this, "ROW1"),
+			m_row2(*this, "ROW2"),
+			m_row3(*this, "ROW3"),
+			m_row4(*this, "ROW4"),
+			m_row5(*this, "ROW5"),
+			m_row6(*this, "ROW6"),
+			m_row7(*this, "ROW7"),
+			m_restore(*this, "RESTORE"),
+			m_lock(*this, "LOCK"),
 			m_cia_irq(CLEAR_LINE),
 			m_vic_irq(CLEAR_LINE),
 			m_exp_irq(CLEAR_LINE)
@@ -54,6 +62,17 @@ public:
 	required_device<vic10_expansion_slot_device> m_exp;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
+	optional_shared_ptr<UINT8> m_color_ram;
+	required_ioport m_row0;
+	required_ioport m_row1;
+	required_ioport m_row2;
+	required_ioport m_row3;
+	required_ioport m_row4;
+	required_ioport m_row5;
+	required_ioport m_row6;
+	required_ioport m_row7;
+	required_ioport m_restore;
+	required_ioport m_lock;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -85,14 +104,10 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 
-	// video state
-	optional_shared_ptr<UINT8> m_color_ram;
-
 	// interrupt state
 	int m_cia_irq;
 	int m_vic_irq;
 	int m_exp_irq;
-	INTERRUPT_GEN_MEMBER(vic10_frame_interrupt);
 };
 
 
