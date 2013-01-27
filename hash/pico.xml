@@ -25,7 +25,6 @@ Published by Sega/Sega Toys (HPC-6*** serial codes)
 * 愛と夢と冒険 サンリオピューロランド - Ai to Yume to Bouken Sanrio Puroland! (Sega - 199410xx - HPC-6014)
 * めざせプロ野球 - Mezase Pro Yakyuu (Sega - 1995xxxx - HPC-6021)
 * 魔法騎士 レイアース マジックナイトたんじょう - Magic Knight Rayearth: Magic Knight Tanjou (Sega - 1995xxxx - HPC-6022)
-* 世界名作劇場 - Sekai Meisaku Gekijou (Sega - 19950725 - HPC-6024)
 * NHKおかあさんといっしょ げんきなこあつまれ! - NHK Okaasan to Issho Genki na Koatsumare! (Sega - 19951125 - HPC-6025)
 * ぺたぺたちょっきん あそべるずかん <どうぶつ> - Petapeta Chokkinna Soberuzukan ~Doubutsu~ (Sega - 199511xx - HPC-6028)
 * サンリオカーニバル たのしいカードづくり - Sanrio Carnival Tanoshii Card Dukuri (Sega - 19951130 - HPC-6031)
@@ -129,7 +128,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * うんてんトーマス デラックスセット - Unten Thomas Track Set (Bandai - 200004xx - T-133???)
 * ウルトラマンピコ ウルトラファイティングベース - Ultraman Pico Ultraman Fighting Best (Bandai - 200009xx - T-133???)
 * アンパンマンピコ わくわくパン工場 - Anpanman Pico Wakuwaku Pan Koujou (Bandai - 200106xx - T-133350)
-* も～っと!おジャ魔女どれみ - Mo~tto! Ojamajo Doremi (Bandai - 200106xx - T-133370)
 * 新ウルトラマンピコ ウルトラファイティングベース - Shin Ultraman Pico Ultraman Fighting Best (Bandai - 200110xx - T-133380)
 * どうぶつピコ ハムスターランド <初回限定･ハムスター人形付属> - Doubutsu Pico Hamster Land ~Shokai Gentei-Hamster Ningyou Fuzoku~ (Bandai - 20020315 - T-133390)
 * おジャ魔女どれみ ドッカ～ン! - Ojamajo Doremi Dokka~n! (Bandai - 200205xx - T-133410)
@@ -1554,6 +1552,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="mottodrm">
+		<description>Mo~tto! Ojamajo Doremi (Jpn)</description>
+		<year>2001</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133370"/>
+		<info name="release" value="200106xx"/>
+		<info name="alt_title" value="も～っと!おジャ魔女どれみ "/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="9K0-0039-RV" />
+			<dataarea name="rom" size="1048576">
+				<rom name="9k0-0039-rv.ic1" size="1048576" crc="42d8aad2" sha1="807eba6e44cb941b295f4f047ef949eea63f82fc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- This same file had also been released as Prototype, but it just means it was a final build... -->
 	<software name="mukabana">
 		<description>Nihon Mukashi Banashi (Jpn)</description>
@@ -1961,6 +1975,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-18587-T" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-18587-t.ic1" size="524288" crc="e6ef55f9" sha1="927e48f24745732235de4745d3acf1656750e12b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sekaimg">
+		<description>Sekai Meisaku Gekijou (Jpn)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="HPC-6024"/>
+		<info name="release" value="19950725"/>
+		<info name="alt_title" value="世界名作劇場"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18118 J13" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18118 j13.ic1" size="1048576" crc="c9334ac9" sha1="8da44d61ada02fc56b528948be443dea00709a07" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
