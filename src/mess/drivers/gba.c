@@ -145,7 +145,7 @@ TIMER_CALLBACK_MEMBER(gba_state::dma_complete)
 
 void gba_state::dma_exec(FPTR ch)
 {
-	address_space &space = ((device_t*)m_maincpu)->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT32 src = m_dma_src[ch];
 	UINT32 dst = m_dma_dst[ch];
 	int ctrl = m_dma_regs[(ch*3)+2] >> 16;
@@ -3153,7 +3153,7 @@ DIRECT_UPDATE_MEMBER(gba_state::gba_direct)
 
 DRIVER_INIT_MEMBER(gba_state,gbadv)
 {
-	((device_t*)m_maincpu)->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(gba_state::gba_direct), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(gba_state::gba_direct), this));
 }
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   COMPANY     FULLNAME */
