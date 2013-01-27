@@ -82,24 +82,20 @@ void gba_state::palette_init()
 	}
 }
 
-static void dma_exec(running_machine &machine, FPTR ch);
-
-static void gba_request_irq(running_machine &machine, UINT32 int_type)
+void gba_state::request_irq(UINT32 int_type)
 {
-	gba_state *state = machine.driver_data<gba_state>();
-
 	// set flag for later recovery
-	state->m_IF |= int_type;
+	m_IF |= int_type;
 
 	// is this specific interrupt enabled?
-	int_type &= state->m_IE;
+	int_type &= m_IE;
 	if (int_type != 0)
 	{
 		// master enable?
-		if (state->m_IME & 1)
+		if (m_IME & 1)
 		{
-			machine.device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
-			machine.device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+			m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+			m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 		}
 	}
 }
@@ -121,7 +117,7 @@ TIMER_CALLBACK_MEMBER(gba_state::dma_complete)
 	// IRQ
 	if (ctrl & 0x4000)
 	{
-		gba_request_irq(machine(), ch_int[ch]);
+		request_irq(ch_int[ch]);
 	}
 
 	// if we're supposed to repeat, don't clear "active" and then the next vbl/hbl will retrigger us
@@ -147,22 +143,16 @@ TIMER_CALLBACK_MEMBER(gba_state::dma_complete)
 	}
 }
 
-static void dma_exec(running_machine &machine, FPTR ch)
+void gba_state::dma_exec(FPTR ch)
 {
-	int i, cnt;
-	int ctrl;
-	int srcadd, dstadd;
-	UINT32 src, dst;
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	gba_state *state = machine.driver_data<gba_state>();
+	address_space &space = ((device_t*)m_maincpu)->memory().space(AS_PROGRAM);
+	UINT32 src = m_dma_src[ch];
+	UINT32 dst = m_dma_dst[ch];
+	int ctrl = m_dma_regs[(ch*3)+2] >> 16;
+	int srcadd = m_dma_srcadd[ch];
+	int dstadd = m_dma_dstadd[ch];
 
-	src = state->m_dma_src[ch];
-	dst = state->m_dma_dst[ch];
-	ctrl = state->m_dma_regs[(ch*3)+2] >> 16;
-	srcadd = state->m_dma_srcadd[ch];
-	dstadd = state->m_dma_dstadd[ch];
-
-	cnt = state->m_dma_cnt[ch];
+	int cnt = m_dma_cnt[ch];
 	if (!cnt)
 	{
 		if (ch == 3)
@@ -198,7 +188,7 @@ static void dma_exec(running_machine &machine, FPTR ch)
 //          printf("DMA exec: ch %d from %08x to %08x, mode %04x, count %04x (PC %x) (%s)\n", (int)ch, src, dst, ctrl, cnt, activecpu_get_pc(), ((ctrl>>10) & 1) ? "32" : "16");
 	}
 
-	for (i = 0; i < cnt; i++)
+	for (int i = 0; i < cnt; i++)
 	{
 		if ((ctrl>>10) & 1)
 		{
@@ -272,99 +262,89 @@ static void dma_exec(running_machine &machine, FPTR ch)
 		}
 	}
 
-	state->m_dma_src[ch] = src;
-	state->m_dma_dst[ch] = dst;
+	m_dma_src[ch] = src;
+	m_dma_dst[ch] = dst;
 
-//  printf("settng DMA timer %d for %d cycs (tmr %x)\n", ch, cnt, (UINT32)state->m_dma_timer[ch]);
-//  state->m_dma_timer[ch]->adjust(ATTOTIME_IN_CYCLES(0, cnt), ch);
-	state->dma_complete(NULL, ch);
+//  printf("settng DMA timer %d for %d cycs (tmr %x)\n", ch, cnt, (UINT32)m_dma_timer[ch]);
+//  m_dma_timer[ch]->adjust(ATTOTIME_IN_CYCLES(0, cnt), ch);
+	dma_complete(NULL, ch);
 }
 
-static void audio_tick(running_machine &machine, int ref)
+void gba_state::audio_tick(int ref)
 {
-	gba_state *state = machine.driver_data<gba_state>();
-
-	if (!(state->m_SOUNDCNT_X & 0x80))
+	if (!(m_SOUNDCNT_X & 0x80))
 	{
 		return;
 	}
 
 	if (!ref)
 	{
-		if (state->m_fifo_a_ptr != state->m_fifo_a_in)
+		if (m_fifo_a_ptr != m_fifo_a_in)
 		{
-			if (state->m_fifo_a_ptr == 17)
+			if (m_fifo_a_ptr == 17)
 			{
-				state->m_fifo_a_ptr = 0;
+				m_fifo_a_ptr = 0;
 			}
 
-			if (state->m_SOUNDCNT_H & 0x200)
+			if (m_SOUNDCNT_H & 0x200)
 			{
-				dac_device *dac = machine.device<dac_device>("direct_a_left");
-
-				dac->write_signed8(state->m_fifo_a[state->m_fifo_a_ptr]^0x80);
+				m_ladac->write_signed8(m_fifo_a[m_fifo_a_ptr]^0x80);
 			}
-			if (state->m_SOUNDCNT_H & 0x100)
+			if (m_SOUNDCNT_H & 0x100)
 			{
-				dac_device *dac = machine.device<dac_device>("direct_a_right");
-
-				dac->write_signed8(state->m_fifo_a[state->m_fifo_a_ptr]^0x80);
+				m_radac->write_signed8(m_fifo_a[m_fifo_a_ptr]^0x80);
 			}
-			state->m_fifo_a_ptr++;
+			m_fifo_a_ptr++;
 		}
 
 		// fifo empty?
-		if (state->m_fifo_a_ptr == state->m_fifo_a_in)
+		if (m_fifo_a_ptr == m_fifo_a_in)
 		{
 			// is a DMA set up to feed us?
-			if ((state->m_dma_regs[(1*3)+1] == 0x40000a0) && ((state->m_dma_regs[(1*3)+2] & 0x30000000) == 0x30000000))
+			if ((m_dma_regs[(1*3)+1] == 0x40000a0) && ((m_dma_regs[(1*3)+2] & 0x30000000) == 0x30000000))
 			{
 				// channel 1 it is
-				dma_exec(machine, 1);
+				dma_exec(1);
 			}
-			if ((state->m_dma_regs[(2*3)+1] == 0x40000a0) && ((state->m_dma_regs[(2*3)+2] & 0x30000000) == 0x30000000))
+			if ((m_dma_regs[(2*3)+1] == 0x40000a0) && ((m_dma_regs[(2*3)+2] & 0x30000000) == 0x30000000))
 			{
 				// channel 2 it is
-				dma_exec(machine, 2);
+				dma_exec(2);
 			}
 		}
 	}
 	else
 	{
-		if (state->m_fifo_b_ptr != state->m_fifo_b_in)
+		if (m_fifo_b_ptr != m_fifo_b_in)
 		{
-			if (state->m_fifo_b_ptr == 17)
+			if (m_fifo_b_ptr == 17)
 			{
-				state->m_fifo_b_ptr = 0;
+				m_fifo_b_ptr = 0;
 			}
 
-			if (state->m_SOUNDCNT_H & 0x2000)
+			if (m_SOUNDCNT_H & 0x2000)
 			{
-				dac_device *dac = machine.device<dac_device>("direct_b_left");
-
-				dac->write_signed8(state->m_fifo_b[state->m_fifo_b_ptr]^0x80);
+				m_lbdac->write_signed8(m_fifo_b[m_fifo_b_ptr]^0x80);
 			}
-			if (state->m_SOUNDCNT_H & 0x1000)
+			if (m_SOUNDCNT_H & 0x1000)
 			{
-				dac_device *dac = machine.device<dac_device>("direct_b_right");
-
-				dac->write_signed8(state->m_fifo_b[state->m_fifo_b_ptr]^0x80);
+				m_rbdac->write_signed8(m_fifo_b[m_fifo_b_ptr]^0x80);
 			}
-			state->m_fifo_b_ptr++;
+			m_fifo_b_ptr++;
 		}
 
-		if (state->m_fifo_b_ptr == state->m_fifo_b_in)
+		if (m_fifo_b_ptr == m_fifo_b_in)
 		{
 			// is a DMA set up to feed us?
-			if ((state->m_dma_regs[(1*3)+1] == 0x40000a4) && ((state->m_dma_regs[(1*3)+2] & 0x30000000) == 0x30000000))
+			if ((m_dma_regs[(1*3)+1] == 0x40000a4) && ((m_dma_regs[(1*3)+2] & 0x30000000) == 0x30000000))
 			{
 				// channel 1 it is
-				dma_exec(machine, 1);
+				dma_exec(1);
 			}
-			if ((state->m_dma_regs[(2*3)+1] == 0x40000a4) && ((state->m_dma_regs[(2*3)+2] & 0x30000000) == 0x30000000))
+			if ((m_dma_regs[(2*3)+1] == 0x40000a4) && ((m_dma_regs[(2*3)+2] & 0x30000000) == 0x30000000))
 			{
 				// channel 2 it is
-				dma_exec(machine, 2);
+				dma_exec(2);
 			}
 		}
 	}
@@ -399,12 +379,12 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 	{
 		if ((m_SOUNDCNT_H & 0x400) == 0)
 		{
-			audio_tick(machine(), 0);
+			audio_tick(0);
 		}
 
 		if ((m_SOUNDCNT_H & 0x4000) == 0)
 		{
-			audio_tick(machine(), 1);
+			audio_tick(1);
 		}
 	}
 
@@ -412,12 +392,12 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 	{
 		if ((m_SOUNDCNT_H & 0x400) == 0x400)
 		{
-			audio_tick(machine(), 0);
+			audio_tick(0);
 		}
 
 		if ((m_SOUNDCNT_H & 0x4000) == 0x4000)
 		{
-			audio_tick(machine(), 1);
+			audio_tick(1);
 		}
 	}
 
@@ -433,7 +413,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 				m_timer_regs[1] |= m_timer_reload[1];
 				if( ( m_timer_regs[1] & 0x400000 ) && ( m_IME != 0 ) )
 				{
-					gba_request_irq( machine(), tmr_ints[1] );
+					request_irq(tmr_ints[1]);
 				}
 				if( ( m_timer_regs[2] & 0x40000 ) )
 				{
@@ -443,7 +423,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 						m_timer_regs[2] |= m_timer_reload[2];
 						if( ( m_timer_regs[2] & 0x400000 ) && ( m_IME != 0 ) )
 						{
-							gba_request_irq( machine(), tmr_ints[2] );
+							request_irq(tmr_ints[2]);
 						}
 						if( ( m_timer_regs[3] & 0x40000 ) )
 						{
@@ -453,7 +433,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 								m_timer_regs[3] |= m_timer_reload[3];
 								if( ( m_timer_regs[3] & 0x400000 ) && ( m_IME != 0 ) )
 								{
-									gba_request_irq( machine(), tmr_ints[3] );
+									request_irq(tmr_ints[3]);
 								}
 							}
 						}
@@ -471,7 +451,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 				m_timer_regs[2] |= m_timer_reload[2];
 				if( ( m_timer_regs[2] & 0x400000 ) && ( m_IME != 0 ) )
 				{
-					gba_request_irq( machine(), tmr_ints[2] );
+					request_irq(tmr_ints[2]);
 				}
 				if( ( m_timer_regs[3] & 0x40000 ) )
 				{
@@ -481,7 +461,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 						m_timer_regs[3] |= m_timer_reload[3];
 						if( ( m_timer_regs[3] & 0x400000 ) && ( m_IME != 0 ) )
 						{
-							gba_request_irq( machine(), tmr_ints[3] );
+							request_irq(tmr_ints[3]);
 						}
 					}
 				}
@@ -497,7 +477,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 				m_timer_regs[3] |= m_timer_reload[3];
 				if( ( m_timer_regs[3] & 0x400000 ) && ( m_IME != 0 ) )
 				{
-					gba_request_irq( machine(), tmr_ints[3] );
+					request_irq(tmr_ints[3]);
 				}
 			}
 		}
@@ -507,13 +487,13 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 	// are we supposed to IRQ?
 	if ((m_timer_regs[tmr] & 0x400000) && (m_IME != 0))
 	{
-		gba_request_irq(machine(), tmr_ints[tmr]);
+		request_irq(tmr_ints[tmr]);
 	}
 }
 
 TIMER_CALLBACK_MEMBER(gba_state::handle_irq)
 {
-	gba_request_irq(machine(), m_IF);
+	request_irq(m_IF);
 
 	m_irq_timer->adjust(attotime::never);
 }
@@ -521,7 +501,6 @@ TIMER_CALLBACK_MEMBER(gba_state::handle_irq)
 READ32_MEMBER(gba_state::gba_io_r)
 {
 	UINT32 retval = 0;
-	device_t *gb_device = machine().device("custom");
 
 	switch( offset )
 	{
@@ -769,31 +748,31 @@ READ32_MEMBER(gba_state::gba_io_r)
 			}
 			break;
 		case 0x0060/4:
-			retval = gb_sound_r(gb_device, space, 0) | gb_sound_r(gb_device, space, 1)<<16 | gb_sound_r(gb_device, space, 2)<<24;
+			retval = gb_sound_r(m_gbsound, space, 0) | gb_sound_r(m_gbsound, space, 1)<<16 | gb_sound_r(m_gbsound, space, 2)<<24;
 			break;
 		case 0x0064/4:
-			retval = gb_sound_r(gb_device, space, 3) | gb_sound_r(gb_device, space, 4)<<8;
+			retval = gb_sound_r(m_gbsound, space, 3) | gb_sound_r(m_gbsound, space, 4)<<8;
 			break;
 		case 0x0068/4:
-			retval = gb_sound_r(gb_device, space, 6) | gb_sound_r(gb_device, space, 7)<<8;
+			retval = gb_sound_r(m_gbsound, space, 6) | gb_sound_r(m_gbsound, space, 7)<<8;
 			break;
 		case 0x006c/4:
-			retval = gb_sound_r(gb_device, space, 8) | gb_sound_r(gb_device, space, 9)<<8;
+			retval = gb_sound_r(m_gbsound, space, 8) | gb_sound_r(m_gbsound, space, 9)<<8;
 			break;
 		case 0x0070/4:
-			retval = gb_sound_r(gb_device, space, 0xa) | gb_sound_r(gb_device, space, 0xb)<<16 | gb_sound_r(gb_device, space, 0xc)<<24;
+			retval = gb_sound_r(m_gbsound, space, 0xa) | gb_sound_r(m_gbsound, space, 0xb)<<16 | gb_sound_r(m_gbsound, space, 0xc)<<24;
 			break;
 		case 0x0074/4:
-			retval = gb_sound_r(gb_device, space, 0xd) | gb_sound_r(gb_device, space, 0xe)<<8;
+			retval = gb_sound_r(m_gbsound, space, 0xd) | gb_sound_r(m_gbsound, space, 0xe)<<8;
 			break;
 		case 0x0078/4:
-			retval = gb_sound_r(gb_device, space, 0x10) | gb_sound_r(gb_device, space, 0x11)<<8;
+			retval = gb_sound_r(m_gbsound, space, 0x10) | gb_sound_r(m_gbsound, space, 0x11)<<8;
 			break;
 		case 0x007c/4:
-			retval = gb_sound_r(gb_device, space, 0x12) | gb_sound_r(gb_device, space, 0x13)<<8;
+			retval = gb_sound_r(m_gbsound, space, 0x12) | gb_sound_r(m_gbsound, space, 0x13)<<8;
 			break;
 		case 0x0080/4:
-			retval = gb_sound_r(gb_device, space, 0x14) | gb_sound_r(gb_device, space, 0x15)<<8;
+			retval = gb_sound_r(m_gbsound, space, 0x14) | gb_sound_r(m_gbsound, space, 0x15)<<8;
 			if( (mem_mask) & 0xffff0000 )
 			{
 				verboselog(machine(), 2, "GBA IO Register Read: SOUNDCNT_H (%08x) = %04x\n", 0x04000000 + ( offset << 2 ) + 2, m_SOUNDCNT_H );
@@ -801,7 +780,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 			}
 			break;
 		case 0x0084/4:
-			retval = gb_sound_r(gb_device, space, 0x16);
+			retval = gb_sound_r(m_gbsound, space, 0x16);
 			break;
 		case 0x0088/4:
 			if( (mem_mask) & 0x0000ffff )
@@ -815,16 +794,16 @@ READ32_MEMBER(gba_state::gba_io_r)
 			}
 			break;
 		case 0x0090/4:
-			retval = gb_wave_r(gb_device, space, 0) | gb_wave_r(gb_device, space, 1)<<8 | gb_wave_r(gb_device, space, 2)<<16 | gb_wave_r(gb_device, space, 3)<<24;
+			retval = gb_wave_r(m_gbsound, space, 0) | gb_wave_r(m_gbsound, space, 1)<<8 | gb_wave_r(m_gbsound, space, 2)<<16 | gb_wave_r(m_gbsound, space, 3)<<24;
 			break;
 		case 0x0094/4:
-			retval = gb_wave_r(gb_device, space, 4) | gb_wave_r(gb_device, space, 5)<<8 | gb_wave_r(gb_device, space, 6)<<16 | gb_wave_r(gb_device, space, 7)<<24;
+			retval = gb_wave_r(m_gbsound, space, 4) | gb_wave_r(m_gbsound, space, 5)<<8 | gb_wave_r(m_gbsound, space, 6)<<16 | gb_wave_r(m_gbsound, space, 7)<<24;
 			break;
 		case 0x0098/4:
-			retval = gb_wave_r(gb_device, space, 8) | gb_wave_r(gb_device, space, 9)<<8 | gb_wave_r(gb_device, space, 10)<<16 | gb_wave_r(gb_device, space, 11)<<24;
+			retval = gb_wave_r(m_gbsound, space, 8) | gb_wave_r(m_gbsound, space, 9)<<8 | gb_wave_r(m_gbsound, space, 10)<<16 | gb_wave_r(m_gbsound, space, 11)<<24;
 			break;
 		case 0x009c/4:
-			retval = gb_wave_r(gb_device, space, 12) | gb_wave_r(gb_device, space, 13)<<8 | gb_wave_r(gb_device, space, 14)<<16 | gb_wave_r(gb_device, space, 15)<<24;
+			retval = gb_wave_r(m_gbsound, space, 12) | gb_wave_r(m_gbsound, space, 13)<<8 | gb_wave_r(m_gbsound, space, 14)<<16 | gb_wave_r(m_gbsound, space, 15)<<24;
 			break;
 		case 0x00a0/4:
 		case 0x00a4/4:
@@ -1050,7 +1029,6 @@ READ32_MEMBER(gba_state::gba_io_r)
 
 WRITE32_MEMBER(gba_state::gba_io_w)
 {
-	device_t *gb_device = machine().device("custom");
 	switch( offset )
 	{
 		case 0x0000/4:
@@ -1345,99 +1323,99 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 		case 0x0060/4:
 			if( (mem_mask) & 0x000000ff )   // SOUNDCNTL
 			{
-				gb_sound_w(gb_device, space, 0, data);
+				gb_sound_w(m_gbsound, space, 0, data);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_sound_w(gb_device, space, 1, data>>16);  // SOUND1CNT_H
+				gb_sound_w(m_gbsound, space, 1, data>>16);	// SOUND1CNT_H
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
-				gb_sound_w(gb_device, space, 2, data>>24);
+				gb_sound_w(m_gbsound, space, 2, data>>24);
 			}
 			break;
 		case 0x0064/4:
 			if( (mem_mask) & 0x000000ff )   // SOUNDCNTL
 			{
-				gb_sound_w(gb_device, space, 3, data);
+				gb_sound_w(m_gbsound, space, 3, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(gb_device, space, 4, data>>8);   // SOUND1CNT_H
+				gb_sound_w(m_gbsound, space, 4, data>>8);	// SOUND1CNT_H
 			}
 			break;
 		case 0x0068/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(gb_device, space, 6, data);
+				gb_sound_w(m_gbsound, space, 6, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(gb_device, space, 7, data>>8);
+				gb_sound_w(m_gbsound, space, 7, data>>8);
 			}
 			break;
 		case 0x006c/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(gb_device, space, 8, data);
+				gb_sound_w(m_gbsound, space, 8, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(gb_device, space, 9, data>>8);
+				gb_sound_w(m_gbsound, space, 9, data>>8);
 			}
 			break;
 		case 0x0070/4:  //SND3CNTL and H
 			if( (mem_mask) & 0x000000ff )   // SOUNDCNTL
 			{
-				gb_sound_w(gb_device, space, 0xa, data);
+				gb_sound_w(m_gbsound, space, 0xa, data);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_sound_w(gb_device, space, 0xb, data>>16);    // SOUND1CNT_H
+				gb_sound_w(m_gbsound, space, 0xb, data>>16);	// SOUND1CNT_H
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
-				gb_sound_w(gb_device, space, 0xc, data>>24);
+				gb_sound_w(m_gbsound, space, 0xc, data>>24);
 			}
 			break;
 		case 0x0074/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(gb_device, space, 0xd, data);
+				gb_sound_w(m_gbsound, space, 0xd, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(gb_device, space, 0xe, data>>8);
+				gb_sound_w(m_gbsound, space, 0xe, data>>8);
 			}
 			break;
 		case 0x0078/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(gb_device, space, 0x10, data);
+				gb_sound_w(m_gbsound, space, 0x10, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(gb_device, space, 0x11, data>>8);
+				gb_sound_w(m_gbsound, space, 0x11, data>>8);
 			}
 			break;
 		case 0x007c/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(gb_device, space, 0x12, data);
+				gb_sound_w(m_gbsound, space, 0x12, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(gb_device, space, 0x13, data>>8);
+				gb_sound_w(m_gbsound, space, 0x13, data>>8);
 			}
 			break;
 		case 0x0080/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_sound_w(gb_device, space, 0x14, data);
+				gb_sound_w(m_gbsound, space, 0x14, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(gb_device, space, 0x15, data>>8);
+				gb_sound_w(m_gbsound, space, 0x15, data>>8);
 			}
 
 			if ((mem_mask) & 0xffff0000)
@@ -1448,45 +1426,34 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 				// DAC A reset?
 				if (data & 0x0800)
 				{
-					dac_device *gb_a_l = machine().device<dac_device>("direct_a_left");
-					dac_device *gb_a_r = machine().device<dac_device>("direct_a_right");
-
 					m_fifo_a_ptr = 17;
 					m_fifo_a_in = 17;
-					gb_a_l->write_signed8(0x80);
-					gb_a_r->write_signed8(0x80);
+					m_ladac->write_signed8(0x80);
+					m_radac->write_signed8(0x80);
 				}
 
 				// DAC B reset?
 				if (data & 0x8000)
 				{
-					dac_device *gb_b_l = machine().device<dac_device>("direct_b_left");
-					dac_device *gb_b_r = machine().device<dac_device>("direct_b_right");
-
 					m_fifo_b_ptr = 17;
 					m_fifo_b_in = 17;
-					gb_b_l->write_signed8(0x80);
-					gb_b_r->write_signed8(0x80);
+					m_lbdac->write_signed8(0x80);
+					m_rbdac->write_signed8(0x80);
 				}
 			}
 			break;
 		case 0x0084/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				dac_device *gb_a_l = machine().device<dac_device>("direct_a_left");
-				dac_device *gb_a_r = machine().device<dac_device>("direct_a_right");
-				dac_device *gb_b_l = machine().device<dac_device>("direct_b_left");
-				dac_device *gb_b_r = machine().device<dac_device>("direct_b_right");
-
-				gb_sound_w(gb_device, space, 0x16, data);
+				gb_sound_w(m_gbsound, space, 0x16, data);
 				if ((data & 0x80) && !(m_SOUNDCNT_X & 0x80))
 				{
 					m_fifo_a_ptr = m_fifo_a_in = 17;
 					m_fifo_b_ptr = m_fifo_b_in = 17;
-					gb_a_l->write_signed8(0x80);
-					gb_a_r->write_signed8(0x80);
-					gb_b_l->write_signed8(0x80);
-					gb_b_r->write_signed8(0x80);
+					m_ladac->write_signed8(0x80);
+					m_radac->write_signed8(0x80);
+					m_lbdac->write_signed8(0x80);
+					m_rbdac->write_signed8(0x80);
 				}
 				m_SOUNDCNT_X = data;
 			}
@@ -1505,73 +1472,73 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 		case 0x0090/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_wave_w(gb_device, space, 0, data);
+				gb_wave_w(m_gbsound, space, 0, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_wave_w(gb_device, space, 1, data>>8);
+				gb_wave_w(m_gbsound, space, 1, data>>8);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_wave_w(gb_device, space, 2, data>>16);
+				gb_wave_w(m_gbsound, space, 2, data>>16);
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
-				gb_wave_w(gb_device, space, 3, data>>24);
+				gb_wave_w(m_gbsound, space, 3, data>>24);
 			}
 			break;
 		case 0x0094/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_wave_w(gb_device, space, 4, data);
+				gb_wave_w(m_gbsound, space, 4, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_wave_w(gb_device, space, 5, data>>8);
+				gb_wave_w(m_gbsound, space, 5, data>>8);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_wave_w(gb_device, space, 6, data>>16);
+				gb_wave_w(m_gbsound, space, 6, data>>16);
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
-				gb_wave_w(gb_device, space, 7, data>>24);
+				gb_wave_w(m_gbsound, space, 7, data>>24);
 			}
 			break;
 		case 0x0098/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_wave_w(gb_device, space, 8, data);
+				gb_wave_w(m_gbsound, space, 8, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_wave_w(gb_device, space, 9, data>>8);
+				gb_wave_w(m_gbsound, space, 9, data>>8);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_wave_w(gb_device, space, 0xa, data>>16);
+				gb_wave_w(m_gbsound, space, 0xa, data>>16);
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
-				gb_wave_w(gb_device, space, 0xb, data>>24);
+				gb_wave_w(m_gbsound, space, 0xb, data>>24);
 			}
 			break;
 		case 0x009c/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				gb_wave_w(gb_device, space, 0xc, data);
+				gb_wave_w(m_gbsound, space, 0xc, data);
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_wave_w(gb_device, space, 0xd, data>>8);
+				gb_wave_w(m_gbsound, space, 0xd, data>>8);
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_wave_w(gb_device, space, 0xe, data>>16);
+				gb_wave_w(m_gbsound, space, 0xe, data>>16);
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
-				gb_wave_w(gb_device, space, 0xf, data>>24);
+				gb_wave_w(m_gbsound, space, 0xf, data>>24);
 			}
 			break;
 		case 0x00a0/4:
@@ -1642,7 +1609,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 						// immediate start
 						if ((ctrl & 0x3000) == 0)
 						{
-							dma_exec(machine(), ch);
+							dma_exec(ch);
 							return;
 						}
 					}
@@ -1743,7 +1710,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 						// request interrupt ?
 						if (data & 0x4000)
 						{
-							gba_request_irq( machine(), INT_SIO);
+							request_irq(INT_SIO);
 						}
 					}
 				}
@@ -1829,7 +1796,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 #if 0
 				if (m_IE & m_IF)
 				{
-					gba_request_irq(machine(), m_IF);
+					request_irq(m_IF);
 				}
 #endif
 			}
@@ -1841,7 +1808,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 				// if we still have interrupts, yank the IRQ line again
 				if (m_IF)
 				{
-					m_irq_timer->adjust(machine().device<cpu_device>("maincpu")->clocks_to_attotime(120));
+					m_irq_timer->adjust(m_maincpu->clocks_to_attotime(120));
 				}
 			}
 			break;
@@ -1884,7 +1851,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 					m_HALTCNT = data & 0x000000ff;
 
 					// either way, wait for an IRQ
-					machine().device("maincpu")->execute().spin_until_interrupt();
+					m_maincpu->spin_until_interrupt();
 				}
 			}
 			if( (mem_mask) & 0xffff0000 )
@@ -1952,10 +1919,9 @@ READ32_MEMBER(gba_state::gba_bios_r)
 
 READ32_MEMBER(gba_state::gba_10000000_r)
 {
-	UINT32 data, cpsr, pc;
-	cpu_device *cpu = downcast<cpu_device *>(machine().device( "maincpu"));
-	pc = cpu->state_int( ARM7_PC);
-	cpsr = cpu->state_int( ARM7_CPSR);
+	UINT32 data;
+	UINT32 pc = m_maincpu->state_int( ARM7_PC);
+	UINT32 cpsr = m_maincpu->state_int( ARM7_CPSR);
 	if (T_IS_SET( cpsr))
 	{
 		data = space.read_dword( pc + 8);
@@ -2012,7 +1978,7 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_hbl)
 	m_DISPSTAT |= DISPSTAT_HBL;
 	if ((m_DISPSTAT & DISPSTAT_HBL_IRQ_EN ) != 0)
 	{
-		gba_request_irq(machine(), INT_HBL);
+		request_irq(INT_HBL);
 	}
 
 	for (ch = 0; ch < 4; ch++)
@@ -2022,7 +1988,7 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_hbl)
 		// HBL-triggered DMA?
 		if ((ctrl & 0x8000) && ((ctrl & 0x3000) == 0x2000))
 		{
-			dma_exec(machine(), ch);
+			dma_exec(ch);
 		}
 	}
 
@@ -2054,7 +2020,7 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_scan)
 		m_DISPSTAT |= DISPSTAT_VCNT;
 		if (m_DISPSTAT & DISPSTAT_VCNT_IRQ_EN)
 		{
-			gba_request_irq(machine(), INT_VCNT);
+			request_irq(INT_VCNT);
 		}
 	}
 
@@ -2087,7 +2053,7 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_scan)
 
 		if (m_DISPSTAT & DISPSTAT_VBL_IRQ_EN)
 		{
-			gba_request_irq(machine(), INT_VBL);
+			request_irq(INT_VBL);
 		}
 
 		for (ch = 0; ch < 4; ch++)
@@ -2097,7 +2063,7 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_scan)
 			// VBL-triggered DMA?
 			if ((ctrl & 0x8000) && ((ctrl & 0x3000) == 0x1000))
 			{
-				dma_exec(machine(), ch);
+				dma_exec(ch);
 			}
 		}
 	}
@@ -2108,11 +2074,6 @@ TIMER_CALLBACK_MEMBER(gba_state::perform_scan)
 
 void gba_state::machine_reset()
 {
-	dac_device *gb_a_l = machine().device<dac_device>("direct_a_left");
-	dac_device *gb_a_r = machine().device<dac_device>("direct_a_right");
-	dac_device *gb_b_l = machine().device<dac_device>("direct_b_left");
-	dac_device *gb_b_r = machine().device<dac_device>("direct_b_right");
-
 	//memset(this, 0, sizeof(this));
 	m_SOUNDBIAS = 0x0200;
 	m_eeprom_state = EEP_IDLE;
@@ -2146,10 +2107,10 @@ void gba_state::machine_reset()
 	m_fifo_a_in = m_fifo_b_in = 17;
 
 	// and clear the DACs
-	gb_a_l->write_signed8(0x80);
-	gb_a_r->write_signed8(0x80);
-	gb_b_l->write_signed8(0x80);
-	gb_b_r->write_signed8(0x80);
+	m_ladac->write_signed8(0x80);
+	m_radac->write_signed8(0x80);
+	m_lbdac->write_signed8(0x80);
+	m_rbdac->write_signed8(0x80);
 
 	if (m_flash_battery_load != 0)
 	{
@@ -2381,7 +2342,7 @@ WRITE32_MEMBER(gba_state::eeprom_w)
 
 			if (m_eeprom_bits == 0)
 			{
-				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", machine().device("maincpu")->safe_pc(), m_eep_data, m_eeprom_addr );
+				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", space.device().safe_pc(), m_eep_data, m_eeprom_addr );
 				if (m_eeprom_addr >= sizeof( m_gba_eeprom))
 				{
 					fatalerror( "eeprom: invalid address (%x)\n", m_eeprom_addr);
@@ -3192,7 +3153,7 @@ DIRECT_UPDATE_MEMBER(gba_state::gba_direct)
 
 DRIVER_INIT_MEMBER(gba_state,gbadv)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(gba_state::gba_direct), this));
+	((device_t*)m_maincpu)->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(gba_state::gba_direct), this));
 }
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   COMPANY     FULLNAME */
