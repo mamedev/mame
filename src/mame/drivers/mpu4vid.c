@@ -218,15 +218,23 @@ class mpu4vid_state : public mpu4_state
 public:
 	mpu4vid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mpu4_state(mconfig, type, tag),
+		m_videocpu(*this, "video"),
 		m_scn2674(*this, "scn2674_vid"),
 		m_vid_vidram(*this, "vid_vidram"),
-		m_vid_mainram(*this, "vid_mainram")
+		m_vid_mainram(*this, "vid_mainram"),
+		m_acia_0(*this, "acia6850_0"),
+		m_acia_1(*this, "acia6850_1"),
+		m_ptm(*this, "6840ptm_68k")
 	{
 	}
 
+	required_device<cpu_device> m_videocpu;
 	optional_device<scn2674_device> m_scn2674;
 	optional_shared_ptr<UINT16> m_vid_vidram;
 	optional_shared_ptr<UINT16> m_vid_mainram;
+	required_device<acia6850_device> m_acia_0;
+	required_device<acia6850_device> m_acia_1;
+	required_device<ptm6840_device> m_ptm;
 
 	struct ef9369_t m_pal;
 	struct bt471_t m_bt471;
@@ -425,29 +433,27 @@ WRITE_LINE_MEMBER(mpu4vid_state::cpu1_ptm_irq)
 
 WRITE8_MEMBER(mpu4vid_state::vid_o1_callback)
 {
-	downcast<ptm6840_device *>(machine().device("6840ptm_68k"))->set_c2(data); /* this output is the clock for timer2 */
+	m_ptm->set_c2(data); /* this output is the clock for timer2 */
 
 	if (data)
 	{
-		acia6850_device *acia_0 = machine().device<acia6850_device>("acia6850_0");
-		acia6850_device *acia_1 = machine().device<acia6850_device>("acia6850_1");
-		acia_0->tx_clock_in();
-		acia_0->rx_clock_in();
-		acia_1->tx_clock_in();
-		acia_1->rx_clock_in();
+		m_acia_0->tx_clock_in();
+		m_acia_0->rx_clock_in();
+		m_acia_1->tx_clock_in();
+		m_acia_1->rx_clock_in();
 	}
 }
 
 
 WRITE8_MEMBER(mpu4vid_state::vid_o2_callback)
 {
-	downcast<ptm6840_device *>(machine().device("6840ptm_68k"))->set_c3(data); /* this output is the clock for timer3 */
+	m_ptm->set_c3(data); /* this output is the clock for timer3 */
 }
 
 
 WRITE8_MEMBER(mpu4vid_state::vid_o3_callback)
 {
-	downcast<ptm6840_device *>(machine().device("6840ptm_68k"))->set_c1(data); /* this output is the clock for timer1 */
+	m_ptm->set_c1(data); /* this output is the clock for timer1 */
 }
 
 
@@ -1352,8 +1358,9 @@ INPUT_PORTS_END
 
 static void video_reset(device_t *device)
 {
-	device->machine().device("6840ptm_68k")->reset();
-	device->machine().device("acia6850_1")->reset();
+	mpu4vid_state *state = device->machine().driver_data<mpu4vid_state>();
+	state->m_ptm->reset();
+	state->m_acia_1->reset();
 }
 
 /* machine start (called only once) */

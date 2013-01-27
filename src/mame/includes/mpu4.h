@@ -94,6 +94,7 @@ class mpu4_state : public driver_device
 public:
 	mpu4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_maincpu(*this, "maincpu"),
 			m_vfd(*this, "vfd"),
 			m_6840ptm(*this, "ptm_ic2"),
 			m_pia3(*this, "pia_ic3"),
@@ -101,13 +102,26 @@ public:
 			m_pia5(*this, "pia_ic5"),
 			m_pia6(*this, "pia_ic6"),
 			m_pia7(*this, "pia_ic7"),
-			m_pia8(*this, "pia_ic8")
-			{ }
+			m_pia8(*this, "pia_ic8"),
+			m_orange1_port(*this, "ORANGE1"),
+			m_orange2_port(*this, "ORANGE2"),
+			m_black1_port(*this, "BLACK1"),
+			m_black2_port(*this, "BLACK2"),
+			m_dil1_port(*this, "DIL1"),
+			m_dil2_port(*this, "DIL2"),
+			m_aux1_port(*this, "AUX1"),
+			m_aux2_port(*this, "AUX2"),
+			m_bank1(*this, "bank1"),
+			m_msm6376(*this, "msm6376")
+	{}
+
+
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		return 0;
 	}
+	required_device<cpu_device> m_maincpu;
 	optional_device<roc10937_t> m_vfd;
 	optional_device<ptm6840_device> m_6840ptm;
 	optional_device<pia6821_device> m_pia3;
@@ -116,6 +130,18 @@ public:
 	optional_device<pia6821_device> m_pia6;
 	optional_device<pia6821_device> m_pia7;
 	optional_device<pia6821_device> m_pia8;
+	required_ioport m_orange1_port;
+	required_ioport m_orange2_port;
+	required_ioport m_black1_port;
+	required_ioport m_black2_port;
+	required_ioport m_dil1_port;
+	required_ioport m_dil2_port;
+	required_ioport m_aux1_port;
+	required_ioport m_aux2_port;
+	optional_memory_bank m_bank1;
+	optional_device<okim6376_device> m_msm6376;
+
+
 	int m_mod_number;
 	int m_mmtr_data;
 	int m_alpha_data_line;
