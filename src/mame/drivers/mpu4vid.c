@@ -224,7 +224,9 @@ public:
 		m_vid_mainram(*this, "vid_mainram"),
 		m_acia_0(*this, "acia6850_0"),
 		m_acia_1(*this, "acia6850_1"),
-		m_ptm(*this, "6840ptm_68k")
+		m_ptm(*this, "6840ptm_68k"),
+		m_trackx_port(*this, "TRACKX"),
+		m_tracky_port(*this, "TRACKY")
 	{
 	}
 
@@ -235,6 +237,8 @@ public:
 	required_device<acia6850_device> m_acia_0;
 	required_device<acia6850_device> m_acia_1;
 	required_device<ptm6840_device> m_ptm;
+	optional_ioport m_trackx_port;
+	optional_ioport m_tracky_port;
 
 	struct ef9369_t m_pal;
 	struct bt471_t m_bt471;
@@ -329,9 +333,9 @@ static DECLARE_WRITE16_HANDLER( bwb_characteriser16_w );
 static void update_mpu68_interrupts(running_machine &machine)
 {
 	mpu4vid_state *state = machine.driver_data<mpu4vid_state>();
-	machine.device("video")->execute().set_input_line(1, state->m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("video")->execute().set_input_line(2, state->m_m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("video")->execute().set_input_line(3, state->m_scn2674->get_irq_state() ? ASSERT_LINE : CLEAR_LINE);
+	state->m_videocpu->set_input_line(1, state->m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	state->m_videocpu->set_input_line(2, state->m_m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	state->m_videocpu->set_input_line(3, state->m_scn2674->get_irq_state() ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Communications with 6809 board */
@@ -364,7 +368,7 @@ READ_LINE_MEMBER(mpu4vid_state::m6809_acia_dcd_r)
 WRITE_LINE_MEMBER(mpu4vid_state::m6809_acia_irq)
 {
 	m_m68k_acia_cts = state;
-	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, state);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
 static ACIA6850_INTERFACE( m6809_acia_if )
@@ -740,10 +744,10 @@ READ8_MEMBER(mpu4vid_state::pia_ic5_porta_track_r)
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context()));
 
 
-	UINT8 data = ioport("AUX1")->read();
+	UINT8 data = m_aux1_port->read();
 
-	INT8 dx = ioport("TRACKX")->read();
-	INT8 dy = ioport("TRACKY")->read();
+	INT8 dx = m_trackx_port->read();
+	INT8 dy = m_tracky_port->read();
 
 	m_cur[0] = dy + dx;
 	m_cur[1] = dy - dx;
@@ -1122,10 +1126,10 @@ static INPUT_PORTS_START( skiltrek )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")//PORT_IMPULSE(5)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( turnover )
@@ -1236,10 +1240,10 @@ static INPUT_PORTS_START( turnover )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")//PORT_IMPULSE(5)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( adders )
@@ -1350,10 +1354,10 @@ static INPUT_PORTS_START( adders )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")//PORT_IMPULSE(5)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")//PORT_IMPULSE(5)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")//PORT_IMPULSE(5)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")//PORT_IMPULSE(5)
 INPUT_PORTS_END
 
 static void video_reset(device_t *device)
@@ -1376,7 +1380,7 @@ MACHINE_START_MEMBER(mpu4vid_state,mpu4_vid)
 	MechMtr_config(machine(),8);
 
 	/* Hook the reset line */
-	m68k_set_reset_callback(machine().device("video"), ::video_reset);
+	m68k_set_reset_callback(m_videocpu, ::video_reset);
 }
 
 MACHINE_RESET_MEMBER(mpu4vid_state,mpu4_vid)
