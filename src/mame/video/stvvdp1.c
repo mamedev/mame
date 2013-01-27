@@ -1966,7 +1966,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 					break;
 
 				case 0x0002:
-				case 0x0003:
+				case 0x0003: // used by Hardcore 4x4
 					if (VDP1_LOG) logerror ("Sprite List Distorted Sprite\n");
 					if (VDP1_LOG) logerror ("(A: %d %d)\n",stv2_current_sprite.CMDXA,stv2_current_sprite.CMDYA);
 					if (VDP1_LOG) logerror ("(B: %d %d)\n",stv2_current_sprite.CMDXB,stv2_current_sprite.CMDYB);

@@ -4208,7 +4208,8 @@ static void stv_vdp2_check_tilemap(running_machine &machine, bitmap_rgb32 &bitma
 
 		/* Albert Odyssey Gaiden 0x0001 */
 		/* Asuka 120% (doesn't make sense?) 0x0101 */
-		if(STV_VDP2_ZMCTL & 0x0202)
+		/* Slam n Jam 96 0x0003 */
+		if(STV_VDP2_ZMCTL & 0x0200)
 			popmessage("Reduction enable %04x, contact MAMEdev",STV_VDP2_ZMCTL);
 
 		/* Burning Rangers and friends FMV, J.League Pro Soccer Club Wo Tsukurou!! backgrounds */
