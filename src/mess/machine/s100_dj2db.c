@@ -266,8 +266,12 @@ s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *
 	m_floppy2(*this, MB8866_TAG":2"),
 	m_floppy3(*this, MB8866_TAG":3"),
 	m_floppy(NULL),
-	m_j1a(*this, "J1A"),
+	m_rom(*this, "dj2db"),
 	m_ram(*this, "ram"),
+	m_j1a(*this, "J1A"),
+	m_j3a(*this, "J3A"),
+	m_j4(*this, "J4"),
+	m_sw1(*this, "SW1"),
 	m_drive(0),
 	m_head(1),
 	m_int_enbl(0),
@@ -284,9 +288,6 @@ s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *
 
 void s100_dj2db_device::device_start()
 {
-	// find memory regions
-	m_rom = memregion("dj2db")->base();
-
 	// allocate memory
 	m_ram.allocate(0x400);
 
@@ -310,7 +311,7 @@ void s100_dj2db_device::device_start()
 
 void s100_dj2db_device::device_reset()
 {
-	m_board_enbl = ioport("J4")->read();
+	m_board_enbl = m_j4->read();
 }
 
 
@@ -326,7 +327,7 @@ UINT8 s100_dj2db_device::s100_smemr_r(address_space &space, offs_t offset)
 
 	if ((offset >= 0xf800) && (offset < 0xfbf8))
 	{
-		data = m_rom[offset & 0x3ff] ^ 0xff;
+		data = m_rom->base()[offset & 0x3ff] ^ 0xff;
 	}
 	else if (offset == 0xfbf8) // SERIAL IN
 	{
@@ -504,7 +505,7 @@ void s100_dj2db_device::s100_sout_w(address_space &space, offs_t offset, UINT8 d
 {
 	if (offset == 0x41)
 	{
-		m_board_enbl = (data & ioport("J3A")->read()) ? 1 : 0;
+		m_board_enbl = (data & m_j3a->read()) ? 1 : 0;
 	}
 }
 
@@ -515,7 +516,7 @@ void s100_dj2db_device::s100_sout_w(address_space &space, offs_t offset, UINT8 d
 
 void s100_dj2db_device::s100_phantom_w(int state)
 {
-	if (!BIT(ioport("SW1")->read(), 2))
+	if (!BIT(m_sw1->read(), 2))
 	{
 		m_phantom = state;
 	}

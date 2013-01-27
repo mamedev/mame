@@ -66,8 +66,12 @@ private:
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
 	floppy_image_device *m_floppy;
-	required_ioport m_j1a;
+	required_memory_region m_rom;
 	optional_shared_ptr<UINT8> m_ram;
+	required_ioport m_j1a;
+	required_ioport m_j3a;
+	required_ioport m_j4;
+	required_ioport m_sw1;
 
 	// floppy state
 	int m_drive;                // selected drive
@@ -75,7 +79,6 @@ private:
 	int m_int_enbl;             // interrupt enable
 
 	// S-100 bus state
-	const UINT8 *m_rom;
 	int m_access_enbl;          // access enable
 	int m_board_enbl;           // board enable
 	int m_phantom;              // phantom
