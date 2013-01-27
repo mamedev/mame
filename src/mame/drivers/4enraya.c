@@ -56,7 +56,6 @@ Sound :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 #include "machine/nvram.h"
 #include "includes/4enraya.h"
 
@@ -69,32 +68,27 @@ WRITE8_MEMBER(_4enraya_state::sound_data_w)
 
 WRITE8_MEMBER(_4enraya_state::sound_control_w)
 {
-	device_t *device = machine().device("aysnd");
-
 	if ((m_last_snd_ctrl & m_snd_latch_bit ) == m_snd_latch_bit && (data & m_snd_latch_bit) == 0x00)
-		ay8910_data_address_w(device, space, m_last_snd_ctrl, m_soundlatch);
+		ay8910_data_address_w(m_ay, space, m_last_snd_ctrl, m_soundlatch);
 
 	m_last_snd_ctrl = data;
 }
 
 READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 {
-	UINT8 *prom = memregion("pal_prom")->base();
-	UINT8 prom_routing = (prom[offset >> 12] & 0xf) ^ 0xf;
+	UINT8 prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
 	UINT8 res;
 
 	res = 0;
 
 	if(prom_routing & 1) //ROM5
 	{
-		UINT8 *rom = memregion("maincpu")->base();
-		res |= rom[offset & 0x7fff];
+		res |= m_rom[offset & 0x7fff];
 	}
 
 	if(prom_routing & 2) //ROM4
 	{
-		UINT8 *rom = memregion("maincpu")->base();
-		res |= rom[(offset & 0x7fff) | 0x8000];
+		res |= m_rom[(offset & 0x7fff) | 0x8000];
 	}
 
 	if(prom_routing & 4) //RAM
@@ -112,8 +106,7 @@ READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 
 WRITE8_MEMBER(_4enraya_state::fenraya_custom_map_w)
 {
-	UINT8 *prom = memregion("pal_prom")->base();
-	UINT8 prom_routing = (prom[offset >> 12] & 0xf) ^ 0xf;
+	UINT8 prom_routing = (m_prom[offset >> 12] & 0xf) ^ 0xf;
 
 	if(prom_routing & 1) //ROM5
 	{
@@ -296,6 +289,10 @@ void _4enraya_state::machine_start()
 {
 	save_item(NAME(m_soundlatch));
 	save_item(NAME(m_last_snd_ctrl));
+
+	m_prom = memregion("pal_prom")->base();
+	m_rom = memregion("maincpu")->base();
+
 }
 
 void _4enraya_state::machine_reset()

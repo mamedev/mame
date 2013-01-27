@@ -4,12 +4,19 @@
 
 *************************************************************************/
 
+#include "sound/ay8910.h"
+
 class _4enraya_state : public driver_device
 {
 public:
 	_4enraya_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_snd_latch_bit(4) { }
+		m_ay(*this, "aysnd"),
+		m_snd_latch_bit(4)
+	{ }
+
+	
+	required_device<ay8910_device> m_ay;
 
 	/* memory pointers */
 	UINT8      m_videoram[0x1000];
@@ -30,6 +37,10 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_control_w);
 	DECLARE_DRIVER_INIT(unkpacg);
 	TILE_GET_INFO_MEMBER(get_tile_info);
+
+	UINT8* m_prom;
+	UINT8* m_rom;
+
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
