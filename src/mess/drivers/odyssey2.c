@@ -47,7 +47,7 @@ public:
 	required_device<i8244_device> m_i8244;
 
 	int m_the_voice_lrq_state;
-	UINT8 *m_ram;
+	UINT8 m_ram[256];
 	UINT8 m_p1;
 	UINT8 m_p2;
 	size_t m_cart_size;
@@ -63,6 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(p2_write);
 	DECLARE_READ8_MEMBER(t1_read);
 	DECLARE_DRIVER_INIT(odyssey2);
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -112,6 +113,7 @@ public:
 	required_device<ef9340_1_device> m_ef9340_1;
 
 	virtual void palette_init();
+	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_WRITE8_MEMBER(p2_write);
 	DECLARE_READ8_MEMBER(io_read);
@@ -340,8 +342,6 @@ DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
 	UINT8 *gfx = memregion("gfx1")->base();
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));
 
-	m_ram        = auto_alloc_array(machine(), UINT8, 256);
-
 	for (i = 0; i < 256; i++)
 	{
 		gfx[i] = i;     /* TODO: Why i and not 0? */
@@ -363,6 +363,17 @@ DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
 }
 
 
+void odyssey2_state::machine_start()
+{
+	save_pointer(NAME(m_ram),256);
+	save_item(NAME(m_p1));
+	save_item(NAME(m_p2));
+	save_item(NAME(m_cart_size));
+	save_item(NAME(m_lum));
+	save_item(NAME(m_the_voice_lrq_state));
+}
+
+
 void odyssey2_state::machine_reset()
 {
 	m_lum = 0;
@@ -371,6 +382,15 @@ void odyssey2_state::machine_reset()
 	m_p1 = 0xFF;
 	m_p2 = 0xFF;
 	switch_banks();
+}
+
+
+void g7400_state::machine_start()
+{
+	odyssey2_state::machine_start();
+
+	save_pointer(NAME(m_ic674_decode),8);
+	save_pointer(NAME(m_ic678_decode),8);
 }
 
 
