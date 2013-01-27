@@ -545,7 +545,7 @@ WRITE8_MEMBER( supercon_state::supercon_port3_w )
 	}
 
 	// The IRQ handler writes to both 0x1E00 (1x) and 0x1F00 (2x) ports.
-	// Not 10% sure if this is the correct place for clearing the IRQ
+	// Not 100% sure if this is the correct place for clearing the IRQ
 	// line.
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 }
