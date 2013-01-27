@@ -779,7 +779,7 @@ inline void abc1600_state::get_shinf()
 	*/
 
 	UINT16 shinf_addr = (m_udx << 8) | ((m_xto & 0x0f) << 4) | (m_xfrom & 0x0f);
-	UINT8 shinf = m_shinf_rom[shinf_addr];
+	UINT8 shinf = m_shinf_rom->base()[shinf_addr];
 
 	m_sh = shinf & 0x0f;
 	m_hold_1w_cyk = BIT(shinf, 5);
@@ -805,8 +805,8 @@ inline UINT16 abc1600_state::get_drmsk()
 	*/
 
 	UINT16 drmsk_addr = (m_udx << 4) | (m_sh & 0x0f);
-	UINT8 drmskl = m_drmsk_rom[drmsk_addr];
-	UINT8 drmskh = m_drmsk_rom[drmsk_addr + 0x20];
+	UINT8 drmskl = m_drmsk_rom->base()[drmsk_addr];
+	UINT8 drmskh = m_drmsk_rom->base()[drmsk_addr + 0x20];
 	UINT16 drmsk = (drmskh << 8) | drmskl;
 
 	return drmsk;
@@ -839,8 +839,8 @@ inline UINT16 abc1600_state::get_wrmsk()
 	*/
 
 	UINT16 wrmsk_addr = (m_wrms1 << 11) | (m_wrms0 << 10) | ((!m_wrms1 && !m_wrms0) << 9) | (m_udx << 8) | ((m_xsize & 0x0f) << 4) | (m_xto & 0x0f);
-	UINT8 wrmskl = m_wrmsk_rom[wrmsk_addr];
-	UINT8 wrmskh = m_wrmsk_rom[wrmsk_addr + 0x1000];
+	UINT8 wrmskl = m_wrmsk_rom->base()[wrmsk_addr];
+	UINT8 wrmskh = m_wrmsk_rom->base()[wrmsk_addr + 0x1000];
 	UINT16 wrmsk = (wrmskh << 8) | wrmskl;
 
 	return wrmsk ^ 0xffff;
@@ -1053,11 +1053,6 @@ void abc1600_state::video_start()
 {
 	// allocate video RAM
 	m_video_ram.allocate(VIDEORAM_SIZE);
-
-	// find memory regions
-	m_wrmsk_rom = memregion("wrmsk")->base();
-	m_shinf_rom = memregion("shinf")->base();
-	m_drmsk_rom = memregion("drmsk")->base();
 
 	// state saving
 	save_item(NAME(m_endisp));

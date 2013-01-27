@@ -74,6 +74,10 @@ public:
 			m_bus0x(*this, BUS0X_TAG),
 			m_bus1(*this, BUS1_TAG),
 			m_bus2(*this, BUS2_TAG),
+			m_rom(*this, MC68008P8_TAG),
+			m_wrmsk_rom(*this, "wrmsk"),
+			m_shinf_rom(*this, "shinf"),
+			m_drmsk_rom(*this, "drmsk"),
 			m_segment_ram(*this, "segment_ram"),
 			m_page_ram(*this, "page_ram"),
 			m_video_ram(*this, "video_ram")
@@ -98,6 +102,10 @@ public:
 	required_device<abc1600bus_slot_device> m_bus0x;
 	required_device<abc1600bus_slot_device> m_bus1;
 	required_device<abc1600bus_slot_device> m_bus2;
+	required_memory_region m_rom;
+	required_memory_region m_wrmsk_rom;
+	required_memory_region m_shinf_rom;
+	required_memory_region m_drmsk_rom;
 	optional_shared_ptr<UINT8> m_segment_ram;
 	optional_shared_ptr<UINT16> m_page_ram;
 	optional_shared_ptr<UINT16> m_video_ram;
@@ -223,9 +231,6 @@ public:
 	int m_btce;                 // V.24 channel B external clock enable
 
 	// video
-	const UINT8 *m_wrmsk_rom;   // write mask ROM
-	const UINT8 *m_shinf_rom;   // shifter info ROM
-	const UINT8 *m_drmsk_rom;   // data read mask ROM
 	int m_endisp;               // enable display
 	int m_clocks_disabled;      // clocks disabled
 	UINT16 m_gmdi;              // video RAM data latch

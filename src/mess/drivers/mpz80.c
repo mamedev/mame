@@ -163,7 +163,6 @@ inline offs_t mpz80_state::get_address(offs_t offset)
 READ8_MEMBER( mpz80_state::mmu_r )
 {
 	m_addr = get_address(offset);
-	UINT8 *rom = memregion(Z80_TAG)->base();
 	UINT8 data = 0;
 
 	if (m_pretrap)
@@ -180,8 +179,7 @@ READ8_MEMBER( mpz80_state::mmu_r )
 	{
 		if (offset < 0x400)
 		{
-			UINT8 *ram = m_ram->pointer();
-			data = ram[offset & 0x3ff];
+			data = m_ram->pointer()[offset & 0x3ff];
 		}
 		else if (offset == 0x400)
 		{
@@ -206,7 +204,7 @@ READ8_MEMBER( mpz80_state::mmu_r )
 		else if (offset < 0xc00)
 		{
 			UINT16 rom_addr = (m_trap_reset << 10) | (offset & 0x3ff);
-			data = rom[rom_addr];
+			data = m_rom->base()[rom_addr];
 		}
 		else
 		{
@@ -234,8 +232,7 @@ WRITE8_MEMBER( mpz80_state::mmu_w )
 	{
 		if (offset < 0x400)
 		{
-			UINT8 *ram = m_ram->pointer();
-			ram[offset & 0x3ff] = data;
+			m_ram->pointer()[offset & 0x3ff] = data;
 		}
 		else if (offset == 0x400)
 		{
@@ -813,7 +810,7 @@ DIRECT_UPDATE_MEMBER(mpz80_state::mpz80_direct_update_handler)
 {
 	if (m_trap && address >= m_trap_start && address <= m_trap_start + 0xf)
 	{
-		direct.explicit_configure(m_trap_start, m_trap_start + 0xf, 0xf, memregion(Z80_TAG)->base() + ((m_trap_reset << 10) | 0x3f0));
+		direct.explicit_configure(m_trap_start, m_trap_start + 0xf, 0xf, m_rom->base() + ((m_trap_reset << 10) | 0x3f0));
 		return ~0;
 	}
 
