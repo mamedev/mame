@@ -766,7 +766,7 @@ READ8_MEMBER(pcw16_state::pcw16_system_status_r)
 {
 //  logerror("system status r: \n");
 
-	return m_system_status | (ioport("EXTRA")->read() & 0x04);
+	return m_system_status | (m_io_extra->read() & 0x04);
 }
 
 READ8_MEMBER(pcw16_state::pcw16_timer_interrupt_counter_r)

@@ -45,7 +45,7 @@ READ8_MEMBER( sage2_state::read )
 {
 	UINT8 data = 0xff;
 
-	if (m_reset || (offset >= 0xfe0000))
+	if (m_reset || (offset >= 0xfe0000 && offset < 0xff4000))
 	{
 		data = m_rom[offset & 0x1fff];
 	}
@@ -248,8 +248,8 @@ WRITE8_MEMBER( sage2_state::ppi0_pc_w )
 	// drive select
 	m_floppy = NULL;
 
-	if (BIT(data, 3)) m_floppy = m_floppy0->get_device();
-	if (BIT(data, 4)) m_floppy = m_floppy1->get_device();
+	if (!BIT(data, 3)) m_floppy = m_floppy0->get_device();
+	if (!BIT(data, 4)) m_floppy = m_floppy1->get_device();
 
 	m_fdc->set_floppy(m_floppy);
 

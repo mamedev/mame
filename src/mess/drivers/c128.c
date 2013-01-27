@@ -3,7 +3,6 @@
     TODO:
 
     - connect CAPS LOCK to charom A12 on international variants
-    - remove frame interrupt handler
     - expansion DMA
 
 */
@@ -161,24 +160,24 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 	if (!rom1)
 	{
 		// CR: data = m_rom1[(ms3 << 14) | ((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
-		data = m_rom1[((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
+		data = m_rom->base()[((BIT(ta, 14) && BIT(offset, 13)) << 13) | (ta & 0x1000) | (offset & 0xfff)];
 	}
 	if (!rom2)
 	{
-		data = m_rom2[offset & 0x3fff];
+		data = m_rom->base()[0x4000 | (offset & 0x3fff)];
 	}
 	if (!rom3)
 	{
 		// CR: data = m_rom3[(BIT(offset, 15) << 14) | (offset & 0x3fff)];
-		data = m_rom3[offset & 0x3fff];
+		data = m_rom->base()[0x8000 | (offset & 0x3fff)];
 	}
 	if (!rom4)
 	{
-		data = m_rom4[(ta & 0x1000) | (offset & 0x2fff)];
+		data = m_rom->base()[0xc000 | (ta & 0x1000) | (offset & 0x2fff)];
 	}
 	if (!charom)
 	{
-		data = m_charom[(ms3 << 12) | (ta & 0xf00) | sa];
+		data = m_charom->base()[(ms3 << 12) | (ta & 0xf00) | sa];
 	}
 	if (!colorram && aec)
 	{
@@ -190,7 +189,7 @@ UINT8 c128_state::read_memory(address_space &space, offs_t offset, offs_t vma, i
 	}
 	if (!from1)
 	{
-		data = m_from[offset & 0x7fff];
+		data = m_from->base()[offset & 0x7fff];
 	}
 	if (!iocs && BIT(offset, 10))
 	{
@@ -1066,17 +1065,15 @@ READ8_MEMBER( c128_state::cia1_pb_r )
 
 	// keyboard
 	UINT8 cia1_pa = m_cia1->pa_r();
-	UINT8 row[8] = { m_row0->read(), m_row1->read() & m_lock->read(), m_row2->read(), m_row3->read(),
-					 m_row4->read(), m_row5->read(), m_row6->read(), m_row7->read() };
 
-	if (!BIT(cia1_pa, 7)) data &= row[7];
-	if (!BIT(cia1_pa, 6)) data &= row[6];
-	if (!BIT(cia1_pa, 5)) data &= row[5];
-	if (!BIT(cia1_pa, 4)) data &= row[4];
-	if (!BIT(cia1_pa, 3)) data &= row[3];
-	if (!BIT(cia1_pa, 2)) data &= row[2];
-	if (!BIT(cia1_pa, 1)) data &= row[1];
-	if (!BIT(cia1_pa, 0)) data &= row[0];
+	if (!BIT(cia1_pa, 7)) data &= m_row7->read();
+	if (!BIT(cia1_pa, 6)) data &= m_row6->read();
+	if (!BIT(cia1_pa, 5)) data &= m_row5->read();
+	if (!BIT(cia1_pa, 4)) data &= m_row4->read();
+	if (!BIT(cia1_pa, 3)) data &= m_row3->read();
+	if (!BIT(cia1_pa, 2)) data &= m_row2->read();
+	if (!BIT(cia1_pa, 1)) data &= m_row1->read() & m_lock->read();
+	if (!BIT(cia1_pa, 0)) data &= m_row0->read();
 
 	if (!BIT(m_vic_k, 0)) data &= m_k0->read();
 	if (!BIT(m_vic_k, 1)) data &= m_k1->read();
@@ -1433,16 +1430,6 @@ static C64_USER_PORT_INTERFACE( user_intf )
 
 void c128_state::machine_start()
 {
-	cbm_common_init();
-
-	// find memory regions
-	m_rom1 = memregion(M8502_TAG)->base();
-	m_rom2 = m_rom1 + 0x4000;
-	m_rom3 = m_rom1 + 0x8000;
-	m_rom4 = m_rom1 + 0xc000;
-	m_from = memregion("from")->base();
-	m_charom = memregion("charom")->base();
-
 	// allocate memory
 	m_color_ram.allocate(0x800);
 

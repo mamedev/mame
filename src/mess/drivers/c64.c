@@ -644,17 +644,15 @@ READ8_MEMBER( c64_state::cia1_pb_r )
 
 	// keyboard
 	UINT8 cia1_pa = m_cia1->pa_r();
-	UINT8 row[8] = { m_row0->read(), m_row1->read() & m_lock->read(), m_row2->read(), m_row3->read(),
-					 m_row4->read(), m_row5->read(), m_row6->read(), m_row7->read() };
 
-	if (!BIT(cia1_pa, 7)) data &= row[7];
-	if (!BIT(cia1_pa, 6)) data &= row[6];
-	if (!BIT(cia1_pa, 5)) data &= row[5];
-	if (!BIT(cia1_pa, 4)) data &= row[4];
-	if (!BIT(cia1_pa, 3)) data &= row[3];
-	if (!BIT(cia1_pa, 2)) data &= row[2];
-	if (!BIT(cia1_pa, 1)) data &= row[1];
-	if (!BIT(cia1_pa, 0)) data &= row[0];
+	if (!BIT(cia1_pa, 7)) data &= m_row7->read();
+	if (!BIT(cia1_pa, 6)) data &= m_row6->read();
+	if (!BIT(cia1_pa, 5)) data &= m_row5->read();
+	if (!BIT(cia1_pa, 4)) data &= m_row4->read();
+	if (!BIT(cia1_pa, 3)) data &= m_row3->read();
+	if (!BIT(cia1_pa, 2)) data &= m_row2->read();
+	if (!BIT(cia1_pa, 1)) data &= m_row1->read() & m_lock->read();
+	if (!BIT(cia1_pa, 0)) data &= m_row0->read();
 
 	return data;
 }

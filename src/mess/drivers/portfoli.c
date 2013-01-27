@@ -62,8 +62,8 @@
 
     TODO:
 
+	- expansion port slot interface
     - clock is running too fast
-    - access violation after OFF command
     - create chargen ROM from tech manual
     - memory error interrupt vector
     - i/o port 8051

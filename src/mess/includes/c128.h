@@ -57,6 +57,10 @@ public:
 			m_user(*this, C64_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+			m_rom(*this, M8502_TAG),
+			m_from(*this, "from"),
+			m_charom(*this, "charom"),
+			m_color_ram(*this, "color_ram"),
 			m_row0(*this, "ROW0"),
 			m_row1(*this, "ROW1"),
 			m_row2(*this, "ROW2"),
@@ -78,13 +82,6 @@ public:
 			m_charen(1),
 			m_game(1),
 			m_exrom(1),
-			m_rom1(NULL),
-			m_rom2(NULL),
-			m_rom3(NULL),
-			m_rom4(NULL),
-			m_from(NULL),
-			m_charom(NULL),
-			m_color_ram(*this, "color_ram"),
 			m_va14(1),
 			m_va15(1),
 			m_clrbank(0),
@@ -118,6 +115,10 @@ public:
 	required_device<c64_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	required_device<pet_datassette_port_device> m_cassette;
+	required_memory_region m_rom;
+	required_memory_region m_from;
+	required_memory_region m_charom;
+	optional_shared_ptr<UINT8> m_color_ram;
 	required_ioport m_row0;
 	required_ioport m_row1;
 	required_ioport m_row2;
@@ -203,15 +204,8 @@ public:
 	int m_game;
 	int m_exrom;
 	int m_reset;
-	const UINT8 *m_rom1;
-	const UINT8 *m_rom2;
-	const UINT8 *m_rom3;
-	const UINT8 *m_rom4;
-	const UINT8 *m_from;
-	const UINT8 *m_charom;
 
 	// video state
-	optional_shared_ptr<UINT8> m_color_ram;
 	int m_va14;
 	int m_va15;
 	int m_clrbank;
