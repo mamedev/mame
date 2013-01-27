@@ -93,14 +93,12 @@
 #include "cpu/z80/z80.h"
 #include "includes/z80ne.h"
 #include "imagedev/flopdrv.h"
-#include "imagedev/cassette.h"
 #include "formats/z80ne_dsk.h"
 #include "machine/ram.h"
 
 /* peripheral chips */
 #include "machine/ay31015.h"
 #include "machine/kr2376.h"
-#include "video/mc6847.h"
 #include "machine/wd17xx.h"
 
 /* Layout */

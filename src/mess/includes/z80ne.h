@@ -12,6 +12,7 @@
 #define Z80NE_H_
 
 #include "video/mc6847.h"
+#include "imagedev/cassette.h"
 
 
 /***************************************************************************
@@ -63,20 +64,48 @@ class z80ne_state : public driver_device
 {
 public:
 	z80ne_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_vdg(*this, "mc6847"),
-			m_videoram(*this,"videoram") {}
+		: driver_device(mconfig, type, tag)
+		, m_vdg(*this, "mc6847")
+		, m_videoram(*this, "videoram")
+		, m_ay31015(*this, "ay_3_1015")
+		, m_lx388_kr2376(*this, "lx388_kr2376")
+		, m_maincpu(*this, "z80ne")
+		, m_cassette1(*this, CASSETTE_TAG)
+		, m_cassette2(*this, CASSETTE2_TAG)
+		, m_wd1771(*this, "wd1771")
+		, m_region_z80ne(*this, "z80ne")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_io_row0(*this, "ROW0")
+		, m_io_row1(*this, "ROW1")
+		, m_io_ctrl(*this, "CTRL")
+		, m_io_rst(*this, "RST")
+		, m_io_lx_385(*this, "LX.385")
+		, m_io_lx388_brk(*this, "LX388_BRK")
+		, m_io_x0(*this, "X0")
+		, m_io_x1(*this, "X1")
+		, m_io_x2(*this, "X2")
+		, m_io_x3(*this, "X3")
+		, m_io_x4(*this, "X4")
+		, m_io_x5(*this, "X5")
+		, m_io_x6(*this, "X6")
+		, m_io_x7(*this, "X7")
+		, m_io_modifiers(*this, "MODIFIERS")
+		, m_io_config(*this, "CONFIG")
+	{ }
 
 	optional_device<mc6847_base_device> m_vdg;
 	optional_shared_ptr<UINT8> m_videoram;
+	required_device<device_t> m_ay31015;
+	optional_device<device_t> m_lx388_kr2376;
 	UINT8 m_lx383_scan_counter;
 	UINT8 m_lx383_key[LX383_KEYS];
 	int m_lx383_downsampler;
 	int m_nmi_delay_counter;
 	int m_reset_delay_counter;
-	device_t *m_ay31015;
 	UINT8 m_lx385_ctrl;
-	device_t *m_lx388_kr2376;
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
 	wd17xx_state_t m_wd17xx_state;
@@ -113,6 +142,38 @@ public:
 	DECLARE_READ8_MEMBER(lx390_reset_bank);
 	DECLARE_READ8_MEMBER(lx390_fdc_r);
 	DECLARE_WRITE8_MEMBER(lx390_fdc_w);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette1;
+	required_device<cassette_image_device> m_cassette2;
+	optional_device<device_t> m_wd1771;
+	required_memory_region m_region_z80ne;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	optional_memory_bank m_bank3;
+	optional_memory_bank m_bank4;
+	required_ioport m_io_row0;
+	required_ioport m_io_row1;
+	required_ioport m_io_ctrl;
+	required_ioport m_io_rst;
+	required_ioport m_io_lx_385;
+	optional_ioport m_io_lx388_brk;
+	optional_ioport m_io_x0;
+	optional_ioport m_io_x1;
+	optional_ioport m_io_x2;
+	optional_ioport m_io_x3;
+	optional_ioport m_io_x4;
+	optional_ioport m_io_x5;
+	optional_ioport m_io_x6;
+	optional_ioport m_io_x7;
+	optional_ioport m_io_modifiers;
+	optional_ioport m_io_config;
+
+	cassette_image_device *cassette_device_image();
+	void reset_lx388();
+	void reset_lx382_banking();
+	void reset_lx390_banking();
 };
 
 #endif /* Z80NE_H_ */
