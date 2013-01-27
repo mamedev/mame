@@ -25,69 +25,87 @@ class atm_state : public spectrum_state
 {
 public:
 	atm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: spectrum_state(mconfig, type, tag) { }
+		: spectrum_state(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_beta(*this, BETA_DISK_TAG)
+		, m_ram(*this, RAM_TAG)
+	{ }
 
 	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
 	DIRECT_UPDATE_MEMBER(atm_direct);
 	DECLARE_MACHINE_RESET(atm);
+	void atm_update_memory();
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	required_memory_bank m_bank4;
+	required_device<device_t> m_beta;
+	required_device<ram_device> m_ram;
+private:
+	UINT8 *m_p_ram;
 };
 
 
 DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
 {
-	device_t *beta = machine().device(BETA_DISK_TAG);
-	UINT16 pc = machine().device("maincpu")->state().state_int(STATE_GENPCBASE);
+	UINT16 pc = m_maincpu->state_int(STATE_GENPCBASE);
 
-	if (beta->started() && betadisk_is_active(beta))
+	if (m_beta->started() && betadisk_is_active(m_beta))
 	{
 		if (pc >= 0x4000)
 		{
-			m_ROMSelection = ((m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
-			betadisk_disable(beta);
-			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
+			m_ROMSelection = BIT(m_port_7ffd_data, 4);
+			betadisk_disable(m_beta);
+			m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
 		}
 	}
 	else if (((pc & 0xff00) == 0x3d00) && (m_ROMSelection==1))
 	{
 		m_ROMSelection = 3;
-		if (beta->started())
-			betadisk_enable(beta);
+		if (m_beta->started())
+			betadisk_enable(m_beta);
 
 	}
 	if(address<=0x3fff)
 	{
-		if (m_ROMSelection == 3) {
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, memregion("maincpu")->base() + 0x018000);
-			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x018000);
-		} else {
-			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
-			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
+		if (m_ROMSelection == 3)
+		{
+			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, &m_p_ram[0x18000]);
+			m_bank1->set_base(&m_p_ram[0x18000]);
+		}
+		else
+		{
+			direct.explicit_configure(0x0000, 0x3fff, 0x3fff, &m_p_ram[0x10000 + (m_ROMSelection<<14)]);
+			m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
 		}
 		return ~0;
 	}
 	return address;
 }
 
-static void atm_update_memory(running_machine &machine)
+void atm_state::atm_update_memory()
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	device_t *beta = machine.device(BETA_DISK_TAG);
-	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
+	spectrum_state *state = machine().driver_data<spectrum_state>();
+	UINT8 *messram = m_ram->pointer();
 
 	state->m_screen_location = messram + ((state->m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	state->membank("bank4")->set_base(messram + ((state->m_port_7ffd_data & 0x07) * 0x4000));
+	m_bank4->set_base(messram + ((state->m_port_7ffd_data & 0x07) * 0x4000));
 
-	if (beta->started() && betadisk_is_active(beta) && !( state->m_port_7ffd_data & 0x10 ) )
-	{
+	if (m_beta->started() && betadisk_is_active(m_beta) && !( state->m_port_7ffd_data & 0x10 ) )
 		state->m_ROMSelection = 3;
-	}
-	else {
+	else
 		/* ROM switching */
-		state->m_ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01) ;
-	}
+		state->m_ROMSelection = BIT(state->m_port_7ffd_data, 4) ;
+
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-	state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+	m_bank1->set_base(&m_p_ram[0x10000 + (state->m_ROMSelection<<14)]);
 }
 
 WRITE8_MEMBER(atm_state::atm_port_7ffd_w)
@@ -100,7 +118,7 @@ WRITE8_MEMBER(atm_state::atm_port_7ffd_w)
 	m_port_7ffd_data = data;
 
 	/* update memory */
-	atm_update_memory(machine());
+	atm_update_memory();
 }
 
 static ADDRESS_MAP_START (atm_io, AS_IO, 8, atm_state )
@@ -118,31 +136,32 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(atm_state,atm)
 {
-	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	device_t *beta = machine().device(BETA_DISK_TAG);
+	UINT8 *messram = m_ram->pointer();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	m_p_ram = memregion("maincpu")->base();
 
 	space.install_read_bank(0x0000, 0x3fff, "bank1");
 	space.unmap_write(0x0000, 0x3fff);
 
-	if (beta->started())  {
-		betadisk_enable(beta);
-		betadisk_clear_status(beta);
+	if (m_beta->started())
+	{
+		betadisk_enable(m_beta);
+		betadisk_clear_status(m_beta);
 	}
 	space.set_direct_update_handler(direct_update_delegate(FUNC(atm_state::atm_direct), this));
 
 	memset(messram,0,128*1024);
 
-	/* Bank 5 is always in 0x4000 - 0x7fff */
-	membank("bank2")->set_base(messram + (5<<14));
+	/* Bank 2 is always in 0x4000 - 0x7fff */
+	m_bank2->set_base(messram + (5<<14));
 
-	/* Bank 2 is always in 0x8000 - 0xbfff */
-	membank("bank3")->set_base(messram + (2<<14));
+	/* Bank 3 is always in 0x8000 - 0xbfff */
+	m_bank3->set_base(messram + (2<<14));
 
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = -1;
 
-	atm_update_memory(machine());
+	atm_update_memory();
 }
 
 /* F4 Character Displayer */
@@ -228,8 +247,8 @@ ROM_START( atmtb2 )
 	ROM_LOAD( "sgen.rom", 0x0000, 0x0800, CRC(1f4387d6) SHA1(93b3774dc8a486643a1bdd48c606b0c84fa0e22b))
 ROM_END
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1991, atm,    spec128,    0,      atm,    spec_plus, driver_device,   0,          "MicroART",     "ATM", GAME_NOT_WORKING)
-//COMP( 1991, atmtb1,   spec128,    0,      atm,    spec_plus, driver_device,  0,      "MicroART",     "ATM-turbo1", GAME_NOT_WORKING)
-COMP( 1993, atmtb2, spec128,    0,      atmtb2, spec_plus, driver_device,   0,          "MicroART",     "ATM-turbo2", GAME_NOT_WORKING)
-//COMP( 1994, turbo2, spec128,  0,      atm,    spec_plus, driver_device,  0,          "MicroART",     "TURBO 2+", GAME_NOT_WORKING)
+/*    YEAR  NAME    PARENT   COMPAT  MACHINE INPUT      CLASS          INIT    COMPANY     FULLNAME */
+COMP( 1991, atm,    spec128, 0,      atm,    spec_plus, driver_device, 0,    "MicroART", "ATM", GAME_NOT_WORKING)
+//COMP( 1991, atmtb1, spec128, 0,      atm,    spec_plus, driver_device, 0,    "MicroART", "ATM-turbo1", GAME_NOT_WORKING)
+COMP( 1993, atmtb2, spec128, 0,      atmtb2, spec_plus, driver_device, 0,    "MicroART", "ATM-turbo2", GAME_NOT_WORKING)
+//COMP( 1994, turbo2, spec128, 0,      atm,    spec_plus, driver_device, 0,    "MicroART", "TURBO 2+", GAME_NOT_WORKING)
