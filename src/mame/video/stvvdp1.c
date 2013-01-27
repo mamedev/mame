@@ -1966,6 +1966,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 					break;
 
 				case 0x0002:
+				case 0x0003:
 					if (VDP1_LOG) logerror ("Sprite List Distorted Sprite\n");
 					if (VDP1_LOG) logerror ("(A: %d %d)\n",stv2_current_sprite.CMDXA,stv2_current_sprite.CMDYA);
 					if (VDP1_LOG) logerror ("(B: %d %d)\n",stv2_current_sprite.CMDXB,stv2_current_sprite.CMDYB);
@@ -1984,6 +1985,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 					break;
 
 				case 0x0005:
+//				case 0x0007: // mirror?
 					if (VDP1_LOG) logerror ("Sprite List Polyline\n");
 					stv2_current_sprite.ispoly = 1;
 					stv_vdp1_draw_poly_line(machine, *cliprect);
@@ -1996,6 +1998,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 					break;
 
 				case 0x0008:
+//				case 0x000b: // mirror?
 					if (VDP1_LOG) logerror ("Sprite List Set Command for User Clipping (%d,%d),(%d,%d)\n", stv2_current_sprite.CMDXA, stv2_current_sprite.CMDYA, stv2_current_sprite.CMDXC, stv2_current_sprite.CMDYC);
 					state->m_vdp1.user_cliprect.set(stv2_current_sprite.CMDXA, stv2_current_sprite.CMDXC, stv2_current_sprite.CMDYA, stv2_current_sprite.CMDYC);
 					break;
@@ -2012,7 +2015,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 					break;
 
 				default:
-					popmessage ("VDP1: Sprite List Illegal, contact MAMEdev");
+					popmessage ("VDP1: Sprite List Illegal %02x, contact MAMEdev",stv2_current_sprite.CMDCTRL & 0xf);
 					state->m_vdp1.lopr = (position * 0x20) >> 3;
 					state->m_vdp1.copr = (position * 0x20) >> 3;
 					return;
