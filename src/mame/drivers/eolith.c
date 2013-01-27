@@ -100,7 +100,7 @@
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "cpu/mcs51/mcs51.h"
-#include "sound/qs1000.h"
+
 #include "machine/eeprom.h"
 #include "includes/eolith.h"
 #include "includes/eolithsp.h"
@@ -127,7 +127,7 @@ READ32_MEMBER(eolith_state::eolith_custom_r)
 	*/
 	eolith_speedup_read(space);
 
-	return (ioport("IN0")->read() & ~0x300) | (machine().rand() & 0x300);
+	return (m_in0->read() & ~0x300) | (machine().rand() & 0x300);
 }
 
 WRITE32_MEMBER(eolith_state::systemcontrol_w)
@@ -136,7 +136,7 @@ WRITE32_MEMBER(eolith_state::systemcontrol_w)
 	coin_counter_w(machine(), 0, data & m_coin_counter_bit);
 	set_led_status(machine(), 0, data & 1);
 
-	ioport("EEPROMOUT")->write(data, 0xff);
+	m_eepromoutport->write(data, 0xff);
 
 	// bit 0x100 and 0x040 ?
 }
@@ -144,8 +144,8 @@ WRITE32_MEMBER(eolith_state::systemcontrol_w)
 READ32_MEMBER(eolith_state::hidctch3_pen1_r)
 {
 	//320 x 240
-	int xpos = ioport("PEN_X_P1")->read();
-	int ypos = ioport("PEN_Y_P1")->read();
+	int xpos = m_penx1port->read();
+	int ypos = m_peny1port->read();
 
 	return xpos + (ypos*168*2);
 }
@@ -153,8 +153,8 @@ READ32_MEMBER(eolith_state::hidctch3_pen1_r)
 READ32_MEMBER(eolith_state::hidctch3_pen2_r)
 {
 	//320 x 240
-	int xpos = ioport("PEN_X_P2")->read();
-	int ypos = ioport("PEN_Y_P2")->read();
+	int xpos = m_penx2port->read();
+	int ypos = m_peny2port->read();
 
 	return xpos + (ypos*168*2);
 }
@@ -185,7 +185,7 @@ WRITE8_MEMBER( eolith_state::sound_p1_w )
 {
 	// .... xxxx - Data ROM bank (32kB)
 	// ...x .... - Unknown (Usually 1?)
-	membank("sound_bank")->set_entry(data & 0x0f);
+	m_sndbank->set_entry(data & 0x0f);
 }
 
 
@@ -227,9 +227,8 @@ WRITE8_MEMBER( eolith_state::qs1000_p1_w )
 
 static void soundcpu_to_qs1000(device_t *device, int data)
 {
-	qs1000_device *qs1000 = device->machine().device<qs1000_device>("qs1000");
-	qs1000->serial_in(data);
-
+	eolith_state *state = device->machine().driver_data<eolith_state>();
+	state->m_qs1000->serial_in(data);
 	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(250));
 }
 
