@@ -72,8 +72,8 @@
         It has a main board with a 3Dfx video card and is hard drive based. This series started with
         GT Fore! in 2000 and continued through 2006 ending with Golden Tee Complete. This final
         version incuded all the courses from all the previous years in the Fore! series.
-        The Eagle platform also supports I.T.'s hunting series "Big Buck Hunter" and the light game
-        gun called Carnival King.
+        The Eagle platform also supports I.T.'s hunting series "Big Buck Hunter", the light game gun
+        called Carnival King as well as the limited release game Virtual Pool.
 
         Some time in 2004 I.T. introduced a new bowling game called Silver Strike Bowling on a full
         blown PC system known as "Nighthawk System Box" (AKA The Nighthawk Chassis) to replace it's
