@@ -74,7 +74,7 @@ WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
 	// every other PRD triggers a DMAOUT request
 	if (m_dma)
 	{
-		machine().device(CDP1802_TAG)->execute().set_input_line(COSMAC_INPUT_LINE_DMAOUT, HOLD_LINE);
+		m_cdp1802->set_input_line(COSMAC_INPUT_LINE_DMAOUT, HOLD_LINE);
 	}
 
 	m_dma = !m_dma;

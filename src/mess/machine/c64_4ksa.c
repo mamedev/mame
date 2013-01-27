@@ -65,7 +65,9 @@ ioport_constructor c64_4ksa_device::device_input_ports() const
 
 c64_4ksa_device::c64_4ksa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_4KSA, "C64 Kingsoft 4-Player Adapter", tag, owner, clock),
-	device_c64_user_port_interface(mconfig, *this)
+	device_c64_user_port_interface(mconfig, *this),
+	m_pb(*this, "PB"),
+	m_pa2(*this, "PA2")
 {
 }
 
@@ -85,7 +87,7 @@ void c64_4ksa_device::device_start()
 
 UINT8 c64_4ksa_device::c64_pb_r(address_space &space, offs_t offset)
 {
-	return ioport("PB")->read();
+	return m_pb->read();
 }
 
 
@@ -95,7 +97,7 @@ UINT8 c64_4ksa_device::c64_pb_r(address_space &space, offs_t offset)
 
 int c64_4ksa_device::c64_pa2_r()
 {
-	return BIT(ioport("PA2")->read(), 0);
+	return BIT(m_pa2->read(), 0);
 }
 
 

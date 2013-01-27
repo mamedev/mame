@@ -57,7 +57,9 @@ public:
 			m_floppy0(*this, PC_FDC_XT_TAG ":0:525dd" ),
 			m_floppy1(*this, PC_FDC_XT_TAG ":1:525dd" ),
 			m_bus(*this, ISA_BUS_TAG),
+			m_char_rom(*this, AMS40041_TAG),
 			m_video_ram(*this, "video_ram"),
+		    m_lk(*this, "LK"),
 			m_pit1(0),
 			m_pit2(0),
 			m_status1(0),
@@ -93,7 +95,9 @@ public:
 	required_device<floppy_image_device> m_floppy0;
 	optional_device<floppy_image_device> m_floppy1;
 	required_device<isa8_device> m_bus;
+	optional_memory_region m_char_rom;
 	optional_shared_ptr<UINT8> m_video_ram;
+	required_ioport m_lk;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -196,7 +200,6 @@ public:
 	UINT8 m_printer_control;
 
 	// video state
-	const UINT8 *m_char_rom;
 	int m_toggle;
 	int m_lpen;
 	int m_blink;
@@ -210,7 +213,6 @@ public:
 
 	// sound state
 	int m_speaker_drive;
-	UINT32 screen_update_pc1512(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 class pc1640_state : public pc1512_state
@@ -218,7 +220,8 @@ class pc1640_state : public pc1512_state
 public:
 	pc1640_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc1512_state(mconfig, type, tag),
-			m_opt(0)
+		  m_sw(*this, "SW"),
+		  m_opt(0)
 	{ }
 
 	virtual void machine_start();
@@ -235,6 +238,8 @@ public:
 	DECLARE_WRITE8_MEMBER( iga_w );
 	DECLARE_READ8_MEMBER( printer_r );
 	DECLARE_READ8_MEMBER( io_unmapped_r );
+
+	required_ioport m_sw;
 
 	// video state
 	int m_opt;

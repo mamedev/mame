@@ -65,6 +65,9 @@ ioport_constructor c64_4cga_device::device_input_ports() const
 c64_4cga_device::c64_4cga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_4CGA, "C64 Protovision 4 Player Interface", tag, owner, clock),
 	device_c64_user_port_interface(mconfig, *this),
+	m_fire(*this, "FIRE"),
+	m_joy3(*this, "JOY3"),
+	m_joy4(*this, "JOY4"),
 	m_port(0)
 {
 }
@@ -87,15 +90,15 @@ void c64_4cga_device::device_start()
 
 UINT8 c64_4cga_device::c64_pb_r(address_space &space, offs_t offset)
 {
-	UINT8 data = ioport("FIRE")->read();
+	UINT8 data = m_fire->read();
 
 	if (m_port)
 	{
-		data &= ioport("JOY3")->read();
+		data &= m_joy3->read();
 	}
 	else
 	{
-		data &= ioport("JOY4")->read();
+		data &= m_joy4->read();
 	}
 
 	return data;

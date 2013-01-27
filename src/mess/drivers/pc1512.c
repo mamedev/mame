@@ -319,7 +319,7 @@ READ8_MEMBER( pc1512_state::printer_r )
 
 		*/
 
-		data |= ioport("LK")->read() & 0x07;
+		data |= m_lk->read() & 0x07;
 
 		data |= m_centronics->fault_r() << 3;
 		data |= m_centronics->vcc_r() << 4;
@@ -404,7 +404,7 @@ READ8_MEMBER( pc1640_state::printer_r )
 		*/
 		data = m_printer_control;
 		data |= m_opt << 5;
-		data |= (ioport("SW")->read() & 0x60) << 1;
+		data |= (m_sw->read() & 0x60) << 1;
 		break;
 
 	default:
@@ -489,7 +489,7 @@ READ8_MEMBER( pc1640_state::io_r )
 	}
 	else if (!BIT(offset, 7))
 	{
-		UINT16 sw = ioport("SW")->read();
+		UINT16 sw = m_sw->read();
 
 		if (!BIT(offset, 14))
 		{
@@ -1084,7 +1084,7 @@ FLOPPY_FORMATS_MEMBER( pc1512_state::floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( ibmpc_floppies )
-		SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
 

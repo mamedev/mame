@@ -42,6 +42,10 @@ protected:
 
 	// device_comx_expansion_card_interface overrides
 	virtual UINT8 comx_io_r(address_space &space, offs_t offset);
+
+private:
+	required_ioport m_joy1;
+	required_ioport m_joy2;
 };
 
 
