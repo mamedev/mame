@@ -38,7 +38,6 @@ public:
 	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
 	DIRECT_UPDATE_MEMBER(atm_direct);
 	DECLARE_MACHINE_RESET(atm);
-	void atm_update_memory();
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_bank1;
@@ -49,6 +48,7 @@ protected:
 	required_device<ram_device> m_ram;
 private:
 	UINT8 *m_p_ram;
+	void atm_update_memory();
 };
 
 
@@ -91,21 +91,20 @@ DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
 
 void atm_state::atm_update_memory()
 {
-	spectrum_state *state = machine().driver_data<spectrum_state>();
 	UINT8 *messram = m_ram->pointer();
 
-	state->m_screen_location = messram + ((state->m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
+	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	m_bank4->set_base(messram + ((state->m_port_7ffd_data & 0x07) * 0x4000));
+	m_bank4->set_base(messram + ((m_port_7ffd_data & 0x07) * 0x4000));
 
-	if (m_beta->started() && betadisk_is_active(m_beta) && !( state->m_port_7ffd_data & 0x10 ) )
-		state->m_ROMSelection = 3;
+	if (m_beta->started() && betadisk_is_active(m_beta) && !( m_port_7ffd_data & 0x10 ) )
+		m_ROMSelection = 3;
 	else
 		/* ROM switching */
-		state->m_ROMSelection = BIT(state->m_port_7ffd_data, 4) ;
+		m_ROMSelection = BIT(m_port_7ffd_data, 4) ;
 
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
-	m_bank1->set_base(&m_p_ram[0x10000 + (state->m_ROMSelection<<14)]);
+	m_bank1->set_base(&m_p_ram[0x10000 + (m_ROMSelection<<14)]);
 }
 
 WRITE8_MEMBER(atm_state::atm_port_7ffd_w)
@@ -152,10 +151,10 @@ MACHINE_RESET_MEMBER(atm_state,atm)
 
 	memset(messram,0,128*1024);
 
-	/* Bank 2 is always in 0x4000 - 0x7fff */
+	/* Bank 5 is always in 0x4000 - 0x7fff */
 	m_bank2->set_base(messram + (5<<14));
 
-	/* Bank 3 is always in 0x8000 - 0xbfff */
+	/* Bank 2 is always in 0x8000 - 0xbfff */
 	m_bank3->set_base(messram + (2<<14));
 
 	m_port_7ffd_data = 0;
