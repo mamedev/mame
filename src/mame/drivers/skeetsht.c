@@ -2,7 +2,8 @@
 
     Dynamo Skeet Shot
 
-Notes: Pop Shot is a prototype sequal (or upgrade) to Skeet Shot
+	Notes:
+		Pop Shot is a prototype sequal (or upgrade) to Skeet Shot
 
 ***************************************************************************/
 
@@ -24,8 +25,10 @@ class skeetsht_state : public driver_device
 public:
 	skeetsht_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+		m_tlc34076(*this, "tlc34076"),
 		m_tms_vram(*this, "tms_vram"){ }
 
+	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_tms_vram;
 	UINT8 m_porta_latch;
 	UINT8 m_ay_sel;
@@ -71,7 +74,7 @@ void skeetsht_state::video_start()
 static void skeetsht_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int scanline, const tms34010_display_params *params)
 {
 	skeetsht_state *state = screen.machine().driver_data<skeetsht_state>();
-	const rgb_t *const pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
+	const rgb_t *const pens = state->m_tlc34076->get_pens();
 	UINT16 *vram = &state->m_tms_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
 	int coladdr = params->coladdr;
@@ -92,7 +95,7 @@ READ16_MEMBER(skeetsht_state::ramdac_r)
 	if (offset & 8)
 		offset = (offset & ~8) | 4;
 
-	return tlc34076_r(machine().device("tlc34076"), space, offset);
+	return m_tlc34076->read(space, offset);
 }
 
 WRITE16_MEMBER(skeetsht_state::ramdac_w)
@@ -102,7 +105,7 @@ WRITE16_MEMBER(skeetsht_state::ramdac_w)
 	if (offset & 8)
 		offset = (offset & ~8) | 4;
 
-	tlc34076_w(machine().device("tlc34076"), space, offset, data);
+	m_tlc34076->write(space, offset, data);
 }
 
 
@@ -259,7 +262,7 @@ static MACHINE_CONFIG_START( skeetsht, skeetsht_state )
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
 
 
-	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(48000000 / 8, 156*4, 0, 100*4, 328, 0, 300) // FIXME

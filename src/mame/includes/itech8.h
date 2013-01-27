@@ -5,6 +5,7 @@
 
 **************************************************************************/
 
+#include "video/tlc34076.h"
 #include "video/tms34061.h"
 
 #define YBUFFER_COUNT   15
@@ -14,7 +15,10 @@ class itech8_state : public driver_device
 public:
 	itech8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+			m_tlc34076(*this, "tlc34076"),
 			m_visarea(0, 0, 0, 0){ }
+
+	required_device<tlc34076_device> m_tlc34076;	
 
 	rectangle m_visarea;
 	UINT8 m_grom_bank;

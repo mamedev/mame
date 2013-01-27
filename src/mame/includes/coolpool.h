@@ -5,9 +5,11 @@ class coolpool_state : public driver_device
 public:
 	coolpool_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+		m_tlc34076(*this, "tlc34076"),
 		m_vram_base(*this, "vram_base"),
 		m_nvram(*this, "nvram"){ }
 
+	optional_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_vram_base;
 	required_shared_ptr<UINT16> m_nvram;
 

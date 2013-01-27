@@ -19,9 +19,12 @@ class xtheball_state : public driver_device
 public:
 	xtheball_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_vram_bg(*this, "vrabg"),
-		m_vram_fg(*this, "vrafg"){ }
+		  m_tlc34076(*this, "tlc34076"),
+		  m_vram_bg(*this, "vrabg"),
+		  m_vram_fg(*this, "vrafg")
+		{ }
 
+	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_vram_bg;
 	required_shared_ptr<UINT16> m_vram_fg;
 	UINT8 m_bitvals[32];
@@ -44,7 +47,7 @@ static void xtheball_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap
 	xtheball_state *state = screen.machine().driver_data<xtheball_state>();
 	UINT16 *srcbg = &state->m_vram_bg[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
+	const rgb_t *pens = state->m_tlc34076->get_pens();
 	int coladdr = params->coladdr;
 	int x;
 
@@ -214,7 +217,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xtheball_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_SHARE("vrabg")
 	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_SHARE("vrafg")
-	AM_RANGE(0x03000000, 0x030000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0x03000000, 0x030000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
 	AM_RANGE(0x03040000, 0x030401ff) AM_WRITE(bit_controls_w)
 	AM_RANGE(0x03040080, 0x0304008f) AM_READ_PORT("DSW")
 	AM_RANGE(0x03040100, 0x0304010f) AM_READ(analogx_r)
@@ -345,7 +348,7 @@ static MACHINE_CONFIG_START( xtheball, xtheball_state )
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(10000000, 640, 114, 626, 257, 24, 248)

@@ -89,7 +89,7 @@ static void coolpool_scanline(screen_device &screen, bitmap_rgb32 &bitmap, int s
 
 	UINT16 *vram = &state->m_vram_base[(params->rowaddr << 8) & 0x1ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
+	const rgb_t *pens = state->m_tlc34076->get_pens();
 	int coladdr = params->coladdr;
 	int x;
 
@@ -632,7 +632,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coolpool_map, AS_PROGRAM, 16, coolpool_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram_base")
-	AM_RANGE(0x01000000, 0x010000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)    // IMSG176P-40
+	AM_RANGE(0x01000000, 0x010000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)    // IMSG176P-40
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
 	AM_RANGE(0x03000000, 0x03ffffff) AM_ROM AM_REGION("gfx1", 0)
@@ -646,7 +646,7 @@ static ADDRESS_MAP_START( nballsht_map, AS_PROGRAM, 16, coolpool_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram_base")
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
-	AM_RANGE(0x04000000, 0x040000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)    // IMSG176P-40
+	AM_RANGE(0x04000000, 0x040000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)    // IMSG176P-40
 	AM_RANGE(0x06000000, 0x0601ffff) AM_MIRROR(0x00020000) AM_RAM_WRITE(nvram_thrash_data_w) AM_SHARE("nvram")
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xff000000, 0xff7fffff) AM_ROM AM_REGION("gfx1", 0)
@@ -879,7 +879,7 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	MCFG_TIMER_DRIVER_ADD("nvram_timer", coolpool_state, nvram_write_timeout)
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_40MHz/6, 424, 0, 320, 262, 0, 240)

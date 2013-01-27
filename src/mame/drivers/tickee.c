@@ -33,9 +33,11 @@ class tickee_state : public driver_device
 public:
 	tickee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
+		m_tlc34076(*this, "tlc34076"),
 		m_vram(*this, "vram"),
 		m_control(*this, "control"){ }
 
+	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_vram;
 	optional_shared_ptr<UINT16> m_control;
 	emu_timer *m_setup_gun_timer;
@@ -160,7 +162,7 @@ static void scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, int sca
 	tickee_state *state = screen.machine().driver_data<tickee_state>();
 	UINT16 *src = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
+	const rgb_t *pens = state->m_tlc34076->get_pens();
 	int coladdr = params->coladdr << 1;
 	int x;
 
@@ -186,7 +188,7 @@ static void rapidfir_scanline_update(screen_device &screen, bitmap_rgb32 &bitmap
 	tickee_state *state = screen.machine().driver_data<tickee_state>();
 	UINT16 *src = &state->m_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = &bitmap.pix32(scanline);
-	const rgb_t *pens = tlc34076_get_pens(screen.machine().device("tlc34076"));
+	const rgb_t *pens = state->m_tlc34076->get_pens();
 	int coladdr = params->coladdr << 1;
 	int x;
 
@@ -388,7 +390,7 @@ static ADDRESS_MAP_START( tickee_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
 	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8_LEGACY("ym1", ay8910_r, 0x00ff)
 	AM_RANGE(0x04200000, 0x0420001f) AM_DEVWRITE8_LEGACY("ym1", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREAD8_LEGACY("ym2", ay8910_r, 0x00ff)
@@ -406,7 +408,7 @@ static ADDRESS_MAP_START( ghoshunt_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04100000, 0x04103fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x04200000, 0x042000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0x04200000, 0x042000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
 	AM_RANGE(0x04300000, 0x0430000f) AM_DEVREAD8_LEGACY("ym1", ay8910_r, 0x00ff)
 	AM_RANGE(0x04300000, 0x0430001f) AM_DEVWRITE8_LEGACY("ym1", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x04300100, 0x0430010f) AM_DEVREAD8_LEGACY("ym2", ay8910_r, 0x00ff)
@@ -422,7 +424,7 @@ static ADDRESS_MAP_START( mouseatk_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
 	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8_LEGACY("ym", ay8910_r, 0x00ff)
 	AM_RANGE(0x04200000, 0x0420000f) AM_DEVWRITE8_LEGACY("ym", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -451,7 +453,7 @@ static ADDRESS_MAP_START( rapidfir_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0xfc000b00, 0xfc000b0f) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfc000c00, 0xfc000c1f) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfc000e00, 0xfc000e1f) AM_READ(watchdog_reset16_r)
-	AM_RANGE(0xfc100000, 0xfc1000ff) AM_MIRROR(0x80000) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0xfc100000, 0xfc1000ff) AM_MIRROR(0x80000) AM_DEVREADWRITE8("tlc34076", tlc34076_device, read, write, 0x00ff)
 	AM_RANGE(0xfc200000, 0xfc207fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xfc300000, 0xfc30000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xfc400010, 0xfc40001f) AM_READWRITE(ff7f_r, ff7f_w)
@@ -775,7 +777,7 @@ static MACHINE_CONFIG_START( tickee, tickee_state )
 	MCFG_TICKET_DISPENSER_ADD("ticket2", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MCFG_VIDEO_START_OVERRIDE(tickee_state,tickee)
 
@@ -815,7 +817,7 @@ static MACHINE_CONFIG_START( rapidfir, tickee_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MCFG_VIDEO_START_OVERRIDE(tickee_state,tickee)
 
@@ -845,7 +847,7 @@ static MACHINE_CONFIG_START( mouseatk, tickee_state )
 	MCFG_TICKET_DISPENSER_ADD("ticket2", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
-	MCFG_TLC34076_ADD("tlc34076", tlc34076_6_bit_intf)
+	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 444, 0, 320, 233, 0, 200)

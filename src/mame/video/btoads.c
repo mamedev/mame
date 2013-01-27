@@ -123,13 +123,13 @@ WRITE16_MEMBER( btoads_state::scroll1_w )
 
 WRITE16_MEMBER( btoads_state::paletteram_w )
 {
-	tlc34076_w(m_tlc34076, space, offset/2, data);
+	m_tlc34076->write(space, offset/2, data);
 }
 
 
 READ16_MEMBER( btoads_state::paletteram_r )
 {
-	return tlc34076_r(m_tlc34076, space, offset/2);
+	return m_tlc34076->read(space, offset/2);
 }
 
 
@@ -323,7 +323,7 @@ void btoads_state::scanline_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	UINT16 *bg1_base = &m_vram_bg1[(fulladdr + (m_yscroll1 << 10)) & 0x3fc00];
 	UINT8 *spr_base = &m_vram_fg_display[fulladdr & 0x3fc00];
 	UINT32 *dst = &bitmap.pix32(scanline);
-	const rgb_t *pens = tlc34076_get_pens(m_tlc34076);
+	const rgb_t *pens = m_tlc34076->get_pens();
 	int coladdr = fulladdr & 0x3ff;
 	int x;
 

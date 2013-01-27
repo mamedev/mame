@@ -8,11 +8,13 @@ class artmagic_state : public driver_device
 {
 public:
 	artmagic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
+		: driver_device(mconfig, type, tag),
+		m_tlc34076(*this, "tlc34076"),
 		m_control(*this, "control"),
 		m_vram0(*this, "vram0"),
 		m_vram1(*this, "vram1"){ }
 
+	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_control;
 	UINT8 m_tms_irq;
 	UINT8 m_hack_irq;
