@@ -49,6 +49,9 @@ Hopper, Ticket Counter, Prize System (Option)
 - Compiler : ADS, SDT
 
 
+ToDo: hook up QS1000
+
+
 */
 
 #include "emu.h"
@@ -80,9 +83,13 @@ class ghosteo_state : public driver_device
 public:
 	ghosteo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_system_memory(*this, "systememory"){ }
+		m_system_memory(*this, "systememory"),
+		m_i2cmem(*this, "i2cmem")
+	{ }
 
 	required_shared_ptr<UINT32> m_system_memory;
+	required_device<i2cmem_device> m_i2cmem;
+
 	int m_security_count;
 	UINT32 m_bballoon_port[20];
 	struct nand_t m_nand;
@@ -91,11 +98,15 @@ public:
 	DECLARE_READ32_MEMBER(touryuu_port_10000000_r);
 
 	int m_rom_pagesize;
+	UINT8* m_flash;
+	device_t* m_s3c2410;
 	DECLARE_DRIVER_INIT(touryuu);
 	DECLARE_DRIVER_INIT(bballoon);
+	virtual void machine_start();
 	virtual void machine_reset();
 };
 
+			
 
 
 /*
@@ -282,17 +293,16 @@ static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 		break;
 		case NAND_M_READ :
 		{
-			UINT8 *flash = (UINT8 *)space.machine().root_device().memregion( "user1")->base();
 			if (nand.byte_addr < state->m_rom_pagesize)
 			{
-				data = *(flash + nand.page_addr * state->m_rom_pagesize + nand.byte_addr);
+				data = *(state->m_flash + nand.page_addr * state->m_rom_pagesize + nand.byte_addr);
 			}
 			else
 			{
 				if ((nand.byte_addr >= 0x200) && (nand.byte_addr < 0x204))
 				{
 					UINT8 mecc[4];
-					s3c2410_nand_calculate_mecc( flash + nand.page_addr * 0x200, 0x200, mecc);
+					s3c2410_nand_calculate_mecc( state->m_flash + nand.page_addr * 0x200, 0x200, mecc);
 					data = mecc[nand.byte_addr-0x200];
 				}
 				else
@@ -328,25 +338,25 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_data_w )
 
 static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_scl_w )
 {
-	device_t *i2cmem = device->machine().device( "i2cmem");
+	ghosteo_state *sta = device->machine().driver_data<ghosteo_state>();
 //  logerror( "s3c2410_i2c_scl_w %d\n", state ? 1 : 0);
-	i2cmem_scl_write( i2cmem, state);
+	i2cmem_scl_write( sta->m_i2cmem, state);
 }
 
 static READ_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_r )
 {
-	device_t *i2cmem = device->machine().device( "i2cmem");
+	ghosteo_state *sta = device->machine().driver_data<ghosteo_state>();
 	int state;
-	state = i2cmem_sda_read( i2cmem);
+	state = i2cmem_sda_read( sta->m_i2cmem );
 //  logerror( "s3c2410_i2c_sda_r %d\n", state ? 1 : 0);
 	return state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_w )
 {
-	device_t *i2cmem = device->machine().device( "i2cmem");
+	ghosteo_state *sta = device->machine().driver_data<ghosteo_state>();
 //  logerror( "s3c2410_i2c_sda_w %d\n", state ? 1 : 0);
-	i2cmem_sda_write( i2cmem, state);
+	i2cmem_sda_write( sta->m_i2cmem, state);
 }
 
 WRITE32_MEMBER(ghosteo_state::sound_w)
@@ -553,11 +563,11 @@ static const i2cmem_interface touryuu_i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, 0, 1024
 };
 
-device_t* s3c2410;
+
 
 READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 {
-	UINT32 ret = s3c2410_lcd_r(s3c2410, space, offset+0x10/4, mem_mask);
+	UINT32 ret = s3c2410_lcd_r(m_s3c2410, space, offset+0x10/4, mem_mask);
 
 
 	int pc = space.device().safe_pc();
@@ -579,10 +589,15 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 	return ret;
 }
 
+void ghosteo_state::machine_start()
+{
+	m_flash = (UINT8 *)machine().root_device().memregion( "user1")->base();
+}
+
 void ghosteo_state::machine_reset()
 {
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), this));
-	s3c2410 = machine().device("s3c2410");
+	m_s3c2410 = machine().device("s3c2410");
 }
 
 static MACHINE_CONFIG_START( ghosteo, ghosteo_state )

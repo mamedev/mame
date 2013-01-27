@@ -892,6 +892,7 @@ struct s3c24xx_t
 	s3c24xx_adc_t adc;
 	s3c24xx_spi_t spi[S3C24XX_SPI_COUNT];
 	s3c24xx_sdi_t sdi;
+	device_t *m_cpu;
 };
 
 #endif
