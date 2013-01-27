@@ -24,12 +24,21 @@ class tmc2000e_state : public driver_device
 {
 public:
 	tmc2000e_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, CDP1802_TAG),
-			m_cti(*this, CDP1864_TAG),
-			m_cassette(*this, CASSETTE_TAG)
-	,
-		m_colorram(*this, "colorram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, CDP1802_TAG)
+		, m_cti(*this, CDP1864_TAG)
+		, m_cassette(*this, CASSETTE_TAG)
+		, m_colorram(*this, "colorram")
+		, m_io_in0(*this, "IN0")
+		, m_io_in1(*this, "IN1")
+		, m_io_in2(*this, "IN2")
+		, m_io_in3(*this, "IN3")
+		, m_io_in4(*this, "IN4")
+		, m_io_in5(*this, "IN5")
+		, m_io_in6(*this, "IN6")
+		, m_io_in7(*this, "IN7")
+		, m_io_run(*this, "RUN")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
@@ -66,6 +75,17 @@ public:
 	/* keyboard state */
 	int m_keylatch;         /* key latch */
 	int m_reset;            /* reset activated */
+
+protected:
+	required_ioport m_io_in0;
+	required_ioport m_io_in1;
+	required_ioport m_io_in2;
+	required_ioport m_io_in3;
+	required_ioport m_io_in4;
+	required_ioport m_io_in5;
+	required_ioport m_io_in6;
+	required_ioport m_io_in7;
+	required_ioport m_io_run;
 };
 
 #endif
