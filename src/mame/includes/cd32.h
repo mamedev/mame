@@ -9,6 +9,7 @@ CuboCD32 definitions
 
 #include "includes/amiga.h"
 #include "machine/microtch.h"
+#include "sound/cdda.h"
 
 class cd32_state : public amiga_state
 {
@@ -17,14 +18,15 @@ public:
 		: amiga_state(mconfig, type, tag),
 			m_microtouch(*this, "microtouch"),
 			m_p1_port(*this, "P1"),
-			m_p2_port(*this, "P2")
-
+			m_p2_port(*this, "P2"),
+			m_cdda(*this, "cdda")
 	{
 	}
 
 	required_device<microtouch_device> m_microtouch;
 	optional_ioport m_p1_port;
 	optional_ioport m_p2_port;
+	required_device<cdda_device> m_cdda;
 
 	DECLARE_WRITE8_MEMBER(microtouch_tx);
 	UINT16 m_potgo_value;

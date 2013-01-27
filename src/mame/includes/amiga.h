@@ -385,7 +385,10 @@ public:
 			m_joy1dat_port(*this, "JOY1DAT"),
 			m_potgo_port(*this, "POTGO"),
 			m_pot0dat_port(*this, "POT0DAT"),
-			m_pot1dat_port(*this, "POT1DAT")
+			m_pot1dat_port(*this, "POT1DAT"),
+			m_p1joy_port(*this, "P1JOY"),
+			m_p2joy_port(*this, "P2JOY")
+
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -402,6 +405,8 @@ public:
 	optional_ioport m_potgo_port;
 	optional_ioport m_pot0dat_port;
 	optional_ioport m_pot1dat_port;
+	optional_ioport m_p1joy_port;
+	optional_ioport m_p2joy_port;
 
 	
 

@@ -33,7 +33,6 @@
 #include "machine/6526cia.h"
 #include "machine/i2cmem.h"
 #include "includes/cd32.h"
-#include "sound/cdda.h"
 #include "imagedev/chd_cd.h"
 #include "machine/amigafdc.h"
 
@@ -85,14 +84,13 @@ WRITE32_MEMBER(cd32_state::aga_overlay_w)
 
 WRITE8_MEMBER(cd32_state::cd32_cia_0_porta_w)
 {
-	device_t *device = machine().device("cia_0");
 	/* bit 1 = cd audio mute */
-	machine().device<cdda_device>("cdda")->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );
+	m_cdda->set_output_gain( 0, ( data & 1 ) ? 0.0 : 1.0 );
 
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(machine(), 0, (data & 2) ? 0 : 1);
 
-	handle_cd32_joystick_cia(machine(), data, mos6526_r(device, space, 2));
+	handle_cd32_joystick_cia(machine(), data, mos6526_r(m_cia_0, space, 2));
 }
 
 /*************************************
@@ -239,7 +237,8 @@ CUSTOM_INPUT_MEMBER(cd32_state::cubo_input)
 
 CUSTOM_INPUT_MEMBER(cd32_state::cd32_sel_mirror_input)
 {
-	UINT8 bits = ioport((const char *)param)->read();
+	ioport_port* ports[2]= { m_p1_port, m_p2_port };
+	UINT8 bits = ports[(int)param]->read();
 	return (bits & 0x20)>>5;
 }
 
@@ -249,18 +248,18 @@ static INPUT_PORTS_START( cd32 )
 	PORT_START("CIA0PORTA")
 	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_SPECIAL )
 	/* this is the regular port for reading a single button joystick on the Amiga, many CD32 games require this to mirror the pad start button! */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state,cd32_sel_mirror_input, "P2")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state,cd32_sel_mirror_input, "P1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state,cd32_sel_mirror_input, 1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state,cd32_sel_mirror_input, 0)
 
 	PORT_START("CIA0PORTB")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("JOY0DAT")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state,amiga_joystick_convert, "P2JOY")
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state,amiga_joystick_convert, 1)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("JOY1DAT")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state,amiga_joystick_convert, "P1JOY")
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state,amiga_joystick_convert, 0)
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("POTGO")

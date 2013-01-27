@@ -411,7 +411,11 @@ TIMER_CALLBACK_MEMBER(amiga_state::amiga_irq_proc)
 
 CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
 {
-	UINT8 bits = ioport((const char *)param)->read();
+	ioport_port* ports[2] = { m_p1joy_port, m_p2joy_port };
+	UINT8 bits;
+	if (ports[(int)param]) bits = ports[(int)param]->read();
+	else bits = 0xff;
+
 	int up = (bits >> 0) & 1;
 	int down = (bits >> 1) & 1;
 	int left = (bits >> 2) & 1;
