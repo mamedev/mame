@@ -129,7 +129,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int
 	}
 	if (!charom)
 	{
-		data = m_charom[offset & 0xfff];
+		data = m_charom->base()[offset & 0xfff];
 	}
 	if (!io)
 	{
@@ -1104,7 +1104,6 @@ void c64_state::machine_start()
 	// find memory regions
 	m_basic = memregion("basic")->base();
 	m_kernal = memregion("kernal")->base();
-	m_charom = memregion("charom")->base();
 
 	// allocate memory
 	m_color_ram.allocate(0x400);

@@ -94,7 +94,7 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			for (int dot = 0; dot < 4; dot++)
 			{
 				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
-				UINT8 fgctl = m_fgctl_prom[fgctl_addr];
+				UINT8 fgctl = m_fgctl_prom->base()[fgctl_addr];
 				int color = fgctl & 0x07;
 
 				if (color)
@@ -126,10 +126,6 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void abc800_state::video_start()
 {
-	// find memory regions
-	m_char_rom = memregion(MC6845_TAG)->base();
-	m_fgctl_prom = memregion("hru2")->base();
-
 	// register for state saving
 	save_item(NAME(m_hrs));
 	save_item(NAME(m_fgctl));
@@ -215,7 +211,7 @@ void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			for (int dot = 0; dot < 4; dot++)
 			{
 				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
-				int color = (m_fgctl_prom[fgctl_addr] & 0x07) ? 1 : 0;
+				int color = (m_fgctl_prom->base()[fgctl_addr] & 0x07) ? 1 : 0;
 
 				bitmap.pix32(y, x++) = RGB_MONOCHROME_YELLOW[color];
 				bitmap.pix32(y, x++) = RGB_MONOCHROME_YELLOW[color];
@@ -247,7 +243,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 		int bit;
 
 		UINT16 address = (state->m_char_ram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
-		UINT8 data = (state->m_char_rom[address & 0x7ff] & 0x3f);
+		UINT8 data = (state->m_char_rom->base()[address & 0x7ff] & 0x3f);
 
 		if (column == cursor_x)
 		{
@@ -301,7 +297,7 @@ UINT32 abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	screen.set_visible_area(0, 767, 0, 311);
 
 	// clear screen
-	bitmap.fill(get_black_pen(machine()), cliprect);
+	bitmap.fill(RGB_BLACK, cliprect);
 
 	// draw HR graphics
 	hr_update(bitmap, cliprect);

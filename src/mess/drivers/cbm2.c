@@ -197,11 +197,11 @@ READ8_MEMBER( cbm2_state::read )
 		}
 		if (!basiccs || !knbcs)
 		{
-			data = m_basic[offset & 0x3fff];
+			data = m_basic->base()[offset & 0x3fff];
 		}
 		if (!kernalcs)
 		{
-			data = m_kernal[offset & 0x1fff];
+			data = m_kernal->base()[offset & 0x1fff];
 		}
 		if (!crtccs)
 		{
@@ -587,15 +587,15 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 		}
 		if (!basiclocs || !basichics)
 		{
-			data = m_basic[offset & 0x3fff];
+			data = m_basic->base()[offset & 0x3fff];
 		}
 		if (!kernalcs)
 		{
-			data = m_kernal[offset & 0x1fff];
+			data = m_kernal->base()[offset & 0x1fff];
 		}
 		if (!charomcs && !vsysaden && !viddaten && viddat_tr)
 		{
-			data = m_charom[offset & 0xfff];
+			data = m_charom->base()[offset & 0xfff];
 		}
 		if (!viccs && !viddaten && viddat_tr)
 		{
@@ -779,7 +779,7 @@ READ8_MEMBER( p500_state::vic_videoram_r )
 		}
 		if (!charomcs)
 		{
-			data = m_charom[offset & 0xfff];
+			data = m_charom->base()[offset & 0xfff];
 		}
 	}
 
@@ -1089,7 +1089,7 @@ static MC6845_UPDATE_ROW( crtc_update_row )
 	{
 		UINT8 code = state->m_video_ram[(ma + column) & 0x7ff];
 		offs_t char_rom_addr = (ma & 0x1000) | (state->m_graphics << 11) | ((code & 0x7f) << 4) | (ra & 0x0f);
-		UINT8 data = state->m_charom[char_rom_addr & 0xfff];
+		UINT8 data = state->m_charom->base()[char_rom_addr & 0xfff];
 
 		for (int bit = 0; bit < 9; bit++)
 		{
@@ -1945,11 +1945,6 @@ void cbm2_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 MACHINE_START_MEMBER( cbm2_state, cbm2 )
 {
-	// find memory regions
-	m_basic = memregion("basic")->base();
-	m_kernal = memregion("kernal")->base();
-	m_charom = memregion("charom")->base();
-
 	// allocate memory
 	m_video_ram.allocate(m_video_ram_size);
 	m_buffer_ram.allocate(0x800);

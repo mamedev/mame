@@ -45,8 +45,9 @@ public:
 			m_user(*this, PLUS4_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
-			m_function(NULL),
-			m_c2(NULL),
+			m_kernal(*this, "kernal"),
+			m_function(*this, "function"),
+			m_c2(*this, "c2"),
 			m_addr(0),
 			m_ted_irq(CLEAR_LINE),
 			m_acia_irq(CLEAR_LINE),
@@ -65,6 +66,9 @@ public:
 	optional_device<plus4_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	required_device<pet_datassette_port_device> m_cassette;
+	required_memory_region m_kernal;
+	optional_memory_region m_function;
+	optional_memory_region m_c2;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -95,9 +99,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 
 	// memory state
-	const UINT8 *m_kernal;
-	const UINT8 *m_function;
-	const UINT8 *m_c2;
 	UINT8 m_addr;
 
 	// interrupt state

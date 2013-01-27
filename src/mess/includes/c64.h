@@ -48,6 +48,8 @@ public:
 			m_user(*this, C64_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+			m_charom(*this, "charom"),
+			m_color_ram(*this, "color_ram"),
 			m_row0(*this, "ROW0"),
 			m_row1(*this, "ROW1"),
 			m_row2(*this, "ROW2"),
@@ -61,7 +63,6 @@ public:
 			m_loram(1),
 			m_hiram(1),
 			m_charen(1),
-			m_color_ram(*this, "color_ram"),
 			m_va14(1),
 			m_va15(1),
 			m_cia1_irq(CLEAR_LINE),
@@ -86,6 +87,8 @@ public:
 	required_device<c64_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
+	required_memory_region m_charom;
+	optional_shared_ptr<UINT8> m_color_ram;
 	optional_ioport m_row0;
 	optional_ioport m_row1;
 	optional_ioport m_row2;
@@ -144,10 +147,8 @@ public:
 	int m_charen;
 	UINT8 *m_basic;
 	UINT8 *m_kernal;
-	UINT8 *m_charom;
 
 	// video state
-	optional_shared_ptr<UINT8> m_color_ram;
 	int m_va14;
 	int m_va15;
 

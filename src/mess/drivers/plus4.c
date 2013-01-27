@@ -181,13 +181,13 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 		switch (m_addr & 0x03)
 		{
 		case CS0_BASIC:
-			data = m_kernal[offset & 0x7fff];
+			data = m_kernal->base()[offset & 0x7fff];
 			break;
 
 		case CS0_FUNCTION_LO:
 			if (m_function != NULL)
 			{
-				data = m_function[offset & 0x7fff];
+				data = m_function->base()[offset & 0x7fff];
 			}
 			break;
 
@@ -200,7 +200,7 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 
 			if (m_c2 != NULL)
 			{
-				data = m_c2[offset & 0x7fff];
+				data = m_c2->base()[offset & 0x7fff];
 			}
 			break;
 		}
@@ -209,20 +209,20 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 	{
 		if (kernal)
 		{
-			data = m_kernal[offset & 0x7fff];
+			data = m_kernal->base()[offset & 0x7fff];
 		}
 		else
 		{
 			switch ((m_addr >> 2) & 0x03)
 			{
 			case CS1_KERNAL:
-				data = m_kernal[offset & 0x7fff];
+				data = m_kernal->base()[offset & 0x7fff];
 				break;
 
 			case CS1_FUNCTION_HI:
 				if (m_function != NULL)
 				{
-					data = m_function[offset & 0x7fff];
+					data = m_function->base()[offset & 0x7fff];
 				}
 				break;
 
@@ -235,7 +235,7 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 
 				if (m_c2 != NULL)
 				{
-					data = m_c2[offset & 0x7fff];
+					data = m_c2->base()[offset & 0x7fff];
 				}
 				break;
 			}
@@ -814,19 +814,6 @@ void plus4_state::machine_start()
 {
 	cbm_common_init();
 
-	// find memory regions
-	m_kernal = memregion("kernal")->base();
-
-	if (memregion("function") != NULL)
-	{
-		m_function = memregion("function")->base();
-	}
-
-	if (memregion("c2") != NULL)
-	{
-		m_c2 = memregion("c2")->base();
-	}
-
 	// initialize memory
 	UINT8 data = 0xff;
 
@@ -841,6 +828,8 @@ void plus4_state::machine_start()
 	save_item(NAME(m_ted_irq));
 	save_item(NAME(m_acia_irq));
 	save_item(NAME(m_exp_irq));
+	save_item(NAME(m_port6529));
+	save_item(NAME(m_keyline));
 }
 
 

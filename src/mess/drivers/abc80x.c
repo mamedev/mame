@@ -202,7 +202,7 @@ void abc800_state::bankswitch()
 	else
 	{
 		// BASIC ROM selected
-		program.install_rom(0x0000, 0x3fff, memregion(Z80_TAG)->base());
+		program.install_rom(0x0000, 0x3fff, m_rom->base());
 	}
 }
 
@@ -218,7 +218,7 @@ void abc802_state::bankswitch()
 	if (m_lrs)
 	{
 		// ROM and video RAM selected
-		program.install_rom(0x0000, 0x77ff, memregion(Z80_TAG)->base());
+		program.install_rom(0x0000, 0x77ff, m_rom->base());
 		program.install_ram(0x7800, 0x7fff, m_char_ram);
 	}
 	else
@@ -1077,7 +1077,7 @@ void abc806_state::machine_start()
 	m_ctc_timer->adjust(attotime::from_hz(ABC800_X01/2/2/2), 0, attotime::from_hz(ABC800_X01/2/2/2));
 
 	// setup memory banking
-	UINT8 *mem = memregion(Z80_TAG)->base();
+	UINT8 *mem = m_rom->base();
 	UINT32 videoram_size = m_ram->size() - (32 * 1024);
 	int bank;
 	char bank_name[10];
@@ -1348,9 +1348,6 @@ ROM_START( abc800c )
 	ROM_LOAD( "abc 6-1.2k", 0x6000, 0x1000, CRC(4bd5e808) SHA1(5ca0a60571de6cfa3d6d166e0cde3c78560569f3) ) // 1981-01-12
 	ROM_LOAD( "abc 7-22.2j", 0x7000, 0x1000, CRC(774511ab) SHA1(5171e43213a402c2d96dee33453c8306ac1aafc8) )
 
-	ROM_REGION( 0x1000, "gfx1", 0 )
-	ROM_LOAD( "saa5052.5c", 0x0140, 0x08c0, BAD_DUMP CRC(cda3bf79) SHA1(cf5ea94459c09001d422dadc212bc970b4b4aa20) )
-
 	ROM_REGION( 0x20, "hru", 0 )
 	ROM_LOAD( "hru i.4g", 0x0000, 0x0020, CRC(d970a972) SHA1(c47fdd61fccc68368d42f03a01c7af90ab1fe1ab) )
 
@@ -1476,7 +1473,7 @@ DIRECT_UPDATE_MEMBER( abc800c_state::direct_update_handler )
 {
 	if (address >= 0x7c00 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7c00, 0x7fff, 0x3ff, memregion(Z80_TAG)->base() + 0x7c00);
+		direct.explicit_configure(0x7c00, 0x7fff, 0x3ff, m_rom->base() + 0x7c00);
 
 		if (!m_fetch_charram)
 		{
@@ -1510,7 +1507,7 @@ DIRECT_UPDATE_MEMBER( abc800m_state::direct_update_handler )
 {
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memregion(Z80_TAG)->base() + 0x7800);
+		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, m_rom->base() + 0x7800);
 
 		if (!m_fetch_charram)
 		{
@@ -1546,7 +1543,7 @@ DIRECT_UPDATE_MEMBER( abc802_state::direct_update_handler )
 	{
 		if (address >= 0x7800 && address < 0x8000)
 		{
-			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memregion(Z80_TAG)->base() + 0x7800);
+			direct.explicit_configure(0x7800, 0x7fff, 0x7ff, m_rom->base() + 0x7800);
 			return ~0;
 		}
 	}
@@ -1568,7 +1565,7 @@ DIRECT_UPDATE_MEMBER( abc806_state::direct_update_handler )
 {
 	if (address >= 0x7800 && address < 0x8000)
 	{
-		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, memregion(Z80_TAG)->base() + 0x7800);
+		direct.explicit_configure(0x7800, 0x7fff, 0x7ff, m_rom->base() + 0x7800);
 
 		if (!m_fetch_charram)
 		{

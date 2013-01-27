@@ -140,7 +140,7 @@ READ8_MEMBER( abc806_state::cli_r )
 	*/
 
 	UINT16 hru2_addr = (m_hru2_a8 << 8) | (offset >> 8);
-	UINT8 data = m_hru2_prom[hru2_addr] & 0x0f;
+	UINT8 data = m_hru2_prom->base()[hru2_addr] & 0x0f;
 
 	logerror("HRU II %03x : %01x\n", hru2_addr, data);
 
@@ -314,13 +314,13 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 		else
 		{
 			rad_addr = (e6 << 8) | (e5 << 7) | (flash << 6) | (underline << 5) | (state->m_flshclk << 4) | ra;
-			rad_data = state->m_rad_prom[rad_addr] & 0x0f;
+			rad_data = state->m_rad_prom->base()[rad_addr] & 0x0f;
 
 			rad_data = ra; // HACK because the RAD prom is not dumped yet
 		}
 
 		UINT16 chargen_addr = (th << 12) | (data << 4) | rad_data;
-		UINT8 chargen_data = state->m_char_rom[chargen_addr & 0xfff] << 2;
+		UINT8 chargen_data = state->m_char_rom->base()[chargen_addr & 0xfff] << 2;
 		int x = HORIZONTAL_PORCH_HACK + (column + 4) * ABC800_CHAR_WIDTH;
 
 		for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
@@ -472,11 +472,6 @@ void abc806_state::video_start()
 	m_d_vsync = 1;
 	m_vsync = 1;
 	m_40 = 1;
-
-	// find memory regions
-	m_char_rom = memregion(MC6845_TAG)->base();
-	m_rad_prom = memregion("rad")->base();
-	m_hru2_prom = memregion("hru2")->base();
 
 	// allocate memory
 	m_char_ram.allocate(ABC806_CHAR_RAM_SIZE);

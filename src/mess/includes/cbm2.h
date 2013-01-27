@@ -70,6 +70,16 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 			m_ieee(*this, IEEE488_TAG),
+			m_ext_cpu(*this, EXT_I8088_TAG),
+			m_ext_pic(*this, EXT_I8259A_TAG),
+			m_ext_cia(*this, EXT_MOS6526_TAG),
+			m_ext_tpi(*this, EXT_MOS6525_TAG),
+			m_basic(*this, "basic"),
+			m_kernal(*this, "kernal"),
+			m_charom(*this, "charom"),
+			m_buffer_ram(*this, "buffer_ram"),
+			m_extbuf_ram(*this, "extbuf_ram"),
+			m_video_ram(*this, "video_ram"),
 			m_pa0(*this, "PA0"),
 			m_pa1(*this, "PA1"),
 			m_pa2(*this, "PA2"),
@@ -87,14 +97,7 @@ public:
 			m_pb6(*this, "PB6"),
 			m_pb7(*this, "PB7"),
 			m_lock(*this, "LOCK"),
-			m_ext_cpu(*this, EXT_I8088_TAG),
-			m_ext_pic(*this, EXT_I8259A_TAG),
-			m_ext_cia(*this, EXT_MOS6526_TAG),
-			m_ext_tpi(*this, EXT_MOS6525_TAG),
-			m_buffer_ram(*this, "buffer_ram"),
-			m_extbuf_ram(*this, "extbuf_ram"),
 			m_dramon(1),
-			m_video_ram(*this, "video_ram"),
 			m_video_ram_size(0x800),
 			m_graphics(1),
 			m_todclk(0),
@@ -122,6 +125,16 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<pet_datassette_port_device> m_cassette;
 	required_device<ieee488_device> m_ieee;
+	optional_device<cpu_device> m_ext_cpu;
+	optional_device<pic8259_device> m_ext_pic;
+	optional_device<mos6526_device> m_ext_cia;
+	optional_device<tpi6525_device> m_ext_tpi;
+	required_memory_region m_basic;
+	required_memory_region m_kernal;
+	required_memory_region m_charom;
+	optional_shared_ptr<UINT8> m_buffer_ram;
+	optional_shared_ptr<UINT8> m_extbuf_ram;
+	optional_shared_ptr<UINT8> m_video_ram;
 	required_ioport m_pa0;
 	required_ioport m_pa1;
 	required_ioport m_pa2;
@@ -139,11 +152,6 @@ public:
 	required_ioport m_pb6;
 	required_ioport m_pb7;
 	required_ioport m_lock;
-
-	optional_device<cpu_device> m_ext_cpu;
-	optional_device<pic8259_device> m_ext_pic;
-	optional_device<mos6526_device> m_ext_cia;
-	optional_device<tpi6525_device> m_ext_tpi;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
@@ -199,17 +207,11 @@ public:
 	DECLARE_WRITE8_MEMBER( ext_cia_pb_w );
 
 	// memory state
-	optional_shared_ptr<UINT8> m_buffer_ram;
-	optional_shared_ptr<UINT8> m_extbuf_ram;
-	UINT8 *m_basic;
-	UINT8 *m_kernal;
-	UINT8 *m_charom;
 	int m_dramon;
 	int m_busen1;
 	int m_busy2;
 
 	// video state
-	optional_shared_ptr<UINT8> m_video_ram;
 	size_t m_video_ram_size;
 	int m_graphics;
 	int m_ntsc;
@@ -261,6 +263,7 @@ public:
 
 	required_device<pls100_device> m_pla2;
 	required_device<mos6566_device> m_vic;
+	optional_shared_ptr<UINT8> m_color_ram;
 
 	DECLARE_MACHINE_START( p500 );
 	DECLARE_MACHINE_START( p500_ntsc );
@@ -297,7 +300,6 @@ public:
 	DECLARE_WRITE8_MEMBER( tpi2_pc_w );
 
 	// video state
-	optional_shared_ptr<UINT8> m_color_ram;
 	int m_statvid;
 	int m_vicdotsel;
 	int m_vicbnksel;
