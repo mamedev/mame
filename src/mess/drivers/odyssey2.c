@@ -50,7 +50,7 @@ public:
 	UINT8 m_ram[256];
 	UINT8 m_p1;
 	UINT8 m_p2;
-	size_t m_cart_size;
+	int m_cart_size;
 	UINT8 m_lum;
 	DECLARE_READ8_MEMBER(t0_read);
 	DECLARE_READ8_MEMBER(io_read);
