@@ -49,6 +49,7 @@ public:
 			m_floppy(NULL),
 			m_terminal(*this, TERMINAL_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
+			m_rom(*this, Z80_TAG),
 			m_sw1(*this, "SW1"),
 			m_fdrdy(0),
 			m_exdsk_sw(false),
@@ -72,6 +73,7 @@ public:
 	floppy_image_device *m_floppy;
 	required_device<serial_terminal_device> m_terminal;
 	required_device<centronics_device> m_centronics;
+	required_memory_region m_rom;
 	required_ioport m_sw1;
 
 	virtual void machine_start();

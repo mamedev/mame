@@ -32,8 +32,17 @@ public:
 			m_cassette(*this, CASSETTE_TAG),
 			m_ram(*this, RAM_TAG),
 			m_page_ram(*this, "page_ram"),
-			m_color_ram(*this, "color_ram")
-		{ }
+			m_color_ram(*this, "color_ram"),
+			m_run(*this, "RUN"),
+			m_y0(*this, "Y0"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2"),
+			m_y3(*this, "Y3"),
+			m_y4(*this, "Y4"),
+			m_y5(*this, "Y5"),
+			m_y6(*this, "Y6"),
+			m_y7(*this, "Y7")
+	{ }
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1869_device> m_vis;
@@ -41,6 +50,15 @@ public:
 	required_device<ram_device> m_ram;
 	required_shared_ptr<UINT8> m_page_ram;
 	optional_shared_ptr<UINT8> m_color_ram;
+	required_ioport m_run;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
 
 	virtual void machine_start();
 

@@ -42,6 +42,7 @@ public:
 			m_floppy0(*this, WD2797_TAG":0"),
 			m_floppy1(*this, WD2797_TAG":1"),
 			m_floppy(NULL),
+			m_rom(*this, Z80_TAG),
 			m_y0(*this, "Y0"),
 			m_y1(*this, "Y1"),
 			m_y2(*this, "Y2"),
@@ -65,6 +66,7 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	floppy_image_device *m_floppy;
+	required_memory_region m_rom;
 	required_ioport m_y0;
 	required_ioport m_y1;
 	required_ioport m_y2;

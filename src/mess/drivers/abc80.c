@@ -101,7 +101,7 @@ Notes:
 READ8_MEMBER( abc80_state::read )
 {
 	UINT8 data = 0xff;
-	UINT8 mmu = m_mmu_rom[0x40 | (offset >> 10)];
+	UINT8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
 
 	if (!(mmu & MMU_XM))
 	{
@@ -109,7 +109,7 @@ READ8_MEMBER( abc80_state::read )
 	}
 	else if (!(mmu & MMU_ROM))
 	{
-		data = memregion(Z80_TAG)->base()[offset & 0x3fff];
+		data = m_rom->base()[offset & 0x3fff];
 	}
 	else if (mmu & MMU_VRAMS)
 	{
@@ -130,7 +130,7 @@ READ8_MEMBER( abc80_state::read )
 
 WRITE8_MEMBER( abc80_state::write )
 {
-	UINT8 mmu = m_mmu_rom[0x40 | (offset >> 10)];
+	UINT8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
 
 	if (!(mmu & MMU_XM))
 	{
@@ -584,9 +584,6 @@ void abc80_state::machine_start()
 	m_cassette_timer = timer_alloc(TIMER_ID_CASSETTE);
 	m_cassette_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
 	m_cassette_timer->enable(false);
-
-	// find memory regions
-	m_mmu_rom = memregion("mmu")->base();
 
 	// register for state saving
 	save_item(NAME(m_key_data));

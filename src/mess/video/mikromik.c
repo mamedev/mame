@@ -10,7 +10,7 @@ static I8275_DISPLAY_PIXELS( crtc_display_pixels )
 {
 	mm1_state *state = device->machine().driver_data<mm1_state>();
 
-	UINT8 romdata = state->m_char_rom[(charcode << 4) | linecount];
+	UINT8 romdata = state->m_char_rom->base()[(charcode << 4) | linecount];
 
 	int d0 = BIT(romdata, 0);
 	int d7 = BIT(romdata, 7);
@@ -81,17 +81,6 @@ static UPD7220_INTERFACE( hgdc_intf )
 	DEVCB_NULL,
 	DEVCB_NULL
 };
-
-
-//-------------------------------------------------
-//  VIDEO_START( mm1 )
-//-------------------------------------------------
-
-void mm1_state::video_start()
-{
-	// find memory regions
-	m_char_rom = memregion("chargen")->base();
-}
 
 
 //-------------------------------------------------

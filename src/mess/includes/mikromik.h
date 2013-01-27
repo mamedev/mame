@@ -43,6 +43,10 @@ public:
 			m_floppy0(*this, UPD765_TAG ":0:525qd"),
 			m_floppy1(*this, UPD765_TAG ":1:525qd"),
 			m_ram(*this, RAM_TAG),
+			m_rom(*this, I8085A_TAG),
+			m_mmu_rom(*this, "address"),
+			m_key_rom(*this, "keyboard"),
+			m_char_rom(*this, "chargen"),
 			m_video_ram(*this, "video_ram"),
 			m_y0(*this, "Y0"),
 			m_y1(*this, "Y1"),
@@ -74,6 +78,10 @@ public:
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_memory_region m_mmu_rom;
+	required_memory_region m_key_rom;
+	required_memory_region m_char_rom;
 	required_shared_ptr<UINT8> m_video_ram;
 	required_ioport m_y0;
 	required_ioport m_y1;
@@ -90,7 +98,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( read );
@@ -115,17 +122,14 @@ public:
 
 	void scan_keyboard();
 
-	const UINT8 *m_mmu_rom;
 	int m_a8;
 
 	// keyboard state
 	int m_sense;
 	int m_drive;
 	UINT8 m_keydata;
-	const UINT8 *m_key_rom;
 
 	// video state
-	const UINT8 *m_char_rom;
 	int m_llen;
 
 	// serial state

@@ -60,6 +60,9 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 protected:
+	required_ioport m_io_term_frame;
+	required_ioport m_io_term_conf;
+
 	virtual void term_write(UINT8 data);
 	virtual void device_start();
 	virtual void device_reset();

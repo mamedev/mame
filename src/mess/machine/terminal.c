@@ -137,12 +137,16 @@ static const UINT8 terminal_font[256*16] =
 };
 
 generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, type, name, tag, owner, clock)
+	: device_t(mconfig, type, name, tag, owner, clock),
+	  m_io_term_frame(*this, "TERM_FRAME"),
+	  m_io_term_conf(*this, "TERM_CONF")
 {
 }
 
 generic_terminal_device::generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, GENERIC_TERMINAL, "Generic Terminal", tag, owner, clock)
+	: device_t(mconfig, GENERIC_TERMINAL, "Generic Terminal", tag, owner, clock),
+	  m_io_term_frame(*this, "TERM_FRAME"),
+	  m_io_term_conf(*this, "TERM_CONF")
 {
 }
 
@@ -227,7 +231,7 @@ void generic_terminal_device::term_write(UINT8 data)
 ***************************************************************************/
 UINT32 generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 options = ioport("TERM_CONF")->read();
+	UINT8 options = m_io_term_conf->read();
 	UINT16 cursor = m_y_pos * TERMINAL_WIDTH + m_x_pos;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
@@ -479,7 +483,7 @@ void serial_terminal_device::device_start()
 
 INPUT_CHANGED_MEMBER(serial_terminal_device::update_frame)
 {
-	UINT8 val = ioport("TERM_FRAME")->read();
+	UINT8 val = m_io_term_frame->read();
 	set_tra_rate(rates[val & 0x0f]);
 	set_rcv_rate(rates[val & 0x0f]);
 

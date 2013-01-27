@@ -47,8 +47,8 @@ void abc80_state::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	for (int y = 0; y < 312; y++)
 	{
-		UINT8 vsync_data = m_vsync_prom[y];
-		UINT8 l = m_line_prom[y];
+		UINT8 vsync_data = m_vsync_prom->base()[y];
+		UINT8 l = m_line_prom->base()[y];
 		int dv = (vsync_data & ABC80_K2_DV) ? 1 : 0;
 
 		if (!(vsync_data & ABC80_K2_FRAME_RESET))
@@ -59,7 +59,7 @@ void abc80_state::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 		for (int sx = 0; sx < 64; sx++)
 		{
-			UINT8 hsync_data = m_hsync_prom[sx];
+			UINT8 hsync_data = m_hsync_prom->base()[sx];
 			int dh = (hsync_data & ABC80_K5_DH) ? 1 : 0;
 			UINT8 data = 0;
 
@@ -89,7 +89,7 @@ void abc80_state::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			UINT16 videoram_addr = ((r & 0x07) << 7) | (s << 3) | (c & 0x07);
 			UINT8 videoram_data = m_latch;
 			UINT8 attr_addr = ((dh & dv) << 7) | (videoram_data & 0x7f);
-			UINT8 attr_data = m_attr_prom[attr_addr];
+			UINT8 attr_data = m_attr_prom->base()[attr_addr];
 
 			int blank = (attr_data & ABC80_J3_BLANK) ? 1 : 0;
 			int j = (attr_data & ABC80_J3_TEXT) ? 1 : 0;
@@ -123,7 +123,7 @@ void abc80_state::update_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				// text mode
 				UINT16 chargen_addr = ((videoram_data & 0x7f) * 10) + l;
 
-				data = m_char_rom[chargen_addr];
+				data = m_char_rom->base()[chargen_addr];
 			}
 
 			// shift out pixels
@@ -181,13 +181,6 @@ void abc80_state::video_start()
 
 	// allocate memory
 	m_video_ram.allocate(0x400);
-
-	// find memory regions
-	m_char_rom = memregion("chargen")->base();
-	m_hsync_prom = memregion("hsync")->base();
-	m_vsync_prom = memregion("vsync")->base();
-	m_line_prom = memregion("line")->base();
-	m_attr_prom = memregion("attr")->base();
 
 	// register for state saving
 	save_item(NAME(m_blink));

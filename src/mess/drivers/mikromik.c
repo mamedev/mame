@@ -80,7 +80,7 @@
 READ8_MEMBER( mm1_state::read )
 {
 	UINT8 data = 0;
-	UINT8 mmu = m_mmu_rom[(m_a8 << 8) | (offset >> 8)];
+	UINT8 mmu = m_mmu_rom->base()[(m_a8 << 8) | (offset >> 8)];
 
 	if (mmu & MMU_IOEN)
 	{
@@ -130,11 +130,11 @@ READ8_MEMBER( mm1_state::read )
 		}
 		else if (!(mmu & MMU_CE0))
 		{
-			data = memregion(I8085A_TAG)->base()[offset & 0x1fff];
+			data = m_rom->base()[offset & 0x1fff];
 		}
 		else if (!(mmu & MMU_CE1))
 		{
-			data = memregion(I8085A_TAG)->base()[0x2000 + (offset & 0x1fff)];
+			data = m_rom->base()[0x2000 + (offset & 0x1fff)];
 		}
 	}
 
@@ -149,7 +149,7 @@ READ8_MEMBER( mm1_state::read )
 
 WRITE8_MEMBER( mm1_state::write )
 {
-	UINT8 mmu = m_mmu_rom[(m_a8 << 8) | (offset >> 8)];
+	UINT8 mmu = m_mmu_rom->base()[(m_a8 << 8) | (offset >> 8)];
 
 	if (mmu & MMU_IOEN)
 	{
@@ -287,7 +287,7 @@ void mm1_state::scan_keyboard()
 	if (!BIT(data, m_sense))
 	{
 		// get key data from PROM
-		keydata = m_key_rom[(ctrl << 8) | (shift << 7) | (m_drive << 3) | (m_sense)];
+		keydata = m_key_rom->base()[(ctrl << 8) | (shift << 7) | (m_drive << 3) | (m_sense)];
 	}
 
 	if (m_keydata != keydata)
@@ -715,10 +715,6 @@ void mm1_state::machine_start()
 	// floppy callbacks
 	m_fdc->setup_intrq_cb(upd765_family_device::line_cb(FUNC(mm1_state::fdc_intrq_w), this));
 	m_fdc->setup_drq_cb(upd765_family_device::line_cb(FUNC(mm1_state::fdc_drq_w), this));
-
-	// find memory regions
-	m_mmu_rom = memregion("address")->base();
-	m_key_rom = memregion("keyboard")->base();
 
 	// register for state saving
 	save_item(NAME(m_sense));

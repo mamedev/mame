@@ -35,6 +35,17 @@ public:
 			m_uart(*this, M82C50A_TAG),
 			m_speaker(*this, SPEAKER_TAG),
 			m_timer_tick(*this, TIMER_TICK_TAG),
+			m_rom(*this, M80C88A_TAG),
+			m_char_rom(*this, HD61830_TAG),
+			m_y0(*this, "Y0"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2"),
+			m_y3(*this, "Y3"),
+			m_y4(*this, "Y4"),
+			m_y5(*this, "Y5"),
+			m_y6(*this, "Y6"),
+			m_y7(*this, "Y7"),
+			m_battery(*this, "BATTERY"),
 			m_contrast(*this, "contrast")
 	{ }
 
@@ -44,7 +55,18 @@ public:
 	required_device<ins8250_device> m_uart;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<timer_device> m_timer_tick;
-
+	required_memory_region m_rom;
+	required_memory_region m_char_rom;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_battery;
+	
 	virtual void machine_start();
 	virtual void machine_reset();
 

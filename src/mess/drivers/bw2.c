@@ -76,7 +76,7 @@ READ8_MEMBER( bw2_state::read )
 	{
 		if (!rom)
 		{
-			data = memregion(Z80_TAG)->base()[offset & 0x3fff];
+			data = m_rom->base()[offset & 0x3fff];
 		}
 
 		if (!vram)

@@ -35,7 +35,7 @@ READ8_MEMBER( trs80m2_state::read )
 	{
 		if (m_boot_rom)
 		{
-			data = memregion(Z80_TAG)->base()[offset];
+			data = m_rom->base()[offset];
 		}
 		else
 		{
@@ -390,7 +390,7 @@ static MC6845_UPDATE_ROW( trs80m2_update_row )
 	{
 		UINT8 code = state->m_video_ram[(ma + column) & 0x7ff];
 		offs_t address = ((code & 0x7f) << 4) | (ra & 0x0f);
-		UINT8 data = state->m_char_rom[address];
+		UINT8 data = state->m_char_rom->base()[address];
 
 		int dcursor = (column == cursor_x);
 		int drevid = BIT(code, 7);
@@ -443,9 +443,6 @@ static MC6845_INTERFACE( mc6845_intf )
 
 void trs80m2_state::video_start()
 {
-	// find memory regions
-	m_char_rom = memregion(MC6845_TAG)->base();
-
 	// allocate memory
 	m_video_ram.allocate(0x800);
 }

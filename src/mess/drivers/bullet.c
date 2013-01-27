@@ -102,7 +102,7 @@ READ8_MEMBER( bullet_state::mreq_r )
 
 	if (!m_brom && !BIT(offset, 5))
 	{
-		data = memregion(Z80_TAG)->base()[offset & 0x1f];
+		data = m_rom->base()[offset & 0x1f];
 	}
 	else
 	{
@@ -359,7 +359,7 @@ READ8_MEMBER( bulletf_state::mreq_r )
 
 	if (!m_rome && !BIT(offset, 5))
 	{
-		data = memregion(Z80_TAG)->base()[offset & 0x1f];
+		data = m_rom->base()[offset & 0x1f];
 	}
 	else
 	{

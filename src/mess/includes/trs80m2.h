@@ -52,6 +52,8 @@ public:
 			m_floppy(NULL),
 			m_ram(*this, RAM_TAG),
 			m_kb(*this, TRS80M2_KEYBOARD_TAG),
+			m_rom(*this, Z80_TAG),
+			m_char_rom(*this, MC6845_TAG),
 			m_video_ram(*this, "video_ram")
 	{ }
 
@@ -69,6 +71,8 @@ public:
 	floppy_image_device *m_floppy;
 	required_device<ram_device> m_ram;
 	required_device<trs80m2_keyboard_device> m_kb;
+	required_memory_region m_rom;
+	required_memory_region m_char_rom;
 	optional_shared_ptr<UINT8> m_video_ram;
 
 	virtual void machine_start();
@@ -115,7 +119,6 @@ public:
 	int m_kbirq;
 
 	// video state
-	const UINT8 *m_char_rom;
 	int m_blnkvid;
 	int m_80_40_char_en;
 	int m_de;

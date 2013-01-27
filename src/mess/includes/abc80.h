@@ -72,6 +72,13 @@ public:
 			m_kb(*this, ABC80_KEYBOARD_TAG),
 			m_ram(*this, RAM_TAG),
 			m_rs232(*this, RS232_TAG),
+			m_rom(*this, Z80_TAG),
+			m_mmu_rom(*this, "mmu"),
+			m_char_rom(*this, "chargen"),
+			m_hsync_prom(*this, "hsync"),
+			m_vsync_prom(*this, "vsync"),
+			m_line_prom(*this, "line"),
+			m_attr_prom(*this, "attr"),
 			m_video_ram(*this, "video_ram"),
 			m_tape_in(1),
 			m_tape_in_latch(1)
@@ -85,6 +92,13 @@ public:
 	required_device<abc80_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
+	required_memory_region m_rom;
+	required_memory_region m_mmu_rom;
+	required_memory_region m_char_rom;
+	required_memory_region m_hsync_prom;
+	required_memory_region m_vsync_prom;
+	required_memory_region m_line_prom;
+	required_memory_region m_attr_prom;
 	optional_shared_ptr<UINT8> m_video_ram;
 
 	enum
@@ -130,14 +144,6 @@ public:
 	// cassette state
 	int m_tape_in;
 	int m_tape_in_latch;
-
-	// memory regions
-	const UINT8 *m_mmu_rom;         // memory mapping ROM
-	const UINT8 *m_char_rom;        // character generator ROM
-	const UINT8 *m_hsync_prom;      // horizontal sync PROM
-	const UINT8 *m_vsync_prom;      // horizontal sync PROM
-	const UINT8 *m_line_prom;       // line address PROM
-	const UINT8 *m_attr_prom;       // character attribute PROM
 
 	// timers
 	emu_timer *m_pio_timer;
