@@ -21,12 +21,16 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		  m_tlc34076(*this, "tlc34076"),
 		  m_vram_bg(*this, "vrabg"),
-		  m_vram_fg(*this, "vrafg")
+		  m_vram_fg(*this, "vrafg"),
+		  m_analog_x(*this, "ANALOGX"),
+		  m_analog_y(*this, "ANALOGY")
 		{ }
 
 	required_device<tlc34076_device> m_tlc34076;
 	required_shared_ptr<UINT16> m_vram_bg;
 	required_shared_ptr<UINT16> m_vram_fg;
+	required_ioport m_analog_x;
+	required_ioport m_analog_y;
 	UINT8 m_bitvals[32];
 	DECLARE_WRITE16_MEMBER(bit_controls_w);
 	DECLARE_READ16_MEMBER(analogx_r);
@@ -194,7 +198,7 @@ WRITE16_MEMBER(xtheball_state::bit_controls_w)
 
 READ16_MEMBER(xtheball_state::analogx_r)
 {
-	return (ioport("ANALOGX")->read() << 8) | 0x00ff;
+	return (m_analog_x->read() << 8) | 0x00ff;
 }
 
 
@@ -202,7 +206,7 @@ READ16_MEMBER(xtheball_state::analogy_watchdog_r)
 {
 	/* doubles as a watchdog address */
 	watchdog_reset_w(space,0,0);
-	return (ioport("ANALOGY")->read() << 8) | 0x00ff;
+	return (m_analog_y->read() << 8) | 0x00ff;
 }
 
 
