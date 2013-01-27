@@ -28,9 +28,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
-		, m_i8243(*this, "i8243")
 		, m_i8244(*this, "i8244")
-		, m_ef9340_1(*this, "ef9340_1")
 		, m_user1(*this, "user1")
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
@@ -46,9 +44,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	optional_device<i8243_device> m_i8243;
 	required_device<i8244_device> m_i8244;
-	optional_device<ef9340_1_device> m_ef9340_1;
 
 	int m_the_voice_lrq_state;
 	UINT8 *m_ram;
@@ -61,8 +57,6 @@ public:
 	DECLARE_WRITE8_MEMBER(io_write);
 	DECLARE_READ8_MEMBER(bus_read);
 	DECLARE_WRITE8_MEMBER(bus_write);
-	DECLARE_READ8_MEMBER(g7400_io_read);
-	DECLARE_WRITE8_MEMBER(g7400_io_write);
 	DECLARE_READ8_MEMBER(p1_read);
 	DECLARE_WRITE8_MEMBER(p1_write);
 	DECLARE_READ8_MEMBER(p2_read);
@@ -73,11 +67,9 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(the_voice_lrq_callback);
-	DECLARE_WRITE8_MEMBER(i8243_port_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_callback);
 
 	DECLARE_WRITE16_MEMBER(scanline_postprocess);
-	DECLARE_WRITE16_MEMBER(scanline_postprocess_g7400);
 
 protected:
 	/* constants */
@@ -104,10 +96,32 @@ protected:
 	required_ioport m_joy0;
 	required_ioport m_joy1;
 	
-	UINT8   m_g7400_ic674_decode[8];
-	UINT8   m_g7400_ic678_decode[8];
-
 	void switch_banks();
+};
+
+class g7400_state : public odyssey2_state
+{
+public:
+	g7400_state(const machine_config &mconfig, device_type type, const char *tag)
+        : odyssey2_state(mconfig, type, tag)
+		, m_i8243(*this, "i8243")
+		, m_ef9340_1(*this, "ef9340_1")
+	{ }
+
+	required_device<i8243_device> m_i8243;
+	required_device<ef9340_1_device> m_ef9340_1;
+
+	virtual void palette_init();
+	virtual void machine_reset();
+	DECLARE_WRITE8_MEMBER(p2_write);
+	DECLARE_READ8_MEMBER(io_read);
+	DECLARE_WRITE8_MEMBER(io_write);
+	DECLARE_WRITE8_MEMBER(i8243_port_w);
+	DECLARE_WRITE16_MEMBER(scanline_postprocess);
+
+protected:
+	UINT8 m_ic674_decode[8];
+	UINT8 m_ic678_decode[8];
 };
 
 
@@ -128,8 +142,8 @@ static ADDRESS_MAP_START( odyssey2_io , AS_IO, 8, odyssey2_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( g7400_io , AS_IO, 8, odyssey2_state )
-	AM_RANGE(0x00,            0xff)            AM_READWRITE(g7400_io_read, g7400_io_write)
+static ADDRESS_MAP_START( g7400_io , AS_IO, 8, g7400_state )
+	AM_RANGE(0x00,            0xff)            AM_READWRITE(io_read, io_write)
 	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_READWRITE(p1_read, p1_write)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_READWRITE(p2_read, p2_write)
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READWRITE(bus_read, bus_write)
@@ -229,53 +243,50 @@ const UINT8 odyssey2_colors[] =
 {
 	/* Background,Grid Dim */
 	0x00,0x00,0x00,						// i r g b
-	0x00,0x00,0xFF,   /* Blue */		// i r g B
-	0x00,0x80,0x00,   /* DK Green */	// i r G b
-	0xff,0x9b,0x60,						// i r G B
-	0xCC,0x00,0x00,   /* Red */			// i R g b
-	0xa9,0x80,0xff,						// i R g B
-	0x82,0xfd,0xdb,						// i R G b
+	0x00,0x00,0xcc,   /* Blue */		// i r g B
+	0x00,0xcc,0x00,   /* DK Green */	// i r G b
+	0x00,0x90,0x90,						// i r G B
+	0xcc,0x00,0x00,   /* Red */			// i R g b
+	0xa9,0x00,0xcf,						// i R g B
+	0x82,0x9d,0x00,						// i R G b
 	0xcc,0xcc,0xcc,						// i R G B
 
 	/* Background,Grid Bright */
-	0x80,0x80,0x80,						// I r g b
+	0x50,0x50,0x50,						// I r g b
 	0x50,0xAE,0xFF,   /* Blue */		// I r g B
-	0x00,0xFF,0x00,   /* Dk Green */	// I r G b
-	0x82,0xfb,0xdb,   /* Lt Grey */		// I r G B
-	0xff,0x80,0x80,   /* Red */			// I R g b
-	0xa9,0x80,0xff,   /* Violet */		// I R g B
-	0xff,0x9b,0x60,   /* Orange */		// I R G b
+	0x50,0xFF,0x50,   /* Dk Green */	// I r G b
+	0x50,0xfb,0xdb,   /* Lt Grey */		// I r G B
+	0xff,0x50,0x50,   /* Red */			// I R g b
+	0xa9,0x50,0xff,   /* Violet */		// I R g B
+	0xff,0x9b,0x50,   /* Orange */		// I R G b
 	0xFF,0xFF,0xFF,						// I R G B
-
-	/* Character,Sprite colors */
-	0x80,0x80,0x80,   /* Dark Grey */	// I r g b 
-	0xFF,0x80,0x80,   /* Red */			// I R g b
-	0x00,0xC0,0x00,   /* Green */		// I r G b
-	0xff,0x9b,0x60,   /* Orange */		// I R G b
-	0x50,0xAE,0xFF,   /* Blue */		// I r g B
-	0xa9,0x80,0xff,   /* Violet */		// I R g B
-	0x82,0xfb,0xdb,   /* Lt Grey */		// I r G B
-	0xff,0xff,0xff,   /* White */		// I R G B
-
-	/* EF9340/EF9341 colors */
-	0x00, 0x00, 0x00,
-	0x00, 0x00, 0xFF,
-	0x00, 0xFF, 0x00,
-	0x00, 0xFF, 0xFF,
-	0xFF, 0x00, 0x00,
-	0xFF, 0x00, 0xFF,
-	0xFF, 0xFF, 0x00,
-	0xFF, 0xFF, 0xFF
 };
 
 
 void odyssey2_state::palette_init()
 {
-	int i;
-
-	for ( i = 0; i < 32; i++ )
+	for ( int i = 0; i < 16; i++ )
 	{
 		palette_set_color_rgb( machine(), i, odyssey2_colors[i*3], odyssey2_colors[i*3+1], odyssey2_colors[i*3+2] );
+	}
+}
+
+
+void g7400_state::palette_init()
+{
+	const UINT8 g7400_colors[] =
+	{
+		0x00,0x00,0x00, 0x00,0x00,0xb6, 0x00,0xb6,0x00, 0x00,0xb6,0xb6,
+		0xb6,0x00,0x00, 0xb6,0x00,0xb6, 0xb6,0xb6,0x00, 0xb6,0xb6,0xb6,
+
+		0x49,0x49,0x49, 0x49,0x49,0xff, 0x49,0xff,0x49, 0x49,0xff,0xff,
+		0xff,0x49,0x49, 0xff,0x49,0xff, 0xff,0xff,0x49, 0xff,0xff,0xff
+		
+	};
+
+	for ( int i = 0; i < 16; i++ )
+	{
+		palette_set_color_rgb( machine(), i, g7400_colors[i*3], g7400_colors[i*3+1], g7400_colors[i*3+2] );
 	}
 }
 
@@ -360,11 +371,17 @@ void odyssey2_state::machine_reset()
 	m_p1 = 0xFF;
 	m_p2 = 0xFF;
 	switch_banks();
+}
+
+
+void g7400_state::machine_reset()
+{
+	odyssey2_state::machine_reset();
 
 	for ( int i = 0; i < 8; i++ )
 	{
-		m_g7400_ic674_decode[i] = 0;
-		m_g7400_ic678_decode[i] = 0;
+		m_ic674_decode[i] = 0;
+		m_ic678_decode[i] = 0;
 	}
 }
 
@@ -410,7 +427,7 @@ WRITE8_MEMBER(odyssey2_state::io_write)
 }
 
 
-READ8_MEMBER(odyssey2_state::g7400_io_read)
+READ8_MEMBER(g7400_state::io_read)
 {
 	if ((m_p1 & (P1_VDC_COPY_MODE_ENABLE | P1_VDC_ENABLE)) == 0)
 	{
@@ -429,7 +446,7 @@ READ8_MEMBER(odyssey2_state::g7400_io_read)
 }
 
 
-WRITE8_MEMBER(odyssey2_state::g7400_io_write)
+WRITE8_MEMBER(g7400_state::io_write)
 {
 	if ((m_p1 & (P1_EXT_RAM_ENABLE | P1_VDC_COPY_MODE_ENABLE)) == 0x00)
 	{
@@ -464,7 +481,7 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess)
 }
 
 
-WRITE16_MEMBER(odyssey2_state::scanline_postprocess_g7400)
+WRITE16_MEMBER(g7400_state::scanline_postprocess)
 {
 	int vpos = data;
 	int y = vpos - i8244_device::START_Y - 5;
@@ -483,12 +500,12 @@ WRITE16_MEMBER(odyssey2_state::scanline_postprocess_g7400)
 	{
 		UINT16 d = bitmap->pix16( vpos, x );
 
-		if ( ( ! m_g7400_ic678_decode[ d & 0x07 ] ) && x >= x_real_start && x < x_real_end && y >= 0 && y < 240 )
+		if ( ( ! m_ic678_decode[ d & 0x07 ] ) && x >= x_real_start && x < x_real_end && y >= 0 && y < 240 )
 		{
 			// Use EF934x input
 			d = ef934x_bitmap->pix16( y, x - x_real_start ) & 0x07;
 
-			if ( ! m_g7400_ic674_decode[ d & 0x07 ] )
+			if ( ! m_ic674_decode[ d & 0x07 ] )
 			{
 				d |= 0x08;
 			}
@@ -577,11 +594,13 @@ READ8_MEMBER(odyssey2_state::p2_read)
 WRITE8_MEMBER(odyssey2_state::p2_write)
 {
 	m_p2 = data;
+}
 
-	if ( m_i8243 )
-	{
-		m_i8243->i8243_p2_w( space, 0, m_p2 & 0x0f );
-	}
+
+WRITE8_MEMBER(g7400_state::p2_write)
+{
+	m_p2 = data;
+	m_i8243->i8243_p2_w( space, 0, m_p2 & 0x0f );
 }
 
 
@@ -613,40 +632,40 @@ WRITE8_MEMBER(odyssey2_state::bus_write)
     i8243 in the g7400
 */
 
-WRITE8_MEMBER(odyssey2_state::i8243_port_w)
+WRITE8_MEMBER(g7400_state::i8243_port_w)
 {
 	switch ( offset & 3 )
 	{
 		case 0: // "port 4"
 logerror("setting ef-port4 to %02x\n", data);
-			m_g7400_ic674_decode[4] = BIT(data,0);
-			m_g7400_ic674_decode[5] = BIT(data,1);
-			m_g7400_ic674_decode[6] = BIT(data,2);
-			m_g7400_ic674_decode[7] = BIT(data,3);
+			m_ic674_decode[4] = BIT(data,0);
+			m_ic674_decode[5] = BIT(data,1);
+			m_ic674_decode[6] = BIT(data,2);
+			m_ic674_decode[7] = BIT(data,3);
 			break;
 
 		case 1: // "port 5"
 logerror("setting ef-port5 to %02x\n", data);
-			m_g7400_ic674_decode[0] = BIT(data,0);
-			m_g7400_ic674_decode[1] = BIT(data,1);
-			m_g7400_ic674_decode[2] = BIT(data,2);
-			m_g7400_ic674_decode[3] = BIT(data,3);
+			m_ic674_decode[0] = BIT(data,0);
+			m_ic674_decode[1] = BIT(data,1);
+			m_ic674_decode[2] = BIT(data,2);
+			m_ic674_decode[3] = BIT(data,3);
 			break;
 
 		case 2: // "port 6"
 logerror("setting vdc-port6 to %02x\n", data);
-			m_g7400_ic678_decode[4] = BIT(data,0);
-			m_g7400_ic678_decode[5] = BIT(data,1);
-			m_g7400_ic678_decode[6] = BIT(data,2);
-			m_g7400_ic678_decode[7] = BIT(data,3);
+			m_ic678_decode[4] = BIT(data,0);
+			m_ic678_decode[5] = BIT(data,1);
+			m_ic678_decode[6] = BIT(data,2);
+			m_ic678_decode[7] = BIT(data,3);
 			break;
 
 		case 3: // "port 7"
 logerror("setting vdc-port7 to %02x\n", data);
-			m_g7400_ic678_decode[0] = BIT(data,0);
-			m_g7400_ic678_decode[1] = BIT(data,1);
-			m_g7400_ic678_decode[2] = BIT(data,2);
-			m_g7400_ic678_decode[3] = BIT(data,3);
+			m_ic678_decode[0] = BIT(data,0);
+			m_ic678_decode[1] = BIT(data,1);
+			m_ic678_decode[2] = BIT(data,2);
+			m_ic678_decode[3] = BIT(data,3);
 			break;
 
 	}
@@ -756,7 +775,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
 	MCFG_GFXDECODE( odyssey2 )
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_LENGTH(16)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -771,7 +790,7 @@ static MACHINE_CONFIG_START( videopac, odyssey2_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( g7400, odyssey2_state )
+static MACHINE_CONFIG_START( g7400, g7400_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", I8048, XTAL_5_911MHz )
 	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
@@ -784,14 +803,14 @@ static MACHINE_CONFIG_START( g7400, odyssey2_state )
 	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
 
 	MCFG_GFXDECODE( odyssey2 )
-	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_LENGTH(16)
 
-	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(odyssey2_state,i8243_port_w))
+	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(g7400_state,i8243_port_w))
 
 	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_I8245_ADD( "i8244", 3540000 * 2, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( odyssey2_state, scanline_postprocess_g7400 ) )
+	MCFG_I8245_ADD( "i8244", 3540000 * 2, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( g7400_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
