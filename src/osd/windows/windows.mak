@@ -253,8 +253,9 @@ CCOMFLAGS += -include $(WINSRC)/winprefix.h
 
 # ensure we statically link the gcc runtime lib
 LDFLAGS += -static-libgcc
+# TODO: needs to use $(CC)
 TEST_GCC = $(shell gcc --version)
-ifeq ($(findstring 4.4,$(TEST_GCC)),)
+ifeq ($(findstring 4.4.,$(TEST_GCC)),)
 	#if we use new tools
 	LDFLAGS += -static-libstdc++
 endif
