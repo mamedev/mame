@@ -1059,10 +1059,12 @@ void hlsl_info::init_fsfx_quad(void *vertbuf)
 
 int hlsl_info::create_resources(bool reset)
 {
-	initialized = true;
+	initialized = false;
 
 	if (!master_enable || !d3dintf->post_fx_available)
 		return 0;
+
+	initialized = true;
 
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 
