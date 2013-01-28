@@ -9,9 +9,16 @@
 #ifndef APPLE2GS_H_
 #define APPLE2GS_H_
 
+#define RUN_ADB_MICRO (0)
+
 #include "includes/apple2.h"
 #include "sound/es5503.h"
 #include "machine/nvram.h"
+#if RUN_ADB_MICRO
+#include "cpu/m6502/m5074x.h"
+#endif
+
+#define ADBMICRO_TAG	"adbmicro"
 
 // IIgs clocks as marked on the schematics
 #define APPLE2GS_28M  (XTAL_28_63636MHz) // IIGS master clock
@@ -23,6 +30,31 @@
 #define BORDER_RIGHT    (32)
 #define BORDER_TOP  (16)    // (plus bottom)
 
+// these are numbered as seen from the MCU
+enum glu_reg_names
+{
+    GLU_KEY_DATA = 0,   // MCU W
+    GLU_COMMAND,        // MCU R
+    GLU_MOUSEX,         // MCU W
+    GLU_MOUSEY,         // MCU W
+    GLU_KG_STATUS,      // MCU R
+    GLU_ANY_KEY_DOWN,   // MCU W
+    GLU_KEYMOD,         // MCU W
+    GLU_DATA,           // MCU W
+
+    GLU_C000,   	// 816 R
+    GLU_C010,		// 816 RW
+    GLU_SYSSTAT		// 816 R/(limited) W
+};
+
+enum glu_kg_status 
+{
+    KGS_ANY_KEY_DOWN = 0x01,
+    KGS_KEYSTROBE    = 0x10,
+    KGS_DATA_FULL    = 0x20,
+    KGS_COMMAND_FULL = 0x40,
+    KGS_MOUSEX_FULL  = 0x80
+};
 
 enum apple2gs_clock_mode
 {
@@ -61,12 +93,22 @@ public:
 		: apple2_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_es5503(*this, "es5503"),
-		m_fdc(*this, "fdc")
+		m_fdc(*this, "fdc"),
+		#if RUN_ADB_MICRO
+		m_adbmicro(*this, ADBMICRO_TAG),
+		#endif
+		m_adb_mousex(*this, "adb_mouse_x"),
+		m_adb_mousey(*this, "adb_mouse_y")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<es5503_device> m_es5503;
 	required_device<applefdc_base_device> m_fdc;
+	#if RUN_ADB_MICRO
+	optional_device<m5074x_device> m_adbmicro;
+	#endif
+
+	required_ioport  m_adb_mousex, m_adb_mousey;
 
 	UINT8 *m_slowmem;
 	UINT8 m_newvideo;
@@ -95,6 +137,7 @@ public:
 	UINT32 m_clock_curtime;
 	seconds_t m_clock_curtime_interval;
 	UINT8 m_clock_bram[256];
+	#if !RUN_ADB_MICRO
 	adbstate_t m_adb_state;
 	UINT8 m_adb_command;
 	UINT8 m_adb_mode;
@@ -109,6 +152,7 @@ public:
 	UINT8 m_adb_memory[0x100];
 	int m_adb_address_keyboard;
 	int m_adb_address_mouse;
+	#endif
 	UINT8 m_sndglu_ctrl;
 	int m_sndglu_addr;
 	int m_sndglu_dummy_read;
@@ -149,6 +193,26 @@ public:
 	DECLARE_WRITE8_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE8_MEMBER(a2bus_inh_w);
 	DECLARE_READ8_MEMBER(apple2gs_read_vector);
+
+    // ADB MCU and ADB GLU stuff
+	#if RUN_ADB_MICRO
+    UINT8 m_glu_regs[8], m_glu_bus, m_glu_sysstat;
+    bool m_glu_mcu_read_kgs, m_glu_816_read_dstat, m_glu_mouse_read_stat, m_adb_line;
+
+	UINT8 keyglu_mcu_read(UINT8 offset);
+    void keyglu_mcu_write(UINT8 offset, UINT8 data);
+    UINT8 keyglu_816_read(UINT8 offset);
+    void keyglu_816_write(UINT8 offset, UINT8 data);
+
+	DECLARE_READ8_MEMBER(adbmicro_p0_in);
+	DECLARE_READ8_MEMBER(adbmicro_p1_in);
+	DECLARE_READ8_MEMBER(adbmicro_p2_in);
+	DECLARE_READ8_MEMBER(adbmicro_p3_in);
+	DECLARE_WRITE8_MEMBER(adbmicro_p0_out);
+	DECLARE_WRITE8_MEMBER(adbmicro_p1_out);
+	DECLARE_WRITE8_MEMBER(adbmicro_p2_out);
+	DECLARE_WRITE8_MEMBER(adbmicro_p3_out);
+	#endif
 };
 
 

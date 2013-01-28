@@ -1516,15 +1516,15 @@ READ8_MEMBER ( apple2_state::apple2_c06x_r )
 				break;
 			case 0x01:
 				/* Open-Apple/Joystick button 0 */
-				result = apple2_pressed_specialkey(space.machine(), SPECIALKEY_BUTTON0);
+				result = apple2_pressed_specialkey(SPECIALKEY_BUTTON0);
 				break;
 			case 0x02:
 				/* Closed-Apple/Joystick button 1 */
-				result = apple2_pressed_specialkey(space.machine(), SPECIALKEY_BUTTON1);
+				result = apple2_pressed_specialkey(SPECIALKEY_BUTTON1);
 				break;
 			case 0x03:
 				/* Joystick button 2. Later revision motherboards connected this to SHIFT also */
-				result = apple2_pressed_specialkey(space.machine(), SPECIALKEY_BUTTON2);
+				result = apple2_pressed_specialkey(SPECIALKEY_BUTTON2);
 				break;
 			case 0x04:
 				/* X Joystick 1 axis */
@@ -1567,10 +1567,10 @@ READ8_MEMBER ( apple2_state::apple2_c07x_r )
 
 		if (offset == 0)
 		{
-			m_joystick_x1_time = space.machine().time().as_double() + x_calibration * space.machine().root_device().ioport("joystick_1_x")->read();
-			m_joystick_y1_time = space.machine().time().as_double() + y_calibration * space.machine().root_device().ioport("joystick_1_y")->read();
-			m_joystick_x2_time = space.machine().time().as_double() + x_calibration * space.machine().root_device().ioport("joystick_2_x")->read();
-			m_joystick_y2_time = space.machine().time().as_double() + y_calibration * space.machine().root_device().ioport("joystick_2_y")->read();
+			m_joystick_x1_time = space.machine().time().as_double() + x_calibration * m_joy1x->read();
+			m_joystick_y1_time = space.machine().time().as_double() + y_calibration * m_joy1y->read();
+			m_joystick_x2_time = space.machine().time().as_double() + x_calibration * m_joy2x->read();
+			m_joystick_y2_time = space.machine().time().as_double() + y_calibration * m_joy2y->read();
 		}
 	}
 	return 0;
@@ -1900,10 +1900,10 @@ MACHINE_START_MEMBER(apple2_state,tk2000)
 	apple2_reset(machine());
 }
 
-int apple2_pressed_specialkey(running_machine &machine, UINT8 key)
+int apple2_state::apple2_pressed_specialkey(UINT8 key)
 {
-	return (machine.root_device().ioport("keyb_special")->read() & key)
-		|| (machine.root_device().ioport("joystick_buttons")->read_safe(0x00) & key);
+	return (m_kbspecial->read() & key)
+		|| (m_joybuttons->read_safe(0x00) & key);
 }
 
 void apple2_state::apple2_refresh_delegates()

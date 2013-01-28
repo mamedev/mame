@@ -356,12 +356,8 @@ static TIMER_CALLBACK(AY3600_poll)
 	int caps_lock = 0;
 	int curkey;
 	int curkey_unmodified;
-
-
-	static const char *const portnames[] = {
-		"keyb_0", "keyb_1", "keyb_2", "keyb_3", "keyb_4", "keyb_5", "keyb_6",
-		"keypad_1", "keypad_2"
-	};
+	ioport_port *portnames[] = { state->m_kb0, state->m_kb1, state->m_kb2, state->m_kb3, state->m_kb4, state->m_kb5, state->m_kb6, 
+								 state->m_kpad1, state->m_kpad2 };
 
 	/* check for these special cases because they affect the emulated key codes */
 
@@ -370,7 +366,7 @@ static TIMER_CALLBACK(AY3600_poll)
 		state->m_time_until_repeat = machine.root_device().ioport("keyb_repeat")->read() & 0x01 ? 0 : ~0;
 
 	/* check caps lock and set LED here */
-	if (apple2_pressed_specialkey(machine, SPECIALKEY_CAPSLOCK))
+	if (state->apple2_pressed_specialkey(SPECIALKEY_CAPSLOCK))
 	{
 		caps_lock = 1;
 		set_led_status(machine,1,1);
@@ -386,7 +382,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	switchkey = A2_KEY_NORMAL;
 
 	/* shift key check */
-	if (apple2_pressed_specialkey(machine, SPECIALKEY_SHIFT))
+	if (state->apple2_pressed_specialkey(SPECIALKEY_SHIFT))
 	{
 		switchkey |= A2_KEY_SHIFT;
 		state->m_keymodreg |= A2_KEYMOD_SHIFT;
@@ -397,7 +393,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	}
 
 	/* control key check - only one control key on the left side on the Apple */
-	if (apple2_pressed_specialkey(machine, SPECIALKEY_CONTROL))
+	if (state->apple2_pressed_specialkey(SPECIALKEY_CONTROL))
 	{
 		switchkey |= A2_KEY_CONTROL;
 		state->m_keymodreg |= A2_KEYMOD_CONTROL;
@@ -408,7 +404,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	}
 
 	/* apple key check */
-	if (apple2_pressed_specialkey(machine, SPECIALKEY_BUTTON0))
+	if (state->apple2_pressed_specialkey(SPECIALKEY_BUTTON0))
 	{
 		state->m_keymodreg |= A2_KEYMOD_COMMAND;
 	}
@@ -418,7 +414,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	}
 
 	/* option key check */
-	if (apple2_pressed_specialkey(machine, SPECIALKEY_BUTTON1))
+	if (state->apple2_pressed_specialkey(SPECIALKEY_BUTTON1))
 	{
 		state->m_keymodreg |= A2_KEYMOD_OPTION;
 	}
@@ -428,21 +424,21 @@ static TIMER_CALLBACK(AY3600_poll)
 	}
 
 	/* reset key check */
-	if (apple2_pressed_specialkey(machine, SPECIALKEY_RESET) &&
+	if (state->apple2_pressed_specialkey(SPECIALKEY_RESET) &&
 		(a2_no_ctrl_reset(machine) || switchkey & A2_KEY_CONTROL))
 	{
 			if (!state->m_reset_flag)
 			{
 				state->m_reset_flag = 1;
 				/* using PULSE_LINE does not allow us to press and hold key */
-				machine.device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+				state->m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 			}
 			return;
 	}
 	if (state->m_reset_flag)
 	{
 		state->m_reset_flag = 0;
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		state->m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		machine.schedule_soft_reset();
 	}
 
@@ -453,7 +449,7 @@ static TIMER_CALLBACK(AY3600_poll)
 
 	for (port = 0; port < num_ports; port++)
 	{
-		data = machine.root_device().ioport(portnames[port])->read();
+		data = portnames[port]->read();
 
 		for (bit = 0; bit < 8; bit++)
 		{
