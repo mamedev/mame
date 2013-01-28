@@ -148,6 +148,15 @@ void uv201_device::device_start()
 
 	initialize_palette();
 
+	memset(m_ram, 0x00, sizeof(m_ram));
+	m_y_int = 0;
+	m_fmod = 0;
+	m_bg = 0;
+	m_cmd = 0;
+	m_freeze_x = 0;
+	m_freeze_y = 0;
+	m_field = 0;
+
 	// state saving
 	save_item(NAME(m_ram));
 	save_item(NAME(m_y_int));
