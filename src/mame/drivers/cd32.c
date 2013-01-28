@@ -238,7 +238,7 @@ CUSTOM_INPUT_MEMBER(cd32_state::cubo_input)
 CUSTOM_INPUT_MEMBER(cd32_state::cd32_sel_mirror_input)
 {
 	ioport_port* ports[2]= { m_p1_port, m_p2_port };
-	UINT8 bits = ports[(int)param]->read();
+	UINT8 bits = ports[(int)(FPTR)param]->read();
 	return (bits & 0x20)>>5;
 }
 
