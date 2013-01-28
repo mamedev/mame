@@ -240,8 +240,8 @@ UINT32 cninja_state::screen_update_robocop2(screen_device &screen, bitmap_ind16 
 
 VIDEO_START_MEMBER(cninja_state,mutantf)
 {
-	machine().device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
-	machine().device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
+	m_sprgen1->alloc_sprite_bitmap();
+	m_sprgen2->alloc_sprite_bitmap();
 }
 
 UINT32 cninja_state::screen_update_mutantf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -258,10 +258,10 @@ UINT32 cninja_state::screen_update_mutantf(screen_device &screen, bitmap_rgb32 &
 	/* Draw playfields */
 	bitmap.fill(0x400, cliprect); /* Confirmed */
 
-	machine().device<decospr_device>("spritegen1")->set_alt_format(true);
-	machine().device<decospr_device>("spritegen2")->set_alt_format(true);
-	machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
-	machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
+	m_sprgen1->set_alt_format(true);
+	m_sprgen2->set_alt_format(true);
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
 
 
 	/* There is no priority prom on this board, but there is a
@@ -282,13 +282,13 @@ UINT32 cninja_state::screen_update_mutantf(screen_device &screen, bitmap_rgb32 &
 
 	if (priority & 1)
 	{
-		machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x100, 0x1ff);
-		machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 1024+768, 0x0ff, 0x80); // fixed alpha of 0x80 for this layer?
+		m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x100, 0x1ff);
+		m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 1024+768, 0x0ff, 0x80); // fixed alpha of 0x80 for this layer?
 	}
 	else
 	{
-		machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 1024+768, 0x0ff, 0x80);  // fixed alpha of 0x80 for this layer?
-		machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x100, 0x1ff);
+		m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 1024+768, 0x0ff, 0x80);  // fixed alpha of 0x80 for this layer?
+		m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x100, 0x1ff);
 	}
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;

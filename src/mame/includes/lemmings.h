@@ -14,7 +14,8 @@ public:
 		m_vram_data(*this, "vram_data"),
 		m_pixel_0_data(*this, "pixel_0_data"),
 		m_pixel_1_data(*this, "pixel_1_data"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_sprgen2(*this, "spritegen2")
 	{ }
 
 	/* video-related */
@@ -34,6 +35,7 @@ public:
 	required_shared_ptr<UINT16> m_pixel_0_data;
 	required_shared_ptr<UINT16> m_pixel_1_data;
 	optional_device<decospr_device> m_sprgen;
+	optional_device<decospr_device> m_sprgen2;
 
 	DECLARE_WRITE16_MEMBER(lemmings_control_w);
 	DECLARE_READ16_MEMBER(lemmings_trackball_r);

@@ -2,12 +2,12 @@
 #include "includes/boogwing.h"
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
-#include "video/decospr.h"
+
 
 void boogwing_state::video_start()
 {
-	machine().device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
-	machine().device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
+	m_sprgen1->alloc_sprite_bitmap();
+	m_sprgen2->alloc_sprite_bitmap();
 }
 
 
@@ -31,8 +31,8 @@ static void mix_boogwing(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	address_space &space = machine.driver_data()->generic_space();
 	UINT16 priority = decocomn_priority_r(state->m_decocomn, space, 0, 0xffff);
 
-	sprite_bitmap1 = &machine.device<decospr_device>("spritegen1")->get_sprite_temp_bitmap();
-	sprite_bitmap2 = &machine.device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
+	sprite_bitmap1 = &state->m_sprgen1->get_sprite_temp_bitmap();
+	sprite_bitmap2 = &state->m_sprgen1->get_sprite_temp_bitmap();
 	priority_bitmap = &machine.priority_bitmap;
 
 	UINT32* dstline;
@@ -185,8 +185,8 @@ UINT32 boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rgb3
 	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
 
 	/* Draw sprite planes to bitmaps for later mixing */
-	machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
-	machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
 
 	flip_screen_set(BIT(flip, 7));
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);

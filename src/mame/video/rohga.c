@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "includes/rohga.h"
 #include "video/deco16ic.h"
-#include "video/decospr.h"
+
 
 WRITE16_MEMBER(rohga_state::rohga_buffer_spriteram16_w)
 {
@@ -18,15 +18,15 @@ WRITE16_MEMBER(rohga_state::rohga_buffer_spriteram16_w)
 
 VIDEO_START_MEMBER(rohga_state,rohga)
 {
-	machine().device<decospr_device>("spritegen1")->set_col_callback(rohga_col_callback);
-	machine().device<decospr_device>("spritegen1")->set_pri_callback(rohga_pri_callback);
+	m_sprgen1->set_col_callback(rohga_col_callback);
+	m_sprgen1->set_pri_callback(rohga_pri_callback);
 }
 
 VIDEO_START_MEMBER(rohga_state,schmeisr)
 {
 	VIDEO_START_CALL_MEMBER( rohga );
 	// wire mods on pcb..
-	machine().device<decospr_device>("spritegen1")->set_col_callback(schmeisr_col_callback);
+	m_sprgen1->set_col_callback(schmeisr_col_callback);
 }
 
 
@@ -104,7 +104,7 @@ UINT32 rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bit
 		break;
 	}
 
-	machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -114,8 +114,8 @@ UINT32 rohga_state::screen_update_rohga(screen_device &screen, bitmap_ind16 &bit
 
 VIDEO_START_MEMBER(rohga_state,wizdfire)
 {
-	machine().device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
-	machine().device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
+	m_sprgen1->alloc_sprite_bitmap();
+	m_sprgen2->alloc_sprite_bitmap();
 }
 
 // not amazingly efficient, called multiple times to pull a layer out of the sprite bitmaps, but keeps correct sprite<->sprite priorities
@@ -171,8 +171,8 @@ UINT32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &
 	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
 
 	/* draw sprite gfx to temp bitmaps */
-	machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
-	machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, true);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, true);
 
 	/* Update playfields */
 	flip_screen_set(BIT(flip, 7));
@@ -183,16 +183,16 @@ UINT32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &
 	bitmap.fill(machine().pens[512], cliprect);
 
 	deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0600, 0x0600, 0x400, 0x1ff);
+	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0600, 0x0600, 0x400, 0x1ff);
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
-	machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0400, 0x0600, 0x400, 0x1ff);
+	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0400, 0x0600, 0x400, 0x1ff);
 
 	if ((priority & 0x1f) == 0x1f) /* Wizdfire has bit 0x40 always set, Dark Seal 2 doesn't?! */
 		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_ALPHA(0x80), 0);
 	else
 		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 0);
 
-	machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0400, 0x400, 0x1ff); // 0x000 and 0x200 of 0x600
+	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0400, 0x400, 0x1ff); // 0x000 and 0x200 of 0x600
 
 	mixwizdfirelayer(machine(), bitmap, cliprect, 4, 0x000, 0x000);
 
@@ -206,10 +206,10 @@ UINT32 rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &
 	UINT16 flip = deco16ic_pf_control_r(m_deco_tilegen1, space, 0, 0xffff);
 
 	/* draw sprite gfx to temp bitmaps */
-	machine().device<decospr_device>("spritegen1")->set_alt_format(true);
-	machine().device<decospr_device>("spritegen2")->set_alt_format(true);
-	machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, false);
-	machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, false);
+	m_sprgen1->set_alt_format(true);
+	m_sprgen2->set_alt_format(true);
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, false);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, false);
 
 	/* Update playfields */
 	flip_screen_set(BIT(flip, 7));
@@ -226,8 +226,8 @@ UINT32 rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 16);
 
 	/* ToDo reimplement priorities + mixing / alpha, it was busted worse than this before anyway, so no big loss that we don't do it for now ;-) */
-	machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x600, 0xff);
-	machine().device<decospr_device>("spritegen1")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x400, 0x1ff);
+	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x600, 0xff);
+	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0000, 0x400, 0x1ff);
 
 
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);

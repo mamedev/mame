@@ -136,7 +136,6 @@ Dip locations verified with US conversion kit manual.
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
-#include "video/decospr.h"
 
 /**********************************************************************************/
 

@@ -88,7 +88,7 @@
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
-#include "video/decospr.h"
+
 
 static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM

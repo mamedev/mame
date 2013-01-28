@@ -16,7 +16,9 @@ public:
 		m_pf3_rowscroll32(*this, "pf3_rowscroll32"),
 		m_pf4_rowscroll32(*this, "pf4_rowscroll32"),
 		m_ace_ram(*this, "ace_ram"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_sprgen1(*this, "spritegen1"),
+		m_sprgen2(*this, "spritegen2")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -31,6 +33,8 @@ public:
 
 	optional_shared_ptr<UINT32> m_ace_ram;
 	optional_device<decospr_device> m_sprgen;
+	optional_device<decospr_device> m_sprgen1;
+	optional_device<decospr_device> m_sprgen2;
 
 	int m_raster_enable;
 	timer_device *m_raster_irq_timer;

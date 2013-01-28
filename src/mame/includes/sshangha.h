@@ -1,4 +1,5 @@
 #include "video/deco16ic.h"
+#include "video/decospr.h"
 
 class sshangha_state : public driver_device
 {
@@ -15,7 +16,10 @@ public:
 		m_tile_paletteram2(*this, "tile_palram2"),
 		m_sprite_paletteram2(*this, "sprite_palram2"),
 		m_tile_paletteram1(*this, "tile_palram1"),
-		m_prot_data(*this, "prot_data"){ }
+		m_prot_data(*this, "prot_data"),
+		m_sprgen1(*this, "spritegen1"),
+		m_sprgen2(*this, "spritegen2")
+	{ }
 
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_shared_ptr<UINT16> m_spriteram;
@@ -31,6 +35,10 @@ public:
 	required_shared_ptr<UINT16> m_tile_paletteram1;
 
 	optional_shared_ptr<UINT16> m_prot_data;
+
+	optional_device<decospr_device> m_sprgen1;
+	optional_device<decospr_device> m_sprgen2;
+
 	int m_video_control;
 
 

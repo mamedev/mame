@@ -29,7 +29,8 @@ public:
 		m_mainram(*this, "mainram"),
 		m_left_priority(*this, "left_priority"),
 		m_right_priority(*this, "right_priority"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_sprgen2(*this, "spritegen2")
 	{ }
 
 	/* memory pointers */
@@ -39,6 +40,7 @@ public:
 	required_shared_ptr<UINT32> m_left_priority;
 	required_shared_ptr<UINT32> m_right_priority;
 	optional_device<decospr_device> m_sprgen;
+	optional_device<decospr_device> m_sprgen2;
 
 	/* video related */
 	bitmap_ind16  *m_left;
@@ -161,13 +163,13 @@ UINT32 backfire_state::screen_update_backfire_right(screen_device &screen, bitma
 	{
 		deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, 0, 1);
 		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
-		machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
+		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
 	}
 	else if (m_right_priority[0] == 2)
 	{
 		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
 		deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, 0, 4);
-		machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
+		m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram_2, 0x800);
 	}
 	else
 		popmessage( "unknown right priority %08x", m_right_priority[0]);

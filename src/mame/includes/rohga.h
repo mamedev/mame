@@ -8,6 +8,7 @@
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
 #include "video/bufsprite.h"
+#include "video/decospr.h"
 
 class rohga_state : public driver_device
 {
@@ -26,7 +27,10 @@ public:
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
-		m_pf4_rowscroll(*this, "pf4_rowscroll"){ }
+		m_pf4_rowscroll(*this, "pf4_rowscroll"),
+		m_sprgen1(*this, "spritegen1"),
+		m_sprgen2(*this, "spritegen2")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -45,6 +49,8 @@ public:
 	required_shared_ptr<UINT16> m_pf3_rowscroll;
 	required_shared_ptr<UINT16> m_pf4_rowscroll;
 
+	optional_device<decospr_device> m_sprgen1;
+	optional_device<decospr_device> m_sprgen2;
 
 	DECLARE_READ16_MEMBER(rohga_irq_ack_r);
 	DECLARE_WRITE16_MEMBER(wizdfire_irq_ack_w);

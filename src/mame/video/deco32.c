@@ -548,8 +548,8 @@ VIDEO_START_MEMBER(deco32_state,nslasher)
 	width = machine().primary_screen->width();
 	height = machine().primary_screen->height();
 	m_tilemap_alpha_bitmap=auto_bitmap_ind16_alloc(machine(), width, height );
-	machine().device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
-	machine().device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
+	m_sprgen1->alloc_sprite_bitmap();
+	m_sprgen2->alloc_sprite_bitmap();
 	memset(m_dirty_palette,0,4096);
 	state_save_register_global(machine(), m_pri);
 	m_has_ace_ram=1;
@@ -840,11 +840,11 @@ UINT32 deco32_state::screen_update_nslasher(screen_device &screen, bitmap_rgb32 
 	bitmap.fill(machine().pens[0x200], cliprect);
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
-	machine().device<decospr_device>("spritegen1")->set_pix_raw_shift(8);
-	machine().device<decospr_device>("spritegen2")->set_pix_raw_shift(8);
+	m_sprgen1->set_pix_raw_shift(8);
+	m_sprgen2->set_pix_raw_shift(8);
 
-	machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x800, true);
-	machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram16_2_buffered, 0x800, true);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x800, true);
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram16_2_buffered, 0x800, true);
 
 
 	/* Render alpha-blended tilemap to separate buffer for proper mixing */

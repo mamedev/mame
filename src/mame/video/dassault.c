@@ -17,14 +17,13 @@
 #include "video/deco16ic.h"
 #include "includes/dassault.h"
 #include "video/decocomn.h"
-#include "video/decospr.h"
 
 /******************************************************************************/
 
 void dassault_state::video_start()
 {
-	machine().device<decospr_device>("spritegen1")->alloc_sprite_bitmap();
-	machine().device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
+	m_sprgen1->alloc_sprite_bitmap();
+	m_sprgen2->alloc_sprite_bitmap();
 }
 
 static void mixdassaultlayer(running_machine &machine, bitmap_rgb32 &bitmap, bitmap_ind16* sprite_bitmap, const rectangle &cliprect, UINT16 pri, UINT16 primask, UINT16 penbase, UINT8 alpha)
@@ -80,10 +79,10 @@ UINT32 dassault_state::screen_update_dassault(screen_device &screen, bitmap_rgb3
 	UINT16 flip = deco16ic_pf_control_r(m_deco_tilegen1, space, 0, 0xffff);
 	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
 
-	machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, false);
-	machine().device<decospr_device>("spritegen1")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, false);
-	bitmap_ind16* sprite_bitmap1 = &machine().device<decospr_device>("spritegen1")->get_sprite_temp_bitmap();
-	bitmap_ind16* sprite_bitmap2 = &machine().device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
+	m_sprgen2->draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 0x400, false);
+	m_sprgen1->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400, false);
+	bitmap_ind16* sprite_bitmap1 = &m_sprgen1->get_sprite_temp_bitmap();
+	bitmap_ind16* sprite_bitmap2 = &m_sprgen2->get_sprite_temp_bitmap();
 
 	/* Update tilemaps */
 	flip_screen_set(BIT(flip, 7));

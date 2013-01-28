@@ -29,7 +29,9 @@ public:
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
 		m_pf4_rowscroll(*this, "pf4_rowscroll"),
 		m_ram(*this, "ram"),
-		m_sprgen(*this, "spritegen")
+		m_sprgen(*this, "spritegen"),
+		m_sprgen1(*this, "spritegen1"),
+		m_sprgen2(*this, "spritegen2")
 	{ }
 
 	/* devices */
@@ -49,6 +51,8 @@ public:
 	required_shared_ptr<UINT16> m_pf4_rowscroll;
 	optional_shared_ptr<UINT16> m_ram;
 	optional_device<decospr_device> m_sprgen;
+	optional_device<decospr_device> m_sprgen1;
+	optional_device<decospr_device> m_sprgen2;
 
 	/* misc */
 	int        m_scanline;

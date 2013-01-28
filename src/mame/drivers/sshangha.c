@@ -51,7 +51,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "includes/sshangha.h"
-#include "video/decospr.h"
 #include "video/deco16ic.h"
 
 #define SSHANGHA_HACK   0
