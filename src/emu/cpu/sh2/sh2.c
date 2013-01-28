@@ -128,7 +128,7 @@ INLINE sh2_state *get_safe_token(device_t *device)
 INLINE UINT8 RB(sh2_state *sh2, offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xff << (((~A) & 3)*8)) >> (((~A) & 3)*8);
+		return sh2_internal_r(*sh2->internal, (A & 0x1fc)>>2, 0xff << (((~A) & 3)*8)) >> (((~A) & 3)*8);
 
 	if (A >= 0xc0000000)
 		return sh2->program->read_byte(A);
@@ -142,7 +142,7 @@ INLINE UINT8 RB(sh2_state *sh2, offs_t A)
 INLINE UINT16 RW(sh2_state *sh2, offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
+		return sh2_internal_r(*sh2->internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
 
 	if (A >= 0xc0000000)
 		return sh2->program->read_word(A);
@@ -156,7 +156,7 @@ INLINE UINT16 RW(sh2_state *sh2, offs_t A)
 INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
+		return sh2_internal_r(*sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
 		return sh2->program->read_dword(A);
@@ -171,7 +171,7 @@ INLINE void WB(sh2_state *sh2, offs_t A, UINT8 V)
 {
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w(sh2->internal, (A & 0x1fc)>>2, V << (((~A) & 3)*8), 0xff << (((~A) & 3)*8));
+		sh2_internal_w(*sh2->internal, (A & 0x1fc)>>2, V << (((~A) & 3)*8), 0xff << (((~A) & 3)*8));
 		return;
 	}
 
@@ -191,7 +191,7 @@ INLINE void WW(sh2_state *sh2, offs_t A, UINT16 V)
 {
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w(sh2->internal, (A & 0x1fc)>>2, V << (((~A) & 2)*8), 0xffff << (((~A) & 2)*8));
+		sh2_internal_w(*sh2->internal, (A & 0x1fc)>>2, V << (((~A) & 2)*8), 0xffff << (((~A) & 2)*8));
 		return;
 	}
 
@@ -211,7 +211,7 @@ INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
 {
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w(sh2->internal, (A & 0x1fc)>>2, V, 0xffffffff);
+		sh2_internal_w(*sh2->internal, (A & 0x1fc)>>2, V, 0xffffffff);
 		return;
 	}
 
