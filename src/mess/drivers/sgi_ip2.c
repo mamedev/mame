@@ -53,24 +53,14 @@ class sgi_ip2_state : public driver_device
 {
 public:
 	sgi_ip2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_terminal(*this, TERMINAL_TAG) ,
-		m_mainram(*this, "mainram"),
-		m_bss(*this, "bss"),
-		m_ptmap(*this, "ptmap"){ }
-
-	required_device<generic_terminal_device> m_terminal;
-	required_shared_ptr<UINT32> m_mainram;
-	required_shared_ptr<UINT32> m_bss;
-	required_shared_ptr<UINT32> m_ptmap;
-	UINT8 m_mbut;
-	UINT16 m_mquad;
-	UINT16 m_tdbase;
-	UINT16 m_tdlmt;
-	UINT16 m_stkbase;
-	UINT16 m_stklmt;
-	UINT8 m_parctl;
-	UINT8 m_mbp;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_terminal(*this, TERMINAL_TAG)
+		, m_mainram(*this, "mainram")
+		, m_bss(*this, "bss")
+		, m_ptmap(*this, "ptmap")
+		, m_rtc(*this, "rtc")
+	{ }
 
 	DECLARE_READ8_MEMBER(sgi_ip2_m_but_r);
 	DECLARE_WRITE8_MEMBER(sgi_ip2_m_but_w);
@@ -100,10 +90,26 @@ public:
 	DECLARE_READ16_MEMBER(sgi_ip2_stklmt_r);
 	DECLARE_WRITE16_MEMBER(sgi_ip2_stklmt_w);
 	DECLARE_DRIVER_INIT(sgi_ip2);
-	virtual void machine_start();
-	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(sgi_ip2_vbl);
 	DECLARE_WRITE8_MEMBER(sgi_kbd_put);
+	required_device<cpu_device> m_maincpu;
+protected:
+	required_device<generic_terminal_device> m_terminal;
+	required_shared_ptr<UINT32> m_mainram;
+	required_shared_ptr<UINT32> m_bss;
+	required_shared_ptr<UINT32> m_ptmap;
+	required_device<mc146818_device> m_rtc;
+private:
+	UINT8 m_mbut;
+	UINT16 m_mquad;
+	UINT16 m_tdbase;
+	UINT16 m_tdlmt;
+	UINT16 m_stkbase;
+	UINT16 m_stklmt;
+	UINT8 m_parctl;
+	UINT8 m_mbp;
+	virtual void machine_start();
+	virtual void machine_reset();
 };
 
 
@@ -177,8 +183,7 @@ READ16_MEMBER(sgi_ip2_state::sgi_ip2_swtch_r)
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_r)
 {
-	mc146818_device *rtc = machine().device<mc146818_device>("rtc");
-	UINT8 ret = rtc->read(space, 1);
+	UINT8 ret = m_rtc->read(space, 1);
 	verboselog(machine(), 1, "sgi_ip2_clock_ctl_r: %02x\n", ret);
 	return ret;
 }
@@ -186,15 +191,12 @@ READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_r)
 WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_ctl_w)
 {
 	verboselog(machine(), 1, "sgi_ip2_clock_ctl_w: %02x\n", data);
-	mc146818_device *rtc = machine().device<mc146818_device>("rtc");
-	rtc->write(space, 1, data);
+	m_rtc->write(space, 1, data);
 }
 
 READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_r)
 {
-	mc146818_device *rtc = machine().device<mc146818_device>("rtc");
-	UINT8 ret = rtc->read(space, 0);
-
+	UINT8 ret = m_rtc->read(space, 0);
 	verboselog(machine(), 1, "sgi_ip2_clock_data_r: %02x\n", ret);
 	return ret;
 }
@@ -202,8 +204,7 @@ READ8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_r)
 WRITE8_MEMBER(sgi_ip2_state::sgi_ip2_clock_data_w)
 {
 	verboselog(machine(), 1, "sgi_ip2_clock_data_w: %02x\n", data);
-	mc146818_device *rtc = machine().device<mc146818_device>("rtc");
-	rtc->write(space, 0, data);
+	m_rtc->write(space, 0, data);
 }
 
 
@@ -415,8 +416,9 @@ ADDRESS_MAP_END
 
 static void duarta_irq_handler(device_t *device, int state, UINT8 vector)
 {
+	sgi_ip2_state *drvstate = device->machine().driver_data<sgi_ip2_state>();
 	verboselog(device->machine(), 0, "duarta_irq_handler\n");
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 };
 
 static UINT8 duarta_input(device_t *device)
@@ -447,8 +449,9 @@ static const duart68681_config sgi_ip2_duart68681a_config =
 
 static void duartb_irq_handler(device_t *device, int state, UINT8 vector)
 {
+	sgi_ip2_state *drvstate = device->machine().driver_data<sgi_ip2_state>();
 	verboselog(device->machine(), 0, "duartb_irq_handler\n");
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
+	drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 };
 
 static UINT8 duartb_input(device_t *device)
@@ -549,7 +552,7 @@ DRIVER_INIT_MEMBER(sgi_ip2_state,sgi_ip2)
 	UINT32 *dst = m_mainram;
 	memcpy(dst, src, 8);
 
-	machine().device("maincpu")->reset();
+	m_maincpu->reset();
 }
 
 /***************************************************************************
