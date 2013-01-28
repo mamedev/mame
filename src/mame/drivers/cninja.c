@@ -51,7 +51,6 @@ Note about version levels using Mutant Fighter as the example:
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
-#include "video/decospr.h"
 #include "video/decocomn.h"
 
 WRITE16_MEMBER(cninja_state::cninja_sound_w)

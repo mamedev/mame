@@ -33,12 +33,15 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_sprgen(*this, "spritegen")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_pf1_rowscroll;
 	required_shared_ptr<UINT16> m_pf2_rowscroll;
 	required_shared_ptr<UINT16> m_spriteram;
+	optional_device<decospr_device> m_sprgen;
 
 	/* protection */
 	UINT16 m_008_data;
@@ -116,7 +119,7 @@ UINT32 dblewing_state::screen_update_dblewing(screen_device &screen, bitmap_ind1
 
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 4);
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }
 

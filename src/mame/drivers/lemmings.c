@@ -21,7 +21,6 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/lemmings.h"
-#include "video/decospr.h"
 
 WRITE16_MEMBER(lemmings_state::lemmings_control_w)
 {

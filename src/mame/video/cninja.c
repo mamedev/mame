@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "video/deco16ic.h"
 #include "includes/cninja.h"
-#include "video/decospr.h"
 #include "video/decocomn.h"
 
 /******************************************************************************/
@@ -139,7 +138,7 @@ UINT32 cninja_state::screen_update_cninja(screen_device &screen, bitmap_ind16 &b
 	deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 2);
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 4);
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -183,7 +182,7 @@ UINT32 cninja_state::screen_update_edrandy(screen_device &screen, bitmap_ind16 &
 	deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 1);
 	deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 4);
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -234,7 +233,7 @@ UINT32 cninja_state::screen_update_robocop2(screen_device &screen, bitmap_ind16 
 			break;
 	}
 
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

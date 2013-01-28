@@ -14,7 +14,7 @@
 
 #include "emu.h"
 #include "includes/lemmings.h"
-#include "video/decospr.h"
+
 
 /******************************************************************************/
 
@@ -38,7 +38,7 @@ void lemmings_state::video_start()
 
 	machine().gfx[2]->set_source(m_vram_buffer);
 
-	machine().device<decospr_device>("spritegen")->alloc_sprite_bitmap();
+	m_sprgen->alloc_sprite_bitmap();
 	machine().device<decospr_device>("spritegen2")->alloc_sprite_bitmap();
 
 	save_item(NAME(m_bitmap0));
@@ -135,11 +135,11 @@ UINT32 lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rgb3
 	rect.max_y = cliprect.max_y;
 	rect.min_y = cliprect.min_y;
 
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_1, 0x400, true);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_1, 0x400, true);
 	machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, m_sprite_triple_buffer_0, 0x400, true);
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
-	machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x300, 0xff);
+	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x300, 0xff);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
 	if ((m_control_data[6] & 2) == 0)
@@ -158,7 +158,7 @@ UINT32 lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rgb3
 	}
 
 	machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0xff);
-	machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x300, 0xff);
+	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x300, 0xff);
 	m_vram_tilemap->draw(bitmap, cliprect, 0, 0);
 	machine().device<decospr_device>("spritegen2")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0xff);
 	return 0;

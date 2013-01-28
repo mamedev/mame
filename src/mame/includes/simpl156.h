@@ -7,6 +7,7 @@
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
+#include "video/decospr.h"
 
 class simpl156_state : public driver_device
 {
@@ -18,7 +19,9 @@ public:
 			m_eeprom(*this, "eeprom"),
 			m_okimusic(*this, "okimusic") ,
 		m_mainram(*this, "mainram"),
-		m_systemram(*this, "systemram"){ }
+		m_systemram(*this, "systemram"),
+		m_sprgen(*this, "spritegen")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -30,6 +33,7 @@ public:
 	UINT16 *  m_pf2_rowscroll;
 	required_shared_ptr<UINT32> m_mainram;
 	required_shared_ptr<UINT32> m_systemram;
+	optional_device<decospr_device> m_sprgen;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
 

@@ -63,8 +63,6 @@ Notes:
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/gotcha.h"
-#include "video/decospr.h"
-
 
 WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
 {

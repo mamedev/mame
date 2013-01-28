@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "video/decospr.h"
+
 class tumblep_state : public driver_device
 {
 public:
@@ -11,12 +13,15 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_spriteram(*this, "spriteram"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
-		m_pf2_rowscroll(*this, "pf2_rowscroll"){ }
+		m_pf2_rowscroll(*this, "pf2_rowscroll"),
+		m_sprgen(*this, "spritegen")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
 	required_shared_ptr<UINT16> m_pf1_rowscroll;
 	required_shared_ptr<UINT16> m_pf2_rowscroll;
+	optional_device<decospr_device> m_sprgen;
 //  UINT16 *  m_paletteram;    // currently this uses generic palette handling (in decocomn.c)
 
 	/* devices */

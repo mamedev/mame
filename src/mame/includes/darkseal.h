@@ -1,5 +1,6 @@
 #include "video/deco16ic.h"
 #include "video/bufsprite.h"
+#include "video/decospr.h"
 
 class darkseal_state : public driver_device
 {
@@ -11,7 +12,9 @@ public:
 			m_spriteram(*this, "spriteram") ,
 		m_ram(*this, "ram"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
-		m_pf3_rowscroll(*this, "pf3_rowscroll"){ }
+		m_pf3_rowscroll(*this, "pf3_rowscroll"),
+		m_sprgen(*this, "spritegen")
+	{ }
 
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<deco16ic_device> m_deco_tilegen2;
@@ -21,6 +24,7 @@ public:
 	//UINT16 *m_pf2_rowscroll;
 	required_shared_ptr<UINT16> m_pf3_rowscroll;
 	//UINT16 *m_pf4_rowscroll;
+	optional_device<decospr_device> m_sprgen;
 
 
 	int m_flipscreen;

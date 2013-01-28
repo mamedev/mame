@@ -1,7 +1,6 @@
 #include "emu.h"
 #include "video/deco16ic.h"
 #include "includes/pktgaldx.h"
-#include "video/decospr.h"
 
 /* Video on the orginal */
 
@@ -17,7 +16,7 @@ UINT32 pktgaldx_state::screen_update_pktgaldx(screen_device &screen, bitmap_ind1
 	machine().priority_bitmap.fill(0);
 
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400, true);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400, true);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

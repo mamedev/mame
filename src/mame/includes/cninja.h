@@ -8,6 +8,7 @@
 #include "video/deco16ic.h"
 #include "video/decocomn.h"
 #include "video/bufsprite.h"
+#include "video/decospr.h"
 
 class cninja_state : public driver_device
 {
@@ -27,7 +28,9 @@ public:
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
 		m_pf4_rowscroll(*this, "pf4_rowscroll"),
-		m_ram(*this, "ram"){ }
+		m_ram(*this, "ram"),
+		m_sprgen(*this, "spritegen")
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -45,6 +48,7 @@ public:
 	required_shared_ptr<UINT16> m_pf3_rowscroll;
 	required_shared_ptr<UINT16> m_pf4_rowscroll;
 	optional_shared_ptr<UINT16> m_ram;
+	optional_device<decospr_device> m_sprgen;
 
 	/* misc */
 	int        m_scanline;

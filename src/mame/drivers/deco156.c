@@ -30,12 +30,15 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, "maincpu"),
 			m_deco_tilegen1(*this, "tilegen1"),
-			m_oki2(*this, "oki2") { }
+			m_oki2(*this, "oki2"),
+			m_sprgen(*this, "spritegen")
+	{ }
 
 	/* devices */
 	required_device<arm_device> m_maincpu;
 	required_device<deco16ic_device> m_deco_tilegen1;
 	optional_device<okim6295_device> m_oki2;
+	optional_device<decospr_device> m_sprgen;
 
 	/* memory */
 	UINT16   m_pf1_rowscroll[0x800/2];
@@ -81,7 +84,7 @@ UINT32 deco156_state::screen_update_wcvol95(screen_device &screen, bitmap_rgb32 
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x800);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x800);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

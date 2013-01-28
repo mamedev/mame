@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "video/decospr.h"
+
 class pktgaldx_state : public driver_device
 {
 public:
@@ -13,7 +15,9 @@ public:
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_spriteram(*this, "spriteram"),
 		m_pktgaldb_fgram(*this, "pktgaldb_fgram"),
-		m_pktgaldb_sprites(*this, "pktgaldb_spr"){ }
+		m_pktgaldb_sprites(*this, "pktgaldb_spr"),
+		m_sprgen(*this, "spritegen")
+	{ }
 
 	/* memory pointers */
 	optional_shared_ptr<UINT16> m_pf1_rowscroll;
@@ -23,6 +27,7 @@ public:
 
 	optional_shared_ptr<UINT16> m_pktgaldb_fgram;
 	optional_shared_ptr<UINT16> m_pktgaldb_sprites;
+	optional_device<decospr_device> m_sprgen;
 
 	/* devices */
 	cpu_device *m_maincpu;

@@ -235,7 +235,9 @@ public:
 		m_scroll_ram(*this, "scroll_ram"),
 		m_bg_videoram(*this, "bg_videoram"),
 		m_fg_videoram(*this, "fg_videoram"),
-		m_bitmap(*this, "bitmap"){ }
+		m_bitmap(*this, "bitmap"),
+		m_sprgen(*this, "spritegen")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_spriteram;
@@ -243,6 +245,7 @@ public:
 	required_shared_ptr<UINT16> m_bg_videoram;
 	required_shared_ptr<UINT16> m_fg_videoram;
 	required_shared_ptr<UINT16> m_bitmap;
+	optional_device<decospr_device> m_sprgen;
 //  UINT16 *  m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
@@ -892,33 +895,33 @@ UINT32 nmg5_state::screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitma
 
 	if (m_priority_reg == 0)
 	{
-		machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		draw_bitmap(machine(), bitmap);
 	}
 	else if (m_priority_reg == 1)
 	{
 		draw_bitmap(machine(), bitmap);
-		machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else if (m_priority_reg == 2)
 	{
-		machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 		draw_bitmap(machine(), bitmap);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else if (m_priority_reg == 3)
 	{
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 		draw_bitmap(machine(), bitmap);
 	}
 	else if (m_priority_reg == 7)
 	{
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		draw_bitmap(machine(), bitmap);
-		machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	}
 	return 0;
 }

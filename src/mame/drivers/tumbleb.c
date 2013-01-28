@@ -303,7 +303,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "includes/tumbleb.h"
-#include "video/decospr.h"
+
 
 #define TUMBLEP_HACK    0
 #define FNCYWLD_HACK    0

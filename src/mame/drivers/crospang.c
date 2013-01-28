@@ -36,7 +36,7 @@
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "includes/crospang.h"
-#include "video/decospr.h"
+
 
 WRITE16_MEMBER(crospang_state::crospang_soundlatch_w)
 {

@@ -35,7 +35,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 #include "emu.h"
 #include "includes/esd16.h"
-#include "video/decospr.h"
+
 
 /***************************************************************************
 
@@ -217,7 +217,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 	}
 
-	if (layers_ctrl & 4) machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	if (layers_ctrl & 4) m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 
 //  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);
 	return 0;

@@ -1,4 +1,7 @@
 
+#include "video/decospr.h"
+
+
 class tumbleb_state : public driver_device
 {
 public:
@@ -8,7 +11,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_pf1_data(*this, "pf1_data"),
 		m_pf2_data(*this, "pf2_data"),
-		m_control(*this, "control")
+		m_control(*this, "control"),
+		m_sprgen(*this, "spritegen")
 	{ }
 
 	/* memory pointers */
@@ -17,6 +21,7 @@ public:
 	required_shared_ptr<UINT16> m_pf1_data;
 	required_shared_ptr<UINT16> m_pf2_data;
 	optional_shared_ptr<UINT16> m_control;
+	optional_device<decospr_device> m_sprgen;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* misc */

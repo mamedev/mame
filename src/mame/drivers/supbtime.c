@@ -27,7 +27,6 @@ down hardware (it doesn't write any good sound data btw, mostly zeros).
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "includes/supbtime.h"
-#include "video/decospr.h"
 
 /******************************************************************************/
 

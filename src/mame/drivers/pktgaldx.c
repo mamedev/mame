@@ -59,7 +59,6 @@ bootleg todo:
 #include "video/deco16ic.h"
 #include "sound/okim6295.h"
 #include "includes/pktgaldx.h"
-#include "video/decospr.h"
 #include "video/decocomn.h"
 
 /**********************************************************************************/

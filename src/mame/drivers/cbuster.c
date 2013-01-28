@@ -24,7 +24,7 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
-#include "video/decospr.h"
+
 
 WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 {

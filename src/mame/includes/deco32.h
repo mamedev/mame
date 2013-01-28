@@ -1,5 +1,6 @@
 #include "audio/decobsmt.h"
 #include "video/bufsprite.h"
+#include "video/decospr.h"
 
 class deco32_state : public driver_device
 {
@@ -14,7 +15,9 @@ public:
 		m_pf2_rowscroll32(*this, "pf2_rowscroll32"),
 		m_pf3_rowscroll32(*this, "pf3_rowscroll32"),
 		m_pf4_rowscroll32(*this, "pf4_rowscroll32"),
-		m_ace_ram(*this, "ace_ram"){ }
+		m_ace_ram(*this, "ace_ram"),
+		m_sprgen(*this, "spritegen")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<decobsmt_device> m_decobsmt;
@@ -27,6 +30,7 @@ public:
 	required_shared_ptr<UINT32> m_pf4_rowscroll32;
 
 	optional_shared_ptr<UINT32> m_ace_ram;
+	optional_device<decospr_device> m_sprgen;
 
 	int m_raster_enable;
 	timer_device *m_raster_irq_timer;

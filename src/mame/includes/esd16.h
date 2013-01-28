@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "machine/eeprom.h"
+#include "video/decospr.h"
 
 class esd16_state : public driver_device
 {
@@ -18,7 +19,8 @@ public:
 		m_spriteram(*this, "spriteram"),
 		m_head_layersize(*this, "head_layersize"),
 		m_headpanic_platform_x(*this, "platform_x"),
-		m_headpanic_platform_y(*this, "platform_y")
+		m_headpanic_platform_y(*this, "platform_y"),
+		m_sprgen(*this, "spritegen")
 	{
 		m_tilemap0_color = 0;
 		m_tilemap1_color = 0;
@@ -33,6 +35,7 @@ public:
 	required_shared_ptr<UINT16> m_head_layersize;
 	required_shared_ptr<UINT16> m_headpanic_platform_x;
 	required_shared_ptr<UINT16> m_headpanic_platform_y;
+	optional_device<decospr_device> m_sprgen;
 //  UINT16 *       m_paletteram;  // currently this uses generic palette handling
 
 	/* video-related */

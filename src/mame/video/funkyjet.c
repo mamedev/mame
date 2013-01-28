@@ -7,7 +7,6 @@
 #include "emu.h"
 #include "includes/funkyjet.h"
 #include "video/deco16ic.h"
-#include "video/decospr.h"
 
 /******************************************************************************/
 
@@ -22,6 +21,6 @@ UINT32 funkyjet_state::screen_update_funkyjet(screen_device &screen, bitmap_ind1
 	bitmap.fill(768, cliprect);
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }

@@ -20,7 +20,6 @@
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/darkseal.h"
-#include "video/decospr.h"
 #include "video/deco16ic.h"
 
 /******************************************************************************/

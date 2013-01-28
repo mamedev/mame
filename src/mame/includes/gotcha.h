@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "video/decospr.h"
+
 class gotcha_state : public driver_device
 {
 public:
@@ -11,12 +13,15 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_fgvideoram(*this, "fgvideoram"),
 		m_bgvideoram(*this, "bgvideoram"),
-		m_spriteram(*this, "spriteram"){ }
+		m_spriteram(*this, "spriteram"),
+		m_sprgen(*this, "spritegen")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_fgvideoram;
 	required_shared_ptr<UINT16> m_bgvideoram;
 	required_shared_ptr<UINT16> m_spriteram;
+	optional_device<decospr_device> m_sprgen;
 //  UINT16 *    m_paletteram; // currently this uses generic palette handling
 
 	/* video-related */

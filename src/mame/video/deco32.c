@@ -1,6 +1,5 @@
 #include "emu.h"
 #include "includes/deco32.h"
-#include "video/decospr.h"
 #include "video/deco16ic.h"
 
 /******************************************************************************/
@@ -518,7 +517,7 @@ VIDEO_START_MEMBER(deco32_state,captaven)
 VIDEO_START_MEMBER(deco32_state,fghthist)
 {
 	m_dirty_palette = auto_alloc_array(machine(), UINT8, 4096);
-	machine().device<decospr_device>("spritegen")->alloc_sprite_bitmap();
+	m_sprgen->alloc_sprite_bitmap();
 	m_has_ace_ram=0;
 }
 
@@ -599,8 +598,8 @@ UINT32 deco32_state::screen_update_captaven(screen_device &screen, bitmap_ind16 
 
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 4);
 
-	machine().device<decospr_device>("spritegen")->set_alt_format(true);
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x400);
+	m_sprgen->set_alt_format(true);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x400);
 
 	return 0;
 }
@@ -655,7 +654,7 @@ UINT32 deco32_state::screen_update_fghthist(screen_device &screen, bitmap_rgb32 
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 	deco16ic_pf_update(m_deco_tilegen2, m_pf3_rowscroll, m_pf4_rowscroll);
 
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x800, true);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram16_buffered, 0x800, true);
 
 	/* Draw screen */
 	deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, 0, 1);
@@ -663,17 +662,17 @@ UINT32 deco32_state::screen_update_fghthist(screen_device &screen, bitmap_rgb32 
 	if(m_pri&1)
 	{
 		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
-		machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
+		m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
 		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 4);
 	}
 	else
 	{
 		deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 2);
-		machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
+		m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 1024, 0x1ff);
 		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 4);
 	}
 
-	machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 1024, 0x1ff);
+	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 1024, 0x1ff);
 
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;

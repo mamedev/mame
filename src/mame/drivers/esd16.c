@@ -71,7 +71,7 @@ ToDo:
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "includes/esd16.h"
-#include "video/decospr.h"
+
 
 /***************************************************************************
 

@@ -16,7 +16,6 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 #include "emu.h"
 #include "includes/tumbleb.h"
-#include "video/decospr.h"
 
 /******************************************************************************/
 
@@ -434,7 +433,7 @@ UINT32 tumbleb_state::screen_update_sdfight(screen_device &screen, bitmap_ind16 
 
 	tumbleb_draw_common(machine(),bitmap,cliprect, offs2, -16, offs, 0);
 
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 	return 0;
 }
 
@@ -493,6 +492,6 @@ UINT32 tumbleb_state::screen_update_suprtrio(screen_device &screen, bitmap_ind16
 	m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 	return 0;
 }

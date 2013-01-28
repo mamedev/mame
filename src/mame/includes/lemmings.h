@@ -1,4 +1,5 @@
 #include "video/bufsprite.h"
+#include "video/decospr.h"
 
 class lemmings_state : public driver_device
 {
@@ -12,7 +13,9 @@ public:
 		m_control_data(*this, "control_data"),
 		m_vram_data(*this, "vram_data"),
 		m_pixel_0_data(*this, "pixel_0_data"),
-		m_pixel_1_data(*this, "pixel_1_data"){ }
+		m_pixel_1_data(*this, "pixel_1_data"),
+		m_sprgen(*this, "spritegen")
+	{ }
 
 	/* video-related */
 	bitmap_ind16 m_bitmap0;
@@ -30,6 +33,7 @@ public:
 	required_shared_ptr<UINT16> m_vram_data;
 	required_shared_ptr<UINT16> m_pixel_0_data;
 	required_shared_ptr<UINT16> m_pixel_1_data;
+	optional_device<decospr_device> m_sprgen;
 
 	DECLARE_WRITE16_MEMBER(lemmings_control_w);
 	DECLARE_READ16_MEMBER(lemmings_trackball_r);

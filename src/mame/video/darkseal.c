@@ -20,7 +20,6 @@
 
 #include "emu.h"
 #include "includes/darkseal.h"
-#include "video/decospr.h"
 #include "video/deco16ic.h"
 
 /***************************************************************************/
@@ -72,7 +71,7 @@ UINT32 darkseal_state::screen_update_darkseal(screen_device &screen, bitmap_ind1
 	deco16ic_tilemap_2_draw(m_deco_tilegen2, bitmap, cliprect, 0, 0);
 
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 
 	return 0;

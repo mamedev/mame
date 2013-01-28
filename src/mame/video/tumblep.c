@@ -16,7 +16,6 @@ to switch between 8*8 tiles and 16*16 tiles.
 #include "emu.h"
 #include "video/deco16ic.h"
 #include "includes/tumblep.h"
-#include "video/decospr.h"
 
 
 UINT32 tumblep_state::screen_update_tumblep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -32,6 +31,6 @@ UINT32 tumblep_state::screen_update_tumblep(screen_device &screen, bitmap_ind16 
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }

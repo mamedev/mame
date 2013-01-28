@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "includes/crospang.h"
-#include "video/decospr.h"
+
 
 WRITE16_MEMBER(crospang_state::bestri_tilebank_w)
 {
@@ -114,6 +114,6 @@ UINT32 crospang_state::screen_update_crospang(screen_device &screen, bitmap_ind1
 {
 	m_bg_layer->draw(bitmap, cliprect, 0, 0);
 	m_fg_layer->draw(bitmap, cliprect, 0, 0);
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	return 0;
 }

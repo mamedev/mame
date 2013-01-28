@@ -53,7 +53,9 @@ public:
 			m_oki_bgm(*this, "oki_bgm"),
 			m_spriteram(*this, "spriteram") ,
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
-		m_pf2_rowscroll(*this, "pf2_rowscroll"){ }
+		m_pf2_rowscroll(*this, "pf2_rowscroll"),
+		m_sprgen(*this, "spritegen")
+	{ }
 
 
 	/* misc */
@@ -68,6 +70,7 @@ public:
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_pf1_rowscroll;
 	required_shared_ptr<UINT16> m_pf2_rowscroll;
+	optional_device<decospr_device> m_sprgen;
 //  UINT16 *  m_paletteram;    // currently this uses generic palette handling (in decocomn.c)
 	DECLARE_WRITE16_MEMBER(mirage_mux_w);
 	DECLARE_READ16_MEMBER(mirage_input_r);
@@ -82,7 +85,7 @@ public:
 
 void miragemi_state::video_start()
 {
-	machine().device<decospr_device>("spritegen")->alloc_sprite_bitmap();
+	m_sprgen->alloc_sprite_bitmap();
 }
 
 UINT32 miragemi_state::screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -92,16 +95,16 @@ UINT32 miragemi_state::screen_update_mirage(screen_device &screen, bitmap_rgb32 
 
 	flip_screen_set(BIT(flip, 7));
 
-	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
+	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0x400);
 
 	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
 
 	bitmap.fill(256, cliprect); /* not verified */
 
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0x1ff);
+	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0x1ff);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
-	machine().device<decospr_device>("spritegen")->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0x1ff);
+	m_sprgen->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0800, 0x200, 0x1ff);
 
 	return 0;
 }

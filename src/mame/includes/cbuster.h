@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include "video/decospr.h"
+
 class cbuster_state : public driver_device
 {
 public:
@@ -14,7 +16,9 @@ public:
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
 		m_pf4_rowscroll(*this, "pf4_rowscroll"),
-		m_spriteram16(*this, "spriteram16"){ }
+		m_spriteram16(*this, "spriteram16"),
+		m_sprgen(*this, "spritegen")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT16> m_ram;
@@ -23,6 +27,8 @@ public:
 	required_shared_ptr<UINT16> m_pf3_rowscroll;
 	required_shared_ptr<UINT16> m_pf4_rowscroll;
 	required_shared_ptr<UINT16> m_spriteram16;
+	optional_device<decospr_device> m_sprgen;
+
 	UINT16    m_spriteram16_buffer[0x400];
 
 	/* misc */

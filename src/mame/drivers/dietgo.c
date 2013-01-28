@@ -13,7 +13,6 @@
 #include "includes/decoprot.h"
 #include "includes/dietgo.h"
 #include "video/deco16ic.h"
-#include "video/decospr.h"
 #include "video/decocomn.h"
 
 static ADDRESS_MAP_START( dietgo_map, AS_PROGRAM, 16, dietgo_state )
