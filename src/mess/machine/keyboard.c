@@ -36,11 +36,29 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 
 generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, type, name, tag, owner, clock)
+	, m_io_kbd0(*this, "TERM_LINE0")
+	, m_io_kbd1(*this, "TERM_LINE1")
+	, m_io_kbd2(*this, "TERM_LINE2")
+	, m_io_kbd3(*this, "TERM_LINE3")
+	, m_io_kbd4(*this, "TERM_LINE4")
+	, m_io_kbd5(*this, "TERM_LINE5")
+	, m_io_kbd6(*this, "TERM_LINE6")
+	, m_io_kbd7(*this, "TERM_LINE7")
+	, m_io_kbdc(*this, "TERM_LINEC")
 {
 }
 
 generic_keyboard_device::generic_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, GENERIC_KEYBOARD, "Generic Keyboard", tag, owner, clock)
+	, m_io_kbd0(*this, "TERM_LINE0")
+	, m_io_kbd1(*this, "TERM_LINE1")
+	, m_io_kbd2(*this, "TERM_LINE2")
+	, m_io_kbd3(*this, "TERM_LINE3")
+	, m_io_kbd4(*this, "TERM_LINE4")
+	, m_io_kbd5(*this, "TERM_LINE5")
+	, m_io_kbd6(*this, "TERM_LINE6")
+	, m_io_kbd7(*this, "TERM_LINE7")
+	, m_io_kbdc(*this, "TERM_LINEC")
 {
 }
 
@@ -60,17 +78,17 @@ UINT8 generic_keyboard_device::row_number(UINT8 code)
 
 UINT8 generic_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_line)
 {
-	static const char *const keynames[] = { "TERM_LINE0", "TERM_LINE1", "TERM_LINE2", "TERM_LINE3", "TERM_LINE4", "TERM_LINE5", "TERM_LINE6", "TERM_LINE7" };
+	static ioport_port *const keynames[] = { m_io_kbd0, m_io_kbd1, m_io_kbd2, m_io_kbd3, m_io_kbd4, m_io_kbd5, m_io_kbd6, m_io_kbd7 };
 	int i;
 	UINT8 code;
 	UINT8 key_code = 0;
 	UINT8 retVal = 0;
-	UINT8 shift = BIT(ioport("TERM_LINEC")->read(), 1);
-	UINT8 caps  = BIT(ioport("TERM_LINEC")->read(), 2);
-	UINT8 ctrl  = BIT(ioport("TERM_LINEC")->read(), 0);
+	UINT8 shift = BIT(m_io_kbdc->read(), 1);
+	UINT8 caps  = BIT(m_io_kbdc->read(), 2);
+	UINT8 ctrl  = BIT(m_io_kbdc->read(), 0);
 	i = *scan_line;
 	{
-		code =  ioport(keynames[i])->read();
+		code = keynames[i]->read();
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {

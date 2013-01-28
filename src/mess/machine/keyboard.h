@@ -48,6 +48,15 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 protected:
+	required_ioport m_io_kbd0;
+	required_ioport m_io_kbd1;
+	required_ioport m_io_kbd2;
+	required_ioport m_io_kbd3;
+	required_ioport m_io_kbd4;
+	required_ioport m_io_kbd5;
+	required_ioport m_io_kbd6;
+	required_ioport m_io_kbd7;
+	required_ioport m_io_kbdc;
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
