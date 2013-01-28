@@ -827,7 +827,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_DRIVERS)/pet.o       \
 	$(MESS_MACHINE)/pet.o       \
 	$(MESS_DRIVERS)/c64.o       \
-	$(MESS_MACHINE)/c64.o       \
+	$(MESS_MACHINE)/c64_legacy.o       \
 	$(MESS_DRIVERS)/c64dtv.o    \
 	$(MESS_MACHINE)/c64exp.o    \
 	$(MESS_MACHINE)/c64user.o   \
