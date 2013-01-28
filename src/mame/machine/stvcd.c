@@ -1393,12 +1393,13 @@ TIMER_DEVICE_CALLBACK( stv_sh1_sim )
 		return;
 	}
 
+	/* TODO: doesn't boot if a disk isn't in? */
+	/* TODO: Check out when this really happens. (Daytona USA original version definitely wants it to be on).*/
+	//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
+		hirqreg |= SCDQ;
+
 	if(cd_stat & CD_STAT_PERI)
 	{
-		/* TODO: doesn't boot if a disk isn't in? */
-		//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-			hirqreg |= SCDQ;
-
 		cr_standard_return(cd_stat);
 	}
 }
