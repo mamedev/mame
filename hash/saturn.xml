@@ -190,7 +190,7 @@
 	  Clockwork Knight: Pepperouchau no Fukubukuro (Japan) [GS-9074]                        | (cknightc)          Seems playable bug hangs sometimes?
 	  Clockwork Knight: Pepperouchau's Adventure Gekan (Japan) [GS-9029]                    | (cknight2j)         Seems playable bug hangs sometimes?
 	  Clockwork Knight: Pepperouchau's Adventure Joukan (Japan) [GS-9004]                   | (cknightj)          Seems playable bug hangs sometimes?
-	  Clockworks (Japan) [T-22302G]                                                         | (clockwrk)
+	  Clockwerx (Japan) [T-22302G]                                                         | (clockwrk)
 	  Code R (Japan) [T-23502G]                                                             | (coder)
 	  Columns Arcade Collection (Japan) (Sega Ages) [GS-9161]                               | (columns)
 	  Command & Conquer (Japan) [GS-9131]                                                   | (commconqj)
@@ -3153,7 +3153,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying ClockWerx (Japan)... -->
 	<software name="clockwrk" supported="no">
-		<description>Clockworks (Jpn)</description>
+		<description>ClockWerx (Jpn)</description>
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
 		<info name="serial" value="T-22302G"/>
@@ -15705,7 +15705,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying ClockWerx (T-22302G)... -->
 	<software name="clockwrka" cloneof="clockwrk" supported="no">
-		<description>Clockworks (Jpn, Alt)</description>
+		<description>ClockWerx (Jpn, Alt)</description>
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
 		<info name="serial" value="T-22302G"/>

@@ -225,11 +225,11 @@ static int get_track_index(void)
 
 static void cr_standard_return(UINT16 cur_status)
 {
-	cd_stat |= CD_STAT_PERI;
 	cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
 	cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track); // TODO: fix current track
 	cr3 = (get_track_index()<<8) | (cd_curfad>>16); //index & 0xff00
 	cr4 = cd_curfad;
+	cd_stat |= CD_STAT_PERI;
 }
 
 static void cd_free_block(blockT *blktofree);
