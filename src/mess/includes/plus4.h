@@ -6,7 +6,6 @@
 #include "emu.h"
 #include "cpu/m6502/m7501.h"
 #include "formats/cbm_snqk.h"
-#include "includes/cbm.h"
 #include "audio/t6721.h"
 #include "audio/mos7360.h"
 #include "machine/6551acia.h"
@@ -27,6 +26,8 @@
 #define T6721_TAG           "t6721"
 #define PLA_TAG             "u19"
 #define SCREEN_TAG          "screen"
+#define CONTROL1_TAG    	"joy1"
+#define CONTROL2_TAG   	 	"joy2"
 
 class plus4_state : public driver_device
 {
@@ -41,6 +42,8 @@ public:
 			m_spi_kb(*this, MOS6529_KB_TAG),
 			m_t6721(*this, T6721_TAG),
 			m_iec(*this, CBM_IEC_TAG),
+			m_joy1(*this, CONTROL1_TAG),
+			m_joy2(*this, CONTROL2_TAG),
 			m_exp(*this, PLUS4_EXPANSION_SLOT_TAG),
 			m_user(*this, PLUS4_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
@@ -48,6 +51,15 @@ public:
 			m_kernal(*this, "kernal"),
 			m_function(*this, "function"),
 			m_c2(*this, "c2"),
+			m_row0(*this, "ROW0"),
+			m_row1(*this, "ROW1"),
+			m_row2(*this, "ROW2"),
+			m_row3(*this, "ROW3"),
+			m_row4(*this, "ROW4"),
+			m_row5(*this, "ROW5"),
+			m_row6(*this, "ROW6"),
+			m_row7(*this, "ROW7"),
+			m_lock(*this, "LOCK"),
 			m_addr(0),
 			m_ted_irq(CLEAR_LINE),
 			m_acia_irq(CLEAR_LINE),
@@ -62,6 +74,8 @@ public:
 	required_device<mos6529_device> m_spi_kb;
 	optional_device<t6721_device> m_t6721;
 	required_device<cbm_iec_device> m_iec;
+	required_device<vcs_control_port_device> m_joy1;
+	required_device<vcs_control_port_device> m_joy2;
 	required_device<plus4_expansion_slot_device> m_exp;
 	optional_device<plus4_user_port_device> m_user;
 	required_device<ram_device> m_ram;
@@ -69,6 +83,15 @@ public:
 	required_memory_region m_kernal;
 	optional_memory_region m_function;
 	optional_memory_region m_c2;
+	required_ioport m_row0;
+	required_ioport m_row1;
+	required_ioport m_row2;
+	required_ioport m_row3;
+	required_ioport m_row4;
+	required_ioport m_row5;
+	required_ioport m_row6;
+	required_ioport m_row7;
+	required_ioport m_lock;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -107,8 +130,8 @@ public:
 	int m_exp_irq;
 
 	// keyboard state
-	UINT8 m_port6529;
-	UINT8 m_keyline[10];
+	UINT8 m_kb;
+
 	INTERRUPT_GEN_MEMBER(c16_raster_interrupt);
 	INTERRUPT_GEN_MEMBER(c16_frame_interrupt);
 };
