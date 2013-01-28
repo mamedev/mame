@@ -8,14 +8,12 @@
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cartslot.h"
 #include "imagedev/cassette.h"
-#include "imagedev/flopdrv.h"
-#include "formats/basicdsk.h"
-#include "machine/ctronics.h"
 #include "machine/6821pia.h"
+#include "machine/ctronics.h"
+#include "machine/ram.h"
 #include "sound/sn76496.h"
 #include "sound/wave.h"
 #include "video/tms9928a.h"
-#include "machine/ram.h"
 
 #define SCREEN_TAG      "screen"
 #define M6502_TAG       "u2"
@@ -79,7 +77,19 @@ class laser2001_state : public crvision_state
 {
 public:
 	laser2001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: crvision_state(mconfig, type, tag)
+		: crvision_state(mconfig, type, tag),
+			m_y0(*this, "Y0"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2"),
+			m_y3(*this, "Y3"),
+			m_y4(*this, "Y4"),
+			m_y5(*this, "Y5"),
+			m_y6(*this, "Y6"),
+			m_y7(*this, "Y7"),
+			m_joy0(*this, "JOY0"),
+			m_joy1(*this, "JOY1"),
+			m_joy2(*this, "JOY2"),
+			m_joy3(*this, "JOY3")
 	{ }
 
 	virtual void machine_start();
@@ -92,6 +102,19 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pia_ca2_w );
 	DECLARE_READ_LINE_MEMBER( pia_cb1_r );
 	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
+
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_joy0;
+	required_ioport m_joy1;
+	required_ioport m_joy2;
+	required_ioport m_joy3;
 };
 
 #endif

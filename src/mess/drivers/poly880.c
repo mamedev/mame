@@ -187,16 +187,16 @@ READ8_MEMBER( poly880_state::pio1_pb_r )
 
 	*/
 
-	UINT8 data = 0xf0 | (((m_cassette)->input() < +0.0) << 1);
+	UINT8 data = 0xf0 | ((m_cassette->input() < +0.0) << 1);
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
 		if (BIT(m_digit, i))
 		{
-			if (!BIT(ioport("KI1")->read(), i)) data &= ~0x10;
-			if (!BIT(ioport("KI2")->read(), i)) data &= ~0x20;
-			if (!BIT(ioport("KI3")->read(), i)) data &= ~0x80;
+			if (!BIT(m_ki1->read(), i)) data &= ~0x10;
+			if (!BIT(m_ki2->read(), i)) data &= ~0x20;
+			if (!BIT(m_ki3->read(), i)) data &= ~0x80;
 		}
 	}
 

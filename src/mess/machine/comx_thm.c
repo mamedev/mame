@@ -54,7 +54,8 @@ const rom_entry *comx_thm_device::device_rom_region() const
 
 comx_thm_device::comx_thm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_THM, "COMX-35 Thermal Printer Card", tag, owner, clock),
-	device_comx_expansion_card_interface(mconfig, *this)
+	device_comx_expansion_card_interface(mconfig, *this),
+	m_rom(*this, "c000")
 {
 }
 
@@ -65,7 +66,6 @@ comx_thm_device::comx_thm_device(const machine_config &mconfig, const char *tag,
 
 void comx_thm_device::device_start()
 {
-	m_rom = memregion("c000")->base();
 }
 
 
@@ -88,7 +88,7 @@ UINT8 comx_thm_device::comx_mrd_r(address_space &space, offs_t offset, int *extr
 
 	if (offset >= 0xc000 && offset < 0xd000)
 	{
-		data = m_rom[offset & 0xfff];
+		data = m_rom->base()[offset & 0xfff];
 	}
 
 	return data;

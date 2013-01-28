@@ -553,7 +553,7 @@ void xor100_state::machine_start()
 {
 	int banks = m_ram->size() / 0x10000;
 	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = memregion(Z80_TAG)->base();
+	UINT8 *rom = m_rom->base();
 
 	/* setup memory banking */
 	membank("bank1")->configure_entries(1, banks, ram, 0x10000);

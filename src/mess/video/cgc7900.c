@@ -140,7 +140,7 @@ void cgc7900_state::draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap)
 		{
 			UINT16 addr = (sy * 170) + (sx * 2);
 			UINT32 cell = (m_overlay_ram[addr] << 16) | m_overlay_ram[addr + 1];
-			UINT8 data = m_char_rom[(OVERLAY_DATA << 3) | line];
+			UINT8 data = m_char_rom->base()[(OVERLAY_DATA << 3) | line];
 			int fg = (cell >> 8) & 0x07;
 			int bg = (cell >> 16) & 0x07;
 
@@ -176,16 +176,6 @@ void cgc7900_state::draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap)
 TIMER_DEVICE_CALLBACK_MEMBER(cgc7900_state::blink_tick)
 {
 	m_blink = !m_blink;
-}
-
-/*-------------------------------------------------
-    VIDEO_START( cgc7900 )
--------------------------------------------------*/
-
-void cgc7900_state::video_start()
-{
-	/* find memory regions */
-	m_char_rom = memregion("gfx1")->base();
 }
 
 /*-------------------------------------------------

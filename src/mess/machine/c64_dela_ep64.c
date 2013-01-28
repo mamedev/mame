@@ -72,7 +72,8 @@ machine_config_constructor c64_dela_ep64_cartridge_device::device_mconfig_additi
 
 c64_dela_ep64_cartridge_device::c64_dela_ep64_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_DELA_EP64, "C64 Rex 64KB EPROM cartridge", tag, owner, clock),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this),
+	m_eprom(*this, "eprom")
 {
 }
 
@@ -83,8 +84,6 @@ c64_dela_ep64_cartridge_device::c64_dela_ep64_cartridge_device(const machine_con
 
 void c64_dela_ep64_cartridge_device::device_start()
 {
-	m_rom = memregion("rom")->base();
-
 	// state saving
 	save_item(NAME(m_bank));
 	save_item(NAME(m_reset));
@@ -123,8 +122,8 @@ UINT8 c64_dela_ep64_cartridge_device::c64_cd_r(address_space &space, offs_t offs
 			offs_t addr = (m_bank << 13) | (offset & 0x1fff);
 
 			if (!m_rom0_ce) data |= m_roml[offset & 0x1fff];
-			if (!m_rom1_ce) data |= m_rom[0x0000 + addr];
-			if (!m_rom2_ce) data |= m_rom[0x8000 + addr];
+			if (!m_rom1_ce) data |= m_eprom->base()[0x0000 + addr];
+			if (!m_rom2_ce) data |= m_eprom->base()[0x8000 + addr];
 		}
 	}
 

@@ -517,7 +517,7 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER(sg1000_state::sg1000_vdp_interrupt)
 {
-	machine().device(Z80_TAG)->execute().set_input_line(INPUT_LINE_IRQ0, state);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
 static TMS9928A_INTERFACE(sg1000_tms9918a_interface)
@@ -546,9 +546,9 @@ READ8_MEMBER( sc3000_state::ppi_pa_r )
 	    PA7     Keyboard input
 	*/
 
-	static const char *const keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
+	ioport_port *ports[8] = { m_pa0, m_pa1, m_pa2, m_pa3, m_pa4, m_pa5, m_pa6, m_pa7 };
 
-	return ioport(keynames[m_keylatch])->read();
+	return ports[m_keylatch]->read();
 }
 
 READ8_MEMBER( sc3000_state::ppi_pb_r )
@@ -566,10 +566,10 @@ READ8_MEMBER( sc3000_state::ppi_pb_r )
 	    PB7     Cassette tape input
 	*/
 
-	static const char *const keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
+	ioport_port *ports[8] = { m_pb0, m_pb1, m_pb2, m_pb3, m_pb4, m_pb5, m_pb6, m_pb7 };
 
 	/* keyboard */
-	UINT8 data = ioport(keynames[m_keylatch])->read();
+	UINT8 data = ports[m_keylatch]->read();
 
 	/* cartridge contact */
 	data |= 0x10;
@@ -578,7 +578,7 @@ READ8_MEMBER( sc3000_state::ppi_pb_r )
 	data |= 0x60;
 
 	/* tape input */
-	if ((m_cassette)->input() > +0.0) data |= 0x80;
+	if (m_cassette->input() > +0.0) data |= 0x80;
 
 	return data;
 }
@@ -647,14 +647,14 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 	case 40 * 1024:
 		program.install_read_bank(0x8000, 0x9fff, "bank1");
 		program.unmap_write(0x8000, 0x9fff);
-		membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base() + 0x8000);
+		membank("bank1")->configure_entry(0, m_rom->base() + 0x8000);
 		membank("bank1")->set_entry(0);
 		break;
 
 	case 48 * 1024:
 		program.install_read_bank(0x8000, 0xbfff, "bank1");
 		program.unmap_write(0x8000, 0xbfff);
-		membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base() + 0x8000);
+		membank("bank1")->configure_entry(0, m_rom->base() + 0x8000);
 		membank("bank1")->set_entry(0);
 		break;
 
@@ -682,8 +682,8 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 {
 	running_machine &machine = image.device().machine();
 	sg1000_state *state = machine.driver_data<sg1000_state>();
-	address_space &program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
-	UINT8 *ptr = state->memregion(Z80_TAG)->base();
+	address_space &program = state->m_maincpu->space(AS_PROGRAM);
+	UINT8 *ptr = state->m_rom->base();
 	UINT32 ram_size = 0x400;
 	bool install_2000_ram = false;
 	UINT32 size;
@@ -797,7 +797,7 @@ static DEVICE_IMAGE_LOAD( omv_cart )
 	running_machine &machine = image.device().machine();
 	sg1000_state *state = machine.driver_data<sg1000_state>();
 	UINT32 size;
-	UINT8 *ptr = state->memregion(Z80_TAG)->base();
+	UINT8 *ptr = state->m_rom->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -853,7 +853,7 @@ static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
 	running_machine &machine = image.device().machine();
 	sc3000_state *state = machine.driver_data<sc3000_state>();
-	UINT8 *ptr = state->memregion(Z80_TAG)->base();
+	UINT8 *ptr = state->m_rom->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -986,7 +986,7 @@ static const sn76496_config psg_intf =
 
 TIMER_CALLBACK_MEMBER(sg1000_state::lightgun_tick)
 {
-	UINT8 *rom = machine().root_device().memregion(Z80_TAG)->base();
+	UINT8 *rom = m_rom->base();
 
 	if (IS_CARTRIDGE_TV_DRAW(rom))
 	{
@@ -1035,7 +1035,7 @@ void sc3000_state::machine_start()
 void sf7000_state::machine_start()
 {
 	/* configure memory banking */
-	membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base());
+	membank("bank1")->configure_entry(0, m_rom->base());
 	membank("bank1")->configure_entry(1, m_ram->pointer());
 	membank("bank2")->configure_entry(0, m_ram->pointer());
 

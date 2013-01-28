@@ -37,6 +37,8 @@ public:
 		TYPE_E01S
 	};
 
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( ram_select_r );
 	DECLARE_WRITE8_MEMBER( floppy_w );
 	DECLARE_READ8_MEMBER( network_irq_disable_r );
@@ -88,6 +90,7 @@ protected:
 	required_device<scsicb_device> m_scsibus;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_memory_region m_rom;
 
 	inline void update_interrupts();
 	inline void network_irq_enable(int enabled);
@@ -102,8 +105,8 @@ protected:
 	int m_fdc_irq;
 	bool m_fdc_drq;
 	int m_adlc_irq;
-
 	int m_clk_en;
+	bool m_ram_en;
 
 	int m_variant;
 

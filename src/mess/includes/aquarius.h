@@ -24,6 +24,8 @@ public:
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_screen(*this, "screen"),
+		  m_ram(*this, RAM_TAG),
+		  m_rom(*this, "maincpu"),
 		  m_videoram(*this, "videoram"),
 		  m_colorram(*this, "colorram"),
 		  m_y0(*this, "Y0"),
@@ -40,6 +42,8 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<screen_device> m_screen;
+	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
 	required_shared_ptr<UINT8> m_videoram;
 	required_shared_ptr<UINT8> m_colorram;
 	required_ioport m_y0;

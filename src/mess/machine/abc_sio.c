@@ -142,7 +142,8 @@ abc_sio_device::abc_sio_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, ABC_SIO, "ABC SIO", tag, owner, clock),
 		device_abcbus_card_interface(mconfig, *this),
 		m_ctc(*this, Z80CTC_TAG),
-		m_sio(*this, Z80SIO_TAG)
+		m_sio(*this, Z80SIO_TAG),
+		m_rom(*this, "abc80")
 {
 }
 
@@ -189,7 +190,7 @@ UINT8 abc_sio_device::abcbus_xmemfl(offs_t offset)
 
 	if (offset >= 0x4000 && offset < 0x5000) // TODO where is this mapped?
 	{
-		data = memregion("abc80")->base()[offset & 0xfff];
+		data = m_rom->base()[offset & 0xfff];
 	}
 
 	return data;

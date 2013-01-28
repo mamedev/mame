@@ -418,12 +418,6 @@ void luxor_55_21046_device::device_start()
 	save_item(NAME(m_dma_irq));
 	save_item(NAME(m_busy));
 	save_item(NAME(m_force_busy));
-
-	// patch out sector skew table
-/*  UINT8 *rom = memregion(Z80_TAG)->base();
-
-    for (int i = 0; i < 16; i++)
-        rom[0x2dd3 + i] = i + 1;*/
 }
 
 

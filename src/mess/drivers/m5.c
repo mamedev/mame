@@ -66,13 +66,13 @@ READ8_MEMBER( m5_state::sts_r )
 	UINT8 data = 0;
 
 	// cassette input
-	data |= (m_cassette)->input() >= 0 ? 1 : 0;
+	data |= m_cassette->input() >= 0 ? 1 : 0;
 
 	// centronics busy
 	data |= m_centronics->busy_r() << 1;
 
 	// RESET key
-	data |= ioport("RESET")->read();
+	data |= m_reset->read();
 
 	return data;
 }

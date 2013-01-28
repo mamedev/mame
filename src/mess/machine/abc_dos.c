@@ -107,7 +107,8 @@ const rom_entry *abc_dos_device::device_rom_region() const
 
 abc_dos_device::abc_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, ABC_DOS, "ABC DOS", tag, owner, clock),
-		device_abcbus_card_interface(mconfig, *this)
+		device_abcbus_card_interface(mconfig, *this),
+		m_rom(*this, "dos")
 {
 }
 
@@ -136,7 +137,7 @@ UINT8 abc_dos_device::abcbus_xmemfl(offs_t offset)
 
 	if (offset >= 0x6000 && offset < 0x8000)
 	{
-		data = memregion("dos")->base()[offset & 0x1fff];
+		data = m_rom->base()[offset & 0x1fff];
 	}
 
 	return data;

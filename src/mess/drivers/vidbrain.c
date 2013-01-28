@@ -97,17 +97,17 @@ READ8_MEMBER( vidbrain_state::keyboard_r )
 
 	*/
 
-	UINT8 data = ioport("JOY-R")->read();
+	UINT8 data = m_joy_r->read();
 
-	if (BIT(m_keylatch, 0)) data |= ioport("IO00")->read();
-	if (BIT(m_keylatch, 1)) data |= ioport("IO01")->read();
-	if (BIT(m_keylatch, 2)) data |= ioport("IO02")->read();
-	if (BIT(m_keylatch, 3)) data |= ioport("IO03")->read();
-	if (BIT(m_keylatch, 4)) data |= ioport("IO04")->read();
-	if (BIT(m_keylatch, 5)) data |= ioport("IO05")->read();
-	if (BIT(m_keylatch, 6)) data |= ioport("IO06")->read();
-	if (BIT(m_keylatch, 7)) data |= ioport("IO07")->read();
-	if (!m_uv->kbd_r()) data |= ioport("UV201-31")->read();
+	if (BIT(m_keylatch, 0)) data |= m_io00->read();
+	if (BIT(m_keylatch, 1)) data |= m_io01->read();
+	if (BIT(m_keylatch, 2)) data |= m_io02->read();
+	if (BIT(m_keylatch, 3)) data |= m_io03->read();
+	if (BIT(m_keylatch, 4)) data |= m_io04->read();
+	if (BIT(m_keylatch, 5)) data |= m_io05->read();
+	if (BIT(m_keylatch, 6)) data |= m_io06->read();
+	if (BIT(m_keylatch, 7)) data |= m_io07->read();
+	if (!m_uv->kbd_r()) data |= m_uv201_31->read();
 
 	return data;
 }
@@ -430,14 +430,14 @@ WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
 	{
 		UINT8 joydata = 0;
 
-		if (!BIT(m_keylatch, 0)) joydata = ioport("JOY1-X")->read();
-		if (!BIT(m_keylatch, 1)) joydata = ioport("JOY1-Y")->read();
-		if (!BIT(m_keylatch, 2)) joydata = ioport("JOY2-X")->read();
-		if (!BIT(m_keylatch, 3)) joydata = ioport("JOY2-Y")->read();
-		if (!BIT(m_keylatch, 4)) joydata = ioport("JOY3-X")->read();
-		if (!BIT(m_keylatch, 5)) joydata = ioport("JOY3-Y")->read();
-		if (!BIT(m_keylatch, 6)) joydata = ioport("JOY4-X")->read();
-		if (!BIT(m_keylatch, 7)) joydata = ioport("JOY4-Y")->read();
+		if (!BIT(m_keylatch, 0)) joydata = m_joy1_x->read();
+		if (!BIT(m_keylatch, 1)) joydata = m_joy1_y->read();
+		if (!BIT(m_keylatch, 2)) joydata = m_joy2_x->read();
+		if (!BIT(m_keylatch, 3)) joydata = m_joy2_y->read();
+		if (!BIT(m_keylatch, 4)) joydata = m_joy3_x->read();
+		if (!BIT(m_keylatch, 5)) joydata = m_joy3_y->read();
+		if (!BIT(m_keylatch, 6)) joydata = m_joy4_x->read();
+		if (!BIT(m_keylatch, 7)) joydata = m_joy4_y->read();
 
 		// NE555 in monostable mode
 		// R = 3K9 + 100K linear pot

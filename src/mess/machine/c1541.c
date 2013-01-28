@@ -1091,7 +1091,8 @@ c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine
 c1541_prologic_dos_classic_device::c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: base_c1541_device(mconfig, C1541_PROLOGIC_DOS_CLASSIC, "C1541 ProLogic-DOS Classic", tag, owner, clock, TYPE_1541_PROLOGIC_DOS_CLASSIC),
 		m_pia(*this, MC6821_TAG),
-		m_centronics(*this, CENTRONICS_TAG)
+		m_centronics(*this, CENTRONICS_TAG),
+		m_mmu_rom(*this, "mmu")
 {
 }
 
@@ -1124,12 +1125,6 @@ void fsd2_device::device_start()
 
 		rom[offset] = data;
 	}
-}
-
-void c1541_prologic_dos_classic_device::device_start()
-{
-	// find memory regions
-	m_mmu_rom = memregion("mmu")->base();
 }
 
 

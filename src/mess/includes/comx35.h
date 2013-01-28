@@ -48,8 +48,10 @@ public:
 			m_cassette(*this, CASSETTE_TAG),
 			m_ram(*this, RAM_TAG),
 			m_exp(*this, EXPANSION_TAG),
-			m_modifiers(*this, "MODIFIERS"),
-			m_char_ram(*this, "char_ram")
+			m_rom(*this, CDP1802_TAG),
+			m_char_ram(*this, "char_ram"),
+			m_d6(*this, "D6"),
+			m_modifiers(*this, "MODIFIERS")
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
@@ -58,8 +60,10 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<comx_expansion_slot_device> m_exp;
-	required_ioport m_modifiers;
+	required_memory_region m_rom;
 	optional_shared_ptr<UINT8> m_char_ram;
+	required_ioport m_d6;
+	required_ioport m_modifiers;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void machine_start();
@@ -97,8 +101,6 @@ public:
 	int m_int;                  // interrupt request
 	int m_prd;                  // predisplay
 	int m_cr1;                  // interrupt enable
-
-	const UINT8 *m_rom;
 };
 
 // ---------- defined in video/comx35.c ----------

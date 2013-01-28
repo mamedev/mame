@@ -50,11 +50,13 @@ public:
 	sg1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, Z80_TAG),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_rom(*this, Z80_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
 
 	virtual void machine_start();
 
@@ -80,10 +82,42 @@ class sc3000_state : public sg1000_state
 public:
 	sc3000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: sg1000_state(mconfig, type, tag),
-			m_cassette(*this, CASSETTE_TAG)
+			m_cassette(*this, CASSETTE_TAG),
+			m_pa0(*this, "PA0"),
+			m_pa1(*this, "PA1"),
+			m_pa2(*this, "PA2"),
+			m_pa3(*this, "PA3"),
+			m_pa4(*this, "PA4"),
+			m_pa5(*this, "PA5"),
+			m_pa6(*this, "PA6"),
+			m_pa7(*this, "PA7"),
+			m_pb0(*this, "PB0"),
+			m_pb1(*this, "PB1"),
+			m_pb2(*this, "PB2"),
+			m_pb3(*this, "PB3"),
+			m_pb4(*this, "PB4"),
+			m_pb5(*this, "PB5"),
+			m_pb6(*this, "PB6"),
+			m_pb7(*this, "PB7")
 	{ }
 
 	required_device<cassette_image_device> m_cassette;
+	required_ioport m_pa0;
+	required_ioport m_pa1;
+	required_ioport m_pa2;
+	required_ioport m_pa3;
+	required_ioport m_pa4;
+	required_ioport m_pa5;
+	required_ioport m_pa6;
+	required_ioport m_pa7;
+	required_ioport m_pb0;
+	required_ioport m_pb1;
+	required_ioport m_pb2;
+	required_ioport m_pb3;
+	required_ioport m_pb4;
+	required_ioport m_pb5;
+	required_ioport m_pb6;
+	required_ioport m_pb7;
 
 	virtual void machine_start();
 

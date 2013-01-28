@@ -23,7 +23,7 @@ const device_type C64_DELA_EP256 = &device_creator<c64_dela_ep256_cartridge_devi
 //-------------------------------------------------
 
 ROM_START( c64_dela_ep256 )
-	ROM_REGION( 0x40000, "rom", 0 )
+	ROM_REGION( 0x40000, "eprom", 0 )
 	ROM_CART_LOAD( "rom1", 0x00000, 0x08000, ROM_MIRROR )
 	ROM_CART_LOAD( "rom2", 0x08000, 0x08000, ROM_MIRROR )
 	ROM_CART_LOAD( "rom3", 0x10000, 0x08000, ROM_MIRROR )
@@ -91,7 +91,8 @@ machine_config_constructor c64_dela_ep256_cartridge_device::device_mconfig_addit
 
 c64_dela_ep256_cartridge_device::c64_dela_ep256_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_DELA_EP256, "C64 Dela 256KB EPROM cartridge", tag, owner, clock),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this),
+	m_eprom(*this, "eprom")
 {
 }
 
@@ -102,8 +103,6 @@ c64_dela_ep256_cartridge_device::c64_dela_ep256_cartridge_device(const machine_c
 
 void c64_dela_ep256_cartridge_device::device_start()
 {
-	m_rom = memregion("rom")->base();
-
 	// state saving
 	save_item(NAME(m_bank));
 	save_item(NAME(m_reset));
@@ -137,7 +136,7 @@ UINT8 c64_dela_ep256_cartridge_device::c64_cd_r(address_space &space, offs_t off
 		else
 		{
 			offs_t addr = (m_bank << 13) | (offset & 0x1fff);
-			data = m_rom[addr];
+			data = m_eprom->base()[addr];
 		}
 	}
 

@@ -133,6 +133,7 @@ comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, d
 	m_fdc(*this, WD1770_TAG),
 	m_floppy0(*this, WD1770_TAG":0"),
 	m_floppy1(*this, WD1770_TAG":1"),
+	m_rom(*this, "c000"),
 	m_q(0),
 	m_addr(0),
 	m_disb(1)
@@ -146,9 +147,6 @@ comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, d
 
 void comx_fd_device::device_start()
 {
-	// find memory regions
-	m_rom = memregion("c000")->base();
-
 	// state saving
 	save_item(NAME(m_ds));
 	save_item(NAME(m_q));
@@ -209,12 +207,12 @@ UINT8 comx_fd_device::comx_mrd_r(address_space &space, offs_t offset, int *extro
 
 	if (offset >= 0x0dd0 && offset < 0x0de0)
 	{
-		data = m_rom[offset & 0x1fff];
+		data = m_rom->base()[offset & 0x1fff];
 		*extrom = 0;
 	}
 	else if (offset >= 0xc000 && offset < 0xe000)
 	{
-		data = m_rom[offset & 0x1fff];
+		data = m_rom->base()[offset & 0x1fff];
 	}
 
 	return data;

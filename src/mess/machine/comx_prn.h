@@ -50,8 +50,7 @@ protected:
 
 private:
 	required_device<centronics_device> m_centronics;
-
-	UINT8 *m_rom;               // program ROM
+	required_memory_region m_rom;
 };
 
 

@@ -417,11 +417,11 @@ READ8_MEMBER( adam_state::mreq_r )
 	{
 		if (offset < 0x6000)
 		{
-			data = m_boot_rom[offset];
+			data = m_boot_rom->base()[offset];
 		}
 		else
 		{
-			data = m_boot_rom[(eos_enable << 13) + offset];
+			data = m_boot_rom->base()[(eos_enable << 13) + offset];
 		}
 	}
 
@@ -430,7 +430,7 @@ READ8_MEMBER( adam_state::mreq_r )
 		switch (offset >> 13)
 		{
 		case 0: // U2
-			data = m_os7_rom[offset];
+			data = m_os7_rom->base()[offset];
 			break;
 
 		case 1: break;
@@ -440,7 +440,7 @@ READ8_MEMBER( adam_state::mreq_r )
 		case 5: // CS2
 		case 6: // CS3
 		case 7: // CS4
-			data = m_cart_rom[offset & 0x7fff];
+			data = m_cart_rom->base()[offset & 0x7fff];
 			break;
 		}
 	}
@@ -1059,11 +1059,6 @@ static ADAM_EXPANSION_SLOT_INTERFACE( slot3_intf )
 
 void adam_state::machine_start()
 {
-	// find memory regions
-	m_boot_rom = memregion("boot")->base();
-	m_os7_rom = memregion("os7")->base();
-	m_cart_rom = memregion("cart")->base();
-
 	// state saving
 	save_item(NAME(m_mioc));
 	save_item(NAME(m_game));

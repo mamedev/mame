@@ -202,6 +202,7 @@ void comx_eb_device::set_int(const char *tag, int state)
 comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_EB, "COMX-35E Expansion Box", tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
+	m_rom(*this, "e000"),
 	m_select(0)
 {
 }
@@ -222,8 +223,6 @@ void comx_eb_device::device_start()
 	{
 		m_int[slot] = CLEAR_LINE;
 	}
-
-	m_rom = memregion("e000")->base();
 }
 
 
@@ -290,12 +289,12 @@ UINT8 comx_eb_device::comx_mrd_r(address_space &space, offs_t offset, int *extro
 
 	if (offset >= 0x1000 && offset < 0x1800)
 	{
-		data = m_rom[offset & 0x7ff];
+		data = m_rom->base()[offset & 0x7ff];
 		*extrom = 0;
 	}
 	else if (offset >= 0xe000 && offset < 0xf000)
 	{
-		data = m_rom[offset & 0xfff];
+		data = m_rom->base()[offset & 0xfff];
 	}
 	else
 	{

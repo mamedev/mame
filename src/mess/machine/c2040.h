@@ -102,6 +102,7 @@ protected:
 	required_device<via6522_device> m_via;
 	required_device<legacy_floppy_image_device> m_image0;
 	optional_device<legacy_floppy_image_device> m_image1;
+	required_memory_region m_gcr;
 
 	struct {
 		// motors
@@ -131,7 +132,6 @@ protected:
 	int m_bit_count;                    // GCR bit counter
 	UINT16 m_sr;                        // GCR data shift register
 	UINT8 m_pi;                         // parallel data input
-	const UINT8* m_gcr;                 // GCR encoder/decoder ROM
 	UINT16 m_i;                         // GCR encoder/decoded ROM address
 	UINT8 m_e;                          // GCR encoder/decoded ROM data
 

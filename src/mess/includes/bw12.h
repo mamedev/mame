@@ -47,8 +47,10 @@ public:
 			m_floppy0(*this, UPD765_TAG ":1:525dd"),
 			m_floppy1(*this, UPD765_TAG ":2:525dd"),
 			m_floppy_timer(*this, FLOPPY_TIMER_TAG),
-			m_modifiers(*this, "MODIFIERS"),
-			m_video_ram(*this, "video_ram")
+			m_rom(*this, Z80_TAG),
+			m_char_rom(*this, "chargen"),
+			m_video_ram(*this, "video_ram"),
+			m_modifiers(*this, "MODIFIERS")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -62,12 +64,13 @@ public:
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
 	required_device<timer_device> m_floppy_timer;
+	required_memory_region m_rom;
+	required_memory_region m_char_rom;
+	required_shared_ptr<UINT8> m_video_ram;
 	required_ioport m_modifiers;
 
 	virtual void machine_start();
 	virtual void machine_reset();
-
-	virtual void video_start();
 
 	void bankswitch();
 	void floppy_motor_off();
@@ -86,10 +89,6 @@ public:
 
 	/* memory state */
 	int m_bank;
-
-	/* video state */
-	required_shared_ptr<UINT8> m_video_ram;
-	UINT8 *m_char_rom;
 
 	/* PIT state */
 	int m_pit_out2;

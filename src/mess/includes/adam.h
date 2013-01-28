@@ -34,6 +34,9 @@ public:
 			m_slot1(*this, ADAM_LEFT_EXPANSION_SLOT_TAG),
 			m_slot2(*this, ADAM_CENTER_EXPANSION_SLOT_TAG),
 			m_slot3(*this, ADAM_RIGHT_EXPANSION_SLOT_TAG),
+			m_boot_rom(*this, "boot"),
+			m_os7_rom(*this, "os7"),
+			m_cart_rom(*this, "cart"),
 			m_mioc(0),
 			m_game(0),
 			m_an(0),
@@ -50,6 +53,9 @@ public:
 	required_device<adam_expansion_slot_device> m_slot1;
 	required_device<adam_expansion_slot_device> m_slot2;
 	required_device<adam_expansion_slot_device> m_slot3;
+	required_memory_region m_boot_rom;
+	required_memory_region m_os7_rom;
+	required_memory_region m_cart_rom;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -80,9 +86,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( os3_w );
 
 	// memory state
-	const UINT8 *m_boot_rom;
-	const UINT8 *m_os7_rom;
-	const UINT8 *m_cart_rom;
 	UINT8 m_mioc;
 	int m_game;
 

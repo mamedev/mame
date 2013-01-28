@@ -34,13 +34,24 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, FDC1797_TAG":0"),
 			m_floppy1(*this, FDC1797_TAG":1"),
+			m_rom(*this, Z8400A_TAG),
+			m_sync_rom(*this, "video"),
+			m_char_rom(*this, "chargen"),
+			m_video_ram(*this, "video_ram"),
+			m_y0(*this, "Y0"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2"),
+			m_y3(*this, "Y3"),
+			m_y4(*this, "Y4"),
+			m_y5(*this, "Y5"),
+			m_y6(*this, "Y6"),
+			m_y7(*this, "Y7"),
 			m_fdint(0),
 			m_vsync(0),
 			m_srq(1),
 			m_atn(1),
 			m_rxrdy(0),
-			m_txrdy(0),
-			m_video_ram(*this, "video_ram")
+			m_txrdy(0)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -52,6 +63,18 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_memory_region m_rom;
+	required_memory_region m_sync_rom;
+	required_memory_region m_char_rom;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -107,9 +130,7 @@ public:
 	// video state
 	int m_alt;
 	int m_256;
-	required_shared_ptr<UINT8> m_video_ram;
-	const UINT8 *m_sync_rom;
-	const UINT8 *m_char_rom;
+
 	DECLARE_DRIVER_INIT(vixen);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_tick);
 };

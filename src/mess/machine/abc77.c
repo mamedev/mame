@@ -460,6 +460,7 @@ abc77_device::abc77_device(const machine_config &mconfig, const char *tag, devic
 		m_x9(*this, "X9"),
 		m_x10(*this, "X10"),
 		m_x11(*this, "X11"),
+		m_dsw(*this, "DSW"),
 		m_txd(1),
 		m_keydown(1),
 		m_clock(0),
@@ -483,6 +484,7 @@ abc77_device::abc77_device(const machine_config &mconfig, device_type type, cons
 		m_x9(*this, "X9"),
 		m_x10(*this, "X10"),
 		m_x11(*this, "X11"),
+		m_dsw(*this, "DSW"),
 		m_txd(1),
 		m_keydown(1),
 		m_clock(0),
@@ -519,7 +521,7 @@ void abc77_device::device_start()
 void abc77_device::device_reset()
 {
 	int t = 1.1 * RES_K(100) * CAP_N(100) * 1000; // t = 1.1 * R1 * C1
-	int ea = BIT(ioport("DSW")->read(), 7);
+	int ea = BIT(m_dsw->read(), 7);
 
 	// trigger reset
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);

@@ -43,7 +43,8 @@ public:
 			m_floppy0(*this, WD1795_TAG":0"),
 			m_floppy1(*this, WD1795_TAG":1"),
 			m_floppy2(*this, WD1795_TAG":2"),
-			m_floppy3(*this, WD1795_TAG":3")
+			m_floppy3(*this, WD1795_TAG":3"),
+			m_rom(*this, Z80_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -60,6 +61,7 @@ public:
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
+	required_memory_region m_rom;
 
 	virtual void machine_start();
 	virtual void machine_reset();

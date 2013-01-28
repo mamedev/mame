@@ -122,17 +122,17 @@ static CDP1864_INTERFACE( eti660_cdp1864_intf )
 
 READ_LINE_MEMBER( eti660_state::clear_r )
 {
-	return BIT(ioport("SPECIAL")->read(), 0);
+	return BIT(m_special->read(), 0);
 }
 
 READ_LINE_MEMBER( eti660_state::ef2_r )
 {
-	return (m_cassette)->input() < 0;
+	return m_cassette->input() < 0;
 }
 
 READ_LINE_MEMBER( eti660_state::ef4_r )
 {
-	return BIT(ioport("SPECIAL")->read(), 1);
+	return BIT(m_special->read(), 1);
 }
 
 WRITE_LINE_MEMBER( eti660_state::q_w )
@@ -194,10 +194,10 @@ READ8_MEMBER( eti660_state::pia_pa_r )
 
 	UINT8 data = 0xf0;
 
-	if (!BIT(m_keylatch, 0)) data &= ioport("PA0")->read();
-	if (!BIT(m_keylatch, 1)) data &= ioport("PA1")->read();
-	if (!BIT(m_keylatch, 2)) data &= ioport("PA2")->read();
-	if (!BIT(m_keylatch, 3)) data &= ioport("PA3")->read();
+	if (!BIT(m_keylatch, 0)) data &= m_pa0->read();
+	if (!BIT(m_keylatch, 1)) data &= m_pa1->read();
+	if (!BIT(m_keylatch, 2)) data &= m_pa2->read();
+	if (!BIT(m_keylatch, 3)) data &= m_pa3->read();
 
 	return data;
 }

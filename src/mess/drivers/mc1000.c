@@ -164,7 +164,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) /* = '0' */
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ROW0")
+	PORT_START("Y0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('@')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
@@ -173,7 +173,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ROW1")
+	PORT_START("Y1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
@@ -182,7 +182,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ROW2")
+	PORT_START("Y2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
@@ -191,7 +191,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ROW3")
+	PORT_START("Y3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
@@ -200,7 +200,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ROW4")
+	PORT_START("Y4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ROW5")
+	PORT_START("Y5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
@@ -218,7 +218,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ROW6")
+	PORT_START("Y6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
@@ -227,7 +227,7 @@ static INPUT_PORTS_START( mc1000 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("ROW7")
+	PORT_START("Y7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
@@ -287,22 +287,22 @@ READ8_MEMBER( mc1000_state::keydata_r )
 
 	if (!BIT(m_keylatch, 0))
 	{
-		data &= ioport("ROW0")->read();
-		if (ioport("JOYBKEYMAP")->read()) data &= ioport("JOYB")->read();
+		data &= m_y0->read();
+		if (m_joybkeymap->read()) data &= m_joyb->read();
 	}
 	if (!BIT(m_keylatch, 1))
 	{
-		data &= ioport("ROW1")->read();
-		if (ioport("JOYAKEYMAP")->read()) data &= ioport("JOYA")->read();
+		data &= m_y1->read();
+		if (m_joyakeymap->read()) data &= m_joya->read();
 	}
-	if (!BIT(m_keylatch, 2)) data &= ioport("ROW2")->read();
-	if (!BIT(m_keylatch, 3)) data &= ioport("ROW3")->read();
-	if (!BIT(m_keylatch, 4)) data &= ioport("ROW4")->read();
-	if (!BIT(m_keylatch, 5)) data &= ioport("ROW5")->read();
-	if (!BIT(m_keylatch, 6)) data &= ioport("ROW6")->read();
-	if (!BIT(m_keylatch, 7)) data &= ioport("ROW7")->read();
+	if (!BIT(m_keylatch, 2)) data &= m_y2->read();
+	if (!BIT(m_keylatch, 3)) data &= m_y3->read();
+	if (!BIT(m_keylatch, 4)) data &= m_y4->read();
+	if (!BIT(m_keylatch, 5)) data &= m_y5->read();
+	if (!BIT(m_keylatch, 6)) data &= m_y6->read();
+	if (!BIT(m_keylatch, 7)) data &= m_y7->read();
 
-	data = (ioport("MODIFIERS")->read() & 0xc0) | (data & 0x3f);
+	data = (m_modifiers->read() & 0xc0) | (data & 0x3f);
 
 	if (m_cassette->input() < +0.0) data &= 0x7f;
 
@@ -326,7 +326,7 @@ void mc1000_state::machine_start()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* setup memory banking */
-	UINT8 *rom = memregion(Z80_TAG)->base();
+	UINT8 *rom = m_rom->base();
 
 	program.install_readwrite_bank(0x0000, 0x1fff, "bank1");
 	membank("bank1")->configure_entry(0, rom);
@@ -496,7 +496,7 @@ DIRECT_UPDATE_MEMBER(mc1000_state::mc1000_direct_update_handler)
 
 DRIVER_INIT_MEMBER(mc1000_state,mc1000)
 {
-	machine().device(Z80_TAG)->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(mc1000_state::mc1000_direct_update_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(mc1000_state::mc1000_direct_update_handler), this));
 }
 
 /* System Drivers */

@@ -78,7 +78,7 @@ static CDP1869_CHAR_RAM_READ( tmc600_char_ram_r )
 	UINT16 pageaddr = pma & TMC600_PAGE_RAM_MASK;
 	UINT8 color = state->get_color(pageaddr);
 	UINT16 charaddr = ((cma & 0x08) << 8) | (pmd << 3) | (cma & 0x07);
-	UINT8 cdb = state->m_char_rom[charaddr] & 0x3f;
+	UINT8 cdb = state->m_char_rom->base()[charaddr] & 0x3f;
 
 	int ccb0 = BIT(color, 2);
 	int ccb1 = BIT(color, 1);
@@ -111,9 +111,6 @@ void tmc600_state::video_start()
 {
 	// allocate memory
 	m_color_ram.allocate(TMC600_PAGE_RAM_SIZE);
-
-	// find memory regions
-	m_char_rom = memregion("chargen")->base();
 
 	// register for state saving
 	save_item(NAME(m_vismac_reg_latch));

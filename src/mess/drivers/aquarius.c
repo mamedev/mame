@@ -171,7 +171,7 @@ WRITE8_MEMBER(aquarius_state::scrambler_w)
 
 READ8_MEMBER(aquarius_state::cartridge_r)
 {
-	UINT8 *rom = memregion("maincpu")->base() + 0xc000;
+	UINT8 *rom = m_rom->base() + 0xc000;
 	return rom[offset] ^ m_scrambler;
 }
 
@@ -183,7 +183,7 @@ READ8_MEMBER(aquarius_state::cartridge_r)
 DRIVER_INIT_MEMBER(aquarius_state,aquarius)
 {
 	/* install expansion memory if available */
-	if (machine().device<ram_device>(RAM_TAG)->size() > 0x1000)
+	if (m_ram->size() > 0x1000)
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);
 

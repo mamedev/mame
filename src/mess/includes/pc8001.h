@@ -37,7 +37,9 @@ public:
 			m_cassette(*this, CASSETTE_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_speaker(*this, SPEAKER_TAG),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_rom(*this, Z80_TAG),
+			m_char_rom(*this, UPD3301_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -48,10 +50,10 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_memory_region m_char_rom;
 
 	virtual void machine_start();
-
-	virtual void video_start();
 
 	DECLARE_WRITE8_MEMBER( port10_w );
 	DECLARE_WRITE8_MEMBER( port30_w );
@@ -64,7 +66,6 @@ public:
 	DECLARE_WRITE8_MEMBER( dma_io_w );
 
 	/* video state */
-	UINT8 *m_char_rom;
 	int m_width80;
 	int m_color;
 };
@@ -73,8 +74,11 @@ class pc8001mk2_state : public pc8001_state
 {
 public:
 	pc8001mk2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc8001_state(mconfig, type, tag)
+		: pc8001_state(mconfig, type, tag),
+			m_kanji_rom(*this, "kanji")
 	{ }
+
+	required_memory_region m_kanji_rom;
 
 	DECLARE_WRITE8_MEMBER( port31_w );
 };

@@ -380,7 +380,7 @@ INPUT_PORTS_END
 -------------------------------------------------*/
 
 static INPUT_PORTS_START( manager )
-	PORT_START("ROW0")
+	PORT_START("Y0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
@@ -390,7 +390,7 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('s')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
 
-	PORT_START("ROW1")
+	PORT_START("Y1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x84 \xC3\xA4") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00C4) PORT_CHAR(0x00E4)
@@ -400,7 +400,7 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('a')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('z')
 
-	PORT_START("ROW2")
+	PORT_START("Y2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
@@ -410,7 +410,7 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 
-	PORT_START("ROW3")
+	PORT_START("Y3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xC3\x96 \xC3\xB6") PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00D6) PORT_CHAR(0x00F6)
@@ -420,7 +420,7 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR('d')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('c')
 
-	PORT_START("ROW4")
+	PORT_START("Y4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
@@ -430,7 +430,7 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('f')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('v')
 
-	PORT_START("ROW5")
+	PORT_START("Y5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L') PORT_CHAR('l')
@@ -440,7 +440,7 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G') PORT_CHAR('g')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B') PORT_CHAR('b')
 
-	PORT_START("ROW6")
+	PORT_START("Y6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('s')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K') PORT_CHAR('k')
@@ -450,7 +450,7 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H') PORT_CHAR('h')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')
 
-	PORT_START("ROW7")
+	PORT_START("Y7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('x')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N') PORT_CHAR('n')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -643,14 +643,14 @@ READ8_MEMBER( laser2001_state::pia_pa_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(m_keylatch, 0)) data &= ioport("ROW0")->read();
-	if (!BIT(m_keylatch, 1)) data &= ioport("ROW1")->read();
-	if (!BIT(m_keylatch, 2)) data &= ioport("ROW2")->read();
-	if (!BIT(m_keylatch, 3)) data &= ioport("ROW3")->read();
-	if (!BIT(m_keylatch, 4)) data &= ioport("ROW4")->read();
-	if (!BIT(m_keylatch, 5)) data &= ioport("ROW5")->read();
-	if (!BIT(m_keylatch, 6)) data &= ioport("ROW6")->read();
-	if (!BIT(m_keylatch, 7)) data &= ioport("ROW7")->read();
+	if (!BIT(m_keylatch, 0)) data &= m_y0->read();
+	if (!BIT(m_keylatch, 1)) data &= m_y1->read();
+	if (!BIT(m_keylatch, 2)) data &= m_y2->read();
+	if (!BIT(m_keylatch, 3)) data &= m_y3->read();
+	if (!BIT(m_keylatch, 4)) data &= m_y4->read();
+	if (!BIT(m_keylatch, 5)) data &= m_y5->read();
+	if (!BIT(m_keylatch, 6)) data &= m_y6->read();
+	if (!BIT(m_keylatch, 7)) data &= m_y7->read();
 
 	return data;
 }
@@ -675,10 +675,10 @@ READ8_MEMBER( laser2001_state::pia_pb_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_joylatch, 0)) data &= ioport("JOY0")->read();
-	if (!BIT(m_joylatch, 1)) data &= ioport("JOY1")->read();
-	if (!BIT(m_joylatch, 2)) data &= ioport("JOY2")->read();
-	if (!BIT(m_joylatch, 3)) data &= ioport("JOY3")->read();
+	if (!BIT(m_joylatch, 0)) data &= m_joy0->read();
+	if (!BIT(m_joylatch, 1)) data &= m_joy1->read();
+	if (!BIT(m_joylatch, 2)) data &= m_joy2->read();
+	if (!BIT(m_joylatch, 3)) data &= m_joy3->read();
 
 	return data;
 }
@@ -776,23 +776,6 @@ static const cassette_interface lasr2001_cassette_interface =
 };
 
 /*-------------------------------------------------
-    floppy_interface lasr2001_floppy_interface
--------------------------------------------------*/
-
-static const floppy_interface lasr2001_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_SSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	NULL,
-	NULL
-};
-
-/*-------------------------------------------------
     centronics_interface lasr2001_centronics_intf
 -------------------------------------------------*/
 
@@ -853,7 +836,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	running_machine &machine = image.device().machine();
 	crvision_state *state = machine.driver_data<crvision_state>();
 	UINT8 *mem = state->memregion(M6502_TAG)->base();
-	address_space &program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
+	address_space &program = state->m_maincpu->space(AS_PROGRAM);
 
 	if (image.software_entry() == NULL)
 	{
@@ -945,11 +928,11 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		return IMAGE_INIT_FAIL;
 	}
 
-	state->membank("bank1")->configure_entry(0, mem + 0x8000);
-	state->membank("bank1")->set_entry(0);
+	state->membank(BANK_ROM1)->configure_entry(0, mem + 0x8000);
+	state->membank(BANK_ROM1)->set_entry(0);
 
-	state->membank("bank2")->configure_entry(0, mem + 0x4000);
-	state->membank("bank2")->set_entry(0);
+	state->membank(BANK_ROM2)->configure_entry(0, mem + 0x4000);
+	state->membank(BANK_ROM2)->set_entry(0);
 
 	auto_free(machine, temp_copy);
 
@@ -1033,7 +1016,6 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	// devices
 	MCFG_PIA6821_ADD(PIA6821_TAG, lasr2001_pia_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, lasr2001_cassette_interface)
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, lasr2001_floppy_interface)
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
 
 	// video hardware

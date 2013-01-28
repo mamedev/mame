@@ -244,9 +244,9 @@ enum
 
 void vip_state::update_interrupts()
 {
-	int irq = m_vdc_int | m_exp_int;
+	int irq = m_vdc_int || m_exp_int;
 	int dma_in = m_exp_dma_in;
-	int dma_out = m_vdc_dma_out | m_exp_dma_out;
+	int dma_out = m_vdc_dma_out || m_exp_dma_out;
 
 	m_maincpu->set_input_line(COSMAC_INPUT_LINE_INT, irq);
 	m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, dma_in);
@@ -268,7 +268,7 @@ READ8_MEMBER( vip_state::read )
 
 	if (cs)
 	{
-		data = memregion(CDP1802_TAG)->base()[offset & 0x1ff];
+		data = m_rom->base()[offset & 0x1ff];
 	}
 	else if (!minh)
 	{
@@ -452,14 +452,14 @@ READ_LINE_MEMBER( vip_state::clear_r )
 
 READ_LINE_MEMBER( vip_state::ef1_r )
 {
-	return m_vdc_ef1 | m_exp->ef1_r();
+	return m_vdc_ef1 || m_exp->ef1_r();
 }
 
 READ_LINE_MEMBER( vip_state::ef2_r )
 {
-	set_led_status(machine(), LED_TAPE, ((m_cassette)->input() > 0));
+	set_led_status(machine(), LED_TAPE, m_cassette->input() > 0);
 
-	return ((m_cassette)->input() < 0) ? ASSERT_LINE : CLEAR_LINE;
+	return (m_cassette->input() < 0) ? ASSERT_LINE : CLEAR_LINE;
 }
 
 READ_LINE_MEMBER( vip_state::ef3_r )
@@ -469,7 +469,7 @@ READ_LINE_MEMBER( vip_state::ef3_r )
 
 READ_LINE_MEMBER( vip_state::ef4_r )
 {
-	return m_byteio_ef4 | m_exp_ef4;
+	return m_byteio_ef4 || m_exp_ef4;
 }
 
 static COSMAC_SC_WRITE( vip_sc_w )
@@ -704,7 +704,7 @@ void vip_state::machine_reset()
 	m_8000 = 1;
 
 	// internal speaker
-	m_beeper->set_output_gain(0, ioport("BEEPER")->read() ? 0.80 : 0);
+	m_beeper->set_output_gain(0, m_io_beeper->read() ? 0.80 : 0);
 
 	// clear byte I/O latch
 	m_byteio_data = 0;
@@ -726,17 +726,17 @@ static QUICKLOAD_LOAD( vip )
 	if (strcmp(image.filetype(), "c8") == 0)
 	{
 		/* CHIP-8 program */
-		chip8_ptr = image.device().machine().root_device().memregion("chip8")->base();
-		chip8_size = image.device().machine().root_device().memregion("chip8")->bytes();
+		chip8_ptr = state->m_chip8->base();
+		chip8_size = state->m_chip8->bytes();
 	}
 	else if (strcmp(image.filename(), "c8x") == 0)
 	{
 		/* CHIP-8X program */
-		chip8_ptr = image.device().machine().root_device().memregion("chip8x")->base();
-		chip8_size = image.device().machine().root_device().memregion("chip8x")->bytes();
+		chip8_ptr = state->m_chip8x->base();
+		chip8_size = state->m_chip8x->bytes();
 	}
 
-	if ((size + chip8_size) > image.device().machine().device<ram_device>(RAM_TAG)->size())
+	if ((size + chip8_size) > state->m_ram->size())
 	{
 		return IMAGE_INIT_FAIL;
 	}

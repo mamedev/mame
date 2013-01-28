@@ -218,15 +218,15 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 	UINT8 data = 0x7f;
 
 	/* bit 0 to 5, keyboard rows 0 to 5 */
-	if (!BIT(m_lednum, 0)) data &= ioport("PC0")->read();
-	if (!BIT(m_lednum, 1)) data &= ioport("PC1")->read();
-	if (!BIT(m_lednum, 2)) data &= ioport("PC2")->read();
-	if (!BIT(m_lednum, 3)) data &= ioport("PC3")->read();
-	if (!BIT(m_lednum, 4)) data &= ioport("PC4")->read();
-	if (!BIT(m_lednum, 5)) data &= ioport("PC5")->read();
+	if (!BIT(m_lednum, 0)) data &= m_pc0->read();
+	if (!BIT(m_lednum, 1)) data &= m_pc1->read();
+	if (!BIT(m_lednum, 2)) data &= m_pc2->read();
+	if (!BIT(m_lednum, 3)) data &= m_pc3->read();
+	if (!BIT(m_lednum, 4)) data &= m_pc4->read();
+	if (!BIT(m_lednum, 5)) data &= m_pc5->read();
 
 	/* bit 6, user key */
-	data &= ioport("SPECIAL")->read() & 1 ? 0xff : 0xbf;
+	data &= m_special->read() & 1 ? 0xff : 0xbf;
 
 	/* bit 7, tape input */
 	data |= ((m_cassette)->input() > 0 ? 1 : 0) << 7;

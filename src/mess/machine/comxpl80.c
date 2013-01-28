@@ -161,7 +161,10 @@ ioport_constructor comx_pl80_device::device_input_ports() const
 
 comx_pl80_device::comx_pl80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, COMX_PL80, "COMX PL-80", tag, owner, clock),
-		device_centronics_peripheral_interface(mconfig, *this)
+		device_centronics_peripheral_interface(mconfig, *this),
+		m_plotter(*this, "PLOTTER"),
+		m_font(*this, "FONT"),
+		m_sw(*this, "SW")
 {
 }
 
@@ -225,9 +228,9 @@ WRITE8_MEMBER( comx_pl80_device::pa_w )
 	else
 	{
 		// read data from font ROM
-		int font_rom = (ioport("FONT")->read() & 0x03) * 0x2000;
+		int font_rom = (m_font->read() & 0x03) * 0x2000;
 
-		m_plotter_data = memregion("gfx2")->base()[font_rom | m_font_addr];
+		m_plotter_data = m_plotter->base()[font_rom | m_font_addr];
 	}
 
 	if (!BIT(data, 6))
@@ -239,7 +242,7 @@ WRITE8_MEMBER( comx_pl80_device::pa_w )
 	if (BIT(data, 7))
 	{
 		// read switches
-		m_plotter_data = ioport("SW")->read();
+		m_plotter_data = m_sw->read();
 	}
 }
 

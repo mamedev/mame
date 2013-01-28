@@ -48,6 +48,7 @@ public:
 			m_cassette(*this, CASSETTE_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_speaker(*this, SPEAKER_TAG),
+			m_extrom(*this, EXTROM_TAG),
 			m_y0(*this, "Y0"),
 			m_y1(*this, "Y1"),
 			m_y2(*this, "Y2"),
@@ -68,6 +69,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
+	required_memory_region m_extrom;
 	required_ioport m_y0;
 	required_ioport m_y1;
 	required_ioport m_y2;

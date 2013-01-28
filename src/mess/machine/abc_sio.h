@@ -41,7 +41,7 @@ protected:
 private:
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_sio;
-
+	required_memory_region m_rom;
 };
 
 

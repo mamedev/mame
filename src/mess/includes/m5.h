@@ -27,7 +27,8 @@ public:
 			m_cassette(*this, CASSETTE_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, UPD765_TAG ":0:525dd")
+			m_floppy0(*this, UPD765_TAG ":0:525dd"),
+			m_reset(*this, "RESET")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -39,6 +40,7 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	required_device<floppy_image_device> m_floppy0;
+	required_ioport m_reset;
 
 	virtual void machine_start();
 	virtual void machine_reset();

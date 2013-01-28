@@ -85,7 +85,7 @@ void c64_xl80_device::crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitma
 	{
 		UINT8 code = m_ram[((ma + column) & 0x7ff)];
 		UINT16 addr = (code << 3) | (ra & 0x07);
-		UINT8 data = m_char_rom[addr & 0x7ff];
+		UINT8 data = m_char_rom->base()[addr & 0x7ff];
 
 		if (column == cursor_x)
 		{
@@ -176,7 +176,8 @@ machine_config_constructor c64_xl80_device::device_mconfig_additions() const
 c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_XL80, "XL 80", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
-	m_crtc(*this, HD46505SP_TAG)
+	m_crtc(*this, HD46505SP_TAG),
+	m_char_rom(*this, HD46505SP_TAG)
 {
 }
 
@@ -187,8 +188,7 @@ c64_xl80_device::c64_xl80_device(const machine_config &mconfig, const char *tag,
 
 void c64_xl80_device::device_start()
 {
-	// find memory regions
-	m_char_rom = memregion(HD46505SP_TAG)->base();
+	// allocate memory
 	c64_ram_pointer(machine(), RAM_SIZE);
 
 	// state saving

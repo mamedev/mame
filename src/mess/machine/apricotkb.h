@@ -85,6 +85,21 @@ protected:
 private:
 	devcb_resolved_write_line   m_out_txd_func;
 
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_y8;
+	required_ioport m_y9;
+	required_ioport m_ya;
+	required_ioport m_yb;
+	required_ioport m_yc;
+	required_ioport m_modifiers;
+
 	UINT16 m_kb_y;
 };
 

@@ -219,9 +219,6 @@ public:
 	// construction/destruction
 	c1541_prologic_dos_classic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// device-level overrides
-	virtual void device_start();
-
 	// not really public
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -236,8 +233,7 @@ public:
 protected:
 	required_device<pia6821_device> m_pia;
 	required_device<centronics_device> m_centronics;
-
-	UINT8 *m_mmu_rom;
+	required_memory_region m_mmu_rom;
 };
 
 

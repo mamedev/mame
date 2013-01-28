@@ -81,6 +81,7 @@ public:
 			m_rom(*this, Z80_TAG),
 			m_video_ram(*this, "video_ram"),
 			m_char_ram(*this, "char_ram"),
+			m_io_sb(*this, "SB"),
 			m_ctc_z0(0),
 			m_sio_rxdb(1),
 			m_sio_txcb(0),
@@ -100,6 +101,7 @@ public:
 	required_memory_region m_rom;
 	optional_shared_ptr<UINT8> m_video_ram;
 	optional_shared_ptr<UINT8> m_char_ram;
+	required_ioport m_io_sb;
 
 	enum
 	{
@@ -215,12 +217,14 @@ public:
 		: abc800_state(mconfig, type, tag),
 			m_crtc(*this, MC6845_TAG),
 			m_abc77(*this, ABC77_TAG),
-			m_char_rom(*this, MC6845_TAG)
+			m_char_rom(*this, MC6845_TAG),
+			m_config(*this, "CONFIG")
 	{ }
 
 	required_device<mc6845_device> m_crtc;
 	optional_device<abc77_device> m_abc77;
 	required_memory_region m_char_rom;
+	required_ioport m_config;
 
 	DECLARE_DRIVER_INIT(driver_init);
 	virtual void machine_start();

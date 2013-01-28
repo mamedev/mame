@@ -673,7 +673,10 @@ grip_device::grip_device(const machine_config &mconfig, const char *tag, device_
 	m_crtc(*this, MC6845_TAG),
 	m_centronics(*this, CENTRONICS_TAG),
 	m_speaker(*this, SPEAKER_TAG),
-	m_video_ram(*this, "video_ram")
+	m_video_ram(*this, "video_ram"),
+	m_j3a(*this, "J3A"),
+	m_j3b(*this, "J3B"),
+	m_j7(*this, "J7")
 {
 }
 
@@ -683,8 +686,6 @@ grip_device::grip_device(const machine_config &mconfig, const char *tag, device_
 
 void grip_device::device_start()
 {
-	m_ecb = machine().device<ecbbus_device>(ECBBUS_TAG);
-
 	// allocate video RAM
 	m_video_ram.allocate(VIDEORAM_SIZE);
 
@@ -726,7 +727,7 @@ void grip5_state::machine_start()
 
 void grip_device::device_reset()
 {
-	m_base = ioport("J7")->read();
+	m_base = m_j7->read();
 }
 
 
@@ -797,7 +798,7 @@ READ8_MEMBER( grip_device::stat_r )
 	int js0 = 0, js1 = 0;
 
 	// JS0
-	switch (ioport("J3A")->read())
+	switch (m_j3a->read())
 	{
 	case 0: js0 = 0; break;
 	case 1: js0 = 1; break;
@@ -809,7 +810,7 @@ READ8_MEMBER( grip_device::stat_r )
 	data |= js0 << 4;
 
 	// JS1
-	switch (ioport("J3B")->read())
+	switch (m_j3b->read())
 	{
 	case 0: js1 = 0; break;
 	case 1: js1 = 1; break;

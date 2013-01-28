@@ -47,7 +47,7 @@ protected:
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 
 private:
-	UINT8 *m_rom;
+	required_memory_region m_eprom;
 
 	UINT8 m_bank;
 	int m_reset;

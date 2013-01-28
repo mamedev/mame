@@ -100,7 +100,8 @@ c64_ide64_cartridge_device::c64_ide64_cartridge_device(const machine_config &mco
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_flash_rom(*this, AT29C010A_TAG),
 	m_rtc(*this, DS1302_TAG),
-	m_ide(*this, IDE_TAG)
+	m_ide(*this, IDE_TAG),
+	m_jp1(*this, "JP1")
 {
 }
 
@@ -131,7 +132,7 @@ void c64_ide64_cartridge_device::device_reset()
 
 	m_enable = 1;
 
-	m_wp = ioport("JP1")->read();
+	m_wp = m_jp1->read();
 	m_game = !m_wp;
 	m_exrom = !m_wp;
 }

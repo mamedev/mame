@@ -154,7 +154,7 @@ public:
 	virtual void ecbbus_io_w(offs_t offset, UINT8 data) { };
 
 public:
-	ecbbus_device  *m_ecb;
+	ecbbus_slot_device  *m_slot;
 };
 
 #endif

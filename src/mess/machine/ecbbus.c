@@ -109,6 +109,7 @@ void ecbbus_device::device_config_complete()
 device_ecbbus_card_interface::device_ecbbus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
 {
+	m_slot = dynamic_cast<ecbbus_slot_device *>(device.owner());
 }
 
 

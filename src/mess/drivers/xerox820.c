@@ -45,7 +45,7 @@ void xerox820_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		program.install_rom(0x0000, 0x0fff, memregion("monitor")->base());
+		program.install_rom(0x0000, 0x0fff, m_rom->base());
 		program.unmap_readwrite(0x1000, 0x1fff);
 		program.install_ram(0x3000, 0x3fff, m_video_ram);
 	}
@@ -64,7 +64,7 @@ void xerox820ii_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		program.install_rom(0x0000, 0x17ff, memregion("monitor")->base());
+		program.install_rom(0x0000, 0x17ff, m_rom->base());
 		program.unmap_readwrite(0x1800, 0x2fff);
 		program.install_ram(0x3000, 0x3fff, m_video_ram);
 		program.unmap_readwrite(0x4000, 0xbfff);
@@ -522,13 +522,6 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 
 /* Video */
 
-void xerox820_state::video_start()
-{
-	/* find memory regions */
-	m_char_rom = memregion("chargen")->base();
-}
-
-
 UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	UINT8 y,ra,chr,gfx;
@@ -555,7 +548,7 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 						chr |= 0x80;
 
 					/* get pattern of pixels for that character scanline */
-					gfx = m_char_rom[(m_ncset2 << 10) | (chr<<3) | ra ];
+					gfx = m_char_rom->base()[(m_ncset2 << 10) | (chr<<3) | ra ];
 				}
 				else
 					gfx = 0xff;
@@ -787,7 +780,7 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( bigboard )
-	ROM_REGION( 0x1000, "monitor", 0 )
+	ROM_REGION( 0x1000, Z80_TAG, 0 )
 	ROM_LOAD( "bigboard.u67", 0x0000, 0x0800, CRC(5a85a228) SHA1(d51a2cbd0aae80315bda9530275aabfe8305364e))
 
 	ROM_REGION( 0x800, "chargen", 0 )
@@ -797,7 +790,7 @@ ROM_END
 #define rom_mk82 rom_bigboard
 
 ROM_START( x820 )
-	ROM_REGION( 0x1000, "monitor", 0 )
+	ROM_REGION( 0x1000, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v20" )
 	ROM_SYSTEM_BIOS( 0, "v10", "Xerox Monitor v1.0" )
 	ROMX_LOAD( "x820v10.u64", 0x0000, 0x0800, NO_DUMP, ROM_BIOS(1) )
@@ -820,7 +813,7 @@ ROM_START( x820 )
 ROM_END
 
 ROM_START( x820ii )
-	ROM_REGION( 0x1800, "monitor", 0 )
+	ROM_REGION( 0x1800, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v404" )
 	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" )
 	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(1) )
@@ -836,7 +829,7 @@ ROM_START( x820ii )
 ROM_END
 
 ROM_START( x168 )
-	ROM_REGION( 0x1800, "monitor", 0 )
+	ROM_REGION( 0x1800, Z80_TAG, 0 )
 	ROM_DEFAULT_BIOS( "v404" )
 	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" )
 	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(1) )
@@ -855,7 +848,7 @@ ROM_START( x168 )
 ROM_END
 
 ROM_START( mk83 )
-	ROM_REGION( 0x1000, "monitor", 0 )
+	ROM_REGION( 0x1000, Z80_TAG, 0 )
 	ROM_LOAD( "2732mk83.bin", 0x0000, 0x1000, CRC(a845c7e1) SHA1(3ccf629c5cd384953794ac4a1d2b45678bd40e92))
 	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "2716mk83.bin", 0x0000, 0x0800, CRC(10bf0d81) SHA1(7ec73670a4d9d6421a5d6a4c4edc8b7c87923f6c))

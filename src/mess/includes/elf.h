@@ -32,7 +32,8 @@ public:
 			m_led_l(*this, DM9368_L_TAG),
 			m_led_h(*this, DM9368_H_TAG),
 			m_cassette(*this, CASSETTE_TAG),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_special(*this, "SPECIAL")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -42,6 +43,7 @@ public:
 	required_device<dm9368_device> m_led_h;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_ioport m_special;
 
 	virtual void machine_start();
 

@@ -72,6 +72,8 @@ private:
 	abc1600bus_slot_device *m_slot;
 
 	required_device<scsicb_device> m_sasibus;
+	required_ioport m_1e;
+	required_ioport m_5e;
 
 	int m_cs;
 	UINT8 m_data;

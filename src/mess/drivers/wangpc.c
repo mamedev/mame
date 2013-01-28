@@ -851,7 +851,7 @@ READ8_MEMBER( wangpc_state::ppi_pc_r )
 
 	*/
 
-	return ioport("SW")->read() << 4;
+	return m_sw->read() << 4;
 }
 
 WRITE8_MEMBER( wangpc_state::ppi_pc_w )

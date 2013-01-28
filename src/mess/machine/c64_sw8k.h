@@ -44,6 +44,8 @@ protected:
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 
 private:
+	required_ioport m_sw;
+	
 	int m_bank;
 };
 

@@ -99,7 +99,8 @@ ioport_constructor c64_16kb_cartridge_device::device_input_ports() const
 
 c64_16kb_cartridge_device::c64_16kb_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_16KB, "C64 16KB EPROM cartridge", tag, owner, clock),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this),
+	m_sw1(*this, "SW1")
 {
 }
 
@@ -121,7 +122,7 @@ void c64_16kb_cartridge_device::device_start()
 
 void c64_16kb_cartridge_device::device_reset()
 {
-	UINT8 mode = ioport("SW1")->read();
+	UINT8 mode = m_sw1->read();
 
 	m_exrom = BIT(mode, 0);
 	m_game = BIT(mode, 1);

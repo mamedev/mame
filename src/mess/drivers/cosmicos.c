@@ -79,7 +79,7 @@ WRITE8_MEMBER( cosmicos_state::audio_latch_w )
 
 READ8_MEMBER( cosmicos_state::hex_keyboard_r )
 {
-	static const char *const keynames[] = { "ROW1", "ROW2", "ROW3", "ROW4" };
+	ioport_port *ports[4] = { m_y1, m_y2, m_y3, m_y4 };
 	UINT8 data = 0;
 	int i;
 
@@ -87,7 +87,7 @@ READ8_MEMBER( cosmicos_state::hex_keyboard_r )
 	{
 		if (BIT(m_keylatch, i))
 		{
-			UINT8 keydata = ioport(keynames[i])->read();
+			UINT8 keydata = ports[i]->read();
 
 			if (BIT(keydata, 0)) data |= 0x01;
 			if (BIT(keydata, 1)) data |= 0x02;
@@ -159,7 +159,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER( cosmicos_state::data )
 {
-	UINT8 data = ioport("DATA")->read();
+	UINT8 data = m_io_data->read();
 	int i;
 
 	for (i = 0; i < 8; i++)
@@ -308,25 +308,25 @@ static INPUT_PORTS_START( cosmicos )
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_NAME("Memory Protect") PORT_CHANGED_MEMBER(DEVICE_SELF, cosmicos_state, memory_protect, 0) PORT_TOGGLE
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_NAME("Memory Disable") PORT_CHANGED_MEMBER(DEVICE_SELF, cosmicos_state, memory_disable, 0) PORT_TOGGLE
 
-	PORT_START("ROW1")
+	PORT_START("Y1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
 
-	PORT_START("ROW2")
+	PORT_START("Y2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
 
-	PORT_START("ROW3")
+	PORT_START("Y3")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
 
-	PORT_START("ROW4")
+	PORT_START("Y4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
@@ -395,14 +395,14 @@ READ_LINE_MEMBER( cosmicos_state::clear_r )
 
 READ_LINE_MEMBER( cosmicos_state::ef1_r )
 {
-	UINT8 special = ioport("SPECIAL")->read();
+	UINT8 special = m_special->read();
 
 	return BIT(special, 0);
 }
 
 READ_LINE_MEMBER( cosmicos_state::ef2_r )
 {
-	UINT8 special = ioport("SPECIAL")->read();
+	UINT8 special = m_special->read();
 	int casin = (m_cassette)->input() < 0.0;
 
 	output_set_led_value(LED_CASSETTE, casin);
@@ -412,14 +412,14 @@ READ_LINE_MEMBER( cosmicos_state::ef2_r )
 
 READ_LINE_MEMBER( cosmicos_state::ef3_r )
 {
-	UINT8 special = ioport("SPECIAL")->read();
+	UINT8 special = m_special->read();
 
 	return BIT(special, 2) | BIT(special, 3);
 }
 
 READ_LINE_MEMBER( cosmicos_state::ef4_r )
 {
-	return BIT(ioport("BUTTONS")->read(), 0);
+	return BIT(m_buttons->read(), 0);
 }
 
 static COSMAC_SC_WRITE( cosmicos_sc_w )
@@ -528,7 +528,8 @@ void cosmicos_state::machine_reset()
 
 static QUICKLOAD_LOAD( cosmicos )
 {
-	UINT8 *ptr = image.device().machine().root_device().memregion(CDP1802_TAG)->base();
+	cosmicos_state *state = image.device().machine().driver_data<cosmicos_state>();
+	UINT8 *ptr = state->m_rom->base();
 	int size = image.length();
 
 	/* load image to RAM */
@@ -609,7 +610,7 @@ DIRECT_UPDATE_MEMBER(cosmicos_state::cosmicos_direct_update_handler)
 	if (m_boot)
 	{
 		/* force A6 and A7 high */
-		direct.explicit_configure(0x0000, 0xffff, 0x3f3f, memregion(CDP1802_TAG)->base() + 0xc0);
+		direct.explicit_configure(0x0000, 0xffff, 0x3f3f, m_rom->base() + 0xc0);
 		return ~0;
 	}
 
@@ -618,9 +619,7 @@ DIRECT_UPDATE_MEMBER(cosmicos_state::cosmicos_direct_update_handler)
 
 DRIVER_INIT_MEMBER(cosmicos_state,cosmicos)
 {
-	address_space &program = machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
-
-	program.set_direct_update_handler(direct_update_delegate(FUNC(cosmicos_state::cosmicos_direct_update_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(cosmicos_state::cosmicos_direct_update_handler), this));
 }
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME    FLAGS */

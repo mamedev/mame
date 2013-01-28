@@ -77,6 +77,26 @@ public:
 			m_mfp(*this, MC68901_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_ram(*this, RAM_TAG),
+			m_p31(*this, "P31"),
+			m_p32(*this, "P32"),
+			m_p33(*this, "P33"),
+			m_p34(*this, "P34"),
+			m_p35(*this, "P35"),
+			m_p36(*this, "P36"),
+			m_p37(*this, "P37"),
+			m_p40(*this, "P40"),
+			m_p41(*this, "P41"),
+			m_p42(*this, "P42"),
+			m_p43(*this, "P43"),
+			m_p44(*this, "P44"),
+			m_p45(*this, "P45"),
+			m_p46(*this, "P46"),
+			m_p47(*this, "P47"),
+			m_joy0(*this, "IKBD_JOY0"),
+			m_joy1(*this, "IKBD_JOY1"),
+			m_mousex(*this, "IKBD_MOUSEX"),
+			m_mousey(*this, "IKBD_MOUSEY"),
+			m_config(*this, "config"),
 			m_acia_ikbd_irq(1),
 			m_acia_midi_irq(1),
 			m_ikbd_mouse_x(0),
@@ -92,6 +112,26 @@ public:
 	required_device<mc68901_device> m_mfp;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
+	required_ioport m_p31;
+	required_ioport m_p32;
+	required_ioport m_p33;
+	required_ioport m_p34;
+	required_ioport m_p35;
+	required_ioport m_p36;
+	required_ioport m_p37;
+	required_ioport m_p40;
+	required_ioport m_p41;
+	required_ioport m_p42;
+	required_ioport m_p43;
+	required_ioport m_p44;
+	required_ioport m_p45;
+	required_ioport m_p46;
+	required_ioport m_p47;
+	optional_ioport m_joy0;
+	optional_ioport m_joy1;
+	optional_ioport m_mousex;
+	optional_ioport m_mousey;
+	optional_ioport m_config;
 
 	void machine_start();
 
@@ -382,8 +422,11 @@ class stbook_state : public ste_state
 {
 public:
 	stbook_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ste_state(mconfig, type, tag)
+		: ste_state(mconfig, type, tag),
+			m_sw400(*this, "SW400")
 	{ }
+
+	required_ioport m_sw400;
 
 	void machine_start();
 	void video_start();

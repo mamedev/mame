@@ -40,7 +40,8 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, WD2793_TAG":0"),
 			m_floppy1(*this, WD2793_TAG":1"),
-			m_terminal(*this, TERMINAL_TAG)
+			m_terminal(*this, TERMINAL_TAG),
+			m_rom(*this, Z80_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -54,6 +55,7 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<serial_terminal_device> m_terminal;
+	required_memory_region m_rom;
 
 	virtual void machine_start();
 	virtual void machine_reset();

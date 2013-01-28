@@ -67,7 +67,19 @@ public:
 			m_centronics(*this, CENTRONICS_TAG),
 			m_speaker(*this, SPEAKER_TAG),
 			m_cassette(*this, CASSETTE_TAG),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_rom(*this, I8085_TAG),
+			m_option(*this, "option"),
+			m_y0(*this, "Y0"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2"),
+			m_y3(*this, "Y3"),
+			m_y4(*this, "Y4"),
+			m_y5(*this, "Y5"),
+			m_y6(*this, "Y6"),
+			m_y7(*this, "Y7"),
+			m_y8(*this, "Y8"),
+			m_battery(*this, "BATTERY")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -87,6 +99,18 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_memory_region m_option;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_y8;
+	required_ioport m_battery;
 
 	virtual void machine_start();
 
@@ -166,7 +190,18 @@ public:
 			m_centronics(*this, CENTRONICS_TAG),
 			m_speaker(*this, SPEAKER_TAG),
 			m_cassette(*this, CASSETTE_TAG),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_rom(*this, I8085_TAG),
+			m_option(*this, "option"),
+			m_y0(*this, "Y0"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2"),
+			m_y3(*this, "Y3"),
+			m_y4(*this, "Y4"),
+			m_y5(*this, "Y5"),
+			m_y6(*this, "Y6"),
+			m_y7(*this, "Y7"),
+			m_y8(*this, "Y8")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -176,6 +211,17 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_memory_region m_option;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_y8;
 
 	virtual void machine_start();
 

@@ -24,9 +24,10 @@
 
 void amu880_state::scan_keyboard()
 {
-	static const char *const keynames[] = { "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14", "Y15" };
+	ioport_port* ports[16] = { m_y0, m_y1, m_y2, m_y3, m_y4, m_y5, m_y6, m_y7,
+						 m_y8, m_y9, m_y10, m_y11, m_y12, m_y13, m_y14, m_y15 };
 
-	UINT8 data = ioport(keynames[m_key_a8 ? m_key_d6 : m_key_d7])->read();
+	UINT8 data = ports[m_key_a8 ? m_key_d6 : m_key_d7]->read();
 
 	int a8 = (data & 0x0f) == 0x0f;
 
@@ -68,7 +69,7 @@ READ8_MEMBER( amu880_state::keyboard_r )
 
 	*/
 
-	UINT8 special = ioport("SPECIAL")->read();
+	UINT8 special = m_special->read();
 
 	int ctrl = BIT(special, 0);
 	int shift = BIT(special, 2) & BIT(special, 1);
@@ -76,7 +77,7 @@ READ8_MEMBER( amu880_state::keyboard_r )
 
 	UINT16 address = (ab0 << 9) | (m_key_a8 << 8) | (ctrl << 7) | (shift << 6) | (m_key_a5 << 5) | (m_key_a4 << 4) | m_key_d7;
 
-	return m_kb_rom[address];
+	return m_kb_rom->base()[address];
 }
 
 /* Memory Maps */
@@ -209,12 +210,6 @@ INPUT_PORTS_END
 
 /* Video */
 
-void amu880_state::video_start()
-{
-	// find memory regions
-	m_char_rom = memregion("chargen")->base();
-}
-
 UINT32 amu880_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, sx, x, line;
@@ -229,7 +224,7 @@ UINT32 amu880_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 			UINT8 videoram_data = m_video_ram[videoram_addr & 0x7ff];
 
 			UINT16 charrom_addr = ((videoram_data & 0x7f) << 3) | line;
-			UINT8 data = m_char_rom[charrom_addr & 0x3ff];
+			UINT8 data = m_char_rom->base()[charrom_addr & 0x3ff];
 
 			for (x = 0; x < 6; x++)
 			{
@@ -340,9 +335,6 @@ static const z80_daisy_config amu880_daisy_chain[] =
 
 void amu880_state::machine_start()
 {
-	/* find memory regions */
-	m_kb_rom = memregion("keyboard")->base();
-
 	/* register for state saving */
 	save_item(NAME(m_key_d6));
 	save_item(NAME(m_key_d7));

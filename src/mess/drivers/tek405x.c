@@ -23,14 +23,6 @@
 */
 
 
-#include "emu.h"
-#include "cpu/m6800/m6800.h"
-#include "machine/ram.h"
-#include "machine/6821pia.h"
-#include "machine/6850acia.h"
-#include "machine/ieee488.h"
-#include "sound/speaker.h"
-#include "video/vector.h"
 #include "includes/tek405x.h"
 
 
@@ -123,15 +115,15 @@ void tek4051_state::bankswitch(UINT8 data)
 	switch (lbs)
 	{
 	case LBS_RBC:
-		program.install_rom(0x8800, 0xa7ff, memregion(MC6800_TAG)->base() + 0x800);
+		program.install_rom(0x8800, 0xa7ff, m_rom->base() + 0x800);
 		break;
 
 	case LBS_BSOFL:
-		program.install_rom(0x8800, 0xa7ff, memregion("020_0147_00")->base());
+		program.install_rom(0x8800, 0xa7ff, m_bsofl_rom->base());
 		break;
 
 	case LBS_BSCOM:
-		program.install_rom(0x8800, 0xa7ff, memregion("672_0799_08")->base());
+		program.install_rom(0x8800, 0xa7ff, m_bscom_rom->base());
 		break;
 
 	default:
@@ -639,7 +631,7 @@ READ8_MEMBER( tek4051_state::kb_pia_pa_r )
 	*/
 
 	UINT8 data = 0;
-	UINT8 special = ioport("SPECIAL")->read();
+	UINT8 special = m_special->read();
 
 	// keyboard column
 	data = m_kc;
@@ -668,7 +660,7 @@ READ8_MEMBER( tek4051_state::kb_pia_pb_r )
 	*/
 
 	UINT8 data = 0;
-	UINT8 special = ioport("SPECIAL")->read();
+	UINT8 special = m_special->read();
 
 	// shift
 	data |= (BIT(special, 0) & BIT(special, 1));
@@ -1242,6 +1234,15 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,24K,32K")
+
+	// cartridge
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_INTERFACE("tek4050_cart")
+
+	MCFG_CARTSLOT_ADD("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_INTERFACE("tek4050_cart")
 MACHINE_CONFIG_END
 
 
@@ -1274,6 +1275,18 @@ static MACHINE_CONFIG_START( tek4052, tek4052_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 	MCFG_RAM_EXTRA_OPTIONS("64K")
+
+	// cartridge
+	MCFG_CARTSLOT_ADD("cart1")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_INTERFACE("tek4050_cart")
+
+	MCFG_CARTSLOT_ADD("cart2")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin")
+	MCFG_CARTSLOT_INTERFACE("tek4050_cart")
+
+	// software lists
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "tek4052_cart")
 MACHINE_CONFIG_END
 
 
@@ -1328,7 +1341,7 @@ ROM_START( tek4051 )
 	ROM_LOAD( "156-0714-00.u121", 0x1000, 0x0800, NO_DUMP )
 	ROM_LOAD( "156-0714-01.u121", 0x1000, 0x0800, NO_DUMP )
 	ROM_LOAD( "156-0715-01.u131", 0x1800, 0x0800, NO_DUMP )
-
+/*
 	ROM_REGION( 0x2000, "4051r01", 0 ) // 4051R01 Matrix Functions
 	ROM_LOAD( "4051r01", 0x0000, 0x1000, NO_DUMP )
 
@@ -1338,6 +1351,7 @@ ROM_START( tek4051 )
 
 	ROM_REGION( 0x2000, "4051r06", 0 ) // 4051R06 Editor
 	ROM_LOAD( "4051r06", 0x0000, 0x1000, NO_DUMP )
+*/
 ROM_END
 
 
@@ -1367,24 +1381,18 @@ ROM_START( tek4052a )
 	ROM_LOAD16_BYTE( "160-1702-00.u845", 0x10000, 0x2000, CRC(013344b1) SHA1(4a79654427e15d0fcedd9519914f6448938ecffd) )
 	ROM_LOAD16_BYTE( "160-1685-00.u863", 0x10001, 0x2000, CRC(53ddc8f9) SHA1(431d6f329dedebb54232c623a924d5ecddc5e44e) )
 
-	ROM_REGION( 0x2000, "4052r06", 0 ) // 4052R06 Editor
-	ROM_LOAD( "160-1415 v2.0.u11", 0x0000, 0x1000, CRC(04cbc80d) SHA1(7bfb80fa099a794b18a7a5d7f8c2de4b36e245ec) )
-	ROM_LOAD( "160-1414 v2.0.u1",  0x1000, 0x1000, CRC(675da652) SHA1(36a9677853e50a40195519dfdb6a3b3985438bc4) )
+	ROM_REGION( 0x2000, "020_0147_00", 0 ) // Firmware Backpack (020-0147-00)
+	ROM_LOAD( "156-0747-xx.u101", 0x0000, 0x0800, CRC(9e1facc1) SHA1(7e7a118c3e8c49630f630ee02c3de843dd95d7e1) ) // -00 or -01 ?
+	ROM_LOAD( "156-0748-xx.u201", 0x0800, 0x0800, CRC(be42bfbf) SHA1(23575b411bd9dcb7d7116628820096e3064ff93b) ) // -00 or -01 ?
 
-	ROM_REGION( 0x2000, "4052r07", 0 ) // 4052R07 Signal Processing No. 1
-	ROM_LOAD( "160-1416-00 v2.0.u1", 0x0000, 0x1000, CRC(537acdb2) SHA1(275e016eda327173095ae60ca79e72075c606954) )
-
-	ROM_REGION( 0x2000, "4052r08", 0 ) // 4052R08 Signal Processing No. 2 (FFT)
-	ROM_LOAD( "160-1418 v2.0.u11", 0x1000, 0x1000, CRC(f1c19044) SHA1(b1b86009980900f31eccf158dcc7036c7810b8f5) )
-	ROM_LOAD( "160-1417 v2.0.u1",  0x0000, 0x1000, CRC(bee2e90f) SHA1(9f1a26aa98583678047fc532f5fdb3c8a468e617) )
-
-	ROM_REGION( 0x3000, "020_0478_01", 0 ) // 4052/4054 File Manager
-	ROM_LOAD( "160-1703-00 v3.0.u13", 0x0000, 0x1000, CRC(991c9f5f) SHA1(cce038f90edec6e551049c4411da8eeca6faeb4e) )
-	ROM_LOAD( "160-1420-00 v3.0.u11", 0x1000, 0x1000, CRC(6545e073) SHA1(63a8d774a4b6f3640a833fd8be592a1baf124f7d) )
-	ROM_LOAD( "160-1419-00 v3.0.u1",  0x2000, 0x1000, CRC(66d9d2d5) SHA1(e603ef1cacd6a20b975cf532f2e1978dcbee9789) )
-
-	ROM_REGION( 0x800, "720_dac", 0 ) // Transera 4052/4054 D/A Converter
-	ROM_LOAD( "transera.da", 0x0000, 0x0800, CRC(1c16e4da) SHA1(6d6ea0c5c68bab8e6a885b3cb05aa591f7754c56) )
+	ROM_REGION( 0x2000, "021_0188_00", 0 ) // Communications Backpack (021-0188-00)
+	ROM_LOAD( "156-0712-00.u101", 0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "156-0712-01.u101", 0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "156-0713-00.u111", 0x0800, 0x0800, NO_DUMP )
+	ROM_LOAD( "156-0713-01.u111", 0x0800, 0x0800, NO_DUMP )
+	ROM_LOAD( "156-0714-00.u121", 0x1000, 0x0800, NO_DUMP )
+	ROM_LOAD( "156-0714-01.u121", 0x1000, 0x0800, NO_DUMP )
+	ROM_LOAD( "156-0715-01.u131", 0x1800, 0x0800, NO_DUMP )
 ROM_END
 
 

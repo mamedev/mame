@@ -1018,7 +1018,7 @@ void v1050_state::machine_start()
 
 	membank("bank1")->configure_entries(0, 2, ram, 0x10000);
 	membank("bank1")->configure_entry(2, ram + 0x1c000);
-	membank("bank1")->configure_entry(3, memregion(Z80_TAG)->base());
+	membank("bank1")->configure_entry(3, m_rom->base());
 
 	program.install_readwrite_bank(0x2000, 0x3fff, "bank2");
 	membank("bank2")->configure_entries(0, 2, ram + 0x2000, 0x10000);

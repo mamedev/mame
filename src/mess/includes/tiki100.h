@@ -41,7 +41,20 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_floppy0(*this, FD1797_TAG":0"),
 			m_floppy1(*this, FD1797_TAG":1"),
-			m_video_ram(*this, "video_ram")
+			m_rom(*this, Z80_TAG),
+			m_video_ram(*this, "video_ram"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2"),
+			m_y3(*this, "Y3"),
+			m_y4(*this, "Y4"),
+			m_y5(*this, "Y5"),
+			m_y6(*this, "Y6"),
+			m_y7(*this, "Y7"),
+			m_y8(*this, "Y8"),
+			m_y9(*this, "Y9"),
+			m_y10(*this, "Y10"),
+			m_y11(*this, "Y11"),
+			m_y12(*this, "Y12")	
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -50,7 +63,20 @@ public:
 	required_device<ram_device> m_ram;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_memory_region m_rom;
 	optional_shared_ptr<UINT8> m_video_ram;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
+	required_ioport m_y8;
+	required_ioport m_y9;
+	required_ioport m_y10;
+	required_ioport m_y11;
+	required_ioport m_y12;
 
 	virtual void machine_start();
 

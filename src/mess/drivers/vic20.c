@@ -62,9 +62,6 @@ block of RAM instead of 8.
         * K-Star Patrol (Europe).60
         * Seafox (Japan, USA).60
     - mos6560_port_r/w should respond at 0x1000-0x100f
-    - SHIFT LOCK
-    - restore key
-    - light pen
     - VIC21 (built in 21K ram)
 
 */

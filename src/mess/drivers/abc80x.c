@@ -998,7 +998,7 @@ void abc800_state::machine_start()
 
 void abc800_state::machine_reset()
 {
-	m_sb = ioport("SB")->read();
+	m_sb = m_io_sb->read();
 
 	m_fetch_charram = 0;
 	bankswitch();
@@ -1045,8 +1045,8 @@ void abc802_state::machine_start()
 
 void abc802_state::machine_reset()
 {
-	UINT8 config = ioport("CONFIG")->read();
-	m_sb = ioport("SB")->read();
+	UINT8 config = m_config->read();
+	m_sb = m_io_sb->read();
 
 	// memory banking
 	m_lrs = 1;
@@ -1115,7 +1115,7 @@ void abc806_state::machine_start()
 
 void abc806_state::machine_reset()
 {
-	m_sb = ioport("SB")->read();
+	m_sb = m_io_sb->read();
 
 	// setup memory banking
 	int bank;

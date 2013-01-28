@@ -14,13 +14,15 @@ public:
 			m_maincpu(*this, I8085A_TAG),
 			m_terminal(*this, TERMINAL_TAG),
 			m_cassette(*this, CASSETTE_TAG),
-			m_speaker(*this, SPEAKER_TAG)
+			m_speaker(*this, SPEAKER_TAG),
+			m_rom(*this, I8085A_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<serial_terminal_device> m_terminal;
 	required_device<cassette_image_device> m_cassette;
 	required_device<speaker_sound_device> m_speaker;
+	required_memory_region m_rom;
 
 	virtual void machine_start();
 

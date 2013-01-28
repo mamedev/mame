@@ -118,6 +118,7 @@ protected:
 	required_ioport m_x9;
 	required_ioport m_x10;
 	required_ioport m_x11;
+	required_ioport m_dsw;
 
 	int m_txd;                      // transmit data
 	int m_keylatch;                 // keyboard row latch

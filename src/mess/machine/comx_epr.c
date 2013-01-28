@@ -60,6 +60,8 @@ const rom_entry *comx_epr_device::device_rom_region() const
 comx_epr_device::comx_epr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, COMX_EPR, "COMX-35 F&M EPROM Switchboard", tag, owner, clock),
 	device_comx_expansion_card_interface(mconfig, *this),
+	m_rom(*this, "f800"),
+	m_eprom(*this, "eprom"),
 	m_select(0)
 {
 }
@@ -71,9 +73,6 @@ comx_epr_device::comx_epr_device(const machine_config &mconfig, const char *tag,
 
 void comx_epr_device::device_start()
 {
-	m_rom = memregion("f800")->base();
-	m_eprom = memregion("eprom")->base();
-
 	// state saving
 	save_item(NAME(m_select));
 }
@@ -99,11 +98,11 @@ UINT8 comx_epr_device::comx_mrd_r(address_space &space, offs_t offset, int *extr
 	if (offset >= 0xc000 && offset < 0xe000)
 	{
 		offs_t address = (m_select << 13) | (offset & 0x1fff);
-		data = m_eprom[address];
+		data = m_eprom->base()[address];
 	}
 	else if (offset >= 0xf800)
 	{
-		data = m_rom[offset & 0x7ff];
+		data = m_rom->base()[offset & 0x7ff];
 	}
 
 	return data;

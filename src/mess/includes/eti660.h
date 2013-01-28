@@ -31,13 +31,23 @@ public:
 			m_maincpu(*this, CDP1802_TAG),
 			m_cti(*this, CDP1864_TAG),
 			m_pia(*this, MC6821_TAG),
-			m_cassette(*this, CASSETTE_TAG)
+			m_cassette(*this, CASSETTE_TAG),
+			m_pa0(*this, "PA0"),
+			m_pa1(*this, "PA1"),
+			m_pa2(*this, "PA2"),
+			m_pa3(*this, "PA3"),
+			m_special(*this, "SPECIAL")
 	{ }
 
 	required_device<cosmac_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
 	required_device<pia6821_device> m_pia;
 	required_device<cassette_image_device> m_cassette;
+	required_ioport m_pa0;
+	required_ioport m_pa1;
+	required_ioport m_pa2;
+	required_ioport m_pa3;
+	required_ioport m_special;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -55,6 +55,7 @@ private:
 	required_device<fd1771_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
+	required_memory_region m_rom;
 };
 
 

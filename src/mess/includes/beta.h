@@ -24,6 +24,7 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M6502_TAG),
 			m_speaker(*this, SPEAKER_TAG),
+			m_eprom(*this, EPROM_TAG),
 			m_q6(*this, "Q6"),
 			m_q7(*this, "Q7"),
 			m_q8(*this, "Q8"),
@@ -32,6 +33,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
+	required_memory_region m_eprom;
 	required_ioport m_q6;
 	required_ioport m_q7;
 	required_ioport m_q8;
@@ -46,7 +48,6 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 	/* EPROM state */
-	UINT8 *m_eprom;
 	int m_eprom_oe;
 	int m_eprom_ce;
 	UINT16 m_eprom_addr;

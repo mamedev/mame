@@ -3,7 +3,16 @@
 #ifndef __TEK405X__
 #define __TEK405X__
 
+#include "emu.h"
+#include "cpu/m6800/m6800.h"
+#include "imagedev/cartslot.h"
 #include "machine/ram.h"
+#include "machine/6821pia.h"
+#include "machine/6850acia.h"
+#include "machine/ieee488.h"
+#include "machine/ram.h"
+#include "sound/speaker.h"
+#include "video/vector.h"
 
 #define MC6800_TAG          "u61"
 #define MC6820_Y_TAG        "u561"
@@ -29,7 +38,11 @@ public:
 			m_acia(*this, MC6850_TAG),
 			m_gpib(*this, IEEE488_TAG),
 			m_speaker(*this, SPEAKER_TAG),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_rom(*this, MC6800_TAG),
+			m_bsofl_rom(*this, "020_0147_00"),
+			m_bscom_rom(*this, "021_0188_00"),
+			m_special(*this, "SPECIAL")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -39,6 +52,10 @@ public:
 	required_device<ieee488_device> m_gpib;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_memory_region m_bsofl_rom;
+	required_memory_region m_bscom_rom;
+	required_ioport m_special;
 
 	virtual void machine_start();
 

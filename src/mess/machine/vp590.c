@@ -16,7 +16,7 @@
 //**************************************************************************
 
 #define CDP1862_TAG     "u2"
-#define SCREEN_TAG      ":screen"
+#define SCREEN_TAG      ":screen" // hijack the VIP's screen since the CDP1861 chip would be removed from the PCB on real hardware
 
 #define COLOR_RAM_SIZE  0x100
 

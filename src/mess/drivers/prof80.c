@@ -49,7 +49,7 @@ void prof80_state::bankswitch()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = memregion(Z80_TAG)->base();
+	UINT8 *rom = m_rom->base();
 	int bank;
 
 	for (bank = 0; bank < 16; bank++)
@@ -100,10 +100,8 @@ void prof80_state::bankswitch()
 
 void prof80_state::floppy_motor_off()
 {
-	if(m_floppy0)
-		m_floppy0->mon_w(true);
-	if(m_floppy1)
-		m_floppy1->mon_w(true);
+	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(1);
+	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(1);
 
 	m_motor = 0;
 }
@@ -156,11 +154,9 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 		else
 		{
 			// turn on floppy motor
-			if(m_floppy0)
-				m_floppy0->mon_w(false);
-			if(m_floppy1)
-				m_floppy1->mon_w(false);
-
+			if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
+			if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
+			
 			m_motor = 1;
 
 			// reset floppy motor off NE555 timer
@@ -271,11 +267,7 @@ READ8_MEMBER( prof80_state::status_r )
 	data |= 0x10;
 
 	// floppy index
-	if(m_floppy0)
-		data |= m_floppy0->idx_r() << 5;
-
-	if(m_floppy1)
-		data |= m_floppy1->idx_r() << 5;
+	data |= (m_floppy0->get_device() ? m_floppy0->get_device()->idx_r() : m_floppy1->get_device() ? m_floppy1->get_device()->idx_r() : 1) << 5;
 
 	return data;
 }
@@ -309,7 +301,7 @@ READ8_MEMBER( prof80_state::status2_r )
 	data |= !m_motor;
 
 	// JS4
-	switch (ioport("J4")->read())
+	switch (m_j4->read())
 	{
 	case 0: js4 = 0; break;
 	case 1: js4 = 1; break;
@@ -321,7 +313,7 @@ READ8_MEMBER( prof80_state::status2_r )
 	data |= js4 << 4;
 
 	// JS5
-	switch (ioport("J5")->read())
+	switch (m_j5->read())
 	{
 	case 0: js5 = 0; break;
 	case 1: js5 = 1; break;

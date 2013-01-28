@@ -48,6 +48,8 @@ public:
 			m_user(*this, C64_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+			m_basic(*this, "basic"),
+			m_kernal(*this, "kernal"),
 			m_charom(*this, "charom"),
 			m_color_ram(*this, "color_ram"),
 			m_row0(*this, "ROW0"),
@@ -87,6 +89,8 @@ public:
 	required_device<c64_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	optional_device<pet_datassette_port_device> m_cassette;
+	optional_memory_region m_basic;
+	required_memory_region m_kernal;
 	required_memory_region m_charom;
 	optional_shared_ptr<UINT8> m_color_ram;
 	optional_ioport m_row0;
@@ -145,8 +149,6 @@ public:
 	int m_loram;
 	int m_hiram;
 	int m_charen;
-	UINT8 *m_basic;
-	UINT8 *m_kernal;
 
 	// video state
 	int m_va14;
@@ -182,8 +184,6 @@ public:
 	c64c_state(const machine_config &mconfig, device_type type, const char *tag)
 		: c64_state(mconfig, type, tag)
 	{ }
-
-	virtual void machine_start();
 };
 
 
@@ -193,8 +193,6 @@ public:
 	c64gs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: c64c_state(mconfig, type, tag)
 	{ }
-
-	virtual void machine_start();
 
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );

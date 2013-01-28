@@ -43,7 +43,7 @@ protected:
 	virtual UINT8 vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);
 
 private:
-	const UINT8 *m_rom;
+	required_memory_region m_rom;
 };
 
 

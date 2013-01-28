@@ -46,7 +46,7 @@ protected:
 	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data);
 
 private:
-	UINT8 *m_rom;               // program ROM
+	required_memory_region m_rom;
 };
 
 

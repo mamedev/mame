@@ -428,8 +428,8 @@ void st_state::mouse_tick()
 
 	*/
 
-	UINT8 x = ioport("IKBD_MOUSEX")->read_safe(0x00);
-	UINT8 y = ioport("IKBD_MOUSEY")->read_safe(0x00);
+	UINT8 x = m_mousex->read_safe(0x00);
+	UINT8 y = m_mousey->read_safe(0x00);
 
 	if (m_ikbd_mouse_pc == 0)
 	{
@@ -509,21 +509,21 @@ READ8_MEMBER( st_state::ikbd_port1_r )
 	UINT8 data = 0xff;
 
 	// keyboard data
-	if (!BIT(m_ikbd_keylatch, 1)) data &= ioport("P31")->read();
-	if (!BIT(m_ikbd_keylatch, 2)) data &= ioport("P32")->read();
-	if (!BIT(m_ikbd_keylatch, 3)) data &= ioport("P33")->read();
-	if (!BIT(m_ikbd_keylatch, 4)) data &= ioport("P34")->read();
-	if (!BIT(m_ikbd_keylatch, 5)) data &= ioport("P35")->read();
-	if (!BIT(m_ikbd_keylatch, 6)) data &= ioport("P36")->read();
-	if (!BIT(m_ikbd_keylatch, 7)) data &= ioport("P37")->read();
-	if (!BIT(m_ikbd_keylatch, 8)) data &= ioport("P40")->read();
-	if (!BIT(m_ikbd_keylatch, 9)) data &= ioport("P41")->read();
-	if (!BIT(m_ikbd_keylatch, 10)) data &= ioport("P42")->read();
-	if (!BIT(m_ikbd_keylatch, 11)) data &= ioport("P43")->read();
-	if (!BIT(m_ikbd_keylatch, 12)) data &= ioport("P44")->read();
-	if (!BIT(m_ikbd_keylatch, 13)) data &= ioport("P45")->read();
-	if (!BIT(m_ikbd_keylatch, 14)) data &= ioport("P46")->read();
-	if (!BIT(m_ikbd_keylatch, 15)) data &= ioport("P47")->read();
+	if (!BIT(m_ikbd_keylatch, 1)) data &= m_p31->read();
+	if (!BIT(m_ikbd_keylatch, 2)) data &= m_p32->read();
+	if (!BIT(m_ikbd_keylatch, 3)) data &= m_p33->read();
+	if (!BIT(m_ikbd_keylatch, 4)) data &= m_p34->read();
+	if (!BIT(m_ikbd_keylatch, 5)) data &= m_p35->read();
+	if (!BIT(m_ikbd_keylatch, 6)) data &= m_p36->read();
+	if (!BIT(m_ikbd_keylatch, 7)) data &= m_p37->read();
+	if (!BIT(m_ikbd_keylatch, 8)) data &= m_p40->read();
+	if (!BIT(m_ikbd_keylatch, 9)) data &= m_p41->read();
+	if (!BIT(m_ikbd_keylatch, 10)) data &= m_p42->read();
+	if (!BIT(m_ikbd_keylatch, 11)) data &= m_p43->read();
+	if (!BIT(m_ikbd_keylatch, 12)) data &= m_p44->read();
+	if (!BIT(m_ikbd_keylatch, 13)) data &= m_p45->read();
+	if (!BIT(m_ikbd_keylatch, 14)) data &= m_p46->read();
+	if (!BIT(m_ikbd_keylatch, 15)) data &= m_p47->read();
 
 	return data;
 }
@@ -547,7 +547,7 @@ READ8_MEMBER( st_state::ikbd_port2_r )
 
 	*/
 
-	UINT8 data = ioport("IKBD_JOY1")->read_safe(0xff) & 0x06;
+	UINT8 data = m_joy1->read_safe(0xff) & 0x06;
 
 	// serial receive
 	data |= m_ikbd_tx << 3;
@@ -634,9 +634,9 @@ READ8_MEMBER( st_state::ikbd_port4_r )
 
 	if (m_ikbd_joy) return 0xff;
 
-	UINT8 data = ioport("IKBD_JOY0")->read_safe(0xff);
+	UINT8 data = m_joy0->read_safe(0xff);
 
-	if ((ioport("config")->read() & 0x01) == 0)
+	if ((m_config->read() & 0x01) == 0)
 	{
 		data = (data & 0xf0) | m_ikbd_mouse;
 	}
@@ -726,7 +726,7 @@ void ste_state::dmasound_tick()
 {
 	if (m_dmasnd_samples == 0)
 	{
-		UINT8 *RAM = machine().device<ram_device>(RAM_TAG)->pointer();
+		UINT8 *RAM = m_ram->pointer();
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -1137,7 +1137,7 @@ READ16_MEMBER( stbook_state::config_r )
 
 	*/
 
-	return (ioport("SW400")->read() << 8) | 0xff;
+	return (m_sw400->read() << 8) | 0xff;
 }
 
 
@@ -1919,7 +1919,7 @@ READ8_MEMBER( st_state::mfp_gpio_r )
 	// ring indicator
 
 	// monochrome monitor detect
-	data |= ioport("config")->read() & 0x80;
+	data |= m_config->read() & 0x80;
 
 	return data;
 }
@@ -1989,7 +1989,7 @@ READ8_MEMBER( ste_state::mfp_gpio_r )
 	// ring indicator
 
 	// monochrome monitor detect, DMA sound active
-	data |= (ioport("config")->read() & 0x80) ^ (m_dmasnd_active << 7);
+	data |= (m_config->read() & 0x80) ^ (m_dmasnd_active << 7);
 
 	return data;
 }

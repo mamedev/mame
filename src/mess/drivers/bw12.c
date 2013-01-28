@@ -336,7 +336,7 @@ static MC6845_UPDATE_ROW( bw12_update_row )
 	{
 		UINT8 code = state->m_video_ram[((ma + column) & BW12_VIDEORAM_MASK)];
 		UINT16 addr = code << 4 | (ra & 0x0f);
-		UINT8 data = state->m_char_rom[addr & BW12_CHARROM_MASK];
+		UINT8 data = state->m_char_rom->base()[addr & BW12_CHARROM_MASK];
 
 		if (column == cursor_x)
 		{
@@ -370,12 +370,6 @@ static MC6845_INTERFACE( bw12_mc6845_interface )
 	DEVCB_NULL,
 	NULL
 };
-
-void bw12_state::video_start()
-{
-	/* find memory regions */
-	m_char_rom = memregion("chargen")->base();
-}
 
 /* PIA6821 Interface */
 
@@ -570,7 +564,7 @@ static AY3600_INTERFACE( bw12_ay3600_intf )
 void bw12_state::machine_start()
 {
 	/* setup memory banking */
-	membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base());
+	membank("bank1")->configure_entry(0, m_rom->base());
 	membank("bank1")->configure_entry(1, m_ram->pointer());
 	membank("bank1")->configure_entries(2, 2, m_ram->pointer() + 0x10000, 0x8000);
 

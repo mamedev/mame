@@ -78,6 +78,7 @@ public:
 			m_timer_ack(*this, TIMER_ACK_TAG),
 			m_timer_rst(*this, TIMER_RST_TAG),
 			m_sasibus(*this, SASIBUS_TAG ":host"),
+			m_rom(*this, Z80_TAG),
 			m_video_ram(*this, "video_ram"),
 			m_attr_ram(*this, "attr_ram")
 	{ }
@@ -100,6 +101,7 @@ public:
 	required_device<timer_device> m_timer_ack;
 	required_device<timer_device> m_timer_rst;
 	required_device<scsicb_device> m_sasibus;
+	required_memory_region m_rom;
 	required_shared_ptr<UINT8> m_video_ram;
 	optional_shared_ptr<UINT8> m_attr_ram;
 

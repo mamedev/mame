@@ -68,7 +68,7 @@ protected:
 	virtual void comx_io_w(address_space &space, offs_t offset, UINT8 data);
 
 private:
-	UINT8 *m_rom;               // program ROM
+	required_memory_region m_rom;
 
 	comx_expansion_slot_device  *m_expansion_slot[MAX_EB_SLOTS];
 	int m_int[MAX_EB_SLOTS];

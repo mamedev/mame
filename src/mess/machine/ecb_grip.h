@@ -80,6 +80,10 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
+	optional_shared_ptr<UINT8> m_video_ram;
+	required_ioport m_j3a;
+	required_ioport m_j3b;
+	required_ioport m_j7;
 
 	// sound state
 	int m_vol0;
@@ -92,7 +96,6 @@ private:
 	int m_kbf;              // keyboard buffer full
 
 	// video state
-	optional_shared_ptr<UINT8> m_video_ram;     // video RAM
 	int m_lps;              // light pen sense
 	int m_page;             // video page
 	int m_flash;            // flash

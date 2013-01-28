@@ -49,6 +49,10 @@ protected:
 	virtual void device_reset();
 
 private:
+	required_memory_region m_plotter;
+	required_ioport m_font;
+	required_ioport m_sw;
+	
 	// PL-80 plotter state
 	UINT16 m_font_addr;         // font ROM pack address latch
 	UINT8 m_x_motor_phase;      // X motor phase

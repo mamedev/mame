@@ -28,9 +28,9 @@ public:
 			m_maincpu(*this, Z80_TAG),
 			m_vdg(*this, MC6847_TAG),
 			m_centronics(*this, CENTRONICS_TAG),
-			m_cassette(*this, CASSETTE_TAG)
-	,
-		m_video_ram(*this, "video_ram"){ }
+			m_cassette(*this, CASSETTE_TAG),
+			m_video_ram(*this, "video_ram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;

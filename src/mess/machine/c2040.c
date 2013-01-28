@@ -1341,7 +1341,7 @@ inline void c2040_device::update_gcr_data()
 		m_i = (m_rw << 10) | ((m_pi & 0xf0) << 1) | (m_mode << 4) | (m_pi & 0x0f);
 	}
 
-	m_e = m_gcr[m_i];
+	m_e = m_gcr->base()[m_i];
 }
 
 
@@ -1469,6 +1469,7 @@ c2040_device::c2040_device(const machine_config &mconfig, device_type type, cons
 		m_via(*this, M6522_TAG),
 		m_image0(*this, FLOPPY_0),
 		m_image1(*this, FLOPPY_1),
+		m_gcr(*this, "gcr"),
 		m_drive(0),
 		m_side(0),
 		m_rfdo(1),
@@ -1503,6 +1504,7 @@ c2040_device::c2040_device(const machine_config &mconfig, const char *tag, devic
 		m_via(*this, M6522_TAG),
 		m_image0(*this, FLOPPY_0),
 		m_image1(*this, FLOPPY_1),
+		m_gcr(*this, "gcr"),
 		m_drive(0),
 		m_side(0),
 		m_rfdo(1),
@@ -1585,9 +1587,6 @@ sfd1001_device::sfd1001_device(const machine_config &mconfig, const char *tag, d
 void c2040_device::device_start()
 {
 	m_bit_timer = timer_alloc();
-
-	// find GCR ROM
-	m_gcr = memregion("gcr")->base();
 
 	// install image callbacks
 	m_unit[0].m_image = m_image0;

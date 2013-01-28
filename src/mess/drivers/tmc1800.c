@@ -151,25 +151,25 @@ WRITE8_MEMBER( nano_state::keylatch_w )
 
 	    bit     description
 
-	    0       X0
-	    1       X1
-	    2       X2
-	    3       Y0
-	    4       not connected
-	    5       not connected
-	    6       not connected
-	    7       not connected
+	    0       A
+	    1       B
+	    2       C
+	    3       NY0
+	    4       NY1
+	    5       
+	    6       
+	    7       
 
 	*/
 
-	m_keylatch = data & 0x0f;
+	m_keylatch = data & 0x1f;
 }
 
 void tmc2000_state::bankswitch()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = memregion(CDP1802_TAG)->base();
+	UINT8 *rom = m_rom->base();
 
 	if (m_roc)
 	{
@@ -440,7 +440,7 @@ INPUT_CHANGED_MEMBER( nano_state::monitor_pressed )
 }
 
 static INPUT_PORTS_START( nano )
-	PORT_START("IN0")
+	PORT_START("NY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHAR('0')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHAR('1')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHAR('2')
@@ -450,7 +450,7 @@ static INPUT_PORTS_START( nano )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHAR('6')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHAR('7')
 
-	PORT_START("IN1")
+	PORT_START("NY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHAR('8')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHAR('9')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
@@ -473,20 +473,17 @@ INPUT_PORTS_END
 
 READ_LINE_MEMBER( tmc1800_state::clear_r )
 {
-	return BIT(ioport("RUN")->read(), 0);
+	return BIT(m_run->read(), 0);
 }
 
 READ_LINE_MEMBER( tmc1800_state::ef2_r )
 {
-	return (m_cassette)->input() < 0;
+	return m_cassette->input() < 0;
 }
 
 READ_LINE_MEMBER( tmc1800_state::ef3_r )
 {
-	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~ioport(keynames[m_keylatch / 8])->read();
-
-	return BIT(data, m_keylatch % 8);
+	return CLEAR_LINE; // TODO
 }
 
 WRITE_LINE_MEMBER( tmc1800_state::q_w )
@@ -514,20 +511,17 @@ static COSMAC_INTERFACE( tmc1800_config )
 
 READ_LINE_MEMBER( osc1000b_state::clear_r )
 {
-	return BIT(ioport("RUN")->read(), 0);
+	return BIT(m_run->read(), 0);
 }
 
 READ_LINE_MEMBER( osc1000b_state::ef2_r )
 {
-	return (m_cassette)->input() < 0;
+	return m_cassette->input() < 0;
 }
 
 READ_LINE_MEMBER( osc1000b_state::ef3_r )
 {
-	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~ioport(keynames[m_keylatch / 8])->read();
-
-	return BIT(data, m_keylatch % 8);
+	return CLEAR_LINE; // TODO
 }
 
 WRITE_LINE_MEMBER( osc1000b_state::q_w )
@@ -555,7 +549,7 @@ static COSMAC_INTERFACE( osc1000b_config )
 
 READ_LINE_MEMBER( tmc2000_state::clear_r )
 {
-	return BIT(ioport("RUN")->read(), 0);
+	return BIT(m_run->read(), 0);
 }
 
 READ_LINE_MEMBER( tmc2000_state::ef2_r )
@@ -565,8 +559,8 @@ READ_LINE_MEMBER( tmc2000_state::ef2_r )
 
 READ_LINE_MEMBER( tmc2000_state::ef3_r )
 {
-	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~ioport(keynames[m_keylatch / 8])->read();
+	ioport_port *ports[] = { m_in0, m_in1, m_in2, m_in3, m_in4, m_in5, m_in6, m_in7 };
+	UINT8 data = ~ports[m_keylatch / 8]->read();
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -611,23 +605,25 @@ static COSMAC_INTERFACE( tmc2000_config )
 
 READ_LINE_MEMBER( nano_state::clear_r )
 {
-	int run = BIT(ioport("RUN")->read(), 0);
-	int monitor = BIT(ioport("MONITOR")->read(), 0);
+	int run = BIT(m_run->read(), 0);
+	int monitor = BIT(m_monitor->read(), 0);
 
-	return run & monitor;
+	return run && monitor;
 }
 
 READ_LINE_MEMBER( nano_state::ef2_r )
 {
-	return (m_cassette)->input() < 0;
+	return m_cassette->input() < 0;
 }
 
 READ_LINE_MEMBER( nano_state::ef3_r )
 {
-	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~ioport(keynames[m_keylatch / 8])->read();
+	UINT8 data = 0xff;
 
-	return BIT(data, m_keylatch % 8);
+	if (!BIT(m_keylatch, 3)) data &= m_ny0->read();
+	if (!BIT(m_keylatch, 4)) data &= m_ny1->read();
+
+	return !BIT(data, m_keylatch & 0x07);
 }
 
 WRITE_LINE_MEMBER( nano_state::q_w )
@@ -692,7 +688,7 @@ void tmc2000_state::machine_start()
 {
 	UINT16 addr;
 
-	m_colorram = auto_alloc_array(machine(), UINT8, TMC2000_COLORRAM_SIZE);
+	m_colorram.allocate(TMC2000_COLORRAM_SIZE);
 
 	// randomize color RAM contents
 	for (addr = 0; addr < TMC2000_COLORRAM_SIZE; addr++)
@@ -701,7 +697,6 @@ void tmc2000_state::machine_start()
 	}
 
 	// state saving
-	save_pointer(NAME(m_colorram), TMC2000_COLORRAM_SIZE);
 	save_item(NAME(m_keylatch));
 	save_item(NAME(m_rac));
 	save_item(NAME(m_roc));
@@ -746,7 +741,7 @@ void nano_state::machine_reset()
 
 	/* enable ROM */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *rom = memregion(CDP1802_TAG)->base();
+	UINT8 *rom = m_rom->base();
 	program.install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
 }
 
@@ -763,10 +758,11 @@ static const cassette_interface tmc1800_cassette_interface =
 
 static QUICKLOAD_LOAD( tmc1800 )
 {
-	UINT8 *ptr = image.device().machine().root_device().memregion(CDP1802_TAG)->base();
+	tmc1800_state *state = image.device().machine().driver_data<tmc1800_state>();
+	UINT8 *ptr = state->m_rom->base();
 	int size = image.length();
 
-	if (size > image.device().machine().device<ram_device>(RAM_TAG)->size())
+	if (size > state->m_ram->size())
 	{
 		return IMAGE_INIT_FAIL;
 	}

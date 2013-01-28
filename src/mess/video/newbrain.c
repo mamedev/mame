@@ -3,9 +3,6 @@
 
 void newbrain_state::video_start()
 {
-	/* find memory regions */
-	m_char_rom = memregion("chargen")->base();
-
 	/* register for state saving */
 	save_item(NAME(m_tvcnsl));
 	save_item(NAME(m_tvctl));
@@ -48,7 +45,7 @@ void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &clipre
 			{
 				/* render character rom data */
 				UINT16 charrom_addr = (rc << 8) | ((BIT(videoram_data, 7) & fs) << 7) | (videoram_data & 0x7f);
-				charrom_data = m_char_rom[charrom_addr & 0xfff];
+				charrom_data = m_char_rom->base()[charrom_addr & 0xfff];
 
 				if ((videoram_data & 0x80) && !fs)
 				{

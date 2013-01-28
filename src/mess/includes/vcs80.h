@@ -19,10 +19,16 @@ class vcs80_state : public driver_device
 public:
 	vcs80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-			m_pio(*this, Z80PIO_TAG)
+			m_pio(*this, Z80PIO_TAG),
+			m_y0(*this, "Y0"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2")
 	{ }
 
 	required_device<z80pio_device> m_pio;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
 
 	virtual void machine_start();
 

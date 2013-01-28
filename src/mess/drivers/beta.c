@@ -120,7 +120,7 @@ READ8_MEMBER( beta_state::riot_pa_r )
 	default:
 		if (!m_eprom_oe && !m_eprom_ce)
 		{
-			data = m_eprom[m_eprom_addr & 0x7ff];
+			data = m_eprom->base()[m_eprom_addr & 0x7ff];
 			popmessage("EPROM read %04x = %02x\n", m_eprom_addr & 0x7ff, data);
 		}
 	}
@@ -207,7 +207,7 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 	if (BIT(data, 6) && (!BIT(m_old_data, 7) && BIT(data, 7)))
 	{
 		popmessage("EPROM write %04x = %02x\n", m_eprom_addr & 0x7ff, m_eprom_data);
-		m_eprom[m_eprom_addr & 0x7ff] &= m_eprom_data;
+		m_eprom->base()[m_eprom_addr & 0x7ff] &= m_eprom_data;
 	}
 
 	m_old_data = data;
@@ -226,7 +226,9 @@ static const riot6532_interface beta_riot_interface =
 
 static DEVICE_IMAGE_UNLOAD( beta_eprom )
 {
-	UINT8 *ptr = image.device().machine().root_device().memregion(EPROM_TAG)->base();
+	beta_state *state = image.device().machine().driver_data<beta_state>();
+
+	UINT8 *ptr = state->m_eprom->base();
 
 	image.fwrite(ptr, 0x800);
 }
@@ -236,9 +238,6 @@ static DEVICE_IMAGE_UNLOAD( beta_eprom )
 void beta_state::machine_start()
 {
 	m_led_refresh_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(beta_state::led_refresh),this));
-
-	// find memory regions
-	m_eprom = memregion(EPROM_TAG)->base();
 
 	// state saving
 	save_item(NAME(m_eprom_oe));

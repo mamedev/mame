@@ -125,7 +125,7 @@ void atom_state::bankswitch()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	UINT8 *eprom = memregion(EXTROM_TAG)->base() + (m_eprom << 12);
+	UINT8 *eprom = m_extrom->base() + (m_eprom << 12);
 
 	program.install_rom(0xa000, 0xafff, eprom);
 }

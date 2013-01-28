@@ -164,7 +164,9 @@ inline void luxor_4105_device::update_trrq_int()
 luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, LUXOR_4105, "Luxor 4105", tag, owner, clock),
 		device_abc1600bus_card_interface(mconfig, *this),
-		m_sasibus(*this, SASIBUS_TAG ":host")
+		m_sasibus(*this, SASIBUS_TAG ":host"),
+		m_1e(*this, "1E"),
+		m_5e(*this, "5E")
 {
 }
 
@@ -212,7 +214,7 @@ void luxor_4105_device::device_reset()
 
 void luxor_4105_device::abc1600bus_cs(UINT8 data)
 {
-	m_cs = (data == ioport("5E")->read());
+	m_cs = (data == m_5e->read());
 }
 
 
@@ -283,7 +285,7 @@ UINT8 luxor_4105_device::abc1600bus_inp()
 	{
 		if (!m_sasibus->scsi_bsy_r())
 		{
-			ioport("1E")->read();
+			data = m_1e->read();
 		}
 		else
 		{

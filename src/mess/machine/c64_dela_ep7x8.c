@@ -23,7 +23,7 @@ const device_type C64_DELA_EP7X8 = &device_creator<c64_dela_ep7x8_cartridge_devi
 //-------------------------------------------------
 
 ROM_START( c64_dela_ep7x8 )
-	ROM_REGION( 0x10000, "rom", 0 )
+	ROM_REGION( 0x10000, "eprom", 0 )
 	ROM_CART_LOAD( "rom1", 0x2000, 0x2000, ROM_MIRROR )
 	ROM_CART_LOAD( "rom2", 0x4000, 0x2000, ROM_MIRROR )
 	ROM_CART_LOAD( "rom3", 0x6000, 0x2000, ROM_MIRROR )
@@ -87,7 +87,8 @@ machine_config_constructor c64_dela_ep7x8_cartridge_device::device_mconfig_addit
 
 c64_dela_ep7x8_cartridge_device::c64_dela_ep7x8_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, C64_DELA_EP7X8, "C64 Dela 7x8KB EPROM cartridge", tag, owner, clock),
-	device_c64_expansion_card_interface(mconfig, *this)
+	device_c64_expansion_card_interface(mconfig, *this),
+	m_eprom(*this, "eprom")
 {
 }
 
@@ -98,8 +99,6 @@ c64_dela_ep7x8_cartridge_device::c64_dela_ep7x8_cartridge_device(const machine_c
 
 void c64_dela_ep7x8_cartridge_device::device_start()
 {
-	m_rom = memregion("rom")->base();
-
 	// state saving
 	save_item(NAME(m_bank));
 }
@@ -127,13 +126,13 @@ UINT8 c64_dela_ep7x8_cartridge_device::c64_cd_r(address_space &space, offs_t off
 		offs_t addr = offset & 0x1fff;
 
 		if (!BIT(m_bank, 0)) data |= m_roml[addr];
-		if (!BIT(m_bank, 1)) data |= m_rom[0x2000 + addr];
-		if (!BIT(m_bank, 2)) data |= m_rom[0x4000 + addr];
-		if (!BIT(m_bank, 3)) data |= m_rom[0x6000 + addr];
-		if (!BIT(m_bank, 4)) data |= m_rom[0x8000 + addr];
-		if (!BIT(m_bank, 5)) data |= m_rom[0xa000 + addr];
-		if (!BIT(m_bank, 6)) data |= m_rom[0xc000 + addr];
-		if (!BIT(m_bank, 7)) data |= m_rom[0xe000 + addr];
+		if (!BIT(m_bank, 1)) data |= m_eprom->base()[0x2000 + addr];
+		if (!BIT(m_bank, 2)) data |= m_eprom->base()[0x4000 + addr];
+		if (!BIT(m_bank, 3)) data |= m_eprom->base()[0x6000 + addr];
+		if (!BIT(m_bank, 4)) data |= m_eprom->base()[0x8000 + addr];
+		if (!BIT(m_bank, 5)) data |= m_eprom->base()[0xa000 + addr];
+		if (!BIT(m_bank, 6)) data |= m_eprom->base()[0xc000 + addr];
+		if (!BIT(m_bank, 7)) data |= m_eprom->base()[0xe000 + addr];
 	}
 
 	return data;

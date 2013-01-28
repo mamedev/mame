@@ -28,12 +28,18 @@ public:
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
 			m_vdc(*this, CDP1861_TAG),
-			m_cassette(*this, CASSETTE_TAG)
+			m_cassette(*this, CASSETTE_TAG),
+			m_ram(*this, RAM_TAG),
+			m_rom(*this, CDP1802_TAG),
+			m_run(*this, "RUN")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cdp1861_device> m_vdc;
 	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_ioport m_run;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -58,11 +64,15 @@ public:
 	osc1000b_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, CDP1802_TAG),
-			m_cassette(*this, CASSETTE_TAG)
+			m_cassette(*this, CASSETTE_TAG),
+			m_rom(*this, CDP1802_TAG),
+			m_run(*this, "RUN")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
+	required_memory_region m_rom;
+	required_ioport m_run;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -87,13 +97,35 @@ public:
 			m_maincpu(*this, CDP1802_TAG),
 			m_cti(*this, CDP1864_TAG),
 			m_cassette(*this, CASSETTE_TAG),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_rom(*this, CDP1802_TAG),
+			m_colorram(*this, "color_ram"),
+			m_in0(*this, "IN0"),
+			m_in1(*this, "IN1"),
+			m_in2(*this, "IN2"),
+			m_in3(*this, "IN3"),
+			m_in4(*this, "IN4"),
+			m_in5(*this, "IN5"),
+			m_in6(*this, "IN6"),
+			m_in7(*this, "IN7"),
+			m_run(*this, "RUN")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	optional_shared_ptr<UINT8> m_colorram;
+	required_ioport m_in0;
+	required_ioport m_in1;
+	required_ioport m_in2;
+	required_ioport m_in3;
+	required_ioport m_in4;
+	required_ioport m_in5;
+	required_ioport m_in6;
+	required_ioport m_in7;
+	required_ioport m_run;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -117,7 +149,6 @@ public:
 	int m_roc;
 
 	/* video state */
-	UINT8 *m_colorram;      /* color memory */
 	UINT8 m_color;
 
 	/* keyboard state */
@@ -132,13 +163,23 @@ public:
 			m_maincpu(*this, CDP1802_TAG),
 			m_cti(*this, CDP1864_TAG),
 			m_cassette(*this, CASSETTE_TAG),
-			m_ram(*this, RAM_TAG)
+			m_ram(*this, RAM_TAG),
+			m_rom(*this, CDP1802_TAG),
+			m_ny0(*this, "NY0"),
+			m_ny1(*this, "NY1"),
+			m_run(*this, "RUN"),
+			m_monitor(*this, "MONITOR")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cdp1864_device> m_cti;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_memory_region m_rom;
+	required_ioport m_ny0;
+	required_ioport m_ny1;
+	required_ioport m_run;
+	required_ioport m_monitor;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void machine_start();

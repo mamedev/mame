@@ -48,7 +48,8 @@ const rom_entry *vp700_device::device_rom_region() const
 
 vp700_device::vp700_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VP700, "VP700", tag, owner, clock),
-	device_vip_expansion_card_interface(mconfig, *this)
+	device_vip_expansion_card_interface(mconfig, *this),
+	m_rom(*this, "vp700")
 {
 }
 
@@ -59,8 +60,6 @@ vp700_device::vp700_device(const machine_config &mconfig, const char *tag, devic
 
 void vp700_device::device_start()
 {
-	// find memory regions
-	m_rom = memregion("vp700")->base();
 }
 
 
@@ -76,7 +75,7 @@ UINT8 vp700_device::vip_program_r(address_space &space, offs_t offset, int cs, i
 	{
 		*minh = 1;
 
-		data = m_rom[offset & 0xfff];
+		data = m_rom->base()[offset & 0xfff];
 	}
 
 	return data;

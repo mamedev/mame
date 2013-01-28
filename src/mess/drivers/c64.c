@@ -8,7 +8,8 @@
         - IRQ (WRONG $DC0D)
         - NMI (WRONG $DD0D)
         - some CIA tests
-    - 64C PLA dump
+    - PDC Clipper (C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer)
+    - Tesa 6240 (modified SX64 with label printer)
 
 */
 
@@ -121,11 +122,25 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, offs_t va, int
 	}
 	if (!basic)
 	{
-		data = m_basic[offset & 0x1fff];
+		if (m_basic != NULL)
+		{
+			data = m_basic->base()[offset & 0x1fff];
+		}
+		else
+		{
+			data = m_kernal->base()[offset & 0x1fff];
+		}
 	}
 	if (!kernal)
 	{
-		data = m_kernal[offset & 0x1fff];
+		if (m_basic != NULL)
+		{
+			data = m_kernal->base()[offset & 0x1fff];
+		}
+		else
+		{
+			data = m_kernal->base()[0x2000 | (offset & 0x1fff)];
+		}
 	}
 	if (!charom)
 	{
@@ -278,7 +293,7 @@ READ8_MEMBER( c64_state::vic_videoram_r )
 	offs_t va = offset;
 
 	// A15/A14 are not connected to VIC so they are floating
-	offset |= 0xc000;
+	//offset |= 0xc000;
 
 	return read_memory(space, offset, va, aec, ba);
 }
@@ -894,6 +909,7 @@ WRITE8_MEMBER( c64_state::cpu_w )
 	m_cassette->motor_w(BIT(data, 5));
 }
 
+
 //-------------------------------------------------
 //  M6510_INTERFACE( sx64_cpu_intf )
 //-------------------------------------------------
@@ -937,6 +953,7 @@ WRITE8_MEMBER( sx64_state::cpu_w )
 	m_charen = BIT(data, 2);
 }
 
+
 //-------------------------------------------------
 //  M6510_INTERFACE( c64gs_cpu_intf )
 //-------------------------------------------------
@@ -979,6 +996,7 @@ WRITE8_MEMBER( c64gs_state::cpu_w )
 	m_hiram = BIT(data, 1);
 	m_charen = BIT(data, 2);
 }
+
 
 //-------------------------------------------------
 //  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
@@ -1101,10 +1119,6 @@ static C64_USER_PORT_INTERFACE( user_intf )
 
 void c64_state::machine_start()
 {
-	// find memory regions
-	m_basic = memregion("basic")->base();
-	m_kernal = memregion("kernal")->base();
-
 	// allocate memory
 	m_color_ram.allocate(0x400);
 
@@ -1131,30 +1145,6 @@ void c64_state::machine_start()
 	save_item(NAME(m_exp_dma));
 	save_item(NAME(m_cass_rd));
 	save_item(NAME(m_iec_srq));
-}
-
-
-//-------------------------------------------------
-//  MACHINE_START( c64c )
-//-------------------------------------------------
-
-void c64c_state::machine_start()
-{
-	c64_state::machine_start();
-
-	// find memory regions
-	m_basic = memregion(M6510_TAG)->base();
-	m_kernal = memregion(M6510_TAG)->base() + 0x2000;
-}
-
-
-//-------------------------------------------------
-//  MACHINE_START( c64gs )
-//-------------------------------------------------
-
-void c64gs_state::machine_start()
-{
-	c64c_state::machine_start();
 }
 
 
@@ -1210,7 +1200,7 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
@@ -1625,7 +1615,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( c64c )
-	ROM_REGION( 0x4000, M6510_TAG, 0 )
+	ROM_REGION( 0x4000, "kernal", 0 )
 	ROM_LOAD( "251913-01.u4", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
@@ -1655,7 +1645,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( c64c_se )
-	ROM_REGION( 0x4000, M6510_TAG, 0 )
+	ROM_REGION( 0x4000, "kernal", 0 )
 	ROM_LOAD( "325182-01.u4", 0x0000, 0x4000, CRC(2aff27d3) SHA1(267654823c4fdf2167050f41faa118218d2569ce) ) // 128/64 FI
 
 	ROM_REGION( 0x1000, "charom", 0 )
@@ -1671,7 +1661,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( c64gs )
-	ROM_REGION( 0x4000, M6510_TAG, 0 )
+	ROM_REGION( 0x4000, "kernal", 0 )
 	ROM_LOAD( "390852-01.u4", 0x0000, 0x4000, CRC(b0a9c2da) SHA1(21940ef5f1bfe67d7537164f7ca130a1095b067a) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
@@ -1698,8 +1688,6 @@ COMP( 1984, sx64,   c64,    0,      ntsc_sx,    c64,    driver_device,      0,  
 COMP( 1984, sx64p,  c64,    0,      pal_sx,     c64,    driver_device,      0,      "Commodore Business Machines", "SX-64 / Executive 64 (PAL)",                GAME_SUPPORTS_SAVE )
 COMP( 1984, vip64,  c64,    0,      pal_sx,     c64sw,  driver_device,      0,      "Commodore Business Machines", "VIP-64 (Sweden/Finland)",                   GAME_SUPPORTS_SAVE )
 COMP( 1984, dx64,   c64,    0,      ntsc_dx,    c64,    driver_device,      0,      "Commodore Business Machines", "DX-64 (NTSC)",                              GAME_SUPPORTS_SAVE )
-//COMP(1983, clipper,  c64,  0, c64pal,  clipper, XXX_CLASS, c64pal,  "PDC", "Clipper", GAME_NOT_WORKING) // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
-//COMP(1983, tesa6240, c64,  0, c64pal,  c64, XXX_CLASS,     c64pal,  "Tesa", "6240", GAME_NOT_WORKING) // modified SX64 with label printer
 COMP( 1986, c64c,   c64,    0,      ntsc_c,     c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64C (NTSC)",                      GAME_SUPPORTS_SAVE )
 COMP( 1986, c64cp,  c64,    0,      pal_c,      c64,    driver_device,      0,      "Commodore Business Machines", "Commodore 64C (PAL)",                       GAME_SUPPORTS_SAVE )
 COMP( 1986, c64c_se,c64,    0,      pal_c,      c64sw,  driver_device,      0,      "Commodore Business Machines", "Commodore 64C (Sweden/Finland)",            GAME_SUPPORTS_SAVE )

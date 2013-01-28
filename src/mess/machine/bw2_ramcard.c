@@ -50,6 +50,7 @@ const rom_entry *bw2_ramcard_device::device_rom_region() const
 bw2_ramcard_device::bw2_ramcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, BW2_RAMCARD, "RAMCARD", tag, owner, clock),
 		device_bw2_expansion_slot_interface(mconfig, *this),
+		m_rom(*this, "ramcard"),
 		m_ram(*this, "ram"),
 		m_en(0),
 		m_bank(0)
@@ -63,9 +64,6 @@ bw2_ramcard_device::bw2_ramcard_device(const machine_config &mconfig, const char
 
 void bw2_ramcard_device::device_start()
 {
-	// find memory regions
-	m_rom = memregion("ramcard")->base();
-
 	// allocate memory
 	m_ram.allocate(512 * 1024);
 
@@ -94,7 +92,7 @@ UINT8 bw2_ramcard_device::bw2_cd_r(address_space &space, offs_t offset, UINT8 da
 {
 	if (!ram2)
 	{
-		data = m_rom[offset & 0x3fff];
+		data = m_rom->base()[offset & 0x3fff];
 	}
 	else if (m_en && !ram5)
 	{
