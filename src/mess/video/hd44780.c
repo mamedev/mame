@@ -17,17 +17,22 @@
 //**************************************************************************
 
 const device_type HD44780 = &device_creator<hd44780_device>;
+const device_type KS0066_F05 = &device_creator<ks0066_f05_device>;
 
 
 //-------------------------------------------------
 //  ROM( hd44780 )
 //-------------------------------------------------
 
-ROM_START( hd44780 )
-	ROM_REGION( 0x0860, "cgrom", 0 )
-	ROM_LOAD( "44780a00.bin",    0x0000, 0x0860,  BAD_DUMP CRC(3a89024c) SHA1(5a87b68422a916d1b37b5be1f7ad0b3fb3af5a8d))
+ROM_START( hd44780_a00 )
+	ROM_REGION( 0x1000, "cgrom", 0 )
+	ROM_LOAD( "hd44780_a00.bin",    0x0000, 0x1000,  BAD_DUMP CRC(01d108e2) SHA1(bc0cdf0c9ba895f22e183c7bd35a3f655f2ca96f)) // from page 17 of the HD44780 datasheet
 ROM_END
 
+ROM_START( ks0066_f05 )
+	ROM_REGION( 0x1000, "cgrom", 0 )
+	ROM_LOAD( "ks0066_f05.bin",    0x0000, 0x1000,  BAD_DUMP CRC(af9e7bd6) SHA1(0196e871584ee5d370856e7307c0f9d1466e3e51)) // from page 51 of the KS0066 datasheet
+ROM_END
 
 //**************************************************************************
 //  live device
@@ -38,18 +43,26 @@ ROM_END
 //-------------------------------------------------
 
 hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, HD44780, "HD44780", tag, owner, clock),
+	device_t(mconfig, HD44780, "HD44780 A00", tag, owner, clock),
 	m_pixel_update_func(NULL)
 {
-	m_shortname = "hd44780";
+	m_shortname = "hd44780_a00";
+	set_charset_type(CHARSET_HD44780_A00);
 }
 
 hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, type, name, tag, owner, clock),
 	m_pixel_update_func(NULL)
 {
-	m_shortname = "hd44780";
 }
+
+ks0066_f05_device::ks0066_f05_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	hd44780_device(mconfig, KS0066_F05, "KS0066 F05", tag, owner, clock)
+{
+	m_shortname = "ks0066_f05";
+	set_charset_type(CHARSET_KS0066_F05);
+}
+
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -57,7 +70,13 @@ hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, 
 
 const rom_entry *hd44780_device::device_rom_region() const
 {
-	return ROM_NAME( hd44780 );
+	switch (m_charset_type)
+	{
+		case CHARSET_HD44780_A00:   return ROM_NAME( hd44780_a00 );
+		case CHARSET_KS0066_F05:    return ROM_NAME( ks0066_f05 );
+	}
+
+	return NULL;
 }
 
 //-------------------------------------------------
@@ -149,6 +168,11 @@ void hd44780_device::device_timer(emu_timer &timer, device_timer_id id, int para
 //  HELPERS
 //**************************************************************************
 
+void hd44780_device::set_charset_type(int type)
+{
+	m_charset_type = type;
+}
+
 void hd44780_device::set_busy_flag(UINT16 usec)
 {
 	m_busy_flag = true;
@@ -194,10 +218,12 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8
 	}
 	else
 	{
+		UINT8 line_heigh = (m_char_size == 8) ? m_char_size : m_char_size + 1;
+
 		if (m_lines <= 2)
 		{
 			if (pos < m_chars)
-				bitmap.pix16(line * (m_char_size+1) + y, pos * 6 + x) = state;
+				bitmap.pix16(line * (line_heigh+1) + y, pos * 6 + x) = state;
 		}
 		else if (m_lines <= 4)
 		{
@@ -210,7 +236,7 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8
 				}
 
 				if (line < m_lines)
-					bitmap.pix16(line * (m_char_size+1) + y, pos * 6 + x) = state;
+					bitmap.pix16(line * (line_heigh+1) + y, pos * 6 + x) = state;
 			}
 		}
 		else
@@ -256,15 +282,12 @@ UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					if (m_char_size == 8)
 						char_base = (m_ddram[char_pos] & 0x07) * 8;
 					else
-						char_base = (m_ddram[char_pos] & 0x03) * 16;
+						char_base = ((m_ddram[char_pos]>>1) & 0x03) * 16;
 				}
 				else
 				{
 					// draw CGROM characters
-					if (m_ddram[char_pos] < 0xe0)
-						char_base = m_ddram[char_pos] * 8;
-					else
-						char_base = 0x700 + ((m_ddram[char_pos] - 0xe0) * 11);
+					char_base = m_ddram[char_pos] * 0x10;
 				}
 
 				for (int y=0; y<m_char_size; y++)
@@ -272,24 +295,20 @@ UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 					UINT8 * charset = (m_ddram[char_pos] < 0x10) ? m_cgram : m_cgrom;
 
 					for (int x=0; x<5; x++)
-					{
-						if (m_ddram[char_pos] >= 0xe0 || y < 8)
-							pixel_update(bitmap, line, pos, y, x, BIT(charset[char_base + y], 4 - x));
-						else
-							pixel_update(bitmap, line, pos, y, x, 0);
-					}
+						pixel_update(bitmap, line, pos, y, x, BIT(charset[char_base + y], 4 - x));
 				}
 
 				// if is the correct position draw cursor and blink
 				if (char_pos == m_ac)
 				{
 					// draw the cursor
+					UINT8 cursor_pos = (m_char_size == 8) ? m_char_size : m_char_size + 1;
 					if (m_cursor_on)
 						for (int x=0; x<5; x++)
-							pixel_update(bitmap, line, pos, m_char_size - 1, x, 1);
+							pixel_update(bitmap, line, pos, cursor_pos - 1, x, 1);
 
 					if (!m_blink && m_blink_on)
-						for (int y=0; y<(m_char_size - 1); y++)
+						for (int y=0; y<(cursor_pos - 1); y++)
 							for (int x=0; x<5; x++)
 								pixel_update(bitmap, line, pos, y, x, 1);
 				}

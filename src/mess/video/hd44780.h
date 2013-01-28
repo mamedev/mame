@@ -13,6 +13,9 @@
 #define MCFG_HD44780_ADD( _tag ) \
 	MCFG_DEVICE_ADD( _tag, HD44780, 0 )
 
+#define MCFG_KS0066_F05_ADD( _tag ) \
+	MCFG_DEVICE_ADD( _tag, KS0066_F05, 0 )
+
 #define MCFG_HD44780_LCD_SIZE(_lines, _chars) \
 	hd44780_device::static_set_lcd_size(*device, _lines, _chars);
 
@@ -58,6 +61,24 @@ protected:
 	// optional information overrides
 	const rom_entry *device_rom_region() const;
 
+	// charset
+	enum
+	{
+		CHARSET_HD44780_A00,
+		CHARSET_KS0066_F05,
+		/*
+		CHARSET_HD44780_A01,
+		CHARSET_HD44780_A02,
+		CHARSET_KS0066_F00,
+		CHARSET_KS0066_F03,
+		CHARSET_KS0066_F04,
+		CHARSET_KS0066_F06,
+		CHARSET_KS0066_F59,
+		*/
+	};
+
+	void set_charset_type(int type);
+
 private:
 	// internal helper
 	void set_busy_flag(UINT16 usec);
@@ -95,11 +116,22 @@ private:
 	bool        m_blink;
 	bool        m_first_cmd;
 	bool        m_nibble;
+	int         m_charset_type;
 
 	enum        { DDRAM, CGRAM };
 };
 
+// ======================> ks0066_f05_device
+
+class ks0066_f05_device :  public hd44780_device
+{
+public:
+	// construction/destruction
+	ks0066_f05_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
 // device type definition
 extern const device_type HD44780;
+extern const device_type KS0066_F05;
 
 #endif

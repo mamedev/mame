@@ -382,9 +382,9 @@ static MACHINE_CONFIG_START( alphasmart, alphasmart_state )
 	MCFG_CPU_IO_MAP(alphasmart_io)
 	MCFG_CPU_CONFIG(alphasmart_hc11_config)
 
-	MCFG_HD44780_ADD("ks0066_0")
+	MCFG_KS0066_F05_ADD("ks0066_0")
 	MCFG_HD44780_LCD_SIZE(2, 40)
-	MCFG_HD44780_ADD("ks0066_1")
+	MCFG_KS0066_F05_ADD("ks0066_1")
 	MCFG_HD44780_LCD_SIZE(2, 40)
 
 	/* video hardware */
