@@ -653,6 +653,24 @@ static IEEE488_INTERFACE( ieee488_intf )
 	DEVCB_NULL
 };
 
+//-------------------------------------------------
+//  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
+//-------------------------------------------------
+
+static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
+{
+	DEVCB_DEVICE_LINE_MEMBER("pia_0", pia6821_device, cb1_w)
+};
+
+//-------------------------------------------------
+//  PET_DATASSETTE_PORT_INTERFACE( datassette2_intf )
+//-------------------------------------------------
+
+static PET_DATASSETTE_PORT_INTERFACE( datassette2_intf )
+{
+	DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, write_cb1)
+};
+
 
 /*************************************
  *
@@ -679,8 +697,8 @@ static MACHINE_CONFIG_START( pet_general, pet_state )
 	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(pet_palette) / 3)
 
 	/* cassette */
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
-	MCFG_CASSETTE_ADD( CASSETTE2_TAG, cbm_cassette_interface )
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT2_TAG, datassette2_intf, cbm_datassette_devices, NULL, NULL)
 
 	/* via */
 	MCFG_VIA6522_ADD( "via6522_0", 0, pet_via)

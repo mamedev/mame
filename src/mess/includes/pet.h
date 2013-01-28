@@ -12,6 +12,7 @@
 #include "machine/6522via.h"
 #include "machine/ieee488.h"
 #include "imagedev/cartslot.h"
+#include "machine/petcass.h"
 
 struct spet_t
 {
@@ -26,10 +27,15 @@ public:
 	pet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_ieee(*this, IEEE488_TAG),
+			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+			m_cassette2(*this, PET_DATASSETTE_PORT2_TAG),
 		m_videoram(*this, "videoram"),
-		m_memory(*this, "memory"){ }
+		m_memory(*this, "memory")
+	{ }
 
 	required_device<ieee488_device> m_ieee;
+	required_device<pet_datassette_port_device> m_cassette;
+	required_device<pet_datassette_port_device> m_cassette2;
 
 	int m_pet_basic1; /* basic version 1 for quickloader */
 	int m_superpet;
@@ -44,8 +50,6 @@ public:
 	UINT8 *m_supermemory;
 	UINT8 *m_pet80_bank1_base;
 	int m_keyline_select;
-	emu_timer *m_datasette1_timer;
-	emu_timer *m_datasette2_timer;
 	spet_t m_spet;
 	int m_pia_level;
 	DECLARE_DRIVER_INIT(superpet);
@@ -58,8 +62,6 @@ public:
 	UINT32 screen_update_pet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pet_frame_interrupt);
 	TIMER_CALLBACK_MEMBER(pet_interrupt);
-	TIMER_CALLBACK_MEMBER(pet_tape1_timer);
-	TIMER_CALLBACK_MEMBER(pet_tape2_timer);
 	DECLARE_READ8_MEMBER(pia0_pa_r);
 	DECLARE_WRITE8_MEMBER(pia0_pa_w);
 	DECLARE_READ8_MEMBER(kin_r);

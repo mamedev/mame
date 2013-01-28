@@ -15,7 +15,6 @@
 #include "includes/pet.h"
 
 #include "imagedev/cartslot.h"
-#include "imagedev/cassette.h"
 #include "machine/ram.h"
 
 #define VERBOSE_LEVEL 0
@@ -68,10 +67,10 @@ READ8_MEMBER(pet_state::pia0_pa_r)
 	data |= m_keyline_select;
 
 	/* #1 cassette switch */
-	data |= ((machine().device<cassette_image_device>(CASSETTE_TAG)->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
+	data |= m_cassette->sense_r() << 4;
 
 	/* #2 cassette switch */
-	data |= ((machine().device<cassette_image_device>(CASSETTE2_TAG)->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 5;
+	data |= m_cassette2->sense_r() << 5;
 
 	/* end or identify in */
 	data |= m_ieee->eoi_r() << 6;
@@ -169,21 +168,12 @@ READ8_MEMBER(pet_state::petb_kin_r)
 READ8_MEMBER(pet_state::cass1_r)
 {
 	// cassette 1 read
-	return (machine().device<cassette_image_device>(CASSETTE_TAG)->input() > +0.0) ? 1 : 0;
+	return m_cassette->read();
 }
 
 WRITE8_MEMBER(pet_state::cass1_motor_w)
 {
-	if (!data)
-	{
-		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		m_datasette1_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));    // I put 48000 because I was given some .wav with this freq
-	}
-	else
-	{
-		machine().device<cassette_image_device>(CASSETTE_TAG)->change_state(CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
-		m_datasette1_timer->reset();
-	}
+	m_cassette->motor_w(data);
 }
 
 WRITE_LINE_MEMBER(pet_state::pia0_irq_w)
@@ -238,7 +228,7 @@ const pia6821_interface petb_pia0 =
 WRITE_LINE_MEMBER(pet_state::pia1_irq_w)
 {
 	m_pia1_irq = state;
-	int level = (m_pia0_irq | m_pia1_irq | m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
+	int level = (m_pia0_irq || m_pia1_irq || m_via_irq) ? ASSERT_LINE : CLEAR_LINE;
 
 	machine().firstcpu->set_input_line(INPUT_LINE_IRQ0, level);
 }
@@ -311,8 +301,7 @@ READ8_MEMBER(pet_state::via_pb_r)
 
 READ_LINE_MEMBER(pet_state::cass2_r)
 {
-	// cassette 2 read
-	return (machine().device<cassette_image_device>(CASSETTE2_TAG)->input() > +0.0) ? 1 : 0;
+	return m_cassette2->read();
 }
 
 WRITE8_MEMBER(pet_state::via_pb_w)
@@ -339,20 +328,11 @@ WRITE8_MEMBER(pet_state::via_pb_w)
 	m_ieee->atn_w(BIT(data, 2));
 
 	/* cassette write */
-	machine().device<cassette_image_device>(CASSETTE_TAG)->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
-	machine().device<cassette_image_device>(CASSETTE2_TAG)->output(BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	m_cassette->write(BIT(data, 3));
+	m_cassette2->write(BIT(data, 3));
 
 	/* #2 cassette motor */
-	if (BIT(data, 4))
-	{
-		machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		m_datasette2_timer->adjust(attotime::zero, 0, attotime::from_hz(48000));    // I put 48000 because I was given some .wav with this freq
-	}
-	else
-	{
-		machine().device<cassette_image_device>(CASSETTE2_TAG)->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		m_datasette2_timer->reset();
-	}
+	m_cassette2->motor_w(BIT(data, 4));
 }
 
 WRITE_LINE_MEMBER(pet_state::gb_w)
@@ -612,23 +592,6 @@ TIMER_CALLBACK_MEMBER(pet_state::pet_interrupt)
 }
 
 
-TIMER_CALLBACK_MEMBER(pet_state::pet_tape1_timer)
-{
-	pia6821_device *pia_0 = machine().device<pia6821_device>("pia_0");
-//  cassette 1
-	UINT8 data = (machine().device<cassette_image_device>(CASSETTE_TAG)->input() > +0.0) ? 1 : 0;
-	pia_0->ca1_w(data);
-}
-
-TIMER_CALLBACK_MEMBER(pet_state::pet_tape2_timer)
-{
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
-//  cassette 2
-	UINT8 data = (machine().device<cassette_image_device>(CASSETTE2_TAG)->input() > +0.0) ? 1 : 0;
-	via_0->write_cb1(data);
-}
-
-
 static void pet_common_driver_init( running_machine &machine )
 {
 	int i;
@@ -656,10 +619,6 @@ static void pet_common_driver_init( running_machine &machine )
 
 	/* pet clock */
 	machine.scheduler().timer_pulse(attotime::from_msec(10), timer_expired_delegate(FUNC(pet_state::pet_interrupt),state));
-
-	/* datasette */
-	state->m_datasette1_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pet_state::pet_tape1_timer),state));
-	state->m_datasette2_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(pet_state::pet_tape2_timer),state));
 }
 
 

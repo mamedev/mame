@@ -28,6 +28,20 @@ const device_type C1531 = &device_creator<c1531_device>;
 
 
 //-------------------------------------------------
+//  cassette_interface cbm_cassette_interface
+//-------------------------------------------------
+
+const cassette_interface cbm_cassette_interface =
+{
+	cbm_cassette_formats,
+	NULL,
+	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED),
+	NULL,
+	NULL
+};
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG( c2n )
 //-------------------------------------------------
 

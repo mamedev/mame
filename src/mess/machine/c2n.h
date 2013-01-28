@@ -14,7 +14,8 @@
 
 
 #include "emu.h"
-#include "includes/cbm.h"
+#include "formats/cbm_tap.h"
+#include "imagedev/cassette.h"
 #include "machine/petcass.h"
 
 

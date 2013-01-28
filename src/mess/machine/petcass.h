@@ -30,6 +30,7 @@
 //**************************************************************************
 
 #define PET_DATASSETTE_PORT_TAG     "tape"
+#define PET_DATASSETTE_PORT2_TAG     "tape2"
 
 
 
