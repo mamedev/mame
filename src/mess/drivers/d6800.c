@@ -51,12 +51,22 @@ class d6800_state : public driver_device
 {
 public:
 	d6800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_cass(*this, CASSETTE_TAG),
-			m_pia(*this, "pia"),
-			m_dac(*this, "dac"),
-			m_videoram(*this, "videoram") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cass(*this, CASSETTE_TAG)
+		, m_pia(*this, "pia")
+		, m_dac(*this, "dac")
+		, m_videoram(*this, "videoram")
+		, m_io_x0(*this, "X0")
+		, m_io_x1(*this, "X1")
+		, m_io_x2(*this, "X2")
+		, m_io_x3(*this, "X3")
+		, m_io_y0(*this, "Y0")
+		, m_io_y1(*this, "Y1")
+		, m_io_y2(*this, "Y2")
+		, m_io_y3(*this, "Y3")
+		, m_io_shift(*this, "SHIFT")
+	{ }
 
 	DECLARE_READ8_MEMBER( d6800_cassette_r );
 	DECLARE_WRITE8_MEMBER( d6800_cassette_w );
@@ -66,21 +76,30 @@ public:
 	DECLARE_READ_LINE_MEMBER( d6800_keydown_r );
 	DECLARE_READ_LINE_MEMBER( d6800_rtc_pulse );
 	DECLARE_WRITE_LINE_MEMBER( d6800_screen_w );
-	UINT8 m_rtc;
-	bool m_screen_on;
+	UINT32 screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
+protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<pia6821_device> m_pia;
 	required_device<dac_device> m_dac;
 	required_shared_ptr<UINT8> m_videoram;
+	required_ioport m_io_x0;
+	required_ioport m_io_x1;
+	required_ioport m_io_x2;
+	required_ioport m_io_x3;
+	required_ioport m_io_y0;
+	required_ioport m_io_y1;
+	required_ioport m_io_y2;
+	required_ioport m_io_y3;
+	required_ioport m_io_shift;
 private:
+	UINT8 m_rtc;
+	bool m_screen_on;
 	UINT8 m_kbd_s;
 	UINT8 m_portb;
 	virtual void machine_start();
 	virtual void machine_reset();
-public:
-	UINT32 screen_update_d6800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(d6800_p);
 };
 
 
@@ -198,10 +217,7 @@ READ_LINE_MEMBER( d6800_state::d6800_rtc_pulse )
 
 READ_LINE_MEMBER( d6800_state::d6800_keydown_r )
 {
-	UINT8 data = ioport("X0")->read()
-				& ioport("X1")->read()
-				& ioport("X2")->read()
-				& ioport("X3")->read();
+	UINT8 data = m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read();
 
 	m_kbd_s = (data == 15) ? 0 : 1;
 
@@ -210,7 +226,7 @@ READ_LINE_MEMBER( d6800_state::d6800_keydown_r )
 
 READ_LINE_MEMBER( d6800_state::d6800_fn_key_r )
 {
-	return ioport("SHIFT")->read();
+	return m_io_shift->read();
 }
 
 WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
@@ -254,10 +270,10 @@ READ8_MEMBER( d6800_state::d6800_keyboard_r )
 	m_kbd_s++;
 
 	if (m_kbd_s == 3)
-		return 0x0f & ioport("X0")->read() & ioport("X1")->read() & ioport("X2")->read() & ioport("X3")->read();
+		return 0x0f & m_io_x0->read() & m_io_x1->read() & m_io_x2->read() & m_io_x3->read();
 	else
 	if (m_kbd_s == 6)
-		return 0xf0 & ioport("Y0")->read() & ioport("Y1")->read() & ioport("Y2")->read() & ioport("Y3")->read();
+		return 0xf0 & m_io_y0->read() & m_io_y1->read() & m_io_y2->read() & m_io_y3->read();
 	else
 		return 0xff;
 }
