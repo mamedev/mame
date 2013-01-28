@@ -668,7 +668,8 @@ void asr733_keyboard(device_t *device)
 
 	enum { repeat_delay = 5 /* approx. 1/10s */ };
 
-	UINT16 key_buf[6];
+	//UINT16 key_buf[6];
+	UINT16 key_buf[4];
 	int i, j;
 	modifier_state_t modifier_state;
 	int repeat_mode;
@@ -740,7 +741,8 @@ void asr733_keyboard(device_t *device)
 		}
 		else
 		{
-			for (i=0; i<6; i++)
+			//for (i=0; i<6; i++)
+			for (i=0; i<4; i++)
 			{
 				for (j=0; j<16; j++)
 				{
