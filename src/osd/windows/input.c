@@ -791,7 +791,7 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 			// ctrl-alt-F12 to toggle post-processing
 			case IPT_OSD_4:
 				entry->configure_osd("POST_PROCESS", "Toggle Post-Processing");
-				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_LALT, KEYCODE_LCONTROL, KEYCODE_F12);
+				entry->defseq(SEQ_TYPE_STANDARD).set(KEYCODE_LALT, KEYCODE_LCONTROL, KEYCODE_F5);
 				break;
 
 			// leave everything else alone

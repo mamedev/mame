@@ -500,8 +500,12 @@ void hlsl_info::toggle()
 	{
 		if (!initialized)
 		{
-			bool success = create_resources(false);
-			master_enable = (success ? !master_enable : false);
+			master_enable = !master_enable;
+			bool failed = create_resources(false);
+			if (failed)
+			{
+				master_enable = false;
+			}
 		}
 		else
 		{
@@ -1059,12 +1063,8 @@ void hlsl_info::init_fsfx_quad(void *vertbuf)
 
 int hlsl_info::create_resources(bool reset)
 {
-	initialized = false;
-
 	if (!master_enable || !d3dintf->post_fx_available)
 		return 0;
-
-	initialized = true;
 
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 
@@ -1303,6 +1303,8 @@ int hlsl_info::create_resources(bool reset)
 		osd_free(yiq_encode_name);
 	if (yiq_decode_name)
 		osd_free(yiq_decode_name);
+
+	initialized = true;
 
 	return 0;
 }
