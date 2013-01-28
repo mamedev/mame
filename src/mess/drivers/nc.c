@@ -429,7 +429,8 @@ static void nc_common_restore_memory_from_stream(running_machine &machine)
 
 	LOG(("restoring nc memory\n"));
 	/* get size of memory data stored */
-	state->m_file->read(&stored_size, sizeof(unsigned long));
+	if (state->m_file->read(&stored_size, sizeof(unsigned long)) != sizeof(unsigned long))
+		stored_size = 0;
 
 	if (stored_size > machine.device<ram_device>(RAM_TAG)->size())
 		restore_size = machine.device<ram_device>(RAM_TAG)->size();
