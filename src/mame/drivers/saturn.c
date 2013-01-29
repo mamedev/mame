@@ -448,7 +448,7 @@ void saturn_state::scu_single_transfer(address_space &space, UINT32 src, UINT32 
 
 void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 {
-	UINT32 tmp_src,tmp_dst,tmp_size;
+	UINT32 tmp_src,tmp_dst,total_size;
 	UINT8 cd_transfer_flag;
 
 	if(m_scu.src_add[dma_ch] == 0 || (m_scu.dst_add[dma_ch] != 2 && m_scu.dst_add[dma_ch] != 4))
@@ -469,7 +469,7 @@ void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 
 	tmp_src = tmp_dst = 0;
 
-	tmp_size = m_scu.size[dma_ch];
+	total_size = m_scu.size[dma_ch];
 	if(!(DRUP(dma_ch))) tmp_src = m_scu.src[dma_ch];
 	if(!(DWUP(dma_ch))) tmp_dst = m_scu.dst[dma_ch];
 
@@ -518,12 +518,12 @@ void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 	if(!(DWUP(dma_ch))) m_scu.dst[dma_ch] = tmp_dst;
 
 	{
-		/*TODO: change DMA into DRQ model.  */
+		/*TODO: change DMA into DRQ model. Timing is a guess.  */
 		switch(dma_ch)
 		{
-			case 0: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(tmp_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv0_ended),this)); break;
-			case 1: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(tmp_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv1_ended),this)); break;
-			case 2: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(tmp_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv2_ended),this)); break;
+			case 0: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(total_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv0_ended),this)); break;
+			case 1: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(total_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv1_ended),this)); break;
+			case 2: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(total_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv2_ended),this)); break;
 		}
 	}
 }
@@ -536,6 +536,7 @@ void saturn_state::scu_dma_indirect(address_space &space,UINT8 dma_ch)
 	UINT32 tmp_src;
 	UINT32 indirect_src,indirect_dst;
 	INT32 indirect_size;
+	UINT32 total_size = 0;
 
 	DnMV_1(dma_ch);
 
@@ -582,7 +583,10 @@ void saturn_state::scu_dma_indirect(address_space &space,UINT8 dma_ch)
 			}
 		}
 
-		//if(DRUP(0))   space.write_dword(tmp_src+8,m_scu.src[0]|job_done ? 0x80000000 : 0);
+		/* Guess: Size + data acquire (1 cycle for src/dst/size) */
+		total_size += indirect_size + 3*4;
+
+		//if(DRUP(0)) space.write_dword(tmp_src+8,m_scu.src[0]|job_done ? 0x80000000 : 0);
 		//if(DWUP(0)) space.write_dword(tmp_src+4,m_scu.dst[0]);
 
 		m_scu.index[dma_ch] = tmp_src+0xc;
@@ -590,12 +594,12 @@ void saturn_state::scu_dma_indirect(address_space &space,UINT8 dma_ch)
 	}while(job_done == 0);
 
 	{
-		/*TODO: this is completely wrong HW-wise ...  */
+		/*TODO: change DMA into DRQ model. Timing is a guess.  */
 		switch(dma_ch)
 		{
-			case 0: machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(saturn_state::dma_lv0_ended),this)); break;
-			case 1: machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(saturn_state::dma_lv1_ended),this)); break;
-			case 2: machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(saturn_state::dma_lv2_ended),this)); break;
+			case 0: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(total_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv0_ended),this)); break;
+			case 1: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(total_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv1_ended),this)); break;
+			case 2: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(total_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv2_ended),this)); break;
 		}
 	}
 }
