@@ -20,6 +20,7 @@ struct osd_midi_device
 	#endif
 	UINT8 xmit_in[4]; // Pm_Messages mean we can at most have 3 residue bytes
 	int xmit_cnt;
+	UINT8 last_status;
 };
 
 void osd_list_midi_devices(void)
@@ -242,7 +243,20 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 	#ifndef DISABLE_MIDI
 	int bytes_needed = 0;
 
-	dev->xmit_in[dev->xmit_cnt++] = data;
+	if ((dev->xmit_cnt == 0) && (data & 0x80))
+	{
+		dev->last_status = data;
+	}
+
+	if ((dev->xmit_cnt == 0) && !(data & 0x80))
+	{
+		dev->xmit_in[dev->xmit_cnt++] = dev->last_status;
+		dev->xmit_in[dev->xmit_cnt++] = data;
+	}
+	else
+	{
+		dev->xmit_in[dev->xmit_cnt++] = data;
+	}
 
 	// are we there yet?
 	switch ((dev->xmit_in[0]>>4) & 0xf)
