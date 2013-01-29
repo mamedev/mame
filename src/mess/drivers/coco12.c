@@ -352,7 +352,17 @@ ROM_START(cp400)
 	ROM_LOAD("cp400bas.rom",  0x0000, 0x4000, CRC(878396a5) SHA1(292c545da3c77978e043b00a3dbc317201d18c3b))
 ROM_END
 
+ROM_START(mx1600 )
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD("mx1600bas.rom",    0x2000, 0x2000, CRC(d918156e) SHA1(70a464edf3a654ed4ffe687e6dee4f0d2acc758b))
+	ROM_LOAD("mx1600extbas.rom", 0x0000, 0x2000, CRC(322a3d58) SHA1(9079a477c3f22e46cebb1e68b61df5bd607c71a4))
+ROM_END
 
+ROM_START(lzcolor64 )
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD("color64bas.rom",    0x2000, 0x2000, CRC(b0717d71) SHA1(ad1beef9d6f095ada69f91d0b8ad75985172d86f))
+	ROM_LOAD("color64extbas.rom", 0x0000, 0x2000, CRC(d1b1560d) SHA1(7252de9df405ade453282e992eb1f1910adc8e50))
+ROM_END
 
 //**************************************************************************
 //  SYSTEM DRIVERS
@@ -364,3 +374,5 @@ COMP(  1981,    cocoe,      coco,   0,      cocoe,     coco, driver_device,     
 COMP(  1983,    coco2,      coco,   0,      coco2,     coco, driver_device,      0,      "Tandy Radio Shack",     "Color Computer 2", 0)
 COMP(  1985?,   coco2b,     coco,   0,      coco2b,    coco, driver_device,      0,      "Tandy Radio Shack",     "Color Computer 2B", 0)
 COMP(  1984,    cp400,      coco,   0,      cp400,     coco, driver_device,      0,      "Prologica",            "CP400", 0)
+COMP(  1984,    lzcolor64,  coco,   0,      coco,      coco, driver_device,      0,      "Digiponto",            "LZ Color64", 0)
+COMP(  1984,    mx1600,     coco,   0,      coco,      coco, driver_device,      0,      "Dynacom",              "MX-1600", 0)
