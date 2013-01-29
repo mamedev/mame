@@ -848,11 +848,11 @@ INLINE void EXTUW(sh2_state *sh2, UINT32 m, UINT32 n)
 /*  ILLEGAL */
 INLINE void ILLEGAL(sh2_state *sh2)
 {
-	logerror("SH2.%s: Illegal opcode at %08x\n", sh2->device->tag(), sh2->pc);
+	logerror("SH2.%s: Illegal opcode at %08x\n", sh2->device->tag(), sh2->pc - 2);
 	sh2->r[15] -= 4;
 	WL( sh2, sh2->r[15], sh2->sr );     /* push SR onto stack */
 	sh2->r[15] -= 4;
-	WL( sh2, sh2->r[15], sh2->pc );     /* push PC onto stack */
+	WL( sh2, sh2->r[15], sh2->pc - 2 ); /* push PC onto stack */
 
 	/* fetch PC */
 	sh2->pc = RL( sh2, sh2->vbr + 4 * 4 );
