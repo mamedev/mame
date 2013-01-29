@@ -2089,6 +2089,7 @@ void video_update_vdp1(running_machine &machine)
 			}
 			break;
 		case 3: /* Manual mode - change */
+			/* TODO: Slam n Jam 96 doesn't like this, investigate. */
 			if ( state->m_vdp1.fbcr_accessed )
 			{
 				stv_vdp1_change_framebuffers(machine);
