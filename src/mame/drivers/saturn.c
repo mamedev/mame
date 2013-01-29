@@ -513,17 +513,17 @@ void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 		}
 	}
 
-	m_scu.size[dma_ch] = tmp_size;
+	m_scu.size[dma_ch] = 0;
 	if(!(DRUP(dma_ch))) m_scu.src[dma_ch] = tmp_src;
 	if(!(DWUP(dma_ch))) m_scu.dst[dma_ch] = tmp_dst;
 
 	{
-		/*TODO: this is completely wrong HW-wise ...  */
+		/*TODO: change DMA into DRQ model.  */
 		switch(dma_ch)
 		{
-			case 0: machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(saturn_state::dma_lv0_ended),this)); break;
-			case 1: machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(saturn_state::dma_lv1_ended),this)); break;
-			case 2: machine().scheduler().timer_set(attotime::from_usec(300), timer_expired_delegate(FUNC(saturn_state::dma_lv2_ended),this)); break;
+			case 0: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(tmp_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv0_ended),this)); break;
+			case 1: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(tmp_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv1_ended),this)); break;
+			case 2: machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(tmp_size/4), timer_expired_delegate(FUNC(saturn_state::dma_lv2_ended),this)); break;
 		}
 	}
 }
