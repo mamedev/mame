@@ -719,10 +719,10 @@ static void cd_exec_command(running_machine &machine)
 
 				CDROM_LOG(("%s:CD: Set Filter Range\n",   machine.describe_context()))
 
-				printf("%08x %08x %d\n",filters[fnum].fad,filters[fnum].range,fnum);
-
 				filters[fnum].fad = ((cr1 & 0xff)<<16) | cr2;
 				filters[fnum].range = ((cr3 & 0xff)<<16) | cr4;
+
+				printf("%08x %08x %d\n",filters[fnum].fad,filters[fnum].range,fnum);
 
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
@@ -1623,7 +1623,8 @@ static UINT16 cd_readWord(UINT32 addr)
 
 		case 0x000c:
 		case 0x000e:
-			CDROM_LOG(("RW HIRM: %04x\n", hirqmask))
+//			CDROM_LOG(("RW HIRM: %04x\n", hirqmask))
+			printf("RW HIRM: %04x\n", hirqmask);
 			return hirqmask;
 
 		case 0x0018:
@@ -1842,7 +1843,8 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 		return;
 	case 0x000c:
 	case 0x000e:
-			CDROM_LOG(("WW HIRM: %04x => %04x\n", hirqmask, data))
+//		CDROM_LOG(("WW HIRM: %04x => %04x\n", hirqmask, data))
+		printf("WW HIRM: %04x => %04x\n", hirqmask, data);
 		hirqmask = data;
 		return;
 	case 0x0018:
