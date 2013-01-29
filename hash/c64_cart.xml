@@ -6415,18 +6415,20 @@
 	</software>
 
 	<software name="fcc" supported="no">
-		<description>The Final ChessCard</description>
+		<description>The Final ChessCard (Ger)</description>
 		<year>1989</year>
 		<publisher>Tasc</publisher>
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="fcc" />
 			<feature name="exrom" value="0" />
-			<feature name="game" value="1" />
+			<feature name="game" value="0" />
 
 			<dataarea name="roml" size="0x8000">
 				<rom name="fcc_rom2" size="0x8000" crc="8fc0f156" sha1="c843729870e7ce59bb64b60ebec028f7200f93d1" offset="0x0000" />
 			</dataarea>
+
+			<dataarea name="nvram" size="0x2000" />
 		</part>
 	</software>
 

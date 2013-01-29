@@ -89,6 +89,13 @@ enum
 	REGISTER_FAST
 };
 
+static int UNUSED_BITS[0x40] =
+{
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xc0, 0x00,	0x01, 0x70, 0xf0, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0,	0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xff,
+	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+};
 
 // VICE palette
 static const rgb_t PALETTE[] =
@@ -2460,39 +2467,47 @@ READ8_MEMBER( mos6566_device::read )
 	{
 	case 0x11:
 		val = (m_reg[offset] & ~0x80) | ((m_rasterline & 0x100) >> 1);
+		val |= UNUSED_BITS[offset];
 		break;
 
 	case 0x12:
 		val = m_rasterline & 0xff;
+		val |= UNUSED_BITS[offset];
 		break;
 
 	case 0x16:
 		val = m_reg[offset] | 0xc0;
+		val |= UNUSED_BITS[offset];
 		break;
 
 	case 0x18:
 		val = m_reg[offset] | 0x01;
+		val |= UNUSED_BITS[offset];
 		break;
 
 	case 0x19:                          /* interrupt flag register */
 		/* clear_interrupt(0xf); */
 		val = m_reg[offset] | 0x70;
+		val |= UNUSED_BITS[offset];
 		break;
 
 	case 0x1a:
 		val = m_reg[offset] | 0xf0;
+		val |= UNUSED_BITS[offset];
 		break;
 
 	case 0x1e:                          /* sprite to sprite collision detect */
 		val = m_reg[offset];
 		m_reg[offset] = 0;
 		clear_interrupt(4);
+		val |= UNUSED_BITS[offset];
 		break;
 
 	case 0x1f:                          /* sprite to background collision detect */
 		val = m_reg[offset];
 		m_reg[offset] = 0;
 		clear_interrupt(2);
+		val |= UNUSED_BITS[offset];
 		break;
 
 	case 0x20:
@@ -2501,6 +2516,7 @@ READ8_MEMBER( mos6566_device::read )
 	case 0x23:
 	case 0x24:
 		val = m_reg[offset];
+		val |= UNUSED_BITS[offset];
 		break;
 
 	case 0x00:
@@ -2535,6 +2551,7 @@ READ8_MEMBER( mos6566_device::read )
 	case 0x2d:
 	case 0x2e:
 		val = m_reg[offset];
+		val |= UNUSED_BITS[offset];
 		break;
 
 	case REGISTER_KCR:
@@ -2545,7 +2562,9 @@ READ8_MEMBER( mos6566_device::read )
 			DBG_LOG(2, "vic read", ("%.2x:%.2x\n", offset, val));
 		}
 		else
-			val = 0xff;
+		{
+			val |= UNUSED_BITS[offset];
+		}
 		break;
 
 	case 0x31:
@@ -2563,13 +2582,13 @@ READ8_MEMBER( mos6566_device::read )
 	case 0x3d:
 	case 0x3e:
 	case 0x3f:                          /* not used */
-		// val = m_reg[offset]; //
-		val = 0xff;
 		DBG_LOG(2, "vic read", ("%.2x:%.2x\n", offset, val));
+		val |= UNUSED_BITS[offset];
 		break;
 
 	default:
 		val = m_reg[offset];
+		val |= UNUSED_BITS[offset];
 	}
 
 	if ((offset != 0x11) && (offset != 0x12))

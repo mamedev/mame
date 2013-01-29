@@ -25,7 +25,8 @@
 // ======================> c64_final_chesscard_device
 
 class c64_final_chesscard_device : public device_t,
-									public device_c64_expansion_card_interface
+									public device_c64_expansion_card_interface,
+									public device_nvram_interface
 {
 public:
 	// construction/destruction
@@ -37,12 +38,19 @@ public:
 	virtual ioport_constructor device_input_ports() const;
 
 	DECLARE_INPUT_CHANGED_MEMBER( reset );
+	DECLARE_READ8_MEMBER( nvram_r );
+	DECLARE_WRITE8_MEMBER( nvram_w );
 
 protected:
 	// device-level overrides
 	virtual void device_config_complete() { m_shortname = "c64_fcc"; }
 	virtual void device_start();
 	virtual void device_reset();
+
+	// device_nvram_interface overrides
+	virtual void nvram_default() { }
+	virtual void nvram_read(emu_file &file) { if (m_nvram != NULL) { file.read(m_nvram, m_nvram_size); } }
+	virtual void nvram_write(emu_file &file) { if (m_nvram != NULL) { file.write(m_nvram, m_nvram_size); } }
 
 	// device_c64_expansion_card_interface overrides
 	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
@@ -52,6 +60,7 @@ private:
 	required_device<m65sc02_device> m_maincpu;
 
 	UINT8 m_bank;
+	int m_ramen;
 };
 
 
