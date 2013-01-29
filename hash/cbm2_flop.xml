@@ -2,6 +2,30 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="cbm2_flop" description="Commodore CBM-II diskettes">
 
+	<software name="8250test">
+		<description>Commodore 8250LP Floppy Disk Drive Test/Demo Diskette</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1066496">
+				<rom name="8250lp-demo.d82" size="1066496" crc="cbd23e48" sha1="acedaa2e77f7a113bfe77760eb67ba45099b50db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1001test">
+		<description>Commodore SFD-1001 Floppy Disk Drive Test/Demo Diskette</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1066496">
+				<rom name="sfd1001-demo.d82" size="1066496" crc="83b12b13" sha1="316fa89b4553ff1d411dc14ffcdd477c1fb284da" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="burnin">
 		<description>Factory Burn In Diagnostics for B Series</description>
 		<year>1983</year>
@@ -113,6 +137,18 @@
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="1066496">
 				<rom name="proxa7000d2.d82" size="1066496" crc="6e0f7e44" sha1="4d742b82956126ff568762f8e82ad7290e6cc8a4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sampler">
+		<description>CBM 700 Software Sampler</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="disk2002.d80" size="533248" crc="bed6b1cd" sha1="624ae3c03c03274cc66d027c6be331f064c7773c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
