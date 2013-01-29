@@ -706,6 +706,9 @@ static MACHINE_CONFIG_START( pet_general, pet_state )
 	/* pias */
 	MCFG_PIA6821_ADD( "pia_0", pet_pia0)
 	MCFG_PIA6821_ADD( "pia_1", pet_pia1)
+
+  /* software lists */
+  MCFG_SOFTWARE_LIST_ADD("rom_list", "pet_rom")
 MACHINE_CONFIG_END
 
 
