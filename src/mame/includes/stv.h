@@ -241,6 +241,11 @@ public:
 
 	int m_scsp_last_line;
 
+	UINT8 smpc_direct_mode(UINT8 pad_n);
+	UINT8 smpc_th_control_mode(UINT8 pad_n);
+	DECLARE_READ8_MEMBER( saturn_SMPC_r );
+	DECLARE_WRITE8_MEMBER( saturn_SMPC_w );
+
 };
 
 #define MASTER_CLOCK_352 57272720

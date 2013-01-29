@@ -240,7 +240,11 @@ static void cd_exec_command(running_machine &machine)
 {
 	UINT32 temp;
 
-	if(cr1 != 0 && ((cr1 & 0xff00) != 0x5100) && 1)
+	if(cr1 != 0 &&
+	  ((cr1 & 0xff00) != 0x5100) &&
+	  ((cr1 & 0xff00) != 0x5200) &&
+	  ((cr1 & 0xff00) != 0x5300) &&
+	   1)
 		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 	switch (cr1 & 0xff00)

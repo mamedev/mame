@@ -852,85 +852,144 @@ WRITE8_HANDLER( stv_SMPC_w )
  *
  *******************************************/
 
-READ8_HANDLER( saturn_SMPC_r )
+/*
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 A") PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 C") PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 B") PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("P1 R") PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P1 X") PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Y") PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("P1 Z") PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("P1 L") PORT_PLAYER(1) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_) \
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_CONDITION("INPUT_TYPE", _mask_, EQUALS, _val_)
+
+	0 Start A 0     0    Down Up
+*/
+
+UINT8 saturn_state::smpc_th_control_mode(UINT8 pad_n)
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
+	int th;
+	const char *const padnames[] = { "JOY1", "JOY2" };
+	UINT8 res;
+
+	th = (pad_n == 0) ? ((m_smpc.PDR1>>6) & 1) : ((m_smpc.PDR2>>6) & 1);
+
+	if (LOG_SMPC) printf("SMPC: SH-2 TH control mode, returning pad data %d for phase %d\n",pad_n+1, th);
+
+	switch(th)
+	{
+		case 1:
+			res = th<<7;
+			//	1 C B Right Left Down Up
+			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>4)) & 0x30); // C & B
+			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>12)) & 0xf);
+			break;
+		case 0:
+			res = th<<7;
+			//  0 Start A 0 0    Down Up
+			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>6)) & 0x30); // Start & A
+			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>12)) & 0x3);
+			break;
+	}
+
+	return res;
+}
+
+UINT8 saturn_state::smpc_direct_mode(UINT8 pad_n)
+{
+	int hshake;
+	const int shift_bit[4] = { 4, 12, 8, 0 };
+	const char *const padnames[] = { "JOY1", "JOY2" };
+
+	hshake = (pad_n == 0) ? ((m_smpc.PDR1>>5) & 3) : ((m_smpc.PDR2>>5) & 3);
+
+	if (LOG_SMPC) logerror("SMPC: SH-2 direct mode, returning data for phase %d\n", hshake);
+
+	return 0x80 | 0x10 | ((machine().root_device().ioport(padnames[pad_n])->read()>>shift_bit[hshake]) & 0xf);
+}
+
+READ8_MEMBER( saturn_state::saturn_SMPC_r )
+{
 	UINT8 return_data = 0;
 
 	if (!(offset & 1)) // avoid reading to even bytes (TODO: is it 0s or 1s?)
 		return 0x00;
 
 	if(offset >= 0x21 && offset <= 0x5f)
-		return_data = state->m_smpc.OREG[(offset-0x21) >> 1];
+		return_data = m_smpc.OREG[(offset-0x21) >> 1];
 
 	if (offset == 0x61)
-		return_data = state->m_smpc.SR;
+		return_data = m_smpc.SR;
 
 	if (offset == 0x63)
 	{
 		//printf("SF %d %d\n",space.machine().primary_screen->hpos(),space.machine().primary_screen->vpos());
-		return_data = state->m_smpc.SF;
+		return_data = m_smpc.SF;
 	}
 
 	if (offset == 0x75 || offset == 0x77)//PDR1/2 read
 	{
-		if ((state->m_smpc.IOSEL1 && offset == 0x75) || (state->m_smpc.IOSEL2 && offset == 0x77))
+		if ((m_smpc.IOSEL1 && offset == 0x75) || (m_smpc.IOSEL2 && offset == 0x77))
 		{
-			int hshake;
-			const int shift_bit[4] = { 4, 12, 8, 0 };
-			const char *const padnames[] = { "JOY1", "JOY2" };
+			UINT8 cur_ddr;
 
-			if(space.machine().root_device().ioport("INPUT_TYPE")->read() && !(space.debugger_access()))
+			if(machine().root_device().ioport("INPUT_TYPE")->read() && !(space.debugger_access()))
 			{
 				popmessage("Warning: read with SH-2 direct mode with a non-pad device");
 				return 0;
 			}
 
-			if(offset == 0x75)
-				hshake = (state->m_smpc.PDR1>>5) & 3;
-			else
-				hshake = (state->m_smpc.PDR2>>5) & 3;
+			cur_ddr = (offset == 0x75) ? m_smpc.DDR1 : m_smpc.DDR2;
 
-			if (LOG_SMPC) logerror("SMPC: SH-2 direct mode, returning data for phase %d\n", hshake);
-
-			return_data = 0x80 | 0x10 | ((space.machine().root_device().ioport(padnames[offset == 0x77])->read()>>shift_bit[hshake]) & 0xf);
+			switch(cur_ddr & 0x60)
+			{
+				case 0x40: return_data = smpc_th_control_mode(offset == 0x77); break;
+				case 0x60: return_data = smpc_direct_mode(offset == 0x77); break;
+				default:
+					popmessage("SMPC: unemulated control method %02x, contact MAMEdev",cur_ddr & 0x60);
+					return_data = 0;
+					break;
+			}
 		}
 	}
 
 	if (LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x (%d) Returns %02x\n", space.device().tag(), space.device().safe_pc(), offset, offset>>1, return_data);
 
-
 	return return_data;
 }
 
-WRITE8_HANDLER( saturn_SMPC_w )
+WRITE8_MEMBER( saturn_state::saturn_SMPC_w )
 {
-	saturn_state *state = space.machine().driver_data<saturn_state>();
-
 	if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x\n", offset, offset>>1, data);
 
 	if (!(offset & 1)) // avoid writing to even bytes
 		return;
 
 	if(offset >= 1 && offset <= 0xd)
-		state->m_smpc.IREG[offset >> 1] = data;
+		m_smpc.IREG[offset >> 1] = data;
 
 	if(offset == 1) //IREG0, check if a BREAK / CONTINUE request for INTBACK command
 	{
-		if(state->m_smpc.intback_stage)
+		if(m_smpc.intback_stage)
 		{
 			if(data & 0x40)
 			{
 				if(LOG_PAD_CMD) printf("SMPC: BREAK request\n");
-				state->m_smpc.SR &= 0x0f;
-				state->m_smpc.intback_stage = 0;
+				m_smpc.SR &= 0x0f;
+				m_smpc.intback_stage = 0;
 			}
 			else if(data & 0x80)
 			{
 				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
-				space.machine().scheduler().timer_set(attotime::from_usec(700), FUNC(intback_peripheral),0); /* TODO: is timing correct? */
-				state->m_smpc.OREG[31] = 0x10;
-				state->m_smpc.SF = 0x01; //TODO: set hand-shake flag?
+				machine().scheduler().timer_set(attotime::from_usec(700), FUNC(intback_peripheral),0); /* TODO: is timing correct? */
+				m_smpc.OREG[31] = 0x10;
+				m_smpc.SF = 0x01; //TODO: set hand-shake flag?
 			}
 		}
 	}
@@ -942,37 +1001,37 @@ WRITE8_HANDLER( saturn_SMPC_w )
 		// we've processed the command, clear status flag
 		if(data != 0x10 && data != 2 && data != 3 && data != 6 && data != 7 && data != 0x0e && data != 0x0f && data != 0x19 && data != 0x1a)
 		{
-			state->m_smpc.OREG[31] = data; //read-back for last command issued
-			state->m_smpc.SF = 0x00; //clear hand-shake flag
+			m_smpc.OREG[31] = data; //read-back for last command issued
+			m_smpc.SF = 0x00; //clear hand-shake flag
 		}
 		/*TODO:emulate the timing of each command...*/
 	}
 
 	if (offset == 0x63)
-		state->m_smpc.SF = data & 1; // hand-shake flag
+		m_smpc.SF = data & 1; // hand-shake flag
 
 	if(offset == 0x75)  // PDR1
-		state->m_smpc.PDR1 = (data & state->m_smpc.DDR1);
+		m_smpc.PDR1 = (data & m_smpc.DDR1);
 
 	if(offset == 0x77)  // PDR2
-		state->m_smpc.PDR2 = (data & state->m_smpc.DDR2);
+		m_smpc.PDR2 = (data & m_smpc.DDR2);
 
 	if(offset == 0x79)
-		state->m_smpc.DDR1 = data & 0x7f;
+		m_smpc.DDR1 = data & 0x7f;
 
 	if(offset == 0x7b)
-		state->m_smpc.DDR2 = data & 0x7f;
+		m_smpc.DDR2 = data & 0x7f;
 
 	if(offset == 0x7d)
 	{
-		state->m_smpc.IOSEL1 = data & 1;
-		state->m_smpc.IOSEL2 = (data & 2) >> 1;
+		m_smpc.IOSEL1 = data & 1;
+		m_smpc.IOSEL2 = (data & 2) >> 1;
 	}
 
 	if(offset == 0x7f)
 	{
 		//enable PAD irq & VDP2 external latch for port 1/2
-		state->m_smpc.EXLE1 = (data & 1) >> 0;
-		state->m_smpc.EXLE2 = (data & 2) >> 1;
+		m_smpc.EXLE1 = (data & 1) >> 0;
+		m_smpc.EXLE2 = (data & 2) >> 1;
 	}
 }
