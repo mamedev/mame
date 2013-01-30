@@ -33,11 +33,6 @@ static ADDRESS_MAP_START(gamecom_mem_map, AS_PROGRAM, 8, gamecom_state)
 	AM_RANGE( 0xE000, 0xFFFF )  AM_RAM AM_SHARE("p_nvram")// AM_SHARE("nvram")           /* Extended I/O, Extended RAM */
 ADDRESS_MAP_END
 
-static const SM8500_CONFIG gamecom_cpu_config = {
-	gamecom_handle_dma,
-	gamecom_update_timers
-};
-
 static INPUT_PORTS_START( gamecom )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME( "Up" )
@@ -91,14 +86,15 @@ UINT32 gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
 {
-	m_maincpu->set_input_line(LCDC_INT, ASSERT_LINE );
+	m_maincpu->set_input_line(sm8500_cpu_device::LCDC_INT, ASSERT_LINE );
 }
 
 static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", SM8500, XTAL_11_0592MHz/2 )   /* actually it's an sm8521 microcontroller containing an sm8500 cpu */
 	MCFG_CPU_PROGRAM_MAP( gamecom_mem_map)
-	MCFG_CPU_CONFIG( gamecom_cpu_config )
+	MCFG_SM8500_DMA_CB( WRITE8( gamecom_state, gamecom_handle_dma ) )
+	MCFG_SM8500_TIMER_CB( WRITE8( gamecom_state, gamecom_update_timers ) )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gamecom_state,  gamecom_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))

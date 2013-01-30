@@ -258,6 +258,8 @@ public:
 	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
 	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);
 	TIMER_CALLBACK_MEMBER(gamecom_scanline);
+	DECLARE_WRITE8_MEMBER( gamecom_handle_dma );
+	DECLARE_WRITE8_MEMBER( gamecom_update_timers );
 
 protected:
 	required_memory_bank m_bank1;
@@ -278,8 +280,5 @@ protected:
 
 extern DEVICE_IMAGE_LOAD( gamecom_cart1 );
 extern DEVICE_IMAGE_LOAD( gamecom_cart2 );
-
-extern void gamecom_handle_dma( device_t *device, int cycles );
-extern void gamecom_update_timers( device_t *device, int cycles );
 
 #endif /* GAMECOM_H_ */

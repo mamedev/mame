@@ -10,7 +10,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_clock_timer_callback)
 	UINT8 * RAM = m_region_maincpu->base();
 	UINT8 val = ( ( RAM[SM8521_CLKT] & 0x3F ) + 1 ) & 0x3F;
 	RAM[SM8521_CLKT] = ( RAM[SM8521_CLKT] & 0xC0 ) | val;
-	m_maincpu->set_input_line(CK_INT, ASSERT_LINE );
+	m_maincpu->set_input_line(sm8500_cpu_device::CK_INT, ASSERT_LINE );
 }
 
 void gamecom_state::machine_reset()
@@ -353,194 +353,202 @@ WRITE8_MEMBER( gamecom_state::gamecom_internal_w )
    Their usage is also not explained properly in the manuals. Guess we'll have to wait
    for them to show up in some rom images...
  */
-void gamecom_handle_dma( device_t *device, int cycles )
+WRITE8_MEMBER( gamecom_state::gamecom_handle_dma )
 {
-	gamecom_state *state = device->machine().driver_data<gamecom_state>();
-	UINT8 * RAM = state->memregion("maincpu")->base();
-	UINT8 data = RAM[SM8521_DMC];
-	state->m_dma.overwrite_mode = data & 0x01;
-	state->m_dma.transfer_mode = data & 0x06;
-	state->m_dma.decrement_x = data & 0x08;
-	state->m_dma.decrement_y = data & 0x10;
-	state->m_dma.enabled = data & 0x80;
-	if ( !state->m_dma.enabled ) return;
+	UINT8 * RAM = m_region_maincpu->base();
+	UINT8 dmc = RAM[SM8521_DMC];
+	m_dma.overwrite_mode = dmc & 0x01;
+	m_dma.transfer_mode = dmc & 0x06;
+	m_dma.decrement_x = dmc & 0x08;
+	m_dma.decrement_y = dmc & 0x10;
+	m_dma.enabled = dmc & 0x80;
+	if ( !m_dma.enabled )
+	{
+		return;
+	}
 
+	if ( m_dma.decrement_x || m_dma.decrement_y )
+	{
+		popmessage( "TODO: Decrement-x and decrement-y are not supported yet\n" );
+	}
 
-	if ( state->m_dma.decrement_x || state->m_dma.decrement_y )
-		logerror( "TODO: Decrement-x and decrement-y are not supported yet\n" );
-
-	state->m_dma.width_x = RAM[SM8521_DMDX];
-	state->m_dma.width_x_count = 0;
-	state->m_dma.width_y = RAM[SM8521_DMDY];
-	state->m_dma.width_y_count = 0;
-	state->m_dma.source_x = RAM[SM8521_DMX1];
-	state->m_dma.source_x_current = state->m_dma.source_x;
-	state->m_dma.source_y = RAM[SM8521_DMY1];
-	state->m_dma.source_width = ( RAM[SM8521_LCH] & 0x20 ) ? 50 : 40;
-	state->m_dma.dest_x = RAM[SM8521_DMX2];
-	state->m_dma.dest_x_current = state->m_dma.dest_x;
-	state->m_dma.dest_y = RAM[SM8521_DMY2];
-	state->m_dma.dest_width = ( RAM[SM8521_LCH] & 0x20 ) ? 50 : 40;
-	state->m_dma.palette[0] = RAM[SM8521_DMPL] & 0x03;
-	state->m_dma.palette[1] = ( RAM[SM8521_DMPL] >> 2 ) & 3;
-	state->m_dma.palette[2] = ( RAM[SM8521_DMPL] >> 4 ) & 3;
-	state->m_dma.palette[3] = RAM[SM8521_DMPL] >> 6;
-	state->m_dma.source_mask = 0x1FFF;
-	state->m_dma.dest_mask = 0x1FFF;
-//  logerror("DMA: width %Xx%X, source (%X,%X), dest (%X,%X), transfer_mode %X, banks %X \n", state->m_dma.width_x, state->m_dma.width_y, state->m_dma.source_x, state->m_dma.source_y, state->m_dma.dest_x, state->m_dma.dest_y, state->m_dma.transfer_mode, RAM[SM8521_DMVP] );
-//  logerror( "   Palette: %d, %d, %d, %d\n", state->m_dma.palette[0], state->m_dma.palette[1], state->m_dma.palette[2], state->m_dma.palette[3] );
-	switch( state->m_dma.transfer_mode )
+	m_dma.width_x = RAM[SM8521_DMDX];
+	m_dma.width_x_count = 0;
+	m_dma.width_y = RAM[SM8521_DMDY];
+	m_dma.width_y_count = 0;
+	m_dma.source_x = RAM[SM8521_DMX1];
+	m_dma.source_x_current = m_dma.source_x;
+	m_dma.source_y = RAM[SM8521_DMY1];
+	m_dma.source_width = ( RAM[SM8521_LCH] & 0x20 ) ? 50 : 40;
+	m_dma.dest_x = RAM[SM8521_DMX2];
+	m_dma.dest_x_current = m_dma.dest_x;
+	m_dma.dest_y = RAM[SM8521_DMY2];
+	m_dma.dest_width = ( RAM[SM8521_LCH] & 0x20 ) ? 50 : 40;
+	m_dma.palette[0] = RAM[SM8521_DMPL] & 0x03;
+	m_dma.palette[1] = ( RAM[SM8521_DMPL] >> 2 ) & 3;
+	m_dma.palette[2] = ( RAM[SM8521_DMPL] >> 4 ) & 3;
+	m_dma.palette[3] = RAM[SM8521_DMPL] >> 6;
+	m_dma.source_mask = 0x1FFF;
+	m_dma.dest_mask = 0x1FFF;
+//  logerror("DMA: width %Xx%X, source (%X,%X), dest (%X,%X), transfer_mode %X, banks %X \n", m_dma.width_x, m_dma.width_y, m_dma.source_x, m_dma.source_y, m_dma.dest_x, m_dma.dest_y, m_dma.transfer_mode, RAM[SM8521_DMVP] );
+//  logerror( "   Palette: %d, %d, %d, %d\n", m_dma.palette[0], m_dma.palette[1], m_dma.palette[2], m_dma.palette[3] );
+	switch( m_dma.transfer_mode )
 	{
 	case 0x00:
 		/* VRAM->VRAM */
-		state->m_dma.source_bank = &state->m_p_videoram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
-		state->m_dma.dest_bank = &state->m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
+		m_dma.source_bank = &m_p_videoram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
+		m_dma.dest_bank = &m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x02:
 		/* ROM->VRAM */
 //      logerror( "DMA DMBR = %X\n", RAM[SM8521_DMBR] );
-		state->m_dma.source_width = 64;
-		state->m_dma.source_mask = 0x3FFF;
+		m_dma.source_width = 64;
+		m_dma.source_mask = 0x3FFF;
 		if ( RAM[SM8521_DMBR] < 16 )
-			state->m_dma.source_bank = state->memregion("kernel")->base() + (RAM[SM8521_DMBR] << 14);
+		{
+			m_dma.source_bank = m_region_kernel->base() + (RAM[SM8521_DMBR] << 14);
+		}
 		else
-		if (state->m_cartridge)
-			state->m_dma.source_bank = state->m_cartridge + (RAM[SM8521_DMBR] << 14);
+		{
+			if (m_cartridge)
+			{
+				m_dma.source_bank = m_cartridge + (RAM[SM8521_DMBR] << 14);
+			}
+		}
 
-		state->m_dma.dest_bank = &state->m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
+		m_dma.dest_bank = &m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x04:
 		/* Extend RAM->VRAM */
-		state->m_dma.source_width = 64;
-		state->m_dma.source_bank = &state->m_p_nvram[0x0000];
-		state->m_dma.dest_bank = &state->m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
+		m_dma.source_width = 64;
+		m_dma.source_bank = &m_p_nvram[0x0000];
+		m_dma.dest_bank = &m_p_videoram[(RAM[SM8521_DMVP] & 0x02) ? 0x2000 : 0x0000];
 		break;
 	case 0x06:
 		/* VRAM->Extend RAM */
-		state->m_dma.source_bank = &state->m_p_videoram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
-		state->m_dma.dest_width = 64;
-		state->m_dma.dest_bank = &state->m_p_nvram[0x0000];
+		m_dma.source_bank = &m_p_videoram[(RAM[SM8521_DMVP] & 0x01) ? 0x2000 : 0x0000];
+		m_dma.dest_width = 64;
+		m_dma.dest_bank = &m_p_nvram[0x0000];
 		break;
 	}
-	state->m_dma.source_current = state->m_dma.source_width * state->m_dma.source_y;
-	state->m_dma.source_current += state->m_dma.source_x >> 2;
-	state->m_dma.dest_current = state->m_dma.dest_width * state->m_dma.dest_y;
-	state->m_dma.dest_current += state->m_dma.dest_x >> 2;
-	state->m_dma.source_line = state->m_dma.source_current;
-	state->m_dma.dest_line = state->m_dma.dest_current;
-	state->m_dma.state_count = 0;
+	m_dma.source_current = m_dma.source_width * m_dma.source_y;
+	m_dma.source_current += m_dma.source_x >> 2;
+	m_dma.dest_current = m_dma.dest_width * m_dma.dest_y;
+	m_dma.dest_current += m_dma.dest_x >> 2;
+	m_dma.source_line = m_dma.source_current;
+	m_dma.dest_line = m_dma.dest_current;
+	m_dma.state_count = 0;
 
 	unsigned y_count, x_count;
 
-	for( y_count = 0; y_count <= state->m_dma.width_y; y_count++ )
+	for( y_count = 0; y_count <= m_dma.width_y; y_count++ )
 	{
-		for( x_count = 0; x_count <= state->m_dma.width_x; x_count++ )
+		for( x_count = 0; x_count <= m_dma.width_x; x_count++ )
 		{
 			int source_pixel = 0;
 			int dest_pixel = 0;
-			int src_addr = state->m_dma.source_current & state->m_dma.source_mask;
-			int dest_addr = state->m_dma.dest_current & state->m_dma.dest_mask;
+			int src_addr = m_dma.source_current & m_dma.source_mask;
+			int dest_addr = m_dma.dest_current & m_dma.dest_mask;
 			/* handle DMA for 1 pixel */
 			/* Read pixel data */
-			switch ( state->m_dma.source_x_current & 0x03 )
+			switch ( m_dma.source_x_current & 0x03 )
 			{
-			case 0x00: source_pixel = state->m_dma.source_bank[src_addr] >> 6; break;
-			case 0x01: source_pixel = ( state->m_dma.source_bank[src_addr] >> 4 ) & 3; break;
-			case 0x02: source_pixel = ( state->m_dma.source_bank[src_addr] >> 2 ) & 3; break;
-			case 0x03: source_pixel = state->m_dma.source_bank[src_addr] & 3;      break;
+			case 0x00: source_pixel = m_dma.source_bank[src_addr] >> 6; break;
+			case 0x01: source_pixel = ( m_dma.source_bank[src_addr] >> 4 ) & 3; break;
+			case 0x02: source_pixel = ( m_dma.source_bank[src_addr] >> 2 ) & 3; break;
+			case 0x03: source_pixel = m_dma.source_bank[src_addr] & 3;      break;
 			}
 
-			if ( !state->m_dma.overwrite_mode && source_pixel == 0 )
+			if ( !m_dma.overwrite_mode && source_pixel == 0 )
 			{
-				switch ( state->m_dma.dest_x_current & 0x03 )
+				switch ( m_dma.dest_x_current & 0x03 )
 				{
-				case 0x00: dest_pixel = state->m_dma.dest_bank[dest_addr] >> 6; break;
-				case 0x01: dest_pixel = ( state->m_dma.dest_bank[dest_addr] >> 4 ) & 3; break;
-				case 0x02: dest_pixel = ( state->m_dma.dest_bank[dest_addr] >> 2 ) & 3; break;
-				case 0x03: dest_pixel = state->m_dma.dest_bank[dest_addr] & 3;      break;
+				case 0x00: dest_pixel = m_dma.dest_bank[dest_addr] >> 6; break;
+				case 0x01: dest_pixel = ( m_dma.dest_bank[dest_addr] >> 4 ) & 3; break;
+				case 0x02: dest_pixel = ( m_dma.dest_bank[dest_addr] >> 2 ) & 3; break;
+				case 0x03: dest_pixel = m_dma.dest_bank[dest_addr] & 3;      break;
 				}
 				source_pixel = dest_pixel;
 			}
 
 			/* Translate pixel data using DMA palette. */
 			/* Not sure if this should be done before the compound stuff - WP */
-			source_pixel = state->m_dma.palette[ source_pixel ];
+			source_pixel = m_dma.palette[ source_pixel ];
 			/* Write pixel data */
-			switch( state->m_dma.dest_x_current & 0x03 )
+			switch( m_dma.dest_x_current & 0x03 )
 			{
 			case 0x00:
-				state->m_dma.dest_bank[dest_addr] = ( state->m_dma.dest_bank[dest_addr] & 0x3F ) | ( source_pixel << 6 );
+				m_dma.dest_bank[dest_addr] = ( m_dma.dest_bank[dest_addr] & 0x3F ) | ( source_pixel << 6 );
 				break;
 			case 0x01:
-				state->m_dma.dest_bank[dest_addr] = ( state->m_dma.dest_bank[dest_addr] & 0xCF ) | ( source_pixel << 4 );
+				m_dma.dest_bank[dest_addr] = ( m_dma.dest_bank[dest_addr] & 0xCF ) | ( source_pixel << 4 );
 				break;
 			case 0x02:
-				state->m_dma.dest_bank[dest_addr] = ( state->m_dma.dest_bank[dest_addr] & 0xF3 ) | ( source_pixel << 2 );
+				m_dma.dest_bank[dest_addr] = ( m_dma.dest_bank[dest_addr] & 0xF3 ) | ( source_pixel << 2 );
 				break;
 			case 0x03:
-				state->m_dma.dest_bank[dest_addr] = ( state->m_dma.dest_bank[dest_addr] & 0xFC ) | source_pixel;
+				m_dma.dest_bank[dest_addr] = ( m_dma.dest_bank[dest_addr] & 0xFC ) | source_pixel;
 				break;
 			}
 
 			/* Advance a pixel */
-			if ( state->m_dma.decrement_x )
+			if ( m_dma.decrement_x )
 			{
-				state->m_dma.source_x_current--;
-				if ( ( state->m_dma.source_x_current & 0x03 ) == 0x03 )
-					state->m_dma.source_current--;
+				m_dma.source_x_current--;
+				if ( ( m_dma.source_x_current & 0x03 ) == 0x03 )
+					m_dma.source_current--;
 			}
 			else
 			{
-				state->m_dma.source_x_current++;
-				if ( ( state->m_dma.source_x_current & 0x03 ) == 0x00 )
-					state->m_dma.source_current++;
+				m_dma.source_x_current++;
+				if ( ( m_dma.source_x_current & 0x03 ) == 0x00 )
+					m_dma.source_current++;
 			}
-			state->m_dma.dest_x_current++;
-			if ( ( state->m_dma.dest_x_current & 0x03 ) == 0x00 )
-				state->m_dma.dest_current++;
+			m_dma.dest_x_current++;
+			if ( ( m_dma.dest_x_current & 0x03 ) == 0x00 )
+				m_dma.dest_current++;
 		}
 
 		/* Advance a line */
-		state->m_dma.source_x_current = state->m_dma.source_x;
-		state->m_dma.dest_x_current = state->m_dma.dest_x;
-		state->m_dma.source_line += state->m_dma.source_width;
-		state->m_dma.source_current = state->m_dma.source_line;
-		state->m_dma.dest_line += state->m_dma.dest_width;
-		state->m_dma.dest_current = state->m_dma.dest_line;
+		m_dma.source_x_current = m_dma.source_x;
+		m_dma.dest_x_current = m_dma.dest_x;
+		m_dma.source_line += m_dma.source_width;
+		m_dma.source_current = m_dma.source_line;
+		m_dma.dest_line += m_dma.dest_width;
+		m_dma.dest_current = m_dma.dest_line;
 	}
-	state->m_dma.enabled = 0;
-	device->machine().device("maincpu")->execute().set_input_line(DMA_INT, ASSERT_LINE );
+	m_dma.enabled = 0;
+	m_maincpu->set_input_line(sm8500_cpu_device::DMA_INT, ASSERT_LINE );
 }
 
-void gamecom_update_timers( device_t *device, int cycles )
+WRITE8_MEMBER( gamecom_state::gamecom_update_timers )
 {
-	gamecom_state *state = device->machine().driver_data<gamecom_state>();
-	UINT8 * RAM = state->memregion("maincpu")->base();
-	if ( state->m_timer[0].enabled )
+	UINT8 * RAM = m_region_maincpu->base();
+	if ( m_timer[0].enabled )
 	{
-		state->m_timer[0].state_count += cycles;
-		while ( state->m_timer[0].state_count >= state->m_timer[0].state_limit )
+		m_timer[0].state_count += data;
+		while ( m_timer[0].state_count >= m_timer[0].state_limit )
 		{
-			state->m_timer[0].state_count -= state->m_timer[0].state_limit;
+			m_timer[0].state_count -= m_timer[0].state_limit;
 			RAM[SM8521_TM0D]++;
-			if ( RAM[SM8521_TM0D] >= state->m_timer[0].check_value )
+			if ( RAM[SM8521_TM0D] >= m_timer[0].check_value )
 			{
 				RAM[SM8521_TM0D] = 0;
-				device->machine().device("maincpu")->execute().set_input_line(TIM0_INT, ASSERT_LINE );
+				m_maincpu->set_input_line(sm8500_cpu_device::TIM0_INT, ASSERT_LINE );
 			}
 		}
 	}
-	if ( state->m_timer[1].enabled )
+	if ( m_timer[1].enabled )
 	{
-		state->m_timer[1].state_count += cycles;
-		while ( state->m_timer[1].state_count >= state->m_timer[1].state_limit )
+		m_timer[1].state_count += data;
+		while ( m_timer[1].state_count >= m_timer[1].state_limit )
 		{
-			state->m_timer[1].state_count -= state->m_timer[1].state_limit;
+			m_timer[1].state_count -= m_timer[1].state_limit;
 			RAM[SM8521_TM1D]++;
-			if ( RAM[SM8521_TM1D] >= state->m_timer[1].check_value )
+			if ( RAM[SM8521_TM1D] >= m_timer[1].check_value )
 			{
 				RAM[SM8521_TM1D] = 0;
-				device->machine().device("maincpu")->execute().set_input_line(TIM1_INT, ASSERT_LINE );
+				m_maincpu->set_input_line(sm8500_cpu_device::TIM1_INT, ASSERT_LINE );
 			}
 		}
 	}
