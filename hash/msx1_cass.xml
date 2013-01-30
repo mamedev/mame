@@ -29,4 +29,16 @@
 		</part>
 	</software>
 
+	<software name="hx10smpl">
+		<description>Toshiba Home Computer HX-10 Sample Program (Jpn)</description>
+		<year>19??</year>
+		<publisher>Toshiba</publisher>
+
+		<part name="cass1" interface="msx_cass">
+			<dataarea name="cass" size="24370">
+				<rom name="toshiba home computer hx-10 sample program (19xx)(toshiba)(jp)(en)[!].cas" size="24370" crc="686a6db6" sha1="1d90e7cfa05db433203f181d0fb3b6ab1a04889f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
