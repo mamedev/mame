@@ -40,6 +40,8 @@ public:
 	UINT16 m_lordgun_protection_data;
 	DECLARE_WRITE16_MEMBER(lordgun_protection_w);
 	DECLARE_READ16_MEMBER(lordgun_protection_r);
+	DECLARE_WRITE16_MEMBER(aliencha_protection_w);
+	DECLARE_READ16_MEMBER(aliencha_protection_r);
 
 	DECLARE_WRITE16_MEMBER(lordgun_priority_w);
 	DECLARE_READ16_MEMBER(lordgun_gun_0_x_r);
@@ -60,8 +62,6 @@ public:
 	DECLARE_WRITE8_MEMBER(aliencha_dip_w);
 	DECLARE_WRITE8_MEMBER(lordgun_okibank_w);
 	DECLARE_DRIVER_INIT(lordgun);
-	DECLARE_DRIVER_INIT(aliencha);
-	DECLARE_DRIVER_INIT(alienchac);
 	TILE_GET_INFO_MEMBER(get_tile_info_0);
 	TILE_GET_INFO_MEMBER(get_tile_info_1);
 	TILE_GET_INFO_MEMBER(get_tile_info_2);
