@@ -5133,10 +5133,12 @@
 		</part>
 	</software>
 
-	<software name="exodus" supported="no">
-		<description>Exodus - Journey to the Promised Land (USA)</description>
+	<software name="exodus">
+		<description>Exodus (USA)</description>
 		<year>1992</year>
 		<publisher>Wisdom Tree</publisher>
+		<info name="alt_title" value="Exodus: Journey to the Promised Land (Box)"/>
+		<info name="serial" value="EGB-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="WISDOM" />
 			<dataarea name="rom" size="131072">
@@ -8691,9 +8693,11 @@
 	</software>
 
 	<software name="joshua">
-		<description>Joshua &amp; the Battle of Jericho (USA)</description>
+		<description>Joshua (USA)</description>
 		<year>1992</year>
 		<publisher>Wisdom Tree</publisher>
+		<info name="alt_title" value="Joshua &amp; the Battle of Jericho (Box)"/>
+		<info name="serial" value="JGB-1"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="WISDOM" />
 			<dataarea name="rom" size="131072">
@@ -9194,9 +9198,11 @@
 	</software>
 
 	<software name="kjbible">
-		<description>King James Bible (USA)</description>
+		<description>The Holy Bible - King James Version (USA)</description>
 		<year>1994</year>
 		<publisher>Wisdom Tree</publisher>
+		<info name="alt_title" value="King James Bible (Box)"/>
+		<info name="serial" value="EBGB"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="WISDOM" />
 			<dataarea name="rom" size="1048576">
@@ -10721,7 +10727,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="MMM01" />
 			<dataarea name="rom" size="524288">
-				<rom name="4 in 1 (dmg-603 chn) [raw dump].bin" size="524288" crc="a997c237" sha1="0c8fb3700512fd6b98cda2df1cb2e650bacfc217" offset="000000" />
+				<rom name="4 in 1 (dmg-603 chn) [menu first].bin" size="524288" crc="a997c237" sha1="0c8fb3700512fd6b98cda2df1cb2e650bacfc217" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -13472,9 +13478,11 @@
 	</software>
 
 	<software name="nivbible">
-		<description>NIV Bible &amp; the 20 Lost Levels of Joshua (USA)</description>
+		<description>The NIV Holy Bible (USA)</description>
 		<year>1996</year>
 		<publisher>Wisdom Tree</publisher>
+		<info name="alt_title" value="NIV Bible &amp; the 20 Lost Levels of Joshua (Box)"/>
+		<info name="serial" value="NVGB"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="WISDOM" />
 			<dataarea name="rom" size="2097152">
@@ -18516,6 +18524,7 @@
 		<description>Spiritual Warfare (USA)</description>
 		<year>1992</year>
 		<publisher>Wisdom Tree</publisher>
+		<info name="serial" value="SGB"/>
 		<part name="cart" interface="gameboy_cart">
 			<feature name="mapper" value="WISDOM" />
 			<dataarea name="rom" size="262144">
