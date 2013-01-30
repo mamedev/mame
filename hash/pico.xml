@@ -280,16 +280,16 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
-	<software name="poohcorng" cloneof="poohcorn" supported="no">
-		<description>Ein Jahr in Winnie Puuhs Leben (Ger)</description>
+	<software name="poohcornb" cloneof="poohcorn">
+		<description>Puff e as Quatro Estações (Bra)</description>
 		<year>199?</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="49021-18"/>
+		<publisher>Tec Toy</publisher>
+		<info name="serial" value="MPR-18334?"/>
 		<part name="cart" interface="pico_cart">
-			<feature name="pcb" value="171-6434C" />
-			<feature name="ic1" value="MPR-17790-H" />
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18334-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-17790-h.ic1" size="524288" crc="b4120752" sha1="3c3af9d643060e5a5477210c67528923ff107751" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18334-t.ic1" size="524288" crc="88d92655" sha1="02b84b7bf5fad09ea83ee63bfd4c4296050ad8a0" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -304,6 +304,20 @@ Games for the MIXT BOOK PLAYER COPERA
 			<feature name="ic1" value="MPR-17789-H" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-17789-h.ic1" size="524288" crc="4e4c17bc" sha1="e07a568f90a5db13bae314bfd310488320122439" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcorng" cloneof="poohcorn" supported="no">
+		<description>Ein Jahr in Winnie Puuhs Leben (Ger)</description>
+		<year>199?</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="49021-18"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17790-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17790-h.ic1" size="524288" crc="b4120752" sha1="3c3af9d643060e5a5477210c67528923ff107751" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1267,6 +1281,20 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="lionkingb" cloneof="lionking" supported="no">
+		<description>O Rei Leão - As Aventuras de Simba (Bra)</description>
+		<year>19??</year>
+		<publisher>Tec Toy</publisher>
+		<info name="serial" value="MPR-18809?"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18809 J47" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18809 j47.ic1" size="1048576" crc="e0e0fef1" sha1="32c18f081935a2752c942a1570aedb9b9b4ade18"  offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lionkingu" cloneof="lionking" supported="no">
 		<description>The Lion King - Adventure at Pride Rock (USA)</description>
 		<year>19??</year>
@@ -1775,7 +1803,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	<software name="pocahont">
 		<description>Pocahontas (Euro)</description>
 		<year>199?</year>
-		<publisher>Sega?</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="49030-05"/>
 		<part name="cart" interface="pico_cart">
 			<feature name="pcb" value="171-6883A" />
@@ -1786,10 +1814,24 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="pocahontb" cloneof="pocahont">
+		<description>Pocahontas (Bra)</description>
+		<year>199?</year>
+		<publisher>Tec Toy</publisher>
+		<info name="serial" value="MPR-18808?"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18808 J46" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18808 j46.ic1" size="1048576" crc="752114c8" sha1="f1ca449a2aab70f1f4aeb4430e9ee0f7384d6364" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pocahontu" cloneof="pocahont">
 		<description>Pocahontas - Riverbend Adventures (USA)</description>
 		<year>199?</year>
-		<publisher>Sega?</publisher>
+		<publisher>Sega</publisher>
 		<info name="serial" value="49030-00"/>
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="1048576">
