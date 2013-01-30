@@ -70,6 +70,55 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_d008_w)
 		m_mcu->execute().set_input_line(INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
+
+WRITE8_MEMBER(arkanoid_state::brixian_d008_w)
+{
+	int bank;
+
+	/* bits 0 and 1 flip X and Y, I don't know which is which */
+	if (flip_screen_x() != (data & 0x01))
+	{
+		flip_screen_x_set(data & 0x01);
+		m_bg_tilemap->mark_all_dirty();
+	}
+
+	if (flip_screen_y() != (data & 0x02))
+	{
+		flip_screen_y_set(data & 0x02);
+		m_bg_tilemap->mark_all_dirty();
+	}
+
+	/* bit 2 selects the input paddle */
+	/*  - not relevant to brixian */
+
+	/* bit 3 is coin lockout (but not the service coin) */
+	/*  - not here, means you can only play 1 game */
+
+	/* bit 4 is unknown */
+
+	/* bits 5 and 6 control gfx bank and palette bank. They are used together */
+	/* so I don't know which is which. */
+	bank = (data & 0x20) >> 5;
+
+	if (m_gfxbank != bank)
+	{
+		m_gfxbank = bank;
+		m_bg_tilemap->mark_all_dirty();
+	}
+
+	bank = (data & 0x40) >> 6;
+
+	if (m_palettebank != bank)
+	{
+		m_palettebank = bank;
+		m_bg_tilemap->mark_all_dirty();
+	}
+
+	/* bit 7 is MCU reset on Arkanoid */
+	/*  - does it reset the Brixian MCU too? */
+}
+
+
 /* different hook-up, everything except for bits 0-1 and 7 aren't tested afaik. */
 WRITE8_MEMBER(arkanoid_state::tetrsark_d008_w)
 {

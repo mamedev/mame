@@ -597,20 +597,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( brixian_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("protram")
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0xd001, 0xd001) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xd008, 0xd008) AM_WRITE(arkanoid_d008_w)  /* gfx bank, flip screen etc. */
-	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("MUX") AM_WRITENOP
+	AM_RANGE(0xd008, 0xd008) AM_WRITE(brixian_d008_w)  /* gfx bank, flip screen etc. */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(arkanoid_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe840, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_READNOP /* fixes instant death in final level */
-// Interesting locations:
-// c105=0a @ title displays each piece
-// c110=01 - Title, 02 - Start Game, 04 - Select Stage
 ADDRESS_MAP_END
 
 
@@ -869,53 +862,34 @@ static INPUT_PORTS_START( hexa )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( brixian )
-		PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
-
-	PORT_START("MUX")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_START("INPUTS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0f, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPSETTING(    0x03, "4" )
-	PORT_DIPSETTING(    0x07, "5" )
-	PORT_DIPSETTING(    0x0f, "6" )
-	PORT_DIPNAME( 0x30, 0x00, "Speed of Elevator" ) PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x00, "Slow" )
-	PORT_DIPSETTING(    0x30, "Fast" )
-	PORT_DIPNAME( 0xc0, 0x40, "Time Left" ) PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(    0x00, "Half" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0xc0, "Double" )
-
-	PORT_START("UNUSED")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x03, 0x02, "Time Left" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "More" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x02, "Normal (dupe)" )
+	PORT_DIPSETTING(    0x03, "Less" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown )  ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Speed of Elevator" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x00, "Fast" )
+	PORT_DIPSETTING(    0x08, "Slow" )
+	PORT_DIPNAME( 0xf0, 0x10, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0xf0, "2" )
+	PORT_DIPSETTING(    0x70, "3" )
+	PORT_DIPSETTING(    0x30, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
 INPUT_PORTS_END
 
 /***************************************************************************/
@@ -1092,16 +1066,42 @@ static MACHINE_CONFIG_DERIVED( bootleg, arkanoid )
 	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
-// todo
-static MACHINE_CONFIG_DERIVED( brixian, arkanoid )
+
+static MACHINE_CONFIG_START( brixian, arkanoid_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
 	MCFG_CPU_PROGRAM_MAP(brixian_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", arkanoid_state,  irq0_line_hold)
 
-	MCFG_DEVICE_REMOVE("mcu")
+	/* there is a 68705 but it's only role appears to be to copy data to RAM at startup */
+	/* the RAM is also battery backed, making the 68705 almost reundant as long as the battery doesn't die(!) */
+
+	MCFG_MACHINE_START_OVERRIDE(arkanoid_state,arkanoid)
+	MCFG_MACHINE_RESET_OVERRIDE(arkanoid_state,arkanoid)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_UPDATE_DRIVER(arkanoid_state, screen_update_hexa)
+
+	MCFG_GFXDECODE(arkanoid)
+	MCFG_PALETTE_LENGTH(512)
+
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_VIDEO_START_OVERRIDE(arkanoid_state,arkanoid)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/4/2) /* Imported from arkanoid - correct? */
+	MCFG_SOUND_CONFIG(hexa_ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
+
+
 
 /***************************************************************************/
 
@@ -1547,7 +1547,14 @@ ROM_END
 ROM_START( brixian )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "b1.bin",      0x00000, 0x8000, CRC(3d167d09) SHA1(1d5bd098b655b8d2f956cfcb718213915bee3e41) )
-	ROM_LOAD( "e7.bin",      0x08000, 0x2000, CRC(9e3707ab) SHA1(a04fb4824239f8ed1ef1de2f3c0f9d749320b2ba) ) // this is near a 6116 RAM bank, unknown purpose
+	ROM_LOAD( "e7.bin",      0x08000, 0x2000, CRC(9e3707ab) SHA1(a04fb4824239f8ed1ef1de2f3c0f9d749320b2ba) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "68705p5", 0x0000, 0x0800, NO_DUMP ) // this just provides the 0x200 bytes of code we load in the protdata region by coping it to 0xc600 on startup
+
+	ROM_REGION( 0x200, "protdata", 0 )
+	ROM_LOAD( "protdata.bin",  0x00000, 0x200, CRC(60c04cae) SHA1(bb20ce34898e47ff072abce5d7b9994b48f4087e) ) /* z80 code changes the last couple of bytes while this is running, todo: get a 'clean' dump */
+
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "b4.bin",      0x00000, 0x8000, CRC(34a7a693) SHA1(793fa6dd065a158bedcd0fdc494cc8fc793ae8be) )
@@ -1559,8 +1566,6 @@ ROM_START( brixian )
 	ROM_LOAD( "n82s131n.6p", 0x0200, 0x0200, CRC(d833ad33) SHA1(a7c17c96a670916e7102afc94dc2f0cb0455f0ce) )
 	ROM_LOAD( "n82s131n.6m", 0x0400, 0x0200, CRC(05297649) SHA1(35f99cf8dddd66e26e2110619eb46bd6ccff41df) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )
-	ROM_LOAD( "68705p5", 0x0000, 0x0800, NO_DUMP ) // this appears to be providing ~0x200 bytes of code at c600, like most semicom games.
 ROM_END
 
 
@@ -1681,6 +1686,14 @@ DRIVER_INIT_MEMBER(arkanoid_state,hexa)
 	machine().root_device().membank("bank1")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
 }
 
+DRIVER_INIT_MEMBER(arkanoid_state,brixian)
+{
+	UINT8 *RAM = machine().root_device().memregion("protdata")->base();
+
+	for (int i=0x000;i<0x200;i++)
+		m_protram[i+0x600] = RAM[i];
+
+}
 
 /* Game Drivers */
 
@@ -1706,4 +1719,4 @@ GAME( 1986, arktayt2,   arkanoid, bootleg,  arktayt2, driver_device, 0,        R
 GAME( 1987, arkatour,   0,        arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Tournament Arkanoid (US)", GAME_SUPPORTS_SAVE )
 GAME( 19??, tetrsark,   0,        bootleg,  tetrsark, arkanoid_state, tetrsark, ROT0,  "D.R. Korea", "Tetris (D.R. Korea)", GAME_SUPPORTS_SAVE )
 GAME( 199?, hexa,       0,        hexa,     hexa, arkanoid_state,     hexa,     ROT0,  "D.R. Korea", "Hexa", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1993, brixian,    0,        brixian,  brixian, driver_device,  0,        ROT0,  "Cheil Computer System", "Brixian", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
+GAME( 1993, brixian,    0,        brixian,  brixian, arkanoid_state,  brixian,        ROT0,  "Cheil Computer System", "Brixian", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )

@@ -16,11 +16,14 @@ public:
 	arkanoid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this,"videoram"),
-		m_spriteram(*this,"spriteram") { }
+		m_spriteram(*this,"spriteram"),
+		m_protram(*this,"protram")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<UINT8> m_videoram;
 	optional_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_protram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -61,6 +64,7 @@ public:
 	DECLARE_WRITE8_MEMBER(arkanoid_videoram_w);
 	DECLARE_WRITE8_MEMBER(arkanoid_d008_w);
 	DECLARE_WRITE8_MEMBER(tetrsark_d008_w);
+	DECLARE_WRITE8_MEMBER(brixian_d008_w);
 	DECLARE_WRITE8_MEMBER(hexa_d008_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_68705_input_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_input_mux);
@@ -73,6 +77,7 @@ public:
 	DECLARE_DRIVER_INIT(arkangc2);
 	DECLARE_DRIVER_INIT(arkbloc2);
 	DECLARE_DRIVER_INIT(arkangc);
+	DECLARE_DRIVER_INIT(brixian);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	DECLARE_MACHINE_START(arkanoid);
 	DECLARE_MACHINE_RESET(arkanoid);
