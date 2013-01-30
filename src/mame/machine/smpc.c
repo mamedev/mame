@@ -856,7 +856,7 @@ UINT8 saturn_state::smpc_th_control_mode(UINT8 pad_n)
 {
 	int th;
 	const char *const padnames[] = { "JOY1", "JOY2" };
-	UINT8 res;
+	UINT8 res = 0;
 
 	th = (pad_n == 0) ? ((m_smpc.PDR1>>6) & 1) : ((m_smpc.PDR2>>6) & 1);
 
