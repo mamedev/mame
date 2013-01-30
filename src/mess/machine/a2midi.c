@@ -156,6 +156,13 @@ void a2bus_midi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 dat
 	}
 	else if (offset == 8)
 	{
+		// HACK: GS/OS's CARD6850.MIDI driver sets 8-N-2, which is not valid MIDI.
+		// This works on h/w pretty much by accident; we'll make it right here.
+		if ((data & 0x1c) == 0x10)
+		{
+			data |= 0x04;	// change wordbits from 0x10 to 0x14
+		}
+
 		m_acia->control_write(space, 0, data);
 	}
 	else if (offset == 9)
