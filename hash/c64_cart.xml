@@ -6574,4 +6574,26 @@
 		</part>
 	</software>
 
+	<!-- Dummy cartridge entries to allow requirement mappings from c64_flop -->
+	
+	<software name="cpm">
+		<description>CP/M</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="cpm" />
+		</part>
+	</software>
+
+	<software name="sfxse">
+		<description>SFX Sound Expander</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="sfxse" />
+		</part>
+	</software>
+
 </softwarelist>

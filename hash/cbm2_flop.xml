@@ -2,6 +2,18 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="cbm2_flop" description="Commodore CBM-II diskettes">
 
+	<software name="2031demo">
+		<description>Commodore 2031 LP Floppy Diskette Drive Test/Demo Diskette</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="2031lp-demo.d64" size="174848" crc="9c697562" sha1="940da4a6638058d6899fb629738d7ad8605b3976" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="8250test">
 		<description>Commodore 8250LP Floppy Disk Drive Test/Demo Diskette</description>
 		<year>198?</year>

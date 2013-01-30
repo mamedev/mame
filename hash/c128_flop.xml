@@ -398,4 +398,201 @@
 		</part>
 	</software>
 
+	<software name="1581demo">
+		<description>Commodore 1581 3.5" Disk Drive Demo/Utilities</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="354011-07" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="1581demo.d81" size="819200" crc="1c3d6a09" sha1="680ef0511586976bcd90367a41320d35728193fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c128diag">
+		<description>Commodore 128 Diagnostic Menu</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="diagnostics128.d64" size="174848" crc="8e914518" sha1="f99177d7606ead1b686b7489b02dc46c68fcf050" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1700demo">
+		<description>Commodore 1700/1750 RAM Expansion Test/Demo Disk (v1.0)</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1700-demo.d64" size="174848" crc="673085b6" sha1="ea883cede5677027ef70afc6f164f927cb3be5e3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm">
+		<description>CP/M Version 3.0</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="622-580745" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.system.622-580745.d64" size="174848" crc="44a50dca" sha1="663427e565adb31c2e47d18010e6210b7a771375" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System User Utilities Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.utilities.d64" size="174848" crc="660eaa64" sha1="a33775575d50d55bbb0b3d33fa8b294540b6e671" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpma" cloneof="cpm">
+		<description>CP/M Version 3.0 (Alt)</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="622-598666" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.system.622-598666.d64" size="174848" crc="2c910544" sha1="ebf461bd5c72be96e40eaf4869ee9acdb3049c67" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System User Utilities Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.utilities.d64" size="174848" crc="660eaa64" sha1="a33775575d50d55bbb0b3d33fa8b294540b6e671" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmb" cloneof="cpm">
+		<description>CP/M Version 3.0 (Alt 2)</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="6228129311" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.system.6228129311.d64" size="174848" crc="fe64b343" sha1="7641a16a0cbef4f716934b9d87a3dd06eba24f60" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System User Utilities Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.utilities.d64" size="174848" crc="660eaa64" sha1="a33775575d50d55bbb0b3d33fa8b294540b6e671" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmc" cloneof="cpm">
+		<description>CP/M Version 3.0 (Alt 3)</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="6228151676" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.system.6228151676.d64" size="174848" crc="fa079670" sha1="458792e5a19c79b212b072d2a5a6e682c80dbce8" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System User Utilities Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.utilities2.d64" size="174848" crc="d13ce550" sha1="012a6d4456f2ea5e045dc0fa9be01227af499fe5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm86de" cloneof="cpm">
+		<description>CP/M Version 3.0 (1 May 1986, Ger)</description>
+		<year>1986</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="622-85" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.system.german-1986.d64" size="174848" crc="8629dc87" sha1="5871a0360cf40e5320f3fce559db5c4df2e5a50e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System User Utilities Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.utilities.german-1986.d64" size="174848" crc="76760e69" sha1="fa7aff4e16297cf7442f729bbfbc514385ce2aae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm87" cloneof="cpm">
+		<description>CP/M Version 3.0 (28 May 1987)</description>
+		<year>1987</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="622-3282252" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.system.622-3282252.d64" size="174848" crc="ebfdf2e6" sha1="8953f4062f5af46abe01670a479c7574b3e8a63c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System User Utilities Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.utilities3.d64" size="174848" crc="8df68a10" sha1="3158cb60111e9a4f77e96cfd02d20cbb5e7ec243" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm87a" cloneof="cpm">
+		<description>CP/M Version 3.0 (28 May 1987, Alt)</description>
+		<year>1987</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="622-3297432" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.system.622-3297432.d64" size="174848" crc="7b668049" sha1="750c2b3a2662f5a3b779dab93ce6273f9b3b1fe8" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="CP/M System User Utilities Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.utilities3.d64" size="174848" crc="8df68a10" sha1="3158cb60111e9a4f77e96cfd02d20cbb5e7ec243" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm1581">
+		<description>CP/M Version 3.0 (1581)</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="622-5002336" />
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="cpm.622-5002336.d81" size="819200" crc="091e4f48" sha1="603600b5669d8ddd8aaef8f03e84535e261eef20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pet_flop" description="Commodore PET diskettes">
+
+	<software name="2040demo">
+		<description>Commodore 2040 Floppy Disk Drive Test/Demo Disk</description>
+		<year>197?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="2040-demo.d64" size="174848" crc="7bf8ded0" sha1="3adf60392cbafa4717213a9314293882c435693a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="visicalc">
+		<description>VisiCalc</description>
+		<year>1981</year>
+		<publisher>Software Arts</publisher>
+		<info name="serial" value="20910-5511" />
+
+		<!--
+		VisiCalc(R)                                                 PET 2001, CBM 2001
+		Program Diskette                                              and CBM 8032 32K
+		                              [VisiCorp logo]                for 2040 and 4040
+		One of the VisiTM programs                                     Diskette Drives
+		from VisiCorp                                           by Software Arts, Inc.
+
+		                                VisiCorpTM
+		                            PERSONAL SOFTWARETM
+
+		Program Copyright (C) 1979, 1981
+		Software Arts, Inc. All Rights Reserved
+		                                                                    20910-5511
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="visicalc.d64" size="174848" crc="b41f3121" sha1="aad1254ca95f03430edd63997d995c3671bc6c55" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petass">
+		<description>PET Assembler</description>
+		<year>197?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="pass1.d64" size="174848" crc="0cd57135" sha1="434d2c8a3725c0e57df87db8664058f3947729c0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petspeed">
+		<description>Petspeed</description>
+		<year>1982</year>
+		<publisher>Small Systems Engineering</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="petspe80.d64" size="174848" crc="35d8155d" sha1="b6a134eedbbedf494dd1151153aef45314d2f79f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petbok">
+		<description>PET-BOOK 8000</description>
+		<year>1982</year>
+		<publisher>Datatronic</publisher>
+		<info name="serial" value="2078-V4.2" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="pet-bok.d80" size="533248" crc="0a89998f" sha1="8fcb4f7b05f8dcfd9119318435bcdeba171a27f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petent">
+		<description>PET-ENT 8000</description>
+		<year>1982</year>
+		<publisher>Datatronic</publisher>
+		<info name="serial" value="270-V6.0" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="pet-ent.d80" size="533248" crc="5acfa9dd" sha1="a077adf00e3481a223d52acd9afdb9b1e14d194f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petgen">
+		<description>PET-GEN 8000</description>
+		<year>1982</year>
+		<publisher>Datatronic</publisher>
+		<info name="serial" value="131-V2.1" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="pet-gen.d80" size="533248" crc="3b4d619c" sha1="70a87335dbd32406c83a80dedc7d604cc458aa4d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="petlev">
+		<description>PET-LEV 8000</description>
+		<year>1983</year>
+		<publisher>Datatronic</publisher>
+		<info name="serial" value="600-V6.2" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="pet-lev.d80" size="533248" crc="524d010c" sha1="814601705a5ab7cc61fc625e2a357166875e3b72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -313,8 +313,8 @@ bool c64_expansion_slot_device::call_load()
 				size = get_software_region_length("nvram");
 				if (size) memset(m_cart->c64_nvram_pointer(machine(), size), 0, size);
 
-				m_cart->m_exrom = atol(get_feature("exrom"));
-				m_cart->m_game = atol(get_feature("game"));
+				if (get_feature("exrom") != NULL) m_cart->m_exrom = atol(get_feature("exrom"));
+				if (get_feature("game") != NULL) m_cart->m_game = atol(get_feature("game"));
 			}
 		}
 	}

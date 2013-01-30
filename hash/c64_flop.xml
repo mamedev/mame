@@ -404,19 +404,6 @@
 		</part>
 	</software>
 
-	<software name="sfxse">
-		<description>SFX Sound Expander Test/Demo Disk</description>
-		<year>1985</year>
-		<publisher>Commodore</publisher>
-		<sharedfeat name="requirement" value="c64_cart:sfxse"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="sfx.d64" size="174848" crc="23238762" sha1="a7c6c027af8d9d18a0a4e9d751ffec28cc863bf6" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sprbas64">
 		<description>SuperBase 64 (Fin)</description>
 		<year>1983</year>
@@ -602,15 +589,238 @@
 
 	<!-- Test/Demo disks -->
 
-	<software name="1581demo">
-		<description>Commodore 1581 3.5" Disk Drive Demo/Utilities</description>
+	<software name="1541demo">
+		<description>Commodore 1541 Floppy Disk Drive Test/Demo Disk</description>
 		<year>198?</year>
 		<publisher>Commodore</publisher>
-		<info name="serial" value="354011-07" />
+		<info name="serial" value="1540024-02" />
 
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="1581demo.d81" size="819200" crc="1c3d6a09" sha1="680ef0511586976bcd90367a41320d35728193fe" offset="0" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1541-demo.1540024-02.d64" size="174848" crc="d97dcfc9" sha1="19412d8be0847b9204054fe8b6f052e1c1a45b81" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1541demoa" cloneof="1541demo">
+		<description>Commodore VIC-1541 Test/Demo</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1541-demo.d64" size="174848" crc="a706af44" sha1="7c88ba7858ea51e71414fd4c33c105b08790476a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1541demob" cloneof="1541demo">
+		<description>Commodore 1541 Floppy Disk Drive Test/Demo Disk (Alt)</description>
+		<year>1984</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1541-demo1.d64" size="174848" crc="75423f8c" sha1="e000908e81e2ead34ced9d863ef6758d70802a1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1541democ" cloneof="1541demo">
+		<description>Commodore 1541 Floppy Disk Drive Test/Demo Disk (Alt 2)</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1541-demo2.d64" size="174848" crc="fc981799" sha1="4443771ae67f892bb8c9cc9b59a240074c0bd9ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1541demod" cloneof="1541demo">
+		<description>Commodore Model 1541 Test/Demo-Diskette</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1541-demo3.d64" size="174848" crc="f2e1f736" sha1="2a19d35b332428696b18032511d8a272fceab400" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1764demo">
+		<description>Commodore 1764 RAM Expansion Utility Disk</description>
+		<year>1987</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="1764 RAM Expansion Utility Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="1764-utility.d64" size="174848" crc="41ab5c19" sha1="553f76035311d31b9959abebc9d5dec26fd30a56" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="1764 RAM Expansion GEOS Upgrade"/>
+			<dataarea name="flop" size="174848">
+				<rom name="1764-utility-geos.d64" size="174848" crc="e16571ec" sha1="36aaa8e59786171b8d20aaa608ca3e4feeee058f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1351demo">
+		<description>Commodore 1351 Mouse Utility Disk</description>
+		<year>1986</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Commodore 1351 Mouse Utility Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="1351-demo.d64" size="174848" crc="46e145cc" sha1="7eac697ab76d269b97734ef77a971d833fe6ffca" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="GEOS Upgrade v1.2 to v1.3"/>
+			<dataarea name="flop" size="174848">
+				<rom name="1351-geos.d64" size="174848" crc="e16571ec" sha1="36aaa8e59786171b8d20aaa608ca3e4feeee058f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfxse">
+		<description>SFX Sound Expander Test/Demo Disk</description>
+		<year>1985</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:sfxse"/>
+
+		<!--
+		There's a message in track 18 sector 1 (the start of the BAM) telling you
+		to look at track 26 sector 2. There you find the beginning of a hidden
+		file. If you load this file into the correct start address ($C000) and
+		execute it from BASIC (SYS 49152) you get a rather cool surprise ;)
+		
+		The copy protection (looking for 22,READ ERROR,18,18) has been removed by 
+		changing the two bytes in block 26,1 at offsets $23 and $2A from $AC to $AE
+		-->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="sfx.d64" size="174848" crc="23238762" sha1="a7c6c027af8d9d18a0a4e9d751ffec28cc863bf6" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1660demo">
+		<description>Commodore Modem 300 Test/Demo Diskette</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1660-a.d64" size="174848" crc="4cd535b3" sha1="d9d1d6459db5efb9b6aa8fec2aed99e57c7f2761" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1660-b.d64" size="174848" crc="994d6efa" sha1="7d9ee76f5cc9ced1b486ed69d20f753a664b74db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1670demo">
+		<description>Commodore Modem 1200 Test/Demo Diskette</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1670-a.d64" size="174848" crc="4cd535b3" sha1="d9d1d6459db5efb9b6aa8fec2aed99e57c7f2761" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="1670-b.d64" size="174848" crc="39693e8c" sha1="f89baac56a1ef72b85c9b84a0fd2c8120b4db4a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c64demo">
+		<description>C-64 Demodiskette</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="354011-08" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="c64-demodiskette.d64" size="174848" crc="4aeb0038" sha1="780bf7be5e66d2b930ebf55b7cd6c3c3b5941736" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c64bonus">
+		<description>Commodore C-64 Disk Bonus Pack</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="starter-kit.d64" size="174848" crc="616f4bfa" sha1="cbe9bb7ddda8b280672034cfbeb272e019d3a17e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sx64demo">
+		<description>Commodore SX-64 Test/Demo Disk</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="sx64-demo.d64" size="174848" crc="99b689fd" sha1="bb270585973317389c2a486f57e5e9646904acbc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpm">
+		<description>Commodore 64 CP/M Cartridge Boot Disk</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:cpm"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cpm.d64" size="174848" crc="cc7473e0" sha1="82d8fd45bd4b6e93df7090b325ac6c9b6597fe36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpma" cloneof="cpm">
+		<description>Commodore 64 CP/M Cartridge Boot Disk (Alt)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<sharedfeat name="requirement" value="c64_cart:cpm"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cpm2.d64" size="174848" crc="b78211f0" sha1="37d65e4e7d04994c4e69918530aca444bda11f6e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmb" cloneof="cpm">
+		<description>Commodore 64 CP/M Cartridge Boot Disk (Alt 2)</description>
+		<year>1982</year>
+		<publisher>Commodore</publisher>
+		<info name="serial" value="D CP2 622-04414" />
+		<sharedfeat name="requirement" value="c64_cart:cpm"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="cpm3.d64" size="174848" crc="926d326d" sha1="8d5e6fac79c9f5e463a3514d8b37175e6879cc36" offset="0" />
 			</dataarea>
 		</part>
 	</software>
