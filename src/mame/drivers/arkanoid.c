@@ -1553,7 +1553,7 @@ ROM_START( brixian )
 	ROM_LOAD( "68705p5", 0x0000, 0x0800, NO_DUMP ) // this just provides the 0x200 bytes of code we load in the protdata region by coping it to 0xc600 on startup
 
 	ROM_REGION( 0x200, "protdata", 0 )
-	ROM_LOAD( "protdata.bin",  0x00000, 0x200, CRC(60c04cae) SHA1(bb20ce34898e47ff072abce5d7b9994b48f4087e) ) /* z80 code changes the last couple of bytes while this is running, todo: get a 'clean' dump */
+	ROM_LOAD( "protdata.bin",  0x00000, 0x200, CRC(a4131c0b) SHA1(5ddbd39c26e1bc9ec5f216e399c09994a23d09a7) )
 
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
