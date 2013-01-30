@@ -562,7 +562,10 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_wisdom)
 	m_ROMBank = ( offset << 1 ) & 0x1FF;
 	membank( "bank5" )->set_base( m_ROMMap[ m_ROMBank ] );
 	membank( "bank10" )->set_base( m_ROMMap[ m_ROMBank ] + 0x0100 );
-	gb_rom16_4000( machine(), m_ROMMap[ m_ROMBank + 1 ] );
+	membank( "bank6" )->set_base( m_ROMMap[ m_ROMBank ] + 0x0200 );
+	membank( "bank11" )->set_base( m_ROMMap[ m_ROMBank ] + 0x0900 );
+	membank( "bank1" )->set_base( m_ROMMap[ m_ROMBank + 1 ] );
+	membank( "bank4" )->set_base( m_ROMMap[ m_ROMBank + 1 ] + 0x2000 );
 }
 
 WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc1)
@@ -1729,6 +1732,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 				{ "YONGYONG", MBC_YONGYONG },
 				{ "LASAMA",   MBC_LASAMA },
 				{ "ATVRACIN", MBC_ATVRACIN },
+				{ "unknown",  MBC_UNKNOWN },
 			};
 
 			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && state->m_MBCType == MBC_UNKNOWN; i++)
