@@ -637,7 +637,7 @@ READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
 	UINT8 code;
 	char kbdcol[8];
 	sprintf(kbdcol,"COL%X", (offset&0xF));
-	ioport_port* col_array[16] = { m_col0, m_col1, m_col2, m_col3, m_col4, m_col5, m_col6, m_col7,
+	static ioport_port* col_array[16] = { m_col0, m_col1, m_col2, m_col3, m_col4, m_col5, m_col6, m_col7,
 						m_col8, m_col9, m_cola, m_colb, m_colc, m_cold, m_cole, m_colf };
 	code = col_array[offset&0xF]->read() | m_capsshift->read();
 #ifdef KBD_VERBOSE
