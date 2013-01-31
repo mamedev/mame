@@ -211,6 +211,7 @@ public:
 	UINT8 m_ACTS;
 	UINT16 m_RXDivisor;
 	UINT16 m_TXDivisor;
+	ioport_port* m_col_array[16];
 
 	DECLARE_WRITE8_MEMBER(vgLD_X);
 	DECLARE_WRITE8_MEMBER(vgLD_Y);
@@ -634,12 +635,7 @@ READ8_MEMBER(vk100_state::SYSTAT_B)
 
 READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
 {
-	UINT8 code;
-	char kbdcol[8];
-	sprintf(kbdcol,"COL%X", (offset&0xF));
-	static ioport_port* col_array[16] = { m_col0, m_col1, m_col2, m_col3, m_col4, m_col5, m_col6, m_col7,
-						m_col8, m_col9, m_cola, m_colb, m_colc, m_cold, m_cole, m_colf };
-	code = col_array[offset&0xF]->read() | m_capsshift->read();
+	UINT8 code = m_col_array[offset&0xF]->read() | m_capsshift->read();
 #ifdef KBD_VERBOSE
 	logerror("Keyboard column %X read, returning %02X\n", offset&0xF, code);
 #endif
@@ -913,6 +909,24 @@ void vk100_state::machine_reset()
 	m_ACTS = 1;
 	m_RXDivisor = 6336;
 	m_TXDivisor = 6336;
+	//m_col_array[0] = { m_col0, m_col1, m_col2, m_col3, m_col4, m_col5, m_col6, m_col7,
+	//				m_col8, m_col9, m_cola, m_colb, m_colc, m_cold, m_cole, m_colf };
+	m_col_array[0] = m_col0;
+	m_col_array[1] = m_col1;
+	m_col_array[2] = m_col2;
+	m_col_array[3] = m_col3;
+	m_col_array[4] = m_col4;
+	m_col_array[5] = m_col5;
+	m_col_array[6] = m_col6;
+	m_col_array[7] = m_col7;
+	m_col_array[8] = m_col8;
+	m_col_array[9] = m_col9;
+	m_col_array[10] = m_cola;
+	m_col_array[11] = m_colb;
+	m_col_array[12] = m_colc;
+	m_col_array[13] = m_cold;
+	m_col_array[14] = m_cole;
+	m_col_array[15] = m_colf;
 }
 
 WRITE_LINE_MEMBER(vk100_state::crtc_vsync)
