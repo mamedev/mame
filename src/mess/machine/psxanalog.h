@@ -3,20 +3,24 @@
 
 #include "machine/psxcport.h"
 
-extern const device_type PSX_ANALOG_CONTROLLER;
+extern const device_type PSX_DUALSHOCK;
+extern const device_type PSX_ANALOG_JOYSTICK;
 
 class psx_analog_controller_device :	public device_t,
 										public device_psx_controller_interface
 {
 public:
-	psx_analog_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psx_analog_controller_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock);
 
 	virtual ioport_constructor device_input_ports() const;
 	DECLARE_INPUT_CHANGED_MEMBER(change_mode);
 protected:
 	virtual void device_reset();
 	virtual void device_start() {}
-	virtual void device_config_complete() { m_shortname = "psx_analog_controller"; }
+	enum {
+		JOYSTICK,
+		DUALSHOCK
+	} m_type;
 private:
 	virtual bool get_pad(int count, UINT8 *odata, UINT8 idata);
 	UINT8 pad_data(int count, bool analog);
@@ -34,6 +38,22 @@ private:
 	required_ioport m_rsticky;
 	required_ioport m_lstickx;
 	required_ioport m_lsticky;
+};
+
+class psx_dualshock_device : public psx_analog_controller_device
+{
+public:
+	psx_dualshock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	virtual void device_config_complete() { m_shortname = "psx_dualshock_pad"; }
+};
+
+class psx_analog_joystick_device : public psx_analog_controller_device
+{
+public:
+	psx_analog_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+protected:
+	virtual void device_config_complete() { m_shortname = "psx_analog_joystick"; }
 };
 
 #endif /* PSXANALOG_H_ */

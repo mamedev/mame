@@ -44,7 +44,8 @@ void psxcontrollerports_device::device_start()
 
 SLOT_INTERFACE_START(psx_controllers)
 	SLOT_INTERFACE("digital_pad", PSX_STANDARD_CONTROLLER)
-	SLOT_INTERFACE("analog_pad", PSX_ANALOG_CONTROLLER)
+	SLOT_INTERFACE("dualshock_pad", PSX_DUALSHOCK)
+	SLOT_INTERFACE("analog_joystick", PSX_ANALOG_JOYSTICK)
 SLOT_INTERFACE_END
 
 void psxcontrollerports_device::data_in( int data, int mask )

@@ -1,9 +1,10 @@
 #include "machine/psxanalog.h"
 
-const device_type PSX_ANALOG_CONTROLLER = &device_creator<psx_analog_controller_device>;
+const device_type PSX_ANALOG_JOYSTICK = &device_creator<psx_analog_joystick_device>;
+const device_type PSX_DUALSHOCK = &device_creator<psx_dualshock_device>;
 
-psx_analog_controller_device::psx_analog_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-		device_t(mconfig, PSX_ANALOG_CONTROLLER, "Playstation Analog Controller", tag, owner, clock),
+psx_analog_controller_device::psx_analog_controller_device(const machine_config &mconfig, device_type type, const char* name, const char *tag, device_t *owner, UINT32 clock) :
+		device_t(mconfig, type, name, tag, owner, clock),
 		device_psx_controller_interface(mconfig, *this),
 		m_pad0(*this, "PSXPAD0"),
 		m_pad1(*this, "PSXPAD1"),
@@ -12,6 +13,18 @@ psx_analog_controller_device::psx_analog_controller_device(const machine_config 
 		m_lstickx(*this, "PSXLSTICKX"),
 		m_lsticky(*this, "PSXLSTICKY")
 {
+}
+
+psx_dualshock_device::psx_dualshock_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+		psx_analog_controller_device(mconfig, PSX_DUALSHOCK, "Playstation Dualshock Pad", tag, owner, clock)
+{
+	m_type = DUALSHOCK;
+}
+
+psx_analog_joystick_device::psx_analog_joystick_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock) :
+		psx_analog_controller_device(mconfig, PSX_ANALOG_JOYSTICK, "Playstation Analog Joystick", tag, owner, clock)
+{
+	m_type = JOYSTICK;
 }
 
 void psx_analog_controller_device::device_reset()
@@ -30,7 +43,7 @@ UINT8 psx_analog_controller_device::pad_data(int count, bool analog)
 	{
 		case 2:
 			data = m_pad0->read();
-			if(!analog)
+			if(!analog || (m_type == JOYSTICK))
 				data |= 6; // l3/r3
 			break;
 		case 3:
@@ -147,7 +160,10 @@ bool psx_analog_controller_device::get_pad(int count, UINT8 *odata, UINT8 idata)
 		switch(count)
 		{
 			case 0:
-				*odata = 0x73;
+				if(m_type == JOYSTICK)
+					*odata = 0x53;
+				else
+					*odata = 0x73;
 				break;
 			case 1:
 				m_cmd = idata;
@@ -244,3 +260,4 @@ INPUT_CHANGED_MEMBER(psx_analog_controller_device::change_mode)
 	if(!m_analoglock)
 		m_analogmode = newval;
 }
+
