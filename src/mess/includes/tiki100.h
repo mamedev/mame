@@ -105,6 +105,7 @@ public:
 	UINT8 m_palette;
 
 	/* keyboard state */
+	ioport_port* m_key_row[12];
 	int m_keylatch;
 	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
 };

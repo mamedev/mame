@@ -86,7 +86,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 
 	/* keyboard state */
-	int m_keylatch;         /* key latch */
+	int m_keylatch;
 };
 
 class tmc2000_state : public driver_device
@@ -100,14 +100,14 @@ public:
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, CDP1802_TAG),
 			m_colorram(*this, "color_ram"),
-			m_in0(*this, "IN0"),
-			m_in1(*this, "IN1"),
-			m_in2(*this, "IN2"),
-			m_in3(*this, "IN3"),
-			m_in4(*this, "IN4"),
-			m_in5(*this, "IN5"),
-			m_in6(*this, "IN6"),
-			m_in7(*this, "IN7"),
+			m_y0(*this, "Y0"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2"),
+			m_y3(*this, "Y3"),
+			m_y4(*this, "Y4"),
+			m_y5(*this, "Y5"),
+			m_y6(*this, "Y6"),
+			m_y7(*this, "Y7"),
 			m_run(*this, "RUN")
 	{ }
 
@@ -117,14 +117,14 @@ public:
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	optional_shared_ptr<UINT8> m_colorram;
-	required_ioport m_in0;
-	required_ioport m_in1;
-	required_ioport m_in2;
-	required_ioport m_in3;
-	required_ioport m_in4;
-	required_ioport m_in5;
-	required_ioport m_in6;
-	required_ioport m_in7;
+	required_ioport m_y0;
+	required_ioport m_y1;
+	required_ioport m_y2;
+	required_ioport m_y3;
+	required_ioport m_y4;
+	required_ioport m_y5;
+	required_ioport m_y6;
+	required_ioport m_y7;
 	required_ioport m_run;
 
 	virtual void machine_start();
@@ -152,7 +152,8 @@ public:
 	UINT8 m_color;
 
 	/* keyboard state */
-	int m_keylatch;         /* key latch */
+	ioport_port* m_key_row[8];
+	int m_keylatch;
 };
 
 class nano_state : public driver_device

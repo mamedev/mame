@@ -79,7 +79,6 @@ WRITE8_MEMBER( cosmicos_state::audio_latch_w )
 
 READ8_MEMBER( cosmicos_state::hex_keyboard_r )
 {
-	ioport_port *ports[4] = { m_y1, m_y2, m_y3, m_y4 };
 	UINT8 data = 0;
 	int i;
 
@@ -87,7 +86,7 @@ READ8_MEMBER( cosmicos_state::hex_keyboard_r )
 	{
 		if (BIT(m_keylatch, i))
 		{
-			UINT8 keydata = ports[i]->read();
+			UINT8 keydata = m_key_row[i]->read();
 
 			if (BIT(keydata, 0)) data |= 0x01;
 			if (BIT(keydata, 1)) data |= 0x02;
@@ -500,6 +499,12 @@ void cosmicos_state::machine_start()
 	}
 
 	set_ram_mode();
+
+	// find keyboard rows
+	m_key_row[0] = m_y1;
+	m_key_row[1] = m_y2;
+	m_key_row[2] = m_y3;
+	m_key_row[3] = m_y4;
 
 	/* register for state saving */
 	save_item(NAME(m_wait));

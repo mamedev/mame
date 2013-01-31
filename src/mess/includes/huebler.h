@@ -72,13 +72,14 @@ public:
 
 	virtual void machine_start();
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( keyboard_r );
 
 	void scan_keyboard();
 
 	// keyboard state
+	ioport_port* m_key_row[16];
 	int m_key_d6;
 	int m_key_d7;
 	int m_key_a4;

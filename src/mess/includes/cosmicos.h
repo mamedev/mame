@@ -125,6 +125,7 @@ public:
 	int m_ram_disable;
 
 	/* keyboard state */
+	ioport_port* m_key_row[4];
 	UINT8 m_keylatch;
 
 	/* display state */

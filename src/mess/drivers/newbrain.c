@@ -443,9 +443,6 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 
 	*/
 
-	ioport_port* ports[16] = { m_y0, m_y1, m_y2, m_y3, m_y4, m_y5, m_y6, m_y7,
-						 m_y8, m_y9, m_y10, m_y11, m_y12, m_y13, m_y14, m_y15 };
-
 	/* keyboard row reset */
 
 	if (!BIT(data, 0))
@@ -471,7 +468,7 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 			m_keylatch = 0;
 		}
 
-		m_keydata = ports[m_keylatch]->read();
+		m_keydata = m_key_row[m_keylatch]->read();
 
 		output_set_digit_value(m_keylatch, m_segment_data[m_keylatch]);
 	}
@@ -1269,6 +1266,24 @@ void newbrain_state::machine_start()
 	/* set up memory banking */
 	bankswitch();
 
+	// find keyboard rows
+	m_key_row[0] = m_y0;
+	m_key_row[1] = m_y1;
+	m_key_row[2] = m_y2;
+	m_key_row[3] = m_y3;
+	m_key_row[4] = m_y4;
+	m_key_row[5] = m_y5;
+	m_key_row[6] = m_y6;
+	m_key_row[7] = m_y7;
+	m_key_row[8] = m_y8;
+	m_key_row[9] = m_y9;
+	m_key_row[10] = m_y10;
+	m_key_row[11] = m_y11;
+	m_key_row[12] = m_y12;
+	m_key_row[13] = m_y13;
+	m_key_row[14] = m_y14;
+	m_key_row[15] = m_y15;
+
 	/* register for state saving */
 	save_item(NAME(m_pwrup));
 	save_item(NAME(m_userint));
@@ -1297,10 +1312,9 @@ void newbrain_eim_state::machine_start()
 	newbrain_state::machine_start();
 
 	/* allocate expansion RAM */
-	m_eim_ram = auto_alloc_array(machine(), UINT8, NEWBRAIN_EIM_RAM_SIZE);
+	m_eim_ram.allocate(NEWBRAIN_EIM_RAM_SIZE);
 
 	/* register for state saving */
-	save_pointer(NAME(m_eim_ram), NEWBRAIN_EIM_RAM_SIZE);
 	save_item(NAME(m_mpm));
 	save_item(NAME(m_a16));
 	save_item(NAME(m_pr));

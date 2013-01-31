@@ -84,7 +84,9 @@ public:
 	int m_blink;                // cursor blink
 
 	// keyboard state
+	ioport_port* m_key_row[8];
 	int m_keylatch;             // key latch
+
 	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
 };
 

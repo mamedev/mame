@@ -126,6 +126,8 @@ public:
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+
+	ioport_port* m_key_row[16];
 };
 
 class sf7000_state : public sc3000_state

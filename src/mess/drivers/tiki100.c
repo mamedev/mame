@@ -94,8 +94,7 @@ void tiki100_state::bankswitch()
 
 READ8_MEMBER( tiki100_state::keyboard_r )
 {
-	ioport_port *ports[12] = { m_y1, m_y2, m_y3, m_y4, m_y5, m_y6, m_y7, m_y8, m_y9, m_y10, m_y11, m_y12 };
-	UINT8 data = ports[m_keylatch]->read();
+	UINT8 data = m_key_row[m_keylatch]->read();
 
 	m_keylatch++;
 
@@ -562,6 +561,20 @@ void tiki100_state::machine_start()
 	membank("bank3")->configure_entry(BANK_RAM, ram + 0x8000);
 
 	bankswitch();
+
+	// find keyboard rows
+	m_key_row[0] = m_y1;
+	m_key_row[1] = m_y2;
+	m_key_row[2] = m_y3;
+	m_key_row[3] = m_y4;
+	m_key_row[4] = m_y5;
+	m_key_row[5] = m_y6;
+	m_key_row[6] = m_y7;
+	m_key_row[7] = m_y8;
+	m_key_row[8] = m_y9;
+	m_key_row[9] = m_y10;
+	m_key_row[10] = m_y11;
+	m_key_row[11] = m_y12;
 
 	/* register for state saving */
 	save_item(NAME(m_rome));

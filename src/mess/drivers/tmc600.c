@@ -206,9 +206,7 @@ READ_LINE_MEMBER( tmc600_state::ef2_r )
 
 READ_LINE_MEMBER( tmc600_state::ef3_r )
 {
-	ioport_port* portnames[8] = { m_y0, m_y1, m_y2, m_y3, m_y4, m_y5, m_y6, m_y7 };
-
-	UINT8 data = ~portnames[m_keylatch / 8]->read();
+	UINT8 data = ~m_key_row[m_keylatch / 8]->read();
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -251,6 +249,16 @@ void tmc600_state::machine_start()
 		program.unmap_readwrite(0xa000, 0xbfff);
 		break;
 	}
+	
+	// find keyboard rows
+	m_key_row[0] = m_y0;
+	m_key_row[1] = m_y1;
+	m_key_row[2] = m_y2;
+	m_key_row[3] = m_y3;
+	m_key_row[4] = m_y4;
+	m_key_row[5] = m_y5;
+	m_key_row[6] = m_y6;
+	m_key_row[7] = m_y7;
 
 	/* register for state saving */
 	save_item(NAME(m_keylatch));

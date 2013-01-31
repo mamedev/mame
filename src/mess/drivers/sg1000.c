@@ -522,7 +522,7 @@ WRITE_LINE_MEMBER(sg1000_state::sg1000_vdp_interrupt)
 
 static TMS9928A_INTERFACE(sg1000_tms9918a_interface)
 {
-	"screen",
+	SCREEN_TAG,
 	0x4000,
 	DEVCB_DRIVER_LINE_MEMBER(sg1000_state,sg1000_vdp_interrupt)
 };
@@ -546,9 +546,7 @@ READ8_MEMBER( sc3000_state::ppi_pa_r )
 	    PA7     Keyboard input
 	*/
 
-	ioport_port *ports[8] = { m_pa0, m_pa1, m_pa2, m_pa3, m_pa4, m_pa5, m_pa6, m_pa7 };
-
-	return ports[m_keylatch]->read();
+	return m_key_row[m_keylatch]->read();
 }
 
 READ8_MEMBER( sc3000_state::ppi_pb_r )
@@ -566,10 +564,8 @@ READ8_MEMBER( sc3000_state::ppi_pb_r )
 	    PB7     Cassette tape input
 	*/
 
-	ioport_port *ports[8] = { m_pb0, m_pb1, m_pb2, m_pb3, m_pb4, m_pb5, m_pb6, m_pb7 };
-
 	/* keyboard */
-	UINT8 data = ports[m_keylatch]->read();
+	UINT8 data = m_key_row[m_keylatch + 8]->read();
 
 	/* cartridge contact */
 	data |= 0x10;
@@ -1022,6 +1018,24 @@ void sc3000_state::machine_start()
 	/* toggle light gun crosshair */
 	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(sg1000_state::lightgun_tick),this));
 
+	// find keyboard rows
+	m_key_row[0] = m_pa0;
+	m_key_row[1] = m_pa1;
+	m_key_row[2] = m_pa2;
+	m_key_row[3] = m_pa3;
+	m_key_row[4] = m_pa4;
+	m_key_row[5] = m_pa5;
+	m_key_row[6] = m_pa6;
+	m_key_row[7] = m_pa7;
+	m_key_row[8] = m_pb0;
+	m_key_row[9] = m_pb1;
+	m_key_row[10] = m_pb2;
+	m_key_row[11] = m_pb3;
+	m_key_row[12] = m_pb4;
+	m_key_row[13] = m_pb5;
+	m_key_row[14] = m_pb6;
+	m_key_row[15] = m_pb7;
+
 	/* register for state saving */
 	save_item(NAME(m_tvdraw_data));
 	save_item(NAME(m_keylatch));
@@ -1069,7 +1083,7 @@ static MACHINE_CONFIG_START( sg1000, sg1000_state )
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
 
 	/* sound hardware */
@@ -1123,7 +1137,7 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
 
 	/* sound hardware */
@@ -1164,7 +1178,7 @@ static MACHINE_CONFIG_START( sf7000, sf7000_state )
 
 	/* video hardware */
 	MCFG_TMS9928A_ADD( TMS9918A_TAG, TMS9918A, sg1000_tms9918a_interface )
-	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( SCREEN_TAG )
 	MCFG_SCREEN_UPDATE_DEVICE( TMS9918A_TAG, tms9918a_device, screen_update )
 
 	/* sound hardware */

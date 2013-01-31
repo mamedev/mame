@@ -175,6 +175,7 @@ public:
 	int m_cop_access;       // COP access
 
 	// keyboard state
+	ioport_port* m_key_row[16];
 	int m_keylatch;         // keyboard row
 	int m_keydata;          // keyboard column
 
@@ -206,7 +207,8 @@ public:
 			m_ctc(*this, Z80CTC_TAG),
 			m_acia(*this, MC6850_TAG),
 			m_fdc(*this, UPD765_TAG),
-			m_floppy(*this, UPD765_TAG ":0:525dd")
+			m_floppy(*this, UPD765_TAG ":0:525dd"),
+			m_eim_ram(*this, "eim_ram")
 	{ }
 
 	required_device<cpu_device> m_fdccpu;
@@ -214,6 +216,7 @@ public:
 	required_device<acia6850_device> m_acia;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_image_device> m_floppy;
+	optional_shared_ptr<UINT8> m_eim_ram;
 
 	virtual void machine_start();
 
@@ -252,7 +255,6 @@ public:
 	int m_mpm;              // multi paging mode ?
 	int m_a16;              // address line 16
 	UINT8 m_pr[16];         // expansion interface paging register
-	UINT8 *m_eim_ram;       // expansion interface RAM
 
 	// floppy state
 	int m_fdc_int;          // interrupt
