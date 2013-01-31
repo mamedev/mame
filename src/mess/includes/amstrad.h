@@ -189,6 +189,8 @@ public:
 	void aleste_interrupt(bool state);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	
+	IRQ_CALLBACK_MEMBER(amstrad_cpu_acknowledge_int);
 };
 
 

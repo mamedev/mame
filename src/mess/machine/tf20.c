@@ -182,7 +182,7 @@ void epson_tf20_device::device_start()
 	m_timer_serial = timer_alloc(0, NULL);
 	m_timer_tc = timer_alloc(1, NULL);
 
-	m_cpu->set_irq_acknowledge_callback(irq_callback);
+	m_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(epson_tf20_device::irq_callback),this));
 
 	m_fd0 = subdevice<floppy_connector>("5a:0")->get_device();
 	m_fd1 = subdevice<floppy_connector>("5a:1")->get_device();
@@ -237,7 +237,7 @@ void epson_tf20_device::device_timer(emu_timer &timer, device_timer_id id, int p
 //  irq vector callback
 //-------------------------------------------------
 
-IRQ_CALLBACK( epson_tf20_device::irq_callback )
+IRQ_CALLBACK_MEMBER( epson_tf20_device::irq_callback )
 {
 	return 0x00;
 }

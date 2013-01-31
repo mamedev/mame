@@ -69,6 +69,7 @@ public:
 	DECLARE_DRIVER_INIT(voyager);
 	virtual void machine_start();
 	virtual void machine_reset();
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 
@@ -644,15 +645,14 @@ static INPUT_PORTS_START( voyager )
 INPUT_PORTS_END
 #endif
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(voyager_state::irq_callback)
 {
-	voyager_state *state = device->machine().driver_data<voyager_state>();
-	return pic8259_acknowledge( state->m_pic8259_1);
+	return pic8259_acknowledge(m_pic8259_1);
 }
 
 void voyager_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(voyager_state::irq_callback),this));
 
 	m_pit8254 = machine().device( "pit8254" );
 	m_pic8259_1 = machine().device( "pic8259_1" );

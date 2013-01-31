@@ -90,6 +90,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(queen_pic8259_1_set_int_line);
 	virtual void machine_start();
 	virtual void machine_reset();
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 
@@ -507,10 +508,9 @@ static void queen_set_keyb_int(running_machine &machine, int state)
 	pic8259_ir1_w(drvstate->m_pic8259_1, state);
 }
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(queen_state::irq_callback)
 {
-	queen_state *state = device->machine().driver_data<queen_state>();
-	return pic8259_acknowledge( state->m_pic8259_1);
+	return pic8259_acknowledge(m_pic8259_1);
 }
 
 void queen_state::machine_start()
@@ -520,7 +520,7 @@ void queen_state::machine_start()
 
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, queen_set_keyb_int);
 
-	m_maincpu->set_irq_acknowledge_callback(irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(queen_state::irq_callback),this));
 	intel82439tx_init(machine());
 
 	kbdc8042_init(machine(), &at8042);

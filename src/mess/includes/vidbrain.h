@@ -97,6 +97,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ext_int_w );
 	DECLARE_WRITE_LINE_MEMBER( hblank_w );
 
+	IRQ_CALLBACK_MEMBER(vidbrain_int_ack);
+
 	void interrupt_check();
 
 	// F3853 SMI state

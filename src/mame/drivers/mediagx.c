@@ -199,6 +199,7 @@ public:
 	DECLARE_READ32_MEMBER(speedup10_r);
 	DECLARE_READ32_MEMBER(speedup11_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 // Display controller registers
@@ -1047,10 +1048,9 @@ static INPUT_PORTS_START(mediagx)
 	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
 INPUT_PORTS_END
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(mediagx_state::irq_callback)
 {
-	mediagx_state *state = device->machine().driver_data<mediagx_state>();
-	return pic8259_acknowledge( state->m_pic8259_1);
+	return pic8259_acknowledge(m_pic8259_1);
 }
 
 void mediagx_state::machine_start()
@@ -1069,7 +1069,7 @@ void mediagx_state::machine_reset()
 {
 	UINT8 *rom = memregion("bios")->base();
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mediagx_state::irq_callback),this));
 
 	memcpy(m_bios_ram, rom, 0x40000);
 	machine().device("maincpu")->reset();

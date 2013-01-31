@@ -194,67 +194,66 @@ static void mouse_js_reset(running_machine &machine);
  *  80186 interrupt controller
  *
  *************************************/
-static IRQ_CALLBACK(int_callback)
+IRQ_CALLBACK_MEMBER(rmnimbus_state::int_callback)
 {
-	rmnimbus_state *state = device->machine().driver_data<rmnimbus_state>();
 	UINT8   vector;
 	UINT16  old;
 	UINT16  oldreq;
 
 	if (LOG_INTERRUPTS)
-		logerror("(%f) **** Acknowledged interrupt vector %02X\n", device->machine().time().as_double(), state->m_i186.intr.poll_status & 0x1f);
+		logerror("(%f) **** Acknowledged interrupt vector %02X\n", machine().time().as_double(), m_i186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
-	device->execute().set_input_line(0, CLEAR_LINE);
-	state->m_i186.intr.pending = 0;
+	device.execute().set_input_line(0, CLEAR_LINE);
+	m_i186.intr.pending = 0;
 
-	oldreq=state->m_i186.intr.request;
+	oldreq=m_i186.intr.request;
 
 	/* clear the request and set the in-service bit */
 #if LATCH_INTS
-	state->m_i186.intr.request &= ~state->m_i186.intr.ack_mask;
+	m_i186.intr.request &= ~m_i186.intr.ack_mask;
 #else
-	state->m_i186.intr.request &= ~(state->m_i186.intr.ack_mask & 0x0f);
+	m_i186.intr.request &= ~(m_i186.intr.ack_mask & 0x0f);
 #endif
 
-	if((LOG_INTERRUPTS) && (state->m_i186.intr.request!=oldreq))
-		logerror("i186.intr.request changed from %02X to %02X\n",oldreq,state->m_i186.intr.request);
+	if((LOG_INTERRUPTS) && (m_i186.intr.request!=oldreq))
+		logerror("i186.intr.request changed from %02X to %02X\n",oldreq,m_i186.intr.request);
 
-	old=state->m_i186.intr.in_service;
+	old=m_i186.intr.in_service;
 
-	state->m_i186.intr.in_service |= state->m_i186.intr.ack_mask;
+	m_i186.intr.in_service |= m_i186.intr.ack_mask;
 
-	if((LOG_INTERRUPTS) && (state->m_i186.intr.in_service!=old))
-		logerror("i186.intr.in_service changed from %02X to %02X\n",old,state->m_i186.intr.in_service);
+	if((LOG_INTERRUPTS) && (m_i186.intr.in_service!=old))
+		logerror("i186.intr.in_service changed from %02X to %02X\n",old,m_i186.intr.in_service);
 
-	if (state->m_i186.intr.ack_mask == 0x0001)
+	if (m_i186.intr.ack_mask == 0x0001)
 	{
-		switch (state->m_i186.intr.poll_status & 0x1f)
+		switch (m_i186.intr.poll_status & 0x1f)
 		{
-			case 0x08:  state->m_i186.intr.status &= ~0x01; break;
-			case 0x12:  state->m_i186.intr.status &= ~0x02; break;
-			case 0x13:  state->m_i186.intr.status &= ~0x04; break;
+			case 0x08:  m_i186.intr.status &= ~0x01; break;
+			case 0x12:  m_i186.intr.status &= ~0x02; break;
+			case 0x13:  m_i186.intr.status &= ~0x04; break;
 		}
 	}
-	state->m_i186.intr.ack_mask = 0;
+	m_i186.intr.ack_mask = 0;
 
 	/* a request no longer pending */
-	state->m_i186.intr.poll_status &= ~0x8000;
+	m_i186.intr.poll_status &= ~0x8000;
 
 	/* return the vector */
-	switch(state->m_i186.intr.poll_status & 0x1F)
+	switch(m_i186.intr.poll_status & 0x1F)
 	{
-		case 0x0C   : vector=(state->m_i186.intr.ext[0] & EXTINT_CTRL_CASCADE) ? state->m_i186.intr.ext_vector[0] : (state->m_i186.intr.poll_status & 0x1f); break;
-		case 0x0D   : vector=(state->m_i186.intr.ext[1] & EXTINT_CTRL_CASCADE) ? state->m_i186.intr.ext_vector[1] : (state->m_i186.intr.poll_status & 0x1f); break;
+		case 0x0C   : vector=(m_i186.intr.ext[0] & EXTINT_CTRL_CASCADE) ? m_i186.intr.ext_vector[0] : (m_i186.intr.poll_status & 0x1f); break;
+		case 0x0D   : vector=(m_i186.intr.ext[1] & EXTINT_CTRL_CASCADE) ? m_i186.intr.ext_vector[1] : (m_i186.intr.poll_status & 0x1f); break;
 		default :
-			vector=state->m_i186.intr.poll_status & 0x1f; break;
+			vector=m_i186.intr.poll_status & 0x1f; break;
 	}
 
 	if (LOG_INTERRUPTS)
 	{
-		logerror("i186.intr.ext[0]=%04X i186.intr.ext[1]=%04X\n",state->m_i186.intr.ext[0],state->m_i186.intr.ext[1]);
-		logerror("Ext vectors : %02X %02X\n",state->m_i186.intr.ext_vector[0],state->m_i186.intr.ext_vector[1]);
-		logerror("Int %02X Calling vector %02X\n",state->m_i186.intr.poll_status,vector);
+		logerror("i186.intr.ext[0]=%04X i186.intr.ext[1]=%04X\n",m_i186.intr.ext[0],m_i186.intr.ext[1]);
+		logerror("Ext vectors : %02X %02X\n",m_i186.intr.ext_vector[0],m_i186.intr.ext_vector[1]);
+		logerror("Int %02X Calling vector %02X\n",m_i186.intr.poll_status,vector);
 	}
 
 	return vector;
@@ -855,7 +854,7 @@ READ16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_r)
 		case 0x12:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", space.device().safe_pc());
 			if (m_i186.intr.poll_status & 0x8000)
-				int_callback(machine().device(MAINCPU_TAG), 0);
+				int_callback(*machine().device(MAINCPU_TAG), 0);
 			return m_i186.intr.poll_status;
 
 		case 0x13:
@@ -1167,7 +1166,7 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_i186_internal_port_w)
 			/* we need to do this at a time when the I86 context is swapped in */
 			/* this register is generally set once at startup and never again, so it's a good */
 			/* time to set it up */
-			space.device().execute().set_irq_acknowledge_callback(int_callback);
+			space.device().execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(rmnimbus_state::int_callback),this));
 			break;
 
 		case 0x60:

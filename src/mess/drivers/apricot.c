@@ -66,6 +66,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(apricot_sio_irq_w);
+	IRQ_CALLBACK_MEMBER(apricot_irq_ack);
 };
 
 
@@ -142,10 +143,9 @@ static const z80sio_interface apricot_z80sio_intf =
     INTERRUPTS
 ***************************************************************************/
 
-static IRQ_CALLBACK( apricot_irq_ack )
+IRQ_CALLBACK_MEMBER(apricot_state::apricot_irq_ack)
 {
-	apricot_state *state = device->machine().driver_data<apricot_state>();
-	return pic8259_acknowledge(state->m_pic);
+	return pic8259_acknowledge(m_pic);
 }
 
 static const struct pic8259_interface apricot_pic8259_intf =
@@ -266,7 +266,7 @@ DRIVER_INIT_MEMBER(apricot_state,apricot)
 	prg.unmap_readwrite(0x40000, 0xeffff);
 	prg.install_ram(0x00000, ram_size - 1, ram);
 
-	m_maincpu->set_irq_acknowledge_callback(apricot_irq_ack);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apricot_state::apricot_irq_ack),this));
 
 	m_video_mode = 0;
 	m_display_on = 1;

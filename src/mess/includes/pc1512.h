@@ -160,6 +160,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
 	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	IRQ_CALLBACK_MEMBER(pc1512_irq_callback);
 
 	// system status register
 	int m_pit1;

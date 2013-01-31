@@ -194,6 +194,7 @@ public:
 	void screen_eof_crystal(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(crystal_interrupt);
 	TIMER_CALLBACK_MEMBER(Timercb);
+	IRQ_CALLBACK_MEMBER(icallback);
 };
 
 static void IntReq( running_machine &machine, int num )
@@ -271,10 +272,9 @@ WRITE32_MEMBER(crystal_state::IntAck_w)
 		m_IntHigh = (data >> 8) & 7;
 }
 
-static IRQ_CALLBACK( icallback )
+IRQ_CALLBACK_MEMBER(crystal_state::icallback)
 {
-	crystal_state *state = device->machine().driver_data<crystal_state>();
-	address_space &space = device->memory().space(AS_PROGRAM);
+	address_space &space = device.memory().space(AS_PROGRAM);
 	UINT32 IntPend = space.read_dword(0x01800c0c);
 	int i;
 
@@ -282,7 +282,7 @@ static IRQ_CALLBACK( icallback )
 	{
 		if (BIT(IntPend, i))
 		{
-			return (state->m_IntHigh << 5) | i;
+			return (m_IntHigh << 5) | i;
 		}
 	}
 	return 0;       //This should never happen
@@ -582,7 +582,7 @@ void crystal_state::machine_start()
 	m_ds1302 = machine().device<ds1302_device>("rtc");
 	m_vr0video = machine().device("vr0");
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(icallback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(crystal_state::icallback),this));
 	for (i = 0; i < 4; i++)
 		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(FPTR)i);
 
@@ -611,7 +611,7 @@ void crystal_state::machine_reset()
 	memset(m_vidregs, 0, 0x10000);
 	m_FlipCount = 0;
 	m_IntHigh = 0;
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(icallback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(crystal_state::icallback),this));
 	m_Bank = 0;
 	membank("bank1")->set_base(memregion("user1")->base() + 0);
 	m_FlashCmd = 0xff;

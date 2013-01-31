@@ -133,6 +133,7 @@ public:
 
 	DECLARE_DRIVER_INIT(vixen);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_tick);
+	IRQ_CALLBACK_MEMBER(vixen_int_ack);
 };
 
 #endif

@@ -57,6 +57,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(at_pit8254_out2_changed);
 	DECLARE_DRIVER_INIT(photoply);
 	virtual void machine_start();
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 
@@ -226,10 +227,9 @@ static const struct pic8259_interface pic8259_2_config =
 	DEVCB_NULL
 };
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(photoply_state::irq_callback)
 {
-	photoply_state *state = device->machine().driver_data<photoply_state>();
-	return pic8259_acknowledge(state->m_pic8259_1);
+	return pic8259_acknowledge(m_pic8259_1);
 }
 
 WRITE_LINE_MEMBER(photoply_state::at_pit8254_out0_changed)
@@ -342,7 +342,7 @@ static void photoply_set_keyb_int(running_machine &machine, int state)
 
 void photoply_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(photoply_state::irq_callback),this));
 	m_pit8253 = machine().device( "pit8254" );
 	m_pic8259_1 = machine().device( "pic8259_1" );
 	m_pic8259_2 = machine().device( "pic8259_2" );

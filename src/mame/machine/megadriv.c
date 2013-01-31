@@ -1091,18 +1091,16 @@ void genesis_vdp_lv4irqline_callback_genesis_68k(running_machine &machine, bool 
 }
 
 /* Callback when the 68k takes an IRQ */
-static IRQ_CALLBACK(genesis_int_callback)
+IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
 {
-	md_base_state *state = device->machine().driver_data<md_base_state>();
-
 	if (irqline==4)
 	{
-		state->m_vdp->vdp_clear_irq4_pending();
+		m_vdp->vdp_clear_irq4_pending();
 	}
 
 	if (irqline==6)
 	{
-		state->m_vdp->vdp_clear_irq6_pending();
+		m_vdp->vdp_clear_irq6_pending();
 	}
 
 	return (0x60+irqline*4)/4; // vector address
@@ -1335,45 +1333,45 @@ static int megadriv_tas_callback(device_t *device)
 	return 0; // writeback not allowed
 }
 
-static void megadriv_init_common(running_machine &machine)
+void md_base_state::megadriv_init_common()
 {
 	/* Look to see if this system has the standard Sound Z80 */
-	_genesis_snd_z80_cpu = machine.device<cpu_device>("genesis_snd_z80");
+	_genesis_snd_z80_cpu = machine().device<cpu_device>("genesis_snd_z80");
 	if (_genesis_snd_z80_cpu != NULL)
 	{
 		//printf("GENESIS Sound Z80 cpu found '%s'\n", _genesis_snd_z80_cpu->tag() );
 
-		genz80.z80_prgram = auto_alloc_array(machine, UINT8, 0x2000);
-		machine.root_device().membank("bank1")->set_base(genz80.z80_prgram );
+		genz80.z80_prgram = auto_alloc_array(machine(), UINT8, 0x2000);
+		machine().root_device().membank("bank1")->set_base(genz80.z80_prgram );
 	}
 
 	/* Look to see if this system has the 32x Master SH2 */
-	_32x_master_cpu = machine.device<cpu_device>(_32X_MASTER_TAG);
+	_32x_master_cpu = machine().device<cpu_device>(_32X_MASTER_TAG);
 	if (_32x_master_cpu != NULL)
 	{
 		printf("32x MASTER SH2 cpu found '%s'\n", _32x_master_cpu->tag() );
 	}
 
 	/* Look to see if this system has the 32x Slave SH2 */
-	_32x_slave_cpu = machine.device<cpu_device>(_32X_SLAVE_TAG);
+	_32x_slave_cpu = machine().device<cpu_device>(_32X_SLAVE_TAG);
 	if (_32x_slave_cpu != NULL)
 	{
 		printf("32x SLAVE SH2 cpu found '%s'\n", _32x_slave_cpu->tag() );
 	}
 
-	_svp_cpu = machine.device<cpu_device>("svp");
+	_svp_cpu = machine().device<cpu_device>("svp");
 	if (_svp_cpu != NULL)
 	{
 		printf("SVP (cpu) found '%s'\n", _svp_cpu->tag() );
 	}
 
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(genesis_int_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(md_base_state::genesis_int_callback),this));
 	megadriv_backupram = NULL;
 	megadriv_backupram_length = 0;
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
 
-	m68k_set_tas_callback(machine.device("maincpu"), megadriv_tas_callback);
+	m68k_set_tas_callback(machine().device("maincpu"), megadriv_tas_callback);
 
 	// the drivers which need 6 buttons pad set this to 1 in their init befare calling the megadrive init
 	if (megadrive_6buttons_pad)
@@ -1394,7 +1392,7 @@ static void megadriv_init_common(running_machine &machine)
 		  some games specify a single address, (start 200001, end 200001)
 		  this usually means there is serial eeprom instead */
 		int i;
-		UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
+		UINT16 *rom = (UINT16*)machine().root_device().memregion("maincpu")->base();
 
 		mame_printf_debug("DEBUG:: Header: Backup RAM string (ignore for games without)\n");
 		for (i=0;i<12;i++)
@@ -1411,7 +1409,7 @@ static void megadriv_init_common(running_machine &machine)
 	/* if we have an SVP cpu then do some extra initilization for it */
 	if (_svp_cpu != NULL)
 	{
-		svp_init(machine);
+		svp_init(machine());
 	}
 
 
@@ -1422,7 +1420,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 	genvdp_use_cram = 0;
 	genesis_other_hacks = 0;
 
-	megadriv_init_common(machine());
+	megadriv_init_common();
 	megadriv_framerate = 60;
 }
 
@@ -1433,7 +1431,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv)
 	genvdp_use_cram = 1;
 	genesis_other_hacks = 1;
 
-	megadriv_init_common(machine());
+	megadriv_init_common();
 	megadriv_framerate = 60;
 }
 
@@ -1442,7 +1440,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadrij)
 	genvdp_use_cram = 1;
 	genesis_other_hacks = 1;
 
-	megadriv_init_common(machine());
+	megadriv_init_common();
 	megadriv_framerate = 60;
 }
 
@@ -1451,7 +1449,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadrie)
 	genvdp_use_cram = 1;
 	genesis_other_hacks = 1;
 
-	megadriv_init_common(machine());
+	megadriv_init_common();
 	megadriv_framerate = 50;
 }
 

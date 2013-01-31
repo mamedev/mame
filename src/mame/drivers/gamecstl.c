@@ -120,6 +120,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_gamecstl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 
@@ -602,10 +603,9 @@ static INPUT_PORTS_START(gamecstl)
 	PORT_START("pc_keyboard_7")
 INPUT_PORTS_END
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(gamecstl_state::irq_callback)
 {
-	gamecstl_state *state = device->machine().driver_data<gamecstl_state>();
-	return pic8259_acknowledge(state->m_pic8259_1);
+	return pic8259_acknowledge(m_pic8259_1);
 }
 
 void gamecstl_state::machine_start()
@@ -621,7 +621,7 @@ void gamecstl_state::machine_reset()
 {
 	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base() + 0x30000);
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(gamecstl_state::irq_callback),this));
 }
 
 

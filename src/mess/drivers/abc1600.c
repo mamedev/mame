@@ -1798,26 +1798,25 @@ static ABC1600BUS_INTERFACE( bus2_intf )
 //**************************************************************************
 
 //-------------------------------------------------
-//  IRQ_CALLBACK( abc1600_int_ack )
+//  IRQ_CALLBACK_MEMBER( abc1600_int_ack )
 //-------------------------------------------------
 
-static IRQ_CALLBACK( abc1600_int_ack )
+IRQ_CALLBACK_MEMBER( abc1600_state::abc1600_int_ack )
 {
-	abc1600_state *state = device->machine().driver_data<abc1600_state>();
 	int data = 0;
 
 	switch (irqline)
 	{
 	case M68K_IRQ_2:
-		data = state->m_cio->intack_r();
+		data = m_cio->intack_r();
 		break;
 
 	case M68K_IRQ_5:
-		data = state->m_dart->m1_r();
+		data = m_dart->m1_r();
 		break;
 
 	case M68K_IRQ_7:
-		state->m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
+		m_maincpu->set_input_line(M68K_IRQ_7, CLEAR_LINE);
 
 		data = M68K_INT_ACK_AUTOVECTOR;
 		break;
@@ -1834,7 +1833,7 @@ static IRQ_CALLBACK( abc1600_int_ack )
 void abc1600_state::machine_start()
 {
 	// interrupt callback
-	m_maincpu->set_irq_acknowledge_callback(abc1600_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(abc1600_state::abc1600_int_ack),this));
 
 	// floppy callbacks
 	m_fdc->setup_intrq_cb(wd_fdc_t::line_cb(FUNC(abc1600_state::fdc_intrq_w), this));

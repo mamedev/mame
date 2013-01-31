@@ -359,7 +359,7 @@ static DEVICE_IMAGE_LOAD( jaguar );
  *
  *************************************/
 
-static IRQ_CALLBACK(jaguar_irq_callback)
+IRQ_CALLBACK_MEMBER(jaguar_state::jaguar_irq_callback)
 {
 	return (irqline == 6) ? 0x40 : -1;
 }
@@ -375,7 +375,7 @@ static IRQ_CALLBACK(jaguar_irq_callback)
 void jaguar_state::machine_reset()
 {
 	if (!m_is_cojag)
-		m_main_cpu->set_irq_acknowledge_callback(jaguar_irq_callback);
+		m_main_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(jaguar_state::jaguar_irq_callback),this));
 
 	m_protection_check = 0;
 

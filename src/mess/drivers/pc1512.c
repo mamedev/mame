@@ -911,11 +911,9 @@ static I8237_INTERFACE( dmac_intf )
 //  pic8259_interface pic_intf
 //-------------------------------------------------
 
-static IRQ_CALLBACK( pc1512_irq_callback )
+IRQ_CALLBACK_MEMBER(pc1512_state::pc1512_irq_callback)
 {
-	pc1512_state *state = device->machine().driver_data<pc1512_state>();
-
-	return pic8259_acknowledge(state->m_pic);
+	return pic8259_acknowledge(m_pic);
 }
 
 static const struct pic8259_interface pic_intf =
@@ -1099,7 +1097,7 @@ SLOT_INTERFACE_END
 void pc1512_state::machine_start()
 {
 	// register CPU IRQ callback
-	m_maincpu->set_irq_acknowledge_callback(pc1512_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc1512_state::pc1512_irq_callback),this));
 
 	// set RAM size
 	size_t ram_size = m_ram->size();
@@ -1179,7 +1177,7 @@ void pc1512_state::machine_reset()
 void pc1640_state::machine_start()
 {
 	// register CPU IRQ callback
-	m_maincpu->set_irq_acknowledge_callback(pc1512_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc1512_state::pc1512_irq_callback),this));
 
 	// state saving
 	save_item(NAME(m_pit1));

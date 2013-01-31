@@ -56,6 +56,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_paso1600(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	IRQ_CALLBACK_MEMBER(paso1600_irq_callback);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -274,9 +275,9 @@ static MC6845_INTERFACE( mc6845_intf )
 	NULL        /* update address callback */
 };
 
-static IRQ_CALLBACK(paso1600_irq_callback)
+IRQ_CALLBACK_MEMBER(paso1600_state::paso1600_irq_callback)
 {
-	return pic8259_acknowledge( device->machine().device( "pic8259" ) );
+	return pic8259_acknowledge( machine().device( "pic8259" ) );
 }
 
 WRITE_LINE_MEMBER( paso1600_state::paso1600_set_int_line )
@@ -294,7 +295,7 @@ static const struct pic8259_interface paso1600_pic8259_config =
 
 void paso1600_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(paso1600_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(paso1600_state::paso1600_irq_callback),this));
 }
 
 

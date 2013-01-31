@@ -49,6 +49,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxygame_irq);
+	IRQ_CALLBACK_MEMBER(galaxygame_irq_callback);
 };
 
 /*************************************
@@ -294,9 +295,9 @@ void galaxygame_state::palette_init()
 	palette_set_color(machine(),1,RGB_WHITE); /* white */
 }
 
-static IRQ_CALLBACK(galaxygame_irq_callback)
+IRQ_CALLBACK_MEMBER(galaxygame_state::galaxygame_irq_callback)
 {
-	device->execute().set_input_line(0, CLEAR_LINE);
+	device.execute().set_input_line(0, CLEAR_LINE);
 	return 0x40;
 }
 
@@ -316,7 +317,7 @@ void galaxygame_state::machine_reset()
 	m_point_display_list_index = 0;
 	m_interrupt = 0;
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(galaxygame_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxygame_state::galaxygame_irq_callback),this));
 }
 
 static const struct t11_setup t11_data =

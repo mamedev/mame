@@ -743,11 +743,9 @@ void wangpc_state::check_level2_interrupts()
 	pic8259_ir2_w(m_pic, state);
 }
 
-static IRQ_CALLBACK( wangpc_irq_callback )
+IRQ_CALLBACK_MEMBER(wangpc_state::wangpc_irq_callback)
 {
-	wangpc_state *state = device->machine().driver_data<wangpc_state>();
-
-	return pic8259_acknowledge(state->m_pic);
+	return pic8259_acknowledge(m_pic);
 }
 
 static const struct pic8259_interface pic_intf =
@@ -1099,7 +1097,7 @@ SLOT_INTERFACE_END
 void wangpc_state::machine_start()
 {
 	// register CPU IRQ callback
-	m_maincpu->set_irq_acknowledge_callback(wangpc_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(wangpc_state::wangpc_irq_callback),this));
 
 	// connect serial keyboard
 	m_uart->connect(m_kb);

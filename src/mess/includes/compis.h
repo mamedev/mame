@@ -187,6 +187,8 @@ public:
 	INTERRUPT_GEN_MEMBER(compis_vblank_int);
 	TIMER_CALLBACK_MEMBER(internal_timer_int);
 	TIMER_CALLBACK_MEMBER(dma_timer_callback);
+	IRQ_CALLBACK_MEMBER(int_callback);
+	IRQ_CALLBACK_MEMBER(compis_irq_callback);
 };
 
 

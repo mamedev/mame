@@ -723,11 +723,9 @@ static const z80_daisy_config trs80m2_daisy_chain[] =
 //  pic8259_interface pic_intf
 //-------------------------------------------------
 
-static IRQ_CALLBACK( trs80m16_irq_callback )
+IRQ_CALLBACK_MEMBER(trs80m16_state::trs80m16_irq_callback)
 {
-	trs80m16_state *state = device->machine().driver_data<trs80m16_state>();
-
-	return pic8259_acknowledge(state->m_pic);
+	return pic8259_acknowledge(m_pic);
 }
 
 static const struct pic8259_interface pic_intf =
@@ -775,7 +773,7 @@ void trs80m16_state::machine_start()
 	trs80m2_state::machine_start();
 
 	// register CPU IRQ callback
-	m_maincpu->set_irq_acknowledge_callback(trs80m16_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(trs80m16_state::trs80m16_irq_callback),this));
 
 	// register for state saving
 	save_item(NAME(m_ual));

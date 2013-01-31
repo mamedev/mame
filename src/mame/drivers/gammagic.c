@@ -103,6 +103,7 @@ public:
 	UINT8 m_atapi_data[ATAPI_DATA_SIZE];
 
 	DECLARE_DRIVER_INIT(gammagic);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 //static void atapi_irq(running_machine &machine, int state);
@@ -622,16 +623,15 @@ static INPUT_PORTS_START( gammagic )
 INPUT_PORTS_END
 #endif
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(gammagic_state::irq_callback)
 {
-	gammagic_state *state = device->machine().driver_data<gammagic_state>();
-	return pic8259_acknowledge( state->m_pic8259_1);
+	return pic8259_acknowledge(m_pic8259_1);
 }
 
 static MACHINE_START(gammagic)
 {
 	gammagic_state *state = machine.driver_data<gammagic_state>();
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine.device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(gammagic_state::irq_callback),state));
 
 	state->m_pit8254 = machine.device( "pit8254" );
 	state->m_pic8259_1 = machine.device( "pic8259_1" );

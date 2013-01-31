@@ -38,6 +38,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
+	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);
 };
 
 
@@ -191,7 +192,7 @@ INTERRUPT_GEN_MEMBER(photon_state::pk8000_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static IRQ_CALLBACK(pk8000_irq_callback)
+IRQ_CALLBACK_MEMBER(photon_state::pk8000_irq_callback)
 {
 	return 0xff;
 }
@@ -200,7 +201,7 @@ static IRQ_CALLBACK(pk8000_irq_callback)
 void photon_state::machine_reset()
 {
 	pk8000_set_bank(machine(),0);
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pk8000_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(photon_state::pk8000_irq_callback),this));
 }
 
 void photon_state::video_start()

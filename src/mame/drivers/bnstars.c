@@ -163,6 +163,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 *sprram_top, size_t sprram_size, int region);
 	void irq_init();
 	void irq_raise(int level);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 
@@ -1325,14 +1326,13 @@ ADDRESS_MAP_END
 #endif
 
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(bnstars_state::irq_callback)
 {
-	bnstars_state *state = device->machine().driver_data<bnstars_state>();
 	int i;
-	for(i=15; i>=0 && !(state->m_irqreq & (1<<i)); i--);
-	state->m_irqreq &= ~(1<<i);
-	if(!state->m_irqreq)
-		device->execute().set_input_line(0, CLEAR_LINE);
+	for(i=15; i>=0 && !(m_irqreq & (1<<i)); i--);
+	m_irqreq &= ~(1<<i);
+	if(!m_irqreq)
+		device.execute().set_input_line(0, CLEAR_LINE);
 	return i;
 }
 
@@ -1340,7 +1340,7 @@ void bnstars_state::irq_init()
 {
 	m_irqreq = 0;
 	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(bnstars_state::irq_callback),this));
 }
 
 void bnstars_state::irq_raise(int level)

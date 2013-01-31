@@ -2114,16 +2114,14 @@ static const centronics_interface centronics_intf =
 //**************************************************************************
 
 //-------------------------------------------------
-//  IRQ_CALLBACK( atarist_int_ack )
+//  IRQ_CALLBACK_MEMBER( atarist_int_ack )
 //-------------------------------------------------
 
-static IRQ_CALLBACK( atarist_int_ack )
+IRQ_CALLBACK_MEMBER(st_state::atarist_int_ack)
 {
-	st_state *state = device->machine().driver_data<st_state>();
-
 	if (irqline == M68K_IRQ_6)
 	{
-		return state->m_mfp->get_vector();
+		return m_mfp->get_vector();
 	}
 
 	return M68K_INT_ACK_AUTOVECTOR;
@@ -2199,7 +2197,7 @@ void st_state::machine_start()
 	configure_memory();
 
 	// set CPU interrupt callback
-	m_maincpu->set_irq_acknowledge_callback(atarist_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(st_state::atarist_int_ack),this));
 
 	// allocate timers
 	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::st_mouse_tick),this));
@@ -2256,7 +2254,7 @@ void ste_state::machine_start()
 	configure_memory();
 
 	/* set CPU interrupt callback */
-	m_maincpu->set_irq_acknowledge_callback(atarist_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(st_state::atarist_int_ack),this));
 
 	/* allocate timers */
 	m_dmasound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ste_state::atariste_dmasound_tick),this));
@@ -2296,7 +2294,7 @@ void stbook_state::machine_start()
 	}
 
 	/* set CPU interrupt callback */
-	m_maincpu->set_irq_acknowledge_callback(atarist_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(st_state::atarist_int_ack),this));
 
 	/* register for state saving */
 	ste_state::state_save();

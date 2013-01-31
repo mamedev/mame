@@ -122,6 +122,7 @@ public:
 	UINT32 screen_update_taitol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_taitol(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 /*----------- defined in video/taito_l.c -----------*/

@@ -111,6 +111,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
 	DECLARE_READ8_MEMBER(hd61830_rd_r);
+	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
 };
 
 #endif

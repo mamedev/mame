@@ -418,6 +418,7 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	DECLARE_WRITE_LINE_MEMBER(chihiro_pit8254_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(chihiro_pit8254_out2_changed);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 /*
@@ -1575,14 +1576,13 @@ static const struct pic8259_interface chihiro_pic8259_2_config =
 	DEVCB_NULL
 };
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(chihiro_state::irq_callback)
 {
-	chihiro_state *chst=device->machine().driver_data<chihiro_state>();
 	int r = 0;
-	r = pic8259_acknowledge(chst->chihiro_devs.pic8259_2);
+	r = pic8259_acknowledge(chihiro_devs.pic8259_2);
 	if (r==0)
 	{
-		r = pic8259_acknowledge(chst->chihiro_devs.pic8259_1);
+		r = pic8259_acknowledge(chihiro_devs.pic8259_1);
 	}
 	return r;
 }
@@ -1805,7 +1805,7 @@ void chihiro_state::machine_start()
 	smbus_register_device(0x10,smbus_callback_pic16lc);
 	smbus_register_device(0x45,smbus_callback_cx25871);
 	smbus_register_device(0x54,smbus_callback_eeprom);
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(chihiro_state::irq_callback),this));
 	chihiro_devs.pic8259_1 = machine().device( "pic8259_1" );
 	chihiro_devs.pic8259_2 = machine().device( "pic8259_2" );
 	chihiro_devs.ide = machine().device( "ide" );

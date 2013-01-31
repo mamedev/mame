@@ -2670,28 +2670,27 @@ READ8_MEMBER(amstrad_state::amstrad_psg_porta_read)
 /* called when cpu acknowledges int */
 /* reset top bit of interrupt line counter */
 /* this ensures that the next interrupt is no closer than 32 lines */
-static IRQ_CALLBACK(amstrad_cpu_acknowledge_int)
+IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 {
-	amstrad_state *state = device->machine().driver_data<amstrad_state>();
 	// DMA interrupts can be automatically cleared if bit 0 of &6805 is set to 0
-	if( state->m_asic.enabled && state->m_plus_irq_cause != 0x06 && state->m_asic.dma_clear & 0x01)
+	if( m_asic.enabled && m_plus_irq_cause != 0x06 && m_asic.dma_clear & 0x01)
 	{
-		logerror("IRQ: Not cleared, IRQ was called by DMA [%i]\n",state->m_plus_irq_cause);
-		state->m_asic.ram[0x2c0f] &= ~0x80;  // not a raster interrupt, so this bit is reset
-		return (state->m_asic.ram[0x2805] & 0xf8) | state->m_plus_irq_cause;
+		logerror("IRQ: Not cleared, IRQ was called by DMA [%i]\n",m_plus_irq_cause);
+		m_asic.ram[0x2c0f] &= ~0x80;  // not a raster interrupt, so this bit is reset
+		return (m_asic.ram[0x2805] & 0xf8) | m_plus_irq_cause;
 	}
-	device->machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
-	state->m_gate_array.hsync_counter &= 0x1F;
-	if ( state->m_asic.enabled )
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_gate_array.hsync_counter &= 0x1F;
+	if ( m_asic.enabled )
 	{
-		if(state->m_plus_irq_cause == 6)  // bit 7 is set "if last interrupt acknowledge cycle was caused by a raster interrupt"
-			state->m_asic.ram[0x2c0f] |= 0x80;
+		if(m_plus_irq_cause == 6)  // bit 7 is set "if last interrupt acknowledge cycle was caused by a raster interrupt"
+			m_asic.ram[0x2c0f] |= 0x80;
 		else
 		{
-			state->m_asic.ram[0x2c0f] &= ~0x80;
-			state->m_asic.ram[0x2c0f] &= (0x40 >> state->m_plus_irq_cause/2);
+			m_asic.ram[0x2c0f] &= ~0x80;
+			m_asic.ram[0x2c0f] &= (0x40 >> m_plus_irq_cause/2);
 		}
-		return (state->m_asic.ram[0x2805] & 0xf8) | state->m_plus_irq_cause;
+		return (m_asic.ram[0x2805] & 0xf8) | m_plus_irq_cause;
 	}
 	return 0xFF;
 }
@@ -2898,7 +2897,7 @@ static void amstrad_common_init(running_machine &machine)
 		(const UINT8*)amstrad_cycle_table_ex);
 
 	/* Juergen is a cool dude! */
-	state->m_maincpu->set_irq_acknowledge_callback(amstrad_cpu_acknowledge_int);
+	state->m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(amstrad_state::amstrad_cpu_acknowledge_int),state));
 }
 
 TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)

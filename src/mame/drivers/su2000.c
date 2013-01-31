@@ -81,6 +81,7 @@ public:
 	DECLARE_READ8_MEMBER(get_slave_ack);
 	virtual void machine_start();
 	virtual void machine_reset();
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 
@@ -236,10 +237,9 @@ static const struct pit8253_config su2000_pit8254_config =
  *
  *************************************/
 
-static IRQ_CALLBACK( pc_irq_callback )
+IRQ_CALLBACK_MEMBER(su2000_state::irq_callback)
 {
-	su2000_state *state = device->machine().driver_data<su2000_state>();
-	return pic8259_acknowledge(state->m_pic8259_1);
+	return pic8259_acknowledge(m_pic8259_1);
 }
 
 
@@ -271,7 +271,7 @@ void su2000_state::machine_start()
 	space.install_write_bank(0x100000, ram_limit - 1, "hma_bank");
 	membank("hma_bank")->set_base(m_pc_ram + 0xa0000);
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(su2000_state::irq_callback),this));
 
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, su2000_set_keyb_int);
 

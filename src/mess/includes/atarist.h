@@ -315,6 +315,7 @@ public:
 	TIMER_CALLBACK_MEMBER(atarist_shifter_tick);
 	TIMER_CALLBACK_MEMBER(atarist_glue_tick);
 	TIMER_CALLBACK_MEMBER(atarist_blitter_tick);
+	IRQ_CALLBACK_MEMBER(atarist_int_ack);	
 };
 
 class megast_state : public st_state
@@ -370,7 +371,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER(atariste_dmasound_tick);
 	TIMER_CALLBACK_MEMBER(atariste_microwire_tick);
-
+	
 	void dmasound_set_state(int level);
 	void dmasound_tick();
 	void microwire_shift();

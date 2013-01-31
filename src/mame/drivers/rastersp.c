@@ -41,8 +41,6 @@
  *
  *************************************/
 
-static IRQ_CALLBACK( irq_callback );
-
 class rastersp_state : public driver_device
 {
 public:
@@ -133,7 +131,7 @@ public:
 	UINT32  screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void    update_irq(UINT32 which, UINT32 state);
 	void    upload_palette(UINT32 word1, UINT32 word2);
-
+	IRQ_CALLBACK_MEMBER(irq_callback);
 protected:
 	// driver_device overrides
 	virtual void machine_reset();
@@ -151,7 +149,7 @@ protected:
 
 void rastersp_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(rastersp_state::irq_callback),this));
 
 	m_nvram8 = auto_alloc_array(machine(), UINT8, NVRAM_SIZE);
 
@@ -358,29 +356,27 @@ UINT32 rastersp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
  *
  *************************************/
 
-static IRQ_CALLBACK( irq_callback )
+IRQ_CALLBACK_MEMBER(rastersp_state::irq_callback)
 {
-	rastersp_state *state = device->machine().driver_data<rastersp_state>();
-
 	UINT8 vector = 0;
 
-	if (state->m_irq_status & (1 << rastersp_state::IRQ_SCSI))
+	if (m_irq_status & (1 << IRQ_SCSI))
 	{
 		vector = 11;
 	}
-	else if (state->m_irq_status & (1 << rastersp_state::IRQ_DSP))
+	else if (m_irq_status & (1 << IRQ_DSP))
 	{
-		state->update_irq(rastersp_state::IRQ_DSP, CLEAR_LINE);
+		update_irq(IRQ_DSP, CLEAR_LINE);
 		vector = 12;
 	}
-	else if (state->m_irq_status & (1 << rastersp_state::IRQ_VBLANK))
+	else if (m_irq_status & (1 << IRQ_VBLANK))
 	{
-		state->update_irq(rastersp_state::IRQ_VBLANK, CLEAR_LINE);
+		update_irq(IRQ_VBLANK, CLEAR_LINE);
 		vector = 13;
 	}
 	else
 	{
-		fatalerror("Unknown x86 IRQ (m_irq_status = %x)", state->m_irq_status);
+		fatalerror("Unknown x86 IRQ (m_irq_status = %x)", m_irq_status);
 	}
 
 	return vector;

@@ -699,19 +699,17 @@ WRITE16_MEMBER(model1_state::bank_w)
 
 
 
-static void irq_raise(running_machine &machine, int level)
+void model1_state::irq_raise(int level)
 {
-	model1_state *state = machine.driver_data<model1_state>();
 	//  logerror("irq: raising %d\n", level);
 	//  irq_status |= (1 << level);
-	state->m_last_irq = level;
-	machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+	m_last_irq = level;
+	machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
 }
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
 {
-	model1_state *state = device->machine().driver_data<model1_state>();
-	return state->m_last_irq;
+	return m_last_irq;
 }
 // vf
 // 1 = fe3ed4
@@ -727,10 +725,10 @@ static IRQ_CALLBACK(irq_callback)
 // 3 = ff54c
 // other = ff568/ff574
 
-static void irq_init(running_machine &machine)
+void model1_state::irq_init()
 {
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(model1_state::irq_callback),this));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
@@ -739,11 +737,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 
 	if (scanline == 384)
 	{
-		irq_raise(machine(), 1);
+		irq_raise(1);
 	}
 	else if(scanline == 384/2)
 	{
-		irq_raise(machine(), m_sound_irq);
+		irq_raise(m_sound_irq);
 
 		// if the FIFO has something in it, signal the 68k too
 		if (m_fifo_rptr != m_fifo_wptr)
@@ -756,7 +754,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
 MACHINE_RESET_MEMBER(model1_state,model1)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
-	irq_init(machine());
+	irq_init();
 	model1_tgp_reset(machine(), !strcmp(machine().system().name, "swa") || !strcmp(machine().system().name, "wingwar") || !strcmp(machine().system().name, "wingwaru") || !strcmp(machine().system().name, "wingwarj"));
 	if (!strcmp(machine().system().name, "swa"))
 	{
@@ -775,7 +773,7 @@ MACHINE_RESET_MEMBER(model1_state,model1)
 MACHINE_RESET_MEMBER(model1_state,model1_vr)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
-	irq_init(machine());
+	irq_init();
 	model1_vr_tgp_reset(machine());
 	m_sound_irq = 3;
 

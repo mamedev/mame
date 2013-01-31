@@ -727,10 +727,10 @@ void vixen_state::fdc_intrq_w(bool state)
 //**************************************************************************
 
 //-------------------------------------------------
-//  IRQ_CALLBACK( vixen )
+//  IRQ_CALLBACK_MEMBER( vixen_int_ack )
 //-------------------------------------------------
 
-static IRQ_CALLBACK( vixen_int_ack )
+IRQ_CALLBACK_MEMBER(vixen_state::vixen_int_ack)
 {
 	// D0 is pulled low
 	return 0xfe;
@@ -744,7 +744,7 @@ static IRQ_CALLBACK( vixen_int_ack )
 void vixen_state::machine_start()
 {
 	// interrupt callback
-	m_maincpu->set_irq_acknowledge_callback(vixen_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(vixen_state::vixen_int_ack),this));
 
 	// configure memory banking
 	UINT8 *ram = m_ram->pointer();

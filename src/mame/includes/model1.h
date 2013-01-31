@@ -140,6 +140,9 @@ public:
 	UINT32 screen_update_model1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_model1(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
+	void irq_raise(int level);
+	void irq_init();
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 

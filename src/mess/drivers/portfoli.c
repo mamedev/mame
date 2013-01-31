@@ -161,24 +161,22 @@ WRITE8_MEMBER( portfolio_state::sivr_w )
 }
 
 //-------------------------------------------------
-//  IRQ_CALLBACK( portfolio_int_ack )
+//  IRQ_CALLBACK_MEMBER( portfolio_int_ack )
 //-------------------------------------------------
 
-static IRQ_CALLBACK( portfolio_int_ack )
+IRQ_CALLBACK_MEMBER(portfolio_state::portfolio_int_ack)
 {
-	portfolio_state *state = device->machine().driver_data<portfolio_state>();
-
-	UINT8 vector = state->m_sivr;
+	UINT8 vector = m_sivr;
 
 	for (int i = 0; i < 4; i++)
 	{
-		if (BIT(state->m_ip, i))
+		if (BIT(m_ip, i))
 		{
 			// clear interrupt pending bit
-			state->m_ip &= ~(1 << i);
+			m_ip &= ~(1 << i);
 
 			if (i == 3)
-				vector = state->m_sivr;
+				vector = m_sivr;
 			else
 				vector = INTERRUPT_VECTOR[i];
 
@@ -186,7 +184,7 @@ static IRQ_CALLBACK( portfolio_int_ack )
 		}
 	}
 
-	state->check_interrupt();
+	check_interrupt();
 
 	return vector;
 }
@@ -761,7 +759,7 @@ void portfolio_state::machine_start()
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	/* set CPU interrupt vector callback */
-	m_maincpu->set_irq_acknowledge_callback(portfolio_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(portfolio_state::portfolio_int_ack),this));
 
 	/* memory expansions */
 	switch (machine().device<ram_device>(RAM_TAG)->size())

@@ -214,7 +214,7 @@ public:
 	int quickload(device_image_interface &image, const char *file_type, int quickload_size);
 	void cart_start();
 	int cart_load(device_image_interface &image);
-
+	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
 protected:
 	// timer IDs
 	enum

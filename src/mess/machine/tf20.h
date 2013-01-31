@@ -42,7 +42,7 @@ public:
 	DECLARE_READ8_MEMBER( rom_disable_r );
 	DECLARE_READ8_MEMBER( upd765_tc_r );
 	DECLARE_WRITE8_MEMBER( fdc_control_w );
-	static IRQ_CALLBACK( irq_callback );
+	IRQ_CALLBACK_MEMBER( irq_callback );
 
 	void fdc_irq(bool state);
 

@@ -482,29 +482,27 @@ static VIDEOBRAIN_EXPANSION_INTERFACE( expansion_intf )
 //**************************************************************************
 
 //-------------------------------------------------
-//  IRQ_CALLBACK( vidbrain_int_ack )
+//  	IRQ_CALLBACK_MEMBER(vidbrain_int_ack)
 //-------------------------------------------------
 
-static IRQ_CALLBACK( vidbrain_int_ack )
+IRQ_CALLBACK_MEMBER(vidbrain_state::vidbrain_int_ack)
 {
-	vidbrain_state *state = device->machine().driver_data<vidbrain_state>();
+	UINT16 vector = m_vector;
 
-	UINT16 vector = state->m_vector;
-
-	switch (state->m_int_enable)
+	switch (m_int_enable)
 	{
 	case 1:
 		vector |= 0x80;
-		state->m_ext_int_latch = 0;
+		m_ext_int_latch = 0;
 		break;
 
 	case 3:
 		vector &= ~0x80;
-		state->m_timer_int_latch = 0;
+		m_timer_int_latch = 0;
 		break;
 	}
 
-	state->interrupt_check();
+	interrupt_check();
 
 	return vector;
 }
@@ -530,7 +528,7 @@ void vidbrain_state::device_timer(emu_timer &timer, device_timer_id id, int para
 void vidbrain_state::machine_start()
 {
 	// register IRQ callback
-	m_maincpu->set_irq_acknowledge_callback(vidbrain_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(vidbrain_state::vidbrain_int_ack),this));
 
 	// allocate timers
 	m_timer_ne555 = timer_alloc(TIMER_JOYSTICK);

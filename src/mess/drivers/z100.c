@@ -206,6 +206,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	IRQ_CALLBACK_MEMBER(z100_irq_callback);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -594,9 +595,9 @@ INPUT_PORTS_START( z100 )
 	PORT_CONFSETTING( 0x01, "Color" )
 INPUT_PORTS_END
 
-static IRQ_CALLBACK(z100_irq_callback)
+IRQ_CALLBACK_MEMBER(z100_state::z100_irq_callback)
 {
-	return pic8259_acknowledge( device->machine().device( "pic8259_master" ) );
+	return pic8259_acknowledge( machine().device( "pic8259_master" ) );
 }
 
 WRITE_LINE_MEMBER( z100_state::z100_pic_irq )
@@ -751,7 +752,7 @@ void z100_state::palette_init()
 
 void z100_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(z100_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(z100_state::z100_irq_callback),this));
 	m_mc6845 = machine().device<mc6845_device>("crtc");
 }
 

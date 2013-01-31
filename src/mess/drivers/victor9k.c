@@ -915,17 +915,15 @@ static IEEE488_INTERFACE( ieee488_intf )
 
 // Machine Initialization
 
-static IRQ_CALLBACK( victor9k_irq_callback )
+IRQ_CALLBACK_MEMBER(victor9k_state::victor9k_irq_callback)
 {
-	victor9k_state *state = device->machine().driver_data<victor9k_state>();
-
-	return pic8259_acknowledge(state->m_pic);
+	return pic8259_acknowledge(m_pic);
 }
 
 void victor9k_state::machine_start()
 {
 	// set interrupt callback
-	m_maincpu->set_irq_acknowledge_callback(victor9k_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(victor9k_state::victor9k_irq_callback),this));
 
 	// memory banking
 	address_space &program = m_maincpu->space(AS_PROGRAM);

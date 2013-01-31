@@ -157,6 +157,8 @@ public:
 	DECLARE_WRITE8_MEMBER( cio_pc_w );
 
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
+	
+	IRQ_CALLBACK_MEMBER( abc1600_int_ack );
 
 	void fdc_intrq_w(bool state);
 	void fdc_drq_w(bool state);

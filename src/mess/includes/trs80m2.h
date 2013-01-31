@@ -125,7 +125,7 @@ public:
 	int m_rtc_int;
 	int m_enable_rtc_int;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);	
 };
 
 class trs80m16_state : public trs80m2_state
@@ -144,6 +144,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER( ual_w );
 	DECLARE_WRITE8_MEMBER( tcl_w );
+	
+	IRQ_CALLBACK_MEMBER(trs80m16_irq_callback);
 
 	UINT16 m_ual;
 	UINT8 m_limit[2];

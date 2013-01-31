@@ -127,6 +127,7 @@ public:
 	int m_side;                         /* selected side */
 	DECLARE_WRITE_LINE_MEMBER(mux_serial_b_w);
 	DECLARE_WRITE_LINE_MEMBER(mux_serial_a_w);
+	IRQ_CALLBACK_MEMBER(victor9k_irq_callback);
 };
 
 #endif

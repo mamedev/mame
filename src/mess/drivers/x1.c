@@ -2347,24 +2347,23 @@ static const cassette_interface x1_cassette_interface =
  *************************************/
 
 #ifdef UNUSED_FUNCTION
-static IRQ_CALLBACK(x1_irq_callback)
+IRQ_CALLBACK_MEMBER(x1_state::x1_irq_callback)
 {
-	x1_state *state = device->machine().driver_data<x1_state>();
-	if(state->m_ctc_irq_flag != 0)
+	if(m_ctc_irq_flag != 0)
 	{
-		state->m_ctc_irq_flag = 0;
-		if(state->m_key_irq_flag == 0)  // if no other devices are pulling the IRQ line high
-			device->execute().set_input_line(0, CLEAR_LINE);
-		return state->m_irq_vector;
+		m_ctc_irq_flag = 0;
+		if(m_key_irq_flag == 0)  // if no other devices are pulling the IRQ line high
+			device.execute().set_input_line(0, CLEAR_LINE);
+		return m_irq_vector;
 	}
-	if(state->m_key_irq_flag != 0)
+	if(m_key_irq_flag != 0)
 	{
-		state->m_key_irq_flag = 0;
-		if(state->m_ctc_irq_flag == 0)  // if no other devices are pulling the IRQ line high
-			device->execute().set_input_line(0, CLEAR_LINE);
-		return state->m_key_irq_vector;
+		m_key_irq_flag = 0;
+		if(m_ctc_irq_flag == 0)  // if no other devices are pulling the IRQ line high
+			device.execute().set_input_line(0, CLEAR_LINE);
+		return m_key_irq_vector;
 	}
-	return state->m_irq_vector;
+	return m_irq_vector;
 }
 #endif
 
@@ -2442,7 +2441,7 @@ MACHINE_RESET_MEMBER(x1_state,x1)
 
 	m_io_bank_mode = 0;
 
-	//machine().device("x1_cpu")->execute().set_irq_acknowledge_callback(x1_irq_callback);
+	//machine().device("x1_cpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(x1_state::x1_irq_callback),this));
 
 	m_cmt_current_cmd = 0;
 	m_cmt_test = 0;

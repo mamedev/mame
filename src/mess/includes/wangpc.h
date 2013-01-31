@@ -165,6 +165,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( bus_irq2_w );
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	
+	IRQ_CALLBACK_MEMBER(wangpc_irq_callback);
 
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);

@@ -345,39 +345,38 @@ WRITE16_MEMBER( compis_state::compis_usart_w )
  *  80186 interrupt controller
  *
  *************************************/
-static IRQ_CALLBACK(int_callback)
+IRQ_CALLBACK_MEMBER(compis_state::int_callback)
 {
-	compis_state *state = device->machine().driver_data<compis_state>();
 	if (LOG_INTERRUPTS)
-		logerror("(%f) **** Acknowledged interrupt vector %02X\n", device->machine().time().as_double(), state->m_i186.intr.poll_status & 0x1f);
+		logerror("(%f) **** Acknowledged interrupt vector %02X\n", machine().time().as_double(), m_i186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
-	device->execute().set_input_line(0, CLEAR_LINE);
-	state->m_i186.intr.pending = 0;
+	device.execute().set_input_line(0, CLEAR_LINE);
+	m_i186.intr.pending = 0;
 
 	/* clear the request and set the in-service bit */
 #if LATCH_INTS
-	state->m_i186.intr.request &= ~state->m_i186.intr.ack_mask;
+	m_i186.intr.request &= ~m_i186.intr.ack_mask;
 #else
-	state->m_i186.intr.request &= ~(state->m_i186.intr.ack_mask & 0x0f);
+	m_i186.intr.request &= ~(m_i186.intr.ack_mask & 0x0f);
 #endif
-	state->m_i186.intr.in_service |= state->m_i186.intr.ack_mask;
-	if (state->m_i186.intr.ack_mask == 0x0001)
+	m_i186.intr.in_service |= m_i186.intr.ack_mask;
+	if (m_i186.intr.ack_mask == 0x0001)
 	{
-		switch (state->m_i186.intr.poll_status & 0x1f)
+		switch (m_i186.intr.poll_status & 0x1f)
 		{
-			case 0x08:  state->m_i186.intr.status &= ~0x01; break;
-			case 0x12:  state->m_i186.intr.status &= ~0x02; break;
-			case 0x13:  state->m_i186.intr.status &= ~0x04; break;
+			case 0x08:  m_i186.intr.status &= ~0x01; break;
+			case 0x12:  m_i186.intr.status &= ~0x02; break;
+			case 0x13:  m_i186.intr.status &= ~0x04; break;
 		}
 	}
-	state->m_i186.intr.ack_mask = 0;
+	m_i186.intr.ack_mask = 0;
 
 	/* a request no longer pending */
-	state->m_i186.intr.poll_status &= ~0x8000;
+	m_i186.intr.poll_status &= ~0x8000;
 
 	/* return the vector */
-	return state->m_i186.intr.poll_status & 0x1f;
+	return m_i186.intr.poll_status & 0x1f;
 }
 
 
@@ -819,7 +818,7 @@ READ16_MEMBER( compis_state::compis_i186_internal_port_r )
 		case 0x12:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", m_maincpu->pc());
 			if (m_i186.intr.poll_status & 0x8000)
-				int_callback(machine().device("maincpu"), 0);
+				int_callback(*machine().device("maincpu"), 0);
 			return m_i186.intr.poll_status;
 
 		case 0x13:
@@ -1152,7 +1151,7 @@ WRITE16_MEMBER( compis_state::compis_i186_internal_port_w )
 			/* we need to do this at a time when the I86 context is swapped in */
 			/* this register is generally set once at startup and never again, so it's a good */
 			/* time to set it up */
-			m_maincpu->set_irq_acknowledge_callback(int_callback);
+			m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(compis_state::int_callback),this));
 			break;
 
 		case 0x60:
@@ -1293,16 +1292,15 @@ const struct pic8259_interface compis_pic8259_slave_config =
 };
 
 
-static IRQ_CALLBACK( compis_irq_callback )
+IRQ_CALLBACK_MEMBER(compis_state::compis_irq_callback)
 {
-	compis_state *state = device->machine().driver_data<compis_state>();
-	return pic8259_acknowledge(state->m_8259m);
+	return pic8259_acknowledge(m_8259m);
 }
 
 
 DRIVER_INIT_MEMBER(compis_state,compis)
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(compis_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(compis_state::compis_irq_callback),this));
 	memset (&m_compis, 0, sizeof (m_compis) );
 }
 
@@ -1324,7 +1322,7 @@ void compis_state::machine_reset()
 	compis_keyb_init(this);
 
 	/* OSP PIC 8259 */
-	m_maincpu->set_irq_acknowledge_callback(compis_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(compis_state::compis_irq_callback),this));
 }
 
 /*-------------------------------------------------------------------------*/

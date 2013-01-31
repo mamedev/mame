@@ -467,4 +467,5 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_msg_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_scsi_req_w);
 	void nimbus_scsi_linechange( UINT8 mask, UINT8 state );
+	IRQ_CALLBACK_MEMBER(int_callback);
 };

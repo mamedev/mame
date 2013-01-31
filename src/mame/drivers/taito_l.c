@@ -290,16 +290,15 @@ MACHINE_RESET_MEMBER(taitol_state,horshoes)
 }
 
 
-static IRQ_CALLBACK( irq_callback )
+IRQ_CALLBACK_MEMBER(taitol_state::irq_callback)
 {
-	taitol_state *state = device->machine().driver_data<taitol_state>();
-	return state->m_irq_adr_table[state->m_last_irq_level];
+	return m_irq_adr_table[m_last_irq_level];
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(taitol_state::vbl_interrupt)
 {
 	int scanline = param;
-	m_maincpu->set_irq_acknowledge_callback(irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(taitol_state::irq_callback),this));
 
 	/* kludge to make plgirls boot */
 	if (m_maincpu->state_int(Z80_IM) != 2)

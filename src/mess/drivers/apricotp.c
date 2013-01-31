@@ -416,11 +416,9 @@ static APRICOT_KEYBOARD_INTERFACE( kb_intf )
 //  pic8259_interface pic_intf
 //-------------------------------------------------
 
-static IRQ_CALLBACK( fp_irq_callback )
+ IRQ_CALLBACK_MEMBER(fp_state::fp_irq_callback)
 {
-	fp_state *state = device->machine().driver_data<fp_state>();
-
-	return pic8259_acknowledge(state->m_pic);
+	return pic8259_acknowledge(m_pic);
 }
 
 /*
@@ -588,7 +586,7 @@ void fp_state::machine_start()
 	m_fdc->setup_drq_cb(wd_fdc_t::line_cb(FUNC(fp_state::fdc_drq_w), this));
 
 	// register CPU IRQ callback
-	m_maincpu->set_irq_acknowledge_callback(fp_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fp_state::fp_irq_callback),this));
 
 	// allocate memory
 	m_work_ram.allocate(m_ram->size() / 2);

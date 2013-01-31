@@ -184,6 +184,7 @@ public:
 	DECLARE_WRITE8_MEMBER(m6502_ppi_pc_w);
 	DECLARE_WRITE8_MEMBER(misc_ppi_pb_w);
 	DECLARE_READ8_MEMBER(misc_ppi_pc_r);
+	IRQ_CALLBACK_MEMBER(v1050_int_ack);
 };
 
 //----------- defined in video/v1050.c -----------

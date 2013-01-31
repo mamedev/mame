@@ -83,6 +83,7 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	UINT32 screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 #if !ENABLE_VGA
@@ -532,15 +533,14 @@ static INPUT_PORTS_START(taitowlf)
 INPUT_PORTS_END
 #endif
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(taitowlf_state::irq_callback)
 {
-	taitowlf_state *state = device->machine().driver_data<taitowlf_state>();
-	return pic8259_acknowledge( state->m_pic8259_1);
+	return pic8259_acknowledge(m_pic8259_1);
 }
 
 void taitowlf_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(taitowlf_state::irq_callback),this));
 
 	m_pit8254 = machine().device( "pit8254" );
 	m_pic8259_1 = machine().device( "pic8259_1" );

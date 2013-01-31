@@ -33,6 +33,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_multi16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	IRQ_CALLBACK_MEMBER(multi16_irq_callback);
 };
 
 
@@ -116,9 +117,9 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( multi16 )
 INPUT_PORTS_END
 
-static IRQ_CALLBACK(multi16_irq_callback)
+IRQ_CALLBACK_MEMBER(multi16_state::multi16_irq_callback)
 {
-	return pic8259_acknowledge( device->machine().device("pic8259") );
+	return pic8259_acknowledge( machine().device("pic8259") );
 }
 
 WRITE_LINE_MEMBER( multi16_state::multi16_set_int_line )
@@ -136,7 +137,7 @@ static const struct pic8259_interface multi16_pic8259_config =
 
 void multi16_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(multi16_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(multi16_state::multi16_irq_callback),this));
 }
 
 

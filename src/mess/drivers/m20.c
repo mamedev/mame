@@ -108,6 +108,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void fdc_intrq_w(bool state);
+	IRQ_CALLBACK_MEMBER(m20_irq_callback);
 };
 
 
@@ -798,12 +799,12 @@ DRIVER_INIT_MEMBER(m20_state,m20)
 {
 }
 
-static IRQ_CALLBACK( m20_irq_callback )
+IRQ_CALLBACK_MEMBER(m20_state::m20_irq_callback)
 {
 	if (! irqline)
 		return 0xff; // NVI, value ignored
 	else
-		return pic8259_acknowledge(device->machine().device("i8259"));
+		return pic8259_acknowledge(machine().device("i8259"));
 }
 
 void m20_state::machine_start()
@@ -823,7 +824,7 @@ void m20_state::machine_reset()
 	else
 		m_port21 = 0xff;
 
-	m_maincpu->set_irq_acknowledge_callback(m20_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(m20_state::m20_irq_callback),this));
 
 	m_fd1797->reset();
 

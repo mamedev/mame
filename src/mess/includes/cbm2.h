@@ -206,6 +206,8 @@ public:
 	DECLARE_READ8_MEMBER( ext_cia_pb_r );
 	DECLARE_WRITE8_MEMBER( ext_cia_pb_w );
 
+	IRQ_CALLBACK_MEMBER(pic_irq_callback);
+
 	// memory state
 	int m_dramon;
 	int m_busen1;

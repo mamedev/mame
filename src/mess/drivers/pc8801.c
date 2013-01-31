@@ -483,6 +483,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pic_enlg_w);
 	DECLARE_READ8_MEMBER(opn_porta_r);
 	DECLARE_READ8_MEMBER(opn_portb_r);
+	IRQ_CALLBACK_MEMBER(pc8801_irq_callback);
 };
 
 
@@ -2308,12 +2309,11 @@ static I8214_INTERFACE( pic_intf )
 	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,pic_enlg_w)
 };
 
-static IRQ_CALLBACK( pc8801_irq_callback )
+IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
 {
-	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	UINT8 vector = (7 - state->m_pic->a_r());
+	UINT8 vector = (7 - m_pic->a_r());
 
-	state->m_int_state &= ~(1<<vector);
+	m_int_state &= ~(1<<vector);
 	m_maincpu->set_input_line(0,CLEAR_LINE);
 
 	return vector << 1;
@@ -2344,27 +2344,26 @@ INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 
 #include "debugger.h"
 
-static IRQ_CALLBACK( pc8801_irq_callback )
+IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
 {
-	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	if(state->m_sound_irq_latch)
+	if(m_sound_irq_latch)
 	{
-		state->m_sound_irq_latch = 0;
+		m_sound_irq_latch = 0;
 		return 4*2;
 	}
-	else if(state->m_vrtc_irq_latch)
+	else if(m_vrtc_irq_latch)
 	{
-		state->m_vrtc_irq_latch = 0;
+		m_vrtc_irq_latch = 0;
 		return 1*2;
 	}
-	else if(state->m_timer_irq_latch)
+	else if(m_timer_irq_latch)
 	{
-		state->m_timer_irq_latch = 0;
+		m_timer_irq_latch = 0;
 		return 2*2;
 	}
 
-	printf("IRQ triggered but no vector on the bus! %02x %02x %02x %02x\n",state->m_i8214_irq_level,state->m_sound_irq_latch,state->m_vrtc_irq_latch,state->m_timer_irq_latch);
-	debugger_break(device->machine());
+	printf("IRQ triggered but no vector on the bus! %02x %02x %02x %02x\n",m_i8214_irq_level,m_sound_irq_latch,m_vrtc_irq_latch,m_timer_irq_latch);
+	debugger_break(machine());
 
 	return 4*2; //TODO: mustn't happen
 }
@@ -2412,7 +2411,7 @@ INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 
 void pc8801_state::machine_start()
 {
-	m_maincpu->set_irq_acknowledge_callback(pc8801_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc8801_state::pc8801_irq_callback),this));
 	machine().device<upd765a_device>("upd765")->setup_intrq_cb(upd765a_device::line_cb(FUNC(pc8801_state::fdc_irq_w), this));
 
 	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(300);

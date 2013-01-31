@@ -1725,11 +1725,9 @@ static IEEE488_INTERFACE( ieee488_intf )
 //  pic8259_interface ext_pic_intf
 //-------------------------------------------------
 
-static IRQ_CALLBACK( pic_irq_callback )
+IRQ_CALLBACK_MEMBER(cbm2_state::pic_irq_callback)
 {
-	cbm2_state *state = device->machine().driver_data<cbm2_state>();
-
-	return pic8259_acknowledge(state->m_ext_pic);
+	return pic8259_acknowledge(m_ext_pic);
 }
 
 static pic8259_interface ext_pic_intf =
@@ -2002,7 +2000,7 @@ MACHINE_START_MEMBER( cbm2_state, cbm2_pal )
 MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
 {
 	// register CPU IRQ callback
-	m_ext_cpu->set_irq_acknowledge_callback(pic_irq_callback);
+	m_ext_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cbm2_state::pic_irq_callback),this));
 
 	// allocate memory
 	m_extbuf_ram.allocate(0x800);
@@ -2018,7 +2016,7 @@ MACHINE_START_MEMBER( cbm2_state, cbm2x_ntsc )
 MACHINE_START_MEMBER( cbm2_state, cbm2x_pal )
 {
 	// register CPU IRQ callback
-	m_ext_cpu->set_irq_acknowledge_callback(pic_irq_callback);
+	m_ext_cpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cbm2_state::pic_irq_callback),this));
 
 	// allocate memory
 	m_extbuf_ram.allocate(0x800);

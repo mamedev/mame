@@ -121,6 +121,8 @@ public:
 
 	DECLARE_READ8_MEMBER(megadriv_68k_YM2612_read);
 	DECLARE_WRITE8_MEMBER(megadriv_68k_YM2612_write);
+	IRQ_CALLBACK_MEMBER(genesis_int_callback);
+	void megadriv_init_common();
 };
 
 class md_boot_state : public md_base_state

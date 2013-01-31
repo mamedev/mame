@@ -982,15 +982,13 @@ LEGACY_FLOPPY_OPTIONS_END
 
 // Machine Initialization
 
-static IRQ_CALLBACK( v1050_int_ack )
+IRQ_CALLBACK_MEMBER(v1050_state::v1050_int_ack)
 {
-	v1050_state *state = device->machine().driver_data<v1050_state>();
-
-	UINT8 vector = 0xf0 | (state->m_pic->a_r() << 1);
+	UINT8 vector = 0xf0 | (m_pic->a_r() << 1);
 
 	//logerror("Interrupt Acknowledge Vector: %02x\n", vector);
 
-	state->m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
 	return vector;
 }
@@ -1011,7 +1009,7 @@ void v1050_state::machine_start()
 	m_rtc->cs1_w(1);
 
 	// set CPU interrupt callback
-	m_maincpu->set_irq_acknowledge_callback(v1050_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(v1050_state::v1050_int_ack),this));
 
 	// setup memory banking
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();

@@ -70,16 +70,15 @@ void bk_state::machine_start()
 	machine().scheduler().timer_pulse(attotime::from_hz(2400), timer_expired_delegate(FUNC(bk_state::keyboard_callback),this));
 }
 
-static IRQ_CALLBACK(bk0010_irq_callback)
+IRQ_CALLBACK_MEMBER(bk_state::bk0010_irq_callback)
 {
-	bk_state *state = device->machine().driver_data<bk_state>();
-	device->execute().set_input_line(0, CLEAR_LINE);
-	return state->m_key_irq_vector;
+	device.execute().set_input_line(0, CLEAR_LINE);
+	return m_key_irq_vector;
 }
 
 void bk_state::machine_reset()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(bk0010_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(bk_state::bk0010_irq_callback),this));
 
 	m_kbd_state = 0;
 	m_scrool = 01330;
