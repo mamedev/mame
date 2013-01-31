@@ -141,22 +141,7 @@ public:
 		//m_i8251_rx_timer(NULL),
 		//m_i8251_tx_timer(NULL),
 		//m_sync_timer(NULL),
-		m_col0(*this, "COL0"),
-		m_col1(*this, "COL1"),
-		m_col2(*this, "COL2"),
-		m_col3(*this, "COL3"),
-		m_col4(*this, "COL4"),
-		m_col5(*this, "COL5"),
-		m_col6(*this, "COL6"),
-		m_col7(*this, "COL7"),
-		m_col8(*this, "COL8"),
-		m_col9(*this, "COL9"),
-		m_cola(*this, "COLA"),
-		m_colb(*this, "COLB"),
-		m_colc(*this, "COLC"),
-		m_cold(*this, "COLD"),
-		m_cole(*this, "COLE"),
-		m_colf(*this, "COLF"),
+
 		m_capsshift(*this, "CAPSSHIFT"),
 		m_dipsw(*this, "SWITCHES")
 		{ }
@@ -168,22 +153,7 @@ public:
 	//required_device<> m_i8251_rx_timer;
 	//required_device<> m_i8251_tx_timer;
 	//required_device<> m_sync_timer;
-	required_ioport m_col0;
-	required_ioport m_col1;
-	required_ioport m_col2;
-	required_ioport m_col3;
-	required_ioport m_col4;
-	required_ioport m_col5;
-	required_ioport m_col6;
-	required_ioport m_col7;
-	required_ioport m_col8;
-	required_ioport m_col9;
-	required_ioport m_cola;
-	required_ioport m_colb;
-	required_ioport m_colc;
-	required_ioport m_cold;
-	required_ioport m_cole;
-	required_ioport m_colf;
+
 	required_ioport m_capsshift;
 	required_ioport m_dipsw;
 
@@ -909,24 +879,13 @@ void vk100_state::machine_reset()
 	m_ACTS = 1;
 	m_RXDivisor = 6336;
 	m_TXDivisor = 6336;
-	//m_col_array[0] = { m_col0, m_col1, m_col2, m_col3, m_col4, m_col5, m_col6, m_col7,
-	//				m_col8, m_col9, m_cola, m_colb, m_colc, m_cold, m_cole, m_colf };
-	m_col_array[0] = m_col0;
-	m_col_array[1] = m_col1;
-	m_col_array[2] = m_col2;
-	m_col_array[3] = m_col3;
-	m_col_array[4] = m_col4;
-	m_col_array[5] = m_col5;
-	m_col_array[6] = m_col6;
-	m_col_array[7] = m_col7;
-	m_col_array[8] = m_col8;
-	m_col_array[9] = m_col9;
-	m_col_array[10] = m_cola;
-	m_col_array[11] = m_colb;
-	m_col_array[12] = m_colc;
-	m_col_array[13] = m_cold;
-	m_col_array[14] = m_cole;
-	m_col_array[15] = m_colf;
+	char kbdcol[8];
+	// look up all 16 tags 'the slow way' but only once on reset
+	for (int i = 0; i < 16; i++)
+	{
+		sprintf(kbdcol,"COL%X", i);
+		m_col_array[i] = ioport(kbdcol);
+	}
 }
 
 WRITE_LINE_MEMBER(vk100_state::crtc_vsync)
