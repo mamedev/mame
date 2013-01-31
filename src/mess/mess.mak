@@ -824,6 +824,7 @@ $(MESSOBJ)/casio.a:             \
 	$(MESS_VIDEO)/hd44352.o     \
 
 $(MESSOBJ)/cbm.a:               \
+	$(MESS_DRIVERS)/pet2001.o   \
 	$(MESS_VIDEO)/pet.o         \
 	$(MESS_DRIVERS)/pet.o       \
 	$(MESS_MACHINE)/pet.o       \

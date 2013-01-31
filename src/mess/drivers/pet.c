@@ -730,7 +730,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( petb, pet )
 	MCFG_PIA6821_MODIFY( "pia_0", petb_pia0 )
 MACHINE_CONFIG_END
-
+#if 0
 static MACHINE_CONFIG_DERIVED( pet2001, pet_general )
 	MCFG_QUICKLOAD_ADD("quickload", cbm_pet1, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_FRAGMENT_ADD(pet_cartslot)
@@ -743,7 +743,7 @@ static MACHINE_CONFIG_DERIVED( pet2001, pet_general )
 	/* IEEE bus */
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c4040")
 MACHINE_CONFIG_END
-
+#endif
 
 static MACHINE_CONFIG_DERIVED( pet40, pet )
 	MCFG_CPU_MODIFY( "maincpu" )
@@ -1162,9 +1162,6 @@ ROM_END
 
 /* YEAR    NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                             FULLNAME */
 
-COMP(1977, pet2001,  0,        0,        pet2001,  pet, pet_state,      pet2001, "Commodore Business Machines",  "PET 2001", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP(1979, pet2001n, pet2001,  0,        pet,      pet, pet_state,      pet,     "Commodore Business Machines",  "PET 2001-N", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP(1979, pet2001b, pet2001,  0,        petb,     petb, pet_state,     pet,     "Commodore Business Machines",  "PET 2001-B", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP(1979, cbm30,    pet2001,  0,        pet,      pet, pet_state,      pet,     "Commodore Business Machines",  "CBM 30xx", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP(1979, cbm30b,   pet2001,  0,        petb,     petb, pet_state,     pet,     "Commodore Business Machines",  "CBM 30xx (Business keyboard)", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP(1979, cbm30nor, pet2001,  0,        petb,     petb, pet_state,     pet,     "Commodore Business Machines",  "CBM 30xx (Norway, Business keyboard)", GAME_NOT_WORKING | GAME_NO_SOUND)
