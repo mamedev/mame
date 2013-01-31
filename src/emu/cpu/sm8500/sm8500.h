@@ -79,8 +79,8 @@ protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
 
 	inline void get_sp();
-	inline UINT8 mem_readbyte(UINT32 offset);
-	inline void mem_writebyte(UINT32 offset, UINT8 data);
+	UINT8 mem_readbyte(UINT32 offset);
+	void mem_writebyte(UINT32 offset, UINT8 data);
 	inline UINT16 mem_readword(UINT32 address) { return (mem_readbyte(address ) << 8) | (mem_readbyte(address+1)); }
 	inline void mem_writeword(UINT32 address, UINT16 value) { mem_writebyte(address, value >> 8); mem_writebyte(address+1, value); }
 	inline void take_interrupt(UINT16 vector);
