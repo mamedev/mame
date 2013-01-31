@@ -52,6 +52,7 @@ public:
 	UINT32 screen_update_boxer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pot_interrupt);
 	TIMER_CALLBACK_MEMBER(periodic_callback);
+	void draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 /*************************************
@@ -123,22 +124,21 @@ void boxer_state::palette_init()
 	palette_set_color(machine(),3, MAKE_RGB(0x00,0x00,0x00));
 }
 
-static void draw_boxer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void boxer_state::draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	boxer_state *state = machine.driver_data<boxer_state>();
 	int n;
 
 	for (n = 0; n < 2; n++)
 	{
-		const UINT8* p = state->memregion(n == 0 ? "user1" : "user2")->base();
+		const UINT8* p = memregion(n == 0 ? "user1" : "user2")->base();
 
 		int i, j;
 
-		int x = 196 - state->m_sprite_ram[0 + 2 * n];
-		int y = 192 - state->m_sprite_ram[1 + 2 * n];
+		int x = 196 - m_sprite_ram[0 + 2 * n];
+		int y = 192 - m_sprite_ram[1 + 2 * n];
 
-		int l = state->m_sprite_ram[4 + 2 * n] & 15;
-		int r = state->m_sprite_ram[5 + 2 * n] & 15;
+		int l = m_sprite_ram[4 + 2 * n] & 15;
+		int r = m_sprite_ram[5 + 2 * n] & 15;
 
 		for (i = 0; i < 8; i++)
 		{
@@ -149,7 +149,7 @@ static void draw_boxer( running_machine &machine, bitmap_ind16 &bitmap, const re
 				code = p[32 * l + 4 * i + j];
 
 				drawgfx_transpen(bitmap, cliprect,
-					machine.gfx[n],
+					machine().gfx[n],
 					code,
 					0,
 					code & 0x80, 0,
@@ -159,7 +159,7 @@ static void draw_boxer( running_machine &machine, bitmap_ind16 &bitmap, const re
 				code = p[32 * r + 4 * i - j + 3];
 
 				drawgfx_transpen(bitmap, cliprect,
-					machine.gfx[n],
+					machine().gfx[n],
 					code,
 					0,
 					!(code & 0x80), 0,
@@ -193,7 +193,7 @@ UINT32 boxer_state::screen_update_boxer(screen_device &screen, bitmap_ind16 &bit
 		}
 	}
 
-	draw_boxer(machine(), bitmap, cliprect);
+	draw_boxer(bitmap, cliprect);
 	return 0;
 }
 

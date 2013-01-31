@@ -79,6 +79,8 @@ public:
 	DECLARE_DRIVER_INIT(airh);
 	DECLARE_DRIVER_INIT(ldrba);
 	DECLARE_DRIVER_INIT(socc);
+	void arcadia_init();
+	inline void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0);
 };
 
 
@@ -764,9 +766,9 @@ ROM_END
  *
  *************************************/
 
-INLINE void generic_decode(running_machine &machine, const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
+void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
 {
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion(tag)->base();
+	UINT16 *rom = (UINT16 *)machine().root_device().memregion(tag)->base();
 	int i;
 
 	/* only the low byte of ROMs are encrypted in these games */
@@ -775,12 +777,12 @@ INLINE void generic_decode(running_machine &machine, const char *tag, int bit7, 
 
 	#if 0
 	{
-		UINT8 *ROM = machine.root_device().memregion(tag)->base();
-		int size = machine.root_device().memregion(tag)->bytes();
+		UINT8 *ROM = machine().root_device().memregion(tag)->base();
+		int size = machine().root_device().memregion(tag)->bytes();
 
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"decrypted_%s", machine.system().name);
+		sprintf(filename,"decrypted_%s", machine().system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
@@ -799,9 +801,8 @@ INLINE void generic_decode(running_machine &machine, const char *tag, int bit7, 
  *
  *************************************/
 
-static void arcadia_init(running_machine &machine)
+void arcadia_amiga_state::arcadia_init()
 {
-	arcadia_amiga_state *state = machine.driver_data<arcadia_amiga_state>();
 	static const amiga_machine_interface arcadia_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
@@ -814,16 +815,16 @@ static void arcadia_init(running_machine &machine)
 	UINT16 *biosrom;
 
 	/* configure our Amiga setup */
-	amiga_machine_config(machine, &arcadia_intf);
+	amiga_machine_config(machine(), &arcadia_intf);
 
 	/* set up memory */
-	state->m_bank1->configure_entry(0, state->m_chip_ram);
-	state->m_bank1->configure_entry(1, machine.root_device().memregion("user1")->base());
+	m_bank1->configure_entry(0, m_chip_ram);
+	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
 
 	/* OnePlay bios is encrypted, TenPlay is not */
-	biosrom = (UINT16 *)machine.root_device().memregion("user2")->base();
+	biosrom = (UINT16 *)machine().root_device().memregion("user2")->base();
 	if (biosrom[0] != 0x4afc)
-		generic_decode(machine, "user2", 6, 1, 0, 2, 3, 4, 5, 7);
+		generic_decode("user2", 6, 1, 0, 2, 3, 4, 5, 7);
 }
 
 
@@ -834,17 +835,17 @@ static void arcadia_init(running_machine &machine)
  *
  *************************************/
 
-DRIVER_INIT_MEMBER(arcadia_amiga_state,none)   { arcadia_init(machine()); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,airh)   { arcadia_init(machine()); generic_decode(machine(), "user3", 5, 0, 2, 4, 7, 6, 1, 3); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,bowl)   { arcadia_init(machine()); generic_decode(machine(), "user3", 7, 6, 0, 1, 2, 3, 4, 5); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,dart)   { arcadia_init(machine()); generic_decode(machine(), "user3", 4, 0, 7, 6, 3, 1, 2, 5); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,ldrba)  { arcadia_init(machine()); generic_decode(machine(), "user3", 2, 3, 4, 1, 0, 7, 5, 6); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,ninj)   { arcadia_init(machine()); generic_decode(machine(), "user3", 1, 6, 5, 7, 4, 2, 0, 3); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,rdwr)   { arcadia_init(machine()); generic_decode(machine(), "user3", 3, 1, 6, 4, 0, 5, 2, 7); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,sdwr)   { arcadia_init(machine()); generic_decode(machine(), "user3", 6, 3, 4, 5, 2, 1, 0, 7); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,socc)   { arcadia_init(machine()); generic_decode(machine(), "user3", 0, 7, 1, 6, 5, 4, 3, 2); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,sprg)   { arcadia_init(machine()); generic_decode(machine(), "user3", 4, 7, 3, 0, 6, 5, 2, 1); }
-DRIVER_INIT_MEMBER(arcadia_amiga_state,xeon)   { arcadia_init(machine()); generic_decode(machine(), "user3", 3, 1, 2, 4, 0, 5, 6, 7); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,none)   { arcadia_init(); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,airh)   { arcadia_init(); generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,bowl)   { arcadia_init(); generic_decode("user3", 7, 6, 0, 1, 2, 3, 4, 5); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,dart)   { arcadia_init(); generic_decode("user3", 4, 0, 7, 6, 3, 1, 2, 5); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,ldrba)  { arcadia_init(); generic_decode("user3", 2, 3, 4, 1, 0, 7, 5, 6); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,ninj)   { arcadia_init(); generic_decode("user3", 1, 6, 5, 7, 4, 2, 0, 3); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,rdwr)   { arcadia_init(); generic_decode("user3", 3, 1, 6, 4, 0, 5, 2, 7); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,sdwr)   { arcadia_init(); generic_decode("user3", 6, 3, 4, 5, 2, 1, 0, 7); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,socc)   { arcadia_init(); generic_decode("user3", 0, 7, 1, 6, 5, 4, 3, 2); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,sprg)   { arcadia_init(); generic_decode("user3", 4, 7, 3, 0, 6, 5, 2, 1); }
+DRIVER_INIT_MEMBER(arcadia_amiga_state,xeon)   { arcadia_init(); generic_decode("user3", 3, 1, 2, 4, 0, 5, 6, 7); }
 
 /*************************************
  *

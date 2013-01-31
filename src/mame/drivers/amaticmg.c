@@ -455,6 +455,8 @@ public:
 	UINT32 screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(amaticmg2_irq);
+	void encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddress);
+	void decrypt(int key1, int key2);
 };
 
 
@@ -1060,7 +1062,7 @@ ROM_END
 *       Driver Initialization       *
 ************************************/
 
-static void encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddress)
+void amaticmg_state::encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddress)
 {
 	int aux = address & 0xfff;
 	aux = aux ^ (aux>>6);
@@ -1074,14 +1076,14 @@ static void encf(UINT8 ciphertext, int address, UINT8 &plaintext, int &newaddres
 	newaddress = (address & ~0xfff) | aux;
 }
 
-static void decrypt(running_machine &machine, int key1, int key2)
+void amaticmg_state::decrypt(int key1, int key2)
 {
 	UINT8 plaintext;
 	int newaddress;
 
-	UINT8 *src = machine.root_device().memregion("mainprg")->base();
-	UINT8 *dest = machine.root_device().memregion("maincpu")->base();
-	int len = machine.root_device().memregion("mainprg")->bytes();
+	UINT8 *src = machine().root_device().memregion("mainprg")->base();
+	UINT8 *dest = machine().root_device().memregion("maincpu")->base();
+	int len = machine().root_device().memregion("mainprg")->bytes();
 
 	for (int i = 0; i < len; i++)
 	{
@@ -1092,22 +1094,22 @@ static void decrypt(running_machine &machine, int key1, int key2)
 
 DRIVER_INIT_MEMBER(amaticmg_state,ama8000_1_x)
 {
-	decrypt(machine(), 0x4d1, 0xf5);
+	decrypt(0x4d1, 0xf5);
 }
 
 DRIVER_INIT_MEMBER(amaticmg_state,ama8000_2_i)
 {
-	decrypt(machine(), 0x436, 0x55);
+	decrypt(0x436, 0x55);
 }
 
 DRIVER_INIT_MEMBER(amaticmg_state,ama8000_2_v)
 {
-	decrypt(machine(), 0x703, 0xaf);
+	decrypt(0x703, 0xaf);
 }
 
 DRIVER_INIT_MEMBER(amaticmg_state,ama8000_3_o)
 {
-	decrypt(machine(), 0x56e, 0xa7);
+	decrypt(0x56e, 0xa7);
 }
 
 

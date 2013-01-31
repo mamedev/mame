@@ -60,9 +60,6 @@ Notes:
 #include "cpu/sh4/sh4.h"
 #include "debugger.h"
 
-memory_region *nandregion;
-int nandcommand[4], nandoffset[4], nandaddressstep, nandaddress[4];
-UINT32 area1_data[4];
 
 //#define SPECIALMODE 1 // Alternate code path
 
@@ -86,9 +83,16 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	inline UINT32 decode64_32(offs_t offset64, UINT64 data, UINT64 mem_mask, offs_t &offset32);
+	void logbinary(UINT32 data,int high,int low);
+	
+	memory_region *m_nandregion;
+	int m_nandcommand[4], m_nandoffset[4], m_nandaddressstep, m_nandaddress[4];
+	UINT32 m_area1_data[4];
+	
 };
 
-static void logbinary(UINT32 data,int high=31,int low=0)
+void atvtrack_state::logbinary(UINT32 data,int high=31,int low=0)
 {
 	UINT32 s;
 	int z;
@@ -103,7 +107,7 @@ static void logbinary(UINT32 data,int high=31,int low=0)
 	}
 }
 
-static inline UINT32 decode64_32(offs_t offset64, UINT64 data, UINT64 mem_mask, offs_t &offset32)
+inline UINT32 atvtrack_state::decode64_32(offs_t offset64, UINT64 data, UINT64 mem_mask, offs_t &offset32)
 {
 	if (ACCESSING_BITS_0_31) {
 		offset32 = offset64 << 1;
@@ -137,8 +141,8 @@ WRITE64_MEMBER(atvtrack_state::area1_w)
 
 	addr = 0;
 	dat = decode64_32(offset, data, mem_mask, addr);
-//  old = area1_data[addr];
-	area1_data[addr] = dat;
+//  old = m_area1_data[addr];
+	m_area1_data[addr] = dat;
 	if (addr == (0x00020000-0x00020000)/4) {
 		if (data & 4) {
 			device_execute_interface *exec = dynamic_cast<device_execute_interface *>(machine().device("subcpu"));
@@ -160,10 +164,10 @@ READ64_MEMBER(atvtrack_state::area2_r)
 	if (addr == 0) {
 		dat = 0;
 		for (c = 3;c >= 0;c--) {
-			if (nandcommand[c] <= 0x50) {
-				addr = nandaddress[c]+nandoffset[c];
-				dat = (dat << 8) | nandregion->u8(addr+c);
-				nandoffset[c] += 4;
+			if (m_nandcommand[c] <= 0x50) {
+				addr = m_nandaddress[c]+m_nandoffset[c];
+				dat = (dat << 8) | m_nandregion->u8(addr+c);
+				m_nandoffset[c] += 4;
 			} else
 				dat = (dat << 8) | 0xc0;
 		}
@@ -207,26 +211,26 @@ WRITE64_MEMBER(atvtrack_state::area3_w)
 //  dat = decode64_32(offset, data, mem_mask, addr);
 	if (addr == 0) {
 		for (c = 0;c < 4;c++) {
-			nandcommand[c] = data & 0xff;
-			if (nandcommand[c] == 0x00) {
-				nandoffset[c] = 0;
-			} else if (nandcommand[c] == 0x01) {
-				nandoffset[c] = 256*4;
-			} else if (nandcommand[c] == 0x50) {
-				nandoffset[c] = 512*4;
-			} else if (nandcommand[c] == 0x90) {
-			} else if (nandcommand[c] == 0xff) {
-			} else if (nandcommand[c] == 0x80) {
-			} else if (nandcommand[c] == 0x60) {
-			} else if (nandcommand[c] == 0x70) {
-			} else if (nandcommand[c] == 0x10) {
-			} else if (nandcommand[c] == 0xd0) {
+			m_nandcommand[c] = data & 0xff;
+			if (m_nandcommand[c] == 0x00) {
+				m_nandoffset[c] = 0;
+			} else if (m_nandcommand[c] == 0x01) {
+				m_nandoffset[c] = 256*4;
+			} else if (m_nandcommand[c] == 0x50) {
+				m_nandoffset[c] = 512*4;
+			} else if (m_nandcommand[c] == 0x90) {
+			} else if (m_nandcommand[c] == 0xff) {
+			} else if (m_nandcommand[c] == 0x80) {
+			} else if (m_nandcommand[c] == 0x60) {
+			} else if (m_nandcommand[c] == 0x70) {
+			} else if (m_nandcommand[c] == 0x10) {
+			} else if (m_nandcommand[c] == 0xd0) {
 			} else {
-				nandcommand[c] = 0xff;
+				m_nandcommand[c] = 0xff;
 			}
 			data=data >> 8;
 		}
-		nandaddressstep = 0;
+		m_nandaddressstep = 0;
 	} else
 		;
 }
@@ -253,16 +257,16 @@ WRITE64_MEMBER(atvtrack_state::area4_w)
 //  dat = decode64_32(offset, data, mem_mask, addr);
 	if (addr == 0) {
 		for (c = 0;c < 4;c++) {
-			if (nandaddressstep == 0) {
-				nandaddress[c] = (data & 0xff)*4;
-			} else if (nandaddressstep == 1) {
-				nandaddress[c] = nandaddress[c]+(data & 0xff)*0x840;
-			} else if (nandaddressstep == 2) {
-				nandaddress[c] = nandaddress[c]+(data & 0xff)*0x84000;
+			if (m_nandaddressstep == 0) {
+				m_nandaddress[c] = (data & 0xff)*4;
+			} else if (m_nandaddressstep == 1) {
+				m_nandaddress[c] = m_nandaddress[c]+(data & 0xff)*0x840;
+			} else if (m_nandaddressstep == 2) {
+				m_nandaddress[c] = m_nandaddress[c]+(data & 0xff)*0x84000;
 			}
 			data = data >> 8;
 		}
-		nandaddressstep++;
+		m_nandaddressstep++;
 	} else
 		;
 }
@@ -328,11 +332,11 @@ void atvtrack_state::machine_start()
 {
 	UINT8 *src, *dst;
 
-	nandaddressstep = 0;
-	nandregion = machine().root_device().memregion("maincpu");
+	m_nandaddressstep = 0;
+	m_nandregion = machine().root_device().memregion("maincpu");
 	address_space &as = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	dst = (UINT8 *)(as.get_write_ptr(0x0c7f0000));
-	src = nandregion->base()+0x10;
+	src = m_nandregion->base()+0x10;
 	// copy 0x10000 bytes from region "maincpu" offset 0x10 to 0x0c7f0000
 	memcpy(dst, src, 0x10000);
 }

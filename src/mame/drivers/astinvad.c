@@ -85,6 +85,7 @@ public:
 	UINT32 screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
 	TIMER_CALLBACK_MEMBER(kamizake_int_gen);
+	void plot_byte( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color );
 };
 
 
@@ -154,11 +155,10 @@ WRITE8_MEMBER(astinvad_state::spaceint_videoram_w)
  *
  *************************************/
 
-static void plot_byte( running_machine &machine, bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color )
+void astinvad_state::plot_byte( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color )
 {
-	astinvad_state *state = machine.driver_data<astinvad_state>();
 	pen_t fore_pen = MAKE_RGB(pal1bit(color >> 0), pal1bit(color >> 2), pal1bit(color >> 1));
-	UINT8 flip_xor = state->m_screen_flip & 7;
+	UINT8 flip_xor = m_screen_flip & 7;
 
 	bitmap.pix32(y, x + (0 ^ flip_xor)) = (data & 0x01) ? fore_pen : RGB_BLACK;
 	bitmap.pix32(y, x + (1 ^ flip_xor)) = (data & 0x02) ? fore_pen : RGB_BLACK;
@@ -183,7 +183,7 @@ UINT32 astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rgb3
 		{
 			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (m_screen_flip ? 0 : 4);
 			UINT8 data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
-			plot_byte(machine(), bitmap, y, x, data, m_screen_red ? 1 : color);
+			plot_byte(bitmap, y, x, data, m_screen_red ? 1 : color);
 		}
 
 	return 0;
@@ -216,7 +216,7 @@ UINT32 astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rgb3
 		n = ((offs >> 5) & 0xf0) | color;
 		color = color_prom[n] & 0x07;
 
-		plot_byte(machine(), bitmap, y, x, data, color);
+		plot_byte(bitmap, y, x, data, color);
 	}
 
 	return 0;

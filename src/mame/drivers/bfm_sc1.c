@@ -180,6 +180,7 @@ public:
 	DECLARE_DRIVER_INIT(nocrypt);
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(timer_irq);
+	void sc1_common_init(int reels, int decrypt, int defaultbank);
 };
 
 #define VFD_RESET  0x20
@@ -1152,21 +1153,20 @@ static MACHINE_CONFIG_DERIVED( scorpion1_viper, scorpion1 )
 MACHINE_CONFIG_END
 
 
-static void sc1_common_init(running_machine &machine, int reels, int decrypt, int defaultbank)
+void bfm_sc1_state::sc1_common_init(int reels, int decrypt, int defaultbank)
 {
-	bfm_sc1_state *state = machine.driver_data<bfm_sc1_state>();
 	UINT8 i;
 
-	memset(state->m_sc1_Inputs, 0, sizeof(state->m_sc1_Inputs));
+	memset(m_sc1_Inputs, 0, sizeof(m_sc1_Inputs));
 
 	// setup n default 96 half step reels ///////////////////////////////////////////
 	for ( i = 0; i < reels; i++ )
 	{
-		stepper_config(machine, i, &starpoint_interface_48step);
+		stepper_config(machine(), i, &starpoint_interface_48step);
 	}
-	if (decrypt) bfm_decode_mainrom(machine,"maincpu", state->m_codec_data);    // decode main rom
+	if (decrypt) bfm_decode_mainrom(machine(),"maincpu", m_codec_data);    // decode main rom
 
-	state->m_defaultbank = defaultbank;
+	m_defaultbank = defaultbank;
 
 }
 
@@ -1249,7 +1249,7 @@ int sc1_find_project_string(running_machine &machine )
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,toppoker)
 {
-	sc1_common_init(machine(),3,1, 3);
+	sc1_common_init(3,1, 3);
 	adder2_decode_char_roms(machine()); // decode GFX roms
 	MechMtr_config(machine(),8);
 	sc1_find_project_string(machine());
@@ -1257,14 +1257,14 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,toppoker)
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,lotse)
 {
-	sc1_common_init(machine(),6,1, 3);
+	sc1_common_init(6,1, 3);
 	MechMtr_config(machine(),8);
 	sc1_find_project_string(machine());
 }
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,lotse_bank0)
 {
-	sc1_common_init(machine(),6,1, 0);
+	sc1_common_init(6,1, 0);
 	MechMtr_config(machine(),8);
 	sc1_find_project_string(machine());
 }
@@ -1272,14 +1272,14 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,lotse_bank0)
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt)
 {
-	sc1_common_init(machine(),6,0, 3);
+	sc1_common_init(6,0, 3);
 	MechMtr_config(machine(),8);
 	sc1_find_project_string(machine());
 }
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt_bank0)
 {
-	sc1_common_init(machine(),6,0, 0);
+	sc1_common_init(6,0, 0);
 	MechMtr_config(machine(),8);
 	sc1_find_project_string(machine());
 }
@@ -1289,7 +1289,7 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt_bank0)
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,rou029)
 {
-	sc1_common_init(machine(),6,0, 3);
+	sc1_common_init(6,0, 3);
 	MechMtr_config(machine(),8);
 	sc1_find_project_string(machine());
 }
@@ -1298,7 +1298,7 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,rou029)
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,clatt)
 {
-	sc1_common_init(machine(),6,1, 3);
+	sc1_common_init(6,1, 3);
 	MechMtr_config(machine(),8);
 
 	Scorpion1_SetSwitchState(this,3,2,1);

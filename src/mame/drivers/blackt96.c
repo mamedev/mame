@@ -151,6 +151,8 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg7_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_blackt96(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_strip(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int column);
+	void draw_page(bitmap_ind16 &bitmap, const rectangle &cliprect, int page);
 };
 
 #define GET_INFO( ram ) \
@@ -200,12 +202,11 @@ void blackt96_state::video_start()
 	m_spriteram[7] = m_spriteram7;
 }
 
-static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int column)
+void blackt96_state::draw_strip(bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int column)
 {
-	blackt96_state *state = machine.driver_data<blackt96_state>();
 	/* the very first 'page' in the spriteram contains the x/y positions for each tile strip */
-	gfx_element *gfxbg = machine.gfx[0];
-	gfx_element *gfxspr = machine.gfx[1];
+	gfx_element *gfxbg = machine().gfx[0];
+	gfx_element *gfxspr = machine().gfx[1];
 
 	int base = column * (0x80/2);
 	base += page * 2;
@@ -213,8 +214,8 @@ static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rec
 	/* ---- ---- ---x xxxx
 	   xxxx ---y yyyy yyyy */
 
-	int xx=  ((state->m_spriteram[0][base+0]&0x001f)<<4) | (state->m_spriteram[0][base+1]&0xf000)>>12;
-	int yy = ((state->m_spriteram[0][base+1]&0x1ff));
+	int xx=  ((m_spriteram[0][base+0]&0x001f)<<4) | (m_spriteram[0][base+1]&0xf000)>>12;
+	int yy = ((m_spriteram[0][base+1]&0x1ff));
 
 	if (xx&0x100) xx-=0x200;
 	yy = 0x1ff-yy;
@@ -222,7 +223,7 @@ static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rec
 
 	yy -= 15;
 
-	UINT16* base2 = state->m_spriteram[page]+column * (0x80/2);
+	UINT16* base2 = m_spriteram[page]+column * (0x80/2);
 
 	for (int y=0;y<32;y++)
 	{
@@ -244,11 +245,11 @@ static void draw_strip(running_machine &machine, bitmap_ind16 &bitmap, const rec
 	}
 }
 
-static void draw_page(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int page)
+void blackt96_state::draw_page(bitmap_ind16 &bitmap, const rectangle &cliprect, int page)
 {
 	for (int strip=0;strip<32;strip++)
 	{
-		draw_strip(machine, bitmap, cliprect, page, strip);
+		draw_strip(bitmap, cliprect, page, strip);
 	}
 }
 
@@ -256,9 +257,9 @@ UINT32 blackt96_state::screen_update_blackt96(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	draw_page(machine(), bitmap, cliprect, 2); // bg
-	draw_page(machine(), bitmap, cliprect, 3); // lower pri sprites
-	draw_page(machine(), bitmap, cliprect, 1); // higher pri sprites
+	draw_page(bitmap, cliprect, 2); // bg
+	draw_page(bitmap, cliprect, 3); // lower pri sprites
+	draw_page(bitmap, cliprect, 1); // higher pri sprites
 
 
 	/* Text Layer */

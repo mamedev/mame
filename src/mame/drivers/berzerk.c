@@ -61,6 +61,13 @@ public:
 	UINT32 screen_update_berzerk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(irq_callback);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
+	void vpos_to_vsync_chain_counter(int vpos, UINT8 *counter, UINT8 *v256);
+	int vsync_chain_counter_to_vpos(UINT8 counter, UINT8 v256);
+	void create_irq_timer();
+	void start_irq_timer();
+	void create_nmi_timer();
+	void start_nmi_timer();
+	void get_pens(pen_t *pens);
 };
 
 
@@ -130,7 +137,7 @@ WRITE8_MEMBER(berzerk_state::led_off_w)
  *
  *************************************/
 
-static void vpos_to_vsync_chain_counter(int vpos, UINT8 *counter, UINT8 *v256)
+void berzerk_state::vpos_to_vsync_chain_counter(int vpos, UINT8 *counter, UINT8 *v256)
 {
 	/* convert from a vertical position to the actual values on the vertical sync counters */
 	*v256 = ((vpos < VBEND) || (vpos >= VBSTART));
@@ -149,7 +156,7 @@ static void vpos_to_vsync_chain_counter(int vpos, UINT8 *counter, UINT8 *v256)
 }
 
 
-static int vsync_chain_counter_to_vpos(UINT8 counter, UINT8 v256)
+int berzerk_state::vsync_chain_counter_to_vpos(UINT8 counter, UINT8 v256)
 {
 	/* convert from the vertical sync counters to an actual vertical position */
 	int vpos;
@@ -205,18 +212,16 @@ TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 }
 
 
-static void create_irq_timer(running_machine &machine)
+void berzerk_state::create_irq_timer()
 {
-	berzerk_state *state = machine.driver_data<berzerk_state>();
-	state->m_irq_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(berzerk_state::irq_callback),state));
+	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(berzerk_state::irq_callback),this));
 }
 
 
-static void start_irq_timer(running_machine &machine)
+void berzerk_state::start_irq_timer()
 {
-	berzerk_state *state = machine.driver_data<berzerk_state>();
 	int vpos = vsync_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
-	state->m_irq_timer->adjust(machine.primary_screen->time_until_pos(vpos));
+	m_irq_timer->adjust(machine().primary_screen->time_until_pos(vpos));
 }
 
 
@@ -284,18 +289,16 @@ TIMER_CALLBACK_MEMBER(berzerk_state::nmi_callback)
 }
 
 
-static void create_nmi_timer(running_machine &machine)
+void berzerk_state::create_nmi_timer()
 {
-	berzerk_state *state = machine.driver_data<berzerk_state>();
-	state->m_nmi_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(berzerk_state::nmi_callback),state));
+	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(berzerk_state::nmi_callback),this));
 }
 
 
-static void start_nmi_timer(running_machine &machine)
+void berzerk_state::start_nmi_timer()
 {
-	berzerk_state *state = machine.driver_data<berzerk_state>();
 	int vpos = vsync_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
-	state->m_nmi_timer->adjust(machine.primary_screen->time_until_pos(vpos));
+	m_nmi_timer->adjust(machine().primary_screen->time_until_pos(vpos));
 }
 
 
@@ -308,8 +311,8 @@ static void start_nmi_timer(running_machine &machine)
 
 void berzerk_state::machine_start()
 {
-	create_irq_timer(machine());
-	create_nmi_timer(machine());
+	create_irq_timer();
+	create_nmi_timer();
 
 	/* register for state saving */
 	state_save_register_global(machine(), m_magicram_control);
@@ -334,8 +337,8 @@ void berzerk_state::machine_reset()
 	set_led_status(machine(), 0, 0);
 	m_magicram_control = 0;
 
-	start_irq_timer(machine());
-	start_nmi_timer(machine());
+	start_irq_timer();
+	start_nmi_timer();
 }
 
 
@@ -421,7 +424,7 @@ READ8_MEMBER(berzerk_state::intercept_v256_r)
 }
 
 
-static void get_pens(running_machine &machine, pen_t *pens)
+void berzerk_state::get_pens(pen_t *pens)
 {
 	static const int resistances_wg[] = { 750, 0 };
 	static const int resistances_el[] = { 1.0 / ((1.0 / 750.0) + (1.0 / 360.0)), 0 };
@@ -429,7 +432,7 @@ static void get_pens(running_machine &machine, pen_t *pens)
 	int color;
 	double color_weights[2];
 
-	if (machine.root_device().ioport(MONITOR_TYPE_PORT_TAG)->read() == 0)
+	if (machine().root_device().ioport(MONITOR_TYPE_PORT_TAG)->read() == 0)
 		compute_resistor_weights(0, 0xff, -1.0,
 									2, resistances_wg, color_weights, 0, 270,
 									2, resistances_wg, color_weights, 0, 270,
@@ -461,7 +464,7 @@ UINT32 berzerk_state::screen_update_berzerk(screen_device &screen, bitmap_rgb32 
 	pen_t pens[NUM_PENS];
 	offs_t offs;
 
-	get_pens(machine(), pens);
+	get_pens(pens);
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{

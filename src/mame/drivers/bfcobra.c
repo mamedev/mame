@@ -302,6 +302,12 @@ public:
 	UINT32 screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	INTERRUPT_GEN_MEMBER(vblank_gen);
+	void RunBlit(address_space &space);
+	void update_irqs();
+	void reset_fdc();
+	void exec_w_phase(UINT8 data);
+	void init_ram();
+	void command_phase(struct fdc_t &fdc, UINT8 data);
 };
 
 
@@ -459,12 +465,11 @@ INLINE UINT8* blitter_get_addr(running_machine &machine, UINT32 addr)
     The Flare One blitter is a simpler design with slightly different parameters
     and will require hardware tests to figure everything out correctly.
 */
-static void RunBlit(address_space &space)
+void bfcobra_state::RunBlit(address_space &space)
 {
 #define BLITPRG_READ(x)     blitter.x = *(blitter_get_addr(space.machine(), blitter.program.addr++))
 
-	bfcobra_state *state = space.machine().driver_data<bfcobra_state>();
-	struct blitter_t &blitter = state->m_blitter;
+	struct blitter_t &blitter = m_blitter;
 	int cycles_used = 0;
 
 
@@ -873,15 +878,14 @@ WRITE8_MEMBER(bfcobra_state::ramdac_w)
 
 ***************************************************************************/
 
-static void update_irqs(running_machine &machine)
+void bfcobra_state::update_irqs()
 {
-	bfcobra_state *state = machine.driver_data<bfcobra_state>();
-	int newstate = state->m_blitter_irq || state->m_vblank_irq || state->m_acia_irq;
+	int newstate = m_blitter_irq || m_vblank_irq || m_acia_irq;
 
-	if (newstate != state->m_irq_state)
+	if (newstate != m_irq_state)
 	{
-		state->m_irq_state = newstate;
-		machine.device("maincpu")->execute().set_input_line(0, state->m_irq_state ? ASSERT_LINE : CLEAR_LINE);
+		m_irq_state = newstate;
+		machine().device("maincpu")->execute().set_input_line(0, m_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -910,7 +914,7 @@ READ8_MEMBER(bfcobra_state::chipset_r)
 			val = 0x1;
 
 			/* TODO */
-			update_irqs(machine());
+			update_irqs();
 			break;
 		}
 		case 0x1C:
@@ -1067,9 +1071,6 @@ WRITE8_MEMBER(bfcobra_state::rombank_w)
 
 ***************************************************************************/
 
-static void command_phase(struct fdc_t &fdc, UINT8 data);
-static void exec_w_phase(UINT8 data);
-//UINT8 exec_r_phase(void);
 
 /*
     WD37C656C-PL (or equivalent) Floppy Disk Controller
@@ -1102,13 +1103,12 @@ enum command
 	SCAN_HIGH_OR_EQUAL = 29
 };
 
-static void reset_fdc(running_machine &machine)
+void bfcobra_state::reset_fdc()
 {
-	bfcobra_state *state = machine.driver_data<bfcobra_state>();
-	memset(&state->m_fdc, 0, sizeof(state->m_fdc));
+	memset(&m_fdc, 0, sizeof(m_fdc));
 
-	state->m_fdc.MSR = 0x80;
-	state->m_fdc.phase = COMMAND;
+	m_fdc.MSR = 0x80;
+	m_fdc.phase = COMMAND;
 }
 
 READ8_MEMBER(bfcobra_state::fdctrl_r)
@@ -1215,7 +1215,7 @@ WRITE8_MEMBER(bfcobra_state::fdctrl_w)
 	}
 }
 
-static void command_phase(struct fdc_t &fdc, UINT8 data)
+void bfcobra_state::command_phase(struct fdc_t &fdc, UINT8 data)
 {
 	if (fdc.cmd_cnt == 0)
 	{
@@ -1303,7 +1303,7 @@ UINT8 exec_r_phase(void)
 }
 #endif
 
-static void exec_w_phase(UINT8 data)
+void bfcobra_state::exec_w_phase(UINT8 data)
 {
 }
 
@@ -1333,7 +1333,7 @@ void bfcobra_state::machine_reset()
 
 	m_bank_data[0] = 1;
 	memset(&m_ramdac, 0, sizeof(m_ramdac));
-	reset_fdc(machine());
+	reset_fdc();
 
 	m_irq_state = m_blitter_irq = m_vblank_irq = m_acia_irq = 0;
 }
@@ -1604,14 +1604,13 @@ INPUT_PORTS_END
 /*
     Allocate work RAM and video RAM shared by the Z80 and chipset.
 */
-static void init_ram(running_machine &machine)
+void bfcobra_state::init_ram()
 {
-	bfcobra_state *state = machine.driver_data<bfcobra_state>();
 	/* 768kB work RAM */
-	state->m_work_ram = auto_alloc_array_clear(machine, UINT8, 0xC0000);
+	m_work_ram = auto_alloc_array_clear(machine(), UINT8, 0xC0000);
 
 	/* 128kB video RAM */
-	state->m_video_ram = auto_alloc_array_clear(machine, UINT8, 0x20000);
+	m_video_ram = auto_alloc_array_clear(machine(), UINT8, 0x20000);
 }
 
 /*
@@ -1631,7 +1630,7 @@ WRITE_LINE_MEMBER(bfcobra_state::z80_acia_tx_w)
 WRITE_LINE_MEMBER(bfcobra_state::z80_acia_irq)
 {
 	m_acia_irq = state;
-	update_irqs(machine());
+	update_irqs();
 }
 
 static ACIA6850_INTERFACE( z80_acia_if )
@@ -1733,7 +1732,7 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 
 	auto_free(machine(), tmp);
 
-	init_ram(machine());
+	init_ram();
 
 	m_bank_data[0] = 1;
 	m_bank_data[1] = 0;
@@ -1772,7 +1771,7 @@ INTERRUPT_GEN_MEMBER(bfcobra_state::timer_irq)
 INTERRUPT_GEN_MEMBER(bfcobra_state::vblank_gen)
 {
 	m_vblank_irq = 1;
-	update_irqs(machine());
+	update_irqs();
 }
 
 static MACHINE_CONFIG_START( bfcobra, bfcobra_state )

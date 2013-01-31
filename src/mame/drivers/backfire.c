@@ -87,6 +87,7 @@ public:
 	UINT32 screen_update_backfire_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_backfire_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
+	void descramble_sound();
 };
 
 //UINT32 *backfire_180010, *backfire_188010;
@@ -668,11 +669,11 @@ ROM_START( backfirea )
 	ROM_LOAD( "mbz-06.19l",    0x200000, 0x080000,  CRC(4a38c635) SHA1(7f0fb6a7a4aa6774c04fa38e53ceff8744fe1e9f) )
 ROM_END
 
-static void descramble_sound( running_machine &machine )
+void backfire_state::descramble_sound()
 {
-	UINT8 *rom = machine.root_device().memregion("ymz")->base();
+	UINT8 *rom = machine().root_device().memregion("ymz")->base();
 	int length = 0x200000; // only the first rom is swapped on backfire!
-	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
+	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
 	UINT32 x;
 
 	for (x = 0; x < length; x++)
@@ -691,7 +692,7 @@ static void descramble_sound( running_machine &machine )
 
 	memcpy(rom, buf1, length);
 
-	auto_free(machine, buf1);
+	auto_free(machine(), buf1);
 }
 
 READ32_MEMBER(backfire_state::backfire_speedup_r)
@@ -711,7 +712,7 @@ DRIVER_INIT_MEMBER(backfire_state,backfire)
 	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */
 	deco156_decrypt(machine());
 	machine().device("maincpu")->set_clock_scale(4.0f); /* core timings aren't accurate */
-	descramble_sound(machine());
+	descramble_sound();
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0170018, 0x017001b, read32_delegate(FUNC(backfire_state::backfire_speedup_r), this));
 }
 
