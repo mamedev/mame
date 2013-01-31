@@ -35,6 +35,7 @@ public:
 			//m_user(*this, PET_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, M6502_TAG),
+			m_spare_rom(*this, "spare"),
 			m_char_rom(*this, "gfx1"),
 			m_video_ram(*this, "video_ram"),
 			m_row0(*this, "ROW0"),
@@ -71,6 +72,7 @@ public:
 	//required_device<pet_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
+	optional_memory_region m_spare_rom;
 	required_memory_region m_char_rom;
 	optional_shared_ptr<UINT8> m_video_ram;
 	required_ioport m_row0;

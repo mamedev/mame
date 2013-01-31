@@ -56,6 +56,27 @@ READ8_MEMBER( pet2001_state::read )
 	case SEL8:
 		data = m_video_ram[offset & 0x3ff];
 		break;
+
+	case SEL9:
+		if (m_spare_rom)
+		{
+			data = m_spare_rom->base()[offset & 0xfff];
+		}
+		break;
+
+	case SELA:
+		if (m_spare_rom)
+		{
+			data = m_spare_rom->base()[0x1000 | (offset & 0xfff)];
+		}
+		break;
+
+	case SELB:
+		if (m_spare_rom)
+		{
+			data = m_spare_rom->base()[0x2000 | (offset & 0xfff)];
+		}
+		break;
 	
 	case SELE:
 		if (BIT(offset, 11))
@@ -857,7 +878,6 @@ static MACHINE_CONFIG_START( pet2001, pet2001_state )
 	MCFG_RAM_EXTRA_OPTIONS("8K")
 
 	// software lists
-	MCFG_SOFTWARE_LIST_ADD("rom_list", "pet_rom")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
 MACHINE_CONFIG_END
 
@@ -867,9 +887,23 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( pet2001n, pet2001 )
+	MCFG_CARTSLOT_ADD("9000")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_INTERFACE("pet_9000_rom")
+
+	MCFG_CARTSLOT_ADD("a000")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_INTERFACE("pet_a000_rom")
+
+	MCFG_CARTSLOT_ADD("b000")
+	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MCFG_CARTSLOT_INTERFACE("pet_b000_rom")
+
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("8K")
 	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
+
+	MCFG_SOFTWARE_LIST_ADD("rom_list", "pet_rom")
 MACHINE_CONFIG_END
 
 
@@ -877,13 +911,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet2001b )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( pet2001b, pet2001, pet2001b_state )
+static MACHINE_CONFIG_DERIVED_CLASS( pet2001b, pet2001n, pet2001b_state )
 	MCFG_DEVICE_REMOVE(M6520_1_TAG)
 	MCFG_PIA6821_ADD(M6520_1_TAG, pet2001b_pia1_intf)
-
-	MCFG_RAM_MODIFY(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("8K")
-	MCFG_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_CONFIG_END
 
 
@@ -926,6 +956,11 @@ ROM_START( pet2001n )
 	ROM_LOAD( "901447-24.ud8", 0x2000, 0x0800, CRC(e459ab32) SHA1(5e5502ce32f5a7e387d65efe058916282041e54b) )   // Screen Editor (40 columns, no CRTC, Normal Keyb)
 	ROM_LOAD( "901465-03.ud9", 0x3000, 0x1000, CRC(f02238e2) SHA1(38742bdf449f629bcba6276ef24d3daeb7da6e84) )   // Kernal
 
+	ROM_REGION( 0x3000, "spare", ROMREGION_ERASE00 )
+	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "b000", 0x2000, 0x1000, ROM_MIRROR )
+
 	ROM_REGION( 0x800, "gfx1", 0 )
 	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
 ROM_END
@@ -941,6 +976,11 @@ ROM_START( pet2001b )
 	ROM_LOAD( "901465-02.ud7", 0x1000, 0x1000, CRC(ae4cb035) SHA1(1bc0ebf27c9bb62ad71bca40313e874234cab6ac) )   // BASIC 2
 	ROM_LOAD( "901474-01.ud8", 0x2000, 0x0800, CRC(05db957e) SHA1(174ace3a8c0348cd21d39cc864e2adc58b0101a9) )   // Screen Editor (40 columns, no CRTC, Business Keyb)
 	ROM_LOAD( "901465-03.ud9", 0x3000, 0x1000, CRC(f02238e2) SHA1(38742bdf449f629bcba6276ef24d3daeb7da6e84) )   // Kernal
+
+	ROM_REGION( 0x3000, "spare", ROMREGION_ERASE00 )
+	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "b000", 0x2000, 0x1000, ROM_MIRROR )
 
 	ROM_REGION( 0x800, "gfx1", 0 )
 	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
