@@ -6,6 +6,7 @@
 #include "i386.h"
 #include "../../../lib/softfloat/milieu.h"
 #include "../../../lib/softfloat/softfloat.h"
+#include "cpu/vtlb.h"
 
 //#define DEBUG_MISSING_OPCODE
 
@@ -360,6 +361,8 @@ struct i386_state
 	UINT8 *cycle_table_pm;
 	UINT8 *cycle_table_rm;
 
+	vtlb_state *vtlb;
+
 	// bytes in current opcode, debug only
 #ifdef DEBUG_MISSING_OPCODE
 	UINT8 opcode_bytes[16];
@@ -475,125 +478,159 @@ INLINE UINT32 i386_translate(i386_state *cpustate, int segment, UINT32 ip, int r
 	return cpustate->sreg[segment].base + ip;
 }
 
-// rwn; read = 0, write = 1, none = -1, read at PL 0 = -2
-INLINE int translate_address(i386_state *cpustate, int rwn, UINT32 *address, UINT32 *error)
+#define VTLB_FLAG_DIRTY 0x100
+
+INLINE vtlb_entry get_permissions(UINT32 pte, int wp)
+{
+	vtlb_entry ret = VTLB_READ_ALLOWED | ((pte & 4) ? VTLB_USER_READ_ALLOWED : 0);
+	if(!wp)
+		ret |= VTLB_WRITE_ALLOWED;
+	if(pte & 2)
+		ret |= VTLB_WRITE_ALLOWED | ((pte & 4) ? VTLB_USER_WRITE_ALLOWED : 0);
+	return ret;
+}
+
+static int i386_translate_address(i386_state *cpustate, int intention, offs_t *address, vtlb_entry *entry)
 {
 	UINT32 a = *address;
 	UINT32 pdbr = cpustate->cr[3] & 0xfffff000;
 	UINT32 directory = (a >> 22) & 0x3ff;
 	UINT32 table = (a >> 12) & 0x3ff;
-	UINT32 offset = a & 0xfff;
-	UINT32 page_entry;
-	UINT32 ret = 1;
-	bool user = (cpustate->CPL == 3) && (rwn >= 0);
-	*error = 0;
+	vtlb_entry perm = 0;
+	int ret = FALSE;
+	bool user = (intention & TRANSLATE_USER_MASK) ? true : false;
+	bool write = (intention & TRANSLATE_WRITE) ? true : false;
+	bool debug = (intention & TRANSLATE_DEBUG_MASK) ? true : false;
+
+	if(!(cpustate->cr[0] & 0x80000000))
+	{
+		if(entry)
+			*entry = 0x77;
+		return TRUE;
+	}
 
 	UINT32 page_dir = cpustate->program->read_dword(pdbr + directory * 4);
-	if((page_dir & 1) && ((page_dir & 4) || !user))
+	if(page_dir & 1)
 	{
-		if (!(cpustate->cr[4] & 0x10))
+		if ((page_dir & 0x80) && (cpustate->cr[4] & 0x10))
 		{
-			page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
-			if(!(page_entry & 1))
-				ret = 0;
-			else if((!(page_entry & 2) && (user || WP) && (rwn == 1)) || (!(page_entry & 4) && user))
+			a = (page_dir & 0xffc00000) | (a & 0x003fffff);
+			if(debug)
 			{
-				*error = 1;
-				ret = 0;
+				*address = a;
+				return TRUE;
 			}
+			perm = get_permissions(page_dir, WP);
+			if(write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
+				ret = FALSE;
+			else if(user && !(perm & VTLB_USER_READ_ALLOWED))
+				ret = FALSE;
 			else
 			{
-				if(!(page_dir & 0x20) && (rwn != -1))
+				if(!(page_dir & 0x40) && write)
+				{
+					cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x60);
+					perm |= VTLB_FLAG_DIRTY;
+				}
+				else if(!(page_dir & 0x20))
 					cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x20);
-				if(!(page_entry & 0x40) && (rwn == 1))
-					cpustate->program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x60);
-				else if(!(page_entry & 0x20) && (rwn != -1))
-					cpustate->program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x20);
-				*address = (page_entry & 0xfffff000) | offset;
+				ret = TRUE;
 			}
 		}
 		else
 		{
-			if (page_dir & 0x80)
-			{
-				if(!(page_dir & 2) && (user || WP) && (rwn == 1))
-				{
-					*error = 1;
-					ret = 0;
-				}
-				else
-				{
-					if(!(page_dir & 0x40) && (rwn == 1))
-						cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x60);
-					else if(!(page_dir & 0x20) && (rwn != -1))
-						cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x20);
-					*address = (page_dir & 0xffc00000) | (a & 0x003fffff);
-				}
-			}
+			UINT32 page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
+			if(!(page_entry & 1))
+				ret = FALSE;
 			else
 			{
-				page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
-				if(!(page_entry & 1))
-					ret = 0;
-				else if((!(page_entry & 2) && (user || WP) && (rwn == 1)) || (!(page_entry & 4) && user))
+				a = (page_entry & 0xfffff000) | (a & 0xfff);
+				if(debug)
 				{
-					*error = 1;
-					ret = 0;
+					*address = a;
+					return TRUE;
 				}
+				perm = get_permissions(page_entry, WP);
+				if(write && (!(perm & VTLB_WRITE_ALLOWED) || (user && !(perm & VTLB_USER_WRITE_ALLOWED))))
+					ret = FALSE;
+				else if(user && !(perm & VTLB_USER_READ_ALLOWED))
+					ret = FALSE;
 				else
 				{
-					if(!(page_dir & 0x20) && (rwn != -1))
+					if(!(page_dir & 0x20))
 						cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x20);
-					if(!(page_entry & 0x40) && (rwn == 1))
+					if(!(page_entry & 0x40) && write)
+					{
 						cpustate->program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x60);
-					else if(!(page_entry & 0x20) && (rwn != -1))
+						perm |= VTLB_FLAG_DIRTY;
+					}
+					else if(!(page_entry & 0x20))
 						cpustate->program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x20);
-					*address = (page_entry & 0xfffff000) | offset;
+					ret = TRUE;
 				}
 			}
 		}
 	}
 	else
+		ret = FALSE;
+	if(entry)
+		*entry = perm;
+	if(ret)
+		*address = a;
+	return ret;
+}
+
+//#define TEST_TLB
+
+INLINE int translate_address(i386_state *cpustate, int pl, int type, UINT32 *address, UINT32 *error)
+{
+	const vtlb_entry *table = vtlb_table(cpustate->vtlb);
+	int index = *address >> 12;
+	vtlb_entry entry = table[index];
+	if(type == TRANSLATE_FETCH)
+		type = TRANSLATE_READ;
+	if(pl == 3)
+		type |= TRANSLATE_USER_MASK;
+#ifdef TEST_TLB
+	UINT32 test_addr = *address;
+#endif
+
+	if(!(entry & VTLB_FLAG_VALID) || ((type & TRANSLATE_WRITE) && !(entry & VTLB_FLAG_DIRTY)))
 	{
-		if(page_dir & 1)
-			*error = 1;
-		ret = 0;
+		if(!i386_translate_address(cpustate, type, address, &entry))
+		{
+			*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((cpustate->CPL == 3) ? 4 : 0);
+			if(entry)
+				*error |= 1;
+			return FALSE;
+		}
+		vtlb_dynload(cpustate->vtlb, index, *address, entry);
+		return TRUE;
 	}
-	if(!ret)
+	if(!(entry & (1 << type)))
 	{
-		if(rwn != -1)
-			*error |= ((rwn == 1)<<1) | ((cpustate->CPL == 3)<<2);
-		return 0;
+		*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((cpustate->CPL == 3) ? 4 : 0) | 1;
+		return FALSE;
 	}
-	return 1;
+	*address = (entry & 0xfffff000) | (*address & 0xfff);
+#ifdef TEST_TLB
+	int test_ret = i386_translate_address(cpustate, type | TRANSLATE_DEBUG_MASK, &test_addr, NULL);
+	if(!test_ret || (test_addr != *address))
+		logerror("TLB-PTE mismatch! %06X %06X %06x\n", *address, test_addr, cpustate->pc);
+#endif
+	return TRUE;
 }
 
 INLINE void CHANGE_PC(i386_state *cpustate, UINT32 pc)
 {
-	UINT32 address, error;
 	cpustate->pc = i386_translate(cpustate, CS, pc, -1 );
-
-	address = cpustate->pc;
-
-	if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-	{
-		translate_address(cpustate,-1,&address,&error);
-	}
 }
 
 INLINE void NEAR_BRANCH(i386_state *cpustate, INT32 offs)
 {
-	UINT32 address, error;
 	/* TODO: limit */
 	cpustate->eip += offs;
 	cpustate->pc += offs;
-
-	address = cpustate->pc;
-
-	if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-	{
-		translate_address(cpustate,-1,&address,&error);
-	}
 }
 
 INLINE UINT8 FETCH(i386_state *cpustate)
@@ -601,11 +638,8 @@ INLINE UINT8 FETCH(i386_state *cpustate)
 	UINT8 value;
 	UINT32 address = cpustate->pc, error;
 
-	if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-	{
-		if(!translate_address(cpustate,0,&address,&error))
-			PF_THROW(error);
-	}
+	if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_FETCH,&address,&error))
+		PF_THROW(error);
 
 	value = cpustate->direct->read_decrypted_byte(address & cpustate->a20_mask);
 #ifdef DEBUG_MISSING_OPCODE
@@ -625,11 +659,8 @@ INLINE UINT16 FETCH16(i386_state *cpustate)
 		value = (FETCH(cpustate) << 0) |
 				(FETCH(cpustate) << 8);
 	} else {
-		if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-		{
-			if(!translate_address(cpustate,0,&address,&error))
-				PF_THROW(error);
-		}
+		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_FETCH,&address,&error))
+			PF_THROW(error);
 		address &= cpustate->a20_mask;
 		value = cpustate->direct->read_decrypted_word(address);
 		cpustate->eip += 2;
@@ -648,11 +679,8 @@ INLINE UINT32 FETCH32(i386_state *cpustate)
 				(FETCH(cpustate) << 16) |
 				(FETCH(cpustate) << 24);
 	} else {
-		if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-		{
-			if(!translate_address(cpustate,0,&address,&error))
-				PF_THROW(error);
-		}
+		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_FETCH,&address,&error))
+			PF_THROW(error);
 
 		address &= cpustate->a20_mask;
 		value = cpustate->direct->read_decrypted_dword(address);
@@ -666,11 +694,8 @@ INLINE UINT8 READ8(i386_state *cpustate,UINT32 ea)
 {
 	UINT32 address = ea, error;
 
-	if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-	{
-		if(!translate_address(cpustate,0,&address,&error))
-			PF_THROW(error);
-	}
+	if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_READ,&address, &error))
+		PF_THROW(error);
 
 	address &= cpustate->a20_mask;
 	return cpustate->program->read_byte(address);
@@ -684,11 +709,8 @@ INLINE UINT16 READ16(i386_state *cpustate,UINT32 ea)
 		value = (READ8( cpustate, address+0 ) << 0) |
 				(READ8( cpustate, address+1 ) << 8);
 	} else {
-		if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-		{
-			if(!translate_address(cpustate,0,&address,&error))
-				PF_THROW(error);
-		}
+		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_READ,&address,&error))
+			PF_THROW(error);
 
 		address &= cpustate->a20_mask;
 		value = cpustate->program->read_word( address );
@@ -706,11 +728,8 @@ INLINE UINT32 READ32(i386_state *cpustate,UINT32 ea)
 				(READ8( cpustate, address+2 ) << 16) |
 				(READ8( cpustate, address+3 ) << 24);
 	} else {
-		if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-		{
-			if(!translate_address(cpustate,0,&address,&error))
-				PF_THROW(error);
-		}
+		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_READ,&address,&error))
+			PF_THROW(error);
 
 		address &= cpustate->a20_mask;
 		value = cpustate->program->read_dword( address );
@@ -733,11 +752,8 @@ INLINE UINT64 READ64(i386_state *cpustate,UINT32 ea)
 				(((UINT64) READ8( cpustate, address+6 )) << 48) |
 				(((UINT64) READ8( cpustate, address+7 )) << 56);
 	} else {
-		if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-		{
-			if(!translate_address(cpustate,0,&address,&error))
-				PF_THROW(error);
-		}
+		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_READ,&address,&error))
+			PF_THROW(error);
 
 		address &= cpustate->a20_mask;
 		value = (((UINT64) cpustate->program->read_dword( address+0 )) << 0) |
@@ -749,11 +765,8 @@ INLINE UINT8 READ8PL0(i386_state *cpustate,UINT32 ea)
 {
 	UINT32 address = ea, error;
 
-	if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-	{
-		if(!translate_address(cpustate,-2,&address,&error))
-			PF_THROW(error);
-	}
+	if(!translate_address(cpustate,0,TRANSLATE_READ,&address,&error))
+		PF_THROW(error);
 
 	address &= cpustate->a20_mask;
 	return cpustate->program->read_byte(address);
@@ -767,11 +780,8 @@ INLINE UINT16 READ16PL0(i386_state *cpustate,UINT32 ea)
 		value = (READ8PL0( cpustate, address+0 ) << 0) |
 				(READ8PL0( cpustate, address+1 ) << 8);
 	} else {
-		if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-		{
-			if(!translate_address(cpustate,-2,&address,&error))
-				PF_THROW(error);
-		}
+		if(!translate_address(cpustate,0,TRANSLATE_READ,&address,&error))
+			PF_THROW(error);
 
 		address &= cpustate->a20_mask;
 		value = cpustate->program->read_word( address );
@@ -789,11 +799,8 @@ INLINE UINT32 READ32PL0(i386_state *cpustate,UINT32 ea)
 				(READ8PL0( cpustate, address+2 ) << 16) |
 				(READ8PL0( cpustate, address+3 ) << 24);
 	} else {
-		if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-		{
-			if(!translate_address(cpustate,-2,&address,&error))
-				PF_THROW(error);
-		}
+		if(!translate_address(cpustate,0,TRANSLATE_READ,&address,&error))
+			PF_THROW(error);
 
 		address &= cpustate->a20_mask;
 		value = cpustate->program->read_dword( address );
@@ -804,22 +811,16 @@ INLINE UINT32 READ32PL0(i386_state *cpustate,UINT32 ea)
 INLINE void WRITE_TEST(i386_state *cpustate,UINT32 ea)
 {
 	UINT32 address = ea, error;
-	if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-	{
-		if(!translate_address(cpustate,1,&address,&error))
-			PF_THROW(error);
-	}
+	if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_WRITE,&address,&error))
+		PF_THROW(error);
 }
 
 INLINE void WRITE8(i386_state *cpustate,UINT32 ea, UINT8 value)
 {
 	UINT32 address = ea, error;
 
-	if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-	{
-		if(!translate_address(cpustate,1,&address,&error))
-			PF_THROW(error);
-	}
+	if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_WRITE,&address,&error))
+		PF_THROW(error);
 
 	address &= cpustate->a20_mask;
 	cpustate->program->write_byte(address, value);
@@ -832,11 +833,8 @@ INLINE void WRITE16(i386_state *cpustate,UINT32 ea, UINT16 value)
 		WRITE8( cpustate, address+0, value & 0xff );
 		WRITE8( cpustate, address+1, (value >> 8) & 0xff );
 	} else {
-		if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-		{
-			if(!translate_address(cpustate,1,&address,&error))
-				PF_THROW(error);
-		}
+		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_WRITE,&address,&error))
+			PF_THROW(error);
 
 		address &= cpustate->a20_mask;
 		cpustate->program->write_word(address, value);
@@ -852,11 +850,8 @@ INLINE void WRITE32(i386_state *cpustate,UINT32 ea, UINT32 value)
 		WRITE8( cpustate, address+2, (value >> 16) & 0xff );
 		WRITE8( cpustate, address+3, (value >> 24) & 0xff );
 	} else {
-		if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-		{
-			if(!translate_address(cpustate,1,&address,&error))
-				PF_THROW(error);
-		}
+		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_WRITE,&address,&error))
+			PF_THROW(error);
 
 		ea &= cpustate->a20_mask;
 		cpustate->program->write_dword(address, value);
@@ -877,11 +872,8 @@ INLINE void WRITE64(i386_state *cpustate,UINT32 ea, UINT64 value)
 		WRITE8( cpustate, address+6, (value >> 48) & 0xff );
 		WRITE8( cpustate, address+7, (value >> 56) & 0xff );
 	} else {
-		if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-		{
-			if(!translate_address(cpustate,1,&address,&error))
-				PF_THROW(error);
-		}
+		if(!translate_address(cpustate,cpustate->CPL,TRANSLATE_WRITE,&address,&error))
+			PF_THROW(error);
 
 		ea &= cpustate->a20_mask;
 		cpustate->program->write_dword(address+0, value & 0xffffffff);

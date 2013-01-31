@@ -301,7 +301,16 @@ static void I486OP(group0F01_16)(i386_state *cpustate)      // Opcode 0x0f 01
 			}
 		case 7:         /* INVLPG */
 			{
-				// Nothing to do ?
+				if(PROTECTED_MODE && cpustate->CPL)
+					FAULT(FAULT_GP,0)
+				if(modrm >= 0xc0)
+				{
+					logerror("i486: invlpg with modrm %02X\n", modrm);
+					FAULT(FAULT_UD,0)
+				}
+				ea = GetEA(cpustate,modrm,-1);
+				CYCLES(cpustate,25); // TODO: add to cycles.h
+				vtlb_flush_address(cpustate->vtlb, ea);
 				break;
 			}
 		default:
@@ -410,7 +419,16 @@ static void I486OP(group0F01_32)(i386_state *cpustate)      // Opcode 0x0f 01
 			}
 		case 7:         /* INVLPG */
 			{
-				// Nothing to do ?
+				if(PROTECTED_MODE && cpustate->CPL)
+					FAULT(FAULT_GP,0)
+				if(modrm >= 0xc0)
+				{
+					logerror("i486: invlpg with modrm %02X\n", modrm);
+					FAULT(FAULT_UD,0)
+				}
+				ea = GetEA(cpustate,modrm,-1);
+				CYCLES(cpustate,25); // TODO: add to cycles.h
+				vtlb_flush_address(cpustate->vtlb, ea);
 				break;
 			}
 		default:
@@ -473,15 +491,23 @@ static void I486OP(mov_cr_r32)(i386_state *cpustate)        // Opcode 0x0f 22
 		FAULT(FAULT_GP, 0);
 	UINT8 modrm = FETCH(cpustate);
 	UINT8 cr = (modrm >> 3) & 0x7;
+	UINT32 oldcr = cpustate->cr[cr];
 	cpustate->cr[cr] = LOAD_RM32(modrm);
 	switch(cr)
 	{
-		case 0: CYCLES(cpustate,CYCLES_MOV_REG_CR0); break;
+		case 0:
+			CYCLES(cpustate,CYCLES_MOV_REG_CR0);
+			if((oldcr ^ cpustate->cr[cr]) & 0x80010000)
+				vtlb_flush_dynamic(cpustate->vtlb);
+			break;
 		case 2: CYCLES(cpustate,CYCLES_MOV_REG_CR2); break;
-		case 3: CYCLES(cpustate,CYCLES_MOV_REG_CR3); break;
+		case 3:
+			CYCLES(cpustate,CYCLES_MOV_REG_CR3);
+			vtlb_flush_dynamic(cpustate->vtlb);
+			break;
 		case 4: CYCLES(cpustate,1); break; // TODO
 		default:
-			fatalerror("i386: mov_cr_r32 CR%d !", cr);
+			fatalerror("i486: mov_cr_r32 CR%d !", cr);
 			break;
 	}
 }

@@ -108,7 +108,7 @@ static void i386_load_call_gate(i386_state* cpustate, I386_CALL_GATE *gate)
 static void i386_set_descriptor_accessed(i386_state *cpustate, UINT16 selector)
 {
 	// assume the selector is valid, we don't need to check it again
-	UINT32 base, addr, error;
+	UINT32 base, addr;
 	UINT8 rights;
 	if(!(selector & ~3))
 		return;
@@ -119,7 +119,7 @@ static void i386_set_descriptor_accessed(i386_state *cpustate, UINT16 selector)
 		base = cpustate->gdtr.base;
 
 	addr = base + (selector & ~7) + 5;
-	translate_address(cpustate, -2, &addr, &error);
+	i386_translate_address(cpustate, TRANSLATE_READ, &addr, NULL);
 	rights = cpustate->program->read_byte(addr);
 	// Should a fault be thrown if the table is read only?
 	cpustate->program->write_byte(addr, rights | 1);
@@ -1106,6 +1106,7 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	I386_SREG seg;
 	UINT16 old_task;
 	UINT8 ar_byte;  // access rights byte
+	UINT32 oldcr3 = cpustate->cr[3];
 
 	/* TODO: Task State Segment privilege checks */
 
@@ -1166,7 +1167,6 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	cpustate->ldtr.limit = seg.limit;
 	cpustate->ldtr.base = seg.base;
 	cpustate->ldtr.flags = seg.flags;
-	cpustate->cr[3] = READ32(cpustate,tss+0x1c);  // CR3 (PDBR)
 	cpustate->eip = READ32(cpustate,tss+0x20);
 	set_flags(cpustate,READ32(cpustate,tss+0x24));
 	REG32(EAX) = READ32(cpustate,tss+0x28);
@@ -1189,6 +1189,16 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	i386_load_segment_descriptor(cpustate, FS);
 	cpustate->sreg[GS].selector = READ32(cpustate,tss+0x5c) & 0xffff;
 	i386_load_segment_descriptor(cpustate, GS);
+	/* For nested tasks, we write the outgoing task's selector to the back-link field of the new TSS,
+	   and set the NT flag in the EFLAGS register before settings cr3 as the old tss address might be gone */
+	if(nested != 0)
+	{
+		WRITE32(cpustate,tss+0,old_task);
+		cpustate->NT = 1;
+	}
+	cpustate->cr[3] = READ32(cpustate,tss+0x1c);  // CR3 (PDBR)
+	if(oldcr3 != cpustate->cr[3])
+		vtlb_flush_dynamic(cpustate->vtlb);
 
 	/* Set the busy bit in the new task's descriptor */
 	if(selector & 0x0004)
@@ -1202,13 +1212,6 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 		WRITE8(cpustate,cpustate->gdtr.base + (selector & ~0x0007) + 5,ar_byte | 0x02);
 	}
 
-	/* For nested tasks, we write the outgoing task's selector to the back-link field of the new TSS,
-	   and set the NT flag in the EFLAGS register */
-	if(nested != 0)
-	{
-		WRITE32(cpustate,tss+0,old_task);
-		cpustate->NT = 1;
-	}
 	CHANGE_PC(cpustate,cpustate->eip);
 
 	cpustate->CPL = cpustate->sreg[CS].selector & 0x03;
@@ -1344,7 +1347,7 @@ static void i386_protected_mode_jump(i386_state *cpustate, UINT16 seg, UINT32 of
 				return;
 			case 0x04:  // 286 Call Gate
 			case 0x0c:  // 386 Call Gate
-				logerror("JMP: Call gate at %08x\n",cpustate->pc);
+				//logerror("JMP: Call gate at %08x\n",cpustate->pc);
 				SetRPL = 1;
 				memset(&call_gate, 0, sizeof(call_gate));
 				call_gate.segment = segment;
@@ -1639,7 +1642,7 @@ static void i386_protected_mode_call(i386_state *cpustate, UINT16 seg, UINT32 of
 				gate.segment = selector;
 				i386_load_call_gate(cpustate,&gate);
 				DPL = gate.dpl;
-				logerror("CALL: Call gate at %08x (%i parameters)\n",cpustate->pc,gate.dword_count);
+				//logerror("CALL: Call gate at %08x (%i parameters)\n",cpustate->pc,gate.dword_count);
 				if(DPL < CPL)
 				{
 					logerror("CALL: Call gate DPL %i is less than CPL %i.\n",DPL,CPL);
@@ -2795,15 +2798,11 @@ static void I386OP(decode_three_bytef3)(i386_state *cpustate)
 
 static UINT8 read8_debug(i386_state *cpustate, UINT32 ea, UINT8 *data)
 {
-	UINT32 address = ea, error;
+	UINT32 address = ea;
 
-	if (cpustate->cr[0] & 0x80000000)       // page translation enabled
-	{
-		if(!translate_address(cpustate,-1,&address,&error))
-			return 0;
-	}
+	if(!i386_translate_address(cpustate,TRANSLATE_DEBUG_MASK,&address,NULL))
+		return 0;
 
-	address &= cpustate->a20_mask;
 	*data = cpustate->program->read_byte(address);
 	return 1;
 }
@@ -2941,13 +2940,10 @@ static UINT64 i386_debug_virttophys(symbol_table &table, void *ref, int params, 
 {
 	legacy_cpu_device *device = (legacy_cpu_device *)ref;
 	i386_state *cpustate = get_safe_token(device);
-	UINT32 result = param[0], error;
+	UINT32 result = param[0];
 
-	if (cpustate->cr[0] & 0x80000000)
-	{
-		if(!translate_address(cpustate,-1,&result,&error))
-			return 0;
-	}
+	if(!i386_translate_address(cpustate,TRANSLATE_DEBUG_MASK,&result,NULL))
+		return 0;
 	return result;
 }
 
@@ -2969,7 +2965,7 @@ static void i386_postload(i386_state *cpustate)
 	CHANGE_PC(cpustate,cpustate->eip);
 }
 
-static CPU_INIT( i386 )
+static void i386_common_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, int tlbsize)
 {
 	int i, j;
 	static const int regs8[8] = {AL,CL,DL,BL,AH,CH,DH,BH};
@@ -3003,6 +2999,7 @@ static CPU_INIT( i386 )
 	cpustate->program = &device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = &device->space(AS_IO);
+	cpustate->vtlb = vtlb_alloc(device, AS_PROGRAM, 0, tlbsize);
 
 	device->save_item(NAME( cpustate->reg.d));
 	device->save_item(NAME(cpustate->sreg[ES].selector));
@@ -3059,6 +3056,11 @@ static CPU_INIT( i386 )
 	device->save_item(NAME(cpustate->performed_intersegment_jump));
 	device->save_item(NAME(cpustate->mxcsr));
 	device->machine().save().register_postload(save_prepost_delegate(FUNC(i386_postload), cpustate));
+}
+
+CPU_INIT( i386 )
+{
+	i386_common_init(device, irqcallback, 32);
 }
 
 static void build_opcode_table(i386_state *cpustate, UINT32 features)
@@ -3119,9 +3121,12 @@ static CPU_RESET( i386 )
 {
 	i386_state *cpustate = get_safe_token(device);
 	device_irq_acknowledge_callback save_irqcallback;
+	vtlb_state *save_vtlb = cpustate->vtlb;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
+	vtlb_flush_dynamic(save_vtlb);
+	cpustate->vtlb = save_vtlb;
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
@@ -3193,6 +3198,8 @@ static void i386_set_a20_line(i386_state *cpustate,int state)
 	{
 		cpustate->a20_mask = ~(1 << 20);
 	}
+	// TODO: how does A20M and the tlb interact
+	vtlb_flush_dynamic(cpustate->vtlb);
 }
 
 static CPU_EXECUTE( i386 )
@@ -3260,15 +3267,11 @@ static CPU_EXECUTE( i386 )
 static CPU_TRANSLATE( i386 )
 {
 	i386_state *cpustate = get_safe_token(device);
-	int result = 1;
-	UINT32 error;
-	if (space == AS_PROGRAM)
-	{
-		if (cpustate->cr[0] & 0x80000000)
-			result = translate_address(cpustate,-1,address,&error);
-		*address &= cpustate->a20_mask;
-	}
-	return result;
+	int ret = TRUE;
+	if(space == AS_PROGRAM)
+		ret = i386_translate_address(cpustate, intention, address, NULL);
+	*address &= cpustate->a20_mask;
+	return ret;
 }
 
 static CPU_DISASSEMBLE( i386 )
@@ -3603,16 +3606,19 @@ CPU_GET_INFO( i386 )
 
 static CPU_INIT( i486 )
 {
-	CPU_INIT_CALL(i386);
+	i386_common_init(device, irqcallback, 32);
 }
 
 static CPU_RESET( i486 )
 {
 	i386_state *cpustate = get_safe_token(device);
 	device_irq_acknowledge_callback save_irqcallback;
+	vtlb_state *save_vtlb = cpustate->vtlb;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
+	vtlb_flush_dynamic(save_vtlb);
+	cpustate->vtlb = save_vtlb;
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
@@ -3710,16 +3716,20 @@ CPU_GET_INFO( i486 )
 
 static CPU_INIT( pentium )
 {
-	CPU_INIT_CALL(i386);
+	// 64 dtlb small, 8 dtlb large, 32 itlb
+	i386_common_init(device, irqcallback, 96);
 }
 
 static CPU_RESET( pentium )
 {
 	i386_state *cpustate = get_safe_token(device);
 	device_irq_acknowledge_callback save_irqcallback;
+	vtlb_state *save_vtlb = cpustate->vtlb;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
+	vtlb_flush_dynamic(save_vtlb);
+	cpustate->vtlb = save_vtlb;
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
@@ -3833,16 +3843,20 @@ CPU_GET_INFO( pentium )
 
 static CPU_INIT( mediagx )
 {
-	CPU_INIT_CALL(i386);
+	// probably 32 unified
+	i386_common_init(device, irqcallback, 32);
 }
 
 static CPU_RESET( mediagx )
 {
 	i386_state *cpustate = get_safe_token(device);
 	device_irq_acknowledge_callback save_irqcallback;
+	vtlb_state *save_vtlb = cpustate->vtlb;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
+	vtlb_flush_dynamic(save_vtlb);
+	cpustate->vtlb = save_vtlb;
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
@@ -3948,16 +3962,20 @@ CPU_GET_INFO( mediagx )
 
 static CPU_INIT( pentium_pro )
 {
-	CPU_INIT_CALL(pentium);
+	// 64 dtlb small, 32 itlb
+	i386_common_init(device, irqcallback, 96);
 }
 
 static CPU_RESET( pentium_pro )
 {
 	i386_state *cpustate = get_safe_token(device);
 	device_irq_acknowledge_callback save_irqcallback;
+	vtlb_state *save_vtlb = cpustate->vtlb;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
+	vtlb_flush_dynamic(save_vtlb);
+	cpustate->vtlb = save_vtlb;
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
@@ -4044,16 +4062,20 @@ CPU_GET_INFO( pentium_pro )
 
 static CPU_INIT( pentium_mmx )
 {
-	CPU_INIT_CALL(pentium);
+	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
+	i386_common_init(device, irqcallback, 96);
 }
 
 static CPU_RESET( pentium_mmx )
 {
 	i386_state *cpustate = get_safe_token(device);
 	device_irq_acknowledge_callback save_irqcallback;
+	vtlb_state *save_vtlb = cpustate->vtlb;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
+	vtlb_flush_dynamic(save_vtlb);
+	cpustate->vtlb = save_vtlb;
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
@@ -4140,16 +4162,20 @@ CPU_GET_INFO( pentium_mmx )
 
 static CPU_INIT( pentium2 )
 {
-	CPU_INIT_CALL(pentium);
+	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
+	i386_common_init(device, irqcallback, 96);
 }
 
 static CPU_RESET( pentium2 )
 {
 	i386_state *cpustate = get_safe_token(device);
 	device_irq_acknowledge_callback save_irqcallback;
+	vtlb_state *save_vtlb = cpustate->vtlb;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
+	vtlb_flush_dynamic(save_vtlb);
+	cpustate->vtlb = save_vtlb;
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
@@ -4236,16 +4262,20 @@ CPU_GET_INFO( pentium2 )
 
 static CPU_INIT( pentium3 )
 {
-	CPU_INIT_CALL(pentium);
+	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
+	i386_common_init(device, irqcallback, 96);
 }
 
 static CPU_RESET( pentium3 )
 {
 	i386_state *cpustate = get_safe_token(device);
 	device_irq_acknowledge_callback save_irqcallback;
+	vtlb_state *save_vtlb = cpustate->vtlb;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
+	vtlb_flush_dynamic(save_vtlb);
+	cpustate->vtlb = save_vtlb;
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);
@@ -4334,16 +4364,20 @@ CPU_GET_INFO( pentium3 )
 
 static CPU_INIT( pentium4 )
 {
-	CPU_INIT_CALL(pentium);
+	// 128 dtlb, 64 itlb
+	i386_common_init(device, irqcallback, 196);
 }
 
 static CPU_RESET( pentium4 )
 {
 	i386_state *cpustate = get_safe_token(device);
 	device_irq_acknowledge_callback save_irqcallback;
+	vtlb_state *save_vtlb = cpustate->vtlb;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
+	vtlb_flush_dynamic(save_vtlb);
+	cpustate->vtlb = save_vtlb;
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = &device->space(AS_PROGRAM);

@@ -225,7 +225,42 @@ void vtlb_load(vtlb_state *vtlb, int entrynum, int numpages, offs_t address, vtl
 		vtlb->table[tableindex + pagenum] = value + (pagenum << vtlb->pageshift);
 }
 
+/*-------------------------------------------------
+    vtlb_dynload - load a dynamic VTLB entry
+-------------------------------------------------*/
 
+void vtlb_dynload(vtlb_state *vtlb, int index, offs_t address, vtlb_entry value)
+{
+	vtlb_entry entry = vtlb->table[index];
+	value &= VTLB_FLAGS_MASK;
+
+	if (vtlb->dynamic == 0)
+	{
+		if (PRINTF_TLB)
+			printf("failed: no dynamic entries\n");
+		return;
+	}
+
+	int liveindex = vtlb->dynindex++ % vtlb->dynamic;
+	/* is entry already live? */
+	if (!(entry & VTLB_FLAG_VALID))
+	{
+		/* if an entry already exists at this index, free it */
+		if (vtlb->live[liveindex] != 0)
+			vtlb->table[vtlb->live[liveindex] - 1] = 0;
+
+		/* claim this new entry */
+		vtlb->live[liveindex] = index + 1;
+	}
+	/* form a new blank entry */
+	entry = (address >> vtlb->pageshift) << vtlb->pageshift;
+	entry |= VTLB_FLAG_VALID | value;
+
+	if (PRINTF_TLB)
+		printf("success (%08X), new entry\n", address);
+
+	vtlb->table[index] = entry;
+}
 
 /***************************************************************************
     FLUSHING

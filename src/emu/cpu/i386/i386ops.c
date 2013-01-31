@@ -697,7 +697,10 @@ static void I386OP(mov_cr_r32)(i386_state *cpustate)        // Opcode 0x0f 22
 			CYCLES(cpustate,CYCLES_MOV_REG_CR0);
 			break;
 		case 2: CYCLES(cpustate,CYCLES_MOV_REG_CR2); break;
-		case 3: CYCLES(cpustate,CYCLES_MOV_REG_CR3); break;
+		case 3:
+			CYCLES(cpustate,CYCLES_MOV_REG_CR3);
+			vtlb_flush_dynamic(cpustate->vtlb);
+			break;
 		case 4: CYCLES(cpustate,1); break; // TODO
 		default:
 			fatalerror("i386: mov_cr_r32 CR%d!\n", cr);
