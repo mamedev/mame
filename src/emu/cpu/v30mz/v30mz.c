@@ -129,7 +129,6 @@ v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *ta
 
 void v30mz_cpu_device::device_start()
 {
-	m_irq_callback = static_standard_irq_callback;
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
@@ -1242,7 +1241,7 @@ void v30mz_cpu_device::interrupt(int int_num)
 
 	if (int_num == -1)
 	{
-		int_num = m_irq_callback(this, 0);
+		int_num = standard_irq_callback(0);
 
 		m_irq_state = CLEAR_LINE;
 		m_pending_irq &= ~INT_IRQ;

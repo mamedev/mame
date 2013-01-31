@@ -187,7 +187,6 @@ protected:
 	UINT8   m_no_interrupt;
 	UINT8   m_fire_trap;
 
-	device_irq_acknowledge_callback m_irq_callback;
 	address_space *m_program;
 	direct_read_data *m_direct;
 	address_space *m_io;
