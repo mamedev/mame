@@ -318,9 +318,9 @@ READ8_MEMBER(b2m_state::b2m_localmachine_r)
 	return m_b2m_localmachine;
 }
 
-static void b2m_postload(b2m_state *state)
+void b2m_state::b2m_postload()
 {
-	b2m_set_bank(state->machine(), state->m_b2m_8255_portc & 7);
+	b2m_set_bank(machine(), m_b2m_8255_portc & 7);
 }
 
 void b2m_state::machine_start()
@@ -344,7 +344,7 @@ void b2m_state::machine_start()
 	save_item(NAME(m_b2m_localmachine));
 	save_item(NAME(m_vblank_state));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(b2m_postload), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(b2m_state::b2m_postload), this));
 }
 
 IRQ_CALLBACK_MEMBER(b2m_state::b2m_irq_callback)

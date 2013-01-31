@@ -1930,14 +1930,14 @@ WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
 	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_RESET, state);
 }
 
-static void mac_state_load(mac_state *mac)
+void mac_state::mac_state_load()
 {
 	int overlay;
-	overlay = mac->m_overlay;
-	if (mac->m_model < MODEL_MAC_POWERMAC_6100) // no overlay for PowerPC
+	overlay = m_overlay;
+	if (m_model < MODEL_MAC_POWERMAC_6100) // no overlay for PowerPC
 	{
-		mac->m_overlay = -1;
-		mac->set_memory_overlay(overlay);
+		m_overlay = -1;
+		set_memory_overlay(overlay);
 	}
 }
 
@@ -2077,7 +2077,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 	mac->m_inquiry_timeout = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mac_state::inquiry_timeout_func),mac));
 
 	/* save state stuff */
-	machine.save().register_postload(save_prepost_delegate(FUNC(mac_state_load), mac));
+	machine.save().register_postload(save_prepost_delegate(FUNC(mac_state::mac_state_load), mac));
 }
 
 #define MAC_DRIVER_INIT(label, model)   \

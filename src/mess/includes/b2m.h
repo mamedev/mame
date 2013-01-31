@@ -66,6 +66,7 @@ public:
 	void b2m_fdc_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( b2m_floppy_formats );
 	IRQ_CALLBACK_MEMBER(b2m_irq_callback);
+	void b2m_postload();
 };
 
 /*----------- defined in machine/b2m.c -----------*/

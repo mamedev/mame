@@ -1013,15 +1013,13 @@ static void set_output_data( running_machine &machine, UINT8 data )
  *
  *************************************/
 
-void neogeo_postload(running_machine &machine)
+void neogeo_state::neogeo_postload()
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
-
-	_set_main_cpu_bank_address(machine);
-	_set_main_cpu_vector_table_source(machine);
-	set_audio_cpu_banking(machine);
-	_set_audio_cpu_rom_source(machine.device("maincpu")->memory().space(AS_PROGRAM));
-	if (state->m_is_mvs) set_outputs(machine);
+	_set_main_cpu_bank_address(machine());
+	_set_main_cpu_vector_table_source(machine());
+	set_audio_cpu_banking(machine());
+	_set_audio_cpu_rom_source(machine().device("maincpu")->memory().space(AS_PROGRAM));
+	if (m_is_mvs) set_outputs(machine());
 }
 
 
@@ -1082,7 +1080,7 @@ void neogeo_state::machine_start()
 	save_item(NAME(m_led2_value));
 	save_item(NAME(m_recurse));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(neogeo_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(neogeo_state::neogeo_postload), this));
 }
 
 

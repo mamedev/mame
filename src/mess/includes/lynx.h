@@ -144,6 +144,7 @@ public:
 	TIMER_CALLBACK_MEMBER(lynx_timer_shot);
 	TIMER_CALLBACK_MEMBER(lynx_uart_loopback_timer);
 	TIMER_CALLBACK_MEMBER(lynx_uart_timer);
+	void lynx_postload();
 };
 
 

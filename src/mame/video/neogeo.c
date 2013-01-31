@@ -145,13 +145,12 @@ static pen_t get_pen( running_machine &machine, UINT16 data )
 }
 
 
-static void regenerate_pens(running_machine &machine)
+void neogeo_state::regenerate_pens()
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
 	int i;
 
 	for (i = 0; i < NUM_PENS; i++)
-		state->m_pens[i] = get_pen(machine, state->m_palettes[state->m_palette_bank][i]);
+		m_pens[i] = get_pen(machine(), m_palettes[m_palette_bank][i]);
 }
 
 
@@ -162,7 +161,7 @@ void neogeo_set_palette_bank( running_machine &machine, UINT8 data )
 	{
 		state->m_palette_bank = data;
 
-		regenerate_pens(machine);
+		state->regenerate_pens();
 	}
 }
 
@@ -174,7 +173,7 @@ void neogeo_set_screen_dark( running_machine &machine, UINT8 data )
 	{
 		state->m_screen_dark = data;
 
-		regenerate_pens(machine);
+		state->regenerate_pens();
 	}
 }
 
@@ -886,7 +885,7 @@ void neogeo_state::video_start()
 	save_item(NAME(m_auto_animation_counter));
 	save_item(NAME(m_auto_animation_frame_counter));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(regenerate_pens), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(neogeo_state::regenerate_pens), this));
 
 	m_region_zoomy = memregion("zoomy")->base();
 }

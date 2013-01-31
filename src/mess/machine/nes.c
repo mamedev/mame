@@ -227,13 +227,13 @@ TIMER_CALLBACK_MEMBER(nes_state::nes_irq_callback)
 	m_irq_timer->adjust(attotime::never);
 }
 
-static void nes_banks_restore(nes_state *state)
+void nes_state::nes_banks_restore()
 {
-	state->membank("bank1")->set_entry(state->m_prg_bank[0]);
-	state->membank("bank2")->set_entry(state->m_prg_bank[1]);
-	state->membank("bank3")->set_entry(state->m_prg_bank[2]);
-	state->membank("bank4")->set_entry(state->m_prg_bank[3]);
-	state->membank("bank5")->set_entry(state->m_prg_bank[4]);
+	membank("bank1")->set_entry(m_prg_bank[0]);
+	membank("bank2")->set_entry(m_prg_bank[1]);
+	membank("bank3")->set_entry(m_prg_bank[2]);
+	membank("bank4")->set_entry(m_prg_bank[3]);
+	membank("bank5")->set_entry(m_prg_bank[4]);
 }
 
 static void nes_state_register( running_machine &machine )
@@ -286,7 +286,7 @@ static void nes_state_register( running_machine &machine )
 	if (state->m_battery)
 		state->save_pointer(NAME(state->m_battery_ram), state->m_battery_size);
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(nes_banks_restore), state));
+	machine.save().register_postload(save_prepost_delegate(FUNC(nes_state::nes_banks_restore), state));
 }
 
 

@@ -124,6 +124,7 @@ public:
 	DECLARE_READ8_MEMBER(psg_4015_r);
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
+	void nes_banks_restore();
 
 	ioport_port       *m_io_ctrlsel;
 	ioport_port       *m_io_fckey[9];

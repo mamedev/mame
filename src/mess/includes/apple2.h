@@ -270,6 +270,7 @@ public:
 	DECLARE_WRITE8_MEMBER(a2bus_irq_w);
 	DECLARE_WRITE8_MEMBER(a2bus_nmi_w);
 	DECLARE_WRITE8_MEMBER(a2bus_inh_w);
+	void apple2_update_memory_postload();
 };
 
 

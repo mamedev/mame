@@ -1953,9 +1953,9 @@ static void lynx_reset(running_machine &machine)
 #endif
 }
 
-static void lynx_postload(lynx_state *state)
+void lynx_state::lynx_postload()
 {
-	state->lynx_memory_config_w( state->machine().device("maincpu")->memory().space(AS_PROGRAM), 0, state->m_memory_config);
+	lynx_memory_config_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, m_memory_config);
 }
 
 void lynx_state::machine_start()
@@ -1965,7 +1965,7 @@ void lynx_state::machine_start()
 	int i;
 	save_item(NAME(m_memory_config));
 	save_pointer(NAME(m_mem_fe00.target()), m_mem_fe00.bytes());
-	machine().save().register_postload(save_prepost_delegate(FUNC(lynx_postload), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(lynx_state::lynx_postload), this));
 
 	membank("bank3")->configure_entry(0, machine().root_device().memregion("maincpu")->base() + 0x0000);
 	membank("bank3")->configure_entry(1, m_mem_fe00);

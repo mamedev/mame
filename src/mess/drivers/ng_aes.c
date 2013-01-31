@@ -1085,7 +1085,7 @@ static void common_machine_start(running_machine &machine)
 	state->save_item(NAME(state->m_led2_value));
 	state->save_item(NAME(state->m_recurse));
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(neogeo_postload), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(neogeo_state::neogeo_postload), state));
 }
 
 MACHINE_START_MEMBER(ng_aes_state,neogeo)

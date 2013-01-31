@@ -84,6 +84,8 @@ public:
 	TIMER_CALLBACK_MEMBER(hp48_kbd_cb);
 	TIMER_CALLBACK_MEMBER(hp48_timer1_cb);
 	TIMER_CALLBACK_MEMBER(hp48_timer2_cb);
+	void hp48_update_annunciators();
+	void hp48_apply_modules();
 };
 
 
