@@ -14,6 +14,18 @@
 		</part>
 	</software>
 
+	<software name="2040demov1" cloneof="2040demo">
+		<description>Commodore 2040 Floppy Disk Drive Test/Demo Disk (DOS v1)</description>
+		<year>197?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="c2040testdemo-dosv1.g64" size="333744" crc="4015e3eb" sha1="dd790b66b1ae660cae13c0f608d9895fa0825e37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="visicalc">
 		<description>VisiCalc</description>
 		<year>1981</year>
