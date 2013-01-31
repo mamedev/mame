@@ -34,6 +34,8 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 
 protected:
+	required_ioport m_cga_config;
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
