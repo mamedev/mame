@@ -652,10 +652,9 @@ void ibm5160_mb_device::device_start()
 		membank( "bank10" )->set_base( machine().device<ram_device>(RAM_TAG)->pointer() );
 }
 
-IRQ_CALLBACK(ibm5160_mb_device::pc_irq_callback)
+IRQ_CALLBACK_MEMBER(ibm5160_mb_device::pc_irq_callback)
 {
-	device_t *pic = device->machine().device("mb:pic8259");
-	return pic8259_acknowledge( pic );
+	return pic8259_acknowledge(m_pic8259);
 }
 
 
@@ -665,7 +664,7 @@ IRQ_CALLBACK(ibm5160_mb_device::pc_irq_callback)
 
 void ibm5160_mb_device::device_reset()
 {
-	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ibm5160_mb_device::pc_irq_callback),this));
 
 	m_u73_q2 = 0;
 	m_out1 = 2; // initial state of pit output is undefined

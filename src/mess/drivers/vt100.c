@@ -62,6 +62,7 @@ public:
 	UINT32 screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
 };
 
 
@@ -335,11 +336,10 @@ UINT32 vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &bit
 //          A4 - receiver
 //          A5 - vertical fequency
 //          all other set to 1
-static IRQ_CALLBACK(vt100_irq_callback)
+IRQ_CALLBACK_MEMBER(vt100_state::vt100_irq_callback)
 {
-	vt100_state *state = device->machine().driver_data<vt100_state>();
-	UINT8 ret = 0xc7 | (state->m_keyboard_int << 3) | (state->m_receiver_int << 4) | (state->m_vertical_int << 5);
-	state->m_receiver_int = 0;
+	UINT8 ret = 0xc7 | (m_keyboard_int << 3) | (m_receiver_int << 4) | (m_vertical_int << 5);
+	m_receiver_int = 0;
 	return ret;
 }
 
@@ -363,7 +363,7 @@ void vt100_state::machine_reset()
 
 	m_key_scan = 0;
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(vt100_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(vt100_state::vt100_irq_callback),this));
 }
 
 READ8_MEMBER( vt100_state::vt100_read_video_ram_r )

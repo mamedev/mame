@@ -158,6 +158,7 @@ public:
 	virtual void palette_init();
 	void screen_eof_mbc55x(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(keyscan_callback);
+	IRQ_CALLBACK_MEMBER(mbc55x_irq_callback);
 };
 
 /*----------- defined in drivers/mbc55x.c -----------*/

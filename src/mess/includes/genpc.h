@@ -72,7 +72,7 @@ public:
 	UINT8                   m_ppi_shift_register;
 	UINT8                   m_ppi_shift_enable;
 
-	static IRQ_CALLBACK(pc_irq_callback);
+	IRQ_CALLBACK_MEMBER(pc_irq_callback);
 
 	// interface to the keyboard
 	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );

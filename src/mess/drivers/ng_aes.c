@@ -66,7 +66,6 @@ extern const char layout_neogeo[];
 
 
 
-static IRQ_CALLBACK(neocd_int_callback);
 
 /* Stubs for various functions called by the FBA code, replace with MAME specifics later */
 
@@ -178,6 +177,7 @@ public:
 	DECLARE_DRIVER_INIT(neocdz);
 	DECLARE_DRIVER_INIT(neocdzj);
 
+	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 };
 
 
@@ -1117,7 +1117,7 @@ MACHINE_START_MEMBER(ng_aes_state,neocd)
 	save_pointer(NAME(m_memcard_data), 0x2000);
 
 	// for custom vectors
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(neocd_int_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ng_aes_state::neocd_int_callback),this));
 
 	neogeo_set_main_cpu_vector_table_source(machine(), 0); // default to the BIOS vectors
 
@@ -1539,15 +1539,13 @@ MACHINE_CONFIG_END
 
 /* NeoCD uses custom vectors on IRQ4 to handle various events from the CDC */
 
-static IRQ_CALLBACK(neocd_int_callback)
+IRQ_CALLBACK_MEMBER(ng_aes_state::neocd_int_callback)
 {
-	ng_aes_state *state = device->machine().driver_data<ng_aes_state>();
-
 	if (irqline==4)
 	{
-		if (state->get_nNeoCDIRQVectorAck()) {
-			state->set_nNeoCDIRQVectorAck(0);
-			return state->get_nNeoCDIRQVector();
+		if (get_nNeoCDIRQVectorAck()) {
+			set_nNeoCDIRQVectorAck(0);
+			return get_nNeoCDIRQVector();
 		}
 	}
 

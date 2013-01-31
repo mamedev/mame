@@ -347,10 +347,9 @@ void b2m_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(b2m_postload), this));
 }
 
-static IRQ_CALLBACK(b2m_irq_callback)
+IRQ_CALLBACK_MEMBER(b2m_state::b2m_irq_callback)
 {
-	b2m_state *state = device->machine().driver_data<b2m_state>();
-	return pic8259_acknowledge(state->m_pic);
+	return pic8259_acknowledge(m_pic);
 }
 
 const struct pic8259_interface b2m_pic8259_config =
@@ -372,6 +371,6 @@ void b2m_state::machine_reset()
 	m_b2m_side = 0;
 	m_b2m_drive = 0;
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(b2m_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(b2m_state::b2m_irq_callback),this));
 	b2m_set_bank(machine(), 7);
 }

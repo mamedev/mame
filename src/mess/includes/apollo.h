@@ -187,6 +187,8 @@ public:
 	void fdc_interrupt(bool state);
 	void fdc_dma_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	IRQ_CALLBACK_MEMBER(apollo_irq_acknowledge);
+	IRQ_CALLBACK_MEMBER(apollo_pic_acknowledge);
 };
 
 MACHINE_CONFIG_EXTERN( apollo );
@@ -249,8 +251,6 @@ DECLARE_READ8_DEVICE_HANDLER( apollo_pic8259_master_r );
 
 DECLARE_WRITE8_DEVICE_HANDLER(apollo_pic8259_slave_w );
 DECLARE_READ8_DEVICE_HANDLER( apollo_pic8259_slave_r );
-
-IRQ_CALLBACK(apollo_pic_acknowledge);
 
 /*----------- machine/apollo_ptm.c -----------*/
 

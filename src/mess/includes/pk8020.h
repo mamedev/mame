@@ -54,6 +54,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out0);
 	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out1);
 	DECLARE_WRITE_LINE_MEMBER(pk8020_pic_set_int_line);
+	IRQ_CALLBACK_MEMBER(pk8020_irq_callback);
 };
 
 

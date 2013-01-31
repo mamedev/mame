@@ -138,12 +138,6 @@ void i82371sb_device::pci_write(pci_bus_device *pcibus, int function, int offset
 	//logerror("i82371sb_pci_write: write to undefined function %d\n", function);
 }
 
-static IRQ_CALLBACK(at_irq_callback)
-{
-	device_t *pic = device->machine().device(":pcibus:1:i82371sb:pic8259_master");
-	return pic8259_acknowledge(pic);
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -153,8 +147,6 @@ void i82371sb_device::device_start()
 	southbridge_device::device_start();
 	/* setup save states */
 	save_item(NAME(m_regs));
-
-	machine().device(":maincpu")->execute().set_irq_acknowledge_callback(at_irq_callback);
 }
 
 //-------------------------------------------------

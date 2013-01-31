@@ -675,15 +675,16 @@ static void apollo_pic_set_irq_line(device_t *device, int irq, int state) {
 	}
 }
 
-IRQ_CALLBACK(apollo_pic_acknowledge) {
-	UINT32 vector = pic8259_acknowledge(get_pic8259_master(device));
+IRQ_CALLBACK_MEMBER(apollo_state::apollo_pic_acknowledge) 
+{
+	UINT32 vector = pic8259_acknowledge(get_pic8259_master(&device));
 	if ((vector & 0x0f) == APOLLO_IRQ_PIC_SLAVE) {
-		vector = pic8259_acknowledge(get_pic8259_slave(device));
+		vector = pic8259_acknowledge(get_pic8259_slave(&device));
 	}
 
 	// don't log ptm interrupts
 	if (vector != APOLLO_IRQ_VECTOR+APOLLO_IRQ_PTM) {
-		DLOG1(("apollo_pic_acknowledge: irq=%d vector=%x", vector & 0x0f, vector));
+		MLOG1(("apollo_pic_acknowledge: irq=%d vector=%x", vector & 0x0f, vector));
 	}
 
 	if (apollo_is_dn3000()) {

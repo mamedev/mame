@@ -1463,10 +1463,9 @@ DRIVER_INIT_MEMBER(pc_state,pc1640)
 	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
-static IRQ_CALLBACK(pc_irq_callback)
+IRQ_CALLBACK_MEMBER(pc_state::pc_irq_callback)
 {
-	pc_state *st = device->machine().driver_data<pc_state>();
-	return pic8259_acknowledge( st->m_pic8259 );
+	return pic8259_acknowledge(m_pic8259);
 }
 
 
@@ -1475,7 +1474,7 @@ MACHINE_START_MEMBER(pc_state,pc)
 	m_pic8259 = machine().device("pic8259");
 	m_pit8253 = machine().device("pit8253");
 	m_maincpu = machine().device<cpu_device>("maincpu" );
-	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc_state::pc_irq_callback),this));
 
 	pc_fdc_interface *fdc = machine().device<pc_fdc_interface>("fdc");
 	fdc->setup_intrq_cb(pc_fdc_interface::line_cb(FUNC(pc_state::fdc_interrupt), this));
@@ -1511,7 +1510,7 @@ MACHINE_RESET_MEMBER(pc_state,pc)
 MACHINE_START_MEMBER(pc_state,mc1502)
 {
 	m_maincpu = machine().device<cpu_device>("maincpu" );
-	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc_state::pc_irq_callback),this));
 
 	m_pic8259 = machine().device("pic8259");
 	m_pit8253 = machine().device("pit8253");
@@ -1539,7 +1538,7 @@ MACHINE_START_MEMBER(pc_state,pcjr)
 	m_pcjr_watchdog = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_fdc_watchdog),this));
 	pcjr_keyb.keyb_signal_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc_state::pcjr_keyb_signal_callback),this));
 	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_maincpu->set_irq_acknowledge_callback(pc_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc_state::pc_irq_callback),this));
 
 	machine().device<upd765a_device>("upd765")->set_ready_line_connected(false);
 

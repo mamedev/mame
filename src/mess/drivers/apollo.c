@@ -278,12 +278,13 @@ static void apollo_bus_error(running_machine &machine)
 	apollo_csr_set_status_register(APOLLO_CSR_SR_CPU_TIMEOUT, APOLLO_CSR_SR_CPU_TIMEOUT);
 }
 
-static IRQ_CALLBACK(apollo_irq_acknowledge) {
+IRQ_CALLBACK_MEMBER(apollo_state::apollo_irq_acknowledge)
+{
 	int result = M68K_INT_ACK_AUTOVECTOR;
 
-	device->machine().device(MAINCPU)->execute().set_input_line(irqline, CLEAR_LINE);
+	machine().device(MAINCPU)->execute().set_input_line(irqline, CLEAR_LINE);
 
-	DLOG2(("apollo_irq_acknowledge: interrupt level=%d", irqline));
+	MLOG2(("apollo_irq_acknowledge: interrupt level=%d", irqline));
 
 	if (irqline == 6) {
 		result = apollo_pic_acknowledge(device, irqline);
@@ -1080,7 +1081,7 @@ DRIVER_INIT_MEMBER(apollo_state,dn3500)
 {
 //  MLOG1(("driver_init_dn3500"));
 
-	machine().device(MAINCPU)->execute().set_irq_acknowledge_callback(apollo_irq_acknowledge);
+	machine().device(MAINCPU)->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apollo_state::apollo_irq_acknowledge),this));
 
 	/* hook the RESET line, which resets a slew of other components */
 	m68k_set_reset_callback(machine().device(MAINCPU), apollo_reset_instr_callback);

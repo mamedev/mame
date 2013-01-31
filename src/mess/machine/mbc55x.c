@@ -126,10 +126,9 @@ WRITE8_MEMBER(mbc55x_state::mbcpic8259_w)
 	pic8259_w(m_pic, space, offset>>1, data);
 }
 
-static IRQ_CALLBACK(mbc55x_irq_callback)
+IRQ_CALLBACK_MEMBER(mbc55x_state::mbc55x_irq_callback)
 {
-	mbc55x_state *state = device->machine().driver_data<mbc55x_state>();
-	return pic8259_acknowledge( state->m_pic );
+	return pic8259_acknowledge(m_pic);
 }
 
 /* PIT8253 Configuration */
@@ -388,7 +387,7 @@ void mbc55x_state::machine_reset()
 {
 	set_ram_size(machine());
 	keyboard_reset(machine());
-	machine().device(MAINCPU_TAG)->execute().set_irq_acknowledge_callback(mbc55x_irq_callback);
+	machine().device(MAINCPU_TAG)->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mbc55x_state::mbc55x_irq_callback),this));
 }
 
 void mbc55x_state::machine_start()

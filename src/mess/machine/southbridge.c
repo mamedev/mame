@@ -180,14 +180,12 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
  * Init functions
  *
  **********************************************************/
-/*
-IRQ_CALLBACK(southbridge_device::at_irq_callback)
+
+IRQ_CALLBACK_MEMBER(southbridge_device::at_irq_callback)
 {
-    device_t *pic = device->machine().device(":pcibus:1:i82371ab:pic8259_master");
-    //return pic8259_acknowledge(m_pic8259_master);
-    return pic8259_acknowledge(pic);
+    return pic8259_acknowledge(m_pic8259_master);
 }
-*/
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -209,7 +207,7 @@ void southbridge_device::device_start()
 
 
 	m_at_offset1 = 0xff;
-	//machine().device(":maincpu")->execute().set_irq_acknowledge_callback(at_irq_callback);
+	machine().device(":maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(southbridge_device::at_irq_callback),this));
 }
 
 //-------------------------------------------------

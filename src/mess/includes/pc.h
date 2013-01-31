@@ -147,6 +147,7 @@ public:
 	void pc_eop_w(int channel, bool state);
 	void mc1502_fdc_irq_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	IRQ_CALLBACK_MEMBER(pc_irq_callback);
 };
 
 /*----------- defined in machine/pc.c -----------*/

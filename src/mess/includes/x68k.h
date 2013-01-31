@@ -369,6 +369,7 @@ public:
 	DECLARE_READ32_MEMBER(x68k_gvram32_r);
 	DECLARE_WRITE32_MEMBER(x68k_tvram32_w);
 	DECLARE_READ32_MEMBER(x68k_tvram32_r);
+	IRQ_CALLBACK_MEMBER(x68k_int_ack);
 private:
 	inline void x68k_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
 	void x68k_crtc_text_copy(int src, int dest);

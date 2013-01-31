@@ -1820,33 +1820,31 @@ INTERRUPT_GEN_MEMBER(x68k_state::x68k_vsync_irq)
 #endif
 }
 
-static IRQ_CALLBACK(x68k_int_ack)
+IRQ_CALLBACK_MEMBER(x68k_state::x68k_int_ack)
 {
-	x68k_state *state = device->machine().driver_data<x68k_state>();
-
 	if(irqline == 6)  // MFP
 	{
-		state->m_mfp.current_irq = -1;
-		if(state->m_current_vector[6] != 0x4b && state->m_current_vector[6] != 0x4c)
-			state->m_current_vector[6] = state->m_mfpdev->get_vector();
+		m_mfp.current_irq = -1;
+		if(m_current_vector[6] != 0x4b && m_current_vector[6] != 0x4c)
+			m_current_vector[6] = m_mfpdev->get_vector();
 		else
-			device->machine().device("maincpu")->execute().set_input_line_and_vector(irqline,CLEAR_LINE,state->m_current_vector[irqline]);
-		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",state->m_current_vector[6],irqline);
-		return state->m_current_vector[6];
+			machine().device("maincpu")->execute().set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
+		logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[6],irqline);
+		return m_current_vector[6];
 	}
 
-	device->machine().device("maincpu")->execute().set_input_line_and_vector(irqline,CLEAR_LINE,state->m_current_vector[irqline]);
+	machine().device("maincpu")->execute().set_input_line_and_vector(irqline,CLEAR_LINE,m_current_vector[irqline]);
 	if(irqline == 1)  // IOSC
 	{
-		state->m_ioc.irqstatus &= ~0xf0;
+		m_ioc.irqstatus &= ~0xf0;
 	}
 	if(irqline == 5)  // SCC
 	{
-		state->m_mouse.irqactive = 0;
+		m_mouse.irqactive = 0;
 	}
 
-	logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",state->m_current_vector[irqline],irqline);
-	return state->m_current_vector[irqline];
+	logerror("SYS: IRQ acknowledged (vector=0x%02x, line = %i)\n",m_current_vector[irqline],irqline);
+	return m_current_vector[irqline];
 }
 
 WRITE_LINE_MEMBER(x68k_state::x68k_scsi_irq)
@@ -2587,7 +2585,7 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 
 	mfp_init();
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(x68k_int_ack);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(x68k_state::x68k_int_ack),this));
 
 	// init keyboard
 	m_keyboard.delay = 500;  // 3*100+200

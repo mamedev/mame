@@ -183,6 +183,7 @@ public:
 	DECLARE_MACHINE_START(at);
 	DECLARE_MACHINE_RESET(at);
 	void pc_set_dma_channel(int channel, int state);
+	IRQ_CALLBACK_MEMBER(at_irq_callback);
 };
 
 
