@@ -115,6 +115,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_100hz_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_50hz_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(pc100_10hz_irq);
+	IRQ_CALLBACK_MEMBER(pc100_irq_callback);
 };
 
 void pc100_state::video_start()
@@ -399,9 +400,9 @@ static I8255A_INTERFACE( pc100_ppi8255_interface_2 )
 	DEVCB_DRIVER_MEMBER(pc100_state, crtc_bank_w)
 };
 
-static IRQ_CALLBACK(pc100_irq_callback)
+IRQ_CALLBACK_MEMBER(pc100_state::pc100_irq_callback)
 {
-	return pic8259_acknowledge( device->machine().device( "pic8259" ) );
+	return pic8259_acknowledge( device.machine().device( "pic8259" ) );
 }
 
 WRITE_LINE_MEMBER( pc100_state::pc100_set_int_line )
@@ -419,7 +420,7 @@ static const struct pic8259_interface pc100_pic8259_config =
 
 void pc100_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc100_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc100_state::pc100_irq_callback),this));
 	m_kanji_rom = (UINT16 *)(*machine().root_device().memregion("kanji"));
 	m_vram = (UINT16 *)(*memregion("vram"));
 }

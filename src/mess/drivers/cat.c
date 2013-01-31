@@ -205,6 +205,7 @@ public:
 	TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
 	TIMER_CALLBACK_MEMBER(swyft_reset);
+	IRQ_CALLBACK_MEMBER(cat_int_ack);
 };
 
 // TODO: this init doesn't actually work yet! please fix me!
@@ -681,9 +682,9 @@ TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 	m_6ms_counter++;
 }
 
-static IRQ_CALLBACK(cat_int_ack)
+IRQ_CALLBACK_MEMBER(cat_state::cat_int_ack)
 {
-	device->machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1,CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1,CLEAR_LINE);
 	return M68K_INT_ACK_AUTOVECTOR;
 }
 
@@ -700,7 +701,7 @@ MACHINE_START_MEMBER(cat_state,cat)
 
 MACHINE_RESET_MEMBER(cat_state,cat)
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(cat_int_ack);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cat_state::cat_int_ack),this));
 	m_6ms_counter = 0;
 	m_keyboard_timer->adjust(attotime::zero, 0, attotime::from_hz(120));
 	m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL_19_968MHz/2)/65536));

@@ -101,6 +101,7 @@ enum
 
 // IRQ callback to be called by device implementations when an IRQ is actually taken
 #define IRQ_CALLBACK(func)              int func(device_t *device, int irqline)
+#define IRQ_CALLBACK_MEMBER(func)       int func(device_t &device, int irqline)
 
 // interrupt generator callback called as a VBLANK or periodic interrupt
 #define INTERRUPT_GEN(func)             void func(device_t *device)
@@ -141,7 +142,7 @@ typedef device_delegate<void (device_t &)> device_interrupt_delegate;
 typedef void (*device_interrupt_func)(device_t *device);
 
 // IRQ callback to be called by executing devices when an IRQ is actually taken
-typedef device_delegate<void (device_t &, int)> device_irq_acknowledge_delegate;
+typedef device_delegate<int (device_t &, int)> device_irq_acknowledge_delegate;
 typedef int (*device_irq_acknowledge_callback)(device_t *device, int irqnum);
 
 
@@ -190,6 +191,7 @@ public:
 	void set_input_line_and_vector(int linenum, int state, int vector) { m_input[linenum].set_state_synced(state, vector); }
 	int input_state(int linenum) { return m_input[linenum].m_curstate; }
 	void set_irq_acknowledge_callback(device_irq_acknowledge_callback callback);
+	void set_irq_acknowledge_callback(device_irq_acknowledge_delegate callback);
 
 	// suspend/resume
 	void suspend(UINT32 reason, bool eatcycles);
@@ -292,7 +294,8 @@ protected:
 	device_execute_interface *m_nextexec;               // pointer to the next device to execute, in order
 
 	// input states and IRQ callbacks
-	device_irq_acknowledge_callback m_driver_irq;       // driver-specific IRQ callback
+	device_irq_acknowledge_callback m_driver_irq_legacy;// driver-specific IRQ callback
+	device_irq_acknowledge_delegate m_driver_irq;       // driver-specific IRQ callback
 	device_input            m_input[MAX_INPUT_LINES];   // data about inputs
 	emu_timer *             m_timedint_timer;           // reference to this device's periodic interrupt timer
 

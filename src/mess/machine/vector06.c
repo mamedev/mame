@@ -130,7 +130,7 @@ INTERRUPT_GEN_MEMBER(vector06_state::vector06_interrupt)
 
 }
 
-static IRQ_CALLBACK( vector06_irq_callback )
+IRQ_CALLBACK_MEMBER(vector06_state::vector06_irq_callback)
 {
 	// Interupt is RST 7
 	return 0xff;
@@ -170,7 +170,7 @@ void vector06_state::machine_reset()
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(vector06_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(vector06_state::vector06_irq_callback),this));
 	space.install_read_bank (0x0000, 0x7fff, "bank1");
 	space.install_write_bank(0x0000, 0x7fff, "bank2");
 	space.install_read_bank (0x8000, 0xffff, "bank3");
