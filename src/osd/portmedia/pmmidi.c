@@ -243,6 +243,20 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 	#ifndef DISABLE_MIDI
 	int bytes_needed = 0;
 
+	// skip sysex data
+	if (dev->last_status == 0xf0)
+	{
+		if (data != 0xf7)
+		{
+			return;
+		}
+		else
+		{
+			dev->last_status = 0xf7;
+			return;
+		}
+	}
+
 	if ((dev->xmit_cnt == 0) && (data & 0x80))
 	{
 		dev->last_status = data;
@@ -256,6 +270,13 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 	else
 	{
 		dev->xmit_in[dev->xmit_cnt++] = data;
+	}
+
+	if ((dev->xmit_cnt == 1) && (dev->xmit_in[0] == 0xf0))
+	{
+		dev->xmit_cnt = 0;
+		dev->last_status = 0xf0;
+		return;
 	}
 
 	// are we there yet?

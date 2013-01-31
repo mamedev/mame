@@ -44,7 +44,7 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1,  1,  3, -1, -1, -1, -1, -1, -1, -1, -1,  2,  1, /* 0x */
 		2, -1, -1, -1,  3, -1,  3,  3, -1, -1, -1,  -1,  1, -1, -1,  1, /* 1x */
 	-1, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 2x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 3x */
+	 1,  1, -1, -1,  1,  1,  1,  1,  1,  -1, -1, -1, -1, -1, -1, -1, /* 3x */
 		2,  3,  3, -1, -1, -1, -1, -1,  3, -1, -1,  -1, -1, -1, -1, -1, /* 4x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 5x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 6x */
@@ -71,6 +71,15 @@ static const ymf262_interface pc_ymf262_interface =
 	NULL
 };
 
+static SLOT_INTERFACE_START(midiout_slot)
+	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
+SLOT_INTERFACE_END
+
+static const serial_port_interface midiout_intf =
+{
+	DEVCB_NULL	// midi out ports don't transmit inward
+};
+
 static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("ym3812", YM3812, ym3812_StdClock)
@@ -90,6 +99,7 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("joy")
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
@@ -106,6 +116,7 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("joy")
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
@@ -122,6 +133,7 @@ static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("joy")
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 MACHINE_CONFIG_END
 
 static READ8_DEVICE_HANDLER( ym3812_16_r )
@@ -225,28 +237,41 @@ WRITE8_MEMBER( sb_device::dsp_reset_w )
 	if(offset)
 		return;
 
-	if(data == 0 && m_dsp.reset_latch == 1)
+	// a reset while in UART MIDI mode simply restores the previous
+	// operating state (page 5-3 of the Creative manual).
+	if (!m_uart_midi)
 	{
-		// reset routine
-		m_dsp.fifo_ptr = 0;
-		m_dsp.fifo_r_ptr = 0;
-		for(int i=0;i < 15; i++)
+		if(data == 0 && m_dsp.reset_latch == 1)
 		{
-			m_dsp.fifo[i] = 0;
-			m_dsp.fifo_r[i] = 0;
+			// reset routine
+			m_dsp.fifo_ptr = 0;
+			m_dsp.fifo_r_ptr = 0;
+			for(int i=0;i < 15; i++)
+			{
+				m_dsp.fifo[i] = 0;
+				m_dsp.fifo_r[i] = 0;
+			}
+			queue_r(0xaa); // reset OK ID
 		}
-		queue_r(0xaa); // reset OK ID
+
+		m_dsp.reset_latch = data;
+		drq_w(0);
+		m_dsp.dma_autoinit = 0;
+		irq_w(0, IRQ_ALL);
+		m_timer->adjust(attotime::never, 0);
+		m_dsp.d_rptr = 0;
+		m_dsp.d_wptr = 0;
+		m_dsp.dma_throttled = false;
+		m_dsp.dma_timer_started = false;
 	}
 
-	m_dsp.reset_latch = data;
-	drq_w(0);
-	m_dsp.dma_autoinit = 0;
-	irq_w(0, IRQ_ALL);
-	m_timer->adjust(attotime::never, 0);
-	m_dsp.d_rptr = 0;
-	m_dsp.d_wptr = 0;
-	m_dsp.dma_throttled = false;
-	m_dsp.dma_timer_started = false;
+	m_onebyte_midi = false;
+	m_uart_midi = false;
+	m_uart_irq = false;
+	m_mpu_midi = false;
+	m_tx_busy = false;
+	m_xmit_read = m_xmit_write = 0;
+	m_recv_read = m_recv_write = 0;
 
 	//printf("%02x\n",data);
 }
@@ -256,6 +281,19 @@ READ8_MEMBER( sb_device::dsp_data_r )
 //    printf("read DSP data @ %x\n", offset);
 	if(offset)
 		return 0xff;
+
+	if (m_uart_midi)
+	{
+		UINT8 rv = m_recvring[m_recv_read];
+
+		// only advance the read pointer if the ring wasn't empty
+		if (m_recv_read != m_xmit_read)
+		{
+			m_recv_read++;
+		}
+
+		return rv;
+	}
 
 	return dequeue_r();
 }
@@ -281,6 +319,18 @@ READ8_MEMBER(sb_device::dsp_rbuf_status_r)
 
 //    printf("Clear IRQ5\n");
 	irq_w(0, IRQ_DMA8);   // reading this port ACKs the card's IRQ, 8-bit dma only?
+
+	// in UART MIDI mode, bit 7 indicates if a character is available 
+	// to read.
+	if (m_uart_midi)
+	{
+		if (m_recv_read != m_recv_write)
+		{
+			return 0x80;
+		}
+
+		return 0x00;
+	}
 
 	return m_dsp.rbuf_status;
 }
@@ -361,6 +411,25 @@ void sb_device::process_fifo(UINT8 cmd)
 				m_dsp.dma_autoinit = 0;
 				drq_w(1);
 				logerror("SB: ADC capture unimplemented\n");
+				break;
+
+			case 0x34:
+				m_uart_midi = true;
+				m_uart_irq = true;
+				break;
+
+			case 0x35:
+				m_uart_midi = true;
+				m_uart_irq = false;
+				break;
+
+			case 0x36:
+			case 0x37:	// Enter UART mode
+				printf("timestamp MIDI mode not supported, contact MESSDEV!\n");
+				break;
+
+			case 0x38:	// single-byte MIDI send
+				m_onebyte_midi = true;
 				break;
 
 			case 0x40:  // set time constant
@@ -609,10 +678,17 @@ void sb_device::process_fifo(UINT8 cmd)
 
 WRITE8_MEMBER(sb_device::dsp_cmd_w)
 {
-//  printf("%02x to DSP command @ %x\n", data, offset);
+//	printf("%02x to DSP command @ %x\n", data, offset);
 
 	if(offset)
 		return;
+
+	if (m_uart_midi || m_onebyte_midi)
+	{
+		xmit_char(data);
+		m_onebyte_midi = false;	// clear onebyte (if this is uart, that's harmless)
+		return;
+	}
 
 	queue(data);
 
@@ -698,6 +774,10 @@ WRITE8_MEMBER( sb16_device::mpu401_w )
 	if(offset == 0) // data
 	{
 		logerror("SB MPU401:%02x %02x\n",offset,data);
+		if (m_mpu_midi)
+		{
+			xmit_char(data);
+		}
 	}
 	else // command
 	{
@@ -705,10 +785,18 @@ WRITE8_MEMBER( sb16_device::mpu401_w )
 
 		switch(data)
 		{
+			case 0x3f: // enter MPU-401 UART mode
+				irq_w(1, IRQ_MPU);
+				m_head = m_tail = 0;
+				m_mpu_queue[m_head++] = 0xfe;
+				m_mpu_midi = true;
+				break;
+
 			case 0xff: // reset
 				irq_w(1, IRQ_MPU);
 				m_head = m_tail = 0;
 				m_mpu_queue[m_head++] = 0xfe;
+				m_mpu_midi = false;
 				break;
 		}
 	}
@@ -988,9 +1076,11 @@ machine_config_constructor isa16_sblaster16_device::device_mconfig_additions() c
 
 sb_device::sb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name) :
 	device_t(mconfig, type, name, tag, owner, clock),
+	device_serial_interface(mconfig, *this),
 	m_dacl(*this, "sbdacl"),
 	m_dacr(*this, "sbdacr"),
-	m_joy(*this, "joy")
+	m_joy(*this, "joy"),
+	m_mdout(*this, "mdout")
 {
 }
 
@@ -1116,6 +1206,11 @@ void sb_device::device_reset()
 	m_dsp.irq_active = 0;
 	m_dsp.dma_no_irq = false;
 	mixer_reset();
+
+	// MIDI is 31250 baud, 8-N-1
+	set_rcv_rate(31250);
+	set_tra_rate(31250);
+	set_data_frame(8, 1, SERIAL_PARITY_NONE);
 }
 
 UINT8 sb_device::dack_r(int line)
@@ -1406,3 +1501,96 @@ void sb_device::device_timer(emu_timer &timer, device_timer_id tid, int param, v
 		}
 	}
 }
+
+void sb_device::rcv_complete()    // Rx completed receiving byte
+{
+	receive_register_extract();
+	UINT8 data = get_received_char();
+
+	// in UART MIDI mode, we set the DMA8 IRQ on receiving a character
+	if (m_uart_midi)
+	{
+		m_recvring[m_recv_write++] = data;
+
+		// if not polling mode, trigger the DMA8 IRQ
+		if (m_uart_irq)
+		{
+			irq_w(1, IRQ_DMA8); 
+		}
+	}
+}
+
+void sb16_device::rcv_complete()    // Rx completed receiving byte
+{
+	receive_register_extract();
+	UINT8 data = get_received_char();
+
+	// in UART MIDI mode, we set the DMA8 IRQ on receiving a character
+	if (m_uart_midi)
+	{
+		m_recvring[m_recv_write++] = data;
+		irq_w(1, IRQ_DMA8); 
+	}
+
+	// in MPU MIDI mode, do this instead
+	if (m_mpu_midi)
+	{
+		m_mpu_queue[m_head++] = data;
+		if (m_head >= 16)
+		{
+			m_head = 0;
+		}
+		irq_w(1, IRQ_MPU);
+	}
+}
+
+void sb_device::tra_complete()    // Tx completed sending byte
+{
+//  printf("Tx complete\n");
+	// is there more waiting to send?
+	if (m_xmit_read != m_xmit_write)
+	{
+		transmit_register_setup(m_xmitring[m_xmit_read++]);
+		if (m_xmit_read >= MIDI_RING_SIZE)
+		{
+			m_xmit_read = 0;
+		}
+	}
+	else
+	{
+		m_tx_busy = false;
+	}
+}
+
+void sb_device::tra_callback()    // Tx send bit
+{
+	int bit = transmit_register_get_data_bit();
+    m_mdout->tx(bit);
+}
+
+void sb_device::xmit_char(UINT8 data)
+{
+//	printf("SB: xmit %02x\n", data);
+
+	// if tx is busy it'll pick this up automatically when it completes
+	if (!m_tx_busy)
+	{
+		m_tx_busy = true;
+		transmit_register_setup(data);
+	}
+	else
+	{
+		// tx is busy, it'll pick this up next time
+		m_xmitring[m_xmit_write++] = data;
+		if (m_xmit_write >= MIDI_RING_SIZE)
+		{
+			m_xmit_write = 0;
+		}
+
+		if (m_xmit_write == m_xmit_read)
+		{
+			printf("Overflow xmitring!\n");
+		}
+	}
+}
+
