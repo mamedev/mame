@@ -109,7 +109,18 @@ class gb_state : public driver_device
 {
 public:
 	gb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_bank5(*this, "bank5")
+		, m_bank6(*this, "bank6")
+		, m_bank10(*this, "bank10")
+		, m_bank11(*this, "bank11")
+		, m_inputs(*this, "INPUTS")
+	{ }
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -178,7 +189,7 @@ public:
 	UINT8 m_mmm01_bank;
 	UINT8 m_mmm01_bank_mask;
 	gb_lcd_t m_lcd;
-	void (*update_scanline)( running_machine &machine );
+	void (gb_state::*update_scanline) ();
 
 	bitmap_ind16 m_bitmap;
 	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc1);
@@ -255,6 +266,42 @@ public:
 	TIMER_CALLBACK_MEMBER(gb_video_init_vbl);
 	TIMER_CALLBACK_MEMBER(gb_lcd_timer_proc);
 	TIMER_CALLBACK_MEMBER(gbc_lcd_timer_proc);
+	DECLARE_WRITE8_MEMBER(gb_timer_callback);
+
+protected:
+	required_device<lr35902_cpu_device> m_maincpu;
+	required_memory_bank m_bank1;   // all
+	optional_memory_bank m_bank2;   // dmg, sgb, cgb
+	optional_memory_bank m_bank3;   // cgb
+	optional_memory_bank m_bank4;   // dmg, sgb, cgb
+	optional_memory_bank m_bank5;   // dmg, sgb, cgb
+	optional_memory_bank m_bank6;   // dmg, sgb, cgb
+	required_memory_bank m_bank10;  // all
+	optional_memory_bank m_bank11;  // dmg, sgb, cgb
+	required_ioport m_inputs;
+
+	void gb_timer_increment();
+	void gb_timer_check_irq();
+	void gb_init_regs();
+	void gb_rom16_0000( UINT8 *addr );
+	void gb_rom16_4000( UINT8 *addr );
+	void gb_rom8_4000( UINT8 *addr );
+	void gb_rom8_6000( UINT8 *addr );
+	void gb_init();
+	void gb_set_mbc1_banks();
+	void gb_set_mbc1_kor_banks();
+	void gb_select_sprites();
+	void gb_update_sprites();
+	void gb_update_scanline();
+	void sgb_update_sprites();
+	void sgb_refresh_border();
+	void sgb_update_scanline();
+	void cgb_update_sprites();
+	void cgb_update_scanline();
+	void gb_video_reset( int mode );
+	void gbc_hdma(UINT16 length);
+	void gb_increment_scanline();
+	void gb_lcd_switch_on();
 };
 
 
@@ -262,9 +309,6 @@ public:
 
 DEVICE_START(gb_cart);
 DEVICE_IMAGE_LOAD(gb_cart);
-void gb_timer_callback(lr35902_cpu_device *device, int cycles);
-
-
 
 
 /* -- Super Game Boy specific -- */
@@ -287,9 +331,6 @@ enum
 	GB_VIDEO_SGB,
 	GB_VIDEO_CGB
 };
-
-void gb_video_reset( running_machine &machine, int mode );
-UINT8 *gb_get_vram_ptr(running_machine &machine);
 
 
 #endif /* GB_H_ */

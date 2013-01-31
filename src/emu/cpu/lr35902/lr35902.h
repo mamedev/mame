@@ -4,20 +4,16 @@
 #define __LR35902_H__
 
 
-#define MCFG_LR35902_CONFIG(_config) \
-	lr35902_cpu_device::static_set_config(*device, _config);
+#define MCFG_LR35902_TIMER_CB(_devcb) \
+	lr35902_cpu_device::set_timer_cb(*device, DEVCB2_##_devcb); \
 
-class lr35902_cpu_device;
+#define MCFG_LR35902_HALT_BUG \
+	lr35902_cpu_device::set_halt_bug(*device); \
 
-// Perhaps replace this with a standard device callback
-typedef void (*lr35902_timer_fired_func)(lr35902_cpu_device *device, int cycles);
+// This should be removed/improved once all gameboy boot roms have been dumped
+#define MCFG_LR35902_RESET_VALUES(_regs) \
+	lr35902_cpu_device::set_reset_values(*device, _regs); \
 
-struct lr35902_config
-{
-	const UINT16    *c_regs;
-	UINT8           c_features;
-	lr35902_timer_fired_func c_timer_expired_func;
-};
 
 enum
 {
@@ -29,18 +25,17 @@ enum
 	LR35902_SPEED,
 };
 
-// This and the features configuration could be removed if we introduce proper subclasses
-#define LR35902_FEATURE_HALT_BUG    0x01
 
-
-class lr35902_cpu_device :  public cpu_device,
-							public lr35902_config
+class lr35902_cpu_device :  public cpu_device
 {
 public:
 	// construction/destruction
 	lr35902_cpu_device(const machine_config &mconfig, const char *_tag, device_t *_owner, UINT32 _clock);
 
-	static void static_set_config(device_t &device, const lr35902_config &config);
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_timer_cb(device_t &device, _Object object) { return downcast<lr35902_cpu_device &>(device).m_timer_func.set_callback(object); }
+	static void set_halt_bug(device_t &device) { downcast<lr35902_cpu_device &>(device).m_features |= LR35902_FEATURE_HALT_BUG; }
+	static void set_reset_values(device_t &device, const UINT16 *regs) { downcast<lr35902_cpu_device &>(device).c_regs = regs; }
 
 	UINT8 get_speed();
 	void set_speed( UINT8 speed_request );
@@ -52,6 +47,8 @@ public:
 	void set_if( UINT8 data ) { m_IF = data; }
 
 protected:
+	static const UINT8 LR35902_FEATURE_HALT_BUG = 0x01;
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
@@ -103,8 +100,8 @@ protected:
 	lr35902_cpu_device *m_device;
 	address_space *m_program;
 	int m_icount;
-	/* Timer stuff */
-	lr35902_timer_fired_func m_timer_expired_func;
+	/* Timer callback */
+	devcb2_write8 m_timer_func;
 	/* Fetch & execute related */
 	int     m_execution_state;
 	UINT8   m_op;
@@ -114,6 +111,7 @@ protected:
 	int m_enable;
 	int m_doHALTbug;
 	UINT8   m_features;
+	const UINT16 *c_regs;
 	const struct lr35902_config *m_config;
 
 	/* Flag bit definitions */

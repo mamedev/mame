@@ -453,12 +453,6 @@ space. This mapper uses 32KB sized banks.
 static const UINT16 mgb_cpu_regs[6] = { 0xFFB0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };   /* Game Boy Pocket / Super Game Boy 2 */
 static const UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xFFFE, 0x0000 };  /* Megaduck */
 
-static const struct lr35902_config dmg_cpu_reset = { NULL, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
-static const struct lr35902_config sgb_cpu_reset = { NULL, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
-static const struct lr35902_config mgb_cpu_reset = { mgb_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
-static const struct lr35902_config cgb_cpu_reset = { NULL, 0, gb_timer_callback };
-static const struct lr35902_config megaduck_cpu_reset = { megaduck_cpu_regs, LR35902_FEATURE_HALT_BUG, gb_timer_callback };
-
 static ADDRESS_MAP_START(gb_map, AS_PROGRAM, 8, gb_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK("bank5")                    /* BIOS or ROM */
@@ -561,7 +555,8 @@ static MACHINE_CONFIG_START( gb_common, gb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, 4194304)           /* 4.194304 MHz */
 	MCFG_CPU_PROGRAM_MAP(gb_map)
-	MCFG_LR35902_CONFIG(dmg_cpu_reset)
+	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
+	MCFG_LR35902_HALT_BUG
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gb_state,  gb_scanline_interrupt)  /* 1 dummy int each frame */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
@@ -606,7 +601,8 @@ static MACHINE_CONFIG_DERIVED( supergb, gameboy )
 	MCFG_CPU_PROGRAM_MAP(sgb_map)
 
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_LR35902_CONFIG(sgb_cpu_reset)
+	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
+	MCFG_LR35902_HALT_BUG
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state, sgb )
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, sgb )
@@ -622,7 +618,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 	MCFG_CPU_MODIFY("maincpu")
-	MCFG_LR35902_CONFIG(mgb_cpu_reset)
+	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
+	MCFG_LR35902_HALT_BUG
+	MCFG_LR35902_RESET_VALUES(mgb_cpu_regs)
+
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gbpocket )
 	MCFG_PALETTE_INIT_OVERRIDE(gb_state,gbp)
 
@@ -633,7 +632,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gbcolor, gb_common )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( gbc_map)
-	MCFG_LR35902_CONFIG(cgb_cpu_reset)
+	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
 
 	MCFG_MACHINE_START_OVERRIDE(gb_state,gbc)
 	MCFG_MACHINE_RESET_OVERRIDE(gb_state,gbc)
@@ -659,8 +658,10 @@ static MACHINE_CONFIG_START( megaduck, gb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, 4194304)           /* 4.194304 MHz */
 	MCFG_CPU_PROGRAM_MAP( megaduck_map)
+	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
+	MCFG_LR35902_HALT_BUG
+	MCFG_LR35902_RESET_VALUES(megaduck_cpu_regs)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gb_state,  gb_scanline_interrupt)  /* 1 int each scanline ! */
-	MCFG_LR35902_CONFIG(megaduck_cpu_reset)
 
 	MCFG_SCREEN_ADD("screen", LCD)
 	MCFG_SCREEN_REFRESH_RATE(DMG_FRAMES_PER_SECOND)

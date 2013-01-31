@@ -130,157 +130,156 @@ enum {
 
 
 static void gb_machine_stop(running_machine &machine);
-static void gb_timer_increment( running_machine &machine );
 
 #ifdef MAME_DEBUG
 /* #define V_GENERAL*/      /* Display general debug information */
 /* #define V_BANK*/         /* Display bank switching debug information */
 #endif
 
-static void gb_init_regs(running_machine &machine)
+void gb_state::gb_init_regs()
 {
-	gb_state *state = machine.driver_data<gb_state>();
 	/* Initialize the registers */
-	state->SIODATA = 0x00;
-	state->SIOCONT = 0x7E;
+	SIODATA = 0x00;
+	SIOCONT = 0x7E;
 
-	state->gb_io_w( machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x05, 0x00 );       /* TIMECNT */
-	state->gb_io_w( machine.device("maincpu")->memory().space(AS_PROGRAM ), 0x06, 0x00 );       /* TIMEMOD */
+	gb_io_w( m_maincpu->space(AS_PROGRAM ), 0x05, 0x00 );       /* TIMECNT */
+	gb_io_w( m_maincpu->space(AS_PROGRAM ), 0x06, 0x00 );       /* TIMEMOD */
 }
 
-static void gb_rom16_0000( running_machine &machine, UINT8 *addr )
+
+void gb_state::gb_rom16_0000( UINT8 *addr )
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	state->membank( "bank5" )->set_base( addr );
-	state->membank( "bank10" )->set_base( addr + 0x0100 );
-	state->membank( "bank6" )->set_base( addr + 0x0200 );
-	state->membank( "bank11" )->set_base( addr + 0x0900 );
+	m_bank5->set_base( addr );
+	m_bank10->set_base( addr + 0x0100 );
+	m_bank6->set_base( addr + 0x0200 );
+	m_bank11->set_base( addr + 0x0900 );
 }
 
-static void gb_rom16_4000( running_machine &machine, UINT8 *addr )
+
+void gb_state::gb_rom16_4000( UINT8 *addr )
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	state->membank( "bank1" )->set_base( addr );
-	state->membank( "bank4" )->set_base( addr + 0x2000 );
+	m_bank1->set_base( addr );
+	m_bank4->set_base( addr + 0x2000 );
 }
 
-static void gb_rom8_4000( running_machine &machine, UINT8 *addr )
+
+void gb_state::gb_rom8_4000( UINT8 *addr )
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	state->membank( "bank1" )->set_base( addr );
+	m_bank1->set_base( addr );
 }
 
-static void gb_rom8_6000( running_machine &machine, UINT8 *addr )
+
+void gb_state::gb_rom8_6000( UINT8 *addr )
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	state->membank( "bank4" )->set_base( addr );
+	m_bank4->set_base( addr );
 }
 
-static void gb_init(running_machine &machine)
+
+void gb_state::gb_init()
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	address_space &space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
+	address_space &space = m_maincpu->space( AS_PROGRAM );
 
 	/* Initialize the memory banks */
-	state->m_MBC1Mode = 0;
-	state->m_MBC3RTCBank = 0;
-	state->m_ROMBank = state->m_ROMBank00 + 1;
-	state->m_RAMBank = 0;
+	m_MBC1Mode = 0;
+	m_MBC3RTCBank = 0;
+	m_ROMBank = m_ROMBank00 + 1;
+	m_RAMBank = 0;
 
-	if (state->m_gb_cart)
+	if (m_gb_cart)
 	{
-		if ( state->m_MBCType != MBC_MEGADUCK )
+		if ( m_MBCType != MBC_MEGADUCK )
 		{
-			gb_rom16_4000( machine, state->m_ROMMap[state->m_ROMBank] );
-			state->membank ("bank2")->set_base (state->m_RAMMap[state->m_RAMBank] ? state->m_RAMMap[state->m_RAMBank] : state->m_gb_dummy_ram_bank);
+			gb_rom16_4000( m_ROMMap[m_ROMBank] );
+			m_bank2->set_base( m_RAMMap[m_RAMBank] ? m_RAMMap[m_RAMBank] : m_gb_dummy_ram_bank);
 		}
 		else
 		{
-			state->membank( "bank1" )->set_base( state->m_ROMMap[state->m_ROMBank] );
-			state->membank( "bank10" )->set_base( state->m_ROMMap[0] );
+			m_bank1->set_base( m_ROMMap[m_ROMBank] );
+			m_bank10->set_base( m_ROMMap[0] );
 		}
 	}
 
 	/* Set handlers based on the Memory Bank Controller in the cart */
-	switch( state->m_MBCType )
+	switch( m_MBCType )
 	{
 		case MBC_NONE:
 			break;
 		case MBC_MMM01:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_0000_w),state) );
-			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_2000_w),state));
-			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_4000_w),state));
-			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_6000_w),state));
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_0000_w),this) );
+			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_2000_w),this));
+			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_4000_w),this));
+			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_6000_w),this));
 			break;
 		case MBC_MBC1:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );    /* We don't emulate RAM enable yet */
-			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1),state) );
-			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1),state) );
-			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1),state) );
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),this) );    /* We don't emulate RAM enable yet */
+			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1),this) );
+			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1),this) );
+			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1),this) );
 			break;
 		case MBC_MBC2:
-			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc2),state) );
+			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc2),this) );
 			break;
 		case MBC_MBC3:
 		case MBC_HUC1:  /* Possibly wrong */
 		case MBC_HUC3:  /* Possibly wrong */
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );    /* We don't emulate RAM enable yet */
-			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc3),state) );
-			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc3),state) );
-			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc3),state) );
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),this) );    /* We don't emulate RAM enable yet */
+			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc3),this) );
+			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc3),this) );
+			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc3),this) );
 			break;
 		case MBC_MBC5:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );
-			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc5),state) );
-			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc5),state) );
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),this) );
+			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc5),this) );
+			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc5),this) );
 			break;
 		case MBC_MBC6:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc6),state) );
-			space.install_write_handler( 0x2000, 0x2fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc6_1),state) );
-			space.install_write_handler( 0x3000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc6_2),state) );
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc6),this) );
+			space.install_write_handler( 0x2000, 0x2fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc6_1),this) );
+			space.install_write_handler( 0x3000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc6_2),this) );
 			break;
 		case MBC_MBC7:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) );
-			space.install_write_handler( 0x2000, 0x2fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc7),state) );
-			space.install_write_handler( 0x3000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_unknown_mbc7),state) );
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),this) );
+			space.install_write_handler( 0x2000, 0x2fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc7),this) );
+			space.install_write_handler( 0x3000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_unknown_mbc7),this) );
 			break;
 		case MBC_TAMA5:
-			space.install_write_handler( 0xA000, 0xBFFF, write8_delegate(FUNC(gb_state::gb_ram_tama5),state) );
+			space.install_write_handler( 0xA000, 0xBFFF, write8_delegate(FUNC(gb_state::gb_ram_tama5),this) );
 			break;
 		case MBC_WISDOM:
-			space.install_write_handler( 0x0000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_wisdom),state) );
+			space.install_write_handler( 0x0000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_wisdom),this) );
 			break;
 		case MBC_MBC1_KOR:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),state) ); /* We don't emulate RAM enable yet */
-			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1_kor),state) );
-			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1_kor),state) );
-			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1_kor),state) );
+			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),this) ); /* We don't emulate RAM enable yet */
+			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1_kor),this) );
+			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1_kor),this) );
+			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1_kor),this) );
 			break;
 		case MBC_YONGYONG:
-			space.install_write_handler( 0x2000, 0x2000, write8_delegate(FUNC(gb_state::gb_rom_bank_yongyong_2000),state) );
-			//space.install_write_handler( 0x5000, 0x5003, write8_delegate(FUNC(gb_state::gb_rom_back_yongyong_5000),state) );
+			space.install_write_handler( 0x2000, 0x2000, write8_delegate(FUNC(gb_state::gb_rom_bank_yongyong_2000),this) );
+			//space.install_write_handler( 0x5000, 0x5003, write8_delegate(FUNC(gb_state::gb_rom_back_yongyong_5000),this) );
 			break;
 		case MBC_LASAMA:
-			space.install_write_handler( 0x2080, 0x2080, write8_delegate(FUNC(gb_state::gb_rom_bank_lasama_2080),state) );
-			space.install_write_handler( 0x6000, 0x6000, write8_delegate(FUNC(gb_state::gb_rom_bank_lasama_6000),state) );
+			space.install_write_handler( 0x2080, 0x2080, write8_delegate(FUNC(gb_state::gb_rom_bank_lasama_2080),this) );
+			space.install_write_handler( 0x6000, 0x6000, write8_delegate(FUNC(gb_state::gb_rom_bank_lasama_6000),this) );
 			break;
 		case MBC_ATVRACIN:
-			space.install_write_handler( 0x3F00, 0x3F00, write8_delegate(FUNC(gb_state::gb_rom_bank_atvracin_3f00),state) );
-			space.install_write_handler( 0x3FC0, 0x3FC0, write8_delegate(FUNC(gb_state::gb_rom_bank_atvracin_3fc0),state) );
+			space.install_write_handler( 0x3F00, 0x3F00, write8_delegate(FUNC(gb_state::gb_rom_bank_atvracin_3f00),this) );
+			space.install_write_handler( 0x3FC0, 0x3FC0, write8_delegate(FUNC(gb_state::gb_rom_bank_atvracin_3fc0),this) );
 			break;
 
 		case MBC_MEGADUCK:
-			space.install_write_handler( 0x0001, 0x0001, write8_delegate(FUNC(gb_state::megaduck_rom_bank_select_type1),state) );
-			space.install_write_handler( 0xB000, 0xB000, write8_delegate(FUNC(gb_state::megaduck_rom_bank_select_type2),state) );
+			space.install_write_handler( 0x0001, 0x0001, write8_delegate(FUNC(gb_state::megaduck_rom_bank_select_type1),this) );
+			space.install_write_handler( 0xB000, 0xB000, write8_delegate(FUNC(gb_state::megaduck_rom_bank_select_type2),this) );
 			break;
 	}
 
-	gb_sound_w(space.machine().device("custom"), space, 0x16, 0x00 );       /* Initialize sound hardware */
+	gb_sound_w(machine().device("custom"), space, 0x16, 0x00 );       /* Initialize sound hardware */
 
-	state->m_divcount = 0;
-	state->m_triggering_irq = 0;
-	state->m_gb_io[0x07] = 0xF8;        /* Upper bits of TIMEFRQ register are set to 1 */
+	m_divcount = 0;
+	m_triggering_irq = 0;
+	m_gb_io[0x07] = 0xF8;        /* Upper bits of TIMEFRQ register are set to 1 */
 }
+
 
 MACHINE_START_MEMBER(gb_state,gb)
 {
@@ -306,14 +305,14 @@ MACHINE_START_MEMBER(gb_state,gbc)
 
 MACHINE_RESET_MEMBER(gb_state,gb)
 {
-	gb_init(machine());
+	gb_init();
 
-	gb_video_reset( machine(), GB_VIDEO_DMG );
+	gb_video_reset( GB_VIDEO_DMG );
 
-	gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] );
+	gb_rom16_0000( m_ROMMap[m_ROMBank00] );
 
 	/* Enable BIOS rom */
-	membank("bank5")->set_base(memregion("maincpu")->base() );
+	m_bank5->set_base(memregion("maincpu")->base() );
 
 	m_divcount = 0x0004;
 }
@@ -335,16 +334,16 @@ MACHINE_START_MEMBER(gb_state,sgb)
 
 MACHINE_RESET_MEMBER(gb_state,sgb)
 {
-	gb_init(machine());
+	gb_init();
 
-	gb_video_reset( machine(), GB_VIDEO_SGB );
+	gb_video_reset( GB_VIDEO_SGB );
 
-	gb_init_regs(machine());
+	gb_init_regs();
 
-	gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
+	gb_rom16_0000( m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	membank("bank5")->set_base(memregion("maincpu")->base() );
+	m_bank5->set_base(memregion("maincpu")->base() );
 
 	memset( m_sgb_tile_data, 0, 0x2000 );
 
@@ -369,11 +368,11 @@ MACHINE_RESET_MEMBER(gb_state,sgb)
 
 MACHINE_RESET_MEMBER(gb_state,gbpocket)
 {
-	gb_init(machine());
+	gb_init();
 
-	gb_video_reset( machine(), GB_VIDEO_MGB );
+	gb_video_reset( GB_VIDEO_MGB );
 
-	gb_init_regs(machine());
+	gb_init_regs();
 
 	/* Initialize the Sound registers */
 	gb_sound_w(machine().device("custom"), generic_space(), 0x16,0x80);
@@ -381,7 +380,7 @@ MACHINE_RESET_MEMBER(gb_state,gbpocket)
 	gb_sound_w(machine().device("custom"), generic_space(), 0x14,0x77);
 
 	/* Enable BIOS rom if we have one */
-	gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
+	gb_rom16_0000( m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
 
 	m_divcount = 0xABC8;
 }
@@ -390,17 +389,17 @@ MACHINE_RESET_MEMBER(gb_state,gbc)
 {
 	int ii;
 
-	gb_init(machine());
+	gb_init();
 
-	gb_video_reset( machine(), GB_VIDEO_CGB );
+	gb_video_reset( GB_VIDEO_CGB );
 
-	gb_init_regs(machine());
+	gb_init_regs();
 
-	gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
+	gb_rom16_0000( m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	membank("bank5")->set_base(machine().root_device().memregion("maincpu")->base() );
-	membank("bank6")->set_base(memregion("maincpu")->base() + 0x100 );
+	m_bank5->set_base(memregion("maincpu")->base() );
+	m_bank6->set_base(memregion("maincpu")->base() + 0x100 );
 
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ )
@@ -424,11 +423,10 @@ static void gb_machine_stop(running_machine &machine)
 	image->battery_save(state->m_gb_cart_ram, state->m_RAMBanks * 0x2000);
 }
 
-static void gb_set_mbc1_banks( running_machine &machine )
+void gb_state::gb_set_mbc1_banks()
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	gb_rom16_4000( machine, state->m_ROMMap[ state->m_ROMBank ] );
-	state->membank( "bank2" )->set_base( state->m_RAMMap[ state->m_MBC1Mode ? ( state->m_ROMBank >> 5 ) : 0 ] );
+	gb_rom16_4000( m_ROMMap[ m_ROMBank ] );
+	m_bank2->set_base( m_RAMMap[ m_MBC1Mode ? ( m_ROMBank >> 5 ) : 0 ] );
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc1)
@@ -440,7 +438,7 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc1)
 
 	m_ROMBank = ( m_ROMBank & 0x01E0 ) | data;
 	/* Switch banks */
-	gb_set_mbc1_banks(machine());
+	gb_set_mbc1_banks();
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc2)
@@ -454,7 +452,7 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc2)
 	if( offset & 0x0100 )
 		m_ROMBank = ( m_ROMBank & 0x100 ) | data;
 	/* Switch banks */
-	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+	gb_rom16_4000( m_ROMMap[m_ROMBank] );
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc3)
@@ -467,7 +465,7 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc3)
 
 	m_ROMBank = ( m_ROMBank & 0x0100 ) | data;
 	/* Switch banks */
-	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+	gb_rom16_4000( m_ROMMap[m_ROMBank] );
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc5)
@@ -486,7 +484,7 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc5)
 		m_ROMBank = (m_ROMBank & 0x100 ) | data;
 	}
 	/* Switch banks */
-	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+	gb_rom16_4000( m_ROMMap[m_ROMBank] );
 }
 
 WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc6)
@@ -501,7 +499,7 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc6_1)
 	{
 		if ( data == 0x00 )
 		{
-			gb_rom8_4000( machine(), m_ROMMap[m_ROMBank>>1] + ( ( m_ROMBank & 0x01 ) ? 0x2000 : 0x0000 ) );
+			gb_rom8_4000( m_ROMMap[m_ROMBank>>1] + ( ( m_ROMBank & 0x01 ) ? 0x2000 : 0x0000 ) );
 		}
 	}
 	else
@@ -517,7 +515,7 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc6_2)
 	{
 		if ( data == 0x00 )
 		{
-			gb_rom8_6000( machine(), m_ROMMap[m_ROMBank00>>1] + ( ( m_ROMBank00 & 0x01 ) ? 0x2000 : 0x0000 ) );
+			gb_rom8_6000( m_ROMMap[m_ROMBank00>>1] + ( ( m_ROMBank00 & 0x01 ) ? 0x2000 : 0x0000 ) );
 		}
 	}
 	else
@@ -533,7 +531,7 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc7)
 	if ( offset & 0x0100 )
 	{
 		m_ROMBank = data;
-		gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+		gb_rom16_4000( m_ROMMap[m_ROMBank] );
 	}
 }
 
@@ -560,12 +558,12 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_wisdom)
 	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", space.device() .safe_pc( ), offset );
 	/* The address determines the bank to select */
 	m_ROMBank = ( offset << 1 ) & 0x1FF;
-	membank( "bank5" )->set_base( m_ROMMap[ m_ROMBank ] );
-	membank( "bank10" )->set_base( m_ROMMap[ m_ROMBank ] + 0x0100 );
-	membank( "bank6" )->set_base( m_ROMMap[ m_ROMBank ] + 0x0200 );
-	membank( "bank11" )->set_base( m_ROMMap[ m_ROMBank ] + 0x0900 );
-	membank( "bank1" )->set_base( m_ROMMap[ m_ROMBank + 1 ] );
-	membank( "bank4" )->set_base( m_ROMMap[ m_ROMBank + 1 ] + 0x2000 );
+	m_bank5->set_base( m_ROMMap[ m_ROMBank ] );
+	m_bank10->set_base( m_ROMMap[ m_ROMBank ] + 0x0100 );
+	m_bank6->set_base( m_ROMMap[ m_ROMBank ] + 0x0200 );
+	m_bank11->set_base( m_ROMMap[ m_ROMBank ] + 0x0900 );
+	m_bank1->set_base( m_ROMMap[ m_ROMBank + 1 ] );
+	m_bank4->set_base( m_ROMMap[ m_ROMBank + 1 ] + 0x2000 );
 }
 
 WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc1)
@@ -576,7 +574,7 @@ WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc1)
 	m_ROMBank = ( m_ROMBank & 0x1F ) | ( data << 5 );
 
 	/* Switch banks */
-	gb_set_mbc1_banks(machine());
+	gb_set_mbc1_banks();
 }
 
 WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc3)
@@ -590,7 +588,7 @@ WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc3)
 			if ( data < 5 )
 			{
 				memset( m_MBC3RTCData, m_MBC3RTCMap[m_MBC3RTCBank], 0x2000 );
-				membank( "bank2" )->set_base( m_MBC3RTCData );
+				m_bank2->set_base( m_MBC3RTCData );
 			}
 		}
 	}
@@ -599,7 +597,7 @@ WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc3)
 		m_RAMBank = data & 0x3;
 		m_MBC3RTCBank = 0xFF;
 		/* Switch banks */
-		membank( "bank2" )->set_base( m_RAMMap[m_RAMBank] );
+		m_bank2->set_base( m_RAMMap[m_RAMBank] );
 	}
 }
 
@@ -613,7 +611,7 @@ WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc5)
 	}
 	m_RAMBank = data;
 	/* Switch banks */
-	membank ("bank2")->set_base (m_RAMMap[m_RAMBank] );
+	m_bank2->set_base( m_RAMMap[m_RAMBank] );
 }
 
 WRITE8_MEMBER(gb_state::gb_ram_enable)
@@ -626,7 +624,7 @@ WRITE8_MEMBER(gb_state::gb_ram_enable)
 WRITE8_MEMBER(gb_state::gb_mem_mode_select_mbc1)
 {
 	m_MBC1Mode = data & 0x1;
-	gb_set_mbc1_banks(machine());
+	gb_set_mbc1_banks();
 }
 
 WRITE8_MEMBER(gb_state::gb_mem_mode_select_mbc3)
@@ -653,11 +651,11 @@ WRITE8_MEMBER(gb_state::gb_ram_tama5)
 		{
 		case 0x00:      /* Bits 0-3 for rom bank selection */
 			m_ROMBank = ( m_ROMBank & 0xF0 ) | ( data & 0x0F );
-			gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+			gb_rom16_4000( m_ROMMap[m_ROMBank] );
 			break;
 		case 0x01:      /* Bit 4(-7?) for rom bank selection */
 			m_ROMBank = ( m_ROMBank & 0x0F ) | ( ( data & 0x0F ) << 4 );
-			gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+			gb_rom16_4000( m_ROMMap[m_ROMBank] );
 			break;
 		case 0x04:      /* Data to write lo */
 			m_gbTama5Byte = ( m_gbTama5Byte & 0xF0 ) | ( data & 0x0F );
@@ -707,7 +705,7 @@ WRITE8_MEMBER(gb_state::gb_ram_tama5)
 			break;
 		case 0x0A:      /* Are we ready for the next command? */
 			m_MBC3RTCData[0] = 0x01;
-			membank( "bank2" )->set_base( m_MBC3RTCData );
+			m_bank2->set_base( m_MBC3RTCData );
 			break;
 		case 0x0C:      /* Data read register lo */
 			m_MBC3RTCData[0] = m_gbTama5Byte & 0x0F;
@@ -733,9 +731,9 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_0000_w)
 	if ( data & 0x40 )
 	{
 		m_mmm01_bank_offset = m_mmm01_reg1;
-		membank( "bank5" )->set_base( m_ROMMap[ m_mmm01_bank_offset ] );
-		membank( "bank10" )->set_base( m_ROMMap[ m_mmm01_bank_offset ] + 0x0100 );
-		gb_rom16_4000( machine(), m_ROMMap[ m_mmm01_bank_offset + m_mmm01_bank ] );
+		m_bank5->set_base( m_ROMMap[ m_mmm01_bank_offset ] );
+		m_bank10->set_base( m_ROMMap[ m_mmm01_bank_offset ] + 0x0100 );
+		gb_rom16_4000( m_ROMMap[ m_mmm01_bank_offset + m_mmm01_bank ] );
 	}
 }
 
@@ -749,7 +747,7 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_2000_w)
 	{
 		m_mmm01_bank = 1;
 	}
-	gb_rom16_4000( machine(), m_ROMMap[ m_mmm01_bank_offset + m_mmm01_bank ] );
+	gb_rom16_4000( m_ROMMap[ m_mmm01_bank_offset + m_mmm01_bank ] );
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_4000_w)
@@ -772,15 +770,14 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_6000_w)
 
 /* Korean MBC1 variant mapping */
 
-static void gb_set_mbc1_kor_banks( running_machine &machine )
+void gb_state::gb_set_mbc1_kor_banks()
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	if ( state->m_ROMBank & 0x30 )
+	if ( m_ROMBank & 0x30 )
 	{
-		gb_rom16_0000( machine, state->m_ROMMap[ state->m_ROMBank & 0x30 ] );
+		gb_rom16_0000( m_ROMMap[ m_ROMBank & 0x30 ] );
 	}
-	gb_rom16_4000( machine, state->m_ROMMap[ state->m_ROMBank ] );
-	state->membank( "bank2" )->set_base( state->m_RAMMap[ state->m_MBC1Mode ? ( state->m_ROMBank >> 5 ) : 0 ] );
+	gb_rom16_4000( m_ROMMap[ m_ROMBank ] );
+	m_bank2->set_base( m_RAMMap[ m_MBC1Mode ? ( m_ROMBank >> 5 ) : 0 ] );
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc1_kor)
@@ -792,7 +789,7 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc1_kor)
 
 	m_ROMBank = ( m_ROMBank & 0x01F0 ) | data;
 	/* Switch banks */
-	gb_set_mbc1_kor_banks(machine());
+	gb_set_mbc1_kor_banks();
 }
 
 WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc1_kor)
@@ -803,26 +800,26 @@ WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc1_kor)
 	m_ROMBank = ( m_ROMBank & 0x0F ) | ( data << 4 );
 
 	/* Switch banks */
-	gb_set_mbc1_kor_banks(machine());
+	gb_set_mbc1_kor_banks();
 }
 
 WRITE8_MEMBER(gb_state::gb_mem_mode_select_mbc1_kor)
 {
 	m_MBC1Mode = data & 0x1;
-	gb_set_mbc1_kor_banks(machine());
+	gb_set_mbc1_kor_banks();
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_yongyong_2000)
 {
 	m_ROMBank = data;
-	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+	gb_rom16_4000( m_ROMMap[m_ROMBank] );
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_lasama_2080)
 {
 	// Actual banking?
 	m_ROMBank = m_ROMBank00 | ( data & 0x03 );
-	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+	gb_rom16_4000( m_ROMMap[m_ROMBank] );
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_lasama_6000)
@@ -834,7 +831,7 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_lasama_6000)
 	if ( ! ( data & 0x80 ) )
 	{
 		m_ROMBank00 = ( data & 0x02 ) << 1;
-		gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] );
+		gb_rom16_0000( m_ROMMap[m_ROMBank00] );
 	}
 }
 
@@ -845,13 +842,13 @@ WRITE8_MEMBER(gb_state::gb_rom_bank_atvracin_3f00)
 		data = 1;
 	}
 	m_ROMBank = m_ROMBank00 | data;
-	gb_rom16_4000( machine(), m_ROMMap[m_ROMBank] );
+	gb_rom16_4000( m_ROMMap[m_ROMBank] );
 }
 
 WRITE8_MEMBER(gb_state::gb_rom_bank_atvracin_3fc0)
 {
 	m_ROMBank00 = data * 16;
-	gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] );
+	gb_rom16_0000( m_ROMMap[m_ROMBank00] );
 }
 
 WRITE8_MEMBER(gb_state::gb_io_w)
@@ -863,9 +860,9 @@ WRITE8_MEMBER(gb_state::gb_io_w)
 	case 0x00:                      /* JOYP - Joypad */
 		JOYPAD = 0xCF | data;
 		if (!(data & 0x20))
-			JOYPAD &= (ioport("INPUTS")->read() >> 4) | 0xF0;
+			JOYPAD &= (m_inputs->read() >> 4) | 0xF0;
 		if (!(data & 0x10))
-			JOYPAD &= ioport("INPUTS")->read() | 0xF0;
+			JOYPAD &= m_inputs->read() | 0xF0;
 		return;
 	case 0x01:                      /* SB - Serial transfer data */
 		break;
@@ -880,7 +877,7 @@ WRITE8_MEMBER(gb_state::gb_io_w)
 		case 0x81:              /* enabled & internal clock */
 			SIODATA = 0xFF;
 			m_SIOCount = 8;
-			m_gb_serial_timer->adjust(machine().device<cpu_device>("maincpu")->cycles_to_attotime(512), 0, machine().device<cpu_device>("maincpu")->cycles_to_attotime(512));
+			m_gb_serial_timer->adjust(m_maincpu->cycles_to_attotime(512), 0, m_maincpu->cycles_to_attotime(512));
 			m_gb_serial_timer->enable( 1 );
 			break;
 		}
@@ -888,7 +885,7 @@ WRITE8_MEMBER(gb_state::gb_io_w)
 	case 0x04:                      /* DIV - Divider register */
 		/* Force increment of TIMECNT register */
 		if ( m_divcount >= 16 )
-			gb_timer_increment(machine());
+			gb_timer_increment();
 		m_divcount = 0;
 		return;
 	case 0x05:                      /* TIMA - Timer counter */
@@ -913,7 +910,7 @@ WRITE8_MEMBER(gb_state::gb_io_w)
 			/* Check if TIMECNT should be incremented */
 			if ( ( m_divcount & ( m_shift_cycles - 1 ) ) >= ( m_shift_cycles >> 1 ) )
 			{
-				gb_timer_increment(machine());
+				gb_timer_increment();
 			}
 		}
 		m_shift = timer_shifts[data & 0x03];
@@ -933,7 +930,7 @@ WRITE8_MEMBER(gb_state::gb_io2_w)
 	if ( offset == 0x10 )
 	{
 		/* disable BIOS ROM */
-		gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] );
+		gb_rom16_0000( m_ROMMap[m_ROMBank00] );
 	}
 	else
 	{
@@ -988,7 +985,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 				m_sgb_bitcount = 0;
 				m_sgb_start = 1;
 				m_sgb_rest = 0;
-				JOYPAD = 0x0F & ((ioport("INPUTS")->read() >> 4) | ioport("INPUTS")->read() | 0xF0);
+				JOYPAD = 0x0F & ((m_inputs->read() >> 4) | m_inputs->read() | 0xF0);
 				break;
 			case 0x10:                 /* data true */
 				if (m_sgb_rest)
@@ -1012,7 +1009,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 					}
 					m_sgb_rest = 0;
 				}
-				JOYPAD = 0x1F & ((ioport("INPUTS")->read() >> 4) | 0xF0);
+				JOYPAD = 0x1F & ((m_inputs->read() >> 4) | 0xF0);
 				break;
 			case 0x20:              /* data false */
 				if (m_sgb_rest)
@@ -1316,12 +1313,11 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 								break;
 							case 0x0B:  /* PAL_TRN */
 								{
-									UINT8 *gb_vram = gb_get_vram_ptr(machine());
 									UINT16 I, col;
 
 									for( I = 0; I < 2048; I++ )
 									{
-										col = ( gb_vram[ 0x0800 + (I*2) + 1 ] << 8 ) | gb_vram[ 0x0800 + (I*2) ];
+										col = ( m_lcd.gb_vram_ptr[ 0x0800 + (I*2) + 1 ] << 8 ) | m_lcd.gb_vram_ptr[ 0x0800 + (I*2) ];
 										m_sgb_pal_data[I] = col;
 									}
 								}
@@ -1352,37 +1348,36 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 								break;
 							case 0x13:  /* CHR_TRN */
 								if( sgb_data[1] & 0x1 )
-									memcpy( m_sgb_tile_data + 4096, gb_get_vram_ptr(machine()) + 0x0800, 4096 );
+									memcpy( m_sgb_tile_data + 4096, m_lcd.gb_vram_ptr + 0x0800, 4096 );
 								else
-									memcpy( m_sgb_tile_data, gb_get_vram_ptr(machine()) + 0x0800, 4096 );
+									memcpy( m_sgb_tile_data, m_lcd.gb_vram_ptr + 0x0800, 4096 );
 								break;
 							case 0x14:  /* PCT_TRN */
 								{
 									int I;
 									UINT16 col;
-									UINT8 *gb_vram = gb_get_vram_ptr(machine());
 									if( m_sgb_hack )
 									{
-										memcpy( m_sgb_tile_map, gb_vram + 0x1000, 2048 );
+										memcpy( m_sgb_tile_map, m_lcd.gb_vram_ptr + 0x1000, 2048 );
 										for( I = 0; I < 64; I++ )
 										{
-											col = ( gb_vram[ 0x0800 + (I*2) + 1 ] << 8 ) | gb_vram[ 0x0800 + (I*2) ];
+											col = ( m_lcd.gb_vram_ptr[ 0x0800 + (I*2) + 1 ] << 8 ) | m_lcd.gb_vram_ptr[ 0x0800 + (I*2) ];
 											m_sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
 										}
 									}
 									else /* Do things normally */
 									{
-										memcpy( m_sgb_tile_map, gb_vram + 0x0800, 2048 );
+										memcpy( m_sgb_tile_map, m_lcd.gb_vram_ptr + 0x0800, 2048 );
 										for( I = 0; I < 64; I++ )
 										{
-											col = ( gb_vram[ 0x1000 + (I*2) + 1 ] << 8 ) | gb_vram[ 0x1000 + (I*2) ];
+											col = ( m_lcd.gb_vram_ptr[ 0x1000 + (I*2) + 1 ] << 8 ) | m_lcd.gb_vram_ptr[ 0x1000 + (I*2) ];
 											m_sgb_pal[SGB_BORDER_PAL_OFFSET + I] = col;
 										}
 									}
 								}
 								break;
 							case 0x15:  /* ATTR_TRN */
-								memcpy( m_sgb_atf_data, gb_get_vram_ptr(machine()) + 0x0800, 4050 );
+								memcpy( m_sgb_atf_data, m_lcd.gb_vram_ptr + 0x0800, 4050 );
 								break;
 							case 0x16:  /* ATTR_SET */
 								{
@@ -1439,7 +1434,7 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 					}
 					m_sgb_rest = 0;
 				}
-				JOYPAD = 0x2F & (ioport("INPUTS")->read() | 0xF0);
+				JOYPAD = 0x2F & (m_inputs->read() | 0xF0);
 				break;
 			case 0x30:                 /* rest condition */
 				if (m_sgb_start)
@@ -2044,62 +2039,59 @@ TIMER_CALLBACK_MEMBER(gb_state::gb_serial_timer_proc)
 	{
 		SIOCONT &= 0x7F;
 		m_gb_serial_timer->enable( 0 );
-		machine().device("maincpu")->execute().set_input_line(SIO_INT, ASSERT_LINE);
+		m_maincpu->set_input_line(SIO_INT, ASSERT_LINE);
 	}
 }
 
-INLINE void gb_timer_check_irq( running_machine &machine )
+void gb_state::gb_timer_check_irq()
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	state->m_reloading = 0;
-	if ( state->m_triggering_irq )
+	m_reloading = 0;
+	if ( m_triggering_irq )
 	{
-		state->m_triggering_irq = 0;
-		if ( state->TIMECNT == 0 )
+		m_triggering_irq = 0;
+		if ( TIMECNT == 0 )
 		{
-			state->TIMECNT = state->TIMEMOD;
-			machine.device("maincpu")->execute().set_input_line(TIM_INT, ASSERT_LINE );
-			state->m_reloading = 1;
+			TIMECNT = TIMEMOD;
+			m_maincpu->set_input_line(TIM_INT, ASSERT_LINE );
+			m_reloading = 1;
 		}
 	}
 }
 
-static void gb_timer_increment( running_machine &machine )
+void gb_state::gb_timer_increment()
 {
-	gb_state *state = machine.driver_data<gb_state>();
-	gb_timer_check_irq(machine);
+	gb_timer_check_irq();
 
-	state->TIMECNT += 1;
-	if ( state->TIMECNT == 0 )
+	TIMECNT += 1;
+	if ( TIMECNT == 0 )
 	{
-		state->m_triggering_irq = 1;
+		m_triggering_irq = 1;
 	}
 }
 
-void gb_timer_callback(lr35902_cpu_device *device, int cycles)
+WRITE8_MEMBER( gb_state::gb_timer_callback )
 {
-	gb_state *state = device->machine().driver_data<gb_state>();
-	UINT16 old_gb_divcount = state->m_divcount;
-	state->m_divcount += cycles;
+	UINT16 old_gb_divcount = m_divcount;
+	m_divcount += data;
 
-	gb_timer_check_irq(device->machine());
+	gb_timer_check_irq();
 
-	if ( state->TIMEFRQ & 0x04 )
+	if ( TIMEFRQ & 0x04 )
 	{
-		UINT16 old_count = old_gb_divcount >> state->m_shift;
-		UINT16 new_count = state->m_divcount >> state->m_shift;
-		if ( cycles > state->m_shift_cycles )
+		UINT16 old_count = old_gb_divcount >> m_shift;
+		UINT16 new_count = m_divcount >> m_shift;
+		if ( data > m_shift_cycles )
 		{
-			gb_timer_increment(device->machine());
+			gb_timer_increment();
 			old_count++;
 		}
 		if ( new_count != old_count )
 		{
-			gb_timer_increment(device->machine());
+			gb_timer_increment();
 		}
-		if ( new_count << state->m_shift < state->m_divcount )
+		if ( new_count << m_shift < m_divcount )
 		{
-			gb_timer_check_irq(device->machine());
+			gb_timer_check_irq();
 		}
 	}
 }
@@ -2112,7 +2104,7 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 			machine().device<lr35902_cpu_device>(":maincpu")->set_speed( data );
 			return;
 		case 0x10:  /* BFF - Bios disable */
-			gb_rom16_0000( machine(), m_ROMMap[m_ROMBank00] );
+			gb_rom16_0000( m_ROMMap[m_ROMBank00] );
 			return;
 		case 0x16:  /* RP - Infrared port */
 			break;
@@ -2120,7 +2112,7 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 			m_GBC_RAMBank = data & 0x7;
 			if ( ! m_GBC_RAMBank )
 				m_GBC_RAMBank = 1;
-			membank ("bank3")->set_base (m_GBC_RAMMap[m_GBC_RAMBank]);
+			m_bank3->set_base(m_GBC_RAMMap[m_GBC_RAMBank]);
 			break;
 		default:
 			break;
@@ -2162,9 +2154,9 @@ MACHINE_START_MEMBER(gb_state,megaduck)
 MACHINE_RESET_MEMBER(gb_state,megaduck)
 {
 	/* We may have to add some more stuff here, if not then it can be merged back into gb */
-	gb_init(machine());
+	gb_init();
 
-	gb_video_reset( machine(), GB_VIDEO_DMG );
+	gb_video_reset( GB_VIDEO_DMG );
 }
 
 /*
@@ -2280,7 +2272,7 @@ WRITE8_MEMBER(gb_state::megaduck_rom_bank_select_type1)
 		m_ROMBank = data & m_ROMMask;
 
 		/* Switch banks */
-		membank ("bank1")->set_base (m_ROMMap[m_ROMBank]);
+		m_bank1->set_base(m_ROMMap[m_ROMBank]);
 	}
 }
 
@@ -2291,8 +2283,8 @@ WRITE8_MEMBER(gb_state::megaduck_rom_bank_select_type2)
 		m_ROMBank = (data << 1) & m_ROMMask;
 
 		/* Switch banks */
-		membank( "bank10" )->set_base( m_ROMMap[m_ROMBank]);
-		membank( "bank1" )->set_base( m_ROMMap[m_ROMBank + 1]);
+		m_bank10->set_base( m_ROMMap[m_ROMBank]);
+		m_bank1->set_base( m_ROMMap[m_ROMBank + 1]);
 	}
 }
 

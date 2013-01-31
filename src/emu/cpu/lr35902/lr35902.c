@@ -54,19 +54,12 @@ const device_type LR35902 = &device_creator<lr35902_cpu_device>;
 
 
 lr35902_cpu_device::lr35902_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cpu_device(mconfig, LR35902, "LR35902", tag, owner, clock),
-		m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
+	: cpu_device(mconfig, LR35902, "LR35902", tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_timer_func(*this)
+	, m_features(0)
+	, c_regs(NULL)
 {
-	c_regs = NULL;
-	c_features = 0;
-	c_timer_expired_func = NULL;
-}
-
-
-void lr35902_cpu_device::static_set_config(device_t &device, const lr35902_config &config)
-{
-	lr35902_cpu_device &conf = downcast<lr35902_cpu_device &>(device);
-	static_cast<lr35902_config &>(conf) = config;
 }
 
 
@@ -77,10 +70,7 @@ void lr35902_cpu_device::static_set_config(device_t &device, const lr35902_confi
 inline void lr35902_cpu_device::cycles_passed(UINT8 cycles)
 {
 	m_icount -= cycles / m_gb_speed;
-	if ( m_timer_expired_func )
-	{
-		m_timer_expired_func( this, cycles );
-	}
+	m_timer_func( cycles );
 }
 
 
@@ -118,6 +108,8 @@ void lr35902_cpu_device::device_start()
 {
 	m_device = this;
 	m_program = &space(AS_PROGRAM);
+
+	m_timer_func.resolve_safe();
 
 	save_item(NAME(m_A));
 	save_item(NAME(m_F));
@@ -210,8 +202,6 @@ void lr35902_cpu_device::device_reset()
 		m_SP = c_regs[4];
 		m_PC = c_regs[5];
 	}
-	m_timer_expired_func = c_timer_expired_func;
-	m_features = c_features;
 
 	m_enable = 0;
 	m_IE = 0;
