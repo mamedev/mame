@@ -381,31 +381,6 @@ inline _Dest downcast(_Source &src)
 }
 
 
-// template function for cross-casting from one class to another that throws a bad_cast
-// exception instead of returning NULL
-template<class _Dest, class _Source>
-inline _Dest crosscast(_Source *src)
-{
-	_Dest result;
-#ifdef MAME_DEBUG
-	try
-	{
-#endif
-		result = dynamic_cast<_Dest>(src);
-#ifdef MAME_DEBUG
-	}
-	catch (std::bad_cast &)
-	{
-		report_bad_cast(typeid(src), typeid(_Dest));
-	}
-#endif
-	assert(result != NULL);
-	if (result == NULL)
-		throw std::bad_cast();
-	return result;
-}
-
-
 
 //**************************************************************************
 //  FUNCTION PROTOTYPES
