@@ -118,7 +118,7 @@ static void filter_w( device_t *device, int data )
 	if (data & 2)
 		C +=  47000;    /*  47000pF = 0.047uF */
 
-	filter_rc_set_RC(device, FLT_RC_LOWPASS, 1000, 5100, 0, CAP_P(C));
+	dynamic_cast<filter_rc_device*>(device)->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 5100, 0, CAP_P(C));
 }
 
 
@@ -233,18 +233,18 @@ MACHINE_CONFIG_FRAGMENT( timeplt_sound )
 	MCFG_SOUND_ROUTE(1, "filter.1.1", 0.60)
 	MCFG_SOUND_ROUTE(2, "filter.1.2", 0.60)
 
-	MCFG_SOUND_ADD("filter.0.0", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter.0.0", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("filter.0.1", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter.0.1", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("filter.0.2", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter.0.2", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("filter.1.0", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter.1.0", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("filter.1.1", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter.1.1", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("filter.1.2", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter.1.2", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

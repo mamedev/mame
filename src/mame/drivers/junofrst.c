@@ -230,7 +230,7 @@ WRITE8_MEMBER(junofrst_state::junofrst_portB_w)
 			C += 220000;    /* 220000pF = 0.22uF */
 
 		data >>= 2;
-		filter_rc_set_RC(filter[i], FLT_RC_LOWPASS, 1000, 2200, 200, CAP_P(C));
+		dynamic_cast<filter_rc_device*>(filter[i])->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 200, CAP_P(C));
 	}
 }
 
@@ -453,11 +453,11 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_DAC_ADD("dac")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_SOUND_ADD("filter.0.0", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter.0.0", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("filter.0.1", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter.0.1", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("filter.0.2", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter.0.2", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

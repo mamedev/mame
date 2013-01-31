@@ -195,7 +195,7 @@ READ16_MEMBER(warriorb_state::warriorb_sound_r)
 
 WRITE8_MEMBER(warriorb_state::warriorb_pancontrol)
 {
-	device_t *flt = NULL;
+	filter_volume_device *flt = NULL;
 	offset &= 3;
 
 	switch (offset)
@@ -208,7 +208,7 @@ WRITE8_MEMBER(warriorb_state::warriorb_pancontrol)
 
 	m_pandata[offset] = (data << 1) + data;   /* original volume*3 */
 	//popmessage(" pan %02x %02x %02x %02x", m_pandata[0], m_pandata[1], m_pandata[2], m_pandata[3] );
-	flt_volume_set_volume(flt, m_pandata[offset] / 100.0);
+	flt->flt_volume_set_volume(m_pandata[offset] / 100.0);
 }
 
 
@@ -517,10 +517,10 @@ void warriorb_state::machine_start()
 	m_lscreen = machine().device("lscreen");
 	m_rscreen = machine().device("rscreen");
 
-	m_2610_1l = machine().device("2610.1.l");
-	m_2610_1r = machine().device("2610.1.r");
-	m_2610_2l = machine().device("2610.2.l");
-	m_2610_2r = machine().device("2610.2.r");
+	m_2610_1l = machine().device<filter_volume_device>("2610.1.l");
+	m_2610_1r = machine().device<filter_volume_device>("2610.1.r");
+	m_2610_2l = machine().device<filter_volume_device>("2610.2.l");
+	m_2610_2r = machine().device<filter_volume_device>("2610.2.r");
 
 	save_item(NAME(m_banknum));
 	save_item(NAME(m_pandata));
@@ -585,13 +585,13 @@ static MACHINE_CONFIG_START( darius2d, warriorb_state )
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
-	MCFG_SOUND_ADD("2610.1.l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("2610.1.r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_SOUND_ADD("2610.2.l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("2610.2.r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", warriorb_tc0140syt_intf)
@@ -648,13 +648,13 @@ static MACHINE_CONFIG_START( warriorb, warriorb_state )
 	MCFG_SOUND_ROUTE(2, "2610.2.l", 1.0)
 	MCFG_SOUND_ROUTE(2, "2610.2.r", 1.0)
 
-	MCFG_SOUND_ADD("2610.1.l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.1.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("2610.1.r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.1.r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_SOUND_ADD("2610.2.l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.2.l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("2610.2.r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.2.r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", warriorb_tc0140syt_intf)

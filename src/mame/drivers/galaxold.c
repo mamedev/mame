@@ -368,7 +368,6 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
 #include "sound/dac.h"
-#include "sound/flt_rc.h"
 #include "audio/galaxian.h"
 #include "includes/galaxold.h"
 

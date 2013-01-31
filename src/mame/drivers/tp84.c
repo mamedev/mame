@@ -98,23 +98,23 @@ WRITE8_MEMBER(tp84_state::tp84_filter_w)
 	C = 0;
 	if (offset & 0x008) C +=  47000;    /*  47000pF = 0.047uF */
 	if (offset & 0x010) C += 470000;    /* 470000pF = 0.47uF */
-	filter_rc_set_RC(machine().device("filter1"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	dynamic_cast<filter_rc_device*>(machine().device("filter1"))->filter_rc_set_RC(FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #1 (optional) */
 	C = 0;
 	if (offset & 0x020) C +=  47000;    /*  47000pF = 0.047uF */
 	if (offset & 0x040) C += 470000;    /* 470000pF = 0.47uF */
-//  filter_rc_set_RC(machine().device("filter2"),1000,2200,1000,C);
+        //  dynamic_cast<filter_rc_device*>(machine().device("filter2"))->filter_rc_set_RC(,1000,2200,1000,C);
 
 	/* 76489 #2 */
 	C = 0;
 	if (offset & 0x080) C += 470000;    /* 470000pF = 0.47uF */
-	filter_rc_set_RC(machine().device("filter2"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	dynamic_cast<filter_rc_device*>(machine().device("filter2"))->filter_rc_set_RC(FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #3 */
 	C = 0;
 	if (offset & 0x100) C += 470000;    /* 470000pF = 0.47uF */
-	filter_rc_set_RC(machine().device("filter3"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	dynamic_cast<filter_rc_device*>(machine().device("filter3"))->filter_rc_set_RC(FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 }
 
 WRITE8_MEMBER(tp84_state::tp84_sh_irqtrigger_w)
@@ -346,11 +346,11 @@ static MACHINE_CONFIG_START( tp84, tp84_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 0.75)
 	MCFG_SOUND_CONFIG(psg_intf)
 
-	MCFG_SOUND_ADD("filter1", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter1", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("filter2", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter2", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("filter3", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter3", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

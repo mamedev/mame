@@ -245,10 +245,10 @@ WRITE8_MEMBER(xexex_state::sound_bankswitch_w)
 static void ym_set_mixing(device_t *device, double left, double right)
 {
 	xexex_state *state = device->machine().driver_data<xexex_state>();
-	flt_volume_set_volume(state->m_filter1l, (71.0 * left) / 55.0);
-	flt_volume_set_volume(state->m_filter1r, (71.0 * right) / 55.0);
-	flt_volume_set_volume(state->m_filter2l, (71.0 * left) / 55.0);
-	flt_volume_set_volume(state->m_filter2r, (71.0 * right) / 55.0);
+	state->m_filter1l->flt_volume_set_volume((71.0 * left) / 55.0);
+	state->m_filter1r->flt_volume_set_volume((71.0 * right) / 55.0);
+	state->m_filter2l->flt_volume_set_volume((71.0 * left) / 55.0);
+	state->m_filter2r->flt_volume_set_volume((71.0 * right) / 55.0);
 }
 
 TIMER_CALLBACK_MEMBER(xexex_state::dmaend_callback)
@@ -462,10 +462,10 @@ void xexex_state::machine_start()
 	m_k056832 = machine().device("k056832");
 	m_k054338 = machine().device("k054338");
 	m_k054539 = machine().device("k054539");
-	m_filter1l = machine().device("filter1l");
-	m_filter1r = machine().device("filter1r");
-	m_filter2l = machine().device("filter2l");
-	m_filter2r = machine().device("filter2r");
+	m_filter1l = machine().device<filter_volume_device>("filter1l"); 
+	m_filter1r = machine().device<filter_volume_device>("filter1r");
+	m_filter2l = machine().device<filter_volume_device>("filter2l");
+	m_filter2r = machine().device<filter_volume_device>("filter2r");
 
 	save_item(NAME(m_cur_alpha));
 	save_item(NAME(m_sprite_colorbase));
@@ -555,13 +555,13 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("filter1l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter1l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("filter1r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter1r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_SOUND_ADD("filter2l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter2l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("filter2r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter2r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 

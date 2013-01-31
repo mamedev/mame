@@ -424,20 +424,20 @@ WRITE8_MEMBER(othunder_state::othunder_TC0310FAM_w)
 	   because we are using the AY-3-8910 emulation. */
 	volr = (m_pan[0] + m_pan[2]) * 100 / (2 * 0x1f);
 	voll = (m_pan[1] + m_pan[3]) * 100 / (2 * 0x1f);
-	flt_volume_set_volume(m_2610_0l, voll / 100.0);
-	flt_volume_set_volume(m_2610_0r, volr / 100.0);
+	m_2610_0l->flt_volume_set_volume(voll / 100.0);
+	m_2610_0r->flt_volume_set_volume(volr / 100.0);
 
 	/* CH1 */
 	volr = m_pan[0] * 100 / 0x1f;
 	voll = m_pan[1] * 100 / 0x1f;
-	flt_volume_set_volume(m_2610_1l, voll / 100.0);
-	flt_volume_set_volume(m_2610_1r, volr / 100.0);
+	m_2610_1l->flt_volume_set_volume(voll / 100.0);
+	m_2610_1r->flt_volume_set_volume(volr / 100.0);
 
 	/* CH2 */
 	volr = m_pan[2] * 100 / 0x1f;
 	voll = m_pan[3] * 100 / 0x1f;
-	flt_volume_set_volume(m_2610_2l, voll / 100.0);
-	flt_volume_set_volume(m_2610_2r, volr / 100.0);
+	m_2610_2l->flt_volume_set_volume(voll / 100.0);
+	m_2610_2r->flt_volume_set_volume(volr / 100.0);
 }
 
 
@@ -674,12 +674,12 @@ void othunder_state::machine_start()
 	m_tc0100scn = machine().device("tc0100scn");
 	m_tc0110pcr = machine().device("tc0110pcr");
 	m_tc0140syt = machine().device("tc0140syt");
-	m_2610_0l = machine().device("2610.0l");
-	m_2610_0r = machine().device("2610.0r");
-	m_2610_1l = machine().device("2610.1l");
-	m_2610_1r = machine().device("2610.1r");
-	m_2610_2l = machine().device("2610.2l");
-	m_2610_2r = machine().device("2610.2r");
+	m_2610_0l = machine().device<filter_volume_device>("2610.0l");
+	m_2610_0r = machine().device<filter_volume_device>("2610.0r");
+	m_2610_1l = machine().device<filter_volume_device>("2610.1l");
+	m_2610_1r = machine().device<filter_volume_device>("2610.1r");
+	m_2610_2l = machine().device<filter_volume_device>("2610.2l");
+	m_2610_2r = machine().device<filter_volume_device>("2610.2r");
 
 	save_item(NAME(m_vblank_irq));
 	save_item(NAME(m_ad_irq));
@@ -738,17 +738,17 @@ static MACHINE_CONFIG_START( othunder, othunder_state )
 	MCFG_SOUND_ROUTE(2, "2610.2l", 1.0)
 	MCFG_SOUND_ROUTE(2, "2610.2r", 1.0)
 
-	MCFG_SOUND_ADD("2610.0l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.0l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("2610.0r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.0r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_SOUND_ADD("2610.1l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.1l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("2610.1r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.1r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_SOUND_ADD("2610.2l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.2l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("2610.2r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("2610.2r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", othunder_tc0140syt_intf)

@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include <sound/flt_vol.h>
+
 /* Calculated from CRT controller writes */
 #define PIXEL_CLOCK            (XTAL_21MHz / 3)
 #define FRAMEBUFFER_CLOCK      XTAL_10MHz
@@ -68,12 +70,12 @@ public:
 	cpu_device *m_audiocpu;
 	device_t *m_ground;
 	device_t *m_object;
-	device_t *m_f2203_1l;
-	device_t *m_f2203_2l;
-	device_t *m_f2203_3l;
-	device_t *m_f2203_1r;
-	device_t *m_f2203_2r;
-	device_t *m_f2203_3r;
+	filter_volume_device *m_f2203_1l;
+	filter_volume_device *m_f2203_2l;
+	filter_volume_device *m_f2203_3l;
+	filter_volume_device *m_f2203_1r;
+	filter_volume_device *m_f2203_2r;
+	filter_volume_device *m_f2203_3r;
 	DECLARE_READ16_MEMBER(lockon_crtc_r);
 	DECLARE_WRITE16_MEMBER(lockon_crtc_w);
 	DECLARE_WRITE16_MEMBER(lockon_char_w);

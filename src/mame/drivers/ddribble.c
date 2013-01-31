@@ -98,13 +98,13 @@ WRITE8_MEMBER(ddribble_state::ddribble_vlm5030_ctrl_w)
 	vlm5030_set_rom(device, &SPEECH_ROM[data & 0x08 ? 0x10000 : 0]);
 
 	/* b2 : SSG-C rc filter enable */
-	filter_rc_set_RC(m_filter3, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
+	dynamic_cast<filter_rc_device*>(m_filter3)->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x04 ? CAP_N(150) : 0); /* YM2203-SSG-C */
 
 	/* b1 : SSG-B rc filter enable */
-	filter_rc_set_RC(m_filter2, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
+	dynamic_cast<filter_rc_device*>(m_filter2)->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x02 ? CAP_N(150) : 0); /* YM2203-SSG-B */
 
 	/* b0 : SSG-A rc filter enable */
-	filter_rc_set_RC(m_filter1, FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
+	dynamic_cast<filter_rc_device*>(m_filter1)->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 2200, 1000, data & 0x01 ? CAP_N(150) : 0); /* YM2203-SSG-A */
 }
 
 
@@ -320,11 +320,11 @@ static MACHINE_CONFIG_START( ddribble, ddribble_state )
 	MCFG_SOUND_CONFIG(vlm5030_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_SOUND_ADD("filter1", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter1", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("filter2", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter2", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_SOUND_ADD("filter3", FILTER_RC, 0)
+	MCFG_FILTER_RC_ADD("filter3", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

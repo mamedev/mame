@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include <sound/flt_vol.h>
+
 class ninjaw_state : public driver_device
 {
 public:
@@ -30,10 +32,10 @@ public:
 	device_t *m_lscreen;
 	device_t *m_mscreen;
 	device_t *m_rscreen;
-	device_t *m_2610_1l;
-	device_t *m_2610_1r;
-	device_t *m_2610_2l;
-	device_t *m_2610_2r;
+	filter_volume_device *m_2610_1l;
+	filter_volume_device *m_2610_1r;
+	filter_volume_device *m_2610_2l;
+	filter_volume_device *m_2610_2r;
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(ninjaw_sound_w);

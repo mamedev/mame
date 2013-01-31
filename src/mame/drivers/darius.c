@@ -307,9 +307,9 @@ static void update_fm0( running_machine &machine )
 	int right = ((0xff - state->m_pan[0]) * state->m_vol[6]) >> 8;
 
 	if (state->m_filter0_3l != NULL)
-		flt_volume_set_volume(state->m_filter0_3l, left / 100.0);
+		state->m_filter0_3l->flt_volume_set_volume(left / 100.0);
 	if (state->m_filter0_3r != NULL)
-		flt_volume_set_volume(state->m_filter0_3r, right / 100.0); /* FM #0 */
+		state->m_filter0_3r->flt_volume_set_volume(right / 100.0); /* FM #0 */
 }
 
 static void update_fm1( running_machine &machine )
@@ -319,15 +319,15 @@ static void update_fm1( running_machine &machine )
 	int right = ((0xff - state->m_pan[1]) * state->m_vol[7]) >> 8;
 
 	if (state->m_filter1_3l != NULL)
-		flt_volume_set_volume(state->m_filter1_3l, left / 100.0);
+		state->m_filter1_3l->flt_volume_set_volume(left / 100.0);
 	if (state->m_filter1_3r != NULL)
-		flt_volume_set_volume(state->m_filter1_3r, right / 100.0); /* FM #1 */
+		state->m_filter1_3r->flt_volume_set_volume(right / 100.0); /* FM #1 */
 }
 
 static void update_psg0( running_machine &machine, int port )
 {
 	darius_state *state = machine.driver_data<darius_state>();
-	device_t *lvol = NULL, *rvol = NULL;
+	filter_volume_device *lvol = NULL, *rvol = NULL;
 	int left, right;
 
 	switch (port)
@@ -342,15 +342,15 @@ static void update_psg0( running_machine &machine, int port )
 	right = ((0xff - state->m_pan[2]) * state->m_vol[port]) >> 8;
 
 	if (lvol != NULL)
-		flt_volume_set_volume(lvol, left / 100.0);
+		lvol->flt_volume_set_volume(left / 100.0);
 	if (rvol != NULL)
-		flt_volume_set_volume(rvol, right / 100.0);
+		rvol->flt_volume_set_volume(right / 100.0);
 }
 
 static void update_psg1( running_machine &machine, int port )
 {
 	darius_state *state = machine.driver_data<darius_state>();
-	device_t *lvol = NULL, *rvol = NULL;
+	filter_volume_device *lvol = NULL, *rvol = NULL;
 	int left, right;
 
 	switch (port)
@@ -365,9 +365,9 @@ static void update_psg1( running_machine &machine, int port )
 	right = ((0xff - state->m_pan[3]) * state->m_vol[port + 3]) >> 8;
 
 	if (lvol != NULL)
-		flt_volume_set_volume(lvol, left / 100.0);
+		lvol->flt_volume_set_volume(left / 100.0);
 	if (rvol != NULL)
-		flt_volume_set_volume(rvol, right / 100.0);
+		rvol->flt_volume_set_volume(right / 100.0);
 }
 
 static void update_da( running_machine &machine )
@@ -377,9 +377,9 @@ static void update_da( running_machine &machine )
 	int right = state->m_def_vol[(state->m_pan[4] >> 0) & 0x0f];
 
 	if (state->m_msm5205_l != NULL)
-		flt_volume_set_volume(state->m_msm5205_l, left / 100.0);
+		state->m_msm5205_l->flt_volume_set_volume(left / 100.0);
 	if (state->m_msm5205_r != NULL)
-		flt_volume_set_volume(state->m_msm5205_r, right / 100.0);
+		state->m_msm5205_r->flt_volume_set_volume(right / 100.0);
 }
 
 WRITE8_MEMBER(darius_state::darius_fm0_pan)
@@ -843,26 +843,26 @@ void darius_state::machine_start()
 	m_mscreen = machine().device("mscreen");
 	m_rscreen = machine().device("rscreen");
 
-	m_filter0_0l = machine().device("filter0.0l");
-	m_filter0_0r = machine().device("filter0.0r");
-	m_filter0_1l = machine().device("filter0.1l");
-	m_filter0_1r = machine().device("filter0.1r");
-	m_filter0_2l = machine().device("filter0.2l");
-	m_filter0_2r = machine().device("filter0.2r");
-	m_filter0_3l = machine().device("filter0.3l");
-	m_filter0_3r = machine().device("filter0.3r");
+	m_filter0_0l = machine().device<filter_volume_device>("filter0.0l");
+	m_filter0_0r = machine().device<filter_volume_device>("filter0.0r");
+	m_filter0_1l = machine().device<filter_volume_device>("filter0.1l");
+	m_filter0_1r = machine().device<filter_volume_device>("filter0.1r");
+	m_filter0_2l = machine().device<filter_volume_device>("filter0.2l");
+	m_filter0_2r = machine().device<filter_volume_device>("filter0.2r");
+	m_filter0_3l = machine().device<filter_volume_device>("filter0.3l");
+	m_filter0_3r = machine().device<filter_volume_device>("filter0.3r");
 
-	m_filter1_0l = machine().device("filter1.0l");
-	m_filter1_0r = machine().device("filter1.0r");
-	m_filter1_1l = machine().device("filter1.1l");
-	m_filter1_1r = machine().device("filter1.1r");
-	m_filter1_2l = machine().device("filter1.2l");
-	m_filter1_2r = machine().device("filter1.2r");
-	m_filter1_3l = machine().device("filter1.3l");
-	m_filter1_3r = machine().device("filter1.3r");
+	m_filter1_0l = machine().device<filter_volume_device>("filter1.0l");
+	m_filter1_0r = machine().device<filter_volume_device>("filter1.0r");
+	m_filter1_1l = machine().device<filter_volume_device>("filter1.1l");
+	m_filter1_1r = machine().device<filter_volume_device>("filter1.1r");
+	m_filter1_2l = machine().device<filter_volume_device>("filter1.2l");
+	m_filter1_2r = machine().device<filter_volume_device>("filter1.2r");
+	m_filter1_3l = machine().device<filter_volume_device>("filter1.3l");
+	m_filter1_3r = machine().device<filter_volume_device>("filter1.3r");
 
-	m_msm5205_l = machine().device("msm5205.l");
-	m_msm5205_r = machine().device("msm5205.r");
+	m_msm5205_l = machine().device<filter_volume_device>("msm5205.l");
+	m_msm5205_r = machine().device<filter_volume_device>("msm5205.r");
 
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_coin_word));
@@ -982,43 +982,43 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.l", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.r", 1.0)
 
-	MCFG_SOUND_ADD("filter0.0l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter0.0l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("filter0.0r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter0.0r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_SOUND_ADD("filter0.1l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter0.1l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("filter0.1r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter0.1r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_SOUND_ADD("filter0.2l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter0.2l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("filter0.2r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter0.2r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_SOUND_ADD("filter0.3l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter0.3l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("filter0.3r", FILTER_VOLUME, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-
-	MCFG_SOUND_ADD("filter1.0l", FILTER_VOLUME, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("filter1.0r", FILTER_VOLUME, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_SOUND_ADD("filter1.1l", FILTER_VOLUME, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("filter1.1r", FILTER_VOLUME, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_SOUND_ADD("filter1.2l", FILTER_VOLUME, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("filter1.2r", FILTER_VOLUME, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-	MCFG_SOUND_ADD("filter1.3l", FILTER_VOLUME, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("filter1.3r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter0.3r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MCFG_SOUND_ADD("msm5205.l", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter1.0l", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("msm5205.r", FILTER_VOLUME, 0)
+	MCFG_FILTER_VOLUME_ADD("filter1.0r", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_FILTER_VOLUME_ADD("filter1.1l", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_FILTER_VOLUME_ADD("filter1.1r", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_FILTER_VOLUME_ADD("filter1.2l", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_FILTER_VOLUME_ADD("filter1.2r", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_FILTER_VOLUME_ADD("filter1.3l", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_FILTER_VOLUME_ADD("filter1.3r", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MCFG_FILTER_VOLUME_ADD("msm5205.l", 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_FILTER_VOLUME_ADD("msm5205.r", 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MCFG_TC0140SYT_ADD("tc0140syt", darius_tc0140syt_intf)

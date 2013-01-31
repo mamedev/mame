@@ -1,14 +1,9 @@
 #pragma once
 
 #ifndef __FLT_RC_H__
-#define FLT_RC_H
+#define __FLT_RC_H__
 
 #include "machine/rescap.h"
-#include "devlegcy.h"
-
-#define FLT_RC_LOWPASS      0
-#define FLT_RC_HIGHPASS     1
-#define FLT_RC_AC           2
 
 /*
  * FLT_RC_LOWPASS:
@@ -45,6 +40,24 @@
  *
  */
 
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MCFG_FILTER_RC_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, FILTER_RC, _clock)
+#define MCFG_FILTER_RC_REPLACE(_tag, _clock) \
+	MCFG_DEVICE_REPLACE(_tag, FILTER_RC, _clock)
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+#define FLT_RC_LOWPASS      0
+#define FLT_RC_HIGHPASS     1
+#define FLT_RC_AC           2
+
 struct flt_rc_config
 {
 	int type;
@@ -56,27 +69,33 @@ struct flt_rc_config
 
 extern const flt_rc_config flt_rc_ac_default;
 
-void filter_rc_set_RC(device_t *device, int type, double R1, double R2, double R3, double C);
+
+// ======================> filter_rc_device
 
 class filter_rc_device : public device_t,
-									public device_sound_interface
+						 public device_sound_interface
 {
 public:
 	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~filter_rc_device() { global_free(m_token); }
+	~filter_rc_device() { }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
+    void filter_rc_set_RC(int type, double R1, double R2, double R3, double C);
+
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
 private:
-	// internal state
-	void *m_token;
+    void set_RC_info(int type, double R1, double R2, double R3, double C);
+
+private:
+	sound_stream*  m_stream;
+	int            m_k;
+	int            m_memory;
+	int            m_type;
 };
 
 extern const device_type FILTER_RC;

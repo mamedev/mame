@@ -141,7 +141,7 @@ static void filter_w(device_t *device, int data)
 	if (data & 2)
 		C +=  47000;    /*  47000pF = 0.047uF */
 	if (device != NULL)
-		filter_rc_set_RC(device,FLT_RC_LOWPASS,1000,5100,0,CAP_P(C));
+		dynamic_cast<filter_rc_device*>(device)->filter_rc_set_RC(FLT_RC_LOWPASS, 1000, 5100, 0, CAP_P(C));
 }
 
 WRITE8_MEMBER(scramble_state::scramble_filter_w)

@@ -30,7 +30,6 @@ Notes:
 #include "cpu/s2650/s2650.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/flt_rc.h"
 #include "machine/7474.h"
 #include "machine/i8255.h"
 #include "includes/scramble.h"

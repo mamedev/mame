@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/eeprom.h"
+#include <sound/flt_vol.h>
 
 struct othunder_tempsprite
 {
@@ -44,12 +45,12 @@ public:
 	device_t *m_tc0100scn;
 	device_t *m_tc0110pcr;
 	device_t *m_tc0140syt;
-	device_t *m_2610_0l;
-	device_t *m_2610_0r;
-	device_t *m_2610_1l;
-	device_t *m_2610_1r;
-	device_t *m_2610_2l;
-	device_t *m_2610_2r;
+	filter_volume_device *m_2610_0l;
+	filter_volume_device *m_2610_0r;
+	filter_volume_device *m_2610_1l;
+	filter_volume_device *m_2610_1r;
+	filter_volume_device *m_2610_2l;
+	filter_volume_device *m_2610_2r;
 	DECLARE_WRITE16_MEMBER(irq_ack_w);
 	DECLARE_WRITE16_MEMBER(othunder_tc0220ioc_w);
 	DECLARE_READ16_MEMBER(othunder_tc0220ioc_r);
