@@ -176,6 +176,8 @@ public:
 	TIMER_CALLBACK_MEMBER(karatour_irq_callback);
 	TIMER_CALLBACK_MEMBER(mouja_irq_callback);
 	TIMER_CALLBACK_MEMBER(metro_blit_done);
+	void update_irq_state();
+	IRQ_CALLBACK_MEMBER(metro_irq_callback);
 };
 
 

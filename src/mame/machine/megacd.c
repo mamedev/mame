@@ -14,13 +14,13 @@ UINT16 a12000_halt_reset_reg = 0x0000;
 
 /* Callback when the genesis enters interrupt code */
 // needs to be a member
-static IRQ_CALLBACK(segacd_sub_int_callback)
+IRQ_CALLBACK_MEMBER(sega_segacd_device::segacd_sub_int_callback)
 {
 	if (irqline==2)
 	{
 		// clear this bit
 		a12000_halt_reset_reg &= ~0x0100;
-		device->machine().device(":segacd:segacd_68k")->execute().set_input_line(2, CLEAR_LINE);
+		device.machine().device(":segacd:segacd_68k")->execute().set_input_line(2, CLEAR_LINE);
 	}
 
 	return (0x60+irqline*4)/4; // vector address
@@ -1609,7 +1609,7 @@ void sega_segacd_device::device_start()
 
 
 
-	machine().device(":segacd:segacd_68k")->execute().set_irq_acknowledge_callback(segacd_sub_int_callback);
+	machine().device(":segacd:segacd_68k")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(sega_segacd_device::segacd_sub_int_callback),this));
 
 	space.install_read_handler (0x0000070, 0x0000073, read16_delegate(FUNC(sega_segacd_device::scd_hint_vector_r),this) );
 

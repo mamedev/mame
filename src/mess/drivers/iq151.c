@@ -98,6 +98,7 @@ public:
 	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
 	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_timer);
+	IRQ_CALLBACK_MEMBER(iq151_irq_callback);
 };
 
 READ8_MEMBER(iq151_state::keyboard_row_r)
@@ -327,11 +328,9 @@ INTERRUPT_GEN_MEMBER(iq151_state::iq151_vblank_interrupt)
 	m_vblank_irq_state ^= 1;
 }
 
-static IRQ_CALLBACK(iq151_irq_callback)
+IRQ_CALLBACK_MEMBER(iq151_state::iq151_irq_callback)
 {
-	iq151_state *state = device->machine().driver_data<iq151_state>();
-
-	return pic8259_acknowledge(state->m_pic);
+	return pic8259_acknowledge(m_pic);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(iq151_state::cassette_timer)
@@ -347,7 +346,7 @@ DRIVER_INIT_MEMBER(iq151_state,iq151)
 	membank("boot")->configure_entry(0, RAM + 0xf800);
 	membank("boot")->configure_entry(1, RAM + 0x0000);
 
-	m_maincpu->set_irq_acknowledge_callback(iq151_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(iq151_state::iq151_irq_callback),this));
 
 	// keep machine pointers to slots
 	m_carts[0] = machine().device<iq151cart_slot_device>("slot1");

@@ -180,9 +180,9 @@ static const struct pic8259_interface pic8259_config =
 	DEVCB_NULL
 };
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(tsispch_state::irq_callback)
 {
-	return pic8259_acknowledge(device->machine().device("pic8259"));
+	return pic8259_acknowledge(machine().device("pic8259"));
 }
 
 /*****************************************************************************
@@ -272,7 +272,7 @@ void tsispch_state::machine_reset()
 	int i;
 	for (i=0; i<32; i++) m_infifo[i] = 0;
 	m_infifo_tail_ptr = m_infifo_head_ptr = 0;
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(tsispch_state::irq_callback),this));
 	fprintf(stderr,"machine reset\n");
 }
 

@@ -112,6 +112,7 @@ public:
 	DECLARE_WRITE8_MEMBER( mouse_w );
 	virtual void palette_init();
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
+	IRQ_CALLBACK_MEMBER(prestige_int_ack);
 };
 
 
@@ -393,21 +394,20 @@ INPUT_PORTS_START( prestige )
 
 INPUT_PORTS_END
 
-static IRQ_CALLBACK( prestige_int_ack )
+IRQ_CALLBACK_MEMBER(prestige_state::prestige_int_ack)
 {
 	UINT32 vector;
-	prestige_state *state = device->machine().driver_data<prestige_state>();
 
-	state->m_maincpu->set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 
-	if (state->m_irq_counter == 0x02)
+	if (m_irq_counter == 0x02)
 	{
-		state->m_irq_counter = 0;
+		m_irq_counter = 0;
 		vector = 0x0020;
 	}
 	else
 	{
-		state->m_irq_counter++;
+		m_irq_counter++;
 		vector = 0x0030;
 	}
 
@@ -419,7 +419,7 @@ void prestige_state::machine_start()
 	UINT8 *ram = m_ram->pointer();
 	memset(ram, 0x00, m_ram->size());
 
-	m_maincpu->set_irq_acknowledge_callback(prestige_int_ack);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(prestige_state::prestige_int_ack),this));
 
 	membank("bank1")->configure_entries(0, 64, memregion("maincpu")->base(), 0x4000);
 	membank("bank2")->configure_entries(0, 64, memregion("maincpu")->base(), 0x4000);

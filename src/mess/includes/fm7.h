@@ -250,6 +250,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(fm7_fdc_drq_w);
 	DECLARE_READ8_MEMBER(fm77av_joy_1_r);
 	DECLARE_READ8_MEMBER(fm77av_joy_2_r);
+	IRQ_CALLBACK_MEMBER(fm7_irq_ack);
+	IRQ_CALLBACK_MEMBER(fm7_sub_irq_ack);
 };
 
 #endif /*FM7_H_*/

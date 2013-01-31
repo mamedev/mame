@@ -265,6 +265,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
 	DECLARE_READ8_MEMBER(get_slave_ack);
+	IRQ_CALLBACK_MEMBER(towns_irq_callback);
 };
 
 class marty_state : public towns_state

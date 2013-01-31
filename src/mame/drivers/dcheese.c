@@ -47,42 +47,36 @@
  *
  *************************************/
 
-static void update_irq_state( device_t *cpu )
+void dcheese_state::update_irq_state()
 {
-	dcheese_state *state = cpu->machine().driver_data<dcheese_state>();
-
 	int i;
 	for (i = 1; i < 5; i++)
-		cpu->execute().set_input_line(i, state->m_irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
+		m_maincpu->set_input_line(i, m_irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static IRQ_CALLBACK( irq_callback )
+IRQ_CALLBACK_MEMBER(dcheese_state::irq_callback)
 {
-	dcheese_state *state = device->machine().driver_data<dcheese_state>();
-
 	/* auto-ack the IRQ */
-	state->m_irq_state[irqline] = 0;
-	update_irq_state(device);
+	m_irq_state[irqline] = 0;
+	update_irq_state();
 
 	/* vector is 0x40 + index */
 	return 0x40 + irqline;
 }
 
 
-void dcheese_signal_irq( running_machine &machine, int which )
+void dcheese_state::dcheese_signal_irq(int which )
 {
-	dcheese_state *state = machine.driver_data<dcheese_state>();
-
-	state->m_irq_state[which] = 1;
-	update_irq_state(state->m_maincpu);
+	m_irq_state[which] = 1;
+	update_irq_state();
 }
 
 
 INTERRUPT_GEN_MEMBER(dcheese_state::dcheese_vblank)
 {
 	logerror("---- VBLANK ----\n");
-	dcheese_signal_irq(machine(), 4);
+	dcheese_signal_irq(4);
 }
 
 
@@ -99,7 +93,7 @@ void dcheese_state::machine_start()
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_bsmt = machine().device("bsmt");
 
-	m_maincpu->set_irq_acknowledge_callback(irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(dcheese_state::irq_callback),this));
 
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_soundlatch_full));

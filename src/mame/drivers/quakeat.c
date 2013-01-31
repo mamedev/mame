@@ -77,6 +77,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_quake(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 
@@ -152,15 +153,14 @@ INPUT_PORTS_END
 
 /*************************************************************/
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(quakeat_state::irq_callback)
 {
-	quakeat_state *state = device->machine().driver_data<quakeat_state>();
-	return pic8259_acknowledge( state->m_pic8259_1);
+	return pic8259_acknowledge(m_pic8259_1);
 }
 
 void quakeat_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(quakeat_state::irq_callback),this));
 
 	m_pic8259_1 = machine().device( "pic8259_1" );
 	m_pic8259_2 = machine().device( "pic8259_2" );

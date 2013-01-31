@@ -66,7 +66,7 @@ public:
 	DECLARE_READ8_MEMBER(read_00);
 	DECLARE_READ8_MEMBER(read_78xx);
 
-	static IRQ_CALLBACK(irq_callback_1);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 
 	void maple_w(const UINT32 *data, UINT32 in_size);
 	virtual void maple_reset();
@@ -109,7 +109,6 @@ private:
 
 	void raise_irq(int level);
 	void recalc_irq();
-	int irq_callback();
 };
 
 // Trampoline class, required for device discovery

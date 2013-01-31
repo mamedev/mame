@@ -151,6 +151,7 @@ public:
 	void fdc_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
+	IRQ_CALLBACK_MEMBER(pc88va_irq_callback);
 };
 
 
@@ -1612,9 +1613,9 @@ static I8255_INTERFACE( r232c_ctrl_intf )
 	DEVCB_DRIVER_MEMBER(pc88va_state,r232_ctrl_portc_w)                     /* Port C write */
 };
 
-static IRQ_CALLBACK(pc88va_irq_callback)
+IRQ_CALLBACK_MEMBER(pc88va_state::pc88va_irq_callback)
 {
-	return pic8259_acknowledge( device->machine().device( "pic8259_master" ) );
+	return pic8259_acknowledge( machine().device( "pic8259_master" ) );
 }
 
 WRITE_LINE_MEMBER(pc88va_state::pc88va_pic_irq)
@@ -1647,7 +1648,7 @@ static const struct pic8259_interface pc88va_pic8259_slave_config =
 
 void pc88va_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pc88va_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc88va_state::pc88va_irq_callback),this));
 
 	m_t3_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pc88va_state::t3_mouse_callback),this));
 	m_t3_mouse_timer->adjust(attotime::never);

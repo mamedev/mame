@@ -1794,7 +1794,7 @@ INTERRUPT_GEN_MEMBER(seibuspi_state::spi_interrupt)
 	device.execute().set_input_line(0, ASSERT_LINE );
 }
 
-static IRQ_CALLBACK(spi_irq_callback)
+IRQ_CALLBACK_MEMBER(seibuspi_state::spi_irq_callback)
 {
 	return 0x20;
 }
@@ -1815,7 +1815,7 @@ MACHINE_RESET_MEMBER(seibuspi_state,spi)
 	UINT8 flash_data = rombase[0x1ffffc];
 
 	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE );
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(spi_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000680, 0x00000683, read32_delegate(FUNC(seibuspi_state::sound_fifo_r),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x00000688, 0x0000068b, write32_delegate(FUNC(seibuspi_state::z80_prg_fifo_w),this));
@@ -1902,7 +1902,7 @@ MACHINE_RESET_MEMBER(seibuspi_state,sxx2f)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0000068c, 0x0000068f, write32_delegate(FUNC(seibuspi_state::eeprom_w),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000680, 0x00000683, read32_delegate(FUNC(seibuspi_state::sb_coin_r),this));
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(spi_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
 
 	m_sb_coin_latch = 0;
 }
@@ -2184,7 +2184,7 @@ DRIVER_INIT_MEMBER(seibuspi_state,rfjet2k)
 
 MACHINE_RESET_MEMBER(seibuspi_state,seibu386)
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(spi_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(seibuspi_state::spi_irq_callback),this));
 }
 
 static MACHINE_CONFIG_START( seibu386, seibuspi_state )

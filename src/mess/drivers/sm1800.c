@@ -43,6 +43,7 @@ public:
 	virtual void machine_reset();
 	virtual void palette_init();
 	INTERRUPT_GEN_MEMBER(sm1800_vblank_interrupt);
+	IRQ_CALLBACK_MEMBER(sm1800_irq_callback);
 };
 
 static ADDRESS_MAP_START(sm1800_mem, AS_PROGRAM, 8, sm1800_state)
@@ -66,14 +67,14 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( sm1800 )
 INPUT_PORTS_END
 
-static IRQ_CALLBACK(sm1800_irq_callback)
+IRQ_CALLBACK_MEMBER(sm1800_state::sm1800_irq_callback)
 {
 	return 0xff;
 }
 
 void sm1800_state::machine_reset()
 {
-	m_maincpu->set_irq_acknowledge_callback(sm1800_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(sm1800_state::sm1800_irq_callback),this));
 }
 
 INTERRUPT_GEN_MEMBER(sm1800_state::sm1800_vblank_interrupt)

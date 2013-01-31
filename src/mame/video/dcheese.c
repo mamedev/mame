@@ -47,40 +47,38 @@ void dcheese_state::palette_init()
  *
  *************************************/
 
-static void update_scanline_irq( running_machine &machine )
+void dcheese_state::update_scanline_irq()
 {
-	dcheese_state *state = machine.driver_data<dcheese_state>();
-
 	/* if not in range, don't bother */
-	if (state->m_blitter_vidparam[0x22/2] <= state->m_blitter_vidparam[0x1e/2])
+	if (m_blitter_vidparam[0x22/2] <= m_blitter_vidparam[0x1e/2])
 	{
 		int effscan;
 		attotime time;
 
 		/* compute the effective scanline of the interrupt */
-		effscan = state->m_blitter_vidparam[0x22/2] - state->m_blitter_vidparam[0x1a/2];
+		effscan = m_blitter_vidparam[0x22/2] - m_blitter_vidparam[0x1a/2];
 		if (effscan < 0)
-			effscan += state->m_blitter_vidparam[0x1e/2];
+			effscan += m_blitter_vidparam[0x1e/2];
 
 		/* determine the time; if it's in this scanline, bump to the next frame */
-		time = machine.primary_screen->time_until_pos(effscan);
-		if (time < machine.primary_screen->scan_period())
-			time += machine.primary_screen->frame_period();
-		state->m_blitter_timer->adjust(time);
+		time = machine().primary_screen->time_until_pos(effscan);
+		if (time < machine().primary_screen->scan_period())
+			time += machine().primary_screen->frame_period();
+		m_blitter_timer->adjust(time);
 	}
 }
 
 
 TIMER_CALLBACK_MEMBER(dcheese_state::blitter_scanline_callback)
 {
-	dcheese_signal_irq(machine(), 3);
-	update_scanline_irq(machine());
+	dcheese_signal_irq(3);
+	update_scanline_irq();
 }
 
 
 TIMER_CALLBACK_MEMBER(dcheese_state::dcheese_signal_irq_callback)
 {
-	dcheese_signal_irq(machine(), param);
+	dcheese_signal_irq(param);
 }
 
 
@@ -267,7 +265,7 @@ WRITE16_MEMBER(dcheese_state::madmax_blitter_vidparam_w)
 			break;
 
 		case 0x22/2:        /* scanline interrupt */
-			update_scanline_irq(machine());
+			update_scanline_irq();
 			break;
 
 		case 0x24/2:        /* writes here after writing to 0x28 */

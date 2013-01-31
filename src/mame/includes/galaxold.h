@@ -187,6 +187,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
 	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
 	DECLARE_VIDEO_START(bagmanmc);
+	IRQ_CALLBACK_MEMBER(hunchbkg_irq_callback);
 };
 
 /*----------- defined in video/galaxold.c -----------*/

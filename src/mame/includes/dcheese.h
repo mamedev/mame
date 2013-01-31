@@ -50,7 +50,10 @@ public:
 	INTERRUPT_GEN_MEMBER(dcheese_vblank);
 	TIMER_CALLBACK_MEMBER(blitter_scanline_callback);
 	TIMER_CALLBACK_MEMBER(dcheese_signal_irq_callback);
+	void dcheese_signal_irq(int which);
+	void update_irq_state();
+	IRQ_CALLBACK_MEMBER(irq_callback);
+	void update_scanline_irq();
 };
 
 /*----------- defined in drivers/dcheese.c -----------*/
-void dcheese_signal_irq(running_machine &machine, int which);

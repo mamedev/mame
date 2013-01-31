@@ -116,6 +116,7 @@ public:
 	UINT32 screen_update_spi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sys386f2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(spi_interrupt);
+	IRQ_CALLBACK_MEMBER(spi_irq_callback);
 };
 /*----------- defined in machine/spisprit.c -----------*/
 void seibuspi_sprite_decrypt(UINT8 *src, int romsize);

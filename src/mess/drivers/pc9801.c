@@ -654,6 +654,7 @@ public:
 	inline UINT32 m_calc_grcg_addr(int i,UINT32 offset);
 
 	DECLARE_DRIVER_INIT(pc9801_kanji);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 
@@ -3330,14 +3331,14 @@ PALETTE_INIT_MEMBER(pc9801_state,pc9801)
 		palette_set_color_rgb(machine(), i, pal1bit(0), pal1bit(0), pal1bit(0));
 }
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(pc9801_state::irq_callback)
 {
-	return pic8259_acknowledge( device->machine().device( "pic8259_master" ));
+	return pic8259_acknowledge( machine().device( "pic8259_master" ));
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc9801_state::irq_callback),this));
 
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(0); // TODO: unknown connection, MS-DOS 6.2x wants this low somehow with the test mode

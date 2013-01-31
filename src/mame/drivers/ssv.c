@@ -176,23 +176,19 @@ Notes:
 ***************************************************************************/
 
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state(running_machine &machine)
+void ssv_state::update_irq_state()
 {
-	ssv_state *state = machine.driver_data<ssv_state>();
-
-	machine.device("maincpu")->execute().set_input_line(0, (state->m_requested_int & state->m_irq_enable)? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, (m_requested_int & m_irq_enable)? ASSERT_LINE : CLEAR_LINE);
 }
 
-static IRQ_CALLBACK(ssv_irq_callback)
+IRQ_CALLBACK_MEMBER(ssv_state::ssv_irq_callback)
 {
-	ssv_state *state = device->machine().driver_data<ssv_state>();
-
 	int i;
 	for ( i = 0; i <= 7; i++ )
 	{
-		if (state->m_requested_int & (1 << i))
+		if (m_requested_int & (1 << i))
 		{
-			UINT16 vector = state->m_irq_vectors[i * (16/2)] & 7;
+			UINT16 vector = m_irq_vectors[i * (16/2)] & 7;
 			return vector;
 		}
 	}
@@ -205,7 +201,7 @@ WRITE16_MEMBER(ssv_state::ssv_irq_ack_w)
 
 	m_requested_int &= ~(1 << level);
 
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 /*
@@ -240,13 +236,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::ssv_interrupt)
 		if (m_interrupt_ultrax)
 		{
 			m_requested_int |= 1 << 1;  // needed by ultrax to coin up, breaks cairblad
-			update_irq_state(machine());
+			update_irq_state();
 		}
 	}
 	else if(scanline == 240)
 	{
 		m_requested_int |= 1 << 3;  // vblank
-		update_irq_state(machine());
+		update_irq_state();
 	}
 }
 
@@ -257,12 +253,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::gdfs_interrupt)
 	if ((scanline % 64) == 0)
 	{
 		m_requested_int |= 1 << 6;  // reads lightgun (4 times for 4 axis)
-		update_irq_state(machine());
+		update_irq_state();
 	}
 	else if(scanline == 240)
 	{
 		m_requested_int |= 1 << 3;  // vblank
-		update_irq_state(machine());
+		update_irq_state();
 	}
 }
 
@@ -321,7 +317,7 @@ WRITE16_MEMBER(ssv_state::ssv_lockout_inv_w)
 void ssv_state::machine_reset()
 {
 	m_requested_int = 0;
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(ssv_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ssv_state::ssv_irq_callback),this));
 	membank("bank1")->set_base(memregion("user1")->base());
 }
 

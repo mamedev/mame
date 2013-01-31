@@ -95,10 +95,10 @@ protected:
 	UINT16 decrypt_one(offs_t address, UINT16 val, const UINT8 *main_key, UINT8 state, bool vector_fetch);
 	void decrypt(offs_t baseaddr, UINT32 size, const UINT16 *srcptr, UINT16 *opcodesptr, UINT8 state);
 	void default_state_change(UINT8 state);
+	IRQ_CALLBACK_MEMBER( irq_callback );
 
 	// static helpers
 	static void cmp_callback(device_t *device, UINT32 val, UINT8 reg);
-	static IRQ_CALLBACK( irq_callback );
 	static void rte_callback(device_t *device);
 
 	// internal state

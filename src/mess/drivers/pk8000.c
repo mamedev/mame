@@ -37,6 +37,7 @@ public:
 	DECLARE_READ8_MEMBER(pk8000_84_porta_r);
 	DECLARE_WRITE8_MEMBER(pk8000_84_porta_w);
 	DECLARE_WRITE8_MEMBER(pk8000_84_portc_w);
+	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);
 };
 
 
@@ -318,7 +319,7 @@ INTERRUPT_GEN_MEMBER(pk8000_state::pk8000_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static IRQ_CALLBACK(pk8000_irq_callback)
+IRQ_CALLBACK_MEMBER(pk8000_state::pk8000_irq_callback)
 {
 	return 0xff;
 }
@@ -327,7 +328,7 @@ static IRQ_CALLBACK(pk8000_irq_callback)
 void pk8000_state::machine_reset()
 {
 	pk8000_set_bank(machine(),0);
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(pk8000_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pk8000_state::pk8000_irq_callback),this));
 }
 
 void pk8000_state::video_start()

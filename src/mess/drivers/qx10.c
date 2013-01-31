@@ -146,6 +146,7 @@ public:
 	virtual void palette_init();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 static UPD7220_DISPLAY_PIXELS( hgdc_display_pixels )
@@ -576,9 +577,9 @@ static const struct pic8259_interface qx10_pic8259_slave_config =
 	DEVCB_NULL
 };
 
-static IRQ_CALLBACK( irq_callback )
+IRQ_CALLBACK_MEMBER(qx10_state::irq_callback)
 {
-	return pic8259_acknowledge(device->machine().driver_data<qx10_state>()->m_pic_m );
+	return pic8259_acknowledge(m_pic_m);
 }
 
 READ8_MEMBER( qx10_state::upd7201_r )
@@ -908,7 +909,7 @@ INPUT_PORTS_END
 
 void qx10_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(qx10_state::irq_callback),this));
 	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(qx10_state::qx10_upd765_interrupt), this));
 	m_fdc->setup_drq_cb(upd765a_device::line_cb(FUNC(qx10_state::drq_w), this));
 }

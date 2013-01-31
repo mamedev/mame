@@ -125,6 +125,7 @@ public:
 	DECLARE_DRIVER_INIT(filetto);
 	virtual void machine_reset();
 	UINT32 screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 UINT32 pcxt_state::screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -541,10 +542,9 @@ static const struct pic8259_interface pic8259_2_config =
 	DEVCB_NULL
 };
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(pcxt_state::irq_callback)
 {
-	pcxt_state *state = device->machine().driver_data<pcxt_state>();
-	return pic8259_acknowledge(state->m_pic8259_1);
+	return pic8259_acknowledge(m_pic8259_1);
 }
 
 static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8, pcxt_state )
@@ -716,7 +716,7 @@ void pcxt_state::machine_reset()
 	device_t *speaker = machine().device("speaker");
 	m_bank = -1;
 	m_lastvalue = -1;
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pcxt_state::irq_callback),this));
 
 	m_pc_spkrdata = 0;
 	m_pc_input = 0;

@@ -149,6 +149,7 @@ public:
 	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
 	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
 	TIMER_CALLBACK_MEMBER(delayed_sound_w);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 };
 
 
@@ -1394,7 +1395,7 @@ static const ay8910_interface ay8912_interface_2 =
 	DEVCB_DRIVER_MEMBER(mazerbla_state,gg_led_ctrl_w)
 };
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(mazerbla_state::irq_callback)
 {
 	/* all data lines are tied to +5V via 10K resistors */
 	/* D1 is set to GND when INT comes from CFB */
@@ -1408,8 +1409,7 @@ static IRQ_CALLBACK(irq_callback)
 	note:
 	1111 11110 (0xfe) - cannot happen and is not handled by game */
 
-	mazerbla_state *state = device->machine().driver_data<mazerbla_state>();
-	return (state->m_zpu_int_vector & ~1);  /* D0->GND is performed on CFB board */
+	return (m_zpu_int_vector & ~1);  /* D0->GND is performed on CFB board */
 }
 
 /* frequency is 14.318 MHz/16/16/16/16 */
@@ -1493,7 +1493,7 @@ void mazerbla_state::machine_reset()
 
 	memset(m_lookup_ram, 0, ARRAY_LENGTH(m_lookup_ram));
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mazerbla_state::irq_callback),this));
 }
 
 

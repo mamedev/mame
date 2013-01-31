@@ -721,7 +721,7 @@ void fd1094_device::device_start()
 	// register for the state changing callbacks we need in the m68000
 	m68k_set_cmpild_callback(this, &fd1094_device::cmp_callback);
 	m68k_set_rte_callback(this, &fd1094_device::rte_callback);
-	set_irq_acknowledge_callback(&fd1094_device::irq_callback);
+	set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fd1094_device::irq_callback),this));
 
 	// save state
 	save_item(NAME(m_state));
@@ -987,9 +987,9 @@ void fd1094_device::cmp_callback(device_t *device, UINT32 val, UINT8 reg)
 //  interrupt code
 //-------------------------------------------------
 
-IRQ_CALLBACK( fd1094_device::irq_callback )
+IRQ_CALLBACK_MEMBER( fd1094_device::irq_callback )
 {
-	downcast<fd1094_device *>(device)->change_state(STATE_IRQ);
+	change_state(STATE_IRQ);
 	return (0x60 + irqline * 4) / 4; // vector address
 }
 

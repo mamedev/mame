@@ -356,6 +356,7 @@ public:
 	WRITE16_MEMBER( segacd_font_color_w );
 	READ16_MEMBER( segacd_font_converted_r );
 	TIMER_DEVICE_CALLBACK_MEMBER( scd_dma_timer_callback );
+	IRQ_CALLBACK_MEMBER(segacd_sub_int_callback);
 
 	void SegaCD_CDC_Do_DMA( int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination );
 	timer_device* scd_dma_timer;

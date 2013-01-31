@@ -140,15 +140,14 @@ READ16_MEMBER(metro_state::metro_irq_cause_r)
 
 
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state( running_machine &machine )
+void metro_state::update_irq_state()
 {
-	metro_state *state = machine.driver_data<metro_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/*  Get the pending IRQs (only the enabled ones, e.g. where irq_enable is *0*)  */
-	UINT16 irq = state->metro_irq_cause_r(space, 0, 0xffff) & ~*state->m_irq_enable;
+	UINT16 irq = metro_irq_cause_r(space, 0, 0xffff) & ~*m_irq_enable;
 
-	if (state->m_irq_line == -1)    /* mouja, gakusai, gakusai2, dokyusei, dokyusp */
+	if (m_irq_line == -1)    /* mouja, gakusai, gakusai2, dokyusei, dokyusp */
 	{
 		/*  This is for games that supply an *IRQ Vector* on the data bus together with an IRQ level for each possible IRQ source */
 		UINT8 irq_level[8] = { 0 };
@@ -156,10 +155,10 @@ static void update_irq_state( running_machine &machine )
 
 		for (i = 0; i < 8; i++)
 			if (BIT(irq, i))
-				irq_level[state->m_irq_levels[i] & 7] = 1;
+				irq_level[m_irq_levels[i] & 7] = 1;
 
 		for (i = 0; i < 8; i++)
-			state->m_maincpu->set_input_line(i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
+			m_maincpu->set_input_line(i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
@@ -167,18 +166,16 @@ static void update_irq_state( running_machine &machine )
 		    then reads the actual source by peeking a register (metro_irq_cause_r) */
 
 		int irq_state = (irq ? ASSERT_LINE : CLEAR_LINE);
-		state->m_maincpu->set_input_line(state->m_irq_line, irq_state);
+		m_maincpu->set_input_line(m_irq_line, irq_state);
 	}
 }
 
 
 /* For games that supply an *IRQ Vector* on the data bus */
-static IRQ_CALLBACK( metro_irq_callback )
+IRQ_CALLBACK_MEMBER(metro_state::metro_irq_callback)
 {
-	metro_state *state = device->machine().driver_data<metro_state>();
-
-	// logerror("%s: irq callback returns %04X\n", device->machine().describe_context(), state->m_irq_vectors[int_level]);
-	return state->m_irq_vectors[irqline] & 0xff;
+	// logerror("%s: irq callback returns %04X\n", device.machine().describe_context(), m_irq_vectors[int_level]);
+	return m_irq_vectors[irqline] & 0xff;
 }
 
 
@@ -194,19 +191,19 @@ WRITE16_MEMBER(metro_state::metro_irq_cause_w)
 			if (BIT(data, i)) m_requested_int[i] = 0;
 	}
 
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 INTERRUPT_GEN_MEMBER(metro_state::metro_vblank_interrupt)
 {
 	m_requested_int[m_vblank_bit] = 1;
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 INTERRUPT_GEN_MEMBER(metro_state::metro_periodic_interrupt)
 {
 	m_requested_int[4] = 1;
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 TIMER_CALLBACK_MEMBER(metro_state::karatour_irq_callback)
@@ -223,13 +220,13 @@ INTERRUPT_GEN_MEMBER(metro_state::karatour_interrupt)
 	machine().scheduler().timer_set(attotime::from_usec(2500), timer_expired_delegate(FUNC(metro_state::karatour_irq_callback),this));
 	m_requested_int[5] = 1;
 
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 TIMER_CALLBACK_MEMBER(metro_state::mouja_irq_callback)
 {
 	m_requested_int[0] = 1;
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 WRITE16_MEMBER(metro_state::mouja_irq_timer_ctrl_w)
@@ -242,7 +239,7 @@ WRITE16_MEMBER(metro_state::mouja_irq_timer_ctrl_w)
 INTERRUPT_GEN_MEMBER(metro_state::puzzlet_interrupt)
 {
 	m_requested_int[m_vblank_bit] = 1;
-	update_irq_state(machine());
+	update_irq_state();
 
 	m_maincpu->set_input_line(H8_METRO_TIMER_HACK, HOLD_LINE);
 }
@@ -558,7 +555,7 @@ READ16_MEMBER(metro_state::metro_bankedrom_r)
 TIMER_CALLBACK_MEMBER(metro_state::metro_blit_done)
 {
 	m_requested_int[m_blitter_bit] = 1;
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 INLINE int blt_read( const UINT8 *ROM, const int offs )
@@ -3581,7 +3578,7 @@ MACHINE_START_MEMBER(metro_state,metro)
 MACHINE_RESET_MEMBER(metro_state,metro)
 {
 	if (m_irq_line == -1)
-		machine().device("maincpu")->execute().set_irq_acknowledge_callback(metro_irq_callback);
+		machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(metro_state::metro_irq_callback),this));
 }
 
 

@@ -389,16 +389,14 @@ READ16_MEMBER(ms32_state::ms32_extra_r16)
 	return m_f1superb_extraram_16[offset];
 }
 
-static void irq_raise(running_machine &machine, int level);
-
 WRITE32_MEMBER(ms32_state::ms32_irq2_guess_w)
 {
-	irq_raise(machine(), 2);
+	irq_raise(2);
 }
 
 WRITE32_MEMBER(ms32_state::ms32_irq5_guess_w)
 {
-	irq_raise(machine(), 5);
+	irq_raise(5);
 }
 
 static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
@@ -1277,38 +1275,35 @@ GFXDECODE_END
 */
 
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(ms32_state::irq_callback)
 {
-	ms32_state *state = device->machine().driver_data<ms32_state>();
 	int i;
-	for(i=15; i>=0 && !(state->m_irqreq & (1<<i)); i--);
-	state->m_irqreq &= ~(1<<i);
-	if(!state->m_irqreq)
-		device->execute().set_input_line(0, CLEAR_LINE);
+	for(i=15; i>=0 && !(m_irqreq & (1<<i)); i--);
+	m_irqreq &= ~(1<<i);
+	if(!m_irqreq)
+		device.execute().set_input_line(0, CLEAR_LINE);
 	return i;
 }
 
-static void irq_init(running_machine &machine)
+void ms32_state::irq_init()
 {
-	ms32_state *state = machine.driver_data<ms32_state>();
-	state->m_irqreq = 0;
-	machine.device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
-	machine.device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	m_irqreq = 0;
+	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ms32_state::irq_callback),this));
 }
 
-static void irq_raise(running_machine &machine, int level)
+void ms32_state::irq_raise(int level)
 {
-	ms32_state *state = machine.driver_data<ms32_state>();
-	state->m_irqreq |= (1<<level);
-	machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	m_irqreq |= (1<<level);
+	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 /* TODO: fix this arrangement (derived from old deprecat lib) */
 TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
 {
 	int scanline = param;
-	if( scanline == 0) irq_raise(machine(), 10);
-	if( scanline == 8) irq_raise(machine(), 9);
+	if( scanline == 0) irq_raise(10);
+	if( scanline == 8) irq_raise(9);
 	/* hayaosi1 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
 	   kirarast needs it too, at least 8 per frame, but waits for a variable amount
 	   47pi2 needs ?? per frame (otherwise it hangs when you lose)
@@ -1317,7 +1312,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
 	   desertwr
 	   p47aces
 	   */
-	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(machine(), 0);
+	if( (scanline % 8) == 0 && scanline <= 224 ) irq_raise(0);
 }
 
 
@@ -1359,7 +1354,7 @@ WRITE8_MEMBER(ms32_state::ms32_snd_bank_w)
 WRITE8_MEMBER(ms32_state::to_main_w)
 {
 	m_to_main=data;
-	irq_raise(machine(), 1);
+	irq_raise(1);
 }
 
 static ADDRESS_MAP_START( ms32_sound_map, AS_PROGRAM, 8, ms32_state )
@@ -1384,7 +1379,7 @@ void ms32_state::machine_reset()
 	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
 	machine().root_device().membank("bank4")->set_entry(0);
 	machine().root_device().membank("bank5")->set_entry(1);
-	irq_init(machine());
+	irq_init();
 }
 
 /********** MACHINE DRIVER **********/

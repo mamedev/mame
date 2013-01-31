@@ -2016,10 +2016,9 @@ READ8_MEMBER(towns_state::towns_41ff_r)
 	return 0x01;
 }
 
-static IRQ_CALLBACK( towns_irq_callback )
+IRQ_CALLBACK_MEMBER(towns_state::towns_irq_callback)
 {
-	towns_state* state = device->machine().driver_data<towns_state>();
-	return pic8259_acknowledge(state->m_pic_master);
+	return pic8259_acknowledge(m_pic_master);
 }
 
 // YM3438 interrupt (IRQ 13)
@@ -2511,7 +2510,7 @@ void towns_state::driver_start()
 	// CD-ROM init
 	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)machine().device("dma_1"));
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(towns_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(towns_state::towns_irq_callback),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x100000,machine().device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,NULL);
 
 }

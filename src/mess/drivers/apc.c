@@ -148,6 +148,8 @@ public:
 
 	int m_dack;
 	UINT8 m_dma_offset[4];
+	
+	IRQ_CALLBACK_MEMBER(irq_callback);
 
 protected:
 	// driver_device overrides
@@ -741,14 +743,14 @@ void apc_state::fdc_irq(bool state)
 	pic8259_ir4_w(machine().device("pic8259_slave"), state);
 }
 
-static IRQ_CALLBACK(irq_callback)
+IRQ_CALLBACK_MEMBER(apc_state::irq_callback)
 {
-	return pic8259_acknowledge( device->machine().device( "pic8259_master" ));
+	return pic8259_acknowledge( machine().device( "pic8259_master" ));
 }
 
 void apc_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(apc_state::irq_callback),this));
 
 	m_fdc->set_rate(500000);
 	m_fdc->setup_intrq_cb(upd765a_device::line_cb(FUNC(apc_state::fdc_irq), this));

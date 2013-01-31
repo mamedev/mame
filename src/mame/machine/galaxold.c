@@ -12,7 +12,7 @@
 #include "includes/galaxold.h"
 
 
-static IRQ_CALLBACK(hunchbkg_irq_callback)
+IRQ_CALLBACK_MEMBER(galaxold_state::hunchbkg_irq_callback)
 {
 	//galaxold_state *state = device->machine().driver_data<galaxold_state>();
 	/* for some reason a call to cputag_set_input_line
@@ -22,7 +22,7 @@ static IRQ_CALLBACK(hunchbkg_irq_callback)
 	 *
 	 * Therefore we reset the line without any detour ....
 	 */
-	device->machine().firstcpu->set_input_line(0, CLEAR_LINE);
+	device.machine().firstcpu->set_input_line(0, CLEAR_LINE);
 	//cpu_set_info(device->machine().firstcpu, CPUINFO_INT_INPUT_STATE + state->m_irq_line, CLEAR_LINE);
 	return 0x03;
 }
@@ -97,7 +97,7 @@ MACHINE_RESET_MEMBER(galaxold_state,devilfsg)
 MACHINE_RESET_MEMBER(galaxold_state,hunchbkg)
 {
 	machine_reset_common(machine(), 0);
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(hunchbkg_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxold_state::hunchbkg_irq_callback),this));
 }
 
 WRITE8_MEMBER(galaxold_state::galaxold_coin_lockout_w)
