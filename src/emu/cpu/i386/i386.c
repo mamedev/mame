@@ -1190,7 +1190,7 @@ static void i386_task_switch(i386_state *cpustate, UINT16 selector, UINT8 nested
 	cpustate->sreg[GS].selector = READ32(cpustate,tss+0x5c) & 0xffff;
 	i386_load_segment_descriptor(cpustate, GS);
 	/* For nested tasks, we write the outgoing task's selector to the back-link field of the new TSS,
-	   and set the NT flag in the EFLAGS register before settings cr3 as the old tss address might be gone */
+	   and set the NT flag in the EFLAGS register before setting cr3 as the old tss address might be gone */
 	if(nested != 0)
 	{
 		WRITE32(cpustate,tss+0,old_task);
@@ -2803,6 +2803,7 @@ static UINT8 read8_debug(i386_state *cpustate, UINT32 ea, UINT8 *data)
 	if(!i386_translate_address(cpustate,TRANSLATE_DEBUG_MASK,&address,NULL))
 		return 0;
 
+	address &= cpustate->a20_mask;
 	*data = cpustate->program->read_byte(address);
 	return 1;
 }
