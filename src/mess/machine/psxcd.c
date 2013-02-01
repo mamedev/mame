@@ -8,7 +8,7 @@
 //
 
 //#define debug_cdrom
-//#define debug_cdrom_registers
+#define debug_cdrom_registers
 //#define skip_reads
 //#define dump_subheader
 //#define disable_xa_prefetch
@@ -226,7 +226,7 @@ READ8_MEMBER( psxcd_device::read )
 	}
 
 	#ifdef debug_cdrom_registers
-		printf("cdrom: read byte %08x = %02x (PC=%x)\n",offset,ret,m_maincpu->safe_pc());
+		printf("cdrom: read byte %08x = %02x\n",offset,ret);
 	#endif
 
 	return ret;
@@ -239,7 +239,7 @@ READ8_MEMBER( psxcd_device::read )
 WRITE8_MEMBER( psxcd_device::write )
 {
 	#ifdef debug_cdrom_registers
-		printf("cdrom: write byte %08x = %02x (PC=%x)\n",offset,data,m_maincpu->safe_pc());
+		printf("cdrom: write byte %08x = %02x\n",offset,data);
 	#endif
 
 	switch (offset&3)

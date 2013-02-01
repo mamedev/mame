@@ -23,7 +23,7 @@ TODO:
 - IC13 games on the dev bios doesn't even load the cartridge / crashes the emulation at start-up,
   rom rearrange needed?
 - SCU DSP still has its fair share of issues, it also needs to be converted to CPU structure;
-- Add the RS232c interface (serial port),needed by fhboxers.
+- Add the RS232c interface (serial port), needed by fhboxers.
 - Video emulation bugs: check stvvdp2.c file.
 - Reimplement the idle skip if possible.
 - Properly emulate the protection chips, used by several games (check stvprot.c for more info)
@@ -386,7 +386,7 @@ WRITE32_MEMBER(saturn_state::saturn_scu_w)
 		case 0xa4/4: /* IRQ control */
 			if(LOG_SCU) logerror("PC=%08x IRQ status reg set:%08x %08x\n",space.device().safe_pc(),m_scu_regs[41],mem_mask);
 			m_scu.ist &= m_scu_regs[offset];
-			//scu_test_pending_irq();
+			scu_test_pending_irq();
 			break;
 		case 0xa8/4: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",m_scu_regs[42]); break;
 		case 0xc4/4: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",m_scu_regs[49]); break;
@@ -639,6 +639,51 @@ WRITE32_MEMBER(saturn_state::sinit_w)
 	sh2_set_frt_input(m_maincpu, PULSE_LINE);
 }
 
+/*
+TODO:
+Some games seems to not like either MAME's interleave system and/or SH-2 DRC, causing an hard crash.
+Reported games are:
+Blast Wind (before FMV)
+Choro Q Park (car selection)
+060311E4: MOV.L R14,@-SP ;R14 = 0x60ffba0 / R15 = 0x60ffba0
+060311E6: MOV SP,R14 ;R14 = 0x60ffba0 / R15 = 0x60ffb9c / [0x60ffb9c] <- 0x60ffba0
+060311E8: MOV.L @SP+,R14 ;R14 = 0x60ffb9c / R15 = 0x60ffb9c / [0x60ffb9c] -> R14
+060311EA: RTS ;R14 = 0x60ffba0 / R15 = 0x60ffba0
+060311EC: NOP
+06031734: MULS.W R9, R8 ;R14 = 0x60ffba0 / R15 = 0x60ffba0 / EA = 0x60311E4
+on DRC this becomes:
+R14 0x6031b78 (cause of the crash later on), R15 = 0x60ffba4 and EA = 0
+
+Shinrei Jusatsushi Taromaru (options menu)
+
+*/
+
+WRITE32_MEMBER(saturn_state::saturn_minit_w)
+{
+	//logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
+	if(m_fake_comms->read() & 1)
+		machine().scheduler().synchronize(); // force resync
+	else
+	{
+		machine().scheduler().boost_interleave(m_minit_boost_timeslice, attotime::from_usec(m_minit_boost));
+		machine().scheduler().trigger(1000);
+	}
+
+	sh2_set_frt_input(m_slave, PULSE_LINE);
+}
+
+WRITE32_MEMBER(saturn_state::saturn_sinit_w)
+{
+	//logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space.device().tag(), space.device().safe_pc(),data);
+	if(m_fake_comms->read() & 1)
+		machine().scheduler().synchronize(); // force resync
+	else
+		machine().scheduler().boost_interleave(m_sinit_boost_timeslice, attotime::from_usec(m_sinit_boost));
+
+	sh2_set_frt_input(m_maincpu, PULSE_LINE);
+}
+
+
 READ8_MEMBER(saturn_state::saturn_backupram_r)
 {
 	if(!(offset & 1))
@@ -730,8 +775,8 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r, saturn_SMPC_w,0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r, saturn_backupram_w,0xffffffff) AM_SHARE("share1")
 	AM_RANGE(0x00200000, 0x002fffff) AM_RAM AM_MIRROR(0x20100000) AM_SHARE("workram_l")
-	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
-	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
+	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(saturn_minit_w)
+	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(saturn_sinit_w)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_SHARE("share7") AM_REGION("maincpu", 0x80000)    // cartridge space
 //  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
 //  AM_RANGE(0x04000000, 0x047fffff) AM_RAM //backup RAM area, dynamically allocated
@@ -1187,9 +1232,9 @@ static INPUT_PORTS_START( saturn )
 	PORT_CONFSETTING(0x90,"<unconnected>")
 
 	PORT_START("fake")
-	PORT_CONFNAME(0x01,0x00,"Master-Slave Comms Hack")
-	PORT_CONFSETTING(0x00,"No")
-	PORT_CONFSETTING(0x01,"Yes")
+	PORT_CONFNAME(0x01,0x00,"Master-Slave Comms")
+	PORT_CONFSETTING(0x00,"Normal (400 cycles)")
+	PORT_CONFSETTING(0x01,"One Shot (Hack)")
 INPUT_PORTS_END
 
 #define STV_PLAYER_INPUTS(_n_, _b1_, _b2_, _b3_,_b4_)                       \
@@ -2364,23 +2409,6 @@ static MACHINE_CONFIG_DERIVED( stv_slot, stv )
 MACHINE_CONFIG_END
 
 
-/* we use a clever hack here. Basically 0x60ffc13 is used for master slave comms, synching there should avoid crashes in several spots. */
-READ32_MEMBER(saturn_state::workram_h_comms_r)
-{
-	if(m_fake_comms->read() & 1)
-		machine().scheduler().synchronize(); // force resync
-
-	return m_workram_h[0x0ffc10/4];
-}
-
-WRITE32_MEMBER(saturn_state::workram_h_comms_w)
-{
-	if(m_fake_comms->read() & 1)
-		machine().scheduler().synchronize(); // force resync
-
-	COMBINE_DATA(&m_workram_h[0x0ffc10/4]);
-}
-
 
 void saturn_state::saturn_init_driver(int rgn)
 {
@@ -2390,11 +2418,6 @@ void saturn_state::saturn_init_driver(int rgn)
 	// set compatible options
 	sh2drc_set_options(machine().device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 	sh2drc_set_options(machine().device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x060ffc10, 0x060ffc13, read32_delegate(FUNC(saturn_state::workram_h_comms_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x060ffc10, 0x060ffc13, write32_delegate(FUNC(saturn_state::workram_h_comms_w),this));
-	machine().device("slave")->memory().space(AS_PROGRAM).install_read_handler(0x060ffc10, 0x060ffc13, read32_delegate(FUNC(saturn_state::workram_h_comms_r),this));
-	machine().device("slave")->memory().space(AS_PROGRAM).install_write_handler(0x060ffc10, 0x060ffc13, write32_delegate(FUNC(saturn_state::workram_h_comms_w),this));
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	m_minit_boost = 400;

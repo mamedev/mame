@@ -41,6 +41,7 @@ public:
 		UINT8     enable_mask[3];
 		UINT32    ist;
 		UINT32    ism;
+		UINT32    illegal_factor[3];
 	}m_scu;
 
 	int       m_minit_boost;
@@ -222,6 +223,8 @@ public:
 	DECLARE_READ16_MEMBER(saturn_soundram_r);
 	DECLARE_WRITE32_MEMBER(minit_w);
 	DECLARE_WRITE32_MEMBER(sinit_w);
+	DECLARE_WRITE32_MEMBER(saturn_minit_w);
+	DECLARE_WRITE32_MEMBER(saturn_sinit_w);
 	DECLARE_READ8_MEMBER(saturn_backupram_r);
 	DECLARE_WRITE8_MEMBER(saturn_backupram_w);
 	DECLARE_READ8_MEMBER(saturn_cart_type_r);
@@ -234,8 +237,6 @@ public:
 	DECLARE_WRITE32_MEMBER(saturn_cart_dram1_w);
 	DECLARE_READ32_MEMBER(saturn_cs1_r);
 	DECLARE_WRITE32_MEMBER(saturn_cs1_w);
-	DECLARE_READ32_MEMBER(workram_h_comms_r);
-	DECLARE_WRITE32_MEMBER(workram_h_comms_w);
 	WRITE_LINE_MEMBER(scsp_to_main_irq);
 	void saturn_init_driver(int rgn);
 
