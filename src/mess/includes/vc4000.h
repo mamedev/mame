@@ -72,8 +72,25 @@ class vc4000_state : public driver_device
 {
 public:
 	vc4000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_cass(*this, CASSETTE_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_cass(*this, CASSETTE_TAG)
+		, m_maincpu(*this, "maincpu")
+		, m_keypad1_1(*this, "KEYPAD1_1")
+		, m_keypad1_2(*this, "KEYPAD1_2")
+		, m_keypad1_3(*this, "KEYPAD1_3")
+		, m_panel(*this, "PANEL")
+		, m_keypad2_1(*this, "KEYPAD2_1")
+		, m_keypad2_2(*this, "KEYPAD2_2")
+		, m_keypad2_3(*this, "KEYPAD2_3")
+#ifndef ANALOG_HACK
+		, m_io_joy1_x(*this, "JOY1_X")
+		, m_io_joy1_y(*this, "JOY1_Y")
+		, m_io_joy2_x(*this, "JOY2_X")
+		, m_io_joy2_y(*this, "JOY2_Y")
+#else
+		, m_joys(*this, "JOYS")
+		, m_config(*this, "CONFIG")
+#endif
 	{ }
 
 	DECLARE_WRITE8_MEMBER(vc4000_sound_ctl);
@@ -98,6 +115,25 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vc4000_video_line);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_ioport m_keypad1_1;
+	required_ioport m_keypad1_2;
+	required_ioport m_keypad1_3;
+	required_ioport m_panel;
+	required_ioport m_keypad2_1;
+	required_ioport m_keypad2_2;
+	required_ioport m_keypad2_3;
+#ifndef ANALOG_HACK
+	required_ioport m_io_joy1_x;
+	required_ioport m_io_joy1_y;
+	required_ioport m_io_joy2_x;
+	required_ioport m_io_joy2_y;
+#else
+	required_ioport m_joys;
+	required_ioport m_config;
+#endif
 };
 
 /*----------- defined in audio/vc4000.c -----------*/

@@ -114,25 +114,25 @@ READ8_MEMBER( vc4000_state::vc4000_key_r )
 	switch(offset & 0x0f)
 	{
 	case 0x08:
-		data = ioport("KEYPAD1_1")->read();
+		data = m_keypad1_1->read();
 		break;
 	case 0x09:
-		data = ioport("KEYPAD1_2")->read();
+		data = m_keypad1_2->read();
 		break;
 	case 0x0a:
-		data = ioport("KEYPAD1_3")->read();
+		data = m_keypad1_3->read();
 		break;
 	case 0x0b:
-		data = ioport("PANEL")->read();
+		data = m_panel->read();
 		break;
 	case 0x0c:
-		data = ioport("KEYPAD2_1")->read();
+		data = m_keypad2_1->read();
 		break;
 	case 0x0d:
-		data = ioport("KEYPAD2_2")->read();
+		data = m_keypad2_2->read();
 		break;
 	case 0x0e:
-		data = ioport("KEYPAD2_3")->read();
+		data = m_keypad2_3->read();
 		break;
 	}
 	return data;

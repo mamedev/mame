@@ -115,21 +115,21 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 
 #ifndef ANALOG_HACK
 	case 0xcc:
-		if (!activeS2650_FO)) data=ioport("JOY1_X")->read();
-		else data=ioport("JOY1_Y")->read();
+		if (!activeS2650_FO)) data = m_io_joy1_x->read();
+		else data = m_io_joy1_y->read();
 		break;
 	case 0xcd:
-		if (!activecpu_get_reg(S2650_FO)) data=ioport("JOY2_X")->read();
-		else data=ioport("JOY2_Y")->read();
+		if (!activecpu_get_reg(S2650_FO)) data = m_io_joy2_x->read();
+		else data = m_io_joy2_y->read();
 		break;
 #else
 
 	case 0xcc:      /* left joystick */
-		if (ioport("CONFIG")->read()&1)
+		if (m_config->read()&1)
 		{       /* paddle */
-			if (!machine().device("maincpu")->state().state_int(S2650_FO))
+			if (!m_maincpu->state_int(S2650_FO))
 			{
-				data = ioport("JOYS")->read() & 0x03;
+				data = m_joys->read() & 0x03;
 				switch (data)
 				{
 				case 0x01:
@@ -147,7 +147,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 			}
 			else
 			{
-				data = ioport("JOYS")->read() & 0x0c;
+				data = m_joys->read() & 0x0c;
 				switch (data)
 				{
 				case 0x08:
@@ -166,9 +166,9 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 		}
 		else
 		{       /* buttons */
-			if (!machine().device("maincpu")->state().state_int(S2650_FO))
+			if (!m_maincpu->state_int(S2650_FO))
 			{
-				data = ioport("JOYS")->read() & 0x03;
+				data = m_joys->read() & 0x03;
 				switch (data)
 				{
 				case 0x01:
@@ -184,7 +184,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 			}
 			else
 			{
-				data = ioport("JOYS")->read() & 0x0c;
+				data = m_joys->read() & 0x0c;
 				switch (data)
 				{
 				case 0x08:
@@ -202,11 +202,11 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 		break;
 
 	case 0xcd:      /* right joystick */
-		if (ioport("CONFIG")->read()&1)
+		if (m_config->read()&1)
 		{
-			if (!machine().device("maincpu")->state().state_int(S2650_FO))
+			if (!m_maincpu->state_int(S2650_FO))
 			{
-				data = ioport("JOYS")->read() & 0x30;
+				data = m_joys->read() & 0x30;
 				switch (data)
 				{
 				case 0x10:
@@ -224,7 +224,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 			}
 			else
 			{
-				data = ioport("JOYS")->read() & 0xc0;
+				data = m_joys->read() & 0xc0;
 				switch (data)
 				{
 				case 0x80:
@@ -243,9 +243,9 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 		}
 		else
 		{
-			if (!machine().device("maincpu")->state().state_int(S2650_FO))
+			if (!m_maincpu->state_int(S2650_FO))
 			{
-				data = ioport("JOYS")->read() & 0x30;
+				data = m_joys->read() & 0x30;
 				switch (data)
 				{
 				case 0x10:
@@ -261,7 +261,7 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 			}
 			else
 			{
-				data = ioport("JOYS")->read() & 0xc0;
+				data = m_joys->read() & 0xc0;
 				switch (data)
 				{
 				case 0x80:
@@ -593,7 +593,7 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 
 	if (m_irq_pause>10)
 	{
-		machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 		m_irq_pause = 0;
 	}
 
@@ -639,7 +639,7 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 		(m_video.sprites[1].finished_now) |
 		(m_video.sprites[0].finished_now)) && (!m_irq_pause))
 		{
-			machine().device("maincpu")->execute().set_input_line_and_vector(0, ASSERT_LINE, 3);
+			m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, 3);
 			m_irq_pause=1;
 		}
 }
