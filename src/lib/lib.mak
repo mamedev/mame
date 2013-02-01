@@ -202,6 +202,10 @@ $(OBJ)/libformats.a: $(FORMATSOBJS)
 # zlib library objects
 #-------------------------------------------------
 
+ifdef DEBUG
+ZLIBOPTS=-Dverbose=-1
+endif
+
 ZLIBOBJS = \
 	$(LIBOBJ)/zlib/adler32.o \
 	$(LIBOBJ)/zlib/compress.o \
@@ -221,7 +225,7 @@ $(OBJ)/libz.a: $(ZLIBOBJS)
 
 $(LIBOBJ)/zlib/%.o: $(LIBSRC)/zlib/%.c | $(OSPREBUILD)
 	@echo Compiling $<...
-	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) -c $< -o $@
+	$(CC) $(CDEFS) $(CCOMFLAGS) $(CONLYFLAGS) $(ZLIBOPTS) -c $< -o $@
 
 
 
