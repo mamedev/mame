@@ -144,6 +144,9 @@ public:
 	void screen_eof_toaplan1(screen_device &screen, bool state);
 	void screen_eof_samesame(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(toaplan1_interrupt);
+	void rallybik_flipscreen();
+	void toaplan1_flipscreen();
+	void demonwld_restore_dsp();
 };
 
 

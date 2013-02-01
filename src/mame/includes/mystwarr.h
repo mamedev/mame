@@ -75,4 +75,5 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(metamrph_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mchamp_interrupt);
+	void reset_sound_region();
 };

@@ -60,6 +60,7 @@ public:
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 	TIMER_CALLBACK_MEMBER(firq_off_tick);
 	TIMER_CALLBACK_MEMBER(firq_timer_tick);
+	void expand_pixels();
 };
 
 

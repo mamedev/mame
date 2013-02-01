@@ -127,7 +127,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start)
 {
 	m_vblank_irq = 1;
 	update_irq_state(machine());
-	cave_get_sprite_info(machine());
+	cave_get_sprite_info();
 	m_agallet_vblank_irq = 1;
 	machine().scheduler().timer_set(attotime::from_usec(2000), timer_expired_delegate(FUNC(cave_state::cave_vblank_end),this));
 }

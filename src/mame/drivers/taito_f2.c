@@ -607,10 +607,9 @@ READ8_MEMBER(taitof2_state::driveout_sound_command_r)
 }
 
 
-static void reset_driveout_sound_region( running_machine &machine )
+void taitof2_state::reset_driveout_sound_region()
 {
-	taitof2_state *state = machine.driver_data<taitof2_state>();
-	state->m_oki->set_bank_base(state->m_oki_bank * 0x40000);
+	m_oki->set_bank_base(m_oki_bank * 0x40000);
 }
 
 WRITE8_MEMBER(taitof2_state::oki_bank_w)
@@ -620,7 +619,7 @@ WRITE8_MEMBER(taitof2_state::oki_bank_w)
 		m_oki_bank = (data & 3);
 	}
 
-	reset_driveout_sound_region(machine());
+	reset_driveout_sound_region();
 }
 
 WRITE16_MEMBER(taitof2_state::driveout_sound_command_w)
@@ -5373,7 +5372,7 @@ DRIVER_INIT_MEMBER(taitof2_state,driveout)
 	save_item(NAME(m_driveout_sound_latch));
 	save_item(NAME(m_oki_bank));
 	save_item(NAME(m_nibble));
-	machine().save().register_postload(save_prepost_delegate(FUNC(reset_driveout_sound_region), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(taitof2_state::reset_driveout_sound_region), this));
 }
 
 

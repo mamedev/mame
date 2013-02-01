@@ -325,20 +325,19 @@ static void alloc_empty_tiles( running_machine &machine )
 }
 
 
-static void hyprduel_postload(running_machine &machine)
+void hyprduel_state::hyprduel_postload()
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	int i;
 
 	for (i = 0; i < 3; i++)
 	{
-		UINT16 wx = state->m_window[i * 2 + 1];
-		UINT16 wy = state->m_window[i * 2 + 0];
+		UINT16 wx = m_window[i * 2 + 1];
+		UINT16 wy = m_window[i * 2 + 0];
 
-		state->m_bg_tilemap[i]->set_scrollx(0, state->m_scroll[i * 2 + 1] - wx - (wx & 7));
-		state->m_bg_tilemap[i]->set_scrolly(0, state->m_scroll[i * 2 + 0] - wy - (wy & 7));
+		m_bg_tilemap[i]->set_scrollx(0, m_scroll[i * 2 + 1] - wx - (wx & 7));
+		m_bg_tilemap[i]->set_scrolly(0, m_scroll[i * 2 + 0] - wy - (wy & 7));
 
-		state->m_bg_tilemap[i]->mark_all_dirty();
+		m_bg_tilemap[i]->mark_all_dirty();
 	}
 }
 
@@ -386,7 +385,7 @@ VIDEO_START_MEMBER(hyprduel_state,common_14220)
 	/* Set up save state */
 	save_item(NAME(m_sprite_xoffs));
 	save_item(NAME(m_sprite_yoffs));
-	machine().save().register_postload(save_prepost_delegate(FUNC(hyprduel_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(hyprduel_state::hyprduel_postload), this));
 }
 
 VIDEO_START_MEMBER(hyprduel_state,hyprduel_14220)

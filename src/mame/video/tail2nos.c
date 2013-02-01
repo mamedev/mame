@@ -40,16 +40,15 @@ void tail2nos_zoom_callback( running_machine &machine, int *code, int *color, in
 
 ***************************************************************************/
 
-static void tail2nos_postload(running_machine &machine)
+void tail2nos_state::tail2nos_postload()
 {
-	tail2nos_state *state = machine.driver_data<tail2nos_state>();
 	int i;
 
-	state->m_bg_tilemap->mark_all_dirty();
+	m_bg_tilemap->mark_all_dirty();
 
 	for (i = 0; i < 0x20000; i += 64)
 	{
-		machine.gfx[2]->mark_dirty(i / 64);
+		machine().gfx[2]->mark_dirty(i / 64);
 	}
 }
 
@@ -62,7 +61,7 @@ void tail2nos_state::video_start()
 	m_zoomdata = (UINT16 *)memregion("gfx3")->base();
 
 	save_pointer(NAME(m_zoomdata), 0x20000 / 2);
-	machine().save().register_postload(save_prepost_delegate(FUNC(tail2nos_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tail2nos_state::tail2nos_postload), this));
 }
 
 

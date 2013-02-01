@@ -100,4 +100,5 @@ public:
 	void screen_eof_tnzs(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(arknoid2_interrupt);
 	TIMER_CALLBACK_MEMBER(kludge_callback);
+	void tnzs_postload();
 };

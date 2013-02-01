@@ -195,6 +195,7 @@ public:
 	INTERRUPT_GEN_MEMBER(crystal_interrupt);
 	TIMER_CALLBACK_MEMBER(Timercb);
 	IRQ_CALLBACK_MEMBER(icallback);
+	void crystal_banksw_postload();
 };
 
 static void IntReq( running_machine &machine, int num )
@@ -564,14 +565,12 @@ loop:
 #endif
 }
 
-static void crystal_banksw_postload(running_machine &machine)
+void crystal_state::crystal_banksw_postload()
 {
-	crystal_state *state = machine.driver_data<crystal_state>();
-
-	if (state->m_Bank <= 2)
-		state->membank("bank1")->set_base(state->memregion("user1")->base() + state->m_Bank * 0x1000000);
+	if (m_Bank <= 2)
+		membank("bank1")->set_base(memregion("user1")->base() + m_Bank * 0x1000000);
 	else
-		state->membank("bank1")->set_base(state->memregion("user2")->base());
+		membank("bank1")->set_base(memregion("user2")->base());
 }
 
 void crystal_state::machine_start()
@@ -600,7 +599,7 @@ void crystal_state::machine_start()
 	save_item(NAME(m_PIO));
 	save_item(NAME(m_DMActrl));
 	save_item(NAME(m_OldPort4));
-	machine().save().register_postload(save_prepost_delegate(FUNC(crystal_banksw_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(crystal_state::crystal_banksw_postload), this));
 }
 
 void crystal_state::machine_reset()

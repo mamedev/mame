@@ -164,16 +164,15 @@ Colscroll effects?
                           SOUND
 ***********************************************************/
 
-static void reset_sound_region( running_machine &machine )
+void warriorb_state::reset_sound_region()
 {
-	warriorb_state *state = machine.driver_data<warriorb_state>();
-	state->membank("bank10")->set_entry(state->m_banknum);
+	membank("bank10")->set_entry(m_banknum);
 }
 
 WRITE8_MEMBER(warriorb_state::sound_bankswitch_w)
 {
 	m_banknum = data & 7;
-	reset_sound_region(machine());
+	reset_sound_region();
 }
 
 WRITE16_MEMBER(warriorb_state::warriorb_sound_w)
@@ -524,7 +523,7 @@ void warriorb_state::machine_start()
 
 	save_item(NAME(m_banknum));
 	save_item(NAME(m_pandata));
-	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(warriorb_state::reset_sound_region), this));
 }
 
 void warriorb_state::machine_reset()

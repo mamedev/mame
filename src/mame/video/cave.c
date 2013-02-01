@@ -753,7 +753,7 @@ static void sprite_init_cave( running_machine &machine )
 	state->save_item(NAME(state->m_blit.clip_top));
 	state->save_item(NAME(state->m_blit.clip_bottom));
 
-	machine.save().register_postload(save_prepost_delegate(FUNC(cave_get_sprite_info), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(cave_state::cave_get_sprite_info), state));
 }
 
 static void cave_sprite_check( screen_device &screen, const rectangle &clip )
@@ -1642,24 +1642,23 @@ UINT32 cave_state::screen_update_cave(screen_device &screen, bitmap_ind16 &bitma
 
 /**************************************************************/
 
-void cave_get_sprite_info( running_machine &machine )
+void cave_state::cave_get_sprite_info()
 {
-	cave_state *state = machine.driver_data<cave_state>();
-	if (state->m_kludge == 3)   /* mazinger metmqstr */
+	if (m_kludge == 3)   /* mazinger metmqstr */
 	{
-		if (machine.video().skip_this_frame() == 0)
+		if (machine().video().skip_this_frame() == 0)
 		{
-			state->m_spriteram_bank = state->m_spriteram_bank_delay;
-			(*state->m_get_sprite_info)(machine);
+			m_spriteram_bank = m_spriteram_bank_delay;
+			(*m_get_sprite_info)(machine());
 		}
-		state->m_spriteram_bank_delay = state->m_videoregs[4] & 1;
+		m_spriteram_bank_delay = m_videoregs[4] & 1;
 	}
 	else
 	{
-		if (machine.video().skip_this_frame() == 0)
+		if (machine().video().skip_this_frame() == 0)
 		{
-			state->m_spriteram_bank = state->m_videoregs[4] & 1;
-			(*state->m_get_sprite_info)(machine);
+			m_spriteram_bank = m_videoregs[4] & 1;
+			(*m_get_sprite_info)(machine());
 		}
 	}
 }

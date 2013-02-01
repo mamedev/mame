@@ -1351,11 +1351,10 @@ WRITE8_MEMBER(dynax_state::tenkai_palette_w)
 	}
 }
 
-static void tenkai_update_rombank( running_machine &machine )
+void dynax_state::tenkai_update_rombank()
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
-	state->m_romptr = state->memregion("maincpu")->base() + 0x10000 + 0x8000 * state->m_rombank;
-//  logerror("rombank = %02x\n", state->m_rombank);
+	m_romptr = memregion("maincpu")->base() + 0x10000 + 0x8000 * m_rombank;
+//  logerror("rombank = %02x\n", m_rombank);
 }
 
 READ8_MEMBER(dynax_state::tenkai_p3_r)
@@ -1366,12 +1365,12 @@ READ8_MEMBER(dynax_state::tenkai_p3_r)
 WRITE8_MEMBER(dynax_state::tenkai_p3_w)
 {
 	m_rombank = ((data & 0x04) << 1) | (m_rombank & 0x07);
-	tenkai_update_rombank(machine());
+	tenkai_update_rombank();
 }
 WRITE8_MEMBER(dynax_state::tenkai_p4_w)
 {
 	m_rombank = (m_rombank & 0x08) | ((data & 0x0e) >> 1);
-	tenkai_update_rombank(machine());
+	tenkai_update_rombank();
 }
 
 READ8_MEMBER(dynax_state::tenkai_p5_r)
@@ -1398,7 +1397,7 @@ WRITE8_MEMBER(dynax_state::tenkai_p7_w)
 WRITE8_MEMBER(dynax_state::tenkai_p8_w)
 {
 	m_rombank = ((data & 0x08) << 1) | (m_rombank & 0x0f);
-	tenkai_update_rombank(machine());
+	tenkai_update_rombank();
 }
 
 READ8_MEMBER(dynax_state::tenkai_p8_r)
@@ -4975,7 +4974,7 @@ MACHINE_START_MEMBER(dynax_state,tenkai)
 {
 	MACHINE_START_CALL_MEMBER(dynax);
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(tenkai_update_rombank), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(dynax_state::tenkai_update_rombank), this));
 }
 
 WRITE_LINE_MEMBER(dynax_state::tenkai_rtc_irq)
@@ -5036,18 +5035,16 @@ MACHINE_CONFIG_END
                                 Mahjong Gekisha
 ***************************************************************************/
 
-static void gekisha_bank_postload(running_machine &machine)
+void dynax_state::gekisha_bank_postload()
 {
-	dynax_state *state = machine.driver_data<dynax_state>();
-
-	gekisha_set_rombank(machine, state->m_rombank);
+	gekisha_set_rombank(machine(), m_rombank);
 }
 
 MACHINE_START_MEMBER(dynax_state,gekisha)
 {
 	MACHINE_START_CALL_MEMBER(dynax);
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(gekisha_bank_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(dynax_state::gekisha_bank_postload), this));
 }
 
 MACHINE_RESET_MEMBER(dynax_state,gekisha)

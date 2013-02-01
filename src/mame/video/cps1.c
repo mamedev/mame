@@ -1805,80 +1805,79 @@ DRIVER_INIT_MEMBER(cps_state,cps2_video)
 }
 
 
-void cps1_get_video_base( running_machine &machine )
+void cps_state::cps1_get_video_base()
 {
-	cps_state *state = machine.driver_data<cps_state>();
 	int layercontrol, videocontrol, scroll1xoff, scroll2xoff, scroll3xoff;
 
 	/* Re-calculate the VIDEO RAM base */
-	if (state->m_scroll1 != cps1_base(machine, CPS1_SCROLL1_BASE, state->m_scroll_size))
+	if (m_scroll1 != cps1_base(machine(), CPS1_SCROLL1_BASE, m_scroll_size))
 	{
-		state->m_scroll1 = cps1_base(machine, CPS1_SCROLL1_BASE, state->m_scroll_size);
-		state->m_bg_tilemap[0]->mark_all_dirty();
+		m_scroll1 = cps1_base(machine(), CPS1_SCROLL1_BASE, m_scroll_size);
+		m_bg_tilemap[0]->mark_all_dirty();
 	}
-	if (state->m_scroll2 != cps1_base(machine, CPS1_SCROLL2_BASE, state->m_scroll_size))
+	if (m_scroll2 != cps1_base(machine(), CPS1_SCROLL2_BASE, m_scroll_size))
 	{
-		state->m_scroll2 = cps1_base(machine, CPS1_SCROLL2_BASE, state->m_scroll_size);
-		state->m_bg_tilemap[1]->mark_all_dirty();
+		m_scroll2 = cps1_base(machine(), CPS1_SCROLL2_BASE, m_scroll_size);
+		m_bg_tilemap[1]->mark_all_dirty();
 	}
-	if (state->m_scroll3 != cps1_base(machine, CPS1_SCROLL3_BASE, state->m_scroll_size))
+	if (m_scroll3 != cps1_base(machine(), CPS1_SCROLL3_BASE, m_scroll_size))
 	{
-		state->m_scroll3 = cps1_base(machine, CPS1_SCROLL3_BASE, state->m_scroll_size);
-		state->m_bg_tilemap[2]->mark_all_dirty();
+		m_scroll3 = cps1_base(machine(), CPS1_SCROLL3_BASE, m_scroll_size);
+		m_bg_tilemap[2]->mark_all_dirty();
 	}
 
 	/* Some of the sf2 hacks use only sprite port 0x9100 and the scroll layers are offset */
-	if (state->m_game_config->bootleg_kludge == 1)
+	if (m_game_config->bootleg_kludge == 1)
 	{
-		state->m_cps_a_regs[CPS1_OBJ_BASE] = 0x9100;
-		state->m_obj = cps1_base(machine, CPS1_OBJ_BASE, state->m_obj_size);
+		m_cps_a_regs[CPS1_OBJ_BASE] = 0x9100;
+		m_obj = cps1_base(machine(), CPS1_OBJ_BASE, m_obj_size);
 		scroll1xoff = -0x0c;
 		scroll2xoff = -0x0e;
 		scroll3xoff = -0x10;
 	}
 	else
 	{
-		state->m_obj = cps1_base(machine, CPS1_OBJ_BASE, state->m_obj_size);
+		m_obj = cps1_base(machine(), CPS1_OBJ_BASE, m_obj_size);
 		scroll1xoff = 0;
 		scroll2xoff = 0;
 		scroll3xoff = 0;
 	}
 
-	state->m_other = cps1_base(machine, CPS1_OTHER_BASE, state->m_other_size);
+	m_other = cps1_base(machine(), CPS1_OTHER_BASE, m_other_size);
 
 	/* Get scroll values */
-	state->m_scroll1x = state->m_cps_a_regs[CPS1_SCROLL1_SCROLLX] + scroll1xoff;
-	state->m_scroll1y = state->m_cps_a_regs[CPS1_SCROLL1_SCROLLY];
-	state->m_scroll2x = state->m_cps_a_regs[CPS1_SCROLL2_SCROLLX] + scroll2xoff;
-	state->m_scroll2y = state->m_cps_a_regs[CPS1_SCROLL2_SCROLLY];
-	state->m_scroll3x = state->m_cps_a_regs[CPS1_SCROLL3_SCROLLX] + scroll3xoff;
-	state->m_scroll3y = state->m_cps_a_regs[CPS1_SCROLL3_SCROLLY];
-	state->m_stars1x = state->m_cps_a_regs[CPS1_STARS1_SCROLLX];
-	state->m_stars1y = state->m_cps_a_regs[CPS1_STARS1_SCROLLY];
-	state->m_stars2x = state->m_cps_a_regs[CPS1_STARS2_SCROLLX];
-	state->m_stars2y = state->m_cps_a_regs[CPS1_STARS2_SCROLLY];
+	m_scroll1x = m_cps_a_regs[CPS1_SCROLL1_SCROLLX] + scroll1xoff;
+	m_scroll1y = m_cps_a_regs[CPS1_SCROLL1_SCROLLY];
+	m_scroll2x = m_cps_a_regs[CPS1_SCROLL2_SCROLLX] + scroll2xoff;
+	m_scroll2y = m_cps_a_regs[CPS1_SCROLL2_SCROLLY];
+	m_scroll3x = m_cps_a_regs[CPS1_SCROLL3_SCROLLX] + scroll3xoff;
+	m_scroll3y = m_cps_a_regs[CPS1_SCROLL3_SCROLLY];
+	m_stars1x = m_cps_a_regs[CPS1_STARS1_SCROLLX];
+	m_stars1y = m_cps_a_regs[CPS1_STARS1_SCROLLY];
+	m_stars2x = m_cps_a_regs[CPS1_STARS2_SCROLLX];
+	m_stars2y = m_cps_a_regs[CPS1_STARS2_SCROLLY];
 
 	/* Get layer enable bits */
-	layercontrol = state->m_cps_b_regs[state->m_game_config->layer_control / 2];
-	videocontrol = state->m_cps_a_regs[CPS1_VIDEOCONTROL];
-	state->m_bg_tilemap[0]->enable(layercontrol & state->m_game_config->layer_enable_mask[0]);
-	state->m_bg_tilemap[1]->enable((layercontrol & state->m_game_config->layer_enable_mask[1]) && (videocontrol & 4));
-	state->m_bg_tilemap[2]->enable((layercontrol & state->m_game_config->layer_enable_mask[2]) && (videocontrol & 8));
-	state->m_stars_enabled[0] = layercontrol & state->m_game_config->layer_enable_mask[3];
-	state->m_stars_enabled[1] = layercontrol & state->m_game_config->layer_enable_mask[4];
+	layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
+	videocontrol = m_cps_a_regs[CPS1_VIDEOCONTROL];
+	m_bg_tilemap[0]->enable(layercontrol & m_game_config->layer_enable_mask[0]);
+	m_bg_tilemap[1]->enable((layercontrol & m_game_config->layer_enable_mask[1]) && (videocontrol & 4));
+	m_bg_tilemap[2]->enable((layercontrol & m_game_config->layer_enable_mask[2]) && (videocontrol & 8));
+	m_stars_enabled[0] = layercontrol & m_game_config->layer_enable_mask[3];
+	m_stars_enabled[1] = layercontrol & m_game_config->layer_enable_mask[4];
 
 #ifdef MAME_DEBUG
 {
 	int enablemask = 0;
 
-	if (state->m_game_config->layer_enable_mask[0] == state->m_game_config->layer_enable_mask[1])
-		enablemask = state->m_game_config->layer_enable_mask[0];
+	if (m_game_config->layer_enable_mask[0] == m_game_config->layer_enable_mask[1])
+		enablemask = m_game_config->layer_enable_mask[0];
 
-	if (state->m_game_config->layer_enable_mask[0] == state->m_game_config->layer_enable_mask[2])
-		enablemask = state->m_game_config->layer_enable_mask[0];
+	if (m_game_config->layer_enable_mask[0] == m_game_config->layer_enable_mask[2])
+		enablemask = m_game_config->layer_enable_mask[0];
 
-	if (state->m_game_config->layer_enable_mask[1] == state->m_game_config->layer_enable_mask[2])
-		enablemask = state->m_game_config->layer_enable_mask[1];
+	if (m_game_config->layer_enable_mask[1] == m_game_config->layer_enable_mask[2])
+		enablemask = m_game_config->layer_enable_mask[1];
 
 	if (enablemask)
 	{
@@ -1886,9 +1885,9 @@ void cps1_get_video_base( running_machine &machine )
 			popmessage("layer %02x contact MAMEDEV", layercontrol & 0xc03f);
 	}
 
-	enablemask = state->m_game_config->layer_enable_mask[0] | state->m_game_config->layer_enable_mask[1]
-			| state->m_game_config->layer_enable_mask[2]
-			| state->m_game_config->layer_enable_mask[3] | state->m_game_config->layer_enable_mask[4];
+	enablemask = m_game_config->layer_enable_mask[0] | m_game_config->layer_enable_mask[1]
+			| m_game_config->layer_enable_mask[2]
+			| m_game_config->layer_enable_mask[3] | m_game_config->layer_enable_mask[4];
 
 	if (((layercontrol & ~enablemask) & 0x003e) != 0)
 		popmessage("layer %02x contact MAMEDEV", layercontrol & 0xc03f);
@@ -2134,8 +2133,8 @@ VIDEO_START_MEMBER(cps_state,cps)
 	m_scroll3 = NULL;
 	m_obj = NULL;
 	m_other = NULL;
-	cps1_get_video_base(machine());   /* Calculate base pointers */
-	cps1_get_video_base(machine());   /* Calculate old base pointers */
+	cps1_get_video_base();   /* Calculate base pointers */
+	cps1_get_video_base();   /* Calculate old base pointers */
 
 	/* state save register */
 	save_item(NAME(m_scanline1));
@@ -2166,7 +2165,7 @@ VIDEO_START_MEMBER(cps_state,cps)
 		save_pointer(NAME(m_cps2_buffered_obj), m_cps2_obj_size / 2);
 	}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(cps1_get_video_base), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(cps_state::cps1_get_video_base), this));
 }
 
 VIDEO_START_MEMBER(cps_state,cps1)
@@ -2791,7 +2790,7 @@ UINT32 cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap
 	layercontrol = m_cps_b_regs[m_game_config->layer_control / 2];
 
 	/* Get video memory base registers */
-	cps1_get_video_base(machine());
+	cps1_get_video_base();
 
 	/* Find the offset of the last sprite in the sprite table */
 	cps1_find_last_sprite(machine());
@@ -2938,7 +2937,7 @@ void cps_state::screen_eof_cps1(screen_device &screen, bool state)
 	if (state)
 	{
 		/* Get video memory base registers */
-		cps1_get_video_base(machine());
+		cps1_get_video_base();
 
 		if (m_cps_version == 1)
 		{

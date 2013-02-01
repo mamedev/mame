@@ -94,4 +94,5 @@ public:
 	TIMER_CALLBACK_MEMBER(magerror_irq_callback);
 	TIMER_CALLBACK_MEMBER(hyprduel_blit_done);
 	TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_interrupt);
+	void hyprduel_postload();
 };

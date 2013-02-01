@@ -92,16 +92,15 @@ WRITE16_MEMBER(xmen_state::xmen_18fa00_w)
 	}
 }
 
-static void sound_reset_bank( running_machine &machine )
+void xmen_state::sound_reset_bank()
 {
-	xmen_state *state = machine.driver_data<xmen_state>();
-	state->membank("bank4")->set_entry(state->m_sound_curbank & 0x07);
+	membank("bank4")->set_entry(m_sound_curbank & 0x07);
 }
 
 WRITE8_MEMBER(xmen_state::sound_bankswitch_w)
 {
 	m_sound_curbank = data;
-	sound_reset_bank(machine());
+	sound_reset_bank();
 }
 
 
@@ -311,7 +310,7 @@ void xmen_state::machine_start()
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_layerpri));
 	save_item(NAME(m_vblank_irq_mask));
-	machine().save().register_postload(save_prepost_delegate(FUNC(sound_reset_bank), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(xmen_state::sound_reset_bank), this));
 }
 
 void xmen_state::machine_reset()

@@ -3025,10 +3025,10 @@ static const tc0140syt_interface taitoz_tc0140syt_intf =
                    SAVE STATES
 ***********************************************************/
 
-static void taitoz_postload(running_machine &machine)
+void taitoz_state::taitoz_postload()
 {
-	parse_cpu_control(machine);
-	reset_sound_region(machine);
+	parse_cpu_control(machine());
+	reset_sound_region(machine());
 }
 
 MACHINE_START_MEMBER(taitoz_state,bshark)
@@ -3058,7 +3058,7 @@ MACHINE_START_MEMBER(taitoz_state,taitoz)
 
 	machine().root_device().membank("bank10")->configure_entries(0, banks, machine().root_device().memregion("audiocpu")->base() + 0xc000, 0x4000);
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(taitoz_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(taitoz_state::taitoz_postload), this));
 
 	MACHINE_START_CALL_MEMBER(bshark);
 }

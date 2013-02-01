@@ -666,10 +666,9 @@ MACHINE_RESET_MEMBER(tnzs_state,jpopnics)
 	m_mcu_type = -1;
 }
 
-static void tnzs_postload(running_machine &machine)
+void tnzs_state::tnzs_postload()
 {
-	tnzs_state *state = machine.driver_data<tnzs_state>();
-	state->membank("subbank")->set_entry(state->m_bank2);
+	membank("subbank")->set_entry(m_bank2);
 }
 
 
@@ -693,7 +692,7 @@ MACHINE_START_MEMBER(tnzs_state,jpopnics)
 	save_item(NAME(m_bank1));
 	save_item(NAME(m_bank2));
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(tnzs_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tnzs_state::tnzs_postload), this));
 }
 
 MACHINE_START_MEMBER(tnzs_state,tnzs)

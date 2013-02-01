@@ -551,16 +551,15 @@ ADDRESS_MAP_END
 /**********************************************************************************/
 
 
-static void reset_sound_region(running_machine &machine)
+void mystwarr_state::reset_sound_region()
 {
-	mystwarr_state *state = machine.driver_data<mystwarr_state>();
-	state->membank("bank2")->set_base(state->memregion("soundcpu")->base() + 0x10000 + state->m_cur_sound_region*0x4000);
+	membank("bank2")->set_base(memregion("soundcpu")->base() + 0x10000 + m_cur_sound_region*0x4000);
 }
 
 WRITE8_MEMBER(mystwarr_state::sound_bankswitch_w)
 {
 	m_cur_sound_region = (data & 0xf);
-	reset_sound_region(machine());
+	reset_sound_region();
 }
 
 /* sound memory maps
@@ -838,13 +837,13 @@ MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 {
 	/* set default bankswitch */
 	m_cur_sound_region = 2;
-	reset_sound_region(machine());
+	reset_sound_region();
 
 	m_mw_irq_control = 0;
 
 	state_save_register_global(machine(), m_mw_irq_control);
 	state_save_register_global(machine(), m_cur_sound_region);
-	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(mystwarr_state::reset_sound_region), this));
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,mystwarr)

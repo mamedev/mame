@@ -44,6 +44,7 @@ public:
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	DECLARE_READ8_MEMBER(simpsons_sound_r);
+	void simpsons_postload();
 };
 
 

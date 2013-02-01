@@ -173,6 +173,7 @@ public:
 	DECLARE_WRITE8_MEMBER(invad2ct_audio_2_w);
 	DECLARE_WRITE8_MEMBER(invad2ct_audio_3_w);
 	DECLARE_WRITE8_MEMBER(invad2ct_audio_4_w);
+	void maze_update_discrete();
 };
 
 

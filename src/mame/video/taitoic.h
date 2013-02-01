@@ -105,6 +105,7 @@ public:
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
+	void pc080sn_restore_scroll();
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -147,6 +148,7 @@ public:
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
+	void tc0080vco_postload();
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -170,6 +172,7 @@ public:
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
+	void tc0100scn_postload();
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -237,6 +240,7 @@ public:
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
+	void tc0480scp_postload();
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -282,6 +286,7 @@ public:
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
+	void tc0110pcr_restore_colors();
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

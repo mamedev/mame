@@ -257,6 +257,7 @@ public:
 	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
 	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cps1_get_video_base();
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
@@ -267,7 +268,6 @@ GFXDECODE_EXTERN( cps1 );
 
 
 /*----------- defined in video/cps1.c -----------*/
-void cps1_get_video_base(running_machine &machine);
 void cps2_set_sprite_priorities(running_machine &machine);
 void cps2_objram_latch(running_machine &machine);
 

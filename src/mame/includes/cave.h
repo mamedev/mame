@@ -204,8 +204,8 @@ public:
 	INTERRUPT_GEN_MEMBER(cave_interrupt);
 	TIMER_CALLBACK_MEMBER(cave_vblank_end);
 	TIMER_DEVICE_CALLBACK_MEMBER(cave_vblank_start);
+	void cave_get_sprite_info();
 };
 
 /*----------- defined in video/cave.c -----------*/
-void cave_get_sprite_info(running_machine &machine);
 void sailormn_tilebank_w(running_machine &machine, int bank);

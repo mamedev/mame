@@ -148,10 +148,9 @@ static void demonwld_dsp(running_machine &machine, int enable)
 	}
 }
 
-static void demonwld_restore_dsp(running_machine &machine)
+void toaplan1_state::demonwld_restore_dsp()
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
-	demonwld_dsp(machine, state->m_dsp_on);
+	demonwld_dsp(machine(), m_dsp_on);
 }
 
 WRITE16_MEMBER(toaplan1_state::demonwld_dsp_ctrl_w)
@@ -413,7 +412,7 @@ void demonwld_driver_savestate(running_machine &machine)
 	state->save_item(NAME(state->m_main_ram_seg));
 	state->save_item(NAME(state->m_dsp_BIO));
 	state->save_item(NAME(state->m_dsp_execute));
-	machine.save().register_postload(save_prepost_delegate(FUNC(demonwld_restore_dsp), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::demonwld_restore_dsp), state));
 }
 
 MACHINE_RESET_MEMBER(toaplan1_state,vimana)

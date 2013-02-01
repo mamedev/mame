@@ -58,13 +58,13 @@ void gradius3_sprite_callback( running_machine &machine, int *code, int *color, 
 
 ***************************************************************************/
 
-static void gradius3_postload(running_machine &machine)
+void gradius3_state::gradius3_postload()
 {
 	int i;
 
 	for (i = 0; i < 0x20000; i += 16)
 	{
-		machine.gfx[0]->mark_dirty(i / 16);
+		machine().gfx[0]->mark_dirty(i / 16);
 	}
 }
 
@@ -87,7 +87,7 @@ void gradius3_state::video_start()
 
 	machine().gfx[0]->set_source((UINT8 *)m_gfxram.target());
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(gradius3_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(gradius3_state::gradius3_postload), this));
 }
 
 

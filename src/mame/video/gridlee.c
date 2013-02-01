@@ -38,16 +38,15 @@ void gridlee_state::palette_init()
  *
  *************************************/
 
-static void expand_pixels(running_machine &machine)
+void gridlee_state::expand_pixels()
 {
-	gridlee_state *state = machine.driver_data<gridlee_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int offset = 0;
 
 	for(offset = 0; offset < 0x77ff; offset++)
 	{
-		state->m_local_videoram[offset * 2 + 0] = videoram[offset] >> 4;
-		state->m_local_videoram[offset * 2 + 1] = videoram[offset] & 15;
+		m_local_videoram[offset * 2 + 0] = videoram[offset] >> 4;
+		m_local_videoram[offset * 2 + 1] = videoram[offset] & 15;
 	}
 }
 
@@ -69,7 +68,7 @@ void gridlee_state::video_start()
 
 	state_save_register_global(machine(), m_cocktail_flip);
 	state_save_register_global(machine(), m_palettebank_vis);
-	machine().save().register_postload(save_prepost_delegate(FUNC(expand_pixels), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(gridlee_state::expand_pixels), this));
 }
 
 

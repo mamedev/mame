@@ -504,19 +504,8 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nile_timer_callback);
+	void remap_dynamic_addresses();
 };
-
-
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
-
-
-static void remap_dynamic_addresses(running_machine &machine);
-
 
 
 /*************************************
@@ -576,7 +565,7 @@ void vegas_state::machine_start()
 	state_save_register_global(machine(), m_sio_led_state);
 	state_save_register_global(machine(), m_pending_analog_read);
 	state_save_register_global(machine(), m_cmos_unlocked);
-	machine().save().register_postload(save_prepost_delegate(FUNC(remap_dynamic_addresses), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(vegas_state::remap_dynamic_addresses), this));
 }
 
 
@@ -732,17 +721,17 @@ static WRITE32_HANDLER( pci_ide_w )
 	{
 		case 0x04:      /* address register */
 			state->m_pci_ide_regs[offset] &= 0xfffffff0;
-			remap_dynamic_addresses(space.machine());
+			state->remap_dynamic_addresses();
 			break;
 
 		case 0x05:      /* address register */
 			state->m_pci_ide_regs[offset] &= 0xfffffffc;
-			remap_dynamic_addresses(space.machine());
+			state->remap_dynamic_addresses();
 			break;
 
 		case 0x08:      /* address register */
 			state->m_pci_ide_regs[offset] &= 0xfffffff0;
-			remap_dynamic_addresses(space.machine());
+			state->remap_dynamic_addresses();
 			break;
 
 		case 0x14:      /* interrupt pending */
@@ -810,14 +799,14 @@ static WRITE32_HANDLER( pci_3dfx_w )
 				state->m_pci_3dfx_regs[offset] &= 0xff000000;
 			else
 				state->m_pci_3dfx_regs[offset] &= 0xfe000000;
-			remap_dynamic_addresses(space.machine());
+			state->remap_dynamic_addresses();
 			break;
 
 		case 0x05:      /* address register */
 			if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 			{
 				state->m_pci_3dfx_regs[offset] &= 0xfe000000;
-				remap_dynamic_addresses(space.machine());
+				state->remap_dynamic_addresses();
 			}
 			break;
 
@@ -825,7 +814,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 			{
 				state->m_pci_3dfx_regs[offset] &= 0xffffff00;
-				remap_dynamic_addresses(space.machine());
+				state->remap_dynamic_addresses();
 			}
 			break;
 
@@ -833,7 +822,7 @@ static WRITE32_HANDLER( pci_3dfx_w )
 			if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 			{
 				state->m_pci_3dfx_regs[offset] &= 0xffff0000;
-				remap_dynamic_addresses(space.machine());
+				state->remap_dynamic_addresses();
 			}
 			break;
 
@@ -1127,7 +1116,7 @@ static WRITE32_HANDLER( nile_w )
 
 		case NREG_PCIINIT1+0:   /* PCI master */
 			if (((olddata & 0xe) == 0xa) != ((state->m_nile_regs[offset] & 0xe) == 0xa))
-				remap_dynamic_addresses(space.machine());
+				state->remap_dynamic_addresses();
 			logit = 0;
 			break;
 
@@ -1215,7 +1204,7 @@ static WRITE32_HANDLER( nile_w )
 		case NREG_DCS8:
 		case NREG_PCIW0:
 		case NREG_PCIW1:
-			remap_dynamic_addresses(space.machine());
+			state->remap_dynamic_addresses();
 			break;
 	}
 
@@ -1552,87 +1541,86 @@ INLINE void _add_dynamic_device_address(vegas_state *state, device_t *device, of
 }
 
 
-static void remap_dynamic_addresses(running_machine &machine)
+void vegas_state::remap_dynamic_addresses()
 {
-	vegas_state *state = machine.driver_data<vegas_state>();
-	dynamic_address *dynamic = state->m_dynamic;
-	device_t *ethernet = machine.device("ethernet");
-	device_t *ide = machine.device("ide");
-	int voodoo_type = voodoo_get_type(state->m_voodoo);
+	dynamic_address *dynamic = m_dynamic;
+	device_t *ethernet = machine().device("ethernet");
+	device_t *ide = machine().device("ide");
+	int voodoo_type = voodoo_get_type(m_voodoo);
 	offs_t base;
 	int addr;
 
 	/* unmap everything we know about */
-	for (addr = 0; addr < state->m_dynamic_count; addr++)
-		machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_readwrite(dynamic[addr].start, dynamic[addr].end);
+	for (addr = 0; addr < m_dynamic_count; addr++)
+		machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_readwrite(dynamic[addr].start, dynamic[addr].end);
 
 	/* the build the list of stuff */
-	state->m_dynamic_count = 0;
+	m_dynamic_count = 0;
 
 	/* DCS2 */
-	base = state->m_nile_regs[NREG_DCS2] & 0x1fffff00;
-	if (base >= state->m_rambase.bytes())
+	base = m_nile_regs[NREG_DCS2] & 0x1fffff00;
+	if (base >= m_rambase.bytes())
 	{
-		add_dynamic_address(state, base + 0x0000, base + 0x0003, sio_irq_clear_r, sio_irq_clear_w);
-		add_dynamic_address(state, base + 0x1000, base + 0x1003, sio_irq_enable_r, sio_irq_enable_w);
-		add_dynamic_address(state, base + 0x2000, base + 0x2003, sio_irq_cause_r, NULL);
-		add_dynamic_address(state, base + 0x3000, base + 0x3003, sio_irq_status_r, NULL);
-		add_dynamic_address(state, base + 0x4000, base + 0x4003, sio_led_r, sio_led_w);
-		add_dynamic_address(state, base + 0x5000, base + 0x5007, NOP_HANDLER, NULL);
-		add_dynamic_address(state, base + 0x6000, base + 0x6003, NULL, cmos_unlock_w);
-		add_dynamic_address(state, base + 0x7000, base + 0x7003, NULL, vegas_watchdog_w);
+		add_dynamic_address(this, base + 0x0000, base + 0x0003, sio_irq_clear_r, sio_irq_clear_w);
+		add_dynamic_address(this, base + 0x1000, base + 0x1003, sio_irq_enable_r, sio_irq_enable_w);
+		add_dynamic_address(this, base + 0x2000, base + 0x2003, sio_irq_cause_r, NULL);
+		add_dynamic_address(this, base + 0x3000, base + 0x3003, sio_irq_status_r, NULL);
+		add_dynamic_address(this, base + 0x4000, base + 0x4003, sio_led_r, sio_led_w);
+		add_dynamic_address(this, base + 0x5000, base + 0x5007, NOP_HANDLER, NULL);
+		add_dynamic_address(this, base + 0x6000, base + 0x6003, NULL, cmos_unlock_w);
+		add_dynamic_address(this, base + 0x7000, base + 0x7003, NULL, vegas_watchdog_w);
 	}
 
 	/* DCS3 */
-	base = state->m_nile_regs[NREG_DCS3] & 0x1fffff00;
-	if (base >= state->m_rambase.bytes())
-		add_dynamic_address(state, base + 0x0000, base + 0x0003, analog_port_r, analog_port_w);
+	base = m_nile_regs[NREG_DCS3] & 0x1fffff00;
+	if (base >= m_rambase.bytes())
+		add_dynamic_address(this, base + 0x0000, base + 0x0003, analog_port_r, analog_port_w);
 
 	/* DCS4 */
-	base = state->m_nile_regs[NREG_DCS4] & 0x1fffff00;
-	if (base >= state->m_rambase.bytes())
-		add_dynamic_address(state, base + 0x0000, base + 0x7fff, timekeeper_r, timekeeper_w);
+	base = m_nile_regs[NREG_DCS4] & 0x1fffff00;
+	if (base >= m_rambase.bytes())
+		add_dynamic_address(this, base + 0x0000, base + 0x7fff, timekeeper_r, timekeeper_w);
 
 	/* DCS5 */
-	base = state->m_nile_regs[NREG_DCS5] & 0x1fffff00;
-	if (base >= state->m_rambase.bytes())
-		add_dynamic_address(state, base + 0x0000, base + 0x0003, sio_r, sio_w);
+	base = m_nile_regs[NREG_DCS5] & 0x1fffff00;
+	if (base >= m_rambase.bytes())
+		add_dynamic_address(this, base + 0x0000, base + 0x0003, sio_r, sio_w);
 
 	/* DCS6 */
-	base = state->m_nile_regs[NREG_DCS6] & 0x1fffff00;
-	if (base >= state->m_rambase.bytes())
+	base = m_nile_regs[NREG_DCS6] & 0x1fffff00;
+	if (base >= m_rambase.bytes())
 	{
-		add_dynamic_address(state, base + 0x0000, base + 0x003f, midway_ioasic_packed_r, midway_ioasic_packed_w);
-		add_dynamic_address(state, base + 0x1000, base + 0x1003, NULL, asic_fifo_w);
-		if (state->m_dcs_idma_cs != 0)
-			add_dynamic_address(state, base + 0x3000, base + 0x3003, NULL, dcs3_fifo_full_w);
-		if (state->m_dcs_idma_cs == 6)
+		add_dynamic_address(this, base + 0x0000, base + 0x003f, midway_ioasic_packed_r, midway_ioasic_packed_w);
+		add_dynamic_address(this, base + 0x1000, base + 0x1003, NULL, asic_fifo_w);
+		if (m_dcs_idma_cs != 0)
+			add_dynamic_address(this, base + 0x3000, base + 0x3003, NULL, dcs3_fifo_full_w);
+		if (m_dcs_idma_cs == 6)
 		{
-			add_dynamic_address(state, base + 0x5000, base + 0x5003, NULL, dsio_idma_addr_w);
-			add_dynamic_address(state, base + 0x7000, base + 0x7003, dsio_idma_data_r, dsio_idma_data_w);
+			add_dynamic_address(this, base + 0x5000, base + 0x5003, NULL, dsio_idma_addr_w);
+			add_dynamic_address(this, base + 0x7000, base + 0x7003, dsio_idma_data_r, dsio_idma_data_w);
 		}
 	}
 
 	/* DCS7 */
-	base = state->m_nile_regs[NREG_DCS7] & 0x1fffff00;
-	if (base >= state->m_rambase.bytes())
+	base = m_nile_regs[NREG_DCS7] & 0x1fffff00;
+	if (base >= m_rambase.bytes())
 	{
-		add_dynamic_device_address(state, ethernet, base + 0x1000, base + 0x100f, ethernet_r, ethernet_w);
-		if (state->m_dcs_idma_cs == 7)
+		add_dynamic_device_address(this, ethernet, base + 0x1000, base + 0x100f, ethernet_r, ethernet_w);
+		if (m_dcs_idma_cs == 7)
 		{
-			add_dynamic_address(state, base + 0x5000, base + 0x5003, NULL, dsio_idma_addr_w);
-			add_dynamic_address(state, base + 0x7000, base + 0x7003, dsio_idma_data_r, dsio_idma_data_w);
+			add_dynamic_address(this, base + 0x5000, base + 0x5003, NULL, dsio_idma_addr_w);
+			add_dynamic_address(this, base + 0x7000, base + 0x7003, dsio_idma_data_r, dsio_idma_data_w);
 		}
 	}
 
 	/* PCI config space */
-	if ((state->m_nile_regs[NREG_PCIINIT1] & 0xe) == 0xa)
+	if ((m_nile_regs[NREG_PCIINIT1] & 0xe) == 0xa)
 	{
-		base = state->m_nile_regs[NREG_PCIW1] & 0x1fffff00;
-		if (base >= state->m_rambase.bytes())
+		base = m_nile_regs[NREG_PCIW1] & 0x1fffff00;
+		if (base >= m_rambase.bytes())
 		{
-			add_dynamic_address(state, base + (1 << (21 + 4)) + 0x0000, base + (1 << (21 + 4)) + 0x00ff, pci_3dfx_r, pci_3dfx_w);
-			add_dynamic_address(state, base + (1 << (21 + 5)) + 0x0000, base + (1 << (21 + 5)) + 0x00ff, pci_ide_r, pci_ide_w);
+			add_dynamic_address(this, base + (1 << (21 + 4)) + 0x0000, base + (1 << (21 + 4)) + 0x00ff, pci_3dfx_r, pci_3dfx_w);
+			add_dynamic_address(this, base + (1 << (21 + 5)) + 0x0000, base + (1 << (21 + 5)) + 0x00ff, pci_ide_r, pci_ide_w);
 		}
 	}
 
@@ -1640,48 +1628,48 @@ static void remap_dynamic_addresses(running_machine &machine)
 	else
 	{
 		/* IDE controller */
-		base = state->m_pci_ide_regs[0x04] & 0xfffffff0;
-		if (base >= state->m_rambase.bytes() && base < 0x20000000)
-			add_dynamic_device_address(state, ide, base + 0x0000, base + 0x000f, ide_main_r, ide_main_w);
+		base = m_pci_ide_regs[0x04] & 0xfffffff0;
+		if (base >= m_rambase.bytes() && base < 0x20000000)
+			add_dynamic_device_address(this, ide, base + 0x0000, base + 0x000f, ide_main_r, ide_main_w);
 
-		base = state->m_pci_ide_regs[0x05] & 0xfffffffc;
-		if (base >= state->m_rambase.bytes() && base < 0x20000000)
-			add_dynamic_device_address(state, ide, base + 0x0000, base + 0x0003, ide_alt_r, ide_alt_w);
+		base = m_pci_ide_regs[0x05] & 0xfffffffc;
+		if (base >= m_rambase.bytes() && base < 0x20000000)
+			add_dynamic_device_address(this, ide, base + 0x0000, base + 0x0003, ide_alt_r, ide_alt_w);
 
-		base = state->m_pci_ide_regs[0x08] & 0xfffffff0;
-		if (base >= state->m_rambase.bytes() && base < 0x20000000)
-			add_dynamic_device_address(state, ide, base + 0x0000, base + 0x0007, ide_bus_master32_r, ide_bus_master32_w);
+		base = m_pci_ide_regs[0x08] & 0xfffffff0;
+		if (base >= m_rambase.bytes() && base < 0x20000000)
+			add_dynamic_device_address(this, ide, base + 0x0000, base + 0x0007, ide_bus_master32_r, ide_bus_master32_w);
 
 		/* 3dfx card */
-		base = state->m_pci_3dfx_regs[0x04] & 0xfffffff0;
-		if (base >= state->m_rambase.bytes() && base < 0x20000000)
+		base = m_pci_3dfx_regs[0x04] & 0xfffffff0;
+		if (base >= m_rambase.bytes() && base < 0x20000000)
 		{
 			if (voodoo_type == TYPE_VOODOO_2)
-				add_dynamic_device_address(state, state->m_voodoo, base + 0x000000, base + 0xffffff, voodoo_r, voodoo_w);
+				add_dynamic_device_address(this, m_voodoo, base + 0x000000, base + 0xffffff, voodoo_r, voodoo_w);
 			else
-				add_dynamic_device_address(state, state->m_voodoo, base + 0x000000, base + 0x1ffffff, banshee_r, banshee_w);
+				add_dynamic_device_address(this, m_voodoo, base + 0x000000, base + 0x1ffffff, banshee_r, banshee_w);
 		}
 
 		if (voodoo_type >= TYPE_VOODOO_BANSHEE)
 		{
-			base = state->m_pci_3dfx_regs[0x05] & 0xfffffff0;
-			if (base >= state->m_rambase.bytes() && base < 0x20000000)
-				add_dynamic_device_address(state, state->m_voodoo, base + 0x0000000, base + 0x1ffffff, banshee_fb_r, banshee_fb_w);
+			base = m_pci_3dfx_regs[0x05] & 0xfffffff0;
+			if (base >= m_rambase.bytes() && base < 0x20000000)
+				add_dynamic_device_address(this, m_voodoo, base + 0x0000000, base + 0x1ffffff, banshee_fb_r, banshee_fb_w);
 
-			base = state->m_pci_3dfx_regs[0x06] & 0xfffffff0;
-			if (base >= state->m_rambase.bytes() && base < 0x20000000)
-				add_dynamic_device_address(state, state->m_voodoo, base + 0x0000000, base + 0x00000ff, banshee_io_r, banshee_io_w);
+			base = m_pci_3dfx_regs[0x06] & 0xfffffff0;
+			if (base >= m_rambase.bytes() && base < 0x20000000)
+				add_dynamic_device_address(this, m_voodoo, base + 0x0000000, base + 0x00000ff, banshee_io_r, banshee_io_w);
 
-			base = state->m_pci_3dfx_regs[0x0c] & 0xffff0000;
-			if (base >= state->m_rambase.bytes() && base < 0x20000000)
-				add_dynamic_device_address(state, state->m_voodoo, base + 0x0000000, base + 0x000ffff, banshee_rom_r, NULL);
+			base = m_pci_3dfx_regs[0x0c] & 0xffff0000;
+			if (base >= m_rambase.bytes() && base < 0x20000000)
+				add_dynamic_device_address(this, m_voodoo, base + 0x0000000, base + 0x000ffff, banshee_rom_r, NULL);
 		}
 	}
 
 	/* now remap everything */
 	if (LOG_DYNAMIC) logerror("remap_dynamic_addresses:\n");
-	address_space &space = machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
-	for (addr = 0; addr < state->m_dynamic_count; addr++)
+	address_space &space = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
+	for (addr = 0; addr < m_dynamic_count; addr++)
 	{
 		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", dynamic[addr].start, dynamic[addr].end, dynamic[addr].rdname, dynamic[addr].wrname);
 
@@ -1698,8 +1686,8 @@ static void remap_dynamic_addresses(running_machine &machine)
 
 	if (LOG_DYNAMIC)
 	{
-		++state->m_count;
-		popmessage("Remaps = %d", state->m_count);
+		++m_count;
+		popmessage("Remaps = %d", m_count);
 	}
 }
 

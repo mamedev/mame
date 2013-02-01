@@ -383,17 +383,16 @@ WRITE16_MEMBER(othunder_state::othunder_lightgun_w)
             SOUND
 *****************************************/
 
-static void reset_sound_region( running_machine &machine )
+void othunder_state::reset_sound_region()
 {
-	othunder_state *state = machine.driver_data<othunder_state>();
-	state->membank("bank10")->set_entry(state->m_banknum);
+	membank("bank10")->set_entry(m_banknum);
 }
 
 
 WRITE8_MEMBER(othunder_state::sound_bankswitch_w)
 {
 	m_banknum = data & 7;
-	reset_sound_region(machine());
+	reset_sound_region();
 }
 
 WRITE16_MEMBER(othunder_state::othunder_sound_w)
@@ -685,7 +684,7 @@ void othunder_state::machine_start()
 	save_item(NAME(m_ad_irq));
 	save_item(NAME(m_banknum));
 	save_item(NAME(m_pan));
-	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(othunder_state::reset_sound_region), this));
 }
 
 void othunder_state::machine_reset()

@@ -371,16 +371,15 @@ READ16_MEMBER(taitoair_state::stick2_input_r)
 
 
 
-static void reset_sound_region( running_machine &machine )
+void taitoair_state::reset_sound_region()
 {
-	taitoair_state *state = machine.driver_data<taitoair_state>();
-	state->membank("bank1")->set_entry(state->m_banknum);
+	membank("bank1")->set_entry(m_banknum);
 }
 
 WRITE8_MEMBER(taitoair_state::sound_bankswitch_w)
 {
 	m_banknum = data & 3;
-	reset_sound_region(machine());
+	reset_sound_region();
 }
 
 
@@ -682,7 +681,7 @@ void taitoair_state::machine_start()
 		state_save_register_item(machine(), "globals", NULL, i, m_q.p[i].y);
 	}
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(taitoair_state::reset_sound_region), this));
 }
 
 void taitoair_state::machine_reset()

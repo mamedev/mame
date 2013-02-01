@@ -672,10 +672,10 @@ static const msm5205_interface msm5205_config_2 =
                      MACHINE DRIVERS
 ***********************************************************/
 
-static void topspeed_postload(running_machine &machine)
+void topspeed_state::topspeed_postload()
 {
-	parse_control(machine);
-	reset_sound_region(machine);
+	parse_control(machine());
+	reset_sound_region(machine());
 }
 
 void topspeed_state::machine_start()
@@ -697,7 +697,7 @@ void topspeed_state::machine_start()
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_ioc220_port));
 	save_item(NAME(m_banknum));
-	machine().save().register_postload(save_prepost_delegate(FUNC(topspeed_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(topspeed_state::topspeed_postload), this));
 }
 
 void topspeed_state::machine_reset()

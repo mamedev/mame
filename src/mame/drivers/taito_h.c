@@ -228,16 +228,15 @@ READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 	}
 }
 
-static void reset_sound_region(running_machine &machine)
+void taitoh_state::reset_sound_region()
 {
-	taitoh_state *state = machine.driver_data<taitoh_state>();
-	state->membank("bank1")->set_entry(state->m_banknum);
+	membank("bank1")->set_entry(m_banknum);
 }
 
 WRITE8_MEMBER(taitoh_state::sound_bankswitch_w)
 {
 	m_banknum = data & 3;
-	reset_sound_region(machine());
+	reset_sound_region();
 }
 
 
@@ -532,7 +531,7 @@ void taitoh_state::machine_start()
 	m_tc0080vco = machine().device("tc0080vco");
 
 	save_item(NAME(m_banknum));
-	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(taitoh_state::reset_sound_region), this));
 }
 
 

@@ -88,4 +88,5 @@ public:
 	INTERRUPT_GEN_MEMBER(sci_interrupt);
 	TIMER_CALLBACK_MEMBER(taitoz_interrupt6);
 	TIMER_CALLBACK_MEMBER(taitoz_cpub_interrupt5);
+	void taitoz_postload();
 };

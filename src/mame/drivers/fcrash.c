@@ -361,7 +361,7 @@ UINT32 cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitm
 	layercontrol = m_cps_b_regs[m_layer_enable_reg / 2];
 
 	/* Get video memory base registers */
-	cps1_get_video_base(machine());
+	cps1_get_video_base();
 
 	/* Build palette */
 	fcrash_build_palette(machine());

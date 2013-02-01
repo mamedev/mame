@@ -820,10 +820,10 @@ static const tc0140syt_interface darius_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static void darius_postload(running_machine &machine)
+void darius_state::darius_postload()
 {
-	parse_control(machine);
-	reset_sound_region(machine);
+	parse_control(machine());
+	reset_sound_region(machine());
 }
 
 void darius_state::machine_start()
@@ -872,7 +872,7 @@ void darius_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_vol));
 	save_item(NAME(m_pan));
-	machine().save().register_postload(save_prepost_delegate(FUNC(darius_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(darius_state::darius_postload), this));
 }
 
 

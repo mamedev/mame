@@ -283,20 +283,18 @@ static void toaplan1_set_scrolls(running_machine &machine)
 	state->m_pf4_tilemap->set_scrolly(0, (state->m_pf4_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
 }
 
-static void rallybik_flipscreen(running_machine &machine)
+void toaplan1_state::rallybik_flipscreen()
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->rallybik_bcu_flipscreen_w(space, 0, state->m_bcu_flipscreen, 0xffff);
+	rallybik_bcu_flipscreen_w(space, 0, m_bcu_flipscreen, 0xffff);
 }
 
-static void toaplan1_flipscreen(running_machine &machine)
+void toaplan1_state::toaplan1_flipscreen()
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	state->toaplan1_bcu_flipscreen_w(space, 0, state->m_bcu_flipscreen, 0xffff);
+	toaplan1_bcu_flipscreen_w(space, 0, m_bcu_flipscreen, 0xffff);
 }
 
 static void register_common(running_machine &machine)
@@ -350,7 +348,7 @@ VIDEO_START_MEMBER(toaplan1_state,rallybik)
 
 	register_common(machine());
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(rallybik_flipscreen), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::rallybik_flipscreen), this));
 }
 
 VIDEO_START_MEMBER(toaplan1_state,toaplan1)
@@ -372,7 +370,7 @@ VIDEO_START_MEMBER(toaplan1_state,toaplan1)
 
 	register_common(machine());
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_flipscreen), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::toaplan1_flipscreen), this));
 }
 
 

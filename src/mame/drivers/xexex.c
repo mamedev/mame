@@ -440,10 +440,10 @@ static const k053252_interface xexex_k053252_intf =
 	0, 0
 };
 
-static void xexex_postload(running_machine &machine)
+void xexex_state::xexex_postload()
 {
-	parse_control2(machine);
-	reset_sound_region(machine);
+	parse_control2(machine());
+	reset_sound_region(machine());
 }
 
 void xexex_state::machine_start()
@@ -477,7 +477,7 @@ void xexex_state::machine_start()
 
 	save_item(NAME(m_cur_control2));
 	save_item(NAME(m_cur_sound_region));
-	machine().save().register_postload(save_prepost_delegate(FUNC(xexex_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(xexex_state::xexex_postload), this));
 
 	m_dmadelay_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(xexex_state::dmaend_callback),this));
 }

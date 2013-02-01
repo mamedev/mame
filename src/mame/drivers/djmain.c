@@ -101,10 +101,9 @@ WRITE32_MEMBER(djmain_state::paletteram32_w)
 
 //---------
 
-static void sndram_set_bank(running_machine &machine)
+void djmain_state::sndram_set_bank()
 {
-	djmain_state *state = machine.driver_data<djmain_state>();
-	state->m_sndram = state->memregion("shared")->base() + 0x80000 * state->m_sndram_bank;
+	m_sndram = memregion("shared")->base() + 0x80000 * m_sndram_bank;
 }
 
 WRITE32_MEMBER(djmain_state::sndram_bank_w)
@@ -112,7 +111,7 @@ WRITE32_MEMBER(djmain_state::sndram_bank_w)
 	if (ACCESSING_BITS_16_31)
 	{
 		m_sndram_bank = (data >> 16) & 0x1f;
-		sndram_set_bank(machine());
+		sndram_set_bank();
 	}
 }
 
@@ -1409,7 +1408,7 @@ void djmain_state::machine_start()
 	state_save_register_global(machine(), m_v_ctrl);
 	state_save_register_global_array(machine(), m_obj_regs);
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(sndram_set_bank), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(djmain_state::sndram_set_bank), this));
 }
 
 
@@ -1417,7 +1416,7 @@ void djmain_state::machine_reset()
 {
 	/* reset sound ram bank */
 	m_sndram_bank = 0;
-	sndram_set_bank(machine());
+	sndram_set_bank();
 
 	/* reset the IDE controller */
 	machine().device("ide")->reset();

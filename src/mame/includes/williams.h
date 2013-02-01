@@ -127,6 +127,8 @@ public:
 	DECLARE_READ8_MEMBER(tshoot_input_port_0_3_r);
 	DECLARE_WRITE8_MEMBER(tshoot_maxvol_w);
 	DECLARE_WRITE8_MEMBER(tshoot_lamp_w);
+	void williams2_postload();
+	void defender_postload();
 };
 
 

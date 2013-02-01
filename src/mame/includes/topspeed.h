@@ -60,4 +60,5 @@ public:
 	TIMER_CALLBACK_MEMBER(topspeed_interrupt6);
 	TIMER_CALLBACK_MEMBER(topspeed_cpub_interrupt6);
 	DECLARE_WRITE8_MEMBER(topspeed_tc0140syt_comm_w);
+	void topspeed_postload();
 };

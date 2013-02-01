@@ -86,11 +86,10 @@ TILE_GET_INFO_MEMBER(fortyl_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-static void redraw_pixels(running_machine &machine)
+void fortyl_state::redraw_pixels()
 {
-	fortyl_state *state = machine.driver_data<fortyl_state>();
-	state->m_pix_redraw = 1;
-	state->m_bg_tilemap->mark_all_dirty();
+	m_pix_redraw = 1;
+	m_bg_tilemap->mark_all_dirty();
 }
 
 
@@ -122,7 +121,7 @@ void fortyl_state::video_start()
 	save_item(NAME(*m_tmp_bitmap1));
 	save_item(NAME(*m_tmp_bitmap2));
 	save_item(NAME(m_pixram_sel));
-	machine().save().register_postload(save_prepost_delegate(FUNC(redraw_pixels), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(fortyl_state::redraw_pixels), this));
 }
 
 

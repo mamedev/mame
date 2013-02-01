@@ -263,22 +263,21 @@ WRITE16_MEMBER(nemesis_state::nemesis_charram_word_w)
 }
 
 
-static void nemesis_postload(running_machine &machine)
+void nemesis_state::nemesis_postload()
 {
-	nemesis_state *state = machine.driver_data<nemesis_state>();
 	int i, offs;
 
-	for (offs = 0; offs < state->m_charram.bytes(); offs++)
+	for (offs = 0; offs < m_charram.bytes(); offs++)
 	{
 		for (i = 0; i < 8; i++)
 		{
 			int w = sprite_data[i].width;
 			int h = sprite_data[i].height;
-			machine.gfx[sprite_data[i].char_type]->mark_dirty(offs * 4 / (w * h));
+			machine().gfx[sprite_data[i].char_type]->mark_dirty(offs * 4 / (w * h));
 		}
 	}
-	state->m_background->mark_all_dirty();
-	state->m_foreground->mark_all_dirty();
+	m_background->mark_all_dirty();
+	m_foreground->mark_all_dirty();
 }
 
 
@@ -308,7 +307,7 @@ void nemesis_state::video_start()
 	machine().gfx[7]->set_source((UINT8 *)m_charram.target());
 
 	/* Set up save state */
-	machine().save().register_postload(save_prepost_delegate(FUNC(nemesis_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(nemesis_state::nemesis_postload), this));
 }
 
 

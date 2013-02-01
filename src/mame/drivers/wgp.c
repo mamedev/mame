@@ -910,10 +910,10 @@ However sync to vblank is lacking, which is causing the
 graphics glitches.
 ***********************************************************/
 
-static void wgp_postload(running_machine &machine)
+void wgp_state::wgp_postload()
 {
-	parse_control(machine);
-	reset_sound_region(machine);
+	parse_control(machine());
+	reset_sound_region(machine());
 }
 
 void wgp_state::machine_reset()
@@ -948,7 +948,7 @@ void wgp_state::machine_start()
 	save_item(NAME(m_cpua_ctrl));
 	save_item(NAME(m_banknum));
 	save_item(NAME(m_port_sel));
-	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(wgp_state::wgp_postload), this));
 }
 
 static const tc0100scn_interface wgp_tc0100scn_intf =

@@ -60,12 +60,10 @@ void chaknpop_state::palette_init()
   Memory handlers
 ***************************************************************************/
 
-static void tx_tilemap_mark_all_dirty( running_machine &machine )
+void chaknpop_state::tx_tilemap_mark_all_dirty()
 {
-	chaknpop_state *state = machine.driver_data<chaknpop_state>();
-
-	state->m_tx_tilemap->mark_all_dirty();
-	state->m_tx_tilemap->set_flip(state->m_flip_x | state->m_flip_y);
+	m_tx_tilemap->mark_all_dirty();
+	m_tx_tilemap->set_flip(m_flip_x | m_flip_y);
 }
 
 READ8_MEMBER(chaknpop_state::chaknpop_gfxmode_r)
@@ -95,7 +93,7 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_gfxmode_w)
 		}
 
 		if (all_dirty)
-			tx_tilemap_mark_all_dirty(machine());
+			tx_tilemap_mark_all_dirty();
 	}
 }
 
@@ -112,7 +110,7 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_attrram_w)
 		m_attr_ram[offset] = data;
 
 		if (offset == TX_COLOR1 || offset == TX_COLOR2)
-			tx_tilemap_mark_all_dirty(machine());
+			tx_tilemap_mark_all_dirty();
 	}
 }
 
@@ -165,9 +163,9 @@ void chaknpop_state::video_start()
 	save_pointer(NAME(m_vram4), 0x2000);
 
 	membank("bank1")->set_entry(0);
-	tx_tilemap_mark_all_dirty(machine());
+	tx_tilemap_mark_all_dirty();
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(tx_tilemap_mark_all_dirty), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(chaknpop_state::tx_tilemap_mark_all_dirty), this));
 }
 
 

@@ -433,11 +433,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(williams_state::williams2_endscreen_callback)
  *
  *************************************/
 
-static void williams2_postload(running_machine &machine)
+void williams_state::williams2_postload()
 {
-	williams_state *state = machine.driver_data<williams_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->williams2_bank_select_w(space, 0, state->m_vram_bank);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	williams2_bank_select_w(space, 0, m_vram_bank);
 }
 
 
@@ -449,7 +448,7 @@ MACHINE_START_MEMBER(williams_state,williams2)
 
 	/* register for save states */
 	state_save_register_global(machine(), m_vram_bank);
-	machine().save().register_postload(save_prepost_delegate(FUNC(williams2_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(williams_state::williams2_postload), this));
 }
 
 
@@ -734,11 +733,10 @@ WRITE8_MEMBER(williams_state::williams2_7segment_w)
  *
  *************************************/
 
-static void defender_postload(running_machine &machine)
+void williams_state::defender_postload()
 {
-	williams_state *state = machine.driver_data<williams_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->defender_bank_select_w(space, 0, state->m_vram_bank);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	defender_bank_select_w(space, 0, m_vram_bank);
 }
 
 
@@ -749,7 +747,7 @@ MACHINE_START_MEMBER(williams_state,defender)
 	/* configure the banking and make sure it is reset to 0 */
 	machine().root_device().membank("bank1")->configure_entries(0, 9, &machine().root_device().memregion("maincpu")->base()[0x10000], 0x1000);
 
-	machine().save().register_postload(save_prepost_delegate(FUNC(defender_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(williams_state::defender_postload), this));
 }
 
 

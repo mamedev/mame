@@ -938,10 +938,10 @@ ROM_START( hotdebut )
 ROM_END
 
 
-static void hotgmck_pcm_bank_postload(running_machine &machine)
+void psikyo4_state::hotgmck_pcm_bank_postload()
 {
-	set_hotgmck_pcm_bank(machine, 0);
-	set_hotgmck_pcm_bank(machine, 1);
+	set_hotgmck_pcm_bank(machine(), 0);
+	set_hotgmck_pcm_bank(machine(), 1);
 }
 
 static void install_hotgmck_pcm_bank(running_machine &machine)
@@ -957,7 +957,7 @@ static void install_hotgmck_pcm_bank(running_machine &machine)
 	set_hotgmck_pcm_bank(machine, 1);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x5800008, 0x580000b, write32_delegate(FUNC(psikyo4_state::hotgmck_pcm_bank_w),state));
-	machine.save().register_postload(save_prepost_delegate(FUNC(hotgmck_pcm_bank_postload), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(psikyo4_state::hotgmck_pcm_bank_postload), state));
 }
 
 DRIVER_INIT_MEMBER(psikyo4_state,hotgmck)

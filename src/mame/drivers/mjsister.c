@@ -62,6 +62,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_mjsister(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(dac_callback);
+	void mjsister_redraw();
 };
 
 
@@ -441,10 +442,10 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static void mjsister_redraw(mjsister_state *state)
+void mjsister_state::mjsister_redraw()
 {
 	/* we can skip saving tmpbitmaps because we can redraw them from vram */
-	state->m_screen_redraw = 1;
+	m_screen_redraw = 1;
 }
 
 void mjsister_state::machine_start()
@@ -469,7 +470,7 @@ void mjsister_state::machine_start()
 	save_item(NAME(m_dac_bank));
 	save_item(NAME(m_dac_adr_s));
 	save_item(NAME(m_dac_adr_e));
-	machine().save().register_postload(save_prepost_delegate(FUNC(mjsister_redraw), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(mjsister_state::mjsister_redraw), this));
 }
 
 void mjsister_state::machine_reset()

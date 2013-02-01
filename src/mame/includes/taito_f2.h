@@ -144,4 +144,5 @@ public:
 	void screen_eof_taitof2_partial_buffer_delayed_qzchikyu(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(taitof2_interrupt);
 	TIMER_CALLBACK_MEMBER(taitof2_interrupt6);
+	void reset_driveout_sound_region();
 };

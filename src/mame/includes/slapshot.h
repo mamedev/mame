@@ -68,4 +68,5 @@ public:
 	void screen_eof_taito_no_buffer(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(slapshot_interrupt);
 	TIMER_CALLBACK_MEMBER(slapshot_interrupt6);
+	void reset_sound_region();
 };

@@ -954,8 +954,9 @@ void pc080sn_tilemap_draw_special( device_t *device, bitmap_ind16 &bitmap, const
 }
 
 
-static void pc080sn_restore_scroll(pc080sn_state *pc080sn)
+void pc080sn_device::pc080sn_restore_scroll()
 {
+	pc080sn_state *pc080sn = pc080sn_get_safe_token(this);
 	int flip;
 
 	pc080sn->bgscrollx[0] = -pc080sn->ctrl[0];
@@ -1037,7 +1038,7 @@ void pc080sn_device::device_start()
 
 	save_pointer(NAME(pc080sn->ram), PC080SN_RAM_SIZE / 2);
 	save_item(NAME(pc080sn->ctrl));
-	machine().save().register_postload(save_prepost_delegate(FUNC(pc080sn_restore_scroll), pc080sn));
+	machine().save().register_postload(save_prepost_delegate(FUNC(pc080sn_device::pc080sn_restore_scroll), this));
 
 }
 
@@ -1879,8 +1880,10 @@ READ_LINE_DEVICE_HANDLER( tc0080vco_flipscreen_r )
 }
 
 
-static void tc0080vco_postload(tc0080vco_state *tc0080vco)
+void tc0080vco_device::tc0080vco_postload()
 {
+	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(this);
+	
 	tc0080vco->flipscreen = tc0080vco->scroll_ram[0] & 0x0c00;
 
 	tc0080vco->tilemap[0]->set_flip(tc0080vco->flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -1978,7 +1981,7 @@ void tc0080vco_device::device_start()
 	machine().gfx[tc0080vco->tx_gfx] = auto_alloc(machine(), gfx_element(machine(), tc0080vco_charlayout, (UINT8 *)tc0080vco->char_ram, 64, 0));
 
 	save_pointer(NAME(tc0080vco->ram), TC0080VCO_RAM_SIZE / 2);
-	machine().save().register_postload(save_prepost_delegate(FUNC(tc0080vco_postload), tc0080vco));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tc0080vco_device::tc0080vco_postload), this));
 }
 
 /***************************************************************************/
@@ -2214,8 +2217,10 @@ static void tc0100scn_restore_scroll( tc0100scn_state *tc0100scn )
 }
 
 
-static void tc0100scn_postload(tc0100scn_state *tc0100scn)
+void tc0100scn_device::tc0100scn_postload()
 {
+	tc0100scn_state *tc0100scn = tc0100scn_get_safe_token(this);
+
 	tc0100scn_set_layer_ptrs(tc0100scn);
 	tc0100scn_restore_scroll(tc0100scn);
 
@@ -2603,7 +2608,7 @@ void tc0100scn_device::device_start()
 	save_item(NAME(tc0100scn->ctrl));
 	save_item(NAME(tc0100scn->dblwidth));
 	save_item(NAME(tc0100scn->gfxbank));
-	machine().save().register_postload(save_prepost_delegate(FUNC(tc0100scn_postload), tc0100scn));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tc0100scn_device::tc0100scn_postload), this));
 }
 
 //-------------------------------------------------
@@ -3708,8 +3713,10 @@ READ8_DEVICE_HANDLER( tc0480scp_pri_reg_r )
 	return tc0480scp->pri_reg;
 }
 
-static void tc0480scp_postload(tc0480scp_state *tc0480scp)
+void tc0480scp_device::tc0480scp_postload()
 {
+	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(this);
+	
 	int reg;
 	int flip = tc0480scp->ctrl[0xf] & 0x40;
 
@@ -3891,7 +3898,7 @@ void tc0480scp_device::device_start()
 	save_pointer(NAME(tc0480scp->ram), TC0480SCP_RAM_SIZE / 2);
 	save_item(NAME(tc0480scp->ctrl));
 	save_item(NAME(tc0480scp->dblwidth));
-	machine().save().register_postload(save_prepost_delegate(FUNC(tc0480scp_postload), tc0480scp));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tc0480scp_device::tc0480scp_postload), this));
 }
 
 //-------------------------------------------------
@@ -4787,8 +4794,10 @@ INLINE const tc0110pcr_interface *tc0110pcr_get_interface( device_t *device )
     DEVICE HANDLERS
 *****************************************************************************/
 
-static void tc0110pcr_restore_colors(tc0110pcr_state *tc0110pcr)
+void tc0110pcr_device::tc0110pcr_restore_colors()
 {
+	tc0110pcr_state *tc0110pcr = tc0110pcr_get_safe_token(this);
+
 	int i, color, r = 0, g = 0, b = 0;
 
 	for (i = 0; i < (256 * 16); i++)
@@ -4943,28 +4952,6 @@ WRITE16_DEVICE_HANDLER( tc0110pcr_step1_4bpg_word_w )
     DEVICE INTERFACE
 *****************************************************************************/
 
-static DEVICE_START( tc0110pcr )
-{
-	tc0110pcr_state *tc0110pcr = tc0110pcr_get_safe_token(device);
-	const tc0110pcr_interface *intf = tc0110pcr_get_interface(device);
-
-	tc0110pcr->m_machine = &device->machine();
-
-	tc0110pcr->pal_offs = intf->pal_offs;
-
-	tc0110pcr->ram = auto_alloc_array(device->machine(), UINT16, TC0110PCR_RAM_SIZE);
-
-	device->save_pointer(NAME(tc0110pcr->ram), TC0110PCR_RAM_SIZE);
-	device->save_item(NAME(tc0110pcr->type));
-	device->machine().save().register_postload(save_prepost_delegate(FUNC(tc0110pcr_restore_colors), tc0110pcr));
-}
-
-static DEVICE_RESET( tc0110pcr )
-{
-	tc0110pcr_state *tc0110pcr =  tc0110pcr_get_safe_token(device);
-	tc0110pcr->type = 0;    /* default, xBBBBBGGGGGRRRRR */
-}
-
 const device_type TC0110PCR = &device_creator<tc0110pcr_device>;
 
 tc0110pcr_device::tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -4989,7 +4976,19 @@ void tc0110pcr_device::device_config_complete()
 
 void tc0110pcr_device::device_start()
 {
-	DEVICE_START_NAME( tc0110pcr )(this);
+	tc0110pcr_state *tc0110pcr = tc0110pcr_get_safe_token(this);
+	const tc0110pcr_interface *intf = tc0110pcr_get_interface(this);
+
+	tc0110pcr->m_machine = &machine();
+
+	tc0110pcr->pal_offs = intf->pal_offs;
+
+	tc0110pcr->ram = auto_alloc_array(machine(), UINT16, TC0110PCR_RAM_SIZE);
+
+	save_pointer(NAME(tc0110pcr->ram), TC0110PCR_RAM_SIZE);
+	save_item(NAME(tc0110pcr->type));
+	machine().save().register_postload(save_prepost_delegate(FUNC(tc0110pcr_device::tc0110pcr_restore_colors), this));
+
 }
 
 //-------------------------------------------------
@@ -4998,7 +4997,8 @@ void tc0110pcr_device::device_start()
 
 void tc0110pcr_device::device_reset()
 {
-	DEVICE_RESET_NAME( tc0110pcr )(this);
+	tc0110pcr_state *tc0110pcr =  tc0110pcr_get_safe_token(this);
+	tc0110pcr->type = 0;    /* default, xBBBBBGGGGGRRRRR */
 }
 
 

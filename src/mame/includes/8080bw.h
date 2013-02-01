@@ -131,6 +131,8 @@ public:
 	DECLARE_WRITE8_MEMBER(polaris_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(polaris_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(polaris_sh_port_3_w);
+	
+	void schaser_reinit_555_time_remain();
 };
 
 

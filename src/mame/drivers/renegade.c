@@ -281,11 +281,10 @@ static const UINT8 kuniokun_xor_table[0x2a] =
 	0x68, 0x60
 };
 
-static void setbank(running_machine &machine)
+void renegade_state::setbank()
 {
-	renegade_state *state = machine.driver_data<renegade_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("bank1")->set_base(&RAM[state->m_bank ? 0x10000 : 0x4000]);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("bank1")->set_base(&RAM[m_bank ? 0x10000 : 0x4000]);
 }
 
 void renegade_state::machine_start()
@@ -296,7 +295,7 @@ void renegade_state::machine_start()
 	state_save_register_global(machine(), m_mcu_key);
 
 	state_save_register_global(machine(), m_bank);
-	machine().save().register_postload(save_prepost_delegate(FUNC(setbank), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(renegade_state::setbank), this));
 }
 
 DRIVER_INIT_MEMBER(renegade_state,renegade)
@@ -660,7 +659,7 @@ WRITE8_MEMBER(renegade_state::bankswitch_w)
 	if ((data & 1) != m_bank)
 	{
 		m_bank = data & 1;
-		setbank(machine());
+		setbank();
 	}
 }
 
@@ -925,7 +924,7 @@ static const ym3526_interface ym3526_config =
 void renegade_state::machine_reset()
 {
 	m_bank = 0;
-	setbank(machine());
+	setbank();
 }
 
 

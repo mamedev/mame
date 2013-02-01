@@ -66,11 +66,9 @@ static KONAMI_SETLINES_CALLBACK( simpsons_banking )
 	device->machine().root_device().membank("bank1")->set_entry(lines & 0x3f);
 }
 
-static void simpsons_postload(running_machine &machine)
+void simpsons_state::simpsons_postload()
 {
-	simpsons_state *state = machine.driver_data<simpsons_state>();
-
-	simpsons_video_banking(machine, state->m_video_bank);
+	simpsons_video_banking(machine(), m_video_bank);
 }
 
 void simpsons_state::machine_start()
@@ -93,7 +91,7 @@ void simpsons_state::machine_start()
 	save_item(NAME(m_layerpri));
 	save_pointer(NAME(m_xtraram), 0x1000);
 	save_pointer(NAME(m_spriteram), 0x1000 / 2);
-	machine().save().register_postload(save_prepost_delegate(FUNC(simpsons_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(simpsons_state::simpsons_postload), this));
 }
 
 void simpsons_state::machine_reset()

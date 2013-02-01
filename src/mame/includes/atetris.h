@@ -33,4 +33,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_atetris(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_gen);
+	void reset_bank();
 };

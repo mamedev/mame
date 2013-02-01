@@ -971,11 +971,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::schaser_effect_555_cb)
 }
 
 
-static void schaser_reinit_555_time_remain(_8080bw_state *state)
+void _8080bw_state::schaser_reinit_555_time_remain()
 {
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-	state->m_schaser_effect_555_time_remain = attotime::from_double(state->m_schaser_effect_555_time_remain_savable);
-	state->schaser_sh_port_2_w(space, 0, state->m_port_2_last_extra);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	m_schaser_effect_555_time_remain = attotime::from_double(m_schaser_effect_555_time_remain_savable);
+	schaser_sh_port_2_w(space, 0, m_port_2_last_extra);
 }
 
 
@@ -985,7 +985,7 @@ MACHINE_START_MEMBER(_8080bw_state,schaser_sh)
 	save_item(NAME(m_schaser_effect_555_is_low));
 	save_item(NAME(m_schaser_effect_555_time_remain_savable));
 	save_item(NAME(m_port_2_last_extra));
-	machine().save().register_postload(save_prepost_delegate(FUNC(schaser_reinit_555_time_remain), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(_8080bw_state::schaser_reinit_555_time_remain), this));
 }
 
 

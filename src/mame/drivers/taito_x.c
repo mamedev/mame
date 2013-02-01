@@ -337,6 +337,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(kyustrkr);
 	DECLARE_MACHINE_START(taitox);
+	void reset_sound_region();
 };
 
 READ16_MEMBER(taitox_state::superman_dsw_input_r)
@@ -412,17 +413,15 @@ WRITE16_MEMBER(taitox_state::kyustrkr_input_w)
 
 /**************************************************************************/
 
-static void reset_sound_region(running_machine &machine)
+void taitox_state::reset_sound_region()
 {
-	taitox_state *state = machine.driver_data<taitox_state>();
-
-	state->membank("bank2")->set_base(state->memregion("audiocpu")->base() + (state->m_banknum * 0x4000) + 0x10000 );
+	membank("bank2")->set_base(memregion("audiocpu")->base() + (m_banknum * 0x4000) + 0x10000 );
 }
 
 WRITE8_MEMBER(taitox_state::sound_bankswitch_w)
 {
 	m_banknum = (data - 1) & 3;
-	reset_sound_region(machine());
+	reset_sound_region();
 }
 
 
@@ -806,7 +805,7 @@ MACHINE_START_MEMBER(taitox_state,taitox)
 {
 	m_banknum = -1;
 	save_item(NAME(m_banknum));
-	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(taitox_state::reset_sound_region), this));
 }
 
 static const tc0140syt_interface taitox_tc0140syt_intf =

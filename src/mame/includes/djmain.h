@@ -56,6 +56,7 @@ public:
 	UINT32 screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void sndram_set_bank();
 };
 
 /*----------- defined in video/djmain.c -----------*/

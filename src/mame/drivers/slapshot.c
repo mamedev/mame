@@ -238,22 +238,16 @@ WRITE16_MEMBER(slapshot_state::opwolf3_adc_req_w)
                 SOUND
 *****************************************************/
 
-static void reset_sound_region( running_machine &machine )
+void slapshot_state::reset_sound_region()
 {
-	slapshot_state *state = machine.driver_data<slapshot_state>();
-	state->membank("bank10")->set_entry(state->m_banknum);
+	membank("bank10")->set_entry(m_banknum);
 }
 
 WRITE8_MEMBER(slapshot_state::sound_bankswitch_w)
 {
 	m_banknum = data & 7;
-	reset_sound_region(machine());
+	reset_sound_region();
 }
-
-
-
-
-
 
 WRITE16_MEMBER(slapshot_state::slapshot_msb_sound_w)
 {
@@ -532,7 +526,7 @@ void slapshot_state::machine_start()
 
 	m_banknum = 0;
 	save_item(NAME(m_banknum));
-	machine().save().register_postload(save_prepost_delegate(FUNC(reset_sound_region), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(slapshot_state::reset_sound_region), this));
 }
 
 

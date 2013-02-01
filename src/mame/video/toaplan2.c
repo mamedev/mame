@@ -72,10 +72,10 @@ static void register_state_save(running_machine &machine)
 	state->save_item(NAME(state->m_tx_flip));
 }
 
-static void truxton2_postload(running_machine &machine)
+void toaplan2_state::truxton2_postload()
 {
 	for (int i = 0; i < 1024; i++)
-		machine.gfx[2]->mark_dirty(i);
+		machine().gfx[2]->mark_dirty(i);
 }
 
 VIDEO_START_MEMBER(toaplan2_state,toaplan2)
@@ -108,7 +108,7 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 
 	/* Create the Text tilemap for this game */
 	machine().gfx[2]->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
-	machine().save().register_postload(save_prepost_delegate(FUNC(truxton2_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
 	truxton2_create_tx_tilemap(machine());
 	m_tx_tilemap->set_scrolldx(0x1d4 +1, 0x2a);
@@ -166,7 +166,7 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 	/* Create the Text tilemap for this game */
 	m_tx_gfxram16.allocate(RAIZING_TX_GFXRAM_SIZE/2);
 	machine().gfx[2]->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
-	machine().save().register_postload(save_prepost_delegate(FUNC(truxton2_postload), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
 	truxton2_create_tx_tilemap(machine());
 	m_tx_tilemap->set_scrolldx(0x1d4, 0x2a);

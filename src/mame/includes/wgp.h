@@ -73,4 +73,5 @@ public:
 	TIMER_CALLBACK_MEMBER(wgp_interrupt4);
 	TIMER_CALLBACK_MEMBER(wgp_interrupt6);
 	TIMER_CALLBACK_MEMBER(wgp_cpub_interrupt6);
+	void wgp_postload();
 };
