@@ -314,16 +314,16 @@ READ8_MEMBER( arcadia_state::arcadia_video_r )
 	UINT8 data=0;
 	switch (offset)
 	{
-	case 0xff: data=m_charline|0xf0;break;
-	case 0x100: data=ioport("controller1_col1")->read();break;
-	case 0x101: data=ioport("controller1_col2")->read();break;
-	case 0x102: data=ioport("controller1_col3")->read();break;
-	case 0x103: data=ioport("controller1_extra")->read();break;
-	case 0x104: data=ioport("controller2_col1")->read();break;
-	case 0x105: data=ioport("controller2_col2")->read();break;
-	case 0x106: data=ioport("controller2_col3")->read();break;
-	case 0x107: data=ioport("controller2_extra")->read();break;
-	case 0x108: data=ioport("panel")->read();break;
+	case 0xff: data = m_charline|0xf0;break;
+	case 0x100: data = m_controller1_col1->read();break;
+	case 0x101: data = m_controller1_col2->read();break;
+	case 0x102: data = m_controller1_col3->read();break;
+	case 0x103: data = m_controller1_extra->read();break;
+	case 0x104: data = m_controller2_col1->read();break;
+	case 0x105: data = m_controller2_col2->read();break;
+	case 0x106: data = m_controller2_col3->read();break;
+	case 0x107: data = m_controller2_extra->read();break;
+	case 0x108: data = m_panel->read();break;
 #if 0
 	case 0x1fe:
 		if (m_ad_select)
@@ -342,26 +342,26 @@ READ8_MEMBER( arcadia_state::arcadia_video_r )
 		data = 0x80;
 		if (m_ad_select)
 		{
-			if (ioport("joysticks")->read()&0x10) data=0;
-			if (ioport("joysticks")->read()&0x20) data=0xff;
+			if (m_joysticks->read()&0x10) data=0;
+			if (m_joysticks->read()&0x20) data=0xff;
 		}
 		else
 		{
-			if (ioport("joysticks")->read()&0x40) data=0xff;
-			if (ioport("joysticks")->read()&0x80) data=0;
+			if (m_joysticks->read()&0x40) data=0xff;
+			if (m_joysticks->read()&0x80) data=0;
 		}
 		break;
 	case 0x1ff:
 		data = 0x6f; // 0x7f too big for alien invaders (move right)
 		if (m_ad_select)
 		{
-			if (ioport("joysticks")->read()&0x1) data=0;
-			if (ioport("joysticks")->read()&0x2) data=0xff;
+			if (m_joysticks->read()&0x1) data=0;
+			if (m_joysticks->read()&0x2) data=0xff;
 		}
 		else
 		{
-			if (ioport("joysticks")->read()&0x4) data=0xff;
-			if (ioport("joysticks")->read()&0x8) data=0;
+			if (m_joysticks->read()&0x4) data=0xff;
+			if (m_joysticks->read()&0x8) data=0;
 		}
 		break;
 #endif
@@ -373,7 +373,6 @@ READ8_MEMBER( arcadia_state::arcadia_video_r )
 
 WRITE8_MEMBER( arcadia_state::arcadia_video_w )
 {
-	arcadia_sound_device *sound = machine().device<arcadia_sound_device>("custom");
 	m_reg.data[offset]=data;
 	switch (offset)
 	{
@@ -381,11 +380,11 @@ WRITE8_MEMBER( arcadia_state::arcadia_video_w )
 			m_ypos=255-data+YPOS;
 			break;
 		case 0xfd:
-			sound->write(space, offset&3, data);
+			m_custom->write(space, offset&3, data);
 			m_multicolor = data & 0x80;
 			break;
 		case 0xfe:
-			sound->write(space, offset&3, data);
+			m_custom->write(space, offset&3, data);
 			m_shift = (data>>5);
 			break;
 		case 0xf0:
@@ -421,73 +420,72 @@ WRITE8_MEMBER( arcadia_state::arcadia_video_w )
 	}
 }
 
-INLINE void arcadia_draw_char(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *ch, int charcode, int y, int x)
+void arcadia_state::arcadia_draw_char(UINT8 *ch, int charcode, int y, int x)
 {
-	arcadia_state *state = machine.driver_data<arcadia_state>();
 	int k,b,cc,sc, colour;
-	if (state->m_multicolor)
+	if (m_multicolor)
 	{
 		if (charcode&0x40)
-			cc=((state->m_reg.d.pal[1]>>3)&7);
+			cc=((m_reg.d.pal[1]>>3)&7);
 		else
-			cc=((state->m_reg.d.pal[0]>>3)&7);
+			cc=((m_reg.d.pal[0]>>3)&7);
 
 		if (charcode&0x80)
-			sc=(state->m_reg.d.pal[1]&7);
+			sc=(m_reg.d.pal[1]&7);
 		else
-			sc=(state->m_reg.d.pal[0]&7);
+			sc=(m_reg.d.pal[0]&7);
 	}
 	else
 	{
-		cc=((state->m_reg.d.pal[1]>>3)&1)|((charcode>>5)&6);
-		sc=(state->m_reg.d.pal[1]&7);
+		cc=((m_reg.d.pal[1]>>3)&1)|((charcode>>5)&6);
+		sc=(m_reg.d.pal[1]&7);
 	}
 	colour = (((sc << 3) | cc) + 4);
 
-	if (state->m_doublescan)
+	if (m_doublescan)
 	{
-		for (k=0; (k<8)&&(y<bitmap.height()); k++, y+=2)
+		for (k=0; (k<8)&&(y<m_bitmap->height()); k++, y+=2)
 		{
 			b=ch[k];
-			state->m_bg[y][x>>3]|=b>>(x&7);
-			state->m_bg[y][(x>>3)+1]|=b<<(8-(x&7));
+			m_bg[y][x>>3]|=b>>(x&7);
+			m_bg[y][(x>>3)+1]|=b<<(8-(x&7));
 
-			if (y+1<bitmap.height())
+			if (y+1<m_bitmap->height())
 			{
-				state->m_bg[y+1][x>>3]|=b>>(x&7);
-				state->m_bg[y+1][(x>>3)+1]|=b<<(8-(x&7));
-				drawgfx_opaque(bitmap, bitmap.cliprect(), machine.gfx[0], b,colour, 0,0,x,y);
-				drawgfx_opaque(bitmap, bitmap.cliprect(), machine.gfx[0], b,colour, 0,0,x,y+1);
+				m_bg[y+1][x>>3]|=b>>(x&7);
+				m_bg[y+1][(x>>3)+1]|=b<<(8-(x&7));
+				drawgfx_opaque(*m_bitmap, m_bitmap->cliprect(), machine().gfx[0], b,colour, 0,0,x,y);
+				drawgfx_opaque(*m_bitmap, m_bitmap->cliprect(), machine().gfx[0], b,colour, 0,0,x,y+1);
 			}
 		}
 	}
 	else
 	{
-		for (k=0; (k<8)&&(y<bitmap.height()); k++, y++)
+		for (k=0; (k<8)&&(y<m_bitmap->height()); k++, y++)
 		{
 			b=ch[k];
-			state->m_bg[y][x>>3]|=b>>(x&7);
-			state->m_bg[y][(x>>3)+1]|=b<<(8-(x&7));
+			m_bg[y][x>>3]|=b>>(x&7);
+			m_bg[y][(x>>3)+1]|=b<<(8-(x&7));
 
-			drawgfx_opaque(bitmap, bitmap.cliprect(), machine.gfx[0], b,colour, 0,0,x,y);
+			drawgfx_opaque(*m_bitmap, m_bitmap->cliprect(), machine().gfx[0], b,colour, 0,0,x,y);
 		}
 	}
 }
 
-INLINE void arcadia_vh_draw_line(running_machine &machine, bitmap_ind16 &bitmap, int y, UINT8 chars1[16])
+
+void arcadia_state::arcadia_vh_draw_line(int y, UINT8 chars1[16])
 {
-	arcadia_state *state = machine.driver_data<arcadia_state>();
 	int x, ch, j, h;
-	int graphics=state->m_graphics;
-	h=state->m_doublescan ? 16 : 8 ;
+	int graphics = m_graphics;
+	h = m_doublescan ? 16 : 8 ;
 
-	if (bitmap.height()-state->m_line<h)
-		h=bitmap.height()-state->m_line;
+	if (m_bitmap->height() - m_line < h)
+		h = m_bitmap->height() - m_line;
 
-	bitmap.plot_box(0, y, bitmap.width(), h, (state->m_reg.d.pal[1]&7));
-	memset(state->m_bg[y], 0, sizeof(state->m_bg[0])*h);
+	m_bitmap->plot_box(0, y, m_bitmap->width(), h, (m_reg.d.pal[1]&7));
+	memset(m_bg[y], 0, sizeof(m_bg[0])*h);
 
-	for (x=XPOS+state->m_shift, j=0; j<16;j++,x+=8)
+	for (x=XPOS+m_shift, j=0; j<16;j++,x+=8)
 	{
 		ch=chars1[j];
 // hangman switches with 0x40
@@ -504,29 +502,30 @@ INLINE void arcadia_vh_draw_line(running_machine &machine, bitmap_ind16 &bitmap,
 			}
 		}
 		if (graphics)
-			arcadia_draw_char(machine, bitmap, state->m_rectangle[ch&0x3f], ch, y, x);
+			arcadia_draw_char(m_rectangle[ch&0x3f], ch, y, x);
 		else
-			arcadia_draw_char(machine, bitmap, state->m_chars[ch&0x3f], ch, y, x);
+			arcadia_draw_char(m_chars[ch&0x3f], ch, y, x);
 	}
 }
 
-static int arcadia_sprite_collision(arcadia_state *state, int n1, int n2)
+
+int arcadia_state::arcadia_sprite_collision(int n1, int n2)
 {
 	int k, b1, b2, x;
-	if (state->m_pos[n1].x+8<=state->m_pos[n2].x)
+	if (m_pos[n1].x+8<=m_pos[n2].x)
 		return FALSE;
-	if (state->m_pos[n1].x>=state->m_pos[n2].x+8)
+	if (m_pos[n1].x>=m_pos[n2].x+8)
 		return FALSE;
 
 	for (k=0; k<8; k++)
 	{
-		if (state->m_pos[n1].y+k<state->m_pos[n2].y)
+		if (m_pos[n1].y+k<m_pos[n2].y)
 			continue;
-		if (state->m_pos[n1].y+k>=state->m_pos[n2].y+8)
+		if (m_pos[n1].y+k>=m_pos[n2].y+8)
 			break;
-		x=state->m_pos[n1].x-state->m_pos[n2].x;
-		b1=state->m_reg.d.chars[n1][k];
-		b2=state->m_reg.d.chars[n2][state->m_pos[n1].y+k-state->m_pos[n2].y];
+		x=m_pos[n1].x-m_pos[n2].x;
+		b1=m_reg.d.chars[n1][k];
+		b2=m_reg.d.chars[n2][m_pos[n1].y+k-m_pos[n2].y];
 		if (x<0)
 			b2>>=-x;
 		if (x>0)
@@ -537,80 +536,80 @@ static int arcadia_sprite_collision(arcadia_state *state, int n1, int n2)
 	return FALSE;
 }
 
-static void arcadia_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap)
+
+void arcadia_state::arcadia_draw_sprites()
 {
-	arcadia_state *state = machine.driver_data<arcadia_state>();
 	int i, k, x, y, color=0;
 	UINT8 b;
 
-	state->m_reg.d.collision_bg|=0xf;
-	state->m_reg.d.collision_sprite|=0x3f;
+	m_reg.d.collision_bg|=0xf;
+	m_reg.d.collision_sprite|=0x3f;
 	for (i=0; i<4; i++)
 	{
 		int doublescan = FALSE;
-		if (state->m_pos[i].y<=-YPOS) continue;
-		if (state->m_pos[i].y>=bitmap.height()-YPOS-8) continue;
-		if (state->m_pos[i].x<=-XPOS) continue;
-		if (state->m_pos[i].x>=128+XPOS-8) continue;
+		if (m_pos[i].y<=-YPOS) continue;
+		if (m_pos[i].y>=m_bitmap->height()-YPOS-8) continue;
+		if (m_pos[i].x<=-XPOS) continue;
+		if (m_pos[i].x>=128+XPOS-8) continue;
 
 		switch (i)
 		{
 		case 0:
-			color=(state->m_reg.d.pal[3]>>3)&7;
-			doublescan=state->m_reg.d.pal[3]&0x80?FALSE:TRUE;
+			color=(m_reg.d.pal[3]>>3)&7;
+			doublescan=m_reg.d.pal[3]&0x80?FALSE:TRUE;
 			break;
 		case 1:
-			color=state->m_reg.d.pal[3]&7;
-			doublescan=state->m_reg.d.pal[3]&0x40?FALSE:TRUE;
+			color=m_reg.d.pal[3]&7;
+			doublescan=m_reg.d.pal[3]&0x40?FALSE:TRUE;
 			break;
 		case 2:
-			color=(state->m_reg.d.pal[2]>>3)&7;
-			doublescan=state->m_reg.d.pal[2]&0x80?FALSE:TRUE;
+			color=(m_reg.d.pal[2]>>3)&7;
+			doublescan=m_reg.d.pal[2]&0x80?FALSE:TRUE;
 			break;
 		case 3:
-			color=state->m_reg.d.pal[2]&7;
-			doublescan=state->m_reg.d.pal[2]&0x40?FALSE:TRUE;
+			color=m_reg.d.pal[2]&7;
+			doublescan=m_reg.d.pal[2]&0x40?FALSE:TRUE;
 			break;
 		}
 		for (k=0; k<8; k++)
 		{
 			int j, m;
-			b=state->m_reg.d.chars[i][k];
-			x=state->m_pos[i].x+XPOS;
+			b=m_reg.d.chars[i][k];
+			x=m_pos[i].x+XPOS;
 			if (!doublescan)
 			{
-				y=state->m_pos[i].y+YPOS+k;
+				y=m_pos[i].y+YPOS+k;
 				for (j=0,m=0x80; j<8; j++, m>>=1)
 				{
 					if (b & m)
-						bitmap.pix16(y, x + j) = color;
+						m_bitmap->pix16(y, x + j) = color;
 				}
 			}
 			else
 			{
-				y=state->m_pos[i].y+YPOS+k*2;
+				y=m_pos[i].y+YPOS+k*2;
 				for (j=0,m=0x80; j<8; j++, m>>=1)
 				{
 					if (b & m)
 					{
-						bitmap.pix16(y, x + j) = color;
-						bitmap.pix16(y+1, x + j) = color;
+						m_bitmap->pix16(y, x + j) = color;
+						m_bitmap->pix16(y+1, x + j) = color;
 					}
 				}
 			}
-			if (state->m_reg.d.collision_bg&(1<<i))
+			if (m_reg.d.collision_bg&(1<<i))
 			{
-				if ( (b<<(8-(x&7))) & ((state->m_bg[y][x>>3]<<8) | state->m_bg[y][(x>>3)+1]) )
-				state->m_reg.d.collision_bg&=~(1<<i);
+				if ( (b<<(8-(x&7))) & ((m_bg[y][x>>3]<<8) | m_bg[y][(x>>3)+1]) )
+				m_reg.d.collision_bg&=~(1<<i);
 			}
 		}
 	}
-	if (arcadia_sprite_collision(state,0,1)) state->m_reg.d.collision_sprite&=~1;
-	if (arcadia_sprite_collision(state,0,2)) state->m_reg.d.collision_sprite&=~2;
-	if (arcadia_sprite_collision(state,0,3)) state->m_reg.d.collision_sprite&=~4;
-	if (arcadia_sprite_collision(state,1,2)) state->m_reg.d.collision_sprite&=~8;
-	if (arcadia_sprite_collision(state,1,3)) state->m_reg.d.collision_sprite&=~0x10; //guess
-	if (arcadia_sprite_collision(state,2,3)) state->m_reg.d.collision_sprite&=~0x20; //guess
+	if (arcadia_sprite_collision(0,1)) m_reg.d.collision_sprite&=~1;
+	if (arcadia_sprite_collision(0,2)) m_reg.d.collision_sprite&=~2;
+	if (arcadia_sprite_collision(0,3)) m_reg.d.collision_sprite&=~4;
+	if (arcadia_sprite_collision(1,2)) m_reg.d.collision_sprite&=~8;
+	if (arcadia_sprite_collision(1,3)) m_reg.d.collision_sprite&=~0x10; //guess
+	if (arcadia_sprite_collision(2,3)) m_reg.d.collision_sprite&=~0x20; //guess
 }
 
 INTERRUPT_GEN_MEMBER(arcadia_state::arcadia_video_line)
@@ -642,8 +641,7 @@ INTERRUPT_GEN_MEMBER(arcadia_state::arcadia_video_line)
 		{
 			if (((m_line-m_ypos)&(h-1))==0)
 			{
-				arcadia_vh_draw_line(machine(), *m_bitmap, m_charline*h+m_ypos,
-					m_reg.d.chars1[m_charline]);
+				arcadia_vh_draw_line(m_charline*h+m_ypos, m_reg.d.chars1[m_charline]);
 			}
 		}
 		else
@@ -651,8 +649,7 @@ INTERRUPT_GEN_MEMBER(arcadia_state::arcadia_video_line)
 		{
 			if (((m_line-m_ypos)&(h-1))==0)
 			{
-				arcadia_vh_draw_line(machine(), *m_bitmap, m_charline*h+m_ypos,
-					m_reg.d.chars2[m_charline-13]);
+				arcadia_vh_draw_line(m_charline*h+m_ypos, m_reg.d.chars2[m_charline-13]);
 			}
 		m_charline-=13;
 		}
@@ -664,7 +661,7 @@ INTERRUPT_GEN_MEMBER(arcadia_state::arcadia_video_line)
 		}
 	}
 	if (m_line==261)
-		arcadia_draw_sprites(machine(), *m_bitmap);
+		arcadia_draw_sprites();
 }
 
 READ8_MEMBER( arcadia_state::arcadia_vsync_r )
