@@ -421,15 +421,15 @@ static void nc_refresh_memory_config(running_machine &machine)
 static void nc_common_restore_memory_from_stream(running_machine &machine)
 {
 	nc_state *state = machine.driver_data<nc_state>();
-	unsigned long stored_size;
-	unsigned long restore_size;
+	UINT32 stored_size;
+	UINT32 restore_size;
 
 	if (!state->m_file)
 		return;
 
 	LOG(("restoring nc memory\n"));
 	/* get size of memory data stored */
-	if (state->m_file->read(&stored_size, sizeof(unsigned long)) != sizeof(unsigned long))
+	if (state->m_file->read(&stored_size, sizeof(UINT32)) != sizeof(UINT32))
 		stored_size = 0;
 
 	if (stored_size > machine.device<ram_device>(RAM_TAG)->size())
