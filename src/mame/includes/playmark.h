@@ -36,6 +36,7 @@ public:
 	int         m_xoffset;
 	int         m_yoffset;
 	int         m_txt_tile_offset;
+	int         m_fg_tile_offset;
 	int         m_pri_masks[3];
 	UINT16      m_scroll[7];
 
@@ -96,6 +97,7 @@ public:
 	DECLARE_VIDEO_START(excelsr);
 	DECLARE_VIDEO_START(hotmind);
 	DECLARE_VIDEO_START(hrdtimes);
+	DECLARE_VIDEO_START(luckboomh);
 	DECLARE_MACHINE_START(powerbal);
 	DECLARE_MACHINE_RESET(powerbal);
 	DECLARE_VIDEO_START(powerbal);

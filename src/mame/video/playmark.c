@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_fg_tile_info)
 	int code = m_videoram2[tile_index] & 0x1fff;
 	int colr = m_videoram2[tile_index] & 0xe000;
 
-	SET_TILE_INFO_MEMBER(1,code + 0x2000,(colr >> 13) + 8,0);
+	SET_TILE_INFO_MEMBER(1,code + m_fg_tile_offset,(colr >> 13) + 8,0);
 }
 
 TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_bg_tile_info)
@@ -135,6 +135,7 @@ VIDEO_START_MEMBER(playmark_state,bigtwinb)
 	m_xoffset = 1;
 	m_yoffset = 0;
 	m_txt_tile_offset = 0x8000;
+	m_fg_tile_offset = 0x2000;
 
 	m_pri_masks[0] = 0;
 	m_pri_masks[1] = 0;
@@ -191,12 +192,40 @@ VIDEO_START_MEMBER(playmark_state,hotmind)
 
 	m_xoffset = -9;
 	m_yoffset = -8;
-	m_txt_tile_offset = 0x9000;
+	m_txt_tile_offset = 0x9800;
+	m_fg_tile_offset = 0x2000;
 
 	m_pri_masks[0] = 0xfff0;
 	m_pri_masks[1] = 0xfffc;
 	m_pri_masks[2] = 0;
 }
+
+// this is wrong, and the offsets seem to move, so it can probably help find the register.
+VIDEO_START_MEMBER(playmark_state,luckboomh)
+{
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_tx_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(playmark_state::hrdtimes_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+
+	m_tx_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
+
+	m_tx_tilemap->set_scrolldx(-14, -14);
+	m_fg_tilemap->set_scrolldx(-14, -14);
+	m_bg_tilemap->set_scrolldx(-14, -14);
+
+	m_xoffset = -9;
+	m_yoffset = -8;
+	m_txt_tile_offset = 0x9800;
+
+	m_fg_tile_offset = 0x1800;
+
+	m_pri_masks[0] = 0xfff0;
+	m_pri_masks[1] = 0xfffc;
+	m_pri_masks[2] = 0;
+}
+
+
 
 VIDEO_START_MEMBER(playmark_state,hrdtimes)
 {
@@ -214,6 +243,7 @@ VIDEO_START_MEMBER(playmark_state,hrdtimes)
 	m_xoffset = -8;
 	m_yoffset = -8;
 	m_txt_tile_offset = 0xfc00;
+	m_fg_tile_offset = 0x2000;
 
 	m_pri_masks[0] = 0xfff0;
 	m_pri_masks[1] = 0xfffc;

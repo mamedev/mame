@@ -1202,7 +1202,7 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)   /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(hotmind_main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq2_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", playmark_state,  irq6_line_hold) // lucky boom needs irq6, 2 and 6 point to the same location on hotmind
 
 	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_24MHz/2)    /* verified on pcb */
 	/* Program and Data Maps are internal to the MCU */
@@ -1232,6 +1232,10 @@ static MACHINE_CONFIG_START( hotmind, playmark_state )
 
 	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)  /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( luckboomh, hotmind )
+	MCFG_VIDEO_START_OVERRIDE(playmark_state,luckboomh)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( hrdtimes, playmark_state )
@@ -1588,6 +1592,40 @@ ROM_START( hotmind )
 	ROM_LOAD( "20.io13",      0x00000, 0x40000, CRC(0bf3a3e5) SHA1(2ae06f37a6bcd20bc5fbaa90d970aba2ebf3cf5a) )
 ROM_END
 
+ROM_START( luckboomh )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "21.u67",       0x00000, 0x20000, CRC(5578dd75) SHA1(ed3c2ea302f8bfe49ab5d8c33e572492daa651ae) )
+	ROM_LOAD16_BYTE( "22.u66",       0x00001, 0x20000, CRC(1eb72a39) SHA1(d7ea9985013fd8cb89389829dbff2f2710a2297d) )
+
+	ROM_REGION( 0x2000, "audiocpu", ROMREGION_ERASE00 ) /* sound (PIC16C57) */
+	/* ROM will be copied here by the init code from "user1" */
+	ROM_LOAD( "pic16c57.io15",      0x00000, 0x2000, BAD_DUMP CRC(c4b9c78e) SHA1(e85766383b22a62f19bf272d86d53c7fb1eb5ac4) ) // protected
+
+	/* original PIC was protected, but it works with the Excelsior one
+	   because it uses only 1 bank of samples */
+	ROM_REGION( 0x3000, "user1", 0 )
+	ROM_LOAD( "pic16c57-hs.i015", 0x0000, 0x2d4c, BAD_DUMP CRC(022c6941) SHA1(8ead40bfa7aa783b1ce62bd6cfa673cb876e29e7) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "23.u36",       0x000000, 0x10000, CRC(71840dd9) SHA1(9d0a75555dedb6fd28bb7c04b863f3ef5a1f8aac) )
+	ROM_CONTINUE(             0x080000, 0x10000 )
+	ROM_LOAD16_BYTE( "27.u42",       0x000001, 0x10000, CRC(2f86b37f) SHA1(99b1ffc2006f7eb1517f2fcee955391af98ba061) )
+	ROM_CONTINUE(             0x080001, 0x10000 )
+	ROM_LOAD16_BYTE( "24.u39",       0x100000, 0x10000, CRC(c6725797) SHA1(b6233dbba956e044aa76104bfffdd7fd6799628c) )
+	ROM_CONTINUE(             0x180000, 0x10000 )
+	ROM_LOAD16_BYTE( "28.u40",       0x100001, 0x10000, CRC(40e65ed1) SHA1(bc75eb816c58eb0f983bb0eaee854c54e306e1da) )
+	ROM_CONTINUE(             0x180001, 0x10000 )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "26.u86",       0x00000, 0x20000, CRC(d3ee7d82) SHA1(b0b3df19d60430e7a9fa29fdfff2183a32986d2d) )
+	ROM_LOAD16_BYTE( "30.u85",       0x00001, 0x20000, CRC(4b8a9558) SHA1(9f0f2d8f50f21cf188ad778c3a0a68ec23380b23) )
+	ROM_LOAD16_BYTE( "25.u84",       0x40000, 0x20000, CRC(e1ab5cf5) SHA1(f76d00537cfd6f09439e44071875bf021622fd07) )
+	ROM_LOAD16_BYTE( "29.u83",       0x40001, 0x20000, CRC(9572d2d4) SHA1(90d55b1f13dc93041160530e8c1ce8def6e02bcf) )
+
+	ROM_REGION( 0xc0000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "20.io13",      0x00000, 0x40000, CRC(0d42c0a3) SHA1(1b1d4c7dcbb063e8bf133063770b753947d1a017) )
+ROM_END
+
 ROM_START( hrdtimes )
 	ROM_REGION( 0x100000, "maincpu", 0 )    /* 68000 code */
 	ROM_LOAD16_BYTE( "31.u67",       0x00000, 0x80000, CRC(53eb041b) SHA1(7437da1ceb26e9518a3085560b8a42f37e77ace9) )
@@ -1732,12 +1770,13 @@ DRIVER_INIT_MEMBER(playmark_state,bigtwin)
 	} while (src_pos < 0x2d4c);     /* 0x2d4c is the size of the HEX rom loaded */
 }
 
-GAME( 1995, bigtwin,   0,        bigtwin,  bigtwin, playmark_state,  bigtwin, ROT0, "Playmark", "Big Twin", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1995, bigtwin,   0,        bigtwin,  bigtwin,  playmark_state, bigtwin, ROT0, "Playmark", "Big Twin", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1995, bigtwinb,  bigtwin,  bigtwinb, bigtwinb, playmark_state, bigtwin, ROT0, "Playmark", "Big Twin (No Girls Conversion)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl,  0,        wbeachvl, wbeachvl, driver_device, 0,       ROT0, "Playmark", "World Beach Volley (set 1)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl2, wbeachvl, wbeachvl, wbeachvl, driver_device, 0,       ROT0, "Playmark", "World Beach Volley (set 2)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1995, wbeachvl3, wbeachvl, wbeachvl, wbeachvl, driver_device, 0,       ROT0, "Playmark", "World Beach Volley (set 3)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1996, excelsr,   0,        excelsr,  excelsr, playmark_state,  bigtwin, ROT0, "Playmark", "Excelsior", GAME_SUPPORTS_SAVE )
-GAME( 1995, hotmind,   0,        hotmind,  hotmind, playmark_state,  bigtwin, ROT0, "Playmark", "Hot Mind", GAME_SUPPORTS_SAVE )
-GAME( 1994, hrdtimes,  0,        hrdtimes, hrdtimes, driver_device, 0,       ROT0, "Playmark", "Hard Times (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1994, hrdtimesa, hrdtimes, hrdtimes, hrdtimes, driver_device, 0,       ROT0, "Playmark", "Hard Times (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl,  0,        wbeachvl, wbeachvl, driver_device,  0,       ROT0, "Playmark", "World Beach Volley (set 1)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl2, wbeachvl, wbeachvl, wbeachvl, driver_device,  0,       ROT0, "Playmark", "World Beach Volley (set 2)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1995, wbeachvl3, wbeachvl, wbeachvl, wbeachvl, driver_device,  0,       ROT0, "Playmark", "World Beach Volley (set 3)",  GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1996, excelsr,   0,        excelsr,  excelsr,  playmark_state, bigtwin, ROT0, "Playmark", "Excelsior", GAME_SUPPORTS_SAVE )
+GAME( 1995, hotmind,   0,        hotmind,  hotmind,  playmark_state, bigtwin, ROT0, "Playmark", "Hot Mind (Hard Times hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1995, luckboomh, luckboom, luckboomh,hotmind,  playmark_state, bigtwin, ROT0, "Playmark", "Lucky Boom (Hard Times hardware)", GAME_NOT_WORKING )
+GAME( 1994, hrdtimes,  0,        hrdtimes, hrdtimes, driver_device,  0,       ROT0, "Playmark", "Hard Times (set 1)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1994, hrdtimesa, hrdtimes, hrdtimes, hrdtimes, driver_device,  0,       ROT0, "Playmark", "Hard Times (set 2)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
