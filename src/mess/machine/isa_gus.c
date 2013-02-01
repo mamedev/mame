@@ -10,6 +10,7 @@
 #include "sound/speaker.h"
 #include "machine/6850acia.h"
 
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -1199,16 +1200,34 @@ void gf1_device::eop_w(int state)
 static const acia6850_interface gus_midi_interface =
 {
 	31250 * 16,
-	31250 * 16,
+	0,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa16_gus_device, rx_in),	// rx in
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa16_gus_device, tx_out),	// tx out
 
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,isa16_gus_device,midi_irq)
+};
+
+static SLOT_INTERFACE_START(midiin_slot)
+	SLOT_INTERFACE("midiin", MIDIIN_PORT)
+SLOT_INTERFACE_END
+
+static const serial_port_interface midiin_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa16_gus_device, midi_rx_w)
+};
+
+static SLOT_INTERFACE_START(midiout_slot)
+	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
+SLOT_INTERFACE_END
+
+static const serial_port_interface midiout_intf =
+{
+	DEVCB_NULL	// midi out ports don't transmit inward
 };
 
 static const gf1_interface gus_gf1_config =
@@ -1231,6 +1250,8 @@ static MACHINE_CONFIG_FRAGMENT( gus_config )
 	MCFG_SOUND_ROUTE(0,"lspeaker",0.50)
 	MCFG_SOUND_ROUTE(1,"rspeaker",0.50)
 	MCFG_ACIA6850_ADD("midi",gus_midi_interface)
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
+	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( gus_joy )
@@ -1274,6 +1295,7 @@ void isa16_gus_device::device_start()
 {
 	m_gf1 = subdevice<gf1_device>("gf1");
 	m_midi = subdevice<acia6850_device>("midi");
+	m_mdout = subdevice<serial_port_device>("mdout");
 	set_isa_device();
 	m_isa->install_device(0x0200, 0x0201, 0, 0, read8_delegate(FUNC(isa16_gus_device::joy_r),this), write8_delegate(FUNC(isa16_gus_device::joy_w),this) );
 	m_isa->install_device(0x0220, 0x022f, 0, 0, read8_delegate(FUNC(isa16_gus_device::board_r),this), write8_delegate(FUNC(isa16_gus_device::board_w),this) );
@@ -1672,10 +1694,46 @@ void isa16_gus_device::reset_midi_irq(UINT8 source)
 
 WRITE_LINE_MEMBER( isa16_gus_device::midi_irq )
 {
-	if(state)
-		set_midi_irq(IRQ_MIDI_TRANSMIT);
+	UINT8 irq_type;
+	UINT8 st = m_midi->get_status();
+
+	logerror("GUS: MIDI IRQ: state: %i Status: %02x\n",state,st);
+
+	if(state == ASSERT_LINE)
+	{
+		if(st & 0x01) // receive
+			irq_type = IRQ_MIDI_RECEIVE;
+		else
+			if(st & 0x02) // transmit
+				irq_type = IRQ_MIDI_TRANSMIT;
+			else
+			{
+				logerror("GUS: MIDI IRQ unknown: %02x\n",st);
+				return;  // Should never reach here...
+			}
+		set_midi_irq(irq_type);
+	}
 	else
-		reset_midi_irq(IRQ_MIDI_TRANSMIT);
+		reset_midi_irq(IRQ_MIDI_TRANSMIT | IRQ_MIDI_RECEIVE);
+}
+
+WRITE_LINE_MEMBER( isa16_gus_device::midi_rx_w )
+{
+	m_rx_state = state;
+	for (int i = 0; i < 16; i++)	// divider is set to 16
+	{
+		m_midi->rx_clock_in();
+	}
+}
+
+READ_LINE_MEMBER( isa16_gus_device::rx_in )
+{
+	return m_rx_state;
+}
+
+WRITE_LINE_MEMBER( isa16_gus_device::tx_out )
+{
+	m_mdout->tx(state);
 }
 
 WRITE_LINE_MEMBER( isa16_gus_device::nmi_w)

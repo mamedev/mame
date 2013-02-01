@@ -91,6 +91,8 @@ public:
 
 	void receive_data(UINT8 data);
 
+	UINT8 get_status() { return m_status; }  // returns current status without mangling it
+
 protected:
 	// device-level overrides
 	virtual void device_start();
