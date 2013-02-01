@@ -274,8 +274,13 @@ static void cfunc_printf_probe(void *param)
 static void cfunc_unimplemented(void *param)
 {
 	sh2_state *sh2 = (sh2_state *)param;
-	UINT16 opcode = sh2->arg0;
-	fatalerror("PC=%08X: Unimplemented op %04X\n", sh2->pc, opcode);
+
+	// set up an invalid opcode exception
+	sh2->evec = RL( sh2, sh2->vbr + 4 * 4 );
+	sh2->evec &= AM;
+	sh2->irqsr = sh2->sr;
+	// claim it's an NMI, because it pretty much is
+	sh2->pending_nmi = 1;
 }
 
 /*-------------------------------------------------
@@ -1622,6 +1627,7 @@ static void generate_sequence_instruction(sh2_state *sh2, drcuml_block *block, c
 		/* compile the instruction */
 		if (!generate_opcode(sh2, block, compiler, desc, ovrpc))
 		{
+			// handle an illegal op
 			UML_MOV(block, mem(&sh2->pc), desc->pc);                            // mov     [pc],desc->pc
 			UML_MOV(block, mem(&sh2->arg0), desc->opptr.w[0]);                  // mov     [arg0],opcode
 			UML_CALLC(block, cfunc_unimplemented, sh2);                             // callc   cfunc_unimplemented
@@ -1790,8 +1796,8 @@ static int generate_opcode(sh2_state *sh2, drcuml_block *block, compiler_state *
 			UML_MOV(block, R32(Rn), scratch2);
 			return TRUE;
 
-		case 15:    // NOP
-			return TRUE;
+		case 15:
+			return FALSE;
 	}
 
 	return FALSE;
@@ -1801,22 +1807,24 @@ static int generate_group_0(sh2_state *sh2, drcuml_block *block, compiler_state 
 {
 	switch (opcode & 0x3F)
 	{
-	case 0x00: // NOP();
-	case 0x01: // NOP();
+	case 0x00:	// these are all illegal
+	case 0x01:
+	case 0x10:
+	case 0x11:
+	case 0x13:
+	case 0x20:
+	case 0x21:
+	case 0x30:
+	case 0x31:
+	case 0x32:
+	case 0x33:
+	case 0x38:
+	case 0x39:
+	case 0x3a:
+	case 0x3b:
+		return FALSE;
+
 	case 0x09: // NOP();
-	case 0x10: // NOP();
-	case 0x11: // NOP();
-	case 0x13: // NOP();
-	case 0x20: // NOP();
-	case 0x21: // NOP();
-	case 0x30: // NOP();
-	case 0x31: // NOP();
-	case 0x32: // NOP();
-	case 0x33: // NOP();
-	case 0x38: // NOP();
-	case 0x39: // NOP();
-	case 0x3a: // NOP();
-	case 0x3b: // NOP();
 		return TRUE;
 
 	case 0x02: // STCSR(Rn);
@@ -2093,8 +2101,8 @@ static int generate_group_2(sh2_state *sh2, drcuml_block *block, compiler_state 
 			generate_update_cycles(sh2, block, compiler, desc->pc + 2, TRUE);
 		return TRUE;
 
-	case  3: // NOP();
-		return TRUE;
+	case  3:
+		return FALSE;
 
 	case  4: // MOVBM(Rm, Rn);
 		UML_MOV(block, I1, R32(Rm));        // mov r1, Rm
@@ -2265,9 +2273,9 @@ static int generate_group_3(sh2_state *sh2, drcuml_block *block, compiler_state 
 		UML_ROLINS(block, mem(&sh2->sr), I0, 0, 1); // rolins sr, r0, 0, 1
 		return TRUE;
 
-	case  1: // NOP();
-	case  9: // NOP();
-		return TRUE;
+	case  1:
+	case  9:
+		return FALSE;
 
 	case  4: // DIV1(Rm, Rn);
 		save_fast_iregs(sh2, block);
@@ -2680,29 +2688,29 @@ static int generate_group_4(sh2_state *sh2, drcuml_block *block, compiler_state 
 		UML_MOV(block, mem(&sh2->vbr), R32(Rn));        //  mov vbr, Rn
 		return TRUE;
 
-	case 0x0c: // NOP();
-	case 0x0d: // NOP();
-	case 0x14: // NOP();
-	case 0x1c: // NOP();
-	case 0x1d: // NOP();
-	case 0x2c: // NOP();
-	case 0x2d: // NOP();
-	case 0x30: // NOP();
-	case 0x31: // NOP();
-	case 0x32: // NOP();
-	case 0x33: // NOP();
-	case 0x34: // NOP();
-	case 0x35: // NOP();
-	case 0x36: // NOP();
-	case 0x37: // NOP();
-	case 0x38: // NOP();
-	case 0x39: // NOP();
-	case 0x3a: // NOP();
-	case 0x3b: // NOP();
-	case 0x3c: // NOP();
-	case 0x3d: // NOP();
-	case 0x3e: // NOP();
-		return TRUE;
+	case 0x0c:
+	case 0x0d:
+	case 0x14:
+	case 0x1c:
+	case 0x1d:
+	case 0x2c:
+	case 0x2d:
+	case 0x30:
+	case 0x31:
+	case 0x32:
+	case 0x33:
+	case 0x34:
+	case 0x35:
+	case 0x36:
+	case 0x37:
+	case 0x38:
+	case 0x39:
+	case 0x3a:
+	case 0x3b:
+	case 0x3c:
+	case 0x3d:
+	case 0x3e:
+		return FALSE;
 	}
 
 	return FALSE;
@@ -2866,14 +2874,14 @@ static int generate_group_8(sh2_state *sh2, drcuml_block *block, compiler_state 
 			generate_update_cycles(sh2, block, compiler, desc->pc + 2, TRUE);
 		return TRUE;
 
-	case  2<< 8: // NOP();
-	case  3<< 8: // NOP();
-	case  6<< 8: // NOP();
-	case  7<< 8: // NOP();
-	case 10<< 8: // NOP();
-	case 12<< 8: // NOP();
-	case 14<< 8: // NOP();
-		return TRUE;
+	case  2<< 8:
+	case  3<< 8:
+	case  6<< 8:
+	case  7<< 8:
+	case 10<< 8:
+	case 12<< 8:
+	case 14<< 8:
+		return FALSE;
 
 	case  4<< 8: // MOVBL4(Rm, opcode & 0x0f);
 		udisp = opcode & 0x0f;
