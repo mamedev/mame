@@ -243,6 +243,17 @@ static void add_rom_entry(software_list *swlist, const char *name, const char *h
 		}
 	}
 
+	if ( part->romdata == NULL )
+	{
+		/* Allocate initial space to hold the rom information */
+		swlist->rom_entries = 3;
+		part->romdata = (struct rom_entry *)pool_malloc_lib(swlist->pool, swlist->rom_entries * sizeof(struct rom_entry));
+		if ( part->romdata == NULL )
+		{
+			fatalerror("Unable to claim memory for storing a rom entry\n");
+		}
+	}
+
 	struct rom_entry *entry = &part->romdata[swlist->current_rom_entry];
 
 	entry->_name = name;
@@ -690,12 +701,10 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 
 						add_software_part( swlist, name, interface );
 
-						/* Allocate initial space to hold the rom information */
-						swlist->rom_entries = 3;
+						/* Set up rom/dataarea information */
+						swlist->rom_entries = 0;
 						swlist->current_rom_entry = 0;
-						swlist->softinfo->partdata[swlist->softinfo->current_part_entry-1].romdata = (struct rom_entry *)pool_malloc_lib(swlist->pool, swlist->rom_entries * sizeof(struct rom_entry));
-						if ( ! swlist->softinfo->partdata[swlist->softinfo->current_part_entry-1].romdata )
-							return;
+						swlist->softinfo->partdata[swlist->softinfo->current_part_entry-1].romdata = NULL;
 					}
 				}
 				else
@@ -1040,8 +1049,12 @@ static void end_handler(void *data, const char *name)
 		case POS_SOFT:
 			if ( ! strcmp( name, "part" ) && swlist->softinfo )
 			{
-				/* ROM_END */
-				add_rom_entry( swlist, NULL, NULL, 0, 0, ROMENTRYTYPE_END );
+				/* Was any dataarea/rom information encountered? */
+				if ( swlist->softinfo->partdata[swlist->softinfo->current_part_entry-1].romdata != NULL )
+				{
+					/* If so, force a ROM_END */
+					add_rom_entry( swlist, NULL, NULL, 0, 0, ROMENTRYTYPE_END );
+				}
 				/* Add shared_info inherited from the software_info level, if any */
 				if ( swlist->softinfo && swlist->softinfo->shared_info )
 				{
