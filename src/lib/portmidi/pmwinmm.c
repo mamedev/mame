@@ -1436,9 +1436,7 @@ void pm_winmm_term( void )
 	int i;
 #ifdef DEBUG
 	char msg[PM_HOST_ERROR_MSG_LEN];
-#endif
-	//int doneAny = 0;
-#ifdef DEBUG
+	int doneAny = 0;
 	printf("pm_winmm_term called\n");
 #endif
 	for (i = 0; i < pm_descriptor_index; i++) {
