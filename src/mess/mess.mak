@@ -825,9 +825,6 @@ $(MESSOBJ)/casio.a:             \
 
 $(MESSOBJ)/cbm.a:               \
 	$(MESS_DRIVERS)/pet2001.o   \
-	$(MESS_VIDEO)/pet.o         \
-	$(MESS_DRIVERS)/pet.o       \
-	$(MESS_MACHINE)/pet.o       \
 	$(MESS_DRIVERS)/c64.o       \
 	$(MESS_MACHINE)/c64_legacy.o       \
 	$(MESS_DRIVERS)/c64dtv.o    \

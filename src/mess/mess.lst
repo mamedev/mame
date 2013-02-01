@@ -576,30 +576,34 @@ sym1      // Synertek SYM-1
 aim65    // Rockwell AIM65
 aim65_40  // Rockwell AIM65/40
 
-pet2001   // PET 2001
-pet2001n  // PET 2001-N
-pet2001b  // PET 2001-B
-cbm30    // CBM 30xx
-cbm30b  // CBM 30xx (Business keyboard)
-cbm30nor  // CBM 30xx (Norway, Business keyboard)
-pet40on   // PET 40xx (Basic 4, no CRTC, Normal keyboard)
-pet40ob   // PET 40xx (Basic 4, no CRTC, Business keyboard)
-pet40n  // PET 40xx (Basic 4, CRTC 60Hz, 40 columns)
-pet40b  // PET 40xx (Basic 4, CRTC 60Hz, 80 columns)
-cbm40o  // CBM 40xx (Basic 4, no CRTC, Normal keyboard)
-cbm40ob   // CBM 40xx (Basic 4, no CRTC, Business keyboard)
-cbm40n  // CBM 40xx (Basic 4, CRTC 50Hz, 40 columns)
-cbm40b  // CBM 40xx (Basic 4, CRTC 50Hz, 80 columns)
-pet80    // PET 80xx (Basic 4, CRTC 60Hz, 80 columns)
-cbm80    // CBM 80xx (Basic 4, CRTC 50Hz, 80 columns)
-cbm80ger  // CBM 80xx (Germany, Basic 4, CRTC 50Hz, 80 cols)
-cbm80hun  // CBM 80xx (Hungary, Basic 4, CRTC 50Hz, 80 cols)
-cbm80swe  // CBM 80xx (Sweden, Basic 4, CRTC 50Hz, 80 cols)
-cbm8296   // CBM 8296 (Basic 4, CRTC 50Hz, 80 columns)
-cbm8296d  // CBM 8296D
-superpet  // SuperPET
-sp9000  // CBM SP9000 / MiniMainFrame 9000
-mmf9000s  // MiniMainFrame 9000 (Sweden)
+pet2001
+pet20018
+pet2001n
+pet2001n16
+pet2001n32
+cbm3008
+cbm3016
+cbm3032
+pet2001b
+pet2001b16
+pet2001b32
+cbm3032b
+pet4016
+pet4032
+cbm4016
+cbm4032
+pet4032b
+cbm4032b
+pet8032
+cbm8032
+cbm8032_de
+cbm8032_se
+superpet
+mmf9000
+cbm8096
+cbm8296
+cbm8296d
+cbm8296d_de
 
 vic1001   // Commodore VIC-1001 (Japan)
 vic20    // Commodore VIC 20 (NTSC)
