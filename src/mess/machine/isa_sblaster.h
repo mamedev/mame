@@ -135,12 +135,12 @@ protected:
 		virtual void tra_callback();    // Tx send bit
 		void input_callback(UINT8 state) {}
 
-		static const int MIDI_RING_SIZE = 1024;
+		static const int MIDI_RING_SIZE = 2048;
 
 		struct sb8_dsp_state m_dsp;
 		UINT8 m_dack_out;
 		void xmit_char(UINT8 data);
-		bool m_onebyte_midi, m_uart_midi, m_uart_irq, m_mpu_midi;
+		bool m_onebyte_midi, m_uart_midi, m_uart_irq, m_mpu_midi, m_uart_xmitfull;
 		UINT8 m_recvring[MIDI_RING_SIZE];
 		UINT8 m_xmitring[MIDI_RING_SIZE];
 		int m_xmit_read, m_xmit_write;

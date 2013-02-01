@@ -272,6 +272,7 @@ WRITE8_MEMBER( sb_device::dsp_reset_w )
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;
 	m_recv_read = m_recv_write = 0;
+	m_uart_xmitfull = false;
 
 	//printf("%02x\n",data);
 }
@@ -320,9 +321,9 @@ READ8_MEMBER(sb_device::dsp_rbuf_status_r)
 //    printf("Clear IRQ5\n");
 	irq_w(0, IRQ_DMA8);   // reading this port ACKs the card's IRQ, 8-bit dma only?
 
-	// in UART MIDI mode, bit 7 indicates if a character is available 
+	// in either SB-MIDI mode, bit 7 indicates if a character is available 
 	// to read.
-	if (m_uart_midi)
+	if (m_uart_midi || m_onebyte_midi)
 	{
 		if (m_recv_read != m_recv_write)
 		{
@@ -338,8 +339,21 @@ READ8_MEMBER(sb_device::dsp_rbuf_status_r)
 READ8_MEMBER(sb_device::dsp_wbuf_status_r)
 {
 //    printf("read Wbufstat @ %x\n", offset);
+
 	if(offset)
 		return 0xff;
+
+	// in either SB-MIDI mode, bit 7 indicates if there's space to write.
+	// set = buffer full
+	if (m_uart_midi || m_onebyte_midi)
+	{
+		if (m_uart_xmitfull)
+		{
+ 			return 0x80;
+		}
+
+		return 0x00;
+	}
 
 	return m_dsp.wbuf_status;
 }
@@ -1207,6 +1221,15 @@ void sb_device::device_reset()
 	m_dsp.dma_no_irq = false;
 	mixer_reset();
 
+	m_onebyte_midi = false;
+	m_uart_midi = false;
+	m_uart_irq = false;
+	m_mpu_midi = false;
+	m_tx_busy = false;
+	m_xmit_read = m_xmit_write = 0;
+	m_recv_read = m_recv_write = 0;
+	m_uart_xmitfull = false;
+
 	// MIDI is 31250 baud, 8-N-1
 	set_rcv_rate(31250);
 	set_tra_rate(31250);
@@ -1546,15 +1569,16 @@ void sb16_device::rcv_complete()    // Rx completed receiving byte
 
 void sb_device::tra_complete()    // Tx completed sending byte
 {
-//  printf("Tx complete\n");
+//	printf("Tx complete\n");
 	// is there more waiting to send?
-	if (m_xmit_read != m_xmit_write)
+	if ((m_xmit_read != m_xmit_write) || (m_uart_xmitfull))
 	{
 		transmit_register_setup(m_xmitring[m_xmit_read++]);
 		if (m_xmit_read >= MIDI_RING_SIZE)
 		{
 			m_xmit_read = 0;
 		}
+		m_uart_xmitfull = false;
 	}
 	else
 	{
@@ -1589,7 +1613,7 @@ void sb_device::xmit_char(UINT8 data)
 
 		if (m_xmit_write == m_xmit_read)
 		{
-			printf("Overflow xmitring!\n");
+			m_uart_xmitfull = true;
 		}
 	}
 }
