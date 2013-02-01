@@ -8,7 +8,7 @@
 //
 
 //#define debug_cdrom
-#define debug_cdrom_registers
+//#define debug_cdrom_registers
 //#define skip_reads
 //#define dump_subheader
 //#define disable_xa_prefetch
@@ -203,6 +203,14 @@ READ8_MEMBER( psxcd_device::read )
 
 	switch (offset&3)
 	{
+		/*
+		x--- ---- command/parameter busy flag
+		-x-- ---- data fifo full (active low)
+		--x- ---- response fifo empty (active low)
+		---x ---- parameter fifo full (active low)
+		---- x--- parameter fifo empty (active high)
+		---- --xx cmd mode
+		*/
 		case 0: ret=sr; break;
 		case 1:
 			ret=res;
@@ -226,7 +234,7 @@ READ8_MEMBER( psxcd_device::read )
 	}
 
 	#ifdef debug_cdrom_registers
-		printf("cdrom: read byte %08x = %02x\n",offset,ret);
+		printf("cdrom: read byte %08x = %02x (PC=%08x)\n",offset,ret,space.device().safe_pc());
 	#endif
 
 	return ret;
@@ -239,12 +247,15 @@ READ8_MEMBER( psxcd_device::read )
 WRITE8_MEMBER( psxcd_device::write )
 {
 	#ifdef debug_cdrom_registers
-		printf("cdrom: write byte %08x = %02x\n",offset,data);
+		printf("cdrom: write byte %08x = %02x (PC=%08x)\n",offset,data,space.device().safe_pc());
 	#endif
 
 	switch (offset&3)
 	{
 		case 0:
+			//if(data & 2)
+			//	popmessage("cmdmode = %02x, contact MESSdev",data);
+
 			cmdmode=data&1;
 			if (cmdmode==0)
 			{
@@ -309,10 +320,22 @@ WRITE8_MEMBER( psxcd_device::write )
 			} else
 			{
 				// ?flush buffer?
+				//if(data & 0xf8)
+				//popmessage("Interrupt enable register mode 1 [%02x] -> %02x",offset,data);
 			}
 			break;
 
+		/*
+		x--- ---- unknown
+		-x-- ---- Reset parameter FIFO
+		--x- ---- unknown (used on transitions, so it certainly resets something)
+		---x ---- Command start
+		---- -xxx Response received
+		*/
 		case 3:
+			//if(data & 0x78)
+			//	popmessage("IRQ flag = %02x, contact MESSdev",data);
+
 			if (data==0x07)
 			{
 				if (cur_res)
