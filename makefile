@@ -412,7 +412,7 @@ endif
 
 # define MAME_DEBUG if we are a debugging build
 ifdef DEBUG
-DEFS += -DMAME_DEBUG
+DEFS += -DMAME_DEBUG -DEBUG -D_DEBUG
 else
 DEFS += -DNDEBUG 
 endif
