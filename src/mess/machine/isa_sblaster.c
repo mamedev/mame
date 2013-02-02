@@ -71,6 +71,15 @@ static const ymf262_interface pc_ymf262_interface =
 	NULL
 };
 
+static SLOT_INTERFACE_START(midiin_slot)
+	SLOT_INTERFACE("midiin", MIDIIN_PORT)
+SLOT_INTERFACE_END
+
+static const serial_port_interface midiin_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, sb_device, midi_rx_w)
+};
+
 static SLOT_INTERFACE_START(midiout_slot)
 	SLOT_INTERFACE("midiout", MIDIOUT_PORT)
 SLOT_INTERFACE_END
@@ -99,6 +108,7 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("joy")
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
 	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 MACHINE_CONFIG_END
 
@@ -116,6 +126,7 @@ static MACHINE_CONFIG_FRAGMENT( sblaster1_5_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("joy")
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
 	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 MACHINE_CONFIG_END
 
@@ -133,6 +144,7 @@ static MACHINE_CONFIG_FRAGMENT( sblaster_16_config )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MCFG_PC_JOY_ADD("joy")
+	MCFG_SERIAL_PORT_ADD("mdin", midiin_intf, midiin_slot, "midiin", NULL)
 	MCFG_SERIAL_PORT_ADD("mdout", midiout_intf, midiout_slot, "midiout", NULL)
 MACHINE_CONFIG_END
 
@@ -272,7 +284,7 @@ WRITE8_MEMBER( sb_device::dsp_reset_w )
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;
 	m_recv_read = m_recv_write = 0;
-	m_uart_xmitfull = false;
+	m_rx_waiting = m_tx_waiting = false;
 
 	//printf("%02x\n",data);
 }
@@ -285,12 +297,10 @@ READ8_MEMBER( sb_device::dsp_data_r )
 
 	if (m_uart_midi)
 	{
-		UINT8 rv = m_recvring[m_recv_read];
-
-		// only advance the read pointer if the ring wasn't empty
-		if (m_recv_read != m_xmit_read)
+		UINT8 rv = m_recvring[m_recv_read++];
+		if (m_rx_waiting)
 		{
-			m_recv_read++;
+			m_rx_waiting--;
 		}
 
 		return rv;
@@ -325,7 +335,7 @@ READ8_MEMBER(sb_device::dsp_rbuf_status_r)
 	// to read.
 	if (m_uart_midi || m_onebyte_midi)
 	{
-		if (m_recv_read != m_recv_write)
+		if (m_rx_waiting)
 		{
 			return 0x80;
 		}
@@ -347,7 +357,7 @@ READ8_MEMBER(sb_device::dsp_wbuf_status_r)
 	// set = buffer full
 	if (m_uart_midi || m_onebyte_midi)
 	{
-		if (m_uart_xmitfull)
+		if (m_tx_waiting >= MIDI_RING_SIZE)
 		{
  			return 0x80;
 		}
@@ -429,12 +439,12 @@ void sb_device::process_fifo(UINT8 cmd)
 
 			case 0x34:
 				m_uart_midi = true;
-				m_uart_irq = true;
+				m_uart_irq = false;
 				break;
 
 			case 0x35:
 				m_uart_midi = true;
-				m_uart_irq = false;
+				m_uart_irq = true;
 				break;
 
 			case 0x36:
@@ -1228,7 +1238,7 @@ void sb_device::device_reset()
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;
 	m_recv_read = m_recv_write = 0;
-	m_uart_xmitfull = false;
+	m_rx_waiting = m_tx_waiting = false;
 
 	// MIDI is 31250 baud, 8-N-1
 	set_rcv_rate(31250);
@@ -1534,8 +1544,10 @@ void sb_device::rcv_complete()    // Rx completed receiving byte
 	if (m_uart_midi)
 	{
 		m_recvring[m_recv_write++] = data;
-
-		// if not polling mode, trigger the DMA8 IRQ
+		if (m_recv_write != m_recv_read)
+		{
+			m_rx_waiting++;
+		}
 		if (m_uart_irq)
 		{
 			irq_w(1, IRQ_DMA8); 
@@ -1552,7 +1564,14 @@ void sb16_device::rcv_complete()    // Rx completed receiving byte
 	if (m_uart_midi)
 	{
 		m_recvring[m_recv_write++] = data;
-		irq_w(1, IRQ_DMA8); 
+		if (m_recv_write != m_recv_read)
+		{
+			m_rx_waiting++;
+		}
+		if (m_uart_irq)
+		{
+			irq_w(1, IRQ_DMA8); 
+		}
 	}
 
 	// in MPU MIDI mode, do this instead
@@ -1571,14 +1590,14 @@ void sb_device::tra_complete()    // Tx completed sending byte
 {
 //	printf("Tx complete\n");
 	// is there more waiting to send?
-	if ((m_xmit_read != m_xmit_write) || (m_uart_xmitfull))
+	if (m_tx_waiting)
 	{
 		transmit_register_setup(m_xmitring[m_xmit_read++]);
 		if (m_xmit_read >= MIDI_RING_SIZE)
 		{
 			m_xmit_read = 0;
 		}
-		m_uart_xmitfull = false;
+		m_tx_waiting--;
 	}
 	else
 	{
@@ -1610,11 +1629,7 @@ void sb_device::xmit_char(UINT8 data)
 		{
 			m_xmit_write = 0;
 		}
-
-		if (m_xmit_write == m_xmit_read)
-		{
-			m_uart_xmitfull = true;
-		}
+		m_tx_waiting++;
 	}
 }
 

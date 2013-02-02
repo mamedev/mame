@@ -117,6 +117,8 @@ public:
 		DECLARE_WRITE8_MEMBER(dsp_rbuf_status_w);
 		DECLARE_WRITE8_MEMBER(dsp_cmd_w);
 
+		DECLARE_WRITE_LINE_MEMBER( midi_rx_w ) { check_for_start((UINT8)state); }
+
 protected:
 		// device-level overrides
 		virtual void device_reset();
@@ -140,7 +142,8 @@ protected:
 		struct sb8_dsp_state m_dsp;
 		UINT8 m_dack_out;
 		void xmit_char(UINT8 data);
-		bool m_onebyte_midi, m_uart_midi, m_uart_irq, m_mpu_midi, m_uart_xmitfull;
+		bool m_onebyte_midi, m_uart_midi, m_uart_irq, m_mpu_midi;
+		int m_rx_waiting, m_tx_waiting;
 		UINT8 m_recvring[MIDI_RING_SIZE];
 		UINT8 m_xmitring[MIDI_RING_SIZE];
 		int m_xmit_read, m_xmit_write;
