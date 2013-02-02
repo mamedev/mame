@@ -2,68 +2,26 @@
 #include "tiaintf.h"
 #include "tiasound.h"
 
-struct tia_state
-{
-	sound_stream * channel;
-	void *chip;
-};
-
-INLINE tia_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == TIA);
-	return (tia_state *)downcast<tia_device *>(device)->token();
-}
-
-
-static STREAM_UPDATE( tia_update )
-{
-	tia_state *info = (tia_state *)param;
-	tia_process(info->chip, outputs[0], samples);
-}
-
-
-static DEVICE_START( tia )
-{
-	tia_state *info = get_safe_token(device);
-
-	info->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), info, tia_update);
-
-	info->chip = tia_sound_init(device->clock(), device->clock(), 16);
-	assert_always(info->chip != NULL, "Error creating TIA chip");
-}
-
-static DEVICE_STOP( tia )
-{
-	tia_state *info = get_safe_token(device);
-	tia_sound_free(info->chip);
-}
-
-WRITE8_DEVICE_HANDLER( tia_sound_w )
-{
-	tia_state *info = get_safe_token(device);
-	info->channel->update();
-	tia_write(info->chip, offset, data);
-}
-
+// device type definition
 const device_type TIA = &device_creator<tia_device>;
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  tia_device - constructor
+//-------------------------------------------------
 
 tia_device::tia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, TIA, "TIA", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(tia_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tia_device::device_config_complete()
+	  device_sound_interface(mconfig, *this),
+	  m_channel(NULL),
+	  m_chip(NULL)
 {
 }
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -71,8 +29,11 @@ void tia_device::device_config_complete()
 
 void tia_device::device_start()
 {
-	DEVICE_START_NAME( tia )(this);
+	m_channel = stream_alloc(0, 1, clock());
+	m_chip = tia_sound_init(clock(), clock(), 16);
+	assert_always(m_chip != NULL, "Error creating TIA chip");
 }
+
 
 //-------------------------------------------------
 //  device_stop - device-specific stop
@@ -80,8 +41,9 @@ void tia_device::device_start()
 
 void tia_device::device_stop()
 {
-	DEVICE_STOP_NAME( tia )(this);
+	tia_sound_free(m_chip);
 }
+
 
 //-------------------------------------------------
 //  sound_stream_update - handle a stream update
@@ -89,6 +51,12 @@ void tia_device::device_stop()
 
 void tia_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	tia_process(m_chip, outputs[0], samples);
+}
+
+
+WRITE8_MEMBER( tia_device::tia_sound_w )
+{
+	m_channel->update();
+	tia_write(m_chip, offset, data);
 }

@@ -524,6 +524,6 @@ WRITE8_MEMBER(a7800_state::a7800_TIA_w)
 		}
 		break;
 	}
-	tia_sound_w(machine().device("tia"), space, offset, data);
+	machine().device<tia_device>("tia")->tia_sound_w(space, offset, data);
 	m_ROM[offset] = data;
 }

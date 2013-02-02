@@ -236,30 +236,6 @@ complete set of waveforms is repeated R times.
 
 */
 
-
-struct digitalker {
-	const UINT8 *rom;
-	device_t *device;
-	sound_stream *stream;
-
-	// Port/lines state
-	UINT8 data, cs, cms, wr, intr;
-
-	// Current decoding state
-	UINT16 bpos, apos;
-	UINT8 mode, cur_segment, cur_repeat, segments, repeats;
-	UINT8 prev_pitch, pitch, pitch_pos;
-	UINT8 stop_after, cur_dac, cur_bits;
-
-	// Zero-range size
-	UINT32 zero_count; // 0 for done
-
-	// Waveform and current index in it
-	UINT8 dac_index; // 128 for done
-	INT16 dac[128];
-
-};
-
 // Quantized intensity values, first index is the volume, second the
 // intensity (positive half only, real value goes -8..7)
 static const short pcm_levels[8][8] = {
@@ -277,22 +253,44 @@ static const int delta1[16] = { -4, -4, -1, -1, -2, -2, 0, 0, 0, 0, 2, 2, 1, 1, 
 static const int delta2[16] = { 0, -1, -2, -3, 1, 0, -1, -2, 2, 1, 0, -1, 3, 2, 1, 0 };
 
 // Frequency quantizations, values are in units of 128us.
-
 static const int pitch_vals[32] = {
 	97, 95, 92, 89, 87, 84, 82, 80, 77, 75, 73, 71, 69, 67, 65, 63,
 	61, 60, 58, 56, 55, 53, 52, 50, 49, 48, 46, 45, 43, 42, 41, 40
 };
 
 
-INLINE digitalker *get_safe_token(device_t *device)
+const device_type DIGITALKER = &device_creator<digitalker_device>;
+
+digitalker_device::digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, DIGITALKER, "Digitalker", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_rom(NULL),
+	  m_stream(NULL),
+	  m_data(0), 
+	  m_cs(0), 
+	  m_cms(0), 
+	  m_wr(0), 
+	  m_intr(0),
+	  m_bpos(0), 
+	  m_apos(0),
+	  m_mode(0), 
+	  m_cur_segment(0), 
+	  m_cur_repeat(0), 
+	  m_segments(0), 
+	  m_repeats(0),
+	  m_prev_pitch(0), 
+	  m_pitch(0), 
+	  m_pitch_pos(0),
+	  m_stop_after(0), 
+	  m_cur_dac(0), 
+	  m_cur_bits(0),
+	  m_zero_count(0),
+	  m_dac_index(0)
 {
-	assert(device != NULL);
-	assert(device->type() == DIGITALKER);
-	return (digitalker *)downcast<digitalker_device *>(device)->token();
 }
 
 
-static void digitalker_write(digitalker *dg, UINT8 *adr, UINT8 vol, INT8 dac)
+void digitalker_device::digitalker_write(UINT8 *adr, UINT8 vol, INT8 dac)
 {
 	INT16 v;
 	dac &= 15;
@@ -302,10 +300,10 @@ static void digitalker_write(digitalker *dg, UINT8 *adr, UINT8 vol, INT8 dac)
 		v = pcm_levels[vol][dac-1];
 	else
 		v = 0;
-	dg->dac[(*adr)++] = v;
+	m_dac[(*adr)++] = v;
 }
 
-static UINT8 digitalker_pitch_next(UINT8 val, UINT8 prev, int step)
+UINT8 digitalker_device::digitalker_pitch_next(UINT8 val, UINT8 prev, int step)
 {
 	int delta, nv;
 
@@ -323,253 +321,257 @@ static UINT8 digitalker_pitch_next(UINT8 val, UINT8 prev, int step)
 	return nv;
 }
 
-static void digitalker_set_intr(digitalker *dg, UINT8 intr)
+void digitalker_device::digitalker_set_intr(UINT8 intr)
 {
-	dg->intr = intr;
+	m_intr = intr;
 }
 
-static void digitalker_start_command(digitalker *dg, UINT8 cmd)
+void digitalker_device::digitalker_start_command(UINT8 cmd)
 {
-	dg->bpos = ((dg->rom[cmd*2] << 8) | dg->rom[cmd*2+1]) & 0x3fff;
-	dg->cur_segment = dg->segments = dg->cur_repeat = dg->repeats = 0;
-	dg->dac_index = 128;
-	dg->zero_count = 0;
-	digitalker_set_intr(dg, 0);
+	m_bpos = ((m_rom[cmd*2] << 8) | m_rom[cmd*2+1]) & 0x3fff;
+	m_cur_segment = m_segments = m_cur_repeat = m_repeats = 0;
+	m_dac_index = 128;
+	m_zero_count = 0;
+	digitalker_set_intr(0);
 }
 
-static void digitalker_step_mode_0(digitalker *dg)
+void digitalker_device::digitalker_step_mode_0()
 {
 	INT8 dac = 0;
 	int i, k, l;
 	UINT8 wpos = 0;
-	UINT8 h = dg->rom[dg->apos];
+	UINT8 h = m_rom[m_apos];
 	UINT16 bits = 0x80;
 	UINT8 vol = h >> 5;
-	UINT8 pitch_id = dg->cur_segment ? digitalker_pitch_next(h, dg->prev_pitch, dg->cur_repeat) : h & 0x1f;
+	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
 
-	dg->pitch = pitch_vals[pitch_id];
+	m_pitch = pitch_vals[pitch_id];
 
 	for(i=0; i<32; i++)
-		dg->dac[wpos++] = 0;
+		m_dac[wpos++] = 0;
 
 	for(k=1; k != 9; k++) {
-		bits |= dg->rom[dg->apos+k] << 8;
+		bits |= m_rom[m_apos+k] << 8;
 		for(l=0; l<4; l++) {
 			dac += delta1[(bits >> (6+2*l)) & 15];
-			digitalker_write(dg, &wpos, vol, dac);
+			digitalker_write(&wpos, vol, dac);
 		}
 		bits >>= 8;
 	}
 
-	digitalker_write(dg, &wpos, vol, dac);
+	digitalker_write(&wpos, vol, dac);
 
 	for(k=7; k >= 0; k--) {
-		bits = (bits << 8) | (k ? dg->rom[dg->apos+k] : 0x80);
+		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
 		for(l=3; l>=0; l--) {
 			dac -= delta1[(bits >> (6+2*l)) & 15];
-			digitalker_write(dg, &wpos, vol, dac);
+			digitalker_write(&wpos, vol, dac);
 		}
 	}
 
 	for(i=0; i<31; i++)
-		dg->dac[wpos++] = 0;
+		m_dac[wpos++] = 0;
 
-	dg->cur_repeat++;
-	if(dg->cur_repeat == dg->repeats) {
-		dg->apos += 9;
-		dg->prev_pitch = pitch_id;
-		dg->cur_repeat = 0;
-		dg->cur_segment++;
+	m_cur_repeat++;
+	if(m_cur_repeat == m_repeats) {
+		m_apos += 9;
+		m_prev_pitch = pitch_id;
+		m_cur_repeat = 0;
+		m_cur_segment++;
 	}
 }
 
-static void digitalker_step_mode_1(digitalker *dg)
+void digitalker_device::digitalker_step_mode_1()
 {
 	logerror("Digitalker mode 1 unsupported");
-	dg->zero_count = 1;
-	dg->cur_segment = dg->segments;
+	m_zero_count = 1;
+	m_cur_segment = m_segments;
 }
 
-static void digitalker_step_mode_2(digitalker *dg)
+void digitalker_device::digitalker_step_mode_2()
 {
 	INT8 dac = 0;
 	int k, l;
 	UINT8 wpos=0;
-	UINT8 h = dg->rom[dg->apos];
+	UINT8 h = m_rom[m_apos];
 	UINT16 bits = 0x80;
 	UINT8 vol = h >> 5;
-	UINT8 pitch_id = dg->cur_segment ? digitalker_pitch_next(h, dg->prev_pitch, dg->cur_repeat) : h & 0x1f;
+	UINT8 pitch_id = m_cur_segment ? digitalker_pitch_next(h, m_prev_pitch, m_cur_repeat) : h & 0x1f;
 
-	dg->pitch = pitch_vals[pitch_id];
+	m_pitch = pitch_vals[pitch_id];
 
 	for(k=1; k != 9; k++) {
-		bits |= dg->rom[dg->apos+k] << 8;
+		bits |= m_rom[m_apos+k] << 8;
 		for(l=0; l<4; l++) {
 			dac += delta1[(bits >> (6+2*l)) & 15];
-			digitalker_write(dg, &wpos, vol, dac);
+			digitalker_write(&wpos, vol, dac);
 		}
 		bits >>= 8;
 	}
 
-	digitalker_write(dg, &wpos, vol, dac);
+	digitalker_write(&wpos, vol, dac);
 
 	for(k=7; k >= 0; k--) {
 		int limit = k ? 0 : 1;
-		bits = (bits << 8) | (k ? dg->rom[dg->apos+k] : 0x80);
+		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
 		for(l=3; l>=limit; l--) {
 			dac -= delta1[(bits >> (6+2*l)) & 15];
-			digitalker_write(dg, &wpos, vol, dac);
+			digitalker_write(&wpos, vol, dac);
 		}
 	}
 
-	digitalker_write(dg, &wpos, vol, dac);
+	digitalker_write(&wpos, vol, dac);
 
 	for(k=1; k != 9; k++) {
 		int start = k == 1 ? 1 : 0;
-		bits |= dg->rom[dg->apos+k] << 8;
+		bits |= m_rom[m_apos+k] << 8;
 		for(l=start; l<4; l++) {
 			dac += delta1[(bits >> (6+2*l)) & 15];
-			digitalker_write(dg, &wpos, vol, dac);
+			digitalker_write(&wpos, vol, dac);
 		}
 		bits >>= 8;
 	}
 
-	digitalker_write(dg, &wpos, vol, dac);
+	digitalker_write(&wpos, vol, dac);
 
 	for(k=7; k >= 0; k--) {
 		int limit = k ? 0 : 1;
-		bits = (bits << 8) | (k ? dg->rom[dg->apos+k] : 0x80);
+		bits = (bits << 8) | (k ? m_rom[m_apos+k] : 0x80);
 		for(l=3; l>=limit; l--) {
 			dac -= delta1[(bits >> (6+2*l)) & 15];
-			digitalker_write(dg, &wpos, vol, dac);
+			digitalker_write(&wpos, vol, dac);
 		}
 	}
 
-	dg->cur_repeat++;
-	if(dg->cur_repeat == dg->repeats) {
-		dg->apos += 9;
-		dg->prev_pitch = pitch_id;
-		dg->cur_repeat = 0;
-		dg->cur_segment++;
+	m_cur_repeat++;
+	if(m_cur_repeat == m_repeats) {
+		m_apos += 9;
+		m_prev_pitch = pitch_id;
+		m_cur_repeat = 0;
+		m_cur_segment++;
 	}
 }
 
-static void digitalker_step_mode_3(digitalker *dg)
+void digitalker_device::digitalker_step_mode_3()
 {
-	UINT8 h = dg->rom[dg->apos];
+	UINT8 h = m_rom[m_apos];
 	UINT8 vol = h >> 5;
 	UINT16 bits;
 	UINT8 dac, apos, wpos;
 	int k, l;
 
-	dg->pitch = pitch_vals[h & 0x1f];
-	if(dg->cur_segment == 0 && dg->cur_repeat == 0) {
-		dg->cur_bits = 0x40;
-		dg->cur_dac = 0;
+	m_pitch = pitch_vals[h & 0x1f];
+	if(m_cur_segment == 0 && m_cur_repeat == 0) {
+		m_cur_bits = 0x40;
+		m_cur_dac = 0;
 	}
-	bits = dg->cur_bits;
+	bits = m_cur_bits;
 	dac = 0;
 
-	apos = dg->apos + 1 + 32*dg->cur_segment;
+	apos = m_apos + 1 + 32*m_cur_segment;
 	wpos = 0;
 	for(k=0; k != 32; k++) {
-		bits |= dg->rom[apos++] << 8;
+		bits |= m_rom[apos++] << 8;
 		for(l=0; l<4; l++) {
 			dac += delta2[(bits >> (6+2*l)) & 15];
-			digitalker_write(dg, &wpos, vol, dac);
+			digitalker_write(&wpos, vol, dac);
 		}
 		bits >>= 8;
 	}
 
-	dg->cur_bits = bits;
-	dg->cur_dac = dac;
+	m_cur_bits = bits;
+	m_cur_dac = dac;
 
-	dg->cur_segment++;
-	if(dg->cur_segment == dg->segments) {
-		dg->cur_segment = 0;
-		dg->cur_repeat++;
+	m_cur_segment++;
+	if(m_cur_segment == m_segments) {
+		m_cur_segment = 0;
+		m_cur_repeat++;
 	}
 }
 
-static void digitalker_step(digitalker *dg)
+void digitalker_device::digitalker_step()
 {
-	if(dg->cur_segment == dg->segments || dg->cur_repeat == dg->repeats) {
-		if(dg->stop_after == 0 && dg->bpos == 0xffff)
+	if(m_cur_segment == m_segments || m_cur_repeat == m_repeats) {
+		if(m_stop_after == 0 && m_bpos == 0xffff)
 			return;
-		if(dg->stop_after == 0) {
-			UINT8 v1 = dg->rom[dg->bpos++];
-			UINT8 v2 = dg->rom[dg->bpos++];
-			UINT8 v3 = dg->rom[dg->bpos++];
-			dg->apos = v2 | ((v3 << 8) & 0x3f00);
-			dg->segments = (v1 & 15) + 1;
-			dg->repeats = ((v1 >> 4) & 7) + 1;
-			dg->mode = (v3 >> 6) & 3;
-			dg->stop_after = (v1 & 0x80) != 0;
+		if(m_stop_after == 0) {
+			UINT8 v1 = m_rom[m_bpos++];
+			UINT8 v2 = m_rom[m_bpos++];
+			UINT8 v3 = m_rom[m_bpos++];
+			m_apos = v2 | ((v3 << 8) & 0x3f00);
+			m_segments = (v1 & 15) + 1;
+			m_repeats = ((v1 >> 4) & 7) + 1;
+			m_mode = (v3 >> 6) & 3;
+			m_stop_after = (v1 & 0x80) != 0;
 
-			dg->cur_segment = 0;
-			dg->cur_repeat = 0;
+			m_cur_segment = 0;
+			m_cur_repeat = 0;
 
-			if(!dg->apos) {
-				dg->zero_count = 40*128*dg->segments*dg->repeats;
-				dg->segments = 0;
-				dg->repeats = 0;
+			if(!m_apos) {
+				m_zero_count = 40*128*m_segments*m_repeats;
+				m_segments = 0;
+				m_repeats = 0;
 				return;
 			}
-		} else if(dg->stop_after == 1) {
-			dg->bpos = 0xffff;
-			dg->zero_count = 81920;
-			dg->stop_after = 2;
-			dg->cur_segment = 0;
-			dg->cur_repeat = 0;
-			dg->segments = 0;
-			dg->repeats = 0;
+		} else if(m_stop_after == 1) {
+			m_bpos = 0xffff;
+			m_zero_count = 81920;
+			m_stop_after = 2;
+			m_cur_segment = 0;
+			m_cur_repeat = 0;
+			m_segments = 0;
+			m_repeats = 0;
 		} else {
-			dg->stop_after = 0;
-			digitalker_set_intr(dg, 1);
+			m_stop_after = 0;
+			digitalker_set_intr(1);
 		}
 	}
 
-	switch(dg->mode) {
-	case 0: digitalker_step_mode_0(dg); break;
-	case 1: digitalker_step_mode_1(dg); break;
-	case 2: digitalker_step_mode_2(dg); break;
-	case 3: digitalker_step_mode_3(dg); break;
+	switch(m_mode) {
+	case 0: digitalker_step_mode_0(); break;
+	case 1: digitalker_step_mode_1(); break;
+	case 2: digitalker_step_mode_2(); break;
+	case 3: digitalker_step_mode_3(); break;
 	}
-	if(!dg->zero_count)
-		dg->dac_index = 0;
+	if(!m_zero_count)
+		m_dac_index = 0;
 }
 
-static STREAM_UPDATE(digitalker_update)
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void digitalker_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	digitalker *dg = (digitalker *)param;
 	stream_sample_t *sout = outputs[0];
 	int cpos = 0;
 	while(cpos != samples) {
-		if(dg->zero_count == 0 && dg->dac_index == 128)
-			digitalker_step(dg);
+		if(m_zero_count == 0 && m_dac_index == 128)
+			digitalker_step();
 
-		if(dg->zero_count) {
+		if(m_zero_count) {
 			int n = samples - cpos;
 			int i;
-			if(n > dg->zero_count)
-				n = dg->zero_count;
+			if(n > m_zero_count)
+				n = m_zero_count;
 			for(i=0; i != n; i++)
 				sout[cpos++] = 0;
-			dg->zero_count -= n;
+			m_zero_count -= n;
 
-		} else if(dg->dac_index != 128) {
-			while(cpos != samples && dg->dac_index != 128) {
-				short v = dg->dac[dg->dac_index];
-				int pp = dg->pitch_pos;
-				while(cpos != samples && pp != dg->pitch) {
+		} else if(m_dac_index != 128) {
+			while(cpos != samples && m_dac_index != 128) {
+				short v = m_dac[m_dac_index];
+				int pp = m_pitch_pos;
+				while(cpos != samples && pp != m_pitch) {
 					sout[cpos++] = v;
 					pp++;
 				}
-				if(pp == dg->pitch) {
+				if(pp == m_pitch) {
 					pp = 0;
-					dg->dac_index++;
+					m_dac_index++;
 				}
-				dg->pitch_pos = pp;
+				m_pitch_pos = pp;
 			}
 
 		} else {
@@ -579,135 +581,71 @@ static STREAM_UPDATE(digitalker_update)
 	}
 }
 
-static void digitalker_cs_w(digitalker *dg, int line)
+void digitalker_device::digitalker_cs_w(int line)
 {
 	UINT8 cs = line == ASSERT_LINE ? 1 : 0;
-	if(cs == dg->cs)
+	if(cs == m_cs)
 		return;
-	dg->cs = cs;
+	m_cs = cs;
 	if(cs)
 		return;
-	if(!dg->wr) {
-		if(dg->cms)
-			digitalker_set_intr(dg, 1);
+	if(!m_wr) {
+		if(m_cms)
+			digitalker_set_intr(1);
 		else
-			digitalker_start_command(dg, dg->data);
+			digitalker_start_command(m_data);
 	}
 }
 
-static void digitalker_cms_w(digitalker *dg, int line)
+void digitalker_device::digitalker_cms_w(int line)
 {
-	dg->cms = line == ASSERT_LINE ? 1 : 0;
+	m_cms = line == ASSERT_LINE ? 1 : 0;
 }
 
-static void digitalker_wr_w(digitalker *dg, int line)
+void digitalker_device::digitalker_wr_w(int line)
 {
 	UINT8 wr = line == ASSERT_LINE ? 1 : 0;
-	if(wr == dg->wr)
+	if(wr == m_wr)
 		return;
-	dg->wr = wr;
-	if(wr || dg->cs)
+	m_wr = wr;
+	if(wr || m_cs)
 		return;
-	if(dg->cms)
-		digitalker_set_intr(dg, 1);
+	if(m_cms)
+		digitalker_set_intr(1);
 	else
-		digitalker_start_command(dg, dg->data);
+		digitalker_start_command(m_data);
 }
 
-static int digitalker_intr_r(digitalker *dg)
+int digitalker_device::digitalker_intr_r()
 {
-	return dg->intr ? ASSERT_LINE : CLEAR_LINE;
+	return m_intr ? ASSERT_LINE : CLEAR_LINE;
 }
 
-static void digitalker_register_for_save(digitalker *dg)
+void digitalker_device::digitalker_register_for_save()
 {
-	dg->device->save_item(NAME(dg->data));
-	dg->device->save_item(NAME(dg->cs));
-	dg->device->save_item(NAME(dg->cms));
-	dg->device->save_item(NAME(dg->wr));
-	dg->device->save_item(NAME(dg->intr));
-	dg->device->save_item(NAME(dg->bpos));
-	dg->device->save_item(NAME(dg->apos));
-	dg->device->save_item(NAME(dg->mode));
-	dg->device->save_item(NAME(dg->cur_segment));
-	dg->device->save_item(NAME(dg->cur_repeat));
-	dg->device->save_item(NAME(dg->segments));
-	dg->device->save_item(NAME(dg->repeats));
-	dg->device->save_item(NAME(dg->prev_pitch));
-	dg->device->save_item(NAME(dg->pitch));
-	dg->device->save_item(NAME(dg->pitch_pos));
-	dg->device->save_item(NAME(dg->stop_after));
-	dg->device->save_item(NAME(dg->cur_dac));
-	dg->device->save_item(NAME(dg->cur_bits));
-	dg->device->save_item(NAME(dg->zero_count));
-	dg->device->save_item(NAME(dg->dac_index));
-	dg->device->save_item(NAME(dg->dac));
+	save_item(NAME(m_data));
+	save_item(NAME(m_cs));
+	save_item(NAME(m_cms));
+	save_item(NAME(m_wr));
+	save_item(NAME(m_intr));
+	save_item(NAME(m_bpos));
+	save_item(NAME(m_apos));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_cur_segment));
+	save_item(NAME(m_cur_repeat));
+	save_item(NAME(m_segments));
+	save_item(NAME(m_repeats));
+	save_item(NAME(m_prev_pitch));
+	save_item(NAME(m_pitch));
+	save_item(NAME(m_pitch_pos));
+	save_item(NAME(m_stop_after));
+	save_item(NAME(m_cur_dac));
+	save_item(NAME(m_cur_bits));
+	save_item(NAME(m_zero_count));
+	save_item(NAME(m_dac_index));
+	save_item(NAME(m_dac));
 }
 
-static DEVICE_START(digitalker)
-{
-	digitalker *dg = get_safe_token(device);
-	dg->device = device;
-	dg->rom = device->machine().root_device().memregion(device->tag())->base();
-	dg->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock()/4, dg, digitalker_update);
-	dg->dac_index = 128;
-	dg->data = 0xff;
-	dg->cs = dg->cms = dg->wr = 1;
-	dg->bpos = 0xffff;
-	digitalker_set_intr(dg, 1);
-
-	digitalker_register_for_save(dg);
-}
-
-void digitalker_0_cs_w(device_t *device, int line)
-{
-	digitalker *dg = get_safe_token(device);
-	digitalker_cs_w(dg, line);
-}
-
-void digitalker_0_cms_w(device_t *device, int line)
-{
-	digitalker *dg = get_safe_token(device);
-	digitalker_cms_w(dg, line);
-}
-
-void digitalker_0_wr_w(device_t *device, int line)
-{
-	digitalker *dg = get_safe_token(device);
-	digitalker_wr_w(dg, line);
-}
-
-int digitalker_0_intr_r(device_t *device)
-{
-	digitalker *dg = get_safe_token(device);
-	return digitalker_intr_r(dg);
-}
-
-WRITE8_DEVICE_HANDLER( digitalker_data_w )
-{
-	digitalker *dg = get_safe_token(device);
-	dg->data = data;
-}
-
-
-const device_type DIGITALKER = &device_creator<digitalker_device>;
-
-digitalker_device::digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DIGITALKER, "Digitalker", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(digitalker);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void digitalker_device::device_config_complete()
-{
-}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -715,15 +653,39 @@ void digitalker_device::device_config_complete()
 
 void digitalker_device::device_start()
 {
-	DEVICE_START_NAME( digitalker )(this);
+	m_rom = machine().root_device().memregion(tag())->base();
+	m_stream = stream_alloc(0, 1, clock()/4);
+	m_dac_index = 128;
+	m_data = 0xff;
+	m_cs = m_cms = m_wr = 1;
+	m_bpos = 0xffff;
+	digitalker_set_intr(1);
+
+	digitalker_register_for_save();
 }
 
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void digitalker_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void digitalker_device::digitalker_0_cs_w(int line)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	digitalker_cs_w(line);
 }
+
+void digitalker_device::digitalker_0_cms_w(int line)
+{
+	digitalker_cms_w(line);
+}
+
+void digitalker_device::digitalker_0_wr_w(int line)
+{
+	digitalker_wr_w(line);
+}
+
+int digitalker_device::digitalker_0_intr_r()
+{
+	return digitalker_intr_r();
+}
+
+WRITE8_MEMBER( digitalker_device::digitalker_data_w )
+{
+	m_data = data;
+}
+

@@ -266,10 +266,10 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
         ---- ---- ---- ---0     Coin #0 Counter     */
 			if (ACCESSING_BITS_0_7)
 			{
-				device_t *x1_010 = machine().device("x1snd");
+				x1_010_device *x1_010 = machine().device<x1_010_device>("x1snd");
 				seta_coin_lockout_w (machine(), data & 0x0f);
 				if (x1_010 != NULL)
-					seta_sound_enable_w (x1_010, data & 0x20);
+					x1_010->seta_sound_enable_w (data & 0x20);
 				coin_counter_w(machine(), 0,data & 0x01);
 				coin_counter_w(machine(), 1,data & 0x02);
 			}

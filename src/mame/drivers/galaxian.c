@@ -1031,16 +1031,16 @@ WRITE8_MEMBER(galaxian_state::scorpion_protection_w)
 
 READ8_MEMBER(galaxian_state::scorpion_digitalker_intr_r)
 {
-	device_t *digitalker = machine().device("digitalker");
-	return digitalker_0_intr_r(digitalker);
+	digitalker_device *digitalker = machine().device<digitalker_device>("digitalker");
+	return digitalker->digitalker_0_intr_r();
 }
 
 WRITE8_MEMBER(galaxian_state::scorpion_digitalker_control_w)
 {
-	device_t *device = machine().device("digitalker");
-	digitalker_0_cs_w(device, data & 1 ? ASSERT_LINE : CLEAR_LINE);
-	digitalker_0_cms_w(device, data & 2 ? ASSERT_LINE : CLEAR_LINE);
-	digitalker_0_wr_w(device, data & 4 ? ASSERT_LINE : CLEAR_LINE);
+	digitalker_device *device = machine().device<digitalker_device>("digitalker");
+	device->digitalker_0_cs_w(data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	device->digitalker_0_cms_w(data & 2 ? ASSERT_LINE : CLEAR_LINE);
+	device->digitalker_0_wr_w(data & 4 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static I8255A_INTERFACE( scorpion_ppi8255_1_intf )
@@ -2004,7 +2004,7 @@ static const ay8910_interface scorpion_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_HANDLER("digitalker", digitalker_data_w),
+	DEVCB_DEVICE_MEMBER("digitalker", digitalker_device, digitalker_data_w),
 	DEVCB_DRIVER_MEMBER(galaxian_state,scorpion_digitalker_control_w)
 };
 
@@ -2416,7 +2416,7 @@ static MACHINE_CONFIG_DERIVED( scorpion, theend )
 	MCFG_SOUND_CONFIG(scorpion_ay8910_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("digitalker", DIGITALKER, 4000000)
+	MCFG_DIGITALKER_ADD("digitalker", 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 

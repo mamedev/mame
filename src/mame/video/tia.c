@@ -1804,7 +1804,7 @@ WRITE8_MEMBER( tia_video_device::write )
 	case 0x18: /* AUDF1 */
 	case 0x19: /* AUDV0 */
 	case 0x1A: /* AUDV1 */
-		tia_sound_w(machine().device("tia"), space, offset, data);
+		machine().device<tia_device>("tia")->tia_sound_w(space, offset, data);
 		break;
 
 	case 0x1B:
