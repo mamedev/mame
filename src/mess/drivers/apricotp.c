@@ -155,7 +155,7 @@ READ8_MEMBER( fp_state::prtr_snd_r )
 
 WRITE8_MEMBER( fp_state::pint_clr_w )
 {
-	pic8259_ir6_w(m_pic, CLEAR_LINE);
+	m_pic->ir6_w(CLEAR_LINE);
 }
 
 
@@ -452,7 +452,7 @@ static const struct pit8253_config pit_intf =
 		{
 			2000000,
 			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir0_w)
 		}, {
 			2000000,
 			DEVCB_LINE_VCC,
@@ -473,7 +473,7 @@ static const struct pit8253_config pit_intf =
 static I8237_INTERFACE( dmac_intf )
 {
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir7_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir7_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	{ DEVCB_NULL, DEVCB_DEVICE_MEMBER(WD2797_TAG, wd_fdc_t, data_r), DEVCB_NULL, DEVCB_NULL },
@@ -504,7 +504,7 @@ static Z80DART_INTERFACE( sio_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir4_w)
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir4_w)
 };
 
 

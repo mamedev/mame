@@ -277,9 +277,9 @@ WRITE8_MEMBER( trs80m16_state::tcl_w )
 	m_subcpu->set_input_line(INPUT_LINE_HALT, BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 
-	pic8259_ir0_w(m_pic, BIT(data, 4));
-	pic8259_ir1_w(m_pic, BIT(data, 5));
-	pic8259_ir2_w(m_pic, BIT(data, 6));
+	m_pic->ir0_w(BIT(data, 4));
+	m_pic->ir1_w(BIT(data, 5));
+	m_pic->ir2_w(BIT(data, 6));
 
 	m_ual = (m_ual & 0x1fe) | BIT(data, 7);
 }

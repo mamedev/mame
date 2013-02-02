@@ -337,7 +337,7 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 	}
 
 	// s? interrupt
-	pic8259_ir7_w(m_pic, BIT(data, 2));
+	m_pic->ir7_w(BIT(data, 2));
 
 	// processor LED
 	output_set_led_value(0, BIT(data, 3));
@@ -349,13 +349,13 @@ WRITE8_MEMBER( sage2_state::ppi1_pc_w )
 	if (!BIT(data, 6))
 	{
 		// clear ACK interrupt
-		pic8259_ir5_w(m_pic, CLEAR_LINE);
+		m_pic->ir5_w(CLEAR_LINE);
 	}
 
 	if (!BIT(data, 7))
 	{
 		// clear modem interrupt
-		pic8259_ir4_w(m_pic, CLEAR_LINE);
+		m_pic->ir4_w(CLEAR_LINE);
 	}
 }
 
@@ -380,7 +380,7 @@ static const struct pit8253_config pit0_intf =
 		{
 			0, // from U75 OUT0
 			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE(I8259_TAG, pic8259_ir6_w)
+			DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir6_w)
 		}, {
 			XTAL_16MHz/2/125,
 			DEVCB_LINE_VCC,
@@ -388,7 +388,7 @@ static const struct pit8253_config pit0_intf =
 		}, {
 			0, // from OUT2
 			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE(I8259_TAG, pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir0_w)
 		}
 	}
 };
@@ -442,7 +442,7 @@ static const i8251_interface usart0_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_5),
-	DEVCB_DEVICE_LINE(I8259_TAG, pic8259_ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir2_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -459,8 +459,8 @@ static const i8251_interface usart1_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(I8259_TAG, pic8259_ir1_w),
-	DEVCB_DEVICE_LINE(I8259_TAG, pic8259_ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir1_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259_TAG, pic8259_device, ir3_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -494,7 +494,7 @@ WRITE_LINE_MEMBER( sage2_state::ack_w )
 {
 	if (!state)
 	{
-		pic8259_ir5_w(m_pic, ASSERT_LINE);
+		m_pic->ir5_w(ASSERT_LINE);
 	}
 }
 

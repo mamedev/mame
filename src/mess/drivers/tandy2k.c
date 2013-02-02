@@ -158,7 +158,7 @@ WRITE8_MEMBER( tandy2k_state::dma_mux_w )
 
 	int dme = (drq0 > 2) || (drq1 > 2);
 
-	pic8259_ir6_w(m_pic1, dme);
+	m_pic1->ir6_w(dme);
 }
 
 READ8_MEMBER( tandy2k_state::kbint_clr_r )
@@ -166,7 +166,7 @@ READ8_MEMBER( tandy2k_state::kbint_clr_r )
 	if (m_pb_sel == KBDINEN)
 	{
 		m_kb->busy_w(1);
-		pic8259_ir0_w(m_pic1, CLEAR_LINE);
+		m_pic1->ir0_w(CLEAR_LINE);
 	}
 
 	return 0xff;
@@ -357,7 +357,7 @@ static CRT9007_INTERFACE( vpac_intf )
 {
 	SCREEN_TAG,
 	10,
-	DEVCB_DEVICE_LINE(I8259A_1_TAG, pic8259_ir1_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_1_TAG, pic8259_device, ir1_w),
 	DEVCB_NULL, // DMAR     80186 HOLD
 	DEVCB_DEVICE_LINE_MEMBER(CRT9021B_TAG, crt9021_device, vsync_w), // VS
 	DEVCB_NULL, // HS
@@ -400,13 +400,13 @@ static CRT9021_INTERFACE( vac_intf )
 WRITE_LINE_MEMBER( tandy2k_state::rxrdy_w )
 {
 	m_rxrdy = state;
-	pic8259_ir2_w(m_pic0, m_rxrdy | m_txrdy);
+	m_pic0->ir2_w(m_rxrdy || m_txrdy);
 }
 
 WRITE_LINE_MEMBER( tandy2k_state::txrdy_w )
 {
 	m_txrdy = state;
-	pic8259_ir2_w(m_pic0, m_rxrdy | m_txrdy);
+	m_pic0->ir2_w(m_rxrdy || m_txrdy);
 }
 
 static const i8251_interface usart_intf =
@@ -537,7 +537,7 @@ WRITE8_MEMBER( tandy2k_state::ppi_pc_w )
 	m_pb_sel = (data >> 1) & 0x03;
 
 	// interrupt
-	pic8259_ir3_w(m_pic1, BIT(data, 3));
+	m_pic1->ir3_w(BIT(data, 3));
 
 	// printer strobe
 	m_centronics->strobe_w(BIT(data, 7));
@@ -599,7 +599,7 @@ static const struct pic8259_interface pic1_intf =
 
 void tandy2k_state::fdc_irq(bool state)
 {
-	pic8259_ir4_w(m_pic0, state);
+	m_pic0->ir4_w(state);
 }
 
 void tandy2k_state::fdc_drq(bool state)
@@ -638,7 +638,7 @@ WRITE_LINE_MEMBER( tandy2k_state::kbddat_w )
 	if (!m_kbddat && state)
 	{
 		m_kb->busy_w(m_kbdclk);
-		pic8259_ir0_w(m_pic1, !m_kbdclk);
+		m_pic1->ir0_w(!m_kbdclk);
 	}
 
 	m_kbddat = state;

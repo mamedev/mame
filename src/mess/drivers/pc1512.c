@@ -60,7 +60,7 @@ READ8_MEMBER( pc1512_state::system_r )
 			data = m_kbd;
 			m_kb_bits = 0;
 			m_kb->data_w(1);
-			pic8259_ir1_w(m_pic, CLEAR_LINE);
+			m_pic->ir1_w(CLEAR_LINE);
 		}
 		break;
 
@@ -766,7 +766,7 @@ WRITE_LINE_MEMBER( pc1512_state::kbclk_w )
 		if (m_kb_bits == 8)
 		{
 			m_kb->data_w(0);
-			pic8259_ir1_w(m_pic, ASSERT_LINE);
+			m_pic->ir1_w(ASSERT_LINE);
 		}
 	}
 
@@ -956,7 +956,7 @@ static const struct pit8253_config pit_intf =
 		{
 			XTAL_28_63636MHz/24,
 			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE(I8259A2_TAG, pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER(I8259A2_TAG, pic8259_device, ir0_w)
 		}, {
 			XTAL_28_63636MHz/24,
 			DEVCB_LINE_VCC,
@@ -976,7 +976,7 @@ static const struct pit8253_config pit_intf =
 
 static const struct mc146818_interface rtc_intf =
 {
-	DEVCB_DEVICE_LINE(I8259A2_TAG, pic8259_ir2_w)
+	DEVCB_DEVICE_LINE_MEMBER(I8259A2_TAG, pic8259_device, ir2_w)
 };
 
 
@@ -987,9 +987,9 @@ static const struct mc146818_interface rtc_intf =
 void pc1512_state::update_fdc_int()
 {
 	if (m_nden)
-		pic8259_ir6_w(m_pic, m_dint);
+		m_pic->ir6_w(m_dint);
 	else
-		pic8259_ir6_w(m_pic, CLEAR_LINE);
+		m_pic->ir6_w(CLEAR_LINE);
 }
 
 void pc1512_state::update_fdc_drq()
@@ -1021,7 +1021,7 @@ static const ins8250_interface uart_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(I8259A2_TAG, pic8259_ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A2_TAG, pic8259_device, ir4_w),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -1034,9 +1034,9 @@ static const ins8250_interface uart_intf =
 void pc1512_state::update_ack()
 {
 	if (m_ack_int_enable)
-		pic8259_ir7_w(m_pic, m_ack);
+		m_pic->ir7_w(m_ack);
 	else
-		pic8259_ir7_w(m_pic, CLEAR_LINE);
+		m_pic->ir7_w(CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER( pc1512_state::ack_w )
@@ -1064,12 +1064,12 @@ SLOT_INTERFACE_END
 static const isa8bus_interface isabus_intf =
 {
 	// interrupts
-	DEVCB_DEVICE_LINE(I8259A2_TAG, pic8259_ir2_w),
-	DEVCB_DEVICE_LINE(I8259A2_TAG, pic8259_ir3_w),
-	DEVCB_DEVICE_LINE(I8259A2_TAG, pic8259_ir4_w),
-	DEVCB_DEVICE_LINE(I8259A2_TAG, pic8259_ir5_w),
-	DEVCB_DEVICE_LINE(I8259A2_TAG, pic8259_ir6_w),
-	DEVCB_DEVICE_LINE(I8259A2_TAG, pic8259_ir7_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A2_TAG, pic8259_device, ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A2_TAG, pic8259_device, ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A2_TAG, pic8259_device, ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A2_TAG, pic8259_device, ir5_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A2_TAG, pic8259_device, ir6_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A2_TAG, pic8259_device, ir7_w),
 
 	// dma request
 	DEVCB_DEVICE_LINE_MEMBER(I8237A5_TAG, am9517a_device, dreq1_w),
