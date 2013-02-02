@@ -184,6 +184,11 @@ public:
 	// construction/destruction
 	z80dart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	DECLARE_READ8_MEMBER( cd_ba_r );
+	DECLARE_WRITE8_MEMBER( cd_ba_w );
+	DECLARE_READ8_MEMBER( ba_cd_r );
+	DECLARE_WRITE8_MEMBER( ba_cd_w );
+
 	// control register access
 	UINT8 control_read(int which) { return m_channel[which].control_read(); }
 	void control_write(int which, UINT8 data) { return m_channel[which].control_write(data); }

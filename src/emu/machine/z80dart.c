@@ -1480,3 +1480,33 @@ WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w )
 	else
 		z80dart_d_w(device, space, channel, data);
 }
+
+READ8_MEMBER( z80dart_device::cd_ba_r )
+{
+	return (offset & 2) ? control_read(offset & 1) : data_read(offset & 1);
+}
+
+WRITE8_MEMBER( z80dart_device::cd_ba_w )
+{
+	if (offset & 2)
+		control_write(offset & 1, data);
+	else
+		data_write(offset & 1, data);
+}
+
+READ8_MEMBER( z80dart_device::ba_cd_r )
+{
+	int channel = BIT(offset, 1);
+
+	return (offset & 1) ? control_read(channel) : data_read(channel);
+}
+
+WRITE8_MEMBER( z80dart_device::ba_cd_w )
+{
+	int channel = BIT(offset, 1);
+
+	if (offset & 1)
+		control_write(channel, data);
+	else
+		data_write(channel, data);
+}
