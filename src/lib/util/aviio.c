@@ -54,7 +54,7 @@
 #define FOUR_GB                 ((UINT64)1 << 32)
 
 #define MAX_SOUND_CHANNELS      2
-#define SOUND_BUFFER_MSEC       2000        /* microseconds of sond buffering */
+#define SOUND_BUFFER_MSEC       2000        /* milliseconds of sound buffering */
 
 #define CHUNKTYPE_RIFF          AVI_FOURCC('R','I','F','F')
 #define CHUNKTYPE_LIST          AVI_FOURCC('L','I','S','T')
@@ -541,7 +541,7 @@ error:
 
 
 /*-------------------------------------------------
-    avi_create - create a new QuickTime movie file
+    avi_create - create a new AVI movie file
 -------------------------------------------------*/
 
 avi_error avi_create(const char *filename, const avi_movie_info *info, avi_file **file)
@@ -648,7 +648,7 @@ error:
 
 
 /*-------------------------------------------------
-    avi_close - close a QuickTime movie file
+    avi_close - close an AVI movie file
 -------------------------------------------------*/
 
 avi_error avi_close(avi_file *file)
@@ -980,14 +980,19 @@ avi_error avi_append_video_frame(avi_file *file, bitmap_yuy16 &bitmap)
 	if (avierr != AVIERR_NONE)
 		return avierr;
 
-	/* set the info for this new chunk */
-	avierr = set_stream_chunk_info(stream, stream->chunks, file->writeoffs, maxlength + 8);
+	/* write the data */
+	avierr = chunk_write(file, get_chunkid_for_stream(file, stream), file->tempbuffer, maxlength);
 	if (avierr != AVIERR_NONE)
 		return avierr;
+
+	/* set the info for this new chunk */
+	avierr = set_stream_chunk_info(stream, stream->chunks, file->writeoffs - maxlength - 8, maxlength + 8);
+	if (avierr != AVIERR_NONE)
+		return avierr;
+
 	stream->samples = file->info.video_numsamples = stream->chunks;
 
-	/* write the data */
-	return chunk_write(file, get_chunkid_for_stream(file, stream), file->tempbuffer, maxlength);
+	return AVIERR_NONE;
 }
 
 
@@ -1026,14 +1031,19 @@ avi_error avi_append_video_frame(avi_file *file, bitmap_rgb32 &bitmap)
 	if (avierr != AVIERR_NONE)
 		return avierr;
 
-	/* set the info for this new chunk */
-	avierr = set_stream_chunk_info(stream, stream->chunks, file->writeoffs, maxlength + 8);
+	/* write the data */
+	avierr = chunk_write(file, get_chunkid_for_stream(file, stream), file->tempbuffer, maxlength);
 	if (avierr != AVIERR_NONE)
 		return avierr;
+
+	/* set the info for this new chunk */
+	avierr = set_stream_chunk_info(stream, stream->chunks, file->writeoffs - maxlength - 8, maxlength + 8);
+	if (avierr != AVIERR_NONE)
+		return avierr;
+
 	stream->samples = file->info.video_numsamples = stream->chunks;
 
-	/* write the data */
-	return chunk_write(file, get_chunkid_for_stream(file, stream), file->tempbuffer, maxlength);
+	return AVIERR_NONE;
 }
 
 
@@ -2210,7 +2220,6 @@ static avi_error soundbuf_write_chunk(avi_file *file, UINT32 framenum)
 {
 	avi_stream *stream = get_audio_stream(file, 0, NULL);
 	avi_error avierr;
-	UINT32 chunknum;
 	UINT32 length;
 
 	/* skip if no audio stream */
@@ -2224,14 +2233,13 @@ static avi_error soundbuf_write_chunk(avi_file *file, UINT32 framenum)
 		length = framenum_to_samplenum(file, framenum + 1 + file->soundbuf_frames) - framenum_to_samplenum(file, framenum + file->soundbuf_frames);
 	length *= stream->channels * sizeof(INT16);
 
-	/* set the info for this new chunk */
-	chunknum = stream->chunks;
-	avierr = set_stream_chunk_info(stream, chunknum, file->writeoffs, length + 8);
+	/* then do the initial write */
+	avierr = chunk_write(file, get_chunkid_for_stream(file, stream), file->soundbuf, length);
 	if (avierr != AVIERR_NONE)
 		return avierr;
 
-	/* then do the initial write */
-	return chunk_overwrite(file, get_chunkid_for_stream(file, stream), file->soundbuf, length, &stream->chunk[chunknum].offset, TRUE);
+	/* set the info for this new chunk */
+	return set_stream_chunk_info(stream, stream->chunks, file->writeoffs - length - 8, length + 8);
 }
 
 
