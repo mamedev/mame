@@ -385,7 +385,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 static void ppan_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m92_state *state = machine.driver_data<m92_state>();
-	UINT16 *source = state->m_spriteram->buffer(); // sprite buffer control is never triggered
+	UINT16 *source = state->m_spriteram->live(); // sprite buffer control is never triggered
 	int offs, layer;
 
 	for (layer = 0; layer < 8; layer++)
