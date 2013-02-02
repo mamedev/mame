@@ -2675,23 +2675,6 @@ READ8_MEMBER(namcos22_state::propcycle_mcu_adc_r)
 	switch (offset)
 	{
 		case 0:
-			// also update the pedal here
-			//
-			// this is a wee bit hackish: the way it actually works is like so:
-			// the pedal has a simple 1-bit "light interrupted" sensor.  the faster you pedal,
-			// the faster it pulses.  this is connected to the clock input for timer A3,
-			// and timer A3 is configured by the MCU program to cause an interrupt each time
-			// it's clocked.  by counting the number of interrupts in a frame, we can determine
-			// how fast the user is pedaling.
-			if( ioport("JOY")->read() & 0x10 )
-			{
-				int i;
-				for (i = 0; i < 16; i++)
-				{
-					generic_pulse_irq_line(m_mcu, M37710_LINE_TIMERA3TICK, 1);
-				}
-			}
-
 			return (ddx & 0xff);
 		case 1:
 			return (ddx>>8);
@@ -3087,6 +3070,47 @@ static MACHINE_CONFIG_DERIVED( adillor, namcos22s )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("ar_tb_upd", namcos22_state, adillor_trackball_update, attotime::from_msec(20))
 
 	MCFG_MACHINE_START_OVERRIDE(namcos22_state,adillor)
+MACHINE_CONFIG_END
+
+
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_interrupt)
+{
+	generic_pulse_irq_line(m_mcu, M37710_LINE_TIMERA3TICK, 1);
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
+{
+	// arbitrary timer for reading optical pedal
+	UINT8 i = ioport("PEDAL")->read();
+	
+	if (i != 0)
+	{
+		// the pedal has a simple 1-bit "light interrupted" sensor.  the faster you pedal,
+		// the faster it pulses.  this is connected to the clock input for timer A3,
+		// and timer A3 is configured by the MCU program to cause an interrupt each time
+		// it's clocked.  by counting the number of interrupts in a frame, we can determine
+		// how fast the user is pedaling.
+
+		// these values(in usec) may need tweaking:
+		const int base = 1000;
+		const int range = 10000;
+
+		attotime freq = attotime::from_usec(base + range * (1.0 / (double)i));
+		m_pc_pedal_interrupt->adjust(min(freq, m_pc_pedal_interrupt->time_left()), 0, freq);
+
+	}
+	else
+	{
+		// not moving
+		m_pc_pedal_interrupt->adjust(attotime::never, 0, attotime::never);
+	}
+}
+
+static MACHINE_CONFIG_DERIVED( propcycl, namcos22s )
+
+	/* basic machine hardware */
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("pc_p_upd", namcos22_state, propcycl_pedal_update, attotime::from_msec(20))
+	MCFG_TIMER_DRIVER_ADD("pc_p_int", namcos22_state, propcycl_pedal_interrupt)
 MACHINE_CONFIG_END
 
 /*********************************************************************************/
@@ -5270,13 +5294,8 @@ static INPUT_PORTS_START( propcycl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_START("PEDAL")
+	PORT_BIT( 0x7f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
 	PORT_START("STICKX")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
@@ -5925,7 +5944,7 @@ GAME( 1995, cybrcycc, 0,         namcos22s, cybrcycc,  namcos22_state, cybrcyc, 
 GAME( 1995, dirtdash, 0,         namcos22s, dirtdash,  namcos22_state, dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2)"                   , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
 GAME( 1995, timecris, 0,         timecris,  timecris,  namcos22_state, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B)"           , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
 GAME( 1995, timecrisa,timecris,  timecris,  timecris,  namcos22_state, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.A)"           , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
-GAME( 1996, propcycl, 0,         namcos22s, propcycl,  namcos22_state, propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A)"            , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
+GAME( 1996, propcycl, 0,         propcycl,  propcycl,  namcos22_state, propcycl, ROT0, "Namco", "Prop Cycle (Rev. PR2 Ver.A)"            , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
 GAME( 1996, alpinesa, 0,         namcos22s, alpiner,   namcos22_state, alpinesa, ROT0, "Namco", "Alpine Surfer (Rev. AF2 Ver.A)"         , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 96/07/01 15:19:23. major gfx problems, slave dsp?
 GAME( 1996, tokyowar, 0,         namcos22s, tokyowar,  namcos22_state, tokyowar, ROT0, "Namco", "Tokyo Wars (Rev. TW2 Ver.A)"            , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // 96/09/03 14:08:47. near-invincible tanks, maybe related to timecris helicopter bug?
 GAME( 1996, aquajet,  0,         namcos22s, aquajet,   namcos22_state, aquajet,  ROT0, "Namco", "Aqua Jet (Rev. AJ2 Ver.B)"              , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30

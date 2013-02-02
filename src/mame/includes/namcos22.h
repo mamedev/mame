@@ -53,7 +53,8 @@ public:
 		m_vics_control(*this,"vics_control"),
 		m_czattr(*this,"czattr"),
 		m_tilemapattr(*this,"tilemapattr"),
-		m_czram(*this,"czram")
+		m_czram(*this,"czram"),
+		m_pc_pedal_interrupt(*this, "pc_p_int")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -76,6 +77,7 @@ public:
 	optional_shared_ptr<UINT32> m_czattr;
 	required_shared_ptr<UINT32> m_tilemapattr;
 	optional_shared_ptr<UINT32> m_czram;
+	optional_device<timer_device> m_pc_pedal_interrupt;
 
 	int m_bEnableDspIrqs;
 	emu_timer *m_ar_tb_interrupt[2];
@@ -267,6 +269,8 @@ public:
 	INTERRUPT_GEN_MEMBER(namcos22_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(adillor_trackball_update);
 	TIMER_CALLBACK_MEMBER(adillor_trackball_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(propcycl_pedal_update);
+	TIMER_DEVICE_CALLBACK_MEMBER(propcycl_pedal_interrupt);
 	TIMER_CALLBACK_MEMBER(alpine_steplock_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_master_serial_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_slave_serial_irq);
