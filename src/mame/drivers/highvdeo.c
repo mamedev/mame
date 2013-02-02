@@ -101,13 +101,13 @@ public:
 	UINT16 m_vblank_bit;
 	UINT16 m_brasil_prot_latch;
 	struct { int r,g,b,offs,offs_internal; } m_pal;
+	DECLARE_READ16_MEMBER(read0_r);
 	DECLARE_READ16_MEMBER(read1_r);
 	DECLARE_READ16_MEMBER(read2_r);
-	DECLARE_READ16_MEMBER(read3_r);
 	DECLARE_WRITE16_MEMBER(tv_vcf_paletteram_w);
 	DECLARE_WRITE16_MEMBER(tv_vcf_bankselect_w);
 	DECLARE_WRITE16_MEMBER(write1_w);
-	DECLARE_READ16_MEMBER(tv_ncf_read2_r);
+	DECLARE_READ16_MEMBER(tv_ncf_read1_r);
 	DECLARE_WRITE16_MEMBER(tv_tcf_paletteram_w);
 	DECLARE_WRITE16_MEMBER(tv_tcf_bankselect_w);
 	DECLARE_READ16_MEMBER(newmcard_status_r);
@@ -199,17 +199,17 @@ UINT32 highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb32 
 
 
 
-READ16_MEMBER(highvdeo_state::read1_r)
+READ16_MEMBER(highvdeo_state::read0_r)
 {
 	return ioport("IN0")->read();
 }
 
-READ16_MEMBER(highvdeo_state::read2_r)
+READ16_MEMBER(highvdeo_state::read1_r)
 {
 	return ioport("IN1")->read();
 }
 
-READ16_MEMBER(highvdeo_state::read3_r)
+READ16_MEMBER(highvdeo_state::read2_r)
 {
 	return ioport("IN2")->read();
 }
@@ -315,15 +315,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tv_vcf_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
 	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ(read1_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ(read2_r )
-	AM_RANGE(0x000c, 0x000d) AM_READ(read3_r )
+	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
+	AM_RANGE(0x000a, 0x000b) AM_READ(read1_r )
+	AM_RANGE(0x000c, 0x000d) AM_READ(read2_r )
 	AM_RANGE(0x0010, 0x0015) AM_WRITE(tv_vcf_paletteram_w )
 	AM_RANGE(0x0030, 0x0031) AM_WRITE(tv_vcf_bankselect_w ) AM_READ(tv_oki6376_r )
 ADDRESS_MAP_END
 
 
-READ16_MEMBER(highvdeo_state::tv_ncf_read2_r)
+READ16_MEMBER(highvdeo_state::tv_ncf_read1_r)
 {
 	static int resetpulse = 0;
 
@@ -365,10 +365,33 @@ static ADDRESS_MAP_START( tv_ncf_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
 	AM_RANGE(0x0008, 0x0009) AM_WRITE(tv_ncf_oki6376_w )
 	AM_RANGE(0x000a, 0x000b) AM_WRITE(tv_ncf_oki6376_st_w )
-	AM_RANGE(0x000c, 0x000d) AM_READ(read1_r )
-	AM_RANGE(0x0010, 0x0011) AM_READ(tv_ncf_read2_r )
-	AM_RANGE(0x0012, 0x0013) AM_READ(read3_r )
+	AM_RANGE(0x000c, 0x000d) AM_READ(read0_r )
+	AM_RANGE(0x0010, 0x0011) AM_READ(tv_ncf_read1_r )
+	AM_RANGE(0x0012, 0x0013) AM_READ(read2_r )
 	AM_RANGE(0x0030, 0x0035) AM_WRITE(tv_vcf_paletteram_w )
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( nyjoker_map, AS_PROGRAM, 16, highvdeo_state )
+	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
+	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_SHARE("blit_ram") /*blitter ram*/
+	AM_RANGE(0x40000, 0xbffff) AM_ROM AM_REGION("user1",0x40000)
+	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( nyjoker_io, AS_IO, 16, highvdeo_state )
+//	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
+//	AM_RANGE(0x0008, 0x0009) AM_WRITE(tv_ncf_oki6376_w )
+//	AM_RANGE(0x000a, 0x000b) AM_WRITE(tv_ncf_oki6376_st_w )
+	AM_RANGE(0x0030, 0x0035) AM_WRITE(tv_vcf_paletteram_w )
+
+	AM_RANGE(0x000c, 0x000d) AM_READ_PORT("IN0")
+	AM_RANGE(0x000e, 0x000f) AM_READ_PORT("IN2")
+	AM_RANGE(0x0010, 0x0011) AM_READ_PORT("IN3")
+	AM_RANGE(0x0012, 0x0013) AM_READ_PORT("IN4")
+	AM_RANGE(0x0014, 0x0015) AM_READ(tv_ncf_read1_r )
+
 ADDRESS_MAP_END
 
 
@@ -409,9 +432,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tv_tcf_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
 	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ(read1_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ(read2_r )
-	AM_RANGE(0x0030, 0x0031) AM_READ(read3_r ) AM_WRITE(tv_tcf_bankselect_w )
+	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
+	AM_RANGE(0x000a, 0x000b) AM_READ(read1_r )
+	AM_RANGE(0x0030, 0x0031) AM_READ(read2_r ) AM_WRITE(tv_tcf_bankselect_w )
 ADDRESS_MAP_END
 
 /****************************
@@ -469,10 +492,10 @@ static ADDRESS_MAP_START( newmcard_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x0002, 0x0003) AM_WRITE(write2_w ) // coin counter & coin lockout
 	AM_RANGE(0x0004, 0x0005) AM_WRITE(newmcard_vblank_w )
 	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ(read1_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ(read2_r )
+	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
+	AM_RANGE(0x000a, 0x000b) AM_READ(read1_r )
 	AM_RANGE(0x000c, 0x000d) AM_READ(newmcard_vblank_r )
-	AM_RANGE(0x000e, 0x000f) AM_READ(read3_r )
+	AM_RANGE(0x000e, 0x000f) AM_READ(read2_r )
 	AM_RANGE(0x0010, 0x0015) AM_WRITE(tv_vcf_paletteram_w )
 ADDRESS_MAP_END
 
@@ -535,9 +558,9 @@ static ADDRESS_MAP_START( brasil_io, AS_IO, 16, highvdeo_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
 	AM_RANGE(0x0002, 0x0003) AM_WRITE(write2_w ) // coin counter & coin lockout
 	AM_RANGE(0x0006, 0x0007) AM_WRITE(tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ(read1_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ(read2_r )
-	AM_RANGE(0x000e, 0x000f) AM_READ(read3_r )
+	AM_RANGE(0x0008, 0x0009) AM_READ(read0_r )
+	AM_RANGE(0x000a, 0x000b) AM_READ(read1_r )
+	AM_RANGE(0x000e, 0x000f) AM_READ(read2_r )
 //  AM_RANGE(0x000e, 0x000f) AM_WRITE
 //  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
 ADDRESS_MAP_END
@@ -631,6 +654,137 @@ static INPUT_PORTS_START( tv_ncf )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( nyjoker )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER )        /* connected to the clock signal, to signal heartbeat */
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("IN4")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( tv_tcf )
 	PORT_START("IN0")
@@ -961,6 +1115,14 @@ static MACHINE_CONFIG_DERIVED( tv_ncf, tv_vcf )
 
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( nyjoker, tv_vcf )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nyjoker_map)
+	MCFG_CPU_IO_MAP(nyjoker_io)
+
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( tv_tcf, tv_vcf )
 
 	MCFG_CPU_MODIFY("maincpu")
@@ -1089,6 +1251,36 @@ ROM_START( cfever61 )
 	ROM_LOAD( "ic25.bin", 0x00000, 0x80000, CRC(d71a5566) SHA1(2f7aefc06e39ce211e31b15aadf6338b679e7a31) )
 ROM_END
 
+/*
+pcb made in spain video/mpu-5
+
+CPU d70116c 8
+adv476kp35 CMOS Monolithic 256x18 Color Palette RAM-DAC
+Xtal 16Mhz
+oki m6376
+Lattice	isplsi1032e
+
+model TV
+vers 2.0
+date 2/99
+
+1 empty socket
+
+ny2.ic25 is audio
+*/
+
+ROM_START( nyjoker )
+	ROM_REGION( 0x100000, "user1", 0 ) /* V30 Code */
+	ROM_LOAD16_BYTE( "ni8-2-1.ic8", 0x00001, 0x80000, CRC(81416871) SHA1(c5519b1fcf0131710a8972d9016b8af5f8ac75a1) )
+	ROM_LOAD16_BYTE( "ni7-2-1.ic7", 0x00000, 0x80000, CRC(835b8606) SHA1(a036f8568f0e41eb1f4db7fa41a9cd4b92d41514) )
+
+	ROM_REGION( 0x040000, "boot_prg", 0 ) /*copy for program code*/
+	ROM_COPY( "user1", 0x0C0000, 0x000000, 0x40000 )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* M6376 Samples */
+	ROM_LOAD( "ny2.ic25", 0x00000, 0x80000, CRC(eeea7f4d) SHA1(2afc498792f848fd45be4d3eb3e6607edb5dd9df) )
+ROM_END
+
 ROM_START( cfever1k )
 	ROM_REGION( 0x200000, "user1", 0 ) /* V30 Code */
 	ROM_LOAD16_BYTE( "tcfi28.bin", 0x00001, 0x100000, CRC(e38d115a) SHA1(7fec94ddcdb07e483ed2f0d7d667c35ceb7a1f44) )
@@ -1100,6 +1292,7 @@ ROM_START( cfever1k )
 	ROM_REGION( 0x080000, "oki", 0 ) /* M6376 Samples */
 	ROM_LOAD( "ic25.bin", 0x00000, 0x80000, CRC(d71a5566) SHA1(2f7aefc06e39ce211e31b15aadf6338b679e7a31) )
 ROM_END
+
 
 ROM_START( girotutt )
 	ROM_REGION( 0x200000, "user1", 0 ) /* V30 Code */
@@ -1279,6 +1472,7 @@ GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf, driver_device,   0,       ROT0
 GAMEL( 2000, tour4010,  0,      tv_ncf,   tv_ncf, driver_device,   0,       ROT0,  "High Video", "Tour 4010",         0, layout_fashion )
 GAMEL( 2000, cfever51,  0,      tv_ncf,   tv_ncf, driver_device,   0,       ROT0,  "High Video", "Casino Fever 5.1",  0, layout_fashion )
 GAMEL( 2000, cfever61,  0,      tv_ncf,   tv_ncf, driver_device,   0,       ROT0,  "High Video", "Casino Fever 6.1",  0, layout_fashion )
+GAMEL( 2000, nyjoker,   0,      nyjoker,  nyjoker,driver_device,   0,       ROT0,  "High Video?", "New York Joker",  GAME_NOT_WORKING, layout_fashion ) // todo: fix inputs, output ports
 GAMEL( 2000, cfever1k,  0,      tv_tcf,   tv_tcf, driver_device,   0,       ROT0,  "High Video", "Casino Fever 1k",   0, layout_fashion )
 GAMEL( 2000, girotutt,  0,      tv_tcf,   tv_tcf, driver_device,   0,       ROT0,  "High Video", "GiroTutto",         0, layout_fashion )
 GAMEL( 2000, ciclone,   0,      ciclone,  tv_tcf, highvdeo_state,   ciclone, ROT0,  "High Video", "Ciclone",           0, layout_fashion )
