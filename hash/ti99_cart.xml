@@ -3014,6 +3014,25 @@
 		</dataarea>
 	</part>
 </software>
+<!-- Softlist entry for RXB 2012 -->
+<software name="rxb2012">
+	<description>RXB 2012</description>
+	<year>2011</year>
+	<publisher>Rich Gilbertson</publisher>
+	<info name="version" value="2012"/>
+	<part name="cart" interface="ti99_cart">
+		<feature name="pcb" value="gromemu"/>
+		<dataarea name="grom_socket" size="0xa000">
+			<rom name="rxbg.bin" size="0xa000" crc="abd2811c" sha1="774860b9c60951cb6e285064c863c4a61a90f46b" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom_socket" size="0x2000">
+			<rom name="rxbc.bin" size="0x2000" crc="b43ee777" sha1="3868b19845d4276658898cd278aede6257f524d6" offset="0x0000" />
+		</dataarea>
+		<dataarea name="rom2_socket" size="0x2000">
+			<rom name="rxbd.bin" size="0x2000" crc="d5a91251" sha1="dfa33094b67c31691b0396ea116c9da8d134bbc2" offset="0x0000" />
+		</dataarea>
+	</part>
+</software>
 <!-- Softlist entry for RXB v2.37 -->
 <software name="rxb237">
 	<description>RXB v2.37</description>
