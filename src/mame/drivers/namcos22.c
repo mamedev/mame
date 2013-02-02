@@ -2659,32 +2659,13 @@ WRITE8_MEMBER(namcos22_state::propcycle_mcu_port5_w)
 	set_led_status(machine(), 0, data & 2);
 }
 
-READ8_MEMBER(namcos22_state::propcycle_mcu_adc_r)
+READ8_MEMBER(namcos22_state::namcos22s_mcu_adc_r)
 {
-	// H+L = horizontal, 1 H+L = vertical
-	UINT16 ddx, ddy;
-
-	ddx = ioport("STICKX")->read();
-	if (ddx > 0) ddx -= 1;
-	ddy = ioport("STICKY")->read();
-	if (ddy > 0) ddy -= 1;
-
-	ddx <<= 2;
-	ddy <<= 2;
-
-	switch (offset)
-	{
-		case 0:
-			return (ddx & 0xff);
-		case 1:
-			return (ddx>>8);
-		case 2:
-			return (ddy & 0xff);
-		case 3:
-			return (ddy>>8);
-		default:
-			return 0;
-	}
+	static const char *const portnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
+	if (offset & 1)
+		return (ioport(portnames[offset >> 1 & 3])->read_safe(0) << 2) >> 8 & 0xff;
+	else
+		return (ioport(portnames[offset >> 1 & 3])->read_safe(0) << 2) & 0xff;
 }
 
 TIMER_CALLBACK_MEMBER(namcos22_state::alpine_steplock_callback)
@@ -2715,187 +2696,13 @@ WRITE8_MEMBER(namcos22_state::alpine_mcu_port5_w)
 	}
 }
 
-READ8_MEMBER(namcos22_state::alpineracer_mcu_adc_r)
-{
-	// 0 H+L = swing, 1 H+L = edge
-	UINT16 swing = ioport("SWING")->read()<<2;
-	UINT16 edge  = ioport("EDGE" )->read()<<2;
-
-	switch (offset)
-	{
-		case 0:
-			return swing & 0xff;
-
-		case 1:
-			return (swing>>8);
-
-		case 2:
-			return edge & 0xff;
-
-		case 3:
-			return (edge>>8);
-
-		default:
-			return 0;
-	}
-}
-
-READ8_MEMBER(namcos22_state::cybrcycc_mcu_adc_r)
-{
-	UINT16 gas,brake,steer;
-	ReadAnalogDrivingPorts( machine(), &gas, &brake, &steer );
-
-	gas <<= 2;
-	brake <<= 2;
-	steer <<= 2;
-
-	switch (offset)
-	{
-		case 0:
-			return steer & 0xff;
-
-		case 1:
-			return (steer>>8);
-
-		case 2:
-			return gas & 0xff;
-
-		case 3:
-			return (gas>>8);
-
-		case 4:
-			return brake & 0xff;
-
-		case 5:
-			return (brake>>8);
-
-		default:
-			return 0;
-	}
-}
-
-READ8_MEMBER(namcos22_state::tokyowar_mcu_adc_r)
-{
-	UINT16 gas,brake,steer;
-	ReadAnalogDrivingPorts( machine(), &gas, &brake, &steer );
-
-	gas <<= 2;
-	brake <<= 2;
-	steer <<= 2;
-
-	switch (offset)
-	{
-		case 0:
-			return steer & 0xff;
-
-		case 1:
-			return (steer>>8);
-
-		case 4:
-			return gas & 0xff;
-
-		case 5:
-			return (gas>>8);
-
-		case 6:
-			return brake & 0xff;
-
-		case 7:
-			return (brake>>8);
-
-		default:
-			return 0;
-	}
-}
-
-READ8_MEMBER(namcos22_state::aquajet_mcu_adc_r)
-{
-	UINT16 gas, steer, ddy;
-
-	gas   = ioport("GAS")->read() ^ 0x7f;
-	steer = ioport("STEER")->read() ^ 0xff;
-	ddy = ioport("STICKY")->read();
-	if (ddy > 0) ddy -= 1;
-
-	gas <<= 2;
-	steer <<= 2;
-	ddy <<= 2;
-
-	/*
-	    0 & 1 = handle left/right
-	    2 & 3 = accelerator
-	    4 & 5 = handle pole (Y axis)
-	*/
-
-	switch (offset)
-	{
-		case 0:
-			return steer & 0xff;
-
-		case 1:
-			return (steer>>8);
-
-		case 2:
-			return gas & 0xff;
-
-		case 3:
-			return (gas>>8);
-
-		case 4:
-			return ddy & 0xff;
-
-		case 5:
-			return (ddy>>8);
-
-		default:
-			return 0;
-	}
-}
-
-READ8_MEMBER(namcos22_state::adillor_mcu_adc_r)
-{
-	// unused
-	return 0;
-}
-
-READ8_MEMBER(namcos22_state::airco22_mcu_adc_r)
-{
-	UINT16 pedal, x, y;
-
-	pedal = ioport("PEDAL")->read()<<2;
-	x = ioport("STICKX")->read()<<2;
-	y = ioport("STICKY")->read()<<2;
-
-	switch (offset)
-	{
-		case 0:
-			return x & 0xff;
-
-		case 1:
-			return (x>>8);
-
-		case 2:
-			return y & 0xff;
-
-		case 3:
-			return (y>>8);
-
-		case 4:
-			return pedal & 0xff;
-
-		case 5:
-			return (pedal>>8);
-
-		default:
-			return 0;
-	}
-}
-
 static ADDRESS_MAP_START( mcu_io, AS_IO, 8, namcos22_state )
 	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ(mcu_port4_r ) AM_WRITE(mcu_port4_w )
 	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READ(mcu_port5_r ) AM_WRITE(mcu_port5_w )
 	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READ(mcu_port6_r ) AM_WRITE(mcu_port6_w )
 	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ(mcu_port7_r ) AM_WRITE(mcu_port7_w )
+	AM_RANGE(M37710_ADC0_L, M37710_ADC3_H) AM_READ(namcos22s_mcu_adc_r)
+	AM_RANGE(M37710_ADC4_L, M37710_ADC7_H) AM_READNOP
 ADDRESS_MAP_END
 
 READ8_MEMBER(namcos22_state::mcu_port4_s22_r)
@@ -4977,15 +4784,15 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY // R Selection
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)0) // steps are free
 
-	PORT_START("SWING")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Swing")
-
-	PORT_START("EDGE")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Edge")
-
 	PORT_START("MCUP5B")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)1) // steps are locked
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ADC0")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Swing")
+
+	PORT_START("ADC1")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Edge")
 INPUT_PORTS_END /* Alpine Racer */
 
 static INPUT_PORTS_START( airco22 )
@@ -5015,15 +4822,6 @@ static INPUT_PORTS_START( airco22 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("PEDAL")
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
-
-	PORT_START("STICKX")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
-
-	PORT_START("STICKY")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
-
 	PORT_START("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5036,6 +4834,15 @@ static INPUT_PORTS_START( airco22 )
 
 	PORT_START("MCUP5B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ADC0")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+
+	PORT_START("ADC1")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
+
+	PORT_START("ADC2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 INPUT_PORTS_END /* Air Combat22 */
 
 static INPUT_PORTS_START( cybrcycc )
@@ -5078,7 +4885,14 @@ static INPUT_PORTS_START( cybrcycc )
 	PORT_START("MCUP5B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	DRIVING_ANALOG_PORTS
+	PORT_START("ADC0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+
+	PORT_START("ADC1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+
+	PORT_START("ADC2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
 INPUT_PORTS_END /* Cyber Cycles */
 
 static INPUT_PORTS_START( dirtdash )
@@ -5121,9 +4935,14 @@ static INPUT_PORTS_START( dirtdash )
 	PORT_START("MCUP5B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	DRIVING_ANALOG_PORTS
-	PORT_MODIFY("STEER") // default is too sensitive
+	PORT_START("ADC0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(3) PORT_NAME("Steering Wheel")
+
+	PORT_START("ADC1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+
+	PORT_START("ADC2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
 INPUT_PORTS_END /* Dirt Dash */
 
 static INPUT_PORTS_START( tokyowar )
@@ -5166,7 +4985,14 @@ static INPUT_PORTS_START( tokyowar )
 	PORT_START("MCUP5B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	DRIVING_ANALOG_PORTS
+	PORT_START("ADC0")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+
+	PORT_START("ADC2")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+
+	PORT_START("ADC3")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
 INPUT_PORTS_END /* Tokyo Wars */
 
 static INPUT_PORTS_START( aquajet )
@@ -5196,15 +5022,6 @@ static INPUT_PORTS_START( aquajet )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("GAS")
-	PORT_BIT( 0x7f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
-
-	PORT_START("STEER")
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
-
-	PORT_START("STICKY")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
-
 	PORT_START("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5217,6 +5034,15 @@ static INPUT_PORTS_START( aquajet )
 
 	PORT_START("MCUP5B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ADC0")
+	PORT_BIT( 0xff, 0x7f, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
+
+	PORT_START("ADC1")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0x80) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
+
+	PORT_START("ADC2")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
 INPUT_PORTS_END /* Aqua Jet */
 
 static INPUT_PORTS_START( adillor )
@@ -5261,10 +5087,10 @@ static INPUT_PORTS_START( adillor )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("TRACKX")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Trackball X")
 
 	PORT_START("TRACKY")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Trackball Y")
 INPUT_PORTS_END /* Armadillo Racing */
 
 static INPUT_PORTS_START( propcycl )
@@ -5294,15 +5120,6 @@ static INPUT_PORTS_START( propcycl )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("PEDAL")
-	PORT_BIT( 0x7f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
-
-	PORT_START("STICKX")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
-
-	PORT_START("STICKY")
-	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
-
 	PORT_START("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5316,6 +5133,15 @@ static INPUT_PORTS_START( propcycl )
 	PORT_START("MCUP5B")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("ADC0")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_X ) PORT_MINMAX(0x00, 0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
+
+	PORT_START("ADC1")
+	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_MINMAX(0x00, 0xfe) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
+
+	PORT_START("PEDAL")
+	PORT_BIT( 0x7f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 INPUT_PORTS_END /* Prop Cycle */
 
 static INPUT_PORTS_START( timecris )
@@ -5343,11 +5169,6 @@ static INPUT_PORTS_START( timecris )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START( "LIGHTX" ) // tuned for CRT
-	PORT_BIT( 0xfff, 68+626/2, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(68, 68+626) PORT_SENSITIVITY(48) PORT_KEYDELTA(10)
-	PORT_START( "LIGHTY" ) // tuned for CRT - can't shoot below the statusbar?
-	PORT_BIT( 0xfff, 43+241/2, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(43, 43+241) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
-
 	PORT_START("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -5360,6 +5181,12 @@ static INPUT_PORTS_START( timecris )
 
 	PORT_START("MCUP5B")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "LIGHTX" ) // tuned for CRT
+	PORT_BIT( 0xfff, 68+626/2, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(68, 68+626) PORT_SENSITIVITY(48) PORT_KEYDELTA(10)
+
+	PORT_START( "LIGHTY" ) // tuned for CRT - can't shoot below the statusbar?
+	PORT_BIT( 0xfff, 43+241/2, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(43, 43+241) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
 INPUT_PORTS_END /* Time Crisis */
 
 /*****************************************************************************************************/
@@ -5742,7 +5569,6 @@ static void alpine_init_common( running_machine &machine, int game_type )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, game_type);
 
-	state->m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::alpineracer_mcu_adc_r),state));
 	state->m_mcu->space(AS_IO).install_write_handler(M37710_PORT5, M37710_PORT5, write8_delegate(FUNC(namcos22_state::alpine_mcu_port5_w),state));
 
 	state->m_motor_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos22_state::alpine_steplock_callback),state));
@@ -5784,7 +5610,6 @@ DRIVER_INIT_MEMBER(namcos22_state,airco22)
 	namcos22_init(machine(), NAMCOS22_AIR_COMBAT22);
 
 	// S22-BIOS ver1.20 namco all rights reserved 94/12/21
-	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::airco22_mcu_adc_r),this));
 }
 
 DRIVER_INIT_MEMBER(namcos22_state,propcycl)
@@ -5807,7 +5632,6 @@ DRIVER_INIT_MEMBER(namcos22_state,propcycl)
 //   pROM[0x22296/4] |= 0x00004e75;
 
 	namcos22_init(machine(), NAMCOS22_PROP_CYCLE);
-	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::propcycle_mcu_adc_r),this));
 	m_mcu->space(AS_IO).install_write_handler(M37710_PORT5, M37710_PORT5, write8_delegate(FUNC(namcos22_state::propcycle_mcu_port5_w),this));
 	install_141_speedup(machine());
 }
@@ -5868,7 +5692,6 @@ DRIVER_INIT_MEMBER(namcos22_state,cybrcyc)
 {
 	namcos22_init(machine(), NAMCOS22_CYBER_CYCLES);
 
-	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::cybrcycc_mcu_adc_r),this));
 	install_130_speedup(machine());
 
 	m_keycus_id = 0x0387;
@@ -5885,7 +5708,6 @@ DRIVER_INIT_MEMBER(namcos22_state,tokyowar)
 {
 	namcos22_init(machine(), NAMCOS22_TOKYO_WARS);
 
-	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::tokyowar_mcu_adc_r),this));
 	install_141_speedup(machine());
 
 	m_keycus_id = 0x01a8;
@@ -5894,14 +5716,12 @@ DRIVER_INIT_MEMBER(namcos22_state,tokyowar)
 DRIVER_INIT_MEMBER(namcos22_state,aquajet)
 {
 	namcos22_init(machine(), NAMCOS22_AQUA_JET);
-	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::aquajet_mcu_adc_r),this));
 	install_141_speedup(machine());
 }
 
 DRIVER_INIT_MEMBER(namcos22_state,adillor)
 {
 	namcos22_init(machine(), NAMCOS22_ARMADILLO_RACING);
-	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::adillor_mcu_adc_r),this));
 	install_141_speedup(machine());
 
 	m_keycus_id = 0x59b7;
@@ -5911,7 +5731,6 @@ DRIVER_INIT_MEMBER(namcos22_state,dirtdash)
 {
 	namcos22_init(machine(), NAMCOS22_DIRT_DASH);
 
-	m_mcu->space(AS_IO).install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::cybrcycc_mcu_adc_r),this));
 	install_141_speedup(machine());
 
 	m_keycus_id = 0x01a2;

@@ -222,15 +222,9 @@ public:
 	DECLARE_READ8_MEMBER(mcu_port6_r);
 	DECLARE_WRITE8_MEMBER(mcu_port7_w);
 	DECLARE_READ8_MEMBER(mcu_port7_r);
+	DECLARE_READ8_MEMBER(namcos22s_mcu_adc_r);
 	DECLARE_WRITE8_MEMBER(propcycle_mcu_port5_w);
-	DECLARE_READ8_MEMBER(propcycle_mcu_adc_r);
 	DECLARE_WRITE8_MEMBER(alpine_mcu_port5_w);
-	DECLARE_READ8_MEMBER(alpineracer_mcu_adc_r);
-	DECLARE_READ8_MEMBER(cybrcycc_mcu_adc_r);
-	DECLARE_READ8_MEMBER(tokyowar_mcu_adc_r);
-	DECLARE_READ8_MEMBER(aquajet_mcu_adc_r);
-	DECLARE_READ8_MEMBER(airco22_mcu_adc_r);
-	DECLARE_READ8_MEMBER(adillor_mcu_adc_r);
 	DECLARE_READ8_MEMBER(mcu_port4_s22_r);
 	DECLARE_READ16_MEMBER(mcu141_speedup_r);
 	DECLARE_WRITE16_MEMBER(mcu_speedup_w);
