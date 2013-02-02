@@ -6583,6 +6583,8 @@
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="cpm" />
+			<dataarea name="roml" size="0x2000">
+			</dataarea>
 		</part>
 	</software>
 
@@ -6593,6 +6595,8 @@
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="sfxse" />
+			<dataarea name="roml" size="0x2000">
+			</dataarea>
 		</part>
 	</software>
 
