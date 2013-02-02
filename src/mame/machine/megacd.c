@@ -642,7 +642,7 @@ READ16_MEMBER( sega_segacd_device::segacd_main_dataram_part1_r )
 		}
 		else
 		{
-			printf("Illegal: segacd_main_dataram_part1_r in mode 0 without permission\n");
+			//printf("Illegal: segacd_main_dataram_part1_r in mode 0 without permission\n");
 			return 0xffff;
 		}
 
@@ -707,7 +707,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_main_dataram_part1_w )
 		}
 		else
 		{
-			printf("Illegal: segacd_main_dataram_part1_w in mode 0 without permission\n");
+			//printf("Illegal: segacd_main_dataram_part1_w in mode 0 without permission\n");
 		}
 
 	}
@@ -1120,7 +1120,7 @@ READ16_MEMBER( sega_segacd_device::segacd_sub_dataram_part1_r )
 			return segacd_dataram[offset];
 		else
 		{
-			printf("Illegal: segacd_sub_dataram_part1_r in mode 0 without permission\n");
+			//printf("Illegal: segacd_sub_dataram_part1_r in mode 0 without permission\n");
 			return 0x0000;
 		}
 	}
@@ -1165,7 +1165,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_sub_dataram_part1_w )
 		}
 		else
 		{
-			printf("Illegal: segacd_sub_dataram_part1_w in mode 0 without permission\n");
+			//printf("Illegal: segacd_sub_dataram_part1_w in mode 0 without permission\n");
 		}
 	}
 	else if ((scd_rammode&2)==RAM_MODE_1MEG)
