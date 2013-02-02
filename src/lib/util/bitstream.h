@@ -237,7 +237,10 @@ inline void bitstream_out::write(UINT32 newbits, int numbits)
 		}
 
 	// shift the bits to the top
-	newbits <<= 32 - numbits;
+	if (numbits == 0)
+		newbits = 0;
+	else
+		newbits <<= 32 - numbits;
 
 	// now shift it down to account for the number of bits we already have and OR them in
 	m_buffer |= newbits >> m_bits;
