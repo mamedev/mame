@@ -284,7 +284,7 @@ WRITE8_MEMBER( sb_device::dsp_reset_w )
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;
 	m_recv_read = m_recv_write = 0;
-	m_rx_waiting = m_tx_waiting = false;
+	m_rx_waiting = m_tx_waiting = 0;
 
 	//printf("%02x\n",data);
 }
@@ -298,6 +298,11 @@ READ8_MEMBER( sb_device::dsp_data_r )
 	if (m_uart_midi)
 	{
 		UINT8 rv = m_recvring[m_recv_read++];
+		if (m_recv_read >= MIDI_RING_SIZE)
+		{
+			m_recv_read = 0;
+		}
+
 		if (m_rx_waiting)
 		{
 			m_rx_waiting--;
@@ -777,17 +782,28 @@ READ8_MEMBER( sb16_device::mpu401_r )
 	irq_w(0, IRQ_MPU);
 	if(offset == 0) // data
 	{
-		if(m_head != m_tail)
+		res = m_recvring[m_recv_read++];
+		if (m_recv_read >= MIDI_RING_SIZE)
 		{
-			res = m_mpu_queue[m_tail++];
-			m_tail %= 16;
+			m_recv_read = 0;
 		}
-		else
-			res = 0xff;
+
+		if (m_rx_waiting)
+		{
+			m_rx_waiting--;
+		}
 	}
 	else // status
 	{
-		res = ((m_head != m_tail)?0:0x80) | 0x3f; // bit 7 queue empty (DSR), bit 6 DRR (Data Receive Ready?)
+		res = 0;
+		if (m_tx_waiting >= MIDI_RING_SIZE)
+		{
+			res |= 0x40;   // tx full
+		}
+		if (m_rx_waiting == 0)
+		{
+			res |= 0x80;	// rx empty
+		}
 	}
 
 	return res;
@@ -811,15 +827,18 @@ WRITE8_MEMBER( sb16_device::mpu401_w )
 		{
 			case 0x3f: // enter MPU-401 UART mode
 				irq_w(1, IRQ_MPU);
-				m_head = m_tail = 0;
-				m_mpu_queue[m_head++] = 0xfe;
+				m_recv_read = m_recv_write = 0;
+				m_xmit_read = m_xmit_write = m_tx_waiting = 0;
+				m_recvring[m_recv_write++] = 0xfe;
+				m_rx_waiting = 1;
 				m_mpu_midi = true;
 				break;
 
 			case 0xff: // reset
 				irq_w(1, IRQ_MPU);
-				m_head = m_tail = 0;
-				m_mpu_queue[m_head++] = 0xfe;
+				m_recv_read = m_recv_write = 0;
+				m_recvring[m_recv_write++] = 0xfe;
+				m_rx_waiting = 1;
 				m_mpu_midi = false;
 				break;
 		}
@@ -1199,8 +1218,6 @@ void sb16_device::device_start()
 	m_isa->install_device(subdevice("ymf262"),    0x0220, 0x0223, 0, 0, FUNC(ymf262_r), FUNC(ymf262_w) );
 	m_isa->install_device(subdevice("ymf262"),    0x0228, 0x0229, 0, 0, FUNC(ymf262_r), FUNC(ymf262_w) );
 
-	m_head = 0;
-	m_tail = 0;
 	m_timer = timer_alloc(0, NULL);
 }
 
@@ -1238,7 +1255,7 @@ void sb_device::device_reset()
 	m_tx_busy = false;
 	m_xmit_read = m_xmit_write = 0;
 	m_recv_read = m_recv_write = 0;
-	m_rx_waiting = m_tx_waiting = false;
+	m_rx_waiting = m_tx_waiting = 0;
 
 	// MIDI is 31250 baud, 8-N-1
 	set_rcv_rate(31250);
@@ -1544,6 +1561,11 @@ void sb_device::rcv_complete()    // Rx completed receiving byte
 	if (m_uart_midi)
 	{
 		m_recvring[m_recv_write++] = data;
+		if (m_recv_write >= MIDI_RING_SIZE)
+		{
+			m_recv_write = 0;
+		}
+
 		if (m_recv_write != m_recv_read)
 		{
 			m_rx_waiting++;
@@ -1560,29 +1582,29 @@ void sb16_device::rcv_complete()    // Rx completed receiving byte
 	receive_register_extract();
 	UINT8 data = get_received_char();
 
-	// in UART MIDI mode, we set the DMA8 IRQ on receiving a character
-	if (m_uart_midi)
+	// for UART or MPU, add character to the receive queue
+	if (m_uart_midi || m_mpu_midi)
 	{
 		m_recvring[m_recv_write++] = data;
+		if (m_recv_write >= MIDI_RING_SIZE)
+		{
+			m_recv_write = 0;
+		}
+
 		if (m_recv_write != m_recv_read)
 		{
 			m_rx_waiting++;
 		}
+
 		if (m_uart_irq)
 		{
 			irq_w(1, IRQ_DMA8); 
 		}
-	}
 
-	// in MPU MIDI mode, do this instead
-	if (m_mpu_midi)
-	{
-		m_mpu_queue[m_head++] = data;
-		if (m_head >= 16)
+		if (m_mpu_midi)
 		{
-			m_head = 0;
+			irq_w(1, IRQ_MPU);
 		}
-		irq_w(1, IRQ_MPU);
 	}
 }
 

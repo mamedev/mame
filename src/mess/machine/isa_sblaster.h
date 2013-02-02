@@ -222,9 +222,6 @@ protected:
 		void mixer_set();
 		virtual void rcv_complete();    // Rx completed receiving byte
 private:
-		UINT8 m_mpu_queue[16];
-		UINT8 m_tail;
-		UINT8 m_head;
 		struct sb16_mixer m_mixer;
 };
 
