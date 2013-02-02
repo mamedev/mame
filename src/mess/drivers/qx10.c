@@ -327,7 +327,7 @@ void qx10_state::qx10_upd765_interrupt(bool state)
 
 	//logerror("Interrupt from upd765: %d\n", state);
 	// signal interrupt
-	pic8259_ir6_w(m_pic_m, state);
+	m_pic_m->ir6_w(state);
 }
 
 void qx10_state::drq_w(bool state)
@@ -545,7 +545,7 @@ WRITE_LINE_MEMBER( qx10_state::qx10_pic8259_master_set_int_line )
 READ8_MEMBER( qx10_state::get_slave_ack )
 {
 	if (offset==7) { // IRQ = 7
-		return pic8259_acknowledge(m_pic_s);
+		return m_pic_s->inta_r();
 	}
 	return 0x00;
 }
@@ -572,7 +572,7 @@ static const struct pic8259_interface qx10_pic8259_master_config =
 
 static const struct pic8259_interface qx10_pic8259_slave_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir7_w),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
@@ -611,7 +611,7 @@ WRITE8_MEMBER( qx10_state::upd7201_w )
 				m_keyb.led[(data & 0xe) >> 1] = data & 1;
 				printf("keyb Set led %02x %s\n",((data & 0xe) >> 1),data & 1 ? "on" : "off");
 				m_keyb.rx = (data & 0xf) | 0xc0;
-				pic8259_ir4_w(machine().device("pic8259_master"), 1);
+				m_pic_m->ir4_w(1);
 				break;
 			case 0x60:
 				printf("keyb Read LED status\n");
@@ -702,7 +702,7 @@ INPUT_CHANGED_MEMBER(qx10_state::key_stroke)
 	if(newval && !oldval)
 	{
 		m_keyb.rx = (UINT8)(FPTR)(param) & 0x7f;
-		pic8259_ir4_w(machine().device("pic8259_master"), 1);
+		m_pic_m->ir4_w(1);
 	}
 
 	if(oldval && !newval)

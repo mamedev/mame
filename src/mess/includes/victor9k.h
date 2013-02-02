@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "cpu/mcs48/mcs48.h"
-#include "imagedev/flopdrv.h"
+#include "imagedev/floppy.h"
 #include "machine/ram.h"
 #include "machine/ctronics.h"
 #include "machine/6522via.h"
@@ -52,11 +52,11 @@ public:
 			m_cvsd(*this, HC55516_TAG),
 			m_crtc(*this, HD46505S_TAG),
 			m_ram(*this, RAM_TAG),
-			m_floppy0(*this, FLOPPY_0),
-			m_floppy1(*this, FLOPPY_1),
-			m_kb(*this, VICTOR9K_KEYBOARD_TAG)
-	,
-		m_video_ram(*this, "video_ram"){ }
+			m_floppy0(*this, I8048_TAG":0:525qd"),
+			m_floppy1(*this, I8048_TAG":1:525qd"),
+			m_kb(*this, VICTOR9K_KEYBOARD_TAG),
+			m_video_ram(*this, "video_ram")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fdc_cpu;
@@ -68,8 +68,8 @@ public:
 	required_device<hc55516_device> m_cvsd;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
-	required_device<legacy_floppy_image_device> m_floppy0;
-	required_device<legacy_floppy_image_device> m_floppy1;
+	required_device<floppy_image_device> m_floppy0;
+	required_device<floppy_image_device> m_floppy1;
 	required_device<victor9k_keyboard_device> m_kb;
 
 	virtual void machine_start();

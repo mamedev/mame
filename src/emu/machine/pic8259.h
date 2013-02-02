@@ -46,6 +46,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ir6_w );
 	DECLARE_WRITE_LINE_MEMBER( ir7_w );
 
+	UINT8 inta_r();
+
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
 protected:

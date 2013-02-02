@@ -221,7 +221,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(iq151_state::iq151_break)
 {
-	pic8259_ir5_w(m_pic, newval & 1);
+	m_pic->ir5_w(newval & 1);
 }
 
 /* Input ports */
@@ -324,13 +324,13 @@ WRITE_LINE_MEMBER( iq151_state::pic_set_int_line )
 
 INTERRUPT_GEN_MEMBER(iq151_state::iq151_vblank_interrupt)
 {
-	pic8259_ir6_w(m_pic, m_vblank_irq_state & 1);
+	m_pic->ir6_w(m_vblank_irq_state & 1);
 	m_vblank_irq_state ^= 1;
 }
 
 IRQ_CALLBACK_MEMBER(iq151_state::iq151_irq_callback)
 {
-	return pic8259_acknowledge(m_pic);
+	return m_pic->inta_r();
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(iq151_state::cassette_timer)
@@ -403,11 +403,11 @@ static const cassette_interface iq151_cassette_interface =
 
 static const iq151cart_interface iq151_cart_interface =
 {
-	DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w),
-	DEVCB_DEVICE_LINE("pic8259", pic8259_ir1_w),
-	DEVCB_DEVICE_LINE("pic8259", pic8259_ir2_w),
-	DEVCB_DEVICE_LINE("pic8259", pic8259_ir3_w),
-	DEVCB_DEVICE_LINE("pic8259", pic8259_ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir0_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir1_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir4_w),
 	DEVCB_NULL
 };
 

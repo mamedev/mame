@@ -19,7 +19,7 @@ const struct pic8259_interface at_pic8259_master_config =
 
 const struct pic8259_interface at_pic8259_slave_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir2_w),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };
@@ -75,7 +75,7 @@ static const at_keyboard_controller_interface keyboard_controller_intf =
 {
 	DEVCB_CPU_INPUT_LINE(":maincpu", INPUT_LINE_RESET),
 	DEVCB_CPU_INPUT_LINE(":maincpu", INPUT_LINE_A20),
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir1_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir1_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER("pc_kbdc", pc_kbdc_device, clock_write_from_mb),
 	DEVCB_DEVICE_LINE_MEMBER("pc_kbdc", pc_kbdc_device, data_write_from_mb)
@@ -90,18 +90,18 @@ static const pc_kbdc_interface pc_kbdc_intf =
 static const isa16bus_interface isabus_intf =
 {
 	// interrupts
-	DEVCB_DEVICE_LINE("pic8259_slave",  pic8259_ir2_w), // in place of irq 2 on at irq 9 is used
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir3_w),
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir4_w),
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir5_w),
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir6_w),
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave",  pic8259_device, ir2_w), // in place of irq 2 on at irq 9 is used
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir5_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir6_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir7_w),
 
-	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir3_w),
-	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir4_w),
-	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir5_w),
-	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir6_w),
-	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir7_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave", pic8259_device, ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave", pic8259_device, ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave", pic8259_device, ir5_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave", pic8259_device, ir6_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave", pic8259_device, ir7_w),
 
 	// dma request
 	DEVCB_DEVICE_LINE("dma8237_1", i8237_dreq0_w),
@@ -183,7 +183,7 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
 
 IRQ_CALLBACK_MEMBER(southbridge_device::at_irq_callback)
 {
-    return pic8259_acknowledge(m_pic8259_master);
+    return m_pic8259_master->inta_r();
 }
 
 //-------------------------------------------------
@@ -232,7 +232,7 @@ void southbridge_device::device_reset()
 READ8_MEMBER( southbridge_device::get_slave_ack )
 {
 	if (offset==2) // IRQ = 2
-		return pic8259_acknowledge(m_pic8259_slave);
+		return m_pic8259_slave->inta_r();
 
 	return 0x00;
 }
@@ -266,7 +266,7 @@ void southbridge_device::at_speaker_set_input(UINT8 data)
 WRITE_LINE_MEMBER( southbridge_device::at_pit8254_out0_changed )
 {
 	if (m_pic8259_master)
-		pic8259_ir0_w(m_pic8259_master, state);
+		m_pic8259_master->ir0_w(state);
 }
 
 

@@ -273,7 +273,7 @@ WRITE8_MEMBER( wangpc_state::timer0_irq_clr_w )
 {
 	//if (LOG) logerror("%s: Timer 0 IRQ clear\n", machine().describe_context());
 
-	pic8259_ir0_w(m_pic, CLEAR_LINE);
+	m_pic->ir0_w(CLEAR_LINE);
 }
 
 
@@ -733,19 +733,19 @@ void wangpc_state::check_level1_interrupts()
 {
 	int state = !m_timer2_irq || m_epci->rxrdy_r() || m_epci->txemt_r() || !m_acknlg || !m_dav || !m_busy;
 
-	pic8259_ir1_w(m_pic, state);
+	m_pic->ir1_w(state);
 }
 
 void wangpc_state::check_level2_interrupts()
 {
 	int state = !m_dma_eop || m_uart_dr || m_uart_tbre || m_fdc_dd0 || m_fdc_dd1 || m_fdc->get_irq() || m_fpu_irq || m_bus_irq2;
 
-	pic8259_ir2_w(m_pic, state);
+	m_pic->ir2_w(state);
 }
 
-IRQ_CALLBACK_MEMBER(wangpc_state::wangpc_irq_callback)
+IRQ_CALLBACK_MEMBER( wangpc_state::wangpc_irq_callback )
 {
-	return pic8259_acknowledge(m_pic);
+	return m_pic->inta_r();
 }
 
 static const struct pic8259_interface pic_intf =
@@ -903,7 +903,7 @@ static const struct pit8253_config pit_intf =
 		{
 			500000,
 			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir0_w)
 		}, {
 			2000000,
 			DEVCB_LINE_VCC,
@@ -1062,11 +1062,11 @@ WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
 static WANGPC_BUS_INTERFACE( bus_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(wangpc_state, bus_irq2_w),
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir3_w),
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir4_w),
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir5_w),
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir6_w),
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir7_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir5_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir6_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir7_w),
 	DEVCB_DEVICE_LINE_MEMBER(AM9517A_TAG, am9517a_device, dreq1_w),
 	DEVCB_DEVICE_LINE_MEMBER(AM9517A_TAG, am9517a_device, dreq2_w),
 	DEVCB_DEVICE_LINE_MEMBER(AM9517A_TAG, am9517a_device, dreq3_w),

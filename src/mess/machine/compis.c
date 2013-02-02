@@ -178,8 +178,8 @@ void compis_state::fdc_irq(bool state)
 	{
 		if (m_8259m)
 		{
-			pic8259_ir0_w(m_8259m, 1);
-			pic8259_ir0_w(m_8259m, 0);
+			m_8259m->ir0_w(1);
+			m_8259m->ir0_w(0);
 		}
 	}
 }
@@ -1272,7 +1272,7 @@ WRITE_LINE_MEMBER( compis_state::compis_pic8259_slave_set_int_line )
 READ8_MEMBER( compis_state::get_slave_ack )
 {
 	if (offset==2) { // IRQ = 2
-		return pic8259_acknowledge(m_8259s);
+		return m_8259s->inta_r();
 	}
 	return 0;
 }
@@ -1294,7 +1294,7 @@ const struct pic8259_interface compis_pic8259_slave_config =
 
 IRQ_CALLBACK_MEMBER(compis_state::compis_irq_callback)
 {
-	return pic8259_acknowledge(m_8259m);
+	return m_8259m->inta_r();
 }
 
 

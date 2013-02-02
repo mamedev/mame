@@ -205,7 +205,10 @@ int pic8259_acknowledge(device_t *device)
 	return 0;
 }
 
-
+UINT8 pic8259_device::inta_r()
+{
+	return pic8259_acknowledge(this);
+}
 
 READ8_DEVICE_HANDLER( pic8259_r )
 {

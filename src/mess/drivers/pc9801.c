@@ -2934,7 +2934,7 @@ static const struct pic8259_interface pic8259_master_config =
 
 static const struct pic8259_interface pic8259_slave_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w), //TODO: check me
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir7_w), //TODO: check me
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };

@@ -475,7 +475,7 @@ static const pit8253_config pc_pit8254_config =
 		{
 			4772720/4,              /* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir0_w)
 		}, {
 			4772720/4,              /* dram refresh */
 			DEVCB_NULL,

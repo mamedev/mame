@@ -119,7 +119,7 @@ static MC6845_INTERFACE( hd46505s_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir7_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir7_w),
 	NULL
 };
 
@@ -139,15 +139,15 @@ static const struct pit8253_config pit_intf =
 		{
 			2500000,
 			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(victor9k_state,mux_serial_b_w)
+			DEVCB_DRIVER_LINE_MEMBER(victor9k_state, mux_serial_b_w)
 		}, {
 			2500000,
 			DEVCB_LINE_VCC,
-			DEVCB_DRIVER_LINE_MEMBER(victor9k_state,mux_serial_a_w)
+			DEVCB_DRIVER_LINE_MEMBER(victor9k_state, mux_serial_a_w)
 		}, {
 			100000,
 			DEVCB_LINE_VCC,
-			DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir2_w)
+			DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir2_w)
 		}
 	}
 };
@@ -218,7 +218,7 @@ WRITE_LINE_MEMBER( victor9k_state::ssda_irq_w )
 {
 	m_ssda_irq = state;
 
-	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
 }
 
 static MC6852_INTERFACE( ssda_intf )
@@ -352,7 +352,7 @@ WRITE_LINE_MEMBER( victor9k_state::via1_irq_w )
 {
 	m_via1_irq = state;
 
-	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
 }
 
 static const via6522_interface via1_intf =
@@ -451,7 +451,7 @@ WRITE_LINE_MEMBER( victor9k_state::via2_irq_w )
 {
 	m_via2_irq = state;
 
-	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
 }
 
 static const via6522_interface via2_intf =
@@ -557,7 +557,7 @@ WRITE_LINE_MEMBER( victor9k_state::via3_irq_w )
 {
 	m_via3_irq = state;
 
-	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
 }
 
 static const via6522_interface via3_intf =
@@ -627,7 +627,7 @@ WRITE_LINE_MEMBER( victor9k_state::via4_irq_w )
 {
 	m_via4_irq = state;
 
-	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
 }
 
 static const via6522_interface via4_intf =
@@ -691,7 +691,7 @@ WRITE_LINE_MEMBER( victor9k_state::via5_irq_w )
 {
 	m_via5_irq = state;
 
-	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
 }
 
 static const via6522_interface via5_intf =
@@ -733,13 +733,13 @@ READ8_MEMBER( victor9k_state::via6_pa_r )
 	UINT8 data = 0;
 
 	// track 0 drive A sense
-	data |= floppy_tk00_r(m_floppy0) << 1;
+	data |= m_floppy0->trk00_r() << 1;
 
 	// track 0 drive B sense
-	data |= floppy_tk00_r(m_floppy1) << 3;
+	data |= m_floppy1->trk00_r() << 3;
 
 	// write protect sense
-	data |= floppy_wpt_r(m_drive ? m_floppy1 : m_floppy0) << 6;
+	data |= (m_drive ? m_floppy1->wpt_r() : m_floppy0->wpt_r()) << 6;
 
 	// disk sync detect
 
@@ -804,7 +804,7 @@ READ8_MEMBER( victor9k_state::via6_pb_r )
 	// door A sense
 
 	// single/double sided
-	data |= floppy_twosid_r(m_drive ? m_floppy1 : m_floppy0) << 5;
+	data |= (m_drive ? m_floppy1->twosid_r() : m_floppy0->twosid_r()) << 5;
 
 	return data;
 }
@@ -848,7 +848,7 @@ WRITE_LINE_MEMBER( victor9k_state::via6_irq_w )
 {
 	m_via6_irq = state;
 
-	pic8259_ir3_w(m_pic, m_ssda_irq | m_via1_irq | m_via2_irq | m_via3_irq | m_via4_irq | m_via5_irq | m_via6_irq);
+	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via2_irq || m_via3_irq || m_via4_irq || m_via5_irq || m_via6_irq);
 }
 
 static const via6522_interface via6_intf =
@@ -876,27 +876,12 @@ WRITE_LINE_MEMBER( victor9k_state::kbrdy_w )
 {
 	m_via2->write_cb1(state);
 
-	pic8259_ir6_w(m_pic, state ? CLEAR_LINE : ASSERT_LINE);
+	m_pic->ir6_w(state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static VICTOR9K_KEYBOARD_INTERFACE( kb_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(victor9k_state, kbrdy_w)
-};
-
-// Floppy Configuration
-
-static const floppy_interface victor9k_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSQD,
-	LEGACY_FLOPPY_OPTIONS_NAME(default),
-	"floppy_5_25",
-	NULL
 };
 
 // IEEE-488 Interface
@@ -913,11 +898,15 @@ static IEEE488_INTERFACE( ieee488_intf )
 	DEVCB_NULL
 };
 
+static SLOT_INTERFACE_START( victor9k_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
+
 // Machine Initialization
 
 IRQ_CALLBACK_MEMBER(victor9k_state::victor9k_irq_callback)
 {
-	return pic8259_acknowledge(m_pic);
+	return m_pic->inta_r();
 }
 
 void victor9k_state::machine_start()
@@ -970,7 +959,8 @@ static MACHINE_CONFIG_START( victor9k, victor9k_state )
 	MCFG_VIA6522_ADD(M6522_4_TAG, XTAL_30MHz/30, via4_intf)
 	MCFG_VIA6522_ADD(M6522_5_TAG, XTAL_30MHz/30, via5_intf)
 	MCFG_VIA6522_ADD(M6522_6_TAG, XTAL_30MHz/30, via6_intf)
-	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(victor9k_floppy_interface)
+	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":0", victor9k_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(I8048_TAG":1", victor9k_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_VICTOR9K_KEYBOARD_ADD(kb_intf)
 
 	// internal ram

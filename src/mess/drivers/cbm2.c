@@ -1727,7 +1727,7 @@ static IEEE488_INTERFACE( ieee488_intf )
 
 IRQ_CALLBACK_MEMBER(cbm2_state::pic_irq_callback)
 {
-	return pic8259_acknowledge(m_ext_pic);
+	return m_ext_pic->inta_r();
 }
 
 static pic8259_interface ext_pic_intf =

@@ -117,7 +117,7 @@ WRITE_LINE_MEMBER( apricot_state::apricot_pit8253_out2 )
 static const struct pit8253_config apricot_pit8253_intf =
 {
 	{
-		{ XTAL_4MHz / 16,      DEVCB_LINE_VCC, DEVCB_DEVICE_LINE("ic31", pic8259_ir6_w) },
+		{ XTAL_4MHz / 16,      DEVCB_LINE_VCC, DEVCB_DEVICE_LINE_MEMBER("ic31", pic8259_device, ir6_w) },
 		{ 0 /*XTAL_4MHz / 2*/, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(apricot_state, apricot_pit8253_out1) },
 		{ 0 /*XTAL_4MHz / 2*/, DEVCB_LINE_VCC, DEVCB_DRIVER_LINE_MEMBER(apricot_state, apricot_pit8253_out2) }
 	}
@@ -145,7 +145,7 @@ static const z80sio_interface apricot_z80sio_intf =
 
 IRQ_CALLBACK_MEMBER(apricot_state::apricot_irq_ack)
 {
-	return pic8259_acknowledge(m_pic);
+	return m_pic->inta_r();
 }
 
 static const struct pic8259_interface apricot_pic8259_intf =

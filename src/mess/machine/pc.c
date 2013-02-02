@@ -397,7 +397,7 @@ const struct pit8253_config ibm5150_pit8253_config =
 		{
 			XTAL_14_31818MHz/12,                /* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir0_w)
 		}, {
 			XTAL_14_31818MHz/12,                /* dram refresh */
 			DEVCB_NULL,
@@ -423,7 +423,7 @@ const struct pit8253_config pcjr_pit8253_config =
 		{
 			XTAL_14_31818MHz/12,              /* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir0_w)
 		}, {
 			XTAL_14_31818MHz/12,              /* dram refresh */
 			DEVCB_NULL,
@@ -444,7 +444,7 @@ const struct pit8253_config mc1502_pit8253_config =
 		{
 			XTAL_16MHz/12,              /* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir0_w)
 		}, {
 			XTAL_16MHz/12,              /* serial port */
 			DEVCB_NULL,

@@ -296,7 +296,7 @@ static const at_keyboard_controller_interface keyboard_controller_intf =
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_RESET),
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_A20),
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir1_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir1_w),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER("pc_kbdc", pc_kbdc_device, clock_write_from_mb),
 	DEVCB_DEVICE_LINE_MEMBER("pc_kbdc", pc_kbdc_device, data_write_from_mb)
@@ -310,7 +310,7 @@ static const pc_kbdc_interface pc_kbdc_intf =
 
 WRITE_LINE_MEMBER( at_state::at_mc146818_irq )
 {
-	pic8259_ir0_w(m_pic8259_slave, (state) ? 0 : 1);
+	m_pic8259_slave->ir0_w((state) ? 0 : 1);
 }
 
 const struct mc146818_interface at_mc146818_config =
@@ -321,18 +321,18 @@ const struct mc146818_interface at_mc146818_config =
 static const isa16bus_interface isabus_intf =
 {
 	// interrupts
-	DEVCB_DEVICE_LINE("pic8259_slave",  pic8259_ir2_w), // in place of irq 2 on at irq 9 is used
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir3_w),
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir4_w),
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir5_w),
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir6_w),
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave",  pic8259_device, ir2_w), // in place of irq 2 on at irq 9 is used
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir5_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir6_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir7_w),
 
-	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir3_w),
-	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir4_w),
-	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir5_w),
-	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir6_w),
-	DEVCB_DEVICE_LINE("pic8259_slave", pic8259_ir7_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave", pic8259_device, ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave", pic8259_device, ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave", pic8259_device, ir5_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave", pic8259_device, ir6_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_slave", pic8259_device, ir7_w),
 
 	// dma request
 	DEVCB_DEVICE_LINE_MEMBER("dma8237_1", am9517a_device, dreq0_w),

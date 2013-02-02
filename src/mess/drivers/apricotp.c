@@ -418,7 +418,7 @@ static APRICOT_KEYBOARD_INTERFACE( kb_intf )
 
  IRQ_CALLBACK_MEMBER(fp_state::fp_irq_callback)
 {
-	return pic8259_acknowledge(m_pic);
+	return m_pic->inta_r();
 }
 
 /*
@@ -543,7 +543,7 @@ void fp_state::fdc_drq_w(bool state)
 
 WRITE_LINE_MEMBER( fp_state::busy_w )
 {
-	if (!state) pic8259_ir6_w(m_pic, ASSERT_LINE);
+	if (!state) m_pic->ir6_w(ASSERT_LINE);
 }
 
 static const centronics_interface centronics_intf =

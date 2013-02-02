@@ -237,7 +237,7 @@ const struct pit8253_config pc_pit8253_config =
 		{
 			XTAL_14_31818MHz/12,                /* heartbeat IRQ */
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir0_w)
 		}, {
 			XTAL_14_31818MHz/12,                /* dram refresh */
 			DEVCB_NULL,
@@ -413,7 +413,7 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_ppi_portb_w )
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( m_ppi_keyboard_clear )
 	{
-		pic8259_ir1_w(m_pic8259, 0);
+		m_pic8259->ir1_w(0);
 		m_ppi_shift_register = 0;
 		m_ppi_shift_enable = 1;
 	}
@@ -433,12 +433,12 @@ I8255A_INTERFACE( pc_ppi8255_interface )
 static const isa8bus_interface isabus_intf =
 {
 	// interrupts
-	DEVCB_DEVICE_LINE("pic8259", pic8259_ir2_w),
-	DEVCB_DEVICE_LINE("pic8259", pic8259_ir3_w),
-	DEVCB_DEVICE_LINE("pic8259", pic8259_ir4_w),
-	DEVCB_DEVICE_LINE("pic8259", pic8259_ir5_w),
-	DEVCB_DEVICE_LINE("pic8259", pic8259_ir6_w),
-	DEVCB_DEVICE_LINE("pic8259", pic8259_ir7_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir2_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir5_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir6_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir7_w),
 
 	// dma request
 	DEVCB_DEVICE_LINE_MEMBER("dma8237", am9517a_device, dreq1_w),
@@ -654,7 +654,7 @@ void ibm5160_mb_device::device_start()
 
 IRQ_CALLBACK_MEMBER(ibm5160_mb_device::pc_irq_callback)
 {
-	return pic8259_acknowledge(m_pic8259);
+	return m_pic8259->inta_r();
 }
 
 
@@ -874,7 +874,7 @@ WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( m_ppi_keyboard_clear )
 	{
-		pic8259_ir1_w(m_pic8259, 0);
+		m_pic8259->ir1_w(0);
 		m_ppi_shift_register = 0;
 		m_ppi_shift_enable = 1;
 	}

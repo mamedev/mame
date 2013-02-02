@@ -128,7 +128,7 @@ WRITE8_MEMBER(mbc55x_state::mbcpic8259_w)
 
 IRQ_CALLBACK_MEMBER(mbc55x_state::mbc55x_irq_callback)
 {
-	return pic8259_acknowledge(m_pic);
+	return m_pic->inta_r();
 }
 
 /* PIT8253 Configuration */
@@ -139,12 +139,12 @@ const struct pit8253_config mbc55x_pit8253_config =
 		{
 			PIT_C0_CLOCK,
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE(PIC8259_TAG, pic8259_ir0_w)
+			DEVCB_DEVICE_LINE_MEMBER(PIC8259_TAG, pic8259_device, ir0_w)
 		},
 		{
 			PIT_C1_CLOCK,
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE(PIC8259_TAG, pic8259_ir1_w)
+			DEVCB_DEVICE_LINE_MEMBER(PIC8259_TAG, pic8259_device, ir1_w)
 		},
 		{
 			PIT_C2_CLOCK,
@@ -298,7 +298,7 @@ const i8251_interface mbc55x_i8251a_interface =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(PIC8259_TAG, pic8259_ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER(PIC8259_TAG, pic8259_device, ir3_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

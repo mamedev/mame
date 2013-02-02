@@ -725,7 +725,7 @@ static const z80_daisy_config trs80m2_daisy_chain[] =
 
 IRQ_CALLBACK_MEMBER(trs80m16_state::trs80m16_irq_callback)
 {
-	return pic8259_acknowledge(m_pic);
+	return m_pic->inta_r();
 }
 
 static const struct pic8259_interface pic_intf =

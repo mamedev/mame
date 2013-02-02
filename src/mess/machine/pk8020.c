@@ -967,7 +967,7 @@ const struct pit8253_config pk8020_pit8253_intf =
 		{
 			(XTAL_20MHz / 8) / 164,
 			DEVCB_NULL,
-			DEVCB_DEVICE_LINE("pic8259", pic8259_ir5_w)
+			DEVCB_DEVICE_LINE_MEMBER("pic8259", pic8259_device, ir5_w)
 		}
 	}
 };

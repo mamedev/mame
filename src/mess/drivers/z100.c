@@ -597,19 +597,19 @@ INPUT_PORTS_END
 
 IRQ_CALLBACK_MEMBER(z100_state::z100_irq_callback)
 {
-	return pic8259_acknowledge( machine().device( "pic8259_master" ) );
+	return m_picm->inta_r();
 }
 
 WRITE_LINE_MEMBER( z100_state::z100_pic_irq )
 {
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 //  logerror("PIC#1: set IRQ line to %i\n",interrupt);
 }
 
 READ8_MEMBER( z100_state::get_slave_ack )
 {
 	if (offset==7) { // IRQ = 7
-		return pic8259_acknowledge(m_pics);
+		return m_pics->inta_r();
 	}
 	return 0;
 }
@@ -623,7 +623,7 @@ static const struct pic8259_interface z100_pic8259_master_config =
 
 static const struct pic8259_interface z100_pic8259_slave_config =
 {
-	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER("pic8259_master", pic8259_device, ir3_w),
 	DEVCB_LINE_GND,
 	DEVCB_NULL
 };

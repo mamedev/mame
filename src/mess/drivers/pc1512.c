@@ -913,7 +913,7 @@ static I8237_INTERFACE( dmac_intf )
 
 IRQ_CALLBACK_MEMBER(pc1512_state::pc1512_irq_callback)
 {
-	return pic8259_acknowledge(m_pic);
+	return m_pic->inta_r();
 }
 
 static const struct pic8259_interface pic_intf =

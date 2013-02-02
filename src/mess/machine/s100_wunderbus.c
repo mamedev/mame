@@ -86,7 +86,7 @@ static ins8250_interface ace1_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir3_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir3_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -101,7 +101,7 @@ static ins8250_interface ace2_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir4_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir4_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -116,7 +116,7 @@ static ins8250_interface ace3_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir5_w),
+	DEVCB_DEVICE_LINE_MEMBER(I8259A_TAG, pic8259_device, ir5_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -132,7 +132,7 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
 	if (state)
 	{
 		m_rtc_tp = state;
-		pic8259_ir7_w(m_pic, m_rtc_tp);
+		m_pic->ir7_w(m_rtc_tp);
 	}
 }
 
@@ -301,7 +301,7 @@ void s100_wunderbus_device::device_reset()
 
 void s100_wunderbus_device::s100_vi0_w(int state)
 {
-	pic8259_ir0_w(m_pic, state);
+	m_pic->ir0_w(state);
 }
 
 
@@ -311,7 +311,7 @@ void s100_wunderbus_device::s100_vi0_w(int state)
 
 void s100_wunderbus_device::s100_vi1_w(int state)
 {
-	pic8259_ir1_w(m_pic, state);
+	m_pic->ir1_w(state);
 }
 
 
@@ -321,7 +321,7 @@ void s100_wunderbus_device::s100_vi1_w(int state)
 
 void s100_wunderbus_device::s100_vi2_w(int state)
 {
-	pic8259_ir2_w(m_pic, state);
+	m_pic->ir2_w(state);
 }
 
 
@@ -400,7 +400,7 @@ UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 
 				// reset clock interrupt
 				m_rtc_tp = 0;
-				pic8259_ir7_w(m_pic, m_rtc_tp);
+				m_pic->ir7_w(m_rtc_tp);
 				break;
 
 			case 3: // Parallel data IN
@@ -408,7 +408,7 @@ UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 
 			case 4: // 8259 0 register
 			case 5: // 8259 1 register
-				data = pic8259_r(m_pic, space, offset & 0x01);
+				data = m_pic->read(space, offset & 0x01);
 				break;
 
 			case 6: // not used
@@ -517,7 +517,7 @@ void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, UIN
 
 			case 4: // 8259 0 register
 			case 5: // 8259 1 register
-				pic8259_w(m_pic, space, offset & 0x01, data);
+				m_pic->write(space, offset & 0x01, data);
 				break;
 
 			case 6: // Par. port cntrl.
