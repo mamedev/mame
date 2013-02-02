@@ -2010,7 +2010,7 @@ ROM_START( grmatch )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "grudgematch.u5", 0x04000, 0x4000, CRC(11cadec9) SHA1(e21df623d1311ea63bafa2d6d0d94eb7d13232da) )
 	ROM_CONTINUE(               0x10000, 0xc000 )
-	ROM_COPY( "maincpu",           0x14000, 0x8000, 0x8000 )
+	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "grudgematch.u27", 0x08000, 0x8000, CRC(59c18e63) SHA1(0d00c9cc683ff17e3213ba343ae65d533b57a243) )
@@ -2031,37 +2031,37 @@ ROM_END
 
 ROM_START( stratab )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "sbprogv3.bin", 0x08000, 0x8000, CRC(a5ae728f) SHA1(85098eef1614d5148e8082df4c936883662292ee) )
-	ROM_COPY( "maincpu",    0x8000, 0x14000, 0x8000 )
+	ROM_LOAD( "sb_prog_v3_u5.u5", 0x08000, 0x8000, CRC(a5ae728f) SHA1(85098eef1614d5148e8082df4c936883662292ee) ) /* Labeled as SB PROG V3 (U5) */
+	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "sbsnds.bin", 0x08000, 0x8000, CRC(b36c8f0a) SHA1(c4c3edf3352d95561f76705087338c1946137447) )
+	ROM_LOAD( "sb_snds_u27.u27", 0x08000, 0x8000, CRC(b36c8f0a) SHA1(c4c3edf3352d95561f76705087338c1946137447) ) /* Labeled as SB SNDS (U27) */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(a915b0bd) SHA1(0955c7ebb48e97ccffc18c5deec6eccce1d68de8) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(340c661f) SHA1(150f9158fa6d956d08051c67c17723b1d8c66867) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(5df9f1cf) SHA1(cad87f63ac0e902dffeeaa42538fc73f792d87d9) )
+	ROM_LOAD( "sb_grom0_0.grom0", 0x00000, 0x20000, CRC(a915b0bd) SHA1(0955c7ebb48e97ccffc18c5deec6eccce1d68de8) )
+	ROM_LOAD( "sb_grom0_1.grom1", 0x20000, 0x20000, CRC(340c661f) SHA1(150f9158fa6d956d08051c67c17723b1d8c66867) )
+	ROM_LOAD( "sb_grom0_2.grom2", 0x40000, 0x20000, CRC(5df9f1cf) SHA1(cad87f63ac0e902dffeeaa42538fc73f792d87d9) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
+	ROM_LOAD( "sb_srom0.srom0", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
 ROM_END
 
 
 ROM_START( stratab1 )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "sbprgv1.bin",  0x08000, 0x8000, CRC(46d51604) SHA1(de7b6306fdcee4907b07667baf874bd195822e6a) )
-	ROM_COPY( "maincpu",    0x8000, 0x14000, 0x8000 )
+	ROM_LOAD( "sb_prog_v1_u5.u5",  0x08000, 0x8000, CRC(46d51604) SHA1(de7b6306fdcee4907b07667baf874bd195822e6a) ) /* Labeled as SB PROG V1 (U5) */
+	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "sbsnds.bin", 0x08000, 0x8000, CRC(b36c8f0a) SHA1(c4c3edf3352d95561f76705087338c1946137447) )
+	ROM_LOAD( "sb_snds_u27.u27", 0x08000, 0x8000, CRC(b36c8f0a) SHA1(c4c3edf3352d95561f76705087338c1946137447) ) /* Labeled as SB SNDS (U27) */
 
 	ROM_REGION( 0xc0000, "grom", 0 )
-	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(a915b0bd) SHA1(0955c7ebb48e97ccffc18c5deec6eccce1d68de8) )
-	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(340c661f) SHA1(150f9158fa6d956d08051c67c17723b1d8c66867) )
-	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(5df9f1cf) SHA1(cad87f63ac0e902dffeeaa42538fc73f792d87d9) )
+	ROM_LOAD( "sb_grom0_0.grom0", 0x00000, 0x20000, CRC(a915b0bd) SHA1(0955c7ebb48e97ccffc18c5deec6eccce1d68de8) )
+	ROM_LOAD( "sb_grom0_1.grom1", 0x20000, 0x20000, CRC(340c661f) SHA1(150f9158fa6d956d08051c67c17723b1d8c66867) )
+	ROM_LOAD( "sb_grom0_2.grom2", 0x40000, 0x20000, CRC(5df9f1cf) SHA1(cad87f63ac0e902dffeeaa42538fc73f792d87d9) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
+	ROM_LOAD( "sb_srom0.srom0", 0x00000, 0x20000, CRC(6ff390b9) SHA1(f31dae9e31f3fc83b9253e49fd4204820db3587e) )
 ROM_END
 
 
@@ -2183,7 +2183,7 @@ ROM_END
 
 ROM_START( slikshot )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "pgm20.u5",  0x04000, 0x4000, CRC(370a00eb) SHA1(b2878f161f4931d9fc3979a84b29660941e2608f) )
+	ROM_LOAD( "poolpgm-20.u5",  0x04000, 0x4000, CRC(370a00eb) SHA1(b2878f161f4931d9fc3979a84b29660941e2608f) )
 	ROM_CONTINUE(          0x10000, 0xc000 )
 	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
@@ -2207,8 +2207,8 @@ ROM_END
 
 ROM_START( slikshot17 )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "u5.bin", 0x04000, 0x4000, CRC(09d70554) SHA1(a009cd3b22261c60f1028694baef51f61713154f) )
-	ROM_CONTINUE(       0x10000, 0xc000 )
+	ROM_LOAD( "poolpgm-17.u5", 0x04000, 0x4000, CRC(09d70554) SHA1(a009cd3b22261c60f1028694baef51f61713154f) )
+	ROM_CONTINUE(        0x10000, 0xc000 )
 	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -2232,8 +2232,8 @@ ROM_END
 ROM_START( slikshot16 )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "poolpgm-16.u5", 0x04000, 0x4000, CRC(c0f17012) SHA1(5d466e058daf91b4f52e634498df9d2a03627aaa) )
-	ROM_CONTINUE(              0x10000, 0xc000 )
-	ROM_COPY( "maincpu",     0x14000, 0x8000, 0x8000 )
+	ROM_CONTINUE(        0x10000, 0xc000 )
+	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "u27.bin", 0x08000, 0x8000, CRC(a96ce0f7) SHA1(c1fec3aeef97c846fd1a20b91af54f6bf9723a71) )
@@ -2259,7 +2259,7 @@ ROM_START( dynobop )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "dynobop.u5", 0x04000, 0x4000, CRC(98452c40) SHA1(9b9316fc258792e0d825f16e0fadf8e0c35a864e) )
 	ROM_CONTINUE(           0x10000, 0xc000 )
-	ROM_COPY( "maincpu",  0x14000, 0x8000, 0x8000 )
+	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "dynobop.u27", 0x08000, 0x8000, CRC(a37d862b) SHA1(922eeae184df2c5c28040da27699dd55744f8dca) )
@@ -2282,7 +2282,7 @@ ROM_END
 ROM_START( sstrike )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "sstrku5.bin", 0x08000, 0x8000, CRC(af00cddf) SHA1(b866e8dfce1449f7462a79efa385ea6b55cdc6e7) )
-	ROM_COPY( "maincpu",    0x8000, 0x14000, 0x8000 )
+	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "sstrku27.bin", 0x08000, 0x8000, CRC(efab7252) SHA1(eb3b2002531e551e3d67958ea3cc56a69fa660e2) )
@@ -2325,7 +2325,7 @@ ROM_START( hstennis )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "tenbim.v11", 0x04000, 0x4000, CRC(faffab5c) SHA1(4de525f6adb16205c47788b78aecdebd57008295) )
 	ROM_CONTINUE(           0x10000, 0xc000 )
-	ROM_COPY( "maincpu",  0x14000, 0x8000, 0x8000 )
+	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "tensnd.v1", 0x08000, 0x8000, CRC(f034a694) SHA1(3540e2edff2ce47504260ec856bab9b638d9260d) )
@@ -2577,8 +2577,8 @@ ROM_END
 
 ROM_START( gpgolf )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gpgv1_1.bin",   0x04000, 0x4000, CRC(631e77e0) SHA1(847ba1e00d31441620a2a1f45a9aa58df84bde8b) ) /* Joystick version */
-	ROM_CONTINUE(       0x10000, 0xc000 )
+	ROM_LOAD( "gpgv1_1.bin", 0x04000, 0x4000, CRC(631e77e0) SHA1(847ba1e00d31441620a2a1f45a9aa58df84bde8b) ) /* Joystick version */
+	ROM_CONTINUE(        0x10000, 0xc000 )
 	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -2597,8 +2597,8 @@ ROM_END
 ROM_START( gtg2 )
 	/* banks are loaded in the opposite order from the others, */
 	ROM_REGION( 0x1c000, "maincpu", 0 )
-	ROM_LOAD( "gtg2_v2_2.u5",   0x10000, 0x4000, CRC(4a61580f) SHA1(7c64648d47418fbcc0f9b5bd91f88856209bc0f5) ) /* Trackball version */
-	ROM_CONTINUE(       0x04000, 0xc000 )
+	ROM_LOAD( "gtg2_v2_2.u5", 0x10000, 0x4000, CRC(4a61580f) SHA1(7c64648d47418fbcc0f9b5bd91f88856209bc0f5) ) /* Trackball version */
+	ROM_CONTINUE(        0x04000, 0xc000 )
 	ROM_COPY( "maincpu", 0x8000, 0x14000, 0x8000 )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
