@@ -752,7 +752,7 @@ static MACHINE_CONFIG_START( nwktr, nwktr_state )
 
 	MCFG_K001604_ADD("k001604", racingj_k001604_intf)
 
-	MCFG_K056800_ADD("k056800", nwktr_k056800_interface)
+	MCFG_K056800_ADD("k056800", nwktr_k056800_interface, 64000000/4)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

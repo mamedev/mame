@@ -945,7 +945,7 @@ static void sound_irq_callback( running_machine &machine, int irq )
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	machine.device("audiocpu")->execute().set_input_line(line, ASSERT_LINE);
-	state->m_sound_irq_timer->adjust(attotime::from_usec(1), line);
+	state->m_sound_irq_timer->adjust(attotime::from_usec(5), line);
 }
 
 static const k056800_interface hornet_k056800_interface =
@@ -1023,7 +1023,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_K037122_ADD("k037122_1", hornet_k037122_intf)
 
-	MCFG_K056800_ADD("k056800", hornet_k056800_interface)
+	MCFG_K056800_ADD("k056800", hornet_k056800_interface, 64000000/4)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

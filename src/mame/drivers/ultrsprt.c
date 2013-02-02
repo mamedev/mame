@@ -249,7 +249,7 @@ static MACHINE_CONFIG_START( ultrsprt, ultrsprt_state )
 	MCFG_PALETTE_LENGTH(8192)
 
 	/* sound hardware */
-	MCFG_K056800_ADD("k056800", ultrsprt_k056800_interface)
+	MCFG_K056800_ADD("k056800", ultrsprt_k056800_interface, XTAL_18_432MHz)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

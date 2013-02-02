@@ -189,6 +189,7 @@ public:
 	int m_ccu_vcth;
 	int m_ccu_vctl;
 	optional_shared_ptr<UINT32> m_workram;
+	emu_timer *m_sound_irq_timer;
 	UINT32 *m_sharc_dataram;
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ8_MEMBER(sysreg_r);
@@ -411,6 +412,8 @@ void zr107_state::machine_start()
 {
 	/* set conservative DRC options */
 	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);
+
+	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zr107_state::irq_off),this));
 
 	/* configure fast RAM regions for DRC */
 	ppcdrc_add_fastram(machine().device("maincpu"), 0x00000000, 0x000fffff, FALSE, m_workram);
@@ -689,7 +692,7 @@ static void sound_irq_callback( running_machine &machine, int irq )
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	machine.device("audiocpu")->execute().set_input_line(line, ASSERT_LINE);
-	machine.scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(zr107_state::irq_off),state), line);
+	machine.scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(zr107_state::irq_off),state), line);
 }
 
 static const k056800_interface zr107_k056800_interface =
@@ -762,7 +765,7 @@ static MACHINE_CONFIG_START( zr107, zr107_state )
 
 	MCFG_K056832_ADD("k056832", zr107_k056832_intf)
 
-	MCFG_K056800_ADD("k056800", zr107_k056800_interface)
+	MCFG_K056800_ADD("k056800", zr107_k056800_interface, 64000000/4)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -818,7 +821,7 @@ static MACHINE_CONFIG_START( jetwave, zr107_state )
 
 	MCFG_K001604_ADD("k001604", jetwave_k001604_intf)
 
-	MCFG_K056800_ADD("k056800", zr107_k056800_interface)
+	MCFG_K056800_ADD("k056800", zr107_k056800_interface, 64000000/4)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 

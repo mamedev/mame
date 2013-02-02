@@ -509,10 +509,10 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gticlub )
 	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )        // View switch
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )        // Shift Down
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )        // Shift Up
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )        // AT/MT switch
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("View switch")		
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Shift Down")		
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Shift Up")		
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("AT/MT switch")	
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -540,16 +540,16 @@ static INPUT_PORTS_START( gticlub )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 
 	PORT_START("AN0")   /* mask default type             sens delta min max */
-	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_NAME("Steering Wheel") PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("AN1")
-	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL ) PORT_NAME("Accelerator") PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("AN2")
-	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_NAME("Brake") PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 	PORT_START("AN3")
-	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL3 ) PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL3 ) PORT_NAME("Handbrake") PORT_MINMAX(0x000,0x3ff) PORT_SENSITIVITY(35) PORT_KEYDELTA(5)
 
 INPUT_PORTS_END
 
@@ -722,7 +722,7 @@ static void sound_irq_callback( running_machine &machine, int irq )
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	machine.device("audiocpu")->execute().set_input_line(line, ASSERT_LINE);
-	machine.scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(gticlub_state::irq_off),state), line);
+	machine.scheduler().timer_set(attotime::from_usec(5), timer_expired_delegate(FUNC(gticlub_state::irq_off),state), line);
 }
 
 static const k056800_interface gticlub_k056800_interface =
@@ -845,11 +845,11 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	MCFG_K001604_ADD("k001604_1", gticlub_k001604_intf)
 
-	MCFG_K056800_ADD("k056800", gticlub_k056800_interface)
+	MCFG_K056800_ADD("k056800", gticlub_k056800_interface, 64000000/4)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("rfsnd", RF5C400, 64000000/4)
+	MCFG_SOUND_ADD("rfsnd", RF5C400, 33868800/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -962,11 +962,11 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_K001604_ADD("k001604_1", hangplt_k001604_intf_l)
 	MCFG_K001604_ADD("k001604_2", hangplt_k001604_intf_r)
 
-	MCFG_K056800_ADD("k056800", gticlub_k056800_interface)
+	MCFG_K056800_ADD("k056800", gticlub_k056800_interface, 64000000/4)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("rfsnd", RF5C400, 64000000/4)
+	MCFG_SOUND_ADD("rfsnd", RF5C400, 33868800/2)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

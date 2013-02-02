@@ -48,8 +48,8 @@ extern const device_type K056800;
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_K056800_ADD(_tag, _interface) \
-	MCFG_DEVICE_ADD(_tag, K056800, 0) \
+#define MCFG_K056800_ADD(_tag, _interface, _clock) \
+	MCFG_DEVICE_ADD(_tag, K056800, _clock) \
 	MCFG_DEVICE_CONFIG(_interface)
 
 
