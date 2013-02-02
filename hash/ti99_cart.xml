@@ -1386,7 +1386,7 @@
 	<year>198?</year>
 	<publisher>&lt;unknown&gt;</publisher>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="paged"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="xb25g.bin" size="0xa000" crc="80b33ca1" sha1="664ae7f2810df6942480634288df31b9567df72c" offset="0x0000" />
 		</dataarea>
@@ -1405,7 +1405,7 @@
 	<publisher>&lt;unknown&gt;</publisher>
 	<info name="comment" value="Standard Exbasic with additional functions. Maybe @apesoft."/>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="paged"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="xbapeg.bin" size="0xa000" crc="a27f2f5e" sha1="d9614cd24eb04cb61ecf7c29e42029adfd4bbafc" offset="0x0000" />
 		</dataarea>
@@ -2983,7 +2983,7 @@
 	<publisher>Western Horizon</publisher>
 	<info name="version" value="1002"/>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="paged"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="rxbv2g.bin" size="0xa000" crc="8e07abd2" sha1="ad12ccd39d2a8d0a65d6b1a82fbaddafa1a1f89d" offset="0x0000" />
 		</dataarea>
@@ -3002,7 +3002,7 @@
 	<publisher>Rich Gilbertson</publisher>
 	<info name="version" value="2002"/>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="paged"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="rxb2k2g.bin" size="0xa000" crc="350c4945" sha1="f1417afe7841146903a5182beeeebaf154d21e06" offset="0x0000" />
 		</dataarea>
@@ -3021,7 +3021,7 @@
 	<publisher>Rich Gilbertson</publisher>
 	<info name="version" value="2.37"/>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="paged"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="rxb237g.bin" size="0xa000" crc="34cb2778" sha1="2368f8aeb810ce198180e0da31ac7a5b548bb2b2" offset="0x0000" />
 		</dataarea>
@@ -3040,7 +3040,7 @@
 	<publisher>Rich Gilbertson</publisher>
 	<info name="version" value="2.4"/>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="paged"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="rxb24g.bin" size="0xa000" crc="15b3406b" sha1="aa04abd00f16a08ee336d788a5cc0fc0a9a9a917" offset="0x0000" />
 		</dataarea>
@@ -3059,7 +3059,7 @@
 	<publisher>Rich Gilbertson</publisher>
 	<info name="version" value="2.6"/>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="paged"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="rxb26g.bin" size="0xa000" crc="fb887f39" sha1="26df9cc148b7827d4fc65a117a1fe254febdc388" offset="0x0000" />
 		</dataarea>
@@ -3077,7 +3077,7 @@
 	<year>19??</year>
 	<publisher>Rich Gilbertson</publisher>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="paged"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="rxbg.bin" size="0xa000" crc="8700ecb5" sha1="ca19389a99d4928f570f8c708787daa0a557ba8a" offset="0x0000" />
 		</dataarea>
@@ -3095,7 +3095,7 @@
 	<year>19??</year>
 	<publisher>Rich Gilbertson</publisher>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="paged"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="dump_g.bin" size="0xa000" crc="3bbaba2c" sha1="8b55e7c5f20b1e6366fd7047b0630b6d22af31f0" offset="0x0000" />
 		</dataarea>
@@ -3113,7 +3113,7 @@
 	<year>19??</year>
 	<publisher>Rich Gilbertson</publisher>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="paged"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="dump_g.bin" size="0xa000" crc="e8c04156" sha1="4145c28c252dc6d8f94164fb5a9f501f633587eb" offset="0x0000" />
 		</dataarea>
@@ -3131,7 +3131,7 @@
 	<year>1992</year>
 	<publisher>Cadd Electronics - Rich Gilbertson</publisher>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="paged"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="dump_g.bin" size="0xa000" crc="0d3ff2bd" sha1="de686366ff69892fa2e801f8364f2b09a71f4d5e" offset="0x0000" />
 		</dataarea>
@@ -3989,7 +3989,7 @@
 	<publisher>Triton</publisher>
 	<info name="version" value="120"/>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="paged"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="superxbg.bin" size="0xa000" crc="a94cfd99" sha1="12f1871c8e2dc39a474a78739dd2bd243b755eaf" offset="0x0000" />
 		</dataarea>

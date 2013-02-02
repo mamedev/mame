@@ -9,7 +9,7 @@
 
           LEFT
 
-  RESET*  1||2   GND
+  /RESET  1||2   GND
       D7  3||4   CRUCLK
       D6  5||6   CRUIN
       D5  7||8   A15/CRUOUT
@@ -1053,7 +1053,8 @@ enum
 	PCB_SUPER,
 	PCB_MBX,
 	PCB_PAGED379I,
-	PCB_PAGEDCRU
+	PCB_PAGEDCRU,
+	PCB_GROMEMU
 };
 
 static const pcb_type pcbdefs[] =
@@ -1065,6 +1066,7 @@ static const pcb_type pcbdefs[] =
 	{ PCB_MBX, "mbx" },
 	{ PCB_PAGED379I, "paged379i" },
 	{ PCB_PAGEDCRU, "pagedcru" },
+	{ PCB_GROMEMU, "gromemu" },
 	{ 0, NULL}
 };
 
@@ -1073,6 +1075,7 @@ static const pcb_type sw_pcbdefs[] =
 {
 	{ PCB_STANDARD, "standard" },
 	{ PCB_PAGED, "paged" },
+	{ PCB_GROMEMU, "gromemu" },
 	{ 0, NULL}
 };
 
@@ -1099,9 +1102,10 @@ void ti99_cartridge_device::prepare_cartridge()
 
 	if (m_pcb->m_grom_size > 0)
 	{
-		regg = memregion("grom_contents");
+		regg = memregion(CARTGROM_TAG);
 		grom_ptr = m_softlist? get_software_region("grom_socket") : (UINT8*)m_rpk->get_contents_of_socket("grom_socket");
 		memcpy(regg->base(), grom_ptr, m_pcb->m_grom_size);
+		m_pcb->m_grom_ptr = regg->base();   // for gromemu
 
 		// Find the GROMs and keep their pointers
 		m_pcb->set_grom_pointer(0, subdevice(GROM3_TAG));
@@ -1115,7 +1119,7 @@ void ti99_cartridge_device::prepare_cartridge()
 	if (m_pcb->m_rom_size > 0)
 	{
 		if (VERBOSE>6) LOG("gromport: rom_socket.size=0x%04x\n", m_pcb->m_rom_size);
-		regr = memregion("rom_contents");
+		regr = memregion(CARTROM_TAG);
 		m_pcb->m_rom_ptr = m_softlist? get_software_region("rom_socket") : (UINT8*)m_rpk->get_contents_of_socket("rom_socket");
 		memcpy(regr->base(), m_pcb->m_rom_ptr, m_pcb->m_rom_size);
 	}
@@ -1124,7 +1128,7 @@ void ti99_cartridge_device::prepare_cartridge()
 	if (rom2_length > 0)
 	{
 		// sizes do not differ between rom and rom2
-		regr2 = memregion("rom2_contents");
+		regr2 = memregion(CARTROM2_TAG);
 		m_pcb->m_rom2_ptr = m_softlist? get_software_region("rom2_socket") : (UINT8*)m_rpk->get_contents_of_socket("rom2_socket");
 		memcpy(regr2->base(), m_pcb->m_rom2_ptr, rom2_length);
 	}
@@ -1232,6 +1236,10 @@ bool ti99_cartridge_device::call_load()
 	case PCB_PAGEDCRU:
 		if (VERBOSE>6) LOG("gromport.cartridge_device: PagedCRU PCB\n");
 		m_pcb = new ti99_pagedcru_cartridge();
+		break;
+	case PCB_GROMEMU:
+		if (VERBOSE>6) LOG("gromport.cartridge_device: GromEmulation PCB\n");
+		m_pcb = new ti99_gromemu_cartridge();
 		break;
 	}
 
@@ -1463,8 +1471,9 @@ WRITE8_MEMBER(ti99_paged_cartridge::write)
 	if ((offset & GROM_MASK)==GROM_AREA)
 		gromwrite(space, offset, data, mem_mask);
 
-	else
+	else {
 		m_rom_page = (offset >> 1) & 1;
+	}
 }
 
 /*****************************************************************************
@@ -1793,6 +1802,104 @@ void ti99_pagedcru_cartridge::cruwrite(offs_t offset, UINT8 data)
 		{
 			m_rom_page = (bit-1)/2;
 		}
+	}
+}
+
+/*****************************************************************************
+  Cartridge type: GROM emulation/paged
+
+  This cartridge offers GROM address space without real GROM circuits. The GROMs
+  are emulated by a normal EPROM with a circuits that mimics GROM behavior.
+  Each simulated GROM offers 8K (real GROMs only offer 6K).
+
+  Some assumptions:
+  - No readable address counter. This means the parallel console GROMs
+    will deliver the address when reading.
+  - No wait states. Reading is generally faster than with real GROMs.
+  - No wrapping at 8K boundaries.
+  - Two pages of ROM at address 6000
+
+  If any of these fails, the cartridge will crash, so we'll see.
+
+  Typical cartridges: RXB, Super Extended Basic
+
+  For the sake of simplicity, we register GROMs like the other PCB types, but
+  we implement special access methods for the GROM space.
+
+  Still not working:
+     rxb1002 (Set page to 1 (6372 <- 00), lockup)
+     rxb237 (immediate reset)
+     rxbv555 (repeating reset on Master Title Screen)
+     superxb (lockup, fix: add RAM at 7c00)
+
+******************************************************************************/
+
+READ8Z_MEMBER(ti99_gromemu_cartridge::readz)
+{
+	if ((offset & GROM_MASK)==GROM_AREA)
+		gromemureadz(space, offset, value, mem_mask);
+	else
+	{
+		if (m_rom_page==0)
+		{
+			*value = m_rom_ptr[offset & 0x1fff];
+		}
+		else
+		{
+			*value = m_rom2_ptr[offset & 0x1fff];
+		}
+	}
+}
+
+WRITE8_MEMBER(ti99_gromemu_cartridge::write)
+{
+	// LOG("write standard\n");
+	if ((offset & GROM_MASK)==GROM_AREA)
+		gromemuwrite(space, offset, data, mem_mask);
+
+	else {
+		m_rom_page = (offset >> 1) & 1;
+	}
+}
+
+READ8Z_MEMBER(ti99_gromemu_cartridge::gromemureadz)
+{
+	// Similar to the GKracker implemented above, we do not have a readable
+	// GROM address counter but use the one from the console GROMs.
+	if ((offset & 0x0002)!=0) return;
+	int id = ((m_grom_address & 0xe000)>>13)&0x07;
+	if (id > 2) {
+		// Cartridge space (0x6000 - 0xffff)
+		*value = m_grom_ptr[m_grom_address-0x6000]; // use the GROM memory
+	}
+
+	// The GROM emulation does not wrap at 8K boundaries.
+	m_grom_address = (m_grom_address + 1) & 0xffff;
+
+	// Reset the write address flipflop.
+	m_waddr_LSB = false;
+}
+
+WRITE8_MEMBER(ti99_gromemu_cartridge::gromemuwrite)
+{
+	// Set GROM address
+	if ((offset & 0x0002)==0x0002) {
+		if (m_waddr_LSB == true)
+		{
+			// Accept low address byte (second write)
+			m_grom_address = (m_grom_address & 0xff00) | data;
+			m_waddr_LSB = false;
+			if (VERBOSE>8) LOG("ti99_gromemu_cartridge: set grom address %04x\n", m_grom_address);
+		}
+		else
+		{
+			// Accept high address byte (first write)
+			m_grom_address = (m_grom_address & 0x00ff) | (data << 8);
+			m_waddr_LSB = true;
+		}
+	}
+	else {
+		if (VERBOSE>2) LOG("ti99_gromemu_cartridge: ignoring write to GROM area at address %04x\n", m_grom_address);
 	}
 }
 

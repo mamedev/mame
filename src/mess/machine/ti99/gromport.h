@@ -276,6 +276,7 @@ protected:
 	UINT8*              m_rom_ptr;
 	UINT8*              m_rom2_ptr;
 	UINT8*              m_ram_ptr;
+	UINT8*              m_grom_ptr; // for gromemu
 
 private:
 };
@@ -363,6 +364,22 @@ public:
 	void    cruwrite(offs_t offset, UINT8 data);
 private:
 	int     m_rom_page;
+};
+
+/********************** GROM emulation cartridge  ************************************/
+
+class ti99_gromemu_cartridge : public ti99_cartridge_pcb
+{
+public:
+	~ti99_gromemu_cartridge() { };
+	DECLARE_READ8Z_MEMBER(readz);
+	DECLARE_WRITE8_MEMBER(write);
+	DECLARE_READ8Z_MEMBER(gromemureadz);
+	DECLARE_WRITE8_MEMBER(gromemuwrite);
+private:
+	int     m_rom_page;
+	int     m_grom_address;
+	bool    m_waddr_LSB;
 };
 
 
