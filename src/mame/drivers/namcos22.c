@@ -3012,37 +3012,63 @@ MACHINE_CONFIG_END
 TIMER_CALLBACK_MEMBER(namcos22_state::adillor_trackball_interrupt)
 {
 	generic_pulse_irq_line(m_mcu, param ? M37710_LINE_TIMERA2TICK : M37710_LINE_TIMERA3TICK, 1);
-	m_ar_tb_interrupt[param]->adjust(m_ar_tb_reload[param], param);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
 {
-	// arbitrary timer for reading trackball
-	for (int axis = 0; axis < 2; axis++)
+	// arbitrary timer for reading optical trackball
+	UINT8 ix = ioport("TRACKX")->read();
+	UINT8 iy = ioport("TRACKY")->read();
+
+	if (ix != 0x80 || iy < 0x80)
 	{
-		UINT16 ipt = ioport(axis ? "TRACKY" : "TRACKX")->read();
-		if (ipt > 0 && ipt < 0x8000)
+		if (iy >= 0x80)
+			iy = 0x7f;
+		double x = (double)(ix - 0x80) / 127.0;
+		double y = (double)(0x80 - iy) / 127.0;
+		
+		// normalize
+		double a = atan(x/y);
+		double p = sqrt(x*x + y*y);
+		double v = (fabs(a) < (M_PI / 4.0)) ? p*cos(a) : p*sin(a);
+		v = fabs(v);
+		
+		// note that it is rotated by 45 degrees, so instead of axes like (+), they are like (x)
+		a += (M_PI / 4.0);
+		if (a < 0)
+			a = 0;
+		else if (a > (M_PI / 2.0))
+			a = M_PI / 2.0;
+		
+		// tied to mcu A2/A3 timer (speed determines frequency)
+		// these values(in usec) may need tweaking:
+		const int base = 1000;
+		const int range = 5000;
+
+		double t[2];
+		t[0] = v*sin(a); // y -> A2
+		t[1] = v*cos(a); // x -> A3
+		
+		for (int axis = 0; axis < 2; axis++)
 		{
-			// optical trackball, tied to mcu A2/A3 timer (speed determines frequency)
-			// note that it is rotated by 45 degrees, so instead of axes like (+), they are like (x)
-			// (not yet tested on a real trackball, values below still need to be tweaked)
-			const int cap = 256;
-			const int maxspeed = 500;
-			const int sensitivity = 50;
-
-			if (ipt > cap) ipt = cap;
-			ipt = cap - ipt;
-
-			attotime freq = attotime::from_usec(maxspeed + sensitivity * ipt);
-			m_ar_tb_reload[axis] = freq;
-			m_ar_tb_interrupt[axis]->adjust(min(freq, m_ar_tb_interrupt[axis]->remaining()), axis);
-
+			if (t[axis] >  (1.0 / (double)(range)))
+			{
+				attotime freq = attotime::from_usec((base + range) - ((double)(range) * t[axis]));
+				m_ar_tb_interrupt[axis]->adjust(min(freq, m_ar_tb_interrupt[axis]->remaining()), axis, freq);
+			}
+			else
+			{
+				// not moving
+				m_ar_tb_interrupt[axis]->adjust(attotime::never, axis, attotime::never);
+			}
 		}
-		else
+	}
+	else
+	{
+		// both axes not moving
+		for (int axis = 0; axis < 2; axis++)
 		{
-			// backwards or not moving
-			m_ar_tb_reload[axis] = attotime::never;
-			m_ar_tb_interrupt[axis]->adjust(attotime::never, axis);
+			m_ar_tb_interrupt[axis]->adjust(attotime::never, axis, attotime::never);
 		}
 	}
 }
@@ -5211,10 +5237,10 @@ static INPUT_PORTS_START( adillor )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("TRACKX")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(200) PORT_RESET
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 
 	PORT_START("TRACKY")
-	PORT_BIT( 0xffff, 0x0000, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(200) PORT_RESET PORT_REVERSE
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 INPUT_PORTS_END /* Armadillo Racing */
 
 static INPUT_PORTS_START( propcycl )

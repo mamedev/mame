@@ -78,7 +78,6 @@ public:
 	optional_shared_ptr<UINT32> m_czram;
 
 	int m_bEnableDspIrqs;
-	attotime m_ar_tb_reload[2];
 	emu_timer *m_ar_tb_interrupt[2];
 	UINT16 m_MasterBIOZ;
 	UINT32 *m_pPointRAM;
