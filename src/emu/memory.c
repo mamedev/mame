@@ -4500,7 +4500,21 @@ void handler_entry_read::copy(handler_entry *entry)
 	handler_entry::copy(entry);
 	handler_entry_read *rentry = static_cast<handler_entry_read *>(entry);
 	m_read = rentry->m_read;
-	memcpy(m_subread, rentry->m_subread, m_subunits*sizeof(access_handler));
+	for(int i = 0; i < m_subunits; ++i)
+	{
+		switch(m_subunit_infos[i].m_size)
+		{
+			case 8:
+				m_subread[i].r8 = rentry->m_subread[i].r8;
+				break;
+			case 16:
+				m_subread[i].r16 = rentry->m_subread[i].r16;
+				break;
+			case 32:
+				m_subread[i].r32 = rentry->m_subread[i].r32;
+				break;
+		}
+	}
 	memcpy(m_sub_is_legacy, rentry->m_sub_is_legacy, m_subunits*sizeof(bool));
 	memcpy(m_sublegacy_info, rentry->m_sublegacy_info, m_subunits*sizeof(legacy_info));
 }
@@ -4936,7 +4950,21 @@ void handler_entry_write::copy(handler_entry *entry)
 	handler_entry::copy(entry);
 	handler_entry_write *wentry = static_cast<handler_entry_write *>(entry);
 	m_write = wentry->m_write;
-	memcpy(m_subwrite, wentry->m_subwrite, m_subunits*sizeof(access_handler));
+	for(int i = 0; i < m_subunits; ++i)
+	{
+		switch(m_subunit_infos[i].m_size)
+		{
+			case 8:
+				m_subwrite[i].w8 = wentry->m_subwrite[i].w8;
+				break;
+			case 16:
+				m_subwrite[i].w16 = wentry->m_subwrite[i].w16;
+				break;
+			case 32:
+				m_subwrite[i].w32 = wentry->m_subwrite[i].w32;
+				break;
+		}
+	}
 	memcpy(m_sub_is_legacy, wentry->m_sub_is_legacy, m_subunits*sizeof(bool));
 	memcpy(m_sublegacy_info, wentry->m_sublegacy_info, m_subunits*sizeof(legacy_info));
 }
