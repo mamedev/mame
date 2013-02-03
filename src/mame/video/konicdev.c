@@ -10303,6 +10303,9 @@ void k001604_draw_back_layer( device_t *device, bitmap_rgb32 &bitmap, const rect
 
 	num_layers = k001604->layer_size ? 2 : 1;
 
+	if ((k001604->reg[0x60 / 4] & 0x40000000) == 0)
+		return;
+
 	for (layer = 0; layer < num_layers; layer++)
 	{
 		int reg = 0x08;
