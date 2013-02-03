@@ -653,7 +653,7 @@ void digitalker_device::digitalker_register_for_save()
 
 void digitalker_device::device_start()
 {
-	m_rom = machine().root_device().memregion(tag())->base();
+	m_rom = m_region->base();
 	m_stream = stream_alloc(0, 1, clock()/4);
 	m_dac_index = 128;
 	m_data = 0xff;
