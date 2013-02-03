@@ -137,6 +137,7 @@ TILE_GET_INFO_MEMBER(sanremo_state::get_sanremo_tile_info)
 void sanremo_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sanremo_state::get_sanremo_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
+
 }
 
 UINT32 sanremo_state::screen_update_sanremo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -147,7 +148,13 @@ UINT32 sanremo_state::screen_update_sanremo(screen_device &screen, bitmap_ind16 
 
 void sanremo_state::palette_init()
 {
-	// TODO: implement 3bpp + I
+	int index;
+
+	for (index = 0; index < 0x8; index++)
+		palette_entry_set_color(machine().palette, index, MAKE_RGB(pal1bit((index >> 0)&1), pal1bit((index >> 1)&1), pal1bit((index >> 2)&1)));
+
+	for (index = 0x8; index < 0x10; index++)
+		palette_entry_set_color(machine().palette, index, MAKE_RGB(pal2bit((index >> 0)&1), pal2bit((index >> 1)&1), pal2bit((index >> 2)&1)));
 }
 
 
@@ -295,24 +302,15 @@ INPUT_PORTS_END
 static const gfx_layout tilelayout =
 {
 	8, 8,
-	RGN_FRAC(1,3),
-	3,
-	{ 0, RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	RGN_FRAC(1,4),
+	4,
+	{ 0, RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
 };
 
-static const gfx_layout ilayout =
-{
-	8, 8,
-	RGN_FRAC(1,1),
-	1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
+
 
 
 /**************************************************
@@ -391,7 +389,7 @@ static MACHINE_CONFIG_START( sanremo, sanremo_state )
 	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/12, mc6845_intf)
 
 	MCFG_GFXDECODE(sanremo)
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x10)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -409,13 +407,11 @@ ROM_START( number1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "no_g0.ic26",	0x0000, 0x8000, CRC(2d83646f) SHA1(d1fafcce44ed3ec3dd53d84338c42244ebfca820) )
 
-	ROM_REGION( 0x10000, "gfxi", 0 )
+	ROM_REGION( 0x40000, "gfx", 0 )
 	ROM_LOAD( "no_i4.ic30",	0x00000, 0x10000, CRC(55b351a4) SHA1(b0c8a30dde076520234281da051f21f1b7cb3166) )	// i
-
-	ROM_REGION( 0x30000, "gfx", 0 )
-	ROM_LOAD( "no_b4.ic27",	0x00000, 0x10000, CRC(e48b1c8a) SHA1(88f60268fd43c06e146d936a1bdc078c44e2a213) )	// b
-	ROM_LOAD( "no_g4.ic28",	0x10000, 0x10000, CRC(4eea9a9b) SHA1(c86c083ccf08c3c310028920f9a0fe809fd7ccbe) )	// g
-	ROM_LOAD( "no_r4.ic29",	0x20000, 0x10000, CRC(ab08cdaf) SHA1(e0518403039b6bada79ffe4c6bc22fbb64d16e43) )	// r
+	ROM_LOAD( "no_b4.ic27",	0x10000, 0x10000, CRC(e48b1c8a) SHA1(88f60268fd43c06e146d936a1bdc078c44e2a213) )	// b
+	ROM_LOAD( "no_g4.ic28",	0x20000, 0x10000, CRC(4eea9a9b) SHA1(c86c083ccf08c3c310028920f9a0fe809fd7ccbe) )	// g
+	ROM_LOAD( "no_r4.ic29",	0x30000, 0x10000, CRC(ab08cdaf) SHA1(e0518403039b6bada79ffe4c6bc22fbb64d16e43) )	// r
 
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "number1_nvram.bin", 0x0000, 0x0800, CRC(4ece7b39) SHA1(49815571d75a39ab67d26691f902dfbd4e05feb4) )
