@@ -595,4 +595,28 @@
 		</part>
 	</software>
 
+	<software name="cpmplus3" cloneof="cpm">
+		<description>CP/M 3 Version 3.0</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="349696">
+				<rom name="cpmplus3.d71" size="349696" crc="1c7be360" sha1="034d9a4ba610564c0dfa2ad9539a9a75f391863e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpmfast3" cloneof="cpm">
+		<description>CP/M 3 - BDOS 3.0 / FastBIOS 3.0</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="349696">
+				<rom name="cpmfast3.d71" size="349696" crc="d0e56925" sha1="b713c99122397fd96e02b73ee94e19a26d41b67e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
