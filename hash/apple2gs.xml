@@ -29,18 +29,18 @@
 	</software>
 
 	<software name="3stooges">
-		<description>The Three Stooges</description>
+		<description>The Three Stooges [cracked]</description>
 		<year>1990</year>
 		<publisher>Cinemaware</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819279">
-				<rom name="three stooges, the (1990)(cinemaware)(disk 1 of 2)[cr][b].2mg" size="819279" crc="2530745b" sha1="84aca696fb4218718e6039a970c7bd74069ae9aa" offset="0x0000" />
+				<rom name="three stooges, the (1990)(cinemaware)(disk 1 of 2)[cr][b].2mg" size="819279" crc="2530745b" sha1="84aca696fb4218718e6039a970c7bd74069ae9aa" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819279">
-				<rom name="three stooges, the (1990)(cinemaware)(disk 2 of 2)[cr][b].2mg" size="819279" crc="190b8d64" sha1="31e89eb7633c5a0ca5cb0e0339a112662c9f3890" offset="0x0000" />
+				<rom name="three stooges, the (1990)(cinemaware)(disk 2 of 2)[cr][b].2mg" size="819279" crc="190b8d64" sha1="31e89eb7633c5a0ca5cb0e0339a112662c9f3890" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -175,22 +175,22 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819276">
-				<rom name="alien mind (1988)(pbi software)(disk 1 of 3)[b][non boot].2mg" size="819276" crc="baae3009" sha1="3abea5b3addb2b15a84df868ba6220b281f975d3" offset="0x0000" />
+				<rom name="alien mind (1988)(pbi software)(disk 1 of 3)[b][non boot].2mg" size="819276" crc="baae3009" sha1="3abea5b3addb2b15a84df868ba6220b281f975d3" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819276">
-				<rom name="alien mind (1988)(pbi software)(disk 2 of 3)[b][non boot].2mg" size="819276" crc="0be77419" sha1="0a50c0bf1258cc52c75317d4ae8f7f127be851ee" offset="0x0000" />
+				<rom name="alien mind (1988)(pbi software)(disk 2 of 3)[b][non boot].2mg" size="819276" crc="0be77419" sha1="0a50c0bf1258cc52c75317d4ae8f7f127be851ee" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="819276">
-				<rom name="alien mind (1988)(pbi software)(disk 3 of 3)[b][non boot].2mg" size="819276" crc="182c6208" sha1="72f85088b30714975357a0358cf9e88a6c41c477" offset="0x0000" />
+				<rom name="alien mind (1988)(pbi software)(disk 3 of 3)[b][non boot].2mg" size="819276" crc="182c6208" sha1="72f85088b30714975357a0358cf9e88a6c41c477" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
 			<dataarea name="flop" size="819271">
-				<rom name="alien mind (1988)(pbi software)[b][save non boot].2mg" size="819271" crc="ba560a62" sha1="1759df55fde32efe1e99683cebb5fb4af8487451" offset="0x0000" />
+				<rom name="alien mind (1988)(pbi software)[b][save non boot].2mg" size="819271" crc="ba560a62" sha1="1759df55fde32efe1e99683cebb5fb4af8487451" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -549,7 +549,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="blue helmet (19xx)(-)[b].2mg" size="819264" crc="1a3f88ba" sha1="ccc844331d6bc66ee5c615f9c6e40613a1bc9c5b" offset="0x0000" />
+				<rom name="blue helmet (19xx)(-)[b].2mg" size="819264" crc="1a3f88ba" sha1="ccc844331d6bc66ee5c615f9c6e40613a1bc9c5b" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -685,7 +685,7 @@
 	</software>
 
 	<software name="calgames">
-		<description>California Games</description>
+		<description>California Games [cracked]</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
 
@@ -1290,12 +1290,12 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="dream zone (1988)(baudville)(disk 1 of 2)[b].2mg" size="819264" crc="b9621c49" sha1="2056eac871c36d6e1b196523b6146308c8ad2616" offset="0x0000" />
+				<rom name="dream zone (1988)(baudville)(disk 1 of 2)[b].2mg" size="819264" crc="b9621c49" sha1="2056eac871c36d6e1b196523b6146308c8ad2616" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="dream zone (1988)(baudville)(disk 2 of 2)[b].2mg" size="819264" crc="c1c5bcd6" sha1="bced263f46d61059a6fb7861c3117333110531f6" offset="0x0000" />
+				<rom name="dream zone (1988)(baudville)(disk 2 of 2)[b].2mg" size="819264" crc="c1c5bcd6" sha1="bced263f46d61059a6fb7861c3117333110531f6" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1699,7 +1699,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="future shock 3d (1989)(neeka electronics)[b].2mg" size="819264" crc="5801fd9f" sha1="ef67e53a0db589d10ecc6df9bc39a922c9009eb2" offset="0x0000" />
+				<rom name="future shock 3d (1989)(neeka electronics)[b].2mg" size="819264" crc="5801fd9f" sha1="ef67e53a0db589d10ecc6df9bc39a922c9009eb2" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -1926,7 +1926,7 @@
 	</software>
 
 	<software name="gnrlgolf">
-		<description>Gnarly Golf</description>
+		<description>Gnarly Golf [cracked]</description>
 		<year>1989</year>
 		<publisher>Fanfare by Britannica</publisher>
 
@@ -2685,7 +2685,7 @@
 	</software>
 
 	<software name="keef">
-		<description>Keef the Thief</description>
+		<description>Keef the Thief [cracked]</description><!-- allows multiple goes at copy protection question -->
 		<year>1989</year>
 		<publisher>Naughty Dog / Electronic Arts</publisher>
 
@@ -2851,7 +2851,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="last rites demo (19xx)(bullwinkle moose - corrosive software)[b].2mg" size="819264" crc="f3cc3e67" sha1="05cf344e7a6a70bd712f4ce5e41828c9d38cf828" offset="0x0000" />
+				<rom name="last rites demo (19xx)(bullwinkle moose - corrosive software)[b].2mg" size="819264" crc="f3cc3e67" sha1="05cf344e7a6a70bd712f4ce5e41828c9d38cf828" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3012,7 +3012,7 @@
 	</software>
 
 	<software name="lstninja">
-		<description>The Last Ninja</description>
+		<description>The Last Ninja [cracked]</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 
@@ -3150,7 +3150,7 @@
 	</software>
 
 	<software name="manhuntr">
-		<description>Manhunter: New York</description>
+		<description>Manhunter: New York [cracked]</description><!-- skips copy-protection -->
 		<year>1988</year>
 		<publisher>Sierra</publisher>
 
@@ -3801,12 +3801,12 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="nfc megademo (1997-04)(ninjaforce)(disk 1 of 2)[b].2mg" size="819264" crc="dd1c0c8f" sha1="10f0db3d8587e43082e0369f92687b18e63492a5" offset="0x0000" />
+				<rom name="nfc megademo (1997-04)(ninjaforce)(disk 1 of 2)[b].2mg" size="819264" crc="dd1c0c8f" sha1="10f0db3d8587e43082e0369f92687b18e63492a5" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="nfc megademo (1997-04)(ninjaforce)(disk 2 of 2)[b].2mg" size="819264" crc="fc0e8897" sha1="eb014d073e50598466dec68103379205e8ae2b7b" offset="0x0000" />
+				<rom name="nfc megademo (1997-04)(ninjaforce)(disk 2 of 2)[b].2mg" size="819264" crc="fc0e8897" sha1="eb014d073e50598466dec68103379205e8ae2b7b" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3866,7 +3866,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="oil landers v0.1 (19xx)(-)[b].2mg" size="819264" crc="35011832" sha1="094068388144e59e3b83a0e2ad8ff654c3610f8a" offset="0x0000" />
+				<rom name="oil landers v0.1 (19xx)(-)[b].2mg" size="819264" crc="35011832" sha1="094068388144e59e3b83a0e2ad8ff654c3610f8a" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -4368,13 +4368,13 @@
 	</software>
 
 	<software name="pwgold10">
-		<description>Paintworks Gold v1.0</description>
+		<description>Paintworks Gold v1.0 [cr Digital Gang]</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="paintworks gold v1.0 (1988)(activision)[cr][b].2mg" size="819264" crc="29183993" sha1="a44c128c743ca374ec9dedef73f8e12e16dd877e" offset="0x0000" />
+				<rom name="paintworks gold v1.0 (1988)(activision)[cr][b].2mg" size="819264" crc="29183993" sha1="a44c128c743ca374ec9dedef73f8e12e16dd877e" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -4478,36 +4478,36 @@
 		</part>
 	</software>
 
-	<software name="rastana">
-		<description>Rastan (alt)</description>
+	<software name="rastana" cloneof="rastan">
+		<description>Rastan [cr East Coast Connection]</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="rastan (1990)(taito)(us)(disk 1 of 2)[cr2][b].2mg" size="819264" crc="5fe35b65" sha1="4b5afd7319de0ea1e6a4b0f1edc2f4afa2f108f1" offset="0x0000" />
+				<rom name="rastan (1990)(taito)(us)(disk 1 of 2)[cr2][b].2mg" size="819264" crc="5fe35b65" sha1="4b5afd7319de0ea1e6a4b0f1edc2f4afa2f108f1" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="rastan (1990)(taito)(us)(disk 2 of 2)[cr2][b].2mg" size="819264" crc="90e9bfc3" sha1="fe569db185fd8c4f3257397fd25fdcbac89f9803" offset="0x0000" />
+				<rom name="rastan (1990)(taito)(us)(disk 2 of 2)[cr2][b].2mg" size="819264" crc="90e9bfc3" sha1="fe569db185fd8c4f3257397fd25fdcbac89f9803" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="rastan">
-		<description>Rastan</description>
+		<description>Rastan [cr Computist Magazine][t lives]</description>
 		<year>1990</year>
 		<publisher>Taito</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819271">
-				<rom name="rastan (1990)(taito)(us)(disk 1 of 2)[cr][t][b].2mg" size="819271" crc="ff74fa9b" sha1="6b4a26374ade18db83b9f28bb6b9ca2dd42c8bfe" offset="0x0000" />
+				<rom name="rastan (1990)(taito)(us)(disk 1 of 2)[cr][t][b].2mg" size="819271" crc="ff74fa9b" sha1="6b4a26374ade18db83b9f28bb6b9ca2dd42c8bfe" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819271">
-				<rom name="rastan (1990)(taito)(us)(disk 2 of 2)[cr][t][b].2mg" size="819271" crc="4ad2a826" sha1="3c83975b4390d2c9ae6664f656abc82efe687efa" offset="0x0000" />
+				<rom name="rastan (1990)(taito)(us)(disk 2 of 2)[cr][t][b].2mg" size="819271" crc="4ad2a826" sha1="3c83975b4390d2c9ae6664f656abc82efe687efa" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -4727,12 +4727,12 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="gs sales demo (19xx)(-)(disk 1 of 2)[b].2mg" size="819264" crc="878fcaeb" sha1="d480f73919690534953c99c1e7ee46a1811d4d27" offset="0x0000" />
+				<rom name="gs sales demo (19xx)(-)(disk 1 of 2)[b].2mg" size="819264" crc="878fcaeb" sha1="d480f73919690534953c99c1e7ee46a1811d4d27" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="gs sales demo (19xx)(-)(disk 2 of 2)[b].2mg" size="819264" crc="bd3ee778" sha1="e04137d4e528556f8dfe900627c5b45b41b74da0" offset="0x0000" />
+				<rom name="gs sales demo (19xx)(-)(disk 2 of 2)[b].2mg" size="819264" crc="bd3ee778" sha1="e04137d4e528556f8dfe900627c5b45b41b74da0" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -4755,7 +4755,7 @@
 	</software>
 
 	<software name="sbahras">
-		<description>The Secrets of Bahras</description>
+		<description>The Secrets of Bahras [cr Club 96]</description>
 		<year>1991</year>
 		<publisher>Victory Software</publisher>
 
@@ -4819,7 +4819,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="space harrier (19xx)(-)[b].2mg" size="819264" crc="92f31d5b" sha1="f59bdf1bfd2ecbef17b4794b6fdd8f4b9c25393d" offset="0x0000" />
+				<rom name="space harrier (19xx)(-)[b].2mg" size="819264" crc="92f31d5b" sha1="f59bdf1bfd2ecbef17b4794b6fdd8f4b9c25393d" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -5168,7 +5168,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="space cluster (1990)(miami software)(fw)[b].2mg" size="819264" crc="99949336" sha1="46ad2b82a2bf1405e6329c7e9dde0fe3ca09a1e5" offset="0x0000" />
+				<rom name="space cluster (1990)(miami software)(fw)[b].2mg" size="819264" crc="99949336" sha1="46ad2b82a2bf1405e6329c7e9dde0fe3ca09a1e5" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -5366,7 +5366,7 @@
 	</software>
 
 	<software name="sshockey">
-		<description>Superstar Ice Hockey</description>
+		<description>Superstar Ice Hockey [cr Digital Gang]</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 
@@ -6131,7 +6131,7 @@
 	</software>
 
 	<software name="taskfrce">
-		<description>Task Force</description>
+		<description>Task Force [cr DreamWorld Society][t health]</description>
 		<year>1990</year>
 		<publisher>Fanfare by Britannica Software</publisher>
 
@@ -6254,7 +6254,7 @@
 	</software>
 
 	<software name="tdrive2">
-		<description>Test Drive II: The Duel</description>
+		<description>Test Drive II: The Duel [cr The Torcher Chamber]</description>
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 
@@ -6457,7 +6457,7 @@
 	</software>
 
 	<software name="tomahawk">
-		<description>Tomahawk</description>
+		<description>Tomahawk [cr The Gryphon]</description>
 		<year>1988</year>
 		<publisher>Datasoft</publisher>
 
@@ -6581,7 +6581,7 @@
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="ttc demo (1991-01-12)(ttc)[b].2mg" size="819264" crc="05f67d07" sha1="ba934c3698fbf287f6ab6cd230d3a73d06859896" offset="0x0000" />
+				<rom name="ttc demo (1991-01-12)(ttc)[b].2mg" size="819264" crc="05f67d07" sha1="ba934c3698fbf287f6ab6cd230d3a73d06859896" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -6662,13 +6662,13 @@
 	</software>
 
 	<software name="uninvite">
-		<description>Uninvited</description>
+		<description>Uninvited [cr The Torcher Chamber]</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
-				<rom name="uninvited (1988)(mindscape)[cr][b][non boot].2mg" size="819264" crc="a2f6378f" sha1="ec926232d3b10aea1d1989600e7274d9ec9b6f81" offset="0x0000" />
+				<rom name="uninvited (1988)(mindscape)[cr][b][non boot].2mg" size="819264" crc="a2f6378f" sha1="ec926232d3b10aea1d1989600e7274d9ec9b6f81" offset="0x0000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -6833,7 +6833,7 @@
 	</software>
 
 	<software name="windwlkr">
-		<description>Windwalker</description>
+		<description>Windwalker [cr Club 96]</description>
 		<year>1990</year>
 		<publisher>Origin Systems</publisher>
 
