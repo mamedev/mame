@@ -11,8 +11,7 @@
     TODO:
         - Fog equation and parameters are probably not accurate.
         - Winding Heat (and maybe others) have slight Z-fighting problems.
-        - 3D isn't always turned off properly (during title screens for example).
-          Figure out what controls this. Video mixer, layer priority or some 3D register?
+        - 3D in Solar Assault title isn't properly turned off (the SHARC keeps rendering 3D).
 
 */
 
@@ -512,18 +511,22 @@ WRITE32_HANDLER( K001005_w )
 			K001005_fifo_write_ptr = 0;
 			K001005_fifo_read_ptr = 0;
 
-			if (data == 2 && K001005_3d_fifo_ptr > 0)
+			if (data == 2)
 			{
-				render_polygons(space.machine());
-				poly_wait(poly, "render_polygons");
+				if (K001005_3d_fifo_ptr > 0)
+				{
+					render_polygons(space.machine());
+					poly_wait(poly, "render_polygons");
 
 #if LOG_POLY_FIFO
-				count = 0;
-				printf("\nrender %d\n", K001005_3d_fifo_ptr);
-				printf("------------------------------------\n");
+					count = 0;
+					printf("\nrender %d\n", K001005_3d_fifo_ptr);
+					printf("------------------------------------\n");
 #endif
 
-				K001005_3d_fifo_ptr = 0;
+					K001005_3d_fifo_ptr = 0;
+				}
+
 				K001005_swap_buffers(space.machine());
 			}
 			break;
@@ -1470,7 +1473,7 @@ static void render_polygons(running_machine &machine)
 				poly_render_quad(poly, K001005_bitmap[K001005_bitmap_page], visarea, draw_scanline_2d_tex, 5, &v[0], &v[1], &v[2], &v[3]);
 			}
 		}
-		else if (cmd == 0x80000121)
+		else if (cmd == 0x80000121 || cmd == 0x80000126)
 		{
 			// no texture, color gouraud, Z
 
