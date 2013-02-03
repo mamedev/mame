@@ -24,6 +24,7 @@ struct osd_midi_device
 	UINT8 xmit_in[4]; // Pm_Messages mean we can at most have 3 residue bytes
 	int xmit_cnt;
 	UINT8 last_status;
+	bool rx_sysex;
 };
 
 void osd_list_midi_devices(void)
@@ -192,46 +193,88 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 	for (int msg = 0; msg < msgsRead; msg++)
 	{
 		UINT8 status = Pm_MessageStatus(dev->rx_evBuf[msg].message);
-		switch ((status>>4) & 0xf)
+
+		if (dev->rx_sysex)
 		{
-			case 0xc:	// 2-byte messages
-			case 0xd:
-				*pOut++ = status;
-				*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message); 
-				bytesOut += 2;
-				break;
-
-			case 0xf:	// system common
-				switch (status & 0xf)
+			if (status & 0x80)	// sys real-time imposing on us?
+			{
+				if ((status == 0xf2) || (status == 0xf3))
 				{
-					case 0:	// System Exclusive
-						printf("No SEx please!\n");
-						break;
-
-					case 7:	// End of System Exclusive
-						*pOut++ = status;
-						bytesOut += 1;
-						break;
-
-					case 2:	// song pos
-					case 3:	// song select
-						*pOut++ = status;
-						*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message); 
-						*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message); 
-						bytesOut += 3;
-						break;
-
-					default:	// all other defined Fx messages are 1 byte
-						break;
+					*pOut++ = status;
+					*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message); 
+					*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message); 
+					bytesOut += 3;
 				}
-				break;
+				else
+				{
+					*pOut++ = status;
+					bytesOut++;
+				}
+			}
+			else	// shift out the sysex bytes
+			{
+				for (int i = 0; i < 4; i++)
+				{
+					UINT8 byte = dev->rx_evBuf[msg].message & 0xff;
+					*pOut++ = byte;
+					bytesOut++;
+					if (byte == MIDI_EOX)
+					{
+						dev->rx_sysex = false;
+						break;
+					}
+					dev->rx_evBuf[msg].message >>= 8;
+				}
+			}
+		}
+		else
+		{
+			switch ((status>>4) & 0xf)
+			{
+				case 0xc:	// 2-byte messages
+				case 0xd:
+					*pOut++ = status;
+					*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message); 
+					bytesOut += 2;
+					break;
 
-			default:
-				*pOut++ = status;
-				*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message); 
-				*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message); 
-				bytesOut += 3;
-				break;
+				case 0xf:	// system common
+					switch (status & 0xf)
+					{
+						case 0:	// System Exclusive
+							*pOut++ = status;	// this should be OK: the shortest legal sysex is F0 tt dd F7, I believe
+							*pOut++ = (dev->rx_evBuf[msg].message>>8) & 0xff;
+							*pOut++ = (dev->rx_evBuf[msg].message>>16) & 0xff;
+							*pOut++ = (dev->rx_evBuf[msg].message>>24) & 0xff;
+							bytesOut += 4;
+							dev->rx_sysex = true;
+							break;
+
+						case 7:	// End of System Exclusive
+							*pOut++ = status;
+							bytesOut += 1;
+							break;
+
+						case 2:	// song pos
+						case 3:	// song select
+							*pOut++ = status;
+							*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message); 
+							*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message); 
+							bytesOut += 3;
+							break;
+
+						default:	// all other defined Fx messages are 1 byte
+							break;
+					}
+					break;
+
+				default:
+					*pOut++ = status;
+					*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message); 
+					*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message); 
+					bytesOut += 3;
+					break;
+			}
 		}
 	}
 
