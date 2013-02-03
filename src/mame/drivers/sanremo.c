@@ -100,6 +100,8 @@ public:
 		m_videoram(*this, "videoram"){ }
 
 	required_shared_ptr<UINT8> m_videoram;
+
+	UINT8 m_attrram[0x800];
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(sanremo_videoram_w);
 	TILE_GET_INFO_MEMBER(get_sanremo_tile_info);
@@ -120,20 +122,21 @@ public:
 WRITE8_MEMBER(sanremo_state::sanremo_videoram_w)
 {
 	m_videoram[offset] = data;
+	m_attrram[offset] = banksel;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 TILE_GET_INFO_MEMBER(sanremo_state::get_sanremo_tile_info)
 {
 	int code = m_videoram[tile_index];
-	int bank = banksel;
+	int bank = m_attrram[tile_index];
 
-	SET_TILE_INFO_MEMBER( bank, code, 0, 0);
+	SET_TILE_INFO_MEMBER( 0, code + bank * 256, 0, 0);
 }
 
 void sanremo_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sanremo_state::get_sanremo_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 48, 48);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(sanremo_state::get_sanremo_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 48, 40);
 }
 
 UINT32 sanremo_state::screen_update_sanremo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -195,7 +198,7 @@ WRITE8_MEMBER(sanremo_state::banksel_w)
 
 static ADDRESS_MAP_START( sanremo_map, AS_PROGRAM, 8, sanremo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(sanremo_videoram_w) AM_SHARE("videoram")	// 2x 76C28 (only 1 used?)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(sanremo_videoram_w) AM_SHARE("videoram")	// 2x 76C28 (1x accessed directly, latched bank written to other like subsino etc.)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")								// battery backed UM6116
 ADDRESS_MAP_END
 
@@ -318,42 +321,6 @@ static const gfx_layout ilayout =
 
 static GFXDECODE_START( sanremo )
 	GFXDECODE_ENTRY( "gfx",  0,      tilelayout, 0, 1 )	// ok
-	GFXDECODE_ENTRY( "gfx",  0x800,  tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x1000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x1800, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x2000, tilelayout, 0, 1 ) // ok tiles 0x400 (joker1)
-	GFXDECODE_ENTRY( "gfx",  0x2800, tilelayout, 0, 1 ) // ok tiles 0x500 (joker2)
-	GFXDECODE_ENTRY( "gfx",  0x3000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x3800, tilelayout, 0, 1 )
-
-	GFXDECODE_ENTRY( "gfx",  0x4000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x4800, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x5000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x5800, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x6000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x6800, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x7000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x7800, tilelayout, 0, 1 )
-
-	GFXDECODE_ENTRY( "gfx",  0x8000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x8800, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x9000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0x9800, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0xa000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0xa800, tilelayout, 0, 1 ) // ok tiles 0x1500 (light lucky clubs)
-	GFXDECODE_ENTRY( "gfx",  0xb000, tilelayout, 0, 1 ) // ok tiles 0x1600 (dark lucky clubs)
-	GFXDECODE_ENTRY( "gfx",  0xb800, tilelayout, 0, 1 )
-
-	GFXDECODE_ENTRY( "gfx",  0xc000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0xc800, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0xd000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0xd800, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0xe000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0xe800, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0xf000, tilelayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx",  0xf800, tilelayout, 0, 1 )
-
-	GFXDECODE_ENTRY( "gfxi", 0, ilayout,    0, 1 )	// Intensity, just to see the layer graphically
 GFXDECODE_END
 
 
