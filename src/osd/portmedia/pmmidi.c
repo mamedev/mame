@@ -12,6 +12,9 @@
 
 static const int RX_EVENT_BUF_SIZE = 512;
 
+#define MIDI_SYSEX	0xf0
+#define MIDI_EOX	0xf7
+
 struct osd_midi_device
 {
 	#ifndef DISABLE_MIDI
@@ -242,21 +245,46 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 {
 	#ifndef DISABLE_MIDI
 	int bytes_needed = 0;
+	PmEvent ev;
+	ev.timestamp = 0;	// use the current time
 
-	// skip sysex data
-	if (dev->last_status == 0xf0)
+	// handle sysex
+	if (dev->last_status == MIDI_SYSEX)
 	{
-		if (data != 0xf7)
+//		printf("sysex: %02x (%d)\n", data, dev->xmit_cnt);
+
+		// if we get a status that isn't sysex, assume it's system common
+		if ((data & 0x80) && (data != MIDI_EOX))
 		{
+//			printf("common during sysex!\n");
+			ev.message = Pm_Message(data, 0, 0);
+			Pm_Write(dev->pmStream, &ev, 1);
 			return;
 		}
-		else
+
+		dev->xmit_in[dev->xmit_cnt++] = data;
+
+		// if EOX or 4 bytes filled, transmit 4 bytes
+		if ((dev->xmit_cnt == 4) || (data == MIDI_EOX))
 		{
-			dev->last_status = 0xf7;
-			return;
+			ev.message = dev->xmit_in[0] | (dev->xmit_in[1]<<8) | (dev->xmit_in[2]<<16) | (dev->xmit_in[3]<<24);
+			Pm_Write(dev->pmStream, &ev, 1);
+			dev->xmit_in[0] = dev->xmit_in[1] = dev->xmit_in[2] = dev->xmit_in[3] = 0;
+			dev->xmit_cnt = 0;
+
+//			printf("SysEx packet: %08x\n", ev.message);
+
+			// if this is EOX, kill the running status
+			if (data == MIDI_EOX)
+			{
+				dev->last_status = 0;
+			}
 		}
+
+		return;
 	}
 
+	// handle running status
 	if ((dev->xmit_cnt == 0) && (data & 0x80))
 	{
 		dev->last_status = data;
@@ -272,10 +300,10 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 		dev->xmit_in[dev->xmit_cnt++] = data;
 	}
 
-	if ((dev->xmit_cnt == 1) && (dev->xmit_in[0] == 0xf0))
+	if ((dev->xmit_cnt == 1) && (dev->xmit_in[0] == MIDI_SYSEX))
 	{
-		dev->xmit_cnt = 0;
-		dev->last_status = 0xf0;
+//		printf("Start SysEx!\n");
+		dev->last_status = MIDI_SYSEX;
 		return;
 	}
 
@@ -290,8 +318,7 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 		case 0xf:	// system common
 			switch (dev->xmit_in[0] & 0xf)
 			{
-				case 0:	// System Exclusive
-					printf("No SEx please!\n");
+				case 0:	// System Exclusive is handled above
 					break;
 
 				case 7:	// End of System Exclusive
@@ -316,9 +343,7 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 
 	if (dev->xmit_cnt == bytes_needed)
 	{
-		PmEvent ev;
 		ev.message = Pm_Message(dev->xmit_in[0], dev->xmit_in[1], dev->xmit_in[2]);
-		ev.timestamp = 0;	// use the current time
 		Pm_Write(dev->pmStream, &ev, 1);
 		dev->xmit_cnt = 0;
 	}
