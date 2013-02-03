@@ -22,6 +22,18 @@ public:
 	bitmap_ind16 m_tile_bitmap_bg;
 	bitmap_ind16 m_tile_bitmap_fg;
 	DECLARE_WRITE16_MEMBER(soundcommand_w);
+
+	DECLARE_WRITE16_MEMBER( spbatnp_90002_w );
+	DECLARE_WRITE16_MEMBER( spbatnp_90006_w );
+	DECLARE_WRITE16_MEMBER( spbatnp_9000a_w );
+	DECLARE_WRITE16_MEMBER( spbatnp_9000c_w );
+	DECLARE_WRITE16_MEMBER( spbatnp_9000e_w );
+
+	DECLARE_WRITE16_MEMBER( spbatnp_90124_w );
+	DECLARE_WRITE16_MEMBER( spbatnp_9012c_w );
+
+	
+
 	virtual void video_start();
 	UINT32 screen_update_spbactn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_spbactnp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

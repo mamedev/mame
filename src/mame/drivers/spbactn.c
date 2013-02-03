@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x90030, 0x90031) AM_READ_PORT("DSW1")
 	AM_RANGE(0x90040, 0x90041) AM_READ_PORT("DSW2")
 
-	/* this is an awful lot of unknowns */
+	/* this are an awful lot of unknowns */
 	AM_RANGE(0x90000, 0x90001) AM_WRITENOP
 	AM_RANGE(0x90010, 0x90011) AM_WRITE(soundcommand_w)
 //  AM_RANGE(0x90020, 0x90021) AM_WRITE(soundcommand_w)
@@ -203,6 +203,17 @@ static ADDRESS_MAP_START( spbactnp_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x70000, 0x77fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_word_w) AM_SHARE("paletteram")   // yes R and G are swapped vs. the released version
 
+	AM_RANGE(0x90002, 0x90003) AM_WRITE( spbatnp_90002_w )
+	AM_RANGE(0x90006, 0x90007) AM_WRITE( spbatnp_90006_w )
+	AM_RANGE(0x9000a, 0x9000b) AM_WRITE( spbatnp_9000a_w )
+	AM_RANGE(0x9000c, 0x9000d) AM_WRITE( spbatnp_9000c_w )
+	AM_RANGE(0x9000e, 0x9000f) AM_WRITE( spbatnp_9000e_w )
+
+	AM_RANGE(0x90124, 0x90125) AM_WRITE( spbatnp_90124_w ) // bg scroll
+	AM_RANGE(0x9012c, 0x9012d) AM_WRITE( spbatnp_9012c_w ) // bg scroll
+
+	 
+
 	AM_RANGE(0x90000, 0x900ff) AM_READ(temp_read_handler_r) // temp
 
 ADDRESS_MAP_END
@@ -216,6 +227,17 @@ static ADDRESS_MAP_START( spbactn_sound_map, AS_PROGRAM, 8, spbactn_state )
 	AM_RANGE(0xfc00, 0xfc00) AM_READNOP AM_WRITENOP /* irq ack ?? */
 	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
+
+
+
+static ADDRESS_MAP_START( spbactnp_extra_map, AS_PROGRAM, 8, spbactn_state )
+	AM_RANGE(0x0000, 0xefff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_RAM
+	AM_RANGE(0xd000, 0xd1ff) AM_RAM
+	AM_RANGE(0xd200, 0xd200) AM_RAM
+ADDRESS_MAP_END
+
 
 
 static INPUT_PORTS_START( spbactn )
@@ -432,9 +454,13 @@ static MACHINE_CONFIG_START( spbactnp, spbactn_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq3_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
-	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map) // wrong
+	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map)
 
-	// there is a rom for another Z80 and a socket for one..
+	// yes another cpu..
+	MCFG_CPU_ADD("extracpu", Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(spbactnp_extra_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq0_line_hold)
+
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -521,7 +547,7 @@ ROM_START( spbactnp )
 	ROM_LOAD16_BYTE( "spa.21k", 0x20001, 0x10000, CRC(8226f644) SHA1(2d3e32368fbfec7437bd972096fd92972f52f6b0) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "6204_6-6.29c",   0x00000, 0x10000, CRC(e8250c26) SHA1(9b669878790c8e3c5d80f165b5ffa1d6830f4696) )
+	ROM_LOAD( "spa.17g", 0x00000, 0x10000, CRC(445fc2c5) SHA1(c0e40496cfcaa0a8c90fb05111fadee74582f91a) )
 
 	
 	ROM_REGION( 0x40000, "oki", 0 )
@@ -540,16 +566,16 @@ ROM_START( spbactnp )
 	ROM_LOAD( "spa_sp1_3-14-a-10.4m", 0x20000, 0x20000, CRC(86406336) SHA1(bf091dc13404535e6baee990f5e957d3538841ac) )
 
 
-
-	ROM_REGION( 0x10000, "otherz80", 0 ) // what? it's annother z80 rom... unused for now
-	ROM_LOAD( "spa.17g", 0x00000, 0x10000, CRC(445fc2c5) SHA1(c0e40496cfcaa0a8c90fb05111fadee74582f91a) )
+	/* does this have an extra (horizontal) screen maybe, with the girls being displayed on that instead of the main one.. */
+	ROM_REGION( 0x10000, "extracpu", 0 ) // what? it's annother z80 rom... unused for now
+	ROM_LOAD( "6204_6-6.29c",   0x00000, 0x10000, CRC(e8250c26) SHA1(9b669878790c8e3c5d80f165b5ffa1d6830f4696) )
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* 8x8 BG Tiles */ // more 8x8 tiles, with the girl graphics? unused for now .. for horizontal orientation?? 
 	ROM_LOAD( "spa.25c", 0x00000, 0x20000, CRC(02b69ab9) SHA1(368e774693a6fab756faaeec4ffd42406816e6e2) )
 
 	ROM_REGION( 0x10000, "misc", 0 ) //misc
-	ROM_LOAD( "p109.18d", 0x00000, 0x100, CRC(2297a725) SHA1(211ebae11ca55cc67df29291c3e0916836550bfb) )
-	ROM_LOAD( "pin.b.sub.23g", 0x00000, 0x100, CRC(3a0c70ed) SHA1(9be38c421e9a14f6811752a4464dd5dbf037e385) )
+	ROM_LOAD( "p109.18d", 0x00000, 0x100, CRC(2297a725) SHA1(211ebae11ca55cc67df29291c3e0916836550bfb) ) // mostly empty.. is this correct?
+	ROM_LOAD( "pin.b.sub.23g", 0x00000, 0x100, CRC(3a0c70ed) SHA1(9be38c421e9a14f6811752a4464dd5dbf037e385) ) // mostly empty.. is this correct?
 	ROM_LOAD( "tcm1.19g.bin", 0x00000, 0x53, CRC(2c54354a) SHA1(11d8b6cdaf052b5a9fbcf6b6fbf99c5f89575cfa) )
 ROM_END
 

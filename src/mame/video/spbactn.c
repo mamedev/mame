@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_bg_tile_info)
 {
 	int attr = m_bgvideoram[tile_index];
 	int tileno = m_bgvideoram[tile_index+0x2000];
-	SET_TILE_INFO_MEMBER(1, tileno, ((attr & 0x00f0)>>4), 0);
+	SET_TILE_INFO_MEMBER(1, tileno, ((attr & 0x00f0)>>4)+0x80, 0);
 }
 
 
@@ -142,7 +142,15 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_fg_tile_info)
 	int attr = m_fgvideoram[tile_index];
 	int tileno = m_fgvideoram[tile_index+0x2000];
 
-	SET_TILE_INFO_MEMBER(0, tileno, ((attr & 0x00f0)>>4), 0);
+	int color = ((attr & 0x00f0)>>4);
+	
+	/* blending */
+	if (attr & 0x0008)
+		color += 0x00f0;
+	else
+		color |= 0x0080;
+
+	SET_TILE_INFO_MEMBER(0, tileno, color, 0);
 }
 
 
@@ -156,100 +164,70 @@ void spbactn_state::video_start()
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spbactn_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spbactn_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_transparent_pen(0);
 
 }
 
+
+WRITE16_MEMBER( spbactn_state::spbatnp_90002_w )
+{
+	//printf("spbatnp_90002_w %04x\n",data);
+}
+
+WRITE16_MEMBER( spbactn_state::spbatnp_90006_w )
+{
+	//printf("spbatnp_90006_w %04x\n",data);
+}
+
+
+WRITE16_MEMBER( spbactn_state::spbatnp_9000c_w )
+{
+	//printf("spbatnp_9000c_w %04x\n",data);
+}
+
+WRITE16_MEMBER( spbactn_state::spbatnp_9000e_w )
+{
+	//printf("spbatnp_9000e_w %04x\n",data);
+}
+
+WRITE16_MEMBER( spbactn_state::spbatnp_9000a_w )
+{
+	//printf("spbatnp_9000a_w %04x\n",data);
+}
+
+WRITE16_MEMBER( spbactn_state::spbatnp_90124_w )
+{
+	//printf("spbatnp_90124_w %04x\n",data);
+	m_bg_tilemap->set_scrolly(0, data);
+
+}
+
+WRITE16_MEMBER( spbactn_state::spbatnp_9012c_w )
+{
+	//printf("spbatnp_9012c_w %04x\n",data);
+	m_bg_tilemap->set_scrollx(0, data);
+}
+
+
+
 int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites)
 {
-	int offs, sx, sy;
-
 	m_tile_bitmap_fg.fill(0, cliprect);
 
-	/* draw table bg gfx */
-	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
-	{
-		int attr, code, color;
+	m_bg_tilemap->draw(m_tile_bitmap_bg, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
-		code = m_bgvideoram[offs + 0x4000 / 2];
-		attr = m_bgvideoram[offs + 0x0000 / 2];
 
-		color = ((attr & 0x00f0) >> 4) | 0x80;
-
-		drawgfx_transpen_raw(m_tile_bitmap_bg, cliprect, machine().gfx[1],
-					code,
-					machine().gfx[1]->colorbase() + color * machine().gfx[1]->granularity(),
-					0, 0,
-					16 * sx, 8 * sy,
-					(UINT32)-1);
-
-		sx++;
-		if (sx > 63)
-		{
-			sy++;
-			sx = 0;
-		}
-	}
 
 	if (draw_sprites(machine(), m_tile_bitmap_bg, cliprect, 0, alt_sprites))
 	{
-		/* kludge: draw table bg gfx again if priority 0 sprites are enabled */
-		for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
-		{
-			int attr, code, color;
-
-			code = m_bgvideoram[offs + 0x4000 / 2];
-			attr = m_bgvideoram[offs + 0x0000 / 2];
-
-			color = ((attr & 0x00f0) >> 4) | 0x80;
-
-			drawgfx_transpen_raw(m_tile_bitmap_bg, cliprect, machine().gfx[1],
-					code,
-					machine().gfx[1]->colorbase() + color * machine().gfx[1]->granularity(),
-					0, 0,
-					16 * sx, 8 * sy,
-					0);
-
-			sx++;
-			if (sx > 63)
-			{
-				sy++;
-				sx = 0;
-			}
-		}
+		m_bg_tilemap->draw(m_tile_bitmap_bg, cliprect, 0, 0);
 	}
 
 	draw_sprites(machine(), m_tile_bitmap_bg, cliprect, 1, alt_sprites);
 
-	/* draw table fg gfx */
-	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)
-	{
-		int attr, code, color;
+	m_fg_tilemap->draw(m_tile_bitmap_fg, cliprect, 0, 0);
 
-		code = m_fgvideoram[offs + 0x4000 / 2];
-		attr = m_fgvideoram[offs + 0x0000 / 2];
-
-		color = ((attr & 0x00f0) >> 4);
-
-		/* blending */
-		if (attr & 0x0008)
-			color += 0x00f0;
-		else
-			color |= 0x0080;
-
-		drawgfx_transpen_raw(m_tile_bitmap_fg, cliprect, machine().gfx[0],
-					code,
-					machine().gfx[0]->colorbase() + color * machine().gfx[0]->granularity(),
-					0, 0,
-					16 * sx, 8 * sy,
-					0);
-
-		sx++;
-		if (sx > 63)
-		{
-			sy++;
-			sx = 0;
-		}
-	}
 
 	draw_sprites(machine(), m_tile_bitmap_fg, cliprect, 2, alt_sprites);
 	draw_sprites(machine(), m_tile_bitmap_fg, cliprect, 3, alt_sprites);
