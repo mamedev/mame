@@ -855,6 +855,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="actionpu" supported="no">
     <description>Action Puzzle - Prism Land (Japan)</description>
     <year>199?</year>
@@ -881,6 +882,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="advanrac" supported="no">
     <description>Advan Racing (Japan)</description>
     <year>199?</year>
@@ -1648,6 +1650,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="bakumats" supported="no">
     <description>Bakumatsu Roman - Gekka no Kenshi (The Last Blade) (Japan)</description>
     <year>199?</year>
@@ -1687,6 +1690,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- MESS crash-->
   <software name="bakuryuu" supported="no">
     <description>Bakuryuu (Japan)</description>
     <year>199?</year>
@@ -1700,7 +1704,8 @@ A few comments on these:
     </part>
   </software>
 
-  <software name="baminkid" supported="no">
+  <!-- OK - setloc out of range: 00:00:00 -->
+  <software name="baminkid">
     <description>Bamin Kids (Japan)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
@@ -1726,6 +1731,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="bardyshj" supported="no">
     <description>Bardysh (Japan)</description>
     <year>199?</year>
@@ -1817,6 +1823,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- logos, then black screen -->
   <software name="bealphar" supported="no">
     <description>Bealphareth (Japan)</description>
     <year>199?</year>
@@ -2139,7 +2146,8 @@ A few comments on these:
     </part>
   </software>
 
-  <software name="blockku2" supported="no">
+  <!-- boot OK -->
+  <software name="blockku2">
     <description>Block Kuzushi 2 (Japan)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
@@ -2152,6 +2160,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="blockkuz" supported="no">
     <description>Block Kuzushi Kowashite Help! (Japan)</description>
     <year>199?</year>
@@ -2256,6 +2265,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="bonogura" supported="no">
     <description>Bonogurashi (Japan)</description>
     <year>199?</year>
@@ -2365,6 +2375,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="buckleup" supported="no">
     <description>Buckle Up! (Japan)</description>
     <year>199?</year>
@@ -2378,6 +2389,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- stuck on sony logo -->
   <software name="bugijapa" supported="no">
     <description>Bugi (Japan)</description>
     <year>199?</year>
@@ -2391,6 +2403,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="burnoutj" supported="no">
     <description>Burn Out (Japan)</description>
     <year>199?</year>
@@ -2404,6 +2417,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="burningr" supported="no">
     <description>Burning Road (Japan)</description>
     <year>199?</year>
@@ -2443,6 +2457,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="calcoloj" supported="no">
     <description>Calcolo! (Japan)</description>
     <year>199?</year>
@@ -2456,6 +2471,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="captainc" supported="no">
     <description>Captain Commando (Japan)</description>
     <year>199?</year>
@@ -2703,6 +2719,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- OK, gfx alignment problems -->
   <software name="circuitb" supported="no">
     <description>Circuit Beat (Japan)</description>
     <year>199?</year>
@@ -2716,6 +2733,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="cleopatr" supported="no">
     <description>Cleopatra's Fortune (Japan)</description>
     <year>199?</year>
@@ -2885,6 +2903,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="cotton10" supported="no">
     <description>Cotton 100% (Japan)</description>
     <year>199?</year>
@@ -2942,6 +2961,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- missing GFX? -->
   <software name="crocadve" supported="no">
     <description>Croc Adventure (Japan)</description>
     <year>199?</year>
@@ -3393,6 +3413,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- missing FMVs, crash MESS -->
   <software name="destruct" supported="no">
     <description>Destruction Derby 2 (Japan)</description>
     <year>199?</year>
@@ -3489,6 +3510,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="docchime" supported="no">
     <description>Docchi Mecha! (Japan)</description>
     <year>199?</year>
@@ -3567,6 +3589,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="dominoku" supported="no">
     <description>Domino-Kun wo Tomenaide - No One Can Stop Mr. Domino (Japan)</description>
     <year>199?</year>
@@ -3580,6 +3603,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="donpachi" supported="no">
     <description>DonPachi (Japan)</description>
     <year>199?</year>
@@ -3619,6 +3643,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after logos -->
   <software name="doubledr" supported="no">
     <description>Double Dragon (Japan)</description>
     <year>199?</year>
@@ -3684,6 +3709,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after logos -->
   <software name="dragondr" supported="no">
     <description>Dragon Drive (Japan)</description>
     <year>199?</year>
@@ -3871,6 +3897,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="dsoc04" supported="no">
     <description>Dynamite Soccer 2004 Final (Japan)</description>
     <year>199?</year>
@@ -4296,6 +4323,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- hangs loading after logos -->
   <software name="finaldoo" supported="no">
     <description>Final Doom (Japan)</description>
     <year>199?</year>
@@ -4374,6 +4402,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="firemen2" supported="no">
     <description>Firemen 2, The - Pete &amp; Danny (Japan)</description>
     <year>199?</year>
@@ -4509,6 +4538,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="formulan" supported="no">
     <description>Formula Nippon '99 (Japan)</description>
     <year>199?</year>
@@ -4657,6 +4687,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="gaiaseed" supported="no">
     <description>Gaia Seed - Project Seed Trap (Japan)</description>
     <year>199?</year>
@@ -4922,6 +4953,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="gekiohsh" supported="no">
     <description>Geki-Oh ShienRyu (Japan)</description>
     <year>199?</year>
@@ -5226,6 +5258,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="guiltyge" supported="no">
     <description>Guilty Gear (Japan)</description>
     <year>199?</year>
@@ -5265,6 +5298,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- hardlock MESS -->
   <software name="gunbirdj" supported="no">
     <description>Gunbird (Japan)</description>
     <year>199?</year>
@@ -5391,6 +5425,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="harmfulp" supported="no">
     <description>Harmful Park (Japan)</description>
     <year>199?</year>
@@ -5909,6 +5944,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="hyperral" supported="no">
     <description>Hyper-Rally (Japan)</description>
     <year>199?</year>
@@ -6010,6 +6046,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="indy500j" supported="no">
     <description>Indy 500 (Japan)</description>
     <year>199?</year>
@@ -6062,6 +6099,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="irritati" supported="no">
     <description>Irritating Stick - Denryuu Iraira Bou Returns (Japan)</description>
     <year>199?</year>
@@ -6566,6 +6604,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="kingofbo" supported="no">
     <description>King of Bowling 2 (Japan)</description>
     <year>199?</year>
@@ -6956,6 +6995,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="kyorocha" supported="no">
     <description>Kyorochan no Purikura Daisakusen (Japan)</description>
     <year>199?</year>
@@ -7368,6 +7408,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="madpanic" supported="no">
     <description>Mad Panic Coaster (Japan)</description>
     <year>199?</year>
@@ -7420,6 +7461,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="magicald" supported="no">
     <description>Magical Drop F - Daibouken mo Rakujyanai! (Japan)</description>
     <year>199?</year>
@@ -8113,6 +8155,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="mrdrille" supported="no">
     <description>Mr. Driller G (Japan)</description>
     <year>199?</year>
@@ -8350,6 +8393,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after logos -->
   <software name="nexttedx" supported="no">
     <description>Next Tetris, The (Deluxe) (Japan)</description>
     <year>199?</year>
@@ -8363,6 +8407,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after logos -->
   <software name="nexttetr" supported="no">
     <description>Next Tetris, The (Japan)</description>
     <year>199?</year>
@@ -9124,6 +9169,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- missing GFX -->
   <software name="petitcar" supported="no">
     <description>Petit Carat (Japan)</description>
     <year>199?</year>
@@ -9137,6 +9183,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="picnicex" supported="no">
     <description>Picnic! Excellent (Japan)</description>
     <year>199?</year>
@@ -9150,6 +9197,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="pinballf" supported="no">
     <description>Pinball Fantasies Deluxe (Japan)</description>
     <year>199?</year>
@@ -9306,6 +9354,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="popnpopj" supported="no">
     <description>Pop'n Pop (Japan)</description>
     <year>199?</year>
@@ -9319,6 +9368,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after logos -->
   <software name="popntank" supported="no">
     <description>Pop'n Tanks! (Japan)</description>
     <year>199?</year>
@@ -9488,6 +9538,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="puyopubx" supported="no">
     <description>Puyo Puyo Box (Japan)</description>
     <year>199?</year>
@@ -9514,6 +9565,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="puzzlear" supported="no">
     <description>Puzzle Arena Toshinden (Japan)</description>
     <year>199?</year>
@@ -9631,6 +9683,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="racedriv" supported="no">
     <description>Race Drivin' a Go! Go! (Japan)</description>
     <year>199?</year>
@@ -9779,6 +9832,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="reciproh" supported="no">
     <description>Recipro Heat 5000 (Japan)</description>
     <year>199?</year>
@@ -9932,6 +9986,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="runningh" supported="no">
     <description>Running High (Japan)</description>
     <year>199?</year>
@@ -10036,7 +10091,8 @@ A few comments on these:
     </part>
   </software>
 
-  <software name="sszan" supported="no">
+  <!-- odd gfx problems -->
+  <software name="samsho3" supported="no">
     <description>Samurai Spirits - Zankurou Musouken (Japan)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
@@ -10446,6 +10502,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="shinthem" supported="no">
     <description>Shin Theme Park (Japan)</description>
     <year>199?</year>
@@ -10555,6 +10612,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="sidebysi" supported="no">
     <description>Side by Side Special 2000 (Japan)</description>
     <year>199?</year>
@@ -12173,6 +12231,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- OK, some problems with sky gfx -->
   <software name="tocatour" supported="no">
     <description>Toca Touring Car Championship (Japan)</description>
     <year>199?</year>
@@ -12186,6 +12245,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="tkpzldm" supported="no">
     <description>Tokimeki Memorial - Taisen Puzzle-Dama (Japan)</description>
     <year>199?</year>
@@ -12393,6 +12453,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="toukiden" supported="no">
     <description>Touki Denshou - Angel Eyes (Japan)</description>
     <year>199?</year>
@@ -12406,6 +12467,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="toyotane" supported="no">
     <description>Toyota Netz Racing (Japan)</description>
     <year>199?</year>
@@ -12432,6 +12494,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="tripuzzj" supported="no">
     <description>Tripuzz (Japan)</description>
     <year>199?</year>
@@ -12562,6 +12625,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="twotenka" supported="no">
     <description>Two-Tenkaku (Japan)</description>
     <year>199?</year>
@@ -12705,6 +12769,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="vtennis2" supported="no">
     <description>V-Tennis 2 (Japan)</description>
     <year>199?</year>
@@ -12996,6 +13061,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- some games work -->
   <software name="wonder3a" supported="no">
     <description>Wonder 3 Arcade Gears (Japan)</description>
     <year>199?</year>
@@ -13087,6 +13153,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="xracingj" supported="no">
     <description>X-Racing (Japan)</description>
     <year>199?</year>
