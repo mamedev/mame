@@ -1183,6 +1183,21 @@ void sb8_device::device_start()
 	}
 
 	m_timer = timer_alloc(0, NULL);
+
+	save_item(NAME(m_dack_out));
+	save_item(NAME(m_onebyte_midi));
+	save_item(NAME(m_uart_midi));
+	save_item(NAME(m_uart_irq));
+	save_item(NAME(m_mpu_midi));
+	save_item(NAME(m_rx_waiting));
+	save_item(NAME(m_tx_waiting));
+	save_item(NAME(m_recvring));
+	save_item(NAME(m_xmitring));
+	save_item(NAME(m_xmit_read));
+	save_item(NAME(m_xmit_write));
+	save_item(NAME(m_recv_read));
+	save_item(NAME(m_recv_write));
+	save_item(NAME(m_tx_busy));
 }
 
 void isa8_sblaster1_0_device::device_start()
@@ -1219,6 +1234,23 @@ void sb16_device::device_start()
 	m_isa->install_device(subdevice("ymf262"),    0x0228, 0x0229, 0, 0, FUNC(ymf262_r), FUNC(ymf262_w) );
 
 	m_timer = timer_alloc(0, NULL);
+
+	save_item(NAME(m_mixer.data));
+	save_item(NAME(m_mixer.status));
+	save_item(NAME(m_mixer.main_vol));
+	save_item(NAME(m_mixer.dac_vol));
+	save_item(NAME(m_mixer.fm_vol));
+	save_item(NAME(m_mixer.cd_vol));
+	save_item(NAME(m_mixer.line_vol));
+	save_item(NAME(m_mixer.mic_vol));
+	save_item(NAME(m_mixer.pc_speaker_vol));
+	save_item(NAME(m_mixer.output_ctl));
+	save_item(NAME(m_mixer.input_ctl));
+	save_item(NAME(m_mixer.input_gain));
+	save_item(NAME(m_mixer.output_gain));
+	save_item(NAME(m_mixer.agc));
+	save_item(NAME(m_mixer.treble));
+	save_item(NAME(m_mixer.bass));
 }
 
 void isa16_sblaster16_device::device_start()
