@@ -71,8 +71,8 @@
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="206864">
-				<rom name="bbsb.g64" size="206864" crc="612e0325" sha1="7a8be7b2f04a5fb63f23839c11a3801cff8e022c" offset="0" />
+			<dataarea name="flop" size="208212">
+				<rom name="bbsb.g64" size="208212" crc="69456d8c" sha1="26801eda258f748aa6f6c45df8af7f7cbb2857d4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -110,15 +110,15 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="278234">
-				<rom name="defenderofthecrown_s0.g64" size="278234" crc="131759d0" sha1="2c8695caee776b2082a01856d13a0eeb99f9859f" offset="0" />
+			<dataarea name="flop" size="279582">
+				<rom name="defenderofthecrown_s0.g64" size="279582" crc="5a6dc7c0" sha1="495674468ad6277aa586eb46b6291f4a49b9e020" offset="0" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="323404">
-				<rom name="defenderofthecrown_s1.g64" size="323404" crc="677e8b8b" sha1="fcf9b5db97a7cc48e3d8bf49ed07f29caabafb77" offset="0" />
+			<dataarea name="flop" size="324752">
+				<rom name="defenderofthecrown_s1.g64" size="324752" crc="0104c012" sha1="070c34ee59e44cdd2dda9fd6166d66373ca1bdc2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
