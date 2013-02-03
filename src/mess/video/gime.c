@@ -661,6 +661,10 @@ UINT8 gime_base_device::read(offs_t offset)
 		case 0x20:
 			data = read_palette_register(offset);
 			break;
+
+		default:
+			data = read_floating_bus();
+			break;
 	}
 
 	return data;
@@ -679,7 +683,7 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_gime_register(offs_t offset)
 	UINT8 result;
 	switch(offset)
 	{
-		case 2: /* Read pending IRQs */
+		case 2: // read pending IRQs
 			result = m_irq;
 			if (result != 0x00)
 			{
@@ -688,7 +692,7 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_gime_register(offs_t offset)
 			}
 			break;
 
-		case 3: /* Read pending FIRQs */
+		case 3: // read pending FIRQs 
 			result = m_firq;
 			if (result != 0x00)
 			{
@@ -697,16 +701,15 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_gime_register(offs_t offset)
 			}
 			break;
 
-		case 4: /* Timer MSB/LSB; these arn't readable */
-		case 5:
-			/* JK tells me that these values are indeterminate; and $7E appears
-			 * to be the value most commonly returned
-			 */
-			result = 0x7E;
+		case 14:
+		case 15:
+			// these (I guess) are readable (Mametesters bug #05135)
+			result = m_gime_registers[offset];
 			break;
 
 		default:
-			result = m_gime_registers[offset];
+			// the others are not readable; read floating bus (Mametesters bug #05135)
+			result = read_floating_bus();
 			break;
 	}
 	return result;
@@ -720,7 +723,7 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_gime_register(offs_t offset)
 
 ATTR_FORCE_INLINE UINT8 gime_base_device::read_mmu_register(offs_t offset)
 {
-	return (m_mmu[offset & 0x0F] & 0x3F);
+	return (m_mmu[offset & 0x0F] & 0x3F) | (read_floating_bus() & 0xC0);
 }
 
 
