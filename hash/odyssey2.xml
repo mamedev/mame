@@ -644,8 +644,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<year>1980</year>
 		<publisher>Philips</publisher>
 		<info name="usage" value="Press 1 for Depth Charge, press 2 for Marksman; Uses the 2nd joystick" />
-		<sharedfeat name="compatibility" value="PAL"/>
 		<info name="serial" value="16"/>
+		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="odyssey_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="depth charge - marksman (europe).bin" size="2048" crc="2dcb77f0" sha1="95ccda2010f756069645e50269142a063c9aabc2" offset="0" />
@@ -1142,8 +1142,8 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 	<software name="pickaxe">
 		<description>Pickaxe Pete (Euro) ~ Pick Axe Pete! (USA)</description>
 		<year>1980</year>
-		<info name="serial" value="AC9437 (USA) ~ 43 (Euro)"/>
 		<publisher>Philips (Euro) ~ Magnavox (USA)</publisher>
+		<info name="serial" value="AC9437 (USA) ~ 43 (Euro)"/>
 		<part name="cart" interface="odyssey_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="pick axe pete (usa, europe).bin" size="4096" crc="d62814a3" sha1="b979ed0c2b8947f764786fcf4444463b3d3ae87d" offset="0" />
