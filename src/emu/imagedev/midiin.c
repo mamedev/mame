@@ -21,8 +21,8 @@ const device_type MIDIIN = &device_creator<midiin_device>;
 
 midiin_device::midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDIIN, "MIDI In image device", tag, owner, clock),
-	device_image_interface(mconfig, *this),
-		device_serial_interface(mconfig, *this)
+	  device_image_interface(mconfig, *this),
+          device_serial_interface(mconfig, *this)
 {
 }
 
@@ -35,6 +35,7 @@ void midiin_device::device_start()
 	m_input_func.resolve(m_input_callback, *this);
 	m_timer = timer_alloc(0);
 	m_midi = NULL;
+	m_timer->enable(false);
 }
 
 void midiin_device::device_reset()
@@ -75,6 +76,10 @@ void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	UINT8 buf[8192*4];
 	int bytesRead;
 
+	if (m_midi == NULL) {
+	  return;
+	}
+
 	while (osd_poll_midi_channel(m_midi))
 	{
 		bytesRead = osd_read_midi_channel(m_midi, buf);
@@ -103,7 +108,7 @@ bool midiin_device::call_load(void)
 	}
 
 	m_timer->adjust(attotime::from_hz(1500), 0, attotime::from_hz(1500));
-
+	m_timer->enable(true);
 	return IMAGE_INIT_PASS;
 }
 
@@ -117,6 +122,8 @@ void midiin_device::call_unload(void)
 	{
 		osd_close_midi_channel(m_midi);
 	}
+        m_timer->enable(false);
+        m_midi = NULL;
 }
 
 void midiin_device::tra_complete()
