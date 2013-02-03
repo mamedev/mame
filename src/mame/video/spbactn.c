@@ -155,12 +155,11 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_fg_tile_info)
 
 
 
-void spbactn_state::video_start()
+VIDEO_START_MEMBER(spbactn_state,spbactn)
 {
 	/* allocate bitmaps */
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
-
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spbactn_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spbactn_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
@@ -169,7 +168,12 @@ void spbactn_state::video_start()
 
 }
 
-
+VIDEO_START_MEMBER(spbactn_state,spbactnp)
+{
+	VIDEO_START_CALL_MEMBER(spbactn);
+	// no idea..
+	m_extra_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spbactn_state::get_extra_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 16, 16);
+}
 WRITE16_MEMBER( spbactn_state::spbatnp_90002_w )
 {
 	//printf("spbatnp_90002_w %04x\n",data);
@@ -210,6 +214,21 @@ WRITE16_MEMBER( spbactn_state::spbatnp_9012c_w )
 }
 
 
+WRITE8_MEMBER(spbactn_state::extraram_w)
+{
+	COMBINE_DATA(&m_extraram[offset]);
+	m_extra_tilemap->mark_tile_dirty(offset/2);
+}
+
+TILE_GET_INFO_MEMBER(spbactn_state::get_extra_tile_info)
+{
+	int tileno = m_extraram[(tile_index*2)+1];
+	tileno |= m_extraram[(tile_index*2)] << 8;
+	SET_TILE_INFO_MEMBER(3, tileno, 0, 0);
+}
+
+
+
 
 int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites)
 {
@@ -244,5 +263,9 @@ UINT32 spbactn_state::screen_update_spbactn(screen_device &screen, bitmap_rgb32 
 
 UINT32 spbactn_state::screen_update_spbactnp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// hack to make the extra cpu do something..
+	m_extraram2[0x104] = machine().rand();
+	m_extraram2[0x105] = machine().rand();
+
 	return draw_video(screen,bitmap,cliprect,true);
 }

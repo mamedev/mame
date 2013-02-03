@@ -232,9 +232,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spbactnp_extra_map, AS_PROGRAM, 8, spbactn_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("extraram2")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM
+	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE( extraram_w ) AM_SHARE("extraram")
 	AM_RANGE(0xd200, 0xd200) AM_RAM
 ADDRESS_MAP_END
 
@@ -428,6 +428,7 @@ static MACHINE_CONFIG_START( spbactn, spbactn_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactn)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactn)
 
 	MCFG_GFXDECODE(spbactn)
@@ -460,6 +461,7 @@ static MACHINE_CONFIG_START( spbactnp, spbactn_state )
 	MCFG_CPU_ADD("extracpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spbactnp_extra_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq0_line_hold)
+//	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  nmi_line_pulse)
 
 
 	/* video hardware */
@@ -468,6 +470,7 @@ static MACHINE_CONFIG_START( spbactnp, spbactn_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+	MCFG_VIDEO_START_OVERRIDE(spbactn_state,spbactnp)
 	MCFG_SCREEN_UPDATE_DRIVER(spbactn_state, screen_update_spbactnp)
 
 	MCFG_GFXDECODE(spbactnp)
