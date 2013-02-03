@@ -151,8 +151,8 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x43fff) AM_RAM   // main ram
 	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
-	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_SHARE("fgvideoram")
-	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_SHARE("bgvideoram")
+	AM_RANGE(0x60000, 0x67fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x70000, 0x77fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x90000, 0x90001) AM_READ_PORT("IN0")
 	AM_RANGE(0x90010, 0x90011) AM_READ_PORT("IN1")
@@ -199,9 +199,9 @@ static ADDRESS_MAP_START( spbactnp_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x43fff) AM_RAM   // main ram
 	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
-	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_SHARE("fgvideoram")
-	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_SHARE("bgvideoram")
-	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_word_w) AM_SHARE("paletteram") // yes R and G are swapped vs. the released version
+	AM_RANGE(0x60000, 0x67fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x70000, 0x77fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_word_w) AM_SHARE("paletteram")   // yes R and G are swapped vs. the released version
 
 	AM_RANGE(0x90000, 0x900ff) AM_READ(temp_read_handler_r) // temp
 
@@ -434,7 +434,7 @@ static MACHINE_CONFIG_START( spbactnp, spbactn_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spbactn_sound_map) // wrong
 
-	// there is a rom for another Z80??
+	// there is a rom for another Z80 and a socket for one..
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

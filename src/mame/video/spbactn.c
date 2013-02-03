@@ -117,11 +117,46 @@ static int draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const re
 }
 
 
+WRITE16_MEMBER(spbactn_state::bg_videoram_w)
+{
+	COMBINE_DATA(&m_bgvideoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset&0x1fff);
+}
+
+TILE_GET_INFO_MEMBER(spbactn_state::get_bg_tile_info)
+{
+	int attr = m_bgvideoram[tile_index];
+	int tileno = m_bgvideoram[tile_index+0x2000];
+	SET_TILE_INFO_MEMBER(1, tileno, ((attr & 0x00f0)>>4), 0);
+}
+
+
+WRITE16_MEMBER(spbactn_state::fg_videoram_w)
+{
+	COMBINE_DATA(&m_fgvideoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset&0x1fff);
+}
+
+TILE_GET_INFO_MEMBER(spbactn_state::get_fg_tile_info)
+{
+	int attr = m_fgvideoram[tile_index];
+	int tileno = m_fgvideoram[tile_index+0x2000];
+
+	SET_TILE_INFO_MEMBER(0, tileno, ((attr & 0x00f0)>>4), 0);
+}
+
+
+
 void spbactn_state::video_start()
 {
 	/* allocate bitmaps */
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_bg);
 	machine().primary_screen->register_screen_bitmap(m_tile_bitmap_fg);
+
+
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spbactn_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
+	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(spbactn_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 8, 64, 128);
+
 }
 
 int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites)

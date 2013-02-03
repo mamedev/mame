@@ -11,6 +11,14 @@ public:
 	required_shared_ptr<UINT16> m_fgvideoram;
 	required_shared_ptr<UINT16> m_spvideoram;
 
+	tilemap_t    *m_bg_tilemap;
+	tilemap_t    *m_fg_tilemap;
+	DECLARE_WRITE16_MEMBER(bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(fg_videoram_w);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+
+
 	bitmap_ind16 m_tile_bitmap_bg;
 	bitmap_ind16 m_tile_bitmap_fg;
 	DECLARE_WRITE16_MEMBER(soundcommand_w);
