@@ -53,6 +53,14 @@ device_t* device_slot_interface::get_card_device()
 	return dev;
 }
 
+const bool device_slot_interface::all_internal()
+{
+	for (int i = 0; m_slot_interfaces && m_slot_interfaces[i].name != NULL; i++)
+		if (!m_slot_interfaces[i].internal)
+			return FALSE;
+	return TRUE;
+}
+
 device_slot_card_interface::device_slot_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device)
 {
