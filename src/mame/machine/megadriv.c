@@ -30,9 +30,12 @@ Known Non-Issues (confirmed on Real Genesis)
 #include "sound/2612intf.h"
 
 #include "sound/dac.h"
-
 #include "sound/sn76496.h"
+
 #include "imagedev/chd_cd.h"
+#include "imagedev/cartslot.h"
+#include "formats/imageutl.h"
+
 #include "includes/megadriv.h"
 #include "machine/nvram.h"
 #include "cpu/ssp1601/ssp1601.h"
@@ -40,12 +43,14 @@ Known Non-Issues (confirmed on Real Genesis)
 #include "machine/megavdp.h"
 
 
+MACHINE_CONFIG_EXTERN( megadriv );
 
 
 static cpu_device *_genesis_snd_z80_cpu;
 int genesis_other_hacks = 0; // misc hacks
 
 timer_device* megadriv_scanline_timer;
+cpu_device *_svp_cpu;
 
 struct genesis_z80_vars
 {
@@ -318,7 +323,7 @@ UINT8 megadrive_io_read_data_port_3button(running_machine &machine, int portnum)
 {
 	UINT8 retdata, helper = (megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from megadrive_io_data_regs
 	static const char *const pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
-
+	
 	if (megadrive_io_data_regs[portnum] & 0x40)
 	{
 		/* here we read B, C & the directional buttons */
@@ -885,41 +890,6 @@ MACHINE_CONFIG_END
 
 
 
-INPUT_PORTS_START( megdsvp )
-	PORT_INCLUDE( megadriv )
-
-	PORT_START("MEMORY_TEST") /* special memtest mode */
-	/* Region setting for Console */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Test ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x01, DEF_STR( On ) )
-INPUT_PORTS_END
-
-MACHINE_CONFIG_FRAGMENT( md_svp )
-	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
-	MCFG_CPU_PROGRAM_MAP(svp_ssp_map)
-	MCFG_CPU_IO_MAP(svp_ext_map)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_DERIVED( megdsvp, megadriv )
-
-	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
-	MCFG_CPU_PROGRAM_MAP(svp_ssp_map)
-	MCFG_CPU_IO_MAP(svp_ext_map)
-	/* IRQs are not used by this CPU */
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_DERIVED( megdsvppal, megadpal )
-
-	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_PAL / 7 * 3) /* ~23 MHz (guessed) */
-	MCFG_CPU_PROGRAM_MAP(svp_ssp_map)
-	MCFG_CPU_IO_MAP(svp_ext_map)
-	/* IRQs are not used by this CPU */
-MACHINE_CONFIG_END
-
-
-
-
 
 SCREEN_UPDATE_RGB32(megadriv)
 {
@@ -1030,8 +1000,8 @@ void megadriv_stop_scanline_timer(running_machine &machine)
 
 
 
-UINT16* megadriv_backupram;
-int megadriv_backupram_length;
+static UINT16* megadriv_backupram;
+static int megadriv_backupram_length;
 
 static NVRAM_HANDLER( megadriv )
 {
@@ -1190,7 +1160,7 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( megadriv, md_cons_state )
+MACHINE_CONFIG_START( megadriv, md_base_state )
 	MCFG_FRAGMENT_ADD(md_ntsc)
 MACHINE_CONFIG_END
 
@@ -1245,7 +1215,7 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( megadpal, md_cons_state )
+MACHINE_CONFIG_START( megadpal, md_base_state )
 	MCFG_FRAGMENT_ADD(md_pal)
 MACHINE_CONFIG_END
 
@@ -1294,6 +1264,64 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
 MACHINE_CONFIG_END
+
+
+
+/******* 32X image loading *******/
+
+// FIXME: non-softlist loading should keep using ROM_CART_LOAD in the ROM definitions,
+// once we better integrate softlist with the old loading procedures
+static DEVICE_IMAGE_LOAD( _32x_cart )
+{
+	UINT32 length;
+	UINT8 *temp_copy;
+	UINT16 *ROM16;
+	UINT32 *ROM32;
+	int i;
+	
+	if (image.software_entry() == NULL)
+	{
+		length = image.length();
+		temp_copy = auto_alloc_array(image.device().machine(), UINT8, length);
+		image.fread(temp_copy, length);
+	}
+	else
+	{
+		length = image.get_software_region_length("rom");
+		temp_copy = auto_alloc_array(image.device().machine(), UINT8, length);
+		memcpy(temp_copy, image.get_software_region("rom"), length);
+	}
+	
+	/* Copy the cart image in the locations the driver expects */
+	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
+	ROM16 = (UINT16 *) image.device().machine().root_device().memregion("gamecart")->base();
+	for (i = 0; i < length; i += 2)
+		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
+	
+	ROM32 = (UINT32 *) image.device().machine().root_device().memregion("gamecart_sh2")->base();
+	for (i = 0; i < length; i += 4)
+		ROM32[i / 4] = pick_integer_be(temp_copy, i, 4);
+	
+	ROM16 = (UINT16 *) image.device().machine().root_device().memregion("maincpu")->base();
+	for (i = 0x00; i < length; i += 2)
+		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
+	
+	auto_free(image.device().machine(), temp_copy);
+	
+	return IMAGE_INIT_PASS;
+}
+
+
+MACHINE_CONFIG_FRAGMENT( _32x_cartslot )
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("32x,bin")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("_32x_cart")
+	MCFG_CARTSLOT_LOAD(_32x_cart)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
+MACHINE_CONFIG_END
+
+
 
 struct cdrom_interface scd_cdrom =
 {
@@ -1362,7 +1390,7 @@ void md_base_state::megadriv_init_common()
 	_svp_cpu = machine().device<cpu_device>("svp");
 	if (_svp_cpu != NULL)
 	{
-		printf("SVP (cpu) found '%s'\n", _svp_cpu->tag() );
+		printf("SVP (cpu) found '%s'\n", _svp_cpu->tag());
 	}
 
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(md_base_state::genesis_int_callback),this));
@@ -1405,14 +1433,6 @@ void md_base_state::megadriv_init_common()
 		}
 		mame_printf_debug("\n");
 	}
-
-	/* if we have an SVP cpu then do some extra initilization for it */
-	if (_svp_cpu != NULL)
-	{
-		svp_init(machine());
-	}
-
-
 }
 
 DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)

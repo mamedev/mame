@@ -23,13 +23,7 @@
 #define MASTER_CLOCK_PAL  53203424
 #define SEGACD_CLOCK      12500000
 
-
-#define MAX_MD_CART_SIZE 0x800000
-
-/* where a fresh copy of rom is stashed for reset and banking setup */
-#define VIRGIN_COPY_GEN 0xd00000
-
-#define MD_CPU_REGION_SIZE (MAX_MD_CART_SIZE + VIRGIN_COPY_GEN)
+#define MD_CPU_REGION_SIZE 0x800000
 
 extern int sega_cd_connected;
 
@@ -41,17 +35,12 @@ INPUT_PORTS_EXTERN( megadriv );
 INPUT_PORTS_EXTERN( megadri6 );
 INPUT_PORTS_EXTERN( ssf2mdb );
 INPUT_PORTS_EXTERN( mk3mdb );
-INPUT_PORTS_EXTERN( megdsvp );
 
 MACHINE_CONFIG_EXTERN( megadriv_timers );
 MACHINE_CONFIG_EXTERN( md_ntsc );
 MACHINE_CONFIG_EXTERN( md_pal );
 MACHINE_CONFIG_EXTERN( md_svp );
 
-MACHINE_CONFIG_EXTERN( megdsvppal );
-MACHINE_CONFIG_EXTERN( megadriv );
-MACHINE_CONFIG_EXTERN( megadpal );
-MACHINE_CONFIG_EXTERN( megdsvp );
 MACHINE_CONFIG_EXTERN( genesis_32x );
 MACHINE_CONFIG_EXTERN( genesis_32x_pal );
 MACHINE_CONFIG_EXTERN( genesis_scd );
@@ -61,8 +50,7 @@ MACHINE_CONFIG_EXTERN( genesis_scd_mcdj );
 MACHINE_CONFIG_EXTERN( genesis_32x_scd );
 MACHINE_CONFIG_EXTERN( md_bootleg );    // for topshoot.c & hshavoc.c
 
-extern UINT16* megadriv_backupram;
-extern int megadriv_backupram_length;
+extern cpu_device *_svp_cpu;
 
 extern UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl);
 extern void megadriv_stop_scanline_timer(running_machine &machine);
@@ -384,50 +372,14 @@ struct megadriv_cart
 	int ssf2_lastoff, ssf2_lastdata;
 };
 
-class md_cons_state : public md_base_state
+class md_havoc_state : public md_base_state
 {
 public:
-	md_cons_state(const machine_config &mconfig, device_type type, const char *tag)
+	md_havoc_state(const machine_config &mconfig, device_type type, const char *tag)
 	: md_base_state(mconfig, type, tag) { }
 
-	emu_timer *m_mess_io_timeout[3];
-	int m_mess_io_stage[3];
-	UINT8 m_jcart_io_data[2];
-
-	megadriv_cart m_md_cart;
-
 	DECLARE_DRIVER_INIT(hshavoc);
-	DECLARE_DRIVER_INIT(topshoot);
-
-	DECLARE_DRIVER_INIT(genesis);
-	DECLARE_DRIVER_INIT(mess_md_common);
-	DECLARE_DRIVER_INIT(md_eur);
-	DECLARE_DRIVER_INIT(md_jpn);
-
 };
-
-
-class mdsvp_state : public md_cons_state
-{
-public:
-	mdsvp_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_cons_state(mconfig, type, tag) { }
-
-	UINT8 *m_iram; // IRAM (0-0x7ff)
-	UINT8 *m_dram; // [0x20000];
-	UINT32 m_pmac_read[6];  // read modes/addrs for PM0-PM5
-	UINT32 m_pmac_write[6]; // write ...
-	PAIR m_pmc;
-	UINT32 m_emu_status;
-	UINT16 m_XST;       // external status, mapped at a15000 and a15002 on 68k side.
-	UINT16 m_XST2;      // status of XST (bit1 set when 68k writes to XST)
-};
-
-ADDRESS_MAP_EXTERN( svp_ssp_map, driver_device );
-ADDRESS_MAP_EXTERN( svp_ext_map, driver_device );
-extern void svp_init(running_machine &machine);
-extern cpu_device *_svp_cpu;
-
 
 
 UINT8 megadrive_io_read_data_port_3button(running_machine &machine, int portnum);
@@ -459,13 +411,8 @@ public:
 		{ }
 };
 
-
-/*----------- defined in machine/md_cart.c -----------*/
-
-MACHINE_CONFIG_EXTERN( genesis_cartslot );
 MACHINE_CONFIG_EXTERN( _32x_cartslot );
-MACHINE_CONFIG_EXTERN( pico_cartslot );
-MACHINE_START( md_sram );
+
 
 /*----------- defined in drivers/megadriv.c -----------*/
 

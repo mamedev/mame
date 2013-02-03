@@ -763,7 +763,7 @@ DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 	DRIVER_INIT_CALL(megadriv);
 }
 
-DRIVER_INIT_MEMBER(md_cons_state,topshoot)
+DRIVER_INIT_MEMBER(md_boot_state,topshoot)
 {
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x200050, 0x200051, FUNC(topshoot_200051_r) );
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_port(0x200042, 0x200043, "IN0");
@@ -785,4 +785,4 @@ GAME( 1993, aladmdb,  0, megadrvb,   aladmdb, md_boot_state,  aladmdb,  ROT0, "b
 GAME( 1996, mk3mdb,   0, megadrvb,   mk3mdb, md_boot_state,   mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", 0)
 GAME( 1994, ssf2mdb,  0, megadrvb,   ssf2mdb, md_boot_state,  ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese MegaDrive version)", 0)
 GAME( 1993, srmdb,    0, megadrvb,   srmdb, md_boot_state,    srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)", 0)
-GAME( 1995, topshoot, 0, md_bootleg, topshoot, md_cons_state, topshoot, ROT0, "Sun Mixing",       "Top Shooter", 0)
+GAME( 1995, topshoot, 0, md_bootleg, topshoot, md_boot_state, topshoot, ROT0, "Sun Mixing",       "Top Shooter", 0)

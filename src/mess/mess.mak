@@ -455,7 +455,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_MACHINE)/megacd.o \
 	$(MAME_MACHINE)/megacdcd.o \
 	$(MAME_MACHINE)/mega32x.o \
-	$(MAME_MACHINE)/megasvp.o \
 	$(MAME_MACHINE)/megavdp.o \
 	$(MAME_MACHINE)/dc.o        \
 	$(MAME_DRIVERS)/naomi.o     \
@@ -1617,7 +1616,13 @@ $(MESSOBJ)/sanyo.a:             \
 
 $(MESSOBJ)/sega.a:              \
 	$(MESS_DRIVERS)/sg1000.o    \
-	$(MAME_MACHINE)/md_cart.o   \
+	$(MESS_MACHINE)/md_slot.o   \
+	$(MESS_MACHINE)/md_rom.o   \
+	$(MESS_MACHINE)/md_sk.o   \
+	$(MESS_MACHINE)/md_eeprom.o   \
+	$(MESS_MACHINE)/md_jcart.o   \
+	$(MESS_MACHINE)/md_stm95.o   \
+	$(MESS_MACHINE)/megasvp.o \
 	$(MESS_DRIVERS)/megadriv.o  \
 	$(MESS_DRIVERS)/dccons.o    \
 	$(MAME_MACHINE)/gdrom.o     \

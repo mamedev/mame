@@ -1257,9 +1257,7 @@ $(MAMEOBJ)/sega.a: \
 	$(MACHINE)/megacd.o \
 	$(MACHINE)/megacdcd.o \
 	$(MACHINE)/mega32x.o \
-	$(MACHINE)/megasvp.o \
 	$(MACHINE)/megavdp.o \
-	$(MACHINE)/md_cart.o \
 	$(DRIVERS)/megadrvb.o \
 	$(DRIVERS)/megaplay.o \
 	$(DRIVERS)/megatech.o \
