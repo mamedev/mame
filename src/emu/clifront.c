@@ -1061,7 +1061,7 @@ void cli_frontend::verifysamples(const char *gamename)
 				"\t<!ELEMENT softwarelist (software+)>\n" \
 				"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n" \
 				"\t\t<!ATTLIST softwarelist description CDATA #IMPLIED>\n" \
-				"\t\t<!ELEMENT software (description, year?, publisher, info*, sharedfeat*, part*)>\n" \
+				"\t\t<!ELEMENT software (description, year, publisher, info*, sharedfeat*, part*)>\n" \
 				"\t\t\t<!ATTLIST software name CDATA #REQUIRED>\n" \
 				"\t\t\t<!ATTLIST software cloneof CDATA #IMPLIED>\n" \
 				"\t\t\t<!ATTLIST software supported (yes|partial|no) \"yes\">\n" \
@@ -1094,7 +1094,7 @@ void cli_frontend::verifysamples(const char *gamename)
 				"\t\t\t\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n" \
 				"\t\t\t\t\t\t<!ATTLIST rom value CDATA #IMPLIED>\n" \
 				"\t\t\t\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n" \
-				"\t\t\t\t\t\t<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload|fill|continue) #IMPLIED>\n" \
+				"\t\t\t\t\t\t<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload|fill|continue|reload_plain) #IMPLIED>\n" \
 				"\t\t\t\t<!ELEMENT diskarea (disk*)>\n" \
 				"\t\t\t\t\t<!ATTLIST diskarea name CDATA #REQUIRED>\n" \
 				"\t\t\t\t\t<!ELEMENT disk EMPTY>\n" \
