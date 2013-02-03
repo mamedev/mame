@@ -458,7 +458,7 @@ ROM_START( rrvac )
 	ROM_REGION(0x4010, "jvsio", 0)	// Namco "FCA" JVS I/O board PIC16F84 code (see namcos23.c for FCA details)
 	ROM_LOAD( "fcap11.ic2",   0x000000, 0x004010, CRC(1b2592ce) SHA1(a1a487361053af564f6ec67e545413e370a3b38c) ) 
 
-	ROM_REGION(0x80000, "steering", 0)	// steering I/O board
+	ROM_REGION(0x80000, "steering", 0)	// Steering I/O board MB90242A code (see namcos23.c for steering board details)
 	ROM_LOAD( "rrv3_str-0a.ic16", 0x000000, 0x080000, CRC(df8b6cac) SHA1(d45e150678218084925673e1d77edefc04135035) ) 
 
 	DISK_REGION("dvd")
