@@ -404,9 +404,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi_r5)
 
 TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_irq)//only mm2
 {
-	// That will not work
-	m_maincpu->set_input_line(M65C02_IRQ_LINE, ASSERT_LINE);
-	m_maincpu->set_input_line(M65C02_IRQ_LINE, CLEAR_LINE);
+	m_maincpu->set_input_line(M65C02_IRQ_LINE, HOLD_LINE);
 
 	beep_set_state(m_beep, m_led_status&64?1:0);
 }

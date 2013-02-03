@@ -176,8 +176,7 @@ READ_LINE_MEMBER( csc_state::pia1_cb1_r )
 
 TIMER_DEVICE_CALLBACK_MEMBER(csc_state::irq_timer)
 {
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
-	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE);
 }
 
 /* Address maps */
