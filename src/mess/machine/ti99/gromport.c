@@ -1840,6 +1840,7 @@ READ8Z_MEMBER(ti99_gromemu_cartridge::readz)
 		gromemureadz(space, offset, value, mem_mask);
 	else
 	{
+		if (m_rom_ptr == NULL) return;
 		if (m_rom_page==0)
 		{
 			*value = m_rom_ptr[offset & 0x1fff];

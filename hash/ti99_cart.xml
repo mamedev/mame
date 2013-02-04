@@ -1076,7 +1076,7 @@
 	<publisher>&lt;unknown&gt;</publisher>
 	<info name="comment" value="BASIC programs stored in GROM: MotoCross-Awari-Carres-Hanoi. Allow for 20 seconds for games to start."/>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="standard"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0xa000">
 			<rom name="maxbasgg.bin" size="0xa000" crc="5318530d" sha1="12a378996ef61c6725cdf7f31042792de5374aa3" offset="0x0000" />
 		</dataarea>
@@ -1195,7 +1195,7 @@
 	<info name="version" value="4.0"/>
 	<info name="comment" value="Similar to TI Disk Manager"/>
 	<part name="cart" interface="ti99_cart">
-		<feature name="pcb" value="standard"/>
+		<feature name="pcb" value="gromemu"/>
 		<dataarea name="grom_socket" size="0x4000">
 			<rom name="dump_g.bin" size="0x4000" crc="dcd3433d" sha1="21fcba8e662786def43c94350459d2233377feb1" offset="0x0000" />
 		</dataarea>
