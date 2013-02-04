@@ -22,6 +22,12 @@ const device_type ES5510 = &device_creator<es5510_device>;
 
 #define FLAG_MASK (FLAG_N | FLAG_C | FLAG_V | FLAG_LT | FLAG_Z)
 
+char *stpcpy_int (char *dst, const char *src)
+{
+	const size_t len = strlen (src);
+	return (char *) memcpy (dst, src, len + 1) + len;
+}
+
 inline static UINT8 setFlag(UINT8 ccr, UINT8 flag) {
   return ccr | flag;
 }
@@ -165,7 +171,7 @@ static inline const char * const REGNAME(UINT8 r) {
 }
 
 static inline char * DESCRIBE_REG(char *s, UINT8 r) {
-  return strcpy(s, REGNAME(r));
+  return stpcpy_int(s, REGNAME(r));
 }
 
 const alu_op_t es5510_device::ALU_OPS[16] = {
@@ -214,10 +220,10 @@ static inline char * DESCRIBE_SRC_DST(char *s, UINT8 reg, op_src_dst_t src_dst) 
   case es5510_device::SRC_DST_REG:
     return DESCRIBE_REG(s, reg);
   case es5510_device::SRC_DST_DELAY:
-    return strcpy(s, "Delay");
+    return stpcpy_int(s, "Delay");
   case es5510_device::SRC_DST_BOTH:
     s = DESCRIBE_REG(s, reg);
-    return strcpy(s, ",Delay");
+    return stpcpy_int(s, ",Delay");
   }
   // should never happen!
   return s;
@@ -243,7 +249,7 @@ static inline char * DESCRIBE_ALU(char *s, UINT8 opcode, UINT8 aReg, UINT8 bReg,
 
   switch (op.operands) {
   case 0:
-    return strcpy(s, op.opcode);
+    return stpcpy_int(s, op.opcode);
 
   case 1:
     s += sprintf(s, "%s %s >", op.opcode, REGNAME(bReg));
