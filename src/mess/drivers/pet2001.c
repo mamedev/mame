@@ -1462,9 +1462,9 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c2n", NULL)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT2_TAG, datassette2_intf, cbm_datassette_devices, NULL, NULL)
-	//MCFG_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, NULL, NULL)
 	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, user_intf, pet_user_port_cards, NULL, NULL)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cass_list", "pet_cass")

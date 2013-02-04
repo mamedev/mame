@@ -129,4 +129,40 @@
 		</part>
 	</software>
 
+	<software name="spiele">
+		<description>Spiele (Ger)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="sp1.d80" size="533248" crc="baf5760e" sha1="f565defaa3c361efeef1c659d91c1e66970f227d" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="sp2.d80" size="533248" crc="923bd4eb" sha1="cf7120c13f97b51f4348d9888d4c7c66e1c7593c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="sp3.d80" size="533248" crc="dfb01633" sha1="1521e9a982269cdd58a7b30375b9658e609b46c0" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="sp4.d80" size="533248" crc="eeafd71c" sha1="9e7eae26d1a600c36489183d77c3af3045c2a354" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="1066496">
+				<rom name="sp5.d82" size="1066496" crc="a3622d00" sha1="3c3bf0e64939a5d1a332fafa25d8d1088fae825f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
