@@ -1189,28 +1189,28 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	MCFG_SOUND_ADD(MOS6581_TAG, SID6581, VIC6567_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, cia1_intf)
 	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, cia2_intf)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "c64_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "c64_flop")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("cass_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "NTSC")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1254,7 +1254,7 @@ static MACHINE_CONFIG_START( ntsc_dx, sx64_state )
 
 	// devices
 	MCFG_DEVICE_REMOVE("iec9")
-	MCFG_CBM_IEC_SLOT_ADD("iec9", 8, sx1541_iec_devices, "sx1541", NULL)
+	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, sx1541_iec_devices, "sx1541", NULL)
 MACHINE_CONFIG_END
 
 
@@ -1289,28 +1289,28 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	MCFG_SOUND_ADD(MOS6581_TAG, SID6581, VIC6569_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, cia1_intf)
 	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, cia2_intf)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "c64_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "c64_flop")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("cass_list", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "PAL")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1367,8 +1367,6 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	MCFG_SOUND_ADD(MOS6581_TAG, SID8580, VIC6569_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
@@ -1379,11 +1377,12 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
 
 	// internal ram

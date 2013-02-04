@@ -32,6 +32,7 @@ class c2n_device :  public device_t,
 public:
 	// construction/destruction
 	c2n_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	c2n_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const;
@@ -77,6 +78,7 @@ public:
 
 
 // device type definition
+extern const device_type C2N;
 extern const device_type C1530;
 extern const device_type C1531;
 

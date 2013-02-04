@@ -822,18 +822,16 @@ static MACHINE_CONFIG_START( vic20, vic20_state )
 	// devices
 	MCFG_VIA6522_ADD(M6522_0_TAG, 0, via0_intf)
 	MCFG_VIA6522_ADD(M6522_1_TAG, 0, via1_intf)
-
-	MCFG_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1541")
-
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_VIC20_USER_PORT_ADD(VIC20_USER_PORT_TAG, user_intf, vic20_user_port_cards, NULL, NULL)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vic1001_cart")
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "vic1001_flop")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "vic1001_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "vic1001_flop")
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -863,7 +861,8 @@ static MACHINE_CONFIG_DERIVED( ntsc, vic20 )
 
 	// software lists
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("cass_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "NTSC")
 MACHINE_CONFIG_END
 
 
@@ -889,7 +888,8 @@ static MACHINE_CONFIG_DERIVED( pal, vic20 )
 
 	// software lists
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("cass_list", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "PAL")
 MACHINE_CONFIG_END
 
 

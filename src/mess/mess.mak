@@ -825,6 +825,9 @@ $(MESSOBJ)/casio.a:             \
 
 $(MESSOBJ)/cbm.a:               \
 	$(MESS_DRIVERS)/pet2001.o   \
+	$(MESS_MACHINE)/petcass.o   \
+	$(MESS_MACHINE)/petexp.o   \
+	$(MESS_MACHINE)/petuser.o   \
 	$(MESS_DRIVERS)/c64.o       \
 	$(MESS_MACHINE)/c64_legacy.o       \
 	$(MESS_DRIVERS)/c64dtv.o    \
@@ -917,6 +920,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/cbm2_std.o  \
 	$(MESS_MACHINE)/cbm2_24k.o  \
 	$(MESS_MACHINE)/cbm2_graphic.o  \
+	$(MESS_MACHINE)/cbm2user.o   \
 	$(MESS_DRIVERS)/c65.o       \
 	$(MESS_MACHINE)/c65.o       \
 	$(MESS_DRIVERS)/c128.o      \
@@ -939,7 +943,6 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/cbm.o       \
 	$(MESS_MACHINE)/cbmipt.o    \
 	$(MESS_MACHINE)/64h156.o    \
-	$(MESS_MACHINE)/petcass.o   \
 	$(MESS_MACHINE)/mos8722.o   \
 	$(MESS_MACHINE)/mos8726.o   \
 	$(MESS_MACHINE)/c2n.o       \

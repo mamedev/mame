@@ -150,7 +150,10 @@ INPUT_PORTS_EXTERN( vic_special );
 
 
 
+SLOT_INTERFACE_EXTERN( pet_expansion_cards );
+SLOT_INTERFACE_EXTERN( pet_user_port_cards );
 SLOT_INTERFACE_EXTERN( cbm2_expansion_cards );
+SLOT_INTERFACE_EXTERN( cbm2_user_port_cards );
 SLOT_INTERFACE_EXTERN( cbm_datassette_devices );
 SLOT_INTERFACE_EXTERN( cbm_iec_devices );
 SLOT_INTERFACE_EXTERN( sx1541_iec_devices );

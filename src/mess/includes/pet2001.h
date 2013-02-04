@@ -1,15 +1,18 @@
 #pragma once
 
-#ifndef __PET2001__
-#define __PET2001__
+#ifndef __PET__
+#define __PET__
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "formats/cbm_snqk.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
 #include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 #include "machine/petcass.h"
+#include "machine/petexp.h"
+#include "machine/petuser.h"
 #include "machine/ram.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
@@ -22,10 +25,10 @@
 #define M6809_TAG		"u4"
 #define SCREEN_TAG		"screen"
 
-class pet2001_state : public driver_device
+class pet_state : public driver_device
 {
 public:
-	pet2001_state(const machine_config &mconfig, device_type type, const char *tag)
+	pet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M6502_TAG),
 			m_via(*this, M6522_TAG),
@@ -35,8 +38,8 @@ public:
 			m_ieee(*this, IEEE488_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 			m_cassette2(*this, PET_DATASSETTE_PORT2_TAG),
-			//m_exp(*this, PET_EXPANSION_SLOT_TAG),
-			//m_user(*this, PET_USER_PORT_TAG),
+			m_exp(*this, PET_EXPANSION_SLOT_TAG),
+			m_user(*this, PET_USER_PORT_TAG),
 			m_speaker(*this, SPEAKER_TAG),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, M6502_TAG),
@@ -73,8 +76,8 @@ public:
 	required_device<ieee488_device> m_ieee;
 	required_device<pet_datassette_port_device> m_cassette;
 	required_device<pet_datassette_port_device> m_cassette2;
-	//required_device<pet_expansion_slot_device> m_exp;
-	//required_device<pet_user_port_device> m_user;
+	required_device<pet_expansion_slot_device> m_exp;
+	required_device<pet_user_port_device> m_user;
 	optional_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
@@ -166,11 +169,11 @@ public:
 };
 
 
-class pet2001b_state : public pet2001_state
+class pet2001b_state : public pet_state
 {
 public:
 	pet2001b_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pet2001_state(mconfig, type, tag)
+		: pet_state(mconfig, type, tag)
 	{ }
 
 	DECLARE_READ8_MEMBER( pia1_pb_r );

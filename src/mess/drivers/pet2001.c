@@ -141,8 +141,6 @@ ROM sockets:  UA3   2K or 4K character
 		- PLA dumps
 		- high resolution graphics
 		- rom software list
-	- user port
-	- memory expansion port
 
 */
 
@@ -158,7 +156,7 @@ ROM sockets:  UA3   2K or 4K character
 //  check_interrupts -
 //-------------------------------------------------
 
-void pet2001_state::check_interrupts()
+void pet_state::check_interrupts()
 {
 	int irq = m_via_irq || m_pia1a_irq || m_pia1b_irq || m_pia2a_irq || m_pia2b_irq || m_exp_irq;
 
@@ -170,7 +168,7 @@ void pet2001_state::check_interrupts()
 //  update_speaker -
 //-------------------------------------------------
 
-void pet2001_state::update_speaker()
+void pet_state::update_speaker()
 {
 	if (m_speaker)
 	{
@@ -183,11 +181,13 @@ void pet2001_state::update_speaker()
 //  read -
 //-------------------------------------------------
 
-READ8_MEMBER( pet2001_state::read )
+READ8_MEMBER( pet_state::read )
 {
+	int sel = offset >> 12;
+	int norom = m_exp->norom_r(space, offset, sel);
 	UINT8 data = 0;
 
-	switch (offset >> 12)
+	switch (sel)
 	{
 	case SEL0: case SEL1: case SEL2: case SEL3:	case SEL4: case SEL5: case SEL6: case SEL7:
 		if (offset < m_ram->size())
@@ -201,7 +201,10 @@ READ8_MEMBER( pet2001_state::read )
 		break;
 
 	case SEL9: case SELA: case SELB: case SELC: case SELD: case SELF:
-		data = m_rom->base()[offset - 0x9000];
+		if (norom)
+		{
+			data = m_rom->base()[offset - 0x9000];
+		}
 		break;
 
 	case SELE:
@@ -224,14 +227,14 @@ READ8_MEMBER( pet2001_state::read )
 				data = m_crtc->register_r(space, 0);
 			}
 		}
-		else
+		else if (norom)
 		{
 			data = m_rom->base()[offset - 0x9000];
 		}
 		break;
 	}
 
-	return data;
+	return m_exp->read(space, offset, data, sel);
 }
 
 
@@ -239,9 +242,11 @@ READ8_MEMBER( pet2001_state::read )
 //  write -
 //-------------------------------------------------
 
-WRITE8_MEMBER( pet2001_state::write )
+WRITE8_MEMBER( pet_state::write )
 {
-	switch (offset >> 12)
+	int sel = offset >> 12;
+
+	switch (sel)
 	{
 	case SEL0: case SEL1: case SEL2: case SEL3:	case SEL4: case SEL5: case SEL6: case SEL7:
 		if (offset < m_ram->size())
@@ -283,6 +288,8 @@ WRITE8_MEMBER( pet2001_state::write )
 		}
 		break;
 	}
+
+	m_exp->write(space, offset, data, sel);
 }
 
 
@@ -295,7 +302,7 @@ WRITE8_MEMBER( pet2001_state::write )
 //  ADDRESS_MAP( pet2001_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( pet2001_mem, AS_PROGRAM, 8, pet2001_state )
+static ADDRESS_MAP_START( pet2001_mem, AS_PROGRAM, 8, pet_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -554,14 +561,14 @@ INPUT_PORTS_END
 //  via6522_interface via_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pet2001_state::via_irq_w )
+WRITE_LINE_MEMBER( pet_state::via_irq_w )
 {
 	m_via_irq = state;
 
 	check_interrupts();
 }
 
-READ8_MEMBER( pet2001_state::via_pb_r )
+READ8_MEMBER( pet_state::via_pb_r )
 {
 	/*
 
@@ -591,7 +598,7 @@ READ8_MEMBER( pet2001_state::via_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( pet2001_state::via_pb_w )
+WRITE8_MEMBER( pet_state::via_pb_w )
 {
 	/*
 
@@ -618,34 +625,34 @@ WRITE8_MEMBER( pet2001_state::via_pb_w )
 	m_cassette2->motor_w(BIT(data, 4));
 }
 
-WRITE_LINE_MEMBER( pet2001_state::via_ca2_w )
+WRITE_LINE_MEMBER( pet_state::via_ca2_w )
 {
 	m_graphic = state;
 }
 
-WRITE_LINE_MEMBER( pet2001_state::via_cb2_w )
+WRITE_LINE_MEMBER( pet_state::via_cb2_w )
 {
 	m_via_cb2 = state;
 	update_speaker();
 
-	//m_user->cb2_w(state);
+	m_user->cb2_w(state);
 }
 
 const via6522_interface via_intf =
 {
-	DEVCB_NULL,//DEVCB_DEVICE_MEMBER(PET_USER_PORT_TAG, pet_user_port_device, pa_r),
-	DEVCB_DRIVER_MEMBER(pet2001_state, via_pb_r),
+	DEVCB_DEVICE_MEMBER(PET_USER_PORT_TAG, pet_user_port_device, pa_r),
+	DEVCB_DRIVER_MEMBER(pet_state, via_pb_r),
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT2_TAG, pet_datassette_port_device, read),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,//DEVCB_DEVICE_MEMBER(PET_USER_PORT_TAG, pet_user_port_device, pa_w),
-	DEVCB_DRIVER_MEMBER(pet2001_state, via_pb_w),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER(PET_USER_PORT_TAG, pet_user_port_device, ca1_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, via_ca2_w),
+	DEVCB_DEVICE_MEMBER(PET_USER_PORT_TAG, pet_user_port_device, pa_w),
+	DEVCB_DRIVER_MEMBER(pet_state, via_pb_w),
+	DEVCB_DEVICE_LINE_MEMBER(PET_USER_PORT_TAG, pet_user_port_device, ca1_w),
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, via_ca2_w),
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, via_cb2_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, via_irq_w)
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, via_cb2_w),
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, via_irq_w)
 };
 
 
@@ -653,21 +660,21 @@ const via6522_interface via_intf =
 //  pia6821_interface pia1_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pet2001_state::pia1_irqa_w )
+WRITE_LINE_MEMBER( pet_state::pia1_irqa_w )
 {
 	m_pia1a_irq = state;
 
 	check_interrupts();
 }
 
-WRITE_LINE_MEMBER( pet2001_state::pia1_irqb_w )
+WRITE_LINE_MEMBER( pet_state::pia1_irqb_w )
 {
 	m_pia1b_irq = state;
 
 	check_interrupts();
 }
 
-READ8_MEMBER( pet2001_state::pia1_pa_r )
+READ8_MEMBER( pet_state::pia1_pa_r )
 {
 	/*
 
@@ -702,7 +709,7 @@ READ8_MEMBER( pet2001_state::pia1_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( pet2001_state::pia1_pa_w )
+WRITE8_MEMBER( pet_state::pia1_pa_w )
 {
 	/*
 
@@ -727,7 +734,7 @@ WRITE8_MEMBER( pet2001_state::pia1_pa_w )
 	update_speaker();
 }
 
-READ8_MEMBER( pet2001_state::pia1_pb_r )
+READ8_MEMBER( pet_state::pia1_pb_r )
 {
 	UINT8 data = 0xff;
 
@@ -769,12 +776,12 @@ READ8_MEMBER( pet2001b_state::pia1_pb_r )
 	return data;
 }
 
-READ_LINE_MEMBER( pet2001_state::pia1_cb1_r )
+READ_LINE_MEMBER( pet_state::pia1_cb1_r )
 {
 	return (m_crtc ? m_crtc->vsync_r() : m_sync);
 }
 
-WRITE_LINE_MEMBER( pet2001_state::pia1_ca2_w )
+WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
 {
 	m_ieee->eoi_w(state);
 
@@ -783,34 +790,34 @@ WRITE_LINE_MEMBER( pet2001_state::pia1_ca2_w )
 
 const pia6821_interface pia1_intf =
 {
-	DEVCB_DRIVER_MEMBER(pet2001_state, pia1_pa_r),
-	DEVCB_DRIVER_MEMBER(pet2001_state, pia1_pb_r),
+	DEVCB_DRIVER_MEMBER(pet_state, pia1_pa_r),
+	DEVCB_DRIVER_MEMBER(pet_state, pia1_pb_r),
 	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, read),
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, pia1_cb1_r),
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_cb1_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pet2001_state, pia1_pa_w),
+	DEVCB_DRIVER_MEMBER(pet_state, pia1_pa_w),
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, pia1_ca2_w),
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_ca2_w),
 	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, pia1_irqa_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, pia1_irqb_w)
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_irqa_w),
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_irqb_w)
 };
 
 const pia6821_interface pet2001b_pia1_intf =
 {
-	DEVCB_DRIVER_MEMBER(pet2001_state, pia1_pa_r),
+	DEVCB_DRIVER_MEMBER(pet_state, pia1_pa_r),
 	DEVCB_DRIVER_MEMBER(pet2001b_state, pia1_pb_r),
 	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, read),
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, pia1_cb1_r),
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_cb1_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(pet2001_state, pia1_pa_w),
+	DEVCB_DRIVER_MEMBER(pet_state, pia1_pa_w),
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, pia1_ca2_w),
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_ca2_w),
 	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, pia1_irqa_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, pia1_irqb_w)
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_irqa_w),
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia1_irqb_w)
 };
 
 
@@ -818,14 +825,14 @@ const pia6821_interface pet2001b_pia1_intf =
 //  pia6821_interface pia2_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pet2001_state::pia2_irqa_w )
+WRITE_LINE_MEMBER( pet_state::pia2_irqa_w )
 {
 	m_pia2a_irq = state;
 
 	check_interrupts();
 }
 
-WRITE_LINE_MEMBER( pet2001_state::pia2_irqb_w )
+WRITE_LINE_MEMBER( pet_state::pia2_irqb_w )
 {
 	m_pia2b_irq = state;
 
@@ -844,8 +851,8 @@ const pia6821_interface pia2_intf =
 	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),
 	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ndac_w),
 	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, dav_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, pia2_irqa_w),
-	DEVCB_DRIVER_LINE_MEMBER(pet2001_state, pia2_irqb_w)
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia2_irqa_w),
+	DEVCB_DRIVER_LINE_MEMBER(pet_state, pia2_irqb_w)
 };
 
 
@@ -886,6 +893,17 @@ static PET_DATASSETTE_PORT_INTERFACE( datassette2_intf )
 };
 
 
+//-------------------------------------------------
+//  PET_USER_PORT_INTERFACE( user_intf )
+//-------------------------------------------------
+
+static PET_USER_PORT_INTERFACE( user_intf )
+{
+	DEVCB_DEVICE_LINE_MEMBER(M6522_TAG, via6522_device, write_ca1),
+	DEVCB_DEVICE_LINE_MEMBER(M6522_TAG, via6522_device, write_cb2)
+};
+
+
 
 //**************************************************************************
 //  VIDEO
@@ -895,7 +913,7 @@ static PET_DATASSETTE_PORT_INTERFACE( datassette2_intf )
 //  TIMER_DEVICE_CALLBACK( sync_tick )
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER( pet2001_state::sync_tick )
+TIMER_DEVICE_CALLBACK_MEMBER( pet_state::sync_tick )
 {
 	m_sync = !m_sync;
 
@@ -907,7 +925,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( pet2001_state::sync_tick )
 //  SCREEN_UPDATE( pet2001 )
 //-------------------------------------------------
 
-UINT32 pet2001_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	for (int y = 0; y < 200; y++)
 	{
@@ -1004,7 +1022,7 @@ static MC6845_INTERFACE( crtc_intf )
 //  MACHINE_START( pet )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( pet2001_state, pet )
+MACHINE_START_MEMBER( pet_state, pet )
 {
 	// allocate memory
 	m_video_ram.allocate(m_video_ram_size);
@@ -1044,7 +1062,7 @@ MACHINE_START_MEMBER( pet2001_state, pet )
 //  MACHINE_START( pet2001 )
 //-------------------------------------------------
 
-MACHINE_START_MEMBER( pet2001_state, pet2001 )
+MACHINE_START_MEMBER( pet_state, pet2001 )
 {
 	m_video_ram_size = 0x400;
 
@@ -1056,7 +1074,7 @@ MACHINE_START_MEMBER( pet2001_state, pet2001 )
 //  MACHINE_RESET( pet )
 //-------------------------------------------------
 
-MACHINE_RESET_MEMBER( pet2001_state, pet )
+MACHINE_RESET_MEMBER( pet_state, pet )
 {
 	m_maincpu->reset();
 
@@ -1064,7 +1082,7 @@ MACHINE_RESET_MEMBER( pet2001_state, pet )
 	m_pia1->reset();
 	m_pia2->reset();
 
-	//m_exp->reset();
+	m_exp->reset();
 }
 
 
@@ -1144,9 +1162,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( pet )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( pet, pet2001_state )
-	MCFG_MACHINE_START_OVERRIDE(pet2001_state, pet2001)
-	MCFG_MACHINE_RESET_OVERRIDE(pet2001_state, pet)
+static MACHINE_CONFIG_START( pet, pet_state )
+	MCFG_MACHINE_START_OVERRIDE(pet_state, pet2001)
+	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet)
 
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_8MHz/8)
@@ -1158,21 +1176,22 @@ static MACHINE_CONFIG_START( pet, pet2001_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(320, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pet2001_state, screen_update)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("sync_timer", pet2001_state, sync_tick, attotime::from_hz(120))
+	MCFG_SCREEN_UPDATE_DRIVER(pet_state, screen_update)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("sync_timer", pet_state, sync_tick, attotime::from_hz(120))
 
 	// devices
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_8MHz/8, via_intf)
 	MCFG_PIA6821_ADD(M6520_1_TAG, pia1_intf)
 	MCFG_PIA6821_ADD(M6520_2_TAG, pia2_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c4040")
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c2n", NULL)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT2_TAG, datassette2_intf, cbm_datassette_devices, NULL, NULL)
-	//MCFG_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	//MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_8MHz/8, pet_expansion_cards, NULL, NULL)
-	//MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, user_intf, pet_user_port_cards, NULL, NULL)
+	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_8MHz/8, pet_expansion_cards, NULL, NULL)
+	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, user_intf, pet_user_port_cards, NULL, NULL)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software lists
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "pet_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
 MACHINE_CONFIG_END
 
@@ -1441,13 +1460,14 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_PIA6821_ADD(M6520_1_TAG, pia1_intf)
 	MCFG_PIA6821_ADD(M6520_2_TAG, pia2_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c2n", NULL)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT2_TAG, datassette2_intf, cbm_datassette_devices, NULL, NULL)
 	//MCFG_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	//MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, NULL, NULL)
-	//MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, user_intf, pet_user_port_cards, NULL, NULL)
+	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, NULL, NULL)
+	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, user_intf, pet_user_port_cards, NULL, NULL)
 
 	// software lists
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "pet_cass")
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
 MACHINE_CONFIG_END
 

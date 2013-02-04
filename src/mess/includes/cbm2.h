@@ -11,6 +11,7 @@
 #include "machine/6525tpi.h"
 #include "machine/6551acia.h"
 #include "machine/cbm2exp.h"
+#include "machine/cbm2user.h"
 #include "machine/cbmipt.h"
 #include "machine/ds75160a.h"
 #include "machine/ds75161a.h"
@@ -67,6 +68,7 @@ public:
 			m_joy1(*this, CONTROL1_TAG),
 			m_joy2(*this, CONTROL2_TAG),
 			m_exp(*this, CBM2_EXPANSION_SLOT_TAG),
+			m_user(*this, CBM2_USER_PORT_TAG),
 			m_ram(*this, RAM_TAG),
 			m_cassette(*this, PET_DATASSETTE_PORT_TAG),
 			m_ieee(*this, IEEE488_TAG),
@@ -122,6 +124,7 @@ public:
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
 	required_device<cbm2_expansion_slot_device> m_exp;
+	required_device<cbm2_user_port_device> m_user;
 	required_device<ram_device> m_ram;
 	required_device<pet_datassette_port_device> m_cassette;
 	required_device<ieee488_device> m_ieee;
@@ -195,7 +198,6 @@ public:
 	DECLARE_READ8_MEMBER( cia_pa_r );
 	DECLARE_WRITE8_MEMBER( cia_pa_w );
 	DECLARE_READ8_MEMBER( cia_pb_r );
-	DECLARE_WRITE8_MEMBER( cia_pb_w );
 
 	DECLARE_WRITE_LINE_MEMBER( tape_read_w );
 
@@ -206,7 +208,9 @@ public:
 	DECLARE_READ8_MEMBER( ext_cia_pb_r );
 	DECLARE_WRITE8_MEMBER( ext_cia_pb_w );
 
-	IRQ_CALLBACK_MEMBER(pic_irq_callback);
+	DECLARE_WRITE_LINE_MEMBER( user_irq_w );
+
+	IRQ_CALLBACK_MEMBER( pic_irq_callback );
 
 	// memory state
 	int m_dramon;
@@ -300,6 +304,8 @@ public:
 
 	DECLARE_READ8_MEMBER( tpi2_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi2_pc_w );
+
+	DECLARE_WRITE_LINE_MEMBER( user_irq_w );
 
 	// video state
 	int m_statvid;

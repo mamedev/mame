@@ -121,6 +121,22 @@ public:
 	DECLARE_WRITE8_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 
+	enum
+	{
+		CS0_BASIC = 0,
+		CS0_FUNCTION_LO,
+		CS0_C1_LOW,
+		CS0_C2_LOW
+	};
+
+	enum
+	{
+		CS1_KERNAL = 0,
+		CS1_FUNCTION_HI,
+		CS1_C1_HIGH,
+		CS1_C2_HIGH
+	};
+
 	// memory state
 	UINT8 m_addr;
 

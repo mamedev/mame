@@ -4,11 +4,7 @@
 
     - 8088 board
     - CIA timers fail in burn-in test
-    - shift lock
-    - Hungarian keyboard
     - cbm620hu charom banking?
-    - DIN roms 324866-03a / 324867-02
-    - user port
 
 */
 
@@ -1041,19 +1037,28 @@ INPUT_PORTS_END
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( cbm2hu )
+//  INPUT_PORTS( cbm2_de )
 //-------------------------------------------------
 
-static INPUT_PORTS_START( cbm2hu )
+static INPUT_PORTS_START( cbm2_de )
 	PORT_INCLUDE(cbm2)
 INPUT_PORTS_END
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( cbm2sw )
+//  INPUT_PORTS( cbm2_hu )
 //-------------------------------------------------
 
-static INPUT_PORTS_START( cbm2sw )
+static INPUT_PORTS_START( cbm2_hu )
+	PORT_INCLUDE(cbm2)
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( cbm2_se )
+//------------------------------------------------
+
+static INPUT_PORTS_START( cbm2_se )
 	PORT_INCLUDE(cbm2)
 
 	PORT_MODIFY("PA0")
@@ -1153,7 +1158,20 @@ READ8_MEMBER( cbm2_state::sid_potx_r )
 	{
 	case 1: data = m_joy1->pot_x_r(); break;
 	case 2: data = m_joy2->pot_x_r(); break;
-	case 3: break; // TODO pot1 and pot2 in series
+	case 3:
+		if (m_joy1->has_pot_x() && m_joy2->has_pot_x())
+		{
+			data = 1 / (1 / m_joy1->pot_x_r() + 1 / m_joy2->pot_x_r());
+		}
+		else if (m_joy1->has_pot_x())
+		{
+			data = m_joy1->pot_x_r();
+		}
+		else if (m_joy2->has_pot_x())
+		{
+			data = m_joy2->pot_x_r();
+		}
+		break;
 	}
 
 	return data;
@@ -1167,7 +1185,20 @@ READ8_MEMBER( cbm2_state::sid_poty_r )
 	{
 	case 1: data = m_joy1->pot_y_r(); break;
 	case 2: data = m_joy2->pot_y_r(); break;
-	case 3: break; // TODO pot1 and pot2 in series
+	case 3:
+		if (m_joy1->has_pot_y() && m_joy2->has_pot_y())
+		{
+			data = 1 / (1 / m_joy1->pot_y_r() + 1 / m_joy2->pot_y_r());
+		}
+		else if (m_joy1->has_pot_y())
+		{
+			data = m_joy1->pot_y_r();
+		}
+		else if (m_joy2->has_pot_y())
+		{
+			data = m_joy2->pot_y_r();
+		}
+		break;
 	}
 
 	return data;
@@ -1283,8 +1314,8 @@ READ8_MEMBER( cbm2_state::tpi1_pb_r )
 	data |= m_ieee2->srq_r() << 1;
 
 	// user port
-	//data |= m_user->pb2_r() << 2;
-	//data |= m_user->pb3_r() << 3;
+	data |= m_user->pb2_r() << 2;
+	data |= m_user->pb3_r() << 3;
 
 	// cassette
 	data |= m_cassette->sense_r() << 7;
@@ -1314,8 +1345,8 @@ WRITE8_MEMBER( cbm2_state::tpi1_pb_w )
 	m_ieee2->srq_w(BIT(data, 1));
 
 	// user port
-	//m_user->pb2_w(BIT(data, 2));
-	//m_user->pb3_w(BIT(data, 3));
+	m_user->pb2_w(BIT(data, 2));
+	m_user->pb3_w(BIT(data, 3));
 
 	// memory
 	m_dramon = BIT(data, 4);
@@ -1553,11 +1584,11 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 	data |= m_ieee1->read(space, 0);
 
 	// user port
-	//data |= m_user->data1_r();
+	data |= m_user->d1_r(space, 0);
 
 	// joystick
-	//data |= BIT(m_joy1->joy_r(), 5) << 6;
-	//data |= BIT(m_joy2->joy_r(), 5) << 7;
+	data &= ~(!BIT(m_joy1->joy_r(), 5) << 6);
+	data &= ~(!BIT(m_joy2->joy_r(), 5) << 7);
 
 	return data;
 }
@@ -1583,7 +1614,7 @@ WRITE8_MEMBER( cbm2_state::cia_pa_w )
 	m_ieee1->write(space, 0, data);
 
 	// user port
-	//m_user->data1_w(data);
+	m_user->d1_w(space, 0, data);
 
 	// joystick
 	m_cia_pa = data;
@@ -1613,41 +1644,21 @@ READ8_MEMBER( cbm2_state::cia_pb_r )
 	data |= (m_joy2->joy_r() & 0x0f) << 4;
 
 	// user port
-	//data &= m_user->data2_r();
+	data &= m_user->d2_r(space, 0);
 
 	return data;
-}
-
-WRITE8_MEMBER( cbm2_state::cia_pb_w )
-{
-	/*
-
-	    bit     description
-
-	    0       user port 2D0
-	    1       user port 2D1
-	    2       user port 2D2
-	    3       user port 2D3
-	    4       user port 2D4
-	    5       user port 2D5
-	    6       user port 2D6
-	    7       user port 2D7
-
-	*/
-
-	//m_user->data2_w(data);
 }
 
 static MOS6526_INTERFACE( cia_intf )
 {
 	DEVCB_DEVICE_LINE_MEMBER(MOS6525_1_TAG, tpi6525_device, i2_w),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER(CBM2_USER_PORT_TAG, cbm2_user_port_device, pc_w),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER(CBM2_USER_PORT_TAG, cbm2_user_port_device, sp_w),
-	DEVCB_NULL,//DEVCB_DEVICE_LINE_MEMBER(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w),
+	DEVCB_DEVICE_LINE_MEMBER(CBM2_USER_PORT_TAG, cbm2_user_port_device, pc_w),
+	DEVCB_DEVICE_LINE_MEMBER(CBM2_USER_PORT_TAG, cbm2_user_port_device, sp_w),
+	DEVCB_DEVICE_LINE_MEMBER(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w),
 	DEVCB_DRIVER_MEMBER(cbm2_state, cia_pa_r),
 	DEVCB_DRIVER_MEMBER(cbm2_state, cia_pa_w),
 	DEVCB_DRIVER_MEMBER(cbm2_state, cia_pb_r),
-	DEVCB_DRIVER_MEMBER(cbm2_state, cia_pb_w),
+	DEVCB_DEVICE_MEMBER(CBM2_USER_PORT_TAG, cbm2_user_port_device, d2_w)
 };
 
 
@@ -1918,6 +1929,46 @@ static MOS6526_INTERFACE( ext_cia_intf )
 };
 
 
+//-------------------------------------------------
+//  CBM2_USER_PORT_INTERFACE( user_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( cbm2_state::user_irq_w )
+{
+	m_user_irq = state;
+
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_tpi1_irq || m_user_irq);
+}
+
+static CBM2_USER_PORT_INTERFACE( user_intf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(cbm2_state, user_irq_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_TAG, mos6526_device, sp_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_TAG, mos6526_device, cnt_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_TAG, mos6526_device, flag_w)
+};
+
+
+//-------------------------------------------------
+//  CBM2_USER_PORT_INTERFACE( p500_user_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( p500_state::user_irq_w )
+{
+	m_user_irq = state;
+
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_vic_irq || m_tpi1_irq || m_user_irq);
+}
+
+static CBM2_USER_PORT_INTERFACE( p500_user_intf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(p500_state, user_irq_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_TAG, mos6526_device, sp_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_TAG, mos6526_device, cnt_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_TAG, mos6526_device, flag_w)
+};
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -2157,8 +2208,6 @@ static MACHINE_CONFIG_START( p500_ntsc, p500_state )
 	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6567_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_PLS100_ADD(PLA1_TAG)
@@ -2174,14 +2223,17 @@ static MACHINE_CONFIG_START( p500_ntsc, p500_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6567_CLOCK, cbm2_expansion_cards, NULL, NULL)
-	//MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
+	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, p500_user_intf, cbm2_user_port_cards, NULL, NULL)
+	MCFG_QUICKLOAD_ADD("quickload", p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
 	MCFG_FRAGMENT_ADD(128k)
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "p500_flop")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "p500_flop")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "NTSC")
 MACHINE_CONFIG_END
 
 
@@ -2206,8 +2258,6 @@ static MACHINE_CONFIG_START( p500_pal, p500_state )
 	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, VIC6569_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_PLS100_ADD(PLA1_TAG)
@@ -2223,14 +2273,17 @@ static MACHINE_CONFIG_START( p500_pal, p500_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6569_CLOCK, cbm2_expansion_cards, NULL, NULL)
-	//MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
+	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, p500_user_intf, cbm2_user_port_cards, NULL, NULL)
+	MCFG_QUICKLOAD_ADD("quickload", p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
 	MCFG_FRAGMENT_ADD(128k)
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "p500_flop")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "p500_flop")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "PAL")
 MACHINE_CONFIG_END
 
 
@@ -2263,8 +2316,6 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_SOUND_ADD(MOS6851_TAG, SID6581, XTAL_18MHz/9)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_PLS100_ADD(PLA1_TAG)
@@ -2279,11 +2330,14 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_18MHz/9, cbm2_expansion_cards, NULL, NULL)
-	//MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
+	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
+	MCFG_QUICKLOAD_ADD("quickload", cbmb, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list
-	MCFG_SOFTWARE_LIST_ADD("flop_list", "cbm2_flop")
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "cbm2_cart")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "cbm2_flop")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "NTSC")
 MACHINE_CONFIG_END
 
 
@@ -2507,7 +2561,7 @@ ROM_START( b500 )
 	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
 
 	ROM_REGION( 0xf5, PLA1_TAG, 0 )
-	ROM_LOAD( "906114-04.bin", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
+	ROM_LOAD( "906114-04.u18", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
 ROM_END
 
 
@@ -2533,7 +2587,7 @@ ROM_START( b128 )
 	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
 
 	ROM_REGION( 0xf5, PLA1_TAG, 0 )
-	ROM_LOAD( "906114-04.bin", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
+	ROM_LOAD( "906114-04.u18", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
 ROM_END
 
 
@@ -2557,7 +2611,7 @@ ROM_START( b256 )
 	ROM_LOAD( "901237-01.u25", 0x0000, 0x1000, CRC(1acf5098) SHA1(e63bf18da48e5a53c99ef127c1ae721333d1d102) )
 
 	ROM_REGION( 0xf5, PLA1_TAG, 0 )
-	ROM_LOAD( "906114-04.bin", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
+	ROM_LOAD( "906114-04.u18", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
 ROM_END
 
 
@@ -2584,13 +2638,13 @@ ROM_START( cbm620_hu )
 	ROM_LOAD( "610.u60", 0x0000, 0x4000, CRC(8eed0d7e) SHA1(9d06c5c3c012204eaaef8b24b1801759b62bf57e) )
 
 	ROM_REGION( 0x2000, "kernal", 0 )
-	ROM_LOAD( "kernhun.bin", 0x0000, 0x2000, CRC(0ea8ca4d) SHA1(9977c9f1136ee9c04963e0b50ae0c056efa5663f) )
+	ROM_LOAD( "kernhun.u61", 0x0000, 0x2000, CRC(0ea8ca4d) SHA1(9977c9f1136ee9c04963e0b50ae0c056efa5663f) )
 
 	ROM_REGION( 0x2000, "charom", 0 )
-	ROM_LOAD( "charhun.bin", 0x0000, 0x2000, CRC(1fb5e596) SHA1(3254e069f8691b30679b19a9505b6afdfedce6ac) )
+	ROM_LOAD( "charhun.u25", 0x0000, 0x2000, CRC(1fb5e596) SHA1(3254e069f8691b30679b19a9505b6afdfedce6ac) )
 
 	ROM_REGION( 0xf5, PLA1_TAG, 0 )
-	ROM_LOAD( "906114-04.bin", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
+	ROM_LOAD( "906114-04.u18", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
 ROM_END
 
 
@@ -2616,7 +2670,7 @@ ROM_START( b128hp )
 	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
 
 	ROM_REGION( 0xf5, PLA1_TAG, 0 )
-	ROM_LOAD( "906114-05.bin", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
+	ROM_LOAD( "906114-05.u75", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
 ROM_END
 
 
@@ -2640,7 +2694,7 @@ ROM_START( b256hp )
 	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
 
 	ROM_REGION( 0xf5, PLA1_TAG, 0 )
-	ROM_LOAD( "906114-05.bin", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
+	ROM_LOAD( "906114-05.u75", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
 ROM_END
 
 
@@ -2667,7 +2721,7 @@ ROM_START( bx256hp )
 	ROM_LOAD( "901232-01.u25", 0x0000, 0x1000, CRC(3a350bc3) SHA1(e7f3cbc8e282f79a00c3e95d75c8d725ee3c6287) )
 
 	ROM_REGION( 0xf5, PLA1_TAG, 0 )
-	ROM_LOAD( "906114-05.bin", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
+	ROM_LOAD( "906114-05.u75", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
 ROM_END
 
 
@@ -2693,6 +2747,26 @@ ROM_END
 
 
 //-------------------------------------------------
+//  ROM( cbm720_de )
+//-------------------------------------------------
+
+ROM_START( cbm720_de )
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "901241-03.u59", 0x0000, 0x2000, CRC(5c1f3347) SHA1(2d46be2cd89594b718cdd0a86d51b6f628343f42) )
+	ROM_LOAD( "901240-03.u60", 0x2000, 0x2000, CRC(72aa44e1) SHA1(0d7f77746290afba8d0abeb87c9caab9a3ad89ce) )
+
+	ROM_REGION( 0x2000, "kernal", 0 )
+	ROM_LOAD( "324886-03a.u61", 0x0000, 0x2000, CRC(554b008d) SHA1(1483a46924308d86f4c7f9cb71c34851c510fcf4) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "324867-02.u25", 0x0000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
+	ROM_LOAD( "906114-05.u75", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
+ROM_END
+
+
+//-------------------------------------------------
 //  ROM( cbm720_se )
 //-------------------------------------------------
 
@@ -2708,7 +2782,7 @@ ROM_START( cbm720_se )
 	ROM_LOAD( "901233-03.u25", 0x0000, 0x1000, CRC(09518b19) SHA1(2e28491e31e2c0a3b6db388055216140a637cd09) )
 
 	ROM_REGION( 0xf5, PLA1_TAG, 0 )
-	ROM_LOAD( "906114-05.bin", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
+	ROM_LOAD( "906114-05.u75", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
 ROM_END
 
 
@@ -2717,21 +2791,20 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT                        COMPANY                         FULLNAME                    FLAGS
-COMP( 1983, p500,       0,      0,      p500_ntsc,  cbm2,   driver_device,      0,      "Commodore Business Machines",  "P500 (NTSC)",              GAME_SUPPORTS_SAVE )
-COMP( 1983, p500p,      p500,   0,      p500_pal,   cbm2,   driver_device,      0,      "Commodore Business Machines",  "P500 (PAL)",               GAME_SUPPORTS_SAVE )
-
-COMP( 1983, b500,       p500,   0,      b128,       cbm2,   driver_device,      0,      "Commodore Business Machines",  "B500",                     GAME_SUPPORTS_SAVE )
-COMP( 1983, b128,       p500,   0,      b128,       cbm2,   driver_device,      0,      "Commodore Business Machines",  "B128",                     GAME_SUPPORTS_SAVE )
-COMP( 1983, b256,       p500,   0,      b256,       cbm2,   driver_device,      0,      "Commodore Business Machines",  "B256",                     GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm610,     p500,   0,      cbm610,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "CBM 610",                  GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm620,     p500,   0,      cbm620,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "CBM 620",                  GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm620_hu,  p500,   0,      cbm620,     cbm2hu, driver_device,      0,      "Commodore Business Machines",  "CBM 620 (Hungary)",        GAME_SUPPORTS_SAVE )
-
-COMP( 1983, b128hp,     p500,   0,      b128hp,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "B128-80HP",                GAME_SUPPORTS_SAVE )
-COMP( 1983, b256hp,     p500,   0,      b256hp,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "B256-80HP",                GAME_SUPPORTS_SAVE )
-COMP( 1983, bx256hp,    p500,   0,      bx256hp,    cbm2,   driver_device,      0,      "Commodore Business Machines",  "BX256-80HP",               GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 8088 co-processor is missing
-COMP( 1983, cbm710,     p500,   0,      cbm710,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "CBM 710",                  GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm720,     p500,   0,      cbm720,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "CBM 720",                  GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm720_se,  p500,   0,      cbm720,     cbm2sw, driver_device,      0,      "Commodore Business Machines",  "CBM 720 (Sweden/Finland)", GAME_SUPPORTS_SAVE )
-COMP( 1983, cbm730,     p500,   0,      cbm730,     cbm2,   driver_device,      0,      "Commodore Business Machines",  "CBM 730",                  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 8088 co-processor is missing
+//    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   	INIT                        COMPANY                         FULLNAME                    FLAGS
+COMP( 1983, p500,       0,      0,      p500_ntsc,  cbm2,   	driver_device,      0,      "Commodore Business Machines",  "P500 (NTSC)",              GAME_SUPPORTS_SAVE )
+COMP( 1983, p500p,      p500,   0,      p500_pal,   cbm2,   	driver_device,      0,      "Commodore Business Machines",  "P500 (PAL)",               GAME_SUPPORTS_SAVE )
+COMP( 1983, b500,       0,   	0,      b128,       cbm2,   	driver_device,      0,      "Commodore Business Machines",  "B500",                     GAME_SUPPORTS_SAVE )
+COMP( 1983, b128,       b500,   0,      b128,       cbm2,   	driver_device,      0,      "Commodore Business Machines",  "B128",                     GAME_SUPPORTS_SAVE )
+COMP( 1983, b256,       b500,   0,      b256,       cbm2,   	driver_device,      0,      "Commodore Business Machines",  "B256",                     GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm610,     b500,   0,      cbm610,     cbm2,   	driver_device,      0,      "Commodore Business Machines",  "CBM 610",                  GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm620,     b500,   0,      cbm620,     cbm2,   	driver_device,      0,      "Commodore Business Machines",  "CBM 620",                  GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm620_hu,  b500,   0,      cbm620,     cbm2_hu, 	driver_device,      0,      "Commodore Business Machines",  "CBM 620 (Hungary)",        GAME_SUPPORTS_SAVE )
+COMP( 1983, b128hp,     0,   	0,      b128hp,     cbm2,   	driver_device,      0,      "Commodore Business Machines",  "B128-80HP",                GAME_SUPPORTS_SAVE )
+COMP( 1983, b256hp,     b128hp, 0,      b256hp,     cbm2,   	driver_device,      0,      "Commodore Business Machines",  "B256-80HP",                GAME_SUPPORTS_SAVE )
+COMP( 1983, bx256hp,    b128hp, 0,      bx256hp,    cbm2,   	driver_device,      0,      "Commodore Business Machines",  "BX256-80HP",               GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 8088 co-processor is missing
+COMP( 1983, cbm710,     b128hp, 0,      cbm710,     cbm2,   	driver_device,      0,      "Commodore Business Machines",  "CBM 710",                  GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm720,     b128hp, 0,      cbm720,     cbm2,   	driver_device,      0,      "Commodore Business Machines",  "CBM 720",                  GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm720_de,  b128hp, 0,      cbm720,     cbm2_de,	driver_device,      0,      "Commodore Business Machines",  "CBM 720 (Germany)", 		GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm720_se,  b128hp, 0,      cbm720,     cbm2_se,	driver_device,      0,      "Commodore Business Machines",  "CBM 720 (Sweden/Finland)", GAME_SUPPORTS_SAVE )
+COMP( 1983, cbm730,     b128hp, 0,      cbm730,     cbm2,   	driver_device,      0,      "Commodore Business Machines",  "CBM 730",                  GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // 8088 co-processor is missing

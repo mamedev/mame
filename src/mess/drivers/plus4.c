@@ -32,24 +32,6 @@
 #define BA4 BIT(offset, 4)
 
 
-enum
-{
-	CS0_BASIC = 0,
-	CS0_FUNCTION_LO,
-	CS0_C1_LOW,
-	CS0_C2_LOW
-};
-
-
-enum
-{
-	CS1_KERNAL = 0,
-	CS1_FUNCTION_HI,
-	CS1_C1_HIGH,
-	CS1_C2_HIGH
-};
-
-
 
 //**************************************************************************
 //  INTERRUPTS
@@ -837,8 +819,8 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 	MCFG_CPU_PROGRAM_MAP(plus4_mem)
 	MCFG_M7501_PORT_CALLBACKS(READ8(plus4_state, cpu_r), WRITE8(plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, plus4_state,  c16_frame_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(plus4_state, c16_raster_interrupt,  TED7360_HRETRACERATE)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, plus4_state, c16_frame_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(plus4_state, c16_raster_interrupt, TED7360_HRETRACERATE)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	// video and sound hardware
@@ -851,13 +833,13 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 	MCFG_ACIA6551_ADD(MOS6551_TAG)
 	MCFG_MOS6529_ADD(MOS6529_USER_TAG, spi_user_intf)
 	MCFG_MOS6529_ADD(MOS6529_KB_TAG, spi_kb_intf)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, plus4_datassette_devices, "c1531", NULL)
 	MCFG_CBM_IEC_ADD(iec_intf, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, expansion_intf, plus4_expansion_cards, "c1551", NULL)
 	MCFG_PLUS4_USER_PORT_ADD(PLUS4_USER_PORT_TAG, plus4_user_port_cards, NULL, NULL)
+	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -865,7 +847,11 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "plus4_cart")
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "plus4_flop")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "plus4_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "plus4_flop")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("cass_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "NTSC")
 MACHINE_CONFIG_END
 
 
@@ -879,8 +865,8 @@ static MACHINE_CONFIG_START( pal, plus4_state )
 	MCFG_CPU_PROGRAM_MAP(plus4_mem)
 	MCFG_M7501_PORT_CALLBACKS(READ8(plus4_state, cpu_r), WRITE8(plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, plus4_state,  c16_frame_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(plus4_state, c16_raster_interrupt,  TED7360_HRETRACERATE)
+	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, plus4_state, c16_frame_interrupt)
+	MCFG_CPU_PERIODIC_INT_DRIVER(plus4_state, c16_raster_interrupt, TED7360_HRETRACERATE)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	// video and sound hardware
@@ -907,7 +893,11 @@ static MACHINE_CONFIG_START( pal, plus4_state )
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "plus4_cart")
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "plus4_flop")
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "plus4_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "plus4_flop")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("cass_list", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "PAL")
 MACHINE_CONFIG_END
 
 
