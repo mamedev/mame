@@ -56,6 +56,33 @@
 		</part>
 	</software>
 
+	<software name="language11c" cloneof="language">
+		<description>Waterloo Language (v1.1, 6702 cracked)</description>
+		<year>1981</year>
+		<publisher>University of Waterloo</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Language Disk 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="waterloo2-language-no6702-1.d64" size="174848" crc="eb076ea0" sha1="eb4330a02a844a47fea9b73e7597a6780e002d52" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Language Disk 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="waterloo2-language-no6702-2.d64" size="174848" crc="5e49633b" sha1="5f8d774449cf5fbe8a3c354f0bea4d4c0713fda1" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Tutorial Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="waterloo2-tutorial.d64" size="174848" crc="cdc2bc2c" sha1="5ebc3ef769e7a0ea0d1ab1b33fa1a5f4612fce3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="examples">
 		<description>Development Package Examples</description>
 		<year>1981</year>
@@ -64,6 +91,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="waterloo-development.d64" size="174848" crc="4effcde8" sha1="ddc1d03fb70d5084bb19e4472cf1ea3c2c6053f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="os9">
+		<description>Super-OS/9</description>
+		<year>1985</year>
+		<publisher>Toronto PET Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="os9-systemdisk.d80" size="533248" crc="8e831bba" sha1="3f2d050ffd7a28f590cdaab57f79e5b035324164" offset="0" />
 			</dataarea>
 		</part>
 	</software>
