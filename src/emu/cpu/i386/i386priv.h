@@ -584,6 +584,9 @@ static int i386_translate_address(i386_state *cpustate, int intention, offs_t *a
 
 INLINE int translate_address(i386_state *cpustate, int pl, int type, UINT32 *address, UINT32 *error)
 {
+	if(!(cpustate->cr[0] & 0x80000000)) // Some (very few) old OS's won't work with this
+		return TRUE;
+
 	const vtlb_entry *table = vtlb_table(cpustate->vtlb);
 	int index = *address >> 12;
 	vtlb_entry entry = table[index];
