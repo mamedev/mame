@@ -66,6 +66,7 @@ hash/c64_flop.xml svneol=native#text/xml
 hash/casloopy.xml svneol=native#text/xml
 hash/cbm2_cart.xml svneol=native#text/xml
 hash/cbm2_flop.xml svneol=native#text/xml
+hash/cbm8096_flop.xml svneol=native#text/xml
 hash/cbm8296_flop.xml svneol=native#text/xml
 hash/cd32.xml svneol=native#text/xml
 hash/cdi.xml svneol=native#text/xml
