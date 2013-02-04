@@ -23,6 +23,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
+	void n64_machine_stop();
+	
 	UINT32 screen_update_n64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -120,7 +122,6 @@ public:
 	void poll_reset_button(bool button);
 
 	UINT32 dp_clock;
-
 protected:
 	// device-level overrides
 	virtual void device_start();

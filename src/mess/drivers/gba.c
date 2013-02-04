@@ -43,27 +43,25 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 
 static const UINT32 timer_clks[4] = { 16777216, 16777216/64, 16777216/256, 16777216/1024 };
 
-static void gba_machine_stop(running_machine &machine)
+void gba_state::gba_machine_stop()
 {
-	gba_state *state = machine.driver_data<gba_state>();
-
 	// only do this if the cart loader detected some form of backup
-	if (state->m_nvsize > 0)
+	if (m_nvsize > 0)
 	{
-		device_image_interface *image = dynamic_cast<device_image_interface *>(state->m_nvimage);
-		image->battery_save(state->m_nvptr, state->m_nvsize);
+		device_image_interface *image = dynamic_cast<device_image_interface *>(m_nvimage);
+		image->battery_save(m_nvptr, m_nvsize);
 	}
 
-	if (state->m_flash_size > 0)
+	if (m_flash_size > 0)
 	{
-		device_image_interface *image = dynamic_cast<device_image_interface *>(state->m_nvimage);
-		UINT8 *nvram = auto_alloc_array( machine, UINT8, state->m_flash_size);
-		for (int i = 0; i < state->m_flash_size; i++)
+		device_image_interface *image = dynamic_cast<device_image_interface *>(m_nvimage);
+		UINT8 *nvram = auto_alloc_array( machine(), UINT8, m_flash_size);
+		for (int i = 0; i < m_flash_size; i++)
 		{
-			nvram[i] = state->m_mFlashDev->read_raw( i);
+			nvram[i] = m_mFlashDev->read_raw( i);
 		}
-		image->battery_save( nvram, state->m_flash_size);
-		auto_free( machine, nvram);
+		image->battery_save( nvram, m_flash_size);
+		auto_free( machine(), nvram);
 	}
 }
 
@@ -2129,7 +2127,7 @@ void gba_state::machine_reset()
 void gba_state::machine_start()
 {
 	/* add a hook for battery save */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gba_machine_stop),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gba_state::gba_machine_stop),this));
 
 	/* create a timer to fire scanline functions */
 	m_scan_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gba_state::perform_scan),this));

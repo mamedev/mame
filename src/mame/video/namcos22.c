@@ -2661,16 +2661,15 @@ WRITE32_MEMBER(namcos22_state::namcos22_paletteram_w)
 	m_dirtypal[offset&(0x7fff/4)] = 1;
 }
 
-static void namcos22_reset(running_machine &machine)
+void namcos22_state::namcos22_reset()
 {
 	memset(&mSceneRoot, 0, sizeof(mSceneRoot));
 	mpFreeSceneNode = NULL;
 }
 
-static void namcos22_exit(running_machine &machine)
+void namcos22_state::namcos22_exit()
 {
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	poly_free(state->m_poly);
+	poly_free(m_poly);
 }
 
 VIDEO_START_MEMBER(namcos22_state,common)
@@ -2695,8 +2694,8 @@ VIDEO_START_MEMBER(namcos22_state,common)
 	m_pPolyH = m_pPolyM + m_PtRomSize;
 
 	m_poly = poly_alloc(machine(), 4000, sizeof(poly_extra_data), 0);
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(namcos22_reset), &machine()));
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(namcos22_exit), &machine()));
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(namcos22_state::namcos22_reset), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(namcos22_state::namcos22_exit), this));
 
 	machine().gfx[GFX_CHAR]->set_source((UINT8 *)m_cgram.target());
 }

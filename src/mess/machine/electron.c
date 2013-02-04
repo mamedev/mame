@@ -321,22 +321,21 @@ TIMER_CALLBACK_MEMBER(electron_state::setup_beep)
 	beep_set_frequency( speaker, 300 );
 }
 
-static void electron_reset(running_machine &machine)
+void electron_state::machine_reset()
 {
-	electron_state *state = machine.driver_data<electron_state>();
-	state->membank("bank2")->set_entry(0);
+	membank("bank2")->set_entry(0);
 
-	state->m_ula.communication_mode = 0x04;
-	state->m_ula.screen_mode = 0;
-	state->m_ula.cassette_motor_mode = 0;
-	state->m_ula.capslock_mode = 0;
-	state->m_ula.screen_mode = 0;
-	state->m_ula.screen_start = 0x3000;
-	state->m_ula.screen_base = 0x3000;
-	state->m_ula.screen_size = 0x8000 - 0x3000;
-	state->m_ula.screen_addr = 0;
-	state->m_ula.tape_running = 0;
-	state->m_ula.vram = (UINT8 *)machine.device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(state->m_ula.screen_base);
+	m_ula.communication_mode = 0x04;
+	m_ula.screen_mode = 0;
+	m_ula.cassette_motor_mode = 0;
+	m_ula.capslock_mode = 0;
+	m_ula.screen_mode = 0;
+	m_ula.screen_start = 0x3000;
+	m_ula.screen_base = 0x3000;
+	m_ula.screen_size = 0x8000 - 0x3000;
+	m_ula.screen_addr = 0;
+	m_ula.tape_running = 0;
+	m_ula.vram = (UINT8 *)machine().device("maincpu")->memory().space(AS_PROGRAM).get_read_ptr(m_ula.screen_base);
 }
 
 void electron_state::machine_start()
@@ -347,5 +346,4 @@ void electron_state::machine_start()
 	m_ula.interrupt_control = 0x00;
 	machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(electron_state::setup_beep),this));
 	m_tape_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(electron_state::electron_tape_timer_handler),this));
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(electron_reset),&machine()));
 }

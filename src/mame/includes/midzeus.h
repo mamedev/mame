@@ -61,6 +61,8 @@ public:
 	INTERRUPT_GEN_MEMBER(display_irq);
 	TIMER_CALLBACK_MEMBER(display_irq_off);
 	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
+	void exit_handler();
+	void exit_handler2();
 };
 
 /*----------- defined in video/midzeus2.c -----------*/

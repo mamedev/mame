@@ -217,6 +217,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineR);
+	void vboy_machine_stop();
 };
 
 
@@ -1164,22 +1165,20 @@ static INPUT_PORTS_START( vboy )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // Battery low
 INPUT_PORTS_END
 
-static void vboy_machine_stop(running_machine &machine)
+void vboy_state::vboy_machine_stop()
 {
-	vboy_state *state = machine.driver_data<vboy_state>();
-
 	// only do this if the cart loader detected some form of backup
-	if (state->m_nvptr != NULL)
+	if (m_nvptr != NULL)
 	{
-		device_image_interface *image = dynamic_cast<device_image_interface *>(state->m_nvimage);
-		image->battery_save(state->m_nvptr, 0x10000);
+		device_image_interface *image = dynamic_cast<device_image_interface *>(m_nvimage);
+		image->battery_save(m_nvptr, 0x10000);
 	}
 }
 
 void vboy_state::machine_start()
 {
 	/* add a hook for battery save */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(vboy_machine_stop),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(vboy_state::vboy_machine_stop),this));
 
 //  m_vboy_sram = auto_alloc_array(machine(), UINT32, 0x10000/4);
 }

@@ -120,12 +120,6 @@ receive clock and transmit clock inputs */
 
 static void nc_printer_update(running_machine &machine, UINT8 data);
 
-
-
-
-static void nc100_machine_stop(running_machine &machine);
-static void nc200_machine_stop(running_machine &machine);
-
 /*
     Port 0x00:
     ==========
@@ -933,18 +927,18 @@ void nc_state::machine_reset()
 	m_irq_latch_mask = (1<<0) | (1<<1);
 }
 
-static void nc100_machine_stop(running_machine &machine)
+void nc_state::nc100_machine_stop()
 {
-	nc_common_open_stream_for_writing(machine);
-	nc_common_store_memory_to_stream(machine);
-	nc_common_close_stream(machine);
+	nc_common_open_stream_for_writing(machine());
+	nc_common_store_memory_to_stream(machine());
+	nc_common_close_stream(machine());
 }
 
 void nc_state::machine_start()
 {
 	m_type = NC_TYPE_1xx;
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nc100_machine_stop),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nc_state::nc100_machine_stop),this));
 
 	/* keyboard timer */
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));
@@ -1311,18 +1305,18 @@ MACHINE_RESET_MEMBER(nc_state,nc200)
 	nc200_video_set_backlight(machine(), 0);
 }
 
-static void nc200_machine_stop(running_machine &machine)
+void nc_state::nc200_machine_stop()
 {
-	nc_common_open_stream_for_writing(machine);
-	nc_common_store_memory_to_stream(machine);
-	nc_common_close_stream(machine);
+	nc_common_open_stream_for_writing(machine());
+	nc_common_store_memory_to_stream(machine());
+	nc_common_close_stream(machine());
 }
 
 MACHINE_START_MEMBER(nc_state,nc200)
 {
 	m_type = NC_TYPE_200;
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nc200_machine_stop),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(nc_state::nc200_machine_stop),this));
 
 	/* keyboard timer */
 	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nc_state::nc_keyboard_timer_callback),this));

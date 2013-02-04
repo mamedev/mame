@@ -372,12 +372,11 @@ void tx0_state::machine_reset()
 }
 
 
-static void tx0_machine_stop(running_machine &machine)
+void tx0_state::tx0_machine_stop()
 {
-	tx0_state *state = machine.driver_data<tx0_state>();
 	/* the core will take care of freeing the timers, BUT we must set the variables
 	to NULL if we don't want to risk confusing the tape image init function */
-	state->m_tape_reader.timer = state->m_tape_puncher.timer = state->m_typewriter.prt_timer = state->m_dis_timer = NULL;
+	m_tape_reader.timer = m_tape_puncher.timer = m_typewriter.prt_timer = m_dis_timer = NULL;
 }
 
 
@@ -388,7 +387,7 @@ void tx0_state::machine_start()
 	m_typewriter.prt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::prt_callback),this));
 	m_dis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::dis_callback),this));
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(tx0_machine_stop),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(tx0_state::tx0_machine_stop),this));
 }
 
 

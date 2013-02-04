@@ -2731,38 +2731,36 @@ ROM_START( kikstart )
 	ROM_LOAD( "pal16l8.28",   0x0000, 0x0104, NO_DUMP ) /* PAL is read protected */
 ROM_END
 
-static void reset_common(running_machine &machine)
+void taitosj_state::reset_common()
 {
-	taitosj_state *state = machine.driver_data<taitosj_state>();
-	state->m_sndnmi_disable = 1;
-	state->m_input_port_4_f0 = 0;
+	m_sndnmi_disable = 1;
+	m_input_port_4_f0 = 0;
 	/* start in 1st gear */
-	state->m_kikstart_gears[0] = 0x02;
-	state->m_kikstart_gears[1] = 0x02;
-	state->m_dac_out = 0;
-	state->m_dac_vol = 0;
+	m_kikstart_gears[0] = 0x02;
+	m_kikstart_gears[1] = 0x02;
+	m_dac_out = 0;
+	m_dac_vol = 0;
 }
 
-static void init_common(running_machine &machine)
+void taitosj_state::init_common()
 {
-	taitosj_state *state = machine.driver_data<taitosj_state>();
-	state->save_item(NAME(state->m_sndnmi_disable));
-	state->save_item(NAME(state->m_input_port_4_f0));
-	state->save_item(NAME(state->m_kikstart_gears));
-	state->save_item(NAME(state->m_dac_out));
-	state->save_item(NAME(state->m_dac_vol));
-
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(reset_common), &machine));
+	save_item(NAME(m_sndnmi_disable));
+	save_item(NAME(m_input_port_4_f0));
+	save_item(NAME(m_kikstart_gears));
+	save_item(NAME(m_dac_out));
+	save_item(NAME(m_dac_vol));
+	
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(taitosj_state::reset_common), this));
 }
 
 DRIVER_INIT_MEMBER(taitosj_state,taitosj)
 {
-	init_common(machine());
+	init_common();
 }
 
 DRIVER_INIT_MEMBER(taitosj_state,spacecr)
 {
-	init_common(machine());
+	init_common();
 
 	/* install protection handler */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd48b, 0xd48b, read8_delegate(FUNC(taitosj_state::spacecr_prot_r),this));
@@ -2770,7 +2768,7 @@ DRIVER_INIT_MEMBER(taitosj_state,spacecr)
 
 DRIVER_INIT_MEMBER(taitosj_state,alpine)
 {
-	init_common(machine());
+	init_common();
 
 	/* install protection handlers */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8_delegate(FUNC(taitosj_state::alpine_port_2_r),this));
@@ -2779,7 +2777,7 @@ DRIVER_INIT_MEMBER(taitosj_state,alpine)
 
 DRIVER_INIT_MEMBER(taitosj_state,alpinea)
 {
-	init_common(machine());
+	init_common();
 
 	/* install protection handlers */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd40b, 0xd40b, read8_delegate(FUNC(taitosj_state::alpine_port_2_r),this));
@@ -2788,7 +2786,7 @@ DRIVER_INIT_MEMBER(taitosj_state,alpinea)
 
 DRIVER_INIT_MEMBER(taitosj_state,junglhbr)
 {
-	init_common(machine());
+	init_common();
 
 	/* inverter on bits 0 and 1 */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x9000, 0xbfff, write8_delegate(FUNC(taitosj_state::junglhbr_characterram_w),this));

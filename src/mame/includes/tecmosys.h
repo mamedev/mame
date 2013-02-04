@@ -80,7 +80,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_tecmosys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tecmosys_prot_init(int which);
+	void tecmosys_prot_reset();
 };
 
-/*----------- defined in machine/tecmosys.c -----------*/
-void tecmosys_prot_init(running_machine &machine, int which);

@@ -143,6 +143,7 @@ public:
 	DECLARE_PALETTE_INIT(wscolor);
 	TIMER_CALLBACK_MEMBER(wswan_rtc_callback);
 	TIMER_CALLBACK_MEMBER(wswan_scanline_interrupt);
+	void wswan_machine_stop();
 
 protected:
 	/* Interrupt flags */

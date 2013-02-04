@@ -157,6 +157,7 @@ public:
 	TIMER_CALLBACK_MEMBER(puncher_callback);
 	TIMER_CALLBACK_MEMBER(prt_callback);
 	TIMER_CALLBACK_MEMBER(dis_callback);
+	void tx0_machine_stop();
 };
 
 

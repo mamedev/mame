@@ -292,15 +292,8 @@ static void draw_object_bank(running_machine &machine, bitmap_ind16 &bitmap, con
 }
 
 
-
-static void taitojc_exit(running_machine &machine)
-{
-}
-
 void taitojc_state::video_start()
 {
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitojc_exit), &machine()));
-
 	/* find first empty slot to decode gfx */
 	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
 		if (machine().gfx[m_gfx_index] == 0)

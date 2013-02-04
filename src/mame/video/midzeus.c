@@ -82,8 +82,6 @@ static int is_mk4b;
  *
  *************************************/
 
-static void exit_handler(running_machine &machine);
-
 static void zeus_pointer_w(UINT32 which, UINT32 data, int logit);
 static void zeus_register16_w(running_machine &machine, offs_t offset, UINT16 data, int logit);
 static void zeus_register32_w(running_machine &machine, offs_t offset, UINT32 data, int logit);
@@ -275,7 +273,7 @@ VIDEO_START_MEMBER(midzeus_state,midzeus)
 	poly = poly_alloc(machine(), 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 
 	/* we need to cleanup on exit */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(exit_handler), &machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midzeus_state::exit_handler), this));
 
 	yoffs = 0;
 	texel_width = 256;
@@ -301,7 +299,7 @@ VIDEO_START_MEMBER(midzeus_state,midzeus)
 }
 
 
-static void exit_handler(running_machine &machine)
+void midzeus_state::exit_handler()
 {
 #if DUMP_WAVE_RAM
 	FILE *f = fopen("waveram.dmp", "w");

@@ -87,6 +87,9 @@ public:
 	DECLARE_MACHINE_START(cybikoxt);
 	DECLARE_MACHINE_RESET(cybikoxt);
 	UINT32 screen_update_cybiko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void machine_stop_cybikov1();
+	void machine_stop_cybikov2();
+	void machine_stop_cybikoxt();
 };
 
 #endif /* CYBIKO_H_ */

@@ -723,6 +723,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cobra_vblank);
+	void cobra_video_exit();
 };
 
 void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
@@ -982,15 +983,14 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 	}
 }
 
-static void cobra_video_exit(running_machine *machine)
+void cobra_state::cobra_video_exit()
 {
-	cobra_state *state = machine->driver_data<cobra_state>();
-	state->m_renderer->gfx_exit(*machine);
+	m_renderer->gfx_exit(machine());
 }
 
 void cobra_state::video_start()
 {
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_video_exit), &machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_state::cobra_video_exit), this));
 
 	m_renderer = auto_alloc(machine(), cobra_renderer(machine()));
 	m_renderer->gfx_init(machine());

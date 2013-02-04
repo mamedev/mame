@@ -93,4 +93,6 @@ public:
 	TIMER_CALLBACK_MEMBER(taitosj_mcu_real_data_w);
 	TIMER_CALLBACK_MEMBER(taitosj_mcu_data_real_r);
 	TIMER_CALLBACK_MEMBER(taitosj_mcu_status_real_w);
+	void init_common();
+	void reset_common();
 };

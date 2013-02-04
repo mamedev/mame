@@ -302,6 +302,7 @@ protected:
 	void gbc_hdma(UINT16 length);
 	void gb_increment_scanline();
 	void gb_lcd_switch_on();
+	void gb_machine_stop();
 };
 
 

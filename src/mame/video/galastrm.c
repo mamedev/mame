@@ -20,10 +20,9 @@ struct polygon
 
 /******************************************************************/
 
-static void galastrm_exit(running_machine &machine)
+void galastrm_state::galastrm_exit()
 {
-	galastrm_state *state = machine.driver_data<galastrm_state>();
-	poly_free(state->m_poly);
+	poly_free(m_poly);
 }
 
 void galastrm_state::video_start()
@@ -34,7 +33,7 @@ void galastrm_state::video_start()
 	machine().primary_screen->register_screen_bitmap(m_polybitmap);
 
 	m_poly = poly_alloc(machine(), 16, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(galastrm_exit), &machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(galastrm_state::galastrm_exit), this));
 }
 
 /************************************************************

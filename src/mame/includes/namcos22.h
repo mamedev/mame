@@ -269,6 +269,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_master_serial_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_slave_serial_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
+	void namcos22_reset();
+	void namcos22_exit();
 };
 
 /*----------- defined in video/namcos22.c -----------*/

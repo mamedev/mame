@@ -1920,37 +1920,39 @@ WRITE8_MEMBER(lynx_state::lynx_memory_config_w)
 	membank("bank4")->set_entry((data & 8) ? 1 : 0);
 }
 
-static void lynx_reset(running_machine &machine)
+void lynx_state::machine_reset()
 {
-	lynx_state *state = machine.driver_data<lynx_state>();
-	state->lynx_memory_config_w(machine.device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
+	lynx_memory_config_w(machine().device("maincpu")->memory().space(AS_PROGRAM), 0, 0);
 
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(M65SC02_IRQ_LINE, CLEAR_LINE);
 
-	memset(&state->m_suzy, 0, sizeof(state->m_suzy));
-	memset(&state->m_mikey, 0, sizeof(state->m_mikey));
+	memset(&m_suzy, 0, sizeof(m_suzy));
+	memset(&m_mikey, 0, sizeof(m_mikey));
 
-	state->m_suzy.data[0x88]  = 0x01;
-	state->m_suzy.data[0x90]  = 0x00;
-	state->m_suzy.data[0x91]  = 0x00;
-	state->m_mikey.data[0x80] = 0x00;
-	state->m_mikey.data[0x81] = 0x00;
-	state->m_mikey.data[0x88] = 0x01;
-	state->m_mikey.data[0x8a] = 0x00;
-	state->m_mikey.data[0x8c] = 0x00;
-	state->m_mikey.data[0x90] = 0x00;
-	state->m_mikey.data[0x92] = 0x00;
+	m_suzy.data[0x88]  = 0x01;
+	m_suzy.data[0x90]  = 0x00;
+	m_suzy.data[0x91]  = 0x00;
+	m_mikey.data[0x80] = 0x00;
+	m_mikey.data[0x81] = 0x00;
+	m_mikey.data[0x88] = 0x01;
+	m_mikey.data[0x8a] = 0x00;
+	m_mikey.data[0x8c] = 0x00;
+	m_mikey.data[0x90] = 0x00;
+	m_mikey.data[0x92] = 0x00;
 
-	lynx_uart_reset(state);
+	lynx_uart_reset(this);
 
 	// hack to allow current object loading to work
 #if 0
-	lynx_timer_write( state, 0, 0, 160 ); // set backup value (hpos) = 160
-	lynx_timer_write( state, 0, 1, 0x10 | 0x8 | 0 ); // enable count, enable reload, 1us period
-	lynx_timer_write( state, 2, 0, 105 ); // set backup value (vpos) = 102
-	lynx_timer_write( state, 2, 1, 0x10 | 0x8 | 7 ); // enable count, enable reload, link
+	lynx_timer_write( this, 0, 0, 160 ); // set backup value (hpos) = 160
+	lynx_timer_write( this, 0, 1, 0x10 | 0x8 | 0 ); // enable count, enable reload, 1us period
+	lynx_timer_write( this, 2, 0, 105 ); // set backup value (vpos) = 102
+	lynx_timer_write( this, 2, 1, 0x10 | 0x8 | 7 ); // enable count, enable reload, link
 #endif
+
+	render_target *target = machine().render().first_target();
+	target->set_view(m_rotate);
 }
 
 void lynx_state::lynx_postload()
@@ -1976,17 +1978,10 @@ void lynx_state::machine_start()
 
 	memset(&m_suzy, 0, sizeof(m_suzy));
 
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lynx_reset),&machine()));
-
 	for (i = 0; i < NR_LYNX_TIMERS; i++)
 		lynx_timer_init(machine(), i);
 }
 
-void lynx_state::machine_reset()
-{
-	render_target *target = machine().render().first_target();
-	target->set_view(m_rotate);
-}
 
 /****************************************
 

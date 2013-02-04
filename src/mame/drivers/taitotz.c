@@ -616,10 +616,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 };
 
-
+/*
 static void taitotz_exit(running_machine &machine)
 {
-	/*
+	
 	taitotz_state *state = machine.driver_data<taitotz_state>();
 
 	FILE *file;
@@ -654,9 +654,9 @@ static void taitotz_exit(running_machine &machine)
 	    fputc((UINT8)(state->m_texture_ram[i] >> 0), file);
 	}
 	fclose(file);
-	*/
+	
 }
-
+*/
 void taitotz_state::video_start()
 {
 	int width = machine().primary_screen->width();
@@ -669,7 +669,7 @@ void taitotz_state::video_start()
 	/* create renderer */
 	m_renderer = auto_alloc(machine(), taitotz_renderer(machine(), width, height, m_texture_ram));
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitotz_exit), &machine()));
+	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitotz_exit), &machine()));
 }
 
 static const float dot3_tex_table[32] =

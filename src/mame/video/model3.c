@@ -105,18 +105,17 @@ static const int num_bits[16] = { 0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4
 #define BYTE_REVERSE16(x)       (((x >> 8) & 0xff) | ((x << 8) & 0xff00))
 
 
-static void model3_exit(running_machine &machine)
+void model3_state::model3_exit()
 {
-	model3_state *state = machine.driver_data<model3_state>();
-	invalidate_texture(machine, 0, 0, 0, 6, 5);
-	invalidate_texture(machine, 1, 0, 0, 6, 5);
-	poly_free(state->m_poly);
+	invalidate_texture(machine(), 0, 0, 0, 6, 5);
+	invalidate_texture(machine(), 1, 0, 0, 6, 5);
+	poly_free(m_poly);
 }
 
 void model3_state::video_start()
 {
 	m_poly = poly_alloc(machine(), 4000, sizeof(poly_extra_data), 0);
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_exit), &machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_state::model3_exit), this));
 
 	machine().primary_screen->register_screen_bitmap(m_bitmap3d);
 	machine().primary_screen->register_screen_bitmap(m_zbuffer);

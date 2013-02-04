@@ -101,8 +101,6 @@ static int subregwrite_count[0x100];
  *
  *************************************/
 
-static void exit_handler(running_machine &machine);
-
 static void zeus_register32_w(running_machine &machine, offs_t offset, UINT32 data, int logit);
 static void zeus_register_update(running_machine &machine, offs_t offset, UINT32 oldval, int logit);
 static void zeus_pointer_write(UINT8 which, UINT32 value);
@@ -272,7 +270,7 @@ VIDEO_START_MEMBER(midzeus_state,midzeus2)
 	poly = poly_alloc(machine(), 10000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 
 	/* we need to cleanup on exit */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(exit_handler), &machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midzeus_state::exit_handler2), this));
 
 	zbase = 2.0f;
 	yoffs = 0;
@@ -296,7 +294,7 @@ VIDEO_START_MEMBER(midzeus_state,midzeus2)
 }
 
 
-static void exit_handler(running_machine &machine)
+void midzeus_state::exit_handler2()
 {
 #if DUMP_WAVE_RAM
 	FILE *f = fopen("waveram.dmp", "w");

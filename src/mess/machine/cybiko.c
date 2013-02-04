@@ -21,14 +21,6 @@
 // FUNCTION PROTOTYPES //
 /////////////////////////
 
-#define MACHINE_STOP(name) \
-	static void machine_stop_##name( running_machine &machine)
-
-// machine stop
-MACHINE_STOP( cybikov1 );
-MACHINE_STOP( cybikov2 );
-MACHINE_STOP( cybikoxt );
-
 // state->m_rs232
 static void cybiko_rs232_init(running_machine &machine);
 static void cybiko_rs232_exit(void);
@@ -192,7 +184,7 @@ void cybiko_state::machine_start()
 	// serial port
 	cybiko_rs232_init(machine());
 	// other
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(machine_stop_cybikov1),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cybiko_state::machine_stop_cybikov1),this));
 }
 
 MACHINE_START_MEMBER(cybiko_state,cybikov2)
@@ -210,7 +202,7 @@ MACHINE_START_MEMBER(cybiko_state,cybikov2)
 	// serial port
 	cybiko_rs232_init(machine());
 	// other
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(machine_stop_cybikov2),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cybiko_state::machine_stop_cybikov2),this));
 }
 
 MACHINE_START_MEMBER(cybiko_state,cybikoxt)
@@ -227,7 +219,7 @@ MACHINE_START_MEMBER(cybiko_state,cybikoxt)
 	// serial port
 	cybiko_rs232_init(machine());
 	// other
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(machine_stop_cybikoxt),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cybiko_state::machine_stop_cybikoxt),this));
 }
 
 ///////////////////
@@ -256,39 +248,39 @@ MACHINE_RESET_MEMBER(cybiko_state,cybikoxt)
 // MACHINE STOP //
 //////////////////
 
-MACHINE_STOP( cybikov1 )
+void cybiko_state::machine_stop_cybikov1()
 {
 	_logerror( 0, ("machine_stop_cybikov1\n"));
 	// real-time clock
-	nvram_system_save( machine, "rtc", cybiko_pcf8593_save);
+	nvram_system_save( machine(), "rtc", cybiko_pcf8593_save);
 	// serial dataflash
-	nvram_system_save( machine, "flash1", cybiko_at45dbxx_save);
+	nvram_system_save( machine(), "flash1", cybiko_at45dbxx_save);
 	// serial port
 	cybiko_rs232_exit();
 }
 
-MACHINE_STOP( cybikov2 )
+void cybiko_state::machine_stop_cybikov2()
 {
 	_logerror( 0, ("machine_stop_cybikov2\n"));
 	// real-time clock
-	nvram_system_save( machine, "rtc", cybiko_pcf8593_save);
+	nvram_system_save( machine(), "rtc", cybiko_pcf8593_save);
 	// serial dataflash
-	nvram_system_save( machine, "flash1", cybiko_at45dbxx_save);
+	nvram_system_save( machine(), "flash1", cybiko_at45dbxx_save);
 	// multi-purpose flash
-	nvram_system_save( machine, "flash2", cybiko_sst39vfx_save);
+	nvram_system_save( machine(), "flash2", cybiko_sst39vfx_save);
 	// serial port
 	cybiko_rs232_exit();
 }
 
-MACHINE_STOP( cybikoxt )
+void cybiko_state::machine_stop_cybikoxt()
 {
 	_logerror( 0, ("machine_stop_cybikoxt\n"));
 	// real-time clock
-	nvram_system_save( machine, "rtc", cybiko_pcf8593_save);
+	nvram_system_save( machine(), "rtc", cybiko_pcf8593_save);
 	// multi-purpose flash
-	nvram_system_save( machine, "flash2", cybiko_sst39vfx_save);
+	nvram_system_save( machine(), "flash2", cybiko_sst39vfx_save);
 	// ramdisk
-	nvram_system_save( machine, "ramdisk", cybiko_ramdisk_save);
+	nvram_system_save( machine(), "ramdisk", cybiko_ramdisk_save);
 	// serial port
 	cybiko_rs232_exit();
 }

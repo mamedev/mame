@@ -11,17 +11,14 @@
 #include "includes/nes.h"
 //#include "includes/nes_mmc.h"
 
-static void nes_vh_reset( running_machine &machine )
+void nes_state::video_reset()
 {
-	nes_state *state = machine.driver_data<nes_state>();
-	state->m_ppu->set_vidaccess_callback(nes_ppu_vidaccess);
+	m_ppu->set_vidaccess_callback(nes_ppu_vidaccess);
 }
 
 void nes_state::video_start()
 {
 	m_last_frame_flip =  0;
-
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(nes_vh_reset),&machine()));
 }
 
 void nes_state::palette_init()

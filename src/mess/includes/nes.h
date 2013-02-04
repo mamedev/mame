@@ -117,6 +117,7 @@ public:
 	virtual void machine_stop();
 	virtual void machine_reset();
 	virtual void video_start();
+	virtual void video_reset();
 	virtual void palette_init();
 	UINT32 screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nes_irq_callback);

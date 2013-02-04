@@ -1476,10 +1476,6 @@ static const struct WD33C93interface wd33c93_intf =
 	&scsi_irq,      /* command completion IRQ */
 };
 
-static void ip225015_exit(running_machine &machine)
-{
-}
-
 static int ip22_get_out2(running_machine &machine)
 {
 	ip22_state *state = machine.driver_data<ip22_state>();
@@ -1491,8 +1487,6 @@ void ip22_state::machine_start()
 	sgi_mc_init(machine());
 
 	// SCSI init
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ip225015_exit),&machine()));
-
 	machine().device<nvram_device>("nvram_user")->set_base(m_RTC.nUserRAM, 0x200);
 	machine().device<nvram_device>("nvram")->set_base(m_RTC.nRAM, 0x200);
 }

@@ -387,8 +387,6 @@ static int tape_read(pdp1_state *state, UINT8 *reply);
 
 
 
-static void pdp1_machine_stop(running_machine &machine);
-
 static void pdp1_tape_read_binary(device_t *device);
 static void pdp1_io_sc_callback(device_t *device);
 
@@ -509,12 +507,11 @@ void pdp1_state::machine_reset()
 }
 
 
-static void pdp1_machine_stop(running_machine &machine)
+void pdp1_state::pdp1_machine_stop()
 {
-	pdp1_state *state = machine.driver_data<pdp1_state>();
 	/* the core will take care of freeing the timers, BUT we must set the variables
 	to NULL if we don't want to risk confusing the tape image init function */
-	state->m_tape_reader.timer = state->m_tape_puncher.timer = state->m_typewriter.tyo_timer = state->m_dpy_timer = NULL;
+	m_tape_reader.timer = m_tape_puncher.timer = m_typewriter.tyo_timer = m_dpy_timer = NULL;
 }
 
 
@@ -656,7 +653,7 @@ void pdp1_state::machine_start()
 	dst = machine().root_device().memregion("gfx1")->base();
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(pdp1_machine_stop),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(pdp1_state::pdp1_machine_stop),this));
 
 	m_tape_reader.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_state::reader_callback),this));
 	m_tape_puncher.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_state::puncher_callback),this));

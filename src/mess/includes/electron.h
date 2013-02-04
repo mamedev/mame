@@ -72,6 +72,7 @@ public:
 	void electron_tape_start();
 	void electron_tape_stop();
 	virtual void machine_start();
+	virtual void machine_reset();
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

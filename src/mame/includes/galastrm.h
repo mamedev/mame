@@ -50,4 +50,5 @@ public:
 	UINT32 screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galastrm_interrupt);
 	TIMER_CALLBACK_MEMBER(galastrm_interrupt6);
+	void galastrm_exit();
 };

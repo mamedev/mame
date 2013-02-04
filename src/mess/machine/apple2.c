@@ -1175,35 +1175,34 @@ UINT8 apple2_getfloatingbusvalue(running_machine &machine)
  * Machine reset
  * ----------------------------------------------------------------------- */
 
-static void apple2_reset(running_machine &machine)
+void apple2_state::machine_reset()
 {
-	apple2_state *state = machine.driver_data<apple2_state>();
 	int need_intcxrom;
 
-	state->m_rambase = state->m_ram->pointer();
-	state->apple2_refresh_delegates();
+	m_rambase = m_ram->pointer();
+	apple2_refresh_delegates();
 
-	need_intcxrom = !strcmp(machine.system().name, "apple2c")
-		|| !strcmp(machine.system().name, "apple2c0")
-		|| !strcmp(machine.system().name, "apple2c3")
-		|| !strcmp(machine.system().name, "apple2c4")
-		|| !strcmp(machine.system().name, "prav8c")
-		|| !strcmp(machine.system().name, "apple2cp")
-		|| !strncmp(machine.system().name, "apple2g", 7);
-	apple2_setvar(machine, need_intcxrom ? VAR_INTCXROM : 0, ~0);
+	need_intcxrom = !strcmp(machine().system().name, "apple2c")
+		|| !strcmp(machine().system().name, "apple2c0")
+		|| !strcmp(machine().system().name, "apple2c3")
+		|| !strcmp(machine().system().name, "apple2c4")
+		|| !strcmp(machine().system().name, "prav8c")
+		|| !strcmp(machine().system().name, "apple2cp")
+		|| !strncmp(machine().system().name, "apple2g", 7);
+	apple2_setvar(machine(), need_intcxrom ? VAR_INTCXROM : 0, ~0);
 
 	// ROM 0 cannot boot unless language card bank 2 is write-enabled (but read ROM) on startup
-	if (!strncmp(machine.system().name, "apple2g", 7))
+	if (!strncmp(machine().system().name, "apple2g", 7))
 	{
-		apple2_setvar(machine, VAR_LCWRITE|VAR_LCRAM2, VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2);
+		apple2_setvar(machine(), VAR_LCWRITE|VAR_LCRAM2, VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2);
 	}
 
-	state->m_a2_speaker_state = 0;
+	m_a2_speaker_state = 0;
 
-	state->m_a2_cnxx_slot = -1; // bank in ROM at C800 on reset
+	m_a2_cnxx_slot = -1; // bank in ROM at C800 on reset
 
-	state->m_joystick_x1_time = state->m_joystick_y1_time = 0;
-	state->m_joystick_x2_time = state->m_joystick_y2_time = 0;
+	m_joystick_x1_time = m_joystick_y1_time = 0;
+	m_joystick_x2_time = m_joystick_y2_time = 0;
 }
 
 
@@ -1760,7 +1759,6 @@ void apple2_init_common(running_machine &machine)
 	state->m_fdc_diskreg = 0;
 
 	AY3600_init(machine);
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(apple2_reset),&machine));
 
 	/* state save registers */
 	state->save_item(NAME(state->m_flags));
@@ -1807,9 +1805,6 @@ MACHINE_START_MEMBER(apple2_state,apple2)
 	mem_cfg.memmap = apple2_memmap_entries;
 	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
 	apple2_setup_memory(machine(), &mem_cfg);
-
-	/* perform initial reset */
-	apple2_reset(machine());
 }
 
 MACHINE_START_MEMBER(apple2_state,laser128)
@@ -1827,9 +1822,6 @@ MACHINE_START_MEMBER(apple2_state,laser128)
 	mem_cfg.memmap = apple2_memmap_entries;
 	mem_cfg.auxmem = (UINT8*)NULL;
 	apple2_setup_memory(machine(), &mem_cfg);
-
-	/* perform initial reset */
-	apple2_reset(machine());
 }
 
 MACHINE_START_MEMBER(apple2_state,apple2orig)
@@ -1850,9 +1842,6 @@ MACHINE_START_MEMBER(apple2_state,apple2orig)
 	mem_cfg.memmap = apple2_memmap_entries;
 	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
 	apple2_setup_memory(machine(), &mem_cfg);
-
-	/* perform initial reset */
-	apple2_reset(machine());
 }
 
 MACHINE_START_MEMBER(apple2_state,space84)
@@ -1873,9 +1862,6 @@ MACHINE_START_MEMBER(apple2_state,space84)
 	mem_cfg.memmap = apple2_memmap_entries;
 	mem_cfg.auxmem = (UINT8*)apple2cp_ce00_ram;
 	apple2_setup_memory(machine(), &mem_cfg);
-
-	/* perform initial reset */
-	apple2_reset(machine());
 }
 
 MACHINE_START_MEMBER(apple2_state,tk2000)
@@ -1895,9 +1881,6 @@ MACHINE_START_MEMBER(apple2_state,tk2000)
 	mem_cfg.memmap = tk2000_memmap_entries;
 	mem_cfg.auxmem = (UINT8*)NULL;
 	apple2_setup_memory(machine(), &mem_cfg);
-
-	/* perform initial reset */
-	apple2_reset(machine());
 }
 
 int apple2_state::apple2_pressed_specialkey(UINT8 key)

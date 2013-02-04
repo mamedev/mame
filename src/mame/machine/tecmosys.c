@@ -103,25 +103,23 @@ static const struct prot_data tkdensha_data =
 };
 
 
-static void tecmosys_prot_reset(running_machine &machine)
-{
-	tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	state->m_device_read_ptr = 0;
-	state->m_device_status = DS_IDLE;
-	state->m_device_value = 0xff;
+void tecmosys_state::tecmosys_prot_reset()
+{	
+	m_device_read_ptr = 0;
+	m_device_status = DS_IDLE;
+	m_device_value = 0xff;
 }
 
-void tecmosys_prot_init(running_machine &machine, int which)
+void tecmosys_state::tecmosys_prot_init(int which)
 {
-	tecmosys_state *state = machine.driver_data<tecmosys_state>();
 	switch (which)
 	{
-	case 0: state->m_device_data = &deroon_data; break;
-	case 1: state->m_device_data = &tkdensho_data; break;
-	case 2: state->m_device_data = &tkdensha_data; break;
+	case 0: m_device_data = &deroon_data; break;
+	case 1: m_device_data = &tkdensho_data; break;
+	case 2: m_device_data = &tkdensha_data; break;
 	}
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(tecmosys_prot_reset), &machine));
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(tecmosys_state::tecmosys_prot_reset),this));
 }
 
 READ16_MEMBER(tecmosys_state::tecmosys_prot_status_r)

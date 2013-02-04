@@ -267,6 +267,7 @@ public:
 	TIMER_CALLBACK_MEMBER(tyo_callback);
 	TIMER_CALLBACK_MEMBER(dpy_callback);
 	TIMER_CALLBACK_MEMBER(il_timer_callback);
+	void pdp1_machine_stop();
 };
 
 /*----------- defined in video/pdp1.c -----------*/

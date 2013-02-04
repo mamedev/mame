@@ -181,13 +181,12 @@ TIMER_CALLBACK_MEMBER(wswan_state::wswan_rtc_callback)
 	}
 }
 
-static void wswan_machine_stop( running_machine &machine )
+void wswan_state::wswan_machine_stop()
 {
-	wswan_state *state = machine.driver_data<wswan_state>();
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
-	if ( state->m_eeprom.size )
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));
+	if ( m_eeprom.size )
 	{
-		image->battery_save(state->m_eeprom.data, state->m_eeprom.size );
+		image->battery_save(m_eeprom.data, m_eeprom.size );
 	}
 }
 
@@ -204,7 +203,7 @@ void wswan_state::machine_start()
 {
 	m_ws_bios_bank = NULL;
 	m_system_type = TYPE_WSWAN;
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(wswan_machine_stop),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(wswan_state::wswan_machine_stop),this));
 	m_vdp.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wswan_state::wswan_scanline_interrupt),this), &m_vdp );
 	m_vdp.timer->adjust( attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 
@@ -221,7 +220,7 @@ MACHINE_START_MEMBER(wswan_state,wscolor)
 {
 	m_ws_bios_bank = NULL;
 	m_system_type = TYPE_WSC;
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(wswan_machine_stop),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(wswan_state::wswan_machine_stop),this));
 	m_vdp.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(wswan_state::wswan_scanline_interrupt),this), &m_vdp );
 	m_vdp.timer->adjust( attotime::from_ticks( 256, 3072000 ), 0, attotime::from_ticks( 256, 3072000 ) );
 

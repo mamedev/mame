@@ -1006,55 +1006,54 @@ void dgn_beta_line_interrupt (int data)
 
 
 /********************************* Machine/Driver Initialization ****************************************/
-static void dgnbeta_reset(running_machine &machine)
+void dgn_beta_state::machine_reset()
 {
-	dgn_beta_state *state = machine.driver_data<dgn_beta_state>();
-	device_t *fdc = machine.device(FDC_TAG);
-	pia6821_device *pia_0 = machine.device<pia6821_device>( PIA_0_TAG );
-	pia6821_device *pia_1 = machine.device<pia6821_device>( PIA_1_TAG );
-	pia6821_device *pia_2 = machine.device<pia6821_device>( PIA_2_TAG );
+	device_t *fdc = machine().device(FDC_TAG);
+	pia6821_device *pia_0 = machine().device<pia6821_device>( PIA_0_TAG );
+	pia6821_device *pia_1 = machine().device<pia6821_device>( PIA_1_TAG );
+	pia6821_device *pia_2 = machine().device<pia6821_device>( PIA_2_TAG );
 
 	logerror("MACHINE_RESET( dgnbeta )\n");
 
-	state->m_system_rom = state->memregion(MAINCPU_TAG)->base();
+	m_system_rom = memregion(MAINCPU_TAG)->base();
 
 	/* Make sure CPU 1 is started out halted ! */
-	machine.device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device(DMACPU_TAG)->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	/* Reset to task 0, and map banks disabled, so standard memory map */
 	/* with ram at $0000-$BFFF, ROM at $C000-FBFF, IO at $FC00-$FEFF */
 	/* and ROM at $FF00-$FFFF */
-	state->m_TaskReg = 0;
-	state->m_PIATaskReg = 0;
-	state->m_EnableMapRegs = 0;
-	memset(state->m_PageRegs, 0, sizeof(state->m_PageRegs));    /* Reset page registers to 0 */
-	SetDefaultTask(machine);
+	m_TaskReg = 0;
+	m_PIATaskReg = 0;
+	m_EnableMapRegs = 0;
+	memset(m_PageRegs, 0, sizeof(m_PageRegs));    /* Reset page registers to 0 */
+	SetDefaultTask(machine());
 
 	/* Set pullups on all PIA port A, to match what hardware does */
 	pia_0->set_port_a_z_mask(0xFF);
 	pia_1->set_port_a_z_mask(0xFF);
 	pia_2->set_port_a_z_mask(0xFF);
 
-	state->m_d_pia1_pa_last = 0x00;
-	state->m_d_pia1_pb_last = 0x00;
-	state->m_RowShifter = 0x00;         /* shift register to select row */
-	state->m_Keyrow = 0x00;             /* Keyboard row being shifted out */
-	state->m_d_pia0_pb_last = 0x00;     /* Last byte output to pia0 port b */
-	state->m_d_pia0_cb2_last = 0x00;        /* Last state of CB2 */
+	m_d_pia1_pa_last = 0x00;
+	m_d_pia1_pb_last = 0x00;
+	m_RowShifter = 0x00;         /* shift register to select row */
+	m_Keyrow = 0x00;             /* Keyboard row being shifted out */
+	m_d_pia0_pb_last = 0x00;     /* Last byte output to pia0 port b */
+	m_d_pia0_cb2_last = 0x00;        /* Last state of CB2 */
 
-	state->m_KInDat_next = 0x00;            /* Next data bit to input */
-	state->m_KAny_next = 0x00;          /* Next value for KAny */
+	m_KInDat_next = 0x00;            /* Next data bit to input */
+	m_KAny_next = 0x00;          /* Next value for KAny */
 
-	state->m_DMA_NMI_LAST = 0x80;       /* start with DMA NMI inactive, as pulled up */
+	m_DMA_NMI_LAST = 0x80;       /* start with DMA NMI inactive, as pulled up */
 //  DMA_NMI = CLEAR_LINE;       /* start with DMA NMI inactive */
 
 	wd17xx_dden_w(fdc, CLEAR_LINE);
 	wd17xx_set_drive(fdc, 0);
 
-	state->m_videoram.set_target(machine.device<ram_device>(RAM_TAG)->pointer(),state->m_videoram.bytes());     /* Point video ram at the start of physical ram */
+	m_videoram.set_target(machine().device<ram_device>(RAM_TAG)->pointer(),m_videoram.bytes());     /* Point video ram at the start of physical ram */
 
 	wd17xx_reset(fdc);
-	state->m_wd2797_written=0;
+	m_wd2797_written=0;
 }
 
 void dgn_beta_state::machine_start()
@@ -1065,8 +1064,6 @@ void dgn_beta_state::machine_start()
 		machine().device<cpu_device>(MAINCPU_TAG)->debug()->set_dasm_override(dgnbeta_dasm_override);
 	}
 
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(dgnbeta_reset),&machine()));
-	dgnbeta_reset(machine());
 	/* setup debug commands */
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{

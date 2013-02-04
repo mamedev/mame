@@ -129,8 +129,6 @@ enum {
 */
 
 
-static void gb_machine_stop(running_machine &machine);
-
 #ifdef MAME_DEBUG
 /* #define V_GENERAL*/      /* Display general debug information */
 /* #define V_BANK*/         /* Display bank switching debug information */
@@ -283,7 +281,7 @@ void gb_state::gb_init()
 
 MACHINE_START_MEMBER(gb_state,gb)
 {
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_state::gb_machine_stop),this));
 
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
@@ -294,7 +292,7 @@ MACHINE_START_MEMBER(gb_state,gb)
 
 MACHINE_START_MEMBER(gb_state,gbc)
 {
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_state::gb_machine_stop),this));
 
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
@@ -323,7 +321,7 @@ MACHINE_START_MEMBER(gb_state,sgb)
 	m_sgb_packets = -1;
 	m_sgb_tile_data = auto_alloc_array_clear(machine(), UINT8, 0x2000 );
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_machine_stop),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_state::gb_machine_stop),this));
 
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
@@ -409,18 +407,17 @@ MACHINE_RESET_MEMBER(gb_state,gbc)
 	}
 }
 
-static void gb_machine_stop(running_machine &machine)
+void gb_state::gb_machine_stop()
 {
-	gb_state *state = machine.driver_data<gb_state>();
 	/* Don't save if there was no battery */
-	if(!(state->m_CartType & BATTERY) || !state->m_RAMBanks)
+	if(!(m_CartType & BATTERY) || !m_RAMBanks)
 		return;
 
 	/* NOTE: The reason we save the carts RAM this way instead of using MAME's
 	   built in macros is because they force the filename to be the name of
 	   the machine.  We need to have a separate name for each game. */
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
-	image->battery_save(state->m_gb_cart_ram, state->m_RAMBanks * 0x2000);
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));
+	image->battery_save(m_gb_cart_ram, m_RAMBanks * 0x2000);
 }
 
 void gb_state::gb_set_mbc1_banks()

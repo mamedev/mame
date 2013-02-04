@@ -208,7 +208,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sms_int_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
-
+	void sms_machine_stop();
 protected:
 	required_shared_ptr<UINT8> m_mainram;
 

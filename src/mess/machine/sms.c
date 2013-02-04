@@ -1337,14 +1337,12 @@ READ8_MEMBER(sms_state::gg_sio_r)
 	return m_gg_sio[offset];
 }
 
-static void sms_machine_stop( running_machine &machine )
+void sms_state::sms_machine_stop()
 {
-	sms_state *state = machine.driver_data<sms_state>();
-
 	/* Does the cartridge have SRAM that should be saved? */
-	if (state->m_cartridge[state->m_current_cartridge].sram_save) {
-		device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart1"));
-		image->battery_save(state->m_cartridge[state->m_current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
+	if (m_cartridge[m_current_cartridge].sram_save) {
+		device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart1"));
+		image->battery_save(m_cartridge[m_current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
 	}
 }
 
@@ -1908,7 +1906,7 @@ void sms_state::setup_banks()
 
 MACHINE_START_MEMBER(sms_state,sms)
 {
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sms_machine_stop),&machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sms_state::sms_machine_stop),this));
 	m_rapid_fire_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sms_state::rapid_fire_callback),this));
 	m_rapid_fire_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 

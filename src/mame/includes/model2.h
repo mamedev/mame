@@ -168,6 +168,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
+	void model2_exit();
 };
 
 /*----------- defined in video/model2.c -----------*/

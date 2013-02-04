@@ -94,6 +94,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nc200_fdc_interrupt);
 
 	void nc200_fdc_interrupt(bool state);
+	void nc100_machine_stop();
+	void nc200_machine_stop();
 };
 
 
