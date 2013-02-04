@@ -1,9 +1,9 @@
 /******************************************************************************
 
-  Number One
-
-  8bit gambling hardware.
+  Number One.
   San Remo Games.
+
+  8bit amusement/gambling hardware.
 
 
   Driver by Roberto Fresca.
@@ -34,8 +34,8 @@
   - 1x trimmer (volume)          [P1]
 
 
-  Graphics seems to have the insanely amount of 32 banks of 256 tiles, but with
-  some scrambled logic (maybe driven through PLDs)...
+  Graphics seems to have the insanely amount of 32 banks of 256 tiles each,
+  driven by a 5-bit register/selector.
 
 
 *******************************************************************************
@@ -44,7 +44,8 @@
   ----------
 
   You can switch the game to use numbers or cards through the Test Mode.
-  To enter the Test Mode, just turn the DIP switch 7 ON.
+  To enter the Test Mode, just turn the DIP switch 7 ON. No credits should be
+  in the machine to get it working...
 
 
 *******************************************************************************
@@ -70,12 +71,18 @@
   - Added Button-Lamps layout.
   - Complete lamps support.
   - NVRAM support.
+  - Correct GFX banking.
+
+  [2012/02/03]
+
+  - Fixed graphics issues:
+    Latched the bank bits and stored them when the tiles are written.
+  - Hooked up intensity layer.
+  - Removed the imperfect gfx and game not working flags.
 
 
   TODO:
 
-  - Fix GFX banking.
-  - Hook the intensity layer.
   - Figure out activity in some output ports.
 
 
@@ -83,6 +90,10 @@
 
 
 #define MASTER_CLOCK	XTAL_18MHz
+
+#define CPU_CLOCK		MASTER_CLOCK/3
+#define SND_CLOCK		MASTER_CLOCK/12
+#define CRTC_CLOCK		MASTER_CLOCK/12
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -194,8 +205,6 @@ WRITE8_MEMBER(sanremo_state::banksel_w)
     xxx- ----  unknown
 */
 	banksel = data & 0x1f;
-
-//	printf("BANKSEL %02x\n", data);
 }
 
 
@@ -311,20 +320,19 @@ static const gfx_layout tilelayout =
 };
 
 
-
-
 /**************************************************
 *           Graphics Decode Information           *
 **************************************************/
 
 static GFXDECODE_START( sanremo )
-	GFXDECODE_ENTRY( "gfx",  0,      tilelayout, 0, 1 )	// ok
+	GFXDECODE_ENTRY( "gfx",  0,   tilelayout, 0, 1 )
 GFXDECODE_END
 
 
 /********************************************
 *              CRTC Interface               *
 ********************************************/
+
 
 static const mc6845_interface mc6845_intf =
 /*
@@ -371,7 +379,7 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( sanremo, sanremo_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3)
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(sanremo_map)
 	MCFG_CPU_IO_MAP(sanremo_portmap)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sanremo_state, irq0_line_hold)
@@ -386,14 +394,14 @@ static MACHINE_CONFIG_START( sanremo, sanremo_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 48*8-1, 0, 38*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(sanremo_state, screen_update_sanremo)
 
-	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/12, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
 	MCFG_GFXDECODE(sanremo)
 	MCFG_PALETTE_LENGTH(0x10)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/12)
+	MCFG_SOUND_ADD("ay8910", AY8910, SND_CLOCK)
 	MCFG_SOUND_CONFIG(ay8910_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -408,10 +416,10 @@ ROM_START( number1 )
 	ROM_LOAD( "no_g0.ic26",	0x0000, 0x8000, CRC(2d83646f) SHA1(d1fafcce44ed3ec3dd53d84338c42244ebfca820) )
 
 	ROM_REGION( 0x40000, "gfx", 0 )
-	ROM_LOAD( "no_i4.ic30",	0x00000, 0x10000, CRC(55b351a4) SHA1(b0c8a30dde076520234281da051f21f1b7cb3166) )	// i
-	ROM_LOAD( "no_b4.ic27",	0x10000, 0x10000, CRC(e48b1c8a) SHA1(88f60268fd43c06e146d936a1bdc078c44e2a213) )	// b
-	ROM_LOAD( "no_g4.ic28",	0x20000, 0x10000, CRC(4eea9a9b) SHA1(c86c083ccf08c3c310028920f9a0fe809fd7ccbe) )	// g
-	ROM_LOAD( "no_r4.ic29",	0x30000, 0x10000, CRC(ab08cdaf) SHA1(e0518403039b6bada79ffe4c6bc22fbb64d16e43) )	// r
+	ROM_LOAD( "no_i4.ic30",	0x00000, 0x10000, CRC(55b351a4) SHA1(b0c8a30dde076520234281da051f21f1b7cb3166) )	// I
+	ROM_LOAD( "no_b4.ic27",	0x10000, 0x10000, CRC(e48b1c8a) SHA1(88f60268fd43c06e146d936a1bdc078c44e2a213) )	// B
+	ROM_LOAD( "no_g4.ic28",	0x20000, 0x10000, CRC(4eea9a9b) SHA1(c86c083ccf08c3c310028920f9a0fe809fd7ccbe) )	// G
+	ROM_LOAD( "no_r4.ic29",	0x30000, 0x10000, CRC(ab08cdaf) SHA1(e0518403039b6bada79ffe4c6bc22fbb64d16e43) )	// R
 
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "number1_nvram.bin", 0x0000, 0x0800, CRC(4ece7b39) SHA1(49815571d75a39ab67d26691f902dfbd4e05feb4) )
@@ -427,5 +435,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*     YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT   ROT    COMPANY           FULLNAME      FLAGS...                                    LAYOUT  */
-GAMEL( 1996, number1, 0,      sanremo, number1, driver_device, 0,     ROT0, "San Remo Games", "Number One",  GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING, layout_sanremo )
+/*     YEAR  NAME     PARENT  MACHINE  INPUT    STATE          INIT   ROT    COMPANY           FULLNAME      FLAGS  LAYOUT  */
+GAMEL( 1996, number1, 0,      sanremo, number1, driver_device, 0,     ROT0, "San Remo Games", "Number One",  0,     layout_sanremo )
