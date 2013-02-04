@@ -1,3 +1,5 @@
+#include "video/tecmo_spr.h"
+
 class tecmo16_state : public driver_device
 {
 public:

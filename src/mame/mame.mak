@@ -1538,6 +1538,7 @@ $(MAMEOBJ)/technos.a: \
 	$(DRIVERS)/xain.o $(VIDEO)/xain.o \
 
 $(MAMEOBJ)/tehkan.a: \
+	$(VIDEO)/tecmo_spr.o \
 	$(DRIVERS)/bombjack.o $(VIDEO)/bombjack.o \
 	$(DRIVERS)/gaiden.o $(VIDEO)/gaiden.o \
 	$(DRIVERS)/lvcards.o $(VIDEO)/lvcards.o \

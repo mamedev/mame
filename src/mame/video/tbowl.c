@@ -104,9 +104,23 @@ WRITE8_MEMBER(tbowl_state::tbowl_bg2yscroll_hi)
 	m_bg2yscroll = (m_bg2yscroll & 0x00ff) | (data << 8);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int xscroll)
+
+/*** Video Start / Update ***/
+
+void tbowl_state::video_start()
 {
-	tbowl_state *state = machine.driver_data<tbowl_state>();
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,128,32);
+	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,128,32);
+
+	m_tx_tilemap->set_transparent_pen(0);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg2_tilemap->set_transparent_pen(0);
+}
+
+
+void tbowl_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int xscroll, UINT8* spriteram)
+{
 	int offs;
 	static const UINT8 layout[8][8] =
 	{
@@ -122,20 +136,20 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 	for (offs = 0;offs < 0x800;offs += 8)
 	{
-		if (state->m_spriteram[offs+0] & 0x80)  /* enable */
+		if (spriteram[offs+0] & 0x80)  /* enable */
 		{
 			int code,color,sizex,sizey,flipx,flipy,xpos,ypos;
 			int x,y;//,priority,priority_mask;
 
-			code = (state->m_spriteram[offs+2])+(state->m_spriteram[offs+1]<<8);
-			color = (state->m_spriteram[offs+3])&0x1f;
-			sizex = 1 << ((state->m_spriteram[offs+0] & 0x03) >> 0);
-			sizey = 1 << ((state->m_spriteram[offs+0] & 0x0c) >> 2);
+			code = (spriteram[offs+2])+(spriteram[offs+1]<<8);
+			color = (spriteram[offs+3])&0x1f;
+			sizex = 1 << ((spriteram[offs+0] & 0x03) >> 0);
+			sizey = 1 << ((spriteram[offs+0] & 0x0c) >> 2);
 
-			flipx = (state->m_spriteram[offs+0])&0x20;
+			flipx = (spriteram[offs+0])&0x20;
 			flipy = 0;
-			xpos = (state->m_spriteram[offs+6])+((state->m_spriteram[offs+4]&0x03)<<8);
-			ypos = (state->m_spriteram[offs+5])+((state->m_spriteram[offs+4]&0x10)<<4);
+			xpos = (spriteram[offs+6])+((spriteram[offs+4]&0x03)<<8);
+			ypos = (spriteram[offs+5])+((spriteram[offs+4]&0x10)<<4);
 
 			/* bg: 1; fg:2; text: 4 */
 
@@ -181,23 +195,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			}
 		}
 	}
-
 }
-
-
-/*** Video Start / Update ***/
-
-void tbowl_state::video_start()
-{
-	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,64,32);
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,128,32);
-	m_bg2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(tbowl_state::get_bg2_tile_info),this),TILEMAP_SCAN_ROWS, 16, 16,128,32);
-
-	m_tx_tilemap->set_transparent_pen(0);
-	m_bg_tilemap->set_transparent_pen(0);
-	m_bg2_tilemap->set_transparent_pen(0);
-}
-
 
 UINT32 tbowl_state::screen_update_tbowl_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -210,7 +208,7 @@ UINT32 tbowl_state::screen_update_tbowl_left(screen_device &screen, bitmap_ind16
 
 	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect, 0);
+	tbowl_draw_sprites(machine(), bitmap,cliprect, 0, m_spriteram);
 	m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 
@@ -228,7 +226,7 @@ UINT32 tbowl_state::screen_update_tbowl_right(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect, 32*8);
+	tbowl_draw_sprites(machine(), bitmap,cliprect, 32*8, m_spriteram);
 	m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 

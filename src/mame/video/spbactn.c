@@ -32,90 +32,6 @@ static void blendbitmaps(running_machine &machine,
 }
 
 
-/* from gals pinball (which was in turn from ninja gaiden) */
-static int draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, bool alt_sprites)
-{
-	static const UINT8 layout[8][8] =
-	{
-		{ 0, 1, 4, 5,16,17,20,21},
-		{ 2, 3, 6, 7,18,19,22,23},
-		{ 8, 9,12,13,24,25,28,29},
-		{10,11,14,15,26,27,30,31},
-		{32,33,36,37,48,49,52,53},
-		{34,35,38,39,50,51,54,55},
-		{40,41,44,45,56,57,60,61},
-		{42,43,46,47,58,59,62,63}
-	};
-
-	spbactn_state *state = machine.driver_data<spbactn_state>();
-	int count = 0;
-	int offs;
-
-	for (offs = (0x1000 - 16) / 2; offs >= 0; offs -= 8)
-	{
-		int sx, sy, code, color, size, attr, flipx, flipy;
-		int col, row;
-
-		attr = state->m_spvideoram[offs];
-
-		int pri = (state->m_spvideoram[offs] & 0x0030);
-//		int pri = (state->m_spvideoram[offs+2] & 0x0030);
-
-
-		if ((attr & 0x0004) &&
-			((pri & 0x0030) >> 4) == priority)
-		{
-			flipx = attr & 0x0001;
-			flipy = attr & 0x0002;
-
-			code = state->m_spvideoram[offs + 1];
-
-			if (alt_sprites)
-			{
-				color = state->m_spvideoram[offs + 0];
-			}
-			else
-			{
-				color = state->m_spvideoram[offs + 2];
-			}
-
-			size = 1 << (state->m_spvideoram[offs + 2] & 0x0003);               /* 1,2,4,8 */
-			color = (color & 0x00f0) >> 4;
-
-			sx = state->m_spvideoram[offs + 4];
-			sy = state->m_spvideoram[offs + 3];
-
-			attr &= ~0x0040;                            /* !!! */
-
-			if (attr & 0x0040)
-				color |= 0x0180;
-			else
-				color |= 0x0080;
-
-
-			for (row = 0; row < size; row++)
-			{
-				for (col = 0; col < size; col++)
-				{
-					int x = sx + 8 * (flipx ? (size - 1 - col) : col);
-					int y = sy + 8 * (flipy ? (size - 1 - row) : row);
-
-					drawgfx_transpen_raw(bitmap, cliprect, machine.gfx[2],
-						code + layout[row][col],
-						machine.gfx[2]->colorbase() + color * machine.gfx[2]->granularity(),
-						flipx, flipy,
-						x, y,
-						0);
-				}
-			}
-
-			count++;
-		}
-	}
-
-	return count;
-}
-
 
 WRITE16_MEMBER(spbactn_state::bg_videoram_w)
 {
@@ -238,18 +154,18 @@ int spbactn_state::draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 
 
-	if (draw_sprites(machine(), m_tile_bitmap_bg, cliprect, 0, alt_sprites))
+	if (spbactn_draw_sprites(machine(), m_tile_bitmap_bg, cliprect, 0, alt_sprites, m_spvideoram))
 	{
 		m_bg_tilemap->draw(m_tile_bitmap_bg, cliprect, 0, 0);
 	}
 
-	draw_sprites(machine(), m_tile_bitmap_bg, cliprect, 1, alt_sprites);
+	spbactn_draw_sprites(machine(), m_tile_bitmap_bg, cliprect, 1, alt_sprites, m_spvideoram);
 
 	m_fg_tilemap->draw(m_tile_bitmap_fg, cliprect, 0, 0);
 
 
-	draw_sprites(machine(), m_tile_bitmap_fg, cliprect, 2, alt_sprites);
-	draw_sprites(machine(), m_tile_bitmap_fg, cliprect, 3, alt_sprites);
+	spbactn_draw_sprites(machine(), m_tile_bitmap_fg, cliprect, 2, alt_sprites, m_spvideoram);
+	spbactn_draw_sprites(machine(), m_tile_bitmap_fg, cliprect, 3, alt_sprites, m_spvideoram);
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
 	blendbitmaps(machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, cliprect);

@@ -4,6 +4,8 @@
 
 ***************************************************************************/
 
+#include "video/tecmo_spr.h"
+
 class gaiden_state : public driver_device
 {
 public:

@@ -1,3 +1,6 @@
+
+#include "video/tecmo_spr.h"
+
 class spbactn_state : public driver_device
 {
 public:

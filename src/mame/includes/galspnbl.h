@@ -5,6 +5,8 @@
 
 *************************************************************************/
 
+#include "video/tecmo_spr.h"
+
 class galspnbl_state : public driver_device
 {
 public:
