@@ -19885,7 +19885,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="knucklp" cloneof="sks2">
+	<software name="knucklp">
 		<description>Knuckles in Sonic 2 (Prototype 0524, 19940527, 10.46)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19907,7 +19907,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sonic3c" cloneof="sks3">
+	<software name="sonic3c">
 		<description>Sonic 3C (Prototype 0408, 19940408, 17.29)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19922,7 +19922,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="sonic3ca" cloneof="sks3">
+	<software name="sonic3ca">
 		<description>Sonic 3C (Prototype 0517, 19940517, 17.08)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
