@@ -137,8 +137,8 @@ typedef es5510_device::op_src_dst_t op_src_dst_t;
 
 static inline INT32 SX(INT32 x) { return (x & 0x00800000) ? x | 0xff000000 : x & 0x00ffffff; }
 static inline INT32 SC(INT32 x) { return x & 0x00ffffff; }
-static inline INT64 SX64(INT64 x) { return (x & (0x0000800000000000)) ? x | 0xffff000000000000L : x & 0x0000ffffffffffffL; }
-static inline INT64 SC64(INT64 x) { return x & 0x0000ffffffffffff; }
+static inline INT64 SX64(INT64 x) { return (x & U64(0x0000800000000000)) ? x | U64(0xffff000000000000) : x & U64(0x0000ffffffffffff); }
+static inline INT64 SC64(INT64 x) { return x & U64(0x0000ffffffffffff); }
 
 static inline const char * const REGNAME(UINT8 r) {
   static char rn[8];
@@ -369,12 +369,12 @@ WRITE8_MEMBER(es5510_device::host_w)
     break;
 
     /* 0x03 to 0x08 INSTR Register */
-  case 0x03: instr_latch = ((instr_latch&0x00ffffffffff) | ((INT64)data&0xff)<<40); logerror("ES5510: Write INSTR latch[5] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
-  case 0x04: instr_latch = ((instr_latch&0xff00ffffffff) | ((INT64)data&0xff)<<32); logerror("ES5510: Write INSTR latch[4] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
-  case 0x05: instr_latch = ((instr_latch&0xffff00ffffff) | ((INT64)data&0xff)<<24); logerror("ES5510: Write INSTR latch[3] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
-  case 0x06: instr_latch = ((instr_latch&0xffffff00ffff) | ((INT64)data&0xff)<<16); logerror("ES5510: Write INSTR latch[2] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
-  case 0x07: instr_latch = ((instr_latch&0xffffffff00ff) | ((INT64)data&0xff)<< 8); logerror("ES5510: Write INSTR latch[1] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
-  case 0x08: instr_latch = ((instr_latch&0xffffffffff00) | ((INT64)data&0xff)<< 0); logerror("ES5510: Write INSTR latch[0] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
+  case 0x03: instr_latch = ((instr_latch&U64(0x00ffffffffff)) | ((INT64)data&0xff)<<40); logerror("ES5510: Write INSTR latch[5] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
+  case 0x04: instr_latch = ((instr_latch&U64(0xff00ffffffff)) | ((INT64)data&0xff)<<32); logerror("ES5510: Write INSTR latch[4] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
+  case 0x05: instr_latch = ((instr_latch&U64(0xffff00ffffff)) | ((INT64)data&0xff)<<24); logerror("ES5510: Write INSTR latch[3] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
+  case 0x06: instr_latch = ((instr_latch&U64(0xffffff00ffff)) | ((INT64)data&0xff)<<16); logerror("ES5510: Write INSTR latch[2] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
+  case 0x07: instr_latch = ((instr_latch&U64(0xffffffff00ff)) | ((INT64)data&0xff)<< 8); logerror("ES5510: Write INSTR latch[1] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
+  case 0x08: instr_latch = ((instr_latch&U64(0xffffffffff00)) | ((INT64)data&0xff)<< 0); logerror("ES5510: Write INSTR latch[0] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
 
     /* 0x09 to 0x0b DIL Register (r/o) */
 
