@@ -688,10 +688,8 @@ static const eeprom_interface cps2_eeprom_interface =
 	"0111"  /* erase command */
 };
 
-static WRITE16_HANDLER( cps2_eeprom_port_w )
+WRITE16_MEMBER( cps_state::cps2_eeprom_port_w )
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
-
 	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 0 - Unused */
@@ -704,7 +702,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		/* bit 7 - */
 
 		/* EEPROM */
-		state->ioport("EEPROMOUT")->write(data, 0xffff);
+		ioport("EEPROMOUT")->write(data, 0xffff);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -719,41 +717,41 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		/* bit 7 - */
 
 			/* Z80 Reset */
-		if (state->m_audiocpu != NULL)
-			state->m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+		if (m_audiocpu != NULL)
+			m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
-		coin_counter_w(space.machine(), 0, data & 0x0001);
-		if ((strncmp(space.machine().system().name, "pzloop2", 8) == 0) ||
-			(strncmp(space.machine().system().name, "pzloop2j", 8) == 0) ||
-			(strncmp(space.machine().system().name, "pzloop2jr1", 8) == 0))
+		coin_counter_w(machine(), 0, data & 0x0001);
+		if ((strncmp(machine().system().name, "pzloop2", 8) == 0) ||
+			(strncmp(machine().system().name, "pzloop2j", 8) == 0) ||
+			(strncmp(machine().system().name, "pzloop2jr1", 8) == 0))
 		{
 			// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
-			state->m_readpaddle = data & 0x0002;
+			m_readpaddle = data & 0x0002;
 		}
 		else
 		{
-			coin_counter_w(space.machine(), 1, data & 0x0002);
+			coin_counter_w(machine(), 1, data & 0x0002);
 		}
 
-		if (strncmp(space.machine().system().name, "mmatrix", 7) == 0)      // Mars Matrix seems to require the coin lockout bit to be reversed
+		if (strncmp(machine().system().name, "mmatrix", 7) == 0)      // Mars Matrix seems to require the coin lockout bit to be reversed
 		{
-			coin_lockout_w(space.machine(), 0, data & 0x0010);
-			coin_lockout_w(space.machine(), 1, data & 0x0020);
-			coin_lockout_w(space.machine(), 2, data & 0x0040);
-			coin_lockout_w(space.machine(), 3, data & 0x0080);
+			coin_lockout_w(machine(), 0, data & 0x0010);
+			coin_lockout_w(machine(), 1, data & 0x0020);
+			coin_lockout_w(machine(), 2, data & 0x0040);
+			coin_lockout_w(machine(), 3, data & 0x0080);
 		}
 		else
 		{
-			coin_lockout_w(space.machine(), 0, ~data & 0x0010);
-			coin_lockout_w(space.machine(), 1, ~data & 0x0020);
-			coin_lockout_w(space.machine(), 2, ~data & 0x0040);
-			coin_lockout_w(space.machine(), 3, ~data & 0x0080);
+			coin_lockout_w(machine(), 0, ~data & 0x0010);
+			coin_lockout_w(machine(), 1, ~data & 0x0020);
+			coin_lockout_w(machine(), 2, ~data & 0x0040);
+			coin_lockout_w(machine(), 3, ~data & 0x0080);
 		}
 
 		/*
-		set_led_status(space.machine(), 0, data & 0x01);
-		set_led_status(space.machine(), 1, data & 0x10);
-		set_led_status(space.machine(), 2, data & 0x20);
+		set_led_status(machine(), 0, data & 0x01);
+		set_led_status(machine(), 1, data & 0x10);
+		set_led_status(machine(), 2, data & 0x20);
 		*/
 	}
 }
@@ -765,8 +763,8 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
  *
  *************************************/
 
-	TIMER_CALLBACK_MEMBER(cps_state::cps2_update_digital_volume)
-	{
+TIMER_CALLBACK_MEMBER(cps_state::cps2_update_digital_volume)
+{
 	int vol_button_state;
 
 	vol_button_state = ioport("DIGITALVOL")->read();
@@ -779,13 +777,11 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 
 	machine().device<qsound_device>("qsound")->set_output_gain(0, m_cps2digitalvolumelevel / 39.0);
 	machine().device<qsound_device>("qsound")->set_output_gain(1, m_cps2digitalvolumelevel / 39.0);
-	}
+}
 
-static READ16_HANDLER( cps2_qsound_volume_r )
+READ16_MEMBER( cps_state::cps2_qsound_volume_r )
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
-
-	UINT16 cps2_vol_states[40] =
+	static const UINT16 cps2_vol_states[40] =
 	{
 		0xf010, 0xf008, 0xf004, 0xf002, 0xf001, 0xe810, 0xe808, 0xe804, 0xe802, 0xe801,
 		0xe410, 0xe408, 0xe404, 0xe402, 0xe401, 0xe210, 0xe208, 0xe204, 0xe202, 0xe201,
@@ -795,16 +791,16 @@ static READ16_HANDLER( cps2_qsound_volume_r )
 
 	UINT16 result;
 
-	result = cps2_vol_states[state->m_cps2digitalvolumelevel];
+	result = cps2_vol_states[m_cps2digitalvolumelevel];
 
 	/* Extra adapter memory (0x660000-0x663fff) available when bit 14 = 0 */
 	/* Network adapter (ssf2tb) present when bit 15 = 0 */
 	/* Only game known to use both these so far is SSF2TB */
 
-	if (state->m_cps2networkpresent)
+	if (m_cps2networkpresent)
 		return 0x2021; /* SSF2TB doesn't have a digital slider in the test screen */
 	else
-	if (state->m_cps2disabledigitalvolume)
+	if (m_cps2disabledigitalvolume)
 		return 0xd000; /* digital display isn't shown in test mode */
 	else
 		return result;
@@ -817,19 +813,17 @@ static READ16_HANDLER( cps2_qsound_volume_r )
  *
  *************************************/
 
-static READ16_HANDLER( kludge_r )
+READ16_MEMBER( cps_state::kludge_r )
 {
 	return 0xffff;
 }
 
-static READ16_HANDLER( joy_or_paddle_r )
+READ16_MEMBER( cps_state::joy_or_paddle_r )
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
-
-	if (state->m_readpaddle != 0)
-		return (state->ioport("IN0")->read());
+	if (m_readpaddle != 0)
+		return (ioport("IN0")->read());
 	else
-		return (state->ioport("PADDLE1")->read() & 0xff) | (state->ioport("PADDLE2")->read() << 8);
+		return (ioport("PADDLE1")->read() & 0xff) | (ioport("PADDLE2")->read() << 8);
 }
 
 
@@ -855,10 +849,10 @@ static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x804000, 0x804001) AM_READ_PORT("IN0")                                                            /* IN0 */
 	AM_RANGE(0x804010, 0x804011) AM_READ_PORT("IN1")                                                            /* IN1 */
 	AM_RANGE(0x804020, 0x804021) AM_READ_PORT("IN2")                                                            /* IN2 + EEPROM */
-	AM_RANGE(0x804030, 0x804031) AM_READ_LEGACY(cps2_qsound_volume_r)                                               /* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
-	AM_RANGE(0x804040, 0x804041) AM_WRITE_LEGACY(cps2_eeprom_port_w)                                                    /* EEPROM */
+	AM_RANGE(0x804030, 0x804031) AM_READ(cps2_qsound_volume_r)                                               /* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
+	AM_RANGE(0x804040, 0x804041) AM_WRITE(cps2_eeprom_port_w)                                                    /* EEPROM */
 	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITENOP                                                                    /* Unknown (reset once on startup) */
-	AM_RANGE(0x8040b0, 0x8040b3) AM_READ_LEGACY(kludge_r)                                                               /* unknown (xmcotaj hangs if this is 0) */
+	AM_RANGE(0x8040b0, 0x8040b3) AM_READ(kludge_r)                                                               /* unknown (xmcotaj hangs if this is 0) */
 	AM_RANGE(0x8040e0, 0x8040e1) AM_WRITE(cps2_objram_bank_w)                                                   /* bit 0 = Object ram bank swap */
 	AM_RANGE(0x804100, 0x80413f) AM_WRITE(cps1_cps_a_w) AM_SHARE("cps_a_regs")                          /* CPS-A custom */
 	AM_RANGE(0x804140, 0x80417f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w)                                       /* CPS-B custom */
@@ -883,10 +877,10 @@ static ADDRESS_MAP_START( dead_cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x804000, 0x804001) AM_READ_PORT("IN0")                                                            /* IN0 */
 	AM_RANGE(0x804010, 0x804011) AM_READ_PORT("IN1")                                                            /* IN1 */
 	AM_RANGE(0x804020, 0x804021) AM_READ_PORT("IN2")                                                            /* IN2 + EEPROM */
-	AM_RANGE(0x804030, 0x804031) AM_READ_LEGACY(cps2_qsound_volume_r)                                               /* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
-	AM_RANGE(0x804040, 0x804041) AM_WRITE_LEGACY(cps2_eeprom_port_w)                                                    /* EEPROM */
+	AM_RANGE(0x804030, 0x804031) AM_READ(cps2_qsound_volume_r)                                               /* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
+	AM_RANGE(0x804040, 0x804041) AM_WRITE(cps2_eeprom_port_w)                                                    /* EEPROM */
 	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITENOP                                                                    /* Unknown (reset once on startup) */
-	AM_RANGE(0x8040b0, 0x8040b3) AM_READ_LEGACY(kludge_r)                                                               /* unknown (xmcotaj hangs if this is 0) */
+	AM_RANGE(0x8040b0, 0x8040b3) AM_READ(kludge_r)                                                               /* unknown (xmcotaj hangs if this is 0) */
 	AM_RANGE(0x8040e0, 0x8040e1) AM_WRITE(cps2_objram_bank_w)                                                   /* bit 0 = Object ram bank swap */
 	AM_RANGE(0x804100, 0x80413f) AM_WRITE(cps1_cps_a_w) AM_SHARE("cps_a_regs")                              /* CPS-A custom */
 	AM_RANGE(0x804140, 0x80417f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w)                                       /* CPS-B custom */
@@ -8271,17 +8265,15 @@ ROM_END
  *
  *************************************/
 
-	static void init_digital_volume(running_machine &machine)
-	{
-	cps_state *state = machine.driver_data<cps_state>();
-
-	state->m_cps2digitalvolumelevel = 39; /* maximum */
-	state->m_cps2disabledigitalvolume = 0;
+void cps_state::init_digital_volume()
+{
+	m_cps2digitalvolumelevel = 39; /* maximum */
+	m_cps2disabledigitalvolume = 0;
 
 	/* create a timer to update our volume state from the fake switches - read it every 6 frames or so to enable some granularity */
-	state->m_digital_volume_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(cps_state::cps2_update_digital_volume),state));
-	state->m_digital_volume_timer->adjust(attotime::from_msec(100), 0, attotime::from_msec(100));
-	}
+	m_digital_volume_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cps_state::cps2_update_digital_volume),this));
+	m_digital_volume_timer->adjust(attotime::from_msec(100), 0, attotime::from_msec(100));
+}
 
 DRIVER_INIT_MEMBER(cps_state,cps2)
 {
@@ -8293,7 +8285,7 @@ DRIVER_INIT_MEMBER(cps_state,cps2)
 
 	m_cps2networkpresent = 0;
 
-	init_digital_volume(machine());
+	init_digital_volume();
 
 	machine().device("maincpu")->set_clock_scale(0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
@@ -8318,7 +8310,7 @@ DRIVER_INIT_MEMBER(cps_state,pzloop2)
 
 	save_item(NAME(m_readpaddle));
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x804000, 0x804001, FUNC(joy_or_paddle_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x804000, 0x804001, read16_delegate(FUNC(cps_state::joy_or_paddle_r), this));
 }
 
 DRIVER_INIT_MEMBER(cps_state,singbrd)
@@ -8330,25 +8322,23 @@ DRIVER_INIT_MEMBER(cps_state,singbrd)
 	m_digital_volume_timer->adjust(attotime::never, 0, attotime::never);
 }
 
-static READ16_HANDLER( gigaman2_dummyqsound_r )
+READ16_MEMBER( cps_state::gigaman2_dummyqsound_r )
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
-	return state->m_gigaman2_dummyqsound_ram[offset];
+	return m_gigaman2_dummyqsound_ram[offset];
 };
 
-static WRITE16_HANDLER( gigaman2_dummyqsound_w )
+WRITE16_MEMBER( cps_state::gigaman2_dummyqsound_w )
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
-	state->m_gigaman2_dummyqsound_ram[offset] = data;
+	m_gigaman2_dummyqsound_ram[offset] = data;
 };
 
 /* rearrange the graphics data into the normal order */
-static void gigaman2_gfx_reorder(running_machine &machine)
+void cps_state::gigaman2_gfx_reorder()
 {
 	int i;
-	int length = machine.root_device().memregion( "gfx" )->bytes();
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("gfx")->base();
-	UINT16 *buf = auto_alloc_array(machine, UINT16, length );
+	int length = memregion( "gfx" )->bytes();
+	UINT16 *rom = (UINT16 *)memregion("gfx")->base();
+	UINT16 *buf = auto_alloc_array(machine(), UINT16, length );
 
 	memcpy (buf, rom, length);
 
@@ -8356,7 +8346,7 @@ static void gigaman2_gfx_reorder(running_machine &machine)
 		rom[i] = buf[((i & ~7) >> 2) | ((i & 4) << 18) | ((i & 2) >> 1) | ((i & 1) << 21)];
 	}
 
-	auto_free( machine, buf );
+	auto_free( machine(), buf );
 }
 
 DRIVER_INIT_MEMBER(cps_state,gigaman2)
@@ -8365,14 +8355,14 @@ DRIVER_INIT_MEMBER(cps_state,gigaman2)
 	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 	int length = memregion("maincpu")->bytes();
 
-	gigaman2_gfx_reorder(machine());
+	gigaman2_gfx_reorder();
 
 	DRIVER_INIT_CALL(cps2);
 
 	m_gigaman2_dummyqsound_ram = auto_alloc_array(machine(), UINT16, 0x20000 / 2);
 	save_pointer(NAME(m_gigaman2_dummyqsound_ram), 0x20000 / 2);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x618000, 0x619fff, FUNC(gigaman2_dummyqsound_r), FUNC(gigaman2_dummyqsound_w)); // no qsound..
+	space.install_readwrite_handler(0x618000, 0x619fff, read16_delegate(FUNC(cps_state::gigaman2_dummyqsound_r),this), write16_delegate(FUNC(cps_state::gigaman2_dummyqsound_w), this)); // no qsound..
 	space.set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
 	m68k_set_encrypted_opcode_range(machine().device("maincpu"), 0, length);
 

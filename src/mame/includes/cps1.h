@@ -257,6 +257,9 @@ public:
 	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
 	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+
+	/* cps video */
 	void cps1_get_video_base();
 	void cps1_gfx_decode();
 	void unshuffle(UINT64 *buf, int len);
@@ -275,6 +278,16 @@ public:
 	void cps2_objram_latch();
 	UINT16 *cps2_objbase();
 
+
+	/* cps2 driver */
+	void init_digital_volume();
+	DECLARE_READ16_MEMBER(gigaman2_dummyqsound_r);
+	DECLARE_WRITE16_MEMBER(gigaman2_dummyqsound_w);
+	void gigaman2_gfx_reorder();
+	DECLARE_WRITE16_MEMBER(cps2_eeprom_port_w);
+	DECLARE_READ16_MEMBER(cps2_qsound_volume_r);
+	DECLARE_READ16_MEMBER(kludge_r);
+	DECLARE_READ16_MEMBER(joy_or_paddle_r);
 
 };
 
