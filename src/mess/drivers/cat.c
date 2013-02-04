@@ -1,11 +1,50 @@
 /***************************************************************************
 
-    Canon Cat driver by Miodrag Milanovic and Lord Nightmare
+    Canon Cat, Model V777
+    IAI Swyft Model P0001
+    driver by Miodrag Milanovic and Lord Nightmare
+    With information and help from John "Sandy" Bumgarner, Dwight Elvey,
+    Charles Springer, Terry Holmes, Jonathan Sand, Aza Raskin and others.
+
+    This driver is dedicated in memory of Jef Raskin and Dave Boulton
 
     12/06/2009 Skeleton driver.
     15/06/2009 Working driver
 
 Pictures: http://www.regnirps.com/Apple6502stuff/apple_iie_cat.htm
+
+Canon cat blue "Use Front Labels":
+` (really degree, +-, paragraph-mark and section-mark): LEFT MARGIN
+-_: INDENT
++=: RIGHT MARGIN
+UNDO: SPELL CHECK LEAP (this is actually a red LEAP label)
+PERM SPACE/TAB: SET/CLEAR TAB
+Q: UNDER LINE
+W: BOLD
+E: CAPS
+T: Paragraph STYLE
+U: LINE SPACE
+O: ADD SPELLING
+[ (really 1/4, 1/2, double-underline and |): SETUP
+Backspace (really ERASE): ANSWER
+LOCK: DOCUMENT LOCK
+A: COPY
+D: SEND CONTROL
+G: CALC
+J: PRINT
+L: DISK
+Colon: FORMAT/WIPE DISK (only when wheel! mode is enabled, see below)
+"': PHONE
+Enter (really RETURN): SEND
+X: LOCAL LEAP
+V: LEARN
+N: EXPLAIN
+,: SORT
+?/: KBI/II
+Pgup (really DOCUMENT/PAGE): TITLES
+Leap Left: LEAP AGAIN (left)
+Leap Right: LEAP AGAIN (right)
+
 
 How to enable the FORTH interpreter (http://canoncat.org/canoncat/enableforth.html)
 
@@ -25,9 +64,62 @@ In MESS, to activate it as above:
 * when the Cat boots, type (without quotes) "Enable Forth Language"
 * hold left-alt(leap left) and type E n a, release left-alt (the left cursor is now at the first character)
 * simultaneously press both alt keys for a moment and release both (the whole "Enable Forth Language" line will be selected)
-* press control(use front) and press backspace(Erase) (If beeping actually worked the cat would beep here)
+* press control(use front) and press backspace(ERASE) (If beeping actually worked the cat would beep here)
 * press control(use front), shift, and space (the cursor should stop blinking)
 * press enter and the forth "ok" prompt should appear. you can type 'page' and enter to clear the screen  
+Optional further steps:
+* type without quotes "-1 wheel! savesetup re" at the forth prompt to permanently 
+  enable shift + use front + space to dump to forth mode easily
+* change the keyboard setting in the setup menu (use front + [ ) to ASCII so you can type < and >
+* after doing the -1 wheel! thing, you can compile a selected forth program in the editor
+  by selecting it and hitting ANSWER (use front + ERASE)
+
+If ever in forth mode you can return to the editor with the forth word (without quotes) "re"
+
+
+Canon cat credits easter egg:
+* hold either leap key, then simultaneously hold shift, then type Q W E R A S D F Z X C V and release all the keys
+* hit EXPLAIN (use front + N) and the credits screen will be displayed
+
+Canon Cat credits details: (WIP)
+Scott Kim - responsible for fonts on swyft and cat
+
+
+Swyft versions:
+There are at least 4 variants of machines called 'swyft':
+* The earliest desktop units which use plexi or rubber-tooled case and an
+  angled monitor; about a dozen were made and at least two of clear plexi.
+  These are sometimes called "wrinkled" swyfts. 5.25" drive, may be able to
+  read Apple2 Swyftware and Swyftcard-created disks.
+ It is possible no prototypes of this type got beyond the 'runs forth console only' stage.
+  http://archive.computerhistory.org/resources/access/physical-object/2011/09/102746929.01.01.lg.JPG
+  http://www.digibarn.com/collections/systems/swyft/Swyft-No2-05-1271.jpg
+  http://www.digibarn.com/friends/jef-raskin/slides/iai/A%20-687%20SWYFTPRO.JPG
+* The early "flat cat" or "roadkill" portable LCD screen units with a white
+  case and just a keyboard. Model SP0001
+  http://www.digibarn.com/collections/systems/swyft/Image82.jpg
+* The later "ur-cat" desktop units which use a machine tooled case and look
+  more or less like the canon cat. about 100-200 were made. 3.5" drive.
+  These have a fully functional EDDE editor as the cat does, and can even compile forth programs.
+  (the 'swyft' driver is based on one of these)
+* The very late portable LCD units with a dark grey case and a row of hotkey
+  buttons below the screen.
+  http://www.digibarn.com/collections/systems/swyft/swyft.jpg
+
+Canon Cat versions:
+There is really only one version of the cat which saw wide release, the US version.
+* It is possible a very small number of UK/European units were released as a test.
+  If so, these will have slightly different keyboard key caps and different
+  system and spellcheck roms.
+
+As for prototypes/dev cat machines, a few minor variants exist:
+* Prototype cat motherboards used 16k*4bit drams instead of 64k*4bit as the
+  final system did and hence max out at 128k of dram instead of 512k.
+  The final system included 256k of dram and can be upgraded to 512k.
+* At least some developer units were modified to have an external BNC
+  connector, ostensibly to display the internal screen's video externally.
+  http://www.digibarn.com/collections/systems/canon-cat/Image55.jpg
+
 
 Canon Cat:
 <insert guru-diagram here once drawn>
@@ -36,18 +128,23 @@ X1: 19.968Mhz, used by GA2 (plus a PLL to multiply by 2?), and divide by 4 for c
 X2: 3.579545Mhz, used by the DTMF generator chip AMI S2579 at IC40
 X3: 2.4576Mhz, used by the modem chip AMI S35213 at IC37
 
+IAI Swyft:
+<insert guru-diagram here once drawn>
 
 
 ToDo:
 * Canon Cat
 - Find the mirrors for the write-only video control register and figure out
   what the writes actually do; hook these up properly to screen timing etc
-- The 2.40 (bios 0) firmware gets annoyed and thinks it has a phone call at
+- The 2.40 firmwares both get annoyed and think they have a phone call at
   random.
-  (hit ctrl a few times to make it shut up for a bit or go into forth mode);
-  The 1.74 (bios 1) firmware doesn't have this issue.
+  (hit shift or usefront a few times to make it shut up for a bit or go into
+  forth mode); The 1.74 firmware doesn't have this issue.
   Figure out what causes it and make it stop. May be OFFHOOK or more likely
-  the DUART thinks the phone is ringing constantly.
+  the DUART thinks the phone is ringing constantly due to incomplete duart or
+  an ip bit hooked up wrong.
+  You can alsp make it stop by going to SETUP and change the serial port from
+  'alternate printer' to SEND.
 - Floppy drive (3.5", Single Sided Double Density MFM, ~400kb)
   * Cat has very low level control of data being read or written, much like
     the Amiga does
@@ -71,18 +168,32 @@ ToDo:
 - Hook duart IP2 up to the 6ms timer
 - Correctly hook the duart interrupt to the 68k, including autovector using the vector register on the duart
 - Watchdog timer/powerfail at 0x85xxxx
-- Canon Cat released versions known: 1.74 (dumped), 2.40 (dumped), 2.42 (NEED DUMP)
+- Canon Cat released versions known: 1.74 US (dumped), 2.40 US (dumped; is this actually original, or compiled from the released source code?), 2.42 (NEED DUMP)
+  It is possible a few prototype UK 1.74 or 2.40 units were produced; the code roms of these will differ (they contain different spellcheck "core" code) as well as the spellcheck roms, the keyboard id and the keycaps.
 - Known Spellcheck roms: NH7-0684 (US, dumped); NH7-0724 (UK, NEED DUMP);
   NH7-0813/0814 (Quebec/France, NEED DUMP); NH7-1019/1020/1021 (Germany, NEED DUMP)
   It is possible the non-US roms were never officially released.
   Wordlist sources: American Heritage (US and UK), Librarie Larousse (FR), Langenscheidt (DE)
+- (would-be-really-nice-but-totally-unnecessary feature): due to open bus, the
+  svrom1 and svrom2 checksums in diagnostics read as 01A80000 and 01020000
+  respectively on a real machine (and hence appear inverted/'fail'-state).
+  This requires sub-cycle accurate 68k open bus emulation to pull off, as well 
+  as emulating the fact that UDS/LDS are ?not connected? (unclear because this
+  happens inside an asic) for the SVROMS (or the svram or the code roms, for
+  that matter!)
+- Hook Battery Low input to a dipswitch.
+- Document what every IPx and OPx bit on the DUART connects to.
+  
 
 * Swyft
 - Figure out the keyboard (interrupts are involved? or maybe an NMI on a
   timer/vblank?)
-- Communications ports (Duart? or some other plain UART?)
+- Beeper
+- Communications port (Duart? or some other plain UART?)
 - Floppy (probably similar to the Cat)
 - Centronics port (probably similar to the Cat)
+- Joystick port
+- Forth button (keep in mind shift-usefront-space ALWAYS enables forth on a swyft)
 - Multple undumped firmware revisions exist
 
 ****************************************************************************/
@@ -428,7 +539,7 @@ READ16_MEMBER( cat_state::cat_6ms_counter_r )
 }
 
 /* 0x840001: 'opr' Output Port Register
- * writing 0x1c (or possibly anything) here resets the watchdog
+ * writing 0x1c (or probably anything with bit 3 set) here resets the watchdog
  * if the watchdog expires an NMI is sent to the cpu
  */
 WRITE16_MEMBER( cat_state::cat_opr_w )
@@ -445,17 +556,16 @@ WRITE16_MEMBER( cat_state::cat_opr_w )
 	 * \--------- ?
 	 */
 #ifdef DEBUG_VIDEO_ENABLE_W
-	//if ((data&0xef)!= 0x0c)
 	fprintf(stderr, "Video enable reg write: offset %06X, data %04X\n", 0x840000+(offset<<1), data);
 #endif
 	m_video_enable = BIT( data, 2 );
 	m_video_invert = 1-BIT( data, 4 );
 }
 
-// 0x850000: watchdog timer/video status
+// 0x850000: 'wdt' watchdog timer/video status
 // implement me!
 
-// 0x860000: test regitser
+// 0x860000: 'tcb' test regitser
 // the power fail status reset bit also lives here somewhere?
 WRITE16_MEMBER( cat_state::cat_tcb_w )
 {
@@ -495,7 +605,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 0   0   1   x   x   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   1       R   SVROM 0 ic6 (MASK ROM tc531000) [controlled via GA2 /SVCS0]
 0   0   1   x   x   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   0       O   OPEN BUS (reads as 0x2e) [controlled via GA2 /SVCS1] *SEE BELOW*
 0   0   1   x   x   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   1       R   SVROM 1 ic8 (not present on cat as sold, open bus reads as 0x80) [controlled via GA2 /SVCS1] *SEE BELOW*
-                                                                                                    *NOTE: on developer units, two 128K SRAMS are mapped in place of the two entries immediately above!* (this involves some creative wiring+sockets or an official IAI 'shadow ram board')
+                                                                                                    *NOTE: on Dwight E's user-made developer unit, two 128K SRAMS are mapped in place of the two entries immediately above!* (this involves some creative wiring+sockets); the official IAI 'shadow ram board' maps the ram to the A00000-A3FFFF area instead)
 0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       *BOTH GATE ARRAYS 1 and 2 DECODE THIS AREA; 2 DEALS WITH ADDR AND 1 WITH DATA/CAS/RAS*
 0   1   0   x   x   a   b   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW  VIDEO/SYSTEM DRAM (ab: 00=row 0, ic26-29; 01=row 1, ic22-25; 10=row 2; ic18-21; 11=row 3; ic14-17) 
                                                                                                     *NOTE: DRAM rows 2 and 3 above are only usually populated in cat developer units!*
@@ -520,8 +630,8 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 1   0   0   x   x   1   1   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R?W {'tcb'} test control bits: powerfail status in bit <?> (reads as 0x0000)
 1   0   0   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       ?   Unknown (reads as 0x2e80)
 
-1   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       O   OPEN BUS (reads as 0x2e80)
-1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       O   OPEN BUS (reads as 0x2e80)
+1   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       O   OPEN BUS (reads as 0x2e80) [68k DTACK is asserted by gate array 1 when accessing this area, for testing?] On real IAI shadow rom board, at least 0x40000 of ram lives here.
+1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       O   OPEN BUS (reads as 0x2e80) [68k VPA is asserted by gate array 1 when accessing this area, for testing?]
 */
 
 
@@ -548,8 +658,8 @@ static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	//AM_RANGE(0x850000, 0x850001) AM_READ(cat_video_status) AM_MIRROR(0x18FFFE) // video status and watchdog read: hblank, vblank or draw?
 	AM_RANGE(0x860000, 0x860001) AM_READWRITE(cat_0000_r, cat_tcb_w) AM_MIRROR(0x18FFFE) // Test mode
 	AM_RANGE(0x870000, 0x870001) AM_READ(cat_2e80_r) AM_MIRROR(0x18FFFE) // Open bus?
-	AM_RANGE(0xA00000, 0xA00001) AM_READ(cat_2e80_r) AM_MIRROR(0x1FFFFE) // Open bus?
-	AM_RANGE(0xC00000, 0xC00001) AM_READ(cat_2e80_r) AM_MIRROR(0x3FFFFE) // Open bus?
+	AM_RANGE(0xA00000, 0xA00001) AM_READ(cat_2e80_r) AM_MIRROR(0x1FFFFE) // Open bus/dtack? The 0xA00000-0xA3ffff area is ram used for shadow rom storage on cat developer machines, which is either banked over top of, or jumped to instead of the normal rom
+	AM_RANGE(0xC00000, 0xC00001) AM_READ(cat_2e80_r) AM_MIRROR(0x3FFFFE) // Open bus/vme?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 16, cat_state)
@@ -891,29 +1001,64 @@ ROM_END
 ROM_START( cat )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	// SYS ROM
-	ROM_SYSTEM_BIOS( 0, "r240", "Canon Cat V2.40 Firmware")
-	ROMX_LOAD( "r240l0.ic2", 0x00001, 0x10000, CRC(1b89bdc4) SHA1(39c639587dc30f9d6636b46d0465f06272838432), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "r240h0.ic4", 0x00000, 0x10000, CRC(94f89b8c) SHA1(6c336bc30636a02c625d31f3057ec86bf4d155fc), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "r240l1.ic3", 0x20001, 0x10000, CRC(1a73be4f) SHA1(e2de2cb485f78963368fb8ceba8fb66ca56dba34), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD( "r240h1.ic5", 0x20000, 0x10000, CRC(898dd9f6) SHA1(93e791dd4ed7e4afa47a04df6fdde359e41c2075), ROM_SKIP(1) | ROM_BIOS(1))
-	ROM_SYSTEM_BIOS( 1, "r174", "Canon Cat V1.74 Firmware")
-	// Canon cat v1.74 roms are labeled as r74; they only added the major number to the rom label after 2.0
-	ROMX_LOAD( "r74__0l__c18c.blue.ic2", 0x00001, 0x10000, CRC(b19aa0c8) SHA1(85b3e549cfb91bd3dd32335e02eaaf9350e80900), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "r74__0h__75a6.yellow.ic4", 0x00000, 0x10000, CRC(75281f77) SHA1(ed8b5e37713892ee83413d23c839d09e2fd2c1a9), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "r74__1l__c8a3.green.ic3", 0x20001, 0x10000, CRC(93275558) SHA1(f690077a87076fd51ae385ac5a455804cbc43c8f), ROM_SKIP(1) | ROM_BIOS(2))
-	ROMX_LOAD( "r74__1h__3c37.white.ic5", 0x20000, 0x10000, CRC(5d7c3962) SHA1(8335993583fdd30b894c01c1a7a6aca61cd81bb4), ROM_SKIP(1) | ROM_BIOS(2))
+	/* This 2.40 code came from two development cat machines owned or formerly
+	 * owned by former IAI employees Sandy Bumgarner and Dave Boulton.
+	 * Dave Boulton's machine is interesting in that it has a prototype cat
+	 * motherboard in it, which it has less space for dram than a 'released'
+	 * cat does: it uses 16k*4 dram chips instead of 64k*4 as in the final
+	 * cat, and hence can only support 128k of ram with all 4 rows of drams
+	 * populated, as opposed to 256k-standard (2 rows) and 512k-max with all
+	 * 4 rows populated on a "released" cat.
+	 */
+	ROM_SYSTEM_BIOS( 0, "r240", "Canon Cat V2.40 US Firmware") 
+	ROMX_LOAD( "boultl0.ic2", 0x00001, 0x10000, CRC(77b66208) SHA1(9D718C0A521FEFE4F86EF328805B7921BADE9D89), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "boulth0.ic4", 0x00000, 0x10000, CRC(f1e1361a) SHA1(0A85385527E2CC55790DE9F9919EB44AC32D7F62), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "boultl1.ic3", 0x20001, 0x10000, CRC(c61dafb0) SHA1(93216c26c2d5fc71412acc548c96046a996ea668), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "boulth1.ic5", 0x20000, 0x10000, CRC(bed1f761) SHA1(D177E1D3A39B005DD94A6BDA186221D597129AF4), ROM_SKIP(1) | ROM_BIOS(1))
+	/* This 2.40 code was compiled by Dwight Elvey based on the v2.40 source 
+	 * code disks recovered around 2004. It does NOT exactly match the above
+	 * set exactly but has a few small differences.
+	 * It is as of yet unknown whether it is earlier or later code than the
+	 * set above.
+	 */
+	ROM_SYSTEM_BIOS( 1, "r240r", "Canon Cat V2.40 US Firmware compiled from recovered source code")
+	ROMX_LOAD( "r240l0.ic2", 0x00001, 0x10000, CRC(1b89bdc4) SHA1(39c639587dc30f9d6636b46d0465f06272838432), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "r240h0.ic4", 0x00000, 0x10000, CRC(94f89b8c) SHA1(6c336bc30636a02c625d31f3057ec86bf4d155fc), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "r240l1.ic3", 0x20001, 0x10000, CRC(1a73be4f) SHA1(e2de2cb485f78963368fb8ceba8fb66ca56dba34), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "r240h1.ic5", 0x20000, 0x10000, CRC(898dd9f6) SHA1(93e791dd4ed7e4afa47a04df6fdde359e41c2075), ROM_SKIP(1) | ROM_BIOS(2))
+	/* This v1.74 code comes from (probably) the 'main us release' of first-run
+	 * Canon cats, and was dumped from machine serial number R12014979
+	 * Canon cat v1.74 roms are labeled as r74; they only added the major number
+	 * to the rom label after v2.0?
+	 */
+	ROM_SYSTEM_BIOS( 2, "r174", "Canon Cat V1.74 US Firmware")
+	ROMX_LOAD( "r74__0l__c18c.blue.ic2", 0x00001, 0x10000, CRC(b19aa0c8) SHA1(85b3e549cfb91bd3dd32335e02eaaf9350e80900), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD( "r74__0h__75a6.yellow.ic4", 0x00000, 0x10000, CRC(75281f77) SHA1(ed8b5e37713892ee83413d23c839d09e2fd2c1a9), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD( "r74__1l__c8a3.green.ic3", 0x20001, 0x10000, CRC(93275558) SHA1(f690077a87076fd51ae385ac5a455804cbc43c8f), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD( "r74__1h__3c37.white.ic5", 0x20000, 0x10000, CRC(5d7c3962) SHA1(8335993583fdd30b894c01c1a7a6aca61cd81bb4), ROM_SKIP(1) | ROM_BIOS(3))
 
 	ROM_REGION( 0x80000, "svrom", ROMREGION_ERASE00 )
 	// SPELLING VERIFICATION ROM (SVROM)
-	// since ROM_FILL16BE(0x0, 0x80000, 0x2e80) doesn't exist, the even bytes and latter chunk of the svrom space are filled in in DRIVER_INIT
-	// Romspace here is a little strange: there are 3 rom sockets on the board:
-	// svrom-0 maps to 200000-21ffff every ODD byte (d8-d0)
-	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00000, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask rom, 128KB long
-	// svrom-1 maps to 200000-21ffff every EVEN byte (d15-d7)
-	// no rom is in the socket; it reads as open bus 0x2E
-	// svrom-2 maps to 240000-25ffff every ODD byte (d8-d0)
-	// no rom is in the socket; it reads as open bus 0x80
-	// there is no svrom-3; 240000-25ffff EVEN always reads as 0x2E
+	/* Romspace here is a little strange: there are 3 rom sockets on the board:
+	 * svrom-0 maps to 200000-21ffff every ODD byte (d8-d0)
+	 * svrom-1 maps to 200000-21ffff every EVEN byte (d15-d7)
+	 *  (since no rom is in the socket; it reads as open bus 0x2E)
+	 * svrom-2 maps to 240000-25ffff every ODD byte (d8-d0)
+	 *  (since no rom is in the socket; it reads as open bus 0x80)
+	 * there is no svrom-3; 240000-25ffff EVEN always reads as 0x2E
+	 * since ROM_FILL16BE(0x0, 0x80000, 0x2e80) doesn't exist, the
+	 * even bytes and latter chunk of the svrom space need to be filled in
+	 * DRIVER_INIT or some other means needs to be found to declare them as
+	 * 'open bus' once the mame/mess core supports that.
+	 * NOTE: there are at least 6 more SVROMS which existed (possibly in
+	 * limited form), and are not dumped:
+	 * UK (1 rom)
+	 * French (2 roms)
+	 * German (3 roms)
+	 * Each of these will also have its own code romset as well.
+	 */
+	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00000, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask rom, 128KB long; "US" SVROM
+
 ROM_END
 
 /* Driver */
