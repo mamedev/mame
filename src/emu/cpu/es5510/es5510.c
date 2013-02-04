@@ -84,7 +84,7 @@ es5510_device::es5510_device(const machine_config &mconfig, const char *tag, dev
   icount = 0;
   pc = 0;
   state = STATE_HALTED;
-  bzero(gpr, 0xc0 * sizeof(gpr[0]));
+  memset(gpr, 0, 0xc0 * sizeof(gpr[0]));
   ser0r = 0;
   ser0l = 0;
   ser1r = 0;
@@ -110,8 +110,8 @@ es5510_device::es5510_device(const machine_config &mconfig, const char *tag, dev
   dol[0] = dol[1] = 0;
   dol_count = 0;
 
-  bzero(instr, 160 * sizeof(instr[0]));
-  bzero(dram, (1<<20) * sizeof(dram[0]));
+  memset(instr, 0, 160 * sizeof(instr[0]));
+  memset(dram, 0, (1<<20) * sizeof(dram[0]));
 
   dol_latch = 0;
   dil_latch = 0;
@@ -121,8 +121,8 @@ es5510_device::es5510_device(const machine_config &mconfig, const char *tag, dev
   ram_sel = 0;
   host_control = 0;
 
-  bzero(&alu, sizeof(alu));
-  bzero(&mulacc, sizeof(mulacc));
+  memset(&alu, 0, sizeof(alu));
+  memset(&mulacc, 0, sizeof(mulacc));
 }
 
 typedef es5510_device::alu_op_t alu_op_t;
@@ -165,7 +165,7 @@ static inline const char * const REGNAME(UINT8 r) {
 }
 
 static inline char * DESCRIBE_REG(char *s, UINT8 r) {
-  return stpcpy(s, REGNAME(r));
+  return strcpy(s, REGNAME(r));
 }
 
 const alu_op_t es5510_device::ALU_OPS[16] = {
@@ -214,10 +214,10 @@ static inline char * DESCRIBE_SRC_DST(char *s, UINT8 reg, op_src_dst_t src_dst) 
   case es5510_device::SRC_DST_REG:
     return DESCRIBE_REG(s, reg);
   case es5510_device::SRC_DST_DELAY:
-    return stpcpy(s, "Delay");
+    return strcpy(s, "Delay");
   case es5510_device::SRC_DST_BOTH:
     s = DESCRIBE_REG(s, reg);
-    return stpcpy(s, ",Delay");
+    return strcpy(s, ",Delay");
   }
   // should never happen!
   return s;
@@ -243,7 +243,7 @@ static inline char * DESCRIBE_ALU(char *s, UINT8 opcode, UINT8 aReg, UINT8 bReg,
 
   switch (op.operands) {
   case 0:
-    return stpcpy(s, op.opcode);
+    return strcpy(s, op.opcode);
 
   case 1:
     s += sprintf(s, "%s %s >", op.opcode, REGNAME(bReg));
@@ -363,12 +363,12 @@ WRITE8_MEMBER(es5510_device::host_w)
     break;
 
     /* 0x03 to 0x08 INSTR Register */
-  case 0x03: instr_latch = ((instr_latch&0x00ffffffffff) | ((INT64)data&0xff)<<40); logerror("ES5510: Write INSTR latch[5] = %02x -> %012llx\n", data, instr_latch); break;
-  case 0x04: instr_latch = ((instr_latch&0xff00ffffffff) | ((INT64)data&0xff)<<32); logerror("ES5510: Write INSTR latch[4] = %02x -> %012llx\n", data, instr_latch); break;
-  case 0x05: instr_latch = ((instr_latch&0xffff00ffffff) | ((INT64)data&0xff)<<24); logerror("ES5510: Write INSTR latch[3] = %02x -> %012llx\n", data, instr_latch); break;
-  case 0x06: instr_latch = ((instr_latch&0xffffff00ffff) | ((INT64)data&0xff)<<16); logerror("ES5510: Write INSTR latch[2] = %02x -> %012llx\n", data, instr_latch); break;
-  case 0x07: instr_latch = ((instr_latch&0xffffffff00ff) | ((INT64)data&0xff)<< 8); logerror("ES5510: Write INSTR latch[1] = %02x -> %012llx\n", data, instr_latch); break;
-  case 0x08: instr_latch = ((instr_latch&0xffffffffff00) | ((INT64)data&0xff)<< 0); logerror("ES5510: Write INSTR latch[0] = %02x -> %012llx\n", data, instr_latch); break;
+  case 0x03: instr_latch = ((instr_latch&0x00ffffffffff) | ((INT64)data&0xff)<<40); logerror("ES5510: Write INSTR latch[5] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
+  case 0x04: instr_latch = ((instr_latch&0xff00ffffffff) | ((INT64)data&0xff)<<32); logerror("ES5510: Write INSTR latch[4] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
+  case 0x05: instr_latch = ((instr_latch&0xffff00ffffff) | ((INT64)data&0xff)<<24); logerror("ES5510: Write INSTR latch[3] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
+  case 0x06: instr_latch = ((instr_latch&0xffffff00ffff) | ((INT64)data&0xff)<<16); logerror("ES5510: Write INSTR latch[2] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
+  case 0x07: instr_latch = ((instr_latch&0xffffffff00ff) | ((INT64)data&0xff)<< 8); logerror("ES5510: Write INSTR latch[1] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
+  case 0x08: instr_latch = ((instr_latch&0xffffffffff00) | ((INT64)data&0xff)<< 0); logerror("ES5510: Write INSTR latch[0] = %02x -> %012" I64FMT "x\n", data, instr_latch); break;
 
     /* 0x09 to 0x0b DIL Register (r/o) */
 
@@ -418,7 +418,7 @@ WRITE8_MEMBER(es5510_device::host_w)
     break;
 
   case 0x80: /* Read select - GPR + INSTR */
-    logerror("ES5510: Read INSTR+GPR %02x (%s): %012llx %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & 0xffffffffffffL, gpr[data] & 0xffffff, gpr[data]);
+    logerror("ES5510: Read INSTR+GPR %02x (%s): %012" I64FMT "x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & 0xffffffffffffL, gpr[data] & 0xffffff, gpr[data]);
 
     /* Check if an INSTR address is selected */
     if (data < 0xa0) {
@@ -438,7 +438,7 @@ WRITE8_MEMBER(es5510_device::host_w)
 
   case 0xc0: /* Write select - INSTR */
     DESCRIBE_INSTR(buf, instr_latch, gpr[data]);
-    logerror("ES5510: Write INSTR %02x %012llx: %s\n",data, instr_latch&0xffffffffffffL, buf);
+    logerror("ES5510: Write INSTR %02x %012" I64FMT "x: %s\n",data, instr_latch&0xffffffffffffL, buf);
     if (data < 0xa0) {
       instr[data] = instr_latch&0xffffffffffffL;
     }
@@ -446,7 +446,7 @@ WRITE8_MEMBER(es5510_device::host_w)
 
   case 0xe0: /* Write select - GPR + INSTR */
     DESCRIBE_INSTR(buf, instr_latch, gpr_latch);
-    logerror("ES5510:  Write INSTR+GPR %02x (%s): %012llx %06x (%d): %s\n",data, REGNAME(data&0xff), instr_latch, gpr_latch, SX(gpr_latch), buf);
+    logerror("ES5510:  Write INSTR+GPR %02x (%s): %012" I64FMT "x %06x (%d): %s\n",data, REGNAME(data&0xff), instr_latch, gpr_latch, SX(gpr_latch), buf);
     if (data < 0xa0) {
       instr[data] = instr_latch;
     }
@@ -511,7 +511,7 @@ void es5510_device::execute_run() {
 	char buf[1024];
 	for (addr = 0; addr < 0xa0; addr++) {
 	  DESCRIBE_INSTR(buf, instr[addr], gpr[addr]);
-	  logerror("%02x: %012llx %06x  %s\n", addr, instr[addr], gpr[addr]&0xffffff, buf);
+	  logerror("%02x: %012" I64FMT "x %06x  %s\n", addr, instr[addr], gpr[addr]&0xffffff, buf);
 	}
 	for (; addr < 0xc0; addr++) {
 	  logerror("%02x: %06x (%d)\n", addr, gpr[addr]&0xffffff, gpr[addr]);
