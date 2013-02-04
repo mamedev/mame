@@ -89,11 +89,11 @@ enum
 	/* Undefined Mode - Bank switched registers */
 	eR13_UND, eR14_UND, eSPSR_UND,
 
-	kNumRegisters
+	NUM_REGS
 };
 
 /* Coprocessor-related macros */
-#define COPRO_TLB_BASE          cpustate->tlbBase
+#define COPRO_TLB_BASE          			arm->tlbBase
 #define COPRO_TLB_BASE_MASK                 0xffffc000
 #define COPRO_TLB_VADDR_FLTI_MASK           0xfff00000
 #define COPRO_TLB_VADDR_FLTI_MASK_SHIFT     18
@@ -115,7 +115,7 @@ enum
 #define COPRO_TLB_SECTION_TABLE             2
 #define COPRO_TLB_FINE_TABLE                3
 
-#define COPRO_CTRL            cpustate->control
+#define COPRO_CTRL            				arm->control
 #define COPRO_CTRL_MMU_EN                   0x00000001
 #define COPRO_CTRL_ADDRFAULT_EN             0x00000002
 #define COPRO_CTRL_DCACHE_EN                0x00000004
@@ -139,14 +139,14 @@ enum
 #define COPRO_CTRL_INTVEC_F                 1
 #define COPRO_CTRL_MASK                     0x0000338f
 
-#define COPRO_DOMAIN_ACCESS_CONTROL         cpustate->domainAccessControl
+#define COPRO_DOMAIN_ACCESS_CONTROL         arm->domainAccessControl
 
-#define COPRO_FAULT_STATUS_D        cpustate->faultStatus[0]
-#define COPRO_FAULT_STATUS_P        cpustate->faultStatus[1]
+#define COPRO_FAULT_STATUS_D        		arm->faultStatus[0]
+#define COPRO_FAULT_STATUS_P        		arm->faultStatus[1]
 
-#define COPRO_FAULT_ADDRESS         cpustate->faultAddress
+#define COPRO_FAULT_ADDRESS         		arm->faultAddress
 
-#define COPRO_FCSE_PID          cpustate->fcsePID
+#define COPRO_FCSE_PID          			arm->fcsePID
 
 /* Coprocessor Registers */
 #define ARM7COPRO_REGS \
@@ -169,20 +169,28 @@ enum
 };
 
 #define ARM7CORE_REGS                   \
-	UINT32 sArmRegister[kNumRegisters]; \
-	UINT8 pendingIrq;                   \
-	UINT8 pendingFiq;                   \
-	UINT8 pendingAbtD;                  \
-	UINT8 pendingAbtP;                  \
-	UINT8 pendingUnd;                   \
-	UINT8 pendingSwi;                   \
-	INT32 iCount;           \
+	UINT32 r[NUM_REGS]; \
+	UINT32 pendingIrq;                   \
+	UINT32 pendingFiq;                   \
+	UINT32 pendingAbtD;                  \
+	UINT32 pendingAbtP;                  \
+	UINT32 pendingUnd;                   \
+	UINT32 pendingSwi;                   \
+	int icount;           \
 	endianness_t endian;                \
 	device_irq_acknowledge_callback irq_callback;       \
 	legacy_cpu_device *device;      \
 	address_space *program;         \
 	direct_read_data *direct;
 
+//#define ARM7_USE_DRC
+
+/* forward declaration of implementation-specific state */
+#ifndef ARM7_USE_DRC
+struct arm7imp_state {};
+#else
+struct arm7imp_state;
+#endif
 
 /* CPU state struct */
 struct arm_state
@@ -196,6 +204,7 @@ struct arm_state
 #if ARM7_MMU_ENABLE_HACK
 	UINT32 mmu_enable_addr; // workaround for "MMU is enabled when PA != VA" problem
 #endif
+	arm7imp_state impstate;
 };
 
 /****************************************************************************************************
@@ -493,7 +502,7 @@ enum
 #define R15                     ARM7REG(eR15)
 #define SPSR                    17                     // SPSR is always the 18th register in our 0 based array sRegisterTable[][18]
 #define GET_CPSR                ARM7REG(eCPSR)
-#define SET_CPSR(v)             set_cpsr(cpustate,v)
+#define SET_CPSR(v)             set_cpsr(arm,v)
 #define MODE_FLAG               0xF                    // Mode bits are 4:0 of CPSR, but we ignore bit 4.
 #define GET_MODE                (GET_CPSR & MODE_FLAG)
 #define SIGN_BIT                ((UINT32)(1 << 31))
@@ -502,8 +511,10 @@ enum
 #define THUMB_SIGN_BIT               ((UINT32)(1 << 31))
 #define THUMB_SIGN_BITS_DIFFER(a, b) (((a)^(b)) >> 31)
 
-#define MODE32                  (GET_CPSR & 0x10)
-#define MODE26                  (!(GET_CPSR & 0x10))
+#define SR_MODE32               0x10
+
+#define MODE32                  (GET_CPSR & SR_MODE32)
+#define MODE26                  (!(GET_CPSR & SR_MODE32))
 #define GET_PC                  (MODE32 ? R15 : R15 & 0x03FFFFFC)
 
 #define ARM7_TLB_ABORT_D (1 << 0)
@@ -516,18 +527,33 @@ enum
 #define SET_REGISTER(state, reg, val)  SetRegister(state, reg, val)
 #define GET_MODE_REGISTER(state, mode, reg)       GetModeRegister(state, mode, reg)
 #define SET_MODE_REGISTER(state, mode, reg, val)  SetModeRegister(state, mode, reg, val)
-#define ARM7_CHECKIRQ           arm7_check_irq_state(cpustate)
+#define ARM7_CHECKIRQ           arm7_check_irq_state(arm)
 
 extern write32_device_func arm7_coproc_do_callback;
 extern read32_device_func arm7_coproc_rt_r_callback;
 extern write32_device_func arm7_coproc_rt_w_callback;
-extern void arm7_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
-extern void arm7_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
+extern void arm7_dt_r_callback(arm_state *arm, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *arm, UINT32 addr));
+extern void arm7_dt_w_callback(arm_state *arm, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *arm, UINT32 addr, UINT32 data));
 
 #ifdef UNUSED_DEFINITION
-extern char *(*arm7_dasm_cop_dt_callback)(arm_state *cpustate, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
-extern char *(*arm7_dasm_cop_rt_callback)(arm_state *cpustate, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
-extern char *(*arm7_dasm_cop_do_callback)(arm_state *cpustate, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
+extern char *(*arm7_dasm_cop_dt_callback)(arm_state *arm, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
+extern char *(*arm7_dasm_cop_rt_callback)(arm_state *arm, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
+extern char *(*arm7_dasm_cop_do_callback)(arm_state *arm, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
 #endif
+
+/* ARM flavors */
+enum arm_flavor
+{
+	/* ARM7 variants */
+	ARM_TYPE_ARM7,
+	ARM_TYPE_ARM7BE,
+	ARM_TYPE_ARM7500,
+	ARM_TYPE_PXA255,
+	ARM_TYPE_SA1110,
+
+	/* ARM9 variants */
+	ARM_TYPE_ARM9,
+	ARM_TYPE_ARM920T
+};
 
 #endif /* __ARM7CORE_H__ */
