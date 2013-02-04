@@ -424,7 +424,7 @@ WRITE8_MEMBER(es5510_device::host_w)
     break;
 
   case 0x80: /* Read select - GPR + INSTR */
-    logerror("ES5510: Read INSTR+GPR %02x (%s): %012" I64FMT "x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & 0xffffffffffffL, gpr[data] & 0xffffff, gpr[data]);
+    logerror("ES5510: Read INSTR+GPR %02x (%s): %012" I64FMT "x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & U64(0xffffffffffff), gpr[data] & 0xffffff, gpr[data]);
 
     /* Check if an INSTR address is selected */
     if (data < 0xa0) {
@@ -444,9 +444,9 @@ WRITE8_MEMBER(es5510_device::host_w)
 
   case 0xc0: /* Write select - INSTR */
     DESCRIBE_INSTR(buf, instr_latch, gpr[data]);
-    logerror("ES5510: Write INSTR %02x %012" I64FMT "x: %s\n",data, instr_latch&0xffffffffffffL, buf);
+    logerror("ES5510: Write INSTR %02x %012" I64FMT "x: %s\n",data, instr_latch&U64(0xffffffffffff), buf);
     if (data < 0xa0) {
-      instr[data] = instr_latch&0xffffffffffffL;
+      instr[data] = instr_latch&U64(0xffffffffffff);
     }
     break;
 
@@ -587,7 +587,7 @@ void es5510_device::execute_run() {
       if (mulacc.write_result) {
 	mulacc.product = (mulacc.cValue * mulacc.dValue) << mulshift;
 	mulacc.result = (mulacc.accumulate ? machl : 0) + mulacc.product;
-	INT32 tmp = (mulacc.result & 0x0000ffffff000000) >> 24;
+	INT32 tmp = (mulacc.result & U64(0x0000ffffff000000)) >> 24;
 	if (mulacc.dst & SRC_DST_REG) {
 	  machl = mulacc.result;
 	  write_reg(mulacc.cReg, tmp);
