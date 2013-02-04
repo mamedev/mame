@@ -640,7 +640,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::cps2_interrupt)
 	{
 		m_cps_b_regs[0x10/2] = 0;
 		m_maincpu->set_input_line(4, HOLD_LINE);
-		cps2_set_sprite_priorities(timer.machine());
+		cps2_set_sprite_priorities();
 		timer.machine().primary_screen->update_partial(param);
 		m_scancalls++;
 //      popmessage("IRQ4 scancounter = %04i", param);
@@ -651,7 +651,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::cps2_interrupt)
 	{
 		m_cps_b_regs[0x12 / 2] = 0;
 		m_maincpu->set_input_line(4, HOLD_LINE);
-		cps2_set_sprite_priorities(timer.machine());
+		cps2_set_sprite_priorities();
 		timer.machine().primary_screen->update_partial(param);
 		m_scancalls++;
 //      popmessage("IRQ4 scancounter = %04i", param);
@@ -664,10 +664,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(cps_state::cps2_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 		if(m_scancalls)
 		{
-			cps2_set_sprite_priorities(timer.machine());
+			cps2_set_sprite_priorities();
 			timer.machine().primary_screen->update_partial(256);
 		}
-		cps2_objram_latch(timer.machine());
+		cps2_objram_latch();
 	}
 //  popmessage("Raster calls = %i", m_scancalls);
 }

@@ -258,6 +258,24 @@ public:
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
 	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cps1_get_video_base();
+	void cps1_gfx_decode();
+	void unshuffle(UINT64 *buf, int len);
+	void cps2_gfx_decode();
+	int gfxrom_bank_mapper(int type, int code);
+	void cps1_update_transmasks();
+	void cps1_build_palette(const UINT16* const palette_base);
+	void cps1_find_last_sprite();
+	void cps1_render_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cps2_find_last_sprite();
+	void cps2_render_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks);
+	void cps1_render_stars(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cps1_render_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask);
+	void cps1_render_high_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
+	void cps2_set_sprite_priorities();
+	void cps2_objram_latch();
+	UINT16 *cps2_objbase();
+
+
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
