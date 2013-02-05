@@ -12352,6 +12352,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="tmds1" supported="no">
     <description>Tokimeki Memorial Drama Series Vol.1 - Nijiiro no Seishun (Japan)</description>
     <year>199?</year>
@@ -12365,6 +12366,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="tokyomaj" supported="no">
     <description>Tokyo Majin Gakuen Gehouchou (Japan)</description>
     <year>199?</year>
@@ -12388,7 +12390,8 @@ A few comments on these:
     </part>
   </software>
 
-  <software name="tombathe" supported="no">
+  <!-- black screen -->
+  <software name="tomba" supported="no">
     <description>Tomba! The Wild Adventures (Japan)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
@@ -12401,6 +12404,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="tomikato" supported="no">
     <description>Tomikatown wo Tukurou! (Japan)</description>
     <year>199?</year>
@@ -12414,6 +12418,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- hangs on now loading -->
   <software name="topoloja" supported="no">
     <description>ToPoLo (Japan)</description>
     <year>199?</year>
@@ -12427,7 +12432,8 @@ A few comments on these:
     </part>
   </software>
 
-  <software name="toshinde" supported="no">
+  <!-- black screen after company logos -->
+  <software name="toshcard" supported="no">
     <description>Toshinden Card Quest (Japan)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
@@ -12440,6 +12446,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="tougemax" supported="no">
     <description>Touge Max G (Japan)</description>
     <year>199?</year>
@@ -12481,6 +12488,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="toysdrea" supported="no">
     <description>Toys Dream (Japan)</description>
     <year>199?</year>
@@ -12507,7 +12515,8 @@ A few comments on these:
       </diskarea>
     </part>
   </software>
-
+  
+  <!-- boot ok -->
   <software name="trumpshi" supported="no">
     <description>Trump Shiyouyo! (Japan)</description>
     <year>199?</year>
@@ -12521,6 +12530,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="tsuntsu2" supported="no">
     <description>Tsun-tsun-gumi 2 - Moji Moji Bakkun (Japan)</description>
     <year>199?</year>
@@ -12534,6 +12544,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="tsuntsu3" supported="no">
     <description>Tsun-tsun-gumi 3 - Kanji Vader (Japan)</description>
     <year>199?</year>
@@ -12547,6 +12558,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="tsuribak" supported="no">
     <description>Tsuri Baka Nisshi (Japan)</description>
     <year>199?</year>
@@ -12560,6 +12572,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="tvanimat" supported="no">
     <description>TV Animation X - Unmei no Tatakai (Japan)</description>
     <year>199?</year>
@@ -12573,6 +12586,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="twingodd" supported="no">
     <description>Twin Goddesses (Japan)</description>
     <year>199?</year>
@@ -12586,6 +12600,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="twinbeet" supported="no">
     <description>Twinbee Taisen Puzzle-Dama (Japan)</description>
     <year>199?</year>
@@ -12599,6 +12614,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="twinbeer" supported="no">
     <description>TwinBee-RPG (Japan)</description>
     <year>199?</year>
@@ -12612,6 +12628,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="twinssto" supported="no">
     <description>Twins Story (Japan)</description>
     <year>199?</year>
@@ -12639,6 +12656,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="ufoadayi" supported="no">
     <description>UFO - A Day in the Life (Japan)</description>
     <year>199?</year>
@@ -12652,6 +12670,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen, bad sounds -->
   <software name="ugetsuki" supported="no">
     <description>Ugetsu Kitan (Japan)</description>
     <year>199?</year>
@@ -12665,6 +12684,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="ukiukits" supported="no">
     <description>Ukiuki Tsuri Tengoku - Uogami Densetsu wo Oe (Japan)</description>
     <year>199?</year>
@@ -12678,6 +12698,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- stuck on sony logo -->
   <software name="ultimaun" supported="no">
     <description>Ultima Underworld - The Stygian Abyss (Japan)</description>
     <year>199?</year>
@@ -12691,6 +12712,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="ultraman" supported="no">
     <description>Ultraman Tiga &amp; Dyna Fighting Evolution - New Generations (Japan)</description>
     <year>199?</year>
@@ -12704,6 +12726,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="ultramze" supported="no">
     <description>Ultraman Zearth (Japan)</description>
     <year>199?</year>
@@ -12717,6 +12740,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after company logos -->
   <software name="uminonus" supported="no">
     <description>Umi no Nushi Tsuri (Japan)</description>
     <year>199?</year>
@@ -12730,6 +12754,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="umiharak" supported="no">
     <description>Umihara Kawase Shun - Second Edition (Japan)</description>
     <year>199?</year>
@@ -12743,6 +12768,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="ungrawal" supported="no">
     <description>Ungra Walker (Japan)</description>
     <year>199?</year>
@@ -12756,6 +12782,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="urawazam" supported="no">
     <description>Urawaza Mahjong - Korette Tenhoutte Yatsukai (Japan)</description>
     <year>199?</year>
@@ -12783,6 +12810,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok, every other fmv frame broken -->
   <software name="vampirek" supported="no">
     <description>Vampire - Kyuuketsuki Densetsu (Japan)</description>
     <year>199?</year>
@@ -12795,7 +12823,8 @@ A few comments on these:
       </diskarea>
     </part>
   </software>
-
+  
+  <!-- boot ok -->
   <software name="vehiclec" supported="no">
     <description>Vehicle Cavalier (Japan)</description>
     <year>199?</year>
@@ -12809,6 +12838,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="victorys" supported="no">
     <description>Victory Spike (Japan)</description>
     <year>199?</year>
@@ -12822,6 +12852,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after copyrights -->
   <software name="victoryz" supported="no">
     <description>Victory Zone (Japan)</description>
     <year>199?</year>
@@ -12835,6 +12866,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after memory card message -->
   <software name="virtualh" supported="no">
     <description>Virtual Hiyru no Ken (Japan)</description>
     <year>199?</year>
@@ -12848,6 +12880,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="virtualk" supported="no">
     <description>Virtual Kyotei '98 (Japan)</description>
     <year>199?</year>
@@ -12861,6 +12894,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="virtualp" supported="no">
     <description>Virtual Pro Wrestling (Japan)</description>
     <year>199?</year>
@@ -12874,7 +12908,8 @@ A few comments on these:
     </part>
   </software>
 
-  <software name="virusthe" supported="no">
+  <!-- boot ok -->
+  <software name="virus" supported="no">
     <description>Virus - The Battle Field (Japan)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
@@ -12887,6 +12922,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="visionof" supported="no">
     <description>Vision Of Escaflowne, The (Japan)</description>
     <year>199?</year>
@@ -12900,6 +12936,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- hangs loading afte initial fmv -->
   <software name="volfossj" supported="no">
     <description>Volfoss (Japan)</description>
     <year>199?</year>
@@ -12913,6 +12950,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="wagamama" supported="no">
     <description>Wagamama Fairy Mirumo de Pon! (Japan)</description>
     <year>199?</year>
@@ -12926,6 +12964,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="wangantr" supported="no">
     <description>Wangan Trial (Japan)</description>
     <year>199?</year>
@@ -12944,6 +12983,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="warerami" supported="no">
     <description>Warera Mitsurin Tankentai!! (Japan)</description>
     <year>199?</year>
@@ -12957,6 +12997,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="watersum" supported="no">
     <description>Water Summer (Japan)</description>
     <year>199?</year>
@@ -12970,6 +13011,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="weddingp" supported="no">
     <description>Wedding Peach - Doki Doki Oironaoshi Fashion Daisakuse (Japan)</description>
     <year>199?</year>
@@ -12983,6 +13025,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- stuck on sony logo -->
   <software name="welcomeh" supported="no">
     <description>Welcome House</description>
     <year>199?</year>
@@ -12996,6 +13039,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="weltorve" supported="no">
     <description>Weltorv Estleia (Japan)</description>
     <year>199?</year>
@@ -13009,6 +13053,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="whitedia" supported="no">
     <description>White Diamond (Japan)</description>
     <year>199?</year>
@@ -13022,6 +13067,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- hangs / gets stuck on loading screen playing bad sound -->
   <software name="wingover" supported="no">
     <description>Wing Over (Japan)</description>
     <year>199?</year>
