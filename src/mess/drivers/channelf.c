@@ -216,7 +216,7 @@ INPUT_PORTS_END
 
 
 
-static DEVICE_IMAGE_LOAD( channelf_cart )
+DEVICE_IMAGE_LOAD_MEMBER( channelf_state, channelf_cart )
 {
 	UINT32 size;
 
@@ -251,7 +251,7 @@ static MACHINE_CONFIG_FRAGMENT( channelf_cart )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,chf")
 	MCFG_CARTSLOT_INTERFACE("channelf_cart")
-	MCFG_CARTSLOT_LOAD(channelf_cart)
+	MCFG_CARTSLOT_LOAD(channelf_state,channelf_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","channelf")

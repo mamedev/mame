@@ -560,7 +560,7 @@ DRIVER_INIT_MEMBER(gamecom_state,gamecom)
 	m_p_ram = m_region_maincpu->base(); // required here because pio_w gets called before machine_reset
 }
 
-DEVICE_IMAGE_LOAD( gamecom_cart1 )
+DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart1 )
 {
 	gamecom_state *state = image.device().machine().driver_data<gamecom_state>();
 	UINT32 filesize;
@@ -607,7 +607,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart1 )
 	return IMAGE_INIT_PASS;
 }
 
-DEVICE_IMAGE_LOAD( gamecom_cart2 )
+DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart2 )
 {
 	gamecom_state *state = image.device().machine().driver_data<gamecom_state>();
 	UINT32 filesize;

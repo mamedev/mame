@@ -828,7 +828,7 @@ static MACHINE_CONFIG_FRAGMENT( cpcplus_cartslot )
 	MCFG_CARTSLOT_EXTENSION_LIST("cpr,bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("gx4000_cart")
-	MCFG_CARTSLOT_LOAD(amstrad_plus_cartridge)
+	MCFG_CARTSLOT_LOAD(amstrad_state,amstrad_plus_cartridge)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gx4000")
 MACHINE_CONFIG_END
 

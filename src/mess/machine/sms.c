@@ -1554,34 +1554,33 @@ static int detect_lphaser_xoffset( running_machine &machine, UINT8 *rom )
 }
 
 
-DEVICE_START( sms_cart )
+DEVICE_IMAGE_START_MEMBER( sms_state, sms_cart )
 {
-	sms_state *state = device->machine().driver_data<sms_state>();
 	int i;
 
 	for (i = 0; i < MAX_CARTRIDGES; i++)
 	{
-		state->m_cartridge[i].ROM = NULL;
-		state->m_cartridge[i].size = 0;
-		state->m_cartridge[i].features = 0;
-		state->m_cartridge[i].cartSRAM = NULL;
-		state->m_cartridge[i].sram_save = 0;
-		state->m_cartridge[i].cartRAM = NULL;
-		state->m_cartridge[i].ram_size = 0;
-		state->m_cartridge[i].ram_page = 0;
+		m_cartridge[i].ROM = NULL;
+		m_cartridge[i].size = 0;
+		m_cartridge[i].features = 0;
+		m_cartridge[i].cartSRAM = NULL;
+		m_cartridge[i].sram_save = 0;
+		m_cartridge[i].cartRAM = NULL;
+		m_cartridge[i].ram_size = 0;
+		m_cartridge[i].ram_page = 0;
 	}
-	state->m_current_cartridge = 0;
+	m_current_cartridge = 0;
 
-	state->m_bios_port = (IO_EXPANSION | IO_CARTRIDGE | IO_CARD);
-	if (!state->m_is_gamegear && !state->m_has_bios)
+	m_bios_port = (IO_EXPANSION | IO_CARTRIDGE | IO_CARD);
+	if (!m_is_gamegear && !m_has_bios)
 	{
-		state->m_bios_port &= ~(IO_CARTRIDGE);
-		state->m_bios_port |= IO_BIOS_ROM;
+		m_bios_port &= ~(IO_CARTRIDGE);
+		m_bios_port |= IO_BIOS_ROM;
 	}
 }
 
 
-DEVICE_IMAGE_LOAD( sms_cart )
+DEVICE_IMAGE_LOAD_MEMBER( sms_state, sms_cart )
 {
 	running_machine &machine = image.device().machine();
 	sms_state *state = machine.driver_data<sms_state>();

@@ -224,11 +224,9 @@ static const riot6532_interface beta_riot_interface =
 
 /* Quickload */
 
-static DEVICE_IMAGE_UNLOAD( beta_eprom )
+DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
 {
-	beta_state *state = image.device().machine().driver_data<beta_state>();
-
-	UINT8 *ptr = state->m_eprom->base();
+	UINT8 *ptr = m_eprom->base();
 
 	image.fwrite(ptr, 0x800);
 }
@@ -271,7 +269,7 @@ static MACHINE_CONFIG_START( beta, beta_state )
 	MCFG_CARTSLOT_ADD(EPROM_TAG)
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_UNLOAD(beta_eprom)
+	MCFG_CARTSLOT_UNLOAD(beta_state,beta_eprom)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

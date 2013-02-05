@@ -45,16 +45,14 @@ INPUT_PORTS_END
 static const UPD7810_CONFIG gamepock_cpu_config = { TYPE_78C06, gamepock_io_callback };
 
 
-static DEVICE_START(gamepock_cart)
+DEVICE_IMAGE_START_MEMBER(gamepock_state,gamepock_cart)
 {
-	gamepock_state *state = device->machine().driver_data<gamepock_state>();
-	state->membank( "bank1" )->set_base( state->memregion("user1" )->base() );
+	membank( "bank1" )->set_base( memregion("user1" )->base() );
 }
 
 
-static DEVICE_IMAGE_LOAD(gamepock_cart) {
-	gamepock_state *state = image.device().machine().driver_data<gamepock_state>();
-	UINT8 *cart = state->memregion("user1" )->base();
+DEVICE_IMAGE_LOAD_MEMBER(gamepock_state,gamepock_cart) {
+	UINT8 *cart = memregion("user1" )->base();
 
 	if ( image.software_entry() == NULL )
 	{
@@ -69,7 +67,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 		cart = image.get_software_region( "rom" );
 	}
 
-	state->membank( "bank1" )->set_base( cart );
+	membank( "bank1" )->set_base( cart );
 
 	return IMAGE_INIT_PASS;
 }
@@ -102,8 +100,8 @@ static MACHINE_CONFIG_START( gamepock, gamepock_state )
 	MCFG_CARTSLOT_INTERFACE("gamepock_cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_START(gamepock_cart)
-	MCFG_CARTSLOT_LOAD(gamepock_cart)
+	MCFG_CARTSLOT_START(gamepock_state,gamepock_cart)
+	MCFG_CARTSLOT_LOAD(gamepock_state,gamepock_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gamepock")

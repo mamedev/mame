@@ -128,6 +128,8 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_B_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_callback);
 	DECLARE_READ8_MEMBER(riot_input_port_8_r);
+	DECLARE_DEVICE_IMAGE_START_MEMBER( a2600_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( a2600_cart );
 
 protected:
 	required_device<vcs_control_port_device> m_joy1;
@@ -542,25 +544,22 @@ static int detect_super_chip(running_machine &machine)
 }
 
 
-static DEVICE_START( a2600_cart )
+DEVICE_IMAGE_START_MEMBER( a2600_state, a2600_cart )
 {
-	a2600_state *state = device->machine().driver_data<a2600_state>();
-	state->m_banking_mode = 0xff;
+	m_banking_mode = 0xff;
 }
 
 
-static DEVICE_IMAGE_LOAD( a2600_cart )
+DEVICE_IMAGE_LOAD_MEMBER( a2600_state, a2600_cart )
 {
-	a2600_state *state = image.device().machine().driver_data<a2600_state>();
-	running_machine &machine = image.device().machine();
-	UINT8 *cart = CART;
+	UINT8 *cart = memregion("user1")->base();
 
 	if (image.software_entry() == NULL)
-		state->m_cart_size = image.length();
+		m_cart_size = image.length();
 	else
-		state->m_cart_size = image.get_software_region_length("rom");
+		m_cart_size = image.get_software_region_length("rom");
 
-	switch (state->m_cart_size)
+	switch (m_cart_size)
 	{
 	case 0x00800:
 	case 0x01000:
@@ -579,15 +578,15 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 		return 1; /* unsupported image format */
 	}
 
-	state->m_current_bank = 0;
+	m_current_bank = 0;
 
 	if (image.software_entry() == NULL)
 	{
-		image.fread(cart, state->m_cart_size);
+		image.fread(cart, m_cart_size);
 	}
 	else
 	{
-		memcpy(cart, image.get_software_region("rom"), state->m_cart_size);
+		memcpy(cart, image.get_software_region("rom"), m_cart_size);
 
 		const char *mapper = software_part_get_feature((software_part*)image.part_entry(), "mapper");
 
@@ -616,21 +615,21 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 				{ "8in1",  mode8in1 },
 			};
 
-			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && state->m_banking_mode == 0xff; i++)
+			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && m_banking_mode == 0xff; i++)
 			{
 				if (!mame_stricmp(mapper, mapper_types[i].mapper_name))
 				{
-					state->m_banking_mode = mapper_types[i].mapper_type;
+					m_banking_mode = mapper_types[i].mapper_type;
 				}
 			}
 		}
 	}
 
-	if (!(state->m_cart_size == 0x4000 && detect_modef6(image.device().machine())))
+	if (!(m_cart_size == 0x4000 && detect_modef6(machine())))
 	{
-		while (state->m_cart_size > 0x00800)
+		while (m_cart_size > 0x00800)
 		{
-			if (!memcmp(cart, &cart[state->m_cart_size/2],state->m_cart_size/2)) state->m_cart_size /= 2;
+			if (!memcmp(cart, &cart[m_cart_size/2],m_cart_size/2)) m_cart_size /= 2;
 			else break;
 		}
 	}
@@ -1922,8 +1921,8 @@ static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,a26")
 	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_START(a2600_cart)
-	MCFG_CARTSLOT_LOAD(a2600_cart)
+	MCFG_CARTSLOT_START(a2600_state,a2600_cart)
+	MCFG_CARTSLOT_LOAD(a2600_state,a2600_cart)
 	MCFG_CARTSLOT_INTERFACE("a2600_cart")
 
 	/* software lists */

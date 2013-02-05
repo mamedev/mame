@@ -71,14 +71,13 @@ static int svi318_verify_cart (UINT8 magic[2])
 		return IMAGE_VERIFY_FAIL;
 }
 
-DEVICE_START( svi318_cart )
+DEVICE_IMAGE_START_MEMBER( svi318_state, svi318_cart )
 {
-	svi318_state *state = device->machine().driver_data<svi318_state>();
-	state->m_pcart = NULL;
-	state->m_pcart_rom_size = 0;
+	m_pcart = NULL;
+	m_pcart_rom_size = 0;
 }
 
-DEVICE_IMAGE_LOAD( svi318_cart )
+DEVICE_IMAGE_LOAD_MEMBER( svi318_state, svi318_cart )
 {
 	svi318_state *state = image.device().machine().driver_data<svi318_state>();
 	UINT8 *p = state->memregion("user1")->base();
@@ -112,7 +111,7 @@ DEVICE_IMAGE_LOAD( svi318_cart )
 	return IMAGE_INIT_PASS;
 }
 
-DEVICE_IMAGE_UNLOAD( svi318_cart )
+DEVICE_IMAGE_UNLOAD_MEMBER( svi318_state, svi318_cart )
 {
 	svi318_state *state = image.device().machine().driver_data<svi318_state>();
 	state->m_pcart = NULL;

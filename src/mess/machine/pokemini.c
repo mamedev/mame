@@ -1359,7 +1359,7 @@ READ8_MEMBER(pokemini_state::pokemini_hwreg_r)
 	return data;
 }
 
-DEVICE_IMAGE_LOAD( pokemini_cart )
+DEVICE_IMAGE_LOAD_MEMBER( pokemini_state, pokemini_cart )
 {
 	if (image.software_entry() == NULL)
 	{

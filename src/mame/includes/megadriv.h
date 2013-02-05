@@ -111,6 +111,8 @@ public:
 	DECLARE_WRITE8_MEMBER(megadriv_68k_YM2612_write);
 	IRQ_CALLBACK_MEMBER(genesis_int_callback);
 	void megadriv_init_common();
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
 };
 
 class md_boot_state : public md_base_state
@@ -334,6 +336,8 @@ public:
 	int m_mt_bank_addr;
 
 	int m_cart_is_genesis[8];
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( megatech_cart );
 
 	/* Megatech BIOS specific */
 	UINT8* m_megatech_banked_ram;

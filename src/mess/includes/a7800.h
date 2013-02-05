@@ -70,6 +70,9 @@ public:
 	DECLARE_READ8_MEMBER(riot_joystick_r);
 	DECLARE_READ8_MEMBER(riot_console_button_r);
 	DECLARE_WRITE8_MEMBER(riot_button_pullup_w);
+
+	DECLARE_DEVICE_IMAGE_START_MEMBER( a7800_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( a7800_cart );
 };
 
 /*----------- defined in machine/a7800.c -----------*/
@@ -77,8 +80,5 @@ public:
 extern const riot6532_interface a7800_r6532_interface;
 
 void a7800_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
-
-DEVICE_START( a7800_cart );
-DEVICE_IMAGE_LOAD( a7800_cart );
 
 #endif /* A7800_H_ */

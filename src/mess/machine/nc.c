@@ -89,31 +89,31 @@ static int nc_card_load(device_image_interface &image, unsigned char **ptr)
 	return 0;
 }
 
-DEVICE_START( nc_pcmcia_card )
+
+DEVICE_IMAGE_START_MEMBER( nc_state, nc_pcmcia_card )
 {
-	nc_state *state = device->machine().driver_data<nc_state>();
 	/* card not present */
-	nc_set_card_present_state(device->machine(), 0);
+	nc_set_card_present_state(machine(), 0);
 	/* card ram NULL */
-	state->m_card_ram = NULL;
-	state->m_card_size = 0;
+	m_card_ram = NULL;
+	m_card_size = 0;
 }
 
+
 /* load pcmcia card */
-DEVICE_IMAGE_LOAD( nc_pcmcia_card )
+DEVICE_IMAGE_LOAD_MEMBER( nc_state, nc_pcmcia_card )
 {
-	nc_state *state = image.device().machine().driver_data<nc_state>();
 	/* filename specified */
 
 	/* attempt to load file */
-	if (nc_card_load(image, &state->m_card_ram))
+	if (nc_card_load(image, &m_card_ram))
 	{
-		if (state->m_card_ram!=NULL)
+		if (m_card_ram!=NULL)
 		{
 			/* card present! */
-			if (state->m_membank_card_ram_mask!=0)
+			if (m_membank_card_ram_mask!=0)
 			{
-				nc_set_card_present_state(image.device().machine(), 1);
+				nc_set_card_present_state(machine(), 1);
 			}
 			return IMAGE_INIT_PASS;
 		}
@@ -123,20 +123,20 @@ DEVICE_IMAGE_LOAD( nc_pcmcia_card )
 	return IMAGE_INIT_FAIL;
 }
 
-DEVICE_IMAGE_UNLOAD( nc_pcmcia_card )
+
+DEVICE_IMAGE_UNLOAD_MEMBER( nc_state, nc_pcmcia_card )
 {
-	nc_state *state = image.device().machine().driver_data<nc_state>();
 	/* save card data if there is any */
 	nc_card_save(image);
 
 	/* free ram allocated to card */
-	if (state->m_card_ram!=NULL)
+	if (m_card_ram!=NULL)
 	{
-		free(state->m_card_ram);
-		state->m_card_ram = NULL;
+		free(m_card_ram);
+		m_card_ram = NULL;
 	}
-	state->m_card_size = 0;
+	m_card_size = 0;
 
 	/* set card not present state */
-	nc_set_card_present_state(image.device().machine(), 0);
+	nc_set_card_present_state(machine(), 0);
 }

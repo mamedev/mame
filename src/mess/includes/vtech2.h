@@ -68,11 +68,9 @@ public:
 	DECLARE_READ8_MEMBER(mra_bank2);
 	DECLARE_READ8_MEMBER(mra_bank3);
 	DECLARE_READ8_MEMBER(mra_bank4);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( laser_cart );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( laser_cart );
 };
 
-
-/*----------- defined in machine/vtech2.c -----------*/
-DEVICE_IMAGE_LOAD( laser_cart );
-DEVICE_IMAGE_UNLOAD( laser_cart );
 
 #endif /* VTECH2_H_ */

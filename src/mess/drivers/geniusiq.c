@@ -239,6 +239,8 @@ public:
 
 	DECLARE_READ16_MEMBER(unk0_r) { return 0; }
 	DECLARE_READ16_MEMBER(unk_r) { return machine().rand(); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( iq128_cart );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( iq128_cart );
 
 private:
 	UINT16      m_gfx_y;
@@ -762,14 +764,14 @@ void geniusiq_state::cart_unload(device_image_interface &image)
 	m_cart_state = IQ128_NO_CART;
 }
 
-static DEVICE_IMAGE_LOAD(iq128_cart)
+DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
 {
-	return image.device().machine().driver_data<geniusiq_state>()->cart_load(image);
+	return cart_load(image);
 }
 
-static DEVICE_IMAGE_UNLOAD(iq128_cart)
+DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
 {
-	image.device().machine().driver_data<geniusiq_state>()->cart_unload(image);
+	cart_unload(image);
 }
 
 static MACHINE_CONFIG_START( iq128, geniusiq_state )
@@ -794,8 +796,8 @@ static MACHINE_CONFIG_START( iq128, geniusiq_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(iq128_cart)
-	MCFG_CARTSLOT_UNLOAD(iq128_cart)
+	MCFG_CARTSLOT_LOAD(geniusiq_state,iq128_cart)
+	MCFG_CARTSLOT_UNLOAD(geniusiq_state,iq128_cart)
 	MCFG_CARTSLOT_INTERFACE("iq128_cart")
 
 	/* Software lists */

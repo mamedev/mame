@@ -2026,14 +2026,13 @@ int lynx_verify_cart (char *header, int kind)
 	return IMAGE_VERIFY_PASS;
 }
 
-static DEVICE_IMAGE_LOAD( lynx_cart )
+DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
 {
 	/* Lynx carts have 19 address lines, the upper 8 used for bank select. The lower
 	11 bits are used to address data within the selected bank. Valid bank sizes are 256,
 	512, 1024 or 2048 bytes. Commercial roms use all 256 banks.*/
 
-	lynx_state *state = image.device().machine().driver_data<lynx_state>();
-	UINT8 *rom = state->memregion("user1")->base();
+	UINT8 *rom = memregion("user1")->base();
 	UINT32 size;
 	UINT8 header[0x40];
 
@@ -2063,10 +2062,10 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 			/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
 			it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
 			implement this as well */
-			state->m_granularity = header[4] | (header[5] << 8);
+			m_granularity = header[4] | (header[5] << 8);
 
 			logerror ("%s %dkb cartridge with %dbyte granularity from %s\n",
-					header + 10, size / 1024, state->m_granularity, header + 42);
+					header + 10, size / 1024, m_granularity, header + 42);
 
 			size -= 0x40;
 		}
@@ -2076,11 +2075,11 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 			(see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
 			These should work with most .lyx files, but we need additional info on raw cart images */
 			if (size == 0x20000)
-				state->m_granularity = 0x0200;
+				m_granularity = 0x0200;
 			else if (size == 0x80000)
-				state->m_granularity = 0x0800;
+				m_granularity = 0x0800;
 			else
-				state->m_granularity = 0x0400;
+				m_granularity = 0x0400;
 		}
 
 		if (image.fread( rom, size) != size)
@@ -2090,21 +2089,21 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 	{
 		size = image.get_software_region_length("rom");
 		if (size > 0xffff) // 64,128,256,512k cartridges
-		state->m_granularity = size >> 8;
+		m_granularity = size >> 8;
 		else
-		state->m_granularity = 0x400; // Homebrew roms not using all 256 banks (T-Tris) (none currently in softlist)
+		m_granularity = 0x400; // Homebrew roms not using all 256 banks (T-Tris) (none currently in softlist)
 
 		memcpy(rom, image.get_software_region("rom"), size);
 
 		const char *rotate = image.get_feature("rotation");
-		state->m_rotate = 0;
+		m_rotate = 0;
 		if (rotate)
 		{
 			if(strcmp(rotate, "RIGHT") == 0) {
-				state->m_rotate = 1;
+				m_rotate = 1;
 			}
 			else if (strcmp(rotate, "LEFT") == 0) {
-				state->m_rotate = 2;
+				m_rotate = 2;
 			}
 		}
 
@@ -2118,7 +2117,7 @@ MACHINE_CONFIG_FRAGMENT(lynx_cartslot)
 	MCFG_CARTSLOT_EXTENSION_LIST("lnx,lyx")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("lynx_cart")
-	MCFG_CARTSLOT_LOAD(lynx_cart)
+	MCFG_CARTSLOT_LOAD(lynx_state, lynx_cart)
 	MCFG_CARTSLOT_PARTIALHASH(lynx_partialhash)
 
 	/* Software lists */

@@ -841,7 +841,7 @@ static MACHINE_CONFIG_START( intv, intv_state )
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("int,rom,bin,itv")
-	MCFG_CARTSLOT_LOAD(intv_cart)
+	MCFG_CARTSLOT_LOAD(intv_state,intv_cart)
 	MCFG_CARTSLOT_INTERFACE("intv_cart")
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","intv")
@@ -890,13 +890,13 @@ static MACHINE_CONFIG_DERIVED( intvkbd, intv )
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("int,rom,bin,itv")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(intvkbd_cart)
+	MCFG_CARTSLOT_LOAD(intv_state,intvkbd_cart)
 	MCFG_CARTSLOT_INTERFACE("intv_cart")
 
 	MCFG_CARTSLOT_ADD("cart2")
 	MCFG_CARTSLOT_EXTENSION_LIST("int,rom,bin,itv")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(intvkbd_cart)
+	MCFG_CARTSLOT_LOAD(intv_state,intvkbd_cart)
 	MCFG_CARTSLOT_INTERFACE("intv_cart")
 MACHINE_CONFIG_END
 

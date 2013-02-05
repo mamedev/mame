@@ -66,6 +66,7 @@ public:
 	UINT8 m_digit;
 	UINT8 m_keydata;
 	TIMER_CALLBACK_MEMBER(mekd2_trace);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(mekd2_cart);
 };
 
 
@@ -295,7 +296,7 @@ static ACIA6850_INTERFACE( mekd2_acia_intf )
 	DEVCB_NULL                      /* out irq func */
 };
 
-static DEVICE_IMAGE_LOAD( mekd2_cart )
+DEVICE_IMAGE_LOAD_MEMBER( mekd2_state,mekd2_cart )
 {
 	static const char magic[] = "MEK6800D2";
 	char buff[9];
@@ -344,7 +345,7 @@ static MACHINE_CONFIG_START( mekd2, mekd2_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("d2")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(mekd2_cart)
+	MCFG_CARTSLOT_LOAD(mekd2_state,mekd2_cart)
 
 	/* Devices */
 	MCFG_PIA6821_ADD("pia_s", mekd2_s_mc6821_intf)

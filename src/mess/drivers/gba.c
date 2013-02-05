@@ -2955,7 +2955,7 @@ static int gba_get_pcb_id(const char *pcb)
 	return 0;
 }
 
-static DEVICE_IMAGE_LOAD( gba_cart )
+DEVICE_IMAGE_LOAD_MEMBER( gba_state, gba_cart )
 {
 	UINT8 *ROM = image.device().machine().root_device().memregion("cartridge")->base();
 	UINT32 cart_size;
@@ -3129,7 +3129,7 @@ static MACHINE_CONFIG_START( gbadv, gba_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("gba,bin")
 	MCFG_CARTSLOT_INTERFACE("gba_cart")
-	MCFG_CARTSLOT_LOAD(gba_cart)
+	MCFG_CARTSLOT_LOAD(gba_state,gba_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gba")
 MACHINE_CONFIG_END
 

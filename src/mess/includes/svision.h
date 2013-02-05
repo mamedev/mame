@@ -64,6 +64,7 @@ public:
 	TIMER_CALLBACK_MEMBER(svision_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(svision_pet_timer_dev);
 	void svision_irq();
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svision_cart);
 
 protected:
 	required_device<cpu_device> m_maincpu;

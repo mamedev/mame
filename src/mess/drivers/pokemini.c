@@ -95,7 +95,7 @@ static MACHINE_CONFIG_START( pokemini, pokemini_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("min,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("pokemini_cart")
-	MCFG_CARTSLOT_LOAD(pokemini_cart)
+	MCFG_CARTSLOT_LOAD(pokemini_state,pokemini_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pokemini")

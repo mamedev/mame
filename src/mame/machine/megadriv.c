@@ -1271,7 +1271,7 @@ MACHINE_CONFIG_END
 
 // FIXME: non-softlist loading should keep using ROM_CART_LOAD in the ROM definitions,
 // once we better integrate softlist with the old loading procedures
-static DEVICE_IMAGE_LOAD( _32x_cart )
+DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
 {
 	UINT32 length;
 	UINT8 *temp_copy;
@@ -1317,7 +1317,7 @@ MACHINE_CONFIG_FRAGMENT( _32x_cartslot )
 	MCFG_CARTSLOT_EXTENSION_LIST("32x,bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("_32x_cart")
-	MCFG_CARTSLOT_LOAD(_32x_cart)
+	MCFG_CARTSLOT_LOAD(md_base_state, _32x_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
 MACHINE_CONFIG_END
 

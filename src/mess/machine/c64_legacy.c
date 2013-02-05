@@ -505,30 +505,28 @@ enum {
 	*****************************************/
 };
 
-static DEVICE_IMAGE_UNLOAD( c64_cart )
+DEVICE_IMAGE_UNLOAD_MEMBER( legacy_c64_state, c64_cart )
 {
-	legacy_c64_state *state = image.device().machine().driver_data<legacy_c64_state>();
 	int i;
 
 	for (i = 0; i < C64_MAX_ROMBANK; i++)
 	{
-		state->m_cart.bank[i].size = 0;
-		state->m_cart.bank[i].addr = 0;
-		state->m_cart.bank[i].index = 0;
-		state->m_cart.bank[i].start = 0;
+		m_cart.bank[i].size = 0;
+		m_cart.bank[i].addr = 0;
+		m_cart.bank[i].index = 0;
+		m_cart.bank[i].start = 0;
 	}
 }
 
 
-static DEVICE_START( c64_cart )
+DEVICE_IMAGE_START_MEMBER( legacy_c64_state, c64_cart )
 {
-	legacy_c64_state *state = device->machine().driver_data<legacy_c64_state>();
 	/* In the first slot we can load a .crt file. In this case we want
 	    to use game & exrom values from the header, not the default ones. */
-	state->m_cart.game = -1;
-	state->m_cart.exrom = -1;
-	state->m_cart.mapper = GENERIC_CRT;
-	state->m_cart.n_banks = 0;
+	m_cart.game = -1;
+	m_cart.exrom = -1;
+	m_cart.mapper = GENERIC_CRT;
+	m_cart.n_banks = 0;
 }
 
 static int c64_crt_load( device_image_interface &image )
@@ -1166,7 +1164,7 @@ static void c64_software_list_cartridge_load(device_image_interface &image)
 	}
 }
 
-static DEVICE_IMAGE_LOAD( c64_cart )
+DEVICE_IMAGE_LOAD_MEMBER( legacy_c64_state, c64_cart )
 {
 	int result = IMAGE_INIT_PASS;
 
@@ -1184,16 +1182,16 @@ MACHINE_CONFIG_FRAGMENT( c64_cartslot )
 	MCFG_CARTSLOT_EXTENSION_LIST("crt,80")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("c64_cart")
-	MCFG_CARTSLOT_START(c64_cart)
-	MCFG_CARTSLOT_LOAD(c64_cart)
-	MCFG_CARTSLOT_UNLOAD(c64_cart)
+	MCFG_CARTSLOT_START(legacy_c64_state,c64_cart)
+	MCFG_CARTSLOT_LOAD(legacy_c64_state,c64_cart)
+	MCFG_CARTSLOT_UNLOAD(legacy_c64_state,c64_cart)
 
 	MCFG_CARTSLOT_ADD("cart2")
 	MCFG_CARTSLOT_EXTENSION_LIST("crt,80")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_START(c64_cart)
-	MCFG_CARTSLOT_LOAD(c64_cart)
-	MCFG_CARTSLOT_UNLOAD(c64_cart)
+	MCFG_CARTSLOT_START(legacy_c64_state,c64_cart)
+	MCFG_CARTSLOT_LOAD(legacy_c64_state,c64_cart)
+	MCFG_CARTSLOT_UNLOAD(legacy_c64_state,c64_cart)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 MACHINE_CONFIG_END

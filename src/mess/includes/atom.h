@@ -116,6 +116,8 @@ public:
 	/* devices */
 	int m_previous_i8271_int_state;
 	TIMER_DEVICE_CALLBACK_MEMBER(cassette_output_tick);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( atom_cart );
 };
 
 class atomeb_state : public atom_state

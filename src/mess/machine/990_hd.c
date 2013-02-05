@@ -203,7 +203,7 @@ DEVICE_STOP( ti990_hd )
 /*
     Initialize hard disk unit and open a hard disk image
 */
-static DEVICE_IMAGE_LOAD( ti990_hd )
+static DEVICE_IMAGE_LOAD_LEGACY( ti990_hd )
 {
 	int id = get_id_from_device( &image.device() );
 	hd_unit_t *d;
@@ -280,7 +280,7 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 /*
     close a hard disk image
 */
-static DEVICE_IMAGE_UNLOAD( ti990_hd )
+static DEVICE_IMAGE_UNLOAD_LEGACY( ti990_hd )
 {
 	int id = get_id_from_device( image );
 	hd_unit_t *d;
@@ -1038,8 +1038,8 @@ WRITE16_HANDLER(ti990_hdc_w)
 
 static const struct harddisk_interface ti990_harddisk_config =
 {
-	DEVICE_IMAGE_LOAD_NAME( ti990_hd ),
-	DEVICE_IMAGE_UNLOAD_NAME( ti990_hd ),
+	DEVICE_IMAGE_LOAD_NAME_LEGACY( ti990_hd ),
+	DEVICE_IMAGE_UNLOAD_NAME_LEGACY( ti990_hd ),
 	NULL,
 	NULL
 };

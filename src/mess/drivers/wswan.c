@@ -155,8 +155,8 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("ws,wsc,bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("wswan_cart")
-	MCFG_CARTSLOT_START(wswan_cart)
-	MCFG_CARTSLOT_LOAD(wswan_cart)
+	MCFG_CARTSLOT_START(wswan_state,wswan_cart)
+	MCFG_CARTSLOT_LOAD(wswan_state,wswan_cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","wswan")

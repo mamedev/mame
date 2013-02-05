@@ -109,6 +109,9 @@ public:
 	DECLARE_WRITE8_MEMBER(svi318_ppi_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(svi_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(svi_fdc_drq_w);
+	DECLARE_DEVICE_IMAGE_START_MEMBER(svi318_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svi318_cart);
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(svi318_cart);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -142,11 +145,6 @@ protected:
 extern const i8255_interface svi318_ppi8255_interface;
 extern const ins8250_interface svi318_ins8250_interface[2];
 extern const wd17xx_interface svi_wd17xx_interface;
-
-DEVICE_START( svi318_cart );
-DEVICE_IMAGE_LOAD( svi318_cart );
-DEVICE_IMAGE_UNLOAD( svi318_cart );
-
 
 int svi318_cassette_present(running_machine &machine, int id);
 

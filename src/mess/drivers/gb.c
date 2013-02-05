@@ -590,8 +590,8 @@ static MACHINE_CONFIG_DERIVED( gameboy, gb_common )
 	MCFG_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,gbc,sgb,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("gameboy_cart")
-	MCFG_CARTSLOT_START(gb_cart)
-	MCFG_CARTSLOT_LOAD(gb_cart)
+	MCFG_CARTSLOT_START(gb_state,gb_cart)
+	MCFG_CARTSLOT_LOAD(gb_state,gb_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gameboy")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gbc_list","gbcolor")
 MACHINE_CONFIG_END
@@ -648,8 +648,8 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gb_common )
 	MCFG_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,gbc,sgb,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("gameboy_cart")
-	MCFG_CARTSLOT_START(gb_cart)
-	MCFG_CARTSLOT_LOAD(gb_cart)
+	MCFG_CARTSLOT_START(gb_state,gb_cart)
+	MCFG_CARTSLOT_LOAD(gb_state,gb_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gbcolor")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gb_list","gameboy")
 MACHINE_CONFIG_END
@@ -689,7 +689,7 @@ static MACHINE_CONFIG_START( megaduck, gb_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("megaduck_cart")
-	MCFG_CARTSLOT_LOAD(megaduck_cart)
+	MCFG_CARTSLOT_LOAD(gb_state,megaduck_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megaduck")
 MACHINE_CONFIG_END
 

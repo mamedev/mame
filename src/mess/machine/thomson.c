@@ -399,7 +399,7 @@ static UINT8 thom_cart_nb_banks; /* number of 16 KB banks (up to 4) */
 static UINT8 thom_cart_bank;     /* current bank */
 
 
-DEVICE_IMAGE_LOAD( to7_cartridge )
+DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 {
 	int i,j;
 	UINT8* pos = image.device().machine().root_device().memregion("maincpu" )->base() + 0x10000;
@@ -1942,7 +1942,7 @@ static UINT8 mo5_reg_cart; /* 0xa7cb bank switch */
 
 
 
-DEVICE_IMAGE_LOAD( mo5_cartridge )
+DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 {
 	UINT8* pos = image.device().machine().root_device().memregion("maincpu")->base() + 0x10000;
 	UINT64 size = image.length();

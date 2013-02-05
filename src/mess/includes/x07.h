@@ -199,6 +199,8 @@ public:
 	inline void draw_point(UINT8 x, UINT8 y, UINT8 color);
 	inline void draw_udk();
 
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( x07_card );
+
 	/* general */
 	UINT8 m_sleep;
 	UINT8 m_warm_start;

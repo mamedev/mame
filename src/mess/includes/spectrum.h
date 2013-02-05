@@ -123,6 +123,9 @@ public:
 	UINT32 screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(spec_interrupt);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( spectrum_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( timex_cart );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( timex_cart );
 
 	unsigned int m_previous_border_x, m_previous_border_y;
 	bitmap_ind16 m_border_bitmap;

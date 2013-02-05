@@ -69,9 +69,8 @@ static int msx_probe_type (UINT8* pmem, int size)
 		return (asc8 > asc16) ? 4 : 5;
 }
 
-DEVICE_IMAGE_LOAD (msx_cart)
+DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 {
-	msx_state *state = image.device().machine().driver_data<msx_state>();
 	int size;
 	int size_aligned;
 	UINT8 *mem;
@@ -333,15 +332,14 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	if (msx_slot_list[type].loadsram)
 		msx_slot_list[type].loadsram (image.device().machine(), st);
 
-	state->m_cart_state[id] = st;
+	m_cart_state[id] = st;
 	msx_memory_set_carts (image.device().machine());
 
 	return IMAGE_INIT_PASS;
 }
 
-DEVICE_IMAGE_UNLOAD (msx_cart)
+DEVICE_IMAGE_UNLOAD_MEMBER(msx_state, msx_cart)
 {
-	msx_state *state = image.device().machine().driver_data<msx_state>();
 	int id = -1;
 
 	if (strcmp(image.device().tag(),":cart1")==0)
@@ -356,8 +354,8 @@ DEVICE_IMAGE_UNLOAD (msx_cart)
 		return;
 	}
 
-	if (msx_slot_list[state->m_cart_state[id]->m_type].savesram)
-		msx_slot_list[state->m_cart_state[id]->m_type].savesram (image.device().machine(), state->m_cart_state[id]);
+	if (msx_slot_list[m_cart_state[id]->m_type].savesram)
+		msx_slot_list[m_cart_state[id]->m_type].savesram (machine(), m_cart_state[id]);
 }
 
 void msx_vdp_interrupt(device_t *, v99x8_device &device, int i)

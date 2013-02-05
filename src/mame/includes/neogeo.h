@@ -231,6 +231,7 @@ public:
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(auto_animation_timer_callback);
 	TIMER_CALLBACK_MEMBER(sprite_line_timer_callback);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(neo_cartridge);
 	void neogeo_postload();
 	void regenerate_pens();
 
@@ -254,7 +255,6 @@ void neogeo_set_display_counter_msb(address_space &space, UINT16 data);
 void neogeo_set_display_counter_lsb(address_space &space, UINT16 data);
 void neogeo_acknowledge_interrupt(running_machine &machine, UINT16 data);
 void neogeo_set_main_cpu_bank_address(address_space &space, UINT32 bank_address);
-DEVICE_IMAGE_LOAD( neo_cartridge );
 void neogeo_audio_cpu_banking_init( running_machine &machine );
 void neogeo_main_cpu_banking_init( running_machine &machine );
 void neogeo_set_main_cpu_vector_table_source( running_machine &machine, UINT8 data );

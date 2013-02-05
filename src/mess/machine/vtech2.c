@@ -313,7 +313,7 @@ void vtech2_state::mwa_bank(int bank, int offs, int data)
 	}
 }
 
-DEVICE_IMAGE_LOAD( laser_cart )
+DEVICE_IMAGE_LOAD_MEMBER( vtech2_state, laser_cart )
 {
 	vtech2_state *state = image.device().machine().driver_data<vtech2_state>();
 	int size = 0;
@@ -332,7 +332,7 @@ DEVICE_IMAGE_LOAD( laser_cart )
 	return size > 0 ? IMAGE_INIT_PASS : IMAGE_INIT_FAIL;
 }
 
-DEVICE_IMAGE_UNLOAD( laser_cart )
+DEVICE_IMAGE_UNLOAD_MEMBER( vtech2_state, laser_cart )
 {
 	vtech2_state *state = image.device().machine().driver_data<vtech2_state>();
 	state->m_laser_bank_mask &= ~0xf000;

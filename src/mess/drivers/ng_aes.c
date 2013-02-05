@@ -1528,7 +1528,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( aes, neogeo_base, ng_aes_state )
 	MCFG_MACHINE_RESET_OVERRIDE(ng_aes_state, neogeo)
 
 	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_LOAD(neo_cartridge)
+	MCFG_CARTSLOT_LOAD(ng_aes_state,neo_cartridge)
 	MCFG_CARTSLOT_INTERFACE("neo_cart")
 	MCFG_CARTSLOT_MANDATORY
 

@@ -48,6 +48,7 @@ public:
 	TIMER_CALLBACK_MEMBER(paddle_pulse_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(paddle_update_callback);
 	DECLARE_WRITE_LINE_MEMBER(coleco_vdp_interrupt);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(czz50_cart);
 };
 
 #endif

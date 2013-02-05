@@ -207,6 +207,7 @@ public:
 	TIMER_CALLBACK_MEMBER(supracan_line_on_callback);
 	TIMER_CALLBACK_MEMBER(supracan_line_off_callback);
 	TIMER_CALLBACK_MEMBER(supracan_video_callback);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(supracan_cart);
 };
 
 
@@ -1726,7 +1727,7 @@ WRITE16_MEMBER( supracan_state::supracan_video_w )
 }
 
 
-static DEVICE_IMAGE_LOAD( supracan_cart )
+DEVICE_IMAGE_LOAD_MEMBER( supracan_state, supracan_cart )
 {
 	UINT8 *cart = image.device().machine().root_device().memregion("cart")->base();
 	UINT32 size = 0;
@@ -1906,7 +1907,7 @@ static MACHINE_CONFIG_START( supracan, supracan_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_INTERFACE("supracan_cart")
-	MCFG_CARTSLOT_LOAD(supracan_cart)
+	MCFG_CARTSLOT_LOAD(supracan_state,supracan_cart)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","supracan")
 MACHINE_CONFIG_END

@@ -31,7 +31,7 @@
 static timex_cart_t timex_cart;
 
 
-DEVICE_IMAGE_LOAD( timex_cart )
+DEVICE_IMAGE_LOAD_LEGACY( timex_cart )
 {
 	int file_size;
 	UINT8 * file_data;
@@ -111,7 +111,7 @@ DEVICE_IMAGE_LOAD( timex_cart )
 	return IMAGE_INIT_PASS;
 }
 
-DEVICE_IMAGE_UNLOAD( timex_cart )
+DEVICE_IMAGE_UNLOAD_LEGACY( timex_cart )
 {
 	if (timex_cart.data)
 	{

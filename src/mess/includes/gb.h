@@ -267,6 +267,9 @@ public:
 	TIMER_CALLBACK_MEMBER(gb_lcd_timer_proc);
 	TIMER_CALLBACK_MEMBER(gbc_lcd_timer_proc);
 	DECLARE_WRITE8_MEMBER(gb_timer_callback);
+	DECLARE_DEVICE_IMAGE_START_MEMBER(gb_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gb_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(megaduck_cart);
 
 protected:
 	required_device<lr35902_cpu_device> m_maincpu;
@@ -308,19 +311,10 @@ protected:
 
 /*----------- defined in machine/gb.c -----------*/
 
-DEVICE_START(gb_cart);
-DEVICE_IMAGE_LOAD(gb_cart);
-
-
 /* -- Super Game Boy specific -- */
 #define SGB_BORDER_PAL_OFFSET   64  /* Border colours stored from pal 4-7   */
 #define SGB_XOFFSET             48  /* GB screen starts at column 48        */
 #define SGB_YOFFSET             40  /* GB screen starts at row 40           */
-
-
-/* -- Megaduck specific -- */
-extern DEVICE_IMAGE_LOAD(megaduck_cart);
-
 
 
 /*----------- defined in video/gb.c -----------*/

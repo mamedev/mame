@@ -451,7 +451,7 @@ void arcadia_state::palette_init()
 		colortable_entry_set_value(machine().colortable, i, arcadia_palette[i]);
 }
 
-static DEVICE_IMAGE_LOAD( arcadia_cart )
+DEVICE_IMAGE_LOAD_MEMBER( arcadia_state, arcadia_cart )
 {
 	UINT8 *rom = image.device().machine().root_device().memregion("maincpu")->base();
 	int size;
@@ -555,7 +555,7 @@ static MACHINE_CONFIG_START( arcadia, arcadia_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("arcadia_cart")
-	MCFG_CARTSLOT_LOAD(arcadia_cart)
+	MCFG_CARTSLOT_LOAD(arcadia_state,arcadia_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","arcadia")

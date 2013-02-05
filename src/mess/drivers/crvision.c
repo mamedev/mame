@@ -829,7 +829,7 @@ void laser2001_state::machine_start()
     CARTRIDGE
 ***************************************************************************/
 
-static DEVICE_IMAGE_LOAD( crvision_cart )
+DEVICE_IMAGE_LOAD_MEMBER( crvision_state, crvision_cart )
 {
 	UINT32 size;
 	UINT8 *temp_copy;
@@ -971,7 +971,7 @@ static MACHINE_CONFIG_START( creativision, crvision_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("crvision_cart")
-	MCFG_CARTSLOT_LOAD(crvision_cart)
+	MCFG_CARTSLOT_LOAD(crvision_state, crvision_cart)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1036,7 +1036,7 @@ static MACHINE_CONFIG_START( lasr2001, laser2001_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MCFG_CARTSLOT_INTERFACE("crvision_cart")
-	MCFG_CARTSLOT_LOAD(crvision_cart)
+	MCFG_CARTSLOT_LOAD(crvision_state, crvision_cart)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

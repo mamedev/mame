@@ -143,6 +143,8 @@ public:
 	INTERRUPT_GEN_MEMBER(vii_vblank);
 	TIMER_CALLBACK_MEMBER(tmb1_tick);
 	TIMER_CALLBACK_MEMBER(tmb2_tick);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
 };
 
 enum
@@ -924,10 +926,9 @@ static INPUT_PORTS_START( walle )
 		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
 INPUT_PORTS_END
 
-static DEVICE_IMAGE_LOAD( vii_cart )
+DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 {
-	vii_state *state = image.device().machine().driver_data<vii_state>();
-	UINT8 *cart = state->memregion( "cart" )->base();
+	UINT8 *cart = memregion( "cart" )->base();
 	if (image.software_entry() == NULL)
 	{
 		int size = image.length();
@@ -942,7 +943,7 @@ static DEVICE_IMAGE_LOAD( vii_cart )
 		memcpy(cart, image.get_software_region("rom"), filesize);
 	}
 
-	memcpy(state->m_p_cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
+	memcpy(m_p_cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
 
 	if( cart[0x3cd808] == 0x99 &&
 		cart[0x3cd809] == 0x99 &&
@@ -953,15 +954,14 @@ static DEVICE_IMAGE_LOAD( vii_cart )
 		cart[0x3cd80e] == 0x78 &&
 		cart[0x3cd80f] == 0x7f )
 	{
-		state->m_centered_coordinates = 0;
+		m_centered_coordinates = 0;
 	}
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_LOAD( vsmile_cart )
+DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
 {
-	vii_state *state = image.device().machine().driver_data<vii_state>();
-	UINT8 *cart = state->memregion( "cart" )->base();
+	UINT8 *cart = memregion( "cart" )->base();
 	if (image.software_entry() == NULL)
 	{
 		int size = image.length();
@@ -977,7 +977,7 @@ static DEVICE_IMAGE_LOAD( vsmile_cart )
 		int filesize = image.get_software_region_length("rom");
 		memcpy(cart, image.get_software_region("rom"), filesize);
 	}
-	memcpy(state->m_p_cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
+	memcpy(m_p_cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
 	return IMAGE_INIT_PASS;
 }
 
@@ -1105,7 +1105,7 @@ static MACHINE_CONFIG_START( vii, vii_state )
 
 	MCFG_CARTSLOT_ADD( "cart" )
 	MCFG_CARTSLOT_EXTENSION_LIST( "bin" )
-	MCFG_CARTSLOT_LOAD( vii_cart )
+	MCFG_CARTSLOT_LOAD( vii_state, vii_cart )
 	MCFG_CARTSLOT_INTERFACE("vii_cart")
 
 	MCFG_SOFTWARE_LIST_ADD("vii_cart","vii")
@@ -1128,7 +1128,7 @@ static MACHINE_CONFIG_START( vsmile, vii_state )
 	MCFG_CARTSLOT_ADD( "cart" )
 	MCFG_CARTSLOT_EXTENSION_LIST( "bin" )
 	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_LOAD( vsmile_cart )
+	MCFG_CARTSLOT_LOAD( vii_state, vsmile_cart )
 MACHINE_CONFIG_END
 
 static const i2cmem_interface i2cmem_interface =

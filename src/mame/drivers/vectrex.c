@@ -124,7 +124,7 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,gam,vec")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(vectrex_cart)
+	MCFG_CARTSLOT_LOAD(vectrex_state,vectrex_cart)
 	MCFG_CARTSLOT_INTERFACE("vectrex_cart")
 
 	/* software lists */

@@ -134,7 +134,7 @@ WRITE8_MEMBER(pce_state::pce_cartridge_ram_w)
 	m_cartridge_ram[offset] = data;
 }
 
-DEVICE_IMAGE_LOAD(pce_cart)
+DEVICE_IMAGE_LOAD_MEMBER(pce_state,pce_cart)
 {
 	pce_state *state = image.device().machine().driver_data<pce_state>();
 	UINT32 size;

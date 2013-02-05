@@ -47,6 +47,8 @@ public:
 	DECLARE_WRITE8_MEMBER( riot_pb_w );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( beta_eprom );
+
 	/* EPROM state */
 	int m_eprom_oe;
 	int m_eprom_ce;

@@ -471,7 +471,7 @@ DRIVER_INIT_MEMBER(svision_state,svisions)
 	m_pet.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_pet_timer),this));
 }
 
-static DEVICE_IMAGE_LOAD( svision_cart )
+DEVICE_IMAGE_LOAD_MEMBER( svision_state, svision_cart )
 {
 	UINT32 size;
 	UINT8 *temp_copy;
@@ -569,7 +569,7 @@ static MACHINE_CONFIG_START( svision, svision_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,ws,sv")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("svision_cart")
-	MCFG_CARTSLOT_LOAD(svision_cart)
+	MCFG_CARTSLOT_LOAD(svision_state, svision_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","svision")

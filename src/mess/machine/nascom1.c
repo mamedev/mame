@@ -178,24 +178,22 @@ WRITE8_MEMBER(nascom1_state::nascom1_hd6402_so)
 }
 
 
-DEVICE_IMAGE_LOAD( nascom1_cassette )
+DEVICE_IMAGE_LOAD_MEMBER( nascom1_state,nascom1_cassette )
 {
-	nascom1_state *state = image.device().machine().driver_data<nascom1_state>();
-	state->m_tape_size = image.length();
-	state->m_tape_image = (UINT8*)image.ptr();
-	if (!state->m_tape_image)
+	m_tape_size = image.length();
+	m_tape_image = (UINT8*)image.ptr();
+	if (!m_tape_image)
 		return IMAGE_INIT_FAIL;
 
-	state->m_tape_index = 0;
+	m_tape_index = 0;
 	return IMAGE_INIT_PASS;
 }
 
 
-DEVICE_IMAGE_UNLOAD( nascom1_cassette )
+DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_state,nascom1_cassette )
 {
-	nascom1_state *state = image.device().machine().driver_data<nascom1_state>();
-	state->m_tape_image = NULL;
-	state->m_tape_size = state->m_tape_index = 0;
+	m_tape_image = NULL;
+	m_tape_size = m_tape_index = 0;
 }
 
 

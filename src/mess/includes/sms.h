@@ -209,6 +209,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
 	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
 	void sms_machine_stop();
+	DECLARE_DEVICE_IMAGE_START_MEMBER(sms_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sms_cart);
 protected:
 	required_shared_ptr<UINT8> m_mainram;
 
@@ -228,10 +230,6 @@ protected:
 
 
 /*----------- defined in machine/sms.c -----------*/
-
-DEVICE_START( sms_cart );
-DEVICE_IMAGE_LOAD( sms_cart );
-
 
 #define IO_EXPANSION    (0x80)  /* Expansion slot enable (1= disabled, 0= enabled) */
 #define IO_CARTRIDGE    (0x40)  /* Cartridge slot enable (1= disabled, 0= enabled) */

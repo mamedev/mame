@@ -1496,35 +1496,34 @@ READ8_MEMBER(gb_state::gb_io_r)
 	}
 }
 
-DEVICE_START(gb_cart)
+DEVICE_IMAGE_START_MEMBER(gb_state,gb_cart)
 {
-	gb_state *state = device->machine().driver_data<gb_state>();
 	int I;
 
-	state->m_gb_dummy_rom_bank = auto_alloc_array(device->machine(), UINT8, 0x4000);
-	memset(state->m_gb_dummy_rom_bank, 0xff, 0x4000);
+	m_gb_dummy_rom_bank = auto_alloc_array(machine(), UINT8, 0x4000);
+	memset(m_gb_dummy_rom_bank, 0xff, 0x4000);
 
-	state->m_gb_dummy_ram_bank = auto_alloc_array(device->machine(), UINT8, 0x2000);
-	memset(state->m_gb_dummy_ram_bank, 0xff, 0x2000 );
+	m_gb_dummy_ram_bank = auto_alloc_array(machine(), UINT8, 0x2000);
+	memset(m_gb_dummy_ram_bank, 0xff, 0x2000 );
 
 	for(I = 0; I < MAX_ROMBANK; I++)
 	{
-		state->m_ROMMap[I] = state->m_gb_dummy_rom_bank;
+		m_ROMMap[I] = m_gb_dummy_rom_bank;
 	}
 	for(I = 0; I < MAX_RAMBANK; I++)
 	{
-		state->m_RAMMap[I] = state->m_gb_dummy_ram_bank;
+		m_RAMMap[I] = m_gb_dummy_ram_bank;
 	}
-	state->m_ROMBank00 = 0;
-	state->m_ROMBanks = 0;
-	state->m_RAMBanks = 0;
-	state->m_MBCType = MBC_NONE;
-	state->m_CartType = 0;
-	state->m_ROMMask = 0;
-	state->m_RAMMask = 0;
+	m_ROMBank00 = 0;
+	m_ROMBanks = 0;
+	m_RAMBanks = 0;
+	m_MBCType = MBC_NONE;
+	m_CartType = 0;
+	m_ROMMask = 0;
+	m_RAMMask = 0;
 }
 
-DEVICE_IMAGE_LOAD(gb_cart)
+DEVICE_IMAGE_LOAD_MEMBER(gb_state,gb_cart)
 {
 	gb_state *state = image.device().machine().driver_data<gb_state>();
 	static const char *const CartTypes[] =
@@ -2285,7 +2284,7 @@ WRITE8_MEMBER(gb_state::megaduck_rom_bank_select_type2)
 	}
 }
 
-DEVICE_IMAGE_LOAD(megaduck_cart)
+DEVICE_IMAGE_LOAD_MEMBER(gb_state,megaduck_cart)
 {
 	gb_state *state = image.device().machine().driver_data<gb_state>();
 	int I;

@@ -292,14 +292,6 @@ They can run the same software and accept the same devices and extensions.
 
 
 **********************************************************************/
-class thomson_state : public driver_device
-{
-public:
-	thomson_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
-
-};
-
 
 /* ------------ address maps ------------ */
 
@@ -692,7 +684,7 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("m7,rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(to7_cartridge)
+	MCFG_CARTSLOT_LOAD(thomson_state,to7_cartridge)
 	MCFG_CARTSLOT_INTERFACE("to7_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list","to7_cart")
 
@@ -1067,7 +1059,7 @@ static MACHINE_CONFIG_DERIVED( mo5, to7 )
 
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("m5,rom")
-	MCFG_CARTSLOT_LOAD(mo5_cartridge)
+	MCFG_CARTSLOT_LOAD(thomson_state,mo5_cartridge)
 	MCFG_CARTSLOT_INTERFACE("mo5_cart")
 
 	MCFG_DEVICE_REMOVE("cart_list")
@@ -2107,7 +2099,7 @@ static MACHINE_CONFIG_DERIVED( mo6, to7 )
 
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("m5,rom")
-	MCFG_CARTSLOT_LOAD(mo5_cartridge)
+	MCFG_CARTSLOT_LOAD(thomson_state, mo5_cartridge)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -2332,7 +2324,7 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("m5,rom")
-	MCFG_CARTSLOT_LOAD(mo5_cartridge)
+	MCFG_CARTSLOT_LOAD(thomson_state, mo5_cartridge)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

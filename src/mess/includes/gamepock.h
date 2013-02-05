@@ -30,6 +30,8 @@ public:
 	DECLARE_WRITE8_MEMBER( port_b_w );
 	DECLARE_READ8_MEMBER( port_c_r );
 	UINT32 screen_update_gamepock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_DEVICE_IMAGE_START_MEMBER(gamepock_cart);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gamepock_cart);
 };
 
 

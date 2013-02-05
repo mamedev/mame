@@ -130,6 +130,9 @@ public:
 	DECLARE_WRITE8_MEMBER(msx_printer_strobe_w);
 	DECLARE_WRITE8_MEMBER(msx_printer_data_w);
 	DECLARE_READ8_MEMBER(msx_printer_status_r);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( msx_cart );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( msx_cart );
 };
 
 
@@ -138,9 +141,6 @@ public:
 extern const i8255_interface msx_ppi8255_interface;
 extern const wd17xx_interface msx_wd17xx_interface;
 /* start/stop functions */
-
-DEVICE_IMAGE_LOAD( msx_cart );
-DEVICE_IMAGE_UNLOAD( msx_cart );
 
 void msx_vdp_interrupt(device_t *, v99x8_device &device, int i);
 

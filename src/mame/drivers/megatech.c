@@ -566,7 +566,7 @@ static const struct megatech_cart_region megatech_cart_table[] =
 	{ 0 }
 };
 
-static DEVICE_IMAGE_LOAD( megatech_cart )
+DEVICE_IMAGE_LOAD_MEMBER( mtech_state, megatech_cart )
 {
 	mtech_state *state = image.device().machine().driver_data<mtech_state>();
 	const struct megatech_cart_region *mt_cart = &megatech_cart_table[0], *this_cart;
@@ -620,7 +620,7 @@ static DEVICE_IMAGE_LOAD( megatech_cart )
 #define MCFG_MEGATECH_CARTSLOT_ADD(_tag) \
 	MCFG_CARTSLOT_ADD(_tag) \
 	MCFG_CARTSLOT_INTERFACE("megatech_cart") \
-	MCFG_CARTSLOT_LOAD(megatech_cart)
+	MCFG_CARTSLOT_LOAD(mtech_state, megatech_cart)
 
 MACHINE_CONFIG_FRAGMENT( megatech_cartslot )
 	MCFG_MEGATECH_CARTSLOT_ADD("cart1")

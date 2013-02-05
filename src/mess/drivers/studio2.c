@@ -433,7 +433,7 @@ void mpt02_state::machine_reset()
 	m_cti->reset();
 }
 
-DEVICE_IMAGE_LOAD( studio2_cart_load )
+DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 {
 	if (image.software_entry() == NULL)
 		return device_load_st2_cartslot_load(image);
@@ -454,7 +454,7 @@ static MACHINE_CONFIG_FRAGMENT( studio2_cartslot )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("st2,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(studio2_cart_load)
+	MCFG_CARTSLOT_LOAD(studio2_state,studio2_cart_load)
 	MCFG_CARTSLOT_INTERFACE("studio2_cart")
 
 	/* software lists */

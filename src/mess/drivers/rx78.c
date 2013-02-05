@@ -78,6 +78,7 @@ public:
 	DECLARE_DRIVER_INIT(rx78);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
 };
 
 
@@ -401,7 +402,7 @@ void rx78_state::machine_reset()
 {
 }
 
-static DEVICE_IMAGE_LOAD( rx78_cart )
+DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
 {
 	UINT8 *cart = image.device().machine().root_device().memregion("cart_img")->base();
 	UINT32 size;
@@ -480,7 +481,7 @@ static MACHINE_CONFIG_START( rx78, rx78_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(rx78_cart)
+	MCFG_CARTSLOT_LOAD(rx78_state,rx78_cart)
 	MCFG_CARTSLOT_INTERFACE("rx78_cart")
 
 	MCFG_RAM_ADD(RAM_TAG)

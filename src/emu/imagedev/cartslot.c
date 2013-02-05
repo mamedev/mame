@@ -24,11 +24,7 @@ cartslot_image_device::cartslot_image_device(const machine_config &mconfig, cons
 		m_extensions("bin"),
 		m_interface(NULL),
 		m_must_be_loaded(0),
-		m_device_start(NULL),
-		m_device_load(NULL),
-		m_device_unload(NULL),
-		m_device_partialhash(NULL),
-		m_device_displayinfo(NULL)
+		m_device_image_partialhash(NULL)
 {
 }
 
@@ -208,9 +204,9 @@ int cartslot_image_device::process_cartridge(bool load)
 void cartslot_image_device::device_start()
 {
 	/* if this cartridge has a custom DEVICE_START, use it */
-	if (m_device_start != NULL)
+	if (!m_device_image_start.isnull())
 	{
-		(*m_device_start)(this);
+		m_device_image_start();
 	}
 }
 
@@ -222,8 +218,8 @@ void cartslot_image_device::device_start()
 bool cartslot_image_device::call_load()
 {
 	/* if this cartridge has a custom DEVICE_IMAGE_LOAD, use it */
-	if (m_device_load != NULL)
-		return (*m_device_load)(*this);
+	if (!m_device_image_load.isnull())
+		return m_device_image_load(*this);
 
 	/* otherwise try the normal route */
 	return process_cartridge(true);
@@ -236,9 +232,9 @@ bool cartslot_image_device::call_load()
 void cartslot_image_device::call_unload()
 {
 	/* if this cartridge has a custom DEVICE_IMAGE_UNLOAD, use it */
-	if (m_device_unload != NULL)
+	if (!m_device_image_unload.isnull())
 	{
-		(*m_device_unload)(*this);
+		m_device_image_unload(*this);
 		return;
 	}
 	process_cartridge(false);

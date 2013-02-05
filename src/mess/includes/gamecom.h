@@ -260,6 +260,8 @@ public:
 	TIMER_CALLBACK_MEMBER(gamecom_scanline);
 	DECLARE_WRITE8_MEMBER( gamecom_handle_dma );
 	DECLARE_WRITE8_MEMBER( gamecom_update_timers );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart1 );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart2 );
 
 protected:
 	required_memory_bank m_bank1;
@@ -274,11 +276,5 @@ protected:
 	required_ioport m_io_styx;
 	required_ioport m_io_styy;
 };
-
-
-/*----------- defined in machine/gamecom.c -----------*/
-
-extern DEVICE_IMAGE_LOAD( gamecom_cart1 );
-extern DEVICE_IMAGE_LOAD( gamecom_cart2 );
 
 #endif /* GAMECOM_H_ */

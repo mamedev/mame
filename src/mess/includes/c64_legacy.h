@@ -89,6 +89,9 @@ public:
 	UINT8 *m_io_ram_r_ptr;
 	c64_cart_t m_cart;
 	int m_nmilevel;
+	DECLARE_DEVICE_IMAGE_START_MEMBER( c64_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( c64_cart );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( c64_cart );
 };
 
 

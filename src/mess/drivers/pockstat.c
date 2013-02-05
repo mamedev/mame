@@ -126,6 +126,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(input_update);
 	TIMER_CALLBACK_MEMBER(timer_tick);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pockstat_flash );
 };
 
 
@@ -956,7 +957,7 @@ UINT32 pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-static DEVICE_IMAGE_LOAD( pockstat_flash )
+DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
 {
 	int i, length;
 	UINT8 *cart = image.device().machine().root_device().memregion("flash")->base();
@@ -1007,7 +1008,7 @@ static MACHINE_CONFIG_START( pockstat, pockstat_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("gme")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(pockstat_flash)
+	MCFG_CARTSLOT_LOAD(pockstat_state, pockstat_flash)
 MACHINE_CONFIG_END
 
 /* ROM definition */

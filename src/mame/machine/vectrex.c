@@ -64,7 +64,7 @@ static int vectrex_verify_cart(char *data)
 
 *********************************************************************/
 
-DEVICE_IMAGE_LOAD(vectrex_cart)
+DEVICE_IMAGE_LOAD_MEMBER(vectrex_state,vectrex_cart)
 {
 	vectrex_state *state = image.device().machine().driver_data<vectrex_state>();
 	UINT8 *mem = state->memregion("maincpu")->base();

@@ -1313,12 +1313,12 @@ static MACHINE_CONFIG_START( ibmpcjr, pc_state )
 	MCFG_CARTSLOT_INTERFACE("ibmpcjr_cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("jrc")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(pcjr_cartridge)
+	MCFG_CARTSLOT_LOAD(pc_state,pcjr_cartridge)
 	MCFG_CARTSLOT_ADD("cart2")
 	MCFG_CARTSLOT_INTERFACE("ibmpcjr_cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("jrc")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(pcjr_cartridge)
+	MCFG_CARTSLOT_LOAD(pc_state,pcjr_cartridge)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

@@ -1913,9 +1913,9 @@ WRITE8_MEMBER(bbc_state::bbc_disc_w)
 /**************************************
    BBC B Rom loading functions
 ***************************************/
-DEVICE_IMAGE_LOAD( bbcb_cart )
+DEVICE_IMAGE_LOAD_MEMBER( bbc_state, bbcb_cart )
 {
-	UINT8 *mem = image.device().machine().root_device().memregion("user1")->base();
+	UINT8 *mem = machine().root_device().memregion("user1")->base();
 	int size, read_;
 	int addr = 0;
 	int index = 0;

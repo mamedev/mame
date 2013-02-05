@@ -24,6 +24,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(panel_check);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ssem_store);
 };
 
 
@@ -514,7 +515,7 @@ static void strlower(char *buf)
 * Image loading                                      *
 \****************************************************/
 
-static DEVICE_IMAGE_LOAD(ssem_store)
+DEVICE_IMAGE_LOAD_MEMBER(ssem_state,ssem_store)
 {
 	ssem_state *state = image.device().machine().driver_data<ssem_state>();
 	const char* image_name = image.filename();
@@ -650,7 +651,7 @@ static MACHINE_CONFIG_START( ssem, ssem_state )
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("snp,asm")
-	MCFG_CARTSLOT_LOAD(ssem_store)
+	MCFG_CARTSLOT_LOAD(ssem_state,ssem_store)
 MACHINE_CONFIG_END
 
 ROM_START( ssem )

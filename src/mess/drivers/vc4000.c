@@ -335,10 +335,9 @@ void vc4000_state::palette_init()
 	palette_set_colors(machine(), 0, vc4000_palette, ARRAY_LENGTH(vc4000_palette));
 }
 
-static DEVICE_IMAGE_LOAD( vc4000_cart )
+DEVICE_IMAGE_LOAD_MEMBER( vc4000_state, vc4000_cart )
 {
 	running_machine &machine = image.device().machine();
-	vc4000_state *state = machine.driver_data<vc4000_state>();
 	address_space &memspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 size;
 
@@ -353,23 +352,23 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 	if (size > 0x1000)  /* 6k rom + 1k ram - Chess2 only */
 	{
 		memspace.install_read_bank(0x0800, 0x15ff, "bank1");    /* extra rom */
-		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
+		membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
 
 		memspace.install_readwrite_bank(0x1800, 0x1bff, "bank2");   /* ram */
-		state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1800);
+		membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1800);
 	}
 	else if (size > 0x0800) /* some 4k roms have 1k of mirrored ram */
 	{
 		memspace.install_read_bank(0x0800, 0x0fff, "bank1");    /* extra rom */
-		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x0800);
+		membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x0800);
 
 		memspace.install_readwrite_bank(0x1000, 0x15ff, 0, 0x800, "bank2"); /* ram */
-		state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
+		membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
 	}
 	else if (size == 0x0800)    /* 2k roms + 2k ram - Hobby Module(Radofin) and elektor TVGC*/
 	{
 		memspace.install_readwrite_bank(0x0800, 0x0fff, "bank1"); /* ram */
-		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x0800);
+		membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x0800);
 	}
 
 	if (size > 0)
@@ -417,7 +416,7 @@ static MACHINE_CONFIG_START( vc4000, vc4000_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("vc4000_cart")
-	MCFG_CARTSLOT_LOAD(vc4000_cart)
+	MCFG_CARTSLOT_LOAD(vc4000_state,vc4000_cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vc4000")

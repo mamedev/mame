@@ -716,7 +716,7 @@ static int nes_cart_get_line( const char *feature )
 	return nes_line->line;
 }
 
-DEVICE_IMAGE_LOAD( nes_cart )
+DEVICE_IMAGE_LOAD_MEMBER( nes_state, nes_cart )
 {
 	nes_state *state = image.device().machine().driver_data<nes_state>();
 	state->m_pcb_id = NO_BOARD; // initialization

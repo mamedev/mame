@@ -608,6 +608,18 @@ MACHINE_RESET_MEMBER(spectrum_state,tc2048)
 }
 
 
+DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
+{
+	return device_load_timex_cart( image );
+}
+
+
+DEVICE_IMAGE_UNLOAD_MEMBER( spectrum_state, timex_cart )
+{
+	device_unload_timex_cart( image );
+}
+
+
 /* F4 Character Displayer - tc2048 code is inherited from the spectrum */
 static const gfx_layout ts2068_charlayout =
 {
@@ -653,8 +665,8 @@ static MACHINE_CONFIG_DERIVED( ts2068, spectrum_128 )
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("dck")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(timex_cart)
-	MCFG_CARTSLOT_UNLOAD(timex_cart)
+	MCFG_CARTSLOT_LOAD(spectrum_state,timex_cart)
+	MCFG_CARTSLOT_UNLOAD(spectrum_state,timex_cart)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)

@@ -218,6 +218,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineR);
 	void vboy_machine_stop();
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vboy_cart);
 };
 
 
@@ -1346,7 +1347,7 @@ WRITE32_MEMBER(vboy_state::sram_w)
 }
 
 
-static DEVICE_IMAGE_LOAD( vboy_cart )
+DEVICE_IMAGE_LOAD_MEMBER( vboy_state, vboy_cart )
 {
 	vboy_state *state = image.device().machine().driver_data<vboy_state>();
 	UINT32 chip = 0;
@@ -1422,7 +1423,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("vb,bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("vboy_cart")
-	MCFG_CARTSLOT_LOAD(vboy_cart)
+	MCFG_CARTSLOT_LOAD(vboy_state, vboy_cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")

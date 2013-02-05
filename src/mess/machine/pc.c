@@ -1578,7 +1578,7 @@ MACHINE_RESET_MEMBER(pc_state,pcjr)
 }
 
 
-DEVICE_IMAGE_LOAD( pcjr_cartridge )
+DEVICE_IMAGE_LOAD_MEMBER( pc_state, pcjr_cartridge )
 {
 	UINT32  address;
 	UINT32  size;

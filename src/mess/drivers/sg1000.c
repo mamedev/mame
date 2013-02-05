@@ -674,7 +674,7 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
     DEVICE_IMAGE_LOAD( sg1000_cart )
 -------------------------------------------------*/
 
-static DEVICE_IMAGE_LOAD( sg1000_cart )
+DEVICE_IMAGE_LOAD_MEMBER( sg1000_state,sg1000_cart )
 {
 	running_machine &machine = image.device().machine();
 	sg1000_state *state = machine.driver_data<sg1000_state>();
@@ -788,7 +788,7 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
     DEVICE_IMAGE_LOAD( omv_cart )
 -------------------------------------------------*/
 
-static DEVICE_IMAGE_LOAD( omv_cart )
+DEVICE_IMAGE_LOAD_MEMBER( sg1000_state,omv_cart )
 {
 	running_machine &machine = image.device().machine();
 	sg1000_state *state = machine.driver_data<sg1000_state>();
@@ -845,7 +845,7 @@ void sc3000_state::install_cartridge(UINT8 *ptr, int size)
     DEVICE_IMAGE_LOAD( sc3000_cart )
 -------------------------------------------------*/
 
-static DEVICE_IMAGE_LOAD( sc3000_cart )
+DEVICE_IMAGE_LOAD_MEMBER( sc3000_state,sc3000_cart )
 {
 	running_machine &machine = image.device().machine();
 	sc3000_state *state = machine.driver_data<sc3000_state>();
@@ -1097,7 +1097,7 @@ static MACHINE_CONFIG_START( sg1000, sg1000_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("sg,bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("sg1000_cart")
-	MCFG_CARTSLOT_LOAD(sg1000_cart)
+	MCFG_CARTSLOT_LOAD(sg1000_state,sg1000_cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")
@@ -1119,7 +1119,7 @@ static MACHINE_CONFIG_DERIVED( omv, sg1000 )
 	MCFG_CARTSLOT_MODIFY("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("sg,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(omv_cart)
+	MCFG_CARTSLOT_LOAD(sg1000_state,omv_cart)
 
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2K")
@@ -1156,7 +1156,7 @@ static MACHINE_CONFIG_START( sc3000, sc3000_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("sg,sc,bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("sg1000_cart")
-	MCFG_CARTSLOT_LOAD(sc3000_cart)
+	MCFG_CARTSLOT_LOAD(sc3000_state,sc3000_cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sg1000")

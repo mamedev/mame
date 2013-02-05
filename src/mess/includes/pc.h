@@ -148,6 +148,8 @@ public:
 	void mc1502_fdc_irq_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	IRQ_CALLBACK_MEMBER(pc_irq_callback);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pcjr_cartridge );
 };
 
 /*----------- defined in machine/pc.c -----------*/
@@ -172,9 +174,6 @@ void pc_speaker_set_spkrdata(running_machine &machine, UINT8 data);
 void pc_speaker_set_input(running_machine &machine, UINT8 data);
 
 void mess_init_pc_common( running_machine &machine, UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int));
-
-
-DEVICE_IMAGE_LOAD( pcjr_cartridge );
 
 void pc_rtc_init(running_machine &machine);
 

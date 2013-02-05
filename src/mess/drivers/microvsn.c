@@ -41,6 +41,7 @@ public:
 	DECLARE_MACHINE_RESET(microvision);
 
 	void screen_vblank(screen_device &screen, bool state);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( microvision_cart );
 
 	// i8021 interface
 	DECLARE_WRITE8_MEMBER(i8021_p0_write);
@@ -453,7 +454,7 @@ WRITE16_MEMBER( microvision_state::tms1100_write_r )
 }
 
 
-static DEVICE_IMAGE_LOAD(microvision_cart)
+DEVICE_IMAGE_LOAD_MEMBER(microvision_state,microvision_cart)
 {
 	microvision_state *state = image.device().machine().driver_data<microvision_state>();
 	UINT8 *rom1 = state->memregion("maincpu1")->base();
@@ -640,7 +641,7 @@ static MACHINE_CONFIG_START( microvision, microvision_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("microvision_cart")
-	MCFG_CARTSLOT_LOAD(microvision_cart)
+	MCFG_CARTSLOT_LOAD(microvision_state,microvision_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","microvision")

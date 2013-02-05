@@ -78,6 +78,7 @@ public:
 	TIMER_CALLBACK_MEMBER(pokemini_prc_counter_callback);
 	DECLARE_WRITE8_MEMBER(pokemini_hwreg_w);
 	DECLARE_READ8_MEMBER(pokemini_hwreg_r);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
 
 protected:
 	required_device<speaker_sound_device> m_speaker;
@@ -87,9 +88,5 @@ protected:
 	void pokemini_check_irqs();
 	void pokemini_update_sound();
 };
-
-
-/*----------- defined in machine/pokemini.c -----------*/
-DEVICE_IMAGE_LOAD( pokemini_cart );
 
 #endif /* POKEMINI_H */

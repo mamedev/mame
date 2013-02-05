@@ -126,6 +126,10 @@ public:
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
 	void nes_banks_restore();
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(nes_cart);
+	DECLARE_DEVICE_IMAGE_START_MEMBER(nes_disk);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(nes_disk);
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(nes_disk);
 
 	ioport_port       *m_io_ctrlsel;
 	ioport_port       *m_io_fckey[9];
@@ -155,11 +159,6 @@ private:
 
 
 /* protos */
-
-DEVICE_IMAGE_LOAD(nes_cart);
-DEVICE_START(nes_disk);
-DEVICE_IMAGE_LOAD(nes_disk);
-DEVICE_IMAGE_UNLOAD(nes_disk);
 
 int nes_ppu_vidaccess( device_t *device, int address, int data );
 

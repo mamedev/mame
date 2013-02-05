@@ -57,6 +57,8 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scv_vb_callback);
+	DECLARE_DEVICE_IMAGE_START_MEMBER( scv_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( scv_cart );
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -358,27 +360,23 @@ WRITE8_MEMBER( scv_state::scv_portc_w )
 }
 
 
-static DEVICE_START( scv_cart )
+DEVICE_IMAGE_START_MEMBER( scv_state, scv_cart )
 {
-	scv_state *state = device->machine().driver_data<scv_state>();
-
-	state->m_cart_rom = state->memregion( "cart" )->base();
-	state->m_cart_rom_size = 0;
-	state->m_cart_ram = NULL;
-	state->m_cart_ram_size = 0;
+	m_cart_rom = memregion( "cart" )->base();
+	m_cart_rom_size = 0;
+	m_cart_ram = NULL;
+	m_cart_ram_size = 0;
 }
 
 
-static DEVICE_IMAGE_LOAD( scv_cart )
+DEVICE_IMAGE_LOAD_MEMBER( scv_state, scv_cart )
 {
-	scv_state *state = image.device().machine().driver_data<scv_state>();
-
 	if ( image.software_entry() == NULL )
 	{
 		UINT8 *cart = image.device().machine().root_device().memregion( "cart" )->base();
 		int size = image.length();
 
-		if ( size > state->memregion( "cart" )->bytes() )
+		if ( size > memregion( "cart" )->bytes() )
 		{
 			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size" );
 			return IMAGE_INIT_FAIL;
@@ -390,17 +388,17 @@ static DEVICE_IMAGE_LOAD( scv_cart )
 			return IMAGE_INIT_FAIL;
 		}
 
-		state->m_cart_rom = cart;
-		state->m_cart_rom_size = size;
-		state->m_cart_ram = NULL;
-		state->m_cart_ram_size = 0;
+		m_cart_rom = cart;
+		m_cart_rom_size = size;
+		m_cart_ram = NULL;
+		m_cart_ram_size = 0;
 	}
 	else
 	{
-		state->m_cart_rom = image.get_software_region( "rom" );
-		state->m_cart_rom_size = image.get_software_region_length( "rom" );
-		state->m_cart_ram = image.get_software_region( "ram" );
-		state->m_cart_ram_size = image.get_software_region_length( "ram" );
+		m_cart_rom = image.get_software_region( "rom" );
+		m_cart_rom_size = image.get_software_region_length( "rom" );
+		m_cart_ram = image.get_software_region( "ram" );
+		m_cart_ram_size = image.get_software_region_length( "ram" );
 	}
 
 	return IMAGE_INIT_PASS;
@@ -861,8 +859,8 @@ static MACHINE_CONFIG_START( scv, scv_state )
 	MCFG_CARTSLOT_EXTENSION_LIST( "bin" )
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("scv_cart")
-	MCFG_CARTSLOT_START( scv_cart )
-	MCFG_CARTSLOT_LOAD( scv_cart )
+	MCFG_CARTSLOT_START( scv_state, scv_cart )
+	MCFG_CARTSLOT_LOAD( scv_state, scv_cart )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","scv")

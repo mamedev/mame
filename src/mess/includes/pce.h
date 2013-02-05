@@ -153,11 +153,11 @@ public:
 	TIMER_CALLBACK_MEMBER(pce_cd_clear_ack);
 	TIMER_CALLBACK_MEMBER(pce_cd_adpcm_dma_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(pce_irq_changed);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pce_cart);
 };
 
 
 /*----------- defined in machine/pce.c -----------*/
-DEVICE_IMAGE_LOAD(pce_cart);
 extern const msm5205_interface pce_cd_msm5205_interface;
 
 #endif /* PCE_H_ */

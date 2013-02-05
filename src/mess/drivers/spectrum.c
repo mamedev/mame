@@ -663,7 +663,7 @@ static const cassette_interface spectrum_cassette_interface =
 	NULL
 };
 
-static DEVICE_IMAGE_LOAD( spectrum_cart )
+DEVICE_IMAGE_LOAD_MEMBER( spectrum_state,spectrum_cart )
 {
 	UINT32 filesize;
 
@@ -732,7 +732,7 @@ MACHINE_CONFIG_START( spectrum_common, spectrum_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(spectrum_cart)
+	MCFG_CARTSLOT_LOAD(spectrum_state,spectrum_cart)
 	MCFG_CARTSLOT_INTERFACE("spectrum_cart")
 	MCFG_SOFTWARE_LIST_ADD("cart_list","spectrum")
 MACHINE_CONFIG_END

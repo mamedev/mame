@@ -24,6 +24,7 @@ public:
 	DECLARE_READ32_MEMBER(dd_null_r);
 	DECLARE_MACHINE_START(n64dd);
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(n64_cart);
 };
 
 READ32_MEMBER(n64_mess_state::dd_null_r)
@@ -171,7 +172,7 @@ static void mempak_format(UINT8* pak)
 	memcpy(pak, pak_header, 272);
 }
 
-static DEVICE_IMAGE_LOAD(n64_cart)
+DEVICE_IMAGE_LOAD_MEMBER(n64_mess_state,n64_cart)
 {
 	int i, length;
 	n64_periphs *periphs = image.device().machine().device<n64_periphs>("rcp");
@@ -309,7 +310,7 @@ static MACHINE_CONFIG_START( n64, n64_mess_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("v64,z64,rom,n64,bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("n64_cart")
-	MCFG_CARTSLOT_LOAD(n64_cart)
+	MCFG_CARTSLOT_LOAD(n64_mess_state,n64_cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","n64")

@@ -84,12 +84,12 @@ public:
 	DECLARE_WRITE8_MEMBER(v_via_pa_w);
 	DECLARE_WRITE8_MEMBER(v_via_ca2_w);
 	DECLARE_WRITE8_MEMBER(v_via_cb2_w);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( vectrex_cart );
 };
 
 
 /*----------- defined in machine/vectrex.c -----------*/
 
-DEVICE_IMAGE_LOAD( vectrex_cart );
 void vectrex_configuration(running_machine &machine);
 void vectrex_via_irq (device_t *device, int level);
 

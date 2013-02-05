@@ -348,9 +348,6 @@ Notes:
 #define M68K_CLOCK          XTAL_50MHz
 
 static QUICKLOAD_LOAD( jaguar );
-static DEVICE_START( jaguar_cart );
-static DEVICE_IMAGE_LOAD( jaguar );
-
 
 
 /*************************************
@@ -1644,8 +1641,8 @@ static MACHINE_CONFIG_START( jaguar, jaguar_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("j64,rom")
 	MCFG_CARTSLOT_INTERFACE("jaguar_cart")
-	MCFG_CARTSLOT_START(jaguar_cart)
-	MCFG_CARTSLOT_LOAD(jaguar)
+	MCFG_CARTSLOT_START(jaguar_state,jaguar_cart)
+	MCFG_CARTSLOT_LOAD(jaguar_state,jaguar_cart)
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","jaguar")
@@ -1770,9 +1767,9 @@ int jaguar_state::quickload(device_image_interface &image, const char *file_type
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_START( jaguar_cart )
+DEVICE_IMAGE_START_MEMBER( jaguar_state, jaguar_cart )
 {
-	device->machine().driver_data<jaguar_state>()->cart_start();
+	cart_start();
 }
 
 void jaguar_state::cart_start()
@@ -1782,9 +1779,9 @@ void jaguar_state::cart_start()
 	memset( m_cart_base, 0, memshare("cart")->bytes() );
 }
 
-static DEVICE_IMAGE_LOAD( jaguar )
+DEVICE_IMAGE_LOAD_MEMBER( jaguar_state, jaguar_cart )
 {
-	return image.device().machine().driver_data<jaguar_state>()->cart_load(image);
+	return cart_load(image);
 }
 
 int jaguar_state::cart_load(device_image_interface &image)

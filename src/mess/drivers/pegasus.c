@@ -82,6 +82,11 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(pegasus);
 	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_1);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_2);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_3);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_4);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_5);
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(pegasus_state::pegasus_firq)
@@ -433,7 +438,7 @@ static void pegasus_decrypt_rom( running_machine &machine, UINT16 addr )
 	}
 }
 
-static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
+DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_1 )
 {
 	image.fread(image.device().machine().root_device().memregion("maincpu")->base() + 0x0000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine(), 0x0000 );
@@ -441,7 +446,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
+DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_2 )
 {
 	image.fread(image.device().machine().root_device().memregion("maincpu")->base() + 0x1000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine(), 0x1000 );
@@ -449,7 +454,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
+DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_3 )
 {
 	image.fread(image.device().machine().root_device().memregion("maincpu")->base() + 0x2000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine(), 0x2000 );
@@ -457,7 +462,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
+DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_4 )
 {
 	image.fread(image.device().machine().root_device().memregion("maincpu")->base() + 0xc000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine(), 0xc000 );
@@ -465,7 +470,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
+DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_5 )
 {
 	image.fread( image.device().machine().root_device().memregion("maincpu")->base() + 0xd000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine(), 0xd000 );
@@ -518,19 +523,19 @@ static MACHINE_CONFIG_START( pegasus, pegasus_state )
 	MCFG_PIA6821_ADD( "pia_u", pegasus_pia_u_intf )
 	MCFG_CARTSLOT_ADD("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_LOAD(pegasus_cart_1)
+	MCFG_CARTSLOT_LOAD(pegasus_state,pegasus_cart_1)
 	MCFG_CARTSLOT_ADD("cart2")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_LOAD(pegasus_cart_2)
+	MCFG_CARTSLOT_LOAD(pegasus_state,pegasus_cart_2)
 	MCFG_CARTSLOT_ADD("cart3")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_LOAD(pegasus_cart_3)
+	MCFG_CARTSLOT_LOAD(pegasus_state,pegasus_cart_3)
 	MCFG_CARTSLOT_ADD("cart4")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_LOAD(pegasus_cart_4)
+	MCFG_CARTSLOT_LOAD(pegasus_state,pegasus_cart_4)
 	MCFG_CARTSLOT_ADD("cart5")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_LOAD(pegasus_cart_5)
+	MCFG_CARTSLOT_LOAD(pegasus_state,pegasus_cart_5)
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, pegasus_cassette_interface )
 MACHINE_CONFIG_END
 

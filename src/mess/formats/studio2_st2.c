@@ -47,7 +47,7 @@ struct st2_header
     DEVICE_IMAGE_LOAD( st2_cartslot_load )
 -------------------------------------------------*/
 
-DEVICE_IMAGE_LOAD( st2_cartslot_load )
+DEVICE_IMAGE_LOAD_LEGACY( st2_cartslot_load )
 {
 	st2_header header;
 

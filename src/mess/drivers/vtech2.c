@@ -459,8 +459,8 @@ static MACHINE_CONFIG_START( laser350, vtech2_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(laser_cart)
-	MCFG_CARTSLOT_UNLOAD(laser_cart)
+	MCFG_CARTSLOT_LOAD(vtech2_state,laser_cart)
+	MCFG_CARTSLOT_UNLOAD(vtech2_state,laser_cart)
 
 	/* 5.25" Floppy drive */
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD( FLOPPY_0, vtech2_floppy_interface )

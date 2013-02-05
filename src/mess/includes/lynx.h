@@ -145,6 +145,7 @@ public:
 	TIMER_CALLBACK_MEMBER(lynx_uart_loopback_timer);
 	TIMER_CALLBACK_MEMBER(lynx_uart_timer);
 	void lynx_postload();
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( lynx_cart );
 };
 
 

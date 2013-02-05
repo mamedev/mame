@@ -94,6 +94,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nc200_fdc_interrupt);
 
 	void nc200_fdc_interrupt(bool state);
+
+	DECLARE_DEVICE_IMAGE_START_MEMBER( nc_pcmcia_card );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
+
 	void nc100_machine_stop();
 	void nc200_machine_stop();
 };
@@ -111,12 +116,5 @@ void nc200_video_set_backlight(running_machine &machine, int state);
 
 
 void nc_set_card_present_state(running_machine &machine, int state);
-
-
-/*----------- defined in machine/nc.c -----------*/
-
-DEVICE_START( nc_pcmcia_card );
-DEVICE_IMAGE_LOAD( nc_pcmcia_card );
-DEVICE_IMAGE_UNLOAD( nc_pcmcia_card );
 
 #endif /* NC_H_ */

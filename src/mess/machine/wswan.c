@@ -1329,30 +1329,28 @@ static const char* wswan_determine_romsize( UINT8 data )
 	return wswan_romsize_str[ ROM_UNKNOWN ];
 }
 
-DEVICE_START(wswan_cart)
+DEVICE_IMAGE_START_MEMBER(wswan_state,wswan_cart)
 {
-	wswan_state *state = device->machine().driver_data<wswan_state>();
 	/* Initialize EEPROM structure */
-	memset( &state->m_eeprom, 0, sizeof( state->m_eeprom ) );
-	state->m_eeprom.data = NULL;
-	state->m_eeprom.page = NULL;
+	memset( &m_eeprom, 0, sizeof( m_eeprom ) );
+	m_eeprom.data = NULL;
+	m_eeprom.page = NULL;
 
 	/* Initialize RTC structure */
-	state->m_rtc.present = 0;
-	state->m_rtc.index = 0;
-	state->m_rtc.year = 0;
-	state->m_rtc.month = 0;
-	state->m_rtc.day = 0;
-	state->m_rtc.day_of_week = 0;
-	state->m_rtc.hour = 0;
-	state->m_rtc.minute = 0;
-	state->m_rtc.second = 0;
-	state->m_rtc.setting = 0xFF;
+	m_rtc.present = 0;
+	m_rtc.index = 0;
+	m_rtc.year = 0;
+	m_rtc.month = 0;
+	m_rtc.day = 0;
+	m_rtc.day_of_week = 0;
+	m_rtc.hour = 0;
+	m_rtc.minute = 0;
+	m_rtc.second = 0;
+	m_rtc.setting = 0xFF;
 }
 
-DEVICE_IMAGE_LOAD(wswan_cart)
+DEVICE_IMAGE_LOAD_MEMBER(wswan_state,wswan_cart)
 {
-	wswan_state *state = image.device().machine().driver_data<wswan_state>();
 	UINT32 ii, size;
 	const char *sram_str;
 
@@ -1361,17 +1359,17 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	else
 		size = image.get_software_region_length("rom");
 
-	state->m_ws_ram = (UINT8*) state->m_maincpu->space(AS_PROGRAM).get_read_ptr(0);
-	memset(state->m_ws_ram, 0, 0xffff);
-	state->m_ROMBanks = size / 65536;
+	m_ws_ram = (UINT8*) m_maincpu->space(AS_PROGRAM).get_read_ptr(0);
+	memset(m_ws_ram, 0, 0xffff);
+	m_ROMBanks = size / 65536;
 
-	for (ii = 0; ii < state->m_ROMBanks; ii++)
+	for (ii = 0; ii < m_ROMBanks; ii++)
 	{
-		if ((state->m_ROMMap[ii] = auto_alloc_array(image.device().machine(), UINT8, 0x10000)))
+		if ((m_ROMMap[ii] = auto_alloc_array(image.device().machine(), UINT8, 0x10000)))
 		{
 			if (image.software_entry() == NULL)
 			{
-				if (image.fread( state->m_ROMMap[ii], 0x10000) != 0x10000)
+				if (image.fread( m_ROMMap[ii], 0x10000) != 0x10000)
 				{
 					image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Wrongly sized ROM");
 					image.message(" Wrongly sized ROM");
@@ -1380,7 +1378,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 				}
 			}
 			else
-				memcpy(state->m_ROMMap[ii], image.get_software_region("rom") + ii * 0x10000, 0x10000);
+				memcpy(m_ROMMap[ii], image.get_software_region("rom") + ii * 0x10000, 0x10000);
 		}
 		else
 		{
@@ -1391,41 +1389,41 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 		}
 	}
 
-	sram_str = wswan_determine_sram(state, state->m_ROMMap[state->m_ROMBanks - 1][0xfffb]);
+	sram_str = wswan_determine_sram(this, m_ROMMap[m_ROMBanks - 1][0xfffb]);
 
-	state->m_rtc.present = state->m_ROMMap[state->m_ROMBanks - 1][0xfffd] ? 1 : 0;
-	state->m_rotate = state->m_ROMMap[state->m_ROMBanks-1][0xfffc] & 0x01;
+	m_rtc.present = m_ROMMap[m_ROMBanks - 1][0xfffd] ? 1 : 0;
+	m_rotate = m_ROMMap[m_ROMBanks-1][0xfffc] & 0x01;
 
 	{
 		int sum = 0;
 		/* Spit out some info */
 		logerror("ROM DETAILS\n" );
-		logerror("\tDeveloper ID: %X\n", state->m_ROMMap[state->m_ROMBanks - 1][0xfff6]);
-		logerror("\tMinimum system: %s\n", state->m_ROMMap[state->m_ROMBanks - 1][0xfff7] ? "WonderSwan Color" : "WonderSwan");
-		logerror("\tCart ID: %X\n", state->m_ROMMap[state->m_ROMBanks - 1][0xfff8]);
-		logerror("\tROM size: %s\n", wswan_determine_romsize(state->m_ROMMap[state->m_ROMBanks - 1][0xfffa]));
+		logerror("\tDeveloper ID: %X\n", m_ROMMap[m_ROMBanks - 1][0xfff6]);
+		logerror("\tMinimum system: %s\n", m_ROMMap[m_ROMBanks - 1][0xfff7] ? "WonderSwan Color" : "WonderSwan");
+		logerror("\tCart ID: %X\n", m_ROMMap[m_ROMBanks - 1][0xfff8]);
+		logerror("\tROM size: %s\n", wswan_determine_romsize(m_ROMMap[m_ROMBanks - 1][0xfffa]));
 		logerror("\tSRAM size: %s\n", sram_str);
-		logerror("\tFeatures: %X\n", state->m_ROMMap[state->m_ROMBanks - 1][0xfffc]);
-		logerror("\tRTC: %s\n", state->m_ROMMap[state->m_ROMBanks - 1][0xfffd] ? "yes" : "no");
-		for (ii = 0; ii < state->m_ROMBanks; ii++)
+		logerror("\tFeatures: %X\n", m_ROMMap[m_ROMBanks - 1][0xfffc]);
+		logerror("\tRTC: %s\n", m_ROMMap[m_ROMBanks - 1][0xfffd] ? "yes" : "no");
+		for (ii = 0; ii < m_ROMBanks; ii++)
 		{
 			int count;
 			for (count = 0; count < 0x10000; count++)
 			{
-				sum += state->m_ROMMap[ii][count];
+				sum += m_ROMMap[ii][count];
 			}
 		}
-		sum -= state->m_ROMMap[state->m_ROMBanks - 1][0xffff];
-		sum -= state->m_ROMMap[state->m_ROMBanks - 1][0xfffe];
+		sum -= m_ROMMap[m_ROMBanks - 1][0xffff];
+		sum -= m_ROMMap[m_ROMBanks - 1][0xfffe];
 		sum &= 0xffff;
-		logerror("\tChecksum: %X%X (calculated: %04X)\n", state->m_ROMMap[state->m_ROMBanks - 1][0xffff], state->m_ROMMap[state->m_ROMBanks - 1][0xfffe], sum);
+		logerror("\tChecksum: %X%X (calculated: %04X)\n", m_ROMMap[m_ROMBanks - 1][0xffff], m_ROMMap[m_ROMBanks - 1][0xfffe], sum);
 	}
 
-	if (state->m_eeprom.size != 0)
+	if (m_eeprom.size != 0)
 	{
-		state->m_eeprom.data = auto_alloc_array(image.device().machine(), UINT8, state->m_eeprom.size);
-		image.battery_load(state->m_eeprom.data, state->m_eeprom.size, 0x00);
-		state->m_eeprom.page = state->m_eeprom.data;
+		m_eeprom.data = auto_alloc_array(image.device().machine(), UINT8, m_eeprom.size);
+		image.battery_load(m_eeprom.data, m_eeprom.size, 0x00);
+		m_eeprom.page = m_eeprom.data;
 	}
 
 	if (image.software_entry() == NULL)

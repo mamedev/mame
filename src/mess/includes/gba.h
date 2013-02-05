@@ -278,6 +278,7 @@ public:
 	TIMER_CALLBACK_MEMBER(perform_hbl);
 	TIMER_CALLBACK_MEMBER(perform_scan);
 	void gba_machine_stop();
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gba_cart);
 };
 
 /*----------- defined in video/gba.c -----------*/

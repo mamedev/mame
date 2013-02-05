@@ -13,6 +13,6 @@
 
 #include "emu.h"
 
-DEVICE_IMAGE_LOAD( st2_cartslot_load );
+DEVICE_IMAGE_LOAD_LEGACY( st2_cartslot_load );
 
 #endif

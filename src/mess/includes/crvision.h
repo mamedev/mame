@@ -53,6 +53,7 @@ public:
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_READ8_MEMBER( pia_pb_r );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( crvision_cart );
 
 	UINT8 read_keyboard(int pa);
 

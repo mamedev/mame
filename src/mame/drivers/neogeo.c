@@ -1316,7 +1316,7 @@ INPUT_PORTS_END
 
 
 
-DEVICE_IMAGE_LOAD( neo_cartridge )
+DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 {
 	UINT32 size;
 	device_t* ym = image.device().machine().device("ymsnd");
@@ -1440,7 +1440,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mvs, neogeo )
 	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_LOAD(neo_cartridge)
+	MCFG_CARTSLOT_LOAD(neogeo_state,neo_cartridge)
 	MCFG_CARTSLOT_INTERFACE("neo_cart")
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","neogeo")

@@ -29,6 +29,9 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
+
+	DECLARE_DEVICE_IMAGE_START_MEMBER( bbcbc_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcbc_cart );
 };
 
 
@@ -130,17 +133,17 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 };
 
 
-static DEVICE_START( bbcbc_cart )
+DEVICE_IMAGE_START_MEMBER( bbcbc_state, bbcbc_cart )
 {
-	UINT8 *cart = device->machine().root_device().memregion("maincpu" )->base() + 0x4000;
+	UINT8 *cart = machine().root_device().memregion("maincpu" )->base() + 0x4000;
 
 	memset( cart, 0xFF, 0x8000 );
 }
 
 
-static DEVICE_IMAGE_LOAD( bbcbc_cart )
+DEVICE_IMAGE_LOAD_MEMBER( bbcbc_state, bbcbc_cart )
 {
-	UINT8 *cart = image.device().machine().root_device().memregion("maincpu" )->base() + 0x4000;
+	UINT8 *cart = machine().root_device().memregion("maincpu" )->base() + 0x4000;
 
 	if ( image.software_entry() == NULL )
 	{
@@ -187,8 +190,8 @@ static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("bbcbc_cart")
-	MCFG_CARTSLOT_START( bbcbc_cart )
-	MCFG_CARTSLOT_LOAD( bbcbc_cart )
+	MCFG_CARTSLOT_START( bbcbc_state, bbcbc_cart )
+	MCFG_CARTSLOT_LOAD( bbcbc_state, bbcbc_cart )
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","bbcbc")

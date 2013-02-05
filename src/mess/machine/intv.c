@@ -545,7 +545,7 @@ static int intv_load_rom_file(device_image_interface &image)
 	}
 }
 
-DEVICE_IMAGE_LOAD( intv_cart )
+DEVICE_IMAGE_LOAD_MEMBER( intv_state,intv_cart )
 {
 	if (image.software_entry() == NULL)
 		return intv_load_rom_file(image);
@@ -820,7 +820,7 @@ WRITE8_MEMBER( intv_state::intv_ecs_porta_w )
 
 /* Intellivision console + keyboard component */
 
-DEVICE_IMAGE_LOAD( intvkbd_cart )
+DEVICE_IMAGE_LOAD_MEMBER( intv_state,intvkbd_cart )
 {
 	if (strcmp(image.device().tag(),":cart1") == 0) /* Legacy cartridge slot */
 	{

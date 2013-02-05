@@ -741,7 +741,7 @@ static const centronics_interface centronics_intf =
 //  DEVICE_IMAGE_LOAD( portfolio_cart )
 //-------------------------------------------------
 
-static DEVICE_IMAGE_LOAD( portfolio_cart )
+DEVICE_IMAGE_LOAD_MEMBER( portfolio_state, portfolio_cart )
 {
 	return IMAGE_INIT_FAIL;
 }
@@ -862,7 +862,7 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_INTERFACE("portfolio_cart")
-	MCFG_CARTSLOT_LOAD(portfolio_cart)
+	MCFG_CARTSLOT_LOAD(portfolio_state,portfolio_cart)
 
 	/* memory card */
 /*  MCFG_MEMCARD_ADD("memcard_a")

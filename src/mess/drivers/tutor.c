@@ -207,6 +207,8 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(tape_interrupt_handler);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( tutor_cart );
+	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( tutor_cart );
 };
 
 
@@ -296,7 +298,7 @@ READ8_MEMBER( tutor_state::key_r )
 }
 
 
-static DEVICE_IMAGE_LOAD( tutor_cart )
+DEVICE_IMAGE_LOAD_MEMBER( tutor_state, tutor_cart )
 {
 	UINT32 size;
 	UINT8 *ptr = image.device().machine().root_device().memregion("maincpu")->base();
@@ -316,7 +318,7 @@ static DEVICE_IMAGE_LOAD( tutor_cart )
 	return IMAGE_INIT_PASS;
 }
 
-static DEVICE_IMAGE_UNLOAD( tutor_cart )
+DEVICE_IMAGE_UNLOAD_MEMBER( tutor_state, tutor_cart )
 {
 	memset(image.device().machine().root_device().memregion("maincpu")->base() + cartridge_base, 0, 0x6000);
 }
@@ -781,8 +783,8 @@ static MACHINE_CONFIG_START( tutor, tutor_state )
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(tutor_cart)
-	MCFG_CARTSLOT_UNLOAD(tutor_cart)
+	MCFG_CARTSLOT_LOAD(tutor_state, tutor_cart)
+	MCFG_CARTSLOT_UNLOAD(tutor_state, tutor_cart)
 	MCFG_CARTSLOT_INTERFACE("tutor_cart")
 
 	/* software lists */

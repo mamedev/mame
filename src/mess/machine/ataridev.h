@@ -20,18 +20,6 @@ MACHINE_START( a800xl );
 MACHINE_START( a5200 );
 MACHINE_START( xegs );
 
-DEVICE_IMAGE_LOAD( a800_cart );
-DEVICE_IMAGE_UNLOAD( a800_cart );
-
-DEVICE_IMAGE_LOAD( a800_cart_right );
-DEVICE_IMAGE_UNLOAD( a800_cart_right );
-
-DEVICE_IMAGE_LOAD( a5200_cart );
-DEVICE_IMAGE_UNLOAD( a5200_cart );
-
-DEVICE_IMAGE_LOAD( xegs_cart );
-DEVICE_IMAGE_UNLOAD( xegs_cart );
-
 
 /*----------- defined in machine/atarifdc.c -----------*/
 /***************************************************************************

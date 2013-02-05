@@ -62,6 +62,7 @@ public:
 	UINT8 m_cass_conf;
 	virtual void machine_start();
 	virtual void machine_reset();
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pv2000_cart );
 };
 
 
@@ -377,7 +378,7 @@ void pv2000_state::machine_reset()
 	memset(&memregion("maincpu")->base()[0x7000], 0xff, 0x1000);    // initialize RAM
 }
 
-static DEVICE_IMAGE_LOAD( pv2000_cart )
+DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
 {
 	UINT8 *cart = image.device().machine().root_device().memregion("maincpu")->base() + 0xC000;
 	UINT32 size;
@@ -446,7 +447,7 @@ static MACHINE_CONFIG_START( pv2000, pv2000_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(pv2000_cart)
+	MCFG_CARTSLOT_LOAD(pv2000_state,pv2000_cart)
 	MCFG_CARTSLOT_INTERFACE("pv2000_cart")
 
 	/* Software lists */

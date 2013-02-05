@@ -700,7 +700,7 @@ static const struct atom_cart_range atom_cart_table[] =
 	{ 0 }
 };
 
-static DEVICE_IMAGE_LOAD( atom_cart )
+DEVICE_IMAGE_LOAD_MEMBER( atom_state, atom_cart )
 {
 	UINT32 size;
 	UINT8 *temp_copy;
@@ -772,7 +772,7 @@ static DEVICE_IMAGE_LOAD( atom_cart )
 	MCFG_CARTSLOT_ADD(_tag) \
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,rom") \
 	MCFG_CARTSLOT_INTERFACE("atom_cart") \
-	MCFG_CARTSLOT_LOAD(atom_cart)
+	MCFG_CARTSLOT_LOAD(atom_state, atom_cart)
 
 
 static MACHINE_CONFIG_START( atom, atom_state )

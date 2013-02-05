@@ -1609,9 +1609,9 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("crd,card")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_START(nc_pcmcia_card)
-	MCFG_CARTSLOT_LOAD(nc_pcmcia_card)
-	MCFG_CARTSLOT_UNLOAD(nc_pcmcia_card)
+	MCFG_CARTSLOT_START(nc_state,nc_pcmcia_card)
+	MCFG_CARTSLOT_LOAD(nc_state,nc_pcmcia_card)
+	MCFG_CARTSLOT_UNLOAD(nc_state,nc_pcmcia_card)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

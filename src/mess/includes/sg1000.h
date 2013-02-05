@@ -67,6 +67,8 @@ public:
 	DECLARE_READ8_MEMBER( tvdraw_data_r );
 	DECLARE_READ8_MEMBER( joysel_r );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( sg1000_cart );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( omv_cart );
 
 	/* keyboard state */
 	UINT8 m_keylatch;
@@ -126,6 +128,7 @@ public:
 	DECLARE_READ8_MEMBER( ppi_pa_r );
 	DECLARE_READ8_MEMBER( ppi_pb_r );
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( sc3000_cart );
 
 	ioport_port* m_key_row[16];
 };

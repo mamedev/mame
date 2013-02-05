@@ -286,7 +286,7 @@ void coleco_state::machine_reset()
 //  return retval;
 //}
 
-static DEVICE_IMAGE_LOAD( czz50_cart )
+DEVICE_IMAGE_LOAD_MEMBER( coleco_state,czz50_cart )
 {
 	UINT8 *ptr = image.device().machine().root_device().memregion(Z80_TAG)->base() + 0x8000;
 	UINT32 size;
@@ -357,7 +357,7 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("rom,col,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_LOAD(czz50_cart)
+	MCFG_CARTSLOT_LOAD(coleco_state,czz50_cart)
 	MCFG_CARTSLOT_INTERFACE("coleco_cart")
 
 	/* software lists */

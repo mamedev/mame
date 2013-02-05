@@ -106,6 +106,7 @@ public:
 	UINT32 screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
 	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pv1000_cart );
 };
 
 
@@ -237,7 +238,7 @@ void pv1000_state::palette_init()
 }
 
 
-static DEVICE_IMAGE_LOAD( pv1000_cart )
+DEVICE_IMAGE_LOAD_MEMBER( pv1000_state, pv1000_cart )
 {
 	UINT8 *cart = image.device().machine().root_device().memregion("cart")->base();
 	UINT32 size;
@@ -439,7 +440,7 @@ static MACHINE_CONFIG_START( pv1000, pv1000_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("pv1000_cart")
-	MCFG_CARTSLOT_LOAD(pv1000_cart)
+	MCFG_CARTSLOT_LOAD(pv1000_state,pv1000_cart)
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","pv1000")

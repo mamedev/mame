@@ -27,7 +27,7 @@ struct timex_cart_t
 
 const timex_cart_t *timex_cart_data(void);
 
-DEVICE_IMAGE_LOAD( timex_cart );
-DEVICE_IMAGE_UNLOAD( timex_cart );
+DEVICE_IMAGE_LOAD_LEGACY( timex_cart );
+DEVICE_IMAGE_UNLOAD_LEGACY( timex_cart );
 
 #endif  /* __TIMEX_DCK_H__ */

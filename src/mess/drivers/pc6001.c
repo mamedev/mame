@@ -244,6 +244,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc6001_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(pc6001_8255_portc_w);
 	DECLARE_READ8_MEMBER(pc6001_8255_portc_r);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pc6001_cass);
 };
 
 
@@ -2261,7 +2262,7 @@ static const cassette_interface pc6001_cassette_interface =
 	NULL
 };
 
-static DEVICE_IMAGE_LOAD( pc6001_cass )
+DEVICE_IMAGE_LOAD_MEMBER( pc6001_state,pc6001_cass )
 {
 	pc6001_state *state = image.device().machine().driver_data<pc6001_state>();
 	UINT8 *cas = state->memregion("cas")->base();
@@ -2347,7 +2348,7 @@ static MACHINE_CONFIG_START( pc6001, pc6001_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("cas,p6")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("pc6001_cass")
-	MCFG_CARTSLOT_LOAD(pc6001_cass)
+	MCFG_CARTSLOT_LOAD(pc6001_state,pc6001_cass)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay8910", AY8910, PC6001_MAIN_CLOCK/4)

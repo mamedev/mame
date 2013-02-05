@@ -2161,7 +2161,7 @@ struct cdrom_interface saturn_cdrom =
 
 
 
-static DEVICE_IMAGE_LOAD( sat_cart )
+DEVICE_IMAGE_LOAD_MEMBER( saturn_state, sat_cart )
 {
 	UINT8 *ROM = image.device().machine().root_device().memregion("maincpu")->base()+0x080000;
 	UINT32 length;
@@ -2245,7 +2245,7 @@ MACHINE_CONFIG_DERIVED( saturnus, saturn )
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_INTERFACE("sat_cart")
-	MCFG_CARTSLOT_LOAD(sat_cart)
+	MCFG_CARTSLOT_LOAD(saturn_state, sat_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 MACHINE_CONFIG_END
@@ -2257,7 +2257,7 @@ MACHINE_CONFIG_DERIVED( saturneu, saturn )
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_INTERFACE("sat_cart")
-	MCFG_CARTSLOT_LOAD(sat_cart)
+	MCFG_CARTSLOT_LOAD(saturn_state, sat_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 MACHINE_CONFIG_END
@@ -2269,7 +2269,7 @@ MACHINE_CONFIG_DERIVED( saturnjp, saturn )
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_INTERFACE("sat_cart")
-	MCFG_CARTSLOT_LOAD(sat_cart)
+	MCFG_CARTSLOT_LOAD(saturn_state, sat_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sat_cart")
 
 MACHINE_CONFIG_END
@@ -2338,7 +2338,7 @@ static const struct stv_cart_region stv_cart_table[] =
 	{ 0 }
 };
 
-static DEVICE_IMAGE_LOAD( stv_cart )
+DEVICE_IMAGE_LOAD_MEMBER( saturn_state, stv_cart )
 {
 //  saturn_state *state = image.device().machine().driver_data<saturn_state>();
 	const struct stv_cart_region *stv_cart = &stv_cart_table[0], *this_cart;
@@ -2391,7 +2391,7 @@ static DEVICE_IMAGE_LOAD( stv_cart )
 #define MCFG_STV_CARTSLOT_ADD(_tag) \
 	MCFG_CARTSLOT_ADD(_tag) \
 	MCFG_CARTSLOT_INTERFACE("stv_cart") \
-	MCFG_CARTSLOT_LOAD(stv_cart)
+	MCFG_CARTSLOT_LOAD(saturn_state,stv_cart)
 
 MACHINE_CONFIG_FRAGMENT( stv_cartslot )
 	MCFG_STV_CARTSLOT_ADD("cart1")

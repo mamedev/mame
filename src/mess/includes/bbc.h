@@ -304,6 +304,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_wd177x_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcb_cart );
 };
 
 
@@ -316,10 +318,6 @@ extern const mc6845_interface bbc_mc6845_intf;
 extern const via6522_interface bbcb_system_via;
 extern const via6522_interface bbcb_user_via;
 extern const wd17xx_interface bbc_wd17xx_interface;
-
-/* disc support */
-
-DEVICE_IMAGE_LOAD ( bbcb_cart );
 
 /* tape support */
 
