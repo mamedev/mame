@@ -40,13 +40,12 @@ void changela_state::video_start()
 
 ***************************************************************************/
 
-static void draw_obj0( running_machine &machine, bitmap_ind16 &bitmap, int sy )
+void changela_state::draw_obj0( bitmap_ind16 &bitmap, int sy )
 {
-	changela_state *state = machine.driver_data<changela_state>();
 	int sx, i;
 
-	UINT8* ROM = state->memregion("user1")->base();
-	UINT8* RAM = state->m_spriteram;
+	UINT8* ROM = memregion("user1")->base();
+	UINT8* RAM = m_spriteram;
 
 	for (sx = 0; sx < 256; sx++)
 	{
@@ -103,13 +102,12 @@ static void draw_obj0( running_machine &machine, bitmap_ind16 &bitmap, int sy )
 
 ***************************************************************************/
 
-static void draw_obj1( running_machine &machine, bitmap_ind16 &bitmap )
+void changela_state::draw_obj1( bitmap_ind16 &bitmap )
 {
-	changela_state *state = machine.driver_data<changela_state>();
 	int sx, sy;
 
-	UINT8* ROM = state->memregion("gfx2")->base();
-	UINT8* RAM = state->m_videoram;
+	UINT8* ROM = memregion("gfx2")->base();
+	UINT8* RAM = m_videoram;
 
 	UINT8 reg[4] = { 0 }; /* 4x4-bit registers (U58, U59) */
 
@@ -168,16 +166,15 @@ static void draw_obj1( running_machine &machine, bitmap_ind16 &bitmap )
 
 ***************************************************************************/
 
-static void draw_river( running_machine &machine, bitmap_ind16 &bitmap, int sy )
+void changela_state::draw_river( bitmap_ind16 &bitmap, int sy )
 {
-	changela_state *state = machine.driver_data<changela_state>();
 	int sx, i, j;
 
-	UINT8* ROM = state->memregion("user2")->base();
-	UINT8* RAM = state->m_memory_devices + 0x800;
-	UINT8* TILE_ROM = state->memregion("gfx1")->base();
-	UINT8* TILE_RAM = state->m_memory_devices + 0x1000;
-	UINT8* PROM = state->memregion("proms")->base();
+	UINT8* ROM = memregion("user2")->base();
+	UINT8* RAM = m_memory_devices + 0x800;
+	UINT8* TILE_ROM = memregion("gfx1")->base();
+	UINT8* TILE_RAM = m_memory_devices + 0x1000;
+	UINT8* PROM = memregion("proms")->base();
 
 	int preload = ((sy < 32) ? 1 : 0);
 
@@ -194,8 +191,8 @@ static void draw_river( running_machine &machine, bitmap_ind16 &bitmap, int sy )
 	int carry = 0;
 
 	/* Update Counters */
-	if (sy == 30) state->m_v_count_river = state->m_horizon;
-	state->m_v_count_river = (state->m_v_count_river + 1) & 0xff;
+	if (sy == 30) m_v_count_river = m_horizon;
+	m_v_count_river = (m_v_count_river + 1) & 0xff;
 
 	/* ----- STATE MACHINE ----- */
 	for (i = 0; i < 0x20; i++)
@@ -219,11 +216,11 @@ static void draw_river( running_machine &machine, bitmap_ind16 &bitmap, int sy )
 		if (prev_state & 0x10)
 			hosc = (math_train[8] << 4) | math_train[9];
 
-		rom_addr = state->m_slopeROM_bank | ((state->m_v_count_river & 0x7e) << 2) | ((rom_count & 0x0e) >> 1);
+		rom_addr = m_slopeROM_bank | ((m_v_count_river & 0x7e) << 2) | ((rom_count & 0x0e) >> 1);
 		ram_a5 = ((curr_state & 0x01) & ((curr_state & 0x40) >> 6) & preload) ^ 0x01;
 		ram_addr =  (ram_a5 << 5) | (ram_count << 1) | ((curr_state & 0x20) >> 5);
 		mux45 = rom_count & 0x01;
-		mux61 = state->m_v_count_river & 0x01;
+		mux61 = m_v_count_river & 0x01;
 
 		switch (curr_state)
 		{
@@ -270,7 +267,7 @@ static void draw_river( running_machine &machine, bitmap_ind16 &bitmap, int sy )
 		prev_state = curr_state;
 	}
 
-	if (!(state->m_v_count_river & 0x80))
+	if (!(m_v_count_river & 0x80))
 	{
 		int h_count = 0x80 | (hosc >> 1);
 		int tile_v = ((math_train[3] & 0x0c) >> 2) | ((math_train[2] & 0x0f) << 2) | ((math_train[1] & 0x07) << 6);
@@ -347,20 +344,19 @@ static void draw_river( running_machine &machine, bitmap_ind16 &bitmap, int sy )
 
 ***************************************************************************/
 
-static void draw_tree( running_machine &machine, bitmap_ind16 &bitmap, int sy, int tree_num )
+void changela_state::draw_tree( bitmap_ind16 &bitmap, int sy, int tree_num )
 {
-	changela_state *state = machine.driver_data<changela_state>();
 	int sx, i, j;
 
 	/* State machine */
-	UINT8* ROM = state->memregion("user2")->base();
-	UINT8* RAM = state->m_memory_devices + 0x840 + 0x40 * tree_num;
-	UINT8* PROM = state->memregion("proms")->base();
+	UINT8* ROM = memregion("user2")->base();
+	UINT8* RAM = m_memory_devices + 0x840 + 0x40 * tree_num;
+	UINT8* PROM = memregion("proms")->base();
 
 	/* Tree Data */
-	UINT8* RAM2 = state->m_tree_ram + 0x20 * tree_num;
-	UINT8* TILE_ROM = (tree_num ? (state->memregion("user3")->base() + 0x1000) : (state->memregion("gfx1")->base() + 0x2000));
-	UINT8* TILE_RAM = (tree_num ? (state->memregion("user3")->base()) : (state->m_memory_devices + 0x1800));
+	UINT8* RAM2 = m_tree_ram + 0x20 * tree_num;
+	UINT8* TILE_ROM = (tree_num ? (memregion("user3")->base() + 0x1000) : (memregion("gfx1")->base() + 0x2000));
+	UINT8* TILE_RAM = (tree_num ? (memregion("user3")->base()) : (m_memory_devices + 0x1800));
 
 	int preload = ((sy < 32) ? 1 : 0);
 
@@ -384,12 +380,12 @@ static void draw_tree( running_machine &machine, bitmap_ind16 &bitmap, int sy, i
 	/* Update Counters */
 	if (sy == 30)
 	{
-		state->m_tree_on[tree_num] = 0;
+		m_tree_on[tree_num] = 0;
 		if (tree_num == 0)
-			state->m_v_count_tree = state->m_horizon;
+			m_v_count_tree = m_horizon;
 	}
 	if (tree_num == 0)
-		state->m_v_count_tree = (state->m_v_count_tree + 1) & 0xff;
+		m_v_count_tree = (m_v_count_tree + 1) & 0xff;
 
 	/* ----- STATE MACHINE ----- */
 	for (i = 0; i < 0x20; i++)
@@ -416,12 +412,12 @@ static void draw_tree( running_machine &machine, bitmap_ind16 &bitmap, int sy, i
 		if (prev_state & 0x10)
 			hosc = (math_train[8] << 4) | math_train[9];
 
-		rom_addr = state->m_slopeROM_bank | ((state->m_v_count_tree & 0x7e) << 2) | ((rom_count & 0x0e) >> 1);
+		rom_addr = m_slopeROM_bank | ((m_v_count_tree & 0x7e) << 2) | ((rom_count & 0x0e) >> 1);
 		ram_a5 = ((curr_state & 0x01) & ((curr_state & 0x40) >> 6) & preload) ^ 0x01;
 		ram_addr = (ram_a5 << 5) | (ram_count << 1) | ((curr_state & 0x20) >> 5);
 		ram2_addr = (ram_count << 1) | ((curr_state & 0x20) >> 5);
 		mux45 = rom_count & 0x01;
-		mux61 = state->m_v_count_tree & 0x01;
+		mux61 = m_v_count_tree & 0x01;
 
 		switch(curr_state)
 		{
@@ -441,9 +437,9 @@ static void draw_tree( running_machine &machine, bitmap_ind16 &bitmap, int sy, i
 				break;
 		}
 
-		if (!state->m_tree_on[tree_num])
+		if (!m_tree_on[tree_num])
 		{
-			int mux82 = (state->m_v_count_tree & 0x01) ^ 0x01;
+			int mux82 = (m_v_count_tree & 0x01) ^ 0x01;
 
 			switch(curr_state)
 			{
@@ -531,10 +527,10 @@ static void draw_tree( running_machine &machine, bitmap_ind16 &bitmap, int sy, i
 		ram_addr = ((tile_h & 0x1f8) >> 3) | ((tile_v & 0x1f0) << 2);
 		rom_addr = ((tile_h & 0x06) >> 1) | ((tile_v & 0x0f) << 2) | ((TILE_RAM[ram_addr] & 0x7f) << 6);
 
-		if (!(state->m_v_count_tree & 0x80) && (state->m_tree_en & (0x01 << tree_num)) && ((TILE_ROM[rom_addr] & 0xf0) == 0))
-			state->m_tree_on[tree_num] = 1;
+		if (!(m_v_count_tree & 0x80) && (m_tree_en & (0x01 << tree_num)) && ((TILE_ROM[rom_addr] & 0xf0) == 0))
+			m_tree_on[tree_num] = 1;
 
-		if (state->m_tree_on[tree_num])
+		if (m_tree_on[tree_num])
 		{
 			if (tile_h & 0x01)
 				col = TILE_ROM[rom_addr] & 0x0f;
@@ -571,10 +567,10 @@ static void draw_tree( running_machine &machine, bitmap_ind16 &bitmap, int sy, i
 		ram_addr = ((tile_h & 0x1f8) >> 3) | ((tile_v & 0x1f0) << 2);
 		rom_addr = ((tile_h & 0x06) >> 1) | ((tile_v & 0x0f) << 2) | ((TILE_RAM[ram_addr] & 0x7f) << 6);
 
-		if (!(state->m_v_count_tree & 0x80) && (state->m_tree_en & (0x01 << tree_num)) && ((TILE_ROM[rom_addr] & 0xf0) == 0))
-			state->m_tree_on[tree_num] = 1;
+		if (!(m_v_count_tree & 0x80) && (m_tree_en & (0x01 << tree_num)) && ((TILE_ROM[rom_addr] & 0xf0) == 0))
+			m_tree_on[tree_num] = 1;
 
-		if (state->m_tree_on[tree_num])
+		if (m_tree_on[tree_num])
 		{
 			if (tile_h & 0x01)
 				col = TILE_ROM[rom_addr] & 0x0f;
@@ -591,7 +587,7 @@ static void draw_tree( running_machine &machine, bitmap_ind16 &bitmap, int sy, i
 
 	/* Tree on only stays high if a pixel that is not 0xf is encountered,
 	   because any non 0xf pixel sets U56 high */
-	if (all_ff) state->m_tree_on[tree_num] = 0;
+	if (all_ff) m_tree_on[tree_num] = 0;
 }
 
 /*
@@ -655,10 +651,10 @@ TIMER_CALLBACK_MEMBER(changela_state::changela_scanline_callback)
 	m_tree0_bitmap.fill(0x00, rect);
 	m_tree1_bitmap.fill(0x00, rect);
 
-	draw_river(machine(), m_river_bitmap, sy);
-	draw_obj0(machine(), m_obj0_bitmap, sy);
-	draw_tree(machine(), m_tree0_bitmap, sy, 0);
-	draw_tree(machine(), m_tree1_bitmap, sy, 1);
+	draw_river(m_river_bitmap, sy);
+	draw_obj0(m_obj0_bitmap, sy);
+	draw_tree(m_tree0_bitmap, sy, 0);
+	draw_tree(m_tree1_bitmap, sy, 1);
 
 	/* Collision Detection */
 	for (sx = 1; sx < 256; sx++)
@@ -725,7 +721,7 @@ UINT32 changela_state::screen_update_changela(screen_device &screen, bitmap_ind1
 	copybitmap_trans(bitmap, m_obj0_bitmap,  0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, m_tree0_bitmap, 0, 0, 0, 0, cliprect, 0);
 	copybitmap_trans(bitmap, m_tree1_bitmap, 0, 0, 0, 0, cliprect, 0);
-	draw_obj1(machine(), bitmap);
+	draw_obj1(bitmap);
 
 	return 0;
 }

@@ -31,4 +31,5 @@ public:
 	DECLARE_VIDEO_START(clshroad);
 	DECLARE_PALETTE_INIT(clshroad);
 	UINT32 screen_update_clshroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

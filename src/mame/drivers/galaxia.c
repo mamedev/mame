@@ -70,7 +70,7 @@ TODO:
 INTERRUPT_GEN_MEMBER(galaxia_state::galaxia_interrupt)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
-	cvs_scroll_stars(machine());
+	cvs_scroll_stars();
 }
 
 

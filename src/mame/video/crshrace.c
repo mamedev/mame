@@ -95,17 +95,15 @@ WRITE16_MEMBER(crshrace_state::crshrace_gfxctrl_w)
 
 ***************************************************************************/
 
-static void draw_bg( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void crshrace_state::draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	crshrace_state *state = machine.driver_data<crshrace_state>();
-	state->m_tilemap2->draw(bitmap, cliprect, 0, 0);
+	m_tilemap2->draw(bitmap, cliprect, 0, 0);
 }
 
 
-static void draw_fg(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void crshrace_state::draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	crshrace_state *state = machine.driver_data<crshrace_state>();
-	k053936_zoom_draw(state->m_k053936, bitmap, cliprect, state->m_tilemap1, 0, 0, 1);
+	k053936_zoom_draw(m_k053936, bitmap, cliprect, m_tilemap1, 0, 0, 1);
 }
 
 
@@ -125,13 +123,13 @@ UINT32 crshrace_state::screen_update_crshrace(screen_device &screen, bitmap_ind1
 	{
 		case 0x00:  /* high score screen */
 			m_spr->draw_sprites(m_spriteram->buffer(), 0x2000,  machine(), bitmap, cliprect);
-			draw_bg(machine(), bitmap, cliprect);
-			draw_fg(machine(), bitmap, cliprect);
+			draw_bg(bitmap, cliprect);
+			draw_fg(bitmap, cliprect);
 			break;
 		case 0x01:
 		case 0x02:
-			draw_bg(machine(), bitmap, cliprect);
-			draw_fg(machine(), bitmap, cliprect);
+			draw_bg(bitmap, cliprect);
+			draw_fg(bitmap, cliprect);
 			m_spr->draw_sprites(m_spriteram->buffer(), 0x2000,  machine(), bitmap, cliprect);
 			break;
 		default:

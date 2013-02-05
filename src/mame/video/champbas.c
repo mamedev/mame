@@ -188,27 +188,26 @@ WRITE8_MEMBER(champbas_state::champbas_flipscreen_w)
 
 
 
-static void champbas_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void champbas_state::champbas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	champbas_state *state = machine.driver_data<champbas_state>();
 	int offs;
-	gfx_element* const gfx = machine.gfx[1];
+	gfx_element* const gfx = machine().gfx[1];
 
-	for (offs = state->m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
+	for (offs = m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
 	{
-		int code = (state->m_spriteram[offs] >> 2) | (state->m_gfx_bank << 6);
-		int color = (state->m_spriteram[offs + 1] & 0x1f) | (state->m_palette_bank << 6);
-		int flipx = ~state->m_spriteram[offs] & 0x01;
-		int flipy = ~state->m_spriteram[offs] & 0x02;
-		int sx = state->m_spriteram_2[offs + 1] - 16;
-		int sy = 255 - state->m_spriteram_2[offs];
+		int code = (m_spriteram[offs] >> 2) | (m_gfx_bank << 6);
+		int color = (m_spriteram[offs + 1] & 0x1f) | (m_palette_bank << 6);
+		int flipx = ~m_spriteram[offs] & 0x01;
+		int flipy = ~m_spriteram[offs] & 0x02;
+		int sx = m_spriteram_2[offs + 1] - 16;
+		int sy = 255 - m_spriteram_2[offs];
 
 		drawgfx_transmask(bitmap, cliprect,
 				gfx,
 				code, color,
 				flipx, flipy,
 				sx, sy,
-				colortable_get_transpen_mask(machine.colortable, gfx, color, 0));
+				colortable_get_transpen_mask(machine().colortable, gfx, color, 0));
 
 		// wraparound
 		drawgfx_transmask(bitmap, cliprect,
@@ -216,18 +215,17 @@ static void champbas_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 				code, color,
 				flipx, flipy,
 				sx + 256, sy,
-				colortable_get_transpen_mask(machine.colortable, gfx, color, 0));
+				colortable_get_transpen_mask(machine().colortable, gfx, color, 0));
 	}
 }
 
-static void exctsccr_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void champbas_state::exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	champbas_state *state = machine.driver_data<champbas_state>();
 	int offs;
 	UINT8 *obj1, *obj2;
 
-	obj1 = state->m_bg_videoram;
-	obj2 = &(state->m_spriteram[0x20]);
+	obj1 = m_bg_videoram;
+	obj2 = &(m_spriteram[0x20]);
 
 	for (offs = 0x0e; offs >= 0; offs -= 2)
 	{
@@ -243,15 +241,15 @@ static void exctsccr_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		bank = ((obj1[offs + 1] >> 4) & 1);
 
 		drawgfx_transpen(bitmap,cliprect,
-				machine.gfx[1],
+				machine().gfx[1],
 				code + (bank << 6),
 				color,
 				flipx, flipy,
 				sx,sy,0);
 	}
 
-	obj1 = state->m_spriteram_2;
-	obj2 = state->m_spriteram;
+	obj1 = m_spriteram_2;
+	obj2 = m_spriteram;
 
 	for (offs = 0x0e; offs >= 0; offs -= 2)
 	{
@@ -266,12 +264,12 @@ static void exctsccr_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		color = (obj1[offs + 1]) & 0x0f;
 
 		drawgfx_transmask(bitmap,cliprect,
-				machine.gfx[2],
+				machine().gfx[2],
 				code,
 				color,
 				flipx, flipy,
 				sx,sy,
-				colortable_get_transpen_mask(machine.colortable, machine.gfx[2], color, 0x10));
+				colortable_get_transpen_mask(machine().colortable, machine().gfx[2], color, 0x10));
 	}
 }
 
@@ -280,13 +278,13 @@ static void exctsccr_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 UINT32 champbas_state::screen_update_champbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	champbas_draw_sprites(machine(), bitmap, cliprect);
+	champbas_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
 UINT32 champbas_state::screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	exctsccr_draw_sprites(machine(), bitmap, cliprect);
+	exctsccr_draw_sprites(bitmap, cliprect);
 	return 0;
 }

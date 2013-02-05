@@ -333,10 +333,10 @@ ROM_END
  *
  *************************************/
 
-static void compgolf_expand_bg(running_machine &machine)
+void compgolf_state::compgolf_expand_bg()
 {
-	UINT8 *GFXDST = machine.root_device().memregion("gfx2")->base();
-	UINT8 *GFXSRC = machine.root_device().memregion("gfx4")->base();
+	UINT8 *GFXDST = machine().root_device().memregion("gfx2")->base();
+	UINT8 *GFXSRC = machine().root_device().memregion("gfx4")->base();
 
 	int x;
 
@@ -350,7 +350,7 @@ static void compgolf_expand_bg(running_machine &machine)
 DRIVER_INIT_MEMBER(compgolf_state,compgolf)
 {
 	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("user1")->base(), 0x4000);
-	compgolf_expand_bg(machine());
+	compgolf_expand_bg();
 }
 
 

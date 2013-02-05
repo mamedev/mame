@@ -90,18 +90,17 @@ PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 }
 
 
-static void set_pens( running_machine &machine )
+void combatsc_state::set_pens(  )
 {
-	combatsc_state *state = machine.driver_data<combatsc_state>();
 	int i;
 
 	for (i = 0x00; i < 0x100; i += 2)
 	{
-		UINT16 data = state->m_paletteram[i] | (state->m_paletteram[i | 1] << 8);
+		UINT16 data = m_paletteram[i] | (m_paletteram[i | 1] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine.colortable, i >> 1, color);
+		colortable_palette_set_color(machine().colortable, i >> 1, color);
 	}
 }
 
@@ -380,14 +379,13 @@ WRITE8_MEMBER(combatsc_state::combatsc_scrollram_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit, UINT32 pri_mask )
+void combatsc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit, UINT32 pri_mask )
 {
-	combatsc_state *state = machine.driver_data<combatsc_state>();
-	device_t *k007121 = circuit ? state->m_k007121_2 : state->m_k007121_1;
-	address_space &space = machine.driver_data()->generic_space();
+	device_t *k007121 = circuit ? m_k007121_2 : m_k007121_1;
+	address_space &space = machine().driver_data()->generic_space();
 	int base_color = (circuit * 4) * 16 + (k007121_ctrlram_r(k007121, space, 6) & 0x10) * 2;
 
-	k007121_sprites_draw(k007121, bitmap, cliprect, machine.gfx[circuit], machine.colortable, source, base_color, 0, 0, pri_mask);
+	k007121_sprites_draw(k007121, bitmap, cliprect, machine().gfx[circuit], machine().colortable, source, base_color, 0, 0, pri_mask);
 }
 
 
@@ -395,7 +393,7 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 {
 	int i;
 
-	set_pens(machine());
+	set_pens();
 
 	address_space &space = machine().driver_data()->generic_space();
 	if (k007121_ctrlram_r(m_k007121_1, space, 1) & 0x02)
@@ -435,8 +433,8 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 		m_bg_tilemap[0]->draw(bitmap, cliprect, 1, 2);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(machine(), bitmap, cliprect, m_spriteram[1], 1, 0x0f00);
-		draw_sprites(machine(), bitmap, cliprect, m_spriteram[0], 0, 0x4444);
+		draw_sprites(bitmap, cliprect, m_spriteram[1], 1, 0x0f00);
+		draw_sprites(bitmap, cliprect, m_spriteram[0], 0, 0x4444);
 	}
 	else
 	{
@@ -446,8 +444,8 @@ UINT32 combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_ind1
 		m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 8);
 
 		/* we use the priority buffer so sprites are drawn front to back */
-		draw_sprites(machine(), bitmap, cliprect, m_spriteram[1], 1, 0x0f00);
-		draw_sprites(machine(), bitmap, cliprect, m_spriteram[0], 0, 0x4444);
+		draw_sprites(bitmap, cliprect, m_spriteram[1], 1, 0x0f00);
+		draw_sprites(bitmap, cliprect, m_spriteram[0], 0, 0x4444);
 	}
 
 	if (k007121_ctrlram_r(m_k007121_1, space, 1) & 0x08)
@@ -503,10 +501,10 @@ byte #4:
 
 ***************************************************************************/
 
-static void bootleg_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit )
+void combatsc_state::bootleg_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *source, int circuit )
 {
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	gfx_element *gfx = machine.gfx[circuit + 2];
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	gfx_element *gfx = machine().gfx[circuit + 2];
 
 	int limit = circuit ? (space.read_byte(0xc2) * 256 + space.read_byte(0xc3)) : (space.read_byte(0xc0) * 256 + space.read_byte(0xc1));
 	const UINT8 *finish;
@@ -536,9 +534,9 @@ static void bootleg_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 			color = (circuit * 4) * 16 + (color >> 4);
 
 			/*  hacks to select alternate palettes */
-//          if(state->m_vreg == 0x40 && (attributes & 0x40)) color += 1*16;
-//          if(state->m_vreg == 0x23 && (attributes & 0x02)) color += 1*16;
-//          if(state->m_vreg == 0x66 ) color += 2*16;
+//          if(m_vreg == 0x40 && (attributes & 0x40)) color += 1*16;
+//          if(m_vreg == 0x23 && (attributes & 0x02)) color += 1*16;
+//          if(m_vreg == 0x66 ) color += 2*16;
 
 			drawgfx_transpen(   bitmap, cliprect, gfx,
 							number, color,
@@ -553,7 +551,7 @@ UINT32 combatsc_state::screen_update_combatscb(screen_device &screen, bitmap_ind
 {
 	int i;
 
-	set_pens(machine());
+	set_pens();
 
 	for (i = 0; i < 32; i++)
 	{
@@ -566,16 +564,16 @@ UINT32 combatsc_state::screen_update_combatscb(screen_device &screen, bitmap_ind
 	if (m_priority == 0)
 	{
 		m_bg_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		bootleg_draw_sprites(machine(), bitmap,cliprect, m_page[0], 0);
+		bootleg_draw_sprites(bitmap,cliprect, m_page[0], 0);
 		m_bg_tilemap[0]->draw(bitmap, cliprect, 0 ,0);
-		bootleg_draw_sprites(machine(), bitmap,cliprect, m_page[1], 1);
+		bootleg_draw_sprites(bitmap,cliprect, m_page[1], 1);
 	}
 	else
 	{
 		m_bg_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		bootleg_draw_sprites(machine(), bitmap,cliprect, m_page[0], 0);
+		bootleg_draw_sprites(bitmap,cliprect, m_page[0], 0);
 		m_bg_tilemap[1]->draw(bitmap, cliprect, 0, 0);
-		bootleg_draw_sprites(machine(), bitmap,cliprect, m_page[1], 1);
+		bootleg_draw_sprites(bitmap,cliprect, m_page[1], 1);
 	}
 
 	m_textlayer->draw(bitmap, cliprect, 0, 0);

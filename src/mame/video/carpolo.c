@@ -186,9 +186,9 @@ static void draw_alpha_line(running_machine &machine, bitmap_ind16 &bitmap, cons
 }
 
 
-static void remap_sprite_code(running_machine &machine, int bank, int code, int *remapped_code, int *flipy)
+void carpolo_state::remap_sprite_code(int bank, int code, int *remapped_code, int *flipy)
 {
-	UINT8* PROM = machine.root_device().memregion("user1")->base();
+	UINT8* PROM = machine().root_device().memregion("user1")->base();
 
 	code = (bank << 4) | code;
 	*remapped_code = PROM[code] & 0x0f;
@@ -196,23 +196,23 @@ static void remap_sprite_code(running_machine &machine, int bank, int code, int 
 }
 
 
-static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
+void carpolo_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect,
 						UINT8 x, UINT8 y, int bank, int code, int col)
 {
 	int remapped_code, flipy;
 
-	remap_sprite_code(machine, bank, code, &remapped_code, &flipy);
+	remap_sprite_code(bank, code, &remapped_code, &flipy);
 
 	x = 240 - x;
 	y = 240 - y;
 
-	drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+	drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 			remapped_code, col,
 			0, flipy,
 			x, y,0);
 
 	/* draw with wrap around */
-	drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+	drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 			remapped_code, col,
 			0, flipy,
 			(INT16)x - 256, y,0);
@@ -230,7 +230,7 @@ UINT32 carpolo_state::screen_update_carpolo(screen_device &screen, bitmap_ind16 
 	bitmap.plot_box(0,TOP_BORDER,RIGHT_BORDER+1,BOTTOM_BORDER-TOP_BORDER+1,FIELD_PEN);
 
 	/* car 1 */
-	draw_sprite(machine(), bitmap, cliprect,
+	draw_sprite(bitmap, cliprect,
 				m_spriteram[0x00], m_spriteram[0x01],
 				0, m_spriteram[0x0c] & 0x0f, CAR1_COLOR);
 
@@ -241,22 +241,22 @@ UINT32 carpolo_state::screen_update_carpolo(screen_device &screen, bitmap_ind16 
 	bitmap.plot_box(RIGHT_BORDER,TOP_BORDER,1,BOTTOM_BORDER-TOP_BORDER+1,LINE_PEN);
 
 	/* car 4 */
-	draw_sprite(machine(), bitmap, cliprect,
+	draw_sprite(bitmap, cliprect,
 				m_spriteram[0x06], m_spriteram[0x07],
 				0, m_spriteram[0x0d] >> 4, CAR4_COLOR);
 
 	/* car 3 */
-	draw_sprite(machine(), bitmap, cliprect,
+	draw_sprite(bitmap, cliprect,
 				m_spriteram[0x04], m_spriteram[0x05],
 				0, m_spriteram[0x0d] & 0x0f, CAR3_COLOR);
 
 	/* car 2 */
-	draw_sprite(machine(), bitmap, cliprect,
+	draw_sprite(bitmap, cliprect,
 				m_spriteram[0x02], m_spriteram[0x03],
 				0, m_spriteram[0x0c] >> 4, CAR2_COLOR);
 
 	/* ball */
-	draw_sprite(machine(), bitmap, cliprect,
+	draw_sprite(bitmap, cliprect,
 				m_spriteram[0x08], m_spriteram[0x09],
 				1, m_spriteram[0x0e] & 0x0f, BALL_COLOR);
 
@@ -281,7 +281,7 @@ UINT32 carpolo_state::screen_update_carpolo(screen_device &screen, bitmap_ind16 
 		popmessage("WIDE!\n");
 
 	if (m_spriteram[0x0f] & 0x01)
-		draw_sprite(machine(), bitmap, cliprect,
+		draw_sprite(bitmap, cliprect,
 					m_spriteram[0x0a], m_spriteram[0x0b],
 					1, m_spriteram[0x0e] >> 4, SPECIAL_CHAR_COLOR);
 
@@ -311,7 +311,7 @@ UINT32 carpolo_state::screen_update_carpolo(screen_device &screen, bitmap_ind16 
  *
  *************************************/
 
-static void normalize_coordinates(int *x1, int *y1, int *x2, int *y2)
+void carpolo_state::normalize_coordinates(int *x1, int *y1, int *x2, int *y2)
 {
 	if (*x1 < *x2)
 	{
@@ -337,12 +337,10 @@ static void normalize_coordinates(int *x1, int *y1, int *x2, int *y2)
 }
 
 
-static int check_sprite_sprite_collision(running_machine &machine,
-											int x1, int y1, int code1, int flipy1,
+int carpolo_state::check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
 											int x2, int y2, int code2, int flipy2,
 											int *col_x, int *col_y)
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
 	int collided = 0;
 
 	x1 = 240 - x1;
@@ -357,23 +355,23 @@ static int check_sprite_sprite_collision(running_machine &machine,
 
 		normalize_coordinates(&x1, &y1, &x2, &y2);
 
-		state->m_sprite_sprite_collision_bitmap1->fill(0);
-		state->m_sprite_sprite_collision_bitmap2->fill(0);
+		m_sprite_sprite_collision_bitmap1->fill(0);
+		m_sprite_sprite_collision_bitmap2->fill(0);
 
-		drawgfx_opaque(*state->m_sprite_sprite_collision_bitmap1,state->m_sprite_sprite_collision_bitmap1->cliprect(),machine.gfx[0],
+		drawgfx_opaque(*m_sprite_sprite_collision_bitmap1,m_sprite_sprite_collision_bitmap1->cliprect(),machine().gfx[0],
 				code1,0,
 				0,flipy1,
 				x1,y1);
 
-		drawgfx_opaque(*state->m_sprite_sprite_collision_bitmap2,state->m_sprite_sprite_collision_bitmap2->cliprect(),machine.gfx[0],
+		drawgfx_opaque(*m_sprite_sprite_collision_bitmap2,m_sprite_sprite_collision_bitmap2->cliprect(),machine().gfx[0],
 				code2,0,
 				0,flipy2,
 				x2,y2);
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
-				if ((state->m_sprite_sprite_collision_bitmap1->pix16(y, x) == 1) &&
-					(state->m_sprite_sprite_collision_bitmap2->pix16(y, x) == 1))
+				if ((m_sprite_sprite_collision_bitmap1->pix16(y, x) == 1) &&
+					(m_sprite_sprite_collision_bitmap2->pix16(y, x) == 1))
 				{
 					*col_x = (x1 + x) & 0x0f;
 					*col_y = (y1 + y) & 0x0f;
@@ -390,9 +388,8 @@ static int check_sprite_sprite_collision(running_machine &machine,
 
 /* returns 1 for collision with goal post,
    2 for collision with scoring area */
-static int check_sprite_left_goal_collision(running_machine &machine, int x1, int y1, int code1, int flipy1, int goalpost_only)
+int carpolo_state::check_sprite_left_goal_collision(int x1, int y1, int code1, int flipy1, int goalpost_only)
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
 	int collided = 0;
 
 	x1 = 240 - x1;
@@ -411,15 +408,15 @@ static int check_sprite_left_goal_collision(running_machine &machine, int x1, in
 
 		normalize_coordinates(&x1, &y1, &x2, &y2);
 
-		state->m_sprite_goal_collision_bitmap1->fill(0);
-		state->m_sprite_goal_collision_bitmap2->fill(0);
+		m_sprite_goal_collision_bitmap1->fill(0);
+		m_sprite_goal_collision_bitmap2->fill(0);
 
-		drawgfx_opaque(*state->m_sprite_goal_collision_bitmap1,state->m_sprite_goal_collision_bitmap1->cliprect(),machine.gfx[0],
+		drawgfx_opaque(*m_sprite_goal_collision_bitmap1,m_sprite_goal_collision_bitmap1->cliprect(),machine().gfx[0],
 				code1,0,
 				0,flipy1,
 				x1,y1);
 
-		drawgfxzoom_transpen(*state->m_sprite_goal_collision_bitmap2,state->m_sprite_goal_collision_bitmap2->cliprect(),machine.gfx[1],
+		drawgfxzoom_transpen(*m_sprite_goal_collision_bitmap2,m_sprite_goal_collision_bitmap2->cliprect(),machine().gfx[1],
 					0,0,
 					0,0,
 					x2,y2,
@@ -427,9 +424,9 @@ static int check_sprite_left_goal_collision(running_machine &machine, int x1, in
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
-				if (state->m_sprite_goal_collision_bitmap1->pix16(y, x) == 1)
+				if (m_sprite_goal_collision_bitmap1->pix16(y, x) == 1)
 				{
-					pen_t pix = state->m_sprite_goal_collision_bitmap2->pix16(y, x);
+					pen_t pix = m_sprite_goal_collision_bitmap2->pix16(y, x);
 
 					if (pix == LEFT_GOAL_PEN)
 					{
@@ -449,9 +446,8 @@ static int check_sprite_left_goal_collision(running_machine &machine, int x1, in
 }
 
 
-static int check_sprite_right_goal_collision(running_machine &machine, int x1, int y1, int code1, int flipy1, int goalpost_only)
+int carpolo_state::check_sprite_right_goal_collision(int x1, int y1, int code1, int flipy1, int goalpost_only)
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
 	int collided = 0;
 
 	x1 = 240 - x1;
@@ -469,15 +465,15 @@ static int check_sprite_right_goal_collision(running_machine &machine, int x1, i
 
 		normalize_coordinates(&x1, &y1, &x2, &y2);
 
-		state->m_sprite_goal_collision_bitmap1->fill(0);
-		state->m_sprite_goal_collision_bitmap2->fill(0);
+		m_sprite_goal_collision_bitmap1->fill(0);
+		m_sprite_goal_collision_bitmap2->fill(0);
 
-		drawgfx_opaque(*state->m_sprite_goal_collision_bitmap1,state->m_sprite_goal_collision_bitmap1->cliprect(),machine.gfx[0],
+		drawgfx_opaque(*m_sprite_goal_collision_bitmap1,m_sprite_goal_collision_bitmap1->cliprect(),machine().gfx[0],
 				code1,0,
 				0,flipy1,
 				x1,y1);
 
-		drawgfxzoom_transpen(*state->m_sprite_goal_collision_bitmap2,state->m_sprite_goal_collision_bitmap2->cliprect(),machine.gfx[1],
+		drawgfxzoom_transpen(*m_sprite_goal_collision_bitmap2,m_sprite_goal_collision_bitmap2->cliprect(),machine().gfx[1],
 					0,1,
 					1,0,
 					x2,y2,
@@ -485,9 +481,9 @@ static int check_sprite_right_goal_collision(running_machine &machine, int x1, i
 
 		for (x = x1; x < x1 + SPRITE_WIDTH; x++)
 			for (y = y1; y < y1 + SPRITE_HEIGHT; y++)
-				if (state->m_sprite_goal_collision_bitmap1->pix16(y, x) == 1)
+				if (m_sprite_goal_collision_bitmap1->pix16(y, x) == 1)
 				{
-					pen_t pix = state->m_sprite_goal_collision_bitmap2->pix16(y, x);
+					pen_t pix = m_sprite_goal_collision_bitmap2->pix16(y, x);
 
 					if (pix == RIGHT_GOAL_PEN)
 					{
@@ -509,23 +505,22 @@ static int check_sprite_right_goal_collision(running_machine &machine, int x1, i
 
 /* returns 1 for collision with vertical border,
    2 for collision with horizontal border */
-static int check_sprite_border_collision(running_machine &machine, UINT8 x1, UINT8 y1, int code1, int flipy1)
+int carpolo_state::check_sprite_border_collision(UINT8 x1, UINT8 y1, int code1, int flipy1)
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
 	UINT8 x,y;
 	int collided = 0;
 
 	x1 = 240 - x1;
 	y1 = 240 - y1;
 
-	drawgfx_opaque(*state->m_sprite_border_collision_bitmap,state->m_sprite_border_collision_bitmap->cliprect(),machine.gfx[0],
+	drawgfx_opaque(*m_sprite_border_collision_bitmap,m_sprite_border_collision_bitmap->cliprect(),machine().gfx[0],
 			code1,0,
 			0,flipy1,
 			0,0);
 
 	for (x = 0; x < SPRITE_WIDTH; x++)
 		for (y = 0; y < SPRITE_HEIGHT; y++)
-			if (state->m_sprite_border_collision_bitmap->pix16(y, x) == 1)
+			if (m_sprite_border_collision_bitmap->pix16(y, x) == 1)
 			{
 				if (((UINT8)(x1 + x) == LEFT_BORDER) ||
 					((UINT8)(x1 + x) == RIGHT_BORDER))
@@ -562,139 +557,129 @@ void carpolo_state::screen_eof_carpolo(screen_device &screen, bool state)
 
 		car1_x = m_spriteram[0x00];
 		car1_y = m_spriteram[0x01];
-		remap_sprite_code(machine(), 0, m_spriteram[0x0c] & 0x0f, &car1_code, &car1_flipy);
+		remap_sprite_code(0, m_spriteram[0x0c] & 0x0f, &car1_code, &car1_flipy);
 
 		car2_x = m_spriteram[0x02];
 		car2_y = m_spriteram[0x03];
-		remap_sprite_code(machine(), 0, m_spriteram[0x0c] >> 4,   &car2_code, &car2_flipy);
+		remap_sprite_code(0, m_spriteram[0x0c] >> 4,   &car2_code, &car2_flipy);
 
 		car3_x = m_spriteram[0x04];
 		car3_y = m_spriteram[0x05];
-		remap_sprite_code(machine(), 0, m_spriteram[0x0d] & 0x0f, &car3_code, &car3_flipy);
+		remap_sprite_code(0, m_spriteram[0x0d] & 0x0f, &car3_code, &car3_flipy);
 
 		car4_x = m_spriteram[0x06];
 		car4_y = m_spriteram[0x07];
-		remap_sprite_code(machine(), 0, m_spriteram[0x0d] >> 4,   &car4_code, &car4_flipy);
+		remap_sprite_code(0, m_spriteram[0x0d] >> 4,   &car4_code, &car4_flipy);
 
 		ball_x = m_spriteram[0x08];
 		ball_y = m_spriteram[0x09];
-		remap_sprite_code(machine(), 1, m_spriteram[0x0e] & 0x0f, &ball_code, &ball_flipy);
+		remap_sprite_code(1, m_spriteram[0x0e] & 0x0f, &ball_code, &ball_flipy);
 
 
 		/* cars 1 and 2 */
-		if (check_sprite_sprite_collision(machine(),
-											car1_x, car1_y, car1_code, car1_flipy,
+		if (check_sprite_sprite_collision(car1_x, car1_y, car1_code, car1_flipy,
 											car2_x, car2_y, car2_code, car2_flipy,
 											&col_x, &col_y))
-			carpolo_generate_car_car_interrupt(machine(), 0, 1);
+			carpolo_generate_car_car_interrupt(0, 1);
 
 		/* cars 1 and 3 */
-		else if (check_sprite_sprite_collision(machine(),
-												car1_x, car1_y, car1_code, car1_flipy,
+		else if (check_sprite_sprite_collision(car1_x, car1_y, car1_code, car1_flipy,
 												car3_x, car3_y, car3_code, car3_flipy,
 												&col_x, &col_y))
-			carpolo_generate_car_car_interrupt(machine(), 0, 2);
+			carpolo_generate_car_car_interrupt(0, 2);
 
 		/* cars 1 and 4 */
-		else if (check_sprite_sprite_collision(machine(),
-												car1_x, car1_y, car1_code, car1_flipy,
+		else if (check_sprite_sprite_collision(car1_x, car1_y, car1_code, car1_flipy,
 												car4_x, car4_y, car4_code, car4_flipy,
 												&col_x, &col_y))
-			carpolo_generate_car_car_interrupt(machine(), 0, 3);
+			carpolo_generate_car_car_interrupt(0, 3);
 
 		/* cars 2 and 3 */
-		else if (check_sprite_sprite_collision(machine(),
-												car2_x, car2_y, car2_code, car2_flipy,
+		else if (check_sprite_sprite_collision(car2_x, car2_y, car2_code, car2_flipy,
 												car3_x, car3_y, car3_code, car3_flipy,
 												&col_x, &col_y))
-			carpolo_generate_car_car_interrupt(machine(), 1, 2);
+			carpolo_generate_car_car_interrupt(1, 2);
 
 		/* cars 2 and 4 */
-		else if (check_sprite_sprite_collision(machine(),
-												car2_x, car2_y, car2_code, car2_flipy,
+		else if (check_sprite_sprite_collision(car2_x, car2_y, car2_code, car2_flipy,
 												car4_x, car4_y, car4_code, car4_flipy,
 												&col_x, &col_y))
-			carpolo_generate_car_car_interrupt(machine(), 1, 3);
+			carpolo_generate_car_car_interrupt(1, 3);
 
 		/* cars 3 and 4 */
-		else if (check_sprite_sprite_collision(machine(),
-												car3_x, car3_y, car3_code, car3_flipy,
+		else if (check_sprite_sprite_collision(car3_x, car3_y, car3_code, car3_flipy,
 												car4_x, car4_y, car4_code, car4_flipy,
 												&col_x, &col_y))
-			carpolo_generate_car_car_interrupt(machine(), 2, 3);
+			carpolo_generate_car_car_interrupt(2, 3);
 
 
 
 		/* check car-ball collision */
-		if (check_sprite_sprite_collision(machine(),
-											car1_x, car1_y, car1_code, car1_flipy,
+		if (check_sprite_sprite_collision(car1_x, car1_y, car1_code, car1_flipy,
 											ball_x, ball_y, ball_code, ball_flipy,
 											&col_x, &col_y))
-			carpolo_generate_car_ball_interrupt(machine(), 0, col_x, col_y);
+			carpolo_generate_car_ball_interrupt(0, col_x, col_y);
 
-		else if (check_sprite_sprite_collision(machine(),
-												car2_x, car2_y, car2_code, car2_flipy,
+		else if (check_sprite_sprite_collision(car2_x, car2_y, car2_code, car2_flipy,
 												ball_x, ball_y, ball_code, ball_flipy,
 												&col_x, &col_y))
-			carpolo_generate_car_ball_interrupt(machine(), 1, col_x, col_y);
+			carpolo_generate_car_ball_interrupt(1, col_x, col_y);
 
-		else if (check_sprite_sprite_collision(machine(),
-												car3_x, car3_y, car3_code, car3_flipy,
+		else if (check_sprite_sprite_collision(car3_x, car3_y, car3_code, car3_flipy,
 												ball_x, ball_y, ball_code, ball_flipy,
 												&col_x, &col_y))
-			carpolo_generate_car_ball_interrupt(machine(), 2, col_x, col_y);
+			carpolo_generate_car_ball_interrupt(2, col_x, col_y);
 
-		else if (check_sprite_sprite_collision(machine(),
-												car4_x, car4_y, car4_code, car4_flipy,
+		else if (check_sprite_sprite_collision(car4_x, car4_y, car4_code, car4_flipy,
 												ball_x, ball_y, ball_code, ball_flipy,
 												&col_x, &col_y))
-			carpolo_generate_car_ball_interrupt(machine(), 3, col_x, col_y);
+			carpolo_generate_car_ball_interrupt(3, col_x, col_y);
 
 
 		/* check car-goal collision */
-		if (check_sprite_left_goal_collision(machine(), car1_x, car1_y, car1_code, car1_flipy, 1))
-			carpolo_generate_car_goal_interrupt(machine(), 0, 0);
+		if (check_sprite_left_goal_collision(car1_x, car1_y, car1_code, car1_flipy, 1))
+			carpolo_generate_car_goal_interrupt(0, 0);
 
-		else if (check_sprite_right_goal_collision(machine(), car1_x, car1_y, car1_code, car1_flipy, 1))
-			carpolo_generate_car_goal_interrupt(machine(), 0, 1);
+		else if (check_sprite_right_goal_collision(car1_x, car1_y, car1_code, car1_flipy, 1))
+			carpolo_generate_car_goal_interrupt(0, 1);
 
-		else if (check_sprite_left_goal_collision(machine(), car2_x, car2_y, car2_code, car2_flipy, 1))
-			carpolo_generate_car_goal_interrupt(machine(), 1, 0);
+		else if (check_sprite_left_goal_collision(car2_x, car2_y, car2_code, car2_flipy, 1))
+			carpolo_generate_car_goal_interrupt(1, 0);
 
-		else if (check_sprite_right_goal_collision(machine(), car2_x, car2_y, car2_code, car2_flipy, 1))
-			carpolo_generate_car_goal_interrupt(machine(), 1, 1);
+		else if (check_sprite_right_goal_collision(car2_x, car2_y, car2_code, car2_flipy, 1))
+			carpolo_generate_car_goal_interrupt(1, 1);
 
-		else if (check_sprite_left_goal_collision(machine(), car3_x, car3_y, car3_code, car3_flipy, 1))
-			carpolo_generate_car_goal_interrupt(machine(), 2, 0);
+		else if (check_sprite_left_goal_collision(car3_x, car3_y, car3_code, car3_flipy, 1))
+			carpolo_generate_car_goal_interrupt(2, 0);
 
-		else if (check_sprite_right_goal_collision(machine(), car3_x, car3_y, car3_code, car3_flipy, 1))
-			carpolo_generate_car_goal_interrupt(machine(), 2, 1);
+		else if (check_sprite_right_goal_collision(car3_x, car3_y, car3_code, car3_flipy, 1))
+			carpolo_generate_car_goal_interrupt(2, 1);
 
-		else if (check_sprite_left_goal_collision(machine(), car4_x, car4_y, car4_code, car4_flipy, 1))
-			carpolo_generate_car_goal_interrupt(machine(), 3, 0);
+		else if (check_sprite_left_goal_collision(car4_x, car4_y, car4_code, car4_flipy, 1))
+			carpolo_generate_car_goal_interrupt(3, 0);
 
-		else if (check_sprite_right_goal_collision(machine(), car4_x, car4_y, car4_code, car4_flipy, 1))
-			carpolo_generate_car_goal_interrupt(machine(), 3, 1);
+		else if (check_sprite_right_goal_collision(car4_x, car4_y, car4_code, car4_flipy, 1))
+			carpolo_generate_car_goal_interrupt(3, 1);
 
 
 		/* check ball collision with static screen elements */
 		{
 			int col;
 
-			col = check_sprite_left_goal_collision(machine(), ball_x, ball_y, ball_code, ball_flipy, 0);
+			col = check_sprite_left_goal_collision(ball_x, ball_y, ball_code, ball_flipy, 0);
 
-			if (col == 1)  carpolo_generate_ball_screen_interrupt(machine(), 0x05);
-			if (col == 2)  carpolo_generate_ball_screen_interrupt(machine(), 0x03);
-
-
-			col = check_sprite_right_goal_collision(machine(), ball_x, ball_y, ball_code, ball_flipy, 0);
-
-			if (col == 1)  carpolo_generate_ball_screen_interrupt(machine(), 0x05 | 0x08);
-			if (col == 2)  carpolo_generate_ball_screen_interrupt(machine(), 0x03 | 0x08);
+			if (col == 1)  carpolo_generate_ball_screen_interrupt(0x05);
+			if (col == 2)  carpolo_generate_ball_screen_interrupt(0x03);
 
 
-			if (check_sprite_border_collision(machine(), ball_x, ball_y, ball_code, ball_flipy))
-				carpolo_generate_ball_screen_interrupt(machine(), 0x06);
+			col = check_sprite_right_goal_collision(ball_x, ball_y, ball_code, ball_flipy, 0);
+
+			if (col == 1)  carpolo_generate_ball_screen_interrupt(0x05 | 0x08);
+			if (col == 2)  carpolo_generate_ball_screen_interrupt(0x03 | 0x08);
+
+
+			if (check_sprite_border_collision(ball_x, ball_y, ball_code, ball_flipy))
+				carpolo_generate_ball_screen_interrupt(0x06);
 		}
 
 
@@ -702,28 +687,28 @@ void carpolo_state::screen_eof_carpolo(screen_device &screen, bool state)
 		{
 			int col;
 
-			col = check_sprite_border_collision(machine(), car1_x, car1_y, car1_code, car1_flipy);
+			col = check_sprite_border_collision(car1_x, car1_y, car1_code, car1_flipy);
 
 			if (col)
-				carpolo_generate_car_border_interrupt(machine(), 0, (col == 2));
+				carpolo_generate_car_border_interrupt(0, (col == 2));
 			else
 			{
-				col = check_sprite_border_collision(machine(), car2_x, car2_y, car2_code, car2_flipy);
+				col = check_sprite_border_collision(car2_x, car2_y, car2_code, car2_flipy);
 
 				if (col)
-					carpolo_generate_car_border_interrupt(machine(), 1, (col == 2));
+					carpolo_generate_car_border_interrupt(1, (col == 2));
 				else
 				{
-					col = check_sprite_border_collision(machine(), car3_x, car3_y, car3_code, car3_flipy);
+					col = check_sprite_border_collision(car3_x, car3_y, car3_code, car3_flipy);
 
 					if (col)
-						carpolo_generate_car_border_interrupt(machine(), 2, (col == 2));
+						carpolo_generate_car_border_interrupt(2, (col == 2));
 					else
 					{
-						col = check_sprite_border_collision(machine(), car4_x, car4_y, car4_code, car4_flipy);
+						col = check_sprite_border_collision(car4_x, car4_y, car4_code, car4_flipy);
 
 						if (col)
-							carpolo_generate_car_border_interrupt(machine(), 3, (col == 2));
+							carpolo_generate_car_border_interrupt(3, (col == 2));
 					}
 				}
 			}

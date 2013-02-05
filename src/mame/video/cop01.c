@@ -161,15 +161,14 @@ WRITE8_MEMBER(cop01_state::cop01_vreg_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void cop01_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	cop01_state *state = machine.driver_data<cop01_state>();
 	int offs, code, attr, sx, sy, flipx, flipy, color;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
-		code = state->m_spriteram[offs + 1];
-		attr = state->m_spriteram[offs + 2];
+		code = m_spriteram[offs + 1];
+		attr = m_spriteram[offs + 2];
 		/* xxxx---- color
 		 * ----xx-- flipy,flipx
 		 * -------x msbx
@@ -178,10 +177,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		flipx = attr & 0x04;
 		flipy = attr & 0x08;
 
-		sx = (state->m_spriteram[offs + 3] - 0x80) + 256 * (attr & 0x01);
-		sy = 240 - state->m_spriteram[offs];
+		sx = (m_spriteram[offs + 3] - 0x80) + 256 * (attr & 0x01);
+		sy = 240 - m_spriteram[offs];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -190,9 +189,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 
 		if (code & 0x80)
-			code += (state->m_vreg[0] & 0x30) << 3;
+			code += (m_vreg[0] & 0x30) << 3;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 			code,
 			color,
 			flipx,flipy,
@@ -207,7 +206,7 @@ UINT32 cop01_state::screen_update_cop01(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->set_scrolly(0, m_vreg[3]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0 );
 	return 0;

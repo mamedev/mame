@@ -138,17 +138,16 @@
  *
  *************************************/
 
-INLINE void schedule_next_irq( running_machine &machine, int curscanline )
+inline void ccastles_state::schedule_next_irq( int curscanline )
 {
-	ccastles_state *state = machine.driver_data<ccastles_state>();
 
 	/* scan for a rising edge on the IRQCK signal */
 	for (curscanline++; ; curscanline = (curscanline + 1) & 0xff)
-		if ((state->m_syncprom[(curscanline - 1) & 0xff] & 8) == 0 && (state->m_syncprom[curscanline] & 8) != 0)
+		if ((m_syncprom[(curscanline - 1) & 0xff] & 8) == 0 && (m_syncprom[curscanline] & 8) != 0)
 			break;
 
 	/* next one at the start of this scanline */
-	state->m_irq_timer->adjust(machine.primary_screen->time_until_pos(curscanline), curscanline);
+	m_irq_timer->adjust(machine().primary_screen->time_until_pos(curscanline), curscanline);
 }
 
 
@@ -165,7 +164,7 @@ TIMER_CALLBACK_MEMBER(ccastles_state::clock_irq)
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 
 	/* find the next edge */
-	schedule_next_irq(machine(), param);
+	schedule_next_irq(param);
 }
 
 
@@ -215,7 +214,7 @@ void ccastles_state::machine_start()
 	/* create a timer for IRQs and set up the first callback */
 	m_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ccastles_state::clock_irq),this));
 	m_irq_state = 0;
-	schedule_next_irq(machine(), 0);
+	schedule_next_irq(0);
 
 	/* setup for save states */
 	save_item(NAME(m_irq_state));

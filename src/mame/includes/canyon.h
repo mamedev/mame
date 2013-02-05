@@ -44,6 +44,8 @@ public:
 	DECLARE_WRITE8_MEMBER(canyon_explode_w);
 	DECLARE_WRITE8_MEMBER(canyon_attract_w);
 	DECLARE_WRITE8_MEMBER(canyon_whistle_w);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_bombs( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 

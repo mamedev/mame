@@ -158,18 +158,17 @@ WRITE8_MEMBER(circusc_state::circusc_flipscreen_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void circusc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	circusc_state *state = machine.driver_data<circusc_state>();
 	int offs;
 	UINT8 *sr;
 
-	if ((*state->m_spritebank & 0x01) != 0)
-		sr = state->m_spriteram;
+	if ((*m_spritebank & 0x01) != 0)
+		sr = m_spriteram;
 	else
-		sr = state->m_spriteram_2;
+		sr = m_spriteram_2;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int code = sr[offs + 0] + 8 * (sr[offs + 1] & 0x20);
 		int color = sr[offs + 1] & 0x0f;
@@ -178,7 +177,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = sr[offs + 1] & 0x40;
 		int flipy = sr[offs + 1] & 0x80;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -187,11 +186,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 
 
-		drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transmask(bitmap,cliprect,machine().gfx[1],
 				code, color,
 				flipx,flipy,
 				sx,sy,
-				colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0));
+				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
 	}
 }
 
@@ -206,7 +205,7 @@ UINT32 circusc_state::screen_update_circusc(screen_device &screen, bitmap_ind16 
 
 	bitmap.fill(0, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

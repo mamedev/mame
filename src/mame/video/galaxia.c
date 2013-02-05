@@ -76,15 +76,15 @@ TILE_GET_INFO_MEMBER(galaxia_state::get_astrowar_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static void init_common( running_machine &machine )
+void galaxia_state::init_common()
 {
 	assert((STAR_PEN & 7) == 0);
-	cvs_init_stars(machine);
+	cvs_init_stars();
 }
 
 VIDEO_START_MEMBER(galaxia_state,galaxia)
 {
-	init_common(machine());
+	init_common();
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxia_state::get_galaxia_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
@@ -94,7 +94,7 @@ VIDEO_START_MEMBER(galaxia_state,galaxia)
 
 VIDEO_START_MEMBER(galaxia_state,astrowar)
 {
-	init_common(machine());
+	init_common();
 
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxia_state::get_astrowar_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
@@ -116,7 +116,7 @@ UINT32 galaxia_state::screen_update_galaxia(screen_device &screen, bitmap_ind16 
 	bitmap_ind16 &s2636_2_bitmap = s2636_update(machine().device("s2636_2"), cliprect);
 
 	bitmap.fill(0, cliprect);
-	cvs_update_stars(machine(), bitmap, cliprect, STAR_PEN, 1);
+	cvs_update_stars(bitmap, cliprect, STAR_PEN, 1);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -180,7 +180,7 @@ UINT32 galaxia_state::screen_update_astrowar(screen_device &screen, bitmap_ind16
 	bitmap_ind16 &s2636_0_bitmap = s2636_update(machine().device("s2636_0"), cliprect);
 
 	bitmap.fill(0, cliprect);
-	cvs_update_stars(machine(), bitmap, cliprect, STAR_PEN, 1);
+	cvs_update_stars(bitmap, cliprect, STAR_PEN, 1);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	copybitmap(m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 

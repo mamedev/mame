@@ -83,4 +83,5 @@ private:
 	void cyberbal_sound_reset();
 	UINT32 update_one_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
 	void update_sound_68k_interrupts();
+	inline void set_palette_entry(int entry, UINT16 value);
 };

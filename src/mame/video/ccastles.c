@@ -115,10 +115,9 @@ WRITE8_MEMBER(ccastles_state::ccastles_paletteram_w)
  *
  *************************************/
 
-INLINE void ccastles_write_vram( running_machine &machine, UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba )
+inline void ccastles_state::ccastles_write_vram( UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba )
 {
-	ccastles_state *state = machine.driver_data<ccastles_state>();
-	UINT8 *dest = &state->m_videoram[addr & 0x7ffe];
+	UINT8 *dest = &m_videoram[addr & 0x7ffe];
 	UINT8 promaddr = 0;
 	UINT8 wpbits;
 
@@ -141,7 +140,7 @@ INLINE void ccastles_write_vram( running_machine &machine, UINT16 addr, UINT8 da
 	promaddr |= (pixba << 0);
 
 	/* look up the PROM result */
-	wpbits = state->m_wpprom[promaddr];
+	wpbits = m_wpprom[promaddr];
 
 	/* write to the appropriate parts of VRAM depending on the result */
 	if (!(wpbits & 1))
@@ -162,26 +161,25 @@ INLINE void ccastles_write_vram( running_machine &machine, UINT16 addr, UINT8 da
  *
  *************************************/
 
-INLINE void bitmode_autoinc( running_machine &machine )
+inline void ccastles_state::bitmode_autoinc(  )
 {
-	ccastles_state *state = machine.driver_data<ccastles_state>();
 
 	/* auto increment in the x-direction if it's enabled */
-	if (!state->m_video_control[0]) /* /AX */
+	if (!m_video_control[0]) /* /AX */
 	{
-		if (!state->m_video_control[2]) /* /XINC */
-			state->m_bitmode_addr[0]++;
+		if (!m_video_control[2]) /* /XINC */
+			m_bitmode_addr[0]++;
 		else
-			state->m_bitmode_addr[0]--;
+			m_bitmode_addr[0]--;
 	}
 
 	/* auto increment in the y-direction if it's enabled */
-	if (!state->m_video_control[1]) /* /AY */
+	if (!m_video_control[1]) /* /AY */
 	{
-		if (!state->m_video_control[3]) /* /YINC */
-			state->m_bitmode_addr[1]++;
+		if (!m_video_control[3]) /* /YINC */
+			m_bitmode_addr[1]++;
 		else
-			state->m_bitmode_addr[1]--;
+			m_bitmode_addr[1]--;
 	}
 }
 
@@ -196,7 +194,7 @@ INLINE void bitmode_autoinc( running_machine &machine )
 WRITE8_MEMBER(ccastles_state::ccastles_videoram_w)
 {
 	/* direct writes to VRAM go through the write protect PROM as well */
-	ccastles_write_vram(machine(), offset, data, 0, 0);
+	ccastles_write_vram(offset, data, 0, 0);
 }
 
 
@@ -216,7 +214,7 @@ READ8_MEMBER(ccastles_state::ccastles_bitmode_r)
 	UINT8 result = m_videoram[addr] << ((~m_bitmode_addr[0] & 1) * 4);
 
 	/* autoincrement because /BITMD was selected */
-	bitmode_autoinc(machine());
+	bitmode_autoinc();
 
 	/* the low 4 bits of the data lines are not driven so make them all 1's */
 	return result | 0x0f;
@@ -232,17 +230,17 @@ WRITE8_MEMBER(ccastles_state::ccastles_bitmode_w)
 	data = (data & 0xf0) | (data >> 4);
 
 	/* write through the generic VRAM routine, passing the low 2 X bits as PIXB/PIXA */
-	ccastles_write_vram(machine(), addr, data, 1, m_bitmode_addr[0] & 3);
+	ccastles_write_vram(addr, data, 1, m_bitmode_addr[0] & 3);
 
 	/* autoincrement because /BITMD was selected */
-	bitmode_autoinc(machine());
+	bitmode_autoinc();
 }
 
 
 WRITE8_MEMBER(ccastles_state::ccastles_bitmode_addr_w)
 {
 	/* write through to video RAM and also to the addressing latches */
-	ccastles_write_vram(machine(), offset, data, 0, 0);
+	ccastles_write_vram(offset, data, 0, 0);
 	m_bitmode_addr[offset] = data;
 }
 

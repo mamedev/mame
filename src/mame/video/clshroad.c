@@ -280,13 +280,12 @@ Offset:     Format:     Value:
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void clshroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	clshroad_state *state = machine.driver_data<clshroad_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int i;
 
-	for (i = 0; i < state->m_spriteram.bytes() ; i += 8)
+	for (i = 0; i < m_spriteram.bytes() ; i += 8)
 	{
 		int y       =    240 - spriteram[i+1];
 		int code    =   (spriteram[i+3] & 0x3f) + (spriteram[i+2] << 6);
@@ -297,14 +296,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int flipy   =   0;
 
 		x -= 0x4a/2;
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			y = 240 - y;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				code,
 				attr & 0x0f,
 				flipx,flipy,
@@ -332,7 +331,7 @@ UINT32 clshroad_state::screen_update_clshroad(screen_device &screen, bitmap_ind1
 
 	m_tilemap_0a->draw(bitmap, cliprect, 0,0);  // Opaque
 	m_tilemap_0b->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

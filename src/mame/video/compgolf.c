@@ -86,28 +86,27 @@ xx------ xxxxxxxx -------- -------- sprite code
 -----x-- -------- -------- -------- Flip X
 -------- -------- -------- -------- Flip Y(used?)
 */
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void compgolf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	compgolf_state *state = machine.driver_data<compgolf_state>();
 	int offs, fx, fy, x, y, color, sprite;
 
 	for (offs = 0; offs < 0x60; offs += 4)
 	{
-		sprite = state->m_spriteram[offs + 1] + (((state->m_spriteram[offs] & 0xc0) >> 6) * 0x100);
-		x = 240 - state->m_spriteram[offs + 3];
-		y = state->m_spriteram[offs + 2];
-		color = (state->m_spriteram[offs] & 8)>>3;
-		fx = state->m_spriteram[offs] & 4;
+		sprite = m_spriteram[offs + 1] + (((m_spriteram[offs] & 0xc0) >> 6) * 0x100);
+		x = 240 - m_spriteram[offs + 3];
+		y = m_spriteram[offs + 2];
+		color = (m_spriteram[offs] & 8)>>3;
+		fx = m_spriteram[offs] & 4;
 		fy = 0; /* ? */
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				sprite,
 				color,fx,fy,x,y,0);
 
 		/* Double Height */
-		if(state->m_spriteram[offs] & 0x10)
+		if(m_spriteram[offs] & 0x10)
 		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				sprite + 1,
 				color, fx, fy, x, y + 16, 0);
 		}
@@ -124,6 +123,6 @@ UINT32 compgolf_state::screen_update_compgolf(screen_device &screen, bitmap_ind1
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_text_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

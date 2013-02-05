@@ -65,18 +65,17 @@ PALETTE_INIT_MEMBER(cvs_state,cvs)
 }
 
 
-static void set_pens( running_machine &machine )
+void cvs_state::set_pens(  )
 {
-	cvs_state *state = machine.driver_data<cvs_state>();
 	int i;
 
 	for (i = 0; i < 0x10; i++)
 	{
-		int r = pal2bit(~state->m_palette_ram[i] >> 0);
-		int g = pal3bit(~state->m_palette_ram[i] >> 2);
-		int b = pal3bit(~state->m_palette_ram[i] >> 5);
+		int r = pal2bit(~m_palette_ram[i] >> 0);
+		int g = pal3bit(~m_palette_ram[i] >> 2);
+		int b = pal3bit(~m_palette_ram[i] >> 5);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -122,7 +121,7 @@ WRITE8_MEMBER(cvs_state::cvs_scroll_w)
 
 VIDEO_START_MEMBER(cvs_state,cvs)
 {
-	cvs_init_stars(machine());
+	cvs_init_stars();
 
 	/* create helper bitmaps */
 	machine().primary_screen->register_screen_bitmap(m_background_bitmap);
@@ -142,7 +141,7 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 	offs_t offs;
 	int scroll[8];
 
-	set_pens(machine());
+	set_pens();
 
 	/* draw the background */
 	for (offs = 0; offs < 0x0400; offs++)
@@ -262,7 +261,7 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 
 	/* stars circuit */
 	if (m_stars_on)
-		cvs_update_stars(machine(), bitmap, cliprect, BULLET_STAR_PEN, 0);
+		cvs_update_stars(bitmap, cliprect, BULLET_STAR_PEN, 0);
 
 	return 0;
 }
@@ -271,21 +270,19 @@ UINT32 cvs_state::screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap,
 
 /* cvs stars hardware */
 
-void cvs_scroll_stars( running_machine &machine )
+void cvs_state::cvs_scroll_stars(  )
 {
-	cvs_state *state = machine.driver_data<cvs_state>();
-	state->m_stars_scroll++;
+	m_stars_scroll++;
 }
 
-void cvs_init_stars( running_machine &machine )
+void cvs_state::cvs_init_stars(  )
 {
-	cvs_state *state = machine.driver_data<cvs_state>();
 	int generator = 0;
 	int x, y;
 
 	/* precalculate the star background */
 
-	state->m_total_stars = 0;
+	m_total_stars = 0;
 
 	for (y = 255; y >= 0; y--)
 	{
@@ -304,13 +301,13 @@ void cvs_init_stars( running_machine &machine )
 			{
 				if(((~(generator >> 12)) & 0x01) && ((~(generator >> 13)) & 0x01))
 				{
-					if (state->m_total_stars < CVS_MAX_STARS)
+					if (m_total_stars < CVS_MAX_STARS)
 					{
-						state->m_stars[state->m_total_stars].x = x;
-						state->m_stars[state->m_total_stars].y = y;
-						state->m_stars[state->m_total_stars].code = 1;
+						m_stars[m_total_stars].x = x;
+						m_stars[m_total_stars].y = y;
+						m_stars[m_total_stars].code = 1;
 
-						state->m_total_stars++;
+						m_total_stars++;
 					}
 				}
 			}
@@ -318,24 +315,23 @@ void cvs_init_stars( running_machine &machine )
 	}
 }
 
-void cvs_update_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always)
+void cvs_state::cvs_update_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always)
 {
-	cvs_state *state = machine.driver_data<cvs_state>();
-	for (int offs = 0; offs < state->m_total_stars; offs++)
+	for (int offs = 0; offs < m_total_stars; offs++)
 	{
-		UINT8 x = (state->m_stars[offs].x + state->m_stars_scroll) >> 1;
-		UINT8 y = state->m_stars[offs].y + ((state->m_stars_scroll + state->m_stars[offs].x) >> 9);
+		UINT8 x = (m_stars[offs].x + m_stars_scroll) >> 1;
+		UINT8 y = m_stars[offs].y + ((m_stars_scroll + m_stars[offs].x) >> 9);
 
 		if ((y & 1) ^ ((x >> 4) & 1))
 		{
-			if (state->flip_screen_x())
+			if (flip_screen_x())
 				x = ~x;
 
-			if (state->flip_screen_y())
+			if (flip_screen_y())
 				y = ~y;
 
 			if ((y >= cliprect.min_y) && (y <= cliprect.max_y) &&
-				(update_always || (colortable_entry_get_value(machine.colortable, bitmap.pix16(y, x)) == 0)))
+				(update_always || (colortable_entry_get_value(machine().colortable, bitmap.pix16(y, x)) == 0)))
 				bitmap.pix16(y, x) = star_pen;
 		}
 	}

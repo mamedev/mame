@@ -1781,10 +1781,10 @@ MACHINE_CONFIG_END
 
     We need to untangle it
 */
-static void cischeat_untangle_sprites(running_machine &machine, const char *region)
+void cischeat_state::cischeat_untangle_sprites(const char *region)
 {
-	UINT8       *src = machine.root_device().memregion(region)->base();
-	const UINT8 *end = src + machine.root_device().memregion(region)->bytes();
+	UINT8       *src = machine().root_device().memregion(region)->base();
+	const UINT8 *end = src + machine().root_device().memregion(region)->bytes();
 
 	while (src < end)
 	{
@@ -1936,7 +1936,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cischeat_state,bigrun)
 {
-	cischeat_untangle_sprites(machine(), "gfx4");   // Untangle sprites
+	cischeat_untangle_sprites("gfx4");   // Untangle sprites
 	phantasm_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
 }
 
@@ -2055,7 +2055,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cischeat_state,cischeat)
 {
-	cischeat_untangle_sprites(machine(), "gfx4");   // Untangle sprites
+	cischeat_untangle_sprites("gfx4");   // Untangle sprites
 	astyanax_rom_decode(machine(), "soundcpu");                 // Decrypt sound cpu code
 }
 
@@ -2269,7 +2269,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cischeat_state,f1gpstar)
 {
-	cischeat_untangle_sprites(machine(), "gfx4");
+	cischeat_untangle_sprites("gfx4");
 }
 
 

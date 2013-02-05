@@ -45,19 +45,18 @@ static const UINT8 mcu_data[256] = {
 	0x10, 0xfc, 0x3e, 0x01, 0x32, 0x5b, 0x81, 0xc9
 };
 
-static void mcu_update_seed( running_machine &machine, UINT8 data )
+void chaknpop_state::mcu_update_seed( UINT8 data )
 {
-	chaknpop_state *state = machine.driver_data<chaknpop_state>();
 
 	if (!(data & 0x80))
 	{
-		state->m_mcu_seed += 0x83;
-		state->m_mcu_seed = (state->m_mcu_seed & 0x80) | (state->m_mcu_seed >> 1);
+		m_mcu_seed += 0x83;
+		m_mcu_seed = (m_mcu_seed & 0x80) | (m_mcu_seed >> 1);
 	}
 
-	state->m_mcu_seed += 0x19;
+	m_mcu_seed += 0x19;
 
-	//logerror("New seed: 0x%02x\n", state->m_mcu_seed);
+	//logerror("New seed: 0x%02x\n", m_mcu_seed);
 }
 
 
@@ -94,29 +93,29 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_mcu_port_a_w)
 
 	if (mcu_command < 0x08)
 	{
-		mcu_update_seed(machine(), data);
+		mcu_update_seed(data);
 
 		m_mcu_result = mcu_data[m_mcu_select * 8 + mcu_command];
 		m_mcu_result -= m_mcu_seed;
 
-		mcu_update_seed(machine(), m_mcu_result);
+		mcu_update_seed(m_mcu_result);
 
 		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", space.device().safe_pc(), mcu_command, m_mcu_result);
 	}
 	else if (mcu_command >= 0x28 && mcu_command <= 0x2a)
 	{
-		mcu_update_seed(machine(), data);
+		mcu_update_seed(data);
 
 		m_mcu_result = m_mcu_ram[0x380 + mcu_command];
 		m_mcu_result -= m_mcu_seed;
 
-		mcu_update_seed(machine(), m_mcu_result);
+		mcu_update_seed(m_mcu_result);
 
 		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", space.device().safe_pc(), mcu_command, m_mcu_result);
 	}
 	else if (mcu_command < 0x80)
 	{
-		mcu_update_seed(machine(), data);
+		mcu_update_seed(data);
 
 		if (mcu_command >= 0x40 && mcu_command < 0x60)
 		{
@@ -127,7 +126,7 @@ WRITE8_MEMBER(chaknpop_state::chaknpop_mcu_port_a_w)
 	}
 	else if (mcu_command == 0x9c|| mcu_command == 0xde)
 	{
-		mcu_update_seed(machine(), data);
+		mcu_update_seed(data);
 
 		logerror("%04x: MCU command 0x%02x\n", space.device().safe_pc(), mcu_command);
 	}

@@ -29,19 +29,18 @@ void canyon_state::video_start()
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void canyon_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	canyon_state *state = machine.driver_data<canyon_state>();
 	int i;
 
 	for (i = 0; i < 2; i++)
 	{
-		int x = state->m_videoram[0x3d0 + 2 * i + 0x1];
-		int y = state->m_videoram[0x3d0 + 2 * i + 0x8];
-		int c = state->m_videoram[0x3d0 + 2 * i + 0x9];
+		int x = m_videoram[0x3d0 + 2 * i + 0x1];
+		int y = m_videoram[0x3d0 + 2 * i + 0x8];
+		int c = m_videoram[0x3d0 + 2 * i + 0x9];
 
 		drawgfx_transpen(bitmap, cliprect,
-			machine.gfx[1],
+			machine().gfx[1],
 			c >> 3,
 			i,
 			!(c & 0x80), 0,
@@ -51,15 +50,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 }
 
 
-static void draw_bombs( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void canyon_state::draw_bombs( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	canyon_state *state = machine.driver_data<canyon_state>();
 	int i;
 
 	for (i = 0; i < 2; i++)
 	{
-		int sx = 254 - state->m_videoram[0x3d0 + 2 * i + 0x5];
-		int sy = 246 - state->m_videoram[0x3d0 + 2 * i + 0xc];
+		int sx = 254 - m_videoram[0x3d0 + 2 * i + 0x5];
+		int sy = 246 - m_videoram[0x3d0 + 2 * i + 0xc];
 
 		rectangle rect(sx, sx + 1, sy, sy + 1);
 		rect &= cliprect;
@@ -73,9 +71,9 @@ UINT32 canyon_state::screen_update_canyon(screen_device &screen, bitmap_ind16 &b
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
-	draw_bombs(machine(), bitmap, cliprect);
+	draw_bombs(bitmap, cliprect);
 
 	/* watchdog is disabled during service mode */
 	machine().watchdog_enable(!(machine().root_device().ioport("IN2")->read() & 0x10));

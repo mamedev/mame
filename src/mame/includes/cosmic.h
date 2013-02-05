@@ -76,4 +76,9 @@ public:
 	UINT32 screen_update_devzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_nomnlnd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(panic_scanline);
+	void draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int extra_sprites );
+	void cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void devzone_draw_grid( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

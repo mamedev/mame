@@ -44,16 +44,15 @@
 #define LOG_PC3092      0
 
 
-static void pc3092_reset(void)
+void crbaloon_state::pc3092_reset(void)
 {
 	/* nothing yet */
 }
 
 
-static void pc3092_update(running_machine &machine)
+void crbaloon_state::pc3092_update()
 {
-	crbaloon_state *state = machine.driver_data<crbaloon_state>();
-	state->flip_screen_set((state->m_pc3092_data[1] & 0x01) ? TRUE : FALSE);
+	flip_screen_set((m_pc3092_data[1] & 0x01) ? TRUE : FALSE);
 }
 
 
@@ -63,7 +62,7 @@ WRITE8_MEMBER(crbaloon_state::pc3092_w)
 
 	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", space.device().safe_pc(), offset, m_pc3092_data[offset]);
 
-	pc3092_update(machine());
+	pc3092_update();
 }
 
 
@@ -107,7 +106,7 @@ CUSTOM_INPUT_MEMBER(crbaloon_state::pc3092_r)
 #define LOG_PC3259      0
 
 
-static void pc3259_update(void)
+void crbaloon_state::pc3259_update(void)
 {
 	/* nothing yet */
 }
@@ -118,7 +117,7 @@ READ8_MEMBER(crbaloon_state::pc3259_r)
 	UINT8 ret = 0;
 	UINT8 reg = offset >> 2;
 
-	UINT16 collision_address = crbaloon_get_collision_address(machine());
+	UINT16 collision_address = crbaloon_get_collision_address();
 	int collided = (collision_address != 0xffff);
 
 	switch (reg)
@@ -160,7 +159,7 @@ WRITE8_MEMBER(crbaloon_state::port_sound_w)
 
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
 	m_irq_mask = data & 0x01;
-	crbaloon_set_clear_collision_address(machine(), (data & 0x01) ? TRUE : FALSE);
+	crbaloon_set_clear_collision_address((data & 0x01) ? TRUE : FALSE);
 
 	/* D1 - SOUND STOP */
 	machine().sound().system_enable((data & 0x02) ? TRUE : FALSE);

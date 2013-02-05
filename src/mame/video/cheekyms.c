@@ -103,23 +103,22 @@ void cheekyms_state::video_start()
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int flip )
+void cheekyms_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int flip )
 {
-	cheekyms_state *state = machine.driver_data<cheekyms_state>();
 	offs_t offs;
 
 	for (offs = 0; offs < 0x20; offs += 4)
 	{
 		int x, y, code, color;
 
-		if ((state->m_spriteram[offs + 3] & 0x08) == 0x00) continue;
+		if ((m_spriteram[offs + 3] & 0x08) == 0x00) continue;
 
-		x  = 256 - state->m_spriteram[offs + 2];
-		y  = state->m_spriteram[offs + 1];
-		code =  (~state->m_spriteram[offs + 0] & 0x0f) << 1;
-		color = (~state->m_spriteram[offs + 3] & 0x07);
+		x  = 256 - m_spriteram[offs + 2];
+		y  = m_spriteram[offs + 1];
+		code =  (~m_spriteram[offs + 0] & 0x0f) << 1;
+		color = (~m_spriteram[offs + 3] & 0x07);
 
-		if (state->m_spriteram[offs + 0] & 0x80)
+		if (m_spriteram[offs + 0] & 0x80)
 		{
 			if (!flip)
 				code++;
@@ -128,7 +127,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 		else
 		{
-			if (state->m_spriteram[offs + 0] & 0x02)
+			if (m_spriteram[offs + 0] & 0x02)
 			{
 				drawgfx_transpen(bitmap, cliprect, gfx, code | 0x20, color, 0, 0,        x, y, 0);
 				drawgfx_transpen(bitmap, cliprect, gfx, code | 0x21, color, 0, 0, 0x10 + x, y, 0);
@@ -156,7 +155,7 @@ UINT32 cheekyms_state::screen_update_cheekyms(screen_device &screen, bitmap_ind1
 	m_bitmap_buffer->fill(0, cliprect);
 
 	/* sprites go under the playfield */
-	draw_sprites(machine(), bitmap, cliprect, machine().gfx[1], flip);
+	draw_sprites(bitmap, cliprect, machine().gfx[1], flip);
 
 	/* draw the tilemap to a temp bitmap */
 	m_cm_tilemap->draw(*m_bitmap_buffer, cliprect, 0, 0);

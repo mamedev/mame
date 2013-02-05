@@ -173,34 +173,33 @@ void chaknpop_state::video_start()
   Screen refresh
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void chaknpop_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	chaknpop_state *state = machine.driver_data<chaknpop_state>();
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < state->m_spr_ram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spr_ram.bytes(); offs += 4)
 	{
-		int sx = state->m_spr_ram[offs + 3];
-		int sy = 256 - 15 - state->m_spr_ram[offs];
-		int flipx = state->m_spr_ram[offs+1] & 0x40;
-		int flipy = state->m_spr_ram[offs+1] & 0x80;
-		int color = (state->m_spr_ram[offs + 2] & 7);
-		int tile = (state->m_spr_ram[offs + 1] & 0x3f) | ((state->m_spr_ram[offs + 2] & 0x38) << 3);
+		int sx = m_spr_ram[offs + 3];
+		int sy = 256 - 15 - m_spr_ram[offs];
+		int flipx = m_spr_ram[offs+1] & 0x40;
+		int flipy = m_spr_ram[offs+1] & 0x80;
+		int color = (m_spr_ram[offs + 2] & 7);
+		int tile = (m_spr_ram[offs + 1] & 0x3f) | ((m_spr_ram[offs + 2] & 0x38) << 3);
 
-		if (state->m_flip_x)
+		if (m_flip_x)
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (state->m_flip_y)
+		if (m_flip_y)
 		{
 			sy = 242 - sy;
 			flipy = !flipy;
 		}
 
 		drawgfx_transpen(bitmap,cliprect,
-				machine.gfx[0],
+				machine().gfx[0],
 				tile,
 				color,
 				flipx, flipy,
@@ -208,10 +207,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void chaknpop_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	chaknpop_state *state = machine.driver_data<chaknpop_state>();
-	int dx = state->m_flip_x ? -1 : 1;
+	int dx = m_flip_x ? -1 : 1;
 	int offs, i;
 
 	for (offs = 0; offs < 0x2000; offs++)
@@ -219,23 +217,23 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const r
 		int x = ((offs & 0x1f) << 3) + 7;
 		int y = offs >> 5;
 
-		if (!state->m_flip_x)
+		if (!m_flip_x)
 			x = 255 - x;
 
-		if (!state->m_flip_y)
+		if (!m_flip_y)
 			y = 255 - y;
 
 		for (i = 0x80; i > 0; i >>= 1, x += dx)
 		{
 			pen_t color = 0;
 
-			if (state->m_vram1[offs] & i)
+			if (m_vram1[offs] & i)
 				color |= 0x200; // green lower cage
-			if (state->m_vram2[offs] & i)
+			if (m_vram2[offs] & i)
 				color |= 0x080;
-			if (state->m_vram3[offs] & i)
+			if (m_vram3[offs] & i)
 				color |= 0x100; // green upper cage
-			if (state->m_vram4[offs] & i)
+			if (m_vram4[offs] & i)
 				color |= 0x040; // tx mask
 
 			if (color)
@@ -251,7 +249,7 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 chaknpop_state::screen_update_chaknpop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
-	draw_bitmap(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
+	draw_bitmap(bitmap, cliprect);
 	return 0;
 }

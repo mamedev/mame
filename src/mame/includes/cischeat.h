@@ -87,4 +87,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(bigrun_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(scudhamm_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_scanline);
+	void prepare_shadows(cischeat_state *state);
+	inline void scrollram_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int which);
+	void create_tilemaps();
+	void cischeat_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect, int road_num, int priority1, int priority2, int transparency);
+	void f1gpstar_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect, int road_num, int priority1, int priority2, int transparency);
+	void cischeat_draw_sprites(bitmap_ind16 &bitmap , const rectangle &cliprect, int priority1, int priority2);
+	void bigrun_draw_sprites(bitmap_ind16 &bitmap , const rectangle &cliprect, int priority1, int priority2);
+	void cischeat_untangle_sprites(const char *region);
 };

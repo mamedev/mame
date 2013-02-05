@@ -92,4 +92,8 @@ public:
 	INTERRUPT_GEN_MEMBER(chl_mcu_irq);
 	TIMER_CALLBACK_MEMBER(changela_scanline_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(changela_scanline);
+	void draw_obj0( bitmap_ind16 &bitmap, int sy );
+	void draw_obj1( bitmap_ind16 &bitmap );
+	void draw_river( bitmap_ind16 &bitmap, int sy );
+	void draw_tree( bitmap_ind16 &bitmap, int sy, int tree_num );
 };

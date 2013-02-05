@@ -553,10 +553,10 @@ ROM_START( bestri )
 ROM_END
 
 
-static void tumblepb_gfx1_rearrange(running_machine &machine)
+void crospang_state::tumblepb_gfx1_rearrange()
 {
-	UINT8 *rom = machine.root_device().memregion("gfx1")->base();
-	int len = machine.root_device().memregion("gfx1")->bytes();
+	UINT8 *rom = machine().root_device().memregion("gfx1")->base();
+	int len = machine().root_device().memregion("gfx1")->bytes();
 	int i;
 
 	/* gfx data is in the wrong order */
@@ -576,7 +576,7 @@ static void tumblepb_gfx1_rearrange(running_machine &machine)
 
 DRIVER_INIT_MEMBER(crospang_state,crospang)
 {
-	tumblepb_gfx1_rearrange(machine());
+	tumblepb_gfx1_rearrange();
 }
 
 GAME( 1998, crospang, 0, crospang, crospang, crospang_state, crospang, ROT0, "F2 System", "Cross Pang", GAME_SUPPORTS_SAVE )

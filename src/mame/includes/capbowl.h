@@ -43,4 +43,5 @@ public:
 	UINT32 screen_update_capbowl(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(capbowl_interrupt);
 	TIMER_CALLBACK_MEMBER(capbowl_update);
+	inline rgb_t pen_for_pixel( UINT8 *src, UINT8 pix );
 };

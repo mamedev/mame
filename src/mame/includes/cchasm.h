@@ -35,6 +35,7 @@ public:
 	TIMER_CALLBACK_MEMBER(cchasm_refresh_end);
 	DECLARE_WRITE_LINE_MEMBER(ctc_timer_1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc_timer_2_w);
+	void cchasm_refresh ();
 };
 
 /*----------- defined in audio/cchasm.c -----------*/

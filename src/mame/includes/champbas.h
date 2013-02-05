@@ -65,4 +65,6 @@ public:
 	void screen_eof_champbas(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(exctsccr_fm_callback);
+	void champbas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void exctsccr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

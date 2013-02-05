@@ -42,6 +42,14 @@ public:
 	UINT32 screen_update_crash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ripcord(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(crash_scanline);
+	void draw_line( bitmap_ind16 &bitmap, const rectangle &cliprect, int x1, int y1, int x2, int y2, int dotted );
+	void draw_sprite_collision( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void circus_draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void robotbwl_draw_box( bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y );
+	void robotbwl_draw_scoreboard( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void robotbwl_draw_bowling_alley( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void robotbwl_draw_ball( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void crash_draw_car( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 /*----------- defined in audio/circus.c -----------*/
 

@@ -76,43 +76,40 @@ void crbaloon_state::video_start()
 }
 
 
-UINT16 crbaloon_get_collision_address(running_machine &machine)
+UINT16 crbaloon_state::crbaloon_get_collision_address()
 {
-	crbaloon_state *state = machine.driver_data<crbaloon_state>();
-	return state->m_collision_address_clear ? 0xffff : state->m_collision_address;
+	return m_collision_address_clear ? 0xffff : m_collision_address;
 }
 
 
-void crbaloon_set_clear_collision_address(running_machine &machine, int _crbaloon_collision_address_clear)
+void crbaloon_state::crbaloon_set_clear_collision_address(int _crbaloon_collision_address_clear)
 {
-	crbaloon_state *state = machine.driver_data<crbaloon_state>();
-	state->m_collision_address_clear = !_crbaloon_collision_address_clear; /* active LO */
+	m_collision_address_clear = !_crbaloon_collision_address_clear; /* active LO */
 }
 
 
 
-static void draw_sprite_and_check_collision(running_machine &machine, bitmap_ind16 &bitmap)
+void crbaloon_state::draw_sprite_and_check_collision(bitmap_ind16 &bitmap)
 {
-	crbaloon_state *state = machine.driver_data<crbaloon_state>();
 	int y;
-	UINT8 code = state->m_spriteram[0] & 0x0f;
-	UINT8 color = state->m_spriteram[0] >> 4;
-	UINT8 sy = state->m_spriteram[2] - 32;
+	UINT8 code = m_spriteram[0] & 0x0f;
+	UINT8 color = m_spriteram[0] >> 4;
+	UINT8 sy = m_spriteram[2] - 32;
 
-	UINT8 *gfx = state->memregion("gfx2")->base() + (code << 7);
+	UINT8 *gfx = memregion("gfx2")->base() + (code << 7);
 
 
-	if (state->flip_screen())
+	if (flip_screen())
 		sy += 32;
 
 	/* assume no collision */
-	state->m_collision_address = 0xffff;
+	m_collision_address = 0xffff;
 
 	for (y = 0x1f; y >= 0; y--)
 	{
 		int x;
 		UINT8 data = 0;
-		UINT8 sx = state->m_spriteram[1];
+		UINT8 sx = m_spriteram[1];
 
 		for (x = 0x1f; x >= 0; x--)
 		{
@@ -130,7 +127,7 @@ static void draw_sprite_and_check_collision(running_machine &machine, bitmap_ind
 				if (bitmap.pix16(sy, sx) & 0x01)
 					/* compute the collision address -- the +1 is via observation
 					   of the game code, probably wrong for cocktail mode */
-					state->m_collision_address = ((((sy ^ 0xff) >> 3) << 5) | ((sx ^ 0xff) >> 3)) + 1;
+					m_collision_address = ((((sy ^ 0xff) >> 3) << 5) | ((sx ^ 0xff) >> 3)) + 1;
 
 				bitmap.pix16(sy, sx) = (color << 1) | 1;
 			}
@@ -148,7 +145,7 @@ UINT32 crbaloon_state::screen_update_crbaloon(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprite_and_check_collision(machine(), bitmap);
+	draw_sprite_and_check_collision(bitmap);
 
 	return 0;
 }

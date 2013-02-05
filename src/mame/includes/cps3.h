@@ -108,6 +108,26 @@ public:
 	UINT32 screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cps3_vbl_interrupt);
 	INTERRUPT_GEN_MEMBER(cps3_other_interrupt);
+	UINT16 rotate_left(UINT16 value, int n);
+	UINT16 rotxor(UINT16 val, UINT16 xorval);
+	UINT32 cps3_mask(UINT32 address, UINT32 key1, UINT32 key2);
+	void cps3_decrypt_bios();
+	void init_common(UINT32 key1, UINT32 key2, int altEncryption);
+	void cps3_set_mame_colours(int colournum, UINT16 data, UINT32 fadeval);
+	void cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	UINT32 cps3_flashmain_r(address_space &space, int which, UINT32 offset, UINT32 mem_mask);
+	void cps3_flashmain_w(int which, UINT32 offset, UINT32 data, UINT32 mem_mask);
+	UINT32 process_byte( UINT8 real_byte, UINT32 destination, int max_length );
+	void cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, UINT32 real_length );
+	UINT32 ProcessByte8(UINT8 b,UINT32 dst_offset);
+	void cps3_do_alt_char_dma( UINT32 src, UINT32 real_dest, UINT32 real_length );
+	void cps3_process_character_dma(UINT32 address);
+	void copy_from_nvram();
+	inline void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
+		int transparency,int transparent_color,
+		int scalex, int scaley,bitmap_ind8 *pri_buffer,UINT32 pri_mask);
+	
 };
 
 

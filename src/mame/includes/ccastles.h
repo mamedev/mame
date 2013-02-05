@@ -69,4 +69,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_ccastles(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(clock_irq);
+	inline void ccastles_write_vram( UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba );
+	inline void bitmode_autoinc(  );
+	inline void schedule_next_irq( int curscanline );
 };

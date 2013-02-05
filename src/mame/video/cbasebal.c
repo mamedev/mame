@@ -130,15 +130,14 @@ WRITE8_MEMBER(cbasebal_state::cbasebal_scrolly_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void cbasebal_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	cbasebal_state *state = machine.driver_data<cbasebal_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs, sx, sy;
 
 	/* the last entry is not a sprite, we skip it otherwise spang shows a bubble */
 	/* moving diagonally across the screen */
-	for (offs = state->m_spriteram.bytes() - 8; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 8; offs >= 0; offs -= 4)
 	{
 		int code = spriteram[offs];
 		int attr = spriteram[offs + 1];
@@ -147,19 +146,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		sx = spriteram[offs + 3] + ((attr & 0x10) << 4);
 		sy = ((spriteram[offs + 2] + 8) & 0xff) - 8;
 		code += (attr & 0xe0) << 3;
-		code += state->m_spritebank * 0x800;
+		code += m_spritebank * 0x800;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;
 			flipx = !flipx;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 				code,
 				color,
-				flipx,state->m_flipscreen,
+				flipx,m_flipscreen,
 				sx,sy,15);
 	}
 }
@@ -172,7 +171,7 @@ UINT32 cbasebal_state::screen_update_cbasebal(screen_device &screen, bitmap_ind1
 		bitmap.fill(768, cliprect);
 
 	if (m_obj_on)
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 
 	if (m_text_on)
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

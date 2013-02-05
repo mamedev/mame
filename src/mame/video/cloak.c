@@ -44,10 +44,9 @@ WRITE8_MEMBER(cloak_state::cloak_paletteram_w)
 }
 
 
-static void set_pens(running_machine &machine)
+void cloak_state::set_pens()
 {
-	cloak_state *state = machine.driver_data<cloak_state>();
-	UINT16 *palette_ram = state->m_palette_ram;
+	UINT16 *palette_ram = m_palette_ram;
 	static const int resistances[3] = { 10000, 4700, 2200 };
 	double weights[3];
 	int i;
@@ -81,7 +80,7 @@ static void set_pens(running_machine &machine)
 		bit2 = (~palette_ram[i] >> 2) & 0x01;
 		b = combine_3_weights(weights, bit0, bit1, bit2);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -178,25 +177,23 @@ void cloak_state::video_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(cloak_state::set_current_bitmap_videoram_pointer), this));
 }
 
-static void draw_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void cloak_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cloak_state *state = machine.driver_data<cloak_state>();
 	int x, y;
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			pen_t pen = state->m_current_bitmap_videoram_displayed[(y << 8) | x] & 0x07;
+			pen_t pen = m_current_bitmap_videoram_displayed[(y << 8) | x] & 0x07;
 
 			if (pen)
 				bitmap.pix16(y, (x - 6) & 0xff) = 0x10 | ((x & 0x80) >> 4) | pen;
 		}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void cloak_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cloak_state *state = machine.driver_data<cloak_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = (0x100 / 4) - 1; offs >= 0; offs--)
@@ -207,7 +204,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int sx = spriteram[offs + 192];
 		int sy = 240 - spriteram[offs];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx -= 9;
 			sy = 240 - sy;
@@ -215,15 +212,15 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, 0, flipx, flipy,   sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, 0, flipx, flipy,   sx, sy, 0);
 	}
 }
 
 UINT32 cloak_state::screen_update_cloak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(machine());
+	set_pens();
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_bitmap(machine(), bitmap, cliprect);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_bitmap(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

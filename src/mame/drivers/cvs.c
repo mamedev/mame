@@ -221,7 +221,7 @@ INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 	device.execute().set_input_line_vector(0, 0x03);
 	generic_pulse_irq_line(device.execute(), 0, 1);
 
-	cvs_scroll_stars(machine());
+	cvs_scroll_stars();
 }
 
 
@@ -296,11 +296,10 @@ TIMER_CALLBACK_MEMBER(cvs_state::cvs_393hz_timer_cb)
 }
 
 
-static void start_393hz_timer(running_machine &machine)
+void cvs_state::start_393hz_timer()
 {
-	cvs_state *state = machine.driver_data<cvs_state>();
-	state->m_cvs_393hz_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(cvs_state::cvs_393hz_timer_cb),state));
-	state->m_cvs_393hz_timer->adjust(attotime::from_hz(30*393), 0, attotime::from_hz(30*393));
+	m_cvs_393hz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cvs_state::cvs_393hz_timer_cb),this));
+	m_cvs_393hz_timer->adjust(attotime::from_hz(30*393), 0, attotime::from_hz(30*393));
 }
 
 
@@ -980,7 +979,7 @@ MACHINE_START_MEMBER(cvs_state,cvs)
 	if (machine().gfx[1] != NULL)
 		machine().gfx[1]->set_source(m_character_ram);
 
-	start_393hz_timer(machine());
+	start_393hz_timer();
 
 	/* set devices */
 	m_maincpu = machine().device<cpu_device>("maincpu");

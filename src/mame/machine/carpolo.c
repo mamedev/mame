@@ -94,55 +94,50 @@ WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2u_2_q_cb)
 }
 
 
-void carpolo_generate_ball_screen_interrupt(running_machine &machine, UINT8 cause)
+void carpolo_state::carpolo_generate_ball_screen_interrupt(UINT8 cause)
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
-	state->m_ball_screen_collision_cause = cause;
+	m_ball_screen_collision_cause = cause;
 
-	ttl74148_input_line_w(state->m_ttl74148_3s, BALL_SCREEN_PRIORITY_LINE, 0);
-	ttl74148_update(state->m_ttl74148_3s);
+	ttl74148_input_line_w(m_ttl74148_3s, BALL_SCREEN_PRIORITY_LINE, 0);
+	ttl74148_update(m_ttl74148_3s);
 }
 
-void carpolo_generate_car_car_interrupt(running_machine &machine, int car1, int car2)
+void carpolo_state::carpolo_generate_car_car_interrupt(int car1, int car2)
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
-	state->m_car_car_collision_cause = ~((1 << (3 - car1)) | (1 << (3 - car2)));
+	m_car_car_collision_cause = ~((1 << (3 - car1)) | (1 << (3 - car2)));
 
-	ttl74148_input_line_w(state->m_ttl74148_3s, CAR_CAR_PRIORITY_LINE, 0);
-	ttl74148_update(state->m_ttl74148_3s);
+	ttl74148_input_line_w(m_ttl74148_3s, CAR_CAR_PRIORITY_LINE, 0);
+	ttl74148_update(m_ttl74148_3s);
 }
 
-void carpolo_generate_car_goal_interrupt(running_machine &machine, int car, int right_goal)
+void carpolo_state::carpolo_generate_car_goal_interrupt(int car, int right_goal)
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
-	state->m_car_goal_collision_cause = car | (right_goal ? 0x08 : 0x00);
+	m_car_goal_collision_cause = car | (right_goal ? 0x08 : 0x00);
 
-	ttl74148_input_line_w(state->m_ttl74148_3s, CAR_GOAL_PRIORITY_LINE, 0);
-	ttl74148_update(state->m_ttl74148_3s);
+	ttl74148_input_line_w(m_ttl74148_3s, CAR_GOAL_PRIORITY_LINE, 0);
+	ttl74148_update(m_ttl74148_3s);
 }
 
-void carpolo_generate_car_ball_interrupt(running_machine &machine, int car, int car_x, int car_y)
+void carpolo_state::carpolo_generate_car_ball_interrupt(int car, int car_x, int car_y)
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
-	state->m_car_ball_collision_cause = car;
-	state->m_car_ball_collision_x = car_x;
-	state->m_car_ball_collision_y = car_y;
+	m_car_ball_collision_cause = car;
+	m_car_ball_collision_x = car_x;
+	m_car_ball_collision_y = car_y;
 
-	state->m_priority_0_extension = CAR_BALL_EXTRA_BITS;
+	m_priority_0_extension = CAR_BALL_EXTRA_BITS;
 
-	ttl74148_input_line_w(state->m_ttl74148_3s, PRI0_PRIORTITY_LINE, 0);
-	ttl74148_update(state->m_ttl74148_3s);
+	ttl74148_input_line_w(m_ttl74148_3s, PRI0_PRIORTITY_LINE, 0);
+	ttl74148_update(m_ttl74148_3s);
 }
 
-void carpolo_generate_car_border_interrupt(running_machine &machine, int car, int horizontal_border)
+void carpolo_state::carpolo_generate_car_border_interrupt(int car, int horizontal_border)
 {
-	carpolo_state *state = machine.driver_data<carpolo_state>();
-	state->m_car_border_collision_cause = car | (horizontal_border ? 0x04 : 0x00);
+	m_car_border_collision_cause = car | (horizontal_border ? 0x04 : 0x00);
 
-	state->m_priority_0_extension = CAR_BORDER_EXTRA_BITS;
+	m_priority_0_extension = CAR_BORDER_EXTRA_BITS;
 
-	ttl74148_input_line_w(state->m_ttl74148_3s, PRI0_PRIORTITY_LINE, 0);
-	ttl74148_update(state->m_ttl74148_3s);
+	ttl74148_input_line_w(m_ttl74148_3s, PRI0_PRIORTITY_LINE, 0);
+	ttl74148_update(m_ttl74148_3s);
 }
 
 

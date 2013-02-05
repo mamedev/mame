@@ -105,11 +105,10 @@ WRITE8_MEMBER(cloud9_state::cloud9_paletteram_w)
  *
  *************************************/
 
-INLINE void cloud9_write_vram( running_machine &machine, UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba )
+inline void cloud9_state::cloud9_write_vram( UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba )
 {
-	cloud9_state *state = machine.driver_data<cloud9_state>();
-	UINT8 *dest = &state->m_videoram[0x0000 | (addr & 0x3fff)];
-	UINT8 *dest2 = &state->m_videoram[0x4000 | (addr & 0x3fff)];
+	UINT8 *dest = &m_videoram[0x0000 | (addr & 0x3fff)];
+	UINT8 *dest2 = &m_videoram[0x4000 | (addr & 0x3fff)];
 	UINT8 promaddr = 0;
 	UINT8 wpbits;
 
@@ -126,15 +125,15 @@ INLINE void cloud9_write_vram( running_machine &machine, UINT16 addr, UINT8 data
 	    Bit 0 = PIXA
 	*/
 	promaddr |= bitmd << 7;
-	promaddr |= state->m_video_control[4] << 6;
-	promaddr |= state->m_video_control[6] << 5;
+	promaddr |= m_video_control[4] << 6;
+	promaddr |= m_video_control[6] << 5;
 	promaddr |= ((addr & 0xf000) != 0x4000) << 4;
 	promaddr |= ((addr & 0x3800) == 0x0000) << 3;
 	promaddr |= ((addr & 0x0600) == 0x0600) << 2;
 	promaddr |= (pixba << 0);
 
 	/* look up the PROM result */
-	wpbits = state->m_wpprom[promaddr];
+	wpbits = m_wpprom[promaddr];
 
 	/* write to the appropriate parts of VRAM depending on the result */
 	if (!(wpbits & 1))
@@ -155,17 +154,16 @@ INLINE void cloud9_write_vram( running_machine &machine, UINT16 addr, UINT8 data
  *
  *************************************/
 
-INLINE void bitmode_autoinc( running_machine &machine )
+inline void cloud9_state::bitmode_autoinc(  )
 {
-	cloud9_state *state = machine.driver_data<cloud9_state>();
 
 	/* auto increment in the x-direction if it's enabled */
-	if (!state->m_video_control[0]) /* /AX */
-		state->m_bitmode_addr[0]++;
+	if (!m_video_control[0]) /* /AX */
+		m_bitmode_addr[0]++;
 
 	/* auto increment in the y-direction if it's enabled */
-	if (!state->m_video_control[1]) /* /AY */
-		state->m_bitmode_addr[1]++;
+	if (!m_video_control[1]) /* /AY */
+		m_bitmode_addr[1]++;
 }
 
 
@@ -179,7 +177,7 @@ INLINE void bitmode_autoinc( running_machine &machine )
 WRITE8_MEMBER(cloud9_state::cloud9_videoram_w)
 {
 	/* direct writes to VRAM go through the write protect PROM as well */
-	cloud9_write_vram(machine(), offset, data, 0, 0);
+	cloud9_write_vram(offset, data, 0, 0);
 }
 
 
@@ -199,7 +197,7 @@ READ8_MEMBER(cloud9_state::cloud9_bitmode_r)
 	UINT8 result = m_videoram[((~m_bitmode_addr[0] & 2) << 13) | addr] << ((m_bitmode_addr[0] & 1) * 4);
 
 	/* autoincrement because /BITMD was selected */
-	bitmode_autoinc(machine());
+	bitmode_autoinc();
 
 	/* the upper 4 bits of the data lines are not driven so make them all 1's */
 	return (result >> 4) | 0xf0;
@@ -215,17 +213,17 @@ WRITE8_MEMBER(cloud9_state::cloud9_bitmode_w)
 	data = (data & 0x0f) | (data << 4);
 
 	/* write through the generic VRAM routine, passing the low 2 X bits as PIXB/PIXA */
-	cloud9_write_vram(machine(), addr, data, 1, m_bitmode_addr[0] & 3);
+	cloud9_write_vram(addr, data, 1, m_bitmode_addr[0] & 3);
 
 	/* autoincrement because /BITMD was selected */
-	bitmode_autoinc(machine());
+	bitmode_autoinc();
 }
 
 
 WRITE8_MEMBER(cloud9_state::cloud9_bitmode_addr_w)
 {
 	/* write through to video RAM and also to the addressing latches */
-	cloud9_write_vram(machine(), offset, data, 0, 0);
+	cloud9_write_vram(offset, data, 0, 0);
 	m_bitmode_addr[offset] = data;
 }
 

@@ -408,14 +408,11 @@ Notes:
 #define CPS3_TRANSPARENCY_PEN_INDEX 2
 #define CPS3_TRANSPARENCY_PEN_INDEX_BLEND 3
 
-static void copy_from_nvram(running_machine &machine);
-
-INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		int transparency,int transparent_color,
 		int scalex, int scaley,bitmap_ind8 *pri_buffer,UINT32 pri_mask)
 {
-	cps3_state *state = gfx->machine().driver_data<cps3_state>();
 	rectangle myclip;
 
 //  UINT8 al;
@@ -449,7 +446,7 @@ INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_el
 		{
 //          const pen_t *pal = &gfx->colortable[gfx->granularity() * (color % gfx->colors())];
 			UINT32 palbase = (gfx->granularity() * color) & 0x1ffff;
-			const pen_t *pal = &state->m_mame_colours[palbase];
+			const pen_t *pal = &m_mame_colours[palbase];
 			const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 
 			int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
@@ -625,13 +622,13 @@ INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_el
 /* Encryption */
 
 
-static UINT16 rotate_left(UINT16 value, int n)
+UINT16 cps3_state::rotate_left(UINT16 value, int n)
 {
 	int aux = value>>(16-n);
 	return ((value<<n)|aux)%0x10000;
 }
 
-static UINT16 rotxor(UINT16 val, UINT16 xorval)
+UINT16 cps3_state::rotxor(UINT16 val, UINT16 xorval)
 {
 	UINT16 res;
 
@@ -642,7 +639,7 @@ static UINT16 rotxor(UINT16 val, UINT16 xorval)
 	return res;
 }
 
-static UINT32 cps3_mask(UINT32 address, UINT32 key1, UINT32 key2)
+UINT32 cps3_state::cps3_mask(UINT32 address, UINT32 key1, UINT32 key2)
 {
 	UINT16 val;
 
@@ -661,32 +658,31 @@ static UINT32 cps3_mask(UINT32 address, UINT32 key1, UINT32 key2)
 	return val | (val << 16);
 }
 
-static void cps3_decrypt_bios(running_machine &machine)
+void cps3_state::cps3_decrypt_bios()
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
 	int i;
-	UINT32 *coderegion = (UINT32*)state->memregion("user1")->base();
+	UINT32 *coderegion = (UINT32*)memregion("user1")->base();
 
-	state->m_decrypted_bios = (UINT32*)state->memregion("user1")->base();
+	m_decrypted_bios = (UINT32*)memregion("user1")->base();
 
 	for (i=0;i<0x80000;i+=4)
 	{
 		UINT32 dword = coderegion[i/4];
-		UINT32 xormask = cps3_mask(i, state->m_key1, state->m_key2);
-		state->m_decrypted_bios[i/4] = dword ^ xormask;
+		UINT32 xormask = cps3_mask(i, m_key1, m_key2);
+		m_decrypted_bios[i/4] = dword ^ xormask;
 	}
 #if 0
 	/* Dump to file */
 	{
 		FILE *fp;
-		const char *gamename = machine.system().name;
+		const char *gamename = machine().system().name;
 		char filename[256];
 		sprintf(filename, "%s_bios.dump", gamename);
 
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
-			fwrite(state->m_decrypted_bios, 0x080000, 1, fp);
+			fwrite(m_decrypted_bios, 0x080000, 1, fp);
 			fclose(fp);
 		}
 	}
@@ -694,54 +690,53 @@ static void cps3_decrypt_bios(running_machine &machine)
 }
 
 
-static void init_common(running_machine &machine, UINT32 key1, UINT32 key2, int altEncryption)
+void cps3_state::init_common(UINT32 key1, UINT32 key2, int altEncryption)
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
 
-	state->m_key1 = key1;
-	state->m_key2 = key2;
-	state->m_altEncryption = altEncryption;
+	m_key1 = key1;
+	m_key2 = key2;
+	m_altEncryption = altEncryption;
 
 	// cache pointers to regions
-	state->m_user4region = state->memregion("user4")->base();
-	state->m_user5region = state->memregion("user5")->base();
+	m_user4region = memregion("user4")->base();
+	m_user5region = memregion("user5")->base();
 
-	if (!state->m_user4region) state->m_user4region = auto_alloc_array(machine, UINT8, USER4REGION_LENGTH);
-	if (!state->m_user5region) state->m_user5region = auto_alloc_array(machine, UINT8, USER5REGION_LENGTH);
+	if (!m_user4region) m_user4region = auto_alloc_array(machine(), UINT8, USER4REGION_LENGTH);
+	if (!m_user5region) m_user5region = auto_alloc_array(machine(), UINT8, USER5REGION_LENGTH);
 
 	// set strict verify
-	sh2drc_set_options(machine.device("maincpu"), SH2DRC_STRICT_VERIFY);
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_STRICT_VERIFY);
 
-	cps3_decrypt_bios(machine);
-	state->m_decrypted_gamerom = auto_alloc_array(machine, UINT32, 0x1000000/4);
+	cps3_decrypt_bios();
+	m_decrypted_gamerom = auto_alloc_array(machine(), UINT32, 0x1000000/4);
 
 	/* just some NOPs for the game to execute if it crashes and starts executing unmapped addresses
 	 - this prevents MAME from crashing */
-	state->m_nops = auto_alloc(machine, UINT32);
-	state->m_nops[0] = 0x00090009;
+	m_nops = auto_alloc(machine(), UINT32);
+	m_nops[0] = 0x00090009;
 
 
-	state->m_0xc0000000_ram_decrypted = auto_alloc_array(machine, UINT32, 0x400/4);
+	m_0xc0000000_ram_decrypted = auto_alloc_array(machine(), UINT32, 0x400/4);
 
-	address_space &main = machine.device<sh2_device>("maincpu")->space(AS_PROGRAM);
-	main.set_direct_update_handler(direct_update_delegate(FUNC(cps3_state::cps3_direct_handler), state));
+	address_space &main = machine().device<sh2_device>("maincpu")->space(AS_PROGRAM);
+	main.set_direct_update_handler(direct_update_delegate(FUNC(cps3_state::cps3_direct_handler), this));
 
 	// flash roms
 	astring tempstr;
 	for (int simmnum = 0; simmnum < 7; simmnum++)
 		for (int chipnum = 0; chipnum < 8; chipnum++)
-			state->m_simm[simmnum][chipnum] = machine.device<fujitsu_29f016a_device>(tempstr.format("simm%d.%d", simmnum + 1, chipnum));
+			m_simm[simmnum][chipnum] = machine().device<fujitsu_29f016a_device>(tempstr.format("simm%d.%d", simmnum + 1, chipnum));
 
-	state->m_eeprom = auto_alloc_array(machine, UINT32, 0x400/4);
-	machine.device<nvram_device>("eeprom")->set_base(state->m_eeprom, 0x400);
+	m_eeprom = auto_alloc_array(machine(), UINT32, 0x400/4);
+	machine().device<nvram_device>("eeprom")->set_base(m_eeprom, 0x400);
 }
 
-DRIVER_INIT_MEMBER(cps3_state,redearth)  { init_common(machine(), 0x9e300ab1, 0xa175b82c, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii)     { init_common(machine(), 0xb5fe053e, 0xfc03925a, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii2)    { init_common(machine(), 0x00000000, 0x00000000, 1); }
-DRIVER_INIT_MEMBER(cps3_state,jojo)      { init_common(machine(), 0x02203ee3, 0x01301972, 0); }
-DRIVER_INIT_MEMBER(cps3_state,sfiii3)    { init_common(machine(), 0xa55432b4, 0x0c129981, 0); }
-DRIVER_INIT_MEMBER(cps3_state,jojoba)    { init_common(machine(), 0x23323ee3, 0x03021972, 0); }
+DRIVER_INIT_MEMBER(cps3_state,redearth)  { init_common(0x9e300ab1, 0xa175b82c, 0); }
+DRIVER_INIT_MEMBER(cps3_state,sfiii)     { init_common(0xb5fe053e, 0xfc03925a, 0); }
+DRIVER_INIT_MEMBER(cps3_state,sfiii2)    { init_common(0x00000000, 0x00000000, 1); }
+DRIVER_INIT_MEMBER(cps3_state,jojo)      { init_common(0x02203ee3, 0x01301972, 0); }
+DRIVER_INIT_MEMBER(cps3_state,sfiii3)    { init_common(0xa55432b4, 0x0c129981, 0); }
+DRIVER_INIT_MEMBER(cps3_state,jojoba)    { init_common(0x23323ee3, 0x03021972, 0); }
 
 
 
@@ -775,11 +770,10 @@ static const gfx_layout cps3_tiles8x8_layout =
 };
 
 
-static void cps3_set_mame_colours(running_machine &machine, int colournum, UINT16 data, UINT32 fadeval)
+void cps3_state::cps3_set_mame_colours(int colournum, UINT16 data, UINT32 fadeval)
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
 	int r,g,b;
-	UINT16* dst = (UINT16*)state->m_colourram.target();
+	UINT16* dst = (UINT16*)m_colourram.target();
 
 
 	r = (data >> 0) & 0x1f;
@@ -809,9 +803,9 @@ static void cps3_set_mame_colours(running_machine &machine, int colournum, UINT1
 
 	dst[colournum] = data;
 
-	state->m_mame_colours[colournum] = (r << (16+3)) | (g << (8+3)) | (b << (0+3));
+	m_mame_colours[colournum] = (r << (16+3)) | (g << (8+3)) | (b << (0+3));
 
-	if (colournum<0x10000) palette_set_color(machine,colournum,state->m_mame_colours[colournum]/* MAKE_RGB(r<<3,g<<3,b<<3)*/);//state->m_mame_colours[colournum]);
+	if (colournum<0x10000) palette_set_color(machine(),colournum,m_mame_colours[colournum]/* MAKE_RGB(r<<3,g<<3,b<<3)*/);//m_mame_colours[colournum]);
 }
 
 
@@ -853,10 +847,9 @@ void cps3_state::video_start()
 
 // the 0x400 bit in the tilemap regs is "draw it upside-down"  (bios tilemap during flashing, otherwise capcom logo is flipped)
 
-static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void cps3_state::cps3_draw_tilemapsprite_line(int tmnum, int drawline, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
-	UINT32* tmapregs[4] = { state->m_tilemap20_regs_base, state->m_tilemap30_regs_base, state->m_tilemap40_regs_base, state->m_tilemap50_regs_base };
+	UINT32* tmapregs[4] = { m_tilemap20_regs_base, m_tilemap30_regs_base, m_tilemap40_regs_base, m_tilemap50_regs_base };
 	UINT32* regs;
 	int line;
 	int scrolly;
@@ -897,7 +890,7 @@ static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, in
 		//  printf("linebase %08x\n", linebase);
 
 			scrollx =  (regs[0]&0xffff0000)>>16;
-			scrollx+= (state->m_spriteram[linebase+((line+16-4)&0x3ff)]>>16)&0x3ff;
+			scrollx+= (m_spriteram[linebase+((line+16-4)&0x3ff)]>>16)&0x3ff;
 
 		}
 
@@ -917,17 +910,17 @@ static void cps3_draw_tilemapsprite_line(running_machine &machine, int tmnum, in
 			int bpp;
 			int xflip,yflip;
 
-			dat = state->m_spriteram[mapbase+((tileline&63)*64)+((x+scrollx/16)&63)];
+			dat = m_spriteram[mapbase+((tileline&63)*64)+((x+scrollx/16)&63)];
 			tileno = (dat & 0xffff0000)>>17;
 			colour = (dat & 0x000001ff)>>0;
 			bpp = (dat & 0x0000200)>>9;
 			yflip  = (dat & 0x00000800)>>11;
 			xflip  = (dat & 0x00001000)>>12;
 
-			if (!bpp) machine.gfx[1]->set_granularity(256);
-			else machine.gfx[1]->set_granularity(64);
+			if (!bpp) machine().gfx[1]->set_granularity(256);
+			else machine().gfx[1]->set_granularity(64);
 
-			cps3_drawgfxzoom(bitmap,clip,machine.gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
+			cps3_drawgfxzoom(bitmap,clip,machine().gfx[1],tileno,colour,xflip,yflip,(x*16)-scrollx%16,drawline-tilesubline,CPS3_TRANSPARENCY_PEN_INDEX,0, 0x10000, 0x10000, NULL, 0);
 		}
 	}
 }
@@ -1080,7 +1073,7 @@ UINT32 cps3_state::screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitma
 					{
 						for (uu=0;uu<1023;uu++)
 						{
-							cps3_draw_tilemapsprite_line(machine(), tilemapnum, uu, m_renderbuffer_bitmap, m_renderbuffer_clip );
+							cps3_draw_tilemapsprite_line(tilemapnum, uu, m_renderbuffer_bitmap, m_renderbuffer_clip );
 						}
 					}
 					bg_drawn[tilemapnum] = 1;
@@ -1453,33 +1446,32 @@ WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 
 
 
-static UINT32 cps3_flashmain_r(address_space &space, int which, UINT32 offset, UINT32 mem_mask)
+UINT32 cps3_state::cps3_flashmain_r(address_space &space, int which, UINT32 offset, UINT32 mem_mask)
 {
-	cps3_state *state = space.machine().driver_data<cps3_state>();
 	UINT32 result = 0;
 
-	if (state->m_simm[which][0] == NULL || state->m_simm[which][1] == NULL || state->m_simm[which][2] == NULL || state->m_simm[which][3] == NULL)
+	if (m_simm[which][0] == NULL || m_simm[which][1] == NULL || m_simm[which][2] == NULL || m_simm[which][3] == NULL)
 		return 0xffffffff;
 
 	if (ACCESSING_BITS_24_31)   // Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+0, offset*4 );
-		result |= (state->m_simm[which][0]->read(offset)<<24);
+		result |= (m_simm[which][0]->read(offset)<<24);
 	}
 	if (ACCESSING_BITS_16_23)   // Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+1, offset*4 );
-		result |= (state->m_simm[which][1]->read(offset)<<16);
+		result |= (m_simm[which][1]->read(offset)<<16);
 	}
 	if (ACCESSING_BITS_8_15)    // Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+2, offset*4 );
-		result |= (state->m_simm[which][2]->read(offset)<<8);
+		result |= (m_simm[which][2]->read(offset)<<8);
 	}
 	if (ACCESSING_BITS_0_7) // Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+3, offset*4 );
-		result |= (state->m_simm[which][3]->read(offset)<<0);
+		result |= (m_simm[which][3]->read(offset)<<0);
 	}
 
 //  if (base==4) logerror("read flash chips addr %02x returning %08x\n", offset*4, result );
@@ -1509,43 +1501,42 @@ READ32_MEMBER(cps3_state::cps3_flash2_r)
 	return retvalue;
 }
 
-static void cps3_flashmain_w(running_machine &machine, int which, UINT32 offset, UINT32 data, UINT32 mem_mask)
+void cps3_state::cps3_flashmain_w(int which, UINT32 offset, UINT32 data, UINT32 mem_mask)
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
 	int command;
 
-	if (state->m_simm[which][0] == NULL || state->m_simm[which][1] == NULL || state->m_simm[which][2] == NULL || state->m_simm[which][3] == NULL)
+	if (m_simm[which][0] == NULL || m_simm[which][1] == NULL || m_simm[which][2] == NULL || m_simm[which][3] == NULL)
 		return;
 
 	if (ACCESSING_BITS_24_31)   // Flash 1
 	{
 		command = (data >> 24) & 0xff;
-		logerror("write to flash chip %s addr %02x cmd %02x\n", state->m_simm[which][0]->tag(), offset, command);
-		state->m_simm[which][0]->write(offset, command);
+		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][0]->tag(), offset, command);
+		m_simm[which][0]->write(offset, command);
 	}
 	if (ACCESSING_BITS_16_23)   // Flash 2
 	{
 		command = (data >> 16) & 0xff;
-		logerror("write to flash chip %s addr %02x cmd %02x\n", state->m_simm[which][1]->tag(), offset, command);
-		state->m_simm[which][1]->write(offset, command);
+		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][1]->tag(), offset, command);
+		m_simm[which][1]->write(offset, command);
 	}
 	if (ACCESSING_BITS_8_15)    // Flash 2
 	{
 		command = (data >> 8) & 0xff;
-		logerror("write to flash chip %s addr %02x cmd %02x\n", state->m_simm[which][2]->tag(), offset, command);
-		state->m_simm[which][2]->write(offset, command);
+		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][2]->tag(), offset, command);
+		m_simm[which][2]->write(offset, command);
 	}
 	if (ACCESSING_BITS_0_7) // Flash 2
 	{
 		command = (data >> 0) & 0xff;
-		logerror("write to flash chip %s addr %02x cmd %02x\n", state->m_simm[which][3]->tag(), offset, command);
-		state->m_simm[which][3]->write(offset, command);
+		logerror("write to flash chip %s addr %02x cmd %02x\n", m_simm[which][3]->tag(), offset, command);
+		m_simm[which][3]->write(offset, command);
 	}
 
 	/* copy data into regions to execute from */
 	{
-		UINT32* romdata =  (UINT32*)state->m_user4region;
-		UINT32* romdata2 = (UINT32*)state->m_decrypted_gamerom;
+		UINT32* romdata =  (UINT32*)m_user4region;
+		UINT32* romdata2 = (UINT32*)m_decrypted_gamerom;
 		int real_offset = 0;
 		UINT32 newdata;
 
@@ -1558,26 +1549,26 @@ static void cps3_flashmain_w(running_machine &machine, int which, UINT32 offset,
 			real_offset += 0x800000;
 		}
 
-		newdata = (state->m_simm[which][0]->read_raw(offset)<<24) |
-					(state->m_simm[which][1]->read_raw(offset)<<16) |
-					(state->m_simm[which][2]->read_raw(offset)<<8) |
-					(state->m_simm[which][3]->read_raw(offset)<<0);
+		newdata = (m_simm[which][0]->read_raw(offset)<<24) |
+					(m_simm[which][1]->read_raw(offset)<<16) |
+					(m_simm[which][2]->read_raw(offset)<<8) |
+					(m_simm[which][3]->read_raw(offset)<<0);
 
-		//printf("%08x %08x %08x %08x %08x\n",offset, romdata2[offset], romdata[offset], newdata,  newdata^cps3_mask(0x6000000+real_offset, state->m_key1, state->m_key2)  );
+		//printf("%08x %08x %08x %08x %08x\n",offset, romdata2[offset], romdata[offset], newdata,  newdata^cps3_mask(0x6000000+real_offset, m_key1, m_key2)  );
 
 		romdata[offset] = newdata;
-		romdata2[offset] = newdata^cps3_mask(0x6000000+real_offset, state->m_key1, state->m_key2);
+		romdata2[offset] = newdata^cps3_mask(0x6000000+real_offset, m_key1, m_key2);
 	}
 }
 
 WRITE32_MEMBER(cps3_state::cps3_flash1_w)
 {
-	cps3_flashmain_w(machine(),0,offset,data,mem_mask);
+	cps3_flashmain_w(0,offset,data,mem_mask);
 }
 
 WRITE32_MEMBER(cps3_state::cps3_flash2_w)
 {
-	cps3_flashmain_w(machine(),1,offset,data,mem_mask);
+	cps3_flashmain_w(1,offset,data,mem_mask);
 }
 
 WRITE32_MEMBER(cps3_state::cram_gfxflash_bank_w)
@@ -1778,7 +1769,7 @@ WRITE32_MEMBER(cps3_state::cps3_palettedma_w)
 
 					//if (m_paldma_fade!=0) printf("%08x\n",m_paldma_fade);
 
-					cps3_set_mame_colours(machine(), (m_paldma_dest+i)^1, coldata, m_paldma_fade);
+					cps3_set_mame_colours((m_paldma_dest+i)^1, coldata, m_paldma_fade);
 				}
 
 
@@ -1797,10 +1788,9 @@ WRITE32_MEMBER(cps3_state::cps3_palettedma_w)
 
 
 
-static UINT32 process_byte( running_machine &machine, UINT8 real_byte, UINT32 destination, int max_length )
+UINT32 cps3_state::process_byte( UINT8 real_byte, UINT32 destination, int max_length )
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
-	UINT8* dest       = (UINT8*)state->m_char_ram;
+	UINT8* dest       = (UINT8*)m_char_ram;
 
 	//printf("process byte for destination %08x\n", destination);
 
@@ -1811,18 +1801,18 @@ static UINT32 process_byte( running_machine &machine, UINT8 real_byte, UINT32 de
 		int tranfercount = 0;
 
 		//printf("Set RLE Mode\n");
-		state->m_rle_length = (real_byte&0x3f)+1;
+		m_rle_length = (real_byte&0x3f)+1;
 
-		//printf("RLE Operation (length %08x\n", state->m_rle_length );
+		//printf("RLE Operation (length %08x\n", m_rle_length );
 
-		while (state->m_rle_length)
+		while (m_rle_length)
 		{
-			dest[((destination+tranfercount)&0x7fffff)^3] = (state->m_last_normal_byte&0x3f);
-			machine.gfx[1]->mark_dirty(((destination+tranfercount)&0x7fffff)/0x100);
+			dest[((destination+tranfercount)&0x7fffff)^3] = (m_last_normal_byte&0x3f);
+			machine().gfx[1]->mark_dirty(((destination+tranfercount)&0x7fffff)/0x100);
 			//printf("RLE WRite Byte %08x, %02x\n", destination+tranfercount, real_byte);
 
 			tranfercount++;
-			state->m_rle_length--;
+			m_rle_length--;
 			max_length--;
 
 			if ((destination+tranfercount) > 0x7fffff)  return max_length;
@@ -1836,20 +1826,19 @@ static UINT32 process_byte( running_machine &machine, UINT8 real_byte, UINT32 de
 	{
 		//printf("Write Normal Data\n");
 		dest[(destination&0x7fffff)^3] = real_byte;
-		state->m_last_normal_byte = real_byte;
-		machine.gfx[1]->mark_dirty((destination&0x7fffff)/0x100);
+		m_last_normal_byte = real_byte;
+		machine().gfx[1]->mark_dirty((destination&0x7fffff)/0x100);
 		return 1;
 	}
 }
 
-static void cps3_do_char_dma( running_machine &machine, UINT32 real_source, UINT32 real_destination, UINT32 real_length )
+void cps3_state::cps3_do_char_dma( UINT32 real_source, UINT32 real_destination, UINT32 real_length )
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
-	UINT8* sourcedata = (UINT8*)state->m_user5region;
+	UINT8* sourcedata = (UINT8*)m_user5region;
 	int length_remaining;
 
-	state->m_last_normal_byte = 0;
-	state->m_rle_length = 0;
+	m_last_normal_byte = 0;
+	m_rle_length = 0;
 	length_remaining = real_length;
 	while (length_remaining)
 	{
@@ -1864,17 +1853,17 @@ static void cps3_do_char_dma( running_machine &machine, UINT32 real_source, UINT
 			UINT32 length_processed;
 			current_byte &= 0x7f;
 
-			real_byte = sourcedata[DMA_XOR((state->m_current_table_address+current_byte*2+0))];
+			real_byte = sourcedata[DMA_XOR((m_current_table_address+current_byte*2+0))];
 			//if (real_byte&0x80) return;
-			length_processed = process_byte( machine, real_byte, real_destination, length_remaining );
+			length_processed = process_byte(real_byte, real_destination, length_remaining );
 			length_remaining-=length_processed; // subtract the number of bytes the operation has taken
 			real_destination+=length_processed; // add it onto the destination
 			if (real_destination>0x7fffff) return;
 			if (length_remaining<=0) return; // if we've expired, exit
 
-			real_byte = sourcedata[DMA_XOR((state->m_current_table_address+current_byte*2+1))];
+			real_byte = sourcedata[DMA_XOR((m_current_table_address+current_byte*2+1))];
 			//if (real_byte&0x80) return;
-			length_processed = process_byte( machine, real_byte, real_destination, length_remaining );
+			length_processed = process_byte(real_byte, real_destination, length_remaining );
 			length_remaining-=length_processed; // subtract the number of bytes the operation has taken
 			real_destination+=length_processed; // add it onto the destination
 			if (real_destination>0x7fffff) return;
@@ -1883,7 +1872,7 @@ static void cps3_do_char_dma( running_machine &machine, UINT32 real_source, UINT
 		else
 		{
 			UINT32 length_processed;
-			length_processed = process_byte( machine, current_byte, real_destination, length_remaining );
+			length_processed = process_byte(current_byte, real_destination, length_remaining );
 			length_remaining-=length_processed; // subtract the number of bytes the operation has taken
 			real_destination+=length_processed; // add it onto the destination
 			if (real_destination>0x7fffff) return;
@@ -1894,48 +1883,46 @@ static void cps3_do_char_dma( running_machine &machine, UINT32 real_source, UINT
 	}
 }
 
-static UINT32 ProcessByte8(running_machine &machine,UINT8 b,UINT32 dst_offset)
+UINT32 cps3_state::ProcessByte8(UINT8 b,UINT32 dst_offset)
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
-	UINT8* destRAM = (UINT8*)state->m_char_ram;
+	UINT8* destRAM = (UINT8*)m_char_ram;
 	int l=0;
 
-	if(state->m_lastb==state->m_lastb2) //rle
+	if(m_lastb==m_lastb2) //rle
 	{
 		int i;
 		int rle=(b+1)&0xff;
 
 		for(i=0;i<rle;++i)
 		{
-			destRAM[(dst_offset&0x7fffff)^3] = state->m_lastb;
-			machine.gfx[1]->mark_dirty((dst_offset&0x7fffff)/0x100);
+			destRAM[(dst_offset&0x7fffff)^3] = m_lastb;
+			machine().gfx[1]->mark_dirty((dst_offset&0x7fffff)/0x100);
 
 			dst_offset++;
 			++l;
 		}
-		state->m_lastb2=0xffff;
+		m_lastb2=0xffff;
 
 		return l;
 	}
 	else
 	{
-		state->m_lastb2=state->m_lastb;
-		state->m_lastb=b;
+		m_lastb2=m_lastb;
+		m_lastb=b;
 		destRAM[(dst_offset&0x7fffff)^3] = b;
-		machine.gfx[1]->mark_dirty((dst_offset&0x7fffff)/0x100);
+		machine().gfx[1]->mark_dirty((dst_offset&0x7fffff)/0x100);
 		return 1;
 	}
 }
 
-static void cps3_do_alt_char_dma( running_machine &machine, UINT32 src, UINT32 real_dest, UINT32 real_length )
+void cps3_state::cps3_do_alt_char_dma( UINT32 src, UINT32 real_dest, UINT32 real_length )
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
-	UINT8* px = (UINT8*)state->m_user5region;
+	UINT8* px = (UINT8*)m_user5region;
 	UINT32 start = real_dest;
 	UINT32 ds = real_dest;
 
-	state->m_lastb=0xfffe;
-	state->m_lastb2=0xffff;
+	m_lastb=0xfffe;
+	m_lastb2=0xffff;
 
 	while(1)
 	{
@@ -1951,14 +1938,14 @@ static void cps3_do_alt_char_dma( running_machine &machine, UINT32 src, UINT32 r
 			{
 				UINT8 real_byte;
 				p&=0x7f;
-				real_byte = px[DMA_XOR((state->m_current_table_address+p*2+0))];
-				ds+=ProcessByte8(machine,real_byte,ds);
-				real_byte = px[DMA_XOR((state->m_current_table_address+p*2+1))];
-				ds+=ProcessByte8(machine,real_byte,ds);
+				real_byte = px[DMA_XOR((m_current_table_address+p*2+0))];
+				ds+=ProcessByte8(real_byte,ds);
+				real_byte = px[DMA_XOR((m_current_table_address+p*2+1))];
+				ds+=ProcessByte8(real_byte,ds);
 			}
 			else
 			{
-				ds+=ProcessByte8(machine,p,ds);
+				ds+=ProcessByte8(p,ds);
 			}
 			++src;
 			ctrl<<=1;
@@ -1969,18 +1956,17 @@ static void cps3_do_alt_char_dma( running_machine &machine, UINT32 src, UINT32 r
 	}
 }
 
-static void cps3_process_character_dma(running_machine &machine, UINT32 address)
+void cps3_state::cps3_process_character_dma(UINT32 address)
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
 	int i;
 
 	//printf("charDMA start:\n");
 
 	for (i = 0; i < 0x1000; i += 3)
 	{
-		UINT32 dat1 = LITTLE_ENDIANIZE_INT32(state->m_char_ram[i + 0 + (address)]);
-		UINT32 dat2 = LITTLE_ENDIANIZE_INT32(state->m_char_ram[i + 1 + (address)]);
-		UINT32 dat3 = LITTLE_ENDIANIZE_INT32(state->m_char_ram[i + 2 + (address)]);
+		UINT32 dat1 = LITTLE_ENDIANIZE_INT32(m_char_ram[i + 0 + (address)]);
+		UINT32 dat2 = LITTLE_ENDIANIZE_INT32(m_char_ram[i + 1 + (address)]);
+		UINT32 dat3 = LITTLE_ENDIANIZE_INT32(m_char_ram[i + 2 + (address)]);
 		UINT32 real_source      = (dat3 << 1) - 0x400000;
 		UINT32 real_destination =  dat2 << 3;
 		UINT32 real_length      = (((dat1 & 0x001fffff) + 1) << 3);
@@ -1995,24 +1981,24 @@ static void cps3_process_character_dma(running_machine &machine, UINT32 address)
 			/* Sets a table used by the decompression routines */
 			{
 				/* We should probably copy this, but a pointer to it is fine for our purposes as the data doesn't change */
-				state->m_current_table_address = real_source;
+				m_current_table_address = real_source;
 			}
-			machine.device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
+			machine().device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
 		}
 		else if  ((dat1 & 0x00e00000) == 0x00400000)
 		{
 			/* 6bpp DMA decompression
 			  - this is used for the majority of sprites and backgrounds */
-			cps3_do_char_dma( machine, real_source, real_destination, real_length );
-			machine.device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
+			cps3_do_char_dma(real_source, real_destination, real_length );
+			machine().device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
 
 		}
 		else if  ((dat1 & 0x00e00000) == 0x00600000)
 		{
 			/* 8bpp DMA decompression
 			  - this is used on SFIII NG Sean's Stage ONLY */
-			cps3_do_alt_char_dma( machine, real_source, real_destination, real_length);
-			machine.device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
+			cps3_do_alt_char_dma(real_source, real_destination, real_length);
+			machine().device("maincpu")->execute().set_input_line(10, ASSERT_LINE);
 		}
 		else
 		{
@@ -2051,7 +2037,7 @@ WRITE32_MEMBER(cps3_state::cps3_characterdma_w)
 				list_address = (m_chardma_source | ((m_chardma_other&0x003f0000)));
 
 				//printf("chardma_w activated %08x %08x (address = cram %08x)\n", m_chardma_source, m_chardma_other, list_address*4 );
-				cps3_process_character_dma(machine(), list_address);
+				cps3_process_character_dma(list_address);
 			}
 			else
 			{
@@ -2096,12 +2082,12 @@ WRITE32_MEMBER(cps3_state::cps3_colourram_w)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		cps3_set_mame_colours(machine(), offset*2, (data & 0xffff0000) >> 16, 0);
+		cps3_set_mame_colours(offset*2, (data & 0xffff0000) >> 16, 0);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		cps3_set_mame_colours(machine(), offset*2+1, (data & 0x0000ffff) >> 0, 0);
+		cps3_set_mame_colours(offset*2+1, (data & 0x0000ffff) >> 0, 0);
 	}
 }
 
@@ -2268,44 +2254,43 @@ void cps3_state::machine_reset()
 	m_current_table_address = -1;
 
 	// copy data from flashroms back into user regions + decrypt into regions we execute/draw from.
-	copy_from_nvram(machine());
+	copy_from_nvram();
 }
 
 
 
 // make a copy in the regions we execute code / draw gfx from
-static void copy_from_nvram(running_machine &machine)
+void cps3_state::copy_from_nvram()
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
-	UINT32* romdata = (UINT32*)state->m_user4region;
-	UINT32* romdata2 = (UINT32*)state->m_decrypted_gamerom;
+	UINT32* romdata = (UINT32*)m_user4region;
+	UINT32* romdata2 = (UINT32*)m_decrypted_gamerom;
 	int i;
 	/* copy + decrypt program roms which have been loaded from flashroms/nvram */
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
 
-		data = ((state->m_simm[0][0]->read_raw(i/4)<<24) | (state->m_simm[0][1]->read_raw(i/4)<<16) | (state->m_simm[0][2]->read_raw(i/4)<<8) | (state->m_simm[0][3]->read_raw(i/4)<<0));
+		data = ((m_simm[0][0]->read_raw(i/4)<<24) | (m_simm[0][1]->read_raw(i/4)<<16) | (m_simm[0][2]->read_raw(i/4)<<8) | (m_simm[0][3]->read_raw(i/4)<<0));
 
-	//  printf("%08x %08x %08x %08x\n",romdata[i/4],data, romdata2[i/4], data ^ cps3_mask(i+0x6000000, state->m_key1, state->m_key2));
+	//  printf("%08x %08x %08x %08x\n",romdata[i/4],data, romdata2[i/4], data ^ cps3_mask(i+0x6000000, m_key1, m_key2));
 		romdata[i/4] = data;
-		romdata2[i/4] = data ^ cps3_mask(i+0x6000000, state->m_key1, state->m_key2);
+		romdata2[i/4] = data ^ cps3_mask(i+0x6000000, m_key1, m_key2);
 
 	}
 
 	romdata  += 0x800000/4;
 	romdata2 += 0x800000/4;
 
-	if (state->m_simm[1][0] != NULL)
+	if (m_simm[1][0] != NULL)
 		for (i=0;i<0x800000;i+=4)
 		{
 			UINT32 data;
 
-			data = ((state->m_simm[1][0]->read_raw(i/4)<<24) | (state->m_simm[1][1]->read_raw(i/4)<<16) | (state->m_simm[1][2]->read_raw(i/4)<<8) | (state->m_simm[1][3]->read_raw(i/4)<<0));
+			data = ((m_simm[1][0]->read_raw(i/4)<<24) | (m_simm[1][1]->read_raw(i/4)<<16) | (m_simm[1][2]->read_raw(i/4)<<8) | (m_simm[1][3]->read_raw(i/4)<<0));
 
-		//  printf("%08x %08x %08x %08x\n",romdata[i/4],data, romdata2[i/4],  data ^ cps3_mask(i+0x6800000, state->m_key1, state->m_key2) );
+		//  printf("%08x %08x %08x %08x\n",romdata[i/4],data, romdata2[i/4],  data ^ cps3_mask(i+0x6800000, m_key1, m_key2) );
 			romdata[i/4] = data;
-			romdata2[i/4] = data ^ cps3_mask(i+0x6800000, state->m_key1, state->m_key2);
+			romdata2[i/4] = data ^ cps3_mask(i+0x6800000, m_key1, m_key2);
 		}
 
 	/* copy gfx from loaded flashroms to user reigon 5, where it's used */
@@ -2314,13 +2299,13 @@ static void copy_from_nvram(running_machine &machine)
 		int flashnum = 0;
 		int countoffset = 0;
 
-		romdata = (UINT32*)state->m_user5region;
+		romdata = (UINT32*)m_user5region;
 		for (thebase = 0;thebase < len/2; thebase+=0x200000)
 		{
 		//  printf("flashnums %d. %d\n",flashnum, flashnum+1);
 
-			fujitsu_29f016a_device *flash0 = state->m_simm[2 + flashnum/8][flashnum % 8 + 0];
-			fujitsu_29f016a_device *flash1 = state->m_simm[2 + flashnum/8][flashnum % 8 + 1];
+			fujitsu_29f016a_device *flash0 = m_simm[2 + flashnum/8][flashnum % 8 + 0];
+			fujitsu_29f016a_device *flash1 = m_simm[2 + flashnum/8][flashnum % 8 + 1];
 			if (flash0 == NULL || flash1 == NULL)
 				continue;
 			if (flash0 != NULL && flash1 != NULL)
@@ -2346,7 +2331,7 @@ static void copy_from_nvram(running_machine &machine)
 	/*
 	{
 	    FILE *fp;
-	    const char *gamename = machine.system().name;
+	    const char *gamename = machine().system().name;
 	    char filename[256];
 	    sprintf(filename, "%s_bios.dump", gamename);
 
@@ -2387,17 +2372,17 @@ static int cps3_dma_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 da
 	if (src<0x80000)
 	{
 		int offs = (src&0x07ffff)>>2;
-		data = data ^ cps3_mask(offs*4, state->m_key1, state->m_key2);
+		data = data ^ state->cps3_mask(offs*4, state->m_key1, state->m_key2);
 	}
 	else if (src>=0x6000000 && src<0x6800000)
 	{
 		int offs = (src&0x07fffff)>>2;
-		if (!state->m_altEncryption) data = data ^ cps3_mask(0x6000000+offs*4, state->m_key1, state->m_key2);
+		if (!state->m_altEncryption) data = data ^ state->cps3_mask(0x6000000+offs*4, state->m_key1, state->m_key2);
 	}
 	else if (src>=0x6800000 && src<0x7000000)
 	{
 		int offs = (src&0x07fffff)>>2;
-		if (!state->m_altEncryption) data = data ^ cps3_mask(0x6800000+offs*4, state->m_key1, state->m_key2);
+		if (!state->m_altEncryption) data = data ^ state->cps3_mask(0x6800000+offs*4, state->m_key1, state->m_key2);
 	}
 	else
 	{

@@ -83,6 +83,22 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2u_1_q_cb);
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2u_2_q_cb);
 
+	void remap_sprite_code(int bank, int code, int *remapped_code, int *flipy);
+	void normalize_coordinates(int *x1, int *y1, int *x2, int *y2);
+	int check_sprite_left_goal_collision(int x1, int y1, int code1, int flipy1, int goalpost_only);
+	int check_sprite_right_goal_collision(int x1, int y1, int code1, int flipy1, int goalpost_only);
+	int check_sprite_border_collision(UINT8 x1, UINT8 y1, int code1, int flipy1);
+	void carpolo_generate_ball_screen_interrupt(UINT8 cause);
+	void carpolo_generate_car_car_interrupt(int car1, int car2);
+	void carpolo_generate_car_goal_interrupt(int car, int right_goal);
+	void carpolo_generate_car_ball_interrupt(int car, int car_x, int car_y);
+	void carpolo_generate_car_border_interrupt(int car, int horizontal_border);
+	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect,
+						UINT8 x, UINT8 y, int bank, int code, int col);
+	int check_sprite_sprite_collision(int x1, int y1, int code1, int flipy1,
+										int x2, int y2, int code2, int flipy2,
+										int *col_x, int *col_y);
+	
 };
 
 
@@ -92,8 +108,3 @@ extern const pia6821_interface carpolo_pia0_intf;
 extern const pia6821_interface carpolo_pia1_intf;
 
 void carpolo_74148_3s_cb(device_t *device);
-void carpolo_generate_car_car_interrupt(running_machine &machine, int car1, int car2);
-void carpolo_generate_ball_screen_interrupt(running_machine &machine, UINT8 cause);
-void carpolo_generate_car_goal_interrupt(running_machine &machine, int car, int right_goal);
-void carpolo_generate_car_ball_interrupt(running_machine &machine, int car, int car_x, int car_y);
-void carpolo_generate_car_border_interrupt(running_machine &machine, int car, int horizontal_border);

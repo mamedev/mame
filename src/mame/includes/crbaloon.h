@@ -44,6 +44,12 @@ public:
 	DECLARE_WRITE8_MEMBER(crbaloon_audio_set_music_freq);
 	DECLARE_WRITE8_MEMBER(crbaloon_audio_set_music_enable);
 	DECLARE_WRITE8_MEMBER(crbaloon_audio_set_laugh_enable);
+	UINT16 crbaloon_get_collision_address();
+	void crbaloon_set_clear_collision_address(int _crbaloon_collision_address_clear);
+	void draw_sprite_and_check_collision(bitmap_ind16 &bitmap);
+	void pc3092_reset(void);
+	void pc3092_update();
+	void pc3259_update(void);
 };
 
 
@@ -53,7 +59,3 @@ void crbaloon_audio_set_explosion_enable(device_t *sn, int enabled);
 void crbaloon_audio_set_breath_enable(device_t *sn, int enabled);
 void crbaloon_audio_set_appear_enable(device_t *sn, int enabled);
 MACHINE_CONFIG_EXTERN( crbaloon_audio );
-
-/*----------- defined in video/crbaloon.c -----------*/
-UINT16 crbaloon_get_collision_address(running_machine &machine);
-void crbaloon_set_clear_collision_address(running_machine &machine, int _crbaloon_collision_address_clear);

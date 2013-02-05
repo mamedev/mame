@@ -23,10 +23,9 @@ VIDEO_START_MEMBER(cninja_state,stoneage)
 
 
 /* The bootleg sprites are in a different format! */
-static void cninjabl_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void cninja_state::cninjabl_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	cninja_state *state = machine.driver_data<cninja_state>();
-	UINT16 *buffered_spriteram = state->m_spriteram->buffer();
+	UINT16 *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 	int endoffs;
 
@@ -66,7 +65,7 @@ static void cninjabl_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		}
 
 		flash = y & 0x1000;
-		if (flash && (machine.primary_screen->frame_number() & 1))
+		if (flash && (machine().primary_screen->frame_number() & 1))
 			continue;
 
 		colour = (x >> 9) & 0x1f;
@@ -95,7 +94,7 @@ static void cninjabl_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 			inc = 1;
 		}
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			y = 240 - y;
 			x = 240 - x;
@@ -108,12 +107,12 @@ static void cninjabl_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 		while (multi >= 0)
 		{
-			pdrawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+			pdrawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 					sprite - multi * inc,
 					colour,
 					fx,fy,
 					x,y + mult * multi,
-					machine.priority_bitmap,pri,0);
+					machine().priority_bitmap,pri,0);
 
 			multi--;
 		}
@@ -163,7 +162,7 @@ UINT32 cninja_state::screen_update_cninjabl(screen_device &screen, bitmap_ind16 
 	deco16ic_tilemap_1_draw(m_deco_tilegen2, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 2);
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 4);
-	cninjabl_draw_sprites(machine(), bitmap, cliprect);
+	cninjabl_draw_sprites(bitmap, cliprect);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;
 }

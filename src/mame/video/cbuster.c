@@ -12,28 +12,27 @@
 
 /* maybe the game should just use generic palette handling, and have a darker palette by design... */
 
-static void update_24bitcol( running_machine &machine, int offset )
+void cbuster_state::update_24bitcol( int offset )
 {
-	cbuster_state *state = machine.driver_data<cbuster_state>();
 	UINT8 r, g, b; /* The highest palette value seems to be 0x8e */
 
-	r = (UINT8)((float)((state->m_generic_paletteram_16[offset]  >> 0) & 0xff) * 1.75);
-	g = (UINT8)((float)((state->m_generic_paletteram_16[offset]  >> 8) & 0xff) * 1.75);
-	b = (UINT8)((float)((state->m_generic_paletteram2_16[offset] >> 0) & 0xff) * 1.75);
+	r = (UINT8)((float)((m_generic_paletteram_16[offset]  >> 0) & 0xff) * 1.75);
+	g = (UINT8)((float)((m_generic_paletteram_16[offset]  >> 8) & 0xff) * 1.75);
+	b = (UINT8)((float)((m_generic_paletteram2_16[offset] >> 0) & 0xff) * 1.75);
 
-	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
 }
 
 WRITE16_MEMBER(cbuster_state::twocrude_palette_24bit_rg_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	update_24bitcol(machine(), offset);
+	update_24bitcol(offset);
 }
 
 WRITE16_MEMBER(cbuster_state::twocrude_palette_24bit_b_w)
 {
 	COMBINE_DATA(&m_generic_paletteram2_16[offset]);
-	update_24bitcol(machine(), offset);
+	update_24bitcol(offset);
 }
 
 

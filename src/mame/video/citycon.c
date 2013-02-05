@@ -99,39 +99,37 @@ WRITE8_MEMBER(citycon_state::citycon_background_w)
 
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void citycon_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	citycon_state *state = machine.driver_data<citycon_state>();
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int sx, sy, flipx;
 
-		sx = state->m_spriteram[offs + 3];
-		sy = 239 - state->m_spriteram[offs];
-		flipx = ~state->m_spriteram[offs + 2] & 0x10;
-		if (state->flip_screen())
+		sx = m_spriteram[offs + 3];
+		sy = 239 - m_spriteram[offs];
+		flipx = ~m_spriteram[offs + 2] & 0x10;
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 238 - sy;
 			flipx = !flipx;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[state->m_spriteram[offs + 1] & 0x80 ? 2 : 1],
-				state->m_spriteram[offs + 1] & 0x7f,
-				state->m_spriteram[offs + 2] & 0x0f,
-				flipx,state->flip_screen(),
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[m_spriteram[offs + 1] & 0x80 ? 2 : 1],
+				m_spriteram[offs + 1] & 0x7f,
+				m_spriteram[offs + 2] & 0x0f,
+				flipx,flip_screen(),
 				sx, sy, 0);
 	}
 }
 
 
-INLINE void changecolor_RRRRGGGGBBBBxxxx( running_machine &machine, int color, int indx )
+inline void citycon_state::changecolor_RRRRGGGGBBBBxxxx( int color, int indx )
 {
-	citycon_state *state = machine.driver_data<citycon_state>();
-	int data = state->m_generic_paletteram_8[2 * indx | 1] | (state->m_generic_paletteram_8[2 * indx] << 8);
-	palette_set_color_rgb(machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
+	int data = m_generic_paletteram_8[2 * indx | 1] | (m_generic_paletteram_8[2 * indx] << 8);
+	palette_set_color_rgb(machine(), color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 
 UINT32 citycon_state::screen_update_citycon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -145,7 +143,7 @@ UINT32 citycon_state::screen_update_citycon(screen_device &screen, bitmap_ind16 
 		int i;
 
 		for (i = 0; i < 4; i++)
-			changecolor_RRRRGGGGBBBBxxxx(machine(), 640 + 4 * offs + i, 512 + 4 * indx + i);
+			changecolor_RRRRGGGGBBBBxxxx(640 + 4 * offs + i, 512 + 4 * indx + i);
 	}
 
 
@@ -156,6 +154,6 @@ UINT32 citycon_state::screen_update_citycon(screen_device &screen, bitmap_ind16 
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

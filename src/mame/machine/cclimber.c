@@ -4,11 +4,11 @@
 /* set to 1 to fix protection check after bonus round (see notes in pacman.c driver) */
 #define CANNONB_HACK    0
 
-static void cclimber_decode(running_machine &machine, const UINT8 convtable[8][16])
+void cclimber_state::cclimber_decode(const UINT8 convtable[8][16])
 {
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x10000);
 	int A;
 
 	space.set_decrypted_region(0x0000, 0xffff, decrypt);
@@ -45,7 +45,7 @@ DRIVER_INIT_MEMBER(cclimber_state,cclimber)
 		{   -1,  -1,0x54,0x01,0x15,0x40,0x45,0x41,0x51,0x04,0x50,0x05,0x11,0x44,0x10,0x14 }
 	};
 
-	cclimber_decode(machine(), convtable);
+	cclimber_decode(convtable);
 }
 
 DRIVER_INIT_MEMBER(cclimber_state,cclimberj)
@@ -62,7 +62,7 @@ DRIVER_INIT_MEMBER(cclimber_state,cclimberj)
 		{ 0x55,0x50,0x15,0x10,0x01,0x04,0x41,0x44,0x45,0x40,0x05,0x00,0x11,0x14,0x51,0x54 },
 	};
 
-	cclimber_decode(machine(), convtable);
+	cclimber_decode(convtable);
 }
 
 DRIVER_INIT_MEMBER(cclimber_state,ckongb)
@@ -77,9 +77,9 @@ DRIVER_INIT_MEMBER(cclimber_state,ckongb)
 }
 
 #if CANNONB_HACK
-static void cannonb_patch(running_machine &machine)
+void ::cannonb_patch()
 {
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	rom[0x2ba0] = 0x21;
 	rom[0x2ba1] = 0xfb;

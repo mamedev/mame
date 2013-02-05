@@ -832,18 +832,18 @@ ROM_END
 
 
 
-static void seibu_sound_bootleg(running_machine &machine,const char *cpu,int length)
+void cabal_state::seibu_sound_bootleg(const char *cpu,int length)
 {
-	address_space &space = machine.device(cpu)->memory().space(AS_PROGRAM);
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
-	UINT8 *rom = machine.root_device().memregion(cpu)->base();
+	address_space &space = machine().device(cpu)->memory().space(AS_PROGRAM);
+	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, length);
+	UINT8 *rom = machine().root_device().memregion(cpu)->base();
 
 	space.set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
 
 	memcpy(decrypt, rom+length, length);
 
 	if (length > 0x10000)
-		machine.root_device().membank("bank1")->configure_decrypted_entries(0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
+		machine().root_device().membank("bank1")->configure_decrypted_entries(0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
 }
 
 
@@ -857,7 +857,7 @@ DRIVER_INIT_MEMBER(cabal_state,cabal)
 
 DRIVER_INIT_MEMBER(cabal_state,cabalbl2)
 {
-	seibu_sound_bootleg(machine(),"audiocpu",0x2000);
+	seibu_sound_bootleg("audiocpu",0x2000);
 	seibu_adpcm_decrypt(machine(),"adpcm1");
 	seibu_adpcm_decrypt(machine(),"adpcm2");
 }

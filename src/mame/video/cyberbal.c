@@ -201,7 +201,7 @@ VIDEO_START_MEMBER(cyberbal_state,cyberbal2p)
  *
  *************************************/
 
-INLINE void set_palette_entry(running_machine &machine, int entry, UINT16 value)
+inline void cyberbal_state::set_palette_entry(int entry, UINT16 value)
 {
 	int r, g, b;
 
@@ -209,7 +209,7 @@ INLINE void set_palette_entry(running_machine &machine, int entry, UINT16 value)
 	g = ((value >> 4) & 0x3e) | ((value >> 15) & 1);
 	b = ((value << 1) & 0x3e) | ((value >> 15) & 1);
 
-	palette_set_color_rgb(machine, entry, pal6bit(r), pal6bit(g), pal6bit(b));
+	palette_set_color_rgb(machine(), entry, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 
@@ -223,7 +223,7 @@ INLINE void set_palette_entry(running_machine &machine, int entry, UINT16 value)
 WRITE16_HANDLER(cyberbal_state::paletteram_0_w)
 {
 	COMBINE_DATA(&m_paletteram_0[offset]);
-	set_palette_entry(machine(), offset, m_paletteram_0[offset]);
+	set_palette_entry(offset, m_paletteram_0[offset]);
 }
 
 READ16_HANDLER(cyberbal_state::paletteram_0_r)
@@ -235,7 +235,7 @@ READ16_HANDLER(cyberbal_state::paletteram_0_r)
 WRITE16_HANDLER(cyberbal_state::paletteram_1_w)
 {
 	COMBINE_DATA(&m_paletteram_1[offset]);
-	set_palette_entry(machine(), offset + 0x800, m_paletteram_1[offset]);
+	set_palette_entry(offset + 0x800, m_paletteram_1[offset]);
 }
 
 READ16_HANDLER(cyberbal_state::paletteram_1_r)
