@@ -65,47 +65,39 @@ None of this is hooked up currently due to issues with row scroll on the scroll2
 #include "sound/okim6295.h"
 
 
-static WRITE16_HANDLER( fcrash_soundlatch_w )
+WRITE16_MEMBER( cps_state::fcrash_soundlatch_w )
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
-
 	if (ACCESSING_BITS_0_7)
 	{
-		state->soundlatch_byte_w(space, 0, data & 0xff);
-		state->m_audiocpu->set_input_line(0, HOLD_LINE);
+		soundlatch_byte_w(space, 0, data & 0xff);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
 WRITE16_MEMBER(cps_state::cawingbl_soundlatch_w)
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
-
 	if (ACCESSING_BITS_8_15)
 	{
-		state->soundlatch_byte_w(space, 0, data  >> 8);
-		state->m_audiocpu->set_input_line(0, HOLD_LINE);
+		soundlatch_byte_w(space, 0, data  >> 8);
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); /* boost the interleave or some voices get dropped */
 	}
 }
 
-static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
+WRITE8_MEMBER( cps_state::fcrash_snd_bankswitch_w )
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
+	m_msm_1->set_output_gain(0, (data & 0x08) ? 0.0 : 1.0);
+	m_msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
 
-	state->m_msm_1->set_output_gain(0, (data & 0x08) ? 0.0 : 1.0);
-	state->m_msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
-
-	state->membank("bank1")->set_entry(data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
-static WRITE8_HANDLER( sf2mdt_snd_bankswitch_w )
+WRITE8_MEMBER( cps_state::sf2mdt_snd_bankswitch_w )
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
+	m_msm_1->set_output_gain(0, (data & 0x20) ? 0.0 : 1.0);
+	m_msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
 
-	state->m_msm_1->set_output_gain(0, (data & 0x20) ? 0.0 : 1.0);
-	state->m_msm_2->set_output_gain(0, (data & 0x10) ? 0.0 : 1.0);
-
-	state->membank("bank1")->set_entry(data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
 static void m5205_int1( device_t *device )
@@ -129,16 +121,15 @@ static void m5205_int2( device_t *device )
 }
 
 
-static WRITE8_HANDLER( fcrash_msm5205_0_data_w )
+
+WRITE8_MEMBER( cps_state::fcrash_msm5205_0_data_w )
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
-	state->m_sample_buffer1 = data;
+	m_sample_buffer1 = data;
 }
 
-static WRITE8_HANDLER( fcrash_msm5205_1_data_w )
+WRITE8_MEMBER( cps_state::fcrash_msm5205_1_data_w )
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
-	state->m_sample_buffer2 = data;
+	m_sample_buffer2 = data;
 }
 
 /* not verified */
@@ -146,85 +137,82 @@ static WRITE8_HANDLER( fcrash_msm5205_1_data_w )
 
 WRITE16_MEMBER(cps_state::kodb_layer_w)
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
-
 	/* layer enable and mask 1&2 registers are written here - passing them to m_cps_b_regs for now for drawing routines */
 	if (offset == 0x06)
-		state->m_cps_b_regs[m_layer_enable_reg / 2] = data;
+		m_cps_b_regs[m_layer_enable_reg / 2] = data;
 	else
 	if (offset == 0x10)
-		state->m_cps_b_regs[state->m_layer_mask_reg[1] / 2] = data;
+		m_cps_b_regs[m_layer_mask_reg[1] / 2] = data;
 	else
 	if (offset == 0x11)
-		state->m_cps_b_regs[state->m_layer_mask_reg[2] / 2] = data;
+		m_cps_b_regs[m_layer_mask_reg[2] / 2] = data;
 }
 
 WRITE16_MEMBER(cps_state::sf2mdt_layer_w)
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
-
 	/* layer enable and scroll registers are written here - passing them to m_cps_b_regs and m_cps_a_regs for now for drawing routines
 	the scroll layers aren't buttery smooth, due to the lack of using the row scroll address tables in the rendering code, this is also
 	supported by the fact that the game doesn't write the table address anywhere */
 
 	if (offset == 0x0086)
-		state->m_cps_a_regs[0x14 / 2] = data + 0xffce; /* scroll 3x */
+		m_cps_a_regs[0x14 / 2] = data + 0xffce; /* scroll 3x */
 	else
 	if (offset == 0x0087)
-		state->m_cps_a_regs[0x16 / 2] = data; /* scroll 3y */
+		m_cps_a_regs[0x16 / 2] = data; /* scroll 3y */
 	else
 	if (offset == 0x0088)
-		state->m_cps_a_regs[0x10 / 2] = data + 0xffce; /* scroll 2x */
+		m_cps_a_regs[0x10 / 2] = data + 0xffce; /* scroll 2x */
 	else
 	if (offset == 0x0089)
-		state->m_cps_a_regs[0x0c / 2] = data + 0xffca; /* scroll 1x */
+		m_cps_a_regs[0x0c / 2] = data + 0xffca; /* scroll 1x */
 	else
-	if (offset == 0x008a) {
-		state->m_cps_a_regs[0x12 / 2] = data; /* scroll 2y */
-		state->m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
-	} else
+	if (offset == 0x008a)
+	{
+		m_cps_a_regs[0x12 / 2] = data; /* scroll 2y */
+		m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
+	}
+	else
 	if (offset == 0x008b)
-		state->m_cps_a_regs[0x0e / 2] = data; /* scroll 1y */
+		m_cps_a_regs[0x0e / 2] = data; /* scroll 1y */
 	else
 	if (offset == 0x00a6)
-		state->m_cps_b_regs[m_layer_enable_reg / 2] = data;
+		m_cps_b_regs[m_layer_enable_reg / 2] = data;
 }
 
 WRITE16_MEMBER(cps_state::sf2mdta_layer_w)
 {
-	cps_state *state = space.machine().driver_data<cps_state>();
-
 	/* layer enable and scroll registers are written here - passing them to m_cps_b_regs and m_cps_a_regs for now for drawing routines
 	the scroll layers aren't buttery smooth, due to the lack of using the row scroll address tables in the rendering code, this is also
 	supported by the fact that the game doesn't write the table address anywhere */
 
 	if (offset == 0x0086)
-		state->m_cps_a_regs[0x0c / 2] = data + 0xffbe; /* scroll 1x */
+		m_cps_a_regs[0x0c / 2] = data + 0xffbe; /* scroll 1x */
 	else
 	if (offset == 0x0087)
-		state->m_cps_a_regs[0x0e / 2] = data; /* scroll 1y */
+		m_cps_a_regs[0x0e / 2] = data; /* scroll 1y */
 	else
 	if (offset == 0x0088)
-		state->m_cps_a_regs[0x14 / 2] = data + 0xffce; /* scroll 3x */
+		m_cps_a_regs[0x14 / 2] = data + 0xffce; /* scroll 3x */
 	else
-	if (offset == 0x0089) {
-		state->m_cps_a_regs[0x12 / 2] = data; /* scroll 2y */
-		state->m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
-	} else
+	if (offset == 0x0089)
+	{
+		m_cps_a_regs[0x12 / 2] = data; /* scroll 2y */
+		m_cps_a_regs[CPS1_ROWSCROLL_OFFS] = data; /* row scroll start */
+	}
+	else
 	if (offset == 0x008a)
-		state->m_cps_a_regs[0x10 / 2] = data + 0xffce; /* scroll 2x */
+		m_cps_a_regs[0x10 / 2] = data + 0xffce; /* scroll 2x */
 	else
 	if (offset == 0x008b)
-		state->m_cps_a_regs[0x16 / 2] = data; /* scroll 3y */
+		m_cps_a_regs[0x16 / 2] = data; /* scroll 3y */
 	else
 	if (offset == 0x00a6)
-		state->m_cps_b_regs[m_layer_enable_reg / 2] = data;
+		m_cps_b_regs[m_layer_enable_reg / 2] = data;
 }
 
 
-static void fcrash_update_transmasks( running_machine &machine )
+void cps_state::fcrash_update_transmasks()
 {
-	cps_state *state = machine.driver_data<cps_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
@@ -232,39 +220,36 @@ static void fcrash_update_transmasks( running_machine &machine )
 		int mask;
 
 		/* Get transparency registers */
-		if (state->m_layer_mask_reg[i])
-			mask = state->m_cps_b_regs[state->m_layer_mask_reg[i] / 2] ^ 0xffff;
+		if (m_layer_mask_reg[i])
+			mask = m_cps_b_regs[m_layer_mask_reg[i] / 2] ^ 0xffff;
 		else
 			mask = 0xffff;  /* completely transparent if priority masks not defined (mercs, qad) */
 
-		state->m_bg_tilemap[0]->set_transmask(i, mask, 0x8000);
-		state->m_bg_tilemap[1]->set_transmask(i, mask, 0x8000);
-		state->m_bg_tilemap[2]->set_transmask(i, mask, 0x8000);
+		m_bg_tilemap[0]->set_transmask(i, mask, 0x8000);
+		m_bg_tilemap[1]->set_transmask(i, mask, 0x8000);
+		m_bg_tilemap[2]->set_transmask(i, mask, 0x8000);
 	}
 }
 
-static void fcrash_render_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void cps_state::fcrash_render_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	cps_state *state = machine.driver_data<cps_state>();
 	int pos;
-	int base = state->m_sprite_base / 2;
-	int num_sprites = machine.gfx[2]->elements();
+	int base = m_sprite_base / 2;
+	int num_sprites = machine().gfx[2]->elements();
 	int last_sprite_offset = 0x1ffc;
-	UINT16 *sprite_ram = state->m_gfxram;
+	UINT16 *sprite_ram = m_gfxram;
 
 	// sprite base registers need hooking up properly.. on fcrash it is NOT cps1_cps_a_regs[0]
 	//  on kodb, it might still be, unless that's just a leftover and it writes somewhere else too
-//  if (state->m_cps_a_regs[0] & 0x00ff) base = 0x10c8/2;
-//  printf("cps1_cps_a_regs %04x\n", state->m_cps_a_regs[0]);
+//  if (m_cps_a_regs[0] & 0x00ff) base = 0x10c8/2;
+//  printf("cps1_cps_a_regs %04x\n", m_cps_a_regs[0]);
 
 	/* if we have separate sprite ram, use it */
-	if (state->m_bootleg_sprite_ram) sprite_ram = state->m_bootleg_sprite_ram;
+	if (m_bootleg_sprite_ram) sprite_ram = m_bootleg_sprite_ram;
 
 	/* get end of sprite list marker */
 	for (pos = 0x1ffc - base; pos >= 0x0000; pos -= 4)
-	{
-		if (sprite_ram[base + pos - 1] == state->m_sprite_list_end_marker) last_sprite_offset = pos;
-	}
+		if (sprite_ram[base + pos - 1] == m_sprite_list_end_marker) last_sprite_offset = pos;
 
 	for (pos = last_sprite_offset; pos >= 0x0000; pos -= 4)
 	{
@@ -282,34 +267,29 @@ static void fcrash_render_sprites( running_machine &machine, bitmap_ind16 &bitma
 		flipy  = sprite_ram[base + pos + 1] & 0x40;
 		colour = sprite_ram[base + pos + 1] & 0x1f;
 		ypos   = 256 - ypos;
-		xpos  += state->m_sprite_x_offset;
+		xpos  += m_sprite_x_offset;
 
-		pdrawgfx_transpen(bitmap, cliprect, machine.gfx[2], tileno, colour, flipx, flipy, xpos + 49, ypos - 16, machine.priority_bitmap, 0x02, 15);
-
+		pdrawgfx_transpen(bitmap, cliprect, machine().gfx[2], tileno, colour, flipx, flipy, xpos + 49, ypos - 16, machine().priority_bitmap, 0x02, 15);
 	}
-
 }
 
-static void fcrash_render_layer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask )
+void cps_state::fcrash_render_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask )
 {
-	cps_state *state = machine.driver_data<cps_state>();
-
 	switch (layer)
 	{
 		case 0:
-			fcrash_render_sprites(machine, bitmap, cliprect);
+			fcrash_render_sprites(bitmap, cliprect);
 			break;
 		case 1:
 		case 2:
 		case 3:
-			state->m_bg_tilemap[layer - 1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, primask);
+			m_bg_tilemap[layer - 1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, primask);
 			break;
 	}
 }
 
-static void fcrash_render_high_layer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
+void cps_state::fcrash_render_high_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
-	cps_state *state = machine.driver_data<cps_state>();
 	bitmap_ind16 dummy_bitmap;
 
 	switch (layer)
@@ -320,22 +300,21 @@ static void fcrash_render_high_layer( running_machine &machine, bitmap_ind16 &bi
 		case 1:
 		case 2:
 		case 3:
-			state->m_bg_tilemap[layer - 1]->draw(dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
+			m_bg_tilemap[layer - 1]->draw(dummy_bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
 			break;
 	}
 }
 
-static void fcrash_build_palette( running_machine &machine )
+void cps_state::fcrash_build_palette()
 {
-	cps_state *state = machine.driver_data<cps_state>();
 	int offset;
 
 	// all the bootlegs seem to write the palette offset as usual
-	int palettebase = (state->m_cps_a_regs[0x0a / 2] << 8) & 0x1ffff;
+	int palettebase = (m_cps_a_regs[0x0a / 2] << 8) & 0x1ffff;
 
 	for (offset = 0; offset < 32 * 6 * 16; offset++)
 	{
-		int palette = state->m_gfxram[palettebase / 2 + offset];
+		int palette = m_gfxram[palettebase / 2 + offset];
 		int r, g, b, bright;
 
 		// from my understanding of the schematics, when the 'brightness'
@@ -347,7 +326,7 @@ static void fcrash_build_palette( running_machine &machine )
 		g = ((palette >> 4) & 0x0f) * 0x11 * bright / 0x2d;
 		b = ((palette >> 0) & 0x0f) * 0x11 * bright / 0x2d;
 
-		palette_set_color (machine, offset, MAKE_RGB(r, g, b));
+		palette_set_color (machine(), offset, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -364,9 +343,9 @@ UINT32 cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitm
 	cps1_get_video_base();
 
 	/* Build palette */
-	fcrash_build_palette(machine());
+	fcrash_build_palette();
 
-	fcrash_update_transmasks(machine());
+	fcrash_update_transmasks();
 
 	m_bg_tilemap[0]->set_scrollx(0, m_scroll1x - m_layer_scroll1x_offset);
 	m_bg_tilemap[0]->set_scrolly(0, m_scroll1y);
@@ -409,22 +388,22 @@ UINT32 cps_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitm
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
 
-	fcrash_render_layer(machine(), bitmap, cliprect, l0, 0);
+	fcrash_render_layer(bitmap, cliprect, l0, 0);
 
 	if (l1 == 0)
-		fcrash_render_high_layer(machine(), bitmap, cliprect, l0);
+		fcrash_render_high_layer(bitmap, cliprect, l0);
 
-	fcrash_render_layer(machine(), bitmap, cliprect, l1, 0);
+	fcrash_render_layer(bitmap, cliprect, l1, 0);
 
 	if (l2 == 0)
-		fcrash_render_high_layer(machine(), bitmap, cliprect, l1);
+		fcrash_render_high_layer(bitmap, cliprect, l1);
 
-	fcrash_render_layer(machine(), bitmap, cliprect, l2, 0);
+	fcrash_render_layer(bitmap, cliprect, l2, 0);
 
 	if (l3 == 0)
-		fcrash_render_high_layer(machine(), bitmap, cliprect, l2);
+		fcrash_render_high_layer(bitmap, cliprect, l2);
 
-	fcrash_render_layer(machine(), bitmap, cliprect, l3, 0);
+	fcrash_render_layer(bitmap, cliprect, l3, 0);
 
 	return 0;
 }
@@ -436,7 +415,7 @@ static ADDRESS_MAP_START( fcrash_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x800100, 0x80013f) AM_RAM AM_SHARE("cps_a_regs")  /* CPS-A custom */
 	AM_RANGE(0x800140, 0x80017f) AM_RAM AM_SHARE("cps_b_regs")  /* CPS-B custom */
 	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("IN1")                /* Player input ports */
-	AM_RANGE(0x880006, 0x880007) AM_WRITE_LEGACY(fcrash_soundlatch_w)       /* Sound command */
+	AM_RANGE(0x880006, 0x880007) AM_WRITE(fcrash_soundlatch_w)       /* Sound command */
 	AM_RANGE(0x880008, 0x88000f) AM_READ(cps1_dsw_r)                /* System input ports / Dip Switches */
 	AM_RANGE(0x890000, 0x890001) AM_WRITENOP    // palette related?
 	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_SHARE("gfxram")
@@ -449,10 +428,10 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cps_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xd800, 0xd801) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xdc00, 0xdc01) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(fcrash_snd_bankswitch_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(fcrash_snd_bankswitch_w)
 	AM_RANGE(0xe400, 0xe400) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(fcrash_msm5205_0_data_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE_LEGACY(fcrash_msm5205_1_data_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcrash_msm5205_0_data_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(fcrash_msm5205_1_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kodb_sound_map, AS_PROGRAM, 8, cps_state )
@@ -470,9 +449,9 @@ static ADDRESS_MAP_START( sf2mdt_z80map, AS_PROGRAM, 8, cps_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xd800, 0xd801) AM_DEVREADWRITE("2151", ym2151_device, read, write)
 	AM_RANGE(0xdc00, 0xdc00) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(sf2mdt_snd_bankswitch_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE_LEGACY(fcrash_msm5205_0_data_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(fcrash_msm5205_1_data_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(sf2mdt_snd_bankswitch_w)
+	AM_RANGE(0xe400, 0xe400) AM_WRITE(fcrash_msm5205_0_data_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcrash_msm5205_1_data_w)
 ADDRESS_MAP_END
 
 

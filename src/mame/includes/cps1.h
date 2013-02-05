@@ -256,7 +256,17 @@ public:
 	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
 	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
+	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(sf2mdt_snd_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(fcrash_msm5205_0_data_w);
+	DECLARE_WRITE8_MEMBER(fcrash_msm5205_1_data_w);
 	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void fcrash_update_transmasks();
+	void fcrash_render_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void fcrash_render_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int primask);
+	void fcrash_render_high_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer);
+	void fcrash_build_palette();
 
 
 	/* cps video */
