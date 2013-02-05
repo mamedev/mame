@@ -13035,6 +13035,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="wizardsh" supported="no">
     <description>Wizard's Harmony R (Japan)</description>
     <year>199?</year>
@@ -13048,6 +13049,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="wolffang" supported="no">
     <description>Wolf Fang (Japan)</description>
     <year>199?</year>
@@ -13075,6 +13077,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- crash MESS -->
   <software name="wonderbc" supported="no">
     <description>Wonder B-Cruise - Dogiborn Daisakusen (Japan)</description>
     <year>199?</year>
@@ -13088,6 +13091,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="wondertr" supported="no">
     <description>Wonder Tracker (Japan)</description>
     <year>199?</year>
@@ -13101,6 +13105,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="worldlea" supported="no">
     <description>World League Soccer - Challenge Nippon! (Japan)</description>
     <year>199?</year>
@@ -13114,6 +13119,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="worldnev" supported="no">
     <description>World Neverland - Olerud Oukoku Monogatari (Japan)</description>
     <year>199?</year>
@@ -13127,6 +13133,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="worldpro" supported="no">
     <description>World Pro Tennis '98 (Japan)</description>
     <year>199?</year>
@@ -13140,6 +13147,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="wwfwrest" supported="no">
     <description>WWF Wrestlemania - The Arcade Game (Japan)</description>
     <year>199?</year>
@@ -13167,6 +13175,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok, but invisible player sprite -->
   <software name="x2noreli" supported="no">
     <description>X2 - No Relief (Japan)</description>
     <year>199?</year>
@@ -13180,6 +13189,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="yakiniku" supported="no">
     <description>Yakiniku Bugyou (Japan)</description>
     <year>199?</year>
@@ -13193,6 +13203,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="yakitori" supported="no">
     <description>Yakitori Musume - Sugo Ude Hanjouki (Japan)</description>
     <year>199?</year>
@@ -13206,6 +13217,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="yamagaau" supported="no">
     <description>Yamagata Digital Museum - Autumn (Japan)</description>
     <year>199?</year>
@@ -13219,6 +13231,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="yamagasp" supported="no">
     <description>Yamagata Digital Museum - Spring (Japan)</description>
     <year>199?</year>
@@ -13232,6 +13245,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="yamagasu" supported="no">
     <description>Yamagata Digital Museum - Summer (Japan)</description>
     <year>199?</year>
@@ -13245,6 +13259,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="yamagawi" supported="no">
     <description>Yamagata Digital Museum - Winter (Japan)</description>
     <year>199?</year>
@@ -13258,6 +13273,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="yasoukyo" supported="no">
     <description>Yasoukyoku 2 (Japan)</description>
     <year>199?</year>
@@ -13271,6 +13287,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="yoshimot" supported="no">
     <description>Yoshimoto Muchicco Daikessen (Japan)</description>
     <year>199?</year>
@@ -13284,6 +13301,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="youkaiha" supported="no">
     <description>Youkai Hanaasobi (Japan)</description>
     <year>199?</year>
@@ -13297,6 +13315,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="yugiohmo" supported="no">
     <description>Yu-Gi-Oh! Monster Capsule Breed &amp; Battle (Japan)</description>
     <year>199?</year>
@@ -13310,6 +13329,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="yukinkob" supported="no">
     <description>Yukinko Burning (Japan)</description>
     <year>199?</year>
@@ -13323,6 +13343,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- white screen after initial menus -->
   <software name="yumenots" supported="no">
     <description>Yume no Tsubasa (Japan)</description>
     <year>199?</year>
@@ -13336,6 +13357,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="yumeiroi" supported="no">
     <description>Yume-Iroiro (Japan)</description>
     <year>199?</year>
@@ -13349,6 +13371,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="yuugenga" supported="no">
     <description>Yuugen Gaisha Chikyuu Boueitai - Earth Defenders Corporation (Japan)</description>
     <year>199?</year>
@@ -13362,6 +13385,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok, bad fmv every other frame -->
   <software name="yuukyuun" supported="no">
     <description>Yuukyuu no Eden - The Eternal Eden (Japan)</description>
     <year>199?</year>
@@ -13375,6 +13399,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok, hang on loading screen after first menu -->
   <software name="yuuyamid" supported="no">
     <description>Yuuyami Doori Tankentai (Japan)</description>
     <year>199?</year>
@@ -13388,6 +13413,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="zapsnowb" supported="no">
     <description>Zap! Snowboarding Trix '98 (Japan)</description>
     <year>199?</year>
@@ -13401,6 +13427,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="zeiramzo" supported="no">
     <description>Zeiramzone (Japan)</description>
     <year>199?</year>
@@ -13414,6 +13441,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after company logos -->
   <software name="zeitgeis" supported="no">
     <description>Zeitgeist (Japan)</description>
     <year>199?</year>
@@ -13427,6 +13455,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="zennippo" supported="no">
     <description>Zen-Nippon Joshi Pro Wrestling - Joou Densetsu Yume no Taikousen (Japan)</description>
     <year>199?</year>
@@ -13440,6 +13469,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen -->
   <software name="zennipok" supported="no">
     <description>Zen-Nippon Pro-Wrestling - Ouja no Kon (Japan)</description>
     <year>199?</year>
@@ -13453,6 +13483,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="zero4cha" supported="no">
     <description>Zero 4 Champ Doozy-J (Japan)</description>
     <year>199?</year>
@@ -13466,6 +13497,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="zigzagba" supported="no">
     <description>Zig Zag Ball (Japan)</description>
     <year>199?</year>
@@ -13479,6 +13511,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="zipangut" supported="no">
     <description>Zipangutou - Unmei wa Saikoro ga Kimeru! (Japan)</description>
     <year>199?</year>
@@ -13492,6 +13525,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after logos -->
   <software name="zoidsbat" supported="no">
     <description>Zoids - Battle Card Game - Seihou Tairiku Senki (Japan)</description>
     <year>199?</year>
@@ -13505,6 +13539,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="zoidstei" supported="no">
     <description>Zoids - Teikoku vs. Kyouwakoku - Meka Seitai no Idenshi (Japan)</description>
     <year>199?</year>
@@ -13518,7 +13553,8 @@ A few comments on these:
     </part>
   </software>
 
-  <software name="zoids2he" supported="no">
+  <!-- boot OK -->
+  <software name="zoids2" supported="no">
     <description>Zoids 2 - Heric Kyouwakoku vs. Guylos Teikoku  (Japan)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
@@ -13531,6 +13567,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="zokuhats" supported="no">
     <description>Zoku Hatsukoi Monogatari (Japan)</description>
     <year>199?</year>
@@ -13559,6 +13596,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after company logos -->
   <software name="zorkithe" supported="no">
     <description>Zork I - The Great Underground Empire (Japan)</description>
     <year>199?</year>
@@ -13572,6 +13610,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="zuttoiss" supported="no">
     <description>Zutto Issho With Me Everytime (Japan)</description>
     <year>199?</year>
@@ -13585,6 +13624,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK, but controls stop working -->
   <software name="zxedlege" supported="no">
     <description>Zxe-D - Legend of Plasmalite (Japan)</description>
     <year>199?</year>
@@ -13597,5 +13637,36 @@ A few comments on these:
       </diskarea>
     </part>
   </software>
+
+  <!-- Non-redump PAL (Europe) -->
+
+  <!-- corrupt text -->
+  <software name="firebugs" supported="partial">
+    <description>Firebugs (Europe)</description>
+    <year>199?</year>
+    <publisher>&lt;unknown&gt;</publisher>
+    <!-- <info name="serial" value="" /> -->
+    <sharedfeat name="compatibility" value="PAL-E"/>
+    <part name="cdrom" interface="psx_cdrom">
+      <diskarea name="cdrom">
+        <disk name="firebugs (e)" sha1="763f232c64d2fa7091c3c6f8eed13686f636da49"/>
+      </diskarea>
+    </part>
+  </software>
+
+  <!-- boot ok -->
+  <software name="terracon" supported="yes">
+    <description>Terracon (Europe)</description>
+    <year>199?</year>
+    <publisher>&lt;unknown&gt;</publisher>
+    <!-- <info name="serial" value="" /> -->
+    <sharedfeat name="compatibility" value="PAL-E"/>
+    <part name="cdrom" interface="psx_cdrom">
+      <diskarea name="cdrom">
+        <disk name="terracon_pal" sha1="06f1e225c8e214cb7717d5a131a0c6ed9f53a42b"/>
+      </diskarea>
+    </part>
+  </software>
+
 
 </softwarelist>
