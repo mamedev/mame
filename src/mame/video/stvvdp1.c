@@ -194,6 +194,7 @@ READ16_HANDLER( saturn_vdp1_regs_r )
 
 			return modr;
 		default:
+			if(!space.debugger_access())
 			printf ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space.device().tag(), space.device().safe_pc(), offset*2);
 			break;
 	}
@@ -1985,7 +1986,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 					break;
 
 				case 0x0005:
-//				case 0x0007: // mirror?
+//				case 0x0007: // mirror? Baroque uses it, crashes for whatever reason
 					if (VDP1_LOG) logerror ("Sprite List Polyline\n");
 					stv2_current_sprite.ispoly = 1;
 					stv_vdp1_draw_poly_line(machine, *cliprect);
@@ -1998,7 +1999,7 @@ static void stv_vdp1_process_list(running_machine &machine)
 					break;
 
 				case 0x0008:
-//				case 0x000b: // mirror?
+//				case 0x000b: // mirror? Bug 2
 					if (VDP1_LOG) logerror ("Sprite List Set Command for User Clipping (%d,%d),(%d,%d)\n", stv2_current_sprite.CMDXA, stv2_current_sprite.CMDYA, stv2_current_sprite.CMDXC, stv2_current_sprite.CMDYC);
 					state->m_vdp1.user_cliprect.set(stv2_current_sprite.CMDXA, stv2_current_sprite.CMDXC, stv2_current_sprite.CMDYA, stv2_current_sprite.CMDYC);
 					break;

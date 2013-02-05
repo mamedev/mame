@@ -24,13 +24,16 @@ enum
 	EA_DMADSTMEM,
 	EA_DSTMEM,
 	EA_MVIDSTMEM,
+	EA_FLAGS,
+	EA_DMASRCMEM
+
 };
 
 struct SCUDSP_OPCODE {
 	char mnemonic[32];
 	int address_mode_1;
 	int address_mode_2;
-	int address_mode_3,
+	int address_mode_3;
 };
 
 static const SCUDSP_OPCODE alu_table[16] =
@@ -95,7 +98,7 @@ static const SCUDSP_OPCODE dma_table[] =
 {
 	{ "DMA",  EA_D0,          EA_DMADSTMEM,  EA_IMM8, }, /* 000 */ // "DMA%H%A D0,%M,%I",
 	{ "DMA",  EA_DMASRCMEM,   EA_D0,  EA_IMM8, },   /* 001 */ // "DMA%H%A %s,D0,%I",
-	{ "DMA",  0,          0,  0, }, /* 010 */ // "DMA%H%A D0,%M,%s",
+	{ "DMA",  0,   0,  0, }, /* 010 */ // "DMA%H%A D0,%M,%s",
 	{ "DMA",  0,   0,  0, },                        /* 011 */ // "DMA%H%A %s,D0,%s",
 	{ "DMAH", EA_D0,   EA_DMADSTMEM,  EA_IMM8, },   /* 100 */ // "DMA%H%A D0,%M,%I",
 	{ "DMAH", EA_DMASRCMEM,   EA_D0,  EA_IMM8, },   /* 101 */ // "DMA%H%A %s,D0,%I",
@@ -206,7 +209,7 @@ static const char *const cond_flags[] =
 /*****************************************************************************/
 
 static char *output;
-static const UINT32 *rombase;
+static const UINT8 *rombase;
 
 static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
 {
@@ -236,9 +239,9 @@ static UINT8 add_table(UINT32 cur_opcode)
 
 static UINT32 decode_opcode(UINT32 pc, const SCUDSP_OPCODE *op_table,UINT32 cur_opcode)
 {
-	INT8 rel8;
-	UINT32 imm32;
-	UINT8 op2;
+//	INT8 rel8;
+//	UINT32 imm32;
+//	UINT8 op2;
 	UINT32 flags = 0;
 
 	//if (!strcmp(op_table->mnemonic, "jsr") || !strcmp(op_table->mnemonic, "bsr"))
