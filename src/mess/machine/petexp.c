@@ -72,12 +72,40 @@ device_pet_expansion_card_interface::~device_pet_expansion_card_interface()
 
 
 //-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void pet_expansion_slot_device::device_config_complete()
+{
+	// inherit a copy of the static data
+	const pet_expansion_slot_interface *intf = reinterpret_cast<const pet_expansion_slot_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<pet_expansion_slot_interface *>(this) = *intf;
+	}
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in_dma_bd_cb, 0, sizeof(m_in_dma_bd_cb));
+		memset(&m_out_dma_bd_cb, 0, sizeof(m_out_dma_bd_cb));
+	}
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void pet_expansion_slot_device::device_start()
 {
 	m_card = dynamic_cast<device_pet_expansion_card_interface *>(get_card_device());
+
+	// resolve callbacks
+	m_in_dma_bd_func.resolve(m_in_dma_bd_cb, *this);
+	m_out_dma_bd_func.resolve(m_out_dma_bd_cb, *this);
 }
 
 
@@ -105,7 +133,7 @@ int pet_expansion_slot_device::norom_r(address_space &space, offs_t offset, int 
 
 
 //-------------------------------------------------
-//  read - cartridge data read
+//  read - buffered data read
 //-------------------------------------------------
 
 UINT8 pet_expansion_slot_device::read(address_space &space, offs_t offset, UINT8 data, int sel)
@@ -120,7 +148,7 @@ UINT8 pet_expansion_slot_device::read(address_space &space, offs_t offset, UINT8
 
 
 //-------------------------------------------------
-//  write - cartridge data write
+//  write - buffered data write
 //-------------------------------------------------
 
 void pet_expansion_slot_device::write(address_space &space, offs_t offset, UINT8 data, int sel)
@@ -129,6 +157,46 @@ void pet_expansion_slot_device::write(address_space &space, offs_t offset, UINT8
 	{
 		m_card->pet_bd_w(space, offset, data, sel);
 	}
+}
+
+
+//-------------------------------------------------
+//  diag_r - DIAG read
+//-------------------------------------------------
+
+READ_LINE_MEMBER( pet_expansion_slot_device::diag_r )
+{
+	return m_card ? m_card->pet_diag_r() : 1;
+}
+
+
+//-------------------------------------------------
+//  irq_w - IRQ write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( pet_expansion_slot_device::irq_w )
+{
+	if (m_card) m_card->pet_irq_w(state);
+}
+
+
+//-------------------------------------------------
+//  dma_bd_r - DMA read
+//-------------------------------------------------
+
+UINT8 pet_expansion_slot_device::dma_bd_r(offs_t offset)
+{
+	return m_in_dma_bd_func(offset);
+}
+
+
+//-------------------------------------------------
+//  dma_bd_w - DMA write
+//-------------------------------------------------
+
+void pet_expansion_slot_device::dma_bd_w(offs_t offset, UINT8 data)
+{
+	m_out_dma_bd_func(offset, data);
 }
 
 

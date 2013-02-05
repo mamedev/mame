@@ -6,8 +6,8 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "formats/cbm_snqk.h"
-#include "machine/6821pia.h"
 #include "machine/6522via.h"
+#include "machine/6821pia.h"
 #include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 #include "machine/petcass.h"
@@ -22,7 +22,6 @@
 #define M6520_1_TAG 	"g8"
 #define M6520_2_TAG 	"b8"
 #define MC6845_TAG		"ub13"
-#define M6809_TAG		"u4"
 #define SCREEN_TAG		"screen"
 
 class pet_state : public driver_device

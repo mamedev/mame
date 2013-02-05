@@ -134,7 +134,13 @@ ROM sockets:  UA3   2K or 4K character
 
 	- accurate video timing for non-CRTC models
 	- PET 4000-12 (40 column CRTC models)
+	- High Speed Graphics board
+	- keyboard layouts
+		- Swedish
+		- German
 	- SuperPET
+		- 6809
+		- OS/9 MMU
 	- 8096
 		- 64k expansion
 	- 8296
@@ -161,6 +167,7 @@ void pet_state::check_interrupts()
 	int irq = m_via_irq || m_pia1a_irq || m_pia1b_irq || m_pia2a_irq || m_pia2b_irq || m_exp_irq;
 
 	m_maincpu->set_input_line(M6502_IRQ_LINE, irq);
+	m_exp->irq_w(irq);
 }
 
 
@@ -704,7 +711,7 @@ READ8_MEMBER( pet_state::pia1_pa_r )
 	data |= m_ieee->eoi_r() << 6;
 
 	// diagnostic jumper
-	data |= 0x80;
+	data |= m_exp->diag_r() << 7;
 
 	return data;
 }
@@ -890,6 +897,17 @@ static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
 static PET_DATASSETTE_PORT_INTERFACE( datassette2_intf )
 {
 	DEVCB_DEVICE_LINE_MEMBER(M6522_TAG, via6522_device, write_cb1)
+};
+
+
+//-------------------------------------------------
+//  PET_EXPANSION_INTERFACE( exp_intf )
+//-------------------------------------------------
+
+static PET_EXPANSION_INTERFACE( exp_intf )
+{
+	DEVCB_DRIVER_MEMBER(pet_state, read),
+	DEVCB_DRIVER_MEMBER(pet_state, write)
 };
 
 
@@ -1186,7 +1204,7 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c4040")
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c2n", NULL)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT2_TAG, datassette2_intf, cbm_datassette_devices, NULL, NULL)
-	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_8MHz/8, pet_expansion_cards, NULL, NULL)
+	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_8MHz/8, exp_intf, pet_expansion_cards, NULL, NULL)
 	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, user_intf, pet_user_port_cards, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -1462,7 +1480,7 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c2n", NULL)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT2_TAG, datassette2_intf, cbm_datassette_devices, NULL, NULL)
-	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, NULL, NULL)
+	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, exp_intf, pet_expansion_cards, NULL, NULL)
 	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, user_intf, pet_user_port_cards, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -1485,9 +1503,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( superpet )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_DERIVED_CLASS( superpet, pet80, superpet_state )
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("96K")
+static MACHINE_CONFIG_DERIVED_CLASS( superpet, pet8032, superpet_state )
+	MCFG_DEVICE_REMOVE(PET_EXPANSION_SLOT_TAG)
+	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, exp_intf, pet_expansion_cards, "superpet", NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list2", "superpet_flop")
 MACHINE_CONFIG_END
@@ -1750,7 +1768,7 @@ ROM_START( cbm8032_se )
 	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
 	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
-	ROM_LOAD( "swedish.bin",   0x5000, 0x0800, CRC(75901dd7) SHA1(2ead0d83255a344a42bb786428353ca48d446d03) )   // It had a label "8000-UD7, SCREEN-04"
+	ROM_LOAD( "8000-ud7, screen-04.ud7", 0x5000, 0x0800, CRC(75901dd7) SHA1(2ead0d83255a344a42bb786428353ca48d446d03) )
 	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
@@ -1769,22 +1787,33 @@ ROM_START( superpet )
 	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
 	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
-	ROM_LOAD( "901474-03.ud7", 0x5000, 0x0800, CRC(5674dd5e) SHA1(c605fa343fd77c73cbe1e0e9567e2f014f6e7e30) )   // Screen Editor (80 columns, CRTC 60Hz, Business Keyb)
+	ROM_LOAD( "901474-04.ud7", 0x5000, 0x0800, CRC(abb000e7) SHA1(66887061b6c4ebef7d6efb90af9afd5e2c3b08ba) )   // Screen Editor (80 columns, CRTC 50Hz, Business Keyb)
 	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
-	ROM_REGION( 0x7000, M6809_TAG, 0 )
-	ROM_LOAD( "901898-01.u17", 0x1000, 0x1000, CRC(728a998b) SHA1(0414b3ab847c8977eb05c2fcc72efcf2f9d92871) )
-	ROM_LOAD( "901898-02.u18", 0x2000, 0x1000, CRC(6beb7c62) SHA1(df154939b934d0aeeb376813ec1ba0d43c2a3378) )
-	ROM_LOAD( "901898-03.u19", 0x3000, 0x1000, CRC(5db4983d) SHA1(6c5b0cce97068f8841112ba6d5cd8e568b562fa3) )
-	ROM_LOAD( "901898-04.u20", 0x4000, 0x1000, CRC(f55fc559) SHA1(b42a2050a319a1ffca7868a8d8d635fadd37ec37) )
-	ROM_LOAD( "901897-01.u21", 0x5000, 0x0800, CRC(b2cee903) SHA1(e8ce8347451a001214a5e71a13081b38b4be23bc) )
-	ROM_LOAD( "901898-05.u22", 0x6000, 0x1000, CRC(f42df0cb) SHA1(9b4a5134d20345171e7303445f87c4e0b9addc96) )
-
-	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-10.ua3", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901640-01.ua3", 0x0000, 0x1000, CRC(ee8229c4) SHA1(bf346f11595a3e65e55d6aeeaa2c0cec807b66c7) )
 ROM_END
 
 #define rom_mmf9000 rom_superpet
+
+
+//-------------------------------------------------
+//  ROM( mmf9000_se )
+//-------------------------------------------------
+
+ROM_START( mmf9000_se )
+	ROM_REGION( 0x7000, M6502_TAG, 0 )
+	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
+	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
+	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
+	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
+	ROM_LOAD( "8000-ud7, screen-04.ud7", 0x5000, 0x0800, CRC(75901dd7) SHA1(2ead0d83255a344a42bb786428353ca48d446d03) )
+	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901640-01 skand.gen.ua3", 0x0000, 0x1000, CRC(da1cd630) SHA1(35f472114ff001259bdbae073ae041b0759e32cb) )
+ROM_END
 
 
 //-------------------------------------------------
@@ -1895,6 +1924,7 @@ COMP( 1981,	cbm8032_de,	pet8032,	0,		pet8032,	petb_de,	driver_device,	0,	"Commod
 COMP( 1981,	cbm8032_se,	pet8032,	0,		pet8032,	petb_se,	driver_device,	0,	"Commodore Business Machines",	"CBM 8032 (Sweden/Finland)",	GAME_SUPPORTS_SAVE )
 COMP( 1981,	superpet,	pet8032,	0,		superpet,	petb,		driver_device,	0,	"Commodore Business Machines",	"SuperPET SP-9000",				GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1981,	mmf9000,	pet8032,	0,		superpet,	petb,		driver_device,	0,	"Commodore Business Machines",	"MicroMainFrame 9000",			GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1981,	mmf9000_se,	pet8032,	0,		superpet,	petb_se,	driver_device,	0,	"Commodore Business Machines",	"MicroMainFrame 9000 (Sweden/Finland)",			GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1981,	cbm8096,	pet8032,	0,		cbm8096,	petb,		driver_device,	0,	"Commodore Business Machines",	"CBM 8096",						GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1984,	cbm8296,	0,			0,		cbm8296,	petb,		driver_device,	0,	"Commodore Business Machines",	"CBM 8296",						GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1984,	cbm8296d,	cbm8296,	0,		cbm8296d,	petb,		driver_device,	0,	"Commodore Business Machines",	"CBM 8296D",					GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

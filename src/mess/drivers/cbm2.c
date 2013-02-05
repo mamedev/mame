@@ -1584,7 +1584,7 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 	data |= m_ieee1->read(space, 0);
 
 	// user port
-	data |= m_user->d1_r(space, 0);
+	data &= m_user->d1_r(space, 0);
 
 	// joystick
 	data &= ~(!BIT(m_joy1->joy_r(), 5) << 6);
