@@ -9581,6 +9581,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="pbobl3dx" supported="no">
     <description>Puzzle Bobble 3 DX (Japan)</description>
     <year>199?</year>
@@ -9594,6 +9595,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="pbobl4" supported="no">
     <description>Puzzle Bobble 4 (Japan)</description>
     <year>199?</year>
@@ -9607,6 +9609,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok, must skip fmv before it begins or black screen -->
   <software name="qix2000j" supported="no">
     <description>Qix 2000 (Japan)</description>
     <year>199?</year>
@@ -9646,6 +9649,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="quizdara" supported="no">
     <description>Quiz Darake no Jinsei Game - Un to Atama de Daifugou (Japan)</description>
     <year>199?</year>
@@ -9659,6 +9663,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- hang starting new game -->
   <software name="quizmill" supported="no">
     <description>Quiz Millionaire (Japan)</description>
     <year>199?</year>
@@ -9672,6 +9677,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="quovadis" supported="no">
     <description>Quo Vadis - Iberukatsu Seneki (Japan)</description>
     <year>199?</year>
@@ -9699,6 +9705,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="rakugaki" supported="no">
     <description>Rakugaki Showtime (Japan)</description>
     <year>199?</year>
@@ -9712,6 +9719,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="rallydea" supported="no">
     <description>Rally de Africa (Japan)</description>
     <year>199?</year>
@@ -9725,6 +9733,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="rallydee" supported="no">
     <description>Rally de Europe (Japan)</description>
     <year>199?</year>
@@ -9738,6 +9747,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after some movies -->
   <software name="ramichan" supported="no">
     <description>Ramichan no Odeo Surogoku - Keio Yugekitai Gaiden (Japan)</description>
     <year>199?</year>
@@ -9751,6 +9761,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="ranma12b" supported="no">
     <description>Ranma 1-2 - Battle Renaissance (Japan)</description>
     <year>199?</year>
@@ -9764,6 +9775,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="raytrace" supported="no">
     <description>Ray Tracers (Japan)</description>
     <year>199?</year>
@@ -9777,6 +9789,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- hangs at company logo -->
   <software name="raymanja" supported="no">
     <description>Rayman (Japan)</description>
     <year>199?</year>
@@ -9790,6 +9803,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="readymai" supported="no">
     <description>Ready Maid (Japan)</description>
     <year>199?</year>
@@ -9803,7 +9817,8 @@ A few comments on these:
     </part>
   </software>
 
-  <software name="realbout" supported="no">
+  <!-- boot OK -->
+  <software name="rbffsdm" supported="no">
     <description>Real Bout Garou Densetsu Special - Dominated Mind (Limited Edition) (Japan) (Disc 1)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
@@ -9821,6 +9836,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot OK -->
   <software name="realrobo" supported="no">
     <description>Real Robots - Final Attack (Japan)</description>
     <year>199?</year>
@@ -9848,7 +9864,8 @@ A few comments on these:
     </part>
   </software>
 
-  <software name="rescuesh" supported="no">
+  <!-- boot ok, needs gun -->
+  <software name="rsbhdemo" supported="no">
     <description>Rescue Shot Bubibo &amp; BioHazard - Gun Survivor (Demo) (Japan)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
@@ -9861,7 +9878,8 @@ A few comments on these:
     </part>
   </software>
 
-  <software name="returnto" supported="no">
+  <!-- black screen, MESS crash -->
+  <software name="retzork" supported="no">
     <description>Return to Zork (Japan)</description>
     <year>199?</year>
     <publisher>&lt;unknown&gt;</publisher>
@@ -9879,6 +9897,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="ridegear" supported="no">
     <description>Ridegear Guybrave II (Japan)</description>
     <year>199?</year>
@@ -9897,6 +9916,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="rikujoub" supported="no">
     <description>Rikujou Boueitai Maochan (Deluxe Pack) (Japan)</description>
     <year>199?</year>
@@ -9910,6 +9930,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- black screen after company logos -->
   <software name="riotstar" supported="no">
     <description>Riot Stars (Japan)</description>
     <year>199?</year>
@@ -9923,6 +9944,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- company logos shown, broken into incorrect parts, then hang -->
   <software name="riseofro" supported="no">
     <description>Rise of Robots 2 - Resurection (Japan)</description>
     <year>199?</year>
@@ -9936,6 +9958,7 @@ A few comments on these:
     </part>
   </software>
 
+  <!-- boot ok -->
   <software name="risingza" supported="no">
     <description>Rising Zan - The Samurai Gunman (Japan)</description>
     <year>199?</year>
