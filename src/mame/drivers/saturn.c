@@ -789,7 +789,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE_LEGACY(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
 	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE_LEGACY(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
 	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16_LEGACY(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
-	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE_LEGACY(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
+	AM_RANGE(0x05e00000, 0x05e7ffff) AM_MIRROR(0x80000) AM_READWRITE_LEGACY(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE_LEGACY(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16_LEGACY(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(saturn_scu_r, saturn_scu_w)
@@ -797,7 +797,8 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
 	AM_RANGE(0x22000000, 0x24ffffff) AM_ROM AM_SHARE("share7")  // cart mirror
 	AM_RANGE(0x45000000, 0x46ffffff) AM_WRITENOP
-	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache RAM, Dragon Ball Z sprites needs this
+	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP // cache address array
+	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache data array, Dragon Ball Z sprites relies on this
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, saturn_state )
@@ -817,7 +818,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE_LEGACY(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
 	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE_LEGACY(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
 	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16_LEGACY(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
-	AM_RANGE(0x05e00000, 0x05efffff) AM_READWRITE_LEGACY(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
+	AM_RANGE(0x05e00000, 0x05e7ffff) AM_MIRROR(0x80000) AM_READWRITE_LEGACY(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
 	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE_LEGACY(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
 	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16_LEGACY(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(saturn_scu_r, saturn_scu_w)

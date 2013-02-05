@@ -719,10 +719,10 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 	#define STV_VDP2_MPOFN_ (state->m_vdp2_regs[0x03c/2])
 
 	/* Higher 3 bits of the map offset for each layer */
-	#define STV_VDP2_N3MP_ ((STV_VDP2_MPOFN_ & 0x7000) >> 12)
-	#define STV_VDP2_N2MP_ ((STV_VDP2_MPOFN_ & 0x0700) >> 8)
-	#define STV_VDP2_N1MP_ ((STV_VDP2_MPOFN_ & 0x0070) >> 4)
-	#define STV_VDP2_N0MP_ ((STV_VDP2_MPOFN_ & 0x0007) >> 0)
+	#define STV_VDP2_N3MP_ ((STV_VDP2_MPOFN_ & 0x3000) >> 12)
+	#define STV_VDP2_N2MP_ ((STV_VDP2_MPOFN_ & 0x0300) >> 8)
+	#define STV_VDP2_N1MP_ ((STV_VDP2_MPOFN_ & 0x0030) >> 4)
+	#define STV_VDP2_N0MP_ ((STV_VDP2_MPOFN_ & 0x0003) >> 0)
 
 
 
@@ -736,8 +736,8 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_MPOFR_ (state->m_vdp2_regs[0x03e/2])
 
-	#define STV_VDP2_RAMP_ ((STV_VDP2_MPOFR_ & 0x0007) >> 0)
-	#define STV_VDP2_RBMP_ ((STV_VDP2_MPOFR_ & 0x0070) >> 4)
+	#define STV_VDP2_RBMP_ ((STV_VDP2_MPOFR_ & 0x0030) >> 4)
+	#define STV_VDP2_RAMP_ ((STV_VDP2_MPOFR_ & 0x0003) >> 0)
 
 /* 180040 - MPABN0 - Map (NBG0, Plane A,B)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -5366,6 +5366,12 @@ static void stv_vdp2_draw_back(running_machine &machine, bitmap_rgb32 &bitmap, c
 	}
 }
 
+READ32_HANDLER ( saturn_vdp2_vram_r )
+{
+	saturn_state *state = space.machine().driver_data<saturn_state>();
+
+	return state->m_vdp2_vram[offset];
+}
 
 WRITE32_HANDLER ( saturn_vdp2_vram_w )
 {
@@ -5513,12 +5519,7 @@ READ32_HANDLER ( saturn_vdp2_cram_r )
 }
 
 
-READ32_HANDLER ( saturn_vdp2_vram_r )
-{
-	saturn_state *state = space.machine().driver_data<saturn_state>();
 
-	return state->m_vdp2_vram[offset];
-}
 
 WRITE32_HANDLER ( saturn_vdp2_cram_w )
 {
