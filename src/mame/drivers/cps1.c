@@ -245,7 +245,7 @@ Stephh's log (2006.09.20) :
 #include "sound/qsound.h"
 #include "sound/msm5205.h"
 #include "machine/timekpr.h"
-
+#include "machine/kabuki.h"
 #include "includes/cps1.h"       /* External CPS1 definitions */
 
 

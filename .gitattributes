@@ -4834,6 +4834,7 @@ src/mame/machine/jvs13551.h svneol=native#text/plain
 src/mame/machine/k573cass.c svneol=native#text/plain
 src/mame/machine/k573cass.h svneol=native#text/plain
 src/mame/machine/kabuki.c svneol=native#text/plain
+src/mame/machine/kabuki.h svneol=native#text/plain
 src/mame/machine/kaneko_calc3.c svneol=native#text/plain
 src/mame/machine/kaneko_calc3.h svneol=native#text/plain
 src/mame/machine/kaneko_hit.c svneol=native#text/plain
