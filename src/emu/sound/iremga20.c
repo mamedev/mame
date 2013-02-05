@@ -31,41 +31,80 @@ Revisions:
 
 #define MAX_VOL 256
 
-struct IremGA20_channel_def
-{
-	UINT32 rate;
-	UINT32 size;
-	UINT32 start;
-	UINT32 pos;
-	UINT32 frac;
-	UINT32 end;
-	UINT32 volume;
-	UINT32 pan;
-	UINT32 effect;
-	UINT32 play;
-};
 
-struct ga20_state
-{
-	UINT8 *rom;
-	INT32 rom_size;
-	sound_stream * stream;
-	UINT16 regs[0x40];
-	struct IremGA20_channel_def channel[4];
-};
+// device type definition
+const device_type IREMGA20 = &device_creator<iremga20_device>;
 
 
-INLINE ga20_state *get_safe_token(device_t *device)
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  iremga20_device - constructor
+//-------------------------------------------------
+
+iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, IREMGA20, "Irem GA20", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_rom(NULL),
+	  m_rom_size(0),
+	  m_stream(NULL)
 {
-	assert(device != NULL);
-	assert(device->type() == IREMGA20);
-	return (ga20_state *)downcast<iremga20_device *>(device)->token();
 }
 
 
-static STREAM_UPDATE( IremGA20_update )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void iremga20_device::device_start()
 {
-	ga20_state *chip = (ga20_state *)param;
+	int i;
+
+	/* Initialize our chip structure */
+	m_rom = m_region->base();
+	m_rom_size = m_region->bytes();
+
+	iremga20_reset();
+
+	for ( i = 0; i < 0x40; i++ )
+		m_regs[i] = 0;
+
+	m_stream = stream_alloc(0, 2, clock()/4);
+
+	save_item(NAME(m_regs));
+	for (i = 0; i < 4; i++)
+	{
+		save_item(NAME(m_channel[i].rate), i);
+		save_item(NAME(m_channel[i].size), i);
+		save_item(NAME(m_channel[i].start), i);
+		save_item(NAME(m_channel[i].pos), i);
+		save_item(NAME(m_channel[i].end), i);
+		save_item(NAME(m_channel[i].volume), i);
+		save_item(NAME(m_channel[i].pan), i);
+		save_item(NAME(m_channel[i].effect), i);
+		save_item(NAME(m_channel[i].play), i);
+	}
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void iremga20_device::device_reset()
+{
+	iremga20_reset();
+}
+
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
 	UINT32 rate[4], pos[4], frac[4], end[4], vol[4], play[4];
 	UINT8 *pSamples;
 	stream_sample_t *outL, *outR;
@@ -74,16 +113,16 @@ static STREAM_UPDATE( IremGA20_update )
 	/* precache some values */
 	for (i=0; i < 4; i++)
 	{
-		rate[i] = chip->channel[i].rate;
-		pos[i] = chip->channel[i].pos;
-		frac[i] = chip->channel[i].frac;
-		end[i] = chip->channel[i].end - 0x20;
-		vol[i] = chip->channel[i].volume;
-		play[i] = chip->channel[i].play;
+		rate[i] = m_channel[i].rate;
+		pos[i] = m_channel[i].pos;
+		frac[i] = m_channel[i].frac;
+		end[i] = m_channel[i].end - 0x20;
+		vol[i] = m_channel[i].volume;
+		play[i] = m_channel[i].play;
 	}
 
 	i = samples;
-	pSamples = chip->rom;
+	pSamples = m_rom;
 	outL = outputs[0];
 	outR = outputs[1];
 
@@ -133,72 +172,70 @@ static STREAM_UPDATE( IremGA20_update )
 	/* update the regs now */
 	for (i=0; i < 4; i++)
 	{
-		chip->channel[i].pos = pos[i];
-		chip->channel[i].frac = frac[i];
-		chip->channel[i].play = play[i];
+		m_channel[i].pos = pos[i];
+		m_channel[i].frac = frac[i];
+		m_channel[i].play = play[i];
 	}
 }
 
-WRITE8_DEVICE_HANDLER( irem_ga20_w )
+WRITE8_MEMBER( iremga20_device::irem_ga20_w )
 {
-	ga20_state *chip = get_safe_token(device);
 	int channel;
 
 	//logerror("GA20:  Offset %02x, data %04x\n",offset,data);
 
-	chip->stream->update();
+	m_stream->update();
 
 	channel = offset >> 3;
 
-	chip->regs[offset] = data;
+	m_regs[offset] = data;
 
 	switch (offset & 0x7)
 	{
 		case 0: /* start address low */
-			chip->channel[channel].start = ((chip->channel[channel].start)&0xff000) | (data<<4);
+			m_channel[channel].start = ((m_channel[channel].start)&0xff000) | (data<<4);
 			break;
 
 		case 1: /* start address high */
-			chip->channel[channel].start = ((chip->channel[channel].start)&0x00ff0) | (data<<12);
+			m_channel[channel].start = ((m_channel[channel].start)&0x00ff0) | (data<<12);
 			break;
 
 		case 2: /* end address low */
-			chip->channel[channel].end = ((chip->channel[channel].end)&0xff000) | (data<<4);
+			m_channel[channel].end = ((m_channel[channel].end)&0xff000) | (data<<4);
 			break;
 
 		case 3: /* end address high */
-			chip->channel[channel].end = ((chip->channel[channel].end)&0x00ff0) | (data<<12);
+			m_channel[channel].end = ((m_channel[channel].end)&0x00ff0) | (data<<12);
 			break;
 
 		case 4:
-			chip->channel[channel].rate = 0x1000000 / (256 - data);
+			m_channel[channel].rate = 0x1000000 / (256 - data);
 			break;
 
 		case 5: //AT: gain control
-			chip->channel[channel].volume = (data * MAX_VOL) / (data + 10);
+			m_channel[channel].volume = (data * MAX_VOL) / (data + 10);
 			break;
 
 		case 6: //AT: this is always written 2(enabling both channels?)
-			chip->channel[channel].play = data;
-			chip->channel[channel].pos = chip->channel[channel].start;
-			chip->channel[channel].frac = 0;
+			m_channel[channel].play = data;
+			m_channel[channel].pos = m_channel[channel].start;
+			m_channel[channel].frac = 0;
 			break;
 	}
 }
 
-READ8_DEVICE_HANDLER( irem_ga20_r )
+READ8_MEMBER( iremga20_device::irem_ga20_r )
 {
-	ga20_state *chip = get_safe_token(device);
 	int channel;
 
-	chip->stream->update();
+	m_stream->update();
 
 	channel = offset >> 3;
 
 	switch (offset & 0x7)
 	{
 		case 7: // voice status.  bit 0 is 1 if active. (routine around 0xccc in rtypeleo)
-			return chip->channel[channel].play ? 1 : 0;
+			return m_channel[channel].play ? 1 : 0;
 
 		default:
 			logerror("GA20: read unk. register %d, channel %d\n", offset & 0xf, channel);
@@ -208,104 +245,21 @@ READ8_DEVICE_HANDLER( irem_ga20_r )
 	return 0;
 }
 
-static void iremga20_reset(ga20_state *chip)
+
+void iremga20_device::iremga20_reset()
 {
 	int i;
 
 	for( i = 0; i < 4; i++ ) {
-	chip->channel[i].rate = 0;
-	chip->channel[i].size = 0;
-	chip->channel[i].start = 0;
-	chip->channel[i].pos = 0;
-	chip->channel[i].frac = 0;
-	chip->channel[i].end = 0;
-	chip->channel[i].volume = 0;
-	chip->channel[i].pan = 0;
-	chip->channel[i].effect = 0;
-	chip->channel[i].play = 0;
+	m_channel[i].rate = 0;
+	m_channel[i].size = 0;
+	m_channel[i].start = 0;
+	m_channel[i].pos = 0;
+	m_channel[i].frac = 0;
+	m_channel[i].end = 0;
+	m_channel[i].volume = 0;
+	m_channel[i].pan = 0;
+	m_channel[i].effect = 0;
+	m_channel[i].play = 0;
 	}
-}
-
-
-static DEVICE_RESET( iremga20 )
-{
-	iremga20_reset(get_safe_token(device));
-}
-
-static DEVICE_START( iremga20 )
-{
-	ga20_state *chip = get_safe_token(device);
-	int i;
-
-	/* Initialize our chip structure */
-	chip->rom = *device->region();
-	chip->rom_size = device->region()->bytes();
-
-	iremga20_reset(chip);
-
-	for ( i = 0; i < 0x40; i++ )
-		chip->regs[i] = 0;
-
-	chip->stream = device->machine().sound().stream_alloc( *device, 0, 2, device->clock()/4, chip, IremGA20_update );
-
-	device->save_item(NAME(chip->regs));
-	for (i = 0; i < 4; i++)
-	{
-		device->save_item(NAME(chip->channel[i].rate), i);
-		device->save_item(NAME(chip->channel[i].size), i);
-		device->save_item(NAME(chip->channel[i].start), i);
-		device->save_item(NAME(chip->channel[i].pos), i);
-		device->save_item(NAME(chip->channel[i].end), i);
-		device->save_item(NAME(chip->channel[i].volume), i);
-		device->save_item(NAME(chip->channel[i].pan), i);
-		device->save_item(NAME(chip->channel[i].effect), i);
-		device->save_item(NAME(chip->channel[i].play), i);
-	}
-}
-
-const device_type IREMGA20 = &device_creator<iremga20_device>;
-
-iremga20_device::iremga20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, IREMGA20, "Irem GA20", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(ga20_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void iremga20_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void iremga20_device::device_start()
-{
-	DEVICE_START_NAME( iremga20 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void iremga20_device::device_reset()
-{
-	DEVICE_RESET_NAME( iremga20 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void iremga20_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }

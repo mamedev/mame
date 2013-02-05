@@ -402,7 +402,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, m92_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8_LEGACY("irem", irem_ga20_r, irem_ga20_w, 0x00ff)
+	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", iremga20_device, irem_ga20_r, irem_ga20_w, 0x00ff)
 	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
 	AM_RANGE(0xa8044, 0xa8045) AM_READWRITE(m92_soundlatch_r, m92_sound_irq_ack_w)
 	AM_RANGE(0xa8046, 0xa8047) AM_WRITE(m92_sound_status_w)
@@ -953,7 +953,7 @@ static MACHINE_CONFIG_START( m92, m92_state )
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MCFG_SOUND_ADD("irem", IREMGA20, XTAL_14_31818MHz/4)
+	MCFG_IREMGA20_ADD("irem", XTAL_14_31818MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
