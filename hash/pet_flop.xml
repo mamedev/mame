@@ -165,4 +165,64 @@
 		</part>
 	</software>
 
+	<software name="dealerts">
+		<description>CBM Dealer Tests</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbmdealertests.d80" size="533248" crc="35cbe914" sha1="14d15ebe8ac36f4afbb8dd19160f551ef094a5c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diag35">
+		<description>Diagnostic (v3.5)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="diagnosticv3.5.d80" size="533248" crc="2b0abd85" sha1="67a912aacbf5c939745cc490356bf32f1b95642f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="goceliak">
+		<description>Goceliak Test Mods</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="goceliaktestmods.d80" size="533248" crc="a4c1aaf2" sha1="45cfe360fd03292cf630ecae0e735b66246ac416" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superdsk">
+		<description>Super DiskDoc</description>
+		<year>1986</year>
+		<publisher>Precision Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="super disk doc.d80" size="533248" crc="c2e2f377" sha1="39856428e109fd26c14bae6d21cda7ab05a36e7b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="techdisk">
+		<description>Techdisk</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="techdisk.d80" size="533248" crc="1f18f127" sha1="d1c0977f7aed87df143147002c2bf26755b9b52a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

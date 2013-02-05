@@ -14,4 +14,16 @@
 		</part>
 	</software>
 
+	<software name="demos">
+		<description>Demos</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="p500demos.d80" size="533248" crc="676451dd" sha1="4d66ec01c46030ad671bea6b44bcf4c8fe563ea2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
