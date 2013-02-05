@@ -61,6 +61,10 @@ using namespace uml;
     CONSTANTS
 ***************************************************************************/
 
+typedef const void (*arm7thumb_drcophandler)(arm_state*, drcuml_block*, compiler_state*, opcode_desc*);
+
+#include "arm7tdrc.c"
+
 /* map variables */
 #define MAPVAR_PC                       M0
 #define MAPVAR_CYCLES                   M1
@@ -137,6 +141,9 @@ struct arm7imp_state
 	code_handle *   entry;                      /* entry point */
 	code_handle *   nocode;                     /* nocode exception handler */
 	code_handle *   out_of_cycles;              /* out of cycles exception handler */
+	code_handle *   tlb_translate;              /* tlb translation handler */
+	code_handle *   detect_fault;               /* tlb fault detection handler */
+	code_handle *   check_irq;               	/* irq check handler */
 	code_handle *   read8;                   	/* read byte */
 	code_handle *   write8;                  	/* write byte */
 	code_handle *   read16;                  	/* read half */
@@ -146,7 +153,7 @@ struct arm7imp_state
 
 	/* fast RAM */
 	UINT32              fastram_select;
-	fast_ram_info       fastram[MIPS3_MAX_FASTRAM];
+	fast_ram_info       fastram[ARM7_MAX_FASTRAM];
 };
 
 
@@ -165,6 +172,8 @@ static void static_generate_entry_point(arm_state *arm);
 static void static_generate_nocode_handler(arm_state *arm);
 static void static_generate_out_of_cycles(arm_state *arm);
 static void static_generate_tlb_translate(arm_state *arm);
+static void static_generate_detect_fault(arm_state *arm);
+static void static_generate_check_irq(arm_state *arm);
 
 static void generate_update_cycles(arm_state *arm, drcuml_block *block, compiler_state *compiler, parameter param, int allow_exception);
 static void generate_checksum_block(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
@@ -296,8 +305,7 @@ static void arm7_init(arm7_flavor flavor, int bigendian, legacy_cpu_device *devi
 	arm->impstate->drcuml = auto_alloc(device->machine(), drcuml_state(*device, *cache, flags, 1, 32, 1));
 
 	/* add symbols for our stuff */
-	arm->impstate->drcuml->symbol_add(&arm->pc, sizeof(mips3->pc), "pc");
-	arm->impstate->drcuml->symbol_add(&arm->icount, sizeof(mips3->icount), "icount");
+	arm->impstate->drcuml->symbol_add(&arm->icount, sizeof(arm->icount), "icount");
 	for (int regnum = 0; regnum < 37; regnum++)
 	{
 		char buf[10];
@@ -476,10 +484,10 @@ static CPU_EXECUTE( arm7 )
 }
 
 /*-------------------------------------------------
-    mips3_exit - cleanup from execution
+    arm7_exit - cleanup from execution
 -------------------------------------------------*/
 
-static CPU_EXIT( mips3 )
+static CPU_EXIT( arm7 )
 {
 	arm_state *arm = get_safe_token(device);
 
@@ -491,7 +499,7 @@ static CPU_EXIT( mips3 )
 
 
 /*-------------------------------------------------
-    mips3_translate - perform virtual-to-physical
+    arm7_translate - perform virtual-to-physical
     address translation
 -------------------------------------------------*/
 
@@ -1224,41 +1232,16 @@ static void code_flush_cache(arm_state *arm)
 		static_generate_nocode_handler(arm);
 		static_generate_out_of_cycles(arm);
 		static_generate_tlb_translate(arm);
+		static_generate_detect_fault(arm);
 		//static_generate_tlb_mismatch(arm);
 
-		/* append exception handlers for various types */
-		/*static_generate_exception(mips3, EXCEPTION_INTERRUPT,     TRUE,  "exception_interrupt");
-		static_generate_exception(mips3, EXCEPTION_INTERRUPT,     FALSE, "exception_interrupt_norecover");
-		static_generate_exception(mips3, EXCEPTION_TLBMOD,        TRUE,  "exception_tlbmod");
-		static_generate_exception(mips3, EXCEPTION_TLBLOAD,       TRUE,  "exception_tlbload");
-		static_generate_exception(mips3, EXCEPTION_TLBSTORE,      TRUE,  "exception_tlbstore");
-		static_generate_exception(mips3, EXCEPTION_TLBLOAD_FILL,  TRUE,  "exception_tlbload_fill");
-		static_generate_exception(mips3, EXCEPTION_TLBSTORE_FILL, TRUE,  "exception_tlbstore_fill");
-		static_generate_exception(mips3, EXCEPTION_ADDRLOAD,      TRUE,  "exception_addrload");
-		static_generate_exception(mips3, EXCEPTION_ADDRSTORE,     TRUE,  "exception_addrstore");
-		static_generate_exception(mips3, EXCEPTION_SYSCALL,       TRUE,  "exception_syscall");
-		static_generate_exception(mips3, EXCEPTION_BREAK,         TRUE,  "exception_break");
-		static_generate_exception(mips3, EXCEPTION_INVALIDOP,     TRUE,  "exception_invalidop");
-		static_generate_exception(mips3, EXCEPTION_BADCOP,        TRUE,  "exception_badcop");
-		static_generate_exception(mips3, EXCEPTION_OVERFLOW,      TRUE,  "exception_overflow");
-		static_generate_exception(mips3, EXCEPTION_TRAP,          TRUE,  "exception_trap");*/
-
 		/* add subroutines for memory accesses */
-		//for (mode = 0; mode < 3; mode++)
-		//{
-			static_generate_memory_accessor(mips3, mode, 1, FALSE, FALSE, "read8",       &mips3->impstate->read8[mode]);
-			static_generate_memory_accessor(mips3, mode, 1, TRUE,  FALSE, "write8",      &mips3->impstate->write8[mode]);
-			static_generate_memory_accessor(mips3, mode, 2, FALSE, FALSE, "read16",      &mips3->impstate->read16[mode]);
-			static_generate_memory_accessor(mips3, mode, 2, TRUE,  FALSE, "write16",     &mips3->impstate->write16[mode]);
-			static_generate_memory_accessor(mips3, mode, 4, FALSE, FALSE, "read32",      &mips3->impstate->read32[mode]);
-			static_generate_memory_accessor(mips3, mode, 4, FALSE, TRUE,  "read32mask",  &mips3->impstate->read32mask[mode]);
-			static_generate_memory_accessor(mips3, mode, 4, TRUE,  FALSE, "write32",     &mips3->impstate->write32[mode]);
-			static_generate_memory_accessor(mips3, mode, 4, TRUE,  TRUE,  "write32mask", &mips3->impstate->write32mask[mode]);
-			static_generate_memory_accessor(mips3, mode, 8, FALSE, FALSE, "read64",      &mips3->impstate->read64[mode]);
-			static_generate_memory_accessor(mips3, mode, 8, FALSE, TRUE,  "read64mask",  &mips3->impstate->read64mask[mode]);
-			static_generate_memory_accessor(mips3, mode, 8, TRUE,  FALSE, "write64",     &mips3->impstate->write64[mode]);
-			static_generate_memory_accessor(mips3, mode, 8, TRUE,  TRUE,  "write64mask", &mips3->impstate->write64mask[mode]);
-		//}
+		static_generate_memory_accessor(arm, mode, 1, FALSE, FALSE, "read8",       &arm->impstate->read8);
+		static_generate_memory_accessor(arm, mode, 1, TRUE,  FALSE, "write8",      &arm->impstate->write8);
+		static_generate_memory_accessor(arm, mode, 2, FALSE, FALSE, "read16",      &arm->impstate->read16);
+		static_generate_memory_accessor(arm, mode, 2, TRUE,  FALSE, "write16",     &arm->impstate->write16);
+		static_generate_memory_accessor(arm, mode, 4, FALSE, FALSE, "read32",      &arm->impstate->read32);
+		static_generate_memory_accessor(arm, mode, 4, TRUE,  FALSE, "write32",     &arm->impstate->write32);
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
@@ -1435,13 +1418,47 @@ static void static_generate_entry_point(arm_state *arm)
 	/* forward references */
 	alloc_handle(drcuml, &arm->impstate->exception_norecover[EXCEPTION_INTERRUPT], "interrupt_norecover");
 	alloc_handle(drcuml, &arm->impstate->nocode, "nocode");
+	alloc_handle(drcuml, &arm->impstate->detect_fault, "detect_fault");
+	alloc_handle(drcuml, &arm->impstate->tlb_translate, "tlb_translate");
 
 	alloc_handle(drcuml, &arm->impstate->entry, "entry");
-	UML_HANDLE(block, *arm->impstate->entry);                                     // handle  entry
+	UML_HANDLE(block, *arm->impstate->entry);                        	// handle  entry
 
 	/* load fast integer registers */
 	load_fast_iregs(arm, block);
 
+	UML_CALLH(block, *arm->impstate->check_irq);
+
+	/* generate a hash jump via the current mode and PC */
+	UML_HASHJMP(block, 0, mem(&arm->pc), *arm->impstate->nocode);		// hashjmp 0,<pc>,nocode
+	block->end();
+}
+
+
+/*-------------------------------------------------
+    static_generate_check_irq - generate a handler
+    to check IRQs
+-------------------------------------------------*/
+
+static void static_generate_check_irq(arm_state *arm)
+{
+	drcuml_state *drcuml = arm->impstate->drcuml;
+	drcuml_block *block;
+	int nodabt = 0;
+	int nopabt = 0;
+	int irqadjust = 0;
+	int nofiq = 0;
+	int irq32 = 0;
+	int swi32 = 0;
+	int done = 0;
+	int label = 1;
+
+	/* begin generating */
+	block = drcuml->begin_block(120);
+
+	/* generate a hash jump via the current mode and PC */
+	alloc_handle(drcuml, &arm->impstate->check_irq, "check_irq");
+	UML_HANDLE(block, *arm->impstate->check_irq);						// handle  check_irq
 	/* Exception priorities:
 
 	    Reset
@@ -1544,7 +1561,7 @@ static void static_generate_entry_point(arm_state *arm)
 	UML_MOV(block, mem(&arm->pendingUnd, 0);							// mov		pendingUnd, 0
 	UML_JMP(block, irqadjust);											// jmp		irqadjust
 
-	UML_LABEL(block, nound);                                           	// nound:
+	UML_LABEL(block, nopabt);                                           // nopabt:
 
 	// Software Interrupt
 	UML_TEST(block, mem(&arm->pendingSwi, 1);							// test		pendingSwi, 1
@@ -1583,12 +1600,8 @@ static void static_generate_entry_point(arm_state *arm)
 
 	UML_LABEL(block, done);												// done:
 
-	/* generate a hash jump via the current mode and PC */
-	UML_HASHJMP(block, mem(&arm->impstate->mode), mem(&arm->pc), *arm->impstate->nocode);
-																		// hashjmp <mode>,<pc>,nocode
 	block->end();
-}
-
+};
 
 /*-------------------------------------------------
     static_generate_nocode_handler - generate an
@@ -1658,8 +1671,8 @@ static void static_generate_detect_fault(arm_state *arm, code_handle **handleptr
 	block = drcuml->begin_block(1024);
 
 	/* add a global entry for this */
-	alloc_handle(drcuml, handleptr, name);
-	UML_HANDLE(block, **handleptr);									// handle	*handleptr
+	alloc_handle(drcuml, &arm->impstate->detect_fault, "detect_fault");
+	UML_HANDLE(block, *arm->impstate->detect_fault);               	// handle  	detect_fault
 
 	UML_ROLAND(block, I6, I4, 32-4, 0x0f<<1);						// roland	i6, i4, 32-4, 0xf<<1
 	UML_ROLAND(block, I6, mem(&COPRO_DOMAIN_ACCESS_CONTROL), I6, 3);// roland	i6, COPRO_DOMAIN_ACCESS_CONTROL, i6, 3
@@ -1747,9 +1760,8 @@ static void static_generate_tlb_translate(arm_state *arm, code_handle **handlept
 	/* begin generating */
 	block = drcuml->begin_block(170);
 
-	/* add a global entry for this */
-	alloc_handle(drcuml, handleptr, name);
-	UML_HANDLE(block, **handleptr);									// handle	*handleptr
+	alloc_handle(drcuml, &arm->impstate->tlb_translate, "tlb_translate");
+	UML_HANDLE(block, *arm->impstate->tlb_translate);               // handle  	tlb_translate
 
 	// I3: vaddr
 	UML_CMP(block, I0, 32 * 1024 * 1024);							// cmp		i0, 32*1024*1024
@@ -1932,12 +1944,9 @@ static void static_generate_tlb_translate(arm_state *arm, code_handle **handlept
 
 static void static_generate_memory_accessor(arm_state *arm, int size, bool istlb, bool iswrite, const char *name, code_handle **handleptr)
 {
-	/* on entry, address is in I0; data for writes is in I1 */
+	/* on entry, address is in I0; data for writes is in I1, fetch type in I2 */
 	/* on exit, read result is in I0 */
 	/* routine trashes I0-I3 */
-	//code_handle &exception_tlb = *mips3->impstate->exception[iswrite ? EXCEPTION_TLBSTORE : EXCEPTION_TLBLOAD];
-	//code_handle &exception_tlbfill = *mips3->impstate->exception[iswrite ? EXCEPTION_TLBSTORE_FILL : EXCEPTION_TLBLOAD_FILL];
-	//code_handle &exception_addrerr = *mips3->impstate->exception[iswrite ? EXCEPTION_ADDRSTORE : EXCEPTION_ADDRLOAD];
 	drcuml_state *drcuml = arm->impstate->drcuml;
 	drcuml_block *block;
 	int tlbmiss = 0;
@@ -1955,12 +1964,13 @@ static void static_generate_memory_accessor(arm_state *arm, int size, bool istlb
 		UML_TEST(block, mem(&COPRO_CTRL), COPRO_CTRL_MMU_EN);				// test		COPRO_CTRL, COPRO_CTRL_MMU_EN
 		if (iswrite)
 		{
-			UML_MOVc(block, COND_NZ, I2, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE);// movnz	i2, ARM7_TLB_ABORT_D | ARM7_TLB_WRITE
+			UML_MOVc(block, COND_NZ, I3, ARM7_TLB_WRITE);					// movnz	i3, ARM7_TLB_WRITE
 		}
 		else
 		{
-			UML_MOVc(block, COND_NZ, I2, ARM7_TLB_ABORT_D | ARM7_TLB_READ);	// movnz	i2, ARM7_TLB_ABORT_D | ARM7_TLB_READ
+			UML_MOVc(block, COND_NZ, I3, ARM7_TLB_READ);					// movnz	i3, ARM7_TLB_READ
 		}
+		UML_OR(block, I2, I2, I3);											// or		i2, i2, i3
 		UML_CALLHc(block, COND_NZ, *arm->impstate->tlb_translate);			// callhnz	tlb_translate
 	}
 
@@ -2014,7 +2024,7 @@ static void static_generate_memory_accessor(arm_state *arm, int size, bool istlb
 					}
 					else if (size == 2)
 					{
-						UML_XOR(block, I0, I0, mips3->bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0));
+						UML_XOR(block, I0, I0, arm->bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0));
 																						// xor     i0, i0, wordxor
 						UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);		// store   fastbase, i0, i1, word_x1
 					}
@@ -2069,6 +2079,227 @@ static void static_generate_memory_accessor(arm_state *arm, int size, bool istlb
 
 	block->end();
 }
+
+/***************************************************************************
+    CODE GENERATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    generate_update_cycles - generate code to
+    subtract cycles from the icount and generate
+    an exception if out
+-------------------------------------------------*/
+
+static void generate_update_cycles(arm_state *arm, drcuml_block *block, compiler_state *compiler, parameter param)
+{
+	/* check full interrupts if pending */
+	if (compiler->checkints)
+	{
+		code_label skip;
+
+		compiler->checkints = FALSE;
+		UML_CALLH(block, *arm->impstate->check_irq);
+	}
+
+	/* account for cycles */
+	if (compiler->cycles > 0)
+	{
+		UML_SUB(block, mem(&arm->icount), mem(&arm->icount), MAPVAR_CYCLES);    // sub     icount,icount,cycles
+		UML_MAPVAR(block, MAPVAR_CYCLES, 0);                                    // mapvar  cycles,0
+		UML_EXHc(block, COND_S, *arm->impstate->out_of_cycles, param);			// exh     out_of_cycles,nextpc
+	}
+	compiler->cycles = 0;
+}
+
+
+/*-------------------------------------------------
+    generate_checksum_block - generate code to
+    validate a sequence of opcodes
+-------------------------------------------------*/
+
+static void generate_checksum_block(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast)
+{
+	const opcode_desc *curdesc;
+	if (LOG_UML)
+	{
+		block->append_comment("[Validation for %08X]", seqhead->pc);                // comment
+	}
+
+	/* loose verify or single instruction: just compare and fail */
+	if (!(arm->impstate->drcoptions & ARM7DRC_STRICT_VERIFY) || seqhead->next() == NULL)
+	{
+		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
+		{
+			UINT32 sum = seqhead->opptr.l[0];
+			void *base = arm->direct->read_decrypted_ptr(seqhead->physpc);
+			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);				// load    i0,base,0,dword
+
+			if (seqhead->delay.first() != NULL && seqhead->physpc != seqhead->delay.first()->physpc)
+			{
+				base = arm->direct->read_decrypted_ptr(seqhead->delay.first()->physpc);
+				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);			// load    i1,base,dword
+				UML_ADD(block, I0, I0, I1);									// add     i0,i0,i1
+
+				sum += seqhead->delay.first()->opptr.l[0];
+			}
+
+			UML_CMP(block, I0, sum);                                    	// cmp     i0,opptr[0]
+			UML_EXHc(block, COND_NE, *arm->impstate->nocode, epc(seqhead));	// exne    nocode,seqhead->pc
+		}
+	}
+
+	/* full verification; sum up everything */
+	else
+	{
+		UINT32 sum = 0;
+		void *base = arm->direct->read_decrypted_ptr(seqhead->physpc);
+		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);					// load    i0,base,0,dword
+		sum += seqhead->opptr.l[0];
+		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
+			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
+			{
+				base = arm->direct->read_decrypted_ptr(curdesc->physpc);
+				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);			// load    i1,base,dword
+				UML_ADD(block, I0, I0, I1);									// add     i0,i0,i1
+				sum += curdesc->opptr.l[0];
+
+				if (curdesc->delay.first() != NULL && (curdesc == seqlast || (curdesc->next() != NULL && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
+				{
+					base = arm->direct->read_decrypted_ptr(curdesc->delay.first()->physpc);
+					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);		// load    i1,base,dword
+					UML_ADD(block, I0, I0, I1);								// add     i0,i0,i1
+					sum += curdesc->delay.first()->opptr.l[0];
+				}
+			}
+		UML_CMP(block, I0, sum);											// cmp     i0,sum
+		UML_EXHc(block, COND_NE, *arm->impstate->nocode, epc(seqhead));		// exne    nocode,seqhead->pc
+	}
+}
+
+
+/*-------------------------------------------------
+    generate_sequence_instruction - generate code
+    for a single instruction in a sequence
+-------------------------------------------------*/
+
+static void generate_sequence_instruction(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	offs_t expc;
+	int hotnum;
+
+	/* add an entry for the log */
+	if (LOG_UML && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
+		log_add_disasm_comment(arm, block, desc->pc, desc->opptr.l[0]);
+
+	/* set the PC map variable */
+	expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 3 : desc->pc;
+	UML_MAPVAR(block, MAPVAR_PC, expc);                                 	// mapvar  PC,expc
+
+	/* accumulate total cycles */
+	compiler->cycles += desc->cycles;
+
+	/* is this a hotspot? */
+	for (hotnum = 0; hotnum < MIPS3_MAX_HOTSPOTS; hotnum++)
+	{
+		if (arm->impstate->hotspot[hotnum].pc != 0 && desc->pc == arm->impstate->hotspot[hotnum].pc && desc->opptr.l[0] == arm->impstate->hotspot[hotnum].opcode)
+		{
+			compiler->cycles += arm->impstate->hotspot[hotnum].cycles;
+			break;
+		}
+	}
+
+	/* update the icount map variable */
+	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);						// mapvar  CYCLES,compiler->cycles
+
+	/* if we are debugging, call the debugger */
+	if ((arm->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	{
+		UML_MOV(block, mem(&R15), desc->pc);								// mov     [pc],desc->pc
+		save_fast_iregs(arm, block);
+		UML_DEBUG(block, desc->pc);											// debug   desc->pc
+	}
+
+	/* if we hit an unmapped address, fatal error */
+	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
+	{
+		UML_MOV(block, mem(&R15), desc->pc);								// mov     R15,desc->pc
+		save_fast_iregs(arm, block);
+		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);								// exit    EXECUTE_UNMAPPED_CODE
+	}
+
+	/* otherwise, unless this is a virtual no-op, it's a regular instruction */
+	else if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
+	{
+		/* compile the instruction */
+		if (!generate_opcode(arm, block, compiler, desc))
+		{
+			UML_MOV(block, mem(&R15), desc->pc);							// mov     R15,desc->pc
+			UML_MOV(block, mem(&arm->impstate->arg0), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_unimplemented, arm);                 	// callc   cfunc_unimplemented
+		}
+	}
+}
+
+
+/*------------------------------------------------------------------
+    generate_delay_slot_and_branch
+------------------------------------------------------------------*/
+
+static void generate_delay_slot_and_branch(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT8 linkreg)
+{
+	compiler_state compiler_temp = *compiler;
+	UINT32 op = desc->opptr.l[0];
+
+	/* update the cycles and jump through the hash table to the target */
+	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
+	{
+		generate_update_cycles(arm, block, &compiler_temp, desc->targetpc, TRUE);	// <subtract cycles>
+		UML_HASHJMP(block, 0, desc->targetpc, *arm->impstate->nocode);
+																					// hashjmp 0,desc->targetpc,nocode
+	}
+	else
+	{
+		generate_update_cycles(arm, block, &compiler_temp, mem(&arm->impstate->jmpdest), TRUE);
+																					// <subtract cycles>
+		UML_HASHJMP(block, 0, mem(&arm->impstate->jmpdest), *arm->impstate->nocode);// hashjmp 0,<rsreg>,nocode
+	}
+
+	/* update the label */
+	compiler->labelnum = compiler_temp.labelnum;
+
+	/* reset the mapvar to the current cycles and account for skipped slots */
+	compiler->cycles += desc->skipslots;
+	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                             // mapvar  CYCLES,compiler->cycles
+}
+
+
+/*-------------------------------------------------
+    generate_opcode - generate code for a specific
+    opcode
+-------------------------------------------------*/
+
+static int generate_opcode(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+{
+	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
+	UINT32 op = desc->opptr.l[0];
+	UINT8 opswitch = op >> 26;
+	code_label skip;
+
+	if (T_IS_SET(GET_CPSR))
+	{
+
+	}
+
+	switch (opswitch)
+	{
+		/* ----- sub-groups ----- */
+
+		case 0x00:  /* SPECIAL - MIPS I */
+			UML_DCMP(block, R64(RSREG), R64(RTREG));                                // dcmp    <rsreg>,<rtreg>
+			UML_JMPc(block, COND_NE, skip = compiler->labelnum++);                  // jmp     skip,NE
+			generate_delay_slot_and_branch(mips3, block, compiler, desc, 0);        // <next instruction + hashjmp>
+			UML_LABEL(block, skip);                                             // skip:
+			return TRUE;
 
 DEFINE_LEGACY_CPU_DEVICE(ARM7, arm7);
 DEFINE_LEGACY_CPU_DEVICE(ARM7_BE, arm7_be);

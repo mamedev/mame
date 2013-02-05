@@ -353,6 +353,7 @@ src/emu/cpu/arm7/arm7exec.c svneol=native#text/plain
 src/emu/cpu/arm7/arm7help.h svneol=native#text/plain
 src/emu/cpu/arm7/arm7ops.c svneol=native#text/plain
 src/emu/cpu/arm7/arm7ops.h svneol=native#text/plain
+src/emu/cpu/arm7/arm7tdrc.c svneol=native#text/plain
 src/emu/cpu/arm7/arm7thmb.c svneol=native#text/plain
 src/emu/cpu/arm7/arm7thmb.h svneol=native#text/plain
 src/emu/cpu/asap/asap.c svneol=native#text/plain

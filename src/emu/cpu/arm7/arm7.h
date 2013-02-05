@@ -54,6 +54,16 @@ enum
 	CPUINFO_PTR_ARM7_FASTRAM_BASE = CPUINFO_PTR_CPU_SPECIFIC
 };
 
+/***************************************************************************
+    COMPILER-SPECIFIC OPTIONS
+***************************************************************************/
+
+#define ARM7DRC_STRICT_VERIFY      0x0001          /* verify all instructions */
+#define ARM7DRC_FLUSH_PC           0x0008          /* flush the PC value before each memory access */
+
+#define ARM7DRC_COMPATIBLE_OPTIONS (ARM7DRC_STRICT_VERIFY | ARM7DRC_FLUSH_PC)
+#define ARM7DRC_FASTEST_OPTIONS    (0)
+
 /****************************************************************************************************
  *  PUBLIC FUNCTIONS
  ***************************************************************************************************/
