@@ -68,7 +68,6 @@ public:
 	DECLARE_MACHINE_RESET(quizrr42);
 	UINT32 screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INLINE void verboselog(int n_level, const char *s_fmt, ...);
 };
 
 /*----------- debug defines -----------*/
