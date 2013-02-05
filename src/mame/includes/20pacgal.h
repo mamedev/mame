@@ -57,6 +57,14 @@ public:
 	UINT32 screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	void set_bankptr();
+	void get_pens(pen_t *pens);
+	void do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_rgb32 &bitmap);
+	void draw_chars(bitmap_rgb32 &bitmap);
+	void draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	void draw_sprite(bitmap_rgb32 &bitmap, int y, int x,
+					 UINT8 code, UINT8 color, int flip_y, int flip_x);
+	
 };
 
 

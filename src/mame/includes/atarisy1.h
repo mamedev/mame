@@ -70,6 +70,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_reset_yscroll_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_int3off_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_int3_callback);
+	void update_timers(int scanline);
+	void decode_gfx(UINT16 *pflookup, UINT16 *molookup);
+	int get_bank(UINT8 prom1, UINT8 prom2, int bpp);
 };
 
 DECLARE_READ16_HANDLER( atarisy1_int3state_r );

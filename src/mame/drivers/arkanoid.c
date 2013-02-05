@@ -1572,25 +1572,24 @@ ROM_END
 
 /* Driver Initialization */
 
-static void arkanoid_bootleg_init( running_machine &machine )
+void arkanoid_state::arkanoid_bootleg_init(  )
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xf000, 0xf000, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_f000_r),state) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xf002, 0xf002, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_f002_r),state) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd018, 0xd018, write8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d018_w),state) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd008, 0xd008, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d008_r),state) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xf000, 0xf000, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_f000_r),this) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xf002, 0xf002, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_f002_r),this) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd018, 0xd018, write8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d018_w),this) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd008, 0xd008, read8_delegate(FUNC(arkanoid_state::arkanoid_bootleg_d008_r),this) );
 }
 
 DRIVER_INIT_MEMBER(arkanoid_state,arkangc)
 {
 	m_bootleg_id = ARKANGC;
-	arkanoid_bootleg_init(machine());
+	arkanoid_bootleg_init();
 }
 
 DRIVER_INIT_MEMBER(arkanoid_state,arkangc2)
 {
 	m_bootleg_id = ARKANGC2;
-	arkanoid_bootleg_init(machine());
+	arkanoid_bootleg_init();
 }
 
 DRIVER_INIT_MEMBER(arkanoid_state,block2)
@@ -1625,31 +1624,31 @@ DRIVER_INIT_MEMBER(arkanoid_state,block2)
 	auto_free(machine(), buffer);
 
 	m_bootleg_id = BLOCK2;
-	arkanoid_bootleg_init(machine());
+	arkanoid_bootleg_init();
 }
 
 DRIVER_INIT_MEMBER(arkanoid_state,arkblock)
 {
 	m_bootleg_id = ARKBLOCK;
-	arkanoid_bootleg_init(machine());
+	arkanoid_bootleg_init();
 }
 
 DRIVER_INIT_MEMBER(arkanoid_state,arkbloc2)
 {
 	m_bootleg_id = ARKBLOC2;
-	arkanoid_bootleg_init(machine());
+	arkanoid_bootleg_init();
 }
 
 DRIVER_INIT_MEMBER(arkanoid_state,arkgcbl)
 {
 	m_bootleg_id = ARKGCBL;
-	arkanoid_bootleg_init(machine());
+	arkanoid_bootleg_init();
 }
 
 DRIVER_INIT_MEMBER(arkanoid_state,paddle2)
 {
 	m_bootleg_id = PADDLE2;
-	arkanoid_bootleg_init(machine());
+	arkanoid_bootleg_init();
 }
 
 

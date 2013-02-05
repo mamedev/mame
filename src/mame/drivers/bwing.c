@@ -555,11 +555,10 @@ ROM_END
 //****************************************************************************
 // Initializations
 
-static void fix_bwp3( running_machine &machine )
+void bwing_state::fix_bwp3(  )
 {
-	bwing_state *state = machine.driver_data<bwing_state>();
-	UINT8 *rom = state->m_bwp3_rombase;
-	int i, j = state->m_bwp3_rombase.bytes();
+	UINT8 *rom = m_bwp3_rombase;
+	int i, j = m_bwp3_rombase.bytes();
 
 	// swap nibbles
 	for (i = 0; i < j; i++)
@@ -577,7 +576,7 @@ DRIVER_INIT_MEMBER(bwing_state,bwing)
 	m_bwp123_membase[1] = memregion("sub")->base();
 	m_bwp123_membase[2] = memregion("audiocpu")->base();
 
-	fix_bwp3(machine());
+	fix_bwp3();
 }
 
 //****************************************************************************

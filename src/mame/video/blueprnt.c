@@ -124,20 +124,19 @@ VIDEO_START_MEMBER(blueprnt_state,blueprnt)
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void blueprnt_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	blueprnt_state *state = machine.driver_data<blueprnt_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
-		int code = state->m_spriteram[offs + 1];
-		int sx = state->m_spriteram[offs + 3];
-		int sy = 240 - state->m_spriteram[offs];
-		int flipx = state->m_spriteram[offs + 2] & 0x40;
-		int flipy = state->m_spriteram[offs + 2 - 4] & 0x80;    // -4? Awkward, isn't it?
+		int code = m_spriteram[offs + 1];
+		int sx = m_spriteram[offs + 3];
+		int sy = 240 - m_spriteram[offs];
+		int flipx = m_spriteram[offs + 2] & 0x40;
+		int flipy = m_spriteram[offs + 2 - 4] & 0x80;    // -4? Awkward, isn't it?
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 240 - sy;
@@ -146,7 +145,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 
 		// sprites are slightly misplaced, regardless of the screen flip
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, 0, flipx, flipy, 2 + sx, sy - 1, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, 0, flipx, flipy, 2 + sx, sy - 1, 0);
 	}
 }
 
@@ -163,7 +162,7 @@ UINT32 blueprnt_state::screen_update_blueprnt(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 	return 0;
 }

@@ -20,20 +20,19 @@ void boogwing_state::video_start()
 
  apparently priority is based on a PROM, that should be used if possible.
 */
-static void mix_boogwing(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void boogwing_state::mix_boogwing(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	boogwing_state *state = machine.driver_data<boogwing_state>();
 	int y, x;
-	const pen_t *paldata = machine.pens;
+	const pen_t *paldata = machine().pens;
 	bitmap_ind16 *sprite_bitmap1, *sprite_bitmap2;
 	bitmap_ind8* priority_bitmap;
 
-	address_space &space = machine.driver_data()->generic_space();
-	UINT16 priority = decocomn_priority_r(state->m_decocomn, space, 0, 0xffff);
+	address_space &space = machine().driver_data()->generic_space();
+	UINT16 priority = decocomn_priority_r(m_decocomn, space, 0, 0xffff);
 
-	sprite_bitmap1 = &state->m_sprgen1->get_sprite_temp_bitmap();
-	sprite_bitmap2 = &state->m_sprgen1->get_sprite_temp_bitmap();
-	priority_bitmap = &machine.priority_bitmap;
+	sprite_bitmap1 = &m_sprgen1->get_sprite_temp_bitmap();
+	sprite_bitmap2 = &m_sprgen1->get_sprite_temp_bitmap();
+	priority_bitmap = &machine().priority_bitmap;
 
 	UINT32* dstline;
 	UINT16 *srcline1, *srcline2;
@@ -225,7 +224,7 @@ UINT32 boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rgb3
 		deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 32);
 	}
 
-	mix_boogwing(machine(), bitmap,cliprect);
+	mix_boogwing(bitmap,cliprect);
 
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;

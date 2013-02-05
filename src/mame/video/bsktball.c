@@ -29,29 +29,28 @@ void bsktball_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(bsktball_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-static void draw_sprites( running_machine &machine,  bitmap_ind16 &bitmap, const rectangle &cliprect )
+void bsktball_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	bsktball_state *state = machine.driver_data<bsktball_state>();
 	int mot;
 
 	for (mot = 0; mot < 16; mot++)
 	{
-		int pic = state->m_motion[mot * 4];
-		int sy = 28 * 8 - state->m_motion[mot * 4 + 1];
-		int sx = state->m_motion[mot * 4 + 2];
-		int color = state->m_motion[mot * 4 + 3];
+		int pic = m_motion[mot * 4];
+		int sy = 28 * 8 - m_motion[mot * 4 + 1];
+		int sx = m_motion[mot * 4 + 2];
+		int color = m_motion[mot * 4 + 3];
 		int flipx = (pic & 0x80) >> 7;
 
 		pic = (pic & 0x3f);
 		color = (color & 0x3f);
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], pic, color, flipx, 0, sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], pic, color, flipx, 0, sx, sy, 0);
 	}
 }
 
 UINT32 bsktball_state::screen_update_bsktball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

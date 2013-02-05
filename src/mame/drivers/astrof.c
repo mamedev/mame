@@ -173,12 +173,10 @@ void astrof_state::video_start()
 }
 
 
-static rgb_t make_pen( running_machine &machine, UINT8 data )
+rgb_t astrof_state::make_pen( UINT8 data )
 {
-	astrof_state *state = machine.driver_data<astrof_state>();
-
-	UINT8 r1_bit = state->m_red_on ? 0x01 : (data >> 0) & 0x01;
-	UINT8 r2_bit = state->m_red_on ? 0x01 : (data >> 1) & 0x01;
+	UINT8 r1_bit = m_red_on ? 0x01 : (data >> 0) & 0x01;
+	UINT8 r2_bit = m_red_on ? 0x01 : (data >> 1) & 0x01;
 	UINT8 g1_bit = (data >> 2) & 0x01;
 	UINT8 g2_bit = (data >> 3) & 0x01;
 	UINT8 b1_bit = (data >> 4) & 0x01;
@@ -194,13 +192,12 @@ static rgb_t make_pen( running_machine &machine, UINT8 data )
 }
 
 
-static void astrof_get_pens( running_machine &machine, pen_t *pens )
+void astrof_state::astrof_get_pens( pen_t *pens )
 {
-	astrof_state *state = machine.driver_data<astrof_state>();
 	offs_t i;
-	UINT8 bank = (state->m_astrof_palette_bank ? 0x10 : 0x00);
-	UINT8 config = state->ioport("FAKE")->read_safe(0x00);
-	UINT8 *prom = state->memregion("proms")->base();
+	UINT8 bank = (m_astrof_palette_bank ? 0x10 : 0x00);
+	UINT8 config = ioport("FAKE")->read_safe(0x00);
+	UINT8 *prom = memregion("proms")->base();
 
 	/* a common wire hack to the pcb causes the prom halves to be inverted */
 	/* this results in e.g. astrof background being black */
@@ -226,16 +223,16 @@ static void astrof_get_pens( running_machine &machine, pen_t *pens )
 	for (i = 0; i < ASTROF_NUM_PENS; i++)
 	{
 		UINT8 data = prom[bank | i];
-		pens[i] = make_pen(machine, data);
+		pens[i] = make_pen(data);
 	}
 }
 
 
-static void tomahawk_get_pens( running_machine &machine, pen_t *pens )
+void astrof_state::tomahawk_get_pens( pen_t *pens )
 {
 	offs_t i;
-	UINT8 *prom = machine.root_device().memregion("proms")->base();
-	UINT8 config = machine.root_device().ioport("FAKE")->read_safe(0x00);
+	UINT8 *prom = machine().root_device().memregion("proms")->base();
+	UINT8 config = machine().root_device().ioport("FAKE")->read_safe(0x00);
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
 	{
@@ -266,7 +263,7 @@ static void tomahawk_get_pens( running_machine &machine, pen_t *pens )
 
 		data = prom[pen];
 
-		pens[i] = make_pen(machine, data);
+		pens[i] = make_pen(data);
 	}
 }
 
@@ -299,79 +296,72 @@ WRITE8_MEMBER(astrof_state::video_control_1_w)
 }
 
 
-static void astrof_set_video_control_2( running_machine &machine, UINT8 data )
+void astrof_state::astrof_set_video_control_2( UINT8 data )
 {
-	astrof_state *state = machine.driver_data<astrof_state>();
-
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
 
 	/* D2 - selects one of the two palette banks */
-	state->m_astrof_palette_bank = (data & 0x04) ? TRUE : FALSE;
+	m_astrof_palette_bank = (data & 0x04) ? TRUE : FALSE;
 
 	/* D3 - turns on the red color gun regardless of the value in the color PROM */
-	state->m_red_on = (data & 0x08) ? TRUE : FALSE;
+	m_red_on = (data & 0x08) ? TRUE : FALSE;
 
 	/* D4-D7 - not connected */
 }
 
 WRITE8_MEMBER(astrof_state::astrof_video_control_2_w)
 {
-	astrof_set_video_control_2(machine(), data);
+	astrof_set_video_control_2(data);
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 }
 
 
-static void spfghmk2_set_video_control_2( running_machine &machine, UINT8 data )
+void astrof_state::spfghmk2_set_video_control_2( UINT8 data )
 {
-	astrof_state *state = machine.driver_data<astrof_state>();
-
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
 
 	/* D2 - selects one of the two palette banks */
-	state->m_astrof_palette_bank = (data & 0x04) ? TRUE : FALSE;
+	m_astrof_palette_bank = (data & 0x04) ? TRUE : FALSE;
 
 	/* D3-D7 - not connected */
 }
 
 WRITE8_MEMBER(astrof_state::spfghmk2_video_control_2_w)
 {
-	spfghmk2_set_video_control_2(machine(), data);
+	spfghmk2_set_video_control_2(data);
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 }
 
 
-static void tomahawk_set_video_control_2( running_machine &machine, UINT8 data )
+void astrof_state::tomahawk_set_video_control_2( UINT8 data )
 {
-	astrof_state *state = machine.driver_data<astrof_state>();
-
 	/* D0 - OUT0 - goes to edge conn. pin A10 - was perhaps meant to be a start lamp */
 	/* D1 - OUT1 - goes to edge conn. pin A11 - was perhaps meant to be a start lamp */
 	/* D2 - not connected */
 
 	/* D3 - turns on the red color gun regardless of the value in the color PROM */
-	state->m_red_on = (data & 0x08) ? TRUE : FALSE;
+	m_red_on = (data & 0x08) ? TRUE : FALSE;
 }
 
 WRITE8_MEMBER(astrof_state::tomahawk_video_control_2_w)
 {
-	tomahawk_set_video_control_2(machine(), data);
+	tomahawk_set_video_control_2(data);
 	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 }
 
 
-static void video_update_common( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, pen_t *pens )
+void astrof_state::video_update_common( bitmap_rgb32 &bitmap, const rectangle &cliprect, pen_t *pens )
 {
-	astrof_state *state = machine.driver_data<astrof_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
+	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		UINT8 data;
 		int i;
 
-		UINT8 color = state->m_colorram[offs >> 1];
+		UINT8 color = m_colorram[offs >> 1];
 
 		pen_t back_pen = pens[color | 0x00];
 		pen_t fore_pen = pens[color | 0x01];
@@ -379,22 +369,22 @@ static void video_update_common( running_machine &machine, bitmap_rgb32 &bitmap,
 		UINT8 y = offs;
 		UINT8 x = offs >> 8 << 3;
 
-		if (!state->m_flipscreen)
+		if (!m_flipscreen)
 			y = ~y;
 
 		if ((y <= cliprect.min_y) || (y >= cliprect.max_y))
 			continue;
 
-		if (state->m_screen_off)
+		if (m_screen_off)
 			data = 0;
 		else
-			data = state->m_videoram[offs];
+			data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen = (data & 0x01) ? fore_pen : back_pen;
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 				bitmap.pix32(y, 255 - x) = pen;
 			else
 				bitmap.pix32(y, x) = pen;
@@ -410,9 +400,9 @@ UINT32 astrof_state::screen_update_astrof(screen_device &screen, bitmap_rgb32 &b
 {
 	pen_t pens[ASTROF_NUM_PENS];
 
-	astrof_get_pens(machine(), pens);
+	astrof_get_pens(pens);
 
-	video_update_common(machine(), bitmap, cliprect, pens);
+	video_update_common(bitmap, cliprect, pens);
 
 	return 0;
 }
@@ -422,9 +412,9 @@ UINT32 astrof_state::screen_update_tomahawk(screen_device &screen, bitmap_rgb32 
 {
 	pen_t pens[TOMAHAWK_NUM_PENS];
 
-	tomahawk_get_pens(machine(), pens);
+	tomahawk_get_pens(pens);
 
-	video_update_common(machine(), bitmap, cliprect, pens);
+	video_update_common(bitmap, cliprect, pens);
 
 	return 0;
 }
@@ -475,7 +465,7 @@ READ8_MEMBER(astrof_state::tomahawk_protection_r)
 MACHINE_START_MEMBER(astrof_state,astrof)
 {
 	/* the 74175 outputs all HI's if not otherwise set */
-	astrof_set_video_control_2(machine(), 0xff);
+	astrof_set_video_control_2(0xff);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_samples = machine().device<samples_device>("samples");
@@ -505,7 +495,7 @@ MACHINE_START_MEMBER(astrof_state,abattle)
 MACHINE_START_MEMBER(astrof_state,spfghmk2)
 {
 	/* the 74175 outputs all HI's if not otherwise set */
-	spfghmk2_set_video_control_2(machine(), 0xff);
+	spfghmk2_set_video_control_2(0xff);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
@@ -522,7 +512,7 @@ MACHINE_START_MEMBER(astrof_state,spfghmk2)
 MACHINE_START_MEMBER(astrof_state,tomahawk)
 {
 	/* the 74175 outputs all HI's if not otherwise set */
-	tomahawk_set_video_control_2(machine(), 0xff);
+	tomahawk_set_video_control_2(0xff);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_sn = machine().device("snsnd");

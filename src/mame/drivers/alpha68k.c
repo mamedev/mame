@@ -218,7 +218,7 @@ WRITE16_MEMBER(alpha68k_state::tnextspc_unknown_w)
 {
 	logerror("tnextspc_unknown_w : PC = %04x - offset = %04x - data = %04x\n", space.device().safe_pc(), offset, data);
 	if (offset == 0)
-		alpha68k_flipscreen_w(machine(), data & 0x100);
+		alpha68k_flipscreen_w(data & 0x100);
 }
 
 WRITE16_MEMBER(alpha68k_state::alpha_microcontroller_w)
@@ -226,7 +226,7 @@ WRITE16_MEMBER(alpha68k_state::alpha_microcontroller_w)
 	logerror("%04x:  Alpha write trigger at %04x (%04x)\n", space.device().safe_pc(), offset, data);
 	/* 0x44 = coin clear signal to microcontroller? */
 	if (offset == 0x2d && ACCESSING_BITS_0_7)
-		alpha68k_flipscreen_w(machine(), data & 1);
+		alpha68k_flipscreen_w(data & 1);
 }
 
 /******************************************************************************/
@@ -307,7 +307,7 @@ WRITE16_MEMBER(alpha68k_state::alpha68k_V_sound_w)
 	if(ACCESSING_BITS_0_7)
 		soundlatch_byte_w(space, 0, data & 0xff);
 	if(ACCESSING_BITS_8_15)
-		alpha68k_V_video_bank_w(machine(), (data >> 8) & 0xff);
+		alpha68k_V_video_bank_w((data >> 8) & 0xff);
 }
 //AT
 WRITE16_MEMBER(alpha68k_state::paddlema_soundlatch_w)

@@ -120,26 +120,25 @@ WRITE8_MEMBER(aeroboto_state::aeroboto_tilecolor_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void aeroboto_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
-		int x = state->m_spriteram[offs + 3];
-		int y = 240 - state->m_spriteram[offs];
+		int x = m_spriteram[offs + 3];
+		int y = 240 - m_spriteram[offs];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			x = 248 - x;
 			y = 240 - y;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
-				state->m_spriteram[offs + 1],
-				state->m_spriteram[offs + 2] & 0x07,
-				state->flip_screen(), state->flip_screen(),
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
+				m_spriteram[offs + 1],
+				m_spriteram[offs + 2] & 0x07,
+				flip_screen(), flip_screen(),
 				((x + 8) & 0xff) - 8, y, 0);
 	}
 }
@@ -209,7 +208,7 @@ UINT32 aeroboto_state::screen_update_aeroboto(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->set_scrolly(0, *m_vscroll);
 	m_bg_tilemap->draw(bitmap, splitrect2, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	// the status display behaves more closely to a 40-line splitscreen than an overlay
 	m_bg_tilemap->set_scrolly(0, 0);

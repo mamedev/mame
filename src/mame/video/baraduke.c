@@ -158,19 +158,18 @@ WRITE8_MEMBER(baraduke_state::baraduke_textram_w)
 }
 
 
-static void scroll_w(address_space &space, int layer, int offset, int data)
+void baraduke_state::scroll_w(address_space &space, int layer, int offset, int data)
 {
-	baraduke_state *state = space.machine().driver_data<baraduke_state>();
 	switch (offset)
 	{
 		case 0: /* high scroll x */
-			state->m_xscroll[layer] = (state->m_xscroll[layer] & 0xff) | (data << 8);
+			m_xscroll[layer] = (m_xscroll[layer] & 0xff) | (data << 8);
 			break;
 		case 1: /* low scroll x */
-			state->m_xscroll[layer] = (state->m_xscroll[layer] & 0xff00) | data;
+			m_xscroll[layer] = (m_xscroll[layer] & 0xff00) | data;
 			break;
 		case 2: /* scroll y */
-			state->m_yscroll[layer] = data;
+			m_yscroll[layer] = data;
 			break;
 	}
 }
@@ -208,10 +207,9 @@ WRITE8_MEMBER(baraduke_state::baraduke_spriteram_w)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority)
+void baraduke_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority)
 {
-	baraduke_state *state = machine.driver_data<baraduke_state>();
-	UINT8 *spriteram = state->m_spriteram + 0x1800;
+	UINT8 *spriteram = m_spriteram + 0x1800;
 	const UINT8 *source = &spriteram[0x0000];
 	const UINT8 *finish = &spriteram[0x0800-16];    /* the last is NOT a sprite */
 
@@ -257,7 +255,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 			sy -= 16 * sizey;
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				sx = 496+3 - 16 * sizex - sx;
 				sy = 240 - 16 * sizey - sy;
@@ -269,7 +267,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx_transpen( bitmap, cliprect,machine.gfx[3],
+					drawgfx_transpen( bitmap, cliprect,machine().gfx[3],
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
@@ -284,22 +282,21 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-static void set_scroll(running_machine &machine, int layer)
+void baraduke_state::set_scroll(int layer)
 {
-	baraduke_state *state = machine.driver_data<baraduke_state>();
 	static const int xdisp[2] = { 26, 24 };
 	int scrollx, scrolly;
 
-	scrollx = state->m_xscroll[layer] + xdisp[layer];
-	scrolly = state->m_yscroll[layer] + 9;
-	if (state->flip_screen())
+	scrollx = m_xscroll[layer] + xdisp[layer];
+	scrolly = m_yscroll[layer] + 9;
+	if (flip_screen())
 	{
 		scrollx = -scrollx + 3;
 		scrolly = -scrolly;
 	}
 
-	state->m_bg_tilemap[layer]->set_scrollx(0, scrollx);
-	state->m_bg_tilemap[layer]->set_scrolly(0, scrolly);
+	m_bg_tilemap[layer]->set_scrollx(0, scrollx);
+	m_bg_tilemap[layer]->set_scrolly(0, scrolly);
 }
 
 
@@ -312,8 +309,8 @@ UINT32 baraduke_state::screen_update_baraduke(screen_device &screen, bitmap_ind1
 	/* can't use flip_screen_set() because the visible area is asymmetrical */
 	flip_screen_set_no_update(spriteram[0x07f6] & 0x01);
 	machine().tilemap().set_flip_all(flip_screen() ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
-	set_scroll(machine(), 0);
-	set_scroll(machine(), 1);
+	set_scroll(0);
+	set_scroll(1);
 
 	if (((m_xscroll[0] & 0x0e00) >> 9) == 6)
 		back = 1;
@@ -321,9 +318,9 @@ UINT32 baraduke_state::screen_update_baraduke(screen_device &screen, bitmap_ind1
 		back = 0;
 
 	m_bg_tilemap[back]->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(machine(), bitmap,cliprect,0);
+	draw_sprites(bitmap,cliprect,0);
 	m_bg_tilemap[back ^ 1]->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect,1);
+	draw_sprites(bitmap,cliprect,1);
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;

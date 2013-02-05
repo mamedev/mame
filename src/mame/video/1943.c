@@ -212,20 +212,19 @@ void _1943_state::video_start()
 	save_item(NAME(m_bg2_on));
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void _1943_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	_1943_state *state = machine.driver_data<_1943_state>();
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 32; offs >= 0; offs -= 32)
+	for (offs = m_spriteram.bytes() - 32; offs >= 0; offs -= 32)
 	{
-		int attr = state->m_spriteram[offs + 1];
-		int code = state->m_spriteram[offs] + ((attr & 0xe0) << 3);
+		int attr = m_spriteram[offs + 1];
+		int code = m_spriteram[offs] + ((attr & 0xe0) << 3);
 		int color = attr & 0x0f;
-		int sx = state->m_spriteram[offs + 3] - ((attr & 0x10) << 4);
-		int sy = state->m_spriteram[offs + 2];
+		int sx = m_spriteram[offs + 3] - ((attr & 0x10) << 4);
+		int sy = m_spriteram[offs + 2];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -235,12 +234,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if (priority)
 		{
 			if (color != 0x0a && color != 0x0b)
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[3], code, color, state->flip_screen(), state->flip_screen(), sx, sy, 0);
+				drawgfx_transpen(bitmap, cliprect, machine().gfx[3], code, color, flip_screen(), flip_screen(), sx, sy, 0);
 		}
 		else
 		{
 			if (color == 0x0a || color == 0x0b)
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[3], code, color, state->flip_screen(), state->flip_screen(), sx, sy, 0);
+				drawgfx_transpen(bitmap, cliprect, machine().gfx[3], code, color, flip_screen(), flip_screen(), sx, sy, 0);
 		}
 	}
 }
@@ -257,13 +256,13 @@ UINT32 _1943_state::screen_update_1943(screen_device &screen, bitmap_ind16 &bitm
 		bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (m_obj_on)
-		draw_sprites(machine(), bitmap, cliprect, 0);
+		draw_sprites(bitmap, cliprect, 0);
 
 	if (m_bg1_on)
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_obj_on)
-		draw_sprites(machine(), bitmap, cliprect, 1);
+		draw_sprites(bitmap, cliprect, 1);
 
 	if (m_char_on)
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

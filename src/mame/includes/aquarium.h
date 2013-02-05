@@ -47,4 +47,6 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_aquarium(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
+	UINT8 aquarium_snd_bitswap( UINT8 scrambled_data );
 };

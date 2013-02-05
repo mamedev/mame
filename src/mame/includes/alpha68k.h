@@ -105,6 +105,15 @@ public:
 	UINT32 screen_update_alpha68k_V(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(alpha68k_sound_nmi);
+	void alpha68k_flipscreen_w( int flip );
+	void alpha68k_V_video_bank_w( int bank );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e );
+	void draw_sprites_V( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e, int fx_mask, int fy_mask, int sprite_mask );
+	void draw_sprites_I( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d, int yshift );
+	void kyros_video_banking(int *bank, int data);
+	void jongbou_video_banking(int *bank, int data);
+	void kyros_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d );
+	void sstingry_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int c, int d );
 };
 
 /* game_id - used to deal with a few game specific situations */
@@ -116,6 +125,3 @@ enum
 };
 
 
-/*----------- defined in video/alpha68k.c -----------*/
-void alpha68k_V_video_bank_w(running_machine &machine, int bank);
-void alpha68k_flipscreen_w(running_machine &machine, int flip);

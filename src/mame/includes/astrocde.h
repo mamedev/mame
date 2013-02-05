@@ -125,6 +125,13 @@ public:
 	TIMER_CALLBACK_MEMBER(interrupt_off);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	void profbank_banksw_restore();
+	inline int mame_vpos_to_astrocade_vpos(int scanline);
+	void init_savestate();
+	void astrocade_trigger_lightpen(UINT8 vfeedback, UINT8 hfeedback);
+	inline void increment_source(UINT8 curwidth, UINT8 *u13ff);
+	inline void increment_dest(UINT8 curwidth);
+	void execute_blit(address_space &space);
+	void init_sparklestar();
 };
 
 /*----------- defined in audio/wow.c -----------*/

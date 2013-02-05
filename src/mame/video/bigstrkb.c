@@ -6,7 +6,7 @@
 
 /* Sprites */
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void bigstrkb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/*- SPR RAM Format -**
 
@@ -16,9 +16,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	    ( rest unused )
 	**- End of Comments -*/
 
-	bigstrkb_state *state = machine.driver_data<bigstrkb_state>();
-	gfx_element *gfx = machine.gfx[2];
-	UINT16 *source = state->m_spriteram;
+	gfx_element *gfx = machine().gfx[2];
+	UINT16 *source = m_spriteram;
 	UINT16 *finish = source + 0x800/2;
 
 	while( source<finish )
@@ -134,7 +133,7 @@ UINT32 bigstrkb_state::screen_update_bigstrkb(screen_device &screen, bitmap_ind1
 	m_tilemap2->draw(bitmap, cliprect, 0,0);
 	m_tilemap3->draw(bitmap, cliprect, 0,0);
 
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_tilemap->draw(bitmap, cliprect, 0,0);
 
 //  popmessage ("Regs %08x %08x %08x %08x",bsb_vidreg2[0],bsb_vidreg2[1],bsb_vidreg2[2],bsb_vidreg2[3]);

@@ -62,6 +62,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bsktball_bounce_w);
 	DECLARE_WRITE8_MEMBER(bsktball_note_w);
 	DECLARE_WRITE8_MEMBER(bsktball_noise_reset_w);
+	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 /*----------- defined in audio/bsktball.c -----------*/

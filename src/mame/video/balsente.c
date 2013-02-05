@@ -119,9 +119,8 @@ WRITE8_MEMBER(balsente_state::shrike_sprite_select_w)
  *
  *************************************/
 
-static void draw_one_sprite(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *sprite)
+void balsente_state::draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *sprite)
 {
-	balsente_state *state = machine.driver_data<balsente_state>();
 	int flags = sprite[0];
 	int image = sprite[1] | ((flags & 7) << 8);
 	int ypos = sprite[2] + 17 + BALSENTE_VBEND;
@@ -130,7 +129,7 @@ static void draw_one_sprite(running_machine &machine, bitmap_ind16 &bitmap, cons
 	int x, y;
 
 	/* get a pointer to the source image */
-	src = &state->m_sprite_data[(64 * image) & state->m_sprite_mask];
+	src = &m_sprite_data[(64 * image) & m_sprite_mask];
 	if (flags & 0x80) src += 4 * 15;
 
 	/* loop over y */
@@ -138,8 +137,8 @@ static void draw_one_sprite(running_machine &machine, bitmap_ind16 &bitmap, cons
 	{
 		if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect.min_y && ypos <= cliprect.max_y)
 		{
-			const pen_t *pens = &machine.pens[state->m_palettebank_vis * 256];
-			UINT8 *old = &state->m_expanded_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
+			const pen_t *pens = &machine().pens[m_palettebank_vis * 256];
+			UINT8 *old = &m_expanded_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
 			int currx = xpos;
 
 			/* standard case */
@@ -214,7 +213,7 @@ UINT32 balsente_state::screen_update_balsente(screen_device &screen, bitmap_ind1
 
 	/* draw the sprite images */
 	for (i = 0; i < 40; i++)
-		draw_one_sprite(machine(), bitmap, cliprect, &m_spriteram[(0xe0 + i * 4) & 0xff]);
+		draw_one_sprite(bitmap, cliprect, &m_spriteram[(0xe0 + i * 4) & 0xff]);
 
 	return 0;
 }

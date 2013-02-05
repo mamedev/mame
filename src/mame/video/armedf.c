@@ -256,11 +256,10 @@ WRITE16_MEMBER(armedf_state::armedf_bg_scrolly_w)
 ***************************************************************************/
 
 /* custom code to handle color cycling effect, handled by m_spr_pal_clut */
-void armedf_drawgfx(running_machine &machine, bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 							UINT32 code,UINT32 color, UINT32 clut,int flipx,int flipy,int offsx,int offsy,
 							int transparent_color)
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
 	const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
 	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 	int x_index_base, y_index, sx, sy, ex, ey;
@@ -314,7 +313,7 @@ void armedf_drawgfx(running_machine &machine, bitmap_ind16 &dest_bmp,const recta
 				int x_index = x_index_base;
 				for (x = sx; x < ex; x++)
 				{
-					int c = (source[x_index] & ~0xf) | ((state->m_spr_pal_clut[clut*0x10+(source[x_index] & 0xf)]) & 0xf);
+					int c = (source[x_index] & ~0xf) | ((m_spr_pal_clut[clut*0x10+(source[x_index] & 0xf)]) & 0xf);
 					if (c != transparent_color)
 						dest[x] = pal[c];
 
@@ -327,13 +326,12 @@ void armedf_drawgfx(running_machine &machine, bitmap_ind16 &dest_bmp,const recta
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void armedf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	armedf_state *state = machine.driver_data<armedf_state>();
-	UINT16 *buffered_spriteram = state->m_spriteram->buffer();
+	UINT16 *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram->bytes() / 2; offs += 4)
+	for (offs = 0; offs < m_spriteram->bytes() / 2; offs += 4)
 	{
 		int code = buffered_spriteram[offs + 1]; /* ??YX?TTTTTTTTTTT */
 		int flipx = code & 0x2000;
@@ -341,9 +339,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int color = (buffered_spriteram[offs + 2] >> 8) & 0x1f;
 		int clut = (buffered_spriteram[offs + 2]) & 0x7f;
 		int sx = buffered_spriteram[offs + 3];
-		int sy = state->m_sprite_offy + 240 - (buffered_spriteram[offs + 0] & 0x1ff);
+		int sy = m_sprite_offy + 240 - (buffered_spriteram[offs + 0] & 0x1ff);
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 320 - sx + 176;    /* don't ask where 176 comes from, just tried it out */
 			sy = 240 - sy + 1;  /* don't ask where 1 comes from, just tried it out */
@@ -353,7 +351,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		if (((buffered_spriteram[offs + 0] & 0x3000) >> 12) == priority)
 		{
-			armedf_drawgfx(machine,bitmap,cliprect,machine.gfx[3],
+			armedf_drawgfx(bitmap,cliprect,machine().gfx[3],
 				code & 0xfff,
 				color,clut,
 				flipx,flipy,
@@ -393,15 +391,15 @@ UINT32 armedf_state::screen_update_armedf(screen_device &screen, bitmap_ind16 &b
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (sprite_enable)
-		draw_sprites(machine(), bitmap, cliprect, 2);
+		draw_sprites(bitmap, cliprect, 2);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (sprite_enable)
-		draw_sprites(machine(), bitmap, cliprect, 1);
+		draw_sprites(bitmap, cliprect, 1);
 
 	if (sprite_enable)
-		draw_sprites(machine(), bitmap, cliprect, 0);
+		draw_sprites(bitmap, cliprect, 0);
 
 	m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
 

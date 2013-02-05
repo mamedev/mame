@@ -68,12 +68,11 @@ void bombjack_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void bombjack_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	bombjack_state *state = machine.driver_data<bombjack_state>();
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 /*
  abbbbbbb cdefgggg hhhhhhhh iiiiiiii
@@ -91,19 +90,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx,sy,flipx,flipy;
 
 
-		sx = state->m_spriteram[offs + 3];
+		sx = m_spriteram[offs + 3];
 
-		if (state->m_spriteram[offs] & 0x80)
-			sy = 225 - state->m_spriteram[offs + 2];
+		if (m_spriteram[offs] & 0x80)
+			sy = 225 - m_spriteram[offs + 2];
 		else
-			sy = 241 - state->m_spriteram[offs + 2];
+			sy = 241 - m_spriteram[offs + 2];
 
-		flipx = state->m_spriteram[offs + 1] & 0x40;
-		flipy = state->m_spriteram[offs + 1] & 0x80;
+		flipx = m_spriteram[offs + 1] & 0x40;
+		flipy = m_spriteram[offs + 1] & 0x80;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
-			if (state->m_spriteram[offs + 1] & 0x20)
+			if (m_spriteram[offs + 1] & 0x20)
 			{
 				sx = 224 - sx;
 				sy = 224 - sy;
@@ -117,9 +116,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[(state->m_spriteram[offs] & 0x80) ? 3 : 2],
-				state->m_spriteram[offs] & 0x7f,
-				state->m_spriteram[offs + 1] & 0x0f,
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[(m_spriteram[offs] & 0x80) ? 3 : 2],
+				m_spriteram[offs] & 0x7f,
+				m_spriteram[offs + 1] & 0x0f,
 				flipx,flipy,
 				sx,sy,0);
 	}
@@ -129,6 +128,6 @@ UINT32 bombjack_state::screen_update_bombjack(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

@@ -40,6 +40,7 @@ public:
 	DECLARE_MACHINE_RESET(missb2);
 	UINT32 screen_update_missb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(missb2_interrupt);
+	void configure_banks();
 };
 
 
@@ -571,21 +572,21 @@ ROM_START( bublpong )
 ROM_END
 
 
-static void configure_banks( running_machine& machine )
+void missb2_state::configure_banks()
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	UINT8 *SLAVE = machine.root_device().memregion("slave")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *SLAVE = machine().root_device().memregion("slave")->base();
 
-	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	/* 2009-11 FP: isn't there a way to configure both at once? */
-	machine.root_device().membank("bank2")->configure_entries(0, 7, &SLAVE[0x8000], 0x1000);
-	machine.root_device().membank("bank3")->configure_entries(0, 7, &SLAVE[0x9000], 0x1000);
+	machine().root_device().membank("bank2")->configure_entries(0, 7, &SLAVE[0x8000], 0x1000);
+	machine().root_device().membank("bank3")->configure_entries(0, 7, &SLAVE[0x9000], 0x1000);
 }
 
 DRIVER_INIT_MEMBER(missb2_state,missb2)
 {
-	configure_banks(machine());
+	configure_banks();
 	m_video_enable = 0;
 }
 

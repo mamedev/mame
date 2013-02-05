@@ -93,4 +93,5 @@ public:
 	TIMER_CALLBACK_MEMBER(from_sound_latch_callback);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	TIMER_CALLBACK_MEMBER(deferred_ls74_w);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

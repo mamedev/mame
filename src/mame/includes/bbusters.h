@@ -57,4 +57,7 @@ public:
 	UINT32 screen_update_bbuster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mechatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_bbuster(screen_device &screen, bool state);
+	inline const UINT8 *get_source_ptr(gfx_element *gfx, UINT32 sprite, int dx, int dy, int block);
+	void bbusters_draw_block(bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block);
+	void draw_sprites(bitmap_ind16 &bitmap, const UINT16 *source, int bank, int colval, int colmask);
 };

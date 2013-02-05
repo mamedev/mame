@@ -26,4 +26,5 @@ public:
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	virtual void palette_init();
 	UINT32 screen_update_ambush(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 };

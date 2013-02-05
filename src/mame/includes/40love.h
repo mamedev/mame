@@ -98,4 +98,8 @@ public:
 	UINT32 screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void redraw_pixels();
+	void fortyl_set_scroll_x( int offset );
+	void fortyl_plot_pix( int offset );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_pixram( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

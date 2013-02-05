@@ -111,4 +111,11 @@ public:
 	UINT32 screen_update_aerfboot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_aerfboo2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_wbbc97(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void aerofgt_register_state_globals(  );
+	void setbank( tilemap_t *tmap, int num, int bank );
+	void aerfboo2_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri );
+	void pspikesb_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void spikes91_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void aerfboot_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void wbbc97_draw_bitmap( bitmap_rgb32 &bitmap );
 };

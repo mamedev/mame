@@ -64,20 +64,19 @@ void bigevglf_state::video_start()
 	save_pointer(NAME(m_vidram), 0x100 * 0x100 * 4);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void bigevglf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	bigevglf_state *state = machine.driver_data<bigevglf_state>();
 	int i, j;
 	for (i = 0xc0-4; i >= 0; i-= 4)
 	{
 		int code, sx, sy;
-		code = state->m_spriteram2[i + 1];
-		sx = state->m_spriteram2[i + 3];
-		sy = 200 - state->m_spriteram2[i];
+		code = m_spriteram2[i + 1];
+		sx = m_spriteram2[i + 3];
+		sy = 200 - m_spriteram2[i];
 		for (j = 0; j < 16; j++)
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[0],
-				state->m_spriteram1[(code << 4) + j] + ((state->m_spriteram1[0x400 + (code << 4) + j] & 0xf) << 8),
-				state->m_spriteram2[i + 2] & 0xf,
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[0],
+				m_spriteram1[(code << 4) + j] + ((m_spriteram1[0x400 + (code << 4) + j] & 0xf) << 8),
+				m_spriteram2[i + 2] & 0xf,
 				0,0,
 				sx + ((j & 1) << 3), sy + ((j >> 1) << 3), 0);
 	}
@@ -86,6 +85,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 bigevglf_state::screen_update_bigevglf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_tmp_bitmap[m_plane_visible], 0, 0, 0, 0, cliprect);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

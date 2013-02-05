@@ -139,9 +139,8 @@ void battlane_state::video_start()
 	m_screen_bitmap.allocate(32 * 8, 32 * 8);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void battlane_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	battlane_state *state = machine.driver_data<battlane_state>();
 	int offs, attr, code, color, sx, sy, flipx, flipy, dy;
 
 	for (offs = 0; offs < 0x100; offs += 4)
@@ -157,8 +156,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		    0x01 = Sprite Enable
 		*/
 
-		attr = state->m_spriteram[offs + 1];
-		code = state->m_spriteram[offs + 3];
+		attr = m_spriteram[offs + 1];
+		code = m_spriteram[offs + 3];
 
 		code += 256 * ((attr >> 6) & 0x02);
 		code += 256 * ((attr >> 5) & 0x01);
@@ -167,13 +166,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		{
 			color = (attr >> 3) & 0x01;
 
-			sx = state->m_spriteram[offs + 2];
-			sy = state->m_spriteram[offs];
+			sx = m_spriteram[offs + 2];
+			sy = m_spriteram[offs];
 
 			flipx = attr & 0x04;
 			flipy = attr & 0x02;
 
-			if (!state->flip_screen())
+			if (!flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -182,7 +181,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			}
 
 			drawgfx_transpen(bitmap,cliprect,
-				machine.gfx[0],
+				machine().gfx[0],
 				code,
 				color,
 				flipx, flipy,
@@ -193,7 +192,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				dy = flipy ? 16 : -16;
 
 				drawgfx_transpen(bitmap,cliprect,
-					machine.gfx[0],
+					machine().gfx[0],
 					code + 1,
 					color,
 					flipx, flipy,
@@ -203,20 +202,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static void draw_fg_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
+void battlane_state::draw_fg_bitmap( bitmap_ind16 &bitmap )
 {
-	battlane_state *state = machine.driver_data<battlane_state>();
 	int x, y, data;
 
 	for (y = 0; y < 32 * 8; y++)
 	{
 		for (x = 0; x < 32 * 8; x++)
 		{
-			data = state->m_screen_bitmap.pix8(y, x);
+			data = m_screen_bitmap.pix8(y, x);
 
 			if (data)
 			{
-				if (state->flip_screen())
+				if (flip_screen())
 					bitmap.pix16(255 - y, 255 - x) = data;
 				else
 					bitmap.pix16(y, x) = data;
@@ -230,7 +228,7 @@ UINT32 battlane_state::screen_update_battlane(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->mark_all_dirty(); // HACK
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
-	draw_fg_bitmap(machine(), bitmap);
+	draw_sprites(bitmap, cliprect);
+	draw_fg_bitmap(bitmap);
 	return 0;
 }

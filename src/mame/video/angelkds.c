@@ -119,12 +119,11 @@ a split down the middle of the screen
 
 */
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int enable_n)
+void angelkds_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int enable_n)
 {
-	angelkds_state *state = machine.driver_data<angelkds_state>();
-	const UINT8 *source = state->m_spriteram + 0x100 - 4;
-	const UINT8 *finish = state->m_spriteram;
-	gfx_element *gfx = machine.gfx[3];
+	const UINT8 *source = m_spriteram + 0x100 - 4;
+	const UINT8 *finish = m_spriteram;
+	gfx_element *gfx = machine().gfx[3];
 
 	while (source >= finish)
 	{
@@ -261,7 +260,7 @@ UINT32 angelkds_state::screen_update_angelkds(screen_device &screen, bitmap_ind1
 	if ((m_layer_ctrl & 0x80) == 0x00)
 		m_bgtop_tilemap->draw(bitmap, clip, 0, 0);
 
-	draw_sprites(machine(), bitmap, clip, 0x80);
+	draw_sprites(bitmap, clip, 0x80);
 
 	if ((m_layer_ctrl & 0x20) == 0x00)
 		m_tx_tilemap->draw(bitmap, clip, 0, 0);
@@ -272,7 +271,7 @@ UINT32 angelkds_state::screen_update_angelkds(screen_device &screen, bitmap_ind1
 	if ((m_layer_ctrl & 0x40) == 0x00)
 		m_bgbot_tilemap->draw(bitmap, clip, 0, 0);
 
-	draw_sprites(machine(), bitmap, clip, 0x40);
+	draw_sprites(bitmap, clip, 0x40);
 
 	if ((m_layer_ctrl & 0x20) == 0x00)
 		m_tx_tilemap->draw(bitmap, clip, 0, 0);

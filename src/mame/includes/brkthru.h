@@ -47,4 +47,6 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_brkthru(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void show_register( bitmap_ind16 &bitmap, int x, int y, UINT32 data );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int prio );
 };

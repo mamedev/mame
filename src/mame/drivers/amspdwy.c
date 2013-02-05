@@ -34,32 +34,31 @@ Sound:  YM2151
     Or last value when wheel delta = 0
 */
 
-static UINT8 amspdwy_wheel_r( running_machine &machine, int index )
+UINT8 amspdwy_state::amspdwy_wheel_r( int index )
 {
-	amspdwy_state *state = machine.driver_data<amspdwy_state>();
 	static const char *const portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };
-	UINT8 wheel = machine.root_device().ioport(portnames[2 + index])->read();
-	if (wheel != state->m_wheel_old[index])
+	UINT8 wheel = machine().root_device().ioport(portnames[2 + index])->read();
+	if (wheel != m_wheel_old[index])
 	{
 		wheel = (wheel & 0x7fff) - (wheel & 0x8000);
-		if (wheel > state->m_wheel_old[index])
-		state->m_wheel_return[index] = ((+wheel) & 0xf) | 0x00;
+		if (wheel > m_wheel_old[index])
+		m_wheel_return[index] = ((+wheel) & 0xf) | 0x00;
 		else
-		state->m_wheel_return[index] = ((-wheel) & 0xf) | 0x10;
+		m_wheel_return[index] = ((-wheel) & 0xf) | 0x10;
 
-	state->m_wheel_old[index] = wheel;
+	m_wheel_old[index] = wheel;
 	}
-	return state->m_wheel_return[index] | machine.root_device().ioport(portnames[index])->read();
+	return m_wheel_return[index] | machine().root_device().ioport(portnames[index])->read();
 }
 
 READ8_MEMBER(amspdwy_state::amspdwy_wheel_0_r)
 {
-	return amspdwy_wheel_r(machine(), 0);
+	return amspdwy_wheel_r(0);
 }
 
 READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
 {
-	return amspdwy_wheel_r(machine(), 1);
+	return amspdwy_wheel_r(1);
 }
 
 READ8_MEMBER(amspdwy_state::amspdwy_sound_r)

@@ -48,14 +48,13 @@ void ambush_state::palette_init()
 }
 
 
-static void draw_chars( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void ambush_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	ambush_state *state = machine.driver_data<ambush_state>();
 	int offs, transpen;
 
 	transpen = (priority == 0) ? -1 : 0;
 
-	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
+	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		int code, sx, sy, col;
 		UINT8 scroll;
@@ -63,26 +62,26 @@ static void draw_chars( running_machine &machine, bitmap_ind16 &bitmap, const re
 		sy = (offs / 32);
 		sx = (offs % 32);
 
-		col = state->m_colorram[((sy & 0x1c) << 3) + sx];
+		col = m_colorram[((sy & 0x1c) << 3) + sx];
 
 		if (priority & ~col)
 			continue;
 
-		scroll = ~state->m_scrollram[sx];
+		scroll = ~m_scrollram[sx];
 
-		code = state->m_videoram[offs] | ((col & 0x60) << 3);
+		code = m_videoram[offs] | ((col & 0x60) << 3);
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 31 - sx;
 			sy = 31 - sy;
 			scroll = ~scroll - 1;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 			code,
-			(col & 0x0f) | ((*state->m_colorbank & 0x03) << 4),
-			state->flip_screen(), state->flip_screen(),
+			(col & 0x0f) | ((*m_colorbank & 0x03) << 4),
+			flip_screen(), flip_screen(),
 			8 * sx, (8 * sy + scroll) & 0xff, transpen);
 	}
 }
@@ -95,7 +94,7 @@ UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &b
 	bitmap.fill(0, cliprect);
 
 	/* Draw the characters */
-	draw_chars(machine(), bitmap, cliprect, 0x00);
+	draw_chars(bitmap, cliprect, 0x00);
 
 	/* Draw the sprites. */
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
@@ -153,6 +152,6 @@ UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &b
 	}
 
 	/* Draw the foreground priority characters over the sprites */
-	draw_chars(machine(), bitmap, cliprect, 0x10);
+	draw_chars(bitmap, cliprect, 0x10);
 	return 0;
 }

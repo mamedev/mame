@@ -133,6 +133,12 @@ public:
 	DECLARE_WRITE8_MEMBER(polaris_sh_port_3_w);
 	
 	void schaser_reinit_555_time_remain();
+	void invadpt2_get_pens( pen_t *pens );
+	void sflush_get_pens( pen_t *pens );
+	void cosmo_get_pens( pen_t *pens );
+	inline void set_pixel( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, pen_t *pens, UINT8 color );
+	inline void set_8_pixels( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, pen_t *pens, UINT8 fore_color, UINT8 back_color );
+	void clear_extra_columns( bitmap_rgb32 &bitmap, pen_t *pens, UINT8 color );
 };
 
 

@@ -37,4 +37,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_blockout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(blockout_scanline);
+	void setcolor( int color, int rgb );
+	void update_pixels( int x, int y );
 };

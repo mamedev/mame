@@ -232,32 +232,31 @@ WRITE8_MEMBER(battlera_state::HuC6270_data_w)
 
 /******************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &clip,int pri)
+void battlera_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &clip,int pri)
 {
-	battlera_state *state = machine.driver_data<battlera_state>();
 	int offs,my,mx,code,code2,fx,fy,cgy=0,cgx,colour,i,yinc;
 
 	/* Draw sprites, starting at SATB, draw in _reverse_ order */
-	for (offs=(state->m_HuC6270_registers[19]<<1)+0x200-8; offs>=(state->m_HuC6270_registers[19]<<1); offs-=8)
+	for (offs=(m_HuC6270_registers[19]<<1)+0x200-8; offs>=(m_HuC6270_registers[19]<<1); offs-=8)
 	{
-		if ((state->m_HuC6270_vram[offs+7]&0x80) && !pri) continue;
-		if (!(state->m_HuC6270_vram[offs+7]&0x80) && pri) continue;
+		if ((m_HuC6270_vram[offs+7]&0x80) && !pri) continue;
+		if (!(m_HuC6270_vram[offs+7]&0x80) && pri) continue;
 
-		code=state->m_HuC6270_vram[offs+5] + (state->m_HuC6270_vram[offs+4]<<8);
+		code=m_HuC6270_vram[offs+5] + (m_HuC6270_vram[offs+4]<<8);
 		code=code>>1;
 
-		my=state->m_HuC6270_vram[offs+1] + (state->m_HuC6270_vram[offs+0]<<8);
-		mx=state->m_HuC6270_vram[offs+3] + (state->m_HuC6270_vram[offs+2]<<8);
+		my=m_HuC6270_vram[offs+1] + (m_HuC6270_vram[offs+0]<<8);
+		mx=m_HuC6270_vram[offs+3] + (m_HuC6270_vram[offs+2]<<8);
 
 		mx-=32;
 		my-=57;
 
-		fx=state->m_HuC6270_vram[offs+6]&0x8;
-		fy=state->m_HuC6270_vram[offs+6]&0x80;
-		cgx=state->m_HuC6270_vram[offs+6]&1;
-		colour=state->m_HuC6270_vram[offs+7]&0xf;
+		fx=m_HuC6270_vram[offs+6]&0x8;
+		fy=m_HuC6270_vram[offs+6]&0x80;
+		cgx=m_HuC6270_vram[offs+6]&1;
+		colour=m_HuC6270_vram[offs+7]&0xf;
 
-		switch ((state->m_HuC6270_vram[offs+6]>>4)&3) {
+		switch ((m_HuC6270_vram[offs+6]>>4)&3) {
 		case 0: cgy=1; break;
 		case 1: cgy=2; break;
 		case 2: cgy=0; break; /* Illegal */
@@ -273,14 +272,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		if (fy) { my += 16*(cgy-1); yinc = -16; } /* Swap tile order on Y flips */
 
 		for (i=0; i<cgy; i++) {
-			drawgfx_transpen(bitmap,clip,machine.gfx[1],
+			drawgfx_transpen(bitmap,clip,machine().gfx[1],
 				code,
 				colour,
 				fx,fy,
 				mx,my,0);
 
 			if (cgx)
-				drawgfx_transpen(bitmap,clip,machine.gfx[1],
+				drawgfx_transpen(bitmap,clip,machine().gfx[1],
 						code2,
 						colour,
 						fx,fy,
@@ -346,13 +345,13 @@ UINT32 battlera_state::screen_update_battlera(screen_device &screen, bitmap_ind1
 	/* Todo:  Background enable (not used anyway) */
 
 	/* Render low priority sprites, if enabled */
-	if (m_sb_enable) draw_sprites(machine(),bitmap,cliprect,0);
+	if (m_sb_enable) draw_sprites(bitmap,cliprect,0);
 
 	/* Render background over sprites */
 	copyscrollbitmap_trans(bitmap,*m_front_bitmap,1,&scrollx,1,&scrolly,cliprect,256);
 
 	/* Render high priority sprites, if enabled */
-	if (m_sb_enable) draw_sprites(machine(),bitmap,cliprect,1);
+	if (m_sb_enable) draw_sprites(bitmap,cliprect,1);
 
 	return 0;
 }

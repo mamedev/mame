@@ -21,7 +21,7 @@ drivers by Acho A. Tang
 //****************************************************************************
 // Local Functions
 
-static void fill_srxlat( int *xlat )
+void bwing_state::fill_srxlat( int *xlat )
 {
 	unsigned base, offset, i;
 
@@ -240,11 +240,10 @@ void bwing_state::video_start()
 //****************************************************************************
 // Realtime
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bmp, const rectangle &clip, UINT8 *ram, int pri )
+void bwing_state::draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, UINT8 *ram, int pri )
 {
-	bwing_state *state = machine.driver_data<bwing_state>();
 	int attrib, fx, fy, code, x, y, color, i;
-	gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine().gfx[1];
 
 	for (i = 0; i < 0x200; i += 4)
 	{
@@ -265,7 +264,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bmp, const rec
 		fy = ~attrib & 0x02;
 
 		// normal/cocktail
-		if (state->m_mapmask & 0x20)
+		if (m_mapmask & 0x20)
 		{
 			fx = !fx;
 			fy = !fy;
@@ -311,7 +310,7 @@ UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bit
 		bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// draw low priority sprites
-	draw_sprites(machine(), bitmap, cliprect, m_spriteram, 0);
+	draw_sprites(bitmap, cliprect, m_spriteram, 0);
 
 	// draw foreground
 	if (!(m_mapmask & 2))
@@ -325,7 +324,7 @@ UINT32 bwing_state::screen_update_bwing(screen_device &screen, bitmap_ind16 &bit
 	}
 
 	// draw high priority sprites
-	draw_sprites(machine(), bitmap, cliprect, m_spriteram, 1);
+	draw_sprites(bitmap, cliprect, m_spriteram, 1);
 
 	// draw text layer
 //  if (m_mapmask & 4)

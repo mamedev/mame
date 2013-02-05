@@ -201,6 +201,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(balsente_interrupt_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(balsente_counter_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(balsente_clock_counter_0_ff);
+	void draw_one_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *sprite);
+	void poly17_init();
+	void m6850_update_io();
+	void set_counter_0_ff(timer_device &timer, int newstate);
+	void update_grudge_steering();
+	void expand_roms(UINT8 cd_rom_mask);
+	inline void config_shooter_adc(UINT8 shooter, UINT8 adc_shift);
 };
 
 

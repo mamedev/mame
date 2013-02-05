@@ -98,15 +98,14 @@ Offset:     Format:     Value:
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void amspdwy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	amspdwy_state *state = machine.driver_data<amspdwy_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int i;
-	int max_x = machine.primary_screen->width()  - 1;
-	int max_y = machine.primary_screen->height() - 1;
+	int max_x = machine().primary_screen->width()  - 1;
+	int max_y = machine().primary_screen->height() - 1;
 
-	for (i = 0; i < state->m_spriteram.bytes() ; i += 4)
+	for (i = 0; i < m_spriteram.bytes() ; i += 4)
 	{
 		int y = spriteram[i + 0];
 		int x = spriteram[i + 1];
@@ -115,7 +114,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = attr & 0x80;
 		int flipy = attr & 0x40;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			x = max_x - x - 8;
 			y = max_y - y - 8;
@@ -123,7 +122,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 //              code + ((attr & 0x18)<<5),
 				code + ((attr & 0x08)<<5),
 				attr,
@@ -144,6 +143,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 amspdwy_state::screen_update_amspdwy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

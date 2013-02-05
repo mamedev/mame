@@ -4,53 +4,52 @@
 #include "includes/aquarium.h"
 
 /* gcpinbal.c modified */
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
+void aquarium_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	aquarium_state *state = machine.driver_data<aquarium_state>();
 	int offs, chain_pos;
 	int x, y, curx, cury;
 	UINT8 col, flipx, flipy, chain;
 	UINT16 code;
 
-	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 8)
+	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 8)
 	{
-		code = ((state->m_spriteram[offs + 5]) & 0xff) + (((state->m_spriteram[offs + 6]) & 0xff) << 8);
+		code = ((m_spriteram[offs + 5]) & 0xff) + (((m_spriteram[offs + 6]) & 0xff) << 8);
 		code &= 0x3fff;
 
-		if (!(state->m_spriteram[offs + 4] &0x80))  /* active sprite ? */
+		if (!(m_spriteram[offs + 4] &0x80))  /* active sprite ? */
 		{
-			x = ((state->m_spriteram[offs + 0]) &0xff) + (((state->m_spriteram[offs + 1]) & 0xff) << 8);
-			y = ((state->m_spriteram[offs + 2]) &0xff) + (((state->m_spriteram[offs + 3]) & 0xff) << 8);
+			x = ((m_spriteram[offs + 0]) &0xff) + (((m_spriteram[offs + 1]) & 0xff) << 8);
+			y = ((m_spriteram[offs + 2]) &0xff) + (((m_spriteram[offs + 3]) & 0xff) << 8);
 
 			/* Treat coords as signed */
 			if (x & 0x8000)  x -= 0x10000;
 			if (y & 0x8000)  y -= 0x10000;
 
-			col = ((state->m_spriteram[offs + 7]) & 0x0f);
-			chain = (state->m_spriteram[offs + 4]) & 0x07;
-			flipy = (state->m_spriteram[offs + 4]) & 0x10;
-			flipx = (state->m_spriteram[offs + 4]) & 0x20;
+			col = ((m_spriteram[offs + 7]) & 0x0f);
+			chain = (m_spriteram[offs + 4]) & 0x07;
+			flipy = (m_spriteram[offs + 4]) & 0x10;
+			flipx = (m_spriteram[offs + 4]) & 0x20;
 
 			curx = x;
 			cury = y;
 
-			if (((state->m_spriteram[offs + 4]) & 0x08) && flipy)
+			if (((m_spriteram[offs + 4]) & 0x08) && flipy)
 				cury += (chain * 16);
 
-			if (!(((state->m_spriteram[offs + 4]) & 0x08)) && flipx)
+			if (!(((m_spriteram[offs + 4]) & 0x08)) && flipx)
 				curx += (chain * 16);
 
 
 			for (chain_pos = chain; chain_pos >= 0; chain_pos--)
 			{
-				drawgfx_transpen(bitmap, cliprect,machine.gfx[0],
+				drawgfx_transpen(bitmap, cliprect,machine().gfx[0],
 						code,
 						col,
 						flipx, flipy,
 						curx,cury,0);
 
 				/* wrap around y */
-				drawgfx_transpen(bitmap, cliprect,machine.gfx[0],
+				drawgfx_transpen(bitmap, cliprect,machine().gfx[0],
 						code,
 						col,
 						flipx, flipy,
@@ -58,7 +57,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 				code++;
 
-				if ((state->m_spriteram[offs + 4]) &0x08)   /* Y chain */
+				if ((m_spriteram[offs + 4]) &0x08)   /* Y chain */
 				{
 					if (flipy)
 						cury -= 16;
@@ -163,7 +162,7 @@ UINT32 aquarium_state::screen_update_aquarium(screen_device &screen, bitmap_ind1
 	m_bak_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect, 16);
+	draw_sprites(bitmap, cliprect, 16);
 
 	m_bak_tilemap->draw(bitmap, cliprect, 1, 0);
 	m_mid_tilemap->draw(bitmap, cliprect, 1, 0);

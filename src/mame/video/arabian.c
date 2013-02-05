@@ -219,10 +219,9 @@ void arabian_state::video_start()
  *
  *************************************/
 
-static void blit_area( running_machine &machine, UINT8 plane, UINT16 src, UINT8 x, UINT8 y, UINT8 sx, UINT8 sy )
+void arabian_state::blit_area( UINT8 plane, UINT16 src, UINT8 x, UINT8 y, UINT8 sx, UINT8 sy )
 {
-	arabian_state *state = machine.driver_data<arabian_state>();
-	UINT8 *srcdata = &state->m_converted_gfx[src * 4];
+	UINT8 *srcdata = &m_converted_gfx[src * 4];
 	int i,j;
 
 	/* loop over X, then Y */
@@ -236,7 +235,7 @@ static void blit_area( running_machine &machine, UINT8 plane, UINT16 src, UINT8 
 			UINT8 *base;
 
 			/* get a pointer to the bitmap */
-			base = &state->m_main_bitmap[((y + j) & 0xff) * BITMAP_WIDTH + (x & 0xff)];
+			base = &m_main_bitmap[((y + j) & 0xff) * BITMAP_WIDTH + (x & 0xff)];
 
 			/* bit 0 means write to upper plane (upper 4 bits of our bitmap) */
 			if (plane & 0x01)
@@ -283,7 +282,7 @@ WRITE8_MEMBER(arabian_state::arabian_blitter_w)
 		int sy    = m_blitter[5];
 
 		/* blit it */
-		blit_area(machine(), plane, src, x, y, sx, sy);
+		blit_area(plane, src, x, y, sx, sy);
 	}
 }
 

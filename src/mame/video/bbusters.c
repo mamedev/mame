@@ -105,7 +105,7 @@ VIDEO_START_MEMBER(bbusters_state,mechatt)
 		else if (dy&0x40) code+=32;             \
 		else if (dx&0x40) code+=16
 
-INLINE const UINT8 *get_source_ptr(gfx_element *gfx, UINT32 sprite, int dx, int dy, int block)
+inline const UINT8 *bbusters_state::get_source_ptr(gfx_element *gfx, UINT32 sprite, int dx, int dy, int block)
 {
 	int code=0;
 
@@ -143,21 +143,20 @@ INLINE const UINT8 *get_source_ptr(gfx_element *gfx, UINT32 sprite, int dx, int 
 	return gfx->get_data((sprite+code) % gfx->elements()) + ((dy%16) * gfx->rowbytes());
 }
 
-static void bbusters_draw_block(running_machine &machine, bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
+void bbusters_state::bbusters_draw_block(bitmap_ind16 &dest,int x,int y,int size,int flipx,int flipy,UINT32 sprite,int color,int bank,int block)
 {
-	bbusters_state *state = machine.driver_data<bbusters_state>();
-	gfx_element *gfx = machine.gfx[bank];
+	gfx_element *gfx = machine().gfx[bank];
 	pen_t pen_base = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-	UINT32 xinc=(state->m_scale_line_count * 0x10000 ) / size;
+	UINT32 xinc=(m_scale_line_count * 0x10000 ) / size;
 	UINT8 pixel;
 	int x_index;
 	int dy=y;
-	int sx, ex = state->m_scale_line_count;
+	int sx, ex = m_scale_line_count;
 
-	while (state->m_scale_line_count) {
+	while (m_scale_line_count) {
 		if (dy>=16 && dy<240) {
 			UINT16 *destline = &dest.pix16(dy);
-			UINT8 srcline=*state->m_scale_table_ptr;
+			UINT8 srcline=*m_scale_table_ptr;
 			const UINT8 *srcptr=0;
 
 			if (!flipy)
@@ -184,15 +183,14 @@ static void bbusters_draw_block(running_machine &machine, bitmap_ind16 &dest,int
 		}
 
 		dy++;
-		state->m_scale_table_ptr--;
-		state->m_scale_line_count--;
+		m_scale_table_ptr--;
+		m_scale_line_count--;
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const UINT16 *source, int bank, int colval, int colmask)
+void bbusters_state::draw_sprites(bitmap_ind16 &bitmap, const UINT16 *source, int bank, int colval, int colmask)
 {
-	bbusters_state *state = machine.driver_data<bbusters_state>();
-	const UINT8 *scale_table=state->memregion("user1")->base();
+	const UINT8 *scale_table=memregion("user1")->base();
 	int offs;
 
 	for (offs = 0;offs <0x800 ;offs += 4) {
@@ -237,27 +235,27 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const U
 		switch ((source[offs+0]>>8)&0x3) {
 			case 0:
 				scale=source[offs+0]&0x7;
-				state->m_scale_table_ptr = scale_table+0x387f+(0x80*scale);
-				state->m_scale_line_count = 0x10-scale;
-				bbusters_draw_block(machine,bitmap,x,y,16,fx,fy,sprite,colour,bank,block);
+				m_scale_table_ptr = scale_table+0x387f+(0x80*scale);
+				m_scale_line_count = 0x10-scale;
+				bbusters_draw_block(bitmap,x,y,16,fx,fy,sprite,colour,bank,block);
 				break;
 			case 1: /* 2 x 2 */
 				scale=source[offs+0]&0xf;
-				state->m_scale_table_ptr = scale_table+0x707f+(0x80*scale);
-				state->m_scale_line_count = 0x20-scale;
-				bbusters_draw_block(machine,bitmap,x,y,32,fx,fy,sprite,colour,bank,block);
+				m_scale_table_ptr = scale_table+0x707f+(0x80*scale);
+				m_scale_line_count = 0x20-scale;
+				bbusters_draw_block(bitmap,x,y,32,fx,fy,sprite,colour,bank,block);
 				break;
 			case 2: /* 64 by 64 block (2 x 2) x 2 */
 				scale=source[offs+0]&0x1f;
-				state->m_scale_table_ptr = scale_table+0xa07f+(0x80*scale);
-				state->m_scale_line_count = 0x40-scale;
-				bbusters_draw_block(machine,bitmap,x,y,64,fx,fy,sprite,colour,bank,block);
+				m_scale_table_ptr = scale_table+0xa07f+(0x80*scale);
+				m_scale_line_count = 0x40-scale;
+				bbusters_draw_block(bitmap,x,y,64,fx,fy,sprite,colour,bank,block);
 				break;
 			case 3: /* 2 x 2 x 2 x 2 */
 				scale=source[offs+0]&0x3f;
-				state->m_scale_table_ptr = scale_table+0xc07f+(0x80*scale);
-				state->m_scale_line_count = 0x80-scale;
-				bbusters_draw_block(machine,bitmap,x,y,128,fx,fy,sprite,colour,bank,block);
+				m_scale_table_ptr = scale_table+0xc07f+(0x80*scale);
+				m_scale_line_count = 0x80-scale;
+				bbusters_draw_block(bitmap,x,y,128,fx,fy,sprite,colour,bank,block);
 				break;
 		}
 	}
@@ -275,8 +273,8 @@ UINT32 bbusters_state::screen_update_bbuster(screen_device &screen, bitmap_ind16
 	m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 	//draw_sprites(machine(), bitmap, m_spriteram2->buffer(), 2, 0x8, 0x8);
 	m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, m_spriteram2->buffer(), 2, 0, 0);
-	draw_sprites(machine(), bitmap, m_spriteram->buffer(), 1, 0, 0);
+	draw_sprites(bitmap, m_spriteram2->buffer(), 2, 0, 0);
+	draw_sprites(bitmap, m_spriteram->buffer(), 1, 0, 0);
 	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -290,7 +288,7 @@ UINT32 bbusters_state::screen_update_mechatt(screen_device &screen, bitmap_ind16
 
 	m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, m_spriteram->buffer(), 1, 0, 0);
+	draw_sprites(bitmap, m_spriteram->buffer(), 1, 0, 0);
 	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

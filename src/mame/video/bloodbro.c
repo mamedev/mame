@@ -138,12 +138,11 @@ WRITE16_MEMBER(bloodbro_state::bloodbro_txvideoram_w)
    -------X XXXXXXXX
    -------- YYYYYYYY */
 
-static void bloodbro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void bloodbro_state::bloodbro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bloodbro_state *state = machine.driver_data<bloodbro_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs;
-	for (offs = 0;offs < state->m_spriteram.bytes()/2;offs += 4)
+	for (offs = 0;offs < m_spriteram.bytes()/2;offs += 4)
 	{
 		int sx,sy,x,y,width,height,attributes,tile_number,color,flipx,flipy,pri_mask;
 
@@ -167,12 +166,12 @@ static void bloodbro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		{
 			for (y = 0;y <= height;y++)
 			{
-				pdrawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+				pdrawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 						tile_number++,
 						color,
 						flipx,flipy,
 						flipx ? (sx + 16*(width-x)) : (sx + 16*x),flipy ? (sy + 16*(height-y)) : (sy + 16*y),
-						machine.priority_bitmap,
+						machine().priority_bitmap,
 						pri_mask,15);
 			}
 		}
@@ -187,14 +186,13 @@ static void bloodbro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
    -------X XXXXXXXX
 */
 
-static void weststry_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void bloodbro_state::weststry_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bloodbro_state *state = machine.driver_data<bloodbro_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 
 	/* TODO: the last two entries are not sprites - control registers? */
-	for (offs = 0;offs < state->m_spriteram.bytes()/2 - 8;offs += 4)
+	for (offs = 0;offs < m_spriteram.bytes()/2 - 8;offs += 4)
 	{
 		int data = spriteram16[offs+2];
 		int data0 = spriteram16[offs+0];
@@ -213,12 +211,12 @@ static void weststry_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		/* Remap code 0x800 <-> 0x1000 */
 		code = (code&0x7ff) | ((code&0x800)<<1) | ((code&0x1000)>>1);
 
-		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
-				machine.priority_bitmap,
+				machine().priority_bitmap,
 				pri_mask,15);
 	}
 }
@@ -236,7 +234,7 @@ UINT32 bloodbro_state::screen_update_bloodbro(screen_device &screen, bitmap_ind1
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
-	bloodbro_draw_sprites(machine(),bitmap,cliprect);
+	bloodbro_draw_sprites(bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -252,7 +250,7 @@ UINT32 bloodbro_state::screen_update_weststry(screen_device &screen, bitmap_ind1
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
-	weststry_draw_sprites(machine(),bitmap,cliprect);
+	weststry_draw_sprites(bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -269,7 +267,7 @@ UINT32 bloodbro_state::screen_update_skysmash(screen_device &screen, bitmap_ind1
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,1);
-	bloodbro_draw_sprites(machine(),bitmap,cliprect);
+	bloodbro_draw_sprites(bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

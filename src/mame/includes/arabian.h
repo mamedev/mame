@@ -43,4 +43,5 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_arabian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void blit_area( UINT8 plane, UINT16 src, UINT8 x, UINT8 y, UINT8 sx, UINT8 sy );
 };

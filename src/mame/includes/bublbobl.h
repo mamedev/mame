@@ -112,4 +112,5 @@ public:
 	INTERRUPT_GEN_MEMBER(bublbobl_m68705_interrupt);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	TIMER_CALLBACK_MEMBER(bublbobl_m68705_irq_ack);
+	void configure_banks(  );
 };

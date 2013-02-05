@@ -80,6 +80,11 @@ public:
 	DECLARE_VIDEO_START(terraf);
 	DECLARE_VIDEO_START(armedf);
 	UINT32 screen_update_armedf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	void armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+						UINT32 code,UINT32 color, UINT32 clut,int flipx,int flipy,int offsx,int offsy,
+						int transparent_color);
+	
 };
 
 class bigfghtr_state : public armedf_state

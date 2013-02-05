@@ -71,6 +71,13 @@ public:
 	UINT32 screen_update_astrof(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_tomahawk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_callback);
+	rgb_t make_pen( UINT8 data );
+	void astrof_get_pens( pen_t *pens );
+	void tomahawk_get_pens( pen_t *pens );
+	void astrof_set_video_control_2( UINT8 data );
+	void spfghmk2_set_video_control_2( UINT8 data );
+	void tomahawk_set_video_control_2( UINT8 data );
+	void video_update_common( bitmap_rgb32 &bitmap, const rectangle &cliprect, pen_t *pens );
 };
 
 /*----------- defined in audio/astrof.c -----------*/

@@ -107,13 +107,12 @@ VIDEO_START_MEMBER(bagman_state,bagman)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void bagman_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bagman_state *state = machine.driver_data<bagman_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
+	for (offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
 
@@ -121,12 +120,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sy = 255 - spriteram[offs + 2] - 16;
 		flipx = spriteram[offs] & 0x40;
 		flipy = spriteram[offs] & 0x80;
-		if (state->flip_screen_x())
+		if (flip_screen_x())
 		{
 			sx = bitmap.width() - sx - 15;
 			flipx = !flipx;
 		}
-		if (state->flip_screen_y())
+		if (flip_screen_y())
 		{
 			sy = bitmap.height() - sy - 15;
 			flipy = !flipy;
@@ -134,7 +133,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		if (spriteram[offs + 2] && spriteram[offs + 3])
 			drawgfx_transpen(bitmap,
-					cliprect,machine.gfx[1],
+					cliprect,machine().gfx[1],
 					(spriteram[offs] & 0x3f) + 2 * (spriteram[offs + 1] & 0x20),
 					spriteram[offs + 1] & 0x1f,
 					flipx,flipy,
@@ -149,6 +148,6 @@ UINT32 bagman_state::screen_update_bagman(screen_device &screen, bitmap_ind16 &b
 		return 0;
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

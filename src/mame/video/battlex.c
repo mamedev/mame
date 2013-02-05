@@ -58,12 +58,11 @@ void battlex_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(battlex_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void battlex_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	battlex_state *state = machine.driver_data<battlex_state>();
-	gfx_element *gfx = machine.gfx[1];
-	UINT8 *source = state->m_spriteram;
-	UINT8 *finish = state->m_spriteram + 0x200;
+	gfx_element *gfx = machine().gfx[1];
+	UINT8 *source = m_spriteram;
+	UINT8 *finish = m_spriteram + 0x200;
 
 	while (source < finish)
 	{
@@ -74,7 +73,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipy = source[1] & 0x80;
 		int flipx = source[1] & 0x40;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -93,7 +92,7 @@ UINT32 battlex_state::screen_update_battlex(screen_device &screen, bitmap_ind16 
 {
 	m_bg_tilemap->set_scrollx(0, m_scroll_lsb | (m_scroll_msb << 8));
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	return 0;
 }

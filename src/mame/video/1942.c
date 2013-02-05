@@ -187,23 +187,22 @@ WRITE8_MEMBER(_1942_state::c1942_c804_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void _1942_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	_1942_state *state = machine.driver_data<_1942_state>();
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int i, code, col, sx, sy, dir;
 
-		code = (state->m_spriteram[offs] & 0x7f) + 4 * (state->m_spriteram[offs + 1] & 0x20)
-				+ 2 * (state->m_spriteram[offs] & 0x80);
-		col = state->m_spriteram[offs + 1] & 0x0f;
-		sx = state->m_spriteram[offs + 3] - 0x10 * (state->m_spriteram[offs + 1] & 0x10);
-		sy = state->m_spriteram[offs + 2];
+		code = (m_spriteram[offs] & 0x7f) + 4 * (m_spriteram[offs + 1] & 0x20)
+				+ 2 * (m_spriteram[offs] & 0x80);
+		col = m_spriteram[offs + 1] & 0x0f;
+		sx = m_spriteram[offs + 3] - 0x10 * (m_spriteram[offs + 1] & 0x10);
+		sy = m_spriteram[offs + 2];
 		dir = 1;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -211,15 +210,15 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 
 		/* handle double / quadruple height */
-		i = (state->m_spriteram[offs + 1] & 0xc0) >> 6;
+		i = (m_spriteram[offs + 1] & 0xc0) >> 6;
 		if (i == 2)
 			i = 3;
 
 		do
 		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 					code + i,col,
-					state->flip_screen(),state->flip_screen(),
+					flip_screen(),flip_screen(),
 					sx,sy + 16 * i * dir,15);
 
 			i--;
@@ -232,7 +231,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 _1942_state::screen_update_1942(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

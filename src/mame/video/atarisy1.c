@@ -72,20 +72,6 @@ static const gfx_layout objlayout_6bpp =
 	8*8     /* every sprite takes 8 consecutive bytes */
 };
 
-
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
-
-static void update_timers(running_machine &machine, int scanline);
-static void decode_gfx(running_machine &machine, UINT16 *pflookup, UINT16 *molookup);
-static int get_bank(running_machine &machine, UINT8 prom1, UINT8 prom2, int bpp);
-
-
-
 /*************************************
  *
  *  Tilemap callbacks
@@ -165,7 +151,7 @@ VIDEO_START_MEMBER(atarisy1_state,atarisy1)
 	int i, size;
 
 	/* first decode the graphics */
-	decode_gfx(machine(), m_playfield_lookup, motable);
+	decode_gfx(m_playfield_lookup, motable);
 
 	/* initialize the playfield */
 	m_playfield_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(atarisy1_state::get_playfield_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 64,64);
@@ -233,7 +219,7 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
 
 	/* motion object bank select */
 	atarimo_set_bank(0, (newselect >> 3) & 7);
-	update_timers(space.machine(), scanline);
+	state->update_timers(scanline);
 
 	/* playfield bank select */
 	if (diff & 0x0004)
@@ -344,6 +330,7 @@ WRITE16_HANDLER( atarisy1_yscroll_w )
 
 WRITE16_HANDLER( atarisy1_spriteram_w )
 {
+	atarisy1_state *state = space.machine().driver_data<atarisy1_state>();
 	int active_bank = atarimo_get_bank(0);
 	int oldword = atarimo_0_spriteram_r(space, offset, mem_mask);
 	int newword = oldword;
@@ -358,7 +345,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 		{
 			/* if the timer is in the active bank, update the display list */
 			atarimo_0_spriteram_w(space, offset, data, 0xffff);
-			update_timers(space.machine(), space.machine().primary_screen->vpos());
+			state->update_timers(space.machine().primary_screen->vpos());
 		}
 
 		/* if we're about to modify data in the active sprite bank, make sure the video is up-to-date */
@@ -402,7 +389,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3_callback)
 
 	/* determine the time of the next one */
 	m_next_timer_scanline = -1;
-	update_timers(machine(), scanline);
+	update_timers(scanline);
 }
 
 
@@ -427,10 +414,9 @@ READ16_HANDLER( atarisy1_int3state_r )
  *
  *************************************/
 
-static void update_timers(running_machine &machine, int scanline)
+void atarisy1_state::update_timers(int scanline)
 {
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
-	address_space &space = state->generic_space();
+	address_space &space = generic_space();
 	UINT16 mem_mask = 0xffff;
 	int offset = atarimo_get_bank(0) * 64 * 4;
 	int link = 0, best = scanline, found = 0;
@@ -475,15 +461,15 @@ static void update_timers(running_machine &machine, int scanline)
 		best = -1;
 
 	/* update the timer */
-	if (best != state->m_next_timer_scanline)
+	if (best != m_next_timer_scanline)
 	{
-		state->m_next_timer_scanline = best;
+		m_next_timer_scanline = best;
 
 		/* set a new one */
 		if (best != -1)
-			state->m_scanline_timer->adjust(machine.primary_screen->time_until_pos(best), best);
+			m_scanline_timer->adjust(machine().primary_screen->time_until_pos(best), best);
 		else
-			state->m_scanline_timer->reset();
+			m_scanline_timer->reset();
 	}
 }
 
@@ -548,15 +534,14 @@ UINT32 atarisy1_state::screen_update_atarisy1(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-static void decode_gfx(running_machine &machine, UINT16 *pflookup, UINT16 *molookup)
+void atarisy1_state::decode_gfx(UINT16 *pflookup, UINT16 *molookup)
 {
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
-	UINT8 *prom1 = &state->memregion("proms")->u8(0x000);
-	UINT8 *prom2 = &state->memregion("proms")->u8(0x200);
+	UINT8 *prom1 = &memregion("proms")->u8(0x000);
+	UINT8 *prom2 = &memregion("proms")->u8(0x200);
 	int obj, i;
 
 	/* reset the globals */
-	memset(&state->m_bank_gfx[0][0], 0, sizeof(state->m_bank_gfx));
+	memset(&m_bank_gfx[0][0], 0, sizeof(m_bank_gfx));
 
 	/* loop for two sets of objects */
 	for (obj = 0; obj < 2; obj++)
@@ -579,7 +564,7 @@ static void decode_gfx(running_machine &machine, UINT16 *pflookup, UINT16 *moloo
 			offset = *prom1 & PROM1_OFFSET_MASK;
 
 			/* determine the bank */
-			bank = get_bank(machine, *prom1, *prom2, bpp);
+			bank = get_bank(*prom1, *prom2, bpp);
 
 			/* set the value */
 			if (obj == 0)
@@ -611,9 +596,8 @@ static void decode_gfx(running_machine &machine, UINT16 *pflookup, UINT16 *moloo
  *
  *************************************/
 
-static int get_bank(running_machine &machine, UINT8 prom1, UINT8 prom2, int bpp)
+int atarisy1_state::get_bank(UINT8 prom1, UINT8 prom2, int bpp)
 {
-	atarisy1_state *state = machine.driver_data<atarisy1_state>();
 	const UINT8 *srcdata;
 	int bank_index, gfx_index;
 
@@ -639,17 +623,17 @@ static int get_bank(running_machine &machine, UINT8 prom1, UINT8 prom2, int bpp)
 		return 0;
 
 	/* find the bank */
-	if (state->m_bank_gfx[bpp - 4][bank_index])
-		return state->m_bank_gfx[bpp - 4][bank_index];
+	if (m_bank_gfx[bpp - 4][bank_index])
+		return m_bank_gfx[bpp - 4][bank_index];
 
 	/* if the bank is out of range, call it 0 */
-	memory_region *tiles = machine.root_device().memregion("tiles");
+	memory_region *tiles = machine().root_device().memregion("tiles");
 	if (0x80000 * (bank_index - 1) >= tiles->bytes())
 		return 0;
 
 	/* don't have one? let's make it ... first find any empty slot */
 	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (machine.gfx[gfx_index] == NULL)
+		if (machine().gfx[gfx_index] == NULL)
 			break;
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
@@ -658,15 +642,15 @@ static int get_bank(running_machine &machine, UINT8 prom1, UINT8 prom2, int bpp)
 	switch (bpp)
 	{
 	case 4:
-		machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, objlayout_4bpp, srcdata, 0x40, 256));
+		machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), objlayout_4bpp, srcdata, 0x40, 256));
 		break;
 
 	case 5:
-		machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, objlayout_5bpp, srcdata, 0x40, 256));
+		machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), objlayout_5bpp, srcdata, 0x40, 256));
 		break;
 
 	case 6:
-		machine.gfx[gfx_index] = auto_alloc(machine, gfx_element(machine, objlayout_6bpp, srcdata, 0x40, 256));
+		machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), objlayout_6bpp, srcdata, 0x40, 256));
 		break;
 
 	default:
@@ -674,9 +658,9 @@ static int get_bank(running_machine &machine, UINT8 prom1, UINT8 prom2, int bpp)
 	}
 
 	/* set the color information */
-	machine.gfx[gfx_index]->set_granularity(8);
-	state->m_bank_color_shift[gfx_index] = bpp - 3;
+	machine().gfx[gfx_index]->set_granularity(8);
+	m_bank_color_shift[gfx_index] = bpp - 3;
 
 	/* set the entry and return it */
-	return state->m_bank_gfx[bpp - 4][bank_index] = gfx_index;
+	return m_bank_gfx[bpp - 4][bank_index] = gfx_index;
 }

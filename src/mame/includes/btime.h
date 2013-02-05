@@ -116,4 +116,10 @@ public:
 	UINT32 screen_update_zoar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_disco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(audio_nmi_gen);
+	void draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 transparency, UINT8 color, int priority );
+	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* tmap, UINT8 color );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 color,
+							UINT8 sprite_y_adjust, UINT8 sprite_y_adjust_flip_screen,
+							UINT8 *sprite_ram, offs_t interleave );
+	
 };

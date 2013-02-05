@@ -70,7 +70,7 @@ WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
 	membank("bank1")->set_entry(data & 0x07);
 }
 
-static UINT8 aquarium_snd_bitswap( UINT8 scrambled_data )
+UINT8 aquarium_state::aquarium_snd_bitswap( UINT8 scrambled_data )
 {
 	UINT8 data = 0;
 

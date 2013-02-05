@@ -80,17 +80,16 @@ TILE_GET_INFO_MEMBER(aerofgt_state::get_bg2_tile_info)
 
 
 
-static void aerofgt_register_state_globals( running_machine &machine )
+void aerofgt_state::aerofgt_register_state_globals(  )
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	state->save_item(NAME(state->m_gfxbank));
-	state->save_item(NAME(state->m_bank));
-	state->save_item(NAME(state->m_bg1scrollx));
-	state->save_item(NAME(state->m_bg1scrolly));
-	state->save_item(NAME(state->m_bg2scrollx));
-	state->save_item(NAME(state->m_bg2scrolly));
-	state->save_item(NAME(state->m_charpalettebank));
-	state->save_item(NAME(state->m_spritepalettebank));
+	save_item(NAME(m_gfxbank));
+	save_item(NAME(m_bank));
+	save_item(NAME(m_bg1scrollx));
+	save_item(NAME(m_bg1scrolly));
+	save_item(NAME(m_bg2scrollx));
+	save_item(NAME(m_bg2scrolly));
+	save_item(NAME(m_charpalettebank));
+	save_item(NAME(m_spritepalettebank));
 }
 
 VIDEO_START_MEMBER(aerofgt_state,pspikes)
@@ -100,7 +99,7 @@ VIDEO_START_MEMBER(aerofgt_state,pspikes)
 
 	m_sprite_gfx = 1;
 
-	aerofgt_register_state_globals(machine());
+	aerofgt_register_state_globals();
 	save_item(NAME(m_spikes91_lookup));
 }
 
@@ -114,7 +113,7 @@ VIDEO_START_MEMBER(aerofgt_state,karatblz)
 	m_spritepalettebank = 0;
 	m_sprite_gfx = 2;
 
-	aerofgt_register_state_globals(machine());
+	aerofgt_register_state_globals();
 }
 
 VIDEO_START_MEMBER(aerofgt_state,spinlbrk)
@@ -132,7 +131,7 @@ VIDEO_START_MEMBER(aerofgt_state,spinlbrk)
 	/* enemy sprites use ROM instead of RAM */
 	m_spriteram2.set_target(reinterpret_cast<UINT16 *>(memregion("gfx5")->base()), 0x20000);
 
-	aerofgt_register_state_globals(machine());
+	aerofgt_register_state_globals();
 }
 
 VIDEO_START_MEMBER(aerofgt_state,turbofrc)
@@ -145,7 +144,7 @@ VIDEO_START_MEMBER(aerofgt_state,turbofrc)
 	m_spritepalettebank = 0;
 	m_sprite_gfx = 2;
 
-	aerofgt_register_state_globals(machine());
+	aerofgt_register_state_globals();
 }
 
 
@@ -190,12 +189,11 @@ WRITE16_MEMBER(aerofgt_state::aerofgt_bg2videoram_w)
 }
 
 
-static void setbank( running_machine &machine, tilemap_t *tmap, int num, int bank )
+void aerofgt_state::setbank( tilemap_t *tmap, int num, int bank )
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
-	if (state->m_gfxbank[num] != bank)
+	if (m_gfxbank[num] != bank)
 	{
-		state->m_gfxbank[num] = bank;
+		m_gfxbank[num] = bank;
 		tmap->mark_all_dirty();
 	}
 }
@@ -204,8 +202,8 @@ WRITE16_MEMBER(aerofgt_state::pspikes_gfxbank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		setbank(machine(), m_bg1_tilemap, 0, (data & 0xf0) >> 4);
-		setbank(machine(), m_bg1_tilemap, 1, data & 0x0f);
+		setbank(m_bg1_tilemap, 0, (data & 0xf0) >> 4);
+		setbank(m_bg1_tilemap, 1, data & 0x0f);
 	}
 }
 
@@ -214,8 +212,8 @@ WRITE16_MEMBER(aerofgt_state::karatblz_gfxbank_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		setbank(machine(), m_bg1_tilemap, 0, (data & 0x0100) >> 8);
-		setbank(machine(), m_bg2_tilemap, 1, (data & 0x0800) >> 11);
+		setbank(m_bg1_tilemap, 0, (data & 0x0100) >> 8);
+		setbank(m_bg2_tilemap, 1, (data & 0x0800) >> 11);
 	}
 }
 
@@ -223,8 +221,8 @@ WRITE16_MEMBER(aerofgt_state::spinlbrk_gfxbank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		setbank(machine(), m_bg1_tilemap, 0, (data & 0x07));
-		setbank(machine(), m_bg2_tilemap, 1, (data & 0x38) >> 3);
+		setbank(m_bg1_tilemap, 0, (data & 0x07));
+		setbank(m_bg2_tilemap, 1, (data & 0x38) >> 3);
 	}
 }
 
@@ -234,10 +232,10 @@ WRITE16_MEMBER(aerofgt_state::turbofrc_gfxbank_w)
 
 	data = COMBINE_DATA(&m_bank[offset]);
 
-	setbank(machine(), tmap, 4 * offset + 0, (data >> 0) & 0x0f);
-	setbank(machine(), tmap, 4 * offset + 1, (data >> 4) & 0x0f);
-	setbank(machine(), tmap, 4 * offset + 2, (data >> 8) & 0x0f);
-	setbank(machine(), tmap, 4 * offset + 3, (data >> 12) & 0x0f);
+	setbank(tmap, 4 * offset + 0, (data >> 0) & 0x0f);
+	setbank(tmap, 4 * offset + 1, (data >> 4) & 0x0f);
+	setbank(tmap, 4 * offset + 2, (data >> 8) & 0x0f);
+	setbank(tmap, 4 * offset + 3, (data >> 12) & 0x0f);
 }
 
 WRITE16_MEMBER(aerofgt_state::aerofgt_gfxbank_w)
@@ -246,8 +244,8 @@ WRITE16_MEMBER(aerofgt_state::aerofgt_gfxbank_w)
 
 	data = COMBINE_DATA(&m_bank[offset]);
 
-	setbank(machine(), tmap, 2 * offset + 0, (data >> 8) & 0xff);
-	setbank(machine(), tmap, 2 * offset + 1, (data >> 0) & 0xff);
+	setbank(tmap, 2 * offset + 0, (data >> 8) & 0xff);
+	setbank(tmap, 2 * offset + 1, (data >> 0) & 0xff);
 }
 
 WRITE16_MEMBER(aerofgt_state::aerofgt_bg1scrollx_w)
@@ -422,7 +420,7 @@ VIDEO_START_MEMBER(aerofgt_state,wbbc97)
 
 	m_sprite_gfx = 1;
 
-	aerofgt_register_state_globals(machine());
+	aerofgt_register_state_globals();
 
 	save_item(NAME(m_wbbc97_bitmap_enable));
 }
@@ -432,8 +430,8 @@ WRITE16_MEMBER(aerofgt_state::pspikesb_gfxbank_w)
 {
 	COMBINE_DATA(&m_rasterram[0x200 / 2]);
 
-	setbank(machine(), m_bg1_tilemap, 0, (data & 0xf000) >> 12);
-	setbank(machine(), m_bg1_tilemap, 1, (data & 0x0f00) >> 8);
+	setbank(m_bg1_tilemap, 0, (data & 0xf000) >> 12);
+	setbank(m_bg1_tilemap, 1, (data & 0x0f00) >> 8);
 }
 
 // BOOTLEG
@@ -449,13 +447,12 @@ WRITE16_MEMBER(aerofgt_state::wbbc97_bitmap_enable_w)
 }
 
 // BOOTLEG
-static void aerfboo2_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
+void aerofgt_state::aerfboo2_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri )
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int attr_start, base, first;
 
 	base = chip * 0x0200;
-//  first = 4 * state->m_spriteram3[0x1fe + base];
+//  first = 4 * m_spriteram3[0x1fe + base];
 	first = 0;
 
 	for (attr_start = base + 0x0200 - 4; attr_start >= first + base; attr_start -= 4)
@@ -465,26 +462,26 @@ static void aerfboo2_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 // some other drivers still use this wrong table, they have to be upgraded
 //      int zoomtable[16] = { 0,7,14,20,25,30,34,38,42,46,49,52,54,57,59,61 };
 
-		if (!(state->m_spriteram3[attr_start + 2] & 0x0080))
+		if (!(m_spriteram3[attr_start + 2] & 0x0080))
 			continue;
 
-		pri = state->m_spriteram3[attr_start + 2] & 0x0010;
+		pri = m_spriteram3[attr_start + 2] & 0x0010;
 
 		if ( chip_disabled_pri & !pri)
 			continue;
 		if ((!chip_disabled_pri) & (pri >> 4))
 			continue;
-		ox = state->m_spriteram3[attr_start + 1] & 0x01ff;
-		xsize = (state->m_spriteram3[attr_start + 2] & 0x0700) >> 8;
-		zoomx = (state->m_spriteram3[attr_start + 1] & 0xf000) >> 12;
-		oy = state->m_spriteram3[attr_start + 0] & 0x01ff;
-		ysize = (state->m_spriteram3[attr_start + 2] & 0x7000) >> 12;
-		zoomy = (state->m_spriteram3[attr_start + 0] & 0xf000) >> 12;
-		flipx = state->m_spriteram3[attr_start + 2] & 0x0800;
-		flipy = state->m_spriteram3[attr_start + 2] & 0x8000;
-		color = (state->m_spriteram3[attr_start + 2] & 0x000f) + 16 * state->m_spritepalettebank;
+		ox = m_spriteram3[attr_start + 1] & 0x01ff;
+		xsize = (m_spriteram3[attr_start + 2] & 0x0700) >> 8;
+		zoomx = (m_spriteram3[attr_start + 1] & 0xf000) >> 12;
+		oy = m_spriteram3[attr_start + 0] & 0x01ff;
+		ysize = (m_spriteram3[attr_start + 2] & 0x7000) >> 12;
+		zoomy = (m_spriteram3[attr_start + 0] & 0xf000) >> 12;
+		flipx = m_spriteram3[attr_start + 2] & 0x0800;
+		flipy = m_spriteram3[attr_start + 2] & 0x8000;
+		color = (m_spriteram3[attr_start + 2] & 0x000f) + 16 * m_spritepalettebank;
 
-		map_start = state->m_spriteram3[attr_start + 3];
+		map_start = m_spriteram3[attr_start + 3];
 
 // aerofgt has this adjustment, but doing it here would break turbo force title screen
 //      ox += (xsize*zoomx+2)/4;
@@ -512,17 +509,17 @@ static void aerfboo2_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 					sx = ((ox + zoomx * x / 2 + 16) & 0x1ff) - 16;
 
 				if (chip == 0)
-					code = state->m_spriteram1[map_start % (state->m_spriteram1.bytes()/2)];
+					code = m_spriteram1[map_start % (m_spriteram1.bytes()/2)];
 				else
-					code = state->m_spriteram2[map_start % (state->m_spriteram2.bytes()/2)];
+					code = m_spriteram2[map_start % (m_spriteram2.bytes()/2)];
 
-				pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[state->m_sprite_gfx + chip],
+				pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx + chip],
 								code,
 								color,
 								flipx,flipy,
 								sx,sy,
 								zoomx << 11, zoomy << 11,
-								machine.priority_bitmap,pri ? 0 : 2,15);
+								machine().priority_bitmap,pri ? 0 : 2,15);
 				map_start++;
 			}
 
@@ -535,33 +532,32 @@ static void aerfboo2_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 }
 
 // BOOTLEG
-static void pspikesb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void aerofgt_state::pspikesb_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int i;
 
-	for (i = 4; i < state->m_spriteram3.bytes() / 2; i += 4)
+	for (i = 4; i < m_spriteram3.bytes() / 2; i += 4)
 	{
 		int xpos, ypos, color, flipx, flipy, code;
 
-		if (state->m_spriteram3[i + 3 - 4] & 0x8000)
+		if (m_spriteram3[i + 3 - 4] & 0x8000)
 			break;
 
-		xpos = (state->m_spriteram3[i + 2] & 0x1ff) - 34;
-		ypos = 256 - (state->m_spriteram3[i + 3 - 4] & 0x1ff) - 33;
-		code = state->m_spriteram3[i + 0] & 0x1fff;
+		xpos = (m_spriteram3[i + 2] & 0x1ff) - 34;
+		ypos = 256 - (m_spriteram3[i + 3 - 4] & 0x1ff) - 33;
+		code = m_spriteram3[i + 0] & 0x1fff;
 		flipy = 0;
-		flipx = state->m_spriteram3[i + 1] & 0x0800;
-		color = state->m_spriteram3[i + 1] & 0x000f;
+		flipx = m_spriteram3[i + 1] & 0x0800;
+		color = m_spriteram3[i + 1] & 0x000f;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[state->m_sprite_gfx],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx],
 				code,
 				color,
 				flipx,flipy,
 				xpos,ypos,15);
 
 		/* wrap around y */
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[state->m_sprite_gfx],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx],
 				code,
 				color,
 				flipx,flipy,
@@ -571,41 +567,40 @@ static void pspikesb_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 }
 
 // BOOTLEG
-static void spikes91_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void aerofgt_state::spikes91_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int i;
 	UINT8 *lookup;
-	lookup = state->memregion("user1")->base();
-	state->m_spritepalettebank = 1;
+	lookup = memregion("user1")->base();
+	m_spritepalettebank = 1;
 
-	for (i = state->m_spriteram3.bytes() / 2 - 4; i >= 4; i -= 4)
+	for (i = m_spriteram3.bytes() / 2 - 4; i >= 4; i -= 4)
 	{
 		int xpos, ypos, color, flipx, flipy, code, realcode;
 
-		code = state->m_spriteram3[i + 0] & 0x1fff;
+		code = m_spriteram3[i + 0] & 0x1fff;
 
 		if (!code)
 			continue;
 
-		xpos = (state->m_spriteram3[i + 2] & 0x01ff) - 16;
-		ypos = 256 - (state->m_spriteram3[i + 1] & 0x00ff) - 26;
+		xpos = (m_spriteram3[i + 2] & 0x01ff) - 16;
+		ypos = 256 - (m_spriteram3[i + 1] & 0x00ff) - 26;
 		flipy = 0;
-		flipx = state->m_spriteram3[i + 3] & 0x8000;
-		color = ((state->m_spriteram3[i + 3] & 0x00f0) >> 4);
+		flipx = m_spriteram3[i + 3] & 0x8000;
+		color = ((m_spriteram3[i + 3] & 0x00f0) >> 4);
 
-		code |= state->m_spikes91_lookup * 0x2000;
+		code |= m_spikes91_lookup * 0x2000;
 
 		realcode = (lookup[code] << 8) + lookup[0x10000 + code];
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[state->m_sprite_gfx],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx],
 				realcode,
 				color,
 				flipx,flipy,
 				xpos,ypos,15);
 
 		/* wrap around y */
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[state->m_sprite_gfx],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx],
 				realcode,
 				color,
 				flipx,flipy,
@@ -614,30 +609,29 @@ static void spikes91_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 }
 
 // BOOTLEG
-static void aerfboot_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void aerofgt_state::aerfboot_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int attr_start, last;
 
-	last = ((state->m_rasterram[0x404 / 2] << 5) - 0x8000) / 2;
+	last = ((m_rasterram[0x404 / 2] << 5) - 0x8000) / 2;
 
-	for (attr_start = state->m_spriteram3.bytes() / 2 - 4; attr_start >= last; attr_start -= 4)
+	for (attr_start = m_spriteram3.bytes() / 2 - 4; attr_start >= last; attr_start -= 4)
 	{
 		int code;
 		int ox, oy, sx, sy, zoomx, zoomy, flipx, flipy, color, pri;
 
-		ox = state->m_spriteram3[attr_start + 1] & 0x01ff;
-		oy = state->m_spriteram3[attr_start + 0] & 0x01ff;
-		flipx = state->m_spriteram3[attr_start + 2] & 0x0800;
-		flipy = state->m_spriteram3[attr_start + 2] & 0x8000;
-		color = state->m_spriteram3[attr_start + 2] & 0x000f;
+		ox = m_spriteram3[attr_start + 1] & 0x01ff;
+		oy = m_spriteram3[attr_start + 0] & 0x01ff;
+		flipx = m_spriteram3[attr_start + 2] & 0x0800;
+		flipy = m_spriteram3[attr_start + 2] & 0x8000;
+		color = m_spriteram3[attr_start + 2] & 0x000f;
 
-		zoomx = (state->m_spriteram3[attr_start + 1] & 0xf000) >> 12;
-		zoomy = (state->m_spriteram3[attr_start + 0] & 0xf000) >> 12;
-		pri = state->m_spriteram3[attr_start + 2] & 0x0010;
-		code = state->m_spriteram3[attr_start + 3] & 0x1fff;
+		zoomx = (m_spriteram3[attr_start + 1] & 0xf000) >> 12;
+		zoomy = (m_spriteram3[attr_start + 0] & 0xf000) >> 12;
+		pri = m_spriteram3[attr_start + 2] & 0x0010;
+		code = m_spriteram3[attr_start + 3] & 0x1fff;
 
-		if (!(state->m_spriteram3[attr_start + 2] & 0x0040))
+		if (!(m_spriteram3[attr_start + 2] & 0x0040))
 			code |= 0x2000;
 
 		zoomx = 32 + zoomx;
@@ -647,35 +641,35 @@ static void aerfboot_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 		sx = ((ox + 16 + 3) & 0x1ff) - 16;
 
-		pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[state->m_sprite_gfx + (code >= 0x1000 ? 0 : 1)],
+		pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx + (code >= 0x1000 ? 0 : 1)],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
 				zoomx << 11,zoomy << 11,
-				machine.priority_bitmap,pri ? 0 : 2,15);
+				machine().priority_bitmap,pri ? 0 : 2,15);
 
 	}
 
-	last = ((state->m_rasterram[0x402 / 2] << 5) - 0x8000) / 2;
+	last = ((m_rasterram[0x402 / 2] << 5) - 0x8000) / 2;
 
-	for (attr_start = ((state->m_spriteram3.bytes() / 2) / 2) - 4; attr_start >= last; attr_start -= 4)
+	for (attr_start = ((m_spriteram3.bytes() / 2) / 2) - 4; attr_start >= last; attr_start -= 4)
 	{
 		int code;
 		int ox, oy, sx, sy, zoomx, zoomy, flipx, flipy, color, pri;
 
-		ox = state->m_spriteram3[attr_start + 1] & 0x01ff;
-		oy = state->m_spriteram3[attr_start + 0] & 0x01ff;
-		flipx = state->m_spriteram3[attr_start + 2] & 0x0800;
-		flipy = state->m_spriteram3[attr_start + 2] & 0x8000;
-		color = state->m_spriteram3[attr_start + 2] & 0x000f;
+		ox = m_spriteram3[attr_start + 1] & 0x01ff;
+		oy = m_spriteram3[attr_start + 0] & 0x01ff;
+		flipx = m_spriteram3[attr_start + 2] & 0x0800;
+		flipy = m_spriteram3[attr_start + 2] & 0x8000;
+		color = m_spriteram3[attr_start + 2] & 0x000f;
 
-		zoomx = (state->m_spriteram3[attr_start + 1] & 0xf000) >> 12;
-		zoomy = (state->m_spriteram3[attr_start + 0] & 0xf000) >> 12;
-		pri = state->m_spriteram3[attr_start + 2] & 0x0010;
-		code = state->m_spriteram3[attr_start + 3] & 0x1fff;
+		zoomx = (m_spriteram3[attr_start + 1] & 0xf000) >> 12;
+		zoomy = (m_spriteram3[attr_start + 0] & 0xf000) >> 12;
+		pri = m_spriteram3[attr_start + 2] & 0x0010;
+		code = m_spriteram3[attr_start + 3] & 0x1fff;
 
-		if (!(state->m_spriteram3[attr_start + 2] & 0x0040))
+		if (!(m_spriteram3[attr_start + 2] & 0x0040))
 			code |= 0x2000;
 
 		zoomx = 32 + zoomx;
@@ -685,32 +679,31 @@ static void aerfboot_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 		sx = ((ox + 16 + 3) & 0x1ff) - 16;
 
-		pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[state->m_sprite_gfx + (code >= 0x1000 ? 0 : 1)],
+		pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[m_sprite_gfx + (code >= 0x1000 ? 0 : 1)],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
 				zoomx << 11,zoomy << 11,
-				machine.priority_bitmap,pri ? 0 : 2,15);
+				machine().priority_bitmap,pri ? 0 : 2,15);
 
 	}
 }
 
 // BOOTLEG
-static void wbbc97_draw_bitmap( running_machine &machine, bitmap_rgb32 &bitmap )
+void aerofgt_state::wbbc97_draw_bitmap( bitmap_rgb32 &bitmap )
 {
-	aerofgt_state *state = machine.driver_data<aerofgt_state>();
 	int x, y, count;
 
 	count = 16; // weird, the bitmap doesn't start at 0?
 	for (y = 0; y < 256; y++)
 		for (x = 0; x < 512; x++)
 		{
-			int color = state->m_bitmapram[count] >> 1;
+			int color = m_bitmapram[count] >> 1;
 
 			/* data is GRB; convert to RGB */
 			rgb_t pen = MAKE_RGB(pal5bit((color & 0x3e0) >> 5), pal5bit((color & 0x7c00) >> 10), pal5bit(color & 0x1f));
-			bitmap.pix32(y, (10 + x - state->m_rasterram[(y & 0x7f)]) & 0x1ff) = pen;
+			bitmap.pix32(y, (10 + x - m_rasterram[(y & 0x7f)]) & 0x1ff) = pen;
 
 			count++;
 			count &= 0x1ffff;
@@ -729,7 +722,7 @@ UINT32 aerofgt_state::screen_update_pspikesb(screen_device &screen, bitmap_ind16
 	m_bg1_tilemap->set_scrolly(0, scrolly);
 
 	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	pspikesb_draw_sprites(machine(), bitmap, cliprect);
+	pspikesb_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -749,7 +742,7 @@ UINT32 aerofgt_state::screen_update_spikes91(screen_device &screen, bitmap_ind16
 	m_bg1_tilemap->set_scrolly(0, scrolly);
 
 	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	spikes91_draw_sprites(machine(), bitmap, cliprect);
+	spikes91_draw_sprites(bitmap, cliprect);
 
 	/* we could use a tilemap, but it's easier to just do it here */
 	count = 0;
@@ -793,7 +786,7 @@ UINT32 aerofgt_state::screen_update_aerfboot(screen_device &screen, bitmap_ind16
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	aerfboot_draw_sprites(machine(), bitmap, cliprect);
+	aerfboot_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -817,10 +810,10 @@ UINT32 aerofgt_state::screen_update_aerfboo2(screen_device &screen, bitmap_ind16
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 1);
 
 	/* we use the priority buffer so sprites are drawn front to back */
-	aerfboo2_draw_sprites(machine(), bitmap, cliprect, 1, -1); //ship
-	aerfboo2_draw_sprites(machine(), bitmap, cliprect, 1, 0); //intro
-	aerfboo2_draw_sprites(machine(), bitmap, cliprect, 0, -1); //enemy
-	aerfboo2_draw_sprites(machine(), bitmap, cliprect, 0, 0); //enemy
+	aerfboo2_draw_sprites(bitmap, cliprect, 1, -1); //ship
+	aerfboo2_draw_sprites(bitmap, cliprect, 1, 0); //intro
+	aerfboo2_draw_sprites(bitmap, cliprect, 0, -1); //enemy
+	aerfboo2_draw_sprites(bitmap, cliprect, 0, 0); //enemy
 	return 0;
 }
 
@@ -839,7 +832,7 @@ UINT32 aerofgt_state::screen_update_wbbc97(screen_device &screen, bitmap_rgb32 &
 
 	if (m_wbbc97_bitmap_enable)
 	{
-		wbbc97_draw_bitmap(machine(), bitmap);
+		wbbc97_draw_bitmap(bitmap);
 		m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else

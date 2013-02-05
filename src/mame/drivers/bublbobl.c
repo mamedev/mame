@@ -1531,15 +1531,15 @@ ROM_END
  *
  *************************************/
 
-static void configure_banks( running_machine& machine )
+void bublbobl_state::configure_banks(  )
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	machine().root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
 DRIVER_INIT_MEMBER(bublbobl_state,bublbobl)
 {
-	configure_banks(machine());
+	configure_banks();
 
 	/* we init this here, so that it does not conflict with tokio init, below */
 	m_video_enable = 0;
@@ -1547,7 +1547,7 @@ DRIVER_INIT_MEMBER(bublbobl_state,bublbobl)
 
 DRIVER_INIT_MEMBER(bublbobl_state,tokio)
 {
-	configure_banks(machine());
+	configure_banks();
 
 	/* preemptively enable video, the bit is not mapped for this game and */
 	/* I don't know if it even has it. */

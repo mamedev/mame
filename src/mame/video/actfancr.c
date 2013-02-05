@@ -11,15 +11,14 @@
 
 /******************************************************************************/
 
-static void register_savestate( running_machine &machine )
+void actfancr_state::register_savestate()
 {
-	actfancr_state *state = machine.driver_data<actfancr_state>();
-	state->save_item(NAME(state->m_flipscreen));
+	save_item(NAME(m_flipscreen));
 }
 
 void actfancr_state::video_start()
 {
-	register_savestate(machine());
+	register_savestate();
 }
 
 /******************************************************************************/

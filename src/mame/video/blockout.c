@@ -8,7 +8,7 @@
 #include "includes/blockout.h"
 
 
-static void setcolor( running_machine &machine, int color, int rgb )
+void blockout_state::setcolor( int color, int rgb )
 {
 	int bit0, bit1, bit2, bit3;
 	int r, g, b;
@@ -35,19 +35,19 @@ static void setcolor( running_machine &machine, int color, int rgb )
 	bit3 = (rgb >> 11) & 0x01;
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(machine, color, MAKE_RGB(r,g,b));
+	palette_set_color(machine(), color, MAKE_RGB(r,g,b));
 }
 
 WRITE16_MEMBER(blockout_state::blockout_paletteram_w)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
-	setcolor(machine(), offset, m_paletteram[offset]);
+	setcolor(offset, m_paletteram[offset]);
 }
 
 WRITE16_MEMBER(blockout_state::blockout_frontcolor_w)
 {
 	COMBINE_DATA(&m_color);
-	setcolor(machine(), 512, m_color);
+	setcolor(512, m_color);
 }
 
 
@@ -64,32 +64,31 @@ void blockout_state::video_start()
 	save_item(NAME(m_tmpbitmap));
 }
 
-static void update_pixels( running_machine &machine, int x, int y )
+void blockout_state::update_pixels( int x, int y )
 {
-	blockout_state *state = machine.driver_data<blockout_state>();
 	UINT16 front, back;
 	int color;
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine().primary_screen->visible_area();
 
 	if (!visarea.contains(x, y))
 		return;
 
-	front = state->m_videoram[y * 256 + x / 2];
-	back = state->m_videoram[0x10000 + y * 256 + x / 2];
+	front = m_videoram[y * 256 + x / 2];
+	back = m_videoram[0x10000 + y * 256 + x / 2];
 
 	if (front >> 8)
 		color = front >> 8;
 	else
 		color = (back >> 8) + 256;
 
-	state->m_tmpbitmap.pix16(y, x) = color;
+	m_tmpbitmap.pix16(y, x) = color;
 
 	if (front & 0xff)
 		color = front & 0xff;
 	else
 		color = (back & 0xff) + 256;
 
-	state->m_tmpbitmap.pix16(y, x + 1) = color;
+	m_tmpbitmap.pix16(y, x + 1) = color;
 }
 
 
@@ -97,7 +96,7 @@ static void update_pixels( running_machine &machine, int x, int y )
 WRITE16_MEMBER(blockout_state::blockout_videoram_w)
 {
 	COMBINE_DATA(&m_videoram[offset]);
-	update_pixels(machine(), (offset % 256) * 2, (offset / 256) % 256);
+	update_pixels((offset % 256) * 2, (offset / 256) % 256);
 }
 
 

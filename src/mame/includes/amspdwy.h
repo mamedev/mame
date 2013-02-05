@@ -44,4 +44,6 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_amspdwy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	UINT8 amspdwy_wheel_r( int index );
 };

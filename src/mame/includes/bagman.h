@@ -49,6 +49,7 @@ public:
 	DECLARE_PALETTE_INIT(bagman);
 	UINT32 screen_update_bagman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- timings -----------*/

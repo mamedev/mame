@@ -211,33 +211,32 @@ VIDEO_START_MEMBER(arkanoid_state,arkanoid)
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(arkanoid_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void arkanoid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	arkanoid_state *state = machine.driver_data<arkanoid_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int sx, sy, code;
 
-		sx = state->m_spriteram[offs];
-		sy = 248 - state->m_spriteram[offs + 1];
-		if (state->flip_screen_x())
+		sx = m_spriteram[offs];
+		sy = 248 - m_spriteram[offs + 1];
+		if (flip_screen_x())
 			sx = 248 - sx;
-		if (state->flip_screen_y())
+		if (flip_screen_y())
 			sy = 248 - sy;
 
-		code = state->m_spriteram[offs + 3] + ((state->m_spriteram[offs + 2] & 0x03) << 8) + 1024 * state->m_gfxbank;
+		code = m_spriteram[offs + 3] + ((m_spriteram[offs + 2] & 0x03) << 8) + 1024 * m_gfxbank;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				2 * code,
-				((state->m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * state->m_palettebank,
-				state->flip_screen_x(),state->flip_screen_y(),
-				sx,sy + (state->flip_screen_y() ? 8 : -8),0);
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+				((m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * m_palettebank,
+				flip_screen_x(),flip_screen_y(),
+				sx,sy + (flip_screen_y() ? 8 : -8),0);
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				2 * code + 1,
-				((state->m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * state->m_palettebank,
-				state->flip_screen_x(),state->flip_screen_y(),
+				((m_spriteram[offs + 2] & 0xf8) >> 3) + 32 * m_palettebank,
+				flip_screen_x(),flip_screen_y(),
 				sx,sy,0);
 	}
 }
@@ -246,7 +245,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 arkanoid_state::screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 

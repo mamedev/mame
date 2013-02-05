@@ -29,4 +29,5 @@ public:
 	virtual void video_start();
 	INTERRUPT_GEN_MEMBER(aztarac_snd_timed_irq);
 	IRQ_CALLBACK_MEMBER(aztarac_irq_callback);
+	inline void read_vectorram(UINT16 *vectorram, int addr, int *x, int *y, int *c);
 };

@@ -12,9 +12,6 @@
 #include "video/atarimo.h"
 #include "includes/arcadecl.h"
 
-
-static void arcadecl_bitmap_render(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 /*************************************
  *
  *  Video system start
@@ -80,7 +77,7 @@ VIDEO_START_MEMBER(arcadecl_state,arcadecl)
 UINT32 arcadecl_state::screen_update_arcadecl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* draw the playfield */
-	arcadecl_bitmap_render(machine(), bitmap, cliprect);
+	arcadecl_bitmap_render(bitmap, cliprect);
 
 	/* draw and merge the MO */
 	if (m_has_mo)
@@ -118,15 +115,14 @@ UINT32 arcadecl_state::screen_update_arcadecl(screen_device &screen, bitmap_ind1
  *
  *************************************/
 
-static void arcadecl_bitmap_render(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void arcadecl_state::arcadecl_bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	arcadecl_state *state = machine.driver_data<arcadecl_state>();
 	int x, y;
 
 	/* update any dirty scanlines */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const UINT16 *src = &state->m_bitmap[256 * y];
+		const UINT16 *src = &m_bitmap[256 * y];
 		UINT16 *dst = &bitmap.pix16(y);
 
 		/* regenerate the line */

@@ -85,4 +85,15 @@ public:
 	UINT32 screen_update_butasan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(argus_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(butasan_scanline);
+	void reset_common();
+	void argus_write_dummy_rams(int dramoffs, int vromoffs);
+	void argus_change_palette(int color, int lo_offs, int hi_offs);
+	void argus_change_bg_palette(int color, int lo_offs, int hi_offs);
+	void bg_setting();
+	void argus_bg0_scroll_handle();
+	void argus_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority);
+	void valtric_draw_mosaic(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void valtric_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void butasan_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void butasan_log_vram();
 };
