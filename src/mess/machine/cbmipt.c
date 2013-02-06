@@ -1129,6 +1129,7 @@ SLOT_INTERFACE_START( c64_expansion_cards )
 	SLOT_INTERFACE("sfxse", C64_SFX_SOUND_EXPANDER)
 	SLOT_INTERFACE("supercpu", C64_SUPERCPU)
 	SLOT_INTERFACE("swiftlink", C64_SWIFTLINK)
+	SLOT_INTERFACE("turbo232", C64_TURBO232)
 
 	// the following need ROMs from the software list
 	SLOT_INTERFACE_INTERNAL("standard", C64_STD)

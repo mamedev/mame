@@ -889,6 +889,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/c64_swiftlink.o   \
 	$(MESS_MACHINE)/c64_system3.o   \
 	$(MESS_MACHINE)/c64_tdos.o  \
+	$(MESS_MACHINE)/c64_turbo232.o  \
 	$(MESS_MACHINE)/c64_vw64.o  \
 	$(MESS_MACHINE)/c64_warp_speed.o    \
 	$(MESS_MACHINE)/c64_westermann.o    \

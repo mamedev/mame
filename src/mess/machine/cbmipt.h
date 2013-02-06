@@ -58,6 +58,7 @@
 #include "machine/c64_swiftlink.h"
 #include "machine/c64_system3.h"
 #include "machine/c64_tdos.h"
+#include "machine/c64_turbo232.h"
 #include "machine/c64_vw64.h"
 #include "machine/c64_warp_speed.h"
 #include "machine/c64_westermann.h"
