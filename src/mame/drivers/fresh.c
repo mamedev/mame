@@ -31,6 +31,8 @@ public:
 		: driver_device(mconfig, type, tag) ,
 		m_bg_videoram(*this, "bg_videoram"),
 		m_bg_2_videoram(*this, "bg_videoram_2"),
+		m_attr_videoram(*this, "attr_videoram"),
+		m_attr_2_videoram(*this, "attr_videoram_2"),
 		m_paletteram_1(*this, "paletteram_1"),
 		m_paletteram_2(*this, "paletteram_2")
 	
@@ -41,14 +43,23 @@ public:
 
 	required_shared_ptr<UINT16> m_bg_videoram;
 	required_shared_ptr<UINT16> m_bg_2_videoram;
+	required_shared_ptr<UINT16> m_attr_videoram;
+	required_shared_ptr<UINT16> m_attr_2_videoram;
 
 	required_shared_ptr<UINT16> m_paletteram_1;
 	required_shared_ptr<UINT16> m_paletteram_2;
 
 	DECLARE_WRITE16_MEMBER(fresh_bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(fresh_attr_videoram_w);
 	TILE_GET_INFO_MEMBER(get_fresh_bg_tile_info);
 	DECLARE_WRITE16_MEMBER(fresh_bg_2_videoram_w);
+	DECLARE_WRITE16_MEMBER(fresh_attr_2_videoram_w);
 	TILE_GET_INFO_MEMBER(get_fresh_bg_2_tile_info);
+
+	DECLARE_WRITE16_MEMBER(fresh_paletteram_1_w);
+	DECLARE_WRITE16_MEMBER(fresh_paletteram_2_w);
+
+	void update_palette(int offset);
 
 	DECLARE_READ16_MEMBER( unk_r )
 	{
@@ -69,9 +80,10 @@ public:
 
 TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_tile_info)
 {
-	int tileno;
+	int tileno, pal;
 	tileno = m_bg_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);
+	pal = m_attr_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(1, tileno, pal, 0);
 }
 
 
@@ -81,11 +93,19 @@ WRITE16_MEMBER(fresh_state::fresh_bg_videoram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
+WRITE16_MEMBER(fresh_state::fresh_attr_videoram_w)
+{
+	COMBINE_DATA(&m_attr_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+
 TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_2_tile_info)
 {
-	int tileno;
+	int tileno, pal;
 	tileno = m_bg_2_videoram[tile_index];
-	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
+	pal = m_attr_2_videoram[tile_index];
+	SET_TILE_INFO_MEMBER(0, tileno, pal, 0);
 }
 
 
@@ -94,6 +114,34 @@ WRITE16_MEMBER(fresh_state::fresh_bg_2_videoram_w)
 	COMBINE_DATA(&m_bg_2_videoram[offset]);
 	m_bg_2_tilemap->mark_tile_dirty(offset);
 }
+
+WRITE16_MEMBER(fresh_state::fresh_attr_2_videoram_w)
+{
+	COMBINE_DATA(&m_attr_2_videoram[offset]);
+	m_bg_2_tilemap->mark_tile_dirty(offset);
+}
+
+
+void fresh_state::update_palette( int offset )
+{
+	UINT16 pal1 = m_paletteram_1[offset];
+	UINT8 pal2 = m_paletteram_2[offset];
+
+	palette_set_color(machine(),offset,MAKE_RGB(pal1&0xff,(pal1>>8)&0xff,pal2));
+}
+
+WRITE16_MEMBER(fresh_state::fresh_paletteram_1_w)
+{
+	COMBINE_DATA(&m_paletteram_1[offset]);
+	update_palette(offset);
+}
+
+WRITE16_MEMBER(fresh_state::fresh_paletteram_2_w)
+{
+	COMBINE_DATA(&m_paletteram_2[offset]);
+	update_palette(offset);
+}
+
 
 
 
@@ -118,14 +166,14 @@ static ADDRESS_MAP_START( fresh_map, AS_PROGRAM, 16, fresh_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	AM_RANGE(0xC00000, 0xC0ffff) AM_RAM_WRITE( fresh_bg_2_videoram_w ) AM_SHARE( "bg_videoram_2" )
-	AM_RANGE(0xC10000, 0xC1ffff) AM_RAM
+	AM_RANGE(0xC10000, 0xC1ffff) AM_RAM_WRITE( fresh_attr_2_videoram_w ) AM_SHARE( "attr_videoram_2" )
 	AM_RANGE(0xC20000, 0xC2ffff) AM_RAM_WRITE( fresh_bg_videoram_w ) AM_SHARE( "bg_videoram" )
-	AM_RANGE(0xC30000, 0xC3ffff) AM_RAM 
+	AM_RANGE(0xC30000, 0xC3ffff) AM_RAM_WRITE( fresh_attr_videoram_w ) AM_SHARE( "attr_videoram" )
 
 
 	// written together
-	AM_RANGE(0xC40000, 0xC417ff) AM_RAM AM_SHARE( "paletteram_1" ) // 16-bit
-	AM_RANGE(0xC50000, 0xC517ff) AM_RAM AM_SHARE( "paletteram_2" ) // 8-bit
+	AM_RANGE(0xC40000, 0xC417ff) AM_RAM_WRITE(fresh_paletteram_1_w) AM_SHARE( "paletteram_1" ) // 16-bit
+	AM_RANGE(0xC50000, 0xC517ff) AM_RAM_WRITE(fresh_paletteram_2_w) AM_SHARE( "paletteram_2" ) // 8-bit
 
 	AM_RANGE(0xD40000, 0xD40001) AM_READ_PORT("IN0")
 	AM_RANGE(0xD70000, 0xD70001) AM_READ_PORT("IN1")
@@ -558,8 +606,8 @@ static const gfx_layout tiles8x8_layout =
 
 
 static GFXDECODE_START( fresh )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 2 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 2 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
 
@@ -594,7 +642,7 @@ static MACHINE_CONFIG_START( fresh, fresh_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(fresh_state, screen_update_fresh)
 
-	MCFG_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x1000) // or 0xc00
 	MCFG_GFXDECODE(fresh)
 
 	/* sound hw? */
@@ -616,5 +664,5 @@ ROM_END
 
 
 
-
-GAME( 1996, fresh, 0, fresh, fresh, driver_device, 0, ROT0, "Chain Leisure", "Fruit Fresh", GAME_NOT_WORKING|GAME_NO_SOUND )
+// title shows Fruit Fresh but on resetting you get text strings of 'Dream World V2.41SI 97. 1.28' 
+GAME( 1996, fresh, 0, fresh, fresh, driver_device, 0, ROT0, "Chain Leisure", "Fruit Fresh (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )
