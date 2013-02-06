@@ -2438,6 +2438,58 @@ INLINE UINT32 stv_add_blend(UINT32 a, UINT32 b)
 	);
 }
 
+
+static void stv_vdp2_compute_color_offset( running_machine &machine,int *r, int *g, int *b, int cor )
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	if ( cor == 0 )
+	{
+		*r = (STV_VDP2_COAR & 0x100) ? (*r - (0x100 - (STV_VDP2_COAR & 0xff))) : ((STV_VDP2_COAR & 0xff) + *r);
+		*g = (STV_VDP2_COAG & 0x100) ? (*g - (0x100 - (STV_VDP2_COAG & 0xff))) : ((STV_VDP2_COAG & 0xff) + *g);
+		*b = (STV_VDP2_COAB & 0x100) ? (*b - (0x100 - (STV_VDP2_COAB & 0xff))) : ((STV_VDP2_COAB & 0xff) + *b);
+	}
+	else
+	{
+		*r = (STV_VDP2_COBR & 0x100) ? (*r - (0xff - (STV_VDP2_COBR & 0xff))) : ((STV_VDP2_COBR & 0xff) + *r);
+		*g = (STV_VDP2_COBG & 0x100) ? (*g - (0xff - (STV_VDP2_COBG & 0xff))) : ((STV_VDP2_COBG & 0xff) + *g);
+		*b = (STV_VDP2_COBB & 0x100) ? (*b - (0xff - (STV_VDP2_COBB & 0xff))) : ((STV_VDP2_COBB & 0xff) + *b);
+	}
+	if(*r < 0)      { *r = 0; }
+	if(*r > 0xff)   { *r = 0xff; }
+	if(*g < 0)      { *g = 0; }
+	if(*g > 0xff)   { *g = 0xff; }
+	if(*b < 0)      { *b = 0; }
+	if(*b > 0xff)   { *b = 0xff; }
+}
+
+static void stv_vdp2_compute_color_offset_UINT32(running_machine &machine,UINT32 *rgb, int cor)
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+	int _r = RGB_RED(*rgb);
+	int _g = RGB_GREEN(*rgb);
+	int _b = RGB_BLUE(*rgb);
+	if ( cor == 0 )
+	{
+		_r = (STV_VDP2_COAR & 0x100) ? (_r - (0x100 - (STV_VDP2_COAR & 0xff))) : ((STV_VDP2_COAR & 0xff) + _r);
+		_g = (STV_VDP2_COAG & 0x100) ? (_g - (0x100 - (STV_VDP2_COAG & 0xff))) : ((STV_VDP2_COAG & 0xff) + _g);
+		_b = (STV_VDP2_COAB & 0x100) ? (_b - (0x100 - (STV_VDP2_COAB & 0xff))) : ((STV_VDP2_COAB & 0xff) + _b);
+	}
+	else
+	{
+		_r = (STV_VDP2_COBR & 0x100) ? (_r - (0xff - (STV_VDP2_COBR & 0xff))) : ((STV_VDP2_COBR & 0xff) + _r);
+		_g = (STV_VDP2_COBG & 0x100) ? (_g - (0xff - (STV_VDP2_COBG & 0xff))) : ((STV_VDP2_COBG & 0xff) + _g);
+		_b = (STV_VDP2_COBB & 0x100) ? (_b - (0xff - (STV_VDP2_COBB & 0xff))) : ((STV_VDP2_COBB & 0xff) + _b);
+	}
+	if(_r < 0)      { _r = 0; }
+	if(_r > 0xff)   { _r = 0xff; }
+	if(_g < 0)      { _g = 0; }
+	if(_g > 0xff)   { _g = 0xff; }
+	if(_b < 0)      { _b = 0; }
+	if(_b > 0xff)   { _b = 0xff; }
+
+	*rgb = MAKE_RGB(_r, _g, _b);
+}
+
 static void stv_vdp2_drawgfxzoom_rgb555(
 		bitmap_rgb32 &dest_bmp,const rectangle &clip,running_machine &machine,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
@@ -2565,6 +2617,9 @@ static void stv_vdp2_drawgfxzoom_rgb555(
 							b = pal5bit((data & 0x7c00) >> 10);
 							g = pal5bit((data & 0x03e0) >> 5);
 							r = pal5bit( data & 0x001f);
+							if(stv2_current_tilemap.fade_control & 1)
+								stv_vdp2_compute_color_offset(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+
 							dest[x] = MAKE_RGB(r, g, b);
 							x_index += dx;
 						}
@@ -2589,6 +2644,9 @@ static void stv_vdp2_drawgfxzoom_rgb555(
 							b = pal5bit((data & 0x7c00) >> 10);
 							g = pal5bit((data & 0x03e0) >> 5);
 							r = pal5bit( data & 0x001f);
+							if(stv2_current_tilemap.fade_control & 1)
+								stv_vdp2_compute_color_offset(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+
 							if( data ) dest[x] = MAKE_RGB(r, g, b);
 							x_index += dx;
 						}
@@ -2613,6 +2671,9 @@ static void stv_vdp2_drawgfxzoom_rgb555(
 							b = pal5bit((data & 0x7c00) >> 10);
 							g = pal5bit((data & 0x03e0) >> 5);
 							r = pal5bit( data & 0x001f);
+							if(stv2_current_tilemap.fade_control & 1)
+								stv_vdp2_compute_color_offset(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+
 							if( data ) dest[x] = alpha_blend_r32(dest[x], MAKE_RGB(r, g, b), alpha);
 							x_index += dx;
 						}
@@ -2637,6 +2698,9 @@ static void stv_vdp2_drawgfxzoom_rgb555(
 							b = pal5bit((data & 0x7c00) >> 10);
 							g = pal5bit((data & 0x03e0) >> 5);
 							r = pal5bit( data & 0x001f);
+							if(stv2_current_tilemap.fade_control & 1)
+								stv_vdp2_compute_color_offset(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+
 							if( data ) dest[x] = stv_add_blend(dest[x], MAKE_RGB(r, g, b));
 							x_index += dx;
 						}
@@ -2842,56 +2906,6 @@ static void stv_vdp2_drawgfxzoom(
 
 }
 
-static void stv_vdp2_compute_color_offset( running_machine &machine,int *r, int *g, int *b, int cor )
-{
-	saturn_state *state = machine.driver_data<saturn_state>();
-	if ( cor == 0 )
-	{
-		*r = (STV_VDP2_COAR & 0x100) ? (*r - (0x100 - (STV_VDP2_COAR & 0xff))) : ((STV_VDP2_COAR & 0xff) + *r);
-		*g = (STV_VDP2_COAG & 0x100) ? (*g - (0x100 - (STV_VDP2_COAG & 0xff))) : ((STV_VDP2_COAG & 0xff) + *g);
-		*b = (STV_VDP2_COAB & 0x100) ? (*b - (0x100 - (STV_VDP2_COAB & 0xff))) : ((STV_VDP2_COAB & 0xff) + *b);
-	}
-	else
-	{
-		*r = (STV_VDP2_COBR & 0x100) ? (*r - (0xff - (STV_VDP2_COBR & 0xff))) : ((STV_VDP2_COBR & 0xff) + *r);
-		*g = (STV_VDP2_COBG & 0x100) ? (*g - (0xff - (STV_VDP2_COBG & 0xff))) : ((STV_VDP2_COBG & 0xff) + *g);
-		*b = (STV_VDP2_COBB & 0x100) ? (*b - (0xff - (STV_VDP2_COBB & 0xff))) : ((STV_VDP2_COBB & 0xff) + *b);
-	}
-	if(*r < 0)      { *r = 0; }
-	if(*r > 0xff)   { *r = 0xff; }
-	if(*g < 0)      { *g = 0; }
-	if(*g > 0xff)   { *g = 0xff; }
-	if(*b < 0)      { *b = 0; }
-	if(*b > 0xff)   { *b = 0xff; }
-}
-
-static void stv_vdp2_compute_color_offset_UINT32(running_machine &machine,UINT32 *rgb, int cor)
-{
-	saturn_state *state = machine.driver_data<saturn_state>();
-	int _r = RGB_RED(*rgb);
-	int _g = RGB_GREEN(*rgb);
-	int _b = RGB_BLUE(*rgb);
-	if ( cor == 0 )
-	{
-		_r = (STV_VDP2_COAR & 0x100) ? (_r - (0x100 - (STV_VDP2_COAR & 0xff))) : ((STV_VDP2_COAR & 0xff) + _r);
-		_g = (STV_VDP2_COAG & 0x100) ? (_g - (0x100 - (STV_VDP2_COAG & 0xff))) : ((STV_VDP2_COAG & 0xff) + _g);
-		_b = (STV_VDP2_COAB & 0x100) ? (_b - (0x100 - (STV_VDP2_COAB & 0xff))) : ((STV_VDP2_COAB & 0xff) + _b);
-	}
-	else
-	{
-		_r = (STV_VDP2_COBR & 0x100) ? (_r - (0xff - (STV_VDP2_COBR & 0xff))) : ((STV_VDP2_COBR & 0xff) + _r);
-		_g = (STV_VDP2_COBG & 0x100) ? (_g - (0xff - (STV_VDP2_COBG & 0xff))) : ((STV_VDP2_COBG & 0xff) + _g);
-		_b = (STV_VDP2_COBB & 0x100) ? (_b - (0xff - (STV_VDP2_COBB & 0xff))) : ((STV_VDP2_COBB & 0xff) + _b);
-	}
-	if(_r < 0)      { _r = 0; }
-	if(_r > 0xff)   { _r = 0xff; }
-	if(_g < 0)      { _g = 0; }
-	if(_g > 0xff)   { _g = 0xff; }
-	if(_b < 0)      { _b = 0; }
-	if(_b > 0xff)   { _b = 0xff; }
-
-	*rgb = MAKE_RGB(_r, _g, _b);
-}
 
 static void stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle &clip, running_machine &machine, UINT32 code, int flipx, int flipy,
 										int sx, int sy, int transparency, int alpha)
