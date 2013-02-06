@@ -556,10 +556,8 @@ private:
 	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_8x8_1_size1);
 	TILEMAP_MAPPER_MEMBER(slrasslt_scan_layer_8x8_0_size0);
 	TILEMAP_MAPPER_MEMBER(slrasslt_scan_layer_8x8_1_size0);
-	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_roz_0_size0);
-	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_roz_0_size1);
-	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_roz_1_size0);
-	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_roz_1_size1);
+	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_roz_256);
+	TILEMAP_MAPPER_MEMBER(k001604_scan_layer_roz_128);
 	TILE_GET_INFO_MEMBER(k001604_tile_info_layer_8x8);
 	TILE_GET_INFO_MEMBER(k001604_tile_info_layer_roz);
 };
