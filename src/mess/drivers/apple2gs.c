@@ -272,7 +272,7 @@ WRITE8_MEMBER(apple2gs_state::a2bus_nmi_w)
 WRITE8_MEMBER(apple2gs_state::a2bus_inh_w)
 {
     m_inh_slot = data;
-    apple2_update_memory(machine());
+    apple2_update_memory();
 }
 
 static const struct a2bus_interface a2bus_intf =

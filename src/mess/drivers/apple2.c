@@ -237,7 +237,7 @@ WRITE8_MEMBER(apple2_state::a2bus_nmi_w)
 WRITE8_MEMBER(apple2_state::a2bus_inh_w)
 {
 	m_inh_slot = data;
-	apple2_update_memory(machine());
+	apple2_update_memory();
 }
 
 /***************************************************************************
@@ -707,6 +707,7 @@ static MACHINE_CONFIG_DERIVED( apple2p, apple2_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
+	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2e)
 	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2e)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -748,6 +749,7 @@ static MACHINE_CONFIG_DERIVED( tk2000, apple2_common )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mprof3, apple2e )
+	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2)
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -763,6 +765,8 @@ static MACHINE_CONFIG_DERIVED( apple2ep, apple2e )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( apple2c, apple2ee )
+	MCFG_MACHINE_START_OVERRIDE(apple2_state,apple2)
+
 	MCFG_A2BUS_SLOT_REMOVE("sl1")   // IIc has no slots, of course :)
 	MCFG_A2BUS_SLOT_REMOVE("sl2")
 	MCFG_A2BUS_SLOT_REMOVE("sl3")

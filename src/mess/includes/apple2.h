@@ -75,7 +75,8 @@
 enum machine_type_t
 {
 	APPLE_II,           // Apple II/II+
-	APPLE_IIEPLUS,      // Apple IIe/IIc/IIgs/IIc+
+	APPLE_IIE,			// Apple IIe with aux slots
+	APPLE_IIEPLUS,      // Apple IIc/IIgs/IIc+ with permanent aux memory
 	TK2000,             // Microdigital TK2000
 	LASER128,           // Laser 128/128EX/128EX2
 	SPACE84             // "Space 84" with flipped text mode
@@ -257,6 +258,7 @@ public:
 	read8_delegate rd_inh_e000;
 	write8_delegate wd_inh_e000;
 	DECLARE_MACHINE_START(apple2);
+	DECLARE_MACHINE_START(apple2e);
 	DECLARE_VIDEO_START(apple2);
 	DECLARE_PALETTE_INIT(apple2);
 	DECLARE_MACHINE_START(apple2orig);
@@ -272,6 +274,8 @@ public:
 	DECLARE_WRITE8_MEMBER(a2bus_inh_w);
 	void apple2_update_memory_postload();
 	virtual void machine_reset();
+	void apple2_setup_memory(const apple2_memmap_config *config);
+	void apple2_update_memory();
 };
 
 
@@ -305,9 +309,6 @@ INT8 apple2_slotram_r(running_machine &machine, int slotnum, int offset);
 void apple2_setvar(running_machine &machine, UINT32 val, UINT32 mask);
 
 int apple2_pressed_specialkey(running_machine &machine, UINT8 key);
-
-void apple2_setup_memory(running_machine &machine, const apple2_memmap_config *config);
-void apple2_update_memory(running_machine &machine);
 
 /*----------- defined in video/apple2.c -----------*/
 
