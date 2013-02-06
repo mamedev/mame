@@ -51,6 +51,7 @@ public:
 	a2600_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_riot_ram(*this, "riot_ram")
+		, m_banking_mode(0xff)
 		, m_joy1(*this, CONTROL1_TAG)
 		, m_joy2(*this, CONTROL2_TAG)
 		{ }
@@ -128,7 +129,6 @@ public:
 	DECLARE_WRITE8_MEMBER(switch_B_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_callback);
 	DECLARE_READ8_MEMBER(riot_input_port_8_r);
-	DECLARE_DEVICE_IMAGE_START_MEMBER( a2600_cart );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( a2600_cart );
 
 protected:
@@ -541,12 +541,6 @@ static int detect_super_chip(running_machine &machine)
 		return 0;
 	}
 	return 1;
-}
-
-
-DEVICE_IMAGE_START_MEMBER( a2600_state, a2600_cart )
-{
-	m_banking_mode = 0xff;
 }
 
 
@@ -1921,7 +1915,6 @@ static MACHINE_CONFIG_FRAGMENT(a2600_cartslot)
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("bin,a26")
 	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_START(a2600_state,a2600_cart)
 	MCFG_CARTSLOT_LOAD(a2600_state,a2600_cart)
 	MCFG_CARTSLOT_INTERFACE("a2600_cart")
 

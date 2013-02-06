@@ -1329,7 +1329,8 @@ static const char* wswan_determine_romsize( UINT8 data )
 	return wswan_romsize_str[ ROM_UNKNOWN ];
 }
 
-DEVICE_IMAGE_START_MEMBER(wswan_state,wswan_cart)
+
+DRIVER_INIT_MEMBER(wswan_state, wswan)
 {
 	/* Initialize EEPROM structure */
 	memset( &m_eeprom, 0, sizeof( m_eeprom ) );
@@ -1348,6 +1349,7 @@ DEVICE_IMAGE_START_MEMBER(wswan_state,wswan_cart)
 	m_rtc.second = 0;
 	m_rtc.setting = 0xFF;
 }
+
 
 DEVICE_IMAGE_LOAD_MEMBER(wswan_state,wswan_cart)
 {

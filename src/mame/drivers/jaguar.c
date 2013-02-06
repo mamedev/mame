@@ -1641,7 +1641,6 @@ static MACHINE_CONFIG_START( jaguar, jaguar_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("j64,rom")
 	MCFG_CARTSLOT_INTERFACE("jaguar_cart")
-	MCFG_CARTSLOT_START(jaguar_state,jaguar_cart)
 	MCFG_CARTSLOT_LOAD(jaguar_state,jaguar_cart)
 
 	/* software lists */
@@ -1681,7 +1680,7 @@ DRIVER_INIT_MEMBER(jaguar_state,jaguar)
 {
 	m_hacks_enabled = false;
 	save_item(NAME(m_joystick_data));
-	m_using_cart = false;
+	cart_start();
 
 	for (int i=0;i<0x20000/4;i++) // the cd bios is bigger.. check
 	{
@@ -1765,11 +1764,6 @@ int jaguar_state::quickload(device_image_interface &image, const char *file_type
 	m_main_cpu->set_pc(quickload_begin);
 	m_shared_ram[1]=quickload_begin;
 	return IMAGE_INIT_PASS;
-}
-
-DEVICE_IMAGE_START_MEMBER( jaguar_state, jaguar_cart )
-{
-	cart_start();
 }
 
 void jaguar_state::cart_start()

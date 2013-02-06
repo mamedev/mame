@@ -144,7 +144,7 @@ public:
 	TIMER_CALLBACK_MEMBER(wswan_rtc_callback);
 	TIMER_CALLBACK_MEMBER(wswan_scanline_interrupt);
 	void wswan_machine_stop();
-	DECLARE_DEVICE_IMAGE_START_MEMBER( wswan_cart );
+	DECLARE_DRIVER_INIT( wswan );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( wswan_cart );
 
 protected:

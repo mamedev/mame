@@ -590,7 +590,6 @@ static MACHINE_CONFIG_DERIVED( gameboy, gb_common )
 	MCFG_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,gbc,sgb,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("gameboy_cart")
-	MCFG_CARTSLOT_START(gb_state,gb_cart)
 	MCFG_CARTSLOT_LOAD(gb_state,gb_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gameboy")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gbc_list","gbcolor")
@@ -648,7 +647,6 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gb_common )
 	MCFG_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,gbc,sgb,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("gameboy_cart")
-	MCFG_CARTSLOT_START(gb_state,gb_cart)
 	MCFG_CARTSLOT_LOAD(gb_state,gb_cart)
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gbcolor")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gb_list","gameboy")
@@ -731,13 +729,13 @@ ROM_START( megaduck )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  COMPANY     FULLNAME */
-CONS( 1990, gameboy,  0,       0,       gameboy,  gameboy, driver_device, 0,    "Nintendo", "Game Boy", 0)
-CONS( 1994, supergb,  gameboy, 0,       supergb,  gameboy, driver_device, 0,    "Nintendo", "Super Game Boy", 0)
-CONS( 1996, gbpocket, gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Pocket", 0)
-CONS( 1997, gblight,  gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Light", 0)
-CONS( 1998, gbcolor,  gameboy, 0,       gbcolor,  gameboy, driver_device, 0,    "Nintendo", "Game Boy Color", GAME_IMPERFECT_GRAPHICS)
+CONS( 1990, gameboy,  0,       0,       gameboy,  gameboy, gb_state, gb,    "Nintendo", "Game Boy", 0)
+CONS( 1994, supergb,  gameboy, 0,       supergb,  gameboy, gb_state, gb,    "Nintendo", "Super Game Boy", 0)
+CONS( 1996, gbpocket, gameboy, 0,       gbpocket, gameboy, gb_state, gb,    "Nintendo", "Game Boy Pocket", 0)
+CONS( 1997, gblight,  gameboy, 0,       gbpocket, gameboy, gb_state, gb,    "Nintendo", "Game Boy Light", 0)
+CONS( 1998, gbcolor,  gameboy, 0,       gbcolor,  gameboy, gb_state, gb,    "Nintendo", "Game Boy Color", GAME_IMPERFECT_GRAPHICS)
 
 /* Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real
    system there's no way to verify. Same goes for the colors of the LCD. We are no using the default
    Game Boy green colors */
-CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, driver_device, 0,    "Creatronic/Videojet/Timlex/Cougar",  "MegaDuck/Cougar Boy" , 0)
+CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, gb_state, gb,    "Creatronic/Videojet/Timlex/Cougar",  "MegaDuck/Cougar Boy" , 0)

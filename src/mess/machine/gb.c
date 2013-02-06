@@ -1496,7 +1496,7 @@ READ8_MEMBER(gb_state::gb_io_r)
 	}
 }
 
-DEVICE_IMAGE_START_MEMBER(gb_state,gb_cart)
+DRIVER_INIT_MEMBER(gb_state, gb)
 {
 	int I;
 

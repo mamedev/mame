@@ -215,7 +215,6 @@ public:
 	void cart_start();
 	int cart_load(device_image_interface &image);
 	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
-	DECLARE_DEVICE_IMAGE_START_MEMBER( jaguar_cart );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
 protected:
 	// timer IDs

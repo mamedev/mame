@@ -17,6 +17,9 @@ public:
 	scv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_videoram(*this,"videoram")
+		, m_cart_rom_size(0)
+		, m_cart_ram(NULL)
+		, m_cart_ram_size(0)
 		, m_maincpu(*this, "maincpu")
 		, m_upd1771c(*this, "upd1771c")
 		, m_pa0(*this, "PA0")
@@ -57,7 +60,6 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_scv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scv_vb_callback);
-	DECLARE_DEVICE_IMAGE_START_MEMBER( scv_cart );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( scv_cart );
 
 protected:
@@ -360,20 +362,12 @@ WRITE8_MEMBER( scv_state::scv_portc_w )
 }
 
 
-DEVICE_IMAGE_START_MEMBER( scv_state, scv_cart )
-{
-	m_cart_rom = memregion( "cart" )->base();
-	m_cart_rom_size = 0;
-	m_cart_ram = NULL;
-	m_cart_ram_size = 0;
-}
-
-
 DEVICE_IMAGE_LOAD_MEMBER( scv_state, scv_cart )
 {
+	UINT8 *cart = memregion( "cart" )->base();
+
 	if ( image.software_entry() == NULL )
 	{
-		UINT8 *cart = image.device().machine().root_device().memregion( "cart" )->base();
 		int size = image.length();
 
 		if ( size > memregion( "cart" )->bytes() )
@@ -388,17 +382,17 @@ DEVICE_IMAGE_LOAD_MEMBER( scv_state, scv_cart )
 			return IMAGE_INIT_FAIL;
 		}
 
-		m_cart_rom = cart;
 		m_cart_rom_size = size;
-		m_cart_ram = NULL;
-		m_cart_ram_size = 0;
 	}
 	else
 	{
-		m_cart_rom = image.get_software_region( "rom" );
 		m_cart_rom_size = image.get_software_region_length( "rom" );
-		m_cart_ram = image.get_software_region( "ram" );
+		memcpy( cart, image.get_software_region( "rom" ), m_cart_rom_size );
 		m_cart_ram_size = image.get_software_region_length( "ram" );
+		if ( m_cart_ram_size > 0 )
+		{
+			m_cart_ram = auto_alloc_array_clear( machine(), UINT8, m_cart_ram_size );
+		}
 	}
 
 	return IMAGE_INIT_PASS;
@@ -799,6 +793,7 @@ WRITE_LINE_MEMBER( scv_state::scv_upd1771_ack_w )
 
 void scv_state::machine_start()
 {
+	m_cart_rom = memregion( "cart" )->base();
 	m_vb_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(scv_state::scv_vb_callback),this));
 }
 
@@ -859,7 +854,6 @@ static MACHINE_CONFIG_START( scv, scv_state )
 	MCFG_CARTSLOT_EXTENSION_LIST( "bin" )
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("scv_cart")
-	MCFG_CARTSLOT_START( scv_state, scv_cart )
 	MCFG_CARTSLOT_LOAD( scv_state, scv_cart )
 
 	/* Software lists */

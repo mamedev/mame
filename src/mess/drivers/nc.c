@@ -1609,7 +1609,6 @@ static MACHINE_CONFIG_START( nc100, nc_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("crd,card")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_START(nc_state,nc_pcmcia_card)
 	MCFG_CARTSLOT_LOAD(nc_state,nc_pcmcia_card)
 	MCFG_CARTSLOT_UNLOAD(nc_state,nc_pcmcia_card)
 
@@ -1703,6 +1702,6 @@ ROM_START(nc200)
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1992, nc100,  0,      0,      nc100,  nc100, driver_device,  0,      "Amstrad plc",  "NC100",    0 )
-COMP( 1992, nc150,  nc100,  0,      nc100,  nc100, driver_device,  0,      "Amstrad plc",  "NC150",    0 )
-COMP( 1993, nc200,  0,      0,      nc200,  nc200, driver_device,  0,      "Amstrad plc",  "NC200",    GAME_NOT_WORKING ) // boot hangs while checking the MC146818 UIP (update in progress) bit
+COMP( 1992, nc100,  0,      0,      nc100,  nc100, nc_state,  nc,      "Amstrad plc",  "NC100",    0 )
+COMP( 1992, nc150,  nc100,  0,      nc100,  nc100, nc_state,  nc,      "Amstrad plc",  "NC150",    0 )
+COMP( 1993, nc200,  0,      0,      nc200,  nc200, nc_state,  nc,      "Amstrad plc",  "NC200",    GAME_NOT_WORKING ) // boot hangs while checking the MC146818 UIP (update in progress) bit

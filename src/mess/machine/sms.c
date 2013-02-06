@@ -1554,7 +1554,7 @@ static int detect_lphaser_xoffset( running_machine &machine, UINT8 *rom )
 }
 
 
-DEVICE_IMAGE_START_MEMBER( sms_state, sms_cart )
+void sms_state::setup_sms_cart()
 {
 	int i;
 
@@ -2105,12 +2105,14 @@ DRIVER_INIT_MEMBER(sms_state,sg1000m3)
 {
 	m_is_region_japan = 1;
 	m_has_fm = 1;
+	setup_sms_cart();
 }
 
 
 DRIVER_INIT_MEMBER(sms_state,sms1)
 {
 	m_has_bios_full = 1;
+	setup_sms_cart();
 }
 
 
@@ -2119,6 +2121,7 @@ DRIVER_INIT_MEMBER(sms_state,smsj)
 	m_is_region_japan = 1;
 	m_has_bios_2000 = 1;
 	m_has_fm = 1;
+	setup_sms_cart();
 }
 
 
@@ -2127,11 +2130,13 @@ DRIVER_INIT_MEMBER(sms_state,sms2kr)
 	m_is_region_japan = 1;
 	m_has_bios_full = 1;
 	m_has_fm = 1;
+	setup_sms_cart();
 }
 
 
 DRIVER_INIT_MEMBER(sms_state,smssdisp)
 {
+	setup_sms_cart();
 }
 
 
@@ -2139,6 +2144,7 @@ DRIVER_INIT_MEMBER(sms_state,gamegear)
 {
 	m_is_gamegear = 1;
 	m_has_bios_0400 = 1;
+	setup_sms_cart();
 }
 
 
@@ -2147,6 +2153,7 @@ DRIVER_INIT_MEMBER(sms_state,gamegeaj)
 	m_is_region_japan = 1;
 	m_is_gamegear = 1;
 	m_has_bios_0400 = 1;
+	setup_sms_cart();
 }
 
 

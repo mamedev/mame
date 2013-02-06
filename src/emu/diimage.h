@@ -111,7 +111,6 @@ struct software_part;
 struct software_info;
 
 // device image interface function types
-typedef delegate<void ()> device_image_start_delegate;
 typedef delegate<int (device_image_interface &)> device_image_load_delegate;
 typedef delegate<void (device_image_interface &)> device_image_func_delegate;
 // legacy
@@ -136,12 +135,6 @@ typedef void (*device_image_display_info_func)(device_image_interface &image);
 #define DEVICE_IMAGE_DISPLAY_INFO_NAME(name)       device_image_display_info_func##name
 #define DEVICE_IMAGE_DISPLAY_INFO(name)            void DEVICE_IMAGE_DISPLAY_INFO_NAME(name)(device_image_interface &image)
 
-
-#define DEVICE_IMAGE_START_MEMBER_NAME(_name)          device_image_start_##_name
-#define DEVICE_IMAGE_START_NAME(_class,_name)          _class::DEVICE_IMAGE_START_MEMBER_NAME(_name)
-#define DECLARE_DEVICE_IMAGE_START_MEMBER(_name)       void DEVICE_IMAGE_START_MEMBER_NAME(_name)()
-#define DEVICE_IMAGE_START_MEMBER(_class,_name)        void DEVICE_IMAGE_START_NAME(_class,_name)()
-#define DEVICE_IMAGE_START_DELEGATE(_class,_name)      device_image_start_delegate(&DEVICE_IMAGE_START_NAME(_class,_name),#_class "::device_image_start_" #_name,downcast<_class *>(device->owner()))
 
 #define DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)           device_image_load_##_name
 #define DEVICE_IMAGE_LOAD_NAME(_class,_name)           _class::DEVICE_IMAGE_LOAD_MEMBER_NAME(_name)

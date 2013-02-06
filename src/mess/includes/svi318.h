@@ -56,6 +56,8 @@ class svi318_state : public driver_device
 public:
 	svi318_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_pcart(NULL)
+		, m_pcart_rom_size(0)
 		, m_maincpu(*this, "maincpu")
 		, m_cassette(*this, CASSETTE_TAG)
 		, m_dac(*this, "dac")
@@ -109,7 +111,6 @@ public:
 	DECLARE_WRITE8_MEMBER(svi318_ppi_port_c_w);
 	DECLARE_WRITE_LINE_MEMBER(svi_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(svi_fdc_drq_w);
-	DECLARE_DEVICE_IMAGE_START_MEMBER(svi318_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svi318_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(svi318_cart);
 

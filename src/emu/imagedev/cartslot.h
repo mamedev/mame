@@ -57,7 +57,6 @@ public:
 	void set_extensions(const char *_extensions) { m_extensions = _extensions; }
 	void set_interface(const char *_interface) { m_interface = _interface; }
 	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
-	void set_device_start(device_image_start_delegate _start) { m_device_image_start = _start; }
 	void set_device_load(device_image_load_delegate _load) { m_device_image_load = _load; }
 	void set_device_unload(device_image_func_delegate _unload) { m_device_image_unload = _unload; }
 	void set_partialhash(device_image_partialhash_func _partialhash) { m_device_image_partialhash = _partialhash; }
@@ -75,7 +74,6 @@ protected:
 	const char *                    m_extensions;
 	const char *                    m_interface;
 	bool                            m_must_be_loaded;
-	device_image_start_delegate     m_device_image_start;
 	device_image_load_delegate      m_device_image_load;
 	device_image_func_delegate      m_device_image_unload;
 	device_image_partialhash_func   m_device_image_partialhash;
@@ -104,9 +102,6 @@ extern const device_type CARTSLOT;
 
 #define MCFG_CARTSLOT_MANDATORY                                         \
 	static_cast<cartslot_image_device *>(device)->set_must_be_loaded(TRUE);
-
-#define MCFG_CARTSLOT_START(_class,_start)                              \
-	static_cast<cartslot_image_device *>(device)->set_device_start( DEVICE_IMAGE_START_DELEGATE(_class,_start));
 
 #define MCFG_CARTSLOT_LOAD(_class,_load)                                \
 	static_cast<cartslot_image_device *>(device)->set_device_load( DEVICE_IMAGE_LOAD_DELEGATE(_class,_load));

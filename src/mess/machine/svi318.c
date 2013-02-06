@@ -62,25 +62,9 @@ const ins8250_interface svi318_ins8250_interface[2]=
 
 /* Cartridge */
 
-static int svi318_verify_cart (UINT8 magic[2])
-{
-	/* read the first two bytes */
-	if ( (magic[0] == 0xf3) && (magic[1] == 0x31) )
-		return IMAGE_VERIFY_PASS;
-	else
-		return IMAGE_VERIFY_FAIL;
-}
-
-DEVICE_IMAGE_START_MEMBER( svi318_state, svi318_cart )
-{
-	m_pcart = NULL;
-	m_pcart_rom_size = 0;
-}
-
 DEVICE_IMAGE_LOAD_MEMBER( svi318_state, svi318_cart )
 {
-	svi318_state *state = image.device().machine().driver_data<svi318_state>();
-	UINT8 *p = state->memregion("user1")->base();
+	UINT8 *p = memregion("user1")->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -100,23 +84,28 @@ DEVICE_IMAGE_LOAD_MEMBER( svi318_state, svi318_cart )
 		}
 	}
 	else
+	{
 		memcpy(p, image.get_software_region("rom"), size);
+	}
 
-	if (svi318_verify_cart(p) == IMAGE_VERIFY_FAIL)
+	if ( p[0] != 0xf3 || p[1] != 0x31 )
+	{
 		return IMAGE_INIT_FAIL;
+	}
 
-	state->m_pcart = p;
-	state->m_pcart_rom_size = size;
+	m_pcart = p;
+	m_pcart_rom_size = size;
 
 	return IMAGE_INIT_PASS;
 }
 
+
 DEVICE_IMAGE_UNLOAD_MEMBER( svi318_state, svi318_cart )
 {
-	svi318_state *state = image.device().machine().driver_data<svi318_state>();
-	state->m_pcart = NULL;
-	state->m_pcart_rom_size = 0;
+	m_pcart = NULL;
+	m_pcart_rom_size = 0;
 }
+
 
 /* PPI */
 

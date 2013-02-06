@@ -30,7 +30,6 @@ public:
 	virtual void machine_reset();
 	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
 
-	DECLARE_DEVICE_IMAGE_START_MEMBER( bbcbc_cart );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcbc_cart );
 };
 
@@ -133,14 +132,6 @@ static const z80_daisy_config bbcbc_daisy_chain[] =
 };
 
 
-DEVICE_IMAGE_START_MEMBER( bbcbc_state, bbcbc_cart )
-{
-	UINT8 *cart = machine().root_device().memregion("maincpu" )->base() + 0x4000;
-
-	memset( cart, 0xFF, 0x8000 );
-}
-
-
 DEVICE_IMAGE_LOAD_MEMBER( bbcbc_state, bbcbc_cart )
 {
 	UINT8 *cart = machine().root_device().memregion("maincpu" )->base() + 0x4000;
@@ -190,7 +181,6 @@ static MACHINE_CONFIG_START( bbcbc, bbcbc_state )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("bbcbc_cart")
-	MCFG_CARTSLOT_START( bbcbc_state, bbcbc_cart )
 	MCFG_CARTSLOT_LOAD( bbcbc_state, bbcbc_cart )
 
 	/* Software lists */
@@ -199,7 +189,7 @@ MACHINE_CONFIG_END
 
 
 ROM_START( bbcbc )
-	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD("br_4_1.ic3", 0x0000, 0x2000, CRC(7c880d75) SHA1(954db096bd9e8edfef72946637a12f1083841fb0))
 	ROM_LOAD("br_4_2.ic4", 0x2000, 0x2000, CRC(16a33aef) SHA1(9529f9f792718a3715af2063b91a5fb18f741226))
 ROM_END

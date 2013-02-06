@@ -90,7 +90,7 @@ static int nc_card_load(device_image_interface &image, unsigned char **ptr)
 }
 
 
-DEVICE_IMAGE_START_MEMBER( nc_state, nc_pcmcia_card )
+DRIVER_INIT_MEMBER( nc_state, nc )
 {
 	/* card not present */
 	nc_set_card_present_state(machine(), 0);

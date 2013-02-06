@@ -402,7 +402,6 @@ static MACHINE_CONFIG_FRAGMENT( sms_cartslot )
 	MCFG_CARTSLOT_EXTENSION_LIST("sms,bin")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("sms_cart")
-	MCFG_CARTSLOT_START(sms_state,sms_cart)
 	MCFG_CARTSLOT_LOAD(sms_state,sms_cart)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","sms")
@@ -413,7 +412,6 @@ static MACHINE_CONFIG_FRAGMENT( gg_cartslot )
 	MCFG_CARTSLOT_EXTENSION_LIST("gg,bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("gamegear_cart")
-	MCFG_CARTSLOT_START(sms_state,sms_cart)
 	MCFG_CARTSLOT_LOAD(sms_state,sms_cart)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gamegear")
@@ -495,7 +493,6 @@ MACHINE_CONFIG_END
 	MCFG_CARTSLOT_EXTENSION_LIST("sms,bin") \
 	MCFG_CARTSLOT_NOT_MANDATORY \
 	MCFG_CARTSLOT_INTERFACE("sms_cart") \
-	MCFG_CARTSLOT_START(sms_state,sms_cart) \
 	MCFG_CARTSLOT_LOAD(sms_state,sms_cart)
 
 static MACHINE_CONFIG_DERIVED( sms_sdisp, sms2_ntsc )
@@ -512,7 +509,6 @@ static MACHINE_CONFIG_DERIVED( sms_sdisp, sms2_ntsc )
 	MCFG_CARTSLOT_EXTENSION_LIST("sms,bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("sms_cart")
-	MCFG_CARTSLOT_START(sms_state,sms_cart)
 	MCFG_CARTSLOT_LOAD(sms_state,sms_cart)
 
 	MCFG_SMSSDISP_CARTSLOT_ADD("cart2")
@@ -617,7 +613,6 @@ static MACHINE_CONFIG_DERIVED( sg1000m3, sms_fm )
 	MCFG_CARTSLOT_MODIFY("cart1")
 	MCFG_CARTSLOT_EXTENSION_LIST("sms,bin,sg")
 	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_START(sms_state,sms_cart)
 	MCFG_CARTSLOT_LOAD(sms_state,sms_cart)
 MACHINE_CONFIG_END
 

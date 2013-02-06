@@ -203,11 +203,6 @@ int cartslot_image_device::process_cartridge(bool load)
 
 void cartslot_image_device::device_start()
 {
-	/* if this cartridge has a custom DEVICE_START, use it */
-	if (!m_device_image_start.isnull())
-	{
-		m_device_image_start();
-	}
 }
 
 

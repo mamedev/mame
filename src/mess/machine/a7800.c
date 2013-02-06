@@ -68,38 +68,54 @@ const riot6532_interface a7800_r6532_interface =
     DRIVER INIT
 ***************************************************************************/
 
-static void a7800_driver_init(running_machine &machine, int ispal, int lines)
+void a7800_state::a7800_driver_init(int ispal, int lines)
 {
-	a7800_state *state = machine.driver_data<a7800_state>();
-	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	state->m_ROM = state->memregion("maincpu")->base();
-	state->m_ispal = ispal;
-	state->m_lines = lines;
-	state->m_p1_one_button = 1;
-	state->m_p2_one_button = 1;
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	m_ROM = memregion("maincpu")->base();
+	m_ispal = ispal;
+	m_lines = lines;
+	m_p1_one_button = 1;
+	m_p2_one_button = 1;
 
 	/* standard banks */
-	state->membank("bank5")->set_base(&state->m_ROM[0x2040]);       /* RAM0 */
-	state->membank("bank6")->set_base(&state->m_ROM[0x2140]);       /* RAM1 */
-	state->membank("bank7")->set_base(&state->m_ROM[0x2000]);       /* MAINRAM */
+	membank("bank5")->set_base(&m_ROM[0x2040]);       /* RAM0 */
+	membank("bank6")->set_base(&m_ROM[0x2140]);       /* RAM1 */
+	membank("bank7")->set_base(&m_ROM[0x2000]);       /* MAINRAM */
 
 	/* Brutal hack put in as a consequence of new memory system; fix this */
 	space.install_readwrite_bank(0x0480, 0x04FF,"bank10");
-	state->membank("bank10")->set_base(state->m_ROM + 0x0480);
+	membank("bank10")->set_base(m_ROM + 0x0480);
 	space.install_readwrite_bank(0x1800, 0x27FF, "bank11");
-	state->membank("bank11")->set_base(state->m_ROM + 0x1800);
+	membank("bank11")->set_base(m_ROM + 0x1800);
+
+	m_bios_bkup = NULL;
+	m_cart_bkup = NULL;
+
+	/* Allocate memory for BIOS bank switching */
+	m_bios_bkup = auto_alloc_array_clear(machine(), UINT8, 0x4000);
+	m_cart_bkup = auto_alloc_array(machine(), UINT8, 0x4000);
+
+	/* save the BIOS so we can switch it in and out */
+	memcpy( m_bios_bkup, m_ROM + 0xC000, 0x4000 );
+
+	/* Initialize cart area to "no data" */
+	memset( m_cart_bkup, 0xFF, 0x4000 );
+
+	/* defaults for PAL bios without cart */
+	m_cart_type = 0;
+	m_stick_type = 1;
 }
 
 
 DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
 {
-	a7800_driver_init(machine(), FALSE, 262);
+	a7800_driver_init(FALSE, 262);
 }
 
 
 DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
 {
-	a7800_driver_init(machine(), TRUE, 312);
+	a7800_driver_init(TRUE, 312);
 }
 
 
@@ -190,28 +206,6 @@ static int a7800_verify_cart(char header[128])
 	return IMAGE_VERIFY_PASS;
 }
 
-
-DEVICE_IMAGE_START_MEMBER( a7800_state, a7800_cart )
-{
-	UINT8 *memory = memregion("maincpu")->base();
-
-	m_bios_bkup = NULL;
-	m_cart_bkup = NULL;
-
-	/* Allocate memory for BIOS bank switching */
-	m_bios_bkup = auto_alloc_array_clear(machine(), UINT8, 0x4000);
-	m_cart_bkup = auto_alloc_array(machine(), UINT8, 0x4000);
-
-	/* save the BIOS so we can switch it in and out */
-	memcpy( m_bios_bkup, memory + 0xC000, 0x4000 );
-
-	/* Initialize cart area to "no data" */
-	memset( m_cart_bkup, 0xFF, 0x4000 );
-
-	/* defaults for PAL bios without cart */
-	m_cart_type = 0;
-	m_stick_type = 1;
-}
 
 struct a7800_pcb
 {

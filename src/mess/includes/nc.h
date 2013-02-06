@@ -95,7 +95,7 @@ public:
 
 	void nc200_fdc_interrupt(bool state);
 
-	DECLARE_DEVICE_IMAGE_START_MEMBER( nc_pcmcia_card );
+	DECLARE_DRIVER_INIT( nc );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
 

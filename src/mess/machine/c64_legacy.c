@@ -519,7 +519,7 @@ DEVICE_IMAGE_UNLOAD_MEMBER( legacy_c64_state, c64_cart )
 }
 
 
-DEVICE_IMAGE_START_MEMBER( legacy_c64_state, c64_cart )
+void legacy_c64_state::c64_legacy_driver_init()
 {
 	/* In the first slot we can load a .crt file. In this case we want
 	    to use game & exrom values from the header, not the default ones. */
@@ -1182,14 +1182,12 @@ MACHINE_CONFIG_FRAGMENT( c64_cartslot )
 	MCFG_CARTSLOT_EXTENSION_LIST("crt,80")
 	MCFG_CARTSLOT_NOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("c64_cart")
-	MCFG_CARTSLOT_START(legacy_c64_state,c64_cart)
 	MCFG_CARTSLOT_LOAD(legacy_c64_state,c64_cart)
 	MCFG_CARTSLOT_UNLOAD(legacy_c64_state,c64_cart)
 
 	MCFG_CARTSLOT_ADD("cart2")
 	MCFG_CARTSLOT_EXTENSION_LIST("crt,80")
 	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_START(legacy_c64_state,c64_cart)
 	MCFG_CARTSLOT_LOAD(legacy_c64_state,c64_cart)
 	MCFG_CARTSLOT_UNLOAD(legacy_c64_state,c64_cart)
 

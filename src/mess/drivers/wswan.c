@@ -155,7 +155,6 @@ static MACHINE_CONFIG_START( wswan, wswan_state )
 	MCFG_CARTSLOT_EXTENSION_LIST("ws,wsc,bin")
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("wswan_cart")
-	MCFG_CARTSLOT_START(wswan_state,wswan_cart)
 	MCFG_CARTSLOT_LOAD(wswan_state,wswan_cart)
 
 	/* software lists */
@@ -195,5 +194,5 @@ ROM_START( wscolor )
 ROM_END
 
 /*     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT COMPANY   FULLNAME*/
-CONS( 1999, wswan,   0,      0,      wswan,   wswan, driver_device, 0,    "Bandai", "WonderSwan",       GAME_IMPERFECT_SOUND )
-CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, driver_device, 0,    "Bandai", "WonderSwan Color", GAME_IMPERFECT_SOUND )
+CONS( 1999, wswan,   0,      0,      wswan,   wswan, wswan_state, wswan,    "Bandai", "WonderSwan",       GAME_IMPERFECT_SOUND )
+CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, wswan_state, wswan,    "Bandai", "WonderSwan Color", GAME_IMPERFECT_SOUND )

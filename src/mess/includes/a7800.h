@@ -59,6 +59,7 @@ public:
 	DECLARE_WRITE8_MEMBER(a7800_TIA_w);
 	DECLARE_READ8_MEMBER(a7800_MARIA_r);
 	DECLARE_WRITE8_MEMBER(a7800_MARIA_w);
+	void a7800_driver_init(int ispal, int lines);
 	DECLARE_DRIVER_INIT(a7800_pal);
 	DECLARE_DRIVER_INIT(a7800_ntsc);
 	virtual void machine_reset();
@@ -71,7 +72,6 @@ public:
 	DECLARE_READ8_MEMBER(riot_console_button_r);
 	DECLARE_WRITE8_MEMBER(riot_button_pullup_w);
 
-	DECLARE_DEVICE_IMAGE_START_MEMBER( a7800_cart );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( a7800_cart );
 };
 
