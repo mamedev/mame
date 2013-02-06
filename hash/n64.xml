@@ -354,7 +354,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="astarten">
+	<software name="astenn99">
 		<description>All Star Tennis '99 (Euro)</description>
 		<year>1999</year>
 		<publisher>Ubi Soft</publisher>
@@ -365,7 +365,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="astartenu" cloneof="astarten">
+	<software name="astenn99u" cloneof="astenn99">
 		<description>All Star Tennis '99 (USA)</description>
 		<year>1999</year>
 		<publisher>Ubi Soft</publisher>
@@ -1893,7 +1893,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="destdrby">
+	<software name="dderby">
 		<description>Destruction Derby 64 (Euro)</description>
 		<year>1999</year>
 		<publisher>T*HQ</publisher>
@@ -1904,7 +1904,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="destdrbyu" cloneof="destdrby">
+	<software name="dderbyu" cloneof="dderby">
 		<description>Destruction Derby 64 (USA)</description>
 		<year>1999</year>
 		<publisher>T*HQ</publisher>
@@ -9014,7 +9014,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="honeyhnt">
+	<software name="tiggerhh">
 		<description>Tigger's Honey Hunt (Euro)</description>
 		<year>2000</year>
 		<publisher>NewKidCo</publisher>
@@ -9025,7 +9025,7 @@ Canceled games (possibly never got to the proto stage)
 		</part>
 	</software>
 
-	<software name="honeyhntu" cloneof="honeyhnt">
+	<software name="tiggerhhu" cloneof="tiggerhh">
 		<description>Tigger's Honey Hunt (USA)</description>
 		<year>2000</year>
 		<publisher>NewKidCo</publisher>

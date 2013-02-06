@@ -188,8 +188,8 @@
 		</part>
 	</software>
 
-	<software name="arukiba">
-		<description>Arunamu no Kiba - Juuzoku Juuni Shinto Densetsu (SCD)(Jpn)</description>
+	<software name="alkiba">
+		<description>Alnam no Kiba - Juuzoku Juuni Shinto Densetsu (SCD)(Jpn)</description>
 		<year>1994</year>
 		<publisher>Right Stuff</publisher>
 		<info name="serial" value="RSCD4006"/>

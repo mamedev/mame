@@ -79,7 +79,7 @@
 	  Albert Odyssey Gaiden: Legend of Eldean (Japan) (Satakore) [T-1517G]                  |  ??
 	  Album Club Mune Kyun: Saint Paulia Jogakuin (Japan) [T-21903G]                        | (albumclu)
 	  Alien Trilogy (Japan) [T-8113G]                                                       | (alientrij)
-	  Alone in the Dark 2 (Japan) [T-10602G]                                                | (aitd2j)
+	  Alone in the Dark 2 (Japan) [T-10602G]                                                | (alondrk2j)
 	  Amagi Shien (Japan) [T-1513G]                                                         | (amagishi)      gets stuck on sega logo
 	  America Oudan Ultra Quiz (Japan) [T-6004G]                                            | (amoudan)
 	  AMOK (Japan) [T-7637G]                                                                | (amokj)         playable?
@@ -130,7 +130,7 @@
 	  Baroque (Japan) [T-33901G]                                                            | (baroque)
 	  Batman Forever: The Arcade Game (Japan) [T-8118G]                                     | ########MISSING########
 	  Batsugun (Japan) [T-20605G]                                                           | (batsugun)
-	  Battle Athletess Daiundoukai (Japan) [T-24601G]                                       | (battleat)
+	  Battle Athletess Daiundoukai (Japan) [T-24601G]                                       | (btathlet)
 	  Battle Garegga (Japan) [T-10627G]                                                     | (bgaregga)
 	  Battle Monsters (Japan) [T-18701G]                                                    | (btlmonstj)
 	  Beach de Reach! (Japan) [T-29004G]                                                    | (beachrea)
@@ -2600,7 +2600,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Alone in the Dark 2 (Japan)... -->
-	<software name="aitd2j" cloneof="aitd2" supported="no">
+	<software name="alondrk2j" cloneof="alondrk2" supported="no">
 		<description>Alone in the Dark 2 (Jpn)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -14867,7 +14867,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Alone in the Dark 2 (T-10602G)... -->
-	<software name="aitd2ja" cloneof="aitd2" supported="no">
+	<software name="alondrk2ja" cloneof="alondrk2" supported="no">
 		<description>Alone in the Dark 2 (Jpn, Alt)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
@@ -15150,7 +15150,7 @@ Olympic Soccer (Fra) T-7904H-09
 	<!-- Identifying BackGuiner - Yomi Gaeru Yuusya Tati - Kakusei Hen Guiner Tensei Disc 1 (T-19906G)... -->
 	<!-- Identifying BackGuiner - Yomi Gaeru Yuusya Tati - Kakusei Hen Guiner Tensei Disc 2 (T-19906G)... -->
 	<software name="backgkh" supported="no">
-		<description>BackGuiner - Yomi Gaeru Yuusya Tati - Kakusei Hen Guiner Tensei (Jpn)</description>
+		<description>BackGuiner - Yomi Gaeru Yuusya Tati - Kakusei-hen 'Guiner Tensei' (Jpn)</description>
 		<year>1998</year>
 		<publisher>Ving</publisher>
 		<info name="serial" value="T-19906G"/>
@@ -15239,7 +15239,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Battle Athletess Daiundoukai (T-24601G)... -->
-	<software name="battleat" supported="no">
+	<software name="btathlet" supported="no">
 		<description>Battle Athletess Daiundoukai (Jpn)</description>
 		<year>1996</year>
 		<publisher>Increment P</publisher>
@@ -17538,7 +17538,7 @@ Olympic Soccer (Fra) T-7904H-09
 
 	<!-- Identifying Gekitotu Koshien (J) (T-6701G)... -->
 	<software name="gekikosh" supported="no">
-		<description>Gekitotu Koshien (Jpn)</description>
+		<description>Gekitotsu Koushien (Jpn)</description>
 		<year>1997</year>
 		<publisher>Magical</publisher>
 		<info name="serial" value="T-6701G"/>
@@ -26811,8 +26811,8 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Yuushun Classic Road (T-6009G)... -->
-	<software name="yuuclass" supported="no">
-		<description>Yuushun Classic Road (Jpn)</description>
+	<software name="classryu" supported="no">
+		<description>Classic Road - Yuushun (Jpn)</description>
 		<year>1997</year>
 		<publisher>Victor Interactive</publisher>
 		<info name="serial" value="T-6009G"/>
@@ -30099,7 +30099,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying Alone in the Dark - Jack is Back v1.100 (1996)(Infogrames)(PAL)(M5)[!][T-15101HP-00738 A]... -->
-	<software name="aitd2" supported="no">
+	<software name="alondrk2" supported="no">
 		<description>Alone in the Dark - Jack is Back (Euro)</description>
 		<year>1996</year>
 		<publisher>Infogrames</publisher>
@@ -31139,7 +31139,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying dw-dh... -->
-	<software name="dragnhrt" supported="no">
+	<software name="dheart" supported="no">
 		<description>DragonHeart - Fire &amp; Steel (Euro)</description>
 		<year>1997</year>
 		<publisher>Acclaim Entertainment</publisher>
@@ -34617,7 +34617,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying dw-at-0792-Alone_in_the_Dark-usa... -->
-	<software name="aitd2u" cloneof="aitd2" supported="no">
+	<software name="alondrk2u" cloneof="alondrk2" supported="no">
 		<description>Alone in the Dark - One-Eyed Jack's Revenge (USA)</description>
 		<year>1996</year>
 		<publisher>Kokopeli</publisher>
@@ -35591,7 +35591,7 @@ Olympic Soccer (Fra) T-7904H-09
 	</software>
 
 	<!-- Identifying dw-sat-0672-Dragonheart_Fire&Steel-usa... -->
-	<software name="dragnhrtu" cloneof="dragnhrt" supported="no">
+	<software name="dheartu" cloneof="dheart" supported="no">
 		<description>DragonHeart - Fire &amp; Steel (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>

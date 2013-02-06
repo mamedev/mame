@@ -1352,7 +1352,7 @@
 		</part>
 	</software>
 
-	<software name="2winraym">
+	<software name="2pohray3">
 		<description>Winnie the Pooh's Rumbly Tumbly Adventure &amp; Rayman 3 (Euro)</description>
 		<year>2006</year>
 		<publisher>Ubisoft</publisher>
@@ -23450,7 +23450,7 @@
 		</part>
 	</software>
 
-	<software name="mx2k2">
+	<software name="motox2k2">
 		<description>MX 2002 featuring Ricky Carmichael (Euro, USA)</description>
 		<year>2001</year>
 		<publisher>THQ</publisher>
@@ -36465,7 +36465,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
-	<software name="winpooh">
+	<software name="poohrumb">
 		<description>Winnie the Pooh's Rumbly Tumbly Adventure (Euro)</description>
 		<year>2005</year>
 		<publisher>Ubisoft</publisher>
@@ -36477,7 +36477,7 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
-	<software name="winpoohu" cloneof="winpooh">
+	<software name="poohrumbu" cloneof="poohrumb">
 		<description>Winnie the Pooh's Rumbly Tumbly Adventure (USA)</description>
 		<year>2005</year>
 		<publisher>Ubisoft</publisher>
