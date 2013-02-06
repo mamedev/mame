@@ -80,7 +80,7 @@ public:
 	static void static_set_cputag(device_t &device, const char *tag);
 
 	void add_a2eauxslot_card(device_a2eauxslot_card_interface *card);
-	device_a2eauxslot_card_interface *get_a2eauxslot_card(int slot);
+	device_a2eauxslot_card_interface *get_a2eauxslot_card();
 
 	void set_irq_line(int state);
 	void set_nmi_line(int state);

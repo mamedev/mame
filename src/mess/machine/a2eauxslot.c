@@ -130,7 +130,7 @@ void a2eauxslot_device::device_reset()
 {
 }
 
-device_a2eauxslot_card_interface *a2eauxslot_device::get_a2eauxslot_card(int slot)
+device_a2eauxslot_card_interface *a2eauxslot_device::get_a2eauxslot_card()
 {
 	return m_device;
 }
