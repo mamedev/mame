@@ -6811,7 +6811,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 							/*shadow - in reality, we should check from what layer pixel beneath comes...*/
 							if ( STV_VDP2_SDCTL & 0x3f )
 							{
-								UINT32 p;// = bitmap_line[x];
+								UINT32 p = bitmap_line[x];
 								if(double_x)
 								{
 									p = bitmap_line[x*2];
@@ -6884,7 +6884,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 					{
 						if ( pix & ~sprite_shadow )
 						{
-							UINT32 p; //= bitmap_line[x];
+							UINT32 p = bitmap_line[x];
 							if(double_x)
 							{
 								p = bitmap_line[x*2];
