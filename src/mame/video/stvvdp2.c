@@ -4264,7 +4264,7 @@ static void stv_vdp2_check_tilemap_with_linescroll(running_machine &machine, bit
 		{
 			prev_scroll_values[i] &= 0x0007ff00;
 			if ( prev_scroll_values[i] & 0x00040000 ) prev_scroll_values[i] |= 0xfff80000;
-//          incx = prev_scroll_values[i];
+			stv2_current_tilemap.incx = prev_scroll_values[i];
 			i++;
 		}
 
