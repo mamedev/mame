@@ -1182,7 +1182,10 @@ UINT32 ide_controller_device::ide_controller_read(int bank, offs_t offset, int s
 	}
 	else
 	{
-		return 0;
+		/* even a do-nothing operation should take a little time */
+
+		status ^= IDE_STATUS_BUSY;
+		return status;
 	}
 
 	switch (BANK(bank, offset))
