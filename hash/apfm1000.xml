@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="apfm1000" description="APF M-1000 cartridges">
-	<software name="backgamm">
+	<software name="backgamm" supported="no">
 		<description>Backgammon</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
@@ -13,7 +13,7 @@
 		</part>
 	</software>
 
-	<software name="baseball">
+	<software name="baseball" supported="no">
 		<description>Baseball</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
@@ -25,7 +25,7 @@
 		</part>
 	</software>
 
-	<software name="blckjack">
+	<software name="blckjack" supported="no">
 		<description>Blackjack</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
@@ -37,7 +37,7 @@
 		</part>
 	</software>
 
-	<software name="bowling">
+	<software name="bowling" supported="no">
 		<description>Bowling / Micro Match</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
@@ -109,7 +109,7 @@
 		</part>
 	</software>
 
-	<software name="hangman">
+	<software name="hangman" supported="no">
 		<description>Hangman / Tic Tac Toe / Doodle</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
@@ -121,7 +121,7 @@
 		</part>
 	</software>
 
-	<software name="pinball">
+	<software name="pinball" supported="no">
 		<description>Pinball / Dungeon Hunt / Blockout</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
@@ -133,7 +133,7 @@
 		</part>
 	</software>
 
-	<software name="spacedst">
+	<software name="spacedst" supported="no">
 		<description>Space Destroyers</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
@@ -164,7 +164,7 @@ $9C00 to $9FFF 1k empty space (39936 to 40959)
 		</part>
 	</software>
 
-	<software name="ufo">
+	<software name="ufo" supported="no">
 		<description>Ufo / Sea Monsters / Break It Down / Rebuild / Shoot</description>
 		<year>1979</year>
 		<publisher>APF</publisher>
