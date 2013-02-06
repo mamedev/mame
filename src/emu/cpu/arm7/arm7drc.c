@@ -2287,7 +2287,40 @@ static int generate_opcode(arm_state *arm, drcuml_block *block, compiler_state *
 
 	if (T_IS_SET(GET_CPSR))
 	{
+		UINT32 raddr;
 
+		pc = R15;
+
+		// "In Thumb state, bit [0] is undefined and must be ignored. Bits [31:1] contain the PC."
+		raddr = pc & (~1);
+
+		if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
+		{
+			if (!arm7_tlb_translate(arm, &raddr, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
+			{
+				goto skip_exec;
+			}
+		}
+
+		UML_AND(block, I0, DRC_PC, ~1);
+		UML_TEST(block, mem(&COPRO_CTRL), COPRO_CTRL_MMU_EN);				// test		COPRO_CTRL, COPRO_CTRL_MMU_EN
+		UML_MOVc(block, COND_Z, I0, 0);										// movz		i0, 0
+		UML_MOVc(block, COND_NZ, I0, ARM7_TLB_ABORT_P | ARM7_TLB_READ);		// movnz	i0, ARM7_TLB_ABORT_P | ARM7_TLB_READ
+		UML_CALLHc(block, COND_NZ, *arm->impstate->tlb_translate);			// callhnz	tlb_translate);
+
+		insn = arm->direct->read_decrypted_word(raddr);
+		thumb_handler[(insn & 0xffc0) >> 6](arm, pc, insn);
+		UML_OR(block, I3, I3, );											// or		i2, i2, i3
+		UML_CALLHc(block, COND_NZ, *arm->impstate->tlb_translate);			// callhnz	tlb_translate
+
+	}
+	else
+	{
+		UML_AND(block, I0, DRC_PC, ~1);
+		UML_TEST(block, mem(&COPRO_CTRL), COPRO_CTRL_MMU_EN);				// test		COPRO_CTRL, COPRO_CTRL_MMU_EN
+		UML_MOVc(block, COND_NZ, I3, ARM7_TLB_READ);					// movnz	i3, ARM7_TLB_READ
+		UML_OR(block, I3, I3, I3);											// or		i2, i2, i3
+		UML_CALLHc(block, COND_NZ, *arm->impstate->tlb_translate);			// callhnz	tlb_translate
 	}
 
 	switch (opswitch)

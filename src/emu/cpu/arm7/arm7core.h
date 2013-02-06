@@ -103,6 +103,8 @@ enum
 #define COPRO_TLB_VADDR_FSLTI_MASK_SHIFT    8
 #define COPRO_TLB_CFLD_ADDR_MASK            0xfffffc00
 #define COPRO_TLB_CFLD_ADDR_MASK_SHIFT      10
+#define COPRO_TLB_FPTB_ADDR_MASK            0xfffff000
+#define COPRO_TLB_FPTB_ADDR_MASK_SHIFT      12
 #define COPRO_TLB_SECTION_PAGE_MASK         0xfff00000
 #define COPRO_TLB_LARGE_PAGE_MASK           0xffff0000
 #define COPRO_TLB_SMALL_PAGE_MASK           0xfffff000

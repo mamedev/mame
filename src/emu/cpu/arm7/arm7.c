@@ -127,10 +127,10 @@ INLINE UINT32 arm7_tlb_get_second_level_descriptor( arm_state *arm, UINT32 granu
 	switch( granularity )
 	{
 		case TLB_COARSE:
-			desc_lvl2 = ( first_desc & COPRO_TLB_CFLD_ADDR_MASK ) | ( ( vaddr & COPRO_TLB_VADDR_CSLTI_MASK ) >> COPRO_TLB_VADDR_CSLTI_MASK_SHIFT );
+			desc_lvl2 = (first_desc & COPRO_TLB_CFLD_ADDR_MASK) | ((vaddr & COPRO_TLB_VADDR_CSLTI_MASK) >> COPRO_TLB_VADDR_CSLTI_MASK_SHIFT);
 			break;
 		case TLB_FINE:
-			LOG( ( "ARM7: Attempting to get second-level TLB descriptor of fine granularity\n" ) );
+			desc_lvl2 = (first_desc & COPRO_TLB_FPTB_ADDR_MASK) | ((vaddr & COPRO_TLB_VADDR_FSLTI_MASK) >> COPRO_TLB_VADDR_FSLTI_MASK_SHIFT);
 			break;
 		default:
 			// We shouldn't be here
@@ -322,8 +322,15 @@ int arm7_tlb_translate(arm_state *arm, UINT32 *addr, int flags)
 			}
 			break;
 		case COPRO_TLB_FINE_TABLE:
-			// Entry is the physical address of a fine second-level table
-			fatalerror("ARM7: Not Yet Implemented: fine second-level TLB lookup, PC = %08x, vaddr = %08x\n", R15, vaddr);
+			// Entry is the physical address of a coarse second-level table
+			if ((permission == 1) || (permission == 3))
+			{
+				desc_lvl2 = arm7_tlb_get_second_level_descriptor( arm, TLB_FINE, desc_lvl1, vaddr );
+			}
+			else
+			{
+				fatalerror("ARM7: Not Yet Implemented: Fine Table, Section Domain fault on virtual address, vaddr = %08x, domain = %08x, PC = %08x\n", vaddr, domain, R15);
+			}
 			break;
 		default:
 			// Entry is the physical address of a three-legged termite-eaten table
