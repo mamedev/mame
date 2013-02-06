@@ -886,6 +886,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/c64_super_games.o   \
 	$(MESS_MACHINE)/c64_supercpu.o  \
 	$(MESS_MACHINE)/c64_sw8k.o  \
+	$(MESS_MACHINE)/c64_swiftlink.o   \
 	$(MESS_MACHINE)/c64_system3.o   \
 	$(MESS_MACHINE)/c64_tdos.o  \
 	$(MESS_MACHINE)/c64_vw64.o  \

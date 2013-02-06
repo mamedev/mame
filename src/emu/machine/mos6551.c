@@ -7,6 +7,17 @@
 
 **********************************************************************/
 
+/*
+
+	TODO:
+
+	- receiver disable
+	- IRQ on DCD/DSR change
+	- parity
+	- framing error
+
+*/
+
 #include "mos6551.h"
 
 
@@ -85,16 +96,16 @@ void mos6551_device::device_reset()
 
 void mos6551_device::tra_complete()
 {
-	if ((m_cmd & CMD_TC_MASK) == CMD_TC_TIE_RTS_LO)
-	{
-		m_st |= ST_IRQ;
-		m_irq_handler(ASSERT_LINE);
-	}
-
 	if (!(m_st & ST_TDRE))
 	{
 		transmit_register_setup(m_tdr);
 		m_st |= ST_TDRE;
+	
+		if ((m_cmd & CMD_TC_MASK) == CMD_TC_TIE_RTS_LO)
+		{
+			m_st |= ST_IRQ;
+			m_irq_handler(ASSERT_LINE);
+		}
 	}
 }
 
@@ -109,15 +120,15 @@ void mos6551_device::rcv_complete()
 	{
 		m_st |= ST_OR;
 	}
-	else
-	{
-		m_st |= ST_RDRF;
+		
+	m_st &= ~(ST_FE | ST_PE);
 
-		if (!(m_cmd & CMD_RIE))
-		{
-			m_st |= ST_IRQ;
-			m_irq_handler(ASSERT_LINE);
-		}
+	m_st |= ST_RDRF;
+
+	if (!(m_cmd & CMD_RIE))
+	{
+		m_st |= ST_IRQ;
+		m_irq_handler(ASSERT_LINE);
 	}
 }
 
@@ -244,6 +255,12 @@ WRITE8_MEMBER( mos6551_device::write )
 		{
 			transmit_register_setup(m_tdr);
 			m_st |= ST_TDRE;
+			
+			if ((m_cmd & CMD_TC_MASK) == CMD_TC_TIE_RTS_LO)
+			{
+				m_st |= ST_IRQ;
+				m_irq_handler(ASSERT_LINE);
+			}
 		}
 		break;
 
@@ -274,4 +291,6 @@ WRITE8_MEMBER( mos6551_device::write )
 void mos6551_device::set_rxc(int clock)
 {
 	m_ext_rxc = clock;
+
+	update_serial();
 }

@@ -825,4 +825,52 @@
 		</part>
 	</software>
 
+	<software name="swiftlnk">
+		<description>CMD SwiftLink</description>
+		<year>1990</year>
+		<publisher>CMD</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cmd_swiftlink_utils_d1s1.d64" size="174848" crc="f70f4ff8" sha1="d70d6b0c8c2f408286ce0ea9edcfe6c5cf1af60a" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1 Side 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cmd_swiftlink_utils_d1s2.d64" size="174848" crc="b9e18c85" sha1="b8b65c99ac1474b89729756adbdd969a3e9e9aa6" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cmd_swiftlink_utils_d2s1.d64" size="174848" crc="de2828a1" sha1="6516d4674dddc58a9d7787bcb9ea55d4b4fc9898" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2 Side 2"/>
+			<dataarea name="flop" size="175531">
+				<rom name="cmd_swiftlink_utils_d2s2.d64" size="175531" crc="309d1b76" sha1="847b06a65238861c84dee715e48a635978647303" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cmd_swiftlink_utils_d3s1.d64" size="174848" crc="180ff985" sha1="0b0f4c610cc5a062287ae20e41d9df78b9dc6007" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3 Side 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="cmd_swiftlink_utils_d3s2.d64" size="174848" crc="d2ec8d3c" sha1="02413c30f631986c17984f54dac48b9aec0904af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
