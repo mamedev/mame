@@ -2090,7 +2090,6 @@ void video_update_vdp1(running_machine &machine)
 			}
 			break;
 		case 3: /* Manual mode - change */
-			/* TODO: Slam n Jam 96 doesn't like this, investigate. */
 			if ( state->m_vdp1.fbcr_accessed )
 			{
 				stv_vdp1_change_framebuffers(machine);
@@ -2098,8 +2097,10 @@ void video_update_vdp1(running_machine &machine)
 				{
 					stv_clear_framebuffer(machine, state->m_vdp1.framebuffer_current_draw);
 				}
-				framebuffer_changed = 1;
+				/* TODO: Slam n Jam 96 & Cross Romance doesn't like this, investigate. */
+//				framebuffer_changed = 1;
 			}
+			framebuffer_changed = 1;
 			break;
 	}
 	state->m_vdp1.fbcr_accessed = 0;
