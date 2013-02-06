@@ -60,12 +60,4 @@
 #define DEVICE_RESET(name)          void DEVICE_RESET_NAME(name)(device_t *device)
 #define DEVICE_RESET_CALL(name)     DEVICE_RESET_NAME(name)(device)
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-class device_t;
-
-typedef void (*device_start_func)(device_t *device);
-
 #endif  /* __DEVLEGCY_H__ */
