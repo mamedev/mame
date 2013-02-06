@@ -121,6 +121,8 @@ public:
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vbl_irq);
+	void updateAceRam();
+	void mixDualAlphaSprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx0, gfx_element *gfx1, int mixAlphaTilemap);
 };
 
 class dragngun_state : public deco32_state
@@ -149,6 +151,7 @@ public:
 	DECLARE_VIDEO_START(lockload);
 	UINT32 screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_dragngun(screen_device &screen, bool state);
+	void dragngun_draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT32 *spritedata);	
 };
 
 /*----------- defined in video/deco32.c -----------*/

@@ -139,10 +139,9 @@ void dcon_state::video_start()
 	m_gfx_bank_select = 0;
 }
 
-static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void dcon_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	dcon_state *state = machine.driver_data<dcon_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs,fx,fy,x,y,color,sprite;
 	int dx,dy,ax,ay,inc,pri_mask = 0;
 
@@ -185,79 +184,79 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap,const re
 			for (ay=0; ay<dy; ay++) {
 				if (!fx && !fy)
 				{
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+ay*16,
-						machine.priority_bitmap,pri_mask,15);
+						machine().priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+ay*16 + 512,
-						machine.priority_bitmap,pri_mask,15);
+						machine().priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+ay*16 - 512,
-						machine.priority_bitmap,pri_mask,15);
+						machine().priority_bitmap,pri_mask,15);
 				}
 				else if (fx && !fy)
 				{
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16,
-						machine.priority_bitmap,pri_mask,15);
+						machine().priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16 + 512,
-						machine.priority_bitmap,pri_mask,15);
+						machine().priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+ay*16 - 512,
-						machine.priority_bitmap,pri_mask,15);
+						machine().priority_bitmap,pri_mask,15);
 				}
 				else if (!fx && fy)
 				{
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+(dy-1-ay)*16,
-						machine.priority_bitmap,pri_mask,15);
+						machine().priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+(dy-1-ay)*16 + 512,
-						machine.priority_bitmap,pri_mask,15);
+						machine().priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+ax*16,y+(dy-1-ay)*16 - 512,
-						machine.priority_bitmap,pri_mask,15);
+						machine().priority_bitmap,pri_mask,15);
 				}
 				else
 				{
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16,
-						machine.priority_bitmap,pri_mask,15);
+						machine().priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16 + 512,
-						machine.priority_bitmap,pri_mask,15);
+						machine().priority_bitmap,pri_mask,15);
 
 					// wrap around y
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						sprite + inc,
 						color,fx,fy,x+(dx-1-ax)*16,y+(dy-1-ay)*16 - 512,
-						machine.priority_bitmap,pri_mask,15);
+						machine().priority_bitmap,pri_mask,15);
 				}
 
 				inc++;
@@ -286,7 +285,7 @@ UINT32 dcon_state::screen_update_dcon(screen_device &screen, bitmap_ind16 &bitma
 	m_foreground_layer->draw(bitmap, cliprect, 0,2);
 	m_text_layer->draw(bitmap, cliprect, 0,4);
 
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	return 0;
 }
 
@@ -320,6 +319,6 @@ UINT32 dcon_state::screen_update_sdgndmps(screen_device &screen, bitmap_ind16 &b
 	m_foreground_layer->draw(bitmap, cliprect, 0,2);
 	m_text_layer->draw(bitmap, cliprect, 0,4);
 
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	return 0;
 }

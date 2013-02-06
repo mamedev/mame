@@ -54,11 +54,10 @@ WRITE16_MEMBER(drgnmst_state::drgnmst_md_videoram_w)
 	m_md_tilemap->mark_tile_dirty(offset / 2);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
+void drgnmst_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	drgnmst_state *state = machine.driver_data<drgnmst_state>();
-	gfx_element *gfx = machine.gfx[0];
-	UINT16 *source = state->m_spriteram;
+	gfx_element *gfx = machine().gfx[0];
+	UINT16 *source = m_spriteram;
 	UINT16 *finish = source + 0x800 / 2;
 
 	while (source < finish)
@@ -186,7 +185,7 @@ UINT32 drgnmst_state::screen_update_drgnmst(screen_device &screen, bitmap_ind16 
 
 	}
 
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 
 //  popmessage ("x %04x x %04x x %04x x %04x x %04x", m_vidregs2[0], m_vidregs[12], m_vidregs[13], m_vidregs[14], m_vidregs[15]);
 //  popmessage ("x %04x x %04x y %04x y %04x z %04x z %04x",m_vidregs[0],m_vidregs[1],m_vidregs[2],m_vidregs[3],m_vidregs[4],m_vidregs[5]);

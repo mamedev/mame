@@ -250,4 +250,5 @@ private:
 	void draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprect,
 					int missile_y_adjust, int missile_y_adjust_flip_screen,
 					UINT8 *missile_ram, int interleave);
+	void decocass_fno( offs_t offset, UINT8 data );
 };

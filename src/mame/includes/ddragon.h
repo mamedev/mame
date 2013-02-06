@@ -103,4 +103,6 @@ public:
 	UINT32 screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(ddragon_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
+	void draw_sprites(  bitmap_ind16 &bitmap,const rectangle &cliprect );
+	int scanline_to_vcount( int scanline );
 };

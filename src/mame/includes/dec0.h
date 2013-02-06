@@ -82,6 +82,13 @@ public:
 	UINT32 screen_update_hippodrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_slyspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_midres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void update_24bitcol(int offset);
+	void baddudes_i8751_write(int data);
+	void birdtry_i8751_write(int data);
+	void dec0_i8751_write(int data);
+	void dec0_i8751_reset();
+	void h6280_decrypt(const char *cputag);
+	void slyspy_set_protection_map( int type);
 };
 
 

@@ -48,4 +48,6 @@ public:
 	virtual void palette_init();
 	DECLARE_VIDEO_START(dorunrun);
 	UINT32 screen_update_docastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void video_start_common( UINT32 tile_transmask );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

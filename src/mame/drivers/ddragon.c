@@ -107,7 +107,7 @@ Dip locations verified with manual for ddragon & ddragon2
     Since MAME's video timing is 0-based, we need to convert this.
 */
 
-INLINE int scanline_to_vcount( int scanline )
+int ddragon_state::scanline_to_vcount( int scanline )
 {
 	int vcount = scanline + 8;
 	if (vcount < 0x100)

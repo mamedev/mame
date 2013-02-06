@@ -26,28 +26,27 @@
 
 /******************************************************************************/
 
-static void update_24bitcol(running_machine &machine, int offset)
+void darkseal_state::update_24bitcol(int offset)
 {
-	darkseal_state *state = machine.driver_data<darkseal_state>();
 	int r,g,b;
 
-	r = (state->m_generic_paletteram_16[offset] >> 0) & 0xff;
-	g = (state->m_generic_paletteram_16[offset] >> 8) & 0xff;
-	b = (state->m_generic_paletteram2_16[offset] >> 0) & 0xff;
+	r = (m_generic_paletteram_16[offset] >> 0) & 0xff;
+	g = (m_generic_paletteram_16[offset] >> 8) & 0xff;
+	b = (m_generic_paletteram2_16[offset] >> 0) & 0xff;
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_MEMBER(darkseal_state::darkseal_palette_24bit_rg_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	update_24bitcol(machine(), offset);
+	update_24bitcol(offset);
 }
 
 WRITE16_MEMBER(darkseal_state::darkseal_palette_24bit_b_w)
 {
 	COMBINE_DATA(&m_generic_paletteram2_16[offset]);
-	update_24bitcol(machine(), offset);
+	update_24bitcol(offset);
 }
 
 /******************************************************************************/

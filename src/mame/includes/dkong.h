@@ -225,6 +225,15 @@ public:
 	DECLARE_READ8_MEMBER(dkong_voice_status_r);
 	DECLARE_READ8_MEMBER(dkong_tune_r);
 	DECLARE_WRITE8_MEMBER(dkong_p1_w);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 mask_bank, UINT32 shift_bits);
+	inline double CD4049(double x);
+	void radarscp_step(int line_cnt);
+	void radarscp_draw_background(dkong_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void radarscp_scanline(int scanline);
+	void check_palette();
+	void dkong_init_device_driver_data(  );
+	void braze_decrypt_rom(UINT8 *dest);
+	void drakton_decrypt_rom(UINT8 mod, int offs, int *bs);
 };
 
 /*----------- defined in audio/dkong.c -----------*/

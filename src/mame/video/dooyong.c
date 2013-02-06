@@ -2,7 +2,7 @@
 #include "includes/dooyong.h"
 
 
-INLINE void dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_t *map)
+inline void dooyong_state::dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_t *map)
 {
 	UINT8 old = scroll[offset];
 	if (old != data)
@@ -30,10 +30,10 @@ INLINE void dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_
 			/* 0x02 is initialised on startup by some games and written to continuously by others */
 			/*{
 			    const char *name;
-			    if (scroll == state->m_bgscroll8)        name = "bg";
-			    else if (scroll == state->m_bg2scroll8)  name = "bg2";
-			    else if (scroll == state->m_fgscroll8)   name = "fg";
-			    else if (scroll == state->m_fg2scroll8)  name = "fg2";
+			    if (scroll == m_bgscroll8)        name = "bg";
+			    else if (scroll == m_bg2scroll8)  name = "bg2";
+			    else if (scroll == m_fgscroll8)   name = "fg";
+			    else if (scroll == m_fg2scroll8)  name = "fg2";
 			    else                            name = "unknown";
 			    printf("Unknown %s tilemap control: 0x%02x = 0x%02x\n", name, (unsigned)offset, (unsigned)data);
 			}*/
@@ -334,7 +334,7 @@ TILE_GET_INFO_MEMBER(dooyong_state::get_tx_tile_info)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pollux_extensions)
+void dooyong_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pollux_extensions)
 {
 	/* Sprites take 32 bytes each in memory:
 	                 MSB   LSB
@@ -359,11 +359,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	   height only used by pollux, bluehawk and flytiger
 	   x flip and y flip only used by pollux and flytiger */
 
-	dooyong_state *state = machine.driver_data<dooyong_state>();
-	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
+	UINT8 *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram->bytes(); offs += 32)
+	for (offs = 0; offs < m_spriteram->bytes(); offs += 32)
 	{
 		int sx, sy, code, color, pri;
 		int flipx = 0, flipy = 0, height = 0, y;
@@ -404,7 +403,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			}
 		}
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 498 - sx;
 			sy = 240 - (16 * height) - sy;
@@ -414,21 +413,20 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		for (y = 0; y <= height; y++)
 		{
-			pdrawgfx_transpen(bitmap, cliprect, machine.gfx[1],
+			pdrawgfx_transpen(bitmap, cliprect, machine().gfx[1],
 					code + y,
 					color,
 					flipx, flipy,
 					sx, sy + (16 * (flipy ? (height - y) : y)),
-					machine.priority_bitmap,
+					machine().priority_bitmap,
 					pri, 15);
 		}
 	}
 }
 
-static void rshark_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void dooyong_state::rshark_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dooyong_state *state = machine.driver_data<dooyong_state>();
-	UINT16 *buffered_spriteram16 = state->m_spriteram16->buffer();
+	UINT16 *buffered_spriteram16 = m_spriteram16->buffer();
 
 	/* Sprites take 8 16-bit words each in memory:
 	              MSB             LSB
@@ -451,7 +449,7 @@ static void rshark_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 
 	int offs;
 
-	for (offs = (state->m_spriteram16->bytes() / 2) - 8; offs >= 0; offs -= 8)
+	for (offs = (m_spriteram16->bytes() / 2) - 8; offs >= 0; offs -= 8)
 	{
 		if (buffered_spriteram16[offs] & 0x0001)    /* enable */
 		{
@@ -469,7 +467,7 @@ static void rshark_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 			width = buffered_spriteram16[offs+1] & 0x000f;
 			height = (buffered_spriteram16[offs+1] & 0x00f0) >> 4;
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				sx = 498 - (16 * width) - sx;
 				sy = 240 - (16 * height) - sy;
@@ -483,12 +481,12 @@ static void rshark_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 				for (x = 0; x <= width; x++)
 				{
 					int _x = sx + (16 * (flipx ? (width - x) : x));
-					pdrawgfx_transpen(bitmap, cliprect, machine.gfx[0],
+					pdrawgfx_transpen(bitmap, cliprect, machine().gfx[0],
 							code,
 							color,
 							flipx, flipy,
 							_x, _y,
-							machine.priority_bitmap,
+							machine().priority_bitmap,
 							pri, 15);
 					code++;
 				}
@@ -508,7 +506,7 @@ UINT32 dooyong_state::screen_update_lastday(screen_device &screen, bitmap_ind16 
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
 	if (!m_sprites_disabled)
-		draw_sprites(machine(), bitmap, cliprect, 0);
+		draw_sprites(bitmap, cliprect, 0);
 	return 0;
 }
 
@@ -521,7 +519,7 @@ UINT32 dooyong_state::screen_update_gulfstrm(screen_device &screen, bitmap_ind16
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
-	draw_sprites(machine(), bitmap, cliprect, 1);
+	draw_sprites(bitmap, cliprect, 1);
 	return 0;
 }
 
@@ -534,7 +532,7 @@ UINT32 dooyong_state::screen_update_pollux(screen_device &screen, bitmap_ind16 &
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
-	draw_sprites(machine(), bitmap, cliprect, 2);
+	draw_sprites(bitmap, cliprect, 2);
 	return 0;
 }
 
@@ -555,7 +553,7 @@ UINT32 dooyong_state::screen_update_flytiger(screen_device &screen, bitmap_ind16
 	}
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
-	draw_sprites(machine(), bitmap, cliprect, 4);
+	draw_sprites(bitmap, cliprect, 4);
 	return 0;
 }
 
@@ -570,7 +568,7 @@ UINT32 dooyong_state::screen_update_bluehawk(screen_device &screen, bitmap_ind16
 	m_fg2_tilemap->draw(bitmap, cliprect, 0, 4);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
-	draw_sprites(machine(), bitmap, cliprect, 3);
+	draw_sprites(bitmap, cliprect, 3);
 	return 0;
 }
 
@@ -595,7 +593,7 @@ UINT32 dooyong_state::screen_update_rshark(screen_device &screen, bitmap_ind16 &
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 	m_fg2_tilemap->draw(bitmap, cliprect, 0, 2);
 
-	rshark_draw_sprites(machine(), bitmap, cliprect);
+	rshark_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -606,7 +604,7 @@ UINT32 dooyong_state::screen_update_popbingo(screen_device &screen, bitmap_ind16
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
 
-	rshark_draw_sprites(machine(), bitmap, cliprect);
+	rshark_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 

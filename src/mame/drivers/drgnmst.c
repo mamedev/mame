@@ -463,7 +463,7 @@ ROM_START( drgnmst )
 ROM_END
 
 
-static UINT8 drgnmst_asciitohex( UINT8 data )
+UINT8 drgnmst_state::drgnmst_asciitohex( UINT8 data )
 {
 	/* Convert ASCII data to HEX */
 

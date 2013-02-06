@@ -106,10 +106,9 @@ void ddragon3_state::video_start()
  *   6,7| unused
  */
 
-static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void ddragon3_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	ddragon3_state *state = machine.driver_data<ddragon3_state>();
-	UINT16 *source = state->m_spriteram;
+	UINT16 *source = m_spriteram;
 	UINT16 *finish = source + 0x800;
 
 	while (source < finish)
@@ -132,7 +131,7 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 			if (attr & 0x02) sy = 239 + (0x100 - sy); else sy = 240 - sy;
 			if (sx > 0x17f) sx = 0 - (0x200 - sx);
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				sx = 304 - sx;
 				sy = 224 - sy;
@@ -143,8 +142,8 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 			for (i = 0; i <= height; i++)
 			{
 				drawgfx_transpen(bitmap, cliprect,
-					machine.gfx[1], code + i, color, flipx, flipy,
-					sx, sy + (state->flip_screen() ? (i * 16) : (-i * 16)), 0);
+					machine().gfx[1], code + i, color, flipx, flipy,
+					sx, sy + (flip_screen() ? (i * 16) : (-i * 16)), 0);
 			}
 		}
 
@@ -163,18 +162,18 @@ UINT32 ddragon3_state::screen_update_ddragon3(screen_device &screen, bitmap_ind1
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 	}
 	else if ((m_vreg & 0x60) == 0x60)
 	{
 		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 	}
 	else
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	return 0;
@@ -190,14 +189,14 @@ UINT32 ddragon3_state::screen_update_ctribe(screen_device &screen, bitmap_ind16 
 	if(m_vreg & 8)
 	{
 		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 	}
 	return 0;
 }

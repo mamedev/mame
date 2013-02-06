@@ -170,22 +170,21 @@ WRITE8_MEMBER(dogfgt_state::dogfgt_1800_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
+void dogfgt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	dogfgt_state *state = machine.driver_data<dogfgt_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
-		if (state->m_spriteram[offs] & 0x01)
+		if (m_spriteram[offs] & 0x01)
 		{
 			int sx, sy, flipx, flipy;
 
-			sx = state->m_spriteram[offs + 3];
-			sy = (240 - state->m_spriteram[offs + 2]) & 0xff;
-			flipx = state->m_spriteram[offs] & 0x04;
-			flipy = state->m_spriteram[offs] & 0x02;
-			if (state->flip_screen())
+			sx = m_spriteram[offs + 3];
+			sy = (240 - m_spriteram[offs + 2]) & 0xff;
+			flipx = m_spriteram[offs] & 0x04;
+			flipy = m_spriteram[offs] & 0x02;
+			if (flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -193,9 +192,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 				flipy = !flipy;
 			}
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
-					state->m_spriteram[offs + 1] + ((state->m_spriteram[offs] & 0x30) << 4),
-					(state->m_spriteram[offs] & 0x08) >> 3,
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
+					m_spriteram[offs + 1] + ((m_spriteram[offs] & 0x30) << 4),
+					(m_spriteram[offs] & 0x08) >> 3,
 					flipx,flipy,
 					sx,sy,0);
 		}
@@ -221,7 +220,7 @@ UINT32 dogfgt_state::screen_update_dogfgt(screen_device &screen, bitmap_ind16 &b
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	copybitmap_trans(bitmap, m_pixbitmap, 0, 0, 0, 0, cliprect, PIXMAP_COLOR_BASE + 8 * m_pixcolor);
 	return 0;

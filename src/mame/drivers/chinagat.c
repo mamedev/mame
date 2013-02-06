@@ -98,15 +98,6 @@ Dip locations and factory settings verified with China Gate US manual.
 
     Since MAME's video timing is 0-based, we need to convert this.
 */
-/* based on ddragon.c driver */
-INLINE int scanline_to_vcount( int scanline )
-{
-	int vcount = scanline + 8;
-	if (vcount < 0x100)
-		return vcount;
-	else
-		return (vcount - 0x18) | 0x100;
-}
 
 TIMER_DEVICE_CALLBACK_MEMBER(ddragon_state::chinagat_scanline)
 {

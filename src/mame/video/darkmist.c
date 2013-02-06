@@ -100,21 +100,20 @@ void darkmist_state::palette_init()
 }
 
 
-static void set_pens(running_machine &machine)
+void darkmist_state::set_pens()
 {
-	darkmist_state *state = machine.driver_data<darkmist_state>();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(state->m_generic_paletteram_8[i | 0x200] >> 0);
-		int g = pal4bit(state->m_generic_paletteram_8[i | 0x000] >> 4);
-		int b = pal4bit(state->m_generic_paletteram_8[i | 0x000] >> 0);
+		int r = pal4bit(m_generic_paletteram_8[i | 0x200] >> 0);
+		int g = pal4bit(m_generic_paletteram_8[i | 0x000] >> 4);
+		int b = pal4bit(m_generic_paletteram_8[i | 0x000] >> 0);
 
-		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
+		colortable_palette_set_color(machine().colortable, i, MAKE_RGB(r, g, b));
 	}
 
-	colortable_palette_set_color(machine.colortable, 0x100, RGB_BLACK);
+	colortable_palette_set_color(machine().colortable, 0x100, RGB_BLACK);
 }
 
 
@@ -133,7 +132,7 @@ UINT32 darkmist_state::screen_update_darkmist(screen_device &screen, bitmap_ind1
 
 #define DM_GETSCROLL(n) (((m_scroll[(n)]<<1)&0xff) + ((m_scroll[(n)]&0x80)?1:0) +( ((m_scroll[(n)-1]<<4) | (m_scroll[(n)-1]<<12) )&0xff00))
 
-	set_pens(machine());
+	set_pens();
 
 	m_bgtilemap->set_scrollx(0, DM_GETSCROLL(0x2));
 	m_bgtilemap->set_scrolly(0, DM_GETSCROLL(0x6));

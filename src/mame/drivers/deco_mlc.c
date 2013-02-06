@@ -689,12 +689,12 @@ ROM_END
 
 /***************************************************************************/
 
-static void descramble_sound( running_machine &machine )
+void deco_mlc_state::descramble_sound(  )
 {
 	/* the same as simpl156 / heavy smash? */
-	UINT8 *rom = machine.root_device().memregion("ymz")->base();
-	int length = machine.root_device().memregion("ymz")->bytes();
-	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
+	UINT8 *rom = machine().root_device().memregion("ymz")->base();
+	int length = machine().root_device().memregion("ymz")->bytes();
+	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
 
 	UINT32 x;
 
@@ -714,7 +714,7 @@ static void descramble_sound( running_machine &machine )
 
 	memcpy(rom,buf1,length);
 
-	auto_free (machine, buf1);
+	auto_free(machine(), buf1);
 }
 
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
@@ -738,7 +738,7 @@ DRIVER_INIT_MEMBER(deco_mlc_state,avengrgs)
 
 	m_mainCpuIsArm = 0;
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),this));
-	descramble_sound(machine());
+	descramble_sound();
 }
 
 DRIVER_INIT_MEMBER(deco_mlc_state,mlc)
@@ -749,7 +749,7 @@ DRIVER_INIT_MEMBER(deco_mlc_state,mlc)
 	machine().device("maincpu")->set_clock_scale(2.0f);
 	m_mainCpuIsArm = 1;
 	deco156_decrypt(machine());
-	descramble_sound(machine());
+	descramble_sound();
 }
 
 /***************************************************************************/

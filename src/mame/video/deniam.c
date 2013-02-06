@@ -2,31 +2,30 @@
 #include "includes/deniam.h"
 
 
-static void deniam_common_init( running_machine &machine )
+void deniam_state::deniam_common_init(  )
 {
-	deniam_state *state = machine.driver_data<deniam_state>();
 	int i;
 
-	state->m_bg_scrollx_reg = 0x00a4/2;
-	state->m_bg_scrolly_reg = 0x00a8/2;
-	state->m_bg_page_reg    = 0x00ac/2;
-	state->m_fg_scrollx_reg = 0x00a2/2;
-	state->m_fg_scrolly_reg = 0x00a6/2;
-	state->m_fg_page_reg    = 0x00aa/2;
+	m_bg_scrollx_reg = 0x00a4/2;
+	m_bg_scrolly_reg = 0x00a8/2;
+	m_bg_page_reg    = 0x00ac/2;
+	m_fg_scrollx_reg = 0x00a2/2;
+	m_fg_scrolly_reg = 0x00a6/2;
+	m_fg_page_reg    = 0x00aa/2;
 
-	state->m_display_enable = 0;
-	state->m_coinctrl = 0;
+	m_display_enable = 0;
+	m_coinctrl = 0;
 
 	for (i = 0; i < 4; i++)
 	{
-		state->m_bg_page[i] = 0;
-		state->m_fg_page[i] = 0;
+		m_bg_page[i] = 0;
+		m_fg_page[i] = 0;
 	}
 }
 
 DRIVER_INIT_MEMBER(deniam_state,logicpro)
 {
-	deniam_common_init(machine());
+	deniam_common_init();
 
 	m_bg_scrollx_offs = 0x00d;
 	m_bg_scrolly_offs = 0x000;
@@ -36,7 +35,7 @@ DRIVER_INIT_MEMBER(deniam_state,logicpro)
 
 DRIVER_INIT_MEMBER(deniam_state,karianx)
 {
-	deniam_common_init(machine());
+	deniam_common_init();
 
 	m_bg_scrollx_offs = 0x10d;
 	m_bg_scrolly_offs = 0x080;
@@ -201,30 +200,29 @@ WRITE16_MEMBER(deniam_state::deniam_coinctrl_w)
  *   c  | ---------------- | zoomy like in System 16?
  *   e  | ---------------- |
  */
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void deniam_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	deniam_state *state = machine.driver_data<deniam_state>();
 	int offs;
-	UINT8 *gfx = state->memregion("gfx2")->base();
+	UINT8 *gfx = memregion("gfx2")->base();
 
-	for (offs = state->m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
+	for (offs = m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
 		int sx, starty, endy, x, y, start, color, width, flipx, primask;
 		UINT8 *rom = gfx;
 
-		sx = (state->m_spriteram[offs + 1] & 0x01ff) + 16 * 8 - 1;
+		sx = (m_spriteram[offs + 1] & 0x01ff) + 16 * 8 - 1;
 		if (sx >= 512) sx -= 512;
-		starty = state->m_spriteram[offs + 0] & 0xff;
-		endy = state->m_spriteram[offs + 0] >> 8;
+		starty = m_spriteram[offs + 0] & 0xff;
+		endy = m_spriteram[offs + 0] >> 8;
 
-		width = state->m_spriteram[offs + 2] & 0x007f;
-		flipx = state->m_spriteram[offs + 2] & 0x0100;
+		width = m_spriteram[offs + 2] & 0x007f;
+		flipx = m_spriteram[offs + 2] & 0x0100;
 		if (flipx) sx++;
 
-		color = 0x40 + (state->m_spriteram[offs + 4] & 0x3f);
+		color = 0x40 + (m_spriteram[offs + 4] & 0x3f);
 
 		primask = 8;
-		switch (state->m_spriteram[offs + 4] & 0xc0)
+		switch (m_spriteram[offs + 4] & 0xc0)
 		{
 			case 0x00: primask |= 4 | 2 | 1; break; /* below everything */
 			case 0x40: primask |= 4 | 2;     break; /* below fg and tx */
@@ -233,7 +231,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 
 
-		start = state->m_spriteram[offs + 3] + ((state->m_spriteram[offs + 4] & 0x1f00) << 8);
+		start = m_spriteram[offs + 3] + ((m_spriteram[offs + 4] & 0x1f00) << 8);
 		rom += 2 * start;
 
 		for (y = starty + 1; y <= endy; y++)
@@ -258,9 +256,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((machine.priority_bitmap.pix8(y, sx + x) & primask) == 0)
+								if ((machine().priority_bitmap.pix8(y, sx + x) & primask) == 0)
 									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
-								machine.priority_bitmap.pix8(y, sx + x) = 8;
+								machine().priority_bitmap.pix8(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -277,9 +275,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((machine.priority_bitmap.pix8(y, sx + x) & primask) == 0)
+								if ((machine().priority_bitmap.pix8(y, sx + x) & primask) == 0)
 									bitmap.pix16(y, sx + x) = color * 16+(rom[i] >> 4);
-								machine.priority_bitmap.pix8(y, sx + x) = 8;
+								machine().priority_bitmap.pix8(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -300,9 +298,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((machine.priority_bitmap.pix8(y, sx + x) & primask) == 0)
+								if ((machine().priority_bitmap.pix8(y, sx + x) & primask) == 0)
 									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] >> 4);
-								machine.priority_bitmap.pix8(y, sx + x) = 8;
+								machine().priority_bitmap.pix8(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -319,9 +317,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 						{
 							if (cliprect.contains(sx + x, y))
 							{
-								if ((machine.priority_bitmap.pix8(y, sx + x) & primask) == 0)
+								if ((machine().priority_bitmap.pix8(y, sx + x) & primask) == 0)
 									bitmap.pix16(y, sx + x) = color * 16 + (rom[i] & 0x0f);
-								machine.priority_bitmap.pix8(y, sx + x) = 8;
+								machine().priority_bitmap.pix8(y, sx + x) = 8;
 							}
 						}
 						x++;
@@ -334,29 +332,27 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static void set_bg_page( running_machine &machine, int page, int value )
+void deniam_state::set_bg_page( int page, int value )
 {
-	deniam_state *state = machine.driver_data<deniam_state>();
 	int tile_index;
 
-	if (state->m_bg_page[page] != value)
+	if (m_bg_page[page] != value)
 	{
-		state->m_bg_page[page] = value;
+		m_bg_page[page] = value;
 		for (tile_index = page * 0x800; tile_index < (page + 1) * 0x800; tile_index++)
-			state->m_bg_tilemap->mark_tile_dirty(tile_index);
+			m_bg_tilemap->mark_tile_dirty(tile_index);
 	}
 }
 
-static void set_fg_page( running_machine &machine, int page, int value )
+void deniam_state::set_fg_page( int page, int value )
 {
-	deniam_state *state = machine.driver_data<deniam_state>();
 	int tile_index;
 
-	if (state->m_fg_page[page] != value)
+	if (m_fg_page[page] != value)
 	{
-		state->m_fg_page[page] = value;
+		m_fg_page[page] = value;
 		for (tile_index = page * 0x800; tile_index < (page + 1) * 0x800; tile_index++)
-			state->m_fg_tilemap->mark_tile_dirty(tile_index);
+			m_fg_tilemap->mark_tile_dirty(tile_index);
 	}
 }
 
@@ -371,18 +367,18 @@ UINT32 deniam_state::screen_update_deniam(screen_device &screen, bitmap_ind16 &b
 	bg_scrollx = m_textram[m_bg_scrollx_reg] - m_bg_scrollx_offs;
 	bg_scrolly = (m_textram[m_bg_scrolly_reg] & 0xff) - m_bg_scrolly_offs;
 	page = m_textram[m_bg_page_reg];
-	set_bg_page(machine(), 3, (page >>12) & 0x0f);
-	set_bg_page(machine(), 2, (page >> 8) & 0x0f);
-	set_bg_page(machine(), 1, (page >> 4) & 0x0f);
-	set_bg_page(machine(), 0, (page >> 0) & 0x0f);
+	set_bg_page(3, (page >>12) & 0x0f);
+	set_bg_page(2, (page >> 8) & 0x0f);
+	set_bg_page(1, (page >> 4) & 0x0f);
+	set_bg_page(0, (page >> 0) & 0x0f);
 
 	fg_scrollx = m_textram[m_fg_scrollx_reg] - m_fg_scrollx_offs;
 	fg_scrolly = (m_textram[m_fg_scrolly_reg] & 0xff) - m_fg_scrolly_offs;
 	page = m_textram[m_fg_page_reg];
-	set_fg_page(machine(), 3, (page >>12) & 0x0f);
-	set_fg_page(machine(), 2, (page >> 8) & 0x0f);
-	set_fg_page(machine(), 1, (page >> 4) & 0x0f);
-	set_fg_page(machine(), 0, (page >> 0) & 0x0f);
+	set_fg_page(3, (page >>12) & 0x0f);
+	set_fg_page(2, (page >> 8) & 0x0f);
+	set_fg_page(1, (page >> 4) & 0x0f);
+	set_fg_page(0, (page >> 0) & 0x0f);
 
 	m_bg_tilemap->set_scrollx(0, bg_scrollx & 0x1ff);
 	m_bg_tilemap->set_scrolly(0, bg_scrolly & 0x0ff);
@@ -395,6 +391,6 @@ UINT32 deniam_state::screen_update_deniam(screen_device &screen, bitmap_ind16 &b
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

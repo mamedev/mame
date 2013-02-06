@@ -88,4 +88,7 @@ public:
 	UINT32 screen_update_rshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_popbingo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(rshark_scanline);
+	inline void dooyong_scroll8_w(offs_t offset, UINT8 data, UINT8 *scroll, tilemap_t *map);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pollux_extensions);
+	void rshark_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

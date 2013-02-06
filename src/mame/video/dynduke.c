@@ -126,13 +126,12 @@ WRITE16_MEMBER(dynduke_state::dynduke_control_w)
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
+void dynduke_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
-	dynduke_state *state = machine.driver_data<dynduke_state>();
-	UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
+	UINT16 *buffered_spriteram16 = m_spriteram->buffer();
 	int offs,fx,fy,x,y,color,sprite;
 
-	if (!state->m_sprite_enable) return;
+	if (!m_sprite_enable) return;
 
 	for (offs = 0x800-4;offs >= 0;offs -= 4)
 	{
@@ -151,36 +150,35 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		sprite = buffered_spriteram16[offs+1];
 		sprite &= 0x3fff;
 
-		if (state->flip_screen()) {
+		if (flip_screen()) {
 			x=240-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;
 			if (fy) fy=0; else fy=1;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 				sprite,
 				color,fx,fy,x,y,15);
 	}
 }
 
-static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	dynduke_state *state = machine.driver_data<dynduke_state>();
 	/* The transparency / palette handling on the background layer is very strange */
-	bitmap_ind16 &bm = state->m_bg_layer->pixmap();
+	bitmap_ind16 &bm = m_bg_layer->pixmap();
 	int scrolly, scrollx;
 	int x,y;
 
 	/* if we're disabled, don't draw */
-	if (!state->m_back_enable)
+	if (!m_back_enable)
 	{
-		bitmap.fill(get_black_pen(machine), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 		return;
 	}
 
-	scrolly = ((state->m_scroll_ram[0x01]&0x30)<<4)+((state->m_scroll_ram[0x02]&0x7f)<<1)+((state->m_scroll_ram[0x02]&0x80)>>7);
-	scrollx = ((state->m_scroll_ram[0x09]&0x30)<<4)+((state->m_scroll_ram[0x0a]&0x7f)<<1)+((state->m_scroll_ram[0x0a]&0x80)>>7);
+	scrolly = ((m_scroll_ram[0x01]&0x30)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7);
+	scrollx = ((m_scroll_ram[0x09]&0x30)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7);
 
 	for (y=0;y<256;y++)
 	{
@@ -206,7 +204,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 			if ((srcdat & 0x20) == pri)
 			{
 				if (srcdat & 0x10) srcdat += 0x400;
-				//if (srcdat & 0x10) srcdat += machine.rand()&0x1f;
+				//if (srcdat & 0x10) srcdat += machine().rand()&0x1f;
 
 				srcdat = (srcdat & 0x000f) | ((srcdat & 0xffc0) >> 2);
 				dst[x] = srcdat;
@@ -226,14 +224,14 @@ UINT32 dynduke_state::screen_update_dynduke(screen_device &screen, bitmap_ind16 
 	m_tx_layer->enable(m_txt_enable);
 
 
-	draw_background(machine(), bitmap, cliprect,0x00);
-	draw_sprites(machine(),bitmap,cliprect,0); // Untested: does anything use it? Could be behind background
-	draw_sprites(machine(),bitmap,cliprect,1);
-	draw_background(machine(), bitmap, cliprect,0x20);
+	draw_background(bitmap, cliprect,0x00);
+	draw_sprites(bitmap,cliprect,0); // Untested: does anything use it? Could be behind background
+	draw_sprites(bitmap,cliprect,1);
+	draw_background(bitmap, cliprect,0x20);
 
-	draw_sprites(machine(),bitmap,cliprect,2);
+	draw_sprites(bitmap,cliprect,2);
 	m_fg_layer->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(),bitmap,cliprect,3);
+	draw_sprites(bitmap,cliprect,3);
 	m_tx_layer->draw(bitmap, cliprect, 0,0);
 
 	return 0;

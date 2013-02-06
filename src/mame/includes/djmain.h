@@ -57,6 +57,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vb_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
 	void sndram_set_bank();
+	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/djmain.c -----------*/

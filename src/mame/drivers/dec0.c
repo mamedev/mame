@@ -192,7 +192,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 			break;
 
 		case 6: /* Intel 8751 microcontroller - Bad Dudes, Heavy Barrel, Birdy Try only */
-			dec0_i8751_write(machine(), data);
+			dec0_i8751_write(data);
 			break;
 
 		case 8: /* Interrupt ack (VBL - IRQ 6) */
@@ -207,7 +207,7 @@ WRITE16_MEMBER(dec0_state::dec0_control_w)
 			break;
 
 		case 0xe: /* Reset Intel 8751? - not sure, all the games write here at startup */
-			dec0_i8751_reset(machine());
+			dec0_i8751_reset();
 			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",space.device().safe_pc(),data,0x30c010+(offset<<1));
 			break;
 
@@ -407,30 +407,29 @@ void slyspy_set_protection_map(running_machine& machine, int type);
 WRITE16_MEMBER(dec0_state::slyspy_state_w)
 {
 	m_slyspy_state=0;
-	slyspy_set_protection_map(machine(), m_slyspy_state);
+	slyspy_set_protection_map(m_slyspy_state);
 }
 
 READ16_MEMBER(dec0_state::slyspy_state_r)
 {
 	m_slyspy_state++;
 	m_slyspy_state=m_slyspy_state%4;
-	slyspy_set_protection_map(machine(), m_slyspy_state);
+	slyspy_set_protection_map(m_slyspy_state);
 
 	return 0; /* Value doesn't mater */
 }
 
-void slyspy_set_protection_map(running_machine& machine, int type)
+void dec0_state::slyspy_set_protection_map( int type)
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
-	address_space& space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	deco_bac06_device *tilegen1 = (deco_bac06_device*)state->m_tilegen1;
-	deco_bac06_device *tilegen2 = (deco_bac06_device*)state->m_tilegen2;
+	deco_bac06_device *tilegen1 = (deco_bac06_device*)m_tilegen1;
+	deco_bac06_device *tilegen2 = (deco_bac06_device*)m_tilegen2;
 
-	space.install_write_handler( 0x240000, 0x24ffff, write16_delegate(FUNC(dec0_state::unmapped_w),state));
+	space.install_write_handler( 0x240000, 0x24ffff, write16_delegate(FUNC(dec0_state::unmapped_w),this));
 
-	space.install_write_handler( 0x24a000, 0x24a001, write16_delegate(FUNC(dec0_state::slyspy_state_w),state));
-	space.install_read_handler( 0x244000, 0x244001, read16_delegate(FUNC(dec0_state::slyspy_state_r),state));
+	space.install_write_handler( 0x24a000, 0x24a001, write16_delegate(FUNC(dec0_state::slyspy_state_w),this));
+	space.install_read_handler( 0x244000, 0x244001, read16_delegate(FUNC(dec0_state::slyspy_state_r),this));
 
 	switch (type)
 	{
@@ -1676,7 +1675,7 @@ MACHINE_CONFIG_END
 MACHINE_RESET_MEMBER(dec0_state,slyspy)
 {
 	// set initial memory map
-	slyspy_set_protection_map(machine(), 0);
+	slyspy_set_protection_map(0);
 }
 
 static MACHINE_CONFIG_DERIVED( slyspy, dec0_base_sound_alt )

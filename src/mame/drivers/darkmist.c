@@ -311,15 +311,15 @@ ROM_START( darkmist )
 ROM_END
 
 
-static void decrypt_gfx(running_machine &machine)
+void darkmist_state::decrypt_gfx()
 {
-	UINT8 *buf = auto_alloc_array(machine, UINT8, 0x40000);
+	UINT8 *buf = auto_alloc_array(machine(), UINT8, 0x40000);
 	UINT8 *rom;
 	int size;
 	int i;
 
-	rom = machine.root_device().memregion("gfx1")->base();
-	size = machine.root_device().memregion("gfx1")->bytes();
+	rom = machine().root_device().memregion("gfx1")->base();
+	size = machine().root_device().memregion("gfx1")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -341,8 +341,8 @@ static void decrypt_gfx(running_machine &machine)
 	}
 
 
-	rom = machine.root_device().memregion("gfx2")->base();
-	size = machine.root_device().memregion("gfx2")->bytes();
+	rom = machine().root_device().memregion("gfx2")->base();
+	size = machine().root_device().memregion("gfx2")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -364,8 +364,8 @@ static void decrypt_gfx(running_machine &machine)
 	}
 
 
-	rom = machine.root_device().memregion("gfx3")->base();
-	size = machine.root_device().memregion("gfx3")->bytes();
+	rom = machine().root_device().memregion("gfx3")->base();
+	size = machine().root_device().memregion("gfx3")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -386,13 +386,13 @@ static void decrypt_gfx(running_machine &machine)
 		rom[i] = buf[BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14, 12,11,10,9,8, 5,4,3, 13, 7,6, 1,0, 2)];
 	}
 
-	auto_free(machine, buf);
+	auto_free(machine(), buf);
 }
 
-static void decrypt_snd(running_machine &machine)
+void darkmist_state::decrypt_snd()
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("t5182")->base();
+	UINT8 *ROM = machine().root_device().memregion("t5182")->base();
 
 	for(i=0x8000;i<0x10000;i++)
 		ROM[i] = BITSWAP8(ROM[i], 7,1,2,3,4,5,6,0);
@@ -408,9 +408,9 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 
 	t5182_init(machine());
 
-	decrypt_gfx(machine());
+	decrypt_gfx();
 
-	decrypt_snd(machine());
+	decrypt_snd();
 
 	for(i=0;i<0x8000;i++)
 	{

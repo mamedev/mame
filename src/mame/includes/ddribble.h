@@ -62,4 +62,6 @@ public:
 	UINT32 screen_update_ddribble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ddribble_interrupt_0);
 	INTERRUPT_GEN_MEMBER(ddribble_interrupt_1);
+	void set_pens(  );
+	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* source, int lenght, int gfxset, int flipscreen );
 };

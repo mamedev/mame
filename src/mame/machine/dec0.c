@@ -201,54 +201,52 @@ WRITE8_MEMBER(dec0_state::dec0_mcu_port_w)
 	}
 }
 
-static void baddudes_i8751_write(running_machine &machine, int data)
+void dec0_state::baddudes_i8751_write(int data)
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
-	state->m_i8751_return=0;
+	m_i8751_return=0;
 
 	switch (data&0xffff) {
-		case 0x714: state->m_i8751_return=0x700; break;
-		case 0x73b: state->m_i8751_return=0x701; break;
-		case 0x72c: state->m_i8751_return=0x702; break;
-		case 0x73f: state->m_i8751_return=0x703; break;
-		case 0x755: state->m_i8751_return=0x704; break;
-		case 0x722: state->m_i8751_return=0x705; break;
-		case 0x72b: state->m_i8751_return=0x706; break;
-		case 0x724: state->m_i8751_return=0x707; break;
-		case 0x728: state->m_i8751_return=0x708; break;
-		case 0x735: state->m_i8751_return=0x709; break;
-		case 0x71d: state->m_i8751_return=0x70a; break;
-		case 0x721: state->m_i8751_return=0x70b; break;
-		case 0x73e: state->m_i8751_return=0x70c; break;
-		case 0x761: state->m_i8751_return=0x70d; break;
-		case 0x753: state->m_i8751_return=0x70e; break;
-		case 0x75b: state->m_i8751_return=0x70f; break;
+		case 0x714: m_i8751_return=0x700; break;
+		case 0x73b: m_i8751_return=0x701; break;
+		case 0x72c: m_i8751_return=0x702; break;
+		case 0x73f: m_i8751_return=0x703; break;
+		case 0x755: m_i8751_return=0x704; break;
+		case 0x722: m_i8751_return=0x705; break;
+		case 0x72b: m_i8751_return=0x706; break;
+		case 0x724: m_i8751_return=0x707; break;
+		case 0x728: m_i8751_return=0x708; break;
+		case 0x735: m_i8751_return=0x709; break;
+		case 0x71d: m_i8751_return=0x70a; break;
+		case 0x721: m_i8751_return=0x70b; break;
+		case 0x73e: m_i8751_return=0x70c; break;
+		case 0x761: m_i8751_return=0x70d; break;
+		case 0x753: m_i8751_return=0x70e; break;
+		case 0x75b: m_i8751_return=0x70f; break;
 	}
 
-	if (!state->m_i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",machine.describe_context(),data);
-	machine.device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+	if (!m_i8751_return) logerror("%s: warning - write unknown command %02x to 8571\n",machine().describe_context(),data);
+	machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 }
 
-static void birdtry_i8751_write(running_machine &machine, int data)
+void dec0_state::birdtry_i8751_write(int data)
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
 	static int  pwr,
 				hgt;
 
-	state->m_i8751_return=0;
+	m_i8751_return=0;
 
 	switch(data&0xffff) {
 		/*"Sprite control"*/
-		case 0x22a: state->m_i8751_return = 0x200;    break;
+		case 0x22a: m_i8751_return = 0x200;    break;
 
 		/* Gives an O.B. otherwise (it must be > 0xb0 )*/
-		case 0x3c7: state->m_i8751_return = 0x7ff;    break;
+		case 0x3c7: m_i8751_return = 0x7ff;    break;
 
 		/*Enables shot checks*/
-		case 0x33c: state->m_i8751_return = 0x200;     break;
+		case 0x33c: m_i8751_return = 0x200;     break;
 
 		/*Used on the title screen only(???)*/
-		case 0x31e: state->m_i8751_return = 0x200;     break;
+		case 0x31e: m_i8751_return = 0x200;     break;
 
 /*  0x100-0x10d values are for club power meters(1W=0x100<<-->>PT=0x10d).    *
  *  Returned value to i8751 doesn't matter,but send the result to 0x481.     *
@@ -267,7 +265,7 @@ static void birdtry_i8751_write(running_machine &machine, int data)
 		case 0x10b: pwr = 0x5c;             break; /*PW*/
 		case 0x10c: pwr = 0x60;             break; /*SW*/
 		case 0x10d: pwr = 0x80;             break; /*PT*/
-		case 0x481: state->m_i8751_return = pwr;     break; /*Power meter*/
+		case 0x481: m_i8751_return = pwr;     break; /*Power meter*/
 
 /*  0x200-0x20f values are for shot height(STRONG=0x200<<-->>WEAK=0x20f).    *
  *  Returned value to i8751 doesn't matter,but send the result to 0x534.     *
@@ -288,36 +286,34 @@ static void birdtry_i8751_write(running_machine &machine, int data)
 		case 0x20d: hgt = 0x280;            break; /*|*/
 		case 0x20e: hgt = 0x240;            break; /*|*/
 		case 0x20f: hgt = 0x200;            break; /*L*/
-		case 0x534: state->m_i8751_return = hgt;    break; /*Shot height*/
+		case 0x534: m_i8751_return = hgt;    break; /*Shot height*/
 
 		/*At the ending screen(???)*/
-		//case 0x3b4: state->m_i8751_return = 0;       break;
+		//case 0x3b4: m_i8751_return = 0;       break;
 
 		/*These are activated after a shot (???)*/
-		case 0x6ca: state->m_i8751_return = 0xff;      break;
-		case 0x7ff: state->m_i8751_return = 0x200;     break;
-		default: logerror("%s: warning - write unknown command %02x to 8571\n",machine.describe_context(),data);
+		case 0x6ca: m_i8751_return = 0xff;      break;
+		case 0x7ff: m_i8751_return = 0x200;     break;
+		default: logerror("%s: warning - write unknown command %02x to 8571\n",machine().describe_context(),data);
 	}
-	machine.device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+	machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 }
 
-void dec0_i8751_write(running_machine &machine, int data)
+void dec0_state::dec0_i8751_write(int data)
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
-	state->m_i8751_command=data;
+	m_i8751_command=data;
 
 	/* Writes to this address cause an IRQ to the i8751 microcontroller */
-	if (state->m_GAME == 1) machine.device("mcu")->execute().set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
-	if (state->m_GAME == 2) baddudes_i8751_write(machine, data);
-	if (state->m_GAME == 3) birdtry_i8751_write(machine, data);
+	if (m_GAME == 1) machine().device("mcu")->execute().set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
+	if (m_GAME == 2) baddudes_i8751_write(data);
+	if (m_GAME == 3) birdtry_i8751_write(data);
 
-	//logerror("%s: warning - write %02x to i8751\n",machine.describe_context(),data);
+	//logerror("%s: warning - write %02x to i8751\n",machine().describe_context(),data);
 }
 
-void dec0_i8751_reset(running_machine &machine)
+void dec0_state::dec0_i8751_reset()
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
-	state->m_i8751_return=state->m_i8751_command=0;
+	m_i8751_return=m_i8751_command=0;
 }
 
 /******************************************************************************/
@@ -348,10 +344,10 @@ WRITE16_MEMBER(dec0_state::robocop_68000_share_w)
 
 /******************************************************************************/
 
-static void h6280_decrypt(running_machine &machine, const char *cputag)
+void dec0_state::h6280_decrypt(const char *cputag)
 {
 	int i;
-	UINT8 *RAM = machine.root_device().memregion(cputag)->base();
+	UINT8 *RAM = machine().root_device().memregion(cputag)->base();
 
 	/* Read each byte, decrypt it */
 	for (i = 0x00000; i < 0x10000; i++)
@@ -364,7 +360,7 @@ DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x180fff, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),this), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),this));
 
-	h6280_decrypt(machine(), "sub");
+	h6280_decrypt("sub");
 
 	/* The protection cpu has additional memory mapped protection! */
 	RAM[0x189] = 0x60; /* RTS prot area */
@@ -377,7 +373,7 @@ DRIVER_INIT_MEMBER(dec0_state,slyspy)
 {
 	UINT8 *RAM = machine().root_device().memregion("audiocpu")->base();
 
-	h6280_decrypt(machine(), "audiocpu");
+	h6280_decrypt("audiocpu");
 
 	/* Slyspy sound cpu has some protection */
 	RAM[0xf2d] = 0xea;

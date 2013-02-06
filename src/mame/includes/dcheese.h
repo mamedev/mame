@@ -54,6 +54,8 @@ public:
 	void update_irq_state();
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void update_scanline_irq();
+	void do_clear(  );
+	void do_blit(  );
 };
 
 /*----------- defined in drivers/dcheese.c -----------*/

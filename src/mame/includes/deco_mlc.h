@@ -39,4 +39,7 @@ public:
 	UINT32 screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_mlc(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
+	void blitRaster(bitmap_rgb32 &bitmap, int rasterMode);
+	void draw_sprites( bitmap_rgb32 &bitmap,const rectangle &cliprect);
+	void descramble_sound(  );
 };

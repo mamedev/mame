@@ -133,6 +133,7 @@ public:
 	INTERRUPT_GEN_MEMBER(gondo_interrupt);
 	INTERRUPT_GEN_MEMBER(oscar_interrupt);
 	TIMER_CALLBACK_MEMBER(dec8_i8751_timer_callback);
+	void srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 };
 
 /*----------- defined in video/dec8.c -----------*/

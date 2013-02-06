@@ -400,19 +400,18 @@ INTERRUPT_GEN_MEMBER(dkong_state::s2650_interrupt)
  *
  *************************************/
 
-static void dkong_init_device_driver_data( running_machine &machine )
+void dkong_state::dkong_init_device_driver_data(  )
 {
-	dkong_state *state = machine.driver_data<dkong_state>();
 
-	state->m_dev_n2a03a = machine.device("n2a03a");
-	state->m_dev_n2a03b = machine.device("n2a03b");
-	state->m_dev_6h = machine.device("ls259.6h");
-	state->m_dev_vp2 = machine.device("virtual_p2");
+	m_dev_n2a03a = machine().device("n2a03a");
+	m_dev_n2a03b = machine().device("n2a03b");
+	m_dev_6h = machine().device("ls259.6h");
+	m_dev_vp2 = machine().device("virtual_p2");
 }
 
 MACHINE_START_MEMBER(dkong_state,dkong2b)
 {
-	dkong_init_device_driver_data(machine());
+	dkong_init_device_driver_data();
 	m_hardware_type = HARDWARE_TKG04;
 
 	save_item(NAME(m_decrypt_counter));
@@ -468,7 +467,7 @@ MACHINE_START_MEMBER(dkong_state,radarscp1)
 
 MACHINE_START_MEMBER(dkong_state,dkong3)
 {
-	dkong_init_device_driver_data(machine());
+	dkong_init_device_driver_data();
 	m_hardware_type = HARDWARE_TKG04;
 }
 
@@ -1606,14 +1605,14 @@ WRITE8_MEMBER(dkong_state::braze_eeprom_w)
 	eeprom->set_clock_line(data & 0x02 ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static void braze_decrypt_rom(running_machine &machine, UINT8 *dest)
+void dkong_state::braze_decrypt_rom(UINT8 *dest)
 {
 	UINT8 oldbyte,newbyte;
 	UINT8 *ROM;
 	UINT32 mem;
 	UINT32 newmem;
 
-	ROM = machine.root_device().memregion("braze")->base();
+	ROM = machine().root_device().memregion("braze")->base();
 
 	for (mem=0;mem<0x10000;mem++)
 	{
@@ -3026,13 +3025,13 @@ ROM_END
  *
  *************************************/
 
-static void drakton_decrypt_rom(running_machine &machine, UINT8 mod, int offs, int *bs)
+void dkong_state::drakton_decrypt_rom(UINT8 mod, int offs, int *bs)
 {
 	UINT8 oldbyte,newbyte;
 	UINT8 *ROM;
 	int mem;
 
-	ROM = machine.root_device().memregion("maincpu")->base();
+	ROM = machine().root_device().memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -3089,10 +3088,10 @@ DRIVER_INIT_MEMBER(dkong_state,drakton)
 	    are actually used in the PAL.  Therefore, we'll take a little
 	    memory overhead and decrypt the ROMs using each method in advance. */
 
-	drakton_decrypt_rom(machine(), 0x02, 0x10000, bs[0]);
-	drakton_decrypt_rom(machine(), 0x40, 0x14000, bs[1]);
-	drakton_decrypt_rom(machine(), 0x8a, 0x18000, bs[2]);
-	drakton_decrypt_rom(machine(), 0xc8, 0x1c000, bs[3]);
+	drakton_decrypt_rom(0x02, 0x10000, bs[0]);
+	drakton_decrypt_rom(0x40, 0x14000, bs[1]);
+	drakton_decrypt_rom(0x8a, 0x18000, bs[2]);
+	drakton_decrypt_rom(0xc8, 0x1c000, bs[3]);
 }
 
 
@@ -3110,10 +3109,10 @@ DRIVER_INIT_MEMBER(dkong_state,strtheat)
 	/* While the PAL supports up to 16 decryption methods, only four
 	    are actually used in the PAL.  Therefore, we'll take a little
 	    memory overhead and decrypt the ROMs using each method in advance. */
-	drakton_decrypt_rom(machine(), 0x03, 0x10000, bs[0]);
-	drakton_decrypt_rom(machine(), 0x81, 0x14000, bs[1]);
-	drakton_decrypt_rom(machine(), 0x0a, 0x18000, bs[2]);
-	drakton_decrypt_rom(machine(), 0x88, 0x1c000, bs[3]);
+	drakton_decrypt_rom(0x03, 0x10000, bs[0]);
+	drakton_decrypt_rom(0x81, 0x14000, bs[1]);
+	drakton_decrypt_rom(0x0a, 0x18000, bs[2]);
+	drakton_decrypt_rom(0x88, 0x1c000, bs[3]);
 
 	/* custom handlers supporting Joystick or Steering Wheel */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x7c00, 0x7c00, read8_delegate(FUNC(dkong_state::strtheat_inputport_0_r),this));
@@ -3136,7 +3135,7 @@ DRIVER_INIT_MEMBER(dkong_state,dkongx)
 	space.install_read_handler(0xc800, 0xc800, read8_delegate(FUNC(dkong_state::braze_eeprom_r),this));
 	space.install_write_handler(0xc800, 0xc800, write8_delegate(FUNC(dkong_state::braze_eeprom_w),this));
 
-	braze_decrypt_rom(machine(), decrypted);
+	braze_decrypt_rom(decrypted);
 
 	membank("bank1")->configure_entries(0, 2, &decrypted[0], 0x8000);
 	membank("bank1")->set_entry(0);

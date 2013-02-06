@@ -17,28 +17,27 @@ WRITE16_MEMBER(dec0_state::dec0_update_sprites_w)
 
 /******************************************************************************/
 
-static void update_24bitcol(running_machine &machine, int offset)
+void dec0_state::update_24bitcol(int offset)
 {
-	dec0_state *state = machine.driver_data<dec0_state>();
 	int r,g,b;
 
-	r = (state->m_generic_paletteram_16[offset] >> 0) & 0xff;
-	g = (state->m_generic_paletteram_16[offset] >> 8) & 0xff;
-	b = (state->m_generic_paletteram2_16[offset] >> 0) & 0xff;
+	r = (m_generic_paletteram_16[offset] >> 0) & 0xff;
+	g = (m_generic_paletteram_16[offset] >> 8) & 0xff;
+	b = (m_generic_paletteram2_16[offset] >> 0) & 0xff;
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_MEMBER(dec0_state::dec0_paletteram_rg_w)
 {
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
-	update_24bitcol(machine(), offset);
+	update_24bitcol(offset);
 }
 
 WRITE16_MEMBER(dec0_state::dec0_paletteram_b_w)
 {
 	COMBINE_DATA(&m_generic_paletteram2_16[offset]);
-	update_24bitcol(machine(), offset);
+	update_24bitcol(offset);
 }
 
 /******************************************************************************/

@@ -30,17 +30,16 @@ void ddribble_state::palette_init()
 }
 
 
-static void set_pens( running_machine &machine )
+void ddribble_state::set_pens(  )
 {
-	ddribble_state *state = machine.driver_data<ddribble_state>();
 	int i;
 
 	for (i = 0x00; i < 0x80; i += 2)
 	{
-		UINT16 data = state->m_paletteram[i | 1] | (state->m_paletteram[i] << 8);
+		UINT16 data = m_paletteram[i | 1] | (m_paletteram[i] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
-		colortable_palette_set_color(machine.colortable, i >> 1, color);
+		colortable_palette_set_color(machine().colortable, i >> 1, color);
 	}
 }
 
@@ -169,9 +168,9 @@ byte #4:    attributes
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* source, int lenght, int gfxset, int flipscreen )
+void ddribble_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* source, int lenght, int gfxset, int flipscreen )
 {
-	gfx_element *gfx = machine.gfx[gfxset];
+	gfx_element *gfx = machine().gfx[gfxset];
 	const UINT8 *finish = source + lenght;
 
 	while (source < finish)
@@ -245,7 +244,7 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 
 UINT32 ddribble_state::screen_update_ddribble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(machine());
+	set_pens();
 
 	m_fg_tilemap->set_flip((m_vregs[0][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	m_bg_tilemap->set_flip((m_vregs[1][4] & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -257,8 +256,8 @@ UINT32 ddribble_state::screen_update_ddribble(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->set_scrolly(0, m_vregs[1][0]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect, m_spriteram_1, 0x07d, 2, m_vregs[0][4] & 0x08);
-	draw_sprites(machine(), bitmap, cliprect, m_spriteram_2, 0x140, 3, m_vregs[1][4] & 0x08);
+	draw_sprites(bitmap, cliprect, m_spriteram_1, 0x07d, 2, m_vregs[0][4] & 0x08);
+	draw_sprites(bitmap, cliprect, m_spriteram_2, 0x140, 3, m_vregs[1][4] & 0x08);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -109,35 +109,33 @@ TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static void video_start_common( running_machine &machine, UINT32 tile_transmask )
+void docastle_state::video_start_common( UINT32 tile_transmask )
 {
-	docastle_state *state = machine.driver_data<docastle_state>();
-	state->m_do_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(docastle_state::get_tile_info),state), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-	state->m_do_tilemap->set_transmask(0, tile_transmask, 0x0000);
+	m_do_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(docastle_state::get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_do_tilemap->set_transmask(0, tile_transmask, 0x0000);
 }
 
 void docastle_state::video_start()
 {
-	video_start_common(machine(), 0x00ff);
+	video_start_common(0x00ff);
 }
 
 VIDEO_START_MEMBER(docastle_state,dorunrun)
 {
-	video_start_common(machine(), 0xff00);
+	video_start_common(0xff00);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void docastle_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	docastle_state *state = machine.driver_data<docastle_state>();
 	int offs;
 
-	machine.priority_bitmap.fill(1);
+	machine().priority_bitmap.fill(1);
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int sx, sy, flipx, flipy, code, color;
 
-		if (machine.gfx[1]->elements() > 256)
+		if (machine().gfx[1]->elements() > 256)
 		{
 			/* spriteram
 
@@ -156,14 +154,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			 */
 
-			code = state->m_spriteram[offs + 3];
-			color = state->m_spriteram[offs + 2] & 0x0f;
-			sx = ((state->m_spriteram[offs + 1] + 8) & 0xff) - 8;
-			sy = state->m_spriteram[offs];
-			flipx = state->m_spriteram[offs + 2] & 0x40;
+			code = m_spriteram[offs + 3];
+			color = m_spriteram[offs + 2] & 0x0f;
+			sx = ((m_spriteram[offs + 1] + 8) & 0xff) - 8;
+			sy = m_spriteram[offs];
+			flipx = m_spriteram[offs + 2] & 0x40;
 			flipy = 0;
-			if (state->m_spriteram[offs + 2] & 0x10) code += 0x100;
-			if (state->m_spriteram[offs + 2] & 0x80) code += 0x200;
+			if (m_spriteram[offs + 2] & 0x10) code += 0x100;
+			if (m_spriteram[offs + 2] & 0x80) code += 0x200;
 		}
 		else
 		{
@@ -182,15 +180,15 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			 */
 
-			code = state->m_spriteram[offs + 3];
-			color = state->m_spriteram[offs + 2] & 0x1f;
-			sx = ((state->m_spriteram[offs + 1] + 8) & 0xff) - 8;
-			sy = state->m_spriteram[offs];
-			flipx = state->m_spriteram[offs + 2] & 0x40;
-			flipy = state->m_spriteram[offs + 2] & 0x80;
+			code = m_spriteram[offs + 3];
+			color = m_spriteram[offs + 2] & 0x1f;
+			sx = ((m_spriteram[offs + 1] + 8) & 0xff) - 8;
+			sy = m_spriteram[offs];
+			flipx = m_spriteram[offs + 2] & 0x40;
+			flipy = m_spriteram[offs + 2] & 0x80;
 		}
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -199,21 +197,21 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 
 		/* first draw the sprite, visible */
-		pdrawgfx_transmask(bitmap,cliprect,machine.gfx[1],
+		pdrawgfx_transmask(bitmap,cliprect,machine().gfx[1],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
-				machine.priority_bitmap,
+				machine().priority_bitmap,
 				0x00,0x80ff);
 
 		/* then draw the mask, behind the background but obscuring following sprites */
-		pdrawgfx_transmask(bitmap,cliprect,machine.gfx[1],
+		pdrawgfx_transmask(bitmap,cliprect,machine().gfx[1],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
-				machine.priority_bitmap,
+				machine().priority_bitmap,
 				0x02,0x7fff);
 	}
 }
@@ -221,7 +219,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 docastle_state::screen_update_docastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_do_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_do_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

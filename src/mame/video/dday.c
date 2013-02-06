@@ -31,13 +31,12 @@ TIMER_CALLBACK_MEMBER(dday_state::countdown_timer_callback)
 		m_timer_value = 99;
 }
 
-static void start_countdown_timer(running_machine &machine)
+void dday_state::start_countdown_timer()
 {
-	dday_state *state = machine.driver_data<dday_state>();
 
-	state->m_timer_value = 0;
+	m_timer_value = 0;
 
-	machine.scheduler().timer_pulse(attotime::from_seconds(1), timer_expired_delegate(FUNC(dday_state::countdown_timer_callback),state));
+	machine().scheduler().timer_pulse(attotime::from_seconds(1), timer_expired_delegate(FUNC(dday_state::countdown_timer_callback),this));
 }
 
 
@@ -219,7 +218,7 @@ void dday_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 	m_text_tilemap->set_transparent_pen(0);
 
-	start_countdown_timer(machine());
+	start_countdown_timer();
 }
 
 WRITE8_MEMBER(dday_state::dday_bgvideoram_w)
