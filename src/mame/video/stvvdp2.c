@@ -6554,15 +6554,6 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 							continue;
 						};
 
-						if ( pix & sprite_shadow )
-						{
-							if ( pix & ~sprite_shadow )
-							{
-								UINT32 p = bitmap_line[x];
-								bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
-							}
-						}
-						else
 						{
 							pix &= sprite_colormask;
 							if ( pix == (sprite_colormask - 1) )
@@ -6581,6 +6572,16 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 								pix &= 0x7ff;
 								pix += color_offset_pal;
 								bitmap_line[x] = machine.pens[ pix ];
+							}
+						}
+
+						/* TODO: I don't think this one makes much logic ... (1) */
+						if ( pix & sprite_shadow )
+						{
+							if ( pix & ~sprite_shadow )
+							{
+								UINT32 p = bitmap_line[x];
+								bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
 							}
 						}
 					}
@@ -6646,15 +6647,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 							}
 						}
 
-						if ( pix & sprite_shadow )
-						{
-							if ( pix & ~sprite_shadow )
-							{
-								UINT32 p = bitmap_line[x];
-								bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
-							}
-						}
-						else
+
 						{
 							pix &= sprite_colormask;
 							if ( pix == (sprite_colormask - 1) )
@@ -6684,6 +6677,16 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 								}
 								else
 									bitmap_line[x] = machine.pens[pix];
+							}
+						}
+
+						/* TODO: (1) */
+						if ( pix & sprite_shadow )
+						{
+							if ( pix & ~sprite_shadow )
+							{
+								UINT32 p = bitmap_line[x];
+								bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
 							}
 						}
 					}
@@ -6801,23 +6804,6 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 						}
 					}
 
-					if ( pix & sprite_shadow )
-					{
-						if ( pix & ~sprite_shadow )
-						{
-							UINT32 p; //= bitmap_line[x];
-							if(double_x)
-							{
-								p = bitmap_line[x*2];
-								bitmap_line[x*2] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
-								p = bitmap_line[x*2+1];
-								bitmap_line[x*2+1] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
-							}
-							else
-								bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
-						}
-					}
-					else
 					{
 						pix &= sprite_colormask;
 						if ( pix == (sprite_colormask - 1) )
@@ -6890,6 +6876,24 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 									}
 								}
 							}
+						}
+					}
+
+					/* TODO: (1) */
+					if ( pix & sprite_shadow )
+					{
+						if ( pix & ~sprite_shadow )
+						{
+							UINT32 p; //= bitmap_line[x];
+							if(double_x)
+							{
+								p = bitmap_line[x*2];
+								bitmap_line[x*2] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
+								p = bitmap_line[x*2+1];
+								bitmap_line[x*2+1] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
+							}
+							else
+								bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
 						}
 					}
 				}
