@@ -9928,6 +9928,80 @@ ROM_END
 
 
 
+ROM_START( fb2010 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "fb2013r.bin", 0x00000, 0x1000, CRC(9cc75315) SHA1(f77fbce1037dbf38ddaa4ce79266d62e5cc7989e) )
+	ROM_CONTINUE(0x4000, 0x1000)
+	ROM_CONTINUE(0x3000, 0x1000)
+	ROM_CONTINUE(0x7000, 0x1000)
+	ROM_CONTINUE(0x1000, 0x1000)
+	ROM_CONTINUE(0x6000, 0x1000)
+	ROM_CONTINUE(0x2000, 0x1000)
+	ROM_CONTINUE(0x5000, 0x1000)
+	ROM_CONTINUE(0x8000, 0x1000)
+	ROM_CONTINUE(0x9000, 0x1000)
+	ROM_CONTINUE(0xa000, 0x1000)
+	ROM_CONTINUE(0xb000, 0x1000)
+	ROM_CONTINUE(0xc000, 0x1000)
+	ROM_CONTINUE(0xd000, 0x1000)
+	ROM_CONTINUE(0xe000, 0x1000)
+	ROM_CONTINUE(0xf000, 0x1000)
+	ROM_REGION( 0x20000, "graphics", 0 )
+	ROM_LOAD( "gfx",  0x00000, 0x20000, NO_DUMP )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_COPY( "graphics", 0x18000, 0x00000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x08000, 0x08000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x04000, 0x10000, 0x4000 ) // 1
+	ROM_COPY( "graphics", 0x1c000, 0x04000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x0c000, 0x0c000, 0x4000 ) // 2
+	ROM_COPY( "graphics", 0x14000, 0x14000, 0x4000 ) // 2
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "graphics", 0x02000, 0x00000, 0x2000 )
+	ROM_COPY( "graphics", 0x12000, 0x02000, 0x2000 )
+	ROM_COPY( "graphics", 0x00000, 0x04000, 0x2000 )
+	ROM_COPY( "graphics", 0x10000, 0x06000, 0x2000 )
+
+	ROM_REGION( 0x200, "proms", 0 ) // palette
+	ROM_LOAD( "proms", 0x0000, 0x0200, NO_DUMP )
+
+	ROM_REGION( 0x80000, "oki", 0 ) // samples
+	ROM_LOAD( "samples", 0x00000, 0x20000, NO_DUMP )
+ROM_END
+
+
+READ8_MEMBER(goldstar_state::fixedval7d_r )
+{
+	return ~0x7d;
+}
+
+
+DRIVER_INIT_MEMBER(goldstar_state,fb2010)
+{
+	int i;
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	for (i = 0;i < 0x10000;i++)
+	{
+		UINT8 x = ROM[i];
+
+		switch(i & 0x22)
+		{
+			case 0x00: x = BITSWAP8(x^0x4c^0xff, 0,4,7,6,5,1,3,2); break;
+			case 0x02: x = BITSWAP8(x^0xc0^0xff, 7,6,0,5,3,2,1,4); break; //   67053214
+			case 0x20: x = BITSWAP8(x^0x6b^0xff, 4,3,2,7,5,6,0,1); break;
+			case 0x22: x = BITSWAP8(x^0x23^0xff, 0,6,1,3,4,5,2,7); break;
+		}
+
+		ROM[i] = x;
+	}
+
+	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(goldstar_state::fixedval7d_r),this));
+
+}
+
+
+
 
 /* descrambled by looking at CALLs
 
@@ -11543,6 +11617,7 @@ GAME( 1998, skill98,   0,        amcoe1,   schery97,  goldstar_state, skill98,  
 GAME( 1997, pokonl97,  0,        amcoe1,   pokonl97,  goldstar_state, po33,      ROT0, "Amcoe",   "Poker Only '97 (ver. 3.3)",                                        0 )   /* ver. 3.3 */
 GAME( 1998, match98,   0,        amcoe1a,  match98,   goldstar_state, match133,  ROT0, "Amcoe",   "Match '98 (ver. 1.33)",                                 0 )
 
+
 /* The Sub-PCB has a printed sticker denoting C1, C2, D or DK for the type of FPGA decryption chip used */
 /* There is known to be a special IOWA version running on the Texas C2 hardware with roms FB96P IA, FB96L IA & FB96H IA with a (c) 2000 Amcoe */
 GAME( 1996, nfb96,     0,        amcoe2,   nfb96,     goldstar_state, nfb96_c1,  ROT0, "Amcoe",   "New Fruit Bonus '96 Special Edition (v3.63, C1 PCB)",          0 ) /* ver. 02-3.63 C1 Sub-PCB */
@@ -11556,6 +11631,8 @@ GAME( 1996, nc96a,     nc96,     amcoe2,   nfb96,     goldstar_state, nfb96_c1, 
 GAME( 1996, nc96b,     nc96,     amcoe2,   nfb96,     goldstar_state, nfb96_d,   ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.54, D PCB)",           0 ) /* D  Sub-PCB */
 GAME( 1996, nc96c,     nc96,     amcoe2,   nfb96,     goldstar_state, nfb96_dk,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v3.62, DK PCB)",          0 ) /* DK Sub-PCB */
 GAME( 2000, nc96txt,   nc96,     amcoe2,   nfb96tx,   goldstar_state, nfb96_c2,  ROT0, "Amcoe",   "New Cherry '96 Special Edition (v1.32 Texas XT, C2 PCB)", 0 ) /* ver. tc1.32axt C2 Sub-PCB */
+
+GAME( 2009, fb2010,    skill98,  amcoe2,   nfb96tx,   goldstar_state, fb2010,    ROT0, "Amcoe",   "Fruit Bonus 2010", GAME_NOT_WORKING ) // no gfx dumped
 
 GAME( 1996, roypok96,  0,        amcoe2,   roypok96,  goldstar_state, rp35,      ROT0, "Amcoe",   "Royal Poker '96 (set 1)",                                 0 ) /* ver. 97-3.5 */
 GAME( 1996, roypok96a, roypok96, amcoe2,   roypok96a, goldstar_state, rp36,      ROT0, "Amcoe",   "Royal Poker '96 (set 2)",                                 0 ) /* ver. 98-3.6 */

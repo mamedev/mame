@@ -2875,6 +2875,7 @@ src/mame/drivers/foodf.c svneol=native#text/plain
 src/mame/drivers/forte2.c svneol=native#text/plain
 src/mame/drivers/fortecar.c svneol=native#text/plain
 src/mame/drivers/freekick.c svneol=native#text/plain
+src/mame/drivers/fresh.c svneol=native#text/plain
 src/mame/drivers/fromanc2.c svneol=native#text/plain
 src/mame/drivers/fromance.c svneol=native#text/plain
 src/mame/drivers/funkball.c svneol=native#text/plain

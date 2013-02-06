@@ -79,6 +79,7 @@ public:
 	DECLARE_READ8_MEMBER(fixedval74_r);
 	DECLARE_READ8_MEMBER(fixedvale4_r);
 	DECLARE_READ8_MEMBER(fixedvalc7_r);
+	DECLARE_READ8_MEMBER(fixedval7d_r);
 	DECLARE_WRITE8_MEMBER(cm_girl_scroll_w);
 	DECLARE_WRITE8_MEMBER(cm_outport0_w);
 	DECLARE_WRITE8_MEMBER(goldstar_fg_vidram_w);
@@ -123,6 +124,7 @@ public:
 	DECLARE_DRIVER_INIT(rp36c3);
 	DECLARE_DRIVER_INIT(magoddsc);
 	DECLARE_DRIVER_INIT(nfb96_c1);
+	DECLARE_DRIVER_INIT(fb2010);
 	TILE_GET_INFO_MEMBER(get_goldstar_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
