@@ -2490,6 +2490,197 @@ static void stv_vdp2_compute_color_offset_UINT32(running_machine &machine,UINT32
 	*rgb = MAKE_RGB(_r, _g, _b);
 }
 
+static void stv_vdp2_drawgfxzoom(
+		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
+		int transparency,int transparent_color,int scalex, int scaley,
+		int sprite_screen_width, int sprite_screen_height, int alpha)
+{
+	rectangle myclip;
+
+	if (!scalex || !scaley) return;
+
+	if (gfx->has_pen_usage() && transparency == STV_TRANSPARENCY_PEN)
+	{
+		int transmask = 0;
+
+		transmask = 1 << (transparent_color & 0xff);
+
+		if ((gfx->pen_usage(code) & ~transmask) == 0)
+			/* character is totally transparent, no need to draw */
+			return;
+		else if ((gfx->pen_usage(code) & transmask) == 0)
+			/* character is totally opaque, can disable transparency */
+			transparency = STV_TRANSPARENCY_NONE;
+	}
+
+	/*
+	scalex and scaley are 16.16 fixed point numbers
+	1<<15 : shrink to 50%
+	1<<16 : uniform scale
+	1<<17 : double to 200%
+	*/
+
+
+	/* KW 991012 -- Added code to force clip to bitmap boundary */
+	myclip = clip;
+	myclip &= dest_bmp.cliprect();
+
+	if( gfx )
+	{
+		const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+		const UINT8 *source_base = gfx->get_data(code % gfx->elements());
+
+		//int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
+		//int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
+
+		if (sprite_screen_width && sprite_screen_height)
+		{
+			/* compute sprite increment per screen pixel */
+			//int dx = (gfx->width()<<16)/sprite_screen_width;
+			//int dy = (gfx->height()<<16)/sprite_screen_height;
+			int dx = stv2_current_tilemap.incx;
+			int dy = stv2_current_tilemap.incy;
+
+			int ex = sx+sprite_screen_width;
+			int ey = sy+sprite_screen_height;
+
+			int x_index_base;
+			int y_index;
+
+			if( flipx )
+			{
+				x_index_base = (sprite_screen_width-1)*dx;
+				dx = -dx;
+			}
+			else
+			{
+				x_index_base = 0;
+			}
+
+			if( flipy )
+			{
+				y_index = (sprite_screen_height-1)*dy;
+				dy = -dy;
+			}
+			else
+			{
+				y_index = 0;
+			}
+
+			if( sx < myclip.min_x)
+			{ /* clip left */
+				int pixels = myclip.min_x-sx;
+				sx += pixels;
+				x_index_base += pixels*dx;
+			}
+			if( sy < myclip.min_y )
+			{ /* clip top */
+				int pixels = myclip.min_y-sy;
+				sy += pixels;
+				y_index += pixels*dy;
+			}
+			/* NS 980211 - fixed incorrect clipping */
+			if( ex > myclip.max_x+1 )
+			{ /* clip right */
+				int pixels = ex-myclip.max_x-1;
+				ex -= pixels;
+			}
+			if( ey > myclip.max_y+1 )
+			{ /* clip bottom */
+				int pixels = ey-myclip.max_y-1;
+				ey -= pixels;
+			}
+
+			if( ex>sx )
+			{ /* skip if inner loop doesn't draw anything */
+				int y;
+
+				/* case 0: STV_TRANSPARENCY_NONE */
+				if (transparency == STV_TRANSPARENCY_NONE)
+				{
+					for( y=sy; y<ey; y++ )
+					{
+						const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
+						UINT32 *dest = &dest_bmp.pix32(y);
+
+						int x, x_index = x_index_base;
+						for( x=sx; x<ex; x++ )
+						{
+							dest[x] = pal[source[x_index>>16]];
+							x_index += dx;
+						}
+
+						y_index += dy;
+					}
+				}
+
+				/* case 1: STV_TRANSPARENCY_PEN */
+				if (transparency == STV_TRANSPARENCY_PEN)
+				{
+					for( y=sy; y<ey; y++ )
+					{
+						const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
+						UINT32 *dest = &dest_bmp.pix32(y);
+
+						int x, x_index = x_index_base;
+						for( x=sx; x<ex; x++ )
+						{
+							int c = source[x_index>>16];
+							if( c != transparent_color ) dest[x] = pal[c];
+							x_index += dx;
+						}
+
+						y_index += dy;
+					}
+				}
+
+				/* case 6: STV_TRANSPARENCY_ALPHA */
+				if (transparency == STV_TRANSPARENCY_ALPHA)
+				{
+					for( y=sy; y<ey; y++ )
+					{
+						const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
+						UINT32 *dest = &dest_bmp.pix32(y);
+
+						int x, x_index = x_index_base;
+						for( x=sx; x<ex; x++ )
+						{
+							int c = source[x_index>>16];
+							if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
+							x_index += dx;
+						}
+
+						y_index += dy;
+					}
+				}
+
+				/* case : STV_TRANSPARENCY_ADD_BLEND */
+				if (transparency == STV_TRANSPARENCY_ADD_BLEND )
+				{
+					for( y=sy; y<ey; y++ )
+					{
+						const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
+						UINT32 *dest = &dest_bmp.pix32(y);
+
+						int x, x_index = x_index_base;
+						for( x=sx; x<ex; x++ )
+						{
+							int c = source[x_index>>16];
+							if( c != transparent_color ) dest[x] = stv_add_blend(dest[x],pal[c]);
+							x_index += dx;
+						}
+
+						y_index += dy;
+					}
+				}
+
+			}
+		}
+	}
+
+}
+
 static void stv_vdp2_drawgfxzoom_rgb555(
 		bitmap_rgb32 &dest_bmp,const rectangle &clip,running_machine &machine,
 		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
@@ -2702,197 +2893,6 @@ static void stv_vdp2_drawgfxzoom_rgb555(
 								stv_vdp2_compute_color_offset(machine,&r,&g,&b,stv2_current_tilemap.fade_control & 2);
 
 							if( data ) dest[x] = stv_add_blend(dest[x], MAKE_RGB(r, g, b));
-							x_index += dx;
-						}
-
-						y_index += dy;
-					}
-				}
-
-			}
-		}
-	}
-
-}
-
-static void stv_vdp2_drawgfxzoom(
-		bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
-		int transparency,int transparent_color,int scalex, int scaley,
-		int sprite_screen_width, int sprite_screen_height, int alpha)
-{
-	rectangle myclip;
-
-	if (!scalex || !scaley) return;
-
-	if (gfx->has_pen_usage() && transparency == STV_TRANSPARENCY_PEN)
-	{
-		int transmask = 0;
-
-		transmask = 1 << (transparent_color & 0xff);
-
-		if ((gfx->pen_usage(code) & ~transmask) == 0)
-			/* character is totally transparent, no need to draw */
-			return;
-		else if ((gfx->pen_usage(code) & transmask) == 0)
-			/* character is totally opaque, can disable transparency */
-			transparency = STV_TRANSPARENCY_NONE;
-	}
-
-	/*
-	scalex and scaley are 16.16 fixed point numbers
-	1<<15 : shrink to 50%
-	1<<16 : uniform scale
-	1<<17 : double to 200%
-	*/
-
-
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
-	myclip = clip;
-	myclip &= dest_bmp.cliprect();
-
-	if( gfx )
-	{
-		const pen_t *pal = &gfx->machine().pens[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
-		const UINT8 *source_base = gfx->get_data(code % gfx->elements());
-
-		//int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
-		//int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
-
-		if (sprite_screen_width && sprite_screen_height)
-		{
-			/* compute sprite increment per screen pixel */
-			//int dx = (gfx->width()<<16)/sprite_screen_width;
-			//int dy = (gfx->height()<<16)/sprite_screen_height;
-			int dx = stv2_current_tilemap.incx;
-			int dy = stv2_current_tilemap.incy;
-
-			int ex = sx+sprite_screen_width;
-			int ey = sy+sprite_screen_height;
-
-			int x_index_base;
-			int y_index;
-
-			if( flipx )
-			{
-				x_index_base = (sprite_screen_width-1)*dx;
-				dx = -dx;
-			}
-			else
-			{
-				x_index_base = 0;
-			}
-
-			if( flipy )
-			{
-				y_index = (sprite_screen_height-1)*dy;
-				dy = -dy;
-			}
-			else
-			{
-				y_index = 0;
-			}
-
-			if( sx < myclip.min_x)
-			{ /* clip left */
-				int pixels = myclip.min_x-sx;
-				sx += pixels;
-				x_index_base += pixels*dx;
-			}
-			if( sy < myclip.min_y )
-			{ /* clip top */
-				int pixels = myclip.min_y-sy;
-				sy += pixels;
-				y_index += pixels*dy;
-			}
-			/* NS 980211 - fixed incorrect clipping */
-			if( ex > myclip.max_x+1 )
-			{ /* clip right */
-				int pixels = ex-myclip.max_x-1;
-				ex -= pixels;
-			}
-			if( ey > myclip.max_y+1 )
-			{ /* clip bottom */
-				int pixels = ey-myclip.max_y-1;
-				ey -= pixels;
-			}
-
-			if( ex>sx )
-			{ /* skip if inner loop doesn't draw anything */
-				int y;
-
-				/* case 0: STV_TRANSPARENCY_NONE */
-				if (transparency == STV_TRANSPARENCY_NONE)
-				{
-					for( y=sy; y<ey; y++ )
-					{
-						const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-						UINT32 *dest = &dest_bmp.pix32(y);
-
-						int x, x_index = x_index_base;
-						for( x=sx; x<ex; x++ )
-						{
-							dest[x] = pal[source[x_index>>16]];
-							x_index += dx;
-						}
-
-						y_index += dy;
-					}
-				}
-
-				/* case 1: STV_TRANSPARENCY_PEN */
-				if (transparency == STV_TRANSPARENCY_PEN)
-				{
-					for( y=sy; y<ey; y++ )
-					{
-						const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-						UINT32 *dest = &dest_bmp.pix32(y);
-
-						int x, x_index = x_index_base;
-						for( x=sx; x<ex; x++ )
-						{
-							int c = source[x_index>>16];
-							if( c != transparent_color ) dest[x] = pal[c];
-							x_index += dx;
-						}
-
-						y_index += dy;
-					}
-				}
-
-				/* case 6: STV_TRANSPARENCY_ALPHA */
-				if (transparency == STV_TRANSPARENCY_ALPHA)
-				{
-					for( y=sy; y<ey; y++ )
-					{
-						const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-						UINT32 *dest = &dest_bmp.pix32(y);
-
-						int x, x_index = x_index_base;
-						for( x=sx; x<ex; x++ )
-						{
-							int c = source[x_index>>16];
-							if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
-							x_index += dx;
-						}
-
-						y_index += dy;
-					}
-				}
-
-				/* case : STV_TRANSPARENCY_ADD_BLEND */
-				if (transparency == STV_TRANSPARENCY_ADD_BLEND )
-				{
-					for( y=sy; y<ey; y++ )
-					{
-						const UINT8 *source = source_base + (y_index>>16) * gfx->rowbytes();
-						UINT32 *dest = &dest_bmp.pix32(y);
-
-						int x, x_index = x_index_base;
-						for( x=sx; x<ex; x++ )
-						{
-							int c = source[x_index>>16];
-							if( c != transparent_color ) dest[x] = stv_add_blend(dest[x],pal[c]);
 							x_index += dx;
 						}
 
@@ -6419,7 +6419,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	UINT8   ccr = 0;
 	UINT8 sprite_priorities[8];
 	UINT8 sprite_ccr[8];
-	int     sprite_color_mode = STV_VDP2_SPCLMD;
+	int sprite_color_mode = STV_VDP2_SPCLMD;
 	rectangle mycliprect;
 
 	if ( (stv_sprite_priorities_usage_valid == 1) && (stv_sprite_priorities_used[pri] == 0) )
@@ -6805,8 +6805,16 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 					{
 						if ( pix & ~sprite_shadow )
 						{
-							UINT32 p = bitmap_line[x];
-							bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
+							UINT32 p; //= bitmap_line[x];
+							if(double_x)
+							{
+								p = bitmap_line[x*2];
+								bitmap_line[x*2] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
+								p = bitmap_line[x*2+1];
+								bitmap_line[x*2+1] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
+							}
+							else
+								bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
 						}
 					}
 					else
@@ -6817,8 +6825,16 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 							/*shadow - in reality, we should check from what layer pixel beneath comes...*/
 							if ( STV_VDP2_SDCTL & 0x3f )
 							{
-								UINT32 p = bitmap_line[x];
-								bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
+								UINT32 p;// = bitmap_line[x];
+								if(double_x)
+								{
+									p = bitmap_line[x*2];
+									bitmap_line[x*2] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
+									p = bitmap_line[x*2+1];
+									bitmap_line[x*2+1] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
+								}
+								else
+									bitmap_line[x] = MAKE_RGB(RGB_RED(p) >> 1, RGB_GREEN(p) >> 1, RGB_BLUE(p) >> 1);
 							}
 							/* note that when shadows are disabled, "shadow" palette entries are not drawn */
 						} else if ( pix )
