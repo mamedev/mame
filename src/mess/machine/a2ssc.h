@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "machine/a2bus.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -40,7 +40,7 @@ protected:
 	virtual UINT8 read_cnxx(address_space &space, UINT8 offset);
 	virtual UINT8 read_c800(address_space &space, UINT16 offset);
 
-	required_device<acia6551_device> m_acia;
+	required_device<mos6551_device> m_acia;
 
 private:
 	UINT8 *m_rom;

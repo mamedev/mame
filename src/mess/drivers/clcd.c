@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "cpu/m6502/m65c02.h"
 #include "machine/6522via.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 #include "rendlay.h"
 
 class clcd_state : public driver_device
@@ -178,7 +178,7 @@ private:
 static ADDRESS_MAP_START( clcd_mem, AS_PROGRAM, 8, clcd_state )
 	AM_RANGE(0xf800, 0xf80f) AM_DEVREADWRITE("via0", via6522_device, read, write)
 	AM_RANGE(0xf880, 0xf88f) AM_DEVREADWRITE("via1", via6522_device, read, write)
-	AM_RANGE(0xf980, 0xf981) AM_DEVREADWRITE("acia", acia6551_device, read, write)
+	AM_RANGE(0xf980, 0xf981) AM_DEVREADWRITE("acia", mos6551_device, read, write)
 	AM_RANGE(0xff00, 0xff00) AM_WRITE(rombank_w)
 	AM_RANGE(0xff80, 0xff83) AM_WRITE(rambank_w)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("ram")
@@ -345,7 +345,7 @@ static MACHINE_CONFIG_START( clcd, clcd_state )
 
 	MCFG_VIA6522_ADD("via0", 0, via0_intf)
 	MCFG_VIA6522_ADD("via1", 0, via1_intf)
-	MCFG_ACIA6551_ADD("acia")
+	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", LCD)

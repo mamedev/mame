@@ -174,7 +174,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( dragon64, dragon_base, dragon64_state )
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_state::cartridge_config, dragon_cart, "dragon_fdc", NULL)
 
 	// acia
-	MCFG_ACIA6551_ADD("acia")
+	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( d64plus, dragon_base, dragon64_state )
@@ -186,7 +186,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( d64plus, dragon_base, dragon64_state )
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_state::cartridge_config, dragon_cart, "dragon_fdc", NULL)
 
 	// acia
-	MCFG_ACIA6551_ADD("acia")
+	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( dgnalpha, dragon_base, dragon_alpha_state )
@@ -198,7 +198,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( dgnalpha, dragon_base, dragon_alpha_state )
 	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, dragon_alpha_state::cartridge_config, dragon_cart, NULL, NULL)
 
 	// acia
-	MCFG_ACIA6551_ADD("acia")
+	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
 
 	// floppy
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(coco_floppy_interface)

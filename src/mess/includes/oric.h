@@ -12,7 +12,7 @@
 #include "sound/ay8910.h"
 #include "sound/wave.h"
 #include "machine/6522via.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 #include "machine/ctronics.h"
 #include "machine/wd17xx.h"
 //#include <stdio.h>

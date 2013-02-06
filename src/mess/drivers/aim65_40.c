@@ -48,7 +48,7 @@ The source code there implies that *maybe* ff7e and ff7f are also open bus.
 #include "includes/aim65_40.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 #include "aim65_40.lh"
 
 /***************************************************************************
@@ -61,7 +61,7 @@ static ADDRESS_MAP_START( aim65_40_mem, AS_PROGRAM, 8, aim65_40_state )
 	AM_RANGE(0xffa0, 0xffaf) AM_DEVREADWRITE(M6522_0_TAG, via6522_device, read, write)
 	AM_RANGE(0xffb0, 0xffbf) AM_DEVREADWRITE(M6522_1_TAG, via6522_device, read, write)
 	AM_RANGE(0xffc0, 0xffcf) AM_DEVREADWRITE(M6522_2_TAG, via6522_device, read, write)
-	AM_RANGE(0xffd0, 0xffd3) AM_DEVREADWRITE(M6551_TAG, acia6551_device, read, write)
+	AM_RANGE(0xffd0, 0xffd3) AM_DEVREADWRITE(M6551_TAG, mos6551_device, read, write)
 	AM_RANGE(0xffe0, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -145,7 +145,7 @@ static MACHINE_CONFIG_START( aim65_40, aim65_40_state )
 	MCFG_VIA6522_ADD(M6522_0_TAG, 0, user_via_intf)
 	MCFG_VIA6522_ADD(M6522_1_TAG, 0, system_via_intf)
 	MCFG_VIA6522_ADD(M6522_2_TAG, 0, kb_via_intf)
-	MCFG_ACIA6551_ADD(M6551_TAG)
+	MCFG_MOS6551_ADD(M6551_TAG, XTAL_1_8432MHz, NULL)
 MACHINE_CONFIG_END
 
 /***************************************************************************

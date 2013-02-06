@@ -26,7 +26,7 @@ const device_type A2BUS_SSC = &device_creator<a2bus_ssc_device>;
 
 
 MACHINE_CONFIG_FRAGMENT( ssc )
-	MCFG_ACIA6551_ADD(SSC_ACIA_TAG)
+	MCFG_MOS6551_ADD(SSC_ACIA_TAG, XTAL_1_8432MHz, NULL)
 MACHINE_CONFIG_END
 
 ROM_START( ssc )

@@ -63,7 +63,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "includes/dgn_beta.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 

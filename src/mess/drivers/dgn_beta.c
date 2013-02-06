@@ -42,7 +42,7 @@ documentation still exists.
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "includes/dgn_beta.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 #include "formats/coco_dsk.h"
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"

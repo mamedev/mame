@@ -8,7 +8,7 @@
 #include "formats/cbm_snqk.h"
 #include "audio/t6721.h"
 #include "audio/mos7360.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 #include "machine/plus4exp.h"
 #include "machine/plus4user.h"
 #include "machine/cbmiec.h"

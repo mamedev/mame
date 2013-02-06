@@ -21,7 +21,7 @@
 #include "machine/ay3600.h"
 #include "machine/applefdc.h"
 #include "devices/appldriv.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 #include "machine/ram.h"
 
 
@@ -103,7 +103,7 @@ void apple3_state::apple3_profile_w(offs_t offset, UINT8 data)
 
 READ8_MEMBER(apple3_state::apple3_c0xx_r)
 {
-	acia6551_device *acia = machine().device<acia6551_device>("acia");
+	mos6551_device *acia = machine().device<mos6551_device>("acia");
 	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 	UINT8 result = 0xFF;
 
@@ -188,7 +188,7 @@ READ8_MEMBER(apple3_state::apple3_c0xx_r)
 
 WRITE8_MEMBER(apple3_state::apple3_c0xx_w)
 {
-	acia6551_device *acia = machine().device<acia6551_device>("acia");
+	mos6551_device *acia = machine().device<mos6551_device>("acia");
 	applefdc_base_device *fdc = machine().device<applefdc_base_device>("fdc");
 
 	switch(offset)

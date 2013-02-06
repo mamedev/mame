@@ -14,7 +14,7 @@
 #include "machine/6821pia.h"
 #include "machine/mc6846.h"
 #include "machine/6850acia.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 #include "sound/dac.h"
 #include "audio/mea8000.h"
 #include "machine/ctronics.h"

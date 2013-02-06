@@ -60,7 +60,7 @@
 #include "machine/terminal.h"
 #include "sound/speaker.h"
 #include "machine/roc10937.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 #include "machine/mm74c922.h"
 #include "machine/ram.h"
 #include "digel804.lh"
@@ -84,7 +84,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<speaker_sound_device> m_speaker;
-	required_device<acia6551_device> m_acia;
+	required_device<mos6551_device> m_acia;
 	required_device<roc10937_t> m_vfd;
 	required_device<mm74c922_device> m_kb;
 	required_device<ram_device> m_ram;
@@ -480,7 +480,7 @@ static ADDRESS_MAP_START(z80_io_1_4, AS_IO, 8, digel804_state)
 	AM_RANGE(0x85, 0x85) AM_MIRROR(0x38) AM_READ(acia_command_r) // (ACIA command reg)
 	AM_RANGE(0x86, 0x86) AM_MIRROR(0x38) AM_WRITE(acia_control_w) // (ACIA control reg)
 	AM_RANGE(0x87, 0x87) AM_MIRROR(0x38) AM_READ(acia_control_r) // (ACIA control reg)
-	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", acia6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
+	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", mos6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
 
 ADDRESS_MAP_END
 
@@ -507,7 +507,7 @@ static ADDRESS_MAP_START(z80_io_1_2, AS_IO, 8, digel804_state)
 	AM_RANGE(0x85, 0x85) AM_MIRROR(0x38) AM_READ(acia_command_r) // (ACIA command reg)
 	AM_RANGE(0x86, 0x86) AM_MIRROR(0x38) AM_WRITE(acia_control_w) // (ACIA control reg)
 	AM_RANGE(0x87, 0x87) AM_MIRROR(0x38) AM_READ(acia_control_r) // (ACIA control reg)
-	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", acia6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
+	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", mos6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
 
 ADDRESS_MAP_END
 
@@ -561,7 +561,7 @@ INPUT_PORTS_END
 ******************************************************************************/
 WRITE8_MEMBER(digel804_state::digel804_serial_put)
 {
-	m_acia->receive_character(data);
+	//m_acia->receive_character(data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( digel804_terminal_intf )
@@ -603,7 +603,7 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	MCFG_MM74C923_ADD("74c923", digel804_keypad_intf)
 
 	/* acia */
-	MCFG_ACIA6551_ADD("acia")
+	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
 
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("256K")

@@ -13,7 +13,7 @@
 
 #include "machine/6522via.h"
 #include "machine/wd17xx.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 
 #define ACIA_0_TAG  "acia0"
 #define ACIA_1_TAG  "acia1"
@@ -43,8 +43,8 @@ public:
 		m_acia1(*this, ACIA_1_TAG),
 		m_videoram(*this,"videoram") { }
 
-	required_device<acia6551_device> m_acia0;
-	required_device<acia6551_device> m_acia1;
+	required_device<mos6551_device> m_acia0;
+	required_device<mos6551_device> m_acia1;
 	required_shared_ptr<UINT16> m_videoram;
 	UINT8 m_pending_interrupts;
 	char m_clock_enable;

@@ -57,7 +57,7 @@ static ADDRESS_MAP_START(telestrat_mem, AS_PROGRAM, 8, oric_state )
 	AM_RANGE( 0x0000, 0x02ff) AM_RAM
 	AM_RANGE( 0x0300, 0x030f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
 	AM_RANGE( 0x0310, 0x031b) AM_READWRITE(oric_microdisc_r, oric_microdisc_w )
-	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia", acia6551_device, read, write)
+	AM_RANGE( 0x031c, 0x031f) AM_DEVREADWRITE("acia", mos6551_device, read, write)
 	AM_RANGE( 0x0320, 0x032f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)
 	AM_RANGE( 0x0400, 0xbfff) AM_RAM
 	AM_RANGE( 0xc000, 0xffff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
@@ -425,7 +425,7 @@ static MACHINE_CONFIG_DERIVED( telstrat, oric )
 	MCFG_MACHINE_START_OVERRIDE(oric_state, telestrat )
 
 	/* acia */
-	MCFG_ACIA6551_ADD("acia")
+	MCFG_MOS6551_ADD("acia", XTAL_1_8432MHz, NULL)
 
 	/* via */
 	MCFG_VIA6522_ADD( "via6522_1", 1000000, telestrat_via2_interface )

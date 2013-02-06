@@ -14,7 +14,7 @@
 
 #include "includes/coco12.h"
 #include "imagedev/printer.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 
 
 
@@ -57,7 +57,7 @@ public:
 	{
 	}
 
-	required_device<acia6551_device> m_acia;
+	required_device<mos6551_device> m_acia;
 
 protected:
 	virtual DECLARE_READ8_MEMBER( ff00_read );
