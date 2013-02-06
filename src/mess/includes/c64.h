@@ -71,9 +71,7 @@ public:
 			m_cia2_irq(CLEAR_LINE),
 			m_vic_irq(CLEAR_LINE),
 			m_exp_irq(CLEAR_LINE),
-			m_exp_nmi(CLEAR_LINE),
-			m_cass_rd(1),
-			m_iec_srq(1)
+			m_exp_nmi(CLEAR_LINE)
 	{ }
 
 	required_device<m6510_device> m_maincpu;
@@ -134,10 +132,6 @@ public:
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
 
-	DECLARE_WRITE_LINE_MEMBER( tape_read_w );
-
-	DECLARE_WRITE_LINE_MEMBER( iec_srq_w );
-
 	DECLARE_READ8_MEMBER( exp_dma_r );
 	DECLARE_WRITE8_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
@@ -161,8 +155,6 @@ public:
 	int m_exp_irq;
 	int m_exp_nmi;
 	int m_exp_dma;
-	int m_cass_rd;
-	int m_iec_srq;
 };
 
 

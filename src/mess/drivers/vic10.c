@@ -555,15 +555,6 @@ WRITE8_MEMBER( vic10_state::cpu_w )
 	m_cassette->motor_w(BIT(data, 5));
 }
 
-//-------------------------------------------------
-//  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
-//-------------------------------------------------
-
-static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(MOS6526_TAG, mos6526_device, flag_w)
-};
-
 
 //-------------------------------------------------
 //  C64_EXPANSION_INTERFACE( expansion_intf )
@@ -652,13 +643,12 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 	MCFG_SOUND_ADD(MOS6581_TAG, SID6581, VIC6566_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_MOS6526_ADD(MOS6526_TAG, VIC6566_CLOCK, 60, cia_intf)
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", NULL, DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6566_TAG, mos6566_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, VIC6566_CLOCK, expansion_intf, vic10_expansion_cards, NULL, NULL)
 

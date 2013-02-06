@@ -29,32 +29,12 @@ const device_type DS75160A = &device_creator<ds75160a_device>;
 
 ds75160a_device::ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DS75160A, "DS75160A", tag, owner, clock),
+		m_read(*this),
+		m_write(*this),
 		m_data(0xff),
 		m_te(0),
 		m_pe(0)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ds75160a_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const ds75160a_interface *intf = reinterpret_cast<const ds75160a_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<ds75160a_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_bus_cb, 0, sizeof(m_in_bus_cb));
-		memset(&m_out_bus_cb, 0, sizeof(m_out_bus_cb));
-	}
 }
 
 
@@ -65,8 +45,8 @@ void ds75160a_device::device_config_complete()
 void ds75160a_device::device_start()
 {
 	// resolve callbacks
-	m_in_bus_func.resolve(m_in_bus_cb, *this);
-	m_out_bus_func.resolve(m_out_bus_cb, *this);
+	m_read.resolve_safe(0);
+	m_write.resolve_safe();
 
 	// register for state saving
 	save_item(NAME(m_data));
@@ -85,7 +65,7 @@ READ8_MEMBER( ds75160a_device::read )
 
 	if (!m_te)
 	{
-		data = m_in_bus_func(0);
+		data = m_read(0);
 	}
 
 	return data;
@@ -102,7 +82,7 @@ WRITE8_MEMBER( ds75160a_device::write )
 
 	if (m_te)
 	{
-		m_out_bus_func(0, m_data);
+		m_write((offs_t)0, m_data);
 	}
 }
 
@@ -115,7 +95,7 @@ WRITE_LINE_MEMBER( ds75160a_device::te_w )
 {
 	if (m_te != state)
 	{
-		m_out_bus_func(0, m_te ? m_data : 0xff);
+		m_write((offs_t)0, m_te ? m_data : 0xff);
 	}
 
 	m_te = state;

@@ -48,10 +48,6 @@ void c64_state::check_interrupts()
 
 	m_maincpu->set_input_line(M6510_IRQ_LINE, irq);
 	m_maincpu->set_input_line(INPUT_LINE_NMI, nmi);
-
-	int flag = m_cass_rd && m_iec_srq;
-
-	m_cia1->flag_w(flag);
 }
 
 
@@ -999,36 +995,12 @@ WRITE8_MEMBER( c64gs_state::cpu_w )
 
 
 //-------------------------------------------------
-//  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( c64_state::tape_read_w )
-{
-	m_cass_rd = state;
-
-	check_interrupts();
-}
-
-static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, tape_read_w),
-};
-
-
-//-------------------------------------------------
 //  CBM_IEC_INTERFACE( iec_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c64_state::iec_srq_w )
-{
-	m_iec_srq = state;
-
-	check_interrupts();
-}
-
 static CBM_IEC_INTERFACE( iec_intf )
 {
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, iec_srq_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6526_1_TAG, mos6526_device, flag_w),
 	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, atn_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1143,8 +1115,6 @@ void c64_state::machine_start()
 	save_item(NAME(m_exp_irq));
 	save_item(NAME(m_exp_nmi));
 	save_item(NAME(m_exp_dma));
-	save_item(NAME(m_cass_rd));
-	save_item(NAME(m_iec_srq));
 }
 
 
@@ -1194,9 +1164,10 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, cia1_intf)
 	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, cia2_intf)
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", NULL, DEVWRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6567_TAG, mos6567_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
@@ -1294,9 +1265,10 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, cia1_intf)
 	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, cia2_intf)
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", NULL, DEVWRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
@@ -1374,6 +1346,7 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, cia2_intf)
 	MCFG_CBM_IEC_BUS_ADD(iec_intf)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)

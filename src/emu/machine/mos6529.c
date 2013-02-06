@@ -20,41 +20,27 @@
 
 
 //**************************************************************************
-//  LIVE DEVICE
+//  DEVICE DEFINITIONS
 //**************************************************************************
 
 // device type definition
 const device_type MOS6529 = &device_creator<mos6529_device>;
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
 
 //-------------------------------------------------
 //  mos6529_device - constructor
 //-------------------------------------------------
 
 mos6529_device::mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, MOS6529, "MOS6529", tag, owner, clock)
+	: device_t(mconfig, MOS6529, "MOS6529", tag, owner, clock),
+		m_read_port(*this),
+		m_write_port(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mos6529_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mos6529_interface *intf = reinterpret_cast<const mos6529_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mos6529_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_p_cb, 0, sizeof(m_in_p_cb));
-		memset(&m_out_p_cb, 0, sizeof(m_out_p_cb));
-	}
 }
 
 
@@ -65,8 +51,8 @@ void mos6529_device::device_config_complete()
 void mos6529_device::device_start()
 {
 	// resolve callbacks
-	m_in_p_func.resolve(m_in_p_cb, *this);
-	m_out_p_func.resolve(m_out_p_cb, *this);
+	m_read_port.resolve_safe(0);
+	m_write_port.resolve_safe();
 }
 
 
@@ -76,7 +62,7 @@ void mos6529_device::device_start()
 
 READ8_MEMBER( mos6529_device::read )
 {
-	return m_in_p_func(0);
+	return m_read_port(0);
 }
 
 
@@ -86,5 +72,5 @@ READ8_MEMBER( mos6529_device::read )
 
 WRITE8_MEMBER( mos6529_device::write )
 {
-	m_out_p_func(0, data);
+	m_write_port((offs_t)0, data);
 }

@@ -702,16 +702,6 @@ static const via6522_interface via1_intf =
 
 
 //-------------------------------------------------
-//  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
-//-------------------------------------------------
-
-static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(M6522_1_TAG, via6522_device, write_ca1),
-};
-
-
-//-------------------------------------------------
 //  CBM_IEC_INTERFACE( cbm_iec_intf )
 //-------------------------------------------------
 
@@ -822,9 +812,8 @@ static MACHINE_CONFIG_START( vic20, vic20_state )
 	// devices
 	MCFG_VIA6522_ADD(M6522_0_TAG, 0, via0_intf)
 	MCFG_VIA6522_ADD(M6522_1_TAG, 0, via1_intf)
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", NULL, DEVWRITELINE(M6522_1_TAG, via6522_device, write_ca1))
 	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1541")
-	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_VIC20_USER_PORT_ADD(VIC20_USER_PORT_TAG, user_intf, vic20_user_port_cards, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -853,11 +842,11 @@ static MACHINE_CONFIG_DERIVED( ntsc, vic20 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_MOS6560_ADD(M6560_TAG, SCREEN_TAG, MOS6560_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, MOS6560_CLOCK, expansion_intf, vic20_expansion_cards, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy", NULL)
+	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(M6560_TAG, mos6560_device, lp_w))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
@@ -880,11 +869,11 @@ static MACHINE_CONFIG_DERIVED( pal, vic20 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_MOS6561_ADD(M6560_TAG, SCREEN_TAG, MOS6561_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
 	MCFG_VIC20_EXPANSION_SLOT_ADD(VIC20_EXPANSION_SLOT_TAG, MOS6561_CLOCK, expansion_intf, vic20_expansion_cards, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, "joy", NULL)
+	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(M6561_TAG, mos6561_device, lp_w))
 
 	// software lists
 	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")

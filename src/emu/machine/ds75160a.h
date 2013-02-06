@@ -33,13 +33,9 @@
 //  INTERFACE CONFIGURATION MACROS
 ///*************************************************************************
 
-#define MCFG_DS75160A_ADD(_tag, _config) \
+#define MCFG_DS75160A_ADD(_tag, _read, _write) \
 	MCFG_DEVICE_ADD(_tag, DS75160A, 0)  \
-	MCFG_DEVICE_CONFIG(_config)
-
-
-#define DS75160A_INTERFACE(name) \
-	const ds75160a_interface (name) =
+	downcast<ds75160a_device *>(device)->set_callbacks(DEVCB2_##_read, DEVCB2_##_write);
 
 
 
@@ -47,23 +43,18 @@
 //  TYPE DEFINITIONS
 ///*************************************************************************
 
-// ======================> ds75160a_interface
-
-struct ds75160a_interface
-{
-	devcb_read8     m_in_bus_cb;
-	devcb_write8    m_out_bus_cb;
-};
-
-
 // ======================> ds75160a_device
 
-class ds75160a_device : public device_t,
-						public ds75160a_interface
+class ds75160a_device : public device_t
 {
 public:
 	// construction/destruction
 	ds75160a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _read, class _write> void set_callbacks(_read rd, _write wr) {
+		m_read.set_callback(rd);
+		m_write.set_callback(wr);
+	}
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -73,12 +64,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 private:
-	devcb_resolved_read8    m_in_bus_func;
-	devcb_resolved_write8   m_out_bus_func;
+	devcb2_read8  m_read;
+	devcb2_write8 m_write;
 
 	UINT8 m_data;
 

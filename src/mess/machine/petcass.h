@@ -38,14 +38,10 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define PET_DATASSETTE_PORT_INTERFACE(_name) \
-	const pet_datassette_port_interface (_name) =
-
-
-#define MCFG_PET_DATASSETTE_PORT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_PET_DATASSETTE_PORT_ADD(_tag, _slot_intf, _def_slot, _def_inp, _devcb) \
 	MCFG_DEVICE_ADD(_tag, PET_DATASSETTE_PORT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false) \
+	devcb = &pet_datassette_port_device::set_read_handler(*device, DEVCB2_##_devcb);
 
 
 
@@ -53,26 +49,20 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pet_datassette_port_interface
-
-struct pet_datassette_port_interface
-{
-	devcb_write_line    m_out_read_cb;
-};
-
-
 // ======================> pet_datassette_port_device
 
 class device_pet_datassette_port_interface;
 
 class pet_datassette_port_device : public device_t,
-									public pet_datassette_port_interface,
 									public device_slot_interface
 {
 public:
 	// construction/destruction
 	pet_datassette_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~pet_datassette_port_device();
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_read_handler(device_t &device, _Object object) { return downcast<pet_datassette_port_device &>(device).m_read_handler.set_callback(object); }
 
 	// computer interface
 	DECLARE_READ_LINE_MEMBER( read );
@@ -85,10 +75,9 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
-	devcb_resolved_write_line   m_out_read_func;
+	devcb2_write_line m_read_handler;
 
 	device_pet_datassette_port_interface *m_cart;
 };

@@ -33,12 +33,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_MOS6529_ADD(_tag, _config) \
-	MCFG_DEVICE_ADD(_tag, MOS6529, 0)   \
-	MCFG_DEVICE_CONFIG(_config)
-
-#define MOS6529_INTERFACE(name) \
-	const mos6529_interface (name) =
+#define MCFG_MOS6529_ADD(_tag, _read, _write) \
+	MCFG_DEVICE_ADD(_tag, MOS6529, 0) \
+	downcast<mos6529_device *>(device)->set_callbacks(DEVCB2_##_read, DEVCB2_##_write);
 
 
 
@@ -46,35 +43,29 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> mos6529_interface
-
-struct mos6529_interface
-{
-	devcb_read8             m_in_p_cb;
-	devcb_write8            m_out_p_cb;
-};
-
-
 // ======================> mos6529_device
 
-class mos6529_device :  public device_t,
-						public mos6529_interface
+class mos6529_device :  public device_t
 {
 public:
 	// construction/destruction
 	mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _read, class _write> void set_callbacks(_read rd, _write wr) {
+		m_read_port.set_callback(rd);
+		m_write_port.set_callback(wr);
+	}
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 private:
-	devcb_resolved_read8        m_in_p_func;
-	devcb_resolved_write8       m_out_p_func;
+	devcb2_read8  m_read_port;
+	devcb2_write8 m_write_port;
 };
 
 

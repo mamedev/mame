@@ -881,37 +881,6 @@ static IEEE488_INTERFACE( ieee488_intf )
 
 
 //-------------------------------------------------
-//  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
-//-------------------------------------------------
-
-static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(M6520_1_TAG, pia6821_device, ca1_w)
-};
-
-
-//-------------------------------------------------
-//  PET_DATASSETTE_PORT_INTERFACE( datassette2_intf )
-//-------------------------------------------------
-
-static PET_DATASSETTE_PORT_INTERFACE( datassette2_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(M6522_TAG, via6522_device, write_cb1)
-};
-
-
-//-------------------------------------------------
-//  PET_EXPANSION_INTERFACE( exp_intf )
-//-------------------------------------------------
-
-static PET_EXPANSION_INTERFACE( exp_intf )
-{
-	DEVCB_DRIVER_MEMBER(pet_state, read),
-	DEVCB_DRIVER_MEMBER(pet_state, write)
-};
-
-
-//-------------------------------------------------
 //  PET_USER_PORT_INTERFACE( user_intf )
 //-------------------------------------------------
 
@@ -1202,9 +1171,10 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	MCFG_PIA6821_ADD(M6520_1_TAG, pia1_intf)
 	MCFG_PIA6821_ADD(M6520_2_TAG, pia2_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c4040")
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c2n", NULL)
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT2_TAG, datassette2_intf, cbm_datassette_devices, NULL, NULL)
-	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_8MHz/8, exp_intf, pet_expansion_cards, NULL, NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c2n", NULL, DEVWRITELINE(M6520_1_TAG, pia6821_device, ca1_w))
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT2_TAG, cbm_datassette_devices, NULL, NULL, DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
+	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_8MHz/8, pet_expansion_cards, NULL, NULL)
+	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(pet_state, read), WRITE8(pet_state, write))
 	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, user_intf, pet_user_port_cards, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -1478,9 +1448,10 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_PIA6821_ADD(M6520_1_TAG, pia1_intf)
 	MCFG_PIA6821_ADD(M6520_2_TAG, pia2_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c2n", NULL)
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT2_TAG, datassette2_intf, cbm_datassette_devices, NULL, NULL)
-	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, exp_intf, pet_expansion_cards, NULL, NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c2n", NULL, DEVWRITELINE(M6520_1_TAG, pia6821_device, ca1_w))
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT2_TAG, cbm_datassette_devices, NULL, NULL, DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
+	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, NULL, NULL)
+	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(pet_state, read), WRITE8(pet_state, write))
 	MCFG_PET_USER_PORT_ADD(PET_USER_PORT_TAG, user_intf, pet_user_port_cards, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_pet, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -1505,7 +1476,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( superpet, pet8032, superpet_state )
 	MCFG_DEVICE_REMOVE(PET_EXPANSION_SLOT_TAG)
-	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, exp_intf, pet_expansion_cards, "superpet", NULL)
+	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, "superpet", NULL)
+	MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(READ8(pet_state, read), WRITE8(pet_state, write))
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list2", "superpet_flop")
 MACHINE_CONFIG_END

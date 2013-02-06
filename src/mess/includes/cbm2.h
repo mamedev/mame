@@ -9,7 +9,6 @@
 #include "formats/cbm_snqk.h"
 #include "includes/cbm.h"
 #include "machine/6525tpi.h"
-#include "machine/6551acia.h"
 #include "machine/cbm2exp.h"
 #include "machine/cbm2user.h"
 #include "machine/cbmipt.h"
@@ -17,6 +16,7 @@
 #include "machine/ds75161a.h"
 #include "machine/ieee488.h"
 #include "machine/mos6526.h"
+#include "machine/mos6551.h"
 #include "machine/petcass.h"
 #include "machine/pic8259.h"
 #include "machine/pla.h"
@@ -104,8 +104,7 @@ public:
 			m_graphics(1),
 			m_todclk(0),
 			m_tpi1_irq(CLEAR_LINE),
-			m_cass_rd(1),
-			m_user_flag(0),
+			m_acia_irq(CLEAR_LINE),
 			m_user_irq(CLEAR_LINE),
 			m_tpi2_pa(0),
 			m_tpi2_pb(0)
@@ -117,7 +116,7 @@ public:
 	required_device<sid6581_device> m_sid;
 	required_device<tpi6525_device> m_tpi1;
 	required_device<tpi6525_device> m_tpi2;
-	required_device<acia6551_device> m_acia;
+	required_device<mos6551_device> m_acia;
 	required_device<mos6526_device> m_cia;
 	required_device<ds75160a_device> m_ieee1;
 	required_device<ds75161a_device> m_ieee2;
@@ -225,8 +224,7 @@ public:
 	// interrupt state
 	int m_todclk;
 	int m_tpi1_irq;
-	int m_cass_rd;
-	int m_user_flag;
+	int m_acia_irq;
 	int m_user_irq;
 
 	// keyboard state;

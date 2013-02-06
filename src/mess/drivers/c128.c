@@ -50,10 +50,6 @@ inline void c128_state::check_interrupts()
 
 	m_subcpu->set_input_line(M8502_IRQ_LINE, irq);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, nmi);
-
-	int flag = m_cass_rd && m_iec_srq;
-
-	m_cia1->flag_w(flag);
 }
 
 
@@ -1328,23 +1324,6 @@ static CBM_IEC_INTERFACE( cbm_iec_intf )
 
 
 //-------------------------------------------------
-//  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( c128_state::tape_read_w )
-{
-	m_cass_rd = state;
-
-	check_interrupts();
-}
-
-static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, tape_read_w),
-};
-
-
-//-------------------------------------------------
 //  C64_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
@@ -1462,8 +1441,6 @@ void c128_state::machine_start()
 	save_item(NAME(m_exp_irq));
 	save_item(NAME(m_exp_nmi));
 	save_item(NAME(m_exp_dma));
-	save_item(NAME(m_cass_rd));
-	save_item(NAME(m_iec_srq));
 	save_item(NAME(m_vic_k));
 	save_item(NAME(m_caps_lock));
 }
@@ -1531,24 +1508,27 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, cia1_intf)
 	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", NULL, DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS8564_TAG, mos8564_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_c128", "c128_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_c128", "NTSC")
-	MCFG_SOFTWARE_LIST_ADD("disk_list_c64", "c64_flop")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list_c64", "NTSC")
-	MCFG_SOFTWARE_LIST_ADD("disk_list_c128", "c128_flop")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list_c128", "NTSC")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "c128_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list_c64", "c64_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list_c64", "c64_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "c128_flop")
 	MCFG_SOFTWARE_LIST_ADD("from_list", "c128_rom")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("cass_list_c64", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list_c64", "NTSC")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "NTSC")
 	MCFG_SOFTWARE_LIST_FILTER("from_list", "NTSC")
 
 	// function ROM
@@ -1635,24 +1615,27 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, cia1_intf)
 	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, cia2_intf)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, "c1530", NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", NULL, DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS8566_TAG, mos8566_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
-	MCFG_SOFTWARE_LIST_ADD("cart_list_c128", "c128_cart")
-	MCFG_SOFTWARE_LIST_FILTER("cart_list_c128", "PAL")
-	MCFG_SOFTWARE_LIST_ADD("disk_list_c64", "c64_flop")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list_c64", "PAL")
-	MCFG_SOFTWARE_LIST_ADD("disk_list_c128", "c128_flop")
-	MCFG_SOFTWARE_LIST_FILTER("disk_list_c128", "PAL")
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "c128_cart")
+	MCFG_SOFTWARE_LIST_ADD("cass_list_c64", "c64_cass")
+	MCFG_SOFTWARE_LIST_ADD("flop_list_c64", "c64_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "c128_flop")
 	MCFG_SOFTWARE_LIST_ADD("from_list", "c128_rom")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("cass_list_c64", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list_c64", "PAL")
+	MCFG_SOFTWARE_LIST_FILTER("flop_list", "PAL")
 	MCFG_SOFTWARE_LIST_FILTER("from_list", "PAL")
 
 	// function ROM

@@ -37,7 +37,9 @@ const device_type PET_EXPANSION_SLOT = &device_creator<pet_expansion_slot_device
 
 pet_expansion_slot_device::pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, PET_EXPANSION_SLOT, "PET memory expansion port", tag, owner, clock),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this),
+	m_read_dma(*this),
+	m_write_dma(*this)
 {
 }
 
@@ -72,30 +74,6 @@ device_pet_expansion_card_interface::~device_pet_expansion_card_interface()
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void pet_expansion_slot_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const pet_expansion_slot_interface *intf = reinterpret_cast<const pet_expansion_slot_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<pet_expansion_slot_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_dma_bd_cb, 0, sizeof(m_in_dma_bd_cb));
-		memset(&m_out_dma_bd_cb, 0, sizeof(m_out_dma_bd_cb));
-	}
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -104,8 +82,8 @@ void pet_expansion_slot_device::device_start()
 	m_card = dynamic_cast<device_pet_expansion_card_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_in_dma_bd_func.resolve(m_in_dma_bd_cb, *this);
-	m_out_dma_bd_func.resolve(m_out_dma_bd_cb, *this);
+	m_read_dma.resolve_safe(0);
+	m_write_dma.resolve_safe();
 }
 
 
@@ -186,7 +164,7 @@ WRITE_LINE_MEMBER( pet_expansion_slot_device::irq_w )
 
 UINT8 pet_expansion_slot_device::dma_bd_r(offs_t offset)
 {
-	return m_in_dma_bd_func(offset);
+	return m_read_dma(offset);
 }
 
 
@@ -196,7 +174,7 @@ UINT8 pet_expansion_slot_device::dma_bd_r(offs_t offset)
 
 void pet_expansion_slot_device::dma_bd_w(offs_t offset, UINT8 data)
 {
-	m_out_dma_bd_func(offset, data);
+	m_write_dma(offset, data);
 }
 
 

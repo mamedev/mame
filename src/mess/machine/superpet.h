@@ -15,7 +15,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "machine/6551acia.h"
+#include "machine/mos6551.h"
 #include "machine/mos6702.h"
 #include "machine/petexp.h"
 
@@ -41,6 +41,7 @@ public:
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
 
 protected:
 	// device-level overrides
@@ -77,7 +78,7 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<acia6551_device> m_acia;
+	required_device<mos6551_device> m_acia;
 	required_device<mos6702_device> m_dongle;
 	required_memory_region m_rom;
 	optional_shared_ptr<UINT8> m_ram;

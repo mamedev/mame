@@ -28,6 +28,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
+#define MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(_devcb) \
+	devcb = &vcs_control_port_device::set_trigger_handler(*device, DEVCB2_##_devcb);
+
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -44,6 +48,9 @@ public:
 	// construction/destruction
 	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~vcs_control_port_device();
+
+	// static configuration helpers
+	template<class _Object> static devcb2_base &set_trigger_handler(device_t &device, _Object object) { return downcast<vcs_control_port_device &>(device).m_trigger_handler.set_callback(object); }
 
 	// computer interface
 
@@ -72,11 +79,16 @@ public:
 	bool has_pot_x();
 	bool has_pot_y();
 
+	void trigger_w(int state);
+
 protected:
 	// device-level overrides
 	virtual void device_start();
 
 	device_vcs_control_port_interface *m_device;
+
+private:
+	devcb2_write_line m_trigger_handler;
 };
 
 

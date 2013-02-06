@@ -30,14 +30,13 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define PET_EXPANSION_INTERFACE(_name) \
-	const pet_expansion_slot_interface (_name) =
-
-
-#define MCFG_PET_EXPANSION_SLOT_ADD(_tag, _clock, _config, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_PET_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot, _def_inp) \
 	MCFG_DEVICE_ADD(_tag, PET_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+
+
+#define MCFG_PET_EXPANSION_SLOT_DMA_CALLBACKS(_read, _write) \
+	downcast<pet_expansion_slot_device *>(device)->set_callbacks(DEVCB2_##_read, DEVCB2_##_write);
 
 
 
@@ -45,27 +44,22 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pet_expansion_slot_interface
-
-struct pet_expansion_slot_interface
-{
-	devcb_read8         m_in_dma_bd_cb;
-	devcb_write8        m_out_dma_bd_cb;
-};
-
-
 // ======================> pet_expansion_slot_device
 
 class device_pet_expansion_card_interface;
 
 class pet_expansion_slot_device : public device_t,
-									public device_slot_interface,
-									public pet_expansion_slot_interface
+									public device_slot_interface
 {
 public:
 	// construction/destruction
 	pet_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~pet_expansion_slot_device();
+
+	template<class _read, class _write> void set_callbacks(_read rd, _write wr) {
+		m_read_dma.set_callback(rd);
+		m_write_dma.set_callback(wr);
+	}
 
 	// computer interface
 	int norom_r(address_space &space, offs_t offset, int sel);
@@ -81,14 +75,13 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 	device_pet_expansion_card_interface *m_card;
 
-	devcb_resolved_read8        m_in_dma_bd_func;
-	devcb_resolved_write8       m_out_dma_bd_func;
+	devcb2_read8  m_read_dma;
+	devcb2_write8 m_write_dma;
 };
 
 

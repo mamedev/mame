@@ -1663,34 +1663,6 @@ static MOS6526_INTERFACE( cia_intf )
 
 
 //-------------------------------------------------
-//  PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( cbm2_state::tape_read_w )
-{
-	m_cass_rd = state;
-
-	m_cia->flag_w(m_cass_rd && m_user_flag);
-}
-
-static PET_DATASSETTE_PORT_INTERFACE( datassette_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(cbm2_state, tape_read_w)
-};
-
-
-//-------------------------------------------------
-//  DS75160A_INTERFACE( ds75160a_intf )
-//-------------------------------------------------
-
-static DS75160A_INTERFACE( ds75160a_intf )
-{
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),
-	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w)
-};
-
-
-//-------------------------------------------------
 //  DS75161A_INTERFACE( ds75161a_intf )
 //-------------------------------------------------
 
@@ -2012,8 +1984,6 @@ MACHINE_START_MEMBER( cbm2_state, cbm2 )
 	save_item(NAME(m_ntsc));
 	save_item(NAME(m_todclk));
 	save_item(NAME(m_tpi1_irq));
-	save_item(NAME(m_cass_rd));
-	save_item(NAME(m_user_flag));
 	save_item(NAME(m_tpi2_pa));
 	save_item(NAME(m_tpi2_pb));
 	save_item(NAME(m_cia_pa));
@@ -2132,7 +2102,6 @@ MACHINE_RESET_MEMBER( cbm2_state, cbm2 )
 	m_busy2 = 1;
 	m_graphics = 1;
 	m_tpi1_irq = CLEAR_LINE;
-	m_cass_rd = 1;
 	m_user_irq = CLEAR_LINE;
 
 	m_maincpu->reset();
@@ -2214,13 +2183,14 @@ static MACHINE_CONFIG_START( p500_ntsc, p500_state )
 	MCFG_PLS100_ADD(PLA2_TAG)
 	MCFG_TPI6525_ADD(MOS6525_1_TAG, p500_tpi1_intf)
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, p500_tpi2_intf)
-	MCFG_ACIA6551_ADD(MOS6551A_TAG)
+	MCFG_MOS6551_ADD(MOS6551A_TAG, XTAL_1_8432MHz, DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
 	MCFG_MOS6526_ADD(MOS6526_TAG, VIC6567_CLOCK, 60, cia_intf)
-	MCFG_DS75160A_ADD(DS75160A_TAG, ds75160a_intf)
+	MCFG_DS75160A_ADD(DS75160A_TAG, DEVREAD8(IEEE488_TAG, ieee488_device, dio_r), DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
 	MCFG_DS75161A_ADD(DS75161A_TAG, ds75161a_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, NULL, NULL, DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6567_TAG, mos6567_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6567_CLOCK, cbm2_expansion_cards, NULL, NULL)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, p500_user_intf, cbm2_user_port_cards, NULL, NULL)
@@ -2264,13 +2234,14 @@ static MACHINE_CONFIG_START( p500_pal, p500_state )
 	MCFG_PLS100_ADD(PLA2_TAG)
 	MCFG_TPI6525_ADD(MOS6525_1_TAG, p500_tpi1_intf)
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, p500_tpi2_intf)
-	MCFG_ACIA6551_ADD(MOS6551A_TAG)
+	MCFG_MOS6551_ADD(MOS6551A_TAG, XTAL_1_8432MHz, DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
 	MCFG_MOS6526_ADD(MOS6526_TAG, VIC6569_CLOCK, 50, cia_intf)
-	MCFG_DS75160A_ADD(DS75160A_TAG, ds75160a_intf)
+	MCFG_DS75160A_ADD(DS75160A_TAG, DEVREAD8(IEEE488_TAG, ieee488_device, dio_r), DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
 	MCFG_DS75161A_ADD(DS75161A_TAG, ds75161a_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, NULL, NULL, DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
+	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6569_CLOCK, cbm2_expansion_cards, NULL, NULL)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, p500_user_intf, cbm2_user_port_cards, NULL, NULL)
@@ -2321,12 +2292,12 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_PLS100_ADD(PLA1_TAG)
 	MCFG_TPI6525_ADD(MOS6525_1_TAG, tpi1_intf)
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, tpi2_intf)
-	MCFG_ACIA6551_ADD(MOS6551A_TAG)
+	MCFG_MOS6551_ADD(MOS6551A_TAG, XTAL_1_8432MHz, DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i4_w))
 	MCFG_MOS6526_ADD(MOS6526_TAG, XTAL_18MHz/9, 60, cia_intf)
-	MCFG_DS75160A_ADD(DS75160A_TAG, ds75160a_intf)
+	MCFG_DS75160A_ADD(DS75160A_TAG, DEVREAD8(IEEE488_TAG, ieee488_device, dio_r), DEVWRITE8(IEEE488_TAG, ieee488_device, dio_w))
 	MCFG_DS75161A_ADD(DS75161A_TAG, ds75161a_intf)
 	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
-	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, datassette_intf, cbm_datassette_devices, NULL, NULL)
+	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, NULL, NULL, DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_18MHz/9, cbm2_expansion_cards, NULL, NULL)
@@ -2345,8 +2316,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b128 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( b128, cbm2_state )
-	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
+static MACHINE_CONFIG_DERIVED( b128, cbm2lp_ntsc )
 	MCFG_FRAGMENT_ADD(128k)
 MACHINE_CONFIG_END
 
@@ -2355,8 +2325,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b256 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( b256, cbm2_state )
-	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
+static MACHINE_CONFIG_DERIVED( b256, cbm2lp_ntsc )
 	MCFG_FRAGMENT_ADD(256k)
 MACHINE_CONFIG_END
 
@@ -2365,9 +2334,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2lp_pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm2lp_pal, cbm2_state )
-	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
-
+static MACHINE_CONFIG_DERIVED( cbm2lp_pal, cbm2lp_ntsc )
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	MCFG_DEVICE_REMOVE(MOS6526_TAG)
@@ -2379,8 +2346,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm610 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm610, cbm2_state )
-	MCFG_FRAGMENT_ADD(cbm2lp_pal)
+static MACHINE_CONFIG_DERIVED( cbm610, cbm2lp_pal )
 	MCFG_FRAGMENT_ADD(128k)
 MACHINE_CONFIG_END
 
@@ -2389,8 +2355,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm620 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm620, cbm2_state )
-	MCFG_FRAGMENT_ADD(cbm2lp_pal)
+static MACHINE_CONFIG_DERIVED( cbm620, cbm2lp_pal )
 	MCFG_FRAGMENT_ADD(256k)
 MACHINE_CONFIG_END
 
@@ -2399,10 +2364,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2hp_ntsc )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm2hp_ntsc, cbm2hp_state )
-	MCFG_FRAGMENT_ADD(cbm2lp_ntsc)
-
-	// devices
+static MACHINE_CONFIG_DERIVED_CLASS( cbm2hp_ntsc, cbm2lp_ntsc, cbm2hp_state )
 	MCFG_DEVICE_REMOVE(MOS6525_2_TAG)
 	MCFG_TPI6525_ADD(MOS6525_2_TAG, hp_tpi2_intf)
 MACHINE_CONFIG_END
@@ -2412,8 +2374,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b128hp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( b128hp, cbm2hp_state )
-	MCFG_FRAGMENT_ADD(cbm2hp_ntsc)
+static MACHINE_CONFIG_DERIVED( b128hp, cbm2hp_ntsc )
 	MCFG_FRAGMENT_ADD(128k)
 MACHINE_CONFIG_END
 
@@ -2422,8 +2383,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( b256hp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( b256hp, cbm2hp_state )
-	MCFG_FRAGMENT_ADD(cbm2hp_ntsc)
+static MACHINE_CONFIG_DERIVED( b256hp, cbm2hp_ntsc )
 	MCFG_FRAGMENT_ADD(256k)
 MACHINE_CONFIG_END
 
@@ -2432,9 +2392,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( bx256hp )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( bx256hp, cbm2hp_state )
-	MCFG_FRAGMENT_ADD(b256hp)
-
+static MACHINE_CONFIG_DERIVED( bx256hp, b256hp )
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_ntsc)
 
 	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
@@ -2451,9 +2409,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm2hp_pal )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm2hp_pal, cbm2hp_state )
-	MCFG_FRAGMENT_ADD(cbm2hp_ntsc)
-
+static MACHINE_CONFIG_DERIVED( cbm2hp_pal, cbm2hp_ntsc )
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2_pal)
 
 	// devices
@@ -2469,8 +2425,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm710 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm710, cbm2hp_state )
-	MCFG_FRAGMENT_ADD(cbm2hp_pal)
+static MACHINE_CONFIG_DERIVED( cbm710, cbm2hp_pal )
 	MCFG_FRAGMENT_ADD(128k)
 MACHINE_CONFIG_END
 
@@ -2479,8 +2434,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm720 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm720, cbm2hp_state )
-	MCFG_FRAGMENT_ADD(cbm2hp_pal)
+static MACHINE_CONFIG_DERIVED( cbm720, cbm2hp_pal )
 	MCFG_FRAGMENT_ADD(256k)
 MACHINE_CONFIG_END
 
@@ -2489,9 +2443,7 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( cbm730 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( cbm730, cbm2hp_state )
-	MCFG_FRAGMENT_ADD(cbm720)
-
+static MACHINE_CONFIG_DERIVED( cbm730, cbm720 )
 	MCFG_MACHINE_START_OVERRIDE(cbm2_state, cbm2x_pal)
 
 	MCFG_CPU_ADD(EXT_I8088_TAG, I8088, XTAL_12MHz)
@@ -2536,11 +2488,6 @@ ROM_START( p500 )
 	ROM_REGION( 0xf5, PLA2_TAG, 0 )
 	ROM_LOAD( "906114-03.u88", 0x00, 0xf5, CRC(668c073e) SHA1(1115858bb2dc91ea9e2016ba2e23ec94239358b4) )
 ROM_END
-
-
-//-------------------------------------------------
-//  ROM( p500p )
-//-------------------------------------------------
 
 #define rom_p500p   rom_p500
 
@@ -2590,6 +2537,9 @@ ROM_START( b128 )
 	ROM_LOAD( "906114-04.u18", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
 ROM_END
 
+#define rom_cbm610  rom_b128
+#define rom_cbm620  rom_b256
+
 
 //-------------------------------------------------
 //  ROM( b256 )
@@ -2613,20 +2563,6 @@ ROM_START( b256 )
 	ROM_REGION( 0xf5, PLA1_TAG, 0 )
 	ROM_LOAD( "906114-04.u18", 0x00, 0xf5, CRC(ae3ec265) SHA1(334e0bc4b2c957ecb240c051d84372f7b47efba3) )
 ROM_END
-
-
-//-------------------------------------------------
-//  ROM( cbm610 )
-//-------------------------------------------------
-
-#define rom_cbm610  rom_b128
-
-
-//-------------------------------------------------
-//  ROM( cbm620 )
-//-------------------------------------------------
-
-#define rom_cbm620  rom_b256
 
 
 //-------------------------------------------------
@@ -2673,6 +2609,8 @@ ROM_START( b128hp )
 	ROM_LOAD( "906114-05.u75", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
 ROM_END
 
+#define rom_cbm710  rom_b128hp
+
 
 //-------------------------------------------------
 //  ROM( b256hp )
@@ -2696,6 +2634,8 @@ ROM_START( b256hp )
 	ROM_REGION( 0xf5, PLA1_TAG, 0 )
 	ROM_LOAD( "906114-05.u75", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
 ROM_END
+
+#define rom_cbm720  rom_b256hp
 
 
 //-------------------------------------------------
@@ -2723,25 +2663,6 @@ ROM_START( bx256hp )
 	ROM_REGION( 0xf5, PLA1_TAG, 0 )
 	ROM_LOAD( "906114-05.u75", 0x00, 0xf5, CRC(ff6ba6b6) SHA1(45808c570eb2eda7091c51591b3dbd2db1ac646a) )
 ROM_END
-
-
-//-------------------------------------------------
-//  ROM( cbm710 )
-//-------------------------------------------------
-
-#define rom_cbm710  rom_b128hp
-
-
-//-------------------------------------------------
-//  ROM( cbm720 )
-//-------------------------------------------------
-
-#define rom_cbm720  rom_b256hp
-
-
-//-------------------------------------------------
-//  ROM( cbm730 )
-//-------------------------------------------------
 
 #define rom_cbm730  rom_bx256hp
 

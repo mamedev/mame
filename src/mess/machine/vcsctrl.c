@@ -54,7 +54,8 @@ device_vcs_control_port_interface::~device_vcs_control_port_interface()
 
 vcs_control_port_device::vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 	device_t(mconfig, VCS_CONTROL_PORT, "Atari VCS control port", tag, owner, clock),
-	device_slot_interface(mconfig, *this)
+	device_slot_interface(mconfig, *this),
+	m_trigger_handler(*this)
 {
 }
 
@@ -75,6 +76,8 @@ vcs_control_port_device::~vcs_control_port_device()
 void vcs_control_port_device::device_start()
 {
 	m_device = dynamic_cast<device_vcs_control_port_interface *>(get_card_device());
+
+	m_trigger_handler.resolve_safe();
 }
 
 
@@ -89,6 +92,11 @@ WRITE8_MEMBER( vcs_control_port_device::joy_w ) { joy_w(data); }
 bool vcs_control_port_device::exists() { return m_device != NULL; }
 bool vcs_control_port_device::has_pot_x() { return exists() && m_device->has_pot_x(); }
 bool vcs_control_port_device::has_pot_y() { return exists() && m_device->has_pot_y(); }
+
+void vcs_control_port_device::trigger_w(int state)
+{
+	m_trigger_handler(state);
+}
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( vcs_control_port_devices )

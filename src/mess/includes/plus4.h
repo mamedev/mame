@@ -69,7 +69,7 @@ public:
 	required_device<m7501_device> m_maincpu;
 	required_device<pls100_device> m_pla;
 	required_device<mos7360_device> m_ted;
-	optional_device<acia6551_device> m_acia;
+	optional_device<mos6551_device> m_acia;
 	optional_device<mos6529_device> m_spi_user;
 	required_device<mos6529_device> m_spi_kb;
 	optional_device<t6721_device> m_t6721;
@@ -106,7 +106,6 @@ public:
 	DECLARE_READ8_MEMBER( ted_videoram_r );
 
 	DECLARE_READ8_MEMBER( cpu_r );
-	DECLARE_READ8_MEMBER( c16_cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
 
 	DECLARE_WRITE_LINE_MEMBER( ted_irq_w );
@@ -114,8 +113,9 @@ public:
 	DECLARE_READ8_MEMBER( ted_rom_r );
 	DECLARE_READ8_MEMBER( ted_k_r );
 
-	DECLARE_READ8_MEMBER( spi_kb_r );
 	DECLARE_WRITE8_MEMBER( spi_kb_w );
+
+	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
 
 	DECLARE_READ8_MEMBER( exp_dma_r );
 	DECLARE_WRITE8_MEMBER( exp_dma_w );
@@ -150,6 +150,17 @@ public:
 
 	INTERRUPT_GEN_MEMBER(c16_raster_interrupt);
 	INTERRUPT_GEN_MEMBER(c16_frame_interrupt);
+};
+
+
+class c16_state : public plus4_state
+{
+public:
+	c16_state(const machine_config &mconfig, device_type type, const char *tag)
+		: plus4_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_READ8_MEMBER( cpu_r );
 };
 
 

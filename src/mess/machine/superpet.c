@@ -70,7 +70,7 @@ static MACHINE_CONFIG_FRAGMENT( superpet )
 	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(superpet_mem)
 
-	MCFG_ACIA6551_ADD(M6551_TAG) // XTAL_1_8432MHz
+	MCFG_MOS6551_ADD(M6551_TAG, XTAL_1_8432MHz, DEVWRITELINE(DEVICE_SELF, superpet_device, acia_irq_w))
 	MCFG_MOS6702_ADD(MOS6702_TAG, XTAL_16MHz/16)
 MACHINE_CONFIG_END
 
@@ -383,4 +383,16 @@ READ8_MEMBER( superpet_device::read )
 WRITE8_MEMBER( superpet_device::write )
 {
 	m_slot->dma_bd_w(offset, data);
+}
+
+
+//-------------------------------------------------
+//  acia_irq_w -
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( superpet_device::acia_irq_w )
+{
+	m_acia_irq = state;
+
+	//m_maincpu->set_input_line(M6809_IRQ_LINE, m_pet_irq || m_acia_irq);
 }
