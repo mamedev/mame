@@ -115,7 +115,7 @@ ROM_END
 
 #endif
 
-DRIVER_INIT_MEMBER(md_havoc_state,hshavoc)
+DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 {
 	int x;
 	UINT16 *src = (UINT16 *)machine().root_device().memregion("maincpu")->base();
@@ -227,5 +227,5 @@ DRIVER_INIT_MEMBER(md_havoc_state,hshavoc)
 
 
 
-GAME( 1993, hshavoc,   0,        md_bootleg, hshavoc, md_havoc_state, hshavoc, ROT0, "Data East",                  "High Seas Havoc",GAME_NOT_WORKING )
+GAME( 1993, hshavoc,   0,        md_bootleg, hshavoc, md_boot_state, hshavoc, ROT0, "Data East",                  "High Seas Havoc",GAME_NOT_WORKING )
 //GAME( 1993, hshavoc2,  hshavoc,  md_bootleg, hshavoc, md_havoc_state, genesis, ROT0, "Data East",                  "High Seas Havoc (Genesis ROM)",GAME_NOT_WORKING )

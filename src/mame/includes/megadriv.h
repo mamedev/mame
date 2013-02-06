@@ -203,7 +203,9 @@ public:
 	DECLARE_DRIVER_INIT(srmdb);
 	DECLARE_DRIVER_INIT(topshoot);
 	DECLARE_DRIVER_INIT(puckpkmn);
+	DECLARE_DRIVER_INIT(hshavoc);
 };
+
 
 class segac2_state : public md_base_state
 {
@@ -374,15 +376,6 @@ struct megadriv_cart
 	UINT16 realtec_bank_addr, realtec_bank_size, realtec_old_bank_addr;
 	UINT16 l3alt_pdat, l3alt_pcmd;
 	int ssf2_lastoff, ssf2_lastdata;
-};
-
-class md_havoc_state : public md_base_state
-{
-public:
-	md_havoc_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag) { }
-
-	DECLARE_DRIVER_INIT(hshavoc);
 };
 
 
