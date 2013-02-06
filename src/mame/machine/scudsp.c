@@ -913,13 +913,6 @@ void dsp_execute_program(address_space &dmaspace)
 
 		cycles_run++;
 
-		if(cycles_run > 10000)
-		{
-			opcode = 0x38000000;
-			dsp_end(dmaspace);
-			cont = 0;
-		}
-
 	} while( cont );
 #if DEBUG_DSP
 	dsp_dump_mem( log_file );
