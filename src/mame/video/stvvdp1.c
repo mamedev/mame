@@ -16,7 +16,7 @@ Framebuffer todo:
 #include "emu.h"
 #include "includes/stv.h"
 
-#define VDP1_LOG 1
+#define VDP1_LOG 0
 
 
 enum { FRAC_SHIFT = 16 };
@@ -311,7 +311,21 @@ READ32_MEMBER ( saturn_state::saturn_vdp1_vram_r )
 
 WRITE32_MEMBER ( saturn_state::saturn_vdp1_vram_w )
 {
-	COMBINE_DATA(&m_vdp1_vram[offset]);
+	UINT8 *vdp1 = m_vdp1.gfx_decode;
+
+	COMBINE_DATA (&m_vdp1_vram[offset]);
+
+//  if (((offset * 4) > 0xdf) && ((offset * 4) < 0x140))
+//  {
+//      logerror("cpu %s (PC=%08X): VRAM dword write to %08X = %08X & %08X\n", space.device().tag(), space.device().safe_pc(), offset*4, data, mem_mask);
+//  }
+
+	data = m_vdp1_vram[offset];
+	/* put in gfx region for easy decoding */
+	vdp1[offset*4+0] = (data & 0xff000000) >> 24;
+	vdp1[offset*4+1] = (data & 0x00ff0000) >> 16;
+	vdp1[offset*4+2] = (data & 0x0000ff00) >> 8;
+	vdp1[offset*4+3] = (data & 0x000000ff) >> 0;
 }
 
 WRITE32_MEMBER ( saturn_state::saturn_vdp1_framebuffer0_w )
@@ -824,10 +838,9 @@ void saturn_state::drawpixel_poly(int x, int y, int patterndata, int offsetcnt)
 
 void saturn_state::drawpixel_8bpp_trans(int x, int y, int patterndata, int offsetcnt)
 {
-	UINT8 *vdp1_vram = (UINT8 *)m_vdp1_vram;
 	UINT16 pix;
 
-	pix = vdp1_vram[((patterndata+offsetcnt)^3) & 0x7ffff];
+	pix = m_vdp1.gfx_decode[patterndata+offsetcnt];
 	if ( pix & 0xff )
 	{
 		m_vdp1.framebuffer_draw_lines[y][x] = pix | m_sprite_colorbank;
@@ -836,28 +849,25 @@ void saturn_state::drawpixel_8bpp_trans(int x, int y, int patterndata, int offse
 
 void saturn_state::drawpixel_4bpp_notrans(int x, int y, int patterndata, int offsetcnt)
 {
-	UINT8 *vdp1_vram = (UINT8 *)m_vdp1_vram;
 	UINT16 pix;
 
-	pix = vdp1_vram[((patterndata+offsetcnt)^3) & 0x7ffff];
-	pix = offsetcnt&1 ? (pix & 0x0f):((pix & 0xf0)>>4) ;
+	pix = m_vdp1.gfx_decode[patterndata+offsetcnt/2];
+	pix = offsetcnt&1 ? (pix & 0x0f) : ((pix & 0xf0)>>4);
 	m_vdp1.framebuffer_draw_lines[y][x] = pix | m_sprite_colorbank;
 }
 
 void saturn_state::drawpixel_4bpp_trans(int x, int y, int patterndata, int offsetcnt)
 {
-	UINT8 *vdp1_vram = (UINT8 *)m_vdp1_vram;
 	UINT16 pix;
 
-	pix = vdp1_vram[((patterndata+offsetcnt)^3) & 0x7ffff];
-	pix = offsetcnt&1 ? (pix & 0x0f):((pix & 0xf0)>>4) ;
+	pix = m_vdp1.gfx_decode[patterndata+offsetcnt/2];
+	pix = offsetcnt&1 ? (pix & 0x0f) : ((pix & 0xf0)>>4);
 	if ( pix )
 		m_vdp1.framebuffer_draw_lines[y][x] = pix | m_sprite_colorbank;
 }
 
 void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcnt)
 {
-	UINT8 *vdp1_vram = (UINT8 *)m_vdp1_vram;
 	int pix,mode,transmask, spd = stv2_current_sprite.CMDPMOD & 0x40;
 	int mesh = stv2_current_sprite.CMDPMOD & 0x100;
 	int pix2;
@@ -887,16 +897,16 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 		{
 			case 0x0000: // mode 0 16 colour bank mode (4bits) (hanagumi blocks)
 				// most of the shienryu sprites use this mode
-				pix = vdp1_vram[((patterndata+offsetcnt)^3) & 0x7ffff];
-				pix = offsetcnt&1 ? (pix & 0x0f):((pix & 0xf0)>>4) ;
+				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt/2) & 0xfffff];
+				pix = offsetcnt&1 ? (pix & 0x0f) : ((pix & 0xf0)>>4);
 				pix = pix+((stv2_current_sprite.CMDCOLR&0xfff0));
 				mode = 0;
 				transmask = 0xf;
 				break;
 			case 0x0008: // mode 1 16 colour lookup table mode (4bits)
 				// shienryu explosisons (and some enemies) use this mode
-				pix2 = vdp1_vram[((patterndata+offsetcnt)^3) & 0x7ffff];
-				pix2 = offsetcnt&1 ?  (pix2 & 0x0f):((pix2 & 0xf0)>>4);
+				pix2 = m_vdp1.gfx_decode[(patterndata+offsetcnt/2) & 0xfffff];
+				pix = offsetcnt&1 ? (pix & 0x0f) : ((pix & 0xf0)>>4);
 				pix = pix2&1 ?
 				((((m_vdp1_vram[(((stv2_current_sprite.CMDCOLR&0xffff)*8)>>2)+((pix2&0xfffe)/2)])) & 0x0000ffff) >> 0):
 				((((m_vdp1_vram[(((stv2_current_sprite.CMDCOLR&0xffff)*8)>>2)+((pix2&0xfffe)/2)])) & 0xffff0000) >> 16);
@@ -917,25 +927,25 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 				}
 				break;
 			case 0x0010: // mode 2 64 colour bank mode (8bits) (character select portraits on hanagumi)
-				pix = vdp1_vram[((patterndata+offsetcnt)^3) & 0x7ffff];
+				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt) & 0xfffff];
 				mode = 2;
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xffc0);
 				transmask = 0x3f;
 				break;
 			case 0x0018: // mode 3 128 colour bank mode (8bits) (little characters on hanagumi use this mode)
-				pix = vdp1_vram[((patterndata+offsetcnt)^3) & 0x7ffff];
+				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt) & 0xfffff];
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xff80);
 				transmask = 0x7f;
 				mode = 3;
 				break;
 			case 0x0020: // mode 4 256 colour bank mode (8bits) (hanagumi title)
-				pix = vdp1_vram[((patterndata+offsetcnt)^3) & 0x7ffff];
+				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt) & 0xfffff];
 				pix = pix+(stv2_current_sprite.CMDCOLR&0xff00);
 				transmask = 0xff;
 				mode = 4;
 				break;
 			case 0x0028: // mode 5 32,768 colour RGB mode (16bits)
-				pix = vdp1_vram[((patterndata+offsetcnt*2+1)^3) & 0x7ffff] | (vdp1_vram[((patterndata+offsetcnt*2)^3) & 0x7ffff]<<8) ;
+				pix = m_vdp1.gfx_decode[(patterndata+offsetcnt*2+1) & 0xfffff] | (m_vdp1.gfx_decode[(patterndata+offsetcnt*2) & 0xfffff]<<8) ;
 				mode = 5;
 				transmask = -1; /* TODO: check me */
 				break;
@@ -2039,16 +2049,31 @@ void saturn_state::video_update_vdp1( void )
 
 void saturn_state::stv_vdp1_state_save_postload( void )
 {
+	UINT8 *vdp1 = m_vdp1.gfx_decode;
+	int offset;
+	UINT32 data;
+
 	m_vdp1.framebuffer_mode = -1;
 	m_vdp1.framebuffer_double_interlace = -1;
 
 	stv_set_framebuffer_config();
+
+	for (offset = 0; offset < 0x80000/4; offset++ )
+	{
+		data = m_vdp1_vram[offset];
+		/* put in gfx region for easy decoding */
+		vdp1[offset*4+0] = (data & 0xff000000) >> 24;
+		vdp1[offset*4+1] = (data & 0x00ff0000) >> 16;
+		vdp1[offset*4+2] = (data & 0x0000ff00) >> 8;
+		vdp1[offset*4+3] = (data & 0x000000ff) >> 0;
+	}
 }
 
 int saturn_state::stv_vdp1_start ( void )
 {
 	m_vdp1_regs = auto_alloc_array_clear(machine(), UINT16, 0x020/2 );
 	m_vdp1_vram = auto_alloc_array_clear(machine(), UINT32, 0x100000/4 );
+	m_vdp1.gfx_decode = auto_alloc_array(machine(), UINT8, 0x100000 );
 
 	stv_vdp1_shading_data = auto_alloc(machine(), struct stv_vdp1_poly_scanline_data);
 
