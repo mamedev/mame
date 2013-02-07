@@ -428,8 +428,8 @@ void st_state::mouse_tick()
 
 	*/
 
-	UINT8 x = m_mousex->read_safe(0x00);
-	UINT8 y = m_mousey->read_safe(0x00);
+	UINT8 x = m_mousex->read();
+	UINT8 y = m_mousey->read();
 
 	if (m_ikbd_mouse_pc == 0)
 	{
@@ -547,7 +547,7 @@ READ8_MEMBER( st_state::ikbd_port2_r )
 
 	*/
 
-	UINT8 data = m_joy1->read_safe(0xff) & 0x06;
+	UINT8 data = m_joy1 ? m_joy1->read() & 0x06 : 0x06;
 
 	// serial receive
 	data |= m_ikbd_tx << 3;
@@ -634,7 +634,7 @@ READ8_MEMBER( st_state::ikbd_port4_r )
 
 	if (m_ikbd_joy) return 0xff;
 
-	UINT8 data = m_joy0->read_safe(0xff);
+	UINT8 data = m_joy0 ? m_joy0->read() : 0xff;
 
 	if ((m_config->read() & 0x01) == 0)
 	{
@@ -2200,8 +2200,10 @@ void st_state::machine_start()
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(st_state::atarist_int_ack),this));
 
 	// allocate timers
-	m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::st_mouse_tick),this));
-	m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
+	if(m_mousex) {
+		m_mouse_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(st_state::st_mouse_tick),this));
+		m_mouse_timer->adjust(attotime::zero, 0, attotime::from_hz(500));
+	}
 
 	// register for state saving
 	state_save();

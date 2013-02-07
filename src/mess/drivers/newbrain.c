@@ -133,7 +133,7 @@ void newbrain_state::bankswitch()
 			else if (bank == 5)
 			{
 				/* 0x8000-0x9fff */
-				if (m_eim_rom->base())
+				if (m_eim_rom)
 				{
 					/* expansion interface ROM */
 					memory_install_rom_helper(program, bank_name, bank_start, bank_end);

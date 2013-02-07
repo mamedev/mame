@@ -1923,8 +1923,8 @@ MACHINE_START_MEMBER(apple2_state,tk2000)
 
 int apple2_state::apple2_pressed_specialkey(UINT8 key)
 {
-	return (m_kbspecial->read() & key)
-		|| (m_joybuttons->read_safe(0x00) & key);
+	return ((m_kbspecial ? m_kbspecial->read() : 0) & key)
+		|| ((m_joybuttons ? m_joybuttons->read() : 0) & key);
 }
 
 void apple2_state::apple2_refresh_delegates()

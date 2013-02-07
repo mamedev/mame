@@ -149,8 +149,8 @@ protected:
 	required_device<cassette_image_device> m_cassette2;
 	optional_device<device_t> m_wd1771;
 	required_memory_region m_region_z80ne;
-	required_memory_bank m_bank1;
-	required_memory_bank m_bank2;
+	optional_memory_bank m_bank1;
+	optional_memory_bank m_bank2;
 	optional_memory_bank m_bank3;
 	optional_memory_bank m_bank4;
 	required_ioport m_io_row0;

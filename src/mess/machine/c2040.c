@@ -1591,14 +1591,12 @@ void c2040_device::device_start()
 	// install image callbacks
 	m_unit[0].m_image = m_image0;
 
-	floppy_install_unload_proc(m_image0, c2040_device::on_disk0_change);
 	floppy_install_load_proc(m_image0, c2040_device::on_disk0_change);
 
 	if (m_image1)
 	{
 		m_unit[1].m_image = m_image1;
 
-		floppy_install_unload_proc(m_image1, c2040_device::on_disk1_change);
 		floppy_install_load_proc(m_image1, c2040_device::on_disk1_change);
 	}
 
