@@ -369,6 +369,18 @@
 		</part>
 	</software>
 
+	<software name="cbug18">
+		<description>CBUG #18</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug18.d80" size="533248" crc="70c5d190" sha1="230516b694b6aea429cfb8a73fc409a9bb2891d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cbug19">
 		<description>CBUG #19</description>
 		<year>1983</year>
@@ -628,7 +640,19 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug44.d80" size="533248" crc="2fd1cf36" sha1="9625a6ac43811f2b9a024ac585dd7ddbef793b69" offset="0" />
+				<rom name="cbug44.d80" size="533248" crc="202fc2b1" sha1="74d6e3e36ce713214f799bf9afe0cca458d555fa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbug44a" cloneof="cbug44">
+		<description>CBUG #44 (Alt)</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug44a.d80" size="533248" crc="2fd1cf36" sha1="9625a6ac43811f2b9a024ac585dd7ddbef793b69" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -652,7 +676,19 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug47.d80" size="533248" crc="70a909af" sha1="40bbb38a0ff431c2aaa51a1230838e1ecab2bf62" offset="0" />
+				<rom name="cbug47.d80" size="533248" crc="883c67d9" sha1="eec9fd273dafab516f01d0988f86645c7856208b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbug47a" cloneof="cbug47">
+		<description>CBUG #47 (Alt)</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug47a.d80" size="533248" crc="70a909af" sha1="40bbb38a0ff431c2aaa51a1230838e1ecab2bf62" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -664,7 +700,19 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug48.d80" size="533248" crc="8639a5d9" sha1="a58c296168800e95fd4f529017725fb5a058c140" offset="0" />
+				<rom name="cbug48.d80" size="533248" crc="d6d5d44e" sha1="7f9c4302db07603590a8548bfcf93bd98f953141" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbug48a" cloneof="cbug48">
+		<description>CBUG #48 (Alt)</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug48a.d80" size="533248" crc="8639a5d9" sha1="a58c296168800e95fd4f529017725fb5a058c140" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -820,7 +868,19 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="cbug60.d80" size="533248" crc="b852c24d" sha1="561c298ffe8dab5dfbabce18fb01e19ed29d28f3" offset="0" />
+				<rom name="cbug60.d80" size="533248" crc="54bc9bf6" sha1="c2223ffd286d123e3529ab954be2511b83cb00c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbug60a" cloneof="cbug60">
+		<description>CBUG #60 (Alt)</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug60a.d80" size="533248" crc="b852c24d" sha1="561c298ffe8dab5dfbabce18fb01e19ed29d28f3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -833,6 +893,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
 				<rom name="cbug61.d80" size="533248" crc="84079189" sha1="82eede2c6cdbdd1621d1b0149e3d22a4862f4c9e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbug62">
+		<description>CBUG #62</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug62.d80" size="533248" crc="6e63f34d" sha1="7b1273430d4211cad8f021323de2ea7a2982bbc5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -935,6 +1007,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
 				<rom name="cbug70.d80" size="533248" crc="23d2bebd" sha1="e9ddd97e120d479ba93e6d3abeb3090a574198e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbug71">
+		<description>CBUG #71</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug71.d80" size="533248" crc="50188eac" sha1="d9f3d401956aefd754bb326e5a3996a20232cd1c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1113,6 +1197,18 @@
 		</part>
 	</software>
 
+	<software name="cbug83">
+		<description>CBUG #83</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug83.d80" size="533248" crc="7fbeb655" sha1="ca9d1fa7f0eb78cd82f5a7ce8d5b437c417bb6e8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cbug84">
 		<description>CBUG #84</description>
 		<year>1983</year>
@@ -1160,6 +1256,84 @@
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="cbug88">
+		<description>CBUG #88</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug88.d80" size="533248" crc="e40303fd" sha1="7cdc78236e4f0f59a43b3f1d3dea2a4306c2741c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbug89">
+		<description>CBUG #89</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug89.d80" size="533248" crc="c5ccfe16" sha1="f45f6e96d050fae5edba0ed385c061016194f27d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbug90">
+		<description>CBUG #90</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug90.d80" size="533248" crc="efe2b6e3" sha1="e8d47dbcff664f22b8c6f9c0dd3b6f69006b5eef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbug91">
+		<description>CBUG #91</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug91-1.d80" size="533248" crc="13aeeb6f" sha1="b0d7d3b6e49e024cdd5c45c2e8506fa3c8023ece" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug91-2.d80" size="533248" crc="9f513dd1" sha1="8e54ff73b9c8940e3f85a5bf67a7d1e7a224ea29" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbug92">
+		<description>CBUG #92</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug92.d80" size="533248" crc="9229e68e" sha1="2441ca84b6f28e268cbe797409f7b900e1f9db7d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbug93">
+		<description>CBUG #93</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug93.d80" size="533248" crc="134c012b" sha1="6c34a4d619c3086bf9051c3279446474fb63d18c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="cbug94">
 		<description>CBUG #94</description>
@@ -1181,6 +1355,24 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
 				<rom name="cbug95.d80" size="533248" crc="33a152fe" sha1="94b2ba626047d4ea14044c793f6b1386bf889784" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbug96">
+		<description>CBUG #96</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug96-1.d80" size="533248" crc="01c863d4" sha1="531ee1aaaf1bab13228ef3ac702b9949f30ef593" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbug96-2.d80" size="533248" crc="07d31e96" sha1="c5e2703627b81eb4aa94d62e29d86f6e182b842d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1229,6 +1421,18 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
 				<rom name="cbugm45.d80" size="533248" crc="44218c61" sha1="472120d840c0ff86dcd8097fa722abad150a6797" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbugm54">
+		<description>CBUG #M54</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbugm54.d80" size="533248" crc="9b0b08b8" sha1="b532327f7dd8fbcf3217477449ee23f8eeae38b4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1425,6 +1629,18 @@
 		</part>
 	</software>
 
+	<software name="cbugpr14">
+		<description>CBUG #PR14</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbugpr14.d80" size="533248" crc="0099b0f4" sha1="0f6bf95c4250ccbb3b18b50ce21582543bd4a3a2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cbugpr15">
 		<description>CBUG #PR15</description>
 		<year>1983</year>
@@ -1445,6 +1661,54 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
 				<rom name="cbugpr16.d80" size="533248" crc="ecd40443" sha1="6b1c2cacadc2975f229c6351d44e9ab199e8ad77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbugpr17">
+		<description>CBUG #PR17</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbugpr17.d80" size="533248" crc="e258a470" sha1="47d559570f7c1f6289b30261c87cdca8b55de56d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbugpr18">
+		<description>CBUG #PR18</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbugpr18.d80" size="533248" crc="89556c22" sha1="3a66495f676ba4faf4d7575b0da853a3b2f08a7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbugpr19">
+		<description>CBUG #PR19</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbugpr19.d80" size="533248" crc="c384cfde" sha1="2657e3bb8ee3f93550a40aa282e025537d69b669" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cbugpr20">
+		<description>CBUG #PR20</description>
+		<year>1983</year>
+		<publisher>Chicago B128 Users Group</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="cbugpr20.d80" size="533248" crc="281e1c4b" sha1="bbf0a208c676dcb235af4861c9d8976fb88d4412" offset="0" />
 			</dataarea>
 		</part>
 	</software>
