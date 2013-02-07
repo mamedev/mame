@@ -5905,10 +5905,6 @@ VIDEO_START_MEMBER(saturn_state,stv_vdp2)
 	machine().gfx[1]->set_source(m_vdp2.gfx_decode);
 	machine().gfx[2]->set_source(m_vdp2.gfx_decode);
 	machine().gfx[3]->set_source(m_vdp2.gfx_decode);
-	machine().gfx[4]->set_source(m_vdp1.gfx_decode);
-	machine().gfx[5]->set_source(m_vdp1.gfx_decode);
-	machine().gfx[6]->set_source(m_vdp1.gfx_decode);
-	machine().gfx[7]->set_source(m_vdp1.gfx_decode);
 }
 
 void saturn_state::stv_vdp2_dynamic_res_change( void )
