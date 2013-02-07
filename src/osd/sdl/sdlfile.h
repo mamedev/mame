@@ -29,6 +29,7 @@ enum
 struct osd_file
 {
 	int handle;
+	int socket;
 	int type;
 	char    filename[1];
 };

@@ -43,7 +43,7 @@ bool win_init_sockets()
 
 	/* check for correct version */
 	if ( LOBYTE( wsaData.wVersion ) != 2 ||
-			HIBYTE( wsaData.wVersion ) != 0 )
+		 HIBYTE( wsaData.wVersion ) != 0 )
 	{
 		/* incorrect WinSock version */
 		WSACleanup();
@@ -60,7 +60,7 @@ void win_cleanup_sockets()
 
 bool win_check_socket_path(const char *path)
 {
-	if (*winfile_socket_identifier != 0 &&
+	if (strlen(winfile_socket_identifier) > 0 &&
 		strncmp(path, winfile_socket_identifier, strlen(winfile_socket_identifier)) == 0 &&
 		strchr(path, ':') != NULL) return true;
 	return false;
@@ -75,8 +75,6 @@ file_error win_open_socket(const char *path, UINT32 openflags, osd_file **file, 
 	int port;
 
 	sscanf( path+strlen(winfile_socket_identifier), "%255[^:]:%d", hostname, &port );
-
-	printf("Connecting to server '%s' on port '%d'\n", hostname, port);
 
 	if (((*file)->socket = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
@@ -94,13 +92,35 @@ file_error win_open_socket(const char *path, UINT32 openflags, osd_file **file, 
 	sai.sin_port = htons(port);
 	sai.sin_addr = *((struct in_addr *)localhost->h_addr);
 
+	// listening socket support
+	if (openflags & OPEN_FLAG_CREATE)
+	{
+//		printf("Listening for client at '%s' on port '%d'\n", hostname, port);
+		// bind socket...
+		if (bind((*file)->socket, (struct sockaddr *)&sai, sizeof(struct sockaddr)) == -1)
+		{
+			return FILERR_ACCESS_DENIED;
+		}
+		
+		// start to listen...
+		if (listen((*file)->socket, 1) == -1) {
+			return FILERR_ACCESS_DENIED;
+		}
+		
+		// mark socket as "listening"
+		(*file)->handle = 0;
+		*filesize = 0;
+		return FILERR_NONE;
+	}
+	
+//	printf("Connecting to server '%s' on port '%d'\n", hostname, port);
 	if (connect((*file)->socket, (struct sockaddr *)&sai, sizeof(struct sockaddr)) == -1)
 	{
 		return FILERR_ACCESS_DENIED;
 	}
 	*filesize = 0;
+	(*file)->handle = INVALID_HANDLE_VALUE;
 	return FILERR_NONE;
-
 }
 
 file_error win_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
@@ -122,7 +142,30 @@ file_error win_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 	}
 	else if (FD_ISSET(file->socket, &readfds))
 	{
-		result = recv(file->socket, (char*)buffer, count, 0);
+		if (file->handle == INVALID_HANDLE_VALUE)
+		{
+			// connected socket
+			result = recv(file->socket, (char*)buffer, count, 0);
+		}
+		else
+		{
+			// listening socket
+			SOCKET AcceptSocket;
+			AcceptSocket = accept(file->socket, NULL, NULL);
+			if (AcceptSocket == INVALID_SOCKET)
+			{
+				return FILERR_FAILURE;
+			}
+			closesocket(file->socket);
+			file->socket = AcceptSocket;
+			file->handle = INVALID_HANDLE_VALUE;
+			if (actual != NULL )
+			{
+				*actual = 0;
+			}
+
+			return FILERR_NONE;
+		}
 	}
 	else
 	{
