@@ -906,7 +906,7 @@ void saturn_state::drawpixel_generic(int x, int y, int patterndata, int offsetcn
 			case 0x0008: // mode 1 16 colour lookup table mode (4bits)
 				// shienryu explosisons (and some enemies) use this mode
 				pix2 = m_vdp1.gfx_decode[(patterndata+offsetcnt/2) & 0xfffff];
-				pix = offsetcnt&1 ? (pix & 0x0f) : ((pix & 0xf0)>>4);
+				pix2 = offsetcnt&1 ? (pix2 & 0x0f) : ((pix2 & 0xf0)>>4);
 				pix = pix2&1 ?
 				((((m_vdp1_vram[(((stv2_current_sprite.CMDCOLR&0xffff)*8)>>2)+((pix2&0xfffe)/2)])) & 0x0000ffff) >> 0):
 				((((m_vdp1_vram[(((stv2_current_sprite.CMDCOLR&0xffff)*8)>>2)+((pix2&0xfffe)/2)])) & 0xffff0000) >> 16);
