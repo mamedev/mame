@@ -586,7 +586,7 @@ INLINE int translate_address(i386_state *cpustate, int pl, int type, UINT32 *add
 		return TRUE;
 
 	const vtlb_entry *table = vtlb_table(cpustate->vtlb);
-	int index = *address >> 12;
+	UINT32 index = *address >> 12;
 	vtlb_entry entry = table[index];
 	if(type == TRANSLATE_FETCH)
 		type = TRANSLATE_READ;

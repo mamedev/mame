@@ -70,7 +70,7 @@ int vtlb_fill(vtlb_state *vtlb, offs_t address, int intention);
 void vtlb_load(vtlb_state *vtlb, int entrynum, int numpages, offs_t address, vtlb_entry value);
 
 /* load a dynamic VTLB entry */
-void vtlb_dynload(vtlb_state *vtlb, int index, offs_t address, vtlb_entry value);
+void vtlb_dynload(vtlb_state *vtlb, UINT32 index, offs_t address, vtlb_entry value);
 
 /* ----- flushing ----- */
 

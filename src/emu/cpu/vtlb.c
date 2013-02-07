@@ -229,7 +229,7 @@ void vtlb_load(vtlb_state *vtlb, int entrynum, int numpages, offs_t address, vtl
     vtlb_dynload - load a dynamic VTLB entry
 -------------------------------------------------*/
 
-void vtlb_dynload(vtlb_state *vtlb, int index, offs_t address, vtlb_entry value)
+void vtlb_dynload(vtlb_state *vtlb, UINT32 index, offs_t address, vtlb_entry value)
 {
 	vtlb_entry entry = vtlb->table[index];
 

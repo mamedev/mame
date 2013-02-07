@@ -10,6 +10,7 @@ static void (*pcap_close_dl)(pcap_t *) = NULL;
 static int (*pcap_setfilter_dl)(pcap_t *, struct bpf_program *) = NULL;
 static int (*pcap_sendpacket_dl)(pcap_t *, u_char *, int) = NULL;
 static int (*pcap_set_datalink_dl)(pcap_t *, int) = NULL;
+static HMODULE handle = NULL;
 
 #include "emu.h"
 #include "osdnet.h"
@@ -73,7 +74,7 @@ int netdev_pcap::recv_dev(UINT8 **buf)
 
 netdev_pcap::~netdev_pcap()
 {
-	if(m_p) pcap_close_dl(m_p);
+	if(m_p && handle) pcap_close_dl(m_p);
 }
 
 static CREATE_NETDEV(create_pcap)
@@ -81,8 +82,6 @@ static CREATE_NETDEV(create_pcap)
 	class netdev_pcap *dev = global_alloc(netdev_pcap(ifname, ifdev, rate));
 	return dynamic_cast<netdev *>(dev);
 }
-
-static HMODULE handle = NULL;
 
 void init_pcap()
 {
@@ -134,4 +133,5 @@ void deinit_pcap()
 {
 	clear_netdev();
 	FreeLibrary(handle);
+	handle = NULL;
 }
