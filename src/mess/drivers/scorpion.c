@@ -160,13 +160,11 @@ class scorpion_state : public spectrum_state
 public:
 	scorpion_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_state(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
 		, m_bank4(*this, "bank4")
 		, m_beta(*this, BETA_DISK_TAG)
-		, m_ram(*this, RAM_TAG)
 	{ }
 
 	DECLARE_DIRECT_UPDATE_MEMBER(scorpion_direct);
@@ -177,13 +175,11 @@ public:
 	DECLARE_MACHINE_RESET(scorpion);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
 protected:
-	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<device_t> m_beta;
-	required_device<ram_device> m_ram;
 private:
 	UINT8 *m_p_ram;
 	void scorpion_update_memory();
@@ -288,7 +284,7 @@ DIRECT_UPDATE_MEMBER(scorpion_state::scorpion_direct)
 
 TIMER_DEVICE_CALLBACK_MEMBER(scorpion_state::nmi_check_callback)
 {
-	if ((machine().root_device().ioport("NMI")->read() & 1)==1)
+	if ((m_io_nmi->read() & 1)==1)
 	{
 		m_port_1ffd_data |= 0x02;
 		scorpion_update_memory();

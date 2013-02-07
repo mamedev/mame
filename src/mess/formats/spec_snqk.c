@@ -86,7 +86,7 @@ static void spectrum_update_paging(running_machine &machine)
 	if (state->m_port_7ffd_data == -1)
 		return;
 	if (state->m_port_1ffd_data == -1)
-		spectrum_128_update_memory(machine);
+		state->spectrum_128_update_memory();
 
 	else
 	{
@@ -95,7 +95,7 @@ static void spectrum_update_paging(running_machine &machine)
 			state->m_port_1ffd_data = 0x04;
 		else
 			state->m_port_1ffd_data = 0x00;
-		spectrum_plus3_update_memory(machine);
+		state->spectrum_plus3_update_memory();
 	}
 }
 
@@ -2440,13 +2440,13 @@ void spectrum_setup_z80(running_machine &machine, UINT8 *snapdata, UINT32 snapsi
 		{
 			state->m_port_f4_data = 0x03;
 			state->m_port_ff_data = 0x00;
-			ts2068_update_memory(machine);
+			state->ts2068_update_memory();
 		}
 		if (z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068 && !strcmp(machine.system().name,"ts2068"))
 		{
 			state->m_port_f4_data = snapdata[35];
 			state->m_port_ff_data = snapdata[36];
-			ts2068_update_memory(machine);
+			state->ts2068_update_memory();
 		}
 	}
 }

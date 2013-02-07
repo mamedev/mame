@@ -67,7 +67,7 @@ void spectrum_state::screen_eof_spectrum(screen_device &screen, bool state)
 		}
 
 
-		spectrum_UpdateBorderBitmap(machine());
+		spectrum_UpdateBorderBitmap();
 	}
 }
 
@@ -181,55 +181,44 @@ PALETTE_INIT_MEMBER(spectrum_state,spectrum)
 
 /* The code below is just a per-pixel 'partial update' for the border */
 
-INLINE void spectrum_GetNextPos(running_machine &machine, unsigned int &x, unsigned int &y)
+void spectrum_state::spectrum_UpdateBorderBitmap()
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	int width = state->m_border_bitmap.width();
-	int height = state->m_border_bitmap.height();
+	unsigned int x = machine().primary_screen->hpos();
+	unsigned int y = machine().primary_screen->vpos();
+	int width = m_border_bitmap.width();
+	int height = m_border_bitmap.height();
 
-	x += 1;
 
-	if (x>width)
+	if (m_border_bitmap.valid())
 	{
-		x = 0;
-		y += 1;
+		int colour = m_port_fe_data & 0x07;
 
-		if (y>height)
-		{
-			y = 0;
-		}
-	}
-}
-
-
-void spectrum_UpdateBorderBitmap(running_machine &machine)
-{
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	unsigned int x = machine.primary_screen->hpos();
-	unsigned int y = machine.primary_screen->vpos();
-	int width = state->m_border_bitmap.width();
-	int height = state->m_border_bitmap.height();
-
-
-	if (state->m_border_bitmap.valid())
-	{
-		int colour = state->m_port_fe_data & 0x07;
-
-		//printf("update border from %d,%d to %d,%d\n", state->m_previous_border_x, state->m_previous_border_y, x, y);
+		//printf("update border from %d,%d to %d,%d\n", m_previous_border_x, m_previous_border_y, x, y);
 
 		do
 		{
-			if (state->m_previous_border_y < height)
+			if (m_previous_border_y < height)
 			{
-				UINT16* bm = &state->m_border_bitmap.pix16(state->m_previous_border_y);
+				UINT16* bm = &m_border_bitmap.pix16(m_previous_border_y);
 
-				if (state->m_previous_border_x < width)
-					bm[state->m_previous_border_x] = colour;
+				if (m_previous_border_x < width)
+					bm[m_previous_border_x] = colour;
 			}
 
-			spectrum_GetNextPos(machine, state->m_previous_border_x, state->m_previous_border_y);
+			m_previous_border_x += 1;
+
+			if (m_previous_border_x > width)
+			{
+				m_previous_border_x = 0;
+				m_previous_border_y += 1;
+
+				if (m_previous_border_y > height)
+				{
+					m_previous_border_y = 0;
+				}
+			}
 		}
-		while (!((state->m_previous_border_x == x) && (state->m_previous_border_y == y)));
+		while (!((m_previous_border_x == x) && (m_previous_border_y == y)));
 
 	}
 	else

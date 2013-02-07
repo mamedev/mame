@@ -10,6 +10,9 @@
 #include "imagedev/snapquik.h"
 #include "imagedev/cartslot.h"
 #include "machine/upd765.h"
+#include "imagedev/cassette.h"
+#include "sound/speaker.h"
+#include "machine/ram.h"
 
 /* Spectrum crystals */
 
@@ -70,8 +73,36 @@ class spectrum_state : public driver_device
 {
 public:
 	spectrum_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_video_ram(*this, "video_ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_video_ram(*this, "video_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_cassette(*this, CASSETTE_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_speaker(*this, SPEAKER_TAG)
+		, m_upd765(*this, "upd765")
+		, m_upd765_0(*this, "upd765:0")
+		, m_upd765_1(*this, "upd765:1")
+		, m_io_line0(*this, "LINE0")
+		, m_io_line1(*this, "LINE1")
+		, m_io_line2(*this, "LINE2")
+		, m_io_line3(*this, "LINE3")
+		, m_io_line4(*this, "LINE4")
+		, m_io_line5(*this, "LINE5")
+		, m_io_line6(*this, "LINE6")
+		, m_io_line7(*this, "LINE7")
+		, m_io_nmi(*this, "NMI")
+		, m_io_config(*this, "CONFIG")
+		, m_io_joy_intf(*this, "JOY_INTF")
+		, m_io_kempston(*this, "KEMPSTON")
+		, m_io_fuller(*this, "FULLER")
+		, m_io_mikrogen(*this, "MIKROGEN")
+		, m_io_plus0(*this, "PLUS0")
+		, m_io_plus1(*this, "PLUS1")
+		, m_io_plus2(*this, "PLUS2")
+		, m_io_plus3(*this, "PLUS3")
+		, m_io_plus4(*this, "PLUS4")
+
+	{ }
 
 	int m_port_fe_data;
 	int m_port_7ffd_data;
@@ -106,6 +137,22 @@ public:
 	DECLARE_READ8_MEMBER(spectrum_port_7f_r);
 	DECLARE_READ8_MEMBER(spectrum_port_df_r);
 	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
+
+	DECLARE_WRITE8_MEMBER(spectrum_128_port_7ffd_w);
+	DECLARE_READ8_MEMBER(spectrum_128_ula_r);
+
+	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_3ffd_w);
+	DECLARE_READ8_MEMBER(spectrum_plus3_port_3ffd_r);
+	DECLARE_READ8_MEMBER(spectrum_plus3_port_2ffd_r);
+	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_7ffd_w);
+	DECLARE_WRITE8_MEMBER(spectrum_plus3_port_1ffd_w);
+
+	DECLARE_READ8_MEMBER(ts2068_port_f4_r);
+	DECLARE_WRITE8_MEMBER(ts2068_port_f4_w);
+	DECLARE_READ8_MEMBER(ts2068_port_ff_r);
+	DECLARE_WRITE8_MEMBER(ts2068_port_ff_w);
+	DECLARE_WRITE8_MEMBER(tc2048_port_ff_w);
+
 	DECLARE_DRIVER_INIT(spectrum);
 	DECLARE_DRIVER_INIT(plus2);
 	DECLARE_DRIVER_INIT(plus3);
@@ -131,6 +178,42 @@ public:
 	bitmap_ind16 m_border_bitmap;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
+	void spectrum_128_update_memory();
+	void spectrum_plus3_update_memory();
+	void ts2068_update_memory();
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
+	required_device<device_t> m_speaker;
+	optional_device<upd765a_device> m_upd765;
+	optional_device<floppy_connector> m_upd765_0;
+	optional_device<floppy_connector> m_upd765_1;
+
+	// Regular spectrum ports; marked as optional because of other subclasses
+	optional_ioport m_io_line0;
+	optional_ioport m_io_line1;
+	optional_ioport m_io_line2;
+	optional_ioport m_io_line3;
+	optional_ioport m_io_line4;
+	optional_ioport m_io_line5;
+	optional_ioport m_io_line6;
+	optional_ioport m_io_line7;
+	optional_ioport m_io_nmi;
+	optional_ioport m_io_config;
+	optional_ioport m_io_joy_intf;
+	optional_ioport m_io_kempston;
+	optional_ioport m_io_fuller;
+	optional_ioport m_io_mikrogen;
+	// Plus ports
+	optional_ioport m_io_plus0;
+	optional_ioport m_io_plus1;
+	optional_ioport m_io_plus2;
+	optional_ioport m_io_plus3;
+	optional_ioport m_io_plus4;
+
+	void spectrum_UpdateBorderBitmap();
 };
 
 
@@ -141,26 +224,8 @@ INPUT_PORTS_EXTERN( spec_plus );
 
 MACHINE_CONFIG_EXTERN( spectrum );
 
-
-
 /*----------- defined in drivers/spec128.c -----------*/
 
 MACHINE_CONFIG_EXTERN( spectrum_128 );
-
-void spectrum_128_update_memory(running_machine &machine);
-
-/*----------- defined in drivers/specpls3.c -----------*/
-
-void spectrum_plus3_update_memory(running_machine &machine);
-
-/*----------- defined in drivers/timex.c -----------*/
-
-void ts2068_update_memory(running_machine &machine);
-
-/*----------- defined in video/spectrum.c -----------*/
-
-void spectrum_UpdateBorderBitmap(running_machine &machine);
-
-
 
 #endif /* __SPECTRUM_H__ */

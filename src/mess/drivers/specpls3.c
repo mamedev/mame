@@ -172,51 +172,47 @@ static const int spectrum_plus3_memory_selections[]=
 		4,7,6,3
 };
 
-static WRITE8_HANDLER(spectrum_plus3_port_3ffd_w)
+WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_w )
 {
-	spectrum_state *state = space.machine().driver_data<spectrum_state>();
-	if (state->m_floppy==1)
-		space.machine().device<upd765a_device>("upd765")->fifo_w(space, 0, data, 0xff);
+	if (m_floppy==1)
+		m_upd765->fifo_w(space, 0, data, 0xff);
 }
 
-static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
+READ8_MEMBER( spectrum_state::spectrum_plus3_port_3ffd_r )
 {
-	spectrum_state *state = space.machine().driver_data<spectrum_state>();
-	if (state->m_floppy==0)
+	if (m_floppy==0)
 		return 0xff;
 	else
-		return space.machine().device<upd765a_device>("upd765")->fifo_r(space, 0, 0xff);
+		return m_upd765->fifo_r(space, 0, 0xff);
 }
 
 
-static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
+READ8_MEMBER( spectrum_state::spectrum_plus3_port_2ffd_r )
 {
-	spectrum_state *state = space.machine().driver_data<spectrum_state>();
-	if (state->m_floppy==0)
+	if (m_floppy==0)
 		return 0xff;
 	else
-		return space.machine().device<upd765a_device>("upd765")->msr_r(space, 0, 0xff);
+		return m_upd765->msr_r(space, 0, 0xff);
 }
 
 
-void spectrum_plus3_update_memory(running_machine &machine)
+void spectrum_state::spectrum_plus3_update_memory()
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT8 *messram = m_ram->pointer();
 
-	if (state->m_port_7ffd_data & 8)
+	if (m_port_7ffd_data & 8)
 	{
 		logerror("+3 SCREEN 1: BLOCK 7\n");
-		state->m_screen_location = messram + (7 << 14);
+		m_screen_location = messram + (7 << 14);
 	}
 	else
 	{
 		logerror("+3 SCREEN 0: BLOCK 5\n");
-		state->m_screen_location = messram + (5 << 14);
+		m_screen_location = messram + (5 << 14);
 	}
 
-	if ((state->m_port_1ffd_data & 0x01) == 0)
+	if ((m_port_1ffd_data & 0x01) == 0)
 	{
 			int ram_page;
 			unsigned char *ram_data;
@@ -226,29 +222,29 @@ void spectrum_plus3_update_memory(running_machine &machine)
 			int ROMSelection;
 
 			/* select ram at 0x0c000-0x0ffff */
-			ram_page = state->m_port_7ffd_data & 0x07;
+			ram_page = m_port_7ffd_data & 0x07;
 			ram_data = messram + (ram_page<<14);
 
-			state->membank("bank4")->set_base(ram_data);
+			membank("bank4")->set_base(ram_data);
 
 			logerror("RAM at 0xc000: %02x\n", ram_page);
 
 			/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
 			/* Bank 5 in 0x4000 - 0x7fff */
-			state->membank("bank2")->set_base(messram + (5 << 14));
+			membank("bank2")->set_base(messram + (5 << 14));
 
 			/* Bank 2 in 0x8000 - 0xbfff */
-			state->membank("bank3")->set_base(messram + (2 << 14));
+			membank("bank3")->set_base(messram + (2 << 14));
 
 
-			ROMSelection = ((state->m_port_7ffd_data >> 4) & 0x01) |
-				((state->m_port_1ffd_data >> 1) & 0x02);
+			ROMSelection = ((m_port_7ffd_data >> 4) & 0x01) |
+				((m_port_1ffd_data >> 1) & 0x02);
 
 			/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
 
-			ChosenROM = machine.root_device().memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
+			ChosenROM = memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
 
-			state->membank("bank1")->set_base(ChosenROM);
+			membank("bank1")->set_base(ChosenROM);
 			space.unmap_write(0x0000, 0x3fff);
 
 			logerror("rom switch: %02x\n", ROMSelection);
@@ -261,23 +257,23 @@ void spectrum_plus3_update_memory(running_machine &machine)
 			int MemorySelection;
 			unsigned char *ram_data;
 
-			MemorySelection = (state->m_port_1ffd_data >> 1) & 0x03;
+			MemorySelection = (m_port_1ffd_data >> 1) & 0x03;
 
 			memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
 
 			ram_data = messram + (memory_selection[0] << 14);
-			state->membank("bank1")->set_base(ram_data);
+			membank("bank1")->set_base(ram_data);
 			/* allow writes to 0x0000-0x03fff */
 			space.install_write_bank(0x0000, 0x3fff, "bank1");
 
 			ram_data = messram + (memory_selection[1] << 14);
-			state->membank("bank2")->set_base(ram_data);
+			membank("bank2")->set_base(ram_data);
 
 			ram_data = messram + (memory_selection[2] << 14);
-			state->membank("bank3")->set_base(ram_data);
+			membank("bank3")->set_base(ram_data);
 
 			ram_data = messram + (memory_selection[3] << 14);
-			state->membank("bank4")->set_base(ram_data);
+			membank("bank4")->set_base(ram_data);
 
 			logerror("extended memory paging: %02x\n", MemorySelection);
 	}
@@ -285,45 +281,41 @@ void spectrum_plus3_update_memory(running_machine &machine)
 
 
 
-static WRITE8_HANDLER(spectrum_plus3_port_7ffd_w)
+WRITE8_MEMBER( spectrum_state::spectrum_plus3_port_7ffd_w )
 {
 		/* D0-D2: RAM page located at 0x0c000-0x0ffff */
 		/* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
 		/* D4 - ROM select - which rom paged into 0x0000-0x03fff */
 		/* D5 - Disable paging */
 
-	spectrum_state *state = space.machine().driver_data<spectrum_state>();
-
 	/* disable paging? */
-	if (state->m_port_7ffd_data & 0x20)
+	if (m_port_7ffd_data & 0x20)
 		return;
 
 	/* store new state */
-	state->m_port_7ffd_data = data;
+	m_port_7ffd_data = data;
 
 	/* update memory */
-	spectrum_plus3_update_memory(space.machine());
+	spectrum_plus3_update_memory();
 }
 
-static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
+WRITE8_HANDLER( spectrum_state::spectrum_plus3_port_1ffd_w )
 {
 	/* D0-D1: ROM/RAM paging */
 	/* D2: Affects if d0-d1 work on ram/rom */
 	/* D3 - Disk motor on/off */
 	/* D4 - parallel port strobe */
 
-	spectrum_state *state = space.machine().driver_data<spectrum_state>();
+	m_upd765_0->get_device()->mon_w(!BIT(data, 3));
+	m_upd765_1->get_device()->mon_w(!BIT(data, 3));
 
-	space.machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(!BIT(data, 3));
-	space.machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(!BIT(data, 3));
-
-	state->m_port_1ffd_data = data;
+	m_port_1ffd_data = data;
 
 	/* disable paging? */
-	if ((state->m_port_7ffd_data & 0x20)==0)
+	if ((m_port_7ffd_data & 0x20)==0)
 	{
 			/* no */
-			spectrum_plus3_update_memory(space.machine());
+			spectrum_plus3_update_memory();
 	}
 }
 
@@ -333,17 +325,17 @@ static ADDRESS_MAP_START (spectrum_plus3_io, AS_IO, 8, spectrum_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
 	AM_RANGE(0x001f, 0x001f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(spectrum_plus3_port_7ffd_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(spectrum_plus3_port_7ffd_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_LEGACY("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(spectrum_plus3_port_1ffd_w) AM_MIRROR(0x0ffd)
-	AM_RANGE(0x2000, 0x2000) AM_READ_LEGACY(spectrum_plus3_port_2ffd_r) AM_MIRROR(0x0ffd)
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(spectrum_plus3_port_3ffd_r,spectrum_plus3_port_3ffd_w) AM_MIRROR(0x0ffd)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(spectrum_plus3_port_1ffd_w) AM_MIRROR(0x0ffd)
+	AM_RANGE(0x2000, 0x2000) AM_READ(spectrum_plus3_port_2ffd_r) AM_MIRROR(0x0ffd)
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE(spectrum_plus3_port_3ffd_r,spectrum_plus3_port_3ffd_w) AM_MIRROR(0x0ffd)
 ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 {
-	UINT8 *messram = machine().device<ram_device>(RAM_TAG)->pointer();
+	UINT8 *messram = m_ram->pointer();
 	memset(messram,0,128*1024);
 
 	MACHINE_RESET_CALL_MEMBER(spectrum);
@@ -351,7 +343,7 @@ MACHINE_RESET_MEMBER(spectrum_state,spectrum_plus3)
 	/* Initial configuration */
 	m_port_7ffd_data = 0;
 	m_port_1ffd_data = 0;
-	spectrum_plus3_update_memory(machine());
+	spectrum_plus3_update_memory();
 }
 
 DRIVER_INIT_MEMBER(spectrum_state,plus3)

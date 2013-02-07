@@ -26,26 +26,24 @@ class atm_state : public spectrum_state
 public:
 	atm_state(const machine_config &mconfig, device_type type, const char *tag)
 		: spectrum_state(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
 		, m_bank3(*this, "bank3")
 		, m_bank4(*this, "bank4")
 		, m_beta(*this, BETA_DISK_TAG)
-		, m_ram(*this, RAM_TAG)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(atm_port_7ffd_w);
 	DIRECT_UPDATE_MEMBER(atm_direct);
 	DECLARE_MACHINE_RESET(atm);
+
 protected:
-	required_device<cpu_device> m_maincpu;
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
 	required_memory_bank m_bank4;
 	required_device<device_t> m_beta;
-	required_device<ram_device> m_ram;
+
 private:
 	UINT8 *m_p_ram;
 	void atm_update_memory();
