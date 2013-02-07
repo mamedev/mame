@@ -16,6 +16,7 @@
 #include "machine/abc830.h"
 #include "machine/abcbus.h"
 #include "machine/e0516.h"
+#include "machine/serial.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/ram.h"
@@ -58,6 +59,8 @@
 #define Z80SIO_TAG          "z80sio"
 #define Z80DART_TAG         "z80dart"
 #define DISCRETE_TAG        "discrete"
+#define RS232_A_TAG			"rs232a"
+#define RS232_B_TAG			"rs232b"
 
 
 //**************************************************************************

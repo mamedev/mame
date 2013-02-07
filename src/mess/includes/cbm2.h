@@ -21,6 +21,7 @@
 #include "machine/pic8259.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
+#include "machine/serial.h"
 #include "machine/vcsctrl.h"
 #include "sound/dac.h"
 #include "sound/sid6581.h"
@@ -43,6 +44,7 @@
 #define SCREEN_TAG      "screen"
 #define CONTROL1_TAG    "joy1"
 #define CONTROL2_TAG    "joy2"
+#define RS232_TAG		"rs232"
 
 #define EXT_I8088_TAG   "ext_u1"
 #define EXT_I8087_TAG   "ext_u4"

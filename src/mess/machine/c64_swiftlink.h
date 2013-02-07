@@ -16,6 +16,7 @@
 #include "emu.h"
 #include "machine/c64exp.h"
 #include "machine/mos6551.h"
+#include "machine/serial.h"
 
 
 

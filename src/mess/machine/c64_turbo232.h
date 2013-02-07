@@ -16,6 +16,7 @@
 #include "emu.h"
 #include "machine/c64exp.h"
 #include "machine/mos6551.h"
+#include "machine/serial.h"
 
 
 
@@ -50,6 +51,7 @@ protected:
 
 private:
 	required_device<mos6551_device> m_acia;
+	required_device<rs232_port_device> m_rs232;
 	required_ioport m_io_cs;
 	required_ioport m_io_irq;
 

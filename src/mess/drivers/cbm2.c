@@ -1941,6 +1941,23 @@ static CBM2_USER_PORT_INTERFACE( p500_user_intf )
 };
 
 
+//-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static SLOT_INTERFACE_START( rs232_devices )
+SLOT_INTERFACE_END
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -2194,6 +2211,7 @@ static MACHINE_CONFIG_START( p500_ntsc, p500_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6567_CLOCK, cbm2_expansion_cards, NULL, NULL)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, p500_user_intf, cbm2_user_port_cards, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, rs232_devices, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
@@ -2245,6 +2263,7 @@ static MACHINE_CONFIG_START( p500_pal, p500_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, VIC6569_CLOCK, cbm2_expansion_cards, NULL, NULL)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, p500_user_intf, cbm2_user_port_cards, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, rs232_devices, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", p500, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// internal ram
@@ -2302,6 +2321,7 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_CBM2_EXPANSION_SLOT_ADD(CBM2_EXPANSION_SLOT_TAG, XTAL_18MHz/9, cbm2_expansion_cards, NULL, NULL)
 	MCFG_CBM2_USER_PORT_ADD(CBM2_USER_PORT_TAG, user_intf, cbm2_user_port_cards, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, rs232_devices, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", cbmb, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list

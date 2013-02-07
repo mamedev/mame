@@ -21,7 +21,8 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define MOS6551_TAG       "mos6551"
+#define MOS6551_TAG		"mos6551"
+#define RS232_TAG		"rs232"
 
 
 
@@ -33,11 +34,30 @@ const device_type C64_TURBO232 = &device_creator<c64_turbo232_cartridge_device>;
 
 
 //-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static SLOT_INTERFACE_START( rs232_devices )
+SLOT_INTERFACE_END
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_turbo232 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_turbo232 )
 	MCFG_MOS6551_ADD(MOS6551_TAG, XTAL_3_6864MHz, DEVWRITELINE(DEVICE_SELF, c64_turbo232_cartridge_device, acia_irq_w))
+
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, rs232_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
 
@@ -93,6 +113,7 @@ c64_turbo232_cartridge_device::c64_turbo232_cartridge_device(const machine_confi
 	device_t(mconfig, C64_TURBO232, "C64 Turbo232 cartridge", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_acia(*this, MOS6551_TAG),
+	m_rs232(*this, RS232_TAG),
 	m_io_cs(*this, "CS"),
 	m_io_irq(*this, "IRQ")
 {
@@ -183,9 +204,9 @@ void c64_turbo232_cartridge_device::c64_cd_w(address_space &space, offs_t offset
 
 					switch (m_es & ES_S_MASK)
 					{
-					case ES_S_230400: m_acia->set_rxc(230400*16); break;
-					case ES_S_115200: m_acia->set_rxc(115200*16); break;
-					case ES_S_57600: m_acia->set_rxc(57600*16); break;
+					case ES_S_230400: m_acia->set_rxc(XTAL_3_6864MHz); break;
+					case ES_S_115200: m_acia->set_rxc(XTAL_3_6864MHz/2); break;
+					case ES_S_57600: m_acia->set_rxc(XTAL_3_6864MHz/4); break;
 					case ES_S_UNDEFINED: m_acia->set_rxc(0); break;
 					}
 				}

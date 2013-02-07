@@ -891,10 +891,10 @@ static const z80_daisy_config abc800_daisy_chain[] =
 
 
 //-------------------------------------------------
-//  cassette_interface abc800_cassette_interface
+//  cassette_interface cass_intf
 //-------------------------------------------------
 
-static const cassette_interface abc800_cassette_interface =
+static const cassette_interface cass_intf =
 {
 	cassette_default_formats,
 	NULL,
@@ -910,6 +910,37 @@ static const cassette_interface abc800_cassette_interface =
 
 static ABCBUS_INTERFACE( abcbus_intf )
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232a_intf
+//-------------------------------------------------
+
+static SLOT_INTERFACE_START( rs232_devices )
+SLOT_INTERFACE_END
+
+static const rs232_port_interface rs232a_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232b_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232b_intf =
+{
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1174,7 +1205,9 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, cass_intf)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, rs232_devices, NULL, NULL)
 	MCFG_ABC800_KEYBOARD_ADD(abc800_kb_intf)
 
 	// ABC bus
@@ -1214,7 +1247,9 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, cass_intf)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, rs232_devices, NULL, NULL)
 	MCFG_ABC800_KEYBOARD_ADD(abc800_kb_intf)
 
 	// ABC bus
@@ -1254,8 +1289,10 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
+	MCFG_CASSETTE_ADD(CASSETTE_TAG, cass_intf)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, rs232_devices, NULL, NULL)
 	MCFG_ABC55_ADD(kb_intf)
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
 
 	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast", abc834_fast)
@@ -1285,6 +1322,8 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, rs232_devices, NULL, NULL)
 	MCFG_ABC77_ADD(kb_intf)
 
 	// ABC bus

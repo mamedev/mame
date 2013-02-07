@@ -21,7 +21,8 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define MOS6551_TAG       "mos6551"
+#define MOS6551_TAG		"mos6551"
+#define RS232_TAG		"rs232"
 
 
 
@@ -33,11 +34,30 @@ const device_type C64_SWIFTLINK = &device_creator<c64_swiftlink_cartridge_device
 
 
 //-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static SLOT_INTERFACE_START( rs232_devices )
+SLOT_INTERFACE_END
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_swiftlink )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_swiftlink )
 	MCFG_MOS6551_ADD(MOS6551_TAG, XTAL_3_6864MHz, DEVWRITELINE(DEVICE_SELF, c64_swiftlink_cartridge_device, acia_irq_w))
+
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, rs232_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
 
