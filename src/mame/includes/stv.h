@@ -1,4 +1,9 @@
 /*----------- defined in drivers/stv.c -----------*/
+#include "cdrom.h"
+
+#define MAX_FILTERS (24)
+#define MAX_BLOCKS  (200)
+#define MAX_DIR_SIZE    (256*1024)
 
 class saturn_state : public driver_device
 {
@@ -284,12 +289,12 @@ public:
 	int y2s(int v);
 	void vdp1_fill_quad(const rectangle &cliprect, int patterndata, int xsize, const struct spoint *q);
 	void vdp1_fill_line(const rectangle &cliprect, int patterndata, int xsize, INT32 y, INT32 x1, INT32 x2, INT32 u1, INT32 u2, INT32 v1, INT32 v2);
-//	void (*drawpixel)(int x, int y, int patterndata, int offsetcnt);
-//	void drawpixel_poly(int x, int y, int patterndata, int offsetcnt);
-//	void drawpixel_8bpp_trans(int x, int y, int patterndata, int offsetcnt);
-//	void drawpixel_4bpp_notrans(int x, int y, int patterndata, int offsetcnt);
-//	void drawpixel_4bpp_trans(int x, int y, int patterndata, int offsetcnt);
-//	void drawpixel_generic(int x, int y, int patterndata, int offsetcnt);
+	void (saturn_state::*drawpixel)(int x, int y, int patterndata, int offsetcnt);
+	void drawpixel_poly(int x, int y, int patterndata, int offsetcnt);
+	void drawpixel_8bpp_trans(int x, int y, int patterndata, int offsetcnt);
+	void drawpixel_4bpp_notrans(int x, int y, int patterndata, int offsetcnt);
+	void drawpixel_4bpp_trans(int x, int y, int patterndata, int offsetcnt);
+	void drawpixel_generic(int x, int y, int patterndata, int offsetcnt);
 	void vdp1_fill_slope(const rectangle &cliprect, int patterndata, int xsize,
 		                    INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 *nx1, INT32 *nx2,
 							INT32 u1, INT32 u2, INT32 slu1, INT32 slu2, INT32 *nu1, INT32 *nu2,
@@ -515,7 +520,163 @@ public:
 
 	} stv_rbg_cache_data;
 
+	/* stvcd */
+	DECLARE_READ32_MEMBER( stvcd_r );
+	DECLARE_WRITE32_MEMBER( stvcd_w );
 
+	TIMER_DEVICE_CALLBACK_MEMBER( stv_sector_cb );
+	TIMER_DEVICE_CALLBACK_MEMBER( stv_sh1_sim );
+
+	struct direntryT
+	{
+		UINT8 record_size;
+		UINT8 xa_record_size;
+		UINT32 firstfad;        // first sector of file
+		UINT32 length;      // length of file
+		UINT8 year;
+		UINT8 month;
+		UINT8 day;
+		UINT8 hour;
+		UINT8 minute;
+		UINT8 second;
+		UINT8 gmt_offset;
+		UINT8 flags;        // iso9660 flags
+		UINT8 file_unit_size;
+		UINT8 interleave_gap_size;
+		UINT16 volume_sequencer_number;
+		UINT8 name[128];
+	};
+
+	struct filterT
+	{
+		UINT8 mode;
+		UINT8 chan;
+		UINT8 smmask;
+		UINT8 cimask;
+		UINT8 fid;
+		UINT8 smval;
+		UINT8 cival;
+		UINT8 condtrue;
+		UINT8 condfalse;
+		UINT32 fad;
+		UINT32 range;
+	};
+
+	struct blockT
+	{
+		INT32 size; // size of block
+		INT32 FAD;  // FAD on disc
+		UINT8 data[CD_MAX_SECTOR_DATA];
+		UINT8 chan; // channel
+		UINT8 fnum; // file number
+		UINT8 subm; // subchannel mode
+		UINT8 cinf; // coding information
+	};
+
+	struct partitionT
+	{
+		INT32 size;
+		blockT *blocks[MAX_BLOCKS];
+		UINT8 bnum[MAX_BLOCKS];
+		UINT8 numblks;
+	};
+
+	// 16-bit transfer types
+	enum transT
+	{
+		XFERTYPE_INVALID,
+		XFERTYPE_TOC,
+		XFERTYPE_FILEINFO_1,
+		XFERTYPE_FILEINFO_254,
+		XFERTYPE_SUBQ,
+		XFERTYPE_SUBRW
+	};
+
+	// 32-bit transfer types
+	enum trans32T
+	{
+		XFERTYPE32_INVALID,
+		XFERTYPE32_GETSECTOR,
+		XFERTYPE32_GETDELETESECTOR
+	};
+
+
+	void stvcd_reset(void);
+	void stvcd_exit(void);
+	void stvcd_set_tray_open(void);
+	void stvcd_set_tray_close(void);
+
+	int get_track_index(void);
+	void cr_standard_return(UINT16 cur_status);
+	void cd_free_block(blockT *blktofree);
+	void cd_defragblocks(partitionT *part);
+	void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectnum);
+
+	UINT16 cd_readWord(UINT32 addr);
+	void cd_writeWord(UINT32 addr, UINT16 data);
+	UINT32 cd_readLong(UINT32 addr);
+
+	void cd_readTOC(void);
+	void cd_readblock(UINT32 fad, UINT8 *dat);
+	void cd_playdata(void);
+
+	void cd_exec_command( void );
+	// iso9660 utilities
+	void make_dir_current(UINT32 fad);
+	void read_new_dir(UINT32 fileno);
+
+	blockT *cd_alloc_block(UINT8 *blknum);
+	partitionT *cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok);
+	partitionT *cd_read_filtered_sector(INT32 fad, UINT8 *p_ok);
+
+	cdrom_file *cdrom;// = (cdrom_file *)NULL;
+
+	// local variables
+	timer_device *sector_timer;
+	timer_device *sh1_timer;
+	partitionT partitions[MAX_FILTERS];
+	partitionT *transpart;
+
+	blockT blocks[MAX_BLOCKS];
+	blockT curblock;
+
+	UINT8 tocbuf[102*4];
+	UINT8 subqbuf[5*2];
+	UINT8 subrwbuf[12*2];
+	UINT8 finfbuf[256];
+
+	INT32 sectlenin, sectlenout;
+
+	UINT8 lastbuf, playtype;
+
+	transT xfertype;
+	trans32T xfertype32;
+	UINT32 xfercount, calcsize;
+	UINT32 xferoffs, xfersect, xfersectpos, xfersectnum, xferdnum;
+
+	filterT filters[MAX_FILTERS];
+	filterT *cddevice;
+	int cddevicenum;
+
+	UINT16 cr1, cr2, cr3, cr4;
+	UINT16 hirqmask, hirqreg;
+	UINT16 cd_stat;
+	UINT32 cd_curfad;// = 0;
+	UINT32 fadstoplay;// = 0;
+	UINT32 in_buffer;// = 0;    // amount of data in the buffer
+	int oddframe;// = 0;
+	int buffull, sectorstore, freeblocks;
+	int cur_track;
+	UINT8 cmd_pending;
+	UINT8 cd_speed;
+	UINT8 cdda_maxrepeat;
+	UINT8 cdda_repeat_count;
+	UINT8 tray_is_closed;
+
+	direntryT curroot;       // root entry of current filesystem
+	direntryT *curdir;       // current directory
+	int numfiles;            // # of entries in current directory
+	int firstfile;           // first non-directory file
 };
 
 #define MASTER_CLOCK_352 57272720
@@ -552,12 +713,12 @@ void install_stvbios_speedups(running_machine &machine);
 
 /*----------- defined in video/stvvdp1.c -----------*/
 
-extern UINT16   **stv_framebuffer_display_lines;
-extern int stv_framebuffer_double_interlace;
-extern int stv_framebuffer_mode;
-extern UINT8* stv_vdp1_gfx_decode;
+//extern UINT16   **stv_framebuffer_display_lines;
+//extern int stv_framebuffer_double_interlace;
+//extern int stv_framebuffer_mode;
+//extern UINT8* stv_vdp1_gfx_decode;
 
-int stv_vdp1_start ( running_machine &machine );
-void video_update_vdp1(running_machine &machine);
-void stv_vdp2_dynamic_res_change(running_machine &machine);
+//int stv_vdp1_start ( running_machine &machine );
+//void video_update_vdp1(running_machine &machine);
+//void stv_vdp2_dynamic_res_change(running_machine &machine);
 

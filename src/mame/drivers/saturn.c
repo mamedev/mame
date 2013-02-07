@@ -781,7 +781,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, saturn_state )
 //  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
 //  AM_RANGE(0x04000000, 0x047fffff) AM_RAM //backup RAM area, dynamically allocated
 	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8(saturn_cart_type_r,0x000000ff)
-	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE_LEGACY(stvcd_r, stvcd_w)
+	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16_LEGACY("scsp", scsp_r, scsp_w, 0xffffffff)
@@ -810,7 +810,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x01000000, 0x017fffff) AM_WRITE(minit_w)
 	AM_RANGE(0x01800000, 0x01ffffff) AM_WRITE(sinit_w)
 	AM_RANGE(0x02000000, 0x04ffffff) AM_ROM AM_SHARE("share7") AM_REGION("abus", 0) // cartridge
-	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE_LEGACY(stvcd_r, stvcd_w)
+	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05afffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16_LEGACY("scsp", scsp_r, scsp_w, 0xffffffff)
@@ -930,13 +930,13 @@ INPUT_CHANGED_MEMBER(saturn_state::nmi_reset)
 INPUT_CHANGED_MEMBER(saturn_state::tray_open)
 {
 	if(newval)
-		stvcd_set_tray_open(machine());
+		stvcd_set_tray_open();
 }
 
 INPUT_CHANGED_MEMBER(saturn_state::tray_close)
 {
 	if(newval)
-		stvcd_set_tray_close(machine());
+		stvcd_set_tray_close();
 }
 
 static INPUT_PORTS_START( saturn )
@@ -1797,7 +1797,7 @@ MACHINE_START_MEMBER(saturn_state,stv)
 
 	stv_register_protection_savestates(machine()); // machine/stvprot.c
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(saturn_state::stvcd_exit), this));
 
 	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
 	m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
@@ -1842,7 +1842,7 @@ MACHINE_START_MEMBER(saturn_state,saturn)
 	state_save_register_global_array(machine(), m_smpc.SMEM);
 	state_save_register_global_pointer(machine(), m_cart_dram, 0x400000/4);
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stvcd_exit), &machine()));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(saturn_state::stvcd_exit), this));
 
 	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
 	m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
@@ -2062,7 +2062,7 @@ MACHINE_RESET_MEMBER(saturn_state,saturn)
 	machine().device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
 	machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
 
-	stvcd_reset( machine() );
+	stvcd_reset();
 
 	m_cart_type = ioport("CART_AREA")->read() & 7;
 
@@ -2138,7 +2138,7 @@ MACHINE_RESET_MEMBER(saturn_state,stv)
 	machine().device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
 	machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
 
-	stvcd_reset(machine());
+	stvcd_reset();
 
 	m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 	m_prev_bankswitch = 0xff;
@@ -2213,8 +2213,8 @@ static MACHINE_CONFIG_START( saturn, saturn_state )
 
 	MCFG_NVRAM_HANDLER(saturn)
 
-	MCFG_TIMER_ADD("sector_timer", stv_sector_cb)
-	MCFG_TIMER_ADD("sh1_cmd", stv_sh1_sim)
+	MCFG_TIMER_DRIVER_ADD("sector_timer", saturn_state, stv_sector_cb)
+	MCFG_TIMER_DRIVER_ADD("sh1_cmd", saturn_state, stv_sh1_sim)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2296,8 +2296,8 @@ static MACHINE_CONFIG_START( stv, saturn_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
-	MCFG_TIMER_ADD("sector_timer", stv_sector_cb)
-	MCFG_TIMER_ADD("sh1_cmd", stv_sh1_sim)
+	MCFG_TIMER_DRIVER_ADD("sector_timer", saturn_state, stv_sector_cb)
+	MCFG_TIMER_DRIVER_ADD("sh1_cmd", saturn_state, stv_sh1_sim)
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)

@@ -23,6 +23,7 @@
 
 #include "emu.h"
 #include "imagedev/chd_cd.h"
+#include "includes/stv.h"
 #include "cdrom.h"
 #include "stvcd.h"
 #include "sound/cdda.h"
@@ -35,140 +36,6 @@
 #else
 #define CDROM_LOG(x)
 #endif
-
-static cdrom_file *cdrom = (cdrom_file *)NULL;
-
-static void cd_readTOC(void);
-static void cd_readblock(UINT32 fad, UINT8 *dat);
-static void cd_playdata(running_machine &machine);
-
-#define MAX_FILTERS (24)
-#define MAX_BLOCKS  (200)
-#define MAX_DIR_SIZE    (256*1024)
-
-struct direntryT
-{
-	UINT8 record_size;
-	UINT8 xa_record_size;
-	UINT32 firstfad;        // first sector of file
-	UINT32 length;      // length of file
-	UINT8 year;
-	UINT8 month;
-	UINT8 day;
-	UINT8 hour;
-	UINT8 minute;
-	UINT8 second;
-	UINT8 gmt_offset;
-	UINT8 flags;        // iso9660 flags
-	UINT8 file_unit_size;
-	UINT8 interleave_gap_size;
-	UINT16 volume_sequencer_number;
-	UINT8 name[128];
-};
-
-struct filterT
-{
-	UINT8 mode;
-	UINT8 chan;
-	UINT8 smmask;
-	UINT8 cimask;
-	UINT8 fid;
-	UINT8 smval;
-	UINT8 cival;
-	UINT8 condtrue;
-	UINT8 condfalse;
-	UINT32 fad;
-	UINT32 range;
-};
-
-struct blockT
-{
-	INT32 size; // size of block
-	INT32 FAD;  // FAD on disc
-	UINT8 data[CD_MAX_SECTOR_DATA];
-	UINT8 chan; // channel
-	UINT8 fnum; // file number
-	UINT8 subm; // subchannel mode
-	UINT8 cinf; // coding information
-};
-
-struct partitionT
-{
-	INT32 size;
-	blockT *blocks[MAX_BLOCKS];
-	UINT8 bnum[MAX_BLOCKS];
-	UINT8 numblks;
-};
-
-// 16-bit transfer types
-enum transT
-{
-	XFERTYPE_INVALID,
-	XFERTYPE_TOC,
-	XFERTYPE_FILEINFO_1,
-	XFERTYPE_FILEINFO_254,
-	XFERTYPE_SUBQ,
-	XFERTYPE_SUBRW
-};
-
-// 32-bit transfer types
-enum trans32T
-{
-	XFERTYPE32_INVALID,
-	XFERTYPE32_GETSECTOR,
-	XFERTYPE32_GETDELETESECTOR
-};
-
-// local variables
-static timer_device *sector_timer;
-static timer_device *sh1_timer;
-static partitionT partitions[MAX_FILTERS];
-static partitionT *transpart;
-
-static blockT blocks[MAX_BLOCKS];
-static blockT curblock;
-
-static UINT8 tocbuf[102*4];
-static UINT8 subqbuf[5*2];
-static UINT8 subrwbuf[12*2];
-static UINT8 finfbuf[256];
-
-static INT32 sectlenin, sectlenout;
-
-static UINT8 lastbuf, playtype;
-
-static transT xfertype;
-static trans32T xfertype32;
-static UINT32 xfercount, calcsize;
-static UINT32 xferoffs, xfersect, xfersectpos, xfersectnum, xferdnum;
-
-static filterT filters[MAX_FILTERS];
-static filterT *cddevice;
-static int cddevicenum;
-
-static UINT16 cr1, cr2, cr3, cr4;
-static UINT16 hirqmask, hirqreg;
-static UINT16 cd_stat;
-static UINT32 cd_curfad = 0;
-static UINT32 fadstoplay = 0;
-static UINT32 in_buffer = 0;    // amount of data in the buffer
-static int oddframe = 0;
-static int buffull, sectorstore, freeblocks;
-static int cur_track;
-static UINT8 cmd_pending;
-static UINT8 cd_speed;
-static UINT8 cdda_maxrepeat;
-static UINT8 cdda_repeat_count;
-static UINT8 tray_is_closed;
-
-// iso9660 utilities
-static void read_new_dir(running_machine &machine, UINT32 fileno);
-static void make_dir_current(running_machine &machine, UINT32 fad);
-
-static direntryT curroot;       // root entry of current filesystem
-static direntryT *curdir;       // current directory
-static int numfiles;            // # of entries in current directory
-static int firstfile;           // first non-directory file
 
 // HIRQ definitions
 #define CMOK 0x0001 // command dispatch possible
@@ -205,7 +72,7 @@ static int firstfile;           // first non-directory file
 #define CD_STAT_REJECT   0xff00     // ultra-fatal error.
 
 /* FIXME: assume Saturn CD-ROMs to have a 2 secs pre-gap for now. */
-static int get_track_index(void)
+int saturn_state::get_track_index(void)
 {
 	UINT32 rel_fad;
 	UINT8 track;
@@ -223,7 +90,7 @@ static int get_track_index(void)
 	return 1;
 }
 
-static void cr_standard_return(UINT16 cur_status)
+void saturn_state::cr_standard_return(UINT16 cur_status)
 {
 	cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
 	cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track); // TODO: fix current track
@@ -232,11 +99,7 @@ static void cr_standard_return(UINT16 cur_status)
 	cd_stat |= CD_STAT_PERI;
 }
 
-static void cd_free_block(blockT *blktofree);
-static void cd_defragblocks(partitionT *part);
-static void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectnum);
-
-static void cd_exec_command(running_machine &machine)
+void saturn_state::cd_exec_command( void )
 {
 	UINT32 temp;
 
@@ -537,7 +400,7 @@ static void cd_exec_command(running_machine &machine)
 			// cdda
 			if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
 			{
-				cdda_pause_audio( machine.device( "cdda" ), 0 );
+				cdda_pause_audio( machine().device( "cdda" ), 0 );
 				//cdda_start_audio( machine.device( "cdda" ), cd_curfad, fadstoplay  );
 				//cdda_repeat_count = 0;
 			}
@@ -564,7 +427,7 @@ static void cd_exec_command(running_machine &machine)
 				if (temp == 0xffffff)
 				{
 					cd_stat = CD_STAT_PAUSE;
-					cdda_pause_audio( machine.device( "cdda" ), 1 );
+					cdda_pause_audio( machine().device( "cdda" ), 1 );
 				}
 				else
 				{
@@ -580,7 +443,7 @@ static void cd_exec_command(running_machine &machine)
 					cd_stat = CD_STAT_PAUSE;
 					cur_track = cr2>>8;;
 					cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
-					cdda_pause_audio( machine.device( "cdda" ), 1 );
+					cdda_pause_audio( machine().device( "cdda" ), 1 );
 					// (index is cr2 low byte)
 				}
 				else // error!
@@ -588,7 +451,7 @@ static void cd_exec_command(running_machine &machine)
 					cd_stat = CD_STAT_STANDBY;
 					cd_curfad = 0xffffffff;
 					cur_track = 0xff;
-					cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
+					cdda_stop_audio( machine().device( "cdda" ) ); //stop any pending CD-DA
 				}
 			}
 
@@ -1224,7 +1087,7 @@ static void cd_exec_command(running_machine &machine)
 			temp = (cr3&0xff)<<16;
 			temp |= cr4;
 
-			read_new_dir(machine, temp);
+			read_new_dir(temp);
 			cr_standard_return(cd_stat);
 			break;
 
@@ -1240,7 +1103,7 @@ static void cd_exec_command(running_machine &machine)
 				cddevice = (filterT *)NULL;
 
 			/* TODO:  */
-			//read_new_dir(machine, read_dir - 2);
+			//read_new_dir(read_dir - 2);
 
 			cr_standard_return(cd_stat);
 			hirqreg |= (CMOK|EFLS);
@@ -1387,13 +1250,13 @@ static void cd_exec_command(running_machine &machine)
 	}
 }
 
-TIMER_DEVICE_CALLBACK( stv_sh1_sim )
+TIMER_DEVICE_CALLBACK_MEMBER( saturn_state::stv_sh1_sim )
 {
 	sh1_timer->adjust(attotime::from_hz(16667));
 
 	if((cmd_pending == 0xf) && (!(hirqreg & CMOK)))
 	{
-		cd_exec_command(timer.machine());
+		cd_exec_command();
 		return;
 	}
 
@@ -1408,13 +1271,13 @@ TIMER_DEVICE_CALLBACK( stv_sh1_sim )
 	}
 }
 
-TIMER_DEVICE_CALLBACK( stv_sector_cb )
+TIMER_DEVICE_CALLBACK_MEMBER( saturn_state::stv_sector_cb )
 {
 	//sector_timer->reset();
 
 	//popmessage("%08x %08x %d %d",cd_curfad,fadstoplay,cmd_pending,cd_speed);
 
-	cd_playdata(timer.machine());
+	cd_playdata();
 
 	if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) == CD_TRACK_AUDIO)
 		sector_timer->adjust(attotime::from_hz(75));    // 75 sectors / second = 150kBytes/second (cdda track ignores cd_speed setting)
@@ -1423,7 +1286,7 @@ TIMER_DEVICE_CALLBACK( stv_sector_cb )
 }
 
 // global functions
-void stvcd_reset(running_machine &machine)
+void saturn_state::stvcd_reset( void )
 {
 	INT32 i, j;
 
@@ -1438,7 +1301,7 @@ void stvcd_reset(running_machine &machine)
 	cur_track = 0xff;
 
 	if (curdir != (direntryT *)NULL)
-		auto_free(machine, curdir);
+		auto_free(machine(), curdir);
 	curdir = (direntryT *)NULL;     // no directory yet
 
 	xfertype = XFERTYPE_INVALID;
@@ -1480,7 +1343,7 @@ void stvcd_reset(running_machine &machine)
 		cdrom = (cdrom_file *)NULL;
 	}
 
-	cdrom_image_device *cddevice = machine.device<cdrom_image_device>("cdrom");
+	cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
 	if (cddevice!=NULL)
 	{
 		// MESS case
@@ -1489,15 +1352,15 @@ void stvcd_reset(running_machine &machine)
 	else
 	{
 		// MAME case
-		cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
+		cdrom = cdrom_open(get_disk_handle(machine(), "cdrom"));
 	}
 
-	cdda_set_cdrom( machine.device("cdda"), cdrom );
+	cdda_set_cdrom( machine().device("cdda"), cdrom );
 
 	if (cdrom)
 	{
 		CDROM_LOG(("Opened CD-ROM successfully, reading root directory\n"))
-		read_new_dir(machine, 0xffffff);    // read root directory
+		read_new_dir(0xffffff);    // read root directory
 	}
 	else
 	{
@@ -1508,13 +1371,13 @@ void stvcd_reset(running_machine &machine)
 	cdda_repeat_count = 0;
 	tray_is_closed = 1;
 
-	sector_timer = machine.device<timer_device>("sector_timer");
+	sector_timer = machine().device<timer_device>("sector_timer");
 	sector_timer->adjust(attotime::from_hz(150));   // 150 sectors / second = 300kBytes/second
-	sh1_timer = machine.device<timer_device>("sh1_cmd");
+	sh1_timer = machine().device<timer_device>("sh1_cmd");
 	sh1_timer->adjust(attotime::from_hz(16667));
 }
 
-static blockT *cd_alloc_block(UINT8 *blknum)
+saturn_state::blockT *saturn_state::cd_alloc_block(UINT8 *blknum)
 {
 	INT32 i;
 
@@ -1542,7 +1405,7 @@ static blockT *cd_alloc_block(UINT8 *blknum)
 	return (blockT *)NULL;
 }
 
-static void cd_free_block(blockT *blktofree)
+void saturn_state::cd_free_block(blockT *blktofree)
 {
 	INT32 i;
 
@@ -1567,7 +1430,7 @@ static void cd_free_block(blockT *blktofree)
 	hirqreg &= ~BFUL;
 }
 
-static void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectnum)
+void saturn_state::cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectnum)
 {
 	if (*sectoffs == 0xffff)
 	{
@@ -1580,7 +1443,7 @@ static void cd_getsectoroffsetnum(UINT32 bufnum, UINT32 *sectoffs, UINT32 *sectn
 	}
 }
 
-static void cd_defragblocks(partitionT *part)
+void saturn_state::cd_defragblocks(partitionT *part)
 {
 	UINT32 i, j;
 	blockT *temp;
@@ -1604,7 +1467,7 @@ static void cd_defragblocks(partitionT *part)
 	}
 }
 
-static UINT16 cd_readWord(UINT32 addr)
+UINT16 saturn_state::cd_readWord(UINT32 addr)
 {
 	UINT16 rv;
 
@@ -1758,7 +1621,7 @@ static UINT16 cd_readWord(UINT32 addr)
 
 }
 
-static UINT32 cd_readLong(UINT32 addr)
+UINT32 saturn_state::cd_readLong(UINT32 addr)
 {
 	UINT32 rv = 0;
 
@@ -1773,10 +1636,10 @@ static UINT32 cd_readLong(UINT32 addr)
 					if (xfersect < xfersectnum)
 					{
 						// get next longword
-						rv = transpart->blocks[xfersectpos+xfersect]->data[xferoffs]<<24 |
-								transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16 |
-								transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8 |
-								transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3];
+						rv = (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0]<<24) |
+						     (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16) |
+						     (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8)  |
+						     (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3]<<0);
 
 						xferdnum += 4;
 						xferoffs += 4;
@@ -1831,13 +1694,13 @@ static UINT32 cd_readLong(UINT32 addr)
 	}
 }
 
-static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
+void saturn_state::cd_writeWord(UINT32 addr, UINT16 data)
 {
 	switch(addr & 0xffff)
 	{
 	case 0x0008:
 	case 0x000a:
-//              CDROM_LOG(("%s:WW HIRQ: %04x & %04x => %04x\n", machine.describe_context(), hirqreg, data, hirqreg & data))
+//		CDROM_LOG(("%s:WW HIRQ: %04x & %04x => %04x\n", machine().describe_context(), hirqreg, data, hirqreg & data))
 		hirqreg &= data;
 		if(!(hirqreg & CMOK))
 		{
@@ -1853,26 +1716,26 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 		return;
 	case 0x0018:
 	case 0x001a:
-//              CDROM_LOG(("WW CR1: %04x\n", data))
+//      CDROM_LOG(("WW CR1: %04x\n", data))
 		cr1 = data;
 		cd_stat &= ~CD_STAT_PERI;
 		cmd_pending |= 1;
 		break;
 	case 0x001c:
 	case 0x001e:
-//              CDROM_LOG(("WW CR2: %04x\n", data))
+//      CDROM_LOG(("WW CR2: %04x\n", data))
 		cr2 = data;
 		cmd_pending |= 2;
 		break;
 	case 0x0020:
 	case 0x0022:
-//              CDROM_LOG(("WW CR3: %04x\n", data))
+//      CDROM_LOG(("WW CR3: %04x\n", data))
 		cr3 = data;
 		cmd_pending |= 4;
 		break;
 	case 0x0024:
 	case 0x0026:
-//              CDROM_LOG(("WW CR4: %04x\n", data))
+//      CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
 		cmd_pending |= 8;
 		break;
@@ -1882,7 +1745,7 @@ static void cd_writeWord(running_machine &machine, UINT32 addr, UINT16 data)
 	}
 }
 
-READ32_HANDLER( stvcd_r )
+READ32_MEMBER( saturn_state::stvcd_r )
 {
 	UINT32 rv = 0;
 
@@ -1934,7 +1797,7 @@ READ32_HANDLER( stvcd_r )
 	return rv;
 }
 
-WRITE32_HANDLER( stvcd_w )
+WRITE32_MEMBER( saturn_state::stvcd_w )
 {
 	offset <<= 2;
 
@@ -1952,7 +1815,7 @@ WRITE32_HANDLER( stvcd_w )
 		case 0x90022:
 		case 0x90024:
 		case 0x90026:
-			cd_writeWord(space.machine(), offset, data>>16);
+			cd_writeWord(offset, data>>16);
 			break;
 
 		default:
@@ -1962,7 +1825,7 @@ WRITE32_HANDLER( stvcd_w )
 }
 
 // iso9660 parsing
-static void read_new_dir(running_machine &machine, UINT32 fileno)
+void saturn_state::read_new_dir(UINT32 fileno)
 {
 	int foundpd, i;
 	UINT32 cfad;//, dirfad;
@@ -2029,7 +1892,7 @@ static void read_new_dir(running_machine &machine, UINT32 fileno)
 			}
 
 			// done with all that, read the root directory now
-			make_dir_current(machine, curroot.firstfad);
+			make_dir_current(curroot.firstfad);
 		}
 	}
 	else
@@ -2038,12 +1901,12 @@ static void read_new_dir(running_machine &machine, UINT32 fileno)
 		{
 			mame_printf_error("ERROR: new directory too big (%d)!\n", curdir[fileno].length);
 		}
-		make_dir_current(machine, curdir[fileno].firstfad);
+		make_dir_current(curdir[fileno].firstfad);
 	}
 }
 
 // makes the directory pointed to by FAD current
-static void make_dir_current(running_machine &machine, UINT32 fad)
+void saturn_state::make_dir_current(UINT32 fad)
 {
 	int i;
 	UINT32 nextent, numentries;
@@ -2077,10 +1940,10 @@ static void make_dir_current(running_machine &machine, UINT32 fad)
 
 	if (curdir != (direntryT *)NULL)
 	{
-		auto_free(machine, curdir);
+		auto_free(machine(), curdir);
 	}
 
-	curdir = auto_alloc_array(machine, direntryT, numentries);
+	curdir = auto_alloc_array(machine(), direntryT, numentries);
 	curentry = curdir;
 	numfiles = numentries;
 
@@ -2149,17 +2012,17 @@ static void make_dir_current(running_machine &machine, UINT32 fad)
 	free(sect);
 }
 
-void stvcd_exit(running_machine& machine)
+void saturn_state::stvcd_exit( void )
 {
 	if (curdir != (direntryT *)NULL)
 	{
-		auto_free(machine, curdir);
+		auto_free(machine(), curdir);
 		curdir = (direntryT *)NULL;
 	}
 
 	if (cdrom)
 	{
-		cdrom_image_device *cddevice = machine.device<cdrom_image_device>("cdrom");
+		cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
 		if (cddevice==NULL)
 		{
 			cdrom_close(cdrom);
@@ -2168,7 +2031,7 @@ void stvcd_exit(running_machine& machine)
 	}
 }
 
-static void cd_readTOC(void)
+void saturn_state::cd_readTOC(void)
 {
 	int i, ntrks, tocptr, fad;
 
@@ -2258,7 +2121,7 @@ static void cd_readTOC(void)
 	tocbuf[tocptr+11] = fad&0xff;
 }
 
-static partitionT *cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok)
+saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok)
 {
 	int match = 1, keepgoing = 2;
 	partitionT *filterprt = (partitionT *)NULL;
@@ -2411,7 +2274,7 @@ static partitionT *cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok)
 }
 
 // read a single sector off the CD, applying the current filter(s) as necessary
-static partitionT *cd_read_filtered_sector(INT32 fad, UINT8 *p_ok)
+saturn_state::partitionT *saturn_state::cd_read_filtered_sector(INT32 fad, UINT8 *p_ok)
 {
 	int trktype;
 
@@ -2460,7 +2323,7 @@ static partitionT *cd_read_filtered_sector(INT32 fad, UINT8 *p_ok)
 }
 
 // loads in data set up by a CD-block PLAY command
-static void cd_playdata(running_machine &machine)
+void saturn_state::cd_playdata( void )
 {
 	if ((cd_stat & 0x0f00) == CD_STAT_PLAY)
 	{
@@ -2475,12 +2338,12 @@ static void cd_playdata(running_machine &machine)
 				if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
 				{
 					cd_read_filtered_sector(cd_curfad,&p_ok);
-					cdda_stop_audio( machine.device( "cdda" ) ); //stop any pending CD-DA
+					cdda_stop_audio( machine().device( "cdda" ) ); //stop any pending CD-DA
 				}
 				else
 				{
 					p_ok = 1; // TODO
-					cdda_start_audio( machine.device( "cdda" ), cd_curfad, 1  );
+					cdda_start_audio( machine().device( "cdda" ), cd_curfad, 1  );
 				}
 
 				if(p_ok)
@@ -2521,7 +2384,7 @@ static void cd_playdata(running_machine &machine)
 }
 
 // loads a single sector off the CD, anywhere from FAD 150 on up
-static void cd_readblock(UINT32 fad, UINT8 *dat)
+void saturn_state::cd_readblock(UINT32 fad, UINT8 *dat)
 {
 	if (cdrom)
 	{
@@ -2529,7 +2392,7 @@ static void cd_readblock(UINT32 fad, UINT8 *dat)
 	}
 }
 
-void stvcd_set_tray_open(running_machine &machine)
+void saturn_state::stvcd_set_tray_open( void )
 {
 	if(!tray_is_closed)
 		return;
@@ -2543,7 +2406,7 @@ void stvcd_set_tray_open(running_machine &machine)
 	popmessage("Tray Open");
 }
 
-void stvcd_set_tray_close(running_machine &machine)
+void saturn_state::stvcd_set_tray_close( void )
 {
 	/* avoid user attempts to load a CD-ROM without opening the tray first (emulation asserts anyway with current framework) */
 	if(tray_is_closed)
@@ -2551,7 +2414,7 @@ void stvcd_set_tray_close(running_machine &machine)
 
 	hirqreg |= DCHG;
 
-	cdrom_image_device *cddevice = machine.device<cdrom_image_device>("cdrom");
+	cdrom_image_device *cddevice = machine().device<cdrom_image_device>("cdrom");
 	if (cddevice!=NULL)
 	{
 		// MESS case
@@ -2560,15 +2423,15 @@ void stvcd_set_tray_close(running_machine &machine)
 	else
 	{
 		// MAME case
-		cdrom = cdrom_open(get_disk_handle(machine, "cdrom"));
+		cdrom = cdrom_open(get_disk_handle(machine(), "cdrom"));
 	}
 
-	cdda_set_cdrom( machine.device("cdda"), cdrom );
+	cdda_set_cdrom( machine().device("cdda"), cdrom );
 
 	if (cdrom)
 	{
 		CDROM_LOG(("Opened CD-ROM successfully, reading root directory\n"))
-		//read_new_dir(machine, 0xffffff);  // read root directory
+		//read_new_dir(0xffffff);  // read root directory
 		cd_stat = CD_STAT_PAUSE;
 	}
 	else
