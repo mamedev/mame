@@ -31,22 +31,21 @@
     suggestions.  Mismatching modes is responsible for the semigraphic modes
     on the CoCo.
 
-    Timing:
-    (source Motorola M6847 Manual)
+    Timing:    (source Motorola M6847 Manual, experimentation, SockMaster)
 
-    Horizontal Sync:  Total Period: 227.5 clock cycles
+    Horizontal Sync:  Total Period: 228 clock cycles
         @ CLK(0) + DHS_F            - falling edge (high to low)
         @ CLK(16.5) + DHS_R         - rising edge (low to high)
         @ CLK(42)                   - left border start
         @ CLK(71.5)                 - body start
         @ CLK(199.5)                - right border start
-        @ CLK(227.5) + DHS_F        - falling edge (high to low)
+        @ CLK(228) + DHS_F          - falling edge (high to low)
         ...
 
-    Field Sync: Total Period 262*227.5 clock cycles
+    Field Sync: Total Period 262*228 clock cycles
         @ CLK(0) + DFS_F            - falling edge (high to low)
-        @ CLK(32*227.5) + DFS_R     - rising edge (low to high)
-        @ CLK(262*227.5) + DFS_F    - falling edge (high to low) (262.5 for the M6847Y)
+        @ CLK(32*228) + DFS_R       - rising edge (low to high)
+        @ CLK(262*228) + DFS_F      - falling edge (high to low) (262.5 for the M6847Y)
 
     DHS_F:  550ns
     DHS_R:  740ns
@@ -58,6 +57,13 @@
     I have not been able to find a pinout diagram for this chip so I am
     assuming that the extra text modes on the CoCo 2B are activated by the
     GM2-0 pins.  This needs to be confirmed.
+
+	The MC6847 datasheet states that a scanline is 227.5 clock cycles,
+	but experimentation suggests that it is 228.  The game "Dragon Fire"
+	has a fine tuned loop that runs in 57 clock cycles by the CPU's
+	reckoning (228 actual clock cycles) and would not function correctly
+	if skew existed.  SockMaster has confirmed that scanlines are in
+	fact 228 clock cycles.
 
 **********************************************************************/
 
@@ -73,7 +79,7 @@
 #define TOP_BORDER              25
 #define USE_HORIZONTAL_CLIP     false
 
-#define TIMER_HSYNC_PERIOD      (227.5)
+#define TIMER_HSYNC_PERIOD      (228)
 #define TIMER_HSYNC_OFF_TIME    (10.0)
 #define TIMER_HSYNC_ON_TIME     (TIMER_HSYNC_OFF_TIME + 16.5)
 #define TIMER_FSYNC_OFF_TIME    (TIMER_HSYNC_PERIOD * TOP_BORDER + TIMER_HSYNC_ON_TIME)
@@ -81,7 +87,9 @@
 
 #define LOG_SCANLINE            0
 #define LOG_HSYNC               0
-#define LOG_FSYNC               0
+#define LOG_FSYNC               1
+#define LOG_FLUSH				1
+#define LOG_INPUT				0
 
 
 const UINT32 mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
@@ -117,11 +125,12 @@ const UINT32 mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
 //-------------------------------------------------
 
 mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
-		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline)
+		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines)
 	: device_t(mconfig, type, name, tag, owner, clock),
-		m_character_map(fontdata, is_mc6847t1)
+	  m_character_map(fontdata, is_mc6847t1)
 {
 	m_tpfs = tpfs;
+	m_supports_partial_body_scanlines = supports_partial_body_scanlines;
 
 	// The MC6847 and the GIME apply field sync on different scanlines
 	m_field_sync_falling_edge_scanline = field_sync_falling_edge_scanline;
@@ -161,6 +170,7 @@ void mc6847_friend_device::device_start(void)
 	m_top_border_scanlines = 0;
 	m_body_scanlines = 0;
 	m_wide = false;
+	m_recording_scanline = false;
 	set_geometry(25, 192, false);
 
 	/* save states */
@@ -295,7 +305,12 @@ ATTR_FORCE_INLINE void mc6847_friend_device::change_horizontal_sync(bool line)
 				break;
 
 			case SCANLINE_ZONE_BODY:
-				record_body_scanline(m_physical_scanline, m_logical_scanline);
+				m_recording_scanline = true;
+				if (m_partial_scanline_clocks > 0)
+					record_partial_body_scanline(m_physical_scanline, m_logical_scanline, m_partial_scanline_clocks, 228);
+				else
+					record_body_scanline(m_physical_scanline, m_logical_scanline);
+				m_recording_scanline = false;
 				break;
 
 			case SCANLINE_ZONE_RETRACE:
@@ -369,6 +384,7 @@ ATTR_FORCE_INLINE void mc6847_friend_device::next_scanline(void)
 	/* advance to next scanline */
 	m_physical_scanline++;
 	m_logical_scanline++;
+	m_partial_scanline_clocks = 0;
 
 	/* check for movement into the next "zone" */
 	if (m_logical_scanline_zone == SCANLINE_ZONE_FRAME_END)
@@ -447,11 +463,43 @@ void mc6847_friend_device::record_border_scanline(UINT16 physical_scanline)
 
 
 //-------------------------------------------------
+//  get_clocks_since_hsync
+//-------------------------------------------------
+
+INT32 mc6847_friend_device::get_clocks_since_hsync()
+{
+	UINT64 hsync_on_clocks = attotime_to_clocks(m_hsync_on_timer->start());
+	UINT64 current_clocks = attotime_to_clocks(machine().time());
+	return (INT32) (current_clocks - hsync_on_clocks);
+}
+
+
+
+//-------------------------------------------------
 //  video_flush
 //-------------------------------------------------
 
-void mc6847_friend_device::video_flush(void)
+void mc6847_friend_device::video_flush()
 {
+	// first, only flush if...
+	//   1.  We support partial scanlines
+	//   2.  We're not already recording
+	//   3.  We're in the body
+	if (m_supports_partial_body_scanlines && !m_recording_scanline && (m_logical_scanline_zone == SCANLINE_ZONE_BODY))
+	{
+		UINT32 new_partial_scanline_clocks = get_clocks_since_hsync();
+		if (m_partial_scanline_clocks < new_partial_scanline_clocks)
+		{
+			if (LOG_FLUSH)
+				logerror("%s: new_partial_scanline_clocks=%u\n", describe_context(), new_partial_scanline_clocks);
+
+			m_recording_scanline = true;
+			record_partial_body_scanline(m_physical_scanline, m_logical_scanline, m_partial_scanline_clocks, new_partial_scanline_clocks);
+			m_recording_scanline = false;
+
+			m_partial_scanline_clocks = new_partial_scanline_clocks;
+		}
+	}
 }
 
 
@@ -481,7 +529,7 @@ const char *mc6847_friend_device::describe_context(void)
 //-------------------------------------------------
 
 mc6847_base_device::mc6847_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata, double tpfs)
-	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191)
+	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, (type == MC6847T1_NTSC) || (type == MC6847T1_PAL), tpfs, 25+191, true)
 {
 	m_palette = s_palette;
 
@@ -576,37 +624,54 @@ void mc6847_base_device::device_reset()
 
 
 //-------------------------------------------------
+//  input
+//-------------------------------------------------
+
+UINT8 mc6847_base_device::input(UINT16 address)
+{
+	UINT8 data = m_res_input_func(address);
+	if (LOG_INPUT)
+		logerror("%s: input: address=0x%04X data=0x%02X\n", describe_context(), address, data);
+	return data;
+}
+
+
+
+//-------------------------------------------------
 //  record_scanline_res
 //-------------------------------------------------
 
 template<int sample_count, int yres>
-void mc6847_base_device::record_scanline_res(int scanline)
+void mc6847_base_device::record_scanline_res(int scanline, INT32 start_pos, INT32 end_pos)
 {
-	int i, column;
-	UINT8 data;
+	UINT8 current_sample_count = (start_pos > 0) ? m_data[scanline].m_sample_count : 0;
 
-	/* calculate offset */
-	offs_t offset = scanline / (192 / yres) * sample_count;
-
-	/* main loop */
-	for (column = 0; column < sample_count; column++)
+	// main loop
+	for (INT32 pos = start_pos; pos < end_pos; pos++)
 	{
-		/* input data */
-		data = m_res_input_func(offset++);
+		// set address at beginning of line
+		if (pos == 0)
+			m_video_address = scanline / (192 / yres) * sample_count;
 
-		/* update values */
-		update_value(&m_data[scanline].m_mode[column], simplify_mode(data, m_mode));
-		update_value(&m_data[scanline].m_data[column], data);
+		if ((sample_count == 32) || ((pos % 1) == 0))
+		{
+			// input data
+			UINT8 data = input(m_video_address++);
+
+			if (pos < 32)
+			{
+				// update values
+				assert(current_sample_count >= 0);
+				assert(current_sample_count < ARRAY_LENGTH(m_data[scanline].m_mode));
+				update_value(&m_data[scanline].m_mode[current_sample_count], simplify_mode(data, m_mode));
+				update_value(&m_data[scanline].m_data[current_sample_count], data);
+				current_sample_count++;
+			}
+		}
 	}
 
-	/* several more inputs occur after hblank */
-	for (i = 0; i < sample_count * 5 / 16; i++)
-	{
-		data = m_res_input_func(offset++);
-	}
-
-	/* update sample count */
-	update_value(&m_data[scanline].m_sample_count, (UINT8) sample_count);
+	// update sample count
+	update_value(&m_data[scanline].m_sample_count, current_sample_count);
 }
 
 
@@ -615,7 +680,7 @@ void mc6847_base_device::record_scanline_res(int scanline)
 //  record_body_scanline
 //-------------------------------------------------
 
-void mc6847_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 scanline)
+ATTR_FORCE_INLINE void mc6847_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 scanline, INT32 start_pos, INT32 end_pos)
 {
 	// sanity checks
 	assert(scanline < 192);
@@ -626,28 +691,28 @@ void mc6847_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 s
 		{
 			case 0:
 			case MODE_GM0:
-				record_scanline_res<16, 64>(scanline);
+				record_scanline_res<16, 64>(scanline, start_pos, end_pos);
 				break;
 
 			case MODE_GM1:
-				record_scanline_res<32, 64>(scanline);
+				record_scanline_res<32, 64>(scanline, start_pos, end_pos);
 				break;
 
 			case MODE_GM1|MODE_GM0:
-				record_scanline_res<16, 96>(scanline);
+				record_scanline_res<16, 96>(scanline, start_pos, end_pos);
 				break;
 
 			case MODE_GM2:
-				record_scanline_res<32, 96>(scanline);
+				record_scanline_res<32, 96>(scanline, start_pos, end_pos);
 				break;
 
 			case MODE_GM2|MODE_GM0:
-				record_scanline_res<16, 192>(scanline);
+				record_scanline_res<16, 192>(scanline, start_pos, end_pos);
 				break;
 
 			case MODE_GM2|MODE_GM1:
 			case MODE_GM2|MODE_GM1|MODE_GM0:
-				record_scanline_res<32, 192>(scanline);
+				record_scanline_res<32, 192>(scanline, start_pos, end_pos);
 				break;
 
 			default:
@@ -658,8 +723,45 @@ void mc6847_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 s
 	}
 	else
 	{
-		record_scanline_res<32, 16>(scanline);
+		record_scanline_res<32, 16>(scanline, start_pos, end_pos);
 	}
+}
+
+
+
+//-------------------------------------------------
+//  record_body_scanline
+//-------------------------------------------------
+
+void mc6847_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 scanline)
+{
+	record_body_scanline(physical_scanline, scanline, 0, 32);
+}
+
+
+
+//-------------------------------------------------
+//  record_partial_body_scanline
+//-------------------------------------------------
+
+void mc6847_base_device::record_partial_body_scanline(UINT16 physical_scanline, UINT16 scanline, INT32 start_clock, INT32 end_clock)
+{
+	INT32 start_pos = MAX(scanline_position_from_clock(start_clock), 0);
+	INT32 end_pos = MIN(scanline_position_from_clock(end_clock), 42);
+
+	if (start_pos < end_pos)
+		record_body_scanline(physical_scanline, scanline, start_pos, end_pos);
+}
+
+
+
+//-------------------------------------------------
+//  scanline_position_from_clock
+//-------------------------------------------------
+
+INT32 mc6847_base_device::scanline_position_from_clock(INT32 clocks_since_hsync)
+{
+	return (clocks_since_hsync - 20) / 4;
 }
 
 
@@ -1564,7 +1666,7 @@ const device_type MC6847T1_PAL = &device_creator<mc6847t1_pal_device>;
 //-------------------------------------------------
 
 mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6847_base_device(mconfig, MC6847_NTSC, "MC6847_NTSC", tag, owner, clock, ntsc_square_fontdata8x12, 227.0)
+	: mc6847_base_device(mconfig, MC6847_NTSC, "MC6847_NTSC", tag, owner, clock, ntsc_square_fontdata8x12, 262.0)
 {
 }
 
@@ -1575,7 +1677,7 @@ mc6847_ntsc_device::mc6847_ntsc_device(const machine_config &mconfig, const char
 //-------------------------------------------------
 
 mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6847_base_device(mconfig, MC6847_PAL, "MC6847_PAL", tag, owner, clock, pal_square_fontdata8x12, 227.0)
+	: mc6847_base_device(mconfig, MC6847_PAL, "MC6847_PAL", tag, owner, clock, pal_square_fontdata8x12, 262.0)
 {
 }
 
@@ -1586,7 +1688,7 @@ mc6847_pal_device::mc6847_pal_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6847_base_device(mconfig, MC6847Y_NTSC, "MC6847Y_NTSC", tag, owner, clock, ntsc_square_fontdata8x12, 227.5)
+	: mc6847_base_device(mconfig, MC6847Y_NTSC, "MC6847Y_NTSC", tag, owner, clock, ntsc_square_fontdata8x12, 262.5)
 {
 }
 
@@ -1597,7 +1699,7 @@ mc6847y_ntsc_device::mc6847y_ntsc_device(const machine_config &mconfig, const ch
 //-------------------------------------------------
 
 mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6847_base_device(mconfig, MC6847Y_PAL, "MC6847Y_PAL", tag, owner, clock, pal_square_fontdata8x12, 227.5)
+	: mc6847_base_device(mconfig, MC6847Y_PAL, "MC6847Y_PAL", tag, owner, clock, pal_square_fontdata8x12, 262.5)
 {
 }
 
@@ -1608,7 +1710,7 @@ mc6847y_pal_device::mc6847y_pal_device(const machine_config &mconfig, const char
 //-------------------------------------------------
 
 mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6847_base_device(mconfig, MC6847T1_NTSC, "MC6847T1_NTSC", tag, owner, clock, ntsc_round_fontdata8x12, 227.0)
+	: mc6847_base_device(mconfig, MC6847T1_NTSC, "MC6847T1_NTSC", tag, owner, clock, ntsc_round_fontdata8x12, 262.0)
 {
 }
 
@@ -1619,6 +1721,6 @@ mc6847t1_ntsc_device::mc6847t1_ntsc_device(const machine_config &mconfig, const 
 //-------------------------------------------------
 
 mc6847t1_pal_device::mc6847t1_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: mc6847_base_device(mconfig, MC6847T1_PAL, "MC6847T1_PAL", tag, owner, clock, pal_round_fontdata8x12, 227.0)
+	: mc6847_base_device(mconfig, MC6847T1_PAL, "MC6847T1_PAL", tag, owner, clock, pal_round_fontdata8x12, 262.0)
 {
 }

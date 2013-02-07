@@ -91,7 +91,7 @@ public:
 
 protected:
 	mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
-		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline);
+		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines);
 
 	// video mode constants
 	static const UINT8 MODE_AG      = 0x80;
@@ -288,6 +288,7 @@ protected:
 	virtual void enter_bottom_border(void);
 	virtual void record_border_scanline(UINT16 physical_scanline);
 	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline) = 0;
+	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock) = 0;
 
 	// miscellaneous
 	void video_flush(void);
@@ -443,7 +444,6 @@ protected:
 		return result;
 	}
 
-
 private:
 	enum scanline_zone
 	{
@@ -468,6 +468,8 @@ private:
 	bool m_video_changed;
 	UINT16 m_top_border_scanlines;
 	UINT16 m_body_scanlines;
+	bool m_recording_scanline;
+	bool m_supports_partial_body_scanlines;
 
 	// video state
 	UINT16 m_physical_scanline;
@@ -475,12 +477,14 @@ private:
 	UINT16 m_logical_scanline_zone;
 	bool m_horizontal_sync;
 	bool m_field_sync;
+	UINT32 m_partial_scanline_clocks;
 
 	// functions
 	void change_horizontal_sync(bool line);
 	void change_field_sync(bool line);
 	void update_field_sync_timer(void);
 	void next_scanline(void);
+	INT32 get_clocks_since_hsync();
 
 	// debugging
 	const char *scanline_zone_string(scanline_zone zone);
@@ -515,6 +519,8 @@ protected:
 
 	// other overrides
 	virtual void field_sync_changed(bool line);
+	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 scanline);
+	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock);
 
 private:
 	struct video_scanline
@@ -540,8 +546,9 @@ private:
 
 	// state
 	UINT8 m_mode;
-	video_scanline m_data[192];
+	UINT16 m_video_address;
 	bool m_dirty;
+	video_scanline m_data[192];
 
 	void change_mode(UINT8 mode, int state)
 	{
@@ -559,9 +566,9 @@ private:
 		if (new_mode != m_mode)
 		{
 			// it has!  check dirty flag
+			video_flush();
 			if (!m_dirty)
 			{
-				video_flush();
 				m_dirty = true;
 			}
 
@@ -574,7 +581,7 @@ private:
 	void setup_fixed_mode(struct devcb_read_line callback, UINT8 mode);
 
 	// runtime functions
-	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 scanline);
+	void record_body_scanline(UINT16 physical_scanline, UINT16 scanline, INT32 start_pos, INT32 end_pos);
 	pixel_t border_value(UINT8 mode, const pixel_t *palette, bool is_mc6847t1);
 
 	template<int xscale>
@@ -582,7 +589,11 @@ private:
 
 	// template function for doing video update collection
 	template<int sample_count, int yres>
-	void record_scanline_res(int scanline);
+	void record_scanline_res(int scanline, INT32 start_pos, INT32 end_pos);
+
+	// miscellaneous
+	UINT8 input(UINT16 address);
+	INT32 scanline_position_from_clock(INT32 clocks_since_hsync);
 };
 
 

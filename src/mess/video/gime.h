@@ -100,6 +100,7 @@ protected:
 	virtual void enter_bottom_border(void);
 	virtual void record_border_scanline(UINT16 physical_scanline);
 	virtual void record_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline);
+	virtual void record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock);
 
 private:
 	typedef mc6847_friend_device super;

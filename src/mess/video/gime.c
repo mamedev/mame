@@ -107,7 +107,7 @@
 //-------------------------------------------------
 
 gime_base_device::gime_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const UINT8 *fontdata)
-	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3)
+	:   mc6847_friend_device(mconfig, type, name, tag, owner, clock, fontdata, true, 263, 25+192+26+3, false)
 {
 }
 
@@ -1542,6 +1542,17 @@ void gime_base_device::record_body_scanline(UINT16 physical_scanline, UINT16 log
 		m_line_in_row = 0;
 		m_video_position += pitch;
 	}
+}
+
+
+
+//-------------------------------------------------
+//  record_partial_body_scanline
+//-------------------------------------------------
+
+void gime_base_device::record_partial_body_scanline(UINT16 physical_scanline, UINT16 logical_scanline, INT32 start_clock, INT32 end_clock)
+{
+	fatalerror("NYI");
 }
 
 
