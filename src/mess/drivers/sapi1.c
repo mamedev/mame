@@ -27,7 +27,7 @@
 /* switch out the rom shadow */
 WRITE8_MEMBER( sapi1_state::sapi3_00_w )
 {
-	membank("bank1")->set_entry(0);
+	m_bank1->set_entry(0);
 }
 
 READ8_MEMBER( sapi1_state::sapi2_keyboard_status_r)

@@ -19,8 +19,15 @@ class sapi1_state : public driver_device
 {
 public:
 	sapi1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_sapi_video_ram(*this, "sapi_video_ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_sapi_video_ram(*this, "sapi_video_ram")
+		, m_bank1(*this, "bank1")
+		, m_line0(*this, "LINE0")
+		, m_line1(*this, "LINE1")
+		, m_line2(*this, "LINE2")
+		, m_line3(*this, "LINE3")
+		, m_line4(*this, "LINE4")
+	{ }
 
 	required_shared_ptr<UINT8> m_sapi_video_ram;
 	UINT8 m_keyboard_mask;
@@ -44,6 +51,14 @@ public:
 	DECLARE_VIDEO_START(sapizps3);
 	UINT32 screen_update_sapi1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sapizps3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	required_memory_bank m_bank1;
+	required_ioport m_line0;
+	required_ioport m_line1;
+	required_ioport m_line2;
+	required_ioport m_line3;
+	required_ioport m_line4;
 };
 
 #endif
