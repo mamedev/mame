@@ -5,6 +5,7 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
+#define MD_ADDR(a)  rom_bank_map[(a / 0x10000) & 0x3f] * 0x10000 + (a & 0xffff)
 
 /* PCB */
 enum
@@ -19,6 +20,7 @@ enum
 
 	// Cart + NVRAM
 	SEGA_SRAM, SEGA_FRAM,
+	HARDBALL95,                  /* Hardball 95 uses different sram start address */
 	BEGGAR,                      /* Xin Qigai Wangzi uses different sram start address and has no valid header */
 	
 	// EEPROM
@@ -106,6 +108,9 @@ public:
 	virtual UINT32 get_rom_size() { return m_rom_size; };
 	virtual UINT32 get_nvram_size() { return m_nvram_size; };
 	
+	virtual void rom_map_setup(UINT32 size);	
+	virtual UINT32 get_padded_size(UINT32 size);
+	
 	int m_nvram_start, m_nvram_end;
 	int m_nvram_active, m_nvram_readonly;
 	
@@ -119,6 +124,8 @@ public:
 	UINT16      *m_nvram;
 	UINT32 m_rom_size;
 	UINT32 m_nvram_size;
+	
+	UINT8 rom_bank_map[128];	// 64K chunks of rom
 };
 
 

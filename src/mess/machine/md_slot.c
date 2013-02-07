@@ -16,11 +16,29 @@
 	md_sk: Sonic & Knuckles pass-thorugh cart (enables a second slot to mount any other cart)
 	md_stm95: cart + STM95 EEPROM (e.g. Pier Solar)
 
- TODO: currently read access in 0x000000-0x7fffff are not masked (so we assume that no game attempts to
-       read beyond its ROM size). A regression test is pending to identify which games need this and mirror 
-       them properly (Eke's doc states ROM data should be mirrored), but none of the ~120 games I tried 
-       attempted that and a testcase would be appreciated
  
+	Cart Mirroring (based Eke's research)
+
+	MD Cartridge area is mapped to $000000-$3fffff: when accessing ROM, 68k address lines A1 to A21 can be 
+	used by the internal cartridge hardware to decode full 4MB address range.
+	Depending on ROM total size and additional decoding hardware, some address lines might be ignored,
+	resulting in ROM mirroring.
+ 
+	Cartridges typically use either 8-bits (x2) or 16-bits (x1, x2) Mask ROM chips, each chip size is a 
+	factor of 2 bytes. 
+	When one chip ROM1 of size 2^N is present, it is generally mirrored each 2^N bytes so that read access 
+	to cart area sees the sequence ROM1,ROM1,ROM1,... (up to 4MB)
+	When two chips ROM1 & ROM2 are present and the whole size is 2^N, then the block ROM1+ROM2 is mirrored
+	in the cart area, and reads see the sequence ROM1+ROM2,ROM1+ROM2,... (up to 4MB)
+	When two chips ROM1 & ROM2 are present and the whole size is not 2^N (e.g. because ROM1 and ROM2 have 
+	different sizes), then the area between the end of ROM2 and next power 2^N is generally ignored, and 
+	reads see the sequence ROM1,ROM2,XXXX,ROM1,ROM2,XXXX... (up to 4MB)
+ 
+	At loading time we first compute first power 2^N larger than cart size (see get_padded_size function),
+	we allocate such a size for ROM and we fill of 0xff the area between end of dump and 2^N.
+	Then we handle mirroring by creating a rom_bank_map[] (see rom_map_setup function) which points each 
+	access in 0x000000-0x400000 to the correct 64K ROM bank.
+
  ***********************************************************************************************************/
 
 
@@ -88,6 +106,57 @@ void device_md_cart_interface::nvram_alloc(running_machine &machine, size_t size
 		m_nvram_size = size;
 	}
 }
+
+//-------------------------------------------------
+//  rom_map_setup - setup map of rom banks in 64K 
+//  blocks, so to simplify ROM mirroring
+//-------------------------------------------------
+
+void device_md_cart_interface::rom_map_setup(UINT32 size)
+{
+	int i;
+	// setup the rom_bank_map array to faster ROM read 
+	for (i = 0; i < size / 0x10000; i++)
+		rom_bank_map[i] = i;
+	
+	// fill up remaining blocks with mirrors
+	while (i % 64)
+	{
+		int j = 0, repeat_banks;
+		while ((i % (64 >> j)) && j < 7)
+			j++;
+		repeat_banks = i % (64 >> (j - 1));
+		for (int k = 0; k < repeat_banks; k++)
+			rom_bank_map[i + k] = rom_bank_map[i + k - repeat_banks];
+		i += repeat_banks;
+	}
+	
+// check bank map!
+//	for (i = 0; i < 64; i++)
+//	{
+//		printf("bank %3d = %3d\t", i, rom_bank_map[i]);
+//		if ((i%8) == 7)
+//			printf("\n");
+//	}
+}
+
+//-------------------------------------------------
+//  
+//  
+//-------------------------------------------------
+
+UINT32 device_md_cart_interface::get_padded_size(UINT32 size)
+{
+	UINT32 pad_size = 0x10000;
+	while (size > pad_size)
+		pad_size <<= 1;
+
+	if (pad_size < 0x800000 && size < pad_size)
+		return pad_size;
+	else
+		return size;
+}
+
 
 
 //**************************************************************************
@@ -170,6 +239,7 @@ static const md_slot slot_list[] =
 
 	{ SEGA_SRAM, "rom_sram" },
 	{ SEGA_FRAM, "rom_fram" },
+	{ HARDBALL95, "rom_hardbl95" },
 	{ BEGGAR, "rom_beggar"},
 	
 	{ SEGA_EEPROM, "rom_eeprom" },
@@ -294,15 +364,26 @@ int base_md_cart_slot_device::load_list()
 	UINT32 length = get_software_region_length("rom");
 	const char  *slot_name;
 
-	m_cart->rom_alloc(machine(), length);	
+	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
+	length = m_cart->get_padded_size(length);
+
+	m_cart->rom_alloc(machine(), length);
 	ROM = m_cart->get_rom_base();
-	memcpy(ROM, get_software_region("rom"), length);
+	memcpy(ROM, get_software_region("rom"), get_software_region_length("rom"));
+
+	// if we allocated a ROM larger that the file (e.g. due to uneven cart size), set remaining space to 0xff
+	if (length > get_software_region_length("rom"))
+		memset(ROM + get_software_region_length("rom")/2, 0xffff, (length - get_software_region_length("rom"))/2);
 	
 	if ((slot_name = get_feature("slot")) == NULL)
 		m_type = SEGA_STD;
 	else
 		m_type = md_get_pcb_id(slot_name);
-	
+
+	// handle mirroring of ROM, unless it's SSF2 or Pier Solar
+	if (m_type != SSF2 && m_type != PSOLAR)
+		m_cart->rom_map_setup(length);
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -382,7 +463,7 @@ static int genesis_is_SMD(unsigned char *buf,unsigned int len)
 int base_md_cart_slot_device::load_nonlist()
 {
 	unsigned char *ROM, *tmpROM;
-	UINT32 len = length();
+	UINT32 len = m_cart->get_padded_size(length());	// if cart size is not (2^n * 64K), the system will see anyway that size so we need to alloc a bit more space
 
 	// this contains an hack for SSF2: its current bankswitch code needs larger rom space to work
 	m_cart->rom_alloc(machine(), (len == 0x500000) ? 0x900000 : len);
@@ -428,10 +509,18 @@ int base_md_cart_slot_device::load_nonlist()
 	}
 
 	global_free(tmpROM);
-
+	
+	// if we allocated a ROM larger that the file (e.g. due to uneven cart size), set remaining space to 0xff
+	if (len > length())
+		memset(m_cart->get_rom_base() + length()/2, 0xffff, (len - length())/2);
+	
 	// STEP 2: determine the cart type (to deal with pirate mappers & eeprom)
-	m_type = get_cart_type(ROM, len);
+	m_type = get_cart_type(ROM, length());
 
+	// handle mirroring of ROM, unless it's SSF2 or Pier Solar
+	if (m_type != SSF2 && m_type != PSOLAR)
+		m_cart->rom_map_setup(len);
+	
 #ifdef LSB_FIRST
 	unsigned char fliptemp;
 	// is this really needed nowadays?
@@ -577,8 +666,15 @@ void base_md_cart_slot_device::setup_nvram()
 			m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
 			break;
-
+			
 		// These types might come from both (pending proper id routines)
+		case HARDBALL95:
+			m_cart->m_nvram_start = 0x300000;
+			m_cart->m_nvram_end = m_cart->m_nvram_start + get_software_region_length("sram") - 1;
+			m_cart->nvram_alloc(machine(), m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
+			m_cart->m_nvram_active = 1;
+			m_cart->m_nvram_handlers_installed = 1;
+			break;
 		case BEGGAR:
 			m_cart->m_nvram_start = 0x400000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + 0xffff;

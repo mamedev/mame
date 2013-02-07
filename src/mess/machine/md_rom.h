@@ -3,7 +3,6 @@
 
 #include "machine/md_slot.h"
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -23,7 +22,7 @@ public:
 	virtual void device_config_complete() { m_shortname = "md_std_rom"; }
 		
 	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read) { return m_rom[offset]; };
+	virtual DECLARE_READ16_MEMBER(read) { if (offset < 0x400000/2) return m_rom[MD_ADDR(offset)]; else return 0xffff; };
 	virtual DECLARE_WRITE16_MEMBER(write) { };
 };
 
@@ -37,23 +36,6 @@ public:
 	
 	// device-level overrides
 	virtual void device_config_complete() { m_shortname = "md_rom_sram"; }
-	
-	// reading and writing
-	virtual DECLARE_READ16_MEMBER(read);
-	virtual DECLARE_WRITE16_MEMBER(write);
-	virtual DECLARE_WRITE16_MEMBER(write_a13);
-};
-
-// ======================> md_rom_beggar_device
-
-class md_rom_beggar_device : public md_std_rom_device
-{
-public:
-	// construction/destruction
-	md_rom_beggar_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
-	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "md_rom_beggar"; }
 	
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -165,6 +147,21 @@ public:
 	
 	// device-level overrides
 	virtual void device_config_complete() { m_shortname = "md_rom_elfwor"; }
+	
+	// reading and writing
+	virtual DECLARE_READ16_MEMBER(read);
+};
+
+// ======================> md_rom_yasech_device
+
+class md_rom_yasech_device : public md_std_rom_device
+{
+public:
+	// construction/destruction
+	md_rom_yasech_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "md_rom_yasech"; }
 	
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
@@ -469,10 +466,10 @@ private:
 extern const device_type MD_STD_ROM;
 extern const device_type MD_ROM_SRAM;
 extern const device_type MD_ROM_FRAM;
-extern const device_type MD_ROM_BEGGAR;
 extern const device_type MD_ROM_BUGSLIFE;
 extern const device_type MD_ROM_CHINF3;
 extern const device_type MD_ROM_ELFWOR;
+extern const device_type MD_ROM_YASECH;
 extern const device_type MD_ROM_KOF98;
 extern const device_type MD_ROM_KOF99;
 extern const device_type MD_ROM_LION2;

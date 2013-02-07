@@ -37,6 +37,7 @@ const device_type MD_ROM_KOF99 = &device_creator<md_rom_kof99_device>;
 const device_type MD_ROM_SOULB = &device_creator<md_rom_soulb_device>;
 const device_type MD_ROM_CHINF3 = &device_creator<md_rom_chinf3_device>;
 const device_type MD_ROM_ELFWOR = &device_creator<md_rom_elfwor_device>;
+const device_type MD_ROM_YASECH = &device_creator<md_rom_yasech_device>;
 const device_type MD_ROM_LION2 = &device_creator<md_rom_lion2_device>;
 const device_type MD_ROM_LION3 = &device_creator<md_rom_lion3_device>;
 const device_type MD_ROM_MCPIR = &device_creator<md_rom_mcpirate_device>;
@@ -46,7 +47,6 @@ const device_type MD_ROM_REDCL = &device_creator<md_rom_redcl_device>;
 const device_type MD_ROM_SQUIR = &device_creator<md_rom_squir_device>;
 const device_type MD_ROM_TOPF = &device_creator<md_rom_topf_device>;
 const device_type MD_ROM_RADICA = &device_creator<md_rom_radica_device>;
-const device_type MD_ROM_BEGGAR = &device_creator<md_rom_beggar_device>;
 
 // below ones are currently unused, because the protection is patched out
 const device_type MD_ROM_MULAN = &device_creator<md_std_rom_device>;
@@ -68,11 +68,6 @@ md_std_rom_device::md_std_rom_device(const machine_config &mconfig, const char *
 
 md_rom_sram_device::md_rom_sram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_SRAM, "MD Standard cart + SRAM", tag, owner, clock)
-{
-}
-
-md_rom_beggar_device::md_rom_beggar_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: md_std_rom_device(mconfig, MD_ROM_BEGGAR, "MD Xin Qigai Wangzi", tag, owner, clock)
 {
 }
 
@@ -148,6 +143,11 @@ md_rom_chinf3_device::md_rom_chinf3_device(const machine_config &mconfig, const 
 
 md_rom_elfwor_device::md_rom_elfwor_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_ELFWOR, "MD Linghuan Daoshi Super Magician / Elf Wor", tag, owner, clock)
+{
+}
+
+md_rom_yasech_device::md_rom_yasech_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: md_std_rom_device(mconfig, MD_ROM_YASECH, "MD Ya Se Chuan Shuo", tag, owner, clock)
 {
 }
 
@@ -282,15 +282,17 @@ void md_rom_radica_device::device_start()
 
 READ16_MEMBER(md_rom_sram_device::read)
 {
-	offset <<= 1;
 	// since a lot of generic carts ends up here if loaded from fullpath
 	// we access nvram only if m_nvram_handlers_installed has been turned on
 	if (m_nvram_handlers_installed)
 	{
-		if (offset >= m_nvram_start && offset < m_nvram_end && m_nvram_active)
-			return m_nvram[(offset - m_nvram_start)/2];
+		if (offset >= m_nvram_start/2 && offset < m_nvram_end/2 && m_nvram_active)
+			return m_nvram[offset - m_nvram_start/2];
 	}
-	return m_rom[offset/2];
+	if (offset < 0x400000/2) 
+		return m_rom[MD_ADDR(offset)]; 
+	else 
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_rom_sram_device::write)
@@ -299,16 +301,14 @@ WRITE16_MEMBER(md_rom_sram_device::write)
 	// we access nvram only if m_nvram_handlers_installed has been turned on
 	if (m_nvram_handlers_installed)
 	{
-		offset <<= 1;
-		if (offset >= m_nvram_start && offset <= m_nvram_end && m_nvram_active && !m_nvram_readonly)
-			m_nvram[(offset - m_nvram_start)/2] = data;
+		if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active && !m_nvram_readonly)
+			m_nvram[offset - m_nvram_start/2] = data;
 	}
 }
 
 WRITE16_MEMBER(md_rom_sram_device::write_a13)
 {
-	offset <<= 1;
-	if (offset == 0xf)
+	if (offset == 0xf0/2)
 	{
 		/* unsure if this is actually supposed to toggle or just switch on? yet to encounter game that uses this */
 		m_nvram_active = BIT(data, 0);
@@ -322,58 +322,29 @@ WRITE16_MEMBER(md_rom_sram_device::write_a13)
 }
 
 /*-------------------------------------------------
- BEGGAR PRINCE / XIN QIGAI WANGZI [same as above, but diff start/end... merge?]
- -------------------------------------------------*/
-
-READ16_MEMBER(md_rom_beggar_device::read)
-{
-	offset <<= 1;
-	if (offset >= m_nvram_start && offset < m_nvram_end && m_nvram_active)
-		return m_nvram[(offset - m_nvram_start)/2];
-	return m_rom[offset/2];
-}
-
-WRITE16_MEMBER(md_rom_beggar_device::write)
-{
-	offset <<= 1;
-	if (offset >= m_nvram_start && offset <= m_nvram_end && m_nvram_active && !m_nvram_readonly)
-		m_nvram[(offset - m_nvram_start)/2] = data;
-}
-
-WRITE16_MEMBER(md_rom_beggar_device::write_a13)
-{
-	offset <<= 1;
-	if (offset == 0xf)
-	{
-		/* unsure if this is actually supposed to toggle or just switch on? yet to encounter game that uses this */
-		m_nvram_active = BIT(data, 0);
-		m_nvram_readonly = BIT(data, 1);
-	}
-}
-
-/*-------------------------------------------------
  CART + FRAM [almost same as SRAM... merge common parts?]
  -------------------------------------------------*/
 
 READ16_MEMBER(md_rom_fram_device::read)
 {
-	offset <<= 1;
-	if (offset >= m_nvram_start && offset < m_nvram_end && m_nvram_active)
-		return m_nvram[(offset - m_nvram_start)/2];
-	return m_rom[offset/2];
+	if (offset >= m_nvram_start/2 && offset < m_nvram_end/2 && m_nvram_active)
+		return m_nvram[offset - m_nvram_start/2];
+	if (offset < 0x400000/2) 
+		return m_rom[MD_ADDR(offset)]; 
+	else 
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_rom_fram_device::write_a13)
 {
-	offset <<= 1;
-	if (offset == 0xf)
+	if (offset == 0xf0/2)
 		m_nvram_active = BIT(data, 0);
 }
 
 
 READ16_MEMBER(md_rom_fram_device::read_a13)
 {
-	if (offset == 0xf)
+	if (offset == 0xf0/2)
 		return m_nvram_active;
 	else
 		return 0xffff;
@@ -560,6 +531,19 @@ READ16_MEMBER(md_rom_smouse_device::read)
 	if (offset == 0x400002/2)	return 0x0f00;
 	if (offset == 0x400004/2)	return 0xaa00;
 	if (offset == 0x400006/2)	return 0xf000;
+	return m_rom[offset];
+}
+
+/*-------------------------------------------------
+ YA SE CHUAN SHUO
+ -------------------------------------------------*/
+
+READ16_MEMBER(md_rom_yasech_device::read)
+{
+	if (offset == 0x400000/2)	return 0x6300;
+	if (offset == 0x400002/2)	return 0x9800;
+	if (offset == 0x400004/2)	return 0xc900;
+	if (offset == 0x400006/2)	return 0x1800;
 	return m_rom[offset];
 }
 

@@ -22,25 +22,8 @@ Known Non-Issues (confirmed on Real Genesis)
 
 
 #include "emu.h"
-#include "coreutil.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/sh2/sh2.h"
-#include "cpu/sh2/sh2comn.h"
-#include "cpu/z80/z80.h"
-#include "sound/2612intf.h"
-
-#include "sound/dac.h"
-#include "sound/sn76496.h"
-
-#include "imagedev/chd_cd.h"
-#include "imagedev/cartslot.h"
-#include "formats/imageutl.h"
-
 #include "includes/megadriv.h"
-#include "machine/nvram.h"
-#include "cpu/ssp1601/ssp1601.h"
 
-#include "machine/megavdp.h"
 
 
 MACHINE_CONFIG_EXTERN( megadriv );
@@ -880,7 +863,8 @@ static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_base_state )
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
 ADDRESS_MAP_END
 
-MACHINE_CONFIG_DERIVED( md_bootleg, megadriv )
+MACHINE_CONFIG_START( md_bootleg, md_base_state )
+	MCFG_FRAGMENT_ADD( md_ntsc )
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(md_bootleg_map)
@@ -1160,10 +1144,6 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_START( megadriv, md_base_state )
-	MCFG_FRAGMENT_ADD(md_ntsc)
-MACHINE_CONFIG_END
-
 /************ PAL hardware has a different master clock *************/
 
 MACHINE_CONFIG_FRAGMENT( md_pal )
@@ -1214,146 +1194,6 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
-
-MACHINE_CONFIG_START( megadpal, md_base_state )
-	MCFG_FRAGMENT_ADD(md_pal)
-MACHINE_CONFIG_END
-
-
-
-
-MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
-
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
-
-	// we need to remove and re-add the sound system because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
-	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_REMOVE("snsnd")
-
-	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
-	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
-	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
-
-	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_CONFIG(psg_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
-
-MACHINE_CONFIG_END
-
-
-MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
-
-	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0)
-
-	// we need to remove and re-add the sound system because the balance is different
-	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
-	MCFG_DEVICE_REMOVE("ymsnd")
-	MCFG_DEVICE_REMOVE("snsnd")
-
-	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
-	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
-	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
-
-	/* sound hardware */
-	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
-	MCFG_SOUND_CONFIG(psg_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
-
-MACHINE_CONFIG_END
-
-
-
-/******* 32X image loading *******/
-
-// FIXME: non-softlist loading should keep using ROM_CART_LOAD in the ROM definitions,
-// once we better integrate softlist with the old loading procedures
-DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
-{
-	UINT32 length;
-	UINT8 *temp_copy;
-	UINT16 *ROM16;
-	UINT32 *ROM32;
-	int i;
-	
-	if (image.software_entry() == NULL)
-	{
-		length = image.length();
-		temp_copy = auto_alloc_array(image.device().machine(), UINT8, length);
-		image.fread(temp_copy, length);
-	}
-	else
-	{
-		length = image.get_software_region_length("rom");
-		temp_copy = auto_alloc_array(image.device().machine(), UINT8, length);
-		memcpy(temp_copy, image.get_software_region("rom"), length);
-	}
-	
-	/* Copy the cart image in the locations the driver expects */
-	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
-	ROM16 = (UINT16 *) image.device().machine().root_device().memregion("gamecart")->base();
-	for (i = 0; i < length; i += 2)
-		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
-	
-	ROM32 = (UINT32 *) image.device().machine().root_device().memregion("gamecart_sh2")->base();
-	for (i = 0; i < length; i += 4)
-		ROM32[i / 4] = pick_integer_be(temp_copy, i, 4);
-	
-	ROM16 = (UINT16 *) image.device().machine().root_device().memregion("maincpu")->base();
-	for (i = 0x00; i < length; i += 2)
-		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
-	
-	auto_free(image.device().machine(), temp_copy);
-	
-	return IMAGE_INIT_PASS;
-}
-
-
-MACHINE_CONFIG_FRAGMENT( _32x_cartslot )
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("32x,bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("_32x_cart")
-	MCFG_CARTSLOT_LOAD(md_base_state, _32x_cart)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
-MACHINE_CONFIG_END
-
-
-
-struct cdrom_interface scd_cdrom =
-{
-	"scd_cdrom",
-	NULL
-};
-
-MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
-	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
-MACHINE_CONFIG_END
-
-/* Different Softlists for different regions (for now at least) */
-MACHINE_CONFIG_DERIVED( genesis_scd_scd, genesis_scd )
-	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_DERIVED( genesis_scd_mcd, genesis_scd )
-	MCFG_SOFTWARE_LIST_ADD("cd_list","megacd")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_DERIVED( genesis_scd_mcdj, genesis_scd )
-	MCFG_SOFTWARE_LIST_ADD("cd_list","megacdj")
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
-
-	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
-	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
-MACHINE_CONFIG_END
-
-
 
 
 static int megadriv_tas_callback(device_t *device)

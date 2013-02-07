@@ -39,15 +39,6 @@ INPUT_PORTS_EXTERN( mk3mdb );
 MACHINE_CONFIG_EXTERN( megadriv_timers );
 MACHINE_CONFIG_EXTERN( md_ntsc );
 MACHINE_CONFIG_EXTERN( md_pal );
-MACHINE_CONFIG_EXTERN( md_svp );
-
-MACHINE_CONFIG_EXTERN( genesis_32x );
-MACHINE_CONFIG_EXTERN( genesis_32x_pal );
-MACHINE_CONFIG_EXTERN( genesis_scd );
-MACHINE_CONFIG_EXTERN( genesis_scd_scd );
-MACHINE_CONFIG_EXTERN( genesis_scd_mcd );
-MACHINE_CONFIG_EXTERN( genesis_scd_mcdj );
-MACHINE_CONFIG_EXTERN( genesis_32x_scd );
 MACHINE_CONFIG_EXTERN( md_bootleg );    // for topshoot.c & hshavoc.c
 
 extern cpu_device *_svp_cpu;
@@ -408,14 +399,6 @@ public:
 		{ }
 };
 
-MACHINE_CONFIG_EXTERN( _32x_cartslot );
-
-
-/*----------- defined in drivers/megadriv.c -----------*/
-
-/* These are needed to handle J-Cart inputs */
-extern DECLARE_WRITE16_HANDLER( jcart_ctrl_w );
-extern DECLARE_READ16_HANDLER( jcart_ctrl_r );
 
 /* machine/megavdp.c */
 extern UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source, address_space& space);

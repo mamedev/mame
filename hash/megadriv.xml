@@ -3122,8 +3122,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
+			<feature name="slot" value="rom_sram" />
 			<dataarea name="rom" size="2097152">
 				<rom name="barver battle saga - tai kong zhan shi (chi) (unl).bin" size="2097152" crc="d37a37c6" sha1="6d49a0db7687ccad3441f47fbc483c87cd6eab53" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384"> <!-- Size to be confirmed. It does not work without SRAM. -->
 			</dataarea>
 		</part>
 	</software>
@@ -3778,11 +3782,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		</part>
 	</software>
 
-	<software name="blockb" supported="no">
+	<software name="blockb">
 		<description>Blockbuster World Video Game Championship II (USA)</description>
 		<year>1995</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_nbajamte" />
 			<dataarea name="rom" size="4194304">
 				<rom name="blockbuster world video game championship ii (usa).bin" size="4194304" crc="4385e366" sha1="1a06213a3a26c9105fc3013a141c22d212045a0b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -4667,8 +4672,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>199?</year>
 		<publisher>Gametec?</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
+			<feature name="slot" value="rom_sram" />
 			<dataarea name="rom" size="1048576">
 				<rom name="chao ji da fu weng (chi) (unl).bin" size="1048576" crc="2e2ea687" sha1="be1a66bd1f75f5b1b37b8ae18e6334c36291e63d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384"> <!-- Size to be confirmed. It does not work without SRAM. -->
 			</dataarea>
 		</part>
 	</software>
@@ -9808,8 +9817,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1995</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
+			<feature name="slot" value="rom_hardbl95" />
 			<dataarea name="rom" size="3145728">
 				<rom name="hardball '95 (usa).bin" size="3145728" crc="ed10bc9e" sha1="6a63fba59add9ba8e1845cbfcf4722833893113f" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536"> <!-- Size to be confirmed. It does not work without SRAM. -->
 			</dataarea>
 		</part>
 	</software>
@@ -9819,8 +9832,12 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<year>1993</year>
 		<publisher>Accolade</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
+			<feature name="slot" value="rom_sram" />
 			<dataarea name="rom" size="2097152">
 				<rom name="hardball iii (usa).bin" size="2097152" crc="a4f2f011" sha1="88812ae494288fbf3dda86ccc69161ad960a2e3b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="65536"> <!-- Size to be confirmed. It does not work without SRAM. -->
 			</dataarea>
 		</part>
 	</software>
@@ -22040,7 +22057,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SSF2" />
 			<feature name="slot" value="rom_ssf2" />
-			<dataarea name="rom" size="5242880">
+			<dataarea name="rom" size="9437184">
 				<rom name="super street fighter ii - the new challengers (jpn).bin" size="5242880" crc="d8eeb2bd" sha1="24c8634f59a481118f8350125fa6e00d33e04c95" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -22053,7 +22070,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SSF2" />
 			<feature name="slot" value="rom_ssf2" />
-			<dataarea name="rom" size="5242880">
+			<dataarea name="rom" size="9437184">
 				<rom name="super street fighter ii - the new challengers (usa).bin" size="5242880" crc="165defbf" sha1="9ce6e69db9d28386f7542dacd3e3ead28eacf2a4" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -26496,13 +26513,13 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-<!-- Freezes during the intro sequence... -->
-	<software name="yasech" supported="no">
+	<software name="yasech">
 		<description>Ya Se Chuan Shuo (Chi)</description>
 		<year>1995</year>
 		<publisher>Chuanpu Technologies</publisher>
 		<info name="alt_title" value="亚瑟传说"/>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_yasech" />
 			<dataarea name="rom" size="2097152">
 				<rom name="ya se chuan shuo (chi) (unl).bin" size="2097152" crc="095b9a15" sha1="8fe0806427e123717ba20478ab1410c25fa942e6" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>

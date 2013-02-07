@@ -188,7 +188,10 @@ READ16_MEMBER(md_jcart_device::read)
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 	}
-	return m_rom[offset];
+	if (offset < 0x400000/2) 
+		return m_rom[MD_ADDR(offset)]; 
+	else 
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_jcart_device::write)
@@ -228,7 +231,10 @@ READ16_MEMBER(md_seprom_codemast_device::read)
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 	}
-	return m_rom[offset];
+	if (offset < 0x400000/2) 
+		return m_rom[MD_ADDR(offset)]; 
+	else 
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_seprom_codemast_device::write)

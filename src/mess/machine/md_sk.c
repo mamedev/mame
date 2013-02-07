@@ -52,7 +52,10 @@ READ16_MEMBER(md_rom_sk_device::read)
 {
 	if (m_exp->m_cart != NULL && m_exp->m_cart->get_rom_base() != NULL && offset >= 0x200000/2 && offset < (0x200000 + m_exp->m_cart->get_rom_size())/2)
 		return m_exp->m_cart->m_rom[offset - 0x200000/2];
-	return m_rom[offset];
+	if (offset < 0x400000/2) 
+		return m_rom[MD_ADDR(offset)]; 
+	else 
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_rom_sk_device::write)

@@ -9,6 +9,13 @@
 #include "machine/md_jcart.h"
 #include "machine/md_stm95.h"
 
+#include "sound/sn76496.h"
+
+#include "imagedev/chd_cd.h"
+#include "imagedev/cartslot.h"
+
+#include "formats/imageutl.h"
+
 
 /*************************************
  *
@@ -296,7 +303,8 @@ static SLOT_INTERFACE_START(md_cart)
 	SLOT_INTERFACE_INTERNAL("rom_sram",  MD_ROM_SRAM)
 	SLOT_INTERFACE_INTERNAL("rom_sramsafe",  MD_ROM_SRAM)
 	SLOT_INTERFACE_INTERNAL("rom_fram",  MD_ROM_FRAM)
-	SLOT_INTERFACE_INTERNAL("rom_beggar",  MD_ROM_BEGGAR)
+	SLOT_INTERFACE_INTERNAL("rom_hardbl95", MD_ROM_SRAM)
+	SLOT_INTERFACE_INTERNAL("rom_beggar",  MD_ROM_SRAM)
 // EEPROM handling (not supported fully yet)
 	SLOT_INTERFACE_INTERNAL("rom_eeprom",  MD_STD_EEPROM)
 	SLOT_INTERFACE_INTERNAL("rom_nbajam",  MD_EEPROM_NBAJAM)
@@ -319,6 +327,7 @@ static SLOT_INTERFACE_START(md_cart)
 	SLOT_INTERFACE_INTERNAL("rom_bugs",  MD_ROM_BUGSLIFE)
 	SLOT_INTERFACE_INTERNAL("rom_chinf3",  MD_ROM_CHINF3)
 	SLOT_INTERFACE_INTERNAL("rom_elfwor",  MD_ROM_ELFWOR)
+	SLOT_INTERFACE_INTERNAL("rom_yasech",  MD_ROM_YASECH)
 	SLOT_INTERFACE_INTERNAL("rom_kof98",  MD_ROM_KOF98)
 	SLOT_INTERFACE_INTERNAL("rom_kof99",  MD_ROM_KOF99)
 	SLOT_INTERFACE_INTERNAL("rom_lion2",  MD_ROM_LION2)
@@ -443,8 +452,112 @@ DRIVER_INIT_MEMBER(md_cons_state,md_jpn)
 	megadrive_region_pal = 0;
 }
 
-/****************************************** SegaCD & 32X emulation ****************************************/
+/****************************************** 32X emulation ****************************************/
 
+static const sn76496_config psg_intf =
+{
+	DEVCB_NULL
+};
+
+// FIXME: non-softlist loading should keep using ROM_CART_LOAD in the ROM definitions,
+// once we better integrate softlist with the old loading procedures
+DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
+{
+	UINT32 length;
+	UINT8 *temp_copy;
+	UINT16 *ROM16;
+	UINT32 *ROM32;
+	int i;
+	
+	if (image.software_entry() == NULL)
+	{
+		length = image.length();
+		temp_copy = auto_alloc_array(image.device().machine(), UINT8, length);
+		image.fread(temp_copy, length);
+	}
+	else
+	{
+		length = image.get_software_region_length("rom");
+		temp_copy = auto_alloc_array(image.device().machine(), UINT8, length);
+		memcpy(temp_copy, image.get_software_region("rom"), length);
+	}
+	
+	/* Copy the cart image in the locations the driver expects */
+	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
+	ROM16 = (UINT16 *) image.device().machine().root_device().memregion("gamecart")->base();
+	for (i = 0; i < length; i += 2)
+		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
+	
+	ROM32 = (UINT32 *) image.device().machine().root_device().memregion("gamecart_sh2")->base();
+	for (i = 0; i < length; i += 4)
+		ROM32[i / 4] = pick_integer_be(temp_copy, i, 4);
+	
+	ROM16 = (UINT16 *) image.device().machine().root_device().memregion("maincpu")->base();
+	for (i = 0x00; i < length; i += 2)
+		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
+	
+	auto_free(image.device().machine(), temp_copy);
+	
+	return IMAGE_INIT_PASS;
+}
+
+
+static MACHINE_CONFIG_START( genesis_32x, md_cons_state )
+//MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
+	MCFG_FRAGMENT_ADD( md_ntsc )
+
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_NTSC, 0)
+
+	// we need to remove and re-add the sound system because the balance is different
+	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_DEVICE_REMOVE("snsnd")
+
+	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
+	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
+	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
+	MCFG_SOUND_CONFIG(psg_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
+
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( genesis_32x_pal, md_cons_state )
+//MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
+	MCFG_FRAGMENT_ADD( md_pal )
+
+	MCFG_DEVICE_ADD("sega32x", SEGA_32X_PAL, 0)
+
+	// we need to remove and re-add the sound system because the balance is different
+	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_DEVICE_REMOVE("snsnd")
+
+	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
+	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
+	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("snsnd", SEGAPSG, MASTER_CLOCK_NTSC/15)
+	MCFG_SOUND_CONFIG(psg_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
+
+MACHINE_CONFIG_END
+
+
+MACHINE_CONFIG_FRAGMENT( _32x_cartslot )
+	MCFG_CARTSLOT_ADD("cart")
+	MCFG_CARTSLOT_EXTENSION_LIST("32x,bin")
+	MCFG_CARTSLOT_MANDATORY
+	MCFG_CARTSLOT_INTERFACE("_32x_cart")
+	MCFG_CARTSLOT_LOAD(md_base_state, _32x_cart)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ms_32x, genesis_32x )
 	MCFG_FRAGMENT_ADD( _32x_cartslot )
@@ -498,6 +611,52 @@ ROM_END
 ROM_START( 32xj )
 	_32X_ROMS
 ROM_END
+
+
+/****************************************** SegaCD emulation ****************************************/
+
+struct cdrom_interface scd_cdrom =
+{
+	"scd_cdrom",
+	NULL
+};
+
+static MACHINE_CONFIG_START( genesis_scd, md_cons_state )
+//MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
+	MCFG_FRAGMENT_ADD( md_ntsc )
+	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
+	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
+
+	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( mega_scd, md_cons_state )
+//MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
+	MCFG_FRAGMENT_ADD( md_pal )
+	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_EUROPE, 0)
+
+	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
+
+	MCFG_SOFTWARE_LIST_ADD("cd_list","megacd")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( megaj_scd, md_cons_state )
+//MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
+	MCFG_FRAGMENT_ADD( md_ntsc )
+	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_JAPAN, 0)
+	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
+
+	MCFG_SOFTWARE_LIST_ADD("cd_list","megacdj")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
+
+	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
+	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
+MACHINE_CONFIG_END
+
+
 
 /* We need proper names for most of these BIOS ROMs! */
 ROM_START( segacd )
@@ -954,21 +1113,21 @@ CONS( 1994, 32xe,       32x,       0,      ms_32x_pal,      md, md_cons_state,  
 CONS( 1994, 32xj,       32x,       0,      ms_32x_jpn,      md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive with 32X (Japan, NTSC)", GAME_NOT_WORKING )
 
 // the SegaCD plugged into the expansion port..
-CONS( 1992, segacd,     0,         0,      genesis_scd_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, megacd,     segacd,    0,      genesis_scd_mcd, md, md_cons_state,     md_eur,    "Sega",   "Mega-CD (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1991, megacdj,    segacd,    0,      genesis_scd_mcdj,md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD (Japan, NTSC)", GAME_NOT_WORKING ) // this bios doesn't work with our ram interleave needed by a few games?!
-CONS( 1991, megacda,    segacd,    0,      genesis_scd_mcdj,md, md_cons_state,     md_eur,    "Sega",   "Mega-CD (Asia, PAL)", GAME_NOT_WORKING )
-CONS( 1993, segacd2,    0,         0,      genesis_scd_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD 2 (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, megacd2,    segacd2,   0,      genesis_scd_mcd, md, md_cons_state,     md_eur,    "Sega",   "Mega-CD 2 (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1993, megacd2j,   segacd2,   0,      genesis_scd_mcdj,md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD 2 (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1992, segacd,     0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "Sega CD (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1993, megacd,     segacd,    0,      mega_scd,        md, md_cons_state,     md_eur,    "Sega",   "Mega-CD (Europe, PAL)", GAME_NOT_WORKING )
+CONS( 1991, megacdj,    segacd,    0,      megaj_scd,       md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD (Japan, NTSC)", GAME_NOT_WORKING ) // this bios doesn't work with our ram interleave needed by a few games?!
+CONS( 1991, megacda,    segacd,    0,      megaj_scd,       md, md_cons_state,     md_eur,    "Sega",   "Mega-CD (Asia, PAL)", GAME_NOT_WORKING )
+CONS( 1993, segacd2,    0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "Sega CD 2 (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1993, megacd2,    segacd2,   0,      mega_scd,        md, md_cons_state,     md_eur,    "Sega",   "Mega-CD 2 (Europe, PAL)", GAME_NOT_WORKING )
+CONS( 1993, megacd2j,   segacd2,   0,      megaj_scd,       md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD 2 (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, laseract,   0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Pioneer","LaserActive (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, laseractj,  laseract,  0,      genesis_scd,     md, md_cons_state,     md_jpn,    "Pioneer","LaserActive (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1993, laseractj,  laseract,  0,      megaj_scd,       md, md_cons_state,     md_jpn,    "Pioneer","LaserActive (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1993, xeye,       0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "JVC",    "X'eye (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1992, wmega,      xeye,      0,      genesis_scd,     md, md_cons_state,     md_jpn,    "Sega",   "Wondermega (Japan, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, wmegam2,    xeye,      0,      genesis_scd,     md, md_cons_state,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1992, wmega,      xeye,      0,      megaj_scd,       md, md_cons_state,     md_jpn,    "Sega",   "Wondermega (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1993, wmegam2,    xeye,      0,      megaj_scd,       md, md_cons_state,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", GAME_NOT_WORKING )
 CONS( 1994, cdx,        0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "CDX (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1994, multmega,   cdx,       0,      genesis_scd,     md, md_cons_state,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,     genesis,  "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )
+CONS( 1994, multmega,   cdx,       0,      mega_scd,        md, md_cons_state,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", GAME_NOT_WORKING )
+CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )
 
 // this is a standalone system based on the md-like hardware (same vdp etc.)
 

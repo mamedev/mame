@@ -213,10 +213,13 @@ READ16_MEMBER(md_std_eeprom_device::read)
 {
 	if (offset == 0x200000/2)
 	{
-		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return ~m_i2c_mem & 1;
 	}
-	return m_rom[offset];
+	if (offset < 0x400000/2) 
+		return m_rom[MD_ADDR(offset)]; 
+	else 
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_std_eeprom_device::write)
@@ -234,10 +237,13 @@ READ16_MEMBER(md_eeprom_nbajam_device::read)
 {
 	if (offset == 0x200000/2)
 	{
-		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return m_i2c_mem & 1;
 	}
-	return m_rom[offset];
+	if (offset < 0x400000/2) 
+		return m_rom[MD_ADDR(offset)]; 
+	else 
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_eeprom_nbajam_device::write)
@@ -255,10 +261,13 @@ READ16_MEMBER(md_eeprom_nbajamte_device::read)
 {
 	if (offset == 0x200000/2)
 	{
-		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return m_i2c_mem & 1;
 	}
-	return m_rom[offset];
+	if (offset < 0x400000/2) 
+		return m_rom[MD_ADDR(offset)]; 
+	else 
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_eeprom_nbajamte_device::write)
@@ -277,10 +286,13 @@ READ16_MEMBER(md_eeprom_cslam_device::read)
 {
 	if (offset == 0x200000/2)
 	{
-		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return m_i2c_mem & 1;
 	}
-	return m_rom[offset];
+	if (offset < 0x400000/2) 
+		return m_rom[MD_ADDR(offset)]; 
+	else 
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_eeprom_cslam_device::write)
@@ -299,10 +311,13 @@ READ16_MEMBER(md_eeprom_nflqb_device::read)
 {
 	if (offset == 0x200000/2)
 	{
-		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return m_i2c_mem & 1;
 	}
-	return m_rom[offset];
+	if (offset < 0x400000/2) 
+		return m_rom[MD_ADDR(offset)]; 
+	else 
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_eeprom_nflqb_device::write)
@@ -320,10 +335,13 @@ READ16_MEMBER(md_eeprom_nhlpa_device::read)
 {
 	if (offset == 0x200000/2)
 	{
-		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return (m_i2c_mem & 1) << 7;
 	}
-	return m_rom[offset];
+	if (offset < 0x400000/2) 
+		return m_rom[MD_ADDR(offset)]; 
+	else 
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_eeprom_nhlpa_device::write)
@@ -341,10 +359,13 @@ READ16_MEMBER(md_eeprom_blara_device::read)
 {
 	if (offset == 0x380000/2)
 	{
-		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return (m_i2c_mem & 1) << 7;
 	}
-	return m_rom[offset];
+	if (offset < 0x400000/2) 
+		return m_rom[MD_ADDR(offset)]; 
+	else 
+		return 0xffff;
 }
 
 WRITE16_MEMBER(md_eeprom_blara_device::write)
