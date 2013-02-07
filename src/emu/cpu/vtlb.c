@@ -232,7 +232,6 @@ void vtlb_load(vtlb_state *vtlb, int entrynum, int numpages, offs_t address, vtl
 void vtlb_dynload(vtlb_state *vtlb, int index, offs_t address, vtlb_entry value)
 {
 	vtlb_entry entry = vtlb->table[index];
-	value &= VTLB_FLAGS_MASK;
 
 	if (vtlb->dynamic == 0)
 	{

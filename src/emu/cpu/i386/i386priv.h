@@ -527,11 +527,10 @@ static int i386_translate_address(i386_state *cpustate, int intention, offs_t *a
 				ret = FALSE;
 			else
 			{
-				if(!(page_dir & 0x40) && write)
-				{
-					cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x60);
+				if(write)
 					perm |= VTLB_FLAG_DIRTY;
-				}
+				if(!(page_dir & 0x40) && write)
+					cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x60);
 				else if(!(page_dir & 0x20))
 					cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x20);
 				ret = TRUE;
@@ -557,13 +556,12 @@ static int i386_translate_address(i386_state *cpustate, int intention, offs_t *a
 					ret = FALSE;
 				else
 				{
+					if(write)
+						perm |= VTLB_FLAG_DIRTY;
 					if(!(page_dir & 0x20))
 						cpustate->program->write_dword(pdbr + directory * 4, page_dir | 0x20);
 					if(!(page_entry & 0x40) && write)
-					{
 						cpustate->program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x60);
-						perm |= VTLB_FLAG_DIRTY;
-					}
 					else if(!(page_entry & 0x20))
 						cpustate->program->write_dword((page_dir & 0xfffff000) + (table * 4), page_entry | 0x20);
 					ret = TRUE;
