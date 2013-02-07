@@ -295,11 +295,72 @@ public:
 							INT32 u1, INT32 u2, INT32 slu1, INT32 slu2, INT32 *nu1, INT32 *nu2,
 							INT32 v1, INT32 v2, INT32 slv1, INT32 slv2, INT32 *nv1, INT32 *nv2,
 							INT32 _y1, INT32 y2);
+	void stv_vdp1_setup_shading_for_line(INT32 y, INT32 x1, INT32 x2,
+												INT32 r1, INT32 g1, INT32 b1,
+												INT32 r2, INT32 g2, INT32 b2);
+	void stv_vdp1_setup_shading_for_slope(
+							INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 *nx1, INT32 *nx2,
+							INT32 r1, INT32 r2, INT32 slr1, INT32 slr2, INT32 *nr1, INT32 *nr2,
+							INT32 g1, INT32 g2, INT32 slg1, INT32 slg2, INT32 *ng1, INT32 *ng2,
+							INT32 b1, INT32 b2, INT32 slb1, INT32 slb2, INT32 *nb1, INT32 *nb2,
+							INT32 _y1, INT32 y2);
+	UINT16 stv_vdp1_apply_gouraud_shading( int x, int y, UINT16 pix );
 	void stv_vdp1_setup_shading(const struct spoint* q, const rectangle &cliprect);
 	UINT8 stv_read_gouraud_table( void );
+	void stv_clear_gouraud_shading(void);
+
 	void stv_clear_framebuffer( int which_framebuffer );
 	void stv_vdp1_state_save_postload( void );
 	int stv_vdp1_start ( void );
+
+	struct stv_vdp1_poly_scanline
+	{
+		INT32   x[2];
+		INT32   b[2];
+		INT32   g[2];
+		INT32   r[2];
+		INT32   db;
+		INT32   dg;
+		INT32   dr;
+	};
+
+	struct stv_vdp1_poly_scanline_data
+	{
+		INT32   sy, ey;
+		struct  stv_vdp1_poly_scanline scanline[512];
+	};
+
+	struct stv_vdp1_poly_scanline_data* stv_vdp1_shading_data;
+
+	struct stv_vdp2_sprite_list
+	{
+		int CMDCTRL, CMDLINK, CMDPMOD, CMDCOLR, CMDSRCA, CMDSIZE, CMDGRDA;
+		int CMDXA, CMDYA;
+		int CMDXB, CMDYB;
+		int CMDXC, CMDYC;
+		int CMDXD, CMDYD;
+
+		int ispoly;
+
+	} stv2_current_sprite;
+
+	/* Gouraud shading */
+
+	struct _stv_gouraud_shading
+	{
+		/* Gouraud shading table */
+		UINT16  GA;
+		UINT16  GB;
+		UINT16  GC;
+		UINT16  GD;
+	} stv_gouraud_shading;
+
+	UINT16 m_sprite_colorbank;
+
+	/* VDP1 Framebuffer handling */
+	int      stv_sprite_priorities_used[8];
+	int      stv_sprite_priorities_usage_valid;
+	UINT8    stv_sprite_priorities_in_fb_line[512][8];
 
 
 	/* VDP2 */
@@ -333,8 +394,11 @@ public:
 	void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap, bitmap_rgb32 &roz_bitmap, const rectangle &cliprect, int iRP, int planesizex, int planesizey, int planerenderedsizex, int planerenderedsizey);
 	void stv_vdp2_fill_rotation_parameter_table( UINT8 rot_parameter );
 	UINT8 stv_vdp2_check_vram_cycle_pattern_registers( UINT8 access_command_pnmdr, UINT8 access_command_cpdr, UINT8 bitmap_enable );
-	void stv_vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 is_roz);
+	UINT8 stv_vdp2_is_rotation_applied(void);
+	UINT8 stv_vdp2_are_map_registers_equal(void);
+	void stv_vdp2_get_map_page( int x, int y, int *_map, int *_page );
 
+	void stv_vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 is_roz);
 	void stv_vdp2_fade_effects( void );
 	void stv_vdp2_compute_color_offset( int *r, int *g, int *b, int cor );
 	void stv_vdp2_compute_color_offset_UINT32(UINT32 *rgb, int cor);
@@ -352,6 +416,106 @@ public:
 	void stv_vdp2_state_save_postload( void );
 	void stv_vdp2_exit ( void );
 	int stv_vdp2_start ( void );
+
+	UINT8 m_vdpdebug_roz;
+
+	struct stv_vdp2_tilemap_capabilities
+	{
+		UINT8  enabled;
+		UINT8  transparency;
+		UINT8  colour_calculation_enabled;
+		UINT8  colour_depth;
+		UINT8  alpha;
+		UINT8  tile_size;
+		UINT8  bitmap_enable;
+		UINT8  bitmap_size;
+		UINT8  bitmap_palette_number;
+		UINT8  bitmap_map;
+		UINT16 map_offset[16];
+		UINT8  map_count;
+
+		UINT8  pattern_data_size;
+		UINT8  character_number_supplement;
+		UINT8  special_priority_register;
+		UINT8  special_colour_control_register;
+		UINT8  supplementary_palette_bits;
+		UINT8  supplementary_character_bits;
+
+		INT16 scrollx;
+		INT16 scrolly;
+		UINT32 incx, incy;
+
+		UINT8   linescroll_enable;
+		UINT8   linescroll_interval;
+		UINT32  linescroll_table_address;
+		UINT8   vertical_linescroll_enable;
+		UINT8   linezoom_enable;
+
+		UINT8  plane_size;
+		UINT8  colour_ram_address_offset;
+		UINT8  fade_control;
+		UINT8  window_control;
+
+		UINT8  line_screen_enabled;
+		UINT8  mosaic_screen_enabled;
+
+		int layer_name; /* just to keep track */
+	} stv2_current_tilemap;
+
+	struct rotation_table
+	{
+		INT32   xst;
+		INT32   yst;
+		INT32   zst;
+		INT32   dxst;
+		INT32   dyst;
+		INT32   dx;
+		INT32   dy;
+		INT32   A;
+		INT32   B;
+		INT32   C;
+		INT32   D;
+		INT32   E;
+		INT32   F;
+		INT32   px;
+		INT32   py;
+		INT32   pz;
+		INT32   cx;
+		INT32   cy;
+		INT32   cz;
+		INT32   mx;
+		INT32   my;
+		INT32   kx;
+		INT32   ky;
+		UINT32  kast;
+		INT32   dkast;
+		INT32   dkax;
+
+	} stv_current_rotation_parameter_table;
+
+	struct _stv_vdp2_layer_data_placement
+	{
+		UINT32  map_offset_min;
+		UINT32  map_offset_max;
+		UINT32  tile_offset_min;
+		UINT32  tile_offset_max;
+	} stv_vdp2_layer_data_placement;
+
+	struct _stv_rbg_cache_data
+	{
+		UINT8   watch_vdp2_vram_writes;
+		UINT8   is_cache_dirty;
+
+		UINT32  map_offset_min[2];
+		UINT32  map_offset_max[2];
+		UINT32  tile_offset_min[2];
+		UINT32  tile_offset_max[2];
+
+		struct stv_vdp2_tilemap_capabilities    layer_data[2];
+
+	} stv_rbg_cache_data;
+
+
 };
 
 #define MASTER_CLOCK_352 57272720

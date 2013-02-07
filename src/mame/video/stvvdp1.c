@@ -18,24 +18,6 @@ Framebuffer todo:
 
 #define VDP1_LOG 0
 
-struct stv_vdp1_poly_scanline
-{
-	INT32   x[2];
-	INT32   b[2];
-	INT32   g[2];
-	INT32   r[2];
-	INT32   db;
-	INT32   dg;
-	INT32   dr;
-};
-
-struct stv_vdp1_poly_scanline_data
-{
-	INT32   sy, ey;
-	struct  stv_vdp1_poly_scanline scanline[512];
-};
-
-static struct stv_vdp1_poly_scanline_data* stv_vdp1_shading_data;
 
 enum { FRAC_SHIFT = 16 };
 
@@ -501,30 +483,7 @@ the rest are data used by it
 
 */
 
-static struct stv_vdp2_sprite_list
-{
-	int CMDCTRL, CMDLINK, CMDPMOD, CMDCOLR, CMDSRCA, CMDSIZE, CMDGRDA;
-	int CMDXA, CMDYA;
-	int CMDXB, CMDYB;
-	int CMDXC, CMDYC;
-	int CMDXD, CMDYD;
-
-	int ispoly;
-
-} stv2_current_sprite;
-
-/* Gouraud shading */
-
-static struct _stv_gouraud_shading
-{
-	/* Gouraud shading table */
-	UINT16  GA;
-	UINT16  GB;
-	UINT16  GC;
-	UINT16  GD;
-} stv_gouraud_shading;
-
-static void stv_clear_gouraud_shading(void)
+void saturn_state::stv_clear_gouraud_shading(void)
 {
 	memset( &stv_gouraud_shading, 0, sizeof( stv_gouraud_shading ) );
 }
@@ -559,7 +518,7 @@ INLINE INT32 _shading( INT32 color, INT32 correction )
 	return color;
 }
 
-static UINT16 stv_vdp1_apply_gouraud_shading( int x, int y, UINT16 pix )
+UINT16 saturn_state::stv_vdp1_apply_gouraud_shading( int x, int y, UINT16 pix )
 {
 	INT32 r,g,b, msb;
 
@@ -589,7 +548,7 @@ static UINT16 stv_vdp1_apply_gouraud_shading( int x, int y, UINT16 pix )
 	return msb | b << 10 | g << 5 | r;
 }
 
-static void stv_vdp1_setup_shading_for_line(INT32 y, INT32 x1, INT32 x2,
+void saturn_state::stv_vdp1_setup_shading_for_line(INT32 y, INT32 x1, INT32 x2,
 											INT32 r1, INT32 g1, INT32 b1,
 											INT32 r2, INT32 g2, INT32 b2)
 {
@@ -643,7 +602,7 @@ static void stv_vdp1_setup_shading_for_line(INT32 y, INT32 x1, INT32 x2,
 	}
 }
 
-static void stv_vdp1_setup_shading_for_slope(
+void saturn_state::stv_vdp1_setup_shading_for_slope(
 							INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 *nx1, INT32 *nx2,
 							INT32 r1, INT32 r2, INT32 slr1, INT32 slr2, INT32 *nr1, INT32 *nr2,
 							INT32 g1, INT32 g2, INT32 slg1, INT32 slg2, INT32 *ng1, INT32 *ng2,
@@ -866,9 +825,6 @@ to the framebuffer we CAN'T frameskip the vdp1 drawing as the hardware can READ 
 and if we skip the drawing the content could be incorrect when it reads it, although i have no idea
 why they would want to */
 
-static UINT8* gfxdata;
-static UINT16 sprite_colorbank;
-
 
 static void (*drawpixel)(running_machine &machine, int x, int y, int patterndata, int offsetcnt);
 
@@ -880,7 +836,7 @@ static void drawpixel_poly(running_machine &machine, int x, int y, int patternda
 	if(x >= 1024 || y >= 512)
 		return;
 
-	state->m_vdp1.framebuffer_draw_lines[y][x] = stv2_current_sprite.CMDCOLR;
+	state->m_vdp1.framebuffer_draw_lines[y][x] = state->stv2_current_sprite.CMDCOLR;
 }
 
 static void drawpixel_8bpp_trans(running_machine &machine, int x, int y, int patterndata, int offsetcnt)
@@ -888,10 +844,10 @@ static void drawpixel_8bpp_trans(running_machine &machine, int x, int y, int pat
 	saturn_state *state = machine.driver_data<saturn_state>();
 	UINT16 pix;
 
-	pix = gfxdata[patterndata+offsetcnt];
+	pix = state->m_vdp1.gfx_decode[patterndata+offsetcnt];
 	if ( pix & 0xff )
 	{
-		state->m_vdp1.framebuffer_draw_lines[y][x] = pix | sprite_colorbank;
+		state->m_vdp1.framebuffer_draw_lines[y][x] = pix | state->m_sprite_colorbank;
 	}
 }
 
@@ -900,9 +856,9 @@ static void drawpixel_4bpp_notrans(running_machine &machine, int x, int y, int p
 	saturn_state *state = machine.driver_data<saturn_state>();
 	UINT16 pix;
 
-	pix = gfxdata[patterndata+offsetcnt/2];
+	pix = state->m_vdp1.gfx_decode[patterndata+offsetcnt/2];
 	pix = offsetcnt&1 ? (pix & 0x0f):((pix & 0xf0)>>4) ;
-	state->m_vdp1.framebuffer_draw_lines[y][x] = pix | sprite_colorbank;
+	state->m_vdp1.framebuffer_draw_lines[y][x] = pix | state->m_sprite_colorbank;
 }
 
 static void drawpixel_4bpp_trans(running_machine &machine, int x, int y, int patterndata, int offsetcnt)
@@ -910,17 +866,17 @@ static void drawpixel_4bpp_trans(running_machine &machine, int x, int y, int pat
 	saturn_state *state = machine.driver_data<saturn_state>();
 	UINT16 pix;
 
-	pix = gfxdata[patterndata+offsetcnt/2];
+	pix = state->m_vdp1.gfx_decode[patterndata+offsetcnt/2];
 	pix = offsetcnt&1 ? (pix & 0x0f):((pix & 0xf0)>>4) ;
 	if ( pix )
-		state->m_vdp1.framebuffer_draw_lines[y][x] = pix | sprite_colorbank;
+		state->m_vdp1.framebuffer_draw_lines[y][x] = pix | state->m_sprite_colorbank;
 }
 
 static void drawpixel_generic(running_machine &machine, int x, int y, int patterndata, int offsetcnt)
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
-	int pix,mode,transmask, spd = stv2_current_sprite.CMDPMOD & 0x40;
-	int mesh = stv2_current_sprite.CMDPMOD & 0x100;
+	int pix,mode,transmask, spd = state->stv2_current_sprite.CMDPMOD & 0x40;
+	int mesh = state->stv2_current_sprite.CMDPMOD & 0x100;
 	int pix2;
 
 	if ( mesh && !((x ^ y) & 1) )
@@ -928,9 +884,9 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 		return;
 	}
 
-	if ( stv2_current_sprite.ispoly )
+	if ( state->stv2_current_sprite.ispoly )
 	{
-		pix = stv2_current_sprite.CMDCOLR&0xffff;
+		pix = state->stv2_current_sprite.CMDCOLR&0xffff;
 
 		transmask = 0xffff;
 		if ( pix & 0x8000 )
@@ -944,23 +900,23 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 	}
 	else
 	{
-		switch (stv2_current_sprite.CMDPMOD&0x0038)
+		switch (state->stv2_current_sprite.CMDPMOD&0x0038)
 		{
 			case 0x0000: // mode 0 16 colour bank mode (4bits) (hanagumi blocks)
 				// most of the shienryu sprites use this mode
-				pix = gfxdata[(patterndata+offsetcnt/2) & 0xfffff];
+				pix = state->m_vdp1.gfx_decode[(patterndata+offsetcnt/2) & 0xfffff];
 				pix = offsetcnt&1 ? (pix & 0x0f):((pix & 0xf0)>>4) ;
-				pix = pix+((stv2_current_sprite.CMDCOLR&0xfff0));
+				pix = pix+((state->stv2_current_sprite.CMDCOLR&0xfff0));
 				mode = 0;
 				transmask = 0xf;
 				break;
 			case 0x0008: // mode 1 16 colour lookup table mode (4bits)
 				// shienryu explosisons (and some enemies) use this mode
-				pix2 = gfxdata[(patterndata+offsetcnt/2) & 0xfffff];
+				pix2 = state->m_vdp1.gfx_decode[(patterndata+offsetcnt/2) & 0xfffff];
 				pix2 = offsetcnt&1 ?  (pix2 & 0x0f):((pix2 & 0xf0)>>4);
 				pix = pix2&1 ?
-				((((state->m_vdp1_vram[(((stv2_current_sprite.CMDCOLR&0xffff)*8)>>2)+((pix2&0xfffe)/2)])) & 0x0000ffff) >> 0):
-				((((state->m_vdp1_vram[(((stv2_current_sprite.CMDCOLR&0xffff)*8)>>2)+((pix2&0xfffe)/2)])) & 0xffff0000) >> 16);
+				((((state->m_vdp1_vram[(((state->stv2_current_sprite.CMDCOLR&0xffff)*8)>>2)+((pix2&0xfffe)/2)])) & 0x0000ffff) >> 0):
+				((((state->m_vdp1_vram[(((state->stv2_current_sprite.CMDCOLR&0xffff)*8)>>2)+((pix2&0xfffe)/2)])) & 0xffff0000) >> 16);
 
 				mode = 5;
 				transmask = 0xffff;
@@ -978,25 +934,25 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 				}
 				break;
 			case 0x0010: // mode 2 64 colour bank mode (8bits) (character select portraits on hanagumi)
-				pix = gfxdata[(patterndata+offsetcnt) & 0xfffff];
+				pix = state->m_vdp1.gfx_decode[(patterndata+offsetcnt) & 0xfffff];
 				mode = 2;
-				pix = pix+(stv2_current_sprite.CMDCOLR&0xffc0);
+				pix = pix+(state->stv2_current_sprite.CMDCOLR&0xffc0);
 				transmask = 0x3f;
 				break;
 			case 0x0018: // mode 3 128 colour bank mode (8bits) (little characters on hanagumi use this mode)
-				pix = gfxdata[(patterndata+offsetcnt) & 0xfffff];
-				pix = pix+(stv2_current_sprite.CMDCOLR&0xff80);
+				pix = state->m_vdp1.gfx_decode[(patterndata+offsetcnt) & 0xfffff];
+				pix = pix+(state->stv2_current_sprite.CMDCOLR&0xff80);
 				transmask = 0x7f;
 				mode = 3;
 				break;
 			case 0x0020: // mode 4 256 colour bank mode (8bits) (hanagumi title)
-				pix = gfxdata[(patterndata+offsetcnt) & 0xfffff];
-				pix = pix+(stv2_current_sprite.CMDCOLR&0xff00);
+				pix = state->m_vdp1.gfx_decode[(patterndata+offsetcnt) & 0xfffff];
+				pix = pix+(state->stv2_current_sprite.CMDCOLR&0xff00);
 				transmask = 0xff;
 				mode = 4;
 				break;
 			case 0x0028: // mode 5 32,768 colour RGB mode (16bits)
-				pix = gfxdata[(patterndata+offsetcnt*2+1) & 0xfffff] | (gfxdata[(patterndata+offsetcnt*2) & 0xfffff]<<8) ;
+				pix = state->m_vdp1.gfx_decode[(patterndata+offsetcnt*2+1) & 0xfffff] | (state->m_vdp1.gfx_decode[(patterndata+offsetcnt*2) & 0xfffff]<<8) ;
 				mode = 5;
 				transmask = -1; /* TODO: check me */
 				break;
@@ -1009,7 +965,7 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 
 
 		// preliminary end code disable support
-		if ( ((stv2_current_sprite.CMDPMOD & 0x80) == 0) &&
+		if ( ((state->stv2_current_sprite.CMDPMOD & 0x80) == 0) &&
 			((pix & transmask) == transmask) )
 		{
 			return;
@@ -1017,7 +973,7 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 	}
 
 	/* MSBON */
-	pix |= stv2_current_sprite.CMDPMOD & 0x8000;
+	pix |= state->stv2_current_sprite.CMDPMOD & 0x8000;
 	if ( mode != 5 )
 	{
 		if ( (pix & transmask) || spd )
@@ -1029,7 +985,7 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 	{
 		if ( (pix & transmask) || spd )
 		{
-			switch( stv2_current_sprite.CMDPMOD & 0x7 )
+			switch( state->stv2_current_sprite.CMDPMOD & 0x7 )
 			{
 				case 0: /* replace */
 					state->m_vdp1.framebuffer_draw_lines[y][x] = pix;
@@ -1054,7 +1010,7 @@ static void drawpixel_generic(running_machine &machine, int x, int y, int patter
 					}
 					break;
 				case 4: /* Gouraud shading */
-					state->m_vdp1.framebuffer_draw_lines[y][x] = stv_vdp1_apply_gouraud_shading( x, y, pix );
+					state->m_vdp1.framebuffer_draw_lines[y][x] = state->stv_vdp1_apply_gouraud_shading( x, y, pix );
 					break;
 				default:
 					state->m_vdp1.framebuffer_draw_lines[y][x] = pix;
@@ -1073,8 +1029,6 @@ void saturn_state::stv_vdp1_set_drawpixel( void )
 	int mesh = stv2_current_sprite.CMDPMOD & 0x100;
 	int ecd = stv2_current_sprite.CMDPMOD & 0x80;
 
-	gfxdata = m_vdp1.gfx_decode;
-
 	if ( mesh || !ecd || ((stv2_current_sprite.CMDPMOD & 0x7) != 0) )
 	{
 		drawpixel = drawpixel_generic;
@@ -1087,17 +1041,17 @@ void saturn_state::stv_vdp1_set_drawpixel( void )
 	}
 	else if ( (sprite_mode == 0x20) && !spd )
 	{
-		sprite_colorbank = (stv2_current_sprite.CMDCOLR&0xff00);
+		m_sprite_colorbank = (stv2_current_sprite.CMDCOLR&0xff00);
 		drawpixel = drawpixel_8bpp_trans;
 	}
 	else if ((sprite_mode == 0x00) && spd)
 	{
-		sprite_colorbank = (stv2_current_sprite.CMDCOLR&0xfff0);
+		m_sprite_colorbank = (stv2_current_sprite.CMDCOLR&0xfff0);
 		drawpixel = drawpixel_4bpp_notrans;
 	}
 	else if (sprite_mode == 0x00 && !spd )
 	{
-		sprite_colorbank = (stv2_current_sprite.CMDCOLR&0xfff0);
+		m_sprite_colorbank = (stv2_current_sprite.CMDCOLR&0xfff0);
 		drawpixel = drawpixel_4bpp_trans;
 	}
 	else

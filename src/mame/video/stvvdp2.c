@@ -2081,116 +2081,10 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 	#define STV_VDP2_COBB (m_vdp2_regs[0x11e/2])
 
-/*For Debug purposes only*/
-static struct stv_vdp2_debugging
-{
-	UINT8 l_en;  /*For Layer enable/disable*/
-	UINT8 win;   /*Enters into Window effect debug menu*/
-	UINT32 error; /*bits for VDP2 error logging*/
-	UINT8 roz;   /*Debug roz on screen*/
-} vdpdebug;
-
-/* Not sure if to use this for the rotating tilemaps as well or just use different draw functions, might add too much bloat */
-static struct stv_vdp2_tilemap_capabilities
-{
-	UINT8  enabled;
-	UINT8  transparency;
-	UINT8  colour_calculation_enabled;
-	UINT8  colour_depth;
-	UINT8  alpha;
-	UINT8  tile_size;
-	UINT8  bitmap_enable;
-	UINT8  bitmap_size;
-	UINT8  bitmap_palette_number;
-	UINT8  bitmap_map;
-	UINT16 map_offset[16];
-	UINT8  map_count;
-
-	UINT8  pattern_data_size;
-	UINT8  character_number_supplement;
-	UINT8  special_priority_register;
-	UINT8  special_colour_control_register;
-	UINT8  supplementary_palette_bits;
-	UINT8  supplementary_character_bits;
-
-	INT16 scrollx;
-	INT16 scrolly;
-	UINT32 incx, incy;
-
-	UINT8   linescroll_enable;
-	UINT8   linescroll_interval;
-	UINT32  linescroll_table_address;
-	UINT8   vertical_linescroll_enable;
-	UINT8   linezoom_enable;
-
-	UINT8  plane_size;
-	UINT8  colour_ram_address_offset;
-	UINT8  fade_control;
-	UINT8  window_control;
-
-	UINT8  line_screen_enabled;
-	UINT8  mosaic_screen_enabled;
-
-//  UINT8  real_map_offset[16];
-
-	int layer_name; /* just to keep track */
-} stv2_current_tilemap;
 
 #define STV_VDP2_RBG_ROTATION_PARAMETER_A   1
 #define STV_VDP2_RBG_ROTATION_PARAMETER_B   2
 
-static struct rotation_table
-{
-	INT32   xst;
-	INT32   yst;
-	INT32   zst;
-	INT32   dxst;
-	INT32   dyst;
-	INT32   dx;
-	INT32   dy;
-	INT32   A;
-	INT32   B;
-	INT32   C;
-	INT32   D;
-	INT32   E;
-	INT32   F;
-	INT32   px;
-	INT32   py;
-	INT32   pz;
-	INT32   cx;
-	INT32   cy;
-	INT32   cz;
-	INT32   mx;
-	INT32   my;
-	INT32   kx;
-	INT32   ky;
-	UINT32  kast;
-	INT32   dkast;
-	INT32   dkax;
-
-} stv_current_rotation_parameter_table;
-
-static struct _stv_vdp2_layer_data_placement
-{
-	UINT32  map_offset_min;
-	UINT32  map_offset_max;
-	UINT32  tile_offset_min;
-	UINT32  tile_offset_max;
-} stv_vdp2_layer_data_placement;
-
-static struct _stv_rbg_cache_data
-{
-	UINT8   watch_vdp2_vram_writes;
-	UINT8   is_cache_dirty;
-
-	UINT32  map_offset_min[2];
-	UINT32  map_offset_max[2];
-	UINT32  tile_offset_min[2];
-	UINT32  tile_offset_max[2];
-
-	struct stv_vdp2_tilemap_capabilities    layer_data[2];
-
-} stv_rbg_cache_data;
 
 #define mul_fixed32( a, b ) mul_32x32_shift( a, b, 16 )
 
@@ -2251,18 +2145,19 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( UINT8 rot_parameter )
 	if(LOG_ROZ == 1) logerror( "kast = %x, dkast = %x, dkax = %x\n", RP.kast, RP.dkast, RP.dkax );
 
 	/*Attempt to show on screen the rotation table*/
+	#if 0
 	if(LOG_ROZ == 2)
 	{
 		if(machine().input().code_pressed_once(JOYCODE_Y_UP_SWITCH))
-			vdpdebug.roz++;
+			m_vdpdebug_roz++;
 
 		if(machine().input().code_pressed_once(JOYCODE_Y_DOWN_SWITCH))
-			vdpdebug.roz--;
+			m_vdpdebug_roz--;
 
-		if(vdpdebug.roz > 10)
-			vdpdebug.roz = 10;
+		if(m_vdpdebug_roz > 10)
+			m_vdpdebug_roz = 10;
 
-		switch(vdpdebug.roz)
+		switch(m_vdpdebug_roz)
 		{
 			case 0: popmessage( "Rotation parameter Table (%d)", rot_parameter ); break;
 			case 1: popmessage( "xst = %x, yst = %x, zst = %x", RP.xst, RP.yst, RP.zst ); break;
@@ -2277,10 +2172,11 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( UINT8 rot_parameter )
 			case 10: break;
 		}
 	}
+	#endif
 }
 
 /* check if RGB layer has rotation applied */
-static UINT8 stv_vdp2_is_rotation_applied(void)
+UINT8 saturn_state::stv_vdp2_is_rotation_applied(void)
 {
 #define _FIXED_1    (0x00010000)
 #define _FIXED_0    (0x00000000)
@@ -2306,7 +2202,7 @@ static UINT8 stv_vdp2_is_rotation_applied(void)
 	}
 }
 
-static UINT8 stv_vdp2_are_map_registers_equal(void)
+UINT8 saturn_state::stv_vdp2_are_map_registers_equal(void)
 {
 	int i;
 
@@ -3522,7 +3418,7 @@ map is always enabled?
 
 */
 
-static void stv_vdp2_get_map_page( int x, int y, int *_map, int *_page )
+void saturn_state::stv_vdp2_get_map_page( int x, int y, int *_map, int *_page )
 {
 	int page = 0;
 	int map = 0;
@@ -6004,9 +5900,7 @@ VIDEO_START_MEMBER(saturn_state,stv_vdp2)
 	machine().primary_screen->register_screen_bitmap(m_tmpbitmap);
 	stv_vdp2_start();
 	stv_vdp1_start();
-	vdpdebug.l_en = 0xff;
-	vdpdebug.error = 0xffffffff;
-	vdpdebug.roz = 0;
+	m_vdpdebug_roz = 0;
 	machine().gfx[0]->set_source(m_vdp2.gfx_decode);
 	machine().gfx[1]->set_source(m_vdp2.gfx_decode);
 	machine().gfx[2]->set_source(m_vdp2.gfx_decode);
@@ -6311,11 +6205,6 @@ int saturn_state::stv_vdp2_apply_window_on_layer(rectangle &cliprect)
 		return 0;
 	}
 }
-
-/* VDP1 Framebuffer handling */
-static int      stv_sprite_priorities_used[8];
-static int      stv_sprite_priorities_usage_valid;
-static UINT8    stv_sprite_priorities_in_fb_line[512][8];
 
 void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 pri)
 {
