@@ -9,7 +9,6 @@
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
-#include "machine/ram.h"
 #include "includes/pecom.h"
 
 TIMER_CALLBACK_MEMBER(pecom_state::reset_tick)
@@ -19,13 +18,24 @@ TIMER_CALLBACK_MEMBER(pecom_state::reset_tick)
 
 void pecom_state::machine_start()
 {
+	static const char *const keynames[] = {
+		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
+		"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15", "LINE16",
+		"LINE17", "LINE18", "LINE19", "LINE20", "LINE21", "LINE22", "LINE23", "LINE24","LINE25"
+	};
+
+	for ( int i = 0; i < 26; i++ )
+	{
+		m_io_ports[i] = ioport(keynames[i]);
+	}
+
 	m_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pecom_state::reset_tick),this));
 }
 
 void pecom_state::machine_reset()
 {
-	UINT8 *rom = machine().root_device().memregion(CDP1802_TAG)->base();
-	address_space &space = machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	UINT8 *rom = memregion(CDP1802_TAG)->base();
+	address_space &space = m_cdp1802->space(AS_PROGRAM);
 
 
 	space.unmap_write(0x0000, 0x3fff);
@@ -34,10 +44,10 @@ void pecom_state::machine_reset()
 	space.unmap_write(0xf800, 0xffff);
 	space.install_read_bank (0xf000, 0xf7ff, "bank3");
 	space.install_read_bank (0xf800, 0xffff, "bank4");
-	membank("bank1")->set_base(rom + 0x8000);
-	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x4000);
-	membank("bank3")->set_base(rom + 0xf000);
-	membank("bank4")->set_base(rom + 0xf800);
+	m_bank1->set_base(rom + 0x8000);
+	m_bank2->set_base(m_ram->pointer() + 0x4000);
+	m_bank3->set_base(rom + 0xf000);
+	m_bank4->set_base(rom + 0xf800);
 
 	m_reset = 0;
 	m_dma = 0;
@@ -66,10 +76,10 @@ WRITE8_MEMBER(pecom_state::pecom_cdp1869_pageram_w)
 
 WRITE8_MEMBER(pecom_state::pecom_bank_w)
 {
-	address_space &space2 = machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	address_space &space2 = m_cdp1802->space(AS_PROGRAM);
 	UINT8 *rom = memregion(CDP1802_TAG)->base();
-	machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM).install_write_bank(0x0000, 0x3fff, "bank1");
-	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x0000);
+	m_cdp1802->space(AS_PROGRAM).install_write_bank(0x0000, 0x3fff, "bank1");
+	m_bank1->set_base(m_ram->pointer() + 0x0000);
 
 	if (data==2)
 	{
@@ -84,28 +94,23 @@ WRITE8_MEMBER(pecom_state::pecom_bank_w)
 		space2.unmap_write(0xf800, 0xffff);
 		space2.install_read_bank (0xf000, 0xf7ff, "bank3");
 		space2.install_read_bank (0xf800, 0xffff, "bank4");
-		membank("bank3")->set_base(rom + 0xf000);
-		membank("bank4")->set_base(rom + 0xf800);
+		m_bank3->set_base(rom + 0xf000);
+		m_bank4->set_base(rom + 0xf800);
 	}
 }
 
 READ8_MEMBER(pecom_state::pecom_keyboard_r)
 {
-	static const char *const keynames[] = {
-		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7",
-		"LINE8", "LINE9", "LINE10", "LINE11", "LINE12", "LINE13", "LINE14", "LINE15", "LINE16",
-		"LINE17", "LINE18", "LINE19", "LINE20", "LINE21", "LINE22", "LINE23", "LINE24","LINE25"
-	};
 	/*
 	   INP command BUS -> M(R(X)) BUS -> D
 	   so on each input, address is also set, 8 lower bits are used as input for keyboard
 	   Address is available on address bus during reading of value from port, and that is
 	   used to determine keyboard line reading
 	*/
-	UINT16 addr = machine().device(CDP1802_TAG)->state().state_int(COSMAC_R0 + machine().device(CDP1802_TAG)->state().state_int(COSMAC_X));
+	UINT16 addr = m_cdp1802->state_int(COSMAC_R0 + m_cdp1802->state_int(COSMAC_X));
 	/* just in case somone is reading non existing ports */
 	if (addr<0x7cca || addr>0x7ce3) return 0;
-	return ioport(keynames[addr - 0x7cca])->read() & 0x03;
+	return m_io_ports[addr - 0x7cca]->read() & 0x03;
 }
 
 /* CDP1802 Interface */
@@ -117,9 +122,8 @@ READ_LINE_MEMBER(pecom_state::clear_r)
 
 READ_LINE_MEMBER(pecom_state::ef2_r)
 {
-	device_t *device = machine().device(CASSETTE_TAG);
-	int shift = BIT(machine().root_device().ioport("CNT")->read(), 1);
-	double cas = dynamic_cast<cassette_image_device *>(device)->input();
+	int shift = BIT(m_io_cnt->read(), 1);
+	double cas = m_cassette->input();
 
 	return (cas > 0.0) | shift;
 }
@@ -148,8 +152,7 @@ static COSMAC_EF_READ( pecom64_ef_r )
 */
 WRITE_LINE_MEMBER(pecom_state::pecom64_q_w)
 {
-	device_t *device = machine().device(CASSETTE_TAG);
-	dynamic_cast<cassette_image_device *>(device)->output(state ? -1.0 : +1.0);
+	m_cassette->output(state ? -1.0 : +1.0);
 }
 
 static COSMAC_SC_WRITE( pecom64_sc_w )
