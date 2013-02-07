@@ -352,7 +352,7 @@ WRITE8_MEMBER(gb_state::gb_io2_w)
 	{
 		/* disable BIOS ROM */
 		m_bios_disable = TRUE;
-		printf("here again?\n");
+		//printf("here again?\n");
 	}
 	else
 		gb_video_w(space, offset, data);
