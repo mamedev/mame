@@ -1059,7 +1059,7 @@ void cli_frontend::verifysamples(const char *gamename)
 	}
 }
 #define SOFTLIST_XML_BEGIN "<?xml version=\"1.0\"?>\n" \
-				"<!DOCTYPE softwarelist [\n" \
+				"<!DOCTYPE softwarelists [\n" \
 				"<!ELEMENT softwarelists (softwarelist*)>\n" \
 				"\t<!ELEMENT softwarelist (software+)>\n" \
 				"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n" \
