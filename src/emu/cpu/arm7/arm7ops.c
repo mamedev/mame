@@ -1661,6 +1661,7 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		// write back the result
 		SET_REGISTER(cpustart, (insn>>12)&0xf, (UINT32)dst);
 		SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)(dst >> 32));
+		R15 += 4;
 	}
 	else if ((insn & 0x0ff00090) == 0x01600080) // SMULxy - v5
 	{
@@ -1673,30 +1674,27 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		{
 			src1 >>= 16;
 		}
-		else
+
+		src1 &= 0xffff;
+		if (src1 & 0x8000)
 		{
-			src1 &= 0xffff;
-			if (src1 & 0x8000)
-			{
-				src1 |= 0xffff;
-			}
+			src1 |= 0xffff0000;
 		}
 
 		if (insn & 0x40)
 		{
 			src2 >>= 16;
 		}
-		else
+
+		src2 &= 0xffff;
+		if (src2 & 0x8000)
 		{
-			src2 &= 0xffff;
-			if (src2 & 0x8000)
-			{
-				src2 |= 0xffff;
-			}
+			src2 |= 0xffff0000;
 		}
 
 		res = src1 * src2;
 		SET_REGISTER(cpustart, (insn>>16)&0xf, res);
+		R15 += 4;
 	}
 	else if ((insn & 0x0ff000b0) == 0x012000a0) // SMULWy - v5
 	{
@@ -1708,18 +1706,17 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		{
 			src2 >>= 16;
 		}
-		else
+
+		src2 &= 0xffff;
+		if (src2 & 0x8000)
 		{
-			src2 &= 0xffff;
-			if (src2 & 0x8000)
-			{
-				src2 |= 0xffff;
-			}
+			src2 |= 0xffff0000;
 		}
 
 		res = (INT64)src1 * (INT64)src2;
 		res >>= 16;
 		SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)res);
+		R15 += 4;
 	}
 	else if ((insn & 0x0ff000b0) == 0x01200080) // SMLAWy - v5
 	{
@@ -1732,13 +1729,11 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		{
 			src2 >>= 16;
 		}
-		else
+
+		src2 &= 0xffff;
+		if (src2 & 0x8000)
 		{
-			src2 &= 0xffff;
-			if (src2 & 0x8000)
-			{
-				src2 |= 0xffff;
-			}
+			src2 |= 0xffff0000;
 		}
 
 		res = (INT64)src1 * (INT64)src2;
@@ -1752,6 +1747,7 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 
 		// write the result back
 		SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)res);
+		R15 += 4;
 	}
 	else
 	/* Multiply OR Swap OR Half Word Data Transfer */

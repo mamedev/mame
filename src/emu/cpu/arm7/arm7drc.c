@@ -2421,34 +2421,19 @@ const bool drcarm7ops_0123(arm_state *arm, drcuml_block *block, compiler_state *
 		UINT32 rdh = (insn>>16)&0xf;
 		UINT32 rdl = (insn>>12)&0xf;
 
-		UML_MOV(block, I0, DRC_REG(rm));
-		UML_MOV(block, I1, DRC_REG(rn));
-
-		// select top and bottom halves of src1/src2 and sign extend if necessary
-		if (insn & 0x20)
-		{
-			UML_SHR(block, I0, I0, 16);
-		}
-		UML_SEXT(block, I0, I0, SIZE_WORD);
-
-		if (insn & 0x40)
-		{
-			UML_SHR(block, I1, I1, 16);
-		}
-		UML_SEXT(block, I0, I0, SIZE_WORD);
-
+		UML_DSEXT(block, I0, DRC_REG(rm), SIZE_DWORD);
+		UML_DSEXT(block, I1, DRC_REG(rn), SIZE_DWORD);
 		// do the signed multiply
-		UML_MULS(block, I0, I1, I0, I1);
+		UML_DMULS(block, I2, I3, I0, I1);
 
-		dst = (INT64)GET_REGISTER(arm, (insn>>12)&0xf);
-		dst |= (INT64)GET_REGISTER(arm, (insn>>16)&0xf)<<32;
-
-		// do the multiply and accumulate
-		dst += (INT64)src1 * (INT64)src2;
-
-		// write back the result
-		SET_REGISTER(cpustart, (insn>>12)&0xf, (UINT32)(dst&0xffffffff));
-		SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)(dst>>32));
+		UML_MOV(block, I0, DRC_REG(rdh));
+		UML_MOV(block, I1, DRC_REG(rdl));
+		UML_DSHL(block, I0, I0, 32);
+		UML_DOR(block, I0, I0, I1);
+		UML_DADD(block, I0, I0, I2);
+		UML_MOV(block, DRC_REG(rdl), I0);
+		UML_DSHR(block, I0, I0, 32);
+		UML_MOV(block, DRC_REG(rdh), I0);
 	}
 	else if ((insn & 0x0ff00090) == 0x01600080) // SMULxy - v5
 	{
@@ -2461,30 +2446,27 @@ const bool drcarm7ops_0123(arm_state *arm, drcuml_block *block, compiler_state *
 		{
 			src1 >>= 16;
 		}
-		else
+
+		src1 &= 0xffff;
+		if (src1 & 0x8000)
 		{
-			src1 &= 0xffff;
-			if (src1 & 0x8000)
-			{
-				src1 |= 0xffff;
-			}
+			src1 |= 0xffff0000;
 		}
 
 		if (insn & 0x40)
 		{
 			src2 >>= 16;
 		}
-		else
+
+		src2 &= 0xffff;
+		if (src2 & 0x8000)
 		{
-			src2 &= 0xffff;
-			if (src2 & 0x8000)
-			{
-				src2 |= 0xffff;
-			}
+			src2 |= 0xffff0000;
 		}
 
 		res = src1 * src2;
 		SET_REGISTER(cpustart, (insn>>16)&0xf, res);
+		R15 += 4;
 	}
 	else if ((insn & 0x0ff000b0) == 0x012000a0) // SMULWy - v5
 	{
