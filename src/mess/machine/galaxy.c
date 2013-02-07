@@ -10,8 +10,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/galaxy.h"
-#include "imagedev/cassette.h"
-#include "machine/ram.h"
 
 /***************************************************************************
   I/O devices
@@ -19,16 +17,14 @@
 
 READ8_MEMBER(galaxy_state::galaxy_keyboard_r)
 {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
-
 	if (offset == 0)
 	{
-		double level = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+		double level = m_cassette->input();
 		return (level >  0) ? 0xfe : 0xff;
 	}
 	else
 	{
-		return ioport(keynames[(offset>>3) & 0x07])->read() & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
+		return m_io_ports[(offset>>3) & 0x07]->read() & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
 	}
 }
 
@@ -36,7 +32,7 @@ WRITE8_MEMBER(galaxy_state::galaxy_latch_w)
 {
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
 	m_latch_value = data;
-	machine().device<cassette_image_device>(CASSETTE_TAG)->output(val);
+	m_cassette->output(val);
 }
 
 
@@ -155,13 +151,20 @@ SNAPSHOT_LOAD( galaxy )
 
 DRIVER_INIT_MEMBER(galaxy_state,galaxy)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	space.install_readwrite_bank( 0x2800, 0x2800 + machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
-	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_readwrite_bank( 0x2800, 0x2800 + m_ram->size() - 1, "bank1");
+	membank("bank1")->set_base(m_ram->pointer());
 
 	if (machine().device<ram_device>(RAM_TAG)->size() < (6 + 48) * 1024)
 	{
 		space.nop_readwrite( 0x2800 + machine().device<ram_device>(RAM_TAG)->size(), 0xffff);
+	}
+
+	for ( int i = 0; i < 8; i++ )
+	{
+		m_io_ports[i] = ioport( keynames[i] );
 	}
 }
 
@@ -171,20 +174,20 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxy)
 
 MACHINE_RESET_MEMBER(galaxy_state,galaxy)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	/* ROM 2 enable/disable */
-	if (machine().root_device().ioport("ROM2")->read()) {
+	if (ioport("ROM2")->read()) {
 		space.install_read_bank(0x1000, 0x1fff, "bank10");
 	} else {
 		space.nop_read(0x1000, 0x1fff);
 	}
 	space.nop_write(0x1000, 0x1fff);
 
-	if (machine().root_device().ioport("ROM2")->read())
-		membank("bank10")->set_base(machine().root_device().memregion("maincpu")->base() + 0x1000);
+	if (ioport("ROM2")->read())
+		membank("bank10")->set_base(memregion("maincpu")->base() + 0x1000);
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(galaxy_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(galaxy_irq_callback);
 	m_interrupts_enabled = TRUE;
 }
 
@@ -195,10 +198,10 @@ DRIVER_INIT_MEMBER(galaxy_state,galaxyp)
 
 MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *ROM = memregion("maincpu")->base();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(galaxy_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(galaxy_irq_callback);
 
 	ROM[0x0037] = 0x29;
 	ROM[0x03f9] = 0xcd;

@@ -8,13 +8,19 @@
 #define GALAXY_H_
 
 #include "imagedev/snapquik.h"
+#include "imagedev/cassette.h"
+#include "machine/ram.h"
 
 
 class galaxy_state : public driver_device
 {
 public:
 	galaxy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_cassette(*this, CASSETTE_TAG)
+		, m_ram(*this, RAM_TAG)
+	{ }
 
 	int m_interrupts_enabled;
 	UINT8 m_latch_value;
@@ -34,6 +40,12 @@ public:
 	UINT32 screen_update_galaxy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxy_interrupt);
 	TIMER_CALLBACK_MEMBER(gal_video);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
+	ioport_port *m_io_ports[8];
 };
 
 
