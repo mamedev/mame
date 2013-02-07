@@ -1575,7 +1575,7 @@ static INPUT_PORTS_START( myfairld )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IO_TYPE")
-	PORT_CONFNAME( 0x01, 0x00, "I/O Device type" )
+	PORT_CONFNAME( 0x01, 0x01, "I/O Device type" )
 	PORT_CONFSETTING(    0x00, "Mahjong Panel" )
 	PORT_CONFSETTING(    0x01, "Joystick" )
 INPUT_PORTS_END
