@@ -786,12 +786,12 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16_LEGACY("scsp", scsp_r, scsp_w, 0xffffffff)
 	/* VDP1 */
-	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE_LEGACY(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
-	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE_LEGACY(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
-	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16_LEGACY(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
-	AM_RANGE(0x05e00000, 0x05e7ffff) AM_MIRROR(0x80000) AM_READWRITE_LEGACY(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
-	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE_LEGACY(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
-	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16_LEGACY(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
+	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
+	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
+	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
+	AM_RANGE(0x05e00000, 0x05e7ffff) AM_MIRROR(0x80000) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
+	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
+	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(saturn_scu_r, saturn_scu_w)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
@@ -815,12 +815,12 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x05a00000, 0x05afffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_DEVREADWRITE16_LEGACY("scsp", scsp_r, scsp_w, 0xffffffff)
 	/* VDP1 */
-	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE_LEGACY(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
-	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE_LEGACY(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
-	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16_LEGACY(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
-	AM_RANGE(0x05e00000, 0x05e7ffff) AM_MIRROR(0x80000) AM_READWRITE_LEGACY(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
-	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE_LEGACY(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
-	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16_LEGACY(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
+	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(saturn_vdp1_vram_r, saturn_vdp1_vram_w)
+	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(saturn_vdp1_framebuffer0_r, saturn_vdp1_framebuffer0_w)
+	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE16(saturn_vdp1_regs_r, saturn_vdp1_regs_w,0xffffffff)
+	AM_RANGE(0x05e00000, 0x05e7ffff) AM_MIRROR(0x80000) AM_READWRITE(saturn_vdp2_vram_r, saturn_vdp2_vram_w)
+	AM_RANGE(0x05f00000, 0x05f7ffff) AM_READWRITE(saturn_vdp2_cram_r, saturn_vdp2_cram_w)
+	AM_RANGE(0x05f80000, 0x05fbffff) AM_READWRITE16(saturn_vdp2_regs_r, saturn_vdp2_regs_w,0xffffffff)
 	AM_RANGE(0x05fe0000, 0x05fe00cf) AM_READWRITE(saturn_scu_r, saturn_scu_w)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_MIRROR(0x21f00000) AM_SHARE("workram_h")
 	AM_RANGE(0x20000000, 0x2007ffff) AM_ROM AM_SHARE("share6")  // bios mirror
@@ -1881,7 +1881,6 @@ TODO:
 
 TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 {
-	saturn_state *state = machine().driver_data<saturn_state>();
 	int scanline = param;
 	int max_y = machine().primary_screen->height();
 	int y_step,vblank_line;
@@ -1897,7 +1896,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 
 	if(scanline == (0)*y_step)
 	{
-		video_update_vdp1(machine());
+		video_update_vdp1();
 
 		if(STV_VDP1_VBE)
 			m_vdp1.framebuffer_clear_on_next_frame = 1;

@@ -271,7 +271,7 @@ static TIMER_CALLBACK( smpc_change_clock )
 	machine.device("slave")->set_unscaled_clock(xtal/2);
 
 	state->m_vdp2.dotsel = param ^ 1;
-	stv_vdp2_dynamic_res_change(machine);
+	state->stv_vdp2_dynamic_res_change();
 
 	if(!state->m_NMI_reset)
 		state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

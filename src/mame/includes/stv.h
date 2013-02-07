@@ -249,15 +249,118 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( sat_cart );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart );
+
+	DECLARE_READ16_MEMBER ( saturn_vdp1_regs_r );
+	DECLARE_READ32_MEMBER ( saturn_vdp1_vram_r );
+	DECLARE_READ32_MEMBER ( saturn_vdp1_framebuffer0_r );
+
+	DECLARE_WRITE16_MEMBER ( saturn_vdp1_regs_w );
+	DECLARE_WRITE32_MEMBER ( saturn_vdp1_vram_w );
+	DECLARE_WRITE32_MEMBER ( saturn_vdp1_framebuffer0_w );
+
+	DECLARE_READ32_MEMBER ( saturn_vdp2_vram_r );
+	DECLARE_READ32_MEMBER ( saturn_vdp2_cram_r );
+	DECLARE_READ16_MEMBER ( saturn_vdp2_regs_r );
+
+	DECLARE_WRITE32_MEMBER ( saturn_vdp2_vram_w );
+	DECLARE_WRITE32_MEMBER ( saturn_vdp2_cram_w );
+	DECLARE_WRITE16_MEMBER ( saturn_vdp2_regs_w );
+
+
+	/* VDP1 */
+	void stv_set_framebuffer_config( void );
+	void stv_prepare_framebuffers( void );
+	void stv_vdp1_change_framebuffers( void );
+	void video_update_vdp1( void );
+	void stv_vdp1_process_list( void );
+	void stv_vdp1_set_drawpixel( void );
+
+	void stv_vdp1_draw_normal_sprite(const rectangle &cliprect, int sprite_type);
+	void stv_vdp1_draw_scaled_sprite(const rectangle &cliprect);
+	void stv_vdp1_draw_distorted_sprite(const rectangle &cliprect);
+	void stv_vdp1_draw_poly_line(const rectangle &cliprect);
+	void stv_vdp1_draw_line(const rectangle &cliprect);
+	int x2s(int v);
+	int y2s(int v);
+	void vdp1_fill_quad(const rectangle &cliprect, int patterndata, int xsize, const struct spoint *q);
+	void vdp1_fill_line(const rectangle &cliprect, int patterndata, int xsize, INT32 y, INT32 x1, INT32 x2, INT32 u1, INT32 u2, INT32 v1, INT32 v2);
+//	void (*drawpixel)(int x, int y, int patterndata, int offsetcnt);
+//	void drawpixel_poly(int x, int y, int patterndata, int offsetcnt);
+//	void drawpixel_8bpp_trans(int x, int y, int patterndata, int offsetcnt);
+//	void drawpixel_4bpp_notrans(int x, int y, int patterndata, int offsetcnt);
+//	void drawpixel_4bpp_trans(int x, int y, int patterndata, int offsetcnt);
+//	void drawpixel_generic(int x, int y, int patterndata, int offsetcnt);
+	void vdp1_fill_slope(const rectangle &cliprect, int patterndata, int xsize,
+		                    INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 *nx1, INT32 *nx2,
+							INT32 u1, INT32 u2, INT32 slu1, INT32 slu2, INT32 *nu1, INT32 *nu2,
+							INT32 v1, INT32 v2, INT32 slv1, INT32 slv2, INT32 *nv1, INT32 *nv2,
+							INT32 _y1, INT32 y2);
+	void stv_vdp1_setup_shading(const struct spoint* q, const rectangle &cliprect);
+	UINT8 stv_read_gouraud_table( void );
+	void stv_clear_framebuffer( int which_framebuffer );
+	void stv_vdp1_state_save_postload( void );
+	int stv_vdp1_start ( void );
+
+
+	/* VDP2 */
+
+	UINT8 get_vblank( void );
+	UINT8 get_hblank( void );
+	int get_vblank_duration( void );
+	int get_hblank_duration( void );
+	int get_pixel_clock( void );
+	UINT8 get_odd_bit( void );
+	void stv_vdp2_dynamic_res_change( void );
+
+	void refresh_palette_data( void );
+	int stv_vdp2_window_process(int x,int y);
+	void stv_vdp2_get_window0_coordinates(UINT16 *s_x, UINT16 *e_x, UINT16 *s_y, UINT16 *e_y);
+	void stv_vdp2_get_window1_coordinates(UINT16 *s_x, UINT16 *e_x, UINT16 *s_y, UINT16 *e_y);
+	int get_window_pixel(UINT16 s_x,UINT16 e_x,UINT16 s_y,UINT16 e_y,int x, int y,UINT8 win_num);
+	int stv_vdp2_apply_window_on_layer(rectangle &cliprect);
+
+	void stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void stv_vdp2_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,int transparency,int transparent_color,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
+	void stv_vdp2_drawgfxzoom_rgb555(bitmap_rgb32 &dest_bmp,const rectangle &clip,UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,int transparency,int transparent_color,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
+	void stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle &clip, UINT32 code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
+	void stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectangle &clip, UINT32 code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
+
+	void stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, int iRP);
+	void stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap, bitmap_rgb32 &roz_bitmap, const rectangle &cliprect, int iRP, int planesizex, int planesizey, int planerenderedsizex, int planerenderedsizey);
+	void stv_vdp2_fill_rotation_parameter_table( UINT8 rot_parameter );
+	UINT8 stv_vdp2_check_vram_cycle_pattern_registers( UINT8 access_command_pnmdr, UINT8 access_command_cpdr, UINT8 bitmap_enable );
+	void stv_vdp2_draw_mosaic(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 is_roz);
+
+	void stv_vdp2_fade_effects( void );
+	void stv_vdp2_compute_color_offset( int *r, int *g, int *b, int cor );
+	void stv_vdp2_compute_color_offset_UINT32(UINT32 *rgb, int cor);
+	void stv_vdp2_check_fade_control_for_layer( void );
+
+	void stv_vdp2_draw_line(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void stv_vdp2_draw_back(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void stv_vdp2_draw_NBG0(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void stv_vdp2_draw_NBG1(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void stv_vdp2_draw_NBG2(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void stv_vdp2_draw_NBG3(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void stv_vdp2_draw_RBG0(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 pri);
+
+	void stv_vdp2_state_save_postload( void );
+	void stv_vdp2_exit ( void );
+	int stv_vdp2_start ( void );
 };
 
 #define MASTER_CLOCK_352 57272720
 #define MASTER_CLOCK_320 53693174
-#define CEF_1   state->m_vdp1_regs[0x010/2]|=0x0002
-#define CEF_0   state->m_vdp1_regs[0x010/2]&=~0x0002
-#define BEF_1   state->m_vdp1_regs[0x010/2]|=0x0001
-#define BEF_0   state->m_vdp1_regs[0x010/2]&=~0x0001
-#define STV_VDP1_TVMR ((state->m_vdp1_regs[0x000/2])&0xffff)
+#define CEF_1   m_vdp1_regs[0x010/2]|=0x0002
+#define CEF_0   m_vdp1_regs[0x010/2]&=~0x0002
+#define BEF_1   m_vdp1_regs[0x010/2]|=0x0001
+#define BEF_0   m_vdp1_regs[0x010/2]&=~0x0001
+#define STV_VDP1_TVMR ((m_vdp1_regs[0x000/2])&0xffff)
 #define STV_VDP1_VBE  ((STV_VDP1_TVMR & 0x0008) >> 3)
 #define STV_VDP1_TVM  ((STV_VDP1_TVMR & 0x0007) >> 0)
 
@@ -293,22 +396,4 @@ extern UINT8* stv_vdp1_gfx_decode;
 int stv_vdp1_start ( running_machine &machine );
 void video_update_vdp1(running_machine &machine);
 void stv_vdp2_dynamic_res_change(running_machine &machine);
-
-DECLARE_READ16_HANDLER ( saturn_vdp1_regs_r );
-DECLARE_READ32_HANDLER ( saturn_vdp1_vram_r );
-DECLARE_READ32_HANDLER ( saturn_vdp1_framebuffer0_r );
-
-DECLARE_WRITE16_HANDLER ( saturn_vdp1_regs_w );
-DECLARE_WRITE32_HANDLER ( saturn_vdp1_vram_w );
-DECLARE_WRITE32_HANDLER ( saturn_vdp1_framebuffer0_w );
-
-/*----------- defined in video/stvvdp2.c -----------*/
-
-DECLARE_READ32_HANDLER ( saturn_vdp2_vram_r );
-DECLARE_READ32_HANDLER ( saturn_vdp2_cram_r );
-DECLARE_READ16_HANDLER ( saturn_vdp2_regs_r );
-
-DECLARE_WRITE32_HANDLER ( saturn_vdp2_vram_w );
-DECLARE_WRITE32_HANDLER ( saturn_vdp2_cram_w );
-DECLARE_WRITE16_HANDLER ( saturn_vdp2_regs_w );
 
