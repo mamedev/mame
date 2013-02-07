@@ -132,7 +132,7 @@ PALETTE_INIT_MEMBER(gb_state,gbc)
 		m_lcd.cgb_spal[ii] = 0;
 }
 
-PALETTE_INIT_MEMBER(gb_state,megaduck)
+PALETTE_INIT_MEMBER(megaduck_state,megaduck)
 {
 	int ii;
 	for( ii = 0; ii < 4; ii++)

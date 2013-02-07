@@ -140,138 +140,16 @@ void gb_state::gb_init_regs()
 	SIODATA = 0x00;
 	SIOCONT = 0x7E;
 
-	gb_io_w( m_maincpu->space(AS_PROGRAM ), 0x05, 0x00 );       /* TIMECNT */
-	gb_io_w( m_maincpu->space(AS_PROGRAM ), 0x06, 0x00 );       /* TIMEMOD */
-}
-
-
-void gb_state::gb_rom16_0000( UINT8 *addr )
-{
-	m_bank5->set_base( addr );
-	m_bank10->set_base( addr + 0x0100 );
-	m_bank6->set_base( addr + 0x0200 );
-	m_bank11->set_base( addr + 0x0900 );
-}
-
-
-void gb_state::gb_rom16_4000( UINT8 *addr )
-{
-	m_bank1->set_base( addr );
-	m_bank4->set_base( addr + 0x2000 );
-}
-
-
-void gb_state::gb_rom8_4000( UINT8 *addr )
-{
-	m_bank1->set_base( addr );
-}
-
-
-void gb_state::gb_rom8_6000( UINT8 *addr )
-{
-	m_bank4->set_base( addr );
+	gb_io_w(m_maincpu->space(AS_PROGRAM), 0x05, 0x00);       /* TIMECNT */
+	gb_io_w(m_maincpu->space(AS_PROGRAM), 0x06, 0x00);       /* TIMEMOD */
 }
 
 
 void gb_state::gb_init()
 {
-	address_space &space = m_maincpu->space( AS_PROGRAM );
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	/* Initialize the memory banks */
-	m_MBC1Mode = 0;
-	m_MBC3RTCBank = 0;
-	m_ROMBank = m_ROMBank00 + 1;
-	m_RAMBank = 0;
-
-	if (m_gb_cart)
-	{
-		if ( m_MBCType != MBC_MEGADUCK )
-		{
-			gb_rom16_4000( m_ROMMap[m_ROMBank] );
-			m_bank2->set_base( m_RAMMap[m_RAMBank] ? m_RAMMap[m_RAMBank] : m_gb_dummy_ram_bank);
-		}
-		else
-		{
-			m_bank1->set_base( m_ROMMap[m_ROMBank] );
-			m_bank10->set_base( m_ROMMap[0] );
-		}
-	}
-
-	/* Set handlers based on the Memory Bank Controller in the cart */
-	switch( m_MBCType )
-	{
-		case MBC_NONE:
-			break;
-		case MBC_MMM01:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_0000_w),this) );
-			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_2000_w),this));
-			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_4000_w),this));
-			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_mmm01_6000_w),this));
-			break;
-		case MBC_MBC1:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),this) );    /* We don't emulate RAM enable yet */
-			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1),this) );
-			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1),this) );
-			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1),this) );
-			break;
-		case MBC_MBC2:
-			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc2),this) );
-			break;
-		case MBC_MBC3:
-		case MBC_HUC1:  /* Possibly wrong */
-		case MBC_HUC3:  /* Possibly wrong */
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),this) );    /* We don't emulate RAM enable yet */
-			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc3),this) );
-			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc3),this) );
-			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc3),this) );
-			break;
-		case MBC_MBC5:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),this) );
-			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc5),this) );
-			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc5),this) );
-			break;
-		case MBC_MBC6:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc6),this) );
-			space.install_write_handler( 0x2000, 0x2fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc6_1),this) );
-			space.install_write_handler( 0x3000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc6_2),this) );
-			break;
-		case MBC_MBC7:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),this) );
-			space.install_write_handler( 0x2000, 0x2fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc7),this) );
-			space.install_write_handler( 0x3000, 0x7fff, write8_delegate(FUNC(gb_state::gb_rom_bank_unknown_mbc7),this) );
-			break;
-		case MBC_TAMA5:
-			space.install_write_handler( 0xA000, 0xBFFF, write8_delegate(FUNC(gb_state::gb_ram_tama5),this) );
-			break;
-		case MBC_WISDOM:
-			space.install_write_handler( 0x0000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_wisdom),this) );
-			break;
-		case MBC_MBC1_KOR:
-			space.install_write_handler( 0x0000, 0x1fff, write8_delegate(FUNC(gb_state::gb_ram_enable),this) ); /* We don't emulate RAM enable yet */
-			space.install_write_handler( 0x2000, 0x3fff, write8_delegate(FUNC(gb_state::gb_rom_bank_select_mbc1_kor),this) );
-			space.install_write_handler( 0x4000, 0x5fff, write8_delegate(FUNC(gb_state::gb_ram_bank_select_mbc1_kor),this) );
-			space.install_write_handler( 0x6000, 0x7fff, write8_delegate(FUNC(gb_state::gb_mem_mode_select_mbc1_kor),this) );
-			break;
-		case MBC_YONGYONG:
-			space.install_write_handler( 0x2000, 0x2000, write8_delegate(FUNC(gb_state::gb_rom_bank_yongyong_2000),this) );
-			//space.install_write_handler( 0x5000, 0x5003, write8_delegate(FUNC(gb_state::gb_rom_back_yongyong_5000),this) );
-			break;
-		case MBC_LASAMA:
-			space.install_write_handler( 0x2080, 0x2080, write8_delegate(FUNC(gb_state::gb_rom_bank_lasama_2080),this) );
-			space.install_write_handler( 0x6000, 0x6000, write8_delegate(FUNC(gb_state::gb_rom_bank_lasama_6000),this) );
-			break;
-		case MBC_ATVRACIN:
-			space.install_write_handler( 0x3F00, 0x3F00, write8_delegate(FUNC(gb_state::gb_rom_bank_atvracin_3f00),this) );
-			space.install_write_handler( 0x3FC0, 0x3FC0, write8_delegate(FUNC(gb_state::gb_rom_bank_atvracin_3fc0),this) );
-			break;
-
-		case MBC_MEGADUCK:
-			space.install_write_handler( 0x0001, 0x0001, write8_delegate(FUNC(gb_state::megaduck_rom_bank_select_type1),this) );
-			space.install_write_handler( 0xB000, 0xB000, write8_delegate(FUNC(gb_state::megaduck_rom_bank_select_type2),this) );
-			break;
-	}
-
-	gb_sound_w(machine().device("custom"), space, 0x16, 0x00 );       /* Initialize sound hardware */
+	gb_sound_w(machine().device("custom"), space, 0x16, 0x00);       /* Initialize sound hardware */
 
 	m_divcount = 0;
 	m_triggering_irq = 0;
@@ -281,8 +159,6 @@ void gb_state::gb_init()
 
 MACHINE_START_MEMBER(gb_state,gb)
 {
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_state::gb_machine_stop),this));
-
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
 	m_gb_serial_timer->enable( 0 );
@@ -292,8 +168,6 @@ MACHINE_START_MEMBER(gb_state,gb)
 
 MACHINE_START_MEMBER(gb_state,gbc)
 {
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_state::gb_machine_stop),this));
-
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
 	m_gb_serial_timer->enable( 0 );
@@ -305,12 +179,10 @@ MACHINE_RESET_MEMBER(gb_state,gb)
 {
 	gb_init();
 
-	gb_video_reset( GB_VIDEO_DMG );
-
-	gb_rom16_0000( m_ROMMap[m_ROMBank00] );
+	gb_video_reset(GB_VIDEO_DMG);
 
 	/* Enable BIOS rom */
-	m_bank5->set_base(memregion("maincpu")->base() );
+	m_bios_disable = FALSE;
 
 	m_divcount = 0x0004;
 }
@@ -320,8 +192,6 @@ MACHINE_START_MEMBER(gb_state,sgb)
 {
 	m_sgb_packets = -1;
 	m_sgb_tile_data = auto_alloc_array_clear(machine(), UINT8, 0x2000 );
-
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(gb_state::gb_machine_stop),this));
 
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
@@ -334,30 +204,29 @@ MACHINE_RESET_MEMBER(gb_state,sgb)
 {
 	gb_init();
 
-	gb_video_reset( GB_VIDEO_SGB );
+	gb_video_reset(GB_VIDEO_SGB);
 
 	gb_init_regs();
 
-	gb_rom16_0000( m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
 
 	/* Enable BIOS rom */
-	m_bank5->set_base(memregion("maincpu")->base() );
+	m_bios_disable = FALSE;
 
-	memset( m_sgb_tile_data, 0, 0x2000 );
+	memset(m_sgb_tile_data, 0, 0x2000);
 
 	m_sgb_window_mask = 0;
-	memset( m_sgb_pal_map, 0, sizeof(m_sgb_pal_map) );
-	memset( m_sgb_atf_data, 0, sizeof(m_sgb_atf_data) );
+	memset(m_sgb_pal_map, 0, sizeof(m_sgb_pal_map));
+	memset(m_sgb_atf_data, 0, sizeof(m_sgb_atf_data));
 
 	/* HACKS for Donkey Kong Land 2 + 3.
 	   For some reason that I haven't figured out, they store the tile
 	   data differently.  Hacks will go once I figure it out */
 	m_sgb_hack = 0;
 
-	if (m_gb_cart)  // make sure cart is in
+	if (m_cartslot->m_cart)  // make sure cart is in
 	{
-		if( strncmp( (const char*)(m_gb_cart + 0x134), "DONKEYKONGLAND 2", 16 ) == 0 ||
-			strncmp( (const char*)(m_gb_cart + 0x134), "DONKEYKONGLAND 3", 16 ) == 0 )
+		if (strncmp((const char*)(m_cartslot->m_cart->get_rom_base() + 0x134), "DONKEYKONGLAND 2", 16) == 0 ||
+			strncmp((const char*)(m_cartslot->m_cart->get_rom_base() + 0x134), "DONKEYKONGLAND 3", 16) == 0)
 				m_sgb_hack = 1;
 	}
 
@@ -368,17 +237,16 @@ MACHINE_RESET_MEMBER(gb_state,gbpocket)
 {
 	gb_init();
 
-	gb_video_reset( GB_VIDEO_MGB );
+	gb_video_reset(GB_VIDEO_MGB);
 
 	gb_init_regs();
+
+	m_bios_disable = TRUE;
 
 	/* Initialize the Sound registers */
 	gb_sound_w(machine().device("custom"), generic_space(), 0x16,0x80);
 	gb_sound_w(machine().device("custom"), generic_space(), 0x15,0xF3);
 	gb_sound_w(machine().device("custom"), generic_space(), 0x14,0x77);
-
-	/* Enable BIOS rom if we have one */
-	gb_rom16_0000( m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
 
 	m_divcount = 0xABC8;
 }
@@ -393,459 +261,15 @@ MACHINE_RESET_MEMBER(gb_state,gbc)
 
 	gb_init_regs();
 
-	gb_rom16_0000( m_ROMMap[m_ROMBank00] ? m_ROMMap[m_ROMBank00] : m_gb_dummy_rom_bank );
-
 	/* Enable BIOS rom */
-	m_bank5->set_base(memregion("maincpu")->base() );
-	m_bank6->set_base(memregion("maincpu")->base() + 0x100 );
+	m_bios_disable = FALSE;
 
 	/* Allocate memory for internal ram */
-	for( ii = 0; ii < 8; ii++ )
+	for (ii = 0; ii < 8; ii++)
 	{
 		m_GBC_RAMMap[ii] = machine().device<ram_device>(RAM_TAG)->pointer() + CGB_START_RAM_BANKS + ii * 0x1000;
-		memset (m_GBC_RAMMap[ii], 0, 0x1000);
+		memset(m_GBC_RAMMap[ii], 0, 0x1000);
 	}
-}
-
-void gb_state::gb_machine_stop()
-{
-	/* Don't save if there was no battery */
-	if(!(m_CartType & BATTERY) || !m_RAMBanks)
-		return;
-
-	/* NOTE: The reason we save the carts RAM this way instead of using MAME's
-	   built in macros is because they force the filename to be the name of
-	   the machine.  We need to have a separate name for each game. */
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));
-	image->battery_save(m_gb_cart_ram, m_RAMBanks * 0x2000);
-}
-
-void gb_state::gb_set_mbc1_banks()
-{
-	gb_rom16_4000( m_ROMMap[ m_ROMBank ] );
-	m_bank2->set_base( m_RAMMap[ m_MBC1Mode ? ( m_ROMBank >> 5 ) : 0 ] );
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc1)
-{
-	data &= 0x1F; /* Only uses lower 5 bits */
-	/* Selecting bank 0 == selecting bank 1 */
-	if( data == 0 )
-		data = 1;
-
-	m_ROMBank = ( m_ROMBank & 0x01E0 ) | data;
-	/* Switch banks */
-	gb_set_mbc1_banks();
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc2)
-{
-	data &= 0x0F; /* Only uses lower 4 bits */
-	/* Selecting bank 0 == selecting bank 1 */
-	if( data == 0 )
-		data = 1;
-
-	/* The least significant bit of the upper address byte must be 1 */
-	if( offset & 0x0100 )
-		m_ROMBank = ( m_ROMBank & 0x100 ) | data;
-	/* Switch banks */
-	gb_rom16_4000( m_ROMMap[m_ROMBank] );
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc3)
-{
-	logerror( "0x%04X: write to mbc3 rom bank select register 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), offset, data );
-	data &= 0x7F; /* Only uses lower 7 bits */
-	/* Selecting bank 0 == selecting bank 1 */
-	if( data == 0 )
-		data = 1;
-
-	m_ROMBank = ( m_ROMBank & 0x0100 ) | data;
-	/* Switch banks */
-	gb_rom16_4000( m_ROMMap[m_ROMBank] );
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc5)
-{
-	/* MBC5 has a 9 bit bank select
-	  Writing into 2000-2FFF sets the lower 8 bits
-	  Writing into 3000-3FFF sets the 9th bit
-	*/
-	logerror( "0x%04X: MBC5 ROM Bank select write 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), offset, data );
-	if( offset & 0x1000 )
-	{
-		m_ROMBank = (m_ROMBank & 0xFF ) | ( ( data & 0x01 ) << 8 );
-	}
-	else
-	{
-		m_ROMBank = (m_ROMBank & 0x100 ) | data;
-	}
-	/* Switch banks */
-	gb_rom16_4000( m_ROMMap[m_ROMBank] );
-}
-
-WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc6)
-{
-	logerror( "0x%04X: write to mbc6 ram enable area: %04X <- 0x%02X\n", space.device() .safe_pc( ), offset, data );
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc6_1)
-{
-	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), 0x2000 + offset, data );
-	if ( offset & 0x0800 )
-	{
-		if ( data == 0x00 )
-		{
-			gb_rom8_4000( m_ROMMap[m_ROMBank>>1] + ( ( m_ROMBank & 0x01 ) ? 0x2000 : 0x0000 ) );
-		}
-	}
-	else
-	{
-		m_ROMBank = data;
-	}
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc6_2)
-{
-	logerror( "0x%04X: write to mbc6 rom area: 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), 0x3000 + offset, data );
-	if ( offset & 0x0800 )
-	{
-		if ( data == 0x00 )
-		{
-			gb_rom8_6000( m_ROMMap[m_ROMBank00>>1] + ( ( m_ROMBank00 & 0x01 ) ? 0x2000 : 0x0000 ) );
-		}
-	}
-	else
-	{
-		m_ROMBank00 = data;
-	}
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc7)
-{
-	logerror( "0x%04X: write to mbc7 rom select register: 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), 0x2000 + offset, data );
-	/* Bit 12 must be set for writing to the mbc register */
-	if ( offset & 0x0100 )
-	{
-		m_ROMBank = data;
-		gb_rom16_4000( m_ROMMap[m_ROMBank] );
-	}
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_unknown_mbc7)
-{
-		logerror( "0x%04X: write to mbc7 rom area: 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), 0x3000 + offset, data );
-	/* Bit 12 must be set for writing to the mbc register */
-	if ( offset & 0x0100 )
-	{
-		switch( offset & 0x7000 )
-		{
-		case 0x0000:    /* 0x3000-0x3fff */
-		case 0x1000:    /* 0x4000-0x4fff */
-		case 0x2000:    /* 0x5000-0x5fff */
-		case 0x3000:    /* 0x6000-0x6fff */
-		case 0x4000:    /* 0x7000-0x7fff */
-			break;
-		}
-	}
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_select_wisdom)
-{
-	logerror( "0x%04X: wisdom tree mapper write to address 0x%04X\n", space.device() .safe_pc( ), offset );
-	/* The address determines the bank to select */
-	m_ROMBank = ( offset << 1 ) & 0x1FF;
-	m_bank5->set_base( m_ROMMap[ m_ROMBank ] );
-	m_bank10->set_base( m_ROMMap[ m_ROMBank ] + 0x0100 );
-	m_bank6->set_base( m_ROMMap[ m_ROMBank ] + 0x0200 );
-	m_bank11->set_base( m_ROMMap[ m_ROMBank ] + 0x0900 );
-	m_bank1->set_base( m_ROMMap[ m_ROMBank + 1 ] );
-	m_bank4->set_base( m_ROMMap[ m_ROMBank + 1 ] + 0x2000 );
-}
-
-WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc1)
-{
-	data &= 0x3; /* Only uses the lower 2 bits */
-
-	/* Select the upper bits of the ROMMask */
-	m_ROMBank = ( m_ROMBank & 0x1F ) | ( data << 5 );
-
-	/* Switch banks */
-	gb_set_mbc1_banks();
-}
-
-WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc3)
-{
-	logerror( "0x%04X: write mbc3 ram bank select register 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), offset, data );
-	if( data & 0x8 )
-	{   /* RTC banks */
-		if ( m_CartType & TIMER )
-		{
-			m_MBC3RTCBank = data & 0x07;
-			if ( data < 5 )
-			{
-				memset( m_MBC3RTCData, m_MBC3RTCMap[m_MBC3RTCBank], 0x2000 );
-				m_bank2->set_base( m_MBC3RTCData );
-			}
-		}
-	}
-	else
-	{   /* RAM banks */
-		m_RAMBank = data & 0x3;
-		m_MBC3RTCBank = 0xFF;
-		/* Switch banks */
-		m_bank2->set_base( m_RAMMap[m_RAMBank] );
-	}
-}
-
-WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc5)
-{
-	logerror( "0x%04X: MBC5 RAM Bank select write 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), offset, data );
-	data &= 0x0F;
-	if( m_CartType & RUMBLE )
-	{
-		data &= 0x7;
-	}
-	m_RAMBank = data;
-	/* Switch banks */
-	m_bank2->set_base( m_RAMMap[m_RAMBank] );
-}
-
-WRITE8_MEMBER(gb_state::gb_ram_enable)
-{
-	/* FIXME: Currently we don't handle this, but a value of 0xA will enable
-	 * writing to the cart's RAM banks */
-	logerror( "0x%04X: Write to ram enable register 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), offset, data );
-}
-
-WRITE8_MEMBER(gb_state::gb_mem_mode_select_mbc1)
-{
-	m_MBC1Mode = data & 0x1;
-	gb_set_mbc1_banks();
-}
-
-WRITE8_MEMBER(gb_state::gb_mem_mode_select_mbc3)
-{
-		logerror( "0x%04X: Write to mbc3 mem mode select register 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), offset, data );
-	if( m_CartType & TIMER )
-	{
-		/* FIXME: RTC Latch goes here */
-		m_MBC3RTCMap[0] = 50;    /* Seconds */
-		m_MBC3RTCMap[1] = 40;    /* Minutes */
-		m_MBC3RTCMap[2] = 15;    /* Hours */
-		m_MBC3RTCMap[3] = 25;    /* Day counter lowest 8 bits */
-		m_MBC3RTCMap[4] = 0x01;  /* Day counter upper bit, timer off, no day overflow occurred (bit7) */
-	}
-}
-
-WRITE8_MEMBER(gb_state::gb_ram_tama5)
-{
-	logerror( "0x%04X: TAMA5 write 0x%04X <- 0x%02X\n", space.device() .safe_pc( ), 0xA000 + offset, data );
-	switch( offset & 0x0001 )
-	{
-	case 0x0000:    /* Write to data register */
-		switch( m_gbLastTama5Command )
-		{
-		case 0x00:      /* Bits 0-3 for rom bank selection */
-			m_ROMBank = ( m_ROMBank & 0xF0 ) | ( data & 0x0F );
-			gb_rom16_4000( m_ROMMap[m_ROMBank] );
-			break;
-		case 0x01:      /* Bit 4(-7?) for rom bank selection */
-			m_ROMBank = ( m_ROMBank & 0x0F ) | ( ( data & 0x0F ) << 4 );
-			gb_rom16_4000( m_ROMMap[m_ROMBank] );
-			break;
-		case 0x04:      /* Data to write lo */
-			m_gbTama5Byte = ( m_gbTama5Byte & 0xF0 ) | ( data & 0x0F );
-			break;
-		case 0x05:      /* Data to write hi */
-			m_gbTama5Byte = ( m_gbTama5Byte & 0x0F ) | ( ( data & 0x0F ) << 4 );
-			break;
-		case 0x06:      /* Address selection hi */
-			m_gbTama5Address = ( m_gbTama5Address & 0x0F ) | ( ( data & 0x0F ) << 4 );
-			break;
-		case 0x07:      /* Address selection lo */
-				/* This address always seems to written last, so we'll just
-				   execute the command here */
-			m_gbTama5Address = ( m_gbTama5Address & 0xF0 ) | ( data & 0x0F );
-			switch ( m_gbTama5Address & 0xE0 )
-			{
-			case 0x00:      /* Write memory */
-				logerror( "Write tama5 memory 0x%02X <- 0x%02X\n", m_gbTama5Address & 0x1F, m_gbTama5Byte );
-				m_gbTama5Memory[ m_gbTama5Address & 0x1F ] = m_gbTama5Byte;
-				break;
-			case 0x20:      /* Read memory */
-				logerror( "Read tama5 memory 0x%02X\n", m_gbTama5Address & 0x1F );
-				m_gbTama5Byte = m_gbTama5Memory[ m_gbTama5Address & 0x1F ];
-				break;
-			case 0x40:      /* Unknown, some kind of read */
-				if ( ( m_gbTama5Address & 0x1F ) == 0x12 )
-				{
-					m_gbTama5Byte = 0xFF;
-				}
-			case 0x80:      /* Unknown, some kind of read (when 07=01)/write (when 07=00/02) */
-			default:
-				logerror( "0x%04X: Unknown addressing mode\n", space.device() .safe_pc( ) );
-				break;
-			}
-			break;
-		}
-		break;
-	case 0x0001:    /* Write to control register */
-		switch( data )
-		{
-		case 0x00:      /* Bits 0-3 for rom bank selection */
-		case 0x01:      /* Bits 4-7 for rom bank selection */
-		case 0x04:      /* Data write register lo */
-		case 0x05:      /* Data write register hi */
-		case 0x06:      /* Address register hi */
-		case 0x07:      /* Address register lo */
-			break;
-		case 0x0A:      /* Are we ready for the next command? */
-			m_MBC3RTCData[0] = 0x01;
-			m_bank2->set_base( m_MBC3RTCData );
-			break;
-		case 0x0C:      /* Data read register lo */
-			m_MBC3RTCData[0] = m_gbTama5Byte & 0x0F;
-			break;
-		case 0x0D:      /* Data read register hi */
-			m_MBC3RTCData[0] = ( m_gbTama5Byte & 0xF0 ) >> 4;
-			break;
-		default:
-			logerror( "0x%04X: Unknown tama5 command 0x%02X\n", space.device() .safe_pc( ), data );
-			break;
-		}
-		m_gbLastTama5Command = data;
-		break;
-	}
-}
-
-/* This mmm01 implementation is mostly guess work, no clue how correct it all is */
-
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_0000_w)
-{
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", space.device() .safe_pc( ), data, offset+0x000 );
-	if ( data & 0x40 )
-	{
-		m_mmm01_bank_offset = m_mmm01_reg1;
-		m_bank5->set_base( m_ROMMap[ m_mmm01_bank_offset ] );
-		m_bank10->set_base( m_ROMMap[ m_mmm01_bank_offset ] + 0x0100 );
-		gb_rom16_4000( m_ROMMap[ m_mmm01_bank_offset + m_mmm01_bank ] );
-	}
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_2000_w)
-{
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", space.device() .safe_pc( ), data, offset+0x2000 );
-
-	m_mmm01_reg1 = data & m_ROMMask;
-	m_mmm01_bank = m_mmm01_reg1 & m_mmm01_bank_mask;
-	if ( m_mmm01_bank == 0 )
-	{
-		m_mmm01_bank = 1;
-	}
-	gb_rom16_4000( m_ROMMap[ m_mmm01_bank_offset + m_mmm01_bank ] );
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_4000_w)
-{
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", space.device() .safe_pc( ), data, offset+0x4000 );
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_mmm01_6000_w)
-{
-	logerror( "0x%04X: write 0x%02X to 0x%04X\n", space.device() .safe_pc( ), data, offset+0x6000 );
-	/* Not sure if this is correct, Taito Variety Pack sets these values */
-	/* Momotarou Collection 2 writes 01 and 21 here */
-	switch( data )
-	{
-	case 0x30:  m_mmm01_bank_mask = 0x07;   break;
-	case 0x38:  m_mmm01_bank_mask = 0x03;   break;
-	default:    m_mmm01_bank_mask = 0xFF; break;
-	}
-}
-
-/* Korean MBC1 variant mapping */
-
-void gb_state::gb_set_mbc1_kor_banks()
-{
-	if ( m_ROMBank & 0x30 )
-	{
-		gb_rom16_0000( m_ROMMap[ m_ROMBank & 0x30 ] );
-	}
-	gb_rom16_4000( m_ROMMap[ m_ROMBank ] );
-	m_bank2->set_base( m_RAMMap[ m_MBC1Mode ? ( m_ROMBank >> 5 ) : 0 ] );
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_select_mbc1_kor)
-{
-	data &= 0x0F; /* Only uses lower 5 bits */
-	/* Selecting bank 0 == selecting bank 1 */
-	if( data == 0 )
-		data = 1;
-
-	m_ROMBank = ( m_ROMBank & 0x01F0 ) | data;
-	/* Switch banks */
-	gb_set_mbc1_kor_banks();
-}
-
-WRITE8_MEMBER(gb_state::gb_ram_bank_select_mbc1_kor)
-{
-	data &= 0x3; /* Only uses the lower 2 bits */
-
-	/* Select the upper bits of the ROMMask */
-	m_ROMBank = ( m_ROMBank & 0x0F ) | ( data << 4 );
-
-	/* Switch banks */
-	gb_set_mbc1_kor_banks();
-}
-
-WRITE8_MEMBER(gb_state::gb_mem_mode_select_mbc1_kor)
-{
-	m_MBC1Mode = data & 0x1;
-	gb_set_mbc1_kor_banks();
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_yongyong_2000)
-{
-	m_ROMBank = data;
-	gb_rom16_4000( m_ROMMap[m_ROMBank] );
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_lasama_2080)
-{
-	// Actual banking?
-	m_ROMBank = m_ROMBank00 | ( data & 0x03 );
-	gb_rom16_4000( m_ROMMap[m_ROMBank] );
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_lasama_6000)
-{
-	// On boot the following two get written right after each other:
-	// 02
-	// BE
-	// Disable logo switching?
-	if ( ! ( data & 0x80 ) )
-	{
-		m_ROMBank00 = ( data & 0x02 ) << 1;
-		gb_rom16_0000( m_ROMMap[m_ROMBank00] );
-	}
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_atvracin_3f00)
-{
-	if ( data == 0 )
-	{
-		data = 1;
-	}
-	m_ROMBank = m_ROMBank00 | data;
-	gb_rom16_4000( m_ROMMap[m_ROMBank] );
-}
-
-WRITE8_MEMBER(gb_state::gb_rom_bank_atvracin_3fc0)
-{
-	m_ROMBank00 = data * 16;
-	gb_rom16_0000( m_ROMMap[m_ROMBank00] );
 }
 
 WRITE8_MEMBER(gb_state::gb_io_w)
@@ -924,15 +348,14 @@ WRITE8_MEMBER(gb_state::gb_io_w)
 
 WRITE8_MEMBER(gb_state::gb_io2_w)
 {
-	if ( offset == 0x10 )
+	if (offset == 0x10)
 	{
 		/* disable BIOS ROM */
-		gb_rom16_0000( m_ROMMap[m_ROMBank00] );
+		m_bios_disable = TRUE;
+		printf("here again?\n");
 	}
 	else
-	{
-		gb_video_w( space, offset, data );
-	}
+		gb_video_w(space, offset, data);
 }
 
 #ifdef MAME_DEBUG
@@ -1496,529 +919,6 @@ READ8_MEMBER(gb_state::gb_io_r)
 	}
 }
 
-DRIVER_INIT_MEMBER(gb_state, gb)
-{
-	int I;
-
-	m_gb_dummy_rom_bank = auto_alloc_array(machine(), UINT8, 0x4000);
-	memset(m_gb_dummy_rom_bank, 0xff, 0x4000);
-
-	m_gb_dummy_ram_bank = auto_alloc_array(machine(), UINT8, 0x2000);
-	memset(m_gb_dummy_ram_bank, 0xff, 0x2000 );
-
-	for(I = 0; I < MAX_ROMBANK; I++)
-	{
-		m_ROMMap[I] = m_gb_dummy_rom_bank;
-	}
-	for(I = 0; I < MAX_RAMBANK; I++)
-	{
-		m_RAMMap[I] = m_gb_dummy_ram_bank;
-	}
-	m_ROMBank00 = 0;
-	m_ROMBanks = 0;
-	m_RAMBanks = 0;
-	m_MBCType = MBC_NONE;
-	m_CartType = 0;
-	m_ROMMask = 0;
-	m_RAMMask = 0;
-}
-
-DEVICE_IMAGE_LOAD_MEMBER(gb_state,gb_cart)
-{
-	gb_state *state = image.device().machine().driver_data<gb_state>();
-	static const char *const CartTypes[] =
-	{
-		"ROM ONLY",
-		"ROM+MBC1",
-		"ROM+MBC1+RAM",
-		"ROM+MBC1+RAM+BATTERY",
-		"UNKNOWN",
-		"ROM+MBC2",
-		"ROM+MBC2+BATTERY",
-		"UNKNOWN",
-		"ROM+RAM",
-		"ROM+RAM+BATTERY",
-		"UNKNOWN",
-		"ROM+MMM01",
-		"ROM+MMM01+SRAM",
-		"ROM+MMM01+SRAM+BATTERY",
-		"UNKNOWN",
-		"ROM+MBC3+TIMER+BATTERY",
-		"ROM+MBC3+TIMER+RAM+BATTERY",
-		"ROM+MBC3",
-		"ROM+MBC3+RAM",
-		"ROM+MBC3+RAM+BATTERY",
-		"UNKNOWN",
-		"UNKNOWN",
-		"UNKNOWN",
-		"UNKNOWN",
-		"UNKNOWN",
-		"ROM+MBC5",
-		"ROM+MBC5+RAM",
-		"ROM+MBC5+RAM+BATTERY",
-		"ROM+MBC5+RUMBLE",
-		"ROM+MBC5+RUMBLE+SRAM",
-		"ROM+MBC5+RUMBLE+SRAM+BATTERY",
-		"Pocket Camera",
-		"Bandai TAMA5",
-		/* Need heaps of unknowns here */
-		"Hudson HuC-3",
-		"Hudson HuC-1"
-	};
-
-/*** Following are some known manufacturer codes *************************/
-	static const struct
-	{
-		UINT16 Code;
-		const char *Name;
-	}
-	Companies[] =
-	{
-		{0x3301, "Nintendo"},
-		{0x7901, "Accolade"},
-		{0xA400, "Konami"},
-		{0x6701, "Ocean"},
-		{0x5601, "LJN"},
-		{0x9900, "ARC?"},
-		{0x0101, "Nintendo"},
-		{0x0801, "Capcom"},
-		{0x0100, "Nintendo"},
-		{0xBB01, "SunSoft"},
-		{0xA401, "Konami"},
-		{0xAF01, "Namcot?"},
-		{0x4901, "Irem"},
-		{0x9C01, "Imagineer"},
-		{0xA600, "Kawada?"},
-		{0xB101, "Nexoft"},
-		{0x5101, "Acclaim"},
-		{0x6001, "Titus"},
-		{0xB601, "HAL"},
-		{0x3300, "Nintendo"},
-		{0x0B00, "Coconuts?"},
-		{0x5401, "Gametek"},
-		{0x7F01, "Kemco?"},
-		{0xC001, "Taito"},
-		{0xEB01, "Atlus"},
-		{0xE800, "Asmik?"},
-		{0xDA00, "Tomy?"},
-		{0xB100, "ASCII?"},
-		{0xEB00, "Atlus"},
-		{0xC000, "Taito"},
-		{0x9C00, "Imagineer"},
-		{0xC201, "Kemco?"},
-		{0xD101, "Sofel?"},
-		{0x6101, "Virgin"},
-		{0xBB00, "SunSoft"},
-		{0xCE01, "FCI?"},
-		{0xB400, "Enix?"},
-		{0xBD01, "Imagesoft"},
-		{0x0A01, "Jaleco?"},
-		{0xDF00, "Altron?"},
-		{0xA700, "Takara?"},
-		{0xEE00, "IGS?"},
-		{0x8300, "Lozc?"},
-		{0x5001, "Absolute?"},
-		{0xDD00, "NCS?"},
-		{0xE500, "Epoch?"},
-		{0xCB00, "VAP?"},
-		{0x8C00, "Vic Tokai"},
-		{0xC200, "Kemco?"},
-		{0xBF00, "Sammy?"},
-		{0x1800, "Hudson Soft"},
-		{0xCA01, "Palcom/Ultra"},
-		{0xCA00, "Palcom/Ultra"},
-		{0xC500, "Data East?"},
-		{0xA900, "Technos Japan?"},
-		{0xD900, "Banpresto?"},
-		{0x7201, "Broderbund?"},
-		{0x7A01, "Triffix Entertainment?"},
-		{0xE100, "Towachiki?"},
-		{0x9300, "Tsuburava?"},
-		{0xC600, "Tonkin House?"},
-		{0xCE00, "Pony Canyon"},
-		{0x7001, "Infogrames?"},
-		{0x8B01, "Bullet-Proof Software?"},
-		{0x5501, "Park Place?"},
-		{0xEA00, "King Records?"},
-		{0x5D01, "Tradewest?"},
-		{0x6F01, "ElectroBrain?"},
-		{0xAA01, "Broderbund?"},
-		{0xC301, "SquareSoft"},
-		{0x5201, "Activision?"},
-		{0x5A01, "Bitmap Brothers/Mindscape"},
-		{0x5301, "American Sammy"},
-		{0x4701, "Spectrum Holobyte"},
-		{0x1801, "Hudson Soft"},
-		{0x0000, NULL}
-	};
-
-	int Checksum, I, J, filesize, load_start = 0;
-	UINT16 reported_rom_banks;
-	UINT8 *gb_header;
-	static const int rambanks[8] = {0, 1, 1, 4, 16, 8, 0, 0};
-
-	if (image.software_entry() == NULL)
-		filesize = image.length();
-	else
-		filesize = image.get_software_region_length("rom");
-
-	/* Check for presence of a header, and skip that header */
-	J = filesize % 0x4000;
-	if (J == 512)
-	{
-		logerror("Rom-header found, skipping\n");
-		load_start = 512;
-		filesize -= 512;
-	}
-
-	/* Verify that the file contains 16kb blocks */
-	if ((filesize == 0) || ((filesize % 0x4000) != 0))
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size");
-		return IMAGE_INIT_FAIL;
-	}
-
-	/* Claim memory */
-	state->m_gb_cart = auto_alloc_array(image.device().machine(), UINT8, filesize);
-	state->m_MBCType = MBC_UNKNOWN;
-	state->m_CartType = 0;
-
-	if (image.software_entry() == NULL)
-	{
-		/* Actually skip the header */
-		image.fseek(load_start, SEEK_SET);
-
-		/* Read cartridge */
-		if (image.fread( state->m_gb_cart, filesize) != filesize)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return IMAGE_INIT_FAIL;
-		}
-	}
-	else
-	{
-		memcpy(state->m_gb_cart, image.get_software_region("rom") + load_start, filesize);
-
-		const char *mapper = software_part_get_feature((software_part*)image.part_entry(), "mapper");
-		const char *rumble = software_part_get_feature((software_part*)image.part_entry(), "rumble");
-		const char *battery_backed = software_part_get_feature((software_part*)image.part_entry(), "battery_backed");
-
-		if ( mapper != NULL )
-		{
-			static const struct { const char *mapper_name; int mapper_type; } mapper_types[] =
-			{
-				{ "MBC1",     MBC_MBC1 },
-				{ "MBC2",     MBC_MBC2 },
-				{ "MMM01",    MBC_MMM01 },
-				{ "MBC3",     MBC_MBC3 },
-				{ "MBC4",     MBC_MBC4 },
-				{ "MBC5",     MBC_MBC5 },
-				{ "TAMA5",    MBC_TAMA5 },
-				{ "HuC1",     MBC_HUC1 },
-				{ "HuC3",     MBC_HUC3 },
-				{ "MBC6",     MBC_MBC6 },
-				{ "MBC7",     MBC_MBC7 },
-				{ "WISDOM",   MBC_WISDOM },
-				{ "MBC1_KOR", MBC_MBC1_KOR },
-				{ "YONGYONG", MBC_YONGYONG },
-				{ "LASAMA",   MBC_LASAMA },
-				{ "ATVRACIN", MBC_ATVRACIN },
-				{ "unknown",  MBC_UNKNOWN },
-			};
-
-			for (int i = 0; i < ARRAY_LENGTH(mapper_types) && state->m_MBCType == MBC_UNKNOWN; i++)
-			{
-				if (!mame_stricmp(mapper, mapper_types[i].mapper_name))
-				{
-					state->m_MBCType = mapper_types[i].mapper_type;
-				}
-			}
-		}
-
-		if ( rumble != NULL )
-		{
-			if ( !mame_stricmp(rumble, "yes"))
-			{
-				state->m_CartType |= RUMBLE;
-			}
-		}
-
-		if ( battery_backed != NULL )
-		{
-			if ( !mame_stricmp(battery_backed, "yes"))
-			{
-				state->m_CartType |= BATTERY;
-			}
-		}
-	}
-
-	gb_header = state->m_gb_cart;
-	state->m_ROMBank00 = 0;
-
-	/* Check for presence of MMM01 mapper */
-	if (filesize >= 0x8000)
-	{
-		static const UINT8 nintendo_logo[0x18] = {
-			0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D, 0x00, 0x0B,
-			0x03, 0x73, 0x00, 0x83, 0x00, 0x0C, 0x00, 0x0D,
-			0x00, 0x08, 0x11, 0x1F, 0x88, 0x89, 0x00, 0x0E
-		};
-		int bytes_matched = 0;
-		gb_header = state->m_gb_cart + filesize - 0x8000;
-		for (I = 0; I < 0x18; I++)
-		{
-			if (gb_header[0x0104 + I] == nintendo_logo[I])
-			{
-				bytes_matched++;
-			}
-		}
-
-		if (bytes_matched == 0x18 && gb_header[0x0147] >= 0x0B && gb_header[0x0147] <= 0x0D)
-		{
-			state->m_ROMBank00 = (filesize / 0x4000) - 2;
-			state->m_mmm01_bank_offset = state->m_ROMBank00;
-		}
-		else
-		{
-			gb_header = state->m_gb_cart;
-		}
-	}
-
-	/* Fill in our cart details */
-	switch(gb_header[0x0147])
-	{
-	case 0x00:  state->m_MBCType = MBC_NONE;    state->m_CartType = 0;              break;
-	case 0x01:  state->m_MBCType = MBC_MBC1;    state->m_CartType = 0;              break;
-	case 0x02:  state->m_MBCType = MBC_MBC1;    state->m_CartType = CART_RAM;               break;
-	case 0x03:  state->m_MBCType = MBC_MBC1;    state->m_CartType = CART_RAM | BATTERY;     break;
-	case 0x05:  state->m_MBCType = MBC_MBC2;    state->m_CartType = 0;              break;
-	case 0x06:  state->m_MBCType = MBC_MBC2;    state->m_CartType = BATTERY;            break;
-	case 0x08:  state->m_MBCType = MBC_NONE;    state->m_CartType = CART_RAM;               break;
-	case 0x09:  state->m_MBCType = MBC_NONE;    state->m_CartType = CART_RAM | BATTERY;     break;
-	case 0x0B:  state->m_MBCType = MBC_MMM01;   state->m_CartType = 0;              break;
-	case 0x0C:  state->m_MBCType = MBC_MMM01;   state->m_CartType = CART_RAM;               break;
-	case 0x0D:  state->m_MBCType = MBC_MMM01;   state->m_CartType = CART_RAM | BATTERY;     break;
-	case 0x0F:  state->m_MBCType = MBC_MBC3;    state->m_CartType = TIMER | BATTERY;        break;
-	case 0x10:  state->m_MBCType = MBC_MBC3;    state->m_CartType = TIMER | CART_RAM | BATTERY; break;
-	case 0x11:  state->m_MBCType = MBC_MBC3;    state->m_CartType = 0;              break;
-	case 0x12:  state->m_MBCType = MBC_MBC3;    state->m_CartType = CART_RAM;               break;
-	case 0x13:  state->m_MBCType = MBC_MBC3;    state->m_CartType = CART_RAM | BATTERY;     break;
-	case 0x15:  state->m_MBCType = MBC_MBC4;    state->m_CartType = 0;              break;
-	case 0x16:  state->m_MBCType = MBC_MBC4;    state->m_CartType = CART_RAM;               break;
-	case 0x17:  state->m_MBCType = MBC_MBC4;    state->m_CartType = CART_RAM | BATTERY;     break;
-	case 0x19:  state->m_MBCType = MBC_MBC5;    state->m_CartType = 0;              break;
-	case 0x1A:  state->m_MBCType = MBC_MBC5;    state->m_CartType = CART_RAM;               break;
-	case 0x1B:  state->m_MBCType = MBC_MBC5;    state->m_CartType = CART_RAM | BATTERY;     break;
-	case 0x1C:  state->m_MBCType = MBC_MBC5;    state->m_CartType = RUMBLE;         break;
-	case 0x1D:  state->m_MBCType = MBC_MBC5;    state->m_CartType = RUMBLE | SRAM;      break;
-	case 0x1E:  state->m_MBCType = MBC_MBC5;    state->m_CartType = RUMBLE | SRAM | BATTERY;    break;
-	case 0x20:  state->m_MBCType = MBC_MBC6;    state->m_CartType = SRAM; break;
-	case 0x22:  state->m_MBCType = MBC_MBC7;    state->m_CartType = SRAM | BATTERY;     break;
-	case 0xBE:  state->m_MBCType = MBC_NONE;    state->m_CartType = 0;              break;  /* used in Flash2Advance GB Bridge boot program */
-	case 0xEA:  state->m_MBCType = MBC_YONGYONG;    state->m_CartType = 0;  break;  /* Found in Sonic 3D Blast 5 pirate */
-	case 0xFD:  state->m_MBCType = MBC_TAMA5;   state->m_CartType = 0 /*RTC | BATTERY?*/;   break;
-	case 0xFE:  state->m_MBCType = MBC_HUC3;    state->m_CartType = 0;              break;
-	case 0xFF:  state->m_MBCType = MBC_HUC1;    state->m_CartType = 0;              break;
-	}
-
-	/* Check whether we're dealing with a (possible) Wisdom Tree game here */
-	if (gb_header[0x0147] == 0x00)
-	{
-		int count = 0;
-		for (I = 0x0134; I <= 0x014C; I++)
-		{
-			count += gb_header[I];
-		}
-		if (count == 0)
-		{
-			state->m_MBCType = MBC_WISDOM;
-		}
-	}
-
-	/* Check if we're dealing with a Korean variant of the MBC1 mapper */
-	if (state->m_MBCType == MBC_MBC1)
-	{
-		if (gb_header[0x13F] == 0x42 && gb_header[0x140] == 0x32 && gb_header[0x141] == 0x43 && gb_header[0x142] == 0x4B)
-		{
-			state->m_MBCType = MBC_MBC1_KOR;
-		}
-	}
-	if (state->m_MBCType == MBC_UNKNOWN)
-	{
-		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unknown mapper type");
-		return IMAGE_INIT_FAIL;
-	}
-	if (state->m_MBCType == MBC_MMM01)
-	{
-//      image.seterror(IMAGE_ERROR_UNSUPPORTED, "Mapper MMM01 is not supported yet");
-//      return IMAGE_INIT_FAIL;
-	}
-	if (state->m_MBCType == MBC_MBC4)
-	{
-		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Mapper MBC4 is not supported yet");
-		return IMAGE_INIT_FAIL;
-	}
-	/* MBC7 support is still work-in-progress, so only enable it for debug builds */
-#ifndef MAME_DEBUG
-	if (state->m_MBCType == MBC_MBC7)
-	{
-		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Mapper MBC7 is not supported yet");
-		return IMAGE_INIT_FAIL;
-	}
-#endif
-
-	state->m_ROMBanks = filesize / 0x4000;
-	switch (gb_header[0x0148])
-	{
-	case 0x52:
-		reported_rom_banks = 72;
-		break;
-	case 0x53:
-		reported_rom_banks = 80;
-		break;
-	case 0x54:
-		reported_rom_banks = 96;
-		break;
-	case 0x00: case 0x01: case 0x02: case 0x03:
-	case 0x04: case 0x05: case 0x06: case 0x07:
-		reported_rom_banks = 2 << gb_header[0x0148];
-		break;
-	default:
-		logerror("Warning loading cartridge: Unknown ROM size in header.\n");
-		reported_rom_banks = 256;
-		break;
-	}
-	if (state->m_ROMBanks != reported_rom_banks && state->m_MBCType != MBC_WISDOM)
-	{
-		logerror("Warning loading cartridge: Filesize and reported ROM banks don't match.\n");
-	}
-
-	state->m_RAMBanks = rambanks[gb_header[0x0149] & 7];
-
-	/* Calculate and check checksum */
-	Checksum = ((UINT16) gb_header[0x014E] << 8) + gb_header[0x014F];
-	Checksum += gb_header[0x014E] + gb_header[0x014F];
-	for (I = 0; I < filesize; I++)
-	{
-		Checksum -= state->m_gb_cart[I];
-	}
-	if (Checksum & 0xFFFF)
-	{
-		logerror("Warning loading cartridge: Checksum is wrong.");
-	}
-
-	/* Initialize ROMMap pointers */
-	for (I = 0; I < state->m_ROMBanks; I++)
-	{
-		state->m_ROMMap[I] = state->m_gb_cart + (I * 0x4000);
-	}
-
-	/*
-	  Handle odd-sized cartridges (72,80,96 banks)
-	  ROMBanks      ROMMask
-	  72 (1001000)  1000111 (71)
-	  80 (1010000)  1001111 (79)
-	  96 (1100000)  1011111 (95)
-	*/
-	state->m_ROMMask = I - 1;
-	if ((state->m_ROMBanks & state->m_ROMMask) != 0)
-	{
-		for( ; I & state->m_ROMBanks; I++)
-		{
-			state->m_ROMMap[I] = state->m_ROMMap[I & state->m_ROMMask];
-		}
-		state->m_ROMMask = I - 1;
-	}
-
-	/* Fill out the remaining rom bank pointers, if any. */
-	for ( ; I < MAX_ROMBANK; I++)
-	{
-		state->m_ROMMap[I] = state->m_ROMMap[I & state->m_ROMMask];
-	}
-
-	/* Log cart information */
-	{
-		const char *P;
-		char S[50];
-		static const int ramsize[8] = { 0, 2, 8, 32, 128, 64, 0, 0 };
-
-
-		strncpy (S, (char *)&gb_header[0x0134], 16);
-		S[16] = '\0';
-		logerror("Cart Information\n");
-		logerror("\tName:             %s\n", S);
-		logerror("\tType:             %s [0x%2X]\n", (gb_header[0x0147] <= 32) ? CartTypes[gb_header[0x0147]] : "", gb_header[0x0147] );
-		logerror("\tGame Boy:         %s\n", (gb_header[0x0143] == 0xc0) ? "No" : "Yes" );
-		logerror("\tSuper GB:         %s [0x%2X]\n", (gb_header[0x0146] == 0x03) ? "Yes" : "No", gb_header[0x0146] );
-		logerror("\tColor GB:         %s [0x%2X]\n", (gb_header[0x0143] == 0x80 || gb_header[0x0143] == 0xc0) ? "Yes" : "No", state->m_gb_cart[0x0143] );
-		logerror("\tROM Size:         %d 16kB Banks [0x%2X]\n", state->m_ROMBanks, gb_header[0x0148]);
-		logerror("\tRAM Size:         %d kB [0x%2X]\n", ramsize[ gb_header[0x0149] & 0x07 ], gb_header[0x0149]);
-		logerror("\tLicense code:     0x%2X%2X\n", gb_header[0x0145], gb_header[0x0144] );
-		J = ((UINT16) gb_header[0x014B] << 8) + gb_header[0x014A];
-		for (I = 0, P = NULL; !P && Companies[I].Name; I++)
-			if (J == Companies[I].Code)
-				P = Companies[I].Name;
-		logerror("\tManufacturer ID:  0x%2X", J);
-		logerror(" [%s]\n", P ? P : "?");
-		logerror("\tVersion Number:   0x%2X\n", gb_header[0x014C]);
-		logerror("\tComplement Check: 0x%2X\n", gb_header[0x014D]);
-		logerror("\tChecksum:         0x%2X\n", ( ( gb_header[0x014E] << 8 ) + gb_header[0x014F] ) );
-		J = ((UINT16) gb_header[0x0103] << 8) + gb_header[0x0102];
-		logerror("\tStart Address:    0x%2X\n", J);
-	}
-
-	/* MBC2 has 512 * 4bits (8kb) internal RAM */
-	if(state->m_MBCType == MBC_MBC2)
-		state->m_RAMBanks = 1;
-	/* MBC7 has 512 bytes(?) of internal RAM */
-	if (state->m_MBCType == MBC_MBC7)
-	{
-		state->m_RAMBanks = 1;
-	}
-
-	if (state->m_RAMBanks && state->m_MBCType)
-	{
-		/* Claim memory */
-		state->m_gb_cart_ram = auto_alloc_array(image.device().machine(), UINT8, state->m_RAMBanks * 0x2000);
-		memset(state->m_gb_cart_ram, 0xFF, state->m_RAMBank * 0x2000);
-
-		for (I = 0; I < state->m_RAMBanks; I++)
-		{
-			state->m_RAMMap[I] = state->m_gb_cart_ram + (I * 0x2000);
-		}
-
-		/* Set up rest of the (mirrored) RAM pages */
-		state->m_RAMMask = I - 1;
-		for ( ; I < MAX_RAMBANK; I++)
-		{
-			state->m_RAMMap[I] = state->m_RAMMap[I & state->m_RAMMask];
-		}
-	}
-	else
-	{
-		state->m_RAMMask = 0;
-	}
-
-	/* If there's an RTC claim memory to store the RTC contents */
-	if (state->m_CartType & TIMER)
-	{
-		state->m_MBC3RTCData = auto_alloc_array(image.device().machine(), UINT8, 0x2000);
-	}
-
-	if (state->m_MBCType == MBC_TAMA5)
-	{
-		state->m_MBC3RTCData = auto_alloc_array(image.device().machine(), UINT8, 0x2000);
-		memset(state->m_gbTama5Memory, 0xff, sizeof(state->m_gbTama5Memory));
-	}
-
-	/* Load the saved RAM if this cart has a battery */
-	if (state->m_CartType & BATTERY && state->m_RAMBanks)
-	{
-		image.battery_load(state->m_gb_cart_ram, state->m_RAMBanks * 0x2000, 0x00);
-	}
-
-	return IMAGE_INIT_PASS;
-}
 
 INTERRUPT_GEN_MEMBER(gb_state::gb_scanline_interrupt)
 {
@@ -2097,18 +997,18 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 	switch( offset )
 	{
 		case 0x0D:  /* KEY1 - Prepare speed switch */
-			machine().device<lr35902_cpu_device>(":maincpu")->set_speed( data );
+			machine().device<lr35902_cpu_device>(":maincpu")->set_speed(data);
 			return;
 		case 0x10:  /* BFF - Bios disable */
-			gb_rom16_0000( m_ROMMap[m_ROMBank00] );
+			m_bios_disable = TRUE;
 			return;
 		case 0x16:  /* RP - Infrared port */
 			break;
 		case 0x30:  /* SVBK - RAM bank select */
 			m_GBC_RAMBank = data & 0x7;
-			if ( ! m_GBC_RAMBank )
+			if (!m_GBC_RAMBank)
 				m_GBC_RAMBank = 1;
-			m_bank3->set_base(m_GBC_RAMMap[m_GBC_RAMBank]);
+			m_rambank->set_base(m_GBC_RAMMap[m_GBC_RAMBank]);
 			break;
 		default:
 			break;
@@ -2138,7 +1038,7 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 
  ****************************************************************************/
 
-MACHINE_START_MEMBER(gb_state,megaduck)
+MACHINE_START_MEMBER(megaduck_state,megaduck)
 {
 	/* Allocate the serial timer, and disable it */
 	m_gb_serial_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gb_state::gb_serial_timer_proc),this));
@@ -2147,10 +1047,12 @@ MACHINE_START_MEMBER(gb_state,megaduck)
 	MACHINE_START_CALL_MEMBER( gb_video );
 }
 
-MACHINE_RESET_MEMBER(gb_state,megaduck)
+MACHINE_RESET_MEMBER(megaduck_state,megaduck)
 {
 	/* We may have to add some more stuff here, if not then it can be merged back into gb */
 	gb_init();
+	
+	m_bios_disable = TRUE;
 
 	gb_video_reset( GB_VIDEO_DMG );
 }
@@ -2191,7 +1093,7 @@ MACHINE_RESET_MEMBER(gb_state,megaduck)
 
  **************/
 
-READ8_MEMBER(gb_state::megaduck_video_r)
+READ8_MEMBER(megaduck_state::megaduck_video_r)
 {
 	UINT8 data;
 
@@ -2205,7 +1107,7 @@ READ8_MEMBER(gb_state::megaduck_video_r)
 	return BITSWAP8(data,7,0,5,4,6,3,2,1);
 }
 
-WRITE8_MEMBER(gb_state::megaduck_video_w)
+WRITE8_MEMBER(megaduck_state::megaduck_video_w)
 {
 	if ( !offset )
 	{
@@ -2222,17 +1124,17 @@ WRITE8_MEMBER(gb_state::megaduck_video_w)
 
 static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F };
 
-WRITE8_MEMBER(gb_state::megaduck_sound_w1)
+WRITE8_MEMBER(megaduck_state::megaduck_sound_w1)
 {
 	gb_sound_w(machine().device("custom"), space, megaduck_sound_offsets[offset], data );
 }
 
-READ8_MEMBER(gb_state::megaduck_sound_r1)
+READ8_MEMBER(megaduck_state::megaduck_sound_r1)
 {
 	return gb_sound_r( machine().device("custom"), space, megaduck_sound_offsets[offset] );
 }
 
-WRITE8_MEMBER(gb_state::megaduck_sound_w2)
+WRITE8_MEMBER(megaduck_state::megaduck_sound_w2)
 {
 	switch(offset)
 	{
@@ -2256,98 +1158,8 @@ WRITE8_MEMBER(gb_state::megaduck_sound_w2)
 	}
 }
 
-READ8_MEMBER(gb_state::megaduck_sound_r2)
+READ8_MEMBER(megaduck_state::megaduck_sound_r2)
 {
 	return gb_sound_r(machine().device("custom"), space, 0x10 + megaduck_sound_offsets[offset]);
 }
 
-WRITE8_MEMBER(gb_state::megaduck_rom_bank_select_type1)
-{
-	if( m_ROMMask )
-	{
-		m_ROMBank = data & m_ROMMask;
-
-		/* Switch banks */
-		m_bank1->set_base(m_ROMMap[m_ROMBank]);
-	}
-}
-
-WRITE8_MEMBER(gb_state::megaduck_rom_bank_select_type2)
-{
-	if( m_ROMMask )
-	{
-		m_ROMBank = (data << 1) & m_ROMMask;
-
-		/* Switch banks */
-		m_bank10->set_base( m_ROMMap[m_ROMBank]);
-		m_bank1->set_base( m_ROMMap[m_ROMBank + 1]);
-	}
-}
-
-DEVICE_IMAGE_LOAD_MEMBER(gb_state,megaduck_cart)
-{
-	gb_state *state = image.device().machine().driver_data<gb_state>();
-	int I;
-	UINT32 filesize;
-
-	for (I = 0; I < MAX_ROMBANK; I++)
-		state->m_ROMMap[I] = NULL;
-	for (I = 0; I < MAX_RAMBANK; I++)
-		state->m_RAMMap[I] = NULL;
-
-	if (image.software_entry() == NULL)
-		filesize = image.length();
-	else
-		filesize = image.get_software_region_length("rom");
-
-	if ((filesize == 0) || ((filesize % 0x4000) != 0))
-	{
-		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size");
-		return IMAGE_INIT_FAIL;
-	}
-
-	state->m_ROMBanks = filesize / 0x4000;
-
-	/* Claim memory */
-	state->m_gb_cart = auto_alloc_array(image.device().machine(), UINT8, filesize);
-
-	/* Read cartridge */
-	if (image.software_entry() == NULL)
-	{
-		if (image.fread( state->m_gb_cart, filesize) != filesize)
-		{
-			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return IMAGE_INIT_FAIL;
-		}
-	}
-	else
-	{
-		memcpy(state->m_gb_cart, image.get_software_region("rom"), filesize);
-	}
-
-	/* Log cart information */
-	{
-		logerror("Cart Information\n");
-		logerror("\tRom Banks:        %d\n", state->m_ROMBanks);
-	}
-
-	for (I = 0; I < state->m_ROMBanks; I++)
-	{
-		state->m_ROMMap[I] = state->m_gb_cart + (I * 0x4000);
-	}
-
-	/* Build rom bank Mask */
-	if (state->m_ROMBanks < 3)
-		state->m_ROMMask = 0;
-	else
-	{
-		for (I = 1; I < state->m_ROMBanks; I <<= 1)
-		{
-		}
-		state->m_ROMMask = I - 1;
-	}
-
-	state->m_MBCType = MBC_MEGADUCK;
-
-	return IMAGE_INIT_PASS;
-}

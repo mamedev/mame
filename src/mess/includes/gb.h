@@ -7,6 +7,7 @@
 #ifndef GB_H_
 #define GB_H_
 
+#include "machine/gb_slot.h"
 
 
 /* Interrupts */
@@ -110,15 +111,9 @@ class gb_state : public driver_device
 public:
 	gb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, m_cartslot(*this, "gbslot")
 		, m_maincpu(*this, "maincpu")
-		, m_bank1(*this, "bank1")
-		, m_bank2(*this, "bank2")
-		, m_bank3(*this, "bank3")
-		, m_bank4(*this, "bank4")
-		, m_bank5(*this, "bank5")
-		, m_bank6(*this, "bank6")
-		, m_bank10(*this, "bank10")
-		, m_bank11(*this, "bank11")
+		, m_rambank(*this, "cgb_ram")
 		, m_inputs(*this, "INPUTS")
 	{ }
 
@@ -157,70 +152,16 @@ public:
 	UINT8 m_sgb_data[0x100];
 	UINT32 m_sgb_atf;
 
-	/* Cartridge/mapper */
-	UINT16      m_MBCType;              /* MBC type: 0 for none */
-	UINT8       m_CartType;             /* Cartridge type (battery, ram, rtc, etc) */
-	UINT8       *m_ROMMap[MAX_ROMBANK]; /* Addresses of ROM banks */
-	UINT16      m_ROMBank;              /* Index of ROM bank currently used at 4000-7fff */
-	UINT16      m_ROMBank00;                /* Index of ROM bank currently used at 0000-3fff */
-	UINT8       m_ROMMask;              /* Mask for the ROM bank number */
-	UINT16      m_ROMBanks;             /* Total number of ROM banks */
-	UINT8       *m_RAMMap[MAX_RAMBANK]; /* Addresses of RAM banks */
-	UINT8       m_RAMBank;              /* Number of RAM bank currently used */
-	UINT8       m_RAMMask;              /* Mask for the RAM bank number */
-	UINT8       m_RAMBanks;             /* Total number of RAM banks */
-	UINT8       m_MBC1Mode;             /* MBC1 ROM/RAM mode */
-	UINT8       *m_MBC3RTCData;         /* MBC3 RTC data */
-	UINT8       m_MBC3RTCMap[5];            /* MBC3 RTC banks */
-	UINT8       m_MBC3RTCBank;          /* MBC3 RTC bank */
+	/* CGB variables */
 	UINT8       *m_GBC_RAMMap[8];           /* (CGB) Addresses of internal RAM banks */
 	UINT8       m_GBC_RAMBank;          /* (CGB) Current CGB RAM bank */
-	UINT8       m_gbTama5Memory[32];
-	UINT8       m_gbTama5Byte;
-	UINT8       m_gbTama5Address;
-	UINT8       m_gbLastTama5Command;
-	UINT8       *m_gb_cart;
-	UINT8       *m_gb_cart_ram;
-	UINT8       *m_gb_dummy_rom_bank;
-	UINT8       *m_gb_dummy_ram_bank;
 
-	UINT8 m_mmm01_bank_offset;
-	UINT8 m_mmm01_reg1;
-	UINT8 m_mmm01_bank;
-	UINT8 m_mmm01_bank_mask;
+	
 	gb_lcd_t m_lcd;
 	void (gb_state::*update_scanline) ();
+	bool m_bios_disable;
 
 	bitmap_ind16 m_bitmap;
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc1);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc2);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc3);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc5);
-	DECLARE_WRITE8_MEMBER(gb_ram_bank_select_mbc6);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc6_1);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc6_2);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc7);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_unknown_mbc7);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_wisdom);
-	DECLARE_WRITE8_MEMBER(gb_ram_bank_select_mbc1);
-	DECLARE_WRITE8_MEMBER(gb_ram_bank_select_mbc3);
-	DECLARE_WRITE8_MEMBER(gb_ram_bank_select_mbc5);
-	DECLARE_WRITE8_MEMBER(gb_ram_enable);
-	DECLARE_WRITE8_MEMBER(gb_mem_mode_select_mbc1);
-	DECLARE_WRITE8_MEMBER(gb_mem_mode_select_mbc3);
-	DECLARE_WRITE8_MEMBER(gb_ram_tama5);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_mmm01_0000_w);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_mmm01_2000_w);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_mmm01_4000_w);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_mmm01_6000_w);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc1_kor);
-	DECLARE_WRITE8_MEMBER(gb_ram_bank_select_mbc1_kor);
-	DECLARE_WRITE8_MEMBER(gb_mem_mode_select_mbc1_kor);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_yongyong_2000);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_lasama_6000);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_lasama_2080);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_atvracin_3f00);
-	DECLARE_WRITE8_MEMBER(gb_rom_bank_atvracin_3fc0);
 	DECLARE_WRITE8_MEMBER(gb_io_w);
 	DECLARE_WRITE8_MEMBER(gb_io2_w);
 	DECLARE_WRITE8_MEMBER(sgb_io_w);
@@ -229,14 +170,6 @@ public:
 	DECLARE_READ8_MEMBER(gb_io_r);
 	DECLARE_WRITE8_MEMBER(gbc_io2_w);
 	DECLARE_READ8_MEMBER(gbc_io2_r);
-	DECLARE_READ8_MEMBER(megaduck_video_r);
-	DECLARE_WRITE8_MEMBER(megaduck_video_w);
-	DECLARE_WRITE8_MEMBER(megaduck_sound_w1);
-	DECLARE_READ8_MEMBER(megaduck_sound_r1);
-	DECLARE_WRITE8_MEMBER(megaduck_sound_w2);
-	DECLARE_READ8_MEMBER(megaduck_sound_r2);
-	DECLARE_WRITE8_MEMBER(megaduck_rom_bank_select_type1);
-	DECLARE_WRITE8_MEMBER(megaduck_rom_bank_select_type2);
 	DECLARE_READ8_MEMBER(gb_video_r);
 	DECLARE_READ8_MEMBER(gb_vram_r);
 	DECLARE_WRITE8_MEMBER(gb_vram_w);
@@ -248,9 +181,6 @@ public:
 	DECLARE_MACHINE_START(gb);
 	DECLARE_MACHINE_RESET(gb);
 	DECLARE_PALETTE_INIT(gb);
-	DECLARE_MACHINE_START(megaduck);
-	DECLARE_MACHINE_RESET(megaduck);
-	DECLARE_PALETTE_INIT(megaduck);
 	DECLARE_MACHINE_START(sgb);
 	DECLARE_MACHINE_RESET(sgb);
 	DECLARE_PALETTE_INIT(sgb);
@@ -267,32 +197,23 @@ public:
 	TIMER_CALLBACK_MEMBER(gb_lcd_timer_proc);
 	TIMER_CALLBACK_MEMBER(gbc_lcd_timer_proc);
 	DECLARE_WRITE8_MEMBER(gb_timer_callback);
-	DECLARE_DRIVER_INIT(gb);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gb_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(megaduck_cart);
+
+	DECLARE_READ8_MEMBER(gb_cart_r);
+	DECLARE_READ8_MEMBER(gbc_cart_r);
+	DECLARE_WRITE8_MEMBER(gb_bank_w);
+	DECLARE_READ8_MEMBER(gb_ram_r);
+	DECLARE_WRITE8_MEMBER(gb_ram_w);
+	optional_device<gb_cart_slot_device> m_cartslot;
 
 protected:
 	required_device<lr35902_cpu_device> m_maincpu;
-	required_memory_bank m_bank1;   // all
-	optional_memory_bank m_bank2;   // dmg, sgb, cgb
-	optional_memory_bank m_bank3;   // cgb
-	optional_memory_bank m_bank4;   // dmg, sgb, cgb
-	optional_memory_bank m_bank5;   // dmg, sgb, cgb
-	optional_memory_bank m_bank6;   // dmg, sgb, cgb
-	required_memory_bank m_bank10;  // all
-	optional_memory_bank m_bank11;  // dmg, sgb, cgb
+	optional_memory_bank m_rambank;   // cgb
 	required_ioport m_inputs;
 
 	void gb_timer_increment();
 	void gb_timer_check_irq();
-	void gb_init_regs();
-	void gb_rom16_0000( UINT8 *addr );
-	void gb_rom16_4000( UINT8 *addr );
-	void gb_rom8_4000( UINT8 *addr );
-	void gb_rom8_6000( UINT8 *addr );
 	void gb_init();
-	void gb_set_mbc1_banks();
-	void gb_set_mbc1_kor_banks();
+	void gb_init_regs();
 	void gb_select_sprites();
 	void gb_update_sprites();
 	void gb_update_scanline();
@@ -305,7 +226,37 @@ protected:
 	void gbc_hdma(UINT16 length);
 	void gb_increment_scanline();
 	void gb_lcd_switch_on();
-	void gb_machine_stop();
+};
+
+
+class megaduck_state : public gb_state
+{
+public:
+	megaduck_state(const machine_config &mconfig, device_type type, const char *tag)
+	: gb_state(mconfig, type, tag)
+	, m_cartslot(*this, "duckslot")
+	, m_maincpu(*this, "maincpu")
+	, m_inputs(*this, "INPUTS")
+	{ }
+	
+	DECLARE_READ8_MEMBER(megaduck_video_r);
+	DECLARE_WRITE8_MEMBER(megaduck_video_w);
+	DECLARE_WRITE8_MEMBER(megaduck_sound_w1);
+	DECLARE_READ8_MEMBER(megaduck_sound_r1);
+	DECLARE_WRITE8_MEMBER(megaduck_sound_w2);
+	DECLARE_READ8_MEMBER(megaduck_sound_r2);
+	DECLARE_MACHINE_START(megaduck);
+	DECLARE_MACHINE_RESET(megaduck);
+	DECLARE_PALETTE_INIT(megaduck);
+	
+	DECLARE_READ8_MEMBER(cart_r);
+	DECLARE_WRITE8_MEMBER(bank1_w);
+	DECLARE_WRITE8_MEMBER(bank2_w);
+	optional_device<megaduck_cart_slot_device> m_cartslot;
+	
+protected:
+	required_device<lr35902_cpu_device> m_maincpu;
+	required_ioport m_inputs;
 };
 
 

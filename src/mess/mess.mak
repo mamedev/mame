@@ -1421,6 +1421,9 @@ $(MESSOBJ)/nintendo.a:          \
 	$(MESS_AUDIO)/gb.o          \
 	$(MESS_VIDEO)/gb.o          \
 	$(MESS_MACHINE)/gb.o        \
+	$(MESS_MACHINE)/gb_slot.o   \
+	$(MESS_MACHINE)/gb_rom.o    \
+	$(MESS_MACHINE)/gb_mbc.o    \
 	$(MESS_DRIVERS)/gb.o        \
 	$(MESS_MACHINE)/pokemini.o  \
 	$(MESS_DRIVERS)/pokemini.o  \
@@ -1627,12 +1630,12 @@ $(MESSOBJ)/sanyo.a:             \
 $(MESSOBJ)/sega.a:              \
 	$(MESS_DRIVERS)/sg1000.o    \
 	$(MESS_MACHINE)/md_slot.o   \
-	$(MESS_MACHINE)/md_rom.o   \
-	$(MESS_MACHINE)/md_sk.o   \
-	$(MESS_MACHINE)/md_eeprom.o   \
-	$(MESS_MACHINE)/md_jcart.o   \
-	$(MESS_MACHINE)/md_stm95.o   \
-	$(MESS_MACHINE)/megasvp.o \
+	$(MESS_MACHINE)/md_rom.o    \
+	$(MESS_MACHINE)/md_sk.o     \
+	$(MESS_MACHINE)/md_eeprom.o \
+	$(MESS_MACHINE)/md_jcart.o  \
+	$(MESS_MACHINE)/md_stm95.o  \
+	$(MESS_MACHINE)/megasvp.o   \
 	$(MESS_DRIVERS)/megadriv.o  \
 	$(MESS_DRIVERS)/dccons.o    \
 	$(MAME_MACHINE)/gdrom.o     \

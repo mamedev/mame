@@ -447,6 +447,9 @@ space. This mapper uses 32KB sized banks.
 #include "rendlay.h"
 #include "audio/gb.h"
 #include "includes/gb.h"
+#include "machine/gb_slot.h"
+#include "machine/gb_rom.h"
+#include "machine/gb_mbc.h"
 
 
 /* Initial value of the cpu registers (hacks until we get bios dumps) */
@@ -474,16 +477,113 @@ static ADDRESS_MAP_START(gb_map, AS_PROGRAM, 8, gb_state )
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w )        /* Interrupt enable register */
 ADDRESS_MAP_END
 
+READ8_MEMBER(gb_state::gb_cart_r)
+{
+	if (m_bios_disable && m_cartslot->m_cart)
+		return m_cartslot->m_cart->read_rom(space, offset);
+	else
+	{
+		if (offset < 0x100)
+		{
+			UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
+			return ROM[offset];
+		}
+		else if (m_cartslot->m_cart)
+		{
+			return m_cartslot->m_cart->read_rom(space, offset);
+		}
+		else
+			return 0xff;
+	}
+}
+
+READ8_MEMBER(gb_state::gbc_cart_r)
+{
+	if (m_bios_disable && m_cartslot->m_cart)
+		return m_cartslot->m_cart->read_rom(space, offset);
+	else
+	{
+		if (offset < 0x100)
+		{
+			UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
+			return ROM[offset];
+		}
+		else if (offset >= 0x200 && offset < 0x900)
+		{
+			UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
+			return ROM[offset - 0x100];
+		}
+		else if (m_cartslot->m_cart)
+		{
+			return m_cartslot->m_cart->read_rom(space, offset);
+		}
+		else
+			return 0xff;
+	}
+}
+
+WRITE8_MEMBER(gb_state::gb_bank_w)
+{
+	if (m_cartslot->m_cart)
+		m_cartslot->m_cart->write_bank(space, offset, data);
+}
+
+READ8_MEMBER(gb_state::gb_ram_r)
+{
+	if (m_cartslot->m_cart)
+		return m_cartslot->m_cart->read_ram(space, offset);
+	else
+		return 0xff;
+}
+
+WRITE8_MEMBER(gb_state::gb_ram_w)
+{
+	if (m_cartslot->m_cart)
+		m_cartslot->m_cart->write_ram(space, offset, data);
+}
+
+READ8_MEMBER(megaduck_state::cart_r)
+{
+	if (m_cartslot && m_cartslot->m_cart)
+		return m_cartslot->m_cart->read_rom(space, offset);
+	else
+		return 0xff;
+}
+
+WRITE8_MEMBER(megaduck_state::bank1_w)
+{
+	if (m_cartslot->m_cart)
+		m_cartslot->m_cart->write_bank(space, offset, data);
+}
+
+WRITE8_MEMBER(megaduck_state::bank2_w)
+{
+	if (m_cartslot->m_cart)
+		m_cartslot->m_cart->write_ram(space, offset, data); /* used for bankswitch, but we re-use GB name */
+}
+
+
+static ADDRESS_MAP_START(gameboy_map, AS_PROGRAM, 8, gb_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w ) /* 8k VRAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w )   /* 8k switched RAM bank (cartridge) */
+	AM_RANGE(0xc000, 0xfdff) AM_RAM                     /* 8k low RAM, echo RAM */
+	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w )  /* OAM RAM */
+	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w )        /* I/O */
+	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE_LEGACY("custom", gb_sound_r, gb_sound_w )      /* sound registers */
+	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
+	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE_LEGACY("custom", gb_wave_r, gb_wave_w )        /* Wave ram */
+	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(gb_video_r, gb_io2_w)     /* Video controller & BIOS flip-flop */
+	AM_RANGE(0xff80, 0xfffe) AM_RAM                     /* High RAM */
+	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w )        /* Interrupt enable register */
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START(sgb_map, AS_PROGRAM, 8, gb_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK("bank5")                    /* BIOS or ROM */
-	AM_RANGE(0x0100, 0x01ff) AM_ROMBANK("bank10")                   /* ROM bank */
-	AM_RANGE(0x0200, 0x08ff) AM_ROMBANK("bank6")
-	AM_RANGE(0x0900, 0x3fff) AM_ROMBANK("bank11")
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")                    /* 8KB/16KB switched ROM bank */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")                    /* 8KB/16KB switched ROM bank */
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w ) /* 8k VRAM */
-	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank2")                    /* 8k switched RAM bank (cartridge) */
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w )   /* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xfdff) AM_RAM                     /* 8k low RAM, echo RAM */
 	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w )  /* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, sgb_io_w )       /* I/O */
@@ -497,16 +597,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(gbc_map, AS_PROGRAM, 8, gb_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK("bank5")                    /* 16k fixed ROM bank */
-	AM_RANGE(0x0100, 0x01ff) AM_ROMBANK("bank10")                   /* ROM bank */
-	AM_RANGE(0x0200, 0x08ff) AM_ROMBANK("bank6")
-	AM_RANGE(0x0900, 0x3fff) AM_ROMBANK("bank11")
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")                    /* 8KB/16KB switched ROM bank */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")                    /* 8KB/16KB switched ROM bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w )        /* 8k switched VRAM bank */
-	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank2")                    /* 8k switched RAM bank (on cartridge) */
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gbc_cart_r, gb_bank_w)
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w ) /* 8k VRAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w )   /* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM                     /* 4k fixed RAM bank */
-	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("bank3")                    /* 4k switched RAM bank */
+	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("cgb_ram")                    /* 4k switched RAM bank */
 	AM_RANGE(0xe000, 0xfdff) AM_RAM                     /* echo RAM */
 	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w )  /* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w )        /* I/O */
@@ -518,12 +613,13 @@ static ADDRESS_MAP_START(gbc_map, AS_PROGRAM, 8, gb_state )
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w )        /* Interrupt enable register */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(megaduck_map, AS_PROGRAM, 8, gb_state )
+static ADDRESS_MAP_START(megaduck_map, AS_PROGRAM, 8, megaduck_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank10")                       /* 16k switched ROM bank */
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")                        /* 16k switched ROM bank */
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(cart_r, bank1_w)
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w )        /* 8k VRAM */
-	AM_RANGE(0xa000, 0xbfff) AM_NOP                         /* unused? */
+	AM_RANGE(0xa000, 0xafff) AM_NOP                         /* unused? */
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(bank2_w)				
+	AM_RANGE(0xb001, 0xbfff) AM_NOP                         /* unused? */
 	AM_RANGE(0xc000, 0xfe9f) AM_RAM                         /* 8k low RAM, echo RAM */
 	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w )      /* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w )            /* I/O */
@@ -584,13 +680,36 @@ static MACHINE_CONFIG_START( gb_common, gb_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gameboy, gb_common )
+static SLOT_INTERFACE_START(gb_cart)
+	SLOT_INTERFACE_INTERNAL("rom",  GB_STD_ROM)
+	SLOT_INTERFACE_INTERNAL("rom_mbc1",  GB_ROM_MBC1)
+	SLOT_INTERFACE_INTERNAL("rom_mbc1k",  GB_ROM_MBC1K)
+	SLOT_INTERFACE_INTERNAL("rom_mbc2",  GB_ROM_MBC2)
+	SLOT_INTERFACE_INTERNAL("rom_mbc3",  GB_ROM_MBC3)
+	SLOT_INTERFACE_INTERNAL("rom_huc1",  GB_ROM_MBC3)
+	SLOT_INTERFACE_INTERNAL("rom_huc3",  GB_ROM_MBC3)
+	SLOT_INTERFACE_INTERNAL("rom_mbc5",  GB_ROM_MBC5)
+	SLOT_INTERFACE_INTERNAL("rom_mbc6",  GB_ROM_MBC6)
+	SLOT_INTERFACE_INTERNAL("rom_mbc7",  GB_ROM_MBC7)
+	SLOT_INTERFACE_INTERNAL("rom_tama5",  GB_ROM_TAMA5)
+	SLOT_INTERFACE_INTERNAL("rom_mmm01",  GB_ROM_MMM01)
+	SLOT_INTERFACE_INTERNAL("rom_wisdom",  GB_ROM_WISDOM)
+	SLOT_INTERFACE_INTERNAL("rom_yong",  GB_ROM_YONG)
+	SLOT_INTERFACE_INTERNAL("rom_lasama",  GB_ROM_LASAMA)
+	SLOT_INTERFACE_INTERNAL("rom_atvrac",  GB_ROM_ATVRAC)
+	SLOT_INTERFACE_INTERNAL("rom_camera",  GB_STD_ROM)
+SLOT_INTERFACE_END
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,gbc,sgb,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("gameboy_cart")
-	MCFG_CARTSLOT_LOAD(gb_state,gb_cart)
+static SLOT_INTERFACE_START(megaduck_cart)
+	SLOT_INTERFACE_INTERNAL("rom",  MEGADUCK_ROM)
+SLOT_INTERFACE_END
+
+static MACHINE_CONFIG_DERIVED( gameboy, gb_common )
+	MCFG_CPU_REPLACE("maincpu", LR35902, 4194304)           /* 4.194304 MHz */
+	MCFG_CPU_PROGRAM_MAP(gameboy_map)
+
+	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, NULL, NULL)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gameboy")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gbc_list","gbcolor")
 MACHINE_CONFIG_END
@@ -621,14 +740,11 @@ static MACHINE_CONFIG_DERIVED( gbpocket, gameboy )
 	MCFG_LR35902_HALT_BUG
 	MCFG_LR35902_RESET_VALUES(mgb_cpu_regs)
 
-	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gbpocket )
+	MCFG_MACHINE_RESET_OVERRIDE(gb_state, gbpocket)
 	MCFG_PALETTE_INIT_OVERRIDE(gb_state,gbp)
-
-	MCFG_CARTSLOT_MODIFY("cart")
-	MCFG_CARTSLOT_MANDATORY
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( gbcolor, gb_common )
+static MACHINE_CONFIG_DERIVED( gbcolor, gameboy )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP( gbc_map)
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
@@ -643,16 +759,13 @@ static MACHINE_CONFIG_DERIVED( gbcolor, gb_common )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("48K") /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,gbc,sgb,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("gameboy_cart")
-	MCFG_CARTSLOT_LOAD(gb_state,gb_cart)
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_DEVICE_REMOVE("gbc_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gbcolor")
 	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("gb_list","gameboy")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( megaduck, gb_state )
+static MACHINE_CONFIG_START( megaduck, megaduck_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, 4194304)           /* 4.194304 MHz */
 	MCFG_CPU_PROGRAM_MAP( megaduck_map)
@@ -666,8 +779,8 @@ static MACHINE_CONFIG_START( megaduck, gb_state )
 	MCFG_SCREEN_VBLANK_TIME(0)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	MCFG_MACHINE_START_OVERRIDE(gb_state, megaduck )
-	MCFG_MACHINE_RESET_OVERRIDE(gb_state, megaduck )
+	MCFG_MACHINE_START_OVERRIDE(megaduck_state, megaduck )
+	MCFG_MACHINE_RESET_OVERRIDE(megaduck_state, megaduck )
 
 	MCFG_SCREEN_UPDATE_DRIVER(gb_state, screen_update)
 	MCFG_SCREEN_SIZE(20*8, 18*8)
@@ -676,19 +789,14 @@ static MACHINE_CONFIG_START( megaduck, gb_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 	MCFG_GFXDECODE(gb)
 	MCFG_PALETTE_LENGTH(4)
-	MCFG_PALETTE_INIT_OVERRIDE(gb_state,megaduck)
+	MCFG_PALETTE_INIT_OVERRIDE(megaduck_state,megaduck)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MCFG_SOUND_ADD("custom", GAMEBOY, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("megaduck_cart")
-	MCFG_CARTSLOT_LOAD(gb_state,megaduck_cart)
-	MCFG_SOFTWARE_LIST_ADD("cart_list","megaduck")
+	MCFG_MEGADUCK_CARTRIDGE_ADD("duckslot", megaduck_cart, NULL, NULL)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -729,13 +837,13 @@ ROM_START( megaduck )
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT    INIT  COMPANY     FULLNAME */
-CONS( 1990, gameboy,  0,       0,       gameboy,  gameboy, gb_state, gb,    "Nintendo", "Game Boy", 0)
-CONS( 1994, supergb,  gameboy, 0,       supergb,  gameboy, gb_state, gb,    "Nintendo", "Super Game Boy", 0)
-CONS( 1996, gbpocket, gameboy, 0,       gbpocket, gameboy, gb_state, gb,    "Nintendo", "Game Boy Pocket", 0)
-CONS( 1997, gblight,  gameboy, 0,       gbpocket, gameboy, gb_state, gb,    "Nintendo", "Game Boy Light", 0)
-CONS( 1998, gbcolor,  gameboy, 0,       gbcolor,  gameboy, gb_state, gb,    "Nintendo", "Game Boy Color", GAME_IMPERFECT_GRAPHICS)
+CONS( 1990, gameboy,  0,       0,       gameboy,  gameboy, driver_device, 0,    "Nintendo", "Game Boy", 0)
+CONS( 1994, supergb,  gameboy, 0,       supergb,  gameboy, driver_device, 0,    "Nintendo", "Super Game Boy", 0)
+CONS( 1996, gbpocket, gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Pocket", 0)
+CONS( 1997, gblight,  gameboy, 0,       gbpocket, gameboy, driver_device, 0,    "Nintendo", "Game Boy Light", 0)
+CONS( 1998, gbcolor,  gameboy, 0,       gbcolor,  gameboy, driver_device, 0,    "Nintendo", "Game Boy Color", GAME_IMPERFECT_GRAPHICS)
 
 /* Sound is not 100% yet, it generates some sounds which could be ok. Since we're lacking a real
    system there's no way to verify. Same goes for the colors of the LCD. We are no using the default
    Game Boy green colors */
-CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, gb_state, gb,    "Creatronic/Videojet/Timlex/Cougar",  "MegaDuck/Cougar Boy" , 0)
+CONS( 1993, megaduck, 0,       0,       megaduck, gameboy, driver_device, 0,    "Creatronic/Videojet/Timlex/Cougar",  "MegaDuck/Cougar Boy" , 0)
