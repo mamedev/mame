@@ -1652,33 +1652,6 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
 		INT64 dst;
 
-		// select top and bottom halves of src1/src2 and sign extend if necessary
-		if (insn & 0x20)
-		{
-			src1 >>= 16;
-		}
-		else
-		{
-			src1 &= 0xffff;
-			if (src1 & 0x8000)
-			{
-				src1 |= 0xffff;
-			}
-		}
-
-		if (insn & 0x40)
-		{
-			src2 >>= 16;
-		}
-		else
-		{
-			src2 &= 0xffff;
-			if (src2 & 0x8000)
-			{
-				src2 |= 0xffff;
-			}
-		}
-
 		dst = (INT64)GET_REGISTER(arm, (insn>>12)&0xf);
 		dst |= (INT64)GET_REGISTER(arm, (insn>>16)&0xf)<<32;
 
@@ -1686,8 +1659,8 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		dst += (INT64)src1 * (INT64)src2;
 
 		// write back the result
-		SET_REGISTER(cpustart, (insn>>12)&0xf, (UINT32)(dst&0xffffffff));
-		SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)(dst>>32));
+		SET_REGISTER(cpustart, (insn>>12)&0xf, (UINT32)dst);
+		SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)(dst >> 32));
 	}
 	else if ((insn & 0x0ff00090) == 0x01600080) // SMULxy - v5
 	{

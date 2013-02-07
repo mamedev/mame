@@ -2383,85 +2383,62 @@ const bool drcarm7ops_0123(arm_state *arm, drcuml_block *block, compiler_state *
 	else if ((insn & 0x0ff00090) == 0x01000080) // SMLAxy - v5
 	{
 		UINT32 rm = insn&0xf;
-		UINT32 rn = (insn>>16)&0xf;
-		UINT32 rd = (insn>>12)&0xf;
-		UINT32 rr = (insn>>8)&0xf;
-
-		INT32 src1 = GET_REGISTER(arm, insn&0xf);
-		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
-		INT32 res1;
+		UINT32 rn = (insn>>8)&0xf;
+		UINT32 rd = (insn>>16)&0xf;
+		UINT32 ra = (insn>>12)&0xf;
 
 		UML_MOV(block, I0, DRC_REG(rm));
-		UML_MOV(block, I1, DRC_REG(rr));
+		UML_MOV(block, I1, DRC_REG(rn));
 
 		// select top and bottom halves of src1/src2 and sign extend if necessary
 		if (insn & 0x20)
 		{
 			UML_SHR(block, I0, I0, 16);
 		}
-		else
-		{
-			UML_SEXT(block, I1, I1, SIZE_WORD);
-			src1 &= 0xffff;
-			if (src1 & 0x8000)
-			{
-				src1 |= 0xffff;
-			}
-		}
+		UML_SEXT(block, I0, I0, SIZE_WORD);
 
 		if (insn & 0x40)
 		{
-			src2 >>= 16;
+			UML_SHR(block, I1, I1, 16);
 		}
-		else
-		{
-			src2 &= 0xffff;
-			if (src2 & 0x8000)
-			{
-				src2 |= 0xffff;
-			}
-		}
+		UML_SEXT(block, I0, I0, SIZE_WORD);
 
 		// do the signed multiply
-		res1 = src1 * src2;
+		UML_MULS(block, I0, I1, I0, I1);
+		UML_DSHL(block, I0, I0, 32);
+		UML_DOR(block, I0, I0, I1);
+		UML_MOV(block, I1, DRC_REG(ra));
+		UML_DADD(block, I0, I0, I1);
 		// and the accumulate.  NOTE: only the accumulate can cause an overflow, which is why we do it this way.
-		saturate_qbit_overflow(arm, (INT64)res1 + (INT64)GET_REGISTER(arm, (insn>>12)&0xf));
-
-		SET_REGISTER(arm, (insn>>16)&0xf, res1 + GET_REGISTER(arm, (insn>>12)&0xf));
-		R15 += 4;
+		saturate_qbit_overflow(arm, block);
+		UML_MOV(block, DRC_REG(rd), I0);
+		UML_ADD(block, DRC_PC, DRC_PC, 4);
 	}
 	else if ((insn & 0x0ff00090) == 0x01400080) // SMLALxy - v5
 	{
-		INT32 src1 = GET_REGISTER(arm, insn&0xf);
-		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
-		INT64 dst;
+		UINT32 rm = insn&0xf;
+		UINT32 rn = (insn>>8)&0xf;
+		UINT32 rdh = (insn>>16)&0xf;
+		UINT32 rdl = (insn>>12)&0xf;
+
+		UML_MOV(block, I0, DRC_REG(rm));
+		UML_MOV(block, I1, DRC_REG(rn));
 
 		// select top and bottom halves of src1/src2 and sign extend if necessary
 		if (insn & 0x20)
 		{
-			src1 >>= 16;
+			UML_SHR(block, I0, I0, 16);
 		}
-		else
-		{
-			src1 &= 0xffff;
-			if (src1 & 0x8000)
-			{
-				src1 |= 0xffff;
-			}
-		}
+		UML_SEXT(block, I0, I0, SIZE_WORD);
 
 		if (insn & 0x40)
 		{
-			src2 >>= 16;
+			UML_SHR(block, I1, I1, 16);
 		}
-		else
-		{
-			src2 &= 0xffff;
-			if (src2 & 0x8000)
-			{
-				src2 |= 0xffff;
-			}
-		}
+		UML_SEXT(block, I0, I0, SIZE_WORD);
+
+		// do the signed multiply
+		UML_MULS(block, I0, I1, I0, I1);
 
 		dst = (INT64)GET_REGISTER(arm, (insn>>12)&0xf);
 		dst |= (INT64)GET_REGISTER(arm, (insn>>16)&0xf)<<32;
