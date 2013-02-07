@@ -12,15 +12,6 @@
 #define ATARI_600XL 3
 #define ATARI_800XL 4
 
-/*----------- defined in machine/ataricrt.c -----------*/
-
-MACHINE_START( a400 );
-MACHINE_START( a800 );
-MACHINE_START( a800xl );
-MACHINE_START( a5200 );
-MACHINE_START( xegs );
-
-
 /*----------- defined in machine/atarifdc.c -----------*/
 /***************************************************************************
     MACROS
