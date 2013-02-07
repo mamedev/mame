@@ -19,11 +19,13 @@ class irisha_state : public driver_device
 {
 public:
 	irisha_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_pit(*this, "pit8253"),
-			m_speaker(*this, SPEAKER_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pit(*this, "pit8253")
+		, m_speaker(*this, SPEAKER_TAG)
 		{ }
 
+	required_device<cpu_device> m_maincpu;
 	required_device<pit8253_device> m_pit;
 	required_device<speaker_sound_device> m_speaker;
 
@@ -49,6 +51,8 @@ public:
 	UINT32 screen_update_irisha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(irisha_key);
 	DECLARE_WRITE_LINE_MEMBER(irisha_pic_set_int_line);
+
+	ioport_port *m_io_ports[10];
 };
 
 
