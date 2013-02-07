@@ -25,7 +25,6 @@
 #include "imagedev/chd_cd.h"
 #include "includes/stv.h"
 #include "cdrom.h"
-#include "stvcd.h"
 #include "sound/cdda.h"
 #include "debugger.h"
 #include "coreutil.h"
