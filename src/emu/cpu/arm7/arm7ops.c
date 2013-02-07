@@ -1524,7 +1524,10 @@ static void HandleMemBlock(arm_state *arm, UINT32 insn)
 
 arm7ops_ophandler ops_handler[0x10] =
 {
-	arm7ops_0123, arm7ops_0123, arm7ops_0123, arm7ops_0123,arm7ops_4567,arm7ops_4567,arm7ops_4567,arm7ops_4567,arm7ops_89,arm7ops_89,arm7ops_ab,arm7ops_ab,arm7ops_cd,arm7ops_cd,arm7ops_e,arm7ops_f,
+	arm7ops_0123, arm7ops_0123, arm7ops_0123, arm7ops_0123,
+	arm7ops_4567, arm7ops_4567, arm7ops_4567, arm7ops_4567,
+	arm7ops_89,   arm7ops_89,   arm7ops_ab,   arm7ops_ab,
+	arm7ops_cd,   arm7ops_cd,   arm7ops_e,    arm7ops_f,
 };
 
 const void arm7ops_0123(arm_state *arm, UINT32 insn)
@@ -1617,26 +1620,22 @@ const void arm7ops_0123(arm_state *arm, UINT32 insn)
 		{
 			src1 >>= 16;
 		}
-		else
+
+		src1 &= 0xffff;
+		if (src1 & 0x8000)
 		{
-			src1 &= 0xffff;
-			if (src1 & 0x8000)
-			{
-				src1 |= 0xffff;
-			}
+			src1 |= 0xffff0000;
 		}
 
 		if (insn & 0x40)
 		{
 			src2 >>= 16;
 		}
-		else
+
+		src2 &= 0xffff;
+		if (src2 & 0x8000)
 		{
-			src2 &= 0xffff;
-			if (src2 & 0x8000)
-			{
-				src2 |= 0xffff;
-			}
+			src2 |= 0xffff0000;
 		}
 
 		// do the signed multiply

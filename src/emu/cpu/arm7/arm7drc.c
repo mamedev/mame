@@ -2192,11 +2192,14 @@ static void generate_sequence_instruction(arm_state *arm, drcuml_block *block, c
 		log_add_disasm_comment(arm, block, desc->pc, desc->opptr.l[0]);
 
 	/* set the PC map variable */
-	expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 3 : desc->pc;
-	UML_MAPVAR(block, MAPVAR_PC, expc);                                 	// mapvar  PC,expc
+	//expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 3 : desc->pc;
+	UML_MAPVAR(block, MAPVAR_PC, desc->pc);                                 // mapvar  PC,pc
 
 	/* accumulate total cycles */
 	compiler->cycles += desc->cycles;
+
+	/* update the icount map variable */
+	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                   	// mapvar  CYCLES,compiler->cycles
 
 	/* is this a hotspot? */
 	for (hotnum = 0; hotnum < MIPS3_MAX_HOTSPOTS; hotnum++)
@@ -2272,6 +2275,374 @@ static void generate_delay_slot_and_branch(arm_state *arm, drcuml_block *block, 
 	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                             // mapvar  CYCLES,compiler->cycles
 }
 
+typedef const bool (*drcarm7ops_ophandler)(arm_state*, drcuml_block*, compiler_state*, const opcode_desc*, UINT32);
+
+static drcarm7ops_ophandler drcops_handler[0x10] =
+{
+	drcarm7ops_0123, drcarm7ops_0123, drcarm7ops_0123, drcarm7ops_0123,
+	drcarm7ops_4567, drcarm7ops_4567, drcarm7ops_4567, drcarm7ops_4567,
+	drcarm7ops_89,   drcarm7ops_89,   drcarm7ops_ab,   drcarm7ops_ab,
+	drcarm7ops_cd,   drcarm7ops_cd,   drcarm7ops_e,    drcarm7ops_f,
+};
+
+INLINE void saturate_qbit_overflow(arm_state *arm, drcuml_block *block)
+{
+	UML_MOV(block, I1, 0);
+	UML_DCMP(block, I0, 0x000000007fffffffL);
+	UML_MOVc(block, COND_G, I1, Q_MASK);
+	UML_MOVc(block, COND_G, I0, 0x7fffffff);
+	UML_DCMP(block, I0, 0xffffffff80000000L);
+	UML_MOVc(block, COND_L, I1, Q_MASK);
+	UML_MOVc(block, COND_L, I0, 0x80000000);
+	UML_OR(block, DRC_CPSR, DRC_CPSR, I1);
+}
+
+const bool drcarm7ops_0123(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+{
+	code_label done;
+	/* Branch and Exchange (BX) */
+	if ((insn & 0x0ffffff0) == 0x012fff10)     // bits 27-4 == 000100101111111111110001
+	{
+		UML_MOV(block, DRC_PC, DRC_REG(insn & 0x0f));
+		UML_TEST(block, DRC_PC, 1);
+		UML_JMPc(block, COND_Z, done = compiler->labelnum++);
+		UML_OR(block, DRC_CPSR, DRC_CPSR, T_MASK);
+		UML_AND(block, DRC_PC, DRC_PC, ~1);
+	}
+	else if ((insn & 0x0ff000f0) == 0x01600010) // CLZ - v5
+	{
+		UINT32 rm = insn&0xf;
+		UINT32 rd = (insn>>12)&0xf;
+
+		UML_LZCNT(block, DRC_REG(rd), DRC_REG(rm));
+		UML_ADD(block, DRC_PC, DRC_PC, 4);
+	}
+	else if ((insn & 0x0ff000f0) == 0x01000050) // QADD - v5
+	{
+		UINT32 rm = insn&0xf;
+		UINT32 rn = (insn>>16)&0xf;
+		UINT32 rd = (insn>>12)&0xf;
+		UML_DSEXT(block, I0, DRC_REG(rm), SIZE_DWORD);
+		UML_DSEXT(block, I1, DRC_REG(rn), SIZE_DWORD);
+		UML_DADD(block, I0, I0, I1);
+		saturate_qbit_overflow(arm, block);
+		UML_MOV(block, DRC_REG(rd), I0);
+		UML_ADD(block, DRC_PC, DRC_PC, 4);
+	}
+	else if ((insn & 0x0ff000f0) == 0x01400050) // QDADD - v5
+	{
+		UINT32 rm = insn&0xf;
+		UINT32 rn = (insn>>16)&0xf;
+		UINT32 rd = (insn>>12)&0xf;
+
+		UML_DSEXT(block, I1, DRC_REG(rn), SIZE_DWORD);
+		UML_DADD(block, I0, I1, I1);
+		saturate_qbit_overflow(arm, block);
+
+		UML_DSEXT(block, I0, DRC_REG(rm), SIZE_DWORD);
+		UML_DSEXT(block, I1, DRC_REG(rn), SIZE_DWORD);
+		UML_DADD(block, I1, I1, I1);
+		UML_DADD(block, I0, I0, I1);
+		saturate_qbit_overflow(arm, block);
+		UML_MOV(block, DRC_REG(rd), I0);
+
+		UML_ADD(block, DRC_PC, DRC_PC, 4);
+	}
+	else if ((insn & 0x0ff000f0) == 0x01200050) // QSUB - v5
+	{
+		UINT32 rm = insn&0xf;
+		UINT32 rn = (insn>>16)&0xf;
+		UINT32 rd = (insn>>12)&0xf;
+
+		UML_DSEXT(block, I0, DRC_REG(rm), SIZE_DWORD);
+		UML_DSEXT(block, I1, DRC_REG(rn), SIZE_DWORD);
+		UML_DSUB(block, I0, I0, I1);
+		saturate_qbit_overflow(arm, block);
+		UML_MOV(block, DRC_REG(rd), I0);
+		UML_ADD(block, DRC_PC, DRC_PC, 4);
+	}
+	else if ((insn & 0x0ff000f0) == 0x01600050) // QDSUB - v5
+	{
+		UINT32 rm = insn&0xf;
+		UINT32 rn = (insn>>16)&0xf;
+		UINT32 rd = (insn>>12)&0xf;
+
+		UML_DSEXT(block, I1, DRC_REG(rn), SIZE_DWORD);
+		UML_DADD(block, I0, I1, I1);
+		saturate_qbit_overflow(arm, block);
+
+		UML_DSEXT(block, I0, DRC_REG(rm), SIZE_DWORD);
+		UML_DSEXT(block, I1, DRC_REG(rn), SIZE_DWORD);
+		UML_DADD(block, I1, I1, I1);
+		UML_DSUB(block, I0, I0, I1);
+		saturate_qbit_overflow(arm, block);
+		UML_MOV(block, DRC_REG(rd), I0);
+
+		UML_ADD(block, DRC_PC, DRC_PC, 4);
+	}
+	else if ((insn & 0x0ff00090) == 0x01000080) // SMLAxy - v5
+	{
+		UINT32 rm = insn&0xf;
+		UINT32 rn = (insn>>16)&0xf;
+		UINT32 rd = (insn>>12)&0xf;
+		UINT32 rr = (insn>>8)&0xf;
+
+		INT32 src1 = GET_REGISTER(arm, insn&0xf);
+		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
+		INT32 res1;
+
+		UML_MOV(block, I0, DRC_REG(rm));
+		UML_MOV(block, I1, DRC_REG(rr));
+
+		// select top and bottom halves of src1/src2 and sign extend if necessary
+		if (insn & 0x20)
+		{
+			UML_SHR(block, I0, I0, 16);
+		}
+		else
+		{
+			UML_SEXT(block, I1, I1, SIZE_WORD);
+			src1 &= 0xffff;
+			if (src1 & 0x8000)
+			{
+				src1 |= 0xffff;
+			}
+		}
+
+		if (insn & 0x40)
+		{
+			src2 >>= 16;
+		}
+		else
+		{
+			src2 &= 0xffff;
+			if (src2 & 0x8000)
+			{
+				src2 |= 0xffff;
+			}
+		}
+
+		// do the signed multiply
+		res1 = src1 * src2;
+		// and the accumulate.  NOTE: only the accumulate can cause an overflow, which is why we do it this way.
+		saturate_qbit_overflow(arm, (INT64)res1 + (INT64)GET_REGISTER(arm, (insn>>12)&0xf));
+
+		SET_REGISTER(arm, (insn>>16)&0xf, res1 + GET_REGISTER(arm, (insn>>12)&0xf));
+		R15 += 4;
+	}
+	else if ((insn & 0x0ff00090) == 0x01400080) // SMLALxy - v5
+	{
+		INT32 src1 = GET_REGISTER(arm, insn&0xf);
+		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
+		INT64 dst;
+
+		// select top and bottom halves of src1/src2 and sign extend if necessary
+		if (insn & 0x20)
+		{
+			src1 >>= 16;
+		}
+		else
+		{
+			src1 &= 0xffff;
+			if (src1 & 0x8000)
+			{
+				src1 |= 0xffff;
+			}
+		}
+
+		if (insn & 0x40)
+		{
+			src2 >>= 16;
+		}
+		else
+		{
+			src2 &= 0xffff;
+			if (src2 & 0x8000)
+			{
+				src2 |= 0xffff;
+			}
+		}
+
+		dst = (INT64)GET_REGISTER(arm, (insn>>12)&0xf);
+		dst |= (INT64)GET_REGISTER(arm, (insn>>16)&0xf)<<32;
+
+		// do the multiply and accumulate
+		dst += (INT64)src1 * (INT64)src2;
+
+		// write back the result
+		SET_REGISTER(cpustart, (insn>>12)&0xf, (UINT32)(dst&0xffffffff));
+		SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)(dst>>32));
+	}
+	else if ((insn & 0x0ff00090) == 0x01600080) // SMULxy - v5
+	{
+		INT32 src1 = GET_REGISTER(arm, insn&0xf);
+		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
+		INT32 res;
+
+		// select top and bottom halves of src1/src2 and sign extend if necessary
+		if (insn & 0x20)
+		{
+			src1 >>= 16;
+		}
+		else
+		{
+			src1 &= 0xffff;
+			if (src1 & 0x8000)
+			{
+				src1 |= 0xffff;
+			}
+		}
+
+		if (insn & 0x40)
+		{
+			src2 >>= 16;
+		}
+		else
+		{
+			src2 &= 0xffff;
+			if (src2 & 0x8000)
+			{
+				src2 |= 0xffff;
+			}
+		}
+
+		res = src1 * src2;
+		SET_REGISTER(cpustart, (insn>>16)&0xf, res);
+	}
+	else if ((insn & 0x0ff000b0) == 0x012000a0) // SMULWy - v5
+	{
+		INT32 src1 = GET_REGISTER(arm, insn&0xf);
+		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
+		INT64 res;
+
+		if (insn & 0x40)
+		{
+			src2 >>= 16;
+		}
+		else
+		{
+			src2 &= 0xffff;
+			if (src2 & 0x8000)
+			{
+				src2 |= 0xffff;
+			}
+		}
+
+		res = (INT64)src1 * (INT64)src2;
+		res >>= 16;
+		SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)res);
+	}
+	else if ((insn & 0x0ff000b0) == 0x01200080) // SMLAWy - v5
+	{
+		INT32 src1 = GET_REGISTER(arm, insn&0xf);
+		INT32 src2 = GET_REGISTER(arm, (insn>>8)&0xf);
+		INT32 src3 = GET_REGISTER(arm, (insn>>12)&0xf);
+		INT64 res;
+
+		if (insn & 0x40)
+		{
+			src2 >>= 16;
+		}
+		else
+		{
+			src2 &= 0xffff;
+			if (src2 & 0x8000)
+			{
+				src2 |= 0xffff;
+			}
+		}
+
+		res = (INT64)src1 * (INT64)src2;
+		res >>= 16;
+
+		// check for overflow and set the Q bit
+		saturate_qbit_overflow(arm, (INT64)src3 + res);
+
+		// do the real accumulate
+		src3 += (INT32)res;
+
+		// write the result back
+		SET_REGISTER(cpustart, (insn>>16)&0xf, (UINT32)res);
+	}
+	else
+	/* Multiply OR Swap OR Half Word Data Transfer */
+	if ((insn & 0x0e000000) == 0 && (insn & 0x80) && (insn & 0x10))  // bits 27-25=000 bit 7=1 bit 4=1
+	{
+		/* Half Word Data Transfer */
+		if (insn & 0x60)         // bits = 6-5 != 00
+		{
+			HandleHalfWordDT(arm, insn);
+		}
+		else
+		/* Swap */
+		if (insn & 0x01000000)   // bit 24 = 1
+		{
+			HandleSwap(arm, insn);
+		}
+		/* Multiply Or Multiply Long */
+		else
+		{
+			/* multiply long */
+			if (insn & 0x800000) // Bit 23 = 1 for Multiply Long
+			{
+				/* Signed? */
+				if (insn & 0x00400000)
+					HandleSMulLong(arm, insn);
+				else
+					HandleUMulLong(arm, insn);
+			}
+			/* multiply */
+			else
+			{
+				HandleMul(arm, insn);
+			}
+			R15 += 4;
+		}
+	}
+	/* Data Processing OR PSR Transfer */
+	else if ((insn & 0x0c000000) == 0)   // bits 27-26 == 00 - This check can only exist properly after Multiplication check above
+	{
+		/* PSR Transfer (MRS & MSR) */
+		if (((insn & 0x00100000) == 0) && ((insn & 0x01800000) == 0x01000000)) // S bit must be clear, and bit 24,23 = 10
+		{
+			HandlePSRTransfer(arm, insn);
+			ARM7_ICOUNT += 2;       // PSR only takes 1 - S Cycle, so we add + 2, since at end, we -3..
+			R15 += 4;
+		}
+		/* Data Processing */
+		else
+		{
+			HandleALU(arm, insn);
+		}
+	}
+
+	UML_LABEL(block, done);
+	return true;
+}
+
+const bool drcarm7ops_4567(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+{
+}
+
+const bool drcarm7ops_89(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+{
+}
+
+const bool drcarm7ops_ab(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+{
+}
+
+const bool drcarm7ops_cd(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+{
+}
+
+const bool drcarm7ops_e(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+{
+}
+
+const bool drcarm7ops_f(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, UINT32 op)
+{
+}
 
 /*-------------------------------------------------
     generate_opcode - generate code for a specific
@@ -2280,48 +2651,138 @@ static void generate_delay_slot_and_branch(arm_state *arm, drcuml_block *block, 
 
 static int generate_opcode(arm_state *arm, drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
-	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
+	//int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
 	UINT32 op = desc->opptr.l[0];
 	UINT8 opswitch = op >> 26;
 	code_label skip;
+	code_label contdecode;
+	code_label unexecuted;
 
 	if (T_IS_SET(GET_CPSR))
 	{
-		UINT32 raddr;
-
-		pc = R15;
-
 		// "In Thumb state, bit [0] is undefined and must be ignored. Bits [31:1] contain the PC."
-		raddr = pc & (~1);
-
-		if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
-		{
-			if (!arm7_tlb_translate(arm, &raddr, ARM7_TLB_ABORT_P | ARM7_TLB_READ))
-			{
-				goto skip_exec;
-			}
-		}
-
 		UML_AND(block, I0, DRC_PC, ~1);
-		UML_TEST(block, mem(&COPRO_CTRL), COPRO_CTRL_MMU_EN);				// test		COPRO_CTRL, COPRO_CTRL_MMU_EN
-		UML_MOVc(block, COND_Z, I0, 0);										// movz		i0, 0
-		UML_MOVc(block, COND_NZ, I0, ARM7_TLB_ABORT_P | ARM7_TLB_READ);		// movnz	i0, ARM7_TLB_ABORT_P | ARM7_TLB_READ
-		UML_CALLHc(block, COND_NZ, *arm->impstate->tlb_translate);			// callhnz	tlb_translate);
-
-		insn = arm->direct->read_decrypted_word(raddr);
-		thumb_handler[(insn & 0xffc0) >> 6](arm, pc, insn);
-		UML_OR(block, I3, I3, );											// or		i2, i2, i3
-		UML_CALLHc(block, COND_NZ, *arm->impstate->tlb_translate);			// callhnz	tlb_translate
-
 	}
 	else
 	{
-		UML_AND(block, I0, DRC_PC, ~1);
-		UML_TEST(block, mem(&COPRO_CTRL), COPRO_CTRL_MMU_EN);				// test		COPRO_CTRL, COPRO_CTRL_MMU_EN
-		UML_MOVc(block, COND_NZ, I3, ARM7_TLB_READ);					// movnz	i3, ARM7_TLB_READ
-		UML_OR(block, I3, I3, I3);											// or		i2, i2, i3
-		UML_CALLHc(block, COND_NZ, *arm->impstate->tlb_translate);			// callhnz	tlb_translate
+		UML_AND(block, I0, DRC_PC, ~3);
 	}
+
+	UML_TEST(block, mem(&COPRO_CTRL), COPRO_CTRL_MMU_EN);						// test		COPRO_CTRL, COPRO_CTRL_MMU_EN
+	UML_MOVc(block, COND_NZ, I2, ARM7_TLB_ABORT_P | ARM7_TLB_READ);				// movnz	i0, ARM7_TLB_ABORT_P | ARM7_TLB_READ
+	UML_CALLHc(block, COND_NZ, *arm->impstate->tlb_translate);					// callhnz	tlb_translate);
+
+	if (T_IS_SET(GET_CPSR))
+	{
+		UML_CALLH(block, *arm->impstate->drcthumb[(op & 0xffc0) >> 6);			// callh	drcthumb[op]
+		return TRUE;
+	}
+
+	switch (op >> INSN_COND_SHIFT)
+	{
+		case COND_EQ:
+			UML_TEST(block, DRC_CPSR, Z_MASK);
+			UML_JMPc(block, COND_Z, unexecuted = compiler->labelnum++);
+			break;
+		case COND_NE:
+			UML_TEST(block, DRC_CPSR, Z_MASK);
+			UML_JMPc(block, COND_NZ, unexecuted = compiler->labelnum++);
+			break;
+		case COND_CS:
+			UML_TEST(block, DRC_CPSR, C_MASK);
+			UML_JMPc(block, COND_Z, unexecuted = compiler->labelnum++);
+			break;
+		case COND_CC:
+			UML_TEST(block, DRC_CPSR, C_MASK);
+			UML_JMPc(block, COND_NZ, unexecuted = compiler->labelnum++);
+			break;
+		case COND_MI:
+			UML_TEST(block, DRC_CPSR, N_MASK);
+			UML_JMPc(block, COND_Z, unexecuted = compiler->labelnum++);
+			break;
+		case COND_PL:
+			UML_TEST(block, DRC_CPSR, N_MASK);
+			UML_JMPc(block, COND_NZ, unexecuted = compiler->labelnum++);
+			break;
+		case COND_VS:
+			UML_TEST(block, DRC_CPSR, V_MASK);
+			UML_JMPc(block, COND_Z, unexecuted = compiler->labelnum++);
+			break;
+		case COND_VC:
+			UML_TEST(block, DRC_CPSR, V_MASK);
+			UML_JMPc(block, COND_NZ, unexecuted = compiler->labelnum++);
+			break;
+		case COND_HI:
+			UML_TEST(block, DRC_CPSR, Z_MASK);
+			UML_JMPc(block, COND_NZ, unexecuted = compiler->labelnum++);
+			UML_TEST(block, DRC_CPSR, C_MASK);
+			UML_JMPc(block, COND_Z, unexecuted = compiler->labelnum++);
+			break;
+		case COND_LS:
+			UML_TEST(block, DRC_CPSR, Z_MASK);
+			UML_JMPc(block, COND_NZ, contdecode = compiler->labelnum++);
+			UML_TEST(block, DRC_CPSR, C_MASK);
+			UML_JMPc(block, COND_Z, contdecode);
+			UML_JMP(block, unexecuted);
+			break;
+		case COND_GE:
+			UML_TEST(block, DRC_CPSR, N_MASK);
+			UML_MOVc(block, COND_Z, I0, 0);
+			UML_MOVc(block, COND_NZ, I0, 1);
+			UML_TEST(block, DRC_CPSR, V_MASK);
+			UML_MOVc(block, COND_Z, I1, 0);
+			UML_MOVc(block, COND_NZ, I1, 1);
+			UML_CMP(block, I0, I1);
+			UML_JMPc(block, COND_NE, unexecuted);
+			break;
+		case COND_LT:
+			UML_TEST(block, DRC_CPSR, N_MASK);
+			UML_MOVc(block, COND_Z, I0, 0);
+			UML_MOVc(block, COND_NZ, I0, 1);
+			UML_TEST(block, DRC_CPSR, V_MASK);
+			UML_MOVc(block, COND_Z, I1, 0);
+			UML_MOVc(block, COND_NZ, I1, 1);
+			UML_CMP(block, I0, I1);
+			UML_JMPc(block, COND_E, unexecuted);
+			break;
+		case COND_GT:
+			UML_TEST(block, DRC_CPSR, Z_MASK);
+			UML_JMPc(block, COND_NZ, unexecuted);
+			UML_TEST(block, DRC_CPSR, N_MASK);
+			UML_MOVc(block, COND_Z, I0, 0);
+			UML_MOVc(block, COND_NZ, I0, 1);
+			UML_TEST(block, DRC_CPSR, V_MASK);
+			UML_MOVc(block, COND_Z, I1, 0);
+			UML_MOVc(block, COND_NZ, I1, 1);
+			UML_CMP(block, I0, I1);
+			UML_JMPc(block, COND_NE, unexecuted);
+			break;
+		case COND_LE:
+			UML_TEST(block, DRC_CPSR, N_MASK);
+			UML_MOVc(block, COND_Z, I0, 0);
+			UML_MOVc(block, COND_NZ, I0, 1);
+			UML_TEST(block, DRC_CPSR, V_MASK);
+			UML_MOVc(block, COND_Z, I1, 0);
+			UML_MOVc(block, COND_NZ, I1, 1);
+			UML_CMP(block, I0, I1);
+			UML_JMPc(block, COND_NE, contdecode);
+			UML_TEST(block, DRC_CPSR, Z_MASK);
+			UML_JMPc(block, COND_Z, unexecuted);
+			break;
+		case COND_NV:
+			UML_JMP(block, unexecuted);
+			break;
+	}
+
+	UML_LABEL(block, contdecode);
+
+	drcops_handler[(op & 0xF000000) >> 24](arm, block, compiler, desc);
+
+	UML_LABEL(block, unexecuted);
+	UML_ADD(block, DRC_PC, DRC_PC, 4);
+	UML_ADD(block, MAPVAR_CYCLES, MAPVAR_CYCLES, 2);								// add		cycles, cycles, 2
+
+	UML_LABEL(block, skip);
 
 	switch (opswitch)
 	{
