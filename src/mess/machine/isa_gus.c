@@ -257,15 +257,16 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 					if(!(m_voice[x].voice_ctrl & 0x08))
 					{
 						m_voice[x].voice_ctrl |= 0x01;
-//                          m_voice[x].current_addr = m_voice[x].end_addr;
+//                        m_voice[x].current_addr = m_voice[x].end_addr;
 					}
+				}
+				// looping is not supposed to happen when rollover is active, but the Windows drivers have other ideas...
+				if(m_voice[x].voice_ctrl & 0x08)
+				{
+					if(m_voice[x].voice_ctrl & 0x10)
+						m_voice[x].voice_ctrl |= 0x40; // change direction
 					else
-					{
-						if(m_voice[x].voice_ctrl & 0x10)
-							m_voice[x].voice_ctrl |= 0x40; // change direction
-						else
-							m_voice[x].current_addr = m_voice[x].start_addr; // start sample again
-					}
+						m_voice[x].current_addr = m_voice[x].start_addr; // start sample again
 				}
 			}
 			if((m_voice[x].voice_ctrl & 0x40) && (m_voice[x].current_addr <= m_voice[x].start_addr) && !m_voice[x].rollover && !(m_voice[x].voice_ctrl & 0x01))
@@ -287,13 +288,14 @@ void gf1_device::sound_stream_update(sound_stream &stream, stream_sample_t **inp
 						m_voice[x].voice_ctrl |= 0x01;
 //                          m_voice[x].current_addr = m_voice[x].start_addr;
 					}
+				}
+				// looping is not supposed to happen when rollover is active, but the Windows drivers have other ideas...
+				if(m_voice[x].voice_ctrl & 0x08)
+				{
+					if(m_voice[x].voice_ctrl & 0x10)
+						m_voice[x].voice_ctrl &= ~0x40; // change direction
 					else
-					{
-						if(m_voice[x].voice_ctrl & 0x10)
-							m_voice[x].voice_ctrl &= ~0x40; // change direction
-						else
-							m_voice[x].current_addr = m_voice[x].end_addr; // start sample again
-					}
+						m_voice[x].current_addr = m_voice[x].end_addr; // start sample again
 				}
 			}
 			if(!(m_voice[x].voice_ctrl & 0x01))
@@ -922,6 +924,7 @@ WRITE8_MEMBER(gf1_device::adlib_cmd_w)
 					m_gf1_irq = 15;
 					break;
 				default:
+					m_gf1_irq = 0;
 					logerror("GUS: Invalid GF1 IRQ set! [%02x]\n",data);
 				}
 				switch((data >> 3) & 0x07)
@@ -1696,8 +1699,6 @@ WRITE_LINE_MEMBER( isa16_gus_device::midi_irq )
 {
 	UINT8 irq_type;
 	UINT8 st = m_midi->get_status();
-
-	logerror("GUS: MIDI IRQ: state: %i Status: %02x\n",state,st);
 
 	if(state == ASSERT_LINE)
 	{

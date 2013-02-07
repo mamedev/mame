@@ -105,7 +105,7 @@ public:
 		gf1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 		// current IRQ/DMA channel getters
-		UINT8 gf1_irq() { return m_gf1_irq; }
+		UINT8 gf1_irq() { if(m_gf1_irq != 0) return m_gf1_irq; else return m_midi_irq; }  // workaround for win95 loading dumb values
 		UINT8 midi_irq() { if(m_irq_combine == 0) return m_midi_irq; else return m_gf1_irq; }
 		UINT8 dma_channel1() { return m_dma_channel1; }
 		UINT8 dma_channel2() { if(m_dma_combine == 0) return m_dma_channel2; else return m_dma_channel1; }
