@@ -306,14 +306,14 @@ WRITE32_MEMBER(saturn_state::magzun_ioga_w32)
 
 */
 
-void install_stvbios_speedups(running_machine &machine)
+void saturn_state::install_stvbios_speedups( void )
 {
 	// flushes 0 & 1 on both CPUs are for the BIOS speedups
-	sh2drc_add_pcflush(machine.device("maincpu"), 0x60154b2);
-	sh2drc_add_pcflush(machine.device("maincpu"), 0x6013aee);
+	sh2drc_add_pcflush(machine().device("maincpu"), 0x60154b2);
+	sh2drc_add_pcflush(machine().device("maincpu"), 0x6013aee);
 
-	sh2drc_add_pcflush(machine.device("slave"), 0x60154b2);
-	sh2drc_add_pcflush(machine.device("slave"), 0x6013aee);
+	sh2drc_add_pcflush(machine().device("slave"), 0x60154b2);
+	sh2drc_add_pcflush(machine().device("slave"), 0x6013aee);
 }
 
 DRIVER_INIT_MEMBER(saturn_state,stv)
@@ -332,7 +332,7 @@ DRIVER_INIT_MEMBER(saturn_state,stv)
 	m_scsp_regs  = auto_alloc_array(machine(), UINT16, 0x1000/2);
 	m_backupram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
 
-	install_stvbios_speedups(machine());
+	install_stvbios_speedups();
 
 	// do strict overwrite verification - maruchan and rsgun crash after coinup without this.
 	// cottonbm needs strict PCREL

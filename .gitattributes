@@ -4993,7 +4993,6 @@ src/mame/machine/steppers.c svneol=native#text/plain
 src/mame/machine/steppers.h svneol=native#text/plain
 src/mame/machine/stfight.c svneol=native#text/plain
 src/mame/machine/stvcd.c svneol=native#text/plain
-src/mame/machine/stvcd.h svneol=native#text/plain
 src/mame/machine/stvprot.c svneol=native#text/plain
 src/mame/machine/stvprot.h svneol=native#text/plain
 src/mame/machine/subs.c svneol=native#text/plain

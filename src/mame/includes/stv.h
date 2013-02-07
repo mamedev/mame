@@ -677,6 +677,10 @@ public:
 	direntryT *curdir;       // current directory
 	int numfiles;            // # of entries in current directory
 	int firstfile;           // first non-directory file
+
+
+	// ST-V specific
+	void install_stvbios_speedups( void );
 };
 
 #define MASTER_CLOCK_352 57272720
@@ -704,21 +708,4 @@ public:
 #define IRQ_DMAILL     1 << 12
 #define IRQ_VDP1_END   1 << 13
 #define IRQ_ABUS       1 << 15
-
-
-
-/*----------- defined in drivers/stv.c -----------*/
-
-void install_stvbios_speedups(running_machine &machine);
-
-/*----------- defined in video/stvvdp1.c -----------*/
-
-//extern UINT16   **stv_framebuffer_display_lines;
-//extern int stv_framebuffer_double_interlace;
-//extern int stv_framebuffer_mode;
-//extern UINT8* stv_vdp1_gfx_decode;
-
-//int stv_vdp1_start ( running_machine &machine );
-//void video_update_vdp1(running_machine &machine);
-//void stv_vdp2_dynamic_res_change(running_machine &machine);
 
