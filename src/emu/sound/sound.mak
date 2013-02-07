@@ -636,6 +636,16 @@ $(SOUNDOBJ)/tms5220.o:  $(SOUNDSRC)/tms5220r.c
 
 
 #-------------------------------------------------
+# Toshiba T6721A voice synthesizer
+#-------------------------------------------------
+
+ifneq ($(filter T6721A,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/t6721a.o
+endif
+
+
+
+#-------------------------------------------------
 # Toshiba TC8830F sample player/recorder
 #-------------------------------------------------
 

@@ -135,9 +135,9 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 
 	//logerror("offset %04x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
 
-	if (!scs && m_t6721)
+	if (!scs && m_vslsi)
 	{
-		data = t6721_speech_r(m_t6721, space, offset & 0x03);
+		data = m_vslsi->read(space, offset & 0x03);
 	}
 	else if (!user)
 	{
@@ -264,9 +264,9 @@ WRITE8_MEMBER( plus4_state::write )
 
 	//logerror("write offset %04x data %02x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,data,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
 
-	if (!scs && m_t6721)
+	if (!scs && m_vslsi)
 	{
-		t6721_speech_w(m_t6721, space, offset & 0x03, data);
+		m_vslsi->write(space, offset & 0x03, data);
 	}
 	else if (!user && m_spi_user)
 	{
@@ -940,8 +940,10 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( v364, ntsc )
-	MCFG_T6721_ADD(T6721_TAG)
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD(T6721A_TAG, T6721A, XTAL_640kHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MCFG_MOS8706_ADD(MOS8706_TAG, XTAL_14_31818MHz/16)
 MACHINE_CONFIG_END
 
 

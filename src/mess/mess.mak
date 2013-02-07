@@ -237,6 +237,7 @@ SOUNDS += TMS5200
 #SOUNDS += TMS5110A
 SOUNDS += LMC1992
 SOUNDS += AWACS
+SOUNDS += T6721A
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -865,6 +866,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/c64_mach5.o \
 	$(MESS_MACHINE)/c64_magic_desk.o    \
 	$(MESS_MACHINE)/c64_magic_formel.o  \
+	$(MESS_MACHINE)/c64_magic_voice.o    \
 	$(MESS_MACHINE)/c64_mikro_assembler.o   \
 	$(MESS_MACHINE)/c64_multiscreen.o   \
 	$(MESS_MACHINE)/c64_neoram.o    \
@@ -909,13 +911,13 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/vic1111.o   \
 	$(MESS_MACHINE)/vic1112.o   \
 	$(MESS_MACHINE)/vic1210.o   \
-	$(MESS_AUDIO)/t6721.o       \
 	$(MESS_AUDIO)/mos7360.o     \
 	$(MESS_DRIVERS)/plus4.o     \
 	$(MESS_MACHINE)/plus4exp.o  \
 	$(MESS_MACHINE)/plus4user.o \
 	$(MESS_MACHINE)/plus4_sid.o \
 	$(MESS_MACHINE)/plus4_std.o \
+	$(MESS_MACHINE)/mos8706.o   \
 	$(MESS_MACHINE)/diag264_lb_iec.o    \
 	$(MESS_MACHINE)/diag264_lb_tape.o   \
 	$(MESS_MACHINE)/diag264_lb_user.o   \

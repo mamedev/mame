@@ -34,6 +34,7 @@
 #include "machine/c64_mach5.h"
 #include "machine/c64_magic_desk.h"
 #include "machine/c64_magic_formel.h"
+#include "machine/c64_magic_voice.h"
 #include "machine/c64_mikro_assembler.h"
 #include "machine/c64_multiscreen.h"
 #include "machine/c64_neoram.h"

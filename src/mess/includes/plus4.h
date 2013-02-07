@@ -4,26 +4,28 @@
 #define __PLUS4__
 
 #include "emu.h"
+#include "audio/mos7360.h"
 #include "cpu/m6502/m7501.h"
 #include "formats/cbm_snqk.h"
-#include "audio/t6721.h"
-#include "audio/mos7360.h"
-#include "machine/mos6551.h"
-#include "machine/plus4exp.h"
-#include "machine/plus4user.h"
 #include "machine/cbmiec.h"
 #include "machine/cbmipt.h"
 #include "machine/mos6529.h"
+#include "machine/mos6551.h"
+#include "machine/mos8706.h"
 #include "machine/petcass.h"
 #include "machine/pla.h"
+#include "machine/plus4exp.h"
+#include "machine/plus4user.h"
 #include "machine/ram.h"
+#include "sound/t6721a.h"
 
 #define MOS7501_TAG         "u2"
 #define MOS7360_TAG         "u1"
 #define MOS6551_TAG         "u3"
 #define MOS6529_USER_TAG    "u5"
 #define MOS6529_KB_TAG      "u27"
-#define T6721_TAG           "t6721"
+#define T6721A_TAG          "t6721a"
+#define MOS8706_TAG         "mos8706"
 #define PLA_TAG             "u19"
 #define SCREEN_TAG          "screen"
 #define CONTROL1_TAG    	"joy1"
@@ -40,7 +42,7 @@ public:
 			m_acia(*this, MOS6551_TAG),
 			m_spi_user(*this, MOS6529_USER_TAG),
 			m_spi_kb(*this, MOS6529_KB_TAG),
-			m_t6721(*this, T6721_TAG),
+			m_vslsi(*this, MOS8706_TAG),
 			m_iec(*this, CBM_IEC_TAG),
 			m_joy1(*this, CONTROL1_TAG),
 			m_joy2(*this, CONTROL2_TAG),
@@ -72,7 +74,7 @@ public:
 	optional_device<mos6551_device> m_acia;
 	optional_device<mos6529_device> m_spi_user;
 	required_device<mos6529_device> m_spi_kb;
-	optional_device<t6721_device> m_t6721;
+	optional_device<mos8706_device> m_vslsi;
 	required_device<cbm_iec_device> m_iec;
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
