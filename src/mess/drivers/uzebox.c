@@ -44,7 +44,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	void line_update();
-	int cart_load(device_image_interface &image);
 	UINT32 screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(uzebox_cart);
 
@@ -263,7 +262,7 @@ UINT32 uzebox_state::screen_update_uzebox(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
-int uzebox_state::cart_load(device_image_interface &image)
+DEVICE_IMAGE_LOAD_MEMBER(uzebox_state,uzebox_cart)
 {
 	UINT8* rom = (UINT8*)(*memregion("maincpu"));
 
@@ -291,10 +290,6 @@ int uzebox_state::cart_load(device_image_interface &image)
 	return IMAGE_INIT_PASS;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(uzebox_state,uzebox_cart)
-{
-	return cart_load(image);
-}
 
 /****************************************************\
 * Machine definition                                 *

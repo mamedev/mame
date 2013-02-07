@@ -234,8 +234,6 @@ public:
 	DECLARE_WRITE16_MEMBER(gfx_idx_w);
 	void queue_input(UINT16 data);
 	DECLARE_READ16_MEMBER(cart_state_r);
-	int cart_load(device_image_interface &image);
-	void cart_unload(device_image_interface &image);
 
 	DECLARE_READ16_MEMBER(unk0_r) { return 0; }
 	DECLARE_READ16_MEMBER(unk_r) { return machine().rand(); }
@@ -723,7 +721,7 @@ void geniusiq_state::machine_reset()
 	m_mouse_gfx_posy = 0;
 }
 
-int geniusiq_state::cart_load(device_image_interface &image)
+DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
 {
 	if (image.software_entry() == NULL)
 	{
@@ -758,21 +756,12 @@ int geniusiq_state::cart_load(device_image_interface &image)
 	return IMAGE_INIT_PASS;
 }
 
-void geniusiq_state::cart_unload(device_image_interface &image)
+DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
 {
 	memset(m_cart, 0xff, memregion("cart")->bytes());
 	m_cart_state = IQ128_NO_CART;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
-{
-	return cart_load(image);
-}
-
-DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
-{
-	cart_unload(image);
-}
 
 static MACHINE_CONFIG_START( iq128, geniusiq_state )
 	/* basic machine hardware */
