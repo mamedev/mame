@@ -103,28 +103,27 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_paletteram_w)
 
 
 /* 8x8x4 tiles only */
-INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int layer, UINT16 *vram)
+inline void hyprduel_state::get_tile_info( tile_data &tileinfo, int tile_index, int layer, UINT16 *vram)
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	UINT16 code;
 	int table_index;
 	UINT32 tile;
 
 	/* The actual tile index depends on the window */
-	tile_index = ((tile_index / WIN_NX + state->m_window[layer * 2 + 0] / 8) % BIG_NY) * BIG_NX +
-					((tile_index % WIN_NX + state->m_window[layer * 2 + 1] / 8) % BIG_NX);
+	tile_index = ((tile_index / WIN_NX + m_window[layer * 2 + 0] / 8) % BIG_NY) * BIG_NX +
+					((tile_index % WIN_NX + m_window[layer * 2 + 1] / 8) % BIG_NX);
 
 	/* Fetch the code */
 	code = vram[tile_index];
 
 	/* Use it as an index into the tiles set table */
 	table_index = ((code & 0x1ff0) >> 4 ) * 2;
-	tile = (state->m_tiletable[table_index + 0] << 16) + state->m_tiletable[table_index + 1];
+	tile = (m_tiletable[table_index + 0] << 16) + m_tiletable[table_index + 1];
 
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		int _code = code & 0x000f;
-		tileinfo.pen_data = state->m_empty_tiles + _code * 16 * 16;
+		tileinfo.pen_data = m_empty_tiles + _code * 16 * 16;
 		tileinfo.palette_base = ((code & 0x0ff0)) + 0x1000;
 		tileinfo.flags = 0;
 		tileinfo.group = 0;
@@ -132,7 +131,7 @@ INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int ti
 	else
 	{
 		tileinfo.group = 0;
-		SET_TILE_INFO(
+		SET_TILE_INFO_MEMBER(
 				0,
 				(tile & 0xfffff) + (code & 0xf),
 				(((tile & 0x0ff00000) >> 20)) + 0x100,
@@ -142,28 +141,27 @@ INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int ti
 
 /* 8x8x4 or 8x8x8 tiles. It's the tile's color that decides: if its low 4
    bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
-INLINE void get_tile_info_8bit( running_machine &machine, tile_data &tileinfo, int tile_index, int layer, UINT16 *vram )
+inline void hyprduel_state::get_tile_info_8bit( tile_data &tileinfo, int tile_index, int layer, UINT16 *vram )
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	UINT16 code;
 	int table_index;
 	UINT32 tile;
 
 	/* The actual tile index depends on the window */
-	tile_index = ((tile_index / WIN_NX + state->m_window[layer * 2 + 0] / 8) % BIG_NY) * BIG_NX +
-					((tile_index % WIN_NX + state->m_window[layer * 2 + 1] / 8) % BIG_NX);
+	tile_index = ((tile_index / WIN_NX + m_window[layer * 2 + 0] / 8) % BIG_NY) * BIG_NX +
+					((tile_index % WIN_NX + m_window[layer * 2 + 1] / 8) % BIG_NX);
 
 	/* Fetch the code */
 	code = vram[tile_index];
 
 	/* Use it as an index into the tiles set table */
 	table_index = ((code & 0x1ff0) >> 4) * 2;
-	tile = (state->m_tiletable[table_index + 0] << 16) + state->m_tiletable[table_index + 1];
+	tile = (m_tiletable[table_index + 0] << 16) + m_tiletable[table_index + 1];
 
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		int _code = code & 0x000f;
-		tileinfo.pen_data = state->m_empty_tiles + _code * 16 * 16;
+		tileinfo.pen_data = m_empty_tiles + _code * 16 * 16;
 		tileinfo.palette_base = ((code & 0x0ff0)) + 0x1000;
 		tileinfo.flags = 0;
 		tileinfo.group = 0;
@@ -171,7 +169,7 @@ INLINE void get_tile_info_8bit( running_machine &machine, tile_data &tileinfo, i
 	else if ((tile & 0x00f00000) == 0x00f00000) /* draw tile as 8bpp */
 	{
 		tileinfo.group = 1;
-		SET_TILE_INFO(
+		SET_TILE_INFO_MEMBER(
 				1,
 				(tile & 0xfffff) + 2*(code & 0xf),
 				((tile & 0x0f000000) >> 24) + 0x10,
@@ -180,7 +178,7 @@ INLINE void get_tile_info_8bit( running_machine &machine, tile_data &tileinfo, i
 	else
 	{
 		tileinfo.group = 0;
-		SET_TILE_INFO(
+		SET_TILE_INFO_MEMBER(
 				0,
 				(tile & 0xfffff) + (code & 0xf),
 				(((tile & 0x0ff00000) >> 20)) + 0x100,
@@ -190,28 +188,27 @@ INLINE void get_tile_info_8bit( running_machine &machine, tile_data &tileinfo, i
 
 /* 16x16x4 or 16x16x8 tiles. It's the tile's color that decides: if its low 4
    bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
-INLINE void get_tile_info_16x16_8bit( running_machine &machine, tile_data &tileinfo, int tile_index, int layer, UINT16 *vram )
+inline void hyprduel_state::get_tile_info_16x16_8bit( tile_data &tileinfo, int tile_index, int layer, UINT16 *vram )
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	UINT16 code;
 	int table_index;
 	UINT32 tile;
 
 	/* The actual tile index depends on the window */
-	tile_index = ((tile_index / WIN_NX + state->m_window[layer * 2 + 0] / 8) % BIG_NY) * BIG_NX +
-					((tile_index % WIN_NX + state->m_window[layer * 2 + 1] / 8) % BIG_NX);
+	tile_index = ((tile_index / WIN_NX + m_window[layer * 2 + 0] / 8) % BIG_NY) * BIG_NX +
+					((tile_index % WIN_NX + m_window[layer * 2 + 1] / 8) % BIG_NX);
 
 	/* Fetch the code */
 	code = vram[tile_index];
 
 	/* Use it as an index into the tiles set table */
 	table_index = ((code & 0x1ff0) >> 4) * 2;
-	tile = (state->m_tiletable[table_index + 0] << 16) + state->m_tiletable[table_index + 1];
+	tile = (m_tiletable[table_index + 0] << 16) + m_tiletable[table_index + 1];
 
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
 		int _code = code & 0x000f;
-		tileinfo.pen_data = state->m_empty_tiles + _code * 16 * 16;
+		tileinfo.pen_data = m_empty_tiles + _code * 16 * 16;
 		tileinfo.palette_base = ((code & 0x0ff0)) + 0x1000;
 		tileinfo.flags = 0;
 		tileinfo.group = 0;
@@ -219,7 +216,7 @@ INLINE void get_tile_info_16x16_8bit( running_machine &machine, tile_data &tilei
 	else if ((tile & 0x00f00000) == 0x00f00000) /* draw tile as 8bpp */
 	{
 		tileinfo.group = 1;
-		SET_TILE_INFO(
+		SET_TILE_INFO_MEMBER(
 				3,
 				(tile & 0xfffff) + 8*(code & 0xf),
 				((tile & 0x0f000000) >> 24) + 0x10,
@@ -228,7 +225,7 @@ INLINE void get_tile_info_16x16_8bit( running_machine &machine, tile_data &tilei
 	else
 	{
 		tileinfo.group = 0;
-		SET_TILE_INFO(
+		SET_TILE_INFO_MEMBER(
 				2,
 				(tile & 0xfffff) + 4*(code & 0xf),
 				(((tile & 0x0ff00000) >> 20)) + 0x100,
@@ -237,20 +234,19 @@ INLINE void get_tile_info_16x16_8bit( running_machine &machine, tile_data &tilei
 	}
 }
 
-INLINE void hyprduel_vram_w( running_machine &machine, offs_t offset, UINT16 data, UINT16 mem_mask, int layer, UINT16 *vram )
+inline void hyprduel_state::hyprduel_vram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int layer, UINT16 *vram )
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	COMBINE_DATA(&vram[offset]);
 	{
 		/* Account for the window */
-		int col = (offset % BIG_NX) - ((state->m_window[layer * 2 + 1] / 8) % BIG_NX);
-		int row = (offset / BIG_NX) - ((state->m_window[layer * 2 + 0] / 8) % BIG_NY);
+		int col = (offset % BIG_NX) - ((m_window[layer * 2 + 1] / 8) % BIG_NX);
+		int row = (offset / BIG_NX) - ((m_window[layer * 2 + 0] / 8) % BIG_NY);
 		if (col < -(BIG_NX-WIN_NX))
 			col += (BIG_NX-WIN_NX) + WIN_NX;
 		if (row < -(BIG_NY-WIN_NY))
 			row += (BIG_NY-WIN_NY) + WIN_NY;
 		if ((col >= 0) && (col < WIN_NX) && (row >= 0) && (row < WIN_NY))
-			state->m_bg_tilemap[layer]->mark_tile_dirty(row * WIN_NX + col);
+			m_bg_tilemap[layer]->mark_tile_dirty(row * WIN_NX + col);
 	}
 }
 
@@ -258,32 +254,32 @@ INLINE void hyprduel_vram_w( running_machine &machine, offs_t offset, UINT16 dat
 
 TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_0_8bit)
 {
-	get_tile_info_8bit(machine(), tileinfo, tile_index, 0, m_vram_0);
+	get_tile_info_8bit(tileinfo, tile_index, 0, m_vram_0);
 }
 
 TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_1_8bit)
 {
-	get_tile_info_8bit(machine(), tileinfo, tile_index, 1, m_vram_1);
+	get_tile_info_8bit(tileinfo, tile_index, 1, m_vram_1);
 }
 
 TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_2_8bit)
 {
-	get_tile_info_8bit(machine(), tileinfo, tile_index, 2, m_vram_2);
+	get_tile_info_8bit(tileinfo, tile_index, 2, m_vram_2);
 }
 
 WRITE16_MEMBER(hyprduel_state::hyprduel_vram_0_w)
 {
-	hyprduel_vram_w(machine(), offset, data, mem_mask, 0, m_vram_0);
+	hyprduel_vram_w(offset, data, mem_mask, 0, m_vram_0);
 }
 
 WRITE16_MEMBER(hyprduel_state::hyprduel_vram_1_w)
 {
-	hyprduel_vram_w(machine(), offset, data, mem_mask, 1, m_vram_1);
+	hyprduel_vram_w(offset, data, mem_mask, 1, m_vram_1);
 }
 
 WRITE16_MEMBER(hyprduel_state::hyprduel_vram_2_w)
 {
-	hyprduel_vram_w(machine(), offset, data, mem_mask, 2, m_vram_2);
+	hyprduel_vram_w(offset, data, mem_mask, 2, m_vram_2);
 }
 
 
@@ -311,17 +307,16 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_window_w)
  the tile's sizes to be known at startup - which we don't!
 */
 
-static void alloc_empty_tiles( running_machine &machine )
+void hyprduel_state::alloc_empty_tiles(  )
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	int code,i;
 
-	state->m_empty_tiles = auto_alloc_array(machine, UINT8, 16*16*16);
-	state->save_pointer(NAME(state->m_empty_tiles), 16*16*16);
+	m_empty_tiles = auto_alloc_array(machine(), UINT8, 16*16*16);
+	save_pointer(NAME(m_empty_tiles), 16*16*16);
 
 	for (code = 0; code < 0x10; code++)
 		for (i = 0; i < 16 * 16; i++)
-			state->m_empty_tiles[16 * 16 * code + i] = code;
+			m_empty_tiles[16 * 16 * code + i] = code;
 }
 
 
@@ -342,7 +337,7 @@ void hyprduel_state::hyprduel_postload()
 }
 
 
-static void expand_gfx1(hyprduel_state &state)
+void hyprduel_state::expand_gfx1(hyprduel_state &state)
 {
 	UINT8 *base_gfx = state.machine().root_device().memregion("gfx1")->base();
 	UINT32 length = 2 * state.machine().root_device().memregion("gfx1")->bytes();
@@ -358,7 +353,7 @@ static void expand_gfx1(hyprduel_state &state)
 VIDEO_START_MEMBER(hyprduel_state,common_14220)
 {
 	expand_gfx1(*this);
-	alloc_empty_tiles(machine());
+	alloc_empty_tiles();
 	m_tiletable_old = auto_alloc_array(machine(), UINT16, m_tiletable.bytes() / 2);
 	m_dirtyindex = auto_alloc_array(machine(), UINT8, m_tiletable.bytes() / 4);
 
@@ -459,20 +454,19 @@ VIDEO_START_MEMBER(hyprduel_state,magerror_14220)
 
 /* Draw sprites */
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void hyprduel_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
-	UINT8 *base_gfx4 = state->m_expanded_gfx1;
-	UINT8 *base_gfx8 = state->memregion("gfx1")->base();
-	UINT32 gfx_size = state->memregion("gfx1")->bytes();
+	UINT8 *base_gfx4 = m_expanded_gfx1;
+	UINT8 *base_gfx8 = memregion("gfx1")->base();
+	UINT32 gfx_size = memregion("gfx1")->bytes();
 
-	int max_x = machine.primary_screen->width();
-	int max_y = machine.primary_screen->height();
+	int max_x = machine().primary_screen->width();
+	int max_y = machine().primary_screen->height();
 
-	int max_sprites = state->m_spriteram.bytes() / 8;
-	int sprites = state->m_videoregs[0x00 / 2] % max_sprites;
+	int max_sprites = m_spriteram.bytes() / 8;
+	int sprites = m_videoregs[0x00 / 2] % max_sprites;
 
-	int color_start = ((state->m_videoregs[0x08 / 2] & 0xf) << 4) + 0x100;
+	int color_start = ((m_videoregs[0x08 / 2] & 0xf) << 4) + 0x100;
 
 	int i, j, pri;
 	static const int primask[4] = { 0x0000, 0xff00, 0xff00|0xf0f0, 0xff00|0xf0f0|0xcccc };
@@ -485,12 +479,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (i = 0; i < 0x20; i++)
 	{
-		if (!(state->m_videoregs[0x02 / 2] & 0x8000))
+		if (!(m_videoregs[0x02 / 2] & 0x8000))
 		{
-			src = state->m_spriteram + (sprites - 1) * (8 / 2);
+			src = m_spriteram + (sprites - 1) * (8 / 2);
 			inc = -(8 / 2);
 		} else {
-			src = state->m_spriteram;
+			src = m_spriteram;
 			inc = (8 / 2);
 		}
 
@@ -520,12 +514,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				continue;
 			}
 
-			pri = (state->m_videoregs[0x02 / 2] & 0x0300) >> 8;
+			pri = (m_videoregs[0x02 / 2] & 0x0300) >> 8;
 
-			if (!(state->m_videoregs[0x02 / 2] & 0x8000))
+			if (!(m_videoregs[0x02 / 2] & 0x8000))
 			{
-				if (curr_pri > (state->m_videoregs[0x02 / 2] & 0x1f))
-					pri = (state->m_videoregs[0x02 / 2] & 0x0c00) >> 10;
+				if (curr_pri > (m_videoregs[0x02 / 2] & 0x1f))
+					pri = (m_videoregs[0x02 / 2] & 0x0c00) >> 10;
 			}
 
 			y = src[1];
@@ -538,15 +532,15 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			zoom = zoomtable[(y & 0xfc00) >> 10] << (16 - 8);
 
-			x = (x & 0x07ff) - state->m_sprite_xoffs;
-			y = (y & 0x03ff) - state->m_sprite_yoffs;
+			x = (x & 0x07ff) - m_sprite_xoffs;
+			y = (y & 0x03ff) - m_sprite_yoffs;
 
 			width = (((attr >> 11) & 0x7) + 1) * 8;
 			height = (((attr >>  8) & 0x7) + 1) * 8;
 
 			UINT32 gfxstart = (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				flipx = !flipx;     x = max_x - x - width;
 				flipy = !flipy;     y = max_y - y - height;
@@ -558,7 +552,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				if ((gfxstart + width * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element gfx(machine, base_gfx8 + gfxstart, width, height, width, 0, 256);
+				gfx_element gfx(machine(), base_gfx8 + gfxstart, width, height, width, 0, 256);
 
 				pdrawgfxzoom_transpen(bitmap,cliprect, &gfx,
 								0,
@@ -566,7 +560,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 								flipx, flipy,
 								x, y,
 								zoom, zoom,
-								machine.priority_bitmap,primask[pri], 255);
+								machine().priority_bitmap,primask[pri], 255);
 			}
 			else
 			{
@@ -574,7 +568,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				if ((gfxstart + width / 2 * height - 1) >= gfx_size)
 					continue;
 
-				gfx_element gfx(machine, base_gfx4 + 2 * gfxstart, width, height, width, 0, 16);
+				gfx_element gfx(machine(), base_gfx4 + 2 * gfxstart, width, height, width, 0, 16);
 
 				pdrawgfxzoom_transpen(bitmap,cliprect, &gfx,
 								0,
@@ -582,7 +576,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 								flipx, flipy,
 								x, y,
 								zoom, zoom,
-								machine.priority_bitmap,primask[pri], 15);
+								machine().priority_bitmap,primask[pri], 15);
 			}
 #if 0
 {   /* Display priority + zoom on each sprite */
@@ -630,10 +624,9 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_scrollreg_init_w)
 }
 
 
-static void draw_layers( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int layers_ctrl )
+void hyprduel_state::draw_layers( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int layers_ctrl )
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
-	UINT16 layers_pri = state->m_videoregs[0x10/2];
+	UINT16 layers_pri = m_videoregs[0x10/2];
 	int layer;
 
 	/* Draw all the layers with priority == pri */
@@ -642,26 +635,25 @@ static void draw_layers( running_machine &machine, bitmap_ind16 &bitmap, const r
 		if ( pri == ((layers_pri >> (layer*2)) & 3) )
 		{
 			if (layers_ctrl & (1 << layer)) // for debug
-				state->m_bg_tilemap[layer]->draw(bitmap, cliprect, 0, 1 << (3 - pri));
+				m_bg_tilemap[layer]->draw(bitmap, cliprect, 0, 1 << (3 - pri));
 		}
 	}
 }
 
 /* Dirty tilemaps when the tiles set changes */
-static void dirty_tiles( running_machine &machine, int layer, UINT16 *vram )
+void hyprduel_state::dirty_tiles( int layer, UINT16 *vram )
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	int col, row;
 
 	for (row = 0; row < WIN_NY; row++)
 	{
 		for (col = 0; col < WIN_NX; col++)
 		{
-			int offset = (col + state->m_window[layer * 2 + 1] / 8) % BIG_NX + ((row + state->m_window[layer * 2 + 0] / 8) % BIG_NY) * BIG_NX;
+			int offset = (col + m_window[layer * 2 + 1] / 8) % BIG_NX + ((row + m_window[layer * 2 + 0] / 8) % BIG_NY) * BIG_NX;
 			UINT16 code = vram[offset];
 
-			if (!(code & 0x8000) && state->m_dirtyindex[(code & 0x1ff0) >> 4])
-				state->m_bg_tilemap[layer]->mark_tile_dirty(row * WIN_NX + col);
+			if (!(code & 0x8000) && m_dirtyindex[(code & 0x1ff0) >> 4])
+				m_bg_tilemap[layer]->mark_tile_dirty(row * WIN_NX + col);
 		}
 	}
 }
@@ -691,9 +683,9 @@ UINT32 hyprduel_state::screen_update_hyprduel(screen_device &screen, bitmap_ind1
 
 		if (dirty)
 		{
-			dirty_tiles(machine(), 0, m_vram_0);
-			dirty_tiles(machine(), 1, m_vram_1);
-			dirty_tiles(machine(), 2, m_vram_2);
+			dirty_tiles(0, m_vram_0);
+			dirty_tiles(1, m_vram_1);
+			dirty_tiles(2, m_vram_2);
 		}
 	}
 
@@ -740,10 +732,10 @@ if (machine().input().code_pressed(KEYCODE_Z))
 #endif
 
 	for (pri = 3; pri >= 0; pri--)
-		draw_layers(machine(), bitmap, cliprect, pri, layers_ctrl);
+		draw_layers(bitmap, cliprect, pri, layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 
 	return 0;
 }

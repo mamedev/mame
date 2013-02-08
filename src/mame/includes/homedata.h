@@ -127,4 +127,14 @@ public:
 	void screen_eof_homedata(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(homedata_irq);
 	INTERRUPT_GEN_MEMBER(upd7807_irq);
+	void mrokumei_handleblit( address_space &space, int rom_base );
+	void reikaids_handleblit( address_space &space, int rom_base );
+	void pteacher_handleblit( address_space &space, int rom_base );
+	inline void mrokumei_info0( tile_data &tileinfo, int tile_index, int page, int gfxbank );
+	inline void mrokumei_info1( tile_data &tileinfo, int tile_index, int page, int gfxbank );
+	inline void reikaids_info( tile_data &tileinfo, int tile_index, int page, int layer, int gfxbank );
+	inline void pteacher_info( tile_data &tileinfo, int tile_index, int page, int layer, int gfxbank );
+	inline void lemnangl_info( tile_data &tileinfo, int tile_index, int page, int layer, int gfxset, int gfxbank );
+	inline void mirderby_info0( tile_data &tileinfo, int tile_index, int page, int gfxbank );
+	inline void mirderby_info1( tile_data &tileinfo, int tile_index, int page, int gfxbank );
 };

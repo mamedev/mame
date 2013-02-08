@@ -10,10 +10,10 @@
 
 ***************************************************************************/
 
-INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,UINT8 *ram)
+inline void hexion_state::get_tile_info(tile_data &tileinfo,int tile_index,UINT8 *ram)
 {
 	tile_index *= 4;
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			0,
 			ram[tile_index] + ((ram[tile_index+1] & 0x3f) << 8),
 			ram[tile_index+2] & 0x0f,
@@ -22,12 +22,12 @@ INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_
 
 TILE_GET_INFO_MEMBER(hexion_state::get_tile_info0)
 {
-	get_tile_info(machine(),tileinfo,tile_index,m_vram[0]);
+	get_tile_info(tileinfo,tile_index,m_vram[0]);
 }
 
 TILE_GET_INFO_MEMBER(hexion_state::get_tile_info1)
 {
-	get_tile_info(machine(),tileinfo,tile_index,m_vram[1]);
+	get_tile_info(tileinfo,tile_index,m_vram[1]);
 }
 
 

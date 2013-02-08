@@ -42,18 +42,17 @@ void hcastle_state::palette_init()
 }
 
 
-static void set_pens(running_machine &machine)
+void hcastle_state::set_pens()
 {
-	hcastle_state *state = machine.driver_data<hcastle_state>();
 	int i;
 
 	for (i = 0x00; i < 0x100; i += 2)
 	{
-		UINT16 data = state->m_paletteram[i | 1] | (state->m_paletteram[i] << 8);
+		UINT16 data = m_paletteram[i | 1] | (m_paletteram[i] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine.colortable, i >> 1, color);
+		colortable_palette_set_color(machine().colortable, i >> 1, color);
 	}
 }
 
@@ -199,15 +198,14 @@ WRITE8_MEMBER(hcastle_state::hcastle_pf2_control_w)
 
 /*****************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *sbank, int bank )
+void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *sbank, int bank )
 {
-	hcastle_state *state = machine.driver_data<hcastle_state>();
-	device_t *k007121 = bank ? state->m_k007121_2 : state->m_k007121_1;
-	address_space &space = machine.driver_data()->generic_space();
+	device_t *k007121 = bank ? m_k007121_2 : m_k007121_1;
+	address_space &space = machine().driver_data()->generic_space();
 	int base_color = (k007121_ctrlram_r(k007121, space, 6) & 0x30) * 2;
-	int bank_base = (bank == 0) ? 0x4000 * (state->m_gfx_bank & 1) : 0;
+	int bank_base = (bank == 0) ? 0x4000 * (m_gfx_bank & 1) : 0;
 
-	k007121_sprites_draw(k007121, bitmap, cliprect, machine.gfx[bank], machine.colortable, sbank, base_color, 0, bank_base, (UINT32)-1);
+	k007121_sprites_draw(k007121, bitmap, cliprect, machine().gfx[bank], machine().colortable, sbank, base_color, 0, bank_base, (UINT32)-1);
 }
 
 /*****************************************************************************/
@@ -225,7 +223,7 @@ UINT32 hcastle_state::screen_update_hcastle(screen_device &screen, bitmap_ind16 
 	UINT8 ctrl_2_2 = k007121_ctrlram_r(m_k007121_2, space, 2);
 	UINT8 ctrl_2_3 = k007121_ctrlram_r(m_k007121_2, space, 3);
 
-	set_pens(machine());
+	set_pens();
 
 	m_pf1_bankbase = 0x0000;
 	m_pf2_bankbase = 0x4000 * ((m_gfx_bank & 2) >> 1);
@@ -254,16 +252,16 @@ UINT32 hcastle_state::screen_update_hcastle(screen_device &screen, bitmap_ind16 
 	if ((m_gfx_bank & 0x04) == 0)
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(machine(), bitmap, cliprect, m_spriteram->buffer(), 0);
-		draw_sprites(machine(), bitmap, cliprect, m_spriteram2->buffer(), 1);
+		draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0);
+		draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 1);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(machine(), bitmap, cliprect, m_spriteram->buffer(), 0);
-		draw_sprites(machine(), bitmap, cliprect, m_spriteram2->buffer(), 1);
+		draw_sprites(bitmap, cliprect, m_spriteram->buffer(), 0);
+		draw_sprites(bitmap, cliprect, m_spriteram2->buffer(), 1);
 	}
 	return 0;
 }

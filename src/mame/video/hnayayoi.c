@@ -12,27 +12,26 @@ The blitter reads compressed data from ROM and copies it to the bitmap RAM.
 #include "emu.h"
 #include "includes/hnayayoi.h"
 
-static void common_vh_start( running_machine &machine, int num_pixmaps )
+void hnayayoi_state::common_vh_start( int num_pixmaps )
 {
-	hnayayoi_state *state = machine.driver_data<hnayayoi_state>();
 	int i;
 
-	state->m_total_pixmaps = num_pixmaps;
+	m_total_pixmaps = num_pixmaps;
 
 	for (i = 0; i < 8; i++)
 	{
-		if (i < state->m_total_pixmaps)
+		if (i < m_total_pixmaps)
 		{
-			state->m_pixmap[i] = auto_alloc_array(machine, UINT8, 256 * 256);
+			m_pixmap[i] = auto_alloc_array(machine(), UINT8, 256 * 256);
 		}
 		else
-			state->m_pixmap[i] = NULL;
+			m_pixmap[i] = NULL;
 	}
 }
 
 void hnayayoi_state::video_start()
 {
-	common_vh_start(machine(), 4);  /* 4 bitmaps -> 2 layers */
+	common_vh_start(4);  /* 4 bitmaps -> 2 layers */
 
 	save_pointer(NAME(m_pixmap[0]), 256 * 256);
 	save_pointer(NAME(m_pixmap[1]), 256 * 256);
@@ -42,7 +41,7 @@ void hnayayoi_state::video_start()
 
 VIDEO_START_MEMBER(hnayayoi_state,untoucha)
 {
-	common_vh_start(machine(), 8);  /* 8 bitmaps -> 4 layers */
+	common_vh_start(8);  /* 8 bitmaps -> 4 layers */
 
 	save_pointer(NAME(m_pixmap[0]), 256 * 256);
 	save_pointer(NAME(m_pixmap[1]), 256 * 256);
@@ -111,17 +110,16 @@ WRITE8_MEMBER(hnayayoi_state::dynax_blitter_rev1_param_w)
 	}
 }
 
-static void copy_pixel( running_machine &machine, int x, int y, int pen )
+void hnayayoi_state::copy_pixel( int x, int y, int pen )
 {
-	hnayayoi_state *state = machine.driver_data<hnayayoi_state>();
 	if (x >= 0 && x <= 255 && y >= 0 && y <= 255)
 	{
 		int i;
 
 		for (i = 0; i < 8; i++)
 		{
-			if ((~state->m_blit_layer & (1 << i)) && (state->m_pixmap[i]))
-				state->m_pixmap[i][256 * y + x] = pen;
+			if ((~m_blit_layer & (1 << i)) && (m_pixmap[i]))
+				m_pixmap[i][256 * y + x] = pen;
 		}
 	}
 }
@@ -190,7 +188,7 @@ WRITE8_MEMBER(hnayayoi_state::dynax_blitter_rev1_start_w)
 			case 0x2:
 			case 0x1:
 				while (cmd--)
-					copy_pixel(machine(), x++, y, pen);
+					copy_pixel(x++, y, pen);
 				break;
 
 			case 0x0:
@@ -221,12 +219,11 @@ WRITE8_MEMBER(hnayayoi_state::hnayayoi_palbank_w)
 }
 
 
-static void draw_layer_interleaved( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int left_pixmap, int right_pixmap, int palbase, int transp )
+void hnayayoi_state::draw_layer_interleaved( bitmap_ind16 &bitmap, const rectangle &cliprect, int left_pixmap, int right_pixmap, int palbase, int transp )
 {
-	hnayayoi_state *state = machine.driver_data<hnayayoi_state>();
 	int county, countx, pen;
-	UINT8 *src1 = state->m_pixmap[left_pixmap];
-	UINT8 *src2 = state->m_pixmap[right_pixmap];
+	UINT8 *src1 = m_pixmap[left_pixmap];
+	UINT8 *src2 = m_pixmap[right_pixmap];
 	UINT16 *dstbase = &bitmap.pix16(0);
 
 	palbase *= 16;
@@ -266,15 +263,15 @@ UINT32 hnayayoi_state::screen_update_hnayayoi(screen_device &screen, bitmap_ind1
 
 	if (m_total_pixmaps == 4)
 	{
-		draw_layer_interleaved(machine(), bitmap, cliprect, 3, 2, col1, 0);
-		draw_layer_interleaved(machine(), bitmap, cliprect, 1, 0, col0, 1);
+		draw_layer_interleaved(bitmap, cliprect, 3, 2, col1, 0);
+		draw_layer_interleaved(bitmap, cliprect, 1, 0, col0, 1);
 	}
 	else    /* total_pixmaps == 8 */
 	{
-		draw_layer_interleaved(machine(), bitmap, cliprect, 7, 6, col3, 0);
-		draw_layer_interleaved(machine(), bitmap, cliprect, 5, 4, col2, 1);
-		draw_layer_interleaved(machine(), bitmap, cliprect, 3, 2, col1, 1);
-		draw_layer_interleaved(machine(), bitmap, cliprect, 1, 0, col0, 1);
+		draw_layer_interleaved(bitmap, cliprect, 7, 6, col3, 0);
+		draw_layer_interleaved(bitmap, cliprect, 5, 4, col2, 1);
+		draw_layer_interleaved(bitmap, cliprect, 3, 2, col1, 1);
+		draw_layer_interleaved(bitmap, cliprect, 1, 0, col0, 1);
 	}
 	return 0;
 }

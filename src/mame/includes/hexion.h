@@ -24,4 +24,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_hexion(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(hexion_scanline);
+	inline void get_tile_info(tile_data &tileinfo,int tile_index,UINT8 *ram);
 };

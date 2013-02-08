@@ -25,4 +25,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(blitter_timer_callback);
+	void hyhoo_gfxdraw();
 };

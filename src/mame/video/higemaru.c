@@ -102,13 +102,12 @@ void higemaru_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(higemaru_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void higemaru_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	higemaru_state *state = machine.driver_data<higemaru_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 16; offs >= 0; offs -= 16)
+	for (offs = m_spriteram.bytes() - 16; offs >= 0; offs -= 16)
 	{
 		int code,col,sx,sy,flipx,flipy;
 
@@ -118,7 +117,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		sy = spriteram[offs + 8];
 		flipx = spriteram[offs + 4] & 0x10;
 		flipy = spriteram[offs + 4] & 0x20;
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -126,14 +125,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code,
 				col,
 				flipx,flipy,
 				sx,sy,15);
 
 		/* draw again with wraparound */
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code,
 				col,
 				flipx,flipy,
@@ -144,6 +143,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 higemaru_state::screen_update_higemaru(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

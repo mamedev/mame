@@ -37,4 +37,7 @@ public:
 	virtual void video_start();
 	DECLARE_VIDEO_START(untoucha);
 	UINT32 screen_update_hnayayoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void common_vh_start( int num_pixmaps );
+	void copy_pixel( int x, int y, int pen );
+	void draw_layer_interleaved( bitmap_ind16 &bitmap, const rectangle &cliprect, int left_pixmap, int right_pixmap, int palbase, int transp );
 };

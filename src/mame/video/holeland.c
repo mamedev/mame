@@ -101,39 +101,38 @@ WRITE8_MEMBER(holeland_state::holeland_flipscreen_w)
 }
 
 
-static void holeland_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void holeland_state::holeland_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	holeland_state *state = machine.driver_data<holeland_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs, code, sx, sy, color, flipx, flipy;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
-	for (offs = 3; offs < state->m_spriteram.bytes() - 1; offs += 4)
+	for (offs = 3; offs < m_spriteram.bytes() - 1; offs += 4)
 	{
 		sy = 236 - spriteram[offs];
 		sx = spriteram[offs + 2];
 
 		/* Bit 7 unknown */
 		code = spriteram[offs + 1] & 0x7f;
-		color = state->m_palette_offset + (spriteram[offs + 3] >> 4);
+		color = m_palette_offset + (spriteram[offs + 3] >> 4);
 
 		/* Bit 0, 1 unknown */
 		flipx = spriteram[offs + 3] & 0x04;
 		flipy = spriteram[offs + 3] & 0x08;
 
-		if (state->flip_screen_x())
+		if (flip_screen_x())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (state->flip_screen_y())
+		if (flip_screen_y())
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -141,14 +140,13 @@ static void holeland_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	}
 }
 
-static void crzrally_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
+void holeland_state::crzrally_draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	holeland_state *state = machine.driver_data<holeland_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs, code, sx, sy, color, flipx, flipy;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
-	for (offs = 3; offs < state->m_spriteram.bytes() - 1; offs += 4)
+	for (offs = 3; offs < m_spriteram.bytes() - 1; offs += 4)
 	{
 		sy = 236 - spriteram[offs];
 		sx = spriteram[offs + 2];
@@ -160,19 +158,19 @@ static void crzrally_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		flipx = spriteram[offs + 3] & 0x04;
 		flipy = spriteram[offs + 3] & 0x08;
 
-		if (state->flip_screen_x())
+		if (flip_screen_x())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (state->flip_screen_y())
+		if (flip_screen_y())
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -184,7 +182,7 @@ UINT32 holeland_state::screen_update_holeland(screen_device &screen, bitmap_ind1
 {
 /*m_bg_tilemap->mark_all_dirty(); */
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	holeland_draw_sprites(machine(), bitmap, cliprect);
+	holeland_draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }
@@ -192,6 +190,6 @@ UINT32 holeland_state::screen_update_holeland(screen_device &screen, bitmap_ind1
 UINT32 holeland_state::screen_update_crzrally(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	crzrally_draw_sprites(machine(), bitmap, cliprect);
+	crzrally_draw_sprites(bitmap, cliprect);
 	return 0;
 }

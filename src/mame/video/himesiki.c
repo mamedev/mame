@@ -45,10 +45,9 @@ WRITE8_MEMBER(himesiki_state::himesiki_flip_w)
 		logerror("p08_w %02x\n",data);
 }
 
-static void himesiki_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void himesiki_state::himesiki_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	himesiki_state *state = machine.driver_data<himesiki_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0x100; offs < 0x160; offs += 4)
@@ -65,7 +64,7 @@ static void himesiki_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		if (x > 0x1e0)
 			x -= 0x200;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			y = (y + 33) & 0xff;
 			x = 224 - x;
@@ -79,7 +78,7 @@ static void himesiki_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 				y -= 0x100;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, col, fx, fy, x, y, 15);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, col, fx, fy, x, y, 15);
 	}
 
 	for (offs = 0; offs < 0x100; offs += 4)
@@ -95,7 +94,7 @@ static void himesiki_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		if (x > 0x1e0)
 			x -= 0x200;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			y += 49;
 			x = 240 - x;
@@ -108,7 +107,7 @@ static void himesiki_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		if (y > 0xf0)
 			y -= 0x100;
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[2], code, col, f, f, x, y, 15);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[2], code, col, f, f, x, y, 15);
 	}
 }
 
@@ -118,7 +117,7 @@ UINT32 himesiki_state::screen_update_himesiki(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->set_scrolldx(x, x);
 
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-	himesiki_draw_sprites(machine(), bitmap, cliprect);
+	himesiki_draw_sprites(bitmap, cliprect);
 
 	return 0;
 }

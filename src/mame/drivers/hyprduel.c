@@ -45,12 +45,11 @@ fix comms so it boots, it's a bit of a hack for hyperduel at the moment ;-)
                                 Interrupts
 ***************************************************************************/
 
-static void update_irq_state( running_machine &machine )
+void hyprduel_state::update_irq_state(  )
 {
-	hyprduel_state *state = machine.driver_data<hyprduel_state>();
-	int irq = state->m_requested_int & ~*state->m_irq_enable;
+	int irq = m_requested_int & ~*m_irq_enable;
 
-	state->m_maincpu->set_input_line(3, (irq & state->m_int_num) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(3, (irq & m_int_num) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(hyprduel_state::vblank_end_callback)
@@ -73,7 +72,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::hyprduel_interrupt)
 	else
 		m_requested_int |= 0x12;        /* hsync */
 
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 READ16_MEMBER(hyprduel_state::hyprduel_irq_cause_r)
@@ -90,7 +89,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_irq_cause_w)
 		else
 			m_requested_int &= ~(data & *m_irq_enable);
 
-		update_irq_state(machine());
+		update_irq_state();
 	}
 }
 
@@ -255,10 +254,10 @@ READ16_MEMBER(hyprduel_state::hyprduel_bankedrom_r)
 TIMER_CALLBACK_MEMBER(hyprduel_state::hyprduel_blit_done)
 {
 	m_requested_int |= 1 << m_blitter_bit;
-	update_irq_state(machine());
+	update_irq_state();
 }
 
-INLINE int blt_read( const UINT8 *ROM, const int offs )
+inline int hyprduel_state::blt_read( const UINT8 *ROM, const int offs )
 {
 	return ROM[offs];
 }
