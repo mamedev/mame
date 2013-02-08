@@ -147,7 +147,9 @@ public:
 		m_radac(*this, "direct_a_right"),
 		m_lbdac(*this, "direct_b_left"),
 		m_rbdac(*this, "direct_b_right"),
-		m_gbsound(*this, "custom"){ }
+		m_gbsound(*this, "custom"),
+		m_io_in0(*this, "IN0")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT32> m_gba_pram;
@@ -279,6 +281,9 @@ public:
 	TIMER_CALLBACK_MEMBER(perform_scan);
 	void gba_machine_stop();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gba_cart);
+
+protected:
+	required_ioport m_io_in0;
 };
 
 /*----------- defined in video/gba.c -----------*/

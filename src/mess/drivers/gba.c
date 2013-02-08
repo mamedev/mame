@@ -916,7 +916,7 @@ READ32_MEMBER(gba_state::gba_io_r)
 		case 0x0130/4:
 			if( (mem_mask) & 0x0000ffff )   // KEYINPUT
 			{
-				retval = ioport("IN0")->read();
+				retval = m_io_in0->read();
 			}
 			else if( (mem_mask) & 0xffff0000 )
 			{
