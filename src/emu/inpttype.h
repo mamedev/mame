@@ -51,6 +51,9 @@
 #if defined(__GNUC__) && __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3)
 __attribute__((optimize("O0")))
 #endif
+#ifdef _MSC_VER
+#pragma optimize("", off)
+#endif
 void construct_core_types(simple_list<input_type_entry> &typelist)
 {
 	INPUT_PORT_DIGITAL_TYPE( 1, PLAYER1, JOYSTICK_UP,         "P1 Up",                  input_seq(KEYCODE_UP, input_seq::or_code, JOYCODE_Y_UP_SWITCH_INDEXED(0)) )
@@ -672,3 +675,6 @@ void construct_core_types(simple_list<input_type_entry> &typelist)
 	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, DIPSWITCH,           NULL,                     input_seq() )
 	INPUT_PORT_DIGITAL_TYPE( 0, INVALID, CONFIG,              NULL,                     input_seq() )
 }
+#ifdef _MSC_VER
+#pragma optimize("", on)
+#endif

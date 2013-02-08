@@ -560,6 +560,10 @@ void nes_carts_state::set_nt_mirroring(int mirroring)
     MIRROR_HIGH and MIRROR_LOW compared to the above) and Sachen games use sachen_set_mirror (which has
     a slightly different MIRROR_HIGH, with page 0 set to 0) */
 
+#ifdef _MSC_VER
+#pragma optimize("", off)
+#endif	
+
 
 /*************************************************************
 
@@ -589,3 +593,7 @@ void nes_carts_state::set_nt_mirroring(int mirroring)
 
 /* Include emulation of iNES Mappers for .nes files */
 #include "machine/nes_ines.c"
+
+#ifdef _MSC_VER
+#pragma optimize("", on)
+#endif
