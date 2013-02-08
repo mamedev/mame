@@ -903,7 +903,7 @@ MACHINE_RESET_MEMBER(galaga_state,galaga)
 MACHINE_RESET_MEMBER(xevious_state,battles)
 {
 	MACHINE_RESET_CALL_MEMBER(galaga);
-	battles_customio_init(machine());
+	battles_customio_init();
 }
 
 
@@ -917,14 +917,14 @@ static ADDRESS_MAP_START( bosco_map, AS_PROGRAM, 8, bosco_state )
 	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE_LEGACY("06xx_0", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE_LEGACY("06xx_0", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(bosco_videoram_w) AM_SHARE("videoram")/* + sprite registers */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(bosco_videoram_w) AM_SHARE("videoram")/* + sprite registers */
 	AM_RANGE(0x9000, 0x90ff) AM_DEVREADWRITE_LEGACY("06xx_1", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x9100, 0x9100) AM_DEVREADWRITE_LEGACY("06xx_1", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0x9800, 0x980f) AM_WRITEONLY AM_SHARE("bosco_radarattr")
-	AM_RANGE(0x9810, 0x9810) AM_WRITE_LEGACY(bosco_scrollx_w)
-	AM_RANGE(0x9820, 0x9820) AM_WRITE_LEGACY(bosco_scrolly_w)
+	AM_RANGE(0x9810, 0x9810) AM_WRITE(bosco_scrollx_w)
+	AM_RANGE(0x9820, 0x9820) AM_WRITE(bosco_scrolly_w)
 	AM_RANGE(0x9830, 0x9830) AM_WRITEONLY AM_SHARE("starcontrol")
-	AM_RANGE(0x9840, 0x9840) AM_WRITE_LEGACY(bosco_starclr_w)
+	AM_RANGE(0x9840, 0x9840) AM_WRITE(bosco_starclr_w)
 	AM_RANGE(0x9870, 0x9870) AM_WRITE(bosco_flip_screen_w)
 	AM_RANGE(0x9874, 0x9875) AM_WRITEONLY AM_SHARE("bosco_starblink")
 ADDRESS_MAP_END
@@ -959,12 +959,12 @@ static ADDRESS_MAP_START( xevious_map, AS_PROGRAM, 8, xevious_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("xevious_sr1") /* work RAM + sprite registers */
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_SHARE("xevious_sr2") /* work RAM + sprite registers */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("xevious_sr3") /* work RAM + sprite registers */
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(xevious_fg_colorram_w) AM_SHARE("fg_colorram")
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE_LEGACY(xevious_bg_colorram_w) AM_SHARE("bg_colorram")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(xevious_fg_videoram_w) AM_SHARE("fg_videoram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(xevious_bg_videoram_w) AM_SHARE("bg_videoram")
-	AM_RANGE(0xd000, 0xd07f) AM_WRITE_LEGACY(xevious_vh_latch_w)
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE_LEGACY(xevious_bb_r, xevious_bs_w)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(xevious_fg_colorram_w) AM_SHARE("fg_colorram")
+	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(xevious_bg_colorram_w) AM_SHARE("bg_colorram")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(xevious_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(xevious_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0xd000, 0xd07f) AM_WRITE(xevious_vh_latch_w)
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE(xevious_bb_r, xevious_bs_w)
 ADDRESS_MAP_END
 
 
@@ -975,12 +975,12 @@ static ADDRESS_MAP_START( digdug_map, AS_PROGRAM, 8, digdug_state )
 	AM_RANGE(0x6830, 0x6830) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7000, 0x70ff) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x7100, 0x7100) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(digdug_videoram_w) AM_SHARE("videoram") /* tilemap RAM (bottom half of RAM 0 */
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(digdug_videoram_w) AM_SHARE("videoram") /* tilemap RAM (bottom half of RAM 0 */
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("share1")                          /* work RAM (top half for RAM 0 */
 	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_SHARE("digdug_objram")   /* work RAM + sprite registers */
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("digdug_posram")   /* work RAM + sprite registers */
 	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("digdug_flpram")   /* work RAM + sprite registers */
-	AM_RANGE(0xa000, 0xa007) AM_READNOP AM_WRITE_LEGACY(digdug_PORT_w)      /* video latches (spurious reads when setting latch bits) */
+	AM_RANGE(0xa000, 0xa007) AM_READNOP AM_WRITE(digdug_PORT_w)      /* video latches (spurious reads when setting latch bits) */
 	AM_RANGE(0xb800, 0xb83f) AM_DEVREADWRITE("earom", atari_vg_earom_device, read, write)   /* non volatile memory data */
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)                    /* non volatile memory control */
 ADDRESS_MAP_END
@@ -993,13 +993,13 @@ static ADDRESS_MAP_START( galaga_mem4, AS_PROGRAM, 8, galaga_state )
 	AM_RANGE(0x1000, 0x107f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( battles_mem4, AS_PROGRAM, 8, galaga_state )
+static ADDRESS_MAP_START( battles_mem4, AS_PROGRAM, 8, xevious_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x4000, 0x4003) AM_READ_LEGACY(battles_input_port_r)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE_LEGACY(battles_CPU4_coin_w)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(battles_noise_sound_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE_LEGACY(battles_customio3_r, battles_customio3_w)
-	AM_RANGE(0x7000, 0x7000) AM_READWRITE_LEGACY(battles_customio_data3_r, battles_customio_data3_w)
+	AM_RANGE(0x4000, 0x4003) AM_READ(battles_input_port_r)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(battles_CPU4_coin_w)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(battles_noise_sound_w)
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE(battles_customio3_r, battles_customio3_w)
+	AM_RANGE(0x7000, 0x7000) AM_READWRITE(battles_customio_data3_r, battles_customio_data3_w)
 	AM_RANGE(0x8000, 0x80ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -3348,8 +3348,8 @@ DRIVER_INIT_MEMBER(xevious_state,xevios)
 DRIVER_INIT_MEMBER(xevious_state,battles)
 {
 	/* replace the Namco I/O handlers with interface to the 4th CPU */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x7000, 0x700f, FUNC(battles_customio_data0_r), FUNC(battles_customio_data0_w) );
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x7100, 0x7100, FUNC(battles_customio0_r), FUNC(battles_customio0_w) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x7000, 0x700f, read8_delegate(FUNC(xevious_state::battles_customio_data0_r),this), write8_delegate(FUNC(xevious_state::battles_customio_data0_w),this) );
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x7100, 0x7100, read8_delegate(FUNC(xevious_state::battles_customio0_r),this), write8_delegate(FUNC(xevious_state::battles_customio0_w),this) );
 
 	DRIVER_INIT_CALL(xevious);
 }

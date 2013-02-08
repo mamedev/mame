@@ -237,42 +237,32 @@ VIDEO_START_MEMBER(xevious_state,xevious)
 
 ***************************************************************************/
 
-WRITE8_HANDLER( xevious_fg_videoram_w )
+WRITE8_MEMBER( xevious_state::xevious_fg_videoram_w )
 {
-	xevious_state *state =  space.machine().driver_data<xevious_state>();
-
-	state->m_xevious_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_xevious_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( xevious_fg_colorram_w )
+WRITE8_MEMBER( xevious_state::xevious_fg_colorram_w )
 {
-	xevious_state *state =  space.machine().driver_data<xevious_state>();
-
-	state->m_xevious_fg_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_xevious_fg_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( xevious_bg_videoram_w )
+WRITE8_MEMBER( xevious_state::xevious_bg_videoram_w )
 {
-	xevious_state *state =  space.machine().driver_data<xevious_state>();
-
-	state->m_xevious_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_xevious_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( xevious_bg_colorram_w )
+WRITE8_MEMBER( xevious_state::xevious_bg_colorram_w )
 {
-	xevious_state *state =  space.machine().driver_data<xevious_state>();
-
-	state->m_xevious_bg_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_xevious_bg_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( xevious_vh_latch_w )
+WRITE8_MEMBER( xevious_state::xevious_vh_latch_w )
 {
-	xevious_state *state =  space.machine().driver_data<xevious_state>();
-
 	int reg;
 	int scroll = data + ((offset&0x01)<<8);   /* A0 -> D8 */
 
@@ -281,19 +271,19 @@ WRITE8_HANDLER( xevious_vh_latch_w )
 	switch (reg)
 	{
 	case 0:
-		state->m_bg_tilemap->set_scrollx(0,scroll);
+		m_bg_tilemap->set_scrollx(0,scroll);
 		break;
 	case 1:
-		state->m_fg_tilemap->set_scrollx(0,scroll);
+		m_fg_tilemap->set_scrollx(0,scroll);
 		break;
 	case 2:
-		state->m_bg_tilemap->set_scrolly(0,scroll);
+		m_bg_tilemap->set_scrolly(0,scroll);
 		break;
 	case 3:
-		state->m_fg_tilemap->set_scrolly(0,scroll);
+		m_fg_tilemap->set_scrolly(0,scroll);
 		break;
 	case 7:
-		state->flip_screen_set(scroll & 1);
+		flip_screen_set(scroll & 1);
 		break;
 	default:
 			logerror("CRTC WRITE REG: %x  Data: %03x\n",reg, scroll);
@@ -303,25 +293,21 @@ WRITE8_HANDLER( xevious_vh_latch_w )
 
 
 /* emulation for schematic 9B */
-WRITE8_HANDLER( xevious_bs_w )
+WRITE8_MEMBER( xevious_state::xevious_bs_w )
 {
-	xevious_state *state =  space.machine().driver_data<xevious_state>();
-
-	state->m_xevious_bs[offset & 1] = data;
+	m_xevious_bs[offset & 1] = data;
 }
 
-READ8_HANDLER( xevious_bb_r )
+READ8_MEMBER( xevious_state::xevious_bb_r )
 {
-	xevious_state *state =  space.machine().driver_data<xevious_state>();
-
-	UINT8 *rom2a = state->memregion("gfx4")->base();
+	UINT8 *rom2a = memregion("gfx4")->base();
 	UINT8 *rom2b = rom2a+0x1000;
 	UINT8 *rom2c = rom2a+0x3000;
 	int adr_2b,adr_2c;
 	int dat1,dat2;
 
 	/* get BS to 12 bit data from 2A,2B */
-	adr_2b = ((state->m_xevious_bs[1] & 0x7e) << 6) | ((state->m_xevious_bs[0] & 0xfe) >> 1);
+	adr_2b = ((m_xevious_bs[1] & 0x7e) << 6) | ((m_xevious_bs[0] & 0xfe) >> 1);
 
 	if (adr_2b & 1)
 	{
@@ -334,7 +320,7 @@ READ8_HANDLER( xevious_bb_r )
 		dat1 = ((rom2a[adr_2b >> 1] & 0x0f) << 8) | rom2b[adr_2b];
 	}
 
-	adr_2c = ((dat1 & 0x1ff) << 2) | ((state->m_xevious_bs[1] & 1) << 1) | (state->m_xevious_bs[0] & 1);
+	adr_2c = ((dat1 & 0x1ff) << 2) | ((m_xevious_bs[1] & 1) << 1) | (m_xevious_bs[0] & 1);
 	if (dat1 & 0x400) adr_2c ^= 1;
 	if (dat1 & 0x200) adr_2c ^= 2;
 

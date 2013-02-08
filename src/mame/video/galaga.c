@@ -31,7 +31,7 @@ There are 63 stars in each set, 126 displayed at any one time
 
 */
 
-const struct star star_seed_tab[252]=
+struct galaga_state::star galaga_state::m_star_seed_tab[252]=
 {
 /* also shared by Bosconian */
 
@@ -544,13 +544,13 @@ void galaga_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect )
 		{
 			int x,y;
 
-			if ( (set_a == star_seed_tab[star_cntr].set) || ( set_b == star_seed_tab[star_cntr].set) )
+			if ( (set_a == m_star_seed_tab[star_cntr].set) || ( set_b == m_star_seed_tab[star_cntr].set) )
 			{
-				x = (star_seed_tab[star_cntr].x + m_stars_scrollx) % 256 + x_align;
-				y = (y_align + star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
+				x = (m_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256 + x_align;
+				y = (y_align + m_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
 
 				if (cliprect.contains(x, y))
-					bitmap.pix16(y, x) = STARS_COLOR_BASE + star_seed_tab[ star_cntr ].col;
+					bitmap.pix16(y, x) = STARS_COLOR_BASE + m_star_seed_tab[ star_cntr ].col;
 			}
 
 		}

@@ -162,18 +162,14 @@ VIDEO_START_MEMBER(digdug_state,digdug)
 
 ***************************************************************************/
 
-WRITE8_HANDLER( digdug_videoram_w )
+WRITE8_MEMBER( digdug_state::digdug_videoram_w )
 {
-	digdug_state *state =  space.machine().driver_data<digdug_state>();
-
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( digdug_PORT_w )
+WRITE8_MEMBER( digdug_state::digdug_PORT_w )
 {
-	digdug_state *state =  space.machine().driver_data<digdug_state>();
-
 	switch (offset)
 	{
 		case 0: /* select background picture */
@@ -182,27 +178,27 @@ WRITE8_HANDLER( digdug_PORT_w )
 				int shift = offset;
 				int mask = 1 << shift;
 
-				if ((state->m_bg_select & mask) != ((data & 1) << shift))
+				if ((m_bg_select & mask) != ((data & 1) << shift))
 				{
-					state->m_bg_select = (state->m_bg_select & ~mask) | ((data & 1) << shift);
-					state->m_bg_tilemap->mark_all_dirty();
+					m_bg_select = (m_bg_select & ~mask) | ((data & 1) << shift);
+					m_bg_tilemap->mark_all_dirty();
 				}
 			}
 			break;
 
 		case 2: /* select alpha layer color mode (see tx_get_tile_info) */
-			if (state->m_tx_color_mode != (data & 1))
+			if (m_tx_color_mode != (data & 1))
 			{
-				state->m_tx_color_mode = data & 1;
-				state->m_fg_tilemap->mark_all_dirty();
+				m_tx_color_mode = data & 1;
+				m_fg_tilemap->mark_all_dirty();
 			}
 			break;
 
 		case 3: /* "disable" background (see bg_get_tile_info) */
-			if (state->m_bg_disable != (data & 1))
+			if (m_bg_disable != (data & 1))
 			{
-				state->m_bg_disable = data & 1;
-				state->m_bg_tilemap->mark_all_dirty();
+				m_bg_disable = data & 1;
+				m_bg_tilemap->mark_all_dirty();
 			}
 			break;
 
@@ -212,10 +208,10 @@ WRITE8_HANDLER( digdug_PORT_w )
 				int shift = offset;
 				int mask = 1 << shift;
 
-				if ((state->m_bg_color_bank & mask) != ((data & 1) << shift))
+				if ((m_bg_color_bank & mask) != ((data & 1) << shift))
 				{
-					state->m_bg_color_bank = (state->m_bg_color_bank & ~mask) | ((data & 1) << shift);
-					state->m_bg_tilemap->mark_all_dirty();
+					m_bg_color_bank = (m_bg_color_bank & ~mask) | ((data & 1) << shift);
+					m_bg_tilemap->mark_all_dirty();
 				}
 			}
 			break;
@@ -224,7 +220,7 @@ WRITE8_HANDLER( digdug_PORT_w )
 			break;
 
 		case 7: /* FLIP */
-			state->flip_screen_set(data & 1);
+			flip_screen_set(data & 1);
 			break;
 	}
 }

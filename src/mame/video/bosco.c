@@ -150,31 +150,26 @@ VIDEO_START_MEMBER(bosco_state,bosco)
 
 ***************************************************************************/
 
-WRITE8_HANDLER( bosco_videoram_w )
+WRITE8_MEMBER( bosco_state::bosco_videoram_w )
 {
-	bosco_state *state =  space.machine().driver_data<bosco_state>();
-
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 	if (offset & 0x400)
-		state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+		m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 	else
-		state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+		m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( bosco_scrollx_w )
+WRITE8_MEMBER( bosco_state::bosco_scrollx_w )
 {
-	bosco_state *state =  space.machine().driver_data<bosco_state>();
-
-	state->m_bg_tilemap->set_scrollx(0,data);
+	m_bg_tilemap->set_scrollx(0,data);
 }
 
-WRITE8_HANDLER( bosco_scrolly_w )
+WRITE8_MEMBER( bosco_state::bosco_scrolly_w )
 {
-	bosco_state *state =  space.machine().driver_data<bosco_state>();
-	state->m_bg_tilemap->set_scrolly(0,data);
+	m_bg_tilemap->set_scrolly(0,data);
 }
 
-WRITE8_HANDLER( bosco_starclr_w )
+WRITE8_MEMBER( bosco_state::bosco_starclr_w )
 {
 }
 
@@ -255,10 +250,10 @@ void bosco_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 		{
 			int x,y;
 
-			if ( (set_a == star_seed_tab[star_cntr].set) || ( set_b == star_seed_tab[star_cntr].set) )
+			if ( (set_a == m_star_seed_tab[star_cntr].set) || ( set_b == m_star_seed_tab[star_cntr].set) )
 			{
-				x = (star_seed_tab[star_cntr].x + m_stars_scrollx) % 256;
-				y = (star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
+				x = (m_star_seed_tab[star_cntr].x + m_stars_scrollx) % 256;
+				y = (m_star_seed_tab[star_cntr].y + m_stars_scrolly) % 256;
 
 				/* dont draw the stars that are off the screen */
 				if ( x < 224 )
@@ -266,7 +261,7 @@ void bosco_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, in
 					if (flip) x += 20*8;
 
 					if (cliprect.contains(x, y))
-						bitmap.pix16(y, x) = STARS_COLOR_BASE + star_seed_tab[star_cntr].col;
+						bitmap.pix16(y, x) = STARS_COLOR_BASE + m_star_seed_tab[star_cntr].col;
 				}
 			}
 		}
