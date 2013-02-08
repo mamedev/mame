@@ -66,22 +66,20 @@ void karnov_state::palette_init()
 	}
 }
 
-void karnov_flipscreen_w( running_machine &machine, int data )
+void karnov_state::karnov_flipscreen_w( int data )
 {
-	karnov_state *state = machine.driver_data<karnov_state>();
-	state->m_flipscreen = data;
-	machine.tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	state->flip_screen_set(state->m_flipscreen);
+	m_flipscreen = data;
+	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	flip_screen_set(m_flipscreen);
 }
 
-static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void karnov_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	karnov_state *state = machine.driver_data<karnov_state>();
 	int my, mx, offs, color, tile, fx, fy;
-	int scrollx = state->m_scroll[0];
-	int scrolly = state->m_scroll[1];
+	int scrollx = m_scroll[0];
+	int scrolly = m_scroll[1];
 
-	if (state->m_flipscreen)
+	if (m_flipscreen)
 		fx = fy = 1;
 	else
 		fx = fy = 0;
@@ -98,18 +96,18 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
 			my++;
 		}
 
-		tile = state->m_pf_data[offs];
+		tile = m_pf_data[offs];
 		color = tile >> 12;
 		tile = tile & 0x7ff;
-		if (state->m_flipscreen)
-			drawgfx_opaque(*state->m_bitmap_f, state->m_bitmap_f->cliprect(), machine.gfx[1],tile,
+		if (m_flipscreen)
+			drawgfx_opaque(*m_bitmap_f, m_bitmap_f->cliprect(), machine().gfx[1],tile,
 				color, fx, fy, 496-16*mx,496-16*my);
 		else
-			drawgfx_opaque(*state->m_bitmap_f, state->m_bitmap_f->cliprect(), machine.gfx[1],tile,
+			drawgfx_opaque(*m_bitmap_f, m_bitmap_f->cliprect(), machine().gfx[1],tile,
 				color, fx, fy, 16*mx,16*my);
 	}
 
-	if (!state->m_flipscreen)
+	if (!m_flipscreen)
 	{
 		scrolly = -scrolly;
 		scrollx = -scrollx;
@@ -120,14 +118,14 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
 		scrollx = scrollx + 256;
 	}
 
-	copyscrollbitmap(bitmap, *state->m_bitmap_f, 1, &scrollx, 1, &scrolly, cliprect);
+	copyscrollbitmap(bitmap, *m_bitmap_f, 1, &scrollx, 1, &scrolly, cliprect);
 }
 
 /******************************************************************************/
 
 UINT32 karnov_state::screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(machine(), bitmap, cliprect);
+	draw_background(bitmap, cliprect);
 	machine().device<deco_karnovsprites_device>("spritegen")->draw_sprites(machine(), bitmap, cliprect, m_spriteram->buffer(), 0x800, 0);
 	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;

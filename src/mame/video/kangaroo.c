@@ -7,9 +7,6 @@
 #include "emu.h"
 #include "includes/kangaroo.h"
 
-static void blitter_execute(running_machine &machine);
-
-
 /*************************************
  *
  *  Video setup
@@ -31,9 +28,8 @@ void kangaroo_state::video_start()
  *
  *************************************/
 
-static void videoram_write( running_machine &machine, UINT16 offset, UINT8 data, UINT8 mask )
+void kangaroo_state::videoram_write( UINT16 offset, UINT8 data, UINT8 mask )
 {
-	kangaroo_state *state = machine.driver_data<kangaroo_state>();
 	UINT32 expdata, layermask;
 
 	/* data contains 4 2-bit values packed as DCBADCBA; expand these into 4 8-bit values */
@@ -55,13 +51,13 @@ static void videoram_write( running_machine &machine, UINT16 offset, UINT8 data,
 	if (mask & 0x01) layermask |= 0x0c0c0c0c;
 
 	/* update layers */
-	state->m_videoram[offset] = (state->m_videoram[offset] & ~layermask) | (expdata & layermask);
+	m_videoram[offset] = (m_videoram[offset] & ~layermask) | (expdata & layermask);
 }
 
 
 WRITE8_MEMBER(kangaroo_state::kangaroo_videoram_w)
 {
-	videoram_write(machine(), offset, data, m_video_control[8]);
+	videoram_write(offset, data, m_video_control[8]);
 }
 
 
@@ -79,7 +75,7 @@ WRITE8_MEMBER(kangaroo_state::kangaroo_video_control_w)
 	switch (offset)
 	{
 		case 5: /* blitter start */
-			blitter_execute(machine());
+			blitter_execute();
 			break;
 
 		case 8: /* bank select */
@@ -96,16 +92,15 @@ WRITE8_MEMBER(kangaroo_state::kangaroo_video_control_w)
  *
  *************************************/
 
-static void blitter_execute( running_machine &machine )
+void kangaroo_state::blitter_execute(  )
 {
-	kangaroo_state *state = machine.driver_data<kangaroo_state>();
-	UINT32 gfxhalfsize = state->memregion("gfx1")->bytes() / 2;
-	const UINT8 *gfxbase = state->memregion("gfx1")->base();
-	UINT16 src = state->m_video_control[0] + 256 * state->m_video_control[1];
-	UINT16 dst = state->m_video_control[2] + 256 * state->m_video_control[3];
-	UINT8 height = state->m_video_control[5];
-	UINT8 width = state->m_video_control[4];
-	UINT8 mask = state->m_video_control[8];
+	UINT32 gfxhalfsize = memregion("gfx1")->bytes() / 2;
+	const UINT8 *gfxbase = memregion("gfx1")->base();
+	UINT16 src = m_video_control[0] + 256 * m_video_control[1];
+	UINT16 dst = m_video_control[2] + 256 * m_video_control[3];
+	UINT8 height = m_video_control[5];
+	UINT8 width = m_video_control[4];
+	UINT8 mask = m_video_control[8];
 	int x, y;
 
 	/* during DMA operations, the top 2 bits are ORed together, as well as the bottom 2 bits */
@@ -119,8 +114,8 @@ static void blitter_execute( running_machine &machine )
 		{
 			UINT16 effdst = (dst + x) & 0x3fff;
 			UINT16 effsrc = src++ & (gfxhalfsize - 1);
-			videoram_write(machine, effdst, gfxbase[0 * gfxhalfsize + effsrc], mask & 0x05);
-			videoram_write(machine, effdst, gfxbase[1 * gfxhalfsize + effsrc], mask & 0x0a);
+			videoram_write(effdst, gfxbase[0 * gfxhalfsize + effsrc], mask & 0x05);
+			videoram_write(effdst, gfxbase[1 * gfxhalfsize + effsrc], mask & 0x0a);
 		}
 }
 

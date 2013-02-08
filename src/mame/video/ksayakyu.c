@@ -78,11 +78,10 @@ TILE_GET_INFO_MEMBER(ksayakyu_state::get_text_tile_info)
 [3]
 */
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void ksayakyu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
-	const UINT8 *source = state->m_spriteram + state->m_spriteram.bytes() - 4;
-	const UINT8 *finish = state->m_spriteram;
+	const UINT8 *source = m_spriteram + m_spriteram.bytes() - 4;
+	const UINT8 *finish = m_spriteram;
 
 	while (source>=finish) /* is order correct ? */
 	{
@@ -93,9 +92,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = (tile & 0x80) ? 1 : 0;
 		int flipy = 0;
 
-		gfx_element *gfx = machine.gfx[2];
+		gfx_element *gfx = machine().gfx[2];
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -128,6 +127,6 @@ UINT32 ksayakyu_state::screen_update_ksayakyu(screen_device &screen, bitmap_ind1
 		m_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	m_textmap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

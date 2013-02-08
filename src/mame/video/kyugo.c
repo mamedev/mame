@@ -142,15 +142,13 @@ WRITE8_MEMBER(kyugo_state::kyugo_flipscreen_w)
  *
  *************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void kyugo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	kyugo_state *state = machine.driver_data<kyugo_state>();
-
 	/* sprite information is scattered through memory */
 	/* and uses a portion of the text layer memory (outside the visible area) */
-	UINT8 *spriteram_area1 = &state->m_spriteram_1[0x28];
-	UINT8 *spriteram_area2 = &state->m_spriteram_2[0x28];
-	UINT8 *spriteram_area3 = &state->m_fgvideoram[0x28];
+	UINT8 *spriteram_area1 = &m_spriteram_1[0x28];
+	UINT8 *spriteram_area2 = &m_spriteram_2[0x28];
+	UINT8 *spriteram_area3 = &m_fgvideoram[0x28];
 
 	int n;
 
@@ -168,7 +166,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if (sy > 0xf0)
 			sy -= 256;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 			sy = 240 - sy;
 
 		color = spriteram_area1[offs + 1] & 0x1f;
@@ -185,18 +183,18 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipx =  attr & 0x08;
 			flipy =  attr & 0x04;
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				flipx = !flipx;
 				flipy = !flipy;
 			}
 
 
-			drawgfx_transpen( bitmap, cliprect,machine.gfx[2],
+			drawgfx_transpen( bitmap, cliprect,machine().gfx[2],
 						code,
 						color,
 						flipx,flipy,
-						sx,state->m_flipscreen ? sy - 16*y : sy + 16*y, 0 );
+						sx,m_flipscreen ? sy - 16*y : sy + 16*y, 0 );
 		}
 	}
 }
@@ -212,7 +210,7 @@ UINT32 kyugo_state::screen_update_kyugo(screen_device &screen, bitmap_ind16 &bit
 	m_bg_tilemap->set_scrolly(0, m_scroll_y);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

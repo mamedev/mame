@@ -65,10 +65,9 @@ void kchamp_state::video_start()
              3        XXXXXXXX
 */
 
-static void kchamp_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void kchamp_state::kchamp_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	kchamp_state *state = machine.driver_data<kchamp_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < 0x100; offs += 4)
@@ -82,7 +81,7 @@ static void kchamp_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 		int sx = spriteram[offs + 3] - 8;
 		int sy = 247 - spriteram[offs];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -90,14 +89,13 @@ static void kchamp_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[bank], code, color, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[bank], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
-static void kchampvs_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void kchamp_state::kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	kchamp_state *state = machine.driver_data<kchamp_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < 0x100; offs += 4)
@@ -111,7 +109,7 @@ static void kchampvs_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		int sx = spriteram[offs + 3];
 		int sy = 240 - spriteram[offs];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -119,7 +117,7 @@ static void kchampvs_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[bank], code, color, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[bank], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -127,13 +125,13 @@ static void kchampvs_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 UINT32 kchamp_state::screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	kchamp_draw_sprites(machine(), bitmap, cliprect);
+	kchamp_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
 UINT32 kchamp_state::screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	kchampvs_draw_sprites(machine(), bitmap, cliprect);
+	kchampvs_draw_sprites(bitmap, cliprect);
 	return 0;
 }

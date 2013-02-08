@@ -31,4 +31,6 @@ public:
 	virtual void video_start();
 	DECLARE_MACHINE_START(kangaroo_mcu);
 	UINT32 screen_update_kangaroo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void videoram_write( UINT16 offset, UINT8 data, UINT8 mask );
+	void blitter_execute(  );
 };

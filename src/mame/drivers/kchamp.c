@@ -705,11 +705,11 @@ ROM_START( karatevs )
 ROM_END
 
 
-static UINT8 *decrypt_code(running_machine &machine)
+UINT8 *kchamp_state::decrypt_code()
 {
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	int A;
 
 	space.set_decrypted_region(0x0000, 0xffff, decrypted);
@@ -724,7 +724,7 @@ static UINT8 *decrypt_code(running_machine &machine)
 DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 {
 	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *decrypted = decrypt_code(machine());
+	UINT8 *decrypted = decrypt_code();
 	int A;
 
 	/*
@@ -754,7 +754,7 @@ DRIVER_INIT_MEMBER(kchamp_state,kchampvs)
 
 DRIVER_INIT_MEMBER(kchamp_state,kchampvs2)
 {
-	decrypt_code(machine());
+	decrypt_code();
 	m_counter = 0;
 	m_msm_data = 0;
 	m_msm_play_lo_nibble = 1;

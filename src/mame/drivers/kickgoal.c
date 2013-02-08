@@ -116,7 +116,7 @@ Hollywood Action
 //static int kickgoal_melody;
 //static int kickgoal_snd_bank;
 
-static void kickgoal_play(okim6295_device *oki, int melody, int data)
+void ::kickgoal_play(okim6295_device *oki, int melody, int data)
 {
 	int status = oki->read(0);
 
@@ -124,12 +124,12 @@ static void kickgoal_play(okim6295_device *oki, int melody, int data)
 	if (kickgoal_sound == 0) popmessage("Unknown sound command %02x",kickgoal_sound);
 
 	if (melody) {
-		if (state->m_melody != kickgoal_sound) {
-			state->m_melody      = kickgoal_sound;
-			state->m_melody_loop = kickgoal_sound;
+		if (m_melody != kickgoal_sound) {
+			m_melody      = kickgoal_sound;
+			m_melody_loop = kickgoal_sound;
 			if (status & 0x08)
 				oki->write(0,0x40);
-			oki->write(0,(0x80 | state->m_melody));
+			oki->write(0,(0x80 | m_melody));
 			oki->write(0,0x81);
 		}
 	}

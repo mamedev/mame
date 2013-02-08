@@ -632,17 +632,17 @@ ADDRESS_MAP_END
                                 Shogun Warriors
 ***************************************************************************/
 
-static void kaneko16_common_oki_bank_w( running_machine& machine, const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize )
+void kaneko16_state::kaneko16_common_oki_bank_w(  const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize )
 {
 	UINT32 bankaddr;
-	UINT8* samples = machine.root_device().memregion(tag)->base();
-	size_t length = machine.root_device().memregion(tag)->bytes();
+	UINT8* samples = machine().root_device().memregion(tag)->base();
+	size_t length = machine().root_device().memregion(tag)->bytes();
 
 	bankaddr = fixedsize + (bankedsize * bank);
 
 	if (bankaddr <= (length-bankedsize))
 	{
-		machine.root_device().membank(bankname)->set_base(samples + bankaddr);
+		machine().root_device().membank(bankname)->set_base(samples + bankaddr);
 	}
 }
 
@@ -650,8 +650,8 @@ WRITE16_MEMBER(kaneko16_shogwarr_state::shogwarr_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kaneko16_common_oki_bank_w(machine(), "bank10", "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
-		kaneko16_common_oki_bank_w(machine(), "bank11", "oki2", (data & 0xf)     , 0x00000, 0x40000);
+		kaneko16_common_oki_bank_w("bank10", "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
+		kaneko16_common_oki_bank_w("bank11", "oki2", (data & 0xf)     , 0x00000, 0x40000);
 	}
 }
 
@@ -659,8 +659,8 @@ WRITE16_MEMBER(kaneko16_shogwarr_state::brapboys_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kaneko16_common_oki_bank_w(machine(), "bank10", "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
-		kaneko16_common_oki_bank_w(machine(), "bank11", "oki2", (data & 0xf)     , 0x20000, 0x20000);
+		kaneko16_common_oki_bank_w("bank10", "oki1", (data >> 4) & 0xf, 0x30000, 0x10000);
+		kaneko16_common_oki_bank_w("bank11", "oki2", (data & 0xf)     , 0x20000, 0x20000);
 	}
 }
 
@@ -2155,10 +2155,10 @@ MACHINE_CONFIG_END
  have the even and odd pixels swapped. So we use this function to untangle
  them and have one single gfxlayout for both tiles and sprites.
 */
-static void kaneko16_unscramble_tiles(running_machine &machine, const char *region)
+void kaneko16_state::kaneko16_unscramble_tiles(const char *region)
 {
-	UINT8 *RAM  =   machine.root_device().memregion(region)->base();
-	int size            =   machine.root_device().memregion(region)->bytes();
+	UINT8 *RAM  =   machine().root_device().memregion(region)->base();
+	int size            =   machine().root_device().memregion(region)->bytes();
 	int i;
 
 	if (RAM == NULL)    return;
@@ -2169,7 +2169,7 @@ static void kaneko16_unscramble_tiles(running_machine &machine, const char *regi
 	}
 }
 
-static void kaneko16_expand_sample_banks(running_machine &machine, const char *region)
+void kaneko16_state::kaneko16_expand_sample_banks(const char *region)
 {
 	/* The sample data for the first OKI has an address translator/
 	   banking register in it that munges the addresses as follows:
@@ -2183,11 +2183,11 @@ static void kaneko16_expand_sample_banks(running_machine &machine, const char *r
 	int bank;
 	UINT8 *src0;
 
-	if (machine.root_device().memregion(region)->bytes() < 0x40000 * 16)
+	if (machine().root_device().memregion(region)->bytes() < 0x40000 * 16)
 		fatalerror("gtmr SOUND1 region too small\n");
 
 	/* bank 0 maps to itself, so we just leave it alone */
-	src0 = machine.root_device().memregion(region)->base();
+	src0 = machine().root_device().memregion(region)->base();
 	for (bank = 15; bank > 0; bank--)
 	{
 		UINT8 *srcn = src0 + 0x10000 * (bank < 3 ? 3 : bank);
@@ -2200,20 +2200,20 @@ static void kaneko16_expand_sample_banks(running_machine &machine, const char *r
 
 DRIVER_INIT_MEMBER( kaneko16_state, kaneko16 )
 {
-	kaneko16_unscramble_tiles(machine(), "gfx2");
-	kaneko16_unscramble_tiles(machine(), "gfx3");
+	kaneko16_unscramble_tiles("gfx2");
+	kaneko16_unscramble_tiles("gfx3");
 }
 
 DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwall )
 {
-	kaneko16_unscramble_tiles(machine(), "gfx2");
+	kaneko16_unscramble_tiles("gfx2");
 }
 
 DRIVER_INIT_MEMBER( kaneko16_state, samplebank )
 {
-	kaneko16_unscramble_tiles(machine(), "gfx2");
-	kaneko16_unscramble_tiles(machine(), "gfx3");
-	kaneko16_expand_sample_banks(machine(), "oki1");
+	kaneko16_unscramble_tiles("gfx2");
+	kaneko16_unscramble_tiles("gfx3");
+	kaneko16_expand_sample_banks("oki1");
 }
 
 
@@ -3829,8 +3829,8 @@ DRIVER_INIT_MEMBER( kaneko16_gtmr_state, gtmr )
 DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, shogwarr )
 {
 	// default sample banks
-	kaneko16_common_oki_bank_w(machine(), "bank10", "oki1", 0, 0x30000, 0x10000);
-	kaneko16_common_oki_bank_w(machine(), "bank11", "oki2", 0, 0x00000, 0x40000);
+	kaneko16_common_oki_bank_w("bank10", "oki1", 0, 0x30000, 0x10000);
+	kaneko16_common_oki_bank_w("bank11", "oki2", 0, 0x00000, 0x40000);
 	DRIVER_INIT_CALL(kaneko16);
 }
 
@@ -3841,8 +3841,8 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe00000, 0xe00001, write16_delegate(FUNC(kaneko16_shogwarr_state::brapboys_oki_bank_w),this));
 
 	// default sample banks
-	kaneko16_common_oki_bank_w(machine(), "bank10", "oki1", 0, 0x30000, 0x10000);
-	kaneko16_common_oki_bank_w(machine(), "bank11", "oki2", 0, 0x20000, 0x20000);
+	kaneko16_common_oki_bank_w("bank10", "oki1", 0, 0x30000, 0x10000);
+	kaneko16_common_oki_bank_w("bank11", "oki2", 0, 0x20000, 0x20000);
 	DRIVER_INIT_CALL(kaneko16);
 }
 

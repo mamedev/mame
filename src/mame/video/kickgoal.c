@@ -88,14 +88,13 @@ TILEMAP_MAPPER_MEMBER(kickgoal_state::tilemap_scan_actionhwbg2)// 32x32 tiles
 
 
 
-static void kickgoal_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void kickgoal_state::kickgoal_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	kickgoal_state *state = machine.driver_data<kickgoal_state>();
-	UINT16 *spriteram = state->m_spriteram;
-	gfx_element *gfx = machine.gfx[1];
+	UINT16 *spriteram = m_spriteram;
+	gfx_element *gfx = machine().gfx[1];
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
 		int xpos = spriteram[offs + 3];
 		int ypos = spriteram[offs + 0] & 0x00ff;
@@ -108,7 +107,7 @@ static void kickgoal_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		ypos = 0x110 - ypos;
 
 		drawgfx_transpen(bitmap,cliprect,gfx,
-				tileno+state->m_sprbase,
+				tileno+m_sprbase,
 				0x30 + color,
 				flipx,0,
 				xpos-16+4,ypos-32,15);
@@ -172,7 +171,7 @@ UINT32 kickgoal_state::screen_update_kickgoal(screen_device &screen, bitmap_ind1
 	m_bg2tm->draw(bitmap, cliprect, 0, 0);
 	m_bgtm->draw(bitmap, cliprect, 0, 0);
 
-	kickgoal_draw_sprites(machine(), bitmap, cliprect);
+	kickgoal_draw_sprites(bitmap, cliprect);
 
 	m_fgtm->draw(bitmap, cliprect, 0, 0);
 

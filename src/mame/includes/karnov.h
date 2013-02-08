@@ -59,6 +59,11 @@ public:
 	DECLARE_VIDEO_START(wndrplnt);
 	UINT32 screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(karnov_interrupt);
+	void karnov_flipscreen_w( int data );
+	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void karnov_i8751_w( int data );
+	void wndrplnt_i8751_w( int data );
+	void chelnov_i8751_w( int data );
 };
 
 enum {

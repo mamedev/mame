@@ -67,6 +67,10 @@ public:
 	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(shogwarr_interrupt);
+	void kaneko16_fill_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void kaneko16_common_oki_bank_w(  const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize );
+	void kaneko16_unscramble_tiles(const char *region);
+	void kaneko16_expand_sample_banks(const char *region);
 };
 
 class kaneko16_gtmr_state : public kaneko16_state
@@ -117,6 +121,7 @@ public:
 	DECLARE_PALETTE_INIT(berlwall);
 	DECLARE_VIDEO_START(berlwall);
 	UINT32 screen_update_berlwall(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void kaneko16_render_15bpp_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 class kaneko16_shogwarr_state : public kaneko16_state

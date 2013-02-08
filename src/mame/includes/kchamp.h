@@ -52,4 +52,7 @@ public:
 	UINT32 screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kc_interrupt);
 	INTERRUPT_GEN_MEMBER(sound_int);
+	void kchamp_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void kchampvs_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	UINT8 *decrypt_code();
 };

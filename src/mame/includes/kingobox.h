@@ -59,4 +59,9 @@ public:
 	UINT32 screen_update_kingofb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ringking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kingofb_interrupt);
+	void palette_init_common( const UINT8 *color_prom, void (kingofb_state::*get_rgb_data)(const UINT8 *, int, int *, int *, int *) );
+	void kingofb_get_rgb_data( const UINT8 *color_prom, int i, int *r_data, int *g_data, int *b_data );
+	void ringking_get_rgb_data( const UINT8 *color_prom, int i, int *r_data, int *g_data, int *b_data );
+	void kingofb_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void ringking_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
