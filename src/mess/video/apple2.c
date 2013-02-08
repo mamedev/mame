@@ -160,8 +160,6 @@ static void apple2_text_draw(running_machine &machine, bitmap_ind16 &bitmap, con
 	int row, col;
 	UINT32 start_address = (page ? 0x0800 : 0x0400);
 	UINT32 address;
-	const UINT8 *textgfx_data = machine.root_device().memregion("gfx1")->base();
-	UINT32 textgfx_datalen = state->memregion("gfx1")->bytes();
 	UINT32 my_a2 = effective_a2(state);
 
 	/* perform adjustments */
@@ -176,15 +174,15 @@ static void apple2_text_draw(running_machine &machine, bitmap_ind16 &bitmap, con
 
 			if (my_a2 & VAR_80COL)
 			{
-				apple2_plot_text_character(machine, bitmap, col * 14 + 0, row, 1, state->m_a2_videoram[address + 0x10000],
-					textgfx_data, textgfx_datalen, my_a2);
-				apple2_plot_text_character(machine, bitmap, col * 14 + 7, row, 1, state->m_a2_videoram[address + 0x00000],
-					textgfx_data, textgfx_datalen, my_a2);
+				apple2_plot_text_character(machine, bitmap, col * 14 + 0, row, 1, state->m_a2_videoaux[address],
+					state->m_textgfx_data, state->m_textgfx_datalen, my_a2);
+				apple2_plot_text_character(machine, bitmap, col * 14 + 7, row, 1, state->m_a2_videoram[address],
+					state->m_textgfx_data, state->m_textgfx_datalen, my_a2);
 			}
 			else
 			{
 				apple2_plot_text_character(machine, bitmap, col * 14, row, 2, state->m_a2_videoram[address],
-					textgfx_data, textgfx_datalen, my_a2);
+					state->m_textgfx_data, state->m_textgfx_datalen, my_a2);
 			}
 		}
 	}
@@ -239,7 +237,7 @@ static void apple2_lores_draw(running_machine &machine, bitmap_ind16 &bitmap, co
 static void apple2_hires_draw(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int page, int beginrow, int endrow)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
-	const UINT8 *vram;
+	const UINT8 *vram, *vaux;
 	int row, col, b;
 	int offset;
 	int columns;
@@ -259,11 +257,13 @@ static void apple2_hires_draw(running_machine &machine, bitmap_ind16 &bitmap, co
 
 	if (state->m_machinetype == TK2000)
 	{
-		vram        = state->m_a2_videoram + (page ? 0xa000 : 0x2000);
+		vram = state->m_a2_videoram + (page ? 0xa000 : 0x2000);
+		vaux = state->m_a2_videoaux + (page ? 0xa000 : 0x2000);
 	}
 	else
 	{
-		vram        = state->m_a2_videoram + (page ? 0x4000 : 0x2000);
+		vram = state->m_a2_videoram + (page ? 0x4000 : 0x2000);
+		vaux = state->m_a2_videoaux + (page ? 0x4000 : 0x2000);
 	}
 	columns     = ((effective_a2(state) & (VAR_DHIRES|VAR_80COL)) == (VAR_DHIRES|VAR_80COL)) ? 80 : 40;
 
@@ -283,8 +283,8 @@ static void apple2_hires_draw(running_machine &machine, bitmap_ind16 &bitmap, co
 					break;
 
 				case 80:
-					vram_row[1+(col*2)+0] = vram[offset + 0x10000];
-					vram_row[1+(col*2)+1] = vram[offset + 0x00000];
+					vram_row[1+(col*2)+0] = vaux[offset];
+					vram_row[1+(col*2)+1] = vram[offset];
 					break;
 
 				default:
@@ -347,7 +347,7 @@ static void apple2_hires_draw(running_machine &machine, bitmap_ind16 &bitmap, co
     VIDEO CORE
 ***************************************************************************/
 
-void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo)
+void apple2_video_start(running_machine &machine, const UINT8 *vram, const UINT8 *aux_vram, UINT32 ignored_softswitches, int hires_modulo)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
 	int i, j;
@@ -374,6 +374,10 @@ void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram
 	apple2_font = machine.root_device().memregion("gfx1")->base();
 	state->m_alt_charset_value = machine.root_device().memregion("gfx1")->bytes() / 16;
 	state->m_a2_videoram = vram;
+	state->m_a2_videoaux = aux_vram;
+
+	state->m_textgfx_data = machine.root_device().memregion("gfx1")->base();
+	state->m_textgfx_datalen = state->memregion("gfx1")->bytes();
 
 	/* 2^3 dependent pixels * 2 color sets * 2 offsets */
 	state->m_hires_artifact_map = auto_alloc_array(machine, UINT16, 8 * 2 * 2);
@@ -444,7 +448,7 @@ void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram
 
 VIDEO_START_MEMBER(apple2_state,apple2)
 {
-	apple2_video_start(machine(), machine().device<ram_device>(RAM_TAG)->pointer(), machine().device<ram_device>(RAM_TAG)->size(), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
+	apple2_video_start(machine(), m_ram->pointer(), m_ram->pointer()+0x10000, VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
 
 	/* hack to fix the colors on apple2/apple2p */
 	m_fgcolor = 0;
@@ -456,7 +460,7 @@ VIDEO_START_MEMBER(apple2_state,apple2)
 
 VIDEO_START_MEMBER(apple2_state,apple2p)
 {
-	apple2_video_start(machine(), machine().device<ram_device>(RAM_TAG)->pointer(), machine().device<ram_device>(RAM_TAG)->size(), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
+	apple2_video_start(machine(), m_ram->pointer(), m_ram->pointer(), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
 
 	/* hack to fix the colors on apple2/apple2p */
 	m_fgcolor = 0;
@@ -468,9 +472,22 @@ VIDEO_START_MEMBER(apple2_state,apple2p)
 
 VIDEO_START_MEMBER(apple2_state,apple2e)
 {
-	apple2_video_start(machine(), machine().device<ram_device>(RAM_TAG)->pointer(), machine().device<ram_device>(RAM_TAG)->size(), 0, 8);
+	device_a2eauxslot_card_interface *auxslotdevice = m_a2eauxslot->get_a2eauxslot_card();
+	if (auxslotdevice)
+	{
+		apple2_video_start(machine(), m_ram->pointer(), auxslotdevice->get_vram_ptr(), auxslotdevice->allow_dhr() ? 0 : VAR_DHIRES, 8);
+	}
+	else
+	{
+		apple2_video_start(machine(), m_ram->pointer(), m_ram->pointer(), VAR_80COL | VAR_DHIRES, 8);
+	}
 }
 
+
+VIDEO_START_MEMBER(apple2_state,apple2c)
+{
+	apple2_video_start(machine(), m_ram->pointer(), m_ram->pointer()+0x10000, 0, 8);
+}
 
 UINT32 apple2_state::screen_update_apple2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

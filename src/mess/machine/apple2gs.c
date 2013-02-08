@@ -1060,7 +1060,7 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 		case 0x78: case 0x79: case 0x7a: case 0x7b:
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 			offset |= (memregion("maincpu")->bytes() - 1) & ~0x3FFF;
-			result = memregion("maincpu")->base()[offset];
+			result = m_rom[offset];
 			break;
 
 		case 0x21:  /* C021 - MONOCOLOR */
@@ -1564,13 +1564,14 @@ static const apple2_memmap_entry apple2gs_memmap_entries[] =
 
 static UINT8 *apple2gs_getslotmem(running_machine &machine, offs_t address)
 {
+	apple2gs_state *state = machine.driver_data<apple2gs_state>();
 	UINT8 *rom;
 
 	address %= 0x00FFFF;
 	assert(address >= 0xC000);
 	assert(address <= 0xCFFF);
 
-	rom = machine.root_device().memregion("maincpu")->base();
+	rom = state->m_rom;
 	rom += 0x030000 % machine.root_device().memregion("maincpu")->bytes();
 	return &rom[address];
 }
@@ -1878,7 +1879,7 @@ static void apple2gs_setup_memory(running_machine &machine)
 	begin = 0x1000000 - state->memregion("maincpu")->bytes();
 	end = 0xffffff;
 	space.install_read_bank(begin, end, "bank3");
-	state->membank("bank3")->set_base(state->memregion("maincpu")->base());
+	state->membank("bank3")->set_base(state->m_rom);
 
 	/* install new xxC000-xxCFFF handlers */
 	space.install_legacy_read_handler(0x00c000, 0x00cfff, FUNC(apple2gs_00Cxxx_r));

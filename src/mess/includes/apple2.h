@@ -174,8 +174,8 @@ public:
 	int m_last_key;
 	int m_last_key_unmodified;
 	unsigned int m_time_until_repeat;
-	const UINT8 *m_a2_videoram;
-	UINT32 m_a2_videomask;
+	const UINT8 *m_a2_videoram, *m_a2_videoaux, *m_textgfx_data;
+	UINT32 m_a2_videomask, m_textgfx_datalen;
 	UINT32 m_old_a2;
 	int m_fgcolor;
 	int m_bgcolor;
@@ -188,7 +188,12 @@ public:
 
 	UINT8 *m_rambase;
 
+	UINT8 *m_rom, *m_slot_ram;
+	UINT32 m_rom_length, m_slot_length;
+
 	machine_type_t m_machinetype;
+
+	device_a2eauxslot_card_interface *m_auxslotdevice;
 
 	READ8_MEMBER(apple2_c0xx_r);
 	WRITE8_MEMBER(apple2_c0xx_w);
@@ -209,10 +214,43 @@ public:
 	WRITE8_MEMBER ( apple2_c05x_w );
 	WRITE8_MEMBER ( apple2_c07x_w );
 
+	READ8_MEMBER ( apple2_mainram0000_r );
+	READ8_MEMBER ( apple2_mainram0200_r );
+	READ8_MEMBER ( apple2_mainram0400_r );
+	READ8_MEMBER ( apple2_mainram0800_r );
+	READ8_MEMBER ( apple2_mainram2000_r );
+	READ8_MEMBER ( apple2_mainram4000_r );
+	READ8_MEMBER ( apple2_mainramc000_r );
+	READ8_MEMBER ( apple2_mainramd000_r );
+	READ8_MEMBER ( apple2_mainrame000_r );
+	READ8_MEMBER ( apple2_auxram0000_r );
+	READ8_MEMBER ( apple2_auxram0200_r );
+	READ8_MEMBER ( apple2_auxram0400_r );
+	READ8_MEMBER ( apple2_auxram0800_r );
+	READ8_MEMBER ( apple2_auxram2000_r );
+	READ8_MEMBER ( apple2_auxram4000_r );
+	READ8_MEMBER ( apple2_auxramc000_r );
+	READ8_MEMBER ( apple2_auxramd000_r );
+	READ8_MEMBER ( apple2_auxrame000_r );
+
+	WRITE8_MEMBER ( apple2_mainram0000_w );
+	WRITE8_MEMBER ( apple2_mainram0200_w );
 	WRITE8_MEMBER ( apple2_mainram0400_w );
+	WRITE8_MEMBER ( apple2_mainram0800_w );
 	WRITE8_MEMBER ( apple2_mainram2000_w );
+	WRITE8_MEMBER ( apple2_mainram4000_w );
+	WRITE8_MEMBER ( apple2_mainramc000_w );
+	WRITE8_MEMBER ( apple2_mainramd000_w );
+	WRITE8_MEMBER ( apple2_mainrame000_w );
+	WRITE8_MEMBER ( apple2_auxram0000_w );
+	WRITE8_MEMBER ( apple2_auxram0200_w );
 	WRITE8_MEMBER ( apple2_auxram0400_w );
+	WRITE8_MEMBER ( apple2_auxram0800_w );
 	WRITE8_MEMBER ( apple2_auxram2000_w );
+	WRITE8_MEMBER ( apple2_auxram4000_w );
+	WRITE8_MEMBER ( apple2_auxramc000_w );
+	WRITE8_MEMBER ( apple2_auxramd000_w );
+	WRITE8_MEMBER ( apple2_auxrame000_w );
 
 	READ8_MEMBER ( apple2_c1xx_r );
 	WRITE8_MEMBER ( apple2_c1xx_w );
@@ -241,8 +279,24 @@ public:
 
 	read8_delegate read_delegates_master[4];
 	write8_delegate write_delegates_master[3];
+	write8_delegate write_delegates_0000[2];
+	write8_delegate write_delegates_0200[2];
 	write8_delegate write_delegates_0400[2];
+	write8_delegate write_delegates_0800[2];
 	write8_delegate write_delegates_2000[2];
+	write8_delegate write_delegates_4000[2];
+	write8_delegate write_delegates_c000[2];
+	write8_delegate write_delegates_d000[2];
+	write8_delegate write_delegates_e000[2];
+	read8_delegate read_delegates_0000[2];
+	read8_delegate read_delegates_0200[2];
+	read8_delegate read_delegates_0400[2];
+	read8_delegate read_delegates_0800[2];
+	read8_delegate read_delegates_2000[2];
+	read8_delegate read_delegates_4000[2];
+	read8_delegate read_delegates_c000[2];
+	read8_delegate read_delegates_d000[2];
+	read8_delegate read_delegates_e000[2];
 	read8_delegate rd_c000;
 	write8_delegate wd_c000;
 	read8_delegate rd_c080;
@@ -264,6 +318,7 @@ public:
 	DECLARE_MACHINE_START(apple2orig);
 	DECLARE_VIDEO_START(apple2p);
 	DECLARE_VIDEO_START(apple2e);
+	DECLARE_VIDEO_START(apple2c);
 	DECLARE_MACHINE_START(tk2000);
 	DECLARE_MACHINE_START(laser128);
 	DECLARE_MACHINE_START(space84);
@@ -312,7 +367,7 @@ int apple2_pressed_specialkey(running_machine &machine, UINT8 key);
 
 /*----------- defined in video/apple2.c -----------*/
 
-void apple2_video_start(running_machine &machine, const UINT8 *vram, size_t vram_size, UINT32 ignored_softswitches, int hires_modulo);
+void apple2_video_start(running_machine &machine, const UINT8 *vram, const UINT8 *aux_vram, UINT32 ignored_softswitches, int hires_modulo);
 
 
 #endif /* APPLE2_H_ */

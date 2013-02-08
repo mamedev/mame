@@ -119,7 +119,11 @@ public:
 	device_a2eauxslot_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_a2eauxslot_card_interface();
 
-	virtual void write_c07x(address_space &space, UINT8 offset, UINT8 data) { printf("a2eauxslot: unhandled write %02x to C07%x\n", data, offset); }
+	virtual UINT8 read_auxram(UINT16 offset) { printf("a2eauxslot: unhandled auxram read @ %04x\n", offset); return 0xff; }
+	virtual void write_auxram(UINT16 offset, UINT8 data) { printf("a2eauxslot: unhandled auxram write %02x @ %04x\n", data, offset); } 
+	virtual void write_c07x(address_space &space, UINT8 offset, UINT8 data) {}
+	virtual UINT8 *get_vram_ptr() = 0;
+	virtual bool allow_dhr() { return true; }
 
 	device_a2eauxslot_card_interface *next() const { return m_next; }
 
