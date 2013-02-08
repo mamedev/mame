@@ -35,7 +35,7 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", machine.device("maincpu")->safe_pc(), buf );
+		logerror( "%08x: %s", machine.driver_data<gba_state>()->m_maincpu->pc(), buf );
 	}
 }
 
@@ -2957,15 +2957,14 @@ static int gba_get_pcb_id(const char *pcb)
 
 DEVICE_IMAGE_LOAD_MEMBER( gba_state, gba_cart )
 {
-	UINT8 *ROM = image.device().machine().root_device().memregion("cartridge")->base();
+	UINT8 *ROM = memregion("cartridge")->base();
 	UINT32 cart_size;
 	UINT32 chip = 0;
-	gba_state *state = image.device().machine().driver_data<gba_state>();
 
-	state->m_nvsize = 0;
-	state->m_flash_size = 0;
-	state->m_nvptr = (UINT8 *)NULL;
-	state->m_flash_battery_load = 0;
+	m_nvsize = 0;
+	m_flash_size = 0;
+	m_nvptr = (UINT8 *)NULL;
+	m_flash_battery_load = 0;
 
 	if (image.software_entry() == NULL)
 	{
@@ -2994,59 +2993,59 @@ DEVICE_IMAGE_LOAD_MEMBER( gba_state, gba_cart )
 		mame_printf_info( "GBA: Detected (ROM) %s\n", gba_chip_string( chip).cstr());
 
 		// fix the previous value when possible
-		chip = gba_fix_wrong_chip(image.device().machine(), cart_size, chip);
+		chip = gba_fix_wrong_chip(machine(), cart_size, chip);
 	}
 
 	mame_printf_info( "GBA: Emulate %s\n", gba_chip_string( chip).cstr());
 
 	if ((chip & (GBA_CHIP_EEPROM | GBA_CHIP_EEPROM_4K | GBA_CHIP_EEPROM_64K)) != 0)
 	{
-		state->m_nvptr = (UINT8 *)&state->m_gba_eeprom;
-		state->m_nvsize = (chip & GBA_CHIP_EEPROM_64K) ? 0x2000 : 0x200;
+		m_nvptr = (UINT8 *)m_gba_eeprom;
+		m_nvsize = (chip & GBA_CHIP_EEPROM_64K) ? 0x2000 : 0x200;
 
-		state->m_eeprom_addr_bits = (chip & GBA_CHIP_EEPROM_64K) ? 14 : 6;
+		m_eeprom_addr_bits = (chip & GBA_CHIP_EEPROM_64K) ? 14 : 6;
 
 		if (cart_size <= (16 * 1024 * 1024))
 		{
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd000000, 0xdffffff, read32_delegate(FUNC(gba_state::eeprom_r),state));
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd000000, 0xdffffff, write32_delegate(FUNC(gba_state::eeprom_w),state));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xd000000, 0xdffffff, read32_delegate(FUNC(gba_state::eeprom_r),this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xd000000, 0xdffffff, write32_delegate(FUNC(gba_state::eeprom_w),this));
 		}
 		else
 		{
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xdffff00, 0xdffffff, read32_delegate(FUNC(gba_state::eeprom_r),state));
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xdffff00, 0xdffffff, write32_delegate(FUNC(gba_state::eeprom_w),state));
+			m_maincpu->space(AS_PROGRAM).install_read_handler(0xdffff00, 0xdffffff, read32_delegate(FUNC(gba_state::eeprom_r),this));
+			m_maincpu->space(AS_PROGRAM).install_write_handler(0xdffff00, 0xdffffff, write32_delegate(FUNC(gba_state::eeprom_w),this));
 		}
 	}
 
 	if (chip & GBA_CHIP_SRAM)
 	{
-		state->m_nvptr = (UINT8 *)&state->m_gba_sram;
-		state->m_nvsize = 0x10000;
+		m_nvptr = (UINT8 *)&m_gba_sram;
+		m_nvsize = 0x10000;
 
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_state::sram_r),state));
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_state::sram_w),state));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_state::sram_r),this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_state::sram_w),this));
 	}
 
 	if (chip & GBA_CHIP_FLASH_1M)
 	{
-		state->m_nvptr = NULL;
-		state->m_nvsize = 0;
-		state->m_flash_size = 0x20000;
-		state->m_flash_mask = 0x1ffff/4;
+		m_nvptr = NULL;
+		m_nvsize = 0;
+		m_flash_size = 0x20000;
+		m_flash_mask = 0x1ffff/4;
 
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xe000000, 0xe01ffff, read32_delegate(FUNC(gba_state::flash_r),state));
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe000000, 0xe01ffff, write32_delegate(FUNC(gba_state::flash_w),state));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe01ffff, read32_delegate(FUNC(gba_state::flash_r),this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe01ffff, write32_delegate(FUNC(gba_state::flash_w),this));
 	}
 
 	if ((chip & GBA_CHIP_FLASH) || (chip & GBA_CHIP_FLASH_512))
 	{
-		state->m_nvptr = NULL;
-		state->m_nvsize = 0;
-		state->m_flash_size = 0x10000;
-		state->m_flash_mask = 0xffff/4;
+		m_nvptr = NULL;
+		m_nvsize = 0;
+		m_flash_size = 0x10000;
+		m_flash_mask = 0xffff/4;
 
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_state::flash_r),state));
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_state::flash_w),state));
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0xe000000, 0xe00ffff, read32_delegate(FUNC(gba_state::flash_r),this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0xe000000, 0xe00ffff, write32_delegate(FUNC(gba_state::flash_w),this));
 	}
 
 	if (chip & GBA_CHIP_RTC)
@@ -3055,26 +3054,26 @@ DEVICE_IMAGE_LOAD_MEMBER( gba_state, gba_cart )
 	}
 
 	// if save media was found, reload it
-	if (state->m_nvsize > 0)
+	if (m_nvsize > 0)
 	{
-		image.battery_load(state->m_nvptr, state->m_nvsize, 0x00);
-		state->m_nvimage = image;
+		image.battery_load(m_nvptr, m_nvsize, 0x00);
+		m_nvimage = image;
 	}
 	else
 	{
-		state->m_nvimage = NULL;
-		state->m_nvsize = 0;
+		m_nvimage = NULL;
+		m_nvsize = 0;
 	}
 
 	// init the flash here so it gets the contents from the battery_load above
-	if (state->m_flash_size > 0)
+	if (m_flash_size > 0)
 	{
-		if (state->m_flash_size == 0x10000)
-			state->m_mFlashDev = image.device().machine().device<intelfsh8_device>("pflash");
+		if (m_flash_size == 0x10000)
+			m_mFlashDev = machine().device<intelfsh8_device>("pflash");
 		else
-			state->m_mFlashDev = image.device().machine().device<intelfsh8_device>("sflash");
-		state->m_flash_battery_load = 1;
-		state->m_nvimage = image;
+			m_mFlashDev = machine().device<intelfsh8_device>("sflash");
+		m_flash_battery_load = 1;
+		m_nvimage = image;
 	}
 
 	// mirror the ROM

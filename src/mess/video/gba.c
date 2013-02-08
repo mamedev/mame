@@ -22,7 +22,7 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", machine.device("maincpu")->safe_pc(), buf );
+		logerror( "%08x: %s", machine.driver_data<gba_state>()->m_maincpu->pc(), buf );
 	}
 }
 
