@@ -583,12 +583,11 @@ void gottlieb_state::audio_handle_zero_crossing(attotime zerotime, int logit)
 }
 
 
-static void laserdisc_audio_process(device_t *dummy, laserdisc_device &device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1)
+void gottlieb_state::laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1)
 {
-	gottlieb_state *state = device.machine().driver_data<gottlieb_state>();
-	int logit = LOG_AUDIO_DECODE && device.machine().input().code_pressed(KEYCODE_L);
+	int logit = LOG_AUDIO_DECODE && machine().input().code_pressed(KEYCODE_L);
 	attotime time_per_sample = attotime::from_hz(samplerate);
-	attotime curtime = state->m_laserdisc_last_time;
+	attotime curtime = m_laserdisc_last_time;
 	int cursamp;
 
 	if (logit)
@@ -597,7 +596,7 @@ static void laserdisc_audio_process(device_t *dummy, laserdisc_device &device, i
 	/* if no data, reset it all */
 	if (ch1 == NULL)
 	{
-		state->m_laserdisc_last_time = curtime + time_per_sample * samples;
+		m_laserdisc_last_time = curtime + time_per_sample * samples;
 		return;
 	}
 
@@ -611,36 +610,36 @@ static void laserdisc_audio_process(device_t *dummy, laserdisc_device &device, i
 			logerror("%s: %d", (curtime + time_per_sample + time_per_sample).as_string(6), sample);
 
 		/* if we are past the "break in transmission" time, reset everything */
-		if ((curtime - state->m_laserdisc_last_clock) > attotime::from_usec(400))
-			state->audio_end_state();
+		if ((curtime - m_laserdisc_last_clock) > attotime::from_usec(400))
+			audio_end_state();
 
 		/* if this sample reinforces that the previous one ended a zero crossing, count it */
-		if ((sample >= 256 && state->m_laserdisc_last_samples[1] >= 0 && state->m_laserdisc_last_samples[0] < 0) ||
-			(sample <= -256 && state->m_laserdisc_last_samples[1] <= 0 && state->m_laserdisc_last_samples[0] > 0))
+		if ((sample >= 256 && m_laserdisc_last_samples[1] >= 0 && m_laserdisc_last_samples[0] < 0) ||
+			(sample <= -256 && m_laserdisc_last_samples[1] <= 0 && m_laserdisc_last_samples[0] > 0))
 		{
 			attotime zerotime;
 			int fractime;
 
 			/* compute the fractional position of the 0-crossing, between the two samples involved */
-			fractime = (-state->m_laserdisc_last_samples[0] * 1000) / (state->m_laserdisc_last_samples[1] - state->m_laserdisc_last_samples[0]);
+			fractime = (-m_laserdisc_last_samples[0] * 1000) / (m_laserdisc_last_samples[1] - m_laserdisc_last_samples[0]);
 
 			/* use this fraction to compute the approximate actual zero crossing time */
 			zerotime = curtime + time_per_sample * fractime / 1000;
 
 			/* determine if this is a clock; if it is, process */
-			state->audio_handle_zero_crossing(zerotime, logit);
+			audio_handle_zero_crossing(zerotime, logit);
 		}
 		if (logit)
 			logerror(" \n");
 
 		/* update our sample tracking and advance time */
-		state->m_laserdisc_last_samples[0] = state->m_laserdisc_last_samples[1];
-		state->m_laserdisc_last_samples[1] = sample;
+		m_laserdisc_last_samples[0] = m_laserdisc_last_samples[1];
+		m_laserdisc_last_samples[1] = sample;
 		curtime += time_per_sample;
 	}
 
 	/* remember the last time */
-	state->m_laserdisc_last_time = curtime;
+	m_laserdisc_last_time = curtime;
 }
 
 
@@ -1745,7 +1744,7 @@ static MACHINE_CONFIG_DERIVED( g2laser, gottlieb_core )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(laserdisc_audio_process), device))
+	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(gottlieb_state::laserdisc_audio_process), (gottlieb_state*)owner))
 	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update_gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)
@@ -1836,7 +1835,7 @@ static MACHINE_CONFIG_DERIVED( cobram3, gottlieb_core )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(laserdisc_audio_process), device))
+	MCFG_LASERDISC_AUDIO(laserdisc_audio_delegate(FUNC(gottlieb_state::laserdisc_audio_process), (gottlieb_state*)owner))
 	MCFG_LASERDISC_OVERLAY_DRIVER(GOTTLIEB_VIDEO_HCOUNT, GOTTLIEB_VIDEO_VCOUNT, gottlieb_state, screen_update_gottlieb)
 	MCFG_LASERDISC_OVERLAY_CLIP(0, GOTTLIEB_VIDEO_HBLANK-1, 0, GOTTLIEB_VIDEO_VBLANK-8)
 	MCFG_SOUND_ROUTE(0, "mono", 1.0)

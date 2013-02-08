@@ -318,6 +318,7 @@ public:
 	inline void audio_end_state();
 	void audio_process_clock(int logit);
 	void audio_handle_zero_crossing(attotime zerotime, int logit);
+	void laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1);
 };
 
 /*----------- defined in audio/gottlieb.c -----------*/
