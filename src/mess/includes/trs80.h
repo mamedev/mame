@@ -33,7 +33,8 @@ public:
 	m_fdc(*this, "wd179x"),
 	m_speaker(*this, SPEAKER_TAG),
 	m_cass(*this, CASSETTE_TAG),
-	m_p_videoram(*this, "p_videoram")
+	m_p_videoram(*this, "p_videoram"),
+	m_region_maincpu(*this, "maincpu")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -126,6 +127,11 @@ public:
 	INTERRUPT_GEN_MEMBER(trs80_fdc_interrupt);
 	TIMER_CALLBACK_MEMBER(cassette_data_callback);
 	DECLARE_WRITE_LINE_MEMBER(trs80_fdc_intrq_w);
+
+protected:
+	required_memory_region m_region_maincpu;
+
+	void trs80_fdc_interrupt_internal();
 };
 
 

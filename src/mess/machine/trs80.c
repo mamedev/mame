@@ -37,7 +37,7 @@ TIMER_CALLBACK_MEMBER(trs80_state::cassette_data_callback)
 		{
 			m_cassette_data = 0;
 			m_irq |= CASS_FALL;
-			machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+			m_maincpu->set_input_line(0, HOLD_LINE);
 		}
 	}
 	else
@@ -47,7 +47,7 @@ TIMER_CALLBACK_MEMBER(trs80_state::cassette_data_callback)
 		{
 			m_cassette_data = 1;
 			m_irq |= CASS_RISE;
-			machine().device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+			m_maincpu->set_input_line(0, HOLD_LINE);
 		}
 	}
 
@@ -78,7 +78,7 @@ READ8_MEMBER( trs80_state::trs80m4_e0_r )
     d1 Cass 1500 baud Falling
     d0 Cass 1500 baud Rising */
 
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return ~(m_mask & m_irq);
 }
 
@@ -94,7 +94,7 @@ READ8_MEMBER( trs80_state::trs80m4_e4_r )
     d6 status of Motor Timeout (0=true)
     d5 status of Reset signal (0=true - this will reboot the computer) */
 
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	return ~(m_nmi_mask & m_nmi_data);
 }
@@ -216,7 +216,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
 
 	/* get address space instead of io space */
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	UINT8 *base = memregion("maincpu")->base();
+	UINT8 *base = m_region_maincpu->base();
 
 	m_mode = (m_mode & 0x73) | (data & 0x8c);
 
@@ -361,10 +361,10 @@ WRITE8_MEMBER( trs80_state::trs80m4p_9c_w )     /* model 4P only - swaps the ROM
 		switch (m_model4 & 8)
 		{
 			case 0:     /* Read-only RAM replaces rom */
-				membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000);
+				membank("bank1")->set_base(m_region_maincpu->base() + 0x10000);
 				break;
 			case 8:     /* Normal setup - rom enabled */
-				membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+				membank("bank1")->set_base(m_region_maincpu->base());
 				break;
 		}
 	}
@@ -572,7 +572,7 @@ WRITE8_MEMBER( trs80_state::lnw80_fe_w )
 	{
 		mem.unmap_readwrite (0x0000, 0x3fff);
 		mem.install_read_bank (0x0000, 0x2fff, "bank1");
-		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+		membank("bank1")->set_base(m_region_maincpu->base());
 		mem.install_readwrite_handler (0x37e0, 0x37e3, read8_delegate(FUNC(trs80_state::trs80_irq_status_r), this), write8_delegate(FUNC(trs80_state::trs80_motor_w), this));
 		mem.install_readwrite_handler (0x37e8, 0x37eb, read8_delegate(FUNC(trs80_state::trs80_printer_r), this), write8_delegate(FUNC(trs80_state::trs80_printer_w), this));
 		mem.install_read_handler (0x37ec, 0x37ec, read8_delegate(FUNC(trs80_state::trs80_wd179x_r), this));
@@ -643,34 +643,33 @@ INTERRUPT_GEN_MEMBER(trs80_state::trs80_rtc_interrupt)
 	}
 }
 
-static void trs80_fdc_interrupt_internal(running_machine &machine)
+void trs80_state::trs80_fdc_interrupt_internal()
 {
-	trs80_state *state = machine.driver_data<trs80_state>();
-	if (state->m_model4)
+	if (m_model4)
 	{
-		if (state->m_nmi_mask & 0x80)   // Model 4 does a NMI
+		if (m_nmi_mask & 0x80)   // Model 4 does a NMI
 		{
-			state->m_nmi_data = 0x80;
-			machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			m_nmi_data = 0x80;
+			m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 	else        // Model 1 does a IRQ
 	{
-		state->m_irq |= IRQ_M1_FDC;
-		machine.device("maincpu")->execute().set_input_line(0, HOLD_LINE);
+		m_irq |= IRQ_M1_FDC;
+		m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
 INTERRUPT_GEN_MEMBER(trs80_state::trs80_fdc_interrupt)/* not used - should it be? */
 {
-	trs80_fdc_interrupt_internal(machine());
+	trs80_fdc_interrupt_internal();
 }
 
 WRITE_LINE_MEMBER(trs80_state::trs80_fdc_intrq_w)
 {
 	if (state)
 	{
-		trs80_fdc_interrupt_internal(machine());
+		trs80_fdc_interrupt_internal();
 	}
 	else
 	{
@@ -748,7 +747,7 @@ READ8_MEMBER( trs80_state::trs80_irq_status_r )
     which is dealt with by the DOS. We take the opportunity to reset the cpu INT line. */
 
 	int result = m_irq;
-	machine().device("maincpu")->execute().set_input_line(0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_irq = 0;
 	return result;
 }
