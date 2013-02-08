@@ -230,65 +230,65 @@ WRITE8_HANDLER( fastfred_flip_screen_y_w )
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void fastfred_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const rectangle spritevisiblearea(2*8, 32*8-1, 2*8, 30*8-1);
 	const rectangle spritevisibleareaflipx(0*8, 30*8-1, 2*8, 30*8-1);
-	fastfred_state *state = machine.driver_data<fastfred_state>();
+//OBRISI.ME
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		UINT8 code,sx,sy;
 		int flipx,flipy;
 
-		sx = state->m_spriteram[offs + 3];
-		sy = 240 - state->m_spriteram[offs];
+		sx = m_spriteram[offs + 3];
+		sy = 240 - m_spriteram[offs];
 
-		if (state->m_hardware_type == 3)
+		if (m_hardware_type == 3)
 		{
 			// Imago
-			code  = (state->m_spriteram[offs + 1]) & 0x3f;
+			code  = (m_spriteram[offs + 1]) & 0x3f;
 			flipx = 0;
 			flipy = 0;
 		}
-		else if (state->m_hardware_type == 2)
+		else if (m_hardware_type == 2)
 		{
 			// Boggy 84
-			code  =  state->m_spriteram[offs + 1] & 0x7f;
+			code  =  m_spriteram[offs + 1] & 0x7f;
 			flipx =  0;
-			flipy =  state->m_spriteram[offs + 1] & 0x80;
+			flipy =  m_spriteram[offs + 1] & 0x80;
 		}
-		else if (state->m_hardware_type == 1)
+		else if (m_hardware_type == 1)
 		{
 			// Fly-Boy/Fast Freddie/Red Robin
-			code  =  state->m_spriteram[offs + 1] & 0x7f;
+			code  =  m_spriteram[offs + 1] & 0x7f;
 			flipx =  0;
-			flipy = ~state->m_spriteram[offs + 1] & 0x80;
+			flipy = ~m_spriteram[offs + 1] & 0x80;
 		}
 		else
 		{
 			// Jump Coaster
-			code  = (state->m_spriteram[offs + 1] & 0x3f) | 0x40;
-			flipx = ~state->m_spriteram[offs + 1] & 0x40;
-			flipy =  state->m_spriteram[offs + 1] & 0x80;
+			code  = (m_spriteram[offs + 1] & 0x3f) | 0x40;
+			flipx = ~m_spriteram[offs + 1] & 0x40;
+			flipy =  m_spriteram[offs + 1] & 0x80;
 		}
 
 
-		if (state->flip_screen_x())
+		if (flip_screen_x())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (state->flip_screen_y())
+		if (flip_screen_y())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,state->flip_screen_x() ? spritevisibleareaflipx : spritevisiblearea,machine.gfx[1],
+		drawgfx_transpen(bitmap,flip_screen_x() ? spritevisibleareaflipx : spritevisiblearea,machine().gfx[1],
 				code,
-				state->m_colorbank | (state->m_spriteram[offs + 2] & 0x07),
+				m_colorbank | (m_spriteram[offs + 2] & 0x07),
 				flipx,flipy,
 				sx,sy,0);
 	}
@@ -299,7 +299,7 @@ UINT32 fastfred_state::screen_update_fastfred(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(*m_background_color, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	return 0;
 }
@@ -366,7 +366,7 @@ UINT32 fastfred_state::screen_update_imago(screen_device &screen, bitmap_ind16 &
 	m_web_tilemap->draw(bitmap, cliprect, 0,0);
 	galaxold_draw_stars(machine(), bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;

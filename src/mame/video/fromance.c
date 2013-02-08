@@ -19,33 +19,33 @@
  *
  *************************************/
 
-INLINE void get_fromance_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int layer )
+inline void fromance_state::get_fromance_tile_info( tile_data &tileinfo, int tile_index, int layer )
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
-	int tile = ((state->m_local_videoram[layer][0x0000 + tile_index] & 0x80) << 9) |
-				(state->m_local_videoram[layer][0x1000 + tile_index] << 8) |
-				state->m_local_videoram[layer][0x2000 + tile_index];
-	int color = state->m_local_videoram[layer][tile_index] & 0x7f;
+//OBRISI.ME
+	int tile = ((m_local_videoram[layer][0x0000 + tile_index] & 0x80) << 9) |
+				(m_local_videoram[layer][0x1000 + tile_index] << 8) |
+				m_local_videoram[layer][0x2000 + tile_index];
+	int color = m_local_videoram[layer][tile_index] & 0x7f;
 
-	SET_TILE_INFO(layer, tile, color, 0);
+	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(fromance_state::get_fromance_bg_tile_info){ get_fromance_tile_info(machine(), tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(fromance_state::get_fromance_fg_tile_info){ get_fromance_tile_info(machine(), tileinfo, tile_index, 1); }
+TILE_GET_INFO_MEMBER(fromance_state::get_fromance_bg_tile_info){ get_fromance_tile_info(tileinfo, tile_index, 0); }
+TILE_GET_INFO_MEMBER(fromance_state::get_fromance_fg_tile_info){ get_fromance_tile_info(tileinfo, tile_index, 1); }
 
 
-INLINE void get_nekkyoku_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int layer )
+inline void fromance_state::get_nekkyoku_tile_info( tile_data &tileinfo, int tile_index, int layer )
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
-	int tile = (state->m_local_videoram[layer][0x0000 + tile_index] << 8) |
-				state->m_local_videoram[layer][0x1000 + tile_index];
-	int color = state->m_local_videoram[layer][tile_index + 0x2000] & 0x3f;
+//OBRISI.ME
+	int tile = (m_local_videoram[layer][0x0000 + tile_index] << 8) |
+				m_local_videoram[layer][0x1000 + tile_index];
+	int color = m_local_videoram[layer][tile_index + 0x2000] & 0x3f;
 
-	SET_TILE_INFO(layer, tile, color, 0);
+	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_bg_tile_info){ get_nekkyoku_tile_info(machine(), tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_fg_tile_info){ get_nekkyoku_tile_info(machine(), tileinfo, tile_index, 1); }
+TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_bg_tile_info){ get_nekkyoku_tile_info(tileinfo, tile_index, 0); }
+TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_fg_tile_info){ get_nekkyoku_tile_info(tileinfo, tile_index, 1); }
 
 
 
@@ -55,38 +55,38 @@ TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_fg_tile_info){ get_nekkyoku_ti
  *
  *************************************/
 
-static void init_common( running_machine &machine )
+void fromance_state::init_common(  )
 {
-	fromance_state *state = machine.driver_data<fromance_state>();
+//OBRISI.ME
 
 	/* allocate local videoram */
-	state->m_local_videoram[0] = auto_alloc_array(machine, UINT8, 0x1000 * 3);
-	state->m_local_videoram[1] = auto_alloc_array(machine, UINT8, 0x1000 * 3);
+	m_local_videoram[0] = auto_alloc_array(machine(), UINT8, 0x1000 * 3);
+	m_local_videoram[1] = auto_alloc_array(machine(), UINT8, 0x1000 * 3);
 
 	/* allocate local palette RAM */
-	state->m_local_paletteram = auto_alloc_array(machine, UINT8, 0x800 * 2);
+	m_local_paletteram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
 
 	/* configure tilemaps */
-	state->m_fg_tilemap->set_transparent_pen(15);
+	m_fg_tilemap->set_transparent_pen(15);
 
 	/* reset the timer */
-	state->m_crtc_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(fromance_state::crtc_interrupt_gen),state));
+	m_crtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(fromance_state::crtc_interrupt_gen),this));
 
 	/* state save */
-	state->save_item(NAME(state->m_selected_videoram));
-	state->save_pointer(NAME(state->m_local_videoram[0]), 0x1000 * 3);
-	state->save_pointer(NAME(state->m_local_videoram[1]), 0x1000 * 3);
-	state->save_item(NAME(state->m_selected_paletteram));
-	state->save_item(NAME(state->m_scrollx));
-	state->save_item(NAME(state->m_scrolly));
-	state->save_item(NAME(state->m_gfxreg));
-	state->save_item(NAME(state->m_flipscreen));
-	state->save_item(NAME(state->m_flipscreen_old));
-	state->save_item(NAME(state->m_scrollx_ofs));
-	state->save_item(NAME(state->m_scrolly_ofs));
-	state->save_item(NAME(state->m_crtc_register));
-	state->save_item(NAME(state->m_crtc_data));
-	state->save_pointer(NAME(state->m_local_paletteram), 0x800 * 2);
+	save_item(NAME(m_selected_videoram));
+	save_pointer(NAME(m_local_videoram[0]), 0x1000 * 3);
+	save_pointer(NAME(m_local_videoram[1]), 0x1000 * 3);
+	save_item(NAME(m_selected_paletteram));
+	save_item(NAME(m_scrollx));
+	save_item(NAME(m_scrolly));
+	save_item(NAME(m_gfxreg));
+	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_flipscreen_old));
+	save_item(NAME(m_scrollx_ofs));
+	save_item(NAME(m_scrolly_ofs));
+	save_item(NAME(m_crtc_register));
+	save_item(NAME(m_crtc_data));
+	save_pointer(NAME(m_local_paletteram), 0x800 * 2);
 }
 
 VIDEO_START_MEMBER(fromance_state,fromance)
@@ -95,7 +95,7 @@ VIDEO_START_MEMBER(fromance_state,fromance)
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_fromance_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 
-	init_common(machine());
+	init_common();
 }
 
 VIDEO_START_MEMBER(fromance_state,nekkyoku)
@@ -104,7 +104,7 @@ VIDEO_START_MEMBER(fromance_state,nekkyoku)
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(fromance_state::get_nekkyoku_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 4, 64, 64);
 
-	init_common(machine());
+	init_common();
 }
 
 VIDEO_START_MEMBER(fromance_state,pipedrm)

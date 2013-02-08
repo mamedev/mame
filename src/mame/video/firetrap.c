@@ -95,11 +95,11 @@ TILE_GET_INFO_MEMBER(firetrap_state::get_fg_tile_info)
 			0);
 }
 
-INLINE void get_bg_tile_info(running_machine &machine, tile_data &tileinfo, int tile_index, UINT8 *bgvideoram, int gfx_region)
+inline void firetrap_state::get_bg_tile_info(tile_data &tileinfo, int tile_index, UINT8 *bgvideoram, int gfx_region)
 {
 	int code = bgvideoram[tile_index];
 	int color = bgvideoram[tile_index + 0x100];
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			gfx_region,
 			code + ((color & 0x03) << 8),
 			(color & 0x30) >> 4,
@@ -108,12 +108,12 @@ INLINE void get_bg_tile_info(running_machine &machine, tile_data &tileinfo, int 
 
 TILE_GET_INFO_MEMBER(firetrap_state::get_bg1_tile_info)
 {
-	get_bg_tile_info(machine(), tileinfo, tile_index, m_bg1videoram, 1);
+	get_bg_tile_info(tileinfo, tile_index, m_bg1videoram, 1);
 }
 
 TILE_GET_INFO_MEMBER(firetrap_state::get_bg2_tile_info)
 {
-	get_bg_tile_info(machine(), tileinfo, tile_index, m_bg2videoram, 2);
+	get_bg_tile_info(tileinfo, tile_index, m_bg2videoram, 2);
 }
 
 
@@ -190,25 +190,25 @@ WRITE8_MEMBER(firetrap_state::firetrap_bg2_scrolly_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void firetrap_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	firetrap_state *state = machine.driver_data<firetrap_state>();
+//OBRISI.ME
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int sx, sy, flipx, flipy, code, color;
 
 
 		/* the meaning of bit 3 of [offs] is unknown */
 
-		sy = state->m_spriteram[offs];
-		sx = state->m_spriteram[offs + 2];
-		code = state->m_spriteram[offs + 3] + 4 * (state->m_spriteram[offs + 1] & 0xc0);
-		color = ((state->m_spriteram[offs + 1] & 0x08) >> 2) | (state->m_spriteram[offs + 1] & 0x01);
-		flipx = state->m_spriteram[offs + 1] & 0x04;
-		flipy = state->m_spriteram[offs + 1] & 0x02;
-		if (state->flip_screen())
+		sy = m_spriteram[offs];
+		sx = m_spriteram[offs + 2];
+		code = m_spriteram[offs + 3] + 4 * (m_spriteram[offs + 1] & 0xc0);
+		color = ((m_spriteram[offs + 1] & 0x08) >> 2) | (m_spriteram[offs + 1] & 0x01);
+		flipx = m_spriteram[offs + 1] & 0x04;
+		flipy = m_spriteram[offs + 1] & 0x02;
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -216,28 +216,28 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		if (state->m_spriteram[offs + 1] & 0x10)    /* double width */
+		if (m_spriteram[offs + 1] & 0x10)    /* double width */
 		{
-			if (state->flip_screen()) sy -= 16;
+			if (flip_screen()) sy -= 16;
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 					code & ~1,
 					color,
 					flipx,flipy,
 					sx,flipy ? sy : sy + 16,0);
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 					code | 1,
 					color,
 					flipx,flipy,
 					sx,flipy ? sy + 16 : sy,0);
 
 			/* redraw with wraparound */
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 					code & ~1,
 					color,
 					flipx,flipy,
 					sx - 256,flipy ? sy : sy + 16,0);
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 					code | 1,
 					color,
 					flipx,flipy,
@@ -245,14 +245,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 		else
 		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 					code,
 					color,
 					flipx,flipy,
 					sx,sy,0);
 
 			/* redraw with wraparound */
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 					code,
 					color,
 					flipx,flipy,
@@ -265,7 +265,7 @@ UINT32 firetrap_state::screen_update_firetrap(screen_device &screen, bitmap_ind1
 {
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

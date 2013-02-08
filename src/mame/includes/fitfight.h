@@ -63,4 +63,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_fitfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(snd_irq);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer );
 };

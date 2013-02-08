@@ -61,17 +61,17 @@
 #include "emu.h"
 #include "includes/fantland.h"
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void fantland_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	fantland_state *state = machine.driver_data<fantland_state>();
-	UINT8 *spriteram_2 = state->m_spriteram2;
-	UINT8   *indx_ram   =   state->m_spriteram + 0x2000,    // this ram contains indexes into offs_ram
-			*offs_ram   =   state->m_spriteram + 0x2400,    // this ram contains x,y offsets or indexes into spriteram_2
-			*ram        =   state->m_spriteram,         // current sprite pointer in spriteram
+//OBRISI.ME
+	UINT8 *spriteram_2 = m_spriteram2;
+	UINT8   *indx_ram   =   m_spriteram + 0x2000,    // this ram contains indexes into offs_ram
+			*offs_ram   =   m_spriteram + 0x2400,    // this ram contains x,y offsets or indexes into spriteram_2
+			*ram        =   m_spriteram,         // current sprite pointer in spriteram
 			*ram2       =   indx_ram;           // current sprite pointer in indx_ram
 
 	// wheelrun is the only game with a smaller visible area
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine().primary_screen->visible_area();
 	int special = (visarea.max_y - visarea.min_y + 1) < 0x100;
 
 	for ( ; ram < indx_ram; ram += 8,ram2++)
@@ -135,14 +135,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		if (x >= 0x180)     x -= 0x200;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0], code,color, flipx,flipy, x,y,0);
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0], code,color, flipx,flipy, x,y,0);
 	}
 }
 
 UINT32 fantland_state::screen_update_fantland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 
 	return 0;
 }

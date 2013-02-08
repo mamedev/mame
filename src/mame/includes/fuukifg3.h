@@ -66,4 +66,9 @@ public:
 	TIMER_CALLBACK_MEMBER(level_1_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(raster_interrupt_callback);
+	inline void get_tile_info8bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
+	inline void get_tile_info4bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
+	inline void fuuki32_vram_w(offs_t offset, UINT32 data, UINT32 mem_mask, int _N_);
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void fuuki32_draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri );
 };

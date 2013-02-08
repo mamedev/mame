@@ -48,4 +48,6 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_fgoal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	int intensity(int bits);
+	unsigned video_ram_address(  );
 };

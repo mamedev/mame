@@ -51,4 +51,5 @@ public:
 	UINT32 screen_update_fantland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(fantland_irq);
 	INTERRUPT_GEN_MEMBER(fantland_sound_irq);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };

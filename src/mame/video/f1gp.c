@@ -246,14 +246,14 @@ UINT32 f1gp_state::screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitm
 ***************************************************************************/
 
 // BOOTLEG
-static void f1gpb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
+void f1gp_state::f1gpb_draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	f1gp_state *state = machine.driver_data<f1gp_state>();
-	UINT16 *spriteram = state->m_spriteram;
-	int attr_start, start_offset = state->m_spriteram.bytes() / 2 - 4;
+//OBRISI.ME
+	UINT16 *spriteram = m_spriteram;
+	int attr_start, start_offset = m_spriteram.bytes() / 2 - 4;
 
 	// find the "end of list" to draw the sprites in reverse order
-	for (attr_start = 4; attr_start < state->m_spriteram.bytes() / 2; attr_start += 4)
+	for (attr_start = 4; attr_start < m_spriteram.bytes() / 2; attr_start += 4)
 	{
 		if (spriteram[attr_start + 3 - 4] == 0xffff) /* end of list marker */
 		{
@@ -278,7 +278,7 @@ static void f1gpb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,c
 		if((spriteram[attr_start + 1] & 0x00f0) && (spriteram[attr_start + 1] & 0x00f0) != 0xc0)
 		{
 			printf("attr %X\n",spriteram[attr_start + 1] & 0x00f0);
-			code = machine.rand();
+			code = machine().rand();
 		}
 
 /*
@@ -295,21 +295,21 @@ static void f1gpb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,c
 			gfx = 0;
 		}
 
-		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1 + gfx],
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1 + gfx],
 			code,
 			color,
 			flipx,flipy,
 			x,y,
-			machine.priority_bitmap,
+			machine().priority_bitmap,
 			pri ? 0 : 0x2,15);
 
 		// wrap around x
-		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1 + gfx],
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1 + gfx],
 			code,
 			color,
 			flipx,flipy,
 			x - 512,y,
-			machine.priority_bitmap,
+			machine().priority_bitmap,
 			pri ? 0 : 0x2,15);
 	}
 }
@@ -337,7 +337,7 @@ UINT32 f1gp_state::screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitm
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
 
-	f1gpb_draw_sprites(machine(), bitmap, cliprect);
+	f1gpb_draw_sprites(bitmap, cliprect);
 
 	return 0;
 }

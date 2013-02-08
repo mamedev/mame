@@ -29,4 +29,6 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_funkybee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_columns( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

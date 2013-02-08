@@ -94,4 +94,7 @@ public:
 	UINT32 screen_update_pipedrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(deferred_commanddata_w);
 	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
+	inline void get_fromance_tile_info( tile_data &tileinfo, int tile_index, int layer );
+	inline void get_nekkyoku_tile_info( tile_data &tileinfo, int tile_index, int layer );
+	void init_common(  );
 };

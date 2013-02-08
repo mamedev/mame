@@ -15,44 +15,44 @@
 
 ******************************************************************************/
 
-INLINE void fromanc2_get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int vram, int layer )
+inline void fromanc2_state::fromanc2_get_tile_info( tile_data &tileinfo, int tile_index, int vram, int layer )
 {
-	fromanc2_state *state = machine.driver_data<fromanc2_state>();
+//OBRISI.ME
 	int tile, color;
 
-	tile  = (state->m_videoram[vram][layer][tile_index] & 0x3fff) | (state->m_gfxbank[vram][layer] << 14);
-	color = ((state->m_videoram[vram][layer][tile_index] & 0xc000) >> 14) | (0x10 * vram);
+	tile  = (m_videoram[vram][layer][tile_index] & 0x3fff) | (m_gfxbank[vram][layer] << 14);
+	color = ((m_videoram[vram][layer][tile_index] & 0xc000) >> 14) | (0x10 * vram);
 
-	SET_TILE_INFO(layer, tile, color, 0);
+	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l0_tile_info){ fromanc2_get_tile_info(machine(), tileinfo, tile_index, 0, 0); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l1_tile_info){ fromanc2_get_tile_info(machine(), tileinfo, tile_index, 0, 1); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l2_tile_info){ fromanc2_get_tile_info(machine(), tileinfo, tile_index, 0, 2); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l3_tile_info){ fromanc2_get_tile_info(machine(), tileinfo, tile_index, 0, 3); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l0_tile_info){ fromanc2_get_tile_info(machine(), tileinfo, tile_index, 1, 0); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l1_tile_info){ fromanc2_get_tile_info(machine(), tileinfo, tile_index, 1, 1); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l2_tile_info){ fromanc2_get_tile_info(machine(), tileinfo, tile_index, 1, 2); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l3_tile_info){ fromanc2_get_tile_info(machine(), tileinfo, tile_index, 1, 3); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l0_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 0); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l1_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 1); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l2_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 2); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l3_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 3); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l0_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 0); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l1_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 1); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l2_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 2); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l3_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 3); }
 
 
-INLINE void fromancr_get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int vram, int layer )
+inline void fromanc2_state::fromancr_get_tile_info( tile_data &tileinfo, int tile_index, int vram, int layer )
 {
-	fromanc2_state *state = machine.driver_data<fromanc2_state>();
+//OBRISI.ME
 	int tile, color;
 
-	tile  = state->m_videoram[vram][layer][tile_index] | (state->m_gfxbank[vram][layer] << 16);
+	tile  = m_videoram[vram][layer][tile_index] | (m_gfxbank[vram][layer] << 16);
 	color = vram;
 
-	SET_TILE_INFO(layer, tile, color, 0);
+	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l0_tile_info){ fromancr_get_tile_info(machine(), tileinfo, tile_index, 0, 0); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l1_tile_info){ fromancr_get_tile_info(machine(), tileinfo, tile_index, 0, 1); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l2_tile_info){ fromancr_get_tile_info(machine(), tileinfo, tile_index, 0, 2); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v1_l0_tile_info){ fromancr_get_tile_info(machine(), tileinfo, tile_index, 1, 0); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v1_l1_tile_info){ fromancr_get_tile_info(machine(), tileinfo, tile_index, 1, 1); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v1_l2_tile_info){ fromancr_get_tile_info(machine(), tileinfo, tile_index, 1, 2); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l0_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 0, 0); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l1_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 0, 1); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l2_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 0, 2); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v1_l0_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 1, 0); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v1_l1_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 1, 1); }
+TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v1_l2_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 1, 2); }
 
 
 /******************************************************************************
@@ -160,19 +160,19 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_paletteram_1_w)
 }
 
 
-INLINE void fromanc2_dispvram_w( running_machine &machine, offs_t offset, UINT16 data, UINT16 mem_mask, int vram, int layer )
+inline void fromanc2_state::fromanc2_dispvram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int vram, int layer )
 {
-	fromanc2_state *state = machine.driver_data<fromanc2_state>();
+//OBRISI.ME
 	layer += (offset < 0x1000) ? 0 : 1;
 
-	COMBINE_DATA(&state->m_videoram[vram][layer][offset & 0x0fff]);
-	state->m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
+	COMBINE_DATA(&m_videoram[vram][layer][offset & 0x0fff]);
+	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_0_w){ fromanc2_dispvram_w(machine(), offset, data, mem_mask, 0, 0); }
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_1_w){ fromanc2_dispvram_w(machine(), offset, data, mem_mask, 0, 2); }
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_2_w){ fromanc2_dispvram_w(machine(), offset, data, mem_mask, 1, 0); }
-WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_3_w){ fromanc2_dispvram_w(machine(), offset, data, mem_mask, 1, 2); }
+WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_0_w){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 0); }
+WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_1_w){ fromanc2_dispvram_w(offset, data, mem_mask, 0, 2); }
+WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_2_w){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 0); }
+WRITE16_MEMBER(fromanc2_state::fromanc2_videoram_3_w){ fromanc2_dispvram_w(offset, data, mem_mask, 1, 2); }
 
 WRITE16_MEMBER(fromanc2_state::fromanc2_gfxreg_0_w)
 {
@@ -251,18 +251,18 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxbank_1_w)
 }
 
 
-INLINE void fromancr_vram_w(running_machine &machine, offs_t offset, UINT16 data, UINT16 mem_mask, int layer )
+inline void fromanc2_state::fromancr_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int layer )
 {
-	fromanc2_state *state = machine.driver_data<fromanc2_state>();
+//OBRISI.ME
 	int vram = (offset < 0x1000) ? 0 : 1;
 
-	COMBINE_DATA(&state->m_videoram[vram][layer][offset & 0x0fff]);
-	state->m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
+	COMBINE_DATA(&m_videoram[vram][layer][offset & 0x0fff]);
+	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x0fff);
 }
 
-WRITE16_MEMBER(fromanc2_state::fromancr_videoram_0_w){ fromancr_vram_w(machine(), offset, data, mem_mask, 1); }
-WRITE16_MEMBER(fromanc2_state::fromancr_videoram_1_w){ fromancr_vram_w(machine(), offset, data, mem_mask, 0); }
-WRITE16_MEMBER(fromanc2_state::fromancr_videoram_2_w){ fromancr_vram_w(machine(), offset, data, mem_mask, 2); }
+WRITE16_MEMBER(fromanc2_state::fromancr_videoram_0_w){ fromancr_vram_w(offset, data, mem_mask, 1); }
+WRITE16_MEMBER(fromanc2_state::fromancr_videoram_1_w){ fromancr_vram_w(offset, data, mem_mask, 0); }
+WRITE16_MEMBER(fromanc2_state::fromancr_videoram_2_w){ fromancr_vram_w(offset, data, mem_mask, 2); }
 
 WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_0_w)
 {
@@ -290,33 +290,33 @@ WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_1_w)
 	}
 }
 
-void fromancr_gfxbank_w( running_machine &machine, int data )
+void fromanc2_state::fromancr_gfxbank_w( int data )
 {
-	fromanc2_state *state = machine.driver_data<fromanc2_state>();
+//OBRISI.ME
 
-	state->m_gfxbank[0][0] = (data & 0x0010) >>  4; // BG (1P)
-	state->m_gfxbank[0][1] = (data & 0xf000) >> 12; // FG (1P)
-	state->m_gfxbank[1][0] = (data & 0x0008) >>  3; // BG (2P)
-	state->m_gfxbank[1][1] = (data & 0x0f00) >>  8; // FG (2P)
-	state->m_tilemap[0][0]->mark_all_dirty();
-	state->m_tilemap[0][1]->mark_all_dirty();
-	state->m_tilemap[1][0]->mark_all_dirty();
-	state->m_tilemap[1][1]->mark_all_dirty();
+	m_gfxbank[0][0] = (data & 0x0010) >>  4; // BG (1P)
+	m_gfxbank[0][1] = (data & 0xf000) >> 12; // FG (1P)
+	m_gfxbank[1][0] = (data & 0x0008) >>  3; // BG (2P)
+	m_gfxbank[1][1] = (data & 0x0f00) >>  8; // FG (2P)
+	m_tilemap[0][0]->mark_all_dirty();
+	m_tilemap[0][1]->mark_all_dirty();
+	m_tilemap[1][0]->mark_all_dirty();
+	m_tilemap[1][1]->mark_all_dirty();
 }
 
 
-INLINE void fromanc4_vram_w( running_machine &machine, offs_t offset, UINT16 data, UINT16 mem_mask, int layer )
+inline void fromanc2_state::fromanc4_vram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int layer )
 {
-	fromanc2_state *state = machine.driver_data<fromanc2_state>();
+//OBRISI.ME
 	int vram = (offset < 0x4000) ? 0 : 1;
 
-	COMBINE_DATA(&state->m_videoram[vram][layer][offset & 0x3fff]);
-	state->m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x3fff);
+	COMBINE_DATA(&m_videoram[vram][layer][offset & 0x3fff]);
+	m_tilemap[vram][layer]->mark_tile_dirty(offset & 0x3fff);
 }
 
-WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_0_w){ fromanc4_vram_w(machine(), offset, data, mem_mask, 2); }
-WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_1_w){ fromanc4_vram_w(machine(), offset, data, mem_mask, 1); }
-WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_2_w){ fromanc4_vram_w(machine(), offset, data, mem_mask, 0); }
+WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_0_w){ fromanc4_vram_w(offset, data, mem_mask, 2); }
+WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_1_w){ fromanc4_vram_w(offset, data, mem_mask, 1); }
+WRITE16_MEMBER(fromanc2_state::fromanc4_videoram_2_w){ fromanc4_vram_w(offset, data, mem_mask, 0); }
 
 WRITE16_MEMBER(fromanc2_state::fromanc4_gfxreg_0_w)
 {

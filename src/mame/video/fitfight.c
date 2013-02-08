@@ -4,11 +4,11 @@
 #include "includes/fitfight.h"
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
+void fitfight_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
-	fitfight_state *state = machine.driver_data<fitfight_state>();
-	gfx_element *gfx = machine.gfx[3];
-	UINT16 *source = state->m_spriteram;
+//OBRISI.ME
+	gfx_element *gfx = machine().gfx[3];
+	UINT16 *source = m_spriteram;
 	UINT16 *finish = source + 0x800 / 2;
 
 	while (source < finish)
@@ -23,7 +23,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		prio = (source[1] & 0x0400) >> 10;
 		colr = (source[1] & 0x00fc) >> 2;
 
-		if (state->m_bbprot_kludge == 1)
+		if (m_bbprot_kludge == 1)
 			colr = (source[1] & 0x00f8) >> 3;
 
 		end = source[0] & 0x8000;
@@ -130,7 +130,7 @@ UINT32 fitfight_state::screen_update_fitfight(screen_device &screen, bitmap_ind1
 		m_fof_bak_tilemap->set_scrolly(0, m_fof_a00000[0] & 0xff);
 		m_fof_bak_tilemap->draw(bitmap, cliprect, 0, 0);
 
-		draw_sprites(machine(), bitmap, cliprect, 0);
+		draw_sprites(bitmap, cliprect, 0);
 
 //      if (machine().input().code_pressed(KEYCODE_A))
 //          scrollmid = ((m_fof_900000[0] & 0xff00) >> 5) - ((m_fof_700000[0] & 0x01c0) >> 6);
@@ -147,7 +147,7 @@ UINT32 fitfight_state::screen_update_fitfight(screen_device &screen, bitmap_ind1
 //      if (!machine().input().code_pressed(KEYCODE_F))
 		m_fof_mid_tilemap->draw(bitmap, cliprect, 0, 0);
 
-		draw_sprites(machine(), bitmap, cliprect, 1);
+		draw_sprites(bitmap, cliprect, 1);
 
 		m_fof_txt_tilemap->draw(bitmap, cliprect, 0, 0);
 	}

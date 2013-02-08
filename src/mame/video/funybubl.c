@@ -27,10 +27,10 @@ void funybubl_state::video_start()
 {
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void funybubl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	funybubl_state *state = machine.driver_data<funybubl_state>();
-	UINT8 *source = &state->m_banked_vram[0x2000 - 0x20];
+//OBRISI.ME
+	UINT8 *source = &m_banked_vram[0x2000 - 0x20];
 	UINT8 *finish = source - 0x1000;
 
 	while (source > finish)
@@ -66,7 +66,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		// bits 0x40 and 0x10 not used?...
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], tile, 0, 0, 0, xpos, ypos, 255);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], tile, 0, 0, 0, xpos, ypos, 255);
 		source -= 0x20;
 	}
 }
@@ -92,7 +92,7 @@ UINT32 funybubl_state::screen_update_funybubl(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 #if 0
 	if ( machine().input().code_pressed_once(KEYCODE_W) )

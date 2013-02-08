@@ -159,25 +159,25 @@ WRITE8_MEMBER(flstory_state::flstory_scrlram_w)
 }
 
 
-static void flstory_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void flstory_state::flstory_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	flstory_state *state = machine.driver_data<flstory_state>();
+//OBRISI.ME
 	int i;
 
 	for (i = 0; i < 0x20; i++)
 	{
-		int pr = state->m_spriteram[state->m_spriteram.bytes() - 1 - i];
+		int pr = m_spriteram[m_spriteram.bytes() - 1 - i];
 		int offs = (pr & 0x1f) * 4;
 
 		if ((pr & 0x80) == pri)
 		{
 			int code, sx, sy, flipx, flipy;
 
-			code = state->m_spriteram[offs + 2] + ((state->m_spriteram[offs + 1] & 0x30) << 4);
-			sx = state->m_spriteram[offs + 3];
-			sy = state->m_spriteram[offs + 0];
+			code = m_spriteram[offs + 2] + ((m_spriteram[offs + 1] & 0x30) << 4);
+			sx = m_spriteram[offs + 3];
+			sy = m_spriteram[offs + 0];
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				sx = (240 - sx) & 0xff ;
 				sy = sy - 1 ;
@@ -185,19 +185,19 @@ static void flstory_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 			else
 				sy = 240 - sy - 1 ;
 
-			flipx = ((state->m_spriteram[offs + 1] & 0x40) >> 6) ^ state->m_flipscreen;
-			flipy = ((state->m_spriteram[offs + 1] & 0x80) >> 7) ^ state->m_flipscreen;
+			flipx = ((m_spriteram[offs + 1] & 0x40) >> 6) ^ m_flipscreen;
+			flipy = ((m_spriteram[offs + 1] & 0x80) >> 7) ^ m_flipscreen;
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					code,
-					state->m_spriteram[offs + 1] & 0x0f,
+					m_spriteram[offs + 1] & 0x0f,
 					flipx,flipy,
 					sx,sy,15);
 			/* wrap around */
 			if (sx > 240)
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 						code,
-						state->m_spriteram[offs + 1] & 0x0f,
+						m_spriteram[offs + 1] & 0x0f,
 						flipx,flipy,
 						sx-256,sy,15);
 		}
@@ -208,32 +208,32 @@ UINT32 flstory_state::screen_update_flstory(screen_device &screen, bitmap_ind16 
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
 	m_bg_tilemap->draw(bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);
-	flstory_draw_sprites(machine(), bitmap, cliprect, 0x00);
+	flstory_draw_sprites(bitmap, cliprect, 0x00);
 	m_bg_tilemap->draw(bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
-	flstory_draw_sprites(machine(), bitmap, cliprect, 0x80);
+	flstory_draw_sprites(bitmap, cliprect, 0x80);
 	m_bg_tilemap->draw(bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }
 
-static void victnine_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void flstory_state::victnine_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	flstory_state *state = machine.driver_data<flstory_state>();
+//OBRISI.ME
 	int i;
 
 	for (i = 0; i < 0x20; i++)
 	{
-		int pr = state->m_spriteram[state->m_spriteram.bytes() - 1 - i];
+		int pr = m_spriteram[m_spriteram.bytes() - 1 - i];
 		int offs = (pr & 0x1f) * 4;
 
 		//if ((pr & 0x80) == pri)
 		{
 			int code, sx, sy, flipx, flipy;
 
-			code = state->m_spriteram[offs + 2] + ((state->m_spriteram[offs + 1] & 0x20) << 3);
-			sx = state->m_spriteram[offs + 3];
-			sy = state->m_spriteram[offs + 0];
+			code = m_spriteram[offs + 2] + ((m_spriteram[offs + 1] & 0x20) << 3);
+			sx = m_spriteram[offs + 3];
+			sy = m_spriteram[offs + 0];
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				sx = (240 - sx + 1) & 0xff ;
 				sy = sy + 1 ;
@@ -241,19 +241,19 @@ static void victnine_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 			else
 				sy = 240 - sy + 1 ;
 
-			flipx = ((state->m_spriteram[offs + 1] & 0x40) >> 6) ^ state->m_flipscreen;
-			flipy = ((state->m_spriteram[offs + 1] & 0x80) >> 7) ^ state->m_flipscreen;
+			flipx = ((m_spriteram[offs + 1] & 0x40) >> 6) ^ m_flipscreen;
+			flipy = ((m_spriteram[offs + 1] & 0x80) >> 7) ^ m_flipscreen;
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					code,
-					state->m_spriteram[offs + 1] & 0x0f,
+					m_spriteram[offs + 1] & 0x0f,
 					flipx,flipy,
 					sx,sy,15);
 			/* wrap around */
 			if (sx > 240)
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 						code,
-						state->m_spriteram[offs + 1] & 0x0f,
+						m_spriteram[offs + 1] & 0x0f,
 						flipx,flipy,
 						sx-256,sy,15);
 		}
@@ -263,7 +263,7 @@ static void victnine_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 UINT32 flstory_state::screen_update_victnine(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	victnine_draw_sprites(machine(), bitmap, cliprect);
+	victnine_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -271,9 +271,9 @@ UINT32 flstory_state::screen_update_rumba(screen_device &screen, bitmap_ind16 &b
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER1, 0);
 	m_bg_tilemap->draw(bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);
-	victnine_draw_sprites(machine(), bitmap, cliprect);
+	victnine_draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0 | TILEMAP_DRAW_LAYER0, 0);
-	victnine_draw_sprites(machine(), bitmap, cliprect);
+	victnine_draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

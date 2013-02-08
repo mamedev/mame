@@ -48,39 +48,38 @@
 
 ***************************************************************************/
 
-INLINE void get_tile_info8bpp(running_machine &machine, tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
+inline void fuuki32_state::get_tile_info8bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
-	fuuki32_state *state = machine.driver_data<fuuki32_state>();
-	UINT16 code = (state->m_vram[_N_][tile_index] & 0xffff0000) >> 16;
-	UINT16 attr = (state->m_vram[_N_][tile_index] & 0x0000ffff);
-	SET_TILE_INFO(1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX((attr >> 6) & 3));
+//OBRISI.ME
+	UINT16 code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
+	UINT16 attr = (m_vram[_N_][tile_index] & 0x0000ffff);
+	SET_TILE_INFO_MEMBER(1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX((attr >> 6) & 3));
 }
 
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_0){ get_tile_info8bpp(machine(), tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_1){ get_tile_info8bpp(machine(), tileinfo, tile_index, 1); }
+TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_0){ get_tile_info8bpp(tileinfo, tile_index, 0); }
+TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_1){ get_tile_info8bpp(tileinfo, tile_index, 1); }
 
-INLINE void get_tile_info4bpp(running_machine &machine, tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
+inline void fuuki32_state::get_tile_info4bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
-	fuuki32_state *state = machine.driver_data<fuuki32_state>();
-	UINT16 code = (state->m_vram[_N_][tile_index] & 0xffff0000) >> 16;
-	UINT16 attr = (state->m_vram[_N_][tile_index] & 0x0000ffff);
-	SET_TILE_INFO(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
+//OBRISI.ME
+	UINT16 code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
+	UINT16 attr = (m_vram[_N_][tile_index] & 0x0000ffff);
+	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
 }
 
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_2){ get_tile_info4bpp(machine(), tileinfo, tile_index, 2); }
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_3){ get_tile_info4bpp(machine(), tileinfo, tile_index, 3); }
+TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_2){ get_tile_info4bpp(tileinfo, tile_index, 2); }
+TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_3){ get_tile_info4bpp(tileinfo, tile_index, 3); }
 
-INLINE void fuuki32_vram_w(address_space &space, offs_t offset, UINT32 data, UINT32 mem_mask, int _N_)
+inline void fuuki32_state::fuuki32_vram_w(offs_t offset, UINT32 data, UINT32 mem_mask, int _N_)
 {
-	fuuki32_state *state = space.machine().driver_data<fuuki32_state>();
-	COMBINE_DATA(&state->m_vram[_N_][offset]);
-	state->m_tilemap[_N_]->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_vram[_N_][offset]);
+	m_tilemap[_N_]->mark_tile_dirty(offset);
 }
 
-WRITE32_MEMBER(fuuki32_state::fuuki32_vram_0_w){ fuuki32_vram_w(space, offset, data, mem_mask, 0); }
-WRITE32_MEMBER(fuuki32_state::fuuki32_vram_1_w){ fuuki32_vram_w(space, offset, data, mem_mask, 1); }
-WRITE32_MEMBER(fuuki32_state::fuuki32_vram_2_w){ fuuki32_vram_w(space, offset, data, mem_mask, 2); }
-WRITE32_MEMBER(fuuki32_state::fuuki32_vram_3_w){ fuuki32_vram_w(space, offset, data, mem_mask, 3); }
+WRITE32_MEMBER(fuuki32_state::fuuki32_vram_0_w){ fuuki32_vram_w(offset, data, mem_mask, 0); }
+WRITE32_MEMBER(fuuki32_state::fuuki32_vram_1_w){ fuuki32_vram_w(offset, data, mem_mask, 1); }
+WRITE32_MEMBER(fuuki32_state::fuuki32_vram_2_w){ fuuki32_vram_w(offset, data, mem_mask, 2); }
+WRITE32_MEMBER(fuuki32_state::fuuki32_vram_3_w){ fuuki32_vram_w(offset, data, mem_mask, 3); }
 
 
 /***************************************************************************
@@ -142,9 +141,8 @@ void fuuki32_state::video_start()
 
 ***************************************************************************/
 
-static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void fuuki32_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	fuuki32_state *state = screen.machine().driver_data<fuuki32_state>();
 	int offs;
 	gfx_element *gfx = screen.machine().gfx[0];
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
@@ -152,10 +150,10 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 	int max_x = visarea.max_x + 1;
 	int max_y = visarea.max_y + 1;
 
-	UINT32 *src = state->m_buf_spriteram2; /* Use spriteram buffered by 2 frames, need palette buffered by one frame? */
+	UINT32 *src = m_buf_spriteram2; /* Use spriteram buffered by 2 frames, need palette buffered by one frame? */
 
 	/* Draw them backwards, for pdrawgfx */
-	for (offs = (state->m_spriteram.bytes() - 8) / 4; offs >= 0; offs -= 8/4)
+	for (offs = (m_spriteram.bytes() - 8) / 4; offs >= 0; offs -= 8/4)
 	{
 		int x, y, xstart, ystart, xend, yend, xinc, yinc;
 		int xnum, ynum, xzoom, yzoom, flipx, flipy;
@@ -169,7 +167,7 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 		int bank = (code & 0xc000) >> 14;
 		int bank_lookedup;
 
-		bank_lookedup = ((state->m_spr_buffered_tilebank[1] & 0xffff0000) >> (16 + bank * 4)) & 0xf;
+		bank_lookedup = ((m_spr_buffered_tilebank[1] & 0xffff0000) >> (16 + bank * 4)) & 0xf;
 		code &= 0x3fff;
 		code += bank_lookedup * 0x4000;
 
@@ -197,7 +195,7 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 		sx = (sx & 0x1ff) - (sx & 0x200);
 		sy = (sy & 0x1ff) - (sy & 0x200);
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			flipx = !flipx;     sx = max_x - sx - xnum * 16;
 			flipy = !flipy;     sy = max_y - sy - ynum * 16;
@@ -288,19 +286,19 @@ if (screen.machine().input().code_pressed(KEYCODE_X))
 ***************************************************************************/
 
 /* Wrapper to handle bg and bg2 ttogether */
-static void fuuki32_draw_layer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
+void fuuki32_state::fuuki32_draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
 {
-	fuuki32_state *state = machine.driver_data<fuuki32_state>();
-	int buffer = ((state->m_vregs[0x1e / 4] & 0x0000ffff) & 0x40);
+//OBRISI.ME
+	int buffer = ((m_vregs[0x1e / 4] & 0x0000ffff) & 0x40);
 
 	switch( i )
 	{
-		case 2: if (buffer) state->m_tilemap[3]->draw(bitmap, cliprect, flag, pri);
-				else        state->m_tilemap[2]->draw(bitmap, cliprect, flag, pri);
+		case 2: if (buffer) m_tilemap[3]->draw(bitmap, cliprect, flag, pri);
+				else        m_tilemap[2]->draw(bitmap, cliprect, flag, pri);
 				return;
-		case 1: state->m_tilemap[1]->draw(bitmap, cliprect, flag, pri);
+		case 1: m_tilemap[1]->draw(bitmap, cliprect, flag, pri);
 				return;
-		case 0: state->m_tilemap[0]->draw(bitmap, cliprect, flag, pri);
+		case 0: m_tilemap[0]->draw(bitmap, cliprect, flag, pri);
 				return;
 	}
 }
@@ -357,9 +355,9 @@ UINT32 fuuki32_state::screen_update_fuuki32(screen_device &screen, bitmap_ind16 
 	bitmap.fill((0x800 * 4) - 1, cliprect);
 	machine().priority_bitmap.fill(0, cliprect);
 
-	fuuki32_draw_layer(machine(), bitmap, cliprect, tm_back,   0, 1);
-	fuuki32_draw_layer(machine(), bitmap, cliprect, tm_middle, 0, 2);
-	fuuki32_draw_layer(machine(), bitmap, cliprect, tm_front,  0, 4);
+	fuuki32_draw_layer(bitmap, cliprect, tm_back,   0, 1);
+	fuuki32_draw_layer(bitmap, cliprect, tm_middle, 0, 2);
+	fuuki32_draw_layer(bitmap, cliprect, tm_front,  0, 4);
 
 	draw_sprites(screen, bitmap, cliprect);
 	return 0;

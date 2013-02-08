@@ -16,22 +16,22 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 
 
 
-static void set_service_mode(running_machine &machine, int enable)
+void firetrk_state::set_service_mode(int enable)
 {
-	firetrk_state *state = machine.driver_data<firetrk_state>();
-	state->m_in_service_mode = enable;
+//OBRISI.ME
+	m_in_service_mode = enable;
 
 	/* watchdog is disabled during service mode */
-	machine.watchdog_enable(!enable);
+	machine().watchdog_enable(!enable);
 
 	/* change CPU clock speed according to service switch change */
-	machine.device("maincpu")->set_unscaled_clock(enable ? (MASTER_CLOCK/12) : (MASTER_CLOCK/16));
+	machine().device("maincpu")->set_unscaled_clock(enable ? (MASTER_CLOCK/12) : (MASTER_CLOCK/16));
 }
 
 
 INPUT_CHANGED_MEMBER(firetrk_state::service_mode_switch_changed)
 {
-	set_service_mode(machine(), newval);
+	set_service_mode(newval);
 }
 
 
@@ -164,7 +164,7 @@ WRITE8_MEMBER(firetrk_state::montecar_output_2_w)
 
 void firetrk_state::machine_reset()
 {
-	set_service_mode(machine(), 0);
+	set_service_mode(0);
 
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(firetrk_state::periodic_callback),this));
 }

@@ -107,7 +107,10 @@ public:
 	UINT32 screen_update_fromanc2_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_fromanc2_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(fromanc2_interrupt);
+	inline void fromanc2_get_tile_info( tile_data &tileinfo, int tile_index, int vram, int layer );
+	inline void fromancr_get_tile_info( tile_data &tileinfo, int tile_index, int vram, int layer );
+	inline void fromanc2_dispvram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int vram, int layer );
+	inline void fromancr_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int layer );
+	void fromancr_gfxbank_w( int data );
+	inline void fromanc4_vram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int layer );
 };
-
-/*----------- defined in video/fromanc2.c -----------*/
-void fromancr_gfxbank_w(running_machine &machine, int data);

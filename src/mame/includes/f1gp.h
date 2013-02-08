@@ -92,4 +92,5 @@ public:
 	UINT32 screen_update_f1gp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_f1gpb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_f1gp2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void f1gpb_draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 };

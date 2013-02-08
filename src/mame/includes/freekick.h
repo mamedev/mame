@@ -52,4 +52,7 @@ public:
 	UINT32 screen_update_freekick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_gigas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(freekick_irqgen);
+	void gigas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void pbillrd_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void freekick_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

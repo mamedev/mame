@@ -94,7 +94,7 @@ WRITE16_MEMBER(fromanc2_state::fromancr_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		fromancr_gfxbank_w(machine(), data & 0xfff8);
+		fromancr_gfxbank_w(data & 0xfff8);
 		ioport("EEPROMOUT")->write(data, 0xff);
 	}
 }

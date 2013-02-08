@@ -26,11 +26,11 @@ void flower_state::palette_init()
 		colortable_entry_set_value(machine().colortable, i, i);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void flower_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	flower_state *state = machine.driver_data<flower_state>();
-	gfx_element *gfx = machine.gfx[1];
-	UINT8 *source = state->m_spriteram + 0x200;
+//OBRISI.ME
+	gfx_element *gfx = machine().gfx[1];
+	UINT8 *source = m_spriteram + 0x200;
 	UINT8 *finish = source - 0x200;
 
 	source -= 8;
@@ -79,7 +79,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		code |= ((source[2] & 0x01) << 6);
 		code |= ((source[2] & 0x08) << 4);
 
-		if(state->flip_screen())
+		if(flip_screen())
 		{
 			flipx = !flipx;
 			flipy = !flipy;
@@ -170,7 +170,7 @@ UINT32 flower_state::screen_update_flower(screen_device &screen, bitmap_ind16 &b
 	m_bg0_tilemap->draw(bitmap, cliprect, 0,0);
 	m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
 
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 
 	if(flip_screen())
 	{

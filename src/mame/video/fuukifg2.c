@@ -44,30 +44,29 @@
 
 ***************************************************************************/
 
-INLINE void get_tile_info(running_machine &machine, tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
+inline void fuuki16_state::get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
-	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	UINT16 code = state->m_vram[_N_][2 * tile_index + 0];
-	UINT16 attr = state->m_vram[_N_][2 * tile_index + 1];
-	SET_TILE_INFO(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
+//OBRISI.ME
+	UINT16 code = m_vram[_N_][2 * tile_index + 0];
+	UINT16 attr = m_vram[_N_][2 * tile_index + 1];
+	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
 }
 
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_0){ get_tile_info(machine(), tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_1){ get_tile_info(machine(), tileinfo, tile_index, 1); }
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_2){ get_tile_info(machine(), tileinfo, tile_index, 2); }
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_3){ get_tile_info(machine(), tileinfo, tile_index, 3); }
+TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0); }
+TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 1); }
+TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 2); }
+TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 3); }
 
-INLINE void fuuki16_vram_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
+inline void fuuki16_state::fuuki16_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
 {
-	fuuki16_state *state = space.machine().driver_data<fuuki16_state>();
-	COMBINE_DATA(&state->m_vram[_N_][offset]);
-	state->m_tilemap[_N_]->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_vram[_N_][offset]);
+	m_tilemap[_N_]->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_MEMBER(fuuki16_state::fuuki16_vram_0_w){ fuuki16_vram_w(space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(fuuki16_state::fuuki16_vram_1_w){ fuuki16_vram_w(space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(fuuki16_state::fuuki16_vram_2_w){ fuuki16_vram_w(space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(fuuki16_state::fuuki16_vram_3_w){ fuuki16_vram_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_0_w){ fuuki16_vram_w(offset, data, mem_mask, 0); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_1_w){ fuuki16_vram_w(offset, data, mem_mask, 1); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_2_w){ fuuki16_vram_w(offset, data, mem_mask, 2); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_3_w){ fuuki16_vram_w(offset, data, mem_mask, 3); }
 
 
 /***************************************************************************
@@ -135,19 +134,18 @@ void fuuki16_state::video_start()
 
 ***************************************************************************/
 
-static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void fuuki16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	fuuki16_state *state = screen.machine().driver_data<fuuki16_state>();
 	int offs;
 	gfx_element *gfx = screen.machine().gfx[0];
 	bitmap_ind8 &priority_bitmap = screen.machine().priority_bitmap;
 	const rectangle &visarea = screen.visible_area();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int max_x = visarea.max_x + 1;
 	int max_y = visarea.max_y + 1;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (state->m_spriteram.bytes() - 8) / 2; offs >=0; offs -= 8 / 2 )
+	for ( offs = (m_spriteram.bytes() - 8) / 2; offs >=0; offs -= 8 / 2 )
 	{
 		int x, y, xstart, ystart, xend, yend, xinc, yinc;
 		int xnum, ynum, xzoom, yzoom, flipx, flipy;
@@ -182,7 +180,7 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 		sx = (sx & 0x1ff) - (sx & 0x200);
 		sy = (sy & 0x1ff) - (sy & 0x200);
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			flipx = !flipx;     sx = max_x - sx - xnum * 16;
 			flipy = !flipy;     sy = max_y - sy - ynum * 16;
@@ -265,19 +263,19 @@ if (screen.machine().input().code_pressed(KEYCODE_X))
 ***************************************************************************/
 
 /* Wrapper to handle bg and bg2 ttogether */
-static void fuuki16_draw_layer( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
+void fuuki16_state::fuuki16_draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
 {
-	fuuki16_state *state = machine.driver_data<fuuki16_state>();
-	int buffer = (state->m_vregs[0x1e / 2] & 0x40);
+//OBRISI.ME
+	int buffer = (m_vregs[0x1e / 2] & 0x40);
 
 	switch( i )
 	{
-		case 2: if (buffer) state->m_tilemap[3]->draw(bitmap, cliprect, flag, pri);
-				else        state->m_tilemap[2]->draw(bitmap, cliprect, flag, pri);
+		case 2: if (buffer) m_tilemap[3]->draw(bitmap, cliprect, flag, pri);
+				else        m_tilemap[2]->draw(bitmap, cliprect, flag, pri);
 				return;
-		case 1: state->m_tilemap[1]->draw(bitmap, cliprect, flag, pri);
+		case 1: m_tilemap[1]->draw(bitmap, cliprect, flag, pri);
 				return;
-		case 0: state->m_tilemap[0]->draw(bitmap, cliprect, flag, pri);
+		case 0: m_tilemap[0]->draw(bitmap, cliprect, flag, pri);
 				return;
 	}
 }
@@ -339,9 +337,9 @@ UINT32 fuuki16_state::screen_update_fuuki16(screen_device &screen, bitmap_ind16 
 	bitmap.fill((0x800 * 4) - 1, cliprect);
 	machine().priority_bitmap.fill(0, cliprect);
 
-	fuuki16_draw_layer(machine(), bitmap, cliprect, tm_back,   0, 1);
-	fuuki16_draw_layer(machine(), bitmap, cliprect, tm_middle, 0, 2);
-	fuuki16_draw_layer(machine(), bitmap, cliprect, tm_front,  0, 4);
+	fuuki16_draw_layer(bitmap, cliprect, tm_back,   0, 1);
+	fuuki16_draw_layer(bitmap, cliprect, tm_middle, 0, 2);
+	fuuki16_draw_layer(bitmap, cliprect, tm_front,  0, 4);
 
 	draw_sprites(screen, bitmap, cliprect);
 

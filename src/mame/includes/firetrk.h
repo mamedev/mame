@@ -115,6 +115,12 @@ public:
 	DECLARE_WRITE8_MEMBER(firetrk_motor_snd_w);
 	DECLARE_WRITE8_MEMBER(superbug_motor_snd_w);
 	DECLARE_WRITE8_MEMBER(firetrk_xtndply_w);
+	void prom_to_palette(int number, UINT8 val);
+	void firetrk_draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, int which, int flash);
+	void superbug_draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, int flash);
+	void montecar_draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, int which, int is_collision_detection);
+	void check_collision(firetrk_state *state, int which);
+	void set_service_mode(int enable);
 };
 
 
