@@ -92,7 +92,6 @@ TIMER_CALLBACK_MEMBER(fgoal_state::interrupt_callback)
 
 unsigned fgoal_state::video_ram_address(  )
 {
-//OBRISI.ME
 	return 0x4000 | (m_row << 5) | (m_col >> 3);
 }
 

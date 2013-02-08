@@ -6,7 +6,6 @@
 
 void fitfight_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer )
 {
-//OBRISI.ME
 	gfx_element *gfx = machine().gfx[3];
 	UINT16 *source = m_spriteram;
 	UINT16 *finish = source + 0x800 / 2;

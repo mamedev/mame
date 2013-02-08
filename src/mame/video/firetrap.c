@@ -192,7 +192,6 @@ WRITE8_MEMBER(firetrap_state::firetrap_bg2_scrolly_w)
 
 void firetrap_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-//OBRISI.ME
 	int offs;
 
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)

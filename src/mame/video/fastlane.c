@@ -26,7 +26,6 @@ void fastlane_state::palette_init()
 
 void fastlane_state::set_pens(  )
 {
-//OBRISI.ME
 	int i;
 
 	for (i = 0x00; i < 0x800; i += 2)

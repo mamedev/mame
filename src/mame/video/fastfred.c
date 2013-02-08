@@ -234,7 +234,6 @@ void fastfred_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	const rectangle spritevisiblearea(2*8, 32*8-1, 2*8, 30*8-1);
 	const rectangle spritevisibleareaflipx(0*8, 30*8-1, 2*8, 30*8-1);
-//OBRISI.ME
 	int offs;
 
 	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)

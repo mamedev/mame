@@ -28,7 +28,6 @@ WRITE8_MEMBER(freekick_state::freek_videoram_w)
 
 void freekick_state::gigas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-//OBRISI.ME
 	int offs;
 
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
@@ -63,7 +62,6 @@ void freekick_state::gigas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 
 void freekick_state::pbillrd_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-//OBRISI.ME
 	int offs;
 
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
@@ -99,7 +97,6 @@ void freekick_state::pbillrd_draw_sprites( bitmap_ind16 &bitmap, const rectangle
 
 void freekick_state::freekick_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-//OBRISI.ME
 	int offs;
 
 	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)

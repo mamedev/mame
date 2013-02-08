@@ -46,7 +46,6 @@
 
 inline void fuuki16_state::get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
-//OBRISI.ME
 	UINT16 code = m_vram[_N_][2 * tile_index + 0];
 	UINT16 attr = m_vram[_N_][2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
@@ -265,7 +264,6 @@ if (screen.machine().input().code_pressed(KEYCODE_X))
 /* Wrapper to handle bg and bg2 ttogether */
 void fuuki16_state::fuuki16_draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
 {
-//OBRISI.ME
 	int buffer = (m_vregs[0x1e / 2] & 0x40);
 
 	switch( i )

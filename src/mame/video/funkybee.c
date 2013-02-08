@@ -92,7 +92,6 @@ void funkybee_state::video_start()
 
 void funkybee_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-//OBRISI.ME
 	int offs;
 
 	for (offs = 0x0f; offs >= 0; offs--)
@@ -121,7 +120,6 @@ void funkybee_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 void funkybee_state::draw_columns( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-//OBRISI.ME
 	int offs;
 
 	for (offs = 0x1f; offs >= 0; offs--)

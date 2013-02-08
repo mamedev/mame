@@ -29,7 +29,6 @@ void funybubl_state::video_start()
 
 void funybubl_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-//OBRISI.ME
 	UINT8 *source = &m_banked_vram[0x2000 - 0x20];
 	UINT8 *finish = source - 0x1000;
 

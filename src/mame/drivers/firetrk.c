@@ -18,7 +18,6 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 
 void firetrk_state::set_service_mode(int enable)
 {
-//OBRISI.ME
 	m_in_service_mode = enable;
 
 	/* watchdog is disabled during service mode */

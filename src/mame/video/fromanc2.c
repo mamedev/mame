@@ -17,7 +17,6 @@
 
 inline void fromanc2_state::fromanc2_get_tile_info( tile_data &tileinfo, int tile_index, int vram, int layer )
 {
-//OBRISI.ME
 	int tile, color;
 
 	tile  = (m_videoram[vram][layer][tile_index] & 0x3fff) | (m_gfxbank[vram][layer] << 14);
@@ -38,7 +37,6 @@ TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l3_tile_info){ fromanc2_get
 
 inline void fromanc2_state::fromancr_get_tile_info( tile_data &tileinfo, int tile_index, int vram, int layer )
 {
-//OBRISI.ME
 	int tile, color;
 
 	tile  = m_videoram[vram][layer][tile_index] | (m_gfxbank[vram][layer] << 16);
@@ -162,7 +160,6 @@ WRITE16_MEMBER(fromanc2_state::fromanc4_paletteram_1_w)
 
 inline void fromanc2_state::fromanc2_dispvram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int vram, int layer )
 {
-//OBRISI.ME
 	layer += (offset < 0x1000) ? 0 : 1;
 
 	COMBINE_DATA(&m_videoram[vram][layer][offset & 0x0fff]);
@@ -253,7 +250,6 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_gfxbank_1_w)
 
 inline void fromanc2_state::fromancr_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int layer )
 {
-//OBRISI.ME
 	int vram = (offset < 0x1000) ? 0 : 1;
 
 	COMBINE_DATA(&m_videoram[vram][layer][offset & 0x0fff]);
@@ -292,7 +288,6 @@ WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_1_w)
 
 void fromanc2_state::fromancr_gfxbank_w( int data )
 {
-//OBRISI.ME
 
 	m_gfxbank[0][0] = (data & 0x0010) >>  4; // BG (1P)
 	m_gfxbank[0][1] = (data & 0xf000) >> 12; // FG (1P)
@@ -307,7 +302,6 @@ void fromanc2_state::fromancr_gfxbank_w( int data )
 
 inline void fromanc2_state::fromanc4_vram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int layer )
 {
-//OBRISI.ME
 	int vram = (offset < 0x4000) ? 0 : 1;
 
 	COMBINE_DATA(&m_videoram[vram][layer][offset & 0x3fff]);

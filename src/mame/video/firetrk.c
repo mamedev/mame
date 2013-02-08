@@ -247,7 +247,6 @@ VIDEO_START_MEMBER(firetrk_state,montecar)
 
 void firetrk_state::firetrk_draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, int which, int flash)
 {
-//OBRISI.ME
 	int gfx_bank, code, color, flip_x, flip_y, x, y;
 
 	if (which)
@@ -277,7 +276,6 @@ void firetrk_state::firetrk_draw_car(bitmap_ind16 &bitmap, const rectangle &clip
 
 void firetrk_state::superbug_draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, int flash)
 {
-//OBRISI.ME
 	int gfx_bank = (*m_car_rot & 0x10) ? 4 : 3;
 	int code = ~*m_car_rot & 0x03;
 	int color = flash ? 1 : 0;
@@ -290,7 +288,6 @@ void firetrk_state::superbug_draw_car(bitmap_ind16 &bitmap, const rectangle &cli
 
 void firetrk_state::montecar_draw_car(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element **gfx, int which, int is_collision_detection)
 {
-//OBRISI.ME
 	int gfx_bank, code, color, flip_x, flip_y, x, y;
 
 	if (which)

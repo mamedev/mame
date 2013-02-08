@@ -50,7 +50,6 @@
 
 inline void fuuki32_state::get_tile_info8bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
-//OBRISI.ME
 	UINT16 code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
 	UINT16 attr = (m_vram[_N_][tile_index] & 0x0000ffff);
 	SET_TILE_INFO_MEMBER(1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX((attr >> 6) & 3));
@@ -61,7 +60,6 @@ TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_1){ get_tile_info8bpp(tileinfo
 
 inline void fuuki32_state::get_tile_info4bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
-//OBRISI.ME
 	UINT16 code = (m_vram[_N_][tile_index] & 0xffff0000) >> 16;
 	UINT16 attr = (m_vram[_N_][tile_index] & 0x0000ffff);
 	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
@@ -288,7 +286,6 @@ if (screen.machine().input().code_pressed(KEYCODE_X))
 /* Wrapper to handle bg and bg2 ttogether */
 void fuuki32_state::fuuki32_draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, int i, int flag, int pri )
 {
-//OBRISI.ME
 	int buffer = ((m_vregs[0x1e / 4] & 0x0000ffff) & 0x40);
 
 	switch( i )

@@ -63,7 +63,6 @@
 
 void fantland_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-//OBRISI.ME
 	UINT8 *spriteram_2 = m_spriteram2;
 	UINT8   *indx_ram   =   m_spriteram + 0x2000,    // this ram contains indexes into offs_ram
 			*offs_ram   =   m_spriteram + 0x2400,    // this ram contains x,y offsets or indexes into spriteram_2

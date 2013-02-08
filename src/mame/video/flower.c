@@ -28,7 +28,6 @@ void flower_state::palette_init()
 
 void flower_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-//OBRISI.ME
 	gfx_element *gfx = machine().gfx[1];
 	UINT8 *source = m_spriteram + 0x200;
 	UINT8 *finish = source - 0x200;

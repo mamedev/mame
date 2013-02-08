@@ -21,7 +21,6 @@
 
 inline void fromance_state::get_fromance_tile_info( tile_data &tileinfo, int tile_index, int layer )
 {
-//OBRISI.ME
 	int tile = ((m_local_videoram[layer][0x0000 + tile_index] & 0x80) << 9) |
 				(m_local_videoram[layer][0x1000 + tile_index] << 8) |
 				m_local_videoram[layer][0x2000 + tile_index];
@@ -36,7 +35,6 @@ TILE_GET_INFO_MEMBER(fromance_state::get_fromance_fg_tile_info){ get_fromance_ti
 
 inline void fromance_state::get_nekkyoku_tile_info( tile_data &tileinfo, int tile_index, int layer )
 {
-//OBRISI.ME
 	int tile = (m_local_videoram[layer][0x0000 + tile_index] << 8) |
 				m_local_videoram[layer][0x1000 + tile_index];
 	int color = m_local_videoram[layer][tile_index + 0x2000] & 0x3f;
@@ -57,7 +55,6 @@ TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_fg_tile_info){ get_nekkyoku_ti
 
 void fromance_state::init_common(  )
 {
-//OBRISI.ME
 
 	/* allocate local videoram */
 	m_local_videoram[0] = auto_alloc_array(machine(), UINT8, 0x1000 * 3);
