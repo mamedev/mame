@@ -131,11 +131,11 @@ INPUT_PORTS_END
 
 void _3do_state::machine_start()
 {
-	membank("bank2")->set_base(memregion("user1")->base());
+	m_bank2->set_base(memregion("user1")->base());
 
 	/* configure overlay */
-	membank("bank1")->configure_entry(0, m_dram);
-	membank("bank1")->configure_entry(1, memregion("user1")->base());
+	m_bank1->configure_entry(0, m_dram);
+	m_bank1->configure_entry(1, memregion("user1")->base());
 
 	m_3do_slow2_init();
 	m_3do_madam_init();
@@ -145,7 +145,7 @@ void _3do_state::machine_start()
 void _3do_state::machine_reset()
 {
 	/* start with overlay enabled */
-	membank("bank1")->set_entry(1);
+	m_bank1->set_entry(1);
 
 	m_clio.cstatbits = 0x01; /* bit 0 = reset of clio caused by power on */
 }

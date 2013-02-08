@@ -135,10 +135,13 @@ class _3do_state : public driver_device
 {
 public:
 	_3do_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_maincpu(*this, "maincpu"),
-		m_dram(*this, "dram"),
-		m_vram(*this, "vram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_dram(*this, "dram")
+		, m_vram(*this, "vram")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT32> m_dram;
@@ -167,6 +170,10 @@ public:
 	UINT32 screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );
+
+protected:
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
 
 private:
 	void m_3do_slow2_init( void );
