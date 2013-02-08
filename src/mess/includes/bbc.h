@@ -24,14 +24,17 @@ class bbc_state : public driver_device
 {
 public:
 	bbc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_sn(*this, "sn76489"),
-			m_trom(*this, "saa505x"),
-			m_ACCCON_IRR(CLEAR_LINE),
-			m_via_system_irq(CLEAR_LINE),
-			m_via_user_irq(CLEAR_LINE),
-			m_acia_irq(CLEAR_LINE)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_sn(*this, "sn76489")
+		, m_trom(*this, "saa505x")
+		, m_ACCCON_IRR(CLEAR_LINE)
+		, m_via_system_irq(CLEAR_LINE)
+		, m_via_user_irq(CLEAR_LINE)
+		, m_acia_irq(CLEAR_LINE)
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_user1(*this, "user1")
+		, m_region_user2(*this, "user2")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -306,6 +309,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(bbc_vsync);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( bbcb_cart );
+
+protected:
+	required_memory_region m_region_maincpu;
+	required_memory_region m_region_user1;
+	optional_memory_region m_region_user2;
 };
 
 
