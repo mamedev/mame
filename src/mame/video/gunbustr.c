@@ -227,7 +227,7 @@ UINT32 gunbustr_state::screen_update_gunbustr(screen_device &screen, bitmap_ind1
 	if (!machine().input().code_pressed (KEYCODE_C)) tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 2);
 	if (!machine().input().code_pressed (KEYCODE_V)) tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[3], 0, 4);
 	if (!machine().input().code_pressed (KEYCODE_B)) tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 8);
-	if (!machine().input().code_pressed (KEYCODE_N)) draw_sprites(machine(), bitmap, cliprect, primasks, 48, -116);
+	if (!machine().input().code_pressed (KEYCODE_N)) draw_sprites(bitmap, cliprect, primasks, 48, -116);
 #else
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[1], 0, 1);
