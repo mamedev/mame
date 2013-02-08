@@ -61,16 +61,15 @@ WRITE8_MEMBER(ikki_state::ikki_scrn_ctrl_w)
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void ikki_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	ikki_state *state = machine.driver_data<ikki_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int y;
 	offs_t offs;
 
-	state->m_sprite_bitmap.fill(state->m_punch_through_pen, cliprect);
+	m_sprite_bitmap.fill(m_punch_through_pen, cliprect);
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int code = (spriteram[offs + 2] & 0x80) | (spriteram[offs + 1] >> 1);
 		int color = spriteram[offs + 2] & 0x3f;
@@ -78,7 +77,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int x = spriteram[offs + 3];
 			y = spriteram[offs + 0];
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 			x = 240 - x;
 		else
 			y = 224 - y;
@@ -92,11 +91,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if (y > 240)
 			y = y - 256;
 
-		drawgfx_transmask(state->m_sprite_bitmap,cliprect, machine.gfx[1],
+		drawgfx_transmask(m_sprite_bitmap,cliprect, machine().gfx[1],
 				code, color,
-				state->m_flipscreen,state->m_flipscreen,
+				m_flipscreen,m_flipscreen,
 				x,y,
-				colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0));
+				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
 	}
 
 	/* copy the sprite bitmap into the main bitmap, skipping the transparent pixels */
@@ -106,9 +105,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 pen = state->m_sprite_bitmap.pix16(y, x);
+			UINT16 pen = m_sprite_bitmap.pix16(y, x);
 
-			if (colortable_entry_get_value(machine.colortable, pen) != 0x100)
+			if (colortable_entry_get_value(machine().colortable, pen) != 0x100)
 				bitmap.pix16(y, x) = pen;
 		}
 	}
@@ -182,7 +181,7 @@ UINT32 ikki_state::screen_update_ikki(screen_device &screen, bitmap_ind16 &bitma
 			x,y);
 	}
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	/* mask sprites */
 

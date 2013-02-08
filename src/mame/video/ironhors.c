@@ -150,28 +150,27 @@ void ironhors_state::video_start()
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void ironhors_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	ironhors_state *state = machine.driver_data<ironhors_state>();
 	int offs;
 	UINT8 *sr;
 
-	if (state->m_spriterambank != 0)
-		sr = state->m_spriteram;
+	if (m_spriterambank != 0)
+		sr = m_spriteram;
 	else
-		sr = state->m_spriteram2;
+		sr = m_spriteram2;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 5)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 5)
 	{
 		int sx = sr[offs + 3];
 		int sy = sr[offs + 2];
 		int flipx = sr[offs + 4] & 0x20;
 		int flipy = sr[offs + 4] & 0x40;
 		int code = (sr[offs] << 2) + ((sr[offs + 1] & 0x03) << 10) + ((sr[offs + 1] & 0x0c) >> 2);
-		int color = ((sr[offs + 1] & 0xf0) >> 4) + 16 * state->m_palettebank;
-	//  int mod = state->flip_screen() ? -8 : 8;
+		int color = ((sr[offs + 1] & 0xf0) >> 4) + 16 * m_palettebank;
+	//  int mod = flip_screen() ? -8 : 8;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -182,7 +181,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		switch (sr[offs + 4] & 0x0c)
 		{
 			case 0x00:  /* 16x16 */
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 						code/4,
 						color,
 						flipx,flipy,
@@ -191,14 +190,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			case 0x04:  /* 16x8 */
 				{
-					if (state->flip_screen()) sy += 8; // this fixes the train wheels' position
+					if (flip_screen()) sy += 8; // this fixes the train wheels' position
 
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 							code & ~1,
 							color,
 							flipx,flipy,
 							flipx?sx+8:sx,sy,0);
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 							code | 1,
 							color,
 							flipx,flipy,
@@ -208,12 +207,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			case 0x08:  /* 8x16 */
 				{
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 							code & ~2,
 							color,
 							flipx,flipy,
 							sx,flipy?sy+8:sy,0);
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 							code | 2,
 							color,
 							flipx,flipy,
@@ -223,7 +222,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			case 0x0c:  /* 8x8 */
 				{
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 							code,
 							color,
 							flipx,flipy,
@@ -242,7 +241,7 @@ UINT32 ironhors_state::screen_update_ironhors(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->set_scrollx(row, m_scroll[row]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -263,21 +262,20 @@ VIDEO_START_MEMBER(ironhors_state,farwest)
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
-static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void ironhors_state::farwest_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	ironhors_state *state = machine.driver_data<ironhors_state>();
 	int offs;
-	UINT8 *sr = state->m_spriteram2;
-	UINT8 *sr2 = state->m_spriteram;
+	UINT8 *sr = m_spriteram2;
+	UINT8 *sr2 = m_spriteram;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int sx = sr[offs + 2];
 		int sy = sr[offs + 1];
 		int flipx = sr[offs + 3] & 0x20;
 		int flipy = sr[offs + 3] & 0x40;
 		int code = (sr[offs] << 2) + ((sr2[offs] & 0x03) << 10) + ((sr2[offs] & 0x0c) >> 2);
-		int color = ((sr2[offs] & 0xf0) >> 4) + 16 * state->m_palettebank;
+		int color = ((sr2[offs] & 0xf0) >> 4) + 16 * m_palettebank;
 
 	//  int mod = flip_screen() ? -8 : 8;
 
@@ -292,7 +290,7 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 		switch (sr[offs + 3] & 0x0c)
 		{
 			case 0x00:  /* 16x16 */
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 						code/4,
 						color,
 						flipx,flipy,
@@ -301,14 +299,14 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 
 			case 0x04:  /* 16x8 */
 				{
-					if (state->flip_screen()) sy += 8; // this fixes the train wheels' position
+					if (flip_screen()) sy += 8; // this fixes the train wheels' position
 
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 							code & ~1,
 							color,
 							flipx,flipy,
 							flipx?sx+8:sx,sy,0);
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 							code | 1,
 							color,
 							flipx,flipy,
@@ -318,12 +316,12 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 
 			case 0x08:  /* 8x16 */
 				{
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 							code & ~2,
 							color,
 							flipx,flipy,
 							sx,flipy?sy+8:sy,0);
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 							code | 2,
 							color,
 							flipx,flipy,
@@ -333,7 +331,7 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 
 			case 0x0c:  /* 8x8 */
 				{
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 							code,
 							color,
 							flipx,flipy,
@@ -352,6 +350,6 @@ UINT32 ironhors_state::screen_update_farwest(screen_device &screen, bitmap_ind16
 		m_bg_tilemap->set_scrollx(row, m_scroll[row]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	farwest_draw_sprites(machine(), bitmap, cliprect);
+	farwest_draw_sprites(bitmap, cliprect);
 	return 0;
 }

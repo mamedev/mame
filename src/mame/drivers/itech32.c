@@ -374,42 +374,41 @@ Notes:
  *
  *************************************/
 
-INLINE int determine_irq_state(itech32_state *state, int vint, int xint, int qint)
+inline int itech32_state::determine_irq_state(int vint, int xint, int qint)
 {
 	int level = 0;
 
 
 	/* determine which level is active */
-	if (state->m_vint_state) level = 1;
-	if (state->m_xint_state) level = 2;
-	if (state->m_qint_state) level = 3;
+	if (m_vint_state) level = 1;
+	if (m_xint_state) level = 2;
+	if (m_qint_state) level = 3;
 
 	/* Driver's Edge shifts the interrupts a bit */
-	if (state->m_is_drivedge && level) level += 2;
+	if (m_is_drivedge && level) level += 2;
 
 	return level;
 }
 
 
-void itech32_update_interrupts(running_machine &machine, int vint, int xint, int qint)
+void itech32_state::itech32_update_interrupts(int vint, int xint, int qint)
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
 	/* update the states */
-	if (vint != -1) state->m_vint_state = vint;
-	if (xint != -1) state->m_xint_state = xint;
-	if (qint != -1) state->m_qint_state = qint;
+	if (vint != -1) m_vint_state = vint;
+	if (xint != -1) m_xint_state = xint;
+	if (qint != -1) m_qint_state = qint;
 
-	if (state->m_is_drivedge)
+	if (m_is_drivedge)
 	{
-		machine.device("maincpu")->execute().set_input_line(3, state->m_vint_state ? ASSERT_LINE : CLEAR_LINE);
-		machine.device("maincpu")->execute().set_input_line(4, state->m_xint_state ? ASSERT_LINE : CLEAR_LINE);
-		machine.device("maincpu")->execute().set_input_line(5, state->m_qint_state ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(3, m_vint_state ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(4, m_xint_state ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(5, m_qint_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
-		machine.device("maincpu")->execute().set_input_line(1, state->m_vint_state ? ASSERT_LINE : CLEAR_LINE);
-		machine.device("maincpu")->execute().set_input_line(2, state->m_xint_state ? ASSERT_LINE : CLEAR_LINE);
-		machine.device("maincpu")->execute().set_input_line(3, state->m_qint_state ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(1, m_vint_state ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(2, m_xint_state ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(3, m_qint_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -417,14 +416,14 @@ void itech32_update_interrupts(running_machine &machine, int vint, int xint, int
 INTERRUPT_GEN_MEMBER(itech32_state::generate_int1)
 {
 	/* signal the NMI */
-	itech32_update_interrupts(machine(), 1, -1, -1);
+	itech32_update_interrupts(1, -1, -1);
 	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", machine().primary_screen->vpos());
 }
 
 
 WRITE16_MEMBER(itech32_state::int1_ack_w)
 {
-	itech32_update_interrupts(machine(), 0, -1, -1);
+	itech32_update_interrupts(0, -1, -1);
 }
 
 
@@ -873,15 +872,14 @@ WRITE32_MEMBER(itech32_state::int1_ack32_w)
 
 void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 {
-	itech32_state *state = machine().driver_data<itech32_state>();
 	// if nvram is the main RAM, don't overwrite exception vectors
-	int start = (base == state->m_main_ram) ? 0x80 : 0x00;
+	int start = (base == m_main_ram) ? 0x80 : 0x00;
 	for (int i = start; i < length; i++)
 		((UINT8 *)base)[i] = machine().rand();
 
 	// due to accessing uninitialized RAM, we need this hack
-	if (state->m_is_drivedge)
-		((UINT32 *)state->m_main_ram.target())[0x2ce4/4] = 0x0000001e;
+	if (m_is_drivedge)
+		((UINT32 *)m_main_ram.target())[0x2ce4/4] = 0x0000001e;
 }
 
 
@@ -4111,18 +4109,17 @@ ROM_END
  *
  *************************************/
 
-static void init_program_rom(running_machine &machine)
+void itech32_state::init_program_rom()
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
-	if (state->m_main_ram == NULL)
-		state->m_main_ram.set_target(state->m_nvram, state->m_nvram.bytes());
-	memcpy(state->m_main_ram, state->m_main_rom, 0x80);
+	if (m_main_ram == NULL)
+		m_main_ram.set_target(m_nvram, m_nvram.bytes());
+	memcpy(m_main_ram, m_main_rom, 0x80);
 }
 
 
 DRIVER_INIT_MEMBER(itech32_state,timekill)
 {
-	init_program_rom(machine());
+	init_program_rom();
 	m_vram_height = 512;
 	m_planes = 2;
 	m_is_drivedge = 0;
@@ -4131,7 +4128,7 @@ DRIVER_INIT_MEMBER(itech32_state,timekill)
 
 DRIVER_INIT_MEMBER(itech32_state,hardyard)
 {
-	init_program_rom(machine());
+	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 1;
 	m_is_drivedge = 0;
@@ -4140,7 +4137,7 @@ DRIVER_INIT_MEMBER(itech32_state,hardyard)
 
 DRIVER_INIT_MEMBER(itech32_state,bloodstm)
 {
-	init_program_rom(machine());
+	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 1;
 	m_is_drivedge = 0;
@@ -4149,7 +4146,7 @@ DRIVER_INIT_MEMBER(itech32_state,bloodstm)
 
 DRIVER_INIT_MEMBER(itech32_state,drivedge)
 {
-	init_program_rom(machine());
+	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 1;
 	m_is_drivedge = 1;
@@ -4167,7 +4164,7 @@ DRIVER_INIT_MEMBER(itech32_state,wcbowl)
 	      ROM   P/N 1079 Rev 1 (contains graphic roms, 4MHz OSC + ITBWL-1 security PIC chip)
 	      Sound P/N 1060 Rev 0 (see Hot Memory PCB layout above)
 	*/
-	init_program_rom(machine());
+	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 1;
 
@@ -4187,7 +4184,7 @@ DRIVER_INIT_MEMBER(itech32_state,wcbowlj)
 	      ROM   P/N 1079 Rev 1 (contains graphic roms, 4MHz OSC + ITBWL-1 security PIC chip)
 	      Sound P/N 1060 Rev 0 (see Hot Memory PCB layout above)
 	*/
-	init_program_rom(machine());
+	init_program_rom();
 	m_vram_height = 1024;
 	m_planes = 1;
 
@@ -4200,90 +4197,87 @@ DRIVER_INIT_MEMBER(itech32_state,wcbowlj)
 }
 
 
-static void init_sftm_common(running_machine &machine, int prot_addr)
+void itech32_state::init_sftm_common(int prot_addr)
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
-	init_program_rom(machine);
-	state->m_vram_height = 1024;
-	state->m_planes = 1;
-	state->m_is_drivedge = 0;
+	init_program_rom();
+	m_vram_height = 1024;
+	m_planes = 1;
+	m_is_drivedge = 0;
 
-	state->m_itech020_prot_address = prot_addr;
+	m_itech020_prot_address = prot_addr;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(itech32_state::itech020_color2_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write32_delegate(FUNC(itech32_state::itech020_color1_w),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(itech32_state::itech020_color2_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write32_delegate(FUNC(itech32_state::itech020_color1_w),this));
 }
 
 
 DRIVER_INIT_MEMBER(itech32_state,sftm)
 {
-	init_sftm_common(machine(), 0x7a6a);
+	init_sftm_common(0x7a6a);
 }
 
 
 DRIVER_INIT_MEMBER(itech32_state,sftm110)
 {
-	init_sftm_common(machine(), 0x7a66);
+	init_sftm_common(0x7a66);
 }
 
 
-static void init_shuffle_bowl_common(running_machine &machine, int prot_addr)
+void itech32_state::init_shuffle_bowl_common(int prot_addr)
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
 	/*
 	    The newest versions of World Class Bowling are on the same exact
 	    platform as Shuffle Shot. So We'll use the same general INIT
 	    routine for these two programs.  IE: PCB P/N 1083 Rev 2
 	*/
-	init_program_rom(machine);
-	state->m_vram_height = 1024;
-	state->m_planes = 1;
-	state->m_is_drivedge = 0;
+	init_program_rom();
+	m_vram_height = 1024;
+	m_planes = 1;
+	m_is_drivedge = 0;
 
-	state->m_itech020_prot_address = prot_addr;
+	m_itech020_prot_address = prot_addr;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(itech32_state::itech020_color2_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write32_delegate(FUNC(itech32_state::itech020_color1_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(itech32_state::itech020_color2_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x380000, 0x380003, write32_delegate(FUNC(itech32_state::itech020_color1_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),this));
 }
 
 
 DRIVER_INIT_MEMBER(itech32_state,shufshot)
 {
-	init_shuffle_bowl_common(machine(), 0x111a);
+	init_shuffle_bowl_common(0x111a);
 }
 
 
 DRIVER_INIT_MEMBER(itech32_state,wcbowln)
 {
 	/* The security PROM is NOT interchangeable between the Deluxe and "normal" versions. */
-	init_shuffle_bowl_common(machine(), 0x1116);
+	init_shuffle_bowl_common(0x1116);
 }
 
-static void install_timekeeper(running_machine &machine)
+void itech32_state::install_timekeeper()
 {
-	device_t *device = machine.device("m48t02");
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(*device, 0x681000, 0x6817ff, FUNC(timekeeper_r), FUNC(timekeeper_w), 0xffffffff);
+	device_t *device = machine().device("m48t02");
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(*device, 0x681000, 0x6817ff, FUNC(timekeeper_r), FUNC(timekeeper_w), 0xffffffff);
 }
 
 DRIVER_INIT_MEMBER(itech32_state,wcbowlt)
 {
 	/* Tournament Version, Same protection memory address as WCB Deluxe, but uses the standard WCB pic ITBWL-3 */
-	init_shuffle_bowl_common(machine(), 0x111a);
+	init_shuffle_bowl_common(0x111a);
 
-	install_timekeeper(machine());
+	install_timekeeper();
 }
 
-static void init_gt_common(running_machine &machine)
+void itech32_state::init_gt_common()
 {
-	itech32_state *state = machine.driver_data<itech32_state>();
-	init_program_rom(machine);
-	state->m_vram_height = 1024;
-	state->m_planes = 2;
-	state->m_is_drivedge = 0;
+	init_program_rom();
+	m_vram_height = 1024;
+	m_planes = 2;
+	m_is_drivedge = 0;
 
-	state->m_itech020_prot_address = 0x112f;
+	m_itech020_prot_address = 0x112f;
 }
 
 
@@ -4297,7 +4291,7 @@ DRIVER_INIT_MEMBER(itech32_state,gt3d)
 	    through GTClassic. This is _NOT_ a factory modification
 	*/
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read32_delegate(FUNC(itech32_state::trackball32_8bit_r),this));
-	init_gt_common(machine());
+	init_gt_common();
 }
 
 
@@ -4311,7 +4305,7 @@ DRIVER_INIT_MEMBER(itech32_state,aama)
 	*/
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x180800, 0x180803, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x181000, 0x181003, read32_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),this));
-	init_gt_common(machine());
+	init_gt_common();
 }
 
 
@@ -4322,7 +4316,7 @@ DRIVER_INIT_MEMBER(itech32_state,aamat)
 	*/
 	DRIVER_INIT_CALL(aama);
 
-	install_timekeeper(machine());
+	install_timekeeper();
 }
 
 
@@ -4335,7 +4329,7 @@ DRIVER_INIT_MEMBER(itech32_state,s_ver)
 	    Trackball info is read through 200202 (actually 200203).
 	*/
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200200, 0x200203, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),this));
-	init_gt_common(machine());
+	init_gt_common();
 }
 
 
@@ -4349,7 +4343,7 @@ DRIVER_INIT_MEMBER(itech32_state,gt3dl)
 	    Player 2 trackball read through 200002
 	*/
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200000, 0x200003, read32_delegate(FUNC(itech32_state::trackball32_4bit_combined_r),this));
-	init_gt_common(machine());
+	init_gt_common();
 }
 
 

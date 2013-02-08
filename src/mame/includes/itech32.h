@@ -163,7 +163,25 @@ public:
 	INTERRUPT_GEN_MEMBER(generate_int1);
 	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
 	TIMER_CALLBACK_MEMBER(scanline_interrupt);
+	inline offs_t compute_safe_address(int x, int y);
+	inline void disable_clipping();
+	inline void enable_clipping();
+	void logblit(const char *tag);
+	void update_interrupts(int fast);
+	void draw_raw(UINT16 *base, UINT16 color);
+	void draw_raw_drivedge(UINT16 *base, UINT16 *zbase, UINT16 color);
+	inline void draw_rle_fast(UINT16 *base, UINT16 color);
+	inline void draw_rle_fast_xflip(UINT16 *base, UINT16 color);
+	inline void draw_rle_slow(UINT16 *base, UINT16 color);
+	void draw_rle(UINT16 *base, UINT16 color);
+	void shiftreg_clear(UINT16 *base, UINT16 *zbase);
+	void handle_video_command();
+	inline int determine_irq_state(int vint, int xint, int qint);
+	void itech32_update_interrupts(int vint, int xint, int qint);
+	void init_program_rom();
+	void init_sftm_common(int prot_addr);
+	void init_shuffle_bowl_common(int prot_addr);
+	void install_timekeeper();
+	void init_gt_common();
 };
 
-/*----------- defined in drivers/itech32.c -----------*/
-void itech32_update_interrupts(running_machine &machine, int vint, int xint, int qint);

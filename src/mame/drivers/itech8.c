@@ -569,30 +569,29 @@ static const via6522_interface via_interface =
  *
  *************************************/
 
-void itech8_update_interrupts(running_machine &machine, int periodic, int tms34061, int blitter)
+void itech8_state::itech8_update_interrupts(int periodic, int tms34061, int blitter)
 {
-	itech8_state *state = machine.driver_data<itech8_state>();
-	device_type main_cpu_type = machine.device("maincpu")->type();
+	device_type main_cpu_type = machine().device("maincpu")->type();
 
 	/* update the states */
-	if (periodic != -1) state->m_periodic_int = periodic;
-	if (tms34061 != -1) state->m_tms34061_int = tms34061;
-	if (blitter != -1) state->m_blitter_int = blitter;
+	if (periodic != -1) m_periodic_int = periodic;
+	if (tms34061 != -1) m_tms34061_int = tms34061;
+	if (blitter != -1) m_blitter_int = blitter;
 
 	/* handle the 6809 case */
 	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
 	{
 		/* just modify lines that have changed */
-		if (periodic != -1) machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
-		if (tms34061 != -1) machine.device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
-		if (blitter != -1) machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
+		if (periodic != -1) machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
+		if (tms34061 != -1) machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
+		if (blitter != -1) machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* handle the 68000 case */
 	else
 	{
-		machine.device("maincpu")->execute().set_input_line(2, state->m_blitter_int ? ASSERT_LINE : CLEAR_LINE);
-		machine.device("maincpu")->execute().set_input_line(3, state->m_periodic_int ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(2, m_blitter_int ? ASSERT_LINE : CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(3, m_periodic_int ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -606,14 +605,14 @@ void itech8_update_interrupts(running_machine &machine, int periodic, int tms340
 
 TIMER_CALLBACK_MEMBER(itech8_state::irq_off)
 {
-	itech8_update_interrupts(machine(), 0, -1, -1);
+	itech8_update_interrupts(0, -1, -1);
 }
 
 
 INTERRUPT_GEN_MEMBER(itech8_state::generate_nmi)
 {
 	/* signal the NMI */
-	itech8_update_interrupts(machine(), 1, -1, -1);
+	itech8_update_interrupts(1, -1, -1);
 	machine().scheduler().timer_set(attotime::from_usec(1), timer_expired_delegate(FUNC(itech8_state::irq_off),this));
 
 	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", machine().primary_screen->vpos());

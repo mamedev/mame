@@ -138,11 +138,12 @@
  *
  *************************************/
 
-static void generate_interrupt(running_machine &machine, int state)
+static void generate_interrupt(running_machine &machine, int state_num)
 {
-	itech8_update_interrupts(machine, -1, state, -1);
+	itech8_state *state = machine.driver_data<itech8_state>();
+	state->itech8_update_interrupts(-1, state_num, -1);
 
-	if (FULL_LOGGING && state) logerror("------------ DISPLAY INT (%d) --------------\n", machine.primary_screen->vpos());
+	if (FULL_LOGGING && state_num) logerror("------------ DISPLAY INT (%d) --------------\n", machine.primary_screen->vpos());
 }
 
 
@@ -215,60 +216,60 @@ WRITE8_MEMBER(itech8_state::itech8_page_w)
  *
  *************************************/
 
-INLINE UINT8 fetch_next_raw(itech8_state *state)
+inline UINT8 itech8_state::fetch_next_raw()
 {
-	return state->m_grom_base[state->m_fetch_offset++ % state->m_grom_size];
+	return m_grom_base[m_fetch_offset++ % m_grom_size];
 }
 
 
-INLINE void consume_raw(itech8_state *state, int count)
+inline void itech8_state::consume_raw(int count)
 {
-	state->m_fetch_offset += count;
+	m_fetch_offset += count;
 }
 
 
-INLINE UINT8 fetch_next_rle(itech8_state *state)
+inline UINT8 itech8_state::fetch_next_rle()
 {
-	if (state->m_fetch_rle_count == 0)
+	if (m_fetch_rle_count == 0)
 	{
-		state->m_fetch_rle_count = state->m_grom_base[state->m_fetch_offset++ % state->m_grom_size];
-		state->m_fetch_rle_literal = state->m_fetch_rle_count & 0x80;
-		state->m_fetch_rle_count &= 0x7f;
+		m_fetch_rle_count = m_grom_base[m_fetch_offset++ % m_grom_size];
+		m_fetch_rle_literal = m_fetch_rle_count & 0x80;
+		m_fetch_rle_count &= 0x7f;
 
-		if (!state->m_fetch_rle_literal)
-			state->m_fetch_rle_value = state->m_grom_base[state->m_fetch_offset++ % state->m_grom_size];
+		if (!m_fetch_rle_literal)
+			m_fetch_rle_value = m_grom_base[m_fetch_offset++ % m_grom_size];
 	}
 
-	state->m_fetch_rle_count--;
-	if (state->m_fetch_rle_literal)
-		state->m_fetch_rle_value = state->m_grom_base[state->m_fetch_offset++ % state->m_grom_size];
+	m_fetch_rle_count--;
+	if (m_fetch_rle_literal)
+		m_fetch_rle_value = m_grom_base[m_fetch_offset++ % m_grom_size];
 
-	return state->m_fetch_rle_value;
+	return m_fetch_rle_value;
 }
 
 
-INLINE void consume_rle(itech8_state *state, int count)
+inline void itech8_state::consume_rle(int count)
 {
 	while (count)
 	{
 		int num_to_consume;
 
-		if (state->m_fetch_rle_count == 0)
+		if (m_fetch_rle_count == 0)
 		{
-			state->m_fetch_rle_count = state->m_grom_base[state->m_fetch_offset++ % state->m_grom_size];
-			state->m_fetch_rle_literal = state->m_fetch_rle_count & 0x80;
-			state->m_fetch_rle_count &= 0x7f;
+			m_fetch_rle_count = m_grom_base[m_fetch_offset++ % m_grom_size];
+			m_fetch_rle_literal = m_fetch_rle_count & 0x80;
+			m_fetch_rle_count &= 0x7f;
 
-			if (!state->m_fetch_rle_literal)
-				state->m_fetch_rle_value = state->m_grom_base[state->m_fetch_offset++ % state->m_grom_size];
+			if (!m_fetch_rle_literal)
+				m_fetch_rle_value = m_grom_base[m_fetch_offset++ % m_grom_size];
 		}
 
-		num_to_consume = (count < state->m_fetch_rle_count) ? count : state->m_fetch_rle_count;
+		num_to_consume = (count < m_fetch_rle_count) ? count : m_fetch_rle_count;
 		count -= num_to_consume;
 
-		state->m_fetch_rle_count -= num_to_consume;
-		if (state->m_fetch_rle_literal)
-			state->m_fetch_offset += num_to_consume;
+		m_fetch_rle_count -= num_to_consume;
+		if (m_fetch_rle_literal)
+			m_fetch_offset += num_to_consume;
 	}
 }
 
@@ -280,12 +281,11 @@ INLINE void consume_rle(itech8_state *state, int count)
  *
  *************************************/
 
-static void perform_blit(address_space &space)
+void itech8_state::perform_blit(address_space &space)
 {
-	itech8_state *state = space.machine().driver_data<itech8_state>();
-	struct tms34061_display &tms_state = state->m_tms_state;
-	UINT8 *blitter_data = state->m_blitter_data;
-	offs_t addr = state->m_tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8);
+	struct tms34061_display &tms_state = m_tms_state;
+	UINT8 *blitter_data = m_blitter_data;
+	offs_t addr = m_tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8);
 	UINT8 shift = (BLITTER_FLAGS & BLITFLAG_SHIFT) ? 4 : 0;
 	int transparent = (BLITTER_FLAGS & BLITFLAG_TRANSPARENT);
 	int ydir = (BLITTER_FLAGS & BLITFLAG_YFLIP) ? -1 : 1;
@@ -304,17 +304,17 @@ static void perform_blit(address_space &space)
 	if (FULL_LOGGING)
 		logerror("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
 				space.machine().primary_screen->vpos(),
-				(state->m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
+				(m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
 				tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8),
 				BLITTER_WIDTH, BLITTER_HEIGHT, BLITTER_FLAGS);
 
 	/* initialize the fetcher */
-	state->m_fetch_offset = (state->m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO;
-	state->m_fetch_rle_count = 0;
+	m_fetch_offset = (m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO;
+	m_fetch_rle_count = 0;
 
 	/* RLE starts with a couple of extra 0's */
 	if (rle)
-		state->m_fetch_offset += 2;
+		m_fetch_offset += 2;
 
 	/* select 4-bit versus 8-bit transparency */
 	if (BLITTER_OUTPUT & 0x40)
@@ -346,9 +346,9 @@ static void perform_blit(address_space &space)
 		/* skip src and dest */
 		addr += xdir * (width + skip[0] + skip[1]);
 		if (rle)
-			consume_rle(state, width + skip[0] + skip[1]);
+			consume_rle(width + skip[0] + skip[1]);
 		else
-			consume_raw(state, width + skip[0] + skip[1]);
+			consume_raw(width + skip[0] + skip[1]);
 
 		/* back up one and reverse directions */
 		addr -= xdir;
@@ -363,14 +363,14 @@ static void perform_blit(address_space &space)
 		/* skip left */
 		addr += xdir * skip[y & 1];
 		if (rle)
-			consume_rle(state, skip[y & 1]);
+			consume_rle(skip[y & 1]);
 		else
-			consume_raw(state, skip[y & 1]);
+			consume_raw(skip[y & 1]);
 
 		/* loop over width */
 		for (x = 0; x < width; x++)
 		{
-			UINT8 pix = rle ? fetch_next_rle(state) : fetch_next_raw(state);
+			UINT8 pix = rle ? fetch_next_rle() : fetch_next_raw();
 
 			/* swap pixels for X flip in 4bpp mode */
 			if (xflip && transmaskhi != 0xff)
@@ -399,9 +399,9 @@ static void perform_blit(address_space &space)
 		/* skip right */
 		addr += xdir * skip[~y & 1];
 		if (rle)
-			consume_rle(state, skip[~y & 1]);
+			consume_rle(skip[~y & 1]);
 		else
-			consume_raw(state, skip[~y & 1]);
+			consume_raw(skip[~y & 1]);
 
 		/* back up one and reverse directions */
 		addr -= xdir;
@@ -423,7 +423,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::blitter_done)
 {
 	/* turn off blitting and generate an interrupt */
 	m_blit_in_progress = 0;
-	itech8_update_interrupts(machine(), -1, -1, 1);
+	itech8_update_interrupts(-1, -1, 1);
 
 	if (FULL_LOGGING) logerror("------------ BLIT DONE (%d) --------------\n", machine().primary_screen->vpos());
 }
@@ -450,7 +450,7 @@ READ8_MEMBER(itech8_state::itech8_blitter_r)
 	/* a read from offset 3 clears the interrupt and returns the status */
 	if (offset == 3)
 	{
-		itech8_update_interrupts(machine(), -1, -1, 0);
+		itech8_update_interrupts(-1, -1, 0);
 		if (m_blit_in_progress)
 			result |= 0x80;
 		else

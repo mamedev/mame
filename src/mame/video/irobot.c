@@ -76,16 +76,15 @@ WRITE8_MEMBER(irobot_state::irobot_paletteram_w)
 }
 
 
-static void _irobot_poly_clear(running_machine &machine, UINT8 *bitmap_base)
+void irobot_state::_irobot_poly_clear(UINT8 *bitmap_base)
 {
-	memset(bitmap_base, 0, BITMAP_WIDTH * machine.primary_screen->height());
+	memset(bitmap_base, 0, BITMAP_WIDTH * machine().primary_screen->height());
 }
 
-void irobot_poly_clear(running_machine &machine)
+void irobot_state::irobot_poly_clear()
 {
-	irobot_state *state = machine.driver_data<irobot_state>();
-	UINT8 *bitmap_base = state->m_bufsel ? state->m_polybitmap2 : state->m_polybitmap1;
-	_irobot_poly_clear(machine, bitmap_base);
+	UINT8 *bitmap_base = m_bufsel ? m_polybitmap2 : m_polybitmap1;
+	_irobot_poly_clear(bitmap_base);
 }
 
 
@@ -102,8 +101,8 @@ void irobot_state::video_start()
 	m_polybitmap2 = auto_alloc_array(machine(), UINT8, BITMAP_WIDTH * height);
 
 	/* clear the bitmaps so we start with valid palette look-up values for drawing */
-	_irobot_poly_clear(machine(), m_polybitmap1);
-	_irobot_poly_clear(machine(), m_polybitmap2);
+	_irobot_poly_clear(m_polybitmap1);
+	_irobot_poly_clear(m_polybitmap2);
 
 	/* Set clipping */
 	m_ir_xmin = m_ir_ymin = 0;
@@ -162,9 +161,8 @@ void irobot_state::video_start()
      modified from a routine written by Andrew Caldwell
  */
 
-static void draw_line(running_machine &machine, UINT8 *polybitmap, int x1, int y1, int x2, int y2, int col)
+void irobot_state::draw_line(UINT8 *polybitmap, int x1, int y1, int x2, int y2, int col)
 {
-	irobot_state *state = machine.driver_data<irobot_state>();
 	int dx,dy,sx,sy,cx,cy;
 
 	dx = abs(x1-x2);
@@ -178,7 +176,7 @@ static void draw_line(running_machine &machine, UINT8 *polybitmap, int x1, int y
 	{
 		for (;;)
 		{
-			if (x1 >= state->m_ir_xmin && x1 < state->m_ir_xmax && y1 >= state->m_ir_ymin && y1 < state->m_ir_ymax)
+			if (x1 >= m_ir_xmin && x1 < m_ir_xmax && y1 >= m_ir_ymin && y1 < m_ir_ymax)
 					draw_pixel (x1, y1, col);
 				if (x1 == x2) break;
 				x1 += sx;
@@ -194,7 +192,7 @@ static void draw_line(running_machine &machine, UINT8 *polybitmap, int x1, int y
 	{
 		for (;;)
 		{
-			if (x1 >= state->m_ir_xmin && x1 < state->m_ir_xmax && y1 >= state->m_ir_ymin && y1 < state->m_ir_ymax)
+			if (x1 >= m_ir_xmin && x1 < m_ir_xmax && y1 >= m_ir_ymin && y1 < m_ir_ymax)
 				draw_pixel (x1, y1, col);
 			if (y1 == y2) break;
 			y1 += sy;
@@ -211,11 +209,10 @@ static void draw_line(running_machine &machine, UINT8 *polybitmap, int x1, int y
 
 #define ROUND_TO_PIXEL(x)   ((x >> 7) - 128)
 
-void irobot_run_video(running_machine &machine)
+void irobot_state::irobot_run_video()
 {
-	irobot_state *state = machine.driver_data<irobot_state>();
 	UINT8 *polybitmap;
-	UINT16 *combase16 = (UINT16 *)state->m_combase;
+	UINT16 *combase16 = (UINT16 *)m_combase;
 	int sx,sy,ex,ey,sx2,ey2;
 	int color;
 	UINT32 d1;
@@ -223,12 +220,12 @@ void irobot_run_video(running_machine &machine)
 	int shp;
 	INT32 word1,word2;
 
-	logerror("Starting Polygon Generator, Clear=%d\n",state->m_vg_clear);
+	logerror("Starting Polygon Generator, Clear=%d\n",m_vg_clear);
 
-	if (state->m_bufsel)
-		polybitmap = state->m_polybitmap2;
+	if (m_bufsel)
+		polybitmap = m_polybitmap2;
 	else
-		polybitmap = state->m_polybitmap1;
+		polybitmap = m_polybitmap1;
 
 	lpnt=0;
 	while (lpnt < 0x7ff)
@@ -249,7 +246,7 @@ void irobot_run_video(running_machine &machine)
 				color = sy & 0x3f;
 				sx = ROUND_TO_PIXEL(sx);
 				sy = ROUND_TO_PIXEL(sy);
-				if (sx >= state->m_ir_xmin && sx < state->m_ir_xmax && sy >= state->m_ir_ymin && sy < state->m_ir_ymax)
+				if (sx >= m_ir_xmin && sx < m_ir_xmax && sy >= m_ir_ymin && sy < m_ir_ymax)
 					draw_pixel(sx,sy,color);
 				spnt+=2;
 			}//while object
@@ -269,7 +266,7 @@ void irobot_run_video(running_machine &machine)
 				sx = combase16[spnt+3];
 				word1 = (INT16)combase16[spnt+2];
 				ex = sx + word1 * (ey - sy + 1);
-				draw_line(machine, polybitmap, ROUND_TO_PIXEL(sx),sy,ROUND_TO_PIXEL(ex),ey,color);
+				draw_line(polybitmap, ROUND_TO_PIXEL(sx),sy,ROUND_TO_PIXEL(ex),ey,color);
 				spnt+=4;
 			}//while object
 		}//if line
@@ -303,15 +300,15 @@ void irobot_run_video(running_machine &machine)
 
 				while(1)
 				{
-					if (sy >= state->m_ir_ymin && sy < state->m_ir_ymax)
+					if (sy >= m_ir_ymin && sy < m_ir_ymax)
 					{
 						int x1 = ROUND_TO_PIXEL(sx);
 						int x2 = ROUND_TO_PIXEL(sx2);
 						int temp;
 
 						if (x1 > x2) temp = x1, x1 = x2, x2 = temp;
-						if (x1 < state->m_ir_xmin) x1 = state->m_ir_xmin;
-						if (x2 >= state->m_ir_xmax) x2 = state->m_ir_xmax - 1;
+						if (x1 < m_ir_xmin) x1 = m_ir_xmin;
+						if (x2 >= m_ir_xmax) x2 = m_ir_xmax - 1;
 						if (x1 < x2)
 							fill_hline(x1 + 1, x2, sy, color);
 					}

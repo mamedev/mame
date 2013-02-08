@@ -104,13 +104,13 @@ public:
 	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
 	TIMER_CALLBACK_MEMBER(blitter_done);
 	TIMER_DEVICE_CALLBACK_MEMBER(grmatch_palette_update);
+	inline UINT8 fetch_next_raw();
+	inline void consume_raw(int count);
+	inline UINT8 fetch_next_rle();
+	inline void consume_rle(int count);
+	void perform_blit(address_space &space);
+	void itech8_update_interrupts(int periodic, int tms34061, int blitter);
 };
-
-
-/*----------- defined in drivers/itech8.c -----------*/
-
-void itech8_update_interrupts(running_machine &machine, int periodic, int tms34061, int blitter);
-
 
 /*----------- defined in machine/slikshot.c -----------*/
 
