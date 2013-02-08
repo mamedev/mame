@@ -28,11 +28,8 @@
 
 #include "emu.h"
 #include "cpu/arm/arm.h"
-#include "sound/dac.h"
 #include "includes/archimds.h"
-#include "machine/i2cmem.h"
 #include "debugger.h"
-#include "machine/wd17xx.h"
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 static const UINT32 pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
@@ -45,11 +42,14 @@ void archimedes_state::archimedes_request_irq_a(int mask)
 	m_ioc_regs[IRQ_STATUS_A] |= mask;
 
 	if (m_ioc_regs[IRQ_STATUS_A] & m_ioc_regs[IRQ_MASK_A])
-		machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
+	{
+		m_maincpu->set_input_line(ARM_IRQ_LINE, ASSERT_LINE);
+	}
 
 	if ((m_ioc_regs[IRQ_STATUS_A] & m_ioc_regs[IRQ_MASK_A]) == 0)
-		machine().device("maincpu")->execute().set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
-
+	{
+		m_maincpu->set_input_line(ARM_IRQ_LINE, CLEAR_LINE);
+	}
 }
 
 void archimedes_state::archimedes_request_irq_b(int mask)
@@ -58,7 +58,7 @@ void archimedes_state::archimedes_request_irq_b(int mask)
 
 	if (m_ioc_regs[IRQ_STATUS_B] & m_ioc_regs[IRQ_MASK_B])
 	{
-		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM_IRQ_LINE, 1);
+		generic_pulse_irq_line(m_maincpu, ARM_IRQ_LINE, 1);
 	}
 }
 
@@ -68,7 +68,7 @@ void archimedes_state::archimedes_request_fiq(int mask)
 
 	if (m_ioc_regs[FIQ_STATUS] & m_ioc_regs[FIQ_MASK])
 	{
-		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM_FIRQ_LINE, 1);
+		generic_pulse_irq_line(m_maincpu, ARM_FIRQ_LINE, 1);
 	}
 }
 
@@ -113,8 +113,8 @@ void archimedes_state::vidc_vblank()
 /* TODO: what type of DMA this is, burst or cycle steal? Docs doesn't explain it (4 usec is the DRAM refresh). */
 void archimedes_state::vidc_video_tick()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	static UINT8 *vram = machine().root_device().memregion("vram")->base();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	static UINT8 *vram = m_region_vram->base();
 	UINT32 size;
 
 	size = m_vidc_vidend-m_vidc_vidstart+0x10;
@@ -131,11 +131,10 @@ void archimedes_state::vidc_video_tick()
 /* audio DMA */
 void archimedes_state::vidc_audio_tick()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT8 ulaw_comp;
 	INT16 res;
 	UINT8 ch;
-	static const char *const dac_port[8] = { "dac0", "dac1", "dac2", "dac3", "dac4", "dac5", "dac6", "dac7" };
 	static const INT16 mulawTable[256] =
 	{
 		-32124,-31100,-30076,-29052,-28028,-27004,-25980,-24956,
@@ -180,7 +179,7 @@ void archimedes_state::vidc_audio_tick()
 
 		res = mulawTable[ulaw_comp];
 
-		machine().device<dac_device>(dac_port[ch & 7])->write_signed16(res^0x8000);
+		m_dac[ch & 7]->write_signed16(res^0x8000);
 	}
 
 	m_vidc_sndcur+=8;
@@ -194,7 +193,9 @@ void archimedes_state::vidc_audio_tick()
 		{
 			m_snd_timer->adjust(attotime::never);
 			for(ch=0;ch<8;ch++)
-				machine().device<dac_device>(dac_port[ch & 7])->write_signed16(0x8000);
+			{
+				m_dac[ch & 7]->write_signed16(0x8000);
+			}
 		}
 	}
 }
@@ -259,6 +260,8 @@ void archimedes_state::archimedes_reset()
 
 void archimedes_state::archimedes_init()
 {
+	static const char *const dac_names[8] = { "dac0", "dac1", "dac2", "dac3", "dac4", "dac5", "dac6", "dac7" };
+
 	m_memc_pagesize = 0;
 
 	m_vbl_timer = timer_alloc(TIMER_VBLANK);
@@ -276,6 +279,11 @@ void archimedes_state::archimedes_init()
 	m_vid_timer = timer_alloc(TIMER_VIDEO);
 	m_snd_timer = timer_alloc(TIMER_AUDIO);
 	m_snd_timer->adjust(attotime::never);
+
+	for ( int i = 0; i < 8; i++ )
+	{
+		m_dac[i] = machine().device<dac_device>(dac_names[i]);
+	}
 }
 
 READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)
@@ -287,7 +295,7 @@ READ32_MEMBER(archimedes_state::archimedes_memc_logical_r)
 	{
 		UINT32 *rom;
 
-		rom = (UINT32 *)machine().root_device().memregion("maincpu")->base();
+		rom = (UINT32 *)m_region_maincpu->base();
 
 		return rom[offset & 0x1fffff];
 	}
@@ -353,7 +361,7 @@ READ32_MEMBER(archimedes_state::aristmk5_drame_memc_logical_r)
 	{
 		UINT32 *rom;
 
-		rom = (UINT32 *)machine().root_device().memregion("maincpu")->base();
+		rom = (UINT32 *)m_region_maincpu->base();
 
 		return rom[offset & 0x1fffff];
 	}
@@ -394,8 +402,8 @@ READ32_MEMBER(archimedes_state::aristmk5_drame_memc_logical_r)
 
 void archimedes_state::archimedes_driver_init()
 {
-	m_archimedes_memc_physmem = reinterpret_cast<UINT32 *>(machine().root_device().memshare("physicalram")->ptr());
-//  address_space &space = machine.device<arm_device>("maincpu")->space(AS_PROGRAM);
+	m_archimedes_memc_physmem = reinterpret_cast<UINT32 *>(memshare("physicalram")->ptr());
+//  address_space &space = m_maincpu->space(AS_PROGRAM);
 //  space.set_direct_update_handler(direct_update_delegate(FUNC(a310_setopbase), &machine));
 }
 
@@ -446,20 +454,23 @@ void archimedes_state::latch_timer_cnt(int tmr)
 READ32_MEMBER( archimedes_state::ioc_ctrl_r )
 {
 	if(IOC_LOG)
-	logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], m_ioc_regs[offset&0x1f], space.device() .safe_pc( ),offset & 0x1f);
+	logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], m_ioc_regs[offset&0x1f], m_maincpu->pc(),offset & 0x1f);
 
 	switch (offset & 0x1f)
 	{
 		case CONTROL:
 		{
-			UINT8 i2c_data;
+			UINT8 i2c_data = 1;
 			static UINT8 flyback; //internal name for vblank here
 			int vert_pos;
 
 			vert_pos = machine().primary_screen->vpos();
 			flyback = (vert_pos <= m_vidc_regs[VIDC_VDSR] || vert_pos >= m_vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
 
-			i2c_data = (i2cmem_sda_read(space.machine().device("i2cmem")) & 1);
+			if ( m_i2cmem )
+			{
+				i2c_data = (i2cmem_sda_read(m_i2cmem) & 1);
+			}
 
 			return (flyback) | (m_ioc_regs[CONTROL] & 0x7c) | (m_i2c_clk<<1) | i2c_data;
 		}
@@ -524,8 +535,11 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 	{
 		case CONTROL:   // I2C bus control
 			//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
-			i2cmem_sda_write(machine().device("i2cmem"), data & 0x01);
-			i2cmem_scl_write(machine().device("i2cmem"), (data & 0x02) >> 1);
+			if ( m_i2cmem )
+			{
+				i2cmem_sda_write(m_i2cmem, data & 0x01);
+				i2cmem_scl_write(m_i2cmem, (data & 0x02) >> 1);
+			}
 			m_i2c_clk = (data & 2) >> 1;
 			break;
 
@@ -632,7 +646,6 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 {
 	UINT32 ioc_addr;
-	device_t *fdc = (device_t *)space.machine().device("wd1772");
 
 	ioc_addr = offset*4;
 
@@ -649,9 +662,9 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 			{
 				case 0: return ioc_ctrl_r(space,offset,mem_mask);
 				case 1:
-					if (fdc) {
+					if (m_wd1772) {
 						logerror("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
-						return wd17xx_data_r(fdc, space, offset&0xf);
+						return wd17xx_data_r(m_wd1772, space, offset&0xf);
 					} else {
 						logerror("Read from FDC device?\n");
 						return 0;
@@ -666,7 +679,7 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 					logerror("IOC: Internal Podule Read\n");
 					return 0xffff;
 				case 5:
-					if (fdc) {
+					if (m_wd1772) {
 						switch(ioc_addr & 0xfffc)
 						{
 							case 0x50: return 0; //fdc type, new model returns 5 here
@@ -688,7 +701,6 @@ READ32_MEMBER(archimedes_state::archimedes_ioc_r)
 WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 {
 	UINT32 ioc_addr;
-	device_t *fdc = (device_t *)space.machine().device("wd1772");
 
 	ioc_addr = offset*4;
 
@@ -705,9 +717,9 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 			{
 				case 0: ioc_ctrl_w(space,offset,data,mem_mask); return;
 				case 1:
-						if (fdc) {
+						if (m_wd1772) {
 							logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
-							wd17xx_data_w(fdc, space, offset&0xf, data&0xff);
+							wd17xx_data_w(m_wd1772, space, offset&0xf, data&0xff);
 						} else {
 							logerror("Write to FDC device?\n");
 						}
@@ -722,20 +734,20 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 					logerror("IOC: Internal Podule Write\n");
 					return;
 				case 5:
-					if (fdc) {
+					if (m_wd1772) {
 						switch(ioc_addr & 0xfffc)
 						{
 							case 0x18: // latch B
-								wd17xx_dden_w(fdc, BIT(data, 1));
+								wd17xx_dden_w(m_wd1772, BIT(data, 1));
 								return;
 
 							case 0x40: // latch A
-								if (data & 1) { wd17xx_set_drive(fdc,0); }
-								if (data & 2) { wd17xx_set_drive(fdc,1); }
-								if (data & 4) { wd17xx_set_drive(fdc,2); }
-								if (data & 8) { wd17xx_set_drive(fdc,3); }
+								if (data & 1) { wd17xx_set_drive(m_wd1772,0); }
+								if (data & 2) { wd17xx_set_drive(m_wd1772,1); }
+								if (data & 4) { wd17xx_set_drive(m_wd1772,2); }
+								if (data & 8) { wd17xx_set_drive(m_wd1772,3); }
 
-								wd17xx_set_side(fdc,(data & 0x10)>>4);
+								wd17xx_set_side(m_wd1772,(data & 0x10)>>4);
 								//bit 5 is motor on
 								return;
 						}

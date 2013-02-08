@@ -8,6 +8,9 @@
 #define _ARCHIMEDES_H_
 
 #include "machine/aakart.h"
+#include "sound/dac.h"
+#include "machine/i2cmem.h"
+#include "machine/wd17xx.h"
 
 // interrupt definitions.  these are for the real Archimedes computer - arcade
 // and gambling knockoffs likely are a bit different.
@@ -40,9 +43,14 @@ class archimedes_state : public driver_device
 {
 public:
 	archimedes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_kart(*this, "kart")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_kart(*this, "kart")
+		, m_maincpu(*this, "maincpu")
+		, m_i2cmem(*this, "i2cmem")
+		, m_wd1772(*this, "wd1772")
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_vram(*this, "vram")
+	{ }
 
 	optional_device<aakart_device> m_kart;
 	void archimedes_init();
@@ -78,6 +86,15 @@ public:
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	optional_device<device_t> m_i2cmem;
+	optional_device<device_t> m_wd1772;
+	required_memory_region m_region_maincpu;
+	required_memory_region m_region_vram;
+	dac_device *m_dac[8];
+
 private:
 
 	static const device_timer_id TIMER_VBLANK = 0;
