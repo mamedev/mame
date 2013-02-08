@@ -25,14 +25,34 @@ class special_state : public driver_device
 {
 public:
 	special_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_ppi(*this, "ppi8255"),
-	m_fdc(*this, "fd1793"),
-	m_dac(*this, "dac"),
-	m_cass(*this, CASSETTE_TAG),
-	m_ram(*this, RAM_TAG),
-	m_p_videoram(*this, "p_videoram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ppi(*this, "ppi8255")
+		, m_fdc(*this, "fd1793")
+		, m_dac(*this, "dac")
+		, m_cass(*this, CASSETTE_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_p_videoram(*this, "p_videoram")
+		, m_region_maincpu(*this, "maincpu")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_bank5(*this, "bank5")
+		, m_bank6(*this, "bank6")
+		, m_io_line0(*this, "LINE0")
+		, m_io_line1(*this, "LINE1")
+		, m_io_line2(*this, "LINE2")
+		, m_io_line3(*this, "LINE3")
+		, m_io_line4(*this, "LINE4")
+		, m_io_line5(*this, "LINE5")
+		, m_io_line6(*this, "LINE6")
+		, m_io_line7(*this, "LINE7")
+		, m_io_line8(*this, "LINE8")
+		, m_io_line9(*this, "LINE9")
+		, m_io_line10(*this, "LINE10")
+		, m_io_line11(*this, "LINE11")
+		, m_io_line12(*this, "LINE12")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(specimx_select_bank);
@@ -97,6 +117,28 @@ public:
 	TIMER_CALLBACK_MEMBER(setup_pit8253_gates);
 	void fdc_drq(bool state);
 	DECLARE_FLOPPY_FORMATS( specimx_floppy_formats );
+
+protected:
+	required_memory_region m_region_maincpu;
+	required_memory_bank m_bank1;
+	optional_memory_bank m_bank2;
+	optional_memory_bank m_bank3;
+	optional_memory_bank m_bank4;
+	optional_memory_bank m_bank5;
+	optional_memory_bank m_bank6;
+	required_ioport m_io_line0;
+	required_ioport m_io_line1;
+	required_ioport m_io_line2;
+	required_ioport m_io_line3;
+	required_ioport m_io_line4;
+	required_ioport m_io_line5;
+	required_ioport m_io_line6;
+	required_ioport m_io_line7;
+	required_ioport m_io_line8;
+	required_ioport m_io_line9;
+	required_ioport m_io_line10;
+	required_ioport m_io_line11;
+	required_ioport m_io_line12;
 };
 
 
