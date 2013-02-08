@@ -15,7 +15,7 @@
 #include "includes/liberate.h"
 
 #if 0
-void debug_print(bitmap_ind16 &bitmap)
+void liberate_state::debug_print(bitmap_ind16 &bitmap)
 {
 	int i, j;
 	char buf[20 * 16];
@@ -278,10 +278,9 @@ PALETTE_INIT_MEMBER(liberate_state,liberate)
 
 /***************************************************************************/
 
-static void liberate_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void liberate_state::liberate_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	liberate_state *state = machine.driver_data<liberate_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	/* Sprites */
@@ -314,7 +313,7 @@ static void liberate_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		if (multi && fy == 0)
 			sy -= 16;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -333,13 +332,13 @@ static void liberate_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 				sy2 = sy + 16;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					code,
 					color,
 					fx,fy,
 					sx,sy,0);
 		if (multi)
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					code+1,
 					color,
 					fx,fy,
@@ -347,11 +346,10 @@ static void liberate_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	}
 }
 
-static void prosport_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void liberate_state::prosport_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	liberate_state *state = machine.driver_data<liberate_state>();
 	int offs, multi, fx, fy, sx, sy, sy2, code, code2, color, gfx_region;
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 
 	for (offs = 0x000; offs < 0x800; offs += 4)
 	{
@@ -361,10 +359,10 @@ static void prosport_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		code = spriteram[offs + 1] + ((spriteram[offs + 0] & 0x3) << 8);
 		code2 = code + 1;
 
-		if(state->m_io_ram[0] & 0x40) //dynamic ram-based gfxs for Pro Golf
+		if(m_io_ram[0] & 0x40) //dynamic ram-based gfxs for Pro Golf
 			gfx_region = 3 + 4;
 		else
-			gfx_region = ((state->m_io_ram[0] & 0x30) >> 4) + 4;
+			gfx_region = ((m_io_ram[0] & 0x30) >> 4) + 4;
 
 
 		multi = spriteram[offs + 0] & 0x10;
@@ -376,7 +374,7 @@ static void prosport_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 //      sy = (240 - spriteram[offs + 2]);//-16;
 		sy = 240 - sy;
 
-		color = 1;//(state->m_io_ram[4] & 2) + 1;//(spriteram[offs + 0] & 0x4) >> 2;
+		color = 1;//(m_io_ram[4] & 2) + 1;//(spriteram[offs + 0] & 0x4) >> 2;
 
 		fy = spriteram[offs + 0] & 0x02;
 		fx = spriteram[offs + 0] & 0x04;
@@ -385,7 +383,7 @@ static void prosport_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 //      if (multi) sy -= 16;
 		if ((fy && multi) || (fx && multi)) { code2 = code; code++; }
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -398,13 +396,13 @@ static void prosport_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 			sy2 = sy + 16;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[gfx_region],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[gfx_region],
 				code,
 				color,
 				fx,fy,
 				sx,sy,0);
 		if (multi)
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[gfx_region],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[gfx_region],
 				code2,
 				color,
 				fx,fy,
@@ -412,10 +410,9 @@ static void prosport_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	}
 }
 
-static void boomrang_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void liberate_state::boomrang_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	liberate_state *state = machine.driver_data<liberate_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs, multi, fx, fy, sx, sy, sy2, code, code2, color;
 
 	for (offs = 0x000; offs < 0x800; offs += 4)
@@ -446,7 +443,7 @@ static void boomrang_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 //      if (multi) sy -= 16;
 		if (fy && multi) { code2 = code; code++; }
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -459,13 +456,13 @@ static void boomrang_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 			sy2 = sy + 16;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code,
 				color,
 				fx,fy,
 				sx,sy,0);
 		if (multi)
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code2,
 				color,
 				fx,fy,
@@ -473,10 +470,9 @@ static void boomrang_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	}
 }
 
-static void prosoccr_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void liberate_state::prosoccr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	liberate_state *state = machine.driver_data<liberate_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs, code, fx, fy, sx, sy;
 
 	for (offs = 0x000; offs < 0x400; offs += 4)
@@ -490,7 +486,7 @@ static void prosoccr_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		fx = spriteram[offs + 0] & 4;
 		fy = spriteram[offs + 0] & 2;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code,
 				0,
 				fx,fy,
@@ -511,7 +507,7 @@ UINT32 liberate_state::screen_update_prosoccr(screen_device &screen, bitmap_ind1
 		m_back_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
-	prosoccr_draw_sprites(machine(), bitmap, cliprect);
+	prosoccr_draw_sprites(bitmap, cliprect);
 
 	return 0;
 }
@@ -554,7 +550,7 @@ UINT32 liberate_state::screen_update_prosport(screen_device &screen, bitmap_ind1
 				tile, 1, 0, 0, 248 - 8 * mx, 8 * my, 0);
 	}
 
-	prosport_draw_sprites(machine(), bitmap, cliprect);
+	prosport_draw_sprites(bitmap, cliprect);
 
 	return 0;
 }
@@ -569,11 +565,11 @@ UINT32 liberate_state::screen_update_boomrang(screen_device &screen, bitmap_ind1
 	else
 		m_back_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 
-	boomrang_draw_sprites(machine(),bitmap,cliprect,8);
+	boomrang_draw_sprites(bitmap,cliprect,8);
 	if (!m_background_disable)
 		m_back_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 
-	boomrang_draw_sprites(machine(), bitmap, cliprect, 0);
+	boomrang_draw_sprites(bitmap, cliprect, 0);
 	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -588,7 +584,7 @@ UINT32 liberate_state::screen_update_liberate(screen_device &screen, bitmap_ind1
 	else
 		m_back_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	liberate_draw_sprites(machine(), bitmap, cliprect);
+	liberate_draw_sprites(bitmap, cliprect);
 	m_fix_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

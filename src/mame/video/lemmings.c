@@ -107,10 +107,10 @@ WRITE16_MEMBER(lemmings_state::lemmings_vram_w)
 }
 
 
-void lemmings_copy_bitmap(running_machine &machine, bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect)
+void lemmings_state::lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect)
 {
 	int y,x;
-	const pen_t *paldata = machine.pens;
+	const pen_t *paldata = machine().pens;
 
 	for (y=cliprect.min_y; y<cliprect.max_y;y++)
 	{
@@ -144,17 +144,17 @@ UINT32 lemmings_state::screen_update_lemmings(screen_device &screen, bitmap_rgb3
 	/* Pixel layer can be windowed in hardware (two player mode) */
 	if ((m_control_data[6] & 2) == 0)
 	{
-		lemmings_copy_bitmap(machine(), bitmap, m_bitmap0, &x1, &y, cliprect);
+		lemmings_copy_bitmap(bitmap, m_bitmap0, &x1, &y, cliprect);
 	}
 	else
 	{
 		rect.max_x = 159;
 		rect.min_x = 0;
-		lemmings_copy_bitmap(machine(), bitmap, m_bitmap0, &x0, &y, rect);
+		lemmings_copy_bitmap(bitmap, m_bitmap0, &x0, &y, rect);
 
 		rect.max_x = 319;
 		rect.min_x = 160;
-		lemmings_copy_bitmap(machine(), bitmap, m_bitmap0, &x1, &y, rect);
+		lemmings_copy_bitmap(bitmap, m_bitmap0, &x1, &y, rect);
 	}
 
 	m_sprgen2->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0800, 0x0800, 0x200, 0xff);

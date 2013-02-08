@@ -224,13 +224,12 @@ VIDEO_START_MEMBER(ladybug_state,sraider)
 	m_bg_tilemap->set_transparent_pen(0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void ladybug_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 2 * 0x40; offs >= 2 * 0x40; offs -= 0x40)
+	for (offs = m_spriteram.bytes() - 2 * 0x40; offs >= 2 * 0x40; offs -= 0x40)
 	{
 		int i = 0;
 
@@ -257,14 +256,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			if (spriteram[offs + i] & 0x80)
 			{
 				if (spriteram[offs + i] & 0x40) /* 16x16 */
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 							(spriteram[offs + i + 1] >> 2) + 4 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
 							spriteram[offs + i + 3],
 							offs / 4 - 8 + (spriteram[offs + i] & 0x0f),0);
 				else    /* 8x8 */
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 							spriteram[offs + i + 1] + 16 * (spriteram[offs + i + 2] & 0x10),
 							spriteram[offs + i + 2] & 0x0f,
 							spriteram[offs + i] & 0x20,spriteram[offs + i] & 0x10,
@@ -294,7 +293,7 @@ UINT32 ladybug_state::screen_update_ladybug(screen_device &screen, bitmap_ind16 
 	}
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -357,7 +356,7 @@ UINT32 ladybug_state::screen_update_sraider(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, flip_screen());
 
 	// now the sprites
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	return 0;
 }

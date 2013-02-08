@@ -181,7 +181,7 @@ WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
 	// Update light guns positions
 	for (i = 0; i < 2; i++)
 		if ( (data & (0x04 << i)) && !(m_old & (0x04 << i)) )
-			lordgun_update_gun(machine(), i);
+			lordgun_update_gun(i);
 
 	// latch the bit
 	eeprom->write_bit(data & 0x40);

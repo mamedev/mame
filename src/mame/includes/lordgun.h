@@ -68,8 +68,12 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_3);
 	virtual void video_start();
 	UINT32 screen_update_lordgun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	inline void get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_);
+	inline void lordgun_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _N_);
+	void lorddgun_calc_gun_scr(int i);
+	void lordgun_update_gun(int i);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/lordgun.c -----------*/
 float lordgun_crosshair_mapper(const ioport_field *field, float linear_value);
-void lordgun_update_gun(running_machine &machine, int i);

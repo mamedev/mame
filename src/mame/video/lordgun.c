@@ -61,31 +61,29 @@ WRITE16_MEMBER(lordgun_state::lordgun_paletteram_w)
 ***************************************************************************/
 
 
-INLINE void get_tile_info(running_machine &machine, tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
+inline void lordgun_state::get_tile_info(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
-	lordgun_state *state = machine.driver_data<lordgun_state>();
-	UINT16 attr = state->m_vram[_N_][tile_index * 2 + 0 ];
-	UINT16 code = state->m_vram[_N_][ tile_index * 2 + 1 ];
+	UINT16 attr = m_vram[_N_][tile_index * 2 + 0 ];
+	UINT16 code = m_vram[_N_][ tile_index * 2 + 1 ];
 	UINT16 pri  = (attr & 0x0e00) >> 9;
-	SET_TILE_INFO( _N_, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((_N_ + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
+	SET_TILE_INFO_MEMBER( _N_, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((_N_ + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
-TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_0){ get_tile_info(machine(), tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_1){ get_tile_info(machine(), tileinfo, tile_index, 1); }
-TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_2){ get_tile_info(machine(), tileinfo, tile_index, 2); }
-TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_3){ get_tile_info(machine(), tileinfo, tile_index, 3); }
+TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0); }
+TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 1); }
+TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 2); }
+TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 3); }
 
-INLINE void lordgun_vram_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
+inline void lordgun_state::lordgun_vram_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _N_)
 {
-	lordgun_state *state = space.machine().driver_data<lordgun_state>();
-	COMBINE_DATA(&state->m_vram[_N_][offset]);
-	state->m_tilemap[_N_]->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_vram[_N_][offset]);
+	m_tilemap[_N_]->mark_tile_dirty(offset/2);
 }
 
-WRITE16_MEMBER(lordgun_state::lordgun_vram_0_w){ lordgun_vram_w(space, offset, data, mem_mask, 0); }
-WRITE16_MEMBER(lordgun_state::lordgun_vram_1_w){ lordgun_vram_w(space, offset, data, mem_mask, 1); }
-WRITE16_MEMBER(lordgun_state::lordgun_vram_2_w){ lordgun_vram_w(space, offset, data, mem_mask, 2); }
-WRITE16_MEMBER(lordgun_state::lordgun_vram_3_w){ lordgun_vram_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(lordgun_state::lordgun_vram_0_w){ lordgun_vram_w(offset, data, mem_mask, 0); }
+WRITE16_MEMBER(lordgun_state::lordgun_vram_1_w){ lordgun_vram_w(offset, data, mem_mask, 1); }
+WRITE16_MEMBER(lordgun_state::lordgun_vram_2_w){ lordgun_vram_w(offset, data, mem_mask, 2); }
+WRITE16_MEMBER(lordgun_state::lordgun_vram_3_w){ lordgun_vram_w(offset, data, mem_mask, 3); }
 
 /***************************************************************************
 
@@ -182,32 +180,30 @@ float lordgun_crosshair_mapper(ioport_field *field, float linear_value)
 	return lordgun_gun_x_table[x] * 1.0f / 0x1BF;
 }
 
-static void lorddgun_calc_gun_scr(running_machine &machine, int i)
+void lordgun_state::lorddgun_calc_gun_scr(int i)
 {
-	lordgun_state *state = machine.driver_data<lordgun_state>();
-//  popmessage("%03x, %02x", machine, "LIGHT0_X"), state->ioport("LIGHT0_Y")->read());
+//  popmessage("%03x, %02x", machine, "LIGHT0_X"), ioport("LIGHT0_Y")->read());
 
-	int x = state->ioport(gunnames[i])->read() - 0x3c;
+	int x = ioport(gunnames[i])->read() - 0x3c;
 
 	if ( (x < 0) || (x > sizeof(lordgun_gun_x_table)/sizeof(lordgun_gun_x_table[0])) )
 		x = 0;
 
-	state->m_gun[i].scr_x = lordgun_gun_x_table[x];
-	state->m_gun[i].scr_y = state->ioport(gunnames[i+2])->read();
+	m_gun[i].scr_x = lordgun_gun_x_table[x];
+	m_gun[i].scr_y = ioport(gunnames[i+2])->read();
 }
 
-void lordgun_update_gun(running_machine &machine, int i)
+void lordgun_state::lordgun_update_gun(int i)
 {
-	lordgun_state *state = machine.driver_data<lordgun_state>();
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine().primary_screen->visible_area();
 
-	state->m_gun[i].hw_x = state->ioport(gunnames[i])->read();
-	state->m_gun[i].hw_y = state->ioport(gunnames[i+2])->read();
+	m_gun[i].hw_x = ioport(gunnames[i])->read();
+	m_gun[i].hw_y = ioport(gunnames[i+2])->read();
 
-	lorddgun_calc_gun_scr(machine, i);
+	lorddgun_calc_gun_scr(i);
 
-	if (!visarea.contains(state->m_gun[i].scr_x, state->m_gun[i].scr_y))
-		state->m_gun[i].hw_x = state->m_gun[i].hw_y = 0;
+	if (!visarea.contains(m_gun[i].scr_x, m_gun[i].scr_y))
+		m_gun[i].hw_x = m_gun[i].hw_y = 0;
 }
 
 
@@ -235,11 +231,10 @@ void lordgun_update_gun(running_machine &machine, int i)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void lordgun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	lordgun_state *state = machine.driver_data<lordgun_state>();
-	UINT16 *s       =   state->m_spriteram;
-	UINT16 *end     =   state->m_spriteram + state->m_spriteram.bytes()/2;
+	UINT16 *s       =   m_spriteram;
+	UINT16 *end     =   m_spriteram + m_spriteram.bytes()/2;
 
 	for ( ; s < end; s += 8/2 )
 	{
@@ -278,7 +273,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		{
 			for (x = x0; x != x1; x += dx)
 			{
-				drawgfx_transpen(   bitmap, cliprect, machine.gfx[4],
+				drawgfx_transpen(   bitmap, cliprect, machine().gfx[4],
 									code, color + pri * 0x800/0x40,
 									flipx, flipy,
 									sx + x * 0x10, sy + y * 0x10,
@@ -373,7 +368,7 @@ UINT32 lordgun_state::screen_update_lordgun(screen_device &screen, bitmap_ind16 
 	if (layers_ctrl & 2)    m_tilemap[1]->draw(*m_bitmaps[1], cliprect, 0, 0);
 	if (layers_ctrl & 4)    m_tilemap[2]->draw(*m_bitmaps[2], cliprect, 0, 0);
 	if (layers_ctrl & 8)    m_tilemap[3]->draw(*m_bitmaps[3], cliprect, 0, 0);
-	if (layers_ctrl & 16)   draw_sprites(machine(), *m_bitmaps[4], cliprect);
+	if (layers_ctrl & 16)   draw_sprites(*m_bitmaps[4], cliprect);
 
 	// copy to screen bitmap
 

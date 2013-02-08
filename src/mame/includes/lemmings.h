@@ -51,4 +51,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_lemmings(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_lemmings(screen_device &screen, bool state);
+	void lemmings_copy_bitmap(bitmap_rgb32& bitmap, bitmap_ind16& srcbitmap, int* xscroll, int* yscroll, const rectangle& cliprect);
 };

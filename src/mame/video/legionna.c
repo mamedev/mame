@@ -245,10 +245,9 @@ VIDEO_START_MEMBER(legionna_state,godzilla)
 
 *************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void legionna_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	legionna_state *state = machine.driver_data<legionna_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs,fx,fy,x,y,color,sprite,cur_pri;
 	int dx,dy,ax,ay;
 	int pri_mask;
@@ -260,7 +259,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		pri_mask = 0;
 
-		if (state->m_has_extended_priority)
+		if (m_has_extended_priority)
 		{
 			cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
 
@@ -310,7 +309,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		sprite &= 0x3fff;
 
-		if (state->m_has_extended_banking)
+		if (m_has_extended_banking)
 		{
 			if(data & 0x0040)
 			{
@@ -360,10 +359,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						pdrawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 						sprite++,
-						color,fx,fy,(x+ax*16)+state->m_sprite_xoffs,y+ay*16+state->m_sprite_yoffs,
-						machine.priority_bitmap,pri_mask, 15);
+						color,fx,fy,(x+ax*16)+m_sprite_xoffs,y+ay*16+m_sprite_yoffs,
+						machine().priority_bitmap,pri_mask, 15);
 					}
 			}
 			else
@@ -371,10 +370,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						pdrawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 						sprite++,
-						color,fx,fy,(x+ax*16)+state->m_sprite_xoffs,y+(dy-ay-1)*16+state->m_sprite_yoffs,
-						machine.priority_bitmap,pri_mask,15);
+						color,fx,fy,(x+ax*16)+m_sprite_xoffs,y+(dy-ay-1)*16+m_sprite_yoffs,
+						machine().priority_bitmap,pri_mask,15);
 					}
 			}
 		}
@@ -385,10 +384,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						pdrawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 						sprite++,
-						color,fx,fy,(x+(dx-ax-1)*16)+state->m_sprite_xoffs,y+ay*16+state->m_sprite_yoffs,
-						machine.priority_bitmap,pri_mask,15);
+						color,fx,fy,(x+(dx-ax-1)*16)+m_sprite_xoffs,y+ay*16+m_sprite_yoffs,
+						machine().priority_bitmap,pri_mask,15);
 					}
 			}
 			else
@@ -396,10 +395,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						pdrawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 						sprite++,
-						color,fx,fy,(x+(dx-ax-1)*16)+state->m_sprite_xoffs,y+(dy-ay-1)*16+state->m_sprite_yoffs,
-						machine.priority_bitmap,pri_mask, 15);
+						color,fx,fy,(x+(dx-ax-1)*16)+m_sprite_xoffs,y+(dy-ay-1)*16+m_sprite_yoffs,
+						machine().priority_bitmap,pri_mask, 15);
 					}
 			}
 		}
@@ -430,7 +429,7 @@ UINT32 legionna_state::screen_update_legionna(screen_device &screen, bitmap_ind1
 	if (!(m_layer_disable&0x0002)) m_background_layer->draw(bitmap, cliprect, 0, 1);
 	if (!(m_layer_disable&0x0001)) m_text_layer->draw(bitmap, cliprect, 0, 2);
 
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 
 
 	return 0;
@@ -460,7 +459,7 @@ UINT32 legionna_state::screen_update_godzilla(screen_device &screen, bitmap_ind1
 	if (!(m_layer_disable&0x0004)) m_foreground_layer->draw(bitmap, cliprect, 0,1);
 	if (!(m_layer_disable&0x0008)) m_text_layer->draw(bitmap, cliprect, 0,2);
 
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 
 	return 0;
 }
@@ -492,7 +491,7 @@ UINT32 legionna_state::screen_update_grainbow(screen_device &screen, bitmap_ind1
 	if(!(m_layer_disable & 8))
 		m_text_layer->draw(bitmap, cliprect, 0,8);
 
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 
 	return 0;
 }

@@ -62,4 +62,8 @@ public:
 	UINT32 screen_update_lsasquad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_daikaiju(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
+	void draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *scrollram );
+	int draw_layer_daikaiju( bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int  * previd, int type );
+	void drawbg( bitmap_ind16 &bitmap, const rectangle &cliprect, int type );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

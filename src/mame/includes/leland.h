@@ -50,7 +50,7 @@ public:
 	UINT8 m_sound_port_bank;
 	UINT8 m_alternate_bank;
 	UINT8 m_master_bank;
-	void (*m_update_master_bank)(running_machine &machine);
+	void (leland_state::*m_update_master_bank)();
 	UINT32 m_xrom1_addr;
 	UINT32 m_xrom2_addr;
 	UINT8 m_battery_ram_enable;
@@ -152,6 +152,25 @@ public:
 	DECLARE_READ8_MEMBER(leland_sound_port_r);
 	DECLARE_WRITE8_MEMBER(leland_sound_port_w);
 	DECLARE_WRITE8_MEMBER(leland_gfx_port_w);
+	void leland_video_addr_w(address_space &space, int offset, int data, int num);
+	int leland_vram_port_r(address_space &space, int offset, int num);
+	void leland_vram_port_w(address_space &space, int offset, int data, int num);
+	int dial_compute_value(int new_val, int indx);
+	void update_dangerz_xy();
+	void cerberus_bankswitch();
+	void mayhem_bankswitch();
+	void dangerz_bankswitch();
+	void basebal2_bankswitch();
+	void redline_bankswitch();
+	void viper_bankswitch();
+	void offroad_bankswitch();
+	void ataxx_bankswitch();
+	void leland_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
+	void ataxx_init_eeprom(const UINT16 *data);
+	int keycard_r();
+	void keycard_w(int data);
+	void leland_rotate_memory(const char *cpuname);
+	void init_master_ports(UINT8 mvram_base, UINT8 io_base);
 };
 
 
@@ -162,15 +181,6 @@ public:
 #define SERIAL_TYPE_ADD_XOR     2
 #define SERIAL_TYPE_ENCRYPT     3
 #define SERIAL_TYPE_ENCRYPT_XOR 4
-
-void cerberus_bankswitch(running_machine &machine);
-void mayhem_bankswitch(running_machine &machine);
-void dangerz_bankswitch(running_machine &machine);
-void basebal2_bankswitch(running_machine &machine);
-void redline_bankswitch(running_machine &machine);
-void viper_bankswitch(running_machine &machine);
-void offroad_bankswitch(running_machine &machine);
-void ataxx_bankswitch(running_machine &machine);
 
 void leland_init_eeprom(running_machine &machine, UINT8 default_val, const UINT16 *data, UINT8 serial_offset, UINT8 serial_type);
 void ataxx_init_eeprom(running_machine &machine, const UINT16 *data);

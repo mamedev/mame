@@ -427,7 +427,7 @@ UINT32 ladybug_state::screen_update_redclash(screen_device &screen, bitmap_ind16
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	redclash_draw_stars(machine(), bitmap, cliprect, 0x60, 0, 0x00, 0xff);
-	draw_sprites(machine(), bitmap, cliprect);
+	::draw_sprites(machine(), bitmap, cliprect);
 	draw_bullets(machine(), bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;

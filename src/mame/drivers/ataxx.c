@@ -707,8 +707,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(leland_state,ataxx)
 {
-	leland_rotate_memory(machine(), "master");
-	leland_rotate_memory(machine(), "slave");
+	leland_rotate_memory("master");
+	leland_rotate_memory("slave");
 
 	/* set up additional input ports */
 	machine().device("master")->memory().space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(leland_state::ataxx_trackball_r),this));
@@ -717,8 +717,8 @@ DRIVER_INIT_MEMBER(leland_state,ataxx)
 
 DRIVER_INIT_MEMBER(leland_state,ataxxj)
 {
-	leland_rotate_memory(machine(), "master");
-	leland_rotate_memory(machine(), "slave");
+	leland_rotate_memory("master");
+	leland_rotate_memory("slave");
 
 	/* set up additional input ports */
 	machine().device("master")->memory().space(AS_IO).install_read_handler(0x00, 0x03, read8_delegate(FUNC(leland_state::ataxx_trackball_r),this));
@@ -727,8 +727,8 @@ DRIVER_INIT_MEMBER(leland_state,ataxxj)
 
 DRIVER_INIT_MEMBER(leland_state,wsf)
 {
-	leland_rotate_memory(machine(), "master");
-	leland_rotate_memory(machine(), "slave");
+	leland_rotate_memory("master");
+	leland_rotate_memory("slave");
 
 	/* set up additional input ports */
 	machine().device("master")->memory().space(AS_IO).install_read_port(0x0d, 0x0d, "P1_P2");
@@ -739,8 +739,8 @@ DRIVER_INIT_MEMBER(leland_state,wsf)
 
 DRIVER_INIT_MEMBER(leland_state,indyheat)
 {
-	leland_rotate_memory(machine(), "master");
-	leland_rotate_memory(machine(), "slave");
+	leland_rotate_memory("master");
+	leland_rotate_memory("slave");
 
 	/* set up additional input ports */
 	machine().device("master")->memory().space(AS_IO).install_read_handler(0x00, 0x02, read8_delegate(FUNC(leland_state::indyheat_wheel_r),this));
@@ -756,8 +756,8 @@ DRIVER_INIT_MEMBER(leland_state,indyheat)
 
 DRIVER_INIT_MEMBER(leland_state,brutforc)
 {
-	leland_rotate_memory(machine(), "master");
-	leland_rotate_memory(machine(), "slave");
+	leland_rotate_memory("master");
+	leland_rotate_memory("slave");
 
 	/* set up additional input ports */
 	machine().device("master")->memory().space(AS_IO).install_read_port(0x0d, 0x0d, "P2");
@@ -768,8 +768,8 @@ DRIVER_INIT_MEMBER(leland_state,brutforc)
 
 DRIVER_INIT_MEMBER(leland_state,asylum)
 {
-	leland_rotate_memory(machine(), "master");
-	leland_rotate_memory(machine(), "slave");
+	leland_rotate_memory("master");
+	leland_rotate_memory("slave");
 
 	/* asylum appears to have some extra RAM for the slave CPU */
 	machine().device("slave")->memory().space(AS_PROGRAM).install_ram(0xf000, 0xfffb);

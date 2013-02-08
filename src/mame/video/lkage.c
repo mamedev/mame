@@ -97,10 +97,9 @@ void lkage_state::video_start()
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void lkage_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	lkage_state *state = machine.driver_data<lkage_state>();
-	const UINT8 *source = state->m_spriteram;
+	const UINT8 *source = m_spriteram;
 	const UINT8 *finish = source + 0x60;
 
 	while (source < finish)
@@ -118,7 +117,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = attributes & 0x01;
 		int flipy = attributes & 0x02;
 		int height = (attributes & 0x08) ? 2 : 1;
-		int sx = source[0] - 15 + state->m_sprite_dx;
+		int sx = source[0] - 15 + m_sprite_dx;
 		int sy = 256 - 16 * height - source[1];
 		int sprite_number = source[3] + ((attributes & 0x04) << 6);
 		int y;
@@ -132,12 +131,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			priority_mask = 0xf0;
 		}
 
-		if (state->flip_screen_x())
+		if (flip_screen_x())
 		{
 			sx = 239 - sx - 24;
 			flipx = !flipx;
 		}
-		if (state->flip_screen_y())
+		if (flip_screen_y())
 		{
 			sy = 254 - 16 * height - sy;
 			flipy = !flipy;
@@ -152,13 +151,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			pdrawgfx_transpen(
 				bitmap,
 				cliprect,
-				machine.gfx[1],
+				machine().gfx[1],
 				sprite_number ^ y,
 				color,
 				flipx,flipy,
 				sx&0xff,
 				sy + 16*y,
-				machine.priority_bitmap,
+				machine().priority_bitmap,
 				priority_mask,0 );
 		}
 		source += 4;
@@ -213,7 +212,7 @@ UINT32 lkage_state::screen_update_lkage(screen_device &screen, bitmap_ind16 &bit
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, (m_vreg[1] & 2) ? 2 : 4);
 		m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 	}
 	else
 	{

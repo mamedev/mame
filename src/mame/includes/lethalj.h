@@ -30,6 +30,7 @@ public:
 	DECLARE_DRIVER_INIT(cclownz);
 	virtual void video_start();
 	TIMER_CALLBACK_MEMBER(gen_ext1_int);
+	inline void get_crosshair_xy(int player, int *x, int *y);
 };
 
 /*----------- defined in video/lethalj.c -----------*/

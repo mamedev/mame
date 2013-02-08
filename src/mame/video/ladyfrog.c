@@ -89,32 +89,31 @@ WRITE8_MEMBER(ladyfrog_state::ladyfrog_scrlram_w)
 	m_bg_tilemap->set_scrolly(offset, data);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void ladyfrog_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	ladyfrog_state *state = machine.driver_data<ladyfrog_state>();
 	int i;
 	for (i = 0; i < 0x20; i++)
 	{
-		int pr = state->m_spriteram[0x9f - i];
+		int pr = m_spriteram[0x9f - i];
 		int offs = (pr & 0x1f) * 4;
 		{
 			int code, sx, sy, flipx, flipy, pal;
-			code = state->m_spriteram[offs + 2] + ((state->m_spriteram[offs + 1] & 0x10) << 4) + state->m_spritetilebase;
-			pal = state->m_spriteram[offs + 1] & 0x0f;
-			sx = state->m_spriteram[offs + 3];
-			sy = 238 - state->m_spriteram[offs + 0];
-			flipx = ((state->m_spriteram[offs + 1] & 0x40)>>6);
-			flipy = ((state->m_spriteram[offs + 1] & 0x80)>>7);
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			code = m_spriteram[offs + 2] + ((m_spriteram[offs + 1] & 0x10) << 4) + m_spritetilebase;
+			pal = m_spriteram[offs + 1] & 0x0f;
+			sx = m_spriteram[offs + 3];
+			sy = 238 - m_spriteram[offs + 0];
+			flipx = ((m_spriteram[offs + 1] & 0x40)>>6);
+			flipy = ((m_spriteram[offs + 1] & 0x80)>>7);
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					code,
 					pal,
 					flipx,flipy,
 					sx,sy,15);
 
-			if (state->m_spriteram[offs + 3] > 240)
+			if (m_spriteram[offs + 3] > 240)
 			{
-				sx = (state->m_spriteram[offs + 3] - 256);
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+				sx = (m_spriteram[offs + 3] - 256);
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 						code,
 						pal,
 						flipx,flipy,
@@ -154,6 +153,6 @@ VIDEO_START_MEMBER(ladyfrog_state,toucheme)
 UINT32 ladyfrog_state::screen_update_ladyfrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

@@ -62,4 +62,8 @@ public:
 	UINT32 screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lwings_interrupt);
 	INTERRUPT_GEN_MEMBER(avengers_interrupt);
+	inline int is_sprite_on( UINT8 *buffered_spriteram, int offs );
+	void lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	int avengers_fetch_paldata(  );
 };

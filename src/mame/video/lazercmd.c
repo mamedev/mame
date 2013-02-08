@@ -16,7 +16,7 @@
 /*     2      4 + 5      10      14 + 15 */
 /*     3      6 + 7      11      16 + 17 */
 /*     4      8 + 9      12      18 + 19 */
-static int vert_scale(int data)
+int lazercmd_state::vert_scale(int data)
 {
 	return ((data & 0x07) << 1) + ((data & 0xf8) >> 3) * VERT_CHR;
 }
@@ -24,12 +24,12 @@ static int vert_scale(int data)
 /* plot a bitmap marker */
 /* hardware has 2 marker sizes 2x2 and 4x2 selected by jumper */
 /* meadows lanes normaly use 2x2 pixels and lazer command uses either */
-static void plot_pattern( running_machine &machine, bitmap_ind16 &bitmap, int x, int y )
+void lazercmd_state::plot_pattern( bitmap_ind16 &bitmap, int x, int y )
 {
 	int xbit, ybit, size;
 
 	size = 2;
-	if (machine.root_device().ioport("DSW")->read() & 0x40)
+	if (machine().root_device().ioport("DSW")->read() & 0x40)
 	{
 		size = 4;
 	}
@@ -75,7 +75,7 @@ UINT32 lazercmd_state::screen_update_lazercmd(screen_device &screen, bitmap_ind1
 
 	x = m_marker_x - 1;             /* normal video lags marker by 1 pixel */
 	y = vert_scale(m_marker_y) - VERT_CHR; /* first line used as scratch pad */
-	plot_pattern(machine(), bitmap, x, y);
+	plot_pattern(bitmap, x, y);
 
 	return 0;
 }

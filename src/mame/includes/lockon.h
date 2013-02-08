@@ -109,4 +109,9 @@ public:
 	void screen_eof_lockon(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(cursor_callback);
 	TIMER_CALLBACK_MEMBER(bufend_callback);
+	void scene_draw(  );
+	void ground_draw(  );
+	void objects_draw(  );
+	void rotate_draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void hud_draw( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

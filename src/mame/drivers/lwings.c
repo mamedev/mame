@@ -131,9 +131,8 @@ WRITE8_MEMBER(lwings_state::avengers_prot_bank_w)
 	m_palette_pen = data * 64;
 }
 
-static int avengers_fetch_paldata( running_machine &machine )
+int lwings_state::avengers_fetch_paldata(  )
 {
-	lwings_state *state = machine.driver_data<lwings_state>();
 
 	static const char pal_data[] =
 	/* page 1: 0x03,0x02,0x01,0x00 */
@@ -196,8 +195,8 @@ static int avengers_fetch_paldata( running_machine &machine )
 	"0000000000000000" "6474667676660100" "7696657575650423" "88A8647474645473"
 	"0000000000000000" "0001070701050004" "0003060603040303" "0005050505040302";
 
-	int bank = state->m_palette_pen / 64;
-	int offs = state->m_palette_pen % 64;
+	int bank = m_palette_pen / 64;
+	int offs = m_palette_pen % 64;
 	int page = bank / 4;                    /* 0..7 */
 	int base = (3 - (bank & 3));            /* 0..3 */
 	int row = offs & 0xf;                   /* 0..15 */
@@ -218,8 +217,8 @@ static int avengers_fetch_paldata( running_machine &machine )
 
 	result = digit0 * 16 + digit1;
 
-	if ((state->m_palette_pen & 0x3f) != 0x3f)
-		state->m_palette_pen++;
+	if ((m_palette_pen & 0x3f) != 0x3f)
+		m_palette_pen++;
 
 	return result;
 }
@@ -236,7 +235,7 @@ READ8_MEMBER(lwings_state::avengers_protection_r)
 	if (space.device().safe_pc() == 0x7c7)
 	{
 		/* palette data */
-		return avengers_fetch_paldata(machine());
+		return avengers_fetch_paldata();
 	}
 
 	/*  Point to Angle Function

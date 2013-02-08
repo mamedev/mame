@@ -68,4 +68,8 @@ public:
 	UINT32 screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_wwjgtin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	rgb_t get_color( int data );
+	void wwjgtin_set_last_four_colors( colortable_t *colortable );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int reverse );
+	void draw_lasso( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

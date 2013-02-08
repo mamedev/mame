@@ -20,15 +20,15 @@
  *
  *************************************/
 
-INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *y)
+inline void lethalj_state::get_crosshair_xy(int player, int *x, int *y)
 {
 	static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine().primary_screen->visible_area();
 	int width = visarea.width();
 	int height = visarea.height();
 
-	*x = ((machine.root_device().ioport(gunnames[player * 2])->read_safe(0x00) & 0xff) * width) / 255;
-	*y = ((machine.root_device().ioport(gunnames[1 + player * 2])->read_safe(0x00) & 0xff) * height) / 255;
+	*x = ((machine().root_device().ioport(gunnames[player * 2])->read_safe(0x00) & 0xff) * width) / 255;
+	*y = ((machine().root_device().ioport(gunnames[1 + player * 2])->read_safe(0x00) & 0xff) * height) / 255;
 }
 
 
@@ -49,7 +49,7 @@ READ16_MEMBER(lethalj_state::lethalj_gun_r)
 		case 4:
 		case 5:
 			/* latch the crosshair position */
-			get_crosshair_xy(machine(), offset - 4, &beamx, &beamy);
+			get_crosshair_xy(offset - 4, &beamx, &beamy);
 			m_gunx = beamx;
 			m_guny = beamy;
 			m_blank_palette = 1;

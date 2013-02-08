@@ -197,14 +197,13 @@ WRITE16_MEMBER(lastduel_state::lastduel_palette_word_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void lastduel_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	lastduel_state *state = machine.driver_data<lastduel_state>();
 
-	UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
+	UINT16 *buffered_spriteram16 = m_spriteram->buffer();
 	int offs;
 
-	if (!state->m_sprite_pri_mask)
+	if (!m_sprite_pri_mask)
 		if (pri == 1)
 			return; /* only low priority sprites in lastduel */
 
@@ -213,11 +212,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int attr, sy, sx, flipx, flipy, code, color;
 
 		attr = buffered_spriteram16[offs + 1];
-		if (state->m_sprite_pri_mask)   /* only madgear seems to have this */
+		if (m_sprite_pri_mask)   /* only madgear seems to have this */
 		{
-			if (pri == 1 && (attr & state->m_sprite_pri_mask))
+			if (pri == 1 && (attr & m_sprite_pri_mask))
 				continue;
-			if (pri == 0 && !(attr & state->m_sprite_pri_mask))
+			if (pri == 0 && !(attr & m_sprite_pri_mask))
 				continue;
 		}
 
@@ -228,10 +227,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			sy -= 0x200;
 
 		flipx = attr & 0x20;
-		flipy = attr & state->m_sprite_flipy_mask;  /* 0x40 for lastduel, 0x80 for madgear */
+		flipy = attr & m_sprite_flipy_mask;  /* 0x40 for lastduel, 0x80 for madgear */
 		color = attr & 0x0f;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;
@@ -240,7 +239,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 
 		drawgfx_transpen(bitmap,cliprect,
-				machine.gfx[0],
+				machine().gfx[0],
 				code,
 				color,
 				flipx,flipy,
@@ -252,9 +251,9 @@ UINT32 lastduel_state::screen_update_lastduel(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(machine(), bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	draw_sprites(machine(), bitmap, cliprect, 1);
+	draw_sprites(bitmap, cliprect, 1);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -264,18 +263,18 @@ UINT32 lastduel_state::screen_update_madgear(screen_device &screen, bitmap_ind16
 	if (m_tilemap_priority)
 	{
 		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1 | TILEMAP_DRAW_OPAQUE, 0);
-		draw_sprites(machine(), bitmap, cliprect, 0);
+		draw_sprites(bitmap, cliprect, 0);
 		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(machine(), bitmap, cliprect, 1);
+		draw_sprites(bitmap, cliprect, 1);
 	}
 	else
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-		draw_sprites(machine(), bitmap, cliprect, 0);
+		draw_sprites(bitmap, cliprect, 0);
 		m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-		draw_sprites(machine(), bitmap, cliprect, 1);
+		draw_sprites(bitmap, cliprect, 1);
 	}
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
