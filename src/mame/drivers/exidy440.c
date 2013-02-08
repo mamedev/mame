@@ -294,21 +294,20 @@ CUSTOM_INPUT_MEMBER(exidy440_state::hitnmiss_button1_r)
  *
  *************************************/
 
-void exidy440_bank_select(running_machine &machine, UINT8 bank)
+void exidy440_state::exidy440_bank_select(UINT8 bank)
 {
-	exidy440_state *state = machine.driver_data<exidy440_state>();
 	/* for the showdown case, bank 0 is a PLD */
-	if (state->m_showdown_bank_data[0] != NULL)
+	if (m_showdown_bank_data[0] != NULL)
 	{
-		if (bank == 0 && state->m_bank != 0)
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(exidy440_state::showdown_bank0_r),state));
-		else if (bank != 0 && state->m_bank == 0)
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, "bank1");
+		if (bank == 0 && m_bank != 0)
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(exidy440_state::showdown_bank0_r),this));
+		else if (bank != 0 && m_bank == 0)
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, "bank1");
 	}
 
 	/* select the bank and update the bank pointer */
-	state->m_bank = bank;
-	state->membank("bank1")->set_base(&machine.root_device().memregion("maincpu")->base()[0x10000 + state->m_bank * 0x4000]);
+	m_bank = bank;
+	membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[0x10000 + m_bank * 0x4000]);
 }
 
 
@@ -452,7 +451,7 @@ void exidy440_state::machine_start()
 void exidy440_state::machine_reset()
 {
 	m_bank = 0xff;
-	exidy440_bank_select(machine(), 0);
+	exidy440_bank_select(0);
 }
 
 

@@ -73,6 +73,8 @@ public:
 	TIMER_CALLBACK_MEMBER(delayed_sound_command_w);
 	TIMER_CALLBACK_MEMBER(beam_firq_callback);
 	TIMER_CALLBACK_MEMBER(collide_firq_callback);
+	void exidy440_update_firq();
+	void exidy440_bank_select(UINT8 bank);
 };
 
 

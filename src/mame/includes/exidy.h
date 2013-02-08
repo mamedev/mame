@@ -70,6 +70,14 @@ public:
 	UINT32 screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(exidy_vblank_interrupt);
 	TIMER_CALLBACK_MEMBER(collision_irq_callback);
+	void exidy_video_config(UINT8 _collision_mask, UINT8 _collision_invert, int _is_2bpp);
+	inline void latch_condition(int collision);
+	inline void set_1_color(int index, int which);
+	void set_colors();
+	void draw_background();
+	inline int sprite_1_enabled();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void check_collision();
 };
 
 /*----------- defined in video/exidy.c -----------*/

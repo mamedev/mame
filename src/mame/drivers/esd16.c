@@ -595,7 +595,7 @@ void esd16_state::machine_reset()
 	m_tilemap0_color = 0;
 }
 
-static UINT16 hedpanic_pri_callback(UINT16 x)
+UINT16 esd16_state::hedpanic_pri_callback(UINT16 x)
 {
 	if (x & 0x8000)
 		return 0xfffe; // under "tilemap 1"
@@ -627,7 +627,7 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	decospr_device::set_gfx_region(*device, 0);
 	decospr_device::set_is_bootleg(*device, true);
-	decospr_device::set_pri_callback(*device, hedpanic_pri_callback);
+	decospr_device::set_pri_callback(*device, esd16_state::hedpanic_pri_callback);
 	decospr_device::set_flipallx(*device, 1);
 
 	MCFG_GFXDECODE(esd16)

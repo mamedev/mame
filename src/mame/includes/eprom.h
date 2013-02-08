@@ -35,6 +35,7 @@ public:
 	DECLARE_VIDEO_START(guts);
 	UINT32 screen_update_eprom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_guts(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void update_palette();
 };
 
 /*----------- defined in video/eprom.c -----------*/

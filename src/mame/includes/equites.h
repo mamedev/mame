@@ -111,4 +111,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(equites_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_scanline);
 	DECLARE_WRITE_LINE_MEMBER(equites_msm5232_gate);
+	void equites_draw_sprites_block( bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int end );
+	void equites_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void splndrbt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void splndrbt_copy_bg( bitmap_ind16 &dst_bitmap, const rectangle &cliprect );
+	void equites_update_dac(  );
+	void unpack_block( const char *region, int offset, int size );
+	void unpack_region( const char *region );
 };

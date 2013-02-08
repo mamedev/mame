@@ -25,12 +25,6 @@
 
 #define SPRITE_COUNT        (0x28)
 
-
-/* function prototypes */
-static void exidy440_update_firq(running_machine &machine);
-
-
-
 /*************************************
  *
  *  Initialize the video system
@@ -135,7 +129,7 @@ READ8_MEMBER(exidy440_state::exidy440_horizontal_pos_r)
 {
 	/* clear the FIRQ on a read here */
 	m_firq_beam = 0;
-	exidy440_update_firq(machine());
+	exidy440_update_firq();
 
 	/* according to the schems, this value is only latched on an FIRQ
 	 * caused by collision or beam */
@@ -182,14 +176,14 @@ WRITE8_MEMBER(exidy440_state::exidy440_control_w)
 	int oldvis = m_palettebank_vis;
 
 	/* extract the various bits */
-	exidy440_bank_select(machine(), data >> 4);
+	exidy440_bank_select(data >> 4);
 	m_firq_enable = (data >> 3) & 1;
 	m_firq_select = (data >> 2) & 1;
 	m_palettebank_io = (data >> 1) & 1;
 	m_palettebank_vis = data & 1;
 
 	/* update the FIRQ in case we enabled something */
-	exidy440_update_firq(machine());
+	exidy440_update_firq();
 
 	/* if we're swapping palettes, change all the colors */
 	if (oldvis != m_palettebank_vis)
@@ -212,7 +206,7 @@ WRITE8_MEMBER(exidy440_state::exidy440_interrupt_clear_w)
 {
 	/* clear the VBLANK FIRQ on a write here */
 	m_firq_vblank = 0;
-	exidy440_update_firq(machine());
+	exidy440_update_firq();
 }
 
 
@@ -223,13 +217,12 @@ WRITE8_MEMBER(exidy440_state::exidy440_interrupt_clear_w)
  *
  *************************************/
 
-static void exidy440_update_firq(running_machine &machine)
+void exidy440_state::exidy440_update_firq()
 {
-	exidy440_state *state = machine.driver_data<exidy440_state>();
-	if (state->m_firq_vblank || (state->m_firq_enable && state->m_firq_beam))
-		machine.device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
+	if (m_firq_vblank || (m_firq_enable && m_firq_beam))
+		machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
 	else
-		machine.device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 }
 
 
@@ -237,7 +230,7 @@ INTERRUPT_GEN_MEMBER(exidy440_state::exidy440_vblank_interrupt)
 {
 	/* set the FIRQ line on a VBLANK */
 	m_firq_vblank = 1;
-	exidy440_update_firq(machine());
+	exidy440_update_firq();
 }
 
 
@@ -254,7 +247,7 @@ TIMER_CALLBACK_MEMBER(exidy440_state::beam_firq_callback)
 	if (m_firq_select && m_firq_enable)
 	{
 		m_firq_beam = 1;
-		exidy440_update_firq(machine());
+		exidy440_update_firq();
 	}
 
 	/* round the x value to the nearest byte */
@@ -271,7 +264,7 @@ TIMER_CALLBACK_MEMBER(exidy440_state::collide_firq_callback)
 	if (!m_firq_select && m_firq_enable)
 	{
 		m_firq_beam = 1;
-		exidy440_update_firq(machine());
+		exidy440_update_firq();
 	}
 
 	/* round the x value to the nearest byte */

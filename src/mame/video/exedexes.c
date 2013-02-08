@@ -174,18 +174,17 @@ void exedexes_state::video_start()
 	colortable_configure_tilemap_groups(machine().colortable, m_tx_tilemap, machine().gfx[0], 0xcf);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void exedexes_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	exedexes_state *state = machine.driver_data<exedexes_state>();
-	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
+	UINT8 *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
-	if (!state->m_objon)
+	if (!m_objon)
 		return;
 
 	priority = priority ? 0x40 : 0x00;
 
-	for (offs = state->m_spriteram->bytes() - 32;offs >= 0;offs -= 32)
+	for (offs = m_spriteram->bytes() - 32;offs >= 0;offs -= 32)
 	{
 		if ((buffered_spriteram[offs + 1] & 0x40) == priority)
 		{
@@ -198,7 +197,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			sx = buffered_spriteram[offs + 3] - ((buffered_spriteram[offs + 1] & 0x80) << 1);
 			sy = buffered_spriteram[offs + 2];
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 					code,
 					color,
 					flipx,flipy,
@@ -217,7 +216,7 @@ UINT32 exedexes_state::screen_update_exedexes(screen_device &screen, bitmap_ind1
 	else
 		bitmap.fill(0, cliprect);
 
-	draw_sprites(machine(), bitmap, cliprect, 1);
+	draw_sprites(bitmap, cliprect, 1);
 
 	if (m_sc1on)
 	{
@@ -226,7 +225,7 @@ UINT32 exedexes_state::screen_update_exedexes(screen_device &screen, bitmap_ind1
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 
-	draw_sprites(machine(), bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, 0);
 
 	if (m_chon)
 		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);

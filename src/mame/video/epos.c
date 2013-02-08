@@ -22,11 +22,11 @@
 
 ***************************************************************************/
 
-static void get_pens( running_machine &machine, pen_t *pens )
+void epos_state::get_pens( pen_t *pens )
 {
 	offs_t i;
-	const UINT8 *prom = machine.root_device().memregion("proms")->base();
-	int len = machine.root_device().memregion("proms")->bytes();
+	const UINT8 *prom = machine().root_device().memregion("proms")->base();
+	int len = machine().root_device().memregion("proms")->bytes();
 
 	for (i = 0; i < len; i++)
 	{
@@ -76,7 +76,7 @@ UINT32 epos_state::screen_update_epos(screen_device &screen, bitmap_rgb32 &bitma
 	pen_t pens[0x20];
 	offs_t offs;
 
-	get_pens(machine(), pens);
+	get_pens(pens);
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{

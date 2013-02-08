@@ -231,36 +231,35 @@ READ8_MEMBER(exerion_state::exerion_video_timing_r)
  *
  *************************************/
 
-static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void exerion_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	exerion_state *state = machine.driver_data<exerion_state>();
 	int x, y;
 
 	/* loop over all visible scanlines */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *src0 = &state->m_background_gfx[0][state->m_background_latches[1] * 256];
-		UINT16 *src1 = &state->m_background_gfx[1][state->m_background_latches[3] * 256];
-		UINT16 *src2 = &state->m_background_gfx[2][state->m_background_latches[5] * 256];
-		UINT16 *src3 = &state->m_background_gfx[3][state->m_background_latches[7] * 256];
-		int xoffs0 = state->m_background_latches[0];
-		int xoffs1 = state->m_background_latches[2];
-		int xoffs2 = state->m_background_latches[4];
-		int xoffs3 = state->m_background_latches[6];
-		int start0 = state->m_background_latches[8] & 0x0f;
-		int start1 = state->m_background_latches[9] & 0x0f;
-		int start2 = state->m_background_latches[10] & 0x0f;
-		int start3 = state->m_background_latches[11] & 0x0f;
-		int stop0 = state->m_background_latches[8] >> 4;
-		int stop1 = state->m_background_latches[9] >> 4;
-		int stop2 = state->m_background_latches[10] >> 4;
-		int stop3 = state->m_background_latches[11] >> 4;
-		UINT8 *mixer = &state->m_background_mixer[(state->m_background_latches[12] << 4) & 0xf0];
+		UINT16 *src0 = &m_background_gfx[0][m_background_latches[1] * 256];
+		UINT16 *src1 = &m_background_gfx[1][m_background_latches[3] * 256];
+		UINT16 *src2 = &m_background_gfx[2][m_background_latches[5] * 256];
+		UINT16 *src3 = &m_background_gfx[3][m_background_latches[7] * 256];
+		int xoffs0 = m_background_latches[0];
+		int xoffs1 = m_background_latches[2];
+		int xoffs2 = m_background_latches[4];
+		int xoffs3 = m_background_latches[6];
+		int start0 = m_background_latches[8] & 0x0f;
+		int start1 = m_background_latches[9] & 0x0f;
+		int start2 = m_background_latches[10] & 0x0f;
+		int start3 = m_background_latches[11] & 0x0f;
+		int stop0 = m_background_latches[8] >> 4;
+		int stop1 = m_background_latches[9] >> 4;
+		int stop2 = m_background_latches[10] >> 4;
+		int stop3 = m_background_latches[11] >> 4;
+		UINT8 *mixer = &m_background_mixer[(m_background_latches[12] << 4) & 0xf0];
 		UINT16 scanline[VISIBLE_X_MAX];
-		pen_t pen_base = 0x200 + ((state->m_background_latches[12] >> 4) << 4);
+		pen_t pen_base = 0x200 + ((m_background_latches[12] >> 4) << 4);
 
 		/* the cocktail flip flag controls whether we count up or down in X */
-		if (!state->m_cocktail_flip)
+		if (!m_cocktail_flip)
 		{
 			/* skip processing anything that's not visible */
 			for (x = BACKGROUND_X_START; x < cliprect.min_x; x++)
@@ -352,7 +351,7 @@ UINT32 exerion_state::screen_update_exerion(screen_device &screen, bitmap_ind16 
 	int sx, sy, offs, i;
 
 	/* draw background */
-	draw_background(machine(), bitmap, cliprect);
+	draw_background(bitmap, cliprect);
 
 	/* draw sprites */
 	for (i = 0; i < m_spriteram.bytes(); i += 4)

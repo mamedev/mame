@@ -15,15 +15,14 @@
  *
  *************************************/
 
-static void update_palette(running_machine &machine)
+void eprom_state::update_palette()
 {
-	eprom_state *state = machine.driver_data<eprom_state>();
 	int color;
 
 	for (color = 0; color < 0x800; ++color)
 	{
 		int i, r, g, b;
-		UINT16 const data = state->m_generic_paletteram_16[color];
+		UINT16 const data = m_generic_paletteram_16[color];
 
 		/* FIXME this is only a very crude approximation of the palette output.
 		 * The circuit involves a dozen transistors and probably has an output
@@ -31,7 +30,7 @@ static void update_palette(running_machine &machine)
 		 * This is, however, good enough to match the video and description
 		 * of MAMETesters bug #02677.
 		 */
-		i = (((data >> 12) & 15) + 1) * (4 - state->m_screen_intensity);
+		i = (((data >> 12) & 15) + 1) * (4 - m_screen_intensity);
 		if (i < 0)
 			i = 0;
 
@@ -39,7 +38,7 @@ static void update_palette(running_machine &machine)
 		g = ((data >> 4) & 15) * i / 4;
 		b = ((data >> 0) & 15) * i / 4;
 
-		palette_set_color_rgb(machine, color, r, g, b);
+		palette_set_color_rgb(machine(), color, r, g, b);
 	}
 }
 
@@ -239,7 +238,7 @@ UINT32 eprom_state::screen_update_eprom(screen_device &screen, bitmap_ind16 &bit
 		return 0;
 	}
 
-	update_palette(machine());
+	update_palette();
 
 	/* draw the playfield */
 	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);
@@ -393,7 +392,7 @@ UINT32 eprom_state::screen_update_guts(screen_device &screen, bitmap_ind16 &bitm
 		return 0;
 	}
 
-	update_palette(machine());
+	update_palette();
 
 	/* draw the playfield */
 	m_playfield_tilemap->draw(bitmap, cliprect, 0, 0);

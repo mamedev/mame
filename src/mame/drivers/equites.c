@@ -534,9 +534,8 @@ WRITE8_MEMBER(equites_state::equites_cymbal_ctrl_w)
 }
 
 
-static void equites_update_dac( running_machine &machine )
+void equites_state::equites_update_dac(  )
 {
-	equites_state *state = machine.driver_data<equites_state>();
 
 	// there is only one latch, which is used to drive two DAC channels.
 	// When the channel is enabled in the 4066, it goes to a series of
@@ -544,23 +543,23 @@ static void equites_update_dac( running_machine &machine )
 	// then it's disabled again.
 	// Note that PB0 goes through three filters while PB1 only goes through one.
 
-	if (state->m_eq8155_port_b & 1)
-		state->m_dac_1->write_signed8(state->m_dac_latch);
+	if (m_eq8155_port_b & 1)
+		m_dac_1->write_signed8(m_dac_latch);
 
-	if (state->m_eq8155_port_b & 2)
-		state->m_dac_2->write_signed8(state->m_dac_latch);
+	if (m_eq8155_port_b & 2)
+		m_dac_2->write_signed8(m_dac_latch);
 }
 
 WRITE8_MEMBER(equites_state::equites_dac_latch_w)
 {
 	m_dac_latch = data << 2;
-	equites_update_dac(machine());
+	equites_update_dac();
 }
 
 WRITE8_MEMBER(equites_state::equites_8155_portb_w)
 {
 	m_eq8155_port_b = data;
-	equites_update_dac(machine());
+	equites_update_dac();
 }
 
 WRITE_LINE_MEMBER(equites_state::equites_msm5232_gate)
@@ -1847,9 +1846,9 @@ ROM_END
 /******************************************************************************/
 // Initializations
 
-static void unpack_block( running_machine &machine, const char *region, int offset, int size )
+void equites_state::unpack_block( const char *region, int offset, int size )
 {
-	UINT8 *rom = machine.root_device().memregion(region)->base();
+	UINT8 *rom = machine().root_device().memregion(region)->base();
 	int i;
 
 	for (i = 0; i < size; ++i)
@@ -1859,35 +1858,35 @@ static void unpack_block( running_machine &machine, const char *region, int offs
 	}
 }
 
-static void unpack_region( running_machine &machine, const char *region )
+void equites_state::unpack_region( const char *region )
 {
-	unpack_block(machine, region, 0x0000, 0x2000);
-	unpack_block(machine, region, 0x4000, 0x2000);
+	unpack_block(region, 0x0000, 0x2000);
+	unpack_block(region, 0x4000, 0x2000);
 }
 
 
 DRIVER_INIT_MEMBER(equites_state,equites)
 {
-	unpack_region(machine(), "gfx2");
-	unpack_region(machine(), "gfx3");
+	unpack_region("gfx2");
+	unpack_region("gfx3");
 }
 
 DRIVER_INIT_MEMBER(equites_state,bullfgtr)
 {
-	unpack_region(machine(), "gfx2");
-	unpack_region(machine(), "gfx3");
+	unpack_region("gfx2");
+	unpack_region("gfx3");
 }
 
 DRIVER_INIT_MEMBER(equites_state,kouyakyu)
 {
-	unpack_region(machine(), "gfx2");
-	unpack_region(machine(), "gfx3");
+	unpack_region("gfx2");
+	unpack_region("gfx3");
 }
 
 DRIVER_INIT_MEMBER(equites_state,gekisou)
 {
-	unpack_region(machine(), "gfx2");
-	unpack_region(machine(), "gfx3");
+	unpack_region("gfx2");
+	unpack_region("gfx3");
 
 	// install special handlers for unknown device (protection?)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x580000, 0x580001, write16_delegate(FUNC(equites_state::gekisou_unknown_0_w),this));
@@ -1896,12 +1895,12 @@ DRIVER_INIT_MEMBER(equites_state,gekisou)
 
 DRIVER_INIT_MEMBER(equites_state,splndrbt)
 {
-	unpack_region(machine(), "gfx3");
+	unpack_region("gfx3");
 }
 
 DRIVER_INIT_MEMBER(equites_state,hvoltage)
 {
-	unpack_region(machine(), "gfx3");
+	unpack_region("gfx3");
 
 #if HVOLTAGE_DEBUG
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x000038, 0x000039, read16_delegate(FUNC(equites_state::hvoltage_debug_r),this));
