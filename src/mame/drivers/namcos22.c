@@ -1168,23 +1168,6 @@ static UINT8 nthbyte( const UINT32 *pSource, int offs )
 
 /*********************************************************************************************/
 
-/* mask,default,type,sensitivity,delta,min,max */
-#define DRIVING_ANALOG_PORTS \
-	PORT_START("GAS") \
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal") \
-	PORT_START("BRAKE") \
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal") \
-	PORT_START("STEER") \
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
-
-/* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
-static void ReadAnalogDrivingPorts( running_machine &machine, UINT16 *gas, UINT16 *brake, UINT16 *steer )
-{
-	*gas   = machine.root_device().ioport("GAS")->read();
-	*brake = machine.root_device().ioport("BRAKE")->read();
-	*steer = machine.root_device().ioport("STEER")->read();
-}
-
 /* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
 static UINT16 AnalogAsDigital( running_machine &machine )
 {
@@ -1274,8 +1257,11 @@ static void HandleDrivingIO( running_machine &machine )
 	if( nthbyte(state->m_system_controller, 0x18) != 0 )
 	{
 		UINT16 flags = state->ioport("INPUTS")->read();
-		UINT16 gas, brake, steer, coinram_address_is_odd = 0;
-		ReadAnalogDrivingPorts( machine, &gas, &brake, &steer );
+		UINT16 coinram_address_is_odd = 0;
+
+		UINT16 gas   = machine.root_device().ioport("GAS")->read();
+		UINT16 brake = machine.root_device().ioport("BRAKE")->read();
+		UINT16 steer = machine.root_device().ioport("STEER")->read();
 
 		switch (state->m_gametype)
 		{
@@ -1346,14 +1332,6 @@ static void HandleCyberCommandoIO( running_machine &machine )
 }
 
 /*********************************************************************************************/
-
-static void InitDSP( running_machine &machine )
-{
-	namcos22_state *state = machine.driver_data<namcos22_state>();
-	state->m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	state->m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	state->m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-}
 
 READ16_MEMBER(namcos22_state::pdp_status_r)
 {
@@ -1480,7 +1458,8 @@ READ16_MEMBER(namcos22_state::pdp_begin_r)
 			case 0xffff: /* "goto" command */
 				offs = ReadFromCommRAM(offs);
 				if( offs == start )
-				{ /* most commands end with a "goto self" */
+				{
+					/* most commands end with a "goto self" */
 					return 0;
 				}
 				break;
@@ -2143,20 +2122,23 @@ WRITE32_MEMBER(namcos22_state::namcos22s_system_controller_w)
 		if (newreg != oldreg)
 		{
 			if( newreg == 0 )
-			{ /* disable DSPs */
+			{
+				/* disable DSPs */
 				m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); /* master DSP */
 				m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); /* slave DSP */
 				namcos22_enable_slave_simulation(machine(), 0);
 				m_bEnableDspIrqs = 0;
 			}
 			else if( newreg == 1 )
-			{ /* enable dsp and rendering subsystem */
+			{
+				/* enable dsp and rendering subsystem */
 				m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				namcos22_enable_slave_simulation(machine(), 1);
 				m_bEnableDspIrqs = 1;
 			}
 			else if( newreg == 0xff )
-			{ /* used to upload game-specific code to master/slave dsps */
+			{
+				/* used to upload game-specific code to master/slave dsps */
 				m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				m_bEnableDspIrqs = 0;
 			}
@@ -2271,20 +2253,23 @@ WRITE32_MEMBER(namcos22_state::namcos22_system_controller_w)
 		if (newreg != oldreg)
 		{
 			if( newreg == 0 )
-			{ /* disable DSPs */
+			{
+				/* disable DSPs */
 				m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); /* master DSP */
 				m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); /* slave DSP */
 				namcos22_enable_slave_simulation(machine(), 0);
 				m_bEnableDspIrqs = 0;
 			}
 			else if( newreg == 1 )
-			{ /* enable dsp and rendering subsystem */
+			{
+				/* enable dsp and rendering subsystem */
 				m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				namcos22_enable_slave_simulation(machine(), 1);
 				m_bEnableDspIrqs = 1;
 			}
 			else if( newreg == 0xff )
-			{ /* used to upload game-specific code to master/slave dsps */
+			{
+				/* used to upload game-specific code to master/slave dsps */
 				m_master->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 				m_bEnableDspIrqs = 0;
 			}
@@ -2707,7 +2692,8 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(namcos22_state::mcu_port4_s22_r)
 {
-	return 0x10; // for C74, 0x10 selects sound MCU role, 0x00 selects control-reading role
+	// for C74, 0x10 selects sound MCU role, 0x00 selects control-reading role
+	return (&space.device() == m_mcu) ? 0x10: 0x00;
 }
 
 static ADDRESS_MAP_START( mcu_s22_io, AS_IO, 8, namcos22_state )
@@ -2715,6 +2701,7 @@ static ADDRESS_MAP_START( mcu_s22_io, AS_IO, 8, namcos22_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( iomcu_s22_io, AS_IO, 8, namcos22_state )
+	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ(mcu_port4_s22_r )
 	AM_RANGE(0x00, 0xff) AM_NOP
 ADDRESS_MAP_END
 
@@ -2733,7 +2720,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
 
 void namcos22_state::machine_reset()
 {
-	InitDSP(machine());
+	m_master->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_slave->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 void namcos22_state::machine_start()
@@ -4793,7 +4782,7 @@ static INPUT_PORTS_START( alpiner )
 
 	PORT_START("ADC1")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Edge")
-INPUT_PORTS_END /* Alpine Racer */
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( airco22 )
 	PORT_START("DSW0")
@@ -4843,7 +4832,7 @@ static INPUT_PORTS_START( airco22 )
 
 	PORT_START("ADC2")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
-INPUT_PORTS_END /* Air Combat22 */
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( cybrcycc )
 	PORT_START("DSW0")
@@ -4893,7 +4882,7 @@ static INPUT_PORTS_START( cybrcycc )
 
 	PORT_START("ADC2")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
-INPUT_PORTS_END /* Cyber Cycles */
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( dirtdash )
 	PORT_START("DSW0")
@@ -4943,7 +4932,7 @@ static INPUT_PORTS_START( dirtdash )
 
 	PORT_START("ADC2")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
-INPUT_PORTS_END /* Dirt Dash */
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( tokyowar )
 	PORT_START("DSW0")
@@ -4993,7 +4982,7 @@ static INPUT_PORTS_START( tokyowar )
 
 	PORT_START("ADC3")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
-INPUT_PORTS_END /* Tokyo Wars */
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( aquajet )
 	PORT_START("DSW0")
@@ -5043,7 +5032,7 @@ static INPUT_PORTS_START( aquajet )
 
 	PORT_START("ADC2")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE
-INPUT_PORTS_END /* Aqua Jet */
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( adillor )
 	PORT_START("DSW0")
@@ -5091,7 +5080,7 @@ static INPUT_PORTS_START( adillor )
 
 	PORT_START("TRACKY")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x01, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Trackball Y")
-INPUT_PORTS_END /* Armadillo Racing */
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( propcycl )
 	PORT_START("DSW0")  /* DIP4 */
@@ -5142,7 +5131,7 @@ static INPUT_PORTS_START( propcycl )
 
 	PORT_START("PEDAL")
 	PORT_BIT( 0x7f, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
-INPUT_PORTS_END /* Prop Cycle */
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( timecris )
 	PORT_START("DSW0")
@@ -5187,7 +5176,7 @@ static INPUT_PORTS_START( timecris )
 
 	PORT_START( "LIGHTY" ) // tuned for CRT - can't shoot below the statusbar?
 	PORT_BIT( 0xfff, 43+241/2, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(43, 43+241) PORT_SENSITIVITY(64) PORT_KEYDELTA(4)
-INPUT_PORTS_END /* Time Crisis */
+INPUT_PORTS_END
 
 /*****************************************************************************************************/
 
@@ -5274,7 +5263,7 @@ static INPUT_PORTS_START( cybrcomm )
 	PORT_DIPNAME( 0x8000, 0x8000, "DIP3-8" )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END /* Cyber Commando */
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( acedrvr )
 	PORT_START("INPUTS")
@@ -5294,8 +5283,6 @@ static INPUT_PORTS_START( acedrvr )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Motion-Stop")
-
-	DRIVING_ANALOG_PORTS
 
 	PORT_START("DSW0") /* DIP2 and DIP3 */
 	PORT_DIPNAME( 0x0001, 0x0001, "DIP2-1" )
@@ -5346,7 +5333,16 @@ static INPUT_PORTS_START( acedrvr )
 	PORT_DIPNAME( 0x8000, 0x8000, "DIP3-8 (TEST MODE?)" )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END /* Ace Driver */
+
+	PORT_START("GAS")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+
+	PORT_START("BRAKE")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+
+	PORT_START("STEER")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( ridgera )
 	PORT_START("INPUTS")
@@ -5371,8 +5367,6 @@ static INPUT_PORTS_START( ridgera )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	DRIVING_ANALOG_PORTS
 
 	PORT_START("DSW0") /* DIP2 and DIP3 */
 	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW ) PORT_NAME("DIP2-1 (Service Mode)")
@@ -5421,7 +5415,16 @@ static INPUT_PORTS_START( ridgera )
 	PORT_DIPNAME( 0x8000, 0x8000, "DIP3-8" )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END /* Ridge Racer */
+
+	PORT_START("GAS")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Gas Pedal")
+
+	PORT_START("BRAKE")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal")
+
+	PORT_START("STEER")
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( ridgeracf )
 	PORT_INCLUDE( ridgera )
@@ -5445,7 +5448,7 @@ static INPUT_PORTS_START( ridgeracf )
 	PORT_DIPNAME( 0x8000, 0x8000, "DIP3-8 (Test Mode)" )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END /* Ridge Racer Full Scale */
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( ridgera2 )
 	PORT_INCLUDE( ridgera )
@@ -5468,7 +5471,7 @@ static INPUT_PORTS_START( ridgera2 )
 	PORT_DIPNAME( 0x8000, 0x8000, "DIP3-8 (Test Mode)" )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END /* Ridge Racer 2 */
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( raveracw )
 	PORT_INCLUDE( ridgera )
@@ -5482,7 +5485,7 @@ static INPUT_PORTS_START( raveracw )
 	PORT_DIPSETTING(      0x0100, "Twin" )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Standard ) )
 	PORT_DIPSETTING(      0x2100, "Deluxe" )
-INPUT_PORTS_END /* Rave Racer */
+INPUT_PORTS_END
 
 /*****************************************************************************************************/
 
