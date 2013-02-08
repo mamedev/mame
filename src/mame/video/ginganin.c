@@ -203,13 +203,12 @@ Offset:         Values:         Format:
 
 ------------------------------------------------------------------------ */
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
+void ginganin_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	ginganin_state *state = machine.driver_data<ginganin_state>();
-	UINT16 *spriteram = state->m_spriteram;
+	UINT16 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < (state->m_spriteram.bytes() >> 1); offs += 4)
+	for (offs = 0; offs < (m_spriteram.bytes() >> 1); offs += 4)
 	{
 		int y = spriteram[offs + 0];
 		int x = spriteram[offs + 1];
@@ -221,7 +220,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 		x = (x & 0xff) - (x & 0x100);
 		y = (y & 0xff) - (y & 0x100);
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			x = 240 - x;
 			y = 240 - y;
@@ -229,7 +228,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 				code & 0x3fff,
 				attr >> 12,
 				flipx, flipy,
@@ -279,7 +278,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	if (layers_ctrl1 & 2)
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	if (layers_ctrl1 & 8)
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 	if (layers_ctrl1 & 4)
 		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 

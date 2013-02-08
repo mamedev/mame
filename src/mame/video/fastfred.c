@@ -352,7 +352,7 @@ VIDEO_START_MEMBER(fastfred_state,imago)
 	m_fg_tilemap->set_transparent_pen(0);
 
 	/* the game has a galaxian starfield */
-	galaxold_init_stars(machine(), 256);
+	galaxold_init_stars(256);
 	m_stars_on = 1;
 
 	/* web colors */
@@ -363,7 +363,7 @@ VIDEO_START_MEMBER(fastfred_state,imago)
 UINT32 fastfred_state::screen_update_imago(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_web_tilemap->draw(bitmap, cliprect, 0,0);
-	galaxold_draw_stars(machine(), bitmap, cliprect);
+	galaxold_draw_stars(bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);

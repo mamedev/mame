@@ -1506,12 +1506,12 @@ DRIVER_INIT_MEMBER(gaiden_state,raiga)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::raiga_protection_w),this));
 }
 
-static void descramble_drgnbowl_gfx(running_machine &machine)
+void gaiden_state::descramble_drgnbowl_gfx()
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	size_t size = machine.root_device().memregion("maincpu")->bytes();
-	UINT8 *buffer = auto_alloc_array(machine, UINT8, size);
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	size_t size = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *buffer = auto_alloc_array(machine(), UINT8, size);
 
 	memcpy(buffer, ROM, size);
 	for( i = 0; i < size; i++ )
@@ -1524,11 +1524,11 @@ static void descramble_drgnbowl_gfx(running_machine &machine)
 								3, 2, 1, 0)];
 	}
 
-	auto_free(machine, buffer);
+	auto_free(machine(), buffer);
 
-	ROM = machine.root_device().memregion("gfx2")->base();
-	size = machine.root_device().memregion("gfx2")->bytes();
-	buffer = auto_alloc_array(machine, UINT8, size);
+	ROM = machine().root_device().memregion("gfx2")->base();
+	size = machine().root_device().memregion("gfx2")->bytes();
+	buffer = auto_alloc_array(machine(), UINT8, size);
 
 	memcpy(buffer,ROM,size);
 	for( i = 0; i < size; i++ )
@@ -1541,23 +1541,23 @@ static void descramble_drgnbowl_gfx(running_machine &machine)
 										5, 2, 1, 0)];
 	}
 
-	auto_free(machine, buffer);
+	auto_free(machine(), buffer);
 }
 
 DRIVER_INIT_MEMBER(gaiden_state,drgnbowl)
 {
 	m_raiga_jumppoints = jumppoints_00;
 
-	descramble_drgnbowl_gfx(machine());
+	descramble_drgnbowl_gfx();
 }
 
-static void descramble_mastninj_gfx(running_machine &machine, UINT8* src)
+void gaiden_state::descramble_mastninj_gfx(UINT8* src)
 {
 	UINT8 *buffer;
 	int len = 0x80000;
 
 	/*  rearrange gfx */
-	buffer = auto_alloc_array(machine, UINT8, len);
+	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
 		int i;
 		for (i = 0;i < len; i++)
@@ -1571,10 +1571,10 @@ static void descramble_mastninj_gfx(running_machine &machine, UINT8* src)
 			3,2,1,0)];
 		}
 		memcpy(src, buffer, len);
-		auto_free(machine, buffer);
+		auto_free(machine(), buffer);
 	}
 
-	buffer = auto_alloc_array(machine, UINT8, len);
+	buffer = auto_alloc_array(machine(), UINT8, len);
 	{
 		int i;
 		for (i = 0; i < len; i++)
@@ -1588,15 +1588,15 @@ static void descramble_mastninj_gfx(running_machine &machine, UINT8* src)
 			3,2,1,0)];
 		}
 		memcpy(src, buffer, len);
-		auto_free(machine, buffer);
+		auto_free(machine(), buffer);
 	}
 }
 
 DRIVER_INIT_MEMBER(gaiden_state,mastninj)
 {
 	// rearrange the graphic roms into a format that MAME can decode
-	descramble_mastninj_gfx(machine(), machine().root_device().memregion("gfx2")->base());
-	descramble_mastninj_gfx(machine(), machine().root_device().memregion("gfx3")->base());
+	descramble_mastninj_gfx(machine().root_device().memregion("gfx2")->base());
+	descramble_mastninj_gfx(machine().root_device().memregion("gfx3")->base());
 	DRIVER_INIT_CALL(shadoww);
 }
 

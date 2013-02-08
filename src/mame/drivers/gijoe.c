@@ -82,14 +82,13 @@ WRITE16_MEMBER(gijoe_state::control2_w)
 	}
 }
 
-static void gijoe_objdma( running_machine &machine )
+void gijoe_state::gijoe_objdma(  )
 {
-	gijoe_state *state = machine.driver_data<gijoe_state>();
 	UINT16 *src_head, *src_tail, *dst_head, *dst_tail;
 
-	src_head = state->m_spriteram;
-	src_tail = state->m_spriteram + 255 * 8;
-	k053247_get_ram(state->m_k053246, &dst_head);
+	src_head = m_spriteram;
+	src_tail = m_spriteram + 255 * 8;
+	k053247_get_ram(m_k053246, &dst_head);
 	dst_tail = dst_head + 255 * 8;
 
 	for (; src_head <= src_tail; src_head += 8)
@@ -121,7 +120,7 @@ INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
 
 	if (k053246_is_irq_enabled(m_k053246))
 	{
-		gijoe_objdma(machine());
+		gijoe_objdma();
 
 		// 42.7us(clr) + 341.3us(xfer) delay at 6Mhz dotclock
 		m_dmadelay_timer->adjust(JOE_DMADELAY);

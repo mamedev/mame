@@ -158,24 +158,23 @@ void gsword_state::video_start()
 			8, 8, 32, 64);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void gsword_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gsword_state *state = machine.driver_data<gsword_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spritexy_ram.bytes() - 1; offs+=2)
+	for (offs = 0; offs < m_spritexy_ram.bytes() - 1; offs+=2)
 	{
 		int sx,sy,flipx,flipy,spritebank,tile,color;
 
-		if (state->m_spritexy_ram[offs]!=0xf1)
+		if (m_spritexy_ram[offs]!=0xf1)
 		{
 			spritebank = 0;
-			tile = state->m_spritetile_ram[offs];
-			color = state->m_spritetile_ram[offs+1] & 0x3f;
-			sy = 241-state->m_spritexy_ram[offs];
-			sx = state->m_spritexy_ram[offs+1]-56;
-			flipx = state->m_spriteattrib_ram[offs] & 0x02;
-			flipy = state->m_spriteattrib_ram[offs] & 0x01;
+			tile = m_spritetile_ram[offs];
+			color = m_spritetile_ram[offs+1] & 0x3f;
+			sy = 241-m_spritexy_ram[offs];
+			sx = m_spritexy_ram[offs+1]-56;
+			flipx = m_spriteattrib_ram[offs] & 0x02;
+			flipy = m_spriteattrib_ram[offs] & 0x01;
 
 			// Adjust sprites that should be far far right!
 			if (sx<0) sx+=256;
@@ -187,17 +186,17 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 				tile -= 128;
 				sy-=16;
 			}
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				flipx = !flipx;
 				flipy = !flipy;
 			}
-			drawgfx_transmask(bitmap,cliprect,machine.gfx[1+spritebank],
+			drawgfx_transmask(bitmap,cliprect,machine().gfx[1+spritebank],
 					tile,
 					color,
 					flipx,flipy,
 					sx,sy,
-					colortable_get_transpen_mask(machine.colortable, machine.gfx[1+spritebank], color, 0x8f));
+					colortable_get_transpen_mask(machine().colortable, machine().gfx[1+spritebank], color, 0x8f));
 		}
 	}
 }
@@ -205,6 +204,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 gsword_state::screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

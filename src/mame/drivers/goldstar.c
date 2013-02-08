@@ -10906,7 +10906,7 @@ DRIVER_INIT_MEMBER(goldstar_state,goldstar)
 
 // this block swapping is the same for chry10, chrygld and cb3
 //  the underlying bitswaps / xors are different however
-static void do_blockswaps(running_machine &machine, UINT8* ROM)
+void goldstar_state::do_blockswaps(UINT8* ROM)
 {
 	int A;
 	UINT8 *buffer;
@@ -10925,7 +10925,7 @@ static void do_blockswaps(running_machine &machine, UINT8* ROM)
 		0xa000, 0xa800, 0xb000, 0xb800,
 	};
 
-	buffer = auto_alloc_array(machine, UINT8, 0x10000);
+	buffer = auto_alloc_array(machine(), UINT8, 0x10000);
 	memcpy(buffer,ROM,0x10000);
 
 	// swap some 0x800 blocks around..
@@ -10934,16 +10934,16 @@ static void do_blockswaps(running_machine &machine, UINT8* ROM)
 		memcpy(ROM+A*0x800,buffer+cherry_swaptables[A],0x800);
 	}
 
-	auto_free(machine, buffer);
+	auto_free(machine(), buffer);
 }
 
-static void dump_to_file(running_machine& machine, UINT8* ROM)
+void goldstar_state::dump_to_file( UINT8* ROM)
 {
 	#if 0
 	{
 		FILE *fp;
 		char filename[256];
-		sprintf(filename,"decrypted_%s", machine.system().name);
+		sprintf(filename,"decrypted_%s", machine().system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
 		{
@@ -10954,7 +10954,7 @@ static void dump_to_file(running_machine& machine, UINT8* ROM)
 	#endif
 }
 
-static UINT8 decrypt(UINT8 cipherText, UINT16 address)
+UINT8 goldstar_state::decrypt(UINT8 cipherText, UINT16 address)
 {
 	int idx;
 	UINT8 output;
@@ -10971,7 +10971,7 @@ static UINT8 decrypt(UINT8 cipherText, UINT16 address)
 	return output ^ sbox[idx];
 }
 
-static UINT8 chry10_decrypt(UINT8 cipherText)
+UINT8 goldstar_state::chry10_decrypt(UINT8 cipherText)
 {
 	return cipherText ^ (BIT(cipherText, 4) << 3) ^ (BIT(cipherText, 1) << 5) ^ (BIT(cipherText, 6) << 7);
 }
@@ -10989,7 +10989,7 @@ DRIVER_INIT_MEMBER(goldstar_state,chry10)
 		ROM[i] = chry10_decrypt(ROM[i]);
 	}
 
-	do_blockswaps(machine(), ROM);
+	do_blockswaps(ROM);
 
 	/* The game has a PIC for protection.
 	   If the code enter to this sub, just
@@ -10997,7 +10997,7 @@ DRIVER_INIT_MEMBER(goldstar_state,chry10)
 	*/
 	ROM[0xA5DC] = 0xc9;
 
-	dump_to_file(machine(), ROM);
+	dump_to_file(ROM);
 }
 
 DRIVER_INIT_MEMBER(goldstar_state,cb3)
@@ -11013,8 +11013,8 @@ DRIVER_INIT_MEMBER(goldstar_state,cb3)
 		ROM[i] = decrypt(ROM[i], i);
 	}
 
-	do_blockswaps(machine(), ROM);
-	dump_to_file(machine(), ROM);
+	do_blockswaps(ROM);
+	dump_to_file(ROM);
 }
 
 
@@ -11022,7 +11022,7 @@ DRIVER_INIT_MEMBER(goldstar_state,chrygld)
 {
 	int A;
 	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	do_blockswaps(machine(), ROM);
+	do_blockswaps(ROM);
 
 	// a data bitswap
 	for (A = 0;A < 0x10000;A++)
@@ -11032,7 +11032,7 @@ DRIVER_INIT_MEMBER(goldstar_state,chrygld)
 		ROM[A] = dat;
 	}
 
-	dump_to_file(machine(), ROM);
+	dump_to_file(ROM);
 }
 
 DRIVER_INIT_MEMBER(goldstar_state,cm)

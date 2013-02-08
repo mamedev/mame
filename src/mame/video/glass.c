@@ -159,19 +159,18 @@ void glass_state::video_start()
       3  | xxxxxxxx xxxxxxxx | sprite code
 */
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void glass_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	glass_state *state = machine.driver_data<glass_state>();
 	int i;
-	gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 
 	for (i = 3; i < (0x1000 - 6) / 2; i += 4)
 	{
-		int sx = state->m_spriteram[i + 2] & 0x01ff;
-		int sy = (240 - (state->m_spriteram[i] & 0x00ff)) & 0x00ff;
-		int number = state->m_spriteram[i + 3];
-		int color = (state->m_spriteram[i + 2] & 0x1e00) >> 9;
-		int attr = (state->m_spriteram[i] & 0xfe00) >> 9;
+		int sx = m_spriteram[i + 2] & 0x01ff;
+		int sy = (240 - (m_spriteram[i] & 0x00ff)) & 0x00ff;
+		int number = m_spriteram[i + 3];
+		int color = (m_spriteram[i + 2] & 0x1e00) >> 9;
+		int attr = (m_spriteram[i] & 0xfe00) >> 9;
 
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
@@ -203,6 +202,6 @@ UINT32 glass_state::screen_update_glass(screen_device &screen, bitmap_ind16 &bit
 	copybitmap(bitmap, *m_screen_bitmap, 0, 0, 0x18, 0x24, cliprect);
 	m_pant[1]->draw(bitmap, cliprect, 0, 0);
 	m_pant[0]->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

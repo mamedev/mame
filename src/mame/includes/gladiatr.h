@@ -66,4 +66,6 @@ public:
 	DECLARE_VIDEO_START(gladiatr);
 	UINT32 screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_gladiatr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void swap_block(UINT8 *src1,UINT8 *src2,int len);
 };

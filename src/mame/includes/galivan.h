@@ -58,6 +58,7 @@ public:
 	DECLARE_VIDEO_START(ninjemak);
 	UINT32 screen_update_galivan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ninjemak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 /*----------- defined in video/galivan.c -----------*/

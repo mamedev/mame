@@ -118,10 +118,10 @@ WRITE8_MEMBER(galpani2_state::galpani2_mcu_init_w)
 	machine().device("sub")->execute().set_input_line(INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
 }
 
-static void galpani2_mcu_nmi1(running_machine &machine)
+void galpani2_state::galpani2_mcu_nmi1()
 {
-	address_space &srcspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	address_space &dstspace = machine.device("sub")->memory().space(AS_PROGRAM);
+	address_space &srcspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &dstspace = machine().device("sub")->memory().space(AS_PROGRAM);
 	UINT32 mcu_list, mcu_command, mcu_address, mcu_extra, mcu_src, mcu_dst, mcu_size;
 
 	for ( mcu_list = 0x100021; mcu_list < (0x100021 + 0x40); mcu_list += 4 )
@@ -137,7 +137,7 @@ static void galpani2_mcu_nmi1(running_machine &machine)
 		if (mcu_command != 0)
 		{
 			logerror("%s : MCU [$%06X] endidx = $%02X / command = $%02X addr = $%04X ? = $%02X.\n",
-			machine.describe_context(),
+			machine().describe_context(),
 			mcu_list,
 			srcspace.read_byte(0x100020),
 			mcu_command,
@@ -160,7 +160,7 @@ static void galpani2_mcu_nmi1(running_machine &machine)
 
 			mcu_size    =   (srcspace.read_byte(mcu_address + 8)<<8) +
 							(srcspace.read_byte(mcu_address + 9)<<0) ;
-			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",machine.describe_context(),mcu_command,mcu_src,mcu_size,mcu_dst);
+			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",machine().describe_context(),mcu_command,mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
@@ -185,7 +185,7 @@ static void galpani2_mcu_nmi1(running_machine &machine)
 			mcu_size    =   (srcspace.read_byte(mcu_address + 8)<<8) +
 							(srcspace.read_byte(mcu_address + 9)<<0) ;
 
-			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",machine.describe_context(),mcu_command,mcu_src,mcu_size,mcu_dst);
+			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",machine().describe_context(),mcu_command,mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
@@ -213,7 +213,7 @@ static void galpani2_mcu_nmi1(running_machine &machine)
 			srcspace.write_byte(mcu_address+0,0xff);
 			srcspace.write_byte(mcu_address+1,0xff);
 
-			logerror("%s : MCU ERROR, unknown command $%02X\n",machine.describe_context(),mcu_command);
+			logerror("%s : MCU ERROR, unknown command $%02X\n",machine().describe_context(),mcu_command);
 		}
 
 		/* Erase command (so that it won't be processed again)? */
@@ -221,10 +221,10 @@ static void galpani2_mcu_nmi1(running_machine &machine)
 	}
 }
 
-static void galpani2_mcu_nmi2(running_machine &machine)
+void galpani2_state::galpani2_mcu_nmi2()
 {
-		galpani2_write_kaneko(machine.device("maincpu"));
-		//logerror("%s : MCU executes CHECKs synchro\n", machine.describe_context());
+		galpani2_write_kaneko(machine().device("maincpu"));
+		//logerror("%s : MCU executes CHECKs synchro\n", machine().describe_context());
 }
 
 WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi1_w)//driven by CPU1's int5 ISR
@@ -233,7 +233,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi1_w)//driven by CPU1's int5 ISR
 //Triggered from 'maincpu' (00007D60),once, with no command, using alternate line, during init
 //Triggered from 'maincpu' (000080BE),once, for unknown command, during init
 //Triggered from 'maincpu' (0000741E),from here on...driven by int5, even if there's no command
-	if ( (data & 1) && !(m_old_mcu_nmi1 & 1) )  galpani2_mcu_nmi1(machine());
+	if ( (data & 1) && !(m_old_mcu_nmi1 & 1) )  galpani2_mcu_nmi1();
 	//if ( (data & 0x10) && !(m_old_mcu_nmi1 & 0x10) )    galpani2_mcu_nmi1(machine());
 	//alternate line, same function?
 	m_old_mcu_nmi1 = data;
@@ -241,7 +241,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi1_w)//driven by CPU1's int5 ISR
 
 WRITE8_MEMBER(galpani2_state::galpani2_mcu_nmi2_w)//driven by CPU2's int5 ISR
 {
-	if ( (data & 1) && !(m_old_mcu_nmi2 & 1) )  galpani2_mcu_nmi2(machine());
+	if ( (data & 1) && !(m_old_mcu_nmi2 & 1) )  galpani2_mcu_nmi2();
 	m_old_mcu_nmi2 = data;
 }
 

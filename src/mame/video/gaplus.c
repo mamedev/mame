@@ -125,18 +125,17 @@ TILE_GET_INFO_MEMBER(gaplus_state::get_tile_info)
 #define SPEED_2 1.0
 #define SPEED_3 2.0
 
-static void starfield_init(running_machine &machine)
+void gaplus_state::starfield_init()
 {
-	gaplus_state *state = machine.driver_data<gaplus_state>();
-	struct star *stars = state->m_stars;
+	struct star *stars = m_stars;
 	int generator = 0;
 	int x,y;
 	int set = 0;
 
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	state->m_total_stars = 0;
+	m_total_stars = 0;
 
 	/* precalculate the star background */
 	/* this comes from the Galaxian hardware, Gaplus is probably different */
@@ -155,16 +154,16 @@ static void starfield_init(running_machine &machine)
 				int color;
 
 				color = (~(generator >> 8)) & 0x3f;
-				if ( color && state->m_total_stars < MAX_STARS ) {
-					stars[state->m_total_stars].x = x;
-					stars[state->m_total_stars].y = y;
-					stars[state->m_total_stars].col = color;
-					stars[state->m_total_stars].set = set++;
+				if ( color && m_total_stars < MAX_STARS ) {
+					stars[m_total_stars].x = x;
+					stars[m_total_stars].y = y;
+					stars[m_total_stars].col = color;
+					stars[m_total_stars].set = set++;
 
 					if ( set == 3 )
 						set = 0;
 
-					state->m_total_stars++;
+					m_total_stars++;
 				}
 			}
 		}
@@ -185,7 +184,7 @@ void gaplus_state::video_start()
 
 	colortable_configure_tilemap_groups(machine().colortable, m_bg_tilemap, machine().gfx[0], 0xff);
 
-	starfield_init(machine());
+	starfield_init();
 }
 
 
@@ -221,21 +220,20 @@ WRITE8_MEMBER(gaplus_state::gaplus_starfield_control_w)
 
 ***************************************************************************/
 
-static void starfield_render(running_machine &machine, bitmap_ind16 &bitmap)
+void gaplus_state::starfield_render(bitmap_ind16 &bitmap)
 {
-	gaplus_state *state = machine.driver_data<gaplus_state>();
-	struct star *stars = state->m_stars;
+	struct star *stars = m_stars;
 	int i;
 
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
 	/* check if we're running */
-	if ( ( state->m_starfield_control[0] & 1 ) == 0 )
+	if ( ( m_starfield_control[0] & 1 ) == 0 )
 		return;
 
 	/* draw the starfields */
-	for ( i = 0; i < state->m_total_stars; i++ )
+	for ( i = 0; i < m_total_stars; i++ )
 	{
 		int x, y;
 
@@ -249,10 +247,9 @@ static void starfield_render(running_machine &machine, bitmap_ind16 &bitmap)
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void gaplus_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gaplus_state *state = machine.driver_data<gaplus_state>();
-	UINT8 *spriteram = state->m_spriteram + 0x780;
+	UINT8 *spriteram = m_spriteram + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
@@ -278,7 +275,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			int duplicate = spriteram_3[offs] & 0x80;
 			int x,y;
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -291,12 +288,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
+					drawgfx_transmask(bitmap,cliprect,machine().gfx[1],
 						sprite + (duplicate ? 0 : (gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)])),
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0xff));
+						colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0xff));
 				}
 			}
 		}
@@ -310,12 +307,12 @@ UINT32 gaplus_state::screen_update_gaplus(screen_device &screen, bitmap_ind16 &b
 
 	bitmap.fill(0, cliprect);
 
-	starfield_render(machine(), bitmap);
+	starfield_render(bitmap);
 
 	/* draw the low priority characters */
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	/* draw the high priority characters */
 	/* (I don't know if this feature is used by Gaplus, but it's shown in the schematics) */

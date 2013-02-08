@@ -99,6 +99,17 @@ public:
 	DECLARE_VIDEO_START(vgoalsoc);
 	DECLARE_VIDEO_START(twrldc94);
 	UINT32 screen_update_gstriker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void VS920A_init(int numchips);
+	tilemap_t* VS920A_get_tilemap(int numchip);
+	void VS920A_set_pal_base(int numchip, int pal_base);
+	void VS920A_set_gfx_region(int numchip, int gfx_region);
+	void VS920A_draw(int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority);
+	void MB60553_init(int numchips);
+	void MB60553_set_pal_base(int numchip, int pal_base);
+	void MB60553_set_gfx_region(int numchip, int gfx_region);
+	void MB60553_draw(int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority);
+	tilemap_t* MB60553_get_tilemap(int numchip);
+	void mcu_init(  );
 };
 
 #endif

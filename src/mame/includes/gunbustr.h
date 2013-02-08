@@ -42,4 +42,5 @@ public:
 	UINT32 screen_update_gunbustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gunbustr_interrupt);
 	TIMER_CALLBACK_MEMBER(gunbustr_interrupt5);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 };

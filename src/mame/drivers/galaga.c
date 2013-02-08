@@ -882,21 +882,20 @@ MACHINE_START_MEMBER(galaga_state,galaga)
 	save_item(NAME(m_sub2_nmi_mask));
 }
 
-static void bosco_latch_reset(running_machine &machine)
+void galaga_state::bosco_latch_reset()
 {
-	galaga_state *state = machine.driver_data<galaga_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0;i < 8;i++)
-		state->bosco_latch_w(space,i,0);
+		bosco_latch_w(space,i,0);
 }
 
 MACHINE_RESET_MEMBER(galaga_state,galaga)
 {
 	/* Reset all latches */
-	bosco_latch_reset(machine());
+	bosco_latch_reset();
 
 	m_cpu3_interrupt_timer->adjust(machine().primary_screen->time_until_pos(64), 64);
 }

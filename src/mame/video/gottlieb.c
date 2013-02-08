@@ -198,10 +198,9 @@ VIDEO_START_MEMBER(gottlieb_state,screwloo)
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	gottlieb_state *state = machine.driver_data<gottlieb_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	rectangle clip = cliprect;
 	int offs;
 
@@ -215,15 +214,15 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 		/* of level animation. */
 		int sx = (spriteram[offs + 1]) - 4;
 		int sy = (spriteram[offs]) - 13;
-		int code = (255 ^ spriteram[offs + 2]) + 256 * state->m_spritebank;
+		int code = (255 ^ spriteram[offs + 2]) + 256 * m_spritebank;
 
-		if (state->flip_screen_x()) sx = 233 - sx;
-		if (state->flip_screen_y()) sy = 244 - sy;
+		if (flip_screen_x()) sx = 233 - sx;
+		if (flip_screen_y()) sy = 244 - sy;
 
 		drawgfx_transpen(bitmap, clip,
-			machine.gfx[2],
+			machine().gfx[2],
 			code, 0,
-			state->flip_screen_x(), state->flip_screen_y(),
+			flip_screen_x(), flip_screen_y(),
 			sx,sy, 0);
 	}
 }
@@ -245,7 +244,7 @@ UINT32 gottlieb_state::screen_update_gottlieb(screen_device &screen, bitmap_rgb3
 		bitmap.fill(machine().pens[0], cliprect);
 
 	/* draw the sprites */
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	/* if the background has higher priority, render it now */
 	if (m_background_priority)

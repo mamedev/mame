@@ -87,10 +87,6 @@
 /* constants */
 #define FIRQ_SCANLINE 92
 
-
-/* local prototypes */
-static void poly17_init(running_machine &machine);
-
 /*************************************
  *
  *  Interrupt handling
@@ -142,7 +138,7 @@ void gridlee_state::machine_start()
 	m_maincpu = machine().device<cpu_device>("maincpu");
 
 	/* create the polynomial tables */
-	poly17_init(machine());
+	poly17_init();
 
 	state_save_register_global_array(machine(), m_last_analog_input);
 	state_save_register_global_array(machine(), m_last_analog_output);
@@ -221,15 +217,14 @@ READ8_MEMBER(gridlee_state::analog_port_r)
 #define POLY17_SHR  10
 #define POLY17_ADD  0x18000
 
-static void poly17_init(running_machine &machine)
+void gridlee_state::poly17_init()
 {
-	gridlee_state *state = machine.driver_data<gridlee_state>();
 	UINT32 i, x = 0;
 	UINT8 *p, *r;
 
 	/* allocate memory */
-	p = state->m_poly17 = auto_alloc_array(machine, UINT8, 2 * (POLY17_SIZE + 1));
-	r = state->m_rand17 = state->m_poly17 + POLY17_SIZE + 1;
+	p = m_poly17 = auto_alloc_array(machine(), UINT8, 2 * (POLY17_SIZE + 1));
+	r = m_rand17 = m_poly17 + POLY17_SIZE + 1;
 
 	/* generate the polynomial */
 	for (i = 0; i < POLY17_SIZE; i++)

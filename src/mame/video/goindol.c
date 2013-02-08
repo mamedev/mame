@@ -80,17 +80,16 @@ WRITE8_MEMBER(goindol_state::goindol_bg_videoram_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int gfxbank, UINT8 *sprite_ram )
+void goindol_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int gfxbank, UINT8 *sprite_ram )
 {
-	goindol_state *state = machine.driver_data<goindol_state>();
 	int offs, sx, sy, tile, palette;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		sx = sprite_ram[offs];
 		sy = 240 - sprite_ram[offs + 1];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -103,17 +102,17 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			palette = sprite_ram[offs + 2] >> 3;
 
 			drawgfx_transpen(bitmap,cliprect,
-						machine.gfx[gfxbank],
+						machine().gfx[gfxbank],
 						tile,
 						palette,
-						state->flip_screen(),state->flip_screen(),
+						flip_screen(),flip_screen(),
 						sx,sy, 0);
 			drawgfx_transpen(bitmap,cliprect,
-						machine.gfx[gfxbank],
+						machine().gfx[gfxbank],
 						tile+1,
 						palette,
-						state->flip_screen(),state->flip_screen(),
-						sx,sy + (state->flip_screen() ? -8 : 8), 0);
+						flip_screen(),flip_screen(),
+						sx,sy + (flip_screen() ? -8 : 8), 0);
 		}
 	}
 }
@@ -125,7 +124,7 @@ UINT32 goindol_state::screen_update_goindol(screen_device &screen, bitmap_ind16 
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect, 1, m_spriteram);
-	draw_sprites(machine(), bitmap, cliprect, 0, m_spriteram2);
+	draw_sprites(bitmap, cliprect, 1, m_spriteram);
+	draw_sprites(bitmap, cliprect, 0, m_spriteram2);
 	return 0;
 }

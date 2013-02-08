@@ -51,4 +51,7 @@ public:
 	INTERRUPT_GEN_MEMBER(gaplus_vblank_sub_irq);
 	INTERRUPT_GEN_MEMBER(gaplus_vblank_sub2_irq);
 	TIMER_CALLBACK_MEMBER(namcoio_run);
+	void starfield_init();
+	void starfield_render(bitmap_ind16 &bitmap);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

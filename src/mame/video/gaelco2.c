@@ -332,19 +332,18 @@ VIDEO_START_MEMBER(gaelco2_state,gaelco2_dual)
 
 ***************************************************************************/
 
-static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask, int xoffs)
+void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask, int xoffs)
 {
-	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
-	UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
+	UINT16 *buffered_spriteram16 = m_spriteram->buffer();
 	int j, x, y, ex, ey, px, py;
 	gfx_element *gfx = screen.machine().gfx[0];
 
 	/* get sprite ram start and end offsets */
-	int start_offset = (state->m_vregs[1] & 0x10)*0x100;
+	int start_offset = (m_vregs[1] & 0x10)*0x100;
 	int end_offset = start_offset + 0x1000;
 
 	/* sprite offset is based on the visible area */
-	int spr_x_adjust = (screen.visible_area().max_x - 320 + 1) - (511 - 320 - 1) - ((state->m_vregs[0] >> 4) & 0x01) + xoffs;
+	int spr_x_adjust = (screen.visible_area().max_x - 320 + 1) - (511 - 320 - 1) - ((m_vregs[0] >> 4) & 0x01) + xoffs;
 
 	for (j = start_offset; j < end_offset; j += 8){
 		int data = buffered_spriteram16[(j/2) + 0];
@@ -361,7 +360,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 		int xsize = ((data3 >> 12) & 0x0f) + 1;
 		int ysize = ((data2 >> 12) & 0x0f) + 1;
 
-		if (state->m_dual_monitor && ((data & 0x8000) != mask)) continue;
+		if (m_dual_monitor && ((data & 0x8000) != mask)) continue;
 
 		/* if it's enabled, draw it */
 		if ((data2 & 0x0200) != 0){
@@ -371,7 +370,7 @@ static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rect
 					int data5 = buffered_spriteram16[((data4/2) + (y*xsize + x)) & 0x7fff];
 					int number = ((data & 0x1ff) << 10) + (data5 & 0x0fff);
 					int color = ((data >> 9) & 0x7f) + ((data5 >> 12) & 0x0f);
-					int color_effect = state->m_dual_monitor ? ((color & 0x3f) == 0x3f) : (color == 0x7f);
+					int color_effect = m_dual_monitor ? ((color & 0x3f) == 0x3f) : (color == 0x7f);
 
 					ex = xflip ? (xsize - 1 - x) : x;
 					ey = yflip ? (ysize - 1 - y) : y;
@@ -458,31 +457,30 @@ UINT32 gaelco2_state::screen_update_gaelco2(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-static UINT32 dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
+UINT32 gaelco2_state::dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index)
 {
-	gaelco2_state *state = screen.machine().driver_data<gaelco2_state>();
 	int i;
 
 	/* read scroll values */
-	int scroll0x = state->m_videoram[0x2802/2] + 0x14;
-	int scroll1x = state->m_videoram[0x2806/2] + 0x10;
-	int scroll0y = state->m_videoram[0x2800/2] + 0x01;
-	int scroll1y = state->m_videoram[0x2804/2] + 0x01;
+	int scroll0x = m_videoram[0x2802/2] + 0x14;
+	int scroll1x = m_videoram[0x2806/2] + 0x10;
+	int scroll0y = m_videoram[0x2800/2] + 0x01;
+	int scroll1y = m_videoram[0x2804/2] + 0x01;
 
 	/* set y scroll registers */
-	state->m_pant[0]->set_scrolly(0, scroll0y & 0x1ff);
-	state->m_pant[1]->set_scrolly(0, scroll1y & 0x1ff);
+	m_pant[0]->set_scrolly(0, scroll0y & 0x1ff);
+	m_pant[1]->set_scrolly(0, scroll1y & 0x1ff);
 
 	/* set x linescroll registers */
 	for (i = 0; i < 512; i++){
-		state->m_pant[0]->set_scrollx(i & 0x1ff, (state->m_vregs[0] & 0x8000) ? (state->m_videoram[(0x2000/2) + i] + 0x14) & 0x3ff : scroll0x & 0x3ff);
-		state->m_pant[1]->set_scrollx(i & 0x1ff, (state->m_vregs[1] & 0x8000) ? (state->m_videoram[(0x2400/2) + i] + 0x10) & 0x3ff : scroll1x & 0x3ff);
+		m_pant[0]->set_scrollx(i & 0x1ff, (m_vregs[0] & 0x8000) ? (m_videoram[(0x2000/2) + i] + 0x14) & 0x3ff : scroll0x & 0x3ff);
+		m_pant[1]->set_scrollx(i & 0x1ff, (m_vregs[1] & 0x8000) ? (m_videoram[(0x2400/2) + i] + 0x10) & 0x3ff : scroll1x & 0x3ff);
 	}
 
 	/* draw screen */
 	bitmap.fill(0, cliprect);
 
-	state->m_pant[index]->draw(bitmap, cliprect, 0, 0);
+	m_pant[index]->draw(bitmap, cliprect, 0, 0);
 	draw_sprites(screen,bitmap,cliprect, 0x8000 * index, 0);
 
 	return 0;

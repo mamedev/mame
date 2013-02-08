@@ -48,4 +48,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_glass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(glass_interrupt);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void glass_ROM16_split_gfx( const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2 );
 };

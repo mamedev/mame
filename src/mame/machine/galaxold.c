@@ -64,12 +64,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxold_state::galaxold_interrupt_timer)
 }
 
 
-static void machine_reset_common(running_machine &machine, int line)
+void galaxold_state::machine_reset_common(int line)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	ttl7474_device *ttl7474_9m_1 = machine.device<ttl7474_device>("7474_9m_1");
-	ttl7474_device *ttl7474_9m_2 = machine.device<ttl7474_device>("7474_9m_2");
-	state->m_irq_line = line;
+	ttl7474_device *ttl7474_9m_1 = machine().device<ttl7474_device>("7474_9m_1");
+	ttl7474_device *ttl7474_9m_2 = machine().device<ttl7474_device>("7474_9m_2");
+	m_irq_line = line;
 
 	/* initalize main CPU interrupt generator flip-flops */
 	ttl7474_9m_2->preset_w(1);
@@ -80,23 +79,23 @@ static void machine_reset_common(running_machine &machine, int line)
 	ttl7474_9m_1->preset_w(0);
 
 	/* start a timer to generate interrupts */
-	timer_device *int_timer = machine.device<timer_device>("int_timer");
-	int_timer->adjust(machine.primary_screen->time_until_pos(0));
+	timer_device *int_timer = machine().device<timer_device>("int_timer");
+	int_timer->adjust(machine().primary_screen->time_until_pos(0));
 }
 
 MACHINE_RESET_MEMBER(galaxold_state,galaxold)
 {
-	machine_reset_common(machine(), INPUT_LINE_NMI);
+	machine_reset_common(INPUT_LINE_NMI);
 }
 
 MACHINE_RESET_MEMBER(galaxold_state,devilfsg)
 {
-	machine_reset_common(machine(), 0);
+	machine_reset_common(0);
 }
 
 MACHINE_RESET_MEMBER(galaxold_state,hunchbkg)
 {
-	machine_reset_common(machine(), 0);
+	machine_reset_common(0);
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxold_state::hunchbkg_irq_callback),this));
 }
 
@@ -281,7 +280,7 @@ DRIVER_INIT_MEMBER(galaxold_state,dingo)
 }
 
 
-static UINT8 decode_mooncrst(UINT8 data,offs_t addr)
+UINT8 galaxold_state::decode_mooncrst(UINT8 data,offs_t addr)
 {
 	UINT8 res;
 

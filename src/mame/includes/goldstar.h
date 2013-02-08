@@ -150,4 +150,8 @@ public:
 	UINT32 screen_update_amcoe1a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lucky8_irq);
+	void do_blockswaps(UINT8* ROM);
+	void dump_to_file( UINT8* ROM);
+	UINT8 decrypt(UINT8 cipherText, UINT16 address);
+	UINT8 chry10_decrypt(UINT8 cipherText);
 };

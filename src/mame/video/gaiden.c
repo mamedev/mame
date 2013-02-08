@@ -272,12 +272,11 @@ WRITE16_MEMBER(gaiden_state::gaiden_videoram_w)
    to blend into the final 32-bit rgb bitmaps, this is currently broken (due to zsolt's core
    changes?) it appears that the sprite drawing is no longer putting the correct raw data
    in the bitmaps? */
-static void blendbitmaps(running_machine &machine,
-		bitmap_rgb32 &dest,bitmap_ind16 &src1,bitmap_ind16 &src2,bitmap_ind16 &src3,
+void gaiden_state::blendbitmaps(bitmap_rgb32 &dest,bitmap_ind16 &src1,bitmap_ind16 &src2,bitmap_ind16 &src3,
 		int sx,int sy,const rectangle &cliprect)
 {
 	int y,x;
-	const pen_t *paldata = machine.pens;
+	const pen_t *paldata = machine().pens;
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -330,10 +329,9 @@ static void blendbitmaps(running_machine &machine,
  *         |---------x------- | x position (high bit)
  */
 
-static void drgnbowl_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void gaiden_state::drgnbowl_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gaiden_state *state = machine.driver_data<gaiden_state>();
-	UINT16 *spriteram = state->m_spriteram;
+	UINT16 *spriteram = m_spriteram;
 	int i, code, color, x, y, flipx, flipy, priority_mask;
 
 	for( i = 0; i < 0x800/2; i += 4 )
@@ -355,18 +353,18 @@ static void drgnbowl_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		else
 			priority_mask = 0;
 
-		pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[3],
+		pdrawgfx_transpen_raw(bitmap,cliprect,machine().gfx[3],
 				code,
-				machine.gfx[3]->colorbase() + color * machine.gfx[3]->granularity(),
+				machine().gfx[3]->colorbase() + color * machine().gfx[3]->granularity(),
 				flipx,flipy,x,y,
-				machine.priority_bitmap, priority_mask,15);
+				machine().priority_bitmap, priority_mask,15);
 
 		/* wrap x*/
-		pdrawgfx_transpen_raw(bitmap,cliprect,machine.gfx[3],
+		pdrawgfx_transpen_raw(bitmap,cliprect,machine().gfx[3],
 				code,
-				machine.gfx[3]->colorbase() + color * machine.gfx[3]->granularity(),
+				machine().gfx[3]->colorbase() + color * machine().gfx[3]->granularity(),
 				flipx,flipy,x-512,y,
-				machine.priority_bitmap, priority_mask,15);
+				machine().priority_bitmap, priority_mask,15);
 
 	}
 }
@@ -391,7 +389,7 @@ UINT32 gaiden_state::screen_update_gaiden(screen_device &screen, bitmap_rgb32 &b
 	gaiden_draw_sprites(machine(), m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, flip_screen());
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
 	return 0;
 
 }
@@ -416,7 +414,7 @@ UINT32 gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &bi
 	raiga_draw_sprites(machine(), m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, flip_screen());
 
 	/* mix & blend the tilemaps and sprites into a 32-bit bitmap */
-	blendbitmaps(machine(), bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
+	blendbitmaps(bitmap, m_tile_bitmap_bg, m_tile_bitmap_fg, m_sprite_bitmap, 0, 0, cliprect);
 	return 0;
 }
 
@@ -427,6 +425,6 @@ UINT32 gaiden_state::screen_update_drgnbowl(screen_device &screen, bitmap_ind16 
 	m_background->draw(bitmap, cliprect, 0, 1);
 	m_foreground->draw(bitmap, cliprect, 0, 2);
 	m_text_layer->draw(bitmap, cliprect, 0, 4);
-	drgnbowl_draw_sprites(machine(), bitmap, cliprect);
+	drgnbowl_draw_sprites(bitmap, cliprect);
 	return 0;
 }

@@ -116,23 +116,22 @@ VIDEO_START_MEMBER(gaelco_state,maniacsq)
       3  | xxxxxxxx xxxxxx-- | sprite code
 */
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void gaelco_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gaelco_state *state = machine.driver_data<gaelco_state>();
 	int i, x, y, ex, ey;
-	gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 
 	static const int x_offset[2] = {0x0,0x2};
 	static const int y_offset[2] = {0x0,0x1};
 
 	for (i = 0x800 - 4 - 1; i >= 3; i -= 4)
 	{
-		int sx = state->m_spriteram[i + 2] & 0x01ff;
-		int sy = (240 - (state->m_spriteram[i] & 0x00ff)) & 0x00ff;
-		int number = state->m_spriteram[i + 3];
-		int color = (state->m_spriteram[i + 2] & 0x7e00) >> 9;
-		int attr = (state->m_spriteram[i] & 0xfe00) >> 9;
-		int priority = (state->m_spriteram[i] & 0x3000) >> 12;
+		int sx = m_spriteram[i + 2] & 0x01ff;
+		int sy = (240 - (m_spriteram[i] & 0x00ff)) & 0x00ff;
+		int number = m_spriteram[i + 3];
+		int color = (m_spriteram[i + 2] & 0x7e00) >> 9;
+		int attr = (m_spriteram[i] & 0xfe00) >> 9;
+		int priority = (m_spriteram[i] & 0x3000) >> 12;
 
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
@@ -170,7 +169,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				pdrawgfx_transpen(bitmap,cliprect,gfx,number + x_offset[ex] + y_offset[ey],
 						color,xflip,yflip,
 						sx-0x0f+x*8,sy+y*8,
-						machine.priority_bitmap,pri_mask,0);
+						machine().priority_bitmap,pri_mask,0);
 			}
 		}
 	}
@@ -205,7 +204,7 @@ UINT32 gaelco_state::screen_update_maniacsq(screen_device &screen, bitmap_ind16 
 	m_tilemap[1]->draw(bitmap, cliprect, 0, 4);
 	m_tilemap[0]->draw(bitmap, cliprect, 0, 4);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -244,6 +243,6 @@ UINT32 gaelco_state::screen_update_bigkarnk(screen_device &screen, bitmap_ind16 
 	m_tilemap[1]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 8);
 	m_tilemap[0]->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0 | 0, 8);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

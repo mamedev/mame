@@ -29,6 +29,8 @@ public:
 	void screen_eof_galpanic(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpanic_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(galhustl_scanline);
+	void comad_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/galpanic.c -----------*/

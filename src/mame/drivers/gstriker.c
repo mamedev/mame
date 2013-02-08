@@ -1018,36 +1018,35 @@ WRITE16_MEMBER(gstriker_state::vbl_toggle_w)
 	}
 }
 
-static void mcu_init( running_machine &machine )
+void gstriker_state::mcu_init(  )
 {
-	gstriker_state *state = machine.driver_data<gstriker_state>();
-	state->m_dmmy_8f_ret = 0xFFFF;
-	state->m_pending_command = 0;
-	state->m_mcu_data = 0;
+	m_dmmy_8f_ret = 0xFFFF;
+	m_pending_command = 0;
+	m_mcu_data = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x20008a, 0x20008b, write16_delegate(FUNC(gstriker_state::twrldc94_mcu_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20008a, 0x20008b, read16_delegate(FUNC(gstriker_state::twrldc94_mcu_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x20008a, 0x20008b, write16_delegate(FUNC(gstriker_state::twrldc94_mcu_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20008a, 0x20008b, read16_delegate(FUNC(gstriker_state::twrldc94_mcu_r),this));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x20008e, 0x20008f, write16_delegate(FUNC(gstriker_state::twrldc94_prot_reg_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20008e, 0x20008f, read16_delegate(FUNC(gstriker_state::twrldc94_prot_reg_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x20008e, 0x20008f, write16_delegate(FUNC(gstriker_state::twrldc94_prot_reg_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x20008e, 0x20008f, read16_delegate(FUNC(gstriker_state::twrldc94_prot_reg_r),this));
 }
 
 DRIVER_INIT_MEMBER(gstriker_state,twrldc94)
 {
 	m_gametype = 1;
-	mcu_init( machine() );
+	mcu_init();
 }
 
 DRIVER_INIT_MEMBER(gstriker_state,twrldc94a)
 {
 	m_gametype = 2;
-	mcu_init( machine() );
+	mcu_init();
 }
 
 DRIVER_INIT_MEMBER(gstriker_state,vgoalsoc)
 {
 	m_gametype = 3;
-	mcu_init( machine() );
+	mcu_init();
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x200090, 0x200091, write16_delegate(FUNC(gstriker_state::vbl_toggle_w),this)); // vblank toggle
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x200090, 0x200091, read16_delegate(FUNC(gstriker_state::vbl_toggle_r),this));

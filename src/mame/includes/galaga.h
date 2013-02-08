@@ -61,6 +61,9 @@ public:
 	INTERRUPT_GEN_MEMBER(main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
 	TIMER_CALLBACK_MEMBER(cpu3_interrupt_callback);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void bosco_latch_reset();
 };
 
 class xevious_state : public galaga_state
@@ -98,6 +101,7 @@ public:
 	UINT32 screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(battles_interrupt_4);
 	TIMER_DEVICE_CALLBACK_MEMBER(battles_nmi_generate);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };
 
 
@@ -129,6 +133,11 @@ public:
 	DECLARE_PALETTE_INIT(bosco);
 	UINT32 screen_update_bosco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_bosco(screen_device &screen, bool state);
+	
+	inline void get_tile_info_bosco(tile_data &tileinfo,int tile_index,int ram_offs);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);	
 };
 
 class digdug_state : public galaga_state
@@ -155,6 +164,7 @@ public:
 	DECLARE_VIDEO_START(digdug);
 	DECLARE_PALETTE_INIT(digdug);
 	UINT32 screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in video/bosco.c -----------*/

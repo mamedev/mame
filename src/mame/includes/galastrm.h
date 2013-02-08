@@ -51,4 +51,7 @@ public:
 	INTERRUPT_GEN_MEMBER(galastrm_interrupt);
 	TIMER_CALLBACK_MEMBER(galastrm_interrupt6);
 	void galastrm_exit();
+	void draw_sprites_pre(int x_offs, int y_offs);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
+	void tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &clip);
 };

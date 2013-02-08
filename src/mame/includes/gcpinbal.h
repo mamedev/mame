@@ -62,4 +62,6 @@ public:
 	INTERRUPT_GEN_MEMBER(gcpinbal_interrupt);
 	TIMER_CALLBACK_MEMBER(gcpinbal_interrupt1);
 	TIMER_CALLBACK_MEMBER(gcpinbal_interrupt3);
+	void gcpinbal_core_vh_start(  );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 };

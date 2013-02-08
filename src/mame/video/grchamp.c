@@ -108,13 +108,13 @@ void grchamp_state::video_start()
 }
 
 #if 0
-static int collision_check(running_machine &machine, grchamp_state *state, bitmap_ind16 &bitmap, int which )
+int grchamp_state::collision_check(grchamp_state *state, bitmap_ind16 &bitmap, int which )
 {
-	int bgcolor = machine.pens[0];
-	int sprite_transp = machine.pens[0x24];
-	const rectangle &visarea = machine.primary_screen->visible_area();
-	int y0 = 240 - state->m_cpu0_out[3];
-	int x0 = 256 - state->m_cpu0_out[2];
+	int bgcolor = machine().pens[0];
+	int sprite_transp = machine().pens[0x24];
+	const rectangle &visarea = machine().primary_screen->visible_area();
+	int y0 = 240 - m_cpu0_out[3];
+	int x0 = 256 - m_cpu0_out[2];
 	int x,y,sx,sy;
 	int pixel;
 	int result = 0;
@@ -122,10 +122,10 @@ static int collision_check(running_machine &machine, grchamp_state *state, bitma
 	if( which==0 )
 	{
 		/* draw the current player sprite into a work bitmap */
-		drawgfx_opaque( state->m_work_bitmap,
-			state->m_work_bitmap.cliprect(),
-			machine.gfx[4],
-			state->m_cpu0_out[4]&0xf,
+		drawgfx_opaque( m_work_bitmap,
+			m_work_bitmap.cliprect(),
+			machine().gfx[4],
+			m_cpu0_out[4]&0xf,
 			1, /* color */
 			0,0,
 			0,0 );
@@ -135,7 +135,7 @@ static int collision_check(running_machine &machine, grchamp_state *state, bitma
 	{
 		for( x = 0; x<32; x++ )
 		{
-			pixel = state->m_work_bitmap.pix16(y, x);
+			pixel = m_work_bitmap.pix16(y, x);
 			if( pixel != sprite_transp ){
 				sx = x+x0;
 				sy = y+y0;
@@ -158,7 +158,7 @@ static int collision_check(running_machine &machine, grchamp_state *state, bitma
 	return result?(1<<which):0;
 }
 
-static void draw_fog(grchamp_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect, int fog)
+void grchamp_state::draw_fog(grchamp_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect, int fog)
 {
 	int x,y,offs;
 
@@ -175,11 +175,11 @@ static void draw_fog(grchamp_state *state, bitmap_ind16 &bitmap, const rectangle
 	}
 }
 
-static void draw_sprites(running_machine &machine, grchamp_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void grchamp_state::draw_sprites(grchamp_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gfx_element *gfx = machine.gfx[5];
-	int bank = (state->m_cpu0_out[0] & 0x20) ? 0x40 : 0x00;
-	const UINT8 *source = state->m_spriteram + 0x40;
+	gfx_element *gfx = machine().gfx[5];
+	int bank = (m_cpu0_out[0] & 0x20) ? 0x40 : 0x00;
+	const UINT8 *source = m_spriteram + 0x40;
 	const UINT8 *finish = source + 0x40;
 
 	while (source < finish)
@@ -201,7 +201,7 @@ static void draw_sprites(running_machine &machine, grchamp_state *state, bitmap_
 #endif
 
 
-static void draw_objects(running_machine &machine, grchamp_state *state, int y, UINT8 *objdata)
+void grchamp_state::draw_objects(int y, UINT8 *objdata)
 {
 /*
     CPU 5/7:
@@ -238,16 +238,16 @@ static void draw_objects(running_machine &machine, grchamp_state *state, int y, 
 
 
 */
-	const UINT8 *prom = machine.root_device().memregion("proms")->base() + 0x20;
+	const UINT8 *prom = machine().root_device().memregion("proms")->base() + 0x20;
 	gfx_element *gfx;
-	int change = (state->m_cpu0_out[0] & 0x20) << 3;
+	int change = (m_cpu0_out[0] & 0x20) << 3;
 	int num;
 
 	/* first clear to 0; this is done as the previous scanline was scanned */
 	memset(objdata, 0, 256);
 
 	/* now draw the sprites; this is done during HBLANK */
-	gfx = machine.gfx[4];
+	gfx = machine().gfx[4];
 	for (num = 0; num < 16; num++)
 	{
 		/*
@@ -261,23 +261,23 @@ static void draw_objects(running_machine &machine, grchamp_state *state, int y, 
 
 		/* the first of the 4 bytes is the Y position; this is used to match the scanline */
 		/* we match this scanline if the sum & 0xf0 == 0 */
-		int sy = state->m_spriteram[0x40 + (dataoffs & ~0x20)];
+		int sy = m_spriteram[0x40 + (dataoffs & ~0x20)];
 		int dy = sy + ~y;
 		if ((dy & 0xf0) == 0)
 		{
 			/* the second byte is: code is in bits 0-5, xflip in bit 6, yflip in bit 7 */
 			/* note that X flip is reversed (on purpose) */
-			int codeflip = state->m_spriteram[0x41 + dataoffs];
+			int codeflip = m_spriteram[0x41 + dataoffs];
 			int code = (codeflip & 0x3f) + (change >> 2);
 			int yflip = (codeflip & 0x80) ? 0x0f : 0x00;
 			int xflip = (codeflip & 0x40) ? 0x0f : 0x00;
 			const UINT8 *src = gfx->get_data(code) + ((dy ^ yflip) & 15) * gfx->rowbytes();
 
 			/* the third byte is: color in bits 0-2 */
-			int color = (state->m_spriteram[0x42 + (dataoffs & ~0x20)] & 0x07) << 2;
+			int color = (m_spriteram[0x42 + (dataoffs & ~0x20)] & 0x07) << 2;
 
 			/* the fourth byte is the X position */
-			int sx = state->m_spriteram[0x43 + dataoffs];
+			int sx = m_spriteram[0x43 + dataoffs];
 			int x;
 
 			/* draw 16 pixels */
@@ -299,7 +299,7 @@ static void draw_objects(running_machine &machine, grchamp_state *state, int y, 
 	}
 
 	/* finally draw the text characters; this is done as we read out the object buffers */
-	gfx = machine.gfx[0];
+	gfx = machine().gfx[0];
 	for (num = 0; num < 32; num++)
 	{
 		/*
@@ -311,10 +311,10 @@ static void draw_objects(running_machine &machine, grchamp_state *state, int y, 
 		*/
 		int hprime = num ^ 0x1f;
 		int dataoffs = hprime << 1;
-		int sy = state->m_spriteram[0x00 + dataoffs];
+		int sy = m_spriteram[0x00 + dataoffs];
 		int dy = sy + ~y;
-		int color = (state->m_spriteram[0x01 + dataoffs] & 0x07) << 2;
-		int code = state->m_videoram[hprime | ((dy & 0xf8) << 2)] + change;
+		int color = (m_spriteram[0x01 + dataoffs] & 0x07) << 2;
+		int code = m_videoram[hprime | ((dy & 0xf8) << 2)] + change;
 		const UINT8 *src = gfx->get_data(code) + (dy & 7) * gfx->rowbytes();
 		int x;
 
@@ -398,7 +398,7 @@ UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 
 		UINT8 objdata[256];
 
 		/* draw the objects for this scanline */
-		draw_objects(machine(), this, y, objdata);
+		draw_objects(y, objdata);
 
 		/* iterate over columns */
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)

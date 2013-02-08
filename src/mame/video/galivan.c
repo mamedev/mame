@@ -294,15 +294,14 @@ WRITE8_MEMBER(galivan_state::galivan_scrolly_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void galivan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	galivan_state *state = machine.driver_data<galivan_state>();
-	const UINT8 *spritepalettebank = state->memregion("user1")->base();
-	UINT8 *spriteram = state->m_spriteram;
+	const UINT8 *spritepalettebank = memregion("user1")->base();
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	/* draw the sprites */
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int code;
 		int attr = spriteram[offs + 2];
@@ -313,7 +312,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		sx = (spriteram[offs + 3] - 0x80) + 256 * (attr & 0x01);
 		sy = 240 - spriteram[offs];
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -324,7 +323,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 //      code = spriteram[offs + 1] + ((attr & 0x02) << 7);
 		code = spriteram[offs + 1] + ((attr & 0x06) << 7);  // for ninjemak, not sure ?
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 				code,
 				color + 16 * (spritepalettebank[code >> 2] & 0x0f),
 				flipx,flipy,
@@ -347,11 +346,11 @@ UINT32 galivan_state::screen_update_galivan(screen_device &screen, bitmap_ind16 
 	{
 		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 		m_tx_tilemap->draw(bitmap, cliprect, 1, 0);
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 	}
 	else
 	{
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 		m_tx_tilemap->draw(bitmap, cliprect, 1, 0);
 	}
@@ -370,7 +369,7 @@ UINT32 galivan_state::screen_update_ninjemak(screen_device &screen, bitmap_ind16
 	else
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

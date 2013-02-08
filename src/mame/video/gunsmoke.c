@@ -133,13 +133,12 @@ void gunsmoke_state::video_start()
 	colortable_configure_tilemap_groups(machine().colortable, m_fg_tilemap, machine().gfx[0], 0x4f);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void gunsmoke_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 32; offs >= 0; offs -= 32)
+	for (offs = m_spriteram.bytes() - 32; offs >= 0; offs -= 32)
 	{
 		int attr = spriteram[offs + 1];
 		int bank = (attr & 0xc0) >> 6;
@@ -151,11 +150,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sy = spriteram[offs + 2];
 
 		if (bank == 3)
-			bank += state->m_sprite3bank;
+			bank += m_sprite3bank;
 
 		code += 256 * bank;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -163,7 +162,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[2], code, color, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[2], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -178,7 +177,7 @@ UINT32 gunsmoke_state::screen_update_gunsmoke(screen_device &screen, bitmap_ind1
 		bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (m_objon)
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 
 	if (m_chon)
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

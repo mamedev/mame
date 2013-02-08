@@ -110,12 +110,11 @@ void gotya_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gotya_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(gotya_state::tilemap_scan_rows_thehand),this), 8, 8, 64, 32);
 }
 
-static void draw_status_row( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int col )
+void gotya_state::draw_status_row( bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int col )
 {
-	gotya_state *state = machine.driver_data<gotya_state>();
 	int row;
 
-	if (state->flip_screen())
+	if (flip_screen())
 	{
 		sx = 35 - sx;
 	}
@@ -124,24 +123,23 @@ static void draw_status_row( running_machine &machine, bitmap_ind16 &bitmap, con
 	{
 		int sy;
 
-		if (state->flip_screen())
+		if (flip_screen())
 			sy = row;
 		else
 			sy = 31 - row;
 
 		drawgfx_opaque(bitmap,cliprect,
-			machine.gfx[0],
-			state->m_videoram2[row * 32 + col],
-			state->m_videoram2[row * 32 + col + 0x10] & 0x0f,
-			state->flip_screen_x(), state->flip_screen_y(),
+			machine().gfx[0],
+			m_videoram2[row * 32 + col],
+			m_videoram2[row * 32 + col + 0x10] & 0x0f,
+			flip_screen_x(), flip_screen_y(),
 			8 * sx, 8 * sy);
 	}
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void gotya_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gotya_state *state = machine.driver_data<gotya_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 2; offs < 0x0e; offs += 2)
@@ -151,32 +149,32 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = 256 - spriteram[offs + 0x10] + (spriteram[offs + 0x01] & 0x01) * 256;
 		int sy = spriteram[offs + 0x00];
 
-		if (state->flip_screen())
+		if (flip_screen())
 			sy = 240 - sy;
 
 		drawgfx_transpen(bitmap,cliprect,
-			machine.gfx[1],
+			machine().gfx[1],
 			code, color,
-			state->flip_screen_x(), state->flip_screen_y(),
+			flip_screen_x(), flip_screen_y(),
 			sx, sy, 0);
 	}
 }
 
-static void draw_status( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void gotya_state::draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	draw_status_row(machine, bitmap, cliprect, 0,  1);
-	draw_status_row(machine, bitmap, cliprect, 1,  0);
-	draw_status_row(machine, bitmap, cliprect, 2,  2);  /* these two are blank, but I dont' know if the data comes */
-	draw_status_row(machine, bitmap, cliprect, 33, 13); /* from RAM or 'hardcoded' into the hardware. Likely the latter */
-	draw_status_row(machine, bitmap, cliprect, 35, 14);
-	draw_status_row(machine, bitmap, cliprect, 34, 15);
+	draw_status_row(bitmap, cliprect, 0,  1);
+	draw_status_row(bitmap, cliprect, 1,  0);
+	draw_status_row(bitmap, cliprect, 2,  2);  /* these two are blank, but I dont' know if the data comes */
+	draw_status_row(bitmap, cliprect, 33, 13); /* from RAM or 'hardcoded' into the hardware. Likely the latter */
+	draw_status_row(bitmap, cliprect, 35, 14);
+	draw_status_row(bitmap, cliprect, 34, 15);
 }
 
 UINT32 gotya_state::screen_update_gotya(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, -(*m_scroll + (m_scroll_bit_8 * 256)) - 2 * 8);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
-	draw_status(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
+	draw_status(bitmap, cliprect);
 	return 0;
 }

@@ -189,9 +189,8 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_video_registers_w)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void gladiatr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	gladiatr_state *state = machine.driver_data<gladiatr_state>();
 	int offs;
 
 	for (offs = 0;offs < 0x80;offs += 2)
@@ -201,10 +200,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			{0x0,0x1},
 			{0x2,0x3},
 		};
-		UINT8 *src = &state->m_spriteram[offs + (state->m_sprite_buffer << 7)];
+		UINT8 *src = &m_spriteram[offs + (m_sprite_buffer << 7)];
 		int attributes = src[0x800];
 		int size = (attributes & 0x10) >> 4;
-		int bank = (attributes & 0x01) + ((attributes & 0x02) ? state->m_sprite_bank : 0);
+		int bank = (attributes & 0x01) + ((attributes & 0x02) ? m_sprite_bank : 0);
 		int tile_number = (src[0]+256*bank);
 		int sx = src[0x400+1] + 256*(src[0x801]&1) - 0x38;
 		int sy = 240 - src[0x400] - (size ? 16 : 0);
@@ -213,7 +212,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int color = src[1] & 0x1f;
 		int x,y;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			xflip = !xflip;
 			yflip = !yflip;
@@ -228,7 +227,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 				int t = tile_offset[ey][ex] + tile_number;
 
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 						t,
 						color,
 						xflip, yflip,
@@ -243,7 +242,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 gladiatr_state::screen_update_ppking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 
 	/* the fg layer just selects the upper palette bank on underlying pixels */
 	{
@@ -290,7 +289,7 @@ UINT32 gladiatr_state::screen_update_gladiatr(screen_device &screen, bitmap_ind1
 		m_fg_tilemap->set_scrolly(0, m_fg_scrolly);
 
 		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-		draw_sprites(machine(), bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 	else

@@ -56,4 +56,7 @@ public:
 	DECLARE_WRITE16_MEMBER(gaelco2_eeprom_cs_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_eeprom_sk_w);
 	DECLARE_WRITE16_MEMBER(gaelco2_eeprom_data_w);
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int mask, int xoffs);
+	UINT32 dual_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int index);
+	void gaelco2_ROM16_split_gfx(const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2);
 };

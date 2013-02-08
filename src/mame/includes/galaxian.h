@@ -27,12 +27,6 @@
 #define GALAXIAN_VBEND          (16)
 #define GALAXIAN_VBSTART        (224+16)
 
-/* video extension callbacks */
-typedef void (*galaxian_extend_tile_info_func)(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
-typedef void (*galaxian_extend_sprite_info_func)(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
-typedef void (*galaxian_draw_bullet_func)(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
-typedef void (*galaxian_draw_background_func)(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 
 class galaxian_state : public driver_device
 {
@@ -70,10 +64,18 @@ public:
 	int m_tenspot_current_game;
 	UINT8 m_frogger_adjust;
 	UINT8 m_sfx_tilemap;
+	
+	/* video extension callbacks */
+	typedef void (galaxian_state::*galaxian_extend_tile_info_func)(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
+	typedef void (galaxian_state::*galaxian_extend_sprite_info_func)(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
+	typedef void (galaxian_state::*galaxian_draw_bullet_func)(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+	typedef void (galaxian_state::*galaxian_draw_background_func)(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	
 	galaxian_extend_tile_info_func m_extend_tile_info_ptr;
 	galaxian_extend_sprite_info_func m_extend_sprite_info_ptr;
 	galaxian_draw_bullet_func m_draw_bullet_ptr;
 	galaxian_draw_background_func m_draw_background_ptr;
+	
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_flipscreen_x;
 	UINT8 m_flipscreen_y;
@@ -230,60 +232,56 @@ public:
 	INTERRUPT_GEN_MEMBER(fakechange_interrupt_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(checkmaj_irq0_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(galaxian_stars_blink_timer);
+	void state_save_register();
+	void sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT8 *spritebase);
+	void bullets_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const UINT8 *base);
+	void stars_init();
+	void stars_update_origin();
+	void stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, UINT32 star_offs, UINT8 starmask);
+	void galaxian_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void background_draw_colorsplit(bitmap_rgb32 &bitmap, const rectangle &cliprect, rgb_t color, int split, int split_flipped);
+	void scramble_draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect, int maxx);
+	void scramble_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void anteater_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void jumpbug_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void turtles_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void frogger_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	int flip_and_clip(rectangle &draw, int xstart, int xend, const rectangle &cliprect);
+	void amidar_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	inline void galaxian_draw_pixel(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x, rgb_t color);
+	void galaxian_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+	void mshuttle_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+	void scramble_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+	void theend_draw_bullet(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
+	void upper_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
+	void upper_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
+	void frogger_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
+	void frogger_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
+	void gmgalax_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
+	void gmgalax_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
+	void pisces_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
+	void pisces_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
+	void batman2_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
+	void mooncrst_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
+	void mooncrst_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
+	void moonqsr_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
+	void moonqsr_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
+	void mshuttle_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
+	void mshuttle_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
+	void calipso_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
+	void jumpbug_extend_tile_info(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
+	void jumpbug_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
+	void monsterz_set_latch();
+	void decode_mooncrst(int length, UINT8 *dest);
+	void decode_checkman();
+	void decode_dingoe();
+	void decode_frogger_sound();
+	void decode_frogger_gfx();
+	void decode_anteater_gfx();
+	void decode_losttomb_gfx();
+	void decode_superbon();
+	void unmap_galaxian_sound(offs_t base);
+	void mshuttle_decode(const UINT8 convtable[8][16]);
+	void common_init(galaxian_draw_bullet_func draw_bullet,galaxian_draw_background_func draw_background,
+		galaxian_extend_tile_info_func extend_tile_info,galaxian_extend_sprite_info_func extend_sprite_info);
 };
-
-
-/*----------- defined in video/galaxian.c -----------*/
-
-/* special purpose background rendering */
-void galaxian_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-void frogger_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-//void amidar_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-void turtles_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-void scramble_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-void anteater_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-void jumpbug_draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-/* special purpose bullet rendering */
-void galaxian_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
-void mshuttle_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
-void scramble_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
-void theend_draw_bullet(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
-
-/* generic extensions */
-void upper_extend_tile_info(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
-void upper_extend_sprite_info(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
-
-/* Frogger extensions */
-void frogger_extend_tile_info(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
-void frogger_extend_sprite_info(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
-
-/* Ghostmuncher Galaxian extensions */
-void gmgalax_extend_tile_info(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
-void gmgalax_extend_sprite_info(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
-
-/* Pisces extensions */
-void pisces_extend_tile_info(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
-void pisces_extend_sprite_info(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
-
-/* Batman Part 2 extensions */
-void batman2_extend_tile_info(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
-
-/* Moon Cresta extensions */
-void mooncrst_extend_tile_info(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
-void mooncrst_extend_sprite_info(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
-
-/* Moon Quasar extensions */
-void moonqsr_extend_tile_info(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
-void moonqsr_extend_sprite_info(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
-
-/* Moon Shuttle extensions */
-void mshuttle_extend_tile_info(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
-void mshuttle_extend_sprite_info(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
-
-/* Calipso extensions */
-void calipso_extend_sprite_info(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
-
-/* Jumpbug extensions */
-void jumpbug_extend_tile_info(running_machine &machine, UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
-void jumpbug_extend_sprite_info(running_machine &machine, const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);

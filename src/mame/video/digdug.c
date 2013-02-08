@@ -237,19 +237,18 @@ WRITE8_HANDLER( digdug_PORT_w )
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void digdug_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	digdug_state *state =  machine.driver_data<digdug_state>();
-	UINT8 *spriteram = state->m_digdug_objram + 0x380;
-	UINT8 *spriteram_2 = state->m_digdug_posram + 0x380;
-	UINT8 *spriteram_3 = state->m_digdug_flpram + 0x380;
+	UINT8 *spriteram = m_digdug_objram + 0x380;
+	UINT8 *spriteram_2 = m_digdug_posram + 0x380;
+	UINT8 *spriteram_3 = m_digdug_flpram + 0x380;
 	int offs;
 
 	// mask upper and lower columns
 	rectangle visarea = cliprect;
 	visarea.min_x = 2*8;
 	visarea.max_x = 34*8-1;
-	if (state->flip_screen())
+	if (flip_screen())
 	{
 		visarea.min_x += 12*8;
 		visarea.max_x += 12*8;
@@ -277,7 +276,7 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap, const r
 		sy -= 16 * size;
 		sy = (sy & 0xff) - 32;  // fix wraparound
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			flipx ^= 1;
 			flipy ^= 1;
@@ -289,14 +288,14 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap, const r
 		{
 			for (x = 0;x <= size;x++)
 			{
-				UINT32 transmask = colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0x1f);
-				drawgfx_transmask(bitmap,visarea,machine.gfx[1],
+				UINT32 transmask = colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0x1f);
+				drawgfx_transmask(bitmap,visarea,machine().gfx[1],
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
 					((sx + 16*x) & 0xff), sy + 16*y,transmask);
 				/* wraparound */
-				drawgfx_transmask(bitmap,visarea,machine.gfx[1],
+				drawgfx_transmask(bitmap,visarea,machine().gfx[1],
 					sprite + gfx_offs[y ^ (size * flipy)][x ^ (size * flipx)],
 					color,
 					flipx,flipy,
@@ -311,6 +310,6 @@ UINT32 digdug_state::screen_update_digdug(screen_device &screen, bitmap_ind16 &b
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	return 0;
 }

@@ -101,15 +101,14 @@ WRITE8_MEMBER(gng_state::gng_flipscreen_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void gng_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	gng_state *state = machine.driver_data<gng_state>();
-	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
-	gfx_element *gfx = machine.gfx[2];
+	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	gfx_element *gfx = machine().gfx[2];
 	int offs;
 
 
-	for (offs = state->m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
 	{
 		UINT8 attributes = buffered_spriteram[offs + 1];
 		int sx = buffered_spriteram[offs + 3] - 0x100 * (attributes & 0x01);
@@ -117,7 +116,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = attributes & 0x04;
 		int flipy = attributes & 0x08;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -136,7 +135,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 gng_state::screen_update_gng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;

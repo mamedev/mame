@@ -55,11 +55,10 @@ Heavy use is made of sprite zooming.
 
 ********************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
+void gunbustr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
-	gunbustr_state *state = machine.driver_data<gunbustr_state>();
-	UINT32 *spriteram32 = state->m_spriteram;
-	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
+	UINT32 *spriteram32 = m_spriteram;
+	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -69,9 +68,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	struct tempsprite *sprite_ptr = state->m_spritelist;
+	struct tempsprite *sprite_ptr = m_spritelist;
 
-	for (offs = (state->m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
+	for (offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
 		data = spriteram32[offs+0];
 		flipx =    (data & 0x00800000) >> 23;
@@ -166,7 +165,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				}
 				else
 				{
-					drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_ptr->gfx],
+					drawgfxzoom_transpen(bitmap,cliprect,machine().gfx[sprite_ptr->gfx],
 							sprite_ptr->code,
 							sprite_ptr->color,
 							sprite_ptr->flipx,sprite_ptr->flipy,
@@ -181,17 +180,17 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != state->m_spritelist)
+	while (sprite_ptr != m_spritelist)
 	{
 		sprite_ptr--;
 
-		pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_ptr->gfx],
+		pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[sprite_ptr->gfx],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				machine.priority_bitmap,sprite_ptr->primask,0);
+				machine().priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 
@@ -235,7 +234,7 @@ UINT32 gunbustr_state::screen_update_gunbustr(screen_device &screen, bitmap_ind1
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[2], 0, 2);
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[3], 0, 4);
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 8);    /* text layer */
-	draw_sprites(machine(), bitmap, cliprect, primasks, 48, -116);
+	draw_sprites(bitmap, cliprect, primasks, 48, -116);
 #endif
 	return 0;
 }

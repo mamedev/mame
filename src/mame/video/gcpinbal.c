@@ -40,32 +40,31 @@ TILE_GET_INFO_MEMBER(gcpinbal_state::get_fg_tile_info)
 			0);
 }
 
-static void gcpinbal_core_vh_start( running_machine &machine )
+void gcpinbal_state::gcpinbal_core_vh_start(  )
 {
-	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
 	int xoffs = 0;
 	int yoffs = 0;
 
-	state->m_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gcpinbal_state::get_bg0_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gcpinbal_state::get_bg1_tile_info),state),TILEMAP_SCAN_ROWS,16,16,32,32);
-	state->m_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gcpinbal_state::get_fg_tile_info),state), TILEMAP_SCAN_ROWS,8,8,64,64);
+	m_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gcpinbal_state::get_bg0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gcpinbal_state::get_bg1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gcpinbal_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS,8,8,64,64);
 
-	state->m_tilemap[0]->set_transparent_pen(0);
-	state->m_tilemap[1]->set_transparent_pen(0);
-	state->m_tilemap[2]->set_transparent_pen(0);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[2]->set_transparent_pen(0);
 
 	/* flipscreen n/a */
-	state->m_tilemap[0]->set_scrolldx(-xoffs, 0);
-	state->m_tilemap[1]->set_scrolldx(-xoffs, 0);
-	state->m_tilemap[2]->set_scrolldx(-xoffs, 0);
-	state->m_tilemap[0]->set_scrolldy(-yoffs, 0);
-	state->m_tilemap[1]->set_scrolldy(-yoffs, 0);
-	state->m_tilemap[2]->set_scrolldy(-yoffs, 0);
+	m_tilemap[0]->set_scrolldx(-xoffs, 0);
+	m_tilemap[1]->set_scrolldx(-xoffs, 0);
+	m_tilemap[2]->set_scrolldx(-xoffs, 0);
+	m_tilemap[0]->set_scrolldy(-yoffs, 0);
+	m_tilemap[1]->set_scrolldy(-yoffs, 0);
+	m_tilemap[2]->set_scrolldy(-yoffs, 0);
 }
 
 void gcpinbal_state::video_start()
 {
-	gcpinbal_core_vh_start(machine());
+	gcpinbal_core_vh_start();
 }
 
 
@@ -164,10 +163,9 @@ WRITE16_MEMBER(gcpinbal_state::gcpinbal_ctrl_word_w)
 
 ****************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
+void gcpinbal_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	gcpinbal_state *state = machine.driver_data<gcpinbal_state>();
-	UINT16 *spriteram = state->m_spriteram;
+	UINT16 *spriteram = m_spriteram;
 	int offs, chain_pos;
 	int x, y, curx, cury;
 	int priority = 0;
@@ -175,9 +173,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT16 code;
 
 	/* According to Raine, word in ioc_ram determines sprite/tile priority... */
-	priority = (state->m_ioc_ram[0x68 / 2] & 0x8800) ? 0 : 1;
+	priority = (m_ioc_ram[0x68 / 2] & 0x8800) ? 0 : 1;
 
-	for (offs = state->m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
+	for (offs = m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
 		code = ((spriteram[offs + 5]) & 0xff) + (((spriteram[offs + 6]) & 0xff) << 8);
 		code &= 0x3fff;
@@ -204,12 +202,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			for (chain_pos = chain; chain_pos >= 0; chain_pos--)
 			{
-				pdrawgfx_transpen(bitmap, cliprect,machine.gfx[0],
+				pdrawgfx_transpen(bitmap, cliprect,machine().gfx[0],
 						code,
 						col,
 						flipx, flipy,
 						curx,cury,
-						machine.priority_bitmap,
+						machine().priority_bitmap,
 						priority ? 0xfc : 0xf0,0);
 
 				code++;
@@ -310,7 +308,7 @@ UINT32 gcpinbal_state::screen_update_gcpinbal(screen_device &screen, bitmap_ind1
 	m_tilemap[layer[2]]->draw(bitmap, cliprect, 0, 4);
 
 
-	draw_sprites(machine(), bitmap, cliprect, 16);
+	draw_sprites(bitmap, cliprect, 16);
 
 #if 0
 	{

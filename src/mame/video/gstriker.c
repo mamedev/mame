@@ -50,9 +50,8 @@ WRITE16_MEMBER(gstriker_state::VS920A_1_vram_w)
 	m_VS920A[1].tmap->mark_tile_dirty(offset);
 }
 
-static void VS920A_init(running_machine &machine, int numchips)
+void gstriker_state::VS920A_init(int numchips)
 {
-	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int i;
 
 	if (numchips > MAX_VS920A)
@@ -60,32 +59,32 @@ static void VS920A_init(running_machine &machine, int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		state->m_VS920A[i].tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gstriker_state::VS920A_get_tile_info),state),TILEMAP_SCAN_ROWS,8,8,64,32);
+		m_VS920A[i].tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gstriker_state::VS920A_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-		state->m_VS920A[i].tmap->set_transparent_pen(0);
+		m_VS920A[i].tmap->set_transparent_pen(0);
 	}
 }
 
-static tilemap_t* VS920A_get_tilemap(gstriker_state *state, int numchip)
+tilemap_t* gstriker_state::VS920A_get_tilemap(int numchip)
 {
-	return state->m_VS920A[numchip].tmap;
+	return m_VS920A[numchip].tmap;
 }
 
-static void VS920A_set_pal_base(gstriker_state *state, int numchip, int pal_base)
+void gstriker_state::VS920A_set_pal_base(int numchip, int pal_base)
 {
-	state->m_VS920A[numchip].pal_base = pal_base;
+	m_VS920A[numchip].pal_base = pal_base;
 }
 
-static void VS920A_set_gfx_region(gstriker_state *state, int numchip, int gfx_region)
+void gstriker_state::VS920A_set_gfx_region(int numchip, int gfx_region)
 {
-	state->m_VS920A[numchip].gfx_region = gfx_region;
+	m_VS920A[numchip].gfx_region = gfx_region;
 }
 
-static void VS920A_draw(gstriker_state *state, int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority)
+void gstriker_state::VS920A_draw(int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority)
 {
-	state->m_VS920A_cur_chip = &state->m_VS920A[numchip];
+	m_VS920A_cur_chip = &m_VS920A[numchip];
 
-	state->m_VS920A_cur_chip->tmap->draw(screen, cliprect, 0, priority);
+	m_VS920A_cur_chip->tmap->draw(screen, cliprect, 0, priority);
 }
 
 
@@ -207,9 +206,8 @@ TILEMAP_MAPPER_MEMBER(gstriker_state::twc94_scan)
 	return (row*64) + (col&63) + ((col&64)<<6);
 }
 
-static void MB60553_init(running_machine &machine, int numchips)
+void gstriker_state::MB60553_init(int numchips)
 {
-	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int i;
 
 	if (numchips > MAX_MB60553)
@@ -217,32 +215,31 @@ static void MB60553_init(running_machine &machine, int numchips)
 
 	for (i=0;i<numchips;i++)
 	{
-		state->m_MB60553[i].tmap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(gstriker_state::MB60553_get_tile_info),state),tilemap_mapper_delegate(FUNC(gstriker_state::twc94_scan),state), 16,16,128,64);
+		m_MB60553[i].tmap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(gstriker_state::MB60553_get_tile_info),this),tilemap_mapper_delegate(FUNC(gstriker_state::twc94_scan),this), 16,16,128,64);
 
-		state->m_MB60553[i].tmap->set_transparent_pen(0);
+		m_MB60553[i].tmap->set_transparent_pen(0);
 	}
 }
 
-static void MB60553_set_pal_base(gstriker_state *state, int numchip, int pal_base)
+void gstriker_state::MB60553_set_pal_base(int numchip, int pal_base)
 {
-	state->m_MB60553[numchip].pal_base = pal_base;
+	m_MB60553[numchip].pal_base = pal_base;
 }
 
-static void MB60553_set_gfx_region(gstriker_state *state, int numchip, int gfx_region)
+void gstriker_state::MB60553_set_gfx_region(int numchip, int gfx_region)
 {
-	state->m_MB60553[numchip].gfx_region = gfx_region;
+	m_MB60553[numchip].gfx_region = gfx_region;
 }
 
 /* THIS IS STILL WRONG! */
-static void MB60553_draw(running_machine &machine, int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority)
+void gstriker_state::MB60553_draw(int numchip, bitmap_ind16& screen, const rectangle &cliprect, int priority)
 {
-	gstriker_state *state = machine.driver_data<gstriker_state>();
 	int line;
 	rectangle clip;
-	state->m_MB60553_cur_chip = &state->m_MB60553[numchip];
+	m_MB60553_cur_chip = &m_MB60553[numchip];
 
-	clip.min_x = machine.primary_screen->visible_area().min_x;
-	clip.max_x = machine.primary_screen->visible_area().max_x;
+	clip.min_x = machine().primary_screen->visible_area().min_x;
+	clip.max_x = machine().primary_screen->visible_area().max_x;
 
 	for (line = 0; line < 224;line++)
 	{
@@ -253,19 +250,19 @@ static void MB60553_draw(running_machine &machine, int numchip, bitmap_ind16& sc
 
 		UINT32 incxx,incyy;
 
-		startx = state->m_MB60553_cur_chip->regs[0];
-		starty = state->m_MB60553_cur_chip->regs[1];
+		startx = m_MB60553_cur_chip->regs[0];
+		starty = m_MB60553_cur_chip->regs[1];
 
 		startx += (24<<4); // maybe not..
 
-		startx -=  state->m_lineram[(line)*8+7]/2;
+		startx -=  m_lineram[(line)*8+7]/2;
 
-		incxx = state->m_lineram[(line)*8+0]<<4;
-		incyy = state->m_lineram[(line)*8+3]<<4;
+		incxx = m_lineram[(line)*8+0]<<4;
+		incyy = m_lineram[(line)*8+3]<<4;
 
 		clip.min_y = clip.max_y = line;
 
-		state->m_MB60553_cur_chip->tmap->draw_roz(screen, clip, startx<<12,starty<<12,
+		m_MB60553_cur_chip->tmap->draw_roz(screen, clip, startx<<12,starty<<12,
 				incxx,0,0,incyy,
 				1,
 				0,priority);
@@ -276,9 +273,9 @@ static void MB60553_draw(running_machine &machine, int numchip, bitmap_ind16& sc
 
 }
 
-static tilemap_t* MB60553_get_tilemap(gstriker_state *state, int numchip)
+tilemap_t* gstriker_state::MB60553_get_tilemap(int numchip)
 {
-	return state->m_MB60553[numchip].tmap;
+	return m_MB60553[numchip].tmap;
 }
 
 
@@ -338,11 +335,11 @@ UINT32 gstriker_state::screen_update_gstriker(screen_device &screen, bitmap_ind1
 
 	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably
 	//  needs sprite orthogonality
-	MB60553_draw(machine(), 0, bitmap,cliprect, 0);
+	MB60553_draw(0, bitmap,cliprect, 0);
 
 	m_spr->draw_sprites(m_CG10103_vram, 0x2000, machine(), bitmap, cliprect, 0x2, 0x0);
 
-	VS920A_draw(this, 0, bitmap, cliprect, 0);
+	VS920A_draw(0, bitmap, cliprect, 0);
 
 	m_spr->draw_sprites(m_CG10103_vram, 0x2000, machine(), bitmap, cliprect, 0x2, 0x2);
 
@@ -367,16 +364,16 @@ VIDEO_START_MEMBER(gstriker_state,gstriker)
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
 	// Initalize the chip for the score plane
-	VS920A_init(machine(), 1);
-	VS920A_set_gfx_region(this, 0, 0);
-	VS920A_set_pal_base(this, 0, 0x30);
-	VS920A_get_tilemap(this, 0)->set_transparent_pen(0xf);
+	VS920A_init(1);
+	VS920A_set_gfx_region(0, 0);
+	VS920A_set_pal_base(0, 0x30);
+	VS920A_get_tilemap(0)->set_transparent_pen(0xf);
 
 	// Initalize the chip for the screen plane
-	MB60553_init(machine(), 1);
-	MB60553_set_gfx_region(this, 0, 1);
-	MB60553_set_pal_base(this, 0, 0);
-	MB60553_get_tilemap(this, 0)->set_transparent_pen(0xf);
+	MB60553_init(1);
+	MB60553_set_gfx_region(0, 1);
+	MB60553_set_pal_base(0, 0);
+	MB60553_get_tilemap(0)->set_transparent_pen(0xf);
 }
 
 VIDEO_START_MEMBER(gstriker_state,twrldc94)
@@ -384,16 +381,16 @@ VIDEO_START_MEMBER(gstriker_state,twrldc94)
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
 	// Initalize the chip for the score plane
-	VS920A_init(machine(), 1);
-	VS920A_set_gfx_region(this, 0, 0);
-	VS920A_set_pal_base(this, 0, 0x40);
-	VS920A_get_tilemap(this, 0)->set_transparent_pen(0xf);
+	VS920A_init(1);
+	VS920A_set_gfx_region(0, 0);
+	VS920A_set_pal_base(0, 0x40);
+	VS920A_get_tilemap(0)->set_transparent_pen(0xf);
 
 	// Initalize the chip for the screen plane
-	MB60553_init(machine(), 1);
-	MB60553_set_gfx_region(this, 0, 1);
-	MB60553_set_pal_base(this, 0, 0x50);
-	MB60553_get_tilemap(this, 0)->set_transparent_pen(0xf);
+	MB60553_init(1);
+	MB60553_set_gfx_region(0, 1);
+	MB60553_set_pal_base(0, 0x50);
+	MB60553_get_tilemap(0)->set_transparent_pen(0xf);
 }
 
 VIDEO_START_MEMBER(gstriker_state,vgoalsoc)
@@ -401,14 +398,14 @@ VIDEO_START_MEMBER(gstriker_state,vgoalsoc)
 	// Palette bases are hardcoded, but should be probably extracted from the mixer registers
 
 	// Initalize the chip for the score plane
-	VS920A_init(machine(), 1);
-	VS920A_set_gfx_region(this, 0, 0);
-	VS920A_set_pal_base(this, 0, 0x30);
-	VS920A_get_tilemap(this, 0)->set_transparent_pen(0xf);
+	VS920A_init(1);
+	VS920A_set_gfx_region(0, 0);
+	VS920A_set_pal_base(0, 0x30);
+	VS920A_get_tilemap(0)->set_transparent_pen(0xf);
 
 	// Initalize the chip for the screen plane
-	MB60553_init(machine(), 1);
-	MB60553_set_gfx_region(this, 0, 1);
-	MB60553_set_pal_base(this, 0, 0x20);
-	MB60553_get_tilemap(this, 0)->set_transparent_pen(0xf);
+	MB60553_init(1);
+	MB60553_set_gfx_region(0, 1);
+	MB60553_set_pal_base(0, 0x20);
+	MB60553_get_tilemap(0)->set_transparent_pen(0xf);
 }

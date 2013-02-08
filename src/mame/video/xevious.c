@@ -410,13 +410,11 @@ ROM 3M,3L color replace table for sprite
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void xevious_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	xevious_state *state =  machine.driver_data<xevious_state>();
-
-	UINT8 *spriteram = state->m_xevious_sr3 + 0x780;
-	UINT8 *spriteram_2 = state->m_xevious_sr1 + 0x780;
-	UINT8 *spriteram_3 = state->m_xevious_sr2 + 0x780;
+	UINT8 *spriteram = m_xevious_sr3 + 0x780;
+	UINT8 *spriteram_2 = m_xevious_sr1 + 0x780;
+	UINT8 *spriteram_3 = m_xevious_sr2 + 0x780;
 	int offs,sx,sy;
 
 	for (offs = 0;offs < 0x80;offs += 2)
@@ -444,7 +442,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			sx = spriteram_2[offs + 1] - 40 + 0x100*(spriteram_3[offs + 1] & 1);
 			sy = 28*8-spriteram_2[offs]-1;
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				flipx = !flipx;
 				flipy = !flipy;
@@ -452,41 +450,41 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				sx += 96;
 			}
 
-			transmask = colortable_get_transpen_mask(machine.colortable, machine.gfx[bank], color, 0x80);
+			transmask = colortable_get_transpen_mask(machine().colortable, machine().gfx[bank], color, 0x80);
 
 			if (spriteram_3[offs] & 2)  /* double height (?) */
 			{
 				if (spriteram_3[offs] & 1)  /* double width, double height */
 				{
 					code &= ~3;
-					drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
+					drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
 							code+3,color,flipx,flipy,
 							flipx ? sx : sx+16,flipy ? sy-16 : sy,transmask);
-					drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
+					drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
 							code+1,color,flipx,flipy,
 							flipx ? sx : sx+16,flipy ? sy : sy-16,transmask);
 				}
 				code &= ~2;
-				drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
+				drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
 						code+2,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy-16 : sy,transmask);
-				drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
+				drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
 						code,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy : sy-16,transmask);
 			}
 			else if (spriteram_3[offs] & 1) /* double width */
 			{
 				code &= ~1;
-				drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
+				drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
 						code,color,flipx,flipy,
 						flipx ? sx+16 : sx,flipy ? sy-16 : sy,transmask);
-				drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
+				drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
 						code+1,color,flipx,flipy,
 						flipx ? sx : sx+16,flipy ? sy-16 : sy,transmask);
 			}
 			else    /* normal */
 			{
-				drawgfx_transmask(bitmap,cliprect,machine.gfx[bank],
+				drawgfx_transmask(bitmap,cliprect,machine().gfx[bank],
 						code,color,flipx,flipy,sx,sy,transmask);
 			}
 		}
@@ -497,7 +495,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 UINT32 xevious_state::screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

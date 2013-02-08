@@ -36,7 +36,7 @@ driver by Chris Moore
  *
  *************************************/
 
-static void gameplan_get_pens( pen_t *pens )
+void gameplan_state::gameplan_get_pens( pen_t *pens )
 {
 	offs_t i;
 
@@ -46,7 +46,7 @@ static void gameplan_get_pens( pen_t *pens )
 
 
 /* RGBI palette. Is it correct, or does it use the standard RGB? */
-static void leprechn_get_pens( pen_t *pens )
+void gameplan_state::leprechn_get_pens( pen_t *pens )
 {
 	offs_t i;
 

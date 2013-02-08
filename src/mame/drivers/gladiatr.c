@@ -982,7 +982,7 @@ ROM_START( gcastle )
 ROM_END
 
 
-static void swap_block(UINT8 *src1,UINT8 *src2,int len)
+void gladiatr_state::swap_block(UINT8 *src1,UINT8 *src2,int len)
 {
 	int i,t;
 

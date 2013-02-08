@@ -84,10 +84,9 @@ TILE_GET_INFO_MEMBER(goal92_state::get_fore_tile_info)
 	SET_TILE_INFO_MEMBER(region, tile, color, 0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void goal92_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	goal92_state *state = machine.driver_data<goal92_state>();
-	UINT16 *buffered_spriteram16 = state->m_buffered_spriteram;
+	UINT16 *buffered_spriteram16 = m_buffered_spriteram;
 	int offs, fx, fy, x, y, color, sprite;
 
 	for (offs = 3; offs <= 0x400 - 5; offs += 4)
@@ -122,7 +121,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		y = 256 - (y + 7);
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				sprite,
 				color,fx,fy,x,y,15);
 	}
@@ -162,18 +161,18 @@ UINT32 goal92_state::screen_update_goal92(screen_device &screen, bitmap_ind16 &b
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	m_bg_layer->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect, 2);
+	draw_sprites(bitmap, cliprect, 2);
 
 	if (!(m_fg_bank & 0xff))
-		draw_sprites(machine(), bitmap, cliprect, 1);
+		draw_sprites(bitmap, cliprect, 1);
 
 	m_fg_layer->draw(bitmap, cliprect, 0, 0);
 
 	if(m_fg_bank & 0xff)
-		draw_sprites(machine(), bitmap, cliprect, 1);
+		draw_sprites(bitmap, cliprect, 1);
 
-	draw_sprites(machine(), bitmap, cliprect, 0);
-	draw_sprites(machine(), bitmap, cliprect, 3);
+	draw_sprites(bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, 3);
 	m_tx_layer->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

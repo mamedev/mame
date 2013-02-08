@@ -119,8 +119,5 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_gen);
 	TIMER_CALLBACK_MEMBER(delayed_sound_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
+	void gaelco3d_render(screen_device &screen);
 };
-
-/*----------- defined in video/gaelco3d.c -----------*/
-
-void gaelco3d_render(screen_device &screen);

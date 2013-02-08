@@ -75,6 +75,7 @@ public:
 	INTERRUPT_GEN_MEMBER(grchamp_cpu0_interrupt);
 	INTERRUPT_GEN_MEMBER(grchamp_cpu1_interrupt);
 	TIMER_CALLBACK_MEMBER(main_to_sub_comm_sync_w);
+	void draw_objects(int y, UINT8 *objdata);
 };
 
 /* Discrete Sound Input Nodes */

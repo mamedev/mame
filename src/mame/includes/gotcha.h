@@ -47,4 +47,5 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_gotcha(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	inline void get_tile_info( tile_data &tileinfo, int tile_index ,UINT16 *vram, int color_offs);
 };

@@ -7,61 +7,9 @@
 #include "emu.h"
 #include "includes/galaxold.h"
 
-#define STARS_COLOR_BASE_LEGACY (machine.root_device().memregion("proms")->bytes())
 #define STARS_COLOR_BASE        (machine().root_device().memregion("proms")->bytes())
 #define BULLETS_COLOR_BASE      (STARS_COLOR_BASE + 64)
-#define BULLETS_COLOR_BASE_LEGACY       (STARS_COLOR_BASE_LEGACY + 64)
 #define BACKGROUND_COLOR_BASE   (BULLETS_COLOR_BASE + 2)
-#define BACKGROUND_COLOR_BASE_LEGACY    (BULLETS_COLOR_BASE_LEGACY + 2)
-
-
-
-
-static void mooncrst_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x);
-static void   pisces_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x);
-static void mimonkey_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x);
-static void  mariner_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x);
-static void dambustr_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x);
-
-static void mshuttle_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-static void mimonkey_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-static void  batman2_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-static void dkongjrm_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-static void   ad2083_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-static void dambustr_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-
-static void drivfrcg_modify_color(UINT8 *color);
-
-
-
-
-		void galaxold_init_stars(running_machine &machine, int colors_offset);
-static void     noop_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-		void galaxold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-static void scrambold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-static void   rescue_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-static void  mariner_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-static void start_stars_blink_timer(running_machine &machine, double ra, double rb, double c);
-static void start_stars_scroll_timer(running_machine &machine);
-
-/* bullets circuit */
-static void galaxold_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
-static void scrambold_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
-static void darkplnt_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
-static void dambustr_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
-
-/* background circuit */
-static void galaxold_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-static void scrambold_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-static void  ad2083_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-static void  mariner_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-static void stratgyx_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-static void  minefld_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-static void   rescue_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-static void dambustr_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-
-
 
 /***************************************************************************
 
@@ -127,7 +75,7 @@ PALETTE_INIT_MEMBER(galaxold_state,galaxold)
 	}
 
 
-	galaxold_init_stars(machine(), STARS_COLOR_BASE);
+	galaxold_init_stars(STARS_COLOR_BASE);
 
 
 	/* bullets - yellow and white */
@@ -372,7 +320,7 @@ PALETTE_INIT_MEMBER(galaxold_state,dambustr)
 	}
 
 
-	galaxold_init_stars(machine(), STARS_COLOR_BASE);
+	galaxold_init_stars(STARS_COLOR_BASE);
 
 
 	/* bullets - yellow and white */
@@ -430,56 +378,54 @@ PALETTE_INIT_MEMBER(galaxold_state,turtles)
 
 ***************************************************************************/
 
-static void state_save_register(running_machine &machine)
+void galaxold_state::state_save_register()
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	state_save_register_global_array(machine, state->m_gfxbank);
-	state_save_register_global(machine, state->m_flipscreen_x);
-	state_save_register_global(machine, state->m_flipscreen_y);
+	state_save_register_global_array(machine(), m_gfxbank);
+	state_save_register_global(machine(), m_flipscreen_x);
+	state_save_register_global(machine(), m_flipscreen_y);
 
-	state_save_register_global(machine, state->m_stars_on);
-	state_save_register_global(machine, state->m_stars_scrollpos);
-	state_save_register_global(machine, state->m_stars_blink_state);
+	state_save_register_global(machine(), m_stars_on);
+	state_save_register_global(machine(), m_stars_scrollpos);
+	state_save_register_global(machine(), m_stars_blink_state);
 
-	state_save_register_global(machine, state->m_darkplnt_bullet_color);
+	state_save_register_global(machine(), m_darkplnt_bullet_color);
 
-	state_save_register_global(machine, state->m_background_enable);
-	state_save_register_global(machine, state->m_background_red);
-	state_save_register_global(machine, state->m_background_green);
-	state_save_register_global(machine, state->m_background_blue);
+	state_save_register_global(machine(), m_background_enable);
+	state_save_register_global(machine(), m_background_red);
+	state_save_register_global(machine(), m_background_green);
+	state_save_register_global(machine(), m_background_blue);
 }
 
-static void video_start_common(running_machine &machine)
+void galaxold_state::video_start_common()
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	state->m_modify_charcode = 0;
-	state->m_modify_spritecode = 0;
-	state->m_modify_color = 0;
-	state->m_modify_ypos = 0;
+	m_modify_charcode = 0;
+	m_modify_spritecode = 0;
+	m_modify_color = 0;
+	m_modify_ypos = 0;
 
-	state->m_mooncrst_gfxextend = 0;
+	m_mooncrst_gfxextend = 0;
 
-	state->m_draw_bullets = 0;
+	m_draw_bullets = 0;
 
-	state->m_draw_background = galaxold_draw_background;
-	state->m_background_enable = 0;
-	state->m_background_blue = 0;
-	state->m_background_red = 0;
-	state->m_background_green = 0;
+	m_draw_background = &galaxold_state::galaxold_draw_background;
+	m_background_enable = 0;
+	m_background_blue = 0;
+	m_background_red = 0;
+	m_background_green = 0;
 
-	state->m_draw_stars = noop_draw_stars;
+	m_draw_stars = &galaxold_state::noop_draw_stars;
 
-	state->m_flipscreen_x = 0;
-	state->m_flipscreen_y = 0;
+	m_flipscreen_x = 0;
+	m_flipscreen_y = 0;
 
-	state->m_spriteram2_present = 0;
+	m_spriteram2_present = 0;
 
-	state_save_register(machine);
+	state_save_register();
 }
 
 VIDEO_START_MEMBER(galaxold_state,galaxold_plain)
 {
-	video_start_common(machine());
+	video_start_common();
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 	m_bg_tilemap->set_transparent_pen(0);
 
@@ -492,9 +438,9 @@ VIDEO_START_MEMBER(galaxold_state,galaxold)
 {
 	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
-	m_draw_stars = galaxold_draw_stars;
+	m_draw_stars = &galaxold_state::galaxold_draw_stars;
 
-	m_draw_bullets = galaxold_draw_bullets;
+	m_draw_bullets = &galaxold_state::galaxold_draw_bullets;
 }
 
 VIDEO_START_MEMBER(galaxold_state,scrambold)
@@ -506,11 +452,11 @@ VIDEO_START_MEMBER(galaxold_state,scrambold)
 	 */
 	m_bg_tilemap->set_scrolldx(0, 0);
 
-	m_draw_stars = scrambold_draw_stars;
+	m_draw_stars = &galaxold_state::scrambold_draw_stars;
 
-	m_draw_bullets = scrambold_draw_bullets;
+	m_draw_bullets = &galaxold_state::scrambold_draw_bullets;
 
-	m_draw_background = scrambold_draw_background;
+	m_draw_background = &galaxold_state::scrambold_draw_background;
 }
 
 VIDEO_START_MEMBER(galaxold_state,darkplnt)
@@ -518,68 +464,68 @@ VIDEO_START_MEMBER(galaxold_state,darkplnt)
 	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
 	m_bg_tilemap->set_scrolldx(0, 0);
-	m_draw_bullets = darkplnt_draw_bullets;
+	m_draw_bullets = &galaxold_state::darkplnt_draw_bullets;
 }
 
 VIDEO_START_MEMBER(galaxold_state,rescue)
 {
 	VIDEO_START_CALL_MEMBER(scrambold);
 
-	m_draw_stars = rescue_draw_stars;
+	m_draw_stars = &galaxold_state::rescue_draw_stars;
 
-	m_draw_background = rescue_draw_background;
+	m_draw_background = &galaxold_state::rescue_draw_background;
 }
 
 VIDEO_START_MEMBER(galaxold_state,minefld)
 {
 	VIDEO_START_CALL_MEMBER(scrambold);
 
-	m_draw_stars = rescue_draw_stars;
+	m_draw_stars = &galaxold_state::rescue_draw_stars;
 
-	m_draw_background = minefld_draw_background;
+	m_draw_background = &galaxold_state::minefld_draw_background;
 }
 
 VIDEO_START_MEMBER(galaxold_state,stratgyx)
 {
 	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
-	m_draw_background = stratgyx_draw_background;
+	m_draw_background = &galaxold_state::stratgyx_draw_background;
 }
 
 VIDEO_START_MEMBER(galaxold_state,ckongs)
 {
 	VIDEO_START_CALL_MEMBER(scrambold);
 
-	m_modify_spritecode = mshuttle_modify_spritecode;
+	m_modify_spritecode = &galaxold_state::mshuttle_modify_spritecode;
 }
 
 VIDEO_START_MEMBER(galaxold_state,mariner)
 {
 	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
-	m_draw_stars = mariner_draw_stars;
+	m_draw_stars = &galaxold_state::mariner_draw_stars;
 
-	m_draw_bullets = scrambold_draw_bullets;
+	m_draw_bullets = &galaxold_state::scrambold_draw_bullets;
 
-	m_draw_background = mariner_draw_background;
+	m_draw_background = &galaxold_state::mariner_draw_background;
 
-	m_modify_charcode = mariner_modify_charcode;
+	m_modify_charcode = &galaxold_state::mariner_modify_charcode;
 }
 
 VIDEO_START_MEMBER(galaxold_state,mimonkey)
 {
 	VIDEO_START_CALL_MEMBER(scrambold);
 
-	m_modify_charcode   = mimonkey_modify_charcode;
-	m_modify_spritecode = mimonkey_modify_spritecode;
+	m_modify_charcode   = &galaxold_state::mimonkey_modify_charcode;
+	m_modify_spritecode = &galaxold_state::mimonkey_modify_spritecode;
 }
 
 VIDEO_START_MEMBER(galaxold_state,dkongjrm)
 {
 	VIDEO_START_CALL_MEMBER(galaxold_plain);
 
-	m_modify_charcode   = pisces_modify_charcode;
-	m_modify_spritecode = dkongjrm_modify_spritecode;
+	m_modify_charcode   = &galaxold_state::pisces_modify_charcode;
+	m_modify_spritecode = &galaxold_state::dkongjrm_modify_spritecode;
 
 	m_spriteram2_present= 1;
 }
@@ -588,25 +534,24 @@ VIDEO_START_MEMBER(galaxold_state,scorpion)
 {
 	VIDEO_START_CALL_MEMBER(scrambold);
 
-	m_modify_spritecode = batman2_modify_spritecode;
+	m_modify_spritecode = &galaxold_state::batman2_modify_spritecode;
 }
 
-static void pisces_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+void galaxold_state::pisces_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	*code |= (state->m_gfxbank[0] << 6);
+	*code |= (m_gfxbank[0] << 6);
 }
 
 VIDEO_START_MEMBER(galaxold_state,pisces)
 {
 	VIDEO_START_CALL_MEMBER(galaxold);
 
-	m_modify_charcode   = pisces_modify_charcode;
-	m_modify_spritecode = pisces_modify_spritecode;
+	m_modify_charcode   = &galaxold_state::pisces_modify_charcode;
+	m_modify_spritecode = &galaxold_state::pisces_modify_spritecode;
 }
 
 #ifdef UNUSED_FUNCTION
-static void theend_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
+void galaxold_state::theend_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
 	int i;
 
@@ -625,16 +570,15 @@ VIDEO_START_MEMBER(galaxold_state,theend)
 {
 	VIDEO_START_CALL_MEMBER(galaxold);
 
-	m_draw_bullets = theend_draw_bullets;
+	m_draw_bullets = &galaxold_state::theend_draw_bullets;
 }
 #endif
 
-static void mooncrst_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+void galaxold_state::mooncrst_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	if (state->m_gfxbank[2] && ((*code & 0x30) == 0x20))
+	if (m_gfxbank[2] && ((*code & 0x30) == 0x20))
 	{
-		*code = (*code & 0x0f) | (state->m_gfxbank[0] << 4) | (state->m_gfxbank[1] << 5) | 0x40;
+		*code = (*code & 0x0f) | (m_gfxbank[0] << 4) | (m_gfxbank[1] << 5) | 0x40;
 	}
 }
 
@@ -642,16 +586,15 @@ VIDEO_START_MEMBER(galaxold_state,mooncrst)
 {
 	VIDEO_START_CALL_MEMBER(galaxold);
 
-	m_modify_charcode   = mooncrst_modify_charcode;
-	m_modify_spritecode = mooncrst_modify_spritecode;
+	m_modify_charcode   = &galaxold_state::mooncrst_modify_charcode;
+	m_modify_spritecode = &galaxold_state::mooncrst_modify_spritecode;
 }
 
-static void batman2_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x)
+void galaxold_state::batman2_modify_charcode(UINT16 *code, UINT8 x)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
 	if (*code & 0x80)
 	{
-		*code |= (state->m_gfxbank[0] << 8);
+		*code |= (m_gfxbank[0] << 8);
 	}
 }
 
@@ -659,22 +602,20 @@ VIDEO_START_MEMBER(galaxold_state,batman2)
 {
 	VIDEO_START_CALL_MEMBER(galaxold);
 
-	m_modify_charcode   = batman2_modify_charcode;
-	m_modify_spritecode = batman2_modify_spritecode;
+	m_modify_charcode   = &galaxold_state::batman2_modify_charcode;
+	m_modify_spritecode = &galaxold_state::batman2_modify_spritecode;
 }
 
 
 
-static void rockclim_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::rockclim_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	state->m_rockclim_tilemap->draw(bitmap, cliprect, 0,0);
+	m_rockclim_tilemap->draw(bitmap, cliprect, 0,0);
 }
 
-static void rockclim_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+void galaxold_state::rockclim_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	if (state->m_gfxbank[2])    *code|=0x40;
+	if (m_gfxbank[2])    *code|=0x40;
 }
 
 VIDEO_START_MEMBER(galaxold_state,rockclim)
@@ -682,9 +623,9 @@ VIDEO_START_MEMBER(galaxold_state,rockclim)
 	VIDEO_START_CALL_MEMBER(galaxold);
 	m_rockclim_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::rockclim_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
-	m_draw_background = rockclim_draw_background;
-	m_modify_charcode = mooncrst_modify_charcode;
-	m_modify_spritecode = rockclim_modify_spritecode;
+	m_draw_background = &galaxold_state::rockclim_draw_background;
+	m_modify_charcode = &galaxold_state::mooncrst_modify_charcode;
+	m_modify_spritecode = &galaxold_state::rockclim_modify_spritecode;
 
 	m_rockclim_v = m_rockclim_h = 0;
 	state_save_register_global(machine(), m_rockclim_v);
@@ -706,31 +647,31 @@ TILE_GET_INFO_MEMBER(galaxold_state::drivfrcg_get_tile_info)
 
 VIDEO_START_MEMBER(galaxold_state,drivfrcg)
 {
-	video_start_common(machine());
+	video_start_common();
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::drivfrcg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
 
-	m_modify_spritecode = mshuttle_modify_spritecode;
-	m_modify_color = drivfrcg_modify_color;
+	m_modify_spritecode = &galaxold_state::mshuttle_modify_spritecode;
+	m_modify_color = &galaxold_state::drivfrcg_modify_color;
 
 	m_color_mask = 0xff;
 }
 
 VIDEO_START_MEMBER(galaxold_state,ad2083)
 {
-	video_start_common(machine());
+	video_start_common();
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::drivfrcg_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_bg_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_scroll_cols(32);
 
-	m_modify_spritecode = ad2083_modify_spritecode;
+	m_modify_spritecode = &galaxold_state::ad2083_modify_spritecode;
 
-	m_draw_bullets = scrambold_draw_bullets;
+	m_draw_bullets = &galaxold_state::scrambold_draw_bullets;
 
-	m_draw_background = ad2083_draw_background;
+	m_draw_background = &galaxold_state::ad2083_draw_background;
 
 	m_color_mask = 7;
 }
@@ -756,7 +697,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::racknrol_get_tile_info)
 
 VIDEO_START_MEMBER(galaxold_state,racknrol)
 {
-	video_start_common(machine());
+	video_start_common();
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::racknrol_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_bg_tilemap->set_transparent_pen(0);
@@ -780,15 +721,14 @@ TILE_GET_INFO_MEMBER(galaxold_state::harem_get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-static void harem_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+void galaxold_state::harem_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	*code |= (state->m_gfxbank[0] << 7) | 0x40;
+	*code |= (m_gfxbank[0] << 7) | 0x40;
 }
 
 VIDEO_START_MEMBER(galaxold_state,harem)
 {
-	video_start_common(machine());
+	video_start_common();
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(galaxold_state::harem_get_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 //  m_bg_tilemap->set_transparent_pen(0);   // opaque tilemap to get sky and sand colors
 
@@ -796,7 +736,7 @@ VIDEO_START_MEMBER(galaxold_state,harem)
 
 	m_color_mask = (machine().gfx[0]->granularity() == 4) ? 7 : 3;
 
-	m_modify_spritecode = harem_modify_spritecode;
+	m_modify_spritecode = &galaxold_state::harem_modify_spritecode;
 }
 
 VIDEO_START_MEMBER(galaxold_state,ozon1)
@@ -812,7 +752,7 @@ VIDEO_START_MEMBER(galaxold_state,bongo)
 
 	m_bg_tilemap->set_scrolldx(0, 384-256);
 
-	m_modify_spritecode = batman2_modify_spritecode;
+	m_modify_spritecode = &galaxold_state::batman2_modify_spritecode;
 }
 
 TILE_GET_INFO_MEMBER(galaxold_state::dambustr_get_tile_info2)
@@ -824,12 +764,12 @@ TILE_GET_INFO_MEMBER(galaxold_state::dambustr_get_tile_info2)
 
 	if (m_modify_charcode)
 	{
-		(*m_modify_charcode)(machine(), &code, x);
+		(this->*m_modify_charcode)(&code, x);
 	}
 
 	if (m_modify_color)
 	{
-		(*m_modify_color)(&color);
+		(this->*m_modify_color)(&color);
 	}
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
@@ -845,12 +785,12 @@ VIDEO_START_MEMBER(galaxold_state,dambustr)
 	m_dambustr_bg_priority = 0;
 	m_dambustr_char_bank = 0;
 
-	m_draw_background = dambustr_draw_background;
+	m_draw_background = &galaxold_state::dambustr_draw_background;
 
-	m_modify_charcode   = dambustr_modify_charcode;
-	m_modify_spritecode = dambustr_modify_spritecode;
+	m_modify_charcode   = &galaxold_state::dambustr_modify_charcode;
+	m_modify_spritecode = &galaxold_state::dambustr_modify_spritecode;
 
-	m_draw_bullets = dambustr_draw_bullets;
+	m_draw_bullets = &galaxold_state::dambustr_draw_bullets;
 
 	/* allocate the temporary bitmap for the background priority */
 	m_dambustr_tmpbitmap = auto_bitmap_ind16_alloc(machine(), machine().primary_screen->width(), machine().primary_screen->height());
@@ -891,7 +831,7 @@ WRITE8_MEMBER(galaxold_state::galaxold_attributesram_w)
 		{
 			if (m_modify_ypos)
 			{
-				(*m_modify_ypos)(&data);
+				(this->*m_modify_ypos)(&data);
 			}
 
 			m_bg_tilemap->set_scrolly(offset >> 1, data);
@@ -1036,43 +976,39 @@ WRITE8_MEMBER(galaxold_state::dambustr_bg_color_w)
 
 /* character banking functions */
 
-static void mooncrst_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x)
+void galaxold_state::mooncrst_modify_charcode(UINT16 *code, UINT8 x)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	if (state->m_gfxbank[2] && ((*code & 0xc0) == 0x80))
+	if (m_gfxbank[2] && ((*code & 0xc0) == 0x80))
 	{
-		*code = (*code & 0x3f) | (state->m_gfxbank[0] << 6) | (state->m_gfxbank[1] << 7) | 0x0100;
+		*code = (*code & 0x3f) | (m_gfxbank[0] << 6) | (m_gfxbank[1] << 7) | 0x0100;
 	}
 }
 
-static void pisces_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x)
+void galaxold_state::pisces_modify_charcode(UINT16 *code, UINT8 x)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	*code |= (state->m_gfxbank[0] << 8);
+	*code |= (m_gfxbank[0] << 8);
 }
 
-static void mimonkey_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x)
+void galaxold_state::mimonkey_modify_charcode(UINT16 *code, UINT8 x)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	*code |= (state->m_gfxbank[0] << 8) | (state->m_gfxbank[2] << 9);
+	*code |= (m_gfxbank[0] << 8) | (m_gfxbank[2] << 9);
 }
 
-static void mariner_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x)
+void galaxold_state::mariner_modify_charcode(UINT16 *code, UINT8 x)
 {
 	UINT8 *prom;
 
 
 	/* bit 0 of the PROM controls character banking */
 
-	prom = machine.root_device().memregion("user2")->base();
+	prom = machine().root_device().memregion("user2")->base();
 
 	*code |= ((prom[x] & 0x01) << 8);
 }
 
-static void dambustr_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x)
+void galaxold_state::dambustr_modify_charcode(UINT16 *code, UINT8 x)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	if (state->m_dambustr_char_bank == 0) { // text mode
+	if (m_dambustr_char_bank == 0) { // text mode
 		*code |= 0x0300;
 	}
 	else {              // graphics mode
@@ -1087,39 +1023,38 @@ static void dambustr_modify_charcode(running_machine &machine, UINT16 *code, UIN
 
 /* sprite banking functions */
 
-static void mshuttle_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+void galaxold_state::mshuttle_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
 	*code |= ((spriteram[offs + 2] & 0x30) << 2);
 }
 
 
-static void mimonkey_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+void galaxold_state::mimonkey_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	*code |= (state->m_gfxbank[0] << 6) | (state->m_gfxbank[2] << 7);
+	*code |= (m_gfxbank[0] << 6) | (m_gfxbank[2] << 7);
 }
 
-static void batman2_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+void galaxold_state::batman2_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
 	/* only the upper 64 sprites are used */
 	*code |= 0x40;
 }
 
-static void dkongjrm_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+void galaxold_state::dkongjrm_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
 	/* No x flip */
 	*code = (spriteram[offs + 1] & 0x7f) | 0x80;
 	*flipx = 0;
 }
 
-static void ad2083_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+void galaxold_state::ad2083_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
 	/* No x flip */
 	*code = (spriteram[offs + 1] & 0x7f) | ((spriteram[offs + 2] & 0x30) << 2);
 	*flipx = 0;
 }
 
-static void dambustr_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+void galaxold_state::dambustr_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
 	*code += 0x40;
 }
@@ -1127,7 +1062,7 @@ static void dambustr_modify_spritecode(running_machine &machine, UINT8 *spritera
 
 /* color PROM mapping functions */
 
-static void drivfrcg_modify_color(UINT8 *color)
+void galaxold_state::drivfrcg_modify_color(UINT8 *color)
 {
 	*color = ((*color & 0x40) >> 3) | (*color & 7);
 }
@@ -1137,7 +1072,7 @@ static void drivfrcg_modify_color(UINT8 *color)
 
 /* bullet drawing functions */
 
-static void galaxold_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
+void galaxold_state::galaxold_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
 	int i;
 
@@ -1152,42 +1087,39 @@ static void galaxold_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap
 
 
 			/* yellow missile, white shells (this is the terminology on the schematics) */
-			color = ((offs == 7*4) ? BULLETS_COLOR_BASE_LEGACY : BULLETS_COLOR_BASE_LEGACY + 1);
+			color = ((offs == 7*4) ? BULLETS_COLOR_BASE : BULLETS_COLOR_BASE + 1);
 
 			bitmap.pix16(y, x) = color;
 		}
 	}
 }
 
-static void scrambold_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
+void galaxold_state::scrambold_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	if (state->m_flipscreen_x)  x++;
+	if (m_flipscreen_x)  x++;
 
 	x = x - 6;
 
 	if (cliprect.contains(x, y))
 		/* yellow bullets */
-		bitmap.pix16(y, x) = BULLETS_COLOR_BASE_LEGACY;
+		bitmap.pix16(y, x) = BULLETS_COLOR_BASE;
 }
 
-static void darkplnt_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
+void galaxold_state::darkplnt_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	if (state->m_flipscreen_x)  x++;
+	if (m_flipscreen_x)  x++;
 
 	x = x - 6;
 
 	if (cliprect.contains(x, y))
-		bitmap.pix16(y, x) = 32 + state->m_darkplnt_bullet_color;
+		bitmap.pix16(y, x) = 32 + m_darkplnt_bullet_color;
 }
 
-static void dambustr_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
+void galaxold_state::dambustr_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
 	int i, color;
 
-	if (state->flip_screen_x())  x++;
+	if (flip_screen_x())  x++;
 
 	x = x - 6;
 
@@ -1196,11 +1128,11 @@ static void dambustr_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap
 	{
 		if (offs < 4*4)
 		{
-			color = BULLETS_COLOR_BASE_LEGACY;
+			color = BULLETS_COLOR_BASE;
 			y--;
 		}
 		else {
-			color = BULLETS_COLOR_BASE_LEGACY + 1;
+			color = BULLETS_COLOR_BASE + 1;
 			x--;
 		}
 
@@ -1213,35 +1145,32 @@ static void dambustr_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap
 
 /* background drawing functions */
 
-static void galaxold_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::galaxold_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* plain black background */
 	bitmap.fill(0, cliprect);
 }
 
-static void scrambold_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::scrambold_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	if (state->m_background_enable)
-		bitmap.fill(BACKGROUND_COLOR_BASE_LEGACY, cliprect);
+	if (m_background_enable)
+		bitmap.fill(BACKGROUND_COLOR_BASE, cliprect);
 	else
 		bitmap.fill(0, cliprect);
 }
 
-static void ad2083_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::ad2083_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	int color = (state->m_background_blue << 2) | (state->m_background_green << 1) | state->m_background_red;
+	int color = (m_background_blue << 2) | (m_background_green << 1) | m_background_red;
 
-	bitmap.fill(BACKGROUND_COLOR_BASE_LEGACY + color, cliprect);
+	bitmap.fill(BACKGROUND_COLOR_BASE + color, cliprect);
 }
 
-static void stratgyx_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::stratgyx_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
 	UINT8 x;
 	UINT8 *prom;
-	int base = BACKGROUND_COLOR_BASE_LEGACY;
+	int base = BACKGROUND_COLOR_BASE;
 
 
 	/* the background PROM is connected the following way:
@@ -1251,7 +1180,7 @@ static void stratgyx_draw_background(running_machine &machine, bitmap_ind16 &bit
 	             the green gun if BCG is asserted
 	   bits 2-7 are unconnected */
 
-	prom = state->memregion("user1")->base();
+	prom = memregion("user1")->base();
 
 	for (x = 0; x < 32; x++)
 	{
@@ -1260,11 +1189,11 @@ static void stratgyx_draw_background(running_machine &machine, bitmap_ind16 &bit
 
 		color = 0;
 
-		if ((~prom[x] & 0x02) && state->m_background_red)   color |= 0x01;
-		if ((~prom[x] & 0x02) && state->m_background_green) color |= 0x02;
-		if ((~prom[x] & 0x01) && state->m_background_blue)  color |= 0x04;
+		if ((~prom[x] & 0x02) && m_background_red)   color |= 0x01;
+		if ((~prom[x] & 0x02) && m_background_green) color |= 0x02;
+		if ((~prom[x] & 0x01) && m_background_blue)  color |= 0x04;
 
-		if (state->m_flipscreen_x)
+		if (m_flipscreen_x)
 			sx = 8 * (31 - x);
 		else
 			sx = 8 * x;
@@ -1273,12 +1202,11 @@ static void stratgyx_draw_background(running_machine &machine, bitmap_ind16 &bit
 	}
 }
 
-static void minefld_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::minefld_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	if (state->m_background_enable)
+	if (m_background_enable)
 	{
-		int base = BACKGROUND_COLOR_BASE_LEGACY;
+		int base = BACKGROUND_COLOR_BASE;
 		int x;
 
 
@@ -1294,12 +1222,11 @@ static void minefld_draw_background(running_machine &machine, bitmap_ind16 &bitm
 		bitmap.fill(0, cliprect);
 }
 
-static void rescue_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::rescue_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	if (state->m_background_enable)
+	if (m_background_enable)
 	{
-		int base = BACKGROUND_COLOR_BASE_LEGACY;
+		int base = BACKGROUND_COLOR_BASE;
 		int x;
 
 		for (x = 0; x < 128; x++)
@@ -1314,10 +1241,9 @@ static void rescue_draw_background(running_machine &machine, bitmap_ind16 &bitma
 		bitmap.fill(0, cliprect);
 }
 
-static void mariner_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::mariner_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	int base = BACKGROUND_COLOR_BASE_LEGACY;
+	int base = BACKGROUND_COLOR_BASE;
 	UINT8 x;
 	UINT8 *prom;
 
@@ -1326,9 +1252,9 @@ static void mariner_draw_background(running_machine &machine, bitmap_ind16 &bitm
 	   line (column) of the screen.  The first 0x20 bytes for unflipped,
 	   and the 2nd 0x20 bytes for flipped screen. */
 
-	prom = state->memregion("user1")->base();
+	prom = memregion("user1")->base();
 
-	if (state->m_flipscreen_x)
+	if (m_flipscreen_x)
 	{
 		for (x = 0; x < 32; x++)
 		{
@@ -1358,39 +1284,37 @@ static void mariner_draw_background(running_machine &machine, bitmap_ind16 &bitm
 	}
 }
 
-static void dambustr_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::dambustr_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	int base = BACKGROUND_COLOR_BASE_LEGACY;
-	int col1 = base + state->m_dambustr_bg_color_1;
-	int col2 = base + state->m_dambustr_bg_color_2;
+	int base = BACKGROUND_COLOR_BASE;
+	int col1 = base + m_dambustr_bg_color_1;
+	int col2 = base + m_dambustr_bg_color_2;
 
-	if (state->flip_screen_x())
+	if (flip_screen_x())
 	{
-		bitmap.plot_box(  0, 0, 256-state->m_dambustr_bg_split_line, 256, col2);
-		bitmap.plot_box(256-state->m_dambustr_bg_split_line, 0, state->m_dambustr_bg_split_line, 256, col1);
+		bitmap.plot_box(  0, 0, 256-m_dambustr_bg_split_line, 256, col2);
+		bitmap.plot_box(256-m_dambustr_bg_split_line, 0, m_dambustr_bg_split_line, 256, col1);
 	}
 	else
 	{
-		bitmap.plot_box(  0, 0, 256-state->m_dambustr_bg_split_line, 256, col1);
-		bitmap.plot_box(256-state->m_dambustr_bg_split_line, 0, state->m_dambustr_bg_split_line, 256, col2);
+		bitmap.plot_box(  0, 0, 256-m_dambustr_bg_split_line, 256, col1);
+		bitmap.plot_box(256-m_dambustr_bg_split_line, 0, m_dambustr_bg_split_line, 256, col2);
 	}
 
 }
 
-static void dambustr_draw_upper_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::dambustr_draw_upper_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
 
-	if (state->flip_screen_x())
+	if (flip_screen_x())
 	{
-		rectangle clip(254 - state->m_dambustr_bg_split_line, state->m_dambustr_bg_split_line, 0, 255);
-		copybitmap(bitmap, *state->m_dambustr_tmpbitmap, 0, 0, 0, 0, clip);
+		rectangle clip(254 - m_dambustr_bg_split_line, m_dambustr_bg_split_line, 0, 255);
+		copybitmap(bitmap, *m_dambustr_tmpbitmap, 0, 0, 0, 0, clip);
 	}
 	else
 	{
-		rectangle clip(0, 254 - state->m_dambustr_bg_split_line, 0, 255);
-		copybitmap(bitmap, *state->m_dambustr_tmpbitmap, 0, 0, 0, 0, clip);
+		rectangle clip(0, 254 - m_dambustr_bg_split_line, 0, 255);
+		copybitmap(bitmap, *m_dambustr_tmpbitmap, 0, 0, 0, 0, clip);
 	}
 }
 
@@ -1398,22 +1322,21 @@ static void dambustr_draw_upper_background(running_machine &machine, bitmap_ind1
 
 /* star drawing functions */
 
-void galaxold_init_stars(running_machine &machine, int colors_offset)
+void galaxold_state::galaxold_init_stars(int colors_offset)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	struct star *stars = state->m_stars;
+	struct star *stars = m_stars;
 	int i;
 	int total_stars;
 	UINT32 generator;
 	int x,y;
 
 
-	state->m_stars_on = 0;
-	state->m_stars_blink_state = 0;
-	state->m_stars_blink_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(galaxold_state::stars_blink_callback),state));
-	state->m_stars_scroll_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(galaxold_state::stars_scroll_callback),state));
-	state->m_timer_adjusted = 0;
-	state->m_stars_colors_start = colors_offset;
+	m_stars_on = 0;
+	m_stars_blink_state = 0;
+	m_stars_blink_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaxold_state::stars_blink_callback),this));
+	m_stars_scroll_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(galaxold_state::stars_scroll_callback),this));
+	m_timer_adjusted = 0;
+	m_stars_colors_start = colors_offset;
 
 	for (i = 0;i < 64;i++)
 	{
@@ -1427,7 +1350,7 @@ void galaxold_init_stars(running_machine &machine, int colors_offset)
 		g = map[bits];
 		bits = (i >> 4) & 0x03;
 		b = map[bits];
-		palette_set_color_rgb(machine,colors_offset+i,r,g,b);
+		palette_set_color_rgb(machine(),colors_offset+i,r,g,b);
 	}
 
 
@@ -1471,33 +1394,32 @@ void galaxold_init_stars(running_machine &machine, int colors_offset)
 	}
 }
 
-static void plot_star(galaxold_state *state, bitmap_ind16 &bitmap, int x, int y, int color, const rectangle &cliprect)
+void galaxold_state::plot_star(bitmap_ind16 &bitmap, int x, int y, int color, const rectangle &cliprect)
 {
-	if (state->m_flipscreen_x)
+	if (m_flipscreen_x)
 		x = 255 - x;
 
-	if (state->m_flipscreen_y)
+	if (m_flipscreen_y)
 		y = 255 - y;
 
 	if (cliprect.contains(x, y))
-		bitmap.pix16(y, x) = state->m_stars_colors_start + color;
+		bitmap.pix16(y, x) = m_stars_colors_start + color;
 }
 
-static void noop_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::noop_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 }
 
-void galaxold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::galaxold_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	struct star *stars = state->m_stars;
+	struct star *stars = m_stars;
 	int offs;
 
 
-	if (!state->m_timer_adjusted)
+	if (!m_timer_adjusted)
 	{
-		start_stars_scroll_timer(machine);
-		state->m_timer_adjusted = 1;
+		start_stars_scroll_timer();
+		m_timer_adjusted = 1;
 	}
 
 
@@ -1506,27 +1428,26 @@ void galaxold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int x,y;
 
 
-		x = ((stars[offs].x +   state->m_stars_scrollpos) & 0x01ff) >> 1;
-		y = ( stars[offs].y + ((state->m_stars_scrollpos + stars[offs].x) >> 9)) & 0xff;
+		x = ((stars[offs].x +   m_stars_scrollpos) & 0x01ff) >> 1;
+		y = ( stars[offs].y + ((m_stars_scrollpos + stars[offs].x) >> 9)) & 0xff;
 
 		if ((y & 0x01) ^ ((x >> 3) & 0x01))
 		{
-			plot_star(state, bitmap, x, y, stars[offs].color, cliprect);
+			plot_star(bitmap, x, y, stars[offs].color, cliprect);
 		}
 	}
 }
 
-static void scrambold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::scrambold_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	struct star *stars = state->m_stars;
+	struct star *stars = m_stars;
 	int offs;
 
 
-	if (!state->m_timer_adjusted)
+	if (!m_timer_adjusted)
 	{
-		start_stars_blink_timer(machine, 100000, 10000, 0.00001);
-		state->m_timer_adjusted = 1;
+		start_stars_blink_timer(100000, 10000, 0.00001);
+		m_timer_adjusted = 1;
 	}
 
 
@@ -1541,7 +1462,7 @@ static void scrambold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap,
 		if ((y & 0x01) ^ ((x >> 3) & 0x01))
 		{
 			/* determine when to skip plotting */
-			switch (state->m_stars_blink_state & 0x03)
+			switch (m_stars_blink_state & 0x03)
 			{
 			case 0:
 				if (!(stars[offs].color & 0x01))  continue;
@@ -1557,24 +1478,23 @@ static void scrambold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap,
 				break;
 			}
 
-			plot_star(state, bitmap, x, y, stars[offs].color, cliprect);
+			plot_star(bitmap, x, y, stars[offs].color, cliprect);
 		}
 	}
 }
 
-static void rescue_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::rescue_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	struct star *stars = state->m_stars;
+	struct star *stars = m_stars;
 	int offs;
 
 
 	/* same as Scramble, but only top (left) half of screen */
 
-	if (!state->m_timer_adjusted)
+	if (!m_timer_adjusted)
 	{
-		start_stars_blink_timer(machine, 100000, 10000, 0.00001);
-		state->m_timer_adjusted = 1;
+		start_stars_blink_timer(100000, 10000, 0.00001);
+		m_timer_adjusted = 1;
 	}
 
 
@@ -1589,7 +1509,7 @@ static void rescue_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, co
 		if ((x < 128) && ((y & 0x01) ^ ((x >> 3) & 0x01)))
 		{
 			/* determine when to skip plotting */
-			switch (state->m_stars_blink_state & 0x03)
+			switch (m_stars_blink_state & 0x03)
 			{
 			case 0:
 				if (!(stars[offs].color & 0x01))  continue;
@@ -1605,43 +1525,42 @@ static void rescue_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, co
 				break;
 			}
 
-			plot_star(state, bitmap, x, y, stars[offs].color, cliprect);
+			plot_star(bitmap, x, y, stars[offs].color, cliprect);
 		}
 	}
 }
 
-static void mariner_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::mariner_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	struct star *stars = state->m_stars;
+	struct star *stars = m_stars;
 	int offs;
 	UINT8 *prom;
 
 
-	if (!state->m_timer_adjusted)
+	if (!m_timer_adjusted)
 	{
-		start_stars_scroll_timer(machine);
-		state->m_timer_adjusted = 1;
+		start_stars_scroll_timer();
+		m_timer_adjusted = 1;
 	}
 
 
 	/* bit 2 of the PROM controls star visibility */
 
-	prom = machine.root_device().memregion("user2")->base();
+	prom = machine().root_device().memregion("user2")->base();
 
 	for (offs = 0;offs < STAR_COUNT;offs++)
 	{
 		int x,y;
 
 
-		x = ((stars[offs].x +   -state->m_stars_scrollpos) & 0x01ff) >> 1;
-		y = ( stars[offs].y + ((-state->m_stars_scrollpos + stars[offs].x) >> 9)) & 0xff;
+		x = ((stars[offs].x +   -m_stars_scrollpos) & 0x01ff) >> 1;
+		y = ( stars[offs].y + ((-m_stars_scrollpos + stars[offs].x) >> 9)) & 0xff;
 
 		if ((y & 0x01) ^ ((x >> 3) & 0x01))
 		{
 			if (prom[(x/8 + 1) & 0x1f] & 0x04)
 			{
-				plot_star(state, bitmap, x, y, stars[offs].color, cliprect);
+				plot_star(bitmap, x, y, stars[offs].color, cliprect);
 			}
 		}
 	}
@@ -1652,14 +1571,13 @@ TIMER_CALLBACK_MEMBER(galaxold_state::stars_blink_callback)
 	m_stars_blink_state++;
 }
 
-static void start_stars_blink_timer(running_machine &machine, double ra, double rb, double c)
+void galaxold_state::start_stars_blink_timer(double ra, double rb, double c)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
 	/* calculate the period using the formula given in the 555 datasheet */
 
 	int period_in_ms = 693 * (ra + 2.0 * rb) * c;
 
-	state->m_stars_blink_timer->adjust(attotime::from_msec(period_in_ms), 0, attotime::from_msec(period_in_ms));
+	m_stars_blink_timer->adjust(attotime::from_msec(period_in_ms), 0, attotime::from_msec(period_in_ms));
 }
 
 
@@ -1671,10 +1589,9 @@ TIMER_CALLBACK_MEMBER(galaxold_state::stars_scroll_callback)
 	}
 }
 
-static void start_stars_scroll_timer(running_machine &machine)
+void galaxold_state::start_stars_scroll_timer()
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	state->m_stars_scroll_timer->adjust(machine.primary_screen->frame_period(), 0, machine.primary_screen->frame_period());
+	m_stars_scroll_timer->adjust(machine().primary_screen->frame_period(), 0, machine().primary_screen->frame_period());
 }
 
 
@@ -1688,12 +1605,12 @@ TILE_GET_INFO_MEMBER(galaxold_state::get_tile_info)
 
 	if (m_modify_charcode)
 	{
-		(*m_modify_charcode)(machine(), &code, x);
+		(this->*m_modify_charcode)(&code, x);
 	}
 
 	if (m_modify_color)
 	{
-		(*m_modify_color)(&color);
+		(this->*m_modify_color)(&color);
 	}
 
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
@@ -1705,32 +1622,30 @@ TILE_GET_INFO_MEMBER(galaxold_state::rockclim_get_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, 0, 0);
 }
 
-static void draw_bullets_common(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galaxold_state::draw_bullets_common(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
 	int offs;
 
 
-	for (offs = 0;offs < state->m_bulletsram.bytes();offs += 4)
+	for (offs = 0;offs < m_bulletsram.bytes();offs += 4)
 	{
 		UINT8 sx,sy;
 
-		sy = 255 - state->m_bulletsram[offs + 1];
-		sx = 255 - state->m_bulletsram[offs + 3];
+		sy = 255 - m_bulletsram[offs + 1];
+		sx = 255 - m_bulletsram[offs + 3];
 
-		if (state->m_flipscreen_y)  sy = 255 - sy;
+		if (m_flipscreen_y)  sy = 255 - sy;
 
-		(*state->m_draw_bullets)(machine, bitmap, cliprect, offs, sx, sy);
+		(this->*m_draw_bullets)(bitmap, cliprect, offs, sx, sy);
 	}
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *spriteram, size_t spriteram_size)
+void galaxold_state::draw_sprites(bitmap_ind16 &bitmap, UINT8 *spriteram, size_t spriteram_size)
 {
 	const rectangle spritevisiblearea(2*8+1, 32*8-1, 2*8,   30*8-1);
 	const rectangle spritevisibleareaflipx(0*8, 30*8-2, 2*8, 30*8-1);
 
-	galaxold_state *state = machine.driver_data<galaxold_state>();
 	int offs;
 
 
@@ -1745,30 +1660,30 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *
 		flipx = spriteram[offs + 1] & 0x40;
 		flipy = spriteram[offs + 1] & 0x80;
 		code = spriteram[offs + 1] & 0x3f;
-		color = spriteram[offs + 2] & state->m_color_mask;
+		color = spriteram[offs + 2] & m_color_mask;
 
-		if (state->m_modify_spritecode)
+		if (m_modify_spritecode)
 		{
-			(*state->m_modify_spritecode)(machine, spriteram, &code, &flipx, &flipy, offs);
+			(this->*m_modify_spritecode)(spriteram, &code, &flipx, &flipy, offs);
 		}
 
-		if (state->m_modify_color)
+		if (m_modify_color)
 		{
-			(*state->m_modify_color)(&color);
+			(this->*m_modify_color)(&color);
 		}
 
-		if (state->m_modify_ypos)
+		if (m_modify_ypos)
 		{
-			(*state->m_modify_ypos)(&sy);
+			(this->*m_modify_ypos)(&sy);
 		}
 
-		if (state->m_flipscreen_x)
+		if (m_flipscreen_x)
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
-		if (state->m_flipscreen_y)
+		if (m_flipscreen_y)
 		{
 			flipy = !flipy;
 		}
@@ -1786,7 +1701,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *
 		if (offs < 3*4)  sy++;
 
 
-		drawgfx_transpen(bitmap, state->m_flipscreen_x ? spritevisibleareaflipx : spritevisiblearea, machine.gfx[1],
+		drawgfx_transpen(bitmap, m_flipscreen_x ? spritevisibleareaflipx : spritevisiblearea, machine().gfx[1],
 				code,color,
 				flipx,flipy,
 				sx,sy,0);
@@ -1796,11 +1711,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, UINT8 *
 
 UINT32 galaxold_state::screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	(*m_draw_background)(machine(), bitmap, cliprect);
+	(this->*m_draw_background)(bitmap, cliprect);
 
 	if (m_stars_on)
 	{
-		(*m_draw_stars)(machine(), bitmap, cliprect);
+		(this->*m_draw_stars)(bitmap, cliprect);
 	}
 
 
@@ -1808,15 +1723,15 @@ UINT32 galaxold_state::screen_update_galaxold(screen_device &screen, bitmap_ind1
 
 	if (m_draw_bullets)
 	{
-		draw_bullets_common(machine(), bitmap, cliprect);
+		draw_bullets_common(bitmap, cliprect);
 	}
 
 
-	draw_sprites(machine(), bitmap, m_spriteram, m_spriteram.bytes());
+	draw_sprites(bitmap, m_spriteram, m_spriteram.bytes());
 
 	if (m_spriteram2_present)
 	{
-		draw_sprites(machine(), bitmap, m_spriteram2, m_spriteram2.bytes());
+		draw_sprites(bitmap, m_spriteram2, m_spriteram2.bytes());
 	}
 	return 0;
 }
@@ -1827,11 +1742,11 @@ UINT32 galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_ind1
 	int i, j;
 	UINT8 color;
 
-	(*m_draw_background)(machine(), bitmap, cliprect);
+	(this->*m_draw_background)(bitmap, cliprect);
 
 	if (m_stars_on)
 	{
-		(*m_draw_stars)(machine(), bitmap, cliprect);
+		(this->*m_draw_stars)(bitmap, cliprect);
 	}
 
 	/* save the background for drawing it again later, if background has priority over characters */
@@ -1841,15 +1756,15 @@ UINT32 galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_ind1
 
 	if (m_draw_bullets)
 	{
-		draw_bullets_common(machine(), bitmap, cliprect);
+		draw_bullets_common(bitmap, cliprect);
 	}
 
-	draw_sprites(machine(), bitmap, m_spriteram, m_spriteram.bytes());
+	draw_sprites(bitmap, m_spriteram, m_spriteram.bytes());
 
 	if (m_dambustr_bg_priority)
 	{
 		/* draw the upper part of the background, as it has priority */
-		dambustr_draw_upper_background(machine(), bitmap, cliprect);
+		dambustr_draw_upper_background(bitmap, cliprect);
 
 		/* only rows with color code > 3 are stronger than the background */
 		memset(m_dambustr_videoram2, 0x20, 0x0400);
@@ -1867,22 +1782,20 @@ UINT32 galaxold_state::screen_update_dambustr(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static void bagmanmc_modify_charcode(running_machine &machine, UINT16 *code, UINT8 x)
+void galaxold_state::bagmanmc_modify_charcode(UINT16 *code, UINT8 x)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	*code |= (state->m_gfxbank[0] << 9);
+	*code |= (m_gfxbank[0] << 9);
 }
 
-static void bagmanmc_modify_spritecode(running_machine &machine, UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
+void galaxold_state::bagmanmc_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs)
 {
-	galaxold_state *state = machine.driver_data<galaxold_state>();
-	*code |= (state->m_gfxbank[0] << 7) | 0x40;
+	*code |= (m_gfxbank[0] << 7) | 0x40;
 }
 
 VIDEO_START_MEMBER(galaxold_state,bagmanmc)
 {
 	VIDEO_START_CALL_MEMBER(galaxold);
 
-	m_modify_charcode = bagmanmc_modify_charcode;
-	m_modify_spritecode = bagmanmc_modify_spritecode;
+	m_modify_charcode = &galaxold_state::bagmanmc_modify_charcode;
+	m_modify_spritecode = &galaxold_state::bagmanmc_modify_spritecode;
 }

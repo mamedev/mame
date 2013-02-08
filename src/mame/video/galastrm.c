@@ -82,11 +82,10 @@ Heavy use is made of sprite zooming.
 
 ********************************************************/
 
-static void draw_sprites_pre(running_machine &machine, int x_offs, int y_offs)
+void galastrm_state::draw_sprites_pre(int x_offs, int y_offs)
 {
-	galastrm_state *state = machine.driver_data<galastrm_state>();
-	UINT32 *spriteram32 = state->m_spriteram;
-	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
+	UINT32 *spriteram32 = m_spriteram;
+	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -96,9 +95,9 @@ static void draw_sprites_pre(running_machine &machine, int x_offs, int y_offs)
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	state->m_sprite_ptr_pre = state->m_spritelist;
+	m_sprite_ptr_pre = m_spritelist;
 
-	for (offs = (state->m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
+	for (offs = (m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
 		data = spriteram32[offs+0];
 		flipx =    (data & 0x00800000) >> 23;
@@ -171,43 +170,42 @@ static void draw_sprites_pre(running_machine &machine, int x_offs, int y_offs)
 				flipy = !flipy;
 			}
 
-			state->m_sprite_ptr_pre->gfx = 0;
-			state->m_sprite_ptr_pre->code = code;
-			state->m_sprite_ptr_pre->color = color;
-			state->m_sprite_ptr_pre->flipx = !flipx;
-			state->m_sprite_ptr_pre->flipy = flipy;
-			state->m_sprite_ptr_pre->x = curx;
-			state->m_sprite_ptr_pre->y = cury;
-			state->m_sprite_ptr_pre->zoomx = zx << 12;
-			state->m_sprite_ptr_pre->zoomy = zy << 12;
-			state->m_sprite_ptr_pre->primask = priority;
+			m_sprite_ptr_pre->gfx = 0;
+			m_sprite_ptr_pre->code = code;
+			m_sprite_ptr_pre->color = color;
+			m_sprite_ptr_pre->flipx = !flipx;
+			m_sprite_ptr_pre->flipy = flipy;
+			m_sprite_ptr_pre->x = curx;
+			m_sprite_ptr_pre->y = cury;
+			m_sprite_ptr_pre->zoomx = zx << 12;
+			m_sprite_ptr_pre->zoomy = zy << 12;
+			m_sprite_ptr_pre->primask = priority;
 
-			state->m_sprite_ptr_pre++;
+			m_sprite_ptr_pre++;
 		}
 		if (bad_chunks)
 logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority)
+void galastrm_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority)
 {
-	galastrm_state *state = machine.driver_data<galastrm_state>();
-	struct tempsprite *sprite_ptr = state->m_sprite_ptr_pre;
+	struct tempsprite *sprite_ptr = m_sprite_ptr_pre;
 
-	while (sprite_ptr != state->m_spritelist)
+	while (sprite_ptr != m_spritelist)
 	{
 		sprite_ptr--;
 
 		if ((priority != 0 && sprite_ptr->primask != 0) ||
 			(priority == 0 && sprite_ptr->primask == 0))
 		{
-			pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[sprite_ptr->gfx],
+			pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[sprite_ptr->gfx],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				machine.priority_bitmap,primasks[sprite_ptr->primask],0);
+				machine().priority_bitmap,primasks[sprite_ptr->primask],0);
 		}
 	}
 }
@@ -238,18 +236,17 @@ static void tc0610_draw_scanline(void *dest, INT32 scanline, const poly_extent *
 	}
 }
 
-static void tc0610_rotate_draw(running_machine &machine, bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &clip)
+void galastrm_state::tc0610_rotate_draw(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &clip)
 {
-	galastrm_state *state = machine.driver_data<galastrm_state>();
-	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
+	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(m_poly);
 	poly_draw_scanline_func callback;
 	poly_vertex vert[4];
-	int rsx = state->m_tc0610_ctrl_reg[1][0];
-	int rsy = state->m_tc0610_ctrl_reg[1][1];
-	const int rzx = state->m_tc0610_ctrl_reg[1][2];
-	const int rzy = state->m_tc0610_ctrl_reg[1][3];
-	const int ryx = state->m_tc0610_ctrl_reg[1][5];
-	const int ryy = state->m_tc0610_ctrl_reg[1][4];
+	int rsx = m_tc0610_ctrl_reg[1][0];
+	int rsy = m_tc0610_ctrl_reg[1][1];
+	const int rzx = m_tc0610_ctrl_reg[1][2];
+	const int rzy = m_tc0610_ctrl_reg[1][3];
+	const int ryx = m_tc0610_ctrl_reg[1][5];
+	const int ryy = m_tc0610_ctrl_reg[1][4];
 	const int lx  = srcbitmap.width();
 	const int ly  = srcbitmap.height();
 
@@ -283,48 +280,48 @@ static void tc0610_rotate_draw(running_machine &machine, bitmap_ind16 &bitmap, b
 	zcs = ((float)pxx/4096.0) / (float)(lx / 2);
 
 
-	if ((rsx == -240 && rsy == 1072) || !state->m_tc0610_ctrl_reg[1][7])
+	if ((rsx == -240 && rsy == 1072) || !m_tc0610_ctrl_reg[1][7])
 	{
-		state->m_rsxoffs = 0;
-		state->m_rsyoffs = 0;
+		m_rsxoffs = 0;
+		m_rsyoffs = 0;
 	}
 	else
 	{
-		if (rsx > state->m_rsxb && state->m_rsxb < 0 && rsx-state->m_rsxb > 0x8000)
+		if (rsx > m_rsxb && m_rsxb < 0 && rsx-m_rsxb > 0x8000)
 		{
-			if (state->m_rsxoffs == 0)
-				state->m_rsxoffs = -0x10000;
+			if (m_rsxoffs == 0)
+				m_rsxoffs = -0x10000;
 			else
-				state->m_rsxoffs = 0;
+				m_rsxoffs = 0;
 		}
-		if (rsx < state->m_rsxb && state->m_rsxb > 0 && state->m_rsxb-rsx > 0x8000)
+		if (rsx < m_rsxb && m_rsxb > 0 && m_rsxb-rsx > 0x8000)
 		{
-			if (state->m_rsxoffs == 0)
-				state->m_rsxoffs = 0x10000-1;
+			if (m_rsxoffs == 0)
+				m_rsxoffs = 0x10000-1;
 			else
-				state->m_rsxoffs = 0;
+				m_rsxoffs = 0;
 		}
-		if (rsy > state->m_rsyb && state->m_rsyb < 0 && rsy-state->m_rsyb > 0x8000)
+		if (rsy > m_rsyb && m_rsyb < 0 && rsy-m_rsyb > 0x8000)
 		{
-			if (state->m_rsyoffs == 0)
-				state->m_rsyoffs = -0x10000;
+			if (m_rsyoffs == 0)
+				m_rsyoffs = -0x10000;
 			else
-				state->m_rsyoffs = 0;
+				m_rsyoffs = 0;
 		}
-		if (rsy < state->m_rsyb && state->m_rsyb > 0 && state->m_rsyb-rsy > 0x8000)
+		if (rsy < m_rsyb && m_rsyb > 0 && m_rsyb-rsy > 0x8000)
 		{
-			if (state->m_rsyoffs == 0)
-				state->m_rsyoffs = 0x10000-1;
+			if (m_rsyoffs == 0)
+				m_rsyoffs = 0x10000-1;
 			else
-				state->m_rsyoffs = 0;
+				m_rsyoffs = 0;
 		}
 	}
-	state->m_rsxb = rsx;
-	state->m_rsyb = rsy;
-	if (state->m_rsxoffs) rsx += state->m_rsxoffs;
-	if (state->m_rsyoffs) rsy += state->m_rsyoffs;
-	if (rsx < -0x14000 || rsx >= 0x14000) state->m_rsxoffs = 0;
-	if (rsy < -0x14000 || rsy >= 0x14000) state->m_rsyoffs = 0;
+	m_rsxb = rsx;
+	m_rsyb = rsy;
+	if (m_rsxoffs) rsx += m_rsxoffs;
+	if (m_rsyoffs) rsy += m_rsyoffs;
+	if (rsx < -0x14000 || rsx >= 0x14000) m_rsxoffs = 0;
+	if (rsy < -0x14000 || rsy >= 0x14000) m_rsyoffs = 0;
 
 
 	pxx = 0;
@@ -338,7 +335,7 @@ static void tc0610_rotate_draw(running_machine &machine, bitmap_ind16 &bitmap, b
 	//ysn = 0.0;
 	//ycs = 0.0;
 
-	if (state->m_tc0610_ctrl_reg[1][7])
+	if (m_tc0610_ctrl_reg[1][7])
 	{
 		if (ryx != 0 || ryy != 0)
 		{
@@ -423,7 +420,7 @@ static void tc0610_rotate_draw(running_machine &machine, bitmap_ind16 &bitmap, b
 
 	extra->texbase = &srcbitmap;
 	callback = tc0610_draw_scanline;
-	poly_render_quad(state->m_poly, &bitmap, clip, callback, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
+	poly_render_quad(m_poly, &bitmap, clip, callback, 2, &vert[0], &vert[1], &vert[2], &vert[3]);
 }
 
 /**************************************************************
@@ -542,15 +539,15 @@ UINT32 galastrm_state::screen_update_galastrm(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	draw_sprites_pre(machine(), 42-X_OFFSET, -571+Y_OFFSET);
-	draw_sprites(machine(),m_tmpbitmaps,clip,primasks,1);
+	draw_sprites_pre(42-X_OFFSET, -571+Y_OFFSET);
+	draw_sprites(m_tmpbitmaps,clip,primasks,1);
 
 	copybitmap_trans(bitmap,m_polybitmap,0,0, 0,0,cliprect,0);
 	m_polybitmap.fill(0, clip);
-	tc0610_rotate_draw(machine(),m_polybitmap,m_tmpbitmaps,cliprect);
+	tc0610_rotate_draw(m_polybitmap,m_tmpbitmaps,cliprect);
 
 	priority_bitmap.fill(0, cliprect);
-	draw_sprites(machine(),bitmap,cliprect,primasks,0);
+	draw_sprites(bitmap,cliprect,primasks,0);
 
 	tc0480scp_tilemap_draw(tc0480scp, bitmap, cliprect, layer[4], 0, 0);
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, pivlayer[2], 0, 0);

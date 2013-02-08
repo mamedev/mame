@@ -45,14 +45,13 @@ WRITE16_HANDLER( galpanic_paletteram_w )
 }
 
 
-static void comad_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galpanic_state::comad_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galpanic_state *state = machine.driver_data<galpanic_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 	int sx=0, sy=0;
 
-	for (offs = 0;offs < state->m_spriteram.bytes()/2;offs += 4)
+	for (offs = 0;offs < m_spriteram.bytes()/2;offs += 4)
 	{
 		int code,color,flipx,flipy;
 
@@ -75,7 +74,7 @@ static void comad_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 		sx = (sx&0x1ff) - (sx&0x200);
 		sy = (sy&0x1ff) - (sy&0x200);
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				code,
 				color,
 				flipx,flipy,
@@ -83,18 +82,17 @@ static void comad_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 	}
 }
 
-static void draw_fgbitmap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void galpanic_state::draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	galpanic_state *state = machine.driver_data<galpanic_state>();
 	int offs;
 
-	for (offs = 0;offs < state->m_fgvideoram.bytes()/2;offs++)
+	for (offs = 0;offs < m_fgvideoram.bytes()/2;offs++)
 	{
 		int sx,sy,color;
 
 		sx = offs % 256;
 		sy = offs / 256;
-		color = state->m_fgvideoram[offs];
+		color = m_fgvideoram[offs];
 		if (color)
 			bitmap.pix16(sy, sx) = color;
 	}
@@ -107,7 +105,7 @@ UINT32 galpanic_state::screen_update_galpanic(screen_device &screen, bitmap_ind1
 	/* copy the temporary bitmap to the screen */
 	copybitmap(bitmap,m_bitmap,0,0,0,0,cliprect);
 
-	draw_fgbitmap(machine(), bitmap, cliprect);
+	draw_fgbitmap(bitmap, cliprect);
 
 	pandora_update(pandora, bitmap, cliprect);
 
@@ -119,13 +117,13 @@ UINT32 galpanic_state::screen_update_comad(screen_device &screen, bitmap_ind16 &
 	/* copy the temporary bitmap to the screen */
 	copybitmap(bitmap,m_bitmap,0,0,0,0,cliprect);
 
-	draw_fgbitmap(machine(), bitmap, cliprect);
+	draw_fgbitmap(bitmap, cliprect);
 
 
 //  if(galpanic_clear_sprites)
 	{
 		m_sprites_bitmap.fill(0, cliprect);
-		comad_draw_sprites(machine(),bitmap,cliprect);
+		comad_draw_sprites(bitmap,cliprect);
 	}
 //  else
 //  {

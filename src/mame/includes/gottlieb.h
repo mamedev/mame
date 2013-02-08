@@ -314,6 +314,10 @@ public:
 	TIMER_CALLBACK_MEMBER(laserdisc_bit_off_callback);
 	TIMER_CALLBACK_MEMBER(laserdisc_bit_callback);
 	TIMER_CALLBACK_MEMBER(nmi_clear);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	inline void audio_end_state();
+	void audio_process_clock(int logit);
+	void audio_handle_zero_crossing(attotime zerotime, int logit);
 };
 
 /*----------- defined in audio/gottlieb.c -----------*/

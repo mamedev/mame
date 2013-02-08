@@ -53,6 +53,8 @@ public:
 	UINT32 screen_update_galpani2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt1);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt2);
+	void galpani2_mcu_nmi1();
+	void galpani2_mcu_nmi2();
 };
 
 
