@@ -148,6 +148,7 @@ public:
 		m_lbdac(*this, "direct_b_left"),
 		m_rbdac(*this, "direct_b_right"),
 		m_gbsound(*this, "custom"),
+		m_region_maincpu(*this, "maincpu"),
 		m_io_in0(*this, "IN0")
 	{ }
 
@@ -283,6 +284,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gba_cart);
 
 protected:
+	required_memory_region m_region_maincpu;
 	required_ioport m_io_in0;
 };
 

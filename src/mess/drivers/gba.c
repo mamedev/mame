@@ -1907,7 +1907,7 @@ WRITE32_MEMBER(gba_state::gba_oam_w)
 
 READ32_MEMBER(gba_state::gba_bios_r)
 {
-	UINT32 *rom = (UINT32 *)(*machine().root_device().memregion("maincpu"));
+	UINT32 *rom = (UINT32 *)(*m_region_maincpu);
 	if (m_bios_protected != 0)
 	{
 		offset = (m_bios_last_address + 8) / 4;
