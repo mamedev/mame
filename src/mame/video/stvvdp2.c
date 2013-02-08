@@ -2731,7 +2731,7 @@ void saturn_state::stv_vdp2_drawgfxzoom_rgb555(
 						int x, x_index = x_index_base;
 						for( x=sx; x<ex; x++ )
 						{
-					data = (source[(x_index>>16)*2] << 8) | source[(x_index>>16)*2+1];
+							data = (source[(x_index>>16)*2] << 8) | source[(x_index>>16)*2+1];
 							b = pal5bit((data & 0x7c00) >> 10);
 							g = pal5bit((data & 0x03e0) >> 5);
 							r = pal5bit( data & 0x001f);
@@ -2999,6 +2999,64 @@ void saturn_state::stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectan
 
 }
 
+#define BITMAP_RGB32 4
+
+
+#if 0
+void saturn_state::draw_rgb16_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	// ...
+}
+#endif
+
+void saturn_state::draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int xsize, ysize;
+	int xsrc,ysrc,xdst,ydst;
+	int src_offs;
+	UINT8* vram = m_vdp2.gfx_decode;
+	UINT32 map_offset = stv2_current_tilemap.bitmap_map * 0x20000;
+	int scrollx = stv2_current_tilemap.scrollx;
+	int scrolly = stv2_current_tilemap.scrolly;
+	int r,g,b;
+	UINT32 dot_data;
+
+	/* TODO: clean this up. */
+	xsize = (stv2_current_tilemap.bitmap_size & 2) ? 1024 : 512;
+	ysize = (stv2_current_tilemap.bitmap_size & 1) ? 512 : 256;
+
+	for(ydst=cliprect.min_y;ydst<cliprect.max_y;ydst++)
+	{
+		for(xdst=cliprect.min_x;xdst<cliprect.max_x;xdst++)
+		{
+			if(stv_vdp2_window_process(xdst,ydst))
+				continue;
+
+			xsrc = (xdst + scrollx) & (xsize-1);
+			ysrc = (ydst + scrolly) & (ysize-1);
+			src_offs = ((xsrc + (ysrc*xsize)) + map_offset) & 0x1ffff;
+
+			dot_data = (vram[4*src_offs+0]<<24)|(vram[4*src_offs+1]<<16)|(vram[4*src_offs+2]<<8)|(vram[4*src_offs+3]<<0);
+
+			if ((dot_data & 0x80000000) || (stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE))
+			{
+				b = ((dot_data & 0x00ff0000) >> 16);
+				g = ((dot_data & 0x0000ff00) >> 8);
+				r = ((dot_data & 0x000000ff) >> 0);
+
+				if(stv2_current_tilemap.fade_control & 1)
+					stv_vdp2_compute_color_offset(&r,&g,&b,stv2_current_tilemap.fade_control & 2);
+
+				if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
+					bitmap.pix32(ydst, xdst) = MAKE_RGB(r, g, b);
+				else
+					bitmap.pix32(ydst, xdst) = alpha_blend_r32( bitmap.pix32(ydst, xdst), MAKE_RGB(r, g, b), stv2_current_tilemap.alpha );
+			}
+		}
+	}
+}
+
+
 void saturn_state::stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 //  if(LOG_VDP2) logerror ("bitmap enable %02x size %08x depth %08x\n", stv2_current_tilemap.layer_name, stv2_current_tilemap.bitmap_size, stv2_current_tilemap.colour_depth);
@@ -3016,6 +3074,31 @@ void saturn_state::stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectan
 	int screen_x,screen_y;
 
 	if (!stv2_current_tilemap.enabled) return;
+
+	/* new bitmap code, supposed to rewrite the old one. Not supposed to be clean, but EFFICIENT! */
+	if(stv2_current_tilemap.incx == 0x10000 && stv2_current_tilemap.incy == 0x10000)
+	{
+		switch(stv2_current_tilemap.colour_depth)
+		{
+			case BITMAP_RGB32: draw_rgb32_bitmap(bitmap,cliprect); return;
+		}
+
+		/* intentional fall-through*/
+		popmessage("%d %s %s %s %s",stv2_current_tilemap.colour_depth,
+		                         stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE ? "no trans" : "trans",
+		                         stv2_current_tilemap.window_control & 6 ? "window" : "no window",
+		                         stv2_current_tilemap.colour_calculation_enabled ? "cc" : "no cc",
+		                         (stv2_current_tilemap.incx == 0x10000 && stv2_current_tilemap.incy == 0x10000) ? "no zoom" : "zoom");
+	}
+	else
+	{
+		/* intentional fall-through*/
+		popmessage("%d %s %s %s %s",stv2_current_tilemap.colour_depth,
+		                         stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE ? "no trans" : "trans",
+		                         stv2_current_tilemap.window_control & 6 ? "window" : "no window",
+		                         stv2_current_tilemap.colour_calculation_enabled ? "cc" : "no cc",
+		                         (stv2_current_tilemap.incx == 0x10000 && stv2_current_tilemap.incy == 0x10000) ? "no zoom" : "zoom");
+	}
 
 	/* size for n0 / n1 */
 	switch (stv2_current_tilemap.bitmap_size)
