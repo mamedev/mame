@@ -19,6 +19,14 @@
 
 struct voice_63701x
 {
+	voice_63701x()
+		: select(0),
+		  playing(0),
+		  base_addr(0),
+		  position(0),
+		  volume(0),
+		  silence_counter(0) {}
+	
 	int select;
 	int playing;
 	int base_addr;
