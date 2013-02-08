@@ -387,6 +387,9 @@ public:
 
 	void stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+//	void draw_11bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
