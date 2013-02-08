@@ -78,6 +78,10 @@ public:
 	DECLARE_VIDEO_START(jedi);
 	UINT32 screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(generate_interrupt);
+	void get_pens(pen_t *pens);
+	void do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in audio/jedi.c -----------*/

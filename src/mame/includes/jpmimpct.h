@@ -110,6 +110,7 @@ public:
 	DECLARE_MACHINE_START(impctawp);
 	DECLARE_MACHINE_RESET(impctawp);
 	TIMER_DEVICE_CALLBACK_MEMBER(duart_1_timer_event);
+	void update_irqs();
 };
 
 

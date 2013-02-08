@@ -1440,12 +1440,12 @@ DRIVER_INIT_MEMBER(jack_state,zzyzzyxx)
 }
 
 
-static void treahunt_decode( running_machine &machine )
+void jack_state::treahunt_decode(  )
 {
 	int A;
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x4000);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x4000);
 	int data;
 
 	space.set_decrypted_region(0x0000, 0x3fff, decrypt);
@@ -1488,7 +1488,7 @@ static void treahunt_decode( running_machine &machine )
 DRIVER_INIT_MEMBER(jack_state,treahunt)
 {
 	m_timer_rate = 256;
-	treahunt_decode(machine());
+	treahunt_decode();
 }
 
 

@@ -311,4 +311,7 @@ protected:
 	void blitter_01800001_xxxxxx_xxxxxx(UINT32 command, UINT32 a1flags, UINT32 a2flags);
 	void blitter_x1800x01_xxxxxx_xxxxxx(UINT32 command, UINT32 a1flags, UINT32 a2flags);
 
+	emu_file *jaguar_nvram_fopen( UINT32 openflags);
+	void jaguar_nvram_load();
+	void jaguar_nvram_save();
 };

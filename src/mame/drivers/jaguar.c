@@ -434,14 +434,14 @@ void jaguar_state::machine_reset()
 *
 ********************************************************************/
 /*
-static emu_file *jaguar_nvram_fopen( running_machine &machine, UINT32 openflags)
+emu_file jaguar_state::*jaguar_nvram_fopen( UINT32 openflags)
 {
-    device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
+    device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));
     file_error filerr;
     emu_file *file;
     if (image->exists())
     {
-        astring fname(machine.system().name, PATH_SEPARATOR, image->basename_noext(), ".nv");
+        astring fname(machine().system().name, PATH_SEPARATOR, image->basename_noext(), ".nv");
         filerr = mame_fopen( SEARCHPATH_NVRAM, fname, openflags, &file);
         return (filerr == FILERR_NONE) ? file : NULL;
     }
@@ -449,12 +449,12 @@ static emu_file *jaguar_nvram_fopen( running_machine &machine, UINT32 openflags)
         return NULL;
 }
 
-static void jaguar_nvram_load(running_machine &machine)
+void jaguar_state::jaguar_nvram_load()
 {
     emu_file *nvram_file = NULL;
     device_t *device;
 
-    for (device = machine.m_devicelist.first(); device != NULL; device = device->next())
+    for (device = machine().m_devicelist.first(); device != NULL; device = device->next())
     {
         device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
         if (nvram != NULL)
@@ -469,12 +469,12 @@ static void jaguar_nvram_load(running_machine &machine)
 }
 
 
-static void jaguar_nvram_save(running_machine &machine)
+void jaguar_state::jaguar_nvram_save()
 {
     emu_file *nvram_file = NULL;
     device_t *device;
 
-    for (device = machine.m_devicelist.first(); device != NULL; device = device->next())
+    for (device = machine().m_devicelist.first(); device != NULL; device = device->next())
     {
         device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
         if (nvram != NULL)

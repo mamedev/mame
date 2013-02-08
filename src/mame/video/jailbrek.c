@@ -62,13 +62,12 @@ void jailbrek_state::video_start()
 	m_bg_tilemap->set_scrolldx(0, 396 - 256);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void jailbrek_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	jailbrek_state *state = machine.driver_data<jailbrek_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int i;
 
-	for (i = 0; i < state->m_spriteram.bytes(); i += 4)
+	for (i = 0; i < m_spriteram.bytes(); i += 4)
 	{
 		int attr = spriteram[i + 1];    // attributes = ?tyxcccc
 		int code = spriteram[i] + ((attr & 0x40) << 2);
@@ -78,7 +77,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = spriteram[i + 2] - ((attr & 0x80) << 1);
 		int sy = spriteram[i + 3];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -86,9 +85,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		drawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy,
+		drawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0));
+			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
 	}
 }
 
@@ -118,6 +117,6 @@ UINT32 jailbrek_state::screen_update_jailbrek(screen_device &screen, bitmap_ind1
 	}
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

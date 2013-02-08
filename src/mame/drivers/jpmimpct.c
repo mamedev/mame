@@ -129,11 +129,10 @@ Thanks to Tony Friery and JPeMU for I/O routines and documentation.
  *
  *************************************/
 
-static void update_irqs(running_machine &machine)
+void jpmimpct_state::update_irqs()
 {
-	jpmimpct_state *state = machine.driver_data<jpmimpct_state>();
-	machine.device("maincpu")->execute().set_input_line(2, state->m_tms_irq ? ASSERT_LINE : CLEAR_LINE);
-	machine.device("maincpu")->execute().set_input_line(5, state->m_duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(2, m_tms_irq ? ASSERT_LINE : CLEAR_LINE);
+	machine().device("maincpu")->execute().set_input_line(5, m_duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -220,7 +219,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jpmimpct_state::duart_1_timer_event)
 	m_duart_1.ISR |= 0x08;
 
 	m_duart_1_irq = 1;
-	update_irqs(machine());
+	update_irqs();
 }
 
 READ16_MEMBER(jpmimpct_state::duart_1_r)
@@ -279,7 +278,7 @@ READ16_MEMBER(jpmimpct_state::duart_1_r)
 		case 0xf:
 		{
 			m_duart_1_irq = 0;
-			update_irqs(machine());
+			update_irqs();
 			duart_1.ISR |= ~0x8;
 			break;
 		}
@@ -844,7 +843,7 @@ static void jpmimpct_tms_irq(device_t *device, int state)
 {
 	jpmimpct_state *drvstate = device->machine().driver_data<jpmimpct_state>();
 	drvstate->m_tms_irq = state;
-	update_irqs(device->machine());
+	drvstate->update_irqs();
 }
 
 static const tms34010_config tms_config =

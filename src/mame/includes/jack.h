@@ -72,4 +72,7 @@ public:
 	virtual void video_start();
 
 	INTERRUPT_GEN_MEMBER(joinem_vblank_irq);
+	void jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void treahunt_decode(  );
 };

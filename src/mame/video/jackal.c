@@ -40,26 +40,24 @@ void jackal_state::palette_init()
 }
 
 
-static void set_pens( running_machine &machine )
+void jackal_state::set_pens(  )
 {
-	jackal_state *state = machine.driver_data<jackal_state>();
 	int i;
 
 	for (i = 0; i < 0x400; i += 2)
 	{
-		UINT16 data = state->m_paletteram[i] | (state->m_paletteram[i | 1] << 8);
+		UINT16 data = m_paletteram[i] | (m_paletteram[i | 1] << 8);
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 
-		colortable_palette_set_color(machine.colortable, i >> 1, color);
+		colortable_palette_set_color(machine().colortable, i >> 1, color);
 	}
 }
 
 
-void jackal_mark_tile_dirty( running_machine &machine, int offset )
+void jackal_state::jackal_mark_tile_dirty( int offset )
 {
-	jackal_state *state = machine.driver_data<jackal_state>();
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 TILE_GET_INFO_MEMBER(jackal_state::get_bg_tile_info)
@@ -79,47 +77,45 @@ void jackal_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(jackal_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void jackal_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	jackal_state *state = machine.driver_data<jackal_state>();
-	UINT8 *RAM = state->memregion("master")->base();
+	UINT8 *RAM = memregion("master")->base();
 	int i;
 
-	state->m_scrollram = &RAM[0x0020];
+	m_scrollram = &RAM[0x0020];
 
-	state->m_bg_tilemap->set_scroll_rows(1);
-	state->m_bg_tilemap->set_scroll_cols(1);
+	m_bg_tilemap->set_scroll_rows(1);
+	m_bg_tilemap->set_scroll_cols(1);
 
-	state->m_bg_tilemap->set_scrolly(0, state->m_videoctrl[0]);
-	state->m_bg_tilemap->set_scrollx(0, state->m_videoctrl[1]);
+	m_bg_tilemap->set_scrolly(0, m_videoctrl[0]);
+	m_bg_tilemap->set_scrollx(0, m_videoctrl[1]);
 
-	if (state->m_videoctrl[2] & 0x02)
+	if (m_videoctrl[2] & 0x02)
 	{
-		if (state->m_videoctrl[2] & 0x08)
+		if (m_videoctrl[2] & 0x08)
 		{
-			state->m_bg_tilemap->set_scroll_rows(32);
+			m_bg_tilemap->set_scroll_rows(32);
 
 			for (i = 0; i < 32; i++)
-				state->m_bg_tilemap->set_scrollx(i, state->m_scrollram[i]);
+				m_bg_tilemap->set_scrollx(i, m_scrollram[i]);
 		}
 
-		if (state->m_videoctrl[2] & 0x04)
+		if (m_videoctrl[2] & 0x04)
 		{
-			state->m_bg_tilemap->set_scroll_cols(32);
+			m_bg_tilemap->set_scroll_cols(32);
 
 			for (i = 0; i < 32; i++)
-				state->m_bg_tilemap->set_scrolly(i, state->m_scrollram[i]);
+				m_bg_tilemap->set_scrolly(i, m_scrollram[i]);
 		}
 	}
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 }
 
-#define DRAW_SPRITE(bank, code, sx, sy) drawgfx_transpen(bitmap, cliprect, machine.gfx[bank], code, color, flipx, flipy, sx, sy, 0);
+#define DRAW_SPRITE(bank, code, sx, sy) drawgfx_transpen(bitmap, cliprect, machine().gfx[bank], code, color, flipx, flipy, sx, sy, 0);
 
-static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *sram, int length, int bank )
+void jackal_state::draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *sram, int length, int bank )
 {
-	jackal_state *state = machine.driver_data<jackal_state>();
 	int offs;
 
 	for (offs = 0; offs < length; offs += 5)
@@ -138,7 +134,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 		if (sy > 0xf0)
 			sy = sy - 256;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -151,7 +147,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 			int spritenum = sn1 * 4 + ((sn2 & (8 + 4)) >> 2) + ((sn2 & (2 + 1)) << 10);
 			int mod = -8;
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				sx += 8;
 				sy -= 8;
@@ -160,7 +156,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 
 			if ((attr & 0x0C) == 0x0C)
 			{
-				if (state->flip_screen()) sy += 16;
+				if (flip_screen()) sy += 16;
 				DRAW_SPRITE(bank + 1, spritenum, sx, sy)
 			}
 
@@ -183,7 +179,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 
 			if (attr & 0x10)
 			{
-				if (state->flip_screen())
+				if (flip_screen())
 				{
 					sx -= 16;
 					sy -= 16;
@@ -202,13 +198,12 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 	}
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void jackal_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	jackal_state *state = machine.driver_data<jackal_state>();
-	UINT8 *RAM = state->memregion("master")->base();
+	UINT8 *RAM = memregion("master")->base();
 	UINT8 *sr, *ss;
 
-	if (state->m_videoctrl[0x03] & 0x08)
+	if (m_videoctrl[0x03] & 0x08)
 	{
 		sr = &RAM[0x03800]; // Sprite 2
 		ss = &RAM[0x13800]; // Additional Sprite 2
@@ -219,14 +214,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		ss = &RAM[0x13000]; // Additional Sprite 1
 	}
 
-	draw_sprites_region(machine, bitmap, cliprect, ss, 0x0f5, 3);
-	draw_sprites_region(machine, bitmap, cliprect, sr, 0x500, 1);
+	draw_sprites_region(bitmap, cliprect, ss, 0x0f5, 3);
+	draw_sprites_region(bitmap, cliprect, sr, 0x500, 1);
 }
 
 UINT32 jackal_state::screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(machine());
-	draw_background(machine(), bitmap, cliprect);
-	draw_sprites(machine(), bitmap, cliprect);
+	set_pens();
+	draw_background(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

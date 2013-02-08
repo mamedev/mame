@@ -67,13 +67,12 @@ void jack_state::video_start()
 
 /**************************************************************************/
 
-static void jack_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void jack_state::jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	jack_state *state = machine.driver_data<jack_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int sy = spriteram[offs];
 		int sx = spriteram[offs + 1];
@@ -82,7 +81,7 @@ static void jack_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, c
 		int flipx = (spriteram[offs + 3] & 0x80) >> 7;
 		int flipy = (spriteram[offs + 3] & 0x40) >> 6;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -90,7 +89,7 @@ static void jack_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, c
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				code,
 				color,
 				flipx,flipy,
@@ -101,7 +100,7 @@ static void jack_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, c
 UINT32 jack_state::screen_update_jack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	jack_draw_sprites(machine(), bitmap, cliprect);
+	jack_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -188,22 +187,21 @@ VIDEO_START_MEMBER(jack_state,joinem)
 
 /**************************************************************************/
 
-static void joinem_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void jack_state::joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	jack_state *state = machine.driver_data<jack_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int sy = spriteram[offs];
 		int sx = spriteram[offs + 1];
 		int code = spriteram[offs + 2] | ((spriteram[offs + 3] & 0x03) << 8);
-		int color = (spriteram[offs + 3] & 0x38) >> 3 | state->m_joinem_palette_bank;
+		int color = (spriteram[offs + 3] & 0x38) >> 3 | m_joinem_palette_bank;
 		int flipx = (spriteram[offs + 3] & 0x80) >> 7;
 		int flipy = (spriteram[offs + 3] & 0x40) >> 6;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -211,7 +209,7 @@ static void joinem_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				code,
 				color,
 				flipx,flipy,
@@ -222,6 +220,6 @@ static void joinem_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 UINT32 jack_state::screen_update_joinem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	joinem_draw_sprites(machine(), bitmap, cliprect);
+	joinem_draw_sprites(bitmap, cliprect);
 	return 0;
 }

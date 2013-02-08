@@ -63,7 +63,7 @@ VIDEO_START_MEMBER(jedi_state,jedi)
  *
  *************************************/
 
-static void get_pens(jedi_state *state, pen_t *pens)
+void jedi_state::get_pens(pen_t *pens)
 {
 	offs_t offs;
 
@@ -71,7 +71,7 @@ static void get_pens(jedi_state *state, pen_t *pens)
 	{
 		int r, g, b, bits, intensity;
 
-		UINT16 color = state->m_paletteram[offs] | (state->m_paletteram[offs | 0x400] << 8);
+		UINT16 color = m_paletteram[offs] | (m_paletteram[offs | 0x400] << 8);
 
 		intensity = (color >> 9) & 7;
 		bits = (color >> 6) & 7;
@@ -86,12 +86,12 @@ static void get_pens(jedi_state *state, pen_t *pens)
 }
 
 
-static void do_pen_lookup(jedi_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void jedi_state::do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y, x;
 	pen_t pens[NUM_PENS];
 
-	get_pens(state, pens);
+	get_pens(pens);
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for(x = cliprect.min_x; x <= cliprect.max_x; x++)
@@ -126,20 +126,20 @@ WRITE8_MEMBER(jedi_state::jedi_hscroll_w)
  *
  *************************************/
 
-static void draw_background_and_text(running_machine &machine, jedi_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void jedi_state::draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int y;
 	int background_line_buffer[0x200];  /* RAM chip at 2A */
 
-	UINT8 *tx_gfx = machine.root_device().memregion("gfx1")->base();
-	UINT8 *bg_gfx = machine.root_device().memregion("gfx2")->base();
-	UINT8 *prom1 = &machine.root_device().memregion("proms")->base()[0x0000 | ((*state->m_smoothing_table & 0x03) << 8)];
-	UINT8 *prom2 = &machine.root_device().memregion("proms")->base()[0x0800 | ((*state->m_smoothing_table & 0x03) << 8)];
-	int vscroll = state->m_vscroll;
-	int hscroll = state->m_hscroll;
-	int tx_bank = *state->m_foreground_bank;
-	UINT8 *tx_ram = state->m_foregroundram;
-	UINT8 *bg_ram = state->m_backgroundram;
+	UINT8 *tx_gfx = machine().root_device().memregion("gfx1")->base();
+	UINT8 *bg_gfx = machine().root_device().memregion("gfx2")->base();
+	UINT8 *prom1 = &machine().root_device().memregion("proms")->base()[0x0000 | ((*m_smoothing_table & 0x03) << 8)];
+	UINT8 *prom2 = &machine().root_device().memregion("proms")->base()[0x0800 | ((*m_smoothing_table & 0x03) << 8)];
+	int vscroll = m_vscroll;
+	int hscroll = m_hscroll;
+	int tx_bank = *m_foreground_bank;
+	UINT8 *tx_ram = m_foregroundram;
+	UINT8 *bg_ram = m_backgroundram;
 
 	memset(background_line_buffer, 0, 0x200 * sizeof(int));
 
@@ -226,11 +226,11 @@ static void draw_background_and_text(running_machine &machine, jedi_state *state
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, jedi_state *state, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void jedi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
-	UINT8 *spriteram = state->m_spriteram;
-	UINT8 *gfx3 = machine.root_device().memregion("gfx3")->base();
+	UINT8 *spriteram = m_spriteram;
+	UINT8 *gfx3 = machine().root_device().memregion("gfx3")->base();
 
 	for (offs = 0x00; offs < 0x30; offs++)
 	{
@@ -330,9 +330,9 @@ UINT32 jedi_state::screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		/* draw the background/text layers, followed by the sprites
 		   - it needs to be done in this order*/
-		draw_background_and_text(machine(), this, bitmap, cliprect);
-		draw_sprites(machine(), this, bitmap, cliprect);
-		do_pen_lookup(this, bitmap, cliprect);
+		draw_background_and_text(bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
+		do_pen_lookup(bitmap, cliprect);
 	}
 
 	return 0;
