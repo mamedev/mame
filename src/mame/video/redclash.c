@@ -100,33 +100,25 @@ PALETTE_INIT_MEMBER(ladybug_state,redclash)
 		colortable_entry_set_value(machine().colortable, i, (i - 0x60) + 0x20);
 }
 
-WRITE8_HANDLER( redclash_videoram_w )
+WRITE8_HANDLER( ladybug_state::redclash_videoram_w )
 {
-	ladybug_state *state = space.machine().driver_data<ladybug_state>();
-
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( redclash_gfxbank_w )
+WRITE8_HANDLER( ladybug_state::redclash_gfxbank_w )
 {
-	ladybug_state *state = space.machine().driver_data<ladybug_state>();
-
-	if (state->m_gfxbank != (data & 0x01))
+	if (m_gfxbank != (data & 0x01))
 	{
-		state->m_gfxbank = data & 0x01;
-		space.machine().tilemap().mark_all_dirty();
+		m_gfxbank = data & 0x01;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( redclash_flipscreen_w )
+WRITE8_HANDLER( ladybug_state::redclash_flipscreen_w )
 {
-	ladybug_state *state = space.machine().driver_data<ladybug_state>();
-	state->flip_screen_set(data & 0x01);
+	flip_screen_set(data & 0x01);
 }
-
-void redclash_set_stars_enable( running_machine &machine, UINT8 on ); //temp
-void redclash_set_stars_speed( running_machine &machine, UINT8 speed );  //temp
 
 /*
 star_speed:
@@ -139,33 +131,27 @@ star_speed:
 6 = backwards medium
 7 = backwards fast
 */
-WRITE8_HANDLER( redclash_star0_w )
+WRITE8_HANDLER( ladybug_state::redclash_star0_w )
 {
-	ladybug_state *state = space.machine().driver_data<ladybug_state>();
-
-	state->m_star_speed = (state->m_star_speed & ~1) | ((data & 1) << 0);
-	redclash_set_stars_speed(space.machine(), state->m_star_speed);
+	m_star_speed = (m_star_speed & ~1) | ((data & 1) << 0);
+	redclash_set_stars_speed(m_star_speed);
 }
 
-WRITE8_HANDLER( redclash_star1_w )
+WRITE8_HANDLER( ladybug_state::redclash_star1_w )
 {
-	ladybug_state *state = space.machine().driver_data<ladybug_state>();
-
-	state->m_star_speed = (state->m_star_speed & ~2) | ((data & 1) << 1);
-	redclash_set_stars_speed(space.machine(), state->m_star_speed);
+	m_star_speed = (m_star_speed & ~2) | ((data & 1) << 1);
+	redclash_set_stars_speed(m_star_speed);
 }
 
-WRITE8_HANDLER( redclash_star2_w )
+WRITE8_HANDLER( ladybug_state::redclash_star2_w )
 {
-	ladybug_state *state = space.machine().driver_data<ladybug_state>();
-
-	state->m_star_speed = (state->m_star_speed & ~4) | ((data & 1) << 2);
-	redclash_set_stars_speed(space.machine(), state->m_star_speed);
+	m_star_speed = (m_star_speed & ~4) | ((data & 1) << 2);
+	redclash_set_stars_speed( m_star_speed);
 }
 
-WRITE8_HANDLER( redclash_star_reset_w )
+WRITE8_HANDLER( ladybug_state::redclash_star_reset_w )
 {
-	redclash_set_stars_enable(space.machine(), 1);
+	redclash_set_stars_enable(1);
 }
 
 TILE_GET_INFO_MEMBER(ladybug_state::get_fg_tile_info)
@@ -182,13 +168,12 @@ VIDEO_START_MEMBER(ladybug_state,redclash)
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void ladybug_state::redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int i, offs;
 
-	for (offs = state->m_spriteram.bytes() - 0x20; offs >= 0; offs -= 0x20)
+	for (offs = m_spriteram.bytes() - 0x20; offs >= 0; offs -= 0x20)
 	{
 		i = 0;
 		while (i < 0x20 && spriteram[offs + i] != 0)
@@ -209,15 +194,15 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				{
 					case 3: /* 24x24 */
 					{
-						int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((state->m_gfxbank & 1) << 4);
+						int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
 
-						drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+						drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 								code,
 								color,
 								0,0,
 								sx,sy - 16,0);
 						/* wraparound */
-						drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+						drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 								code,
 								color,
 								0,0,
@@ -228,10 +213,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 					case 2: /* 16x16 */
 						if (spriteram[offs + i] & 0x20) /* zero hour spaceships */
 						{
-							int code = ((spriteram[offs + i + 1] & 0xf8) >> 3) + ((state->m_gfxbank & 1) << 5);
+							int code = ((spriteram[offs + i + 1] & 0xf8) >> 3) + ((m_gfxbank & 1) << 5);
 							int bank = (spriteram[offs + i + 1] & 0x02) >> 1;
 
-							drawgfx_transpen(bitmap,cliprect,machine.gfx[4+bank],
+							drawgfx_transpen(bitmap,cliprect,machine().gfx[4+bank],
 									code,
 									color,
 									0,0,
@@ -239,9 +224,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 						}
 						else
 						{
-							int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((state->m_gfxbank & 1) << 4);
+							int code = ((spriteram[offs + i + 1] & 0xf0) >> 4) + ((m_gfxbank & 1) << 4);
 
-							drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+							drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 									code,
 									color,
 									0,0,
@@ -250,7 +235,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 						break;
 
 					case 1: /* 8x8 */
-						drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+						drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 								spriteram[offs + i + 1],// + 4 * (spriteram[offs + i + 2] & 0x10),
 								color,
 								0,0,
@@ -266,18 +251,17 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static void draw_bullets( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void ladybug_state::redclash_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
 	int offs;
 
 	for (offs = 0; offs < 0x20; offs++)
 	{
-//      sx = state->m_videoramoffs];
-		int sx = 8 * offs + (state->m_videoram[offs] & 0x07);   /* ?? */
-		int sy = 0xff - state->m_videoram[offs + 0x20];
+//      sx = m_videoramoffs];
+		int sx = 8 * offs + (m_videoram[offs] & 0x07);   /* ?? */
+		int sy = 0xff - m_videoram[offs + 0x20];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 		}
@@ -301,37 +285,35 @@ static void draw_bullets( running_machine &machine, bitmap_ind16 &bitmap, const 
  */
 
 /* This line can reset the LFSR to zero and disables the star generator */
-void redclash_set_stars_enable( running_machine &machine, UINT8 on )
-{   ladybug_state *state = machine.driver_data<ladybug_state>();
-
-	if ((state->m_stars_enable == 0) && (on == 1))
+void ladybug_state::redclash_set_stars_enable(UINT8 on)
+{   
+	if ((m_stars_enable == 0) && (on == 1))
 	{
-		state->m_stars_offset = 0;
+		m_stars_offset = 0;
 	}
 
-	state->m_stars_enable = on;
+	m_stars_enable = on;
 }
 
 /* This sets up which starfield to draw and the offset, */
 /* To be called from SCREEN_VBLANK() */
 
-void redclash_update_stars_state( running_machine &machine )
+void ladybug_state::redclash_update_stars_state()
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
-	if (state->m_stars_enable == 0)
+	if (m_stars_enable == 0)
 		return;
 
-	state->m_stars_count++;
-	state->m_stars_count %= 2;
+	m_stars_count++;
+	m_stars_count %= 2;
 
-	if (state->m_stars_count == 0)
+	if (m_stars_count == 0)
 	{
-		state->m_stars_offset += ((state->m_stars_speed * 2) - 0x09);
-		state->m_stars_offset %= 256 * 256;
-		state->m_stars_state = 0;
+		m_stars_offset += ((m_stars_speed * 2) - 0x09);
+		m_stars_offset %= 256 * 256;
+		m_stars_state = 0;
 	}
 	else
-		state->m_stars_state = 0x1fc71;
+		m_stars_state = 0x1fc71;
 }
 
 /* Set the speed register (3 bits) */
@@ -347,10 +329,9 @@ void redclash_update_stars_state( running_machine &machine )
  * 7 right/up fast     (+5/2 pix per frame)
  */
 
-void redclash_set_stars_speed( running_machine &machine, UINT8 speed )
+void ladybug_state::redclash_set_stars_speed(UINT8 speed )
 {
-	ladybug_state *state = machine.driver_data<ladybug_state>();
-	state->m_stars_speed = speed;
+	m_stars_speed = speed;
 }
 
 /* Draw the stars */
@@ -358,23 +339,22 @@ void redclash_set_stars_speed( running_machine &machine, UINT8 speed )
 /* Space Raider doesn't use the Va bit, and it is also set up to */
 /* window the stars to a certain x range */
 
-void redclash_draw_stars( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx )
+void ladybug_state::redclash_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx )
 {
-	ladybug_state *redclash = machine.driver_data<ladybug_state>();
 	int i;
 	UINT8 tempbit, feedback, star_color, xloc, yloc;
 	UINT32 state;
 	UINT8 hcond, vcond;
 
-	if (redclash->m_stars_enable == 0)
+	if (m_stars_enable == 0)
 		return;
 
-	state = redclash->m_stars_state;
+	state = m_stars_state;
 
 	for(i = 0; i < 256 * 256; i++)
 	{
-		xloc = (redclash->m_stars_offset + i) % 256;
-		yloc = ((redclash->m_stars_offset + i) /256 ) % 256;
+		xloc = (m_stars_offset + i) % 256;
+		yloc = ((m_stars_offset + i) /256 ) % 256;
 
 		if ((state & 0x10000) == 0)
 			tempbit = 1;
@@ -420,15 +400,15 @@ void ladybug_state::screen_eof_redclash(screen_device &screen, bool state)
 {
 	// falling edge
 	if (!state)
-		redclash_update_stars_state(machine());
+		redclash_update_stars_state();
 }
 
 UINT32 ladybug_state::screen_update_redclash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
-	redclash_draw_stars(machine(), bitmap, cliprect, 0x60, 0, 0x00, 0xff);
-	::draw_sprites(machine(), bitmap, cliprect);
-	draw_bullets(machine(), bitmap, cliprect);
+	redclash_draw_stars(bitmap, cliprect, 0x60, 0, 0x00, 0xff);
+	redclash_draw_sprites(bitmap, cliprect);
+	redclash_draw_bullets(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

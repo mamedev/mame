@@ -175,7 +175,7 @@ WRITE8_MEMBER(ladybug_state::sraider_io_w)
 
 	m_grid_color = data & 0x70;
 
-	redclash_set_stars_enable(machine(), (data & 0x08) >> 3);
+	redclash_set_stars_enable((data & 0x08) >> 3);
 
 	/*
 	 * There must be a subtle clocking difference between
@@ -183,7 +183,7 @@ WRITE8_MEMBER(ladybug_state::sraider_io_w)
 	 * hence the -1 here
 	 */
 
-	redclash_set_stars_speed(machine(), (data & 0x07) - 1);
+	redclash_set_stars_speed((data & 0x07) - 1);
 }
 
 TILE_GET_INFO_MEMBER(ladybug_state::get_bg_tile_info)
@@ -301,7 +301,7 @@ void ladybug_state::screen_eof_sraider(screen_device &screen, bool state)/* upda
 {
 	// falling edge
 	if (!state)
-		redclash_update_stars_state(machine());
+		redclash_update_stars_state();
 }
 
 UINT32 ladybug_state::screen_update_sraider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -328,9 +328,9 @@ UINT32 ladybug_state::screen_update_sraider(screen_device &screen, bitmap_ind16 
 
 	// draw the stars
 	if (flip_screen())
-		redclash_draw_stars(machine(), bitmap, cliprect, 0x60, 1, 0x27, 0xff);
+		redclash_draw_stars(bitmap, cliprect, 0x60, 1, 0x27, 0xff);
 	else
-		redclash_draw_stars(machine(), bitmap, cliprect, 0x60, 1, 0x00, 0xd8);
+		redclash_draw_stars(bitmap, cliprect, 0x60, 1, 0x00, 0xd8);
 
 	// draw the gridlines
 	colortable_palette_set_color(machine().colortable, 0x40, MAKE_RGB(m_grid_color & 0x40 ? 0xff : 0,
