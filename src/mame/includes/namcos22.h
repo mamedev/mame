@@ -92,7 +92,7 @@ public:
 	UINT16 m_SerialDataSlaveToMasterCurrent;
 	int m_RenderBufSize;
 	UINT16 m_RenderBufData[MAX_RENDER_CMD_SEQ];
-	UINT32 m_Sys22PortBits;
+	UINT16 m_portbits[2];
 	int m_irq_state;
 	int m_DspUploadState;
 	int m_UploadDestIdx;
@@ -201,13 +201,13 @@ public:
 	DECLARE_WRITE32_MEMBER(namcos22_system_controller_w);
 	DECLARE_READ32_MEMBER(namcos22_keycus_r);
 	DECLARE_WRITE32_MEMBER(namcos22_keycus_w);
-	DECLARE_READ32_MEMBER(namcos22_portbit_r);
-	DECLARE_WRITE32_MEMBER(namcos22_portbit_w);
-	DECLARE_READ32_MEMBER(namcos22_dipswitch_r);
+	DECLARE_READ16_MEMBER(namcos22_portbit_r);
+	DECLARE_WRITE16_MEMBER(namcos22_portbit_w);
+	DECLARE_READ16_MEMBER(namcos22_dipswitch_r);
 	DECLARE_READ32_MEMBER(namcos22_mcuram_r);
 	DECLARE_WRITE32_MEMBER(namcos22_mcuram_w);
 	DECLARE_READ32_MEMBER(namcos22_gun_r);
-	DECLARE_WRITE32_MEMBER(namcos22_cpuleds_w);
+	DECLARE_WRITE16_MEMBER(namcos22_cpuleds_w);
 	DECLARE_READ32_MEMBER(alpinesa_prot_r);
 	DECLARE_WRITE32_MEMBER(alpinesa_prot_w);
 	DECLARE_WRITE32_MEMBER(namcos22s_nvmem_w);
