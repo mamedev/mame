@@ -529,7 +529,7 @@ static TIMER_CALLBACK( saturn_smpc_intback )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-	if(state->m_smpc.IREG[0] != 0)
+	if(state->m_smpc.intback_buf[0] != 0)
 	{
 		{
 			int i;
@@ -560,9 +560,9 @@ static TIMER_CALLBACK( saturn_smpc_intback )
 				state->m_smpc.OREG[16+i]=0xff; // undefined
 		}
 
-		state->m_smpc.intback_stage = (state->m_smpc.IREG[1] & 8) >> 3; // first peripheral
+		state->m_smpc.intback_stage = (state->m_smpc.intback_buf[1] & 8) >> 3; // first peripheral
 		state->m_smpc.SR = 0x40 | state->m_smpc.intback_stage << 5;
-		state->m_smpc.pmode = state->m_smpc.IREG[0]>>4;
+		state->m_smpc.pmode = state->m_smpc.intback_buf[0]>>4;
 
 		if(!(state->m_scu.ism & IRQ_SMPC))
 			state->m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
@@ -574,9 +574,9 @@ static TIMER_CALLBACK( saturn_smpc_intback )
 		/* clear hand-shake flag */
 		state->m_smpc.SF = 0x00;
 	}
-	else if(state->m_smpc.IREG[1] & 8)
+	else if(state->m_smpc.intback_buf[1] & 8)
 	{
-		state->m_smpc.intback_stage = (state->m_smpc.IREG[1] & 8) >> 3; // first peripheral
+		state->m_smpc.intback_stage = (state->m_smpc.intback_buf[1] & 8) >> 3; // first peripheral
 		state->m_smpc.SR = 0x40;
 		state->m_smpc.OREG[31] = 0x10;
 		machine.scheduler().timer_set(attotime::from_usec(0), FUNC(intback_peripheral),0);
@@ -702,6 +702,12 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 					timing += 700;
 
 				/* TODO: check if IREG[2] is setted to 0xf0 */
+				{
+					int i;
+
+					for(i=0;i<3;i++)
+						state->m_smpc.intback_buf[i] = state->m_smpc.IREG[i];
+				}
 
 				if(LOG_PAD_CMD) printf("INTBACK %02x %02x %d %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],space.machine().primary_screen->vpos(),(int)space.machine().primary_screen->frame_number());
 				space.machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(saturn_smpc_intback),0); //TODO: is variable time correct?

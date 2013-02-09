@@ -102,6 +102,7 @@ public:
 		UINT8 SF;
 		UINT8 SR;
 		UINT8 IREG[7];
+		UINT8 intback_buf[7];
 		UINT8 OREG[32];
 		int   intback_stage;
 		int   pmode;
