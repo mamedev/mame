@@ -66,15 +66,14 @@ static int vectrex_verify_cart(char *data)
 
 DEVICE_IMAGE_LOAD_MEMBER(vectrex_state,vectrex_cart)
 {
-	vectrex_state *state = image.device().machine().driver_data<vectrex_state>();
-	UINT8 *mem = state->memregion("maincpu")->base();
+	UINT8 *mem = memregion("maincpu")->base();
 	if (image.software_entry() == NULL)
 	{
 		image.fread( mem, 0x8000);
 		if (image.length() > 0x8000)
 		{
 			image.fread( mem+0x10000, 0x8000);
-			state->m_64k_cart = 1;
+			m_64k_cart = 1;
 		}
 	} else {
 		int size = image.get_software_region_length("rom");
@@ -89,14 +88,14 @@ DEVICE_IMAGE_LOAD_MEMBER(vectrex_state,vectrex_cart)
 	}
 
 	if (memcmp(mem + 0x06,"SRAM",4)) {
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x0000, 0x7fff);
+		m_maincpu->space(AS_PROGRAM).unmap_write(0x0000, 0x7fff);
 	}
 
 	/* If VIA T2 starts, reset refresh timer.
 	   This is the best strategy for most games. */
-	state->m_reset_refresh = 1;
+	m_reset_refresh = 1;
 
-	state->m_imager_angles = narrow_escape_angles;
+	m_imager_angles = narrow_escape_angles;
 
 	/* let's do this 3D detection with a strcmp using data inside the cart images */
 	/* slightly prettier than having to hardcode CRCs */
@@ -104,21 +103,21 @@ DEVICE_IMAGE_LOAD_MEMBER(vectrex_state,vectrex_cart)
 	/* handle 3D Narrow Escape but skip the 2-d hack of it from Fred Taft */
 	if (!memcmp(mem + 0x11,"NARROW",6) && (((char*)mem)[0x39] == 0x0c))
 	{
-		state->m_imager_angles = narrow_escape_angles;
+		m_imager_angles = narrow_escape_angles;
 	}
 
 	if (!memcmp(mem + 0x11,"CRAZY COASTER", 13))
 	{
-		state->m_imager_angles = crazy_coaster_angles;
+		m_imager_angles = crazy_coaster_angles;
 	}
 
 	if (!memcmp(mem + 0x11,"3D MINE STORM", 13))
 	{
-		state->m_imager_angles = minestorm_3d_angles;
+		m_imager_angles = minestorm_3d_angles;
 
 		/* Don't reset T2 each time it's written.
 		   This would cause jerking in mine3. */
-		state->m_reset_refresh = 0;
+		m_reset_refresh = 0;
 	}
 
 	return IMAGE_INIT_PASS;
@@ -131,87 +130,86 @@ DEVICE_IMAGE_LOAD_MEMBER(vectrex_state,vectrex_cart)
 
 *********************************************************************/
 
-void vectrex_configuration(running_machine &machine)
+void vectrex_state::vectrex_configuration()
 {
-	vectrex_state *state = machine.driver_data<vectrex_state>();
-	unsigned char cport = state->ioport("3DCONF")->read();
+	unsigned char cport = m_io_3dconf->read();
 
 	/* Vectrex 'dipswitch' configuration */
 
 	/* Imager control */
 	if (cport & 0x01) /* Imager enabled */
 	{
-		if (state->m_imager_status == 0)
-			state->m_imager_status = cport & 0x01;
+		if (m_imager_status == 0)
+			m_imager_status = cport & 0x01;
 
-		state->vector_add_point_function = cport & 0x02 ? vectrex_add_point_stereo: vectrex_add_point;
+		vector_add_point_function = cport & 0x02 ? &vectrex_state::vectrex_add_point_stereo: &vectrex_state::vectrex_add_point;
 
 		switch ((cport >> 2) & 0x07)
 		{
 		case 0x00:
-			state->m_imager_colors[0] = state->m_imager_colors[1] = state->m_imager_colors[2] = RGB_BLACK;
+			m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = RGB_BLACK;
 			break;
 		case 0x01:
-			state->m_imager_colors[0] = state->m_imager_colors[1] = state->m_imager_colors[2] = VC_DARKRED;
+			m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = VC_DARKRED;
 			break;
 		case 0x02:
-			state->m_imager_colors[0] = state->m_imager_colors[1] = state->m_imager_colors[2] = VC_GREEN;
+			m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = VC_GREEN;
 			break;
 		case 0x03:
-			state->m_imager_colors[0] = state->m_imager_colors[1] = state->m_imager_colors[2] = VC_BLUE;
+			m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = VC_BLUE;
 			break;
 		case 0x04:
 			/* mine3 has a different color sequence */
-			if (state->m_imager_angles == minestorm_3d_angles)
+			if (m_imager_angles == minestorm_3d_angles)
 			{
-				state->m_imager_colors[0] = VC_GREEN;
-				state->m_imager_colors[1] = VC_RED;
+				m_imager_colors[0] = VC_GREEN;
+				m_imager_colors[1] = VC_RED;
 			}
 			else
 			{
-				state->m_imager_colors[0] = VC_RED;
-				state->m_imager_colors[1] = VC_GREEN;
+				m_imager_colors[0] = VC_RED;
+				m_imager_colors[1] = VC_GREEN;
 			}
-			state->m_imager_colors[2]=VC_BLUE;
+			m_imager_colors[2]=VC_BLUE;
 			break;
 		}
 
 		switch ((cport >> 5) & 0x07)
 		{
 		case 0x00:
-			state->m_imager_colors[3] = state->m_imager_colors[4] = state->m_imager_colors[5] = RGB_BLACK;
+			m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = RGB_BLACK;
 			break;
 		case 0x01:
-			state->m_imager_colors[3] = state->m_imager_colors[4] = state->m_imager_colors[5] = VC_DARKRED;
+			m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = VC_DARKRED;
 			break;
 		case 0x02:
-			state->m_imager_colors[3] = state->m_imager_colors[4] = state->m_imager_colors[5] = VC_GREEN;
+			m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = VC_GREEN;
 			break;
 		case 0x03:
-			state->m_imager_colors[3] = state->m_imager_colors[4] = state->m_imager_colors[5] = VC_BLUE;
+			m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = VC_BLUE;
 			break;
 		case 0x04:
-			if (state->m_imager_angles == minestorm_3d_angles)
+			if (m_imager_angles == minestorm_3d_angles)
 			{
-				state->m_imager_colors[3] = VC_GREEN;
-				state->m_imager_colors[4] = VC_RED;
+				m_imager_colors[3] = VC_GREEN;
+				m_imager_colors[4] = VC_RED;
 			}
 			else
 			{
-				state->m_imager_colors[3] = VC_RED;
-				state->m_imager_colors[4] = VC_GREEN;
+				m_imager_colors[3] = VC_RED;
+				m_imager_colors[4] = VC_GREEN;
 			}
-			state->m_imager_colors[5]=VC_BLUE;
+			m_imager_colors[5]=VC_BLUE;
 			break;
 		}
 	}
 	else
 	{
-		state->vector_add_point_function = vectrex_add_point;
-		state->m_beam_color = RGB_WHITE;
-		state->m_imager_colors[0] = state->m_imager_colors[1] = state->m_imager_colors[2] = state->m_imager_colors[3] = state->m_imager_colors[4] = state->m_imager_colors[5] = RGB_WHITE;
+		vector_add_point_function = &vectrex_state::vectrex_add_point;
+		m_beam_color = RGB_WHITE;
+		m_imager_colors[0] = m_imager_colors[1] = m_imager_colors[2] = m_imager_colors[3] = m_imager_colors[4] = m_imager_colors[5] = RGB_WHITE;
 	}
-	state->m_lightpen_port = machine.root_device().ioport("LPENCONF")->read() & 0x03;
+	m_lightpen_port = m_io_lpenconf->read() & 0x03;
 }
 
 
@@ -221,18 +219,18 @@ void vectrex_configuration(running_machine &machine)
 
 *********************************************************************/
 
-void vectrex_via_irq(device_t *device, int level)
+WRITE_LINE_MEMBER(vectrex_state::vectrex_via_irq)
 {
-	device->machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, level);
+	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
 
 READ8_MEMBER(vectrex_state::vectrex_via_pb_r)
 {
 	int pot;
-	static const char *const ctrlnames[] = { "CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y" };
+	ioport_port *io_port[4] = { m_io_contr1x, m_io_contr1y, m_io_contr2x, m_io_contr2y };
 
-	pot = machine().root_device().ioport(ctrlnames[(m_via_out[PORTB] & 0x6) >> 1])->read() - 0x80;
+	pot = io_port[(m_via_out[PORTB] & 0x6) >> 1]->read() - 0x80;
 
 	if (pot > (signed char)m_via_out[PORTA])
 		m_via_out[PORTB] |= 0x20;
@@ -248,9 +246,7 @@ READ8_MEMBER(vectrex_state::vectrex_via_pa_r)
 	if ((!(m_via_out[PORTB] & 0x10)) && (m_via_out[PORTB] & 0x08))
 		/* BDIR inactive, we can read the PSG. BC1 has to be active. */
 	{
-		device_t *ay = machine().device("ay8912");
-
-		m_via_out[PORTA] = ay8910_r(ay, space, 0)
+		m_via_out[PORTA] = ay8910_r(m_ay8912, space, 0)
 			& ~(m_imager_pinlevel & 0x80);
 	}
 	return m_via_out[PORTA];
@@ -259,7 +255,7 @@ READ8_MEMBER(vectrex_state::vectrex_via_pa_r)
 
 READ8_MEMBER(vectrex_state::vectrex_s1_via_pb_r)
 {
-	return (m_via_out[PORTB] & ~0x40) | (ioport("COIN")->read() & 0x40);
+	return (m_via_out[PORTB] & ~0x40) | (m_io_coin->read() & 0x40);
 }
 
 
@@ -284,7 +280,6 @@ TIMER_CALLBACK_MEMBER(vectrex_state::update_level)
 
 TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_eye)
 {
-	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 	int coffset;
 	double rtime = (1.0 / m_imager_freq);
 
@@ -301,8 +296,8 @@ TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_eye)
 			machine().scheduler().timer_set (attotime::from_double(rtime * 0.50), timer_expired_delegate(FUNC(vectrex_state::vectrex_imager_eye),this), 1);
 
 			/* Index hole sensor is connected to IO7 which triggers also CA1 of VIA */
-			via_0->write_ca1(1);
-			via_0->write_ca1(0);
+			m_via6522_0->write_ca1(1);
+			m_via6522_0->write_ca1(0);
 			m_imager_pinlevel |= 0x80;
 			machine().scheduler().timer_set (attotime::from_double(rtime / 360.0), timer_expired_delegate(FUNC(vectrex_state::update_level),this), 0, &m_imager_pinlevel);
 		}
