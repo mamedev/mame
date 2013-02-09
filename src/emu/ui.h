@@ -172,7 +172,7 @@ void ui_show_menu(void);
 void ui_show_mouse(bool status);
 
 /* return true if a menu is displayed */
-int ui_is_menu_active(void);
+bool ui_is_menu_active(void);
 
 /* print the game info string into a buffer */
 astring &game_info_astring(running_machine &machine, astring &string);

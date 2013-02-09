@@ -437,7 +437,7 @@ void ui_update_and_render(running_machine &machine, render_container *container)
 	else
 		popup_text_end = 0;
 
-	if (ui_mouse_show || (machine.options().ui_mouse() && ui_is_menu_active()))
+	if (ui_mouse_show || (ui_is_menu_active() && machine.options().ui_mouse()))
 	{
 		INT32 mouse_target_x, mouse_target_y;
 		int mouse_button;
@@ -924,11 +924,11 @@ void ui_show_mouse(bool status)
 }
 
 /*-------------------------------------------------
-    ui_is_menu_active - return TRUE if the menu
+    ui_is_menu_active - return true if the menu
     UI handler is active
 -------------------------------------------------*/
 
-int ui_is_menu_active(void)
+bool ui_is_menu_active(void)
 {
 	return (ui_handler_callback == ui_menu::ui_handler);
 }
