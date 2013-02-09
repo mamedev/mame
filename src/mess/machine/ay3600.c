@@ -280,30 +280,30 @@ static const unsigned char ay3600_key_remap_2e[2][9*8][4] =
     HELPER FUNCTIONS
 ***************************************************************************/
 
-INLINE int a2_has_keypad(running_machine &machine)
+INLINE int a2_has_keypad(apple2_state *state)
 {
-	return machine.root_device().ioport("keypad_1") != NULL;
+	return (state->m_kpad1 != NULL);
 }
 
-INLINE int a2_has_reset_dip(running_machine &machine)
+INLINE int a2_has_reset_dip(apple2_state *state)
 {
-	return machine.root_device().ioport("reset_dip") != NULL;
+	return (state->m_resetdip != NULL);
 }
 
-INLINE int a2_has_repeat(running_machine &machine)
+INLINE int a2_has_repeat(apple2_state *state)
 {
-	return machine.root_device().ioport("keyb_repeat") != NULL;
+	return (state->m_kbprepeat != NULL);
 }
 
-INLINE int a2_has_capslock(running_machine &machine)
+INLINE int a2_has_capslock(apple2_state *state)
 {
-	return !a2_has_repeat(machine); /* BUG: Doesn't work with Ace */
+	return !a2_has_repeat(state); /* BUG: Doesn't work with Ace */
 }
 
-INLINE int a2_no_ctrl_reset(running_machine &machine)
+INLINE int a2_no_ctrl_reset(apple2_state *state)
 {
-	return ((a2_has_repeat(machine) && !a2_has_reset_dip(machine)) ||
-			(a2_has_reset_dip(machine) && !machine.root_device().ioport("reset_dip")->read()));
+	return ((a2_has_repeat(state) && !a2_has_reset_dip(state)) ||
+			(a2_has_reset_dip(state) && !state->m_resetdip->read()));
 }
 
 
@@ -362,8 +362,8 @@ static TIMER_CALLBACK(AY3600_poll)
 	/* check for these special cases because they affect the emulated key codes */
 
 	/* only repeat keys on a 2/2+ if special REPT key is pressed */
-	if (a2_has_repeat(machine))
-		state->m_time_until_repeat = machine.root_device().ioport("keyb_repeat")->read() & 0x01 ? 0 : ~0;
+	if (a2_has_repeat(state))
+		state->m_time_until_repeat = state->m_kbprepeat->read() & 0x01 ? 0 : ~0;
 
 	/* check caps lock and set LED here */
 	if (state->apple2_pressed_specialkey(SPECIALKEY_CAPSLOCK))
@@ -425,7 +425,7 @@ static TIMER_CALLBACK(AY3600_poll)
 
 	/* reset key check */
 	if (state->apple2_pressed_specialkey(SPECIALKEY_RESET) &&
-		(a2_no_ctrl_reset(machine) || switchkey & A2_KEY_CONTROL))
+		(a2_no_ctrl_reset(state) || switchkey & A2_KEY_CONTROL))
 	{
 			if (!state->m_reset_flag)
 			{
@@ -443,7 +443,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	}
 
 	/* run through real keys and see what's being pressed */
-	num_ports = a2_has_keypad(machine) ? 9 : 7;
+	num_ports = a2_has_keypad(state) ? 9 : 7;
 
 	state->m_keymodreg &= ~A2_KEYMOD_KEYPAD;
 
@@ -453,7 +453,7 @@ static TIMER_CALLBACK(AY3600_poll)
 
 		for (bit = 0; bit < 8; bit++)
 		{
-			if (a2_has_capslock(machine))
+			if (a2_has_capslock(state))
 			{
 				curkey = ay3600_key_remap_2e[caps_lock][port*8+bit][switchkey];
 				curkey_unmodified = ay3600_key_remap_2e[caps_lock][port*8+bit][0];

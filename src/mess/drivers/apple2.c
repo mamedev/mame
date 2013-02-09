@@ -214,6 +214,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/a2midi.h"
 #include "machine/a2estd80col.h"
 #include "machine/a2eext80col.h"
+#include "machine/a2eramworks3.h"
 
 /***************************************************************************
     PARAMETERS
@@ -639,6 +640,7 @@ SLOT_INTERFACE_END
 static SLOT_INTERFACE_START(apple2eaux_cards)
 	SLOT_INTERFACE("std80", A2EAUX_STD80COL) /* Apple IIe Standard 80 Column Card */
 	SLOT_INTERFACE("ext80", A2EAUX_EXT80COL) /* Apple IIe Extended 80 Column Card */
+	SLOT_INTERFACE("rw3", A2EAUX_RAMWORKS3)  /* Applied Engineering RamWorks III */
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( apple2_common, apple2_state )
@@ -731,7 +733,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tk2000, apple2_common )
 	MCFG_MACHINE_START_OVERRIDE(apple2_state,tk2000)
-	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2e)
+	MCFG_VIDEO_START_OVERRIDE(apple2_state,apple2c)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("64K")

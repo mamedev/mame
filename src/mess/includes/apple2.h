@@ -138,7 +138,8 @@ public:
 		m_kbrepeat(*this, "keyb_repeat"),
 		m_resetdip(*this, "reset_dip"),
 		m_kpad1(*this, "keypad_1"),
-		m_kpad2(*this, "keypad_2")
+		m_kpad2(*this, "keypad_2"),
+		m_kbprepeat(*this, "keyb_repeat")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -151,6 +152,7 @@ public:
 	optional_ioport m_kbrepeat;
 	optional_ioport m_resetdip;
 	optional_ioport m_kpad1, m_kpad2;
+	optional_ioport m_kbprepeat;
 
 	UINT32 m_flags, m_flags_mask;
 	INT32 m_a2_cnxx_slot;
