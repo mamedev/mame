@@ -10,7 +10,6 @@
 
 #include "emu.h"
 #include "includes/pmd85.h"
-#include "machine/ram.h"
 
 const unsigned char pmd85_palette[3*3] =
 {
@@ -32,7 +31,7 @@ void pmd85_state::video_start()
 {
 }
 
-static void pmd85_draw_scanline(running_machine &machine,bitmap_ind16 &bitmap, int pmd85_scanline)
+void pmd85_state::pmd85_draw_scanline(bitmap_ind16 &bitmap, int pmd85_scanline)
 {
 	int x, i;
 	int pen0, pen1;
@@ -42,7 +41,7 @@ static void pmd85_draw_scanline(running_machine &machine,bitmap_ind16 &bitmap, i
 	UINT16 *scanline = &bitmap.pix16(pmd85_scanline);
 
 	/* address of current line in PMD-85 video memory */
-	UINT8* pmd85_video_ram_line = machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000 + 0x40*pmd85_scanline;
+	UINT8* pmd85_video_ram_line = m_ram->pointer() + 0xc000 + 0x40*pmd85_scanline;
 
 	for (x=0; x<288; x+=6)
 	{
@@ -61,6 +60,8 @@ UINT32 pmd85_state::screen_update_pmd85(screen_device &screen, bitmap_ind16 &bit
 	int pmd85_scanline;
 
 	for (pmd85_scanline=0; pmd85_scanline<256; pmd85_scanline++)
-		pmd85_draw_scanline (machine(),bitmap, pmd85_scanline);
+	{
+		pmd85_draw_scanline(bitmap, pmd85_scanline);
+	}
 	return 0;
 }
