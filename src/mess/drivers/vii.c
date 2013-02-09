@@ -92,7 +92,10 @@ public:
 		m_p_rowscroll(*this, "p_rowscroll"),
 		m_p_palette(*this, "p_palette"),
 		m_p_spriteram(*this, "p_spriteram"),
-		m_p_cart(*this, "p_cart"){ }
+		m_p_cart(*this, "p_cart"),
+		m_region_cart(*this, "cart"),
+		m_io_p1(*this, "P1")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ16_MEMBER(vii_video_r);
@@ -145,6 +148,10 @@ public:
 	TIMER_CALLBACK_MEMBER(tmb2_tick);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
+
+protected:
+	optional_memory_region m_region_cart;
+	required_ioport m_io_p1;
 };
 
 enum
@@ -176,7 +183,7 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%04x: %s", machine.device("maincpu")->safe_pc(), buf );
+		logerror( "%04x: %s", machine.driver_data<vii_state>()->m_maincpu->pc(), buf );
 	}
 }
 #else
@@ -559,7 +566,7 @@ WRITE16_MEMBER( vii_state::vii_audio_w )
 
 void vii_state::vii_switch_bank(UINT32 bank)
 {
-	UINT8 *cart = memregion("cart")->base();
+	UINT8 *cart = m_region_cart->base();
 
 	if(bank != m_current_bank)
 	{
@@ -595,7 +602,7 @@ void vii_state::vii_do_gpio(UINT32 offset)
 	{
 		if(index == 0)
 		{
-			UINT16 temp = ioport("P1")->read();
+			UINT16 temp = m_io_p1->read();
 			what |= (temp & 0x0001) ? 0x8000 : 0;
 			what |= (temp & 0x0002) ? 0x4000 : 0;
 			what |= (temp & 0x0004) ? 0x2000 : 0;
@@ -928,7 +935,7 @@ INPUT_PORTS_END
 
 DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 {
-	UINT8 *cart = memregion( "cart" )->base();
+	UINT8 *cart = m_region_cart->base();
 	if (image.software_entry() == NULL)
 	{
 		int size = image.length();
@@ -961,7 +968,7 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 
 DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
 {
-	UINT8 *cart = memregion( "cart" )->base();
+	UINT8 *cart = m_region_cart->base();
 	if (image.software_entry() == NULL)
 	{
 		int size = image.length();
@@ -1002,7 +1009,7 @@ void vii_state::machine_start()
 	m_controller_input[6] = 0xff;
 	m_controller_input[7] = 0;
 
-	UINT8 *rom = memregion( "cart" )->base();
+	UINT8 *rom = m_region_cart->base();
 	if (rom)
 	{ // to prevent batman crash
 		memcpy(m_p_cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
@@ -1028,7 +1035,7 @@ INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
 	UINT32 z = machine().rand() & 0x3ff;
 
 
-	m_controller_input[0] = ioport("P1")->read();
+	m_controller_input[0] = m_io_p1->read();
 	m_controller_input[1] = (UINT8)x;
 	m_controller_input[2] = (UINT8)y;
 	m_controller_input[3] = (UINT8)z;
