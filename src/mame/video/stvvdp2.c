@@ -1103,6 +1103,8 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
+	#define STV_VDP2_SCXDN0 (m_vdp2_regs[0x072/2])
+
 /* 180074 - SCYIN0 - Screen Scroll (NBG0, Vertical Integer Part)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
@@ -1118,6 +1120,8 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
+
+	#define STV_VDP2_SCYDN0 (m_vdp2_regs[0x076/2])
 
 /* 180078 - Coordinate Inc (NBG0, Horizontal Integer Part)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -1182,6 +1186,8 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
 
+	#define STV_VDP2_SCXDN1 (m_vdp2_regs[0x082/2])
+
 /* 180084 - SCYIN1 - Screen Scroll (NBG1, Vertical Integer Part)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
@@ -1197,6 +1203,8 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
        |----07----|----06----|----05----|----04----|----03----|----02----|----01----|----00----|
        |    --    |    --    |    --    |    --    |    --    |    --    |    --    |    --    |
        \----------|----------|----------|----------|----------|----------|----------|---------*/
+
+	#define STV_VDP2_SCYDN1 (m_vdp2_regs[0x086/2])
 
 /* 180088 - Coordinate Inc (NBG1, Horizontal Integer Part)
  bit-> /----15----|----14----|----13----|----12----|----11----|----10----|----09----|----08----\
@@ -3011,7 +3019,6 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	UINT16 dot_data;
 	UINT16 pal_bank;
 
-	/* TODO: clean this up. */
 	xsize = (stv2_current_tilemap.bitmap_size & 2) ? 1024 : 512;
 	ysize = (stv2_current_tilemap.bitmap_size & 1) ? 512 : 256;
 
@@ -3067,8 +3074,8 @@ void saturn_state::draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	int scrolly = stv2_current_tilemap.scrolly;
 	UINT16 dot_data;
 	UINT16 pal_bank;
+	int xf, yf;
 
-	/* TODO: clean this up. */
 	xsize = (stv2_current_tilemap.bitmap_size & 2) ? 1024 : 512;
 	ysize = (stv2_current_tilemap.bitmap_size & 1) ? 512 : 256;
 
@@ -3089,8 +3096,13 @@ void saturn_state::draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 			if(stv_vdp2_window_process(xdst,ydst))
 				continue;
 
-			xsrc = (xdst + scrollx) & (xsize_mask-1);
-			ysrc = (ydst + scrolly) & (ysize_mask-1);
+			xf = stv2_current_tilemap.incx * xdst;
+			xf>>=16;
+			yf = stv2_current_tilemap.incy * ydst;
+			yf>>=16;
+
+			xsrc = (xf + scrollx) & (xsize_mask-1);
+			ysrc = (yf + scrolly) & (ysize_mask-1);
 			src_offs = (xsrc + (ysrc*xsize));
 			src_offs += map_offset;
 			src_offs &= 0x7ffff;
@@ -3122,7 +3134,6 @@ void saturn_state::draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	int r,g,b;
 	UINT16 dot_data;
 
-	/* TODO: clean this up. */
 	xsize = (stv2_current_tilemap.bitmap_size & 2) ? 1024 : 512;
 	ysize = (stv2_current_tilemap.bitmap_size & 1) ? 512 : 256;
 
@@ -3175,7 +3186,6 @@ void saturn_state::draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	int r,g,b;
 	UINT32 dot_data;
 
-	/* TODO: clean this up. */
 	xsize = (stv2_current_tilemap.bitmap_size & 2) ? 1024 : 512;
 	ysize = (stv2_current_tilemap.bitmap_size & 1) ? 512 : 256;
 
@@ -3258,7 +3268,7 @@ void saturn_state::stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectan
 		switch(stv2_current_tilemap.colour_depth)
 		{
 		//	case 0: draw_4bpp_bitmap(bitmap,cliprect); return;
-		//	case 1: draw_8bpp_bitmap(bitmap,cliprect); return;
+			case 1: draw_8bpp_bitmap(bitmap,cliprect); return;
 		//	case 3: draw_rgb15_bitmap(bitmap,cliprect); return;
 		//	case 4: draw_rgb32_bitmap(bitmap,cliprect); return;
 		}
@@ -4525,6 +4535,9 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 	{
 		if(stv2_current_tilemap.colour_depth == 2 && !stv2_current_tilemap.bitmap_enable)
 			popmessage("2048 color mode used on a non-bitmap plane");
+
+//		if(STV_VDP2_SCXDN0 || STV_VDP2_SCXDN1 || STV_VDP2_SCYDN0 || STV_VDP2_SCYDN1)
+//			popmessage("Fractional part scrolling write, contact MAMEdev");
 
 		/* Pukunpa */
 		//if(STV_VDP2_SPWINEN)
@@ -6991,6 +7004,17 @@ UINT32 saturn_state::screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 
 	}
 
 	copybitmap(bitmap, m_tmpbitmap, 0, 0, 0, 0, cliprect);
+
+	#if 0
+	/* Do NOT remove me, used to test video code performance. */
+	if(machine().input().code_pressed(KEYCODE_Q))
+	{
+		popmessage("Halt CPUs");
+		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_slave->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	}
+	#endif
 	return 0;
 }
 
