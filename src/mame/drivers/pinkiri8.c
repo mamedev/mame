@@ -63,7 +63,7 @@ public:
 	int m_prev_writes;
 	UINT8 m_mux_data;
 	UINT8 m_prot_read_index;
-	UINT8 m_prot_char[6];
+	UINT8 m_prot_char[5];
 	UINT8 m_prot_index;
 	DECLARE_WRITE8_MEMBER(output_regs_w);
 	DECLARE_WRITE8_MEMBER(pinkiri8_vram_w);
@@ -1227,8 +1227,10 @@ WRITE8_MEMBER(pinkiri8_state::ronjan_prot_w)
 	}
 	else
 	{
-		m_prot_char[m_prot_index] = data;
-		m_prot_index++;
+		if(m_prot_index == 5)
+			return;
+
+		m_prot_char[m_prot_index++] = data;
 
 		if(m_prot_char[0] == 'E' && m_prot_char[1] == 'R' && m_prot_char[2] == 'R' && m_prot_char[3] == 'O' && m_prot_char[4] == 'R')
 			m_prot_read_index = 0;
