@@ -403,8 +403,13 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 {
 	int i,j;
 	UINT8* pos = image.device().machine().root_device().memregion("maincpu" )->base() + 0x10000;
-	offs_t size = image.length();
+	offs_t size;
 	char name[129];
+
+	if (image.software_entry() == NULL)
+		size = image.length();
+	else
+		size = image.get_software_region_length("rom");
 
 	/* get size & number of 16-KB banks */
 	if ( size <= 0x04000 )
@@ -415,14 +420,23 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, to7_cartridge )
 		thom_cart_nb_banks = 4;
 	else
 	{
-		logerror( "to7_cartridge_load: invalid cartridge size %i\n", size );
+		astring errmsg;
+		errmsg.printf("Invalid cartridge size %u", size);
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, errmsg.cstr());
 		return IMAGE_INIT_FAIL;
 	}
 
-	if ( image.fread( pos, size ) != size )
+	if (image.software_entry() == NULL)
 	{
-		logerror( "to7_cartridge_load: read error\n" );
-		return IMAGE_INIT_FAIL;
+		if ( image.fread( pos, size ) != size )
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Read error");
+			return IMAGE_INIT_FAIL;
+		}
+	}
+	else
+	{
+		memcpy(pos, image.get_software_region("rom"), size);
 	}
 
 	/* extract name */
@@ -1945,9 +1959,14 @@ static UINT8 mo5_reg_cart; /* 0xa7cb bank switch */
 DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 {
 	UINT8* pos = image.device().machine().root_device().memregion("maincpu")->base() + 0x10000;
-	UINT64 size = image.length();
+	UINT64 size;
 	int i,j;
 	char name[129];
+
+	if (image.software_entry() == NULL)
+		size = image.length();
+	else
+		size = image.get_software_region_length("rom");
 
 	/* get size & number of 16-KB banks */
 	if ( size > 32 && size <= 0x04000 )
@@ -1958,14 +1977,23 @@ DEVICE_IMAGE_LOAD_MEMBER( thomson_state, mo5_cartridge )
 		thom_cart_nb_banks = 4;
 	else
 	{
-		logerror( "mo5_cartridge_load: invalid cartridge size %u\n", (unsigned) size );
+		astring errmsg;
+		errmsg.printf("Invalid cartridge size "I64FMT, size);
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, errmsg.cstr());
 		return IMAGE_INIT_FAIL;
 	}
 
-	if ( image.fread(pos, size ) != size )
+	if (image.software_entry() == NULL)
 	{
-		logerror( "mo5_cartridge_load: read error\n" );
-		return IMAGE_INIT_FAIL;
+		if ( image.fread(pos, size ) != size )
+		{
+			image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Read error");
+			return IMAGE_INIT_FAIL;
+		}
+	}
+	else
+	{
+		memcpy(pos, image.get_software_region("rom"), size);
 	}
 
 	/* extract name */
