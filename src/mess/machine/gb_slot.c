@@ -252,6 +252,7 @@ bool base_gb_cart_slot_device::call_load()
 		UINT32 offset = 0;
 		UINT32 len = (software_entry() == NULL) ? length() : get_software_region_length("rom");
 		UINT8 *ROM;
+		int rambanks = 0;
 
 		// From fullpath, check for presence of a header and skip it + check filesize is valid
 		if (software_entry() == NULL)
@@ -290,92 +291,82 @@ bool base_gb_cart_slot_device::call_load()
 		else
 			type = get_cart_type(ROM + offset, len - offset);
 
+
+		// setup RAM/NVRAM/RTC/RUMBLE
 		if (software_entry() != NULL)
 		{
-			const char *rumble = get_feature("rumble");
-			const char *battery_backed = get_feature("battery_backed");
-		
-			if (rumble != NULL)
+			// from softlist we only rely on xml
+			if (get_software_region("ram"))
+				rambanks = get_software_region_length("ram") / 0x2000;
+
+			if (get_software_region("nvram"))
 			{
-				if (!mame_stricmp(rumble, "yes"))
+				m_cart->set_has_battery(TRUE);
+				rambanks = get_software_region_length("nvram") / 0x2000;
+			}
+
+			if (get_feature("rumble"))
+			{
+				if (!mame_stricmp(get_feature("rumble"), "yes"))
 					m_cart->set_has_rumble(TRUE);
 			}
 		
-			if (battery_backed != NULL)
+			if (get_feature("rtc"))
 			{
-				if (!mame_stricmp(battery_backed, "yes"))
-					m_cart->set_has_battery(TRUE);
+				if (!mame_stricmp(get_feature("rtc"), "yes"))
+					m_cart->set_has_timer(TRUE);
 			}
 		}
-		
-		switch (ROM[0x0147 + offset])
+		else
 		{
-			case 0x03:  case 0x06:  case 0x09:  case 0x0d:  case 0x13:  case 0x17:  case 0x1b:  case 0x22:
-				m_cart->set_has_battery(TRUE);
-				break;
+			// from fullpath we rely on header
+			switch (ROM[0x0147 + offset])
+			{
+				case 0x03:  case 0x06:  case 0x09:  case 0x0d:  case 0x13:  case 0x17:  case 0x1b:  case 0x22:
+					m_cart->set_has_battery(TRUE);
+					break;
 
-			case 0x0f:  case 0x10:
-				m_cart->set_has_battery(TRUE);
-				m_cart->set_has_timer(TRUE);
-				break;
+				case 0x0f:  case 0x10:
+					m_cart->set_has_battery(TRUE);
+					m_cart->set_has_timer(TRUE);
+					break;
 				
-			case 0x1c:  case 0x1d:
-				m_cart->set_has_rumble(TRUE);
-				break;
+				case 0x1c:  case 0x1d:
+					m_cart->set_has_rumble(TRUE);
+					break;
 				
-			case 0x1e:
-				m_cart->set_has_battery(TRUE);
-				m_cart->set_has_rumble(TRUE);
-				break;
-		}
-
-		int rombanks, rambanks;
-
-		switch (ROM[0x0148 + offset])
-		{
-			case 0x52:
-				rombanks = 72;
-				break;
-			case 0x53:
-				rombanks = 80;
-				break;
-			case 0x54:
-				rombanks = 96;
-				break;
-			case 0x00: case 0x01: case 0x02: case 0x03:
-			case 0x04: case 0x05: case 0x06: case 0x07:
-				rombanks = 2 << ROM[0x0148];
-				break;
-			default:
-				rombanks = 256;
-				break;
+				case 0x1e:
+					m_cart->set_has_battery(TRUE);
+					m_cart->set_has_rumble(TRUE);
+					break;
+			}
+			
+			switch (ROM[0x0149 + offset] & 0x07)
+			{
+				case 0x00: case 0x06: case 0x07:
+					rambanks = 0;
+					break;
+				case 0x01: case 0x02:
+					rambanks = 1;
+					break;
+				case 0x03:
+					rambanks = 4;
+					break;
+				case 0x04:
+					rambanks = 16;
+					break;
+				case 0x05:
+				default:
+					rambanks = 8;
+					break;
+			}
+			
+			if (type == GB_MBC_MBC2 ||  type == GB_MBC_MBC7)
+				rambanks = 1;
 		}
 
 		// setup rom bank map based on real length, not header value
 		m_cart->rom_map_setup(len);
-
-		switch (ROM[0x0149 + offset] & 0x07)
-		{
-			case 0x00: case 0x06: case 0x07:
-				rambanks = 0;
-				break;
-			case 0x01: case 0x02:
-				rambanks = 1;
-				break;
-			case 0x03:
-				rambanks = 4;
-				break;
-			case 0x04:
-				rambanks = 16;
-				break;
-			case 0x05:
-			default:
-				rambanks = 8;
-				break;
-		}
-
-		if (type == GB_MBC_MBC2 ||  type == GB_MBC_MBC7)
-			rambanks = 1;
 
 		if (rambanks)
 			setup_ram(rambanks);
@@ -385,7 +376,7 @@ bool base_gb_cart_slot_device::call_load()
 		
 		//printf("Type: %s\n", gb_get_slot(type));
 
-		internal_header_logging(ROM, len, rombanks);
+		internal_header_logging(ROM + offset, len);
 
 		return IMAGE_INIT_PASS;
 	}
@@ -617,7 +608,7 @@ WRITE8_MEMBER(base_gb_cart_slot_device::write_ram)
  Internal header logging
  -------------------------------------------------*/
 
-void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len, UINT16 rom_banks)
+void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 {
 	static const char *const cart_types[] =
 	{
@@ -723,11 +714,31 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len, U
 	};
 	static const int ramsize[8] = { 0, 2, 8, 32, 128, 64, 0, 0 };
 
-//	const char *prod;
 	char soft[17];
 	UINT32 tmp = 0;
 	int csum = 0, i = 0;
+	int rom_banks;
 	
+	switch (ROM[0x0148])
+	{
+		case 0x52:
+			rom_banks = 72;
+			break;
+		case 0x53:
+			rom_banks = 80;
+			break;
+		case 0x54:
+			rom_banks = 96;
+			break;
+		case 0x00: case 0x01: case 0x02: case 0x03:
+		case 0x04: case 0x05: case 0x06: case 0x07:
+			rom_banks = 2 << ROM[0x0148];
+			break;
+		default:
+			rom_banks = 256;
+			break;
+	}
+
 	strncpy(soft, (char *)&ROM[0x0134], 16);
 	soft[16] = '\0';
 	logerror("Cart Information\n");
@@ -766,6 +777,6 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len, U
 	csum &= 0xffff;
 	
 	if (csum != tmp)
-		logerror("\nWarning loading cartridge: Checksum is wrong (Actual %x vs Internal %x)\n", csum, tmp);
+		logerror("\nWarning loading cartridge: Checksum is wrong (Actual %X vs Internal %X)\n", csum, tmp);
 
 }

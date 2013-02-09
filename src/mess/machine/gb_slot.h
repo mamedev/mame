@@ -117,7 +117,7 @@ public:
 	virtual bool get_mmm01_candidate(UINT8 *ROM, UINT32 len);
 
 	virtual void setup_ram(UINT8 banks);
-	virtual void internal_header_logging(UINT8 *ROM, UINT32 len, UINT16 report_rom_banks);
+	virtual void internal_header_logging(UINT8 *ROM, UINT32 len);
 
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
