@@ -1475,6 +1475,8 @@ static MACHINE_CONFIG_START( nbmjdrv1, nbmj8991_state ) // galkoku
 	MCFG_CPU_IO_MAP(galkoku_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
+	MCFG_MACHINE_START(nb1413m3)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1502,6 +1504,8 @@ static MACHINE_CONFIG_START( nbmjdrv2, nbmj8991_state ) // pstadium
 	MCFG_CPU_PROGRAM_MAP(pstadium_map)
 	MCFG_CPU_IO_MAP(pstadium_io_map)
 	MCFG_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
+
+	MCFG_MACHINE_START(nb1413m3)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)                  /* 4.00 MHz */
 	MCFG_CPU_PROGRAM_MAP(nbmj8991_sound_map)
