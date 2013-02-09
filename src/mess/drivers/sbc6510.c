@@ -72,7 +72,11 @@ public:
 	UINT8 m_key_row;
 	UINT8 m_2;
 	required_device<generic_terminal_device> m_terminal;
+	virtual void machine_start();
 	virtual void machine_reset();
+
+protected:
+	ioport_port *m_io_port[8];
 };
 
 
@@ -194,6 +198,17 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 };
 
 
+void sbc6510_state::machine_start()
+{
+	char kbdrow[6];
+	for ( int i = 0; i < 8; i++ )
+	{
+		sprintf(kbdrow,"X%X",i);
+		m_io_port[i] = ioport(kbdrow);
+	}
+}
+
+
 void sbc6510_state::machine_reset()
 {
 }
@@ -221,14 +236,14 @@ static const ay8910_interface sbc6510_ay_interface =
 
 READ8_MEMBER( sbc6510_state::key_r )
 {
-	UINT8 i,data=0;
-	char kbdrow[6];
+	UINT8 data=0;
 
-	for (i = 0; i < 8; i++)
-	if (!BIT(m_key_row, i))
+	for (int i = 0; i < 8; i++)
 	{
-		sprintf(kbdrow,"X%X",i);
-		data |= ioport(kbdrow)->read();
+		if (!BIT(m_key_row, i))
+		{
+			data |= m_io_port[i]->read();
+		}
 	}
 	return ~data;
 }
