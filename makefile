@@ -753,6 +753,10 @@ clean: $(OSDCLEAN)
 	$(RM) $(EMULATOR)
 	@echo Deleting $(TOOLS)...
 	$(RM) $(TOOLS)
+	@echo Deleting dependencies...
+	$(RM) depend_mame.mak
+	$(RM) depend_mess.mak
+	$(RM) depend_ume.mak
 ifdef MAP
 	@echo Deleting $(FULLNAME).map...
 	$(RM) $(FULLNAME).map
