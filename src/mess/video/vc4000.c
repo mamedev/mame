@@ -385,9 +385,9 @@ static void vc4000_draw_digit(vc4000_state *state, bitmap_ind16 &bitmap, int x, 
 
 	int i=line,j;
 
-	for (j=0; j<sizeof(led[0]); j++)
+	for (j=0; j<sizeof(led[0])-1; j++)
 	{
-		if (digit_to_segment[d]&(1<<(led[i][j]-'a')) )
+		if (led[i][j] != ' ' && digit_to_segment[d]&(1<<(led[i][j]-'a')) )
 			bitmap.pix16(y+i, x+j) = ((state->m_video.reg.d.background>>4)&7)^7;
 	}
 }
