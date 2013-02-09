@@ -2611,7 +2611,7 @@ void floppy_image_format_t::build_pc_track_fm(int track, int head, floppy_image 
 		total_size += sects[i].actual_size;
 
 	int etpos = tpos;
-	etpos += (sector_count*(6+5+2+11+6+1+2) + total_size)*16;
+	etpos += (sector_count*(6+5+2+gap_2+6+1+2) + total_size)*16;
 
 	if(etpos > cell_count)
 		throw emu_fatalerror("Incorrect layout on track %d head %d, expected_size=%d, current_size=%d", track, head, cell_count, etpos);
@@ -2636,7 +2636,7 @@ void floppy_image_format_t::build_pc_track_fm(int track, int head, floppy_image 
 		for(int j=0; j<gap_2; j++) fm_w(track_data, tpos, 8, 0xff);
 
 		if(!sects[i].data)
-			for(int j=0; j<6+1+sects[i].actual_size+2+gap_3; j++) fm_w(track_data, tpos, 8, 0xff);
+			for(int j=0; j<6+1+sects[i].actual_size+2+(i != sector_count-1 ? gap_3 : 0); j++) fm_w(track_data, tpos, 8, 0xff);
 
 		else {
 			// sync, DAM, data and gap 3
@@ -2648,7 +2648,8 @@ void floppy_image_format_t::build_pc_track_fm(int track, int head, floppy_image 
 			if(sects[i].bad_crc)
 				crc = 0xffff^crc;
 			fm_w(track_data, tpos, 16, crc);
-			for(int j=0; j<gap_3; j++) fm_w(track_data, tpos, 8, 0xff);
+			if(i != sector_count-1)
+				for(int j=0; j<gap_3; j++) fm_w(track_data, tpos, 8, 0xff);
 		}
 	}
 
@@ -2706,7 +2707,7 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 		for(int j=0; j<gap_2; j++) mfm_w(track_data, tpos, 8, 0x4e);
 
 		if(!sects[i].data)
-			for(int j=0; j<12+4+sects[i].actual_size+2+gap_3; j++) mfm_w(track_data, tpos, 8, 0x4e);
+			for(int j=0; j<12+4+sects[i].actual_size+2+(i != sector_count-1 ? gap_3 : 0); j++) mfm_w(track_data, tpos, 8, 0x4e);
 
 		else {
 			// sync, DAM, data and gap 3
@@ -2719,7 +2720,8 @@ void floppy_image_format_t::build_pc_track_mfm(int track, int head, floppy_image
 			if(sects[i].bad_crc)
 				crc = 0xffff^crc;
 			mfm_w(track_data, tpos, 16, crc);
-			for(int j=0; j<gap_3; j++) mfm_w(track_data, tpos, 8, 0x4e);
+			if(i != sector_count-1)
+				for(int j=0; j<gap_3; j++) mfm_w(track_data, tpos, 8, 0x4e);
 		}
 	}
 
