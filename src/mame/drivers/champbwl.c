@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8, champbwl_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodelow_r8, spritecodelow_w8)
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodehigh_r8, spritecodehigh_w8)
-	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("x1snd", x1_010_device, seta_sound_r, seta_sound_w)
+	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_r, seta_sound_w)
 	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xe300, 0xe303) AM_MIRROR(0xfc) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)   /* enable / disable background transparency */
@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( doraemon, AS_PROGRAM, 8, champbwl_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodelow_r8, spritecodelow_w8)
 	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodehigh_r8, spritecodehigh_w8)
-	AM_RANGE(0xc000, 0xc07f) AM_DEVREADWRITE("x1snd", x1_010_device, seta_sound_r, seta_sound_w) // Sound
+	AM_RANGE(0xc000, 0xc07f) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_r,seta_sound_w) // Sound
 	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r8, spriteylow_w8)
 	AM_RANGE(0xe300, 0xe303) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)   /* enable / disable background transparency */
@@ -505,7 +505,7 @@ static MACHINE_CONFIG_START( champbwl, champbwl_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_X1_010_ADD("x1snd", 16000000)
+	MCFG_SOUND_ADD("x1snd", X1_010, 16000000)
 	MCFG_SOUND_CONFIG(champbwl_sound_intf)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -567,7 +567,7 @@ static MACHINE_CONFIG_START( doraemon, champbwl_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_X1_010_ADD("x1snd", XTAL_14_31818MHz)
+	MCFG_SOUND_ADD("x1snd", X1_010, XTAL_14_31818MHz)
 	MCFG_SOUND_CONFIG(champbwl_sound_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
