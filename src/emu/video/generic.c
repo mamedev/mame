@@ -131,6 +131,13 @@ const rgb_t RGB_MONOCHROME_WHITE[] =
 	RGB_WHITE
 };
 
+const rgb_t RGB_MONOCHROME_WHITE_HIGHLIGHT[] =
+{
+	RGB_BLACK,
+	MAKE_RGB(0xc0, 0xc0, 0xc0),
+	RGB_WHITE
+};
+
 
 /*-------------------------------------------------
     monochrome_amber - 2-color black & amber
