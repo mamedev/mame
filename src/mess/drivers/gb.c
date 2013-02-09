@@ -485,7 +485,7 @@ READ8_MEMBER(gb_state::gb_cart_r)
 	{
 		if (offset < 0x100)
 		{
-			UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
+			UINT8 *ROM = m_region_maincpu->base();
 			return ROM[offset];
 		}
 		else if (m_cartslot->m_cart)
@@ -505,12 +505,12 @@ READ8_MEMBER(gb_state::gbc_cart_r)
 	{
 		if (offset < 0x100)
 		{
-			UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
+			UINT8 *ROM = m_region_maincpu->base();
 			return ROM[offset];
 		}
 		else if (offset >= 0x200 && offset < 0x900)
 		{
-			UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
+			UINT8 *ROM = m_region_maincpu->base();
 			return ROM[offset - 0x100];
 		}
 		else if (m_cartslot->m_cart)

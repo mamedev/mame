@@ -113,6 +113,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cartslot(*this, "gbslot")
 		, m_maincpu(*this, "maincpu")
+		, m_region_maincpu(*this, "maincpu")
 		, m_rambank(*this, "cgb_ram")
 		, m_inputs(*this, "INPUTS")
 	{ }
@@ -207,6 +208,7 @@ public:
 
 protected:
 	required_device<lr35902_cpu_device> m_maincpu;
+	required_memory_region m_region_maincpu;
 	optional_memory_bank m_rambank;   // cgb
 	required_ioport m_inputs;
 
