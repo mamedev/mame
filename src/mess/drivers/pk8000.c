@@ -36,6 +36,8 @@ public:
 		, m_bank6(*this, "bank6")
 		, m_bank7(*this, "bank7")
 		, m_bank8(*this, "bank8")
+		, m_io_joy1(*this, "JOY1")
+		, m_io_joy2(*this, "JOY2")
 	{ }
 
 	UINT8 m_keyboard_line;
@@ -68,6 +70,8 @@ protected:
 	required_memory_bank m_bank6;
 	required_memory_bank m_bank7;
 	required_memory_bank m_bank8;
+	required_ioport m_io_joy1;
+	required_ioport m_io_joy2;
 	ioport_port *m_io_port[10];
 
 	void pk8000_set_bank(UINT8 data);
@@ -194,13 +198,13 @@ static I8255_INTERFACE( pk8000_ppi8255_interface_2 )
 READ8_MEMBER(pk8000_state::pk8000_joy_1_r)
 {
 	UINT8 retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
-	retVal |= ioport("JOY1")->read() & 0x7f;
+	retVal |= m_io_joy1->read() & 0x7f;
 	return retVal;
 }
 READ8_MEMBER(pk8000_state::pk8000_joy_2_r)
 {
 	UINT8 retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
-	retVal |= ioport("JOY2")->read() & 0x7f;
+	retVal |= m_io_joy2->read() & 0x7f;
 	return retVal;
 }
 
