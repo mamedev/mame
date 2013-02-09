@@ -3001,7 +3001,7 @@ void saturn_state::stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectan
 
 void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int xsize, ysize, xsize_mask;
+	int xsize, ysize, xsize_mask, ysize_mask;
 	int xsrc,ysrc,xdst,ydst;
 	int src_offs;
 	UINT8* vram = m_vdp2.gfx_decode;
@@ -3016,6 +3016,7 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	ysize = (stv2_current_tilemap.bitmap_size & 1) ? 512 : 256;
 
 	xsize_mask = (stv2_current_tilemap.linescroll_enable) ? 1024 : xsize;
+	ysize_mask = (stv2_current_tilemap.vertical_linescroll_enable) ? 512 : ysize;
 
 	pal_bank = stv2_current_tilemap.bitmap_palette_number;
 	pal_bank+= stv2_current_tilemap.colour_ram_address_offset;
@@ -3032,7 +3033,7 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 				continue;
 
 			xsrc = (xdst + scrollx) & (xsize_mask-1);
-			ysrc = (ydst + scrolly) & (ysize-1);
+			ysrc = (ydst + scrolly) & (ysize_mask-1);
 			src_offs = (xsrc + (ysrc*xsize));
 			src_offs/= 2;
 			src_offs += map_offset;
@@ -3057,7 +3058,7 @@ void saturn_state::draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 
 void saturn_state::draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int xsize, ysize, xsize_mask;
+	int xsize, ysize, xsize_mask, ysize_mask;
 	int xsrc,ysrc,xdst,ydst;
 	int src_offs;
 	UINT8* vram = m_vdp2.gfx_decode;
@@ -3072,6 +3073,7 @@ void saturn_state::draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	ysize = (stv2_current_tilemap.bitmap_size & 1) ? 512 : 256;
 
 	xsize_mask = (stv2_current_tilemap.linescroll_enable) ? 1024 : xsize;
+	ysize_mask = (stv2_current_tilemap.vertical_linescroll_enable) ? 512 : ysize;
 
 	pal_bank = stv2_current_tilemap.bitmap_palette_number;
 	pal_bank+= stv2_current_tilemap.colour_ram_address_offset;
@@ -3088,7 +3090,7 @@ void saturn_state::draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 				continue;
 
 			xsrc = (xdst + scrollx) & (xsize_mask-1);
-			ysrc = (ydst + scrolly) & (ysize-1);
+			ysrc = (ydst + scrolly) & (ysize_mask-1);
 			src_offs = (xsrc + (ysrc*xsize));
 			src_offs += map_offset;
 			src_offs &= 0x7ffff;
@@ -3110,7 +3112,7 @@ void saturn_state::draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 
 void saturn_state::draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int xsize, ysize, xsize_mask;
+	int xsize, ysize, xsize_mask, ysize_mask;
 	int xsrc,ysrc,xdst,ydst;
 	int src_offs;
 	UINT8* vram = m_vdp2.gfx_decode;
@@ -3125,6 +3127,7 @@ void saturn_state::draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	ysize = (stv2_current_tilemap.bitmap_size & 1) ? 512 : 256;
 
 	xsize_mask = (stv2_current_tilemap.linescroll_enable) ? 1024 : xsize;
+	ysize_mask = (stv2_current_tilemap.vertical_linescroll_enable) ? 512 : ysize;
 
 	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
 	{
@@ -3134,7 +3137,7 @@ void saturn_state::draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 				continue;
 
 			xsrc = (xdst + scrollx) & (xsize_mask-1);
-			ysrc = (ydst + scrolly) & (ysize-1);
+			ysrc = (ydst + scrolly) & (ysize_mask-1);
 			src_offs = (xsrc + (ysrc*xsize));
 			src_offs *= 2;
 			src_offs += map_offset;
@@ -3162,7 +3165,7 @@ void saturn_state::draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 
 void saturn_state::draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int xsize, ysize, xsize_mask;
+	int xsize, ysize, xsize_mask, ysize_mask;
 	int xsrc,ysrc,xdst,ydst;
 	int src_offs;
 	UINT8* vram = m_vdp2.gfx_decode;
@@ -3177,6 +3180,7 @@ void saturn_state::draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	ysize = (stv2_current_tilemap.bitmap_size & 1) ? 512 : 256;
 
 	xsize_mask = (stv2_current_tilemap.linescroll_enable) ? 1024 : xsize;
+	ysize_mask = (stv2_current_tilemap.vertical_linescroll_enable) ? 512 : ysize;
 
 	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
 	{
@@ -3186,7 +3190,7 @@ void saturn_state::draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 				continue;
 
 			xsrc = (xdst + scrollx) & (xsize_mask-1);
-			ysrc = (ydst + scrolly) & (ysize-1);
+			ysrc = (ydst + scrolly) & (ysize_mask-1);
 			src_offs = (xsrc + (ysrc*xsize));
 			src_offs *= 4;
 			src_offs += map_offset;
@@ -3251,6 +3255,14 @@ void saturn_state::stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectan
 	}
 	else
 	{
+		switch(stv2_current_tilemap.colour_depth)
+		{
+		//	case 0: draw_4bpp_bitmap(bitmap,cliprect); return;
+		//	case 1: draw_8bpp_bitmap(bitmap,cliprect); return;
+		//	case 3: draw_rgb15_bitmap(bitmap,cliprect); return;
+		//	case 4: draw_rgb32_bitmap(bitmap,cliprect); return;
+		}
+
 		/* intentional fall-through*/
 		popmessage("%d %s %s %s %s",stv2_current_tilemap.colour_depth,
 		                         stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE ? "no trans" : "trans",
