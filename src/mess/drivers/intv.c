@@ -798,13 +798,13 @@ ADDRESS_MAP_END
 
 TIMER_CALLBACK_MEMBER(intv_state::intv_interrupt2_complete)
 {
-	machine().device("keyboard")->execute().set_input_line(0, CLEAR_LINE);
+	m_keyboard->set_input_line(0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
 {
-	machine().device("keyboard")->execute().set_input_line(0, ASSERT_LINE);
-	machine().scheduler().timer_set(machine().device<cpu_device>("keyboard")->cycles_to_attotime(100), timer_expired_delegate(FUNC(intv_state::intv_interrupt2_complete),this));
+	m_keyboard->set_input_line(0, ASSERT_LINE);
+	machine().scheduler().timer_set(m_keyboard->cycles_to_attotime(100), timer_expired_delegate(FUNC(intv_state::intv_interrupt2_complete),this));
 }
 
 static MACHINE_CONFIG_START( intv, intv_state )

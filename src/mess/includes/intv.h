@@ -40,7 +40,8 @@ public:
 	m_sound(*this, "ay8914.1"),
 	m_ecs_sound(*this, "ay8914.2"),
 	m_intvkbd_dualport_ram(*this, "dualport_ram"),
-	m_videoram(*this, "videoram")
+	m_videoram(*this, "videoram"),
+	m_keyboard(*this, "keyboard")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -142,6 +143,9 @@ public:
 	TIMER_CALLBACK_MEMBER(intv_btb_fill);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( intv_cart );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( intvkbd_cart );
+
+protected:
+	optional_device<cpu_device> m_keyboard;
 };
 
 /*----------- defined in video/intv.c -----------*/
