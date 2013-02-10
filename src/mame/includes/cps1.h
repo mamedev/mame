@@ -251,14 +251,17 @@ public:
 	DECLARE_MACHINE_RESET(fcrash);
 	DECLARE_MACHINE_START(kodb);
 	DECLARE_MACHINE_START(cawingbl);
+	DECLARE_MACHINE_START(knightsb);
 	DECLARE_MACHINE_START(sf2mdt);
 	DECLARE_WRITE16_MEMBER(kodb_layer_w);
 	DECLARE_WRITE16_MEMBER(cawingbl_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(knightsb_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdt_layer_w);
 	DECLARE_WRITE16_MEMBER(sf2mdta_layer_w);
 	DECLARE_WRITE16_MEMBER(fcrash_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_snd_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sf2mdt_snd_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(knightsb_snd_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(fcrash_msm5205_0_data_w);
 	DECLARE_WRITE8_MEMBER(fcrash_msm5205_1_data_w);
 	UINT32 screen_update_fcrash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -306,6 +309,8 @@ public:
 ADDRESS_MAP_EXTERN( qsound_sub_map, 8 );
 
 GFXDECODE_EXTERN( cps1 );
+
+INPUT_PORTS_EXTERN( knights );
 
 
 #endif
