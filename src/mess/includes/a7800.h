@@ -8,14 +8,34 @@
 #define A7800_H_
 
 #include "machine/6532riot.h"
+#include "sound/pokey.h"
+#include "sound/tiasound.h"
+#include "sound/tiaintf.h"
+
 
 class a7800_state : public driver_device
 {
 public:
 	a7800_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pokey(*this, "pokey")
+		, m_tia(*this, "tia")
+		, m_region_maincpu(*this, "maincpu")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_bank5(*this, "bank5")
+		, m_bank6(*this, "bank6")
+		, m_bank7(*this, "bank7")
+		, m_io_joysticks(*this, "joysticks")
+		, m_io_buttons(*this, "buttons")
+		, m_io_vblank(*this, "vblank")
+		, m_io_console_buttons(*this, "console_buttons")
+		, m_bank10(NULL)
+		, m_bank11(NULL)
+	{ }
 
 	int m_lines;
 	int m_ispal;
@@ -52,7 +72,6 @@ public:
 	int m_p1_one_button;
 	int m_p2_one_button;
 
-	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(a7800_RAM0_w);
 	DECLARE_WRITE8_MEMBER(a7800_cart_w);
 	DECLARE_READ8_MEMBER(a7800_TIA_r);
@@ -73,6 +92,27 @@ public:
 	DECLARE_WRITE8_MEMBER(riot_button_pullup_w);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( a7800_cart );
+
+protected:
+	required_device<cpu_device> m_maincpu;
+	required_device<pokey_device> m_pokey;
+	required_device<tia_device> m_tia;
+	required_memory_region m_region_maincpu;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	required_memory_bank m_bank4;
+	required_memory_bank m_bank5;
+	required_memory_bank m_bank6;
+	required_memory_bank m_bank7;
+	required_ioport m_io_joysticks;
+	required_ioport m_io_buttons;
+	required_ioport m_io_vblank;
+	required_ioport m_io_console_buttons;
+	memory_bank *m_bank10;
+	memory_bank *m_bank11;
+
+	void maria_draw_scanline();
 };
 
 /*----------- defined in machine/a7800.c -----------*/

@@ -23,10 +23,6 @@
 #include "emu.h"
 #include "includes/a7800.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/tiasound.h"
-#include "machine/6532riot.h"
-#include "sound/pokey.h"
-#include "sound/tiaintf.h"
 
 
 
@@ -40,12 +36,12 @@
 
 READ8_MEMBER(a7800_state::riot_joystick_r)
 {
-	return machine().root_device().ioport("joysticks")->read();
+	return m_io_joysticks->read();
 }
 
 READ8_MEMBER(a7800_state::riot_console_button_r)
 {
-	return machine().root_device().ioport("console_buttons")->read();
+	return m_io_console_buttons->read();
 }
 
 WRITE8_MEMBER(a7800_state::riot_button_pullup_w)
@@ -70,23 +66,25 @@ const riot6532_interface a7800_r6532_interface =
 
 void a7800_state::a7800_driver_init(int ispal, int lines)
 {
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	m_ROM = memregion("maincpu")->base();
+	address_space& space = m_maincpu->space(AS_PROGRAM);
+	m_ROM = m_region_maincpu->base();
 	m_ispal = ispal;
 	m_lines = lines;
 	m_p1_one_button = 1;
 	m_p2_one_button = 1;
 
 	/* standard banks */
-	membank("bank5")->set_base(&m_ROM[0x2040]);       /* RAM0 */
-	membank("bank6")->set_base(&m_ROM[0x2140]);       /* RAM1 */
-	membank("bank7")->set_base(&m_ROM[0x2000]);       /* MAINRAM */
+	m_bank5->set_base(&m_ROM[0x2040]);       /* RAM0 */
+	m_bank6->set_base(&m_ROM[0x2140]);       /* RAM1 */
+	m_bank7->set_base(&m_ROM[0x2000]);       /* MAINRAM */
 
 	/* Brutal hack put in as a consequence of new memory system; fix this */
 	space.install_readwrite_bank(0x0480, 0x04FF,"bank10");
-	membank("bank10")->set_base(m_ROM + 0x0480);
+	m_bank10 = membank("bank10");
+	m_bank10->set_base(m_ROM + 0x0480);
 	space.install_readwrite_bank(0x1800, 0x27FF, "bank11");
-	membank("bank11")->set_base(m_ROM + 0x1800);
+	m_bank11 = membank("bank11");
+	m_bank11->set_base(m_ROM + 0x1800);
 
 	m_bios_bkup = NULL;
 	m_cart_bkup = NULL;
@@ -122,24 +120,23 @@ DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
 void a7800_state::machine_reset()
 {
 	UINT8 *memory;
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	address_space& space = m_maincpu->space(AS_PROGRAM);
 
 	m_ctrl_lock = 0;
 	m_ctrl_reg = 0;
 	m_maria_flag = 0;
 
 	/* set banks to default states */
-	memory = memregion("maincpu")->base();
-	membank("bank1")->set_base(memory + 0x4000 );
-	membank("bank2")->set_base(memory + 0x8000 );
-	membank("bank3")->set_base(memory + 0xA000 );
-	membank("bank4")->set_base(memory + 0xC000 );
+	memory = m_region_maincpu->base();
+	m_bank1->set_base(memory + 0x4000 );
+	m_bank2->set_base(memory + 0x8000 );
+	m_bank3->set_base(memory + 0xA000 );
+	m_bank4->set_base(memory + 0xC000 );
 
 	/* pokey cartridge */
 	if (m_cart_type & 0x01)
 	{
-		pokey_device *pokey = machine().device<pokey_device>("pokey");
-		space.install_readwrite_handler(0x4000, 0x7FFF, read8_delegate(FUNC(pokey_device::read),pokey), write8_delegate(FUNC(pokey_device::write),pokey));
+		space.install_readwrite_handler(0x4000, 0x7FFF, read8_delegate(FUNC(pokey_device::read),(pokey_device*)m_pokey), write8_delegate(FUNC(pokey_device::write),(pokey_device*)m_pokey));
 	}
 }
 
@@ -246,7 +243,7 @@ DEVICE_IMAGE_LOAD_MEMBER( a7800_state, a7800_cart )
 {
 	UINT32 len = 0, start = 0;
 	unsigned char header[128];
-	UINT8 *memory = image.device().machine().root_device().memregion("maincpu")->base();
+	UINT8 *memory = m_region_maincpu->base();
 	const char  *pcb_name;
 
 	// detect cart type either from xml or from header
@@ -391,7 +388,7 @@ WRITE8_MEMBER(a7800_state::a7800_RAM0_w)
 
 WRITE8_MEMBER(a7800_state::a7800_cart_w)
 {
-	UINT8 *memory = memregion("maincpu")->base();
+	UINT8 *memory = m_region_maincpu->base();
 
 	if(offset < 0x4000)
 	{
@@ -401,8 +398,7 @@ WRITE8_MEMBER(a7800_state::a7800_cart_w)
 		}
 		else if(m_cart_type & 0x01)
 		{
-			pokey_device *pokey = machine().device<pokey_device>("pokey");
-			pokey->write(space, offset, data);
+			m_pokey->write(space, offset, data);
 		}
 		else
 		{
@@ -421,8 +417,8 @@ WRITE8_MEMBER(a7800_state::a7800_cart_w)
 		{
 			data &= 0x07;
 		}
-		membank("bank2")->set_base(memory + 0x10000 + (data << 14));
-		membank("bank3")->set_base(memory + 0x12000 + (data << 14));
+		m_bank2->set_base(memory + 0x10000 + (data << 14));
+		m_bank3->set_base(memory + 0x12000 + (data << 14));
 	/*  logerror("BANK SEL: %d\n",data); */
 	}
 	else if(( m_cart_type == MBANK_TYPE_ABSOLUTE ) &&( offset == 0x4000 ) )
@@ -431,11 +427,11 @@ WRITE8_MEMBER(a7800_state::a7800_cart_w)
 		/*logerror( "F18 BANK SEL: %d\n", data );*/
 		if( data & 1 )
 		{
-			membank("bank1")->set_base(memory + 0x10000 );
+			m_bank1->set_base(memory + 0x10000 );
 		}
 		else if( data & 2 )
 		{
-			membank("bank1")->set_base(memory + 0x14000 );
+			m_bank1->set_base(memory + 0x14000 );
 		}
 	}
 	else if(( m_cart_type == MBANK_TYPE_ACTIVISION ) &&( offset >= 0xBF80 ) )
@@ -445,8 +441,8 @@ WRITE8_MEMBER(a7800_state::a7800_cart_w)
 
 		/*logerror( "Activision BANK SEL: %d\n", data );*/
 
-		membank("bank3")->set_base(memory + 0x10000 + ( data << 14 ) );
-		membank("bank4")->set_base(memory + 0x12000 + ( data << 14 ) );
+		m_bank3->set_base(memory + 0x10000 + ( data << 14 ) );
+		m_bank4->set_base(memory + 0x12000 + ( data << 14 ) );
 	}
 }
 
@@ -471,20 +467,20 @@ READ8_MEMBER(a7800_state::a7800_TIA_r)
 		   still return a reasonable value */
 			return 0x00;
 		case 0x08:
-				return((ioport("buttons")->read() & 0x02) << 6);
+				return((m_io_buttons->read() & 0x02) << 6);
 		case 0x09:
-				return((ioport("buttons")->read() & 0x08) << 4);
+				return((m_io_buttons->read() & 0x08) << 4);
 		case 0x0A:
-				return((ioport("buttons")->read() & 0x01) << 7);
+				return((m_io_buttons->read() & 0x01) << 7);
 		case 0x0B:
-				return((ioport("buttons")->read() & 0x04) << 5);
+				return((m_io_buttons->read() & 0x04) << 5);
 		case 0x0c:
-			if(((ioport("buttons")->read() & 0x08) ||(ioport("buttons")->read() & 0x02)) && m_p1_one_button)
+			if(((m_io_buttons->read() & 0x08) ||(m_io_buttons->read() & 0x02)) && m_p1_one_button)
 				return 0x00;
 			else
 				return 0x80;
 		case 0x0d:
-			if(((ioport("buttons")->read() & 0x01) ||(ioport("buttons")->read() & 0x04)) && m_p2_one_button)
+			if(((m_io_buttons->read() & 0x01) ||(m_io_buttons->read() & 0x04)) && m_p2_one_button)
 				return 0x00;
 			else
 				return 0x80;
@@ -516,6 +512,6 @@ WRITE8_MEMBER(a7800_state::a7800_TIA_w)
 		}
 		break;
 	}
-	machine().device<tia_device>("tia")->tia_sound_w(space, offset, data);
+	m_tia->tia_sound_w(space, offset, data);
 	m_ROM[offset] = data;
 }
