@@ -19,7 +19,7 @@ TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)
 	int y, x;
 	if (m_interrupts_enabled == TRUE)
 	{
-		UINT8 *gfx = memregion("gfx1")->base();
+		UINT8 *gfx = m_region_gfx1->base();
 		UINT8 dat = (m_latch_value & 0x3c) >> 2;
 		if ((m_gal_cnt >= 48 * 2) && (m_gal_cnt < 48 * 210))  // display on screen just m_first 208 lines
 		{

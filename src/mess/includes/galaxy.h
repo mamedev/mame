@@ -20,6 +20,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cassette(*this, CASSETTE_TAG)
 		, m_ram(*this, RAM_TAG)
+		, m_region_gfx1(*this, "gfx1")
 	{ }
 
 	int m_interrupts_enabled;
@@ -45,6 +46,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_memory_region m_region_gfx1;
 	ioport_port *m_io_ports[8];
 };
 
