@@ -661,7 +661,7 @@ void mc6847_base_device::record_scanline_res(int scanline, INT32 start_pos, INT3
 			if (pos < 32)
 			{
 				// update values
-				assert(current_sample_count >= 0);
+				//assert(current_sample_count >= 0);
 				assert(current_sample_count < ARRAY_LENGTH(m_data[scanline].m_mode));
 				update_value(&m_data[scanline].m_mode[current_sample_count], simplify_mode(data, m_mode));
 				update_value(&m_data[scanline].m_data[current_sample_count], data);
