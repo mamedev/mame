@@ -1009,9 +1009,9 @@ void vii_state::machine_start()
 	m_controller_input[6] = 0xff;
 	m_controller_input[7] = 0;
 
-	UINT8 *rom = m_region_cart->base();
-	if (rom)
-	{ // to prevent batman crash
+	if ( m_region_cart )
+	{
+		UINT8 *rom = m_region_cart->base();
 		memcpy(m_p_cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
 	}
 
