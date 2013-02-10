@@ -97,12 +97,12 @@ static const int width_of_cursor_set[8]={ 0,0,1,2,1,0,2,4 };
 
 /* this is a quick lookup array that puts bits 0,2,4,6 into bits 0,1,2,3
    this is used by the pallette lookup in the video ULA */
-static void set_pixel_lookup(bbc_state *state)
+void bbc_state::set_pixel_lookup()
 {
 	int i;
 	for (i=0; i<256; i++)
 	{
-		state->m_pixel_bits[i] = (((i>>7)&1)<<3) | (((i>>5)&1)<<2) | (((i>>3)&1)<<1) | (((i>>1)&1)<<0);
+		m_pixel_bits[i] = (((i>>7)&1)<<3) | (((i>>5)&1)<<2) | (((i>>3)&1)<<1) | (((i>>1)&1)<<0);
 	}
 }
 
@@ -143,12 +143,11 @@ WRITE8_MEMBER(bbc_state::bbc_videoULA_w)
 		} else {
 			m_pixels_per_byte=pixels_per_byte_set[m_videoULA_characters_per_line|(m_videoULA_6845_clock_rate<<2)];
 		}
-		mc6845_device *mc6845 = machine().device<mc6845_device>("mc6845");
-		mc6845->set_hpixels_per_column(m_pixels_per_byte);
+		m_mc6845->set_hpixels_per_column(m_pixels_per_byte);
 		if (m_videoULA_6845_clock_rate)
-			mc6845->set_clock(2000000);
+			m_mc6845->set_clock(2000000);
 		else
-			mc6845->set_clock(1000000);
+			m_mc6845->set_clock(1000000);
 		}
 		break;
 	// Set a pallet register in the Video ULA
@@ -305,14 +304,13 @@ MC6845_INTERFACE( bbc_mc6845_intf )
 
 WRITE8_MEMBER(bbc_state::bbc_6845_w)
 {
-	mc6845_device *mc6845 = machine().device<mc6845_device>("mc6845");
 	switch(offset & 1)
 	{
 		case 0 :
-			mc6845->address_w(space,0,data);
+			m_mc6845->address_w(space,0,data);
 			break;
 		case 1 :
-			mc6845->register_w(space,0,data);
+			m_mc6845->register_w(space,0,data);
 			break;
 	}
 	return;
@@ -320,12 +318,10 @@ WRITE8_MEMBER(bbc_state::bbc_6845_w)
 
 READ8_MEMBER(bbc_state::bbc_6845_r)
 {
-	mc6845_device *mc6845 = machine().device<mc6845_device>("mc6845");
-
 	switch (offset&1)
 	{
-		case 0: return mc6845->status_r(space,0);
-		case 1: return mc6845->register_r(space,0);
+		case 0: return m_mc6845->status_r(space,0);
+		case 1: return m_mc6845->register_r(space,0);
 	}
 	return 0;
 }
@@ -336,14 +332,13 @@ READ8_MEMBER(bbc_state::bbc_6845_r)
 
 /**** BBC B+ Shadow Ram change ****/
 
-void bbcbp_setvideoshadow(running_machine &machine, int vdusel)
+void bbc_state::bbcbp_setvideoshadow(int vdusel)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
 	if (vdusel)
 	{
-		state->m_BBC_Video_RAM= state->memregion("maincpu")->base()+0x8000;
+		m_BBC_Video_RAM= m_region_maincpu->base()+0x8000;
 	} else {
-		state->m_BBC_Video_RAM= machine.root_device().memregion("maincpu")->base();
+		m_BBC_Video_RAM= m_region_maincpu->base();
 	}
 }
 
@@ -352,39 +347,38 @@ void bbcbp_setvideoshadow(running_machine &machine, int vdusel)
  * Initialize the BBC video emulation
  ************************************************************************/
 
-static void common_init(running_machine &machine, int memorySize)
+void bbc_state::common_init(int memorySize)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
-	state->m_emulation_cursor_size = 1;
+	m_emulation_cursor_size = 1;
 
-	state->m_VideoULA_CR = 7;
-	state->m_VideoULA_CR_counter = 0;
+	m_VideoULA_CR = 7;
+	m_VideoULA_CR_counter = 0;
 
-	set_pixel_lookup(state);
+	set_pixel_lookup();
 
-	state->m_BBC_Video_RAM = state->memregion("maincpu")->base();
-	state->m_memorySize=memorySize;
+	m_BBC_Video_RAM = m_region_maincpu->base();
+	m_memorySize=memorySize;
 
 }
 
 VIDEO_START_MEMBER(bbc_state,bbca)
 {
-	common_init(machine(),16);
+	common_init(16);
 }
 
 VIDEO_START_MEMBER(bbc_state,bbcb)
 {
-	common_init(machine(),32);
+	common_init(32);
 }
 
 VIDEO_START_MEMBER(bbc_state,bbcbp)
 {
-	common_init(machine(),32);
+	common_init(32);
 }
 
 VIDEO_START_MEMBER(bbc_state,bbcm)
 {
-	common_init(machine(),32);
+	common_init(32);
 }
 
 
@@ -582,53 +576,26 @@ static void BBC_Set_CRE(running_machine &machine, int offset, int data)
 
 WRITE8_MEMBER(bbc_state::bbc_6845_w)
 {
-    mc6845_device *mc6845 = machine().device<mc6845_device>("mc6845");
-    switch(offset & 1)
-    {
-        case 0 :
-            mc6845->address_w(space,0,data);
-            break;
-        case 1 :
-            mc6845->register_w(space,0,data);
-            break;
-    }
-    return;
-
-    switch (offset&1)
-    {
-        case 0:
-            m6845_address_w(0,data);
-            break;
-        case 1:
-            m6845_register_w(0,data);
-            break;
-    }
-
+	switch(offset & 1)
+	{
+		case 0 :
+			m_mc6845->address_w(space,0,data);
+			break;
+		case 1 :
+			m_mc6845->register_w(space,0,data);
+			break;
+	}
 }
+
 
  READ8_HANDLER (bbc_6845_r)
 {
-
-    mc6845_device *mc6845 = space.machine().device<mc6845_device>("mc6845");
-
-    switch (offset&1)
-    {
-        case 0: return mc6845->status_r(space,0); break;
-        case 1: return mc6845->register_r(space,0); break;
-    }
-    return 0;
-
-    int retval=0;
-
-    switch (offset&1)
-    {
-        case 0:
-            break;
-        case 1:
-            retval=m6845_register_r(0);
-            break;
-    }
-    return retval;
+	switch (offset&1)
+	{
+		case 0: return m_mc6845->status_r(space,0); break;
+		case 1: return m_mc6845->register_r(space,0); break;
+	}
+	return 0;
 }
 
 
@@ -638,8 +605,7 @@ WRITE8_MEMBER(bbc_state::bbc_6845_w)
 UINT32 bbc_state::screen_update_bbc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 
-    mc6845_device *mc6845 = machine().device<mc6845_device>("mc6845");
-    mc6845->update( bitmap, cliprect);
+    m_mc6845->update( bitmap, cliprect);
 
     return 0;
 
