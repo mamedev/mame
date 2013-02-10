@@ -86,8 +86,10 @@ class gp32_state : public driver_device
 {
 public:
 	gp32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_s3c240x_ram(*this, "s3c240x_ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_s3c240x_ram(*this, "s3c240x_ram")
+		, m_maincpu(*this, "maincpu")
+	{ }
 
 	virtual void video_start();
 
@@ -169,6 +171,34 @@ public:
 	TIMER_CALLBACK_MEMBER(s3c240x_dma_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_iic_timer_exp);
 	TIMER_CALLBACK_MEMBER(s3c240x_iis_timer_exp);
+
+protected:
+	required_device<cpu_device> m_maincpu;
+
+	UINT32 s3c240x_get_fclk(int reg);
+	UINT32 s3c240x_get_hclk(int reg);
+	UINT32 s3c240x_get_pclk(int reg);
+	void s3c240x_lcd_dma_reload();
+	void s3c240x_lcd_dma_init();
+	void s3c240x_lcd_configure();
+	void s3c240x_lcd_start();
+	void s3c240x_lcd_stop();
+	void s3c240x_lcd_recalc();
+	void s3c240x_check_pending_irq();
+	void s3c240x_request_irq(UINT32 int_type);
+	void s3c240x_dma_reload(int dma);
+	void s3c240x_dma_trigger(int dma);
+	void s3c240x_dma_request_iis();
+	void s3c240x_dma_request_pwm();
+	void s3c240x_dma_start(int dma);
+	void s3c240x_dma_stop(int dma);
+	void s3c240x_dma_recalc(int dma);
+	void s3c240x_pwm_start(int timer);
+	void s3c240x_pwm_stop(int timer);
+	void s3c240x_pwm_recalc(int timer);
+	void s3c240x_iis_start();
+	void s3c240x_iis_stop();
+	void s3c240x_iis_recalc();
 };
 
 

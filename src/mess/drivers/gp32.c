@@ -47,13 +47,6 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 #define BITS(x,m,n) (((x)>>(n))&((1<<((m)-(n)+1))-1))
 
 
-static UINT32 s3c240x_get_fclk(gp32_state *state, int reg);
-static UINT32 s3c240x_get_hclk(gp32_state *state, int reg);
-static UINT32 s3c240x_get_pclk(gp32_state *state, int reg);
-
-static void s3c240x_dma_request_iis( running_machine &machine);
-static void s3c240x_dma_request_pwm( running_machine &machine);
-
 // LCD CONTROLLER
 
 
@@ -73,26 +66,24 @@ static rgb_t s3c240x_get_color_5551( UINT16 data)
 	return MAKE_RGB( r | i, g | i, b | i);
 }
 
-static void s3c240x_lcd_dma_reload( running_machine &machine)
+void gp32_state::s3c240x_lcd_dma_reload()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	state->m_s3c240x_lcd.vramaddr_cur = state->m_s3c240x_lcd_regs[5] << 1;
-	state->m_s3c240x_lcd.vramaddr_max = ((state->m_s3c240x_lcd_regs[5] & 0xFFE00000) | state->m_s3c240x_lcd_regs[6]) << 1;
-	state->m_s3c240x_lcd.offsize = BITS( state->m_s3c240x_lcd_regs[7], 21, 11);
-	state->m_s3c240x_lcd.pagewidth_cur = 0;
-	state->m_s3c240x_lcd.pagewidth_max = BITS( state->m_s3c240x_lcd_regs[7], 10, 0);
-	verboselog( machine, 3, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", state->m_s3c240x_lcd.vramaddr_cur, state->m_s3c240x_lcd.vramaddr_max, state->m_s3c240x_lcd.offsize, state->m_s3c240x_lcd.pagewidth_max);
+	m_s3c240x_lcd.vramaddr_cur = m_s3c240x_lcd_regs[5] << 1;
+	m_s3c240x_lcd.vramaddr_max = ((m_s3c240x_lcd_regs[5] & 0xFFE00000) | m_s3c240x_lcd_regs[6]) << 1;
+	m_s3c240x_lcd.offsize = BITS( m_s3c240x_lcd_regs[7], 21, 11);
+	m_s3c240x_lcd.pagewidth_cur = 0;
+	m_s3c240x_lcd.pagewidth_max = BITS( m_s3c240x_lcd_regs[7], 10, 0);
+	verboselog( machine(), 3, "LCD - vramaddr %08X %08X offsize %08X pagewidth %08X\n", m_s3c240x_lcd.vramaddr_cur, m_s3c240x_lcd.vramaddr_max, m_s3c240x_lcd.offsize, m_s3c240x_lcd.pagewidth_max);
 }
 
-static void s3c240x_lcd_dma_init( running_machine &machine)
+void gp32_state::s3c240x_lcd_dma_init()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	s3c240x_lcd_dma_reload( machine);
-	state->m_s3c240x_lcd.bppmode = BITS( state->m_s3c240x_lcd_regs[0], 4, 1);
-	state->m_s3c240x_lcd.bswp = BIT( state->m_s3c240x_lcd_regs[4], 1);
-	state->m_s3c240x_lcd.hwswp = BIT( state->m_s3c240x_lcd_regs[4], 0);
-	state->m_s3c240x_lcd.lineval = BITS( state->m_s3c240x_lcd_regs[1], 23, 14);
-	state->m_s3c240x_lcd.hozval = BITS( state->m_s3c240x_lcd_regs[2], 18, 8);
+	s3c240x_lcd_dma_reload();
+	m_s3c240x_lcd.bppmode = BITS( m_s3c240x_lcd_regs[0], 4, 1);
+	m_s3c240x_lcd.bswp = BIT( m_s3c240x_lcd_regs[4], 1);
+	m_s3c240x_lcd.hwswp = BIT( m_s3c240x_lcd_regs[4], 0);
+	m_s3c240x_lcd.lineval = BITS( m_s3c240x_lcd_regs[1], 23, 14);
+	m_s3c240x_lcd.hozval = BITS( m_s3c240x_lcd_regs[2], 18, 8);
 }
 
 static UINT32 s3c240x_lcd_dma_read( running_machine &machine)
@@ -266,7 +257,7 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_lcd_timer_exp)
 	verboselog( machine(), 3, "LCD - vpos %d hpos %d\n", m_s3c240x_lcd.vpos, m_s3c240x_lcd.hpos);
 	if (m_s3c240x_lcd.vramaddr_cur >= m_s3c240x_lcd.vramaddr_max)
 	{
-		s3c240x_lcd_dma_reload( machine());
+		s3c240x_lcd_dma_reload();
 	}
 	verboselog( machine(), 3, "LCD - vramaddr %08X\n", m_s3c240x_lcd.vramaddr_cur);
 	while (m_s3c240x_lcd.vramaddr_cur < m_s3c240x_lcd.vramaddr_max)
@@ -293,7 +284,7 @@ void gp32_state::video_start()
 UINT32 gp32_state::screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
-	s3c240x_lcd_dma_init( machine());
+	s3c240x_lcd_dma_init();
 	return 0;
 }
 
@@ -315,60 +306,56 @@ READ32_MEMBER(gp32_state::s3c240x_lcd_r)
 	return data;
 }
 
-static void s3c240x_lcd_configure( running_machine &machine)
+void gp32_state::s3c240x_lcd_configure()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	screen_device *screen = machine.primary_screen;
+	screen_device *screen = machine().primary_screen;
 	UINT32 vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
 	double framerate, vclk;
 	rectangle visarea;
-	vspw = BITS( state->m_s3c240x_lcd_regs[1], 5, 0);
-	vbpd = BITS( state->m_s3c240x_lcd_regs[1], 31, 24);
-	lineval = BITS( state->m_s3c240x_lcd_regs[1], 23, 14);
-	vfpd = BITS( state->m_s3c240x_lcd_regs[1], 13, 6);
-	hspw = BITS( state->m_s3c240x_lcd_regs[3], 7, 0);
-	hbpd = BITS( state->m_s3c240x_lcd_regs[2], 25, 19);
-	hfpd = BITS( state->m_s3c240x_lcd_regs[2], 7, 0);
-	hozval = BITS( state->m_s3c240x_lcd_regs[2], 18, 8);
-	clkval = BITS( state->m_s3c240x_lcd_regs[0], 17, 8);
-	hclk = s3c240x_get_hclk(state, MPLLCON);
-	verboselog( machine, 3, "LCD - vspw %d vbpd %d lineval %d vfpd %d hspw %d hbpd %d hfpd %d hozval %d clkval %d hclk %d\n", vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk);
+	vspw = BITS( m_s3c240x_lcd_regs[1], 5, 0);
+	vbpd = BITS( m_s3c240x_lcd_regs[1], 31, 24);
+	lineval = BITS( m_s3c240x_lcd_regs[1], 23, 14);
+	vfpd = BITS( m_s3c240x_lcd_regs[1], 13, 6);
+	hspw = BITS( m_s3c240x_lcd_regs[3], 7, 0);
+	hbpd = BITS( m_s3c240x_lcd_regs[2], 25, 19);
+	hfpd = BITS( m_s3c240x_lcd_regs[2], 7, 0);
+	hozval = BITS( m_s3c240x_lcd_regs[2], 18, 8);
+	clkval = BITS( m_s3c240x_lcd_regs[0], 17, 8);
+	hclk = s3c240x_get_hclk(MPLLCON);
+	verboselog( machine(), 3, "LCD - vspw %d vbpd %d lineval %d vfpd %d hspw %d hbpd %d hfpd %d hozval %d clkval %d hclk %d\n", vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk);
 	vclk = (double)(hclk / ((clkval + 1) * 2));
-	verboselog( machine, 3, "LCD - vclk %f\n", vclk);
+	verboselog( machine(), 3, "LCD - vclk %f\n", vclk);
 	framerate = vclk / (((vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1)) * ((hspw + 1) + (hbpd + 1) + (hfpd + 1) + (hozval + 1)));
-	verboselog( machine, 3, "LCD - framerate %f\n", framerate);
+	verboselog( machine(), 3, "LCD - framerate %f\n", framerate);
 	visarea.set(0, hozval, 0, lineval);
-	verboselog( machine, 3, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+	verboselog( machine(), 3, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 	screen->configure(hozval + 1, lineval + 1, visarea, HZ_TO_ATTOSECONDS( framerate));
 }
 
-static void s3c240x_lcd_start( running_machine &machine)
+void gp32_state::s3c240x_lcd_start()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	screen_device *screen = machine.primary_screen;
-	verboselog( machine, 1, "LCD start\n");
-	s3c240x_lcd_configure( machine);
-	s3c240x_lcd_dma_init( machine);
-	state->m_s3c240x_lcd_timer->adjust( screen->time_until_pos(0, 0));
+	screen_device *screen = machine().primary_screen;
+	verboselog( machine(), 1, "LCD start\n");
+	s3c240x_lcd_configure();
+	s3c240x_lcd_dma_init();
+	m_s3c240x_lcd_timer->adjust( screen->time_until_pos(0, 0));
 }
 
-static void s3c240x_lcd_stop( running_machine &machine)
+void gp32_state::s3c240x_lcd_stop()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	verboselog( machine, 1, "LCD stop\n");
-	state->m_s3c240x_lcd_timer->adjust( attotime::never);
+	verboselog( machine(), 1, "LCD stop\n");
+	m_s3c240x_lcd_timer->adjust( attotime::never);
 }
 
-static void s3c240x_lcd_recalc( running_machine &machine)
+void gp32_state::s3c240x_lcd_recalc()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	if (state->m_s3c240x_lcd_regs[0] & 1)
+	if (m_s3c240x_lcd_regs[0] & 1)
 	{
-		s3c240x_lcd_start( machine);
+		s3c240x_lcd_start();
 	}
 	else
 	{
-		s3c240x_lcd_stop( machine);
+		s3c240x_lcd_stop();
 	}
 }
 
@@ -384,7 +371,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_lcd_w)
 		{
 			if ((old_value & 1) != (data & 1))
 			{
-				s3c240x_lcd_recalc( machine());
+				s3c240x_lcd_recalc();
 			}
 		}
 		break;
@@ -415,36 +402,36 @@ WRITE32_MEMBER(gp32_state::s3c240x_lcd_palette_w)
 // CLOCK & POWER MANAGEMENT
 
 
-static UINT32 s3c240x_get_fclk(gp32_state *state, int reg)
+UINT32 gp32_state::s3c240x_get_fclk(int reg)
 {
 	UINT32 data, mdiv, pdiv, sdiv;
-	data = state->m_s3c240x_clkpow_regs[reg]; // MPLLCON or UPLLCON
+	data = m_s3c240x_clkpow_regs[reg]; // MPLLCON or UPLLCON
 	mdiv = BITS( data, 19, 12);
 	pdiv = BITS( data, 9, 4);
 	sdiv = BITS( data, 1, 0);
 	return (UINT32)((double)((mdiv + 8) * 12000000) / (double)((pdiv + 2) * (1 << sdiv)));
 }
 
-static UINT32 s3c240x_get_hclk(gp32_state *state, int reg)
+UINT32 gp32_state::s3c240x_get_hclk(int reg)
 {
-	switch (state->m_s3c240x_clkpow_regs[5] & 0x3) // CLKDIVN
+	switch (m_s3c240x_clkpow_regs[5] & 0x3) // CLKDIVN
 	{
-		case 0 : return s3c240x_get_fclk(state, reg) / 1;
-		case 1 : return s3c240x_get_fclk(state, reg) / 1;
-		case 2 : return s3c240x_get_fclk(state, reg) / 2;
-		case 3 : return s3c240x_get_fclk(state, reg) / 2;
+		case 0 : return s3c240x_get_fclk(reg) / 1;
+		case 1 : return s3c240x_get_fclk(reg) / 1;
+		case 2 : return s3c240x_get_fclk(reg) / 2;
+		case 3 : return s3c240x_get_fclk(reg) / 2;
 	}
 	return 0;
 }
 
-static UINT32 s3c240x_get_pclk(gp32_state *state, int reg)
+UINT32 gp32_state::s3c240x_get_pclk(int reg)
 {
-	switch (state->m_s3c240x_clkpow_regs[5] & 0x3) // CLKDIVN
+	switch (m_s3c240x_clkpow_regs[5] & 0x3) // CLKDIVN
 	{
-		case 0 : return s3c240x_get_fclk(state, reg) / 1;
-		case 1 : return s3c240x_get_fclk(state, reg) / 2;
-		case 2 : return s3c240x_get_fclk(state, reg) / 2;
-		case 3 : return s3c240x_get_fclk(state, reg) / 4;
+		case 0 : return s3c240x_get_fclk(reg) / 1;
+		case 1 : return s3c240x_get_fclk(reg) / 2;
+		case 2 : return s3c240x_get_fclk(reg) / 2;
+		case 3 : return s3c240x_get_fclk(reg) / 4;
 	}
 	return 0;
 }
@@ -465,8 +452,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_clkpow_w)
 		// MPLLCON
 		case 0x04 / 4 :
 		{
-			gp32_state *state = machine().driver_data<gp32_state>();
-			machine().device("maincpu")->set_unscaled_clock(s3c240x_get_fclk(state, MPLLCON) * CLOCK_MULTIPLIER);
+			m_maincpu->set_unscaled_clock(s3c240x_get_fclk(MPLLCON) * CLOCK_MULTIPLIER);
 		}
 		break;
 	}
@@ -475,43 +461,41 @@ WRITE32_MEMBER(gp32_state::s3c240x_clkpow_w)
 // INTERRUPT CONTROLLER
 
 
-static void s3c240x_check_pending_irq( running_machine &machine)
+void gp32_state::s3c240x_check_pending_irq()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	if (state->m_s3c240x_irq_regs[0] != 0)
+	if (m_s3c240x_irq_regs[0] != 0)
 	{
 		UINT32 int_type = 0, temp;
-		temp = state->m_s3c240x_irq_regs[0];
+		temp = m_s3c240x_irq_regs[0];
 		while (!(temp & 1))
 		{
 			int_type++;
 			temp = temp >> 1;
 		}
-		state->m_s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
-		state->m_s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		machine.device( "maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
+		m_s3c240x_irq_regs[5] = int_type; // INTOFFSET
+		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		machine.device( "maincpu")->execute().set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 }
 
-static void s3c240x_request_irq( running_machine &machine, UINT32 int_type)
+void gp32_state::s3c240x_request_irq(UINT32 int_type)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	verboselog( machine, 5, "request irq %d\n", int_type);
-	if (state->m_s3c240x_irq_regs[0] == 0)
+	verboselog( machine(), 5, "request irq %d\n", int_type);
+	if (m_s3c240x_irq_regs[0] == 0)
 	{
-		state->m_s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
-		state->m_s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
-		state->m_s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		machine.device( "maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		m_s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
+		m_s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
+		m_s3c240x_irq_regs[5] = int_type; // INTOFFSET
+		m_maincpu->set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		state->m_s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
-		s3c240x_check_pending_irq( machine);
+		m_s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
+		s3c240x_check_pending_irq();
 	}
 }
 
@@ -534,7 +518,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_irq_w)
 		case 0x00 / 4 :
 		{
 			m_s3c240x_irq_regs[0] = (old_value & ~data); // clear only the bit positions of SRCPND corresponding to those set to one in the data
-			s3c240x_check_pending_irq( machine());
+			s3c240x_check_pending_irq();
 		}
 		break;
 		// INTPND
@@ -580,61 +564,58 @@ READ32_MEMBER(gp32_state::s3c240x_pwm_r)
 	return data;
 }
 
-static void s3c240x_pwm_start( running_machine &machine, int timer)
+void gp32_state::s3c240x_pwm_start(int timer)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
 	static const int mux_table[] = { 2, 4, 8, 16 };
 	static const int prescaler_shift[] = { 0, 0, 8, 8, 8 };
 	static const int mux_shift[] = { 0, 4, 8, 12, 16 };
 	static const int tcon_shift[] = { 0, 8, 12, 16, 20 };
-	const UINT32 *regs = &state->m_s3c240x_pwm_regs[3+timer*3];
+	const UINT32 *regs = &m_s3c240x_pwm_regs[3+timer*3];
 	UINT32 prescaler, mux, cnt, cmp, auto_reload;
 	double freq, hz;
-	verboselog( machine, 1, "PWM %d start\n", timer);
-	prescaler = (state->m_s3c240x_pwm_regs[0] >> prescaler_shift[timer]) & 0xFF;
-	mux = (state->m_s3c240x_pwm_regs[1] >> mux_shift[timer]) & 0x0F;
-	freq = s3c240x_get_pclk(state, MPLLCON) / (prescaler + 1) / mux_table[mux];
+	verboselog( machine(), 1, "PWM %d start\n", timer);
+	prescaler = (m_s3c240x_pwm_regs[0] >> prescaler_shift[timer]) & 0xFF;
+	mux = (m_s3c240x_pwm_regs[1] >> mux_shift[timer]) & 0x0F;
+	freq = s3c240x_get_pclk(MPLLCON) / (prescaler + 1) / mux_table[mux];
 	cnt = BITS( regs[0], 15, 0);
 	if (timer != 4)
 	{
 		cmp = BITS( regs[1], 15, 0);
-		auto_reload = BIT( state->m_s3c240x_pwm_regs[2], tcon_shift[timer] + 3);
+		auto_reload = BIT( m_s3c240x_pwm_regs[2], tcon_shift[timer] + 3);
 	}
 	else
 	{
 		cmp = 0;
-		auto_reload = BIT( state->m_s3c240x_pwm_regs[2], tcon_shift[timer] + 2);
+		auto_reload = BIT( m_s3c240x_pwm_regs[2], tcon_shift[timer] + 2);
 	}
 	hz = freq / (cnt - cmp + 1);
-	verboselog( machine, 5, "PWM %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, s3c240x_get_fclk(state, MPLLCON), s3c240x_get_hclk(state, MPLLCON), s3c240x_get_pclk(state, MPLLCON), prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
+	verboselog( machine(), 5, "PWM %d - FCLK=%d HCLK=%d PCLK=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, s3c240x_get_fclk(MPLLCON), s3c240x_get_hclk(MPLLCON), s3c240x_get_pclk(MPLLCON), prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
 	if (auto_reload)
 	{
-		state->m_s3c240x_pwm_timer[timer]->adjust( attotime::from_hz( hz), timer, attotime::from_hz( hz));
+		m_s3c240x_pwm_timer[timer]->adjust( attotime::from_hz( hz), timer, attotime::from_hz( hz));
 	}
 	else
 	{
-		state->m_s3c240x_pwm_timer[timer]->adjust( attotime::from_hz( hz), timer);
+		m_s3c240x_pwm_timer[timer]->adjust( attotime::from_hz( hz), timer);
 	}
 }
 
-static void s3c240x_pwm_stop( running_machine &machine, int timer)
+void gp32_state::s3c240x_pwm_stop(int timer)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	verboselog( machine, 1, "PWM %d stop\n", timer);
-	state->m_s3c240x_pwm_timer[timer]->adjust( attotime::never);
+	verboselog( machine(), 1, "PWM %d stop\n", timer);
+	m_s3c240x_pwm_timer[timer]->adjust( attotime::never);
 }
 
-static void s3c240x_pwm_recalc( running_machine &machine, int timer)
+void gp32_state::s3c240x_pwm_recalc(int timer)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
 	static const int tcon_shift[] = { 0, 8, 12, 16, 20 };
-	if (state->m_s3c240x_pwm_regs[2] & (1 << tcon_shift[timer]))
+	if (m_s3c240x_pwm_regs[2] & (1 << tcon_shift[timer]))
 	{
-		s3c240x_pwm_start( machine, timer);
+		s3c240x_pwm_start(timer);
 	}
 	else
 	{
-		s3c240x_pwm_stop( machine, timer);
+		s3c240x_pwm_stop(timer);
 	}
 }
 
@@ -650,23 +631,23 @@ WRITE32_MEMBER(gp32_state::s3c240x_pwm_w)
 		{
 			if ((data & 1) != (old_value & 1))
 			{
-				s3c240x_pwm_recalc( machine(), 0);
+				s3c240x_pwm_recalc(0);
 			}
 			if ((data & 0x100) != (old_value & 0x100))
 			{
-				s3c240x_pwm_recalc( machine(), 1);
+				s3c240x_pwm_recalc(1);
 			}
 			if ((data & 0x1000) != (old_value & 0x1000))
 			{
-				s3c240x_pwm_recalc( machine(), 2);
+				s3c240x_pwm_recalc(2);
 			}
 			if ((data & 0x10000) != (old_value & 0x10000))
 			{
-				s3c240x_pwm_recalc( machine(), 3);
+				s3c240x_pwm_recalc(3);
 			}
 			if ((data & 0x100000) != (old_value & 0x100000))
 			{
-				s3c240x_pwm_recalc( machine(), 4);
+				s3c240x_pwm_recalc(4);
 			}
 		}
 	}
@@ -679,35 +660,33 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_pwm_timer_exp)
 	verboselog( machine(), 2, "PWM %d timer callback\n", ch);
 	if (BITS( m_s3c240x_pwm_regs[1], 23, 20) == (ch + 1))
 	{
-		s3c240x_dma_request_pwm( machine());
+		s3c240x_dma_request_pwm();
 	}
 	else
 	{
-		s3c240x_request_irq( machine(), ch_int[ch]);
+		s3c240x_request_irq(ch_int[ch]);
 	}
 }
 
 // DMA
 
 
-static void s3c240x_dma_reload( running_machine &machine, int dma)
+void gp32_state::s3c240x_dma_reload(int dma)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	UINT32 *regs = &state->m_s3c240x_dma_regs[dma<<3];
+	UINT32 *regs = &m_s3c240x_dma_regs[dma<<3];
 	regs[3] = (regs[3] & ~0x000FFFFF) | BITS( regs[2], 19, 0);
 	regs[4] = (regs[4] & ~0x1FFFFFFF) | BITS( regs[0], 28, 0);
 	regs[5] = (regs[5] & ~0x1FFFFFFF) | BITS( regs[1], 28, 0);
 }
 
-static void s3c240x_dma_trigger( running_machine &machine, int dma)
+void gp32_state::s3c240x_dma_trigger(int dma)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	UINT32 *regs = &state->m_s3c240x_dma_regs[dma<<3];
+	UINT32 *regs = &m_s3c240x_dma_regs[dma<<3];
 	UINT32 curr_tc, curr_src, curr_dst;
-	address_space &space = machine.device( "maincpu")->memory().space( AS_PROGRAM);
+	address_space &space = m_maincpu->space( AS_PROGRAM);
 	int dsz, inc_src, inc_dst, servmode;
 	static const UINT32 ch_int[] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
-	verboselog( machine, 5, "DMA %d trigger\n", dma);
+	verboselog( machine(), 5, "DMA %d trigger\n", dma);
 	curr_tc = BITS( regs[3], 19, 0);
 	curr_src = BITS( regs[4], 28, 0);
 	curr_dst = BITS( regs[5], 28, 0);
@@ -715,7 +694,7 @@ static void s3c240x_dma_trigger( running_machine &machine, int dma)
 	servmode = BIT( regs[2], 26);
 	inc_src = BIT( regs[0], 29);
 	inc_dst = BIT( regs[1], 29);
-	verboselog( machine, 5, "DMA %d - curr_src %08X curr_dst %08X curr_tc %d dsz %d\n", dma, curr_src, curr_dst, curr_tc, dsz);
+	verboselog( machine(), 5, "DMA %d - curr_src %08X curr_dst %08X curr_tc %d dsz %d\n", dma, curr_src, curr_dst, curr_tc, dsz);
 	while (curr_tc > 0)
 	{
 		curr_tc--;
@@ -742,7 +721,7 @@ static void s3c240x_dma_trigger( running_machine &machine, int dma)
 		reload = BIT( regs[2], 22);
 		if (!reload)
 		{
-			s3c240x_dma_reload( machine, dma);
+			s3c240x_dma_reload(dma);
 		}
 		else
 		{
@@ -751,48 +730,45 @@ static void s3c240x_dma_trigger( running_machine &machine, int dma)
 		_int = BIT( regs[2], 28);
 		if (_int)
 		{
-			s3c240x_request_irq( machine, ch_int[dma]);
+			s3c240x_request_irq(ch_int[dma]);
 		}
 	}
 }
 
-static void s3c240x_dma_request_iis( running_machine &machine)
+void gp32_state::s3c240x_dma_request_iis()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	UINT32 *regs = &state->m_s3c240x_dma_regs[2<<3];
-	verboselog( machine, 5, "s3c240x_dma_request_iis\n");
+	UINT32 *regs = &m_s3c240x_dma_regs[2<<3];
+	verboselog( machine(), 5, "s3c240x_dma_request_iis\n");
 	if ((BIT( regs[6], 1) != 0) && (BIT( regs[2], 23) != 0) && (BITS( regs[2], 25, 24) == 0))
 	{
-		s3c240x_dma_trigger( machine, 2);
+		s3c240x_dma_trigger(2);
 	}
 }
 
-static void s3c240x_dma_request_pwm( running_machine &machine)
+void gp32_state::s3c240x_dma_request_pwm()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
 	int i;
-	verboselog( machine, 5, "s3c240x_dma_request_pwm\n");
+	verboselog( machine(), 5, "s3c240x_dma_request_pwm\n");
 	for (i = 0; i < 4; i++)
 	{
 		if (i != 1)
 		{
-			UINT32 *regs = &state->m_s3c240x_dma_regs[i<<3];
+			UINT32 *regs = &m_s3c240x_dma_regs[i<<3];
 			if ((BIT( regs[6], 1) != 0) && (BIT( regs[2], 23) != 0) && (BITS( regs[2], 25, 24) == 3))
 			{
-				s3c240x_dma_trigger( machine, i);
+				s3c240x_dma_trigger(i);
 			}
 		}
 	}
 }
 
-static void s3c240x_dma_start( running_machine &machine, int dma)
+void gp32_state::s3c240x_dma_start(int dma)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
 	UINT32 addr_src, addr_dst, tc;
-	UINT32 *regs = &state->m_s3c240x_dma_regs[dma<<3];
+	UINT32 *regs = &m_s3c240x_dma_regs[dma<<3];
 	UINT32 dsz, tsz, reload;
 	int inc_src, inc_dst, _int, servmode, swhwsel, hwsrcsel;
-	verboselog( machine, 1, "DMA %d start\n", dma);
+	verboselog( machine(), 1, "DMA %d start\n", dma);
 	addr_src = BITS( regs[0], 28, 0);
 	addr_dst = BITS( regs[1], 28, 0);
 	tc = BITS( regs[2], 19, 0);
@@ -805,30 +781,29 @@ static void s3c240x_dma_start( running_machine &machine, int dma)
 	swhwsel = BIT( regs[2], 23);
 	reload = BIT( regs[2], 22);
 	dsz = BITS( regs[2], 21, 20);
-	verboselog( machine, 5, "DMA %d - addr_src %08X inc_src %d addr_dst %08X inc_dst %d int %d tsz %d servmode %d hwsrcsel %d swhwsel %d reload %d dsz %d tc %d\n", dma, addr_src, inc_src, addr_dst, inc_dst, _int, tsz, servmode, hwsrcsel, swhwsel, reload, dsz, tc);
-	verboselog( machine, 5, "DMA %d - copy %08X bytes from %08X (%s) to %08X (%s)\n", dma, tc << dsz, addr_src, inc_src ? "fix" : "inc", addr_dst, inc_dst ? "fix" : "inc");
-	s3c240x_dma_reload( machine, dma);
+	verboselog( machine(), 5, "DMA %d - addr_src %08X inc_src %d addr_dst %08X inc_dst %d int %d tsz %d servmode %d hwsrcsel %d swhwsel %d reload %d dsz %d tc %d\n", dma, addr_src, inc_src, addr_dst, inc_dst, _int, tsz, servmode, hwsrcsel, swhwsel, reload, dsz, tc);
+	verboselog( machine(), 5, "DMA %d - copy %08X bytes from %08X (%s) to %08X (%s)\n", dma, tc << dsz, addr_src, inc_src ? "fix" : "inc", addr_dst, inc_dst ? "fix" : "inc");
+	s3c240x_dma_reload(dma);
 	if (swhwsel == 0)
 	{
-		s3c240x_dma_trigger( machine, dma);
+		s3c240x_dma_trigger(dma);
 	}
 }
 
-static void s3c240x_dma_stop( running_machine &machine, int dma)
+void gp32_state::s3c240x_dma_stop(int dma)
 {
-	verboselog( machine, 1, "DMA %d stop\n", dma);
+	verboselog( machine(), 1, "DMA %d stop\n", dma);
 }
 
-static void s3c240x_dma_recalc( running_machine &machine, int dma)
+void gp32_state::s3c240x_dma_recalc(int dma)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	if (state->m_s3c240x_dma_regs[(dma<<3)+6] & 2)
+	if (m_s3c240x_dma_regs[(dma<<3)+6] & 2)
 	{
-		s3c240x_dma_start( machine, dma);
+		s3c240x_dma_start(dma);
 	}
 	else
 	{
-		s3c240x_dma_stop( machine, dma);
+		s3c240x_dma_stop(dma);
 	}
 }
 
@@ -858,7 +833,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_dma_w)
 		// DMASKTRIG0
 		case 0x18 / 4 :
 		{
-			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( machine(), 0);
+			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc(0);
 		}
 		break;
 		// DCON1
@@ -873,7 +848,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_dma_w)
 		// DMASKTRIG1
 		case 0x38 / 4 :
 		{
-			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( machine(), 1);
+			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc(1);
 		}
 		break;
 		// DCON2
@@ -888,7 +863,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_dma_w)
 		// DMASKTRIG2
 		case 0x58 / 4 :
 		{
-			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( machine(), 2);
+			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc(2);
 		}
 		break;
 		// DCON3
@@ -903,7 +878,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_dma_w)
 		// DMASKTRIG3
 		case 0x78 / 4 :
 		{
-			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc( machine(), 3);
+			if ((old_value & 2) != (data & 2)) s3c240x_dma_recalc(3);
 		}
 		break;
 	}
@@ -1405,7 +1380,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_iic_w)
 			transmit_clock_value = (data >> 0) & 0xF;
 			tx_clock_source_selection = (data >> 6) & 1;
 			enable_interrupt = (data >> 5) & 1;
-			clock = (double)(s3c240x_get_pclk(state, MPLLCON) / div_table[tx_clock_source_selection] / (transmit_clock_value + 1));
+			clock = (double)(s3c240x_get_pclk(MPLLCON) / div_table[tx_clock_source_selection] / (transmit_clock_value + 1));
 #endif
 			interrupt_pending_flag = BIT( data, 4);
 			if (interrupt_pending_flag == 0)
@@ -1481,45 +1456,42 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_iic_timer_exp)
 	enable_interrupt = BIT( m_s3c240x_iic_regs[0], 5);
 	if (enable_interrupt)
 	{
-		s3c240x_request_irq( machine(), INT_IIC);
+		s3c240x_request_irq(INT_IIC);
 	}
 }
 
 // IIS
 
-static void s3c240x_iis_start( running_machine &machine)
+void gp32_state::s3c240x_iis_start()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
 	static const UINT32 codeclk_table[] = { 256, 384 };
 	double freq;
 	int prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk;
-	verboselog( machine, 1, "IIS start\n");
-	prescaler_enable = BIT( state->m_s3c240x_iis_regs[0], 1);
-	prescaler_control_a = BITS( state->m_s3c240x_iis_regs[2], 9, 5);
-	prescaler_control_b = BITS( state->m_s3c240x_iis_regs[2], 4, 0);
-	codeclk = BIT( state->m_s3c240x_iis_regs[1], 2);
-	freq = (double)(s3c240x_get_pclk(state, MPLLCON) / (prescaler_control_a + 1) / codeclk_table[codeclk]) * 2; // why do I have to multiply by two?
-	verboselog( machine, 5, "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", s3c240x_get_pclk(state, MPLLCON), prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
-	state->m_s3c240x_iis_timer->adjust( attotime::from_hz( freq), 0, attotime::from_hz( freq));
+	verboselog( machine(), 1, "IIS start\n");
+	prescaler_enable = BIT( m_s3c240x_iis_regs[0], 1);
+	prescaler_control_a = BITS( m_s3c240x_iis_regs[2], 9, 5);
+	prescaler_control_b = BITS( m_s3c240x_iis_regs[2], 4, 0);
+	codeclk = BIT( m_s3c240x_iis_regs[1], 2);
+	freq = (double)(s3c240x_get_pclk(MPLLCON) / (prescaler_control_a + 1) / codeclk_table[codeclk]) * 2; // why do I have to multiply by two?
+	verboselog( machine(), 5, "IIS - pclk %d psc_enable %d psc_a %d psc_b %d codeclk %d freq %f\n", s3c240x_get_pclk(MPLLCON), prescaler_enable, prescaler_control_a, prescaler_control_b, codeclk_table[codeclk], freq);
+	m_s3c240x_iis_timer->adjust( attotime::from_hz( freq), 0, attotime::from_hz( freq));
 }
 
-static void s3c240x_iis_stop( running_machine &machine)
+void gp32_state::s3c240x_iis_stop()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	verboselog( machine, 1, "IIS stop\n");
-	state->m_s3c240x_iis_timer->adjust( attotime::never);
+	verboselog( machine(), 1, "IIS stop\n");
+	m_s3c240x_iis_timer->adjust( attotime::never);
 }
 
-static void s3c240x_iis_recalc( running_machine &machine)
+void gp32_state::s3c240x_iis_recalc()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	if (state->m_s3c240x_iis_regs[0] & 1)
+	if (m_s3c240x_iis_regs[0] & 1)
 	{
-		s3c240x_iis_start( machine);
+		s3c240x_iis_start();
 	}
 	else
 	{
-		s3c240x_iis_stop( machine);
+		s3c240x_iis_stop();
 	}
 }
 
@@ -1551,7 +1523,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_iis_w)
 		// IISCON
 		case 0x00 / 4 :
 		{
-			if ((old_value & 1) != (data & 1)) s3c240x_iis_recalc( machine());
+			if ((old_value & 1) != (data & 1)) s3c240x_iis_recalc();
 		}
 		break;
 		// IISFIF
@@ -1582,7 +1554,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_iis_w)
 TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_iis_timer_exp)
 {
 	verboselog( machine(), 2, "IIS timer callback\n");
-	s3c240x_dma_request_iis( machine());
+	s3c240x_dma_request_iis();
 }
 
 // RTC
