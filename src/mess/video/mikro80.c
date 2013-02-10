@@ -17,7 +17,7 @@ void mikro80_state::video_start()
 
 UINT32 mikro80_state::screen_update_mikro80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *gfx = memregion("gfx1")->base();
+	UINT8 *gfx = m_region_gfx1->base();
 	int x,y,b;
 
 	for(y = 0; y < 32*8; y++ )
