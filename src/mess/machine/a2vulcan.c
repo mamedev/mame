@@ -4,32 +4,51 @@
 
 	Applied Engineering Vulcan IDE controller
 
+	Our copy of ROM version 1.4 will refuse any drive > 40 megs (top 2 bytes of # blocks >= 0x15b).
+	Protection against field upgrades?
+
+	Vulcan Gold ROMs omit this protection but don't work with the version of the partitioner program
+	we have.
+
 	Recognized drives by IDE features parameters:
 	(# of cylinders is never checked, just heads, sectors, and the vendor specific at 0x0A)
 
-	 H  S    Vendor specific #5
-	 8, 33 + 0x69
-	 2, 33 + 0x69
-	 4, 26 + 0x69
-	 5, 29 + (any)
-	 7, 29 + 0x44
-	 9, 29 + (any)
-	 9, 36 + 0x44
-	 9, 36 + 0xff
-	 7, 34 + (any)
-	 4, 17 + 0x55
-	 4, 26 + 0x55
-	 5, 17 + 0x55
-	 6, 26 + 0x55
-	 2, 28 + 0x36
-	 4, 28 + 0x36
-	 4, 28 + 0x67
-	 4, 27 + 0x43
-	 5, 17 + 0x26
-	15, 32 + 0x43
-	16, 38 + 0x94
-	10, 17 + (any)
+	H  S    Vendor specific #5
+	8, 33 + 0x69  0x31d blocks   (400K?!)
+	2, 33 + 0x69  0xa208 blocks  (20 megs,  21237760  bytes)
+	4, 26 + 0x69  0x14500 blocks (40 megs,  42598400  bytes)
+	5, 29 + (any) 0x25c5b blocks (80 megs,  79214080  bytes) (chs = 1067,5,29)
+	7, 29 + 0x44  0x34e19 blocks (100 megs, 110899712 bytes)
+	9, 29 + (any) 0x44068 blocks (140 megs, 142659584 bytes) (chs = 1068,9,29)
+	9, 36 + 0x44  0x54888 blocks (180 megs, 177278976 bytes)
+	9, 36 + 0xff  0x645a8 blocks (200 megs, 210456576 bytes)
+	7, 34 + (any) 0x32252 blocks (100 megs, 105161728 bytes) (chs = 863,7,34)
+	4, 17 + 0x55  0xa218 blocks  (20 megs,  21245952  bytes)
+	4, 26 + 0x55  0xa218 blocks  (20 megs,  21245952  bytes) 
+	5, 17 + 0x55  0x15234 blocks (40 megs,  44328960  bytes)
+	6, 26 + 0x55  0x15234 blocks (40 megs,  44328960  bytes) 
+	2, 28 + 0x36  0xa250 blocks  (20 megs,  21274624  bytes)
+	4, 28 + 0x36  0x143c0 blocks (40 megs,  42434450  bytes)
+	4, 28 + 0x67  0x143c0 blocks (40 megs,  42434450  bytes)                                                                                         
+	4, 27 + 0x43  0x147cc blocks (40 megs,  42964992  bytes)
+	5, 17 + 0x26  0x13ec0 blocks (40 megs,  41779200  bytes) (chs = 960,5,17)
+	15, 32 + 0x43  0x5f6e0 blocks (200 megs, 200130560 bytes) 
+	16, 38 + 0x94  0x6540c blocks (200 megs, 212342784 bytes)
+	10, 17 + (any) 0x2792f blocks (80 megs,  82992640  bytes) (chs = 954,10,17)
 
+	Partition block:
+	+0000: 0xAE 0xAE  signature
+	+0002: bytesum of remaining 508 bytes of partition block
+	+0005: total # of blocks (3 bytes)
+	+000E: boot partition # (0 based)
+	+0100: partition records
+
+	Partition record:
+	+02: partition number (seems to be only valud for non-CLEAR partitions)
+	+03: little-endian unsigned word: # of 512 byte blocks
+	+06: bit 6 set for ON, bits 0-2 = 0 CLEAR, 1 PRODOS, 2 DOS 3.3, 3 PASCAL, 4 CP/M
+	+07: Partition name (Apple high-ASCII, zero terminated unless full 10 chars)
+ 
 *********************************************************************/
 
 #include "a2vulcan.h"
@@ -107,9 +126,9 @@ void a2bus_vulcanbase_device::device_start()
 	astring tempstring;
 	m_rom = device().machine().root_device().memregion(this->subtag(tempstring, VULCAN_ROM_REGION))->base();
 
-	// patch partition table check failure
-//	m_rom[0x59e] = 0xea;
-//	m_rom[0x59f] = 0xea;
+	// disable 40 meg partition size limit / protection
+	m_rom[0x59e] = 0xea;
+	m_rom[0x59f] = 0xea;
 
 	save_item(NAME(m_lastdata));
 	save_item(NAME(m_ram));
@@ -217,7 +236,7 @@ void a2bus_vulcanbase_device::write_c0nx(address_space &space, UINT8 offset, UIN
 			break;
 
 		default:
-			printf("Write %02x @ C0n%x\n", data, offset);
+			logerror("a2vulcan: write %02x @ unhandled C0n%x\n", data, offset);
 			break;
 	}
 }
@@ -247,7 +266,8 @@ UINT8 a2bus_vulcanbase_device::read_c800(address_space &space, UINT16 offset)
 		return m_ram[offset + m_rambank];
 	}
 
-	return m_rom[(offset & 0x3ff)+m_rombank];
+	offset -= 0x400;
+	return m_rom[offset+m_rombank];
 }
 
 void a2bus_vulcanbase_device::write_c800(address_space &space, UINT16 offset, UINT8 data)

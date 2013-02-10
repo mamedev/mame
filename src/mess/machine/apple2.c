@@ -841,8 +841,8 @@ static void apple2_mem_CE00(running_machine &machine, offs_t begin, offs_t end, 
 		}
 		else
 		{
-			meminfo->read_handler = &state->rd_c800;
-			meminfo->write_handler = &state->wd_c800;
+			meminfo->read_handler = &state->rd_ce00;
+			meminfo->write_handler = &state->wd_ce00;
 		}
 	}
 }
