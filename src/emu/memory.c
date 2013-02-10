@@ -4398,7 +4398,7 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits, int 
 	// compute the inverse mask
 	m_invsubmask = 0;
 	for (int i = 0; i < m_subunits; i++)
-		m_invsubmask |= m_subunit_infos[i].m_mask << m_subunit_infos[i].m_shift;
+		m_invsubmask |= UINT64(m_subunit_infos[i].m_mask) << m_subunit_infos[i].m_shift;
 	m_invsubmask = ~m_invsubmask;
 }
 
