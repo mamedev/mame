@@ -2,8 +2,9 @@
 
 High Video Tour 4000
 
-driver by Mirko Buffoni
-original brasil.c by David Haywood & Angelo Salese
+Driver by Mirko Buffoni.
+Original brasil.c by David Haywood & Angelo Salese.
+Additional work by Roberto Fresca.
 
 
 Memory layout:
@@ -80,6 +81,17 @@ Resolution is higher as 400x300x256 colors, and graphic is fancier.
 There is a simple protection check, tied on an input port.
 Game is V30 based, with rom banking (2Mb)
 
+*************************************************************************************************
+
+  Game notes....
+
+  * New York Joker:
+
+  The game needs default NVRAM, otherwise the game parameters will be totally wrong and the game
+  can't work properly. To switch between pins/cards, after insert some credits (before bet on the
+  game), press HOLD3 to get the graphics option, and use HOLD2 and HOLD4 to choose the wished set.
+
+
 *************************************************************************************************/
 
 #include "emu.h"
@@ -114,6 +126,7 @@ public:
 	DECLARE_READ16_MEMBER(newmcard_vblank_r);
 	DECLARE_WRITE16_MEMBER(newmcard_vblank_w);
 	DECLARE_WRITE16_MEMBER(write2_w);
+	DECLARE_WRITE16_MEMBER(nyj_write2_w);
 	DECLARE_READ16_MEMBER(brasil_status_r);
 	DECLARE_WRITE16_MEMBER(brasil_status_w);
 	DECLARE_READ16_MEMBER(ciclone_status_r);
@@ -381,18 +394,37 @@ static ADDRESS_MAP_START( nyjoker_map, AS_PROGRAM, 16, highvdeo_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nyjoker_io, AS_IO, 16, highvdeo_state )
-//	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w ) // lamps
-//	AM_RANGE(0x0008, 0x0009) AM_WRITE(tv_ncf_oki6376_w )
-//	AM_RANGE(0x000a, 0x000b) AM_WRITE(tv_ncf_oki6376_st_w )
-	AM_RANGE(0x0030, 0x0035) AM_WRITE(tv_vcf_paletteram_w )
-
+	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w )	// lamps
+	AM_RANGE(0x0002, 0x0003) AM_WRITENOP			// alternate coin counter (bits 0 and 2)
+	AM_RANGE(0x0004, 0x0005) AM_WRITE(nyj_write2_w ) // coin and note counter
+//	AM_RANGE(0x0006, 0x0007) AM_WRITENOP
+	AM_RANGE(0x0008, 0x0009) AM_WRITE(tv_ncf_oki6376_w )
+	AM_RANGE(0x000a, 0x000b) AM_WRITE(tv_ncf_oki6376_st_w )
 	AM_RANGE(0x000c, 0x000d) AM_READ_PORT("IN0")
-	AM_RANGE(0x000e, 0x000f) AM_READ_PORT("IN2")
-	AM_RANGE(0x0010, 0x0011) AM_READ_PORT("IN3")
-	AM_RANGE(0x0012, 0x0013) AM_READ_PORT("IN4")
+	AM_RANGE(0x000e, 0x000f) AM_READ_PORT("DSW")
+	AM_RANGE(0x0010, 0x0011) AM_READ_PORT("IN2")
+	AM_RANGE(0x0012, 0x0013) AM_READ_PORT("IN3")
 	AM_RANGE(0x0014, 0x0015) AM_READ(tv_ncf_read1_r )
-
+	AM_RANGE(0x0020, 0x0021) AM_WRITENOP
+	AM_RANGE(0x0030, 0x0035) AM_WRITE(tv_vcf_paletteram_w )
 ADDRESS_MAP_END
+
+
+WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
+{
+/*
+    7654 3210
+    =========
+    ---- xxxx  Coin counter (all mixed).
+    ---x ----  Note counter.
+    xxx- ----  Unknown.
+*/
+//	popmessage("%04x",data);
+	coin_counter_w(machine(), 0, ~data & 0x0f);	// Coins (all)
+	coin_counter_w(machine(), 1, ~data & 0x10);	// Notes (all)
+}
+
+
 
 
 WRITE16_MEMBER(highvdeo_state::tv_tcf_paletteram_w)
@@ -657,33 +689,17 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( nyjoker )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Risk")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Hold 3 / Choose")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Hold 5 / Bet")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Hold 1 / Magic")
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0001, 0x0001, "IN1" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -707,82 +723,50 @@ static INPUT_PORTS_START( nyjoker )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) // Coin 1
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) // Coin 2
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 ) // Coin 3
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 ) // Coin 4 <--- This one has non-timed pulse, so maybe was designed to be KEY IN.
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note 1") PORT_CODE(KEYCODE_1_PAD)	// Note 1
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_NAME("Note 2") PORT_CODE(KEYCODE_2_PAD)	// Note 2
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN7 ) PORT_NAME("Note 3") PORT_CODE(KEYCODE_3_PAD)	// Note 3
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN8 ) PORT_NAME("Note 4") PORT_CODE(KEYCODE_4_PAD)	// Note 4
 
 	PORT_START("IN3")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  PORT_NAME("Bookkeeping")					// Account
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Key")							// Key
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Ticket")   PORT_CODE(KEYCODE_T)	// Ticket
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Unknown")  PORT_CODE(KEYCODE_U)	// Unknown
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Hopper 1") PORT_CODE(KEYCODE_H)	// Hopper 1
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Hopper 2") PORT_CODE(KEYCODE_J)	// Hopper 2
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Level 2")  PORT_CODE(KEYCODE_K)	// Level 2
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Level 1")  PORT_CODE(KEYCODE_L)	// Level 1
 
-	PORT_START("IN4")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_START("DSW")	// DIP switches bank
+	PORT_DIPNAME( 0x0001, 0x0000, "DSW 8" )				PORT_DIPLOCATION("DSW:!8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, "Test Mode" )			PORT_DIPLOCATION("DSW:!7")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, "DSW 6" )				PORT_DIPLOCATION("DSW:!6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, "DSW 5" )				PORT_DIPLOCATION("DSW:!5")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0000, "DSW 4" )				PORT_DIPLOCATION("DSW:!4")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0000, "DSW 3" )				PORT_DIPLOCATION("DSW:!3")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, "DSW 2" )				PORT_DIPLOCATION("DSW:!2")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, "DSW 1" )				PORT_DIPLOCATION("DSW:!1")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1252,21 +1236,23 @@ ROM_START( cfever61 )
 ROM_END
 
 /*
-pcb made in spain video/mpu-5
+  New York Joker...
 
-CPU d70116c 8
-adv476kp35 CMOS Monolithic 256x18 Color Palette RAM-DAC
-Xtal 16Mhz
-oki m6376
-Lattice	isplsi1032e
+  pcb made in spain video/mpu-5
 
-model TV
-vers 2.0
-date 2/99
+  CPU d70116c 8
+  adv476kp35 CMOS Monolithic 256x18 Color Palette RAM-DAC
+  Xtal 16Mhz
+  oki m6376
+  Lattice	isplsi1032e
 
-1 empty socket
+  model TV
+  vers 2.0
+  date 2/99
 
-ny2.ic25 is audio
+  1 empty socket
+  ny2.ic25 is audio
+
 */
 
 ROM_START( nyjoker )
@@ -1274,11 +1260,14 @@ ROM_START( nyjoker )
 	ROM_LOAD16_BYTE( "ni8-2-1.ic8", 0x00001, 0x80000, CRC(81416871) SHA1(c5519b1fcf0131710a8972d9016b8af5f8ac75a1) )
 	ROM_LOAD16_BYTE( "ni7-2-1.ic7", 0x00000, 0x80000, CRC(835b8606) SHA1(a036f8568f0e41eb1f4db7fa41a9cd4b92d41514) )
 
-	ROM_REGION( 0x040000, "boot_prg", 0 ) /*copy for program code*/
+	ROM_REGION( 0x040000, "boot_prg", 0 ) /* copy for program code */
 	ROM_COPY( "user1", 0x0C0000, 0x000000, 0x40000 )
 
 	ROM_REGION( 0x080000, "oki", 0 ) /* M6376 Samples */
 	ROM_LOAD( "ny2.ic25", 0x00000, 0x80000, CRC(eeea7f4d) SHA1(2afc498792f848fd45be4d3eb3e6607edb5dd9df) )
+
+	ROM_REGION( 0x3c00, "nvram", 0 )    /* default NVRAM (to check bounds) */
+	ROM_LOAD( "nyjoker_nvram", 0x0000, 0x3c00, CRC(5ed3d184) SHA1(043ac9ea33676529d02e340891f8447c4497e73e) )
 ROM_END
 
 ROM_START( cfever1k )
@@ -1472,10 +1461,10 @@ GAMEL( 2000, cfever50,  0,      tv_vcf,   tv_vcf, driver_device,   0,       ROT0
 GAMEL( 2000, tour4010,  0,      tv_ncf,   tv_ncf, driver_device,   0,       ROT0,  "High Video", "Tour 4010",         0, layout_fashion )
 GAMEL( 2000, cfever51,  0,      tv_ncf,   tv_ncf, driver_device,   0,       ROT0,  "High Video", "Casino Fever 5.1",  0, layout_fashion )
 GAMEL( 2000, cfever61,  0,      tv_ncf,   tv_ncf, driver_device,   0,       ROT0,  "High Video", "Casino Fever 6.1",  0, layout_fashion )
-GAMEL( 2000, nyjoker,   0,      nyjoker,  nyjoker,driver_device,   0,       ROT0,  "High Video?", "New York Joker",  GAME_NOT_WORKING, layout_fashion ) // todo: fix inputs, output ports
+GAMEL( 2000, nyjoker,   0,      nyjoker,  nyjoker,driver_device,   0,       ROT0,  "High Video", "New York Joker",    0, layout_fashion )
 GAMEL( 2000, cfever1k,  0,      tv_tcf,   tv_tcf, driver_device,   0,       ROT0,  "High Video", "Casino Fever 1k",   0, layout_fashion )
 GAMEL( 2000, girotutt,  0,      tv_tcf,   tv_tcf, driver_device,   0,       ROT0,  "High Video", "GiroTutto",         0, layout_fashion )
-GAMEL( 2000, ciclone,   0,      ciclone,  tv_tcf, highvdeo_state,   ciclone, ROT0,  "High Video", "Ciclone",           0, layout_fashion )
+GAMEL( 2000, ciclone,   0,      ciclone,  tv_tcf, highvdeo_state,  ciclone, ROT0,  "High Video", "Ciclone",           0, layout_fashion )
 GAMEL( 2000, newmcard,  0,      newmcard, tv_tcf, driver_device,   0,       ROT0,  "High Video", "New Magic Card",    0, layout_fashion )
 GAMEL( 2000, brasil,    0,      brasil,   brasil, driver_device,   0,       ROT0,  "High Video", "Bra$il (Version 3)",     0, layout_fashion )
-GAMEL( 2000, fashion,   brasil, brasil,   fashion, highvdeo_state,  fashion, ROT0,  "High Video", "Fashion (Version 2.14)", 0, layout_fashion )
+GAMEL( 2000, fashion,   brasil, brasil,   fashion, highvdeo_state, fashion, ROT0,  "High Video", "Fashion (Version 2.14)", 0, layout_fashion )
