@@ -148,6 +148,8 @@ static void execute_hardreset(running_machine &machine, int ref, int params, con
 static void execute_images(running_machine &machine, int ref, int params, const char **param);
 static void execute_mount(running_machine &machine, int ref, int params, const char **param);
 static void execute_unmount(running_machine &machine, int ref, int params, const char **param);
+static void execute_input(running_machine &machine, int ref, int params, const char **param);
+static void execute_dumpkbd(running_machine &machine, int ref, int params, const char **param);
 
 
 /***************************************************************************
@@ -370,6 +372,9 @@ void debug_command_init(running_machine &machine)
 	debug_console_register_command(machine, "images",   CMDFLAG_NONE, 0, 0, 0, execute_images);
 	debug_console_register_command(machine, "mount",    CMDFLAG_NONE, 0, 2, 2, execute_mount);
 	debug_console_register_command(machine, "unmount",  CMDFLAG_NONE, 0, 1, 1, execute_unmount);
+
+	debug_console_register_command(machine, "input",    CMDFLAG_NONE, 0, 1, 1, execute_input);
+	debug_console_register_command(machine, "dumpkbd",  CMDFLAG_NONE, 0, 0, 1, execute_dumpkbd);
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(debug_command_exit), &machine));
 
@@ -2748,4 +2753,51 @@ static void execute_unmount(running_machine &machine, int ref, int params, const
 	}
 	if (!done)
 		debug_console_printf(machine, "There is no image device :%s\n",param[0]);
+}
+
+
+/*-------------------------------------------------
+    execute_input - debugger command to enter
+    natural keyboard input
+-------------------------------------------------*/
+
+static void execute_input(running_machine &machine, int ref, int params, const char **param)
+{
+	machine.ioport().natkeyboard().post_coded(param[0]);
+}
+
+
+/*-------------------------------------------------
+    execute_dumpkbd - debugger command to natural
+    keyboard codes
+-------------------------------------------------*/
+
+static void execute_dumpkbd(running_machine &machine, int ref, int params, const char **param)
+{
+	// was there a file specified?
+	const char *filename = (params > 0) ? param[0] : NULL;
+	FILE *file = NULL;
+	if (filename != NULL)
+	{
+		// if so, open it
+		file = fopen(filename, "w");
+		if (file == NULL)
+		{
+			debug_console_printf(machine, "Cannot open \"%s\"\n", filename);
+			return;
+		}
+	}
+
+	// loop through all codes
+	astring buffer = machine.ioport().natkeyboard().dump();
+
+	// and output it as appropriate
+	if (file != NULL)
+		fprintf(file, "%s\n", buffer.cstr());
+	else
+		debug_console_printf(machine, "%s\n", buffer.cstr());
+
+	// cleanup
+	if (file != NULL)
+		fclose(file);
 }

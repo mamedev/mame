@@ -853,6 +853,9 @@ public:
 	void frame_update(ioport_port &port, ioport_value &digital);
 	const char *key_name(astring &string, unicode_char ch);
 
+	// debugging
+	astring dump();
+
 private:
 	// internal keyboard code information
 	struct keycode_map_entry
@@ -870,10 +873,6 @@ private:
 	void timer(void *ptr, int param);
 	const char *unicode_to_string(astring &buffer, unicode_char ch);
 	const keycode_map_entry *find_code(unicode_char ch) const;
-
-	// debugger helpers
-	static void execute_input(running_machine &machine, int ref, int params, const char *param[]);
-	static void execute_dumpkbd(running_machine &machine, int ref, int params, const char *param[]);
 
 	// internal state
 	running_machine &       m_machine;              // reference to our machine
