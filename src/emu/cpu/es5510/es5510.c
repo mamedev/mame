@@ -476,6 +476,9 @@ void es5510_device::device_reset() {
   instr_latch = UINT64(0);
   ram_sel = 0;
   host_control = 0;
+  memset(&ram, 0, sizeof(ram_t));
+  memset(&ram_p, 0, sizeof(ram_t));
+  memset(&ram_pp, 0, sizeof(ram_t));
 }
 
 const address_space_config *es5510_device::memory_space_config(address_spacenum spacenum) const {
