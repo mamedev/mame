@@ -118,6 +118,8 @@ private:
 
 	// address space configurations
 	const address_space_config      m_space_config;
+
+	required_memory_region m_region_hd61830;
 };
 
 

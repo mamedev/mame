@@ -110,7 +110,8 @@ hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, d
 		device_memory_interface(mconfig, *this),
 		m_bf(false),
 		m_blink(0),
-		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(hd61830))
+		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(hd61830)),
+		m_region_hd61830(*this, "hd61830")
 {
 	m_shortname = "hd61830";
 }
@@ -478,7 +479,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					addr = 160*7 + (md - 0xe0) * 11 + cl;
 				}
 
-				data = memregion("hd61830")->u8(addr);
+				data = m_region_hd61830->u8(addr);
 			}
 
 			int cursor = m_mcr & MODE_CURSOR;
