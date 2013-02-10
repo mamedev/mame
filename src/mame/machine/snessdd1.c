@@ -37,7 +37,7 @@ UINT8 SDD1_IM::IM_getCodeword(UINT8 *ROM, UINT32 *mmc, const UINT8 code_len)
 
 	if (codeword & 0x80)
 	{
-		codeword |= ROM[SSD1_ADD(m_byte_ptr + 1)] >> (9 - m_bit_count);
+		codeword |= ROM[SSD1_ADD((m_byte_ptr + 1))] >> (9 - m_bit_count);
 		m_bit_count += code_len;
 	}
 
