@@ -152,6 +152,11 @@ public:
 protected:
 	optional_memory_region m_region_cart;
 	required_ioport m_io_p1;
+
+	void vii_blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile);
+	void vii_blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 bitmap_addr, UINT16 *regs);
+	void vii_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr);
+	void vii_blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth);
 };
 
 enum
@@ -225,10 +230,9 @@ static void vii_set_pixel(vii_state *state, UINT32 offset, UINT16 rgb)
 	state->m_screen[offset].b = expand_rgb5_to_rgb8(rgb);
 }
 
-static void vii_blit(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile)
+void vii_state::vii_blit(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile)
 {
-	vii_state *state = machine.driver_data<vii_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	UINT32 h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
 	UINT32 w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
@@ -272,21 +276,21 @@ static void vii_blit(running_machine &machine, bitmap_rgb32 &bitmap, const recta
 
 			if((ctrl & 0x0010) && yy < 240)
 			{
-				xx = (xx - (INT16)state->m_p_rowscroll[yy]) & 0x01ff;
+				xx = (xx - (INT16)m_p_rowscroll[yy]) & 0x01ff;
 			}
 
 			if(xx < 320 && yy < 240)
 			{
-				UINT16 rgb = state->m_p_palette[pal];
+				UINT16 rgb = m_p_palette[pal];
 				if(!(rgb & 0x8000))
 				{
 					if (attr & 0x4000)
 					{
-						vii_mix_pixel(state, xx + 320*yy, rgb);
+						vii_mix_pixel(this, xx + 320*yy, rgb);
 					}
 					else
 					{
-						vii_set_pixel(state, xx + 320*yy, rgb);
+						vii_set_pixel(this, xx + 320*yy, rgb);
 					}
 				}
 			}
@@ -294,7 +298,7 @@ static void vii_blit(running_machine &machine, bitmap_rgb32 &bitmap, const recta
 	}
 }
 
-static void vii_blit_page(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 bitmap_addr, UINT16 *regs)
+void vii_state::vii_blit_page(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 bitmap_addr, UINT16 *regs)
 {
 	UINT32 x0, y0;
 	UINT32 xscroll = regs[0];
@@ -304,7 +308,7 @@ static void vii_blit_page(running_machine &machine, bitmap_rgb32 &bitmap, const 
 	UINT32 tilemap = regs[4];
 	UINT32 palette_map = regs[5];
 	UINT32 h, w, hn, wn;
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	if(!(ctrl & PAGE_ENABLE_MASK))
 	{
@@ -358,19 +362,18 @@ static void vii_blit_page(running_machine &machine, bitmap_rgb32 &bitmap, const 
 			yy = ((h*y0 - yscroll + 0x10) & 0xff) - 0x10;
 			xx = (w*x0 - xscroll) & 0x1ff;
 
-			vii_blit(machine, bitmap, cliprect, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
+			vii_blit(bitmap, cliprect, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
 		}
 	}
 }
 
-static void vii_blit_sprite(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr)
+void vii_state::vii_blit_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth, UINT32 base_addr)
 {
-	vii_state *state = machine.driver_data<vii_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT16 tile, attr;
 	INT16 x, y;
 	UINT32 h, w;
-	UINT32 bitmap_addr = 0x40 * state->m_video_regs[0x22];
+	UINT32 bitmap_addr = 0x40 * m_video_regs[0x22];
 
 	tile = space.read_word((base_addr + 0) << 1);
 	x = space.read_word((base_addr + 1) << 1);
@@ -387,7 +390,7 @@ static void vii_blit_sprite(running_machine &machine, bitmap_rgb32 &bitmap, cons
 		return;
 	}
 
-	if(state->m_centered_coordinates)
+	if(m_centered_coordinates)
 	{
 		x = 160 + x;
 		y = 120 - y;
@@ -402,15 +405,14 @@ static void vii_blit_sprite(running_machine &machine, bitmap_rgb32 &bitmap, cons
 	x &= 0x01ff;
 	y &= 0x01ff;
 
-	vii_blit(machine, bitmap, cliprect, x, y, attr, 0, bitmap_addr, tile);
+	vii_blit(bitmap, cliprect, x, y, attr, 0, bitmap_addr, tile);
 }
 
-static void vii_blit_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth)
+void vii_state::vii_blit_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int depth)
 {
-	vii_state *state = machine.driver_data<vii_state>();
 	UINT32 n;
 
-	if (!(state->m_video_regs[0x42] & 1))
+	if (!(m_video_regs[0x42] & 1))
 	{
 		return;
 	}
@@ -419,7 +421,7 @@ static void vii_blit_sprites(running_machine &machine, bitmap_rgb32 &bitmap, con
 	{
 		//if(space.read_word((0x2c00 + 4*n) << 1))
 		{
-			vii_blit_sprite(machine, bitmap, cliprect, depth, 0x2c00 + 4*n);
+			vii_blit_sprite(bitmap, cliprect, depth, 0x2c00 + 4*n);
 		}
 	}
 }
@@ -434,9 +436,9 @@ UINT32 vii_state::screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	for(i = 0; i < 4; i++)
 	{
-		vii_blit_page(machine(), bitmap, cliprect, i, 0x40 * m_video_regs[0x20], m_video_regs + 0x10);
-		vii_blit_page(machine(), bitmap, cliprect, i, 0x40 * m_video_regs[0x21], m_video_regs + 0x16);
-		vii_blit_sprites(machine(), bitmap, cliprect, i);
+		vii_blit_page(bitmap, cliprect, i, 0x40 * m_video_regs[0x20], m_video_regs + 0x10);
+		vii_blit_page(bitmap, cliprect, i, 0x40 * m_video_regs[0x21], m_video_regs + 0x16);
+		vii_blit_sprites(bitmap, cliprect, i);
 	}
 
 	for(y = 0; y < 240; y++)
