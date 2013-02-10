@@ -518,7 +518,7 @@ READ16_MEMBER(md_rom_elfwor_device::read)
 	if (offset == 0x400002/2)	return 0x0f00;
 	if (offset == 0x400004/2)	return 0xc900;
 	if (offset == 0x400006/2)	return 0x1800;
-	return m_rom[offset];
+	return m_rom[MD_ADDR(offset)];
 }
 
 /*-------------------------------------------------
@@ -531,7 +531,7 @@ READ16_MEMBER(md_rom_smouse_device::read)
 	if (offset == 0x400002/2)	return 0x0f00;
 	if (offset == 0x400004/2)	return 0xaa00;
 	if (offset == 0x400006/2)	return 0xf000;
-	return m_rom[offset];
+	return m_rom[MD_ADDR(offset)];
 }
 
 /*-------------------------------------------------
@@ -544,7 +544,7 @@ READ16_MEMBER(md_rom_yasech_device::read)
 	if (offset == 0x400002/2)	return 0x9800;
 	if (offset == 0x400004/2)	return 0xc900;
 	if (offset == 0x400006/2)	return 0x1800;
-	return m_rom[offset];
+	return m_rom[MD_ADDR(offset)];
 }
 
 /*-------------------------------------------------
@@ -559,7 +559,7 @@ READ16_MEMBER(md_rom_kof98_device::read)
 	if (offset == 0x488880/2)	return 0xaa00;
 	if (offset == 0x4a8820/2)	return 0x0a00;
 	if (offset == 0x4f8820/2)	return 0x0000;
-	return m_rom[offset];
+	return m_rom[MD_ADDR(offset)];
 }
 
 /*-------------------------------------------------
@@ -582,7 +582,7 @@ READ16_MEMBER(md_rom_lion2_device::read)
 {
 	if (offset == 0x400002/2)	return m_prot1_data;
 	if (offset == 0x400006/2)	return m_prot2_data;
-	return m_rom[offset];
+	return m_rom[MD_ADDR(offset)];
 }
 
 WRITE16_MEMBER(md_rom_lion2_device::write)
@@ -677,7 +677,7 @@ READ16_MEMBER(md_rom_mjlov_device::read)
 {
 	if (offset == 0x400000/2)	return 0x9000;
 	if (offset == 0x401000/2)	return 0xd300;
-	return m_rom[offset];
+	return m_rom[MD_ADDR(offset)];
 }
 
 
@@ -689,7 +689,7 @@ READ16_MEMBER(md_rom_sbubl_device::read)
 {
 	if (offset == 0x400000/2)	return 0x5500;
 	if (offset == 0x400002/2)	return 0x0f00;
-	return m_rom[offset];
+	return m_rom[MD_ADDR(offset)];
 }
 
 /*-------------------------------------------------
@@ -701,7 +701,7 @@ READ16_MEMBER(md_rom_soulb_device::read)
 	if (offset == 0x400002/2)	return 0x9800;
 	if (offset == 0x400004/2)	return 0xc900;
 	if (offset == 0x400006/2)	return 0xf000;
-	return m_rom[offset];
+	return m_rom[MD_ADDR(offset)];
 }
 
 /*-------------------------------------------------
@@ -712,7 +712,7 @@ READ16_MEMBER(md_rom_pokestad_device::read)
 {
 	if (offset < 0x8000/2)
 		return m_rom[offset + (m_bank * 0x8000)/2];
-	return m_rom[offset];
+	return m_rom[MD_ADDR(offset)];
 }
 
 WRITE16_MEMBER(md_rom_pokestad_device::write)
@@ -759,7 +759,7 @@ READ16_MEMBER(md_rom_redcl_device::read)
 {
 	if (offset == 0x400000/2)	return 0x55 << 8;
 	if (offset == 0x400004/2)	return -0x56 << 8;
-	return m_rom[offset];
+	return m_rom[MD_ADDR(offset)];
 }
 
 /*-------------------------------------------------
@@ -782,7 +782,7 @@ READ16_MEMBER(md_rom_squir_device::read)
 {
 	if ((offset >= 0x400000/2) && (offset < 0x400008/2))
 		return m_latch;
-	return m_rom[offset];
+	return m_rom[MD_ADDR(offset)];
 }
 
 WRITE16_MEMBER(md_rom_squir_device::write)
