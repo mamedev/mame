@@ -1309,6 +1309,7 @@ DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 		machine().memory().region_free(":fixed");
 		machine().memory().region_alloc(":fixed",size,1, ENDIANNESS_LITTLE);
 		memcpy(memregion("fixed")->base(),image.get_software_region("fixed"),size);
+		m_region_fixed.findit();
 
 		if(image.get_software_region("audiocpu") != NULL)
 		{
@@ -1338,6 +1339,8 @@ DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 		machine().memory().region_free(":sprites");
 		machine().memory().region_alloc(":sprites",size,1, ENDIANNESS_LITTLE);
 		memcpy(machine().root_device().memregion("sprites")->base(),image.get_software_region("sprites"),size);
+		// Reset the reference to the region
+		m_region_sprites.findit();
 		if(image.get_software_region("audiocrypt") != NULL)  // encrypted Z80 code
 		{
 			size = image.get_software_region_length("audiocrypt");

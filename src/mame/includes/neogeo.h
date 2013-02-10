@@ -42,6 +42,9 @@ public:
 		, m_audiocpu(*this, "audiocpu")
 		, m_upd4990a(*this, "upd4990a")
 		, m_region_maincpu(*this, "maincpu")
+		, m_region_sprites(*this, "sprites")
+		, m_region_fixed(*this, "fixed")
+		, m_region_fixedbios(*this, "fixedbios")
 		, m_bank_vectors(*this, NEOGEO_BANK_VECTORS)
 		, m_bank_bios(*this, NEOGEO_BANK_BIOS)
 		, m_bank_cartridge(*this, NEOGEO_BANK_CARTRIDGE)
@@ -262,6 +265,9 @@ public:
 
 protected:
 	required_memory_region m_region_maincpu;
+	required_memory_region m_region_sprites;
+	required_memory_region m_region_fixed;
+	required_memory_region m_region_fixedbios;
 	required_memory_bank m_bank_vectors;
 	required_memory_bank m_bank_bios;
 	optional_memory_bank m_bank_cartridge;  // optional because of neocd
@@ -283,6 +289,8 @@ protected:
 	void _set_audio_cpu_rom_source();
 	void set_audio_cpu_rom_source( UINT8 data );
 	void _set_main_cpu_vector_table_source();
+	void optimize_sprite_data();
+	void draw_fixed_layer( bitmap_rgb32 &bitmap, int scanline );
 };
 
 
