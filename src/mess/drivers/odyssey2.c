@@ -235,33 +235,33 @@ INPUT_PORTS_END
 
 
 /* character sprite colors
-   dark grey, red, green, orange, blue, violet, light grey, white
+   dark grey, red, green, yellow, blue, violet, light grey, white
    dark back / grid colors
-   black, dark blue, dark green, light green, red, violet, orange, light grey
+   black, dark blue, dark green, light green, red, violet, yellow, light grey
    light back / grid colors
-   black, blue, green, light green, red, violet, orange, light grey */
+   black, blue, green, light green, red, violet, yellow, light grey */
 
 const UINT8 odyssey2_colors[] =
 {
 	/* Background,Grid Dim */
-	0x00,0x00,0x00,						// i r g b
-	0x00,0x00,0xcc,   /* Blue */		// i r g B
-	0x00,0xcc,0x00,   /* DK Green */	// i r G b
-	0x00,0x90,0x90,						// i r G B
-	0xcc,0x00,0x00,   /* Red */			// i R g b
-	0xa9,0x00,0xcf,						// i R g B
-	0x82,0x9d,0x00,						// i R G b
-	0xcc,0xcc,0xcc,						// i R G B
+	0x00,0x00,0x00,   /* Black */                                         // i r g b
+	0x13,0x35,0xA5,   /* Blue           - Calibrated To Real VideoPac */  // i r g B
+	0x02,0x70,0x02,   /* Green          - Calibrated To Real VideoPac */  // i r G b	
+	0x38,0x85,0x8C,   /* Blue-Green     - Calibrated To Real VideoPac */  // i r G B
+	0x91,0x00,0x00,   /* Dk Red         - Calibrated To Real VideoPac */  // i R g b
+	0x86,0x49,0xA3,   /* Violet         - Calibrated To Real VideoPac */  // i R g B
+	0x68,0x5A,0x0A,   /* Khaki          - Calibrated To Real VideoPac */  // i R g B
+	0xcc,0xcc,0xcc,   /* Lt Grey */                                       // i R G B
 
 	/* Background,Grid Bright */
-	0x50,0x50,0x50,						// I r g b
-	0x50,0xAE,0xFF,   /* Blue */		// I r g B
-	0x50,0xFF,0x50,   /* Dk Green */	// I r G b
-	0x50,0xfb,0xdb,   /* Lt Grey */		// I r G B
-	0xff,0x50,0x50,   /* Red */			// I R g b
-	0xa9,0x50,0xff,   /* Violet */		// I R g B
-	0xff,0x9b,0x50,   /* Orange */		// I R G b
-	0xFF,0xFF,0xFF,						// I R G B
+	0x5B,0x5B,0x5B,   /* Grey           - Calibrated To Real VideoPac */  // I R g B
+	0x60,0x89,0xDB,   /* Ltr Blue       - Calibrated To Real VideoPac */  // I R g B
+	0x54,0xBF,0x54,   /* Lt Green       - Calibrated To Real VideoPac */  // I R g B
+	0x6B,0xDD,0xF4,   /* Lt Blue        - Calibrated To Real VideoPac */  // I R g b
+	0xE5,0x5E,0x5E,   /* Red            - Calibrated To Real VideoPac */  // I R g b  
+	0xD9,0x83,0xDB,   /* Lt Violet      - Calibrated To Real VideoPac */  // I R g B
+	0xC4,0xBD,0x5C,   /* Lt Yellow      - Calibrated To Real VideoPac */  // I R G b
+	0xFF,0xFF,0xFF,   /* White */                                         // I R G B
 };
 
 
