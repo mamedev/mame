@@ -698,7 +698,7 @@ const wd17xx_interface trs80_wd17xx_interface =
 READ8_MEMBER( trs80_state::trs80_wd179x_r )
 {
 	UINT8 data = 0xff;
-	if (BIT(ioport("CONFIG")->read(), 7))
+	if (BIT(m_io_config->read(), 7))
 		data = wd17xx_status_r(m_fdc, space, offset);
 
 	return data;
@@ -818,21 +818,21 @@ READ8_MEMBER( trs80_state::trs80_keyboard_r )
 	UINT8 result = 0;
 
 	if (offset & 1)
-		result |= ioport("LINE0")->read();
+		result |= m_io_line0->read();
 	if (offset & 2)
-		result |= ioport("LINE1")->read();
+		result |= m_io_line1->read();
 	if (offset & 4)
-		result |= ioport("LINE2")->read();
+		result |= m_io_line2->read();
 	if (offset & 8)
-		result |= ioport("LINE3")->read();
+		result |= m_io_line3->read();
 	if (offset & 16)
-		result |= ioport("LINE4")->read();
+		result |= m_io_line4->read();
 	if (offset & 32)
-		result |= ioport("LINE5")->read();
+		result |= m_io_line5->read();
 	if (offset & 64)
-		result |= ioport("LINE6")->read();
+		result |= m_io_line6->read();
 	if (offset & 128)
-		result |= ioport("LINE7")->read();
+		result |= m_io_line7->read();
 
 	return result;
 }

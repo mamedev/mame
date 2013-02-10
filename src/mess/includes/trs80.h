@@ -35,6 +35,15 @@ public:
 		, m_cass(*this, CASSETTE_TAG)
 		, m_p_videoram(*this, "p_videoram")
 		, m_region_maincpu(*this, "maincpu")
+		, m_io_config(*this, "CONFIG")
+		, m_io_line0(*this, "LINE0")
+		, m_io_line1(*this, "LINE1")
+		, m_io_line2(*this, "LINE2")
+		, m_io_line3(*this, "LINE3")
+		, m_io_line4(*this, "LINE4")
+		, m_io_line5(*this, "LINE5")
+		, m_io_line6(*this, "LINE6")
+		, m_io_line7(*this, "LINE7")
 		, m_bank1(NULL)
 		, m_bank2(NULL)
 		, m_bank3(NULL)
@@ -148,6 +157,15 @@ public:
 
 protected:
 	required_memory_region m_region_maincpu;
+	required_ioport m_io_config;
+	required_ioport m_io_line0;
+	required_ioport m_io_line1;
+	required_ioport m_io_line2;
+	required_ioport m_io_line3;
+	required_ioport m_io_line4;
+	required_ioport m_io_line5;
+	required_ioport m_io_line6;
+	required_ioport m_io_line7;
 	memory_bank *m_bank1;
 	memory_bank *m_bank2;
 	memory_bank *m_bank3;
