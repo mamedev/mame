@@ -15,6 +15,7 @@ mmc[(addr >> 20) & 3] + (addr & 0x0fffff)
 class SDD1_IM //Input Manager
 {
 public:
+	SDD1_IM() {}
 
 	UINT32 m_byte_ptr;
 	UINT8 m_bit_count;
