@@ -6574,6 +6574,29 @@
 		</part>
 	</software>
 
+	<software name="vizastar">
+		<description>VizaStar XL4</description>
+		<year>1984</year>
+		<publisher>Viza</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="vizastar" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+	
+			<dataarea name="roml" size="0x1000">
+				<rom name="v" size="0x1000" crc="d17689a0" sha1="4df4d254d7fae916c473d421515b2b74d77e9fd9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="350952">
+				<rom name="vizastar.g64" size="350952" crc="c4f327ac" sha1="c4d35b895f73d7133a72a5d7642e3a588df5370f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Dummy cartridge entries to allow requirement mappings from c64_flop -->
 	
 	<software name="cpm">
