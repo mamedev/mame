@@ -78,9 +78,8 @@ UINT8 generic_keyboard_device::row_number(UINT8 code)
 
 UINT8 generic_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_line)
 {
-	static ioport_port *const keynames[] = { m_io_kbd0, m_io_kbd1, m_io_kbd2, m_io_kbd3, m_io_kbd4, m_io_kbd5, m_io_kbd6, m_io_kbd7 };
 	int i;
-	UINT8 code;
+	UINT8 code = 0;
 	UINT8 key_code = 0;
 	UINT8 retVal = 0;
 	UINT8 shift = BIT(m_io_kbdc->read(), 1);
@@ -88,7 +87,22 @@ UINT8 generic_keyboard_device::keyboard_handler(UINT8 last_code, UINT8 *scan_lin
 	UINT8 ctrl  = BIT(m_io_kbdc->read(), 0);
 	i = *scan_line;
 	{
-		code = keynames[i]->read();
+		if (i == 0) code = m_io_kbd0->read();
+		else
+		if (i == 1) code = m_io_kbd1->read();
+		else
+		if (i == 2) code = m_io_kbd2->read();
+		else
+		if (i == 3) code = m_io_kbd3->read();
+		else
+		if (i == 4) code = m_io_kbd4->read();
+		else
+		if (i == 5) code = m_io_kbd5->read();
+		else
+		if (i == 6) code = m_io_kbd6->read();
+		else
+		if (i == 7) code = m_io_kbd7->read();
+
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {
