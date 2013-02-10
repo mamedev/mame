@@ -776,15 +776,15 @@ static UINT16 get_video_control( running_machine &machine )
 }
 
 
-static void set_video_control( running_machine &machine, UINT16 data )
+void neogeo_state::set_video_control( UINT16 data )
 {
 	/* this does much more than this, but I'm not sure exactly what */
-	if (VERBOSE) logerror("%s: video control write %04x\n", machine.describe_context(), data);
+	if (VERBOSE) logerror("%s: video control write %04x\n", machine().describe_context(), data);
 
-	set_auto_animation_speed(machine, data >> 8);
-	set_auto_animation_disabled(machine, data & 0x0008);
+	set_auto_animation_speed(machine(), data >> 8);
+	set_auto_animation_disabled(machine(), data & 0x0008);
 
-	neogeo_set_display_position_interrupt_control(machine, data & 0x00f0);
+	neogeo_set_display_position_interrupt_control(data & 0x00f0);
 }
 
 
@@ -825,10 +825,10 @@ WRITE16_MEMBER(neogeo_state::neogeo_video_register_w)
 		case 0x00: set_videoram_offset(machine(), data); break;
 		case 0x01: set_videoram_data(machine(), data); break;
 		case 0x02: set_videoram_modulo(machine(), data); break;
-		case 0x03: set_video_control(machine(), data); break;
-		case 0x04: neogeo_set_display_counter_msb(space, data); break;
-		case 0x05: neogeo_set_display_counter_lsb(space, data); break;
-		case 0x06: neogeo_acknowledge_interrupt(machine(), data); break;
+		case 0x03: set_video_control(data); break;
+		case 0x04: neogeo_set_display_counter_msb(data); break;
+		case 0x05: neogeo_set_display_counter_lsb(data); break;
+		case 0x06: neogeo_acknowledge_interrupt(data); break;
 		case 0x07: break; /* unknown, see get_video_control */
 		}
 	}

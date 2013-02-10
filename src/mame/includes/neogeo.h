@@ -36,8 +36,16 @@ class neogeo_state : public driver_device
 {
 public:
 	neogeo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_save_ram(*this, "save_ram")
+		: driver_device(mconfig, type, tag)
+		, m_save_ram(*this, "save_ram")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_upd4990a(*this, "upd4990a")
+		, m_region_maincpu(*this, "maincpu")
+		, m_bank_vectors(*this, NEOGEO_BANK_VECTORS)
+		, m_bank_bios(*this, NEOGEO_BANK_BIOS)
+		, m_bank_cartridge(*this, NEOGEO_BANK_CARTRIDGE)
+		, m_bank_audio_main(*this, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)
 	{
 		m_has_audio_banking = true;
 		m_is_mvs = true;
@@ -46,6 +54,10 @@ public:
 		m_has_text_bus = true;
 		m_has_ymrom_bus = true;
 		m_has_z80_bus = true;
+		m_bank_audio_cart[0] = NULL;
+		m_bank_audio_cart[1] = NULL;
+		m_bank_audio_cart[2] = NULL;
+		m_bank_audio_cart[3] = NULL;
 	}
 
 	/* memory pointers */
@@ -124,9 +136,10 @@ public:
 	UINT16     m_mslugx_command;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	cpu_device *m_audiocpu;
-	device_t *m_upd4990a;
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<device_t> m_upd4990a;
+
 	DECLARE_WRITE8_MEMBER(audio_cpu_clear_nmi_w);
 	DECLARE_WRITE16_MEMBER(io_control_w);
 	DECLARE_WRITE16_MEMBER(save_ram_w);
@@ -223,9 +236,9 @@ public:
 	virtual void video_start();
 	virtual void video_reset();
 	UINT32 screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void update_interrupts( running_machine &machine );
-	void create_interrupt_timers( running_machine &machine );
-	void start_interrupt_timers( running_machine &machine );
+	void update_interrupts();
+	void create_interrupt_timers();
+	void start_interrupt_timers();
 	TIMER_CALLBACK_MEMBER(display_position_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
 	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
@@ -244,20 +257,38 @@ public:
 	bool m_has_text_bus;
 	bool m_has_ymrom_bus;
 	bool m_has_z80_bus;
+
+	void neogeo_set_main_cpu_bank_address( UINT32 bank_address );
+
+protected:
+	required_memory_region m_region_maincpu;
+	required_memory_bank m_bank_vectors;
+	required_memory_bank m_bank_bios;
+	optional_memory_bank m_bank_cartridge;  // optional because of neocd
+	optional_memory_bank m_bank_audio_main; // optional because of neocd
+	memory_bank *m_bank_audio_cart[4];
+
+	void neogeo_acknowledge_interrupt(UINT16 data);
+	void _set_main_cpu_bank_address();
+	void neogeo_main_cpu_banking_init();
+	void neogeo_audio_cpu_banking_init();
+	void set_audio_cpu_banking();
+	void audio_cpu_bank_select( int region, UINT8 bank );
+	void adjust_display_position_interrupt_timer();
+	void neogeo_set_display_position_interrupt_control(UINT16 data);
+	void neogeo_set_display_counter_msb(UINT16 data);
+	void neogeo_set_display_counter_lsb(UINT16 data);
+	void neogeo_set_main_cpu_vector_table_source( UINT8 data );
+	void set_video_control( UINT16 data );
+	void _set_audio_cpu_rom_source();
+	void set_audio_cpu_rom_source( UINT8 data );
+	void _set_main_cpu_vector_table_source();
 };
 
 
 /*----------- defined in drivers/neogeo.c -----------*/
 
 MACHINE_CONFIG_EXTERN( neogeo_base );
-void neogeo_set_display_position_interrupt_control(running_machine &machine, UINT16 data);
-void neogeo_set_display_counter_msb(address_space &space, UINT16 data);
-void neogeo_set_display_counter_lsb(address_space &space, UINT16 data);
-void neogeo_acknowledge_interrupt(running_machine &machine, UINT16 data);
-void neogeo_set_main_cpu_bank_address(address_space &space, UINT32 bank_address);
-void neogeo_audio_cpu_banking_init( running_machine &machine );
-void neogeo_main_cpu_banking_init( running_machine &machine );
-void neogeo_set_main_cpu_vector_table_source( running_machine &machine, UINT8 data );
 
 /*----------- defined in machine/neocrypt.c -----------*/
 

@@ -257,7 +257,7 @@ static WRITE16_HANDLER( kof99_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(space, bankaddress);
+	space.machine().driver_data<neogeo_state>()->neogeo_set_main_cpu_bank_address(bankaddress);
 }
 
 
@@ -294,7 +294,7 @@ static WRITE16_HANDLER( garou_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(space, bankaddress);
+	space.machine().driver_data<neogeo_state>()->neogeo_set_main_cpu_bank_address(bankaddress);
 }
 
 
@@ -333,7 +333,7 @@ static WRITE16_HANDLER( garouh_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(space, bankaddress);
+	space.machine().driver_data<neogeo_state>()->neogeo_set_main_cpu_bank_address(bankaddress);
 }
 
 
@@ -369,7 +369,7 @@ static WRITE16_HANDLER( mslug3_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(space, bankaddress);
+	space.machine().driver_data<neogeo_state>()->neogeo_set_main_cpu_bank_address(bankaddress);
 }
 
 
@@ -401,7 +401,7 @@ static WRITE16_HANDLER( kof2000_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(space, bankaddress);
+	space.machine().driver_data<neogeo_state>()->neogeo_set_main_cpu_bank_address(bankaddress);
 }
 
 
@@ -550,7 +550,7 @@ static void pvc_write_bankswitch( address_space &space )
 	*(((UINT8 *)state->m_pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff0)) = 0xa0;
 	*(((UINT8 *)state->m_pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff1)) &= 0xfe;
 	*(((UINT8 *)state->m_pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff3)) &= 0x7f;
-	neogeo_set_main_cpu_bank_address(space, bankaddress + 0x100000);
+	state->neogeo_set_main_cpu_bank_address(bankaddress + 0x100000);
 }
 
 
