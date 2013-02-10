@@ -2019,9 +2019,9 @@ void saturn_state::video_update_vdp1( void )
 					stv_clear_framebuffer(m_vdp1.framebuffer_current_draw);
 				}
 				/* TODO: Slam n Jam 96 & Cross Romance doesn't like this, investigate. */
-//				framebuffer_changed = 1;
+				framebuffer_changed = 1;
 			}
-			framebuffer_changed = 1;
+	//		framebuffer_changed = 1;
 			break;
 	}
 	m_vdp1.fbcr_accessed = 0;
