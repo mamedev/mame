@@ -31,8 +31,30 @@ class nightgal_state : public driver_device
 {
 public:
 	nightgal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_comms_ram(*this, "comms_ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_comms_ram(*this, "comms_ram")
+		, m_region_gfx1(*this, "gfx1")
+		, m_io_cr_clear(*this, "CR_CLEAR")
+		, m_io_coins(*this, "COINS")
+		, m_io_pl1_1(*this, "PL1_1")
+		, m_io_pl1_2(*this, "PL1_2")
+		, m_io_pl1_3(*this, "PL1_3")
+		, m_io_pl1_4(*this, "PL1_4")
+		, m_io_pl1_5(*this, "PL1_5")
+		, m_io_pl1_6(*this, "PL1_6")
+		, m_io_pl2_1(*this, "PL2_1")
+		, m_io_pl2_2(*this, "PL2_2")
+		, m_io_pl2_3(*this, "PL2_3")
+		, m_io_pl2_4(*this, "PL2_4")
+		, m_io_pl2_5(*this, "PL2_5")
+		, m_io_pl2_6(*this, "PL2_6")
+		, m_io_system(*this, "SYSTEM")
+		, m_io_sysa(*this, "SYSA")
+		, m_io_dswa(*this, "DSWA")
+		, m_io_dswb(*this, "DSWB")
+		, m_io_dswc(*this, "DSWC")
+
+	{ }
 
 	/* video-related */
 	UINT8 m_blit_raw_data[3];
@@ -81,6 +103,30 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+	required_memory_region m_region_gfx1;
+	required_ioport m_io_cr_clear;
+	required_ioport m_io_coins;
+	required_ioport m_io_pl1_1;
+	required_ioport m_io_pl1_2;
+	required_ioport m_io_pl1_3;
+	required_ioport m_io_pl1_4;
+	required_ioport m_io_pl1_5;
+	required_ioport m_io_pl1_6;
+	required_ioport m_io_pl2_1;
+	required_ioport m_io_pl2_2;
+	required_ioport m_io_pl2_3;
+	required_ioport m_io_pl2_4;
+	required_ioport m_io_pl2_5;
+	required_ioport m_io_pl2_6;
+	required_ioport m_io_system;
+	required_ioport m_io_sysa;
+	required_ioport m_io_dswa;
+	required_ioport m_io_dswb;
+	required_ioport m_io_dswc;
+
+	UINT8 nightgal_gfx_nibble( int niboffset );
 };
 
 
@@ -116,9 +162,9 @@ UINT32 nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static UINT8 nightgal_gfx_nibble( running_machine &machine, int niboffset )
+UINT8 nightgal_state::nightgal_gfx_nibble( int niboffset )
 {
-	UINT8 *blit_rom = machine.root_device().memregion("gfx1")->base();
+	UINT8 *blit_rom = m_region_gfx1->base();
 
 	if (niboffset & 1)
 	{
@@ -178,7 +224,7 @@ WRITE8_MEMBER(nightgal_state::nsc_true_blitter_w)
 				{
 					int drawx = (x + xcount) & 0xff;
 					int drawy = (y + ycount) & 0xff;
-					UINT8 dat = nightgal_gfx_nibble(machine(), src + count);
+					UINT8 dat = nightgal_gfx_nibble(src + count);
 					UINT8 cur_pen_hi = m_pen_data[(dat & 0xf0) >> 4];
 					UINT8 cur_pen_lo = m_pen_data[(dat & 0x0f) >> 0];
 
@@ -233,7 +279,7 @@ WRITE8_MEMBER(nightgal_state::sexygal_nsc_true_blitter_w)
 				{
 					int drawx = (x + xcount) & 0xff;
 					int drawy = (y + ycount) & 0xff;
-					UINT8 dat = nightgal_gfx_nibble(machine(), src + count);
+					UINT8 dat = nightgal_gfx_nibble(src + count);
 					UINT8 cur_pen_hi = m_pen_data[(dat & 0xf0) >> 4];
 					UINT8 cur_pen_lo = m_pen_data[(dat & 0x0f) >> 0];
 
@@ -421,40 +467,40 @@ WRITE8_MEMBER(nightgal_state::mux_w)
 
 READ8_MEMBER(nightgal_state::input_1p_r)
 {
-	UINT8 cr_clear = ioport("CR_CLEAR")->read();
+	UINT8 cr_clear = m_io_cr_clear->read();
 
 	switch (m_mux_data)
 	{
-		case 0x01: return ioport("PL1_1")->read() | cr_clear;
-		case 0x02: return ioport("PL1_2")->read() | cr_clear;
-		case 0x04: return ioport("PL1_3")->read() | cr_clear;
-		case 0x08: return ioport("PL1_4")->read() | cr_clear;
-		case 0x10: return ioport("PL1_5")->read() | cr_clear;
-		case 0x20: return ioport("PL1_6")->read() | cr_clear;
+		case 0x01: return m_io_pl1_1->read() | cr_clear;
+		case 0x02: return m_io_pl1_2->read() | cr_clear;
+		case 0x04: return m_io_pl1_3->read() | cr_clear;
+		case 0x08: return m_io_pl1_4->read() | cr_clear;
+		case 0x10: return m_io_pl1_5->read() | cr_clear;
+		case 0x20: return m_io_pl1_6->read() | cr_clear;
 	}
 	//printf("%04x\n", m_mux_data);
 
-	return (ioport("PL1_1")->read() & ioport("PL1_2")->read() & ioport("PL1_3")->read() &
-			ioport("PL1_4")->read() & ioport("PL1_5")->read() & ioport("PL1_6")->read()) | cr_clear;
+	return (m_io_pl1_1->read() & m_io_pl1_2->read() & m_io_pl1_3->read() &
+			m_io_pl1_4->read() & m_io_pl1_5->read() & m_io_pl1_6->read()) | cr_clear;
 }
 
 READ8_MEMBER(nightgal_state::input_2p_r)
 {
-	UINT8 coin_port = ioport("COINS")->read();
+	UINT8 coin_port = m_io_coins->read();
 
 	switch (m_mux_data)
 	{
-		case 0x01: return ioport("PL2_1")->read() | coin_port;
-		case 0x02: return ioport("PL2_2")->read() | coin_port;
-		case 0x04: return ioport("PL2_3")->read() | coin_port;
-		case 0x08: return ioport("PL2_4")->read() | coin_port;
-		case 0x10: return ioport("PL2_5")->read() | coin_port;
-		case 0x20: return ioport("PL2_6")->read() | coin_port;
+		case 0x01: return m_io_pl2_1->read() | coin_port;
+		case 0x02: return m_io_pl2_2->read() | coin_port;
+		case 0x04: return m_io_pl2_3->read() | coin_port;
+		case 0x08: return m_io_pl2_4->read() | coin_port;
+		case 0x10: return m_io_pl2_5->read() | coin_port;
+		case 0x20: return m_io_pl2_6->read() | coin_port;
 	}
 	//printf("%04x\n", m_mux_data);
 
-	return (ioport("PL2_1")->read() & ioport("PL2_2")->read() & ioport("PL2_3")->read() &
-			ioport("PL2_4")->read() & ioport("PL2_5")->read() & ioport("PL2_6")->read()) | coin_port;
+	return (m_io_pl2_1->read() & m_io_pl2_2->read() & m_io_pl2_3->read() &
+			m_io_pl2_4->read() & m_io_pl2_5->read() & m_io_pl2_6->read()) | coin_port;
 }
 
 /********************************************
