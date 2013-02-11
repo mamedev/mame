@@ -668,19 +668,16 @@ void saturn_state::cd_exec_command( void )
 
 		case 0x4600:    // Set Filter Connection
 			{
+				/* TODO: maybe condition false is cr3 low? */
 				UINT8 fnum = (cr3>>8)&0xff;
 
 				CDROM_LOG(("%s:CD: Set Filter Connection %x => mode %x parm %04x\n", machine.describe_context(), fnum, cr1 & 0xf, cr2))
 
-				// set true condition?
-				if (cr1 & 1)
-				{
+				if (cr1 & 1)	// set true condition
 					filters[fnum].condtrue = (cr2>>8)&0xff;
-				}
-				else if (cr1 & 2)   // set false condition
-				{
+
+				if (cr1 & 2)	// set false condition
 					filters[fnum].condfalse = cr2&0xff;
-				}
 
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);

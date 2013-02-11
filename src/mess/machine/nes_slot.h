@@ -23,7 +23,7 @@ public:
 	// construction/destruction
 	device_nes_cart_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_nes_cart_interface();
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l) { return 0xff; }
 	virtual DECLARE_READ8_MEMBER(read_m) { return 0xff; }
@@ -31,7 +31,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_l) { }
 	virtual DECLARE_WRITE8_MEMBER(write_m) { }
 	virtual DECLARE_WRITE8_MEMBER(write_h) { }
-	
+
 	virtual void prg_alloc(running_machine &machine, size_t size);
 	virtual void prgram_alloc(running_machine &machine, size_t size);
 	virtual void vrom_alloc(running_machine &machine, size_t size);
@@ -39,12 +39,12 @@ public:
 	virtual void battery_alloc(running_machine &machine, size_t size);
 	virtual void mapper_ram_alloc(running_machine &machine, size_t size);
 	virtual void mapper_bram_alloc(running_machine &machine, size_t size);
-	
+
 	virtual int get_mirroring() { return m_mirroring; }
 	virtual void set_mirroring(int val) { m_mirroring = val; }
 	virtual int get_four_screen_vram() { return m_four_screen_vram; }
 	virtual void set_four_screen_vram(int val) { m_four_screen_vram = val; }
-	
+
 	virtual UINT8* get_prg_base() { return m_prg; }
 	virtual UINT8* get_prgram_base() { return m_prgram; }
 	virtual UINT8* get_vrom_base() { return m_vrom; }
@@ -60,9 +60,9 @@ public:
 	virtual UINT32 get_battery_size() { return m_battery_size; }
 	virtual UINT32 get_mapper_ram_size() { return m_mapper_ram_size; }
 	virtual UINT32 get_mapper_bram_size() { return m_mapper_bram_size; }
-	
+
 //private:
-	
+
 	// internal state
 	UINT8      *m_prg;
 	UINT8      *m_prgram;
@@ -71,7 +71,7 @@ public:
 	UINT8      *m_battery;
 	UINT8      *m_mapper_ram;
 	UINT8      *m_mapper_bram;
-	
+
 	UINT32 m_prg_size;
 	UINT32 m_prgram_size;
 	UINT32 m_vrom_size;
@@ -81,7 +81,7 @@ public:
 	UINT32 m_mapper_bram_size;
 
 	int m_mirroring, m_four_screen_vram;
-	bool m_has_battery, m_has_prgram; 
+	bool m_has_battery, m_has_prgram;
 };
 
 extern void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
@@ -98,16 +98,16 @@ public:
 	// construction/destruction
 	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~nes_cart_slot_device();
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete();
-	
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
 	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry);
-	
+
 	virtual iodevice_t image_type() const { return IO_CARTSLOT; }
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 0; }
@@ -119,10 +119,10 @@ public:
 	virtual const char *file_extensions() const { return "nes,unf,unif"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
 	virtual device_image_partialhash_func get_partial_hash() const { return &nes_partialhash; }
-	
+
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_m);
@@ -132,7 +132,7 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_h);
 
 	int get_pcb_id() { return m_pcb_id; };
-	
+
 	// temporarily here
 	int m_chr_open_bus;
 	int m_ce_mask;
@@ -141,7 +141,7 @@ public:
 	int m_vrc_ls_prg_b;
 	int m_vrc_ls_chr;
 	int m_crc_hack;
-	
+
 	virtual int get_chr_open_bus() { return m_chr_open_bus; };
 	virtual int get_ce_mask() { return m_ce_mask; };
 	virtual int get_ce_state() { return m_ce_state; };
@@ -149,9 +149,9 @@ public:
 	virtual int get_vrc_ls_prg_b() { return m_vrc_ls_prg_b; };
 	virtual int get_vrc_ls_chr() { return m_vrc_ls_chr; };
 	virtual int get_crc_hack() { return m_crc_hack; };
-	
+
 	//private:
-	
+
 	device_nes_cart_interface*		m_cart;
 	int m_pcb_id;
 	bool                            m_must_be_loaded;
@@ -189,12 +189,12 @@ public:
 	// construction/destruction
 	nes_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	nes_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	//protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "nes_rom"; }
-	
+
 	// nescart_interface overrides
 //	virtual DECLARE_READ8_MEMBER(read_l);
 //	virtual DECLARE_READ8_MEMBER(read_m);
