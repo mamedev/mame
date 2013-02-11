@@ -864,20 +864,31 @@ UINT8 saturn_state::smpc_th_control_mode(UINT8 pad_n)
 	const char *const padnames[] = { "JOY1", "JOY2" };
 	UINT8 res = 0;
 
-	th = (pad_n == 0) ? ((m_smpc.PDR1>>6) & 1) : ((m_smpc.PDR2>>6) & 1);
+	th = (pad_n == 0) ? ((m_smpc.PDR1>>5) & 3) : ((m_smpc.PDR2>>6) & 3);
 
 	if (LOG_SMPC) printf("SMPC: SH-2 TH control mode, returning pad data %d for phase %d\n",pad_n+1, th);
 
 	switch(th)
 	{
-		case 1:
-			res = th<<7;
+		/* TODO: 3D Lemmings bogusly enables TH Control mode, wants this to return the ID, needs HW tests.  */
+		case 3:
+			res = th<<6;
+			res |= 0x14;
+			res |= machine().root_device().ioport(padnames[pad_n])->read() & 8; // L
+			break;
+		case 2:
+			res = th<<6;
 			//	1 C B Right Left Down Up
 			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>4)) & 0x30); // C & B
 			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>12)) & 0xf);
 			break;
+		case 1:
+			res = th<<6;
+			res |= 0x10;
+			res |= (machine().root_device().ioport(padnames[pad_n])->read()>>4) & 0xf; // R, X, Y, Z
+			break;
 		case 0:
-			res = th<<7;
+			res = th<<6;
 			//  0 Start A 0 0    Down Up
 			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>6)) & 0x30); // Start & A
 			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>12)) & 0x3);
@@ -997,10 +1008,10 @@ WRITE8_MEMBER( saturn_state::saturn_SMPC_w )
 		m_smpc.SF = data & 1; // hand-shake flag
 
 	if(offset == 0x75)  // PDR1
-		m_smpc.PDR1 = (data & m_smpc.DDR1);
+		m_smpc.PDR1 = data & 0x7f;
 
 	if(offset == 0x77)  // PDR2
-		m_smpc.PDR2 = (data & m_smpc.DDR2);
+		m_smpc.PDR2 = data & 0x7f;
 
 	if(offset == 0x79)
 		m_smpc.DDR1 = data & 0x7f;
