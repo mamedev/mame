@@ -47,10 +47,10 @@ public:
 	int             m_select_value;
 
 protected:
-	void            device_start();
-	void            device_reset(void);
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
+	virtual void    device_start();
+	virtual void    device_reset(void);
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
 	tms5220n_device *m_vsp;

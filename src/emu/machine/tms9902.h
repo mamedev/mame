@@ -71,10 +71,10 @@ public:
 	DECLARE_WRITE8_MEMBER( cruwrite );
 
 protected:
-	void    device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	void    device_start();
-	void    device_reset();
-	void    device_stop();
+	virtual void    device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void    device_start();
+	virtual void    device_reset();
+	virtual void    device_stop();
 
 private:
 	void    field_interrupts();

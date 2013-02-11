@@ -44,7 +44,7 @@ public:
 	: device_t(mconfig, type, name, tag, owner, clock) { }
 
 protected:
-	void device_config_complete();
+	virtual void device_config_complete();
 	joyport_device* m_joyport;
 
 private:
@@ -64,8 +64,8 @@ public:
 	void    set_interrupt(int state);
 
 protected:
-	void device_start() { };
-	void device_config_complete();
+	virtual void device_start() { };
+	virtual void device_config_complete();
 
 private:
 	devcb_resolved_write_line   m_interrupt;

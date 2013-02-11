@@ -22,14 +22,14 @@ public:
 	kc_8k_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
-	const rom_entry *device_rom_region() const;
 
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_config_complete() { m_shortname = "kc_8k"; }
-
+	virtual const rom_entry *device_rom_region() const;
+	
 	// kcexp_interface overrides
 	virtual UINT8 module_id_r() { return 0xfb; }
 	virtual void control_w(UINT8 data);

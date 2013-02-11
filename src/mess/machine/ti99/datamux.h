@@ -78,7 +78,7 @@ protected:
 	virtual void device_start(void);
 	virtual void device_stop(void);
 	virtual void device_reset(void);
-	ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const;
 
 private:
 	// Ready line to the CPU

@@ -50,10 +50,10 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 protected:
-	void device_start(void);
-	void device_reset(void);
-	void device_stop(void);
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start(void);
+	virtual void device_reset(void);
+	virtual void device_stop(void);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	void nvram_default();
 	void nvram_read(emu_file &file);

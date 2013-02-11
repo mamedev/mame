@@ -59,7 +59,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// optional information overrides
-	const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const;
 
 	// charset
 	enum

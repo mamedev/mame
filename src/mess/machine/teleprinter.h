@@ -33,7 +33,7 @@ public:
 protected:
 	virtual void term_write(UINT8 data);
 	virtual void device_reset();
-	machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 private:
 	void scroll_line();
 	void write_char(UINT8 data);

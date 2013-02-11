@@ -91,8 +91,8 @@ public:
 	void reset();
 
 protected:
-	void device_start(void);
-	void device_reset(void);
+	virtual void device_start(void);
+	virtual void device_reset(void);
 
 private:
 	devcb_resolved_write_line   m_out_intrq;    // INT line
@@ -121,7 +121,7 @@ private:
 	void    timed_sector_write_request();
 	void    timed_track_request();
 	void    timed_seek_request();
-	void    device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void    device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	UINT8   cylinder_to_ident(int cylinder);
 	int     ident_to_cylinder(UINT8 ident);
 	void    update_id_regs(chrn_id_hd id);

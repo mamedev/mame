@@ -47,11 +47,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( senila );
 
 protected:
-	void device_start(void);
-	void device_reset(void);
-	const rom_entry *device_rom_region(void) const;
-	machine_config_constructor device_mconfig_additions() const;
-	ioport_constructor device_input_ports() const;
+	virtual void device_start(void);
+	virtual void device_reset(void);
+	virtual const rom_entry *device_rom_region(void) const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 private:
 	void        incoming_dtr(int uartind, line_state value);
@@ -119,10 +119,10 @@ public:
 	const option_guide *create_option_guide() const { return NULL; }
 
 protected:
-	void    device_start(void);
+	virtual void    device_start(void);
 	bool    call_load();
 	void    call_unload();
-	void    device_config_complete();
+	virtual void    device_config_complete();
 
 private:
 	int get_index_from_tagname();
@@ -147,10 +147,10 @@ public:
 	const option_guide *create_option_guide() const { return NULL; }
 
 protected:
-	void    device_start(void);
+	virtual void    device_start(void);
 	bool    call_load();
 	void    call_unload();
-	void    device_config_complete();
+	virtual void    device_config_complete();
 };
 
 #endif

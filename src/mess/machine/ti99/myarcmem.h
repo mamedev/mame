@@ -28,10 +28,10 @@ public:
 	void cruwrite(offs_t offset, UINT8 data);
 
 protected:
-	void device_start(void);
-	void device_reset(void);
-	const rom_entry *device_rom_region(void) const;
-	ioport_constructor device_input_ports() const;
+	virtual void device_start(void);
+	virtual void device_reset(void);
+	virtual const rom_entry *device_rom_region(void) const;
+	virtual ioport_constructor device_input_ports() const;
 
 private:
 	int     get_base(int offset);

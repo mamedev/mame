@@ -137,8 +137,8 @@ class tms52xx_device : public device_t, public device_sound_interface
 {
 public:
 	tms52xx_device(const machine_config &mconfig, device_type type,  const char *name, const char *tag, const struct tms5100_coeffs* coeffs, const int var, device_t *owner, UINT32 clock);
-	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	DECLARE_WRITE_LINE_MEMBER( rsq_w );
 	DECLARE_WRITE_LINE_MEMBER( wsq_w );
@@ -150,8 +150,8 @@ public:
 	double time_to_ready();
 
 protected:
-	void device_start();
-	void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 
 private:
 	// Methods

@@ -85,7 +85,7 @@ public:
 	void ack();
 
 protected:
-	void device_start();
+	virtual void device_start();
 
 private:
 	virtual void data_in(int data, int mask);

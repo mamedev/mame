@@ -71,13 +71,13 @@ public:
 private:
 	static const device_timer_id DECREMENTER = 0;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	void timer_reload(void);
 	void field_interrupts(void);
 
-	void device_start(void);
-	void device_stop(void);
-	void device_reset(void);
+	virtual void device_start(void);
+	virtual void device_stop(void);
+	virtual void device_reset(void);
 
 	/* interrupt registers */
 	// mask:  bit #n is set if pin #n is supported as an interrupt pin,

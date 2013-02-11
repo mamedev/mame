@@ -31,11 +31,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( ks_changed );
 
 protected:
-	void device_start();
-	void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 
-	const rom_entry *device_rom_region() const;
-	ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	void nvram_default();
 	void nvram_read(emu_file &file);

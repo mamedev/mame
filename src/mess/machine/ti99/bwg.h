@@ -31,17 +31,17 @@ public:
 	void cruwrite(offs_t offset, UINT8 value);
 
 protected:
-	void device_start(void);
-	void device_reset(void);
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
-	ioport_constructor device_input_ports() const;
+	virtual void device_start(void);
+	virtual void device_reset(void);
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 private:
 	void handle_hold(void);
 	void set_all_geometries(floppy_type_t type);
 	void set_geometry(device_t *drive, floppy_type_t type);
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// Holds the status of the DRQ and IRQ lines.
 	bool            m_DRQ, m_IRQ;

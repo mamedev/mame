@@ -32,13 +32,13 @@ public:
 	void    cruwrite(offs_t offset, UINT8 data);
 
 protected:
-	void device_start(void);
-	void device_reset(void);
-	void device_stop(void);
-	void device_config_complete(void);
-	ioport_constructor device_input_ports() const;
+	virtual void device_start(void);
+	virtual void device_reset(void);
+	virtual void device_stop(void);
+	virtual void device_config_complete(void);
+	virtual ioport_constructor device_input_ports() const;
 
-	machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
 	at29040a_device* m_dsr_eeprom;

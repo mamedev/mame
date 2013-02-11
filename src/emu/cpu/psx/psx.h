@@ -172,7 +172,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_post_load();
-	machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 	// device_execute_interface overrides
 	virtual UINT32 execute_min_cycles() const { return 1; }

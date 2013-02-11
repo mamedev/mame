@@ -30,11 +30,11 @@ public:
 	void    cruwrite(offs_t offset, UINT8 value);
 
 protected:
-	void device_start(void);
-	void device_reset(void);
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
-	ioport_constructor device_input_ports() const;
+	virtual void device_start(void);
+	virtual void device_reset(void);
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 private:
 	UINT16      usbsm_mem_16_r(offs_t offset);

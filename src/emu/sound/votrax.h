@@ -86,7 +86,7 @@ public:
 
 protected:
 	// device-level overrides
-	const rom_entry *device_rom_region() const;
+	virtual const rom_entry *device_rom_region() const;
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_clock_changed();

@@ -13,7 +13,6 @@ public:
 	void setup(line_cb_t int_change_cb, line_cb_t _int_power_cb, line_cb_t _int_nmi_cb);
 
 	DECLARE_ADDRESS_MAP(amap, 32);
-	ioport_constructor device_input_ports() const;
 
 	DECLARE_READ32_MEMBER(ctrl_r);
 	DECLARE_READ32_MEMBER(ctrl2_r);
@@ -31,6 +30,7 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual ioport_constructor device_input_ports() const;
 
 private:
 	enum { FLAG_INT = 0x800000, FLAG_DATA = 0x400000, FLAG_RESET = 0x000200 };

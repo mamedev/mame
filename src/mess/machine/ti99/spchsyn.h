@@ -34,11 +34,11 @@ public:
 	DECLARE_WRITE8_MEMBER( spchrom_read_and_branch );
 
 protected:
-	void            device_start();
-	void            device_reset(void);
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
-	void            device_config_complete();
+	virtual void            device_start();
+	virtual void            device_reset(void);
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void            device_config_complete();
 
 private:
 	tmc0285n_device *m_vsp;

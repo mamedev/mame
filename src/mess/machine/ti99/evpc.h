@@ -40,12 +40,12 @@ public:
 	void    cruwrite(offs_t offset, UINT8 data);
 
 protected:
-	void device_start(void);
-	void device_reset(void);
-	void device_stop(void);
+	virtual void device_start(void);
+	virtual void device_reset(void);
+	virtual void device_stop(void);
 
-	const rom_entry *device_rom_region() const;
-	ioport_constructor device_input_ports() const;
+	virtual const rom_entry *device_rom_region() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	void nvram_default();
 	void nvram_read(emu_file &file);

@@ -113,8 +113,8 @@ public:
 	void clock_in(int state);
 
 protected:
-	void device_start(void);
-	void device_reset(void);
+	virtual void device_start(void);
+	virtual void device_reset(void);
 
 private:
 	bool search_logically_addressed_r(address_space& space, offs_t offset, UINT8 *value, UINT8 mem_mask );

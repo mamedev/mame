@@ -64,8 +64,8 @@ public:
 	void set_genmod(bool set);
 
 protected:
-	void device_start(void);
-	void device_config_complete(void);
+	virtual void device_start(void);
+	virtual void device_config_complete(void);
 
 	virtual machine_config_constructor device_mconfig_additions() const;
 
@@ -103,7 +103,7 @@ public:
 	peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 /*
@@ -115,7 +115,7 @@ public:
 	peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 /*
@@ -127,7 +127,7 @@ public:
 	peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 /*****************************************************************************
@@ -159,8 +159,8 @@ public:
 	device_t*   get_drive(const char* name);
 
 protected:
-	void device_start(void);
-	void device_config_complete(void);
+	virtual void device_start(void);
+	virtual void device_config_complete(void);
 
 private:
 	int get_index_from_tagname();

@@ -69,8 +69,8 @@ public:
 
 protected:
 	// device-level overrides
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();

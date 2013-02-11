@@ -89,9 +89,9 @@ private:
 	// CPU into wait state mode. A timer is set to raise READY again.
 	void clear_ready();
 
-	void device_start(void);
-	void device_reset(void);
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start(void);
+	virtual void device_reset(void);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 };
 
 

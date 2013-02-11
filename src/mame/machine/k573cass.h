@@ -13,7 +13,7 @@ public:
 	konami573cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 protected:
-	void device_start();
+	virtual void device_start();
 
 private:
 	virtual void data_in( int data, int mask );

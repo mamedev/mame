@@ -27,8 +27,8 @@ public:
 	void cruwrite(offs_t offset, UINT8 value);
 
 protected:
-	void device_start();
-	const rom_entry *device_rom_region() const;
+	virtual void device_start();
+	virtual const rom_entry *device_rom_region() const;
 private:
 	UINT8*  m_ram_ptr;
 };

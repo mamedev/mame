@@ -26,7 +26,6 @@ class sega_837_13551 : public jvs_device
 public:
 	sega_837_13551(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	static void static_set_port_tag(device_t &device, int port, const char *tag);
-	ioport_constructor device_input_ports() const;
 
 	DECLARE_WRITE_LINE_MEMBER(jvs13551_coin_1_w);
 	DECLARE_WRITE_LINE_MEMBER(jvs13551_coin_2_w);
@@ -36,6 +35,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
+	virtual ioport_constructor device_input_ports() const;
 
 	// JVS device overrides
 	virtual const char *device_id();

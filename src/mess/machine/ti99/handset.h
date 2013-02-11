@@ -31,11 +31,11 @@ public:
 	void  write_dev(UINT8 data);
 
 protected:
-	void device_start(void);
-	void device_reset(void);
-	ioport_constructor device_input_ports() const;
+	virtual void device_start(void);
+	virtual void device_reset(void);
+	virtual ioport_constructor device_input_ports() const;
 
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
 	void do_task();
@@ -71,13 +71,13 @@ class ti99_twin_joystick : public joyport_attached_device
 public:
 	ti99_twin_joystick(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_READ8_MEMBER( read );
-	void device_start(void);
+	virtual void device_start(void);
 
 	UINT8 read_dev();
 	void  write_dev(UINT8 data);
 
 protected:
-	ioport_constructor device_input_ports() const;
+	virtual ioport_constructor device_input_ports() const;
 
 private:
 	// Which joystick is selected?

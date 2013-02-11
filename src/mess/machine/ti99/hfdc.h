@@ -41,12 +41,12 @@ public:
 	DECLARE_WRITE8_MEMBER( write_buffer );
 
 protected:
-	void device_start(void);
-	void device_reset(void);
-	const rom_entry *device_rom_region() const;
-	machine_config_constructor device_mconfig_additions() const;
-	ioport_constructor device_input_ports() const;
-	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void device_start(void);
+	virtual void device_reset(void);
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 
 private:

@@ -67,7 +67,7 @@ protected:
 		virtual void                    device_reset();
 		virtual void                    device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
-		const rom_entry*                device_rom_region() const;
+		virtual const rom_entry*        device_rom_region() const;
 
 private:
 		void                            set_pc_interrupt(int src, int state);

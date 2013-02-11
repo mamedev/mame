@@ -39,10 +39,10 @@ public:
 	void    cartridge_inserted();
 
 protected:
-	void device_start();
-	void device_reset();
-	void device_config_complete();
-	ioport_constructor device_input_ports() const;
+	virtual void device_start();
+	virtual void device_reset();
+	virtual void device_config_complete();
+	virtual ioport_constructor device_input_ports() const;
 
 private:
 	ti99_cartridge_connector_device*    m_connector;
@@ -78,10 +78,10 @@ public:
 	void    set_slot(int i);
 
 protected:
-	void device_start() { };
-	void device_config_complete();
-	machine_config_constructor device_mconfig_additions() const;
-	const rom_entry* device_rom_region() const;
+	virtual void device_start() { };
+	virtual void device_config_complete();
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry* device_rom_region() const;
 
 	// Image handling: implementation of methods which are abstract in the parent
 	bool call_load();
@@ -150,10 +150,10 @@ public:
 	void cruwrite(offs_t offset, UINT8 data);
 
 protected:
-	void device_start() { };
-	void device_reset();
-	machine_config_constructor device_mconfig_additions() const;
-	void device_config_complete();
+	virtual void device_start() { };
+	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_config_complete();
 
 private:
 	ti99_cartridge_device *m_cartridge;
@@ -182,10 +182,10 @@ public:
 	void remove(int index);
 
 protected:
-	void device_start();
-	void device_reset();
-	machine_config_constructor device_mconfig_additions() const;
-	ioport_constructor device_input_ports() const;
+	virtual void device_start();
+	virtual void device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 private:
 	int     m_active_slot;
@@ -217,12 +217,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER( gk_changed );
 
 protected:
-	void device_start();
-	void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 
-	machine_config_constructor device_mconfig_additions() const;
-	const rom_entry* device_rom_region() const;
-	ioport_constructor device_input_ports() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual const rom_entry* device_rom_region() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	// device_nvram_interface
 	void nvram_default();

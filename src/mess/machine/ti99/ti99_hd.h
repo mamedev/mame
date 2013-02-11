@@ -50,9 +50,9 @@ public:
 	int     get_track_length();
 
 protected:
-	void    device_start();
-	void    device_reset();
-	machine_config_constructor device_mconfig_additions() const;
+	virtual void    device_start();
+	virtual void    device_reset();
+	virtual machine_config_constructor device_mconfig_additions() const;
 
 private:
 	int     find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size_t number);
@@ -73,9 +73,9 @@ class ide_harddisk_device : public device_t
 public:
 	ide_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 protected:
-	void    device_start() { };
-	void    device_reset() { };
-	machine_config_constructor device_mconfig_additions() const;
+	virtual void    device_start() { };
+	virtual void    device_reset() { };
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 #define MCFG_MFMHD_3_DRIVES_ADD()           \

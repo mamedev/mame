@@ -29,9 +29,9 @@ public:
 	line_state  left_button();  // left button is not connected to the V9938 but to a TMS9901 pin
 
 protected:
-	void device_start();
-	void device_reset();
-	ioport_constructor device_input_ports() const;
+	virtual void device_start();
+	virtual void device_reset();
+	virtual ioport_constructor device_input_ports() const;
 
 private:
 	v9938_device*   m_v9938;
@@ -68,12 +68,12 @@ public:
 	UINT8 get_recent_key();
 
 protected:
-	void                        device_start();
-	void                        device_reset();
-	void                        device_config_complete();
-	ioport_constructor          device_input_ports() const;
+	virtual void                        device_start();
+	virtual void                        device_reset();
+	virtual void                        device_config_complete();
+	virtual ioport_constructor          device_input_ports() const;
 	devcb_resolved_write_line   m_interrupt;    // Keyboard interrupt to console
-	void                        device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	virtual void                        device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
 	void    post_in_key_queue(int keycode);
@@ -140,8 +140,8 @@ public:
 	void clock_in(int state);
 
 protected:
-	void    device_start();
-	void    device_reset();
+	virtual void    device_start();
+	virtual void    device_reset();
 
 private:
 	// GROM simulation

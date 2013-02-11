@@ -26,10 +26,11 @@ public:
 	void  write_dev(UINT8 data);
 
 protected:
-	void device_start(void);
-	void device_reset(void);
-	ioport_constructor device_input_ports() const;
-
+	virtual void device_start(void);
+	virtual void device_reset(void);
+	virtual ioport_constructor device_input_ports() const;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
+	
 private:
 	int     m_last_select;
 	bool    m_read_y_axis;
@@ -39,7 +40,6 @@ private:
 	int     m_y_buf;
 	int     m_last_mx;
 	int     m_last_my;
-	void    device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	emu_timer   *m_poll_timer;
 };

@@ -29,8 +29,8 @@ public:
 	void draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, int priority );
 
 protected:
-	void device_start();
-	void device_reset();
+	virtual void device_start();
+	virtual void device_reset();
 
 private:
 	UINT8 regs[8];

@@ -114,7 +114,7 @@ protected:
 	virtual void device_reset();
 
 	// internal callbacks
-	void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 	// internal state
 	void (*m_irq_cb)(device_t *device, int state);

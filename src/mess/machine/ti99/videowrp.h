@@ -62,7 +62,7 @@ public:
 	void    reset_vdp(int state) { m_v9938->reset_line(state); }
 
 protected:
-	void            device_start(void);
+	virtual void    device_start(void);
 	v9938_device    *m_v9938;
 };
 
@@ -97,7 +97,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( sound_ready );   // connect to console READY
 
 protected:
-	void device_start(void);
+	virtual void device_start(void);
 	virtual machine_config_constructor device_mconfig_additions() const =0;
 
 private:
@@ -115,7 +115,7 @@ public:
 	: ti_sound_system_device(mconfig, TISOUND_94624, tag, "Onboard sound (SN94624)", owner, clock) { }
 
 protected:
-	machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 /*
@@ -128,7 +128,7 @@ public:
 	: ti_sound_system_device(mconfig, TISOUND_76496, tag, "Onboard sound (SN76496)", owner, clock) { }
 
 protected:
-	machine_config_constructor device_mconfig_additions() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
 
