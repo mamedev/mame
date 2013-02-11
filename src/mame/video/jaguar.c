@@ -551,7 +551,9 @@ WRITE32_MEMBER( jaguar_state::blitter_w )
 	if ((offset == B_CMD) && (mem_mask & 0x0000ffff))
 	{
 		m_blitter_status = 0;
-		timer_set(attotime::from_usec(100), TID_BLITTER_DONE);
+		int inner_count = m_blitter_regs[B_COUNT] & 0xffff;
+		int outer_count = m_blitter_regs[B_COUNT] >> 16;
+		timer_set(attotime::from_ticks(inner_count * outer_count, JAGUAR_CLOCK), TID_BLITTER_DONE);
 		blitter_run();
 	}
 
