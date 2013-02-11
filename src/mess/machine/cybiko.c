@@ -104,18 +104,6 @@ static int nvram_system_save( running_machine &machine, const char *name, nvram_
 	return TRUE;
 }
 
-static void cybiko_at45dbxx_load(running_machine &machine, emu_file *file)
-{
-	device_t *device = machine.device("flash1");
-	at45dbxx_load(device, file);
-}
-
-static void cybiko_at45dbxx_save(running_machine &machine, emu_file *file)
-{
-	device_t *device = machine.device("flash1");
-	at45dbxx_save(device, file);
-}
-
 static void cybiko_sst39vfx_load(running_machine &machine, emu_file *file)
 {
 	device_t *device = machine.device("flash2");
@@ -165,8 +153,6 @@ static void cybiko_ramdisk_save(running_machine &machine, emu_file *file)
 void cybiko_state::machine_start()
 {
 	_logerror( 0, ("machine_start_cybikov1\n"));
-	// serial dataflash
-	nvram_system_load( machine(), "flash1", cybiko_at45dbxx_load, 1);
 	// serial port
 	cybiko_rs232_init(machine());
 	// other
@@ -178,8 +164,6 @@ MACHINE_START_MEMBER(cybiko_state,cybikov2)
 	device_t *flash2 = machine().device("flash2");
 
 	_logerror( 0, ("machine_start_cybikov2\n"));
-	// serial dataflash
-	nvram_system_load( machine(), "flash1", cybiko_at45dbxx_load, 1);
 	// multi-purpose flash
 	nvram_system_load( machine(), "flash2", cybiko_sst39vfx_load, 1);
 	machine().root_device().membank( "bank2" )->set_base( sst39vfx_get_base(flash2));
@@ -233,8 +217,6 @@ MACHINE_RESET_MEMBER(cybiko_state,cybikoxt)
 void cybiko_state::machine_stop_cybikov1()
 {
 	_logerror( 0, ("machine_stop_cybikov1\n"));
-	// serial dataflash
-	nvram_system_save( machine(), "flash1", cybiko_at45dbxx_save);
 	// serial port
 	cybiko_rs232_exit();
 }
@@ -242,8 +224,6 @@ void cybiko_state::machine_stop_cybikov1()
 void cybiko_state::machine_stop_cybikov2()
 {
 	_logerror( 0, ("machine_stop_cybikov2\n"));
-	// serial dataflash
-	nvram_system_save( machine(), "flash1", cybiko_at45dbxx_save);
 	// multi-purpose flash
 	nvram_system_save( machine(), "flash2", cybiko_sst39vfx_save);
 	// serial port
@@ -402,7 +382,7 @@ READ8_MEMBER( cybiko_state::cybikov1_io_reg_r )
 		// serial dataflash
 		case H8S_IO_PORT3 :
 		{
-			if (at45dbxx_pin_so(m_flash1))
+			if (m_flash1->so_r())
 				data |= H8S_P3_RXD1;
 		}
 		break;
@@ -448,7 +428,7 @@ READ8_MEMBER( cybiko_state::cybikov2_io_reg_r )
 		// serial dataflash
 		case H8S_IO_PORT3 :
 		{
-			if (at45dbxx_pin_so(m_flash1))
+			if (m_flash1->so_r())
 				data |= H8S_P3_RXD1;
 		}
 		break;
@@ -530,9 +510,9 @@ WRITE8_MEMBER( cybiko_state::cybikov1_io_reg_w )
 		// serial dataflash
 		case H8S_IO_P3DR :
 		{
-			at45dbxx_pin_cs (m_flash1, (data & H8S_P3_SCK0) ? 0 : 1);
-			at45dbxx_pin_si (m_flash1, (data & H8S_P3_TXD1) ? 1 : 0);
-			at45dbxx_pin_sck(m_flash1, (data & H8S_P3_SCK1) ? 1 : 0);
+			m_flash1->cs_w ((data & H8S_P3_SCK0) ? 0 : 1);
+			m_flash1->si_w ((data & H8S_P3_TXD1) ? 1 : 0);
+			m_flash1->sck_w((data & H8S_P3_SCK1) ? 1 : 0);
 		}
 		break;
 		// rs232
@@ -571,9 +551,9 @@ WRITE8_MEMBER( cybiko_state::cybikov2_io_reg_w )
 		// serial dataflash
 		case H8S_IO_P3DR :
 		{
-			at45dbxx_pin_cs (m_flash1, (data & H8S_P3_SCK0) ? 0 : 1);
-			at45dbxx_pin_si (m_flash1, (data & H8S_P3_TXD1) ? 1 : 0);
-			at45dbxx_pin_sck(m_flash1, (data & H8S_P3_SCK1) ? 1 : 0);
+			m_flash1->cs_w ((data & H8S_P3_SCK0) ? 0 : 1);
+			m_flash1->si_w ((data & H8S_P3_TXD1) ? 1 : 0);
+			m_flash1->sck_w((data & H8S_P3_SCK1) ? 1 : 0);
 		}
 		break;
 		// rs232

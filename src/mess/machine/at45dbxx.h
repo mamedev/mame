@@ -16,77 +16,127 @@
 #include "emu.h"
 
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
-class at45db041_device : public device_t
-{
-public:
-	at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-	~at45db041_device() { global_free(m_token); }
-
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
-protected:
-	// device-level overrides
-	virtual void device_config_complete();
-	virtual void device_start();
-	virtual void device_reset();
-private:
-	// internal state
-	void *m_token;
-};
-
-extern const device_type AT45DB041;
-
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
 #define MCFG_AT45DB041_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AT45DB041, 0)
-class at45db081_device : public at45db041_device
-{
-public:
-	at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-protected:
-	// device-level overrides
-	virtual void device_start();
-};
-
-extern const device_type AT45DB081;
-
 
 #define MCFG_AT45DB081_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AT45DB081, 0)
-class at45db161_device : public at45db041_device
-{
-public:
-	at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-protected:
-	// device-level overrides
-	virtual void device_start();
-};
-
-extern const device_type AT45DB161;
-
 
 #define MCFG_AT45DB161_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, AT45DB161, 0)
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-// pins
-void at45dbxx_pin_cs(device_t *device, int data);
-void at45dbxx_pin_sck(device_t *device,  int data);
-void at45dbxx_pin_si(device_t *device,  int data);
-int  at45dbxx_pin_so(device_t *device);
 
-// load/save
-void at45dbxx_load(device_t *device, emu_file *file);
-void at45dbxx_save(device_t *device, emu_file *file);
+// ======================> at45db041_device
 
-// non-volatile ram handler
-//NVRAM_HANDLER( at45dbxx );
+class at45db041_device : public device_t,
+							public device_nvram_interface
+{
+public:
+	at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+
+	DECLARE_WRITE_LINE_MEMBER(cs_w);
+	DECLARE_WRITE_LINE_MEMBER(sck_w);
+	DECLARE_WRITE_LINE_MEMBER(si_w);
+	DECLARE_READ_LINE_MEMBER(so_r);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// device_nvram_interface overrides
+	virtual void nvram_default();
+	virtual void nvram_read(emu_file &file);
+	virtual void nvram_write(emu_file &file);
+
+protected:
+	virtual int num_pages() const { return 2048; }
+	virtual int page_size() const { return 264; }
+	virtual UINT8 device_id() const { return 0x18; }
+
+	UINT8 read_byte();
+	void flash_set_io(UINT8* data, UINT32 size, UINT32 pos);
+	virtual UINT32 flash_get_page_addr();
+	virtual UINT32 flash_get_byte_addr();
+	void write_byte(UINT8 data);
+
+	// internal state
+	UINT8 *     m_data;
+	UINT32      m_size;
+	UINT8       m_mode;
+	UINT8       m_status;
+	UINT8 *     m_buffer1;
+	UINT8 *     m_buffer2;
+	UINT8       m_si_byte;
+	UINT8       m_si_bits;
+	UINT8       m_so_byte;
+	UINT8       m_so_bits;
+
+	struct AT45DBXX_PINS
+	{
+		int cs;    // chip select
+		int sck;   // serial clock
+		int si;    // serial input
+		int so;    // serial output
+		int wp;    // write protect
+		int reset; // reset
+		int busy;  // busy
+	} m_pin;
+
+	struct AT45DBXX_IO
+	{
+		UINT8 *data;
+		UINT32 size;
+		UINT32 pos;
+	} m_io;
+
+	struct AT45DBXX_CMD
+	{
+		UINT8 data[8];
+		UINT8 size;
+	} m_cmd;
+};
+
+// ======================> at45db081_device
+
+class at45db081_device : public at45db041_device
+{
+public:
+	at45db081_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual int num_pages() const { return 4096; }
+	virtual int page_size() const { return 264;  }
+	virtual UINT8 device_id() const { return 0x20; }
+
+	virtual UINT32 flash_get_page_addr();
+};
+
+// ======================> at45db161_device
+
+class at45db161_device : public at45db041_device
+{
+public:
+	at45db161_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+protected:
+	virtual int num_pages() const { return 4096; }
+	virtual int page_size() const { return 528;  }
+	virtual UINT8 device_id() const { return 0x28; }
+
+	virtual UINT32 flash_get_page_addr();
+	virtual UINT32 flash_get_byte_addr();
+};
+
+
+// device type definition
+extern const device_type AT45DB041;
+extern const device_type AT45DB081;
+extern const device_type AT45DB161;
 
 #endif
