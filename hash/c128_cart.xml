@@ -12,7 +12,7 @@ Missing dumps:
 
 -->
 	<software name="c128diag">
-		<description>C128 Diagnostic v1.1</description>
+		<description>C128 Diagnostic (v1.1)</description>
 		<year>1987</year>
 		<publisher>Commodore</publisher>
 
@@ -75,8 +75,8 @@ Missing dumps:
 		</part>
 	</software>
 
-	<software name="mach128" supported="no">
-		<description>MACH 128 v.1A</description>
+	<software name="mach128">
+		<description>MACH 128 (v.1A)</description>
 		<year>1985</year>
 		<publisher>Access Software</publisher>
 
@@ -90,15 +90,15 @@ Missing dumps:
 			</dataarea>
 		</part>
 
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="mach_128_utilities.d64" size="174848" crc="5fb309f5" sha1="2f5e6c5c028654500425be7a703ba5d9bf72bdab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mach128_2a" cloneof="mach128" supported="no">
-		<description>MACH 128 v.2A</description>
+	<software name="mach128_2a" cloneof="mach128">
+		<description>MACH 128 (v.2A)</description>
 		<year>1985</year>
 		<publisher>Access Software</publisher>
 
@@ -112,11 +112,33 @@ Missing dumps:
 			</dataarea>
 		</part>
 
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="mach_128_utilities.d64" size="174848" crc="5fb309f5" sha1="2f5e6c5c028654500425be7a703ba5d9bf72bdab" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="vstar128">
+		<description>VizaStar 128: The Information Processor</description>
+		<year>1984</year>
+		<publisher>Viza</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="romh" size="0x2000">
+				<rom name="vizastar 128" size="0x2000" status="nodump" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="vizastar 128.g64" size="333744" crc="f45ef840" sha1="456480c22cb9204c50d8586fe988903fefd52257" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	
 </softwarelist>

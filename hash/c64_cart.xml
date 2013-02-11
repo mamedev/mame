@@ -462,7 +462,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="xl 80 system software.d64" size="174848" crc="7fc45fca" sha1="c8c890ecd826dd9c3b1a1254793f73dc0ef9ef95" offset="0" />
 			</dataarea>
@@ -749,7 +749,7 @@
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="mach5" />
 			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
+			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="mach_5_v1a.bin" size="0x2000" crc="46c0a547" sha1="fb30893f80abb0e7463adbda979e0ebe386022e8" offset="0x0000" />
@@ -764,7 +764,7 @@
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="mach5" />
 			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
+			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="mach_5_v1b_v1.bin" size="0x1000" crc="f1444e48" sha1="4236ad371a5df7046e770b858291b42fe14b8a18" offset="0x0000" />
@@ -779,7 +779,7 @@
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="mach5" />
 			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
+			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="mach_5_v1b_v2.bin" size="0x2000" crc="c320e154" sha1="59de7347b61d39cfd0b89306e9e898b1452d3a20" offset="0x0000" />
@@ -794,7 +794,7 @@
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="mach5" />
 			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
+			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="mach_5_v2a.bin" size="0x2000" crc="8d5b2d06" sha1="2b53dd5d6cf46fd7c90f4e2c4300d5d5bb970014" offset="0x0000" />
@@ -809,10 +809,26 @@
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="mach5" />
 			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
+			<feature name="exrom" value="1" />
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="mach_5_v3a.bin" size="0x2000" crc="c2449aea" sha1="99b702275373480269cde747e774d54ca5d2e1dd" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="m128" cloneof="mach5">
+		<description>M-128 (Arg)</description>
+		<year>1985</year>
+		<publisher>HAL Sociedad Anonima</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="mach5" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="halm128.bin" size="0x2000" crc="ea6b27c0" sha1="63a69db5f64228d51a49d656d52360006382ee1e" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1152,7 +1168,7 @@
 				<rom name="msd cie (telesys) ieee interface.bin" size="0x400" crc="2ff6de42" sha1="f43654fc264d0a6f8229119bf149f1443024d0f5" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="cie utilities.d64" size="174848" status="nodump" offset="0" />
 			</dataarea>
@@ -1433,7 +1449,7 @@
 			</dataarea>
 		</part>
 
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="s'more.d64" size="174848" crc="268eb91b" sha1="c8672643441a6714093382fd018fc3ead722bc5a" offset="0" />
 			</dataarea>
@@ -1604,7 +1620,7 @@
 				<rom name="adventure series - viking raider (1984)(interphase).80" size="0x4000" crc="ed963ee9" sha1="d47a46efa1210ae503e16dd711b5235dccd4f70f" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="vikingraider.d64" size="174848" crc="f3489d8f" sha1="1b85f123d9bab8c2cb7168f5d019427e79073530" offset="0" />
 			</dataarea>
@@ -4854,7 +4870,7 @@
 				<rom name="calc result (1983)(handic software).80" size="0x2000" crc="18fb50c0" sha1="d5a1c81357d4867e5179dec617a8eaff8f8dc38b" offset="0x0000" />
 			</dataarea>
 		</part>
-		<part name="flop" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="calc_result.d64" size="174848" crc="ed84c27b" sha1="b5d6169e4e42701ee4ddef17dbc1049754642a19" offset="0" />
 			</dataarea>
@@ -6477,7 +6493,7 @@
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
 
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="scim64s" />
+			<feature name="slot" value="midisci" />
 			<feature name="game" value="0" />
 			<feature name="exrom" value="0" />
 
@@ -6575,7 +6591,7 @@
 	</software>
 
 	<software name="vizastar">
-		<description>VizaStar XL4</description>
+		<description>VizaStar 64: The Information Processor (XL4)</description>
 		<year>1984</year>
 		<publisher>Viza</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
@@ -6592,7 +6608,29 @@
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="350952">
-				<rom name="vizastar.g64" size="350952" crc="c4f327ac" sha1="c4d35b895f73d7133a72a5d7642e3a588df5370f" offset="0" />
+				<rom name="vizastar 64 xl4.g64" size="350952" crc="c4f327ac" sha1="c4d35b895f73d7133a72a5d7642e3a588df5370f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vizastar8" cloneof="vizastar">
+		<description>VizaStar 64: The Information Processor (XL8)</description>
+		<year>1984</year>
+		<publisher>Viza</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="vizastar xl8" size="0x2000" crc="a1e961c9" sha1="d1f2eb048ea2db005f6fb00e88030b7b42b28499" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="vizastar 64 xl8.d64" status="nodump" size="174848" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -6618,6 +6656,18 @@
 
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="sfxse" />
+			<dataarea name="roml" size="0x2000">
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="midipp">
+		<description>Passport MIDI Interface (MH-01C)</description>
+		<year>1984</year>
+		<publisher>Passport Designs</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="midipp" />
 			<dataarea name="roml" size="0x2000">
 			</dataarea>
 		</part>

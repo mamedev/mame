@@ -712,6 +712,19 @@
 		</part>
 	</software>
 
+	<software name="sfxsea">
+		<description>SFX Sound Expander (MIDI)</description>
+		<year>1987</year>
+		<publisher>Music Sales</publisher>
+		<sharedfeat name="requirement" value="c64_cart:sfxse"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="sfxse.d64" size="174848" crc="7eec5794" sha1="86c9413fc5f48735520b7714e9777a202843bc9e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="1660demo">
 		<description>Commodore Modem 300 Test/Demo Diskette</description>
 		<year>198?</year>
@@ -881,6 +894,20 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="turbo232.d64" size="174848" crc="48874d98" sha1="28b6d25bb0b62df81c4b17d9205c059c6736e817" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midi8p">
+		<description>MIDI 8+</description>
+		<year>1984</year>
+		<publisher>Passport Designs</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+		<sharedfeat name="requirement" value="c64_cart:midipp"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="midi8+.g64" size="333744" crc="294921f7" sha1="376f7b91feb7709f9169aa1a9f297d3678e2d97a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
