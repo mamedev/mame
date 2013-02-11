@@ -1,6 +1,8 @@
 #ifndef __MMC_H
 #define __MMC_H
 
+#include "video/ppu2c0x.h"
+
 /* Boards */
 enum
 {
@@ -109,7 +111,7 @@ enum
 
 // these are used to setup the proper PCB ID, for each supported type of files
 int nes_get_pcb_id(running_machine &machine, const char *feature);  // for softlist
-void unif_mapr_setup(running_machine &machine, const char *board);  // for UNIF files
+void unif_mapr_setup(const char *board, int *pcb_id, int *battery, int *prgram, int *vram_chunks);   // for UNIF files
 int nes_get_mmc_id(running_machine &machine, int mapper);   // for iNES files
 
 // these are used to setup handlers and callbacks necessary to the emulation (resp. at start and reset)
@@ -609,7 +611,5 @@ public:
 	void set_nt_mirroring(int mirroring);
 
 };
-
-
 
 #endif

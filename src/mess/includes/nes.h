@@ -10,6 +10,7 @@
 #define NES_H_
 
 #include "includes/nes_mmc.h"
+#include "machine/nes_slot.h"
 
 
 /***************************************************************************
@@ -54,7 +55,9 @@ class nes_state : public nes_carts_state
 {
 public:
 	nes_state(const machine_config &mconfig, device_type type, const char *tag)
-	: nes_carts_state(mconfig, type, tag) { }
+		: nes_carts_state(mconfig, type, tag),
+		m_cartslot(*this, "nes_slot")
+	{ }
 
 	/* input_related - this part has to be cleaned up (e.g. in_2 and in_3 are not really necessary here...) */
 	nes_input m_in_0, m_in_1, m_in_2, m_in_3;
@@ -74,8 +77,6 @@ public:
 	DECLARE_READ8_MEMBER(nes_chr_r);
 	DECLARE_WRITE8_MEMBER(nes_nt_w);
 	DECLARE_READ8_MEMBER(nes_nt_r);
-	DECLARE_WRITE8_MEMBER(nes_low_mapper_w);
-	DECLARE_READ8_MEMBER(nes_low_mapper_r);
 
 	/* misc */
 	write8_delegate   m_mmc_write_low;
@@ -114,7 +115,6 @@ public:
 	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
 	DECLARE_DRIVER_INIT(famicom);
 	virtual void machine_start();
-	virtual void machine_stop();
 	virtual void machine_reset();
 	virtual void video_start();
 	virtual void video_reset();
@@ -126,7 +126,6 @@ public:
 	DECLARE_WRITE8_MEMBER(psg_4015_w);
 	DECLARE_WRITE8_MEMBER(psg_4017_w);
 	void nes_banks_restore();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(nes_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(nes_disk);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER(nes_disk);
 
@@ -144,16 +143,18 @@ public:
 	ioport_port       *m_io_zapper2_y;
 	ioport_port       *m_io_paddle;
 
+	optional_device<nes_cart_slot_device> m_cartslot;	//mandatory
+
 private:
 	/* devices */
 //  cpu_device        *m_maincpu;
 //  ppu2c0x_device    *m_ppu;
 //  device_t          *m_sound;
-	device_t          *m_cart;
 //  emu_timer         *m_irq_timer;
 	memory_bank       *m_prg_bank_mem[5];
 };
 
+	
 /*----------- defined in machine/nes.c -----------*/
 
 

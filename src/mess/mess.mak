@@ -1417,6 +1417,7 @@ $(MESSOBJ)/next.a:              \
 
 $(MESSOBJ)/nintendo.a:          \
 	$(MESS_MACHINE)/nes_mmc.o   \
+	$(MESS_MACHINE)/nes_slot.o  \
 	$(MESS_VIDEO)/nes.o         \
 	$(MESS_MACHINE)/nes.o       \
 	$(MESS_DRIVERS)/nes.o       \

@@ -158,25 +158,20 @@ const unif *nes_unif_lookup( const char *board )
 
  *************************************************************/
 
-void unif_mapr_setup( running_machine &machine, const char *board )
+void unif_mapr_setup( const char *board, int *pcb_id, int *battery, int *prgram, int *vram_chunks )
 {
-	nes_state *state = machine.driver_data<nes_state>();
-	const unif *unif_board = nes_unif_lookup(board);
-
-	logerror("%s\n", board);
-
+	const unif *unif_board = nes_unif_lookup(board);		
 	if (unif_board == NULL)
 		fatalerror("Unknown UNIF board %s.\n", board);
-
-	state->m_pcb_id = unif_board->board_idx;
-	state->m_battery = unif_board->nvwram;  // we should implement battery banks based on the size of this...
-	state->m_battery_size = NES_BATTERY_SIZE; // FIXME: we should allow for smaller battery!
-	state->m_prg_ram = unif_board->wram;    // we should implement WRAM banks based on the size of this...
-
+	
+	*pcb_id = unif_board->board_idx;
+	*battery = unif_board->nvwram;	// we should implement battery banks based on the size of this...
+	*prgram = unif_board->wram;	// we should implement WRAM banks based on the size of this...
+	
 	if (unif_board->chrram <= CHRRAM_8)
-		state->m_vram_chunks = 1;
+		*vram_chunks = 1;
 	else if (unif_board->chrram == CHRRAM_16)
-		state->m_vram_chunks = 2;
+		*vram_chunks = 2;
 	else if (unif_board->chrram == CHRRAM_32)
-		state->m_vram_chunks = 4;
+		*vram_chunks = 4;
 }

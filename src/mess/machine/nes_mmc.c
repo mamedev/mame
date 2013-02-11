@@ -209,24 +209,6 @@ READ8_MEMBER(nes_state::nes_nt_r)
 	return m_nt_page[page].access[offset & 0x3ff];
 }
 
-WRITE8_MEMBER(nes_state::nes_low_mapper_w)
-{
-	if (!m_mmc_write_low.isnull())
-		(m_mmc_write_low)(space, offset, data, mem_mask);
-	else
-		logerror("Unimplemented LOW mapper write, offset: %04x, data: %02x\n", offset + 0x4100, data);
-}
-
-READ8_MEMBER(nes_state::nes_low_mapper_r)
-{
-	if (!m_mmc_read_low.isnull())
-		return (m_mmc_read_low)(space, offset, mem_mask);
-	else
-		logerror("Unimplemented LOW mapper read, offset: %04x\n", offset + 0x4100);
-
-	return 0;
-}
-
 /*************************************************************
 
     Helpers to handle MMC
