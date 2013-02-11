@@ -93,19 +93,54 @@ class amstrad_state : public driver_device
 {
 public:
 	amstrad_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ay(*this, "ay"),
-			m_fdc(*this, "upd765"),
-			m_crtc(*this, "mc6845"),
-			m_screen(*this, "screen"),
-			m_ppi(*this, "ppi8255"),
-			m_centronics(*this, "centronics"),
-			m_cassette(*this, CASSETTE_TAG),
-			m_ram(*this, RAM_TAG),
-			m_exp(*this, "exp"),
-			m_rtc(*this, "rtc")
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ay(*this, "ay")
+		, m_fdc(*this, "upd765")
+		, m_crtc(*this, "mc6845")
+		, m_screen(*this, "screen")
+		, m_ppi(*this, "ppi8255")
+		, m_centronics(*this, "centronics")
+		, m_cassette(*this, CASSETTE_TAG)
+		, m_ram(*this, RAM_TAG)
+		, m_exp(*this, "exp")
+		, m_rtc(*this, "rtc")
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_user1(*this, "user1")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_bank5(*this, "bank5")
+		, m_bank6(*this, "bank6")
+		, m_bank7(*this, "bank7")
+		, m_bank8(*this, "bank8")
+		, m_bank9(*this, "bank9")
+		, m_bank10(*this, "bank10")
+		, m_bank11(*this, "bank11")
+		, m_bank12(*this, "bank12")
+		, m_bank13(*this, "bank13")
+		, m_bank14(*this, "bank14")
+		, m_bank15(*this, "bank15")
+		, m_bank16(*this, "bank16")
+		, m_io_keyboard_row_0(*this, "keyboard_row_0")
+		, m_io_keyboard_row_1(*this, "keyboard_row_1")
+		, m_io_keyboard_row_2(*this, "keyboard_row_2")
+		, m_io_keyboard_row_3(*this, "keyboard_row_3")
+		, m_io_keyboard_row_4(*this, "keyboard_row_4")
+		, m_io_keyboard_row_5(*this, "keyboard_row_5")
+		, m_io_keyboard_row_6(*this, "keyboard_row_6")
+		, m_io_keyboard_row_7(*this, "keyboard_row_7")
+		, m_io_keyboard_row_8(*this, "keyboard_row_8")
+		, m_io_keyboard_row_9(*this, "keyboard_row_9")
+		, m_io_keyboard_row_10(*this, "keyboard_row_10")
+		, m_io_solder_links(*this, "solder_links")
+		, m_io_green_display(*this, "green_display")
+		, m_io_analog1(*this, "analog1")
+		, m_io_analog2(*this, "analog2")
+		, m_io_analog3(*this, "analog3")
+		, m_io_analog4(*this, "analog4")
+	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8910_device> m_ay;
@@ -193,6 +228,67 @@ public:
 	IRQ_CALLBACK_MEMBER(amstrad_cpu_acknowledge_int);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( amstrad_plus_cartridge );
+
+	void amstrad_handle_snapshot(unsigned char *pSnapshot);
+	void amstrad_rethinkMemory();
+
+protected:
+	required_memory_region m_region_maincpu;
+	optional_memory_region m_region_user1;
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	required_memory_bank m_bank4;
+	required_memory_bank m_bank5;
+	required_memory_bank m_bank6;
+	required_memory_bank m_bank7;
+	required_memory_bank m_bank8;
+	required_memory_bank m_bank9;
+	required_memory_bank m_bank10;
+	required_memory_bank m_bank11;
+	required_memory_bank m_bank12;
+	required_memory_bank m_bank13;
+	required_memory_bank m_bank14;
+	required_memory_bank m_bank15;
+	required_memory_bank m_bank16;
+	required_ioport m_io_keyboard_row_0;
+	required_ioport m_io_keyboard_row_1;
+	required_ioport m_io_keyboard_row_2;
+	required_ioport m_io_keyboard_row_3;
+	required_ioport m_io_keyboard_row_4;
+	required_ioport m_io_keyboard_row_5;
+	required_ioport m_io_keyboard_row_6;
+	required_ioport m_io_keyboard_row_7;
+	required_ioport m_io_keyboard_row_8;
+	required_ioport m_io_keyboard_row_9;
+	optional_ioport m_io_keyboard_row_10;
+	required_ioport m_io_solder_links;
+	required_ioport m_io_green_display;
+	optional_ioport m_io_analog1;
+	optional_ioport m_io_analog2;
+	optional_ioport m_io_analog3;
+	optional_ioport m_io_analog4;
+
+	void amstrad_init_lookups();
+	void amstrad_vh_update_mode();
+	void amstrad_plus_dma_parse(int channel);
+	void amstrad_plus_handle_dma();
+	void amstrad_vh_update_colour(int PenIndex, UINT16 hw_colour_index);
+	void aleste_vh_update_colour(int PenIndex, UINT16 hw_colour_index);
+	void amstrad_gate_array_get_video_data();
+	void amstrad_update_video();
+	void amstrad_plus_gate_array_get_video_data();
+	void amstrad_plus_update_video();
+	void amstrad_plus_update_video_sprites();
+	void amstrad_setLowerRom();
+	void amstrad_setUpperRom();
+	void AmstradCPC_GA_SetRamConfiguration();
+	void AmstradCPC_PALWrite(int data);
+	void amstrad_GateArray_write(UINT8 dataToGateArray);
+	void amstrad_reset_machine();
+	void kccomp_reset_machine();
+	void update_psg();
+	void amstrad_common_init();
 };
 
 

@@ -293,7 +293,7 @@ INPUT_PORTS_END
 /* Steph 2000-10-27 I remapped the 'Machine Name' Dip Switches (easier to understand) */
 INPUT_CHANGED_MEMBER(amstrad_state::cpc_monitor_changed)
 {
-	if ( (machine().root_device().ioport("green_display")->read()) & 0x01 )
+	if ( (m_io_green_display->read()) & 0x01 )
 	{
 		PALETTE_INIT_CALL_MEMBER( amstrad_cpc_green );
 	}
