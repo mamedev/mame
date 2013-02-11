@@ -431,13 +431,13 @@ static void dsp_operation(address_space &space)
 		case 0x2:   /* OR */
 			i3 = dsp_reg.acl.si | dsp_reg.pl.si;
 			dsp_reg.alu = (UINT64)(UINT32)i3;
+			SET_C(0);
+			SET_S(i3 < 0);
 			/* TODO: Croc and some early Psygnosis games wants Z to be 1 when the result of this one is negative.
 			         Needs HW tests ... */
 			if(i3 < 0)
 				i3 = 0;
 			SET_Z(i3 == 0);
-			SET_C(0);
-			SET_S(i3 < 0);
 			break;
 		case 0x3:   /* XOR */
 			i3 = dsp_reg.acl.si ^ dsp_reg.pl.si;
