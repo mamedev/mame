@@ -435,7 +435,19 @@ void am9517a_device::device_start()
 	}
 
 	// state saving
+	save_item(NAME(m_msb));
+	save_item(NAME(m_hreq));
+	save_item(NAME(m_hack));
+	save_item(NAME(m_ready));
+	save_item(NAME(m_eop));
 	save_item(NAME(m_state));
+	save_item(NAME(m_current_channel));
+	save_item(NAME(m_last_channel));
+	save_item(NAME(m_command));
+	save_item(NAME(m_mask));
+	save_item(NAME(m_status));
+	save_item(NAME(m_temp));
+	save_item(NAME(m_request));
 }
 
 
