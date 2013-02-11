@@ -89,15 +89,15 @@ extern void nes_partialhash(hash_collection &dest, const unsigned char *data, un
 
 // ======================> nes_cart_slot_device
 
-class base_nes_cart_slot_device : public device_t,
+class nes_cart_slot_device : public device_t,
 								public nes_cart_interface,
 								public device_image_interface,
 								public device_slot_interface
 {
 public:
 	// construction/destruction
-	base_nes_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~base_nes_cart_slot_device();
+	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	virtual ~nes_cart_slot_device();
 	
 	// device-level overrides
 	virtual void device_start();
@@ -112,7 +112,8 @@ public:
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 0; }
 	virtual bool is_creatable() const { return 0; }
-	virtual bool must_be_loaded() const { return 1; }
+	virtual bool must_be_loaded() const { return m_must_be_loaded; }
+	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
 	virtual bool is_reset_on_load() const { return 0; }
 	virtual const char *image_interface() const { return "nes_cart"; }
 	virtual const char *file_extensions() const { return "nes,unf,unif"; }
@@ -153,33 +154,11 @@ public:
 	
 	device_nes_cart_interface*		m_cart;
 	int m_pcb_id;
+	bool                            m_must_be_loaded;
 };
-
-// ======================> nes_cart_slot_device
-
-class nes_cart_slot_device :  public base_nes_cart_slot_device
-{
-public:
-	// construction/destruction
-	nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual bool must_be_loaded() const { return 1; }
-};
-
-
-// ======================> fc_cart_slot_device
-
-class fc_cart_slot_device :  public base_nes_cart_slot_device
-{
-public:
-	// construction/destruction
-	fc_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual bool must_be_loaded() const { return 0; }
-};
-
 
 // device type definition
 extern const device_type NES_CART_SLOT;
-extern const device_type FC_CART_SLOT;	// same but not mandatory
 
 
 /***************************************************************************
@@ -191,10 +170,8 @@ extern const device_type FC_CART_SLOT;	// same but not mandatory
 	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
-#define MCFG_FC_CARTRIDGE_ADD(_tag,_config,_slot_intf,_def_slot,_def_inp) \
-	MCFG_DEVICE_ADD(_tag, FC_CART_SLOT, 0) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+#define MCFG_NES_CARTRIDGE_NOT_MANDATORY                                     \
+	static_cast<nes_cart_slot_device *>(device)->set_must_be_loaded(FALSE);
 
 
 // CART DEVICE [TO BE MOVED TO SEPARATE SOURCE LATER]

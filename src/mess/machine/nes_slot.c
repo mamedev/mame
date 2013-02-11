@@ -9,7 +9,6 @@
 //**************************************************************************
 
 const device_type NES_CART_SLOT = &device_creator<nes_cart_slot_device>;
-const device_type FC_CART_SLOT = &device_creator<fc_cart_slot_device>;
 
 
 //**************************************************************************
@@ -121,10 +120,10 @@ void device_nes_cart_interface::mapper_bram_alloc(running_machine &machine, size
 //**************************************************************************
 
 //-------------------------------------------------
-//  base_nes_cart_slot_device - constructor
+//  nes_cart_slot_device - constructor
 //-------------------------------------------------
-base_nes_cart_slot_device::base_nes_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-						device_t(mconfig, type, name, tag, owner, clock),
+nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+						device_t(mconfig, NES_CART_SLOT, "NES Cartridge Slot", tag, owner, clock),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_chr_open_bus(0),
@@ -133,25 +132,16 @@ base_nes_cart_slot_device::base_nes_cart_slot_device(const machine_config &mconf
 						m_vrc_ls_prg_a(0),
 						m_vrc_ls_prg_b(0),
 						m_vrc_ls_chr(0),
-						m_crc_hack(0)
-{
-}
-
-nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						base_nes_cart_slot_device(mconfig, NES_CART_SLOT, "NES Cartridge Slot", tag, owner, clock)
-{
-}
-
-fc_cart_slot_device::fc_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-						base_nes_cart_slot_device(mconfig, FC_CART_SLOT, "FC Cartridge Slot", tag, owner, clock)
+						m_crc_hack(0),
+						m_must_be_loaded(1)
 {
 }
 
 //-------------------------------------------------
-//  base_nes_cart_slot_device - destructor
+//  nes_cart_slot_device - destructor
 //-------------------------------------------------
 
-base_nes_cart_slot_device::~base_nes_cart_slot_device()
+nes_cart_slot_device::~nes_cart_slot_device()
 {
 }
 
@@ -159,7 +149,7 @@ base_nes_cart_slot_device::~base_nes_cart_slot_device()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void base_nes_cart_slot_device::device_start()
+void nes_cart_slot_device::device_start()
 {
 	m_cart = dynamic_cast<device_nes_cart_interface *>(get_card_device());
 }
@@ -170,7 +160,7 @@ void base_nes_cart_slot_device::device_start()
 //  complete
 //-------------------------------------------------
 
-void base_nes_cart_slot_device::device_config_complete()
+void nes_cart_slot_device::device_config_complete()
 {
 	// inherit a copy of the static data
 //	const nes_cart_interface *intf = reinterpret_cast<const nes_cart_interface *>(static_config());
@@ -243,7 +233,7 @@ static int nes_cart_get_line( const char *feature )
 #define SPLIT_PRG   0
 #define SPLIT_CHR   0
 
-bool base_nes_cart_slot_device::call_load()
+bool nes_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
@@ -1120,7 +1110,7 @@ bool base_nes_cart_slot_device::call_load()
  call_unloadload
  -------------------------------------------------*/
 
-void base_nes_cart_slot_device::call_unload()
+void nes_cart_slot_device::call_unload()
 {
 	if (m_cart->get_battery_size())
 		battery_save(m_cart->get_battery_base(), m_cart->get_battery_size());
@@ -1133,7 +1123,7 @@ void base_nes_cart_slot_device::call_unload()
  call softlist load
  -------------------------------------------------*/
 
-bool base_nes_cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
+bool nes_cart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
 {
 	load_software_part_region(this, swlist, swname, start_entry );
 	return TRUE;
@@ -1143,7 +1133,7 @@ bool base_nes_cart_slot_device::call_softlist_load(char *swlist, char *swname, r
  get default card software
  -------------------------------------------------*/
 
-const char * base_nes_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
+const char * nes_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
 {
 	return software_get_default_slot(config, options, this, "rom");
 }
@@ -1153,7 +1143,7 @@ const char * base_nes_cart_slot_device::get_default_card_software(const machine_
  read
  -------------------------------------------------*/
 
-READ8_MEMBER(base_nes_cart_slot_device::read_l)
+READ8_MEMBER(nes_cart_slot_device::read_l)
 {
 	if (m_cart)
 		return m_cart->read_l(space, offset);
@@ -1161,7 +1151,7 @@ READ8_MEMBER(base_nes_cart_slot_device::read_l)
 		return 0xff;
 }
 
-READ8_MEMBER(base_nes_cart_slot_device::read_m)
+READ8_MEMBER(nes_cart_slot_device::read_m)
 {
 	if (m_cart)
 		return m_cart->read_m(space, offset);
@@ -1169,7 +1159,7 @@ READ8_MEMBER(base_nes_cart_slot_device::read_m)
 		return 0xff;
 }
 
-READ8_MEMBER(base_nes_cart_slot_device::read_h)
+READ8_MEMBER(nes_cart_slot_device::read_h)
 {
 	if (m_cart)
 		return m_cart->read_h(space, offset);
@@ -1182,19 +1172,19 @@ READ8_MEMBER(base_nes_cart_slot_device::read_h)
  write
  -------------------------------------------------*/
 
-WRITE8_MEMBER(base_nes_cart_slot_device::write_l)
+WRITE8_MEMBER(nes_cart_slot_device::write_l)
 {
 	if (m_cart)
 		m_cart->write_l(space, offset, data);
 }
 
-WRITE8_MEMBER(base_nes_cart_slot_device::write_m)
+WRITE8_MEMBER(nes_cart_slot_device::write_m)
 {
 	if (m_cart)
 		m_cart->write_m(space, offset, data);
 }
 
-WRITE8_MEMBER(base_nes_cart_slot_device::write_h)
+WRITE8_MEMBER(nes_cart_slot_device::write_h)
 {
 	if (m_cart)
 		m_cart->write_h(space, offset, data);
