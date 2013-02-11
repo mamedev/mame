@@ -26,7 +26,7 @@ const device_type A2BUS_SSC = &device_creator<a2bus_ssc_device>;
 
 
 MACHINE_CONFIG_FRAGMENT( ssc )
-	MCFG_MOS6551_ADD(SSC_ACIA_TAG, XTAL_1_8432MHz, NULL)
+	MCFG_MOS6551_ADD(SSC_ACIA_TAG, XTAL_1_8432MHz, DEVWRITELINE(DEVICE_SELF, a2bus_ssc_device, acia_irq_w))
 MACHINE_CONFIG_END
 
 ROM_START( ssc )
@@ -120,6 +120,8 @@ const rom_entry *a2bus_ssc_device::device_rom_region() const
 a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, A2BUS_SSC, "Apple Super Serial Card", tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
+		m_dsw1(*this, "DSW1"),
+		m_dsw2(*this, "DSW2"),
 		m_acia(*this, SSC_ACIA_TAG)
 {
 	m_shortname = "a2ssc";
@@ -128,6 +130,8 @@ a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, const char *ta
 a2bus_ssc_device::a2bus_ssc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, type, name, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
+		m_dsw1(*this, "DSW1"),
+		m_dsw2(*this, "DSW2"),
 		m_acia(*this, SSC_ACIA_TAG)
 {
 	m_shortname = "a2ssc";
@@ -179,9 +183,9 @@ UINT8 a2bus_ssc_device::read_c0nx(address_space &space, UINT8 offset)
 	switch (offset)
 	{
 		case 1:
-			return device().ioport("DSW1")->read();
+			return m_dsw1->read();
 		case 2:
-			return device().ioport("DSW2")->read();
+			return m_dsw2->read();
 
 		case 8:
 		case 9:
@@ -211,3 +215,19 @@ void a2bus_ssc_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data
 
 	}
 }
+
+WRITE_LINE_MEMBER( a2bus_ssc_device::acia_irq_w )
+{
+	if (!(m_dsw2->read() & 4))
+	{
+		if (state)
+		{
+			raise_slot_irq();
+		}
+		else
+		{
+			lower_slot_irq();
+		}
+	}
+}
+

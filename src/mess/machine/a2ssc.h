@@ -31,6 +31,10 @@ public:
 	virtual const rom_entry *device_rom_region() const;
 	virtual ioport_constructor device_input_ports() const;
 
+	required_ioport m_dsw1, m_dsw2;
+
+	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
