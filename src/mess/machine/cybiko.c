@@ -104,18 +104,6 @@ static int nvram_system_save( running_machine &machine, const char *name, nvram_
 	return TRUE;
 }
 
-static void cybiko_pcf8593_load(running_machine &machine, emu_file *file)
-{
-	device_t *device = machine.device("rtc");
-	pcf8593_load(device, file);
-}
-
-static void cybiko_pcf8593_save(running_machine &machine, emu_file *file)
-{
-	device_t *device = machine.device("rtc");
-	pcf8593_save(device, file);
-}
-
 static void cybiko_at45dbxx_load(running_machine &machine, emu_file *file)
 {
 	device_t *device = machine.device("flash1");
@@ -177,8 +165,6 @@ static void cybiko_ramdisk_save(running_machine &machine, emu_file *file)
 void cybiko_state::machine_start()
 {
 	_logerror( 0, ("machine_start_cybikov1\n"));
-	// real-time clock
-	nvram_system_load( machine(), "rtc", cybiko_pcf8593_load, 0);
 	// serial dataflash
 	nvram_system_load( machine(), "flash1", cybiko_at45dbxx_load, 1);
 	// serial port
@@ -192,8 +178,6 @@ MACHINE_START_MEMBER(cybiko_state,cybikov2)
 	device_t *flash2 = machine().device("flash2");
 
 	_logerror( 0, ("machine_start_cybikov2\n"));
-	// real-time clock
-	nvram_system_load( machine(), "rtc", cybiko_pcf8593_load, 0);
 	// serial dataflash
 	nvram_system_load( machine(), "flash1", cybiko_at45dbxx_load, 1);
 	// multi-purpose flash
@@ -209,8 +193,6 @@ MACHINE_START_MEMBER(cybiko_state,cybikoxt)
 {
 	device_t *flash2 = machine().device("flash2");
 	_logerror( 0, ("machine_start_cybikoxt\n"));
-	// real-time clock
-	nvram_system_load( machine(), "rtc", cybiko_pcf8593_load, 0);
 	// multi-purpose flash
 	nvram_system_load( machine(), "flash2", cybiko_sst39vfx_load, 1);
 	machine().root_device().membank( "bank2" )->set_base( sst39vfx_get_base(flash2));
@@ -251,8 +233,6 @@ MACHINE_RESET_MEMBER(cybiko_state,cybikoxt)
 void cybiko_state::machine_stop_cybikov1()
 {
 	_logerror( 0, ("machine_stop_cybikov1\n"));
-	// real-time clock
-	nvram_system_save( machine(), "rtc", cybiko_pcf8593_save);
 	// serial dataflash
 	nvram_system_save( machine(), "flash1", cybiko_at45dbxx_save);
 	// serial port
@@ -262,8 +242,6 @@ void cybiko_state::machine_stop_cybikov1()
 void cybiko_state::machine_stop_cybikov2()
 {
 	_logerror( 0, ("machine_stop_cybikov2\n"));
-	// real-time clock
-	nvram_system_save( machine(), "rtc", cybiko_pcf8593_save);
 	// serial dataflash
 	nvram_system_save( machine(), "flash1", cybiko_at45dbxx_save);
 	// multi-purpose flash
@@ -275,8 +253,6 @@ void cybiko_state::machine_stop_cybikov2()
 void cybiko_state::machine_stop_cybikoxt()
 {
 	_logerror( 0, ("machine_stop_cybikoxt\n"));
-	// real-time clock
-	nvram_system_save( machine(), "rtc", cybiko_pcf8593_save);
 	// multi-purpose flash
 	nvram_system_save( machine(), "flash2", cybiko_sst39vfx_save);
 	// ramdisk
@@ -441,7 +417,7 @@ READ8_MEMBER( cybiko_state::cybikov1_io_reg_r )
 		case H8S_IO_PORTF :
 		{
 			data = H8S_PF_PF2;
-			if (pcf8593_pin_sda_r(m_rtc))
+			if (m_rtc->sda_r())
 				data |= H8S_PF_PF0;
 		}
 		break;
@@ -487,7 +463,7 @@ READ8_MEMBER( cybiko_state::cybikov2_io_reg_r )
 		case H8S_IO_PORTF :
 		{
 			data = H8S_PF_PF2;
-			if (pcf8593_pin_sda_r(m_rtc))
+			if (m_rtc->sda_r())
 				data |= H8S_PF_PF0;
 		}
 		break;
@@ -525,7 +501,7 @@ READ8_MEMBER( cybiko_state::cybikoxt_io_reg_r )
 		// real-time clock
 		case H8S_IO_PORTF :
 		{
-			if (pcf8593_pin_sda_r(m_rtc))
+			if (m_rtc->sda_r())
 				data |= H8S_PF_PF6;
 		}
 		break;
@@ -569,13 +545,13 @@ WRITE8_MEMBER( cybiko_state::cybikov1_io_reg_w )
 		// real-time clock
 		case H8S_IO_PFDR :
 		{
-			pcf8593_pin_scl(m_rtc, (data & H8S_PF_PF1) ? 1 : 0);
+			m_rtc->scl_w((data & H8S_PF_PF1) ? 1 : 0);
 		}
 		break;
 		// real-time clock
 		case H8S_IO_PFDDR :
 		{
-			pcf8593_pin_sda_w(m_rtc, (data & H8S_PF_PF0) ? 0 : 1);
+			m_rtc->sda_w((data & H8S_PF_PF0) ? 0 : 1);
 		}
 		break;
 	}
@@ -610,13 +586,13 @@ WRITE8_MEMBER( cybiko_state::cybikov2_io_reg_w )
 		// real-time clock
 		case H8S_IO_PFDR :
 		{
-			pcf8593_pin_scl(m_rtc, (data & H8S_PF_PF1) ? 1 : 0);
+			m_rtc->scl_w((data & H8S_PF_PF1) ? 1 : 0);
 		}
 		break;
 		// real-time clock
 		case H8S_IO_PFDDR :
 		{
-			pcf8593_pin_sda_w(m_rtc, (data & H8S_PF_PF0) ? 0 : 1);
+			m_rtc->sda_w((data & H8S_PF_PF0) ? 0 : 1);
 		}
 		break;
 	}
@@ -643,13 +619,13 @@ WRITE8_MEMBER( cybiko_state::cybikoxt_io_reg_w )
 		// real-time clock
 		case H8S_IO_PFDR :
 		{
-			pcf8593_pin_scl(m_rtc, (data & H8S_PF_PF1) ? 1 : 0);
+			m_rtc->scl_w((data & H8S_PF_PF1) ? 1 : 0);
 		}
 		break;
 		// real-time clock
 		case H8S_IO_PFDDR :
 		{
-			pcf8593_pin_sda_w(m_rtc, (data & H8S_PF_PF6) ? 0 : 1);
+			m_rtc->sda_w((data & H8S_PF_PF6) ? 0 : 1);
 		}
 		break;
 	}
