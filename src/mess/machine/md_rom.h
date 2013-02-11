@@ -56,6 +56,7 @@ public:
 
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
+	virtual DECLARE_WRITE16_MEMBER(write);
 	virtual DECLARE_READ16_MEMBER(read_a13);
 	virtual DECLARE_WRITE16_MEMBER(write_a13);
 };

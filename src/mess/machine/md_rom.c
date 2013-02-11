@@ -285,7 +285,7 @@ READ16_MEMBER(md_rom_sram_device::read)
 	// we access nvram only if m_nvram_handlers_installed has been turned on
 	if (m_nvram_handlers_installed)
 	{
-		if (offset >= m_nvram_start/2 && offset < m_nvram_end/2 && m_nvram_active)
+		if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active)
 			return m_nvram[offset - m_nvram_start/2];
 	}
 	if (offset < 0x400000/2)
@@ -326,12 +326,18 @@ WRITE16_MEMBER(md_rom_sram_device::write_a13)
 
 READ16_MEMBER(md_rom_fram_device::read)
 {
-	if (offset >= m_nvram_start/2 && offset < m_nvram_end/2 && m_nvram_active)
+	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active)
 		return m_nvram[offset - m_nvram_start/2];
 	if (offset < 0x400000/2)
 		return m_rom[MD_ADDR(offset)];
 	else
 		return 0xffff;
+}
+
+WRITE16_MEMBER(md_rom_fram_device::write)
+{
+	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active)
+			m_nvram[offset - m_nvram_start/2] = data;
 }
 
 WRITE16_MEMBER(md_rom_fram_device::write_a13)
