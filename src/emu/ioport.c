@@ -1522,14 +1522,14 @@ astring natural_keyboard::dump()
 //  eval - evaluate condition
 //-------------------------------------------------
 
-bool ioport_condition::eval(device_t &device) const
+bool ioport_condition::eval() const
 {
 	// always condition is always true
 	if (m_condition == ALWAYS)
 		return true;
 
 	// otherwise, read the referenced port and switch off the condition type
-	ioport_value condvalue = device.ioport(m_tag)->read();
+	ioport_value condvalue = m_port->read();
 	switch (m_condition)
 	{
 		case ALWAYS:            return true;
@@ -1541,6 +1541,17 @@ bool ioport_condition::eval(device_t &device) const
 		case NOTLESSTHAN:       return ((condvalue & m_mask) >= m_value);
 	}
 	return true;
+}
+
+
+//-------------------------------------------------
+//  initialize - create the live state
+//-------------------------------------------------
+
+void ioport_condition::initialize(device_t &device)
+{
+	if (m_tag != NULL)
+		m_port = device.ioport(m_tag);
 }
 
 
@@ -2257,6 +2268,11 @@ void ioport_field::init_live_state(analog_field *analog)
 
 	// allocate live state
 	m_live = global_alloc(ioport_field_live(*this, analog));
+
+	m_condition.initialize(device());
+
+	for (ioport_setting *setting = first_setting(); setting != NULL; setting = setting->next())
+		setting->condition().initialize(setting->device());
 }
 
 

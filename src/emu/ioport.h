@@ -917,7 +917,7 @@ public:
 
 	// operators
 	bool operator==(const ioport_condition &rhs) const { return (m_mask == rhs.m_mask && m_value == rhs.m_value && m_condition == rhs.m_condition && strcmp(m_tag, rhs.m_tag) == 0); }
-	bool eval(device_t &device) const;
+	bool eval() const;
 	bool none() const { return (m_condition == ALWAYS); }
 
 	// configuration
@@ -930,10 +930,13 @@ public:
 		m_value = value;
 	}
 
+	void initialize(device_t &device);
+
 private:
 	// internal state
 	condition_t     m_condition;    // condition to use
 	const char *    m_tag;          // tag of port whose condition is to be tested
+	ioport_port *   m_port;         // reference to the port to be tested
 	ioport_value    m_mask;         // mask to apply to the port
 	ioport_value    m_value;        // value to compare against
 };
@@ -961,7 +964,7 @@ public:
 	const char *name() const { return m_name; }
 
 	// helpers
-	bool enabled() { return m_condition.eval(device()); }
+	bool enabled() { return m_condition.eval(); }
 
 private:
 	// internal state
@@ -1084,7 +1087,7 @@ public:
 	bool is_digital_joystick() const { return (m_type > IPT_DIGITAL_JOYSTICK_FIRST && m_type < IPT_DIGITAL_JOYSTICK_LAST); }
 
 	// additional operations
-	bool enabled() const { return m_condition.eval(device()); }
+	bool enabled() const { return m_condition.eval(); }
 	const char *setting_name() const;
 	bool has_previous_setting() const;
 	void select_previous_setting();
