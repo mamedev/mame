@@ -871,6 +871,11 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/c64_magic_desk.o    \
 	$(MESS_MACHINE)/c64_magic_formel.o  \
 	$(MESS_MACHINE)/c64_magic_voice.o    \
+	$(MESS_MACHINE)/c64_midi_maplin.o   \
+	$(MESS_MACHINE)/c64_midi_namesoft.o   \
+	$(MESS_MACHINE)/c64_midi_passport.o   \
+	$(MESS_MACHINE)/c64_midi_sci.o   \
+	$(MESS_MACHINE)/c64_midi_siel.o   \
 	$(MESS_MACHINE)/c64_mikro_assembler.o   \
 	$(MESS_MACHINE)/c64_multiscreen.o   \
 	$(MESS_MACHINE)/c64_neoram.o    \
