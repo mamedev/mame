@@ -271,7 +271,6 @@ static const md_slot slot_list[] =
 	{ MC_PIRATE, "rom_mcpir" },
 	{ MJLOVER, "rom_mjlov" },
 	{ MULAN, "rom_mulan"},
-	{ POKEMON, "rom_poke"},
 	{ POKEMON2, "rom_poke2"},
 	{ REALTEC, "rom_realtec" },
 	{ REDCL_EN, "rom_redcl" },
@@ -566,23 +565,6 @@ void base_md_cart_slot_device::setup_custom_mappers()
 			break;
 
 		// patch out protection in a bunch of titles...
-		case POKEMON:
-			/*todo: emulate protection instead
-			 0dd19e:47f8
-			 0dd1a0:fff0
-			 0dd1a2:4e63
-			 0dd46e:4ef8
-			 0dd470:0300
-			 0dd49c:6002
-			 */
-			/* you need to return 1 @ 0xa13002 and 0???1f @ 0xa1303e (it does word reads). */
-			ROM16[0x0dd19e/2] = 0x47f8;
-			ROM16[0x0dd1a0/2] = 0xfff0;
-			ROM16[0x0dd1a2/2] = 0x4e63;
-			ROM16[0x0dd46e/2] = 0x4ef8;
-			ROM16[0x0dd470/2] = 0x0300;
-			ROM16[0x0dd49c/2] = 0x6002;
-			break;
 		case POKEMON2:
 			/*todo: emulate protection instead
 			 006036:e000

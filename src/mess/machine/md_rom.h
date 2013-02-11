@@ -492,7 +492,6 @@ extern const device_type MD_ROM_RADICA;
 
 // this are currently unused... protection is directly patched out!
 extern const device_type MD_ROM_MULAN;
-extern const device_type MD_ROM_POKE;
 extern const device_type MD_ROM_POKE2;
 
 #endif

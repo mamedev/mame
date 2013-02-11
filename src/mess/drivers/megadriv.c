@@ -347,7 +347,6 @@ static SLOT_INTERFACE_START(md_cart)
 	SLOT_INTERFACE_INTERNAL("rom_topf",  MD_ROM_TOPF)
 // these have protection patched out, instead of emulated!
 	SLOT_INTERFACE_INTERNAL("rom_mulan",  MD_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_poke",  MD_STD_ROM)
 	SLOT_INTERFACE_INTERNAL("rom_poke2",  MD_STD_ROM)
 SLOT_INTERFACE_END
 
@@ -1043,6 +1042,8 @@ INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(pico_cart)
 	SLOT_INTERFACE_INTERNAL("rom",  MD_STD_ROM)
+	SLOT_INTERFACE_INTERNAL("rom_sram",  MD_ROM_SRAM)   // not sure these are needed...
+	SLOT_INTERFACE_INTERNAL("rom_sramsafe",  MD_ROM_SRAM)   // not sure these are needed...
 SLOT_INTERFACE_END
 
 static MACHINE_START(pico)

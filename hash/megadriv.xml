@@ -16663,7 +16663,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_poke" />
+			<feature name="slot" value="rom_kof99" />
 			<dataarea name="rom" size="2097152">
 				<rom name="pocket monsters (unl).bin" size="2097152" crc="f68f6367" sha1="d10de935e099c520384c986b1f00fd5e72d64e03" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>

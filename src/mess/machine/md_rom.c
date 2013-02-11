@@ -50,7 +50,6 @@ const device_type MD_ROM_RADICA = &device_creator<md_rom_radica_device>;
 
 // below ones are currently unused, because the protection is patched out
 const device_type MD_ROM_MULAN = &device_creator<md_std_rom_device>;
-const device_type MD_ROM_POKE = &device_creator<md_std_rom_device>;
 const device_type MD_ROM_POKE2 = &device_creator<md_std_rom_device>;
 
 
