@@ -172,7 +172,7 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 	INT32 a2_zoffs = (A2FIXED >> 6) & 7;
 	INT32 a2_width = ((4 | ((a2flags >> 9) & 3)) << ((a2flags >> 11) & 15)) >> 2;
 	INT32 a2_xadd = (A2FIXED >> 16) & 0x03;
-	INT32 a2_yadd = (A2FIXED >> 18) & 0x01;
+	INT32 a2_yadd = (A1FIXED >> 18) & 0x01;		// From Jaguar HW errata: "If the A1 Y add control bit is set it will affect both address generators."
 	INT32 a2_x = (m_blitter_regs[A2_PIXEL] << 16);
 	INT32 a2_y = (m_blitter_regs[A2_PIXEL] & 0xffff0000);
 	INT32 a2_xstep = 0;
