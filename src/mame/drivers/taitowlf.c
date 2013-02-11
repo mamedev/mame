@@ -44,7 +44,17 @@ class taitowlf_state : public driver_device
 {
 public:
 	taitowlf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_pit8254(*this, "pit8254")
+		, m_pic8259_1(*this, "pic8259_1")
+		, m_pic8259_2(*this, "pic8259_2")
+		, m_dma8237_1(*this, "dma8237_1")
+		, m_dma8237_2(*this, "dma8237_2")
+		, m_region_user1(*this, "user1")
+		, m_region_user5(*this, "user5")
+		, m_bank1(*this, "bank1")
+	{ }
 
 	UINT32 *m_bios_ram;
 	UINT8 m_mxtc_config_reg[256];
@@ -53,11 +63,15 @@ public:
 	UINT8 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
 
-	device_t    *m_pit8254;
-	device_t    *m_pic8259_1;
-	device_t    *m_pic8259_2;
-	device_t    *m_dma8237_1;
-	device_t    *m_dma8237_2;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_pit8254;
+	required_device<device_t> m_pic8259_1;
+	required_device<device_t> m_pic8259_2;
+	required_device<device_t> m_dma8237_1;
+	required_device<device_t> m_dma8237_2;
+	required_memory_region m_region_user1;
+	required_memory_region m_region_user5;
+	required_memory_bank m_bank1;
 	DECLARE_WRITE32_MEMBER(pnp_config_w);
 	DECLARE_WRITE32_MEMBER(pnp_data_w);
 	DECLARE_WRITE32_MEMBER(bios_ram_w);
@@ -90,7 +104,7 @@ public:
 UINT32 taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
-	const UINT8 *blit_ram = machine().root_device().memregion("user5")->base();
+	const UINT8 *blit_ram = m_region_user5->base();
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
@@ -118,14 +132,12 @@ UINT32 taitowlf_state::screen_update_taitowlf(screen_device &screen, bitmap_rgb3
 
 READ8_MEMBER(taitowlf_state::at_dma8237_2_r)
 {
-	device_t *device = machine().device("dma8237_2");
-	return i8237_r(device, space, offset / 2);
+	return i8237_r(m_dma8237_2, space, offset / 2);
 }
 
 WRITE8_MEMBER(taitowlf_state::at_dma8237_2_w)
 {
-	device_t *device = machine().device("dma8237_2");
-	i8237_w(device, space, offset / 2, data);
+	i8237_w(m_dma8237_2, space, offset / 2, data);
 }
 
 // Intel 82439TX System Controller (MXTC)
@@ -149,11 +161,11 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)        // enable RAM access to region 0xf0000 - 0xfffff
 			{
-				state->membank("bank1")->set_base(state->m_bios_ram);
+				state->m_bank1->set_base(state->m_bios_ram);
 			}
 			else                    // disable RAM access (reads go to BIOS ROM)
 			{
-				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("user1")->base() + 0x30000);
+				state->m_bank1->set_base(state->m_region_user1->base() + 0x30000);
 			}
 			break;
 		}
@@ -383,7 +395,7 @@ WRITE8_MEMBER(taitowlf_state::at_page8_w)
 
 WRITE_LINE_MEMBER(taitowlf_state::pc_dma_hrq_changed)
 {
-	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
 	i8237_hlda_w( m_dma8237_1, state );
@@ -540,18 +552,12 @@ IRQ_CALLBACK_MEMBER(taitowlf_state::irq_callback)
 
 void taitowlf_state::machine_start()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(taitowlf_state::irq_callback),this));
-
-	m_pit8254 = machine().device( "pit8254" );
-	m_pic8259_1 = machine().device( "pic8259_1" );
-	m_pic8259_2 = machine().device( "pic8259_2" );
-	m_dma8237_1 = machine().device( "dma8237_1" );
-	m_dma8237_2 = machine().device( "dma8237_2" );
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(taitowlf_state::irq_callback),this));
 }
 
 void taitowlf_state::machine_reset()
 {
-	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("user1")->base() + 0x30000);
+	m_bank1->set_base(m_region_user1->base() + 0x30000);
 }
 
 
@@ -563,7 +569,7 @@ void taitowlf_state::machine_reset()
 
 WRITE_LINE_MEMBER(taitowlf_state::taitowlf_pic8259_1_set_int_line)
 {
-	machine().device("maincpu")->execute().set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 READ8_MEMBER(taitowlf_state::get_slave_ack)
@@ -664,7 +670,8 @@ MACHINE_CONFIG_END
 
 static void set_gate_a20(running_machine &machine, int a20)
 {
-	machine.device("maincpu")->execute().set_input_line(INPUT_LINE_A20, a20);
+	taitowlf_state *drvstate = machine.driver_data<taitowlf_state>();
+	drvstate->m_maincpu->set_input_line(INPUT_LINE_A20, a20);
 }
 
 static void keyboard_interrupt(running_machine &machine, int state)
