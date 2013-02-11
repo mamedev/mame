@@ -21,6 +21,7 @@
 #include "rendlay.h"
 #include "video/decospr.h"
 
+
 class backfire_state : public driver_device
 {
 public:
@@ -30,7 +31,17 @@ public:
 		m_left_priority(*this, "left_priority"),
 		m_right_priority(*this, "right_priority"),
 		m_sprgen(*this, "spritegen"),
-		m_sprgen2(*this, "spritegen2")
+		m_sprgen2(*this, "spritegen2"),
+		m_maincpu(*this, "maincpu"),
+		m_deco_tilegen1(*this, "tilegen1"),
+		m_deco_tilegen2(*this, "tilegen2"),
+		m_lscreen(*this, "lscreen"),
+		m_rscreen(*this, "rscreen"),
+		m_eeprom(*this, "eeprom"),
+		m_io_in0(*this, "IN0"),
+		m_io_in1(*this, "IN1"),
+		m_io_in2(*this, "IN2"),
+		m_io_in3(*this, "IN3")
 	{ }
 
 	/* memory pointers */
@@ -47,13 +58,13 @@ public:
 	bitmap_ind16  *m_right;
 
 	/* devices */
-	cpu_device *m_maincpu;
-	device_t *m_deco_tilegen1;
-	device_t *m_deco_tilegen2;
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_deco_tilegen1;
+	required_device<device_t> m_deco_tilegen2;
 
-	device_t *m_lscreen;
-	device_t *m_rscreen;
-	eeprom_device *m_eeprom;
+	required_device<device_t> m_lscreen;
+	required_device<device_t> m_rscreen;
+	required_device<eeprom_device> m_eeprom;
 
 	/* memory */
 	UINT16    m_pf1_rowscroll[0x0800/2];
@@ -88,6 +99,11 @@ public:
 	UINT32 screen_update_backfire_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
 	void descramble_sound();
+
+	required_ioport m_io_in0;
+	required_ioport m_io_in1;
+	required_ioport m_io_in2;
+	required_ioport m_io_in3;
 };
 
 //UINT32 *backfire_180010, *backfire_188010;
@@ -182,40 +198,36 @@ UINT32 backfire_state::screen_update_backfire_right(screen_device &screen, bitma
 
 READ32_MEMBER(backfire_state::backfire_eeprom_r)
 {
-	device_t *device = machine().device("eeprom");
 	/* some kind of screen indicator?  checked by backfirea set before it will boot */
 	int backfire_screen = machine().rand() & 1;
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return ((eeprom->read_bit() << 24) | machine().root_device().ioport("IN0")->read()
-			| ((machine().root_device().ioport("IN2")->read() & 0xbf) << 16)
-			| ((machine().root_device().ioport("IN3")->read() & 0x40) << 16)) ^ (backfire_screen << 26) ;
+	return ((m_eeprom->read_bit() << 24) | m_io_in0->read()
+			| ((m_io_in2->read() & 0xbf) << 16)
+			| ((m_io_in3->read() & 0x40) << 16)) ^ (backfire_screen << 26) ;
 }
 
 READ32_MEMBER(backfire_state::backfire_control2_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n", space.device().safe_pc(), offset << 1, mem_mask);
-	return (m_eeprom->read_bit() << 24) | ioport("IN1")->read() | (ioport("IN1")->read() << 16);
+	return (m_eeprom->read_bit() << 24) | m_io_in1->read() | (m_io_in1->read() << 16);
 }
 
 #ifdef UNUSED_FUNCTION
 READ32_MEMBER(backfire_state::backfire_control3_r)
 {
 //  logerror("%08x:Read eprom %08x (%08x)\n", space.device().safe_pc(), offset << 1, mem_mask);
-	return (m_eeprom->read_bit() << 24) | ioport("IN2")->read() | (ioport("IN2")->read() << 16);
+	return (m_eeprom->read_bit() << 24) | m_io_in2->read() | (m_io_in2->read() << 16);
 }
 #endif
 
 
 WRITE32_MEMBER(backfire_state::backfire_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
 	logerror("%s:write eprom %08x (%08x) %08x\n",machine().describe_context(),offset<<1,mem_mask,data);
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->set_clock_line(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
-		eeprom->write_bit(BIT(data, 0));
-		eeprom->set_cs_line(BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_clock_line(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+		m_eeprom->write_bit(BIT(data, 0));
+		m_eeprom->set_cs_line(BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -476,12 +488,6 @@ static const deco16ic_interface backfire_deco16ic_tilegen2_intf =
 
 void backfire_state::machine_start()
 {
-	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_deco_tilegen1 = machine().device("tilegen1");
-	m_deco_tilegen2 = machine().device("tilegen2");
-	m_lscreen = machine().device("lscreen");
-	m_rscreen = machine().device("rscreen");
-	m_eeprom = machine().device<eeprom_device>("eeprom");
 }
 
 UINT16 backfire_pri_callback(UINT16 x)
@@ -711,9 +717,9 @@ DRIVER_INIT_MEMBER(backfire_state,backfire)
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine(), "gfx2"); /* 141 */
 	deco156_decrypt(machine());
-	machine().device("maincpu")->set_clock_scale(4.0f); /* core timings aren't accurate */
+	m_maincpu->set_clock_scale(4.0f); /* core timings aren't accurate */
 	descramble_sound();
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x0170018, 0x017001b, read32_delegate(FUNC(backfire_state::backfire_speedup_r), this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0170018, 0x017001b, read32_delegate(FUNC(backfire_state::backfire_speedup_r), this));
 }
 
 GAME( 1995, backfire,  0,        backfire,   backfire, backfire_state, backfire, ROT0, "Data East Corporation", "Backfire! (set 1)", GAME_SUPPORTS_SAVE )
