@@ -216,8 +216,12 @@ class ssfindo_state : public driver_device
 {
 public:
 	ssfindo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_vram(*this, "vram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_vram(*this, "vram")
+		, m_maincpu(*this, "maincpu")
+		, m_region_user2(*this, "user2")
+		, m_io_ps7500(*this, "PS7500")
+	{ }
 
 	UINT32 m_PS7500_IO[MAXIO];
 	UINT32 m_PS7500_FIFO[256];
@@ -250,6 +254,10 @@ public:
 	INTERRUPT_GEN_MEMBER(ssfindo_interrupt);
 	TIMER_CALLBACK_MEMBER(PS7500_Timer0_callback);
 	TIMER_CALLBACK_MEMBER(PS7500_Timer1_callback);
+
+	required_device<cpu_device> m_maincpu;
+	required_memory_region m_region_user2;
+	required_ioport m_io_ps7500;
 };
 
 
@@ -297,7 +305,7 @@ TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer0_callback)
 	m_PS7500_IO[IRQSTA]|=0x20;
 	if(m_PS7500_IO[IRQMSKA]&0x20)
 	{
-		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM7_IRQ_LINE, 1);
+		generic_pulse_irq_line(m_maincpu, ARM7_IRQ_LINE, 1);
 	}
 }
 
@@ -317,7 +325,7 @@ TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer1_callback)
 	m_PS7500_IO[IRQSTA]|=0x40;
 	if(m_PS7500_IO[IRQMSKA]&0x40)
 	{
-		generic_pulse_irq_line(machine().device("maincpu")->execute(), ARM7_IRQ_LINE, 1);
+		generic_pulse_irq_line(m_maincpu, ARM7_IRQ_LINE, 1);
 	}
 }
 
@@ -398,10 +406,10 @@ READ32_MEMBER(ssfindo_state::PS7500_IO_r)
 
 			if( m_iocr_hack)
 			{
-				return (ioport("PS7500")->read() & 0x80) | 0x34 | (machine().rand()&3); //eeprom read ?
+				return (m_io_ps7500->read() & 0x80) | 0x34 | (machine().rand()&3); //eeprom read ?
 			}
 
-			return (ioport("PS7500")->read() & 0x80) | 0x37;
+			return (m_io_ps7500->read() & 0x80) | 0x37;
 
 		case VIDCR:
 			return (m_PS7500_IO[offset] | 0x50) & 0xfffffff0;
@@ -490,7 +498,7 @@ WRITE32_MEMBER(ssfindo_state::PS7500_IO_w)
 
 READ32_MEMBER(ssfindo_state::io_r)
 {
-	UINT16 *FLASH = (UINT16 *)machine().root_device().memregion("user2")->base(); //16 bit - WORD access
+	UINT16 *FLASH = (UINT16 *)m_region_user2->base(); //16 bit - WORD access
 
 	int adr=m_flashAdr*0x200+(m_flashOffset);
 
