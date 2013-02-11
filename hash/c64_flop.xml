@@ -712,7 +712,7 @@
 		</part>
 	</software>
 
-	<software name="sfxsea">
+	<software name="sfxsea" cloneof="sfxse">
 		<description>SFX Sound Expander (MIDI)</description>
 		<year>1987</year>
 		<publisher>Music Sales</publisher>
@@ -898,6 +898,8 @@
 		</part>
 	</software>
 
+	<!-- MIDI -->
+
 	<software name="midi8p">
 		<description>MIDI 8+</description>
 		<year>1984</year>
@@ -908,6 +910,71 @@
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="midi8+.g64" size="333744" crc="294921f7" sha1="376f7b91feb7709f9169aa1a9f297d3678e2d97a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cagedart">
+		<description>Caged Artist's FB and DX Editor/Librarian</description>
+		<year>198?</year>
+		<publisher>Dr T</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="CAGED ARTIST_1.g64" size="333744" crc="a2e05594" sha1="4950d59682683af49098e7665f81341e4c7843d1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lxp1edit">
+		<description>Lexicon LXP-1 Visual Editor/Librarian</description>
+		<year>1988</year>
+		<publisher>Leaping Lizards</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="lexedit.g64" size="333744" crc="b6468192" sha1="15ef75d08111fb1a992f866313b346186f0a77cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midiutil">
+		<description>Midi Utilities 02</description>
+		<year>198?</year>
+		<publisher>The Music Software Exchange</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="MIDU.d64" size="174848" crc="4f4d3f29" sha1="e5c1bf26cca0e0dd65c8908f4554722d1d2d492c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="patobmtx">
+		<description>Oberheim Matrix 6/6R Patches</description>
+		<year>198?</year>
+		<publisher>Oberheim</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="patobmtrx.d64" size="174848" crc="7243d5fc" sha1="4cdd27ef400e0b3f62299206e18ba0c8f0bd72be" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superseq">
+		<description>Super Sequencer</description>
+		<year>1984</year>
+		<publisher>Sonus</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="333744">
+				<rom name="sonusseq.g64" size="333744" crc="4b2d949a" sha1="824c0058c567e25fb4bc19b1f7a75352c4e19459" offset="0" />
 			</dataarea>
 		</part>
 	</software>
