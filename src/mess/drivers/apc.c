@@ -6,9 +6,7 @@
 
     TODO:
     - video emulation (bitmap part)
-    - Understand interrupt sources
     - NMI seems valid, dumps a x86 stack to vram?
-    - Unknown RTC device type (upd1990a?);
     - What are exactly APU and MPU devices? They sounds scary ...
     - DMA hook-ups
     - serial ports
@@ -16,6 +14,7 @@
     - Extract info regarding Hard Disk functionality
     - Various unknown ports
     - What kind of external ROM actually maps at 0xa****?
+    - Jumper settings (comms settings and display select)
 
 ============================================================================
     front ^
@@ -148,7 +147,7 @@ public:
 
 	int m_dack;
 	UINT8 m_dma_offset[4];
-	
+
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
 protected:
@@ -229,8 +228,7 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 			{
 				int res_x,res_y;
 
-//              res_x = (x*8+xi) * (state->m_video_ff[WIDTH40_REG]+1);
-				res_x = (x*8+xi) * (1);
+				res_x = (x*8+xi);
 				res_y = y*lr+yi;
 
 				if(!device->machine().primary_screen->visible_area().contains(res_x, res_y))
@@ -278,14 +276,6 @@ static UPD7220_DRAW_TEXT_LINE( hgdc_draw_text )
 
 				if(pen)
 					bitmap.pix32(res_y, res_x) = palette[pen];
-
-//              if(state->m_video_ff[WIDTH40_REG])
-//              {
-//                  if(res_x+1 > 640 || res_y > char_size*25) //TODO
-//                      continue;
-
-//                  bitmap.pix16(res_y, res_x+1) = pen;
-//              }
 			}
 		}
 	}
@@ -412,6 +402,12 @@ WRITE8_MEMBER(apc_state::apc_dma_w)
 
 WRITE8_MEMBER(apc_state::apc_irq_ack_w)
 {
+	/*
+		x--- GDC
+		-x-- TM
+		--x- APU
+		---x CRT
+	*/
 	if(data & 4)
 		pic8259_ir3_w(machine().device("pic8259_master"), 0);
 
@@ -419,9 +415,11 @@ WRITE8_MEMBER(apc_state::apc_irq_ack_w)
 		logerror("IRQ ACK %02x\n",data);
 }
 
-/* TODO: bit arrangement is completely wrong */
 READ8_MEMBER(apc_state::apc_rtc_r)
 {
+	/*
+	bit 1 high: low battery.
+	*/
 	//fprintf(stderr, "RTC Read: %d\n", m_rtc->data_out_r());
 	return m_rtc->data_out_r();
 }
@@ -444,16 +442,16 @@ RTC write: 0x11
 ...
 
 RTC write bits: 76543210
-                |||||||\- c0 (or OE?)
+                |||||||\- c0
                 ||||||\-- c1
                 |||||\--- c2
                 ||||\---- STB
                 |||\----- CLK
                 ||\------ DATA_IN
-                |\------- ?
-                \-------- ?
+                |\------- "don't care"
+                \-------- ///
 */
-	if (data&0xE0) fprintf(stderr,"RTC write: 0x%02x\n", data);
+	if (data&0xc0) fprintf(stderr,"RTC write: 0x%02x\n", data);
 	m_rtc->c0_w(BIT(data, 0)); // correct assuming theres a delay for changing command lines before stb
 	m_rtc->c1_w(BIT(data, 1)); // "
 	m_rtc->c2_w(BIT(data, 2)); // "
@@ -466,6 +464,7 @@ RTC write bits: 76543210
 static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0fff) AM_RAM AM_SHARE("cmos")
+//	AM_RANGE(0xa1000, 0xbffff) mirror CMOS
 //  AM_RANGE(0xc0000, 0xcffff) standard character ROM
 	AM_RANGE(0xd8000, 0xd9fff) AM_RAM AM_REGION("aux_pcg", 0) // AUX character RAM
 //  AM_RANGE(0xe0000, 0xeffff) Special Character RAM
@@ -484,12 +483,16 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 	AM_RANGE(0x48, 0x4f) AM_READWRITE8(apc_kbd_r, apc_kbd_w, 0x00ff)
 	AM_RANGE(0x50, 0x53) AM_DEVICE8("upd765", upd765a_device, map, 0x00ff ) // upd765
 	AM_RANGE(0x58, 0x59) AM_READWRITE8(apc_rtc_r, apc_rtc_w, 0x00ff)
+//	0x59 CMOS enable
 //  0x5a  APU data (Arithmetic Processing Unit!)
+//  0x5b, Power Off
 //  0x5e  APU status/command
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE8_LEGACY("upd1771c", upd1771_r, upd1771_w, 0x00ff )
-//  AM_RANGE(0x68, 0x6f) i8255 , printer port (A: status (R) B: data (W) C: command (W))
-//  AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
-//  0x92, 0x9a, 0xa2, 0xaa is for a Hard Disk (unknown type)
+//  AM_RANGE(0x68, 0x6f) i8255 , ODA printer port (A: status (R) B: data (W) C: command (W))
+//  0x70, 0x76 AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
+//  0x71, 0x77 IDA Controller
+//  0x80, 0x90 Communication Adapter
+//	0xf0, 0xf6 ASOP Controller
 ADDRESS_MAP_END
 
 /* TODO: key repeat, remove port impulse! */
@@ -973,6 +976,12 @@ WRITE8_MEMBER(apc_state::fdc_w)
 	m_fdc->dma_w(data);
 }
 
+/*
+CH0: CRT
+CH1: FDC
+CH2: ("reserved for future graphics expansion")
+CH3: AUX
+*/
 static I8237_INTERFACE( dmac_intf )
 {
 	DEVCB_DRIVER_LINE_MEMBER(apc_state, apc_dma_hrq_changed),
@@ -1051,7 +1060,7 @@ static MACHINE_CONFIG_START( apc, apc_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD( "upd1771c", UPD1771C, MAIN_CLOCK )
+	MCFG_SOUND_ADD( "upd1771c", UPD1771C, MAIN_CLOCK ) //uPD1771C-006
 	MCFG_SOUND_CONFIG( upd1771c_config )
 	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 MACHINE_CONFIG_END
