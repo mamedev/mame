@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    VizaStar 64 cartridge emulation
+    VizaStar 64 XL4 cartridge emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.

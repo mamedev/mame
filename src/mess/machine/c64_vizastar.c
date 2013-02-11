@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    VizaWrite 64 cartridge emulation
+    VizaStar 64 XL4 cartridge emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -23,7 +23,7 @@
     |=|                         |
     |===========================|
 
-    ROM     - Hitachi HN462732G EPROM "V"
+    ROM     - Hitachi HN462732G 4Kx8 EPROM "V"
 
 */
 
@@ -60,7 +60,7 @@ const device_type C64_VIZASTAR = &device_creator<c64_vizastar_cartridge_device>;
 //-------------------------------------------------
 
 c64_vizastar_cartridge_device::c64_vizastar_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, C64_VIZASTAR, "VizaStar 64", tag, owner, clock),
+	device_t(mconfig, C64_VIZASTAR, "VizaStar 64 XL4", tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this)
 {
 }

@@ -205,6 +205,22 @@ ioport_constructor c64_sfx_sound_expander_cartridge_device::device_input_ports()
 
 
 //**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  get_offset - get passthru expansion port offset
+//-------------------------------------------------
+
+inline offs_t c64_sfx_sound_expander_cartridge_device::get_offset(offs_t offset, int rw)
+{
+	// assimilate the 3 different MIDI cartridge 6850 ACIA register mappings?
+	return (offset & 0xfffc) | (rw << 1) | BIT(offset, 1);
+}
+
+
+
+//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -244,6 +260,7 @@ void c64_sfx_sound_expander_cartridge_device::device_start()
 
 void c64_sfx_sound_expander_cartridge_device::device_reset()
 {
+	m_opl->reset();
 }
 
 
@@ -253,7 +270,7 @@ void c64_sfx_sound_expander_cartridge_device::device_reset()
 
 UINT8 c64_sfx_sound_expander_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	data = m_exp->cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	data = m_exp->cd_r(space, get_offset(offset, 1), data, sphi2, ba, roml, romh, io1, io2);
 
 	if (!io2)
 	{
@@ -292,7 +309,7 @@ void c64_sfx_sound_expander_cartridge_device::c64_cd_w(address_space &space, off
 		ym3526_w(m_opl, space, BIT(offset, 4), data);
 	}
 
-	m_exp->cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+	m_exp->cd_w(space, get_offset(offset, 0), data, sphi2, ba, roml, romh, io1, io2);
 }
 
 
@@ -302,7 +319,7 @@ void c64_sfx_sound_expander_cartridge_device::c64_cd_w(address_space &space, off
 
 int c64_sfx_sound_expander_cartridge_device::c64_game_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
-	return m_exp->game_r(offset, sphi2, ba, rw, hiram);
+	return m_exp->game_r(get_offset(offset, rw), sphi2, ba, rw, hiram);
 }
 
 
@@ -312,5 +329,5 @@ int c64_sfx_sound_expander_cartridge_device::c64_game_r(offs_t offset, int sphi2
 
 int c64_sfx_sound_expander_cartridge_device::c64_exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram)
 {
-	return m_exp->exrom_r(offset, sphi2, ba, rw, hiram);
+	return m_exp->exrom_r(get_offset(offset, rw), sphi2, ba, rw, hiram);
 }

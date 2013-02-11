@@ -46,7 +46,7 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() { m_shortname = "c64_sfx_sound_expander"; }
+	virtual void device_config_complete() { m_shortname = "c64_sfxse"; }
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -67,6 +67,8 @@ private:
 	required_ioport m_kb5;
 	required_ioport m_kb6;
 	required_ioport m_kb7;
+
+	inline offs_t get_offset(offs_t offset, int rw);
 };
 
 
