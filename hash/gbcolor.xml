@@ -25085,6 +25085,20 @@ Undumped Pirates:
 
 <!-- Other Asian Pirate dumps to sort -->
 
+	<software name="qtdsheng">
+		<description>Qi Tian Da Sheng - Sun Wu Kong (Chi, Ripped from 8 in 1 multicart)</description>
+		<year>2001</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="齊天大聖 - 孫悟空"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="mapper" value="MBC5" />
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="524288">
+				<rom name="qi tian da sheng - sun wu kong (unlicensed, chinese) (multicart rip).bin" size="524288" crc="a336c40c" sha1="3d7e987f1315242422c0db45c4aea120c1b41429" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sswy">
 		<description>Sheng Shou Wu Yu - Shen Long Chuan Shuo (Chi, Ripped from 12 in 1 multicart)</description>
 		<year>2001</year>

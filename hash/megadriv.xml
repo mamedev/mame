@@ -38,7 +38,6 @@
     SIDE POCKET                 JAPAN/USA   conflict in current info
     SMURFS                  PAL     we have Rev A, Rev 0 needed (does it exist?)
     SUMISEI HOME TANMATSU           JAPAN
-    SUPER DAISENRYAKU               JAPAN       we have Rev 0, Rev A needed (confirmed by Ototo)
     TOM & JERRY                 JAPAN
     VALIS III                   JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
     WONDER MIDI                 JAPAN
@@ -16585,7 +16584,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="pstar4">
+	<software name="pstar4u" cloneof="pstar4">
 		<description>Phantasy Star - The End of the Millennium (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -16602,7 +16601,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 
-	<software name="pstar4e" cloneof="pstar4">
+	<software name="pstar4">
 		<description>Phantasy Star - The End of the Millennium (Euro)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -21728,6 +21727,30 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="supdaisn">
+		<description>Super Daisenryaku (Jpn, Rev. 02)</description>
+		<year>1989</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="G-4501-02"/>
+		<info name="release" value="19890429"/>
+		<info name="alt_title" value="スーパー大戦略"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb_type" value="SEGA-SRAM" />
+			<feature name="slot" value="rom_sram" />
+			<feature name="pcb" value="171-5919" />
+			<feature name="ic1" value="MPR-12477A-H" />
+			<feature name="ic2" value="MB8464A" />
+			<feature name="ic3" value="? 1471026B" />
+			<feature name="ic4" value="PC74HC00P" />
+			<feature name="batt" value="(Lithium Cell)" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-12477a-h.ic1" size="524288" crc="11645d6e" sha1="21ef9d2b425a8dc084c21c88cca2c610d035d75d" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supdaisna" cloneof="supdaisn">
 		<description>Super Daisenryaku (Jpn)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
@@ -21737,8 +21760,14 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb_type" value="SEGA-SRAM" />
 			<feature name="slot" value="rom_sram" />
+			<feature name="pcb" value="171-5821" />
+			<feature name="ic1" value="MPR-12477" />
+			<feature name="ic2" value="MB8464A" />
+			<feature name="ic3" value="?" />
+			<feature name="ic4" value="HD74LS00P" />
+			<feature name="batt" value="(Lithium Cell)" />
 			<dataarea name="rom" size="524288">
-				<rom name="mpr-12477.bin" size="524288" crc="d50a166f" sha1="56d9366b50cea65b16ed621b9a5bf355ef89e6b5" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-12477.ic1" size="524288" crc="d50a166f" sha1="56d9366b50cea65b16ed621b9a5bf355ef89e6b5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 			<dataarea name="sram" size="16384">
 			</dataarea>
@@ -28096,9 +28125,9 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-
-	<software name="smario64">
-		<description>Super Mario World 64 (Unl)</description>
+<!-- Needs emulation of the protection. -->
+	<software name="smario64" supported="no">
+		<description>Super Mario World 64</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -28108,6 +28137,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- This can be removed when protected version is emulated correctly -->
+	<software name="smario64h" cloneof="smario64">
+		<description>Super Mario World 64 (Hacked Protection)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="super mario world 64 (hacked).bin" size="1048576" crc="a20f98aa" sha1="47fd007173419906ecdc7b0efc7d49f42de70c91" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="mgs" cloneof="crkdown">
 		<description>Metal Gear Solid (Rus)</description>
