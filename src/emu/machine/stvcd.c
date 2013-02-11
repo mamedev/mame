@@ -109,16 +109,16 @@ void saturn_state::cd_exec_command( void )
 		1)
 		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
-	switch (cr1 & 0xff00)
+	switch ((cr1 >> 8) & 0xff)
 	{
-		case 0x0000:
+		case 0x00:
 			//CDROM_LOG(("%s:CD: Get Status\n", machine.describe_context()))
 			hirqreg |= CMOK;
 			cr_standard_return(cd_stat);
 			//CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 			break;
 
-		case 0x0100:
+		case 0x01:
 			CDROM_LOG(("%s:CD: Get Hardware Info\n", machine.describe_context()))
 			hirqreg |= CMOK;
 			cr1 = cd_stat;
@@ -127,7 +127,7 @@ void saturn_state::cd_exec_command( void )
 			cr4 = 0x0400;
 			break;
 
-		case 0x0200:    // Get TOC
+		case 0x02:    // Get TOC
 			CDROM_LOG(("%s:CD: Get TOC\n", machine.describe_context()))
 			cd_readTOC();
 			cd_stat = CD_STAT_TRANS|CD_STAT_PAUSE;
@@ -139,7 +139,7 @@ void saturn_state::cd_exec_command( void )
 			hirqreg |= (CMOK|DRDY);
 			break;
 
-		case 0x0300:    // get session info (lower byte = session # to get?)
+		case 0x03:    // get session info (lower byte = session # to get?)
 						// bios is interested in returns in cr3 and cr4
 						// cr3 should be data track #
 						// cr4 must be > 1 and < 100 or bios gets angry.
@@ -176,7 +176,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		/* TODO: double check this */
-		case 0x0400:    // initialize CD system
+		case 0x04:    // initialize CD system
 				// CR1 & 1 = reset software
 				// CR1 & 2 = decode RW subcode
 				// CR1 & 4 = don't confirm mode 2 subheader
@@ -224,7 +224,7 @@ void saturn_state::cd_exec_command( void )
 			cr_standard_return(cd_stat);
 			break;
 
-		case 0x0600:    // end data transfer (TODO: needs to be worked on!)
+		case 0x06:    // end data transfer (TODO: needs to be worked on!)
 				// returns # of bytes transfered (24 bits) in
 				// low byte of cr1 (MSB) and cr2 (middle byte, LSB)
 			CDROM_LOG(("%s:CD: End data transfer (%d bytes xfer'd)\n", machine.describe_context(), xferdnum))
@@ -297,7 +297,7 @@ void saturn_state::cd_exec_command( void )
 			CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 			break;
 
-		case 0x1000: // Play Disc.  FAD is in lowest 7 bits of cr1 and all of cr2.
+		case 0x10: // Play Disc.  FAD is in lowest 7 bits of cr1 and all of cr2.
 			UINT32 start_pos,end_pos;
 			UINT8 play_mode;
 
@@ -413,7 +413,7 @@ void saturn_state::cd_exec_command( void )
 
 			break;
 
-		case 0x1100: // disc seek
+		case 0x11: // disc seek
 			CDROM_LOG(("%s:CD: Disc seek\n",   machine.describe_context()))
 			//printf("%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
 			if (cr1 & 0x80)
@@ -459,12 +459,12 @@ void saturn_state::cd_exec_command( void )
 			cr_standard_return(cd_stat);
 			break;
 
-		case 0x1200: // FFWD / REW
+		case 0x12: // FFWD / REW
 			//cr1 bit 0 determines if this is a Fast Forward (0) or a Rewind (1) command
 			// ...
 			break;
 
-		case 0x2000: // Get SubCode Q / RW Channel
+		case 0x20: // Get SubCode Q / RW Channel
 			switch(cr1 & 0xff)
 			{
 				case 0: // Get Q
@@ -535,7 +535,7 @@ void saturn_state::cd_exec_command( void )
 			hirqreg |= CMOK|DRDY;
 			break;
 
-		case 0x3000:    // Set CD Device connection
+		case 0x30:    // Set CD Device connection
 			{
 				UINT8 parm;
 
@@ -564,12 +564,12 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x3100:
+		case 0x31:
 			popmessage("Get CD Device Connection, contact MAMEdev");
 			hirqreg |= CMOK;
 			break;
 
-		case 0x3200:    // Last Buffer Destination
+		case 0x32:    // Last Buffer Destination
 			cr1 = cd_stat | 0;
 			cr2 = 0;
 			cr3 = lastbuf << 8;
@@ -577,7 +577,7 @@ void saturn_state::cd_exec_command( void )
 			hirqreg |= (CMOK);
 			break;
 
-		case 0x4000:    // Set Filter Range
+		case 0x40:    // Set Filter Range
 						// cr1 low + cr2 = FAD0, cr3 low + cr4 = FAD1
 						// cr3 hi = filter num.
 			{
@@ -595,12 +595,12 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x4100:
+		case 0x41:
 			popmessage("Get Filter Range, contact MAMEdev");
 			hirqreg |= CMOK;
 			break;
 
-		case 0x4200:    // Set Filter Subheader conditions
+		case 0x42:    // Set Filter Subheader conditions
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 
@@ -618,7 +618,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x4300:    // Get Filter Subheader conditions
+		case 0x43:    // Get Filter Subheader conditions
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 
@@ -633,7 +633,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x4400:    // Set Filter Mode
+		case 0x44:    // Set Filter Mode
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 				UINT8 mode = (cr1 & 0xff);
@@ -654,7 +654,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x4500:    // Get Filter Mode
+		case 0x45:    // Get Filter Mode
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 
@@ -666,7 +666,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x4600:    // Set Filter Connection
+		case 0x46:    // Set Filter Connection
 			{
 				/* TODO: maybe condition false is cr3 low? */
 				UINT8 fnum = (cr3>>8)&0xff;
@@ -684,7 +684,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x4800:    // Reset Selector
+		case 0x48:    // Reset Selector
 			{
 			int i,j;
 
@@ -771,7 +771,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x5000:    // get Buffer Size
+		case 0x50:    // get Buffer Size
 			cr1 = cd_stat;
 			cr2 = (freeblocks > 200) ? 200 : freeblocks;
 			cr3 = 0x1800;
@@ -780,7 +780,7 @@ void saturn_state::cd_exec_command( void )
 			hirqreg |= (CMOK);
 			break;
 
-		case 0x5100:    // get # sectors used in a buffer
+		case 0x51:    // get # sectors used in a buffer
 			{
 				UINT32 bufnum = cr3>>8;
 
@@ -803,7 +803,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x5200:    // calculate actual size
+		case 0x52:    // calculate actual size
 			{
 				UINT32 bufnum = cr3>>8;
 				UINT32 sectoffs = cr2;
@@ -830,7 +830,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x5300:    // get actual block size
+		case 0x53:    // get actual block size
 			CDROM_LOG(("%s:CD: Get actual block size\n", machine.describe_context()))
 			hirqreg |= (CMOK|ESEL);
 			cr1 = cd_stat | ((calcsize>>16)&0xff);
@@ -839,7 +839,7 @@ void saturn_state::cd_exec_command( void )
 			cr4 = 0;
 			break;
 
-		case 0x5400:    // get sector info
+		case 0x54:    // get sector info
 			{
 				UINT32 sectoffs = cr2 & 0xff;
 				UINT32 bufnum = cr3>>8;
@@ -861,7 +861,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x6000:    // set sector length
+		case 0x60:    // set sector length
 			CDROM_LOG(("%s:CD: Set sector length\n",   machine.describe_context()))
 
 			switch (cr1 & 0xff)
@@ -899,7 +899,7 @@ void saturn_state::cd_exec_command( void )
 			cr_standard_return(cd_stat);
 			break;
 
-		case 0x6100:    // get sector data
+		case 0x61:    // get sector data
 			{
 				UINT32 sectnum = cr4;
 				UINT32 sectofs = cr2;
@@ -941,7 +941,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x6200:    // delete sector data
+		case 0x62:    // delete sector data
 			{
 				UINT32 sectnum = cr4;
 				UINT32 sectofs = cr2;
@@ -993,7 +993,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x6300:    // get then delete sector data
+		case 0x63:    // get then delete sector data
 			{
 				UINT32 sectnum = cr4;
 				UINT32 sectofs = cr2;
@@ -1035,7 +1035,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			break;
 
-		case 0x6400:    // put sector data
+		case 0x64:    // put sector data
 			/* TODO: After Burner 2, Out Run, Fantasy Zone and Dungeon Master Nexus trips this */
 			// ...
 			{
@@ -1049,12 +1049,12 @@ void saturn_state::cd_exec_command( void )
 			cr_standard_return(cd_stat);
 			break;
 
-		case 0x6500:
+		case 0x65:
 			popmessage("Copy Sector data, contact MAMEdev");
 			hirqreg |= (CMOK);
 			break;
 
-		case 0x6600:    // move sector data
+		case 0x66:    // move sector data
 			/* TODO: Sword & Sorcery / Riglord Saga 2 */
 			{
 				//UINT8 src_filter = (cr3>>8)&0xff;
@@ -1066,7 +1066,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 
-		case 0x6700:    // get copy error
+		case 0x67:    // get copy error
 			CDROM_LOG(("%s:CD: Get copy error\n",   machine.describe_context()))
 			printf("Get copy error\n");
 			cr1 = cd_stat;
@@ -1076,7 +1076,7 @@ void saturn_state::cd_exec_command( void )
 			hirqreg |= (CMOK);
 			break;
 
-		case 0x7000:    // change directory
+		case 0x70:    // change directory
 			CDROM_LOG(("%s:CD: Change Directory\n",   machine.describe_context()))
 			hirqreg |= (CMOK|EFLS);
 
@@ -1087,7 +1087,7 @@ void saturn_state::cd_exec_command( void )
 			cr_standard_return(cd_stat);
 			break;
 
-		case 0x7100:    // Read directory entry
+		case 0x71:    // Read directory entry
 			CDROM_LOG(("%s:CD: Read Directory Entry\n",   machine.describe_context()))
 //          UINT32 read_dir;
 
@@ -1105,7 +1105,7 @@ void saturn_state::cd_exec_command( void )
 			hirqreg |= (CMOK|EFLS);
 			break;
 
-		case 0x7200:    // Get file system scope
+		case 0x72:    // Get file system scope
 			CDROM_LOG(("CD: Get file system scope\n"))
 			hirqreg |= (CMOK|EFLS);
 			cr1 = cd_stat;
@@ -1115,7 +1115,7 @@ void saturn_state::cd_exec_command( void )
 			printf("%04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
 			break;
 
-		case 0x7300:    // Get File Info
+		case 0x73:    // Get File Info
 			CDROM_LOG(("%s:CD: Get File Info\n",   machine.describe_context()))
 			cd_stat |= CD_STAT_TRANS;
 			cd_stat &= 0xff00;      // clear top byte of return value
@@ -1173,7 +1173,7 @@ void saturn_state::cd_exec_command( void )
 			CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 			break;
 
-		case 0x7400:    // Read File
+		case 0x74:    // Read File
 			CDROM_LOG(("%s:CD: Read File\n",   machine.describe_context()))
 			UINT16 file_offset,file_filter,file_id,file_size;
 
@@ -1203,7 +1203,7 @@ void saturn_state::cd_exec_command( void )
 
 			break;
 
-		case 0x7500:
+		case 0x75:
 			CDROM_LOG(("%s:CD: Abort File\n",   machine.describe_context()))
 			// bios expects "2bc" mask to work against this
 			hirqreg |= (CMOK|EFLS);
@@ -1215,7 +1215,7 @@ void saturn_state::cd_exec_command( void )
 			cr_standard_return(cd_stat);
 			break;
 
-		case 0xe000:    // appears to be copy protection check.  needs only to return OK.
+		case 0xe0:    // appears to be copy protection check.  needs only to return OK.
 			CDROM_LOG(("%s:CD: Verify copy protection\n",   machine.describe_context()))
 			if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 				cd_stat = CD_STAT_PAUSE;
@@ -1227,7 +1227,7 @@ void saturn_state::cd_exec_command( void )
 			cr_standard_return(cd_stat);
 			break;
 
-		case 0xe100:    // get disc region
+		case 0xe1:    // get disc region
 			CDROM_LOG(("%s:CD: Get disc region\n",   machine.describe_context()))
 			if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
 				cd_stat = CD_STAT_PAUSE;
@@ -1240,7 +1240,8 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		default:
-			CDROM_LOG(("CD: Unknown command %04x\n", cr1))
+			CDROM_LOG(("CD: Unknown command %04x\n", cr1>>8))
+			popmessage("CD Block unknown command %02x, contact MAMEdev",cr1>>8);
 			hirqreg |= (CMOK);
 			break;
 	}
