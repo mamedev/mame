@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    NEC uPD1771 as used in the Epoch Super Cassette Vision (SCV)
+    NEC uPD1771-017 as used in the Epoch Super Cassette Vision (SCV)
 
     Made using recording/analysis on a Yeno (PAL Super Cassete Vision)
     by plgDavid
@@ -113,23 +113,27 @@
      GND         14        15        ? tied to pin 16 (VCC) through a resistor (pullup?)
 
      Pinout based on guesses and information in "Electronic Speech Synthesis" by Geoff Bristow
-     (ISBN 0-07-007912-9, pages 148-152); [x] is unsure:
+     (ISBN 0-07-007912-9, pages 148-152), and the data on page 233 of the Nec APC technical manual at
+     http://bitsavers.trailing-edge.com/pdf/nec/APC/819-000100-1003_APC_System_Reference_Guide_Apr83.pdf
+     [x] is unsure:
      PB3          1        28        PB2
      PB4(/ALE)    2        27        PB1
      PB5(/RD)     3        26        PB0
-     PB6(/WR)     4        25        PA7
-     PB7(/CS)     5        24        PA6
-     /EXTINT?     6        23        PA5
-     [RESET?]     7        22        PA4
-     VCC          8        21        PA3
-     XI           9        20        PA2
-     XO          10        19        PA1
-     D/A OUT +   11        18        PA0
-     [D/A VREF?] 12        17        [MODE3?]
-     D/A OUT -   13        16        [MODE2?]
-     GND         14        15        [MODE1/TEST/RESET?] tied to pin 16 (VCC) through a resistor (pullup?)
+     PB6(/WR)     4        25        D7(PA7)
+     PB7(/CS)     5        24        D6(PA6)
+     /RESET       6        23        D5(PA5)
+     [TEST?]      7        22        D4(PA4)
+     VCC          8        21        D3(PA3)
+     XI(CLK)      9        20        D2(PA2)
+     XO          10        19        D1(PA1)
+     D/A OUT +   11        18        D0(PA0)
+     [D/A VREF]  12        17        CH2
+     D/A OUT -   13        16        /EXTINT
+     GND         14        15        CH1 tied to pin 16 (VCC) through a resistor, on APC to VCC thru a 12k resistor and thru a 10uf cap to gnd
 
-    In the SCV:
+    CH1 and CH2 are some sort of mode selects?
+
+    In the SCV (info from plgDavid):
     pin  5 is tied to the !SCPU pin on the Epoch TV chip pin 29 (0x3600 writes)
     pin  6 is tied to the   PC3 pin of the upD7801 CPU
     pin 26 is tied to the  INT1 pin of the upD7801 (CPU pin 12),
