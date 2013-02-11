@@ -124,10 +124,8 @@ CPU_DISASSEMBLE( sh2 );
 INLINE sh2_state *get_safe_token(device_t *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_SH1 ||
-			cpu_get_type(device) == CPU_SH2);
+	assert(device->type() == SH1 ||
+			device->type() == SH2);
 	return (sh2_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
