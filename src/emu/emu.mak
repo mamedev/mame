@@ -261,9 +261,12 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/scsidev.o     \
 	$(EMUMACHINE)/scsihd.o      \
 	$(EMUMACHINE)/scsihle.o     \
+	$(EMUMACHINE)/scudsp.o      \
 	$(EMUMACHINE)/secflash.o    \
 	$(EMUMACHINE)/seibu_cop.o   \
 	$(EMUMACHINE)/smc91c9x.o    \
+	$(EMUMACHINE)/smpc.o      \
+	$(EMUMACHINE)/stvcd.o       \
 	$(EMUMACHINE)/tc009xlvc.o   \
 	$(EMUMACHINE)/timekpr.o     \
 	$(EMUMACHINE)/tmp68301.o    \
@@ -328,6 +331,8 @@ EMUVIDEOOBJS = \
 	$(EMUVIDEO)/s2636.o         \
 	$(EMUVIDEO)/saa5050.o       \
 	$(EMUVIDEO)/sed1330.o       \
+	$(EMUVIDEO)/stvvdp1.o       \
+	$(EMUVIDEO)/stvvdp2.o       \
 	$(EMUVIDEO)/tlc34076.o      \
 	$(EMUVIDEO)/tms34061.o      \
 	$(EMUVIDEO)/tms9927.o       \

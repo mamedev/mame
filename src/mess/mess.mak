@@ -491,13 +491,6 @@ $(MESSOBJ)/mame.a: \
 	$(MAME_DRIVERS)/vectrex.o   \
 	$(MAME_VIDEO)/vectrex.o     \
 	$(MAME_MACHINE)/vectrex.o   \
-	$(MAME_DRIVERS)/saturn.o    \
-	$(MAME_MACHINE)/stvcd.o     \
-	$(MAME_MACHINE)/scudsp.o    \
-	$(MAME_MACHINE)/stvprot.o   \
-	$(MAME_MACHINE)/smpc.o      \
-	$(MAME_VIDEO)/stvvdp1.o     \
-	$(MAME_VIDEO)/stvvdp2.o     \
 	$(MAME_DRIVERS)/cps1.o  \
 	$(MAME_VIDEO)/cps1.o    \
 	$(MAME_DRIVERS)/konamim2.o \
@@ -1651,8 +1644,10 @@ $(MESSOBJ)/sega.a:              \
 	$(MESS_DRIVERS)/dccons.o    \
 	$(MAME_MACHINE)/gdrom.o     \
 	$(MESS_MACHINE)/dccons.o    \
-	$(MESS_MACHINE)/sms.o   \
-	$(MESS_DRIVERS)/sms.o   \
+	$(MAME_DRIVERS)/saturn.o    \
+	$(MESS_MACHINE)/sms.o       \
+	$(MESS_DRIVERS)/sms.o       \
+	$(MAME_MACHINE)/stvprot.o   \
 	$(MESS_DRIVERS)/svmu.o      \
 
 $(MESSOBJ)/sgi.a:               \

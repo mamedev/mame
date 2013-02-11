@@ -714,3 +714,6 @@ public:
 #define IRQ_DMAILL     1 << 12
 #define IRQ_VDP1_END   1 << 13
 #define IRQ_ABUS       1 << 15
+
+extern void scsp_irq(device_t *device, int irq);
+GFXDECODE_EXTERN( stv );
