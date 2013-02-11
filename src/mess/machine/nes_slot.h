@@ -84,6 +84,8 @@ public:
 	bool m_has_battery, m_has_prgram; 
 };
 
+extern void nes_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
+
 
 // ======================> nes_cart_slot_device
 
@@ -115,6 +117,7 @@ public:
 	virtual const char *image_interface() const { return "nes_cart"; }
 	virtual const char *file_extensions() const { return "nes,unf,unif"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
+	virtual device_image_partialhash_func get_partial_hash() const { return &nes_partialhash; }
 	
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);

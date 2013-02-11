@@ -1,6 +1,6 @@
 #include "emu.h"
 #include "machine/nes_slot.h"
-
+#include "hashfile.h"
 
 #define NES_BATTERY_SIZE 0x2000
 
@@ -268,7 +268,7 @@ bool base_nes_cart_slot_device::call_load()
 				bool ines20 = FALSE, has_trainer = FALSE, prg16k;
 				
 				// check if the image is recognized by nes.hsi
-//              mapinfo = hashfile_extrainfo(image);
+				mapinfo = hashfile_extrainfo(*this);
 				
 				// image_extrainfo() resets the file position back to start.
 				fseek(0, SEEK_SET);
