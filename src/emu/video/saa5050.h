@@ -102,6 +102,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+	virtual void device_reset();
 
 private:
 	void process_control_character(UINT8 data);
