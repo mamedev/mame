@@ -81,4 +81,6 @@ public:
 	DECLARE_DRIVER_INIT(m1);
 	virtual void machine_start();
 	virtual void machine_reset();
+	void update_outputs(i8279_state *chip, UINT16 which);
+	void m1_stepper_reset();
 };

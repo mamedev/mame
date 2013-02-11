@@ -39,13 +39,12 @@ WRITE8_MEMBER(mrflea_state::mrflea_spriteram_w)
 	m_spriteram[offset] = data;
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mrflea_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	mrflea_state *state = machine.driver_data<mrflea_state>();
-	gfx_element *gfx = machine.gfx[0];
-	const UINT8 *source = state->m_spriteram;
+	gfx_element *gfx = machine().gfx[0];
+	const UINT8 *source = m_spriteram;
 	const UINT8 *finish = source + 0x100;
-	rectangle clip = machine.primary_screen->visible_area();
+	rectangle clip = machine().primary_screen->visible_area();
 
 	clip.max_x -= 24;
 	clip.min_x += 16;
@@ -70,18 +69,17 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mrflea_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	mrflea_state *state = machine.driver_data<mrflea_state>();
-	const UINT8 *source = state->m_videoram;
-	gfx_element *gfx = machine.gfx[1];
+	const UINT8 *source = m_videoram;
+	gfx_element *gfx = machine().gfx[1];
 	int sx, sy;
 	int base = 0;
 
-	if (BIT(state->m_gfx_bank, 2))
+	if (BIT(m_gfx_bank, 2))
 		base |= 0x400;
 
-	if (BIT(state->m_gfx_bank, 4))
+	if (BIT(m_gfx_bank, 4))
 		base |= 0x200;
 
 	for (sy = 0; sy < 256; sy += 8)
@@ -102,7 +100,7 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
 
 UINT32 mrflea_state::screen_update_mrflea(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(machine(), bitmap, cliprect);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_background(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

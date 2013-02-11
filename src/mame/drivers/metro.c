@@ -558,7 +558,7 @@ TIMER_CALLBACK_MEMBER(metro_state::metro_blit_done)
 	update_irq_state();
 }
 
-INLINE int blt_read( const UINT8 *ROM, const int offs )
+inline int metro_state::blt_read( const UINT8 *ROM, const int offs )
 {
 	return ROM[offs];
 }
@@ -6263,16 +6263,15 @@ ROM_END
 
 ***************************************************************************/
 
-static void metro_common( running_machine &machine )
+void metro_state::metro_common(  )
 {
-	metro_state *state = machine.driver_data<metro_state>();
 
-	memset(state->m_requested_int, 0, ARRAY_LENGTH(state->m_requested_int));
-	state->m_vblank_bit = 0;
-	state->m_blitter_bit = 2;
-	state->m_irq_line = 2;
+	memset(m_requested_int, 0, ARRAY_LENGTH(m_requested_int));
+	m_vblank_bit = 0;
+	m_blitter_bit = 2;
+	m_irq_line = 2;
 
-	*state->m_irq_enable = 0;
+	*m_irq_enable = 0;
 }
 
 
@@ -6280,7 +6279,7 @@ DRIVER_INIT_MEMBER(metro_state,metro)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	metro_common(machine());
+	metro_common();
 
 	m_porta = 0x00;
 	m_portb = 0x00;
@@ -6307,7 +6306,7 @@ DRIVER_INIT_MEMBER(metro_state,daitorid)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	metro_common(machine());
+	metro_common();
 
 	m_porta = 0x00;
 	m_portb = 0x00;
@@ -6333,7 +6332,7 @@ DRIVER_INIT_MEMBER(metro_state,balcube)
 		src   +=  2;
 	}
 
-	metro_common(machine());
+	metro_common();
 	m_irq_line = 1;
 }
 
@@ -6360,13 +6359,13 @@ DRIVER_INIT_MEMBER(metro_state,dharmak)
 
 DRIVER_INIT_MEMBER(metro_state,blzntrnd)
 {
-	metro_common(machine());
+	metro_common();
 	m_irq_line = 1;
 }
 
 DRIVER_INIT_MEMBER(metro_state,mouja)
 {
-	metro_common(machine());
+	metro_common();
 	m_irq_line = -1;    /* split interrupt handlers */
 	m_vblank_bit = 1;
 	m_mouja_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(metro_state::mouja_irq_callback),this));
@@ -6374,7 +6373,7 @@ DRIVER_INIT_MEMBER(metro_state,mouja)
 
 DRIVER_INIT_MEMBER(metro_state,gakusai)
 {
-	metro_common(machine());
+	metro_common();
 	m_irq_line = -1;
 	m_vblank_bit = 1;
 	m_blitter_bit = 3;
@@ -6382,7 +6381,7 @@ DRIVER_INIT_MEMBER(metro_state,gakusai)
 
 DRIVER_INIT_MEMBER(metro_state,puzzlet)
 {
-	metro_common(machine());
+	metro_common();
 	m_irq_line = 0;
 	m_vblank_bit = 1;
 	m_blitter_bit = 0;

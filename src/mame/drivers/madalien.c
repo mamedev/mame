@@ -23,16 +23,16 @@ INPUT_CHANGED_MEMBER(madalien_state::coin_inserted)
 }
 
 
-INLINE UINT8 shift_common(running_machine &machine, UINT8 hi, UINT8 lo)
+inline UINT8 madalien_state::shift_common(UINT8 hi, UINT8 lo)
 {
-	const UINT8 *table = machine.root_device().memregion("user2")->base();
+	const UINT8 *table = machine().root_device().memregion("user2")->base();
 
 	return table[((hi & 0x07) << 8) | lo];
 }
 
 READ8_MEMBER(madalien_state::shift_r)
 {
-	return shift_common(machine(), *m_shift_hi, *m_shift_lo);
+	return shift_common(*m_shift_hi, *m_shift_lo);
 }
 
 READ8_MEMBER(madalien_state::shift_rev_r)
@@ -40,7 +40,7 @@ READ8_MEMBER(madalien_state::shift_rev_r)
 	UINT8 hi = *m_shift_hi ^ 0x07;
 	UINT8 lo = BITSWAP8(*m_shift_lo,0,1,2,3,4,5,6,7);
 
-	UINT8 ret = shift_common(machine(), hi, lo);
+	UINT8 ret = shift_common(hi, lo);
 
 	return BITSWAP8(ret,7,0,1,2,3,4,5,6) & 0x7f;
 }

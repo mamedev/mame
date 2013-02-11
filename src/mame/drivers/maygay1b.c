@@ -99,7 +99,7 @@ void maygay1b_state::m1_draw_lamps(int data,int strobe, int col)
  *
  *************************************/
 
-static void update_outputs(i8279_state *chip, UINT16 which)
+void maygay1b_state::update_outputs(i8279_state *chip, UINT16 which)
 {
 	static const UINT8 ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
@@ -456,23 +456,22 @@ WRITE8_MEMBER(maygay1b_state::m1_8279_2_w)
 // called if board is reset ///////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-static void m1_stepper_reset(running_machine &machine)
+void maygay1b_state::m1_stepper_reset()
 {
-	maygay1b_state *state = machine.driver_data<maygay1b_state>();
 	int pattern = 0,i;
 	for ( i = 0; i < 6; i++)
 	{
 		stepper_reset_position(i);
 		if ( stepper_optic_state(i) ) pattern |= 1<<i;
 	}
-	state->m_optic_pattern = pattern;
+	m_optic_pattern = pattern;
 }
 
 void maygay1b_state::machine_reset()
 {
 	m_vfd->reset(); // reset display1
 	m_duart68681 = machine().device( "duart68681" );
-	m1_stepper_reset(machine());
+	m1_stepper_reset();
 }
 
 ///////////////////////////////////////////////////////////////////////////

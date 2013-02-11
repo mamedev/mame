@@ -117,12 +117,11 @@ WRITE8_MEMBER(mainsnk_state::mainsnk_bgram_w)
 
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int scrollx, int scrolly )
+void mainsnk_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scrollx, int scrolly )
 {
-	mainsnk_state *state = machine.driver_data<mainsnk_state>();
-	gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine().gfx[1];
 	const UINT8 *source, *finish;
-	source =  state->m_spriteram;
+	source =  m_spriteram;
 	finish =  source + 25*4;
 
 	while( source<finish )
@@ -141,7 +140,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sx = 288-16 - sx;
 		sy += 8;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 288-16 - sx;
 			sy = 224-16 - sy;
@@ -163,7 +162,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 mainsnk_state::screen_update_mainsnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect, 0, 0);
+	draw_sprites(bitmap, cliprect, 0, 0);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;

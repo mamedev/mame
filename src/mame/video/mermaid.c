@@ -178,16 +178,15 @@ void mermaid_state::video_start()
 	machine().primary_screen->register_screen_bitmap(m_helper2);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mermaid_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	const rectangle spritevisiblearea(0 * 8, 26 * 8 - 1, 2 * 8, 30 * 8 - 1);
 	const rectangle flip_spritevisiblearea(6 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1);
 
-	mermaid_state *state = machine.driver_data<mermaid_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int attr = spriteram[offs + 2];
 		int bank = (attr & 0x30) >> 4;
@@ -200,23 +199,23 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		if (sx >= 0xf0) sx -= 256;
 
-		code |= state->m_rougien_gfxbank1 * 0x2800;
-		code |= state->m_rougien_gfxbank2 * 0x2400;
+		code |= m_rougien_gfxbank1 * 0x2800;
+		code |= m_rougien_gfxbank2 * 0x2400;
 
-		if (state->flip_screen_x())
+		if (flip_screen_x())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (state->flip_screen_y())
+		if (flip_screen_y())
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap, (state->flip_screen_x() ? flip_spritevisiblearea : spritevisiblearea),
-			machine.gfx[1], code, color, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(bitmap, (flip_screen_x() ? flip_spritevisiblearea : spritevisiblearea),
+			machine().gfx[1], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -224,13 +223,12 @@ UINT32 mermaid_state::screen_update_mermaid(screen_device &screen, bitmap_ind16 
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
-static UINT8 collision_check( running_machine &machine, rectangle& rect )
+UINT8 mermaid_state::collision_check( rectangle& rect )
 {
-	mermaid_state *state = machine.driver_data<mermaid_state>();
 	UINT8 data = 0;
 
 	int x;
@@ -239,8 +237,8 @@ static UINT8 collision_check( running_machine &machine, rectangle& rect )
 	for (y = rect.min_y; y <= rect.max_y; y++)
 		for (x = rect.min_x; x <= rect.max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(machine.colortable, state->m_helper.pix16(y, x)) & 0x3f;
-			UINT16 b = colortable_entry_get_value(machine.colortable, state->m_helper2.pix16(y, x)) & 0x3f;
+			UINT16 a = colortable_entry_get_value(machine().colortable, m_helper.pix16(y, x)) & 0x3f;
+			UINT16 b = colortable_entry_get_value(machine().colortable, m_helper2.pix16(y, x)) & 0x3f;
 
 			if (b)
 				if (a)
@@ -314,7 +312,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			drawgfx_transpen(m_helper2, rect, machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-			m_coll_bit2 |= collision_check(machine(), rect);
+			m_coll_bit2 |= collision_check(rect);
 
 			// check collision sprite - foreground
 
@@ -325,7 +323,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			drawgfx_transpen(m_helper2, rect, machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-			m_coll_bit1 |= collision_check(machine(), rect);
+			m_coll_bit1 |= collision_check(rect);
 
 			// check collision sprite - sprite
 
@@ -366,7 +364,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			drawgfx_transpen(m_helper2, rect, machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-			m_coll_bit0 |= collision_check(machine(), rect);
+			m_coll_bit0 |= collision_check(rect);
 		}
 
 		// check for bit 3 (sprite-sprite)
@@ -447,7 +445,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			drawgfx_transpen(m_helper2, rect, machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-			m_coll_bit3 |= collision_check(machine(), rect);
+			m_coll_bit3 |= collision_check(rect);
 		}
 
 		// check for bit 6
@@ -528,7 +526,7 @@ void mermaid_state::screen_eof_mermaid(screen_device &screen, bool state)
 
 			drawgfx_transpen(m_helper2, rect, machine().gfx[1], code, 0, flipx, flipy, sx, sy, 0);
 
-			m_coll_bit6 |= collision_check(machine(), rect);
+			m_coll_bit6 |= collision_check(rect);
 		}
 	}
 }

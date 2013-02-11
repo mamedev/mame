@@ -290,14 +290,13 @@ WRITE8_MEMBER(m52_state::alpha1v_flipscreen_w)
  *
  *************************************/
 
-void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image)
+void m52_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image)
 {
 	rectangle rect;
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine().primary_screen->visible_area();
 
-	m52_state *state = machine.driver_data<m52_state>();
 
-	if (state->flip_screen())
+	if (flip_screen())
 	{
 		xpos = 127 - xpos;
 		ypos = 255 - ypos - BGHEIGHT;
@@ -309,25 +308,25 @@ void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const recta
 	ypos = ypos + (22 - 8);
 
 	drawgfx_transpen(bitmap, cliprect,
-		machine.gfx[image],
+		machine().gfx[image],
 		0, 0,
-		state->flip_screen(),
-		state->flip_screen(),
+		flip_screen(),
+		flip_screen(),
 		xpos,
 		ypos, 0);
 
 	drawgfx_transpen(bitmap, cliprect,
-		machine.gfx[image],
+		machine().gfx[image],
 		0, 0,
-		state->flip_screen(),
-		state->flip_screen(),
+		flip_screen(),
+		flip_screen(),
 		xpos - 256,
 		ypos, 0);
 
 	rect.min_x = visarea.min_x;
 	rect.max_x = visarea.max_x;
 
-	if (state->flip_screen())
+	if (flip_screen())
 	{
 		rect.min_y = ypos - BGHEIGHT;
 		rect.max_y = ypos - 1;
@@ -338,7 +337,7 @@ void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const recta
 		rect.max_y = ypos + 2 * BGHEIGHT - 1;
 	}
 
-	bitmap.fill(machine.gfx[image]->colorbase() + 3, rect);
+	bitmap.fill(machine().gfx[image]->colorbase() + 3, rect);
 }
 
 
@@ -358,13 +357,13 @@ UINT32 m52_state::screen_update_m52(screen_device &screen, bitmap_ind16 &bitmap,
 	if (!(m_bgcontrol & 0x20))
 	{
 		if (!(m_bgcontrol & 0x10))
-			draw_background(machine(), bitmap, cliprect, m_bg2xpos, m_bg2ypos, 2); /* distant mountains */
+			draw_background(bitmap, cliprect, m_bg2xpos, m_bg2ypos, 2); /* distant mountains */
 
 		if (!(m_bgcontrol & 0x02))
-			draw_background(machine(), bitmap, cliprect, m_bg1xpos, m_bg1ypos, 3); /* hills */
+			draw_background(bitmap, cliprect, m_bg1xpos, m_bg1ypos, 3); /* hills */
 
 		if (!(m_bgcontrol & 0x04))
-			draw_background(machine(), bitmap, cliprect, m_bg1xpos, m_bg1ypos, 4); /* cityscape */
+			draw_background(bitmap, cliprect, m_bg1xpos, m_bg1ypos, 4); /* cityscape */
 	}
 
 	m_bg_tilemap->set_flip(flip_screen() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);

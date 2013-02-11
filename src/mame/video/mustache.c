@@ -96,16 +96,15 @@ void mustache_state::video_start()
 	m_bg_tilemap->set_scroll_rows(4);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mustache_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	mustache_state *state = machine.driver_data<mustache_state>();
 	rectangle clip = cliprect;
-	gfx_element *gfx = machine.gfx[1];
-	const rectangle &visarea = machine.primary_screen->visible_area();
-	UINT8 *spriteram = state->m_spriteram;
+	gfx_element *gfx = machine().gfx[1];
+	const rectangle &visarea = machine().primary_screen->visible_area();
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram.bytes();offs += 4)
+	for (offs = 0;offs < m_spriteram.bytes();offs += 4)
 	{
 		int sy = 240-spriteram[offs];
 		int sx = 240-spriteram[offs+3];
@@ -117,15 +116,15 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		code+=(attr&0x0c)<<6;
 
-		if ((state->m_control_byte & 0xa))
+		if ((m_control_byte & 0xa))
 			clip.max_y = visarea.max_y;
 		else
-			if (state->flip_screen())
+			if (flip_screen())
 				clip.min_y = visarea.min_y + 56;
 			else
 				clip.max_y = visarea.max_y - 56;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -134,7 +133,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		drawgfx_transpen(bitmap,clip,gfx,
 				code,
 				color,
-				state->flip_screen(),state->flip_screen(),
+				flip_screen(),flip_screen(),
 				sx,sy,0);
 	}
 }
@@ -142,6 +141,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 mustache_state::screen_update_mustache(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

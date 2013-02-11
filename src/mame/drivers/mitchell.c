@@ -2080,17 +2080,17 @@ ROM_END
  *
  *************************************/
 
-static void bootleg_decode( running_machine &machine )
+void mitchell_state::bootleg_decode(  )
 {
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base() + 0x50000);
-	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x60000, 0x4000);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space.set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x50000);
+	machine().root_device().membank("bank1")->configure_decrypted_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x60000, 0x4000);
 }
 
 
-static void configure_banks( running_machine &machine )
+void mitchell_state::configure_banks(  )
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -2098,19 +2098,19 @@ DRIVER_INIT_MEMBER(mitchell_state,dokaben)
 {
 	m_input_type = 0;
 	mgakuen2_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,pang)
 {
 	m_input_type = 0;
 	pang_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,pangb)
 {
 	m_input_type = 0;
-	bootleg_decode(machine());
-	configure_banks(machine());
+	bootleg_decode();
+	configure_banks();
 	if (m_nvram != NULL)
 		m_nvram->set_base(&m_dummy_nvram, sizeof(m_dummy_nvram));   /* for pangba */
 }
@@ -2118,28 +2118,28 @@ DRIVER_INIT_MEMBER(mitchell_state,cworld)
 {
 	m_input_type = 0;
 	cworld_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,hatena)
 {
 	m_input_type = 0;
 	hatena_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,spang)
 {
 	m_input_type = 3;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
 	spang_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 
 DRIVER_INIT_MEMBER(mitchell_state,spangbl)
 {
 	m_input_type = 3;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
-	bootleg_decode(machine());
-	configure_banks(machine());
+	bootleg_decode();
+	configure_banks();
 }
 
 DRIVER_INIT_MEMBER(mitchell_state,spangj)
@@ -2147,31 +2147,31 @@ DRIVER_INIT_MEMBER(mitchell_state,spangj)
 	m_input_type = 3;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
 	spangj_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,sbbros)
 {
 	m_input_type = 3;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xe000], 0x80); /* NVRAM */
 	sbbros_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,qtono1)
 {
 	m_input_type = 0;
 	qtono1_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,qsangoku)
 {
 	m_input_type = 0;
 	qsangoku_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,mgakuen)
 {
 	m_input_type = 1;
-	configure_banks(machine());
+	configure_banks();
 	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x03, 0x03, "DSW0");
 	machine().device("maincpu")->memory().space(AS_IO).install_read_port(0x04, 0x04, "DSW1");
 }
@@ -2179,39 +2179,39 @@ DRIVER_INIT_MEMBER(mitchell_state,mgakuen2)
 {
 	m_input_type = 1;
 	mgakuen2_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,pkladies)
 {
 	m_input_type = 1;
 	mgakuen2_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,pkladiesbl)
 {
 	m_input_type = 1;
-	bootleg_decode(machine());
-	configure_banks(machine());
+	bootleg_decode();
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,marukin)
 {
 	m_input_type = 1;
 	marukin_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,block)
 {
 	m_input_type = 2;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xff80], 0x80); /* NVRAM */
 	block_decode(machine());
-	configure_banks(machine());
+	configure_banks();
 }
 DRIVER_INIT_MEMBER(mitchell_state,blockbl)
 {
 	m_input_type = 2;
 	m_nvram->set_base(&memregion("maincpu")->base()[0xff80], 0x80); /* NVRAM */
-	bootleg_decode(machine());
-	configure_banks(machine());
+	bootleg_decode();
+	configure_banks();
 }
 
 DRIVER_INIT_MEMBER(mitchell_state,mstworld)
@@ -2257,8 +2257,8 @@ DRIVER_INIT_MEMBER(mitchell_state,mstworld)
 	}
 	auto_free(machine(), source);
 
-	bootleg_decode(machine());
-	configure_banks(machine());
+	bootleg_decode();
+	configure_banks();
 }
 
 

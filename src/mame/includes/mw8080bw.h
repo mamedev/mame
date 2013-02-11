@@ -174,6 +174,16 @@ public:
 	DECLARE_WRITE8_MEMBER(invad2ct_audio_3_w);
 	DECLARE_WRITE8_MEMBER(invad2ct_audio_4_w);
 	void maze_update_discrete();
+	UINT8 vpos_to_vysnc_chain_counter( int vpos );
+	int vysnc_chain_counter_to_vpos( UINT8 counter, int vblank );
+	void mw8080bw_create_interrupt_timer(  );
+	void mw8080bw_start_interrupt_timer(  );
+	UINT8 tornbase_get_cabinet_type();
+	UINT8 spcenctr_get_trench_width();
+	UINT8 spcenctr_get_trench_center();
+	UINT8 spcenctr_get_trench_slope(UINT8 addr );
+	int invaders_is_cabinet_cocktail();
+	UINT32 invad2ct_coin_input_r(void *param);
 };
 
 

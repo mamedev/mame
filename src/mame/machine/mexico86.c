@@ -41,66 +41,65 @@ WRITE8_MEMBER(mexico86_state::mexico86_f008_w)
 
 ***************************************************************************/
 
-static void mcu_simulate( running_machine &machine )
+void mexico86_state::mcu_simulate(  )
 {
-	mexico86_state *state = machine.driver_data<mexico86_state>();
 
-	if (!state->m_mcu_initialised)
+	if (!m_mcu_initialised)
 	{
-		if (state->m_protection_ram[0x01] == 0x00)
+		if (m_protection_ram[0x01] == 0x00)
 		{
 			logerror("initialising MCU\n");
-			state->m_protection_ram[0x04] = 0xfc;   // coin inputs
-			state->m_protection_ram[0x02] = 0xff;   // player 1
-			state->m_protection_ram[0x03] = 0xff;   // player 2
-			state->m_protection_ram[0x1b] = 0xff;   // active player
-			state->m_protection_ram[0x06] = 0xff;   // must be FF otherwise PS4 ERROR
-			state->m_protection_ram[0x07] = 0x03;   // must be 03 otherwise PS4 ERROR
-			state->m_protection_ram[0x00] = 0x00;
-			state->m_mcu_initialised = 1;
+			m_protection_ram[0x04] = 0xfc;   // coin inputs
+			m_protection_ram[0x02] = 0xff;   // player 1
+			m_protection_ram[0x03] = 0xff;   // player 2
+			m_protection_ram[0x1b] = 0xff;   // active player
+			m_protection_ram[0x06] = 0xff;   // must be FF otherwise PS4 ERROR
+			m_protection_ram[0x07] = 0x03;   // must be 03 otherwise PS4 ERROR
+			m_protection_ram[0x00] = 0x00;
+			m_mcu_initialised = 1;
 		}
 	}
 
-	if (state->m_mcu_initialised)
+	if (m_mcu_initialised)
 	{
 		int i;
 		int coin_curr;
 
-		coin_curr = ~machine.root_device().ioport("IN0")->read() & 1;
-		if (coin_curr && !state->m_coin_last && state->m_protection_ram[0x01] < 9)
+		coin_curr = ~machine().root_device().ioport("IN0")->read() & 1;
+		if (coin_curr && !m_coin_last && m_protection_ram[0x01] < 9)
 		{
-			state->m_protection_ram[0x01]++;    // increase credits counter
-			state->m_protection_ram[0x0a] = 0x01;   // set flag (coin inserted sound is not played otherwise)
+			m_protection_ram[0x01]++;    // increase credits counter
+			m_protection_ram[0x0a] = 0x01;   // set flag (coin inserted sound is not played otherwise)
 		}
-		state->m_coin_last = coin_curr;
+		m_coin_last = coin_curr;
 
-		state->m_protection_ram[0x04] = 0x3c;   // coin inputs
+		m_protection_ram[0x04] = 0x3c;   // coin inputs
 
-		state->m_protection_ram[0x02] = BITSWAP8(machine.root_device().ioport("IN1")->read(), 7,6,5,4,2,3,1,0); // player 1
-		state->m_protection_ram[0x03] = BITSWAP8(machine.root_device().ioport("IN2")->read(), 7,6,5,4,2,3,1,0); // player 2
+		m_protection_ram[0x02] = BITSWAP8(machine().root_device().ioport("IN1")->read(), 7,6,5,4,2,3,1,0); // player 1
+		m_protection_ram[0x03] = BITSWAP8(machine().root_device().ioport("IN2")->read(), 7,6,5,4,2,3,1,0); // player 2
 
-		if (state->m_protection_ram[0x19] == 0xaa)  // player 2 active
-			state->m_protection_ram[0x1b] = state->m_protection_ram[0x03];
+		if (m_protection_ram[0x19] == 0xaa)  // player 2 active
+			m_protection_ram[0x1b] = m_protection_ram[0x03];
 		else
-			state->m_protection_ram[0x1b] = state->m_protection_ram[0x02];
+			m_protection_ram[0x1b] = m_protection_ram[0x02];
 
 
 		for (i = 0; i < 0x10; i += 2)
-			state->m_protection_ram[i + 0xb1] = state->m_protection_ram[i + 0xb0];
+			m_protection_ram[i + 0xb1] = m_protection_ram[i + 0xb0];
 
 		for (i = 0; i < 0x0a; i++)
-			state->m_protection_ram[i + 0xc0] = state->m_protection_ram[i + 0x90] + 1;
+			m_protection_ram[i + 0xc0] = m_protection_ram[i + 0x90] + 1;
 
-		if (state->m_protection_ram[0xd1] == 0xff)
+		if (m_protection_ram[0xd1] == 0xff)
 		{
-			if (state->m_protection_ram[0xd0] > 0 && state->m_protection_ram[0xd0] < 4)
+			if (m_protection_ram[0xd0] > 0 && m_protection_ram[0xd0] < 4)
 			{
-				state->m_protection_ram[0xd2] = 0x81;
-				state->m_protection_ram[0xd0] = 0xff;
+				m_protection_ram[0xd2] = 0x81;
+				m_protection_ram[0xd0] = 0xff;
 			}
 		}
 
-		if (state->m_protection_ram[0xe0] > 0 && state->m_protection_ram[0xe0] < 4)
+		if (m_protection_ram[0xe0] > 0 && m_protection_ram[0xe0] < 4)
 		{
 			static const UINT8 answers[3][16] =
 			{
@@ -108,17 +107,17 @@ static void mcu_simulate( running_machine &machine )
 				{ 0x00,0x04,0x08,0x0C,0x10,0x14,0x18,0x1C,0x20,0x31,0x2B,0x35,0x00,0x00,0x00,0x00 },
 				{ 0x00,0x0C,0x0D,0x0E,0x0F,0x10,0x11,0x12,0x03,0x0A,0x0B,0x14,0x00,0x00,0x00,0x00 },
 			};
-			int table = state->m_protection_ram[0xe0] - 1;
+			int table = m_protection_ram[0xe0] - 1;
 
 			for (i = 1; i < 0x10; i++)
-				state->m_protection_ram[0xe0 + i] = answers[table][i];
-			state->m_protection_ram[0xe0] = 0xff;
+				m_protection_ram[0xe0 + i] = answers[table][i];
+			m_protection_ram[0xe0] = 0xff;
 		}
 
-		if (state->m_protection_ram[0xf0] > 0 && state->m_protection_ram[0xf0] < 4)
+		if (m_protection_ram[0xf0] > 0 && m_protection_ram[0xf0] < 4)
 		{
-			state->m_protection_ram[0xf1] = 0xb3;
-			state->m_protection_ram[0xf0] = 0xff;
+			m_protection_ram[0xf1] = 0xb3;
+			m_protection_ram[0xf0] = 0xff;
 		}
 
 
@@ -126,21 +125,21 @@ static void mcu_simulate( running_machine &machine )
 		// this should be equivalent to the obfuscated kiki_clogic() below
 		{
 			static const UINT8 db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
-			UINT16 sy = state->m_protection_ram[0xa0] + ((0x18) >> 1);
-			UINT16 sx = state->m_protection_ram[0xa1] + ((0x18) >> 1);
+			UINT16 sy = m_protection_ram[0xa0] + ((0x18) >> 1);
+			UINT16 sx = m_protection_ram[0xa1] + ((0x18) >> 1);
 
 			for (i = 0; i < 0x38; i += 8)
 			{
-				UINT8 hw = db[state->m_protection_ram[0x20 + i] & 0xf];
+				UINT8 hw = db[m_protection_ram[0x20 + i] & 0xf];
 
 				if (hw)
 				{
-					UINT16 xdiff = sx - ((UINT16)state->m_protection_ram[0x20 + i + 6] << 8 | state->m_protection_ram[0x20 + i + 7]);
+					UINT16 xdiff = sx - ((UINT16)m_protection_ram[0x20 + i + 6] << 8 | m_protection_ram[0x20 + i + 7]);
 					if (xdiff < hw)
 					{
-						UINT16 ydiff = sy - ((UINT16)state->m_protection_ram[0x20 + i + 4] << 8 | state->m_protection_ram[0x20 + i + 5]);
+						UINT16 ydiff = sy - ((UINT16)m_protection_ram[0x20 + i + 4] << 8 | m_protection_ram[0x20 + i + 5]);
 						if (ydiff < hw)
-							state->m_protection_ram[0xa2] = 1; // we have a collision
+							m_protection_ram[0xa2] = 1; // we have a collision
 					}
 				}
 			}
@@ -152,7 +151,7 @@ static void mcu_simulate( running_machine &machine )
 INTERRUPT_GEN_MEMBER(mexico86_state::kikikai_interrupt)
 {
 	if (m_mcu_running)
-		mcu_simulate(machine());
+		mcu_simulate();
 
 	device.execute().set_input_line_vector(0, m_protection_ram[0]);
 	device.execute().set_input_line(0, HOLD_LINE);
@@ -171,35 +170,34 @@ INTERRUPT_GEN_MEMBER(mexico86_state::kikikai_interrupt)
 #define DCWIDTH 0
 #define DCHEIGHT 0
 
-static void kiki_clogic(running_machine &machine, int address, int latch)
+void mexico86_state::kiki_clogic(int address, int latch)
 {
-	mexico86_state *state = machine.driver_data<mexico86_state>();
 	static const UINT8 db[16]={0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x08,0x00,0x10,0x18,0x00,0x00,0x00,0x00};
 	int sy, sx, hw, i, qptr, diff1, diff2;
 
-	if (address != KIKI_CL_TRIGGER) // state->m_queue latched data
+	if (address != KIKI_CL_TRIGGER) // m_queue latched data
 	{
-		state->m_queue[state->m_qfront++] = latch;
-		state->m_qfront &= 0x3f;
+		m_queue[m_qfront++] = latch;
+		m_qfront &= 0x3f;
 	}
-	else if (state->m_qstate ^= 1) // scan state->m_queue
+	else if (m_qstate ^= 1) // scan m_queue
 	{
-		sy = state->m_queue[(state->m_qfront-0x3a)&0x3f] + ((0x18-DCHEIGHT)>>1);
-		sx = state->m_queue[(state->m_qfront-0x39)&0x3f] + ((0x18-DCWIDTH)>>1);
+		sy = m_queue[(m_qfront-0x3a)&0x3f] + ((0x18-DCHEIGHT)>>1);
+		sx = m_queue[(m_qfront-0x39)&0x3f] + ((0x18-DCWIDTH)>>1);
 
 		for (i=0x38; i; i-=8)
 		{
-			qptr = state->m_qfront - i;
-			if (!(hw = db[state->m_queue[qptr&0x3f]&0xf])) continue;
+			qptr = m_qfront - i;
+			if (!(hw = db[m_queue[qptr&0x3f]&0xf])) continue;
 
-			diff1 = sx - (short)(state->m_queue[(qptr+6)&0x3f]<<8|state->m_queue[(qptr+7)&0x3f]) + DCWIDTH;
+			diff1 = sx - (short)(m_queue[(qptr+6)&0x3f]<<8|m_queue[(qptr+7)&0x3f]) + DCWIDTH;
 			diff2 = diff1 - (hw + DCWIDTH);
 			if ((diff1^diff2)<0)
 			{
-				diff1 = sy - (short)(state->m_queue[(qptr+4)&0x3f]<<8|state->m_queue[(qptr+5)&0x3f]) + DCHEIGHT;
+				diff1 = sy - (short)(m_queue[(qptr+4)&0x3f]<<8|m_queue[(qptr+5)&0x3f]) + DCHEIGHT;
 				diff2 = diff1 - (hw + DCHEIGHT);
 				if ((diff1^diff2)<0)
-					state->m_protection_ram[KIKI_CL_OUT] = 1; // we have a collision
+					m_protection_ram[KIKI_CL_OUT] = 1; // we have a collision
 			}
 		}
 	}

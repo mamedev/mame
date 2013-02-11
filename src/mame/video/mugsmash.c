@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/mugsmash.h"
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mugsmash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/* Each Sprite takes 16 bytes, 5 used? */
 
@@ -24,10 +24,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	*/
 
-	mugsmash_state *state = machine.driver_data<mugsmash_state>();
-	const UINT16 *source = state->m_spriteram;
+	const UINT16 *source = m_spriteram;
 	const UINT16 *finish = source + 0x2000;
-	gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 
 	while (source < finish)
 	{
@@ -142,6 +141,6 @@ UINT32 mugsmash_state::screen_update_mugsmash(screen_device &screen, bitmap_ind1
 {
 	m_tilemap2->draw(bitmap, cliprect, 0, 0);
 	m_tilemap1->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

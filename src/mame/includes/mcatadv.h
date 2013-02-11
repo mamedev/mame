@@ -43,4 +43,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_mcatadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_mcatadv(screen_device &screen, bool state);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

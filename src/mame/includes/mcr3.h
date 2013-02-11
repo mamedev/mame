@@ -65,4 +65,6 @@ public:
 	DECLARE_PALETTE_INIT(spyhunt);
 	UINT32 screen_update_mcr3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_spyhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void mcr3_update_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy);
+	void mcr_common_init();
 };

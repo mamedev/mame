@@ -387,9 +387,8 @@ WRITE8_MEMBER(mappy_state::mappy_scroll_w)
 
 ***************************************************************************/
 
-static void mappy_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
+void mappy_state::mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
 {
-	mappy_state *state = machine.driver_data<mappy_state>();
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
@@ -422,7 +421,7 @@ static void mappy_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 			sy -= 16 * sizey;
 			sy = (sy & 0xff) - 32;  // fix wraparound
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -434,12 +433,12 @@ static void mappy_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
+					drawgfx_transmask(bitmap,cliprect,machine().gfx[1],
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 15));
+						colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 15));
 				}
 			}
 		}
@@ -468,9 +467,8 @@ spriteram_3
 1   -------x  X position MSB
 */
 
-static void phozon_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
+void mappy_state::phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
 {
-	mappy_state *state = machine.driver_data<mappy_state>();
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
@@ -502,7 +500,7 @@ static void phozon_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 			sy -= 8 * sizey;
 			sy = (sy & 0xff) - 32;  // fix wraparound
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -514,12 +512,12 @@ static void phozon_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 			{
 				for (x = 0;x <= sizex;x++)
 				{
-					drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
+					drawgfx_transmask(bitmap,cliprect,machine().gfx[1],
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
 						sx + 8*x,sy + 8*y,
-						colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 31));
+						colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 31));
 				}
 			}
 		}
@@ -535,7 +533,7 @@ UINT32 mappy_state::screen_update_superpac(screen_device &screen, bitmap_ind16 &
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
 	sprite_bitmap.fill(15, cliprect);
-	mappy_draw_sprites(machine(),sprite_bitmap,cliprect,m_spriteram);
+	mappy_draw_sprites(sprite_bitmap,cliprect,m_spriteram);
 	copybitmap_trans(bitmap,sprite_bitmap,0,0,0,0,cliprect,15);
 
 	/* Redraw the high priority characters */
@@ -562,7 +560,7 @@ UINT32 mappy_state::screen_update_phozon(screen_device &screen, bitmap_ind16 &bi
 
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
-	phozon_draw_sprites(machine(),bitmap,cliprect,m_spriteram);
+	phozon_draw_sprites(bitmap,cliprect,m_spriteram);
 
 	/* Redraw the high priority characters */
 	m_bg_tilemap->draw(bitmap, cliprect, 1,0);
@@ -578,7 +576,7 @@ UINT32 mappy_state::screen_update_mappy(screen_device &screen, bitmap_ind16 &bit
 
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
-	mappy_draw_sprites(machine(),bitmap,cliprect,m_spriteram);
+	mappy_draw_sprites(bitmap,cliprect,m_spriteram);
 
 	/* Redraw the high priority characters */
 	m_bg_tilemap->draw(bitmap, cliprect, 1,0);

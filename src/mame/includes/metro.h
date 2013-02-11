@@ -178,6 +178,14 @@ public:
 	TIMER_CALLBACK_MEMBER(metro_blit_done);
 	void update_irq_state();
 	IRQ_CALLBACK_MEMBER(metro_irq_callback);
+	inline UINT8 get_tile_pix( UINT16 code, UINT8 x, UINT8 y, int big, UINT16 *pix );
+	inline void metro_vram_w( offs_t offset, UINT16 data, UINT16 mem_mask, int layer, UINT16 *vram );
+	void metro_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_layers( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, int layers_ctrl );
+	inline int blt_read( const UINT8 *ROM, const int offs );
+	void metro_common(  );
+	void draw_tilemap( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 flags, UINT32 pcode,
+					int sx, int sy, int wx, int wy, int big, UINT16 *tilemapram, int layer );
 };
 
 

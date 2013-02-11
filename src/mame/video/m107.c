@@ -146,12 +146,11 @@ void m107_state::video_start()
 
 /*****************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void m107_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m107_state *state = machine.driver_data<m107_state>();
-	UINT16 *spriteram = state->m_buffered_spriteram;
+	UINT16 *spriteram = m_buffered_spriteram;
 	int offs;
-	UINT8 *rom = state->memregion("user1")->base();
+	UINT8 *rom = memregion("user1")->base();
 
 	for (offs = 0;offs < 0x800;offs += 4)
 	{
@@ -176,7 +175,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		fy=(spriteram[offs+2]>>8)&0x2;
 		y_multi=(spriteram[offs+0]>>11)&0x3;
 
-		if (state->m_spritesystem == 0)
+		if (m_spritesystem == 0)
 		{
 			y_multi=1 << y_multi; /* 1, 2, 4 or 8 */
 
@@ -185,20 +184,20 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 			for (i=0; i<y_multi; i++)
 			{
-				pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+				pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 						sprite + s_ptr,
 						colour,
 						fx,fy,
 						x,y-i*16,
-						machine.priority_bitmap,pri_mask,0);
+						machine().priority_bitmap,pri_mask,0);
 
 				/* wrap-around y */
-				pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+				pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 						sprite + s_ptr,
 						colour,
 						fx,fy,
 						x,(y-i*16) - 0x200,
-						machine.priority_bitmap,pri_mask,0);
+						machine().priority_bitmap,pri_mask,0);
 
 				if (fy) s_ptr++; else s_ptr--;
 			}
@@ -242,20 +241,20 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 					if (!ffy) sprite+=y_multi-1;
 					for (i=0; i<y_multi; i++)
 					{
-						pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 								sprite+(ffy?i:-i),
 								colour,
 								ffx,ffy,
 								(x+xdisp)&0x1ff,(y-ydisp-16*i)&0x1ff,
-								machine.priority_bitmap,pri_mask,0);
+								machine().priority_bitmap,pri_mask,0);
 
 						/* wrap-around y */
-						pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+						pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 								sprite+(ffy?i:-i),
 								colour,
 								ffx,ffy,
 								(x+xdisp)&0x1ff,((y-ydisp-16*i)&0x1ff)-0x200,
-								machine.priority_bitmap,pri_mask,0);
+								machine().priority_bitmap,pri_mask,0);
 					}
 
 					if (rom[rom_offs+1]&0x80) break;    /* end of block */
@@ -269,9 +268,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 /*****************************************************************************/
 
-static void m107_update_scroll_positions(running_machine &machine)
+void m107_state::m107_update_scroll_positions()
 {
-	m107_state *state = machine.driver_data<m107_state>();
 	int laynum;
 	int i;
 
@@ -283,14 +281,14 @@ static void m107_update_scroll_positions(running_machine &machine)
 
 	for (laynum = 0; laynum < 4; laynum++)
 	{
-		pf_layer_info *layer = &state->m_pf_layer[laynum];
+		pf_layer_info *layer = &m_pf_layer[laynum];
 
-		int scrolly = state->m_control[0 + 2 * laynum];
-		int scrollx = state->m_control[1 + 2 * laynum];
+		int scrolly = m_control[0 + 2 * laynum];
+		int scrollx = m_control[1 + 2 * laynum];
 
-		if (state->m_control[0x08 + laynum] & 0x01) //used by World PK Soccer goal scrolling and Fire Barrel sea wave effect (stage 2) / canyon parallax effect (stage 6)
+		if (m_control[0x08 + laynum] & 0x01) //used by World PK Soccer goal scrolling and Fire Barrel sea wave effect (stage 2) / canyon parallax effect (stage 6)
 		{
-			const UINT16 *scrolldata = state->m_vram_data + (0xe000 + 0x200 * laynum) / 2;
+			const UINT16 *scrolldata = m_vram_data + (0xe000 + 0x200 * laynum) / 2;
 
 			layer->tmap->set_scroll_rows(512);
 			for (i = 0; i < 512; i++)
@@ -309,55 +307,53 @@ static void m107_update_scroll_positions(running_machine &machine)
 
 /*****************************************************************************/
 
-static void m107_tilemap_draw(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int laynum, int category,int opaque)
+void m107_state::m107_tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int laynum, int category,int opaque)
 {
-	m107_state *state = machine.driver_data<m107_state>();
 	int line;
 	rectangle clip;
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine().primary_screen->visible_area();
 	clip = visarea;
 
-	if (state->m_control[0x08 + laynum] & 0x02)
+	if (m_control[0x08 + laynum] & 0x02)
 	{
 		for (line = cliprect.min_y; line <= cliprect.max_y;line++)
 		{
-			const UINT16 *scrolldata = state->m_vram_data + (0xe800 + 0x200 * laynum) / 2;
+			const UINT16 *scrolldata = m_vram_data + (0xe800 + 0x200 * laynum) / 2;
 			clip.min_y = clip.max_y = line;
 
-			state->m_pf_layer[laynum].tmap->set_scrollx(0,  state->m_control[1 + 2 * laynum]);
-			state->m_pf_layer[laynum].tmap->set_scrolly(0,  (state->m_control[0 + 2 * laynum] + scrolldata[line]));
+			m_pf_layer[laynum].tmap->set_scrollx(0,  m_control[1 + 2 * laynum]);
+			m_pf_layer[laynum].tmap->set_scrolly(0,  (m_control[0 + 2 * laynum] + scrolldata[line]));
 
-			state->m_pf_layer[laynum].tmap->draw(bitmap, clip, category | opaque, category);
+			m_pf_layer[laynum].tmap->draw(bitmap, clip, category | opaque, category);
 		}
 	}
 	else
-		state->m_pf_layer[laynum].tmap->draw(bitmap, cliprect, category | opaque, category);
+		m_pf_layer[laynum].tmap->draw(bitmap, cliprect, category | opaque, category);
 }
 
 
-static void m107_screenrefresh(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void m107_state::m107_screenrefresh(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m107_state *state = machine.driver_data<m107_state>();
-	machine.priority_bitmap.fill(0, cliprect);
+	machine().priority_bitmap.fill(0, cliprect);
 
-	if ((~state->m_control[0x0b] >> 7) & 1)
+	if ((~m_control[0x0b] >> 7) & 1)
 	{
-		m107_tilemap_draw(machine, bitmap, cliprect, 3, 0,0);
-		m107_tilemap_draw(machine, bitmap, cliprect, 3, 1,0);
+		m107_tilemap_draw(bitmap, cliprect, 3, 0,0);
+		m107_tilemap_draw(bitmap, cliprect, 3, 1,0);
 	}
 	else
 		bitmap.fill(0, cliprect);
 
 	/* note: the opaque flag is used if layer 3 is disabled, noticeable in World PK Soccer title and gameplay screens */
-	m107_tilemap_draw(machine, bitmap, cliprect, 2, 0,(((state->m_control[0x0b] >> 7) & 1) ? TILEMAP_DRAW_OPAQUE : 0));
-	m107_tilemap_draw(machine, bitmap, cliprect, 1, 0,0);
-	m107_tilemap_draw(machine, bitmap, cliprect, 0, 0,0);
-	m107_tilemap_draw(machine, bitmap, cliprect, 2, 1,0);
-	m107_tilemap_draw(machine, bitmap, cliprect, 1, 1,0);
-	m107_tilemap_draw(machine, bitmap, cliprect, 0, 1,0);
+	m107_tilemap_draw(bitmap, cliprect, 2, 0,(((m_control[0x0b] >> 7) & 1) ? TILEMAP_DRAW_OPAQUE : 0));
+	m107_tilemap_draw(bitmap, cliprect, 1, 0,0);
+	m107_tilemap_draw(bitmap, cliprect, 0, 0,0);
+	m107_tilemap_draw(bitmap, cliprect, 2, 1,0);
+	m107_tilemap_draw(bitmap, cliprect, 1, 1,0);
+	m107_tilemap_draw(bitmap, cliprect, 0, 1,0);
 
-	if(state->m_sprite_display)
-		draw_sprites(machine, bitmap, cliprect);
+	if(m_sprite_display)
+		draw_sprites(bitmap, cliprect);
 
 	/* This hardware probably has more priority values - but I haven't found
 	    any used yet */
@@ -382,7 +378,7 @@ WRITE16_MEMBER(m107_state::m107_spritebuffer_w)
 
 UINT32 m107_state::screen_update_m107(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m107_update_scroll_positions(machine());
-	m107_screenrefresh(machine(), bitmap, cliprect);
+	m107_update_scroll_positions();
+	m107_screenrefresh(bitmap, cliprect);
 	return 0;
 }

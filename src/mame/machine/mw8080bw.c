@@ -13,7 +13,7 @@
  *
  *************************************/
 
-static UINT8 vpos_to_vysnc_chain_counter( int vpos )
+UINT8 mw8080bw_state::vpos_to_vysnc_chain_counter( int vpos )
 {
 	/* convert from a vertical position to the actual values on the vertical sync counters */
 	UINT8 counter;
@@ -28,7 +28,7 @@ static UINT8 vpos_to_vysnc_chain_counter( int vpos )
 }
 
 
-static int vysnc_chain_counter_to_vpos( UINT8 counter, int vblank )
+int mw8080bw_state::vysnc_chain_counter_to_vpos( UINT8 counter, int vblank )
 {
 	/* convert from the vertical sync counters to an actual vertical position */
 	int vpos;
@@ -71,18 +71,16 @@ TIMER_CALLBACK_MEMBER(mw8080bw_state::mw8080bw_interrupt_callback)
 }
 
 
-static void mw8080bw_create_interrupt_timer( running_machine &machine )
+void mw8080bw_state::mw8080bw_create_interrupt_timer(  )
 {
-	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mw8080bw_state::mw8080bw_interrupt_callback),state));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mw8080bw_state::mw8080bw_interrupt_callback),this));
 }
 
 
-static void mw8080bw_start_interrupt_timer( running_machine &machine )
+void mw8080bw_state::mw8080bw_start_interrupt_timer(  )
 {
-	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
 	int vpos = vysnc_chain_counter_to_vpos(MW8080BW_INT_TRIGGER_COUNT_1, MW8080BW_INT_TRIGGER_VBLANK_1);
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(vpos));
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(vpos));
 }
 
 
@@ -95,7 +93,7 @@ static void mw8080bw_start_interrupt_timer( running_machine &machine )
 
 MACHINE_START_MEMBER(mw8080bw_state,mw8080bw)
 {
-	mw8080bw_create_interrupt_timer(machine());
+	mw8080bw_create_interrupt_timer();
 
 	m_samples = machine().device<samples_device>("samples");
 	m_samples1 = machine().device<samples_device>("samples1");
@@ -115,5 +113,5 @@ MACHINE_START_MEMBER(mw8080bw_state,mw8080bw)
 
 MACHINE_RESET_MEMBER(mw8080bw_state,mw8080bw)
 {
-	mw8080bw_start_interrupt_timer(machine());
+	mw8080bw_start_interrupt_timer();
 }

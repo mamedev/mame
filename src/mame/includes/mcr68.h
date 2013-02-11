@@ -109,6 +109,13 @@ public:
 	DECLARE_WRITE8_MEMBER(zwackery_pia1_w);
 	DECLARE_WRITE_LINE_MEMBER(zwackery_ca2_w);
 	DECLARE_WRITE_LINE_MEMBER(zwackery_pia_irq);
+	void mcr68_update_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	void zwackery_update_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
+	void mcr68_common_init();
+	void update_mcr68_interrupts();
+	inline void update_interrupts();
+	void subtract_from_counter(int counter, int count);
+	void mcr68_common_init(int clip, int xoffset);
 };
 
 /*----------- defined in machine/mcr68.c -----------*/

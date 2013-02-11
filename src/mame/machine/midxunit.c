@@ -24,15 +24,14 @@ static void midxunit_dcs_output_full(running_machine &machine, int state);
  *
  *************************************/
 
-static void register_state_saving(running_machine &machine)
+void midxunit_state::register_state_saving()
 {
-	midxunit_state *state = machine.driver_data<midxunit_state>();
-	state_save_register_global(machine, state->m_cmos_write_enable);
-	state_save_register_global_array(machine, state->m_iodata);
-	state_save_register_global_array(machine, state->m_ioshuffle);
-	state_save_register_global(machine, state->m_analog_port);
-	state_save_register_global_array(machine, state->m_uart);
-	state_save_register_global(machine, state->m_security_bits);
+	state_save_register_global(machine(), m_cmos_write_enable);
+	state_save_register_global_array(machine(), m_iodata);
+	state_save_register_global_array(machine(), m_ioshuffle);
+	state_save_register_global(machine(), m_analog_port);
+	state_save_register_global_array(machine(), m_uart);
+	state_save_register_global(machine(), m_security_bits);
 }
 
 
@@ -292,7 +291,7 @@ WRITE16_MEMBER(midxunit_state::midxunit_uart_w)
 DRIVER_INIT_MEMBER(midxunit_state,revx)
 {
 	/* register for state saving */
-	register_state_saving(machine());
+	register_state_saving();
 
 	/* init sound */
 	dcs_init(machine());

@@ -123,4 +123,13 @@ public:
 	TIMER_CALLBACK_MEMBER(m72_scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(kengo_scanline_interrupt);
 	TIMER_CALLBACK_MEMBER(delayed_ram16_w);
+	inline void m72_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum);
+	inline void rtype2_get_tile_info(tile_data &tileinfo,int tile_index,const UINT16 *vram,int gfxnum);
+	void register_savestate();
+	inline void changecolor(int color,int r,int g,int b);
+	void m72_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void majtitle_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	int find_sample(int num);
+	void copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes);
+	void install_protection_handler(const UINT8 *code,const UINT8 *crc);
 };

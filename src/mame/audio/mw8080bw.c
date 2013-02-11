@@ -337,7 +337,7 @@ WRITE8_MEMBER(mw8080bw_state::tornbase_audio_w)
 
 	/* if (data & 0x10)  enable CHEER sound */
 
-	if (tornbase_get_cabinet_type(machine()) == TORNBASE_CAB_TYPE_UPRIGHT_OLD)
+	if (tornbase_get_cabinet_type() == TORNBASE_CAB_TYPE_UPRIGHT_OLD)
 	{
 		/* if (data & 0x20)  enable WHISTLE sound */
 
@@ -4195,7 +4195,7 @@ WRITE8_MEMBER(mw8080bw_state::invaders_audio_2_w)
 	discrete_sound_w(m_discrete, space, INVADERS_NODE(INVADERS_SAUCER_HIT_EN, 1), data & 0x10);
 
 	/* the flip screen line is only connected on the cocktail PCB */
-	if (invaders_is_cabinet_cocktail(machine()))
+	if (invaders_is_cabinet_cocktail())
 	{
 		m_flip_screen = (data >> 5) & 0x01;
 	}

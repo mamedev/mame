@@ -37,4 +37,5 @@ public:
 	DECLARE_DRIVER_INIT(revx);
 	DECLARE_MACHINE_RESET(midxunit);
 	DECLARE_VIDEO_START(midxunit);
+	void register_state_saving();
 };

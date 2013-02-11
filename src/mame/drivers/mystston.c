@@ -37,9 +37,9 @@
  *
  *************************************/
 
-void mystston_on_scanline_interrupt(running_machine &machine)
+void mystston_state::mystston_on_scanline_interrupt()
 {
-	machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 }
 
 

@@ -46,4 +46,5 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	UINT32 screen_update_momoko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void momoko_draw_bg_pri( bitmap_ind16 &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri );
 };

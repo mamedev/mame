@@ -163,14 +163,13 @@ void metlclsh_state::video_start()
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void metlclsh_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	metlclsh_state *state = machine.driver_data<metlclsh_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	gfx_element *gfx = machine.gfx[0];
+	UINT8 *spriteram = m_spriteram;
+	gfx_element *gfx = machine().gfx[0];
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int attr, code, color, sx, sy, flipx, flipy, wrapy, sizey;
 
@@ -190,7 +189,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		sy = 240 - spriteram[offs + 2];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;  flipx = !flipx;
 			sy = 240 - sy;  flipy = !flipy;     if (sizey)  sy += 16;
@@ -244,7 +243,7 @@ UINT32 metlclsh_state::screen_update_metlclsh(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->set_scrollx(0, m_scrollx[1] + ((m_scrollx[0] & 0x02) << 7) );
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
-	draw_sprites(machine(), bitmap, cliprect);          // sprites
+	draw_sprites(bitmap, cliprect);          // sprites
 	m_fg_tilemap->draw(bitmap, cliprect, 2, 0); // high priority tiles of foreground
 
 //  popmessage("%02X", m_scrollx[0]);

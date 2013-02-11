@@ -90,6 +90,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mario_sh_sound_w);
 	DECLARE_WRITE8_MEMBER(mario_sh1_w);
 	DECLARE_WRITE8_MEMBER(mario_sh2_w);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in audio/mario.c -----------*/

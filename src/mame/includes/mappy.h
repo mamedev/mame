@@ -62,4 +62,6 @@ public:
 	TIMER_CALLBACK_MEMBER(pacnpal_io_run);
 	TIMER_CALLBACK_MEMBER(phozon_io_run);
 	TIMER_CALLBACK_MEMBER(mappy_io_run);
+	void mappy_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base);
+	void phozon_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base);
 };

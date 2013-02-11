@@ -74,10 +74,9 @@ WRITE8_MEMBER(meadows_state::meadows_spriteram_w)
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &clip)
+void meadows_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip)
 {
-	meadows_state *state = machine.driver_data<meadows_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int i;
 
 	for (i = 0; i < 4; i++)
@@ -89,7 +88,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int bank = i;                           /* that fixes it for now :-/ */
 		int flip = spriteram[i+8] >> 5;         /* bit #5 flip vertical flag */
 
-		drawgfx_transpen(bitmap, clip, machine.gfx[bank + 1], code, 0, flip, 0, x, y, 0);
+		drawgfx_transpen(bitmap, clip, machine().gfx[bank + 1], code, 0, flip, 0, x, y, 0);
 	}
 }
 
@@ -108,6 +107,6 @@ UINT32 meadows_state::screen_update_meadows(screen_device &screen, bitmap_ind16 
 
 	/* draw the sprites */
 	if (machine().gfx[1])
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 	return 0;
 }

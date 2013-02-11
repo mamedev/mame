@@ -119,9 +119,8 @@ VIDEO_START_MEMBER(ms32_state,f1superb)
 /********** PALETTE WRITES **********/
 
 
-static void update_color(running_machine &machine, int color)
+void ms32_state::update_color(int color)
 {
-	ms32_state *state = machine.driver_data<ms32_state>();
 	int r,g,b;
 
 	/* I'm not sure how the brightness should be applied, currently I'm only
@@ -130,18 +129,18 @@ static void update_color(running_machine &machine, int color)
 	 */
 	if (~color & 0x4000)
 	{
-		r = ((state->m_palram_16[color*2] & 0xff00) >>8 ) * state->m_brt_r / 0x100;
-		g = ((state->m_palram_16[color*2] & 0x00ff) >>0 ) * state->m_brt_g / 0x100;
-		b = ((state->m_palram_16[color*2+1] & 0x00ff) >>0 ) * state->m_brt_b / 0x100;
+		r = ((m_palram_16[color*2] & 0xff00) >>8 ) * m_brt_r / 0x100;
+		g = ((m_palram_16[color*2] & 0x00ff) >>0 ) * m_brt_g / 0x100;
+		b = ((m_palram_16[color*2+1] & 0x00ff) >>0 ) * m_brt_b / 0x100;
 	}
 	else
 	{
-		r = ((state->m_palram_16[color*2] & 0xff00) >>8 );
-		g = ((state->m_palram_16[color*2] & 0x00ff) >>0 );
-		b = ((state->m_palram_16[color*2+1] & 0x00ff) >>0 );
+		r = ((m_palram_16[color*2] & 0xff00) >>8 );
+		g = ((m_palram_16[color*2] & 0x00ff) >>0 );
+		b = ((m_palram_16[color*2+1] & 0x00ff) >>0 );
 	}
 
-	palette_set_color(machine,color,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),color,MAKE_RGB(r,g,b));
 }
 
 WRITE32_MEMBER(ms32_state::ms32_brightness_w)
@@ -194,14 +193,14 @@ WRITE32_MEMBER(ms32_state::ms32_gfxctrl_w)
 
 
 /* SPRITES based on tetrisp2 for now, readd priority bits later */
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder)
+void ms32_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder)
 {
 	int tx, ty, sx, sy, flipx, flipy;
 	int xsize, ysize;
 	int code, attr, color, size;
 	int pri;
 	int xzoom, yzoom;
-	gfx_element *gfx = machine.gfx[gfxnum];
+	gfx_element *gfx = machine().gfx[gfxnum];
 
 	UINT16      *source =   sprram_top;
 	UINT16  *finish =   sprram_top + (sprram_size - 0x10) / 2;
@@ -264,12 +263,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, bitmap_
 }
 
 
-static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,int priority)
+void ms32_state::draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect,int priority)
 {
-	ms32_state *state = machine.driver_data<ms32_state>();
 	/* TODO: registers 0x40/4 / 0x44/4 and 0x50/4 / 0x54/4 are used, meaning unknown */
 
-	if (state->m_roz_ctrl[0x5c/4] & 1)  /* "super" mode */
+	if (m_roz_ctrl[0x5c/4] & 1)  /* "super" mode */
 	{
 		rectangle my_clip;
 		int y,maxy;
@@ -282,21 +280,21 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 
 		while (y <= maxy)
 		{
-			UINT16 *lineaddr = state->m_lineram_16 + 8 * (y & 0xff);
+			UINT16 *lineaddr = m_lineram_16 + 8 * (y & 0xff);
 
 			int start2x = (lineaddr[0x00/4] & 0xffff) | ((lineaddr[0x04/4] & 3) << 16);
 			int start2y = (lineaddr[0x08/4] & 0xffff) | ((lineaddr[0x0c/4] & 3) << 16);
 			int incxx  = (lineaddr[0x10/4] & 0xffff) | ((lineaddr[0x14/4] & 1) << 16);
 			int incxy  = (lineaddr[0x18/4] & 0xffff) | ((lineaddr[0x1c/4] & 1) << 16);
-			int startx = (state->m_roz_ctrl[0x00/4] & 0xffff) | ((state->m_roz_ctrl[0x04/4] & 3) << 16);
-			int starty = (state->m_roz_ctrl[0x08/4] & 0xffff) | ((state->m_roz_ctrl[0x0c/4] & 3) << 16);
-			int offsx  = state->m_roz_ctrl[0x30/4];
-			int offsy  = state->m_roz_ctrl[0x34/4];
+			int startx = (m_roz_ctrl[0x00/4] & 0xffff) | ((m_roz_ctrl[0x04/4] & 3) << 16);
+			int starty = (m_roz_ctrl[0x08/4] & 0xffff) | ((m_roz_ctrl[0x0c/4] & 3) << 16);
+			int offsx  = m_roz_ctrl[0x30/4];
+			int offsy  = m_roz_ctrl[0x34/4];
 
 			my_clip.min_y = my_clip.max_y = y;
 
-			offsx += (state->m_roz_ctrl[0x38/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
-			offsy += (state->m_roz_ctrl[0x3c/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
+			offsx += (m_roz_ctrl[0x38/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
+			offsy += (m_roz_ctrl[0x3c/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
 
 			/* extend sign */
 			if (start2x & 0x20000) start2x |= ~0x3ffff;
@@ -306,7 +304,7 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 			if (incxx & 0x10000) incxx |= ~0x1ffff;
 			if (incxy & 0x10000) incxy |= ~0x1ffff;
 
-			state->m_roz_tilemap->draw_roz(bitmap, my_clip,
+			m_roz_tilemap->draw_roz(bitmap, my_clip,
 					(start2x+startx+offsx)<<16, (start2y+starty+offsy)<<16,
 					incxx<<8, incxy<<8, 0, 0,
 					1, // Wrap
@@ -317,17 +315,17 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 	}
 	else    /* "simple" mode */
 	{
-		int startx = (state->m_roz_ctrl[0x00/4] & 0xffff) | ((state->m_roz_ctrl[0x04/4] & 3) << 16);
-		int starty = (state->m_roz_ctrl[0x08/4] & 0xffff) | ((state->m_roz_ctrl[0x0c/4] & 3) << 16);
-		int incxx  = (state->m_roz_ctrl[0x10/4] & 0xffff) | ((state->m_roz_ctrl[0x14/4] & 1) << 16);
-		int incxy  = (state->m_roz_ctrl[0x18/4] & 0xffff) | ((state->m_roz_ctrl[0x1c/4] & 1) << 16);
-		int incyy  = (state->m_roz_ctrl[0x20/4] & 0xffff) | ((state->m_roz_ctrl[0x24/4] & 1) << 16);
-		int incyx  = (state->m_roz_ctrl[0x28/4] & 0xffff) | ((state->m_roz_ctrl[0x2c/4] & 1) << 16);
-		int offsx  = state->m_roz_ctrl[0x30/4];
-		int offsy  = state->m_roz_ctrl[0x34/4];
+		int startx = (m_roz_ctrl[0x00/4] & 0xffff) | ((m_roz_ctrl[0x04/4] & 3) << 16);
+		int starty = (m_roz_ctrl[0x08/4] & 0xffff) | ((m_roz_ctrl[0x0c/4] & 3) << 16);
+		int incxx  = (m_roz_ctrl[0x10/4] & 0xffff) | ((m_roz_ctrl[0x14/4] & 1) << 16);
+		int incxy  = (m_roz_ctrl[0x18/4] & 0xffff) | ((m_roz_ctrl[0x1c/4] & 1) << 16);
+		int incyy  = (m_roz_ctrl[0x20/4] & 0xffff) | ((m_roz_ctrl[0x24/4] & 1) << 16);
+		int incyx  = (m_roz_ctrl[0x28/4] & 0xffff) | ((m_roz_ctrl[0x2c/4] & 1) << 16);
+		int offsx  = m_roz_ctrl[0x30/4];
+		int offsy  = m_roz_ctrl[0x34/4];
 
-		offsx += (state->m_roz_ctrl[0x38/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
-		offsy += (state->m_roz_ctrl[0x3c/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
+		offsx += (m_roz_ctrl[0x38/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
+		offsy += (m_roz_ctrl[0x3c/4] & 1) * 0x400;   // ??? gratia, hayaosi1...
 
 		/* extend sign */
 		if (startx & 0x20000) startx |= ~0x3ffff;
@@ -337,7 +335,7 @@ static void draw_roz(running_machine &machine, bitmap_ind16 &bitmap, const recta
 		if (incyy & 0x10000) incyy |= ~0x1ffff;
 		if (incyx & 0x10000) incyx |= ~0x1ffff;
 
-		state->m_roz_tilemap->draw_roz(bitmap, cliprect,
+		m_roz_tilemap->draw_roz(bitmap, cliprect,
 				(startx+offsx)<<16, (starty+offsy)<<16,
 				incxx<<8, incxy<<8, incyx<<8, incyy<<8,
 				1, // Wrap
@@ -365,7 +363,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 	int i;
 
 	for (i = 0;i < 0x10000;i++) // colors 0x3000-0x3fff are not used
-		update_color(machine(), i);
+		update_color(i);
 
 	scrollx = m_tx_scroll[0x00/4] + m_tx_scroll[0x08/4] + 0x18;
 	scrolly = m_tx_scroll[0x0c/4] + m_tx_scroll[0x14/4];
@@ -392,7 +390,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 	m_temp_bitmap_sprites.fill(0, cliprect);
 	m_temp_bitmap_sprites_pri.fill(0, cliprect);
 
-	draw_sprites(machine(), m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_16, 0x20000, 0, m_reverse_sprite_order);
+	draw_sprites(m_temp_bitmap_sprites, m_temp_bitmap_sprites_pri, cliprect, m_sprram_16, 0x20000, 0, m_reverse_sprite_order);
 
 
 
@@ -415,7 +413,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		rot_pri++;
 
 	if (rot_pri == 0)
-		draw_roz(machine(), m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(m_temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 0)
 		if (m_tilemaplayoutcontrol&1)
 		{
@@ -429,7 +427,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		m_tx_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 1)
-		draw_roz(machine(), m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(m_temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 1)
 		if (m_tilemaplayoutcontrol&1)
 		{
@@ -443,7 +441,7 @@ UINT32 ms32_state::screen_update_ms32(screen_device &screen, bitmap_rgb32 &bitma
 		m_tx_tilemap->draw(m_temp_bitmap_tilemaps, cliprect, 0, 1 << 2);
 
 	if (rot_pri == 2)
-		draw_roz(machine(), m_temp_bitmap_tilemaps, cliprect, 1 << 1);
+		draw_roz(m_temp_bitmap_tilemaps, cliprect, 1 << 1);
 	else if (scr_pri == 2)
 		if (m_tilemaplayoutcontrol&1)
 		{

@@ -233,17 +233,16 @@ WRITE8_MEMBER(mrdo_state::mrdo_flipscreen_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
+void mrdo_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	mrdo_state *state = machine.driver_data<mrdo_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		if (spriteram[offs + 1] != 0)
 		{
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[2],
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[2],
 					spriteram[offs], spriteram[offs + 2] & 0x0f,
 					spriteram[offs + 2] & 0x10, spriteram[offs + 2] & 0x20,
 					spriteram[offs + 3], 256 - spriteram[offs + 1], 0);
@@ -256,6 +255,6 @@ UINT32 mrdo_state::screen_update_mrdo(screen_device &screen, bitmap_ind16 &bitma
 	bitmap.fill(0, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

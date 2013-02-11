@@ -147,11 +147,10 @@ WRITE8_MEMBER(msisaac_state::msisaac_fg_videoram_w)
   Display refresh
 
 ***************************************************************************/
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void msisaac_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	msisaac_state *state = machine.driver_data<msisaac_state>();
-	const UINT8 *source = state->m_spriteram + 32 * 4 - 4;
-	const UINT8 *finish = state->m_spriteram; /* ? */
+	const UINT8 *source = m_spriteram + 32 * 4 - 4;
+	const UINT8 *finish = m_spriteram; /* ? */
 
 	while (source >= finish)
 	{
@@ -164,12 +163,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = (attributes & 0x1);
 		int flipy = (attributes & 0x2);
 
-		gfx_element *gfx = machine.gfx[2];
+		gfx_element *gfx = machine().gfx[2];
 
 		if (attributes & 4)
 		{
 			//color = rand() & 15;
-			gfx = machine.gfx[3];
+			gfx = machine().gfx[3];
 		}
 
 		if (attributes & 8) /* double size sprite */
@@ -234,7 +233,7 @@ UINT32 msisaac_state::screen_update_msisaac(screen_device &screen, bitmap_ind16 
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

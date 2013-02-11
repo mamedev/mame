@@ -30,15 +30,14 @@
 #include "includes/m90.h"
 
 
-INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,int layer,int page_mask)
+inline void m90_state::get_tile_info(tile_data &tileinfo,int tile_index,int layer,int page_mask)
 {
-	m90_state *state = machine.driver_data<m90_state>();
 	int tile,color;
-	tile_index = 2*tile_index + ((state->m_video_control_data[5+layer] & page_mask) * 0x2000);
+	tile_index = 2*tile_index + ((m_video_control_data[5+layer] & page_mask) * 0x2000);
 
-	tile=state->m_video_data[tile_index];
-	color=state->m_video_data[tile_index+1];
-	SET_TILE_INFO(
+	tile=m_video_data[tile_index];
+	color=m_video_data[tile_index+1];
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color&0xf,
@@ -46,15 +45,14 @@ INLINE void get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_
 			tileinfo.category = (color & 0x30) ? 1 : 0;
 }
 
-INLINE void bomblord_get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,int layer)
+inline void m90_state::bomblord_get_tile_info(tile_data &tileinfo,int tile_index,int layer)
 {
-	m90_state *state = machine.driver_data<m90_state>();
 	int tile,color;
 	tile_index = 2*tile_index + (layer * 0x2000);
 
-	tile=state->m_video_data[tile_index];
-	color=state->m_video_data[tile_index+1];
-	SET_TILE_INFO(
+	tile=m_video_data[tile_index];
+	color=m_video_data[tile_index+1];
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color&0xf,
@@ -62,15 +60,14 @@ INLINE void bomblord_get_tile_info(running_machine &machine,tile_data &tileinfo,
 			tileinfo.category = (color & 0x30) ? 1 : 0;
 }
 
-INLINE void dynablsb_get_tile_info(running_machine &machine,tile_data &tileinfo,int tile_index,int layer)
+inline void m90_state::dynablsb_get_tile_info(tile_data &tileinfo,int tile_index,int layer)
 {
-	m90_state *state = machine.driver_data<m90_state>();
 	int tile,color;
 	tile_index = 2*tile_index + (layer * 0x2000);
 
-	tile=state->m_video_data[tile_index];
-	color=state->m_video_data[tile_index+1];
-	SET_TILE_INFO(
+	tile=m_video_data[tile_index];
+	color=m_video_data[tile_index+1];
+	SET_TILE_INFO_MEMBER(
 			0,
 			tile,
 			color&0xf,
@@ -78,20 +75,20 @@ INLINE void dynablsb_get_tile_info(running_machine &machine,tile_data &tileinfo,
 			tileinfo.category = (color & 0x30) ? 1 : 0;
 }
 
-TILE_GET_INFO_MEMBER(m90_state::get_pf1_tile_info){ get_tile_info(machine(),tileinfo,tile_index,0,0x3); }
-TILE_GET_INFO_MEMBER(m90_state::get_pf1w_tile_info){ get_tile_info(machine(),tileinfo,tile_index,0,0x2); }
-TILE_GET_INFO_MEMBER(m90_state::get_pf2_tile_info){ get_tile_info(machine(),tileinfo,tile_index,1,0x3); }
-TILE_GET_INFO_MEMBER(m90_state::get_pf2w_tile_info){ get_tile_info(machine(),tileinfo,tile_index,1,0x2); }
+TILE_GET_INFO_MEMBER(m90_state::get_pf1_tile_info){ get_tile_info(tileinfo,tile_index,0,0x3); }
+TILE_GET_INFO_MEMBER(m90_state::get_pf1w_tile_info){ get_tile_info(tileinfo,tile_index,0,0x2); }
+TILE_GET_INFO_MEMBER(m90_state::get_pf2_tile_info){ get_tile_info(tileinfo,tile_index,1,0x3); }
+TILE_GET_INFO_MEMBER(m90_state::get_pf2w_tile_info){ get_tile_info(tileinfo,tile_index,1,0x2); }
 
-TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf1_tile_info){ bomblord_get_tile_info(machine(),tileinfo,tile_index,0); }
-TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf1w_tile_info){ bomblord_get_tile_info(machine(),tileinfo,tile_index,0); }
-TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf2_tile_info){ bomblord_get_tile_info(machine(),tileinfo,tile_index,2); }
-TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf2w_tile_info){ bomblord_get_tile_info(machine(),tileinfo,tile_index,2); }
+TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf1_tile_info){ bomblord_get_tile_info(tileinfo,tile_index,0); }
+TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf1w_tile_info){ bomblord_get_tile_info(tileinfo,tile_index,0); }
+TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf2_tile_info){ bomblord_get_tile_info(tileinfo,tile_index,2); }
+TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf2w_tile_info){ bomblord_get_tile_info(tileinfo,tile_index,2); }
 
-TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf1_tile_info){ dynablsb_get_tile_info(machine(),tileinfo,tile_index,0); }
-TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf1w_tile_info){ dynablsb_get_tile_info(machine(),tileinfo,tile_index,0); }
-TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf2_tile_info){ dynablsb_get_tile_info(machine(),tileinfo,tile_index,2); }
-TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf2w_tile_info){ dynablsb_get_tile_info(machine(),tileinfo,tile_index,2); }
+TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf1_tile_info){ dynablsb_get_tile_info(tileinfo,tile_index,0); }
+TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf1w_tile_info){ dynablsb_get_tile_info(tileinfo,tile_index,0); }
+TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf2_tile_info){ dynablsb_get_tile_info(tileinfo,tile_index,2); }
+TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf2w_tile_info){ dynablsb_get_tile_info(tileinfo,tile_index,2); }
 
 void m90_state::video_start()
 {
@@ -136,10 +133,9 @@ VIDEO_START_MEMBER(m90_state,dynablsb)
 	state_save_register_global_array(machine(), m_video_control_data);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void m90_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	m90_state *state = machine.driver_data<m90_state>();
-	UINT16 *spriteram = state->m_video_data + 0xee00/2;;
+	UINT16 *spriteram = m_video_data + 0xee00/2;;
 	int offs;
 
 	for (offs = 0x1f2/2; offs >= 0; offs -= 3)
@@ -163,42 +159,41 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		for (i = 0;i < y_multi;i++)
 
-			if (state->m_video_control_data[7] & 0x01)
-				pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			if (m_video_control_data[7] & 0x01)
+				pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
 					x,y+i*16,
-					machine.priority_bitmap,
+					machine().priority_bitmap,
 					(colour & 0x08) ? 0x00 : 0x02,0);
-			else if (state->m_video_control_data[7] & 0x02)
-				pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			else if (m_video_control_data[7] & 0x02)
+				pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
 					x,y+i*16,
-					machine.priority_bitmap,
+					machine().priority_bitmap,
 					((colour & 0x0c)==0x0c) ? 0x00 : 0x02,0);
 			else
-				pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+				pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					sprite + (fy ? y_multi-1 - i : i),
 					colour,
 					fx,fy,
 					x,y+i*16,
-					machine.priority_bitmap,
+					machine().priority_bitmap,
 					0x02,0);
 	}
 }
 
-static void bomblord_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void m90_state::bomblord_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	m90_state *state = machine.driver_data<m90_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs = 0, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
 
 
-	while ((offs < state->m_spriteram.bytes()/2) & (spriteram16[offs+0] != 0x8000))
+	while ((offs < m_spriteram.bytes()/2) & (spriteram16[offs+0] != 0x8000))
 	{
 		last_sprite = offs;
 		offs += 4;
@@ -220,24 +215,23 @@ static void bomblord_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
 
-		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				sprite,
 				colour,
 				fx,fy,
 				x,y,
-				machine.priority_bitmap,
+				machine().priority_bitmap,
 				(colour & 0x08) ? 0x00 : 0x02,0);
 	}
 }
 
-static void dynablsb_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void m90_state::dynablsb_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	m90_state *state = machine.driver_data<m90_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs = 0, last_sprite = 0;
 	int x,y,sprite,colour,fx,fy;
 
-	while ((offs < state->m_spriteram.bytes()/2) & (spriteram16[offs+0] != 0xffff))
+	while ((offs < m_spriteram.bytes()/2) & (spriteram16[offs+0] != 0xffff))
 	{
 		last_sprite = offs;
 		offs += 4;
@@ -259,12 +253,12 @@ static void dynablsb_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		fx = (spriteram16[offs+3] >> 8) & 0x02;
 		fy = (spriteram16[offs+2] >> 8) & 0x80;
 
-		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				sprite,
 				colour,
 				fx,fy,
 				x,y,
-				machine.priority_bitmap,
+				machine().priority_bitmap,
 				(colour & 0x08) ? 0x00 : 0x02,0);
 	}
 }
@@ -274,7 +268,7 @@ WRITE16_MEMBER(m90_state::m90_video_control_w)
 	COMBINE_DATA(&m_video_control_data[offset]);
 }
 
-static void markdirty(tilemap_t *tmap,int page,offs_t offset)
+void m90_state::markdirty(tilemap_t *tmap,int page,offs_t offset)
 {
 	offset -= page * 0x2000;
 
@@ -447,7 +441,7 @@ UINT32 m90_state::screen_update_m90(screen_device &screen, bitmap_ind16 &bitmap,
 			}
 		}
 
-		draw_sprites(machine(),bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 
 	} else {
 		bitmap.fill(get_black_pen(machine()), cliprect);
@@ -503,7 +497,7 @@ UINT32 m90_state::screen_update_bomblord(screen_device &screen, bitmap_ind16 &bi
 		m_pf1_layer->draw(bitmap, cliprect, 1,1);
 	}
 
-	bomblord_draw_sprites(machine(),bitmap,cliprect);
+	bomblord_draw_sprites(bitmap,cliprect);
 
 	return 0;
 }
@@ -545,7 +539,7 @@ UINT32 m90_state::screen_update_dynablsb(screen_device &screen, bitmap_ind16 &bi
 		m_pf2_layer->draw(bitmap, cliprect, 1,1);
 	}
 
-	dynablsb_draw_sprites(machine(),bitmap,cliprect);
+	dynablsb_draw_sprites(bitmap,cliprect);
 
 	return 0;
 }

@@ -1523,19 +1523,17 @@ ROM_END
  *
  *************************************/
 
-static void mcr_common_init(running_machine &machine)
+void mcr3_state::mcr_common_init()
 {
-	mcr3_state *state = machine.driver_data<mcr3_state>();
-
-	state_save_register_global(machine, state->m_input_mux);
-	state_save_register_global(machine, state->m_latched_input);
-	state_save_register_global(machine, state->m_last_op4);
+	state_save_register_global(machine(), m_input_mux);
+	state_save_register_global(machine(), m_latched_input);
+	state_save_register_global(machine(), m_last_op4);
 }
 
 
 DRIVER_INIT_MEMBER(mcr3_state,demoderm)
 {
-	mcr_common_init(machine());
+	mcr_common_init();
 	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::demoderm_ip1_r),this));
 	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::demoderm_ip2_r),this));
 	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::demoderm_op6_w),this));
@@ -1544,14 +1542,14 @@ DRIVER_INIT_MEMBER(mcr3_state,demoderm)
 
 DRIVER_INIT_MEMBER(mcr3_state,sarge)
 {
-	mcr_common_init(machine());
+	mcr_common_init();
 	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(midway_turbo_chip_squeak_device::write),m_turbo_chip_squeak.target()));
 }
 
 
 DRIVER_INIT_MEMBER(mcr3_state,maxrpm)
 {
-	mcr_common_init(machine());
+	mcr_common_init();
 	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x01, 0x01, read8_delegate(FUNC(mcr3_state::maxrpm_ip1_r),this));
 	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::maxrpm_ip2_r),this));
 	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::maxrpm_op5_w),this));
@@ -1567,7 +1565,7 @@ DRIVER_INIT_MEMBER(mcr3_state,maxrpm)
 
 DRIVER_INIT_MEMBER(mcr3_state,rampage)
 {
-	mcr_common_init(machine());
+	mcr_common_init();
 	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x04, 0x04, read8_delegate(FUNC(mcr3_state::rampage_ip4_r),this));
 	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::rampage_op6_w),this));
 }
@@ -1575,7 +1573,7 @@ DRIVER_INIT_MEMBER(mcr3_state,rampage)
 
 DRIVER_INIT_MEMBER(mcr3_state,powerdrv)
 {
-	mcr_common_init(machine());
+	mcr_common_init();
 	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x02, 0x02, read8_delegate(FUNC(mcr3_state::powerdrv_ip2_r),this));
 	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::powerdrv_op5_w),this));
 	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::powerdrv_op6_w),this));
@@ -1584,7 +1582,7 @@ DRIVER_INIT_MEMBER(mcr3_state,powerdrv)
 
 DRIVER_INIT_MEMBER(mcr3_state,stargrds)
 {
-	mcr_common_init(machine());
+	mcr_common_init();
 	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(mcr3_state::stargrds_ip0_r),this));
 	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x05, 0x05, write8_delegate(FUNC(mcr3_state::stargrds_op5_w),this));
 	machine().device("maincpu")->memory().space(AS_IO).install_write_handler(0x06, 0x06, write8_delegate(FUNC(mcr3_state::stargrds_op6_w),this));
@@ -1593,7 +1591,7 @@ DRIVER_INIT_MEMBER(mcr3_state,stargrds)
 
 DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 {
-	mcr_common_init(machine());
+	mcr_common_init();
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::spyhunt_ip2_r),this));
 	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));
@@ -1605,7 +1603,7 @@ DRIVER_INIT_MEMBER(mcr3_state,spyhunt)
 
 DRIVER_INIT_MEMBER(mcr3_state,crater)
 {
-	mcr_common_init(machine());
+	mcr_common_init();
 
 	m_spyhunt_sprite_color_mask = 0x03;
 	m_spyhunt_scroll_offset = 96;
@@ -1614,7 +1612,7 @@ DRIVER_INIT_MEMBER(mcr3_state,crater)
 
 DRIVER_INIT_MEMBER(mcr3_state,turbotag)
 {
-	mcr_common_init(machine());
+	mcr_common_init();
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(1, 0x60, read8_delegate(FUNC(mcr3_state::spyhunt_ip1_r),this));
 	machine().device<midway_ssio_device>("ssio")->set_custom_input(2, 0xff, read8_delegate(FUNC(mcr3_state::turbotag_ip2_r),this));
 	machine().device<midway_ssio_device>("ssio")->set_custom_output(4, 0xff, write8_delegate(FUNC(mcr3_state::spyhunt_op4_w),this));

@@ -48,4 +48,11 @@ public:
 	INTERRUPT_GEN_MEMBER(m90_interrupt);
 	INTERRUPT_GEN_MEMBER(dynablsb_interrupt);
 	INTERRUPT_GEN_MEMBER(bomblord_interrupt);
+	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,int page_mask);
+	inline void bomblord_get_tile_info(tile_data &tileinfo,int tile_index,int layer);
+	inline void dynablsb_get_tile_info(tile_data &tileinfo,int tile_index,int layer);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void bomblord_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void dynablsb_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void markdirty(tilemap_t *tmap,int page,offs_t offset);
 };

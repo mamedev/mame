@@ -18,14 +18,13 @@
  *
  *************************************/
 
-static void register_state_saving(running_machine &machine)
+void midwunit_state::register_state_saving()
 {
-	midwunit_state *state = machine.driver_data<midwunit_state>();
-	state_save_register_global(machine, state->m_cmos_write_enable);
-	state_save_register_global_array(machine, state->m_iodata);
-	state_save_register_global_array(machine, state->m_ioshuffle);
-	state_save_register_global_array(machine, state->m_uart);
-	state_save_register_global(machine, state->m_security_bits);
+	state_save_register_global(machine(), m_cmos_write_enable);
+	state_save_register_global_array(machine(), m_iodata);
+	state_save_register_global_array(machine(), m_ioshuffle);
+	state_save_register_global_array(machine(), m_uart);
+	state_save_register_global(machine(), m_security_bits);
 }
 
 
@@ -146,13 +145,13 @@ READ16_MEMBER(midwunit_state::midwunit_io_r)
  *
  *************************************/
 
-static void init_wunit_generic(running_machine &machine)
+void midwunit_state::init_wunit_generic()
 {
 	/* register for state saving */
-	register_state_saving(machine);
+	register_state_saving();
 
 	/* init sound */
-	dcs_init(machine);
+	dcs_init(machine());
 }
 
 
@@ -194,39 +193,39 @@ WRITE16_MEMBER(midwunit_state::umk3_palette_hack_w)
 /*  printf("in=%04X%04X  out=%04X%04X\n", m_umk3_palette[3], m_umk3_palette[2], m_umk3_palette[1], m_umk3_palette[0]); */
 }
 
-static void init_mk3_common(running_machine &machine)
+void midwunit_state::init_mk3_common()
 {
 	/* common init */
-	init_wunit_generic(machine);
+	init_wunit_generic();
 
 	/* serial prefixes 439, 528 */
-	midway_serial_pic_init(machine, 528);
+	midway_serial_pic_init(machine(), 528);
 }
 
 DRIVER_INIT_MEMBER(midwunit_state,mk3)
 {
-	init_mk3_common(machine());
+	init_mk3_common();
 }
 
 DRIVER_INIT_MEMBER(midwunit_state,mk3r20)
 {
-	init_mk3_common(machine());
+	init_mk3_common();
 }
 
 DRIVER_INIT_MEMBER(midwunit_state,mk3r10)
 {
-	init_mk3_common(machine());
+	init_mk3_common();
 }
 
 DRIVER_INIT_MEMBER(midwunit_state,umk3)
 {
-	init_mk3_common(machine());
+	init_mk3_common();
 	m_umk3_palette = machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f, write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),this));
 }
 
 DRIVER_INIT_MEMBER(midwunit_state,umk3r11)
 {
-	init_mk3_common(machine());
+	init_mk3_common();
 	m_umk3_palette = machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x0106a060, 0x0106a09f,write16_delegate(FUNC(midwunit_state::umk3_palette_hack_w),this));
 }
 
@@ -236,7 +235,7 @@ DRIVER_INIT_MEMBER(midwunit_state,umk3r11)
 DRIVER_INIT_MEMBER(midwunit_state,openice)
 {
 	/* common init */
-	init_wunit_generic(machine());
+	init_wunit_generic();
 
 	/* serial prefixes 438, 528 */
 	midway_serial_pic_init(machine(), 528);
@@ -248,7 +247,7 @@ DRIVER_INIT_MEMBER(midwunit_state,openice)
 DRIVER_INIT_MEMBER(midwunit_state,nbahangt)
 {
 	/* common init */
-	init_wunit_generic(machine());
+	init_wunit_generic();
 
 	/* serial prefixes 459, 470, 528 */
 	midway_serial_pic_init(machine(), 528);
@@ -309,7 +308,7 @@ WRITE16_MEMBER(midwunit_state::wwfmania_io_0_w)
 DRIVER_INIT_MEMBER(midwunit_state,wwfmania)
 {
 	/* common init */
-	init_wunit_generic(machine());
+	init_wunit_generic();
 
 	/* enable I/O shuffling */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x01800000, 0x0180000f, write16_delegate(FUNC(midwunit_state::wwfmania_io_0_w),this));
@@ -324,7 +323,7 @@ DRIVER_INIT_MEMBER(midwunit_state,wwfmania)
 DRIVER_INIT_MEMBER(midwunit_state,rmpgwt)
 {
 	/* common init */
-	init_wunit_generic(machine());
+	init_wunit_generic();
 
 	/* serial prefixes 465, 528 */
 	midway_serial_pic_init(machine(), 528);

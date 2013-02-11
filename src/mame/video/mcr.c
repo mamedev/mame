@@ -130,13 +130,13 @@ VIDEO_START_MEMBER(mcr_state,mcr)
  *
  *************************************/
 
-static void mcr_set_color(running_machine &machine, int index, int data)
+void mcr_state::mcr_set_color(int index, int data)
 {
-	palette_set_color_rgb(machine, index, pal3bit(data >> 6), pal3bit(data >> 0), pal3bit(data >> 3));
+	palette_set_color_rgb(machine(), index, pal3bit(data >> 6), pal3bit(data >> 0), pal3bit(data >> 3));
 }
 
 
-static void journey_set_color(running_machine &machine, int index, int data)
+void mcr_state::journey_set_color(int index, int data)
 {
 	/* 3 bits each, RGB */
 	int r = (data >> 6) & 7;
@@ -149,7 +149,7 @@ static void journey_set_color(running_machine &machine, int index, int data)
 	b = (b << 5) | (b << 1);
 
 	/* set the BG color */
-	palette_set_color(machine, index, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), index, MAKE_RGB(r, g, b));
 
 	/* if this is an odd entry in the upper palette bank, the hardware */
 	/* hard-codes a low 1 bit -- this is used for better grayscales */
@@ -161,7 +161,7 @@ static void journey_set_color(running_machine &machine, int index, int data)
 	}
 
 	/* set the FG color */
-	palette_set_color(machine, index + 64, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), index + 64, MAKE_RGB(r, g, b));
 }
 
 
@@ -169,7 +169,7 @@ WRITE8_MEMBER(mcr_state::mcr_91490_paletteram_w)
 {
 	m_generic_paletteram_8[offset] = data;
 	offset &= 0x7f;
-	mcr_set_color(machine(), (offset / 2) & 0x3f, data | ((offset & 1) << 8));
+	mcr_set_color((offset / 2) & 0x3f, data | ((offset & 1) << 8));
 }
 
 
@@ -198,9 +198,9 @@ WRITE8_MEMBER(mcr_state::mcr_90010_videoram_w)
 	if ((offset & 0x780) == 0x780)
 	{
 		if (mcr_cpu_board != 91475)
-			mcr_set_color(machine(), (offset / 2) & 0x3f, data | ((offset & 1) << 8));
+			mcr_set_color((offset / 2) & 0x3f, data | ((offset & 1) << 8));
 		else
-			journey_set_color(machine(), (offset / 2) & 0x3f, data | ((offset & 1) << 8));
+			journey_set_color((offset / 2) & 0x3f, data | ((offset & 1) << 8));
 	}
 }
 
@@ -224,7 +224,7 @@ WRITE8_MEMBER(mcr_state::twotiger_videoram_w)
 
 	/* palette RAM is mapped into the upper 0x80 bytes here */
 	if ((effoffs & 0x780) == 0x780)
-		mcr_set_color(machine(), ((offset & 0x400) >> 5) | ((offset >> 1) & 0x1f), data | ((offset & 1) << 8));
+		mcr_set_color(((offset & 0x400) >> 5) | ((offset >> 1) & 0x1f), data | ((offset & 1) << 8));
 }
 
 
@@ -247,15 +247,14 @@ WRITE8_MEMBER(mcr_state::mcr_91490_videoram_w)
  *
  *************************************/
 
-static void render_sprites_91399(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void mcr_state::render_sprites_91399(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mcr_state *state = machine.driver_data<mcr_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	gfx_element *gfx = machine.gfx[1];
+	UINT8 *spriteram = m_spriteram;
+	gfx_element *gfx = machine().gfx[1];
 	int offs;
 
 	/* render the sprites into the bitmap, ORing together */
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int code, x, y, sx, sy, hflip, vflip;
 
@@ -287,7 +286,7 @@ static void render_sprites_91399(running_machine &machine, bitmap_ind16 &bitmap,
 			{
 				const UINT8 *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
 				UINT16 *dst = &bitmap.pix16(sy);
-				UINT8 *pri = &machine.priority_bitmap.pix8(sy);
+				UINT8 *pri = &machine().priority_bitmap.pix8(sy);
 
 				/* loop over columns */
 				for (x = 0; x < 32; x++)
@@ -320,15 +319,14 @@ static void render_sprites_91399(running_machine &machine, bitmap_ind16 &bitmap,
  *
  *************************************/
 
-static void render_sprites_91464(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask)
+void mcr_state::render_sprites_91464(bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int sprmask, int colormask)
 {
-	mcr_state *state = machine.driver_data<mcr_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	gfx_element *gfx = machine.gfx[1];
+	UINT8 *spriteram = m_spriteram;
+	gfx_element *gfx = machine().gfx[1];
 	int offs;
 
 	/* render the sprites into the bitmap, working from topmost to bottommost */
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int code, color, x, y, sx, sy, hflip, vflip;
 
@@ -359,7 +357,7 @@ static void render_sprites_91464(running_machine &machine, bitmap_ind16 &bitmap,
 			{
 				const UINT8 *src = gfx->get_data(code) + gfx->rowbytes() * (y ^ vflip);
 				UINT16 *dst = &bitmap.pix16(sy);
-				UINT8 *pri = &machine.priority_bitmap.pix8(sy);
+				UINT8 *pri = &machine().priority_bitmap.pix8(sy);
 
 				/* loop over columns */
 				for (x = 0; x < 32; x++)
@@ -411,18 +409,18 @@ UINT32 mcr_state::screen_update_mcr(screen_device &screen, bitmap_ind16 &bitmap,
 	switch (mcr_sprite_board)
 	{
 		case 91399:
-			render_sprites_91399(machine(), bitmap, cliprect);
+			render_sprites_91399(bitmap, cliprect);
 			break;
 
 		case 91464:
 			if (mcr_cpu_board == 91442)
-				render_sprites_91464(machine(), bitmap, cliprect, 0x00, 0x30, 0x00);
+				render_sprites_91464(bitmap, cliprect, 0x00, 0x30, 0x00);
 			else if (mcr_cpu_board == 91475)
-				render_sprites_91464(machine(), bitmap, cliprect, 0x00, 0x30, 0x40);
+				render_sprites_91464(bitmap, cliprect, 0x00, 0x30, 0x40);
 			else if (mcr_cpu_board == 91490)
-				render_sprites_91464(machine(), bitmap, cliprect, 0x00, 0x30, 0x00);
+				render_sprites_91464(bitmap, cliprect, 0x00, 0x30, 0x00);
 			else if (mcr_cpu_board == 91721)
-				render_sprites_91464(machine(), bitmap, cliprect, 0x00, 0x30, 0x00);
+				render_sprites_91464(bitmap, cliprect, 0x00, 0x30, 0x00);
 			break;
 	}
 	return 0;

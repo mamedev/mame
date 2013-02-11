@@ -49,4 +49,7 @@ public:
 	UINT32 screen_update_mnchmobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mnchmobl_vblank_irq);
 	INTERRUPT_GEN_MEMBER(mnchmobl_sound_irq);
+	void draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

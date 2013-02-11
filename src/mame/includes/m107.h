@@ -53,4 +53,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_m107(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(m107_scanline_interrupt);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void m107_update_scroll_positions();
+	void m107_tilemap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int laynum, int category,int opaque);
+	void m107_screenrefresh(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

@@ -270,30 +270,29 @@ READ8_MEMBER(mitchell_state::mgakuen_paletteram_r)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mitchell_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	mitchell_state *state = machine.driver_data<mitchell_state>();
 	int offs, sx, sy;
 
 	/* the last entry is not a sprite, we skip it otherwise spang shows a bubble */
 	/* moving diagonally across the screen */
 	for (offs = 0x1000 - 0x40; offs >= 0; offs -= 0x20)
 	{
-		int code = state->m_objram[offs];
-		int attr = state->m_objram[offs + 1];
+		int code = m_objram[offs];
+		int attr = m_objram[offs + 1];
 		int color = attr & 0x0f;
-		sx = state->m_objram[offs + 3] + ((attr & 0x10) << 4);
-		sy = ((state->m_objram[offs + 2] + 8) & 0xff) - 8;
+		sx = m_objram[offs + 3] + ((attr & 0x10) << 4);
+		sy = ((m_objram[offs + 2] + 8) & 0xff) - 8;
 		code += (attr & 0xe0) << 3;
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;
 		}
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					code,
 					color,
-					state->m_flipscreen, state->m_flipscreen,
+					m_flipscreen, m_flipscreen,
 					sx,sy,15);
 	}
 }
@@ -302,6 +301,6 @@ UINT32 mitchell_state::screen_update_pang(screen_device &screen, bitmap_ind16 &b
 {
 	bitmap.fill(0, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

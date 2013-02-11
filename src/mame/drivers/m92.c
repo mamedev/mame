@@ -204,9 +204,9 @@ psoldier dip locations still need verification.
 #include "sound/okim6295.h"
 
 
-#define M92_IRQ_0 ((state->m_irq_vectorbase+0)/4)  /* VBL interrupt */
-#define M92_IRQ_1 ((state->m_irq_vectorbase+4)/4)  /* Sprite buffer complete interrupt */
-#define M92_IRQ_2 ((state->m_irq_vectorbase+8)/4)  /* Raster interrupt */
+#define M92_IRQ_0 ((m_irq_vectorbase+0)/4)  /* VBL interrupt */
+#define M92_IRQ_1 ((m_irq_vectorbase+4)/4)  /* Sprite buffer complete interrupt */
+#define M92_IRQ_2 ((m_irq_vectorbase+8)/4)  /* Raster interrupt */
 #define M92_IRQ_3 ((m_irq_vectorbase+12)/4) /* Sound cpu interrupt */
 
 
@@ -226,21 +226,20 @@ MACHINE_RESET_MEMBER(m92_state,m92)
 
 TIMER_DEVICE_CALLBACK_MEMBER(m92_state::m92_scanline_interrupt)
 {
-	m92_state *state = machine().driver_data<m92_state>();
 	int scanline = param;
 
 	/* raster interrupt */
 	if (scanline == m_raster_irq_position)
 	{
 		machine().primary_screen->update_partial(scanline);
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_2);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == machine().primary_screen->visible_area().max_y + 1)
 	{
 		machine().primary_screen->update_partial(scanline);
-		state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_0);
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_0);
 	}
 }
 
@@ -908,11 +907,9 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-void m92_sprite_interrupt(running_machine &machine)
+void m92_state::m92_sprite_interrupt()
 {
-	m92_state *state = machine.driver_data<m92_state>();
-
-	state->m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_1);
+	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, M92_IRQ_1);
 }
 
 static MACHINE_CONFIG_START( m92, m92_state )

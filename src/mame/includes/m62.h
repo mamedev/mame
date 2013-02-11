@@ -106,4 +106,9 @@ public:
 	UINT32 screen_update_spelunk2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_youjyudn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_horizon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void m62_amplify_contrast(palette_t *palette, UINT32 numcolors);
+	void register_savestate(  );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int colormask, int prioritymask, int priority );
+	void m62_start( tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 );
+	void m62_textlayer( tilemap_get_info_delegate tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 );
 };

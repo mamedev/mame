@@ -46,28 +46,27 @@ WRITE16_MEMBER(mcatadv_state::mcatadv_videoram2_w)
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mcatadv_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	mcatadv_state *state = machine.driver_data<mcatadv_state>();
-	UINT16 *source = state->m_spriteram_old;
-	UINT16 *finish = source + (state->m_spriteram.bytes() / 2) /2;
-	int global_x = state->m_vidregs[0] - 0x184;
-	int global_y = state->m_vidregs[1] - 0x1f1;
+	UINT16 *source = m_spriteram_old;
+	UINT16 *finish = source + (m_spriteram.bytes() / 2) /2;
+	int global_x = m_vidregs[0] - 0x184;
+	int global_y = m_vidregs[1] - 0x1f1;
 
 	UINT16 *destline;
 	UINT8 *priline;
-	UINT8 *sprdata = state->memregion("gfx1")->base();
-	int sprmask = state->memregion("gfx1")->bytes()-1;
+	UINT8 *sprdata = memregion("gfx1")->base();
+	int sprmask = memregion("gfx1")->bytes()-1;
 
 	int xstart, xend, xinc;
 	int ystart, yend, yinc;
 
-	if (state->m_vidregs_old[2] == 0x0001) /* Double Buffered */
+	if (m_vidregs_old[2] == 0x0001) /* Double Buffered */
 	{
-		source += (state->m_spriteram.bytes() / 2) / 2;
-		finish += (state->m_spriteram.bytes() / 2) / 2;
+		source += (m_spriteram.bytes() / 2) / 2;
+		finish += (m_spriteram.bytes() / 2) / 2;
 	}
-	else if (state->m_vidregs_old[2]) /* I suppose it's possible that there is 4 banks, haven't seen it used though */
+	else if (m_vidregs_old[2]) /* I suppose it's possible that there is 4 banks, haven't seen it used though */
 	{
 		logerror("Spritebank != 0/1\n");
 	}
@@ -94,11 +93,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if (y & 0x200) y-=0x400;
 
 #if 0 // For Flipscreen/Cocktail
-		if(state->m_vidregs[0] & 0x8000)
+		if(m_vidregs[0] & 0x8000)
 		{
 			flipx = !flipx;
 		}
-		if(state->m_vidregs[1] & 0x8000)
+		if(m_vidregs[1] & 0x8000)
 		{
 			flipy = !flipy;
 		}
@@ -118,7 +117,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				if ((drawypos >= cliprect.min_y) && (drawypos <= cliprect.max_y))
 				{
 					destline = &bitmap.pix16(drawypos);
-					priline = &machine.priority_bitmap.pix8(drawypos);
+					priline = &machine().priority_bitmap.pix8(drawypos);
 
 					for (xcnt = xstart; xcnt != xend; xcnt += xinc)
 					{
@@ -152,7 +151,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static void mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mcatadv_state::mcatadv_draw_tilemap_part( UINT16* current_scroll, UINT16* current_videoram1, int i, tilemap_t* current_tilemap, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	int flip;
 	UINT32 drawline;
@@ -240,7 +239,7 @@ UINT32 mcatadv_state::screen_update_mcatadv(screen_device &screen, bitmap_ind16 
 #ifdef MAME_DEBUG
 	if (!machine().input().code_pressed(KEYCODE_E))
 #endif
-		draw_sprites (machine(), bitmap, cliprect);
+		draw_sprites (bitmap, cliprect);
 	g_profiler.stop();
 	return 0;
 }

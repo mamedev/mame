@@ -71,10 +71,9 @@ void markham_state::video_start()
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void markham_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	markham_state *state = machine.driver_data<markham_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0x60; offs < 0x100; offs += 4)
@@ -82,15 +81,15 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int chr = spriteram[offs + 1];
 		int col = spriteram[offs + 2];
 
-		int fx = state->flip_screen();
-		int fy = state->flip_screen();
+		int fx = flip_screen();
+		int fy = flip_screen();
 
 		int x = spriteram[offs + 3];
 		int y = spriteram[offs + 0];
 		int px, py;
 		col &= 0x3f ;
 
-		if (state->flip_screen() == 0)
+		if (flip_screen() == 0)
 		{
 			px = x - 2;
 			py = 240 - y;
@@ -106,12 +105,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if (px > 248)
 			px = px - 256;
 
-		drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transmask(bitmap,cliprect,machine().gfx[1],
 			chr,
 			col,
 			fx,fy,
 			px,py,
-			colortable_get_transpen_mask(machine.colortable, machine.gfx[1], col, 0));
+			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], col, 0));
 	}
 }
 
@@ -128,6 +127,6 @@ UINT32 markham_state::screen_update_markham(screen_device &screen, bitmap_ind16 
 	}
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

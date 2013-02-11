@@ -92,4 +92,8 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void irq_init();
 	void irq_raise(int level);
+	void update_color(int color);
+	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, UINT16 *sprram_top, size_t sprram_size, int gfxnum, int reverseorder);
+	void draw_roz(bitmap_ind16 &bitmap, const rectangle &cliprect,int priority);
+	void configure_banks();
 };

@@ -49,6 +49,7 @@ public:
 	INTERRUPT_GEN_MEMBER(meadows_interrupt);
 	INTERRUPT_GEN_MEMBER(minferno_interrupt);
 	INTERRUPT_GEN_MEMBER(audio_interrupt);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip);
 };
 
 

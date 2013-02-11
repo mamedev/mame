@@ -170,22 +170,21 @@ WRITE8_MEMBER(m57_state::m57_flipscreen_w)
  *
  *************************************/
 
-static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void m57_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m57_state *state = machine.driver_data<m57_state>();
 	int y,x;
 	INT16 scrolly;
 
 	// from 64 to 127: not wrapped
 	for (y = 64; y < 128; y++)
-		state->m_bg_tilemap->set_scrollx(y, state->m_scrollram[0x40]);
+		m_bg_tilemap->set_scrollx(y, m_scrollram[0x40]);
 
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	// from 128 to 255: wrapped
 	for (y = 128; y <= cliprect.max_y; y++)
 	{
-		scrolly = state->m_scrollram[y] + (state->m_scrollram[y + 0x100] << 8);
+		scrolly = m_scrollram[y] + (m_scrollram[y + 0x100] << 8);
 
 		if (scrolly >= 0)
 		{
@@ -214,17 +213,16 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void m57_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m57_state *state = machine.driver_data<m57_state>();
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
-		UINT8 attributes = state->m_spriteram[offs + 1];
-		int sx = state->m_spriteram[offs + 3];
-		int sy = ((224 - state->m_spriteram[offs + 0] - 32) & 0xff) + 32;
-		int code = state->m_spriteram[offs + 2];
+		UINT8 attributes = m_spriteram[offs + 1];
+		int sx = m_spriteram[offs + 3];
+		int sy = ((224 - m_spriteram[offs + 0] - 32) & 0xff) + 32;
+		int code = m_spriteram[offs + 2];
 		int color = attributes & 0x1f;
 		int flipy = attributes & 0x80;
 		int flipx = attributes & 0x40;
@@ -235,7 +233,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		if (code & 0x80) bank += 1;
 		if (attributes & 0x20) bank += 2;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			sx = 240 - sx;
 			sy = 224 - sy;
@@ -243,12 +241,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			flipy = !flipy;
 		}
 
-		drawgfx_transmask(bitmap, cliprect, machine.gfx[1 + bank],
+		drawgfx_transmask(bitmap, cliprect, machine().gfx[1 + bank],
 			tile_number,
 			color,
 			flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 256 + 15));
+			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 256 + 15));
 	}
 }
 
@@ -262,7 +260,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 m57_state::screen_update_m57(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(machine(), bitmap, cliprect);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_background(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

@@ -74,4 +74,5 @@ public:
 	DECLARE_MACHINE_RESET(ta7630);
 	UINT32 screen_update_msisaac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

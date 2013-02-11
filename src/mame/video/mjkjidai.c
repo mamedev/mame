@@ -81,12 +81,11 @@ WRITE8_MEMBER(mjkjidai_state::mjkjidai_ctrl_w)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void mjkjidai_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
-	UINT8 *spriteram = state->m_spriteram1;
-	UINT8 *spriteram_2 = state->m_spriteram2;
-	UINT8 *spriteram_3 = state->m_spriteram3;
+	UINT8 *spriteram = m_spriteram1;
+	UINT8 *spriteram_2 = m_spriteram2;
+	UINT8 *spriteram_3 = m_spriteram3;
 	int offs;
 
 	for (offs = 0x20-2;offs >= 0;offs -= 2)
@@ -102,7 +101,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		sx += (spriteram_2[offs] & 0x20) >> 5;  // not sure about this
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;
@@ -113,7 +112,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		sx += 16;
 		sy += 1;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -130,7 +129,7 @@ UINT32 mjkjidai_state::screen_update_mjkjidai(screen_device &screen, bitmap_ind1
 	else
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-		draw_sprites(machine(), bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 	}
 	return 0;
 }

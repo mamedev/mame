@@ -107,9 +107,8 @@ void mrjong_state::video_start()
 /*
 Note: First 0x40 entries in the videoram are actually spriteram
 */
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mrjong_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	mrjong_state *state = machine.driver_data<mrjong_state>();
 	int offs;
 
 	for (offs = (0x40 - 4); offs >= 0; offs -= 4)
@@ -119,14 +118,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx, sy;
 		int flipx, flipy;
 
-		sprt = (((state->m_videoram[offs + 1] >> 2) & 0x3f) | ((state->m_videoram[offs + 3] & 0x20) << 1));
-		flipx = (state->m_videoram[offs + 1] & 0x01) >> 0;
-		flipy = (state->m_videoram[offs + 1] & 0x02) >> 1;
-		color = (state->m_videoram[offs + 3] & 0x1f);
+		sprt = (((m_videoram[offs + 1] >> 2) & 0x3f) | ((m_videoram[offs + 3] & 0x20) << 1));
+		flipx = (m_videoram[offs + 1] & 0x01) >> 0;
+		flipy = (m_videoram[offs + 1] & 0x02) >> 1;
+		color = (m_videoram[offs + 3] & 0x1f);
 
-		sx = 224 - state->m_videoram[offs + 2];
-		sy = state->m_videoram[offs + 0];
-		if (state->flip_screen())
+		sx = 224 - m_videoram[offs + 2];
+		sy = m_videoram[offs + 0];
+		if (flip_screen())
 		{
 			sx = 208 - sx;
 			sy = 240 - sy;
@@ -134,7 +133,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
 				sprt,
 				color,
 				flipx, flipy,
@@ -145,6 +144,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 mrjong_state::screen_update_mrjong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

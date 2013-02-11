@@ -1534,20 +1534,19 @@ ROM_END
  *
  *************************************/
 
-static void mcr68_common_init(running_machine &machine, int clip, int xoffset)
+void mcr68_state::mcr68_common_init(int clip, int xoffset)
 {
-	mcr68_state *state = machine.driver_data<mcr68_state>();
 
-	state->m_sprite_clip = clip;
-	state->m_sprite_xoffset = xoffset;
+	m_sprite_clip = clip;
+	m_sprite_xoffset = xoffset;
 
-	state_save_register_global(machine, state->m_control_word);
+	state_save_register_global(machine(), m_control_word);
 }
 
 
 DRIVER_INIT_MEMBER(mcr68_state,zwackery)
 {
-	mcr68_common_init(machine(), 0, 0);
+	mcr68_common_init(0, 0);
 
 	/* Zwackery doesn't care too much about this value; currently taken from Blasted */
 	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
@@ -1556,7 +1555,7 @@ DRIVER_INIT_MEMBER(mcr68_state,zwackery)
 
 DRIVER_INIT_MEMBER(mcr68_state,xenophob)
 {
-	mcr68_common_init(machine(), 0, -4);
+	mcr68_common_init(0, -4);
 
 	/* Xenophobe doesn't care too much about this value; currently taken from Blasted */
 	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
@@ -1568,7 +1567,7 @@ DRIVER_INIT_MEMBER(mcr68_state,xenophob)
 
 DRIVER_INIT_MEMBER(mcr68_state,spyhunt2)
 {
-	mcr68_common_init(machine(), 0, -6);
+	mcr68_common_init(0, -6);
 
 	/* Spy Hunter II doesn't care too much about this value; currently taken from Blasted */
 	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
@@ -1582,7 +1581,7 @@ DRIVER_INIT_MEMBER(mcr68_state,spyhunt2)
 
 DRIVER_INIT_MEMBER(mcr68_state,blasted)
 {
-	mcr68_common_init(machine(), 0, 0);
+	mcr68_common_init(0, 0);
 
 	/* Blasted checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 220-256 E clocks (i.e., 2200-2560 CPU clocks) */
@@ -1598,7 +1597,7 @@ DRIVER_INIT_MEMBER(mcr68_state,blasted)
 
 DRIVER_INIT_MEMBER(mcr68_state,intlaser)
 {
-	mcr68_common_init(machine(), 0, 0);
+	mcr68_common_init(0, 0);
 
 	/* Copied from Blasted */
 	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
@@ -1612,7 +1611,7 @@ DRIVER_INIT_MEMBER(mcr68_state,intlaser)
 
 DRIVER_INIT_MEMBER(mcr68_state,archrivl)
 {
-	mcr68_common_init(machine(), 16, 0);
+	mcr68_common_init(16, 0);
 
 	/* Arch Rivals doesn't care too much about this value; currently taken from Blasted */
 	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * (256 + 16);
@@ -1630,7 +1629,7 @@ DRIVER_INIT_MEMBER(mcr68_state,archrivl)
 
 DRIVER_INIT_MEMBER(mcr68_state,pigskin)
 {
-	mcr68_common_init(machine(), 16, 0);
+	mcr68_common_init(16, 0);
 
 	/* Pigskin doesn't care too much about this value; currently taken from Tri-Sports */
 	m_timing_factor = attotime::from_hz(machine().device("maincpu")->unscaled_clock() / 10) * 115;
@@ -1641,7 +1640,7 @@ DRIVER_INIT_MEMBER(mcr68_state,pigskin)
 
 DRIVER_INIT_MEMBER(mcr68_state,trisport)
 {
-	mcr68_common_init(machine(), 0, 0);
+	mcr68_common_init(0, 0);
 
 	/* Tri-Sports checks the timing of VBLANK relative to the 493 interrupt */
 	/* VBLANK is required to come within 87-119 E clocks (i.e., 870-1190 CPU clocks) */

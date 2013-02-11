@@ -2191,18 +2191,17 @@ ROM_START( wpksocv2 )
 ROM_END
 
 
-static void configure_banks(running_machine &machine)
+void ms32_state::configure_banks()
 {
-	ms32_state *state = machine.driver_data<ms32_state>();
-	state_save_register_global(machine, state->m_to_main);
-	state->membank("bank4")->configure_entries(0, 16, state->memregion("audiocpu")->base() + 0x14000, 0x4000);
-	state->membank("bank5")->configure_entries(0, 16, state->memregion("audiocpu")->base() + 0x14000, 0x4000);
+	state_save_register_global(machine(), m_to_main);
+	membank("bank4")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x14000, 0x4000);
+	membank("bank5")->configure_entries(0, 16, memregion("audiocpu")->base() + 0x14000, 0x4000);
 }
 
 DRIVER_INIT_MEMBER(ms32_state,ms32_common)
 {
 	m_nvram_8 = auto_alloc_array(machine(), UINT8, 0x2000);
-	configure_banks(machine());
+	configure_banks();
 }
 
 /* SS91022-10: desertwr, gratiaa, tp2m32, gametngk */

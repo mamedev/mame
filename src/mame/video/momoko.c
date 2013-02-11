@@ -66,12 +66,12 @@ WRITE8_MEMBER(momoko_state::momoko_flipscreen_w)
 
 /****************************************************************************/
 
-static void momoko_draw_bg_pri( running_machine &machine, bitmap_ind16 &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri )
+void momoko_state::momoko_draw_bg_pri( bitmap_ind16 &bitmap, int chr, int col, int flipx, int flipy, int x, int y, int pri )
 {
 	int xx, sx, sy, px, py, dot;
 	UINT32 gfxadr;
 	UINT8 d0, d1;
-	UINT8 *BG_GFX = machine.root_device().memregion("gfx2")->base();
+	UINT8 *BG_GFX = machine().root_device().memregion("gfx2")->base();
 
 	for (sy = 0; sy < 8; sy++)
 	{
@@ -210,7 +210,7 @@ UINT32 momoko_state::screen_update_momoko(screen_device &screen, bitmap_ind16 &b
 				{
 					col = col & 0x0f;
 					chr = chr + m_bg_select * 512;
-					momoko_draw_bg_pri(machine(), bitmap, chr, col, flip, flip, px, py, pri);
+					momoko_draw_bg_pri(bitmap, chr, col, flip, flip, px, py, pri);
 				}
 			}
 		}

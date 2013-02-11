@@ -552,9 +552,9 @@ MACHINE_CONFIG_END
 #define TORNBASE_CAB_TYPE_PORT_TAG      ("CAB")
 
 
-UINT8 tornbase_get_cabinet_type(running_machine &machine)
+UINT8 mw8080bw_state::tornbase_get_cabinet_type()
 {
-	return machine.root_device().ioport(TORNBASE_CAB_TYPE_PORT_TAG)->read();
+	return machine().root_device().ioport(TORNBASE_CAB_TYPE_PORT_TAG)->read();
 }
 
 
@@ -568,7 +568,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_right_input_r)
 {
 	UINT32 ret;
 
-	switch (tornbase_get_cabinet_type(machine()))
+	switch (tornbase_get_cabinet_type())
 	{
 	case TORNBASE_CAB_TYPE_UPRIGHT_OLD:
 		ret = ioport(TORNBASE_L_HIT_PORT_TAG)->read();
@@ -589,7 +589,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_pitch_left_input_r)
 {
 	UINT32 ret;
 
-	switch (tornbase_get_cabinet_type(machine()))
+	switch (tornbase_get_cabinet_type())
 	{
 	case TORNBASE_CAB_TYPE_UPRIGHT_OLD:
 	case TORNBASE_CAB_TYPE_UPRIGHT_NEW:
@@ -2122,24 +2122,21 @@ MACHINE_START_MEMBER(mw8080bw_state,spcenctr)
 }
 
 #if 0
-UINT8 spcenctr_get_trench_width( *running_machine &machine )
+UINT8 mw8080bw_state::spcenctr_get_trench_width()
 {
-	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
-	return state->m_spcenctr_trench_width;
+	return m_spcenctr_trench_width;
 }
 
 
-UINT8 spcenctr_get_trench_center( *running_machine &machine )
+UINT8 mw8080bw_state::spcenctr_get_trench_center()
 {
-	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
-	return state->m_spcenctr_trench_center;
+	return m_spcenctr_trench_center;
 }
 
 
-UINT8 spcenctr_get_trench_slope( *running_machine &machine, UINT8 addr )
+UINT8 mw8080bw_state::spcenctr_get_trench_slope(UINT8 addr )
 {
-	mw8080bw_state *state = machine.driver_data<mw8080bw_state>();
-	return state->m_spcenctr_trench_slope[addr & 0x0f];
+	return m_spcenctr_trench_slope[addr & 0x0f];
 }
 #endif
 
@@ -2519,7 +2516,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw6_sw7_r)
 	/* upright PCB : switches visible
 	   cocktail PCB: HI */
 
-	if (invaders_is_cabinet_cocktail(machine()))
+	if (invaders_is_cabinet_cocktail())
 		ret = 0x03;
 	else
 		ret = ioport(INVADERS_SW6_SW7_PORT_TAG)->read();
@@ -2535,7 +2532,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw5_r)
 	/* upright PCB : switch visible
 	   cocktail PCB: HI */
 
-	if (invaders_is_cabinet_cocktail(machine()))
+	if (invaders_is_cabinet_cocktail())
 		ret = 0x01;
 	else
 		ret = ioport(INVADERS_SW5_PORT_TAG)->read();
@@ -2551,7 +2548,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in0_control_r)
 	/* upright PCB : P1 controls
 	   cocktail PCB: HI */
 
-	if (invaders_is_cabinet_cocktail(machine()))
+	if (invaders_is_cabinet_cocktail())
 		ret = 0x07;
 	else
 		ret = ioport(INVADERS_P1_CONTROL_PORT_TAG)->read();
@@ -2573,7 +2570,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in2_control_r)
 	/* upright PCB : P1 controls
 	   cocktail PCB: P2 controls */
 
-	if (invaders_is_cabinet_cocktail(machine()))
+	if (invaders_is_cabinet_cocktail())
 		ret = ioport(INVADERS_P2_CONTROL_PORT_TAG)->read();
 	else
 		ret = ioport(INVADERS_P1_CONTROL_PORT_TAG)->read();
@@ -2582,9 +2579,9 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in2_control_r)
 }
 
 
-int invaders_is_cabinet_cocktail(running_machine &machine)
+int mw8080bw_state::invaders_is_cabinet_cocktail()
 {
-	return machine.root_device().ioport(INVADERS_CAB_TYPE_PORT_TAG)->read();
+	return machine().root_device().ioport(INVADERS_CAB_TYPE_PORT_TAG)->read();
 }
 
 
@@ -2788,9 +2785,9 @@ MACHINE_CONFIG_END
 
 
 #ifdef UNUSED_FUNCTION
-static UINT32 invad2ct_coin_input_r(void *param)
+UINT32 mw8080bw_state::invad2ct_coin_input_r(void *param)
 {
-	UINT32 ret = machine.root_device().ioport(INVAD2CT_COIN_INPUT_PORT_TAG)->read();
+	UINT32 ret = machine().root_device().ioport(INVAD2CT_COIN_INPUT_PORT_TAG)->read();
 
 	coin_counter_w(machine, 0, !ret);
 

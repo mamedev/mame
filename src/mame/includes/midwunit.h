@@ -41,4 +41,7 @@ public:
 	DECLARE_DRIVER_INIT(mk3r20);
 	DECLARE_MACHINE_RESET(midwunit);
 	DECLARE_VIDEO_START(midwunit);
+	void register_state_saving();
+	void init_wunit_generic();
+	void init_mk3_common();
 };

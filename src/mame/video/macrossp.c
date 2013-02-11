@@ -159,13 +159,12 @@ void macrossp_state::video_start()
 
 
 
-static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority )
+void macrossp_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int priority )
 {
-	macrossp_state *state = machine.driver_data<macrossp_state>();
-	gfx_element *gfx = machine.gfx[0];
-	//  UINT32 *source = state->m_spriteram;
-	UINT32 *source = state->m_spriteram_old2; /* buffers by two frames */
-	UINT32 *finish = source + state->m_spriteram.bytes() / 4;
+	gfx_element *gfx = machine().gfx[0];
+	//  UINT32 *source = m_spriteram;
+	UINT32 *source = m_spriteram_old2; /* buffers by two frames */
+	UINT32 *finish = source + m_spriteram.bytes() / 4;
 
 	while (source < finish)
 	{
@@ -217,7 +216,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 					break;
 
 				default:
-					col = machine.rand();
+					col = machine().rand();
 					break;
 			}
 
@@ -305,9 +304,8 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 }
 
 
-static void draw_layer( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer )
+void macrossp_state::draw_layer( bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer )
 {
-	macrossp_state *state = machine.driver_data<macrossp_state>();
 	tilemap_t *tm;
 	UINT32 *vr;
 
@@ -315,18 +313,18 @@ static void draw_layer( running_machine &machine, bitmap_rgb32 &bitmap, const re
 	{
 		case 0:
 		default:
-			tm = state->m_scra_tilemap;
-			vr = state->m_scra_videoregs;
+			tm = m_scra_tilemap;
+			vr = m_scra_videoregs;
 			break;
 
 		case 1:
-			tm = state->m_scrb_tilemap;
-			vr = state->m_scrb_videoregs;
+			tm = m_scrb_tilemap;
+			vr = m_scrb_videoregs;
 			break;
 
 		case 2:
-			tm = state->m_scrc_tilemap;
-			vr = state->m_scrc_videoregs;
+			tm = m_scrc_tilemap;
+			vr = m_scrc_videoregs;
 			break;
 	}
 
@@ -357,7 +355,7 @@ static void draw_layer( running_machine &machine, bitmap_rgb32 &bitmap, const re
 }
 
 /* useful function to sort the three tile layers by priority order */
-static void sortlayers(int *layer,int *pri)
+void macrossp_state::sortlayers(int *layer,int *pri)
 {
 #define SWAP(a,b) \
 	if (pri[a] >= pri[b]) \
@@ -387,13 +385,13 @@ UINT32 macrossp_state::screen_update_macrossp(screen_device &screen, bitmap_rgb3
 
 	sortlayers(layers, layerpri);
 
-	draw_layer(machine(), bitmap, cliprect, layers[0]);
-	draw_sprites(machine(), bitmap, cliprect, 0);
-	draw_layer(machine(), bitmap, cliprect, layers[1]);
-	draw_sprites(machine(), bitmap, cliprect, 1);
-	draw_layer(machine(), bitmap, cliprect, layers[2]);
-	draw_sprites(machine(), bitmap, cliprect, 2);
-	draw_sprites(machine(), bitmap, cliprect, 3);
+	draw_layer(bitmap, cliprect, layers[0]);
+	draw_sprites(bitmap, cliprect, 0);
+	draw_layer(bitmap, cliprect, layers[1]);
+	draw_sprites(bitmap, cliprect, 1);
+	draw_layer(bitmap, cliprect, layers[2]);
+	draw_sprites(bitmap, cliprect, 2);
+	draw_sprites(bitmap, cliprect, 3);
 	m_text_tilemap->draw(bitmap, cliprect, 0, 0);
 
 #if 0

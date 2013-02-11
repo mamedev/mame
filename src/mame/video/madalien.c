@@ -65,7 +65,7 @@ PALETTE_INIT_MEMBER(madalien_state,madalien)
 }
 
 
-INLINE int scan_helper(int col, int row, int section)
+inline int madalien_state::scan_helper(int col, int row, int section)
 {
 	return (section << 8) | ((~col & 0x0f) << 3) | row;
 }
@@ -159,9 +159,8 @@ VIDEO_START_MEMBER(madalien_state,madalien)
 }
 
 
-static void draw_edges(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int scroll_mode)
+void madalien_state::draw_edges(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip, int scroll_mode)
 {
-	madalien_state *state = machine.driver_data<madalien_state>();
 	rectangle clip_edge1;
 	rectangle clip_edge2;
 
@@ -170,45 +169,44 @@ static void draw_edges(running_machine &machine, bitmap_ind16 &bitmap, const rec
 
 	if (flip)
 	{
-		clip_edge1.min_y = *state->m_edge1_pos | 0x80;
-		clip_edge2.max_y = (*state->m_edge2_pos & 0x7f) ^ 0x7f;
+		clip_edge1.min_y = *m_edge1_pos | 0x80;
+		clip_edge2.max_y = (*m_edge2_pos & 0x7f) ^ 0x7f;
 	}
 	else
 	{
-		clip_edge1.max_y = (*state->m_edge1_pos & 0x7f) ^ 0x7f;
-		clip_edge2.min_y = *state->m_edge2_pos | 0x80;
+		clip_edge1.max_y = (*m_edge1_pos & 0x7f) ^ 0x7f;
+		clip_edge2.min_y = *m_edge2_pos | 0x80;
 	}
 
 	clip_edge1 &= cliprect;
 	clip_edge2 &= cliprect;
 
-	state->m_tilemap_edge1[scroll_mode]->mark_all_dirty();
-	state->m_tilemap_edge2[scroll_mode]->mark_all_dirty();
+	m_tilemap_edge1[scroll_mode]->mark_all_dirty();
+	m_tilemap_edge2[scroll_mode]->mark_all_dirty();
 
-	state->m_tilemap_edge1[scroll_mode]->set_flip(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	state->m_tilemap_edge1[scroll_mode]->set_scrollx(0, -(*state->m_scroll & 0xfc));
-	state->m_tilemap_edge1[scroll_mode]->set_scrolly(0, *state->m_edge1_pos & 0x7f);
+	m_tilemap_edge1[scroll_mode]->set_flip(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_tilemap_edge1[scroll_mode]->set_scrollx(0, -(*m_scroll & 0xfc));
+	m_tilemap_edge1[scroll_mode]->set_scrolly(0, *m_edge1_pos & 0x7f);
 
-	state->m_tilemap_edge2[scroll_mode]->set_flip(flip ? TILEMAP_FLIPX : TILEMAP_FLIPY);
-	state->m_tilemap_edge2[scroll_mode]->set_scrollx(0, -(*state->m_scroll & 0xfc));
-	state->m_tilemap_edge2[scroll_mode]->set_scrolly(0, *state->m_edge2_pos & 0x7f);
+	m_tilemap_edge2[scroll_mode]->set_flip(flip ? TILEMAP_FLIPX : TILEMAP_FLIPY);
+	m_tilemap_edge2[scroll_mode]->set_scrollx(0, -(*m_scroll & 0xfc));
+	m_tilemap_edge2[scroll_mode]->set_scrolly(0, *m_edge2_pos & 0x7f);
 
-	state->m_tilemap_edge1[scroll_mode]->draw(bitmap, clip_edge1, 0, 0);
-	state->m_tilemap_edge2[scroll_mode]->draw(bitmap, clip_edge2, 0, 0);
+	m_tilemap_edge1[scroll_mode]->draw(bitmap, clip_edge1, 0, 0);
+	m_tilemap_edge2[scroll_mode]->draw(bitmap, clip_edge2, 0, 0);
 }
 
 
-static void draw_headlight(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
+void madalien_state::draw_headlight(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
 {
-	madalien_state *state = machine.driver_data<madalien_state>();
-	if (BIT(*state->m_video_flags, 0))
+	if (BIT(*m_video_flags, 0))
 	{
 		UINT8 y;
 
 		for (y = 0; y < 0x80; y++)
 		{
 			UINT8 x;
-			UINT8 hy = y - *state->m_headlight_pos;
+			UINT8 hy = y - *m_headlight_pos;
 
 			if (flip)
 				hy = ~hy;
@@ -226,7 +224,7 @@ static void draw_headlight(running_machine &machine, bitmap_ind16 &bitmap, const
 				if ((hx < cliprect.min_x) || (hx > cliprect.max_x))
 					continue;
 
-				if (state->m_headlight_bitmap->pix16(y, x) != 0)
+				if (m_headlight_bitmap->pix16(y, x) != 0)
 					bitmap.pix16(hy, hx) |= 8;
 			}
 		}
@@ -234,11 +232,10 @@ static void draw_headlight(running_machine &machine, bitmap_ind16 &bitmap, const
 }
 
 
-static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
+void madalien_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip)
 {
-	madalien_state *state = machine.driver_data<madalien_state>();
-	state->m_tilemap_fg->set_flip(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
-	state->m_tilemap_fg->draw(bitmap, cliprect, 0, 0);
+	m_tilemap_fg->set_flip(flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	m_tilemap_fg->draw(bitmap, cliprect, 0, 0);
 }
 
 
@@ -263,8 +260,8 @@ UINT32 madalien_state::screen_update_madalien(screen_device &screen, bitmap_ind1
 	int scroll_mode = *m_scroll & 3;
 
 	bitmap.fill(0, cliprect);
-	draw_edges(machine(), bitmap, cliprect, flip, scroll_mode);
-	draw_foreground(machine(), bitmap, cliprect, flip);
+	draw_edges(bitmap, cliprect, flip, scroll_mode);
+	draw_foreground(bitmap, cliprect, flip);
 
 	/* highlight section A (outside of tunnels).
 	 * also, bit 1 of the video_flags register (6A) is
@@ -298,7 +295,7 @@ UINT32 madalien_state::screen_update_madalien(screen_device &screen, bitmap_ind1
 					bitmap.pix16(y, x) |= 8;
 	}
 
-	draw_headlight(machine(), bitmap, cliprect, flip);
+	draw_headlight(bitmap, cliprect, flip);
 
 	return 0;
 }

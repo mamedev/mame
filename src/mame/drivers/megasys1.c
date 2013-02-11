@@ -3608,10 +3608,10 @@ ROM_START( tshingen )
 ROM_END
 
 
-static void rodlandj_gfx_unmangle(running_machine &machine, const char *region)
+void megasys1_state::rodlandj_gfx_unmangle(const char *region)
 {
-	UINT8 *rom = machine.root_device().memregion(region)->base();
-	int size = machine.root_device().memregion(region)->bytes();
+	UINT8 *rom = machine().root_device().memregion(region)->base();
+	int size = machine().root_device().memregion(region)->bytes();
 	UINT8 *buffer;
 	int i;
 
@@ -3622,7 +3622,7 @@ static void rodlandj_gfx_unmangle(running_machine &machine, const char *region)
 				| ((rom[i] & 0x48) << 1)
 				| ((rom[i] & 0x10) << 2);
 
-	buffer = auto_alloc_array(machine, UINT8, size);
+	buffer = auto_alloc_array(machine(), UINT8, size);
 
 	memcpy(buffer,rom,size);
 
@@ -3637,13 +3637,13 @@ static void rodlandj_gfx_unmangle(running_machine &machine, const char *region)
 		rom[i] = buffer[a];
 	}
 
-	auto_free(machine, buffer);
+	auto_free(machine(), buffer);
 }
 
-static void jitsupro_gfx_unmangle(running_machine &machine, const char *region)
+void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 {
-	UINT8 *rom = machine.root_device().memregion(region)->base();
-	int size = machine.root_device().memregion(region)->bytes();
+	UINT8 *rom = machine().root_device().memregion(region)->base();
+	int size = machine().root_device().memregion(region)->bytes();
 	UINT8 *buffer;
 	int i;
 
@@ -3651,7 +3651,7 @@ static void jitsupro_gfx_unmangle(running_machine &machine, const char *region)
 	for (i = 0;i < size;i++)
 		rom[i] =   BITSWAP8(rom[i],0x4,0x3,0x5,0x7,0x6,0x2,0x1,0x0);
 
-	buffer = auto_alloc_array(machine, UINT8, size);
+	buffer = auto_alloc_array(machine(), UINT8, size);
 
 	memcpy(buffer,rom,size);
 
@@ -3664,13 +3664,13 @@ static void jitsupro_gfx_unmangle(running_machine &machine, const char *region)
 		rom[i] = buffer[a];
 	}
 
-	auto_free(machine, buffer);
+	auto_free(machine(), buffer);
 }
 
-static void stdragona_gfx_unmangle(running_machine &machine, const char *region)
+void megasys1_state::stdragona_gfx_unmangle(const char *region)
 {
-	UINT8 *rom = machine.root_device().memregion(region)->base();
-	int size = machine.root_device().memregion(region)->bytes();
+	UINT8 *rom = machine().root_device().memregion(region)->base();
+	int size = machine().root_device().memregion(region)->bytes();
 	UINT8 *buffer;
 	int i;
 
@@ -3678,7 +3678,7 @@ static void stdragona_gfx_unmangle(running_machine &machine, const char *region)
 	for (i = 0;i < size;i++)
 		rom[i] =   BITSWAP8(rom[i],3,7,5,6,4,2,1,0);
 
-	buffer = auto_alloc_array(machine, UINT8, size);
+	buffer = auto_alloc_array(machine(), UINT8, size);
 
 	memcpy(buffer,rom,size);
 
@@ -3691,7 +3691,7 @@ static void stdragona_gfx_unmangle(running_machine &machine, const char *region)
 		rom[i] = buffer[a];
 	}
 
-	auto_free(machine, buffer);
+	auto_free(machine(), buffer);
 }
 
 /*************************************
@@ -3927,8 +3927,8 @@ DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
 
 	astyanax_rom_decode(machine(), "maincpu");      // Code
 
-	jitsupro_gfx_unmangle(machine(), "gfx1");   // Gfx
-	jitsupro_gfx_unmangle(machine(), "gfx4");
+	jitsupro_gfx_unmangle("gfx1");   // Gfx
+	jitsupro_gfx_unmangle("gfx4");
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
 
@@ -3954,8 +3954,8 @@ DRIVER_INIT_MEMBER(megasys1_state,rodland)
 
 DRIVER_INIT_MEMBER(megasys1_state,rodlandj)
 {
-	rodlandj_gfx_unmangle(machine(), "gfx1");
-	rodlandj_gfx_unmangle(machine(), "gfx4");
+	rodlandj_gfx_unmangle("gfx1");
+	rodlandj_gfx_unmangle("gfx4");
 
 	astyanax_rom_decode(machine(), "maincpu");
 }
@@ -4025,8 +4025,8 @@ DRIVER_INIT_MEMBER(megasys1_state,stdragona)
 {
 	phantasm_rom_decode(machine(), "maincpu");
 
-	stdragona_gfx_unmangle(machine(), "gfx1");
-	stdragona_gfx_unmangle(machine(), "gfx4");
+	stdragona_gfx_unmangle("gfx1");
+	stdragona_gfx_unmangle("gfx4");
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));

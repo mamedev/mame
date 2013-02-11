@@ -349,33 +349,32 @@ READ16_MEMBER(macrossp_state::macrossp_soundcmd_r)
 	return soundlatch_word_r(space, offset, mem_mask);
 }
 
-static void update_colors( running_machine &machine )
+void macrossp_state::update_colors(  )
 {
-	macrossp_state *state = machine.driver_data<macrossp_state>();
 	int i, r, g, b;
 
 	for (i = 0; i < 0x1000; i++)
 	{
-		b = ((state->m_paletteram[i] & 0x0000ff00) >>  8);
-		g = ((state->m_paletteram[i] & 0x00ff0000) >> 16);
-		r = ((state->m_paletteram[i] & 0xff000000) >> 24);
+		b = ((m_paletteram[i] & 0x0000ff00) >>  8);
+		g = ((m_paletteram[i] & 0x00ff0000) >> 16);
+		r = ((m_paletteram[i] & 0xff000000) >> 24);
 
-		if (state->m_fade_effect > b)
+		if (m_fade_effect > b)
 			b = 0;
 		else
-			b -= state->m_fade_effect;
+			b -= m_fade_effect;
 
-		if (state->m_fade_effect > g)
+		if (m_fade_effect > g)
 			g = 0;
 		else
-			g -= state->m_fade_effect;
+			g -= m_fade_effect;
 
-		if (state->m_fade_effect > r)
+		if (m_fade_effect > r)
 			r = 0;
 		else
-			r -= state->m_fade_effect;
+			r -= m_fade_effect;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -387,7 +386,7 @@ WRITE32_MEMBER(macrossp_state::macrossp_palette_fade_w)
 	if (m_old_fade != m_fade_effect)
 	{
 		m_old_fade = m_fade_effect;
-		update_colors(machine());
+		update_colors();
 	}
 }
 

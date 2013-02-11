@@ -49,7 +49,7 @@ TIMER_CALLBACK_MEMBER(mystston_state::interrupt_callback)
 {
 	int scanline = param;
 
-	mystston_on_scanline_interrupt(machine());
+	mystston_on_scanline_interrupt();
 
 	scanline = scanline + 16;
 	if (scanline >= VTOTAL)
@@ -67,14 +67,14 @@ TIMER_CALLBACK_MEMBER(mystston_state::interrupt_callback)
  *
  *************************************/
 
-static void set_palette(running_machine &machine, mystston_state *state)
+void mystston_state::set_palette()
 {
 	int i;
 	static const int resistances_rg[3] = { 4700, 3300, 1500 };
 	static const int resistances_b [2] = { 3300, 1500 };
 	double weights_rg[3], weights_b[2];
 
-	UINT8 *color_prom = machine.root_device().memregion("proms")->base();
+	UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 4700,
@@ -91,7 +91,7 @@ static void set_palette(running_machine &machine, mystston_state *state)
 		if (i & 0x20)
 			data = color_prom[i & 0x1f];
 		else
-			data = state->m_paletteram[i];
+			data = m_paletteram[i];
 
 		/* red component */
 		bit0 = (data >> 0) & 0x01;
@@ -110,7 +110,7 @@ static void set_palette(running_machine &machine, mystston_state *state)
 		bit1 = (data >> 7) & 0x01;
 		b = combine_2_weights(weights_b, bit0, bit1);
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i, MAKE_RGB(r, g, b));
 	}
 }
 
@@ -172,23 +172,22 @@ TILE_GET_INFO_MEMBER(mystston_state::get_fg_tile_info)
  *
  *************************************/
 
-static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int flip)
+void mystston_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx, int flip)
 {
-	mystston_state *state = gfx->machine().driver_data<mystston_state>();
 	int offs;
 
 	for (offs = 0; offs < 0x60; offs += 4)
 	{
-		int attr = state->m_spriteram[offs];
+		int attr = m_spriteram[offs];
 
 		if (attr & 0x01)
 		{
-			int code = ((attr & 0x10) << 4) | state->m_spriteram[offs + 1];
+			int code = ((attr & 0x10) << 4) | m_spriteram[offs + 1];
 			int color = (attr & 0x08) >> 3;
 			int flipx = attr & 0x04;
 			int flipy = attr & 0x02;
-			int x = 240 - state->m_spriteram[offs + 3];
-			int y = (240 - state->m_spriteram[offs + 2]) & 0xff;
+			int x = 240 - m_spriteram[offs + 3];
+			int y = (240 - m_spriteram[offs + 2]) & 0xff;
 
 			if (flip)
 			{
@@ -247,7 +246,7 @@ UINT32 mystston_state::screen_update_mystston(screen_device &screen, bitmap_ind1
 {
 	int flip = (*m_video_control & 0x80) ^ ((machine().root_device().ioport("DSW1")->read() & 0x20) << 2);
 
-	set_palette(machine(), this);
+	set_palette();
 
 	machine().tilemap().mark_all_dirty();
 	m_bg_tilemap->set_scrolly(0, *m_scroll);

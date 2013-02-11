@@ -104,4 +104,7 @@ public:
 	DECLARE_VIDEO_START(pang);
 	UINT32 screen_update_pang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(mitchell_irq);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void bootleg_decode(  );
+	void configure_banks(  );
 };
