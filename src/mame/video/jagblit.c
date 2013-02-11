@@ -154,7 +154,7 @@
 
 void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 {
-	UINT32 a1_base = m_blitter_regs[A1_BASE];
+	UINT32 a1_base = m_blitter_regs[A1_BASE] & ~0x7;
 	INT32 a1_pitch = (A1FIXED & 3) ^ ((A1FIXED & 2) >> 1);
 	INT32 a1_zoffs = (A1FIXED >> 6) & 7;
 	INT32 a1_width = ((4 | ((a1flags >> 9) & 3)) << ((a1flags >> 11) & 15)) >> 2;
@@ -167,7 +167,7 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 	UINT32 a1_xmask = 0xffffffff;
 	UINT32 a1_ymask = 0xffffffff;
 
-	UINT32 a2_base = m_blitter_regs[A2_BASE];
+	UINT32 a2_base = m_blitter_regs[A2_BASE] & ~0x7;
 	INT32 a2_pitch = (A2FIXED & 3) ^ ((A2FIXED & 2) >> 1);
 	INT32 a2_zoffs = (A2FIXED >> 6) & 7;
 	INT32 a2_width = ((4 | ((a2flags >> 9) & 3)) << ((a2flags >> 11) & 15)) >> 2;
