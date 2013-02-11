@@ -1,54 +1,54 @@
 /*********************************************************************
- 
-	a2vulcan.c
 
-	Applied Engineering Vulcan IDE controller
+    a2vulcan.c
 
-	Our copy of ROM version 1.4 will refuse any drive > 40 megs (top 2 bytes of # blocks >= 0x15b).
-	Protection against field upgrades?
+    Applied Engineering Vulcan IDE controller
 
-	Vulcan Gold ROMs omit this protection but don't work with the version of the partitioner program
-	we have.
+    Our copy of ROM version 1.4 will refuse any drive > 40 megs (top 2 bytes of # blocks >= 0x15b).
+    Protection against field upgrades?
 
-	Recognized drives by IDE features parameters:
-	(# of cylinders is never checked, just heads, sectors, and the vendor specific at 0x0A)
+    Vulcan Gold ROMs omit this protection but don't work with the version of the partitioner program
+    we have.
 
-	H  S    Vendor specific #5
-	8, 33 + 0x69  0x31d blocks   (400K?!)
-	2, 33 + 0x69  0xa208 blocks  (20 megs,  21237760  bytes)
-	4, 26 + 0x69  0x14500 blocks (40 megs,  42598400  bytes)
-	5, 29 + (any) 0x25c5b blocks (80 megs,  79214080  bytes) (chs = 1067,5,29)
-	7, 29 + 0x44  0x34e19 blocks (100 megs, 110899712 bytes)
-	9, 29 + (any) 0x44068 blocks (140 megs, 142659584 bytes) (chs = 1068,9,29)
-	9, 36 + 0x44  0x54888 blocks (180 megs, 177278976 bytes)
-	9, 36 + 0xff  0x645a8 blocks (200 megs, 210456576 bytes)
-	7, 34 + (any) 0x32252 blocks (100 megs, 105161728 bytes) (chs = 863,7,34)
-	4, 17 + 0x55  0xa218 blocks  (20 megs,  21245952  bytes)
-	4, 26 + 0x55  0xa218 blocks  (20 megs,  21245952  bytes) 
-	5, 17 + 0x55  0x15234 blocks (40 megs,  44328960  bytes)
-	6, 26 + 0x55  0x15234 blocks (40 megs,  44328960  bytes) 
-	2, 28 + 0x36  0xa250 blocks  (20 megs,  21274624  bytes)
-	4, 28 + 0x36  0x143c0 blocks (40 megs,  42434450  bytes)
-	4, 28 + 0x67  0x143c0 blocks (40 megs,  42434450  bytes)                                                                                         
-	4, 27 + 0x43  0x147cc blocks (40 megs,  42964992  bytes)
-	5, 17 + 0x26  0x13ec0 blocks (40 megs,  41779200  bytes) (chs = 960,5,17)
-	15, 32 + 0x43  0x5f6e0 blocks (200 megs, 200130560 bytes) 
-	16, 38 + 0x94  0x6540c blocks (200 megs, 212342784 bytes)
-	10, 17 + (any) 0x2792f blocks (80 megs,  82992640  bytes) (chs = 954,10,17)
+    Recognized drives by IDE features parameters:
+    (# of cylinders is never checked, just heads, sectors, and the vendor specific at 0x0A)
 
-	Partition block:
-	+0000: 0xAE 0xAE  signature
-	+0002: bytesum of remaining 508 bytes of partition block
-	+0005: total # of blocks (3 bytes)
-	+000E: boot partition # (0 based)
-	+0100: partition records
+    H  S    Vendor specific #5
+    8, 33 + 0x69  0x31d blocks   (400K?!)
+    2, 33 + 0x69  0xa208 blocks  (20 megs,  21237760  bytes)
+    4, 26 + 0x69  0x14500 blocks (40 megs,  42598400  bytes)
+    5, 29 + (any) 0x25c5b blocks (80 megs,  79214080  bytes) (chs = 1067,5,29)
+    7, 29 + 0x44  0x34e19 blocks (100 megs, 110899712 bytes)
+    9, 29 + (any) 0x44068 blocks (140 megs, 142659584 bytes) (chs = 1068,9,29)
+    9, 36 + 0x44  0x54888 blocks (180 megs, 177278976 bytes)
+    9, 36 + 0xff  0x645a8 blocks (200 megs, 210456576 bytes)
+    7, 34 + (any) 0x32252 blocks (100 megs, 105161728 bytes) (chs = 863,7,34)
+    4, 17 + 0x55  0xa218 blocks  (20 megs,  21245952  bytes)
+    4, 26 + 0x55  0xa218 blocks  (20 megs,  21245952  bytes)
+    5, 17 + 0x55  0x15234 blocks (40 megs,  44328960  bytes)
+    6, 26 + 0x55  0x15234 blocks (40 megs,  44328960  bytes)
+    2, 28 + 0x36  0xa250 blocks  (20 megs,  21274624  bytes)
+    4, 28 + 0x36  0x143c0 blocks (40 megs,  42434450  bytes)
+    4, 28 + 0x67  0x143c0 blocks (40 megs,  42434450  bytes)
+    4, 27 + 0x43  0x147cc blocks (40 megs,  42964992  bytes)
+    5, 17 + 0x26  0x13ec0 blocks (40 megs,  41779200  bytes) (chs = 960,5,17)
+    15, 32 + 0x43  0x5f6e0 blocks (200 megs, 200130560 bytes)
+    16, 38 + 0x94  0x6540c blocks (200 megs, 212342784 bytes)
+    10, 17 + (any) 0x2792f blocks (80 megs,  82992640  bytes) (chs = 954,10,17)
 
-	Partition record:
-	+02: partition number (seems to be only valud for non-CLEAR partitions)
-	+03: little-endian unsigned word: # of 512 byte blocks
-	+06: bit 6 set for ON, bits 0-2 = 0 CLEAR, 1 PRODOS, 2 DOS 3.3, 3 PASCAL, 4 CP/M
-	+07: Partition name (Apple high-ASCII, zero terminated unless full 10 chars)
- 
+    Partition block:
+    +0000: 0xAE 0xAE  signature
+    +0002: bytesum of remaining 508 bytes of partition block
+    +0005: total # of blocks (3 bytes)
+    +000E: boot partition # (0 based)
+    +0100: partition records
+
+    Partition record:
+    +02: partition number (seems to be only valud for non-CLEAR partitions)
+    +03: little-endian unsigned word: # of 512 byte blocks
+    +06: bit 6 set for ON, bits 0-2 = 0 CLEAR, 1 PRODOS, 2 DOS 3.3, 3 PASCAL, 4 CP/M
+    +07: Partition name (Apple high-ASCII, zero terminated unless full 10 chars)
+
 *********************************************************************/
 
 #include "a2vulcan.h"
@@ -153,7 +153,7 @@ UINT8 a2bus_vulcanbase_device::read_c0nx(address_space &space, UINT8 offset)
 	{
 		case 0:
 			m_lastdata = ide_controller_r(m_ide, 0x1f0+offset, 2);
-//			printf("IDE: read %04x\n", m_lastdata);
+//          printf("IDE: read %04x\n", m_lastdata);
 			m_last_read_was_0 = true;
 			return m_lastdata&0xff;
 
@@ -178,7 +178,7 @@ UINT8 a2bus_vulcanbase_device::read_c0nx(address_space &space, UINT8 offset)
 			return ide_controller_r(m_ide, 0x1f0+offset, 1);
 
 		default:
-//			printf("Read @ C0n%x\n", offset);
+//          printf("Read @ C0n%x\n", offset);
 			break;
 
 	}
@@ -195,18 +195,18 @@ void a2bus_vulcanbase_device::write_c0nx(address_space &space, UINT8 offset, UIN
 {
 	switch (offset)
 	{
-		case 0:   
+		case 0:
 			m_lastdata = data;
 			m_last_read_was_0 = true;
 			break;
-			  				 
+
 		case 1:
 			if (m_last_read_was_0)
 			{
 				m_last_read_was_0 = false;
 				m_lastdata &= 0x00ff;
 				m_lastdata |= (data << 8);
-//				printf("IDE: write %04x\n", m_lastdata);
+//              printf("IDE: write %04x\n", m_lastdata);
 				ide_controller_w(m_ide, 0x1f0, 2, m_lastdata);
 			}
 			else
@@ -221,17 +221,17 @@ void a2bus_vulcanbase_device::write_c0nx(address_space &space, UINT8 offset, UIN
 		case 5:
 		case 6:
 		case 7:
-//			printf("%02x to IDE controller @ %x\n", data, offset);
+//          printf("%02x to IDE controller @ %x\n", data, offset);
 			ide_controller_w(m_ide, 0x1f0+offset, 1, data);
 			break;
 
-		case 9:	// ROM bank
-//			printf("%x (%x) to ROM bank\n", data, (data & 0xf) * 0x400);
+		case 9: // ROM bank
+//          printf("%x (%x) to ROM bank\n", data, (data & 0xf) * 0x400);
 			m_rombank = (data & 0xf) * 0x400;
 			break;
 
 		case 0xa: // RAM bank
-//			printf("%x to RAM bank\n", data);
+//          printf("%x to RAM bank\n", data);
 			m_rambank = (data & 7) * 0x400;
 			break;
 
@@ -260,9 +260,9 @@ UINT8 a2bus_vulcanbase_device::read_cnxx(address_space &space, UINT8 offset)
 UINT8 a2bus_vulcanbase_device::read_c800(address_space &space, UINT16 offset)
 {
 	offset &= 0x7ff;
-	if (offset < 0x400)	// c800-cbff is banked RAM window, cc00-cfff is banked ROM window
+	if (offset < 0x400) // c800-cbff is banked RAM window, cc00-cfff is banked ROM window
 	{
-//		printf("read RAM @ %x (bank %x)\n", offset, m_rambank);
+//      printf("read RAM @ %x (bank %x)\n", offset, m_rambank);
 		return m_ram[offset + m_rambank];
 	}
 
@@ -275,7 +275,7 @@ void a2bus_vulcanbase_device::write_c800(address_space &space, UINT16 offset, UI
 	offset &= 0x7ff;
 	if (offset < 0x400)
 	{
-//		printf("%02x to RAM @ %x (bank %x)\n", data, offset, m_rambank);
+//      printf("%02x to RAM @ %x (bank %x)\n", data, offset, m_rambank);
 		m_ram[offset + m_rambank] = data;
 	}
 }

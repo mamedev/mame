@@ -355,7 +355,7 @@ Port 8 controls some kind of memory protection scheme.
 The code indicates that B is the page to protect, and
 A is the code (0x08 = inhibit; 0x0B = unprotect;
 0x0C = enable; 0x0E = protect). There are 256 pages so
-each page is 256 bytes. 
+each page is 256 bytes.
 
 To turn the clock on (if it was working), put a non-zero
 into D80D.

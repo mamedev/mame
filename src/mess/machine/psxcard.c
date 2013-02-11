@@ -341,4 +341,3 @@ void psxcard_device::sel_w(bool state)
 		reset();
 	m_sel = state;
 }
-

@@ -127,7 +127,7 @@ public:
 		unsigned int code,unsigned int color,int flipx,int flipy,int sx,int sy,
 		int transparency,int transparent_color,
 		int scalex, int scaley,bitmap_ind8 *pri_buffer,UINT32 pri_mask);
-	
+
 };
 
 

@@ -545,7 +545,7 @@ UINT32 x1_state::screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, c
 	m_xstart = ((mc6845_h_char_total - mc6845_h_sync_pos) * 8) / 2;
 	m_ystart = ((mc6845_v_char_total - mc6845_v_sync_pos) * 8) / 2;
 
-//	popmessage("%d %d %d %d",mc6845_h_sync_pos,mc6845_v_sync_pos,mc6845_h_char_total,mc6845_v_char_total);
+//  popmessage("%d %d %d %d",mc6845_h_sync_pos,mc6845_v_sync_pos,mc6845_h_char_total,mc6845_v_char_total);
 
 	draw_gfxbitmap(machine(),bitmap,cliprect,m_scrn_reg.disp_bank,m_scrn_reg.pri);
 	draw_fgtilemap(machine(),bitmap,cliprect);
@@ -1884,7 +1884,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
-	true,		/* show border area */
+	true,       /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -2239,7 +2239,7 @@ static GFXDECODE_START( x1 )
 	GFXDECODE_ENTRY( "cgrom",   0x00000, x1_chars_8x8,    0, 1 )
 	GFXDECODE_ENTRY( "font",    0x00000, x1_chars_8x16,   0, 1 )
 	GFXDECODE_ENTRY( "kanji",   0x00000, x1_chars_16x16,  0, 1 )
-//	GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0, 1 )
+//  GFXDECODE_ENTRY( "pcg",     0x00000, x1_pcg_8x8,      0, 1 )
 GFXDECODE_END
 
 /*************************************

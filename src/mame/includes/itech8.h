@@ -18,7 +18,7 @@ public:
 			m_tlc34076(*this, "tlc34076"),
 			m_visarea(0, 0, 0, 0){ }
 
-	required_device<tlc34076_device> m_tlc34076;	
+	required_device<tlc34076_device> m_tlc34076;
 
 	rectangle m_visarea;
 	UINT8 m_grom_bank;

@@ -297,7 +297,7 @@ static MACHINE_RESET( ms_megadriv )
 static SLOT_INTERFACE_START(md_cart)
 	SLOT_INTERFACE_INTERNAL("rom",  MD_STD_ROM)
 	SLOT_INTERFACE_INTERNAL("rom_svp",  MD_STD_ROM)
-//	SLOT_INTERFACE_INTERNAL("rom_svp",  MD_ROM_SVP)	// not ready yet...
+//  SLOT_INTERFACE_INTERNAL("rom_svp",  MD_ROM_SVP) // not ready yet...
 	SLOT_INTERFACE_INTERNAL("rom_sk",  MD_ROM_SK)
 // NVRAM handling
 	SLOT_INTERFACE_INTERNAL("rom_sram",  MD_ROM_SRAM)
@@ -468,7 +468,7 @@ DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
 	UINT16 *ROM16;
 	UINT32 *ROM32;
 	int i;
-	
+
 	if (image.software_entry() == NULL)
 	{
 		length = image.length();
@@ -481,23 +481,23 @@ DEVICE_IMAGE_LOAD_MEMBER( md_base_state, _32x_cart )
 		temp_copy = auto_alloc_array(image.device().machine(), UINT8, length);
 		memcpy(temp_copy, image.get_software_region("rom"), length);
 	}
-	
+
 	/* Copy the cart image in the locations the driver expects */
 	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
 	ROM16 = (UINT16 *) image.device().machine().root_device().memregion("gamecart")->base();
 	for (i = 0; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
-	
+
 	ROM32 = (UINT32 *) image.device().machine().root_device().memregion("gamecart_sh2")->base();
 	for (i = 0; i < length; i += 4)
 		ROM32[i / 4] = pick_integer_be(temp_copy, i, 4);
-	
+
 	ROM16 = (UINT16 *) image.device().machine().root_device().memregion("maincpu")->base();
 	for (i = 0x00; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
-	
+
 	auto_free(image.device().machine(), temp_copy);
-	
+
 	return IMAGE_INIT_PASS;
 }
 

@@ -131,7 +131,7 @@ public:
 	DECLARE_WRITE8_MEMBER(polaris_sh_port_1_w);
 	DECLARE_WRITE8_MEMBER(polaris_sh_port_2_w);
 	DECLARE_WRITE8_MEMBER(polaris_sh_port_3_w);
-	
+
 	void schaser_reinit_555_time_remain();
 	void invadpt2_get_pens( pen_t *pens );
 	void sflush_get_pens( pen_t *pens );

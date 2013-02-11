@@ -2,8 +2,8 @@
 
     Dynamo Skeet Shot
 
-	Notes:
-		Pop Shot is a prototype sequal (or upgrade) to Skeet Shot
+    Notes:
+        Pop Shot is a prototype sequal (or upgrade) to Skeet Shot
 
 ***************************************************************************/
 

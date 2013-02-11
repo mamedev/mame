@@ -1325,7 +1325,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_sound_w(m_gbsound, space, 1, data>>16);	// SOUND1CNT_H
+				gb_sound_w(m_gbsound, space, 1, data>>16);  // SOUND1CNT_H
 			}
 			if( (mem_mask) & 0xff000000 )
 			{
@@ -1339,7 +1339,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 			}
 			if( (mem_mask) & 0x0000ff00 )
 			{
-				gb_sound_w(m_gbsound, space, 4, data>>8);	// SOUND1CNT_H
+				gb_sound_w(m_gbsound, space, 4, data>>8);   // SOUND1CNT_H
 			}
 			break;
 		case 0x0068/4:
@@ -1369,7 +1369,7 @@ WRITE32_MEMBER(gba_state::gba_io_w)
 			}
 			if( (mem_mask) & 0x00ff0000 )
 			{
-				gb_sound_w(m_gbsound, space, 0xb, data>>16);	// SOUND1CNT_H
+				gb_sound_w(m_gbsound, space, 0xb, data>>16);    // SOUND1CNT_H
 			}
 			if( (mem_mask) & 0xff000000 )
 			{

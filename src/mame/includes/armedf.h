@@ -84,7 +84,7 @@ public:
 	void armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
 						UINT32 code,UINT32 color, UINT32 clut,int flipx,int flipy,int offsx,int offsy,
 						int transparent_color);
-	
+
 };
 
 class bigfghtr_state : public armedf_state

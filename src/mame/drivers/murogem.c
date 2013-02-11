@@ -231,7 +231,7 @@ UINT32 murogem_state::screen_update_murogem(screen_device &screen, bitmap_ind16 
 static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
-	false,		/* show border area */
+	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

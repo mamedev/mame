@@ -1,23 +1,23 @@
 /***********************************************************************************************************
- 
- 
+
+
  MegaDrive / Genesis J-Cart (+SEPROM) emulation
- 
- 
+
+
  i2c games mapping table:
- 
+
  game name                         |   SDA_IN   |  SDA_OUT   |     SCL    |  SIZE_MASK     | PAGE_MASK |
  ----------------------------------|------------|------------|------------|----------------|-----------|
  Micro Machines 2                  | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |
  Micro Machines Military           | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x03ff (24C08) |   0x0f    |
  Micro Machines 96                 | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x07ff (24C16) |   0x0f    |
  ----------------------------------|------------|------------|------------|----------------|-----------|
- 
+
  * Notes: check these
 
 
  TODO: proper SEPROM emulation, still not worked on (just hooked up the I2C device)
- 
+
 ***********************************************************************************************************/
 
 
@@ -174,7 +174,7 @@ READ16_MEMBER(md_jcart_device::read)
 	if (offset == 0x38fffe/2)
 	{
 		UINT8 joy[2];
-		
+
 		if (m_jcart_io_data[0] & 0x40)
 		{
 			joy[0] = m_jcart3->read_safe(0);
@@ -188,9 +188,9 @@ READ16_MEMBER(md_jcart_device::read)
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 	}
-	if (offset < 0x400000/2) 
-		return m_rom[MD_ADDR(offset)]; 
-	else 
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
 		return 0xffff;
 }
 
@@ -217,7 +217,7 @@ READ16_MEMBER(md_seprom_codemast_device::read)
 	if (offset == 0x38fffe/2)
 	{
 		UINT8 joy[2];
-		
+
 		if (m_jcart_io_data[0] & 0x40)
 		{
 			joy[0] = m_jcart3->read_safe(0);
@@ -231,9 +231,9 @@ READ16_MEMBER(md_seprom_codemast_device::read)
 			return (m_jcart_io_data[0] & 0x40) | joy[0] | (joy[1] << 8);
 		}
 	}
-	if (offset < 0x400000/2) 
-		return m_rom[MD_ADDR(offset)]; 
-	else 
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
 		return 0xffff;
 }
 
@@ -252,4 +252,3 @@ WRITE16_MEMBER(md_seprom_codemast_device::write)
 		m_jcart_io_data[1] = (data & 1) << 6;
 	}
 }
-

@@ -70,8 +70,8 @@ public:
 	};
 
 public:
-	WindowQtConfig() : 
-		m_type(WIN_TYPE_MAIN), 
+	WindowQtConfig() :
+		m_type(WIN_TYPE_MAIN),
 		m_size(800, 600),
 		m_position(120, 120)
 	{}

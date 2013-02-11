@@ -43,7 +43,7 @@ bool win_init_sockets()
 
 	/* check for correct version */
 	if ( LOBYTE( wsaData.wVersion ) != 2 ||
-		 HIBYTE( wsaData.wVersion ) != 0 )
+			HIBYTE( wsaData.wVersion ) != 0 )
 	{
 		/* incorrect WinSock version */
 		WSACleanup();
@@ -95,25 +95,25 @@ file_error win_open_socket(const char *path, UINT32 openflags, osd_file **file, 
 	// listening socket support
 	if (openflags & OPEN_FLAG_CREATE)
 	{
-//		printf("Listening for client at '%s' on port '%d'\n", hostname, port);
+//      printf("Listening for client at '%s' on port '%d'\n", hostname, port);
 		// bind socket...
 		if (bind((*file)->socket, (struct sockaddr *)&sai, sizeof(struct sockaddr)) == -1)
 		{
 			return FILERR_ACCESS_DENIED;
 		}
-		
+
 		// start to listen...
 		if (listen((*file)->socket, 1) == -1) {
 			return FILERR_ACCESS_DENIED;
 		}
-		
+
 		// mark socket as "listening"
 		(*file)->handle = 0;
 		*filesize = 0;
 		return FILERR_NONE;
 	}
-	
-//	printf("Connecting to server '%s' on port '%d'\n", hostname, port);
+
+//  printf("Connecting to server '%s' on port '%d'\n", hostname, port);
 	if (connect((*file)->socket, (struct sockaddr *)&sai, sizeof(struct sockaddr)) == -1)
 	{
 		return FILERR_ACCESS_DENIED;

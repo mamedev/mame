@@ -249,7 +249,7 @@ void tmc600_state::machine_start()
 		program.unmap_readwrite(0xa000, 0xbfff);
 		break;
 	}
-	
+
 	// find keyboard rows
 	m_key_row[0] = m_y0;
 	m_key_row[1] = m_y1;

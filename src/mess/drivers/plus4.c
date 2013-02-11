@@ -594,18 +594,18 @@ WRITE_LINE_MEMBER( plus4_state::ted_irq_w )
 READ8_MEMBER( plus4_state::ted_k_r )
 {
 	/*
-	
+
 	    bit     description
-	
+
 	    0       JOY A0, JOY B0
 	    1       JOY A1, JOY B1
 	    2       JOY A2, JOY B2
 	    3       JOY A3, JOY B3
-	    4       
-	    5       
+	    4
+	    5
 	    6       BTN A
 	    7       BTN B
-	
+
 	*/
 
 	UINT8 data = 0xff;
@@ -614,7 +614,7 @@ READ8_MEMBER( plus4_state::ted_k_r )
 	if (!BIT(offset, 2))
 	{
 		UINT8 joy_a = m_joy1->joy_r();
-		
+
 		data &= (0xf0 | (joy_a & 0x0f));
 		data &= ~(!BIT(joy_a, 5) << 6);
 	}
@@ -622,7 +622,7 @@ READ8_MEMBER( plus4_state::ted_k_r )
 	if (!BIT(offset, 1))
 	{
 		UINT8 joy_b = m_joy2->joy_r();
-		
+
 		data &= (0xf0 | (joy_b & 0x0f));
 		data &= ~(!BIT(joy_b, 5) << 7);
 	}

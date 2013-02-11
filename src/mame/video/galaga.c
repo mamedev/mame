@@ -472,7 +472,6 @@ WRITE8_MEMBER(galaga_state::gatsbee_bank_w)
 
 void galaga_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-
 	UINT8 *spriteram = m_galaga_ram1 + 0x380;
 	UINT8 *spriteram_2 = m_galaga_ram2 + 0x380;
 	UINT8 *spriteram_3 = m_galaga_ram3 + 0x380;

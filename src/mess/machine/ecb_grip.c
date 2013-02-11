@@ -301,7 +301,7 @@ static MC6845_INTERFACE( crtc_intf )
 static MC6845_INTERFACE( grip5_crtc_intf )
 {
     SCREEN_TAG,
-	false,
+    false,
     8,
     NULL,
     grip5_update_row,

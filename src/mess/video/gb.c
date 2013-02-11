@@ -2362,4 +2362,3 @@ WRITE8_MEMBER(gb_state::gbc_video_w)
 
 	m_lcd.gb_vid_regs[offset] = data;
 }
-

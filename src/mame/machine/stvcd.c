@@ -103,10 +103,10 @@ void saturn_state::cd_exec_command( void )
 	UINT32 temp;
 
 	if(cr1 != 0 &&
-	  ((cr1 & 0xff00) != 0x5100) &&
-	  ((cr1 & 0xff00) != 0x5200) &&
-	  ((cr1 & 0xff00) != 0x5300) &&
-	   1)
+		((cr1 & 0xff00) != 0x5100) &&
+		((cr1 & 0xff00) != 0x5200) &&
+		((cr1 & 0xff00) != 0x5300) &&
+		1)
 		printf("CD: command exec %04x %04x %04x %04x %04x (stat %04x)\n", hirqreg, cr1, cr2, cr3, cr4, cd_stat);
 
 	switch (cr1 & 0xff00)
@@ -1222,8 +1222,8 @@ void saturn_state::cd_exec_command( void )
 			CDROM_LOG(("%s:CD: Verify copy protection\n",   machine.describe_context()))
 			if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 				cd_stat = CD_STAT_PAUSE;
-//			cr1 = cd_stat;  // necessary to pass
-//			cr2 = 0x4;
+//          cr1 = cd_stat;  // necessary to pass
+//          cr2 = 0x4;
 //          hirqreg |= (CMOK|EFLS|CSCT);
 			sectorstore = 1;
 			hirqreg = 0xfc5;
@@ -1239,7 +1239,7 @@ void saturn_state::cd_exec_command( void )
 			cr3 = 0;
 			cr4 = 0;
 			hirqreg |= (CMOK);
-//			cr_standard_return(cd_stat);
+//          cr_standard_return(cd_stat);
 			break;
 
 		default:
@@ -1489,7 +1489,7 @@ UINT16 saturn_state::cd_readWord(UINT32 addr)
 
 		case 0x000c:
 		case 0x000e:
-//			CDROM_LOG(("RW HIRM: %04x\n", hirqmask))
+//          CDROM_LOG(("RW HIRM: %04x\n", hirqmask))
 			printf("RW HIRM: %04x\n", hirqmask);
 			return hirqmask;
 
@@ -1636,9 +1636,9 @@ UINT32 saturn_state::cd_readLong(UINT32 addr)
 					{
 						// get next longword
 						rv = (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0]<<24) |
-						     (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16) |
-						     (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8)  |
-						     (transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3]<<0);
+								(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1]<<16) |
+								(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2]<<8)  |
+								(transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3]<<0);
 
 						xferdnum += 4;
 						xferoffs += 4;
@@ -1699,7 +1699,7 @@ void saturn_state::cd_writeWord(UINT32 addr, UINT16 data)
 	{
 	case 0x0008:
 	case 0x000a:
-//		CDROM_LOG(("%s:WW HIRQ: %04x & %04x => %04x\n", machine().describe_context(), hirqreg, data, hirqreg & data))
+//      CDROM_LOG(("%s:WW HIRQ: %04x & %04x => %04x\n", machine().describe_context(), hirqreg, data, hirqreg & data))
 		hirqreg &= data;
 		if(!(hirqreg & CMOK))
 		{
@@ -1709,7 +1709,7 @@ void saturn_state::cd_writeWord(UINT32 addr, UINT16 data)
 		return;
 	case 0x000c:
 	case 0x000e:
-//		CDROM_LOG(("WW HIRM: %04x => %04x\n", hirqmask, data))
+//      CDROM_LOG(("WW HIRM: %04x => %04x\n", hirqmask, data))
 		printf("WW HIRM: %04x => %04x\n", hirqmask, data);
 		hirqmask = data;
 		return;

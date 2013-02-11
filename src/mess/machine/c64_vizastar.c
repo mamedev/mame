@@ -11,7 +11,7 @@
 
     PCB Layout
     ----------
-	RB84 (C) MICROPORT
+    RB84 (C) MICROPORT
     |===========================|
     |=|                         |
     |=|                         |

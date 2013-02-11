@@ -435,7 +435,7 @@ SLOT_INTERFACE_END
 
 static const serial_port_interface midiin_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_a_w)	// route MIDI Tx send directly to 68681 channel A Rx
+	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_a_w)   // route MIDI Tx send directly to 68681 channel A Rx
 };
 
 static SLOT_INTERFACE_START(midiout_slot)
@@ -444,7 +444,7 @@ SLOT_INTERFACE_END
 
 static const serial_port_interface midiout_intf =
 {
-	DEVCB_NULL	// midi out ports don't transmit inward
+	DEVCB_NULL  // midi out ports don't transmit inward
 };
 
 static MACHINE_CONFIG_START( kt, esqkt_state )

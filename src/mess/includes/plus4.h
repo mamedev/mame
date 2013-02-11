@@ -28,8 +28,8 @@
 #define MOS8706_TAG         "mos8706"
 #define PLA_TAG             "u19"
 #define SCREEN_TAG          "screen"
-#define CONTROL1_TAG    	"joy1"
-#define CONTROL2_TAG   	 	"joy2"
+#define CONTROL1_TAG        "joy1"
+#define CONTROL2_TAG        "joy2"
 
 class plus4_state : public driver_device
 {

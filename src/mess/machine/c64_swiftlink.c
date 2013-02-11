@@ -9,7 +9,7 @@
 
 /*
 
-	http://mclauchlan.site.net.au/scott/C=Hacking/C-Hacking10/C-Hacking10-swiftlink.html
+    http://mclauchlan.site.net.au/scott/C=Hacking/C-Hacking10/C-Hacking10-swiftlink.html
 
 */
 
@@ -21,8 +21,8 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define MOS6551_TAG		"mos6551"
-#define RS232_TAG		"rs232"
+#define MOS6551_TAG     "mos6551"
+#define RS232_TAG       "rs232"
 
 
 

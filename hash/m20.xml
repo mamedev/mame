@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="m20" description="Olivetti M20 floppies">
 
-<!-- 
+<!--
 
   General usage: if not bootable disk, check content with VL, then launch the .cmd files
 
@@ -131,8 +131,8 @@
 	</software>
 
 	<software name="msdos20" supported="no">
-    <!-- "This is a standard 360k MS-DOS disk image, 512 bytes/sector, 9 sectors, 2 sides, 40 tracks." -->
-    <!-- MESS complains about "Unable to identify the image format" -->
+	<!-- "This is a standard 360k MS-DOS disk image, 512 bytes/sector, 9 sectors, 2 sides, 40 tracks." -->
+	<!-- MESS complains about "Unable to identify the image format" -->
 		<description>MS-DOS 2.0</description>
 		<year>19??</year>
 		<publisher>Microsoft</publisher>

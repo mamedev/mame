@@ -83,4 +83,3 @@ public:
 	void tecmosys_prot_init(int which);
 	void tecmosys_prot_reset();
 };
-

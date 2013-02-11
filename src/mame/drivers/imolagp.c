@@ -206,7 +206,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(imolagp_state::imolagp_pot_callback)
 			steer = -steer;
 			m_steerlatch = (m_steerlatch << 1) | (~m_steerlatch >> 1 & 1);
 		}
-		
+
 		// steering speed is determined by timer period
 		// these values(in usec) may need tweaking:
 		const int base = 6500;
@@ -262,15 +262,15 @@ WRITE8_MEMBER(imolagp_state::imola_led_board_w)
 
 	output_set_digit_value(offset, ls48_map[data & 0x0f]);
 /*
-	score:         0,  1,  2,  3
-	time:          4,  5
-	result:       10, 11
-	credits:      12, 13
-	highscore 1:  32, 33, 34, 35
-	highscore 2:  36, 37, 24, 25
-	highscore 3:  26, 27, 28, 29
-	highscore 4:  16, 17, 18, 19
-	highscore 5:  20, 21,  8,  9
+    score:         0,  1,  2,  3
+    time:          4,  5
+    result:       10, 11
+    credits:      12, 13
+    highscore 1:  32, 33, 34, 35
+    highscore 2:  36, 37, 24, 25
+    highscore 3:  26, 27, 28, 29
+    highscore 4:  16, 17, 18, 19
+    highscore 5:  20, 21,  8,  9
 */
 }
 
@@ -302,7 +302,7 @@ WRITE8_MEMBER(imolagp_state::screenram_w)
 	// when in tunnel: $81/$82 -> sprite ram?
 	if (m_draw_mode & 0x80)
 		m_videoram[1][offset] = data;
-	
+
 	// sprites: $05
 	else if (m_draw_mode & 0x01)
 		m_videoram[1][offset] = data;
@@ -325,7 +325,7 @@ static ADDRESS_MAP_START( imolagp_master_map, AS_PROGRAM, 8, imolagp_state )
 	AM_RANGE(0x2800, 0x2803) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(vreg_control_w)
 	AM_RANGE(0x37f0, 0x37f0) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-//	AM_RANGE(0x37f7, 0x37f7) AM_NOP
+//  AM_RANGE(0x37f7, 0x37f7) AM_NOP
 	AM_RANGE(0x3800, 0x3800) AM_READWRITE(vreg_data_r, vreg_data_w)
 	AM_RANGE(0x3810, 0x3810) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSWA")

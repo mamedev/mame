@@ -10327,7 +10327,7 @@ void k001604_draw_back_layer( device_t *device, bitmap_rgb32 &bitmap, const rect
 		window_x = ((k001604->reg[0x1b] >> 1) & 3) * 512;
 	else
 		window_x = ((k001604->reg[0x1b] >> 1) & 1) * 512;
-	
+
 	window_y = 0;
 
 	switch (layer_size)
@@ -10339,7 +10339,7 @@ void k001604_draw_back_layer( device_t *device, bitmap_rgb32 &bitmap, const rect
 	}
 
 	window_ymask = pixmap.height() - 1;
-	
+
 
 	// loop over rows
 	while (sy <= ey)

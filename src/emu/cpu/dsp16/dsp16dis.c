@@ -234,8 +234,8 @@ bool disasmSIField(const UINT8& SI)
 {
 	switch (SI)
 	{
-		case 0x00: return 0;	// Not a software interrupt
-		case 0x01: return 1;	// Software Interrupt
+		case 0x00: return 0;    // Not a software interrupt
+		case 0x01: return 1;    // Software Interrupt
 	}
 	return false;
 }
@@ -505,7 +505,7 @@ CPU_DISASSEMBLE( dsp16a )
 			const UINT8 R = (op & 0x03f0) >> 4;
 			astring yString = disasmYField(Y);
 			astring rString = disasmRField(R);
-            // TODO: page 3-31 "special function encoding"
+			// TODO: page 3-31 "special function encoding"
 			sprintf(buffer, "%s = %s", yString.cstr(), rString.cstr());
 			break;
 		}

@@ -402,7 +402,6 @@ INTERRUPT_GEN_MEMBER(dkong_state::s2650_interrupt)
 
 void dkong_state::dkong_init_device_driver_data(  )
 {
-
 	m_dev_n2a03a = machine().device("n2a03a");
 	m_dev_n2a03b = machine().device("n2a03b");
 	m_dev_6h = machine().device("ls259.6h");

@@ -199,7 +199,6 @@ WRITE16_MEMBER(lastduel_state::lastduel_palette_word_w)
 
 void lastduel_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-
 	UINT16 *buffered_spriteram16 = m_spriteram->buffer();
 	int offs;
 

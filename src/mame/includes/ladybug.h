@@ -96,7 +96,7 @@ public:
 	void redclash_set_stars_enable(UINT8 on);
 	void redclash_update_stars_state();
 	void redclash_set_stars_speed(UINT8 speed);
-	void redclash_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);	
+	void redclash_draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 palette_offset, UINT8 sraider, UINT8 firstx, UINT8 lastx);
 	void redclash_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void redclash_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

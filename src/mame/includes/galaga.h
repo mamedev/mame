@@ -116,7 +116,7 @@ public:
 	DECLARE_WRITE8_MEMBER( xevious_vh_latch_w );
 	DECLARE_WRITE8_MEMBER( xevious_bs_w );
 	DECLARE_READ8_MEMBER( xevious_bb_r );
-	
+
 	// Custom I/O
 	void battles_customio_init();
 
@@ -132,7 +132,7 @@ public:
 	DECLARE_WRITE8_MEMBER( battles_customio_data3_w );
 	DECLARE_WRITE8_MEMBER( battles_CPU4_coin_w );
 	DECLARE_WRITE8_MEMBER( battles_noise_sound_w );
-	
+
 	UINT8 m_customio[16];
 	char m_battles_customio_command;
 	char m_battles_customio_prev_command;
@@ -170,11 +170,11 @@ public:
 	DECLARE_PALETTE_INIT(bosco);
 	UINT32 screen_update_bosco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_bosco(screen_device &screen, bool state);
-	
+
 	inline void get_tile_info_bosco(tile_data &tileinfo,int tile_index,int ram_offs);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);	
+	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect, int flip);
 	DECLARE_WRITE8_MEMBER( bosco_videoram_w );
 	DECLARE_WRITE8_MEMBER( bosco_scrollx_w );
 	DECLARE_WRITE8_MEMBER( bosco_scrolly_w );
@@ -207,7 +207,7 @@ public:
 	UINT32 screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER( digdug_videoram_w );
-	DECLARE_WRITE8_MEMBER( digdug_PORT_w );	
+	DECLARE_WRITE8_MEMBER( digdug_PORT_w );
 };
 
 /*----------- defined in audio/galaga.c -----------*/

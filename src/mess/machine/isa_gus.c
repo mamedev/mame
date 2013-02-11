@@ -1205,8 +1205,8 @@ static const acia6850_interface gus_midi_interface =
 	31250 * 16,
 	0,
 
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa16_gus_device, rx_in),	// rx in
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa16_gus_device, tx_out),	// tx out
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa16_gus_device, rx_in),   // rx in
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, isa16_gus_device, tx_out),  // tx out
 
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1230,7 +1230,7 @@ SLOT_INTERFACE_END
 
 static const serial_port_interface midiout_intf =
 {
-	DEVCB_NULL	// midi out ports don't transmit inward
+	DEVCB_NULL  // midi out ports don't transmit inward
 };
 
 static const gf1_interface gus_gf1_config =
@@ -1721,7 +1721,7 @@ WRITE_LINE_MEMBER( isa16_gus_device::midi_irq )
 WRITE_LINE_MEMBER( isa16_gus_device::midi_rx_w )
 {
 	m_rx_state = state;
-	for (int i = 0; i < 16; i++)	// divider is set to 16
+	for (int i = 0; i < 16; i++)    // divider is set to 16
 	{
 		m_midi->rx_clock_in();
 	}

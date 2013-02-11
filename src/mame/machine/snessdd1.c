@@ -485,7 +485,7 @@ SDD1emu::SDD1emu(running_machine &machine)
 	m_BG6 = auto_alloc(machine, SDD1_BG(m_GCD, 6));
 	m_BG7 = auto_alloc(machine, SDD1_BG(m_GCD, 7));
 	m_PEM = auto_alloc(machine, SDD1_PEM(m_BG0, m_BG1, m_BG2, m_BG3,
-										 m_BG4, m_BG5, m_BG6, m_BG7));
+											m_BG4, m_BG5, m_BG6, m_BG7));
 	m_CM = auto_alloc(machine, SDD1_CM(m_PEM));
 	m_OL = auto_alloc(machine, SDD1_OL(m_CM));
 }

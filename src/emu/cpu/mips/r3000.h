@@ -13,7 +13,7 @@
 /***************************************************************************
     INTERFACE CONFIGURATION MACROS
 ***************************************************************************/
-	
+
 #define MCFG_R3000_ENDIANNESS(_endianness) \
 	r3000_device::static_set_endianness(*device, _endianness);
 
@@ -134,12 +134,12 @@ protected:
 	// memory accessors
 	struct r3000_data_accessors
 	{
-		UINT8	(r3000_device::*m_read_byte)(offs_t byteaddress);
-		UINT16	(r3000_device::*m_read_word)(offs_t byteaddress);
-		UINT32	(r3000_device::*m_read_dword)(offs_t byteaddress);
-		void	(r3000_device::*m_write_byte)(offs_t byteaddress, UINT8 data);
-		void	(r3000_device::*m_write_word)(offs_t byteaddress, UINT16 data);
-		void	(r3000_device::*m_write_dword)(offs_t byteaddress, UINT32 data);
+		UINT8   (r3000_device::*m_read_byte)(offs_t byteaddress);
+		UINT16  (r3000_device::*m_read_word)(offs_t byteaddress);
+		UINT32  (r3000_device::*m_read_dword)(offs_t byteaddress);
+		void    (r3000_device::*m_write_byte)(offs_t byteaddress, UINT8 data);
+		void    (r3000_device::*m_write_word)(offs_t byteaddress, UINT16 data);
+		void    (r3000_device::*m_write_dword)(offs_t byteaddress, UINT32 data);
 	};
 
 	UINT32 readop(offs_t pc);
@@ -213,13 +213,13 @@ protected:
 	direct_read_data *m_direct;
 
 	// configuration
-	chip_type		m_chip_type;
-	bool			m_hasfpu;
-	endianness_t	m_endianness;
+	chip_type       m_chip_type;
+	bool            m_hasfpu;
+	endianness_t    m_endianness;
 
 	// core registers
 	UINT32      m_pc;
-	UINT32		m_nextpc;
+	UINT32      m_nextpc;
 	UINT32      m_hi;
 	UINT32      m_lo;
 	UINT32      m_r[32];
@@ -229,8 +229,8 @@ protected:
 	UINT32      m_ccr[4][32];
 
 	// internal stuff
-	UINT32		m_ppc;
-	UINT32		m_op;
+	UINT32      m_ppc;
+	UINT32      m_op;
 	int         m_icount;
 	int         m_interrupt_cycles;
 
@@ -254,10 +254,10 @@ protected:
 	size_t      m_dcache_size;
 
 	// I/O
-	devcb2_read_line	m_in_brcond0;
-	devcb2_read_line	m_in_brcond1;
-	devcb2_read_line	m_in_brcond2;
-	devcb2_read_line	m_in_brcond3;
+	devcb2_read_line    m_in_brcond0;
+	devcb2_read_line    m_in_brcond1;
+	devcb2_read_line    m_in_brcond2;
+	devcb2_read_line    m_in_brcond3;
 };
 
 

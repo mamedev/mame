@@ -1014,7 +1014,7 @@ READ8_MEMBER( c128_state::cia1_pa_r )
 	// keyboard
 	UINT8 cia1_pb = m_cia1->pb_r();
 	UINT8 row[8] = { m_row0->read(), m_row1->read() & m_lock->read(), m_row2->read(), m_row3->read(),
-					 m_row4->read(), m_row5->read(), m_row6->read(), m_row7->read() };
+						m_row4->read(), m_row5->read(), m_row6->read(), m_row7->read() };
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -1055,7 +1055,7 @@ READ8_MEMBER( c128_state::cia1_pb_r )
 
 	// joystick
 	UINT8 joy_a = m_joy1->joy_r();
-	
+
 	data &= (0xf0 | (joy_a & 0x0f));
 	data &= ~(!BIT(joy_a, 5) << 4);
 

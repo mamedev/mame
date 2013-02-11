@@ -163,7 +163,6 @@ inline void ccastles_state::ccastles_write_vram( UINT16 addr, UINT8 data, UINT8 
 
 inline void ccastles_state::bitmode_autoinc(  )
 {
-
 	/* auto increment in the x-direction if it's enabled */
 	if (!m_video_control[0]) /* /AX */
 	{

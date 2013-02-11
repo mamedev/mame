@@ -73,13 +73,13 @@ extern const flt_rc_config flt_rc_ac_default;
 // ======================> filter_rc_device
 
 class filter_rc_device : public device_t,
-						 public device_sound_interface
+							public device_sound_interface
 {
 public:
 	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	~filter_rc_device() { }
 
-    void filter_rc_set_RC(int type, double R1, double R2, double R3, double C);
+	void filter_rc_set_RC(int type, double R1, double R2, double R3, double C);
 
 protected:
 	// device-level overrides
@@ -89,7 +89,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 private:
-    void set_RC_info(int type, double R1, double R2, double R3, double C);
+	void set_RC_info(int type, double R1, double R2, double R3, double C);
 
 private:
 	sound_stream*  m_stream;

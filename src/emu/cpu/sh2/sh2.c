@@ -1860,7 +1860,7 @@ INLINE void op0000(sh2_state *sh2, UINT16 opcode)
 	case 0x06: MOVLS0(sh2, Rm, Rn);             break;
 	case 0x07: MULL(sh2, Rm, Rn);               break;
 	case 0x08: CLRT(sh2);                       break;
-	case 0x09: NOP();                     		break;
+	case 0x09: NOP();                           break;
 	case 0x0a: STSMACH(sh2, Rn);                break;
 	case 0x0b: RTS(sh2);                        break;
 	case 0x0c: MOVBL0(sh2, Rm, Rn);             break;

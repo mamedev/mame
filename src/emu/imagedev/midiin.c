@@ -21,8 +21,8 @@ const device_type MIDIIN = &device_creator<midiin_device>;
 
 midiin_device::midiin_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MIDIIN, "MIDI In image device", tag, owner, clock),
-	  device_image_interface(mconfig, *this),
-          device_serial_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+			device_serial_interface(mconfig, *this)
 {
 }
 
@@ -77,7 +77,7 @@ void midiin_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	int bytesRead;
 
 	if (m_midi == NULL) {
-	  return;
+		return;
 	}
 
 	while (osd_poll_midi_channel(m_midi))
@@ -122,8 +122,8 @@ void midiin_device::call_unload(void)
 	{
 		osd_close_midi_channel(m_midi);
 	}
-        m_timer->enable(false);
-        m_midi = NULL;
+		m_timer->enable(false);
+		m_midi = NULL;
 }
 
 void midiin_device::tra_complete()
@@ -131,7 +131,7 @@ void midiin_device::tra_complete()
 	// is there more waiting to send?
 	if (m_xmit_read != m_xmit_write)
 	{
-//		printf("tx1 %02x\n", m_xmitring[m_xmit_read]);
+//      printf("tx1 %02x\n", m_xmitring[m_xmit_read]);
 		transmit_register_setup(m_xmitring[m_xmit_read++]);
 		if (m_xmit_read >= XMIT_RING_SIZE)
 		{
@@ -158,7 +158,7 @@ void midiin_device::xmit_char(UINT8 data)
 	if (!m_tx_busy)
 	{
 		m_tx_busy = true;
-//		printf("tx0 %02x\n", data);
+//      printf("tx0 %02x\n", data);
 		transmit_register_setup(data);
 	}
 	else
@@ -175,4 +175,3 @@ void midiin_device::xmit_char(UINT8 data)
 void midiin_device::input_callback(UINT8 state)
 {
 }
-

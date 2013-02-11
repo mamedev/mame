@@ -318,20 +318,20 @@ READ8_MEMBER(i8244_device::read)
 			break;
 
 
-        case 0xa5:
-            if ((m_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
+		case 0xa5:
+			if ((m_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
 			{
-                m_x_beam_pos = get_x_beam();
+				m_x_beam_pos = get_x_beam();
 			}
-            data = m_x_beam_pos;
-            break;
-
-        default:
-            data = m_vdc.reg[offset];
+			data = m_x_beam_pos;
 			break;
-    }
 
-    return data;
+		default:
+			data = m_vdc.reg[offset];
+			break;
+	}
+
+	return data;
 }
 
 
@@ -348,7 +348,7 @@ WRITE8_MEMBER(i8244_device::write)
 	if (offset == 0xa0)
 	{
 		if ( ( m_vdc.s.control & VDC_CONTROL_REG_STROBE_XY )
-		   && !(data & VDC_CONTROL_REG_STROBE_XY))
+			&& !(data & VDC_CONTROL_REG_STROBE_XY))
 		{
 			/* Toggling strobe bit, tuck away values */
 			m_x_beam_pos = get_x_beam();
@@ -409,7 +409,7 @@ void i8244_device::render_scanline(int vpos)
 	//static const UINT8 COLLISION_EXTERNAL_UNUSED = 0x40;
 	static const UINT8 COLLISION_CHARACTERS      = 0x80;
 
-	UINT8	collision_map[160];
+	UINT8   collision_map[160];
 
 
 	if ( vpos == m_start_vpos )
@@ -501,8 +501,8 @@ void i8244_device::render_scanline(int vpos)
 			/* Regular foreground objects */
 			for ( int i = 0; i < ARRAY_LENGTH( m_vdc.s.foreground ); i++ )
 			{
-				int	y = m_vdc.s.foreground[i].y & 0xFE;
-				int	height = 8 - ( ( ( y >> 1 ) + m_vdc.s.foreground[i].ptr ) & 7 );
+				int y = m_vdc.s.foreground[i].y & 0xFE;
+				int height = 8 - ( ( ( y >> 1 ) + m_vdc.s.foreground[i].ptr ) & 7 );
 
 				if ( y >= 0x0E && y <= scanline && scanline < y + height * 2 )
 				{
@@ -544,7 +544,7 @@ void i8244_device::render_scanline(int vpos)
 
 				if ( y <= scanline && scanline < y + height * 2 )
 				{
-					int	x = m_vdc.s.quad[i].single[0].x;
+					int x = m_vdc.s.quad[i].single[0].x;
 
 					// Charaecter height is always determined by the height of the 4th character
 					int char_height = 8 - ( ( ( y >> 1 ) + m_vdc.s.quad[i].single[3].ptr ) & 7 );
@@ -553,7 +553,6 @@ void i8244_device::render_scanline(int vpos)
 					{
 						if ( y <= scanline && scanline < y + char_height * 2 )
 						{
-
 							UINT16 color = 8 + bgr2rgb[ ( ( m_vdc.s.quad[i].single[j].color >> 1 ) & 0x07 ) ];
 							int offset = ( m_vdc.s.quad[i].single[j].ptr | ( ( m_vdc.s.quad[i].single[j].color & 0x01 ) << 8 ) ) + ( y >> 1 ) + ( ( scanline - y ) >> 1 );
 							UINT8 chr = c_shape[ offset & 0x1FF ];
@@ -605,7 +604,7 @@ void i8244_device::render_scanline(int vpos)
 						int    x = m_vdc.s.sprites[i].x;
 						int    x_shift = 0;
 
-						switch ( m_vdc.s.sprites[i].color & 0x03 ) 
+						switch ( m_vdc.s.sprites[i].color & 0x03 )
 						{
 							case 1:    // Xg attribute set
 								x_shift = 2;
@@ -736,7 +735,7 @@ void i8244_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	/* Generate the signal */
 	old_signal = signal = m_vdc.s.shift3 | (m_vdc.s.shift2 << 8) | (m_vdc.s.shift1 << 16);
 
-	if( m_vdc.s.sound & 0x80 )	/* Sound is enabled */
+	if( m_vdc.s.sound & 0x80 )  /* Sound is enabled */
 	{
 		for( ii = 0; ii < samples; ii++, buffer++ )
 		{
@@ -791,5 +790,3 @@ UINT32 i8244_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 	return 0;
 }
-
-

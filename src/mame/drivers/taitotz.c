@@ -619,42 +619,42 @@ public:
 /*
 static void taitotz_exit(running_machine &machine)
 {
-	
-	taitotz_state *state = machine.driver_data<taitotz_state>();
 
-	FILE *file;
-	int i;
+    taitotz_state *state = machine.driver_data<taitotz_state>();
 
-	file = fopen("screen_ram.bin","wb");
-	for (i=0; i < 0x200000; i++)
-	{
-	    fputc((UINT8)(state->m_screen_ram[i] >> 24), file);
-	    fputc((UINT8)(state->m_screen_ram[i] >> 16), file);
-	    fputc((UINT8)(state->m_screen_ram[i] >> 8), file);
-	    fputc((UINT8)(state->m_screen_ram[i] >> 0), file);
-	}
-	fclose(file);
+    FILE *file;
+    int i;
 
-	file = fopen("frame_ram.bin","wb");
-	for (i=0; i < 0x80000; i++)
-	{
-	    fputc((UINT8)(state->m_frame_ram[i] >> 24), file);
-	    fputc((UINT8)(state->m_frame_ram[i] >> 16), file);
-	    fputc((UINT8)(state->m_frame_ram[i] >> 8), file);
-	    fputc((UINT8)(state->m_frame_ram[i] >> 0), file);
-	}
-	fclose(file);
+    file = fopen("screen_ram.bin","wb");
+    for (i=0; i < 0x200000; i++)
+    {
+        fputc((UINT8)(state->m_screen_ram[i] >> 24), file);
+        fputc((UINT8)(state->m_screen_ram[i] >> 16), file);
+        fputc((UINT8)(state->m_screen_ram[i] >> 8), file);
+        fputc((UINT8)(state->m_screen_ram[i] >> 0), file);
+    }
+    fclose(file);
 
-	file = fopen("texture_ram.bin","wb");
-	for (i=0; i < 0x800000; i++)
-	{
-	    fputc((UINT8)(state->m_texture_ram[i] >> 24), file);
-	    fputc((UINT8)(state->m_texture_ram[i] >> 16), file);
-	    fputc((UINT8)(state->m_texture_ram[i] >> 8), file);
-	    fputc((UINT8)(state->m_texture_ram[i] >> 0), file);
-	}
-	fclose(file);
-	
+    file = fopen("frame_ram.bin","wb");
+    for (i=0; i < 0x80000; i++)
+    {
+        fputc((UINT8)(state->m_frame_ram[i] >> 24), file);
+        fputc((UINT8)(state->m_frame_ram[i] >> 16), file);
+        fputc((UINT8)(state->m_frame_ram[i] >> 8), file);
+        fputc((UINT8)(state->m_frame_ram[i] >> 0), file);
+    }
+    fclose(file);
+
+    file = fopen("texture_ram.bin","wb");
+    for (i=0; i < 0x800000; i++)
+    {
+        fputc((UINT8)(state->m_texture_ram[i] >> 24), file);
+        fputc((UINT8)(state->m_texture_ram[i] >> 16), file);
+        fputc((UINT8)(state->m_texture_ram[i] >> 8), file);
+        fputc((UINT8)(state->m_texture_ram[i] >> 0), file);
+    }
+    fclose(file);
+
 }
 */
 void taitotz_state::video_start()

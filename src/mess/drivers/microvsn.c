@@ -80,8 +80,8 @@ public:
 	};
 
 	cpu_type    m_cpu_type;
-	pcb_type	m_pcb_type;
-	rc_type		m_rc_type;
+	pcb_type    m_pcb_type;
+	rc_type     m_rc_type;
 
 protected:
 	required_device<dac_device> m_dac;
@@ -191,7 +191,7 @@ MACHINE_RESET_MEMBER(microvision_state, microvision)
 					break;
 
 				case RC_TYPE_100PF_23_2K:
-				case RC_TYPE_UNKNOWN:	// Default to most occuring setting
+				case RC_TYPE_UNKNOWN:   // Default to most occuring setting
 					static_set_clock( m_tms1100, 500000 );
 					break;
 

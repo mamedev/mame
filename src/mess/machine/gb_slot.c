@@ -1,18 +1,18 @@
 /***********************************************************************************************************
- 
+
 
     Game Boy cart emulation
     (through slot devices)
 
- 
+
  The driver exposes address ranges
  0x0000-0x7fff to read_rom/write_bank
  0xa000-0xbfff to read_ram/write_ram (typically RAM/NVRAM accesses, but megaduck uses the write for bankswitch)
- 
+
  currently available slot devices:
  gb_rom: standard carts + TAMA5 mapper + pirate carts with protection & bankswitch
  gb_mbc: MBC1-MBC7 carts (more complex bankswitch + RAM + possibly RTC/Rumble/etc.)
- 
+
  ***********************************************************************************************************/
 
 
@@ -81,17 +81,17 @@ void device_gb_cart_interface::ram_alloc(running_machine &machine, UINT32 size)
 
 
 //-------------------------------------------------
-//  rom_map_setup - setup map of rom banks in 16K 
+//  rom_map_setup - setup map of rom banks in 16K
 //  blocks, so to simplify ROM access
 //-------------------------------------------------
 
 void device_gb_cart_interface::rom_map_setup(UINT32 size)
 {
 	int i;
-	// setup the rom_bank_map array to faster ROM read 
+	// setup the rom_bank_map array to faster ROM read
 	for (i = 0; i < size / 0x4000; i++)
 		rom_bank_map[i] = i;
-	
+
 	// fill up remaining blocks with mirrors
 	while (i % 512)
 	{
@@ -105,26 +105,26 @@ void device_gb_cart_interface::rom_map_setup(UINT32 size)
 	}
 
 // check bank map!
-//	for (i = 0; i < 256; i++)
-//	{
-//		printf("bank %3d = %3d\t", i, rom_bank_map[i]);
-//		if ((i%8) == 7)
-//			printf("\n");
-//	}
+//  for (i = 0; i < 256; i++)
+//  {
+//      printf("bank %3d = %3d\t", i, rom_bank_map[i]);
+//      if ((i%8) == 7)
+//          printf("\n");
+//  }
 }
 
 //-------------------------------------------------
-//  ram_map_setup - setup map of ram banks in 16K 
+//  ram_map_setup - setup map of ram banks in 16K
 //  blocks, so to simplify ROM access
 //-------------------------------------------------
 
 void device_gb_cart_interface::ram_map_setup(UINT8 banks)
 {
 	int mask = banks - 1;
-	
+
 	for (int i = 0; i < banks; i++)
 		ram_bank_map[i] = i;
-	
+
 	// Set up rest of the (mirrored) RAM pages
 	for (int i = banks; i < 256; i++)
 		ram_bank_map[i] = i & mask;
@@ -208,8 +208,8 @@ static const gb_slot slot_list[] =
 	{ GB_MBC_MBC7, "rom_mbc7" },
 	{ GB_MBC_TAMA5, "rom_tama5" },
 	{ GB_MBC_MMM01, "rom_mmm01" },
-	{ GB_MBC_MBC3, "rom_huc1" },	// for now treat this as alias for MBC3
-	{ GB_MBC_MBC3, "rom_huc3" },	// for now treat this as alias for MBC3
+	{ GB_MBC_MBC3, "rom_huc1" },    // for now treat this as alias for MBC3
+	{ GB_MBC_MBC3, "rom_huc3" },    // for now treat this as alias for MBC3
 	{ GB_MBC_WISDOM, "rom_wisdom" },
 	{ GB_MBC_YONGYONG, "rom_yong" },
 	{ GB_MBC_LASAMA, "rom_lasama" },
@@ -224,7 +224,7 @@ static int gb_get_pcb_id(const char *slot)
 		if (!mame_stricmp(slot_list[i].slot_option, slot))
 			return slot_list[i].pcb_id;
 	}
-	
+
 	return 0;
 }
 
@@ -235,7 +235,7 @@ static const char *gb_get_slot(int type)
 		if (slot_list[i].pcb_id == type)
 			return slot_list[i].slot_option;
 	}
-	
+
 	return "rom";
 }
 
@@ -263,7 +263,7 @@ bool base_gb_cart_slot_device::call_load()
 				offset = 512;
 				len -= offset;
 				fseek(offset, SEEK_SET);
-			}			
+			}
 			/* Verify that the file contains 16kb blocks */
 			if ((len == 0) || ((len % 0x4000) != 0))
 			{
@@ -271,7 +271,7 @@ bool base_gb_cart_slot_device::call_load()
 				return IMAGE_INIT_FAIL;
 			}
 		}
-		
+
 		m_cart->rom_alloc(machine(), len);
 		ROM = m_cart->get_rom_base();
 
@@ -310,7 +310,7 @@ bool base_gb_cart_slot_device::call_load()
 				if (!mame_stricmp(get_feature("rumble"), "yes"))
 					m_cart->set_has_rumble(TRUE);
 			}
-		
+
 			if (get_feature("rtc"))
 			{
 				if (!mame_stricmp(get_feature("rtc"), "yes"))
@@ -330,17 +330,17 @@ bool base_gb_cart_slot_device::call_load()
 					m_cart->set_has_battery(TRUE);
 					m_cart->set_has_timer(TRUE);
 					break;
-				
+
 				case 0x1c:  case 0x1d:
 					m_cart->set_has_rumble(TRUE);
 					break;
-				
+
 				case 0x1e:
 					m_cart->set_has_battery(TRUE);
 					m_cart->set_has_rumble(TRUE);
 					break;
 			}
-			
+
 			switch (ROM[0x0149 + offset] & 0x07)
 			{
 				case 0x00: case 0x06: case 0x07:
@@ -360,7 +360,7 @@ bool base_gb_cart_slot_device::call_load()
 					rambanks = 8;
 					break;
 			}
-			
+
 			if (type == GB_MBC_MBC2 ||  type == GB_MBC_MBC7)
 				rambanks = 1;
 		}
@@ -373,14 +373,14 @@ bool base_gb_cart_slot_device::call_load()
 
 		if (m_cart->get_ram_size() && m_cart->get_has_battery())
 			battery_load(m_cart->get_ram_base(), m_cart->get_ram_size(), 0xff);
-		
+
 		//printf("Type: %s\n", gb_get_slot(type));
 
 		internal_header_logging(ROM + offset, len);
 
 		return IMAGE_INIT_PASS;
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -393,7 +393,7 @@ bool megaduck_cart_slot_device::call_load()
 
 		m_cart->rom_alloc(machine(), len);
 		ROM = m_cart->get_rom_base();
-		
+
 		if (software_entry() == NULL)
 			fread(ROM, len);
 		else
@@ -401,10 +401,10 @@ bool megaduck_cart_slot_device::call_load()
 
 		// setup rom bank map based on real length, not header value
 		m_cart->rom_map_setup(len);
-		
+
 		return IMAGE_INIT_PASS;
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -455,7 +455,7 @@ bool base_gb_cart_slot_device::get_mmm01_candidate(UINT8 *ROM, UINT32 len)
 		if (ROM[(len - 0x8000) + 0x104 + i] == nintendo_logo[i])
 			bytes_matched++;
 	}
-	
+
 	if (bytes_matched == 0x18 && ROM[(len - 0x8000) + 0x147] >= 0x0b && ROM[(len - 0x8000) + 0x147] <= 0x0d)
 		return TRUE;
 	else
@@ -465,13 +465,13 @@ bool base_gb_cart_slot_device::get_mmm01_candidate(UINT8 *ROM, UINT32 len)
 int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 {
 	int type = GB_MBC_NONE;
-	
+
 	if (len < 0x014c)
 		fatalerror("Checking header of a corrupted image!\n");
 
 	switch(ROM[0x0147])
 	{
-		case 0x00:  type = GB_MBC_NONE;	break;
+		case 0x00:  type = GB_MBC_NONE; break;
 		case 0x01:  type = GB_MBC_MBC1;    break;
 		case 0x02:  type = GB_MBC_MBC1;    break;
 		case 0x03:  type = GB_MBC_MBC1;    break;
@@ -519,14 +519,14 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			type = GB_MBC_WISDOM;
 		}
 	}
-	
+
 	/* Check if we're dealing with a Korean variant of the MBC1 mapper */
 	if (type == GB_MBC_MBC1)
 	{
 		if (ROM[0x13f] == 0x42 && ROM[0x140] == 0x32 && ROM[0x141] == 0x43 && ROM[0x142] == 0x4B)
 			type = GB_MBC_MBC1_KOR;
 	}
-	
+
 	return type;
 }
 /*-------------------------------------------------
@@ -535,16 +535,15 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 const char * base_gb_cart_slot_device::get_default_card_software(const machine_config &config, emu_options &options)
 {
-
 	if (open_image_file(options))
 	{
 		const char *slot_string = "rom";
 		UINT32 len = core_fsize(m_file), offset = 0;
 		UINT8 *ROM = global_alloc_array(UINT8, len);
 		int type;
-		
+
 		core_fread(m_file, ROM, len);
-		
+
 		if ((len % 0x4000) == 512)
 			offset = 512;
 
@@ -557,7 +556,7 @@ const char * base_gb_cart_slot_device::get_default_card_software(const machine_c
 		//printf("type: %s\n", slot_string);
 		global_free(ROM);
 		clear();
-	
+
 		return slot_string;
 	}
 
@@ -612,19 +611,19 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 {
 	static const char *const cart_types[] =
 	{
-		"ROM ONLY",						"ROM+MBC1",						"ROM+MBC1+RAM",
-		"ROM+MBC1+RAM+BATTERY",			"UNKNOWN",						"ROM+MBC2",
-		"ROM+MBC2+BATTERY",				"UNKNOWN",						"ROM+RAM",
-		"ROM+RAM+BATTERY",				"UNKNOWN",						"ROM+MMM01",
-		"ROM+MMM01+SRAM",				"ROM+MMM01+SRAM+BATTERY",		"UNKNOWN",
-		"ROM+MBC3+TIMER+BATTERY",		"ROM+MBC3+TIMER+RAM+BATTERY",	"ROM+MBC3",
-		"ROM+MBC3+RAM",					"ROM+MBC3+RAM+BATTERY",			"UNKNOWN",
-		"UNKNOWN",						"UNKNOWN",						"UNKNOWN",
-		"UNKNOWN",						"ROM+MBC5",						"ROM+MBC5+RAM",
-		"ROM+MBC5+RAM+BATTERY",			"ROM+MBC5+RUMBLE",				"ROM+MBC5+RUMBLE+SRAM",
-		"ROM+MBC5+RUMBLE+SRAM+BATTERY",	"Pocket Camera",				"Bandai TAMA5",
+		"ROM ONLY",                     "ROM+MBC1",                     "ROM+MBC1+RAM",
+		"ROM+MBC1+RAM+BATTERY",         "UNKNOWN",                      "ROM+MBC2",
+		"ROM+MBC2+BATTERY",             "UNKNOWN",                      "ROM+RAM",
+		"ROM+RAM+BATTERY",              "UNKNOWN",                      "ROM+MMM01",
+		"ROM+MMM01+SRAM",               "ROM+MMM01+SRAM+BATTERY",       "UNKNOWN",
+		"ROM+MBC3+TIMER+BATTERY",       "ROM+MBC3+TIMER+RAM+BATTERY",   "ROM+MBC3",
+		"ROM+MBC3+RAM",                 "ROM+MBC3+RAM+BATTERY",         "UNKNOWN",
+		"UNKNOWN",                      "UNKNOWN",                      "UNKNOWN",
+		"UNKNOWN",                      "ROM+MBC5",                     "ROM+MBC5+RAM",
+		"ROM+MBC5+RAM+BATTERY",         "ROM+MBC5+RUMBLE",              "ROM+MBC5+RUMBLE+SRAM",
+		"ROM+MBC5+RUMBLE+SRAM+BATTERY", "Pocket Camera",                "Bandai TAMA5",
 		/* Need heaps of unknowns here */
-		"Hudson HuC-3",					"Hudson HuC-1"
+		"Hudson HuC-3",                 "Hudson HuC-1"
 	};
 
 	// some company codes
@@ -718,7 +717,7 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	UINT32 tmp = 0;
 	int csum = 0, i = 0;
 	int rom_banks;
-	
+
 	switch (ROM[0x0148])
 	{
 		case 0x52:
@@ -768,14 +767,14 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 
 	if ((len / 0x4000) != rom_banks)
 		logerror("\nWarning loading cartridge: Filesize (0x%x) and reported ROM banks (0x%x) don't match.\n",
-				 len, rom_banks * 0x4000);
+					len, rom_banks * 0x4000);
 	/* Calculate and check checksum */
 	tmp = (ROM[0x014e] << 8) + ROM[0x014f];
 	for (int i = 0; i < len; i++)
 		csum += ROM[i];
 	csum -= (ROM[0x014e] + ROM[0x014f]);
 	csum &= 0xffff;
-	
+
 	if (csum != tmp)
 		logerror("\nWarning loading cartridge: Checksum is wrong (Actual %X vs Internal %X)\n", csum, tmp);
 

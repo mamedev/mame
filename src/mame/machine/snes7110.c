@@ -127,7 +127,7 @@ public:
 
 	void init(running_machine &machine, UINT8 *ROM, UINT32 mode, UINT32 offset, UINT32 index);
 	void reset();
-	
+
 	UINT8 read(UINT8 *ROM);
 	void write(UINT8 data);
 	void mode0(UINT8 init, UINT8 *ROM);
@@ -159,7 +159,7 @@ public:
 	UINT32 m_morton16[2][256];
 	UINT32 m_morton32[4][256];
 
-	
+
 private:
 	running_machine& m_machine;
 	UINT32 m_rom_size;
@@ -238,10 +238,10 @@ UINT8 SPC7110Decomp::read(UINT8 *ROM)
 {
 	UINT8 data;
 
-	if (m_decomp_buffer_length == 0) 
+	if (m_decomp_buffer_length == 0)
 	{
 		//decompress at least (SPC7110_DECOMP_BUFFER_SIZE / 2) bytes to the buffer
-		switch (m_decomp_mode) 
+		switch (m_decomp_mode)
 		{
 			case 0:
 				mode0(0, ROM);

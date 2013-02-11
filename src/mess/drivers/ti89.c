@@ -39,7 +39,7 @@ UINT8 ti68k_state::keypad_r (running_machine &machine)
 			data ^= m_io_bit5->read() & (0x01 << bit) ? 0x20 : 0x00;
 			data ^= m_io_bit6->read() & (0x01 << bit) ? 0x40 : 0x00;
 			data ^= m_io_bit7->read() & (0x01 << bit) ? 0x80 : 0x00;
-		}		
+		}
 	}
 
 	return data;

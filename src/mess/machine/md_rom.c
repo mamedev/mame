@@ -1,9 +1,9 @@
 /***********************************************************************************************************
- 
- 
+
+
  MegaDrive / Genesis cart emulation
- 
- 
+
+
  Here we emulate bankswitch / protection / NVRAM found on generic carts with no additional hardware
 
 
@@ -244,7 +244,7 @@ void md_rom_pokestad_device::device_start()
 
 void md_rom_realtec_device::device_start()
 {
-	m_bank_addr = 0; 
+	m_bank_addr = 0;
 	m_bank_size = 0;
 	m_old_bank_addr = -1;
 	save_item(NAME(m_bank_addr));
@@ -289,9 +289,9 @@ READ16_MEMBER(md_rom_sram_device::read)
 		if (offset >= m_nvram_start/2 && offset < m_nvram_end/2 && m_nvram_active)
 			return m_nvram[offset - m_nvram_start/2];
 	}
-	if (offset < 0x400000/2) 
-		return m_rom[MD_ADDR(offset)]; 
-	else 
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
 		return 0xffff;
 }
 
@@ -329,9 +329,9 @@ READ16_MEMBER(md_rom_fram_device::read)
 {
 	if (offset >= m_nvram_start/2 && offset < m_nvram_end/2 && m_nvram_active)
 		return m_nvram[offset - m_nvram_start/2];
-	if (offset < 0x400000/2) 
-		return m_rom[MD_ADDR(offset)]; 
-	else 
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
 		return 0xffff;
 }
 
@@ -372,7 +372,7 @@ WRITE16_MEMBER(md_rom_ssf2_device::write_a13)
 		{
 			m_lastoff = offset;
 			m_lastdata = data;
-			if (offset)	// bank 0 is not modified
+			if (offset) // bank 0 is not modified
 			{
 				UINT16 *ROM = get_rom_base();
 				m_bank[offset] = data & 0xf;
@@ -430,7 +430,7 @@ READ16_MEMBER(md_rom_chinf3_device::read)
 		else
 			return m_rom[(offset & 0xffff/2) + (m_bank * 0x10000)/2];
 	}
-	
+
 	// PROTECTION in 0x400000 - 0x4fffff
 	/* not 100% correct, there may be some relationship between the reads here
 	 and the writes made at the start of the game.. */
@@ -485,7 +485,7 @@ READ16_MEMBER(md_rom_chinf3_device::read)
 		}
 		return 0;
 	}
-	
+
 	return m_rom[offset & 0x1fffff/2];
 }
 
@@ -512,12 +512,12 @@ WRITE16_MEMBER(md_rom_chinf3_device::write)
 
 READ16_MEMBER(md_rom_elfwor_device::read)
 {
-	/* It returns (0x55 @ 0x400000 OR 0xc9 @ 0x400004) AND (0x0f @ 0x400002 OR 0x18 @ 0x400006). 
+	/* It returns (0x55 @ 0x400000 OR 0xc9 @ 0x400004) AND (0x0f @ 0x400002 OR 0x18 @ 0x400006).
 	 It is probably best to add handlers for all 4 addresses. */
-	if (offset == 0x400000/2)	return 0x5500;
-	if (offset == 0x400002/2)	return 0x0f00;
-	if (offset == 0x400004/2)	return 0xc900;
-	if (offset == 0x400006/2)	return 0x1800;
+	if (offset == 0x400000/2)   return 0x5500;
+	if (offset == 0x400002/2)   return 0x0f00;
+	if (offset == 0x400004/2)   return 0xc900;
+	if (offset == 0x400006/2)   return 0x1800;
 	return m_rom[MD_ADDR(offset)];
 }
 
@@ -527,10 +527,10 @@ READ16_MEMBER(md_rom_elfwor_device::read)
 
 READ16_MEMBER(md_rom_smouse_device::read)
 {
-	if (offset == 0x400000/2)	return 0x5500;
-	if (offset == 0x400002/2)	return 0x0f00;
-	if (offset == 0x400004/2)	return 0xaa00;
-	if (offset == 0x400006/2)	return 0xf000;
+	if (offset == 0x400000/2)   return 0x5500;
+	if (offset == 0x400002/2)   return 0x0f00;
+	if (offset == 0x400004/2)   return 0xaa00;
+	if (offset == 0x400006/2)   return 0xf000;
 	return m_rom[MD_ADDR(offset)];
 }
 
@@ -540,10 +540,10 @@ READ16_MEMBER(md_rom_smouse_device::read)
 
 READ16_MEMBER(md_rom_yasech_device::read)
 {
-	if (offset == 0x400000/2)	return 0x6300;
-	if (offset == 0x400002/2)	return 0x9800;
-	if (offset == 0x400004/2)	return 0xc900;
-	if (offset == 0x400006/2)	return 0x1800;
+	if (offset == 0x400000/2)   return 0x6300;
+	if (offset == 0x400002/2)   return 0x9800;
+	if (offset == 0x400004/2)   return 0xc900;
+	if (offset == 0x400006/2)   return 0x1800;
 	return m_rom[MD_ADDR(offset)];
 }
 
@@ -553,12 +553,12 @@ READ16_MEMBER(md_rom_yasech_device::read)
 
 READ16_MEMBER(md_rom_kof98_device::read)
 {
-	if (offset == 0x480000/2)	return 0xaa00;
-	if (offset == 0x4800e0/2)	return 0xaa00;
-	if (offset == 0x4824a0/2)	return 0xaa00;
-	if (offset == 0x488880/2)	return 0xaa00;
-	if (offset == 0x4a8820/2)	return 0x0a00;
-	if (offset == 0x4f8820/2)	return 0x0000;
+	if (offset == 0x480000/2)   return 0xaa00;
+	if (offset == 0x4800e0/2)   return 0xaa00;
+	if (offset == 0x4824a0/2)   return 0xaa00;
+	if (offset == 0x488880/2)   return 0xaa00;
+	if (offset == 0x4a8820/2)   return 0x0a00;
+	if (offset == 0x4f8820/2)   return 0x0000;
 	return m_rom[MD_ADDR(offset)];
 }
 
@@ -568,10 +568,10 @@ READ16_MEMBER(md_rom_kof98_device::read)
 // gfx glitch with the new code... uninitialized ram somewhere?
 READ16_MEMBER(md_rom_kof99_device::read_a13)
 {
-	if (offset == 0x00/2)	return 0x00;	// startup protection check, chinese message if != 0
-	if (offset == 0x02/2)	return 0x01;	// write 02 to a13002.. shift right 1?
-	if (offset == 0x3e/2)	return 0x1f;	// write 3e to a1303e.. shift right 1?
-	else	return 0xffff;
+	if (offset == 0x00/2)   return 0x00;    // startup protection check, chinese message if != 0
+	if (offset == 0x02/2)   return 0x01;    // write 02 to a13002.. shift right 1?
+	if (offset == 0x3e/2)   return 0x1f;    // write 3e to a1303e.. shift right 1?
+	else    return 0xffff;
 }
 
 /*-------------------------------------------------
@@ -580,15 +580,15 @@ READ16_MEMBER(md_rom_kof99_device::read_a13)
 
 READ16_MEMBER(md_rom_lion2_device::read)
 {
-	if (offset == 0x400002/2)	return m_prot1_data;
-	if (offset == 0x400006/2)	return m_prot2_data;
+	if (offset == 0x400002/2)   return m_prot1_data;
+	if (offset == 0x400006/2)   return m_prot2_data;
 	return m_rom[MD_ADDR(offset)];
 }
 
 WRITE16_MEMBER(md_rom_lion2_device::write)
 {
-	if (offset == 0x400000/2)	m_prot1_data = data;
-	if (offset == 0x400004/2)	m_prot2_data = data;
+	if (offset == 0x400000/2)   m_prot1_data = data;
+	if (offset == 0x400004/2)   m_prot2_data = data;
 }
 
 /*-------------------------------------------------
@@ -600,7 +600,7 @@ READ16_MEMBER(md_rom_lion3_device::read)
 	if (offset < 0x8000/2)
 		return m_rom[offset + (m_bank * 0x8000)/2];
 	else if (offset >= 0x600000/2 && offset < 0x700000/2)
-	{	
+	{
 		UINT16 retdata = 0;
 		switch (offset & 0x7)
 		{
@@ -627,14 +627,14 @@ READ16_MEMBER(md_rom_lion3_device::read)
 					retdata |= (BIT(m_prot_data, 0) << 7);
 				}
 				break;
-				
+
 			default:
 				logerror("protection read, unknown offset %x\n", offset & 0x7);
 				break;
 		}
 		return retdata;
 	}
-	
+
 	return m_rom[offset];
 }
 
@@ -675,8 +675,8 @@ WRITE16_MEMBER(md_rom_lion3_device::write)
 
 READ16_MEMBER(md_rom_mjlov_device::read)
 {
-	if (offset == 0x400000/2)	return 0x9000;
-	if (offset == 0x401000/2)	return 0xd300;
+	if (offset == 0x400000/2)   return 0x9000;
+	if (offset == 0x401000/2)   return 0xd300;
 	return m_rom[MD_ADDR(offset)];
 }
 
@@ -687,8 +687,8 @@ READ16_MEMBER(md_rom_mjlov_device::read)
 
 READ16_MEMBER(md_rom_sbubl_device::read)
 {
-	if (offset == 0x400000/2)	return 0x5500;
-	if (offset == 0x400002/2)	return 0x0f00;
+	if (offset == 0x400000/2)   return 0x5500;
+	if (offset == 0x400002/2)   return 0x0f00;
 	return m_rom[MD_ADDR(offset)];
 }
 
@@ -698,9 +698,9 @@ READ16_MEMBER(md_rom_sbubl_device::read)
 
 READ16_MEMBER(md_rom_soulb_device::read)
 {
-	if (offset == 0x400002/2)	return 0x9800;
-	if (offset == 0x400004/2)	return 0xc900;
-	if (offset == 0x400006/2)	return 0xf000;
+	if (offset == 0x400002/2)   return 0x9800;
+	if (offset == 0x400004/2)   return 0xc900;
+	if (offset == 0x400006/2)   return 0xf000;
 	return m_rom[MD_ADDR(offset)];
 }
 
@@ -727,9 +727,9 @@ WRITE16_MEMBER(md_rom_pokestad_device::write)
 
 READ16_MEMBER(md_rom_realtec_device::read)
 {
-	if (offset < (m_bank_size * 0x20000))	// two banks of same (variable) size at the bottom of the rom
+	if (offset < (m_bank_size * 0x20000))   // two banks of same (variable) size at the bottom of the rom
 		return m_rom[offset + (m_bank_addr * 0x20000)/2];
-	return m_rom[(offset & 0x1fff/2) + 0x7e000/2];	// otherwise it accesses the final 8k of the image
+	return m_rom[(offset & 0x1fff/2) + 0x7e000/2];  // otherwise it accesses the final 8k of the image
 }
 
 WRITE16_MEMBER(md_rom_realtec_device::write)
@@ -757,8 +757,8 @@ WRITE16_MEMBER(md_rom_realtec_device::write)
 
 READ16_MEMBER(md_rom_redcl_device::read)
 {
-	if (offset == 0x400000/2)	return 0x55 << 8;
-	if (offset == 0x400004/2)	return -0x56 << 8;
+	if (offset == 0x400000/2)   return 0x55 << 8;
+	if (offset == 0x400004/2)   return -0x56 << 8;
 	return m_rom[MD_ADDR(offset)];
 }
 
@@ -827,7 +827,7 @@ READ16_MEMBER(md_rom_topf_device::read)
 		//cpu #0 (PC=0004DE00): unmapped program memory word write to 00689B80 = 004A & 00FF
 		//cpu #0 (PC=0004DE08): unmapped program memory word write to 00 = 00B5 & 00FF
 		//cpu #0 (PC=0004DE0C): unmapped program memory word read from 00645B44 & 00FF
-		
+
 		return 0x9f;//0x25;
 	}
 	if (offset == 0x6bd294/2)
@@ -837,7 +837,7 @@ READ16_MEMBER(md_rom_topf_device::read)
 		 cpu #0 (PC=0017719A): unmapped program memory word write to 006BD2D2 = 0098 & 00FF
 		 cpu #0 (PC=001771A2): unmapped program memory word read from 006BD294 & 00FF
 		 */
-		
+
 		if (space.device().safe_pc()==0x1771a2) return 0x50;
 		else
 		{
@@ -875,9 +875,9 @@ WRITE16_MEMBER(md_rom_topf_device::write)
 	if (offset >= 0x700000/2 && offset < 0x800000/2)
 	{
 		if (data == 0x002a)
-			m_bank[2] = 1;	// == 0x2e*0x8000?!
+			m_bank[2] = 1;  // == 0x2e*0x8000?!
 		else if (data==0x0035) // characters ingame
-			m_bank[0] = 1;	// == 0x35*0x8000
+			m_bank[0] = 1;  // == 0x35*0x8000
 		else if (data==0x000f) // special moves
 			m_bank[1] = 1; // == 0xf*0x8000
 		else if (data==0x0000)

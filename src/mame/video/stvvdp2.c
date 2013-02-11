@@ -2604,9 +2604,9 @@ void saturn_state::stv_vdp2_drawgfxzoom_rgb555(
 	myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
-//	if( gfx )
+//  if( gfx )
 	{
-//		const UINT8 *source_base = gfx->get_data(code % gfx->elements());
+//      const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 
 		//int sprite_screen_height = (scaley*gfx->height()+0x8000)>>16;
 		//int sprite_screen_width = (scalex*gfx->width()+0x8000)>>16;
@@ -3264,27 +3264,27 @@ void saturn_state::stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectan
 
 		/* intentional fall-through*/
 		popmessage("%d %s %s %s %s",stv2_current_tilemap.colour_depth,
-		                         stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE ? "no trans" : "trans",
-		                         stv2_current_tilemap.window_control & 6 ? "window" : "no window",
-		                         stv2_current_tilemap.colour_calculation_enabled ? "cc" : "no cc",
-		                         (stv2_current_tilemap.incx == 0x10000 && stv2_current_tilemap.incy == 0x10000) ? "no zoom" : "zoom");
+									stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE ? "no trans" : "trans",
+									stv2_current_tilemap.window_control & 6 ? "window" : "no window",
+									stv2_current_tilemap.colour_calculation_enabled ? "cc" : "no cc",
+									(stv2_current_tilemap.incx == 0x10000 && stv2_current_tilemap.incy == 0x10000) ? "no zoom" : "zoom");
 	}
 	else
 	{
 		switch(stv2_current_tilemap.colour_depth)
 		{
-		//	case 0: draw_4bpp_bitmap(bitmap,cliprect); return;
+		//  case 0: draw_4bpp_bitmap(bitmap,cliprect); return;
 			case 1: draw_8bpp_bitmap(bitmap,cliprect); return;
 			case 3: draw_rgb15_bitmap(bitmap,cliprect); return;
-		//	case 4: draw_rgb32_bitmap(bitmap,cliprect); return;
+		//  case 4: draw_rgb32_bitmap(bitmap,cliprect); return;
 		}
 
 		/* intentional fall-through*/
 		popmessage("%d %s %s %s %s",stv2_current_tilemap.colour_depth,
-		                         stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE ? "no trans" : "trans",
-		                         stv2_current_tilemap.window_control & 6 ? "window" : "no window",
-		                         stv2_current_tilemap.colour_calculation_enabled ? "cc" : "no cc",
-		                         (stv2_current_tilemap.incx == 0x10000 && stv2_current_tilemap.incy == 0x10000) ? "no zoom" : "zoom");
+									stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE ? "no trans" : "trans",
+									stv2_current_tilemap.window_control & 6 ? "window" : "no window",
+									stv2_current_tilemap.colour_calculation_enabled ? "cc" : "no cc",
+									(stv2_current_tilemap.incx == 0x10000 && stv2_current_tilemap.incy == 0x10000) ? "no zoom" : "zoom");
 	}
 
 	/* size for n0 / n1 */
@@ -4319,11 +4319,11 @@ void saturn_state::stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, 
 
 	// prepare linescroll flags
 	linescroll_enable = stv2_current_tilemap.linescroll_enable;
-//	stv2_current_tilemap.linescroll_enable = 0;
+//  stv2_current_tilemap.linescroll_enable = 0;
 	vertical_linescroll_enable = stv2_current_tilemap.vertical_linescroll_enable;
-//	stv2_current_tilemap.vertical_linescroll_enable = 0;
+//  stv2_current_tilemap.vertical_linescroll_enable = 0;
 	linezoom_enable = stv2_current_tilemap.linezoom_enable;
-//	stv2_current_tilemap.linezoom_enable = 0;
+//  stv2_current_tilemap.linezoom_enable = 0;
 
 	// prepare working clipping rectangle
 	memcpy( &mycliprect, &cliprect, sizeof(rectangle) );
@@ -4542,8 +4542,8 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 		if(stv2_current_tilemap.colour_depth == 2 && !stv2_current_tilemap.bitmap_enable)
 			popmessage("2048 color mode used on a non-bitmap plane");
 
-//		if(STV_VDP2_SCXDN0 || STV_VDP2_SCXDN1 || STV_VDP2_SCYDN0 || STV_VDP2_SCYDN1)
-//			popmessage("Fractional part scrolling write, contact MAMEdev");
+//      if(STV_VDP2_SCXDN0 || STV_VDP2_SCXDN1 || STV_VDP2_SCYDN0 || STV_VDP2_SCYDN1)
+//          popmessage("Fractional part scrolling write, contact MAMEdev");
 
 		/* Pukunpa */
 		//if(STV_VDP2_SPWINEN)
@@ -7023,5 +7023,3 @@ UINT32 saturn_state::screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 
 	#endif
 	return 0;
 }
-
-

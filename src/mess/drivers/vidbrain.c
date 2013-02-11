@@ -482,7 +482,7 @@ static VIDEOBRAIN_EXPANSION_INTERFACE( expansion_intf )
 //**************************************************************************
 
 //-------------------------------------------------
-//  	IRQ_CALLBACK_MEMBER(vidbrain_int_ack)
+//      IRQ_CALLBACK_MEMBER(vidbrain_int_ack)
 //-------------------------------------------------
 
 IRQ_CALLBACK_MEMBER(vidbrain_state::vidbrain_int_ack)

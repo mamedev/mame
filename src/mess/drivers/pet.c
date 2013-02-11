@@ -707,9 +707,9 @@ static MACHINE_CONFIG_START( pet_general, pet_state )
 	MCFG_PIA6821_ADD( "pia_0", pet_pia0)
 	MCFG_PIA6821_ADD( "pia_1", pet_pia1)
 
-  /* software lists */
-  MCFG_SOFTWARE_LIST_ADD("rom_list", "pet_rom")
-  MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
+	/* software lists */
+	MCFG_SOFTWARE_LIST_ADD("rom_list", "pet_rom")
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "pet_flop")
 MACHINE_CONFIG_END
 
 
@@ -818,12 +818,12 @@ static MACHINE_CONFIG_DERIVED( superpet, pet80 )
 
 	MCFG_PIA6821_MODIFY( "pia_0", petb_pia0 )
 
-  MCFG_SOFTWARE_LIST_ADD("flop_list2", "superpet_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list2", "superpet_flop")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cbm8296, pet80pal )
-  MCFG_SOFTWARE_LIST_ADD("flop_list2", "cbm8296_flop")
+	MCFG_SOFTWARE_LIST_ADD("flop_list2", "cbm8296_flop")
 MACHINE_CONFIG_END
 
 

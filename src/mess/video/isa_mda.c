@@ -78,7 +78,7 @@ GFXDECODE_END
 static MC6845_INTERFACE( mc6845_mda_intf )
 {
 	MDA_SCREEN_NAME, /* screen number */
-	false,				/* show border area */
+	false,              /* show border area */
 	9,                  /* number of pixels per video memory address */
 	NULL,               /* begin_update */
 	mda_update_row,     /* update_row */
@@ -501,7 +501,7 @@ The divder/pixels per 6845 clock is 9 for text mode and 16 for graphics mode.
 static MC6845_INTERFACE( mc6845_hercules_intf )
 {
 	HERCULES_SCREEN_NAME,   /* screen number */
-	false,					/* show border area */
+	false,                  /* show border area */
 	9,                      /* number of pixels per video memory address */
 	NULL,                   /* begin_update */
 	mda_update_row,         /* update_row */

@@ -239,9 +239,9 @@ static UINT8 add_table(UINT32 cur_opcode)
 
 static UINT32 decode_opcode(UINT32 pc, const SCUDSP_OPCODE *op_table,UINT32 cur_opcode)
 {
-//	INT8 rel8;
-//	UINT32 imm32;
-//	UINT8 op2;
+//  INT8 rel8;
+//  UINT32 imm32;
+//  UINT8 op2;
 	UINT32 flags = 0;
 
 	//if (!strcmp(op_table->mnemonic, "jsr") || !strcmp(op_table->mnemonic, "bsr"))

@@ -11,15 +11,15 @@ add serials for radiola and jopacs
 -->
 <!--
 Undumped:
-Spaans			(spanish to dutch translator)
+Spaans          (spanish to dutch translator)
 Crazy Horses
 
 Protos:
-Bastion			youtube.com/watch?v=cFdmgs4r7_E
-Catburglar		youtube.com/watch?v=DDsWDFxy0oE
-Himalaya		youtube.com/watch?v=L_lvOs6EnA4
-SoundTool		youtube.com/watch?v=7JYn6B7rxqw
-Terrahawks		youtube.com/watch?v=AXk7OSA6NGg
+Bastion         youtube.com/watch?v=cFdmgs4r7_E
+Catburglar      youtube.com/watch?v=DDsWDFxy0oE
+Himalaya        youtube.com/watch?v=L_lvOs6EnA4
+SoundTool       youtube.com/watch?v=7JYn6B7rxqw
+Terrahawks      youtube.com/watch?v=AXk7OSA6NGg
 
 http://www.ozyr.com/rene/PICS/protos.jpg
 Sherlock Holmes Consulting Detective (programmed by Ed Friedman, most likely dumped and hoarded)
@@ -375,7 +375,7 @@ adds 16K RAM and 18K ROM, that plugs into the G7000 needs to be dumped.
 		<info name="serial" value="AA9427 (USA) ~ 29 (Euro)"/>
 		<part name="cart" interface="odyssey_cart">
 			<dataarea name="rom" size="2048">
- 				<rom name="blockout - breakdown (usa, europe).bin" size="2048" crc="fb83171e" sha1="00ef6868724a6826534da620f34dad207fcb3800" offset="0" />
+				<rom name="blockout - breakdown (usa, europe).bin" size="2048" crc="fb83171e" sha1="00ef6868724a6826534da620f34dad207fcb3800" offset="0" />
 				</dataarea>
 		</part>
 	</software>

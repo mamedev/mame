@@ -419,4 +419,3 @@ void sm8500_cpu_device::execute_set_input( int inptnum, int state )
 	m_program->write_byte(0x12, m_IR0);
 	m_program->write_byte(0x13, m_IR1);
 }
-

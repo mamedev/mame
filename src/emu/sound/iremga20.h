@@ -56,12 +56,12 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_WRITE8_MEMBER( irem_ga20_w );
-    DECLARE_READ8_MEMBER( irem_ga20_r );
+	DECLARE_WRITE8_MEMBER( irem_ga20_w );
+	DECLARE_READ8_MEMBER( irem_ga20_r );
 
 private:
 	void iremga20_reset();
-        
+
 private:
 	UINT8 *m_rom;
 	INT32 m_rom_size;

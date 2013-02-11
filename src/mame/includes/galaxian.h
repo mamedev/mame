@@ -64,18 +64,18 @@ public:
 	int m_tenspot_current_game;
 	UINT8 m_frogger_adjust;
 	UINT8 m_sfx_tilemap;
-	
+
 	/* video extension callbacks */
 	typedef void (galaxian_state::*galaxian_extend_tile_info_func)(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);
 	typedef void (galaxian_state::*galaxian_extend_sprite_info_func)(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *flipx, UINT8 *flipy, UINT16 *code, UINT8 *color);
 	typedef void (galaxian_state::*galaxian_draw_bullet_func)(bitmap_rgb32 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	typedef void (galaxian_state::*galaxian_draw_background_func)(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	galaxian_extend_tile_info_func m_extend_tile_info_ptr;
 	galaxian_extend_sprite_info_func m_extend_sprite_info_ptr;
 	galaxian_draw_bullet_func m_draw_bullet_ptr;
 	galaxian_draw_background_func m_draw_background_ptr;
-	
+
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_flipscreen_x;
 	UINT8 m_flipscreen_y;

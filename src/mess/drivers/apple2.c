@@ -633,7 +633,7 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("vtc1", A2BUS_VTC1)    /* Unknown VideoTerm clone #1 */
 	SLOT_INTERFACE("vtc2", A2BUS_VTC2)    /* Unknown VideoTerm clone #2 */
 	SLOT_INTERFACE("arcbd", A2BUS_ARCADEBOARD)    /* Third Millenium Engineering Arcade Board */
-	SLOT_INTERFACE("midi", A2BUS_MIDI)	/* Generic 6840+6850 MIDI board */
+	SLOT_INTERFACE("midi", A2BUS_MIDI)  /* Generic 6840+6850 MIDI board */
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
 
@@ -727,7 +727,7 @@ static MACHINE_CONFIG_DERIVED( apple2e, apple2_common )
 	MCFG_A2BUS_ONBOARD_ADD("a2bus", "sl0", A2BUS_LANG, NULL)
 
 	MCFG_A2EAUXSLOT_BUS_ADD(AUXSLOT_TAG, "maincpu", a2eauxbus_intf)
-	MCFG_A2EAUXSLOT_SLOT_ADD(AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80", NULL)	// default to an extended 80-column card
+	MCFG_A2EAUXSLOT_SLOT_ADD(AUXSLOT_TAG, "aux", apple2eaux_cards, "ext80", NULL)   // default to an extended 80-column card
 
 MACHINE_CONFIG_END
 

@@ -20,22 +20,22 @@ class aquarius_state : public driver_device
 public:
 	aquarius_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_cassette(*this, CASSETTE_TAG),
-		  m_speaker(*this, SPEAKER_TAG),
-		  m_screen(*this, "screen"),
-		  m_ram(*this, RAM_TAG),
-		  m_rom(*this, "maincpu"),
-		  m_videoram(*this, "videoram"),
-		  m_colorram(*this, "colorram"),
-		  m_y0(*this, "Y0"),
-		  m_y1(*this, "Y1"),
-		  m_y2(*this, "Y2"),
-		  m_y3(*this, "Y3"),
-		  m_y4(*this, "Y4"),
-		  m_y5(*this, "Y5"),
-		  m_y6(*this, "Y6"),
-		  m_y7(*this, "Y7")
+			m_maincpu(*this, "maincpu"),
+			m_cassette(*this, CASSETTE_TAG),
+			m_speaker(*this, SPEAKER_TAG),
+			m_screen(*this, "screen"),
+			m_ram(*this, RAM_TAG),
+			m_rom(*this, "maincpu"),
+			m_videoram(*this, "videoram"),
+			m_colorram(*this, "colorram"),
+			m_y0(*this, "Y0"),
+			m_y1(*this, "Y1"),
+			m_y2(*this, "Y2"),
+			m_y3(*this, "Y3"),
+			m_y4(*this, "Y4"),
+			m_y5(*this, "Y5"),
+			m_y6(*this, "Y6"),
+			m_y7(*this, "Y7")
 	{ }
 
 	required_device<legacy_cpu_device> m_maincpu;

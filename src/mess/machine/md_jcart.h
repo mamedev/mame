@@ -18,7 +18,7 @@ public:
 	// construction/destruction
 	md_jcart_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	md_jcart_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "md_jcart"; }
@@ -43,12 +43,12 @@ public:
 	// construction/destruction
 	md_seprom_codemast_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	md_seprom_codemast_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "md_seprom_codemast"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_WRITE16_MEMBER(write);
@@ -56,7 +56,7 @@ public:
 	required_device<i2cmem_device> m_i2cmem;
 
 private:
-	UINT8 m_jcart_io_data[2];	
+	UINT8 m_jcart_io_data[2];
 	UINT8 m_i2c_mem, m_i2c_clk;
 };
 
@@ -67,7 +67,7 @@ class md_seprom_mm96_device : public md_seprom_codemast_device
 public:
 	// construction/destruction
 	md_seprom_mm96_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_config_complete() { m_shortname = "md_seprom_mm96"; }
 	virtual machine_config_constructor device_mconfig_additions() const;

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pet_cass" description="Commodore PET cassettes">
-	
+
 	<software name="lunarlnd">
 		<description>Lunar Lander</description>
 		<year>197?</year>

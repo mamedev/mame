@@ -260,4 +260,3 @@ INPUT_CHANGED_MEMBER(psx_analog_controller_device::change_mode)
 	if(!m_analoglock)
 		m_analogmode = newval;
 }
-

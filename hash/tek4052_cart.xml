@@ -15,7 +15,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sp1">
 		<description>Signal Processing No. 1</description>
 		<year>198?</year>
@@ -28,7 +28,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sp2">
 		<description>Signal Processing No. 2 (FFT)</description>
 		<year>198?</year>
@@ -56,7 +56,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="da">
 		<description>D/A Converter</description>
 		<year>198?</year>

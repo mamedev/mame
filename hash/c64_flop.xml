@@ -701,8 +701,8 @@
 		to look at track 26 sector 2. There you find the beginning of a hidden
 		file. If you load this file into the correct start address ($C000) and
 		execute it from BASIC (SYS 49152) you get a rather cool surprise ;)
-		
-		The copy protection (looking for 22,READ ERROR,18,18) has been removed by 
+
+		The copy protection (looking for 22,READ ERROR,18,18) has been removed by
 		changing the two bytes in block 26,1 at offsets $23 and $2A from $AC to $AE
 		-->
 		<part name="flop1" interface="floppy_5_25">

@@ -362,7 +362,7 @@ WRITE_LINE_MEMBER(tapatune_state::crtc_vsync)
 static MC6845_INTERFACE( h46505_intf )
 {
 	"screen",   /* screen we are acting on */
-	false,		/* show border area */
+	false,      /* show border area */
 	5,          /* number of pixels per video memory address */
 	begin_update,/* before pixel update callback */
 	update_row, /* row update callback */

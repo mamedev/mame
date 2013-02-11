@@ -835,20 +835,20 @@ Missing files come here
 			</dataarea>
 		</part>
 	</software>
-	
+
 <!--
-	This is not a real dump, it was constructed using WinImage for use with MESS
-	Also circulating with CRC fb591430
-	<software name="ptombs">
-		<description>Pharaoh's Tomb (Shareware)</description>
-		<year>1994</year>
-		<publisher>Apogee</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="368640">
-				<rom name="pharaoh's tomb (shareware).img" size="368640" crc="b1f4dbf6" sha1="d3c4ae0b6ac6b5233c4970805c8e4f2b89f9c57a" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    This is not a real dump, it was constructed using WinImage for use with MESS
+    Also circulating with CRC fb591430
+    <software name="ptombs">
+        <description>Pharaoh's Tomb (Shareware)</description>
+        <year>1994</year>
+        <publisher>Apogee</publisher>
+        <part name="flop1" interface="floppy_5_25">
+            <dataarea name="flop" size="368640">
+                <rom name="pharaoh's tomb (shareware).img" size="368640" crc="b1f4dbf6" sha1="d3c4ae0b6ac6b5233c4970805c8e4f2b89f9c57a" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="raptor12">

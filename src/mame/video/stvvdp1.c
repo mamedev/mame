@@ -239,7 +239,7 @@ void saturn_state::stv_vdp1_change_framebuffers( void )
 void saturn_state::stv_set_framebuffer_config( void )
 {
 	if ( m_vdp1.framebuffer_mode == STV_VDP1_TVM &&
-		 m_vdp1.framebuffer_double_interlace == STV_VDP1_DIE ) return;
+			m_vdp1.framebuffer_double_interlace == STV_VDP1_DIE ) return;
 
 	if ( VDP1_LOG ) logerror( "Setting framebuffer config\n" );
 	m_vdp1.framebuffer_mode = STV_VDP1_TVM;
@@ -1908,7 +1908,7 @@ void saturn_state::stv_vdp1_process_list( void )
 					break;
 
 				case 0x0005:
-//				case 0x0007: // mirror? Baroque uses it, crashes for whatever reason
+//              case 0x0007: // mirror? Baroque uses it, crashes for whatever reason
 					if (VDP1_LOG) logerror ("Sprite List Polyline\n");
 					stv2_current_sprite.ispoly = 1;
 					stv_vdp1_draw_poly_line(*cliprect);
@@ -1921,7 +1921,7 @@ void saturn_state::stv_vdp1_process_list( void )
 					break;
 
 				case 0x0008:
-//				case 0x000b: // mirror? Bug 2
+//              case 0x000b: // mirror? Bug 2
 					if (VDP1_LOG) logerror ("Sprite List Set Command for User Clipping (%d,%d),(%d,%d)\n", stv2_current_sprite.CMDXA, stv2_current_sprite.CMDYA, stv2_current_sprite.CMDXC, stv2_current_sprite.CMDYC);
 					m_vdp1.user_cliprect.set(stv2_current_sprite.CMDXA, stv2_current_sprite.CMDXC, stv2_current_sprite.CMDYA, stv2_current_sprite.CMDYC);
 					break;
@@ -2021,7 +2021,7 @@ void saturn_state::video_update_vdp1( void )
 				/* TODO: Slam n Jam 96 & Cross Romance doesn't like this, investigate. */
 				framebuffer_changed = 1;
 			}
-	//		framebuffer_changed = 1;
+	//      framebuffer_changed = 1;
 			break;
 	}
 	m_vdp1.fbcr_accessed = 0;

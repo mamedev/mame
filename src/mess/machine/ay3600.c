@@ -356,8 +356,8 @@ static TIMER_CALLBACK(AY3600_poll)
 	int caps_lock = 0;
 	int curkey;
 	int curkey_unmodified;
-	ioport_port *portnames[] = { state->m_kb0, state->m_kb1, state->m_kb2, state->m_kb3, state->m_kb4, state->m_kb5, state->m_kb6, 
-								 state->m_kpad1, state->m_kpad2 };
+	ioport_port *portnames[] = { state->m_kb0, state->m_kb1, state->m_kb2, state->m_kb3, state->m_kb4, state->m_kb5, state->m_kb6,
+									state->m_kpad1, state->m_kpad2 };
 
 	/* check for these special cases because they affect the emulated key codes */
 

@@ -1807,7 +1807,7 @@ static int generate_group_0(sh2_state *sh2, drcuml_block *block, compiler_state 
 {
 	switch (opcode & 0x3F)
 	{
-	case 0x00:	// these are all illegal
+	case 0x00:  // these are all illegal
 	case 0x01:
 	case 0x10:
 	case 0x11:

@@ -736,7 +736,7 @@ static void apple2_mem_2000(running_machine &machine, offs_t begin, offs_t end, 
 static void apple2_mem_4000(running_machine &machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	apple2_state *state = machine.driver_data<apple2_state>();
-	meminfo->read_handler   	= (state->m_flags & VAR_RAMRD)  ? &state->read_delegates_4000[0] : &state->read_delegates_4000[1];
+	meminfo->read_handler       = (state->m_flags & VAR_RAMRD)  ? &state->read_delegates_4000[0] : &state->read_delegates_4000[1];
 	meminfo->write_handler      = (state->m_flags & VAR_RAMWRT) ? &state->write_delegates_4000[0] : &state->write_delegates_4000[1];
 }
 
@@ -911,7 +911,7 @@ static void apple2_mem_E000(running_machine &machine, offs_t begin, offs_t end, 
 
 		if (state->m_flags & VAR_LCWRITE)
 		{
-    		meminfo->write_handler  = (state->m_flags & VAR_ALTZP) ? &state->write_delegates_e000[0] : &state->write_delegates_e000[1];
+			meminfo->write_handler  = (state->m_flags & VAR_ALTZP) ? &state->write_delegates_e000[0] : &state->write_delegates_e000[1];
 		}
 		else
 		{

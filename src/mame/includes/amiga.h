@@ -410,7 +410,7 @@ public:
 	optional_ioport m_p2joy_port;
 	optional_memory_bank m_bank1;
 
-	
+
 
 	const amiga_machine_interface *m_intf;
 	autoconfig_device *m_autoconfig_list;

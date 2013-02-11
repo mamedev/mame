@@ -59,8 +59,8 @@
 #define Z80SIO_TAG          "z80sio"
 #define Z80DART_TAG         "z80dart"
 #define DISCRETE_TAG        "discrete"
-#define RS232_A_TAG			"rs232a"
-#define RS232_B_TAG			"rs232b"
+#define RS232_A_TAG         "rs232a"
+#define RS232_B_TAG         "rs232b"
 
 
 //**************************************************************************

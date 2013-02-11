@@ -3679,7 +3679,7 @@ static DEVICE_RESET( s3c24xx )
 static DEVICE_START( s3c24xx )
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	
+
 	s3c24xx->m_cpu = device->machine().device( "maincpu");
 
 	verboselog( device->machine(), 1, "s3c24xx device start\n");

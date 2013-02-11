@@ -66,9 +66,9 @@ In MESS, to activate it as above:
 * simultaneously press both alt keys for a moment and release both (the whole "Enable Forth Language" line will be selected)
 * press control(use front) and press backspace(ERASE) (If beeping actually worked the cat would beep here)
 * press control(use front), shift, and space (the cursor should stop blinking)
-* press enter and the forth "ok" prompt should appear. you can type 'page' and enter to clear the screen  
+* press enter and the forth "ok" prompt should appear. you can type 'page' and enter to clear the screen
 Optional further steps:
-* type without quotes "-1 wheel! savesetup re" at the forth prompt to permanently 
+* type without quotes "-1 wheel! savesetup re" at the forth prompt to permanently
   enable shift + use front + space to dump to forth mode easily
 * change the keyboard setting in the setup menu (use front + [ ) to ASCII so you can type < and >
 * after doing the -1 wheel! thing, you can compile a selected forth program in the editor
@@ -177,13 +177,13 @@ ToDo:
 - (would-be-really-nice-but-totally-unnecessary feature): due to open bus, the
   svrom1 and svrom2 checksums in diagnostics read as 01A80000 and 01020000
   respectively on a real machine (and hence appear inverted/'fail'-state).
-  This requires sub-cycle accurate 68k open bus emulation to pull off, as well 
+  This requires sub-cycle accurate 68k open bus emulation to pull off, as well
   as emulating the fact that UDS/LDS are ?not connected? (unclear because this
   happens inside an asic) for the SVROMS (or the svram or the code roms, for
   that matter!)
 - Hook Battery Low input to a dipswitch.
 - Document what every IPx and OPx bit on the DUART connects to.
-  
+
 
 * Swyft
 - Figure out the keyboard (interrupts are involved? or maybe an NMI on a
@@ -307,7 +307,7 @@ public:
 	   this causes the DUART to fire an interrupt, which makes the 68000 read
 	   the keyboard.
 	 */
-	UINT16 m_6ms_counter; 
+	UINT16 m_6ms_counter;
 	UINT8 m_video_enable;
 	UINT8 m_video_invert;
 	UINT16 m_pr_cont;
@@ -323,18 +323,18 @@ public:
 /*
 DRIVER_INIT_MEMBER( cat_state,cat )
 {
-	UINT8 *svrom = machine().root_device().memregion("svrom")->base();
-	int i;
-	// fill svrom with the correct 2e80 pattern except where svrom1 sits
-	// first half
-	for (i = 0; i < 0x20000; i+=2)
-		svrom[i] = 0x2E;
-	// second half
-	for (i = 0x20000; i < 0x40000; i+=2)
-	{
-		svrom[i] = 0x2E;
-		svrom[i+1] = 0x80;
-	}
+    UINT8 *svrom = machine().root_device().memregion("svrom")->base();
+    int i;
+    // fill svrom with the correct 2e80 pattern except where svrom1 sits
+    // first half
+    for (i = 0; i < 0x20000; i+=2)
+        svrom[i] = 0x2E;
+    // second half
+    for (i = 0x20000; i < 0x40000; i+=2)
+    {
+        svrom[i] = 0x2E;
+        svrom[i+1] = 0x80;
+    }
 }*/
 
 /* 0x600000-0x65ffff Write: Video Generator (AKA NH4-5001 AKA Gate Array #1 @ IC30)
@@ -607,7 +607,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 0   0   1   x   x   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   1       R   SVROM 1 ic8 (not present on cat as sold, open bus reads as 0x80) [controlled via GA2 /SVCS1] *SEE BELOW*
                                                                                                     *NOTE: on Dwight E's user-made developer unit, two 128K SRAMS are mapped in place of the two entries immediately above!* (this involves some creative wiring+sockets); the official IAI 'shadow ram board' maps the ram to the A00000-A3FFFF area instead)
 0   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       *BOTH GATE ARRAYS 1 and 2 DECODE THIS AREA; 2 DEALS WITH ADDR AND 1 WITH DATA/CAS/RAS*
-0   1   0   x   x   a   b   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW  VIDEO/SYSTEM DRAM (ab: 00=row 0, ic26-29; 01=row 1, ic22-25; 10=row 2; ic18-21; 11=row 3; ic14-17) 
+0   1   0   x   x   a   b   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *       RW  VIDEO/SYSTEM DRAM (ab: 00=row 0, ic26-29; 01=row 1, ic22-25; 10=row 2; ic18-21; 11=row 3; ic14-17)
                                                                                                     *NOTE: DRAM rows 2 and 3 above are only usually populated in cat developer units!*
 0   1   1   ?   ?   *   *   *   ?   ?   ?   ?   ?   ?   ?   *   *   *   *   *   *   *   *   x       W   VIDEO CONTRL REGISTERS (reads as 0x2e80)
 1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *   *   *   *   *       *GATE ARRAY 3 DECODES THIS AREA, GA3 IS ENABLED BY /IOCS1 FROM GA2*
@@ -626,7 +626,7 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 1   0   0   x   x   0   1   0   x   x   x   x   x   x   x   x   x   x   *   *   *   *   *   0       RW  {'modem'} Modem Chip AMI S35213 @ IC37 DATA BIT 7 ONLY [controlled via GA2 /SMCS]
 1   0   0   x   x   0   1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R   {'timer'} Read: Fixed 16-bit counter from ga2. increments every 6.5535ms when another 16-bit counter clocked at 10mhz overflows
 1   0   0   x   x   1   0   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       W   {'opr'} Output Port (Video/Sync enable and watchdog reset?) register (screen enable on bit 3?) (reads as 0x2e80)
-1   0   0   x   x   1   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R   {'wdt'} Watchdog timer reads as 0x0100 0x0101 or 0x0102, some sort of test register or video status register? 
+1   0   0   x   x   1   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R   {'wdt'} Watchdog timer reads as 0x0100 0x0101 or 0x0102, some sort of test register or video status register?
 1   0   0   x   x   1   1   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       R?W {'tcb'} test control bits: powerfail status in bit <?> (reads as 0x0000)
 1   0   0   x   x   1   1   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   *       ?   Unknown (reads as 0x2e80)
 
@@ -1010,12 +1010,12 @@ ROM_START( cat )
 	 * populated, as opposed to 256k-standard (2 rows) and 512k-max with all
 	 * 4 rows populated on a "released" cat.
 	 */
-	ROM_SYSTEM_BIOS( 0, "r240", "Canon Cat V2.40 US Firmware") 
+	ROM_SYSTEM_BIOS( 0, "r240", "Canon Cat V2.40 US Firmware")
 	ROMX_LOAD( "boultl0.ic2", 0x00001, 0x10000, CRC(77b66208) SHA1(9D718C0A521FEFE4F86EF328805B7921BADE9D89), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "boulth0.ic4", 0x00000, 0x10000, CRC(f1e1361a) SHA1(0A85385527E2CC55790DE9F9919EB44AC32D7F62), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "boultl1.ic3", 0x20001, 0x10000, CRC(c61dafb0) SHA1(93216c26c2d5fc71412acc548c96046a996ea668), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD( "boulth1.ic5", 0x20000, 0x10000, CRC(bed1f761) SHA1(D177E1D3A39B005DD94A6BDA186221D597129AF4), ROM_SKIP(1) | ROM_BIOS(1))
-	/* This 2.40 code was compiled by Dwight Elvey based on the v2.40 source 
+	/* This 2.40 code was compiled by Dwight Elvey based on the v2.40 source
 	 * code disks recovered around 2004. It does NOT exactly match the above
 	 * set exactly but has a few small differences.
 	 * It is as of yet unknown whether it is earlier or later code than the

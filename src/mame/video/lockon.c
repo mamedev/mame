@@ -300,7 +300,6 @@ TIMER_CALLBACK_MEMBER(lockon_state::bufend_callback)
 
 void lockon_state::ground_draw(  )
 {
-
 	/* ROM pointers */
 	const UINT8 *const gfx_rom  = memregion("gfx4")->base();
 	const UINT8 *const lut_rom  = gfx_rom + 0x30000 + ((m_ground_ctrl >> 2) & 0x3 ? 0x10000 : 0);

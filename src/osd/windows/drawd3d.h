@@ -72,8 +72,8 @@ public:
 	d3d_surface *last_target;
 	d3d_texture *last_texture;
 
-    int target_width;
-    int target_height;
+	int target_width;
+	int target_height;
 
 	int width;
 	int height;
@@ -83,8 +83,8 @@ public:
 	d3d_cache_target *next;
 	d3d_cache_target *prev;
 
-    d3d_surface *bloom_target[11];
-    d3d_texture *bloom_texture[11];
+	d3d_surface *bloom_target[11];
+	d3d_texture *bloom_texture[11];
 };
 
 /* d3d_render_target is the information about a Direct3D render target chain */
@@ -116,8 +116,8 @@ public:
 	d3d_render_target *next;
 	d3d_render_target *prev;
 
-    d3d_surface *bloom_target[11];
-    d3d_texture *bloom_texture[11];
+	d3d_surface *bloom_target[11];
+	d3d_texture *bloom_texture[11];
 };
 
 /* d3d_info is the information about Direct3D for the current screen */
@@ -143,7 +143,7 @@ struct d3d_info
 	d3d_poly_info           poly[VERTEX_BUFFER_SIZE/3]; // array to hold polygons as they are created
 	int                     numpolys;                   // number of accumulated polygons
 
-	bool					restarting;					// if we're restarting
+	bool                    restarting;                 // if we're restarting
 
 	d3d_texture_info *      texlist;                    // list of active textures
 	int                     dynamic_supported;          // are dynamic textures supported?

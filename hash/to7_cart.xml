@@ -14,7 +14,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="6809ass1" cloneof="6809ass2">
 		<description>6809 Assembler v1.0</description>
 		<year>1984</year>
@@ -26,7 +26,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="airbus">
 		<description>Airbus</description>
 		<year>1984</year>
@@ -38,7 +38,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="atomium">
 		<description>Atomium</description>
 		<year>1982</year>
@@ -50,7 +50,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="basic">
 		<description>BASIC v1.0</description>
 		<year>1982</year>
@@ -62,7 +62,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="blitz">
 		<description>Blitz</description>
 		<year>1984</year>
@@ -74,7 +74,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="caractr2">
 		<description>Caractor II</description>
 		<year>1984</year>
@@ -86,7 +86,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="caractor">
 		<description>Caractor</description>
 		<year>1983</year>
@@ -98,7 +98,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="choplift">
 		<description>Choplifter</description>
 		<year>1982</year>
@@ -110,7 +110,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="clrpaint">
 		<description>Colorpaint</description>
 		<year>1985</year>
@@ -122,7 +122,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="controle">
 		<description>Controle Aerien</description>
 		<year>1984</year>
@@ -134,7 +134,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="crypto">
 		<description>Crypto</description>
 		<year>1982</year>
@@ -158,7 +158,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gemini">
 		<description>Gemini</description>
 		<year>1982</year>
@@ -169,8 +169,8 @@
 				<rom name="gemini (1982)(vifi-nathan)(fr).m7" size="4096" crc="c20c1d82" sha1="92ee16ef7d14b241e8df390b0e6192810a8eda40" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="gerfiche">
 		<description>Gerez vos Fiches</description>
 		<year>1983</year>
@@ -181,8 +181,8 @@
 				<rom name="gerez vos fiches (1983)(answare)(fr).m7" size="8192" crc="e9dacb6b" sha1="a83ffd9e28387e57aaf5acf4e7294c045c1e4c7f" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="gerteque">
 		<description>Gerez Votre Bibliotheque-Discotheque-Videotheque</description>
 		<year>1983</year>
@@ -193,8 +193,8 @@
 				<rom name="gerez votre bibliotheque-discotheque-videotheque (1983)(answare)(fr).m7" size="8192" crc="cb6f0f85" sha1="56ce86e414a7debdadac4a416bad4c70d289be95" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="chiflett">
 		<description>Les Chiffres et les Lettres</description>
 		<year>198?</year>
@@ -206,7 +206,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="logicod">
 		<description>Logicod</description>
 		<year>1982</year>
@@ -218,7 +218,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="logo">
 		<description>LOGO v1.0</description>
 		<year>1984</year>
@@ -230,7 +230,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="melodia">
 		<description>Melodia</description>
 		<year>1982</year>
@@ -266,7 +266,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pictor">
 		<description>Pictor</description>
 		<year>1982</year>
@@ -278,7 +278,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="prolog">
 		<description>Prolog v1.0</description>
 		<year>1986</year>
@@ -290,7 +290,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="quest">
 		<description>Quest</description>
 		<year>1983</year>
@@ -302,7 +302,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="scriptor">
 		<description>Scriptor</description>
 		<year>1984</year>
@@ -314,7 +314,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="threshld">
 		<description>Threshold</description>
 		<year>1984</year>

@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(spbactn_state::get_fg_tile_info)
 	int tileno = m_fgvideoram[tile_index+0x2000];
 
 	int color = ((attr & 0x00f0)>>4);
-	
+
 	/* blending */
 	if (attr & 0x0008)
 		color += 0x00f0;

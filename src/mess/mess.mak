@@ -564,8 +564,8 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/3c503.o     \
 	$(MESS_FORMATS)/z80bin.o    \
 	$(MESS_MACHINE)/mb8795.o    \
-	$(MESS_MACHINE)/midiinport.o	\
-	$(MESS_MACHINE)/midioutport.o	\
+	$(MESS_MACHINE)/midiinport.o    \
+	$(MESS_MACHINE)/midioutport.o   \
 	$(MESS_MACHINE)/null_modem.o    \
 	$(MESS_MACHINE)/vcsctrl.o   \
 	$(MESS_MACHINE)/vcs_joy.o   \

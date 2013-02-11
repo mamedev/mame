@@ -15,9 +15,9 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define M6809_TAG		"u4"
-#define M6551_TAG		"u23"
-#define MOS6702_TAG		"u2"
+#define M6809_TAG       "u4"
+#define M6551_TAG       "u23"
+#define MOS6702_TAG     "u2"
 
 
 
@@ -92,7 +92,7 @@ machine_config_constructor superpet_device::device_mconfig_additions() const
 
 static INPUT_PORTS_START( superpet )
 	PORT_START("SW1")
-	
+
 	PORT_START("SW2")
 INPUT_PORTS_END
 
@@ -300,18 +300,18 @@ void superpet_device::pet_bd_w(address_space &space, offs_t offset, UINT8 data, 
 		if (BIT(m_bank, 7))
 		{
 			/*
-			
+
 			    bit     description
-			
+
 			    0       SW2 CPU (0=6809, 1=6502)
 			    1       SW1 RAM (0=read only, 1=read/write)
-			    2       
+			    2
 			    3       DIAG
-			    4       
-			    5       
-			    6       
-			    7       
-			
+			    4
+			    5
+			    6
+			    7
+
 			*/
 
 			m_system = data;
@@ -323,9 +323,9 @@ void superpet_device::pet_bd_w(address_space &space, offs_t offset, UINT8 data, 
 	case 0xeffc:
 	case 0xeffd:
 		/*
-		
+
 		    bit     description
-		
+
 		    0       A0
 		    1       A1
 		    2       A2
@@ -334,7 +334,7 @@ void superpet_device::pet_bd_w(address_space &space, offs_t offset, UINT8 data, 
 		    5       SEL B
 		    6       J1 pin 39
 		    7       BIT 7
-		
+
 		*/
 
 		m_bank = data;

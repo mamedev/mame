@@ -254,7 +254,7 @@ WRITE8_MEMBER( psxcd_device::write )
 	{
 		case 0:
 			//if(data & 2)
-			//	popmessage("cmdmode = %02x, contact MESSdev",data);
+			//  popmessage("cmdmode = %02x, contact MESSdev",data);
 
 			cmdmode=data&1;
 			if (cmdmode==0)
@@ -334,7 +334,7 @@ WRITE8_MEMBER( psxcd_device::write )
 		*/
 		case 3:
 			//if(data & 0x78)
-			//	popmessage("IRQ flag = %02x, contact MESSdev",data);
+			//  popmessage("IRQ flag = %02x, contact MESSdev",data);
 
 			if (data==0x07)
 			{
@@ -1682,7 +1682,7 @@ void psxcd_device::add_system_event(event *ev)
 
 	// ev->t is in maincpu clock cycles
 	UINT32 hz = m_sysclock / ev->t;
-//	printf("add_system_event: event type %d for %d hz (using timer %d)\n", ev->type, hz, tnum);
+//  printf("add_system_event: event type %d for %d hz (using timer %d)\n", ev->type, hz, tnum);
 	timer->adjust(attotime::from_hz(hz), tnum, attotime::never);
 
 	// back-reference the timer from the event

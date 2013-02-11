@@ -82,7 +82,7 @@ static void xml_configuration_save(running_machine &machine, int config_type, xm
 		// Create an xml node
 		xml_data_node *debugger_node;
 		debugger_node = xml_add_child(parentnode, "window", NULL);
-		if (debugger_node == NULL) 
+		if (debugger_node == NULL)
 			continue;
 
 		xml_set_attribute_int(debugger_node, "type", xmlConfigurations[i].m_type);
@@ -144,7 +144,7 @@ static void load_and_clear_main_window_config(std::vector<WindowQtConfig>& confi
 		if (configs[i].m_type == WindowQtConfig::WIN_TYPE_MAIN)
 		{
 			mainQtWindow->setGeometry(configs[i].m_position.x(), configs[i].m_position.y(),
-									  configs[i].m_size.x(), configs[i].m_size.y());
+										configs[i].m_size.x(), configs[i].m_size.y());
 			break;
 		}
 	}
@@ -168,8 +168,8 @@ static void setup_additional_startup_windows(running_machine& machine, std::vect
 			default: break;
 		}
 		foo->setGeometry(configs[i].m_position.x(), configs[i].m_position.y(),
-						 configs[i].m_size.x(), configs[i].m_size.y());
-		foo->show(); 
+							configs[i].m_size.x(), configs[i].m_size.y());
+		foo->show();
 	}
 }
 

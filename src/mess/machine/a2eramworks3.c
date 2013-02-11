@@ -3,7 +3,7 @@
     a2eramworks3.c
 
     Applied Engineering RamWorks III
- 
+
 
 *********************************************************************/
 
@@ -73,14 +73,14 @@ UINT8 *a2eaux_ramworks3_device::get_vram_ptr()
 
 /*
     These cards are split into 64k logical banks.
- 
+
     On a RW3:
     Banks 00-0F is the first MB
     Banks 10-17 are the next 512K
     Banks 30-37 are the next 512K
     Banks 50-57 are the next 512K
     Banks 70-77 are the next 512K
- 
+
     However, the software will recognize and correctly use a configuration in which
     all of banks 00-7F are populated for a total of 8 megabytes.  So that's what we do.
 */
@@ -92,4 +92,3 @@ void a2eaux_ramworks3_device::write_c07x(address_space &space, UINT8 offset, UIN
 		m_bank = 0x10000 * (data & 0x7f);
 	}
 }
-

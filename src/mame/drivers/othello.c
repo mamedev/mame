@@ -367,7 +367,7 @@ INPUT_PORTS_END
 static MC6845_INTERFACE( h46505_intf )
 {
 	"screen",   /* screen we are acting on */
-	false,		/* show border area */
+	false,      /* show border area */
 	TILE_WIDTH, /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	update_row, /* row update callback */

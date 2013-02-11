@@ -263,29 +263,29 @@ const device_type DIGITALKER = &device_creator<digitalker_device>;
 
 digitalker_device::digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, DIGITALKER, "Digitalker", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_rom(NULL),
-	  m_stream(NULL),
-	  m_data(0), 
-	  m_cs(0), 
-	  m_cms(0), 
-	  m_wr(0), 
-	  m_intr(0),
-	  m_bpos(0), 
-	  m_apos(0),
-	  m_mode(0), 
-	  m_cur_segment(0), 
-	  m_cur_repeat(0), 
-	  m_segments(0), 
-	  m_repeats(0),
-	  m_prev_pitch(0), 
-	  m_pitch(0), 
-	  m_pitch_pos(0),
-	  m_stop_after(0), 
-	  m_cur_dac(0), 
-	  m_cur_bits(0),
-	  m_zero_count(0),
-	  m_dac_index(0)
+		device_sound_interface(mconfig, *this),
+		m_rom(NULL),
+		m_stream(NULL),
+		m_data(0),
+		m_cs(0),
+		m_cms(0),
+		m_wr(0),
+		m_intr(0),
+		m_bpos(0),
+		m_apos(0),
+		m_mode(0),
+		m_cur_segment(0),
+		m_cur_repeat(0),
+		m_segments(0),
+		m_repeats(0),
+		m_prev_pitch(0),
+		m_pitch(0),
+		m_pitch_pos(0),
+		m_stop_after(0),
+		m_cur_dac(0),
+		m_cur_bits(0),
+		m_zero_count(0),
+		m_dac_index(0)
 {
 }
 
@@ -688,4 +688,3 @@ WRITE8_MEMBER( digitalker_device::digitalker_data_w )
 {
 	m_data = data;
 }
-

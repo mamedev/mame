@@ -21,7 +21,7 @@
 
 const device_type A2BUS_MIDI = &device_creator<a2bus_midi_device>;
 
-#define MIDI_PTM_TAG	 "midi_ptm"
+#define MIDI_PTM_TAG     "midi_ptm"
 #define MIDI_ACIA_TAG    "midi_acia"
 
 static struct ptm6840_interface ptm_interface =
@@ -34,13 +34,13 @@ static struct ptm6840_interface ptm_interface =
 
 static struct acia6850_interface acia_interface =
 {
-	31250*16,	// tx clock
-	0,  		// rx clock (we manually clock rx)
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_midi_device, rx_in),	// rx in
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_midi_device, tx_out),	// tx out
-	DEVCB_NULL,	// cts in
-	DEVCB_NULL,	// rts out
-	DEVCB_NULL,	// dcd in
+	31250*16,   // tx clock
+	0,          // rx clock (we manually clock rx)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_midi_device, rx_in),  // rx in
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_midi_device, tx_out), // tx out
+	DEVCB_NULL, // cts in
+	DEVCB_NULL, // rts out
+	DEVCB_NULL, // dcd in
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, a2bus_midi_device, acia_irq_w)
 };
 
@@ -59,7 +59,7 @@ SLOT_INTERFACE_END
 
 static const serial_port_interface midiout_intf =
 {
-	DEVCB_NULL	// midi out ports don't transmit inward
+	DEVCB_NULL  // midi out ports don't transmit inward
 };
 
 MACHINE_CONFIG_FRAGMENT( midi )
@@ -160,7 +160,7 @@ void a2bus_midi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 dat
 		// This works on h/w pretty much by accident; we'll make it right here.
 		if ((data & 0x1c) == 0x10)
 		{
-			data |= 0x04;	// change wordbits from 0x10 to 0x14
+			data |= 0x04;   // change wordbits from 0x10 to 0x14
 		}
 
 		m_acia->control_write(space, 0, data);
@@ -202,7 +202,7 @@ WRITE_LINE_MEMBER( a2bus_midi_device::ptm_irq_w )
 WRITE_LINE_MEMBER( a2bus_midi_device::midi_rx_w )
 {
 	m_rx_state = state;
-	for (int i = 0; i < 16; i++)	// divider is set to 16
+	for (int i = 0; i < 16; i++)    // divider is set to 16
 	{
 		m_acia->rx_clock_in();
 	}
@@ -217,4 +217,3 @@ WRITE_LINE_MEMBER( a2bus_midi_device::tx_out )
 {
 	m_mdout->tx(state);
 }
-

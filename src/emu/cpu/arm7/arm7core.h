@@ -93,7 +93,7 @@ enum
 };
 
 /* Coprocessor-related macros */
-#define COPRO_TLB_BASE          			arm->tlbBase
+#define COPRO_TLB_BASE                      arm->tlbBase
 #define COPRO_TLB_BASE_MASK                 0xffffc000
 #define COPRO_TLB_VADDR_FLTI_MASK           0xfff00000
 #define COPRO_TLB_VADDR_FLTI_MASK_SHIFT     18
@@ -117,7 +117,7 @@ enum
 #define COPRO_TLB_SECTION_TABLE             2
 #define COPRO_TLB_FINE_TABLE                3
 
-#define COPRO_CTRL            				arm->control
+#define COPRO_CTRL                          arm->control
 #define COPRO_CTRL_MMU_EN                   0x00000001
 #define COPRO_CTRL_ADDRFAULT_EN             0x00000002
 #define COPRO_CTRL_DCACHE_EN                0x00000004
@@ -143,12 +143,12 @@ enum
 
 #define COPRO_DOMAIN_ACCESS_CONTROL         arm->domainAccessControl
 
-#define COPRO_FAULT_STATUS_D        		arm->faultStatus[0]
-#define COPRO_FAULT_STATUS_P        		arm->faultStatus[1]
+#define COPRO_FAULT_STATUS_D                arm->faultStatus[0]
+#define COPRO_FAULT_STATUS_P                arm->faultStatus[1]
 
-#define COPRO_FAULT_ADDRESS         		arm->faultAddress
+#define COPRO_FAULT_ADDRESS                 arm->faultAddress
 
-#define COPRO_FCSE_PID          			arm->fcsePID
+#define COPRO_FCSE_PID                      arm->fcsePID
 
 /* Coprocessor Registers */
 #define ARM7COPRO_REGS \

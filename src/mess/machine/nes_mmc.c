@@ -562,7 +562,7 @@ void nes_carts_state::set_nt_mirroring(int mirroring)
 
 #ifdef _MSC_VER
 #pragma optimize("", off)
-#endif	
+#endif
 
 
 /*************************************************************

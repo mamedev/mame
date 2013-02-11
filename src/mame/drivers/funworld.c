@@ -817,8 +817,8 @@
   - Added a Jolly Card (Italian) set from an encrypted blue TAB
      bootleg board. This one allows to play in both 'remote' and
     'normal' mode. The game could pay through regular hopper, or
-	 through manual switch/button, discharging the credits one
-	 by one.
+     through manual switch/button, discharging the credits one
+     by one.
 
 
   *** TO DO ***
@@ -1317,29 +1317,29 @@ static INPUT_PORTS_START( jolycdic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW")	// place '10000000' for NVRAM creation.
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_START("DSW")   // place '10000000' for NVRAM creation.
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Remote Value" )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Remote Value" )      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, "10 Points/Pulse" )
 	PORT_DIPSETTING(    0x02, "100 Points/Pulse" )
-	PORT_DIPNAME( 0x04, 0x04, "Coinage B" )			PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x04, 0x04, "Coinage B" )         PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x04, "10 Credits" )
 	PORT_DIPSETTING(    0x00, "5 Credits" )
-	PORT_DIPNAME( 0x08, 0x08, "Coinage A" )			PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x08, 0x08, "Coinage A" )         PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, "20 Credits" )
 	PORT_DIPSETTING(    0x00, "1 Credit" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Joker" )				PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x20, 0x00, "Joker" )             PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x00, "With Joker" )    /* also enables Five of a Kind */
 	PORT_DIPSETTING(    0x20, "Without Joker" )
-	PORT_DIPNAME( 0x40, 0x00, "Auto Hold" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x40, 0x00, "Auto Hold" )         PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )   /* when is ON, allow the player to activate/deactivate the autohold through CANCEL button */
-	PORT_DIPNAME( 0x80, 0x00, "Payout" )			PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x80, 0x00, "Payout" )            PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Hopper" )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
@@ -2526,7 +2526,7 @@ static const ay8910_interface funquiz_ay8910_intf =
 static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
-	false,		/* show border area */
+	false,      /* show border area */
 	4,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -3015,15 +3015,15 @@ ROM_END
     Jolly Card (italian encrypted bootleg, set 2)
     ---------------------------------------------
 
-	This program works in both 'normal' and 'remote' modes,
+    This program works in both 'normal' and 'remote' modes,
     allowing to pay through hopper, or just through manual
-	switch/button.
+    switch/button.
 
     To initialize the NVRAM, DIP switches should be placed
-	at factory default: (On On On On On On On Off), then
-	keep pressed both service buttons (key 9 & 0), reset
-	using F3 key, and then finally releasing the service
-	buttons.
+    at factory default: (On On On On On On On Off), then
+    keep pressed both service buttons (key 9 & 0), reset
+    using F3 key, and then finally releasing the service
+    buttons.
 */
 
 ROM_START( jolycdic )   /* another bootleg PCB, encrypted graphics */

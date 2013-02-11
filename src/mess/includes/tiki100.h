@@ -54,7 +54,7 @@ public:
 			m_y9(*this, "Y9"),
 			m_y10(*this, "Y10"),
 			m_y11(*this, "Y11"),
-			m_y12(*this, "Y12")	
+			m_y12(*this, "Y12")
 	{ }
 
 	required_device<cpu_device> m_maincpu;

@@ -156,7 +156,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 			// turn on floppy motor
 			if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(0);
 			if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(0);
-			
+
 			m_motor = 1;
 
 			// reset floppy motor off NE555 timer

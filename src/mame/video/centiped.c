@@ -80,7 +80,6 @@ void centiped_state::init_penmask()
 
 void centiped_state::init_common()
 {
-
 	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_gfx_bank));
 	save_item(NAME(m_bullsdrt_sprites_bank));

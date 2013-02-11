@@ -1551,8 +1551,8 @@ static MC6845_INTERFACE( mc6845_intf )
 	that's why the big horizontal parameters */
 
 	"screen",   /* screen we are acting on */
-	false,		/* show border area */
-	4,			/* number of pixels per video memory address */
+	false,      /* show border area */
+	4,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
 	NULL,       /* after pixel update callback */

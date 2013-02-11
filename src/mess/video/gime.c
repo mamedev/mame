@@ -692,7 +692,7 @@ ATTR_FORCE_INLINE UINT8 gime_base_device::read_gime_register(offs_t offset)
 			}
 			break;
 
-		case 3: // read pending FIRQs 
+		case 3: // read pending FIRQs
 			result = m_firq;
 			if (result != 0x00)
 			{

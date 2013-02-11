@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!-- based on vic20tapes.org dumps -->
 <softwarelist name="vic1001_cass" description="Commodore VIC-1001 / VIC-20 cassettes">
-	
+
 	<software name="3dmaze">
 		<description>3D Maze</description>
 		<year>1984</year>

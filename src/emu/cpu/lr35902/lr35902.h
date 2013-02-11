@@ -5,15 +5,12 @@
 
 
 #define MCFG_LR35902_TIMER_CB(_devcb) \
-	lr35902_cpu_device::set_timer_cb(*device, DEVCB2_##_devcb); \
-
+	lr35902_cpu_device::set_timer_cb(*device, DEVCB2_##_devcb);
 #define MCFG_LR35902_HALT_BUG \
-	lr35902_cpu_device::set_halt_bug(*device); \
-
+	lr35902_cpu_device::set_halt_bug(*device);
 // This should be removed/improved once all gameboy boot roms have been dumped
 #define MCFG_LR35902_RESET_VALUES(_regs) \
-	lr35902_cpu_device::set_reset_values(*device, _regs); \
-
+	lr35902_cpu_device::set_reset_values(*device, _regs);
 
 enum
 {

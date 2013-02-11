@@ -1057,7 +1057,7 @@ MACHINE_RESET_MEMBER(megaduck_state,megaduck)
 {
 	/* We may have to add some more stuff here, if not then it can be merged back into gb */
 	gb_init();
-	
+
 	m_bios_disable = TRUE;
 
 	gb_video_reset( GB_VIDEO_DMG );
@@ -1168,4 +1168,3 @@ READ8_MEMBER(megaduck_state::megaduck_sound_r2)
 {
 	return gb_sound_r(machine().device("custom"), space, 0x10 + megaduck_sound_offsets[offset]);
 }
-

@@ -435,7 +435,7 @@ static const pia6821_interface pia0_intf =
 static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
-	false,		/* show border area */
+	false,      /* show border area */
 	4,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

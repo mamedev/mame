@@ -162,7 +162,7 @@ Undumped Pirates:
 			<dataarea name="rom" size="524288">
 				<rom name="3-d ultra pinball - thrillride (usa).bin" size="524288" crc="1766e558" sha1="2b704415803cf6172a1d07912b1155c51576a511" offset="000000" />
 			</dataarea>
- 			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -11870,7 +11870,7 @@ Undumped Pirates:
 			<dataarea name="rom" size="4194304">
 				<rom name="love hina pocket (japan).bin" size="4194304" crc="1c877abd" sha1="912c09f99bdae6e7fcd62d0c6f727e5fff93db70" offset="000000" />
 			</dataarea>
- 			<dataarea name="nvram" size="8192">
+			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -18682,7 +18682,7 @@ Undumped Pirates:
 			<dataarea name="rom" size="131072">
 				<rom name="roadsters '98 (usa) (proto).bin" size="131072" crc="fe2995a1" sha1="30a28cd5e020e98b0e7016b5ccda5bc0972a0ac9" offset="000000" />
 			</dataarea>
-			<dataarea name="nvram" size="8192">	<!-- Unconfirmed size -->
+			<dataarea name="nvram" size="8192"> <!-- Unconfirmed size -->
 			</dataarea>
 		</part>
 	</software>
@@ -25007,7 +25007,7 @@ Undumped Pirates:
 			<dataarea name="rom" size="1048576">
 				<rom name="harry potter (unl).bin" size="1048576" crc="5bebe333" sha1="dfd0693315da697240b510776695162880a75a82" offset="000000" />
 			</dataarea>
-			<dataarea name="nvram" size="8192">	<!-- Unconfirmed size -->
+			<dataarea name="nvram" size="8192"> <!-- Unconfirmed size -->
 			</dataarea>
 		</part>
 	</software>
@@ -25872,7 +25872,7 @@ Undumped Pirates:
 			<dataarea name="rom" size="4194304">
 				<rom name="shu ma bao long 9 - bao long pian 2002 (unlicensed, chinese) [raw dump].bin" size="4194304" crc="76ab97f6" sha1="c3d9e17c9b01959b64a7c662479c755f757f58c9" offset="000000" />
 			</dataarea>
-			<dataarea name="nvram" size="8192">	<!-- Unconfirmed size -->
+			<dataarea name="nvram" size="8192"> <!-- Unconfirmed size -->
 			</dataarea>
 		</part>
 	</software>
@@ -26091,7 +26091,7 @@ Undumped Pirates:
 			<dataarea name="rom" size="1048576">
 				<rom name="mark of the wolves (chi).bin" size="1048576" crc="219decf9" sha1="27cffc9c0224a7bb2e0751073a27670017211c87" offset="000000" />
 			</dataarea>
-			<dataarea name="nvram" size="8192">	<!-- Unconfirmed size -->
+			<dataarea name="nvram" size="8192"> <!-- Unconfirmed size -->
 			</dataarea>
 		</part>
 	</software>
@@ -26125,7 +26125,7 @@ Undumped Pirates:
 			<dataarea name="rom" size="1048576">
 				<rom name="e fighter hot (chi).bin" size="1048576" crc="8fa2539d" sha1="93a3716f8f41b89bee795af6e8f6fdddfcd8acf1" offset="000000" />
 			</dataarea>
-			<dataarea name="nvram" size="8192">	<!-- Unconfirmed size -->
+			<dataarea name="nvram" size="8192"> <!-- Unconfirmed size -->
 			</dataarea>
 		</part>
 	</software>
@@ -26161,7 +26161,7 @@ Undumped Pirates:
 			<dataarea name="rom" size="1048576">
 				<rom name="harry potter 3 (chi).bin" size="1048576" crc="4ea2c869" sha1="739c0e5dc0efd4ddb912236a6f630c3d6987d064" offset="000000" />
 			</dataarea>
-			<dataarea name="nvram" size="8192">	<!-- Unconfirmed size -->
+			<dataarea name="nvram" size="8192"> <!-- Unconfirmed size -->
 			</dataarea>
 		</part>
 	</software>

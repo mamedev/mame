@@ -157,7 +157,7 @@ public:
 	UINT8       *m_GBC_RAMMap[8];           /* (CGB) Addresses of internal RAM banks */
 	UINT8       m_GBC_RAMBank;          /* (CGB) Current CGB RAM bank */
 
-	
+
 	gb_lcd_t m_lcd;
 	void (gb_state::*update_scanline) ();
 	bool m_bios_disable;
@@ -240,7 +240,7 @@ public:
 	, m_maincpu(*this, "maincpu")
 	, m_inputs(*this, "INPUTS")
 	{ }
-	
+
 	DECLARE_READ8_MEMBER(megaduck_video_r);
 	DECLARE_WRITE8_MEMBER(megaduck_video_w);
 	DECLARE_WRITE8_MEMBER(megaduck_sound_w1);
@@ -250,12 +250,12 @@ public:
 	DECLARE_MACHINE_START(megaduck);
 	DECLARE_MACHINE_RESET(megaduck);
 	DECLARE_PALETTE_INIT(megaduck);
-	
+
 	DECLARE_READ8_MEMBER(cart_r);
 	DECLARE_WRITE8_MEMBER(bank1_w);
 	DECLARE_WRITE8_MEMBER(bank2_w);
 	optional_device<megaduck_cart_slot_device> m_cartslot;
-	
+
 protected:
 	required_device<lr35902_cpu_device> m_maincpu;
 	required_ioport m_inputs;

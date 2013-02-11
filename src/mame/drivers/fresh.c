@@ -37,7 +37,7 @@ public:
 		m_attr_2_videoram(*this, "attr_videoram_2"),
 		m_paletteram_1(*this, "paletteram_1"),
 		m_paletteram_2(*this, "paletteram_2")
-	
+
 	{ }
 
 	tilemap_t *m_bg_tilemap;
@@ -79,11 +79,11 @@ public:
 	DECLARE_WRITE16_MEMBER( c75000_write )
 	{
 		logerror("c75000_write (scroll 2) %04x (m_d30000_value = %04x)\n", data, m_d30000_value);
-	}	
+	}
 	DECLARE_WRITE16_MEMBER( c76000_write )
 	{
 		logerror("c76000_write (scroll 3) %04x (m_d30000_value = %04x)\n", data, m_d30000_value);
-	}	
+	}
 	void update_palette(int offset);
 
 	DECLARE_READ16_MEMBER( unk_r )
@@ -195,29 +195,29 @@ static ADDRESS_MAP_START( fresh_map, AS_PROGRAM, 16, fresh_state )
 	AM_RANGE(0xC20000, 0xC2ffff) AM_RAM_WRITE( fresh_bg_videoram_w ) AM_SHARE( "bg_videoram" )
 	AM_RANGE(0xC30000, 0xC3ffff) AM_RAM_WRITE( fresh_attr_videoram_w ) AM_SHARE( "attr_videoram" )
 
-//	AM_RANGE(0xC70000, 0xC70001) AM_RAM
-//	AM_RANGE(0xC70002, 0xC70003) AM_RAM
+//  AM_RANGE(0xC70000, 0xC70001) AM_RAM
+//  AM_RANGE(0xC70002, 0xC70003) AM_RAM
 	AM_RANGE(0xC71000, 0xC71001) AM_WRITE(c71000_write)
-//	AM_RANGE(0xC72000, 0xC72001) AM_RAM
-//	AM_RANGE(0xC72002, 0xC72003) AM_RAM
-//	AM_RANGE(0xC73000, 0xC73001) AM_RAM
-//	AM_RANGE(0xC73002, 0xC73003) AM_RAM
+//  AM_RANGE(0xC72000, 0xC72001) AM_RAM
+//  AM_RANGE(0xC72002, 0xC72003) AM_RAM
+//  AM_RANGE(0xC73000, 0xC73001) AM_RAM
+//  AM_RANGE(0xC73002, 0xC73003) AM_RAM
 	AM_RANGE(0xC74000, 0xC74001) AM_WRITE(c74000_write)
 	AM_RANGE(0xC75000, 0xC75001) AM_WRITE(c75000_write)
 	AM_RANGE(0xC76000, 0xC76001) AM_WRITE(c76000_write)
-//	AM_RANGE(0xC77000, 0xC77001) AM_RAM
-//	AM_RANGE(0xC77002, 0xC77003) AM_RAM
-	
+//  AM_RANGE(0xC77000, 0xC77001) AM_RAM
+//  AM_RANGE(0xC77002, 0xC77003) AM_RAM
+
 
 	// written together
 	AM_RANGE(0xC40000, 0xC417ff) AM_RAM_WRITE(fresh_paletteram_1_w) AM_SHARE( "paletteram_1" ) // 16-bit
 	AM_RANGE(0xC50000, 0xC517ff) AM_RAM_WRITE(fresh_paletteram_2_w) AM_SHARE( "paletteram_2" ) // 8-bit
 
-//	AM_RANGE(0xD00000, 0xD00001) AM_RAM
-//	AM_RANGE(0xD10000, 0xD10001) AM_RAM
+//  AM_RANGE(0xD00000, 0xD00001) AM_RAM
+//  AM_RANGE(0xD10000, 0xD10001) AM_RAM
 	AM_RANGE(0xD30000, 0xD30001) AM_WRITE(d30000_write)
 	AM_RANGE(0xD40000, 0xD40001) AM_READ_PORT("IN0") //AM_WRITENOP // checks for 0x10
-//	AM_RANGE(0xD40002, 0xD40003) AM_WRITENOP
+//  AM_RANGE(0xD40002, 0xD40003) AM_WRITENOP
 	AM_RANGE(0xD70000, 0xD70001) AM_READ_PORT("IN1") // checks for 0x10, dead loop if fail
 
 	AM_RANGE(0xE00000, 0xE00001) AM_READ_PORT("DSW0") //AM_WRITENOP
@@ -336,7 +336,7 @@ static INPUT_PORTS_START( fresh )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
-	PORT_START("DSW0") 
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x0001, 0x0000, "DSW-0:0" ) // SWITCH 1 in test mode
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
@@ -593,14 +593,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(fresh_state::fake_scanline)
 
 	}
 
-//	if(scanline == 32)
-//		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+//  if(scanline == 32)
+//      machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
 
 	if(scanline == 64)
 		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 
-//	if(scanline == 96)
-//		machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
+//  if(scanline == 96)
+//      machine().device("maincpu")->execute().set_input_line(5, HOLD_LINE);
 
 
 	if(scanline == 200) // vbl?
@@ -646,5 +646,5 @@ ROM_END
 
 
 
-// title shows Fruit Fresh but on resetting you get text strings of 'Dream World V2.41SI 97. 1.28' 
+// title shows Fruit Fresh but on resetting you get text strings of 'Dream World V2.41SI 97. 1.28'
 GAME( 1996, fresh, 0, fresh, fresh, driver_device, 0, ROT0, "Chain Leisure", "Fruit Fresh (Italy)", GAME_NOT_WORKING|GAME_NO_SOUND )

@@ -4,12 +4,10 @@
 #define __SM8500_H__
 
 #define MCFG_SM8500_DMA_CB(_devcb) \
-	sm8500_cpu_device::set_dma_cb(*device, DEVCB2_##_devcb); \
-
+	sm8500_cpu_device::set_dma_cb(*device, DEVCB2_##_devcb);
 
 #define MCFG_SM8500_TIMER_CB(_devcb) \
-	sm8500_cpu_device::set_timer_cb(*device, DEVCB2_##_devcb); \
-
+	sm8500_cpu_device::set_timer_cb(*device, DEVCB2_##_devcb);
 
 enum
 {

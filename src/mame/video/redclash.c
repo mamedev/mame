@@ -286,7 +286,7 @@ void ladybug_state::redclash_draw_bullets( bitmap_ind16 &bitmap, const rectangle
 
 /* This line can reset the LFSR to zero and disables the star generator */
 void ladybug_state::redclash_set_stars_enable(UINT8 on)
-{   
+{
 	if ((m_stars_enable == 0) && (on == 1))
 	{
 		m_stars_offset = 0;

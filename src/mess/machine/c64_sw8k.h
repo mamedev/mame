@@ -45,7 +45,7 @@ protected:
 
 private:
 	required_ioport m_sw;
-	
+
 	int m_bank;
 };
 

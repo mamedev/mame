@@ -12,8 +12,8 @@
 
 static const int RX_EVENT_BUF_SIZE = 512;
 
-#define MIDI_SYSEX	0xf0
-#define MIDI_EOX	0xf7
+#define MIDI_SYSEX  0xf0
+#define MIDI_EOX    0xf7
 
 struct osd_midi_device
 {
@@ -196,13 +196,13 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 
 		if (dev->rx_sysex)
 		{
-			if (status & 0x80)	// sys real-time imposing on us?
+			if (status & 0x80)  // sys real-time imposing on us?
 			{
 				if ((status == 0xf2) || (status == 0xf3))
 				{
 					*pOut++ = status;
-					*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message); 
-					*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message); 
+					*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message);
+					*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message);
 					bytesOut += 3;
 				}
 				else
@@ -211,7 +211,7 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 					bytesOut++;
 				}
 			}
-			else	// shift out the sysex bytes
+			else    // shift out the sysex bytes
 			{
 				for (int i = 0; i < 4; i++)
 				{
@@ -231,18 +231,18 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 		{
 			switch ((status>>4) & 0xf)
 			{
-				case 0xc:	// 2-byte messages
+				case 0xc:   // 2-byte messages
 				case 0xd:
 					*pOut++ = status;
-					*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message); 
+					*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message);
 					bytesOut += 2;
 					break;
 
-				case 0xf:	// system common
+				case 0xf:   // system common
 					switch (status & 0xf)
 					{
-						case 0:	// System Exclusive
-							*pOut++ = status;	// this should be OK: the shortest legal sysex is F0 tt dd F7, I believe
+						case 0: // System Exclusive
+							*pOut++ = status;   // this should be OK: the shortest legal sysex is F0 tt dd F7, I believe
 							*pOut++ = (dev->rx_evBuf[msg].message>>8) & 0xff;
 							*pOut++ = (dev->rx_evBuf[msg].message>>16) & 0xff;
 							*pOut++ = (dev->rx_evBuf[msg].message>>24) & 0xff;
@@ -250,28 +250,28 @@ int osd_read_midi_channel(osd_midi_device *dev, UINT8 *pOut)
 							dev->rx_sysex = true;
 							break;
 
-						case 7:	// End of System Exclusive
+						case 7: // End of System Exclusive
 							*pOut++ = status;
 							bytesOut += 1;
 							break;
 
-						case 2:	// song pos
-						case 3:	// song select
+						case 2: // song pos
+						case 3: // song select
 							*pOut++ = status;
-							*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message); 
-							*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message); 
+							*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message);
+							*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message);
 							bytesOut += 3;
 							break;
 
-						default:	// all other defined Fx messages are 1 byte
+						default:    // all other defined Fx messages are 1 byte
 							break;
 					}
 					break;
 
 				default:
 					*pOut++ = status;
-					*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message); 
-					*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message); 
+					*pOut++ = Pm_MessageData1(dev->rx_evBuf[msg].message);
+					*pOut++ = Pm_MessageData2(dev->rx_evBuf[msg].message);
 					bytesOut += 3;
 					break;
 			}
@@ -289,17 +289,17 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 	#ifndef DISABLE_MIDI
 	int bytes_needed = 0;
 	PmEvent ev;
-	ev.timestamp = 0;	// use the current time
+	ev.timestamp = 0;   // use the current time
 
 	// handle sysex
 	if (dev->last_status == MIDI_SYSEX)
 	{
-//		printf("sysex: %02x (%d)\n", data, dev->xmit_cnt);
+//      printf("sysex: %02x (%d)\n", data, dev->xmit_cnt);
 
 		// if we get a status that isn't sysex, assume it's system common
 		if ((data & 0x80) && (data != MIDI_EOX))
 		{
-//			printf("common during sysex!\n");
+//          printf("common during sysex!\n");
 			ev.message = Pm_Message(data, 0, 0);
 			Pm_Write(dev->pmStream, &ev, 1);
 			return;
@@ -315,7 +315,7 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 			dev->xmit_in[0] = dev->xmit_in[1] = dev->xmit_in[2] = dev->xmit_in[3] = 0;
 			dev->xmit_cnt = 0;
 
-//			printf("SysEx packet: %08x\n", ev.message);
+//          printf("SysEx packet: %08x\n", ev.message);
 
 			// if this is EOX, kill the running status
 			if (data == MIDI_EOX)
@@ -345,7 +345,7 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 
 	if ((dev->xmit_cnt == 1) && (dev->xmit_in[0] == MIDI_SYSEX))
 	{
-//		printf("Start SysEx!\n");
+//      printf("Start SysEx!\n");
 		dev->last_status = MIDI_SYSEX;
 		return;
 	}
@@ -353,27 +353,27 @@ void osd_write_midi_channel(osd_midi_device *dev, UINT8 data)
 	// are we there yet?
 	switch ((dev->xmit_in[0]>>4) & 0xf)
 	{
-		case 0xc:	// 2-byte messages
+		case 0xc:   // 2-byte messages
 		case 0xd:
 			bytes_needed = 2;
 			break;
 
-		case 0xf:	// system common
+		case 0xf:   // system common
 			switch (dev->xmit_in[0] & 0xf)
 			{
-				case 0:	// System Exclusive is handled above
+				case 0: // System Exclusive is handled above
 					break;
 
-				case 7:	// End of System Exclusive
+				case 7: // End of System Exclusive
 					bytes_needed = 1;
 					break;
 
-				case 2:	// song pos
-				case 3:	// song select
+				case 2: // song pos
+				case 3: // song select
 					bytes_needed = 3;
 					break;
 
-				default:	// all other defined Fx messages are 1 byte
+				default:    // all other defined Fx messages are 1 byte
 					bytes_needed = 1;
 					break;
 			}

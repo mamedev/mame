@@ -306,7 +306,7 @@ UINT8 megadrive_io_read_data_port_3button(running_machine &machine, int portnum)
 {
 	UINT8 retdata, helper = (megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from megadrive_io_data_regs
 	static const char *const pad3names[] = { "PAD1", "PAD2", "IN0", "UNK" };
-	
+
 	if (megadrive_io_data_regs[portnum] & 0x40)
 	{
 		/* here we read B, C & the directional buttons */

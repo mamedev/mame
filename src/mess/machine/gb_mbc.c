@@ -1,8 +1,8 @@
 /***********************************************************************************************************
- 
+
  Game Boy carts with MBC (Memory Bank Controller)
- 
- 
+
+
  TODO: add proper RTC and Rumble support
 
  ***********************************************************************************************************/
@@ -94,7 +94,7 @@ void gb_rom_mbc1_device::device_start()
 {
 	has_timer = FALSE;
 	has_rumble = FALSE;
-	
+
 	m_latch_bank = 0;
 	m_latch_bank2 = 1;
 	m_ram_bank = 0;
@@ -111,7 +111,7 @@ void gb_rom_mbc1k_device::device_start()
 {
 	has_timer = FALSE;
 	has_rumble = FALSE;
-	
+
 	m_latch_bank = 0;
 	m_latch_bank2 = 1;
 	m_ram_bank = 0;
@@ -128,7 +128,7 @@ void gb_rom_mbc2_device::device_start()
 {
 	has_timer = FALSE;
 	has_rumble = FALSE;
-	
+
 	m_latch_bank = 0;
 	m_latch_bank2 = 1;
 	m_ram_bank = 0;
@@ -164,7 +164,7 @@ void gb_rom_mbc5_device::device_start()
 {
 	has_timer = FALSE;
 	has_rumble = FALSE;
-	
+
 	m_latch_bank = 0;
 	m_latch_bank2 = 1;
 	m_ram_bank = 0;
@@ -181,14 +181,14 @@ void gb_rom_mbc6_device::device_start()
 {
 	has_timer = FALSE;
 	has_rumble = FALSE;
-	
-	m_bank_4000 = 2;	// correct default?
-	m_bank_6000 = 3;	// correct default?
-	m_latch1 = 0;	// correct default?
-	m_latch2 = 0;	// correct default?
 
-	m_latch_bank = 2;	// correct default?
-	m_latch_bank2 = 3;	// correct default?
+	m_bank_4000 = 2;    // correct default?
+	m_bank_6000 = 3;    // correct default?
+	m_latch1 = 0;   // correct default?
+	m_latch2 = 0;   // correct default?
+
+	m_latch_bank = 2;   // correct default?
+	m_latch_bank2 = 3;  // correct default?
 	m_ram_bank = 0;
 	m_ram_enable = 0;
 	m_mode = 0;
@@ -208,7 +208,7 @@ void gb_rom_mbc7_device::device_start()
 {
 	has_timer = FALSE;
 	has_rumble = TRUE;
-	
+
 	m_latch_bank = 0;
 	m_latch_bank2 = 1;
 	m_ram_bank = 0;
@@ -223,7 +223,7 @@ void gb_rom_mmm01_device::device_start()
 {
 	has_timer = FALSE;
 	has_rumble = TRUE;
-	
+
 	m_latch_bank = 0x200 - 2;
 	m_latch_bank2 = 0x200 - 1;
 	m_ram_bank = 0;
@@ -285,7 +285,7 @@ WRITE8_MEMBER(gb_rom_mbc1_device::write_bank)
 		// bank = 0 => bank = 1
 		if (data == 0)
 			data = 1;
-		
+
 		m_latch_bank2 = (m_latch_bank2 & 0x01e0) | data;
 	}
 	else if (offset < 0x6000)
@@ -340,7 +340,7 @@ WRITE8_MEMBER(gb_rom_mbc1k_device::write_bank)
 		// bank = 0 => bank = 1
 		if (data == 0)
 			data = 1;
-		
+
 		m_latch_bank2 = (m_latch_bank2 & 0x01f0) | data;
 	}
 	else if (offset < 0x6000)
@@ -390,13 +390,13 @@ WRITE8_MEMBER(gb_rom_mbc2_device::write_bank)
 	if (offset < 0x2000)
 		m_ram_enable = ((data & 0x0f) == 0x0a) ? 1 : 0;
 	else if (offset < 0x4000)
-	{		
+	{
 		// 4bits only
 		data &= 0x0f;
 		// bank = 0 => bank = 1
 		if (data == 0)
 			data = 1;
-		
+
 		// The least significant bit of the upper address byte must be 1
 		if (offset & 0x0100)
 			m_latch_bank2 = (m_latch_bank2 & 0x100) | data;
@@ -440,7 +440,7 @@ WRITE8_MEMBER(gb_rom_mbc3_device::write_bank)
 		/* Selecting bank 0 == selecting bank 1 */
 		if (data == 0)
 			data = 1;
-		
+
 		m_latch_bank2 = data;
 	}
 	else if (offset < 0x6000)
@@ -464,14 +464,14 @@ WRITE8_MEMBER(gb_rom_mbc3_device::write_bank)
 READ8_MEMBER(gb_rom_mbc3_device::read_ram)
 {
 	if (m_ram_bank < 4 && m_ram_enable)
-	{	// RAM
+	{   // RAM
 		if (m_ram)
-			return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];		
+			return m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)];
 	}
 	if (m_ram_bank >= 0x8 && m_ram_bank <= 0xc)
-	{	// RAM
+	{   // RAM
 		if (has_timer)
-			return m_rtc_map[m_ram_bank - 8];		
+			return m_rtc_map[m_ram_bank - 8];
 	}
 	return 0xff;
 }
@@ -479,12 +479,12 @@ READ8_MEMBER(gb_rom_mbc3_device::read_ram)
 WRITE8_MEMBER(gb_rom_mbc3_device::write_ram)
 {
 	if (m_ram_bank < 4 && m_ram_enable)
-	{	// RAM
+	{   // RAM
 		if (m_ram)
 			m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 	}
 	if (m_ram_bank >= 0x8 && m_ram_bank <= 0xc)
-	{	// RAM
+	{   // RAM
 		if (has_timer)
 		{
 		// what to do here?
@@ -689,4 +689,3 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 		}
 	}
 }
-

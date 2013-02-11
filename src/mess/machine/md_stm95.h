@@ -26,11 +26,11 @@ enum STMSTATE
 class stm95_eeprom_device
 {
 public:
-	stm95_eeprom_device() : 
-	stm_state(IDLE), 
-	stream_pos(0) 
+	stm95_eeprom_device() :
+	stm_state(IDLE),
+	stream_pos(0)
 	{};
-	
+
 	UINT8   *eeprom_data;
 	void    set_cs_line(int);
 	void    set_halt_line(int state) {}; // not implemented
@@ -43,7 +43,7 @@ protected:
 	int     reset_line;
 	int     sck_line;
 	int     WEL;
-	
+
 	STMSTATE    stm_state;
 	int     stream_pos;
 	int     stream_data;
@@ -54,17 +54,17 @@ protected:
 // ======================> md_eeprom_stm95_device
 
 class md_eeprom_stm95_device : public device_t,
-					  public device_md_cart_interface
+						public device_md_cart_interface
 {
 public:
 	// construction/destruction
 	md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	md_eeprom_stm95_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "md_eeprom_stm95"; }
-		
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_READ16_MEMBER(read_a13);

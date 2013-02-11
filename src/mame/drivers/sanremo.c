@@ -89,11 +89,11 @@
 *******************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_18MHz
+#define MASTER_CLOCK    XTAL_18MHz
 
-#define CPU_CLOCK		MASTER_CLOCK/3
-#define SND_CLOCK		MASTER_CLOCK/12
-#define CRTC_CLOCK		MASTER_CLOCK/12
+#define CPU_CLOCK       MASTER_CLOCK/3
+#define SND_CLOCK       MASTER_CLOCK/12
+#define CRTC_CLOCK      MASTER_CLOCK/12
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -187,13 +187,13 @@ WRITE8_MEMBER(sanremo_state::lamps_w)
     -x-- ----  BET
     x--- ----  (always on)
 */
-	output_set_lamp_value(0, (data >> 0) & 1);	/* DISCARD 1 */
-	output_set_lamp_value(1, (data >> 1) & 1);	/* DISCARD 2 */
-	output_set_lamp_value(2, (data >> 2) & 1);	/* DISCARD 3 */
-	output_set_lamp_value(3, (data >> 3) & 1);	/* DISCARD 4 */
-	output_set_lamp_value(4, (data >> 4) & 1);	/* DISCARD 5 */
-	output_set_lamp_value(5, (data >> 5) & 1);	/* START */
-	output_set_lamp_value(6, (data >> 6) & 1);	/* BET */
+	output_set_lamp_value(0, (data >> 0) & 1);  /* DISCARD 1 */
+	output_set_lamp_value(1, (data >> 1) & 1);  /* DISCARD 2 */
+	output_set_lamp_value(2, (data >> 2) & 1);  /* DISCARD 3 */
+	output_set_lamp_value(3, (data >> 3) & 1);  /* DISCARD 4 */
+	output_set_lamp_value(4, (data >> 4) & 1);  /* DISCARD 5 */
+	output_set_lamp_value(5, (data >> 5) & 1);  /* START */
+	output_set_lamp_value(6, (data >> 6) & 1);  /* BET */
 }
 
 WRITE8_MEMBER(sanremo_state::banksel_w)
@@ -214,8 +214,8 @@ WRITE8_MEMBER(sanremo_state::banksel_w)
 
 static ADDRESS_MAP_START( sanremo_map, AS_PROGRAM, 8, sanremo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(sanremo_videoram_w) AM_SHARE("videoram")	// 2x 76C28 (1x accessed directly, latched bank written to other like subsino etc.)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")								// battery backed UM6116
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(sanremo_videoram_w) AM_SHARE("videoram")  // 2x 76C28 (1x accessed directly, latched bank written to other like subsino etc.)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("nvram")                               // battery backed UM6116
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sanremo_portmap, AS_IO, 8, sanremo_state )
@@ -255,49 +255,49 @@ ADDRESS_MAP_END
 *********************************************/
 
 static INPUT_PORTS_START( number1 )
-	PORT_START("IN0")	// from I/O port 01h.
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("IN1-1") PORT_CODE(KEYCODE_A) 
+	PORT_START("IN0")   // from I/O port 01h.
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )      PORT_NAME("IN1-1") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("IN1-4") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("IN1-5") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("IN1-6") PORT_CODE(KEYCODE_F) 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER )      PORT_NAME("IN1-4") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )      PORT_NAME("IN1-5") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )      PORT_NAME("IN1-6") PORT_CODE(KEYCODE_F)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("IN1-8") PORT_CODE(KEYCODE_G) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER )      PORT_NAME("IN1-8") PORT_CODE(KEYCODE_G)
 
-	PORT_START("IN1")	// from I/O port 02h.
+	PORT_START("IN1")   // from I/O port 02h.
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )      PORT_NAME("Start")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME("Discard 2 / Basso (Low) / Left Card")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) PORT_NAME("Discard 4 / Alto (High) / Right Card")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("IN0-5")     PORT_CODE(KEYCODE_H) 
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )       PORT_NAME("IN0-5")     PORT_CODE(KEYCODE_H)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME("Discard 3")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD5 ) PORT_NAME("Discard 5")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME("Discard 1")
 
-	PORT_START("DSW")	// from AY-8910 por A.
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:1")
+	PORT_START("DSW")   // from AY-8910 por A.
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:2")
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:3")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:4")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Auto Hold" )			PORT_DIPLOCATION("DSW:5")
+	PORT_DIPNAME( 0x10, 0x00, "Auto Hold" )         PORT_DIPLOCATION("DSW:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:6")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Test Mode" )			PORT_DIPLOCATION("DSW:7")
+	PORT_DIPNAME( 0x40, 0x00, "Test Mode" )         PORT_DIPLOCATION("DSW:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:8")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -344,7 +344,7 @@ static const mc6845_interface mc6845_intf =
 */
 {
 	"screen",   /* screen we are acting on */
-	false,		/* show border area */
+	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -413,21 +413,21 @@ MACHINE_CONFIG_END
 
 ROM_START( number1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "no_g0.ic26",	0x0000, 0x8000, CRC(2d83646f) SHA1(d1fafcce44ed3ec3dd53d84338c42244ebfca820) )
+	ROM_LOAD( "no_g0.ic26", 0x0000, 0x8000, CRC(2d83646f) SHA1(d1fafcce44ed3ec3dd53d84338c42244ebfca820) )
 
 	ROM_REGION( 0x40000, "gfx", 0 )
-	ROM_LOAD( "no_i4.ic30",	0x00000, 0x10000, CRC(55b351a4) SHA1(b0c8a30dde076520234281da051f21f1b7cb3166) )	// I
-	ROM_LOAD( "no_b4.ic27",	0x10000, 0x10000, CRC(e48b1c8a) SHA1(88f60268fd43c06e146d936a1bdc078c44e2a213) )	// B
-	ROM_LOAD( "no_g4.ic28",	0x20000, 0x10000, CRC(4eea9a9b) SHA1(c86c083ccf08c3c310028920f9a0fe809fd7ccbe) )	// G
-	ROM_LOAD( "no_r4.ic29",	0x30000, 0x10000, CRC(ab08cdaf) SHA1(e0518403039b6bada79ffe4c6bc22fbb64d16e43) )	// R
+	ROM_LOAD( "no_i4.ic30", 0x00000, 0x10000, CRC(55b351a4) SHA1(b0c8a30dde076520234281da051f21f1b7cb3166) )    // I
+	ROM_LOAD( "no_b4.ic27", 0x10000, 0x10000, CRC(e48b1c8a) SHA1(88f60268fd43c06e146d936a1bdc078c44e2a213) )    // B
+	ROM_LOAD( "no_g4.ic28", 0x20000, 0x10000, CRC(4eea9a9b) SHA1(c86c083ccf08c3c310028920f9a0fe809fd7ccbe) )    // G
+	ROM_LOAD( "no_r4.ic29", 0x30000, 0x10000, CRC(ab08cdaf) SHA1(e0518403039b6bada79ffe4c6bc22fbb64d16e43) )    // R
 
 	ROM_REGION( 0x0800, "nvram", 0 )    /* default NVRAM */
 	ROM_LOAD( "number1_nvram.bin", 0x0000, 0x0800, CRC(4ece7b39) SHA1(49815571d75a39ab67d26691f902dfbd4e05feb4) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce1.bin",	0x0000, 0x0104, NO_DUMP )	/* PALCE is read protected */
-	ROM_LOAD( "palce2.bin",	0x0200, 0x0104, NO_DUMP )	/* PALCE is read protected */
-	ROM_LOAD( "palce3.bin",	0x0400, 0x0104, NO_DUMP )	/* PALCE is read protected */
+	ROM_LOAD( "palce1.bin", 0x0000, 0x0104, NO_DUMP )   /* PALCE is read protected */
+	ROM_LOAD( "palce2.bin", 0x0200, 0x0104, NO_DUMP )   /* PALCE is read protected */
+	ROM_LOAD( "palce3.bin", 0x0400, 0x0104, NO_DUMP )   /* PALCE is read protected */
 ROM_END
 
 

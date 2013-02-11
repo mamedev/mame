@@ -255,7 +255,7 @@ WRITE8_MEMBER( sage2_state::ppi0_pc_w )
 
 	// floppy motor
 	if (m_floppy) m_floppy->mon_w(BIT(data, 5));
-	
+
 	// FDC reset
 	if(BIT(data, 7)) m_fdc->reset();
 }

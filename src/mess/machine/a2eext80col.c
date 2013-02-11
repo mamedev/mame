@@ -67,4 +67,3 @@ UINT8 *a2eaux_ext80col_device::get_vram_ptr()
 {
 	return &m_ram[0];
 }
-

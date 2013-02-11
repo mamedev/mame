@@ -51,7 +51,7 @@ protected:
 	required_ioport m_p1_1;
 	required_ioport m_p1_2;
 	required_ioport m_p1_3;
-	required_ioport m_p1_4;	
+	required_ioport m_p1_4;
 	required_ioport m_p1_5;
 	required_ioport m_p1_6;
 	required_ioport m_p1_7;

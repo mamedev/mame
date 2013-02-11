@@ -675,7 +675,7 @@ static void apollo_pic_set_irq_line(device_t *device, int irq, int state) {
 	}
 }
 
-IRQ_CALLBACK_MEMBER(apollo_state::apollo_pic_acknowledge) 
+IRQ_CALLBACK_MEMBER(apollo_state::apollo_pic_acknowledge)
 {
 	UINT32 vector = pic8259_acknowledge(get_pic8259_master(&device));
 	if ((vector & 0x0f) == APOLLO_IRQ_PIC_SLAVE) {

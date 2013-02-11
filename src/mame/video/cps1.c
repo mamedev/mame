@@ -2276,7 +2276,6 @@ void cps_state::cps1_find_last_sprite()    /* Find the offset of last sprite */
 
 void cps_state::cps1_render_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                    \
 {                                                                   \
 	if (flip_screen())                                           \
@@ -2510,7 +2509,6 @@ void cps_state::cps2_find_last_sprite()    /* Find the offset of last sprite */
 
 void cps_state::cps2_render_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks )
 {
-
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                                    \
 {                                                                                   \
 	if (flip_screen())                                                           \

@@ -79,7 +79,7 @@ int spbactn_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		attr = spriteram[offs];
 
 		int pri = (spriteram[offs] & 0x0030);
-//		int pri = (spriteram[offs+2] & 0x0030);
+//      int pri = (spriteram[offs+2] & 0x0030);
 
 
 		if ((attr & 0x0004) &&
@@ -542,5 +542,3 @@ void raiga_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap_bg, bitm
 		source -= 8;
 	}
 }
-
-

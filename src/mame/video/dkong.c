@@ -669,7 +669,6 @@ void dkong_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 inline double dkong_state::CD4049(double x)
 {
-
 	if (x>0)
 		return exp(-m_cd4049_a * pow(x,m_cd4049_b));
 	else
@@ -690,7 +689,6 @@ inline double dkong_state::CD4049(double x)
 
 void dkong_state::radarscp_step(int line_cnt)
 {
-
 	/* Condensator is illegible in schematics for TRS2 board.
 	 * TRS1 board states 3.3u.
 	 */

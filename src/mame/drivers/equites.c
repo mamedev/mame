@@ -536,7 +536,6 @@ WRITE8_MEMBER(equites_state::equites_cymbal_ctrl_w)
 
 void equites_state::equites_update_dac(  )
 {
-
 	// there is only one latch, which is used to drive two DAC channels.
 	// When the channel is enabled in the 4066, it goes to a series of
 	// low-pass filters. The channel is kept enabled only for a short time,

@@ -93,17 +93,17 @@ protected:
 		CTRL_BRG_9600,
 		CTRL_BRG_19200,
 		CTRL_BRG_MASK = 0x0f,
-		
+
 		CTRL_RXC_EXT = 0x00,
 		CTRL_RXC_BRG = 0x10,
 		CTRL_RXC_MASK = 0x10,
-		
+
 		CTRL_WL_8 = 0x00,
 		CTRL_WL_7 = 0x20,
 		CTRL_WL_6 = 0x40,
 		CTRL_WL_5 = 0x60,
 		CTRL_WL_MASK = 0x60,
-		
+
 		CTRL_SB_1 = 0x00,
 		CTRL_SB_2 = 0x80,
 		CTRL_SB_MASK = 0x80
@@ -112,9 +112,9 @@ protected:
 	enum
 	{
 		CMD_DTR = 0x01,
-		
+
 		CMD_RIE = 0x02,
-		
+
 		CMD_TC_RTS_HI = 0x00,
 		CMD_TC_TIE_RTS_LO = 0x04,
 		CMD_TC_RTS_LO = 0x08,

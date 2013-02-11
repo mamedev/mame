@@ -44,7 +44,7 @@ void midiout_device::device_reset()
 }
 
 /*-------------------------------------------------
-    device_config_complete  										   
+    device_config_complete
 -------------------------------------------------*/
 
 void midiout_device::device_config_complete(void)
@@ -94,4 +94,3 @@ void midiout_device::rcv_complete()    // Rx completed receiving byte
 void midiout_device::input_callback(UINT8 state)
 {
 }
-

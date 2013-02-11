@@ -18,7 +18,7 @@
 #include "cpu/m6502/m5074x.h"
 #endif
 
-#define ADBMICRO_TAG	"adbmicro"
+#define ADBMICRO_TAG    "adbmicro"
 
 // IIgs clocks as marked on the schematics
 #define APPLE2GS_28M  (XTAL_28_63636MHz) // IIGS master clock
@@ -33,27 +33,27 @@
 // these are numbered as seen from the MCU
 enum glu_reg_names
 {
-    GLU_KEY_DATA = 0,   // MCU W
-    GLU_COMMAND,        // MCU R
-    GLU_MOUSEX,         // MCU W
-    GLU_MOUSEY,         // MCU W
-    GLU_KG_STATUS,      // MCU R
-    GLU_ANY_KEY_DOWN,   // MCU W
-    GLU_KEYMOD,         // MCU W
-    GLU_DATA,           // MCU W
+	GLU_KEY_DATA = 0,   // MCU W
+	GLU_COMMAND,        // MCU R
+	GLU_MOUSEX,         // MCU W
+	GLU_MOUSEY,         // MCU W
+	GLU_KG_STATUS,      // MCU R
+	GLU_ANY_KEY_DOWN,   // MCU W
+	GLU_KEYMOD,         // MCU W
+	GLU_DATA,           // MCU W
 
-    GLU_C000,   	// 816 R
-    GLU_C010,		// 816 RW
-    GLU_SYSSTAT		// 816 R/(limited) W
+	GLU_C000,       // 816 R
+	GLU_C010,       // 816 RW
+	GLU_SYSSTAT     // 816 R/(limited) W
 };
 
-enum glu_kg_status 
+enum glu_kg_status
 {
-    KGS_ANY_KEY_DOWN = 0x01,
-    KGS_KEYSTROBE    = 0x10,
-    KGS_DATA_FULL    = 0x20,
-    KGS_COMMAND_FULL = 0x40,
-    KGS_MOUSEX_FULL  = 0x80
+	KGS_ANY_KEY_DOWN = 0x01,
+	KGS_KEYSTROBE    = 0x10,
+	KGS_DATA_FULL    = 0x20,
+	KGS_COMMAND_FULL = 0x40,
+	KGS_MOUSEX_FULL  = 0x80
 };
 
 enum apple2gs_clock_mode
@@ -194,15 +194,15 @@ public:
 	DECLARE_WRITE8_MEMBER(a2bus_inh_w);
 	DECLARE_READ8_MEMBER(apple2gs_read_vector);
 
-    // ADB MCU and ADB GLU stuff
+	// ADB MCU and ADB GLU stuff
 	#if RUN_ADB_MICRO
-    UINT8 m_glu_regs[8], m_glu_bus, m_glu_sysstat;
-    bool m_glu_mcu_read_kgs, m_glu_816_read_dstat, m_glu_mouse_read_stat, m_adb_line;
+	UINT8 m_glu_regs[8], m_glu_bus, m_glu_sysstat;
+	bool m_glu_mcu_read_kgs, m_glu_816_read_dstat, m_glu_mouse_read_stat, m_adb_line;
 
 	UINT8 keyglu_mcu_read(UINT8 offset);
-    void keyglu_mcu_write(UINT8 offset, UINT8 data);
-    UINT8 keyglu_816_read(UINT8 offset);
-    void keyglu_816_write(UINT8 offset, UINT8 data);
+	void keyglu_mcu_write(UINT8 offset, UINT8 data);
+	UINT8 keyglu_816_read(UINT8 offset);
+	void keyglu_816_write(UINT8 offset, UINT8 data);
 
 	DECLARE_READ8_MEMBER(adbmicro_p0_in);
 	DECLARE_READ8_MEMBER(adbmicro_p1_in);

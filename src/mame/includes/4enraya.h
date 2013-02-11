@@ -15,7 +15,7 @@ public:
 		m_snd_latch_bit(4)
 	{ }
 
-	
+
 	required_device<ay8910_device> m_ay;
 
 	/* memory pointers */

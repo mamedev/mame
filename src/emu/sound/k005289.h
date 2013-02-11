@@ -30,7 +30,7 @@ struct k005289_sound_channel
 // ======================> k005289_device
 
 class k005289_device : public device_t,
-					   public device_sound_interface
+						public device_sound_interface
 {
 public:
 	k005289_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -52,8 +52,8 @@ public:
 	DECLARE_WRITE8_MEMBER( k005289_keylatch_B_w );
 
 private:
-    void make_mixer_table(int voices);
-    void k005289_recompute();
+	void make_mixer_table(int voices);
+	void k005289_recompute();
 
 private:
 	k005289_sound_channel m_channel_list[2];
@@ -61,7 +61,7 @@ private:
 	const unsigned char *m_sound_prom;
 	sound_stream *m_stream;
 	int m_mclock;
-    int m_rate;
+	int m_rate;
 
 	/* mixer tables and internal buffers */
 	INT16 *m_mixer_table;

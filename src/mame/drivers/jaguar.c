@@ -1542,7 +1542,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
- static const jaguar_cpu_config gpu_config =
+	static const jaguar_cpu_config gpu_config =
 {
 	&jaguar_state::gpu_cpu_int
 };

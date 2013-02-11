@@ -42,7 +42,7 @@
 #include "emu.h"
 #include "formats/g64_dsk.h"
 
-#define G64_FORMAT_HEADER 	"GCR-1541"
+#define G64_FORMAT_HEADER   "GCR-1541"
 
 g64_format::g64_format()
 {
@@ -113,7 +113,7 @@ bool g64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 		if (pos > 0) {
 			track_size = pick_integer_le(img, pos, 2);
 			pos +=2;
-		
+
 			if (speed_zone_offset[track] > 3)
 				throw emu_fatalerror("g64_format: Unsupported variable speed zones on track %d", track);
 

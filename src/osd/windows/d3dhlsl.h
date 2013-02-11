@@ -48,7 +48,7 @@
 //  CONSTANTS
 //============================================================
 
-#define HLSL_VECTOR			(0)
+#define HLSL_VECTOR         (0)
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -92,7 +92,7 @@ struct hlsl_options
 	float                   phosphor[3];
 	float                   saturation;
 
-    // NTSC
+	// NTSC
 	bool                    yiq_enable;
 	float                   yiq_cc;
 	float                   yiq_a;
@@ -106,11 +106,11 @@ struct hlsl_options
 	float                   yiq_scan_time;
 	int                     yiq_phase_count;
 
-    // Vectors
-    float                   vector_time_scale;
-    float                   vector_time_period;
-    float                   vector_length_scale;
-    float                   vector_length_ratio;
+	// Vectors
+	float                   vector_time_scale;
+	float                   vector_time_period;
+	float                   vector_length_scale;
+	float                   vector_length_ratio;
 };
 
 class hlsl_info
@@ -150,7 +150,7 @@ public:
 	void avi_update_snap(d3d_surface *surface);
 	void render_snapshot(d3d_surface *surface);
 	void record_texture();
-    void init_fsfx_quad(void *vertbuf);
+	void init_fsfx_quad(void *vertbuf);
 
 	void                    set_texture(d3d_texture_info *texture);
 	d3d_render_target *     find_render_target(d3d_texture_info *info);
@@ -165,11 +165,11 @@ public:
 	slider_state *init_slider_list();
 
 private:
-	void					blit(d3d_surface *dst, d3d_texture *src, d3d_surface *new_dst,
-								 D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count,
-                                 int dstw, int dsth);
-    void                    blit(d3d_surface *dst, d3d_texture *src, d3d_surface *new_dst,
-                                 D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
+	void                    blit(d3d_surface *dst, d3d_texture *src, d3d_surface *new_dst,
+									D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count,
+									int dstw, int dsth);
+	void                    blit(d3d_surface *dst, d3d_texture *src, d3d_surface *new_dst,
+									D3DPRIMITIVETYPE prim_type, UINT32 prim_index, UINT32 prim_count);
 	void                    enumerate_screens();
 
 	void                    end_avi_recording();
@@ -201,9 +201,9 @@ private:
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	d3d_texture_info *      shadow_texture;             // shadow mask texture for post-processing shader
 	hlsl_options *          options;                    // current uniform state
-	D3DPRIMITIVETYPE		vecbuf_type;
-	UINT32					vecbuf_index;
-	UINT32					vecbuf_count;
+	D3DPRIMITIVETYPE        vecbuf_type;
+	UINT32                  vecbuf_index;
+	UINT32                  vecbuf_count;
 
 	avi_file *              avi_output_file;            // AVI file
 	bitmap_rgb32            avi_snap;                   // AVI snapshot
@@ -215,8 +215,8 @@ private:
 	d3d_surface *           avi_final_target;           // AVI upscaled surface
 	d3d_texture *           avi_final_texture;          // AVI upscaled texture
 
-    d3d_surface *           black_surface;              // black dummy surface
-    d3d_texture *           black_texture;              // black dummy texture
+	d3d_surface *           black_surface;              // black dummy surface
+	d3d_texture *           black_texture;              // black dummy texture
 
 	bool                    render_snap;                // whether or not to take HLSL post-render snapshot
 	bool                    snap_rendered;              // whether we just rendered our HLSL post-render shot or not
@@ -228,7 +228,7 @@ private:
 	int                     snap_height;                // snapshot height
 	bool                    lines_pending;              // whether or not we have lines to flush on the next quad
 
-	bool					initialized;				// whether or not we're initialize
+	bool                    initialized;                // whether or not we're initialize
 
 	// HLSL effects
 	d3d_surface *           backbuffer;                 // pointer to our device's backbuffer
@@ -244,8 +244,8 @@ private:
 	d3d_effect *            yiq_encode_effect;          // pointer to the YIQ encoder effect object
 	d3d_effect *            yiq_decode_effect;          // pointer to the YIQ decoder effect object
 #if HLSL_VECTOR
-    d3d_effect *            bloom_effect;               // pointer to the bloom composite effect
-    d3d_effect *            downsample_effect;          // pointer to the bloom downsample effect
+	d3d_effect *            bloom_effect;               // pointer to the bloom composite effect
+	d3d_effect *            downsample_effect;          // pointer to the bloom downsample effect
 	d3d_effect *            vector_effect;              // pointer to the vector-effect object
 #endif
 	d3d_vertex *            fsfx_vertices;              // pointer to our full-screen-quad object

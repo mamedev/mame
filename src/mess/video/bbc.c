@@ -283,7 +283,7 @@ WRITE_LINE_MEMBER(bbc_state::bbc_vsync)
 MC6845_INTERFACE( bbc_mc6845_intf )
 {
 	"screen",                       /* screen number */
-	false,							/* show border area */
+	false,                          /* show border area */
 	8,                              /* numbers of pixels per video memory address */
 	NULL,                           /* begin_update */
 	vid_update_row,                 /* update_row */
@@ -576,26 +576,26 @@ static void BBC_Set_CRE(running_machine &machine, int offset, int data)
 
 WRITE8_MEMBER(bbc_state::bbc_6845_w)
 {
-	switch(offset & 1)
-	{
-		case 0 :
-			m_mc6845->address_w(space,0,data);
-			break;
-		case 1 :
-			m_mc6845->register_w(space,0,data);
-			break;
-	}
+    switch(offset & 1)
+    {
+        case 0 :
+            m_mc6845->address_w(space,0,data);
+            break;
+        case 1 :
+            m_mc6845->register_w(space,0,data);
+            break;
+    }
 }
 
 
  READ8_HANDLER (bbc_6845_r)
 {
-	switch (offset&1)
-	{
-		case 0: return m_mc6845->status_r(space,0); break;
-		case 1: return m_mc6845->register_r(space,0); break;
-	}
-	return 0;
+    switch (offset&1)
+    {
+        case 0: return m_mc6845->status_r(space,0); break;
+        case 1: return m_mc6845->register_r(space,0); break;
+    }
+    return 0;
 }
 
 

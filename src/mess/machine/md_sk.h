@@ -7,18 +7,18 @@
 // ======================> md_rom_sk_device
 
 class md_rom_sk_device : public device_t,
-					  public device_md_cart_interface
+						public device_md_cart_interface
 {
 public:
 	// construction/destruction
 	md_rom_sk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	md_rom_sk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "md_rom_sk"; }
 	virtual machine_config_constructor device_mconfig_additions() const;
-		
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_WRITE16_MEMBER(write);

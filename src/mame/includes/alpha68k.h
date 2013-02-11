@@ -123,5 +123,3 @@ enum
 	ALPHA68K_JONGBOU,           // used in kyros_alpha_trigger_r & kyros_draw_sprites
 	ALPHA68K_KYROS          // used in kyros_draw_sprites
 };
-
-

@@ -231,7 +231,7 @@ static ADDRESS_MAP_START( esq1_map, AS_PROGRAM, 8, esq1_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM                 // OSRAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                 // SEQRAM
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("es5503", es5503_device, read, write)
-	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", duartn68681_device, read, write) 
+	AM_RANGE(0x6400, 0x640f) AM_DEVREADWRITE("duart", duartn68681_device, read, write)
 	AM_RANGE(0x6800, 0x68ff) AM_NOP
 
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("osbank")
@@ -323,7 +323,7 @@ SLOT_INTERFACE_END
 
 static const serial_port_interface midiin_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_a_w)	// route MIDI Tx send directly to 68681 channel A Rx
+	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_a_w)   // route MIDI Tx send directly to 68681 channel A Rx
 };
 
 static SLOT_INTERFACE_START(midiout_slot)
@@ -332,7 +332,7 @@ SLOT_INTERFACE_END
 
 static const serial_port_interface midiout_intf =
 {
-	DEVCB_NULL	// midi out ports don't transmit inward
+	DEVCB_NULL  // midi out ports don't transmit inward
 };
 
 static const duartn68681_config duart_config =

@@ -26,7 +26,6 @@ TIMER_CALLBACK_MEMBER(cchasm_state::cchasm_refresh_end)
 
 void cchasm_state::cchasm_refresh ()
 {
-
 	int pc = 0;
 	int done = 0;
 	int opcode, data;

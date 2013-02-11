@@ -112,7 +112,6 @@
 
 inline void cloud9_state::schedule_next_irq(int curscanline)
 {
-
 	/* IRQ is clocked by /32V, so every 64 scanlines */
 	curscanline = (curscanline + 64) & 255;
 

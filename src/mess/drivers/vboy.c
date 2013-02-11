@@ -43,7 +43,7 @@
 
 // bit of magic here, we also write pre-flipped copies of the data to extra ram we've allocated
 // to simplify the draw loop (we can just pass the flip / unused bits as the upper character bits)
-// (all TILE words are in the format of ccxy -ttt tttt tttt 
+// (all TILE words are in the format of ccxy -ttt tttt tttt
 //   where 'c' = palette, 'x/y' are flips, '-' is unused(?) and 't' is your basic tile number
 
 #define WRITE_FONT(woffs) \
@@ -56,8 +56,7 @@
 	m_font[((woffs) + 0x10000)] = dat;     /* flip x */ \
 	m_font[((woffs) + 0x14000)] = dat;     /* flip x */ \
 	m_font[((woffs) + 0x18000) ^ 7] = dat; /* flip x+y */ \
-	m_font[((woffs) + 0x1c000) ^ 7] = dat; /* flip x+y */ \
-
+	m_font[((woffs) + 0x1c000) ^ 7] = dat; /* flip x+y */
 
 
 /* FIXME: most if not all of these must be UINT8 */
@@ -295,7 +294,7 @@ void vboy_state::fill_ovr_char(UINT16 code, UINT8 pal)
 
 inline INT8 vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
 {
-//	g_profiler.start(PROFILER_USER1);
+//  g_profiler.start(PROFILER_USER1);
 	int x, y;
 	UINT8 stepx, stepy;
 
@@ -321,14 +320,14 @@ inline INT8 vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
 		//g_profiler.stop();
 		return -1;
 	}
-	//	g_profiler.stop();
+	//  g_profiler.stop();
 	return (pal >> (dat*2)) & 3;
 }
 
 void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w,
 													UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num)
 {
-//	g_profiler.start(PROFILER_USER2);
+//  g_profiler.start(PROFILER_USER2);
 	int x,y;
 
 	for(y=0;y<=h;y++)
@@ -380,13 +379,13 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UI
 				bitmap.pix16(y1, x1) = machine().pens[pix & 3];
 		}
 	}
-//	g_profiler.stop();
+//  g_profiler.stop();
 }
 
 void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int gx, int gp, int gy, int h, int w,
 														UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num)
 {
-//	g_profiler.start(PROFILER_USER3);
+//  g_profiler.start(PROFILER_USER3);
 	int x,y;
 
 	for(y=0;y<=h;y++)
@@ -425,7 +424,7 @@ void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect
 					bitmap.pix16(y1, x1) = machine().pens[pix & 3];
 		}
 	}
-//	g_profiler.stop();
+//  g_profiler.stop();
 }
 
 /*

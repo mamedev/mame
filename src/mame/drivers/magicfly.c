@@ -330,7 +330,7 @@
 
     With the default DIP switches positions, the game is totally in French, and is
     titled 'BONNE CHANCE!'. Turning the 4th DIP switch ON, the game switch to English,
-	and the title changes to 'GOOD LUCK!' (as the above mentioned games).
+    and the title changes to 'GOOD LUCK!' (as the above mentioned games).
 
     To enter the test mode, press SERVICE (key 9). You can see an input-test matrix
     to test all the valid inputs. Pressing BET (key M) and START (Key 1) simultaneou-
@@ -416,7 +416,7 @@
 
     [2013-01-17]
     - Added Bonne Chance!. A French/English poker game prototype of
-	   the well known 'Golden Poker' and 'Jack Potten Poker'.
+       the well known 'Golden Poker' and 'Jack Potten Poker'.
     - Worked complete inputs from the scratch. Promoted to working.
     - Added proper palette. Now the game seems to get accurate colors.
     - Added some notes.
@@ -608,8 +608,8 @@ PALETTE_INIT_MEMBER(magicfly_state, bchance)
 		palette_set_color(machine(), i + 15, MAKE_RGB(0xff, 0xff, 0xff));
 	}
 
-	palette_set_color(machine(), 0x08 , MAKE_RGB(0xff, 0xff, 0xff));	// white for the cards back logo background.
-	palette_set_color(machine(), 0x12 , MAKE_RGB(0x00, 0x00, 0x00));	// black for the cards corners (should be transparent)
+	palette_set_color(machine(), 0x08 , MAKE_RGB(0xff, 0xff, 0xff));    // white for the cards back logo background.
+	palette_set_color(machine(), 0x12 , MAKE_RGB(0x00, 0x00, 0x00));    // black for the cards corners (should be transparent)
 }
 
 
@@ -814,42 +814,42 @@ static INPUT_PORTS_START( bchance )
     R4C1 + R4C5 to exit...
 */
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )											// input test R1C1 (coin 1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )											// input test R1C2 (coin 2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN0-3")	// input test R1C3 (unknown)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN0-4")	// input test R1C4 (unknown)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )                                          // input test R1C1 (coin 1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                                          // input test R1C2 (coin 2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("IN0-3")  // input test R1C3 (unknown)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("IN0-4")  // input test R1C4 (unknown)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN0-6")	// input test R1C5 (unknown)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("IN0-6")  // input test R1C5 (unknown)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )	   PORT_NAME("Small")				// input test R2C1 (small)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )   PORT_NAME("Big")					// input test R2C2 (big)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Payout")				// input test R2C3 (payout)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )									// input test R2C4 (take)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )    PORT_NAME("Small")               // input test R2C1 (small)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )   PORT_NAME("Big")                 // input test R2C2 (big)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Payout")              // input test R2C3 (payout)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )                                    // input test R2C4 (take)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN1-6")	// input test R2C5 (unknown)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("IN1-6")  // input test R2C5 (unknown)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	// input test R3C1 (hold 4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	// input test R3C2 (hold 5)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	// input test R3C3 (hold 2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	// input test R3C4 (hold 3)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )    // input test R3C1 (hold 4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )    // input test R3C2 (hold 5)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    // input test R3C3 (hold 2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    // input test R3C4 (hold 3)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	// input test R3C5 (hold 1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    // input test R3C5 (hold 1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")	// input test R4C1 (start/deal)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL	)				// input test R4C2 (cancel)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )				// input test R4C3 (service/test)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )				// input test R4C4 (d-up)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")  // input test R4C1 (start/deal)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )               // input test R4C2 (cancel)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_SERVICE )             // input test R4C3 (service/test)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )                // input test R4C4 (d-up)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )					// input test R4C5 (bet)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                 // input test R4C5 (bet)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -918,7 +918,7 @@ GFXDECODE_END
 static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
-	false,		/* show border area */
+	false,      /* show border area */
 	8,          /* number of pixels per video memory address */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */
@@ -1031,23 +1031,23 @@ ROM_END
 
 ROM_START( bchance )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "v-pk-4gag.bin",	0xc000, 0x4000, CRC(7c2dd908) SHA1(97b1390fb4c8c838a0d5b78d6904d597a9abe27f) )
+	ROM_LOAD( "v-pk-4gag.bin",  0xc000, 0x4000, CRC(7c2dd908) SHA1(97b1390fb4c8c838a0d5b78d6904d597a9abe27f) )
 
-	ROM_REGION( 0x6000, "gfx", 0 )	/* ROM n-pk-2.bin was created from an exhaustive analysis of 25 different bad dumps */
-	ROM_LOAD( "n-pk-2.bin",	0x0000, 0x2000, BAD_DUMP CRC(462c3dd7) SHA1(fb30d6147e0d607b3fb631d8bdca35e98eccfd2d) )
-	ROM_LOAD( "n-pk-1.bin",	0x2000, 0x2000, CRC(e35cebd6) SHA1(b0dd86fd4c06f98e486b04e09808985bfa4f0e9c) )
-	ROM_LOAD( "n-pk-0.bin",	0x4000, 0x2000, CRC(3c64edc4) SHA1(97b677b7c4999b502ab4b4f70c33b40050843796) )
+	ROM_REGION( 0x6000, "gfx", 0 )  /* ROM n-pk-2.bin was created from an exhaustive analysis of 25 different bad dumps */
+	ROM_LOAD( "n-pk-2.bin", 0x0000, 0x2000, BAD_DUMP CRC(462c3dd7) SHA1(fb30d6147e0d607b3fb631d8bdca35e98eccfd2d) )
+	ROM_LOAD( "n-pk-1.bin", 0x2000, 0x2000, CRC(e35cebd6) SHA1(b0dd86fd4c06f98e486b04e09808985bfa4f0e9c) )
+	ROM_LOAD( "n-pk-0.bin", 0x4000, 0x2000, CRC(3c64edc4) SHA1(97b677b7c4999b502ab4b4f70c33b40050843796) )
 
 	ROM_REGION( 0x0800, "gfxbnk0", 0 )
-	ROM_COPY( "gfx",	0x1800, 0x0000, 0x0800 )	/* chars */
+	ROM_COPY( "gfx",    0x1800, 0x0000, 0x0800 )    /* chars */
 
 	ROM_REGION( 0x1800, "gfxbnk1", 0 )
-	ROM_COPY( "gfx",	0x1000, 0x0000, 0x0800 )	/* 3bpp tiles, bitplane 1 */
-	ROM_COPY( "gfx",	0x3800, 0x0800, 0x0800 )	/* 3bpp tiles, bitplane 2 */
-	ROM_COPY( "gfx",	0x5800, 0x1000, 0x0800 )	/* 3bpp tiles, bitplane 3 */
+	ROM_COPY( "gfx",    0x1000, 0x0000, 0x0800 )    /* 3bpp tiles, bitplane 1 */
+	ROM_COPY( "gfx",    0x3800, 0x0800, 0x0800 )    /* 3bpp tiles, bitplane 2 */
+	ROM_COPY( "gfx",    0x5800, 0x1000, 0x0800 )    /* 3bpp tiles, bitplane 3 */
 
 	ROM_REGION( 0x0200, "plds", 0 )
-	ROM_LOAD( "gal16v8-bchance.bin",	0x0000, 0x0104, NO_DUMP )	/* protected */
+	ROM_LOAD( "gal16v8-bchance.bin",    0x0000, 0x0104, NO_DUMP )   /* protected */
 ROM_END
 
 

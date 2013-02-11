@@ -70,8 +70,8 @@ enum iodevice_t
 	IO_CDROM,       /* 14 - optical CD-ROM disc */
 	IO_MAGTAPE,     /* 15 - Magentic tape */
 	IO_ROM,         /* 16 - Individual ROM image - the Amstrad CPC has a few applications that were sold on 16kB ROMs */
-	IO_MIDIIN,		/* 17 - MIDI In port */
-	IO_MIDIOUT,		/* 18 - MIDI Out port */
+	IO_MIDIIN,      /* 17 - MIDI In port */
+	IO_MIDIOUT,     /* 18 - MIDI Out port */
 	IO_COUNT        /* 19 - Total Number of IO_devices for searching */
 };
 

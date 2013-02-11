@@ -53,7 +53,7 @@ public:
 	UINT32 screen_update_sapizps3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	optional_memory_bank m_bank1;	// Only for sapi3
+	optional_memory_bank m_bank1;   // Only for sapi3
 	required_ioport m_line0;
 	required_ioport m_line1;
 	required_ioport m_line2;

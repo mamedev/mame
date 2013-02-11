@@ -1,14 +1,14 @@
 /***********************************************************************************************************
- 
- 
+
+
  MegaDrive / Genesis cart+EEPROM emulation
- 
- 
+
+
  TODO: proper EEPROM emulation, still not worked on (just hooked up the I2C device)
- 
+
 
  i2c games mapping table:
- 
+
  game name                         |   SDA_IN   |  SDA_OUT   |     SCL    |  SIZE_MASK     | PAGE_MASK |
  ----------------------------------|------------|------------|------------|----------------|-----------|
  NBA Jam                           | 0x200001-0 | 0x200001-0 | 0x200001-1 | 0x00ff (24C02) |   0x03    | xx
@@ -30,7 +30,7 @@
  Micro Machines 96                 | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x07ff (24C16) |   0x0f    |
  Brian Lara Cricket 96             | 0x380001-7 | 0x300000-0*| 0x300000-1*| 0x1fff (24C64) |   0x??*   |
  ----------------------------------|------------|------------|------------|----------------|-----------|
- 
+
  * Notes: check these
  ** original Rockman Mega World (J) set uses normal backup RAM
 
@@ -213,12 +213,12 @@ READ16_MEMBER(md_std_eeprom_device::read)
 {
 	if (offset == 0x200000/2)
 	{
-//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//      m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return ~m_i2c_mem & 1;
 	}
-	if (offset < 0x400000/2) 
-		return m_rom[MD_ADDR(offset)]; 
-	else 
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
 		return 0xffff;
 }
 
@@ -237,12 +237,12 @@ READ16_MEMBER(md_eeprom_nbajam_device::read)
 {
 	if (offset == 0x200000/2)
 	{
-//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//      m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return m_i2c_mem & 1;
 	}
-	if (offset < 0x400000/2) 
-		return m_rom[MD_ADDR(offset)]; 
-	else 
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
 		return 0xffff;
 }
 
@@ -261,12 +261,12 @@ READ16_MEMBER(md_eeprom_nbajamte_device::read)
 {
 	if (offset == 0x200000/2)
 	{
-//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//      m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return m_i2c_mem & 1;
 	}
-	if (offset < 0x400000/2) 
-		return m_rom[MD_ADDR(offset)]; 
-	else 
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
 		return 0xffff;
 }
 
@@ -286,12 +286,12 @@ READ16_MEMBER(md_eeprom_cslam_device::read)
 {
 	if (offset == 0x200000/2)
 	{
-//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//      m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return m_i2c_mem & 1;
 	}
-	if (offset < 0x400000/2) 
-		return m_rom[MD_ADDR(offset)]; 
-	else 
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
 		return 0xffff;
 }
 
@@ -311,12 +311,12 @@ READ16_MEMBER(md_eeprom_nflqb_device::read)
 {
 	if (offset == 0x200000/2)
 	{
-//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//      m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return m_i2c_mem & 1;
 	}
-	if (offset < 0x400000/2) 
-		return m_rom[MD_ADDR(offset)]; 
-	else 
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
 		return 0xffff;
 }
 
@@ -335,12 +335,12 @@ READ16_MEMBER(md_eeprom_nhlpa_device::read)
 {
 	if (offset == 0x200000/2)
 	{
-//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//      m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return (m_i2c_mem & 1) << 7;
 	}
-	if (offset < 0x400000/2) 
-		return m_rom[MD_ADDR(offset)]; 
-	else 
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
 		return 0xffff;
 }
 
@@ -359,12 +359,12 @@ READ16_MEMBER(md_eeprom_blara_device::read)
 {
 	if (offset == 0x380000/2)
 	{
-//		m_i2c_mem = i2cmem_sda_read(m_i2cmem);
+//      m_i2c_mem = i2cmem_sda_read(m_i2cmem);
 		return (m_i2c_mem & 1) << 7;
 	}
-	if (offset < 0x400000/2) 
-		return m_rom[MD_ADDR(offset)]; 
-	else 
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
 		return 0xffff;
 }
 
@@ -378,4 +378,3 @@ WRITE16_MEMBER(md_eeprom_blara_device::write)
 		i2cmem_sda_write(m_i2cmem, m_i2c_mem);
 	}
 }
-

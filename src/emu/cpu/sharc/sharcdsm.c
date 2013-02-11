@@ -493,7 +493,7 @@ static UINT32 dasm_compute_dreg_dmpm(UINT32 pc, UINT64 opcode)
 		compute(comp);
 		print(",  ");
 	}
-	if (dmd) 
+	if (dmd)
 	{
 		print("DM(%s, %s) = R%d, ", GET_DAG1_I(dmi), GET_DAG1_M(dmm), dmdreg);
 	}

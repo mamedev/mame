@@ -63,7 +63,7 @@ public:
 
 	virtual void rom_map_setup(UINT32 size);
 	virtual void ram_map_setup(UINT8 banks);
-	
+
 	virtual void set_has_timer(bool val) { has_timer = val; }
 	virtual void set_has_rumble(bool val) { has_rumble = val; }
 	virtual void set_has_battery(bool val) { has_battery = val; }
@@ -82,8 +82,8 @@ public:
 	// 0x4000-0x7fff = rom_bank_map[m_latch_bank2]  (generally defaults to m_latch_bank2 = 1)
 	// 0xa000-0xbfff = ram_bank_map[m_ram_bank]   (generally defaults to m_ram_bank = 0)
 	// suitable writes to 0x0000-0x7fff can then modify m_latch_bank/m_latch_bank2
-	UINT8 rom_bank_map[512];	// 16K chunks of ROM
-	UINT8 ram_bank_map[256];	// 16K chunks of RAM
+	UINT8 rom_bank_map[512];    // 16K chunks of ROM
+	UINT8 ram_bank_map[256];    // 16K chunks of RAM
 	UINT8 m_ram_bank;
 	UINT16 m_latch_bank, m_latch_bank2;
 
@@ -102,11 +102,11 @@ public:
 	// construction/destruction
 	base_gb_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~base_gb_cart_slot_device();
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete();
-	
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
@@ -128,10 +128,10 @@ public:
 	virtual const option_guide *create_option_guide() const { return NULL; }
 	virtual const char *image_interface() const { return "gameboy_cart"; }
 	virtual const char *file_extensions() const { return "bin,gb,gbc"; }
-	
+
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
@@ -142,8 +142,8 @@ public:
 // this should be private, but then there is some problem installing delegates in the driver...
 //private:
 
-	device_gb_cart_interface*		m_cart;
-	
+	device_gb_cart_interface*       m_cart;
+
 	int m_type;
 };
 

@@ -35,7 +35,7 @@ public:
 	optional_ioport m_penx2port;
 	optional_ioport m_peny2port;
 	optional_memory_bank m_sndbank;
-	
+
 
 	DECLARE_READ32_MEMBER(eolith_custom_r);
 	DECLARE_WRITE32_MEMBER(systemcontrol_w);

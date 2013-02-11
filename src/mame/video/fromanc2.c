@@ -288,7 +288,6 @@ WRITE16_MEMBER(fromanc2_state::fromancr_gfxreg_1_w)
 
 void fromanc2_state::fromancr_gfxbank_w( int data )
 {
-
 	m_gfxbank[0][0] = (data & 0x0010) >>  4; // BG (1P)
 	m_gfxbank[0][1] = (data & 0xf000) >> 12; // FG (1P)
 	m_gfxbank[1][0] = (data & 0x0008) >>  3; // BG (2P)

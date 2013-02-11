@@ -19,11 +19,11 @@ const device_type FILTER_RC = &device_creator<filter_rc_device>;
 
 filter_rc_device::filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, FILTER_RC, "RC Filter", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(NULL),
-	  m_k(0),
-	  m_memory(0),
-	  m_type(0)
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_k(0),
+		m_memory(0),
+		m_type(0)
 {
 }
 
@@ -119,4 +119,3 @@ void filter_rc_device::filter_rc_set_RC(int type, double R1, double R2, double R
 	m_stream->update();
 	set_RC_info(type, R1, R2, R3, C);
 }
-

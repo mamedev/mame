@@ -1,11 +1,11 @@
 /***********************************************************************************************************
 
  Game Boy cart emulation
- 
- 
+
+
  Here we emulate carts with no RAM and simple bankswitch
- 
- 
+
+
  ***********************************************************************************************************/
 
 
@@ -96,7 +96,7 @@ void megaduck_rom_device::device_start()
 void gb_rom_tama5_device::device_start()
 {
 	m_tama5_data = 0;
-	m_tama5_addr= 0; 
+	m_tama5_addr= 0;
 	m_tama5_cmd = 0;
 	memset(m_regs, 0xff, sizeof(m_regs));
 	m_rtc_reg = 0xff;
@@ -366,4 +366,3 @@ WRITE8_MEMBER(megaduck_rom_device::write_ram)
 	m_latch_bank = data * 2;
 	m_latch_bank2 = data * 2 + 1;
 }
-

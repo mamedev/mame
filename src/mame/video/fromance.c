@@ -55,7 +55,6 @@ TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_fg_tile_info){ get_nekkyoku_ti
 
 void fromance_state::init_common(  )
 {
-
 	/* allocate local videoram */
 	m_local_videoram[0] = auto_alloc_array(machine(), UINT8, 0x1000 * 3);
 	m_local_videoram[1] = auto_alloc_array(machine(), UINT8, 0x1000 * 3);

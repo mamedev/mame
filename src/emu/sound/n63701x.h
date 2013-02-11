@@ -21,12 +21,12 @@ struct voice_63701x
 {
 	voice_63701x()
 		: select(0),
-		  playing(0),
-		  base_addr(0),
-		  position(0),
-		  volume(0),
-		  silence_counter(0) {}
-	
+			playing(0),
+			base_addr(0),
+			position(0),
+			volume(0),
+			silence_counter(0) {}
+
 	int select;
 	int playing;
 	int base_addr;
@@ -58,7 +58,7 @@ public:
 private:
 	voice_63701x m_voices[2];
 	sound_stream *m_stream; /* channel assigned by the mixer */
-	UINT8 *m_rom;			/* pointer to sample ROM */
+	UINT8 *m_rom;           /* pointer to sample ROM */
 };
 
 extern const device_type NAMCO_63701X;

@@ -47,7 +47,7 @@ protected:
 
 	virtual bool has_pot_x() { return true; }
 	virtual bool has_pot_y() { return true; }
-	
+
 private:
 	required_ioport m_joy;
 	required_ioport m_potx;

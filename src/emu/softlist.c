@@ -1478,7 +1478,7 @@ static struct rom_entry *software_find_romdata(software_part *swpart, const char
 
 			data++;
 		}
-		
+
 		if (data && !data->_name)
 			data = NULL;
 	}

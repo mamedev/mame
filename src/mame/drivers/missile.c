@@ -513,7 +513,7 @@ TIMER_CALLBACK_MEMBER(missile_state::adjust_cpu_speed)
 void missile_state::machine_start()
 {
 	/* initialize globals */
-	m_mainrom = memregion("maincpu")->base();	
+	m_mainrom = memregion("maincpu")->base();
 	m_writeprom = memregion("proms")->base();
 	m_flipscreen = 0;
 

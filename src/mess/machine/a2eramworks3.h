@@ -44,4 +44,3 @@ private:
 extern const device_type A2EAUX_RAMWORKS3;
 
 #endif  /* __A2EAUX_RAMWORKS3__ */
-

@@ -66,7 +66,7 @@ public:
 	required_ioport m_y6;
 	required_ioport m_y7;
 	required_ioport m_battery;
-	
+
 	virtual void machine_start();
 	virtual void machine_reset();
 

@@ -21,7 +21,7 @@
 MC6845_INTERFACE( twincobr_mc6845_intf )
 {
 	"screen",   /* screen we are acting on */
-	false,		/* show border area */
+	false,      /* show border area */
 	2,          /* number of pixels per video memory address */ /* Horizontal Display programmed to 160 characters */
 	NULL,       /* before pixel update callback */
 	NULL,       /* row update callback */

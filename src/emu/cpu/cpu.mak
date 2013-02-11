@@ -287,7 +287,7 @@ OBJDIRS += $(CPUOBJ)/es5510
 CPUOBJS += $(CPUOBJ)/es5510/es5510.o
 endif
 
-$(CPUOBJ)/es5510.o:	$(CPUSRC)/es5510/es5510.c \
+$(CPUOBJ)/es5510.o: $(CPUSRC)/es5510/es5510.c \
 								$(CPUSRC)/es5510/es5510.h
 
 

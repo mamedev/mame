@@ -104,7 +104,7 @@ WRITE8_MEMBER(tp84_state::tp84_filter_w)
 	C = 0;
 	if (offset & 0x020) C +=  47000;    /*  47000pF = 0.047uF */
 	if (offset & 0x040) C += 470000;    /* 470000pF = 0.47uF */
-        //  dynamic_cast<filter_rc_device*>(machine().device("filter2"))->filter_rc_set_RC(,1000,2200,1000,C);
+		//  dynamic_cast<filter_rc_device*>(machine().device("filter2"))->filter_rc_set_RC(,1000,2200,1000,C);
 
 	/* 76489 #2 */
 	C = 0;

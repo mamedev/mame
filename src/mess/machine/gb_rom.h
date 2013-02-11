@@ -7,13 +7,13 @@
 // ======================> gb_rom_device
 
 class gb_rom_device : public device_t,
-					  public device_gb_cart_interface
+						public device_gb_cart_interface
 {
 public:
 	// construction/destruction
 	gb_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	gb_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "gb_rom"; }
@@ -30,11 +30,11 @@ class gb_rom_tama5_device : public gb_rom_device
 public:
 	// construction/destruction
 	gb_rom_tama5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "gb_rom_tama5"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_READ8_MEMBER(read_ram);
@@ -50,11 +50,11 @@ class gb_rom_wisdom_device : public gb_rom_device
 public:
 	// construction/destruction
 	gb_rom_wisdom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "gb_rom_wisdom"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
@@ -66,11 +66,11 @@ class gb_rom_yong_device : public gb_rom_device
 public:
 	// construction/destruction
 	gb_rom_yong_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "gb_rom_yong"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
@@ -82,11 +82,11 @@ class gb_rom_atvrac_device : public gb_rom_device
 public:
 	// construction/destruction
 	gb_rom_atvrac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "gb_rom_atvrac"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
@@ -98,11 +98,11 @@ class gb_rom_lasama_device : public gb_rom_device
 public:
 	// construction/destruction
 	gb_rom_lasama_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "gb_rom_lasama"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
@@ -119,11 +119,11 @@ public:
 	// construction/destruction
 	megaduck_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	megaduck_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "megaduck_rom"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);

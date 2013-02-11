@@ -60,7 +60,7 @@ private:
 	psx_controller_port_device *m_owner;
 };
 
-class psx_standard_controller_device :	public device_t,
+class psx_standard_controller_device :  public device_t,
 										public device_psx_controller_interface
 {
 public:
@@ -94,7 +94,7 @@ private:
 	psx_controller_port_device *m_port1;
 };
 
-class psx_controller_port_device :	public device_t,
+class psx_controller_port_device :  public device_t,
 									public device_slot_interface
 {
 public:

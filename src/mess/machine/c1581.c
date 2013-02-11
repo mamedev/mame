@@ -11,8 +11,8 @@
 
     TODO:
 
-	- drive not ready if ready_r() is connected to CIA
-	- format fails (seeks to directory track and reports BAD DISK error)
+    - drive not ready if ready_r() is connected to CIA
+    - format fails (seeks to directory track and reports BAD DISK error)
     - save fails (no error message, but no file added to directory either)
 
 */

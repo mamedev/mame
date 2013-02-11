@@ -106,7 +106,7 @@ public:
 	virtual void machine_reset();
 };
 
-			
+
 
 
 /*

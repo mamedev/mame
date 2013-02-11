@@ -157,12 +157,12 @@ READ16_MEMBER(lordgun_state::aliencha_protection_r)
 
 WRITE8_MEMBER(lordgun_state::fake_w)
 {
-//	popmessage("%02x",data);
+//  popmessage("%02x",data);
 }
 
 WRITE8_MEMBER(lordgun_state::fake2_w)
 {
-//	popmessage("%02x",data);
+//  popmessage("%02x",data);
 }
 
 WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
@@ -172,7 +172,7 @@ WRITE8_MEMBER(lordgun_state::lordgun_eeprom_w)
 
 	if (data & ~0xfd)
 	{
-//		popmessage("EE: %02x", data);
+//      popmessage("EE: %02x", data);
 		logerror("%s: Unknown EEPROM bit written %02X\n",machine().describe_context(),data);
 	}
 
@@ -203,7 +203,7 @@ WRITE8_MEMBER(lordgun_state::aliencha_eeprom_w)
 
 	if (~data & ~0xf8)
 	{
-//		popmessage("EE: %02x", data);
+//      popmessage("EE: %02x", data);
 		logerror("%s: Unknown EEPROM bit written %02X\n",machine().describe_context(),data);
 	}
 
@@ -354,7 +354,7 @@ WRITE8_MEMBER(lordgun_state::lordgun_okibank_w)
 	device_t *device = machine().device("oki");
 	downcast<okim6295_device *>(device)->set_bank_base((data & 2) ? 0x40000 : 0);
 	if (data & ~3)  logerror("%s: unknown okibank bits %02x\n", machine().describe_context(), data);
-//	popmessage("OKI %x", data);
+//  popmessage("OKI %x", data);
 }
 
 static ADDRESS_MAP_START( lordgun_soundio_map, AS_IO, 8, lordgun_state )
@@ -565,7 +565,7 @@ static INPUT_PORTS_START( aliencha )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "6" )
-//	PORT_DIPSETTING(    0x00, "6" )
+//  PORT_DIPSETTING(    0x00, "6" )
 	PORT_DIPNAME( 0x04, 0x04, "Vs. Rounds" )        PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "5" )

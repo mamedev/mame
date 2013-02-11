@@ -5,7 +5,7 @@
 
     TODO:
 
-	- slot interface for cartridges
+    - slot interface for cartridges
     - hand controllers
     - scramble RAM also
     - CAQ tape support

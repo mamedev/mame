@@ -24480,7 +24480,7 @@
 			<dataarea name="rom" size="245760">
 				<rom name="x (usa) (proto).bin" size="245760" crc="cd555712" sha1="b1c5b60b82aaa0b824f7bf67fc8f111377ccfb6a" offset="000000" />
 			</dataarea>
-			<dataarea name="nvram" size="8192">	<!-- unconfirmed size -->
+			<dataarea name="nvram" size="8192"> <!-- unconfirmed size -->
 			</dataarea>
 		</part>
 	</software>

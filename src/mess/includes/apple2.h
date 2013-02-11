@@ -75,7 +75,7 @@
 enum machine_type_t
 {
 	APPLE_II,           // Apple II/II+
-	APPLE_IIE,			// Apple IIe with aux slots
+	APPLE_IIE,          // Apple IIe with aux slots
 	APPLE_IIEPLUS,      // Apple IIc/IIgs/IIc+ with permanent aux memory
 	TK2000,             // Microdigital TK2000
 	LASER128,           // Laser 128/128EX/128EX2

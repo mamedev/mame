@@ -297,7 +297,7 @@ public:
 	void drawpixel_4bpp_trans(int x, int y, int patterndata, int offsetcnt);
 	void drawpixel_generic(int x, int y, int patterndata, int offsetcnt);
 	void vdp1_fill_slope(const rectangle &cliprect, int patterndata, int xsize,
-		                    INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 *nx1, INT32 *nx2,
+							INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 *nx1, INT32 *nx2,
 							INT32 u1, INT32 u2, INT32 slu1, INT32 slu2, INT32 *nu1, INT32 *nu2,
 							INT32 v1, INT32 v2, INT32 slv1, INT32 slv2, INT32 *nv1, INT32 *nv2,
 							INT32 _y1, INT32 y2);
@@ -390,7 +390,7 @@ public:
 	void stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-//	void draw_11bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+//  void draw_11bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -714,4 +714,3 @@ public:
 #define IRQ_DMAILL     1 << 12
 #define IRQ_VDP1_END   1 << 13
 #define IRQ_ABUS       1 << 15
-

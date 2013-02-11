@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( spbactnp_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x90124, 0x90125) AM_WRITE( spbatnp_90124_w ) // bg scroll
 	AM_RANGE(0x9012c, 0x9012d) AM_WRITE( spbatnp_9012c_w ) // bg scroll
 
-	 
+
 
 	AM_RANGE(0x90000, 0x900ff) AM_READ(temp_read_handler_r) // temp
 
@@ -461,7 +461,7 @@ static MACHINE_CONFIG_START( spbactnp, spbactn_state )
 	MCFG_CPU_ADD("extracpu", Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(spbactnp_extra_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  irq0_line_hold)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  nmi_line_pulse)
+//  MCFG_CPU_VBLANK_INT_DRIVER("screen", spbactn_state,  nmi_line_pulse)
 
 
 	/* video hardware */
@@ -552,7 +552,7 @@ ROM_START( spbactnp )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "spa.17g", 0x00000, 0x10000, CRC(445fc2c5) SHA1(c0e40496cfcaa0a8c90fb05111fadee74582f91a) )
 
-	
+
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "spa_data_2-21-a10.8e",   0x00000, 0x20000,  CRC(87427d7d) SHA1(f76b0dc3f0d87deb0f0c81084aff9756b236e867) ) // same as regular
 
@@ -573,7 +573,7 @@ ROM_START( spbactnp )
 	ROM_REGION( 0x10000, "extracpu", 0 ) // what? it's annother z80 rom... unused for now
 	ROM_LOAD( "6204_6-6.29c",   0x00000, 0x10000, CRC(e8250c26) SHA1(9b669878790c8e3c5d80f165b5ffa1d6830f4696) )
 
-	ROM_REGION( 0x080000, "gfx4", 0 ) /* 8x8 BG Tiles */ // more 8x8 tiles, with the girl graphics? unused for now .. for horizontal orientation?? 
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* 8x8 BG Tiles */ // more 8x8 tiles, with the girl graphics? unused for now .. for horizontal orientation??
 	ROM_LOAD( "spa.25c", 0x00000, 0x20000, CRC(02b69ab9) SHA1(368e774693a6fab756faaeec4ffd42406816e6e2) )
 
 	ROM_REGION( 0x10000, "misc", 0 ) //misc

@@ -9,12 +9,12 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- receiver disable
-	- IRQ on DCD/DSR change
-	- parity
-	- framing error
+    - receiver disable
+    - IRQ on DCD/DSR change
+    - parity
+    - framing error
 
 */
 
@@ -100,7 +100,7 @@ void mos6551_device::tra_complete()
 	{
 		transmit_register_setup(m_tdr);
 		m_st |= ST_TDRE;
-	
+
 		if ((m_cmd & CMD_TC_MASK) == CMD_TC_TIE_RTS_LO)
 		{
 			m_st |= ST_IRQ;
@@ -120,7 +120,7 @@ void mos6551_device::rcv_complete()
 	{
 		m_st |= ST_OR;
 	}
-		
+
 	m_st &= ~(ST_FE | ST_PE);
 
 	m_st |= ST_RDRF;
@@ -159,7 +159,7 @@ void mos6551_device::update_serial()
 	else
 	{
 		int baud = clock() / brg_divider[brg] / 16;
-		
+
 		set_tra_rate(baud);
 
 		if (m_ctrl & CTRL_RXC_BRG)
@@ -250,12 +250,12 @@ WRITE8_MEMBER( mos6551_device::write )
 	case 0:
 		m_tdr = data;
 		m_st &= ~ST_TDRE;
-		
+
 		if (is_transmit_register_empty())
 		{
 			transmit_register_setup(m_tdr);
 			m_st |= ST_TDRE;
-			
+
 			if ((m_cmd & CMD_TC_MASK) == CMD_TC_TIE_RTS_LO)
 			{
 				m_st |= ST_IRQ;

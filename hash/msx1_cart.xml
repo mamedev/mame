@@ -990,7 +990,7 @@ kept for now until finding out what those bytes affect...
         <description>Super Laydock (The Links Network Version) (Jpn)</description>
         <year>1987</year>
         <publisher>T&amp;E Soft</publisher>
-		<info name="alt_title" value="スーパーレイドック(THE LINKS NETWORK VERSION)" />
+        <info name="alt_title" value="スーパーレイドック(THE LINKS NETWORK VERSION)" />
         <part name="cart" interface="msx_cart">
             <feature name="pcb" value="TA6228" />
             <feature name="mapper" value="M60002-0125SP" />
@@ -1021,7 +1021,7 @@ kept for now until finding out what those bytes affect...
         <description>Synth Saurus (Jpn)</description>
         <year></year>
         <publisher>Bit²</publisher>
-		<info name="alt_title" value="シンセサウルス" />
+        <info name="alt_title" value="シンセサウルス" />
         <part name="cart" interface="msx_cart">
             <feature name="pcb" value="TAS-1M-008S" />
             <feature name="mapper" value="LZ93A13" />
@@ -1037,7 +1037,7 @@ kept for now until finding out what those bytes affect...
         <description>Synth Saurus (Alt) (Jpn)</description>
         <year></year>
         <publisher>Bit²</publisher>
-		<info name="alt_title" value="シンセサウルス" />
+        <info name="alt_title" value="シンセサウルス" />
         <part name="cart" interface="msx_cart">
             <feature name="pcb" value="TAS-2M008-E2M" />
             <feature name="mapper" value="LZ93A13" />
@@ -10911,7 +10911,7 @@ kept for now until finding out what those bytes affect...
 		<description>Scarlet 7 - The Mightiest Women (Jpn)</description>
 		<year>1986</year>
 		<publisher>Toshiba EMI</publisher>
-		<info name="serial" value="	PS-2019G" />
+		<info name="serial" value=" PS-2019G" />
 		<info name="alt_title" value="スカーレット７" />
 		<part name="cart" interface="msx_cart">
 			<feature name="mapper" value="NOMAPPER" />
@@ -11841,7 +11841,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-<!-- mmm... this is interesting: Hi-Com released this as L3W for MSX, then re-release it as Super Columns for the SMS... 
+<!-- mmm... this is interesting: Hi-Com released this as L3W for MSX, then re-release it as Super Columns for the SMS...
      is this the same (working on both) or is it a later backport to MSX?? -->
 	<software name="supercol">
 		<description>Super Columns (Kor)</description>
@@ -12433,7 +12433,7 @@ kept for now until finding out what those bytes affect...
 		<description>Thunderbolt (Jpn)</description>
 		<year>1986</year>
 		<publisher>Pixel</publisher>
-		<info name="serial" value="	AR-8601" />
+		<info name="serial" value=" AR-8601" />
 		<info name="alt_title" value="サンダーボルト" />
 		<part name="cart" interface="msx_cart">
 			<feature name="mapper" value="NOMAPPER" />
@@ -12447,7 +12447,7 @@ kept for now until finding out what those bytes affect...
 		<description>Thunderbolt (Jpn, Alt)</description>
 		<year>1986</year>
 		<publisher>Pixel</publisher>
-		<info name="serial" value="	AR-8601" />
+		<info name="serial" value=" AR-8601" />
 		<info name="alt_title" value="サンダーボルト" />
 		<part name="cart" interface="msx_cart">
 			<feature name="mapper" value="NOMAPPER" />
@@ -12461,7 +12461,7 @@ kept for now until finding out what those bytes affect...
 		<description>Thunderbolt (Jpn, Alt 2)</description>
 		<year>1986</year>
 		<publisher>Pixel</publisher>
-		<info name="serial" value="	AR-8601" />
+		<info name="serial" value=" AR-8601" />
 		<info name="alt_title" value="サンダーボルト" />
 		<part name="cart" interface="msx_cart">
 			<feature name="mapper" value="NOMAPPER" />
@@ -14427,7 +14427,7 @@ kept for now until finding out what those bytes affect...
 	</software>
 
 	<software name="123a">
-        <description>123 (Arab, Alt)</description>
+		<description>123 (Arab, Alt)</description>
 		<year>1986</year>
 		<publisher>Al Alamiah</publisher>
 		<info name="serial" value="P081" />

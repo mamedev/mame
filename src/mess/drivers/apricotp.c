@@ -416,7 +416,7 @@ static APRICOT_KEYBOARD_INTERFACE( kb_intf )
 //  pic8259_interface pic_intf
 //-------------------------------------------------
 
- IRQ_CALLBACK_MEMBER(fp_state::fp_irq_callback)
+	IRQ_CALLBACK_MEMBER(fp_state::fp_irq_callback)
 {
 	return m_pic->inta_r();
 }

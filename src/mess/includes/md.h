@@ -13,13 +13,13 @@ public:
 	md_cons_state(const machine_config &mconfig, device_type type, const char *tag)
 		: md_base_state(mconfig, type, tag),
 		m_slotcart(*this, "mdslot")
-	{ }	
-	
+	{ }
+
 	emu_timer *m_mess_io_timeout[3];
 	int m_mess_io_stage[3];
-	
+
 	optional_device<md_cart_slot_device> m_slotcart;
-	
+
 	DECLARE_DRIVER_INIT(mess_md_common);
 	DECLARE_DRIVER_INIT(genesis);
 	DECLARE_DRIVER_INIT(md_eur);
@@ -31,7 +31,7 @@ class mdsvp_state : public md_cons_state
 public:
 	mdsvp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: md_cons_state(mconfig, type, tag) { }
-	
+
 	UINT8 *m_iram; // IRAM (0-0x7ff)
 	UINT8 *m_dram; // [0x20000];
 	UINT32 m_pmac_read[6];  // read modes/addrs for PM0-PM5
@@ -48,7 +48,7 @@ public:
 	pico_state(const machine_config &mconfig, device_type type, const char *tag)
 		: md_cons_state(mconfig, type, tag),
 		m_picocart(*this, "picoslot") { }
-	
+
 	optional_device<pico_cart_slot_device> m_picocart;
 	UINT8 m_page_register;
 };

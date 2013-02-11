@@ -15,8 +15,8 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define T6721A_TAG	"u5"
-#define MOS6525_TAG	"u2"
+#define T6721A_TAG  "u5"
+#define MOS6525_TAG "u2"
 
 
 

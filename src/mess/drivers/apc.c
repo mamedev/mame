@@ -403,10 +403,10 @@ WRITE8_MEMBER(apc_state::apc_dma_w)
 WRITE8_MEMBER(apc_state::apc_irq_ack_w)
 {
 	/*
-		x--- GDC
-		-x-- TM
-		--x- APU
-		---x CRT
+	    x--- GDC
+	    -x-- TM
+	    --x- APU
+	    ---x CRT
 	*/
 	if(data & 4)
 		pic8259_ir3_w(machine().device("pic8259_master"), 0);
@@ -464,7 +464,7 @@ RTC write bits: 76543210
 static ADDRESS_MAP_START( apc_map, AS_PROGRAM, 16, apc_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0fff) AM_RAM AM_SHARE("cmos")
-//	AM_RANGE(0xa1000, 0xbffff) mirror CMOS
+//  AM_RANGE(0xa1000, 0xbffff) mirror CMOS
 //  AM_RANGE(0xc0000, 0xcffff) standard character ROM
 	AM_RANGE(0xd8000, 0xd9fff) AM_RAM AM_REGION("aux_pcg", 0) // AUX character RAM
 //  AM_RANGE(0xe0000, 0xeffff) Special Character RAM
@@ -483,7 +483,7 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 	AM_RANGE(0x48, 0x4f) AM_READWRITE8(apc_kbd_r, apc_kbd_w, 0x00ff)
 	AM_RANGE(0x50, 0x53) AM_DEVICE8("upd765", upd765a_device, map, 0x00ff ) // upd765
 	AM_RANGE(0x58, 0x59) AM_READWRITE8(apc_rtc_r, apc_rtc_w, 0x00ff)
-//	0x59 CMOS enable
+//  0x59 CMOS enable
 //  0x5a  APU data (Arithmetic Processing Unit!)
 //  0x5b, Power Off
 //  0x5e  APU status/command
@@ -492,7 +492,7 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 //  0x70, 0x76 AM_DEVREADWRITE8("upd7220_btm", upd7220_device, read, write, 0x00ff)
 //  0x71, 0x77 IDA Controller
 //  0x80, 0x90 Communication Adapter
-//	0xf0, 0xf6 ASOP Controller
+//  0xf0, 0xf6 ASOP Controller
 ADDRESS_MAP_END
 
 /* TODO: key repeat, remove port impulse! */

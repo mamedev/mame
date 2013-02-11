@@ -14,7 +14,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="6809assa" cloneof="6809ass">
 		<description>6809 Assembler v1.0 (Alt)</description>
 		<year>1984</year>
@@ -26,7 +26,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="6809mac" cloneof="6809ass">
 		<description>6809 Macro Assembler v3.6 (Hacked)</description>
 		<year>1984</year>
@@ -38,7 +38,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="agenda">
 		<description>Agenda</description>
 		<year>1984</year>
@@ -50,7 +50,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="airbus">
 		<description>Airbus</description>
 		<year>1984</year>
@@ -62,7 +62,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="airbusa" cloneof="airbus">
 		<description>Airbus (Alt)</description>
 		<year>1984</year>
@@ -74,7 +74,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="blitz">
 		<description>Blitz!</description>
 		<year>1984</year>
@@ -86,7 +86,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="blitza" cloneof="blitz">
 		<description>Blitz! (Alt)</description>
 		<year>1984</year>
@@ -98,7 +98,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="carnet">
 		<description>Carnet d'Adresses</description>
 		<year>1984</year>
@@ -110,7 +110,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="clrcalc">
 		<description>Colorcalc</description>
 		<year>1985</year>
@@ -122,7 +122,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="clrpaint">
 		<description>Colopaint</description>
 		<year>1985</year>
@@ -134,7 +134,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="controle">
 		<description>Controle Aerien</description>
 		<year>1984</year>
@@ -146,7 +146,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="desass">
 		<description>Desassembleur Dump &amp; Patch v4.0 (PD)</description>
 		<year>1986</year>
@@ -158,7 +158,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="enigma">
 		<description>Enimatika</description>
 		<year>1984</year>
@@ -170,8 +170,8 @@
 			</dataarea>
 		</part>
 	</software>
-	
-	
+
+
 	<software name="gemini">
 		<description>Gemini</description>
 		<year>1982</year>
@@ -182,8 +182,8 @@
 				<rom name="gemini (1982)(vifi-nathan)(fr).m5" size="16384" crc="cc30bba2" sha1="67be5d9736c50d6c8c4237eec483b0fef1574a4a" offset="0x0000" />
 			</dataarea>
 		</part>
-	</software>	
-	
+	</software>
+
 	<software name="glouton">
 		<description>Blitz (Fra)</description>
 		<year>1986</year>
@@ -195,7 +195,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="gloutona" cloneof="glouton">
 		<description>Blitz (Fra, Alt)</description>
 		<year>1986</year>
@@ -207,7 +207,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="grille">
 		<description>La Grille</description>
 		<year>1985</year>
@@ -219,7 +219,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="jane">
 		<description>Jane</description>
 		<year>1985</year>
@@ -231,7 +231,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="logo">
 		<description>LOGO v1.0</description>
 		<year>1984</year>
@@ -243,7 +243,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="logoa" cloneof="logo">
 		<description>LOGO v1.0 (Alt)</description>
 		<year>1984</year>
@@ -255,7 +255,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="lsegedl">
 		<description>LSEG-EDL v3.2</description>
 		<year>1985</year>
@@ -267,7 +267,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="maison">
 		<description>La Maison d'Amedee</description>
 		<year>1984</year>
@@ -279,7 +279,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="melimemo">
 		<description>Melimemot</description>
 		<year>1983</year>
@@ -291,7 +291,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="melodia">
 		<description>Melodia</description>
 		<year>1982</year>
@@ -327,7 +327,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="peche">
 		<description>La Peche a la Barre</description>
 		<year>1984</year>
@@ -339,7 +339,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="pictor">
 		<description>Pictor</description>
 		<year>1983</year>
@@ -351,7 +351,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="trap">
 		<description>Trap</description>
 		<year>1982</year>
@@ -375,6 +375,6 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 
 </softwarelist>

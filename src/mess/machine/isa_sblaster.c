@@ -44,7 +44,7 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1,  1,  3, -1, -1, -1, -1, -1, -1, -1, -1,  2,  1, /* 0x */
 		2, -1, -1, -1,  3, -1,  3,  3, -1, -1, -1,  -1,  1, -1, -1,  1, /* 1x */
 	-1, -1, -1, -1,  3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 2x */
-	 1,  1, -1, -1,  1,  1,  1,  1,  1,  -1, -1, -1, -1, -1, -1, -1, /* 3x */
+		1,  1, -1, -1,  1,  1,  1,  1,  1,  -1, -1, -1, -1, -1, -1, -1, /* 3x */
 		2,  3,  3, -1, -1, -1, -1, -1,  3, -1, -1,  -1, -1, -1, -1, -1, /* 4x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 5x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 6x */
@@ -86,7 +86,7 @@ SLOT_INTERFACE_END
 
 static const serial_port_interface midiout_intf =
 {
-	DEVCB_NULL	// midi out ports don't transmit inward
+	DEVCB_NULL  // midi out ports don't transmit inward
 };
 
 static MACHINE_CONFIG_FRAGMENT( sblaster1_0_config )
@@ -336,7 +336,7 @@ READ8_MEMBER(sb_device::dsp_rbuf_status_r)
 //    printf("Clear IRQ5\n");
 	irq_w(0, IRQ_DMA8);   // reading this port ACKs the card's IRQ, 8-bit dma only?
 
-	// in either SB-MIDI mode, bit 7 indicates if a character is available 
+	// in either SB-MIDI mode, bit 7 indicates if a character is available
 	// to read.
 	if (m_uart_midi || m_onebyte_midi)
 	{
@@ -364,7 +364,7 @@ READ8_MEMBER(sb_device::dsp_wbuf_status_r)
 	{
 		if (m_tx_waiting >= MIDI_RING_SIZE)
 		{
- 			return 0x80;
+			return 0x80;
 		}
 
 		return 0x00;
@@ -453,11 +453,11 @@ void sb_device::process_fifo(UINT8 cmd)
 				break;
 
 			case 0x36:
-			case 0x37:	// Enter UART mode
+			case 0x37:  // Enter UART mode
 				printf("timestamp MIDI mode not supported, contact MESSDEV!\n");
 				break;
 
-			case 0x38:	// single-byte MIDI send
+			case 0x38:  // single-byte MIDI send
 				m_onebyte_midi = true;
 				break;
 
@@ -707,7 +707,7 @@ void sb_device::process_fifo(UINT8 cmd)
 
 WRITE8_MEMBER(sb_device::dsp_cmd_w)
 {
-//	printf("%02x to DSP command @ %x\n", data, offset);
+//  printf("%02x to DSP command @ %x\n", data, offset);
 
 	if(offset)
 		return;
@@ -715,7 +715,7 @@ WRITE8_MEMBER(sb_device::dsp_cmd_w)
 	if (m_uart_midi || m_onebyte_midi)
 	{
 		xmit_char(data);
-		m_onebyte_midi = false;	// clear onebyte (if this is uart, that's harmless)
+		m_onebyte_midi = false; // clear onebyte (if this is uart, that's harmless)
 		return;
 	}
 
@@ -802,7 +802,7 @@ READ8_MEMBER( sb16_device::mpu401_r )
 		}
 		if (m_rx_waiting == 0)
 		{
-			res |= 0x80;	// rx empty
+			res |= 0x80;    // rx empty
 		}
 	}
 
@@ -1604,7 +1604,7 @@ void sb_device::rcv_complete()    // Rx completed receiving byte
 		}
 		if (m_uart_irq)
 		{
-			irq_w(1, IRQ_DMA8); 
+			irq_w(1, IRQ_DMA8);
 		}
 	}
 }
@@ -1630,7 +1630,7 @@ void sb16_device::rcv_complete()    // Rx completed receiving byte
 
 		if (m_uart_irq)
 		{
-			irq_w(1, IRQ_DMA8); 
+			irq_w(1, IRQ_DMA8);
 		}
 
 		if (m_mpu_midi)
@@ -1642,7 +1642,7 @@ void sb16_device::rcv_complete()    // Rx completed receiving byte
 
 void sb_device::tra_complete()    // Tx completed sending byte
 {
-//	printf("Tx complete\n");
+//  printf("Tx complete\n");
 	// is there more waiting to send?
 	if (m_tx_waiting)
 	{
@@ -1662,12 +1662,12 @@ void sb_device::tra_complete()    // Tx completed sending byte
 void sb_device::tra_callback()    // Tx send bit
 {
 	int bit = transmit_register_get_data_bit();
-    m_mdout->tx(bit);
+	m_mdout->tx(bit);
 }
 
 void sb_device::xmit_char(UINT8 data)
 {
-//	printf("SB: xmit %02x\n", data);
+//  printf("SB: xmit %02x\n", data);
 
 	// if tx is busy it'll pick this up automatically when it completes
 	if (!m_tx_busy)
@@ -1686,4 +1686,3 @@ void sb_device::xmit_char(UINT8 data)
 		m_tx_waiting++;
 	}
 }
-

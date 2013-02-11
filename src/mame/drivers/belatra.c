@@ -4,7 +4,7 @@
 
 These appear to run on Acorn Archimedes-compatible hardware, similar to ertictac.c.
 That would make the SoC an ARM7500 or similar.
- 
+
 */
 
 /*

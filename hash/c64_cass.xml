@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!-- based on c64tapes.org dumps -->
 <softwarelist name="c64_cass" description="Commodore 64 cassettes">
-	
+
 	<software name="jacknip2">
 		<description>Jack the Nipper II: In Coconut Capers</description>
 		<year>1987</year>

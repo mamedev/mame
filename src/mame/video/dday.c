@@ -33,7 +33,6 @@ TIMER_CALLBACK_MEMBER(dday_state::countdown_timer_callback)
 
 void dday_state::start_countdown_timer()
 {
-
 	m_timer_value = 0;
 
 	machine().scheduler().timer_pulse(attotime::from_seconds(1), timer_expired_delegate(FUNC(dday_state::countdown_timer_callback),this));

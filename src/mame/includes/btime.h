@@ -121,5 +121,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 color,
 							UINT8 sprite_y_adjust, UINT8 sprite_y_adjust_flip_screen,
 							UINT8 *sprite_ram, offs_t interleave );
-	
+
 };

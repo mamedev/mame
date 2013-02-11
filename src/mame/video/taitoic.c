@@ -1883,7 +1883,7 @@ READ_LINE_DEVICE_HANDLER( tc0080vco_flipscreen_r )
 void tc0080vco_device::tc0080vco_postload()
 {
 	tc0080vco_state *tc0080vco = tc0080vco_get_safe_token(this);
-	
+
 	tc0080vco->flipscreen = tc0080vco->scroll_ram[0] & 0x0c00;
 
 	tc0080vco->tilemap[0]->set_flip(tc0080vco->flipscreen ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
@@ -3716,7 +3716,7 @@ READ8_DEVICE_HANDLER( tc0480scp_pri_reg_r )
 void tc0480scp_device::tc0480scp_postload()
 {
 	tc0480scp_state *tc0480scp = tc0480scp_get_safe_token(this);
-	
+
 	int reg;
 	int flip = tc0480scp->ctrl[0xf] & 0x40;
 

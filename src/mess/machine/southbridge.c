@@ -183,7 +183,7 @@ southbridge_device::southbridge_device(const machine_config &mconfig, device_typ
 
 IRQ_CALLBACK_MEMBER(southbridge_device::at_irq_callback)
 {
-    return m_pic8259_master->inta_r();
+	return m_pic8259_master->inta_r();
 }
 
 //-------------------------------------------------

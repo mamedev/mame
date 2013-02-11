@@ -11,7 +11,7 @@ Games:
 Goofy Golf*
 Combat!*
 Superbowl
-Football*	(QQA-308)
+Football*   (QQA-308)
 Astro-Logic*
 Hammurabi*
 Life*
@@ -22,19 +22,19 @@ Thinkcards*
 Computer Quiz
 
 Data Sets for use with Computer Quiz:
-TV Trivia			The World of Books
-Famous People		World Geography
-Sports Scene		American History
-Music Masters		Complete the Quote
-Current Exents		Total Trivia
-Popular Pairs		Pseudonyms
-The Sciences		Famous Firsts
-Who Said It?		All About Animals
-The Movies			The Human Body
+TV Trivia           The World of Books
+Famous People       World Geography
+Sports Scene        American History
+Music Masters       Complete the Quote
+Current Exents      Total Trivia
+Popular Pairs       Pseudonyms
+The Sciences        Famous Firsts
+Who Said It?        All About Animals
+The Movies          The Human Body
 
 Programming Aids:
 EZEDIT Program Editor*
-Microsoft 8K Fast Graphics BASIC*	(replaces Level II BASIC)
+Microsoft 8K Fast Graphics BASIC*   (replaces Level II BASIC)
 Micro Video Dissassembler
 Micro Video Monitor
 Bombs Away! Programming Tutorial
@@ -89,7 +89,7 @@ Alignment Tape (Micro Video)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Tape 102 -->
 	<software name="startrck">
 		<description>Star Track</description>
@@ -101,7 +101,7 @@ Alignment Tape (Micro Video)
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!-- Tape 103 -->
 	<software name="concentr">
 		<description>Concentration</description>

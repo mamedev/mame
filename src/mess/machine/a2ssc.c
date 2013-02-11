@@ -230,4 +230,3 @@ WRITE_LINE_MEMBER( a2bus_ssc_device::acia_irq_w )
 		}
 	}
 }
-

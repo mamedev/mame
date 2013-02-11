@@ -2749,20 +2749,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
 			iy = 0x7f;
 		double x = (double)(ix - 0x80) / 127.0;
 		double y = (double)(0x80 - iy) / 127.0;
-		
+
 		// normalize
 		double a = atan(x/y);
 		double p = sqrt(x*x + y*y);
 		double v = (fabs(a) < (M_PI / 4.0)) ? p*cos(a) : p*sin(a);
 		v = fabs(v);
-		
+
 		// note that it is rotated by 45 degrees, so instead of axes like (+), they are like (x)
 		a += (M_PI / 4.0);
 		if (a < 0)
 			a = 0;
 		else if (a > (M_PI / 2.0))
 			a = M_PI / 2.0;
-		
+
 		// tied to mcu A2/A3 timer (speed determines frequency)
 		// these values(in usec) may need tweaking:
 		const int base = 1000;
@@ -2771,7 +2771,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
 		double t[2];
 		t[0] = v*sin(a); // y -> A2
 		t[1] = v*cos(a); // x -> A3
-		
+
 		for (int axis = 0; axis < 2; axis++)
 		{
 			if (t[axis] >  (1.0 / (double)(range)))
@@ -2822,7 +2822,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 {
 	// arbitrary timer for reading optical pedal
 	UINT8 i = ioport("PEDAL")->read();
-	
+
 	if (i != 0)
 	{
 		// the pedal has a simple 1-bit "light interrupted" sensor.  the faster you pedal,
@@ -3082,7 +3082,7 @@ static MACHINE_CONFIG_START( namcos22, namcos22_state )
 	MCFG_CPU_PROGRAM_MAP( mcu_s22_program)
 	MCFG_CPU_IO_MAP( mcu_s22_io)
 
-	MCFG_CPU_ADD("iomcu", M37702, XTAL_6_144MHz)	// 6.144MHz XTAL on I/O board, not sure if it has a divider
+	MCFG_CPU_ADD("iomcu", M37702, XTAL_6_144MHz)    // 6.144MHz XTAL on I/O board, not sure if it has a divider
 	MCFG_CPU_PROGRAM_MAP( iomcu_s22_program)
 	MCFG_CPU_IO_MAP( iomcu_s22_io)
 
@@ -4916,7 +4916,7 @@ static INPUT_PORTS_START( adillor )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_NAME("Dev Service Up")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_NAME("Dev Service Down")
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("MCUP5A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )

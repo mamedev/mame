@@ -1192,7 +1192,7 @@ READ16_HANDLER( amiga_custom_r )
 		case REG_JOY1DAT:
 			if (state->m_intf->joy1dat_r != NULL)
 				return (*state->m_intf->joy1dat_r)(space.machine());
-			
+
 			if (state->m_joy1dat_port) return state->m_joy1dat_port->read();
 			else return 0xffff;
 

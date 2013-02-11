@@ -6,7 +6,7 @@
 extern const device_type PSX_DUALSHOCK;
 extern const device_type PSX_ANALOG_JOYSTICK;
 
-class psx_analog_controller_device :	public device_t,
+class psx_analog_controller_device :    public device_t,
 										public device_psx_controller_interface
 {
 public:

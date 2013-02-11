@@ -6579,12 +6579,12 @@
 		<year>1984</year>
 		<publisher>Viza</publisher>
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-		
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="vizastar" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-	
+
 			<dataarea name="roml" size="0x1000">
 				<rom name="v" size="0x1000" crc="d17689a0" sha1="4df4d254d7fae916c473d421515b2b74d77e9fd9" offset="0" />
 			</dataarea>
@@ -6598,7 +6598,7 @@
 	</software>
 
 	<!-- Dummy cartridge entries to allow requirement mappings from c64_flop -->
-	
+
 	<software name="cpm">
 		<description>CP/M</description>
 		<year>1982</year>

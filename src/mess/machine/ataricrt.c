@@ -54,5 +54,3 @@ static READ8_HANDLER( bbsb_bankh_r )
 	return &mem[0x4000 + bbsb_bankh * 0x1000];
 }
 #endif
-
-

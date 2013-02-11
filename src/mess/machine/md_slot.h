@@ -22,7 +22,7 @@ enum
 	SEGA_SRAM, SEGA_FRAM,
 	HARDBALL95,                  /* Hardball 95 uses different sram start address */
 	BEGGAR,                      /* Xin Qigai Wangzi uses different sram start address and has no valid header */
-	
+
 	// EEPROM
 	SEGA_EEPROM,                 /* Wonder Boy V / Evander Holyfield's Boxing / Greatest Heavyweights of the Ring / Sports Talk Baseball / Megaman */
 	NBA_JAM,                     /* NBA Jam */
@@ -37,12 +37,12 @@ enum
 	CM_JCART,                    /* Pete Sampras Tennis */
 	CODE_MASTERS,                /* Micro Machines 2 / Military (J-Cart + SEPROM)  */
 	CM_MM96,                     /* Micro Machines 96 (J-Cart + SEPROM, diff I2C model)  */
-	
+
 	// Various
 	SSF2,                        /* Super Street Fighter 2 */
 	GAME_KANDUME,                /* Game no Kandume Otokuyou */
 	RADICA,                      /* Radica TV games.. these probably should be a separate driver since they are a separate 'console' */
-	
+
 	BUGSLIFE,                    /* A Bug's Life */
 	CHINFIGHT3,                  /* Chinese Fighters 3 */
 	ELFWOR,                      /* Linghuan Daoshi Super Magician */
@@ -107,13 +107,13 @@ public:
 	virtual UINT16* get_nvram_base() { return m_nvram; };
 	virtual UINT32 get_rom_size() { return m_rom_size; };
 	virtual UINT32 get_nvram_size() { return m_nvram_size; };
-	
-	virtual void rom_map_setup(UINT32 size);	
+
+	virtual void rom_map_setup(UINT32 size);
 	virtual UINT32 get_padded_size(UINT32 size);
-	
+
 	int m_nvram_start, m_nvram_end;
 	int m_nvram_active, m_nvram_readonly;
-	
+
 	// when loading from fullpath, we create NVRAM even if not set in the header
 	// however in this case we access it only if the game turn it on
 	// the variable below is basically needed to track this...
@@ -124,8 +124,8 @@ public:
 	UINT16      *m_nvram;
 	UINT32 m_rom_size;
 	UINT32 m_nvram_size;
-	
-	UINT8 rom_bank_map[128];	// 64K chunks of rom
+
+	UINT8 rom_bank_map[128];    // 64K chunks of rom
 };
 
 
@@ -140,11 +140,11 @@ public:
 	// construction/destruction
 	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~base_md_cart_slot_device();
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete();
-	
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
@@ -165,10 +165,10 @@ public:
 	virtual bool must_be_loaded() const { return 1; }
 	virtual bool is_reset_on_load() const { return 0; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
-	
+
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
-	
+
 	// reading and writing
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_WRITE16_MEMBER(write);
@@ -181,8 +181,8 @@ public:
 // this should be private, but then there is some problem installing delegates in the driver...
 //private:
 
-	device_md_cart_interface*		m_cart;
-	
+	device_md_cart_interface*       m_cart;
+
 	int m_type;
 };
 
@@ -225,7 +225,7 @@ public:
 
 // device type definition
 extern const device_type MD_CART_SLOT;
-extern const device_type MD_SUBCART_SLOT;	// needed to allow S&K pass-through to have non-mandatory cart
+extern const device_type MD_SUBCART_SLOT;   // needed to allow S&K pass-through to have non-mandatory cart
 extern const device_type PICO_CART_SLOT;
 
 

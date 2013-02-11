@@ -62,7 +62,7 @@
 // ======================> t6721a_device
 
 class t6721a_device : public device_t,
-					  public device_sound_interface
+						public device_sound_interface
 {
 public:
 	t6721a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);

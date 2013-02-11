@@ -2749,7 +2749,7 @@ void taitosj_state::init_common()
 	save_item(NAME(m_kikstart_gears));
 	save_item(NAME(m_dac_out));
 	save_item(NAME(m_dac_vol));
-	
+
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(taitosj_state::reset_common), this));
 }
 

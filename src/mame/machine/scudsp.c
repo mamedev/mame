@@ -66,17 +66,17 @@ Changelog:
 - Add control flags
 - Croc: has a bug somewhere that never allows it to trip the ENDI opcode.
   Snippet of interest is:
-  08	00823500	                                        CLR A     MOV M0,PL
-  09	08040000	OR                                      MOV ALU,A
-  0A	D208000D	JMP NZ,$D
-  0B	00000000	NOP
-  0C	F8000000	ENDI
+  08    00823500                                            CLR A     MOV M0,PL
+  09    08040000    OR                                      MOV ALU,A
+  0A    D208000D    JMP NZ,$D
+  0B    00000000    NOP
+  0C    F8000000    ENDI
   ...
-  40	00863502	                                        MOV M0,A  MOV M2,PL
-  41	10003009	ADD                                               MOV ALL,MC0
-  42	D3400042	JMP T0,$42
-  43	00000000	NOP
-  44	D0000007	JMP $7
+  40    00863502                                            MOV M0,A  MOV M2,PL
+  41    10003009    ADD                                               MOV ALL,MC0
+  42    D3400042    JMP T0,$42
+  43    00000000    NOP
+  44    D0000007    JMP $7
 
 ******************************************************************************************/
 #include "emu.h"

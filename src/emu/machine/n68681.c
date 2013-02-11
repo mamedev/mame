@@ -976,4 +976,3 @@ void duart68681_channel::ACR_updated()
 {
 	write_chan_reg(1, CSR);
 }
-

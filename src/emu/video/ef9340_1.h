@@ -17,14 +17,13 @@
 
 #define MCFG_EF9340_1_ADD(_tag, _clock, _screen_tag) \
 	MCFG_DEVICE_ADD(_tag, EF9340_1, _clock) \
-	ef9340_1_device::set_screen_tag(*device, _screen_tag); \
-
+	ef9340_1_device::set_screen_tag(*device, _screen_tag);
 
 class ef9340_1_device : public device_t
 {
 public:
-    // construction/destruction
-    ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// static configuration helpers
 	static void set_screen_tag(device_t &device, const char *screen_tag) { downcast<ef9340_1_device &>(device).m_screen_tag = screen_tag; }
@@ -82,4 +81,3 @@ protected:
 extern const device_type EF9340_1;
 
 #endif  /* __EF9340_1_H__ */
-

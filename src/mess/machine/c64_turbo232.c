@@ -9,7 +9,7 @@
 
 /*
 
-	http://ar.c64.org/wiki/Turbo232_Programming.txt
+    http://ar.c64.org/wiki/Turbo232_Programming.txt
 
 */
 
@@ -21,8 +21,8 @@
 //  MACROS/CONSTANTS
 //**************************************************************************
 
-#define MOS6551_TAG		"mos6551"
-#define RS232_TAG		"rs232"
+#define MOS6551_TAG     "mos6551"
+#define RS232_TAG       "rs232"
 
 
 

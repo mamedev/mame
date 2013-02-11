@@ -192,29 +192,29 @@ static SLOT_INTERFACE_START( ensoniq_floppies )
 SLOT_INTERFACE_END
 
 static int maincpu_irq_acknowledge_callback(device_t *device, int irqnum) {
-  // We immediately update the interrupt presented to the CPU, so that it doesn't
-  // end up retrying the same interrupt over and over. We then return the appropriate vector.
-  esq5505_state *esq5505 = device->machine().driver_data<esq5505_state>();
-  int vector = 0;
-  switch(irqnum) {
-  case 1:
-    esq5505->otis_irq_state = 0;
-    vector = M68K_INT_ACK_AUTOVECTOR;
-    break;
-  case 2:
-    esq5505->dmac_irq_state = 0;
-    vector = esq5505->dmac_irq_vector;
-    break;
-  case 3:
-    esq5505->duart_irq_state = 0;
-    vector = esq5505->duart_irq_vector;
-    break;
-  default:
-    printf("\nUnexpected IRQ ACK Callback: IRQ %d\n", irqnum);
-    return 0;
-  }
-  esq5505->update_irq_to_maincpu();
-  return vector;
+	// We immediately update the interrupt presented to the CPU, so that it doesn't
+	// end up retrying the same interrupt over and over. We then return the appropriate vector.
+	esq5505_state *esq5505 = device->machine().driver_data<esq5505_state>();
+	int vector = 0;
+	switch(irqnum) {
+	case 1:
+	esq5505->otis_irq_state = 0;
+	vector = M68K_INT_ACK_AUTOVECTOR;
+	break;
+	case 2:
+	esq5505->dmac_irq_state = 0;
+	vector = esq5505->dmac_irq_vector;
+	break;
+	case 3:
+	esq5505->duart_irq_state = 0;
+	vector = esq5505->duart_irq_vector;
+	break;
+	default:
+	printf("\nUnexpected IRQ ACK Callback: IRQ %d\n", irqnum);
+	return 0;
+	}
+	esq5505->update_irq_to_maincpu();
+	return vector;
 }
 
 void esq5505_state::machine_reset()
@@ -225,24 +225,24 @@ void esq5505_state::machine_reset()
 }
 
 void esq5505_state::update_irq_to_maincpu() {
-  //printf("\nupdating IRQ state: have OTIS=%d, DMAC=%d, DUART=%d\n", otis_irq_state, dmac_irq_state, duart_irq_state);
-  if (duart_irq_state) {
-    m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-    m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-    m_maincpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, duart_irq_vector);
-  } else if (dmac_irq_state) {
-    m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
-    m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-    m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, dmac_irq_vector);
-  } else if (otis_irq_state) {
-    m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
-    m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-    m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
-  } else {
-    m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
-    m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
-    m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
-  }
+	//printf("\nupdating IRQ state: have OTIS=%d, DMAC=%d, DUART=%d\n", otis_irq_state, dmac_irq_state, duart_irq_state);
+	if (duart_irq_state) {
+	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	m_maincpu->set_input_line_and_vector(M68K_IRQ_3, ASSERT_LINE, duart_irq_vector);
+	} else if (dmac_irq_state) {
+	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	m_maincpu->set_input_line_and_vector(M68K_IRQ_2, ASSERT_LINE, dmac_irq_vector);
+	} else if (otis_irq_state) {
+	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
+	} else {
+	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
+	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
+	}
 }
 
 READ16_MEMBER(esq5505_state::lower_r)
@@ -252,17 +252,17 @@ READ16_MEMBER(esq5505_state::lower_r)
 	// get pointers when 68k resets
 	if (!m_rom)
 	{
-	  m_rom = (UINT16 *)(void *)machine().root_device().memregion("osrom")->base();
-	  m_ram = (UINT16 *)(void *)machine().root_device().memshare("osram")->ptr();
+		m_rom = (UINT16 *)(void *)machine().root_device().memregion("osrom")->base();
+		m_ram = (UINT16 *)(void *)machine().root_device().memshare("osram")->ptr();
 	}
 
-	if (m68k_get_fc(m_maincpu) == 0x6)	// supervisor mode = ROM
+	if (m68k_get_fc(m_maincpu) == 0x6)  // supervisor mode = ROM
 	{
-	  return m_rom[offset];
+		return m_rom[offset];
 	}
 	else
 	{
-	  return m_ram[offset];
+		return m_ram[offset];
 	}
 }
 
@@ -360,10 +360,10 @@ static UINT16 esq5505_read_adc(device_t *device)
 			return 0x7fff;
 
 		case 2: // volume control
-		        return 0xffff;
+				return 0xffff;
 
 		case 3: // pedal
-		        return 0xffff;
+				return 0xffff;
 
 		case 5: // mod wheel
 			return 0xffff;
@@ -390,7 +390,7 @@ WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
 	}
 	else
 	{
-                duart_irq_state = 0;
+				duart_irq_state = 0;
 	}
 	update_irq_to_maincpu();
 };
@@ -446,20 +446,20 @@ WRITE8_MEMBER(esq5505_state::duart_output)
 	    bit 7 = SACK (?)
 	*/
 
-    if (data & 0x40) {
-      if (!m_esp->input_state(es5510_device::ES5510_HALT)) {
+	if (data & 0x40) {
+		if (!m_esp->input_state(es5510_device::ES5510_HALT)) {
 	logerror("ESQ5505: Asserting ESPHALT\n");
 	m_esp->set_input_line(es5510_device::ES5510_HALT, ASSERT_LINE);
-      }
-    } else {
-      if (m_esp->input_state(es5510_device::ES5510_HALT)) {
+		}
+	} else {
+		if (m_esp->input_state(es5510_device::ES5510_HALT)) {
 	logerror("ESQ5505: Clearing ESPHALT\n");
 	m_esp->set_input_line(es5510_device::ES5510_HALT, CLEAR_LINE);
-      }
-    }
+		}
+	}
 
-    if (floppy)
-    {
+	if (floppy)
+	{
 		if (m_system_type == EPS)
 		{
 			floppy->ss_w((data & 2)>>1);
@@ -566,13 +566,13 @@ INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
 				shift += 32;
 				printf("New shift %d\n", shift);
 			}
-			else if (val == 0x02) 
+			else if (val == 0x02)
 			{
-			  printf("Analog tests!\n");
-			  m_panel->xmit_char(54 | 0x80); m_panel->xmit_char(0); // Preset down
-			  m_panel->xmit_char(8 | 0x80);  m_panel->xmit_char(0); // Compare down
-			  m_panel->xmit_char(8);         m_panel->xmit_char(0); // Compare up
-			  m_panel->xmit_char(54);        m_panel->xmit_char(0); // Preset up	    
+				printf("Analog tests!\n");
+				m_panel->xmit_char(54 | 0x80); m_panel->xmit_char(0); // Preset down
+				m_panel->xmit_char(8 | 0x80);  m_panel->xmit_char(0); // Compare down
+				m_panel->xmit_char(8);         m_panel->xmit_char(0); // Compare up
+				m_panel->xmit_char(54);        m_panel->xmit_char(0); // Preset up
 			}
 		}
 	}
@@ -611,7 +611,7 @@ static const es5505_interface es5505_config =
 	"waverom",  /* Bank 0 */
 	"waverom2", /* Bank 1 */
 	esq5505_otis_irq, /* irq */
-        esq5505_read_adc
+		esq5505_read_adc
 };
 
 static const esqpanel_interface esqpanel_config =
@@ -625,7 +625,7 @@ SLOT_INTERFACE_END
 
 static const serial_port_interface midiin_intf =
 {
-	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_a_w)	// route MIDI Tx send directly to 68681 channel A Rx
+	DEVCB_DEVICE_LINE_MEMBER("duart", duartn68681_device, rx_a_w)   // route MIDI Tx send directly to 68681 channel A Rx
 };
 
 static SLOT_INTERFACE_START(midiout_slot)
@@ -634,7 +634,7 @@ SLOT_INTERFACE_END
 
 static const serial_port_interface midiout_intf =
 {
-	DEVCB_NULL	// midi out ports don't transmit inward
+	DEVCB_NULL  // midi out ports don't transmit inward
 };
 
 static MACHINE_CONFIG_START( vfx, esq5505_state )

@@ -96,7 +96,7 @@ protected:
 	required_ioport m_key5;
 	required_ioport m_joy0;
 	required_ioport m_joy1;
-	
+
 	void switch_banks();
 };
 
@@ -104,7 +104,7 @@ class g7400_state : public odyssey2_state
 {
 public:
 	g7400_state(const machine_config &mconfig, device_type type, const char *tag)
-        : odyssey2_state(mconfig, type, tag)
+		: odyssey2_state(mconfig, type, tag)
 		, m_i8243(*this, "i8243")
 		, m_ef9340_1(*this, "ef9340_1")
 	{ }
@@ -246,7 +246,7 @@ const UINT8 odyssey2_colors[] =
 	/* Background,Grid Dim */
 	0x00,0x00,0x00,   /* Black */                                         // i r g b
 	0x13,0x35,0xA5,   /* Blue           - Calibrated To Real VideoPac */  // i r g B
-	0x02,0x70,0x02,   /* Green          - Calibrated To Real VideoPac */  // i r G b	
+	0x02,0x70,0x02,   /* Green          - Calibrated To Real VideoPac */  // i r G b
 	0x38,0x85,0x8C,   /* Blue-Green     - Calibrated To Real VideoPac */  // i r G B
 	0x91,0x00,0x00,   /* Dk Red         - Calibrated To Real VideoPac */  // i R g b
 	0x86,0x49,0xA3,   /* Violet         - Calibrated To Real VideoPac */  // i R g B
@@ -258,7 +258,7 @@ const UINT8 odyssey2_colors[] =
 	0x60,0x89,0xDB,   /* Ltr Blue       - Calibrated To Real VideoPac */  // I R g B
 	0x54,0xBF,0x54,   /* Lt Green       - Calibrated To Real VideoPac */  // I R g B
 	0x6B,0xDD,0xF4,   /* Lt Blue        - Calibrated To Real VideoPac */  // I R g b
-	0xE5,0x5E,0x5E,   /* Red            - Calibrated To Real VideoPac */  // I R g b  
+	0xE5,0x5E,0x5E,   /* Red            - Calibrated To Real VideoPac */  // I R g b
 	0xD9,0x83,0xDB,   /* Lt Violet      - Calibrated To Real VideoPac */  // I R g B
 	0xC4,0xBD,0x5C,   /* Lt Yellow      - Calibrated To Real VideoPac */  // I R G b
 	0xFF,0xFF,0xFF,   /* White */                                         // I R G B
@@ -283,7 +283,7 @@ void g7400_state::palette_init()
 
 		0x49,0x49,0x49, 0x49,0x49,0xff, 0x49,0xff,0x49, 0x49,0xff,0xff,
 		0xff,0x49,0x49, 0xff,0x49,0xff, 0xff,0xff,0x49, 0xff,0xff,0xff
-		
+
 	};
 
 	for ( int i = 0; i < 16; i++ )

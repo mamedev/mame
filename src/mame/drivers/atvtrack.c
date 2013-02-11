@@ -85,11 +85,11 @@ public:
 	UINT32 screen_update_atvtrack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline UINT32 decode64_32(offs_t offset64, UINT64 data, UINT64 mem_mask, offs_t &offset32);
 	void logbinary(UINT32 data,int high,int low);
-	
+
 	memory_region *m_nandregion;
 	int m_nandcommand[4], m_nandoffset[4], m_nandaddressstep, m_nandaddress[4];
 	UINT32 m_area1_data[4];
-	
+
 };
 
 void atvtrack_state::logbinary(UINT32 data,int high=31,int low=0)

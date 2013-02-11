@@ -81,7 +81,7 @@ public:
 		{
 		case 0:
 			return m_col0->read();
-		
+
 		case 1:
 			return m_col1->read();
 

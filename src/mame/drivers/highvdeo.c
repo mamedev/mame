@@ -394,10 +394,10 @@ static ADDRESS_MAP_START( nyjoker_map, AS_PROGRAM, 16, highvdeo_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nyjoker_io, AS_IO, 16, highvdeo_state )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w )	// lamps
-	AM_RANGE(0x0002, 0x0003) AM_WRITENOP			// alternate coin counter (bits 0 and 2)
+	AM_RANGE(0x0000, 0x0001) AM_WRITE(write1_w )    // lamps
+	AM_RANGE(0x0002, 0x0003) AM_WRITENOP            // alternate coin counter (bits 0 and 2)
 	AM_RANGE(0x0004, 0x0005) AM_WRITE(nyj_write2_w ) // coin and note counter
-//	AM_RANGE(0x0006, 0x0007) AM_WRITENOP
+//  AM_RANGE(0x0006, 0x0007) AM_WRITENOP
 	AM_RANGE(0x0008, 0x0009) AM_WRITE(tv_ncf_oki6376_w )
 	AM_RANGE(0x000a, 0x000b) AM_WRITE(tv_ncf_oki6376_st_w )
 	AM_RANGE(0x000c, 0x000d) AM_READ_PORT("IN0")
@@ -419,9 +419,9 @@ WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
     ---x ----  Note counter.
     xxx- ----  Unknown.
 */
-//	popmessage("%04x",data);
-	coin_counter_w(machine(), 0, ~data & 0x0f);	// Coins (all)
-	coin_counter_w(machine(), 1, ~data & 0x10);	// Notes (all)
+//  popmessage("%04x",data);
+	coin_counter_w(machine(), 0, ~data & 0x0f); // Coins (all)
+	coin_counter_w(machine(), 1, ~data & 0x10); // Notes (all)
 }
 
 
@@ -727,44 +727,44 @@ static INPUT_PORTS_START( nyjoker )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) // Coin 2
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 ) // Coin 3
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 ) // Coin 4 <--- This one has non-timed pulse, so maybe was designed to be KEY IN.
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note 1") PORT_CODE(KEYCODE_1_PAD)	// Note 1
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_NAME("Note 2") PORT_CODE(KEYCODE_2_PAD)	// Note 2
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN7 ) PORT_NAME("Note 3") PORT_CODE(KEYCODE_3_PAD)	// Note 3
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN8 ) PORT_NAME("Note 4") PORT_CODE(KEYCODE_4_PAD)	// Note 4
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note 1") PORT_CODE(KEYCODE_1_PAD)   // Note 1
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN6 ) PORT_NAME("Note 2") PORT_CODE(KEYCODE_2_PAD)   // Note 2
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN7 ) PORT_NAME("Note 3") PORT_CODE(KEYCODE_3_PAD)   // Note 3
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN8 ) PORT_NAME("Note 4") PORT_CODE(KEYCODE_4_PAD)   // Note 4
 
 	PORT_START("IN3")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  PORT_NAME("Bookkeeping")					// Account
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Key")							// Key
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Ticket")   PORT_CODE(KEYCODE_T)	// Ticket
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Unknown")  PORT_CODE(KEYCODE_U)	// Unknown
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Hopper 1") PORT_CODE(KEYCODE_H)	// Hopper 1
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Hopper 2") PORT_CODE(KEYCODE_J)	// Hopper 2
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Level 2")  PORT_CODE(KEYCODE_K)	// Level 2
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER )		PORT_NAME("Level 1")  PORT_CODE(KEYCODE_L)	// Level 1
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  PORT_NAME("Bookkeeping")                    // Account
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN ) PORT_NAME("Key")                            // Key
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Ticket")   PORT_CODE(KEYCODE_T)  // Ticket
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Unknown")  PORT_CODE(KEYCODE_U)  // Unknown
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hopper 1") PORT_CODE(KEYCODE_H)  // Hopper 1
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hopper 2") PORT_CODE(KEYCODE_J)  // Hopper 2
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Level 2")  PORT_CODE(KEYCODE_K)  // Level 2
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Level 1")  PORT_CODE(KEYCODE_L)  // Level 1
 
-	PORT_START("DSW")	// DIP switches bank
-	PORT_DIPNAME( 0x0001, 0x0000, "DSW 8" )				PORT_DIPLOCATION("DSW:!8")
+	PORT_START("DSW")   // DIP switches bank
+	PORT_DIPNAME( 0x0001, 0x0000, "DSW 8" )             PORT_DIPLOCATION("DSW:!8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, "Test Mode" )			PORT_DIPLOCATION("DSW:!7")
+	PORT_DIPNAME( 0x0002, 0x0002, "Test Mode" )         PORT_DIPLOCATION("DSW:!7")
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0000, "DSW 6" )				PORT_DIPLOCATION("DSW:!6")
+	PORT_DIPNAME( 0x0004, 0x0000, "DSW 6" )             PORT_DIPLOCATION("DSW:!6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0000, "DSW 5" )				PORT_DIPLOCATION("DSW:!5")
+	PORT_DIPNAME( 0x0008, 0x0000, "DSW 5" )             PORT_DIPLOCATION("DSW:!5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, "DSW 4" )				PORT_DIPLOCATION("DSW:!4")
+	PORT_DIPNAME( 0x0010, 0x0000, "DSW 4" )             PORT_DIPLOCATION("DSW:!4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, "DSW 3" )				PORT_DIPLOCATION("DSW:!3")
+	PORT_DIPNAME( 0x0020, 0x0000, "DSW 3" )             PORT_DIPLOCATION("DSW:!3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, "DSW 2" )				PORT_DIPLOCATION("DSW:!2")
+	PORT_DIPNAME( 0x0040, 0x0000, "DSW 2" )             PORT_DIPLOCATION("DSW:!2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, "DSW 1" )				PORT_DIPLOCATION("DSW:!1")
+	PORT_DIPNAME( 0x0080, 0x0000, "DSW 1" )             PORT_DIPLOCATION("DSW:!1")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -1244,7 +1244,7 @@ ROM_END
   adv476kp35 CMOS Monolithic 256x18 Color Palette RAM-DAC
   Xtal 16Mhz
   oki m6376
-  Lattice	isplsi1032e
+  Lattice   isplsi1032e
 
   model TV
   vers 2.0

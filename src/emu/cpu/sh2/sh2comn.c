@@ -32,7 +32,7 @@ INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 	if (A >= 0xc0000000) /* Cache Data Array */
 		return sh2->program->read_dword(A);
 
-	/*	0x60000000 Cache Address Data Array */
+	/*  0x60000000 Cache Address Data Array */
 
 	if (A >= 0x40000000) /* Cache Associative Purge Area */
 		return 0xa5a5a5a5;
@@ -56,7 +56,7 @@ INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
 		return;
 	}
 
-	/*	0x60000000 Cache Address Data Array */
+	/*  0x60000000 Cache Address Data Array */
 
 	if (A >= 0x40000000) /* Cache Associative Purge Area */
 		return;
@@ -575,13 +575,13 @@ WRITE32_HANDLER( sh2_internal_w )
 		// Standby and cache
 	case 0x24: // SBYCR, CCR
 		/*
-			CCR
-			xx-- ---- ---- ---- Way 0/1
-			---x ---- ---- ---- Cache Purge (CP)
-			---- x--- ---- ---- Two-Way Mode (TW)
-			---- -x-- ---- ---- Data Replacement Disable (OD)
-			---- --x- ---- ---- Instruction Replacement Disable (ID)
-			---- ---x ---- ---- Cache Enable (CE)
+		    CCR
+		    xx-- ---- ---- ---- Way 0/1
+		    ---x ---- ---- ---- Cache Purge (CP)
+		    ---- x--- ---- ---- Two-Way Mode (TW)
+		    ---- -x-- ---- ---- Data Replacement Disable (OD)
+		    ---- --x- ---- ---- Instruction Replacement Disable (ID)
+		    ---- ---x ---- ---- Cache Enable (CE)
 		*/
 		break;
 

@@ -462,7 +462,7 @@ void xexex_state::machine_start()
 	m_k056832 = machine().device("k056832");
 	m_k054338 = machine().device("k054338");
 	m_k054539 = machine().device("k054539");
-	m_filter1l = machine().device<filter_volume_device>("filter1l"); 
+	m_filter1l = machine().device<filter_volume_device>("filter1l");
 	m_filter1r = machine().device<filter_volume_device>("filter1r");
 	m_filter2l = machine().device<filter_volume_device>("filter2l");
 	m_filter2r = machine().device<filter_volume_device>("filter2r");

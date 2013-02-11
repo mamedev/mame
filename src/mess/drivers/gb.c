@@ -618,7 +618,7 @@ static ADDRESS_MAP_START(megaduck_map, AS_PROGRAM, 8, megaduck_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(cart_r, bank1_w)
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w )        /* 8k VRAM */
 	AM_RANGE(0xa000, 0xafff) AM_NOP                         /* unused? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(bank2_w)				
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(bank2_w)
 	AM_RANGE(0xb001, 0xbfff) AM_NOP                         /* unused? */
 	AM_RANGE(0xc000, 0xfe9f) AM_RAM                         /* 8k low RAM, echo RAM */
 	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w )      /* OAM RAM */

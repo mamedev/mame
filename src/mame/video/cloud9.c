@@ -156,7 +156,6 @@ inline void cloud9_state::cloud9_write_vram( UINT16 addr, UINT8 data, UINT8 bitm
 
 inline void cloud9_state::bitmode_autoinc(  )
 {
-
 	/* auto increment in the x-direction if it's enabled */
 	if (!m_video_control[0]) /* /AX */
 		m_bitmode_addr[0]++;

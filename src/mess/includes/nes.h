@@ -143,7 +143,7 @@ public:
 	ioport_port       *m_io_zapper2_x;
 	ioport_port       *m_io_zapper2_y;
 	ioport_port       *m_io_paddle;
-	
+
 private:
 	/* devices */
 //  cpu_device        *m_maincpu;

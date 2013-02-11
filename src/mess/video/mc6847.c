@@ -58,12 +58,12 @@
     assuming that the extra text modes on the CoCo 2B are activated by the
     GM2-0 pins.  This needs to be confirmed.
 
-	The MC6847 datasheet states that a scanline is 227.5 clock cycles,
-	but experimentation suggests that it is 228.  The game "Dragon Fire"
-	has a fine tuned loop that runs in 57 clock cycles by the CPU's
-	reckoning (228 actual clock cycles) and would not function correctly
-	if skew existed.  SockMaster has confirmed that scanlines are in
-	fact 228 clock cycles.
+    The MC6847 datasheet states that a scanline is 227.5 clock cycles,
+    but experimentation suggests that it is 228.  The game "Dragon Fire"
+    has a fine tuned loop that runs in 57 clock cycles by the CPU's
+    reckoning (228 actual clock cycles) and would not function correctly
+    if skew existed.  SockMaster has confirmed that scanlines are in
+    fact 228 clock cycles.
 
 **********************************************************************/
 
@@ -88,8 +88,8 @@
 #define LOG_SCANLINE            0
 #define LOG_HSYNC               0
 #define LOG_FSYNC               1
-#define LOG_FLUSH				1
-#define LOG_INPUT				0
+#define LOG_FLUSH               1
+#define LOG_INPUT               0
 
 
 const UINT32 mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
@@ -127,7 +127,7 @@ const UINT32 mc6847_base_device::s_palette[mc6847_base_device::PALETTE_LENGTH] =
 mc6847_friend_device::mc6847_friend_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
 		const UINT8 *fontdata, bool is_mc6847t1, double tpfs, int field_sync_falling_edge_scanline, bool supports_partial_body_scanlines)
 	: device_t(mconfig, type, name, tag, owner, clock),
-	  m_character_map(fontdata, is_mc6847t1)
+		m_character_map(fontdata, is_mc6847t1)
 {
 	m_tpfs = tpfs;
 	m_supports_partial_body_scanlines = supports_partial_body_scanlines;

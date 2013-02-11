@@ -42,4 +42,3 @@ private:
 extern const device_type A2EAUX_EXT80COL;
 
 #endif  /* __A2EAUX_EXT80COL__ */
-

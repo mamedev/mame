@@ -156,9 +156,9 @@ WRITE8_MEMBER( nano_state::keylatch_w )
 	    2       C
 	    3       NY0
 	    4       NY1
-	    5       
-	    6       
-	    7       
+	    5
+	    6
+	    7
 
 	*/
 
@@ -694,7 +694,7 @@ void tmc2000_state::machine_start()
 	{
 		m_colorram[addr] = machine().rand() & 0xff;
 	}
-	
+
 	// find keyboard rows
 	m_key_row[0] = m_y0;
 	m_key_row[1] = m_y1;

@@ -17,12 +17,12 @@
 #include "sound/speaker.h"
 #include "video/mc6845.h"
 
-#define M6502_TAG 		"f3"
-#define M6522_TAG 		"a5"
-#define M6520_1_TAG 	"g8"
-#define M6520_2_TAG 	"b8"
-#define MC6845_TAG		"ub13"
-#define SCREEN_TAG		"screen"
+#define M6502_TAG       "f3"
+#define M6522_TAG       "a5"
+#define M6520_1_TAG     "g8"
+#define M6520_2_TAG     "b8"
+#define MC6845_TAG      "ub13"
+#define SCREEN_TAG      "screen"
 
 class pet_state : public driver_device
 {

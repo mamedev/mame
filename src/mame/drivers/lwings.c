@@ -133,7 +133,6 @@ WRITE8_MEMBER(lwings_state::avengers_prot_bank_w)
 
 int lwings_state::avengers_fetch_paldata(  )
 {
-
 	static const char pal_data[] =
 	/* page 1: 0x03,0x02,0x01,0x00 */
 	"0000000000000000" "A65486A6364676D6" "C764C777676778A7" "A574E5E5C5756AE5"

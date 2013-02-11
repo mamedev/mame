@@ -1,12 +1,12 @@
 /***************************************************************************
 
 
- MegaDrive / Genesis Cart + STM95 EEPROM device 
+ MegaDrive / Genesis Cart + STM95 EEPROM device
 
- 
+
  Emulation by MetalliC, converted to slot by Fabio Priuli
 
- 
+
  TO DO: split STM95 to a separate device...
 
 ***************************************************************************/
@@ -197,18 +197,18 @@ READ16_MEMBER(md_eeprom_stm95_device::read)
 		UINT16 res;
 		offset -= 0x0015e6/2;
 		logerror("read 0x15e6 %d\n", m_rdcnt);
-		if (m_rdcnt < 6) 
+		if (m_rdcnt < 6)
 		{
 			m_rdcnt++;
 			res = offset ? 0x10 : 0;
-		} 
+		}
 		else
 			res = offset ? 0x8010 : 0x0001;
 		return res;
 	}
 	if (offset < 0x280000/2)
 		return m_rom[offset];
-	else	// last 0x180000 are bankswitched
+	else    // last 0x180000 are bankswitched
 	{
 		UINT8 bank = (offset - 0x280000/2) >> 18;
 		return m_rom[(offset & 0x7ffff/2) + (m_bank[bank] * 0x80000)/2];
@@ -242,4 +242,3 @@ WRITE16_MEMBER(md_eeprom_stm95_device::write_a13)
 		m_stm95.set_cs_line(BIT(data, 3));
 	}
 }
-

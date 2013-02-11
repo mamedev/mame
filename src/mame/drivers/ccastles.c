@@ -140,7 +140,6 @@
 
 inline void ccastles_state::schedule_next_irq( int curscanline )
 {
-
 	/* scan for a rising edge on the IRQCK signal */
 	for (curscanline++; ; curscanline = (curscanline + 1) & 0xff)
 		if ((m_syncprom[(curscanline - 1) & 0xff] & 8) == 0 && (m_syncprom[curscanline] & 8) != 0)

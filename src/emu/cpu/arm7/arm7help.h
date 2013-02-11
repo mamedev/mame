@@ -42,22 +42,22 @@ extern void SwitchMode(arm_state *arm, int cpsr_mode_val);
 				| HandleALUNZFlags(rd)));                                                           \
 	R15 += 2;
 
-#define DRCHandleThumbALUAddFlags(rd, rn, op2)													\
-	UML_AND(block, DRC_CPSR, DRC_CPSR, ~(N_MASK | Z_MASK | V_MASK | C_MASK));					\
-	DRCHandleALUNZFlags(rd);																	\
-	UML_XOR(block, I1, rn, ~0);																	\
-	UML_CMP(block, I1, op2);																	\
-	UML_MOVc(block, COND_B, I1, C_BIT);															\
-	UML_MOVc(block, COND_AE, I1, 0);															\
-	UML_OR(block, I0, I0, I1);																	\
-	UML_XOR(block, I1, rn, op2);																\
-	UML_XOR(block, I2, rn, rd);																	\
-	UML_AND(block, I1, I1, I2);																	\
-	UML_TEST(block, I1, 1 << 31);																\
-	UML_MOVc(block, COND_NZ, I1, V_BIT);														\
-	UML_MOVc(block, COND_Z, I1, 0);																\
-	UML_OR(block, I0, I0, I1);																	\
-	UML_OR(block, DRC_CPSR, DRC_CPSR, I0);														\
+#define DRCHandleThumbALUAddFlags(rd, rn, op2)                                                  \
+	UML_AND(block, DRC_CPSR, DRC_CPSR, ~(N_MASK | Z_MASK | V_MASK | C_MASK));                   \
+	DRCHandleALUNZFlags(rd);                                                                    \
+	UML_XOR(block, I1, rn, ~0);                                                                 \
+	UML_CMP(block, I1, op2);                                                                    \
+	UML_MOVc(block, COND_B, I1, C_BIT);                                                         \
+	UML_MOVc(block, COND_AE, I1, 0);                                                            \
+	UML_OR(block, I0, I0, I1);                                                                  \
+	UML_XOR(block, I1, rn, op2);                                                                \
+	UML_XOR(block, I2, rn, rd);                                                                 \
+	UML_AND(block, I1, I1, I2);                                                                 \
+	UML_TEST(block, I1, 1 << 31);                                                               \
+	UML_MOVc(block, COND_NZ, I1, V_BIT);                                                        \
+	UML_MOVc(block, COND_Z, I1, 0);                                                             \
+	UML_OR(block, I0, I0, I1);                                                                  \
+	UML_OR(block, DRC_CPSR, DRC_CPSR, I0);                                                      \
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 
 #define HandleALUSubFlags(rd, rn, op2)                                                                         \
@@ -75,31 +75,31 @@ extern void SwitchMode(arm_state *arm, int cpsr_mode_val);
 				| HandleALUNZFlags(rd)));                                                                        \
 	R15 += 2;
 
-#define DRCHandleThumbALUSubFlags(rd, rn, op2)													\
-	UML_AND(block, DRC_CPSR, DRC_CPSR, ~(N_MASK | Z_MASK | V_MASK | C_MASK));					\
-	DRCHandleALUNZFlags(rd);																	\
-	UML_XOR(block, I1, rn, op2);																\
-	UML_XOR(block, I2, rn, rd);																	\
-	UML_AND(block, I1, I1, I2);																	\
-	UML_TEST(block, I1, 1 << 31);																\
-	UML_MOVc(block, COND_NZ, I1, V_BIT);														\
-	UML_MOVc(block, COND_Z, I1, 0);																\
-	UML_OR(block, I0, I0, I1);																	\
-	UML_OR(block, DRC_CPSR, DRC_CPSR, I0);														\
-	UML_AND(block, I0, rd, 1 << 31);															\
-	UML_AND(block, I1, op2, 1 << 31);															\
-	UML_AND(block, I2, rn, 1 << 31);															\
-	UML_XOR(block, I2, I2, ~0);																	\
-	UML_AND(block, I1, I1, I2);																	\
-	UML_AND(block, I2, I2, I0);																	\
-	UML_OR(block, I1, I1, I2);																	\
-	UML_AND(block, I2, op2, 1 << 31);															\
-	UML_AND(block, I2, I2, I0);																	\
-	UML_OR(block, I1, I1, I2);																	\
-	UML_TEST(block, I1, 1 << 31);																\
-	UML_MOVc(block, COND_NZ, I0, C_MASK);														\
-	UML_MOVc(block, COND_Z, I0, 0);																\
-	UML_OR(block, DRC_CPSR, DRC_CPSR, I0);														\
+#define DRCHandleThumbALUSubFlags(rd, rn, op2)                                                  \
+	UML_AND(block, DRC_CPSR, DRC_CPSR, ~(N_MASK | Z_MASK | V_MASK | C_MASK));                   \
+	DRCHandleALUNZFlags(rd);                                                                    \
+	UML_XOR(block, I1, rn, op2);                                                                \
+	UML_XOR(block, I2, rn, rd);                                                                 \
+	UML_AND(block, I1, I1, I2);                                                                 \
+	UML_TEST(block, I1, 1 << 31);                                                               \
+	UML_MOVc(block, COND_NZ, I1, V_BIT);                                                        \
+	UML_MOVc(block, COND_Z, I1, 0);                                                             \
+	UML_OR(block, I0, I0, I1);                                                                  \
+	UML_OR(block, DRC_CPSR, DRC_CPSR, I0);                                                      \
+	UML_AND(block, I0, rd, 1 << 31);                                                            \
+	UML_AND(block, I1, op2, 1 << 31);                                                           \
+	UML_AND(block, I2, rn, 1 << 31);                                                            \
+	UML_XOR(block, I2, I2, ~0);                                                                 \
+	UML_AND(block, I1, I1, I2);                                                                 \
+	UML_AND(block, I2, I2, I0);                                                                 \
+	UML_OR(block, I1, I1, I2);                                                                  \
+	UML_AND(block, I2, op2, 1 << 31);                                                           \
+	UML_AND(block, I2, I2, I0);                                                                 \
+	UML_OR(block, I1, I1, I2);                                                                  \
+	UML_TEST(block, I1, 1 << 31);                                                               \
+	UML_MOVc(block, COND_NZ, I0, C_MASK);                                                       \
+	UML_MOVc(block, COND_Z, I0, 0);                                                             \
+	UML_OR(block, DRC_CPSR, DRC_CPSR, I0);                                                      \
 	UML_ADD(block, DRC_PC, DRC_PC, 2);
 
 /* Set NZC flags for logical operations. */
@@ -109,11 +109,11 @@ extern void SwitchMode(arm_state *arm, int cpsr_mode_val);
 #define HandleALUNZFlags(rd)               \
 	(((rd) & SIGN_BIT) | ((!(rd)) << Z_BIT))
 
-#define DRCHandleALUNZFlags(rd)					\
-	UML_AND(block, I0, rd, SIGN_BIT);			\
-	UML_CMP(block, rd, 0);						\
-	UML_MOVc(block, COND_E, I1, 1);				\
-	UML_MOVc(block, COND_NE, I1, 0);			\
+#define DRCHandleALUNZFlags(rd)                 \
+	UML_AND(block, I0, rd, SIGN_BIT);           \
+	UML_CMP(block, rd, 0);                      \
+	UML_MOVc(block, COND_E, I1, 1);             \
+	UML_MOVc(block, COND_NE, I1, 0);            \
 	UML_ROLINS(block, I0, I1, Z_BIT, 1 << Z_BIT);
 
 // Long ALU Functions use bit 63
@@ -127,23 +127,23 @@ extern void SwitchMode(arm_state *arm, int cpsr_mode_val);
 				| (((sc) != 0) << C_BIT)));              \
 	R15 += 4;
 
-#define DRC_RD		mem(&GET_REGISTER(arm, rd))
-#define DRC_RS		mem(&GET_REGISTER(arm, rs))
-#define DRC_CPSR	mem(&GET_CPSR)
-#define DRC_PC		mem(&R15)
-#define DRC_REG(i)	mem(&arm->r[(i)]);
+#define DRC_RD      mem(&GET_REGISTER(arm, rd))
+#define DRC_RS      mem(&GET_REGISTER(arm, rs))
+#define DRC_CPSR    mem(&GET_CPSR)
+#define DRC_PC      mem(&R15)
+#define DRC_REG(i)  mem(&arm->r[(i)]);
 
-#define DRCHandleALULogicalFlags(rd, sc)								\
-	if (insn & INSN_S)													\
-	{																	\
-		UML_AND(block, DRC_CPSR, DRC_CPSR, ~(N_MASK | Z_MASK | C_MASK);	\
-		DRCHandleALUNZFlags(rd);										\
-		UML_TEST(block, sc, ~0);										\
-		UML_MOVc(block, COND_Z, I1, C_BIT);								\
-		UML_MOVc(block, COND_NZ, I1, 0);								\
-		UML_OR(block, I0, I0, I1);										\
-		UML_OR(block, DRC_CPSR, DRC_CPSR, I0);							\
-	}																	\
+#define DRCHandleALULogicalFlags(rd, sc)                                \
+	if (insn & INSN_S)                                                  \
+	{                                                                   \
+		UML_AND(block, DRC_CPSR, DRC_CPSR, ~(N_MASK | Z_MASK | C_MASK); \
+		DRCHandleALUNZFlags(rd);                                        \
+		UML_TEST(block, sc, ~0);                                        \
+		UML_MOVc(block, COND_Z, I1, C_BIT);                             \
+		UML_MOVc(block, COND_NZ, I1, 0);                                \
+		UML_OR(block, I0, I0, I1);                                      \
+		UML_OR(block, DRC_CPSR, DRC_CPSR, I0);                          \
+	}                                                                   \
 	UML_ADD(block, DRC_PC, DRC_PC, 4);
 
 void set_cpsr( arm_state *arm, UINT32 val);

@@ -1305,7 +1305,6 @@ void galaxold_state::dambustr_draw_background(bitmap_ind16 &bitmap, const rectan
 
 void galaxold_state::dambustr_draw_upper_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-
 	if (flip_screen_x())
 	{
 		rectangle clip(254 - m_dambustr_bg_split_line, m_dambustr_bg_split_line, 0, 255);

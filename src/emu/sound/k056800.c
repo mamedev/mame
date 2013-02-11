@@ -198,5 +198,3 @@ void k056800_device::device_reset()
 {
 	DEVICE_RESET_NAME( k056800 )(this);
 }
-
-

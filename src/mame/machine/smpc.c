@@ -226,7 +226,7 @@ static TIMER_CALLBACK( smpc_slave_enable )
 	state->m_smpc.OREG[31] = param + 0x02; //read-back for last command issued
 	state->m_smpc.SF = 0x00; //clear hand-shake flag
 	state->m_smpc.slave_on = param;
-//	printf("%d %d\n",machine.primary_screen->hpos(),machine.primary_screen->vpos());
+//  printf("%d %d\n",machine.primary_screen->hpos(),machine.primary_screen->vpos());
 }
 
 static TIMER_CALLBACK( smpc_sound_enable )
@@ -618,7 +618,7 @@ static TIMER_CALLBACK( smpc_nmi_set )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 
-//	printf("%d %d\n",machine.primary_screen->hpos(),machine.primary_screen->vpos());
+//  printf("%d %d\n",machine.primary_screen->hpos(),machine.primary_screen->vpos());
 	state->m_NMI_reset = param;
 	/* put issued command in OREG31 */
 	state->m_smpc.OREG[31] = 0x19 + param;
@@ -878,7 +878,7 @@ UINT8 saturn_state::smpc_th_control_mode(UINT8 pad_n)
 			break;
 		case 2:
 			res = th<<6;
-			//	1 C B Right Left Down Up
+			//  1 C B Right Left Down Up
 			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>4)) & 0x30); // C & B
 			res|= (((machine().root_device().ioport(padnames[pad_n])->read()>>12)) & 0xf);
 			break;

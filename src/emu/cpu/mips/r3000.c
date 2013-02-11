@@ -75,36 +75,36 @@
     HELPER MACROS
 ***************************************************************************/
 
-#define RSREG			((m_op >> 21) & 31)
-#define RTREG			((m_op >> 16) & 31)
-#define RDREG			((m_op >> 11) & 31)
-#define SHIFT			((m_op >> 6) & 31)
+#define RSREG           ((m_op >> 21) & 31)
+#define RTREG           ((m_op >> 16) & 31)
+#define RDREG           ((m_op >> 11) & 31)
+#define SHIFT           ((m_op >> 6) & 31)
 
-#define RSVAL			m_r[RSREG]
-#define RTVAL			m_r[RTREG]
-#define RDVAL			m_r[RDREG]
+#define RSVAL           m_r[RSREG]
+#define RTVAL           m_r[RTREG]
+#define RDVAL           m_r[RDREG]
 
-#define SIMMVAL			((INT16)m_op)
-#define UIMMVAL			((UINT16)m_op)
-#define LIMMVAL			(m_op & 0x03ffffff)
+#define SIMMVAL         ((INT16)m_op)
+#define UIMMVAL         ((UINT16)m_op)
+#define LIMMVAL         (m_op & 0x03ffffff)
 
-#define ADDPC(x)		do { m_nextpc = m_pc + ((x) << 2); } while (0)
-#define ADDPCL(x,l)		do { m_nextpc = m_pc + ((x) << 2); m_r[l] = m_pc + 4; } while (0)
-#define ABSPC(x)		do { m_nextpc = (m_pc & 0xf0000000) | ((x) << 2); } while (0)
-#define ABSPCL(x,l)		do { m_nextpc = (m_pc & 0xf0000000) | ((x) << 2); m_r[l] = m_pc + 4; } while (0)
-#define SETPC(x)		do { m_nextpc = (x); } while (0)
-#define SETPCL(x,l)		do { m_nextpc = (x); m_r[l] = m_pc + 4; } while (0)
+#define ADDPC(x)        do { m_nextpc = m_pc + ((x) << 2); } while (0)
+#define ADDPCL(x,l)     do { m_nextpc = m_pc + ((x) << 2); m_r[l] = m_pc + 4; } while (0)
+#define ABSPC(x)        do { m_nextpc = (m_pc & 0xf0000000) | ((x) << 2); } while (0)
+#define ABSPCL(x,l)     do { m_nextpc = (m_pc & 0xf0000000) | ((x) << 2); m_r[l] = m_pc + 4; } while (0)
+#define SETPC(x)        do { m_nextpc = (x); } while (0)
+#define SETPCL(x,l)     do { m_nextpc = (x); m_r[l] = m_pc + 4; } while (0)
 
-#define RBYTE(x)		(this->*m_cur->m_read_byte)(x)
-#define RWORD(x)		(this->*m_cur->m_read_word)(x)
-#define RLONG(x)		(this->*m_cur->m_read_dword)(x)
+#define RBYTE(x)        (this->*m_cur->m_read_byte)(x)
+#define RWORD(x)        (this->*m_cur->m_read_word)(x)
+#define RLONG(x)        (this->*m_cur->m_read_dword)(x)
 
-#define WBYTE(x,v)		(this->*m_cur->m_write_byte)(x, v)
-#define WWORD(x,v)		(this->*m_cur->m_write_word)(x, v)
-#define WLONG(x,v)		(this->*m_cur->m_write_dword)(x, v)
+#define WBYTE(x,v)      (this->*m_cur->m_write_byte)(x, v)
+#define WWORD(x,v)      (this->*m_cur->m_write_word)(x, v)
+#define WLONG(x,v)      (this->*m_cur->m_write_dword)(x, v)
 
-#define SR				m_cpr[0][COP0_Status]
-#define CAUSE			m_cpr[0][COP0_Cause]
+#define SR              m_cpr[0][COP0_Status]
+#define CAUSE           m_cpr[0][COP0_Cause]
 
 
 //**************************************************************************
@@ -227,7 +227,7 @@ void r3000_device::device_start()
 			m_icache_size = 4096;
 			m_dcache_size = 2048;
 			break;
-		}		
+		}
 		case CHIP_TYPE_R3052:
 		{
 			m_icache_size = 8192;
@@ -238,17 +238,17 @@ void r3000_device::device_start()
 		// TODO: R3071 and R3081 have configurable cache sizes
 		case CHIP_TYPE_R3071:
 		{
-			m_icache_size = 16384;	// or 8kB
-			m_dcache_size = 4096;	// or 8kB
+			m_icache_size = 16384;  // or 8kB
+			m_dcache_size = 4096;   // or 8kB
 			break;
 		}
 		case CHIP_TYPE_R3081:
 		{
-			m_icache_size = 16384;	// or 8kB
-			m_dcache_size = 4096;	// or 8kB
+			m_icache_size = 16384;  // or 8kB
+			m_dcache_size = 4096;   // or 8kB
 			m_hasfpu = true;
 			break;
-		}		
+		}
 	}
 
 	// allocate cache memory
@@ -286,7 +286,7 @@ void r3000_device::device_start()
 		m_lwr = &r3000_device::lwr_le;
 		m_swl = &r3000_device::swl_le;
 		m_swr = &r3000_device::swr_le;
-	
+
 		m_cache_hand.m_read_byte = &r3000_device::readcache_le;
 		m_cache_hand.m_read_word = &r3000_device::readcache_le_word;
 		m_cache_hand.m_read_dword = &r3000_device::readcache_le_dword;
@@ -302,44 +302,44 @@ void r3000_device::device_start()
 	m_in_brcond3.resolve_safe(0);
 
 	// register our state for the debugger
-	state_add(STATE_GENPC,		"GENPC",     m_pc).noshow();
-	state_add(STATE_GENPCBASE,	"GENPCBASE", m_ppc).noshow();
-	state_add(STATE_GENSP,		"GENSP",     m_r[31]).noshow();
-	state_add(STATE_GENFLAGS,	"GENFLAGS",  SR).callimport().callexport().formatstr("%6s").noshow();
-	state_add(R3000_PC,			"PC",       m_pc);
-	state_add(R3000_SR,			"SR",		SR);
-	state_add(R3000_R0,			"R0",		m_r[0]);
-	state_add(R3000_R1,			"R1",		m_r[1]);
-	state_add(R3000_R2,			"R2",		m_r[2]);
-	state_add(R3000_R3,			"R3",		m_r[3]);
-	state_add(R3000_R4,			"R4",		m_r[4]);
-	state_add(R3000_R5,			"R5",		m_r[5]);
-	state_add(R3000_R6,			"R6",		m_r[6]);
-	state_add(R3000_R7,			"R7",		m_r[7]);
-	state_add(R3000_R8,			"R8",		m_r[8]);
-	state_add(R3000_R9,			"R9",		m_r[9]);
-	state_add(R3000_R10,		"R10",		m_r[10]);
-	state_add(R3000_R11,		"R11",		m_r[11]);
-	state_add(R3000_R12,		"R12",		m_r[12]);
-	state_add(R3000_R13,		"R13",		m_r[13]);
-	state_add(R3000_R14,		"R14",		m_r[14]);
-	state_add(R3000_R15,		"R15",		m_r[15]);
-	state_add(R3000_R16,		"R16",		m_r[16]);
-	state_add(R3000_R17,		"R17",		m_r[17]);
-	state_add(R3000_R18,		"R18",		m_r[18]);
-	state_add(R3000_R19,		"R19",		m_r[19]);
-	state_add(R3000_R20,		"R20",		m_r[20]);
-	state_add(R3000_R21,		"R21",		m_r[21]);
-	state_add(R3000_R22,		"R22",		m_r[22]);
-	state_add(R3000_R23,		"R23",		m_r[23]);
-	state_add(R3000_R24,		"R24",		m_r[24]);
-	state_add(R3000_R25,		"R25",		m_r[25]);
-	state_add(R3000_R26,		"R26",		m_r[26]);
-	state_add(R3000_R27,		"R27",		m_r[27]);
-	state_add(R3000_R28,		"R28",		m_r[28]);
-	state_add(R3000_R29,		"R29",		m_r[29]);
-	state_add(R3000_R30,		"R30",		m_r[30]);
-	state_add(R3000_R31,		"R31",		m_r[31]);
+	state_add(STATE_GENPC,      "GENPC",     m_pc).noshow();
+	state_add(STATE_GENPCBASE,  "GENPCBASE", m_ppc).noshow();
+	state_add(STATE_GENSP,      "GENSP",     m_r[31]).noshow();
+	state_add(STATE_GENFLAGS,   "GENFLAGS",  SR).callimport().callexport().formatstr("%6s").noshow();
+	state_add(R3000_PC,         "PC",       m_pc);
+	state_add(R3000_SR,         "SR",       SR);
+	state_add(R3000_R0,         "R0",       m_r[0]);
+	state_add(R3000_R1,         "R1",       m_r[1]);
+	state_add(R3000_R2,         "R2",       m_r[2]);
+	state_add(R3000_R3,         "R3",       m_r[3]);
+	state_add(R3000_R4,         "R4",       m_r[4]);
+	state_add(R3000_R5,         "R5",       m_r[5]);
+	state_add(R3000_R6,         "R6",       m_r[6]);
+	state_add(R3000_R7,         "R7",       m_r[7]);
+	state_add(R3000_R8,         "R8",       m_r[8]);
+	state_add(R3000_R9,         "R9",       m_r[9]);
+	state_add(R3000_R10,        "R10",      m_r[10]);
+	state_add(R3000_R11,        "R11",      m_r[11]);
+	state_add(R3000_R12,        "R12",      m_r[12]);
+	state_add(R3000_R13,        "R13",      m_r[13]);
+	state_add(R3000_R14,        "R14",      m_r[14]);
+	state_add(R3000_R15,        "R15",      m_r[15]);
+	state_add(R3000_R16,        "R16",      m_r[16]);
+	state_add(R3000_R17,        "R17",      m_r[17]);
+	state_add(R3000_R18,        "R18",      m_r[18]);
+	state_add(R3000_R19,        "R19",      m_r[19]);
+	state_add(R3000_R20,        "R20",      m_r[20]);
+	state_add(R3000_R21,        "R21",      m_r[21]);
+	state_add(R3000_R22,        "R22",      m_r[22]);
+	state_add(R3000_R23,        "R23",      m_r[23]);
+	state_add(R3000_R24,        "R24",      m_r[24]);
+	state_add(R3000_R25,        "R25",      m_r[25]);
+	state_add(R3000_R26,        "R26",      m_r[26]);
+	state_add(R3000_R27,        "R27",      m_r[27]);
+	state_add(R3000_R28,        "R28",      m_r[28]);
+	state_add(R3000_R29,        "R29",      m_r[29]);
+	state_add(R3000_R30,        "R30",      m_r[30]);
+	state_add(R3000_R31,        "R31",      m_r[31]);
 
 	// register our state for saving
 	save_item(NAME(m_pc));
@@ -358,7 +358,7 @@ void r3000_device::device_start()
 
 
 //-------------------------------------------------
-//  device_post_load - 
+//  device_post_load -
 //-------------------------------------------------
 void r3000_device::device_post_load()
 {
@@ -749,8 +749,8 @@ inline void r3000_device::handle_cop0()
 		case 0x08:  /* BC */
 			switch (RTREG)
 			{
-				case 0x00:	/* BCzF */	if (!m_in_brcond0()) ADDPC(SIMMVAL);	break;
-				case 0x01:	/* BCzT */	if (m_in_brcond0()) ADDPC(SIMMVAL);		break;
+				case 0x00:  /* BCzF */  if (!m_in_brcond0()) ADDPC(SIMMVAL);    break;
+				case 0x01:  /* BCzT */  if (m_in_brcond0()) ADDPC(SIMMVAL);     break;
 				case 0x02:  /* BCzFL */ invalid_instruction();                         break;
 				case 0x03:  /* BCzTL */ invalid_instruction();                         break;
 				default:    invalid_instruction();                                     break;
@@ -828,8 +828,8 @@ inline void r3000_device::handle_cop1()
 		case 0x08:  /* BC */
 			switch (RTREG)
 			{
-				case 0x00:	/* BCzF */	if (!m_in_brcond1()) ADDPC(SIMMVAL);	break;
-				case 0x01:	/* BCzT */	if (m_in_brcond1()) ADDPC(SIMMVAL);		break;
+				case 0x00:  /* BCzF */  if (!m_in_brcond1()) ADDPC(SIMMVAL);    break;
+				case 0x01:  /* BCzT */  if (m_in_brcond1()) ADDPC(SIMMVAL);     break;
 				case 0x02:  /* BCzFL */ invalid_instruction();                         break;
 				case 0x03:  /* BCzTL */ invalid_instruction();                         break;
 				default:    invalid_instruction();                                     break;
@@ -894,8 +894,8 @@ inline void r3000_device::handle_cop2()
 		case 0x08:  /* BC */
 			switch (RTREG)
 			{
-				case 0x00:	/* BCzF */	if (!m_in_brcond2()) ADDPC(SIMMVAL);	break;
-				case 0x01:	/* BCzT */	if (m_in_brcond2()) ADDPC(SIMMVAL);		break;
+				case 0x00:  /* BCzF */  if (!m_in_brcond2()) ADDPC(SIMMVAL);    break;
+				case 0x01:  /* BCzT */  if (m_in_brcond2()) ADDPC(SIMMVAL);     break;
 				case 0x02:  /* BCzFL */ invalid_instruction();                         break;
 				case 0x03:  /* BCzTL */ invalid_instruction();                         break;
 				default:    invalid_instruction();                                     break;
@@ -960,8 +960,8 @@ inline void r3000_device::handle_cop3()
 		case 0x08:  /* BC */
 			switch (RTREG)
 			{
-				case 0x00:	/* BCzF */	if (!m_in_brcond3()) ADDPC(SIMMVAL);	break;
-				case 0x01:	/* BCzT */	if (m_in_brcond3()) ADDPC(SIMMVAL);			break;
+				case 0x00:  /* BCzF */  if (!m_in_brcond3()) ADDPC(SIMMVAL);    break;
+				case 0x01:  /* BCzT */  if (m_in_brcond3()) ADDPC(SIMMVAL);         break;
 				case 0x02:  /* BCzFL */ invalid_instruction();                         break;
 				case 0x03:  /* BCzTL */ invalid_instruction();                         break;
 				default:    invalid_instruction();                                     break;

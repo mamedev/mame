@@ -234,7 +234,7 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	floppy_image_format_t::desc_e *desc;
 	desc_s sectors[40];
 	int track_offset = 0, error_offset = 0;
-	
+
 	UINT8 id1 = 0, id2 = 0;
 	get_disk_id(f, io, id1, id2);
 
@@ -251,7 +251,7 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			int remaining_size = total_size - current_size;
 			if(remaining_size < 0)
 				throw emu_fatalerror("d64_format: Incorrect track layout, max_size=%d, current_size=%d", total_size, current_size);
-			
+
 			// Fixup the end gap
 			desc[21].p2 = remaining_size / 8;
 			desc[22].p2 = remaining_size & 7;
@@ -259,7 +259,7 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 			build_sector_description(f, &img[track_offset], sectors, sector_count, &img[f.sector_count*f.sector_base_size + error_offset]);
 			generate_track(desc, physical_track, head, sectors, sector_count, total_size, image);
-			
+
 			track_offset += track_size;
 			error_offset += sector_count;
 		}
@@ -272,7 +272,6 @@ bool d64_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 
 void d64_format::extract_sectors(floppy_image *image, const format &f, desc_s *sdesc, int track, int head)
 {
-
 }
 
 bool d64_format::save(io_generic *io, floppy_image *image)

@@ -692,7 +692,6 @@ void cps3_state::cps3_decrypt_bios()
 
 void cps3_state::init_common(UINT32 key1, UINT32 key2, int altEncryption)
 {
-
 	m_key1 = key1;
 	m_key2 = key2;
 	m_altEncryption = altEncryption;

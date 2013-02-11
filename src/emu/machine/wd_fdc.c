@@ -1002,10 +1002,10 @@ void wd_fdc_t::sector_w(UINT8 val)
 	if (inverted_bus) val ^= 0xff;
 
 	// No more than one write in flight
-	// C1581 accesses this register with an INC opcode, 
+	// C1581 accesses this register with an INC opcode,
 	// i.e. write old value, write new value, and the new value gets ignored by this
 	//if(sector_buffer != -1)
-	//	return;
+	//  return;
 
 	sector_buffer = val;
 	delay_cycles(t_sector, dden ? delay_register_commit*2 : delay_register_commit);

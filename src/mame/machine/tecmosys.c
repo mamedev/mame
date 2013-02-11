@@ -104,7 +104,7 @@ static const struct prot_data tkdensha_data =
 
 
 void tecmosys_state::tecmosys_prot_reset()
-{	
+{
 	m_device_read_ptr = 0;
 	m_device_status = DS_IDLE;
 	m_device_value = 0xff;

@@ -69,7 +69,7 @@ public:
 	virtual void palette_init();
 	DECLARE_INPUT_CHANGED_MEMBER(psion_on);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
-	
+
 	static HD44780_PIXEL_UPDATE(lz_pixel_update);
 };
 

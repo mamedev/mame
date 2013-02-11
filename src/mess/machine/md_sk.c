@@ -1,13 +1,13 @@
 /***********************************************************************************************************
- 
- 
+
+
  Sonic & Knuckles pass-thorugh cart emulation
 
- 
+
  TODO: currently we only support loading of base carts with no bankswitch or protection...
        shall we support other as well?
- 
- 
+
+
  ***********************************************************************************************************/
 
 
@@ -52,9 +52,9 @@ READ16_MEMBER(md_rom_sk_device::read)
 {
 	if (m_exp->m_cart != NULL && m_exp->m_cart->get_rom_base() != NULL && offset >= 0x200000/2 && offset < (0x200000 + m_exp->m_cart->get_rom_size())/2)
 		return m_exp->m_cart->m_rom[offset - 0x200000/2];
-	if (offset < 0x400000/2) 
-		return m_rom[MD_ADDR(offset)]; 
-	else 
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
 		return 0xffff;
 }
 
@@ -90,4 +90,3 @@ machine_config_constructor md_rom_sk_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( sk_slot );
 }
-

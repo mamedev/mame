@@ -59,7 +59,7 @@ public:
 			m_bus(*this, ISA_BUS_TAG),
 			m_char_rom(*this, AMS40041_TAG),
 			m_video_ram(*this, "video_ram"),
-		    m_lk(*this, "LK"),
+			m_lk(*this, "LK"),
 			m_pit1(0),
 			m_pit2(0),
 			m_status1(0),
@@ -221,8 +221,8 @@ class pc1640_state : public pc1512_state
 public:
 	pc1640_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc1512_state(mconfig, type, tag),
-		  m_sw(*this, "SW"),
-		  m_opt(0)
+			m_sw(*this, "SW"),
+			m_opt(0)
 	{ }
 
 	virtual void machine_start();

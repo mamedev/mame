@@ -20,7 +20,7 @@
 // ======================> tia_device
 
 class tia_device : public device_t,
-				   public device_sound_interface
+					public device_sound_interface
 {
 public:
 	tia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
@@ -35,7 +35,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 public:
-    DECLARE_WRITE8_MEMBER( tia_sound_w );
+	DECLARE_WRITE8_MEMBER( tia_sound_w );
 
 private:
 	sound_stream *m_channel;

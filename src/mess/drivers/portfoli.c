@@ -62,7 +62,7 @@
 
     TODO:
 
-	- expansion port slot interface
+    - expansion port slot interface
     - clock is running too fast
     - create chargen ROM from tech manual
     - memory error interrupt vector
@@ -202,12 +202,12 @@ void portfolio_state::scan_keyboard()
 	UINT8 keycode = 0xff;
 
 	UINT8 keydata[8] = { m_y0->read(), m_y1->read(), m_y2->read(), m_y3->read(),
-						 m_y4->read(), m_y5->read(), m_y6->read(), m_y7->read() };
+							m_y4->read(), m_y5->read(), m_y6->read(), m_y7->read() };
 
 	for (int row = 0; row < 8; row++)
 	{
 		UINT8 data = keydata[row];
-		
+
 		if (data != 0xff)
 		{
 			for (int col = 0; col < 8; col++)

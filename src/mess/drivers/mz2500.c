@@ -1849,8 +1849,8 @@ static GFXDECODE_START( mz2500 )
 	GFXDECODE_ENTRY("kanji", 0, mz2500_cg_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0x4400, mz2500_8_layout, 0, 256)
 	GFXDECODE_ENTRY("kanji", 0, mz2500_16_layout, 0, 256)
-//	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_1bpp, 0, 0x10)
-//	GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_3bpp, 0, 4)
+//  GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_1bpp, 0, 0x10)
+//  GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_3bpp, 0, 4)
 GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(mz2500_state::mz2500_vbl)

@@ -569,7 +569,7 @@ WRITE_LINE_MEMBER(vcombat_state::sound_update)
 static MC6845_INTERFACE( mc6845_intf )
 {
 	"screen",                   /* screen we are acting on */
-	false,						/* show border area */
+	false,                      /* show border area */
 	16,                         /* number of pixels per video memory address */
 	NULL,                       /* before pixel update callback */
 	NULL,                       /* row update callback */

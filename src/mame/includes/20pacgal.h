@@ -63,8 +63,8 @@ public:
 	void draw_chars(bitmap_rgb32 &bitmap);
 	void draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void draw_sprite(bitmap_rgb32 &bitmap, int y, int x,
-					 UINT8 code, UINT8 color, int flip_y, int flip_x);
-	
+						UINT8 code, UINT8 color, int flip_y, int flip_x);
+
 };
 
 

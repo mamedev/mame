@@ -24,16 +24,16 @@ silence compression: '00 nn' must be replaced by nn+1 times '80'.
    inside 16 bits without overflowing.
  */
 static const int vol_table[4] = { 26, 84, 200, 258 };
- 
+
 
 // device type definition
 const device_type NAMCO_63701X = &device_creator<namco_63701x_device>;
 
 namco_63701x_device::namco_63701x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, NAMCO_63701X, "Namco 63701X", tag, owner, clock),
-	  device_sound_interface(mconfig, *this),
-	  m_stream(NULL),
-	  m_rom(NULL)
+		device_sound_interface(mconfig, *this),
+		m_stream(NULL),
+		m_rom(NULL)
 {
 }
 
@@ -140,4 +140,3 @@ WRITE8_MEMBER( namco_63701x_device::namco_63701x_w )
 		}
 	}
 }
-

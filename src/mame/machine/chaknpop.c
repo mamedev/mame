@@ -47,7 +47,6 @@ static const UINT8 mcu_data[256] = {
 
 void chaknpop_state::mcu_update_seed( UINT8 data )
 {
-
 	if (!(data & 0x80))
 	{
 		m_mcu_seed += 0x83;

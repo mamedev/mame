@@ -40,31 +40,29 @@ READ8_MEMBER( prof180x_state::read )
 
 	if (offset < 0x40000)
 	{
-
 	}
 	else
 	{
-
 	}
 /*
-	switch ((m_mm1 << 1) | m_mm0)
-	{
-	case 0:
-		// bank0_r = EPROM, bank0_w = RAM, bank1 = RAM
-		break;
+    switch ((m_mm1 << 1) | m_mm0)
+    {
+    case 0:
+        // bank0_r = EPROM, bank0_w = RAM, bank1 = RAM
+        break;
 
-	case 1:
-		// bank0_r = RAM, bank0_w = RAM, bank1 = RAM
-		break;
+    case 1:
+        // bank0_r = RAM, bank0_w = RAM, bank1 = RAM
+        break;
 
-	case 2:
-		// bank0_r = UNMAP, bank0_w = UNMAP, bank1 = RAM
-		break;
+    case 2:
+        // bank0_r = UNMAP, bank0_w = UNMAP, bank1 = RAM
+        break;
 
-	case 3:
-		// bank0_r = RAM, bank0_w = RAM, bank1 = UNMAP
-		break;
-	}
+    case 3:
+        // bank0_r = RAM, bank0_w = RAM, bank1 = UNMAP
+        break;
+    }
 */
 	return data;
 }
@@ -73,12 +71,10 @@ WRITE8_MEMBER( prof180x_state::write )
 {
 	if (offset < 0x40000)
 	{
-
 	}
 	else
 	{
-
-	}	
+	}
 }
 
 void prof180x_state::ls259_w(int flag, int value)

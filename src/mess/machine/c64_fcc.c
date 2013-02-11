@@ -9,16 +9,16 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	629D ldx #$00
-	629F stx $0e
-	62A1 sta $df00
-	62A4 inc $d020
-	62A7 dec $d020
-	62AA cpx $0e
-	62AC beq $62a4 <-- eternal loop here
-	62AE rts
+    629D ldx #$00
+    629F stx $0e
+    62A1 sta $df00
+    62A4 inc $d020
+    62A7 dec $d020
+    62AA cpx $0e
+    62AC beq $62a4 <-- eternal loop here
+    62AE rts
 
 */
 
@@ -205,38 +205,38 @@ void c64_final_chesscard_device::c64_cd_w(address_space &space, offs_t offset, U
 	else if (!io1)
 	{
 		/*
-		
+
 		    bit     description
-		
+
 		    0       ?
-		    1       
-		    2       
-		    3       
-		    4       
-		    5       
-		    6       
-		    7       
-		
+		    1
+		    2
+		    3
+		    4
+		    5
+		    6
+		    7
+
 		*/
 
 		printf("IO1 %04x %02x\n", offset, data);
 		m_bank = BIT(data, 0);
 	}
-	else if (!io2) 
+	else if (!io2)
 	{
 		/*
-		
+
 		    bit     description
-		
+
 		    0       ?
-		    1       
-		    2       
-		    3       
-		    4       
-		    5       
-		    6       
+		    1
+		    2
+		    3
+		    4
+		    5
+		    6
 		    7       ?
-		
+
 		*/
 
 		printf("IO2 %04x %02x\n", offset, data);

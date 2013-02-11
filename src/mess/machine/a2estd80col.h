@@ -32,7 +32,7 @@ protected:
 	virtual UINT8 read_auxram(UINT16 offset);
 	virtual void write_auxram(UINT16 offset, UINT8 data);
 	virtual UINT8 *get_vram_ptr();
-	virtual bool allow_dhr() { return false; }	// we don't allow DHR
+	virtual bool allow_dhr() { return false; }  // we don't allow DHR
 
 private:
 	UINT8 m_ram[2*1024];
@@ -42,4 +42,3 @@ private:
 extern const device_type A2EAUX_STD80COL;
 
 #endif  /* __A2EAUX_STD80COL__ */
-

@@ -120,7 +120,7 @@ struct arm7imp_state
 	/* core state */
 	drc_cache *         cache;                      /* pointer to the DRC code cache */
 	drcuml_state *      drcuml;                     /* DRC UML generator state */
-	arm7_frontend *    	drcfe;                      /* pointer to the DRC front-end state */
+	arm7_frontend *     drcfe;                      /* pointer to the DRC front-end state */
 	UINT32              drcoptions;                 /* configurable DRC options */
 
 	/* internal stuff */
@@ -143,13 +143,13 @@ struct arm7imp_state
 	code_handle *   out_of_cycles;              /* out of cycles exception handler */
 	code_handle *   tlb_translate;              /* tlb translation handler */
 	code_handle *   detect_fault;               /* tlb fault detection handler */
-	code_handle *   check_irq;               	/* irq check handler */
-	code_handle *   read8;                   	/* read byte */
-	code_handle *   write8;                  	/* write byte */
-	code_handle *   read16;                  	/* read half */
-	code_handle *   write16;                 	/* write half */
-	code_handle *   read32;                  	/* read word */
-	code_handle *   write32;                 	/* write word */
+	code_handle *   check_irq;                  /* irq check handler */
+	code_handle *   read8;                      /* read byte */
+	code_handle *   write8;                     /* write byte */
+	code_handle *   read16;                     /* read half */
+	code_handle *   write16;                    /* write half */
+	code_handle *   read32;                     /* read word */
+	code_handle *   write32;                    /* write word */
 
 	/* fast RAM */
 	UINT32              fastram_select;
@@ -335,15 +335,15 @@ static void arm7_init(arm7_flavor flavor, int bigendian, legacy_cpu_device *devi
 	{
 		arm->impstate->drcuml->get_backend_info(beinfo);
 		if (beinfo.direct_iregs > 4)
-		{	// PC
+		{   // PC
 			arm->impstate->regmap[eR15] = I4;
 		}
 		if (beinfo.direct_iregs > 5)
-		{	// Status
+		{   // Status
 			arm->impstate->regmap[eCPSR] = I5;
 		}
 		if (beinfo.direct_iregs > 6)
-		{	// SP
+		{   // SP
 			arm->impstate->regmap[eR13] = I6;
 		}
 	}
@@ -1340,8 +1340,8 @@ static void code_compile_block(arm_state *arm, UINT8 mode, offs_t pc)
 
 				/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
 				/*if (seqlast->flags & OPFLAG_CAN_CHANGE_MODES)
-					UML_HASHJMP(block, mem(&arm->impstate->mode), nextpc, *arm->impstate->nocode);
-																							// hashjmp <mode>,nextpc,nocode
+				    UML_HASHJMP(block, mem(&arm->impstate->mode), nextpc, *arm->impstate->nocode);
+				                                                                            // hashjmp <mode>,nextpc,nocode
 				else*/ if (seqlast->next() == NULL || seqlast->next()->pc != nextpc)
 					UML_HASHJMP(block, arm->impstate->mode, nextpc, *arm->impstate->nocode);
 																							// hashjmp <mode>,nextpc,nocode
@@ -1422,7 +1422,7 @@ static void static_generate_entry_point(arm_state *arm)
 	alloc_handle(drcuml, &arm->impstate->tlb_translate, "tlb_translate");
 
 	alloc_handle(drcuml, &arm->impstate->entry, "entry");
-	UML_HANDLE(block, *arm->impstate->entry);                        	// handle  entry
+	UML_HANDLE(block, *arm->impstate->entry);                           // handle  entry
 
 	/* load fast integer registers */
 	load_fast_iregs(arm, block);
@@ -1430,7 +1430,7 @@ static void static_generate_entry_point(arm_state *arm)
 	UML_CALLH(block, *arm->impstate->check_irq);
 
 	/* generate a hash jump via the current mode and PC */
-	UML_HASHJMP(block, 0, mem(&arm->pc), *arm->impstate->nocode);		// hashjmp 0,<pc>,nocode
+	UML_HASHJMP(block, 0, mem(&arm->pc), *arm->impstate->nocode);       // hashjmp 0,<pc>,nocode
 	block->end();
 }
 
@@ -1458,7 +1458,7 @@ static void static_generate_check_irq(arm_state *arm)
 
 	/* generate a hash jump via the current mode and PC */
 	alloc_handle(drcuml, &arm->impstate->check_irq, "check_irq");
-	UML_HANDLE(block, *arm->impstate->check_irq);						// handle  check_irq
+	UML_HANDLE(block, *arm->impstate->check_irq);                       // handle  check_irq
 	/* Exception priorities:
 
 	    Reset
@@ -1470,135 +1470,135 @@ static void static_generate_check_irq(arm_state *arm)
 	    Software Interrupt
 	*/
 
-	UML_ADD(block, I0, mem(&R15), 4);									// add		i0, PC, 4  ;insn pc
+	UML_ADD(block, I0, mem(&R15), 4);                                   // add      i0, PC, 4  ;insn pc
 
 	// Data Abort
-	UML_TEST(block, mem(&arm->pendingAbtD, 1);							// test		pendingAbtD, 1
-	UML_JMPc(block, COND_Z, nodabt = label++);							// jmpz		nodabt
+	UML_TEST(block, mem(&arm->pendingAbtD, 1);                          // test     pendingAbtD, 1
+	UML_JMPc(block, COND_Z, nodabt = label++);                          // jmpz     nodabt
 
-	UML_ROLINS(block, mem(&GET_CPSR), eARM7_MODE_ABT, 0, MODE_FLAG)		// rolins	CPSR, eARM7_MODE_ABT, 0, MODE_FLAG
-	UML_MOV(block, mem(&GET_REGISTER(arm, 14)), I0);					// mov		LR, i0
-	UML_MOV(block, mem(&GET_REGISTER(arm, SPSR)), mem(&GET_CPSR));		// mov		SPSR, CPSR
-	UML_OR(block, mem(&GET_CPSR), mem(&GET_CPSR), I_MASK);				// or		CPSR, CPSR, I_MASK
-	UML_ROLAND(block, mem(&GET_CPSR), mem(&GET_CPSR), 0, ~T_MASK);		// roland	CPSR, CPSR, 0, ~T_MASK
-	UML_MOV(block, mem(&R15), 0x00000010);								// mov		PC, 0x10 (Data Abort vector address)
-	UML_MOV(block, mem(&arm->pendingAbtD, 0);							// mov		pendingAbtD, 0
-	UML_JMP(block, irqadjust = label++);								// jmp		irqadjust
+	UML_ROLINS(block, mem(&GET_CPSR), eARM7_MODE_ABT, 0, MODE_FLAG)     // rolins   CPSR, eARM7_MODE_ABT, 0, MODE_FLAG
+	UML_MOV(block, mem(&GET_REGISTER(arm, 14)), I0);                    // mov      LR, i0
+	UML_MOV(block, mem(&GET_REGISTER(arm, SPSR)), mem(&GET_CPSR));      // mov      SPSR, CPSR
+	UML_OR(block, mem(&GET_CPSR), mem(&GET_CPSR), I_MASK);              // or       CPSR, CPSR, I_MASK
+	UML_ROLAND(block, mem(&GET_CPSR), mem(&GET_CPSR), 0, ~T_MASK);      // roland   CPSR, CPSR, 0, ~T_MASK
+	UML_MOV(block, mem(&R15), 0x00000010);                              // mov      PC, 0x10 (Data Abort vector address)
+	UML_MOV(block, mem(&arm->pendingAbtD, 0);                           // mov      pendingAbtD, 0
+	UML_JMP(block, irqadjust = label++);                                // jmp      irqadjust
 
 	UML_LABEL(block, nodabt);                                           // nodabt:
 
 	// FIQ
-	UML_TEST(block, mem(&arm->pendingFiq, 1);							// test		pendingFiq, 1
-	UML_JMPc(block, COND_Z, nofiq = label++);							// jmpz		nofiq
-	UML_TEST(block, mem(&GET_CPSR), F_MASK);							// test		CPSR, F_MASK
-	UML_JMPc(block, COND_Z, nofiq);										// jmpz		nofiq
+	UML_TEST(block, mem(&arm->pendingFiq, 1);                           // test     pendingFiq, 1
+	UML_JMPc(block, COND_Z, nofiq = label++);                           // jmpz     nofiq
+	UML_TEST(block, mem(&GET_CPSR), F_MASK);                            // test     CPSR, F_MASK
+	UML_JMPc(block, COND_Z, nofiq);                                     // jmpz     nofiq
 
-	UML_MOV(block, mem(&GET_REGISTER(arm, 14)), I0);					// mov		LR, i0
-	UML_MOV(block, mem(&GET_REGISTER(arm, SPSR)), mem(&GET_CPSR));		// mov		SPSR, CPSR
-	UML_OR(block, mem(&GET_CPSR), mem(&GET_CPSR), I_MASK | F_MASK);		// or		CPSR, CPSR, I_MASK | F_MASK
-	UML_ROLAND(block, mem(&GET_CPSR), mem(&CPSR), 0, ~T_MASK);			// roland	CPSR, CPSR, 0, ~T_MASK
-	UML_MOV(block, mem(&R15), 0x0000001c);								// mov		PC, 0x1c (FIQ vector address)
-	UML_MOV(block, mem(&arm->pendingFiq, 0);							// mov		pendingFiq, 0
-	UML_JMP(block, irqadjust);											// jmp		irqadjust
+	UML_MOV(block, mem(&GET_REGISTER(arm, 14)), I0);                    // mov      LR, i0
+	UML_MOV(block, mem(&GET_REGISTER(arm, SPSR)), mem(&GET_CPSR));      // mov      SPSR, CPSR
+	UML_OR(block, mem(&GET_CPSR), mem(&GET_CPSR), I_MASK | F_MASK);     // or       CPSR, CPSR, I_MASK | F_MASK
+	UML_ROLAND(block, mem(&GET_CPSR), mem(&CPSR), 0, ~T_MASK);          // roland   CPSR, CPSR, 0, ~T_MASK
+	UML_MOV(block, mem(&R15), 0x0000001c);                              // mov      PC, 0x1c (FIQ vector address)
+	UML_MOV(block, mem(&arm->pendingFiq, 0);                            // mov      pendingFiq, 0
+	UML_JMP(block, irqadjust);                                          // jmp      irqadjust
 
-	UML_LABEL(block, nofiq);											// nofiq:
+	UML_LABEL(block, nofiq);                                            // nofiq:
 
 	// IRQ
-	UML_TEST(block, mem(&arm->pendingIrq, 1);							// test		pendingIrq, 1
-	UML_JMPc(block, COND_Z, noirq = label++);							// jmpz		noirq
-	UML_TEST(block, mem(&GET_CPSR), I_MASK);							// test		CPSR, I_MASK
-	UML_JMPc(block, COND_Z, noirq);										// jmpz		noirq
+	UML_TEST(block, mem(&arm->pendingIrq, 1);                           // test     pendingIrq, 1
+	UML_JMPc(block, COND_Z, noirq = label++);                           // jmpz     noirq
+	UML_TEST(block, mem(&GET_CPSR), I_MASK);                            // test     CPSR, I_MASK
+	UML_JMPc(block, COND_Z, noirq);                                     // jmpz     noirq
 
-	UML_MOV(block, mem(&GET_REGISTER(arm, 14)), I0);					// mov		LR, i0
-	UML_TEST(block, mem(&GET_CPSR), SR_MODE32);							// test		CPSR, MODE32
-	UML_JMPc(block, COND_NZ, irq32 = label++);							// jmpnz	irq32
-	UML_AND(block, I1, I0, 0xf4000000);									// and		i1, i0, 0xf4000000
-	UML_OR(block, mem(&R15), I1, 0x0800001a);							// or		PC, i1, 0x0800001a
-	UML_AND(block, I1, mem(&GET_CPSR), 0x0fffff3f);						// and		i1, CPSR, 0x0fffff3f
-	UML_ROLAND(block, I0, mem(&R15), 32-20, 0x0000000c);				// roland	i0, R15, 32-20, 0x0000000c
-	UML_ROLINS(block, I0, mem(&R15), 0, 0xf0000000);					// rolins	i0, R15, 0, 0xf0000000
-	UML_OR(block, mem(&GET_CPSR), I0, I1);								// or		CPSR, i0, i1
-	UML_JMP(block, irqadjust);											// jmp		irqadjust
+	UML_MOV(block, mem(&GET_REGISTER(arm, 14)), I0);                    // mov      LR, i0
+	UML_TEST(block, mem(&GET_CPSR), SR_MODE32);                         // test     CPSR, MODE32
+	UML_JMPc(block, COND_NZ, irq32 = label++);                          // jmpnz    irq32
+	UML_AND(block, I1, I0, 0xf4000000);                                 // and      i1, i0, 0xf4000000
+	UML_OR(block, mem(&R15), I1, 0x0800001a);                           // or       PC, i1, 0x0800001a
+	UML_AND(block, I1, mem(&GET_CPSR), 0x0fffff3f);                     // and      i1, CPSR, 0x0fffff3f
+	UML_ROLAND(block, I0, mem(&R15), 32-20, 0x0000000c);                // roland   i0, R15, 32-20, 0x0000000c
+	UML_ROLINS(block, I0, mem(&R15), 0, 0xf0000000);                    // rolins   i0, R15, 0, 0xf0000000
+	UML_OR(block, mem(&GET_CPSR), I0, I1);                              // or       CPSR, i0, i1
+	UML_JMP(block, irqadjust);                                          // jmp      irqadjust
 
-	UML_LABEL(block, irq32);											// irq32:
-	UML_MOV(block, mem(&GET_REGISTER(arm, SPSR)), mem(&GET_CPSR));		// mov		SPSR, CPSR
-	UML_OR(block, mem(&GET_CPSR), mem(&GET_CPSR), I_MASK);				// or		CPSR, CPSR, I_MASK
-	UML_ROLAND(block, mem(&GET_CPSR), mem(&CPSR), 0, ~T_MASK);			// roland	CPSR, CPSR, 0, ~T_MASK
-	UML_MOV(block, mem(&R15), 0x00000018);								// mov		PC, 0x18 (IRQ vector address)
+	UML_LABEL(block, irq32);                                            // irq32:
+	UML_MOV(block, mem(&GET_REGISTER(arm, SPSR)), mem(&GET_CPSR));      // mov      SPSR, CPSR
+	UML_OR(block, mem(&GET_CPSR), mem(&GET_CPSR), I_MASK);              // or       CPSR, CPSR, I_MASK
+	UML_ROLAND(block, mem(&GET_CPSR), mem(&CPSR), 0, ~T_MASK);          // roland   CPSR, CPSR, 0, ~T_MASK
+	UML_MOV(block, mem(&R15), 0x00000018);                              // mov      PC, 0x18 (IRQ vector address)
 
-	UML_JMP(block, irqadjust);											// jmp		irqadjust
+	UML_JMP(block, irqadjust);                                          // jmp      irqadjust
 
-	UML_LABEL(block, noirq);											// noirq:
+	UML_LABEL(block, noirq);                                            // noirq:
 
 	// Prefetch Abort
-	UML_TEST(block, mem(&arm->pendingAbtP, 1);							// test		pendingAbtP, 1
-	UML_JMPc(block, COND_Z, nopabt = label++);							// jmpz		nopabt
+	UML_TEST(block, mem(&arm->pendingAbtP, 1);                          // test     pendingAbtP, 1
+	UML_JMPc(block, COND_Z, nopabt = label++);                          // jmpz     nopabt
 
-	UML_ROLINS(block, mem(&GET_CPSR), eARM7_MODE_ABT, 0, MODE_FLAG)		// rolins	CPSR, eARM7_MODE_ABT, 0, MODE_FLAG
-	UML_MOV(block, mem(&GET_REGISTER(arm, 14)), I0);					// mov		LR, i0
-	UML_MOV(block, mem(&GET_REGISTER(arm, SPSR)), mem(&GET_CPSR));		// mov		SPSR, CPSR
-	UML_OR(block, mem(&GET_CPSR), mem(&GET_CPSR), I_MASK);				// or		CPSR, CPSR, I_MASK
-	UML_ROLAND(block, mem(&GET_CPSR), mem(&CPSR), 0, ~T_MASK);			// roland	CPSR, CPSR, 0, ~T_MASK
-	UML_MOV(block, mem(&R15), 0x0000000c);								// mov		PC, 0x0c (Prefetch Abort vector address)
-	UML_MOV(block, mem(&arm->pendingAbtP, 0);							// mov		pendingAbtP, 0
-	UML_JMP(block, irqadjust);											// jmp		irqadjust
+	UML_ROLINS(block, mem(&GET_CPSR), eARM7_MODE_ABT, 0, MODE_FLAG)     // rolins   CPSR, eARM7_MODE_ABT, 0, MODE_FLAG
+	UML_MOV(block, mem(&GET_REGISTER(arm, 14)), I0);                    // mov      LR, i0
+	UML_MOV(block, mem(&GET_REGISTER(arm, SPSR)), mem(&GET_CPSR));      // mov      SPSR, CPSR
+	UML_OR(block, mem(&GET_CPSR), mem(&GET_CPSR), I_MASK);              // or       CPSR, CPSR, I_MASK
+	UML_ROLAND(block, mem(&GET_CPSR), mem(&CPSR), 0, ~T_MASK);          // roland   CPSR, CPSR, 0, ~T_MASK
+	UML_MOV(block, mem(&R15), 0x0000000c);                              // mov      PC, 0x0c (Prefetch Abort vector address)
+	UML_MOV(block, mem(&arm->pendingAbtP, 0);                           // mov      pendingAbtP, 0
+	UML_JMP(block, irqadjust);                                          // jmp      irqadjust
 
 	UML_LABEL(block, nopabt);                                           // nopabt:
 
 	// Undefined instruction
-	UML_TEST(block, mem(&arm->pendingUnd, 1);							// test		pendingUnd, 1
-	UML_JMPc(block, COND_Z, nopabt = label++);							// jmpz		nound
+	UML_TEST(block, mem(&arm->pendingUnd, 1);                           // test     pendingUnd, 1
+	UML_JMPc(block, COND_Z, nopabt = label++);                          // jmpz     nound
 
-	UML_ROLINS(block, mem(&GET_CPSR), eARM7_MODE_UND, 0, MODE_FLAG)		// rolins	CPSR, eARM7_MODE_UND, 0, MODE_FLAG
-	UML_MOV(block, I1, -4);												// mov		i1, -4
-	UML_TEST(block, mem(&GET_CPSR), T_MASK);							// test		CPSR, T_MASK
-	UML_MOVc(block, COND_NZ, I1, -2);									// movnz	i1, -2
-	UML_ADD(block, mem(&GET_REGISTER(arm, 14)), I0, I1);				// add		LR, i0, i1
-	UML_MOV(block, mem(&GET_REGISTER(arm, SPSR)), mem(&GET_CPSR));		// mov		SPSR, CPSR
-	UML_OR(block, mem(&GET_CPSR), mem(&GET_CPSR), I_MASK);				// or		CPSR, CPSR, I_MASK
-	UML_ROLAND(block, mem(&GET_CPSR), mem(&CPSR), 0, ~T_MASK);			// roland	CPSR, CPSR, 0, ~T_MASK
-	UML_MOV(block, mem(&R15), 0x00000004);								// mov		PC, 0x0c (Undefined Insn vector address)
-	UML_MOV(block, mem(&arm->pendingUnd, 0);							// mov		pendingUnd, 0
-	UML_JMP(block, irqadjust);											// jmp		irqadjust
+	UML_ROLINS(block, mem(&GET_CPSR), eARM7_MODE_UND, 0, MODE_FLAG)     // rolins   CPSR, eARM7_MODE_UND, 0, MODE_FLAG
+	UML_MOV(block, I1, -4);                                             // mov      i1, -4
+	UML_TEST(block, mem(&GET_CPSR), T_MASK);                            // test     CPSR, T_MASK
+	UML_MOVc(block, COND_NZ, I1, -2);                                   // movnz    i1, -2
+	UML_ADD(block, mem(&GET_REGISTER(arm, 14)), I0, I1);                // add      LR, i0, i1
+	UML_MOV(block, mem(&GET_REGISTER(arm, SPSR)), mem(&GET_CPSR));      // mov      SPSR, CPSR
+	UML_OR(block, mem(&GET_CPSR), mem(&GET_CPSR), I_MASK);              // or       CPSR, CPSR, I_MASK
+	UML_ROLAND(block, mem(&GET_CPSR), mem(&CPSR), 0, ~T_MASK);          // roland   CPSR, CPSR, 0, ~T_MASK
+	UML_MOV(block, mem(&R15), 0x00000004);                              // mov      PC, 0x0c (Undefined Insn vector address)
+	UML_MOV(block, mem(&arm->pendingUnd, 0);                            // mov      pendingUnd, 0
+	UML_JMP(block, irqadjust);                                          // jmp      irqadjust
 
 	UML_LABEL(block, nopabt);                                           // nopabt:
 
 	// Software Interrupt
-	UML_TEST(block, mem(&arm->pendingSwi, 1);							// test		pendingSwi, 1
-	UML_JMPc(block, COND_Z, done = label++);							// jmpz		done
+	UML_TEST(block, mem(&arm->pendingSwi, 1);                           // test     pendingSwi, 1
+	UML_JMPc(block, COND_Z, done = label++);                            // jmpz     done
 
-	UML_ROLINS(block, mem(&GET_CPSR), eARM7_MODE_SVC, 0, MODE_FLAG)		// rolins	CPSR, eARM7_MODE_SVC, 0, MODE_FLAG
-	UML_MOV(block, I1, -4);												// mov		i1, -4
-	UML_TEST(block, mem(&GET_CPSR), T_MASK);							// test		CPSR, T_MASK
-	UML_MOVc(block, COND_NZ, I1, -2);									// movnz	i1, -2
-	UML_ADD(block, mem(&GET_REGISTER(arm, 14)), I0, I1);				// add		LR, i0, i1
+	UML_ROLINS(block, mem(&GET_CPSR), eARM7_MODE_SVC, 0, MODE_FLAG)     // rolins   CPSR, eARM7_MODE_SVC, 0, MODE_FLAG
+	UML_MOV(block, I1, -4);                                             // mov      i1, -4
+	UML_TEST(block, mem(&GET_CPSR), T_MASK);                            // test     CPSR, T_MASK
+	UML_MOVc(block, COND_NZ, I1, -2);                                   // movnz    i1, -2
+	UML_ADD(block, mem(&GET_REGISTER(arm, 14)), I0, I1);                // add      LR, i0, i1
 
-	UML_TEST(block, mem(&GET_CPSR), SR_MODE32);							// test		CPSR, MODE32
-	UML_JMPc(block, COND_NZ, swi32 = label++);							// jmpnz	swi32
-	UML_AND(block, I1, I0, 0xf4000000);									// and		i1, i0, 0xf4000000
-	UML_OR(block, mem(&R15), I1, 0x0800001b);							// or		PC, i1, 0x0800001b
-	UML_AND(block, I1, mem(&GET_CPSR), 0x0fffff3f);						// and		i1, CPSR, 0x0fffff3f
-	UML_ROLAND(block, I0, mem(&R15), 32-20, 0x0000000c);				// roland	i0, R15, 32-20, 0x0000000c
-	UML_ROLINS(block, I0, mem(&R15), 0, 0xf0000000);					// rolins	i0, R15, 0, 0xf0000000
-	UML_OR(block, mem(&GET_CPSR), I0, I1);								// or		CPSR, i0, i1
-	UML_MOV(block, mem(&arm->pendingSwi, 0);							// mov		pendingSwi, 0
-	UML_JMP(block, irqadjust);											// jmp		irqadjust
+	UML_TEST(block, mem(&GET_CPSR), SR_MODE32);                         // test     CPSR, MODE32
+	UML_JMPc(block, COND_NZ, swi32 = label++);                          // jmpnz    swi32
+	UML_AND(block, I1, I0, 0xf4000000);                                 // and      i1, i0, 0xf4000000
+	UML_OR(block, mem(&R15), I1, 0x0800001b);                           // or       PC, i1, 0x0800001b
+	UML_AND(block, I1, mem(&GET_CPSR), 0x0fffff3f);                     // and      i1, CPSR, 0x0fffff3f
+	UML_ROLAND(block, I0, mem(&R15), 32-20, 0x0000000c);                // roland   i0, R15, 32-20, 0x0000000c
+	UML_ROLINS(block, I0, mem(&R15), 0, 0xf0000000);                    // rolins   i0, R15, 0, 0xf0000000
+	UML_OR(block, mem(&GET_CPSR), I0, I1);                              // or       CPSR, i0, i1
+	UML_MOV(block, mem(&arm->pendingSwi, 0);                            // mov      pendingSwi, 0
+	UML_JMP(block, irqadjust);                                          // jmp      irqadjust
 
-	UML_LABEL(block, swi32);											// irq32:
-	UML_MOV(block, mem(&GET_REGISTER(arm, SPSR)), mem(&GET_CPSR));		// mov		SPSR, CPSR
-	UML_OR(block, mem(&GET_CPSR), mem(&GET_CPSR), I_MASK);				// or		CPSR, CPSR, I_MASK
-	UML_ROLAND(block, mem(&GET_CPSR), mem(&CPSR), 0, ~T_MASK);			// roland	CPSR, CPSR, 0, ~T_MASK
-	UML_MOV(block, mem(&R15), 0x00000008);								// mov		PC, 0x08 (SWI vector address)
-	UML_MOV(block, mem(&arm->pendingSwi, 0);							// mov		pendingSwi, 0
-	UML_JMP(block, irqadjust);											// jmp		irqadjust
+	UML_LABEL(block, swi32);                                            // irq32:
+	UML_MOV(block, mem(&GET_REGISTER(arm, SPSR)), mem(&GET_CPSR));      // mov      SPSR, CPSR
+	UML_OR(block, mem(&GET_CPSR), mem(&GET_CPSR), I_MASK);              // or       CPSR, CPSR, I_MASK
+	UML_ROLAND(block, mem(&GET_CPSR), mem(&CPSR), 0, ~T_MASK);          // roland   CPSR, CPSR, 0, ~T_MASK
+	UML_MOV(block, mem(&R15), 0x00000008);                              // mov      PC, 0x08 (SWI vector address)
+	UML_MOV(block, mem(&arm->pendingSwi, 0);                            // mov      pendingSwi, 0
+	UML_JMP(block, irqadjust);                                          // jmp      irqadjust
 
-	UML_LABEL(block, irqadjust);										// irqadjust:
-	UML_MOV(block, I1, 0);												// mov		i1, 0
-	UML_TEST(block, mem(&COPRO_CTRL), COPRO_CTRL_MMU_EN | COPRO_CTRL_INTVEC_ADJUST);	// test	COPRO_CTRL, MMU_EN | INTVEC_ADJUST
-	UML_MOVc(block, COND_NZ, I1, 0xffff0000);							// movnz	i1, 0xffff0000
-	UML_OR(block, mem(&R15), mem(R15), I1);								// or		PC, i1
+	UML_LABEL(block, irqadjust);                                        // irqadjust:
+	UML_MOV(block, I1, 0);                                              // mov      i1, 0
+	UML_TEST(block, mem(&COPRO_CTRL), COPRO_CTRL_MMU_EN | COPRO_CTRL_INTVEC_ADJUST);    // test COPRO_CTRL, MMU_EN | INTVEC_ADJUST
+	UML_MOVc(block, COND_NZ, I1, 0xffff0000);                           // movnz    i1, 0xffff0000
+	UML_OR(block, mem(&R15), mem(R15), I1);                             // or       PC, i1
 
-	UML_LABEL(block, done);												// done:
+	UML_LABEL(block, done);                                             // done:
 
 	block->end();
 };
@@ -1620,7 +1620,7 @@ static void static_generate_nocode_handler(arm_state *arm)
 	alloc_handle(drcuml, &arm->impstate->nocode, "nocode");
 	UML_HANDLE(block, *arm->impstate->nocode);                                  // handle  nocode
 	UML_GETEXP(block, I0);                                                      // getexp  i0
-	UML_MOV(block, mem(&R15), I0);                                        		// mov     [pc],i0
+	UML_MOV(block, mem(&R15), I0);                                              // mov     [pc],i0
 	save_fast_iregs(arm, block);
 	UML_EXIT(block, EXECUTE_MISSING_CODE);                                      // exit    EXECUTE_MISSING_CODE
 
@@ -1643,9 +1643,9 @@ static void static_generate_out_of_cycles(arm_state *arm)
 
 	/* generate a hash jump via the current mode and PC */
 	alloc_handle(drcuml, &arm->impstate->out_of_cycles, "out_of_cycles");
-	UML_HANDLE(block, *arm->impstate->out_of_cycles);                      	// handle  out_of_cycles
+	UML_HANDLE(block, *arm->impstate->out_of_cycles);                       // handle  out_of_cycles
 	UML_GETEXP(block, I0);                                                  // getexp  i0
-	UML_MOV(block, mem(&R15), I0);                                    		// mov     <pc>,i0
+	UML_MOV(block, mem(&R15), I0);                                          // mov     <pc>,i0
 	save_fast_iregs(arm, block);
 	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);                                 // exit    EXECUTE_OUT_OF_CYCLES
 
@@ -1672,63 +1672,63 @@ static void static_generate_detect_fault(arm_state *arm, code_handle **handleptr
 
 	/* add a global entry for this */
 	alloc_handle(drcuml, &arm->impstate->detect_fault, "detect_fault");
-	UML_HANDLE(block, *arm->impstate->detect_fault);               	// handle  	detect_fault
+	UML_HANDLE(block, *arm->impstate->detect_fault);                // handle   detect_fault
 
-	UML_ROLAND(block, I6, I4, 32-4, 0x0f<<1);						// roland	i6, i4, 32-4, 0xf<<1
-	UML_ROLAND(block, I6, mem(&COPRO_DOMAIN_ACCESS_CONTROL), I6, 3);// roland	i6, COPRO_DOMAIN_ACCESS_CONTROL, i6, 3
+	UML_ROLAND(block, I6, I4, 32-4, 0x0f<<1);                       // roland   i6, i4, 32-4, 0xf<<1
+	UML_ROLAND(block, I6, mem(&COPRO_DOMAIN_ACCESS_CONTROL), I6, 3);// roland   i6, COPRO_DOMAIN_ACCESS_CONTROL, i6, 3
 	// if permission == 3, FAULT_NONE
-	UML_CMP(block, I6, 3);											// cmp		i6, 3
-	UML_MOVc(block, COND_E, I6, FAULT_NONE);						// move		i6, FAULT_NONE
-	UML_JMPc(block, COND_E, donefault = label++);					// jmpe		donefault
+	UML_CMP(block, I6, 3);                                          // cmp      i6, 3
+	UML_MOVc(block, COND_E, I6, FAULT_NONE);                        // move     i6, FAULT_NONE
+	UML_JMPc(block, COND_E, donefault = label++);                   // jmpe     donefault
 	// if permission == 0 || permission == 2, FAULT_DOMAIN
-	UML_CMP(block, I6, 1);											// cmp		i6, 1
-	UML_MOVc(block, COND_NE, I6, FAULT_DOMAIN);						// movne	i6, FAULT_DOMAIN
-	UML_JMPc(block, COND_NE, donefault);							// jmpne	donefault
+	UML_CMP(block, I6, 1);                                          // cmp      i6, 1
+	UML_MOVc(block, COND_NE, I6, FAULT_DOMAIN);                     // movne    i6, FAULT_DOMAIN
+	UML_JMPc(block, COND_NE, donefault);                            // jmpne    donefault
 
 	// if permission == 1
-	UML_CMP(block, I5, 3);											// cmp		i5, 3
-	UML_MOVc(block, COND_E, I6, FAULT_NONE);						// move		i6, FAULT_NONE
-	UML_JMPc(block, COND_E, donefault);								// jmpe		donefault
-	UML_CMP(block, I5, 0);											// cmp		i5, 1
-	UML_JMPc(block, COND_NE, checkuser = label++);					// jmpne	checkuser
-	UML_ROLAND(block, I6, mem(&COPRO_CTRL),							// roland	i6, COPRO_CTRL, 32 - COPRO_CTRL_SYSTEM_SHIFT,
-				32 - COPRO_CTRL_SYSTEM_SHIFT,						// 			COPRO_CTRL_SYSTEM | COPRO_CTRL_ROM
+	UML_CMP(block, I5, 3);                                          // cmp      i5, 3
+	UML_MOVc(block, COND_E, I6, FAULT_NONE);                        // move     i6, FAULT_NONE
+	UML_JMPc(block, COND_E, donefault);                             // jmpe     donefault
+	UML_CMP(block, I5, 0);                                          // cmp      i5, 1
+	UML_JMPc(block, COND_NE, checkuser = label++);                  // jmpne    checkuser
+	UML_ROLAND(block, I6, mem(&COPRO_CTRL),                         // roland   i6, COPRO_CTRL, 32 - COPRO_CTRL_SYSTEM_SHIFT,
+				32 - COPRO_CTRL_SYSTEM_SHIFT,                       //          COPRO_CTRL_SYSTEM | COPRO_CTRL_ROM
 				COPRO_CTRL_SYSTEM | COPRO_CTRL_ROM);
 	// if s == 0 && r == 0, FAULT_PERMISSION
-	UML_CMP(block, I6, 0);											// cmp		i6, 0
-	UML_MOVc(block, COND_E, I6, FAULT_PERMISSION);					// move		i6, FAULT_PERMISSION
-	UML_JMPc(block, COND_E, donefault);								// jmpe		donefault
+	UML_CMP(block, I6, 0);                                          // cmp      i6, 0
+	UML_MOVc(block, COND_E, I6, FAULT_PERMISSION);                  // move     i6, FAULT_PERMISSION
+	UML_JMPc(block, COND_E, donefault);                             // jmpe     donefault
 	// if s == 1 && r == 1, FAULT_PERMISSION
-	UML_CMP(block, I6, 3);											// cmp		i6, 3
-	UML_MOVc(block, COND_E, I6, FAULT_PERMISSION);					// move		i6, FAULT_PERMISSION
-	UML_JMPc(block, COND_E, donefault);								// jmpe		donefault
+	UML_CMP(block, I6, 3);                                          // cmp      i6, 3
+	UML_MOVc(block, COND_E, I6, FAULT_PERMISSION);                  // move     i6, FAULT_PERMISSION
+	UML_JMPc(block, COND_E, donefault);                             // jmpe     donefault
 	// if flags & TLB_WRITE, FAULT_PERMISSION
-	UML_TEST(block, I2, ARM7_TLB_WRITE);							// test		i2, ARM7_TLB_WRITE
-	UML_MOVc(block, COND_NZ, I6, FAULT_PERMISSION);					// move		i6, FAULT_PERMISSION
-	UML_JMPc(block, COND_NZ, donefault);							// jmpe		donefault
+	UML_TEST(block, I2, ARM7_TLB_WRITE);                            // test     i2, ARM7_TLB_WRITE
+	UML_MOVc(block, COND_NZ, I6, FAULT_PERMISSION);                 // move     i6, FAULT_PERMISSION
+	UML_JMPc(block, COND_NZ, donefault);                            // jmpe     donefault
 	// if r == 1 && s == 0, FAULT_NONE
-	UML_CMP(block, I6, 2);											// cmp		i6, 2
-	UML_MOVc(block, COND_E, I6, FAULT_NONE);						// move		i6, FAULT_NONE
-	UML_JMPc(block, COND_E, donefault);								// jmpe		donefault
-	UML_AND(block, I6, mem(&GET_CPSR), MODE_FLAG);					// and		i6, GET_CPSR, MODE_FLAG
-	UML_CMP(block, I6, eARM7_MODE_USER);							// cmp		i6, eARM7_MODE_USER
+	UML_CMP(block, I6, 2);                                          // cmp      i6, 2
+	UML_MOVc(block, COND_E, I6, FAULT_NONE);                        // move     i6, FAULT_NONE
+	UML_JMPc(block, COND_E, donefault);                             // jmpe     donefault
+	UML_AND(block, I6, mem(&GET_CPSR), MODE_FLAG);                  // and      i6, GET_CPSR, MODE_FLAG
+	UML_CMP(block, I6, eARM7_MODE_USER);                            // cmp      i6, eARM7_MODE_USER
 	// if r == 0 && s == 1 && usermode, FAULT_PERMISSION
-	UML_MOVc(block, COND_E, I6, FAULT_PERMISSION);					// move		i6, FAULT_PERMISSION
-	UML_MOVc(block, COND_NE, I6, FAULT_NONE);						// movne	i6, FAULT_NONE
-	UML_JMP(block, donefault);										// jmp		donefault
+	UML_MOVc(block, COND_E, I6, FAULT_PERMISSION);                  // move     i6, FAULT_PERMISSION
+	UML_MOVc(block, COND_NE, I6, FAULT_NONE);                       // movne    i6, FAULT_NONE
+	UML_JMP(block, donefault);                                      // jmp      donefault
 
-	UML_LABEL(block, checkuser);									// checkuser:
+	UML_LABEL(block, checkuser);                                    // checkuser:
 	// if !write, FAULT_NONE
-	UML_TEST(block, I2, ARM7_TLB_WRITE);							// test		i2, ARM7_TLB_WRITE
-	UML_MOVc(block, COND_Z, I6, FAULT_NONE);						// movz		i6, FAULT_NONE
-	UML_JMPc(block, COND_Z, donefault);								// jmp		donefault
-	UML_AND(block, I6, mem(&GET_CPSR), MODE_FLAG);					// and		i6, GET_CPSR, MODE_FLAG
-	UML_CMP(block, I6, eARM7_MODE_USER);							// cmp		i6, eARM7_MODE_USER
-	UML_MOVc(block, COND_E, I6, FAULT_PERMISSION);					// move		i6, FAULT_PERMISSION
-	UML_MOVc(block, COND_NE, I6, FAULT_NONE);						// move		i6, FAULT_NONE
+	UML_TEST(block, I2, ARM7_TLB_WRITE);                            // test     i2, ARM7_TLB_WRITE
+	UML_MOVc(block, COND_Z, I6, FAULT_NONE);                        // movz     i6, FAULT_NONE
+	UML_JMPc(block, COND_Z, donefault);                             // jmp      donefault
+	UML_AND(block, I6, mem(&GET_CPSR), MODE_FLAG);                  // and      i6, GET_CPSR, MODE_FLAG
+	UML_CMP(block, I6, eARM7_MODE_USER);                            // cmp      i6, eARM7_MODE_USER
+	UML_MOVc(block, COND_E, I6, FAULT_PERMISSION);                  // move     i6, FAULT_PERMISSION
+	UML_MOVc(block, COND_NE, I6, FAULT_NONE);                       // move     i6, FAULT_NONE
 
-	UML_LABEL(block, donefault);									// donefault:
-	UML_RET(block);													// ret
+	UML_LABEL(block, donefault);                                    // donefault:
+	UML_RET(block);                                                 // ret
 }
 
 /*------------------------------------------------------------------
@@ -1761,179 +1761,179 @@ static void static_generate_tlb_translate(arm_state *arm, code_handle **handlept
 	block = drcuml->begin_block(170);
 
 	alloc_handle(drcuml, &arm->impstate->tlb_translate, "tlb_translate");
-	UML_HANDLE(block, *arm->impstate->tlb_translate);               // handle  	tlb_translate
+	UML_HANDLE(block, *arm->impstate->tlb_translate);               // handle   tlb_translate
 
 	// I3: vaddr
-	UML_CMP(block, I0, 32 * 1024 * 1024);							// cmp		i0, 32*1024*1024
-	UML_JMPc(block, COND_GE, nopid = label++);						// jmpge	nopid
-	UML_AND(block, I3, mem(&COPRO_FCSE_PID), 0xfe000000);			// and		i3, COPRO_FCSE_PID, 0xfe000000
-	UML_ADD(block, I3, I3, I0);										// add		i3, i3, i0
+	UML_CMP(block, I0, 32 * 1024 * 1024);                           // cmp      i0, 32*1024*1024
+	UML_JMPc(block, COND_GE, nopid = label++);                      // jmpge    nopid
+	UML_AND(block, I3, mem(&COPRO_FCSE_PID), 0xfe000000);           // and      i3, COPRO_FCSE_PID, 0xfe000000
+	UML_ADD(block, I3, I3, I0);                                     // add      i3, i3, i0
 
 	// I4: desc_lvl1
-	UML_AND(block, I4, mem(&COPRO_TLB_BASE), COPRO_TLB_BASE_MASK);	// and		i4, COPRO_TLB_BASE, COPRO_TLB_BASE_MASK
-	UML_ROLINS(block, I4, I3, 32 - COPRO_TLB_VADDR_FLTI_MASK_SHIFT, // rolins	i4, i3, 32-COPRO_TLB_VADDR_FLTI_MASK_SHIFT,
-				COPRO_TLB_VADDR_FLTI_MASK);							//			COPRO_TLB_VADDR_FLTI_MASK
-	UML_READ(block, I4, I4, SIZE_DWORD, SPACE_PROGRAM);				// read32	i4, i4, PROGRAM
+	UML_AND(block, I4, mem(&COPRO_TLB_BASE), COPRO_TLB_BASE_MASK);  // and      i4, COPRO_TLB_BASE, COPRO_TLB_BASE_MASK
+	UML_ROLINS(block, I4, I3, 32 - COPRO_TLB_VADDR_FLTI_MASK_SHIFT, // rolins   i4, i3, 32-COPRO_TLB_VADDR_FLTI_MASK_SHIFT,
+				COPRO_TLB_VADDR_FLTI_MASK);                         //          COPRO_TLB_VADDR_FLTI_MASK
+	UML_READ(block, I4, I4, SIZE_DWORD, SPACE_PROGRAM);             // read32   i4, i4, PROGRAM
 
 	// I7: desc_lvl1 & 3
-	UML_AND(block, I7, I4, 3);										// and		i7, i4, 3
+	UML_AND(block, I7, I4, 3);                                      // and      i7, i4, 3
 
-	UML_CMP(block, I7, COPRO_TLB_UNMAPPED);							// cmp		i7, COPRO_TLB_UNMAPPED
-	UML_JMPc(block, COND_NE, nounmapped = label++);					// jmpne	nounmapped
+	UML_CMP(block, I7, COPRO_TLB_UNMAPPED);                         // cmp      i7, COPRO_TLB_UNMAPPED
+	UML_JMPc(block, COND_NE, nounmapped = label++);                 // jmpne    nounmapped
 
 	// TLB Unmapped
-	UML_TEST(block, I2, ARM7_TLB_ABORT_D);							// test		i2, ARM7_TLB_ABORT_D
-	UML_MOVc(block, COND_E, mem(&COPRO_FAULT_STATUS_D), (5 << 0));	// move		COPRO_FAULT_STATUS_D, (5 << 0)
-	UML_MOVc(block, COND_E, mem(&COPRO_FAULT_ADDRESS), I3);			// move		COPRO_FAULT_ADDRESS, i3
-	UML_MOVc(block, COND_E, mem(&arm->pendingAbtD), 1);				// move		pendingAbtD, 1
-	UML_MOVc(block, COND_E, I2, 0);									// move		i2, 0
+	UML_TEST(block, I2, ARM7_TLB_ABORT_D);                          // test     i2, ARM7_TLB_ABORT_D
+	UML_MOVc(block, COND_E, mem(&COPRO_FAULT_STATUS_D), (5 << 0));  // move     COPRO_FAULT_STATUS_D, (5 << 0)
+	UML_MOVc(block, COND_E, mem(&COPRO_FAULT_ADDRESS), I3);         // move     COPRO_FAULT_ADDRESS, i3
+	UML_MOVc(block, COND_E, mem(&arm->pendingAbtD), 1);             // move     pendingAbtD, 1
+	UML_MOVc(block, COND_E, I2, 0);                                 // move     i2, 0
 	UML_RETc(block, COND_E);                                        // rete
 
-	UML_TEST(block, I2, ARM7_TLB_ABORT_P);							// test		i2, ARM7_TLB_ABORT_P
-	UML_MOVc(block, COND_E, mem(&arm->pendingAbtP), 1);				// move		pendingAbtP, 1
-	UML_MOV(block, I2, 0);											// mov		i2, 0
-	UML_RET(block);                                        			// ret
+	UML_TEST(block, I2, ARM7_TLB_ABORT_P);                          // test     i2, ARM7_TLB_ABORT_P
+	UML_MOVc(block, COND_E, mem(&arm->pendingAbtP), 1);             // move     pendingAbtP, 1
+	UML_MOV(block, I2, 0);                                          // mov      i2, 0
+	UML_RET(block);                                                 // ret
 
-	UML_LABEL(block, nounmapped);									// nounmapped:
-	UML_CMP(block, I7, COPRO_TLB_COARSE_TABLE);						// cmp		i7, COPRO_TLB_COARSE_TABLE
-	UML_JMPc(block, COND_NE, nocoarse = label++);					// jmpne	nocoarse
+	UML_LABEL(block, nounmapped);                                   // nounmapped:
+	UML_CMP(block, I7, COPRO_TLB_COARSE_TABLE);                     // cmp      i7, COPRO_TLB_COARSE_TABLE
+	UML_JMPc(block, COND_NE, nocoarse = label++);                   // jmpne    nocoarse
 
-	UML_ROLAND(block, I5, I4, 32-4, 0x0f<<1);						// roland	i5, i4, 32-4, 0xf<<1
-	UML_ROLAND(block, I5, mem(&COPRO_DOMAIN_ACCESS_CONTROL), I5, 3);// roland	i5, COPRO_DOMAIN_ACCESS_CONTROL, i5, 3
-	UML_CMP(block, I5, 1);											// cmp		i5, 1
-	UML_JMPc(block, COND_E, level2 = label++);						// jmpe		level2
-	UML_CMP(block, I5, 3);											// cmp		i5, 3
-	UML_JMPc(block, COND_NE, nofine = label++);						// jmpne	nofine
-	UML_LABEL(block, level2);										// level2:
+	UML_ROLAND(block, I5, I4, 32-4, 0x0f<<1);                       // roland   i5, i4, 32-4, 0xf<<1
+	UML_ROLAND(block, I5, mem(&COPRO_DOMAIN_ACCESS_CONTROL), I5, 3);// roland   i5, COPRO_DOMAIN_ACCESS_CONTROL, i5, 3
+	UML_CMP(block, I5, 1);                                          // cmp      i5, 1
+	UML_JMPc(block, COND_E, level2 = label++);                      // jmpe     level2
+	UML_CMP(block, I5, 3);                                          // cmp      i5, 3
+	UML_JMPc(block, COND_NE, nofine = label++);                     // jmpne    nofine
+	UML_LABEL(block, level2);                                       // level2:
 
 	// I7: desc_level2
-	UML_AND(block, I7, I4, COPRO_TLB_CFLD_ADDR_MASK);				// and		i7, i4, COPRO_TLB_CFLD_ADDR_MASK
-	UML_ROLINS(block, I7, I3, 32 - COPRO_TLB_VADDR_CSLTI_MASK_SHIFT,// rolins	i7, i3, 32 - COPRO_TLB_VADDR_CSLTI_MASK_SHIFT
-				COPRO_TLB_VADDR_CSLTI_MASK);						// 			COPRO_TLB_VADDR_CSLTI_MASK
-	UML_READ(block, I7, I7, SIZE_DWORD, SPACE_PROGRAM);				// read32	i7, i7, PROGRAM
-	UML_JMP(block, nofine);											// jmp		nofine
+	UML_AND(block, I7, I4, COPRO_TLB_CFLD_ADDR_MASK);               // and      i7, i4, COPRO_TLB_CFLD_ADDR_MASK
+	UML_ROLINS(block, I7, I3, 32 - COPRO_TLB_VADDR_CSLTI_MASK_SHIFT,// rolins   i7, i3, 32 - COPRO_TLB_VADDR_CSLTI_MASK_SHIFT
+				COPRO_TLB_VADDR_CSLTI_MASK);                        //          COPRO_TLB_VADDR_CSLTI_MASK
+	UML_READ(block, I7, I7, SIZE_DWORD, SPACE_PROGRAM);             // read32   i7, i7, PROGRAM
+	UML_JMP(block, nofine);                                         // jmp      nofine
 
-	UML_LABEL(block, nocoarse);										// nocoarse:
-	UML_CMP(block, I7, COPRO_TLB_SECTION_TABLE);					// cmp		i7, COPRO_TLB_SECTION_TABLE
-	UML_JMPc(block, COND_NE, nosection = label++);					// jmpne	nosection
+	UML_LABEL(block, nocoarse);                                     // nocoarse:
+	UML_CMP(block, I7, COPRO_TLB_SECTION_TABLE);                    // cmp      i7, COPRO_TLB_SECTION_TABLE
+	UML_JMPc(block, COND_NE, nosection = label++);                  // jmpne    nosection
 
-	UML_ROLAND(block, I5, I4, 32-10, 3);							// roland	i7, i4, 32-10, 3
+	UML_ROLAND(block, I5, I4, 32-10, 3);                            // roland   i7, i4, 32-10, 3
 	// result in I6
-	UML_CALLH(block, *arm->impstate->detect_fault);					// callh	detect_fault
-	UML_CMP(block, I6, FAULT_NONE);									// cmp 		i6, FAULT_NONE
-	UML_JMPc(block, COND_NE, handlefault = label++);				// jmpne	handlefault
+	UML_CALLH(block, *arm->impstate->detect_fault);                 // callh    detect_fault
+	UML_CMP(block, I6, FAULT_NONE);                                 // cmp      i6, FAULT_NONE
+	UML_JMPc(block, COND_NE, handlefault = label++);                // jmpne    handlefault
 
 	// no fault, return translated address
-	UML_AND(block, I0, I3, ~COPRO_TLB_SECTION_PAGE_MASK);			// and		i0, i3, ~COPRO_TLB_SECTION_PAGE_MASK
-	UML_ROLINS(block, I0, I4, 0, COPRO_TLB_SECTION_PAGE_MASK);		// rolins	i0, i4, COPRO_TLB_SECTION_PAGE_MASK
-	UML_MOV(block, I2, 1);											// mov		i2, 1
-	UML_RET(block);													// ret
+	UML_AND(block, I0, I3, ~COPRO_TLB_SECTION_PAGE_MASK);           // and      i0, i3, ~COPRO_TLB_SECTION_PAGE_MASK
+	UML_ROLINS(block, I0, I4, 0, COPRO_TLB_SECTION_PAGE_MASK);      // rolins   i0, i4, COPRO_TLB_SECTION_PAGE_MASK
+	UML_MOV(block, I2, 1);                                          // mov      i2, 1
+	UML_RET(block);                                                 // ret
 
-	UML_LABEL(block, handlefault);									// handlefault:
-	UML_TEST(block, I2, ARM7_TLB_ABORT_D);							// test		i2, ARM7_TLB_ABORT_D
-	UML_JMPc(block, COND_Z, prefetch = label++);					// jmpz		prefetch
-	UML_MOV(block, mem(&COPRO_FAULT_ADDRESS), I3);					// mov		COPRO_FAULT_ADDRESS, i3
-	UML_MOV(block, mem(&arm->pendingAbtD), 1);						// mov		arm->pendingAbtD, 1
-	UML_ROLAND(block, I5, I4, 31, 0xf0);							// roland	i5, i4, 31, 0xf0
-	UML_CMP(block, I6, FAULT_DOMAIN);								// cmp		i6, FAULT_DOMAIN
-	UML_MOVc(block, COND_E, I6, 9 << 0);							// move		i6, 9 << 0
-	UML_MOVc(block, COND_NE, I6, 13 << 0);							// movne	i6, 13 << 0
-	UML_OR(block, mem(&COPRO_FAULT_STATUS_D), I5, I6);				// or		COPRO_FAULT_STATUS_D, i5, i6
-	UML_MOV(block, I2, 0);											// mov		i2, 0
-	UML_RET(block);													// ret
+	UML_LABEL(block, handlefault);                                  // handlefault:
+	UML_TEST(block, I2, ARM7_TLB_ABORT_D);                          // test     i2, ARM7_TLB_ABORT_D
+	UML_JMPc(block, COND_Z, prefetch = label++);                    // jmpz     prefetch
+	UML_MOV(block, mem(&COPRO_FAULT_ADDRESS), I3);                  // mov      COPRO_FAULT_ADDRESS, i3
+	UML_MOV(block, mem(&arm->pendingAbtD), 1);                      // mov      arm->pendingAbtD, 1
+	UML_ROLAND(block, I5, I4, 31, 0xf0);                            // roland   i5, i4, 31, 0xf0
+	UML_CMP(block, I6, FAULT_DOMAIN);                               // cmp      i6, FAULT_DOMAIN
+	UML_MOVc(block, COND_E, I6, 9 << 0);                            // move     i6, 9 << 0
+	UML_MOVc(block, COND_NE, I6, 13 << 0);                          // movne    i6, 13 << 0
+	UML_OR(block, mem(&COPRO_FAULT_STATUS_D), I5, I6);              // or       COPRO_FAULT_STATUS_D, i5, i6
+	UML_MOV(block, I2, 0);                                          // mov      i2, 0
+	UML_RET(block);                                                 // ret
 
-	UML_LABEL(block, prefetch);										// prefetch:
-	UML_MOV(block, mem(&arm->pendingAbtP), 1);						// mov		arm->pendingAbtP, 1
-	UML_MOV(block, I2, 0);											// mov		i2, 0
-	UML_RET(block);													// ret
+	UML_LABEL(block, prefetch);                                     // prefetch:
+	UML_MOV(block, mem(&arm->pendingAbtP), 1);                      // mov      arm->pendingAbtP, 1
+	UML_MOV(block, I2, 0);                                          // mov      i2, 0
+	UML_RET(block);                                                 // ret
 
-	UML_LABEL(block, nosection);									// nosection:
-	UML_CMP(block, I7, COPRO_TLB_FINE_TABLE);						// cmp		i7, COPRO_TLB_FINE_TABLE
-	UML_JMPc(block, COND_NE, nofine);								// jmpne	nofine
+	UML_LABEL(block, nosection);                                    // nosection:
+	UML_CMP(block, I7, COPRO_TLB_FINE_TABLE);                       // cmp      i7, COPRO_TLB_FINE_TABLE
+	UML_JMPc(block, COND_NE, nofine);                               // jmpne    nofine
 
 	// Not yet implemented
-	UML_MOV(block, I2, 1);											// mov		i2, 1
-	UML_RET(block);													// ret
+	UML_MOV(block, I2, 1);                                          // mov      i2, 1
+	UML_RET(block);                                                 // ret
 
-	UML_LABEL(block, nofine);										// nofine:
+	UML_LABEL(block, nofine);                                       // nofine:
 
 	// I7: desc_lvl2
-	UML_AND(block, I6, I7, 3);										// and		i6, i7, 3
-	UML_CMP(block, I6, COPRO_TLB_UNMAPPED);							// cmp		i6, COPRO_TLB_UNMAPPED
-	UML_JMPc(block, COND_NE, nounmapped2 = label++);				// jmpne	nounmapped2
+	UML_AND(block, I6, I7, 3);                                      // and      i6, i7, 3
+	UML_CMP(block, I6, COPRO_TLB_UNMAPPED);                         // cmp      i6, COPRO_TLB_UNMAPPED
+	UML_JMPc(block, COND_NE, nounmapped2 = label++);                // jmpne    nounmapped2
 
-	UML_TEST(block, I2, ARM7_TLB_ABORT_D);							// test		i2, ARM7_TLB_ABORT_D
-	UML_JMPc(block, COND_Z, prefetch2 = label++);					// jmpz		prefetch2
-	UML_MOV(block, mem(&COPRO_FAULT_ADDRESS), I3);					// mov		COPRO_FAULT_ADDRESS, i3
-	UML_MOV(block, mem(&arm->pendingAbtD), 1);						// mov		arm->pendingAbtD, 1
-	UML_ROLAND(block, I5, I4, 31, 0xf0);							// roland	i5, i4, 31, 0xf0
-	UML_OR(block, I5, I5, 7 << 0);									// or		i5, i5, 7 << 0
-	UML_OR(block, mem(&COPRO_FAULT_STATUS_D), I5, I6);				// or		COPRO_FAULT_STATUS_D, i5, i6
-	UML_MOV(block, I2, 0);											// mov		i2, 0
-	UML_RET(block);													// ret
+	UML_TEST(block, I2, ARM7_TLB_ABORT_D);                          // test     i2, ARM7_TLB_ABORT_D
+	UML_JMPc(block, COND_Z, prefetch2 = label++);                   // jmpz     prefetch2
+	UML_MOV(block, mem(&COPRO_FAULT_ADDRESS), I3);                  // mov      COPRO_FAULT_ADDRESS, i3
+	UML_MOV(block, mem(&arm->pendingAbtD), 1);                      // mov      arm->pendingAbtD, 1
+	UML_ROLAND(block, I5, I4, 31, 0xf0);                            // roland   i5, i4, 31, 0xf0
+	UML_OR(block, I5, I5, 7 << 0);                                  // or       i5, i5, 7 << 0
+	UML_OR(block, mem(&COPRO_FAULT_STATUS_D), I5, I6);              // or       COPRO_FAULT_STATUS_D, i5, i6
+	UML_MOV(block, I2, 0);                                          // mov      i2, 0
+	UML_RET(block);                                                 // ret
 
-	UML_LABEL(block, prefetch2);									// prefetch2:
-	UML_MOV(block, mem(&arm->pendingAbtP), 1);						// mov		arm->pendingAbtP, 1
-	UML_MOV(block, I2, 0);											// mov		i2, 0
-	UML_RET(block);													// ret
+	UML_LABEL(block, prefetch2);                                    // prefetch2:
+	UML_MOV(block, mem(&arm->pendingAbtP), 1);                      // mov      arm->pendingAbtP, 1
+	UML_MOV(block, I2, 0);                                          // mov      i2, 0
+	UML_RET(block);                                                 // ret
 
-	UML_LABEL(block, nounmapped2);									// nounmapped2:
-	UML_CMP(block, I6, COPRO_TLB_LARGE_PAGE);						// cmp		i6, COPRO_TLB_LARGE_PAGE
-	UML_JMPc(block, COND_NE, nolargepage = label++);				// jmpne	nolargepage
+	UML_LABEL(block, nounmapped2);                                  // nounmapped2:
+	UML_CMP(block, I6, COPRO_TLB_LARGE_PAGE);                       // cmp      i6, COPRO_TLB_LARGE_PAGE
+	UML_JMPc(block, COND_NE, nolargepage = label++);                // jmpne    nolargepage
 
-	UML_AND(block, I0, I3, ~COPRO_TLB_LARGE_PAGE_MASK);				// and		i0, i3, ~COPRO_TLB_LARGE_PAGE_MASK
-	UML_ROLINS(block, I0, I7, 0, COPRO_TLB_LARGE_PAGE_MASK);		// rolins	i0, i7, 0, COPRO_TLB_LARGE_PAGE_MASK
-	UML_MOV(block, I2, 1);											// mov		i2, 1
-	UML_RET(block);													// ret
+	UML_AND(block, I0, I3, ~COPRO_TLB_LARGE_PAGE_MASK);             // and      i0, i3, ~COPRO_TLB_LARGE_PAGE_MASK
+	UML_ROLINS(block, I0, I7, 0, COPRO_TLB_LARGE_PAGE_MASK);        // rolins   i0, i7, 0, COPRO_TLB_LARGE_PAGE_MASK
+	UML_MOV(block, I2, 1);                                          // mov      i2, 1
+	UML_RET(block);                                                 // ret
 
-	UML_LABEL(block, nolargepage);									// nolargepage:
-	UML_CMP(block, I6, COPRO_TLB_SMALL_PAGE);						// cmp		i6, COPRO_TLB_SMALL_PAGE
-	UML_JMPc(block, COND_NE, nosmallpage = label++);				// jmpne	nosmallpage
+	UML_LABEL(block, nolargepage);                                  // nolargepage:
+	UML_CMP(block, I6, COPRO_TLB_SMALL_PAGE);                       // cmp      i6, COPRO_TLB_SMALL_PAGE
+	UML_JMPc(block, COND_NE, nosmallpage = label++);                // jmpne    nosmallpage
 
-	UML_ROLAND(block, I5, I3, 32-9, 3<<1);							// roland	i5, i3, 32-9, 3<<1
-	UML_ROLAND(block, I6, I7, 32-4, 0xff);							// roland	i6, i7, 32-4, 0xff
-	UML_SHR(block, I5, I7, I5);										// shr		i5, i7, i5
-	UML_AND(block, I5, I5, 3);										// and		i5, i5, 3
+	UML_ROLAND(block, I5, I3, 32-9, 3<<1);                          // roland   i5, i3, 32-9, 3<<1
+	UML_ROLAND(block, I6, I7, 32-4, 0xff);                          // roland   i6, i7, 32-4, 0xff
+	UML_SHR(block, I5, I7, I5);                                     // shr      i5, i7, i5
+	UML_AND(block, I5, I5, 3);                                      // and      i5, i5, 3
 	// result in I6
-	UML_CALLH(block, *arm->impstate->detect_fault);					// callh	detect_fault
+	UML_CALLH(block, *arm->impstate->detect_fault);                 // callh    detect_fault
 
-	UML_CMP(block, I6, FAULT_NONE);									// cmp		i6, FAULT_NONE
-	UML_JMPc(block, COND_NE, smallfault = label++);					// jmpne	smallfault
-	UML_AND(block, I0, I7, COPRO_TLB_SMALL_PAGE_MASK);				// and		i0, i7, COPRO_TLB_SMALL_PAGE_MASK
-	UML_ROLINS(block, I0, I3, 0, ~COPRO_TLB_SMALL_PAGE_MASK);		// rolins	i0, i3, 0, ~COPRO_TLB_SMALL_PAGE_MASK
-	UML_MOV(block, I2, 1);											// mov		i2, 1
-	UML_RET(block);													// ret
+	UML_CMP(block, I6, FAULT_NONE);                                 // cmp      i6, FAULT_NONE
+	UML_JMPc(block, COND_NE, smallfault = label++);                 // jmpne    smallfault
+	UML_AND(block, I0, I7, COPRO_TLB_SMALL_PAGE_MASK);              // and      i0, i7, COPRO_TLB_SMALL_PAGE_MASK
+	UML_ROLINS(block, I0, I3, 0, ~COPRO_TLB_SMALL_PAGE_MASK);       // rolins   i0, i3, 0, ~COPRO_TLB_SMALL_PAGE_MASK
+	UML_MOV(block, I2, 1);                                          // mov      i2, 1
+	UML_RET(block);                                                 // ret
 
-	UML_LABEL(block, smallfault);									// smallfault:
-	UML_TEST(block, I2, ARM7_TLB_ABORT_D);							// test		i2, ARM7_TLB_ABORT_D
-	UML_JMPc(block, COND_NZ, smallprefetch = label++);				// jmpnz	smallprefetch
-	UML_MOV(block, mem(&COPRO_FAULT_ADDRESS), I3);					// mov		COPRO_FAULT_ADDRESS, i3
-	UML_MOV(block, mem(&arm->pendingAbtD), 1);						// mov		pendingAbtD, 1
-	UML_CMP(block, I6, FAULT_DOMAIN);								// cmp		i6, FAULT_DOMAIN
-	UML_MOVc(block, COND_E, I5, 11 << 0);							// move		i5, 11 << 0
-	UML_MOVc(block, COND_NE, I5, 15 << 0);							// movne	i5, 15 << 0
-	UML_ROLINS(block, I5, I4, 31, 0xf0);							// rolins	i5, i4, 31, 0xf0
-	UML_MOV(block, mem(&COPRO_FAULT_STATUS_D), I5);					// mov		COPRO_FAULT_STATUS_D, i5
-	UML_MOV(block, I2, 0);											// mov		i2, 0
-	UML_RET(block);													// ret
+	UML_LABEL(block, smallfault);                                   // smallfault:
+	UML_TEST(block, I2, ARM7_TLB_ABORT_D);                          // test     i2, ARM7_TLB_ABORT_D
+	UML_JMPc(block, COND_NZ, smallprefetch = label++);              // jmpnz    smallprefetch
+	UML_MOV(block, mem(&COPRO_FAULT_ADDRESS), I3);                  // mov      COPRO_FAULT_ADDRESS, i3
+	UML_MOV(block, mem(&arm->pendingAbtD), 1);                      // mov      pendingAbtD, 1
+	UML_CMP(block, I6, FAULT_DOMAIN);                               // cmp      i6, FAULT_DOMAIN
+	UML_MOVc(block, COND_E, I5, 11 << 0);                           // move     i5, 11 << 0
+	UML_MOVc(block, COND_NE, I5, 15 << 0);                          // movne    i5, 15 << 0
+	UML_ROLINS(block, I5, I4, 31, 0xf0);                            // rolins   i5, i4, 31, 0xf0
+	UML_MOV(block, mem(&COPRO_FAULT_STATUS_D), I5);                 // mov      COPRO_FAULT_STATUS_D, i5
+	UML_MOV(block, I2, 0);                                          // mov      i2, 0
+	UML_RET(block);                                                 // ret
 
-	UML_LABEL(block, smallprefetch);								// smallprefetch:
-	UML_MOV(block, mem(&arm->pendingAbtP), 1);						// mov		pendingAbtP, 1
-	UML_MOV(block, I2, 0);											// mov		i2, 0
-	UML_RET(block);													// ret
+	UML_LABEL(block, smallprefetch);                                // smallprefetch:
+	UML_MOV(block, mem(&arm->pendingAbtP), 1);                      // mov      pendingAbtP, 1
+	UML_MOV(block, I2, 0);                                          // mov      i2, 0
+	UML_RET(block);                                                 // ret
 
-	UML_LABEL(block, nosmallpage);									// nosmallpage:
-	UML_CMP(block, I6, COPRO_TLB_TINY_PAGE);						// cmp		i6, COPRO_TLB_TINY_PAGE
-	UML_JMPc(block, COND_NE, notinypage = label++);					// jmpne	notinypage
+	UML_LABEL(block, nosmallpage);                                  // nosmallpage:
+	UML_CMP(block, I6, COPRO_TLB_TINY_PAGE);                        // cmp      i6, COPRO_TLB_TINY_PAGE
+	UML_JMPc(block, COND_NE, notinypage = label++);                 // jmpne    notinypage
 
-	UML_AND(block, I0, I3, ~COPRO_TLB_TINY_PAGE_MASK);				// and		i0, i3, ~COPRO_TLB_TINY_PAGE_MASK
-	UML_ROLINS(block, I0, I7, 0, COPRO_TLB_TINY_PAGE_MASK);			// rolins	i0, i7, 0, COPRO_TLB_TINY_PAGE_MASK
-	UML_MOV(block, I2, 1);											// mov		i2, 1
-	UML_RET(block);													// ret
+	UML_AND(block, I0, I3, ~COPRO_TLB_TINY_PAGE_MASK);              // and      i0, i3, ~COPRO_TLB_TINY_PAGE_MASK
+	UML_ROLINS(block, I0, I7, 0, COPRO_TLB_TINY_PAGE_MASK);         // rolins   i0, i7, 0, COPRO_TLB_TINY_PAGE_MASK
+	UML_MOV(block, I2, 1);                                          // mov      i2, 1
+	UML_RET(block);                                                 // ret
 
-	UML_LABEL(block, notinypage);									// notinypage:
-	UML_MOV(block, I0, I3);											// mov		i0, i3
-	UML_RET(block);													// ret
+	UML_LABEL(block, notinypage);                                   // notinypage:
+	UML_MOV(block, I0, I3);                                         // mov      i0, i3
+	UML_RET(block);                                                 // ret
 
 	block->end();
 }
@@ -1957,21 +1957,21 @@ static void static_generate_memory_accessor(arm_state *arm, int size, bool istlb
 
 	/* add a global entry for this */
 	alloc_handle(drcuml, handleptr, name);
-	UML_HANDLE(block, **handleptr);											// handle  *handleptr
+	UML_HANDLE(block, **handleptr);                                         // handle  *handleptr
 
 	if (istlb)
 	{
-		UML_TEST(block, mem(&COPRO_CTRL), COPRO_CTRL_MMU_EN);				// test		COPRO_CTRL, COPRO_CTRL_MMU_EN
+		UML_TEST(block, mem(&COPRO_CTRL), COPRO_CTRL_MMU_EN);               // test     COPRO_CTRL, COPRO_CTRL_MMU_EN
 		if (iswrite)
 		{
-			UML_MOVc(block, COND_NZ, I3, ARM7_TLB_WRITE);					// movnz	i3, ARM7_TLB_WRITE
+			UML_MOVc(block, COND_NZ, I3, ARM7_TLB_WRITE);                   // movnz    i3, ARM7_TLB_WRITE
 		}
 		else
 		{
-			UML_MOVc(block, COND_NZ, I3, ARM7_TLB_READ);					// movnz	i3, ARM7_TLB_READ
+			UML_MOVc(block, COND_NZ, I3, ARM7_TLB_READ);                    // movnz    i3, ARM7_TLB_READ
 		}
-		UML_OR(block, I2, I2, I3);											// or		i2, i2, i3
-		UML_CALLHc(block, COND_NZ, *arm->impstate->tlb_translate);			// callhnz	tlb_translate
+		UML_OR(block, I2, I2, I3);                                          // or       i2, i2, i3
+		UML_CALLHc(block, COND_NZ, *arm->impstate->tlb_translate);          // callhnz  tlb_translate
 	}
 
 	/* general case: assume paging and perform a translation */
@@ -1985,13 +1985,13 @@ static void static_generate_memory_accessor(arm_state *arm, int size, bool istlb
 				UINT32 skip = label++;
 				if (arm->impstate->fastram[ramnum].end != 0xffffffff)
 				{
-					UML_CMP(block, I0, arm->impstate->fastram[ramnum].end);		// cmp     i0, end
-					UML_JMPc(block, COND_A, skip);								// ja      skip
+					UML_CMP(block, I0, arm->impstate->fastram[ramnum].end);     // cmp     i0, end
+					UML_JMPc(block, COND_A, skip);                              // ja      skip
 				}
 				if (arm->impstate->fastram[ramnum].start != 0x00000000)
 				{
-					UML_CMP(block, I0, arm->impstate->fastram[ramnum].start);	// cmp     i0, fastram_start
-					UML_JMPc(block, COND_B, skip);								// jb      skip
+					UML_CMP(block, I0, arm->impstate->fastram[ramnum].start);   // cmp     i0, fastram_start
+					UML_JMPc(block, COND_B, skip);                              // jb      skip
 				}
 
 				if (!iswrite)
@@ -2000,19 +2000,19 @@ static void static_generate_memory_accessor(arm_state *arm, int size, bool istlb
 					{
 						UML_XOR(block, I0, I0, (arm->endianess == ENDIANNESS_BIG) ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0));
 																						// xor     i0, i0, bytexor
-						UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);			// load    i0, fastbase, i0, byte
+						UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);         // load    i0, fastbase, i0, byte
 					}
 					else if (size == 2)
 					{
 						UML_XOR(block, I0, I0, (arm->endianess == ENDIANNESS_BIG) ? WORD_XOR_BE(0) : WORD_XOR_LE(0));
 																						// xor     i0, i0, wordxor
-						UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);			// load    i0, fastbase, i0, word_x1
+						UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);         // load    i0, fastbase, i0, word_x1
 					}
 					else if (size == 4)
 					{
-						UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);		// load    i0, fastbase, i0, dword_x1
+						UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);        // load    i0, fastbase, i0, dword_x1
 					}
-					UML_RET(block);														// ret
+					UML_RET(block);                                                     // ret
 				}
 				else
 				{
@@ -2020,22 +2020,22 @@ static void static_generate_memory_accessor(arm_state *arm, int size, bool istlb
 					{
 						UML_XOR(block, I0, I0, (arm->endianess == ENDIANNESS_BIG) ? BYTE4_XOR_BE(0) : BYTE4_XOR_LE(0));
 																						// xor     i0, i0, bytexor
-						UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);		// store   fastbase, i0, i1, byte
+						UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);        // store   fastbase, i0, i1, byte
 					}
 					else if (size == 2)
 					{
 						UML_XOR(block, I0, I0, arm->bigendian ? WORD_XOR_BE(0) : WORD_XOR_LE(0));
 																						// xor     i0, i0, wordxor
-						UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);		// store   fastbase, i0, i1, word_x1
+						UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);        // store   fastbase, i0, i1, word_x1
 					}
 					else if (size == 4)
 					{
-						UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);		// store   fastbase,i0,i1,dword_x1
+						UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i1,dword_x1
 					}
 					UML_RET(block);                                                     // ret
 				}
 
-				UML_LABEL(block, skip);													// skip:
+				UML_LABEL(block, skip);                                                 // skip:
 			}
 		}
 	}
@@ -2045,33 +2045,33 @@ static void static_generate_memory_accessor(arm_state *arm, int size, bool istlb
 		case 1:
 			if (iswrite)
 			{
-				UML_WRITE(block, I0, I1, SIZE_BYTE, SPACE_PROGRAM);					// write   i0, i1, program_byte
+				UML_WRITE(block, I0, I1, SIZE_BYTE, SPACE_PROGRAM);                 // write   i0, i1, program_byte
 			}
 			else
 			{
-				UML_READ(block, I0, I0, SIZE_BYTE, SPACE_PROGRAM);					// read    i0, i0, program_byte
+				UML_READ(block, I0, I0, SIZE_BYTE, SPACE_PROGRAM);                  // read    i0, i0, program_byte
 			}
 			break;
 
 		case 2:
 			if (iswrite)
 			{
-				UML_WRITE(block, I0, I1, SIZE_WORD, SPACE_PROGRAM);					// write   i0,i1,program_word
+				UML_WRITE(block, I0, I1, SIZE_WORD, SPACE_PROGRAM);                 // write   i0,i1,program_word
 			}
 			else
 			{
-				UML_READ(block, I0, I0, SIZE_WORD, SPACE_PROGRAM);					// read    i0,i0,program_word
+				UML_READ(block, I0, I0, SIZE_WORD, SPACE_PROGRAM);                  // read    i0,i0,program_word
 			}
 			break;
 
 		case 4:
 			if (iswrite)
 			{
-				UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_PROGRAM);				// write   i0,i1,program_dword
+				UML_WRITE(block, I0, I1, SIZE_DWORD, SPACE_PROGRAM);                // write   i0,i1,program_dword
 			}
 			else
 			{
-				UML_READ(block, I0, I0, SIZE_DWORD, SPACE_PROGRAM);					// read    i0,i0,program_dword
+				UML_READ(block, I0, I0, SIZE_DWORD, SPACE_PROGRAM);                 // read    i0,i0,program_dword
 			}
 			break;
 	}
@@ -2106,7 +2106,7 @@ static void generate_update_cycles(arm_state *arm, drcuml_block *block, compiler
 	{
 		UML_SUB(block, mem(&arm->icount), mem(&arm->icount), MAPVAR_CYCLES);    // sub     icount,icount,cycles
 		UML_MAPVAR(block, MAPVAR_CYCLES, 0);                                    // mapvar  cycles,0
-		UML_EXHc(block, COND_S, *arm->impstate->out_of_cycles, param);			// exh     out_of_cycles,nextpc
+		UML_EXHc(block, COND_S, *arm->impstate->out_of_cycles, param);          // exh     out_of_cycles,nextpc
 	}
 	compiler->cycles = 0;
 }
@@ -2132,19 +2132,19 @@ static void generate_checksum_block(arm_state *arm, drcuml_block *block, compile
 		{
 			UINT32 sum = seqhead->opptr.l[0];
 			void *base = arm->direct->read_decrypted_ptr(seqhead->physpc);
-			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);				// load    i0,base,0,dword
+			UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);             // load    i0,base,0,dword
 
 			if (seqhead->delay.first() != NULL && seqhead->physpc != seqhead->delay.first()->physpc)
 			{
 				base = arm->direct->read_decrypted_ptr(seqhead->delay.first()->physpc);
-				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);			// load    i1,base,dword
-				UML_ADD(block, I0, I0, I1);									// add     i0,i0,i1
+				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);         // load    i1,base,dword
+				UML_ADD(block, I0, I0, I1);                                 // add     i0,i0,i1
 
 				sum += seqhead->delay.first()->opptr.l[0];
 			}
 
-			UML_CMP(block, I0, sum);                                    	// cmp     i0,opptr[0]
-			UML_EXHc(block, COND_NE, *arm->impstate->nocode, epc(seqhead));	// exne    nocode,seqhead->pc
+			UML_CMP(block, I0, sum);                                        // cmp     i0,opptr[0]
+			UML_EXHc(block, COND_NE, *arm->impstate->nocode, epc(seqhead)); // exne    nocode,seqhead->pc
 		}
 	}
 
@@ -2153,26 +2153,26 @@ static void generate_checksum_block(arm_state *arm, drcuml_block *block, compile
 	{
 		UINT32 sum = 0;
 		void *base = arm->direct->read_decrypted_ptr(seqhead->physpc);
-		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);					// load    i0,base,0,dword
+		UML_LOAD(block, I0, base, 0, SIZE_DWORD, SCALE_x4);                 // load    i0,base,0,dword
 		sum += seqhead->opptr.l[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
 				base = arm->direct->read_decrypted_ptr(curdesc->physpc);
-				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);			// load    i1,base,dword
-				UML_ADD(block, I0, I0, I1);									// add     i0,i0,i1
+				UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);         // load    i1,base,dword
+				UML_ADD(block, I0, I0, I1);                                 // add     i0,i0,i1
 				sum += curdesc->opptr.l[0];
 
 				if (curdesc->delay.first() != NULL && (curdesc == seqlast || (curdesc->next() != NULL && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
 				{
 					base = arm->direct->read_decrypted_ptr(curdesc->delay.first()->physpc);
-					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);		// load    i1,base,dword
-					UML_ADD(block, I0, I0, I1);								// add     i0,i0,i1
+					UML_LOAD(block, I1, base, 0, SIZE_DWORD, SCALE_x4);     // load    i1,base,dword
+					UML_ADD(block, I0, I0, I1);                             // add     i0,i0,i1
 					sum += curdesc->delay.first()->opptr.l[0];
 				}
 			}
-		UML_CMP(block, I0, sum);											// cmp     i0,sum
-		UML_EXHc(block, COND_NE, *arm->impstate->nocode, epc(seqhead));		// exne    nocode,seqhead->pc
+		UML_CMP(block, I0, sum);                                            // cmp     i0,sum
+		UML_EXHc(block, COND_NE, *arm->impstate->nocode, epc(seqhead));     // exne    nocode,seqhead->pc
 	}
 }
 
@@ -2199,7 +2199,7 @@ static void generate_sequence_instruction(arm_state *arm, drcuml_block *block, c
 	compiler->cycles += desc->cycles;
 
 	/* update the icount map variable */
-	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                   	// mapvar  CYCLES,compiler->cycles
+	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                     // mapvar  CYCLES,compiler->cycles
 
 	/* is this a hotspot? */
 	for (hotnum = 0; hotnum < MIPS3_MAX_HOTSPOTS; hotnum++)
@@ -2212,22 +2212,22 @@ static void generate_sequence_instruction(arm_state *arm, drcuml_block *block, c
 	}
 
 	/* update the icount map variable */
-	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);						// mapvar  CYCLES,compiler->cycles
+	UML_MAPVAR(block, MAPVAR_CYCLES, compiler->cycles);                     // mapvar  CYCLES,compiler->cycles
 
 	/* if we are debugging, call the debugger */
 	if ((arm->device->machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		UML_MOV(block, mem(&R15), desc->pc);								// mov     [pc],desc->pc
+		UML_MOV(block, mem(&R15), desc->pc);                                // mov     [pc],desc->pc
 		save_fast_iregs(arm, block);
-		UML_DEBUG(block, desc->pc);											// debug   desc->pc
+		UML_DEBUG(block, desc->pc);                                         // debug   desc->pc
 	}
 
 	/* if we hit an unmapped address, fatal error */
 	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
 	{
-		UML_MOV(block, mem(&R15), desc->pc);								// mov     R15,desc->pc
+		UML_MOV(block, mem(&R15), desc->pc);                                // mov     R15,desc->pc
 		save_fast_iregs(arm, block);
-		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);								// exit    EXECUTE_UNMAPPED_CODE
+		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);                             // exit    EXECUTE_UNMAPPED_CODE
 	}
 
 	/* otherwise, unless this is a virtual no-op, it's a regular instruction */
@@ -2236,9 +2236,9 @@ static void generate_sequence_instruction(arm_state *arm, drcuml_block *block, c
 		/* compile the instruction */
 		if (!generate_opcode(arm, block, compiler, desc))
 		{
-			UML_MOV(block, mem(&R15), desc->pc);							// mov     R15,desc->pc
-			UML_MOV(block, mem(&arm->impstate->arg0), desc->opptr.l[0]);	// mov     [arg0],desc->opptr.l
-			UML_CALLC(block, cfunc_unimplemented, arm);                 	// callc   cfunc_unimplemented
+			UML_MOV(block, mem(&R15), desc->pc);                            // mov     R15,desc->pc
+			UML_MOV(block, mem(&arm->impstate->arg0), desc->opptr.l[0]);    // mov     [arg0],desc->opptr.l
+			UML_CALLC(block, cfunc_unimplemented, arm);                     // callc   cfunc_unimplemented
 		}
 	}
 }
@@ -2256,7 +2256,7 @@ static void generate_delay_slot_and_branch(arm_state *arm, drcuml_block *block, 
 	/* update the cycles and jump through the hash table to the target */
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 	{
-		generate_update_cycles(arm, block, &compiler_temp, desc->targetpc, TRUE);	// <subtract cycles>
+		generate_update_cycles(arm, block, &compiler_temp, desc->targetpc, TRUE);   // <subtract cycles>
 		UML_HASHJMP(block, 0, desc->targetpc, *arm->impstate->nocode);
 																					// hashjmp 0,desc->targetpc,nocode
 	}
@@ -2627,13 +2627,13 @@ static int generate_opcode(arm_state *arm, drcuml_block *block, compiler_state *
 		UML_AND(block, I0, DRC_PC, ~3);
 	}
 
-	UML_TEST(block, mem(&COPRO_CTRL), COPRO_CTRL_MMU_EN);						// test		COPRO_CTRL, COPRO_CTRL_MMU_EN
-	UML_MOVc(block, COND_NZ, I2, ARM7_TLB_ABORT_P | ARM7_TLB_READ);				// movnz	i0, ARM7_TLB_ABORT_P | ARM7_TLB_READ
-	UML_CALLHc(block, COND_NZ, *arm->impstate->tlb_translate);					// callhnz	tlb_translate);
+	UML_TEST(block, mem(&COPRO_CTRL), COPRO_CTRL_MMU_EN);                       // test     COPRO_CTRL, COPRO_CTRL_MMU_EN
+	UML_MOVc(block, COND_NZ, I2, ARM7_TLB_ABORT_P | ARM7_TLB_READ);             // movnz    i0, ARM7_TLB_ABORT_P | ARM7_TLB_READ
+	UML_CALLHc(block, COND_NZ, *arm->impstate->tlb_translate);                  // callhnz  tlb_translate);
 
 	if (T_IS_SET(GET_CPSR))
 	{
-		UML_CALLH(block, *arm->impstate->drcthumb[(op & 0xffc0) >> 6);			// callh	drcthumb[op]
+		UML_CALLH(block, *arm->impstate->drcthumb[(op & 0xffc0) >> 6);          // callh    drcthumb[op]
 		return TRUE;
 	}
 
@@ -2739,7 +2739,7 @@ static int generate_opcode(arm_state *arm, drcuml_block *block, compiler_state *
 
 	UML_LABEL(block, unexecuted);
 	UML_ADD(block, DRC_PC, DRC_PC, 4);
-	UML_ADD(block, MAPVAR_CYCLES, MAPVAR_CYCLES, 2);								// add		cycles, cycles, 2
+	UML_ADD(block, MAPVAR_CYCLES, MAPVAR_CYCLES, 2);                                // add      cycles, cycles, 2
 
 	UML_LABEL(block, skip);
 

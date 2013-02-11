@@ -15,7 +15,7 @@ but with GFX processor integrated
 I dont know the CPU core (should ARM based due to fail test)
 the chip has internal rom build-in
 the the FLASH(u33, EV29LV160AB-90PCR) is external rom and encrypted
-if the external rom decrypted then we can 
+if the external rom decrypted then we can
 try to trojan the internal rom
 here we offer several revision a same game to see
 if anyone could find any clue, these 4 revision can
@@ -43,11 +43,11 @@ CPU: IGS036
 GFX: IGS036
 SND: TT5665
 ----------------------------------------------------------------------------
-Filename        	TYPE		CRC32           SHA1
-cjddzsp_s122cn.u27	GFX		797e5ba3	784fae513ac8cfd1143f0d0ce0936f74e2e64e48
-cjddzsp_s122cn.u28	GFX		d0441a6b	e1c948f94472398aa5887963cf8e87be28dd66e0
-cjddzsp_s122cn.u30	SND		e0e02a57	96074a5226dd24d0bc150adff7324b5349cb5dc2
-cjddzsp_s122cn.u18	PRG		4a42aad6	96805e5bfbd50686177fe50020229ea8787ade17
+Filename            TYPE        CRC32           SHA1
+cjddzsp_s122cn.u27  GFX     797e5ba3    784fae513ac8cfd1143f0d0ce0936f74e2e64e48
+cjddzsp_s122cn.u28  GFX     d0441a6b    e1c948f94472398aa5887963cf8e87be28dd66e0
+cjddzsp_s122cn.u30  SND     e0e02a57    96074a5226dd24d0bc150adff7324b5349cb5dc2
+cjddzsp_s122cn.u18  PRG     4a42aad6    96805e5bfbd50686177fe50020229ea8787ade17
 ----------------------------------------------------------------------------
 check more info and photo from cjdh2.zip!!!
 
@@ -252,4 +252,3 @@ GAME( 200?,  cjdh2c,     cjdh2, igs_m036, igs_m036, igs_m036_state, igs_m036,   
 GAME( 200?,  cjddzsp,    0,     igs_m036_tt, igs_m036, igs_m036_state, igs_m036,        ROT0, "IGS", "Super Dou Di Zhu Special (V122CN)", GAME_IS_SKELETON )
 
 GAME( 200?,  igsm312,    0,     igs_m036_tt, igs_m036, igs_m036_state, igs_m036,        ROT0, "IGS", "Unknown IGS036 CPU game (V312CN)", GAME_IS_SKELETON )
-

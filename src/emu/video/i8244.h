@@ -22,23 +22,18 @@
 	MCFG_DEVICE_ADD(_tag, I8244, _clock) \
 	MCFG_I8244_SCREEN_TAG(_screen_tag) \
 	MCFG_I8244_IRQ_CB(_irq_cb) \
-	MCFG_I8244_POSTPROCESS_CB(_postprocess_cb) \
-
+	MCFG_I8244_POSTPROCESS_CB(_postprocess_cb)
 #define MCFG_I8244_SCREEN_TAG(_screen_tag) \
-	i8244_device::set_screen_tag(*device, _screen_tag); \
-
+	i8244_device::set_screen_tag(*device, _screen_tag);
 #define MCFG_I8244_IRQ_CB(_devcb) \
-	devcb = &i8244_device::set_irq_cb(*device, DEVCB2_##_devcb); \
-
+	devcb = &i8244_device::set_irq_cb(*device, DEVCB2_##_devcb);
 #define MCFG_I8244_POSTPROCESS_CB(_devcb) \
-	devcb = &i8244_device::set_postprocess_cb(*device, DEVCB2_##_devcb); \
-
+	devcb = &i8244_device::set_postprocess_cb(*device, DEVCB2_##_devcb);
 #define MCFG_I8245_ADD(_tag, _clock, _screen_tag, _irq_cb, _postprocess_cb) \
 	MCFG_DEVICE_ADD(_tag, I8245, _clock) \
 	MCFG_I8244_SCREEN_TAG(_screen_tag) \
 	MCFG_I8244_IRQ_CB(_irq_cb) \
-	MCFG_I8244_POSTPROCESS_CB(_postprocess_cb ) \
-
+	MCFG_I8244_POSTPROCESS_CB(_postprocess_cb )
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -48,15 +43,15 @@ union vdc_t {
 	UINT8 reg[0x100];
 	struct {
 		struct {
-		    UINT8 y,x,color,res;
+			UINT8 y,x,color,res;
 		} sprites[4];
 		struct {
-		    UINT8 y,x,ptr,color;
+			UINT8 y,x,ptr,color;
 		} foreground[12];
 		struct {
-		    struct {
+			struct {
 				UINT8 y,x,ptr,color;
-		    } single[4];
+			} single[4];
 		} quad[4];
 		UINT8 shape[4][8];
 		UINT8 control;
@@ -83,8 +78,8 @@ class i8244_device :  public device_t
 					, public device_sound_interface
 {
 public:
-    // construction/destruction
-    i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	// construction/destruction
+	i8244_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	i8244_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, int lines);
 
 	// static configuration helpers
@@ -103,7 +98,7 @@ public:
 
 	inline bitmap_ind16 *get_bitmap() { return &m_tmp_bitmap; }
 
-	// Global constants 
+	// Global constants
 	static const int START_ACTIVE_SCAN = 42;
 	static const int BORDER_SIZE       = 10;
 	static const int END_ACTIVE_SCAN   = 42 + 10 + 320 + 10;
@@ -133,8 +128,8 @@ protected:
 	static const device_timer_id TIMER_LINE = 0;
 	static const device_timer_id TIMER_HBLANK = 1;
 
-    // callbacks
-    devcb2_write_line m_irq_func;
+	// callbacks
+	devcb2_write_line m_irq_func;
 	devcb2_write16 m_postprocess_func;
 
 	const char *m_screen_tag;

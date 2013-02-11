@@ -25,7 +25,7 @@
 // ======================> vcs_keypad_device
 
 class vcs_keypad_device : public device_t,
-						  public device_vcs_control_port_interface
+							public device_vcs_control_port_interface
 {
 public:
 	// construction/destruction
