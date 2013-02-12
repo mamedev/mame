@@ -65,8 +65,7 @@ typedef enum
 	CASSETTE_ERROR_INTERNAL,        /* fatal internal error */
 	CASSETTE_ERROR_UNSUPPORTED,     /* this operation is unsupported */
 	CASSETTE_ERROR_OUTOFMEMORY,     /* ran out of memory */
-	CASSETTE_ERROR_INVALIDIMAGE,    /* invalid image */
-	CASSETTE_ERROR_INVALIDARG
+	CASSETTE_ERROR_INVALIDIMAGE     /* invalid image */
 }
 casserr_t;
 
