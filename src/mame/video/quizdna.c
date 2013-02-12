@@ -130,13 +130,13 @@ WRITE8_MEMBER(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)
 	palette_set_color_rgb(machine(),offs/2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void quizdna_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	quizdna_state *state = machine.driver_data<quizdna_state>();
-	UINT8 *spriteram = state->m_spriteram;
+//OBRISI.ME
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = 0; offs<state->m_spriteram.bytes(); offs+=8)
+	for (offs = 0; offs<m_spriteram.bytes(); offs+=8)
 	{
 		int i;
 
@@ -150,7 +150,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int dy = 0x10;
 		col &= 0x1f;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			x -= 7;
 			y += 1;
@@ -173,7 +173,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		{
 			y &= 0x1ff;
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 					code ^ i,
 					col,
 					fx,fy,
@@ -189,7 +189,7 @@ UINT32 quizdna_state::screen_update_quizdna(screen_device &screen, bitmap_ind16 
 	if (m_video_enable)
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else

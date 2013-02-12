@@ -1195,7 +1195,7 @@ static const UINT8 xor2_table[] =
 	99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,99,11, 6,99,
 };
 
-static int kram3_permut1(int idx, int value)
+int qix_state::kram3_permut1(int idx, int value)
 {
 	switch (idx)
 	{
@@ -1207,7 +1207,7 @@ static int kram3_permut1(int idx, int value)
 	}
 }
 
-static int kram3_permut2(int tbl_index, int idx, const UINT8 *xor_table)
+int qix_state::kram3_permut2(int tbl_index, int idx, const UINT8 *xor_table)
 {
 	int xorval = 0;
 
@@ -1228,7 +1228,7 @@ static int kram3_permut2(int tbl_index, int idx, const UINT8 *xor_table)
 	return xorval;
 }
 
-static int kram3_decrypt(int address, int value)
+int qix_state::kram3_decrypt(int address, int value)
 {
 	int indx1 = (BIT(address,1) << 1) | BIT(address,5);
 	int indx2 = (BIT(address,7) << 1) | BIT(address,3);

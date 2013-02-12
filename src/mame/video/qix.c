@@ -225,7 +225,7 @@ WRITE8_MEMBER(qix_state::qix_palettebank_w)
 }
 
 
-static void get_pens(qix_state *state, pen_t *pens)
+void qix_state::get_pens( pen_t *pens)
 {
 	offs_t offs;
 
@@ -252,11 +252,11 @@ static void get_pens(qix_state *state, pen_t *pens)
 		0xff    /* value = 3, intensity = 3 */
 	};
 
-	for (offs = state->m_palette_bank << 8; offs < (state->m_palette_bank << 8) + NUM_PENS; offs++)
+	for (offs = m_palette_bank << 8; offs < (m_palette_bank << 8) + NUM_PENS; offs++)
 	{
 		int bits, intensity, r, g, b;
 
-		UINT8 data = state->m_paletteram[offs];
+		UINT8 data = m_paletteram[offs];
 
 		/* compute R, G, B from the table */
 		intensity = (data >> 0) & 0x03;
@@ -291,7 +291,7 @@ static MC6845_BEGIN_UPDATE( begin_update )
 #endif
 
 	/* create the pens */
-	get_pens(state, state->m_pens);
+	state->get_pens(state->m_pens);
 
 	return state->m_pens;
 }
