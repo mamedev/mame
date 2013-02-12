@@ -459,9 +459,16 @@ void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 	if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",m_scu.src_add[dma_ch],m_scu.dst_add[dma_ch]);
 	}
 
-	/* TODO: Game Basic trips this, bogus transfer from BIOS area to VDP1? */
+	/* TODO: Game Basic and World Cup 98 trips this, according to the docs the SCU can't transfer from BIOS area (can't communicate from/to that bus) */
 	if(BIOS_BUS(m_scu.src[dma_ch]))
+	{
 		popmessage("Warning: SCU transfer from BIOS area, contact MAMEdev");
+		if(!(m_scu.ism & IRQ_DMAILL))
+			m_maincpu->set_input_line_and_vector(3, HOLD_LINE, 0x4c);
+		else
+			m_scu.ist |= (IRQ_DMAILL);
+		return;
+	}
 
 	DnMV_1(dma_ch);
 
