@@ -75,6 +75,8 @@ public:
 	UINT32 screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(opwolf_timer_callback);
 	TIMER_CALLBACK_MEMBER(cchip_timer);
+	void updateDifficulty( int mode );
+	void opwolf_cchip_init(  );
 };
 
 /*----------- defined in machine/opwolf.c -----------*/

@@ -58,45 +58,43 @@ void oneshot_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-static void draw_crosshairs( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void oneshot_state::draw_crosshairs( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	oneshot_state *state = machine.driver_data<oneshot_state>();
 	//int xpos,ypos;
 
 	/* get gun raw coordinates (player 1) */
-	state->m_gun_x_p1 = (state->ioport("LIGHT0_X")->read() & 0xff) * 320 / 256;
-	state->m_gun_y_p1 = (state->ioport("LIGHT0_Y")->read() & 0xff) * 240 / 256;
+	m_gun_x_p1 = (ioport("LIGHT0_X")->read() & 0xff) * 320 / 256;
+	m_gun_y_p1 = (ioport("LIGHT0_Y")->read() & 0xff) * 240 / 256;
 
 	/* compute the coordinates for drawing (from routine at 0x009ab0) */
-	//xpos = state->m_gun_x_p1;
-	//ypos = state->m_gun_y_p1;
+	//xpos = m_gun_x_p1;
+	//ypos = m_gun_y_p1;
 
-	state->m_gun_x_p1 += state->m_gun_x_shift;
+	m_gun_x_p1 += m_gun_x_shift;
 
-	state->m_gun_y_p1 -= 0x0a;
-	if (state->m_gun_y_p1 < 0)
-		state->m_gun_y_p1 = 0;
+	m_gun_y_p1 -= 0x0a;
+	if (m_gun_y_p1 < 0)
+		m_gun_y_p1 = 0;
 
 
 	/* get gun raw coordinates (player 2) */
-	state->m_gun_x_p2 = (state->ioport("LIGHT1_X")->read() & 0xff) * 320 / 256;
-	state->m_gun_y_p2 = (state->ioport("LIGHT1_Y")->read() & 0xff) * 240 / 256;
+	m_gun_x_p2 = (ioport("LIGHT1_X")->read() & 0xff) * 320 / 256;
+	m_gun_y_p2 = (ioport("LIGHT1_Y")->read() & 0xff) * 240 / 256;
 
 	/* compute the coordinates for drawing (from routine at 0x009b6e) */
-	//xpos = state->m_gun_x_p2;
-	//ypos = state->m_gun_y_p2;
+	//xpos = m_gun_x_p2;
+	//ypos = m_gun_y_p2;
 
-	state->m_gun_x_p2 += state->m_gun_x_shift - 0x0a;
-	if (state->m_gun_x_p2 < 0)
-		state->m_gun_x_p2 = 0;
+	m_gun_x_p2 += m_gun_x_shift - 0x0a;
+	if (m_gun_x_p2 < 0)
+		m_gun_x_p2 = 0;
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void oneshot_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	oneshot_state *state = machine.driver_data<oneshot_state>();
-	const UINT16 *source = state->m_sprites;
+	const UINT16 *source = m_sprites;
 	const UINT16 *finish = source + (0x1000 / 2);
-	gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine().gfx[1];
 
 	int xpos, ypos;
 
@@ -157,9 +155,9 @@ UINT32 oneshot_state::screen_update_oneshot(screen_device &screen, bitmap_ind16 
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_crosshairs(machine(), bitmap, cliprect);
+	draw_crosshairs(bitmap, cliprect);
 	return 0;
 }
 
@@ -172,7 +170,7 @@ UINT32 oneshot_state::screen_update_maddonna(screen_device &screen, bitmap_ind16
 	m_mid_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 //  popmessage ("%04x %04x %04x %04x %04x %04x %04x %04x", m_scroll[0], m_scroll[1], m_scroll[2], m_scroll[3], m_scroll[4], m_scroll[5], m_scroll[6], m_scroll[7]);
 	return 0;

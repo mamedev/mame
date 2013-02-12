@@ -59,11 +59,9 @@ INTERRUPT_GEN_MEMBER(orbit_state::orbit_interrupt)
  *
  *************************************/
 
-static void update_misc_flags(address_space &space, UINT8 val)
+void orbit_state::update_misc_flags(address_space &space, UINT8 val)
 {
-	orbit_state *state = space.machine().driver_data<orbit_state>();
-
-	state->m_misc_flags = val;
+	m_misc_flags = val;
 
 	/* BIT0 => UNUSED       */
 	/* BIT1 => LOCKOUT      */
@@ -74,13 +72,13 @@ static void update_misc_flags(address_space &space, UINT8 val)
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
 
-	discrete_sound_w(state->m_discrete, space, ORBIT_WARNING_EN, BIT(state->m_misc_flags, 7));
+	discrete_sound_w(m_discrete, space, ORBIT_WARNING_EN, BIT(m_misc_flags, 7));
 
-	set_led_status(space.machine(), 0, BIT(state->m_misc_flags, 3));
-	set_led_status(space.machine(), 1, BIT(state->m_misc_flags, 6));
+	set_led_status(machine(), 0, BIT(m_misc_flags, 3));
+	set_led_status(machine(), 1, BIT(m_misc_flags, 6));
 
-	coin_lockout_w(space.machine(), 0, !BIT(state->m_misc_flags, 1));
-	coin_lockout_w(space.machine(), 1, !BIT(state->m_misc_flags, 1));
+	coin_lockout_w(machine(), 0, !BIT(m_misc_flags, 1));
+	coin_lockout_w(machine(), 1, !BIT(m_misc_flags, 1));
 }
 
 

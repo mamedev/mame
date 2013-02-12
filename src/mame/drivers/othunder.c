@@ -249,11 +249,10 @@ TODO:
                 INTERRUPTS
 ***********************************************************/
 
-static void update_irq( running_machine &machine )
+void othunder_state::update_irq(  )
 {
-	othunder_state *state = machine.driver_data<othunder_state>();
-	state->m_maincpu->set_input_line(6, state->m_ad_irq ? ASSERT_LINE : CLEAR_LINE);
-	state->m_maincpu->set_input_line(5, state->m_vblank_irq ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(6, m_ad_irq ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(5, m_vblank_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE16_MEMBER(othunder_state::irq_ack_w)
@@ -269,19 +268,19 @@ WRITE16_MEMBER(othunder_state::irq_ack_w)
 			break;
 	}
 
-	update_irq(machine());
+	update_irq();
 }
 
 INTERRUPT_GEN_MEMBER(othunder_state::vblank_interrupt)
 {
 	m_vblank_irq = 1;
-	update_irq(machine());
+	update_irq();
 }
 
 TIMER_CALLBACK_MEMBER(othunder_state::ad_interrupt)
 {
 	m_ad_irq = 1;
-	update_irq(machine());
+	update_irq();
 }
 
 

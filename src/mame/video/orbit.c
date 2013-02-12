@@ -34,10 +34,9 @@ void orbit_state::video_start()
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void orbit_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	orbit_state *state = machine.driver_data<orbit_state>();
-	const UINT8* p = state->m_sprite_ram;
+	const UINT8* p = m_sprite_ram;
 
 	int i;
 
@@ -70,7 +69,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		hpos <<= 1;
 		vpos <<= 1;
 
-		drawgfxzoom_transpen(bitmap, cliprect, machine.gfx[layout], code, 0, flip_x, flip_y,
+		drawgfxzoom_transpen(bitmap, cliprect, machine().gfx[layout], code, 0, flip_x, flip_y,
 			hpos, vpos, zoom_x, zoom_y, 0);
 	}
 }
@@ -82,6 +81,6 @@ UINT32 orbit_state::screen_update_orbit(screen_device &screen, bitmap_ind16 &bit
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

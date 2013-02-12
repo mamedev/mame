@@ -53,6 +53,8 @@ public:
 	DECLARE_WRITE8_MEMBER(orbit_note_amp_w);
 	DECLARE_WRITE8_MEMBER(orbit_noise_amp_w);
 	DECLARE_WRITE8_MEMBER(orbit_noise_rst_w);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void update_misc_flags(address_space &space, UINT8 val);
 };
 /*----------- defined in audio/orbit.c -----------*/
 

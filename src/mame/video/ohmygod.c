@@ -70,18 +70,17 @@ WRITE16_MEMBER(ohmygod_state::ohmygod_scrolly_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void ohmygod_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	ohmygod_state *state = machine.driver_data<ohmygod_state>();
-	UINT16 *spriteram = state->m_spriteram;
+	UINT16 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes() / 4; offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes() / 4; offs += 4)
 	{
 		int sx, sy, code, color, flipx;
 		UINT16 *sr;
 
-		sr = state->m_spritebank ? (spriteram + state->m_spriteram.bytes() / 4) : spriteram;
+		sr = m_spritebank ? (spriteram + m_spriteram.bytes() / 4) : spriteram;
 
 		code = sr[offs + 3] & 0x0fff;
 		color = sr[offs + 2] & 0x000f;
@@ -91,7 +90,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			sy -= 65536;
 		flipx = sr[offs + 3] & 0x8000;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code,
 				color,
 				flipx,0,
@@ -102,6 +101,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 ohmygod_state::screen_update_ohmygod(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

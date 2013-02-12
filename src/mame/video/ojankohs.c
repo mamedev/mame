@@ -181,34 +181,33 @@ TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
 
 ******************************************************************************/
 
-void ojankoc_flipscreen( address_space &space, int data )
+void ojankohs_state::ojankoc_flipscreen( address_space &space, int data )
 {
-	ojankohs_state *state = space.machine().driver_data<ojankohs_state>();
 	int x, y;
 	UINT8 color1, color2;
 
-	state->m_flipscreen = BIT(data, 7);
+	m_flipscreen = BIT(data, 7);
 
-	if (state->m_flipscreen == state->m_flipscreen_old)
+	if (m_flipscreen == m_flipscreen_old)
 		return;
 
 	for (y = 0; y < 0x40; y++)
 	{
 		for (x = 0; x < 0x100; x++)
 		{
-			color1 = state->m_videoram[0x0000 + ((y * 256) + x)];
-			color2 = state->m_videoram[0x3fff - ((y * 256) + x)];
-			state->ojankoc_videoram_w(space, 0x0000 + ((y * 256) + x), color2);
-			state->ojankoc_videoram_w(space, 0x3fff - ((y * 256) + x), color1);
+			color1 = m_videoram[0x0000 + ((y * 256) + x)];
+			color2 = m_videoram[0x3fff - ((y * 256) + x)];
+			ojankoc_videoram_w(space, 0x0000 + ((y * 256) + x), color2);
+			ojankoc_videoram_w(space, 0x3fff - ((y * 256) + x), color1);
 
-			color1 = state->m_videoram[0x4000 + ((y * 256) + x)];
-			color2 = state->m_videoram[0x7fff - ((y * 256) + x)];
-			state->ojankoc_videoram_w(space, 0x4000 + ((y * 256) + x), color2);
-			state->ojankoc_videoram_w(space, 0x7fff - ((y * 256) + x), color1);
+			color1 = m_videoram[0x4000 + ((y * 256) + x)];
+			color2 = m_videoram[0x7fff - ((y * 256) + x)];
+			ojankoc_videoram_w(space, 0x4000 + ((y * 256) + x), color2);
+			ojankoc_videoram_w(space, 0x7fff - ((y * 256) + x), color1);
 		}
 	}
 
-	state->m_flipscreen_old = state->m_flipscreen;
+	m_flipscreen_old = m_flipscreen;
 }
 
 WRITE8_MEMBER(ojankohs_state::ojankoc_videoram_w)

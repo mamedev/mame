@@ -62,12 +62,11 @@ spriteram is being tested, take no notice of that.]
 ********************************************************/
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs )
+void othunder_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs )
 {
-	othunder_state *state = machine.driver_data<othunder_state>();
-	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
-	UINT16 tile_mask = (machine.gfx[0]->elements()) - 1;
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
+	UINT16 tile_mask = (machine().gfx[0]->elements()) - 1;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int sprites_flipscreen = 0;
@@ -77,9 +76,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	struct othunder_tempsprite *sprite_ptr = state->m_spritelist;
+	struct othunder_tempsprite *sprite_ptr = m_spritelist;
 
-	for (offs = (state->m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
+	for (offs = (m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
 		data = spriteram16[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;
@@ -166,7 +165,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			}
 			else
 			{
-				drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[0],
+				drawgfxzoom_transpen(bitmap,cliprect,machine().gfx[0],
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -180,17 +179,17 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
 	}
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != state->m_spritelist)
+	while (sprite_ptr != m_spritelist)
 	{
 		sprite_ptr--;
 
-		pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[0],
+		pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[0],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				machine.priority_bitmap,sprite_ptr->primask,0);
+				machine().priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 
@@ -221,7 +220,7 @@ UINT32 othunder_state::screen_update_othunder(screen_device &screen, bitmap_ind1
 	/* Sprites can be under/over the layer below text layer */
 	{
 		static const int primasks[2] = {0xf0, 0xfc};
-		draw_sprites(machine(), bitmap, cliprect, primasks, 3);
+		draw_sprites(bitmap, cliprect, primasks, 3);
 	}
 
 	return 0;
