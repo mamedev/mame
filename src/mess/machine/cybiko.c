@@ -104,18 +104,6 @@ static int nvram_system_save( running_machine &machine, const char *name, nvram_
 	return TRUE;
 }
 
-static void cybiko_sst39vfx_load(running_machine &machine, emu_file *file)
-{
-	device_t *device = machine.device("flash2");
-	sst39vfx_load(device, file);
-}
-
-static void cybiko_sst39vfx_save(running_machine &machine, emu_file *file)
-{
-	device_t *device = machine.device("flash2");
-	sst39vfx_save(device, file);
-}
-
 static void cybiko_ramdisk_load(running_machine &machine, emu_file *file)
 {
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
@@ -161,12 +149,7 @@ void cybiko_state::machine_start()
 
 MACHINE_START_MEMBER(cybiko_state,cybikov2)
 {
-	device_t *flash2 = machine().device("flash2");
-
 	_logerror( 0, ("machine_start_cybikov2\n"));
-	// multi-purpose flash
-	nvram_system_load( machine(), "flash2", cybiko_sst39vfx_load, 1);
-	machine().root_device().membank( "bank2" )->set_base( sst39vfx_get_base(flash2));
 	// serial port
 	cybiko_rs232_init(machine());
 	// other
@@ -175,11 +158,7 @@ MACHINE_START_MEMBER(cybiko_state,cybikov2)
 
 MACHINE_START_MEMBER(cybiko_state,cybikoxt)
 {
-	device_t *flash2 = machine().device("flash2");
 	_logerror( 0, ("machine_start_cybikoxt\n"));
-	// multi-purpose flash
-	nvram_system_load( machine(), "flash2", cybiko_sst39vfx_load, 1);
-	machine().root_device().membank( "bank2" )->set_base( sst39vfx_get_base(flash2));
 	// ramdisk
 	nvram_system_load( machine(), "ramdisk", cybiko_ramdisk_load, 0);
 	// serial port
@@ -224,8 +203,6 @@ void cybiko_state::machine_stop_cybikov1()
 void cybiko_state::machine_stop_cybikov2()
 {
 	_logerror( 0, ("machine_stop_cybikov2\n"));
-	// multi-purpose flash
-	nvram_system_save( machine(), "flash2", cybiko_sst39vfx_save);
 	// serial port
 	cybiko_rs232_exit();
 }
@@ -233,8 +210,6 @@ void cybiko_state::machine_stop_cybikov2()
 void cybiko_state::machine_stop_cybikoxt()
 {
 	_logerror( 0, ("machine_stop_cybikoxt\n"));
-	// multi-purpose flash
-	nvram_system_save( machine(), "flash2", cybiko_sst39vfx_save);
 	// ramdisk
 	nvram_system_save( machine(), "ramdisk", cybiko_ramdisk_save);
 	// serial port
@@ -317,6 +292,16 @@ int cybiko_state::cybiko_rs232_rx_queue()
 /////////////////////////
 // READ/WRITE HANDLERS //
 /////////////////////////
+
+READ8_MEMBER( cybiko_state::cybikov2_flash_r )
+{
+	return m_flash2->read(offset);
+}
+
+READ16_MEMBER( cybiko_state::cybikoxt_flash_r )
+{
+	return m_flashxt->read(offset);
+}
 
 READ16_MEMBER( cybiko_state::cybiko_lcd_r )
 {

@@ -537,7 +537,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/sa1403d.o   \
 	$(MESS_MACHINE)/smartmed.o  \
 	$(MESS_MACHINE)/smc92x4.o   \
-	$(MESS_MACHINE)/sst39vfx.o  \
 	$(MESS_MACHINE)/terminal.o  \
 	$(MESS_MACHINE)/teleprinter.o   \
 	$(MESS_MACHINE)/upd7002.o   \

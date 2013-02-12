@@ -89,12 +89,14 @@ const device_type MACRONIX_29L001MC = &device_creator<macronix_29l001mc_device>;
 const device_type PANASONIC_MN63F805MNP = &device_creator<panasonic_mn63f805mnp_device>;
 const device_type SANYO_LE26FV10N1TS = &device_creator<sanyo_le26fv10n1ts_device>;
 const device_type SST_28SF040 = &device_creator<sst_28sf040_device>;
+const device_type SST_39VF020 = &device_creator<sst_39vf020_device>;
 
 const device_type SHARP_LH28F400 = &device_creator<sharp_lh28f400_device>;
 const device_type INTEL_E28F008SA = &device_creator<intel_e28f008sa_device>;
 const device_type INTEL_TE28F160 = &device_creator<intel_te28f160_device>;
 const device_type SHARP_UNK128MBIT = &device_creator<sharp_unk128mbit_device>;
 const device_type INTEL_28F320J3D = &device_creator<intel_28f320j3d_device>;
+const device_type SST_39VF400A = &device_creator<sst_39vf400a_device>;
 
 static ADDRESS_MAP_START( memory_map8_512Kb, AS_PROGRAM, 8, intelfsh_device )
 	AM_RANGE(0x00000, 0x00ffff) AM_RAM
@@ -102,6 +104,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( memory_map8_1Mb, AS_PROGRAM, 8, intelfsh_device )
 	AM_RANGE(0x00000, 0x01ffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( memory_map8_2Mb, AS_PROGRAM, 8, intelfsh_device )
+	AM_RANGE(0x00000, 0x03ffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( memory_map8_4Mb, AS_PROGRAM, 8, intelfsh_device )
@@ -208,6 +214,22 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_device_id = 0x16;
 		m_sector_is_4k = true;
 		map = ADDRESS_MAP_NAME( memory_map16_32Mb );
+		break;
+	case FLASH_SST_39VF020:
+		m_bits = 8;
+		m_size = 0x40000;
+		m_maker_id = MFG_SST;
+		m_device_id = 0xd6;
+		m_sector_is_4k = true;
+		map = ADDRESS_MAP_NAME( memory_map8_2Mb );
+		break;
+	case FLASH_SST_39VF400A:
+		m_bits = 16;
+		m_size = 0x80000;
+		m_maker_id = MFG_SST;
+		m_device_id = 0xd6;
+		m_sector_is_4k = true;
+		map = ADDRESS_MAP_NAME( memory_map16_4Mb );
 		break;
 	case FLASH_SHARP_LH28F400:
 	case FLASH_INTEL_E28F400:
@@ -338,6 +360,9 @@ sanyo_le26fv10n1ts_device::sanyo_le26fv10n1ts_device(const machine_config &mconf
 sst_28sf040_device::sst_28sf040_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh8_device(mconfig, SST_28SF040, "SST 28SF040 Flash", tag, owner, clock, FLASH_SST_28SF040) { }
 
+sst_39vf020_device::sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh8_device(mconfig, SST_39VF020, "SST 39VF020 Flash", tag, owner, clock, FLASH_SST_39VF020) { }
+
 sharp_lh28f400_device::sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, SHARP_LH28F400, "Sharp LH28F400 Flash", tag, owner, clock, FLASH_SHARP_LH28F400) { }
 
@@ -352,6 +377,9 @@ sharp_unk128mbit_device::sharp_unk128mbit_device(const machine_config &mconfig, 
 
 intel_28f320j3d_device::intel_28f320j3d_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: intelfsh16_device(mconfig, INTEL_28F320J3D, "Intel 28F320J3D Flash", tag, owner, clock, FLASH_INTEL_28F320J3D) { }
+
+sst_39vf400a_device::sst_39vf400a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: intelfsh16_device(mconfig, SST_39VF400A, "SST 39VF400A Flash", tag, owner, clock, FLASH_SST_39VF400A) { }
 
 //-------------------------------------------------
 //  device_start - device-specific startup

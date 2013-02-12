@@ -25,7 +25,7 @@
 #include "video/hd66421.h"
 #include "machine/pcf8593.h"
 #include "machine/at45dbxx.h"
-#include "machine/sst39vfx.h"
+#include "machine/intelfsh.h"
 #include "machine/ram.h"
 
 struct CYBIKO_RS232_PINS
@@ -49,7 +49,9 @@ public:
 	m_crtc(*this, "hd66421"),
 	m_speaker(*this, SPEAKER_TAG),
 	m_rtc(*this, "rtc"),
-	m_flash1(*this, "flash1")
+	m_flash1(*this, "flash1"),
+	m_flash2(*this, "flash2"),
+	m_flashxt(*this, "flashxt")
 	{ }
 
 	CYBIKO_RS232 m_rs232;
@@ -65,6 +67,8 @@ public:
 	DECLARE_WRITE8_MEMBER(cybikov1_io_reg_w);
 	DECLARE_WRITE8_MEMBER(cybikov2_io_reg_w);
 	DECLARE_WRITE8_MEMBER(cybikoxt_io_reg_w);
+	DECLARE_READ8_MEMBER(cybikov2_flash_r);
+	DECLARE_READ16_MEMBER(cybikoxt_flash_r);
 	int cybiko_key_r( offs_t offset, int mem_mask);
 	void cybiko_rs232_write_byte(int data);
 	void cybiko_rs232_pin_sck(int data);
@@ -76,6 +80,8 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pcf8593_device> m_rtc;
 	optional_device<at45db041_device> m_flash1;
+	optional_device<intelfsh8_device> m_flash2;
+	optional_device<intelfsh16_device> m_flashxt;
 	DECLARE_DRIVER_INIT(cybikoxt);
 	DECLARE_DRIVER_INIT(cybikov1);
 	DECLARE_DRIVER_INIT(cybikov2);
