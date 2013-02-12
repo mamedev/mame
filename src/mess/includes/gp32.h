@@ -1,6 +1,11 @@
 #ifndef _GP32_H_
 #define _GP32_H_
 
+#include "machine/smartmed.h"
+#include "sound/dac.h"
+#include "machine/nvram.h"
+
+
 #define INT_ADC       31
 #define INT_RTC       30
 #define INT_UTXD1     29
@@ -89,6 +94,12 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_s3c240x_ram(*this, "s3c240x_ram")
 		, m_maincpu(*this, "maincpu")
+		, m_smartmedia(*this, "smartmedia")
+		, m_dac1(*this, "dac1")
+		, m_dac2(*this, "dac2")
+		, m_nvram(*this, "nvram")
+		, m_io_in0(*this, "IN0")
+		, m_io_in1(*this, "IN1")
 	{ }
 
 	virtual void video_start();
@@ -174,6 +185,12 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
+	required_device<smartmedia_image_device> m_smartmedia;
+	required_device<dac_device> m_dac1;
+	required_device<dac_device> m_dac2;
+	required_device<nvram_device> m_nvram;
+	required_ioport m_io_in0;
+	required_ioport m_io_in1;
 
 	UINT32 s3c240x_get_fclk(int reg);
 	UINT32 s3c240x_get_hclk(int reg);
@@ -199,6 +216,21 @@ protected:
 	void s3c240x_iis_start();
 	void s3c240x_iis_stop();
 	void s3c240x_iis_recalc();
+	void smc_reset();
+	void smc_init();
+	UINT8 smc_read();
+	void smc_write(UINT8 data);
+	void smc_update();
+	void i2s_reset();
+	void i2s_init();
+	void i2s_write(int line, int data);
+	UINT8 eeprom_read(UINT16 address);
+	void eeprom_write(UINT16 address, UINT8 data);
+	void iic_start();
+	void iic_stop();
+	void iic_resume();
+	void s3c240x_machine_start();
+	void s3c240x_machine_reset();
 };
 
 

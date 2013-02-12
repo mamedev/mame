@@ -17,11 +17,8 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
-#include "machine/smartmed.h"
 #include "includes/gp32.h"
-#include "sound/dac.h"
 #include "rendlay.h"
-#include "machine/nvram.h"
 
 #define VERBOSE_LEVEL ( 0 )
 
@@ -892,76 +889,71 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_dma_timer_exp)
 
 // SMARTMEDIA
 
-static void smc_reset( running_machine &machine)
+void gp32_state::smc_reset()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	verboselog( machine, 5, "smc_reset\n");
-	state->m_smc.add_latch = 0;
-	state->m_smc.chip = 0;
-	state->m_smc.cmd_latch = 0;
-	state->m_smc.do_read = 0;
-	state->m_smc.do_write = 0;
-	state->m_smc.read = 0;
-	state->m_smc.wp = 0;
-	state->m_smc.busy = 0;
+	verboselog( machine(), 5, "smc_reset\n");
+	m_smc.add_latch = 0;
+	m_smc.chip = 0;
+	m_smc.cmd_latch = 0;
+	m_smc.do_read = 0;
+	m_smc.do_write = 0;
+	m_smc.read = 0;
+	m_smc.wp = 0;
+	m_smc.busy = 0;
 }
 
-static void smc_init( running_machine &machine)
+void gp32_state::smc_init()
 {
-	verboselog( machine, 5, "smc_init\n");
-	smc_reset( machine);
+	verboselog( machine(), 5, "smc_init\n");
+	smc_reset();
 }
 
-static UINT8 smc_read( running_machine &machine)
+UINT8 gp32_state::smc_read()
 {
-	smartmedia_image_device *smartmedia = machine.device<smartmedia_image_device>( "smartmedia");
 	UINT8 data;
-	data = smartmedia->data_r();
-	verboselog( machine, 5, "smc_read %08X\n", data);
+	data = m_smartmedia->data_r();
+	verboselog( machine(), 5, "smc_read %08X\n", data);
 	return data;
 }
 
-static void smc_write( running_machine &machine, UINT8 data)
+void gp32_state::smc_write(UINT8 data)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	verboselog( machine, 5, "smc_write %08X\n", data);
-	if ((state->m_smc.chip) && (!state->m_smc.read))
+	verboselog( machine(), 5, "smc_write %08X\n", data);
+	if ((m_smc.chip) && (!m_smc.read))
 	{
-		smartmedia_image_device *smartmedia = machine.device<smartmedia_image_device>( "smartmedia");
-		if (state->m_smc.cmd_latch)
+		if (m_smc.cmd_latch)
 		{
-			verboselog( machine, 5, "smartmedia_command_w %08X\n", data);
-			smartmedia->command_w(data);
+			verboselog( machine(), 5, "smartmedia_command_w %08X\n", data);
+			m_smartmedia->command_w(data);
 		}
-		else if (state->m_smc.add_latch)
+		else if (m_smc.add_latch)
 		{
-			verboselog( machine, 5, "smartmedia_address_w %08X\n", data);
-			smartmedia->address_w(data);
+			verboselog( machine(), 5, "smartmedia_address_w %08X\n", data);
+			m_smartmedia->address_w(data);
 		}
 		else
 		{
-			verboselog( machine, 5, "smartmedia_data_w %08X\n", data);
-			smartmedia->data_w(data);
+			verboselog( machine(), 5, "smartmedia_data_w %08X\n", data);
+			m_smartmedia->data_w(data);
 		}
 	}
 }
 
-static void smc_update( running_machine &machine)
+void gp32_state::smc_update()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	if (!state->m_smc.chip)
+	if (!m_smc.chip)
 	{
-		smc_reset( machine);
+		smc_reset();
 	}
 	else
 	{
-		if ((state->m_smc.do_write) && (!state->m_smc.read))
+		if ((m_smc.do_write) && (!m_smc.read))
 		{
-			smc_write( machine, state->m_smc.datatx);
+			smc_write(m_smc.datatx);
 		}
-		else if ((!state->m_smc.do_write) && (state->m_smc.do_read) && (state->m_smc.read) && (!state->m_smc.cmd_latch) && (!state->m_smc.add_latch))
+		else if ((!m_smc.do_write) && (m_smc.do_read) && (m_smc.read) && (!m_smc.cmd_latch) && (!m_smc.add_latch))
 		{
-			state->m_smc.datarx = smc_read( machine);
+			m_smc.datarx = smc_read();
 		}
 	}
 }
@@ -972,50 +964,48 @@ static void smc_update( running_machine &machine)
 #define I2S_L3M ( 2 )
 #define I2S_L3D ( 3 )
 
-static void i2s_reset( running_machine &machine)
+void gp32_state::i2s_reset()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	verboselog( machine, 5, "i2s_reset\n");
-	state->m_i2s.l3d = 0;
-	state->m_i2s.l3m = 0;
-	state->m_i2s.l3c = 0;
+	verboselog( machine(), 5, "i2s_reset\n");
+	m_i2s.l3d = 0;
+	m_i2s.l3m = 0;
+	m_i2s.l3c = 0;
 }
 
-static void i2s_init( running_machine &machine)
+void gp32_state::i2s_init()
 {
-	verboselog( machine, 5, "i2s_init\n");
-	i2s_reset( machine);
+	verboselog( machine(), 5, "i2s_init\n");
+	i2s_reset();
 }
 
-static void i2s_write( running_machine &machine, int line, int data)
+void gp32_state::i2s_write(int line, int data)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
 	switch (line)
 	{
 		case I2S_L3C :
 		{
-			if (data != state->m_i2s.l3c)
+			if (data != m_i2s.l3c)
 			{
-				verboselog( machine, 5, "I2S L3C %d\n", data);
-				state->m_i2s.l3c = data;
+				verboselog( machine(), 5, "I2S L3C %d\n", data);
+				m_i2s.l3c = data;
 			}
 		}
 		break;
 		case I2S_L3M :
 		{
-			if (data != state->m_i2s.l3m)
+			if (data != m_i2s.l3m)
 			{
-				verboselog( machine, 5, "I2S L3M %d\n", data);
-				state->m_i2s.l3m = data;
+				verboselog( machine(), 5, "I2S L3M %d\n", data);
+				m_i2s.l3m = data;
 			}
 		}
 		break;
 		case I2S_L3D :
 		{
-			if (data != state->m_i2s.l3d)
+			if (data != m_i2s.l3d)
 			{
-				verboselog( machine, 5, "I2S L3D %d\n", data);
-				state->m_i2s.l3d = data;
+				verboselog( machine(), 5, "I2S L3D %d\n", data);
+				m_i2s.l3d = data;
 			}
 		}
 		break;
@@ -1044,33 +1034,31 @@ READ32_MEMBER(gp32_state::s3c240x_gpio_r)
 			// smartmedia
 			data = (data & ~0x000000FF) | (m_smc.datarx & 0xFF);
 			// buttons
-			data = (data & ~0x0000FF00) | (ioport( "IN0")->read() & 0x0000FF00);
+			data = (data & ~0x0000FF00) | (m_io_in0->read() & 0x0000FF00);
 		}
 		break;
 		// PDDAT
 		case 0x24 / 4 :
 		{
-			smartmedia_image_device *smartmedia = machine().device<smartmedia_image_device>( "smartmedia");
 			// smartmedia
 			data = (data & ~0x000003C0);
 			if (!m_smc.busy) data = data | 0x00000200;
 			if (!m_smc.do_read) data = data | 0x00000100;
 			if (!m_smc.chip) data = data | 0x00000080;
-			if (!smartmedia->is_protected()) data = data | 0x00000040;
+			if (!m_smartmedia->is_protected()) data = data | 0x00000040;
 		}
 		break;
 		// PEDAT
 		case 0x30 / 4 :
 		{
-			smartmedia_image_device *smartmedia = machine().device<smartmedia_image_device>( "smartmedia");
 			// smartmedia
 			data = (data & ~0x0000003C);
 			if (m_smc.cmd_latch) data = data | 0x00000020;
 			if (m_smc.add_latch) data = data | 0x00000010;
 			if (!m_smc.do_write) data = data | 0x00000008;
-			if (!smartmedia->is_present()) data = data | 0x00000004;
+			if (!m_smartmedia->is_present()) data = data | 0x00000004;
 			// buttons
-			data = (data & ~0x000000C0) | (ioport( "IN1")->read() & 0x000000C0);
+			data = (data & ~0x000000C0) | (m_io_in1->read() & 0x000000C0);
 		}
 		break;
 	}
@@ -1089,7 +1077,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_gpio_w)
 		{
 			// smartmedia
 			m_smc.read = ((data & 0x00000001) == 0);
-			smc_update( machine());
+			smc_update();
 		}
 		break;
 		// PBDAT
@@ -1106,7 +1094,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_gpio_w)
 			m_smc.do_read = ((data & 0x00000100) == 0);
 			m_smc.chip = ((data & 0x00000080) == 0);
 			m_smc.wp = ((data & 0x00000040) == 0);
-			smc_update( machine());
+			smc_update();
 		}
 		break;
 		// PEDAT
@@ -1116,11 +1104,11 @@ WRITE32_MEMBER(gp32_state::s3c240x_gpio_w)
 			m_smc.cmd_latch = ((data & 0x00000020) != 0);
 			m_smc.add_latch = ((data & 0x00000010) != 0);
 			m_smc.do_write = ((data & 0x00000008) == 0);
-			smc_update( machine());
+			smc_update();
 			// sound
-			i2s_write( machine(), I2S_L3D, (data & 0x00000800) ? 1 : 0);
-			i2s_write( machine(), I2S_L3M, (data & 0x00000400) ? 1 : 0);
-			i2s_write( machine(), I2S_L3C, (data & 0x00000200) ? 1 : 0);
+			i2s_write(I2S_L3D, (data & 0x00000800) ? 1 : 0);
+			i2s_write(I2S_L3M, (data & 0x00000400) ? 1 : 0);
+			i2s_write(I2S_L3C, (data & 0x00000200) ? 1 : 0);
 		}
 		break;
 #if 0
@@ -1251,20 +1239,18 @@ WRITE32_MEMBER(gp32_state::s3c240x_watchdog_w)
 
 // EEPROM
 
-static UINT8 eeprom_read( running_machine &machine, UINT16 address)
+UINT8 gp32_state::eeprom_read(UINT16 address)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
 	UINT8 data;
-	data = state->m_eeprom_data[address];
-	verboselog( machine, 5, "EEPROM %04X -> %02X\n", address, data);
+	data = m_eeprom_data[address];
+	verboselog( machine(), 5, "EEPROM %04X -> %02X\n", address, data);
 	return data;
 }
 
-static void eeprom_write( running_machine &machine, UINT16 address, UINT8 data)
+void gp32_state::eeprom_write(UINT16 address, UINT8 data)
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	verboselog( machine, 5, "EEPROM %04X <- %02X\n", address, data);
-	state->m_eeprom_data[address] = data;
+	verboselog( machine(), 5, "EEPROM %04X <- %02X\n", address, data);
+	m_eeprom_data[address] = data;
 }
 
 // IIC
@@ -1325,26 +1311,23 @@ static void i2cmem_stop( running_machine &machine)
 }
 #endif
 
-static void iic_start( running_machine &machine)
+void gp32_state::iic_start()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	verboselog( machine, 1, "IIC start\n");
-	state->m_s3c240x_iic.data_index = 0;
-	state->m_s3c240x_iic_timer->adjust( attotime::from_msec( 1));
+	verboselog( machine(), 1, "IIC start\n");
+	m_s3c240x_iic.data_index = 0;
+	m_s3c240x_iic_timer->adjust( attotime::from_msec( 1));
 }
 
-static void iic_stop( running_machine &machine)
+void gp32_state::iic_stop()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	verboselog( machine, 1, "IIC stop\n");
-	state->m_s3c240x_iic_timer->adjust( attotime::never);
+	verboselog( machine(), 1, "IIC stop\n");
+	m_s3c240x_iic_timer->adjust( attotime::never);
 }
 
-static void iic_resume( running_machine &machine)
+void gp32_state::iic_resume()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	verboselog( machine, 1, "IIC resume\n");
-	state->m_s3c240x_iic_timer->adjust( attotime::from_msec( 1));
+	verboselog( machine(), 1, "IIC resume\n");
+	m_s3c240x_iic_timer->adjust( attotime::from_msec( 1));
 }
 
 READ32_MEMBER(gp32_state::s3c240x_iic_r)
@@ -1389,7 +1372,7 @@ WRITE32_MEMBER(gp32_state::s3c240x_iic_w)
 				start_stop_condition = BIT( m_s3c240x_iic_regs[1], 5);
 				if (start_stop_condition != 0)
 				{
-					iic_resume( machine());
+					iic_resume();
 				}
 			}
 		}
@@ -1401,11 +1384,11 @@ WRITE32_MEMBER(gp32_state::s3c240x_iic_w)
 			start_stop_condition = BIT( data, 5);
 			if (start_stop_condition != 0)
 			{
-				iic_start( machine());
+				iic_start();
 			}
 			else
 			{
-				iic_stop( machine());
+				iic_stop();
 			}
 		}
 		break;
@@ -1429,7 +1412,7 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_iic_timer_exp)
 			}
 			else
 			{
-				UINT8 data_shift = eeprom_read( machine(), m_s3c240x_iic.address);
+				UINT8 data_shift = eeprom_read(m_s3c240x_iic.address);
 				verboselog( machine(), 5, "IIC read %02X\n", data_shift);
 				m_s3c240x_iic_regs[3] = (m_s3c240x_iic_regs[3] & ~0xFF) | data_shift;
 			}
@@ -1448,7 +1431,7 @@ TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_iic_timer_exp)
 			}
 			if ((m_s3c240x_iic.data_index == 4) && (m_s3c240x_iic.data[0] == 0xA0))
 			{
-				eeprom_write( machine(), m_s3c240x_iic.address, data_shift);
+				eeprom_write(m_s3c240x_iic.address, data_shift);
 			}
 		}
 		break;
@@ -1539,12 +1522,9 @@ WRITE32_MEMBER(gp32_state::s3c240x_iis_w)
 			}
 			if (m_s3c240x_iis.fifo_index == 2)
 			{
-				dac_device *dac[2];
-				dac[0] = machine().device<dac_device>("dac1");
-				dac[1] = machine().device<dac_device>("dac2");
 				m_s3c240x_iis.fifo_index = 0;
-				dac[0]->write_signed16(m_s3c240x_iis.fifo[0] + 0x8000);
-				dac[1]->write_signed16(m_s3c240x_iis.fifo[1] + 0x8000);
+				m_dac1->write_signed16(m_s3c240x_iis.fifo[0] + 0x8000);
+				m_dac2->write_signed16(m_s3c240x_iis.fifo[1] + 0x8000);
 			}
 		}
 		break;
@@ -1623,34 +1603,32 @@ WRITE32_MEMBER(gp32_state::s3c240x_mmc_w)
 
 // ...
 
-static void s3c240x_machine_start( running_machine &machine)
+void gp32_state::s3c240x_machine_start()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	state->m_s3c240x_pwm_timer[0] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),state), (void *)(FPTR)0);
-	state->m_s3c240x_pwm_timer[1] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),state), (void *)(FPTR)1);
-	state->m_s3c240x_pwm_timer[2] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),state), (void *)(FPTR)2);
-	state->m_s3c240x_pwm_timer[3] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),state), (void *)(FPTR)3);
-	state->m_s3c240x_pwm_timer[4] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),state), (void *)(FPTR)4);
-	state->m_s3c240x_dma_timer[0] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),state), (void *)(FPTR)0);
-	state->m_s3c240x_dma_timer[1] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),state), (void *)(FPTR)1);
-	state->m_s3c240x_dma_timer[2] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),state), (void *)(FPTR)2);
-	state->m_s3c240x_dma_timer[3] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),state), (void *)(FPTR)3);
-	state->m_s3c240x_iic_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iic_timer_exp),state), (void *)(FPTR)0);
-	state->m_s3c240x_iis_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iis_timer_exp),state), (void *)(FPTR)0);
-	state->m_s3c240x_lcd_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_lcd_timer_exp),state), (void *)(FPTR)0);
-	state->m_eeprom_data = auto_alloc_array( machine, UINT8, 0x2000);
-	machine.device<nvram_device>("nvram")->set_base(state->m_eeprom_data, 0x2000);
-	smc_init( machine);
-	i2s_init( machine);
+	m_s3c240x_pwm_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(FPTR)0);
+	m_s3c240x_pwm_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(FPTR)1);
+	m_s3c240x_pwm_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(FPTR)2);
+	m_s3c240x_pwm_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(FPTR)3);
+	m_s3c240x_pwm_timer[4] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_pwm_timer_exp),this), (void *)(FPTR)4);
+	m_s3c240x_dma_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(FPTR)0);
+	m_s3c240x_dma_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(FPTR)1);
+	m_s3c240x_dma_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(FPTR)2);
+	m_s3c240x_dma_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_dma_timer_exp),this), (void *)(FPTR)3);
+	m_s3c240x_iic_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iic_timer_exp),this), (void *)(FPTR)0);
+	m_s3c240x_iis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_iis_timer_exp),this), (void *)(FPTR)0);
+	m_s3c240x_lcd_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gp32_state::s3c240x_lcd_timer_exp),this), (void *)(FPTR)0);
+	m_eeprom_data = auto_alloc_array( machine(), UINT8, 0x2000);
+	m_nvram->set_base(m_eeprom_data, 0x2000);
+	smc_init();
+	i2s_init();
 }
 
-static void s3c240x_machine_reset( running_machine &machine)
+void gp32_state::s3c240x_machine_reset()
 {
-	gp32_state *state = machine.driver_data<gp32_state>();
-	smc_reset( machine);
-	i2s_reset( machine);
-	state->m_s3c240x_iis.fifo_index = 0;
-	state->m_s3c240x_iic.data_index = 0;
+	smc_reset();
+	i2s_reset();
+	m_s3c240x_iis.fifo_index = 0;
+	m_s3c240x_iic.data_index = 0;
 }
 
 static ADDRESS_MAP_START( gp32_map, AS_PROGRAM, 32, gp32_state )
@@ -1694,12 +1672,12 @@ INPUT_PORTS_END
 
 void gp32_state::machine_start()
 {
-	s3c240x_machine_start(machine());
+	s3c240x_machine_start();
 }
 
 void gp32_state::machine_reset()
 {
-	s3c240x_machine_reset(machine());
+	s3c240x_machine_reset();
 }
 
 static MACHINE_CONFIG_START( gp32, gp32_state )
