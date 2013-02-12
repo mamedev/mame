@@ -14,8 +14,6 @@
     - Data 20 Z-80 Video Pak (Z80, 80 column video)
 
     Serial I/O:
-    - CMD SwiftLink (6551 @ 3.6864 MHz)
-    - CMD Turbo232
     - HART (8251)
 
     RAM expansions:
@@ -32,7 +30,6 @@
     - Lt. Kernal
 
     Audio:
-    - Currah Speech 64 (Currah, 1984)
     - Easy Speech 64 (Currah, 1984)
     - Voice Messenger (Currah, 1984)
     - Votalker (Votrax, 1986)
@@ -43,9 +40,6 @@
     - 64er MIDI
     - FB-MIDI
     - C-LAB MIDI
-    - JMS MIDI
-    - Datel MIDI
-    - Passport MIDI
     - Speech Maker (Adman)
     - Song Producer (Moog, 1983)
 
