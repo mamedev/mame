@@ -840,6 +840,36 @@ static MACHINE_CONFIG_START( g7400, g7400_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_START( odyssey3, g7400_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I8048, XTAL_5_911MHz )
+	MCFG_CPU_PROGRAM_MAP(odyssey2_mem)
+	MCFG_CPU_IO_MAP(g7400_io)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS( 3540000 * 2, i8244_device::LINE_CLOCKS, i8244_device::START_ACTIVE_SCAN, i8244_device::END_ACTIVE_SCAN, i8244_device::LINES, i8244_device::START_Y, i8244_device::START_Y + i8244_device::SCREEN_HEIGHT )
+	MCFG_SCREEN_UPDATE_DRIVER(odyssey2_state, screen_update_odyssey2)
+
+	MCFG_GFXDECODE( odyssey2 )
+	MCFG_PALETTE_LENGTH(16)
+
+	MCFG_I8243_ADD( "i8243", NOOP, WRITE8(g7400_state,i8243_port_w))
+
+	MCFG_EF9340_1_ADD( "ef9340_1", 3540000, "screen" )
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_I8244_ADD( "i8244", 3540000 * 2, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( g7400_state, scanline_postprocess ) )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
+	MCFG_DEVICE_REMOVE("cart_list")
+	MCFG_SOFTWARE_LIST_ADD("cart_list","g7400")
+	MCFG_SOFTWARE_LIST_COMPATIBLE_ADD("ody2_list","odyssey2")
+MACHINE_CONFIG_END
+
+
 ROM_START (odyssey2)
 	ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */
 	ROM_LOAD ("o2bios.rom", 0x0000, 0x0400, CRC(8016a315) SHA1(b2e1955d957a475de2411770452eff4ea19f4cee))
@@ -908,8 +938,20 @@ ROM_START (jopac)
 ROM_END
 
 
+ROM_START (odyssey3)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD ("odyssey3.bin", 0x0000, 0x0400, CRC(e2b23324) SHA1(0a38c5f2cea929d2fe0a23e5e1a60de9155815dc))
+
+	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x4000, "user1", 0)
+	ROM_CART_LOAD("cart", 0x000, 0x4000, ROM_MIRROR)
+ROM_END
+
 /*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     INIT      COMPANY     FULLNAME     FLAGS */
 COMP( 1978, odyssey2, 0,        0,      odyssey2, odyssey2, odyssey2_state, odyssey2, "Magnavox", "Odyssey 2", 0 )
 COMP( 1979, videopac, odyssey2, 0,      videopac, odyssey2, odyssey2_state, odyssey2, "Philips", "Videopac G7000/C52", 0 )
-COMP( 1983, g7400, odyssey2, 0,         g7400,    odyssey2, odyssey2_state, odyssey2, "Philips", "Videopac Plus G7400", GAME_NOT_WORKING )
-COMP( 1983, jopac, odyssey2, 0,         g7400,    odyssey2, odyssey2_state, odyssey2, "Brandt", "Jopac JO7400", GAME_NOT_WORKING )
+COMP( 1983, g7400, odyssey2, 0,         g7400,    odyssey2, odyssey2_state, odyssey2, "Philips", "Videopac Plus G7400", GAME_IMPERFECT_GRAPHICS )
+COMP( 1983, jopac, odyssey2, 0,         g7400,    odyssey2, odyssey2_state, odyssey2, "Brandt", "Jopac JO7400", GAME_IMPERFECT_GRAPHICS )
+COMP( 1983, odyssey3, odyssey2, 0,      odyssey3, odyssey2, odyssey2_state, odyssey2, "Maganvox", "Odyssey 3 Command Center (prototype)", GAME_IMPERFECT_GRAPHICS )
+
