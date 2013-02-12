@@ -2380,6 +2380,9 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 {
 	rectangle myclip;
 
+	if(stv2_current_tilemap.window_control & 6)
+		popmessage("Window Enabled for Zoomed tiles");
+
 	if (!scalex || !scaley) return;
 
 	if (gfx->has_pen_usage() && transparency == STV_TRANSPARENCY_PEN)
@@ -2573,6 +2576,9 @@ void saturn_state::stv_vdp2_drawgfxzoom_rgb555(
 	UINT8* gfxdata;
 
 	gfxdata = m_vdp2.gfx_decode + code * 0x20;
+
+	if(stv2_current_tilemap.window_control & 6)
+		popmessage("Window Enabled for RGB555 Zoom");
 
 	if (!scalex || !scaley) return;
 
@@ -2797,6 +2803,9 @@ void saturn_state::stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectan
 	gfxdata = m_vdp2.gfx_decode + code * 0x20;
 	sprite_screen_width = sprite_screen_height = 8;
 
+	if(stv2_current_tilemap.window_control & 6)
+		popmessage("Window Enabled for RGB555");
+
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	myclip = clip;
 	myclip &= dest_bmp.cliprect();
@@ -2907,6 +2916,9 @@ void saturn_state::stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectan
 	gfxdata = m_vdp2.gfx_decode + code * 0x20;
 	sprite_screen_width = sprite_screen_height = 8;
 
+	if(stv2_current_tilemap.window_control & 6)
+		popmessage("Window Enabled for RGB888");
+
 	/* KW 991012 -- Added code to force clip to bitmap boundary */
 	myclip = clip;
 	myclip &= dest_bmp.cliprect();
@@ -3014,6 +3026,9 @@ void saturn_state::stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle
 	const UINT8 *source_base = gfx->get_data(code % gfx->elements());
 	int x_index_base, y_index, sx, sy, ex, ey;
 	int xinc, yinc;
+
+	if(stv2_current_tilemap.window_control & 6)
+		popmessage("Window Enabled for Alpha");
 
 	xinc = flipx ? -1 : 1;
 	yinc = flipy ? -1 : 1;
