@@ -6244,19 +6244,13 @@ UINT8 saturn_state::get_vblank( void )
 
 UINT8 saturn_state::get_odd_bit( void )
 {
-	int cur_v;
-	cur_v = machine().primary_screen->vpos();
-
 	if(STV_VDP2_HRES & 4) //exclusive monitor mode makes this bit to be always 1
 		return 1;
 
 	if(STV_VDP2_LSMD == 0) // same for non-interlace mode
 		return 1;
 
-	if(cur_v % 2)
-		return 1;
-
-	return 0;
+	return machine().primary_screen->frame_number() & 1;
 }
 
 void saturn_state::stv_vdp2_state_save_postload( void )
