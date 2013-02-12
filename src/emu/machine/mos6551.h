@@ -39,7 +39,16 @@
 
 #define MCFG_MOS6551_ADD(_tag, _clock, _irq) \
 	MCFG_DEVICE_ADD(_tag, MOS6551, _clock) \
-	devcb = &mos6551_device::set_irq_handler(*device, DEVCB2_##_irq);
+	downcast<mos6551_device *>(device)->set_irq_callback(DEVCB2_##_rxd, DEVCB2_##_irq);
+
+#define MCFG_MOS6551_RXD_TXD_CALLBACKS(_rxd, _txd) \
+	downcast<mos6551_device *>(device)->set_rxd_txd_callbacks(DEVCB2_##_rxd, DEVCB2_##_txd);
+
+#define MCFG_MOS6551_RTS_CALLBACK(_rts) \
+	downcast<mos6551_device *>(device)->set_rts_callback(DEVCB2_##_rts);
+
+#define MCFG_MOS6551_DTR_CALLBACK(_dtr) \
+	downcast<mos6551_device *>(device)->set_dtr_callback(DEVCB2_##_dtr);
 
 
 
@@ -56,11 +65,21 @@ public:
 	// construction/destruction
 	mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	// static configuration helpers
-	template<class _Object> static devcb2_base &set_irq_handler(device_t &device, _Object object) { return downcast<mos6551_device &>(device).m_irq_handler.set_callback(object); }
+	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
+	template<class _rxd, class _txd> void set_rxd_txd_callbacks(_rxd rxd, _txd txd) { 
+		m_read_rxd.set_callback(rxd);
+		m_write_txd.set_callback(txd);
+	}
+	template<class _rts> void set_rts_callback(_rts rts) { m_write_rts.set_callback(rts); }
+	template<class _dtr> void set_dtr_callback(_dtr dtr) { m_write_dtr.set_callback(dtr); }
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_WRITE_LINE_MEMBER( rxc_w );
+	DECLARE_WRITE_LINE_MEMBER( cts_w );
+	DECLARE_WRITE_LINE_MEMBER( dsr_w );
+	DECLARE_WRITE_LINE_MEMBER( dcd_w );
 
 	void set_rxc(int clock);
 
@@ -70,7 +89,9 @@ protected:
 	virtual void device_reset();
 
 	// device_serial_interface overrides
+	virtual void tra_callback();
 	virtual void tra_complete();
+	virtual void rcv_callback();
 	virtual void rcv_complete();
 	virtual void input_callback(UINT8 state);
 
@@ -145,7 +166,11 @@ protected:
 
 	void update_serial();
 
-	devcb2_write_line m_irq_handler;
+	devcb2_write_line m_write_irq;
+	devcb2_read_line m_read_rxd;
+	devcb2_write_line m_write_txd;
+	devcb2_write_line m_write_rts;
+	devcb2_write_line m_write_dtr;
 
 	UINT8 m_ctrl;
 	UINT8 m_cmd;
@@ -153,6 +178,9 @@ protected:
 	UINT8 m_tdr;
 
 	int m_ext_rxc;
+	int m_cts;
+	int m_dsr;
+	int m_dcd;
 
 	static const int brg_divider[16];
 };

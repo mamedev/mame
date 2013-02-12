@@ -55,11 +55,18 @@ const device_type MOS6551 = &device_creator<mos6551_device>;
 mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MOS6551, "MOS6551", tag, owner, clock),
 		device_serial_interface(mconfig, *this),
-		m_irq_handler(*this),
+		m_write_irq(*this),
+		m_read_rxd(*this),
+		m_write_txd(*this),
+		m_write_rts(*this),
+		m_write_dtr(*this),
 		m_ctrl(0),
 		m_cmd(CMD_RIE),
 		m_st(ST_TDRE),
-		m_ext_rxc(0)
+		m_ext_rxc(0),
+		m_cts(1),
+		m_dsr(1),
+		m_dcd(1)
 {
 }
 
@@ -70,10 +77,22 @@ mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, d
 
 void mos6551_device::device_start()
 {
-	m_irq_handler.resolve_safe();
+	// resolve callbacks
+	m_write_irq.resolve_safe();
+	m_read_rxd.resolve_safe(1);
+	m_write_txd.resolve_safe();
+	m_write_rts.resolve_safe();
+	m_write_dtr.resolve_safe();
 
-	transmit_register_reset();
-	receive_register_reset();
+	// state saving
+	save_item(NAME(m_ctrl));
+	save_item(NAME(m_cmd));
+	save_item(NAME(m_st));
+	save_item(NAME(m_tdr));
+	save_item(NAME(m_ext_rxc));
+	save_item(NAME(m_cts));
+	save_item(NAME(m_dsr));
+	save_item(NAME(m_dcd));
 }
 
 
@@ -86,7 +105,20 @@ void mos6551_device::device_reset()
 	m_ctrl = 0;
 	m_cmd = CMD_RIE;
 
+	transmit_register_reset();
+	receive_register_reset();
+
 	update_serial();
+}
+
+
+//-------------------------------------------------
+//  tra_callback -
+//-------------------------------------------------
+
+void mos6551_device::tra_callback()
+{
+	m_write_txd(transmit_register_get_data_bit());
 }
 
 
@@ -104,9 +136,22 @@ void mos6551_device::tra_complete()
 		if ((m_cmd & CMD_TC_MASK) == CMD_TC_TIE_RTS_LO)
 		{
 			m_st |= ST_IRQ;
-			m_irq_handler(ASSERT_LINE);
+			m_write_irq(ASSERT_LINE);
 		}
 	}
+}
+
+
+//-------------------------------------------------
+//  rcv_callback -
+//-------------------------------------------------
+
+void mos6551_device::rcv_callback()
+{
+	if (m_read_rxd.isnull())
+		receive_register_update_bit(get_in_data_bit());
+	else
+		receive_register_update_bit(m_read_rxd());
 }
 
 
@@ -128,7 +173,7 @@ void mos6551_device::rcv_complete()
 	if (!(m_cmd & CMD_RIE))
 	{
 		m_st |= ST_IRQ;
-		m_irq_handler(ASSERT_LINE);
+		m_write_irq(ASSERT_LINE);
 	}
 }
 
@@ -191,10 +236,14 @@ void mos6551_device::update_serial()
 	else
 		m_connection_state &= ~SERIAL_STATE_DTR;
 
+	m_write_dtr((m_connection_state & SERIAL_STATE_DTR) ? 0 : 1);
+
 	if ((m_cmd & CMD_TC_MASK) == CMD_TC_RTS_HI)
 		m_connection_state &= ~SERIAL_STATE_RTS;
 	else
 		m_connection_state |= SERIAL_STATE_RTS;
+	
+	m_write_rts((m_connection_state & SERIAL_STATE_RTS) ? 0 : 1);
 
 	serial_connection_out();
 }
@@ -221,9 +270,9 @@ READ8_MEMBER( mos6551_device::read )
 		break;
 
 	case 1:
-		data = m_st;
+		data = (m_dsr << 6) | (m_dcd << 5) | m_st;
 		m_st &= ~ST_IRQ;
-		m_irq_handler(CLEAR_LINE);
+		m_write_irq(CLEAR_LINE);
 		break;
 
 	case 2:
@@ -259,7 +308,7 @@ WRITE8_MEMBER( mos6551_device::write )
 			if ((m_cmd & CMD_TC_MASK) == CMD_TC_TIE_RTS_LO)
 			{
 				m_st |= ST_IRQ;
-				m_irq_handler(ASSERT_LINE);
+				m_write_irq(ASSERT_LINE);
 			}
 		}
 		break;
@@ -293,4 +342,56 @@ void mos6551_device::set_rxc(int clock)
 	m_ext_rxc = clock;
 
 	update_serial();
+}
+
+
+//-------------------------------------------------
+//  rxc_w - receive clock write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mos6551_device::rxc_w )
+{
+	// TODO
+}
+
+
+//-------------------------------------------------
+//  cts_w - clear to send write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mos6551_device::cts_w )
+{
+	m_cts = state;	
+}
+
+
+//-------------------------------------------------
+//  dsr_w - data set ready write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mos6551_device::dsr_w )
+{
+	if (m_dsr != state)
+	{
+		m_st |= ST_IRQ;
+		m_write_irq(ASSERT_LINE);
+	}
+
+	m_dsr = state;
+}
+
+
+//-------------------------------------------------
+//  dcd_w - data carrier detect write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( mos6551_device::dcd_w )
+{
+	if (m_dcd != state)
+	{
+		m_st |= ST_IRQ;
+		m_write_irq(ASSERT_LINE);
+	}
+
+	m_dcd = state;
 }
