@@ -76,8 +76,6 @@ public:
 	DECLARE_WRITE8_MEMBER(fromance_crtc_data_w);
 	DECLARE_WRITE8_MEMBER(fromance_crtc_register_w);
 	DECLARE_WRITE8_MEMBER(fromance_adpcm_reset_w);
-	DECLARE_DRIVER_INIT(pipedrm);
-	DECLARE_DRIVER_INIT(hatris);
 	TILE_GET_INFO_MEMBER(get_fromance_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fromance_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_nekkyoku_bg_tile_info);
@@ -86,8 +84,6 @@ public:
 	DECLARE_MACHINE_RESET(fromance);
 	DECLARE_VIDEO_START(nekkyoku);
 	DECLARE_VIDEO_START(fromance);
-	DECLARE_MACHINE_START(pipedrm);
-	DECLARE_MACHINE_RESET(pipedrm);
 	DECLARE_VIDEO_START(pipedrm);
 	DECLARE_VIDEO_START(hatris);
 	UINT32 screen_update_fromance(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
