@@ -112,14 +112,14 @@ void saturn_state::cd_exec_command( void )
 	switch ((cr1 >> 8) & 0xff)
 	{
 		case 0x00:
-			//CDROM_LOG(("%s:CD: Get Status\n", machine.describe_context()))
+			//CDROM_LOG(("%s:CD: Get Status\n", machine().describe_context()))
 			hirqreg |= CMOK;
 			cr_standard_return(cd_stat);
 			//CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 			break;
 
 		case 0x01:
-			CDROM_LOG(("%s:CD: Get Hardware Info\n", machine.describe_context()))
+			CDROM_LOG(("%s:CD: Get Hardware Info\n", machine().describe_context()))
 			hirqreg |= CMOK;
 			cr1 = cd_stat;
 			cr2 = 0x0201;
@@ -128,7 +128,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0x02:    // Get TOC
-			CDROM_LOG(("%s:CD: Get TOC\n", machine.describe_context()))
+			CDROM_LOG(("%s:CD: Get TOC\n", machine().describe_context()))
 			cd_readTOC();
 			cd_stat = CD_STAT_TRANS|CD_STAT_PAUSE;
 			cr1 = cd_stat;
@@ -143,7 +143,7 @@ void saturn_state::cd_exec_command( void )
 						// bios is interested in returns in cr3 and cr4
 						// cr3 should be data track #
 						// cr4 must be > 1 and < 100 or bios gets angry.
-			CDROM_LOG(("%s:CD: Get Session Info\n", machine.describe_context()))
+			CDROM_LOG(("%s:CD: Get Session Info\n", machine().describe_context()))
 			cd_readTOC();
 			switch (cr1 & 0xff)
 			{
@@ -183,7 +183,7 @@ void saturn_state::cd_exec_command( void )
 				// CR1 & 8 = retry reading mode 2 sectors
 				// CR1 & 10 = force single-speed
 				// CR1 & 80 = no change flag (done by Assault Suit Leynos 2)
-			CDROM_LOG(("%s:CD: Initialize CD system\n", machine.describe_context()))
+			CDROM_LOG(("%s:CD: Initialize CD system\n", machine().describe_context()))
 			//if((cr1 & 0x81) == 0x00) //guess TODO: nope, Choice Cuts doesn't like it, it crashes if you try to skip the FMV otherwise.
 			{
 				if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
@@ -227,7 +227,7 @@ void saturn_state::cd_exec_command( void )
 		case 0x06:    // end data transfer (TODO: needs to be worked on!)
 				// returns # of bytes transfered (24 bits) in
 				// low byte of cr1 (MSB) and cr2 (middle byte, LSB)
-			CDROM_LOG(("%s:CD: End data transfer (%d bytes xfer'd)\n", machine.describe_context(), xferdnum))
+			CDROM_LOG(("%s:CD: End data transfer (%d bytes xfer'd)\n", machine().describe_context(), xferdnum))
 
 			// clear the "transfer" flag
 			cd_stat &= ~CD_STAT_TRANS;
@@ -301,7 +301,7 @@ void saturn_state::cd_exec_command( void )
 			UINT32 start_pos,end_pos;
 			UINT8 play_mode;
 
-			CDROM_LOG(("%s:CD: Play Disc\n",   machine.describe_context()))
+			CDROM_LOG(("%s:CD: Play Disc\n",   machine().describe_context()))
 			cd_stat = CD_STAT_PLAY;
 
 			play_mode = (cr3 >> 8) & 0x7f;
@@ -414,7 +414,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0x11: // disc seek
-			CDROM_LOG(("%s:CD: Disc seek\n",   machine.describe_context()))
+			CDROM_LOG(("%s:CD: Disc seek\n",   machine().describe_context()))
 			//printf("%08x %08x %08x %08x\n",cr1,cr2,cr3,cr4);
 			if (cr1 & 0x80)
 			{
@@ -542,7 +542,7 @@ void saturn_state::cd_exec_command( void )
 				// get operation
 				parm = cr3>>8;
 
-				CDROM_LOG(("%s:CD: Set CD Device Connection filter # %x\n",   machine.describe_context(), parm))
+				CDROM_LOG(("%s:CD: Set CD Device Connection filter # %x\n",   machine().describe_context(), parm))
 
 				cddevicenum = parm;
 
@@ -583,7 +583,7 @@ void saturn_state::cd_exec_command( void )
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 
-				CDROM_LOG(("%s:CD: Set Filter Range\n",   machine.describe_context()))
+				CDROM_LOG(("%s:CD: Set Filter Range\n",   machine().describe_context()))
 
 				filters[fnum].fad = ((cr1 & 0xff)<<16) | cr2;
 				filters[fnum].range = ((cr3 & 0xff)<<16) | cr4;
@@ -604,7 +604,7 @@ void saturn_state::cd_exec_command( void )
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 
-				CDROM_LOG(("%s:CD: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine.describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4))
+				CDROM_LOG(("%s:CD: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4))
 
 				filters[fnum].chan = cr1 & 0xff;
 				filters[fnum].smmask = (cr2>>8)&0xff;
@@ -622,7 +622,7 @@ void saturn_state::cd_exec_command( void )
 			{
 				UINT8 fnum = (cr3>>8)&0xff;
 
-				CDROM_LOG(("%s:CD: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine.describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4))
+				CDROM_LOG(("%s:CD: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4))
 
 				cr1 = cd_stat | (filters[fnum].chan & 0xff);
 				cr2 = (filters[fnum].smmask << 8) | (filters[fnum].cimask & 0xff);
@@ -648,7 +648,7 @@ void saturn_state::cd_exec_command( void )
 					filters[fnum].mode = mode;
 				}
 
-				CDROM_LOG(("%s:CD: Set Filter Mode filt %x mode %x\n", machine.describe_context(), fnum, mode))
+				CDROM_LOG(("%s:CD: Set Filter Mode filt %x mode %x\n", machine().describe_context(), fnum, mode))
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
 			}
@@ -671,7 +671,7 @@ void saturn_state::cd_exec_command( void )
 				/* TODO: maybe condition false is cr3 low? */
 				UINT8 fnum = (cr3>>8)&0xff;
 
-				CDROM_LOG(("%s:CD: Set Filter Connection %x => mode %x parm %04x\n", machine.describe_context(), fnum, cr1 & 0xf, cr2))
+				CDROM_LOG(("%s:CD: Set Filter Connection %x => mode %x parm %04x\n", machine().describe_context(), fnum, cr1 & 0xf, cr2))
 
 				if (cr1 & 1)	// set true condition
 					filters[fnum].condtrue = (cr2>>8)&0xff;
@@ -688,7 +688,7 @@ void saturn_state::cd_exec_command( void )
 			{
 			int i,j;
 
-			CDROM_LOG(("%s:CD: Reset Selector\n",   machine.describe_context()))
+			CDROM_LOG(("%s:CD: Reset Selector\n",   machine().describe_context()))
 
 			if((cr1 & 0xff) == 0x00)
 			{
@@ -784,7 +784,7 @@ void saturn_state::cd_exec_command( void )
 			{
 				UINT32 bufnum = cr3>>8;
 
-				CDROM_LOG(("%s:CD: Get Sector Number (bufno %d) = %d blocks\n",   machine.describe_context(), bufnum, cr4))
+				CDROM_LOG(("%s:CD: Get Sector Number (bufno %d) = %d blocks\n",   machine().describe_context(), bufnum, cr4))
 				cr1 = cd_stat;
 				cr2 = 0;
 				cr3 = 0;
@@ -809,7 +809,7 @@ void saturn_state::cd_exec_command( void )
 				UINT32 sectoffs = cr2;
 				UINT32 numsect = cr4;
 
-				CDROM_LOG(("%s:CD: Calculate actual size: buf %x offs %x numsect %x\n", machine.describe_context(), bufnum, sectoffs, numsect))
+				CDROM_LOG(("%s:CD: Calculate actual size: buf %x offs %x numsect %x\n", machine().describe_context(), bufnum, sectoffs, numsect))
 
 				calcsize = 0;
 				if (partitions[bufnum].size != -1)
@@ -831,7 +831,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0x53:    // get actual block size
-			CDROM_LOG(("%s:CD: Get actual block size\n", machine.describe_context()))
+			CDROM_LOG(("%s:CD: Get actual block size\n", machine().describe_context()))
 			hirqreg |= (CMOK|ESEL);
 			cr1 = cd_stat | ((calcsize>>16)&0xff);
 			cr2 = (calcsize & 0xffff);
@@ -862,7 +862,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0x60:    // set sector length
-			CDROM_LOG(("%s:CD: Set sector length\n",   machine.describe_context()))
+			CDROM_LOG(("%s:CD: Set sector length\n",   machine().describe_context()))
 
 			switch (cr1 & 0xff)
 			{
@@ -905,7 +905,7 @@ void saturn_state::cd_exec_command( void )
 				UINT32 sectofs = cr2;
 				UINT32 bufnum = cr3>>8;
 
-				CDROM_LOG(("%s:CD: Get sector data (SN %d SO %d BN %d)\n",   machine.describe_context(), sectnum, sectofs, bufnum))
+				CDROM_LOG(("%s:CD: Get sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum))
 
 				if (bufnum >= MAX_FILTERS)
 				{
@@ -948,7 +948,7 @@ void saturn_state::cd_exec_command( void )
 				UINT32 bufnum = cr3>>8;
 				INT32 i;
 
-				CDROM_LOG(("%s:CD: Delete sector data (SN %d SO %d BN %d)\n",   machine.describe_context(), sectnum, sectofs, bufnum))
+				CDROM_LOG(("%s:CD: Delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum))
 
 				if (bufnum >= MAX_FILTERS)
 				{
@@ -999,7 +999,7 @@ void saturn_state::cd_exec_command( void )
 				UINT32 sectofs = cr2;
 				UINT32 bufnum = cr3>>8;
 
-				CDROM_LOG(("%s:CD: Get and delete sector data (SN %d SO %d BN %d)\n",   machine.describe_context(), sectnum, sectofs, bufnum))
+				CDROM_LOG(("%s:CD: Get and delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum))
 
 				if (bufnum >= MAX_FILTERS)
 				{
@@ -1067,7 +1067,7 @@ void saturn_state::cd_exec_command( void )
 
 
 		case 0x67:    // get copy error
-			CDROM_LOG(("%s:CD: Get copy error\n",   machine.describe_context()))
+			CDROM_LOG(("%s:CD: Get copy error\n",   machine().describe_context()))
 			printf("Get copy error\n");
 			cr1 = cd_stat;
 			cr2 = 0;
@@ -1077,7 +1077,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0x70:    // change directory
-			CDROM_LOG(("%s:CD: Change Directory\n",   machine.describe_context()))
+			CDROM_LOG(("%s:CD: Change Directory\n",   machine().describe_context()))
 			hirqreg |= (CMOK|EFLS);
 
 			temp = (cr3&0xff)<<16;
@@ -1088,7 +1088,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0x71:    // Read directory entry
-			CDROM_LOG(("%s:CD: Read Directory Entry\n",   machine.describe_context()))
+			CDROM_LOG(("%s:CD: Read Directory Entry\n",   machine().describe_context()))
 //          UINT32 read_dir;
 
 //          read_dir = ((cr3&0xff)<<16)|cr4;
@@ -1116,7 +1116,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0x73:    // Get File Info
-			CDROM_LOG(("%s:CD: Get File Info\n",   machine.describe_context()))
+			CDROM_LOG(("%s:CD: Get File Info\n",   machine().describe_context()))
 			cd_stat |= CD_STAT_TRANS;
 			cd_stat &= 0xff00;      // clear top byte of return value
 			playtype = 0;
@@ -1174,7 +1174,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0x74:    // Read File
-			CDROM_LOG(("%s:CD: Read File\n",   machine.describe_context()))
+			CDROM_LOG(("%s:CD: Read File\n",   machine().describe_context()))
 			UINT16 file_offset,file_filter,file_id,file_size;
 
 			file_offset = ((cr1 & 0xff)<<8)|(cr2 & 0xff); /* correct? */
@@ -1204,7 +1204,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0x75:
-			CDROM_LOG(("%s:CD: Abort File\n",   machine.describe_context()))
+			CDROM_LOG(("%s:CD: Abort File\n",   machine().describe_context()))
 			// bios expects "2bc" mask to work against this
 			hirqreg |= (CMOK|EFLS);
 			sectorstore = 0;
@@ -1216,7 +1216,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0xe0:    // appears to be copy protection check.  needs only to return OK.
-			CDROM_LOG(("%s:CD: Verify copy protection\n",   machine.describe_context()))
+			CDROM_LOG(("%s:CD: Verify copy protection\n",   machine().describe_context()))
 			if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 				cd_stat = CD_STAT_PAUSE;
 //          cr1 = cd_stat;  // necessary to pass
@@ -1228,7 +1228,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0xe1:    // get disc region
-			CDROM_LOG(("%s:CD: Get disc region\n",   machine.describe_context()))
+			CDROM_LOG(("%s:CD: Get disc region\n",   machine().describe_context()))
 			if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
 				cd_stat = CD_STAT_PAUSE;
 			cr1 = cd_stat;  // necessary to pass
