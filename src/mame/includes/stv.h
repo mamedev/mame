@@ -382,9 +382,9 @@ public:
 
 	void refresh_palette_data( void );
 	int stv_vdp2_window_process(int x,int y);
-	void stv_vdp2_get_window0_coordinates(UINT16 *s_x, UINT16 *e_x, UINT16 *s_y, UINT16 *e_y);
-	void stv_vdp2_get_window1_coordinates(UINT16 *s_x, UINT16 *e_x, UINT16 *s_y, UINT16 *e_y);
-	int get_window_pixel(UINT16 s_x,UINT16 e_x,UINT16 s_y,UINT16 e_y,int x, int y,UINT8 win_num);
+	void stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
+	void stv_vdp2_get_window1_coordinates(int *s_x, int *e_x, int *s_y, int *e_y);
+	int get_window_pixel(int s_x,int e_x,int s_y,int e_y,int x, int y,UINT8 win_num);
 	int stv_vdp2_apply_window_on_layer(rectangle &cliprect);
 
 	void stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -399,6 +399,10 @@ public:
 	void stv_vdp2_drawgfxzoom_rgb555(bitmap_rgb32 &dest_bmp,const rectangle &clip,UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,int transparency,int transparent_color,int scalex, int scaley,int sprite_screen_width, int sprite_screen_height, int alpha);
 	void stv_vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle &clip, UINT32 code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
 	void stv_vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectangle &clip, UINT32 code, int flipx, int flipy, int sx, int sy, int transparency, int alpha);
+
+	void stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, UINT32 code,UINT32 color, int flipx,int flipy,int offsx,int offsy, int transparent_color, int alpha);
+	void stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx, UINT32 code,UINT32 color, int flipx,int flipy,int offsx,int offsy, int transparent_color);
+
 
 	void stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect, int iRP);
 	void stv_vdp2_check_tilemap_with_linescroll(bitmap_rgb32 &bitmap, const rectangle &cliprect);
