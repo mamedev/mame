@@ -39,7 +39,7 @@
 
 #define MCFG_MOS6551_ADD(_tag, _clock, _irq) \
 	MCFG_DEVICE_ADD(_tag, MOS6551, _clock) \
-	downcast<mos6551_device *>(device)->set_irq_callback(DEVCB2_##_rxd, DEVCB2_##_irq);
+	downcast<mos6551_device *>(device)->set_irq_callback(DEVCB2_##_irq);
 
 #define MCFG_MOS6551_RXD_TXD_CALLBACKS(_rxd, _txd) \
 	downcast<mos6551_device *>(device)->set_rxd_txd_callbacks(DEVCB2_##_rxd, DEVCB2_##_txd);
