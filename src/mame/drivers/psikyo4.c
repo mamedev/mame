@@ -322,13 +322,12 @@ WRITE32_MEMBER(psikyo4_state::ps4_vidregs_w)
 	}
 }
 
-#define PCM_BANK_NO_LEGACY(n)   ((state->m_io_select[0] >> (n * 4 + 24)) & 0x07)
+#define PCM_BANK_NO_LEGACY(n)   ((m_io_select[0] >> (n * 4 + 24)) & 0x07)
 
-static void set_hotgmck_pcm_bank( running_machine &machine, int n )
+void psikyo4_state::set_hotgmck_pcm_bank( int n )
 {
-	psikyo4_state *state = machine.driver_data<psikyo4_state>();
-	UINT8 *ymf_pcmbank = state->memregion("ymf")->base() + 0x200000;
-	UINT8 *pcm_rom = state->memregion("ymfsource")->base();
+	UINT8 *ymf_pcmbank = memregion("ymf")->base() + 0x200000;
+	UINT8 *pcm_rom = memregion("ymfsource")->base();
 
 	memcpy(ymf_pcmbank + n * 0x100000, pcm_rom + PCM_BANK_NO_LEGACY(n) * 0x100000, 0x100000);
 }
@@ -345,10 +344,10 @@ WRITE32_MEMBER(psikyo4_state::hotgmck_pcm_bank_w)
 	new_bank1 = PCM_BANK_NO(1);
 
 	if (old_bank0 != new_bank0)
-		set_hotgmck_pcm_bank(machine(), 0);
+		set_hotgmck_pcm_bank(0);
 
 	if (old_bank1 != new_bank1)
-		set_hotgmck_pcm_bank(machine(), 1);
+		set_hotgmck_pcm_bank(1);
 }
 
 static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
@@ -940,31 +939,30 @@ ROM_END
 
 void psikyo4_state::hotgmck_pcm_bank_postload()
 {
-	set_hotgmck_pcm_bank(machine(), 0);
-	set_hotgmck_pcm_bank(machine(), 1);
+	set_hotgmck_pcm_bank(0);
+	set_hotgmck_pcm_bank(1);
 }
 
-static void install_hotgmck_pcm_bank(running_machine &machine)
+void psikyo4_state::install_hotgmck_pcm_bank()
 {
-	psikyo4_state *state = machine.driver_data<psikyo4_state>();
-	UINT8 *ymf_pcm = state->memregion("ymf")->base();
-	UINT8 *pcm_rom = state->memregion("ymfsource")->base();
+	UINT8 *ymf_pcm = memregion("ymf")->base();
+	UINT8 *pcm_rom = memregion("ymfsource")->base();
 
 	memcpy(ymf_pcm, pcm_rom, 0x200000);
 
-	state->m_io_select[0] = (state->m_io_select[0] & 0x00ffffff) | 0x32000000;
-	set_hotgmck_pcm_bank(machine, 0);
-	set_hotgmck_pcm_bank(machine, 1);
+	m_io_select[0] = (m_io_select[0] & 0x00ffffff) | 0x32000000;
+	set_hotgmck_pcm_bank(0);
+	set_hotgmck_pcm_bank(1);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x5800008, 0x580000b, write32_delegate(FUNC(psikyo4_state::hotgmck_pcm_bank_w),state));
-	machine.save().register_postload(save_prepost_delegate(FUNC(psikyo4_state::hotgmck_pcm_bank_postload), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x5800008, 0x580000b, write32_delegate(FUNC(psikyo4_state::hotgmck_pcm_bank_w),this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(psikyo4_state::hotgmck_pcm_bank_postload), this));
 }
 
 DRIVER_INIT_MEMBER(psikyo4_state,hotgmck)
 {
 	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
 	machine().root_device().membank("bank1")->set_base(&RAM[0x100000]);
-	install_hotgmck_pcm_bank(machine());    // Banked PCM ROM
+	install_hotgmck_pcm_bank();    // Banked PCM ROM
 }
 
 

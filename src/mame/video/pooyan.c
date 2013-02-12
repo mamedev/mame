@@ -154,11 +154,10 @@ WRITE8_MEMBER(pooyan_state::pooyan_flipscreen_w)
  *
  *************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void pooyan_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	pooyan_state *state = machine.driver_data<pooyan_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	UINT8 *spriteram_2 = state->m_spriteram2;
+	UINT8 *spriteram = m_spriteram;
+	UINT8 *spriteram_2 = m_spriteram2;
 	int offs;
 
 	for (offs = 0x10; offs < 0x40; offs += 2)
@@ -172,12 +171,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipy = spriteram_2[offs] & 0x80;
 
 		drawgfx_transmask(bitmap,cliprect,
-			machine.gfx[1],
+			machine().gfx[1],
 			code,
 			color,
 			flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0));
+			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
 	}
 }
 
@@ -192,6 +191,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 pooyan_state::screen_update_pooyan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

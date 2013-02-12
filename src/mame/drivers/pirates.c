@@ -335,17 +335,17 @@ ROM_END
 
 /* Init */
 
-static void pirates_decrypt_68k(running_machine &machine)
+void pirates_state::pirates_decrypt_68k()
 {
 	int rom_size;
 	UINT16 *buf, *rom;
 	int i;
 
-	rom_size = machine.root_device().memregion("maincpu")->bytes();
+	rom_size = machine().root_device().memregion("maincpu")->bytes();
 
-	buf = auto_alloc_array(machine, UINT16, rom_size/2);
+	buf = auto_alloc_array(machine(), UINT16, rom_size/2);
 
-	rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 	memcpy (buf, rom, rom_size);
 
 	for (i=0; i<rom_size/2; i++)
@@ -361,20 +361,20 @@ static void pirates_decrypt_68k(running_machine &machine)
 
 		rom[i] = (vr<<8) | vl;
 	}
-	auto_free (machine, buf);
+	auto_free (machine(), buf);
 }
 
-static void pirates_decrypt_p(running_machine &machine)
+void pirates_state::pirates_decrypt_p()
 {
 	int rom_size;
 	UINT8 *buf, *rom;
 	int i;
 
-	rom_size = machine.root_device().memregion("gfx1")->bytes();
+	rom_size = machine().root_device().memregion("gfx1")->bytes();
 
-	buf = auto_alloc_array(machine, UINT8, rom_size);
+	buf = auto_alloc_array(machine(), UINT8, rom_size);
 
-	rom = machine.root_device().memregion("gfx1")->base();
+	rom = machine().root_device().memregion("gfx1")->base();
 	memcpy (buf, rom, rom_size);
 
 	for (i=0; i<rom_size/4; i++)
@@ -385,20 +385,20 @@ static void pirates_decrypt_p(running_machine &machine)
 		rom[adr+2*(rom_size/4)] = BITSWAP8(buf[i+2*(rom_size/4)], 1,4,7,0,3,5,6,2);
 		rom[adr+3*(rom_size/4)] = BITSWAP8(buf[i+3*(rom_size/4)], 2,3,4,0,7,5,1,6);
 	}
-	auto_free (machine, buf);
+	auto_free (machine(), buf);
 }
 
-static void pirates_decrypt_s(running_machine &machine)
+void pirates_state::pirates_decrypt_s()
 {
 	int rom_size;
 	UINT8 *buf, *rom;
 	int i;
 
-	rom_size = machine.root_device().memregion("gfx2")->bytes();
+	rom_size = machine().root_device().memregion("gfx2")->bytes();
 
-	buf = auto_alloc_array(machine, UINT8, rom_size);
+	buf = auto_alloc_array(machine(), UINT8, rom_size);
 
-	rom = machine.root_device().memregion("gfx2")->base();
+	rom = machine().root_device().memregion("gfx2")->base();
 	memcpy (buf, rom, rom_size);
 
 	for (i=0; i<rom_size/4; i++)
@@ -409,21 +409,21 @@ static void pirates_decrypt_s(running_machine &machine)
 		rom[adr+2*(rom_size/4)] = BITSWAP8(buf[i+2*(rom_size/4)], 2,3,4,0,7,5,1,6);
 		rom[adr+3*(rom_size/4)] = BITSWAP8(buf[i+3*(rom_size/4)], 4,2,7,1,6,5,0,3);
 	}
-	auto_free (machine, buf);
+	auto_free (machine(), buf);
 }
 
 
-static void pirates_decrypt_oki(running_machine &machine)
+void pirates_state::pirates_decrypt_oki()
 {
 	int rom_size;
 	UINT8 *buf, *rom;
 	int i;
 
-	rom_size = machine.root_device().memregion("oki")->bytes();
+	rom_size = machine().root_device().memregion("oki")->bytes();
 
-	buf = auto_alloc_array(machine, UINT8, rom_size);
+	buf = auto_alloc_array(machine(), UINT8, rom_size);
 
-	rom = machine.root_device().memregion("oki")->base();
+	rom = machine().root_device().memregion("oki")->base();
 	memcpy (buf, rom, rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -431,7 +431,7 @@ static void pirates_decrypt_oki(running_machine &machine)
 		int adr = BITSWAP24(i,23,22,21,20,19,10,16,13,8,4,7,11,14,17,12,6,2,0,5,18,15,3,1,9);
 		rom[adr] = BITSWAP8(buf[i], 2,3,4,0,7,5,1,6);
 	}
-	auto_free (machine, buf);
+	auto_free (machine(), buf);
 }
 
 
@@ -439,10 +439,10 @@ DRIVER_INIT_MEMBER(pirates_state,pirates)
 {
 	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 
-	pirates_decrypt_68k(machine());
-	pirates_decrypt_p(machine());
-	pirates_decrypt_s(machine());
-	pirates_decrypt_oki(machine());
+	pirates_decrypt_68k();
+	pirates_decrypt_p();
+	pirates_decrypt_s();
+	pirates_decrypt_oki();
 
 	/* patch out protection check */
 	rom[0x62c0/2] = 0x6006; // beq -> bra
@@ -452,10 +452,10 @@ READ16_MEMBER(pirates_state::genix_prot_r){ if(!offset) return 0x0004; else retu
 
 DRIVER_INIT_MEMBER(pirates_state,genix)
 {
-	pirates_decrypt_68k(machine());
-	pirates_decrypt_p(machine());
-	pirates_decrypt_s(machine());
-	pirates_decrypt_oki(machine());
+	pirates_decrypt_68k();
+	pirates_decrypt_p();
+	pirates_decrypt_s();
+	pirates_decrypt_oki();
 
 	/* If this value is increased then something has gone wrong and the protection failed */
 	/* Write-protect it for now */

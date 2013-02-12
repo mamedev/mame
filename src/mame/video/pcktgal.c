@@ -31,13 +31,12 @@ void pcktgal_state::palette_init()
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void pcktgal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pcktgal_state *state = machine.driver_data<pcktgal_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram.bytes();offs += 4)
+	for (offs = 0;offs < m_spriteram.bytes();offs += 4)
 	{
 		if (spriteram[offs] != 0xf8)
 		{
@@ -49,14 +48,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 			flipx = spriteram[offs+1] & 0x04;
 			flipy = spriteram[offs+1] & 0x02;
-			if (state->flip_screen()) {
+			if (flip_screen()) {
 				sx=240-sx;
 				sy=240-sy;
 				if (flipx) flipx=0; else flipx=1;
 				if (flipy) flipy=0; else flipy=1;
 			}
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					spriteram[offs+3] + ((spriteram[offs+1] & 1) << 8),
 					(spriteram[offs+1] & 0x70) >> 4,
 					flipx,flipy,
@@ -69,7 +68,7 @@ UINT32 pcktgal_state::screen_update_pcktgal(screen_device &screen, bitmap_ind16 
 {
 //  flip_screen_set(machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 	machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -77,5 +76,6 @@ UINT32 pcktgal_state::screen_update_pcktgalb(screen_device &screen, bitmap_ind16
 {
 	// the bootleg doesn't properly set the tilemap registers, because it's on non-original hardware, which probably doesn't have the flexible tilemaps.
 	machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw_bootleg(machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0, 2);
-	draw_sprites(machine(), bitmap, cliprect);
-	return 0;}
+	draw_sprites(bitmap, cliprect);
+	return 0;
+}

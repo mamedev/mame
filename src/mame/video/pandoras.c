@@ -147,7 +147,7 @@ WRITE8_MEMBER(pandoras_state::pandoras_flipscreen_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* sr )
+void pandoras_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8* sr )
 {
 	int offs;
 
@@ -159,19 +159,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int nflipx = sr[offs + 3] & 0x40;
 		int nflipy = sr[offs + 3] & 0x80;
 
-		drawgfx_transmask(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transmask(bitmap,cliprect,machine().gfx[0],
 			sr[offs + 2],
 			color,
 			!nflipx,!nflipy,
 			sx,sy,
-			colortable_get_transpen_mask(machine.colortable, machine.gfx[0], color, 0));
+			colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0));
 	}
 }
 
 UINT32 pandoras_state::screen_update_pandoras(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_layer0->draw(bitmap, cliprect, 1 ,0);
-	draw_sprites(machine(), bitmap, cliprect, &m_spriteram[0x800] );
+	draw_sprites(bitmap, cliprect, &m_spriteram[0x800] );
 	m_layer0->draw(bitmap, cliprect, 0 ,0);
 	return 0;
 }

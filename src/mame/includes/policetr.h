@@ -49,4 +49,5 @@ public:
 	UINT32 screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(irq4_gen);
 	TIMER_CALLBACK_MEMBER(irq5_gen);
+	void render_display_list(offs_t offset);
 };

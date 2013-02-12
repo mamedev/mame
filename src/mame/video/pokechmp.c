@@ -35,13 +35,12 @@ void pokechmp_state::video_start()
 			8, 8, 32, 32);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void pokechmp_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pokechmp_state *state = machine.driver_data<pokechmp_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram.bytes();offs += 4)
+	for (offs = 0;offs < m_spriteram.bytes();offs += 4)
 	{
 		if (spriteram[offs] != 0xf8)
 		{
@@ -53,7 +52,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 			flipx = spriteram[offs+1] & 0x04;
 			flipy = spriteram[offs+1] & 0x02;
-			if (state->flip_screen()) {
+			if (flip_screen()) {
 				sx=240-sx;
 				sy=240-sy;
 				if (flipx) flipx=0; else flipx=1;
@@ -63,7 +62,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			if (spriteram[offs+1] & 0x01) tileno += 0x100;
 			if (spriteram[offs+1] & 0x08) tileno += 0x200;
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					tileno,
 					(spriteram[offs+1] & 0xf0) >> 4,
 					flipx,flipy,
@@ -75,6 +74,6 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 pokechmp_state::screen_update_pokechmp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

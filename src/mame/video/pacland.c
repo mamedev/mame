@@ -55,11 +55,10 @@ sprite color 0x7f will erase the tilemap and force it to be transparent.
 
 ***************************************************************************/
 
-static void switch_palette(running_machine &machine)
+void pacland_state::switch_palette()
 {
-	pacland_state *state = machine.driver_data<pacland_state>();
 	int i;
-	const UINT8 *color_prom = state->m_color_prom + 256 * state->m_palette_bank;
+	const UINT8 *color_prom = m_color_prom + 256 * m_palette_bank;
 
 	for (i = 0;i < 256;i++)
 	{
@@ -84,7 +83,7 @@ static void switch_palette(running_machine &machine)
 
 		color_prom++;
 
-		colortable_palette_set_color(machine.colortable,i,MAKE_RGB(r,g,b));
+		colortable_palette_set_color(machine().colortable,i,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -113,7 +112,7 @@ void pacland_state::palette_init()
 		colortable_entry_set_value(machine().colortable, machine().gfx[2]->colorbase() + i, *color_prom++);
 
 	m_palette_bank = 0;
-	switch_palette(machine());
+	switch_palette();
 
 	/* precalculate transparency masks for sprites */
 	m_transmask[0] = auto_alloc_array(machine(), UINT32, 64);
@@ -259,7 +258,7 @@ WRITE8_MEMBER(pacland_state::pacland_bankswitch_w)
 	if (m_palette_bank != ((data & 0x18) >> 3))
 	{
 		m_palette_bank = (data & 0x18) >> 3;
-		switch_palette(machine());
+		switch_palette();
 	}
 }
 
@@ -272,10 +271,9 @@ WRITE8_MEMBER(pacland_state::pacland_bankswitch_w)
 ***************************************************************************/
 
 /* the sprite generator IC is the same as Mappy */
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int whichmask)
+void pacland_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int whichmask)
 {
-	pacland_state *state = machine.driver_data<pacland_state>();
-	UINT8 *spriteram = state->m_spriteram + 0x780;
+	UINT8 *spriteram = m_spriteram + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
 	int offs;
@@ -300,7 +298,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			flipx ^= 1;
 			flipy ^= 1;
@@ -314,39 +312,38 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			for (x = 0;x <= sizex;x++)
 			{
 				if (whichmask != 0)
-					drawgfx_transmask(bitmap,cliprect,machine.gfx[2],
+					drawgfx_transmask(bitmap,cliprect,machine().gfx[2],
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
-						sx + 16*x,sy + 16*y,state->m_transmask[whichmask][color]);
+						sx + 16*x,sy + 16*y,m_transmask[whichmask][color]);
 				else
-					pdrawgfx_transmask(bitmap,cliprect,machine.gfx[2],
+					pdrawgfx_transmask(bitmap,cliprect,machine().gfx[2],
 						sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						machine.priority_bitmap,0,state->m_transmask[whichmask][color]);
+						machine().priority_bitmap,0,m_transmask[whichmask][color]);
 			}
 		}
 	}
 }
 
 
-static void draw_fg(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void pacland_state::draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	pacland_state *state = machine.driver_data<pacland_state>();
 	int y, x;
 
 	/* draw tilemap transparently over it; this will leave invalid pens (0xffff)
 	   anywhere where the fg_tilemap should be transparent; note that we assume
 	   the fg_bitmap has been pre-erased to 0xffff */
-	state->m_fg_tilemap->draw(state->m_fg_bitmap, cliprect, priority, 0);
+	m_fg_tilemap->draw(m_fg_bitmap, cliprect, priority, 0);
 
 	/* now copy the fg_bitmap to the destination wherever the sprite pixel allows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const UINT8 *pri = &machine.priority_bitmap.pix8(y);
-		UINT16 *src = &state->m_fg_bitmap.pix16(y);
+		const UINT8 *pri = &machine().priority_bitmap.pix8(y);
+		UINT16 *src = &m_fg_bitmap.pix16(y);
 		UINT16 *dst = &bitmap.pix16(y);
 
 		/* only copy if the priority bitmap is 0 (no high priority sprite) and the
@@ -377,21 +374,21 @@ UINT32 pacland_state::screen_update_pacland(screen_device &screen, bitmap_ind16 
 	   wherever there is a high-priority pixel; note that we draw to the bitmap
 	   which is safe because the bg_tilemap draw will overwrite everything */
 	machine().priority_bitmap.fill(0x00, cliprect);
-	draw_sprites(machine(), bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, 0);
 
 	/* draw background */
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* draw low priority fg tiles */
-	draw_fg(machine(), bitmap, cliprect, 0);
+	draw_fg(bitmap, cliprect, 0);
 
 	/* draw sprites with regular transparency */
-	draw_sprites(machine(), bitmap, cliprect, 1);
+	draw_sprites(bitmap, cliprect, 1);
 
 	/* draw high priority fg tiles */
-	draw_fg(machine(), bitmap, cliprect, 1);
+	draw_fg(bitmap, cliprect, 1);
 
 	/* draw sprite pixels with colortable values >= 0xf0, which have priority over everything */
-	draw_sprites(machine(), bitmap, cliprect, 2);
+	draw_sprites(bitmap, cliprect, 2);
 	return 0;
 }

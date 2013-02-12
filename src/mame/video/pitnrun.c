@@ -94,11 +94,10 @@ WRITE8_MEMBER(pitnrun_state::pitnrun_color_select_w)
 	machine().tilemap().mark_all_dirty();
 }
 
-static void pitnrun_spotlights(running_machine &machine)
+void pitnrun_state::pitnrun_spotlights()
 {
-	pitnrun_state *state = machine.driver_data<pitnrun_state>();
 	int x,y,i,b,datapix;
-	UINT8 *ROM = state->memregion("user1")->base();
+	UINT8 *ROM = memregion("user1")->base();
 	for(i=0;i<4;i++)
 		for(y=0;y<128;y++)
 		for(x=0;x<16;x++)
@@ -106,7 +105,7 @@ static void pitnrun_spotlights(running_machine &machine)
 		datapix=ROM[128*16*i+x+y*16];
 		for(b=0;b<8;b++)
 		{
-			state->m_tmp_bitmap[i]->pix16(y, x*8+(7-b)) = (datapix&1);
+			m_tmp_bitmap[i]->pix16(y, x*8+(7-b)) = (datapix&1);
 			datapix>>=1;
 		}
 		}
@@ -169,13 +168,12 @@ void pitnrun_state::video_start()
 	m_tmp_bitmap[1] = auto_bitmap_ind16_alloc(machine(),128,128);
 	m_tmp_bitmap[2] = auto_bitmap_ind16_alloc(machine(),128,128);
 	m_tmp_bitmap[3] = auto_bitmap_ind16_alloc(machine(),128,128);
-	pitnrun_spotlights(machine());
+	pitnrun_spotlights();
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void pitnrun_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	pitnrun_state *state = machine.driver_data<pitnrun_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int sx, sy, flipx, flipy, offs,pal;
 
 	for (offs = 0 ; offs < 0x100; offs+=4)
@@ -187,18 +185,18 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		flipy = (spriteram[offs+1]&0x80)>>7;
 		flipx = (spriteram[offs+1]&0x40)>>6;
 
-		if (state->flip_screen_x())
+		if (flip_screen_x())
 		{
 			sx = 256 - sx;
 			flipx = !flipx;
 		}
-		if (state->flip_screen_y())
+		if (flip_screen_y())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 			(spriteram[offs+1]&0x3f)+((spriteram[offs+2]&0x80)>>1)+((spriteram[offs+2]&0x40)<<1),
 			pal,
 			flipx,flipy,
@@ -253,7 +251,7 @@ UINT32 pitnrun_state::screen_update_pitnrun(screen_device &screen, bitmap_ind16 
 		m_bg->draw(bitmap, myclip, 0,0);
 	}
 
-	draw_sprites(machine(),bitmap,myclip);
+	draw_sprites(bitmap,myclip);
 
 	if(m_ha&4)
 		copybitmap_trans(bitmap,*m_tmp_bitmap[m_ha&3],flip_screen_x(),flip_screen_y(),dx,dy,myclip, 1);

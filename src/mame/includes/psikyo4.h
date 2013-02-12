@@ -54,4 +54,7 @@ public:
 	UINT32 screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(psikyosh_interrupt);
 	void hotgmck_pcm_bank_postload();
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 scr );
+	void set_hotgmck_pcm_bank( int n );
+	void install_hotgmck_pcm_bank();
 };

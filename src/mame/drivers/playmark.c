@@ -1693,7 +1693,7 @@ ROM_START( hrdtimesa )
 ROM_END
 
 
-static UINT8 playmark_asciitohex(UINT8 data)
+UINT8 playmark_state::playmark_asciitohex(UINT8 data)
 {
 	/* Convert ASCII data to HEX */
 

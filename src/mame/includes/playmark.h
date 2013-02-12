@@ -107,4 +107,9 @@ public:
 	UINT32 screen_update_excelsr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hrdtimes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift );
+	void bigtwinb_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift );
+	void draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	UINT8 playmark_asciitohex(UINT8 data);
+	void draw_sprites_powerbal( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

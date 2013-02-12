@@ -55,4 +55,6 @@ public:
 	UINT32 screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(paradise_irq);
+	void update_pix_palbank();
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

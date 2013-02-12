@@ -57,4 +57,6 @@ public:
 	TIMER_CALLBACK_MEMBER(pitnrun_mcu_real_data_w);
 	TIMER_CALLBACK_MEMBER(pitnrun_mcu_data_real_r);
 	TIMER_CALLBACK_MEMBER(pitnrun_mcu_status_real_w);
+	void pitnrun_spotlights();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

@@ -387,14 +387,13 @@ TILE_GET_INFO_MEMBER(playmark_state::powerbal_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, colr >> 12, 0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void playmark_state::draw_sprites_powerbal(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	UINT16 *spriteram = state->m_spriteram;
+	UINT16 *spriteram = m_spriteram;
 	int offs;
-	int height = machine.gfx[0]->height();
+	int height = machine().gfx[0]->height();
 
-	for (offs = 4; offs < state->m_spriteram.bytes() / 2; offs += 4)
+	for (offs = 4; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
 		int sx, sy, code, color, flipx;
 
@@ -408,11 +407,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		code = spriteram[offs + 2];
 		color = (spriteram[offs + 1] & 0xf000) >> 12;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				code,
 				color,
 				flipx,0,
-				sx + state->m_xoffset,sy + state->m_yoffset,0);
+				sx + m_xoffset,sy + m_yoffset,0);
 	}
 }
 
@@ -428,7 +427,7 @@ VIDEO_START_MEMBER(playmark_state,powerbal)
 UINT32 playmark_state::screen_update_powerbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites_powerbal(bitmap, cliprect);
 	return 0;
 }
 

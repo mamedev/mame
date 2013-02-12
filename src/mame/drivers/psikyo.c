@@ -208,8 +208,8 @@ WRITE32_MEMBER(psikyo_state::s1945_mcu_w)
 		m_s1945_mcu_direction = data;
 		break;
 	case 0x07:
-		psikyo_switch_banks(machine(), 1, (data >> 6) & 3);
-		psikyo_switch_banks(machine(), 0, (data >> 4) & 3);
+		psikyo_switch_banks(1, (data >> 6) & 3);
+		psikyo_switch_banks(0, (data >> 4) & 3);
 		m_s1945_mcu_bctrl = data;
 		break;
 	case 0x0b:
@@ -1831,28 +1831,27 @@ DRIVER_INIT_MEMBER(psikyo_state,sngkace)
 #endif
 }
 
-static void s1945_mcu_init( running_machine &machine )
+void psikyo_state::s1945_mcu_init(  )
 {
-	psikyo_state *state = machine.driver_data<psikyo_state>();
-	state->m_s1945_mcu_direction = 0x00;
-	state->m_s1945_mcu_inlatch = 0xff;
-	state->m_s1945_mcu_latch1 = 0xff;
-	state->m_s1945_mcu_latch2 = 0xff;
-	state->m_s1945_mcu_latching = 0x5;
-	state->m_s1945_mcu_control = 0xff;
-	state->m_s1945_mcu_index = 0;
-	state->m_s1945_mcu_mode = 0;
-	state->m_s1945_mcu_bctrl = 0x00;
+	m_s1945_mcu_direction = 0x00;
+	m_s1945_mcu_inlatch = 0xff;
+	m_s1945_mcu_latch1 = 0xff;
+	m_s1945_mcu_latch2 = 0xff;
+	m_s1945_mcu_latching = 0x5;
+	m_s1945_mcu_control = 0xff;
+	m_s1945_mcu_index = 0;
+	m_s1945_mcu_mode = 0;
+	m_s1945_mcu_bctrl = 0x00;
 
-	state->save_item(NAME(state->m_s1945_mcu_direction));
-	state->save_item(NAME(state->m_s1945_mcu_inlatch));
-	state->save_item(NAME(state->m_s1945_mcu_latch1));
-	state->save_item(NAME(state->m_s1945_mcu_latch2));
-	state->save_item(NAME(state->m_s1945_mcu_latching));
-	state->save_item(NAME(state->m_s1945_mcu_control));
-	state->save_item(NAME(state->m_s1945_mcu_index));
-	state->save_item(NAME(state->m_s1945_mcu_mode));
-	state->save_item(NAME(state->m_s1945_mcu_bctrl));
+	save_item(NAME(m_s1945_mcu_direction));
+	save_item(NAME(m_s1945_mcu_inlatch));
+	save_item(NAME(m_s1945_mcu_latch1));
+	save_item(NAME(m_s1945_mcu_latch2));
+	save_item(NAME(m_s1945_mcu_latching));
+	save_item(NAME(m_s1945_mcu_control));
+	save_item(NAME(m_s1945_mcu_index));
+	save_item(NAME(m_s1945_mcu_mode));
+	save_item(NAME(m_s1945_mcu_bctrl));
 }
 
 DRIVER_INIT_MEMBER(psikyo_state,tengai)
@@ -1866,7 +1865,7 @@ DRIVER_INIT_MEMBER(psikyo_state,tengai)
 	/* protection */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
 
-	s1945_mcu_init(machine());
+	s1945_mcu_init();
 	m_s1945_mcu_table = 0;
 
 	m_ka302c_banking = 0; // Banking is controlled by mcu
@@ -1903,7 +1902,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945)
 	/* protection and tile bank switching */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
 
-	s1945_mcu_init(machine());
+	s1945_mcu_init();
 	m_s1945_mcu_table = s1945_table;
 
 	m_ka302c_banking = 0; // Banking is controlled by mcu
@@ -1924,7 +1923,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945a)
 	/* protection and tile bank switching */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
 
-	s1945_mcu_init(machine());
+	s1945_mcu_init();
 	m_s1945_mcu_table = s1945a_table;
 
 	m_ka302c_banking = 0; // Banking is controlled by mcu
@@ -1945,7 +1944,7 @@ DRIVER_INIT_MEMBER(psikyo_state,s1945j)
 	/* protection and tile bank switching */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),this));
 
-	s1945_mcu_init(machine());
+	s1945_mcu_init();
 	m_s1945_mcu_table = s1945j_table;
 
 	m_ka302c_banking = 0; // Banking is controlled by mcu

@@ -248,14 +248,13 @@ Offset:     Format:                 Value:
 #define SIGN_EXTEND_POS(_var_)  {_var_ &= 0x3ff; if (_var_ > 0x1ff) _var_ -= 0x400;}
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void powerins_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	powerins_state *state = machine.driver_data<powerins_state>();
-	UINT16 *source = state->m_spriteram + 0x8000/2;
-	UINT16 *finish = state->m_spriteram + 0x9000/2;
+	UINT16 *source = m_spriteram + 0x8000/2;
+	UINT16 *finish = m_spriteram + 0x9000/2;
 
-	int screen_w = machine.primary_screen->width();
-	int screen_h = machine.primary_screen->height();
+	int screen_w = machine().primary_screen->width();
+	int screen_h = machine().primary_screen->height();
 
 	for ( ; source < finish; source += 16/2 )
 	{
@@ -281,7 +280,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		/* Handle flip_screen. Apply a global offset of 32 pixels along x too */
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = screen_w - sx - dimx*16 - 32;  flipx = !flipx;
 			sy = screen_h - sy - dimy*16;       flipy = !flipy;
@@ -298,7 +297,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		{
 			for (y = 0 ; y < dimy ; y++)
 			{
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 						code,
 						color,
 						flipx, flipy,
@@ -353,7 +352,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 	if (layers_ctrl&1)      m_tilemap_0->draw(bitmap, cliprect, 0, 0);
 	else                    bitmap.fill(0, cliprect);
-	if (layers_ctrl&8)      draw_sprites(machine(),bitmap,cliprect);
+	if (layers_ctrl&8)      draw_sprites(bitmap,cliprect);
 	if (layers_ctrl&2)      m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

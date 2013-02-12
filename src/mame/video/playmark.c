@@ -385,16 +385,15 @@ WRITE16_MEMBER(playmark_state::hrdtimes_scroll_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
+void playmark_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	int offs, start_offset = state->m_spriteram.bytes() / 2 - 4;
-	int height = machine.gfx[0]->height();
-	int colordiv = machine.gfx[0]->granularity() / 16;
-	UINT16 *spriteram = state->m_spriteram;
+	int offs, start_offset = m_spriteram.bytes() / 2 - 4;
+	int height = machine().gfx[0]->height();
+	int colordiv = machine().gfx[0]->granularity() / 16;
+	UINT16 *spriteram = m_spriteram;
 
 	// find the "end of list" to draw the sprites in reverse order
-	for (offs = 4; offs < state->m_spriteram.bytes() / 2; offs += 4)
+	for (offs = 4; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
 		if (spriteram[offs + 3 - 4] == 0x2000) /* end of list marker */
 		{
@@ -419,25 +418,24 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if(!pri && (color & 0x0c) == 0x0c)
 			pri = 2;
 
-		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 					code,
 					color,
 					flipx,0,
-					sx + state->m_xoffset,sy + state->m_yoffset,
-					machine.priority_bitmap,state->m_pri_masks[pri],0);
+					sx + m_xoffset,sy + m_yoffset,
+					machine().priority_bitmap,m_pri_masks[pri],0);
 	}
 }
 
 
-static void bigtwinb_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
+void playmark_state::bigtwinb_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int codeshift )
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
-	int offs, start_offset = state->m_spriteram.bytes() / 2 - 4;
-	int height = machine.gfx[0]->height();
-	UINT16 *spriteram = state->m_spriteram;
+	int offs, start_offset = m_spriteram.bytes() / 2 - 4;
+	int height = machine().gfx[0]->height();
+	UINT16 *spriteram = m_spriteram;
 
 	// find the "end of list" to draw the sprites in reverse order
-	for (offs = 4; offs < state->m_spriteram.bytes() / 2; offs += 4)
+	for (offs = 4; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
 		if (spriteram[offs + 3 - 4] == 0x2000) /* end of list marker */
 		{
@@ -458,17 +456,16 @@ static void bigtwinb_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		code = spriteram[offs + 2] >> codeshift;
 		color = ((spriteram[offs + 1] & 0xf000) >> 12);
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 					code,
 					color,
 					flipx,0,
-					sx + state->m_xoffset,sy + state->m_yoffset, 0);
+					sx + m_xoffset,sy + m_yoffset, 0);
 	}
 }
 
-static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void playmark_state::draw_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	playmark_state *state = machine.driver_data<playmark_state>();
 	int x, y, count;
 	int color;
 	UINT8 *pri;
@@ -478,26 +475,26 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const r
 	{
 		for (x = 0; x < 512; x++)
 		{
-			color = state->m_bgvideoram[count] & 0xff;
+			color = m_bgvideoram[count] & 0xff;
 
 			if (color)
 			{
-				if (state->m_bg_full_size)
+				if (m_bg_full_size)
 				{
-					bitmap.pix16((y + state->m_bgscrolly) & 0x1ff, (x + state->m_bgscrollx) & 0x1ff) = 0x100 + color;
+					bitmap.pix16((y + m_bgscrolly) & 0x1ff, (x + m_bgscrollx) & 0x1ff) = 0x100 + color;
 
-					pri = &machine.priority_bitmap.pix8((y + state->m_bgscrolly) & 0x1ff);
-					pri[(x + state->m_bgscrollx) & 0x1ff] |= 2;
+					pri = &machine().priority_bitmap.pix8((y + m_bgscrolly) & 0x1ff);
+					pri[(x + m_bgscrollx) & 0x1ff] |= 2;
 				}
 				else
 				{
 					/* 50% size */
 					if(!(x % 2) && !(y % 2))
 					{
-						bitmap.pix16((y / 2 + state->m_bgscrolly) & 0x1ff, (x / 2 + state->m_bgscrollx) & 0x1ff) = 0x100 + color;
+						bitmap.pix16((y / 2 + m_bgscrolly) & 0x1ff, (x / 2 + m_bgscrollx) & 0x1ff) = 0x100 + color;
 
-						pri = &machine.priority_bitmap.pix8((y / 2 + state->m_bgscrolly) & 0x1ff);
-						pri[(x / 2 + state->m_bgscrollx) & 0x1ff] |= 2;
+						pri = &machine().priority_bitmap.pix8((y / 2 + m_bgscrolly) & 0x1ff);
+						pri[(x / 2 + m_bgscrollx) & 0x1ff] |= 2;
 					}
 				}
 			}
@@ -513,8 +510,8 @@ UINT32 playmark_state::screen_update_bigtwin(screen_device &screen, bitmap_ind16
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	if (m_bg_enable)
-		draw_bitmap(machine(), bitmap, cliprect);
-	draw_sprites(machine(), bitmap, cliprect, 4);
+		draw_bitmap(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect, 4);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -527,7 +524,7 @@ UINT32 playmark_state::screen_update_bigtwinb(screen_device &screen, bitmap_ind1
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		bigtwinb_draw_sprites(machine(), bitmap, cliprect, 4);
+		bigtwinb_draw_sprites(bitmap, cliprect, 4);
 		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else
@@ -541,9 +538,9 @@ UINT32 playmark_state::screen_update_excelsr(screen_device &screen, bitmap_ind16
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 1);
 	if (m_bg_enable)
-		draw_bitmap(machine(), bitmap, cliprect);
+		draw_bitmap(bitmap, cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 4);
-	draw_sprites(machine(), bitmap, cliprect, 2);
+	draw_sprites(bitmap, cliprect, 2);
 	return 0;
 }
 
@@ -567,7 +564,7 @@ UINT32 playmark_state::screen_update_wbeachvl(screen_device &screen, bitmap_ind1
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-	draw_sprites(machine(), bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, 0);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -581,7 +578,7 @@ UINT32 playmark_state::screen_update_hrdtimes(screen_device &screen, bitmap_ind1
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 1);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
-		draw_sprites(machine(), bitmap, cliprect, 2);
+		draw_sprites(bitmap, cliprect, 2);
 		m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else

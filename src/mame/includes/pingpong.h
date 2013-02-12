@@ -29,4 +29,5 @@ public:
 	UINT32 screen_update_pingpong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(pingpong_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(merlinmm_interrupt);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

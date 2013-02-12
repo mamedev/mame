@@ -84,6 +84,9 @@ public:
 	DECLARE_PALETTE_INIT(polepos);
 	UINT32 screen_update_polepos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(polepos_scanline);
+	void draw_road(bitmap_ind16 &bitmap);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void zoom_sprite(bitmap_ind16 &bitmap,int big,UINT32 code,UINT32 color,int flipx,int sx,int sy,int sizex,int sizey);
 };
 
 

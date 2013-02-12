@@ -110,18 +110,17 @@ void pingpong_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(pingpong_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void pingpong_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/* This is strange; it's unlikely that the sprites actually have a hardware */
 	/* clipping region, but I haven't found another way to have them masked by */
 	/* the characters at the top and bottom of the screen. */
 	const rectangle spritevisiblearea(0*8, 32*8-1, 4*8, 29*8-1);
 
-	pingpong_state *state = machine.driver_data<pingpong_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
+	for (offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy,color,schar;
 
@@ -134,18 +133,18 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		color = spriteram[offs] & 0x1f;
 		schar = spriteram[offs + 2] & 0x7f;
 
-		drawgfx_transmask(bitmap,spritevisiblearea,machine.gfx[1],
+		drawgfx_transmask(bitmap,spritevisiblearea,machine().gfx[1],
 				schar,
 				color,
 				flipx,flipy,
 				sx,sy,
-				colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0));
+				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
 	}
 }
 
 UINT32 pingpong_state::screen_update_pingpong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

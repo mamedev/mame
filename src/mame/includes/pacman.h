@@ -139,6 +139,12 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 	INTERRUPT_GEN_MEMBER(s2650_interrupt);
+	void init_save_state();
+	void jrpacman_mark_tile_dirty( int offset );
+	void maketrax_rom_decode();
+	void korosuke_rom_decode();
+	void eyes_decode(UINT8 *data);
+	void mspacman_install_patches(UINT8 *ROM);
 };
 
 /*----------- defined in machine/pacplus.c -----------*/

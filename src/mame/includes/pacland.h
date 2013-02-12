@@ -40,4 +40,7 @@ public:
 	UINT32 screen_update_pacland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(main_vblank_irq);
 	INTERRUPT_GEN_MEMBER(mcu_vblank_irq);
+	void switch_palette();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int whichmask);
+	void draw_fg(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 };

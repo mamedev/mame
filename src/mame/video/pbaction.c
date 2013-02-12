@@ -76,13 +76,12 @@ void pbaction_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void pbaction_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	pbaction_state *state = machine.driver_data<pbaction_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int sx, sy, flipx, flipy;
 
@@ -100,7 +99,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		flipx = spriteram[offs + 1] & 0x40;
 		flipy = spriteram[offs + 1] & 0x80;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			if (spriteram[offs] & 0x80)
 			{
@@ -116,18 +115,18 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[(spriteram[offs] & 0x80) ? 3 : 2], /* normal or double size */
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[(spriteram[offs] & 0x80) ? 3 : 2], /* normal or double size */
 				spriteram[offs],
 				spriteram[offs + 1] & 0x0f,
 				flipx,flipy,
-				sx + (state->flip_screen() ? state->m_scroll : -state->m_scroll), sy,0);
+				sx + (flip_screen() ? m_scroll : -m_scroll), sy,0);
 	}
 }
 
 UINT32 pbaction_state::screen_update_pbaction(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

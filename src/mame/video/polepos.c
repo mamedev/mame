@@ -340,10 +340,9 @@ WRITE8_MEMBER(polepos_state::polepos_alpha_w)
 
 ***************************************************************************/
 
-static void draw_road(running_machine &machine, bitmap_ind16 &bitmap)
+void polepos_state::draw_road(bitmap_ind16 &bitmap)
 {
-	polepos_state *state = machine.driver_data<polepos_state>();
-	const UINT8 *road_control = state->memregion("gfx5")->base();
+	const UINT8 *road_control = memregion("gfx5")->base();
 	const UINT8 *road_bits1 = road_control + 0x2000;
 	const UINT8 *road_bits2 = road_control + 0x4000;
 	int x, y, i;
@@ -357,16 +356,16 @@ static void draw_road(running_machine &machine, bitmap_ind16 &bitmap)
 		pen_t pen_base;
 
 		/* first add the vertical position modifier and the vertical scroll */
-		yoffs = ((state->m_vertical_position_modifier[y] + state->m_road16_vscroll) >> 3) & 0x1ff;
+		yoffs = ((m_vertical_position_modifier[y] + m_road16_vscroll) >> 3) & 0x1ff;
 
 		/* then use that as a lookup into the road memory */
-		roadpal = state->m_road16_memory[yoffs] & 15;
+		roadpal = m_road16_memory[yoffs] & 15;
 
 		/* this becomes the palette base for the scanline */
 		pen_base = 0x0b00 + (roadpal << 6);
 
 		/* now fetch the horizontal scroll offset for this scanline */
-		xoffs = state->m_road16_memory[0x380 + (y & 0x7f)] & 0x3ff;
+		xoffs = m_road16_memory[0x380 + (y & 0x7f)] & 0x3ff;
 
 		/* the road is drawn in 8-pixel chunks, so round downward and adjust the base */
 		/* note that we assume there is at least 8 pixels of slop on the left/right */
@@ -416,14 +415,14 @@ static void draw_road(running_machine &machine, bitmap_ind16 &bitmap)
 	}
 }
 
-static void zoom_sprite(running_machine &machine, bitmap_ind16 &bitmap,int big,
+void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
 		UINT32 code,UINT32 color,int flipx,int sx,int sy,
 		int sizex,int sizey)
 {
-	gfx_element *gfx = machine.gfx[big ? 3 : 2];
+	gfx_element *gfx = machine().gfx[big ? 3 : 2];
 	const UINT8 *gfxdata = gfx->get_data(code % gfx->elements());
-	UINT8 *scaling_rom = machine.root_device().memregion("gfx6")->base();
-	UINT32 transmask = colortable_get_transpen_mask(machine.colortable, gfx, color, 0x1f);
+	UINT8 *scaling_rom = machine().root_device().memregion("gfx6")->base();
+	UINT32 transmask = colortable_get_transpen_mask(machine().colortable, gfx, color, 0x1f);
 	int coloroffs = gfx->colorbase() + color * gfx->granularity();
 	int x,y;
 
@@ -467,11 +466,10 @@ static void zoom_sprite(running_machine &machine, bitmap_ind16 &bitmap,int big,
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void polepos_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	polepos_state *state = machine.driver_data<polepos_state>();
-	UINT16 *posmem = &state->m_sprite16_memory[0x380];
-	UINT16 *sizmem = &state->m_sprite16_memory[0x780];
+	UINT16 *posmem = &m_sprite16_memory[0x380];
+	UINT16 *sizmem = &m_sprite16_memory[0x780];
 	int i;
 
 	for (i = 0; i < 64; i++, posmem += 2, sizmem += 2)
@@ -487,7 +485,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		/* 128V input to the palette PROM */
 		if (sy >= 128) color |= 0x40;
 
-		zoom_sprite(machine, bitmap, (sizmem[0] & 0x8000) ? 1 : 0,
+		zoom_sprite(bitmap, (sizmem[0] & 0x8000) ? 1 : 0,
 					code,
 					color,
 					flipx,
@@ -502,8 +500,8 @@ UINT32 polepos_state::screen_update_polepos(screen_device &screen, bitmap_ind16 
 	rectangle clip = cliprect;
 	clip.max_y = 127;
 	m_bg_tilemap->draw(bitmap, clip, 0,0);
-	draw_road(machine(), bitmap);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_road(bitmap);
+	draw_sprites(bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

@@ -187,22 +187,21 @@ WRITE8_MEMBER(punchout_state::punchout_spr2_videoram_w)
 
 
 
-static void draw_big_sprite(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
+void punchout_state::draw_big_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
 {
-	punchout_state *state = machine.driver_data<punchout_state>();
 	int zoom;
 
-	zoom = state->m_spr1_ctrlram[0] + 256 * (state->m_spr1_ctrlram[1] & 0x0f);
+	zoom = m_spr1_ctrlram[0] + 256 * (m_spr1_ctrlram[1] & 0x0f);
 	if (zoom)
 	{
 		int sx,sy;
 		UINT32 startx,starty;
 		int incxx,incyy;
 
-		sx = 4096 - (state->m_spr1_ctrlram[2] + 256 * (state->m_spr1_ctrlram[3] & 0x0f));
+		sx = 4096 - (m_spr1_ctrlram[2] + 256 * (m_spr1_ctrlram[3] & 0x0f));
 		if (sx > 4096-4*127) sx -= 4096;
 
-		sy = -(state->m_spr1_ctrlram[4] + 256 * (state->m_spr1_ctrlram[5] & 1));
+		sy = -(m_spr1_ctrlram[4] + 256 * (m_spr1_ctrlram[5] & 1));
 		if (sy <= -256 + zoom/0x40) sy += 512;
 		sy += 12;
 
@@ -214,15 +213,15 @@ static void draw_big_sprite(running_machine &machine, bitmap_ind16 &bitmap, cons
 		startx += 3740 * zoom;  /* adjustment to match the screen shots */
 		starty -= 178 * zoom;   /* and make the hall of fame picture nice */
 
-		if (state->m_spr1_ctrlram[6] & 1)   /* flip x */
+		if (m_spr1_ctrlram[6] & 1)   /* flip x */
 		{
 			startx = ((16 * 8) << 16) - startx - 1;
 			incxx = -incxx;
 		}
 
-		state->m_spr1_tilemap->set_palette_offset(0x100 * palette);
+		m_spr1_tilemap->set_palette_offset(0x100 * palette);
 
-		state->m_spr1_tilemap->draw_roz(bitmap, cliprect,
+		m_spr1_tilemap->draw_roz(bitmap, cliprect,
 			startx,starty + 0x200*(2) * zoom,
 			incxx,0,0,incyy,    /* zoom, no rotation */
 			0,  /* no wraparound */
@@ -231,12 +230,11 @@ static void draw_big_sprite(running_machine &machine, bitmap_ind16 &bitmap, cons
 }
 
 
-static void armwrest_draw_big_sprite(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
+void punchout_state::armwrest_draw_big_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
 {
-	punchout_state *state = machine.driver_data<punchout_state>();
 	int zoom;
 
-	zoom = state->m_spr1_ctrlram[0] + 256 * (state->m_spr1_ctrlram[1] & 0x0f);
+	zoom = m_spr1_ctrlram[0] + 256 * (m_spr1_ctrlram[1] & 0x0f);
 	if (zoom)
 	{
 		int sx,sy;
@@ -244,10 +242,10 @@ static void armwrest_draw_big_sprite(running_machine &machine, bitmap_ind16 &bit
 		int incxx,incyy;
 		tilemap_t *_tilemap;
 
-		sx = 4096 - (state->m_spr1_ctrlram[2] + 256 * (state->m_spr1_ctrlram[3] & 0x0f));
+		sx = 4096 - (m_spr1_ctrlram[2] + 256 * (m_spr1_ctrlram[3] & 0x0f));
 		if (sx > 2048) sx -= 4096;
 
-		sy = -(state->m_spr1_ctrlram[4] + 256 * (state->m_spr1_ctrlram[5] & 1));
+		sy = -(m_spr1_ctrlram[4] + 256 * (m_spr1_ctrlram[5] & 1));
 		if (sy <= -256 + zoom/0x40) sy += 512;
 		sy += 12;
 
@@ -259,14 +257,14 @@ static void armwrest_draw_big_sprite(running_machine &machine, bitmap_ind16 &bit
 		startx += 3740 * zoom;  /* adjustment to match the screen shots */
 		starty -= 178 * zoom;   /* and make the hall of fame picture nice */
 
-		if (state->m_spr1_ctrlram[6] & 1)   /* flip x */
+		if (m_spr1_ctrlram[6] & 1)   /* flip x */
 		{
-			_tilemap = state->m_spr1_tilemap_flipx;
+			_tilemap = m_spr1_tilemap_flipx;
 			startx = ((32 * 8) << 16) - startx - 1;
 			incxx = -incxx;
 		}
 		else
-			_tilemap = state->m_spr1_tilemap;
+			_tilemap = m_spr1_tilemap;
 
 		_tilemap->set_palette_offset(0x100 * palette);
 
@@ -278,23 +276,22 @@ static void armwrest_draw_big_sprite(running_machine &machine, bitmap_ind16 &bit
 	}
 }
 
-static void drawbs2(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void punchout_state::drawbs2(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	punchout_state *state = machine.driver_data<punchout_state>();
 	int sx,sy;
 	int incxx;
 
-	sx = 512 - (state->m_spr2_ctrlram[0] + 256 * (state->m_spr2_ctrlram[1] & 1));
+	sx = 512 - (m_spr2_ctrlram[0] + 256 * (m_spr2_ctrlram[1] & 1));
 	if (sx > 512-127) sx -= 512;
 	sx -= 55;   /* adjustment to match the screen shots */
 
-	sy = -state->m_spr2_ctrlram[2] + 256 * (state->m_spr2_ctrlram[3] & 1);
+	sy = -m_spr2_ctrlram[2] + 256 * (m_spr2_ctrlram[3] & 1);
 	sy += 3;    /* adjustment to match the screen shots */
 
 	sx = -sx << 16;
 	sy = -sy << 16;
 
-	if (state->m_spr2_ctrlram[4] & 1)   /* flip x */
+	if (m_spr2_ctrlram[4] & 1)   /* flip x */
 	{
 		sx = ((16 * 8) << 16) - sx - 1;
 		incxx = -1;
@@ -303,18 +300,17 @@ static void drawbs2(running_machine &machine, bitmap_ind16 &bitmap, const rectan
 		incxx = 1;
 
 	// this tilemap doesn't actually zoom, but draw_roz is the only way to draw it without wraparound
-	state->m_spr2_tilemap->draw_roz(bitmap, cliprect,
+	m_spr2_tilemap->draw_roz(bitmap, cliprect,
 		sx, sy, incxx << 16, 0, 0, 1 << 16,
 		0, 0, 0);
 }
 
 
 
-static void punchout_copy_top_palette(running_machine &machine, int bank)
+void punchout_state::punchout_copy_top_palette(int bank)
 {
-	punchout_state *state = machine.driver_data<punchout_state>();
 	int i;
-	const UINT8 *color_prom = state->memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 
 	// top monitor palette
 	for (i = 0; i < 0x100; i++)
@@ -326,15 +322,14 @@ static void punchout_copy_top_palette(running_machine &machine, int bank)
 		g = 255 - pal4bit(color_prom[i + 0x200 + base]);
 		b = 255 - pal4bit(color_prom[i + 0x400 + base]);
 
-		palette_set_color(machine, i ^ state->m_palette_reverse_top, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), i ^ m_palette_reverse_top, MAKE_RGB(r, g, b));
 	}
 }
 
-static void punchout_copy_bot_palette(running_machine &machine, int bank)
+void punchout_state::punchout_copy_bot_palette(int bank)
 {
-	punchout_state *state = machine.driver_data<punchout_state>();
 	int i;
-	const UINT8 *color_prom = state->memregion("proms")->base() + 0x600;
+	const UINT8 *color_prom = memregion("proms")->base() + 0x600;
 
 	// bottom monitor palette
 	for (i = 0; i < 0x100; i++)
@@ -346,19 +341,19 @@ static void punchout_copy_bot_palette(running_machine &machine, int bank)
 		g = 255 - pal4bit(color_prom[i + 0x200 + base]);
 		b = 255 - pal4bit(color_prom[i + 0x400 + base]);
 
-		palette_set_color(machine, (i ^ state->m_palette_reverse_bot) + 0x100, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), (i ^ m_palette_reverse_bot) + 0x100, MAKE_RGB(r, g, b));
 	}
 }
 
 
 UINT32 punchout_state::screen_update_punchout_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	punchout_copy_top_palette(machine(), BIT(*m_palettebank,1));
+	punchout_copy_top_palette(BIT(*m_palettebank,1));
 
 	m_bg_top_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_spr1_ctrlram[7] & 1)  /* display in top monitor */
-		draw_big_sprite(machine(), bitmap, cliprect, 0);
+		draw_big_sprite(bitmap, cliprect, 0);
 
 	return 0;
 }
@@ -367,7 +362,7 @@ UINT32 punchout_state::screen_update_punchout_bottom(screen_device &screen, bitm
 {
 	int offs;
 
-	punchout_copy_bot_palette(machine(), BIT(*m_palettebank,0));
+	punchout_copy_bot_palette(BIT(*m_palettebank,0));
 
 	/* copy the character mapped graphics */
 	for (offs = 0;offs < 32;offs++)
@@ -376,8 +371,8 @@ UINT32 punchout_state::screen_update_punchout_bottom(screen_device &screen, bitm
 	m_bg_bot_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_spr1_ctrlram[7] & 2)  /* display in bottom monitor */
-		draw_big_sprite(machine(), bitmap, cliprect, 1);
-	drawbs2(machine(), bitmap, cliprect);
+		draw_big_sprite(bitmap, cliprect, 1);
+	drawbs2(bitmap, cliprect);
 
 	return 0;
 }
@@ -385,25 +380,25 @@ UINT32 punchout_state::screen_update_punchout_bottom(screen_device &screen, bitm
 
 UINT32 punchout_state::screen_update_armwrest_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	punchout_copy_top_palette(machine(), BIT(*m_palettebank,1));
+	punchout_copy_top_palette(BIT(*m_palettebank,1));
 
 	m_bg_top_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_spr1_ctrlram[7] & 1)  /* display in top monitor */
-		armwrest_draw_big_sprite(machine(), bitmap, cliprect, 0);
+		armwrest_draw_big_sprite(bitmap, cliprect, 0);
 
 	return 0;
 }
 
 UINT32 punchout_state::screen_update_armwrest_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	punchout_copy_bot_palette(machine(), BIT(*m_palettebank,0));
+	punchout_copy_bot_palette(BIT(*m_palettebank,0));
 
 	m_bg_bot_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_spr1_ctrlram[7] & 2)  /* display in bottom monitor */
-		armwrest_draw_big_sprite(machine(), bitmap, cliprect, 1);
-	drawbs2(machine(), bitmap, cliprect);
+		armwrest_draw_big_sprite(bitmap, cliprect, 1);
+	drawbs2(bitmap, cliprect);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 

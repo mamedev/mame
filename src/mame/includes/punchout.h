@@ -68,4 +68,9 @@ public:
 	UINT32 screen_update_armwrest_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_armwrest_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void draw_big_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
+	void armwrest_draw_big_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
+	void drawbs2(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void punchout_copy_top_palette(int bank);
+	void punchout_copy_bot_palette(int bank);
 };

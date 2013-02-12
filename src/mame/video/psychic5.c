@@ -23,31 +23,29 @@
   Palette color
 ***************************************************************************/
 
-static void psychic5_change_palette(running_machine &machine, int color, int offset)
+void psychic5_state::psychic5_change_palette(int color, int offset)
 {
-	psychic5_state *state = machine.driver_data<psychic5_state>();
-	UINT8 lo = state->m_ps5_palette_ram[offset & ~1];
-	UINT8 hi = state->m_ps5_palette_ram[offset | 1];
+	UINT8 lo = m_ps5_palette_ram[offset & ~1];
+	UINT8 hi = m_ps5_palette_ram[offset | 1];
 	jal_blend_set(color, hi & 0x0f);
-	palette_set_color_rgb(machine, color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
+	palette_set_color_rgb(machine(), color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
 }
 
-static void psychic5_change_bg_palette(running_machine &machine, int color, int lo_offs, int hi_offs)
+void psychic5_state::psychic5_change_bg_palette(int color, int lo_offs, int hi_offs)
 {
-	psychic5_state *state = machine.driver_data<psychic5_state>();
 	UINT8 r,g,b,lo,hi,ir,ig,ib,ix;
 	rgb_t irgb;
 
 	/* red,green,blue intensities */
-	ir = pal4bit(state->m_palette_intensity >> 12);
-	ig = pal4bit(state->m_palette_intensity >>  8);
-	ib = pal4bit(state->m_palette_intensity >>  4);
-	ix = state->m_palette_intensity & 0x0f;
+	ir = pal4bit(m_palette_intensity >> 12);
+	ig = pal4bit(m_palette_intensity >>  8);
+	ib = pal4bit(m_palette_intensity >>  4);
+	ix = m_palette_intensity & 0x0f;
 
 	irgb = MAKE_RGB(ir,ig,ib);
 
-	lo = state->m_ps5_palette_ram[lo_offs];
-	hi = state->m_ps5_palette_ram[hi_offs];
+	lo = m_ps5_palette_ram[lo_offs];
+	hi = m_ps5_palette_ram[hi_offs];
 
 	/* red,green,blue component */
 	r = pal4bit(lo >> 4);
@@ -55,33 +53,32 @@ static void psychic5_change_bg_palette(running_machine &machine, int color, int 
 	b = pal4bit(hi >> 4);
 
 	/* Grey background enable */
-	if (state->m_bg_status & 2)
+	if (m_bg_status & 2)
 	{
 		UINT8 val = (r + g + b) / 3;        /* Grey */
 		/* Just leave plain grey */
-		palette_set_color(machine,color,jal_blend_func(MAKE_RGB(val,val,val),irgb,ix));
+		palette_set_color(machine(),color,jal_blend_func(MAKE_RGB(val,val,val),irgb,ix));
 	}
 	else
 	{
 		/* Seems fishy, but the title screen would be black otherwise... */
-		if (!(state->m_title_screen & 1))
+		if (!(m_title_screen & 1))
 		{
 			/* Leave the world as-is */
-			palette_set_color(machine,color,jal_blend_func(MAKE_RGB(r,g,b),irgb,ix));
+			palette_set_color(machine(),color,jal_blend_func(MAKE_RGB(r,g,b),irgb,ix));
 		}
 	}
 }
 
-static void set_background_palette_intensity(running_machine &machine)
+void psychic5_state::set_background_palette_intensity()
 {
-	psychic5_state *state = machine.driver_data<psychic5_state>();
 	int i;
-	state->m_palette_intensity = state->m_ps5_palette_ram[BG_PAL_INTENSITY_BU] |
-						(state->m_ps5_palette_ram[BG_PAL_INTENSITY_RG]<<8);
+	m_palette_intensity = m_ps5_palette_ram[BG_PAL_INTENSITY_BU] |
+						(m_ps5_palette_ram[BG_PAL_INTENSITY_RG]<<8);
 
 	/* for all of the background palette */
 	for (i = 0; i < 0x100; i++)
-		psychic5_change_bg_palette(machine,state->m_bg_palette_base+i,state->m_bg_palette_ram_base+i*2,state->m_bg_palette_ram_base+i*2+1);
+		psychic5_change_bg_palette(m_bg_palette_base+i,m_bg_palette_ram_base+i*2,m_bg_palette_ram_base+i*2+1);
 }
 
 
@@ -147,11 +144,11 @@ WRITE8_MEMBER(psychic5_state::psychic5_paged_ram_w)
 			m_bg_status = m_ps5_io_ram[BG_SCREEN_MODE];
 		}
 		else if (offset >= 0x400 && offset <= 0x5ff)    /* Sprite color */
-			psychic5_change_palette(machine(),((offset >> 1) & 0xff)+0x000,offset-0x400);
+			psychic5_change_palette(((offset >> 1) & 0xff)+0x000,offset-0x400);
 		else if (offset >= 0x800 && offset <= 0x9ff)    /* BG color */
-			psychic5_change_palette(machine(),((offset >> 1) & 0xff)+0x100,offset-0x400);
+			psychic5_change_palette(((offset >> 1) & 0xff)+0x100,offset-0x400);
 		else if (offset >= 0xa00 && offset <= 0xbff)    /* Text color */
-			psychic5_change_palette(machine(),((offset >> 1) & 0xff)+0x200,offset-0x400);
+			psychic5_change_palette(((offset >> 1) & 0xff)+0x200,offset-0x400);
 		else if (offset >= 0x1000)
 			m_fg_tilemap->mark_tile_dirty((offset-0x1000) >> 1);
 	}
@@ -184,7 +181,7 @@ WRITE8_MEMBER(psychic5_state::bombsa_paged_ram_w)
 		else if (offset >= 0x0800 && offset <= 0x0fff)
 			m_fg_tilemap->mark_tile_dirty((offset & 0x7ff) >> 1);
 		else if (offset >= 0x1000 && offset <= 0x15ff)
-			psychic5_change_palette(machine(), (offset >> 1) & 0x3ff, offset-0x1000);
+			psychic5_change_palette((offset >> 1) & 0x3ff, offset-0x1000);
 	}
 }
 
@@ -296,16 +293,15 @@ VIDEO_RESET_MEMBER(psychic5_state,bombsa)
   Screen refresh
 ***************************************************************************/
 
-#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, cliprect, machine.gfx[0], code, color, flipx, flipy, sx, sy, 15);
+#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(bitmap, cliprect, machine().gfx[0], code, color, flipx, flipy, sx, sy, 15);
 
-static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void psychic5_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	psychic5_state *state = machine.driver_data<psychic5_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 16)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 16)
 	{
 		int attr  = spriteram[offs + 13];
 		int code  = spriteram[offs + 14] | ((attr & 0xc0) << 2);
@@ -319,7 +315,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 		if (attr & 0x01) sx -= 256;
 		if (attr & 0x04) sy -= 256;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 224 - sx;
 			sy = 224 - sy;
@@ -344,7 +340,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 		}
 		else
 		{
-			if (state->flip_screen())
+			if (flip_screen())
 				DRAW_SPRITE(code, sx + 16, sy + 16)
 			else
 				DRAW_SPRITE(code, sx, sy)
@@ -352,70 +348,69 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	}
 }
 
-static void draw_background(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void psychic5_state::draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	psychic5_state *state = machine.driver_data<psychic5_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 
 	rectangle clip = cliprect;
 
-	set_background_palette_intensity(machine);
+	set_background_palette_intensity();
 
-	if (!(state->m_title_screen & 1))
+	if (!(m_title_screen & 1))
 	{
-		state->m_bg_clip_mode = 0;
-		state->m_sx1 = state->m_sy1 = state->m_sy2 = 0;
+		m_bg_clip_mode = 0;
+		m_sx1 = m_sy1 = m_sy2 = 0;
 	}
 	else
 	{
-		int sy1_old = state->m_sy1;
-		int sx1_old = state->m_sx1;
-		int sy2_old = state->m_sy2;
+		int sy1_old = m_sy1;
+		int sx1_old = m_sx1;
+		int sy2_old = m_sy2;
 
-		state->m_sy1 = spriteram[11];       /* sprite 0 */
-		state->m_sx1 = spriteram[12];
-		state->m_sy2 = spriteram[11+128];   /* sprite 8 */
+		m_sy1 = spriteram[11];       /* sprite 0 */
+		m_sx1 = spriteram[12];
+		m_sy2 = spriteram[11+128];   /* sprite 8 */
 
-		switch (state->m_bg_clip_mode)
+		switch (m_bg_clip_mode)
 		{
-		case  0: case  4: if (sy1_old != state->m_sy1) state->m_bg_clip_mode++; break;
-		case  2: case  6: if (sy2_old != state->m_sy2) state->m_bg_clip_mode++; break;
+		case  0: case  4: if (sy1_old != m_sy1) m_bg_clip_mode++; break;
+		case  2: case  6: if (sy2_old != m_sy2) m_bg_clip_mode++; break;
 		case  8: case 10:
-		case 12: case 14: if (sx1_old != state->m_sx1) state->m_bg_clip_mode++; break;
-		case  1: case  5: if (state->m_sy1 == 0xf0) state->m_bg_clip_mode++; break;
-		case  3: case  7: if (state->m_sy2 == 0xf0) state->m_bg_clip_mode++; break;
-		case  9: case 11: if (state->m_sx1 == 0xf0) state->m_bg_clip_mode++; break;
-		case 13: case 15: if (sx1_old == 0xf0) state->m_bg_clip_mode++;
-		case 16: if (state->m_sy1 != 0x00) state->m_bg_clip_mode = 0; break;
+		case 12: case 14: if (sx1_old != m_sx1) m_bg_clip_mode++; break;
+		case  1: case  5: if (m_sy1 == 0xf0) m_bg_clip_mode++; break;
+		case  3: case  7: if (m_sy2 == 0xf0) m_bg_clip_mode++; break;
+		case  9: case 11: if (m_sx1 == 0xf0) m_bg_clip_mode++; break;
+		case 13: case 15: if (sx1_old == 0xf0) m_bg_clip_mode++;
+		case 16: if (m_sy1 != 0x00) m_bg_clip_mode = 0; break;
 		}
 
-		switch (state->m_bg_clip_mode)
+		switch (m_bg_clip_mode)
 		{
 		case  0: case  4: case  8: case 12: case 16:
 			clip.set(0, 0, 0, 0);
 			break;
-		case  1: clip.min_y = state->m_sy1; break;
-		case  3: clip.max_y = state->m_sy2; break;
-		case  5: clip.max_y = state->m_sy1; break;
-		case  7: clip.min_y = state->m_sy2; break;
-		case  9: case 15: clip.min_x = state->m_sx1; break;
-		case 11: case 13: clip.max_x = state->m_sx1; break;
+		case  1: clip.min_y = m_sy1; break;
+		case  3: clip.max_y = m_sy2; break;
+		case  5: clip.max_y = m_sy1; break;
+		case  7: clip.min_y = m_sy2; break;
+		case  9: case 15: clip.min_x = m_sx1; break;
+		case 11: case 13: clip.max_x = m_sx1; break;
 		}
 
-		if (state->flip_screen())
+		if (flip_screen())
 			clip.set(255 - clip.max_x, 255 - clip.min_x, 255 - clip.max_y, 255 - clip.min_y);
 	}
 
-	state->m_bg_tilemap->draw(bitmap, clip, 0, 0);
+	m_bg_tilemap->draw(bitmap, clip, 0, 0);
 }
 
 UINT32 psychic5_state::screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
 	if (m_bg_status & 1)    /* Backgound enable */
-		draw_background(machine(), bitmap, cliprect);
+		draw_background(bitmap, cliprect);
 	if (!(m_title_screen & 1))
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -426,7 +421,7 @@ UINT32 psychic5_state::screen_update_bombsa(screen_device &screen, bitmap_rgb32 
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
 		bitmap.fill(machine().pens[0x0ff], cliprect);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

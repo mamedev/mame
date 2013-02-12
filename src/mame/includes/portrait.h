@@ -27,4 +27,6 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_portrait(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	inline void get_tile_info( tile_data &tileinfo, int tile_index, const UINT8 *source );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

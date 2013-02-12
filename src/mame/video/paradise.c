@@ -39,14 +39,13 @@ WRITE8_MEMBER(paradise_state::tgtball_flipscreen_w)
 }
 
 /* Note: Penky updates pixel palette bank register BEFORE actually writing to the paletteram. */
-static void update_pix_palbank(running_machine &machine)
+void paradise_state::update_pix_palbank()
 {
-	paradise_state *state = machine.driver_data<paradise_state>();
 	int i;
 
 	for (i = 0; i < 15; i++)
-		palette_set_color_rgb(machine, 0x800 + i, state->m_paletteram[0x200 + state->m_pixbank + i + 0x800 * 0], state->m_paletteram[0x200 + state->m_pixbank + i + 0x800 * 1],
-								state->m_paletteram[0x200 + state->m_pixbank + i + 0x800 * 2]);
+		palette_set_color_rgb(machine(), 0x800 + i, m_paletteram[0x200 + m_pixbank + i + 0x800 * 0], m_paletteram[0x200 + m_pixbank + i + 0x800 * 1],
+								m_paletteram[0x200 + m_pixbank + i + 0x800 * 2]);
 }
 
 /* 800 bytes for red, followed by 800 bytes for green & 800 bytes for blue */
@@ -57,7 +56,7 @@ WRITE8_MEMBER(paradise_state::paradise_palette_w)
 	palette_set_color_rgb(machine(), offset, m_paletteram[offset + 0x800 * 0], m_paletteram[offset + 0x800 * 1],
 		m_paletteram[offset + 0x800 * 2]);
 
-	update_pix_palbank(machine());
+	update_pix_palbank();
 }
 
 /***************************************************************************
@@ -86,7 +85,7 @@ WRITE8_MEMBER(paradise_state::paradise_palbank_w)
 
 	m_pixbank = bank2;
 
-	update_pix_palbank(machine());
+	update_pix_palbank();
 
 	if (m_palbank != bank1)
 	{
@@ -180,12 +179,11 @@ WRITE8_MEMBER(paradise_state::paradise_priority_w)
 	m_priority = data;
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void paradise_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	paradise_state *state = machine.driver_data<paradise_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int i;
-	for (i = 0; i < state->m_spriteram.bytes() ; i += state->m_sprite_inc)
+	for (i = 0; i < m_spriteram.bytes() ; i += m_sprite_inc)
 	{
 		int code = spriteram[i + 0];
 		int x    = spriteram[i + 1];
@@ -195,26 +193,26 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = 0;  // ?
 		int flipy = 0;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			x = 0xf0 - x;   flipx = !flipx;
 			y = 0xf0 - y;   flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				code + (attr << 8),
 				0,
 				flipx, flipy,
 				x,y, 0xff );
 
 		/* wrap around x */
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				code + (attr << 8),
 				0,
 				flipx, flipy,
 				x - 256,y, 0xff );
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				code + (attr << 8),
 				0,
 				flipx, flipy,
@@ -253,7 +251,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 	if (m_priority & 1)
 		if (layers_ctrl & 16)
-			draw_sprites(screen.machine(), bitmap, cliprect);
+			draw_sprites(bitmap, cliprect);
 
 	if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0, 0);
 	if (layers_ctrl & 2)    m_tilemap_1->draw(bitmap, cliprect, 0, 0);
@@ -263,7 +261,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 	{
 		if (!(m_priority & 1))
 			if (layers_ctrl & 16)
-				draw_sprites(screen.machine(), bitmap, cliprect);
+				draw_sprites(bitmap, cliprect);
 		if (layers_ctrl & 8)
 			m_tilemap_2->draw(bitmap, cliprect, 0, 0);
 	}
@@ -273,7 +271,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 			m_tilemap_2->draw(bitmap, cliprect, 0, 0);
 		if (!(m_priority & 1))
 			if (layers_ctrl & 16)
-				draw_sprites(screen.machine(), bitmap, cliprect);
+				draw_sprites(bitmap, cliprect);
 	}
 	return 0;
 }
@@ -287,14 +285,14 @@ UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &
 		return 0;
 
 	if (m_priority & 1)
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 
 	m_tilemap_1->draw(bitmap, cliprect, 0,0);
 
 	if (m_priority & 4)
 	{
 		if (!(m_priority & 1))
-			draw_sprites(machine(), bitmap, cliprect);
+			draw_sprites(bitmap, cliprect);
 
 		m_tilemap_2->draw(bitmap, cliprect, 0, 0);
 	}
@@ -303,7 +301,7 @@ UINT32 paradise_state::screen_update_torus(screen_device &screen, bitmap_ind16 &
 		m_tilemap_2->draw(bitmap, cliprect, 0, 0);
 
 		if (!(m_priority & 1))
-			draw_sprites(machine(), bitmap,cliprect);
+			draw_sprites(bitmap,cliprect);
 	}
 	return 0;
 }
@@ -315,6 +313,6 @@ UINT32 paradise_state::screen_update_madball(screen_device &screen, bitmap_ind16
 	m_tilemap_0->draw(bitmap, cliprect, 0, 0);
 	m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 	m_tilemap_2->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

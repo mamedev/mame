@@ -79,10 +79,9 @@ WRITE16_MEMBER(pushman_state::pushman_videoram_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void pushman_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	pushman_state *state = machine.driver_data<pushman_state>();
-	UINT16 *spriteram = state->m_spriteram;
+	UINT16 *spriteram = m_spriteram;
 	int offs, x, y, color, sprite, flipx, flipy;
 
 	for (offs = 0x0800 - 4; offs >=0; offs -= 4)
@@ -101,7 +100,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		flipx = spriteram[offs + 1] & 2;
 		flipy = spriteram[offs + 1] & 1;    /* flip y untested */
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			x = 240 - x;
 			y = 240 - y;
@@ -109,7 +108,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1], sprite,
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1], sprite,
 				color, flipx, flipy, x, y, 15);
 	}
 }
@@ -121,7 +120,7 @@ UINT32 pushman_state::screen_update_pushman(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap->set_scrolly(0, 0xf00 - m_control[1]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

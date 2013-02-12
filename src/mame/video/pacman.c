@@ -147,21 +147,20 @@ TILE_GET_INFO_MEMBER(pacman_state::pacman_get_tile_info)
 
 ***************************************************************************/
 
-static void init_save_state(running_machine &machine)
+void pacman_state::init_save_state()
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
-	state_save_register_global(machine, state->m_charbank);
-	state_save_register_global(machine, state->m_spritebank);
-	state_save_register_global(machine, state->m_palettebank);
-	state_save_register_global(machine, state->m_colortablebank);
-	state_save_register_global(machine, state->m_flipscreen);
-	state_save_register_global(machine, state->m_bgpriority);
+	state_save_register_global(machine(), m_charbank);
+	state_save_register_global(machine(), m_spritebank);
+	state_save_register_global(machine(), m_palettebank);
+	state_save_register_global(machine(), m_colortablebank);
+	state_save_register_global(machine(), m_flipscreen);
+	state_save_register_global(machine(), m_bgpriority);
 }
 
 
 VIDEO_START_MEMBER(pacman_state,pacman)
 {
-	init_save_state(machine());
+	init_save_state();
 
 	m_charbank = 0;
 	m_spritebank = 0;
@@ -316,7 +315,7 @@ UINT32 pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &b
 
 VIDEO_START_MEMBER(pacman_state,pengo)
 {
-	init_save_state(machine());
+	init_save_state();
 
 	m_charbank = 0;
 	m_spritebank = 0;
@@ -382,7 +381,7 @@ TILE_GET_INFO_MEMBER(pacman_state::s2650_get_tile_info)
 
 VIDEO_START_MEMBER(pacman_state,s2650games)
 {
-	init_save_state(machine());
+	init_save_state();
 
 	m_charbank = 0;
 	m_spritebank = 0;
@@ -525,33 +524,32 @@ TILE_GET_INFO_MEMBER(pacman_state::jrpacman_get_tile_info)
 	SET_TILE_INFO_MEMBER(0,code,attr,0);
 }
 
-static void jrpacman_mark_tile_dirty( running_machine &machine, int offset )
+void pacman_state::jrpacman_mark_tile_dirty( int offset )
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
 	if( offset < 0x20 )
 	{
 		/* line color - mark whole line as dirty */
 		int i;
 		for( i = 2 * 0x20; i < 56 * 0x20; i += 0x20 )
 		{
-			state->m_bg_tilemap->mark_tile_dirty(offset + i );
+			m_bg_tilemap->mark_tile_dirty(offset + i );
 		}
 	}
 	else if (offset < 1792)
 	{
 		/* tiles for playfield */
-		state->m_bg_tilemap->mark_tile_dirty(offset );
+		m_bg_tilemap->mark_tile_dirty(offset );
 	}
 	else
 	{
 		/* tiles & colors for top and bottom two rows */
-		state->m_bg_tilemap->mark_tile_dirty(offset & ~0x80 );
+		m_bg_tilemap->mark_tile_dirty(offset & ~0x80 );
 	}
 }
 
 VIDEO_START_MEMBER(pacman_state,jrpacman)
 {
-	init_save_state(machine());
+	init_save_state();
 
 	m_charbank = 0;
 	m_spritebank = 0;
@@ -571,7 +569,7 @@ VIDEO_START_MEMBER(pacman_state,jrpacman)
 WRITE8_MEMBER(pacman_state::jrpacman_videoram_w)
 {
 	m_videoram[offset] = data;
-	jrpacman_mark_tile_dirty(machine(), offset);
+	jrpacman_mark_tile_dirty(offset);
 }
 
 WRITE8_MEMBER(pacman_state::jrpacman_charbank_w)

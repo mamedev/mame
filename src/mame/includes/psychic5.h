@@ -48,4 +48,9 @@ public:
 	UINT32 screen_update_psychic5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_bombsa(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(psychic5_scanline);
+	void psychic5_change_palette(int color, int offset);
+	void psychic5_change_bg_palette(int color, int lo_offs, int hi_offs);
+	void set_background_palette_intensity();
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

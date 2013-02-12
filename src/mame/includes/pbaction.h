@@ -54,4 +54,5 @@ public:
 	UINT32 screen_update_pbaction(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pbaction_interrupt);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

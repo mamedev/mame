@@ -31,7 +31,7 @@ HgKairak: 86010000 1f201918 a0000000 Large Screen
 
 
 /* --- SPRITES --- */
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 scr )
+void psikyo4_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 scr )
 {
 	/*- Sprite Format 0x0000 - 0x2bff -**
 
@@ -52,15 +52,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	**- End Sprite Format -*/
 
-	psikyo4_state *state = machine.driver_data<psikyo4_state>();
-	gfx_element *gfx = machine.gfx[0];
-	UINT32 *source = state->m_spriteram;
-	UINT16 *list = (UINT16 *)state->m_spriteram.target() + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
+	gfx_element *gfx = machine().gfx[0];
+	UINT32 *source = m_spriteram;
+	UINT16 *list = (UINT16 *)m_spriteram.target() + 0x2c00/2 + 0x04/2; /* 0x2c00/0x2c02 what are these for, pointers? one for each screen */
 	UINT16 listlen = (0xc00/2 - 0x04/2), listcntr = 0;
 	int flipscreen1, flipscreen2;
 
-	flipscreen1 = (((state->m_vidregs[1] >> 30) & 2) == 2) ? 1 : 0;
-	flipscreen2 = (((state->m_vidregs[1] >> 22) & 2) == 2) ? 1 : 0;
+	flipscreen1 = (((m_vidregs[1] >> 30) & 2) == 2) ? 1 : 0;
+	flipscreen2 = (((m_vidregs[1] >> 22) & 2) == 2) ? 1 : 0;
 
 	while (listcntr < listlen)
 	{
@@ -99,7 +98,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			if ((!scr && flipscreen1) || (scr && flipscreen2))
 			{
-				ypos = machine.primary_screen->visible_area().max_y + 1 - ypos - high * 16; /* Screen Height depends on game */
+				ypos = machine().primary_screen->visible_area().max_y + 1 - ypos - high * 16; /* Screen Height depends on game */
 				xpos = 40 * 8 - xpos - wide * 16;
 				flipx = !flipx;
 				flipy = !flipy;
@@ -130,14 +129,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 psikyo4_state::screen_update_psikyo4_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1000, cliprect);
-	draw_sprites(machine(), bitmap, cliprect, 0x0000);
+	draw_sprites(bitmap, cliprect, 0x0000);
 	return 0;
 }
 
 UINT32 psikyo4_state::screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1001, cliprect);
-	draw_sprites(machine(), bitmap, cliprect, 0x2000);
+	draw_sprites(bitmap, cliprect, 0x2000);
 	return 0;
 }
 

@@ -106,10 +106,9 @@ WRITE8_MEMBER(parodius_state::parodius_sh_irqtrigger_w)
 
 #if 0
 
-static void sound_nmi_callback( running_machine &machine, int param )
+void parodius_state::sound_nmi_callback( int param )
 {
-	parodius_state *state = machine.driver_data<parodius_state>();
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ( state->m_nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ( m_nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
 
 	nmi_enabled = 0;
 }

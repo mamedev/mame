@@ -42,18 +42,17 @@ void policetr_state::video_start()
  *
  *************************************/
 
-static void render_display_list(running_machine &machine, offs_t offset)
+void policetr_state::render_display_list(offs_t offset)
 {
-	policetr_state *state = machine.driver_data<policetr_state>();
 	/* mask against the R3000 address space */
 	offset &= 0x1fffffff;
 
 	/* loop over all items */
 	while (offset != 0x1fffffff)
 	{
-		UINT32 *entry = &state->m_rambase[offset / 4];
+		UINT32 *entry = &m_rambase[offset / 4];
 		UINT32 srcx = entry[0] & 0xfffffff;
-		UINT32 srcy = entry[1] & ((state->m_srcbitmap_height_mask << 16) | 0xffff);
+		UINT32 srcy = entry[1] & ((m_srcbitmap_height_mask << 16) | 0xffff);
 		UINT32 srcxstep = entry[2];
 		UINT32 srcystep = entry[3];
 		int dstw = (entry[4] & 0x1ff) + 1;
@@ -65,43 +64,43 @@ static void render_display_list(running_machine &machine, offs_t offset)
 		UINT32 curx, cury;
 		int x, y;
 
-		if (dstx > state->m_render_clip.max_x)
+		if (dstx > m_render_clip.max_x)
 		{
 			dstw -= (512 - dstx);
 			dstx = 0;
 		}
 		/* apply X clipping */
-		if (dstx < state->m_render_clip.min_x)
+		if (dstx < m_render_clip.min_x)
 		{
-			srcx += srcxstep * (state->m_render_clip.min_x - dstx);
-			dstw -= state->m_render_clip.min_x - dstx;
-			dstx = state->m_render_clip.min_x;
+			srcx += srcxstep * (m_render_clip.min_x - dstx);
+			dstw -= m_render_clip.min_x - dstx;
+			dstx = m_render_clip.min_x;
 		}
-		if (dstx + dstw > state->m_render_clip.max_x)
-			dstw = state->m_render_clip.max_x - dstx + 1;
+		if (dstx + dstw > m_render_clip.max_x)
+			dstw = m_render_clip.max_x - dstx + 1;
 
 		/* apply Y clipping */
-		if (dsty < state->m_render_clip.min_y)
+		if (dsty < m_render_clip.min_y)
 		{
-			srcy += srcystep * (state->m_render_clip.min_y - dsty);
-			dsth -= state->m_render_clip.min_y - dsty;
-			dsty = state->m_render_clip.min_y;
+			srcy += srcystep * (m_render_clip.min_y - dsty);
+			dsth -= m_render_clip.min_y - dsty;
+			dsty = m_render_clip.min_y;
 		}
-		if (dsty + dsth > state->m_render_clip.max_y)
-			dsth = state->m_render_clip.max_y - dsty + 1;
+		if (dsty + dsth > m_render_clip.max_y)
+			dsth = m_render_clip.max_y - dsty + 1;
 
 		/* special case for fills */
 		if (srcxstep == 0 && srcystep == 0)
 		{
 			/* prefetch the pixel */
-			UINT8 pixel = state->m_srcbitmap[((srcy >> 16) * state->m_srcbitmap_height_mask) * SRCBITMAP_WIDTH + (srcx >> 16) % SRCBITMAP_WIDTH];
+			UINT8 pixel = m_srcbitmap[((srcy >> 16) * m_srcbitmap_height_mask) * SRCBITMAP_WIDTH + (srcx >> 16) % SRCBITMAP_WIDTH];
 			pixel = color | (pixel & mask);
 
 			/* loop over rows and columns */
 			if (dstw > 0)
 				for (y = 0; y < dsth; y++)
 				{
-					UINT8 *dst = &state->m_dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
+					UINT8 *dst = &m_dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
 					memset(dst, pixel, dstw);
 				}
 		}
@@ -112,8 +111,8 @@ static void render_display_list(running_machine &machine, offs_t offset)
 			/* loop over rows */
 			for (y = 0, cury = srcy; y < dsth; y++, cury += srcystep)
 			{
-				UINT8 *src = &state->m_srcbitmap[((cury >> 16) & state->m_srcbitmap_height_mask) * SRCBITMAP_WIDTH];
-				UINT8 *dst = &state->m_dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
+				UINT8 *src = &m_srcbitmap[((cury >> 16) & m_srcbitmap_height_mask) * SRCBITMAP_WIDTH];
+				UINT8 *dst = &m_dstbitmap[(dsty + y) * DSTBITMAP_WIDTH + dstx];
 
 				/* loop over columns */
 				for (x = 0, curx = srcx; x < dstw; x++, curx += srcxstep)
@@ -149,7 +148,7 @@ WRITE32_MEMBER(policetr_state::policetr_video_w)
 	{
 		/* offset 0 specifies the start address of a display list */
 		case 0:
-			render_display_list(machine(), data);
+			render_display_list(data);
 			break;
 
 		/* offset 1 specifies a latch value in the upper 8 bits */

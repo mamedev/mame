@@ -10,11 +10,6 @@
 #include "includes/nb1413m3.h"
 #include "includes/pastelg.h"
 
-
-static void pastelg_vramflip(running_machine &machine);
-static void pastelg_gfxdraw(running_machine &machine);
-
-
 /******************************************************************************
 
 
@@ -57,10 +52,9 @@ WRITE8_MEMBER(pastelg_state::pastelg_clut_w)
 
 
 ******************************************************************************/
-int pastelg_blitter_src_addr_r(address_space &space)
+int pastelg_state::pastelg_blitter_src_addr_r(address_space &space)
 {
-	pastelg_state *state = space.machine().driver_data<pastelg_state>();
-	return state->m_blitter_src_addr;
+	return m_blitter_src_addr;
 }
 
 WRITE8_MEMBER(pastelg_state::pastelg_blitter_w)
@@ -74,13 +68,13 @@ WRITE8_MEMBER(pastelg_state::pastelg_blitter_w)
 		case 4: m_blitter_sizex = data; break;
 		case 5: m_blitter_sizey = data;
 				/* writing here also starts the blit */
-				pastelg_gfxdraw(machine());
+				pastelg_gfxdraw();
 				break;
 		case 6: m_blitter_direction_x = (data & 0x01) ? 1 : 0;
 				m_blitter_direction_y = (data & 0x02) ? 1 : 0;
 				m_flipscreen = (data & 0x04) ? 0 : 1;
 				m_dispflag = (data & 0x08) ? 0 : 1;
-				pastelg_vramflip(machine());
+				pastelg_vramflip();
 				break;
 	}
 }
@@ -126,28 +120,27 @@ WRITE8_MEMBER(pastelg_state::pastelg_romsel_w)
 
 
 ******************************************************************************/
-static void pastelg_vramflip(running_machine &machine)
+void pastelg_state::pastelg_vramflip()
 {
-	pastelg_state *state = machine.driver_data<pastelg_state>();
 	int x, y;
 	UINT8 color1, color2;
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	if (state->m_flipscreen == state->m_flipscreen_old) return;
+	if (m_flipscreen == m_flipscreen_old) return;
 
 	for (y = 0; y < height; y++)
 	{
 		for (x = 0; x < width; x++)
 		{
-			color1 = state->m_videoram[(y * width) + x];
-			color2 = state->m_videoram[((y ^ 0xff) * width) + (x ^ 0xff)];
-			state->m_videoram[(y * width) + x] = color2;
-			state->m_videoram[((y ^ 0xff) * width) + (x ^ 0xff)] = color1;
+			color1 = m_videoram[(y * width) + x];
+			color2 = m_videoram[((y ^ 0xff) * width) + (x ^ 0xff)];
+			m_videoram[(y * width) + x] = color2;
+			m_videoram[((y ^ 0xff) * width) + (x ^ 0xff)] = color1;
 		}
 	}
 
-	state->m_flipscreen_old = state->m_flipscreen;
+	m_flipscreen_old = m_flipscreen;
 }
 
 TIMER_CALLBACK_MEMBER(pastelg_state::blitter_timer_callback)
@@ -155,11 +148,10 @@ TIMER_CALLBACK_MEMBER(pastelg_state::blitter_timer_callback)
 	nb1413m3_busyflag = 1;
 }
 
-static void pastelg_gfxdraw(running_machine &machine)
+void pastelg_state::pastelg_gfxdraw()
 {
-	pastelg_state *state = machine.driver_data<pastelg_state>();
-	UINT8 *GFX = state->memregion("gfx1")->base();
-	int width = machine.primary_screen->width();
+	UINT8 *GFX = memregion("gfx1")->base();
+	int width = machine().primary_screen->width();
 
 	int x, y;
 	int dx, dy;
@@ -174,36 +166,36 @@ static void pastelg_gfxdraw(running_machine &machine)
 
 	nb1413m3_busyctr = 0;
 
-	startx = state->m_blitter_destx + state->m_blitter_sizex;
-	starty = state->m_blitter_desty + state->m_blitter_sizey;
+	startx = m_blitter_destx + m_blitter_sizex;
+	starty = m_blitter_desty + m_blitter_sizey;
 
 
-	if (state->m_blitter_direction_x)
+	if (m_blitter_direction_x)
 	{
-		if (state->m_blitter_sizex&0x80) sizex = 0xff-state->m_blitter_sizex;
-		else sizex=state->m_blitter_sizex;
+		if (m_blitter_sizex&0x80) sizex = 0xff-m_blitter_sizex;
+		else sizex=m_blitter_sizex;
 		incx = 1;
 	}
 	else
 	{
-		sizex = state->m_blitter_sizex;
+		sizex = m_blitter_sizex;
 		incx = -1;
 	}
 
-	if (state->m_blitter_direction_y)
+	if (m_blitter_direction_y)
 	{
-		if (state->m_blitter_sizey&0x80) sizey = 0xff-state->m_blitter_sizey;
-		else sizey=state->m_blitter_sizey;
+		if (m_blitter_sizey&0x80) sizey = 0xff-m_blitter_sizey;
+		else sizey=m_blitter_sizey;
 		incy = 1;
 	}
 	else
 	{
-		sizey = state->m_blitter_sizey;
+		sizey = m_blitter_sizey;
 		incy = -1;
 	}
 
-	gfxlen = machine.root_device().memregion("gfx1")->bytes();
-	gfxaddr = (state->m_gfxrom << 16) + state->m_blitter_src_addr;
+	gfxlen = machine().root_device().memregion("gfx1")->bytes();
+	gfxaddr = (m_gfxrom << 16) + m_blitter_src_addr;
 
 	readflag = 0;
 
@@ -216,7 +208,7 @@ static void pastelg_gfxdraw(running_machine &machine)
 
 		for (ctrx = sizex; ctrx >= 0; ctrx--)
 		{
-			gfxaddr = (state->m_gfxrom << 16) + ((state->m_blitter_src_addr + count));
+			gfxaddr = (m_gfxrom << 16) + ((m_blitter_src_addr + count));
 
 			if ((gfxaddr > (gfxlen - 1)))
 			{
@@ -231,7 +223,7 @@ static void pastelg_gfxdraw(running_machine &machine)
 			dx = x & 0xff;
 			dy = y & 0xff;
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				dx ^= 0xff;
 				dy ^= 0xff;
@@ -251,20 +243,20 @@ static void pastelg_gfxdraw(running_machine &machine)
 
 			readflag ^= 1;
 
-			if (state->m_clut[color] & 0xf0)
+			if (m_clut[color] & 0xf0)
 			{
 				if (color)
 				{
-					color = ((state->m_palbank * 0x10) + color);
-					state->m_videoram[(dy * width) + dx] = color;
+					color = ((m_palbank * 0x10) + color);
+					m_videoram[(dy * width) + dx] = color;
 				}
 			}
 			else
 			{
-				if(state->m_clut[color] != 0)
+				if(m_clut[color] != 0)
 				{
-					color = ((state->m_palbank * 0x10) + state->m_clut[color]);
-					state->m_videoram[(dy * width) + dx] = color;
+					color = ((m_palbank * 0x10) + m_clut[color]);
+					m_videoram[(dy * width) + dx] = color;
 				}
 			}
 
@@ -276,7 +268,7 @@ static void pastelg_gfxdraw(running_machine &machine)
 	}
 
 	nb1413m3_busyflag = 0;
-	machine.scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, timer_expired_delegate(FUNC(pastelg_state::blitter_timer_callback),state));
+	machine().scheduler().timer_set(attotime::from_hz(400000) * nb1413m3_busyctr, timer_expired_delegate(FUNC(pastelg_state::blitter_timer_callback),this));
 }
 
 /******************************************************************************

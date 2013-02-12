@@ -5768,12 +5768,11 @@ ROM_END
  *
  *************************************/
 
-static void maketrax_rom_decode(running_machine &machine)
+void pacman_state::maketrax_rom_decode()
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x4000);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
@@ -5798,15 +5797,14 @@ DRIVER_INIT_MEMBER(pacman_state,maketrax)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5080, 0x50bf, read8_delegate(FUNC(pacman_state::maketrax_special_port2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::maketrax_special_port3_r),this));
 
-	maketrax_rom_decode(machine());
+	maketrax_rom_decode();
 }
 
-static void korosuke_rom_decode(running_machine &machine)
+void pacman_state::korosuke_rom_decode()
 {
-	pacman_state *state = machine.driver_data<pacman_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
-	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x4000);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
@@ -5831,7 +5829,7 @@ DRIVER_INIT_MEMBER(pacman_state,korosuke)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x5080, 0x5080, read8_delegate(FUNC(pacman_state::korosuke_special_port2_r),this));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::korosuke_special_port3_r),this));
 
-	korosuke_rom_decode(machine());
+	korosuke_rom_decode();
 }
 
 DRIVER_INIT_MEMBER(pacman_state,ponpoko)
@@ -5870,7 +5868,7 @@ DRIVER_INIT_MEMBER(pacman_state,ponpoko)
 	}
 }
 
-static void eyes_decode(UINT8 *data)
+void pacman_state::eyes_decode(UINT8 *data)
 {
 	int j;
 	UINT8 swapbuffer[8];
@@ -5917,7 +5915,7 @@ DRIVER_INIT_MEMBER(pacman_state,eyes)
 #define BITSWAP11(val,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
 	BITSWAP16(val,15,14,13,12,11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0)
 
-static void mspacman_install_patches(UINT8 *ROM)
+void pacman_state::mspacman_install_patches(UINT8 *ROM)
 {
 	int i;
 

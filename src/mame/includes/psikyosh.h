@@ -3,18 +3,18 @@
 #define MASTER_CLOCK 57272700   // main oscillator frequency
 
 /* Psikyo PS6406B */
-#define FLIPSCREEN (((state->m_vidregs[3] & 0x0000c000) == 0x0000c000) ? 1:0)
-#define DISPLAY_DISABLE (((state->m_vidregs[2] & 0x0000000f) == 0x00000006) ? 1:0)
-#define BG_LARGE(n) (((state->m_vidregs[7] << (4*n)) & 0x00001000 ) ? 1:0)
-#define BG_DEPTH_8BPP(n) (((state->m_vidregs[7] << (4*n)) & 0x00004000 ) ? 1:0)
-#define BG_LAYER_ENABLE(n) (((state->m_vidregs[7] << (4*n)) & 0x00008000 ) ? 1:0)
+#define FLIPSCREEN (((m_vidregs[3] & 0x0000c000) == 0x0000c000) ? 1:0)
+#define DISPLAY_DISABLE (((m_vidregs[2] & 0x0000000f) == 0x00000006) ? 1:0)
+#define BG_LARGE(n) (((m_vidregs[7] << (4*n)) & 0x00001000 ) ? 1:0)
+#define BG_DEPTH_8BPP(n) (((m_vidregs[7] << (4*n)) & 0x00004000 ) ? 1:0)
+#define BG_LAYER_ENABLE(n) (((m_vidregs[7] << (4*n)) & 0x00008000 ) ? 1:0)
 
-#define BG_TYPE(n) (((state->m_vidregs[6] << (8*n)) & 0x7f000000 ) >> 24)
-#define BG_LINE(n) (((state->m_vidregs[6] << (8*n)) & 0x80000000 ) ? 1:0)
+#define BG_TYPE(n) (((m_vidregs[6] << (8*n)) & 0x7f000000 ) >> 24)
+#define BG_LINE(n) (((m_vidregs[6] << (8*n)) & 0x80000000 ) ? 1:0)
 
 #define BG_TRANSPEN MAKE_ARGB(0x00,0xff,0x00,0xff) // used for representing transparency in temporary bitmaps
 
-#define SPRITE_PRI(n) (((state->m_vidregs[2] << (4*n)) & 0xf0000000 ) >> 28)
+#define SPRITE_PRI(n) (((m_vidregs[2] << (4*n)) & 0xf0000000 ) >> 28)
 
 
 class psikyosh_state : public driver_device
@@ -67,4 +67,17 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_psikyosh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(psikyosh_interrupt);
+	void draw_scanline32_alpha(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr, int alpha);
+	void draw_scanline32_argb(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr);
+	void draw_scanline32_transpen(bitmap_rgb32 &bitmap, INT32 destx, INT32 desty, INT32 length, const UINT32 *srcptr);
+	void draw_bglayer( int layer, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 req_pri );
+	void cache_bitmap(int scanline, gfx_element *gfx, int size, int tilebank, int alpha, int *last_bank);
+	void draw_bglayerscroll( int layer, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 req_pri );
+	void draw_background( bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 req_pri );
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 req_pri);
+	void psikyosh_prelineblend( bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	void psikyosh_postlineblend( bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 req_pri );
+	void psikyosh_drawgfxzoom( bitmap_rgb32 &dest_bmp,const rectangle &clip,gfx_element *gfx,
+			UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
+			int alpha, int zoomx, int zoomy, int wide, int high, UINT32 z);	
 };

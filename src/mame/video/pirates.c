@@ -67,11 +67,10 @@ WRITE16_MEMBER(pirates_state::pirates_bg_tileram_w)
 
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void pirates_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	pirates_state *state = machine.driver_data<pirates_state>();
-	gfx_element *gfx = machine.gfx[1];
-	UINT16 *source = state->m_spriteram + 4;
+	gfx_element *gfx = machine().gfx[1];
+	UINT16 *source = m_spriteram + 4;
 	UINT16 *finish = source + 0x800/2-4;
 
 	while( source<finish )
@@ -106,7 +105,7 @@ UINT32 pirates_state::screen_update_pirates(screen_device &screen, bitmap_ind16 
 	m_fg_tilemap->set_scrollx(0,m_scroll[0]);
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

@@ -117,10 +117,9 @@ o fedcba9876543210
 
 3 xxxx............ color+priority, other bits unknown
 */
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int foreground )
+void prehisle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int foreground )
 {
-	prehisle_state *state = machine.driver_data<prehisle_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 
 	for (offs = 0; offs < 1024; offs += 4)
@@ -138,7 +137,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		if (sx&0x100) sx=-0x100+(sx&0xff);
 		if (sy&0x100) sy=-0x100+(sy&0xff);
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -148,7 +147,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		if ((foreground && priority) || (!foreground && !priority))
 		{
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[3], code, color, flipx, flipy, sx, sy, 15);
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[3], code, color, flipx, flipy, sx, sy, 15);
 		}
 	}
 }
@@ -156,9 +155,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 prehisle_state::screen_update_prehisle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, 0);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect, 1);
+	draw_sprites(bitmap, cliprect, 1);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

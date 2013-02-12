@@ -49,9 +49,8 @@ enum { TYPE_SKYSKIPR, TYPE_POPEYE };
   The bootleg is the same, but the outputs are not inverted.
 
 ***************************************************************************/
-static void convert_color_prom(running_machine &machine,const UINT8 *color_prom)
+void popeye_state::convert_color_prom(const UINT8 *color_prom)
 {
-	popeye_state *state = machine.driver_data<popeye_state>();
 	int i;
 
 
@@ -65,22 +64,22 @@ static void convert_color_prom(running_machine &machine,const UINT8 *color_prom)
 		int bit0,bit1,bit2,r,g,b;
 
 		/* red component */
-		bit0 = ((color_prom[prom_offs] ^ state->m_invertmask) >> 0) & 0x01;
-		bit1 = ((color_prom[prom_offs] ^ state->m_invertmask) >> 1) & 0x01;
-		bit2 = ((color_prom[prom_offs] ^ state->m_invertmask) >> 2) & 0x01;
+		bit0 = ((color_prom[prom_offs] ^ m_invertmask) >> 0) & 0x01;
+		bit1 = ((color_prom[prom_offs] ^ m_invertmask) >> 1) & 0x01;
+		bit2 = ((color_prom[prom_offs] ^ m_invertmask) >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* green component */
-		bit0 = ((color_prom[prom_offs] ^ state->m_invertmask) >> 3) & 0x01;
-		bit1 = ((color_prom[prom_offs] ^ state->m_invertmask) >> 4) & 0x01;
-		bit2 = ((color_prom[prom_offs] ^ state->m_invertmask) >> 5) & 0x01;
+		bit0 = ((color_prom[prom_offs] ^ m_invertmask) >> 3) & 0x01;
+		bit1 = ((color_prom[prom_offs] ^ m_invertmask) >> 4) & 0x01;
+		bit2 = ((color_prom[prom_offs] ^ m_invertmask) >> 5) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* blue component */
 		bit0 = 0;
-		bit1 = ((color_prom[prom_offs] ^ state->m_invertmask) >> 6) & 0x01;
-		bit2 = ((color_prom[prom_offs] ^ state->m_invertmask) >> 7) & 0x01;
+		bit1 = ((color_prom[prom_offs] ^ m_invertmask) >> 6) & 0x01;
+		bit2 = ((color_prom[prom_offs] ^ m_invertmask) >> 7) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,16 + (2 * i) + 1,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),16 + (2 * i) + 1,MAKE_RGB(r,g,b));
 	}
 
 	color_prom += 32;
@@ -92,22 +91,22 @@ static void convert_color_prom(running_machine &machine,const UINT8 *color_prom)
 
 
 		/* red component */
-		bit0 = ((color_prom[0] ^ state->m_invertmask) >> 0) & 0x01;
-		bit1 = ((color_prom[0] ^ state->m_invertmask) >> 1) & 0x01;
-		bit2 = ((color_prom[0] ^ state->m_invertmask) >> 2) & 0x01;
+		bit0 = ((color_prom[0] ^ m_invertmask) >> 0) & 0x01;
+		bit1 = ((color_prom[0] ^ m_invertmask) >> 1) & 0x01;
+		bit2 = ((color_prom[0] ^ m_invertmask) >> 2) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* green component */
-		bit0 = ((color_prom[0] ^ state->m_invertmask) >> 3) & 0x01;
-		bit1 = ((color_prom[256] ^ state->m_invertmask) >> 0) & 0x01;
-		bit2 = ((color_prom[256] ^ state->m_invertmask) >> 1) & 0x01;
+		bit0 = ((color_prom[0] ^ m_invertmask) >> 3) & 0x01;
+		bit1 = ((color_prom[256] ^ m_invertmask) >> 0) & 0x01;
+		bit2 = ((color_prom[256] ^ m_invertmask) >> 1) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 		/* blue component */
 		bit0 = 0;
-		bit1 = ((color_prom[256] ^ state->m_invertmask) >> 2) & 0x01;
-		bit2 = ((color_prom[256] ^ state->m_invertmask) >> 3) & 0x01;
+		bit1 = ((color_prom[256] ^ m_invertmask) >> 2) & 0x01;
+		bit2 = ((color_prom[256] ^ m_invertmask) >> 3) & 0x01;
 		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,48+i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),48+i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -118,7 +117,7 @@ void popeye_state::palette_init()
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	m_invertmask = 0xff;
 
-	convert_color_prom(machine(),color_prom);
+	convert_color_prom(color_prom);
 }
 
 PALETTE_INIT_MEMBER(popeye_state,popeyebl)
@@ -126,14 +125,13 @@ PALETTE_INIT_MEMBER(popeye_state,popeyebl)
 	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
 	m_invertmask = 0x00;
 
-	convert_color_prom(machine(),color_prom);
+	convert_color_prom(color_prom);
 }
 
-static void set_background_palette(running_machine &machine,int bank)
+void popeye_state::set_background_palette(int bank)
 {
-	popeye_state *state = machine.driver_data<popeye_state>();
 	int i;
-	UINT8 *color_prom = state->memregion("proms")->base() + 16 * bank;
+	UINT8 *color_prom = memregion("proms")->base() + 16 * bank;
 
 	for (i = 0;i < 16;i++)
 	{
@@ -141,20 +139,20 @@ static void set_background_palette(running_machine &machine,int bank)
 		int r,g,b;
 
 		/* red component */
-		bit0 = ((*color_prom ^ state->m_invertmask) >> 0) & 0x01;
-		bit1 = ((*color_prom ^ state->m_invertmask) >> 1) & 0x01;
-		bit2 = ((*color_prom ^ state->m_invertmask) >> 2) & 0x01;
+		bit0 = ((*color_prom ^ m_invertmask) >> 0) & 0x01;
+		bit1 = ((*color_prom ^ m_invertmask) >> 1) & 0x01;
+		bit2 = ((*color_prom ^ m_invertmask) >> 2) & 0x01;
 		r = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
 		/* green component */
-		bit0 = ((*color_prom ^ state->m_invertmask) >> 3) & 0x01;
-		bit1 = ((*color_prom ^ state->m_invertmask) >> 4) & 0x01;
-		bit2 = ((*color_prom ^ state->m_invertmask) >> 5) & 0x01;
+		bit0 = ((*color_prom ^ m_invertmask) >> 3) & 0x01;
+		bit1 = ((*color_prom ^ m_invertmask) >> 4) & 0x01;
+		bit2 = ((*color_prom ^ m_invertmask) >> 5) & 0x01;
 		g = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
 		/* blue component */
 		bit0 = 0;
-		bit1 = ((*color_prom ^ state->m_invertmask) >> 6) & 0x01;
-		bit2 = ((*color_prom ^ state->m_invertmask) >> 7) & 0x01;
-		if (state->m_bitmap_type == TYPE_SKYSKIPR)
+		bit1 = ((*color_prom ^ m_invertmask) >> 6) & 0x01;
+		bit2 = ((*color_prom ^ m_invertmask) >> 7) & 0x01;
+		if (m_bitmap_type == TYPE_SKYSKIPR)
 		{
 			/* Sky Skipper has different weights */
 			bit0 = bit1;
@@ -162,7 +160,7 @@ static void set_background_palette(running_machine &machine,int bank)
 		}
 		b = 0x1c * bit0 + 0x31 * bit1 + 0x47 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),i,MAKE_RGB(r,g,b));
 
 		color_prom++;
 	}
@@ -273,51 +271,49 @@ VIDEO_START_MEMBER(popeye_state,popeye)
 	state_save_register_global_pointer(machine(), m_bitmapram, popeye_bitmapram_size);
 }
 
-static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void popeye_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	popeye_state *state = machine.driver_data<popeye_state>();
 	int offs;
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	if (state->m_lastflip != state->flip_screen())
+	if (m_lastflip != flip_screen())
 	{
 		for (offs = 0;offs < popeye_bitmapram_size;offs++)
-			state->popeye_bitmap_w(space,offs,state->m_bitmapram[offs]);
+			popeye_bitmap_w(space,offs,m_bitmapram[offs]);
 
-		state->m_lastflip = state->flip_screen();
+		m_lastflip = flip_screen();
 	}
 
-	set_background_palette(machine, (*state->m_palettebank & 0x08) >> 3);
+	set_background_palette((*m_palettebank & 0x08) >> 3);
 
-	if (state->m_background_pos[1] == 0)    /* no background */
+	if (m_background_pos[1] == 0)    /* no background */
 		bitmap.fill(0, cliprect);
 	else
 	{
 		/* copy the background graphics */
-		int scrollx = 200 - state->m_background_pos[0] - 256*(state->m_background_pos[2]&1); /* ??? */
-		int scrolly = 2 * (256 - state->m_background_pos[1]);
+		int scrollx = 200 - m_background_pos[0] - 256*(m_background_pos[2]&1); /* ??? */
+		int scrolly = 2 * (256 - m_background_pos[1]);
 
-		if (state->m_bitmap_type == TYPE_SKYSKIPR)
+		if (m_bitmap_type == TYPE_SKYSKIPR)
 			scrollx = 2*scrollx - 512;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
-			if (state->m_bitmap_type == TYPE_POPEYE)
+			if (m_bitmap_type == TYPE_POPEYE)
 				scrollx = -scrollx;
 			scrolly = -scrolly;
 		}
 
-		copyscrollbitmap(bitmap,*state->m_tmpbitmap2,1,&scrollx,1,&scrolly,cliprect);
+		copyscrollbitmap(bitmap,*m_tmpbitmap2,1,&scrollx,1,&scrolly,cliprect);
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void popeye_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	popeye_state *state = machine.driver_data<popeye_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram.bytes();offs += 4)
+	for (offs = 0;offs < m_spriteram.bytes();offs += 4)
 	{
 		int code,color,flipx,flipy,sx,sy;
 
@@ -335,8 +331,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		code = (spriteram[offs + 2] & 0x7f) + ((spriteram[offs + 3] & 0x10) << 3)
 							+ ((spriteram[offs + 3] & 0x04) << 6);
-		color = (spriteram[offs + 3] & 0x07) + 8*(*state->m_palettebank & 0x07);
-		if (state->m_bitmap_type == TYPE_SKYSKIPR)
+		color = (spriteram[offs + 3] & 0x07) + 8*(*m_palettebank & 0x07);
+		if (m_bitmap_type == TYPE_SKYSKIPR)
 		{
 			/* Two of the PROM address pins are tied together and one is not connected... */
 			color = (color & 0x0f) | ((color & 0x08) << 1);
@@ -348,7 +344,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sx = 2*(spriteram[offs])-8;
 		sy = 2*(256-spriteram[offs + 1]);
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			flipx = !flipx;
 			flipy = !flipy;
@@ -357,7 +353,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		}
 
 		if (spriteram[offs] != 0)
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					code ^ 0x1ff,
 					color,
 					flipx,flipy,
@@ -367,8 +363,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 popeye_state::screen_update_popeye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(machine(), bitmap, cliprect);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_background(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

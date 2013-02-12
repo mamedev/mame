@@ -21,7 +21,7 @@ WRITE8_MEMBER(portrait_state::portrait_fgvideo_write)
 	m_fgvideoram[offset] = data;
 }
 
-INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, const UINT8 *source )
+inline void portrait_state::get_tile_info( tile_data &tileinfo, int tile_index, const UINT8 *source )
 {
 	int attr    = source[tile_index*2+0];
 	int tilenum = source[tile_index*2+1];
@@ -49,17 +49,17 @@ INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int ti
 	else
 		color = ((tilenum&0xff)>>1)+0x80;
 
-	SET_TILE_INFO( 0, tilenum, color, flags );
+	SET_TILE_INFO_MEMBER( 0, tilenum, color, flags );
 }
 
 TILE_GET_INFO_MEMBER(portrait_state::get_bg_tile_info)
 {
-	get_tile_info( machine(), tileinfo, tile_index, m_bgvideoram );
+	get_tile_info(tileinfo, tile_index, m_bgvideoram );
 }
 
 TILE_GET_INFO_MEMBER(portrait_state::get_fg_tile_info)
 {
-	get_tile_info( machine(), tileinfo, tile_index, m_fgvideoram );
+	get_tile_info(tileinfo, tile_index, m_fgvideoram );
 }
 
 void portrait_state::video_start()
@@ -125,10 +125,9 @@ void portrait_state::palette_init()
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void portrait_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	portrait_state *state = machine.driver_data<portrait_state>();
-	UINT8 *source = state->m_spriteram;
+	UINT8 *source = m_spriteram;
 	UINT8 *finish = source + 0x200;
 
 	while( source < finish )
@@ -151,7 +150,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		if(attr & 0x08) sy |= 0x100;
 
-		sx += (source - state->m_spriteram) - 8;
+		sx += (source - m_spriteram) - 8;
 		sx &= 0x1ff;
 
 		sy = (512 - 64) - sy;
@@ -163,11 +162,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			break;
 
 		case 0x40:
-			sy -= state->m_scroll;
+			sy -= m_scroll;
 			break;
 
 		case 0x80:
-			sy -= state->m_scroll;
+			sy -= m_scroll;
 			break;
 
 		case 0xc0:
@@ -175,7 +174,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				tilenum,color,
 				0,fy,
 				sx,sy,7);
@@ -203,6 +202,6 @@ UINT32 portrait_state::screen_update_portrait(screen_device &screen, bitmap_ind1
 	m_background->draw(bitmap, cliprect_scroll, 0, 0);
 	m_foreground->draw(bitmap, cliprect_scroll, 0, 0);
 
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	return 0;
 }
