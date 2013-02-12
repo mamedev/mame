@@ -979,4 +979,57 @@
 		</part>
 	</software>
 
+	<!-- Test -->
+
+	<software name="tsuit215">
+		<description>C64 Emulator Test Suite (v2.15)</description>
+		<year>1997</year>
+		<publisher>Wolfgang Lorenz</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="174848">
+				<rom name="tsuit215-1.d64" size="174848" crc="CF1070B7" sha1="E7D31E4F55B771AA9595B27D294C72BC205E8770" offset="0" />
+			</dataarea>
+		</part>
+	
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="174848">
+				<rom name="tsuit215-2.d64" size="174848" crc="12430B99" sha1="A9522A3971D7E331412DFAD52C297881AE4CEA3C" offset="0" />
+			</dataarea>
+		</part>
+	
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="174848">
+				<rom name="tsuit215-3.d64" size="174848" crc="C5898390" sha1="23E1AE5419983ED993D49B9D6D8FDD27B3632856" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Demos -->
+
+	<software name="2ndreal">
+		<description>Second Reality</description>
+		<year>1997</year>
+		<publisher>Smash Designs &amp; The Obsessed Maniacs</publisher>
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="174848">
+				<rom name="2nd1.d64" size="174848" crc="1dded14f" sha1="73d0d46fa4adf85a0bd7f55583f06d41b76c8e82" offset="0" />
+			</dataarea>
+		</part>
+	
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="174848">
+				<rom name="2nd2.d64" size="174848" crc="222c5b50" sha1="ea440448a32fe7a2e952e3265450b10c25233729" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
