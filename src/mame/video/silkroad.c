@@ -7,11 +7,10 @@
 /* Clean Up */
 /* is theres a bg colour register? */
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void silkroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	silkroad_state *state = machine.driver_data<silkroad_state>();
-	gfx_element *gfx = machine.gfx[0];
-	UINT32 *source = state->m_sprram;
+	gfx_element *gfx = machine().gfx[0];
+	UINT32 *source = m_sprram;
 	UINT32 *finish = source + 0x1000/4;
 
 	while( source < finish )
@@ -37,14 +36,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		{
 			for (wcount=0;wcount<width;wcount++)
 			{
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,machine.priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+wcount,color,0,0,xpos+wcount*16+8,ypos,machine().priority_bitmap,pri_mask,0);
 			}
 		}
 		else
 		{
 			for (wcount=width;wcount>0;wcount--)
 			{
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,machine.priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tileno+(width-wcount),color,1,0,xpos+wcount*16-16+8,ypos,machine().priority_bitmap,pri_mask,0);
 			}
 		}
 
@@ -146,7 +145,7 @@ UINT32 silkroad_state::screen_update_silkroad(screen_device &screen, bitmap_ind1
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg2_tilemap->draw(bitmap, cliprect, 0,1);
 	m_fg3_tilemap->draw(bitmap, cliprect, 0,2);
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 
 	if (0)
 	{

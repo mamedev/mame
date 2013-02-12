@@ -90,24 +90,23 @@ WRITE8_MEMBER(simpsons_state::simpsons_k053247_w)
 	else m_xtraram[offset - 0x1000] = data;
 }
 
-void simpsons_video_banking( running_machine &machine, int bank )
+void simpsons_state::simpsons_video_banking( int bank )
 {
-	simpsons_state *state = machine.driver_data<simpsons_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	if (bank & 1)
 	{
 		space.install_read_bank(0x0000, 0x0fff, "bank5");
-		space.install_write_handler(0x0000, 0x0fff, write8_delegate(FUNC(simpsons_state::paletteram_xBBBBBGGGGGRRRRR_byte_be_w), state));
-		state->membank("bank5")->set_base(state->m_generic_paletteram_8);
+		space.install_write_handler(0x0000, 0x0fff, write8_delegate(FUNC(simpsons_state::paletteram_xBBBBBGGGGGRRRRR_byte_be_w), this));
+		membank("bank5")->set_base(m_generic_paletteram_8);
 	}
 	else
-		space.install_legacy_readwrite_handler(*state->m_k052109, 0x0000, 0x0fff, FUNC(k052109_r), FUNC(k052109_w));
+		space.install_legacy_readwrite_handler(*m_k052109, 0x0000, 0x0fff, FUNC(k052109_r), FUNC(k052109_w));
 
 	if (bank & 2)
-		space.install_readwrite_handler(0x2000, 0x3fff, read8_delegate(FUNC(simpsons_state::simpsons_k053247_r),state), write8_delegate(FUNC(simpsons_state::simpsons_k053247_w),state));
+		space.install_readwrite_handler(0x2000, 0x3fff, read8_delegate(FUNC(simpsons_state::simpsons_k053247_r),this), write8_delegate(FUNC(simpsons_state::simpsons_k053247_w),this));
 	else
-		space.install_readwrite_handler(0x2000, 0x3fff, read8_delegate(FUNC(simpsons_state::simpsons_k052109_r),state), write8_delegate(FUNC(simpsons_state::simpsons_k052109_w),state));
+		space.install_readwrite_handler(0x2000, 0x3fff, read8_delegate(FUNC(simpsons_state::simpsons_k052109_r),this), write8_delegate(FUNC(simpsons_state::simpsons_k052109_w),this));
 }
 
 

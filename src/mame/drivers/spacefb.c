@@ -143,17 +143,15 @@ TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
 }
 
 
-static void create_interrupt_timer(running_machine &machine)
+void spacefb_state::create_interrupt_timer()
 {
-	spacefb_state *state = machine.driver_data<spacefb_state>();
-	state->m_interrupt_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefb_state::interrupt_callback),state));
+	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(spacefb_state::interrupt_callback),this));
 }
 
 
-static void start_interrupt_timer(running_machine &machine)
+void spacefb_state::start_interrupt_timer()
 {
-	spacefb_state *state = machine.driver_data<spacefb_state>();
-	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(SPACEFB_INT_TRIGGER_COUNT_1));
+	m_interrupt_timer->adjust(machine().primary_screen->time_until_pos(SPACEFB_INT_TRIGGER_COUNT_1));
 }
 
 
@@ -166,7 +164,7 @@ static void start_interrupt_timer(running_machine &machine)
 
 void spacefb_state::machine_start()
 {
-	create_interrupt_timer(machine());
+	create_interrupt_timer();
 }
 
 
@@ -185,7 +183,7 @@ void spacefb_state::machine_reset()
 	spacefb_port_1_w(space, 0, 0);
 	spacefb_port_2_w(space, 0, 0);
 
-	start_interrupt_timer(machine());
+	start_interrupt_timer();
 }
 
 

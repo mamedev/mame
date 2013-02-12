@@ -48,4 +48,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_sf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	inline int sf_invert( int nb );
+	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
+	void write_dword( address_space &space, offs_t offset, UINT32 data );
 };

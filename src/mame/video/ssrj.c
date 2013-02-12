@@ -224,16 +224,15 @@ void ssrj_state::video_start()
 }
 
 
-static void draw_objects(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void ssrj_state::draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	ssrj_state *state = machine.driver_data<ssrj_state>();
 	int i,j,k,x,y;
 
 	for(i=0;i<6;i++)
 	{
-		y = state->m_buffer_spriteram[0x80+20*i];
-		x = state->m_buffer_spriteram[0x80+20*i+2];
-		if (!state->m_buffer_spriteram[0x80+20*i+3])
+		y = m_buffer_spriteram[0x80+20*i];
+		x = m_buffer_spriteram[0x80+20*i+2];
+		if (!m_buffer_spriteram[0x80+20*i+3])
 		{
 			for(k=0;k<5;k++,x+=8)
 			{
@@ -242,9 +241,9 @@ static void draw_objects(running_machine &machine, bitmap_ind16 &bitmap, const r
 					int code;
 					int offs = (i * 5 + k) * 64 + (31 - j) * 2;
 
-					code = state->m_vram3[offs] + 256 * state->m_vram3[offs + 1];
+					code = m_vram3[offs] + 256 * m_vram3[offs + 1];
 					drawgfx_transpen(bitmap,
-						cliprect,machine.gfx[0],
+						cliprect,machine().gfx[0],
 						code&1023,
 						((code>>12)&0x3)+8,
 						code&0x4000,
@@ -272,7 +271,7 @@ UINT32 ssrj_state::screen_update_ssrj(screen_device &screen, bitmap_ind16 &bitma
 	m_tilemap1->set_scrollx(0, 0xff-m_scrollram[2] );
 	m_tilemap1->set_scrolly(0, m_scrollram[0] );
 	m_tilemap1->draw(bitmap, cliprect, 0, 0);
-	draw_objects(machine(), bitmap, cliprect);
+	draw_objects(bitmap, cliprect);
 	m_tilemap2->draw(bitmap, cliprect, 0, 0);
 
 	if (m_scrollram[0x101] == 0xb) m_tilemap4->draw(bitmap, cliprect, 0, 0);/* hack to display 4th tilemap */

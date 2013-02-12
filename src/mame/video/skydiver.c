@@ -162,9 +162,8 @@ WRITE8_MEMBER(skydiver_state::skydiver_2000_201F_w)
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void skydiver_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	skydiver_state *state = machine.driver_data<skydiver_state>();
 	int pic;
 
 
@@ -178,12 +177,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int color;
 		int wide;
 
-		sx = 29*8 - state->m_videoram[pic + 0x0390];
-		sy = 30*8 - state->m_videoram[pic*2 + 0x0398];
-		charcode = state->m_videoram[pic*2 + 0x0399];
+		sx = 29*8 - m_videoram[pic + 0x0390];
+		sy = 30*8 - m_videoram[pic*2 + 0x0398];
+		charcode = m_videoram[pic*2 + 0x0399];
 		xflip = charcode & 0x10;
 		yflip = charcode & 0x08;
-		wide = (~pic & 0x02) && state->m_width;
+		wide = (~pic & 0x02) && m_width;
 		charcode = (charcode & 0x07) | ((charcode & 0x60) >> 2);
 		color = pic & 0x01;
 
@@ -192,7 +191,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			sx -= 8;
 		}
 
-		drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfxzoom_transpen(bitmap,cliprect,machine().gfx[1],
 			charcode, color,
 			xflip,yflip,sx,sy,
 			wide ? 0x20000 : 0x10000, 0x10000,0);
@@ -204,6 +203,6 @@ UINT32 skydiver_state::screen_update_skydiver(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

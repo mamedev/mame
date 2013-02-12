@@ -59,7 +59,7 @@ void skullxbo_state::scanline_update(screen_device &screen, int scanline)
 	}
 
 	/* update the playfield and motion objects */
-	skullxbo_scanline_update(machine(), scanline);
+	skullxbo_scanline_update(scanline);
 }
 
 

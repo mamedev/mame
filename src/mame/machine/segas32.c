@@ -33,11 +33,11 @@ const UINT8 ga2_v25_opcode_table[256] = {
 
 #undef xxxx
 
-void decrypt_ga2_protrom(running_machine &machine)
+void segas32_state::decrypt_ga2_protrom()
 {
 	int i;
-	UINT8 *rom = machine.root_device().memregion("mcu")->base();
-	UINT8* temp = auto_alloc_array(machine, UINT8, 0x100000);
+	UINT8 *rom = machine().root_device().memregion("mcu")->base();
+	UINT8* temp = auto_alloc_array(machine(), UINT8, 0x100000);
 
 	// make copy of ROM so original can be overwritten
 	memcpy(temp, rom, 0x10000);
@@ -46,7 +46,7 @@ void decrypt_ga2_protrom(running_machine &machine)
 	for(i = 0; i < 0x10000; i++)
 		rom[i] = temp[BITSWAP16(i, 14, 11, 15, 12, 13, 4, 3, 7, 5, 10, 2, 8, 9, 6, 1, 0)];
 
-	auto_free(machine, temp);
+	auto_free(machine(), temp);
 }
 
 WRITE16_MEMBER(segas32_state::ga2_dpram_w)

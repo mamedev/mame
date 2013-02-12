@@ -475,29 +475,26 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static void set_tile_bank( running_machine &machine, int data )
+void segas1x_bootleg_state::set_tile_bank( int data )
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
-	state->m_tile_bank0 = (data >> 4) & 0x0f;
-	state->m_tile_bank1 = data & 0x0f;
+	m_tile_bank0 = (data >> 4) & 0x0f;
+	m_tile_bank1 = data & 0x0f;
 }
 
-static void set_fg_page( running_machine &machine, int data )
+void segas1x_bootleg_state::set_fg_page( int data )
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
-	state->m_fg_page[0] = data >> 12;
-	state->m_fg_page[1] = (data >> 8) & 0x0f;
-	state->m_fg_page[2] = (data >> 4) & 0x0f;
-	state->m_fg_page[3] = data & 0x0f;
+	m_fg_page[0] = data >> 12;
+	m_fg_page[1] = (data >> 8) & 0x0f;
+	m_fg_page[2] = (data >> 4) & 0x0f;
+	m_fg_page[3] = data & 0x0f;
 }
 
-static void set_bg_page( running_machine &machine, int data )
+void segas1x_bootleg_state::set_bg_page( int data )
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
-	state->m_bg_page[0] = data >> 12;
-	state->m_bg_page[1] = (data >> 8) & 0x0f;
-	state->m_bg_page[2] = (data >> 4) & 0x0f;
-	state->m_bg_page[3] = data & 0x0f;
+	m_bg_page[0] = data >> 12;
+	m_bg_page[1] = (data >> 8) & 0x0f;
+	m_bg_page[2] = (data >> 4) & 0x0f;
+	m_bg_page[3] = data & 0x0f;
 }
 
 #ifdef UNUSED_CODE
@@ -536,12 +533,12 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(segas1x_bootleg_state::s16bl_bgpage_w)
 {
-	set_bg_page(machine(), data);
+	set_bg_page(data);
 }
 
 WRITE16_MEMBER(segas1x_bootleg_state::s16bl_fgpage_w)
 {
-	set_fg_page(machine(), data);
+	set_fg_page(data);
 }
 
 WRITE16_MEMBER(segas1x_bootleg_state::s16bl_fgscrollx_bank_w)
@@ -550,7 +547,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::s16bl_fgscrollx_bank_w)
 	int bank = (data & 0xc000) >> 14;
 
 	scroll += 0x200;
-	set_tile_bank(machine(), bank);
+	set_tile_bank(bank);
 
 	scroll += 3; // so that the character portraits in attract mode are properly aligned (alighnment on character select no longer matches original tho?)
 	m_fg_scrollx = -scroll;
@@ -636,49 +633,48 @@ static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0x902002, 0x902003) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
 
-static void datsu_set_pages( running_machine &machine )
+void segas1x_bootleg_state::datsu_set_pages(  )
 {
-	segas1x_bootleg_state *state = machine.driver_data<segas1x_bootleg_state>();
 	UINT16 page;
 
-	page = ((state->m_datsu_page[0] & 0x00f0) >>0) |
-			((state->m_datsu_page[1] & 0x00f0) >>4) |
-			((state->m_datsu_page[2] & 0x00f0) <<8) |
-			((state->m_datsu_page[3] & 0x00f0) <<4);
+	page = ((m_datsu_page[0] & 0x00f0) >>0) |
+			((m_datsu_page[1] & 0x00f0) >>4) |
+			((m_datsu_page[2] & 0x00f0) <<8) |
+			((m_datsu_page[3] & 0x00f0) <<4);
 
 
-	set_fg_page(machine, page);
+	set_fg_page(page);
 
-	page = ((state->m_datsu_page[0] & 0x000f) <<4) |
-			((state->m_datsu_page[1] & 0x000f) <<0) |
-			((state->m_datsu_page[2] & 0x000f) <<12) |
-			((state->m_datsu_page[3] & 0x000f) <<8);
+	page = ((m_datsu_page[0] & 0x000f) <<4) |
+			((m_datsu_page[1] & 0x000f) <<0) |
+			((m_datsu_page[2] & 0x000f) <<12) |
+			((m_datsu_page[3] & 0x000f) <<8);
 
-	set_bg_page(machine, page);
+	set_bg_page(page);
 }
 
 WRITE16_MEMBER(segas1x_bootleg_state::datsu_page0_w)
 {
 	COMBINE_DATA(&m_datsu_page[0]);
-	datsu_set_pages(machine());
+	datsu_set_pages();
 }
 
 WRITE16_MEMBER(segas1x_bootleg_state::datsu_page1_w)
 {
 	COMBINE_DATA(&m_datsu_page[1]);
-	datsu_set_pages(machine());
+	datsu_set_pages();
 }
 
 WRITE16_MEMBER(segas1x_bootleg_state::datsu_page2_w)
 {
 	COMBINE_DATA(&m_datsu_page[2]);
-	datsu_set_pages(machine());
+	datsu_set_pages();
 }
 
 WRITE16_MEMBER(segas1x_bootleg_state::datsu_page3_w)
 {
 	COMBINE_DATA(&m_datsu_page[3]);
-	datsu_set_pages(machine());
+	datsu_set_pages();
 }
 
 static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16, segas1x_bootleg_state )
@@ -737,7 +733,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_fgscrollx_w)
 	int scroll = data & 0x1ff;
 	int bank = (data & 0xc000) >> 14;
 
-	set_tile_bank(machine(),  bank);
+	set_tile_bank(bank);
 	scroll += 0x1f6;
 	scroll &= 0x3ff;
 	m_fg_scrollx = -scroll;
@@ -780,7 +776,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_fgpage_w)
 			((m_goldnaxeb2_fgpage[3] & 0xf) << 8) |
 			((m_goldnaxeb2_fgpage[2] & 0xf) << 12);
 
-	set_fg_page(machine(), page ^ 0xffff);
+	set_fg_page(page ^ 0xffff);
 
 }
 
@@ -795,7 +791,7 @@ WRITE16_MEMBER(segas1x_bootleg_state::goldnaxeb2_bgpage_w)
 			((m_goldnaxeb2_bgpage[3] & 0xf) << 8) |
 			((m_goldnaxeb2_bgpage[2] & 0xf) << 12);
 
-	set_bg_page(machine(), page ^ 0xffff);
+	set_bg_page(page ^ 0xffff);
 }
 
 static ADDRESS_MAP_START( goldnaxeb2_map, AS_PROGRAM, 16, segas1x_bootleg_state )

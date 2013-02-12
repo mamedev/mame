@@ -106,14 +106,13 @@ WRITE8_MEMBER(srumbler_state::srumbler_scroll_w)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void srumbler_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	srumbler_state *state = machine.driver_data<srumbler_state>();
-	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
+	UINT8 *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
 	/* Draw the sprites. */
-	for (offs = state->m_spriteram->bytes()-4; offs>=0;offs -= 4)
+	for (offs = m_spriteram->bytes()-4; offs>=0;offs -= 4)
 	{
 		/* SPRITES
 		=====
@@ -138,17 +137,17 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sx = buffered_spriteram[offs + 3] + 0x100 * ( attr & 0x01);
 		flipy = attr & 0x02;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 496 - sx;
 			sy = 240 - sy;
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 				code,
 				colour,
-				state->flip_screen(),flipy,
+				flip_screen(),flipy,
 				sx, sy,15);
 	}
 }
@@ -157,7 +156,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 UINT32 srumbler_state::screen_update_srumbler(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;

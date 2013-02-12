@@ -247,7 +247,7 @@ READ8_MEMBER(srmp2_state::vox_status_r)
 }
 
 
-static UINT8 iox_key_matrix_calc(running_machine &machine,UINT8 p_side)
+UINT8 srmp2_state::iox_key_matrix_calc(UINT8 p_side)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 	int i, j, t;
@@ -258,7 +258,7 @@ static UINT8 iox_key_matrix_calc(running_machine &machine,UINT8 p_side)
 
 		for (t = 0 ; t < 8 ; t ++)
 		{
-			if (!(machine.root_device().ioport(keynames[j+p_side])->read() & ( 1 << t )))
+			if (!(machine().root_device().ioport(keynames[j+p_side])->read() & ( 1 << t )))
 			{
 				return (i + t) | (p_side ? 0x20 : 0x00);
 			}
@@ -297,8 +297,8 @@ READ8_MEMBER(srmp2_state::iox_mux_r)
 		/* both side checks */
 		if(iox.mux == 1)
 		{
-			UINT8 p1_side = iox_key_matrix_calc(machine(),0);
-			UINT8 p2_side = iox_key_matrix_calc(machine(),4);
+			UINT8 p1_side = iox_key_matrix_calc(0);
+			UINT8 p2_side = iox_key_matrix_calc(4);
 
 			if(p1_side != 0)
 				return p1_side;
@@ -307,7 +307,7 @@ READ8_MEMBER(srmp2_state::iox_mux_r)
 		}
 
 		/* check individual input side */
-		return iox_key_matrix_calc(machine(),(iox.mux == 2) ? 0 : 4);
+		return iox_key_matrix_calc((iox.mux == 2) ? 0 : 4);
 	}
 
 	return ioport("SERVICE")->read() & 0xff;

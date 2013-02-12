@@ -5,12 +5,6 @@
 ***************************************************************************/
 
 
-typedef void (*sys32_output_callback)(int which, UINT16 data);
-struct layer_info
-{
-	bitmap_ind16 *bitmap;
-	UINT8 *transparent;
-};
 
 
 class segas32_state : public driver_device
@@ -31,6 +25,29 @@ public:
 	required_shared_ptr<UINT16> m_system32_videoram;
 	required_shared_ptr<UINT16> m_system32_spriteram;
 
+	typedef void (segas32_state::*sys32_output_callback)(int which, UINT16 data);
+
+	struct layer_info
+	{
+		bitmap_ind16 *bitmap;
+		UINT8 *transparent;
+	};
+
+	struct extents_list
+	{
+		UINT8                   scan_extent[256];
+		UINT16                  extent[32][16];
+	};
+
+
+	struct cache_entry
+	{
+		struct cache_entry *    next;
+		tilemap_t *             tmap;
+		UINT8                   page;
+		UINT8                   bank;
+	};	
+	
 	UINT8 m_v60_irq_control[0x10];
 	timer_device *m_v60_irq_timer[2];
 	UINT8 m_sound_irq_control[4];
@@ -181,6 +198,56 @@ public:
 	TIMER_CALLBACK_MEMBER(end_of_vblank_int);
 	TIMER_CALLBACK_MEMBER(update_sprites);
 	TIMER_DEVICE_CALLBACK_MEMBER(signal_v60_irq_callback);
+	void common_start(int multi32);
+	void system32_set_vblank(int state);
+	inline UINT16 xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(UINT16 value);
+	inline UINT16 xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(UINT16 value);
+	inline void update_color(int offset, UINT16 data);
+	inline UINT16 common_paletteram_r(address_space &space, int which, offs_t offset);
+	void common_paletteram_w(address_space &space, int which, offs_t offset, UINT16 data, UINT16 mem_mask);
+	tilemap_t *find_cache_entry(int page, int bank);
+	inline void get_tilemaps(int bgnum, tilemap_t **tilemaps);
+	UINT8 update_tilemaps(screen_device &screen, const rectangle &cliprect);
+	void sprite_erase_buffer();
+	void sprite_swap_buffers();
+	int draw_one_sprite(UINT16 *data, int xoffs, int yoffs, const rectangle &clipin, const rectangle &clipout);
+	void sprite_render_list();
+	inline UINT8 compute_color_offsets(int which, int layerbit, int layerflag);
+	inline UINT16 compute_sprite_blend(UINT8 encoding);
+	inline UINT16 *get_layer_scanline(int layer, int scanline);
+	void mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 enablemask);
+	void print_mixer_data(int which);
+	UINT32 multi32_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
+	void decrypt_ga2_protrom();
+	void update_irq_state();
+	void signal_v60_irq(int which);
+	void int_control_w(address_space &space, int offset, UINT8 data);
+	UINT16 common_io_chip_r(address_space &space, int which, offs_t offset, UINT16 mem_mask);
+	void common_io_chip_w(address_space &space, int which, offs_t offset, UINT16 data, UINT16 mem_mask);
+	void update_sound_irq_state();
+	void segas32_common_init(read16_delegate custom_r, write16_delegate custom_w);
+	void radm_sw1_output( int which, UINT16 data );
+	void radm_sw2_output( int which, UINT16 data );
+	void radr_sw2_output( int which, UINT16 data );
+	void alien3_sw1_output( int which, UINT16 data );
+	void arescue_sw1_output( int which, UINT16 data );
+	void f1lap_sw1_output( int which, UINT16 data );
+	void jpark_sw1_output( int which, UINT16 data );
+	void orunners_sw1_output( int which, UINT16 data );
+	void orunners_sw2_output( int which, UINT16 data );
+	void harddunk_sw1_output( int which, UINT16 data );
+	void harddunk_sw2_output( int which, UINT16 data );
+	void harddunk_sw3_output( int which, UINT16 data );
+	void titlef_sw1_output( int which, UINT16 data );
+	void titlef_sw2_output( int which, UINT16 data );
+	void scross_sw1_output( int which, UINT16 data );
+	void scross_sw2_output( int which, UINT16 data );
+	int compute_clipping_extents(screen_device &screen, int enable, int clipout, int clipmask, const rectangle &cliprect, struct extents_list *list);
+	void update_tilemap_zoom(screen_device &screen, struct layer_info *layer, const rectangle &cliprect, int bgnum);
+	void update_tilemap_rowscroll(screen_device &screen, struct layer_info *layer, const rectangle &cliprect, int bgnum);
+	void update_tilemap_text(screen_device &screen, struct layer_info *layer, const rectangle &cliprect);
+	void update_bitmap(screen_device &screen, struct layer_info *layer, const rectangle &cliprect);
+	void update_background(struct layer_info *layer, const rectangle &cliprect);
 };
 
 /*----------- defined in machine/segas32.c -----------*/

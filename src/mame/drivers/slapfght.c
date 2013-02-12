@@ -1801,23 +1801,22 @@ READ8_MEMBER(slapfght_state::gtstarb1_port_0_read)
 	return 0;
 }
 
-static void getstar_init( running_machine &machine )
+void slapfght_state::getstar_init(  )
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::getstar_e803_r),state), write8_delegate(FUNC(slapfght_state::getstar_e803_w),state));
-	machine.device("maincpu")->memory().space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_port_00_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::getstar_e803_r),this), write8_delegate(FUNC(slapfght_state::getstar_e803_w),this));
+	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_port_00_r),this));
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,getstar)
 {
 	m_getstar_id = GETSTAR;
-	getstar_init(machine());
+	getstar_init();
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,getstarj)
 {
 	m_getstar_id = GETSTARJ;
-	getstar_init(machine());
+	getstar_init();
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,gtstarb1)
@@ -1825,7 +1824,7 @@ DRIVER_INIT_MEMBER(slapfght_state,gtstarb1)
 	UINT8 *ROM = memregion("maincpu")->base();
 
 	m_getstar_id = GTSTARB1;
-	getstar_init(machine());
+	getstar_init();
 
 	/* specific handlers for this bootleg */
 	machine().device("maincpu")->memory().space(AS_IO).install_read_handler(0x0, 0x0, read8_delegate(FUNC(slapfght_state::gtstarb1_port_0_read),this));
@@ -1839,7 +1838,7 @@ DRIVER_INIT_MEMBER(slapfght_state,gtstarb1)
 DRIVER_INIT_MEMBER(slapfght_state,gtstarb2)
 {
 	m_getstar_id = GTSTARB2;
-	getstar_init(machine());
+	getstar_init();
 }
 
 DRIVER_INIT_MEMBER(slapfght_state,slapfigh)

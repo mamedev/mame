@@ -65,4 +65,8 @@ public:
 	UINT32 screen_update_splash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(roldfrog_interrupt);
+	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void splash_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void roldfrog_update_irq(  );
 };

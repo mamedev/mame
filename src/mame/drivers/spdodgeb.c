@@ -87,9 +87,8 @@ static void spd_adpcm_int(device_t *device)
 
 
 #if 0   // default - more sensitive (state change and timing measured on real board?)
-static void mcu63705_update_inputs(running_machine &machine)
+void spdodgeb_state::mcu63705_update_inputs()
 {
-	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
 	int buttons[2];
 	int p,j;
 
@@ -98,34 +97,34 @@ static void mcu63705_update_inputs(running_machine &machine)
 	{
 		int curr[2][2];
 
-		curr[p][0] = state->ioport(p ? "P2" : "P1")->read() & 0x01;
-		curr[p][1] = state->ioport(p ? "P2" : "P1")->read() & 0x02;
+		curr[p][0] = ioport(p ? "P2" : "P1")->read() & 0x01;
+		curr[p][1] = ioport(p ? "P2" : "P1")->read() & 0x02;
 
 		for (j = 0;j <= 1;j++)
 		{
 			if (curr[p][j] == 0)
 			{
-				if (state->m_prev[p][j] != 0)
-					state->m_countup[p][j] = 0;
+				if (m_prev[p][j] != 0)
+					m_countup[p][j] = 0;
 				if (curr[p][j^1])
-					state->m_countup[p][j] = 100;
-				state->m_countup[p][j]++;
-				state->m_running[p] &= ~(1 << j);
+					m_countup[p][j] = 100;
+				m_countup[p][j]++;
+				m_running[p] &= ~(1 << j);
 			}
 			else
 			{
-				if (state->m_prev[p][j] == 0)
+				if (m_prev[p][j] == 0)
 				{
-					if (state->m_countup[p][j] < 10 && state->m_countdown[p][j] < 5)
-						state->m_running[p] |= 1 << j;
-					state->m_countdown[p][j] = 0;
+					if (m_countup[p][j] < 10 && m_countdown[p][j] < 5)
+						m_running[p] |= 1 << j;
+					m_countdown[p][j] = 0;
 				}
-				state->m_countdown[p][j]++;
+				m_countdown[p][j]++;
 			}
 		}
 
-		state->m_prev[p][0] = curr[p][0];
-		state->m_prev[p][1] = curr[p][1];
+		m_prev[p][0] = curr[p][0];
+		m_prev[p][1] = curr[p][1];
 	}
 
 	/* update jumping and buttons state */
@@ -133,26 +132,25 @@ static void mcu63705_update_inputs(running_machine &machine)
 	{
 		int curr[2];
 
-		curr[p] = machine.root_device().ioport(p ? "P2" : "P1")->read() & 0x30;
+		curr[p] = machine().root_device().ioport(p ? "P2" : "P1")->read() & 0x30;
 
-		if (state->m_jumped[p]) buttons[p] = 0; /* jump only momentarily flips the buttons */
+		if (m_jumped[p]) buttons[p] = 0; /* jump only momentarily flips the buttons */
 		else buttons[p] = curr[p];
 
-		if (buttons[p] == 0x30) state->m_jumped[p] = 1;
-		if (curr[p] == 0x00) state->m_jumped[p] = 0;
+		if (buttons[p] == 0x30) m_jumped[p] = 1;
+		if (curr[p] == 0x00) m_jumped[p] = 0;
 
-		state->m_prev[p] = curr[p];
+		m_prev[p] = curr[p];
 	}
 
-	state->m_inputs[0] = machine.root_device().ioport("P1")->read() & 0xcf;
-	state->m_inputs[1] = machine.root_device().ioport("P2")->read() & 0x0f;
-	state->m_inputs[2] = state->m_running[0] | buttons[0];
-	state->m_inputs[3] = state->m_running[1] | buttons[1];
+	m_inputs[0] = machine().root_device().ioport("P1")->read() & 0xcf;
+	m_inputs[1] = machine().root_device().ioport("P2")->read() & 0x0f;
+	m_inputs[2] = m_running[0] | buttons[0];
+	m_inputs[3] = m_running[1] | buttons[1];
 }
 #else   // alternate - less sensitive
-static void mcu63705_update_inputs(running_machine &machine)
+void spdodgeb_state::mcu63705_update_inputs()
 {
-	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
 #define DBLTAP_TOLERANCE 5
 
 #define R 0x01
@@ -166,40 +164,40 @@ static void mcu63705_update_inputs(running_machine &machine)
 
 	for (p=0; p<=1; p++)
 	{
-		curr_port[p] = state->ioport(p ? "P2" : "P1")->read();
+		curr_port[p] = ioport(p ? "P2" : "P1")->read();
 		curr_dash[p] = 0;
 
 		if (curr_port[p] & R)
 		{
-			if (!(state->m_last_port[p] & R))
+			if (!(m_last_port[p] & R))
 			{
-				if (state->m_tapc[p]) curr_dash[p] |= R; else state->m_tapc[p] = DBLTAP_TOLERANCE;
+				if (m_tapc[p]) curr_dash[p] |= R; else m_tapc[p] = DBLTAP_TOLERANCE;
 			}
-			else if (state->m_last_dash[p] & R) curr_dash[p] |= R;
+			else if (m_last_dash[p] & R) curr_dash[p] |= R;
 		}
 		else if (curr_port[p] & L)
 		{
-			if (!(state->m_last_port[p] & L))
+			if (!(m_last_port[p] & L))
 			{
-				if (state->m_tapc[p+2]) curr_dash[p] |= L; else state->m_tapc[p+2] = DBLTAP_TOLERANCE;
+				if (m_tapc[p+2]) curr_dash[p] |= L; else m_tapc[p+2] = DBLTAP_TOLERANCE;
 			}
-			else if (state->m_last_dash[p] & L) curr_dash[p] |= L;
+			else if (m_last_dash[p] & L) curr_dash[p] |= L;
 		}
 
-		if (curr_port[p] & A && !(state->m_last_port[p] & A)) curr_dash[p] |= A;
-		if (curr_port[p] & D && !(state->m_last_port[p] & D)) curr_dash[p] |= D;
+		if (curr_port[p] & A && !(m_last_port[p] & A)) curr_dash[p] |= A;
+		if (curr_port[p] & D && !(m_last_port[p] & D)) curr_dash[p] |= D;
 
-		state->m_last_port[p] = curr_port[p];
-		state->m_last_dash[p] = curr_dash[p];
+		m_last_port[p] = curr_port[p];
+		m_last_dash[p] = curr_dash[p];
 
-		if (state->m_tapc[p  ]) state->m_tapc[p  ]--;
-		if (state->m_tapc[p+2]) state->m_tapc[p+2]--;
+		if (m_tapc[p  ]) m_tapc[p  ]--;
+		if (m_tapc[p+2]) m_tapc[p+2]--;
 	}
 
-	state->m_inputs[0] = curr_port[0] & 0xcf;
-	state->m_inputs[1] = curr_port[1] & 0x0f;
-	state->m_inputs[2] = curr_dash[0];
-	state->m_inputs[3] = curr_dash[1];
+	m_inputs[0] = curr_port[0] & 0xcf;
+	m_inputs[1] = curr_port[1] & 0x0f;
+	m_inputs[2] = curr_dash[0];
+	m_inputs[3] = curr_dash[1];
 
 #undef DBLTAP_TOLERANCE
 #undef R
@@ -229,7 +227,7 @@ WRITE8_MEMBER(spdodgeb_state::mcu63701_w)
 {
 //  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",space.device().safe_pc(),data);
 	m_mcu63701_command = data;
-	mcu63705_update_inputs(machine());
+	mcu63705_update_inputs();
 }
 
 

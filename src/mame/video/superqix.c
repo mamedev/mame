@@ -156,13 +156,12 @@ WRITE8_MEMBER(superqix_state::superqix_0410_w)
 
 ***************************************************************************/
 
-static void pbillian_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void superqix_state::pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	superqix_state *state = machine.driver_data<superqix_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int attr = spriteram[offs + 3];
 		int code = ((spriteram[offs] & 0xfc) >> 2) + 64 * (attr & 0x0f);
@@ -170,27 +169,26 @@ static void pbillian_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		int sx = spriteram[offs + 1] + 256 * (spriteram[offs] & 0x01);
 		int sy = spriteram[offs + 2];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect, machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect, machine().gfx[1],
 				code,
 				color,
-				state->flip_screen(), state->flip_screen(),
+				flip_screen(), flip_screen(),
 				sx, sy, 0);
 	}
 }
 
-static void superqix_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void superqix_state::superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	superqix_state *state = machine.driver_data<superqix_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int attr = spriteram[offs + 3];
 		int code = spriteram[offs] + 256 * (attr & 0x01);
@@ -200,7 +198,7 @@ static void superqix_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		int sx = spriteram[offs + 1];
 		int sy = spriteram[offs + 2];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -208,7 +206,7 @@ static void superqix_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect, machine.gfx[2],
+		drawgfx_transpen(bitmap,cliprect, machine().gfx[2],
 				code,
 				color,
 				flipx, flipy,
@@ -219,7 +217,7 @@ static void superqix_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 UINT32 superqix_state::screen_update_pbillian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	pbillian_draw_sprites(machine(), bitmap,cliprect);
+	pbillian_draw_sprites(bitmap,cliprect);
 
 	return 0;
 }
@@ -228,7 +226,7 @@ UINT32 superqix_state::screen_update_superqix(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	copybitmap_trans(bitmap,*m_fg_bitmap[m_show_bitmap],flip_screen(),flip_screen(),0,0,cliprect,0);
-	superqix_draw_sprites(machine(), bitmap,cliprect);
+	superqix_draw_sprites(bitmap,cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }

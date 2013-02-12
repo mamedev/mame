@@ -156,7 +156,7 @@ READ8_MEMBER(suprloco_state::suprloco_control_r)
 
 
 
-INLINE void draw_pixel(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip)
+inline void suprloco_state::draw_pixel(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip)
 {
 	if (flip)
 	{
@@ -169,10 +169,9 @@ INLINE void draw_pixel(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int 
 }
 
 
-static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int spr_number)
+void suprloco_state::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect,int spr_number)
 {
-	suprloco_state *state = machine.driver_data<suprloco_state>();
-	int flip = state->flip_screen();
+	int flip = flip_screen();
 	int sx,sy,col,row,height,src,adjy,dy;
 	UINT8 *spr_reg;
 	UINT8 *gfx2;
@@ -180,17 +179,17 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rec
 	short skip; /* bytes to skip before drawing each row (can be negative) */
 
 
-	spr_reg = state->m_spriteram + 0x10 * spr_number;
+	spr_reg = m_spriteram + 0x10 * spr_number;
 
 	src = spr_reg[SPR_GFXOFS_LO] + (spr_reg[SPR_GFXOFS_HI] << 8);
 	skip = spr_reg[SPR_SKIP_LO] + (spr_reg[SPR_SKIP_HI] << 8);
 
 	height      = spr_reg[SPR_Y_BOTTOM] - spr_reg[SPR_Y_TOP];
-	pen_base = 0x100 + 0x10 * (spr_reg[SPR_COL]&0x03) + ((state->m_control & 0x20)?0x100:0);
+	pen_base = 0x100 + 0x10 * (spr_reg[SPR_COL]&0x03) + ((m_control & 0x20)?0x100:0);
 	sx = spr_reg[SPR_X];
 	sy = spr_reg[SPR_Y_TOP] + 1;
 
-	if (!state->flip_screen())
+	if (!flip_screen())
 	{
 		adjy = sy;
 		dy = 1;
@@ -201,7 +200,7 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rec
 		dy = -1;
 	}
 
-	gfx2 = machine.root_device().memregion("gfx2")->base();
+	gfx2 = machine().root_device().memregion("gfx2")->base();
 	for (row = 0;row < height;row++,adjy+=dy)
 	{
 		int color1,color2,flipx;
@@ -244,25 +243,24 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rec
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void suprloco_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	suprloco_state *state = machine.driver_data<suprloco_state>();
 	int spr_number;
 	UINT8 *spr_reg;
 
 
-	for (spr_number = 0;spr_number < (state->m_spriteram.bytes() >> 4);spr_number++)
+	for (spr_number = 0;spr_number < (m_spriteram.bytes() >> 4);spr_number++)
 	{
-		spr_reg = state->m_spriteram + 0x10 * spr_number;
+		spr_reg = m_spriteram + 0x10 * spr_number;
 		if (spr_reg[SPR_X] != 0xff)
-			draw_sprite(machine, bitmap, cliprect, spr_number);
+			draw_sprite(bitmap, cliprect, spr_number);
 	}
 }
 
 UINT32 suprloco_state::screen_update_suprloco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 1,0);
 	return 0;
 }

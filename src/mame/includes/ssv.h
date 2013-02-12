@@ -132,6 +132,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gdfs_interrupt);
 	void update_irq_state();
 	IRQ_CALLBACK_MEMBER(ssv_irq_callback);
+	void draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int scroll);
+	void draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, int  nr);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void ssv_enable_video(int enable);
+	void init_ssv(int interrupt_ultrax);
+	void init_hypreac2_common();
+	void init_st010();
 };
 
 /*----------- defined in video/ssv.c -----------*/

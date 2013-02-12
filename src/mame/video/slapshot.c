@@ -33,7 +33,7 @@ void slapshot_state::video_start()
             SPRITE DRAW ROUTINES
 ************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset )
+void slapshot_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset )
 {
 	/*
 	    Sprite format:
@@ -88,7 +88,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	    000b - 000f : unused
 
 	*/
-	slapshot_state *state = machine.driver_data<slapshot_state>();
 	int x, y, off, extoffs;
 	int code, color, spritedata, spritecont, flipx, flipy;
 	int xcurrent, ycurrent, big_sprite = 0;
@@ -101,19 +100,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
-	struct slapshot_tempsprite *sprite_ptr = state->m_spritelist;
+	struct slapshot_tempsprite *sprite_ptr = m_spritelist;
 
 	/* must remember enable status from last frame because driftout fails to
 	   reactivate them from a certain point onwards. */
-	int disabled = state->m_sprites_disabled;
+	int disabled = m_sprites_disabled;
 
 	/* must remember master scroll from previous frame because driftout
 	   sometimes doesn't set it. */
-	int master_scrollx = state->m_sprites_master_scrollx;
-	int master_scrolly = state->m_sprites_master_scrolly;
+	int master_scrollx = m_sprites_master_scrollx;
+	int master_scrolly = m_sprites_master_scrolly;
 
 	/* must also remember the sprite bank from previous frame. */
-	int area = state->m_sprites_active_area;
+	int area = m_sprites_active_area;
 
 	scroll1x = 0;
 	scroll1y = 0;
@@ -122,12 +121,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	color = 0;
 
 	x_offset = 3;   /* Get rid of 0-3 unwanted pixels on edge of screen. */
-	if (state->m_sprites_flipscreen) x_offset = -x_offset;
+	if (m_sprites_flipscreen) x_offset = -x_offset;
 
 	/* safety check to avoid getting stuck in bank 2 for games using only one bank */
 	if (area == 0x8000 &&
-			state->m_spriteram_buffered[(0x8000 + 6) / 2] == 0 &&
-			state->m_spriteram_buffered[(0x8000 + 10) / 2] == 0)
+			m_spriteram_buffered[(0x8000 + 6) / 2] == 0 &&
+			m_spriteram_buffered[(0x8000 + 10) / 2] == 0)
 		area = 0;
 
 
@@ -136,37 +135,37 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		/* sprites_active_area may change during processing */
 		int offs = off + area;
 
-		if (state->m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
+		if (m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
 		{
-			disabled = state->m_spriteram_buffered[(offs + 10) / 2] & 0x1000;
-			state->m_sprites_flipscreen = state->m_spriteram_buffered[(offs + 10) / 2] & 0x2000;
+			disabled = m_spriteram_buffered[(offs + 10) / 2] & 0x1000;
+			m_sprites_flipscreen = m_spriteram_buffered[(offs + 10) / 2] & 0x2000;
 			x_offset = 3;   /* Get rid of 0-3 unwanted pixels on edge of screen. */
-			if (state->m_sprites_flipscreen) x_offset = -x_offset;
-			area = 0x8000 * (state->m_spriteram_buffered[(offs + 10) / 2] & 0x0001);
+			if (m_sprites_flipscreen) x_offset = -x_offset;
+			area = 0x8000 * (m_spriteram_buffered[(offs + 10) / 2] & 0x0001);
 			continue;
 		}
 
 //popmessage("%04x",area);
 
 		/* check for extra scroll offset */
-		if ((state->m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
+		if ((m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
 		{
-			master_scrollx = state->m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
+			master_scrollx = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
 			if (master_scrollx >= 0x800)
 				master_scrollx -= 0x1000;   /* signed value */
 
-			master_scrolly = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
+			master_scrolly = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
 			if (master_scrolly >= 0x800)
 				master_scrolly -= 0x1000;   /* signed value */
 		}
 
-		if ((state->m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0x5000)
+		if ((m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0x5000)
 		{
-			scroll1x = state->m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
+			scroll1x = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
 			if (scroll1x >= 0x800)
 				scroll1x -= 0x1000;   /* signed value */
 
-			scroll1y = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
+			scroll1y = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
 			if (scroll1y >= 0x800)
 				scroll1y -= 0x1000;   /* signed value */
 		}
@@ -174,7 +173,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if (disabled)
 			continue;
 
-		spritedata = state->m_spriteram_buffered[(offs + 8) / 2];
+		spritedata = m_spriteram_buffered[(offs + 8) / 2];
 
 		spritecont = (spritedata & 0xff00) >> 8;
 
@@ -182,11 +181,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		{
 			if (big_sprite == 0)   /* are we starting a big sprite ? */
 			{
-				xlatch = state->m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
-				ylatch = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
+				xlatch = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
+				ylatch = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
 				x_no = 0;
 				y_no = 0;
-				zoomword = state->m_spriteram_buffered[(offs + 2) / 2];
+				zoomword = m_spriteram_buffered[(offs + 2) / 2];
 				zoomylatch = (zoomword >> 8) & 0xff;
 				zoomxlatch = (zoomword >> 0) & 0xff;
 				big_sprite = 1;   /* we have started a new big sprite */
@@ -207,7 +206,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 // of anything.
 		if (big_sprite == 0 || (spritecont & 0xf0) == 0)
 		{
-			x = state->m_spriteram_buffered[(offs + 4) / 2];
+			x = m_spriteram_buffered[(offs + 4) / 2];
 
 // DG: some absolute x values deduced here are 1 too high (scenes when you get
 // home run in Koshien, and may also relate to BG layer woods and stuff as you
@@ -230,7 +229,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				scrolly = scroll1y + master_scrolly;
 			}
 			x &= 0xfff;
-			y = state->m_spriteram_buffered[(offs+6)/2] & 0xfff;
+			y = m_spriteram_buffered[(offs+6)/2] & 0xfff;
 
 			xcurrent = x;
 			ycurrent = y;
@@ -278,7 +277,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 		else
 		{
-			zoomword = state->m_spriteram_buffered[(offs+2)/2];
+			zoomword = m_spriteram_buffered[(offs+2)/2];
 			zoomy = (zoomword >> 8) & 0xff;
 			zoomx = (zoomword >> 0) & 0xff;
 			zx = (0x100 - zoomx) / 16;
@@ -298,8 +297,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		{
 			int i;
 
-			code = state->m_spriteram_buffered[(offs)/2] & 0xff;
-			i = (state->m_spriteext[(extoffs >> 4)] & 0xff00 );
+			code = m_spriteram_buffered[(offs)/2] & 0xff;
+			i = (m_spriteext[(extoffs >> 4)] & 0xff00 );
 			code = (i | code);
 		}
 
@@ -315,7 +314,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		cury = (y + scrolly) & 0xfff;
 		if (cury >= 0x800)  cury -= 0x1000;   /* treat it as signed */
 
-		if (state->m_sprites_flipscreen)
+		if (m_sprites_flipscreen)
 		{
 			/* -zx/y is there to fix zoomed sprite coords in screenflip.
 			   drawgfxzoom does not know to draw from flip-side of sprites when
@@ -332,7 +331,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		{
 			sprite_ptr->code = code;
 			sprite_ptr->color = color;
-			if (machine.gfx[0]->granularity() == 64)    /* Final Blow, Slapshot are 6bpp */
+			if (machine().gfx[0]->granularity() == 64)    /* Final Blow, Slapshot are 6bpp */
 				sprite_ptr->color /= 4;
 			sprite_ptr->flipx = flipx;
 			sprite_ptr->flipy = flipy;
@@ -349,7 +348,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			}
 			else
 			{
-				drawgfxzoom_transpen(bitmap,cliprect,machine.gfx[0],
+				drawgfxzoom_transpen(bitmap,cliprect,machine().gfx[0],
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
@@ -361,68 +360,66 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 
 	/* this happens only if primsks != NULL */
-	while (sprite_ptr != state->m_spritelist)
+	while (sprite_ptr != m_spritelist)
 	{
 		sprite_ptr--;
 
-		pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[0],
+		pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[0],
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
 				sprite_ptr->zoomx,sprite_ptr->zoomy,
-				machine.priority_bitmap,sprite_ptr->primask,0);
+				machine().priority_bitmap,sprite_ptr->primask,0);
 	}
 }
 
 
-static void taito_handle_sprite_buffering( running_machine &machine )
+void slapshot_state::taito_handle_sprite_buffering(  )
 {
-	slapshot_state *state = machine.driver_data<slapshot_state>();
 
-	if (state->m_prepare_sprites)   /* no buffering */
+	if (m_prepare_sprites)   /* no buffering */
 	{
-		memcpy(state->m_spriteram_buffered, state->m_spriteram, state->m_spriteram.bytes());
-		state->m_prepare_sprites = 0;
+		memcpy(m_spriteram_buffered, m_spriteram, m_spriteram.bytes());
+		m_prepare_sprites = 0;
 	}
 }
 
-static void taito_update_sprites_active_area( running_machine &machine )
+void slapshot_state::taito_update_sprites_active_area(  )
 {
-	slapshot_state *state = machine.driver_data<slapshot_state>();
 	int off;
 
 	/* if the frame was skipped, we'll have to do the buffering now */
-	taito_handle_sprite_buffering(machine);
+	taito_handle_sprite_buffering();
 
 	/* safety check to avoid getting stuck in bank 2 for games using only one bank */
-	if (state->m_sprites_active_area == 0x8000 &&
-			state->m_spriteram_buffered[(0x8000 + 6) / 2] == 0 &&
-			state->m_spriteram_buffered[(0x8000 + 10) / 2] == 0)
-		state->m_sprites_active_area = 0;
+	if (m_sprites_active_area == 0x8000 &&
+			m_spriteram_buffered[(0x8000 + 6) / 2] == 0 &&
+			m_spriteram_buffered[(0x8000 + 10) / 2] == 0)
+		m_sprites_active_area = 0;
 
 	for (off = 0; off < 0x4000; off += 16)
 	{
 		/* sprites_active_area may change during processing */
-		int offs = off + state->m_sprites_active_area;
+		int offs = off + m_sprites_active_area;
 
-		if (state->m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
+		if (m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
 		{
-			state->m_sprites_disabled = state->m_spriteram_buffered[(offs + 10) / 2] & 0x1000;
-			state->m_sprites_active_area = 0x8000 * (state->m_spriteram_buffered[(offs + 10) / 2] & 0x0001);
+			m_sprites_disabled = m_spriteram_buffered[(offs + 10) / 2] & 0x1000;
+			m_sprites_active_area = 0x8000 * (m_spriteram_buffered[(offs + 10) / 2] & 0x0001);
 			continue;
 		}
 
 		/* check for extra scroll offset */
-		if ((state->m_spriteram_buffered[(offs+4)/2] & 0xf000) == 0xa000)
+		if ((m_spriteram_buffered[(offs+4)/2] & 0xf000) == 0xa000)
 		{
-			state->m_sprites_master_scrollx = state->m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (state->m_sprites_master_scrollx >= 0x800)
-				state->m_sprites_master_scrollx -= 0x1000;   /* signed value */
+			m_sprites_master_scrollx = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
+			if (m_sprites_master_scrollx >= 0x800)
+				m_sprites_master_scrollx -= 0x1000;   /* signed value */
 
-			state->m_sprites_master_scrolly = state->m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (state->m_sprites_master_scrolly >= 0x800)
-				state->m_sprites_master_scrolly -= 0x1000;   /* signed value */
+			m_sprites_master_scrolly = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
+			if (m_sprites_master_scrolly >= 0x800)
+				m_sprites_master_scrolly -= 0x1000;   /* signed value */
 		}
 	}
 }
@@ -432,7 +429,7 @@ void slapshot_state::screen_eof_taito_no_buffer(screen_device &screen, bool stat
 	// rising edge
 	if (state)
 	{
-		taito_update_sprites_active_area(machine());
+		taito_update_sprites_active_area();
 
 		m_prepare_sprites = 1;
 	}
@@ -495,7 +492,7 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 	}
 #endif
 
-	taito_handle_sprite_buffering(machine());
+	taito_handle_sprite_buffering();
 
 	tc0480scp_tilemap_update(m_tc0480scp);
 
@@ -555,7 +552,7 @@ UINT32 slapshot_state::screen_update_slapshot(screen_device &screen, bitmap_ind1
 			if (spritepri[i] < tilepri[(layer[3])]) primasks[i] |= 0xff00;
 		}
 
-		draw_sprites(machine(),bitmap,cliprect,primasks,0);
+		draw_sprites(bitmap,cliprect,primasks,0);
 	}
 
 	/*

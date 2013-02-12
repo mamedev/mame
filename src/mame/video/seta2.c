@@ -211,15 +211,14 @@ static void seta_drawgfx(   bitmap_ind16 &bitmap, const rectangle &cliprect, gfx
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void seta2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	// Sprites list
 
-	seta2_state *state = machine.driver_data<seta2_state>();
-	// When debugging, use state->m_spriteram here, and run mame -update_in_pause
-	UINT16 *buffered_spriteram16 = state->m_buffered_spriteram;
+	// When debugging, use m_spriteram here, and run mame -update_in_pause
+	UINT16 *buffered_spriteram16 = m_buffered_spriteram;
 	UINT16 *s1  = buffered_spriteram16 + 0x3000/2;
-	UINT16 *end = &buffered_spriteram16[state->m_spriteram.bytes()/2];
+	UINT16 *end = &buffered_spriteram16[m_spriteram.bytes()/2];
 
 //  for ( ; s1 < end; s1+=4 )
 	for ( ; s1 < buffered_spriteram16 + 0x4000/2; s1+=4 )   // more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
@@ -250,37 +249,37 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			default:
 				popmessage("unknown gfxset %x",(num & 0x0700)>>8);
 				shadow_depth = 0;
-				gfx = machine.gfx[machine.rand()&3];
+				gfx = machine().gfx[machine().rand()&3];
 				break;
 			case 0x0700:            // 8bpp tiles (76543210)
 				shadow_depth = 8;   // ?
-				gfx = machine.gfx[3];
+				gfx = machine().gfx[3];
 				break;
 			case 0x0600:            // 6bpp tiles (--543210) (myangel sliding blocks test)
 				shadow_depth = 6;   // ?
-				gfx = machine.gfx[2];
+				gfx = machine().gfx[2];
 				break;
 			case 0x0500:            // 4bpp tiles (3210----)
 				shadow_depth = 4;   // ?
-				gfx = machine.gfx[1];
+				gfx = machine().gfx[1];
 				break;
 			case 0x0400:            // 4bpp tiles (----3210)
 				shadow_depth = 3;   // reelquak
-				gfx = machine.gfx[0];
+				gfx = machine().gfx[0];
 				break;
 //          case 0x0300:
 //              unknown
 			case 0x0200:            // 3bpp tiles?  (-----210) (myangel "Graduate Tests")
 				shadow_depth = 3;   // ?
-				gfx = machine.gfx[4];
+				gfx = machine().gfx[4];
 				break;
 			case 0x0100:            // 2bpp tiles??? (--10----) (myangel2 question bubble, myangel endgame)
 				shadow_depth = 2;   // myangel2
-				gfx = machine.gfx[5];
+				gfx = machine().gfx[5];
 				break;
 			case 0x0000:            // no idea!
 				shadow_depth = 4;   // ?
-				gfx = machine.gfx[0];
+				gfx = machine().gfx[0];
 				break;
 		}
 		if (!use_shadow)
@@ -318,7 +317,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				sx &= 0x3ff;
 				sy &= 0x1ff;
 
-				scrollx += state->m_xoffset;
+				scrollx += m_xoffset;
 				scrollx &= 0x3ff;
 				scrolly &= 0x1ff;
 
@@ -333,7 +332,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				if (clip.max_x > cliprect.max_x)    clip.max_x = cliprect.max_x;
 
 				// sprite clipping region (y)
-				clip.min_y = ((sy + yoffs) & 0x1ff) - state->m_yoffset;
+				clip.min_y = ((sy + yoffs) & 0x1ff) - m_yoffset;
 				clip.max_y = clip.min_y + height * 0x10 - 1;
 
 				if (clip.min_y > cliprect.max_y)    continue;
@@ -346,7 +345,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				// Draw the rows
 				for (y = 0; y < (0x40 >> tilesize); y++)
 				{
-					int py = ((scrolly - (y+1) * (8 << tilesize) + 0x10) & 0x1ff) - 0x10 - state->m_yoffset;
+					int py = ((scrolly - (y+1) * (8 << tilesize) + 0x10) & 0x1ff) - 0x10 - m_yoffset;
 
 					for (x = 0; x < 0x40; x++)
 					{
@@ -410,7 +409,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				sx = (sx & 0x1ff) - (sx & 0x200);
 
 				sy &= 0x1ff;
-				sy -= state->m_yoffset;
+				sy -= m_yoffset;
 
 				code &= ~((sizex+1) * (sizey+1) - 1);   // see myangel, myangel2 and grdians
 
@@ -478,7 +477,7 @@ UINT32 seta2_state::screen_update_seta2(screen_device &screen, bitmap_ind16 &bit
 	bitmap.fill(machine().pens[0], cliprect);
 
 	if ( (m_vregs[0x30/2] & 1) == 0 )   // 1 = BLANK SCREEN
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 
 	return 0;
 }

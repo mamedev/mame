@@ -173,26 +173,26 @@ CUSTOM_INPUT_MEMBER(stactics_state::stactics_get_not_shot_arrive)
 }
 
 
-static void update_beam(stactics_state *state)
+void stactics_state::update_beam()
 {
 	/* first, update the firebeam state */
-	state->m_old_beam_state = state->m_beam_state;
-	if (state->m_shot_standby == 0)
-		state->m_beam_state = state->m_beam_state + state->m_beam_states_per_frame;
+	m_old_beam_state = m_beam_state;
+	if (m_shot_standby == 0)
+		m_beam_state = m_beam_state + m_beam_states_per_frame;
 
 	/* These are thresholds for the two shots from the LED fire ROM */
 	/* (Note: There are two more for sound triggers, */
 	/*        whenever that gets implemented)        */
-	if ((state->m_old_beam_state < 0x8b) & (state->m_beam_state >= 0x8b))
-		state->m_shot_arrive = 1;
+	if ((m_old_beam_state < 0x8b) & (m_beam_state >= 0x8b))
+		m_shot_arrive = 1;
 
-	if ((state->m_old_beam_state < 0xca) & (state->m_beam_state >= 0xca))
-		state->m_shot_arrive = 1;
+	if ((m_old_beam_state < 0xca) & (m_beam_state >= 0xca))
+		m_shot_arrive = 1;
 
-	if (state->m_beam_state >= 0x100)
+	if (m_beam_state >= 0x100)
 	{
-		state->m_beam_state = 0;
-		state->m_shot_standby = 1;
+		m_beam_state = 0;
+		m_shot_standby = 1;
 	}
 }
 
@@ -204,7 +204,7 @@ static void update_beam(stactics_state *state)
  *
  *************************************/
 
-INLINE int get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll)
+inline int stactics_state::get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll)
 {
 	UINT8 code;
 	UINT8 gfx;
@@ -223,7 +223,7 @@ INLINE int get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll)
 }
 
 
-static void draw_background(stactics_state *state, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void stactics_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y;
 
@@ -238,13 +238,13 @@ static void draw_background(stactics_state *state, bitmap_ind16 &bitmap, const r
 		for (x = 0; x < 0x100; x++)
 		{
 			/* get the pixels for the four planes */
-			int pixel_b = get_pixel_on_plane(state->m_videoram_b, y, x, 0);
-			int pixel_d = get_pixel_on_plane(state->m_videoram_d, y, x, state->m_y_scroll_d);
-			int pixel_e = get_pixel_on_plane(state->m_videoram_e, y, x, state->m_y_scroll_e);
-			int pixel_f = get_pixel_on_plane(state->m_videoram_f, y, x, state->m_y_scroll_f);
+			int pixel_b = get_pixel_on_plane(m_videoram_b, y, x, 0);
+			int pixel_d = get_pixel_on_plane(m_videoram_d, y, x, m_y_scroll_d);
+			int pixel_e = get_pixel_on_plane(m_videoram_e, y, x, m_y_scroll_e);
+			int pixel_f = get_pixel_on_plane(m_videoram_f, y, x, m_y_scroll_f);
 
 			/* get the color for this pixel */
-			UINT8 color = state->m_videoram_b[((y >> 3) << 5) | (x >> 3)] >> 4;
+			UINT8 color = m_videoram_b[((y >> 3) << 5) | (x >> 3)] >> 4;
 
 			/* assemble the pen index */
 			int pen = color |
@@ -252,13 +252,13 @@ static void draw_background(stactics_state *state, bitmap_ind16 &bitmap, const r
 						(pixel_f << 5) |
 						(pixel_e << 6) |
 						(pixel_d << 7) |
-						((state->m_palette[0] & 0x01) << 8) |
-						((state->m_palette[1] & 0x01) << 9);
+						((m_palette[0] & 0x01) << 8) |
+						((m_palette[1] & 0x01) << 9);
 
 			/* compute the effective pixel coordinate after adjusting for the
 			   mirror movement - this is mechanical on the real machine */
-			int sy = y + state->m_vert_pos;
-			int sx = x - state->m_horiz_pos;
+			int sy = y + m_vert_pos;
+			int sx = x - m_horiz_pos;
 
 			/* plot if visible */
 			if ((sy >= 0) && (sy < 0x100) && (sx >= 0) && (sx < 0x100))
@@ -283,7 +283,7 @@ static const int to_7seg[0x10] =
 };
 
 
-static void set_indicator_leds(int data, const char *output_name, int base_index)
+void stactics_state::set_indicator_leds(int data, const char *output_name, int base_index)
 {
 	/* decode the data */
 	data = to_7seg[~data & 0x0f];
@@ -296,24 +296,24 @@ static void set_indicator_leds(int data, const char *output_name, int base_index
 }
 
 
-static void update_artwork(running_machine &machine, stactics_state *state)
+void stactics_state::update_artwork()
 {
 	int i;
-	UINT8 *beam_region = machine.root_device().memregion("user1")->base();
+	UINT8 *beam_region = machine().root_device().memregion("user1")->base();
 
 	/* set the lamps first */
-	output_set_indexed_value("base_lamp", 4, state->m_lamps[0] & 0x01);
-	output_set_indexed_value("base_lamp", 3, state->m_lamps[1] & 0x01);
-	output_set_indexed_value("base_lamp", 2, state->m_lamps[2] & 0x01);
-	output_set_indexed_value("base_lamp", 1, state->m_lamps[3] & 0x01);
-	output_set_indexed_value("base_lamp", 0, state->m_lamps[4] & 0x01);
-	output_set_value("start_lamp",   state->m_lamps[5] & 0x01);
-	output_set_value("barrier_lamp", state->m_lamps[6] & 0x01);  /* this needs to flash on/off, not implemented */
+	output_set_indexed_value("base_lamp", 4, m_lamps[0] & 0x01);
+	output_set_indexed_value("base_lamp", 3, m_lamps[1] & 0x01);
+	output_set_indexed_value("base_lamp", 2, m_lamps[2] & 0x01);
+	output_set_indexed_value("base_lamp", 1, m_lamps[3] & 0x01);
+	output_set_indexed_value("base_lamp", 0, m_lamps[4] & 0x01);
+	output_set_value("start_lamp",   m_lamps[5] & 0x01);
+	output_set_value("barrier_lamp", m_lamps[6] & 0x01);  /* this needs to flash on/off, not implemented */
 
 	/* laser beam - loop for each LED */
 	for (i = 0; i < 0x40; i++)
 	{
-		offs_t beam_data_offs = ((i & 0x08) << 7) | ((i & 0x30) << 4) | state->m_beam_state;
+		offs_t beam_data_offs = ((i & 0x08) << 7) | ((i & 0x30) << 4) | m_beam_state;
 		UINT8 beam_data = beam_region[beam_data_offs];
 		int on = (beam_data >> (i & 0x07)) & 0x01;
 
@@ -322,26 +322,26 @@ static void update_artwork(running_machine &machine, stactics_state *state)
 	}
 
 	/* sight LED */
-	output_set_value("sight_led", *state->m_motor_on & 0x01);
+	output_set_value("sight_led", *m_motor_on & 0x01);
 
 	/* score display */
 	for (i = 0x01; i < 0x07; i++)
-		output_set_digit_value(i - 1, to_7seg[~state->m_display_buffer[i] & 0x0f]);
+		output_set_digit_value(i - 1, to_7seg[~m_display_buffer[i] & 0x0f]);
 
 	/* credits indicator */
-	set_indicator_leds(state->m_display_buffer[0x07], "credit_led", 0x00);
-	set_indicator_leds(state->m_display_buffer[0x08], "credit_led", 0x04);
+	set_indicator_leds(m_display_buffer[0x07], "credit_led", 0x00);
+	set_indicator_leds(m_display_buffer[0x08], "credit_led", 0x04);
 
 	/* barriers indicator */
-	set_indicator_leds(state->m_display_buffer[0x09], "barrier_led", 0x00);
-	set_indicator_leds(state->m_display_buffer[0x0a], "barrier_led", 0x04);
-	set_indicator_leds(state->m_display_buffer[0x0b], "barrier_led", 0x08);
+	set_indicator_leds(m_display_buffer[0x09], "barrier_led", 0x00);
+	set_indicator_leds(m_display_buffer[0x0a], "barrier_led", 0x04);
+	set_indicator_leds(m_display_buffer[0x0b], "barrier_led", 0x08);
 
 	/* rounds indicator */
-	set_indicator_leds(state->m_display_buffer[0x0c], "round_led", 0x00);
-	set_indicator_leds(state->m_display_buffer[0x0d], "round_led", 0x04);
-	set_indicator_leds(state->m_display_buffer[0x0e], "round_led", 0x08);
-	set_indicator_leds(state->m_display_buffer[0x0f], "round_led", 0x0c);
+	set_indicator_leds(m_display_buffer[0x0c], "round_led", 0x00);
+	set_indicator_leds(m_display_buffer[0x0d], "round_led", 0x04);
+	set_indicator_leds(m_display_buffer[0x0e], "round_led", 0x08);
+	set_indicator_leds(m_display_buffer[0x0f], "round_led", 0x0c);
 }
 
 
@@ -375,9 +375,9 @@ VIDEO_START_MEMBER(stactics_state,stactics)
 
 UINT32 stactics_state::screen_update_stactics(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	update_beam(this);
-	draw_background(this, bitmap, cliprect);
-	update_artwork(machine(), this);
+	update_beam();
+	draw_background(bitmap, cliprect);
+	update_artwork();
 
 	m_frame_count = (m_frame_count + 1) & 0x0f;
 

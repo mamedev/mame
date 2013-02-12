@@ -110,6 +110,16 @@ public:
 	DECLARE_WRITE8_MEMBER(n7751_command_w);
 	DECLARE_WRITE8_MEMBER(n7751_rom_control_w);
 	DECLARE_WRITE8_MEMBER(n7751_p2_w);
+	void vblank_latch_set();
+	void g80_set_palette_entry(int entry, UINT8 data);
+	void spaceod_bg_init_palette();
+	void draw_videoram(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *transparent_pens);
+	void draw_background_spaceod(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_background_page_scroll(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_background_full_scroll(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	offs_t decrypt_offset(address_space &space, offs_t offset);
+	inline UINT8 demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0);
+	void monsterb_expand_gfx(const char *region);
 };
 
 

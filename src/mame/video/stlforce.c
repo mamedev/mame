@@ -87,12 +87,11 @@ WRITE16_MEMBER(stlforce_state::stlforce_tx_videoram_w)
 
 /* sprites - quite a bit still needs doing .. */
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void stlforce_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	stlforce_state *state = machine.driver_data<stlforce_state>();
-	const UINT16 *source = state->m_spriteram+0x0;
-	const UINT16 *finish = state->m_spriteram+0x800;
-	gfx_element *gfx = machine.gfx[2];
+	const UINT16 *source = m_spriteram+0x0;
+	const UINT16 *finish = m_spriteram+0x800;
+	gfx_element *gfx = machine().gfx[2];
 	int ypos, xpos, attr, num;
 
 	while (source<finish)
@@ -112,7 +111,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 						num,
 						64+attr,
 						0,0,
-						xpos+state->m_sprxoffs,ypos,0 );
+						xpos+m_sprxoffs,ypos,0 );
 		}
 
 		source += 0x4;
@@ -166,7 +165,7 @@ UINT32 stlforce_state::screen_update_stlforce(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_mlow_tilemap->draw(bitmap, cliprect, 0,0);
 	m_mhigh_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

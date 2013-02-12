@@ -22,13 +22,9 @@
 #include "includes/sprint2.h"
 #include "sound/discrete.h"
 
-#define GAME_IS_SPRINT1   (state->m_game == 1)
-#define GAME_IS_SPRINT2   (state->m_game == 2)
-#define GAME_IS_DOMINOS   (state->m_game == 3)
-
-
-
-
+#define GAME_IS_SPRINT1   (m_game == 1)
+#define GAME_IS_SPRINT2   (m_game == 2)
+#define GAME_IS_DOMINOS   (m_game == 3)
 
 DRIVER_INIT_MEMBER(sprint2_state,sprint1)
 {
@@ -43,11 +39,9 @@ DRIVER_INIT_MEMBER(sprint2_state,dominos)
 	m_game = 3;
 }
 
-
-static int service_mode(running_machine &machine)
+int sprint2_state::service_mode()
 {
-	sprint2_state *state = machine.driver_data<sprint2_state>();
-	UINT8 v = state->ioport("INB")->read();
+	UINT8 v = ioport("INB")->read();
 
 	if (GAME_IS_SPRINT1)
 	{
@@ -68,7 +62,6 @@ static int service_mode(running_machine &machine)
 
 INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 {
-	sprint2_state *state = machine().driver_data<sprint2_state>();
 	device_t *discrete = machine().device("discrete");
 
 	/* handle steering wheels */
@@ -109,9 +102,9 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 
 	/* interrupts and watchdog are disabled during service mode */
 
-	machine().watchdog_enable(!service_mode(machine()));
+	machine().watchdog_enable(!service_mode());
 
-	if (!service_mode(machine()))
+	if (!service_mode())
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 

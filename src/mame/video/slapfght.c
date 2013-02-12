@@ -122,16 +122,15 @@ WRITE8_MEMBER(slapfght_state::slapfight_palette_bank_w)
 	m_slapfight_palette_bank = offset;
 }
 
-static void slapfght_log_vram(running_machine &machine)
+void slapfght_state::slapfght_log_vram()
 {
 #ifdef MAME_DEBUG
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	if ( machine.input().code_pressed_once(KEYCODE_B) )
+	if ( machine().input().code_pressed_once(KEYCODE_B) )
 	{
 		int i;
 		for (i=0; i<0x800; i++)
 		{
-			logerror("Offset:%03x   TileRAM:%02x   AttribRAM:%02x   SpriteRAM:%02x\n",i, state->m_slapfight_videoram[i],state->m_slapfight_colorram[i],state->m_spriteram->live()[i]);
+			logerror("Offset:%03x   TileRAM:%02x   AttribRAM:%02x   SpriteRAM:%02x\n",i, m_slapfight_videoram[i],m_slapfight_colorram[i],m_spriteram->live()[i]);
 		}
 	}
 #endif
@@ -142,19 +141,18 @@ static void slapfght_log_vram(running_machine &machine)
   Render the Sprites
 
 ***************************************************************************/
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_display )
+void slapfght_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_display )
 {
-	slapfght_state *state = machine.driver_data<slapfght_state>();
-	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
+	UINT8 *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram->bytes();offs += 4)
+	for (offs = 0;offs < m_spriteram->bytes();offs += 4)
 	{
 		int sx, sy;
 
 		if ((buffered_spriteram[offs+2] & 0x80) == priority_to_display)
 		{
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 			{
 				sx = 265 - buffered_spriteram[offs+1];
 				sy = 239 - buffered_spriteram[offs+3];
@@ -165,11 +163,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 				sx = buffered_spriteram[offs+1] + 3;
 				sy = buffered_spriteram[offs+3] - 1;
 			}
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				buffered_spriteram[offs],
 				((buffered_spriteram[offs+2] >> 1) & 3) |
-					((buffered_spriteram[offs+2] << 2) & 4) | (state->m_slapfight_palette_bank << 3),
-				state->m_flipscreen, state->m_flipscreen,
+					((buffered_spriteram[offs+2] << 2) & 4) | (m_slapfight_palette_bank << 3),
+				m_flipscreen, m_flipscreen,
 				sx, sy,0);
 		}
 	}
@@ -188,11 +186,11 @@ UINT32 slapfght_state::screen_update_perfrman(screen_device &screen, bitmap_ind1
 	}
 
 	m_pf1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-	draw_sprites(machine(), bitmap,cliprect,0);
+	draw_sprites(bitmap,cliprect,0);
 	m_pf1_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect,0x80);
+	draw_sprites(bitmap,cliprect,0x80);
 
-	slapfght_log_vram(machine());
+	slapfght_log_vram();
 	return 0;
 }
 
@@ -237,6 +235,6 @@ UINT32 slapfght_state::screen_update_slapfight(screen_device &screen, bitmap_ind
 
 	m_fix_tilemap->draw(bitmap, cliprect, 0,0);
 
-	slapfght_log_vram(machine());
+	slapfght_log_vram();
 	return 0;
 }

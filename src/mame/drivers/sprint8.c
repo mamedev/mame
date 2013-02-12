@@ -11,14 +11,13 @@ Atari Sprint 8 driver
 
 
 
-void sprint8_set_collision(running_machine &machine, int n)
+void sprint8_state::sprint8_set_collision(int n)
 {
-	sprint8_state *state = machine.driver_data<sprint8_state>();
-	if (state->m_collision_reset == 0)
+	if (m_collision_reset == 0)
 	{
-		machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
-		state->m_collision_index = n;
+		m_collision_index = n;
 	}
 }
 

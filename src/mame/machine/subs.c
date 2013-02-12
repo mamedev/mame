@@ -36,62 +36,60 @@ When D7 is high, the steering wheel has moved.
 If D6 is high, it moved left.  If D6 is low, it moved right.
 Be sure to keep returning a direction until steer_reset is called.
 ***************************************************************************/
-static int subs_steering_1(running_machine &machine)
+int subs_state::subs_steering_1()
 {
-	subs_state *state = machine.driver_data<subs_state>();
 	int this_val;
 	int delta;
 
-	this_val=state->ioport("DIAL2")->read();
+	this_val=ioport("DIAL2")->read();
 
-	delta=this_val-state->m_last_val_1;
-	state->m_last_val_1=this_val;
+	delta=this_val-m_last_val_1;
+	m_last_val_1=this_val;
 	if (delta>128) delta-=256;
 	else if (delta<-128) delta+=256;
 	/* Divide by four to make our steering less sensitive */
-	state->m_steering_buf1+=(delta/4);
+	m_steering_buf1+=(delta/4);
 
-	if (state->m_steering_buf1>0)
+	if (m_steering_buf1>0)
 	{
-			state->m_steering_buf1--;
-			state->m_steering_val1=0xC0;
+			m_steering_buf1--;
+			m_steering_val1=0xC0;
 	}
-	else if (state->m_steering_buf1<0)
+	else if (m_steering_buf1<0)
 	{
-			state->m_steering_buf1++;
-			state->m_steering_val1=0x80;
+			m_steering_buf1++;
+			m_steering_val1=0x80;
 	}
 
-	return state->m_steering_val1;
+	return m_steering_val1;
 }
 
-static int subs_steering_2(running_machine &machine)
+int subs_state::subs_steering_2()
 {
-	subs_state *state = machine.driver_data<subs_state>();
 	int this_val;
 	int delta;
 
-	this_val=state->ioport("DIAL1")->read();
+	this_val=ioport("DIAL1")->read();
 
-	delta=this_val-state->m_last_val_2;
-	state->m_last_val_2=this_val;
+	delta=this_val-m_last_val_2;
+	m_last_val_2=this_val;
 	if (delta>128) delta-=256;
 	else if (delta<-128) delta+=256;
 	/* Divide by four to make our steering less sensitive */
-	state->m_steering_buf2+=(delta/4);
+	m_steering_buf2+=(delta/4);
 
-	if (state->m_steering_buf2>0)
+	if (m_steering_buf2>0)
 	{
-		state->m_steering_buf2--;
-		state->m_steering_val2=0xC0;
+		m_steering_buf2--;
+		m_steering_val2=0xC0;
 	}
-	else if (state->m_steering_buf2<0)
+	else if (m_steering_buf2<0)
 	{
-		state->m_steering_buf2++;
-		state->m_steering_val2=0x80;
+		m_steering_buf2++;
+		m_steering_val2=0x80;
 	}
 
-	return state->m_steering_val2;
+	return m_steering_val2;
 }
 
 /***************************************************************************
@@ -116,10 +114,10 @@ READ8_MEMBER(subs_state::subs_control_r)
 		case 0x01:      return ((inport & 0x02) << 6);  /* diag hold */
 		case 0x02:      return ((inport & 0x04) << 5);  /* slam */
 		case 0x03:      return ((inport & 0x08) << 4);  /* spare */
-		case 0x04:      return ((subs_steering_1(machine()) & 0x40) << 1);  /* steer dir 1 */
-		case 0x05:      return ((subs_steering_1(machine()) & 0x80) << 0);  /* steer flag 1 */
-		case 0x06:      return ((subs_steering_2(machine()) & 0x40) << 1);  /* steer dir 2 */
-		case 0x07:      return ((subs_steering_2(machine()) & 0x80) << 0);  /* steer flag 2 */
+		case 0x04:      return ((subs_steering_1() & 0x40) << 1);  /* steer dir 1 */
+		case 0x05:      return ((subs_steering_1() & 0x80) << 0);  /* steer flag 1 */
+		case 0x06:      return ((subs_steering_2() & 0x40) << 1);  /* steer dir 2 */
+		case 0x07:      return ((subs_steering_2() & 0x80) << 0);  /* steer flag 2 */
 	}
 
 	return 0;

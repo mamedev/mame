@@ -101,21 +101,20 @@ READ8_HANDLER( triplep_pap_r )
 
 
 
-static void cavelon_banksw(running_machine &machine)
+void scramble_state::cavelon_banksw()
 {
-	scramble_state *state = machine.driver_data<scramble_state>();
 	/* any read/write access in the 0x8000-0xffff region causes a bank switch.
 	   Only the lower 0x2000 is switched but we switch the whole region
 	   to keep the CPU core happy at the boundaries */
 
-	state->m_cavelon_bank = !state->m_cavelon_bank;
-	state->membank("bank1")->set_entry(state->m_cavelon_bank);
+	m_cavelon_bank = !m_cavelon_bank;
+	membank("bank1")->set_entry(m_cavelon_bank);
 }
 
 static READ8_HANDLER( cavelon_banksw_r )
 {
 	scramble_state *state = space.machine().driver_data<scramble_state>();
-	cavelon_banksw(space.machine());
+	state->cavelon_banksw();
 
 	if ((offset >= 0x0100) && (offset <= 0x0103))
 		return state->m_ppi8255_0->read(space, offset - 0x0100);
@@ -128,7 +127,7 @@ static READ8_HANDLER( cavelon_banksw_r )
 static WRITE8_HANDLER( cavelon_banksw_w )
 {
 	scramble_state *state = space.machine().driver_data<scramble_state>();
-	cavelon_banksw(space.machine());
+	state->cavelon_banksw();
 
 	if ((offset >= 0x0100) && (offset <= 0x0103))
 		state->m_ppi8255_0->write(space, offset - 0x0100, data);
@@ -277,7 +276,7 @@ DRIVER_INIT_MEMBER(scramble_state,cavelon)
 	/* banked ROM */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1");
 	membank("bank1")->configure_entries(0, 2, &ROM[0x00000], 0x10000);
-	cavelon_banksw(machine());
+	cavelon_banksw();
 
 	/* A15 switches memory banks */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(cavelon_banksw_r), FUNC(cavelon_banksw_w));
@@ -341,7 +340,7 @@ DRIVER_INIT_MEMBER(scramble_state,mimonscr)
 }
 
 
-INLINE int bit(int i,int n)
+inline int scramble_state::bit(int i,int n)
 {
 	return ((i >> n) & 1);
 }

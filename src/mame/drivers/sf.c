@@ -52,7 +52,7 @@ WRITE16_MEMBER(sf_state::soundcmd_w)
 /* The protection of the Japanese (and alt US) version */
 /* I'd love to see someone dump the 68705 / i8751 roms */
 
-static void write_dword( address_space &space, offs_t offset, UINT32 data )
+void sf_state::write_dword( address_space &space, offs_t offset, UINT32 data )
 {
 	space.write_word(offset, data >> 16);
 	space.write_word(offset + 2, data);

@@ -82,12 +82,12 @@ DRIVER_INIT_MEMBER(suna8_state,hardhedb)
                                 Brick Zone
 ***************************************************************************/
 
-static UINT8 *brickzn_decrypt(running_machine &machine)
+UINT8 *suna8_state::brickzn_decrypt()
 {
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8   *RAM    =   machine.root_device().memregion("maincpu")->base();
-	size_t  size    =   machine.root_device().memregion("maincpu")->bytes();
-	UINT8   *decrypt = auto_alloc_array(machine, UINT8, size);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8   *RAM    =   machine().root_device().memregion("maincpu")->base();
+	size_t  size    =   machine().root_device().memregion("maincpu")->bytes();
+	UINT8   *decrypt = auto_alloc_array(machine(), UINT8, size);
 	int i;
 
 	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
@@ -132,7 +132,7 @@ static UINT8 *brickzn_decrypt(running_machine &machine)
 DRIVER_INIT_MEMBER(suna8_state,brickzn)
 {
 	UINT8   *RAM    =   machine().root_device().memregion("maincpu")->base();
-	UINT8   *decrypt = brickzn_decrypt(machine());
+	UINT8   *decrypt = brickzn_decrypt();
 	int i;
 
 	// Opcodes decrypted as data (to do: activated at run-time)
@@ -171,7 +171,7 @@ DRIVER_INIT_MEMBER(suna8_state,brickzn)
 DRIVER_INIT_MEMBER(suna8_state,brickznv4)
 {
 	UINT8   *RAM    =   machine().root_device().memregion("maincpu")->base();
-	UINT8   *decrypt = brickzn_decrypt(machine());
+	UINT8   *decrypt = brickzn_decrypt();
 	int i;
 
 	// Opcodes decrypted as data (to do: activated at run-time)

@@ -52,11 +52,10 @@ WRITE8_MEMBER(speedspn_state::speedspn_global_display_w)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void speedspn_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	speedspn_state *state = machine.driver_data<speedspn_state>();
-	gfx_element *gfx = machine.gfx[1];
-	UINT8 *source = state->m_vidram+ 0x1000;
+	gfx_element *gfx = machine().gfx[1];
+	UINT8 *source = m_vidram+ 0x1000;
 	UINT8 *finish = source + 0x1000;
 
 	while( source<finish )
@@ -104,6 +103,6 @@ UINT32 speedspn_state::screen_update_speedspn(screen_device &screen, bitmap_ind1
 #endif
 	m_tilemap->set_scrollx(0, 0x100); // verify
 	m_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	return 0;
 }

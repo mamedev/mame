@@ -56,15 +56,14 @@ WRITE16_MEMBER(sderby_state::sderby_fg_videoram_w)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int codeshift)
+void sderby_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int codeshift)
 {
-	sderby_state *state = machine.driver_data<sderby_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs;
-	int height = machine.gfx[0]->height();
-	int colordiv = machine.gfx[0]->granularity() / 16;
+	int height = machine().gfx[0]->height();
+	int colordiv = machine().gfx[0]->granularity() / 16;
 
-	for (offs = 4;offs < state->m_spriteram.bytes()/2;offs += 4)
+	for (offs = 4;offs < m_spriteram.bytes()/2;offs += 4)
 	{
 		int sx,sy,code,color,flipx;
 
@@ -77,7 +76,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		code = spriteram16[offs+2] >> codeshift;
 		color = (spriteram16[offs+1] & 0x3e00) >> 9;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code,
 				color/colordiv+48,
 				flipx,0,
@@ -100,7 +99,7 @@ void sderby_state::video_start()
 UINT32 sderby_state::screen_update_sderby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect,0);
+	draw_sprites(bitmap,cliprect,0);
 	m_md_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
@@ -110,7 +109,7 @@ UINT32 sderby_state::screen_update_pmroulet(screen_device &screen, bitmap_ind16 
 {
 	m_tilemap->draw(bitmap, cliprect, 0,0);
 	m_md_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect,0);
+	draw_sprites(bitmap,cliprect,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

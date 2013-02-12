@@ -92,39 +92,38 @@ void seicross_state::video_start()
 	m_bg_tilemap->set_scroll_cols(32);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void seicross_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	seicross_state *state = machine.driver_data<seicross_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	UINT8 *spriteram_2 = state->m_spriteram2;
+	UINT8 *spriteram = m_spriteram;
+	UINT8 *spriteram_2 = m_spriteram2;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int x = spriteram[offs + 3];
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				(spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128,
 				spriteram[offs + 1] & 0x0f,
 				spriteram[offs] & 0x40,spriteram[offs] & 0x80,
 				x,240-spriteram[offs + 2],0);
 		if(x>0xf0)
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					(spriteram[offs] & 0x3f) + ((spriteram[offs + 1] & 0x10) << 2) + 128,
 					spriteram[offs + 1] & 0x0f,
 					spriteram[offs] & 0x40,spriteram[offs] & 0x80,
 					x-256,240-spriteram[offs + 2],0);
 	}
 
-	for (offs = state->m_spriteram2.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram2.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int x = spriteram_2[offs + 3];
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				(spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2),
 				spriteram_2[offs + 1] & 0x0f,
 				spriteram_2[offs] & 0x40,spriteram_2[offs] & 0x80,
 				x,240-spriteram_2[offs + 2],0);
 		if(x>0xf0)
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					(spriteram_2[offs] & 0x3f) + ((spriteram_2[offs + 1] & 0x10) << 2),
 					spriteram_2[offs + 1] & 0x0f,
 					spriteram_2[offs] & 0x40,spriteram_2[offs] & 0x80,
@@ -140,6 +139,6 @@ UINT32 seicross_state::screen_update_seicross(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->set_scrolly(col, m_row_scroll[col]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

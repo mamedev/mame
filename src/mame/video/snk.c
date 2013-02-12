@@ -703,11 +703,10 @@ static void marvins_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 }
 
 
-static void tnk3_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll)
+void snk_state::tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll)
 {
-	snk_state *state = machine.driver_data<snk_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	gfx_element *gfx = machine.gfx[2];
+	UINT8 *spriteram = m_spriteram;
+	gfx_element *gfx = machine().gfx[2];
 	const int size = gfx->width();
 	int tile_number, attributes, color, sx, sy;
 	int xflip,yflip;
@@ -719,7 +718,7 @@ static void tnk3_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, co
 	/* sgladiat and tnk3 have 512 tiles, bit 6 is bank and bit 5 is y-flip */
 	/* athena has 1024 tiles, bit 6 and bit 5 are bank */
 
-	for (offs = 0; offs < state->m_num_sprites*4; offs += 4)
+	for (offs = 0; offs < m_num_sprites*4; offs += 4)
 	{
 		tile_number = spriteram[offs+1];
 		attributes  = spriteram[offs+3];
@@ -745,7 +744,7 @@ static void tnk3_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, co
 			yflip = attributes & 0x20;
 		}
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 89 - size - sx;    // this causes slight misalignment in tnk3 but is correct for athena and fitegolf
 			sy = 262 - size - sy;
@@ -754,16 +753,16 @@ static void tnk3_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, co
 		}
 
 		sx &= 0x1ff;
-		sy &= state->m_yscroll_mask;    // sgladiat apparently has only 256 pixels of vertical scrolling range
+		sy &= m_yscroll_mask;    // sgladiat apparently has only 256 pixels of vertical scrolling range
 		if (sx > 512-size) sx -= 512;
-		if (sy > (state->m_yscroll_mask+1)-size) sy -= (state->m_yscroll_mask+1);
+		if (sy > (m_yscroll_mask+1)-size) sy -= (m_yscroll_mask+1);
 
 		drawgfx_transtable(bitmap,cliprect,gfx,
 				tile_number,
 				color,
 				xflip,yflip,
 				sx,sy,
-				state->m_drawmode_table, machine.shadow_table);
+				m_drawmode_table, machine().shadow_table);
 	}
 }
 
@@ -927,7 +926,7 @@ UINT32 snk_state::screen_update_tnk3(screen_device &screen, bitmap_ind16 &bitmap
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	tnk3_draw_sprites(machine(), bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly);
+	tnk3_draw_sprites(bitmap, cliprect, m_sp16_scrollx, m_sp16_scrolly);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;

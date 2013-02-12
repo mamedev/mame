@@ -135,13 +135,12 @@ void sonson_state::video_start()
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void sonson_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	sonson_state *state = machine.driver_data<sonson_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int code = spriteram[offs + 2] + ((spriteram[offs + 1] & 0x20) << 3);
 		int color = spriteram[offs + 1] & 0x1f;
@@ -150,7 +149,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = spriteram[offs + 3];
 		int sy = spriteram[offs + 0];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -159,20 +158,20 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 
 		drawgfx_transpen(bitmap, cliprect,
-			machine.gfx[1],
+			machine().gfx[1],
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
 
 		/* wrap-around */
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, sx - 256, sy, 0);
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, sx, sy - 256, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, sx - 256, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, sx, sy - 256, 0);
 	}
 }
 
 UINT32 sonson_state::screen_update_sonson(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

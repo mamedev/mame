@@ -81,6 +81,21 @@ public:
 	UINT32 screen_update_starshp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_starshp1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(starshp1_interrupt);
+	void set_pens(colortable_t *colortable);
+	void draw_starfield(bitmap_ind16 &bitmap);
+	int get_sprite_hpos(int i);
+	int get_sprite_vpos(int i);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_spaceship(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_phasor(bitmap_ind16 &bitmap);
+	int get_radius();
+	int get_circle_hpos();
+	int get_circle_vpos();
+	void draw_circle_line(bitmap_ind16 &bitmap, int x, int y, int l);
+	void draw_circle(bitmap_ind16 &bitmap);
+	int spaceship_collision(bitmap_ind16 &bitmap, const rectangle &rect);
+	int point_in_circle(int x, int y, int center_x, int center_y, int r);
+	int circle_collision(const rectangle &rect);
 };
 
 /*----------- defined in audio/starshp1.c -----------*/

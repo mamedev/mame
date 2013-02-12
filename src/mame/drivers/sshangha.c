@@ -114,16 +114,16 @@ void sshangha_state::machine_reset()
 
 /******************************************************************************/
 
-INLINE void sshangha_set_color_888(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT32 data)
+inline void sshangha_state::sshangha_set_color_888(pen_t color, int rshift, int gshift, int bshift, UINT32 data)
 {
-	palette_set_color_rgb(machine, color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
+	palette_set_color_rgb(machine(), color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
 }
 
 
 WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)
 {
 	COMBINE_DATA(&m_sprite_paletteram2[offset]);
-	sshangha_set_color_888(machine(), (offset/2)+0x100, 0, 8, 16, m_sprite_paletteram2[(offset) | 1] | (m_sprite_paletteram2[(offset) & ~1] << 16) );
+	sshangha_set_color_888((offset/2)+0x100, 0, 8, 16, m_sprite_paletteram2[(offset) | 1] | (m_sprite_paletteram2[(offset) & ~1] << 16) );
 }
 
 WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_sprites_w)
@@ -136,19 +136,19 @@ WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_sprites_w)
 	paletteram16_xbgr_word_be_sprites2_w(space,offset,data,mem_mask);
 
 	COMBINE_DATA(&m_sprite_paletteram[offset]);
-	sshangha_set_color_888(machine(), (offset/2)+0x000, 0, 8, 16, m_sprite_paletteram[(offset) | 1] | (m_sprite_paletteram[(offset) & ~1] << 16) );
+	sshangha_set_color_888((offset/2)+0x000, 0, 8, 16, m_sprite_paletteram[(offset) | 1] | (m_sprite_paletteram[(offset) & ~1] << 16) );
 }
 
 WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)
 {
 	COMBINE_DATA(&m_tile_paletteram1[offset]);
-	sshangha_set_color_888(machine(), (offset/2)+0x200, 0, 8, 16, m_tile_paletteram1[(offset) | 1] | (m_tile_paletteram1[(offset) & ~1] << 16) );
+	sshangha_set_color_888((offset/2)+0x200, 0, 8, 16, m_tile_paletteram1[(offset) | 1] | (m_tile_paletteram1[(offset) & ~1] << 16) );
 }
 
 WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)
 {
 	COMBINE_DATA(&m_tile_paletteram2[offset]);
-	sshangha_set_color_888(machine(), (offset/2)+0x300, 0, 8, 16, m_tile_paletteram2[(offset) | 1] | (m_tile_paletteram2[(offset) & ~1] << 16) );
+	sshangha_set_color_888((offset/2)+0x300, 0, 8, 16, m_tile_paletteram2[(offset) | 1] | (m_tile_paletteram2[(offset) & ~1] << 16) );
 }
 
 static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )

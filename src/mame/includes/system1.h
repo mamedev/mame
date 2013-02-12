@@ -18,7 +18,7 @@ public:
 	optional_shared_ptr<UINT8> m_nob_mcu_status;
 
 	UINT8 *m_videoram;
-	void (*m_videomode_custom)(running_machine &machine, UINT8 data, UINT8 prevdata);
+	void (system1_state::*m_videomode_custom)(UINT8 data, UINT8 prevdata);
 	UINT8 m_mute_xor;
 	UINT8 m_dakkochn_mux_data;
 	UINT8 m_videomode_prev;
@@ -113,4 +113,11 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(soundirq_gen);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_t0_callback);
 	DECLARE_WRITE8_MEMBER(system1_videoram_bank_w);
+	void video_start_common(int pagecount);
+	inline void videoram_wait_states(cpu_device *cpu);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset);
+	void video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind16 &fgpixmap, bitmap_ind16 **bgpixmaps, const int *bgrowscroll, int bgyscroll, int spritexoffs);
+	void bank44_custom_w(UINT8 data, UINT8 prevdata);
+	void bank0c_custom_w(UINT8 data, UINT8 prevdata);
+	void dakkochn_custom_w(UINT8 data, UINT8 prevdata);
 };

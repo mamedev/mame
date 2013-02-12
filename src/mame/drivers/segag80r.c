@@ -166,17 +166,15 @@ void segag80r_state::machine_start()
  *
  *************************************/
 
-static offs_t decrypt_offset(address_space &space, offs_t offset)
+offs_t segag80r_state::decrypt_offset(address_space &space, offs_t offset)
 {
-	segag80r_state *state = space.machine().driver_data<segag80r_state>();
-
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
 	offs_t pc = space.device().safe_pcbase();
 	if ((UINT16)pc == 0xffff || space.read_byte(pc) != 0x32)
 		return offset;
 
 	/* fetch the low byte of the address and munge it */
-	return (offset & 0xff00) | (*state->m_decrypt)(pc, space.read_byte(pc + 1));
+	return (offset & 0xff00) | (*m_decrypt)(pc, space.read_byte(pc + 1));
 }
 
 WRITE8_MEMBER(segag80r_state::mainram_w)
@@ -198,7 +196,7 @@ WRITE8_MEMBER(segag80r_state::usb_ram_w){ device_t *device = machine().device("u
  *
  *************************************/
 
-INLINE UINT8 demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0)
+inline UINT8 segag80r_state::demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0)
 {
 	return ((d7d6 << 7) & 0x80) | ((d7d6 << 2) & 0x40) |
 			((d5d4 << 5) & 0x20) | ((d5d4 << 0) & 0x10) |
@@ -1415,15 +1413,15 @@ ROM_END
  *
  *************************************/
 
-static void monsterb_expand_gfx(running_machine &machine, const char *region)
+void segag80r_state::monsterb_expand_gfx(const char *region)
 {
 	UINT8 *temp, *dest;
 	int i;
 
 	/* expand the background ROMs; A11/A12 of each ROM is independently controlled via */
 	/* banking */
-	dest = machine.root_device().memregion(region)->base();
-	temp = auto_alloc_array(machine, UINT8, 0x4000);
+	dest = machine().root_device().memregion(region)->base();
+	temp = auto_alloc_array(machine(), UINT8, 0x4000);
 	memcpy(temp, dest, 0x4000);
 
 	/* 16 effective total banks */
@@ -1432,7 +1430,7 @@ static void monsterb_expand_gfx(running_machine &machine, const char *region)
 		memcpy(&dest[0x0000 + i * 0x800], &temp[0x0000 + (i & 3) * 0x800], 0x800);
 		memcpy(&dest[0x8000 + i * 0x800], &temp[0x2000 + (i >> 2) * 0x800], 0x800);
 	}
-	auto_free(machine, temp);
+	auto_free(machine(), temp);
 }
 
 
@@ -1505,7 +1503,7 @@ DRIVER_INIT_MEMBER(segag80r_state,monsterb)
 
 	/* configure video */
 	m_background_pcb = G80_BACKGROUND_MONSTERB;
-	monsterb_expand_gfx(machine(), "gfx1");
+	monsterb_expand_gfx("gfx1");
 
 	/* install background board handlers */
 	iospace.install_write_handler(0xb8, 0xbd, write8_delegate(FUNC(segag80r_state::monsterb_back_port_w),this));
@@ -1524,7 +1522,7 @@ DRIVER_INIT_MEMBER(segag80r_state,monster2)
 
 	/* configure video */
 	m_background_pcb = G80_BACKGROUND_PIGNEWT;
-	monsterb_expand_gfx(machine(), "gfx1");
+	monsterb_expand_gfx("gfx1");
 
 	/* install background board handlers */
 	iospace.install_write_handler(0xb4, 0xb5, write8_delegate(FUNC(segag80r_state::pignewt_back_color_w),this));
@@ -1544,7 +1542,7 @@ DRIVER_INIT_MEMBER(segag80r_state,pignewt)
 
 	/* configure video */
 	m_background_pcb = G80_BACKGROUND_PIGNEWT;
-	monsterb_expand_gfx(machine(), "gfx1");
+	monsterb_expand_gfx("gfx1");
 
 	/* install background board handlers */
 	iospace.install_write_handler(0xb4, 0xb5, write8_delegate(FUNC(segag80r_state::pignewt_back_color_w),this));

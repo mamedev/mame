@@ -67,6 +67,11 @@ public:
 	UINT32 screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sprint2(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(sprint2);
+	UINT8 collision_check(colortable_t *colortable, rectangle& rect);
+	inline int get_sprite_code(UINT8 *video_ram, int n);
+	inline int get_sprite_x(UINT8 *video_ram, int n);
+	inline int get_sprite_y(UINT8 *video_ram, int n);
+	int service_mode();
 };
 
 /*----------- defined in audio/sprint2.c -----------*/

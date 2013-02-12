@@ -156,21 +156,20 @@ WRITE8_MEMBER(senjyo_state::senjyo_bgstripes_w)
 
 ***************************************************************************/
 
-static void draw_bgbitmap(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void senjyo_state::draw_bgbitmap(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
 	int x,y,pen,strwid,count;
 
 
-	if (state->m_bgstripes == 0xff) /* off */
+	if (m_bgstripes == 0xff) /* off */
 		bitmap.fill(0, cliprect);
 	else
 	{
-		int flip = state->flip_screen();
+		int flip = flip_screen();
 
 		pen = 0;
 		count = 0;
-		strwid = state->m_bgstripes;
+		strwid = m_bgstripes;
 		if (strwid == 0) strwid = 0x100;
 		if (flip) strwid ^= 0xff;
 
@@ -193,21 +192,20 @@ static void draw_bgbitmap(running_machine &machine, bitmap_ind16 &bitmap,const r
 	}
 }
 
-static void draw_radar(running_machine &machine,bitmap_ind16 &bitmap,const rectangle &cliprect)
+void senjyo_state::draw_radar(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
 	int offs,x;
 
 	for (offs = 0;offs < 0x400;offs++)
 		for (x = 0;x < 8;x++)
-			if (state->m_radarram[offs] & (1 << x))
+			if (m_radarram[offs] & (1 << x))
 			{
 				int sx, sy;
 
 				sx = (8 * (offs % 8) + x) + 256-64;
 				sy = ((offs & 0x1ff) / 8) + 96;
 
-				if (state->flip_screen())
+				if (flip_screen())
 				{
 					sx = 255 - sx;
 					sy = 255 - sy;
@@ -218,19 +216,18 @@ static void draw_radar(running_machine &machine,bitmap_ind16 &bitmap,const recta
 			}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int priority)
+void senjyo_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int priority)
 {
-	senjyo_state *state = machine.driver_data<senjyo_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int big,sx,sy,flipx,flipy;
 
 		if (((spriteram[offs+1] & 0x30) >> 4) == priority)
 		{
-			if (state->m_is_senjyo) /* Senjyo */
+			if (m_is_senjyo) /* Senjyo */
 				big = (spriteram[offs] & 0x80);
 			else    /* Star Force */
 				big = ((spriteram[offs] & 0xc0) == 0xc0);
@@ -242,7 +239,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			flipx = spriteram[offs+1] & 0x40;
 			flipy = spriteram[offs+1] & 0x80;
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				flipx = !flipx;
 				flipy = !flipy;
@@ -260,7 +257,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			}
 
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[big ? 5 : 4],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[big ? 5 : 4],
 					spriteram[offs],
 					spriteram[offs + 1] & 0x07,
 					flipx,flipy,
@@ -312,16 +309,16 @@ UINT32 senjyo_state::screen_update_senjyo(screen_device &screen, bitmap_ind16 &b
 		m_bg3_tilemap->set_scrolly(0, scrolly);
 	}
 
-	draw_bgbitmap(machine(), bitmap, cliprect);
-	draw_sprites(machine(), bitmap, cliprect, 0);
+	draw_bgbitmap(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect, 0);
 	m_bg3_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect, 1);
+	draw_sprites(bitmap, cliprect, 1);
 	m_bg2_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect, 2);
+	draw_sprites(bitmap, cliprect, 2);
 	m_bg1_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect, 3);
+	draw_sprites(bitmap, cliprect, 3);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_radar(machine(), bitmap, cliprect);
+	draw_radar(bitmap, cliprect);
 
 #if 0
 {

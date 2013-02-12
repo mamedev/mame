@@ -149,15 +149,14 @@ WRITE8_MEMBER(starwars_state::starwars_adc_select_w)
  *
  *************************************/
 
-void starwars_mproc_init(running_machine &machine)
+void starwars_state::starwars_mproc_init()
 {
-	starwars_state *state = machine.driver_data<starwars_state>();
-	UINT8 *src = state->memregion("user2")->base();
+	UINT8 *src = memregion("user2")->base();
 	int cnt, val;
 
-	state->m_PROM_STR = auto_alloc_array(machine, UINT8, 1024);
-	state->m_PROM_MAS = auto_alloc_array(machine, UINT8, 1024);
-	state->m_PROM_AM = auto_alloc_array(machine, UINT8, 1024);
+	m_PROM_STR = auto_alloc_array(machine(), UINT8, 1024);
+	m_PROM_MAS = auto_alloc_array(machine(), UINT8, 1024);
+	m_PROM_AM = auto_alloc_array(machine(), UINT8, 1024);
 
 	for (cnt = 0; cnt < 1024; cnt++)
 	{
@@ -168,12 +167,12 @@ void starwars_mproc_init(running_machine &machine)
 		val |= (src[0x0000 + cnt] << 12) & 0xf000; /* Set MS nibble */
 
 		/* perform pre-decoding */
-		state->m_PROM_STR[cnt] = (val >> 8) & 0x00ff;
-		state->m_PROM_MAS[cnt] =  val       & 0x007f;
-		state->m_PROM_AM[cnt]  = (val >> 7) & 0x0001;
+		m_PROM_STR[cnt] = (val >> 8) & 0x00ff;
+		m_PROM_MAS[cnt] =  val       & 0x007f;
+		m_PROM_AM[cnt]  = (val >> 7) & 0x0001;
 	}
 
-	state->m_math_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(starwars_state::math_run_clear),state));
+	m_math_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(starwars_state::math_run_clear),this));
 }
 
 
@@ -184,11 +183,10 @@ void starwars_mproc_init(running_machine &machine)
  *
  *************************************/
 
-void starwars_mproc_reset(running_machine &machine)
+void starwars_state::starwars_mproc_reset()
 {
-	starwars_state *state = machine.driver_data<starwars_state>();
-	state->m_MPA = state->m_BIC = 0;
-	state->m_math_run = 0;
+	m_MPA = m_BIC = 0;
+	m_math_run = 0;
 }
 
 
@@ -199,9 +197,8 @@ void starwars_mproc_reset(running_machine &machine)
  *
  *************************************/
 
-static void run_mproc(running_machine &machine)
+void starwars_state::run_mproc()
 {
-	starwars_state *state = machine.driver_data<starwars_state>();
 
 	int RAMWORD = 0;
 	int MA_byte;
@@ -214,7 +211,7 @@ static void run_mproc(running_machine &machine)
 	logerror("Running Matrix Processor...\n");
 
 	mptime = 0;
-	state->m_math_run = 1;
+	m_math_run = 1;
 
 	/* loop until finished */
 	while (M_STOP > 0)
@@ -223,18 +220,18 @@ static void run_mproc(running_machine &machine)
 		mptime += 5;
 
 		/* fetch the current instruction data */
-		IP15_8 = state->m_PROM_STR[state->m_MPA];
-		IP7    = state->m_PROM_AM[state->m_MPA];
-		IP6_0  = state->m_PROM_MAS[state->m_MPA];
+		IP15_8 = m_PROM_STR[m_MPA];
+		IP7    = m_PROM_AM[m_MPA];
+		IP6_0  = m_PROM_MAS[m_MPA];
 
 #if (MATHDEBUG)
-		mame_printf_debug("\n(MPA:%x), Strobe: %x, IP7: %d, IP6_0:%x\n",state->m_MPA, IP15_8, IP7, IP6_0);
-		mame_printf_debug("(BIC: %x), A: %x, B: %x, C: %x, ACC: %x\n",state->m_BIC,state->m_A,state->m_B,state->m_C,state->m_ACC);
+		mame_printf_debug("\n(MPA:%x), Strobe: %x, IP7: %d, IP6_0:%x\n",m_MPA, IP15_8, IP7, IP6_0);
+		mame_printf_debug("(BIC: %x), A: %x, B: %x, C: %x, ACC: %x\n",m_BIC,m_A,m_B,m_C,m_ACC);
 #endif
 
 		/* construct the current RAM address */
 		if (IP7 == 0)
-			MA = (IP6_0 & 3) | ((state->m_BIC & 0x01ff) << 2);  /* MA10-2 set to BIC8-0 */
+			MA = (IP6_0 & 3) | ((m_BIC & 0x01ff) << 2);  /* MA10-2 set to BIC8-0 */
 		else
 			MA = IP6_0;
 
@@ -242,7 +239,7 @@ static void run_mproc(running_machine &machine)
 		    and apply base address offset */
 
 		MA_byte = MA << 1;
-		RAMWORD = (state->m_mathram[MA_byte + 1] & 0x00ff) | ((state->m_mathram[MA_byte] & 0x00ff) << 8);
+		RAMWORD = (m_mathram[MA_byte + 1] & 0x00ff) | ((m_mathram[MA_byte] & 0x00ff) << 8);
 
 //      logerror("MATH ADDR: %x, CPU ADDR: %x, RAMWORD: %x\n", MA, MA_byte, RAMWORD);
 
@@ -264,18 +261,18 @@ static void run_mproc(running_machine &machine)
 		/* 0x10 - CLEAR_ACC */
 		if (IP15_8 & CLEAR_ACC)
 		{
-			state->m_ACC = 0;
+			m_ACC = 0;
 		}
 
 		/* 0x01 - LAC (also clears lsb)*/
 		if (IP15_8 & LAC)
-			state->m_ACC = (RAMWORD << 16);
+			m_ACC = (RAMWORD << 16);
 
 		/* 0x02 - READ_ACC */
 		if (IP15_8 & READ_ACC)
 		{
-			state->m_mathram[MA_byte+1] = ((state->m_ACC >> 16) & 0xff);
-			state->m_mathram[MA_byte  ] = ((state->m_ACC >> 24) & 0xff);
+			m_mathram[MA_byte+1] = ((m_ACC >> 16) & 0xff);
+			m_mathram[MA_byte  ] = ((m_ACC >> 24) & 0xff);
 		}
 
 		/* 0x04 - M_HALT */
@@ -284,12 +281,12 @@ static void run_mproc(running_machine &machine)
 
 		/* 0x08 - INC_BIC */
 		if (IP15_8 & INC_BIC)
-			state->m_BIC = (state->m_BIC + 1) & 0x1ff; /* Restrict to 9 bits */
+			m_BIC = (m_BIC + 1) & 0x1ff; /* Restrict to 9 bits */
 
 		/* 0x20 - LDC*/
 		if (IP15_8 & LDC)
 		{
-			state->m_C = RAMWORD;
+			m_C = RAMWORD;
 
 			/* This is a serial subtractor - multiplier (74ls384) -
 			 * accumulator. For the full calculation 33 GMCLK pulses
@@ -320,13 +317,13 @@ static void run_mproc(running_machine &machine)
 			 * takes 33 clock pulses to do a full rotation.
 			 */
 
-			state->m_ACC += (((INT32)(state->m_A - state->m_B) << 1) * state->m_C) << 1;
+			m_ACC += (((INT32)(m_A - m_B) << 1) * m_C) << 1;
 
 			/* A and B are sign extended (requred by the ls384). After
 			 * multiplication they just contain the sign.
 			 */
-			state->m_A = (state->m_A & 0x8000)? 0xffff: 0;
-			state->m_B = (state->m_B & 0x8000)? 0xffff: 0;
+			m_A = (m_A & 0x8000)? 0xffff: 0;
+			m_B = (m_B & 0x8000)? 0xffff: 0;
 
 			/* The multiply-add holds the main matrix processor counter
 			 * for 33 cycles
@@ -336,11 +333,11 @@ static void run_mproc(running_machine &machine)
 
 		/* 0x40 - LDB */
 		if (IP15_8 & LDB)
-			state->m_B = RAMWORD;
+			m_B = RAMWORD;
 
 		/* 0x80 - LDA */
 		if (IP15_8 & LDA)
-			state->m_A = RAMWORD;
+			m_A = RAMWORD;
 
 		/*
 		 * Now update the PROM address counter
@@ -348,13 +345,13 @@ static void run_mproc(running_machine &machine)
 		 * This means that each of the four pages should wrap around rather than
 		 * leaking from one to another.  It may not matter, but I've put it in anyway
 		 */
-		tmp = state->m_MPA + 1;
-		state->m_MPA = (state->m_MPA & 0x0300) | (tmp & 0x00ff); /* New MPA value */
+		tmp = m_MPA + 1;
+		m_MPA = (m_MPA & 0x0300) | (tmp & 0x00ff); /* New MPA value */
 
 		M_STOP--; /* Decrease count */
 	}
 
-	state->m_math_timer->adjust(attotime::from_hz(MASTER_CLOCK) * mptime, 1);
+	m_math_timer->adjust(attotime::from_hz(MASTER_CLOCK) * mptime, 1);
 }
 
 
@@ -412,7 +409,7 @@ WRITE8_MEMBER(starwars_state::starwars_math_w)
 	{
 		case 0: /* mw0 */
 			m_MPA = data << 2;  /* Set starting PROM address */
-			run_mproc(machine());           /* and run the Matrix Processor */
+			run_mproc();           /* and run the Matrix Processor */
 			break;
 
 		case 1: /* mw1 */

@@ -218,17 +218,16 @@ VIDEO_START_MEMBER(suna8_state,suna8_starfigh)          { suna8_vh_start_common(
 
 ***************************************************************************/
 
-static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int which)
+void suna8_state::draw_normal_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int which)
 {
-	suna8_state *state = machine.driver_data<suna8_state>();
 
-	UINT8 *spriteram = state->m_spriteram + which * 0x2000 * 2;
+	UINT8 *spriteram = m_spriteram + which * 0x2000 * 2;
 
 	int i;
 	int mx = 0; // multisprite x counter
 
-	int max_x = machine.primary_screen->width() - 8;
-	int max_y = machine.primary_screen->height() - 8;
+	int max_x = machine().primary_screen->width() - 8;
+	int max_y = machine().primary_screen->height() - 8;
 
 	for (i = 0x1d00; i < 0x2000; i += 4)
 	{
@@ -240,7 +239,7 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 		int x       =   spriteram[i + 2];
 		int bank    =   spriteram[i + 3];
 
-		if (state->m_text_dim)
+		if (m_text_dim)
 		{
 			// Older, simpler hardware: hardhead, rranger
 			flipx = 0;
@@ -292,7 +291,7 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				srcy  = (((bank & 0x80)>>4) + (bank & 0x04) + ((~bank >> 4)&2)) * 2;
 				srcpg = ((code >> 4) & 3) + 4;
 				gfxbank = (bank & 0x3);
-				switch (state->m_gfxbank_type)
+				switch (m_gfxbank_type)
 				{
 					case suna8_state::GFXBANK_TYPE_SPARKMAN:
 						break;
@@ -314,7 +313,7 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 						//      70 56/8/a/c 0e 01 (gfxhi=1)
 						//      6f 78/a/c/e 0f 04 ""
 						if (gfxbank == 3)
-							gfxbank += state->m_gfxbank;
+							gfxbank += m_gfxbank;
 						break;
 				}
 				colorbank = (bank & 8) >> 3;
@@ -328,13 +327,13 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				srcy  = (((bank & 0x80)>>4) + (bank & 0x04) + ((~bank >> 4)&3)) * 2;
 				srcpg = (code >> 4) & 3;
 				gfxbank = bank & 0x03;
-				switch (state->m_gfxbank_type)
+				switch (m_gfxbank_type)
 				{
 					case suna8_state::GFXBANK_TYPE_STARFIGH:
 						// starfigh: boss 2 tail, p2 g7:
 						//      61 20 1b 27
 						if (gfxbank == 3)
-							gfxbank += state->m_gfxbank;
+							gfxbank += m_gfxbank;
 					break;
 
 					default:
@@ -374,15 +373,15 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				if (flipx)  tile_flipx = !tile_flipx;
 				if (flipy)  tile_flipy = !tile_flipy;
 
-				if (state->flip_screen())
+				if (flip_screen())
 				{
 					sx = max_x - sx;    tile_flipx = !tile_flipx;
 					sy = max_y - sy;    tile_flipy = !tile_flipy;
 				}
 
-				drawgfx_transpen(   bitmap, cliprect, machine.gfx[which],
+				drawgfx_transpen(   bitmap, cliprect, machine().gfx[which],
 							tile + (attr & 0x3)*0x100 + gfxbank,
-							(((attr >> 2) & 0xf) | colorbank) + 0x10 * state->m_palettebank,    // hardhea2 player2
+							(((attr >> 2) & 0xf) | colorbank) + 0x10 * m_palettebank,    // hardhea2 player2
 							tile_flipx, tile_flipy,
 							sx, sy, 0xf);
 			}
@@ -391,14 +390,13 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 	}
 }
 
-static void draw_text_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void suna8_state::draw_text_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	suna8_state *state = machine.driver_data<suna8_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int i;
 
-	int max_x = machine.primary_screen->width() - 8;
-	int max_y = machine.primary_screen->height() - 8;
+	int max_x = machine().primary_screen->width() - 8;
+	int max_y = machine().primary_screen->height() - 8;
 
 	for (i = 0x1900; i < 0x19ff; i += 4)
 	{
@@ -411,7 +409,7 @@ static void draw_text_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 
 		if (~code & 0x80)   continue;
 
-		dimx = 2;                   dimy = state->m_text_dim;
+		dimx = 2;                   dimy = m_text_dim;
 		srcx  = (code & 0xf) * 2;   srcy = (y & 0xf0) / 8;
 		srcpg = (code >> 4) & 3;
 
@@ -439,13 +437,13 @@ static void draw_text_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 				int sx      =    x + tx * 8;
 				int sy      =   (y + real_ty * 8) & 0xff;
 
-				if (state->flip_screen())
+				if (flip_screen())
 				{
 					sx = max_x - sx;    flipx = !flipx;
 					sy = max_y - sy;    flipy = !flipy;
 				}
 
-				drawgfx_transpen(   bitmap,cliprect,machine.gfx[0],
+				drawgfx_transpen(   bitmap,cliprect,machine().gfx[0],
 							tile + (attr & 0x3)*0x100 + bank,
 							(attr >> 2) & 0xf,
 							flipx, flipy,
@@ -501,15 +499,15 @@ UINT32 suna8_state::screen_update_suna8(screen_device &screen, bitmap_ind16 &bit
 #endif
 	{
 		// Normal sprites
-		draw_normal_sprites(machine(), bitmap,cliprect, 0);
+		draw_normal_sprites(bitmap,cliprect, 0);
 
 		// More normal sprites (second sprite "chip" in sparkman)
 		if (machine().gfx[1])
-			draw_normal_sprites(machine(), bitmap,cliprect, 1);
+			draw_normal_sprites(bitmap,cliprect, 1);
 
 		// Text sprites (earlier games only)
 		if (m_text_dim)
-			draw_text_sprites(machine(), bitmap,cliprect);
+			draw_text_sprites(bitmap,cliprect);
 	}
 	return 0;
 }

@@ -53,4 +53,8 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_segag80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	inline int adjust_xy(int rawx, int rawy, int *outx, int *outy);
+	void sega_generate_vector_list();
+	offs_t decrypt_offset(address_space &space, offs_t offset);
+	inline UINT8 demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0);
 };

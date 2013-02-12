@@ -57,9 +57,8 @@ WRITE8_MEMBER(shangkid_state::shangkid_videoram_w)
 	m_background->mark_tile_dirty(offset&0x7ff );
 }
 
-static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void shangkid_state::draw_sprite(const UINT8 *source, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	shangkid_state *state = machine.driver_data<shangkid_state>();
 	gfx_element *gfx;
 	int transparent_pen;
 	int bank_index;
@@ -83,7 +82,7 @@ static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_in
 	if( xsize==0 && xflip ) xpos -= 16;
 	if( ysize==0 && yflip==0 ) ypos += 16;
 
-	if( state->m_gfx_type == 1 )
+	if( m_gfx_type == 1 )
 	{
 		/* Shanghai Kid */
 		switch( bank&0x30 )
@@ -129,7 +128,7 @@ static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_in
 		transparent_pen = 7;
 	}
 
-	gfx = machine.gfx[1+bank_index];
+	gfx = machine().gfx[1+bank_index];
 
 	width = (xscale+1)*2;
 	height = (yscale+1)*2;
@@ -168,16 +167,15 @@ static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_in
 	}
 }
 
-static void shangkid_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void shangkid_state::shangkid_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	shangkid_state *state = machine.driver_data<shangkid_state>();
 	const UINT8 *source, *finish;
 
-	finish = state->m_spriteram;
-	source = state->m_spriteram+0x200;
+	finish = m_spriteram;
+	source = m_spriteram+0x200;
 	while( source>finish ){
 		source -= 8;
-		draw_sprite(machine, source, bitmap,cliprect );
+		draw_sprite(source, bitmap,cliprect );
 	}
 }
 
@@ -189,7 +187,7 @@ UINT32 shangkid_state::screen_update_shangkid(screen_device &screen, bitmap_ind1
 	m_background->set_scrolly(0,m_videoreg[2]+0x10 );
 
 	m_background->draw(bitmap, cliprect, 0,0 );
-	shangkid_draw_sprites(machine(), bitmap,cliprect );
+	shangkid_draw_sprites(bitmap,cliprect );
 	m_background->draw(bitmap, cliprect, 1,0 ); /* high priority tiles */
 	return 0;
 }
@@ -231,10 +229,9 @@ PALETTE_INIT_MEMBER(shangkid_state,dynamski)
 }
 
 
-static void dynamski_draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
+void shangkid_state::dynamski_draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	shangkid_state *state = machine.driver_data<shangkid_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int i;
 	int sx,sy;
 	int tile;
@@ -275,7 +272,7 @@ static void dynamski_draw_background(running_machine &machine, bitmap_ind16 &bit
 			drawgfx_transpen(
 				bitmap,
 				cliprect,
-				machine.gfx[0],
+				machine().gfx[0],
 				tile,
 				attr & 0x0f,
 				0,0,//xflip,yflip,
@@ -285,10 +282,9 @@ static void dynamski_draw_background(running_machine &machine, bitmap_ind16 &bit
 	}
 }
 
-static void dynamski_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void shangkid_state::dynamski_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	shangkid_state *state = machine.driver_data<shangkid_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int i;
 	int sx,sy;
 	int tile;
@@ -309,7 +305,7 @@ static void dynamski_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		drawgfx_transpen(
 				bitmap,
 				cliprect,
-				machine.gfx[1],
+				machine().gfx[1],
 				bank*0x40 + (tile&0x3f),
 				color,
 				tile&0x80,tile&0x40, /* flipx,flipy */
@@ -319,8 +315,8 @@ static void dynamski_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 UINT32 shangkid_state::screen_update_dynamski(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	dynamski_draw_background(machine(), bitmap,cliprect, 0 );
-	dynamski_draw_sprites(machine(), bitmap,cliprect );
-	dynamski_draw_background(machine(), bitmap,cliprect, 1 );
+	dynamski_draw_background(bitmap,cliprect, 0 );
+	dynamski_draw_sprites(bitmap,cliprect );
+	dynamski_draw_background(bitmap,cliprect, 1 );
 	return 0;
 }

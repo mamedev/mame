@@ -84,6 +84,9 @@ public:
 	UINT32 screen_update_senjyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(senjyo_interrupt);
 	DECLARE_READ8_MEMBER(pio_pa_r);
+	void draw_bgbitmap(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_radar(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int priority);
 };
 
 /*----------- defined in audio/senjyo.c -----------*/

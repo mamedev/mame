@@ -28,6 +28,11 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_skyraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(skyraid_sound_w);
+	void draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_terrain(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_trapezoid(bitmap_ind16& dst, bitmap_ind16& src);
 };
 
 /*----------- defined in audio/skyraid.c -----------*/

@@ -1412,10 +1412,9 @@ TIMER_CALLBACK_MEMBER(seta_state::uPD71054_timer_callback)
 /*------------------------------
     initialize
 ------------------------------*/
-static void uPD71054_timer_init( running_machine &machine )
+void seta_state::uPD71054_timer_init(  )
 {
-	seta_state *state = machine.driver_data<seta_state>();
-	uPD71054_state *uPD71054 = &state->m_uPD71054;
+	uPD71054_state *uPD71054 = &m_uPD71054;
 	int no;
 
 	uPD71054->write_select = 0;
@@ -1424,7 +1423,7 @@ static void uPD71054_timer_init( running_machine &machine )
 		uPD71054->max[no] = 0xffff;
 	}
 	for( no = 0; no < USED_TIMER_NUM; no++ ) {
-		uPD71054->timer[no] = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(seta_state::uPD71054_timer_callback),state));
+		uPD71054->timer[no] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(seta_state::uPD71054_timer_callback),this));
 	}
 }
 
@@ -1787,7 +1786,7 @@ WRITE16_MEMBER(seta_state::usclssic_lockout_w)
 			machine().tilemap().mark_all_dirty();
 		m_tiles_offset = tiles_offset;
 
-		seta_coin_lockout_w(machine(), data);
+		seta_coin_lockout_w(data);
 	}
 }
 
@@ -3073,7 +3072,7 @@ WRITE8_MEMBER(seta_state::sub_bankswitch_w)
 WRITE8_MEMBER(seta_state::sub_bankswitch_lockout_w)
 {
 	sub_bankswitch_w(space,offset,data);
-	seta_coin_lockout_w(machine(), data);
+	seta_coin_lockout_w(data);
 }
 
 
@@ -8140,7 +8139,7 @@ INTERRUPT_GEN_MEMBER(seta_state::wrofaero_interrupt)
 	device.execute().set_input_line(2, HOLD_LINE );
 }
 
-MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(machine()); }
+MACHINE_START_MEMBER(seta_state,wrofaero){ uPD71054_timer_init(); }
 #endif  // __uPD71054_TIMER
 
 

@@ -172,4 +172,9 @@ public:
 	TIMER_CALLBACK_MEMBER(sgladiat_sndirq_update_callback);
 	TIMER_CALLBACK_MEMBER(sndirq_update_callback);
 	DECLARE_WRITE_LINE_MEMBER(ymirq_callback_2);
+	void tnk3_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const int xscroll, const int yscroll);
+	int hardflags_check(int num);
+	int hardflags_check8(int num);
+	int turbofront_check(int small, int num);
+	int turbofront_check8(int small, int num);
 };

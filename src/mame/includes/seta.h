@@ -209,7 +209,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(setaroul_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(crazyfgt_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(inttoote_interrupt);
+	void seta_coin_lockout_w(int data);
+	inline void twineagl_tile_info( tile_data &tileinfo, int tile_index, int offset );
+	inline void get_tile_info( tile_data &tileinfo, int tile_index, int layer, int offset );
+	void set_pens();
+	void usclssic_set_pens();
+	void draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen);
+	void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size, int sprite_setac );
+	void uPD71054_timer_init(  );
 };
-
-/*----------- defined in video/seta.c -----------*/
-void seta_coin_lockout_w(running_machine &machine, int data);

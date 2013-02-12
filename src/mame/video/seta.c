@@ -214,38 +214,37 @@ static const game_offset game_offsets[] =
     ---- --1-       Coin #1 Counter
     ---- ---0       Coin #0 Counter     */
 
-void seta_coin_lockout_w(running_machine &machine, int data)
+void seta_state::seta_coin_lockout_w(int data)
 {
-	seta_state *state = machine.driver_data<seta_state>();
 	static const char *const seta_nolockout[] =
 	{ "blandia", "eightfrc", "extdwnhl", "gundhara", "kamenrid", "magspeed", "sokonuke", "zingzip", "zombraid"};
 
 	/* Only compute seta_coin_lockout when confronted with a new gamedrv */
-	if (!state->m_coin_lockout_initialized)
+	if (!m_coin_lockout_initialized)
 	{
-		state->m_coin_lockout_initialized = true;
+		m_coin_lockout_initialized = true;
 		int i;
 
-		state->m_coin_lockout = 1;
+		m_coin_lockout = 1;
 		for (i=0; i<ARRAY_LENGTH(seta_nolockout); i++)
 		{
-			if (strcmp(machine.system().name, seta_nolockout[i]) == 0 ||
-				strcmp(machine.system().parent, seta_nolockout[i]) == 0)
+			if (strcmp(machine().system().name, seta_nolockout[i]) == 0 ||
+				strcmp(machine().system().parent, seta_nolockout[i]) == 0)
 			{
-				state->m_coin_lockout = 0;
+				m_coin_lockout = 0;
 				break;
 			}
 		}
 	}
 
-	coin_counter_w      (machine, 0, (( data) >> 0) & 1 );
-	coin_counter_w      (machine, 1, (( data) >> 1) & 1 );
+	coin_counter_w      (machine(), 0, (( data) >> 0) & 1 );
+	coin_counter_w      (machine(), 1, (( data) >> 1) & 1 );
 
 	/* some games haven't the coin lockout device */
-	if (    !state->m_coin_lockout )
+	if (    !m_coin_lockout )
 		return;
-	coin_lockout_w      (machine, 0, ((~data) >> 2) & 1 );
-	coin_lockout_w      (machine, 1, ((~data) >> 3) & 1 );
+	coin_lockout_w      (machine(), 0, ((~data) >> 2) & 1 );
+	coin_lockout_w      (machine(), 1, ((~data) >> 3) & 1 );
 }
 
 
@@ -267,7 +266,7 @@ WRITE16_MEMBER(seta_state::seta_vregs_w)
 			if (ACCESSING_BITS_0_7)
 			{
 				device_t *x1_010 = machine().device("x1snd");
-				seta_coin_lockout_w (machine(), data & 0x0f);
+				seta_coin_lockout_w (data & 0x0f);
 				if (x1_010 != NULL)
 					seta_sound_enable_w (x1_010, data & 0x20);
 				coin_counter_w(machine(), 0,data & 0x01);
@@ -362,46 +361,44 @@ Offset + 0x4:
 
 ***************************************************************************/
 
-INLINE void twineagl_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int offset )
+inline void seta_state::twineagl_tile_info( tile_data &tileinfo, int tile_index, int offset )
 {
-	seta_state *state = machine.driver_data<seta_state>();
-	UINT16 *vram = state->m_vram_0 + offset;
+	UINT16 *vram = m_vram_0 + offset;
 	UINT16 code =   vram[ tile_index ];
 	UINT16 attr =   vram[ tile_index + 0x800 ];
 	if ((code & 0x3e00) == 0x3e00)
-		code = (code & 0xc07f) | ((state->m_twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
-	SET_TILE_INFO( 1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
+		code = (code & 0xc07f) | ((m_twineagl_tilebank[(code & 0x0180) >> 7] >> 1) << 7);
+	SET_TILE_INFO_MEMBER( 1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_0){ twineagl_tile_info( machine(), tileinfo, tile_index, 0x0000 ); }
-TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_1){ twineagl_tile_info( machine(), tileinfo, tile_index, 0x1000 ); }
+TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_0){ twineagl_tile_info(tileinfo, tile_index, 0x0000 ); }
+TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_1){ twineagl_tile_info(tileinfo, tile_index, 0x1000 ); }
 
 
-INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int layer, int offset )
+inline void seta_state::get_tile_info( tile_data &tileinfo, int tile_index, int layer, int offset )
 {
-	seta_state *state = machine.driver_data<seta_state>();
 	int gfx = 1 + layer;
-	UINT16 *vram = (layer == 0) ? state->m_vram_0 + offset : state->m_vram_2 + offset;
-	UINT16 *vctrl = (layer == 0) ? state->m_vctrl_0 : state->m_vctrl_2;
+	UINT16 *vram = (layer == 0) ? m_vram_0 + offset : m_vram_2 + offset;
+	UINT16 *vctrl = (layer == 0) ? m_vctrl_0 : m_vctrl_2;
 	UINT16 code =   vram[ tile_index ];
 	UINT16 attr =   vram[ tile_index + 0x800 ];
 
-	if(machine.gfx[gfx + ((vctrl[ 4/2 ] & 0x10) >> state->m_color_mode_shift)] != NULL)
+	if(machine().gfx[gfx + ((vctrl[ 4/2 ] & 0x10) >> m_color_mode_shift)] != NULL)
 	{
-		gfx += (vctrl[ 4/2 ] & 0x10) >> state->m_color_mode_shift;
+		gfx += (vctrl[ 4/2 ] & 0x10) >> m_color_mode_shift;
 	}
 	else
 	{
 		popmessage("Missing Color Mode = 1 for Layer = %d. Contact MAMETesters.",layer);
 	}
 
-	SET_TILE_INFO( gfx, state->m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
+	SET_TILE_INFO_MEMBER( gfx, m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-TILE_GET_INFO_MEMBER(seta_state::get_tile_info_0){ get_tile_info( machine(), tileinfo, tile_index, 0, 0x0000 ); }
-TILE_GET_INFO_MEMBER(seta_state::get_tile_info_1){ get_tile_info( machine(), tileinfo, tile_index, 0, 0x1000 ); }
-TILE_GET_INFO_MEMBER(seta_state::get_tile_info_2){ get_tile_info( machine(), tileinfo, tile_index, 1, 0x0000 ); }
-TILE_GET_INFO_MEMBER(seta_state::get_tile_info_3){ get_tile_info( machine(), tileinfo, tile_index, 1, 0x1000 ); }
+TILE_GET_INFO_MEMBER(seta_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0, 0x0000 ); }
+TILE_GET_INFO_MEMBER(seta_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 0, 0x1000 ); }
+TILE_GET_INFO_MEMBER(seta_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 1, 0x0000 ); }
+TILE_GET_INFO_MEMBER(seta_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 1, 0x1000 ); }
 
 
 WRITE16_MEMBER(seta_state::seta_vram_0_w)
@@ -511,7 +508,6 @@ VIDEO_START_MEMBER(seta_state,twineagl_1_layer)
 
 int setac_gfxbank_callback( running_machine &machine, UINT16 code, UINT8 color )
 {
-	//seta_state *state = machine.driver_data<seta_state>();
 
 	int bank    =   (color & 0x06) >> 1;
 	code = (code & 0x3fff) + (bank * 0x4000);
@@ -704,65 +700,63 @@ PALETTE_INIT_MEMBER(seta_state,usclssic)
 }
 
 
-static void set_pens(running_machine &machine)
+void seta_state::set_pens()
 {
-	seta_state *state = machine.driver_data<seta_state>();
 	offs_t i;
 
-	for (i = 0; i < state->m_paletteram.bytes() / 2; i++)
+	for (i = 0; i < m_paletteram.bytes() / 2; i++)
 	{
-		UINT16 data = state->m_paletteram[i];
+		UINT16 data = m_paletteram[i];
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
-		if (machine.colortable != NULL)
-			colortable_palette_set_color(machine.colortable, i, color);
+		if (machine().colortable != NULL)
+			colortable_palette_set_color(machine().colortable, i, color);
 		else
-			palette_set_color(machine, i, color);
+			palette_set_color(machine(), i, color);
 	}
 
-	if(state->m_paletteram2 != NULL)
+	if(m_paletteram2 != NULL)
 	{
-		for (i = 0; i < state->m_paletteram2.bytes() / 2; i++)
+		for (i = 0; i < m_paletteram2.bytes() / 2; i++)
 		{
-			UINT16 data = state->m_paletteram2[i];
+			UINT16 data = m_paletteram2[i];
 
 			rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
-			if (machine.colortable != NULL)
-				colortable_palette_set_color(machine.colortable, i + state->m_paletteram.bytes() / 2, color);
+			if (machine().colortable != NULL)
+				colortable_palette_set_color(machine().colortable, i + m_paletteram.bytes() / 2, color);
 			else
-				palette_set_color(machine, i + state->m_paletteram.bytes() / 2, color);
+				palette_set_color(machine(), i + m_paletteram.bytes() / 2, color);
 		}
 	}
 }
 
 
-static void usclssic_set_pens(running_machine &machine)
+void seta_state::usclssic_set_pens()
 {
-	seta_state *state = machine.driver_data<seta_state>();
 	offs_t i;
 
 	for (i = 0; i < 0x200; i++)
 	{
-		UINT16 data = state->m_paletteram[i];
+		UINT16 data = m_paletteram[i];
 
 		rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
 		if (i >= 0x100)
-			colortable_palette_set_color(machine.colortable, i - 0x100, color);
+			colortable_palette_set_color(machine().colortable, i - 0x100, color);
 		else
-			colortable_palette_set_color(machine.colortable, i + 0x200, color);
+			colortable_palette_set_color(machine().colortable, i + 0x200, color);
 	}
 }
 
 
 
 
-static void draw_tilemap_palette_effect(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen)
+void seta_state::draw_tilemap_palette_effect(bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t *tilemap, int scrollx, int scrolly, int gfxnum, int flipscreen)
 {
 	int y;
-	gfx_element *gfx_tilemap = machine.gfx[gfxnum];
+	gfx_element *gfx_tilemap = machine().gfx[gfxnum];
 	const bitmap_ind16 &src_bitmap = tilemap->pixmap();
 	int width_mask, height_mask;
 	int opaque_mask = gfx_tilemap->granularity() - 1;
@@ -794,11 +788,11 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_ind16 &
 				// pixels with the last color are not drawn and the 2nd palette is added to the current bitmap color
 				if((p & pixel_effect_mask) == pixel_effect_mask)
 				{
-					dest[x] = machine.total_colors() / 2 + dest[x];
+					dest[x] = machine().total_colors() / 2 + dest[x];
 				}
 				else
 				{
-					dest[x] = machine.pens[p];
+					dest[x] = machine().pens[p];
 				}
 			}
 		}
@@ -819,7 +813,7 @@ static void draw_tilemap_palette_effect(running_machine &machine, bitmap_ind16 &
 /* For games without tilemaps */
 UINT32 seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(machine());
+	set_pens();
 	bitmap.fill(0x1f0, cliprect);
 
 	machine().device<seta001_device>("spritegen")->seta001_draw_sprites(machine(),bitmap,cliprect,0x1000, 1);
@@ -828,48 +822,47 @@ UINT32 seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_in
 
 
 /* For games with 1 or 2 tilemaps */
-void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size, int sprite_setac )
+void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size, int sprite_setac )
 {
-	seta_state *state = screen.machine().driver_data<seta_state>();
 	int layers_ctrl = -1;
 	int enab_0, enab_1, x_0, x_1=0, y_0, y_1=0;
 
 	int order   =   0;
-	int flip    =   screen.machine().device<seta001_device>("spritegen")->is_flipped();
+	int flip    =   machine().device<seta001_device>("spritegen")->is_flipped();
 
 	const rectangle &visarea = screen.visible_area();
 	int vis_dimy = visarea.max_y - visarea.min_y + 1;
 
 	// check tilemaps color modes
 
-	if(state->m_current_tilemap_mode[0] != (state->m_vctrl_0[ 4/2 ] & 0x10))
+	if(m_current_tilemap_mode[0] != (m_vctrl_0[ 4/2 ] & 0x10))
 	{
-		state->m_current_tilemap_mode[0] = state->m_vctrl_0[ 4/2 ] & 0x10;
-		state->m_tilemap_0->mark_all_dirty();
-		state->m_tilemap_1->mark_all_dirty();
+		m_current_tilemap_mode[0] = m_vctrl_0[ 4/2 ] & 0x10;
+		m_tilemap_0->mark_all_dirty();
+		m_tilemap_1->mark_all_dirty();
 	}
 
-	if(state->m_tilemap_2 != NULL && state->m_tilemap_3 != NULL)
+	if(m_tilemap_2 != NULL && m_tilemap_3 != NULL)
 	{
-		if(state->m_current_tilemap_mode[1] != (state->m_vctrl_2[ 4/2 ] & 0x10))
+		if(m_current_tilemap_mode[1] != (m_vctrl_2[ 4/2 ] & 0x10))
 		{
-			state->m_current_tilemap_mode[1] = state->m_vctrl_2[ 4/2 ] & 0x10;
-			state->m_tilemap_2->mark_all_dirty();
-			state->m_tilemap_3->mark_all_dirty();
+			m_current_tilemap_mode[1] = m_vctrl_2[ 4/2 ] & 0x10;
+			m_tilemap_2->mark_all_dirty();
+			m_tilemap_3->mark_all_dirty();
 		}
 	}
 
-	flip ^= state->m_tilemaps_flip;
+	flip ^= m_tilemaps_flip;
 
 	screen.machine().tilemap().set_flip_all(flip ? (TILEMAP_FLIPX|TILEMAP_FLIPY) : 0 );
 
-	x_0     =   state->m_vctrl_0[ 0/2 ];
-	y_0     =   state->m_vctrl_0[ 2/2 ];
-	enab_0  =   state->m_vctrl_0[ 4/2 ];
+	x_0     =   m_vctrl_0[ 0/2 ];
+	y_0     =   m_vctrl_0[ 2/2 ];
+	enab_0  =   m_vctrl_0[ 4/2 ];
 
 	/* Only one tilemap per layer is enabled! */
-	state->m_tilemap_0->enable((!(enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
-	state->m_tilemap_1->enable(( (enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
+	m_tilemap_0->enable((!(enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
+	m_tilemap_1->enable(( (enab_0 & 0x0008)) /*&& (enab_0 & 0x0001)*/ );
 
 	/* the hardware wants different scroll values when flipped */
 
@@ -879,7 +872,7 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 	                fff0 0260 = -$10, $400-$190 -$10
 	                ffe8 0272 = -$18, $400-$190 -$18 + $1a      */
 
-	x_0 += 0x10 - state->m_global_offsets->tilemap_offs[flip ? 1 : 0];
+	x_0 += 0x10 - m_global_offsets->tilemap_offs[flip ? 1 : 0];
 	y_0 -= (256 - vis_dimy)/2;
 	if (flip)
 	{
@@ -887,21 +880,21 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 		y_0 = y_0 - vis_dimy;
 	}
 
-	state->m_tilemap_0->set_scrollx(0, x_0);
-	state->m_tilemap_1->set_scrollx(0, x_0);
-	state->m_tilemap_0->set_scrolly(0, y_0);
-	state->m_tilemap_1->set_scrolly(0, y_0);
+	m_tilemap_0->set_scrollx(0, x_0);
+	m_tilemap_1->set_scrollx(0, x_0);
+	m_tilemap_0->set_scrolly(0, y_0);
+	m_tilemap_1->set_scrolly(0, y_0);
 
-	if (state->m_tilemap_2)
+	if (m_tilemap_2)
 	{
-		x_1     =   state->m_vctrl_2[ 0/2 ];
-		y_1     =   state->m_vctrl_2[ 2/2 ];
-		enab_1  =   state->m_vctrl_2[ 4/2 ];
+		x_1     =   m_vctrl_2[ 0/2 ];
+		y_1     =   m_vctrl_2[ 2/2 ];
+		enab_1  =   m_vctrl_2[ 4/2 ];
 
-		state->m_tilemap_2->enable((!(enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
-		state->m_tilemap_3->enable(( (enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
+		m_tilemap_2->enable((!(enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
+		m_tilemap_3->enable(( (enab_1 & 0x0008)) /*&& (enab_1 & 0x0001)*/ );
 
-		x_1 += 0x10 - state->m_global_offsets->tilemap_offs[flip ? 1 : 0];
+		x_1 += 0x10 - m_global_offsets->tilemap_offs[flip ? 1 : 0];
 		y_1 -= (256 - vis_dimy)/2;
 		if (flip)
 		{
@@ -909,12 +902,12 @@ void seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const recta
 			y_1 = y_1 - vis_dimy;
 		}
 
-		state->m_tilemap_2->set_scrollx(0, x_1);
-		state->m_tilemap_3->set_scrollx(0, x_1);
-		state->m_tilemap_2->set_scrolly(0, y_1);
-		state->m_tilemap_3->set_scrolly(0, y_1);
+		m_tilemap_2->set_scrollx(0, x_1);
+		m_tilemap_3->set_scrollx(0, x_1);
+		m_tilemap_2->set_scrolly(0, y_1);
+		m_tilemap_3->set_scrolly(0, y_1);
 
-		order   =   state->m_vregs[ 2/2 ];
+		order   =   m_vregs[ 2/2 ];
 	}
 
 
@@ -926,10 +919,10 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 	if (screen.machine().input().code_pressed(KEYCODE_A))   msk |= 8;
 	if (msk != 0) layers_ctrl &= msk;
 
-	if (state->m_tilemap_2)
+	if (m_tilemap_2)
 		popmessage("VR:%04X-%04X-%04X L0:%04X L1:%04X",
-			state->m_vregs[0], state->m_vregs[1], state->m_vregs[2], state->m_vctrl_0[4/2], state->m_vctrl_2[4/2]);
-	else if (state->m_tilemap_0)    popmessage("L0:%04X", state->m_vctrl_0[4/2]);
+			m_vregs[0], m_vregs[1], m_vregs[2], m_vctrl_0[4/2], m_vctrl_2[4/2]);
+	else if (m_tilemap_0)    popmessage("L0:%04X", m_vctrl_0[4/2]);
 }
 #endif
 
@@ -937,10 +930,10 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 	if (order & 1)  // swap the layers?
 	{
-		if (state->m_tilemap_2)
+		if (m_tilemap_2)
 		{
-			if (layers_ctrl & 2)    state->m_tilemap_2->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-			if (layers_ctrl & 2)    state->m_tilemap_3->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)    m_tilemap_2->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+			if (layers_ctrl & 2)    m_tilemap_3->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 		}
 
 		if (order & 2)  // layer-sprite priority?
@@ -952,8 +945,8 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 				popmessage("Missing palette effect. Contact MAMETesters.");
 			}
 
-			if (layers_ctrl & 1)    state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
-			if (layers_ctrl & 1)    state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 		}
 		else
 		{
@@ -962,30 +955,30 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 				popmessage("Missing palette effect. Contact MAMETesters.");
 			}
 
-			if (layers_ctrl & 1)    state->m_tilemap_0->draw(bitmap, cliprect, 0, 0);
-			if (layers_ctrl & 1)    state->m_tilemap_1->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0, 0);
+			if (layers_ctrl & 1)    m_tilemap_1->draw(bitmap, cliprect, 0, 0);
 
-			if (layers_ctrl & 8)        screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
 		}
 	}
 	else
 	{
-		if (layers_ctrl & 1)    state->m_tilemap_0->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
-		if (layers_ctrl & 1)    state->m_tilemap_1->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+		if (layers_ctrl & 1)    m_tilemap_1->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 		if (order & 2)  // layer-sprite priority?
 		{
-			if (layers_ctrl & 8)        screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8)        machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
 
-			if((order & 4) && state->m_paletteram2 != NULL)
+			if((order & 4) && m_paletteram2 != NULL)
 			{
-				if(state->m_tilemap_2->enabled())
+				if(m_tilemap_2->enabled())
 				{
-					draw_tilemap_palette_effect(screen.machine(), bitmap, cliprect, state->m_tilemap_2, x_1, y_1, 2 + ((state->m_vctrl_2[ 4/2 ] & 0x10) >> state->m_color_mode_shift), flip);
+					draw_tilemap_palette_effect(bitmap, cliprect, m_tilemap_2, x_1, y_1, 2 + ((m_vctrl_2[ 4/2 ] & 0x10) >> m_color_mode_shift), flip);
 				}
 				else
 				{
-					draw_tilemap_palette_effect(screen.machine(), bitmap, cliprect, state->m_tilemap_3, x_1, y_1, 2 + ((state->m_vctrl_2[ 4/2 ] & 0x10) >> state->m_color_mode_shift), flip);
+					draw_tilemap_palette_effect(bitmap, cliprect, m_tilemap_3, x_1, y_1, 2 + ((m_vctrl_2[ 4/2 ] & 0x10) >> m_color_mode_shift), flip);
 				}
 			}
 			else
@@ -995,24 +988,24 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 					popmessage("Missing palette effect. Contact MAMETesters.");
 				}
 
-				if (state->m_tilemap_2)
+				if (m_tilemap_2)
 				{
-					if (layers_ctrl & 2)    state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
-					if (layers_ctrl & 2)    state->m_tilemap_3->draw(bitmap, cliprect, 0, 0);
+					if (layers_ctrl & 2)    m_tilemap_2->draw(bitmap, cliprect, 0, 0);
+					if (layers_ctrl & 2)    m_tilemap_3->draw(bitmap, cliprect, 0, 0);
 				}
 			}
 		}
 		else
 		{
-			if((order & 4) && state->m_paletteram2 != NULL)
+			if((order & 4) && m_paletteram2 != NULL)
 			{
-				if(state->m_tilemap_2->enabled())
+				if(m_tilemap_2->enabled())
 				{
-					draw_tilemap_palette_effect(screen.machine(), bitmap, cliprect, state->m_tilemap_2, x_1, y_1, 2 + ((state->m_vctrl_2[ 4/2 ] & 0x10) >> state->m_color_mode_shift), flip);
+					draw_tilemap_palette_effect(bitmap, cliprect, m_tilemap_2, x_1, y_1, 2 + ((m_vctrl_2[ 4/2 ] & 0x10) >> m_color_mode_shift), flip);
 				}
 				else
 				{
-					draw_tilemap_palette_effect(screen.machine(), bitmap, cliprect, state->m_tilemap_3, x_1, y_1, 2 + ((state->m_vctrl_2[ 4/2 ] & 0x10) >> state->m_color_mode_shift), flip);
+					draw_tilemap_palette_effect(bitmap, cliprect, m_tilemap_3, x_1, y_1, 2 + ((m_vctrl_2[ 4/2 ] & 0x10) >> m_color_mode_shift), flip);
 				}
 			}
 			else
@@ -1022,14 +1015,14 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 					popmessage("Missing palette effect. Contact MAMETesters.");
 				}
 
-				if (state->m_tilemap_2)
+				if (m_tilemap_2)
 				{
-					if (layers_ctrl & 2)    state->m_tilemap_2->draw(bitmap, cliprect, 0, 0);
-					if (layers_ctrl & 2)    state->m_tilemap_3->draw(bitmap, cliprect, 0, 0);
+					if (layers_ctrl & 2)    m_tilemap_2->draw(bitmap, cliprect, 0, 0);
+					if (layers_ctrl & 2)    m_tilemap_3->draw(bitmap, cliprect, 0, 0);
 				}
 			}
 
-			if (layers_ctrl & 8)        screen.machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
+			if (layers_ctrl & 8) machine().device<seta001_device>("spritegen")->seta001_draw_sprites(screen.machine(),bitmap,cliprect,sprite_bank_size, sprite_setac);
 		}
 	}
 
@@ -1065,14 +1058,14 @@ void seta_state::screen_eof_setaroul(screen_device &screen, bool state)
 
 UINT32 seta_state::screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(machine());
+	set_pens();
 	return screen_update_seta_layers(screen, bitmap, cliprect);
 }
 
 
 UINT32 seta_state::screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	usclssic_set_pens(machine());
+	usclssic_set_pens();
 	return screen_update_seta_layers(screen, bitmap, cliprect);
 }
 

@@ -73,6 +73,8 @@ public:
 	DECLARE_WRITE8_MEMBER(scramble_protection_w);
 	DECLARE_READ8_MEMBER(scramble_protection_r);
 	DECLARE_WRITE_LINE_MEMBER(scramble_sh_7474_q_callback);
+	void cavelon_banksw();
+	inline int bit(int i,int n);
 };
 
 

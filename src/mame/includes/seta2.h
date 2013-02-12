@@ -75,4 +75,6 @@ public:
 	INTERRUPT_GEN_MEMBER(samshoot_interrupt);
 	INTERRUPT_GEN_MEMBER(funcube_sub_timer_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void funcube_debug_outputs();
 };

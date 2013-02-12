@@ -157,26 +157,25 @@ Offset:         Value:
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void skyfox_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	skyfox_state *state = machine.driver_data<skyfox_state>();
 	int offs;
 
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
 	/* The 32x32 tiles in the 80-ff range are bankswitched */
-	int shift =(state->m_bg_ctrl & 0x80) ? (4 - 1) : 4;
+	int shift =(m_bg_ctrl & 0x80) ? (4 - 1) : 4;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int xstart, ystart, xend, yend;
 		int xinc, yinc, dx, dy;
 		int low_code, high_code, n;
 
-		int y = state->m_spriteram[offs + 0];
-		int x = state->m_spriteram[offs + 1];
-		int code = state->m_spriteram[offs + 2] + state->m_spriteram[offs + 3] * 256;
+		int y = m_spriteram[offs + 0];
+		int x = m_spriteram[offs + 1];
+		int code = m_spriteram[offs + 2] + m_spriteram[offs + 3] * 256;
 		int flipx = code & 0x2;
 		int flipy = code & 0x4;
 
@@ -193,12 +192,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 #define DRAW_SPRITE(DX,DY,CODE) \
 		drawgfx_transpen(bitmap,\
-				cliprect,machine.gfx[0], \
+				cliprect,machine().gfx[0], \
 				(CODE), \
 				0, \
 				flipx,flipy, \
 				x + (DX),y + (DY), 0xff);
-		if (state->m_bg_ctrl & 1)   // flipscreen
+		if (m_bg_ctrl & 1)   // flipscreen
 		{
 			x = width  - x - (n - 1) * 8;
 			y = height - y - (n - 1) * 8;
@@ -235,27 +234,26 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 ***************************************************************************/
 
-static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void skyfox_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	skyfox_state *state = machine.driver_data<skyfox_state>();
-	UINT8 *RAM = state->memregion("gfx2")->base();
+	UINT8 *RAM = memregion("gfx2")->base();
 	int x, y, i;
 
 	/* The foreground stars (sprites) move at twice this speed when
 	   the bg scroll rate [e.g. (skyfox_bg_reg >> 1) & 7] is 4 */
-	int pos = (state->m_bg_pos >> 4) & (512 * 2 - 1);
+	int pos = (m_bg_pos >> 4) & (512 * 2 - 1);
 
 	for (i = 0 ; i < 0x1000; i++)
 	{
 		int pen, offs, j;
 
-		offs    = (i * 2 + ((state->m_bg_ctrl >> 4) & 0x3) * 0x2000) % 0x8000;
+		offs    = (i * 2 + ((m_bg_ctrl >> 4) & 0x3) * 0x2000) % 0x8000;
 
 		pen = RAM[offs];
 		x = RAM[offs + 1] * 2 + (i & 1) + pos + ((i & 8) ? 512 : 0);
 		y = ((i / 8) / 2) * 8 + (i % 8);
 
-		if (state->m_bg_ctrl & 1)   // flipscreen
+		if (m_bg_ctrl & 1)   // flipscreen
 		{
 			x = 512 * 2 - (x % (512 * 2));
 			y = 256     - (y % 256);
@@ -281,7 +279,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 UINT32 skyfox_state::screen_update_skyfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(255, cliprect); // the bg is black
-	draw_background(machine(), bitmap, cliprect);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_background(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

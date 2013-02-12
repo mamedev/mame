@@ -161,14 +161,13 @@ void sidearms_state::video_start()
 	m_flipon = m_charon = m_staron = m_objon = m_bgon = 0;
 }
 
-static void draw_sprites_region(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset )
+void sidearms_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset )
 {
-	sidearms_state *state = machine.driver_data<sidearms_state>();
-	UINT8 *buffered_spriteram = state->m_spriteram->buffer();
-	gfx_element *gfx = machine.gfx[2];
+	UINT8 *buffered_spriteram = m_spriteram->buffer();
+	gfx_element *gfx = machine().gfx[2];
 	int offs, attr, color, code, x, y, flipx, flipy;
 
-	flipy = flipx = state->m_flipon;
+	flipy = flipx = m_flipon;
 
 	for (offs = end_offset - 32; offs >= start_offset; offs -= 32)
 	{
@@ -180,7 +179,7 @@ static void draw_sprites_region(running_machine &machine, bitmap_ind16 &bitmap, 
 		code = buffered_spriteram[offs] + ((attr << 3) & 0x700);
 		x = buffered_spriteram[offs + 3] + ((attr << 4) & 0x100);
 
-		if (state->m_flipon)
+		if (m_flipon)
 		{
 			x = (62 * 8) - x;
 			y = (30 * 8) - y;
@@ -194,14 +193,13 @@ static void draw_sprites_region(running_machine &machine, bitmap_ind16 &bitmap, 
 	}
 }
 
-static void sidearms_draw_starfield( running_machine &machine, bitmap_ind16 &bitmap )
+void sidearms_state::sidearms_draw_starfield( bitmap_ind16 &bitmap )
 {
 	int x, y, i;
 	UINT32 hadd_283, vadd_283, _hflop_74a_n, _hcount_191, _vcount_191;
 	UINT8 *sf_rom;
 	UINT16 *lineptr;
 	int pixadv, lineadv;
-	sidearms_state *state = machine.driver_data<sidearms_state>();
 
 	// clear starfield background
 	lineptr = &bitmap.pix16(16, 64);
@@ -210,16 +208,16 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_ind16 &bit
 	for (i=224; i; i--) { memset(lineptr, 0, 768); lineptr += lineadv; }
 
 	// bail if not Side Arms or the starfield has been disabled
-	if (state->m_gameid || !state->m_staron) return;
+	if (m_gameid || !m_staron) return;
 
 	// init and cache some global vars in stack frame
 	hadd_283 = 0;
 
-	_hflop_74a_n = state->m_hflop_74a_n;
-	_vcount_191 = state->m_vcount_191;
-	_hcount_191 = state->m_hcount_191 & 0xff;
+	_hflop_74a_n = m_hflop_74a_n;
+	_vcount_191 = m_vcount_191;
+	_hcount_191 = m_hcount_191 & 0xff;
 
-	sf_rom = machine.root_device().memregion("user1")->base();
+	sf_rom = machine().root_device().memregion("user1")->base();
 
 #if 0 // old loop (for reference; easier to read)
 	if (!flipon)
@@ -265,7 +263,7 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_ind16 &bit
 		lineptr += lineadv;
 	}
 #else // optimized loop
-	if (!state->m_flipon)
+	if (!m_flipon)
 	{
 		lineptr = &bitmap.pix16(16, 64);
 		pixadv  = 1;
@@ -287,7 +285,7 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_ind16 &bit
 		i = vadd_283<<4 & 0xff0;                // to starfield EPROM A04-A11 (8 bits)
 		i |= (_hflop_74a_n^(hadd_283>>8)) << 3; // to starfield EPROM A03     (1 bit)
 		i |= hadd_283>>5 & 7;                   // to starfield EPROM A00-A02 (3 bits)
-		state->m_latch_374 = sf_rom[i + 0x3000];            // lines A12-A13 are always high
+		m_latch_374 = sf_rom[i + 0x3000];            // lines A12-A13 are always high
 
 		hadd_283 = _hcount_191 + 63;
 
@@ -306,36 +304,35 @@ static void sidearms_draw_starfield( running_machine &machine, bitmap_ind16 &bit
 				i = vadd_283<<4 & 0xff0;                // to starfield EPROM A04-A11 (8 bits)
 				i |= (_hflop_74a_n^(hadd_283>>8)) << 3; // to starfield EPROM A03     (1 bit)
 				i |= hadd_283>>5 & 7;                   // to starfield EPROM A00-A02 (3 bits)
-				state->m_latch_374 = sf_rom[i + 0x3000];            // lines A12-A13 are always high
+				m_latch_374 = sf_rom[i + 0x3000];            // lines A12-A13 are always high
 			}
 
-			if ((~((state->m_latch_374^hadd_283)^1) & 0x1f)) continue; // logic rejection 3
+			if ((~((m_latch_374^hadd_283)^1) & 0x1f)) continue; // logic rejection 3
 
-			*lineptr = (UINT16)(state->m_latch_374>>5 | 0x378); // to color mixer
+			*lineptr = (UINT16)(m_latch_374>>5 | 0x378); // to color mixer
 		}
 		lineptr += lineadv;
 	}
 #endif
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void sidearms_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sidearms_state *state = machine.driver_data<sidearms_state>();
 
-	if (state->m_gameid == 2 || state->m_gameid == 3) // Dyger and Whizz have simple front-to-back sprite priority
-		draw_sprites_region(machine, bitmap, cliprect, 0x0000, 0x1000);
+	if (m_gameid == 2 || m_gameid == 3) // Dyger and Whizz have simple front-to-back sprite priority
+		draw_sprites_region(bitmap, cliprect, 0x0000, 0x1000);
 	else
 	{
-		draw_sprites_region(machine, bitmap, cliprect, 0x0700, 0x0800);
-		draw_sprites_region(machine, bitmap, cliprect, 0x0e00, 0x1000);
-		draw_sprites_region(machine, bitmap, cliprect, 0x0800, 0x0f00);
-		draw_sprites_region(machine, bitmap, cliprect, 0x0000, 0x0700);
+		draw_sprites_region(bitmap, cliprect, 0x0700, 0x0800);
+		draw_sprites_region(bitmap, cliprect, 0x0e00, 0x1000);
+		draw_sprites_region(bitmap, cliprect, 0x0800, 0x0f00);
+		draw_sprites_region(bitmap, cliprect, 0x0000, 0x0700);
 	}
 }
 
 UINT32 sidearms_state::screen_update_sidearms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sidearms_draw_starfield(machine(), bitmap);
+	sidearms_draw_starfield(bitmap);
 
 	m_bg_tilemap->set_scrollx(0, m_bg_scrollx[0] + (m_bg_scrollx[1] << 8 & 0xf00));
 	m_bg_tilemap->set_scrolly(0, m_bg_scrolly[0] + (m_bg_scrolly[1] << 8 & 0xf00));
@@ -344,7 +341,7 @@ UINT32 sidearms_state::screen_update_sidearms(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	if (m_objon)
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 
 	if (m_charon)
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);

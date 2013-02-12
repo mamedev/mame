@@ -64,13 +64,12 @@ void solomon_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void solomon_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	solomon_state *state = machine.driver_data<solomon_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int code = spriteram[offs] + 16 * (spriteram[offs + 1] & 0x10);
 		int color = (spriteram[offs + 1] & 0x0e) >> 1;
@@ -79,7 +78,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int sx = spriteram[offs + 3];
 		int sy = 241 - spriteram[offs + 2];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 242 - sy;
@@ -88,7 +87,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		}
 
 		drawgfx_transpen(bitmap, cliprect,
-			machine.gfx[2],
+			machine().gfx[2],
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -99,6 +98,6 @@ UINT32 solomon_state::screen_update_solomon(screen_device &screen, bitmap_ind16 
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

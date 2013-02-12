@@ -45,11 +45,12 @@ public:
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	DECLARE_READ8_MEMBER(simpsons_sound_r);
 	void simpsons_postload();
+	void simpsons_video_banking( int bank );
+	void sound_nmi_callback( int param );
+	void simpsons_objdma(  );
 };
 
 
 /*----------- defined in video/simpsons.c -----------*/
-void simpsons_video_banking( running_machine &machine, int select );
-
 extern void simpsons_tile_callback(running_machine &machine, int layer,int bank,int *code,int *color,int *flags,int *priority);
 extern void simpsons_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);

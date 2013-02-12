@@ -295,7 +295,7 @@ WRITE16_MEMBER(ssv_state::ssv_lockout_w)
 		coin_counter_w(machine(), 1, data & 0x04);
 		coin_counter_w(machine(), 0, data & 0x08);
 //                        data & 0x40?
-		ssv_enable_video( machine(), data & 0x80);
+		ssv_enable_video(data & 0x80);
 	}
 }
 
@@ -310,7 +310,7 @@ WRITE16_MEMBER(ssv_state::ssv_lockout_inv_w)
 		coin_counter_w(machine(), 1, data & 0x04);
 		coin_counter_w(machine(), 0, data & 0x08);
 //                        data & 0x40?
-		ssv_enable_video( machine(), data & 0x80);
+		ssv_enable_video(data & 0x80);
 	}
 }
 
@@ -2508,34 +2508,32 @@ static const es5506_interface es5506_config =
 
 ***************************************************************************/
 
-static void init_ssv(running_machine &machine, int interrupt_ultrax)
+void ssv_state::init_ssv(int interrupt_ultrax)
 {
-	ssv_state *state = machine.driver_data<ssv_state>();
 	int i;
 	for (i = 0; i < 16; i++)
-		state->m_tile_code[i]   =   ( (i & 8) ? (1 << 16) : 0 ) +
+		m_tile_code[i]   =   ( (i & 8) ? (1 << 16) : 0 ) +
 								( (i & 4) ? (2 << 16) : 0 ) +
 								( (i & 2) ? (4 << 16) : 0 ) +
 								( (i & 1) ? (8 << 16) : 0 ) ;
-	ssv_enable_video(machine, 1);
-	state->m_interrupt_ultrax = interrupt_ultrax;
+	ssv_enable_video(1);
+	m_interrupt_ultrax = interrupt_ultrax;
 }
 
-static void init_hypreac2_common(running_machine &machine)
+void ssv_state::init_hypreac2_common()
 {
-	ssv_state *state = machine.driver_data<ssv_state>();
 	int i;
 
 	for (i = 0; i < 16; i++)
-		state->m_tile_code[i]   =   (i << 16);
+		m_tile_code[i]   =   (i << 16);
 }
 
 // massages the data from the BPMicro-compatible dump to runnable form
-static void init_st010(running_machine &machine)
+void ssv_state::init_st010()
 {
-	UINT8 *dspsrc = (UINT8 *)machine.root_device().memregion("st010")->base();
-	UINT32 *dspprg = (UINT32 *)machine.root_device().memregion("dspprg")->base();
-	UINT16 *dspdata = (UINT16 *)machine.root_device().memregion("dspdata")->base();
+	UINT8 *dspsrc = (UINT8 *)machine().root_device().memregion("st010")->base();
+	UINT32 *dspprg = (UINT32 *)machine().root_device().memregion("dspprg")->base();
+	UINT16 *dspdata = (UINT16 *)machine().root_device().memregion("dspdata")->base();
 
 	// copy DSP program
 	for (int i = 0; i < 0x10000; i+= 4)
@@ -2551,30 +2549,30 @@ static void init_st010(running_machine &machine)
 	}
 }
 
-DRIVER_INIT_MEMBER(ssv_state,drifto94)     {    init_ssv(machine(), 0); init_st010(machine());  }
-DRIVER_INIT_MEMBER(ssv_state,eaglshot)     {    init_ssv(machine(), 0); init_hypreac2_common(machine());    }
-DRIVER_INIT_MEMBER(ssv_state,gdfs)         {    init_ssv(machine(), 0); }
-DRIVER_INIT_MEMBER(ssv_state,hypreact)     {    init_ssv(machine(), 0); }
-DRIVER_INIT_MEMBER(ssv_state,hypreac2)     {    init_ssv(machine(), 0); init_hypreac2_common(machine());    }
-DRIVER_INIT_MEMBER(ssv_state,janjans1)     {    init_ssv(machine(), 0); }
-DRIVER_INIT_MEMBER(ssv_state,keithlcy)     {    init_ssv(machine(), 0); }
-DRIVER_INIT_MEMBER(ssv_state,meosism)       {   init_ssv(machine(), 0); }
-DRIVER_INIT_MEMBER(ssv_state,mslider)       {   init_ssv(machine(), 0); }
-DRIVER_INIT_MEMBER(ssv_state,ryorioh)       {   init_ssv(machine(), 0); }
-DRIVER_INIT_MEMBER(ssv_state,srmp4)        {    init_ssv(machine(), 0);
+DRIVER_INIT_MEMBER(ssv_state,drifto94)     {    init_ssv(0); init_st010();  }
+DRIVER_INIT_MEMBER(ssv_state,eaglshot)     {    init_ssv(0); init_hypreac2_common();    }
+DRIVER_INIT_MEMBER(ssv_state,gdfs)         {    init_ssv(0); }
+DRIVER_INIT_MEMBER(ssv_state,hypreact)     {    init_ssv(0); }
+DRIVER_INIT_MEMBER(ssv_state,hypreac2)     {    init_ssv(0); init_hypreac2_common();    }
+DRIVER_INIT_MEMBER(ssv_state,janjans1)     {    init_ssv(0); }
+DRIVER_INIT_MEMBER(ssv_state,keithlcy)     {    init_ssv(0); }
+DRIVER_INIT_MEMBER(ssv_state,meosism)       {   init_ssv(0); }
+DRIVER_INIT_MEMBER(ssv_state,mslider)       {   init_ssv(0); }
+DRIVER_INIT_MEMBER(ssv_state,ryorioh)       {   init_ssv(0); }
+DRIVER_INIT_MEMBER(ssv_state,srmp4)        {    init_ssv(0);
 //  ((UINT16 *)machine().root_device().memregion("user1")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
-DRIVER_INIT_MEMBER(ssv_state,srmp7)        {    init_ssv(machine(), 0); }
-DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init_ssv(machine(), 0); init_st010(machine()); }
-DRIVER_INIT_MEMBER(ssv_state,survarts)     {    init_ssv(machine(), 0); }
-DRIVER_INIT_MEMBER(ssv_state,dynagear)     {    init_ssv(machine(), 0); }
-DRIVER_INIT_MEMBER(ssv_state,sxyreact)     {    init_ssv(machine(), 0); init_hypreac2_common(machine());    }
-DRIVER_INIT_MEMBER(ssv_state,cairblad)     {    init_ssv(machine(), 0); init_hypreac2_common(machine());    }
-DRIVER_INIT_MEMBER(ssv_state,sxyreac2)     {    init_ssv(machine(), 0); init_hypreac2_common(machine());    }
-DRIVER_INIT_MEMBER(ssv_state,twineag2)     {    init_ssv(machine(), 1); init_st010(machine());  }
-DRIVER_INIT_MEMBER(ssv_state,ultrax)        {   init_ssv(machine(), 1); }
-DRIVER_INIT_MEMBER(ssv_state,vasara)        {   init_ssv(machine(), 0); }
-DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init_ssv(machine(), 0); }
+DRIVER_INIT_MEMBER(ssv_state,srmp7)        {    init_ssv(0); }
+DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init_ssv(0); init_st010(); }
+DRIVER_INIT_MEMBER(ssv_state,survarts)     {    init_ssv(0); }
+DRIVER_INIT_MEMBER(ssv_state,dynagear)     {    init_ssv(0); }
+DRIVER_INIT_MEMBER(ssv_state,sxyreact)     {    init_ssv(0); init_hypreac2_common();    }
+DRIVER_INIT_MEMBER(ssv_state,cairblad)     {    init_ssv(0); init_hypreac2_common();    }
+DRIVER_INIT_MEMBER(ssv_state,sxyreac2)     {    init_ssv(0); init_hypreac2_common();    }
+DRIVER_INIT_MEMBER(ssv_state,twineag2)     {    init_ssv(1); init_st010();  }
+DRIVER_INIT_MEMBER(ssv_state,ultrax)        {   init_ssv(1); }
+DRIVER_INIT_MEMBER(ssv_state,vasara)        {   init_ssv(0); }
+DRIVER_INIT_MEMBER(ssv_state,jsk)          {    init_ssv(0); }
 
 
 static MACHINE_CONFIG_START( ssv, ssv_state )

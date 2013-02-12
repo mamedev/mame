@@ -187,21 +187,20 @@ WRITE16_HANDLER( skullxbo_playfieldlatch_w )
  *
  *************************************/
 
-void skullxbo_scanline_update(running_machine &machine, int scanline)
+void skullxbo_state::skullxbo_scanline_update(int scanline)
 {
-	skullxbo_state *state = machine.driver_data<skullxbo_state>();
-	UINT16 *base = &state->m_alpha[(scanline / 8) * 64 + 42];
+	UINT16 *base = &m_alpha[(scanline / 8) * 64 + 42];
 	int x;
 
 	/* keep in range */
-	if (base >= &state->m_alpha[0x7c0])
+	if (base >= &m_alpha[0x7c0])
 		return;
 
 	/* special case: scanline 0 should re-latch the previous raw scroll */
 	if (scanline == 0)
 	{
-		int newscroll = (*state->m_yscroll >> 7) & 0x1ff;
-		state->m_playfield_tilemap->set_scrolly(0, newscroll);
+		int newscroll = (*m_yscroll >> 7) & 0x1ff;
+		m_playfield_tilemap->set_scrolly(0, newscroll);
 		atarimo_set_yscroll(0, newscroll);
 	}
 
@@ -219,15 +218,15 @@ void skullxbo_scanline_update(running_machine &machine, int scanline)
 
 			/* force a partial update with the previous scroll */
 			if (scanline > 0)
-				machine.primary_screen->update_partial(scanline - 1);
+				machine().primary_screen->update_partial(scanline - 1);
 
 			/* update the new scroll */
-			state->m_playfield_tilemap->set_scrolly(0, newscroll);
+			m_playfield_tilemap->set_scrolly(0, newscroll);
 			atarimo_set_yscroll(0, newscroll);
 
 			/* make sure we change this value so that writes to the scroll register */
 			/* know whether or not they are a different scroll */
-			*state->m_yscroll = data;
+			*m_yscroll = data;
 		}
 	}
 }

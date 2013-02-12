@@ -405,27 +405,26 @@ READ16_MEMBER(snowbros_state::sb3_sound_r)
 	return 0x0003;
 }
 
-static void sb3_play_music(running_machine &machine, int data)
+void snowbros_state::sb3_play_music(int data)
 {
-	snowbros_state *state = machine.driver_data<snowbros_state>();
 	UINT8 *snd;
 
 	/* sample is actually played in interrupt function so it loops */
-	state->m_sb3_music = data;
+	m_sb3_music = data;
 
 	switch (data)
 	{
 		case 0x23:
 		case 0x26:
-		snd = state->memregion("oki")->base();
+		snd = memregion("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x00000, 0x20000);
-		state->m_sb3_music_is_playing = 1;
+		m_sb3_music_is_playing = 1;
 		break;
 
 		case 0x24:
-		snd = state->memregion("oki")->base();
+		snd = memregion("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x20000, 0x20000);
-		state->m_sb3_music_is_playing = 1;
+		m_sb3_music_is_playing = 1;
 		break;
 
 		case 0x25:
@@ -436,18 +435,18 @@ static void sb3_play_music(running_machine &machine, int data)
 		case 0x2b:
 		case 0x2c:
 		case 0x2d:
-		snd = state->memregion("oki")->base();
+		snd = memregion("oki")->base();
 		memcpy(snd+0x20000, snd+0x80000+0x40000, 0x20000);
-		state->m_sb3_music_is_playing = 1;
+		m_sb3_music_is_playing = 1;
 		break;
 
 		case 0x2e:
-		state->m_sb3_music_is_playing = 0;
+		m_sb3_music_is_playing = 0;
 		break;
 	}
 }
 
-static void sb3_play_sound (okim6295_device *oki, int data)
+void snowbros_state::sb3_play_sound (okim6295_device *oki, int data)
 {
 	int status = oki->read_status();
 
@@ -490,7 +489,7 @@ WRITE16_MEMBER(snowbros_state::sb3_sound_w)
 
 		if (data>=0x22 && data<=0x31)
 		{
-			sb3_play_music(machine(), data);
+			sb3_play_music(data);
 		}
 
 		if ((data>=0x30) && (data<=0x51))
@@ -500,7 +499,7 @@ WRITE16_MEMBER(snowbros_state::sb3_sound_w)
 
 		if (data>=0x52 && data<=0x5f)
 		{
-			sb3_play_music(machine(), data-0x30);
+			sb3_play_music(data-0x30);
 		}
 
 	}

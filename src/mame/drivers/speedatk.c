@@ -82,7 +82,7 @@ PS / PD :  key matrix
 
 #define MASTER_CLOCK XTAL_12MHz
 
-static UINT8 iox_key_matrix_calc(running_machine &machine, UINT8 p_side)
+UINT8 speedatk_state::iox_key_matrix_calc(UINT8 p_side)
 {
 	static const char *const keynames[] = { "P1_ROW0", "P1_ROW1", "P2_ROW0", "P2_ROW1" };
 
@@ -94,7 +94,7 @@ static UINT8 iox_key_matrix_calc(running_machine &machine, UINT8 p_side)
 
 		for (t = 0 ; t < 8 ; t ++)
 		{
-			if (!(machine.root_device().ioport(keynames[j+p_side])->read() & ( 1 << t )))
+			if (!(machine().root_device().ioport(keynames[j+p_side])->read() & ( 1 << t )))
 			{
 				return (i + t) | (p_side ? 0x20 : 0x00);
 			}
@@ -125,8 +125,8 @@ READ8_MEMBER(speedatk_state::key_matrix_r)
 	/* both side checks */
 	if(m_mux_data == 1)
 	{
-		UINT8 p1_side = iox_key_matrix_calc(machine(),0);
-		UINT8 p2_side = iox_key_matrix_calc(machine(),2);
+		UINT8 p1_side = iox_key_matrix_calc(0);
+		UINT8 p2_side = iox_key_matrix_calc(2);
 
 		if(p1_side != 0)
 			return p1_side;
@@ -135,7 +135,7 @@ READ8_MEMBER(speedatk_state::key_matrix_r)
 	}
 
 	/* check individual input side */
-	return iox_key_matrix_calc(machine(),(m_mux_data == 2) ? 0 : 2);
+	return iox_key_matrix_calc((m_mux_data == 2) ? 0 : 2);
 }
 
 WRITE8_MEMBER(speedatk_state::key_matrix_w)

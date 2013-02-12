@@ -79,15 +79,14 @@ WRITE8_MEMBER(speedbal_state::speedbal_background_videoram_w)
  *                                   *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void speedbal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	speedbal_state *state = machine.driver_data<speedbal_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int x,y,code,color,offset,flipx,flipy;
 
 	/* Drawing sprites: 64 in total */
 
-	for (offset = 0;offset < state->m_spriteram.bytes();offset += 4)
+	for (offset = 0;offset < m_spriteram.bytes();offset += 4)
 	{
 		if(!(spriteram[offset + 2] & 0x80))
 			continue;
@@ -101,14 +100,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		flipx = flipy = 0;
 
-		if(state->flip_screen())
+		if(flip_screen())
 		{
 			x = 246 - x;
 			y = 238 - y;
 			flipx = flipy = 1;
 		}
 
-		drawgfx_transpen (bitmap,cliprect,machine.gfx[2],
+		drawgfx_transpen (bitmap,cliprect,machine().gfx[2],
 				code,
 				color,
 				flipx,flipy,
@@ -126,7 +125,7 @@ UINT32 speedbal_state::screen_update_speedbal(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;

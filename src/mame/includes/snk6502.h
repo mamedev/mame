@@ -64,6 +64,7 @@ public:
 	INTERRUPT_GEN_MEMBER(satansat_interrupt);
 	INTERRUPT_GEN_MEMBER(snk6502_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(sasuke_update_counter);
+	void sasuke_start_counter();
 };
 
 

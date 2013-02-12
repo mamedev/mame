@@ -68,17 +68,16 @@ void stfight_state::palette_init()
 }
 
 
-static void set_pens(running_machine &machine)
+void stfight_state::set_pens()
 {
-	stfight_state *state = machine.driver_data<stfight_state>();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT16 data = state->m_generic_paletteram_8[i] | (state->m_generic_paletteram2_8[i] << 8);
+		UINT16 data = m_generic_paletteram_8[i] | (m_generic_paletteram2_8[i] << 8);
 		rgb_t color = MAKE_RGB(pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 
-		colortable_palette_set_color(machine.colortable, i, color);
+		colortable_palette_set_color(machine().colortable, i, color);
 	}
 }
 
@@ -240,21 +239,20 @@ WRITE8_MEMBER(stfight_state::stfight_vh_latch_w)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void stfight_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	stfight_state *state = machine.driver_data<stfight_state>();
 	int offs,sx,sy;
 
 	for (offs = 0;offs < 4096;offs += 32)
 	{
 		int code;
-		int attr = state->m_sprite_ram[offs+1];
+		int attr = m_sprite_ram[offs+1];
 		int flipx = attr & 0x10;
 		int color = attr & 0x0f;
 		int pri = (attr & 0x20) >> 5;
 
-		sy = state->m_sprite_ram[offs+2];
-		sx = state->m_sprite_ram[offs+3];
+		sy = m_sprite_ram[offs+2];
+		sx = m_sprite_ram[offs+3];
 
 		// non-active sprites have zero y coordinate value
 		if( sy > 0 )
@@ -267,21 +265,21 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 					sx -= 0x100;
 			}
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
 				flipx = !flipx;
 			}
 
-			code = state->m_sprite_base + state->m_sprite_ram[offs];
+			code = m_sprite_base + m_sprite_ram[offs];
 
-			pdrawgfx_transpen(bitmap,cliprect,machine.gfx[4],
+			pdrawgfx_transpen(bitmap,cliprect,machine().gfx[4],
 						code,
 						color,
-						flipx,state->flip_screen(),
+						flipx,flip_screen(),
 						sx,sy,
-						machine.priority_bitmap,
+						machine().priority_bitmap,
 						pri ? 0x02 : 0,0x0f);
 		}
 	}
@@ -290,7 +288,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 stfight_state::screen_update_stfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(machine());
+	set_pens();
 
 	machine().priority_bitmap.fill(0, cliprect);
 
@@ -300,7 +298,7 @@ UINT32 stfight_state::screen_update_stfight(screen_device &screen, bitmap_ind16 
 
 	/* Draw sprites (may be obscured by foreground layer) */
 	if (m_vh_latch_ram[0x07] & 0x40)
-		draw_sprites(machine(), bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;

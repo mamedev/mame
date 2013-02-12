@@ -194,4 +194,10 @@ public:
 	UINT32 screen_update_s16a_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_s16a_bootleg_passht4b(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sys16_interrupt);
+	void setup_system16_bootleg_spritebanking(  );
+	void update_page(  );
+	void set_tile_bank( int data );
+	void set_fg_page( int data );
+	void set_bg_page( int data );
+	void datsu_set_pages(  );
 };

@@ -73,43 +73,43 @@ READ8_MEMBER(stactics_state::horiz_pos_r)
 }
 
 
-static void move_motor(running_machine &machine, stactics_state *state)
+void stactics_state::move_motor()
 {
 		/* monitor motor under joystick control */
-	if (*state->m_motor_on & 0x01)
+	if (*m_motor_on & 0x01)
 	{
-		int ip3 = machine.root_device().ioport("IN3")->read();
-		int ip4 = machine.root_device().ioport("FAKE")->read();
+		int ip3 = machine().root_device().ioport("IN3")->read();
+		int ip4 = machine().root_device().ioport("FAKE")->read();
 
 		/* up */
-		if (((ip4 & 0x01) == 0) && (state->m_vert_pos > -128))
-			state->m_vert_pos--;
+		if (((ip4 & 0x01) == 0) && (m_vert_pos > -128))
+			m_vert_pos--;
 
 		/* down */
-		if (((ip4 & 0x02) == 0) && (state->m_vert_pos < 127))
-			state->m_vert_pos++;
+		if (((ip4 & 0x02) == 0) && (m_vert_pos < 127))
+			m_vert_pos++;
 
 		/* left */
-		if (((ip3 & 0x20) == 0) && (state->m_horiz_pos < 127))
-			state->m_horiz_pos++;
+		if (((ip3 & 0x20) == 0) && (m_horiz_pos < 127))
+			m_horiz_pos++;
 
 		/* right */
-		if (((ip3 & 0x40) == 0) && (state->m_horiz_pos > -128))
-			state->m_horiz_pos--;
+		if (((ip3 & 0x40) == 0) && (m_horiz_pos > -128))
+			m_horiz_pos--;
 	}
 
 		/* monitor motor under self-centering control */
 	else
 	{
-		if (state->m_horiz_pos > 0)
-			state->m_horiz_pos--;
-		else if (state->m_horiz_pos < 0)
-			state->m_horiz_pos++;
+		if (m_horiz_pos > 0)
+			m_horiz_pos--;
+		else if (m_horiz_pos < 0)
+			m_horiz_pos++;
 
-		if (state->m_vert_pos > 0)
-			state->m_vert_pos--;
-		else if (state->m_vert_pos < 0)
-			state->m_vert_pos++;
+		if (m_vert_pos > 0)
+			m_vert_pos--;
+		else if (m_vert_pos < 0)
+			m_vert_pos++;
 	}
 }
 
@@ -150,7 +150,7 @@ WRITE8_MEMBER(stactics_state::stactics_coin_lockout_w)
 
 INTERRUPT_GEN_MEMBER(stactics_state::stactics_interrupt)
 {
-	move_motor(machine(), this);
+	move_motor();
 
 	device.execute().set_input_line(0, HOLD_LINE);
 }

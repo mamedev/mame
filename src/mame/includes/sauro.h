@@ -39,4 +39,6 @@ public:
 	UINT32 screen_update_trckydoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_sauro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sauro_interrupt);
+	void sauro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void trckydoc_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

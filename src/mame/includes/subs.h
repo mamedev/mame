@@ -52,6 +52,8 @@ public:
 	DECLARE_WRITE8_MEMBER(subs_crash_w);
 	DECLARE_WRITE8_MEMBER(subs_explode_w);
 	DECLARE_WRITE8_MEMBER(subs_noise_reset_w);
+	int subs_steering_1();
+	int subs_steering_2();
 };
 
 /*----------- defined in audio/subs.c -----------*/

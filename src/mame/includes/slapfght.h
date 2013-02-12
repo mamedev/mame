@@ -127,6 +127,9 @@ public:
 	UINT32 screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(getstar_interrupt);
+	void slapfght_log_vram();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority_to_display );
+	void getstar_init(  );
 };
 
 

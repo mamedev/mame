@@ -112,11 +112,10 @@ WRITE8_MEMBER(simpsons_state::z80_bankswitch_w)
 }
 
 #if 0
-static void sound_nmi_callback( running_machine &machine, int param )
+void simpsons_state::sound_nmi_callback( int param )
 {
-	simpsons_state *state = machine.driver_data<simpsons_state>();
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, (state->m_nmi_enabled) ? CLEAR_LINE : ASSERT_LINE );
-	state->m_nmi_enabled = 0;
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, (m_nmi_enabled) ? CLEAR_LINE : ASSERT_LINE );
+	m_nmi_enabled = 0;
 }
 #endif
 
@@ -225,16 +224,15 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-static void simpsons_objdma( running_machine &machine )
+void simpsons_state::simpsons_objdma(  )
 {
-	simpsons_state *state = machine.driver_data<simpsons_state>();
 	int counter, num_inactive;
 	UINT16 *src, *dst;
 
-	k053247_get_ram(state->m_k053246, &dst);
-	counter = k053247_get_dy(state->m_k053246);
+	k053247_get_ram(m_k053246, &dst);
+	counter = k053247_get_dy(m_k053246);
 
-	src = state->m_spriteram;
+	src = m_spriteram;
 	num_inactive = counter = 256;
 
 	do {
@@ -262,7 +260,7 @@ INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
 {
 	if (k053246_is_irq_enabled(m_k053246))
 	{
-		simpsons_objdma(machine());
+		simpsons_objdma();
 		// 32+256us delay at 8MHz dotclock; artificially shortened since actual V-blank length is unknown
 		machine().scheduler().timer_set(attotime::from_usec(30), timer_expired_delegate(FUNC(simpsons_state::dmaend_callback),this));
 	}

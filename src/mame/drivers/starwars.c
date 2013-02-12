@@ -70,7 +70,7 @@ void starwars_state::machine_reset()
 	}
 
 	/* reset the matrix processor */
-	starwars_mproc_reset(machine());
+	starwars_mproc_reset();
 }
 
 
@@ -94,16 +94,15 @@ WRITE8_MEMBER(starwars_state::irq_ack_w)
  *
  *************************************/
 
-static void esb_slapstic_tweak(address_space &space, offs_t offset)
+void starwars_state::esb_slapstic_tweak(address_space &space, offs_t offset)
 {
-	starwars_state *state = space.machine().driver_data<starwars_state>();
 	int new_bank = slapstic_tweak(space, offset);
 
 	/* update for the new bank */
-	if (new_bank != state->m_slapstic_current_bank)
+	if (new_bank != m_slapstic_current_bank)
 	{
-		state->m_slapstic_current_bank = new_bank;
-		memcpy(state->m_slapstic_base, &state->m_slapstic_source[state->m_slapstic_current_bank * 0x2000], 0x2000);
+		m_slapstic_current_bank = new_bank;
+		memcpy(m_slapstic_base, &m_slapstic_source[m_slapstic_current_bank * 0x2000], 0x2000);
 	}
 }
 
@@ -506,7 +505,7 @@ DRIVER_INIT_MEMBER(starwars_state,starwars)
 {
 	/* prepare the mathbox */
 	m_is_esb = 0;
-	starwars_mproc_init(machine());
+	starwars_mproc_init();
 
 	/* initialize banking */
 	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x6000, 0x10000 - 0x6000);
@@ -535,7 +534,7 @@ DRIVER_INIT_MEMBER(starwars_state,esb)
 
 	/* prepare the matrix processor */
 	m_is_esb = 1;
-	starwars_mproc_init(machine());
+	starwars_mproc_init();
 
 	/* initialize banking */
 	membank("bank1")->configure_entries(0, 2, rom + 0x6000, 0x10000 - 0x6000);

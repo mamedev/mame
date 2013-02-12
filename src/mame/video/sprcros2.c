@@ -135,14 +135,13 @@ void sprcros2_state::video_start()
 	colortable_configure_tilemap_groups(machine().colortable, m_fgtilemap, machine().gfx[2], 0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void sprcros2_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	sprcros2_state *state = machine.driver_data<sprcros2_state>();
 	int offs,sx,sy,color,flipx,flipy;
 
-	for (offs = state->m_spriteram.bytes()-4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes()-4; offs >= 0; offs -= 4)
 	{
-		if (state->m_spriteram[offs])
+		if (m_spriteram[offs])
 		{
 			//offs
 			//76543210
@@ -158,13 +157,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			//offs+2   y pos
 			//offs+3   x pos
 
-			sx = ((state->m_spriteram[offs+3]+0x10)%0x100)-0x10;
-			sy = 225-(((state->m_spriteram[offs+2]+0x10)%0x100)-0x10);
-			color = (state->m_spriteram[offs+1]&0x38)>>3;
-			flipx = state->m_spriteram[offs+1]&0x02;
+			sx = ((m_spriteram[offs+3]+0x10)%0x100)-0x10;
+			sy = 225-(((m_spriteram[offs+2]+0x10)%0x100)-0x10);
+			color = (m_spriteram[offs+1]&0x38)>>3;
+			flipx = m_spriteram[offs+1]&0x02;
 			flipy = 0;
 
-			if (state->m_port7&0x02)
+			if (m_port7&0x02)
 			{
 				sx = 224-sx;
 				sy = 224-sy;
@@ -172,12 +171,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				flipy = !flipy;
 			}
 
-			drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
-				state->m_spriteram[offs],
+			drawgfx_transmask(bitmap,cliprect,machine().gfx[1],
+				m_spriteram[offs],
 				color,
 				flipx,flipy,
 				sx,sy,
-				colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0));
+				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
 		}
 	}
 }
@@ -185,7 +184,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 UINT32 sprcros2_state::screen_update_sprcros2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bgtilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fgtilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

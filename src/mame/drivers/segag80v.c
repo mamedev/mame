@@ -184,17 +184,15 @@ void segag80v_state::machine_start()
  *
  *************************************/
 
-static offs_t decrypt_offset(address_space &space, offs_t offset)
+offs_t segag80v_state::decrypt_offset(address_space &space, offs_t offset)
 {
-	segag80v_state *state = space.machine().driver_data<segag80v_state>();
-
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
 	offs_t pc = space.device().safe_pcbase();
 	if ((UINT16)pc == 0xffff || space.read_byte(pc) != 0x32)
 		return offset;
 
 	/* fetch the low byte of the address and munge it */
-	return (offset & 0xff00) | (*state->m_decrypt)(pc, space.read_byte(pc + 1));
+	return (offset & 0xff00) | (*m_decrypt)(pc, space.read_byte(pc + 1));
 }
 
 WRITE8_MEMBER(segag80v_state::mainram_w)
@@ -216,7 +214,7 @@ WRITE8_MEMBER(segag80v_state::vectorram_w)
  *
  *************************************/
 
-INLINE UINT8 demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0)
+inline UINT8 segag80v_state::demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0)
 {
 	return ((d7d6 << 7) & 0x80) | ((d7d6 << 2) & 0x40) |
 			((d5d4 << 5) & 0x20) | ((d5d4 << 0) & 0x10) |

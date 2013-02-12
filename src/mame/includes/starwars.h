@@ -67,6 +67,10 @@ public:
 	DECLARE_READ8_MEMBER(r6532_porta_r);
 	DECLARE_WRITE8_MEMBER(r6532_porta_w);
 	DECLARE_WRITE_LINE_MEMBER(snd_interrupt);
+	void starwars_mproc_init();
+	void starwars_mproc_reset();
+	void run_mproc();
+	void esb_slapstic_tweak(address_space &space, offs_t offset);
 };
 
 

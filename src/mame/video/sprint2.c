@@ -77,7 +77,7 @@ WRITE8_MEMBER(sprint2_state::sprint2_video_ram_w)
 }
 
 
-static UINT8 collision_check(sprint2_state *state, colortable_t *colortable, rectangle& rect)
+UINT8 sprint2_state::collision_check(colortable_t *colortable, rectangle& rect)
 {
 	UINT8 data = 0;
 
@@ -87,7 +87,7 @@ static UINT8 collision_check(sprint2_state *state, colortable_t *colortable, rec
 	for (y = rect.min_y; y <= rect.max_y; y++)
 		for (x = rect.min_x; x <= rect.max_x; x++)
 		{
-			UINT16 a = colortable_entry_get_value(colortable, state->m_helper.pix16(y, x));
+			UINT16 a = colortable_entry_get_value(colortable, m_helper.pix16(y, x));
 
 			if (a == 0)
 				data |= 0x40;
@@ -100,15 +100,15 @@ static UINT8 collision_check(sprint2_state *state, colortable_t *colortable, rec
 }
 
 
-INLINE int get_sprite_code(UINT8 *video_ram, int n)
+inline int sprint2_state::get_sprite_code(UINT8 *video_ram, int n)
 {
 	return video_ram[0x398 + 2 * n + 1] >> 3;
 }
-INLINE int get_sprite_x(UINT8 *video_ram, int n)
+inline int sprint2_state::get_sprite_x(UINT8 *video_ram, int n)
 {
 	return 2 * (248 - video_ram[0x390 + 1 * n]);
 }
-INLINE int get_sprite_y(UINT8 *video_ram, int n)
+inline int sprint2_state::get_sprite_y(UINT8 *video_ram, int n)
 {
 	return 1 * (248 - video_ram[0x398 + 2 * n]);
 }
@@ -176,7 +176,7 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 				get_sprite_x(video_ram, i),
 				get_sprite_y(video_ram, i), 1);
 
-			m_collision[i] |= collision_check(this, machine().colortable, rect);
+			m_collision[i] |= collision_check(machine().colortable, rect);
 
 			/* check for sprite-sprite collisions */
 
@@ -198,7 +198,7 @@ void sprint2_state::screen_eof_sprint2(screen_device &screen, bool state)
 				get_sprite_x(video_ram, i),
 				get_sprite_y(video_ram, i), 1);
 
-			m_collision[i] |= collision_check(this, machine().colortable, rect);
+			m_collision[i] |= collision_check(machine().colortable, rect);
 		}
 	}
 }

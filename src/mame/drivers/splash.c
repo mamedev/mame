@@ -142,17 +142,16 @@ WRITE8_MEMBER(splash_state::sound_bank_w)
 }
 
 
-static void roldfrog_update_irq( running_machine &machine )
+void splash_state::roldfrog_update_irq(  )
 {
-	splash_state * state = machine.driver_data<splash_state>();
-	int irq = (state->m_sound_irq ? 0x08 : 0) | ((state->m_vblank_irq) ? 0x18 : 0);
-	machine.device("audiocpu")->execute().set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq);
+	int irq = (m_sound_irq ? 0x08 : 0) | ((m_vblank_irq) ? 0x18 : 0);
+	machine().device("audiocpu")->execute().set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq);
 }
 
 WRITE8_MEMBER(splash_state::roldfrog_vblank_ack_w)
 {
 	m_vblank_irq = 0;
-	roldfrog_update_irq(machine());
+	roldfrog_update_irq();
 }
 
 
@@ -160,7 +159,7 @@ static void ym_irq(device_t *device, int state)
 {
 	splash_state * driver_state = device->machine().driver_data<splash_state>();
 	driver_state->m_sound_irq = state;
-	roldfrog_update_irq(device->machine());
+	driver_state->roldfrog_update_irq();
 }
 
 static ADDRESS_MAP_START( roldfrog_map, AS_PROGRAM, 16, splash_state )
@@ -538,7 +537,7 @@ static const ym2203_interface ym2203_config =
 INTERRUPT_GEN_MEMBER(splash_state::roldfrog_interrupt)
 {
 	m_vblank_irq = 1;
-	roldfrog_update_irq(machine());
+	roldfrog_update_irq();
 }
 
 static MACHINE_CONFIG_START( roldfrog, splash_state )

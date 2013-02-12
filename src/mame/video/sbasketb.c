@@ -131,11 +131,10 @@ void sbasketb_state::video_start()
 	m_bg_tilemap->set_scroll_cols(32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void sbasketb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	sbasketb_state *state = machine.driver_data<sbasketb_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	int offs = (*state->m_spriteram_select & 0x01) * 0x100;
+	UINT8 *spriteram = m_spriteram;
+	int offs = (*m_spriteram_select & 0x01) * 0x100;
 	int i;
 
 	for (i = 0; i < 64; i++, offs += 4)
@@ -146,11 +145,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if (sx || sy)
 		{
 			int code  =  spriteram[offs + 0] | ((spriteram[offs + 1] & 0x20) << 3);
-			int color = (spriteram[offs + 1] & 0x0f) + 16 * *state->m_palettebank;
+			int color = (spriteram[offs + 1] & 0x0f) + 16 * *m_palettebank;
 			int flipx =  spriteram[offs + 1] & 0x40;
 			int flipy =  spriteram[offs + 1] & 0x80;
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -159,7 +158,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			}
 
 			drawgfx_transpen(bitmap,cliprect,
-				machine.gfx[1],
+				machine().gfx[1],
 				code, color,
 				flipx, flipy,
 				sx, sy, 0);
@@ -175,6 +174,6 @@ UINT32 sbasketb_state::screen_update_sbasketb(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->set_scrolly(col, *m_scroll);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

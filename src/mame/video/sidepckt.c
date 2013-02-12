@@ -104,13 +104,12 @@ WRITE8_MEMBER(sidepckt_state::sidepckt_flipscreen_w)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void sidepckt_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	sidepckt_state *state = machine.driver_data<sidepckt_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0;offs < m_spriteram.bytes(); offs += 4)
 	{
 		int sx,sy,code,color,flipx,flipy;
 
@@ -123,13 +122,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		flipx = spriteram[offs+1] & 0x08;
 		flipy = spriteram[offs+1] & 0x04;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,0);
 		/* wraparound */
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code,
 				color,
 				flipx,flipy,
@@ -141,7 +140,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 UINT32 sidepckt_state::screen_update_sidepckt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
 	return 0;
 }

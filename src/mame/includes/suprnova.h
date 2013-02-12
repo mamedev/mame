@@ -138,12 +138,13 @@ public:
 	void screen_eof_skns(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(skns_irq);
+	void suprnova_draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram);
+	void palette_set_rgb_brightness (int offset, UINT8 brightness_r, UINT8 brightness_g, UINT8 brightness_b);
+	void palette_update();
+	void supernova_draw_a( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const rectangle &cliprect, int tran );
+	void supernova_draw_b( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const rectangle &cliprect, int tran );
+	void hit_recalc();
+	void init_skns();
+	void set_drc_pcflush(UINT32 addr);
 };
 
-/*----------- defined in video/suprnova.c -----------*/
-void skns_sprite_kludge(int x, int y);
-void skns_draw_sprites(
-	running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,
-	UINT32* spriteram_source, size_t spriteram_size,
-	UINT8* gfx_source, size_t gfx_length,
-	UINT32* sprite_regs );

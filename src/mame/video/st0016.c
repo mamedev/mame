@@ -211,7 +211,7 @@ WRITE8_MEMBER(st0016_state::st0016_vregs_w)
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void st0016_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/*
 	object ram :
@@ -256,7 +256,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	*/
 
-	gfx_element *gfx = machine.gfx[st0016_ramgfx];
+	gfx_element *gfx = machine().gfx[st0016_ramgfx];
 	int i,j,lx,ly,x,y,code,offset,length,sx,sy,color,flipx,flipy,scrollx,scrolly/*,plx,ply*/;
 
 
@@ -418,17 +418,17 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-static void st0016_save_init(running_machine &machine)
+void st0016_state::st0016_save_init()
 {
-	state_save_register_global(machine, st0016_spr_bank);
-	state_save_register_global(machine, st0016_spr2_bank);
-	state_save_register_global(machine, st0016_pal_bank);
-	state_save_register_global(machine, st0016_char_bank);
-	//state_save_register_global(machine, st0016_rom_bank);
-	state_save_register_global_array(machine, st0016_vregs);
-	state_save_register_global_pointer(machine, st0016_charram, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
-	state_save_register_global_pointer(machine, st0016_paletteram, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
-	state_save_register_global_pointer(machine, st0016_spriteram, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
+	state_save_register_global(machine(), st0016_spr_bank);
+	state_save_register_global(machine(), st0016_spr2_bank);
+	state_save_register_global(machine(), st0016_pal_bank);
+	state_save_register_global(machine(), st0016_char_bank);
+	//state_save_register_global(machine(), st0016_rom_bank);
+	state_save_register_global_array(machine(), st0016_vregs);
+	state_save_register_global_pointer(machine(), st0016_charram, ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE);
+	state_save_register_global_pointer(machine(), st0016_paletteram, ST0016_MAX_PAL_BANK*ST0016_PAL_BANK_SIZE);
+	state_save_register_global_pointer(machine(), st0016_spriteram, ST0016_MAX_SPR_BANK*ST0016_SPR_BANK_SIZE);
 }
 
 
@@ -483,13 +483,13 @@ VIDEO_START_MEMBER(st0016_state,st0016)
 
 	}
 
-	st0016_save_init(machine());
+	st0016_save_init();
 }
 
 
-static void draw_bgmap(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int priority)
+void st0016_state::draw_bgmap(bitmap_ind16 &bitmap,const rectangle &cliprect, int priority)
 {
-	gfx_element *gfx = machine.gfx[st0016_ramgfx];
+	gfx_element *gfx = machine().gfx[st0016_ramgfx];
 	int j;
 	//for(j=0x40-8;j>=0;j-=8)
 	for(j=0;j<0x40;j+=8)
@@ -583,9 +583,9 @@ static void draw_bgmap(running_machine &machine, bitmap_ind16 &bitmap,const rect
 
 void st0016_state::st0016_draw_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_bgmap(machine(), bitmap,cliprect,0);
-	draw_sprites(machine(), bitmap,cliprect);
-	draw_bgmap(machine(), bitmap,cliprect,1);
+	draw_bgmap(bitmap,cliprect,0);
+	draw_sprites(bitmap,cliprect);
+	draw_bgmap(bitmap,cliprect,1);
 }
 
 UINT32 st0016_state::screen_update_st0016(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

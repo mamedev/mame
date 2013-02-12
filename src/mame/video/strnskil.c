@@ -78,24 +78,23 @@ void strnskil_state::video_start()
 	m_bg_tilemap->set_scroll_rows(32);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void strnskil_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	strnskil_state *state = machine.driver_data<strnskil_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 	for (offs = 0x60; offs < 0x100; offs += 4)
 	{
 		int code = spriteram[offs + 1];
 		int color = spriteram[offs + 2] & 0x3f;
-		int flipx = state->flip_screen_x();
-		int flipy = state->flip_screen_y();
+		int flipx = flip_screen_x();
+		int flipy = flip_screen_y();
 
 		int sx = spriteram[offs + 3];
 		int sy = spriteram[offs];
 		int px, py;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			px = 240 - sx + 0; /* +2 or +0 ? */
 			py = sy;
@@ -112,11 +111,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			sx = sx - 256;
 
 		drawgfx_transmask(bitmap, cliprect,
-			machine.gfx[1],
+			machine().gfx[1],
 			code, color,
 			flipx, flipy,
 			px, py,
-			colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0));
+			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0));
 	}
 }
 
@@ -142,6 +141,6 @@ UINT32 strnskil_state::screen_update_strnskil(screen_device &screen, bitmap_ind1
 	}
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

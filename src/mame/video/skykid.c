@@ -176,10 +176,9 @@ WRITE8_MEMBER(skykid_state::skykid_flipscreen_priority_w)
 ***************************************************************************/
 
 /* the sprite generator IC is the same as Mappy */
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void skykid_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	skykid_state *state = machine.driver_data<skykid_state>();
-	UINT8 *spriteram = state->m_spriteram + 0x780;
+	UINT8 *spriteram = m_spriteram + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x0800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x0800;
 	int offs;
@@ -204,7 +203,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			flipx ^= 1;
 			flipy ^= 1;
@@ -217,12 +216,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				drawgfx_transmask(bitmap,cliprect,machine.gfx[2],
+				drawgfx_transmask(bitmap,cliprect,machine().gfx[2],
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
 					sx + 16*x,sy + 16*y,
-					colortable_get_transpen_mask(machine.colortable, machine.gfx[2], color, 0xff));
+					colortable_get_transpen_mask(machine().colortable, machine().gfx[2], color, 0xff));
 			}
 		}
 	}
@@ -252,7 +251,7 @@ UINT32 skykid_state::screen_update_skykid(screen_device &screen, bitmap_ind16 &b
 		// draw low priority tiles
 		m_tx_tilemap->draw(bitmap, cliprect, pri, 0);
 
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 
 		// draw the other tiles
 		for (cat = 0; cat < 0xf; cat++)
@@ -260,7 +259,7 @@ UINT32 skykid_state::screen_update_skykid(screen_device &screen, bitmap_ind16 &b
 	}
 	else
 	{
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 		m_tx_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_ALL_CATEGORIES, 0);
 	}
 

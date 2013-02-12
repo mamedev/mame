@@ -45,6 +45,9 @@ public:
 	DECLARE_WRITE8_MEMBER(sprint8_screech_w);
 	DECLARE_WRITE8_MEMBER(sprint8_attract_w);
 	DECLARE_WRITE8_MEMBER(sprint8_motor_w);
+	void set_pens(sprint8_state *state, colortable_t *colortable);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sprint8_set_collision(int n);
 };
 
 /*----------- defined in drivers/sprint8.c -----------*/

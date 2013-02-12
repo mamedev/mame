@@ -22,11 +22,10 @@ WRITE16_MEMBER(sslam_state::sslam_paletteram_w)
 	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void sslam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sslam_state *state = machine.driver_data<sslam_state>();
-	gfx_element *gfx = machine.gfx[0];
-	UINT16 *source = state->m_spriteram;
+	gfx_element *gfx = machine().gfx[0];
+	UINT16 *source = m_spriteram;
 	UINT16 *finish = source + 0x1000/2;
 
 	source += 3; // strange
@@ -44,7 +43,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		flipx = source[0] & 0x4000;
 		number = source[3];
 
-		xpos -=16; xpos -=7; xpos += state->m_sprites_x_offset;
+		xpos -=16; xpos -=7; xpos += m_sprites_x_offset;
 		ypos = 0xff - ypos;
 		ypos -=16; ypos -=7;
 
@@ -208,7 +207,7 @@ UINT32 sslam_state::screen_update_sslam(screen_device &screen, bitmap_ind16 &bit
 		m_md_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -225,6 +224,6 @@ UINT32 sslam_state::screen_update_powerbls(screen_device &screen, bitmap_ind16 &
 	m_bg_tilemap->set_scrolly(0, m_regs[1]-240);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	return 0;
 }

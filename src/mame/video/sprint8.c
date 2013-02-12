@@ -28,13 +28,13 @@ void sprint8_state::palette_init()
 }
 
 
-static void set_pens(sprint8_state *state, colortable_t *colortable)
+void sprint8_state::set_pens(sprint8_state *state, colortable_t *colortable)
 {
 	int i;
 
 	for (i = 0; i < 0x10; i += 8)
 	{
-		if (*state->m_team & 1)
+		if (*m_team & 1)
 		{
 			colortable_palette_set_color(colortable, i + 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
 			colortable_palette_set_color(colortable, i + 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
@@ -124,22 +124,21 @@ void sprint8_state::video_start()
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void sprint8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sprint8_state *state = machine.driver_data<sprint8_state>();
 	int i;
 
 	for (i = 0; i < 16; i++)
 	{
-		UINT8 code = state->m_pos_d_ram[i];
+		UINT8 code = m_pos_d_ram[i];
 
-		int x = state->m_pos_h_ram[i];
-		int y = state->m_pos_v_ram[i];
+		int x = m_pos_h_ram[i];
+		int y = m_pos_v_ram[i];
 
 		if (code & 0x80)
 			x |= 0x100;
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[2],
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[2],
 			code ^ 7,
 			i,
 			!(code & 0x10), !(code & 0x08),
@@ -150,7 +149,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 TIMER_CALLBACK_MEMBER(sprint8_state::sprint8_collision_callback)
 {
-	sprint8_set_collision(machine(), param);
+	sprint8_set_collision(param);
 }
 
 
@@ -158,7 +157,7 @@ UINT32 sprint8_state::screen_update_sprint8(screen_device &screen, bitmap_ind16 
 {
 	set_pens(this, machine().colortable);
 	m_tilemap1->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -176,7 +175,7 @@ void sprint8_state::screen_eof_sprint8(screen_device &screen, bool state)
 
 		m_helper1.fill(0x20, visarea);
 
-		draw_sprites(machine(), m_helper1, visarea);
+		draw_sprites(m_helper1, visarea);
 
 		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{

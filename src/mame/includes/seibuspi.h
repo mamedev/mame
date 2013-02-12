@@ -117,6 +117,19 @@ public:
 	UINT32 screen_update_sys386f2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(spi_interrupt);
 	IRQ_CALLBACK_MEMBER(spi_irq_callback);
+	void rf2_set_layer_banks(int banks);
+	void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri_mask);
+	void set_rowscroll(tilemap_t *layer, int scroll, INT16* rows);
+	void set_scroll(tilemap_t *layer, int scroll);
+	void combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int x, int y, int opaque, INT16 *rowscroll);
+	UINT8 z80_fifoout_pop(address_space &space);
+	void z80_fifoout_push(address_space &space, UINT8 data);
+	UINT8 z80_fifoin_pop(address_space &space);
+	void z80_fifoin_push(address_space &space, UINT8 data);
+	void init_spi();
+	void init_rf2_common();
+	void init_rfjet_common();
 };
 /*----------- defined in machine/spisprit.c -----------*/
 void seibuspi_sprite_decrypt(UINT8 *src, int romsize);

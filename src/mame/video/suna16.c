@@ -115,12 +115,11 @@ WRITE16_MEMBER(suna16_state::suna16_paletteram16_w)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *sprites, int gfx)
+void suna16_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 *sprites, int gfx)
 {
-	suna16_state *state = machine.driver_data<suna16_state>();
 	int offs;
-	int max_x = machine.primary_screen->width() - 8;
-	int max_y = machine.primary_screen->height() - 8;
+	int max_x = machine().primary_screen->width() - 8;
+	int max_y = machine().primary_screen->height() - 8;
 
 	for ( offs = 0xfc00/2; offs < 0x10000/2 ; offs += 4/2 )
 	{
@@ -181,7 +180,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 				if (flipx)  tile_flipx = !tile_flipx;
 
-				if (state->flip_screen())
+				if (flip_screen())
 				{
 					sx = max_x - sx;
 					sy = max_y - sy;
@@ -189,9 +188,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 					tile_flipy = !tile_flipy;
 				}
 
-				drawgfx_transpen(   bitmap, cliprect,machine.gfx[gfx],
+				drawgfx_transpen(   bitmap, cliprect,machine().gfx[gfx],
 							(tile & 0x3fff) + bank*0x4000,
-							attr + (state->m_color_bank << 4),
+							attr + (m_color_bank << 4),
 							tile_flipx, tile_flipy,
 							sx, sy,15   );
 
@@ -218,7 +217,7 @@ UINT32 suna16_state::screen_update_suna16(screen_device &screen, bitmap_ind16 &b
 {
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap.fill(0xff, cliprect);
-	draw_sprites(machine(), bitmap, cliprect, m_spriteram, 0);
+	draw_sprites(bitmap, cliprect, m_spriteram, 0);
 	return 0;
 }
 
@@ -237,7 +236,7 @@ if (machine().input().code_pressed(KEYCODE_Z))
 
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap.fill(0xff, cliprect);
-	if (layers_ctrl & 1)    draw_sprites(machine(), bitmap, cliprect, m_spriteram,  0);
-	if (layers_ctrl & 2)    draw_sprites(machine(), bitmap, cliprect, m_spriteram2, 1);
+	if (layers_ctrl & 1)    draw_sprites(bitmap, cliprect, m_spriteram,  0);
+	if (layers_ctrl & 2)    draw_sprites(bitmap, cliprect, m_spriteram2, 1);
 	return 0;
 }

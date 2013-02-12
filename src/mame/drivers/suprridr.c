@@ -226,7 +226,7 @@ CUSTOM_INPUT_MEMBER(suprridr_state::suprridr_control_r)
 	UINT32 ret;
 
 	/* screen flip multiplexes controls */
-	if (suprridr_is_screen_flipped(machine()))
+	if (suprridr_is_screen_flipped())
 		ret = ioport(SUPRRIDR_P2_CONTROL_PORT_TAG)->read();
 	else
 		ret = ioport(SUPRRIDR_P1_CONTROL_PORT_TAG)->read();

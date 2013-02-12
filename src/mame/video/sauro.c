@@ -89,14 +89,13 @@ VIDEO_START_MEMBER(sauro_state,sauro)
 	m_palette_bank = 0;
 }
 
-static void sauro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void sauro_state::sauro_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sauro_state *state = machine.driver_data<sauro_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs,code,sx,sy,color,flipx;
-	int flipy = state->flip_screen();
+	int flipy = flip_screen();
 
-	for (offs = 3; offs < state->m_spriteram.bytes() - 1; offs += 4)
+	for (offs = 3; offs < m_spriteram.bytes() - 1; offs += 4)
 	{
 		sy = spriteram[offs];
 		if (sy == 0xf8) continue;
@@ -104,7 +103,7 @@ static void sauro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 		code = spriteram[offs+1] + ((spriteram[offs+3] & 0x03) << 8);
 		sx = spriteram[offs+2];
 		sy = 236 - sy;
-		color = ((spriteram[offs+3] >> 4) & 0x0f) | state->m_palette_bank;
+		color = ((spriteram[offs+3] >> 4) & 0x0f) | m_palette_bank;
 
 		// I'm not really sure how this bit works
 		if (spriteram[offs+3] & 0x08)
@@ -129,7 +128,7 @@ static void sauro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[2],
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[2],
 				code,
 				color,
 				flipx, flipy,
@@ -141,7 +140,7 @@ UINT32 sauro_state::screen_update_sauro(screen_device &screen, bitmap_ind16 &bit
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-	sauro_draw_sprites(machine(), bitmap, cliprect);
+	sauro_draw_sprites(bitmap, cliprect);
 	return 0;
 }
 
@@ -153,15 +152,14 @@ VIDEO_START_MEMBER(sauro_state,trckydoc)
 			8, 8, 32, 32);
 }
 
-static void trckydoc_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void sauro_state::trckydoc_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	sauro_state *state = machine.driver_data<sauro_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs,code,sy,color,flipx,sx;
-	int flipy = state->flip_screen();
+	int flipy = flip_screen();
 
 	/* Weird, sprites entries don't start on DWORD boundary */
-	for (offs = 3; offs < state->m_spriteram.bytes() - 1; offs += 4)
+	for (offs = 3; offs < m_spriteram.bytes() - 1; offs += 4)
 	{
 		sy = spriteram[offs];
 
@@ -201,7 +199,7 @@ static void trckydoc_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 			sy = 240 - sy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap, cliprect,machine().gfx[1],
 				code,
 				color,
 				flipx, flipy,
@@ -212,6 +210,6 @@ static void trckydoc_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 UINT32 sauro_state::screen_update_trckydoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	trckydoc_draw_sprites(machine(), bitmap, cliprect);
+	trckydoc_draw_sprites(bitmap, cliprect);
 	return 0;
 }

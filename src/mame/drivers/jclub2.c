@@ -147,6 +147,7 @@ public:
 	UINT32 screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(darkhors_irq);
+	void draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -189,11 +190,10 @@ WRITE32_MEMBER(darkhors_state::darkhors_tmapram2_w)
 	m_tmap2->mark_tile_dirty(offset);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void darkhors_state::draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	darkhors_state *state = machine.driver_data<darkhors_state>();
-	UINT32 *s       =   state->m_spriteram;
-	UINT32 *end     =   state->m_spriteram + 0x02000/4;
+	UINT32 *s       =   m_spriteram;
+	UINT32 *end     =   m_spriteram + 0x02000/4;
 
 	for ( ; s < end; s += 8/4 )
 	{
@@ -218,7 +218,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sy  =   -sy;
 		sy  +=  0xf8;
 
-		drawgfx_transpen(   bitmap, cliprect, machine.gfx[0],
+		drawgfx_transpen(   bitmap, cliprect, machine().gfx[0],
 					code/2, color,
 					flipx,  flipy,  sx, sy, 0);
 	}
@@ -258,8 +258,8 @@ UINT32 darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind1
 	m_tmap2->set_scrollx(0, (m_tmapscroll2[0] >> 16) - 5);
 	m_tmap2->set_scrolly(0, (m_tmapscroll2[0] & 0xffff) - 0xff );
 	if (layers_ctrl & 2)    m_tmap2->draw(bitmap, cliprect, 0, 0);
+	if (layers_ctrl & 4)    draw_sprites_darkhors(bitmap,cliprect);
 
-	if (layers_ctrl & 4)    draw_sprites(machine(),bitmap,cliprect);
 
 #if DARKHORS_DEBUG
 #if 0

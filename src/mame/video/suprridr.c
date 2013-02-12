@@ -121,10 +121,9 @@ WRITE8_MEMBER(suprridr_state::suprridr_bgscrolly_w)
 }
 
 
-int suprridr_is_screen_flipped(running_machine &machine)
+int suprridr_state::suprridr_is_screen_flipped()
 {
-	suprridr_state *state = machine.driver_data<suprridr_state>();
-	return state->m_flipx;  /* or is it flipy? */
+	return m_flipx;  /* or is it flipy? */
 }
 
 

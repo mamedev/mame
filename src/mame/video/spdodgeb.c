@@ -143,13 +143,12 @@ WRITE8_MEMBER(spdodgeb_state::spdodgeb_videoram_w)
 
 #define DRAW_SPRITE( order, sx, sy ) drawgfx_transpen( bitmap, \
 					cliprect,gfx, \
-					(which+order),color+ 8 * state->m_sprite_palbank,flipx,flipy,sx,sy,0);
+					(which+order),color+ 8 * m_sprite_palbank,flipx,flipy,sx,sy,0);
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void spdodgeb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	spdodgeb_state *state = machine.driver_data<spdodgeb_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	gfx_element *gfx = machine.gfx[1];
+	UINT8 *spriteram = m_spriteram;
+	gfx_element *gfx = machine().gfx[1];
 	UINT8 *src;
 	int i;
 
@@ -158,7 +157,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 /*  240-SY   Z|F|CLR|WCH WHICH    SX
     xxxxxxxx x|x|xxx|xxx xxxxxxxx xxxxxxxx
 */
-	for (i = 0;i < state->m_spriteram.bytes();i += 4)
+	for (i = 0;i < m_spriteram.bytes();i += 4)
 	{
 		int attr = src[i+1];
 		int which = src[i+2]+((attr & 0x07)<<8);
@@ -171,7 +170,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int dy = -16;
 		int cy;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -190,7 +189,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			break;
 
 			case 1: /* double y */
-			if (state->flip_screen()) { if (sy > 240) sy -= 256; } else { if (sy < 0) sy += 256; }
+			if (flip_screen()) { if (sy > 240) sy -= 256; } else { if (sy < 0) sy += 256; }
 			cy = sy + dy;
 			which &= ~1;
 			DRAW_SPRITE(0,sx,cy);
@@ -207,6 +206,6 @@ UINT32 spdodgeb_state::screen_update_spdodgeb(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->set_scrollx(0,m_lastscroll+5);
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	return 0;
 }

@@ -576,15 +576,14 @@ WRITE8_MEMBER(snk_state::hardflags_scroll_msb_w)
 	// low 6 bits might indicate radius, but it's not clear
 }
 
-static int hardflags_check(running_machine &machine, int num)
+int snk_state::hardflags_check(int num)
 {
-	snk_state *state = machine.driver_data<snk_state>();
-	const UINT8 *sr = &state->m_spriteram[0x800 + 4*num];
+	const UINT8 *sr = &m_spriteram[0x800 + 4*num];
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
 
-	int dx = (x - state->m_hf_posx) & 0x1ff;
-	int dy = (y - state->m_hf_posy) & 0x1ff;
+	int dx = (x - m_hf_posx) & 0x1ff;
+	int dy = (y - m_hf_posy) & 0x1ff;
 
 	if (dx > 0x20 && dx <= 0x1e0 && dy > 0x20 && dy <= 0x1e0)
 		return 0;
@@ -592,33 +591,33 @@ static int hardflags_check(running_machine &machine, int num)
 		return 1;
 }
 
-static int hardflags_check8(running_machine &machine, int num)
+int snk_state::hardflags_check8(int num)
 {
 	return
-		(hardflags_check(machine, num + 0) << 0) |
-		(hardflags_check(machine, num + 1) << 1) |
-		(hardflags_check(machine, num + 2) << 2) |
-		(hardflags_check(machine, num + 3) << 3) |
-		(hardflags_check(machine, num + 4) << 4) |
-		(hardflags_check(machine, num + 5) << 5) |
-		(hardflags_check(machine, num + 6) << 6) |
-		(hardflags_check(machine, num + 7) << 7);
+		(hardflags_check(num + 0) << 0) |
+		(hardflags_check(num + 1) << 1) |
+		(hardflags_check(num + 2) << 2) |
+		(hardflags_check(num + 3) << 3) |
+		(hardflags_check(num + 4) << 4) |
+		(hardflags_check(num + 5) << 5) |
+		(hardflags_check(num + 6) << 6) |
+		(hardflags_check(num + 7) << 7);
 }
 
-READ8_MEMBER(snk_state::hardflags1_r){ return hardflags_check8(machine(), 0*8); }
-READ8_MEMBER(snk_state::hardflags2_r){ return hardflags_check8(machine(), 1*8); }
-READ8_MEMBER(snk_state::hardflags3_r){ return hardflags_check8(machine(), 2*8); }
-READ8_MEMBER(snk_state::hardflags4_r){ return hardflags_check8(machine(), 3*8); }
-READ8_MEMBER(snk_state::hardflags5_r){ return hardflags_check8(machine(), 4*8); }
-READ8_MEMBER(snk_state::hardflags6_r){ return hardflags_check8(machine(), 5*8); }
+READ8_MEMBER(snk_state::hardflags1_r){ return hardflags_check8(0*8); }
+READ8_MEMBER(snk_state::hardflags2_r){ return hardflags_check8(1*8); }
+READ8_MEMBER(snk_state::hardflags3_r){ return hardflags_check8(2*8); }
+READ8_MEMBER(snk_state::hardflags4_r){ return hardflags_check8(3*8); }
+READ8_MEMBER(snk_state::hardflags5_r){ return hardflags_check8(4*8); }
+READ8_MEMBER(snk_state::hardflags6_r){ return hardflags_check8(5*8); }
 READ8_MEMBER(snk_state::hardflags7_r)
 {
 	// apparently the startup tests use bits 0&1 while the game uses bits 4&5
 	return
-		(hardflags_check(machine(), 6*8 + 0) << 0) |
-		(hardflags_check(machine(), 6*8 + 1) << 1) |
-		(hardflags_check(machine(), 6*8 + 0) << 4) |
-		(hardflags_check(machine(), 6*8 + 1) << 5);
+		(hardflags_check(6*8 + 0) << 0) |
+		(hardflags_check(6*8 + 1) << 1) |
+		(hardflags_check(6*8 + 0) << 4) |
+		(hardflags_check(6*8 + 1) << 5);
 }
 
 
@@ -669,15 +668,14 @@ WRITE8_MEMBER(snk_state::turbocheck_msb_w)
 	// low 6 bits might indicate radius, but it's not clear
 }
 
-static int turbofront_check(running_machine &machine, int small, int num)
+int snk_state::turbofront_check(int small, int num)
 {
-	snk_state *state = machine.driver_data<snk_state>();
-	const UINT8 *sr = &state->m_spriteram[0x800*small + 4*num];
+	const UINT8 *sr = &m_spriteram[0x800*small + 4*num];
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
 
-	int dx = (x - (small ? state->m_tc16_posx : state->m_tc32_posx)) & 0x1ff;
-	int dy = (y - (small ? state->m_tc16_posy : state->m_tc32_posy)) & 0x1ff;
+	int dx = (x - (small ? m_tc16_posx : m_tc32_posx)) & 0x1ff;
+	int dy = (y - (small ? m_tc16_posy : m_tc32_posy)) & 0x1ff;
 
 	if (dx > 0x20 && dx <= 0x1e0 && dy > 0x20 && dy <= 0x1e0)
 		return 0;
@@ -685,31 +683,31 @@ static int turbofront_check(running_machine &machine, int small, int num)
 		return 1;
 }
 
-static int turbofront_check8(running_machine &machine, int small, int num)
+int snk_state::turbofront_check8(int small, int num)
 {
 	return
-		(turbofront_check(machine, small, num + 0) << 0) |
-		(turbofront_check(machine, small, num + 1) << 1) |
-		(turbofront_check(machine, small, num + 2) << 2) |
-		(turbofront_check(machine, small, num + 3) << 3) |
-		(turbofront_check(machine, small, num + 4) << 4) |
-		(turbofront_check(machine, small, num + 5) << 5) |
-		(turbofront_check(machine, small, num + 6) << 6) |
-		(turbofront_check(machine, small, num + 7) << 7);
+		(turbofront_check(small, num + 0) << 0) |
+		(turbofront_check(small, num + 1) << 1) |
+		(turbofront_check(small, num + 2) << 2) |
+		(turbofront_check(small, num + 3) << 3) |
+		(turbofront_check(small, num + 4) << 4) |
+		(turbofront_check(small, num + 5) << 5) |
+		(turbofront_check(small, num + 6) << 6) |
+		(turbofront_check(small, num + 7) << 7);
 }
 
-READ8_MEMBER(snk_state::turbocheck16_1_r){ return turbofront_check8(machine(), 1, 0*8); }
-READ8_MEMBER(snk_state::turbocheck16_2_r){ return turbofront_check8(machine(), 1, 1*8); }
-READ8_MEMBER(snk_state::turbocheck16_3_r){ return turbofront_check8(machine(), 1, 2*8); }
-READ8_MEMBER(snk_state::turbocheck16_4_r){ return turbofront_check8(machine(), 1, 3*8); }
-READ8_MEMBER(snk_state::turbocheck16_5_r){ return turbofront_check8(machine(), 1, 4*8); }
-READ8_MEMBER(snk_state::turbocheck16_6_r){ return turbofront_check8(machine(), 1, 5*8); }
-READ8_MEMBER(snk_state::turbocheck16_7_r){ return turbofront_check8(machine(), 1, 6*8); }
-READ8_MEMBER(snk_state::turbocheck16_8_r){ return turbofront_check8(machine(), 1, 7*8); }
-READ8_MEMBER(snk_state::turbocheck32_1_r){ return turbofront_check8(machine(), 0, 0*8); }
-READ8_MEMBER(snk_state::turbocheck32_2_r){ return turbofront_check8(machine(), 0, 1*8); }
-READ8_MEMBER(snk_state::turbocheck32_3_r){ return turbofront_check8(machine(), 0, 2*8); }
-READ8_MEMBER(snk_state::turbocheck32_4_r){ return turbofront_check8(machine(), 0, 3*8); }
+READ8_MEMBER(snk_state::turbocheck16_1_r){ return turbofront_check8(1, 0*8); }
+READ8_MEMBER(snk_state::turbocheck16_2_r){ return turbofront_check8(1, 1*8); }
+READ8_MEMBER(snk_state::turbocheck16_3_r){ return turbofront_check8(1, 2*8); }
+READ8_MEMBER(snk_state::turbocheck16_4_r){ return turbofront_check8(1, 3*8); }
+READ8_MEMBER(snk_state::turbocheck16_5_r){ return turbofront_check8(1, 4*8); }
+READ8_MEMBER(snk_state::turbocheck16_6_r){ return turbofront_check8(1, 5*8); }
+READ8_MEMBER(snk_state::turbocheck16_7_r){ return turbofront_check8(1, 6*8); }
+READ8_MEMBER(snk_state::turbocheck16_8_r){ return turbofront_check8(1, 7*8); }
+READ8_MEMBER(snk_state::turbocheck32_1_r){ return turbofront_check8(0, 0*8); }
+READ8_MEMBER(snk_state::turbocheck32_2_r){ return turbofront_check8(0, 1*8); }
+READ8_MEMBER(snk_state::turbocheck32_3_r){ return turbofront_check8(0, 2*8); }
+READ8_MEMBER(snk_state::turbocheck32_4_r){ return turbofront_check8(0, 3*8); }
 
 
 

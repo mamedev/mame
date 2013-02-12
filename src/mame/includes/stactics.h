@@ -61,6 +61,12 @@ public:
 	DECLARE_PALETTE_INIT(stactics);
 	UINT32 screen_update_stactics(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(stactics_interrupt);
+	void update_beam();
+	inline int get_pixel_on_plane(UINT8 *videoram, UINT8 y, UINT8 x, UINT8 y_scroll);
+	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void set_indicator_leds(int data, const char *output_name, int base_index);
+	void update_artwork();
+	void move_motor();
 };
 /*----------- defined in video/stactics.c -----------*/
 MACHINE_CONFIG_EXTERN( stactics_video );

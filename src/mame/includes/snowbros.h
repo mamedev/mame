@@ -1,4 +1,5 @@
 #include "emu.h"
+#include "sound/okim6295.h"
 
 class snowbros_state : public driver_device
 {
@@ -51,4 +52,6 @@ public:
 	void screen_eof_snowbros(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(snowbros_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(snowbros3_irq);
+	void sb3_play_music(int data);
+	void sb3_play_sound (okim6295_device *oki, int data);
 };

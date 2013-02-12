@@ -700,11 +700,10 @@ READ8_MEMBER(seta2_state::funcube_serial_r)
 	return ret;
 }
 
-static void funcube_debug_outputs(running_machine &machine)
+void seta2_state::funcube_debug_outputs()
 {
 #ifdef MAME_DEBUG
-//  seta2_state *state = machine.driver_data<seta2_state>();
-//  popmessage("LED: %02x OUT: %02x", (int)*state->m_funcube_leds, (int)*state->m_funcube_outputs);
+//  popmessage("LED: %02x OUT: %02x", (int)*m_funcube_leds, (int)*m_funcube_outputs);
 #endif
 }
 
@@ -721,7 +720,7 @@ WRITE8_MEMBER(seta2_state::funcube_leds_w)
 	set_led_status( machine(), 4, (~data) & 0x40 );
 	set_led_status( machine(), 5, (~data) & 0x80 );
 
-	funcube_debug_outputs(space.machine());
+	funcube_debug_outputs();
 }
 
 READ8_MEMBER(seta2_state::funcube_outputs_r)
@@ -744,7 +743,7 @@ WRITE8_MEMBER(seta2_state::funcube_outputs_w)
 	// Bit 3: low after coining up, blinks on pay out
 	set_led_status( machine(), 6, (~data) & 0x08 );
 
-	funcube_debug_outputs(space.machine());
+	funcube_debug_outputs();
 }
 
 READ8_MEMBER(seta2_state::funcube_battery_r)

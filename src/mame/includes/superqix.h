@@ -83,4 +83,8 @@ public:
 	TIMER_CALLBACK_MEMBER(mcu_acknowledge_callback);
 	TIMER_CALLBACK_MEMBER(delayed_z80_mcu_w);
 	TIMER_CALLBACK_MEMBER(delayed_mcu_z80_w);
+	void pbillian_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void superqix_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	int read_dial(int player);
+	void machine_init_common();
 };

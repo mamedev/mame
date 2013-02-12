@@ -303,11 +303,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(snk6502_state::sasuke_update_counter)
 	m_sasuke_counter += 0x10;
 }
 
-static void sasuke_start_counter(running_machine &machine)
+void snk6502_state::sasuke_start_counter()
 {
-	snk6502_state *state = machine.driver_data<snk6502_state>();
 
-	state->m_sasuke_counter = 0;
+	m_sasuke_counter = 0;
 }
 
 
@@ -784,7 +783,7 @@ MACHINE_RESET_MEMBER(snk6502_state,sasuke)
 	// adjusted (measured through audio recording of pcb)
 	snk6502_set_music_freq(machine(), 35300);
 
-	sasuke_start_counter(machine());
+	sasuke_start_counter();
 }
 
 MACHINE_RESET_MEMBER(snk6502_state,satansat)
@@ -793,7 +792,7 @@ MACHINE_RESET_MEMBER(snk6502_state,satansat)
 	// NOTE: this was set before sasuke was adjusted to a lower freq, please don't modify until measured/confirmed on pcb
 	snk6502_set_music_freq(machine(), 38000);
 
-	sasuke_start_counter(machine());
+	sasuke_start_counter();
 }
 
 MACHINE_RESET_MEMBER(snk6502_state,vanguard)

@@ -51,4 +51,8 @@ public:
 	DECLARE_READ8_MEMBER(starcrus_coll_det_r);
 	virtual void video_start();
 	UINT32 screen_update_starcrus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	int collision_check_s1s2();
+	int collision_check_p1p2();
+	int collision_check_s1p1p2();
+	int collision_check_s2p1p2();
 };

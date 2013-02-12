@@ -19,7 +19,7 @@ WRITE8_MEMBER(simpsons_state::simpsons_eeprom_w)
 	ioport("EEPROMOUT")->write(data, 0xff);
 
 	m_video_bank = data & 0x03;
-	simpsons_video_banking(machine(), m_video_bank);
+	simpsons_video_banking(m_video_bank);
 
 	m_firq_enabled = data & 0x04;
 }
@@ -68,7 +68,7 @@ static KONAMI_SETLINES_CALLBACK( simpsons_banking )
 
 void simpsons_state::simpsons_postload()
 {
-	simpsons_video_banking(machine(), m_video_bank);
+	simpsons_video_banking(m_video_bank);
 }
 
 void simpsons_state::machine_start()
@@ -118,5 +118,5 @@ void simpsons_state::machine_reset()
 	membank("bank2")->configure_entries(2, 6, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
 	membank("bank2")->set_entry(0);
 
-	simpsons_video_banking(machine(), 0);
+	simpsons_video_banking(0);
 }

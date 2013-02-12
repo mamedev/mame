@@ -14,10 +14,9 @@ void skyraid_state::video_start()
 }
 
 
-static void draw_text(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void skyraid_state::draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	skyraid_state *state = machine.driver_data<skyraid_state>();
-	const UINT8* p = state->m_alpha_num_ram;
+	const UINT8* p = m_alpha_num_ram;
 
 	int i;
 
@@ -29,22 +28,21 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap, const rect
 		y = 136 + 16 * (i ^ 1);
 
 		for (x = 0; x < bitmap.width(); x += 16)
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], *p++, 0, 0, 0,   x, y, 0);
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[0], *p++, 0, 0, 0,   x, y, 0);
 	}
 }
 
 
-static void draw_terrain(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void skyraid_state::draw_terrain(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	skyraid_state *state = machine.driver_data<skyraid_state>();
-	const UINT8* p = state->memregion("user1")->base();
+	const UINT8* p = memregion("user1")->base();
 
 	int x;
 	int y;
 
 	for (y = 0; y < bitmap.height(); y++)
 	{
-		int offset = (16 * state->m_scroll + 16 * ((y + 1) / 2)) & 0x7FF;
+		int offset = (16 * m_scroll + 16 * ((y + 1) / 2)) & 0x7FF;
 
 		x = 0;
 
@@ -65,54 +63,52 @@ static void draw_terrain(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void skyraid_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	skyraid_state *state = machine.driver_data<skyraid_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
 	{
-		int code = state->m_obj_ram[8 + 2 * i + 0] & 15;
-		int flag = state->m_obj_ram[8 + 2 * i + 1] & 15;
-		int vert = state->m_pos_ram[8 + 2 * i + 0];
-		int horz = state->m_pos_ram[8 + 2 * i + 1];
+		int code = m_obj_ram[8 + 2 * i + 0] & 15;
+		int flag = m_obj_ram[8 + 2 * i + 1] & 15;
+		int vert = m_pos_ram[8 + 2 * i + 0];
+		int horz = m_pos_ram[8 + 2 * i + 1];
 
 		vert -= 31;
 
 		if (flag & 1)
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
 				code ^ 15, code >> 3, 0, 0,
 				horz / 2, vert, 2);
 	}
 }
 
 
-static void draw_missiles(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void skyraid_state::draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	skyraid_state *state = machine.driver_data<skyraid_state>();
 	int i;
 
 	/* hardware is restricted to one sprite per scanline */
 
 	for (i = 0; i < 4; i++)
 	{
-		int code = state->m_obj_ram[2 * i + 0] & 15;
-		int vert = state->m_pos_ram[2 * i + 0];
-		int horz = state->m_pos_ram[2 * i + 1];
+		int code = m_obj_ram[2 * i + 0] & 15;
+		int vert = m_pos_ram[2 * i + 0];
+		int horz = m_pos_ram[2 * i + 1];
 
 		vert -= 15;
 		horz -= 31;
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[2],
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[2],
 			code ^ 15, 0, 0, 0,
 			horz / 2, vert, 0);
 	}
 }
 
 
-static void draw_trapezoid(running_machine &machine, bitmap_ind16& dst, bitmap_ind16& src)
+void skyraid_state::draw_trapezoid(bitmap_ind16& dst, bitmap_ind16& src)
 {
-	const UINT8* p = machine.root_device().memregion("user2")->base();
+	const UINT8* p = machine().root_device().memregion("user2")->base();
 
 	int x;
 	int y;
@@ -138,10 +134,10 @@ UINT32 skyraid_state::screen_update_skyraid(screen_device &screen, bitmap_ind16 
 	rectangle helper_clip = cliprect;
 	helper_clip &= m_helper.cliprect();
 
-	draw_terrain(machine(), m_helper, helper_clip);
-	draw_sprites(machine(), m_helper, helper_clip);
-	draw_missiles(machine(), m_helper, helper_clip);
-	draw_trapezoid(machine(), bitmap, m_helper);
-	draw_text(machine(), bitmap, cliprect);
+	draw_terrain(m_helper, helper_clip);
+	draw_sprites(m_helper, helper_clip);
+	draw_missiles(m_helper, helper_clip);
+	draw_trapezoid(bitmap, m_helper);
+	draw_text(bitmap, cliprect);
 	return 0;
 }

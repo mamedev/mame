@@ -137,6 +137,9 @@ public:
 	DECLARE_WRITE8_MEMBER(rranger_play_samples_w);
 	DECLARE_WRITE8_MEMBER(suna8_samples_number_w);
 	void play_sample(int index);
+	void draw_normal_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int which);
+	void draw_text_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	UINT8 *brickzn_decrypt();
 };
 
 /*----------- defined in audio/suna8.c -----------*/

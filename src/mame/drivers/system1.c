@@ -394,17 +394,17 @@ void system1_state::machine_reset()
  *
  *************************************/
 
-static void bank44_custom_w(running_machine &machine, UINT8 data, UINT8 prevdata)
+void system1_state::bank44_custom_w(UINT8 data, UINT8 prevdata)
 {
 	/* bank bits are bits 6 and 2 */
-	machine.root_device().membank("bank1")->set_entry(((data & 0x40) >> 5) | ((data & 0x04) >> 2));
+	machine().root_device().membank("bank1")->set_entry(((data & 0x40) >> 5) | ((data & 0x04) >> 2));
 }
 
 
-static void bank0c_custom_w(running_machine &machine, UINT8 data, UINT8 prevdata)
+void system1_state::bank0c_custom_w(UINT8 data, UINT8 prevdata)
 {
 	/* bank bits are bits 3 and 2 */
-	machine.root_device().membank("bank1")->set_entry((data & 0x0c) >> 2);
+	machine().root_device().membank("bank1")->set_entry((data & 0x0c) >> 2);
 }
 
 
@@ -418,7 +418,7 @@ WRITE8_MEMBER(system1_state::videomode_w)
 
 	/* handle any custom banking or other stuff */
 	if (m_videomode_custom != NULL)
-		(*m_videomode_custom)(machine(), data, m_videomode_prev);
+		(this->*m_videomode_custom)(data, m_videomode_prev);
 	m_videomode_prev = data;
 
 	/* bit 0 is for the coin counters */
@@ -450,15 +450,14 @@ CUSTOM_INPUT_MEMBER(system1_state::dakkochn_mux_status_r)
 }
 
 
-static void dakkochn_custom_w(running_machine &machine, UINT8 data, UINT8 prevdata)
+void system1_state::dakkochn_custom_w(UINT8 data, UINT8 prevdata)
 {
-	system1_state *state = machine.driver_data<system1_state>();
 	/* bit 1 toggling on clocks the mux; we store the previous state in the high bit of dakkochn_mux_data */
 	if ((data & 0x02) && !(prevdata & 0x02))
-		state->m_dakkochn_mux_data = (state->m_dakkochn_mux_data + 1) % 7;
+		m_dakkochn_mux_data = (m_dakkochn_mux_data + 1) % 7;
 
 	/* remaining stuff acts like bank0c */
-	bank0c_custom_w(machine, data, prevdata);
+	bank0c_custom_w(data, prevdata);
 }
 
 
@@ -4677,12 +4676,12 @@ DRIVER_INIT_MEMBER(system1_state,bank00)
 }
 DRIVER_INIT_MEMBER(system1_state,bank44)
 {
-	m_videomode_custom = bank44_custom_w;
+	m_videomode_custom = &system1_state::bank44_custom_w;
 }
 
 DRIVER_INIT_MEMBER(system1_state,bank0c)
 {
-	m_videomode_custom = bank0c_custom_w;
+	m_videomode_custom = &system1_state::bank0c_custom_w;
 }
 
 DRIVER_INIT_MEMBER(system1_state,regulus)   { DRIVER_INIT_CALL(bank00); regulus_decode(machine(), "maincpu"); }
@@ -4715,7 +4714,7 @@ DRIVER_INIT_MEMBER(system1_state,wboysys2)  { DRIVER_INIT_CALL(bank0c); sega_315
 
 DRIVER_INIT_MEMBER(system1_state,dakkochn)
 {
-	m_videomode_custom = dakkochn_custom_w;
+	m_videomode_custom = &system1_state::dakkochn_custom_w;
 
 	mc8123_decrypt_rom(machine(), "maincpu", "key", "bank1", 4);
 

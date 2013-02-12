@@ -160,40 +160,39 @@ WRITE8_MEMBER(spy_state::bankswitch_w)
 	membank("bank1")->set_entry(bank);
 }
 
-static void spy_collision( running_machine &machine )
+void spy_state::spy_collision(  )
 {
 #define MAX_SPRITES 64
 #define DEF_NEAR_PLANE 0x6400
 #define NEAR_PLANE_ZOOM 0x0100
 #define FAR_PLANE_ZOOM 0x0000
 
-	spy_state *state = machine.driver_data<spy_state>();
 	int op1, x1, w1, z1, d1, y1, h1;
 	int op2, x2, w2, z2, d2, y2, h2;
 	int mode, i, loopend, nearplane;
 
-	mode = state->m_pmcram[0x1];
-	op1 = state->m_pmcram[0x2];
+	mode = m_pmcram[0x1];
+	op1 = m_pmcram[0x2];
 	if (op1 == 1)
 	{
-		x1 = (state->m_pmcram[0x3] << 8) + state->m_pmcram[0x4];
-		w1 = (state->m_pmcram[0x5] << 8) + state->m_pmcram[0x6];
-		z1 = (state->m_pmcram[0x7] << 8) + state->m_pmcram[0x8];
-		d1 = (state->m_pmcram[0x9] << 8) + state->m_pmcram[0xa];
-		y1 = (state->m_pmcram[0xb] << 8) + state->m_pmcram[0xc];
-		h1 = (state->m_pmcram[0xd] << 8) + state->m_pmcram[0xe];
+		x1 = (m_pmcram[0x3] << 8) + m_pmcram[0x4];
+		w1 = (m_pmcram[0x5] << 8) + m_pmcram[0x6];
+		z1 = (m_pmcram[0x7] << 8) + m_pmcram[0x8];
+		d1 = (m_pmcram[0x9] << 8) + m_pmcram[0xa];
+		y1 = (m_pmcram[0xb] << 8) + m_pmcram[0xc];
+		h1 = (m_pmcram[0xd] << 8) + m_pmcram[0xe];
 
 		for (i = 16; i < 14 * MAX_SPRITES + 2; i += 14)
 		{
-			op2 = state->m_pmcram[i];
+			op2 = m_pmcram[i];
 			if (op2 || mode == 0x0c)
 			{
-				x2 = (state->m_pmcram[i + 0x1] << 8) + state->m_pmcram[i + 0x2];
-				w2 = (state->m_pmcram[i + 0x3] << 8) + state->m_pmcram[i + 0x4];
-				z2 = (state->m_pmcram[i + 0x5] << 8) + state->m_pmcram[i + 0x6];
-				d2 = (state->m_pmcram[i + 0x7] << 8) + state->m_pmcram[i + 0x8];
-				y2 = (state->m_pmcram[i + 0x9] << 8) + state->m_pmcram[i + 0xa];
-				h2 = (state->m_pmcram[i + 0xb] << 8) + state->m_pmcram[i + 0xc];
+				x2 = (m_pmcram[i + 0x1] << 8) + m_pmcram[i + 0x2];
+				w2 = (m_pmcram[i + 0x3] << 8) + m_pmcram[i + 0x4];
+				z2 = (m_pmcram[i + 0x5] << 8) + m_pmcram[i + 0x6];
+				d2 = (m_pmcram[i + 0x7] << 8) + m_pmcram[i + 0x8];
+				y2 = (m_pmcram[i + 0x9] << 8) + m_pmcram[i + 0xa];
+				h2 = (m_pmcram[i + 0xb] << 8) + m_pmcram[i + 0xc];
 /*
     The mad scientist's laser truck has both a high sprite center and a small height value.
     It has to be measured from the ground to detect correctly.
@@ -204,11 +203,11 @@ static void spy_collision( running_machine &machine )
 				// what other sprites fall into:
 				if ((abs(x1 - x2) < w1 + w2) && (abs(z1 - z2) < d1 + d2) && (abs(y1 - y2) < h1 + h2))
 				{
-					state->m_pmcram[0xf] = 0;
-					state->m_pmcram[i + 0xd] = 0;
+					m_pmcram[0xf] = 0;
+					m_pmcram[i + 0xd] = 0;
 				}
 				else
-					state->m_pmcram[i + 0xd] = 1;
+					m_pmcram[i + 0xd] = 1;
 			}
 		}
 	}
@@ -219,8 +218,8 @@ static void spy_collision( running_machine &machine )
     the scale factors from the PMCU code. Plugging 0 and 0x100 to the far and near planes seems
     to do the trick though.
 */
-		loopend = (state->m_pmcram[0] << 8) + state->m_pmcram[1];
-		nearplane = (state->m_pmcram[2] << 8) + state->m_pmcram[3];
+		loopend = (m_pmcram[0] << 8) + m_pmcram[1];
+		nearplane = (m_pmcram[2] << 8) + m_pmcram[3];
 
 		// fail safe
 		if (loopend > MAX_SPRITES)
@@ -232,13 +231,13 @@ static void spy_collision( running_machine &machine )
 
 		for (i = 4; i < loopend; i += 2)
 		{
-			op2 = (state->m_pmcram[i] << 8) + state->m_pmcram[i + 1];
+			op2 = (m_pmcram[i] << 8) + m_pmcram[i + 1];
 			op2 = (op2 * (NEAR_PLANE_ZOOM - FAR_PLANE_ZOOM)) / nearplane + FAR_PLANE_ZOOM;
-			state->m_pmcram[i] = op2 >> 8;
-			state->m_pmcram[i + 1] = op2 & 0xff;
+			m_pmcram[i] = op2 >> 8;
+			m_pmcram[i + 1] = op2 & 0xff;
 		}
 
-		memset(state->m_pmcram + loopend, 0, 0x800 - loopend); // clean up for next frame
+		memset(m_pmcram + loopend, 0, 0x800 - loopend); // clean up for next frame
 	}
 }
 
@@ -317,7 +316,7 @@ WRITE8_MEMBER(spy_state::spy_3f90_w)
 				logerror("\n");
 			}
 		}
-		spy_collision(machine());
+		spy_collision();
 //ZT
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 	}

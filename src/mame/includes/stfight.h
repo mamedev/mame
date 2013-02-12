@@ -49,6 +49,8 @@ public:
 	INTERRUPT_GEN_MEMBER(stfight_vb_interrupt);
 	TIMER_CALLBACK_MEMBER(stfight_interrupt_1);
 	DECLARE_WRITE8_MEMBER(stfight_adpcm_control_w);
+	void set_pens();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*----------- defined in machine/stfight.c -----------*/

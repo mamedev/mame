@@ -92,7 +92,7 @@ WRITE16_MEMBER(shadfrce_state::shadfrce_bg1scrolly_w)
 
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void shadfrce_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/* | ---- ---- hhhf Fe-Y | ---- ---- yyyy yyyy | ---- ---- TTTT TTTT | ---- ---- tttt tttt |
 	   | ---- ---- -pCc cccX | ---- ---- xxxx xxxx | ---- ---- ---- ---- | ---- ---- ---- ---- | */
@@ -108,9 +108,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	   P = priority
 	*/
 
-	shadfrce_state *state = machine.driver_data<shadfrce_state>();
-	gfx_element *gfx = machine.gfx[1];
-	UINT16 *finish = state->m_spvideoram_old;
+	gfx_element *gfx = machine().gfx[1];
+	UINT16 *finish = m_spvideoram_old;
 	UINT16 *source = finish + 0x2000/2 - 8;
 	int hcount;
 	while( source>=finish )
@@ -130,10 +129,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		height++;
 		if (enable) {
 			for (hcount=0;hcount<height;hcount++) {
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16,machine.priority_bitmap,pri_mask,0);
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16,machine.priority_bitmap,pri_mask,0);
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16+0x200,machine.priority_bitmap,pri_mask,0);
-				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16+0x200,machine.priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16,machine().priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16,machine().priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos,ypos-hcount*16-16+0x200,machine().priority_bitmap,pri_mask,0);
+				pdrawgfx_transpen(bitmap,cliprect,gfx,tile+hcount,pal,flipx,flipy,xpos-0x200,ypos-hcount*16-16+0x200,machine().priority_bitmap,pri_mask,0);
 			}
 		}
 		source-=8;
@@ -148,7 +147,7 @@ UINT32 shadfrce_state::screen_update_shadfrce(screen_device &screen, bitmap_ind1
 	{
 		m_bg1tilemap->draw(bitmap, cliprect, 0,0);
 		m_bg0tilemap->draw(bitmap, cliprect, 0,1);
-		draw_sprites(machine(), bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 		m_fgtilemap->draw(bitmap, cliprect, 0,0);
 	}
 	else

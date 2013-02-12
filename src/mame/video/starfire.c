@@ -213,14 +213,13 @@ READ8_MEMBER(starfire_state::starfire_videoram_r)
  *
  *************************************/
 
-static void get_pens(running_machine &machine, pen_t *pens)
+void starfire_state::get_pens(pen_t *pens)
 {
 	offs_t offs;
-	starfire_state *state = machine.driver_data<starfire_state>();
 
 	for (offs = 0; offs < STARFIRE_NUM_PENS; offs++)
 	{
-		UINT16 color = state->m_starfire_colors[offs];
+		UINT16 color = m_starfire_colors[offs];
 
 		pens[offs] = MAKE_RGB(pal3bit(color >> 6), pal3bit(color >> 3), pal3bit(color >> 0));
 	}
@@ -231,7 +230,7 @@ TIMER_CALLBACK_MEMBER(starfire_state::starfire_scanline_callback)
 	pen_t pens[STARFIRE_NUM_PENS];
 	int y = param;
 
-	get_pens(machine(), pens);
+	get_pens(pens);
 
 	UINT8 *pix = &m_starfire_videoram[y];
 	UINT8 *col = &m_starfire_colorram[y];

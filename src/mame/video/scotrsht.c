@@ -91,23 +91,22 @@ TILE_GET_INFO_MEMBER(scotrsht_state::scotrsht_get_bg_tile_info)
 }
 
 /* Same as Jailbreak + palette bank */
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void scotrsht_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	scotrsht_state *state = machine.driver_data<scotrsht_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int i;
 
-	for (i = 0; i < state->m_spriteram.bytes(); i += 4)
+	for (i = 0; i < m_spriteram.bytes(); i += 4)
 	{
 		int attr = spriteram[i + 1];    // attributes = ?tyxcccc
 		int code = spriteram[i] + ((attr & 0x40) << 2);
-		int color = (attr & 0x0f) + state->m_palette_bank * 16;
+		int color = (attr & 0x0f) + m_palette_bank * 16;
 		int flipx = attr & 0x10;
 		int flipy = attr & 0x20;
 		int sx = spriteram[i + 2] - ((attr & 0x80) << 1);
 		int sy = spriteram[i + 3];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -115,9 +114,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			flipy = !flipy;
 		}
 
-		drawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy,
+		drawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, state->m_palette_bank * 16));
+			colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, m_palette_bank * 16));
 	}
 }
 
@@ -136,6 +135,6 @@ UINT32 scotrsht_state::screen_update_scotrsht(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->set_scrolly(col, m_scroll[col]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
