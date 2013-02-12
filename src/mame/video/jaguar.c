@@ -617,7 +617,7 @@ WRITE16_MEMBER( jaguar_state::tom_regs_w )
 			case PIT1:
 				if (m_gpu_regs[PIT0] && m_gpu_regs[PIT0] != 0xffff) //FIXME: avoid too much small timers for now
 				{
-					sample_period = attotime::from_nsec(((m_gpu->unscaled_clock()*PIT_MULT_DBG_HACK) / (1+m_gpu_regs[PIT0])) / (1+m_gpu_regs[PIT1]));
+					sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), JAGUAR_CLOCK);
 					timer_set(sample_period, TID_PIT);
 				}
 				break;
@@ -723,11 +723,14 @@ void jaguar_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 			break;
 
 		case TID_PIT:
-			m_cpu_irq_state |= 4;
-			update_cpu_irq();
+			if (m_gpu_regs[INT1] & 0x8)
+			{
+				m_cpu_irq_state |= 8;
+				update_cpu_irq();
+			}
 			if (m_gpu_regs[PIT0] != 0)
 			{
-				attotime sample_period = attotime::from_nsec(((m_gpu->unscaled_clock()*PIT_MULT_DBG_HACK) / (1+m_gpu_regs[PIT0])) / (1+m_gpu_regs[PIT1]));
+				attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), JAGUAR_CLOCK);
 				timer_set(sample_period, TID_PIT);
 			}
 			break;
