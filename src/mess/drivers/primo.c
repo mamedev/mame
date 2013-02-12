@@ -248,15 +248,6 @@ static const cassette_interface primo_cassette_interface =
 	NULL
 };
 
-static CBM_IEC_INTERFACE( cbm_iec_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_START( primoa32, primo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", Z80, 2500000 )
@@ -290,7 +281,7 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, primo_cassette_interface )
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD(cbm_iec_intf, NULL)
+	MCFG_CBM_IEC_ADD(NULL)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart1")

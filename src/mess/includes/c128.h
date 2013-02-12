@@ -18,7 +18,7 @@
 #include "machine/ram.h"
 #include "machine/vcsctrl.h"
 #include "sound/dac.h"
-#include "sound/sid6581.h"
+#include "sound/mos6581.h"
 #include "video/mos6566.h"
 
 #define Z80A_TAG        "u10"
@@ -105,7 +105,7 @@ public:
 	required_device<mos8721_device> m_pla;
 	required_device<mos8563_device> m_vdc;
 	required_device<mos6566_device> m_vic;
-	required_device<sid6581_device> m_sid;
+	required_device<mos6581_device> m_sid;
 	required_device<mos6526_device> m_cia1;
 	required_device<mos6526_device> m_cia2;
 	required_device<cbm_iec_device> m_iec;

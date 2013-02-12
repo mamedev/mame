@@ -34,14 +34,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> base_c1581_device
+// ======================> c1581_device
 
-class base_c1581_device :  public device_t,
-							public device_cbm_iec_interface
+class c1581_device :  public device_t,
+						public device_cbm_iec_interface
 {
 public:
 	// construction/destruction
-	base_c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	enum
 	{
@@ -94,21 +95,11 @@ protected:
 
 // ======================> c1563_device
 
-class c1563_device :  public base_c1581_device
+class c1563_device :  public c1581_device
 {
 public:
 	// construction/destruction
 	c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-};
-
-
-// ======================> c1581_device
-
-class c1581_device :  public base_c1581_device
-{
-public:
-	// construction/destruction
-	c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 

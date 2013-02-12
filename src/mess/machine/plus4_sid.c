@@ -59,24 +59,12 @@ const rom_entry *plus4_sid_cartridge_device::device_rom_region() const
 
 
 //-------------------------------------------------
-//  sid6581_interface sid_intf
-//-------------------------------------------------
-
-static MOS6581_INTERFACE( sid_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( plus4_sid )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( plus4_sid )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS8580_TAG, SID8580, XTAL_17_73447MHz/20)
-	MCFG_SOUND_CONFIG(sid_intf)
+	MCFG_SOUND_ADD(MOS8580_TAG, MOS8580, XTAL_17_73447MHz/20)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

@@ -864,23 +864,6 @@ const pia6821_interface pia2_intf =
 
 
 //-------------------------------------------------
-//  IEEE488_INTERFACE( ieee488_intf )
-//-------------------------------------------------
-
-static IEEE488_INTERFACE( ieee488_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(M6520_2_TAG, pia6821_device, cb1_w),
-	DEVCB_DEVICE_LINE_MEMBER(M6520_2_TAG, pia6821_device, ca1_w),
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  PET_USER_PORT_INTERFACE( user_intf )
 //-------------------------------------------------
 
@@ -1170,7 +1153,9 @@ static MACHINE_CONFIG_START( pet, pet_state )
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_8MHz/8, via_intf)
 	MCFG_PIA6821_ADD(M6520_1_TAG, pia1_intf)
 	MCFG_PIA6821_ADD(M6520_2_TAG, pia2_intf)
-	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c4040")
+	MCFG_CBM_IEEE488_ADD("c4040")
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(M6520_2_TAG, pia6821_device, cb1_w))
+	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE(M6520_2_TAG, pia6821_device, ca1_w))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c2n", NULL, DEVWRITELINE(M6520_1_TAG, pia6821_device, ca1_w))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT2_TAG, cbm_datassette_devices, NULL, NULL, DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_8MHz/8, pet_expansion_cards, NULL, NULL)
@@ -1447,7 +1432,9 @@ static MACHINE_CONFIG_START( pet80, pet80_state )
 	MCFG_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
 	MCFG_PIA6821_ADD(M6520_1_TAG, pia1_intf)
 	MCFG_PIA6821_ADD(M6520_2_TAG, pia2_intf)
-	MCFG_CBM_IEEE488_ADD(ieee488_intf, "c8050")
+	MCFG_CBM_IEEE488_ADD("c8050")
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(M6520_2_TAG, pia6821_device, cb1_w))
+	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE(M6520_2_TAG, pia6821_device, ca1_w))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c2n", NULL, DEVWRITELINE(M6520_1_TAG, pia6821_device, ca1_w))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT2_TAG, cbm_datassette_devices, NULL, NULL, DEVWRITELINE(M6522_TAG, via6522_device, write_cb1))
 	MCFG_PET_EXPANSION_SLOT_ADD(PET_EXPANSION_SLOT_TAG, XTAL_16MHz/16, pet_expansion_cards, NULL, NULL)

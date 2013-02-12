@@ -52,7 +52,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 
 #include "emu.h"
 #include "cpu/m6502/m4510.h"
-#include "sound/sid6581.h"
+#include "sound/mos6581.h"
 #include "machine/6526cia.h"
 #include "machine/cbmipt.h"
 #include "video/vic4567.h"
@@ -203,28 +203,6 @@ READ8_MEMBER( c65_state::sid_poty_r )
 	return c64_paddle_read(sid, space, 1);
 }
 
-static MOS6581_INTERFACE( sidr_intf )
-{
-	DEVCB_DRIVER_MEMBER(c65_state, sid_potx_r),
-	DEVCB_DRIVER_MEMBER(c65_state, sid_poty_r)
-};
-
-static MOS6581_INTERFACE( sidl_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-static CBM_IEC_INTERFACE( cbm_iec_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 /*************************************
  *
@@ -326,12 +304,11 @@ static MACHINE_CONFIG_START( c65, c65_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("sid_r", SID8580, 985248)
-	MCFG_SOUND_CONFIG(sidr_intf)
+	MCFG_SOUND_ADD("sid_r", MOS8580, 985248)
+	MCFG_MOS6581_POTXY_CALLBACKS(DEVREAD8(DEVICE_SELF, c65_state, sid_potx_r), DEVREAD8(DEVICE_SELF, c65_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-	MCFG_SOUND_ADD("sid_l", SID8580, 985248)
+	MCFG_SOUND_ADD("sid_l", MOS8580, 985248)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_CONFIG(sidl_intf)
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c65, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -341,7 +318,7 @@ static MACHINE_CONFIG_START( c65, c65_state )
 	MCFG_LEGACY_MOS6526R1_ADD("cia_1", 3500000, 60, c65_cia1)
 
 	/* floppy from serial bus */
-	MCFG_CBM_IEC_ADD(cbm_iec_intf, NULL)
+	MCFG_CBM_IEC_ADD(NULL)
 
 	MCFG_FRAGMENT_ADD(c64_cartslot)
 
@@ -361,11 +338,10 @@ static MACHINE_CONFIG_DERIVED( c65pal, c65 )
 	MCFG_VIC3_ADD("vic3", c65_vic3_pal_intf)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("sid_r", SID8580, 1022727)
-	MCFG_SOUND_CONFIG(sidr_intf)
+	MCFG_SOUND_REPLACE("sid_r", MOS8580, 1022727)
+	MCFG_MOS6581_POTXY_CALLBACKS(DEVREAD8(DEVICE_SELF, c65_state, sid_potx_r), DEVREAD8(DEVICE_SELF, c65_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-	MCFG_SOUND_REPLACE("sid_l", SID8580, 1022727)
-	MCFG_SOUND_CONFIG(sidl_intf)
+	MCFG_SOUND_REPLACE("sid_l", MOS8580, 1022727)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
 	/* cia */

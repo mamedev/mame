@@ -212,18 +212,6 @@ static const floppy_interface osborne1_floppy_interface =
 	NULL
 };
 
-static IEEE488_INTERFACE( ieee488_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER("pia_0", pia6821_device, ca2_w),
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 /* F4 Character Displayer */
 static const gfx_layout osborne1_charlayout =
 {
@@ -267,7 +255,8 @@ static MACHINE_CONFIG_START( osborne1, osborne1_state )
 	MCFG_MB8877_ADD("mb8877", default_wd17xx_interface_2_drives )
 
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(osborne1_floppy_interface)
-	MCFG_IEEE488_BUS_ADD(ieee488_intf)
+	MCFG_IEEE488_BUS_ADD()
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE("pia_0", pia6821_device, ca2_w))
 	MCFG_SOFTWARE_LIST_ADD("flop_list","osborne1")
 
 	/* internal ram */

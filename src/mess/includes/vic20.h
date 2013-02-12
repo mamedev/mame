@@ -113,7 +113,6 @@ public:
 
 	// keyboard state
 	int m_key_col;
-	INTERRUPT_GEN_MEMBER(vic20_raster_interrupt);
 };
 
 #endif

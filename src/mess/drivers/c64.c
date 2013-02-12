@@ -493,16 +493,6 @@ WRITE_LINE_MEMBER( c64_state::vic_irq_w )
 	check_interrupts();
 }
 
-static MOS6567_INTERFACE( vic_intf )
-{
-	SCREEN_TAG,
-	M6510_TAG,
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, vic_irq_w),
-	DEVCB_NULL, // BA -> 6502 RDY
-	DEVCB_NULL, // AEC -> 6502 AEC
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  MOS6581_INTERFACE( sid_intf )
@@ -561,12 +551,6 @@ READ8_MEMBER( c64_state::sid_poty_r )
 
 	return data;
 }
-
-static MOS6581_INTERFACE( sid_intf )
-{
-	DEVCB_DRIVER_MEMBER(c64_state, sid_potx_r),
-	DEVCB_DRIVER_MEMBER(c64_state, sid_poty_r)
-};
 
 
 //-------------------------------------------------
@@ -688,18 +672,6 @@ WRITE8_MEMBER( c64_state::cia1_pb_w )
 	m_vic->lp_w(BIT(data, 4));
 }
 
-static MOS6526_INTERFACE( cia1_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, cia1_irq_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, sp1_w),
-	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, cnt1_w),
-	DEVCB_DRIVER_MEMBER(c64_state, cia1_pa_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(c64_state, cia1_pb_r),
-	DEVCB_DRIVER_MEMBER(c64_state, cia1_pb_w)
-};
-
 READ8_MEMBER( c64gs_state::cia1_pa_r )
 {
 	/*
@@ -755,18 +727,6 @@ READ8_MEMBER( c64gs_state::cia1_pb_r )
 
 	return data;
 }
-
-static MOS6526_INTERFACE( c64gs_cia1_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, cia1_irq_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, sp1_w),
-	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, cnt1_w),
-	DEVCB_DRIVER_MEMBER(c64gs_state, cia1_pa_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(c64gs_state, cia1_pb_r),
-	DEVCB_DRIVER_MEMBER(c64_state, cia1_pb_w)
-};
 
 
 //-------------------------------------------------
@@ -838,18 +798,6 @@ WRITE8_MEMBER( c64_state::cia2_pa_w )
 	m_iec->clk_w(!BIT(data, 4));
 	m_iec->data_w(!BIT(data, 5));
 }
-
-static MOS6526_INTERFACE( cia2_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, cia2_irq_w),
-	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, pc2_w),
-	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, sp2_w),
-	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, cnt2_w),
-	DEVCB_DRIVER_MEMBER(c64_state, cia2_pa_r),
-	DEVCB_DRIVER_MEMBER(c64_state, cia2_pa_w),
-	DEVCB_DEVICE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, pb_r),
-	DEVCB_DEVICE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, pb_w)
-};
 
 
 //-------------------------------------------------
@@ -992,20 +940,6 @@ WRITE8_MEMBER( c64gs_state::cpu_w )
 	m_hiram = BIT(data, 1);
 	m_charen = BIT(data, 2);
 }
-
-
-//-------------------------------------------------
-//  CBM_IEC_INTERFACE( iec_intf )
-//-------------------------------------------------
-
-static CBM_IEC_INTERFACE( iec_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(MOS6526_1_TAG, mos6526_device, flag_w),
-	DEVCB_DEVICE_LINE_MEMBER(C64_USER_PORT_TAG, c64_user_port_device, atn_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 //-------------------------------------------------
@@ -1152,20 +1086,28 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_MOS6567_ADD(MOS6567_TAG, SCREEN_TAG, VIC6567_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS6567_ADD(MOS6567_TAG, SCREEN_TAG, VIC6567_CLOCK, vic_videoram_map, vic_colorram_map, DEVWRITELINE(DEVICE_SELF, c64_state, vic_irq_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, SID6581, VIC6567_CLOCK)
-	MCFG_SOUND_CONFIG(sid_intf)
+	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, VIC6567_CLOCK)
+	MCFG_MOS6581_POTXY_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, sid_potx_r), DEVREAD8(DEVICE_SELF, c64_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, cia1_intf)
-	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, cia2_intf)
+	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6567_CLOCK, 60, DEVWRITELINE(DEVICE_SELF, c64_state, cia1_irq_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt1_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp1_w))
+	MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, cia1_pa_r), NULL)
+	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, cia1_pb_r), DEVWRITE8(DEVICE_SELF, c64_state, cia1_pb_w), NULL)
+	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6567_CLOCK, 60, DEVWRITELINE(DEVICE_SELF, c64_state, cia2_irq_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt2_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp2_w))
+	MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, cia2_pa_r), DEVWRITE8(DEVICE_SELF, c64_state, cia2_pa_w))
+	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(C64_USER_PORT_TAG, c64_user_port_device, pb_r), DEVWRITE8(C64_USER_PORT_TAG, c64_user_port_device, pb_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, pc2_w))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", NULL, DEVWRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
-	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
+	MCFG_CBM_IEC_ADD("c1541")
+	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, atn_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6567_TAG, mos6567_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
@@ -1234,8 +1176,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED_CLASS( ntsc_c, ntsc, c64c_state )
-	MCFG_SOUND_REPLACE(MOS6581_TAG, SID8580, VIC6567_CLOCK)
-	MCFG_SOUND_CONFIG(sid_intf)
+	MCFG_SOUND_REPLACE(MOS6581_TAG, MOS8580, VIC6567_CLOCK)
+	MCFG_MOS6581_POTXY_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, sid_potx_r), DEVREAD8(DEVICE_SELF, c64_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -1253,20 +1195,28 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_MOS6569_ADD(MOS6569_TAG, SCREEN_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS6569_ADD(MOS6569_TAG, SCREEN_TAG, VIC6569_CLOCK, vic_videoram_map, vic_colorram_map, DEVWRITELINE(DEVICE_SELF, c64_state, vic_irq_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, SID6581, VIC6569_CLOCK)
-	MCFG_SOUND_CONFIG(sid_intf)
+	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, VIC6569_CLOCK)
+	MCFG_MOS6581_POTXY_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, sid_potx_r), DEVREAD8(DEVICE_SELF, c64_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, cia1_intf)
-	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, cia2_intf)
+	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, DEVWRITELINE(DEVICE_SELF, c64_state, cia1_irq_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt1_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp1_w))
+	MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, cia1_pa_r), NULL)
+	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, cia1_pb_r), DEVWRITE8(DEVICE_SELF, c64_state, cia1_pb_w), NULL)
+	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, DEVWRITELINE(DEVICE_SELF, c64_state, cia2_irq_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt2_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp2_w))
+	MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, cia2_pa_r), DEVWRITE8(DEVICE_SELF, c64_state, cia2_pa_w))
+	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(C64_USER_PORT_TAG, c64_user_port_device, pb_r), DEVWRITE8(C64_USER_PORT_TAG, c64_user_port_device, pb_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, pc2_w))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", NULL, DEVWRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
-	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
+	MCFG_CBM_IEC_ADD("c1541")
+	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, atn_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
@@ -1313,8 +1263,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED_CLASS( pal_c, pal, c64c_state )
-	MCFG_SOUND_REPLACE(MOS6581_TAG, SID8580, VIC6569_CLOCK)
-	MCFG_SOUND_CONFIG(sid_intf)
+	MCFG_SOUND_REPLACE(MOS6581_TAG, MOS8580, VIC6569_CLOCK)
+	MCFG_MOS6581_POTXY_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, sid_potx_r), DEVREAD8(DEVICE_SELF, c64_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -1332,19 +1282,28 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_MOS8565_ADD(MOS6569_TAG, SCREEN_TAG, VIC6569_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS8565_ADD(MOS6569_TAG, SCREEN_TAG, VIC6569_CLOCK, vic_videoram_map, vic_colorram_map, DEVWRITELINE(DEVICE_SELF, c64_state, vic_irq_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, SID8580, VIC6569_CLOCK)
-	MCFG_SOUND_CONFIG(sid_intf)
+	MCFG_SOUND_ADD(MOS6581_TAG, MOS8580, VIC6569_CLOCK)
+	MCFG_MOS6581_POTXY_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, sid_potx_r), DEVREAD8(DEVICE_SELF, c64_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
 	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, c64gs_cia1_intf)
-	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, cia2_intf)
-	MCFG_CBM_IEC_BUS_ADD(iec_intf)
+	MCFG_MOS6526_ADD(MOS6526_1_TAG, VIC6569_CLOCK, 50, DEVWRITELINE(DEVICE_SELF, c64_state, cia1_irq_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt1_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp1_w))
+	MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(DEVICE_SELF, c64gs_state, cia1_pa_r), NULL)
+	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(DEVICE_SELF, c64gs_state, cia1_pb_r), NULL, NULL)
+	MCFG_MOS6526_ADD(MOS6526_2_TAG, VIC6569_CLOCK, 50, DEVWRITELINE(DEVICE_SELF, c64_state, cia2_irq_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt2_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp2_w))
+	MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, cia2_pa_r), DEVWRITE8(DEVICE_SELF, c64_state, cia2_pa_w))
+	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(C64_USER_PORT_TAG, c64_user_port_device, pb_r), DEVWRITE8(C64_USER_PORT_TAG, c64_user_port_device, pb_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, pc2_w))
+	MCFG_CBM_IEC_ADD(NULL)
+	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, flag_w))
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, atn_w))
+
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)

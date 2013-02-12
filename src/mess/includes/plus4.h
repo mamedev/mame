@@ -4,7 +4,6 @@
 #define __PLUS4__
 
 #include "emu.h"
-#include "audio/mos7360.h"
 #include "cpu/m6502/m7501.h"
 #include "formats/cbm_snqk.h"
 #include "machine/cbmiec.h"
@@ -17,6 +16,7 @@
 #include "machine/plus4exp.h"
 #include "machine/plus4user.h"
 #include "machine/ram.h"
+#include "sound/mos7360.h"
 #include "sound/t6721a.h"
 
 #define MOS7501_TAG         "u2"
@@ -99,8 +99,8 @@ public:
 	virtual void machine_reset();
 
 	void check_interrupts();
-	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal, int *cs0, int *cs1);
-	UINT8 read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal, int cs0, int cs1);
+	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);
+	UINT8 read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
 	UINT8 read_keyboard(UINT8 databus);
 
 	DECLARE_READ8_MEMBER( read );
@@ -149,9 +149,6 @@ public:
 
 	// keyboard state
 	UINT8 m_kb;
-
-	INTERRUPT_GEN_MEMBER(c16_raster_interrupt);
-	INTERRUPT_GEN_MEMBER(c16_frame_interrupt);
 };
 
 

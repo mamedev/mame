@@ -43,7 +43,7 @@
 // DEVICE CONFIGURATION MACROS
 //***************************************************************************
 
-#define MCFG_MOS6560_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+#define MCFG_MOS6560_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _potx, _poty) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE) \
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
@@ -51,11 +51,11 @@
 	MCFG_SCREEN_VISIBLE_AREA(MOS6560_MAME_XPOS, MOS6560_MAME_XPOS + MOS6560_MAME_XSIZE - 1, MOS6560_MAME_YPOS, MOS6560_MAME_YPOS + MOS6560_MAME_YSIZE - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
 	MCFG_SOUND_ADD(_tag, MOS6560, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
+	downcast<mos6560_device *>(device)->set_callbacks(_screen_tag, DEVCB2_##_potx, DEVCB2_##_poty); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
 
-#define MCFG_MOS6561_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+#define MCFG_MOS6561_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _potx, _poty) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_REFRESH_RATE(MOS6561_VRETRACERATE) \
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
@@ -63,11 +63,11 @@
 	MCFG_SCREEN_VISIBLE_AREA(MOS6561_MAME_XPOS, MOS6561_MAME_XPOS + MOS6561_MAME_XSIZE - 1, MOS6561_MAME_YPOS, MOS6561_MAME_YPOS + MOS6561_MAME_YSIZE - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
 	MCFG_SOUND_ADD(_tag, MOS6561, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
+	downcast<mos6560_device *>(device)->set_callbacks(_screen_tag, DEVCB2_##_potx, DEVCB2_##_poty); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
 
-#define MCFG_MOS656X_ATTACK_UFO_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+#define MCFG_MOS656X_ATTACK_UFO_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE) \
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
@@ -75,13 +75,9 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, 23*8 - 1, 0, 22*8 - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6560_device, screen_update) \
 	MCFG_SOUND_ADD(_tag, MOS656X_ATTACK_UFO, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
+	downcast<mos6560_device *>(device)->set_callbacks(_screen_tag, DEVCB2_NULL, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map)
-
-
-#define MOS6560_INTERFACE(_name) \
-	const mos6560_interface (_name) =
 
 
 
@@ -126,27 +122,21 @@
 //  TYPE DEFINITIONS
 //***************************************************************************
 
-// ======================> mos6560_interface
-
-struct mos6560_interface
-{
-	const char      *m_screen_tag;
-
-	devcb_read8     m_potx_cb;
-	devcb_read8     m_poty_cb;
-};
-
-
 // ======================> mos6560_device
 
 class mos6560_device : public device_t,
 						public device_memory_interface,
-						public device_sound_interface,
-						public mos6560_interface
+						public device_sound_interface
 {
 public:
-	mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 	mos6560_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _potx, class _poty> void set_callbacks(const char *screen_tag, _potx potx, _poty poty) {
+		m_screen_tag = screen_tag;
+		m_read_potx.set_callback(potx);
+		m_read_poty.set_callback(poty);
+	}
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
@@ -158,7 +148,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( lp_w );
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void raster_interrupt_gen();
 
 protected:
 	enum
@@ -168,10 +157,15 @@ protected:
 		TYPE_ATTACK_UFO     // NTSC-M, less features
 	};
 
+	enum
+	{
+		TIMER_LINE
+	};
+
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
@@ -184,12 +178,17 @@ protected:
 	void drawlines( int first, int last );
 	void soundport_w( int offset, int data );
 	void sound_start();
+	void raster_interrupt_gen();
 
 	int  m_variant;
 
 	const address_space_config      m_videoram_space_config;
 	const address_space_config      m_colorram_space_config;
 
+	devcb2_read8	m_read_potx;
+	devcb2_read8	m_read_poty;
+
+	const char *m_screen_tag;
 	screen_device *m_screen;
 
 	UINT8 m_reg[16];
@@ -216,9 +215,6 @@ protected:
 	/* DMA */
 	UINT8 m_last_data;
 
-	/* paddles */
-	devcb_resolved_read8    m_paddle_cb[2];
-
 	/* sound part */
 	int m_tone1pos, m_tone2pos, m_tone3pos,
 	m_tonesize, m_tone1samples, m_tone2samples, m_tone3samples,
@@ -229,6 +225,8 @@ protected:
 	sound_stream *m_channel;
 	INT16 *m_tone;
 	INT8 *m_noise;
+
+	emu_timer *m_line_timer;
 };
 
 

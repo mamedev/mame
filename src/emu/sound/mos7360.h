@@ -43,7 +43,7 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MCFG_MOS7360_ADD(_tag, _screen_tag, _clock, _config, _videoram_map) \
+#define MCFG_MOS7360_ADD(_tag, _screen_tag, _cpu_tag, _clock, _videoram_map, _irq, _k) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
 	MCFG_SCREEN_REFRESH_RATE(TED7360PAL_VRETRACERATE) \
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) \
@@ -51,12 +51,8 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos7360_device, screen_update) \
 	MCFG_DEVICE_ADD(_tag, MOS7360, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
-	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map)
-
-
-#define MOS7360_INTERFACE(_name) \
-	const mos7360_interface (_name) =
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
+	downcast<mos7360_device *>(device)->set_callbacks(_screen_tag, _cpu_tag, DEVCB2_##_irq, DEVCB2_##_k);
 
 
 
@@ -89,48 +85,30 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-// ======================> mos7360_interface
-
-struct mos7360_interface
-{
-	const char          *m_screen_tag;
-	const char          *m_cpu_tag;
-
-	devcb_write_line    m_out_irq_cb;
-
-	devcb_read8         m_in_k_cb;
-};
-
-
 // ======================> mos7360_device
 
 class mos7360_device :  public device_t,
 						public device_memory_interface,
-						public device_sound_interface,
-						public mos7360_interface
+						public device_sound_interface
 {
 public:
 	// construction/destruction
 	//mos7360_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	mos7360_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _irq, class _k> void set_callbacks(const char *screen_tag, const char *cpu_tag, _irq irq, _k k) {
+		m_screen_tag = screen_tag;
+		m_cpu_tag = cpu_tag;
+		m_write_irq.set_callback(irq);
+		m_read_k.set_callback(k);
+	}
+
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
-	DECLARE_READ8_MEMBER( read );
-	DECLARE_WRITE8_MEMBER( write );
-
-	int cs0_r(offs_t offset);
-	int cs1_r(offs_t offset);
-
-	UINT8 bus_r();
+	UINT8 read(address_space &space, offs_t offset, int &cs0, int &cs1);
+	void write(address_space &space, offs_t offset, UINT8 data, int &cs0, int &cs1);
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	// horrible crap code
-	DECLARE_WRITE_LINE_MEMBER( rom_switch_w );
-	DECLARE_READ_LINE_MEMBER( rom_switch_r );
-	void frame_interrupt_gen();
-	void raster_interrupt_gen();
 
 protected:
 	enum
@@ -142,11 +120,12 @@ protected:
 	{
 		TIMER_ID_1,
 		TIMER_ID_2,
-		TIMER_ID_3
+		TIMER_ID_3,
+		TIMER_LINE,
+		TIMER_FRAME
 	};
 
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -167,12 +146,18 @@ protected:
 	void draw_cursor(int ybegin, int yend, int yoff, int xoff, int color);
 	void drawlines(int first, int last);
 	void soundport_w(int offset, int data);
+	void frame_interrupt_gen();
+	void raster_interrupt_gen();
+	int cs0_r(offs_t offset);
+	int cs1_r(offs_t offset);
 
 	const address_space_config      m_videoram_space_config;
 
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_read8        m_in_k_func;
+	devcb2_write_line   m_write_irq;
+	devcb2_read8        m_read_k;
 
+	const char *m_screen_tag;
+	const char *m_cpu_tag;
 	screen_device *m_screen;            // screen which sets bitmap properties
 	cpu_device *m_cpu;
 	sound_stream *m_stream;
@@ -210,6 +195,9 @@ protected:
 	m_noisesamples;   /* count of samples to give out per tone */
 
 	int m_variant;
+
+	emu_timer *m_line_timer;
+	emu_timer *m_frame_timer;
 };
 
 

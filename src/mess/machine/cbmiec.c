@@ -286,36 +286,6 @@ void cbm_iec_slot_device::device_start()
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cbm_iec_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const cbm_iec_interface *intf = reinterpret_cast<const cbm_iec_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<cbm_iec_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_srq_cb, 0, sizeof(m_out_srq_cb));
-		memset(&m_out_atn_cb, 0, sizeof(m_out_atn_cb));
-		memset(&m_out_clk_cb, 0, sizeof(m_out_clk_cb));
-		memset(&m_out_data_cb, 0, sizeof(m_out_data_cb));
-		memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
-	}
-}
-
-
-
-//**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
 
@@ -360,11 +330,11 @@ inline void cbm_iec_device::set_signal(device_t *device, int signal, int state)
 	{
 		switch (signal)
 		{
-		case SRQ:   m_out_srq_func(state);  break;
-		case ATN:   m_out_atn_func(state);  break;
-		case CLK:   m_out_clk_func(state);  break;
-		case DATA:  m_out_data_func(state); break;
-		case RESET: m_out_reset_func(state);break;
+		case SRQ:   m_write_srq(state);  break;
+		case ATN:   m_write_atn(state);  break;
+		case CLK:   m_write_clk(state);  break;
+		case DATA:  m_write_data(state); break;
+		case RESET: m_write_reset(state);break;
 		}
 
 		daisy_entry *entry = m_device_list.first();
@@ -441,7 +411,12 @@ inline int cbm_iec_device::get_signal(int signal)
 //-------------------------------------------------
 
 cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, CBM_IEC, "CBM IEC bus", tag, owner, clock)
+	: device_t(mconfig, CBM_IEC, "CBM IEC bus", tag, owner, clock),
+		m_write_srq(*this),
+		m_write_atn(*this),
+		m_write_clk(*this),
+		m_write_data(*this),
+		m_write_reset(*this)
 {
 	for (int i = 0; i < SIGNAL_COUNT; i++)
 	{
@@ -457,11 +432,11 @@ cbm_iec_device::cbm_iec_device(const machine_config &mconfig, const char *tag, d
 void cbm_iec_device::device_start()
 {
 	// resolve callbacks
-	m_out_srq_func.resolve(m_out_srq_cb, *this);
-	m_out_atn_func.resolve(m_out_atn_cb, *this);
-	m_out_clk_func.resolve(m_out_clk_cb, *this);
-	m_out_data_func.resolve(m_out_data_cb, *this);
-	m_out_reset_func.resolve(m_out_reset_cb, *this);
+	m_write_srq.resolve_safe();
+	m_write_atn.resolve_safe();
+	m_write_clk.resolve_safe();
+	m_write_data.resolve_safe();
+	m_write_reset.resolve_safe();
 }
 
 

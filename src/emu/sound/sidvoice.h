@@ -8,7 +8,7 @@
   approximation of the sid6581 chip
   this part is for 1 (of the 3) voices of a chip
 */
-#include "sound/sid6581.h"
+#include "sound/mos6581.h"
 
 struct sw_storage
 {
@@ -105,7 +105,7 @@ void sidEmuSet(sidOperator* pVoice);
 void sidEmuSet2(sidOperator* pVoice);
 INT8 sidWaveCalcNormal(sidOperator* pVoice);
 
-void sidInitWaveformTables(SIDTYPE type);
+void sidInitWaveformTables(int type);
 void sidInitMixerEngine(running_machine &machine);
 
 #if 0

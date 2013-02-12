@@ -11,7 +11,7 @@
 #include "includes/c65.h"
 #include "includes/c64_legacy.h"
 #include "cpu/m6502/m4510.h"
-#include "sound/sid6581.h"
+#include "sound/mos6581.h"
 #include "machine/6526cia.h"
 #include "machine/cbmiec.h"
 #include "machine/ram.h"
@@ -645,8 +645,8 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 
 static WRITE8_HANDLER( c65_write_io )
 {
-	sid6581_device *sid_0 = space.machine().device<sid6581_device>("sid_r");
-	sid6581_device *sid_1 = space.machine().device<sid6581_device>("sid_l");
+	mos6581_device *sid_0 = space.machine().device<mos6581_device>("sid_r");
+	mos6581_device *sid_1 = space.machine().device<mos6581_device>("sid_l");
 	device_t *vic3 = space.machine().device("vic3");
 
 	switch (offset & 0xf00)
@@ -709,8 +709,8 @@ static WRITE8_HANDLER( c65_write_io_dc00 )
 
 static READ8_HANDLER( c65_read_io )
 {
-	sid6581_device *sid_0 = space.machine().device<sid6581_device>("sid_r");
-	sid6581_device *sid_1 = space.machine().device<sid6581_device>("sid_l");
+	mos6581_device *sid_0 = space.machine().device<mos6581_device>("sid_r");
+	mos6581_device *sid_1 = space.machine().device<mos6581_device>("sid_l");
 	device_t *vic3 = space.machine().device("vic3");
 
 	switch (offset & 0xf00)

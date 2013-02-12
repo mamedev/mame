@@ -698,18 +698,6 @@ WRITE_LINE_MEMBER( vixen_state::atn_w )
 	update_interrupt();
 }
 
-static IEEE488_INTERFACE( ieee488_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(vixen_state, srq_w),
-	DEVCB_DRIVER_LINE_MEMBER(vixen_state, atn_w),
-	DEVCB_NULL
-};
-
 static SLOT_INTERFACE_START( vixen_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
@@ -831,7 +819,9 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_FD1797x_ADD(FDC1797_TAG, XTAL_23_9616MHz/24)
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":0", vixen_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(FDC1797_TAG":1", vixen_floppies, "525dd", NULL, floppy_image_device::default_floppy_formats)
-	MCFG_IEEE488_BUS_ADD(ieee488_intf)
+	MCFG_IEEE488_BUS_ADD()
+	MCFG_IEEE488_SRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF, vixen_state, srq_w))
+	MCFG_IEEE488_ATN_CALLBACK(DEVWRITELINE(DEVICE_SELF, vixen_state, atn_w))
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "vixen")

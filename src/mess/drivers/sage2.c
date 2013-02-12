@@ -507,23 +507,6 @@ static const centronics_interface centronics_intf =
 
 
 //-------------------------------------------------
-//  IEEE488_INTERFACE( ieee488_intf )
-//-------------------------------------------------
-
-static IEEE488_INTERFACE( ieee488_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  GENERIC_TERMINAL_INTERFACE( terminal_intf )
 //-------------------------------------------------
 
@@ -596,7 +579,7 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_CENTRONICS_PRINTER_ADD(CENTRONICS_TAG, centronics_intf)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", sage2_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", sage2_floppies, "525qd", 0, floppy_image_device::default_floppy_formats)
-	MCFG_IEEE488_BUS_ADD(ieee488_intf)
+	MCFG_IEEE488_BUS_ADD()
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

@@ -85,23 +85,6 @@ const device_type INTERPOD = &device_creator<interpod_device>;
 //**************************************************************************
 
 //-------------------------------------------------
-//  IEEE488_INTERFACE( ieee488_intf )
-//-------------------------------------------------
-
-static IEEE488_INTERFACE( ieee488_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  ROM( interpod )
 //-------------------------------------------------
 
@@ -203,7 +186,7 @@ static MACHINE_CONFIG_FRAGMENT( interpod )
 	MCFG_RIOT6532_ADD(R6532_TAG, 1000000, riot_intf)
 	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
 
-	MCFG_CBM_IEEE488_ADD(ieee488_intf, NULL)
+	MCFG_CBM_IEEE488_ADD(NULL)
 MACHINE_CONFIG_END
 
 

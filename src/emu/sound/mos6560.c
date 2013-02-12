@@ -435,8 +435,10 @@ READ8_MEMBER( mos6560_device::read )
 		val = m_reg[offset];
 		break;
 	case 8:                        /* poti 1 */
+		val = m_read_potx(0);
+		break;
 	case 9:                        /* poti 2 */
-		val = (!m_paddle_cb->isnull()) ? m_paddle_cb[offset - 8](0) : m_reg[offset];
+		val = m_read_poty(0);
 		break;
 	default:
 		val = m_reg[offset];
@@ -684,12 +686,15 @@ static ADDRESS_MAP_START( mos6560_colorram_map, AS_1, 8, mos6560_device )
 	AM_RANGE(0x000, 0x3ff) AM_RAM
 ADDRESS_MAP_END
 
-mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+mos6560_device::mos6560_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
 	: device_t(mconfig, type, name, tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
+		m_variant(variant),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map))
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
+		m_read_potx(*this),
+		m_read_poty(*this)
 {
 }
 
@@ -699,35 +704,17 @@ mos6560_device::mos6560_device(const machine_config &mconfig, const char *tag, d
 		device_sound_interface(mconfig, *this),
 		m_variant(TYPE_6560),
 		m_videoram_space_config("videoram", ENDIANNESS_LITTLE, 8, 14, 0, NULL, *ADDRESS_MAP_NAME(mos6560_videoram_map)),
-		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map))
+		m_colorram_space_config("colorram", ENDIANNESS_LITTLE, 8, 10, 0, NULL, *ADDRESS_MAP_NAME(mos6560_colorram_map)),
+		m_read_potx(*this),
+		m_read_poty(*this)
 {
 }
 
 mos6561_device::mos6561_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:mos6560_device(mconfig, MOS6561, "MOS6561", tag, owner, clock) { m_variant = TYPE_6561; }
+	:mos6560_device(mconfig, MOS6561, "MOS6561", tag, owner, clock, TYPE_6561) { }
 
 mos656x_attack_ufo_device::mos656x_attack_ufo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	:mos6560_device(mconfig, MOS656X_ATTACK_UFO, "MOS656X", tag, owner, clock) { m_variant = TYPE_ATTACK_UFO; }
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mos6560_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mos6560_interface *intf = reinterpret_cast<const mos6560_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mos6560_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		// TODO
-	}
-}
+	:mos6560_device(mconfig, MOS656X_ATTACK_UFO, "MOS656X", tag, owner, clock, TYPE_ATTACK_UFO) { }
 
 
 //-------------------------------------------------
@@ -745,6 +732,7 @@ const address_space_config *mos6560_device::memory_space_config(address_spacenum
 	}
 }
 
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -753,10 +741,11 @@ void mos6560_device::device_start()
 {
 	m_screen = machine().device<screen_device>(m_screen_tag);
 	m_screen->register_screen_bitmap(m_bitmap);
+	assert(m_screen);
 
 	// resolve callbacks
-	m_paddle_cb[0].resolve(m_potx_cb, *this);
-	m_paddle_cb[1].resolve(m_poty_cb, *this);
+	m_read_potx.resolve_safe(0xff);
+	m_read_poty.resolve_safe(0xff);
 
 	switch (m_variant)
 	{
@@ -766,12 +755,14 @@ void mos6560_device::device_start()
 		m_total_lines = MOS6560_LINES;
 		m_total_vretracerate = MOS6560_VRETRACERATE;
 		break;
+
 	case TYPE_ATTACK_UFO:
 		m_total_xsize = 23 * 8;
 		m_total_ysize = 22 * 8;
 		m_total_lines = MOS6560_LINES;
 		m_total_vretracerate = MOS6560_VRETRACERATE;
 		break;
+
 	case TYPE_6561:
 		m_total_xsize = MOS6561_XSIZE;
 		m_total_ysize = MOS6561_YSIZE;
@@ -780,8 +771,14 @@ void mos6560_device::device_start()
 		break;
 	}
 
+	// allocate timers
+	m_line_timer = timer_alloc(TIMER_LINE);
+	m_line_timer->adjust(m_screen->scan_period(), 0, m_screen->scan_period());
+
+	// initialize sound
 	sound_start();
 
+	// state saving
 	save_item(NAME(m_lightpenreadtime));
 	save_item(NAME(m_rasterline));
 	save_item(NAME(m_lastline));
@@ -820,6 +817,7 @@ void mos6560_device::device_start()
 	save_item(NAME(m_noisepos));
 	save_item(NAME(m_noisesamples));
 }
+
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -870,6 +868,21 @@ void mos6560_device::device_reset()
 	m_tone3samples = 1;
 	m_noisepos = 0;
 	m_noisesamples = 1;
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void mos6560_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_LINE:
+		raster_interrupt_gen();
+		break;
+	}
 }
 
 //-------------------------------------------------

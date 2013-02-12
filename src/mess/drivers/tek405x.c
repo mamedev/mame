@@ -1129,24 +1129,6 @@ static ACIA6850_INTERFACE( acia_intf )
 
 
 
-//-------------------------------------------------
-//  IEEE488_INTERFACE( ieee488_intf )
-//-------------------------------------------------
-
-static IEEE488_INTERFACE( ieee488_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -1228,7 +1210,7 @@ static MACHINE_CONFIG_START( tek4051, tek4051_state )
 	MCFG_PIA6821_ADD(MC6820_GPIB_TAG, gpib_pia_intf)
 	MCFG_PIA6821_ADD(MC6820_COM_TAG, com_pia_intf)
 	MCFG_ACIA6850_ADD(MC6850_TAG, acia_intf)
-	MCFG_IEEE488_BUS_ADD(ieee488_intf)
+	MCFG_IEEE488_BUS_ADD()
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

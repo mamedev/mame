@@ -52,7 +52,7 @@ void plus4_state::check_interrupts()
 //  MEMORY MANAGEMENT
 //**************************************************************************
 
-void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal, int *cs0, int *cs1)
+void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal)
 {
 	UINT16 i = ras << 15 | BA10 << 14 | BA11 << 13 | BA13 << 12 | BA9 << 11 | BA8 << 10 | BA14 << 9 | mux << 8 | BA12 << 7 | BA7 << 6 | BA6 << 5 | BA5 << 4 | BA4 << 3 | BA15 << 2 | phi0 << 1 | 1;
 /*  UINT8 data = m_pla->read(i);
@@ -118,9 +118,6 @@ void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs
 	*addr_clk = F4;
 	*keyport = F5;
 	*kernal = F6;
-
-	*cs0 = m_ted->cs0_r(offset);
-	*cs1 = m_ted->cs1_r(offset);
 }
 
 
@@ -128,10 +125,10 @@ void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal, int cs0, int cs1)
+UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal)
 {
-	UINT8 data = m_ted->bus_r();
-	int c1l = 1, c1h = 1, c2l = 1, c2h = 1;
+	int cs0 = 1, cs1 = 1, c1l = 1, c1h = 1, c2l = 1, c2h = 1;
+	UINT8 data = m_ted->read(space, offset, cs0, cs1);
 
 	//logerror("offset %04x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
 
@@ -222,10 +219,6 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 			}
 		}
 	}
-	else if (offset >= 0xff00 && offset < 0xff20)
-	{
-		data = m_ted->read(space, offset & 0x1f);
-	}
 	else if (offset < 0xfd00 || offset >= 0xff20)
 	{
 		data = m_ram->pointer()[offset & m_ram->mask()];
@@ -242,11 +235,11 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 READ8_MEMBER( plus4_state::read )
 {
 	int phi0 = 1, mux = 0, ras = 0, ba = 1;
-	int scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1;
+	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
 
-	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
+	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal);
 
-	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1);
+	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal);
 }
 
 
@@ -256,11 +249,13 @@ READ8_MEMBER( plus4_state::read )
 
 WRITE8_MEMBER( plus4_state::write )
 {
-	int scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1;
+	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
 	int phi0 = 1, mux = 0, ras = 0, ba = 1;
-	int c1l = 1, c1h = 1, c2l = 1, c2h = 1;
+	int cs0 = 1, cs1 = 1, c1l = 1, c1h = 1, c2l = 1, c2h = 1;
 
-	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
+	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal);
+
+	m_ted->write(space, offset, data, cs0, cs1);
 
 	//logerror("write offset %04x data %02x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,data,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
 
@@ -284,18 +279,6 @@ WRITE8_MEMBER( plus4_state::write )
 	{
 		m_spi_kb->write(space, 0, data);
 	}
-	else if (offset >= 0xff00 && offset < 0xff20)
-	{
-		m_ted->write(space, offset & 0x1f, data);
-	}
-	else if (offset == 0xff3e)
-	{
-		m_ted->rom_switch_w(1);
-	}
-	else if (offset == 0xff3f)
-	{
-		m_ted->rom_switch_w(0);
-	}
 	else if (offset < 0xfd00 || offset >= 0xff20)
 	{
 		m_ram->pointer()[offset & m_ram->mask()] = data;
@@ -312,11 +295,11 @@ WRITE8_MEMBER( plus4_state::write )
 READ8_MEMBER( plus4_state::ted_videoram_r )
 {
 	int phi0 = 1, mux = 0, ras = 1, ba = 0;
-	int scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1;
+	int scs, phi2, user, _6551, addr_clk, keyport, kernal;
 
-	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
+	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal);
 
-	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1);
+	return read_memory(space, offset, ba, scs, phi2, user, _6551, addr_clk, keyport, kernal);
 }
 
 
@@ -574,16 +557,6 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 //  ted7360_interface ted_intf
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER(plus4_state::c16_raster_interrupt)
-{
-	m_ted->raster_interrupt_gen();
-}
-
-INTERRUPT_GEN_MEMBER(plus4_state::c16_frame_interrupt)
-{
-	m_ted->frame_interrupt_gen();
-}
-
 WRITE_LINE_MEMBER( plus4_state::ted_irq_w )
 {
 	m_ted_irq = state;
@@ -640,13 +613,6 @@ READ8_MEMBER( plus4_state::ted_k_r )
 	return data;
 }
 
-static MOS7360_INTERFACE( ted_intf )
-{
-	SCREEN_TAG,
-	MOS7501_TAG,
-	DEVCB_DRIVER_LINE_MEMBER(plus4_state, ted_irq_w),
-	DEVCB_DRIVER_MEMBER(plus4_state, ted_k_r)
-};
 
 
 //-------------------------------------------------
@@ -669,34 +635,6 @@ WRITE_LINE_MEMBER( plus4_state::acia_irq_w )
 
 	check_interrupts();
 }
-
-
-//-------------------------------------------------
-//  CBM_IEC_INTERFACE( iec_intf )
-//-------------------------------------------------
-
-static CBM_IEC_INTERFACE( iec_intf )
-{
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(PLUS4_USER_PORT_TAG, plus4_user_port_device, atn_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  CBM_IEC_INTERFACE( c16_iec_intf )
-//-------------------------------------------------
-
-static CBM_IEC_INTERFACE( c16_iec_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
 
 
 //-------------------------------------------------
@@ -799,13 +737,11 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 	MCFG_CPU_PROGRAM_MAP(plus4_mem)
 	MCFG_M7501_PORT_CALLBACKS(READ8(plus4_state, cpu_r), WRITE8(plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, plus4_state, c16_frame_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(plus4_state, c16_raster_interrupt, TED7360_HRETRACERATE)
 	MCFG_QUANTUM_PERFECT_CPU(MOS7501_TAG)
 
 	// video and sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, XTAL_14_31818MHz/4, ted_intf, ted_videoram_map)
+	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, MOS7501_TAG, XTAL_14_31818MHz/4, ted_videoram_map, DEVWRITELINE(DEVICE_SELF, plus4_state, ted_irq_w), DEVREAD8(DEVICE_SELF, plus4_state, ted_k_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -814,7 +750,8 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 	MCFG_MOS6529_ADD(MOS6529_USER_TAG, DEVREAD8(PLUS4_USER_PORT_TAG, plus4_user_port_device, p_r), DEVWRITE8(PLUS4_USER_PORT_TAG, plus4_user_port_device, p_w))
 	MCFG_MOS6529_ADD(MOS6529_KB_TAG, CONSTANT(0xff), DEVWRITE8(DEVICE_SELF, plus4_state, spi_kb_w))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, plus4_datassette_devices, "c1531", NULL, NULL)
-	MCFG_CBM_IEC_ADD(iec_intf, NULL)
+	MCFG_CBM_IEC_ADD(NULL)
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(PLUS4_USER_PORT_TAG, plus4_user_port_device, atn_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, expansion_intf, plus4_expansion_cards, "c1551", NULL)
@@ -845,13 +782,11 @@ static MACHINE_CONFIG_START( pal, plus4_state )
 	MCFG_CPU_PROGRAM_MAP(plus4_mem)
 	MCFG_M7501_PORT_CALLBACKS(READ8(plus4_state, cpu_r), WRITE8(plus4_state, cpu_w))
 	MCFG_M7501_PORT_PULLS(0x00, 0xc0)
-	MCFG_CPU_VBLANK_INT_DRIVER(SCREEN_TAG, plus4_state, c16_frame_interrupt)
-	MCFG_CPU_PERIODIC_INT_DRIVER(plus4_state, c16_raster_interrupt, TED7360_HRETRACERATE)
 	MCFG_QUANTUM_PERFECT_CPU(MOS7501_TAG)
 
 	// video and sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, XTAL_17_73447MHz/5, ted_intf, ted_videoram_map)
+	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, MOS7501_TAG, XTAL_17_73447MHz/5, ted_videoram_map, DEVWRITELINE(DEVICE_SELF, plus4_state, ted_irq_w), DEVREAD8(DEVICE_SELF, plus4_state, ted_k_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -860,7 +795,8 @@ static MACHINE_CONFIG_START( pal, plus4_state )
 	MCFG_MOS6529_ADD(MOS6529_USER_TAG, DEVREAD8(PLUS4_USER_PORT_TAG, plus4_user_port_device, p_r), DEVWRITE8(PLUS4_USER_PORT_TAG, plus4_user_port_device, p_w))
 	MCFG_MOS6529_ADD(MOS6529_KB_TAG, CONSTANT(0xff), DEVWRITE8(DEVICE_SELF, plus4_state, spi_kb_w))
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, plus4_datassette_devices, "c1531", NULL, NULL)
-	MCFG_CBM_IEC_ADD(iec_intf, NULL)
+	MCFG_CBM_IEC_ADD(NULL)
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(PLUS4_USER_PORT_TAG, plus4_user_port_device, atn_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
 	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_17_73447MHz/20, expansion_intf, plus4_expansion_cards, "c1551", NULL)
@@ -895,7 +831,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( c16n, ntsc, c16_state )
 	MCFG_DEVICE_REMOVE(PLUS4_USER_PORT_TAG)
 
 	MCFG_DEVICE_MODIFY(CBM_IEC_TAG)
-	MCFG_DEVICE_CONFIG(c16_iec_intf)
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(NULL)
 
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
@@ -917,7 +853,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( c16p, pal, c16_state )
 	MCFG_DEVICE_REMOVE(PLUS4_USER_PORT_TAG)
 
 	MCFG_DEVICE_MODIFY(CBM_IEC_TAG)
-	MCFG_DEVICE_CONFIG(c16_iec_intf)
+	MCFG_CBM_IEC_BUS_ATN_CALLBACK(NULL)
 
 	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")

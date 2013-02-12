@@ -29,13 +29,33 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_IEEE488_BUS_ADD(_config) \
-	MCFG_DEVICE_ADD(IEEE488_TAG, IEEE488, 0) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_IEEE488_BUS_ADD() \
+	MCFG_DEVICE_ADD(IEEE488_TAG, IEEE488, 0)
 
 
-#define IEEE488_INTERFACE(_name) \
-	const ieee488_interface (_name) =
+#define MCFG_IEEE488_EOI_CALLBACK(_write) \
+	downcast<ieee488_device *>(device)->set_eoi_callback(DEVCB2_##_write);
+
+#define MCFG_IEEE488_DAV_CALLBACK(_write) \
+	downcast<ieee488_device *>(device)->set_dav_callback(DEVCB2_##_write);
+
+#define MCFG_IEEE488_NRFD_CALLBACK(_write) \
+	downcast<ieee488_device *>(device)->set_nrfd_callback(DEVCB2_##_write);
+
+#define MCFG_IEEE488_NDAC_CALLBACK(_write) \
+	downcast<ieee488_device *>(device)->set_ndac_callback(DEVCB2_##_write);
+
+#define MCFG_IEEE488_IFC_CALLBACK(_write) \
+	downcast<ieee488_device *>(device)->set_ifc_callback(DEVCB2_##_write);
+
+#define MCFG_IEEE488_SRQ_CALLBACK(_write) \
+	downcast<ieee488_device *>(device)->set_srq_callback(DEVCB2_##_write);
+
+#define MCFG_IEEE488_ATN_CALLBACK(_write) \
+	downcast<ieee488_device *>(device)->set_atn_callback(DEVCB2_##_write);
+
+#define MCFG_IEEE488_REN_CALLBACK(_write) \
+	downcast<ieee488_device *>(device)->set_ren_callback(DEVCB2_##_write);
 
 
 #define MCFG_IEEE488_SLOT_ADD(_tag, _num, _slot_intf, _def_slot, _def_inp) \
@@ -49,31 +69,24 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> ieee488_interface
-
-struct ieee488_interface
-{
-	devcb_write_line    m_out_eoi_cb;
-	devcb_write_line    m_out_dav_cb;
-	devcb_write_line    m_out_nrfd_cb;
-	devcb_write_line    m_out_ndac_cb;
-	devcb_write_line    m_out_ifc_cb;
-	devcb_write_line    m_out_srq_cb;
-	devcb_write_line    m_out_atn_cb;
-	devcb_write_line    m_out_ren_cb;
-};
-
-
 // ======================> ieee488_device
 
 class device_ieee488_interface;
 
-class ieee488_device : public device_t,
-						public ieee488_interface
+class ieee488_device : public device_t
 {
 public:
 	// construction/destruction
 	ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _write> void set_eoi_callback(_write wr) { m_write_eoi.set_callback(wr); }
+	template<class _write> void set_dav_callback(_write wr) { m_write_dav.set_callback(wr); }
+	template<class _write> void set_nrfd_callback(_write wr) { m_write_nrfd.set_callback(wr); }
+	template<class _write> void set_ndac_callback(_write wr) { m_write_ndac.set_callback(wr); }
+	template<class _write> void set_ifc_callback(_write wr) { m_write_ifc.set_callback(wr); }
+	template<class _write> void set_srq_callback(_write wr) { m_write_srq.set_callback(wr); }
+	template<class _write> void set_atn_callback(_write wr) { m_write_atn.set_callback(wr); }
+	template<class _write> void set_ren_callback(_write wr) { m_write_ren.set_callback(wr); }
 
 	void add_device(device_t *target, int address);
 
@@ -128,7 +141,6 @@ protected:
 
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete();
 	virtual void device_stop();
 
 	class daisy_entry
@@ -148,14 +160,14 @@ protected:
 	simple_list<daisy_entry> m_device_list;
 
 private:
-	devcb_resolved_write_line   m_out_eoi_func;
-	devcb_resolved_write_line   m_out_dav_func;
-	devcb_resolved_write_line   m_out_nrfd_func;
-	devcb_resolved_write_line   m_out_ndac_func;
-	devcb_resolved_write_line   m_out_ifc_func;
-	devcb_resolved_write_line   m_out_srq_func;
-	devcb_resolved_write_line   m_out_atn_func;
-	devcb_resolved_write_line   m_out_ren_func;
+	devcb2_write_line   m_write_eoi;
+	devcb2_write_line   m_write_dav;
+	devcb2_write_line   m_write_nrfd;
+	devcb2_write_line   m_write_ndac;
+	devcb2_write_line   m_write_ifc;
+	devcb2_write_line   m_write_srq;
+	devcb2_write_line   m_write_atn;
+	devcb2_write_line   m_write_ren;
 
 	inline void set_signal(device_t *device, int signal, int state);
 	inline int get_signal(int signal);

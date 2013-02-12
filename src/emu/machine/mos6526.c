@@ -118,46 +118,6 @@ const device_type MOS8520 = &device_creator<mos8520_device>;
 const device_type MOS5710 = &device_creator<mos5710_device>;
 
 
-//-------------------------------------------------
-//  static_set_tod_clock -
-//-------------------------------------------------
-
-void mos6526_device::static_set_tod_clock(device_t &device, int tod_clock)
-{
-	mos6526_device &cia = dynamic_cast<mos6526_device &>(device);
-
-	cia.m_tod_clock = tod_clock;
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void mos6526_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const mos6526_interface *intf = reinterpret_cast<const mos6526_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<mos6526_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_pc_cb, 0, sizeof(m_out_pc_cb));
-		memset(&m_out_cnt_cb, 0, sizeof(m_out_cnt_cb));
-		memset(&m_out_sp_cb, 0, sizeof(m_out_sp_cb));
-		memset(&m_in_pa_cb, 0, sizeof(m_in_pa_cb));
-		memset(&m_out_pa_cb, 0, sizeof(m_out_pa_cb));
-		memset(&m_in_pb_cb, 0, sizeof(m_in_pb_cb));
-		memset(&m_out_pb_cb, 0, sizeof(m_out_pb_cb));
-	}
-}
-
-
 
 //**************************************************************************
 //  INLINE HELPERS
@@ -174,7 +134,7 @@ inline void mos6526_device::update_pa()
 	if (m_pa != pa)
 	{
 		m_pa = pa;
-		m_out_pa_func(0, pa);
+		m_write_pa((offs_t)0, pa);
 	}
 }
 
@@ -205,7 +165,7 @@ inline void mos6526_device::update_pb()
 
 	if (m_pb != pb)
 	{
-		m_out_pb_func(0, pb);
+		m_write_pb((offs_t)0, pb);
 		m_pb = pb;
 	}
 }
@@ -438,7 +398,7 @@ inline void mos6526_device::serial_output()
 				}
 
 				m_sp = BIT(m_shift, 7);
-				m_out_sp_func(m_sp);
+				m_write_sp(m_sp);
 
 				m_shift <<= 1;
 				m_bits++;
@@ -457,7 +417,7 @@ inline void mos6526_device::serial_output()
 			}
 
 			m_cnt = !m_cnt;
-			m_out_cnt_func(m_cnt);
+			m_write_cnt(m_cnt);
 		}
 	}
 }
@@ -505,7 +465,7 @@ inline void mos6526_device::update_interrupt()
 {
 	if (!m_irq && m_ir1)
 	{
-		m_out_irq_func(ASSERT_LINE);
+		m_write_irq(ASSERT_LINE);
 		m_irq = true;
 	}
 
@@ -602,7 +562,7 @@ inline void mos6526_device::synchronize()
 	if (!m_pc)
 	{
 		m_pc = 1;
-		m_out_pc_func(m_pc);
+		m_write_pc(m_pc);
 	}
 
 	serial_input();
@@ -634,7 +594,15 @@ mos6526_device::mos6526_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, name, tag, owner, clock),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
-		m_variant(variant)
+		m_variant(variant),
+		m_write_irq(*this),
+		m_write_pc(*this),
+		m_write_cnt(*this),
+		m_write_sp(*this),
+		m_read_pa(*this),
+		m_write_pa(*this),
+		m_read_pb(*this),
+		m_write_pb(*this)
 {
 }
 
@@ -642,7 +610,15 @@ mos6526_device::mos6526_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, MOS6526, "MOS6526", tag, owner, clock),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
-		m_variant(TYPE_6526)
+		m_variant(TYPE_6526),
+		m_write_irq(*this),
+		m_write_pc(*this),
+		m_write_cnt(*this),
+		m_write_sp(*this),
+		m_read_pa(*this),
+		m_write_pa(*this),
+		m_read_pb(*this),
+		m_write_pb(*this)
 { }
 
 mos6526a_device::mos6526a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -665,14 +641,14 @@ void mos6526_device::device_start()
 	m_icountptr = &m_icount;
 
 	// resolve callbacks
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_pc_func.resolve(m_out_pc_cb, *this);
-	m_out_cnt_func.resolve(m_out_cnt_cb, *this);
-	m_out_sp_func.resolve(m_out_sp_cb, *this);
-	m_in_pa_func.resolve(m_in_pa_cb, *this);
-	m_out_pa_func.resolve(m_out_pa_cb, *this);
-	m_in_pb_func.resolve(m_in_pb_cb, *this);
-	m_out_pb_func.resolve(m_out_pb_cb, *this);
+	m_write_irq.resolve_safe();
+	m_write_pc.resolve_safe();
+	m_write_cnt.resolve_safe();
+	m_write_sp.resolve_safe();
+	m_read_pa.resolve_safe(0xff);
+	m_write_pa.resolve_safe();
+	m_read_pb.resolve_safe(0xff);
+	m_write_pb.resolve_safe();
 
 	// allocate timer
 	if (m_tod_clock > 0)
@@ -782,10 +758,10 @@ void mos6526_device::device_reset()
 	m_tod_stopped = true;
 	m_tod_latched = false;
 
-	m_out_irq_func(CLEAR_LINE);
-	m_out_pc_func(m_pc);
-	m_out_sp_func(m_sp);
-	m_out_cnt_func(m_cnt);
+	m_write_irq(CLEAR_LINE);
+	m_write_pc(m_pc);
+	m_write_sp(m_sp);
+	m_write_cnt(m_cnt);
 }
 
 
@@ -833,11 +809,11 @@ READ8_MEMBER( mos6526_device::read )
 	switch (offset)
 	{
 	case PRA:
-		data = (m_in_pa_func(0) & ~m_ddra) | (m_pra & m_ddra);
+		data = (m_read_pa(0) & ~m_ddra) | (m_pra & m_ddra);
 		break;
 
 	case PRB:
-		data = (m_in_pb_func(0) & ~m_ddrb) | (m_prb & m_ddrb);
+		data = (m_read_pb(0) & ~m_ddrb) | (m_prb & m_ddrb);
 
 		if (CRA_PBON)
 		{
@@ -856,7 +832,7 @@ READ8_MEMBER( mos6526_device::read )
 		}
 
 		m_pc = 0;
-		m_out_pc_func(m_pc);
+		m_write_pc(m_pc);
 		break;
 
 	case DDRA:
@@ -920,7 +896,7 @@ READ8_MEMBER( mos6526_device::read )
 		m_ir1 = 0;
 		m_icr = 0;
 		m_irq = false;
-		m_out_irq_func(CLEAR_LINE);
+		m_write_irq(CLEAR_LINE);
 		break;
 
 	case CRA:
@@ -980,7 +956,7 @@ WRITE8_MEMBER( mos6526_device::write )
 		update_pb();
 
 		m_pc = 0;
-		m_out_pc_func(m_pc);
+		m_write_pc(m_pc);
 		break;
 
 	case DDRA:

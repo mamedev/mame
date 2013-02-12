@@ -16,7 +16,7 @@
 #include "machine/ram.h"
 #include "machine/vcsctrl.h"
 #include "sound/dac.h"
-#include "sound/sid6581.h"
+#include "sound/mos6581.h"
 #include "video/mos6566.h"
 
 #define M6510_TAG       "u7"
@@ -77,7 +77,7 @@ public:
 	required_device<m6510_device> m_maincpu;
 	required_device<pls100_device> m_pla;
 	required_device<mos6566_device> m_vic;
-	required_device<sid6581_device> m_sid;
+	required_device<mos6581_device> m_sid;
 	required_device<mos6526_device> m_cia1;
 	required_device<mos6526_device> m_cia2;
 	optional_device<cbm_iec_device> m_iec;

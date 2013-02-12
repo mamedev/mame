@@ -290,16 +290,6 @@ WRITE_LINE_MEMBER( vic10_state::vic_irq_w )
 	check_interrupts();
 }
 
-static MOS6566_INTERFACE( vic_intf )
-{
-	SCREEN_TAG,
-	M6510_TAG,
-	DEVCB_DRIVER_LINE_MEMBER(vic10_state, vic_irq_w),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 
 //-------------------------------------------------
 //  sid6581_interface sid_intf
@@ -358,12 +348,6 @@ READ8_MEMBER( vic10_state::sid_poty_r )
 
 	return data;
 }
-
-static MOS6581_INTERFACE( sid_intf )
-{
-	DEVCB_DRIVER_MEMBER(vic10_state, sid_potx_r),
-	DEVCB_DRIVER_MEMBER(vic10_state, sid_poty_r)
-};
 
 
 //-------------------------------------------------
@@ -484,18 +468,6 @@ WRITE8_MEMBER( vic10_state::cia_pb_w )
 
 	m_vic->lp_w(BIT(data, 4));
 }
-
-static MOS6526_INTERFACE( cia_intf )
-{
-	DEVCB_DRIVER_LINE_MEMBER(vic10_state, cia_irq_w),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, sp_w),
-	DEVCB_DEVICE_LINE_MEMBER(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, cnt_w),
-	DEVCB_DRIVER_MEMBER(vic10_state, cia_pa_r),
-	DEVCB_NULL,
-	DEVCB_DRIVER_MEMBER(vic10_state, cia_pb_r),
-	DEVCB_DRIVER_MEMBER(vic10_state, cia_pb_w)
-};
 
 
 //-------------------------------------------------
@@ -636,16 +608,19 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 	MCFG_QUANTUM_PERFECT_CPU(M6510_TAG)
 
 	// video hardware
-	MCFG_MOS6566_ADD(MOS6566_TAG, SCREEN_TAG, VIC6566_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS6566_ADD(MOS6566_TAG, SCREEN_TAG, VIC6566_CLOCK, vic_videoram_map, vic_colorram_map, DEVWRITELINE(DEVICE_SELF, vic10_state, vic_irq_w))
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, SID6581, VIC6566_CLOCK)
-	MCFG_SOUND_CONFIG(sid_intf)
+	MCFG_SOUND_ADD(MOS6581_TAG, MOS6581, VIC6566_CLOCK)
+	MCFG_MOS6581_POTXY_CALLBACKS(DEVREAD8(DEVICE_SELF, vic10_state, sid_potx_r), DEVREAD8(DEVICE_SELF, vic10_state, sid_poty_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	// devices
-	MCFG_MOS6526_ADD(MOS6526_TAG, VIC6566_CLOCK, 60, cia_intf)
+	MCFG_MOS6526_ADD(MOS6526_TAG, VIC6566_CLOCK, 60, DEVWRITELINE(DEVICE_SELF, vic10_state, cia_irq_w))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, cnt_w), DEVWRITELINE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, sp_w))
+	MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(DEVICE_SELF, vic10_state, cia_pa_r), NULL)
+	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(DEVICE_SELF, vic10_state, cia_pb_r), DEVWRITE8(DEVICE_SELF, vic10_state, cia_pb_w), NULL)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", NULL, DEVWRITELINE(MOS6526_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6566_TAG, mos6566_device, lp_w))

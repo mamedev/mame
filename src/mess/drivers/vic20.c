@@ -302,17 +302,6 @@ READ8_MEMBER( vic20_state::vic_videoram_r )
 
 
 //**************************************************************************
-//  VIDEO
-//**************************************************************************
-
-INTERRUPT_GEN_MEMBER(vic20_state::vic20_raster_interrupt)
-{
-	m_vic->raster_interrupt_gen();
-}
-
-
-
-//**************************************************************************
 //  ADDRESS MAPS
 //**************************************************************************
 
@@ -702,32 +691,6 @@ static const via6522_interface via1_intf =
 
 
 //-------------------------------------------------
-//  CBM_IEC_INTERFACE( cbm_iec_intf )
-//-------------------------------------------------
-
-static CBM_IEC_INTERFACE( cbm_iec_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(M6522_1_TAG, via6522_device, write_cb1),
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
-//  mos6560_interface vic_ntsc_intf
-//-------------------------------------------------
-
-static MOS6560_INTERFACE( vic_intf )
-{
-	SCREEN_TAG,
-	DEVCB_DEVICE_MEMBER(CONTROL1_TAG, vcs_control_port_device, pot_x_r),
-	DEVCB_DEVICE_MEMBER(CONTROL1_TAG, vcs_control_port_device, pot_y_r)
-};
-
-
-//-------------------------------------------------
 //  VIC20_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
@@ -813,7 +776,8 @@ static MACHINE_CONFIG_START( vic20, vic20_state )
 	MCFG_VIA6522_ADD(M6522_0_TAG, 0, via0_intf)
 	MCFG_VIA6522_ADD(M6522_1_TAG, 0, via1_intf)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", NULL, DEVWRITELINE(M6522_1_TAG, via6522_device, write_ca1))
-	MCFG_CBM_IEC_ADD(cbm_iec_intf, "c1541")
+	MCFG_CBM_IEC_ADD("c1541")
+	MCFG_CBM_IEC_BUS_SRQ_CALLBACK(DEVWRITELINE(M6522_1_TAG, via6522_device, write_cb1))
 	MCFG_VIC20_USER_PORT_ADD(VIC20_USER_PORT_TAG, user_intf, vic20_user_port_cards, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -836,11 +800,10 @@ static MACHINE_CONFIG_DERIVED( ntsc, vic20 )
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vic20_state, vic20_raster_interrupt,  MOS656X_HRETRACERATE)
 
 	// video/sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS6560_ADD(M6560_TAG, SCREEN_TAG, MOS6560_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS6560_ADD(M6560_TAG, SCREEN_TAG, MOS6560_CLOCK, vic_videoram_map, vic_colorram_map, DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_x_r), DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -863,11 +826,10 @@ static MACHINE_CONFIG_DERIVED( pal, vic20 )
 	// basic machine hardware
 	MCFG_CPU_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic20_mem)
-	MCFG_CPU_PERIODIC_INT_DRIVER(vic20_state, vic20_raster_interrupt,  MOS656X_HRETRACERATE)
 
 	// video/sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MOS6561_ADD(M6560_TAG, SCREEN_TAG, MOS6561_CLOCK, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS6561_ADD(M6560_TAG, SCREEN_TAG, MOS6561_CLOCK, vic_videoram_map, vic_colorram_map, DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_x_r), DEVREAD8(CONTROL1_TAG, vcs_control_port_device, pot_y_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices

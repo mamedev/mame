@@ -28,13 +28,24 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_CBM_IEC_BUS_ADD(_config) \
-	MCFG_DEVICE_ADD(CBM_IEC_TAG, CBM_IEC, 0) \
-	MCFG_DEVICE_CONFIG(_config)
+#define MCFG_CBM_IEC_BUS_ADD() \
+	MCFG_DEVICE_ADD(CBM_IEC_TAG, CBM_IEC, 0)
 
 
-#define CBM_IEC_INTERFACE(_name) \
-	const cbm_iec_interface (_name) =
+#define MCFG_CBM_IEC_BUS_SRQ_CALLBACK(_write) \
+	downcast<cbm_iec_device *>(device)->set_srq_callback(DEVCB2_##_write);
+
+#define MCFG_CBM_IEC_BUS_ATN_CALLBACK(_write) \
+	downcast<cbm_iec_device *>(device)->set_atn_callback(DEVCB2_##_write);
+
+#define MCFG_CBM_IEC_BUS_CLK_CALLBACK(_write) \
+	downcast<cbm_iec_device *>(device)->set_clk_callback(DEVCB2_##_write);
+
+#define MCFG_CBM_IEC_BUS_DATA_CALLBACK(_write) \
+	downcast<cbm_iec_device *>(device)->set_data_callback(DEVCB2_##_write);
+
+#define MCFG_CBM_IEC_BUS_RESET_CALLBACK(_write) \
+	downcast<cbm_iec_device *>(device)->set_reset_callback(DEVCB2_##_write);
 
 
 #define MCFG_CBM_IEC_SLOT_ADD(_tag, _num, _slot_intf, _def_slot, _def_inp) \
@@ -48,28 +59,21 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> cbm_iec_interface
-
-struct cbm_iec_interface
-{
-	devcb_write_line    m_out_srq_cb;
-	devcb_write_line    m_out_atn_cb;
-	devcb_write_line    m_out_clk_cb;
-	devcb_write_line    m_out_data_cb;
-	devcb_write_line    m_out_reset_cb;
-};
-
-
 // ======================> cbm_iec_device
 
 class device_cbm_iec_interface;
 
-class cbm_iec_device : public device_t,
-						public cbm_iec_interface
+class cbm_iec_device : public device_t
 {
 public:
 	// construction/destruction
 	cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _write> void set_srq_callback(_write wr) { m_write_srq.set_callback(wr); }
+	template<class _write> void set_atn_callback(_write wr) { m_write_atn.set_callback(wr); }
+	template<class _write> void set_clk_callback(_write wr) { m_write_clk.set_callback(wr); }
+	template<class _write> void set_data_callback(_write wr) { m_write_data.set_callback(wr); }
+	template<class _write> void set_reset_callback(_write wr) { m_write_reset.set_callback(wr); }
 
 	void add_device(device_t *target, int address);
 
@@ -108,7 +112,6 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 	virtual void device_stop();
 
 	class daisy_entry
@@ -127,11 +130,11 @@ protected:
 	simple_list<daisy_entry> m_device_list;
 
 private:
-	devcb_resolved_write_line   m_out_atn_func;
-	devcb_resolved_write_line   m_out_clk_func;
-	devcb_resolved_write_line   m_out_data_func;
-	devcb_resolved_write_line   m_out_srq_func;
-	devcb_resolved_write_line   m_out_reset_func;
+	devcb2_write_line   m_write_srq;
+	devcb2_write_line   m_write_atn;
+	devcb2_write_line   m_write_clk;
+	devcb2_write_line   m_write_data;
+	devcb2_write_line   m_write_reset;
 
 	inline void set_signal(device_t *device, int signal, int state);
 	inline int get_signal(int signal);
@@ -177,10 +180,10 @@ public:
 	device_cbm_iec_interface *m_next;
 
 	// optional operation overrides
+	virtual void cbm_iec_srq(int state) { };
 	virtual void cbm_iec_atn(int state) { };
 	virtual void cbm_iec_clk(int state) { };
 	virtual void cbm_iec_data(int state) { };
-	virtual void cbm_iec_srq(int state) { };
 	virtual void cbm_iec_reset(int state) { };
 
 	cbm_iec_device  *m_bus;

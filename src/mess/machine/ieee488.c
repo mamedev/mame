@@ -96,39 +96,6 @@ void ieee488_slot_device::device_start()
 
 
 //**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ieee488_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const ieee488_interface *intf = reinterpret_cast<const ieee488_interface *>(static_config());
-	if (intf != NULL)
-		*static_cast<ieee488_interface *>(this) = *intf;
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_eoi_cb, 0, sizeof(m_out_eoi_cb));
-		memset(&m_out_dav_cb, 0, sizeof(m_out_dav_cb));
-		memset(&m_out_nrfd_cb, 0, sizeof(m_out_nrfd_cb));
-		memset(&m_out_ndac_cb, 0, sizeof(m_out_ndac_cb));
-		memset(&m_out_ifc_cb, 0, sizeof(m_out_ifc_cb));
-		memset(&m_out_srq_cb, 0, sizeof(m_out_srq_cb));
-		memset(&m_out_atn_cb, 0, sizeof(m_out_atn_cb));
-		memset(&m_out_ren_cb, 0, sizeof(m_out_ren_cb));
-	}
-}
-
-
-
-//**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
 
@@ -173,14 +140,14 @@ inline void ieee488_device::set_signal(device_t *device, int signal, int state)
 	{
 		switch (signal)
 		{
-		case EOI:   m_out_eoi_func(state);  break;
-		case DAV:   m_out_dav_func(state);  break;
-		case NRFD:  m_out_nrfd_func(state); break;
-		case NDAC:  m_out_ndac_func(state); break;
-		case IFC:   m_out_ifc_func(state);  break;
-		case SRQ:   m_out_srq_func(state);  break;
-		case ATN:   m_out_atn_func(state);  break;
-		case REN:   m_out_ren_func(state);  break;
+		case EOI:   m_write_eoi(state);  break;
+		case DAV:   m_write_dav(state);  break;
+		case NRFD:  m_write_nrfd(state); break;
+		case NDAC:  m_write_ndac(state); break;
+		case IFC:   m_write_ifc(state);  break;
+		case SRQ:   m_write_srq(state);  break;
+		case ATN:   m_write_atn(state);  break;
+		case REN:   m_write_ren(state);  break;
 		}
 
 		daisy_entry *entry = m_device_list.first();
@@ -325,6 +292,14 @@ inline UINT8 ieee488_device::get_data()
 
 ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, IEEE488, "IEEE488 bus", tag, owner, clock),
+		m_write_eoi(*this),
+		m_write_dav(*this),
+		m_write_nrfd(*this),
+		m_write_ndac(*this),
+		m_write_ifc(*this),
+		m_write_srq(*this),
+		m_write_atn(*this),
+		m_write_ren(*this),
 		m_dio(0xff)
 {
 	for (int i = 0; i < SIGNAL_COUNT; i++)
@@ -341,15 +316,16 @@ ieee488_device::ieee488_device(const machine_config &mconfig, const char *tag, d
 void ieee488_device::device_start()
 {
 	// resolve callbacks
-	m_out_eoi_func.resolve(m_out_eoi_cb, *this);
-	m_out_dav_func.resolve(m_out_dav_cb, *this);
-	m_out_nrfd_func.resolve(m_out_nrfd_cb, *this);
-	m_out_ndac_func.resolve(m_out_ndac_cb, *this);
-	m_out_ifc_func.resolve(m_out_ifc_cb, *this);
-	m_out_srq_func.resolve(m_out_srq_cb, *this);
-	m_out_atn_func.resolve(m_out_atn_cb, *this);
-	m_out_ren_func.resolve(m_out_ren_cb, *this);
+	m_write_eoi.resolve_safe();
+	m_write_dav.resolve_safe();
+	m_write_nrfd.resolve_safe();
+	m_write_ndac.resolve_safe();
+	m_write_ifc.resolve_safe();
+	m_write_srq.resolve_safe();
+	m_write_atn.resolve_safe();
+	m_write_ren.resolve_safe();
 }
+
 
 //-------------------------------------------------
 //  device_stop - device-specific stop

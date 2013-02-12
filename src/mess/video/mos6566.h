@@ -91,9 +91,9 @@
 // DEVICE CONFIGURATION MACROS
 //***************************************************************************
 
-#define MCFG_MOS6566_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+#define MCFG_MOS6566_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
 	MCFG_DEVICE_ADD(_tag, MOS6566, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
+	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, NULL, DEVCB2_##_irq, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -102,9 +102,9 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6566_device, screen_update)
 
-#define MCFG_MOS6567_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+#define MCFG_MOS6567_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
 	MCFG_DEVICE_ADD(_tag, MOS6567, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
+	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, NULL, DEVCB2_##_irq, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -113,9 +113,9 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6567_device, screen_update)
 
-#define MCFG_MOS8562_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+#define MCFG_MOS8562_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
 	MCFG_DEVICE_ADD(_tag, MOS8562, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
+	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, NULL, DEVCB2_##_irq, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -124,9 +124,9 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8562_device, screen_update)
 
-#define MCFG_MOS8564_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+#define MCFG_MOS8564_ADD(_tag, _screen_tag, _cpu_tag, _clock, _videoram_map, _colorram_map, _irq, _k) \
 	MCFG_DEVICE_ADD(_tag, MOS8564, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
+	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, _cpu_tag, DEVCB2_##_irq, DEVCB2_##_k); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -135,9 +135,9 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8564_device, screen_update)
 
-#define MCFG_MOS6569_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+#define MCFG_MOS6569_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
 	MCFG_DEVICE_ADD(_tag, MOS6569, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
+	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, NULL, DEVCB2_##_irq, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -146,9 +146,9 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos6569_device, screen_update)
 
-#define MCFG_MOS8565_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+#define MCFG_MOS8565_ADD(_tag, _screen_tag, _clock, _videoram_map, _colorram_map, _irq) \
 	MCFG_DEVICE_ADD(_tag, MOS8565, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
+	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, NULL, DEVCB2_##_irq, DEVCB2_NULL); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -157,9 +157,9 @@
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8565_device, screen_update)
 
-#define MCFG_MOS8566_ADD(_tag, _screen_tag, _clock, _config, _videoram_map, _colorram_map) \
+#define MCFG_MOS8566_ADD(_tag, _screen_tag, _cpu_tag, _clock, _videoram_map, _colorram_map, _irq, _k) \
 	MCFG_DEVICE_ADD(_tag, MOS8566, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
+	downcast<mos6566_device *>(device)->set_callbacks(_screen_tag, _cpu_tag, DEVCB2_##_irq, DEVCB2_##_k); \
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, _videoram_map) \
 	MCFG_DEVICE_ADDRESS_MAP(AS_1, _colorram_map) \
 	MCFG_SCREEN_ADD(_screen_tag, RASTER) \
@@ -167,22 +167,6 @@
 	MCFG_SCREEN_SIZE(VIC6569_COLUMNS, VIC6569_LINES) \
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1) \
 	MCFG_SCREEN_UPDATE_DEVICE(_tag, mos8566_device, screen_update)
-
-
-#define MOS6566_INTERFACE(_name) \
-	const mos6566_interface (_name) =
-
-#define MOS6567_INTERFACE(_name) \
-	const mos6566_interface (_name) =
-
-#define MOS8564_INTERFACE(_name) \
-	const mos6566_interface (_name) =
-
-#define MOS6569_INTERFACE(_name) \
-	const mos6566_interface (_name) =
-
-#define MOS8566_INTERFACE(_name) \
-	const mos6566_interface (_name) =
 
 
 
@@ -281,32 +265,23 @@
 //  TYPE DEFINITIONS
 //***************************************************************************
 
-// ======================> mos6566_interface
-
-struct mos6566_interface
-{
-	const char          *m_screen_tag;
-	const char          *m_cpu_tag;
-
-	devcb_write_line    m_out_irq_cb;
-	devcb_write_line    m_out_ba_cb;
-	devcb_write_line    m_out_aec_cb;
-
-	devcb_write8        m_out_k_cb;
-};
-
-
 // ======================> mos6566_device
 
 class mos6566_device :  public device_t,
 						public device_memory_interface,
-						public device_execute_interface,
-						public mos6566_interface
+						public device_execute_interface
 {
 public:
 	// construction/destruction
-	mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	mos6566_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 	mos6566_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _irq, class _k> void set_callbacks(const char *screen_tag, const char *cpu_tag, _irq irq, _k k) {
+		m_screen_tag = screen_tag;
+		m_cpu_tag = cpu_tag;
+		m_write_irq.set_callback(irq);
+		m_write_k.set_callback(k);
+	}
 
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const;
 
@@ -340,7 +315,6 @@ protected:
 	};
 
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void execute_run();
@@ -376,6 +350,13 @@ protected:
 	void draw_graphics();
 	void draw_sprites();
 
+	devcb2_write_line       m_write_irq;
+	devcb2_write_line       m_write_ba;
+	devcb2_write_line       m_write_aec;
+	devcb2_write8           m_write_k;
+
+	const char *m_screen_tag;
+	const char *m_cpu_tag;
 	screen_device *m_screen;            // screen which sets bitmap properties
 	cpu_device *m_cpu;
 
@@ -450,11 +431,6 @@ protected:
 	/* Cycles */
 	UINT64 m_first_ba_cycle;
 	UINT8 m_device_suspended;
-
-	devcb_resolved_write_line       m_out_irq_func;
-	devcb_resolved_write_line       m_out_ba_func;
-	devcb_resolved_write_line       m_out_aec_func;
-	devcb_resolved_write8           m_out_k_func;
 };
 
 
@@ -465,7 +441,7 @@ class mos6567_device :  public mos6566_device
 public:
 	// construction/destruction
 	mos6567_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	mos6567_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 };
 
 
@@ -496,7 +472,7 @@ class mos6569_device :  public mos6566_device
 public:
 	// construction/destruction
 	mos6569_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
+	mos6569_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 
 	// device-level overrides
 	virtual void execute_run();

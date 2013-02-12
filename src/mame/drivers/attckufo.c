@@ -69,7 +69,6 @@ public:
 
 	DECLARE_READ8_MEMBER( vic_videoram_r );
 	DECLARE_READ8_MEMBER( vic_colorram_r );
-	INTERRUPT_GEN_MEMBER(attckufo_raster_interrupt);
 };
 
 READ8_MEMBER(attckufo_state::attckufo_io_r)
@@ -148,28 +147,13 @@ static INPUT_PORTS_START( attckufo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-
-INTERRUPT_GEN_MEMBER(attckufo_state::attckufo_raster_interrupt)
-{
-	m_mos6560->raster_interrupt_gen();
-}
-
-static MOS6560_INTERFACE( vic_intf )
-{
-	"screen",
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
 static MACHINE_CONFIG_START( attckufo, attckufo_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 14318181/14)
 	MCFG_CPU_PROGRAM_MAP(cpu_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(attckufo_state, attckufo_raster_interrupt,  MOS656X_HRETRACERATE)
 
 	/* video hardware */
-	MCFG_MOS656X_ATTACK_UFO_ADD("mos6560", "screen", 14318181/14, vic_intf, vic_videoram_map, vic_colorram_map)
+	MCFG_MOS656X_ATTACK_UFO_ADD("mos6560", "screen", 14318181/14, vic_videoram_map, vic_colorram_map)
 MACHINE_CONFIG_END
 
 ROM_START( attckufo )

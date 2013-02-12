@@ -4,16 +4,9 @@
 
 const device_type ISA8_SSI2001 = &device_creator<ssi2001_device>;
 
-static const sid6581_interface ssi_sid6581_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
 static MACHINE_CONFIG_FRAGMENT( ssi2001 )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("sid6581", SID6581, XTAL_14_31818MHz/16)
-	MCFG_SOUND_CONFIG(ssi_sid6581_interface)
+	MCFG_SOUND_ADD("sid6581", MOS6581, XTAL_14_31818MHz/16)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_PC_JOY_ADD("joy")
 MACHINE_CONFIG_END
@@ -40,7 +33,7 @@ void ssi2001_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_device(0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("joy")));
-	m_isa->install_device(0x0280, 0x029F, 0, 0, read8_delegate(FUNC(sid6581_device::read), subdevice<sid6581_device>("sid6581")), write8_delegate(FUNC(sid6581_device::write), subdevice<sid6581_device>("sid6581")));
+	m_isa->install_device(0x0280, 0x029F, 0, 0, read8_delegate(FUNC(mos6581_device::read), subdevice<mos6581_device>("sid6581")), write8_delegate(FUNC(mos6581_device::write), subdevice<mos6581_device>("sid6581")));
 }
 
 

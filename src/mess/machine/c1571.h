@@ -41,9 +41,9 @@
 
 // ======================> c1571_device
 
-class base_c1571_device :  public device_t,
-							public device_cbm_iec_interface,
-							public device_c64_floppy_parallel_interface
+class c1571_device :  public device_t,
+						public device_cbm_iec_interface,
+						public device_c64_floppy_parallel_interface
 {
 public:
 	enum
@@ -55,7 +55,8 @@ public:
 	};
 
 	// construction/destruction
-	base_c1571_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	c1571_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
+	c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
@@ -133,7 +134,7 @@ protected:
 
 // ======================> c1570_device
 
-class c1570_device :  public base_c1571_device
+class c1570_device :  public c1571_device
 {
 public:
 	// construction/destruction
@@ -141,19 +142,9 @@ public:
 };
 
 
-// ======================> c1571_device
-
-class c1571_device :  public base_c1571_device
-{
-public:
-	// construction/destruction
-	c1571_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-};
-
-
 // ======================> c1571cr_device
 
-class c1571cr_device :  public base_c1571_device
+class c1571cr_device :  public c1571_device
 {
 public:
 	// construction/destruction
@@ -166,7 +157,7 @@ public:
 
 // ======================> mini_chief_device
 
-class mini_chief_device :  public base_c1571_device
+class mini_chief_device :  public c1571_device
 {
 public:
 	// construction/destruction

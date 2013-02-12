@@ -324,6 +324,16 @@ endif
 
 
 #-------------------------------------------------
+# MOS 7360 TED
+#-------------------------------------------------
+
+ifneq ($(filter MOS7360,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/mos7360.o
+endif
+
+
+
+#-------------------------------------------------
 # Namco custom sound chips
 #-------------------------------------------------
 
@@ -511,11 +521,11 @@ endif
 #-------------------------------------------------
 
 ifneq ($(filter SID6581,$(SOUNDS)),)
-SOUNDOBJS += $(SOUNDOBJ)/sid6581.o $(SOUNDOBJ)/sid.o $(SOUNDOBJ)/sidenvel.o $(SOUNDOBJ)/sidvoice.o
+SOUNDOBJS += $(SOUNDOBJ)/mos6581.o $(SOUNDOBJ)/sid.o $(SOUNDOBJ)/sidenvel.o $(SOUNDOBJ)/sidvoice.o
 endif
 
 ifneq ($(filter SID8580,$(SOUNDS)),)
-SOUNDOBJS += $(SOUNDOBJ)/sid6581.o $(SOUNDOBJ)/sid.o $(SOUNDOBJ)/sidenvel.o $(SOUNDOBJ)/sidvoice.o
+SOUNDOBJS += $(SOUNDOBJ)/mos6581.o $(SOUNDOBJ)/sid.o $(SOUNDOBJ)/sidenvel.o $(SOUNDOBJ)/sidvoice.o
 endif
 
 

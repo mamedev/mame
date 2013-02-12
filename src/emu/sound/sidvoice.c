@@ -708,7 +708,7 @@ void sidEmuSet2(sidOperator* pVoice)
 	}
 }
 
-void sidInitWaveformTables(SIDTYPE type)
+void sidInitWaveformTables(int type)
 {
 	int i,j;
 	UINT16 k;
@@ -732,7 +732,7 @@ void sidInitWaveformTables(SIDTYPE type)
 	for ( i = 0; i < 4096; i++ )
 		squareTable[k++] = 0; //255;
 
-	if ( type==MOS8580 )
+	if ( type==mos6581_device::TYPE_8580 )
 	{
 		waveform30 = waveform30_8580;
 		waveform50 = waveform50_8580;
@@ -747,7 +747,7 @@ void sidInitWaveformTables(SIDTYPE type)
 		waveform70 = waveform70_6581;  /* really audible? */
 	}
 
-	if ( type==MOS8580 )
+	if ( type==mos6581_device::TYPE_8580 )
 	{
 		sidModeNormalTable[3] = sidMode30;
 		sidModeNormalTable[6] = sidMode60;

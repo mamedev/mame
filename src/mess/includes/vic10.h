@@ -11,7 +11,7 @@
 #include "machine/ram.h"
 #include "machine/vcsctrl.h"
 #include "sound/dac.h"
-#include "sound/sid6581.h"
+#include "sound/mos6581.h"
 #include "video/mos6566.h"
 
 #define M6510_TAG       "u3"
@@ -55,7 +55,7 @@ public:
 
 	required_device<m6510_device> m_maincpu;
 	required_device<mos6566_device> m_vic;
-	required_device<sid6581_device> m_sid;
+	required_device<mos6581_device> m_sid;
 	required_device<mos6526_device> m_cia;
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;

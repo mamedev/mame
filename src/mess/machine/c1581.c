@@ -52,7 +52,7 @@ const device_type C1581 = &device_creator<c1581_device>;
 //  complete
 //-------------------------------------------------
 
-void base_c1581_device::device_config_complete()
+void c1581_device::device_config_complete()
 {
 	switch (m_variant)
 	{
@@ -100,7 +100,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *base_c1581_device::device_rom_region() const
+const rom_entry *c1581_device::device_rom_region() const
 {
 	switch (m_variant)
 	{
@@ -118,7 +118,7 @@ const rom_entry *base_c1581_device::device_rom_region() const
 //  ADDRESS_MAP( c1581_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( c1581_mem, AS_PROGRAM, 8, base_c1581_device )
+static ADDRESS_MAP_START( c1581_mem, AS_PROGRAM, 8, c1581_device )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x2000) AM_RAM
 	AM_RANGE(0x4000, 0x400f) AM_MIRROR(0x1ff0) AM_DEVREADWRITE(M8520_TAG, mos8520_device, read, write)
 	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE(WD1772_TAG, wd1772_t, read, write)
@@ -130,21 +130,21 @@ ADDRESS_MAP_END
 //  MOS8520_INTERFACE( cia_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( base_c1581_device::cnt_w )
+WRITE_LINE_MEMBER( c1581_device::cnt_w )
 {
 	m_cnt_out = state;
 
 	update_iec();
 }
 
-WRITE_LINE_MEMBER( base_c1581_device::sp_w )
+WRITE_LINE_MEMBER( c1581_device::sp_w )
 {
 	m_sp_out = state;
 
 	update_iec();
 }
 
-READ8_MEMBER( base_c1581_device::cia_pa_r )
+READ8_MEMBER( c1581_device::cia_pa_r )
 {
 	/*
 
@@ -175,7 +175,7 @@ READ8_MEMBER( base_c1581_device::cia_pa_r )
 	return data;
 }
 
-WRITE8_MEMBER( base_c1581_device::cia_pa_w )
+WRITE8_MEMBER( c1581_device::cia_pa_w )
 {
 	/*
 
@@ -205,7 +205,7 @@ WRITE8_MEMBER( base_c1581_device::cia_pa_w )
 	output_set_led_value(LED_ACT, BIT(data, 6));
 }
 
-READ8_MEMBER( base_c1581_device::cia_pb_r )
+READ8_MEMBER( c1581_device::cia_pb_r )
 {
 	/*
 
@@ -239,7 +239,7 @@ READ8_MEMBER( base_c1581_device::cia_pb_r )
 	return data;
 }
 
-WRITE8_MEMBER( base_c1581_device::cia_pb_w )
+WRITE8_MEMBER( c1581_device::cia_pb_w )
 {
 	/*
 
@@ -271,18 +271,6 @@ WRITE8_MEMBER( base_c1581_device::cia_pb_w )
 	update_iec();
 }
 
-static MOS8520_INTERFACE( cia_intf )
-{
-	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1581_device, cnt_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1581_device, sp_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c1581_device, cia_pa_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c1581_device, cia_pa_w),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c1581_device, cia_pb_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, base_c1581_device, cia_pb_w)
-};
-
 
 //-------------------------------------------------
 //  SLOT_INTERFACE( c1581_floppies )
@@ -297,7 +285,7 @@ SLOT_INTERFACE_END
 //  FLOPPY_FORMATS( c1581_device::floppy_formats )
 //-------------------------------------------------
 
-FLOPPY_FORMATS_MEMBER( base_c1581_device::floppy_formats )
+FLOPPY_FORMATS_MEMBER( c1581_device::floppy_formats )
 	FLOPPY_D81_FORMAT
 FLOPPY_FORMATS_END
 
@@ -310,10 +298,14 @@ static MACHINE_CONFIG_FRAGMENT( c1581 )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c1581_mem)
 
-	MCFG_MOS8520_ADD(M8520_TAG, XTAL_16MHz/8, 0, cia_intf)
+	MCFG_MOS6526_ADD(M8520_TAG, XTAL_16MHz/8, 0, INPUTLINE(M6502_TAG, INPUT_LINE_IRQ0))
+	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(DEVICE_SELF_OWNER, c1581_device, cnt_w), DEVWRITELINE(DEVICE_SELF_OWNER, c1581_device, sp_w))
+	MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(DEVICE_SELF_OWNER, c1581_device, cia_pa_r), DEVWRITE8(DEVICE_SELF_OWNER, c1581_device, cia_pa_w))
+	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(DEVICE_SELF_OWNER, c1581_device, cia_pb_r), DEVWRITE8(DEVICE_SELF_OWNER, c1581_device, cia_pb_w), NULL)
+
 	MCFG_WD1772x_ADD(WD1772_TAG, XTAL_16MHz/2)
 
-	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", c1581_floppies, "35dd", 0, base_c1581_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD(WD1772_TAG":0", c1581_floppies, "35dd", 0, c1581_device::floppy_formats)
 MACHINE_CONFIG_END
 
 
@@ -322,7 +314,7 @@ MACHINE_CONFIG_END
 //  machine configurations
 //-------------------------------------------------
 
-machine_config_constructor base_c1581_device::device_mconfig_additions() const
+machine_config_constructor c1581_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( c1581 );
 }
@@ -334,10 +326,10 @@ machine_config_constructor base_c1581_device::device_mconfig_additions() const
 //**************************************************************************
 
 //-------------------------------------------------
-//  base_c1581_device - constructor
+//  c1581_device - constructor
 //-------------------------------------------------
 
-base_c1581_device::base_c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
+c1581_device::c1581_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant)
 	: device_t(mconfig, type, name, tag, owner, clock),
 		device_cbm_iec_interface(mconfig, *this),
 		m_maincpu(*this, M6502_TAG),
@@ -353,28 +345,36 @@ base_c1581_device::base_c1581_device(const machine_config &mconfig, device_type 
 {
 }
 
+c1581_device::c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, C1581, "C1581", tag, owner, clock),
+		device_cbm_iec_interface(mconfig, *this),
+		m_maincpu(*this, M6502_TAG),
+		m_cia(*this, M8520_TAG),
+		m_fdc(*this, WD1772_TAG),
+		m_floppy(*this, WD1772_TAG":0:35dd"),
+		m_data_out(0),
+		m_atn_ack(0),
+		m_fast_ser_dir(0),
+		m_sp_out(1),
+		m_cnt_out(1),
+		m_variant(TYPE_1581)
+{
+}
+
 
 //-------------------------------------------------
 //  c1563_device - constructor
 //-------------------------------------------------
 
 c1563_device::c1563_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1581_device(mconfig, C1563, "C1563", tag, owner, clock, TYPE_1563) { }
-
-
-//-------------------------------------------------
-//  c1581_device - constructor
-//-------------------------------------------------
-
-c1581_device::c1581_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: base_c1581_device(mconfig, C1581, "C1581", tag, owner, clock, TYPE_1581) { }
+	: c1581_device(mconfig, C1563, "C1563", tag, owner, clock, TYPE_1563) { }
 
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void base_c1581_device::device_start()
+void c1581_device::device_start()
 {
 	// state saving
 	save_item(NAME(m_data_out));
@@ -389,7 +389,7 @@ void base_c1581_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void base_c1581_device::device_reset()
+void c1581_device::device_reset()
 {
 	m_maincpu->reset();
 
@@ -410,7 +410,7 @@ void base_c1581_device::device_reset()
 //  cbm_iec_srq -
 //-------------------------------------------------
 
-void base_c1581_device::cbm_iec_srq(int state)
+void c1581_device::cbm_iec_srq(int state)
 {
 	update_iec();
 }
@@ -420,7 +420,7 @@ void base_c1581_device::cbm_iec_srq(int state)
 //  cbm_iec_atn -
 //-------------------------------------------------
 
-void base_c1581_device::cbm_iec_atn(int state)
+void c1581_device::cbm_iec_atn(int state)
 {
 	update_iec();
 }
@@ -430,7 +430,7 @@ void base_c1581_device::cbm_iec_atn(int state)
 //  cbm_iec_data -
 //-------------------------------------------------
 
-void base_c1581_device::cbm_iec_data(int state)
+void c1581_device::cbm_iec_data(int state)
 {
 	update_iec();
 }
@@ -440,7 +440,7 @@ void base_c1581_device::cbm_iec_data(int state)
 //  cbm_iec_reset -
 //-------------------------------------------------
 
-void base_c1581_device::cbm_iec_reset(int state)
+void c1581_device::cbm_iec_reset(int state)
 {
 	if (!state)
 	{
@@ -453,7 +453,7 @@ void base_c1581_device::cbm_iec_reset(int state)
 //  update_iec -
 //-------------------------------------------------
 
-void base_c1581_device::update_iec()
+void c1581_device::update_iec()
 {
 	m_cia->cnt_w(m_fast_ser_dir || m_bus->srq_r());
 	m_cia->sp_w(m_fast_ser_dir || m_bus->data_r());

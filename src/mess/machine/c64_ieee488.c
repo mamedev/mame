@@ -151,23 +151,6 @@ static const tpi6525_interface tpi_intf =
 
 
 //-------------------------------------------------
-//  IEEE488_INTERFACE( ieee488_intf )
-//-------------------------------------------------
-
-static IEEE488_INTERFACE( ieee488_intf )
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
-};
-
-
-//-------------------------------------------------
 //  C64_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
@@ -218,7 +201,7 @@ static C64_EXPANSION_INTERFACE( expansion_intf )
 
 static MACHINE_CONFIG_FRAGMENT( c64_ieee488 )
 	MCFG_TPI6525_ADD(MOS6525_TAG, tpi_intf)
-	MCFG_CBM_IEEE488_ADD(ieee488_intf, NULL)
+	MCFG_CBM_IEEE488_ADD(NULL)
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, 0, expansion_intf, c64_expansion_cards, NULL, NULL)
 MACHINE_CONFIG_END
 

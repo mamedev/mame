@@ -17,7 +17,7 @@
 
 #include "cpu/m6502/m6510.h"
 #include "cpu/z80/z80.h"
-#include "sound/sid6581.h"
+#include "sound/mos6581.h"
 #include "machine/6526cia.h"
 #include "machine/cbmiec.h"
 
