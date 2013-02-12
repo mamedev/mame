@@ -134,8 +134,8 @@ struct k001604_interface
 	int            gfx_index_2;
 	int            layer_size;
 	int            roz_size;
-
-	int            is_slrasslt;
+	int            txt_mem_offset;
+	int            roz_mem_offset;
 };
 
 struct k037122_interface

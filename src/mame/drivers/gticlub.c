@@ -777,28 +777,32 @@ static const k001604_interface gticlub_k001604_intf =
 {
 	1, 2,   /* gfx index 1 & 2 */
 	1, 1,       /* layer_size, roz_size */
-	0       /* slrasslt hack */
+	0,      /* text layer mem offset */
+	0,      /* roz layer mem offset */
 };
 
 static const k001604_interface slrasslt_k001604_intf =
 {
 	1, 2,   /* gfx index 1 & 2 */
 	0, 0,       /* layer_size, roz_size */
-	1       /* slrasslt hack */
+	16384,  /* text layer mem offset */
+	0,      /* roz layer mem offset */
 };
 
 static const k001604_interface hangplt_k001604_intf_l =
 {
 	1, 2,   /* gfx index 1 & 2 */
 	0, 1,       /* layer_size, roz_size */
-	0       /* slrasslt hack */
+	0,      /* text layer mem offset */
+	16384,  /* roz layer mem offset */
 };
 
 static const k001604_interface hangplt_k001604_intf_r =
 {
 	3, 4,   /* gfx index 1 & 2 */
 	0, 1,       /* layer_size, roz_size */
-	0       /* slrasslt hack */
+	0,      /* text layer mem offset */
+	16384,  /* roz layer mem offset */
 };
 
 

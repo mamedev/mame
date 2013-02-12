@@ -229,6 +229,8 @@ UINT32 zr107_state::screen_update_jetwave(screen_device &screen, bitmap_rgb32 &b
 
 	bitmap.fill(machine().pens[0], cliprect);
 
+	k001604_draw_back_layer(k001604, bitmap, cliprect);
+
 	K001005_draw(bitmap, cliprect);
 
 	k001604_draw_front_layer(k001604, bitmap, cliprect);
@@ -784,8 +786,9 @@ MACHINE_CONFIG_END
 static const k001604_interface jetwave_k001604_intf =
 {
 	0, 1,   /* gfx index 1 & 2 */
-	0, 1,       /* layer_size, roz_size */
-	0       /* slrasslt hack */
+	0, 0,       /* layer_size, roz_size */
+	0,      /* text layer mem offset */
+	16384,  /* roz layer mem offset */
 };
 
 static MACHINE_CONFIG_START( jetwave, zr107_state )
