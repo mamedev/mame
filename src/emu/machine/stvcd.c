@@ -184,7 +184,7 @@ void saturn_state::cd_exec_command( void )
 				// CR1 & 10 = force single-speed
 				// CR1 & 80 = no change flag (done by Assault Suit Leynos 2)
 			CDROM_LOG(("%s:CD: Initialize CD system\n", machine.describe_context()))
-			if((cr1 & 0x81) == 0x00) //guess
+			//if((cr1 & 0x81) == 0x00) //guess TODO: nope, Choice Cuts doesn't like it, it crashes if you try to skip the FMV otherwise.
 			{
 				if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 				{
