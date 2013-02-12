@@ -272,6 +272,7 @@ public:
 	DECLARE_WRITE32_MEMBER ( saturn_vdp2_cram_w );
 	DECLARE_WRITE16_MEMBER ( saturn_vdp2_regs_w );
 
+	DECLARE_READ32_MEMBER( abus_dummy_r );
 
 	/* VDP1 */
 	void stv_set_framebuffer_config( void );

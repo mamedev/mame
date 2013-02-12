@@ -301,8 +301,10 @@ READ32_MEMBER(saturn_state::saturn_scu_r)
 			res = m_scu.ism;
 			break;
 		case 0xa4/4:
-			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) IRQ status reg read %08x MASK=%08x\n",space.device().safe_pc(),mem_mask,m_scu_regs[0xa0/4]);
-			res = m_scu.ist;
+			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) IRQ status reg read MASK=%08x IST=%08x | ISM=%08x\n",space.device().safe_pc(),mem_mask,m_scu.ist,m_scu.ism);
+			/* TODO: Bug! trips an HW fault. Basically, it tries to read the IST bit 1 with that irq enabled. */
+			res = m_scu.ist | ~m_scu.ism;
+//			res = m_scu.ist;
 			break;
 		case 0xc8/4:
 			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) SCU version reg read\n",space.device().safe_pc());
@@ -769,6 +771,12 @@ READ8_MEMBER(saturn_state::saturn_cart_type_r)
 	return cart_ram_header[m_cart_type];
 }
 
+/* TODO: Bug! accesses this one, if returning 0 the SH-2 hard-crashes. Might be an actual bug with the CD block. */
+READ32_HANDLER( saturn_state::abus_dummy_r )
+{
+	return -1;
+}
+
 static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r, saturn_SMPC_w,0xffffffff)
@@ -780,6 +788,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, saturn_state )
 //  AM_RANGE(0x02400000, 0x027fffff) AM_RAM //cart RAM area, dynamically allocated
 //  AM_RANGE(0x04000000, 0x047fffff) AM_RAM //backup RAM area, dynamically allocated
 	AM_RANGE(0x04fffffc, 0x04ffffff) AM_READ8(saturn_cart_type_r,0x000000ff)
+	AM_RANGE(0x05000000, 0x057fffff) AM_READ(abus_dummy_r)
 	AM_RANGE(0x05800000, 0x0589ffff) AM_READWRITE(stvcd_r, stvcd_w)
 	/* Sound */
 	AM_RANGE(0x05a00000, 0x05a7ffff) AM_READWRITE16(saturn_soundram_r, saturn_soundram_w,0xffffffff)

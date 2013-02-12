@@ -4576,7 +4576,8 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 
 		/* Langrisser III bit 3 normal, bit 1 during battle field */
 		/* Metal Slug bit 0 during gameplay */
-		if(STV_VDP2_SFSEL & ~0xb)
+		/* Bug! Sega Away Logo onward 0x470 */
+		if(STV_VDP2_SFSEL & ~0x47b)
 			popmessage("Special Function Code Select enable %04x %04x, contact MAMEdev",STV_VDP2_SFSEL,STV_VDP2_SFCODE);
 
 		/* Albert Odyssey Gaiden 0x0001 */
@@ -4607,7 +4608,8 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 		/* Find Love  0x4400 */
 		/* Dragon Ball Z 0x3800 - 0x2c00 */
 		/* Assault Suit Leynos 2 0x0200*/
-		if(STV_VDP2_SFPRMD & ~0x7f75)
+		/* Bug! 0x8800 */
+		if(STV_VDP2_SFPRMD & ~0xff75)
 			popmessage("Special Priority Mode enabled %04x, contact MAMEdev",STV_VDP2_SFPRMD);
 	}
 }
