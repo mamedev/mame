@@ -191,10 +191,9 @@ WRITE16_MEMBER(rpunch_state::rpunch_ins_w)
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int stop)
+void rpunch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int stop)
 {
-	rpunch_state *state = machine.driver_data<rpunch_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 
 	start *= 4;
@@ -212,13 +211,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int y = 513 - (data0 & 0x1ff);
 		int xflip = data1 & 0x1000;
 		int yflip = data1 & 0x0800;
-		int color = ((data1 >> 13) & 7) | ((state->m_videoflags & 0x0040) >> 3);
+		int color = ((data1 >> 13) & 7) | ((m_videoflags & 0x0040) >> 3);
 
 		if (x >= BITMAP_WIDTH) x -= 512;
 		if (y >= BITMAP_HEIGHT) y -= 512;
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[2],
-				code, color + (state->m_sprite_palette / 16), xflip, yflip, x, y, 15);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[2],
+				code, color + (m_sprite_palette / 16), xflip, yflip, x, y, 15);
 	}
 }
 
@@ -229,15 +228,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
  *
  *************************************/
 
-static void draw_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void rpunch_state::draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rpunch_state *state = machine.driver_data<rpunch_state>();
 	int colourbase;
 	int xxx=512/4;
 	int yyy=256;
 	int x,y,count;
 
-	colourbase = 512 + ((state->m_videoflags & 15) * 16);
+	colourbase = 512 + ((m_videoflags & 15) * 16);
 
 	count = 0;
 
@@ -246,10 +244,10 @@ static void draw_bitmap(running_machine &machine, bitmap_ind16 &bitmap, const re
 		for(x=0;x<xxx;x++)
 		{
 			int coldat;
-			coldat = (state->m_bitmapram[count]>>12)&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+0)-4)&0x1ff) = coldat+colourbase;
-			coldat = (state->m_bitmapram[count]>>8 )&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+1)-4)&0x1ff) = coldat+colourbase;
-			coldat = (state->m_bitmapram[count]>>4 )&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+2)-4)&0x1ff) = coldat+colourbase;
-			coldat = (state->m_bitmapram[count]>>0 )&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+3)-4)&0x1ff) = coldat+colourbase;
+			coldat = (m_bitmapram[count]>>12)&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+0)-4)&0x1ff) = coldat+colourbase;
+			coldat = (m_bitmapram[count]>>8 )&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+1)-4)&0x1ff) = coldat+colourbase;
+			coldat = (m_bitmapram[count]>>4 )&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+2)-4)&0x1ff) = coldat+colourbase;
+			coldat = (m_bitmapram[count]>>0 )&0xf; if (coldat!=15) bitmap.pix16(y, ((x*4+3)-4)&0x1ff) = coldat+colourbase;
 			count++;
 		}
 	}
@@ -270,10 +268,10 @@ UINT32 rpunch_state::screen_update_rpunch(screen_device &screen, bitmap_ind16 &b
 	effbins = (m_bins > m_gins) ? m_gins : m_bins;
 
 	m_background[0]->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap, cliprect, 0, effbins);
+	draw_sprites(bitmap, cliprect, 0, effbins);
 	m_background[1]->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap, cliprect, effbins, m_gins);
+	draw_sprites(bitmap, cliprect, effbins, m_gins);
 	if (m_bitmapram)
-		draw_bitmap(machine(), bitmap, cliprect);
+		draw_bitmap(bitmap, cliprect);
 	return 0;
 }

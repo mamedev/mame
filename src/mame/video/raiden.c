@@ -109,10 +109,9 @@ WRITE16_MEMBER(raiden_state::raidena_control_w)
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri_mask)
+void raiden_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri_mask)
 {
-	raiden_state *state = machine.driver_data<raiden_state>();
-	UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
+	UINT16 *buffered_spriteram16 = m_spriteram->buffer();
 	int offs,fx,fy,x,y,color,sprite;
 
 	for (offs = 0x1000/2-4;offs >= 0;offs -= 4)
@@ -130,14 +129,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		x = buffered_spriteram16[offs+2] & 0xff;
 		if (buffered_spriteram16[offs+2] & 0x100) x=0-(0x100-x);
 
-		if (state->m_flipscreen) {
+		if (m_flipscreen) {
 			x=240-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;
 			if (fy) fy=0; else fy=1;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 				sprite,
 				color,fx,fy,x,y,15);
 	}
@@ -162,11 +161,11 @@ UINT32 raiden_state::screen_update_raiden(screen_device &screen, bitmap_ind16 &b
 	m_bg_layer->draw(bitmap, cliprect, 0,0);
 
 	/* Draw sprites underneath foreground */
-	draw_sprites(machine(),bitmap,cliprect,0x40);
+	draw_sprites(bitmap,cliprect,0x40);
 	m_fg_layer->draw(bitmap, cliprect, 0,0);
 
 	/* Rest of sprites */
-	draw_sprites(machine(),bitmap,cliprect,0x80);
+	draw_sprites(bitmap,cliprect,0x80);
 
 	/* Text layer */
 	m_tx_layer->draw(bitmap, cliprect, 0,0);

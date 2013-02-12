@@ -119,29 +119,28 @@ void rocnrope_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(rocnrope_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void rocnrope_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	rocnrope_state *state = machine.driver_data<rocnrope_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	UINT8 *spriteram_2 = state->m_spriteram2;
+	UINT8 *spriteram = m_spriteram;
+	UINT8 *spriteram_2 = m_spriteram2;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 2;offs >= 0;offs -= 2)
+	for (offs = m_spriteram.bytes() - 2;offs >= 0;offs -= 2)
 	{
 		int color = spriteram_2[offs] & 0x0f;
 
-		drawgfx_transmask(bitmap, cliprect, machine.gfx[0],
+		drawgfx_transmask(bitmap, cliprect, machine().gfx[0],
 				spriteram[offs + 1],
 				color,
 				spriteram_2[offs] & 0x40,~spriteram_2[offs] & 0x80,
 				240 - spriteram[offs], spriteram_2[offs + 1],
-				colortable_get_transpen_mask(machine.colortable, machine.gfx[0], color, 0));
+				colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0));
 	}
 }
 
 UINT32 rocnrope_state::screen_update_rocnrope(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

@@ -856,7 +856,7 @@ DRIVER_INIT_MEMBER(rbisland_state,rbisland)
 
 	machine().root_device().membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
-	rbisland_cchip_init(machine(), 0);
+	rbisland_cchip_init(0);
 }
 
 DRIVER_INIT_MEMBER(rbisland_state,rbislande)
@@ -865,7 +865,7 @@ DRIVER_INIT_MEMBER(rbisland_state,rbislande)
 
 	machine().root_device().membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
-	rbisland_cchip_init(machine(), 1);
+	rbisland_cchip_init(1);
 }
 
 DRIVER_INIT_MEMBER(rbisland_state,jumping)

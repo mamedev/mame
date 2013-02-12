@@ -204,14 +204,13 @@ void realbrk_state::video_start()
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void realbrk_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	realbrk_state *state = machine.driver_data<realbrk_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 
-	int max_x = machine.primary_screen->width();
-	int max_y = machine.primary_screen->height();
+	int max_x = machine().primary_screen->width();
+	int max_y = machine().primary_screen->height();
 
 	rectangle spritetile_clip(0, 31, 0, 31);
 
@@ -252,8 +251,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		xdim    =       ((zoom & 0x00ff) >> 0) << (16-6+4);
 		ydim    =       ((zoom & 0xff00) >> 8) << (16-6+4);
 
-		if (state->flip_screen_x()) {   flipx = !flipx;     sx = (max_x << 16) - sx - xnum * xdim;  }
-		if (state->flip_screen_y()) {   flipy = !flipy;     sy = (max_y << 16) - sy - ynum * ydim;  }
+		if (flip_screen_x()) {   flipx = !flipx;     sx = (max_x << 16) - sx - xnum * xdim;  }
+		if (flip_screen_y()) {   flipy = !flipy;     sy = (max_y << 16) - sy - ynum * ydim;  }
 
 		if (flipx)  { xstart = xnum-1;  xend = -1;    xinc = -1; }
 		else        { xstart = 0;       xend = xnum;  xinc = +1; }
@@ -287,9 +286,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				// buffer the tile and rotate it into bitmap
 				if( rot )
 				{
-					state->m_tmpbitmap0->fill(0, spritetile_clip );
-					state->m_tmpbitmap1->fill(0, spritetile_clip );
-					drawgfxzoom_transpen(   *state->m_tmpbitmap0,spritetile_clip,machine.gfx[gfx],
+					m_tmpbitmap0->fill(0, spritetile_clip );
+					m_tmpbitmap1->fill(0, spritetile_clip );
+					drawgfxzoom_transpen(   *m_tmpbitmap0,spritetile_clip,machine().gfx[gfx],
 									code++,
 									color,
 									flipx, flipy,
@@ -297,13 +296,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 									(rot & 1 ? scaley : scalex) << 12, (rot & 1 ? scalex : scaley) << 12,0);
 
 					// peek at the unrotated sprite
-					// copybitmap_trans( bitmap,*state->m_tmpbitmap0, 0,0, 50+(x * xdim/0x10000),50+(y * ydim/0x10000), cliprect, 0 );
+					// copybitmap_trans( bitmap,*m_tmpbitmap0, 0,0, 50+(x * xdim/0x10000),50+(y * ydim/0x10000), cliprect, 0 );
 				}
 
 				switch( rot )
 				{
 					case 0x10: // rot 90
-						copyrozbitmap_trans( *state->m_tmpbitmap1, state->m_tmpbitmap1->cliprect(), *state->m_tmpbitmap0,
+						copyrozbitmap_trans( *m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
 							(UINT32)0<<16,
 							(UINT32)16<<16,
 							0 << 16,
@@ -315,11 +314,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 							currx = (sx - (y+1) * ydim) / 0x10000;
 							curry = (sy + x * xdim) / 0x10000;
 
-							copybitmap_trans( bitmap,*state->m_tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
+							copybitmap_trans( bitmap,*m_tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
 						break;
 
 					case 0x20: // rot 180
-						copyrozbitmap_trans( *state->m_tmpbitmap1, state->m_tmpbitmap1->cliprect(), *state->m_tmpbitmap0,
+						copyrozbitmap_trans( *m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
 							(UINT32)16<<16,
 							(UINT32)16<<16,
 							-1 << 16,
@@ -331,11 +330,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 							currx = (sx - (x+1) * xdim) / 0x10000;
 							curry = (sy - (y+1) * ydim) / 0x10000;
 
-							copybitmap_trans( bitmap,*state->m_tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
+							copybitmap_trans( bitmap,*m_tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
 						break;
 
 					case 0x30: // rot 270
-						copyrozbitmap_trans( *state->m_tmpbitmap1, state->m_tmpbitmap1->cliprect(), *state->m_tmpbitmap0,
+						copyrozbitmap_trans( *m_tmpbitmap1, m_tmpbitmap1->cliprect(), *m_tmpbitmap0,
 							(UINT32)16<<16,
 							(UINT32)0<<16,
 							0 << 16,
@@ -347,11 +346,11 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 							currx = (sx + y * ydim) / 0x10000;
 							curry = (sy - (x+1) * xdim) / 0x10000;
 
-							copybitmap_trans( bitmap,*state->m_tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
+							copybitmap_trans( bitmap,*m_tmpbitmap1, 0,0, currx,curry, cliprect, 0 );
 						break;
 
 					default:
-						drawgfxzoom_transpen(   bitmap,cliprect,machine.gfx[gfx],
+						drawgfxzoom_transpen(   bitmap,cliprect,machine().gfx[gfx],
 										code++,
 										color,
 										flipx, flipy,
@@ -367,14 +366,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 /* DaiDaiKakumei */
 /* layer : 0== bghigh<spr    1== bglow<spr<bghigh     2==spr<bglow    3==boarder */
-static void dai2kaku_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int layer)
+void realbrk_state::dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer)
 {
-	realbrk_state *state = machine.driver_data<realbrk_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 
-	int max_x = machine.primary_screen->width();
-	int max_y = machine.primary_screen->height();
+	int max_x = machine().primary_screen->width();
+	int max_y = machine().primary_screen->height();
 
 	for ( offs = 0x3000/2; offs < 0x3600/2; offs += 2/2 )
 	{
@@ -414,8 +412,8 @@ static void dai2kaku_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		xdim    =       ((zoom & 0x00ff) >> 0) << (16-6+4);
 		ydim    =       ((zoom & 0xff00) >> 8) << (16-6+4);
 
-		if (state->flip_screen_x()) {   flipx = !flipx;     sx = (max_x << 16) - sx - xnum * xdim;  }
-		if (state->flip_screen_y()) {   flipy = !flipy;     sy = (max_y << 16) - sy - ynum * ydim;  }
+		if (flip_screen_x()) {   flipx = !flipx;     sx = (max_x << 16) - sx - xnum * xdim;  }
+		if (flip_screen_y()) {   flipy = !flipy;     sy = (max_y << 16) - sy - ynum * ydim;  }
 
 		if (flipx)  { xstart = xnum-1;  xend = -1;    xinc = -1; }
 		else        { xstart = 0;       xend = xnum;  xinc = +1; }
@@ -433,7 +431,7 @@ static void dai2kaku_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 				int scalex = (sx + (x + 1) * xdim) / 0x10000 - currx;
 				int scaley = (sy + (y + 1) * ydim) / 0x10000 - curry;
 
-				drawgfxzoom_transpen(   bitmap,cliprect,machine.gfx[gfx],
+				drawgfxzoom_transpen(   bitmap,cliprect,machine().gfx[gfx],
 								code++,
 								color,
 								flipx, flipy,
@@ -516,7 +514,7 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 	if (layers_ctrl & 2)    m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	if (layers_ctrl & 1)    m_tilemap_0->draw(bitmap, cliprect, 0,0);
 
-	if (layers_ctrl & 8)    draw_sprites(machine(),bitmap,cliprect);
+	if (layers_ctrl & 8)    draw_sprites(bitmap,cliprect);
 
 	if (layers_ctrl & 4)    m_tilemap_2->draw(bitmap, cliprect, 0,0);
 
@@ -586,7 +584,7 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 
 
 	// spr 0
-	if (layers_ctrl & 8)    dai2kaku_draw_sprites(machine(),bitmap,cliprect,2);
+	if (layers_ctrl & 8)    dai2kaku_draw_sprites(bitmap,cliprect,2);
 
 	// bglow
 	if( m_vregs[8/2] & (0x8000)){
@@ -596,7 +594,7 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 	}
 
 	// spr 1
-	if (layers_ctrl & 8)    dai2kaku_draw_sprites(machine(),bitmap,cliprect,1);
+	if (layers_ctrl & 8)    dai2kaku_draw_sprites(bitmap,cliprect,1);
 
 	// bghigh
 	if( m_vregs[8/2] & (0x8000)){
@@ -606,7 +604,7 @@ if ( machine().input().code_pressed(KEYCODE_Z) )
 	}
 
 	// spr 2
-	if (layers_ctrl & 8)    dai2kaku_draw_sprites(machine(),bitmap,cliprect,0);
+	if (layers_ctrl & 8)    dai2kaku_draw_sprites(bitmap,cliprect,0);
 
 	// fix
 	if (layers_ctrl & 4)    m_tilemap_2->draw(bitmap, cliprect, 0,0);

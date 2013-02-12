@@ -141,14 +141,14 @@ Current Problem(s) - in order of priority
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
 
-static UINT16 rps(running_machine &machine)
+UINT16 raiden2_state::rps()
 {
-	return machine.device("maincpu")->state().state_int(NEC_CS);
+	return machine().device("maincpu")->state().state_int(NEC_CS);
 }
 
-static UINT16 rpc(running_machine &machine)
+UINT16 raiden2_state::rpc()
 {
-	return machine.device("maincpu")->state().state_int(NEC_IP);
+	return machine().device("maincpu")->state().state_int(NEC_IP);
 }
 
 WRITE16_MEMBER(raiden2_state::cop_pgm_data_w)
@@ -300,7 +300,7 @@ WRITE16_MEMBER(raiden2_state::cop_pal_brightness_val_w)
 }
 
 /* RE from Seibu Cup Soccer bootleg */
-static const UINT8 fade_table(int v)
+const UINT8 raiden2_state::fade_table(int v)
 {
 	int low  = v & 0x001f;
 	int high = v & 0x03e0;
@@ -691,7 +691,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 		break;
 
 	default:
-		logerror("pcall %04x (%04x:%04x) [%x %x %x %x]\n", data, rps(space.machine()), rpc(space.machine()), cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3]);
+		logerror("pcall %04x (%04x:%04x) [%x %x %x %x]\n", data, rps(), rpc(), cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3]);
 	}
 }
 
@@ -700,7 +700,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 //      space.machine().root_device().membank("bank1")->set_entry((data >> 15) & 1);
 
 
-static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
+void raiden2_state::combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 {
 	UINT16 *dest = (UINT16 *)val + BYTE_XOR_LE(offset);
 	COMBINE_DATA(dest);
@@ -1055,7 +1055,7 @@ static UINT16 sprcpt_flags2;
 static UINT32 sprcpt_val[2], sprcpt_flags1;
 static UINT32 sprcpt_data_1[0x100], sprcpt_data_2[0x40], sprcpt_data_3[6], sprcpt_data_4[4];
 
-static void sprcpt_init(void)
+void raiden2_state::sprcpt_init(void)
 {
 	memset(sprcpt_data_1, 0, sizeof(sprcpt_data_1));
 	memset(sprcpt_data_2, 0, sizeof(sprcpt_data_2));

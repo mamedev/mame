@@ -23,4 +23,5 @@ public:
 	DECLARE_MACHINE_RESET(rampart);
 	DECLARE_VIDEO_START(rampart);
 	UINT32 screen_update_rampart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void rampart_bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

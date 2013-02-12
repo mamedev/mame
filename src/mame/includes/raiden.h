@@ -41,4 +41,6 @@ public:
 	DECLARE_VIDEO_START(raidena);
 	UINT32 screen_update_raiden(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(raiden_interrupt);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri_mask);
+	void common_decrypt();
 };

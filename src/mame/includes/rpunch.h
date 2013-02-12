@@ -43,4 +43,6 @@ public:
 	UINT32 screen_update_rpunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(sound_command_w_callback);
 	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int stop);
+	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

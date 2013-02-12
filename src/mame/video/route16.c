@@ -40,7 +40,7 @@ WRITE8_MEMBER(route16_state::route16_out1_w)
  *
  *************************************/
 
-static pen_t route16_make_pen(UINT8 color)
+pen_t route16_state::route16_make_pen(UINT8 color)
 {
 	return MAKE_RGB(pal1bit((color >> 0) & 0x01),
 					pal1bit((color >> 1) & 0x01),
@@ -49,7 +49,7 @@ static pen_t route16_make_pen(UINT8 color)
 }
 
 
-static pen_t ttmajng_make_pen(UINT8 color)
+pen_t route16_state::ttmajng_make_pen(UINT8 color)
 {
 	return MAKE_RGB(pal1bit((color >> 2) & 0x01),
 					pal1bit((color >> 1) & 0x01),
@@ -122,44 +122,43 @@ UINT32 route16_state::screen_update_route16(screen_device &screen, bitmap_rgb32 
  *  The Stratovox video connections have been verified from the schematics
  */
 
-static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_rgb32 &bitmap,
+int route16_state::video_update_stratvox_ttmahjng(bitmap_rgb32 &bitmap,
 											const rectangle &cliprect,
-											pen_t (*make_pen)(UINT8))
+											pen_t (route16_state::*make_pen)(UINT8))
 {
-	route16_state *state = machine.driver_data<route16_state>();
 	offs_t offs;
 
-	UINT8 *color_prom1 = &state->memregion("proms")->base()[0x000];
-	UINT8 *color_prom2 = &state->memregion("proms")->base()[0x100];
+	UINT8 *color_prom1 = &memregion("proms")->base()[0x000];
+	UINT8 *color_prom2 = &memregion("proms")->base()[0x100];
 
-	for (offs = 0; offs < state->m_videoram1.bytes(); offs++)
+	for (offs = 0; offs < m_videoram1.bytes(); offs++)
 	{
 		int i;
 
 		UINT8 y = offs >> 6;
 		UINT8 x = offs << 2;
 
-		UINT8 data1 = state->m_videoram1[offs];
-		UINT8 data2 = state->m_videoram2[offs];
+		UINT8 data1 = m_videoram1[offs];
+		UINT8 data2 = m_videoram2[offs];
 
 		for (i = 0; i < 4; i++)
 		{
-			UINT8 color1 = color_prom1[(state->m_palette_1 << 2) |
+			UINT8 color1 = color_prom1[(m_palette_1 << 2) |
 										((data1 >> 3) & 0x02) |
 										((data1 >> 0) & 0x01)];
 
 			/* bit 7 of the 2nd color is the OR of the 1st color bits 0 and 1 (verified) */
 			UINT8 color2 = color_prom2[(((data1 << 3) & 0x80) | ((data1 << 7) & 0x80)) |
-										(state->m_palette_2 << 2) |
+										(m_palette_2 << 2) |
 										((data2 >> 3) & 0x02) |
 										((data2 >> 0) & 0x01)];
 
 			/* the final color is the OR of the two colors */
 			UINT8 final_color = color1 | color2;
 
-			pen_t pen = make_pen(final_color);
+			pen_t pen = (this->*make_pen)(final_color);
 
-			if (state->m_flipscreen)
+			if (m_flipscreen)
 				bitmap.pix32(255 - y, 255 - x) = pen;
 			else
 				bitmap.pix32(y, x) = pen;
@@ -176,11 +175,11 @@ static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_rgb32
 
 UINT32 route16_state::screen_update_stratvox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return video_update_stratvox_ttmahjng(machine(), bitmap, cliprect, route16_make_pen);
+	return video_update_stratvox_ttmahjng(bitmap, cliprect, &route16_state::route16_make_pen);
 }
 
 
 UINT32 route16_state::screen_update_ttmahjng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	return video_update_stratvox_ttmahjng(machine(), bitmap, cliprect, ttmajng_make_pen);
+	return video_update_stratvox_ttmahjng(bitmap, cliprect, &route16_state::ttmajng_make_pen);
 }

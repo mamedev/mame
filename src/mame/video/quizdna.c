@@ -132,7 +132,6 @@ WRITE8_MEMBER(quizdna_state::paletteram_xBGR_RRRR_GGGG_BBBB_w)
 
 void quizdna_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//OBRISI.ME
 	UINT8 *spriteram = m_spriteram;
 	int offs;
 

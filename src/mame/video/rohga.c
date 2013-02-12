@@ -119,14 +119,14 @@ VIDEO_START_MEMBER(rohga_state,wizdfire)
 }
 
 // not amazingly efficient, called multiple times to pull a layer out of the sprite bitmaps, but keeps correct sprite<->sprite priorities
-static void mixwizdfirelayer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, int gfxregion, UINT16 pri, UINT16 primask)
+void rohga_state::mixwizdfirelayer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int gfxregion, UINT16 pri, UINT16 primask)
 {
 	int y, x;
-	const pen_t *paldata = machine.pens;
+	const pen_t *paldata = machine().pens;
 	bitmap_ind16* sprite_bitmap;
 	int penbase;
 
-	sprite_bitmap = &machine.device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
+	sprite_bitmap = &machine().device<decospr_device>("spritegen2")->get_sprite_temp_bitmap();
 	penbase = 0x600;
 
 	UINT16* srcline;
@@ -194,7 +194,7 @@ UINT32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &
 
 	m_sprgen1->inefficient_copy_sprite_bitmap(bitmap, cliprect, 0x0000, 0x0400, 0x400, 0x1ff); // 0x000 and 0x200 of 0x600
 
-	mixwizdfirelayer(machine(), bitmap, cliprect, 4, 0x000, 0x000);
+	mixwizdfirelayer(bitmap, cliprect, 4, 0x000, 0x000);
 
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 0);
 	return 0;

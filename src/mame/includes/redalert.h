@@ -48,6 +48,8 @@ public:
 	DECLARE_WRITE8_MEMBER(demoneye_ay8910_latch_1_w);
 	DECLARE_READ8_MEMBER(demoneye_ay8910_latch_2_r);
 	DECLARE_WRITE8_MEMBER(demoneye_ay8910_data_w);
+	void get_pens(pen_t *pens);
+	void get_panther_pens(pen_t *pens);
 };
 /*----------- defined in audio/redalert.c -----------*/
 

@@ -164,12 +164,11 @@ WRITE8_MEMBER(retofinv_state::retofinv_gfx_ctrl_w)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap)
+void retofinv_state::draw_sprites(bitmap_ind16 &bitmap)
 {
-	retofinv_state *state = machine.driver_data<retofinv_state>();
-	UINT8 *spriteram = state->m_sharedram + 0x0780;
-	UINT8 *spriteram_2 = state->m_sharedram + 0x0f80;
-	UINT8 *spriteram_3 = state->m_sharedram + 0x1780;
+	UINT8 *spriteram = m_sharedram + 0x0780;
+	UINT8 *spriteram_2 = m_sharedram + 0x0f80;
+	UINT8 *spriteram_3 = m_sharedram + 0x1780;
 	int offs;
 	const rectangle spritevisiblearea(2*8, 34*8-1, 0*8, 28*8-1);
 
@@ -194,7 +193,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap)
 		sprite &= ~sizex;
 		sprite &= ~(sizey << 1);
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			flipx ^= 1;
 			flipy ^= 1;
@@ -207,12 +206,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap)
 		{
 			for (x = 0;x <= sizex;x++)
 			{
-				drawgfx_transmask(bitmap,spritevisiblearea,machine.gfx[1],
+				drawgfx_transmask(bitmap,spritevisiblearea,machine().gfx[1],
 					sprite + gfx_offs[y ^ (sizey * flipy)][x ^ (sizex * flipx)],
 					color,
 					flipx,flipy,
 					sx + 16*x,sy + 16*y,
-					colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0xff));
+					colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0xff));
 			}
 		}
 	}
@@ -223,7 +222,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap)
 UINT32 retofinv_state::screen_update_retofinv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap);
+	draw_sprites(bitmap);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

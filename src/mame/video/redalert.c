@@ -36,7 +36,7 @@ WRITE8_MEMBER(redalert_state::redalert_bitmap_videoram_w)
  *
  *************************************/
 
-static void get_pens(running_machine &machine, pen_t *pens)
+void redalert_state::get_pens(pen_t *pens)
 {
 	static const int resistances_bitmap[]     = { 100 };
 	static const int resistances_charmap_rg[] = { 390, 220, 180 };
@@ -51,7 +51,7 @@ static void get_pens(running_machine &machine, pen_t *pens)
 	double charmap_b_weights[2];
 	double back_r_weight[1];
 	double back_gb_weight[1];
-	const UINT8 *prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *prom = machine().root_device().memregion("proms")->base();
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
 										1, resistances_bitmap,     bitmap_weight,      470, 0,
@@ -101,7 +101,7 @@ static void get_pens(running_machine &machine, pen_t *pens)
 
 /* this uses the same color hook-up between bitmap and chars. */
 /* TODO: clean me up */
-static void get_panther_pens(running_machine &machine, pen_t *pens)
+void redalert_state::get_panther_pens(pen_t *pens)
 {
 	static const int resistances_bitmap[]     = { 100 };
 	static const int resistances_charmap_rg[] = { 390, 220, 180 };
@@ -116,7 +116,7 @@ static void get_panther_pens(running_machine &machine, pen_t *pens)
 	double charmap_b_weights[2];
 	double back_r_weight[1];
 	double back_gb_weight[1];
-	const UINT8 *prom = machine.root_device().memregion("proms")->base();
+	const UINT8 *prom = machine().root_device().memregion("proms")->base();
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
 										1, resistances_bitmap,     bitmap_weight,      470, 0,
@@ -188,7 +188,7 @@ UINT32 redalert_state::screen_update_redalert(screen_device &screen, bitmap_rgb3
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_pens(machine(), pens);
+	get_pens(pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -260,7 +260,7 @@ UINT32 redalert_state::screen_update_demoneye(screen_device &screen, bitmap_rgb3
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_pens(machine(), pens);
+	get_pens(pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -334,7 +334,7 @@ UINT32 redalert_state::screen_update_panther(screen_device &screen, bitmap_rgb32
 	pen_t pens[NUM_CHARMAP_PENS + NUM_BITMAP_PENS + 1];
 	offs_t offs;
 
-	get_panther_pens(machine(), pens);
+	get_panther_pens(pens);
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{

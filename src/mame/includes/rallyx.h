@@ -66,4 +66,15 @@ public:
 	UINT32 screen_update_locomotn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rallyx_vblank_irq);
 	INTERRUPT_GEN_MEMBER(jungler_vblank_irq);
+	inline void rallyx_get_tile_info( tile_data &tileinfo, int tile_index, int ram_offs);
+	inline void locomotn_get_tile_info(tile_data &tileinfo,int tile_index,int ram_offs);
+	void calculate_star_field(  );
+	void rallyx_video_start_common(  );
+	void plot_star( bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, int color );
+	void draw_stars( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void rallyx_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int displacement );
+	void locomotn_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int displacement );
+	void rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, int transpen );
+	void jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, int transpen );
+	void locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, int transpen );
 };

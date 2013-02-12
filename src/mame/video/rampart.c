@@ -9,9 +9,6 @@
 #include "video/atarimo.h"
 #include "includes/rampart.h"
 
-
-static void rampart_bitmap_render(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 /*************************************
  *
  *  Video system start
@@ -79,7 +76,7 @@ UINT32 rampart_state::screen_update_rampart(screen_device &screen, bitmap_ind16 
 	int x, y, r;
 
 	/* draw the playfield */
-	rampart_bitmap_render(machine(), bitmap, cliprect);
+	rampart_bitmap_render(bitmap, cliprect);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
@@ -109,15 +106,14 @@ UINT32 rampart_state::screen_update_rampart(screen_device &screen, bitmap_ind16 
  *
  *************************************/
 
-static void rampart_bitmap_render(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void rampart_state::rampart_bitmap_render(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rampart_state *state = machine.driver_data<rampart_state>();
 	int x, y;
 
 	/* update any dirty scanlines */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const UINT16 *src = &state->m_bitmap[256 * y];
+		const UINT16 *src = &m_bitmap[256 * y];
 		UINT16 *dst = &bitmap.pix16(y);
 
 		/* regenerate the line */

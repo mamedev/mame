@@ -72,10 +72,9 @@ void renegade_state::video_start()
 	state_save_register_global(machine(), m_scrollx);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void renegade_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	renegade_state *state = machine.driver_data<renegade_state>();
-	UINT8 *source = state->m_spriteram;
+	UINT8 *source = m_spriteram;
 	UINT8 *finish = source + 96 * 4;
 
 	while (source < finish)
@@ -94,7 +93,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			if (sx > 248)
 				sx -= 256;
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -104,20 +103,20 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			if (attributes & 0x80) /* big sprite */
 			{
 				sprite_number &= ~1;
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[sprite_bank],
+				drawgfx_transpen(bitmap, cliprect, machine().gfx[sprite_bank],
 					sprite_number + 1,
 					color,
-					xflip, state->flip_screen(),
-					sx, sy + (state->flip_screen() ? -16 : 16), 0);
+					xflip, flip_screen(),
+					sx, sy + (flip_screen() ? -16 : 16), 0);
 			}
 			else
 			{
-				sy += (state->flip_screen() ? -16 : 16);
+				sy += (flip_screen() ? -16 : 16);
 			}
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[sprite_bank],
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[sprite_bank],
 				sprite_number,
 				color,
-				xflip, state->flip_screen(),
+				xflip, flip_screen(),
 				sx, sy, 0);
 		}
 		source += 4;
@@ -128,7 +127,7 @@ UINT32 renegade_state::screen_update_renegade(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->set_scrollx(0, m_scrollx);
 	m_bg_tilemap->draw(bitmap, cliprect, 0 , 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0 , 0);
 	return 0;
 }

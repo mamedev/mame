@@ -642,35 +642,33 @@ static const UINT32 cchip_round_address[] =
 	0x042C60, 0x042D38
 };
 
-static void request_round_data( running_machine &machine )
+void rbisland_state::request_round_data(  )
 {
-	rbisland_state *state = machine.driver_data<rbisland_state>();
-	int round = state->m_CRAM[1][0x141]; /* 0...49 */
+	int round = m_CRAM[1][0x141]; /* 0...49 */
 
-	memcpy(state->m_CRAM[1], CROM_BANK1, sizeof CROM_BANK1);
-	memcpy(state->m_CRAM[2], CROM_BANK2, sizeof CROM_BANK2);
+	memcpy(m_CRAM[1], CROM_BANK1, sizeof CROM_BANK1);
+	memcpy(m_CRAM[2], CROM_BANK2, sizeof CROM_BANK2);
 
-	state->m_CRAM[1][1] = cchip_round_height[round] >> 0;
-	state->m_CRAM[1][2] = cchip_round_height[round] >> 8;
+	m_CRAM[1][1] = cchip_round_height[round] >> 0;
+	m_CRAM[1][2] = cchip_round_height[round] >> 8;
 
-	state->m_CRAM[1][0x142] = cchip_round_address[round] >> 24;
-	state->m_CRAM[1][0x143] = cchip_round_address[round] >> 16;
-	state->m_CRAM[1][0x144] = cchip_round_address[round] >> 8;
-	state->m_CRAM[1][0x145] = cchip_round_address[round] >> 0;
+	m_CRAM[1][0x142] = cchip_round_address[round] >> 24;
+	m_CRAM[1][0x143] = cchip_round_address[round] >> 16;
+	m_CRAM[1][0x144] = cchip_round_address[round] >> 8;
+	m_CRAM[1][0x145] = cchip_round_address[round] >> 0;
 
 	/* set the secret room or boss flag */
 
-	state->m_CRAM[1][0x148] = (round >= 40 || round % 4 == 3);
+	m_CRAM[1][0x148] = (round >= 40 || round % 4 == 3);
 }
 
-static void request_world_data( running_machine &machine )
+void rbisland_state::request_world_data(  )
 {
-	rbisland_state *state = machine.driver_data<rbisland_state>();
-	int world = state->m_CRAM[0][0x00d] / 4; /* 0...9 */
+	int world = m_CRAM[0][0x00d] / 4; /* 0...9 */
 
 	/* the extra version has the world data swapped around */
 
-	if (state->m_extra_version)
+	if (m_extra_version)
 	{
 		static const UINT8 world_swap[] =
 		{
@@ -682,13 +680,13 @@ static void request_world_data( running_machine &machine )
 
 	/* first two bytes in each bank are left unchanged  */
 
-	memcpy(state->m_CRAM[4] + 2, CROM_BANK4[world].data, CROM_BANK4[world].size);
-	memcpy(state->m_CRAM[5] + 2, CROM_BANK5[world].data, CROM_BANK5[world].size);
-	memcpy(state->m_CRAM[7] + 2, CROM_BANK7[world].data, CROM_BANK7[world].size);
+	memcpy(m_CRAM[4] + 2, CROM_BANK4[world].data, CROM_BANK4[world].size);
+	memcpy(m_CRAM[5] + 2, CROM_BANK5[world].data, CROM_BANK5[world].size);
+	memcpy(m_CRAM[7] + 2, CROM_BANK7[world].data, CROM_BANK7[world].size);
 
 	/* banks 5 and 6 are different in the extra version */
 
-	if (state->m_extra_version)
+	if (m_extra_version)
 	{
 		int i;
 
@@ -698,58 +696,57 @@ static void request_world_data( running_machine &machine )
 
 			if (patch != 0)
 			{
-				state->m_CRAM[5][state->m_CRAM[5][2] + 22 * i + 18] = patch >> 0;
-				state->m_CRAM[5][state->m_CRAM[5][2] + 22 * i + 19] = patch >> 8;
+				m_CRAM[5][m_CRAM[5][2] + 22 * i + 18] = patch >> 0;
+				m_CRAM[5][m_CRAM[5][2] + 22 * i + 19] = patch >> 8;
 			}
 		}
 
-		memcpy(state->m_CRAM[6] + 2, CROM_BANK6_EXTRA, sizeof CROM_BANK6_EXTRA);
+		memcpy(m_CRAM[6] + 2, CROM_BANK6_EXTRA, sizeof CROM_BANK6_EXTRA);
 	}
 	else
 	{
-		memcpy(state->m_CRAM[6] + 2, CROM_BANK6, sizeof CROM_BANK6);
+		memcpy(m_CRAM[6] + 2, CROM_BANK6, sizeof CROM_BANK6);
 	}
 }
 
-static void request_goalin_data( running_machine &machine )
+void rbisland_state::request_goalin_data(  )
 {
-	rbisland_state *state = machine.driver_data<rbisland_state>();
-	int n = machine.rand() % 15;
+	int n = machine().rand() % 15;
 
-	state->m_CRAM[1][0x14B] = 0x00; /* x coordinates */
-	state->m_CRAM[1][0x14D] = 0x10;
-	state->m_CRAM[1][0x14F] = 0x20;
-	state->m_CRAM[1][0x151] = 0x38;
-	state->m_CRAM[1][0x153] = 0x50;
-	state->m_CRAM[1][0x155] = 0x60;
+	m_CRAM[1][0x14B] = 0x00; /* x coordinates */
+	m_CRAM[1][0x14D] = 0x10;
+	m_CRAM[1][0x14F] = 0x20;
+	m_CRAM[1][0x151] = 0x38;
+	m_CRAM[1][0x153] = 0x50;
+	m_CRAM[1][0x155] = 0x60;
 
-	state->m_CRAM[1][0x14A] = cchip_goalin[n][0]; /* y coordinates */
-	state->m_CRAM[1][0x14C] = cchip_goalin[n][1];
-	state->m_CRAM[1][0x14E] = cchip_goalin[n][2];
-	state->m_CRAM[1][0x150] = cchip_goalin[n][3];
-	state->m_CRAM[1][0x152] = cchip_goalin[n][4];
-	state->m_CRAM[1][0x154] = cchip_goalin[n][5];
+	m_CRAM[1][0x14A] = cchip_goalin[n][0]; /* y coordinates */
+	m_CRAM[1][0x14C] = cchip_goalin[n][1];
+	m_CRAM[1][0x14E] = cchip_goalin[n][2];
+	m_CRAM[1][0x150] = cchip_goalin[n][3];
+	m_CRAM[1][0x152] = cchip_goalin[n][4];
+	m_CRAM[1][0x154] = cchip_goalin[n][5];
 }
 
 TIMER_CALLBACK_MEMBER(rbisland_state::cchip_timer)
 {
 	if (m_CRAM[1][0x100] == 1)
 	{
-		request_round_data(machine());
+		request_round_data();
 
 		m_CRAM[1][0x100] = 0xFF;
 	}
 
 	if (m_CRAM[5][0x000] == 1)
 	{
-		request_world_data(machine());
+		request_world_data();
 
 		m_CRAM[5][0x000] = 0xFF;
 	}
 
 	if (m_CRAM[1][0x149] == 1)
 	{
-		request_goalin_data(machine());
+		request_goalin_data();
 
 		m_CRAM[1][0x149] = 0xFF;
 	}
@@ -812,21 +809,20 @@ READ16_MEMBER(rbisland_state::rbisland_cchip_ram_r)
  *
  *************************************/
 
-void rbisland_cchip_init( running_machine &machine, int version )
+void rbisland_state::rbisland_cchip_init( int version )
 {
-	rbisland_state *state = machine.driver_data<rbisland_state>();
 	int i;
 
-	state->m_extra_version = version;
+	m_extra_version = version;
 
 	for (i = 0; i < 8; i++)
 	{
-		state->m_CRAM[i] = auto_alloc_array(machine, UINT8, 0x400);
+		m_CRAM[i] = auto_alloc_array(machine(), UINT8, 0x400);
 
-		state_save_register_item_pointer(machine, "cchip", NULL, i, state->m_CRAM[i], 0x400);
+		state_save_register_item_pointer(machine(), "cchip", NULL, i, m_CRAM[i], 0x400);
 	}
 
-	state_save_register_item(machine, "cchip", NULL, 0, state->m_current_bank);
+	state_save_register_item(machine(), "cchip", NULL, 0, m_current_bank);
 
-	machine.scheduler().timer_pulse(attotime::from_hz(60), timer_expired_delegate(FUNC(rbisland_state::cchip_timer),state));
+	machine().scheduler().timer_pulse(attotime::from_hz(60), timer_expired_delegate(FUNC(rbisland_state::cchip_timer),this));
 }
