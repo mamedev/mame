@@ -291,6 +291,34 @@ protected:
 	void _set_main_cpu_vector_table_source();
 	void optimize_sprite_data();
 	void draw_fixed_layer( bitmap_rgb32 &bitmap, int scanline );
+	void set_videoram_offset( UINT16 data );
+	UINT16 get_videoram_data(  );
+	void set_videoram_data( UINT16 data);
+	void set_videoram_modulo( UINT16 data);
+	UINT16 get_videoram_modulo(  );
+	void compute_rgb_weights(  );
+	pen_t get_pen( UINT16 data );
+	void neogeo_set_palette_bank( UINT8 data );
+	void neogeo_set_screen_dark( UINT8 data );
+	void set_auto_animation_speed( UINT8 data);
+	void set_auto_animation_disabled( UINT8 data);
+	UINT8 neogeo_get_auto_animation_counter(  );
+	void create_auto_animation_timer(  );
+	void start_auto_animation_timer(  );
+	void neogeo_set_fixed_layer_source( UINT8 data );
+	inline int rows_to_height(int rows);
+	inline int sprite_on_scanline(int scanline, int y, int rows);
+	void draw_sprites( bitmap_rgb32 &bitmap, int scanline );
+	void parse_sprites( int scanline );
+	void create_sprite_line_timer(  );
+	void start_sprite_line_timer(  );
+	UINT16 get_video_control(  );
+	void audio_cpu_assert_nmi();
+	void select_controller( UINT8 data );
+	void set_save_ram_unlock( UINT8 data );
+	void set_outputs(  );
+	void set_output_latch( UINT8 data );
+	void set_output_data( UINT8 data );
 };
 
 
@@ -383,11 +411,3 @@ void samsho5b_px_decrypt(running_machine &machine);
 void samsho5b_vx_decrypt(running_machine &machine);
 void matrimbl_decrypt(running_machine &machine);
 
-/*----------- defined in video/neogeo.c -----------*/
-
-void neogeo_set_palette_bank(running_machine &machine, UINT8 data);
-void neogeo_set_screen_dark(running_machine &machine, UINT8 data);
-
-void neogeo_set_fixed_layer_source(running_machine &machine, UINT8 data);
-
-UINT8 neogeo_get_auto_animation_counter(running_machine &machine);

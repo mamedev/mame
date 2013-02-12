@@ -46,4 +46,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_nbmj8900(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(blitter_timer_callback);
+	void nbmj8900_vramflip(int vram);
+	void update_pixel0(int x, int y);
+	void update_pixel1(int x, int y);
+	void nbmj8900_gfxdraw();
 };

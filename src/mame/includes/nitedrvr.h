@@ -59,6 +59,9 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_crash_toggle_callback);
+	void draw_box( bitmap_ind16 &bitmap, int bx, int by, int ex, int ey );
+	void draw_roadway( bitmap_ind16 &bitmap );
+	int nitedrvr_steering(  );
 };
 
 /*----------- defined in audio/nitedrvr.c -----------*/

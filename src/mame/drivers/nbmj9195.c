@@ -52,16 +52,15 @@ WRITE8_MEMBER(nbmj9195_state::nbmj9195_soundclr_w)
 	soundlatch_clear_byte_w(space, 0, 0);
 }
 
-static void nbmj9195_outcoin_flag_w(address_space &space, int data)
+void nbmj9195_state::nbmj9195_outcoin_flag_w(int data)
 {
-	nbmj9195_state *state = space.machine().driver_data<nbmj9195_state>();
 	// bit0: coin in counter
 	// bit1: coin out counter
 	// bit2: hopper
 	// bit3: coin lockout
 
-	if (data & 0x04) state->m_outcoin_flag ^= 1;
-	else state->m_outcoin_flag = 1;
+	if (data & 0x04) m_outcoin_flag ^= 1;
+	else m_outcoin_flag = 1;
 }
 
 WRITE8_MEMBER(nbmj9195_state::nbmj9195_inputportsel_w)
@@ -69,36 +68,33 @@ WRITE8_MEMBER(nbmj9195_state::nbmj9195_inputportsel_w)
 	m_inputport = (data ^ 0xff);
 }
 
-static int nbmj9195_dipsw_r(running_machine &machine)
+int nbmj9195_state::nbmj9195_dipsw_r()
 {
-	nbmj9195_state *state = machine.driver_data<nbmj9195_state>();
-	return (((state->ioport("DSWA")->read() & 0xff) | ((state->ioport("DSWB")->read() & 0xff) << 8)) >> state->m_dipswbitsel) & 0x01;
+	return (((ioport("DSWA")->read() & 0xff) | ((ioport("DSWB")->read() & 0xff) << 8)) >> m_dipswbitsel) & 0x01;
 }
 
-static void nbmj9195_dipswbitsel_w(address_space &space, int data)
+void nbmj9195_state::nbmj9195_dipswbitsel_w(int data)
 {
-	nbmj9195_state *state = space.machine().driver_data<nbmj9195_state>();
 	switch (data & 0xc0)
 	{
 		case 0x00:
-			state->m_dipswbitsel = 0;
+			m_dipswbitsel = 0;
 			break;
 		case 0x40:
 			break;
 		case 0x80:
 			break;
 		case 0xc0:
-			state->m_dipswbitsel = ((state->m_dipswbitsel + 1) & 0x0f);
+			m_dipswbitsel = ((m_dipswbitsel + 1) & 0x0f);
 			break;
 		default:
 			break;
 	}
 }
 
-static void mscoutm_inputportsel_w(address_space &space, int data)
+void nbmj9195_state::mscoutm_inputportsel_w( int data)
 {
-	nbmj9195_state *state = space.machine().driver_data<nbmj9195_state>();
-	state->m_mscoutm_inputport = (data ^ 0xff);
+	m_mscoutm_inputport = (data ^ 0xff);
 }
 
 READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_0_r)
@@ -241,7 +237,7 @@ READ8_MEMBER(nbmj9195_state::tmpz84c011_pio_r)
 						portdata = ioport("KEY3")->read();
 						break;
 					case 0x10:
-						portdata = ((ioport("KEY4")->read() & 0x7f) | (nbmj9195_dipsw_r(machine()) << 7));
+						portdata = ((ioport("KEY4")->read() & 0x7f) | (nbmj9195_dipsw_r() << 7));
 						break;
 					default:
 						portdata = (ioport("KEY0")->read() & ioport("KEY1")->read() & ioport("KEY2")->read() & ioport("KEY3")->read() & (ioport("KEY4")->read() & 0x7f));
@@ -314,17 +310,17 @@ WRITE8_MEMBER(nbmj9195_state::tmpz84c011_pio_w)
 		switch (offset)
 		{
 			case 0:         /* PA_0 */
-				mscoutm_inputportsel_w(space, data);    // NB22090
+				mscoutm_inputportsel_w(data);    // NB22090
 				break;
 			case 1:         /* PB_0 */
 				break;
 			case 2:         /* PC_0 */
 				break;
 			case 3:         /* PD_0 */
-				nbmj9195_clutsel_w(space, data);
+				nbmj9195_clutsel_w(data);
 				break;
 			case 4:         /* PE_0 */
-				nbmj9195_gfxflag2_w(space, data);       // NB22090
+				nbmj9195_gfxflag2_w(data);       // NB22090
 				break;
 
 			case 5:         /* PA_1 */
@@ -356,13 +352,13 @@ WRITE8_MEMBER(nbmj9195_state::tmpz84c011_pio_w)
 			case 1:         /* PB_0 */
 				break;
 			case 2:         /* PC_0 */
-				nbmj9195_dipswbitsel_w(space, data);
+				nbmj9195_dipswbitsel_w(data);
 				break;
 			case 3:         /* PD_0 */
-				nbmj9195_clutsel_w(space, data);
+				nbmj9195_clutsel_w(data);
 				break;
 			case 4:         /* PE_0 */
-				nbmj9195_outcoin_flag_w(space, data);
+				nbmj9195_outcoin_flag_w(data);
 				break;
 
 			case 5:         /* PA_1 */

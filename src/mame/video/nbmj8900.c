@@ -11,10 +11,6 @@
 #include "includes/nbmj8900.h"
 
 
-static void nbmj8900_vramflip(running_machine &machine, int vram);
-static void nbmj8900_gfxdraw(running_machine &machine);
-
-
 /******************************************************************************
 
 
@@ -117,14 +113,14 @@ WRITE8_MEMBER(nbmj8900_state::nbmj8900_blitter_w)
 		case 0x04:  m_blitter_sizex = data; break;
 		case 0x05:  m_blitter_sizey = data;
 					/* writing here also starts the blit */
-					nbmj8900_gfxdraw(machine());
+					nbmj8900_gfxdraw();
 					break;
 		case 0x06:  m_blitter_direction_x = (data & 0x01) ? 1 : 0;
 					m_blitter_direction_y = (data & 0x02) ? 1 : 0;
 					m_flipscreen = (data & 0x04) ? 1 : 0;
 					m_dispflag = (data & 0x08) ? 0 : 1;
-					if (m_gfxdraw_mode) nbmj8900_vramflip(machine(), 1);
-					nbmj8900_vramflip(machine(), 0);
+					if (m_gfxdraw_mode) nbmj8900_vramflip(1);
+					nbmj8900_vramflip(0);
 					break;
 		case 0x07:  break;
 	}
@@ -160,18 +156,17 @@ WRITE8_MEMBER(nbmj8900_state::nbmj8900_romsel_w)
 
 
 ******************************************************************************/
-void nbmj8900_vramflip(running_machine &machine, int vram)
+void nbmj8900_state::nbmj8900_vramflip(int vram)
 {
-	nbmj8900_state *state = machine.driver_data<nbmj8900_state>();
 	int x, y;
 	unsigned char color1, color2;
 	unsigned char *vidram;
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	if (state->m_flipscreen == state->m_flipscreen_old) return;
+	if (m_flipscreen == m_flipscreen_old) return;
 
-	vidram = vram ? state->m_videoram1 : state->m_videoram0;
+	vidram = vram ? m_videoram1 : m_videoram0;
 
 	for (y = 0; y < (height / 2); y++)
 	{
@@ -184,23 +179,21 @@ void nbmj8900_vramflip(running_machine &machine, int vram)
 		}
 	}
 
-	state->m_flipscreen_old = state->m_flipscreen;
-	state->m_screen_refresh = 1;
+	m_flipscreen_old = m_flipscreen;
+	m_screen_refresh = 1;
 }
 
 
-static void update_pixel0(running_machine &machine, int x, int y)
+void nbmj8900_state::update_pixel0(int x, int y)
 {
-	nbmj8900_state *state = machine.driver_data<nbmj8900_state>();
-	UINT8 color = state->m_videoram0[(y * state->m_screen_width) + x];
-	state->m_tmpbitmap0.pix16(y, x) = machine.pens[color];
+	UINT8 color = m_videoram0[(y * m_screen_width) + x];
+	m_tmpbitmap0.pix16(y, x) = machine().pens[color];
 }
 
-static void update_pixel1(running_machine &machine, int x, int y)
+void nbmj8900_state::update_pixel1(int x, int y)
 {
-	nbmj8900_state *state = machine.driver_data<nbmj8900_state>();
-	UINT8 color = state->m_videoram1[(y * state->m_screen_width) + x];
-	state->m_tmpbitmap1.pix16(y, x) = machine.pens[color];
+	UINT8 color = m_videoram1[(y * m_screen_width) + x];
+	m_tmpbitmap1.pix16(y, x) = machine().pens[color];
 }
 
 TIMER_CALLBACK_MEMBER(nbmj8900_state::blitter_timer_callback)
@@ -208,10 +201,9 @@ TIMER_CALLBACK_MEMBER(nbmj8900_state::blitter_timer_callback)
 	nb1413m3_busyflag = 1;
 }
 
-static void nbmj8900_gfxdraw(running_machine &machine)
+void nbmj8900_state::nbmj8900_gfxdraw()
 {
-	nbmj8900_state *state = machine.driver_data<nbmj8900_state>();
-	unsigned char *GFX = state->memregion("gfx")->base();
+	unsigned char *GFX = memregion("gfx")->base();
 
 	int x, y;
 	int dx1, dx2, dy1, dy2;
@@ -224,43 +216,43 @@ static void nbmj8900_gfxdraw(running_machine &machine)
 
 	nb1413m3_busyctr = 0;
 
-	startx = state->m_blitter_destx + state->m_blitter_sizex;
-	starty = state->m_blitter_desty + state->m_blitter_sizey;
+	startx = m_blitter_destx + m_blitter_sizex;
+	starty = m_blitter_desty + m_blitter_sizey;
 
-	if (state->m_blitter_direction_x)
+	if (m_blitter_direction_x)
 	{
-		sizex = state->m_blitter_sizex ^ 0xff;
+		sizex = m_blitter_sizex ^ 0xff;
 		skipx = 1;
 	}
 	else
 	{
-		sizex = state->m_blitter_sizex;
+		sizex = m_blitter_sizex;
 		skipx = -1;
 	}
 
-	if (state->m_blitter_direction_y)
+	if (m_blitter_direction_y)
 	{
-		sizey = state->m_blitter_sizey ^ 0xff;
+		sizey = m_blitter_sizey ^ 0xff;
 		skipy = 1;
 	}
 	else
 	{
-		sizey = state->m_blitter_sizey;
+		sizey = m_blitter_sizey;
 		skipy = -1;
 	}
 
-	gfxaddr = (state->m_gfxrom << 17) + (state->m_blitter_src_addr << 1);
+	gfxaddr = (m_gfxrom << 17) + (m_blitter_src_addr << 1);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
 	{
 		for (x = startx, ctrx = sizex; ctrx >= 0; x += skipx, ctrx--)
 		{
-			if ((gfxaddr > (machine.root_device().memregion("gfx")->bytes() - 1)))
+			if ((gfxaddr > (machine().root_device().memregion("gfx")->bytes() - 1)))
 			{
 #ifdef MAME_DEBUG
 				popmessage("GFXROM ADDRESS OVER!!");
 #endif
-				gfxaddr &= (machine.root_device().memregion("gfx")->bytes() - 1);
+				gfxaddr &= (machine().root_device().memregion("gfx")->bytes() - 1);
 			}
 
 			color = GFX[gfxaddr++];
@@ -274,20 +266,20 @@ static void nbmj8900_gfxdraw(running_machine &machine)
 			dx1 = (2 * x + 0) & 0x1ff;
 			dx2 = (2 * x + 1) & 0x1ff;
 
-			if (state->m_gfxdraw_mode)
+			if (m_gfxdraw_mode)
 			{
 				// 2 layer type
 				dy1 = y & 0xff;
-				dy2 = (y + state->m_scrolly) & 0xff;
+				dy2 = (y + m_scrolly) & 0xff;
 			}
 			else
 			{
 				// 1 layer type
-				dy1 = (y + state->m_scrolly) & 0xff;
+				dy1 = (y + m_scrolly) & 0xff;
 				dy2 = 0;
 			}
 
-			if (!state->m_flipscreen)
+			if (!m_flipscreen)
 			{
 				dx1 ^= 0x1ff;
 				dx2 ^= 0x1ff;
@@ -295,7 +287,7 @@ static void nbmj8900_gfxdraw(running_machine &machine)
 				dy2 ^= 0xff;
 			}
 
-			if (state->m_blitter_direction_x)
+			if (m_blitter_direction_x)
 			{
 				// flip
 				color1 = (color & 0x0f) >> 0;
@@ -308,47 +300,47 @@ static void nbmj8900_gfxdraw(running_machine &machine)
 				color2 = (color & 0x0f) >> 0;
 			}
 
-			color1 = state->m_clut[((state->m_clutsel & 0x7f) << 4) + color1];
-			color2 = state->m_clut[((state->m_clutsel & 0x7f) << 4) + color2];
+			color1 = m_clut[((m_clutsel & 0x7f) << 4) + color1];
+			color2 = m_clut[((m_clutsel & 0x7f) << 4) + color2];
 
-			if ((!state->m_gfxdraw_mode) || (state->m_vram & 0x01))
+			if ((!m_gfxdraw_mode) || (m_vram & 0x01))
 			{
 				// layer 1
 				if (color1 != 0xff)
 				{
-					state->m_videoram0[(dy1 * state->m_screen_width) + dx1] = color1;
-					update_pixel0(machine, dx1, dy1);
+					m_videoram0[(dy1 * m_screen_width) + dx1] = color1;
+					update_pixel0(dx1, dy1);
 				}
 				if (color2 != 0xff)
 				{
-					state->m_videoram0[(dy1 * state->m_screen_width) + dx2] = color2;
-					update_pixel0(machine, dx2, dy1);
+					m_videoram0[(dy1 * m_screen_width) + dx2] = color2;
+					update_pixel0(dx2, dy1);
 				}
 			}
-			if (state->m_gfxdraw_mode && (state->m_vram & 0x02))
+			if (m_gfxdraw_mode && (m_vram & 0x02))
 			{
 				// layer 2
-				if (state->m_vram & 0x08)
+				if (m_vram & 0x08)
 				{
 					// transparent enable
 					if (color1 != 0xff)
 					{
-						state->m_videoram1[(dy2 * state->m_screen_width) + dx1] = color1;
-						update_pixel1(machine, dx1, dy2);
+						m_videoram1[(dy2 * m_screen_width) + dx1] = color1;
+						update_pixel1(dx1, dy2);
 					}
 					if (color2 != 0xff)
 					{
-						state->m_videoram1[(dy2 * state->m_screen_width) + dx2] = color2;
-						update_pixel1(machine, dx2, dy2);
+						m_videoram1[(dy2 * m_screen_width) + dx2] = color2;
+						update_pixel1(dx2, dy2);
 					}
 				}
 				else
 				{
 					// transparent disable
-					state->m_videoram1[(dy2 * state->m_screen_width) + dx1] = color1;
-					update_pixel1(machine, dx1, dy2);
-					state->m_videoram1[(dy2 * state->m_screen_width) + dx2] = color2;
-					update_pixel1(machine, dx2, dy2);
+					m_videoram1[(dy2 * m_screen_width) + dx1] = color1;
+					update_pixel1(dx1, dy2);
+					m_videoram1[(dy2 * m_screen_width) + dx2] = color2;
+					update_pixel1(dx2, dy2);
 				}
 			}
 
@@ -357,7 +349,7 @@ static void nbmj8900_gfxdraw(running_machine &machine)
 	}
 
 	nb1413m3_busyflag = 0;
-	machine.scheduler().timer_set(attotime::from_nsec(2500) * nb1413m3_busyctr, timer_expired_delegate(FUNC(nbmj8900_state::blitter_timer_callback),state));
+	machine().scheduler().timer_set(attotime::from_nsec(2500) * nb1413m3_busyctr, timer_expired_delegate(FUNC(nbmj8900_state::blitter_timer_callback),this));
 }
 
 /******************************************************************************
@@ -396,7 +388,7 @@ UINT32 nbmj8900_state::screen_update_nbmj8900(screen_device &screen, bitmap_ind1
 		{
 			for (x = 0; x < m_screen_width; x++)
 			{
-				update_pixel0(machine(), x, y);
+				update_pixel0(x, y);
 			}
 		}
 		if (m_gfxdraw_mode)
@@ -405,7 +397,7 @@ UINT32 nbmj8900_state::screen_update_nbmj8900(screen_device &screen, bitmap_ind1
 			{
 				for (x = 0; x < m_screen_width; x++)
 				{
-					update_pixel1(machine(), x, y);
+					update_pixel1(x, y);
 				}
 			}
 		}

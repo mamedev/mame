@@ -727,153 +727,152 @@ WRITE16_MEMBER(nmk16_state::tdragon_mainram_w)
 }
 
 /*coin setting MCU simulation*/
-static void mcu_run(running_machine &machine, UINT8 dsw_setting)
+void nmk16_state::mcu_run(UINT8 dsw_setting)
 {
-	nmk16_state *state = machine.driver_data<nmk16_state>();
 	UINT16 coin_input;
 	UINT8 dsw[2];
 	UINT8 i;
 
 	/*Accept the start button but needs some m68k processing first,otherwise you can't start a play with 1 credit inserted*/
-	if(state->m_start_helper & 1 && state->m_mainram[0x9000/2] & 0x0200) /*start 1 */
+	if(m_start_helper & 1 && m_mainram[0x9000/2] & 0x0200) /*start 1 */
 	{
-		state->m_mainram[0xef00/2]--;
-		state->m_start_helper = state->m_start_helper & 2;
+		m_mainram[0xef00/2]--;
+		m_start_helper = m_start_helper & 2;
 	}
-	if(state->m_start_helper & 2 && state->m_mainram[0x9000/2] & 0x0100) /*start 2*/
+	if(m_start_helper & 2 && m_mainram[0x9000/2] & 0x0100) /*start 2*/
 	{
-		state->m_mainram[0xef00/2]--;
-		state->m_start_helper = state->m_start_helper & 1;
+		m_mainram[0xef00/2]--;
+		m_start_helper = m_start_helper & 1;
 	}
 
 	/*needed because of the uncompatibility of the dsw settings.*/
 	if(dsw_setting) // Thunder Dragon
 	{
-		dsw[0] = (machine.root_device().ioport("DSW2")->read() & 0x7);
-		dsw[1] = (machine.root_device().ioport("DSW2")->read() & 0x38) >> 3;
+		dsw[0] = (machine().root_device().ioport("DSW2")->read() & 0x7);
+		dsw[1] = (machine().root_device().ioport("DSW2")->read() & 0x38) >> 3;
 		for(i=0;i<2;i++)
 		{
 			switch(dsw[i] & 7)
 			{
-				case 0: state->m_mainram[0x9000/2]|=0x4000; break; //free play
-				case 1: state->m_coin_count_frac[i] = 1; state->m_coin_count[i] = 4; break;
-				case 2: state->m_coin_count_frac[i] = 1; state->m_coin_count[i] = 3; break;
-				case 3: state->m_coin_count_frac[i] = 1; state->m_coin_count[i] = 2; break;
-				case 4: state->m_coin_count_frac[i] = 4; state->m_coin_count[i] = 1; break;
-				case 5: state->m_coin_count_frac[i] = 3; state->m_coin_count[i] = 1; break;
-				case 6: state->m_coin_count_frac[i] = 2; state->m_coin_count[i] = 1; break;
-				case 7: state->m_coin_count_frac[i] = 1; state->m_coin_count[i] = 1; break;
+				case 0: m_mainram[0x9000/2]|=0x4000; break; //free play
+				case 1: m_coin_count_frac[i] = 1; m_coin_count[i] = 4; break;
+				case 2: m_coin_count_frac[i] = 1; m_coin_count[i] = 3; break;
+				case 3: m_coin_count_frac[i] = 1; m_coin_count[i] = 2; break;
+				case 4: m_coin_count_frac[i] = 4; m_coin_count[i] = 1; break;
+				case 5: m_coin_count_frac[i] = 3; m_coin_count[i] = 1; break;
+				case 6: m_coin_count_frac[i] = 2; m_coin_count[i] = 1; break;
+				case 7: m_coin_count_frac[i] = 1; m_coin_count[i] = 1; break;
 			}
 		}
 	}
 	else // Hacha Mecha Fighter
 	{
-		dsw[0] = (machine.root_device().ioport("DSW1")->read() & 0x0700) >> 8;
-		dsw[1] = (machine.root_device().ioport("DSW1")->read() & 0x3800) >> 11;
+		dsw[0] = (machine().root_device().ioport("DSW1")->read() & 0x0700) >> 8;
+		dsw[1] = (machine().root_device().ioport("DSW1")->read() & 0x3800) >> 11;
 		for(i=0;i<2;i++)
 		{
 			switch(dsw[i] & 7)
 			{
-				case 0: state->m_mainram[0x9000/2]|=0x4000; break; //free play
-				case 1: state->m_coin_count_frac[i] = 4; state->m_coin_count[i] = 1; break;
-				case 2: state->m_coin_count_frac[i] = 3; state->m_coin_count[i] = 1; break;
-				case 3: state->m_coin_count_frac[i] = 2; state->m_coin_count[i] = 1; break;
-				case 4: state->m_coin_count_frac[i] = 1; state->m_coin_count[i] = 4; break;
-				case 5: state->m_coin_count_frac[i] = 1; state->m_coin_count[i] = 3; break;
-				case 6: state->m_coin_count_frac[i] = 1; state->m_coin_count[i] = 2; break;
-				case 7: state->m_coin_count_frac[i] = 1; state->m_coin_count[i] = 1; break;
+				case 0: m_mainram[0x9000/2]|=0x4000; break; //free play
+				case 1: m_coin_count_frac[i] = 4; m_coin_count[i] = 1; break;
+				case 2: m_coin_count_frac[i] = 3; m_coin_count[i] = 1; break;
+				case 3: m_coin_count_frac[i] = 2; m_coin_count[i] = 1; break;
+				case 4: m_coin_count_frac[i] = 1; m_coin_count[i] = 4; break;
+				case 5: m_coin_count_frac[i] = 1; m_coin_count[i] = 3; break;
+				case 6: m_coin_count_frac[i] = 1; m_coin_count[i] = 2; break;
+				case 7: m_coin_count_frac[i] = 1; m_coin_count[i] = 1; break;
 			}
 		}
 	}
 
 	/*read the coin port*/
-	coin_input = (~(machine.root_device().ioport("IN0")->read()));
+	coin_input = (~(machine().root_device().ioport("IN0")->read()));
 
 	if(coin_input & 0x01)//coin 1
 	{
-		if((state->m_input_pressed & 0x01) == 0)
+		if((m_input_pressed & 0x01) == 0)
 		{
-			if(state->m_coin_count_frac[0] != 1)
+			if(m_coin_count_frac[0] != 1)
 			{
-				state->m_mainram[0xef02/2]+=state->m_coin_count[0];
-				if(state->m_coin_count_frac[0] == state->m_mainram[0xef02/2])
+				m_mainram[0xef02/2]+=m_coin_count[0];
+				if(m_coin_count_frac[0] == m_mainram[0xef02/2])
 				{
-					state->m_mainram[0xef00/2]+=state->m_coin_count[0];
-					state->m_mainram[0xef02/2] = 0;
+					m_mainram[0xef00/2]+=m_coin_count[0];
+					m_mainram[0xef02/2] = 0;
 				}
 			}
 			else
-				state->m_mainram[0xef00/2]+=state->m_coin_count[0];
+				m_mainram[0xef00/2]+=m_coin_count[0];
 		}
-		state->m_input_pressed = (state->m_input_pressed & 0xfe) | 1;
+		m_input_pressed = (m_input_pressed & 0xfe) | 1;
 	}
 	else
-		state->m_input_pressed = (state->m_input_pressed & 0xfe);
+		m_input_pressed = (m_input_pressed & 0xfe);
 
 	if(coin_input & 0x02)//coin 2
 	{
-		if((state->m_input_pressed & 0x02) == 0)
+		if((m_input_pressed & 0x02) == 0)
 		{
-			if(state->m_coin_count_frac[1] != 1)
+			if(m_coin_count_frac[1] != 1)
 			{
-				state->m_mainram[0xef02/2]+=state->m_coin_count[1];
-				if(state->m_coin_count_frac[1] == state->m_mainram[0xef02/2])
+				m_mainram[0xef02/2]+=m_coin_count[1];
+				if(m_coin_count_frac[1] == m_mainram[0xef02/2])
 				{
-					state->m_mainram[0xef00/2]+=state->m_coin_count[1];
-					state->m_mainram[0xef02/2] = 0;
+					m_mainram[0xef00/2]+=m_coin_count[1];
+					m_mainram[0xef02/2] = 0;
 				}
 			}
 			else
-				state->m_mainram[0xef00/2]+=state->m_coin_count[1];
+				m_mainram[0xef00/2]+=m_coin_count[1];
 		}
-		state->m_input_pressed = (state->m_input_pressed & 0xfd) | 2;
+		m_input_pressed = (m_input_pressed & 0xfd) | 2;
 	}
 	else
-		state->m_input_pressed = (state->m_input_pressed & 0xfd);
+		m_input_pressed = (m_input_pressed & 0xfd);
 
 	if(coin_input & 0x04)//service 1
 	{
-		if((state->m_input_pressed & 0x04) == 0)
-			state->m_mainram[0xef00/2]++;
-		state->m_input_pressed = (state->m_input_pressed & 0xfb) | 4;
+		if((m_input_pressed & 0x04) == 0)
+			m_mainram[0xef00/2]++;
+		m_input_pressed = (m_input_pressed & 0xfb) | 4;
 	}
 	else
-		state->m_input_pressed = (state->m_input_pressed & 0xfb);
+		m_input_pressed = (m_input_pressed & 0xfb);
 
 	/*The 0x9000 ram address is the status */
-	if(state->m_mainram[0xef00/2] > 0 && state->m_mainram[0x9000/2] & 0x8000) //enable start button
+	if(m_mainram[0xef00/2] > 0 && m_mainram[0x9000/2] & 0x8000) //enable start button
 	{
 		if(coin_input & 0x08)//start 1
 		{
-			if((state->m_input_pressed & 0x08) == 0 && (!(state->m_mainram[0x9000/2] & 0x0200))) //start 1
-				state->m_start_helper = 1;
+			if((m_input_pressed & 0x08) == 0 && (!(m_mainram[0x9000/2] & 0x0200))) //start 1
+				m_start_helper = 1;
 
-			state->m_input_pressed = (state->m_input_pressed & 0xf7) | 8;
+			m_input_pressed = (m_input_pressed & 0xf7) | 8;
 		}
 		else
-			state->m_input_pressed = (state->m_input_pressed & 0xf7);
+			m_input_pressed = (m_input_pressed & 0xf7);
 
 		if(coin_input & 0x10)//start 2
 		{
 			/*Decrease two coins to let two players play with one start 2 button and two credits inserted at the insert coin screen.*/
-			if((state->m_input_pressed & 0x10) == 0 && (!(state->m_mainram[0x9000/2] & 0x0100))) // start 2
-				state->m_start_helper = (state->m_mainram[0x9000/2] == 0x8000) ? (3) : (2);
+			if((m_input_pressed & 0x10) == 0 && (!(m_mainram[0x9000/2] & 0x0100))) // start 2
+				m_start_helper = (m_mainram[0x9000/2] == 0x8000) ? (3) : (2);
 
-			state->m_input_pressed = (state->m_input_pressed & 0xef) | 0x10;
+			m_input_pressed = (m_input_pressed & 0xef) | 0x10;
 		}
 		else
-			state->m_input_pressed = (state->m_input_pressed & 0xef);
+			m_input_pressed = (m_input_pressed & 0xef);
 	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::tdragon_mcu_sim)
 {
-	mcu_run(machine(),1);
+	mcu_run(1);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::hachamf_mcu_sim)
 {
-	mcu_run(machine(),0);
+	mcu_run(0);
 }
 
 static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16, nmk16_state )
@@ -4343,7 +4342,7 @@ static MACHINE_CONFIG_START( bjtwin, nmk16_state )
 MACHINE_CONFIG_END
 
 
-static UINT8 decode_byte(UINT8 src, const UINT8 *bitp)
+UINT8 nmk16_state::decode_byte(UINT8 src, const UINT8 *bitp)
 {
 	UINT8 ret, i;
 
@@ -4354,13 +4353,13 @@ static UINT8 decode_byte(UINT8 src, const UINT8 *bitp)
 	return ret;
 }
 
-static UINT32 bjtwin_address_map_bg0(UINT32 addr)
+UINT32 nmk16_state::bjtwin_address_map_bg0(UINT32 addr)
 {
 	return ((addr&0x00004)>> 2) | ((addr&0x00800)>> 10) | ((addr&0x40000)>>16);
 }
 
 
-static UINT16 decode_word(UINT16 src, const UINT8 *bitp)
+UINT16 nmk16_state::decode_word(UINT16 src, const UINT8 *bitp)
 {
 	UINT16 ret, i;
 
@@ -4372,13 +4371,13 @@ static UINT16 decode_word(UINT16 src, const UINT8 *bitp)
 }
 
 
-static UINT32 bjtwin_address_map_sprites(UINT32 addr)
+UINT32 nmk16_state::bjtwin_address_map_sprites(UINT32 addr)
 {
 	return ((addr&0x00010)>> 4) | ((addr&0x20000)>>16) | ((addr&0x100000)>>18);
 }
 
 
-static void decode_gfx(running_machine &machine)
+void nmk16_state::decode_gfx()
 {
 	/* GFX are scrambled.  We decode them here.  (BIG Thanks to Antiriad for descrambling info) */
 	UINT8 *rom;
@@ -4411,16 +4410,16 @@ static void decode_gfx(running_machine &machine)
 
 
 	/* background */
-	rom = machine.root_device().memregion("gfx2")->base();
-	len = machine.root_device().memregion("gfx2")->bytes();
+	rom = machine().root_device().memregion("gfx2")->base();
+	len = machine().root_device().memregion("gfx2")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_bg[bjtwin_address_map_bg0(A)]);
 	}
 
 	/* sprites */
-	rom = machine.root_device().memregion("gfx3")->base();
-	len = machine.root_device().memregion("gfx3")->bytes();
+	rom = machine().root_device().memregion("gfx3")->base();
+	len = machine().root_device().memregion("gfx3")->bytes();
 	for (A = 0;A < len;A += 2)
 	{
 		UINT16 tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_sprite[bjtwin_address_map_sprites(A)]);
@@ -4429,7 +4428,7 @@ static void decode_gfx(running_machine &machine)
 	}
 }
 
-static void decode_tdragonb(running_machine &machine)
+void nmk16_state::decode_tdragonb()
 {
 	/* Descrambling Info Again Taken from Raine, Huge Thanks to Antiriad and the Raine Team for
 	   going Open Source, best of luck in future development. */
@@ -4449,8 +4448,8 @@ static void decode_tdragonb(running_machine &machine)
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
 
-	rom = machine.root_device().memregion("maincpu")->base();
-	len = machine.root_device().memregion("maincpu")->bytes();
+	rom = machine().root_device().memregion("maincpu")->base();
+	len = machine().root_device().memregion("maincpu")->bytes();
 	for (A = 0;A < len;A += 2)
 	{
 		int h = A+NATIVE_ENDIAN_VALUE_LE_BE(1,0), l = A+NATIVE_ENDIAN_VALUE_LE_BE(0,1);
@@ -4459,22 +4458,22 @@ static void decode_tdragonb(running_machine &machine)
 		rom[l] = tmp & 0xff;
 	}
 
-	rom = machine.root_device().memregion("gfx2")->base();
-	len = machine.root_device().memregion("gfx2")->bytes();
+	rom = machine().root_device().memregion("gfx2")->base();
+	len = machine().root_device().memregion("gfx2")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 
-	rom = machine.root_device().memregion("gfx3")->base();
-	len = machine.root_device().memregion("gfx3")->bytes();
+	rom = machine().root_device().memregion("gfx3")->base();
+	len = machine().root_device().memregion("gfx3")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 }
 
-static void decode_ssmissin(running_machine &machine)
+void nmk16_state::decode_ssmissin()
 {
 	/* Like Thunder Dragon Bootleg without the Program Rom Swapping */
 	UINT8 *rom;
@@ -4486,15 +4485,15 @@ static void decode_ssmissin(running_machine &machine)
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
 
-	rom = machine.root_device().memregion("gfx2")->base();
-	len = machine.root_device().memregion("gfx2")->bytes();
+	rom = machine().root_device().memregion("gfx2")->base();
+	len = machine().root_device().memregion("gfx2")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 
-	rom = machine.root_device().memregion("gfx3")->base();
-	len = machine.root_device().memregion("gfx3")->bytes();
+	rom = machine().root_device().memregion("gfx3")->base();
+	len = machine().root_device().memregion("gfx3")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
@@ -4504,7 +4503,7 @@ static void decode_ssmissin(running_machine &machine)
 
 DRIVER_INIT_MEMBER(nmk16_state,nmk)
 {
-	decode_gfx(machine());
+	decode_gfx();
 }
 
 DRIVER_INIT_MEMBER(nmk16_state,hachamf)
@@ -4520,7 +4519,7 @@ DRIVER_INIT_MEMBER(nmk16_state,hachamf)
 
 DRIVER_INIT_MEMBER(nmk16_state,tdragonb)
 {
-	decode_tdragonb(machine());
+	decode_tdragonb();
 }
 
 DRIVER_INIT_MEMBER(nmk16_state,tdragon)
@@ -4537,7 +4536,7 @@ DRIVER_INIT_MEMBER(nmk16_state,tdragon)
 
 DRIVER_INIT_MEMBER(nmk16_state,ssmissin)
 {
-	decode_ssmissin(machine());
+	decode_ssmissin();
 }
 
 DRIVER_INIT_MEMBER(nmk16_state,bjtwin)

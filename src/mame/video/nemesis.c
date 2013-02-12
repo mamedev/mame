@@ -311,7 +311,7 @@ void nemesis_state::video_start()
 }
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void nemesis_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/*
 	 *  16 bytes per sprite, in memory from 56000-56fff
@@ -328,8 +328,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	 *  byte    E : not used.
 	 */
 
-	nemesis_state *state = machine.driver_data<nemesis_state>();
-	UINT16 *spriteram = state->m_spriteram;
+	UINT16 *spriteram = m_spriteram;
 	int address;    /* start of sprite in spriteram */
 	int sx; /* sprite X-pos */
 	int sy; /* sprite Y-pos */
@@ -345,7 +344,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (priority = 256 - 1; priority >= 0; priority--)
 	{
-		for (address = state->m_spriteram_words - 8; address >= 0; address -= 8)
+		for (address = m_spriteram_words - 8; address >= 0; address -= 8)
 		{
 			if((spriteram[address] & 0xff) != priority)
 				continue;
@@ -379,7 +378,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 				if (zoom)
 				{
 					zoom = ((1 << 16) * 0x80 / zoom) + 0x02ab;
-					if (state->m_flipscreen)
+					if (m_flipscreen)
 					{
 						sx = 256 - ((zoom * w) >> 16) - sx;
 						sy = 256 - ((zoom * h) >> 16) - sy;
@@ -387,13 +386,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 						flipy = !flipy;
 					}
 
-					pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[char_type],
+					pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[char_type],
 						code,
 						color,
 						flipx,flipy,
 						sx,sy,
 						zoom,zoom,
-						machine.priority_bitmap,0xffcc,0 );
+						machine().priority_bitmap,0xffcc,0 );
 				}
 			}
 		}
@@ -452,7 +451,7 @@ UINT32 nemesis_state::screen_update_nemesis(screen_device &screen, bitmap_ind16 
 		}
 	}
 
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 
 	return 0;
 }

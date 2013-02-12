@@ -35,7 +35,7 @@ void nitedrvr_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(nitedrvr_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-static void draw_box( bitmap_ind16 &bitmap, int bx, int by, int ex, int ey )
+void nitedrvr_state::draw_box( bitmap_ind16 &bitmap, int bx, int by, int ex, int ey )
 {
 	int x, y;
 
@@ -49,19 +49,18 @@ static void draw_box( bitmap_ind16 &bitmap, int bx, int by, int ex, int ey )
 	return;
 }
 
-static void draw_roadway( running_machine &machine, bitmap_ind16 &bitmap )
+void nitedrvr_state::draw_roadway( bitmap_ind16 &bitmap )
 {
-	nitedrvr_state *state = machine.driver_data<nitedrvr_state>();
 	int roadway;
 
 	for (roadway = 0; roadway < 16; roadway++)
 	{
 		int bx, by, ex, ey;
 
-		bx = state->m_hvc[roadway];
-		by = state->m_hvc[roadway + 16];
-		ex = bx + ((state->m_hvc[roadway + 32] & 0xf0) >> 4);
-		ey = by + (16 - (state->m_hvc[roadway + 32] & 0x0f));
+		bx = m_hvc[roadway];
+		by = m_hvc[roadway + 16];
+		ex = bx + ((m_hvc[roadway + 32] & 0xf0) >> 4);
+		ey = by + (16 - (m_hvc[roadway + 32] & 0x0f));
 
 		draw_box(bitmap, bx, by, ex, ey);
 	}
@@ -70,6 +69,6 @@ static void draw_roadway( running_machine &machine, bitmap_ind16 &bitmap )
 UINT32 nitedrvr_state::screen_update_nitedrvr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_roadway(machine(), bitmap);
+	draw_roadway(bitmap);
 	return 0;
 }

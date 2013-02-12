@@ -254,11 +254,10 @@ WRITE8_MEMBER(nova2001_state::pkunwar_flipscreen_w)
  *
  *************************************/
 
-static void nova2001_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void nova2001_state::nova2001_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	nova2001_state *state = machine.driver_data<nova2001_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	gfx_element *gfx = machine.gfx[0];
+	UINT8 *spriteram = m_spriteram;
+	gfx_element *gfx = machine().gfx[0];
 	int offs;
 
 	for (offs = 0; offs < 0x800; offs += 32)
@@ -276,7 +275,7 @@ static void nova2001_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 			continue;
 		}
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -292,11 +291,10 @@ static void nova2001_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	}
 }
 
-static void pkunwar_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void nova2001_state::pkunwar_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	nova2001_state *state = machine.driver_data<nova2001_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	gfx_element *gfx = machine.gfx[0];
+	UINT8 *spriteram = m_spriteram;
+	gfx_element *gfx = machine().gfx[0];
 	int offs;
 
 	for (offs = 0; offs < 0x800; offs += 32)
@@ -314,7 +312,7 @@ static void pkunwar_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 			continue;
 		}
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -343,7 +341,7 @@ UINT32 nova2001_state::screen_update_nova2001(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	nova2001_draw_sprites(machine(), bitmap, cliprect);
+	nova2001_draw_sprites(bitmap, cliprect);
 
 	// according to the schematics, fg category 0 should be drawn behind sprites,
 	// but it doesn't look right that way
@@ -357,7 +355,7 @@ UINT32 nova2001_state::screen_update_pkunwar(screen_device &screen, bitmap_ind16
 {
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
-	pkunwar_draw_sprites(machine(), bitmap, cliprect);
+	pkunwar_draw_sprites(bitmap, cliprect);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 
@@ -370,7 +368,7 @@ UINT32 nova2001_state::screen_update_ninjakun(screen_device &screen, bitmap_ind1
 
 	m_fg_tilemap->draw(bitmap, cliprect, 1, 0);
 
-	nova2001_draw_sprites(machine(), bitmap, cliprect);
+	nova2001_draw_sprites(bitmap, cliprect);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
@@ -381,7 +379,7 @@ UINT32 nova2001_state::screen_update_raiders5(screen_device &screen, bitmap_ind1
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	pkunwar_draw_sprites(machine(), bitmap, cliprect);
+	pkunwar_draw_sprites(bitmap, cliprect);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 

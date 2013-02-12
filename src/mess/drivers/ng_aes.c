@@ -1156,7 +1156,7 @@ MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
 	m_recurse = 0;
 
 	/* AES apparently always uses the cartridge's fixed bank mode */
-	neogeo_set_fixed_layer_source(machine(),1);
+	neogeo_set_fixed_layer_source(1);
 
 	NeoSpriteRAM = memregion("sprites")->base();
 	YM2610ADPCMAROM = memregion("ymsnd")->base();

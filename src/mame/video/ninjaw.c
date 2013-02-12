@@ -14,10 +14,9 @@ void ninjaw_state::video_start()
             SPRITE DRAW ROUTINE
 ************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs )
+void ninjaw_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs )
 {
-	ninjaw_state *state = machine.driver_data<ninjaw_state>();
-	UINT16 *spriteram = state->m_spriteram;
+	UINT16 *spriteram = m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
 	int code;
@@ -26,7 +25,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int unknown = 0;
 #endif
 
-	for (offs = (state->m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
+	for (offs = (m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
 		data = spriteram[offs + 2];
 		tilenum = data & 0x7fff;
@@ -78,7 +77,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		cury = y;
 		code = tilenum;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				code, color,
 				flipx, flipy,
 				curx, cury, 0);
@@ -95,7 +94,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
                 SCREEN REFRESH
 **************************************************************/
 
-static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, device_t *tc0100scn)
+UINT32 ninjaw_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, device_t *tc0100scn)
 {
 	UINT8 layer[3], nodraw;
 
@@ -114,12 +113,12 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 		bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
 	/* Sprites can be under/over the layer below text layer */
-	draw_sprites(screen.machine(), bitmap, cliprect, 1, xoffs, 8); // draw sprites with priority 1 which are under the mid layer
+	draw_sprites(bitmap, cliprect, 1, xoffs, 8); // draw sprites with priority 1 which are under the mid layer
 
 	// draw middle layer
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 0);
 
-	draw_sprites(screen.machine(),bitmap,cliprect,0,xoffs,8); // draw sprites with priority 0 which are over the mid layer
+	draw_sprites(bitmap,cliprect,0,xoffs,8); // draw sprites with priority 0 which are over the mid layer
 
 	// draw top(text) layer
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[2], 0, 0);

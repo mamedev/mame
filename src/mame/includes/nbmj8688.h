@@ -91,4 +91,11 @@ public:
 	UINT32 screen_update_mbmj8688_lcd0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_mbmj8688_lcd1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(blitter_timer_callback);
+	void update_pixel(int x, int y);
+	void writeram_low(int x, int y, int color);
+	void writeram_high(int x, int y, int color);
+	void mbmj8688_gfxdraw(int gfxtype);
+	void common_video_start();
+	void nbmj8688_HD61830B_instr_w(address_space &space,int offset,int data,int chip);
+	void nbmj8688_HD61830B_data_w(address_space &space,int offset,int data,int chip);
 };

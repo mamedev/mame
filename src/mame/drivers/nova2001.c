@@ -977,13 +977,13 @@ This code is overly generic because it is used for several games in ninjakd2.c
 
 ******************************************************************************/
 
-static void lineswap_gfx_roms(running_machine &machine, const char *region, const int bit)
+void nova2001_state::lineswap_gfx_roms(const char *region, const int bit)
 {
-	const int length = machine.root_device().memregion(region)->bytes();
+	const int length = machine().root_device().memregion(region)->bytes();
 
-	UINT8* const src = machine.root_device().memregion(region)->base();
+	UINT8* const src = machine().root_device().memregion(region)->base();
 
-	UINT8* const temp = auto_alloc_array(machine, UINT8, length);
+	UINT8* const temp = auto_alloc_array(machine(), UINT8, length);
 
 	const int mask = (1 << (bit + 1)) - 1;
 
@@ -998,7 +998,7 @@ static void lineswap_gfx_roms(running_machine &machine, const char *region, cons
 
 	memcpy(src, temp, length);
 
-	auto_free(machine, temp);
+	auto_free(machine(), temp);
 }
 
 
@@ -1011,13 +1011,13 @@ static void lineswap_gfx_roms(running_machine &machine, const char *region, cons
 
 DRIVER_INIT_MEMBER(nova2001_state,pkunwar)
 {
-	lineswap_gfx_roms(machine(), "gfx1", 13);
+	lineswap_gfx_roms("gfx1", 13);
 }
 
 DRIVER_INIT_MEMBER(nova2001_state,raiders5)
 {
-	lineswap_gfx_roms(machine(), "gfx1", 13);
-	lineswap_gfx_roms(machine(), "gfx2", 13);
+	lineswap_gfx_roms("gfx1", 13);
+	lineswap_gfx_roms("gfx2", 13);
 }
 
 

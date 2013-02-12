@@ -49,4 +49,8 @@ public:
 	UINT32 screen_update_ninjaw_middle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_ninjaw_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ninjaw_postload();
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int primask, int x_offs, int y_offs );
+	void parse_control(  )   /* assumes Z80 sandwiched between 68Ks */;
+	void reset_sound_region(  );
+	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, device_t *tc0100scn);
 };

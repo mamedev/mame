@@ -86,10 +86,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(rst2_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(spacefev_vco_voltage_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(helifire_dac_volume_timer);
+	void spacefev_start_red_cannon(  );
+	void helifire_next_line(  );
 };
-
-/*----------- defined in video/n8080.c -----------*/
-void spacefev_start_red_cannon(running_machine &machine);
 
 /*----------- defined in audio/n8080.c -----------*/
 

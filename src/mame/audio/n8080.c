@@ -275,7 +275,7 @@ static void delayed_sound_1( running_machine &machine, int data )
 	{
 		if (data & ~state->m_prev_snd_data & 0x10)
 		{
-			spacefev_start_red_cannon(machine);
+			state->spacefev_start_red_cannon();
 		}
 
 		state->m_spacefev_red_screen = data & 0x08;

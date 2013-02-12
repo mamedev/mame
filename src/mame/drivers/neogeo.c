@@ -173,17 +173,6 @@ static const char *audio_banks[4] =
 	NEOGEO_BANK_AUDIO_CPU_CART_BANK0, NEOGEO_BANK_AUDIO_CPU_CART_BANK1, NEOGEO_BANK_AUDIO_CPU_CART_BANK2, NEOGEO_BANK_AUDIO_CPU_CART_BANK3
 };
 
-
-/*************************************
- *
- *  Forward declerations
- *
- *************************************/
-
-static void set_output_latch(running_machine &machine, UINT8 data);
-static void set_output_data(running_machine &machine, UINT8 data);
-
-
 /*************************************
  *
  *  Main CPU interrupt generation
@@ -335,10 +324,9 @@ static void audio_cpu_irq(device_t *device, int assert)
 }
 
 
-static void audio_cpu_assert_nmi(running_machine &machine)
+void neogeo_state::audio_cpu_assert_nmi()
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
-	state->m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 WRITE8_MEMBER(neogeo_state::audio_cpu_clear_nmi_w)
@@ -354,10 +342,9 @@ WRITE8_MEMBER(neogeo_state::audio_cpu_clear_nmi_w)
  *
  *************************************/
 
-static void select_controller( running_machine &machine, UINT8 data )
+void neogeo_state::select_controller( UINT8 data )
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
-	state->m_controller_select = data;
+	m_controller_select = data;
 }
 
 
@@ -403,9 +390,9 @@ WRITE16_MEMBER(neogeo_state::io_control_w)
 {
 	switch (offset)
 	{
-	case 0x00: select_controller(machine(), data & 0x00ff); break;
-	case 0x18: if (m_is_mvs) set_output_latch(machine(), data & 0x00ff); break;
-	case 0x20: if (m_is_mvs) set_output_data(machine(), data & 0x00ff); break;
+	case 0x00: select_controller(data & 0x00ff); break;
+	case 0x18: if (m_is_mvs) set_output_latch(data & 0x00ff); break;
+	case 0x20: if (m_is_mvs) set_output_data(data & 0x00ff); break;
 	case 0x28: upd4990a_control_16_w(m_upd4990a, space, 0, data, mem_mask); break;
 //  case 0x30: break; // coin counters
 //  case 0x31: break; // coin counters
@@ -467,10 +454,9 @@ CUSTOM_INPUT_MEMBER(neogeo_state::get_calendar_status)
  *
  *************************************/
 
-static void set_save_ram_unlock( running_machine &machine, UINT8 data )
+void neogeo_state::set_save_ram_unlock( UINT8 data )
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
-	state->m_save_ram_unlocked = data;
+	m_save_ram_unlocked = data;
 }
 
 
@@ -556,7 +542,7 @@ WRITE16_MEMBER(neogeo_state::audio_command_w)
 	{
 		soundlatch_byte_w(space, 0, data >> 8);
 
-		audio_cpu_assert_nmi(machine());
+		audio_cpu_assert_nmi();
 
 		/* boost the interleave to let the audio CPU read the command */
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
@@ -838,7 +824,7 @@ WRITE16_MEMBER(neogeo_state::system_control_w)
 		switch (offset & 0x07)
 		{
 		default:
-		case 0x00: neogeo_set_screen_dark(machine(), bit); break;
+		case 0x00: neogeo_set_screen_dark(bit); break;
 		case 0x01:
 					if (m_is_cartsys)
 					{
@@ -859,9 +845,9 @@ WRITE16_MEMBER(neogeo_state::system_control_w)
 					}
 					if (m_has_audio_banking) set_audio_cpu_rom_source(bit); /* this is a guess */
 					break;
-		case 0x05: neogeo_set_fixed_layer_source(machine(), bit); break;
-		case 0x06: if (m_is_mvs) set_save_ram_unlock(machine(), bit); break;
-		case 0x07: neogeo_set_palette_bank(machine(), bit); break;
+		case 0x05: neogeo_set_fixed_layer_source(bit); break;
+		case 0x06: if (m_is_mvs) set_save_ram_unlock(bit); break;
+		case 0x07: neogeo_set_palette_bank(bit); break;
 
 		case 0x02: /* unknown - HC32 middle pin 1 */
 		case 0x03: /* unknown - uPD4990 pin ? */
@@ -926,55 +912,51 @@ WRITE16_MEMBER(neogeo_state::watchdog_w)
  *
  *************************************/
 
-static void set_outputs( running_machine &machine )
+void neogeo_state::set_outputs(  )
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
 	static const UINT8 led_map[0x10] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	/* EL */
-	output_set_digit_value(0, led_map[state->m_el_value]);
+	output_set_digit_value(0, led_map[m_el_value]);
 
 	/* LED1 */
-	output_set_digit_value(1, led_map[state->m_led1_value >> 4]);
-	output_set_digit_value(2, led_map[state->m_led1_value & 0x0f]);
+	output_set_digit_value(1, led_map[m_led1_value >> 4]);
+	output_set_digit_value(2, led_map[m_led1_value & 0x0f]);
 
 	/* LED2 */
-	output_set_digit_value(3, led_map[state->m_led2_value >> 4]);
-	output_set_digit_value(4, led_map[state->m_led2_value & 0x0f]);
+	output_set_digit_value(3, led_map[m_led2_value >> 4]);
+	output_set_digit_value(4, led_map[m_led2_value & 0x0f]);
 }
 
 
-static void set_output_latch( running_machine &machine, UINT8 data )
+void neogeo_state::set_output_latch( UINT8 data )
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
-
 	/* looks like the LEDs are set on the
 	   falling edge */
-	UINT8 falling_bits = state->m_output_latch & ~data;
+	UINT8 falling_bits = m_output_latch & ~data;
 
 	if (falling_bits & 0x08)
-		state->m_el_value = 16 - (state->m_output_data & 0x0f);
+		m_el_value = 16 - (m_output_data & 0x0f);
 
 	if (falling_bits & 0x10)
-		state->m_led1_value = ~state->m_output_data;
+		m_led1_value = ~m_output_data;
 
 	if (falling_bits & 0x20)
-		state->m_led2_value = ~state->m_output_data;
+		m_led2_value = ~m_output_data;
 
 	if (falling_bits & 0xc7)
-		logerror("%s  Unmaped LED write.  Data: %x\n", machine.describe_context(), falling_bits);
+		logerror("%s  Unmaped LED write.  Data: %x\n", machine().describe_context(), falling_bits);
 
-	state->m_output_latch = data;
+	m_output_latch = data;
 
-	set_outputs(machine);
+	set_outputs();
 }
 
 
-static void set_output_data( running_machine &machine, UINT8 data )
+void neogeo_state::set_output_data( UINT8 data )
 {
-	neogeo_state *state = machine.driver_data<neogeo_state>();
-	state->m_output_data = data;
+	m_output_data = data;
 }
 
 
@@ -991,7 +973,7 @@ void neogeo_state::neogeo_postload()
 	_set_main_cpu_vector_table_source();
 	set_audio_cpu_banking();
 	_set_audio_cpu_rom_source();
-	if (m_is_mvs) set_outputs(machine());
+	if (m_is_mvs) set_outputs();
 }
 
 

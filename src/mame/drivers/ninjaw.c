@@ -325,13 +325,12 @@ rumbling on a subwoofer in the cabinet.)
 
 extern const char layout_darius[];
 
-static void parse_control( running_machine &machine )   /* assumes Z80 sandwiched between 68Ks */
+void ninjaw_state::parse_control(  )   /* assumes Z80 sandwiched between 68Ks */
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
 	   if cpu B is disabled !! */
-	ninjaw_state *state = machine.driver_data<ninjaw_state>();
-	state->m_subcpu->set_input_line(INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, (m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -341,7 +340,7 @@ WRITE16_MEMBER(ninjaw_state::cpua_ctrl_w)
 		data = data >> 8;
 	m_cpua_ctrl = data;
 
-	parse_control(machine());
+	parse_control();
 
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
 }
@@ -351,16 +350,15 @@ WRITE16_MEMBER(ninjaw_state::cpua_ctrl_w)
             SOUND
 *****************************************/
 
-static void reset_sound_region( running_machine &machine )
+void ninjaw_state::reset_sound_region(  )
 {
-	ninjaw_state *state = machine.driver_data<ninjaw_state>();
-	state->membank("bank10")->set_entry(state->m_banknum);
+	membank("bank10")->set_entry(m_banknum);
 }
 
 WRITE8_MEMBER(ninjaw_state::sound_bankswitch_w)
 {
 	m_banknum = data & 7;
-	reset_sound_region(machine());
+	reset_sound_region();
 }
 
 WRITE16_MEMBER(ninjaw_state::ninjaw_sound_w)
@@ -791,8 +789,8 @@ static const tc0140syt_interface ninjaw_tc0140syt_intf =
 
 void ninjaw_state::ninjaw_postload()
 {
-	parse_control(machine());
-	reset_sound_region(machine());
+	parse_control();
+	reset_sound_region();
 }
 
 void ninjaw_state::machine_start()
