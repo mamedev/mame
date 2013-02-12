@@ -34,14 +34,64 @@ class intv_state : public driver_device
 {
 public:
 	intv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_intellivoice(*this, "sp0256_speech"),
-	m_sound(*this, "ay8914.1"),
-	m_ecs_sound(*this, "ay8914.2"),
-	m_intvkbd_dualport_ram(*this, "dualport_ram"),
-	m_videoram(*this, "videoram"),
-	m_keyboard(*this, "keyboard")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_intellivoice(*this, "sp0256_speech")
+		, m_sound(*this, "ay8914.1")
+		, m_ecs_sound(*this, "ay8914.2")
+		, m_intvkbd_dualport_ram(*this, "dualport_ram")
+		, m_videoram(*this, "videoram")
+		, m_keyboard(*this, "keyboard")
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_ecs_rom(*this, "ecs_rom")
+		, m_region_keyboard(*this, "keyboard")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_io_keypad1(*this, "KEYPAD1")
+		, m_io_disc1(*this, "DISC1")
+		, m_io_discx1(*this, "DISCX1")
+		, m_io_discy1(*this, "DISCY1")
+		, m_io_keypad2(*this, "KEYPAD2")
+		, m_io_disc2(*this, "DISC2")
+		, m_io_discx2(*this, "DISCX2")
+		, m_io_discy2(*this, "DISCY2")
+		, m_io_options(*this, "OPTIONS")
+		, m_io_ecs_row0(*this, "ECS_ROW0")
+		, m_io_ecs_row1(*this, "ECS_ROW1")
+		, m_io_ecs_row2(*this, "ECS_ROW2")
+		, m_io_ecs_row3(*this, "ECS_ROW3")
+		, m_io_ecs_row4(*this, "ECS_ROW4")
+		, m_io_ecs_row5(*this, "ECS_ROW5")
+		, m_io_ecs_row6(*this, "ECS_ROW6")
+		, m_io_ecs_synth_row0(*this, "ECS_SYNTH_ROW0")
+		, m_io_ecs_synth_row1(*this, "ECS_SYNTH_ROW1")
+		, m_io_ecs_synth_row2(*this, "ECS_SYNTH_ROW2")
+		, m_io_ecs_synth_row3(*this, "ECS_SYNTH_ROW3")
+		, m_io_ecs_synth_row4(*this, "ECS_SYNTH_ROW4")
+		, m_io_ecs_synth_row5(*this, "ECS_SYNTH_ROW5")
+		, m_io_ecs_synth_row6(*this, "ECS_SYNTH_ROW6")
+		, m_io_keypad3(*this, "KEYPAD3")
+		, m_io_disc3(*this, "DISC3")
+		, m_io_discx3(*this, "DISCX3")
+		, m_io_discy3(*this, "DISCY3")
+		, m_io_keypad4(*this, "KEYPAD4")
+		, m_io_disc4(*this, "DISC4")
+		, m_io_discx4(*this, "DISCX4")
+		, m_io_discy4(*this, "DISCY4")
+		, m_io_ecs_cntrlsel(*this, "ECS_CNTRLSEL")
+		, m_io_row0(*this, "ROW0")
+		, m_io_row1(*this, "ROW1")
+		, m_io_row2(*this, "ROW2")
+		, m_io_row3(*this, "ROW3")
+		, m_io_row4(*this, "ROW4")
+		, m_io_row5(*this, "ROW5")
+		, m_io_row6(*this, "ROW6")
+		, m_io_row7(*this, "ROW7")
+		, m_io_row8(*this, "ROW8")
+		, m_io_row9(*this, "ROW9")
+		, m_io_test(*this, "TEST")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -146,10 +196,73 @@ public:
 
 protected:
 	optional_device<cpu_device> m_keyboard;
+	required_memory_region m_region_maincpu;
+	optional_memory_region m_region_ecs_rom;
+	optional_memory_region m_region_keyboard;
+	optional_memory_bank m_bank1;
+	optional_memory_bank m_bank2;
+	optional_memory_bank m_bank3;
+	optional_memory_bank m_bank4;
+	required_ioport m_io_keypad1;
+	required_ioport m_io_disc1;
+	required_ioport m_io_discx1;
+	required_ioport m_io_discy1;
+	required_ioport m_io_keypad2;
+	required_ioport m_io_disc2;
+	required_ioport m_io_discx2;
+	required_ioport m_io_discy2;
+	required_ioport m_io_options;
+	optional_ioport m_io_ecs_row0;
+	optional_ioport m_io_ecs_row1;
+	optional_ioport m_io_ecs_row2;
+	optional_ioport m_io_ecs_row3;
+	optional_ioport m_io_ecs_row4;
+	optional_ioport m_io_ecs_row5;
+	optional_ioport m_io_ecs_row6;
+	optional_ioport m_io_ecs_synth_row0;
+	optional_ioport m_io_ecs_synth_row1;
+	optional_ioport m_io_ecs_synth_row2;
+	optional_ioport m_io_ecs_synth_row3;
+	optional_ioport m_io_ecs_synth_row4;
+	optional_ioport m_io_ecs_synth_row5;
+	optional_ioport m_io_ecs_synth_row6;
+	optional_ioport m_io_keypad3;
+	optional_ioport m_io_disc3;
+	optional_ioport m_io_discx3;
+	optional_ioport m_io_discy3;
+	optional_ioport m_io_keypad4;
+	optional_ioport m_io_disc4;
+	optional_ioport m_io_discx4;
+	optional_ioport m_io_discy4;
+	optional_ioport m_io_ecs_cntrlsel;
+	optional_ioport m_io_row0;
+	optional_ioport m_io_row1;
+	optional_ioport m_io_row2;
+	optional_ioport m_io_row3;
+	optional_ioport m_io_row4;
+	optional_ioport m_io_row5;
+	optional_ioport m_io_row6;
+	optional_ioport m_io_row7;
+	optional_ioport m_io_row8;
+	optional_ioport m_io_row9;
+	optional_ioport m_io_test;
+
+	int intv_load_rom_file(device_image_interface &image);
+	UINT8 intv_control_r(int hand);
+	void intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	UINT32 intv_get_pixel(bitmap_ind16 &bitmap, int x, int y);
+	void intv_plot_box(bitmap_ind16 &bm, int x, int y, int w, int h, int color);
+	int sprites_collide(int spriteNum1, int spriteNum2);
+	void determine_sprite_collisions();
+	void render_sprites();
+	void render_line(bitmap_ind16 &bitmap, UINT8 nextByte, UINT16 x, UINT16 y, UINT8 fgcolor, UINT8 bgcolor);
+	void render_colored_squares(bitmap_ind16 &bitmap, UINT16 x, UINT16 y, UINT8 color0, UINT8 color1, UINT8 color2, UINT8 color3);
+	void render_color_stack_mode(bitmap_ind16 &bitmap);
+	void render_fg_bg_mode(bitmap_ind16 &bitmap);
+	void copy_sprites_to_background(bitmap_ind16 &bitmap);
+	void render_background(bitmap_ind16 &bitmap);
+	void draw_borders(bitmap_ind16 &bm);
+	void intv_stic_screenrefresh();
 };
-
-/*----------- defined in video/intv.c -----------*/
-void intv_stic_screenrefresh(running_machine &machine);
-
 
 #endif /* INTV_H_ */

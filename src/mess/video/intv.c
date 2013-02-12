@@ -10,28 +10,28 @@
 
 /* initialized to non-zero, because we divide by it */
 
-INLINE void intv_set_pixel(intv_state *state, bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+void intv_state::intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
 {
 	int w, h;
 
 	// output scaling
-	x *= state->m_x_scale;
-	y *= state->m_y_scale;
+	x *= m_x_scale;
+	y *= m_y_scale;
 	color = SET_COLOR(color);
 
-	for (h = 0; h < state->m_y_scale; h++)
-		for (w = 0; w < state->m_x_scale; w++)
+	for (h = 0; h < m_y_scale; h++)
+		for (w = 0; w < m_x_scale; w++)
 			bitmap.pix16(y + h, x + w) = color;
 }
 
-INLINE UINT32 intv_get_pixel(intv_state *state, bitmap_ind16 &bitmap, int x, int y)
+UINT32 intv_state::intv_get_pixel(bitmap_ind16 &bitmap, int x, int y)
 {
-	return GET_COLOR(bitmap.pix16(y * state->m_y_scale, x * state->m_x_scale));
+	return GET_COLOR(bitmap.pix16(y * m_y_scale, x * m_x_scale));
 }
 
-INLINE void intv_plot_box(intv_state *state, bitmap_ind16 &bm, int x, int y, int w, int h, int color)
+void intv_state::intv_plot_box(bitmap_ind16 &bm, int x, int y, int w, int h, int color)
 {
-	bm.plot_box(x * state->m_x_scale, y * state->m_y_scale, w * state->m_x_scale, h * state->m_y_scale, SET_COLOR(color));
+	bm.plot_box(x * m_x_scale, y * m_y_scale, w * m_x_scale, h * m_y_scale, SET_COLOR(color));
 }
 
 void intv_state::video_start()
@@ -93,15 +93,15 @@ void intv_state::video_start()
 }
 
 
-static int sprites_collide(intv_state *state, int spriteNum1, int spriteNum2)
+int intv_state::sprites_collide(int spriteNum1, int spriteNum2)
 {
 	INT16 x0, y0, w0, h0, x1, y1, w1, h1, x2, y2, w2, h2;
 
-	intv_sprite_type* s1 = &state->m_sprite[spriteNum1];
-	intv_sprite_type* s2 = &state->m_sprite[spriteNum2];
+	intv_sprite_type* s1 = &m_sprite[spriteNum1];
+	intv_sprite_type* s2 = &m_sprite[spriteNum2];
 
-	x0 = STIC_OVERSCAN_LEFT_WIDTH + state->m_col_delay - STIC_CARD_WIDTH;
-	y0 = STIC_OVERSCAN_TOP_HEIGHT + state->m_row_delay - STIC_CARD_HEIGHT;
+	x0 = STIC_OVERSCAN_LEFT_WIDTH + m_col_delay - STIC_CARD_WIDTH;
+	y0 = STIC_OVERSCAN_TOP_HEIGHT + m_row_delay - STIC_CARD_HEIGHT;
 	x1 = (s1->xpos + x0) * STIC_X_SCALE; y1 = (s1->ypos + y0) * STIC_Y_SCALE;
 	x2 = (s2->xpos + x0) * STIC_X_SCALE; y2 = (s2->ypos + y0) * STIC_Y_SCALE;
 	w1 = (s1->doublex ? 2 : 1) * STIC_CARD_WIDTH;
@@ -126,8 +126,8 @@ static int sprites_collide(intv_state *state, int spriteNum1, int spriteNum2)
 	{
 		for (y0 = 0; y0 < h0; y0++)
 		{
-			if (state->m_sprite_buffers[spriteNum1][x0 + x1][y0 + y1] &&
-				state->m_sprite_buffers[spriteNum2][x0 + x2][y0 + y2])
+			if (m_sprite_buffers[spriteNum1][x0 + x1][y0 + y1] &&
+				m_sprite_buffers[spriteNum2][x0 + x2][y0 + y2])
 				return TRUE;
 		}
 	}
@@ -135,23 +135,23 @@ static int sprites_collide(intv_state *state, int spriteNum1, int spriteNum2)
 	return FALSE;
 }
 
-static void determine_sprite_collisions(intv_state *state)
+void intv_state::determine_sprite_collisions()
 {
 	// check sprite to sprite collisions
 	int i, j;
 	for (i = 0; i < STIC_MOBS - 1; i++)
 	{
-		intv_sprite_type* s1 = &state->m_sprite[i];
+		intv_sprite_type* s1 = &m_sprite[i];
 		if (s1->xpos == 0 || !s1->coll)
 			continue;
 
 		for (j = i + 1; j < STIC_MOBS; j++)
 		{
-			intv_sprite_type* s2 = &state->m_sprite[j];
+			intv_sprite_type* s2 = &m_sprite[j];
 			if (s2->xpos == 0 || !s2->coll)
 				continue;
 
-			if (sprites_collide(state, i, j))
+			if (sprites_collide(i, j))
 			{
 				s1->collision |= (1 << j);
 				s2->collision |= (1 << i);
@@ -160,9 +160,8 @@ static void determine_sprite_collisions(intv_state *state)
 	}
 }
 
-static void render_sprites(running_machine &machine)
+void intv_state::render_sprites()
 {
-	intv_state *state = machine.driver_data<intv_state>();
 	INT32 cardMemoryLocation, pixelSize;
 	INT32 spritePixelHeight;
 	INT32 nextMemoryLocation;
@@ -172,11 +171,11 @@ static void render_sprites(running_machine &machine)
 	INT32 xInc;
 	INT32 i, j, k;
 
-	UINT8* memory = state->memregion("maincpu")->base();
+	UINT8* memory = m_region_maincpu->base();
 
 	for (i = 0; i < STIC_MOBS; i++)
 	{
-		intv_sprite_type* s = &state->m_sprite[i];
+		intv_sprite_type* s = &m_sprite[i];
 
 		if (s->grom)
 			cardMemoryLocation = (s->card * STIC_CARD_HEIGHT);
@@ -192,7 +191,7 @@ static void render_sprites(running_machine &machine)
 			if (s->grom)
 				nextData = memory[(0x3000+nextMemoryLocation)<<1];
 			else if (nextMemoryLocation < 0x200)
-				nextData = state->m_gram[nextMemoryLocation];
+				nextData = m_gram[nextMemoryLocation];
 			else
 				nextData = 0xFFFF;
 			nextX = (s->xflip ? ((s->doublex ? 2 : 1) * STIC_CARD_WIDTH - 1) : 0);
@@ -201,66 +200,60 @@ static void render_sprites(running_machine &machine)
 
 			for (k = 0; k < STIC_CARD_WIDTH * (1 + s->doublex); k++)
 			{
-				state->m_sprite_buffers[i][nextX + k * xInc][nextY] = (nextData & (1 << ((STIC_CARD_WIDTH - 1) - k / (1 + s->doublex)))) != 0;
+				m_sprite_buffers[i][nextX + k * xInc][nextY] = (nextData & (1 << ((STIC_CARD_WIDTH - 1) - k / (1 + s->doublex)))) != 0;
 			}
 		}
 	}
 }
 
-static void render_line(running_machine &machine, bitmap_ind16 &bitmap,
-	UINT8 nextByte, UINT16 x, UINT16 y, UINT8 fgcolor, UINT8 bgcolor)
+void intv_state::render_line(bitmap_ind16 &bitmap, UINT8 nextByte, UINT16 x, UINT16 y, UINT8 fgcolor, UINT8 bgcolor)
 {
-	intv_state *state = machine.driver_data<intv_state>();
 	UINT32 color;
 	UINT8 i;
 
 	for (i = 0; i < STIC_CARD_WIDTH; i++)
 	{
 		color = (nextByte & (1 << ((STIC_CARD_WIDTH - 1) - i)) ? fgcolor : bgcolor);
-		intv_set_pixel(state, bitmap, x+i, y, color);
-		intv_set_pixel(state, bitmap, x+i, y+1, color);
+		intv_set_pixel(bitmap, x+i, y, color);
+		intv_set_pixel(bitmap, x+i, y+1, color);
 	}
 }
 
-static void render_colored_squares(running_machine &machine, bitmap_ind16 &bitmap,
-	UINT16 x, UINT16 y, UINT8 color0, UINT8 color1, UINT8 color2, UINT8 color3)
+void intv_state::render_colored_squares(bitmap_ind16 &bitmap, UINT16 x, UINT16 y, UINT8 color0, UINT8 color1, UINT8 color2, UINT8 color3)
 {
-	intv_state *state = machine.driver_data<intv_state>();
-
-	intv_plot_box(state, bitmap, x, y, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color0);
-	intv_plot_box(state, bitmap, x + STIC_CSQM_WIDTH * STIC_X_SCALE, y, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color1);
-	intv_plot_box(state, bitmap, x, y + STIC_CSQM_HEIGHT * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color2);
-	intv_plot_box(state, bitmap, x + STIC_CSQM_WIDTH * STIC_X_SCALE, y + STIC_CSQM_HEIGHT * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color3);
+	intv_plot_box(bitmap, x, y, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color0);
+	intv_plot_box(bitmap, x + STIC_CSQM_WIDTH * STIC_X_SCALE, y, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color1);
+	intv_plot_box(bitmap, x, y + STIC_CSQM_HEIGHT * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color2);
+	intv_plot_box(bitmap, x + STIC_CSQM_WIDTH * STIC_X_SCALE, y + STIC_CSQM_HEIGHT * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, color3);
 }
 
-static void render_color_stack_mode(running_machine &machine, bitmap_ind16 &bitmap)
+void intv_state::render_color_stack_mode(bitmap_ind16 &bitmap)
 {
-	intv_state *state = machine.driver_data<intv_state>();
 	INT16 w, h, nextx, nexty;
 	UINT8 csPtr = 0;
 	UINT16 nextCard;
-	UINT8 *ram = state->memregion("maincpu")->base();
+	UINT8 *ram = m_region_maincpu->base();
 
-	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + state->m_row_delay) * STIC_Y_SCALE;
+	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + m_row_delay) * STIC_Y_SCALE;
 			h < STIC_BACKTAB_HEIGHT;
 			h++, nexty += STIC_CARD_HEIGHT * STIC_Y_SCALE)
 	{
-		for (w = 0, nextx = (STIC_OVERSCAN_LEFT_WIDTH + state->m_col_delay) * STIC_X_SCALE;
+		for (w = 0, nextx = (STIC_OVERSCAN_LEFT_WIDTH + m_col_delay) * STIC_X_SCALE;
 				w < STIC_BACKTAB_WIDTH;
 				w++, nextx += STIC_CARD_WIDTH * STIC_X_SCALE)
 		{
-			nextCard = state->m_backtab_buffer[h][w];
+			nextCard = m_backtab_buffer[h][w];
 
 			// colored squares mode
 			if ((nextCard & (STIC_CSTM_FG3|STIC_CSTM_SEL)) == STIC_CSTM_FG3)
 			{
-				UINT8 csColor = state->m_stic_registers[STIC_CSR + csPtr];
+				UINT8 csColor = m_stic_registers[STIC_CSR + csPtr];
 				UINT8 color0 = nextCard & STIC_CSQM_A;
 				UINT8 color1 = (nextCard & STIC_CSQM_B) >> 3;
 				UINT8 color2 = (nextCard & STIC_CSQM_C) >> 6;
 				UINT8 color3 = ((nextCard & STIC_CSQM_D2) >> 11) |
 						((nextCard & (STIC_CSQM_D10)) >> 9);
-				render_colored_squares(machine, bitmap, nextx, nexty,
+				render_colored_squares(bitmap, nextx, nexty,
 						(color0 == 7 ? csColor : (color0 | FOREGROUND_BIT)),
 						(color1 == 7 ? csColor : (color1 | FOREGROUND_BIT)),
 						(color2 == 7 ? csColor : (color2 | FOREGROUND_BIT)),
@@ -279,7 +272,7 @@ static void render_color_stack_mode(running_machine &machine, bitmap_ind16 &bitm
 
 				fgcolor = ((nextCard & STIC_CSTM_FG3) >> 9) |
 						(nextCard & (STIC_CSTM_FG20)) | FOREGROUND_BIT;
-				bgcolor = state->m_stic_registers[STIC_CSR + csPtr] & STIC_CSR_BG;
+				bgcolor = m_stic_registers[STIC_CSR + csPtr] & STIC_CSR_BG;
 
 				isGrom = !(nextCard & STIC_CSTM_SEL);
 				if (isGrom)
@@ -287,15 +280,15 @@ static void render_color_stack_mode(running_machine &machine, bitmap_ind16 &bitm
 					memoryLocation = 0x3000 + (nextCard & STIC_CSTM_C);
 					memory = ram;
 					for (j = 0; j < STIC_CARD_HEIGHT; j++)
-						render_line(machine, bitmap, memory[(memoryLocation + j) * 2],
+						render_line(bitmap, memory[(memoryLocation + j) * 2],
 							nextx, nexty + j * STIC_Y_SCALE, fgcolor, bgcolor);
 				}
 				else
 				{
 					memoryLocation = (nextCard & STIC_CSTM_C50);
-					memory = state->m_gram;
+					memory = m_gram;
 					for (j = 0; j < STIC_CARD_HEIGHT; j++)
-						render_line(machine, bitmap, memory[memoryLocation + j],
+						render_line(bitmap, memory[memoryLocation + j],
 								nextx, nexty + j * STIC_Y_SCALE, fgcolor, bgcolor);
 				}
 			}
@@ -303,24 +296,23 @@ static void render_color_stack_mode(running_machine &machine, bitmap_ind16 &bitm
 	}
 }
 
-static void render_fg_bg_mode(running_machine &machine, bitmap_ind16 &bitmap)
+void intv_state::render_fg_bg_mode(bitmap_ind16 &bitmap)
 {
-	intv_state *state = machine.driver_data<intv_state>();
 	INT16 w, h, nextx, nexty;
 	UINT8 j, isGrom, fgcolor, bgcolor;
 	UINT16 nextCard, memoryLocation;
 	UINT8* memory;
-	UINT8* ram = state->memregion("maincpu")->base();
+	UINT8* ram = m_region_maincpu->base();
 
-	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + state->m_row_delay) * STIC_Y_SCALE;
+	for (h = 0, nexty = (STIC_OVERSCAN_TOP_HEIGHT + m_row_delay) * STIC_Y_SCALE;
 			h < STIC_BACKTAB_HEIGHT;
 			h++, nexty += STIC_CARD_HEIGHT * STIC_Y_SCALE)
 	{
-		for (w = 0, nextx = (STIC_OVERSCAN_LEFT_WIDTH + state->m_col_delay) * STIC_X_SCALE;
+		for (w = 0, nextx = (STIC_OVERSCAN_LEFT_WIDTH + m_col_delay) * STIC_X_SCALE;
 				w < STIC_BACKTAB_WIDTH;
 				w++, nextx += STIC_CARD_WIDTH * STIC_X_SCALE)
 		{
-			nextCard = state->m_backtab_buffer[h][w];
+			nextCard = m_backtab_buffer[h][w];
 			fgcolor = (nextCard & STIC_FBM_FG) | FOREGROUND_BIT;
 			bgcolor = ((nextCard & STIC_FBM_BG2) >> 11) |
 					((nextCard & STIC_FBM_BG310) >> 9);
@@ -331,24 +323,23 @@ static void render_fg_bg_mode(running_machine &machine, bitmap_ind16 &bitmap)
 				memoryLocation = 0x3000 + (nextCard & STIC_FBM_C);
 				memory = ram;
 				for (j = 0; j < STIC_CARD_HEIGHT; j++)
-					render_line(machine, bitmap, memory[(memoryLocation + j) * 2],
+					render_line(bitmap, memory[(memoryLocation + j) * 2],
 							nextx, nexty + j * STIC_Y_SCALE, fgcolor, bgcolor);
 			}
 			else
 			{
 				memoryLocation = (nextCard & STIC_FBM_C);
-				memory = state->m_gram;
+				memory = m_gram;
 				for (j = 0; j < STIC_CARD_HEIGHT; j++)
-					render_line(machine, bitmap, memory[memoryLocation + j],
+					render_line(bitmap, memory[memoryLocation + j],
 							nextx, nexty + j * STIC_Y_SCALE, fgcolor, bgcolor);
 			}
 		}
 	}
 }
 
-static void copy_sprites_to_background(running_machine &machine, bitmap_ind16 &bitmap)
+void intv_state::copy_sprites_to_background(bitmap_ind16 &bitmap)
 {
-	intv_state *state = machine.driver_data<intv_state>();
 	UINT8 width, currentPixel;
 	UINT8 borderCollision, foregroundCollision;
 	UINT8 spritePixelHeight, x, y;
@@ -358,7 +349,7 @@ static void copy_sprites_to_background(running_machine &machine, bitmap_ind16 &b
 
 	for (i = STIC_MOBS - 1; i >= 0; i--)
 	{
-		intv_sprite_type *s = &state->m_sprite[i];
+		intv_sprite_type *s = &m_sprite[i];
 		if (s->xpos == 0 || (!s->coll && !s->visible))
 			continue;
 
@@ -368,12 +359,12 @@ static void copy_sprites_to_background(running_machine &machine, bitmap_ind16 &b
 		spritePixelHeight = (s->quady ? 4 : 1) * (s->doubley ? 2 : 1) * (s->doubleyres ? 2 : 1) * STIC_CARD_HEIGHT;
 		width = (s->doublex ? 2 : 1) * STIC_CARD_WIDTH;
 
-		leftX = (s->xpos - STIC_CARD_WIDTH + STIC_OVERSCAN_LEFT_WIDTH + state->m_col_delay) * STIC_X_SCALE;
-		nextY = (s->ypos - STIC_CARD_HEIGHT + STIC_OVERSCAN_TOP_HEIGHT + state->m_row_delay) * STIC_Y_SCALE;
+		leftX = (s->xpos - STIC_CARD_WIDTH + STIC_OVERSCAN_LEFT_WIDTH + m_col_delay) * STIC_X_SCALE;
+		nextY = (s->ypos - STIC_CARD_HEIGHT + STIC_OVERSCAN_TOP_HEIGHT + m_row_delay) * STIC_Y_SCALE;
 
-		leftBorder =  (STIC_OVERSCAN_LEFT_WIDTH + (state->m_left_edge_inhibit ? STIC_CARD_WIDTH : 0)) * STIC_X_SCALE;
+		leftBorder =  (STIC_OVERSCAN_LEFT_WIDTH + (m_left_edge_inhibit ? STIC_CARD_WIDTH : 0)) * STIC_X_SCALE;
 		rightBorder = (STIC_OVERSCAN_LEFT_WIDTH + STIC_BACKTAB_WIDTH * STIC_CARD_WIDTH - 1 - 1) * STIC_X_SCALE;
-		topBorder = (STIC_OVERSCAN_TOP_HEIGHT + (state->m_top_edge_inhibit ? STIC_CARD_HEIGHT : 0)) * STIC_Y_SCALE;
+		topBorder = (STIC_OVERSCAN_TOP_HEIGHT + (m_top_edge_inhibit ? STIC_CARD_HEIGHT : 0)) * STIC_Y_SCALE;
 		bottomBorder = (STIC_OVERSCAN_TOP_HEIGHT + STIC_BACKTAB_HEIGHT * STIC_CARD_HEIGHT) * STIC_Y_SCALE - 1;
 
 		for (y = 0; y < spritePixelHeight; y++)
@@ -381,7 +372,7 @@ static void copy_sprites_to_background(running_machine &machine, bitmap_ind16 &b
 			for (x = 0; x < width; x++)
 			{
 				//if this sprite pixel is not on, then don't paint it
-				if (!state->m_sprite_buffers[i][x][y])
+				if (!m_sprite_buffers[i][x][y])
 					continue;
 
 				nextX = leftX + x;
@@ -394,7 +385,7 @@ static void copy_sprites_to_background(running_machine &machine, bitmap_ind16 &b
 					continue;
 				}
 
-				currentPixel = intv_get_pixel(state, bitmap, nextX, nextY);
+				currentPixel = intv_get_pixel(bitmap, nextX, nextY);
 
 				//check for foreground collision
 				if (currentPixel & FOREGROUND_BIT)
@@ -406,7 +397,7 @@ static void copy_sprites_to_background(running_machine &machine, bitmap_ind16 &b
 
 				if (s->visible)
 				{
-					intv_set_pixel(state, bitmap, nextX, nextY, s->color | (currentPixel & FOREGROUND_BIT));
+					intv_set_pixel(bitmap, nextX, nextY, s->color | (currentPixel & FOREGROUND_BIT));
 				}
 			}
 			nextY++;
@@ -423,13 +414,12 @@ static void copy_sprites_to_background(running_machine &machine, bitmap_ind16 &b
 	}
 }
 
-static void render_background(running_machine &machine, bitmap_ind16 &bitmap)
+void intv_state::render_background(bitmap_ind16 &bitmap)
 {
-	intv_state *state = machine.driver_data<intv_state>();
-	if (state->m_color_stack_mode)
-		render_color_stack_mode(machine, bitmap);
+	if (m_color_stack_mode)
+		render_color_stack_mode(bitmap);
 	else
-		render_fg_bg_mode(machine, bitmap);
+		render_fg_bg_mode(bitmap);
 }
 
 #ifdef UNUSED_CODE
@@ -478,10 +468,10 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, int 
 					if (colorb == 7) colorb = state->m_stic_registers[STIC_CSR + STIC_CSR3];
 					if (colorc == 7) colorc = state->m_stic_registers[STIC_CSR + STIC_CSR3];
 					if (colord == 7) colord = state->m_stic_registers[STIC_CSR + STIC_CSR3];
-					intv_plot_box(state, bitmap, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colora);
-					intv_plot_box(state, bitmap, (x0 + col * STIC_CARD_WIDTH + STIC_CSQM_WIDTH)) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colorb);
-					intv_plot_box(state, bitmap, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + STIC_CSQM_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colorc);
-					intv_plot_box(state, bitmap, (x0 + col * STIC_CARD_WIDTH + STIC_CSQM_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + STIC_CSQM_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colord);
+					intv_plot_box(bitmap, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colora);
+					intv_plot_box(bitmap, (x0 + col * STIC_CARD_WIDTH + STIC_CSQM_WIDTH)) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colorb);
+					intv_plot_box(bitmap, (x0 + col * STIC_CARD_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + STIC_CSQM_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colorc);
+					intv_plot_box(bitmap, (x0 + col * STIC_CARD_WIDTH + STIC_CSQM_WIDTH) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + STIC_CSQM_HEIGHT) * STIC_Y_SCALE, STIC_CSQM_WIDTH * STIC_X_SCALE, STIC_CSQM_HEIGHT * STIC_Y_SCALE, colord);
 				}
 				else // normal color stack mode
 				{
@@ -519,7 +509,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, int 
 
 						for(j=0;j<8;j++)
 						{
-							//intv_set_pixel(state, bitmap, (x0 + col * STIC_CARD_WIDTH + j) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + 7) * STIC_Y_SCALE + 1, 1);
+							//intv_set_pixel(bitmap, (x0 + col * STIC_CARD_WIDTH + j) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + 7) * STIC_Y_SCALE + 1, 1);
 						}
 
 					}
@@ -533,7 +523,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, int 
 
 						for(j=0;j<8;j++)
 						{
-							//intv_set_pixel(state, bitmap, (x0 + col * STIC_CARD_WIDTH + j) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + 7) * STIC_Y_SCALE + 1, 2);
+							//intv_set_pixel(bitmap, (x0 + col * STIC_CARD_WIDTH + j) * STIC_X_SCALE, (y0 + row * STIC_CARD_HEIGHT + 7) * STIC_Y_SCALE + 1, 2);
 						}
 					}
 				}
@@ -685,41 +675,38 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, int beh
 }
 #endif
 
-static void draw_borders(running_machine &machine, bitmap_ind16 &bm)
+void intv_state::draw_borders(bitmap_ind16 &bm)
 {
-	intv_state *state = machine.driver_data<intv_state>();
+	intv_plot_box(bm, 0, 0, (STIC_OVERSCAN_LEFT_WIDTH + (m_left_edge_inhibit ? STIC_CARD_WIDTH : m_col_delay)) * STIC_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT + STIC_BACKTAB_HEIGHT * STIC_CARD_HEIGHT + STIC_OVERSCAN_BOTTOM_HEIGHT) * STIC_Y_SCALE, m_border_color);
+	intv_plot_box(bm, (STIC_OVERSCAN_LEFT_WIDTH + STIC_BACKTAB_WIDTH * STIC_CARD_WIDTH - 1) * STIC_X_SCALE, 0, STIC_OVERSCAN_RIGHT_WIDTH, (STIC_OVERSCAN_TOP_HEIGHT + STIC_BACKTAB_HEIGHT * STIC_CARD_HEIGHT + STIC_OVERSCAN_BOTTOM_HEIGHT) * STIC_Y_SCALE, m_border_color);
 
-	intv_plot_box(state, bm, 0, 0, (STIC_OVERSCAN_LEFT_WIDTH + (state->m_left_edge_inhibit ? STIC_CARD_WIDTH : state->m_col_delay)) * STIC_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT + STIC_BACKTAB_HEIGHT * STIC_CARD_HEIGHT + STIC_OVERSCAN_BOTTOM_HEIGHT) * STIC_Y_SCALE, state->m_border_color);
-	intv_plot_box(state, bm, (STIC_OVERSCAN_LEFT_WIDTH + STIC_BACKTAB_WIDTH * STIC_CARD_WIDTH - 1) * STIC_X_SCALE, 0, STIC_OVERSCAN_RIGHT_WIDTH, (STIC_OVERSCAN_TOP_HEIGHT + STIC_BACKTAB_HEIGHT * STIC_CARD_HEIGHT + STIC_OVERSCAN_BOTTOM_HEIGHT) * STIC_Y_SCALE, state->m_border_color);
-
-	intv_plot_box(state, bm, 0, 0, (STIC_OVERSCAN_LEFT_WIDTH + STIC_BACKTAB_WIDTH * STIC_CARD_WIDTH - 1 + STIC_OVERSCAN_RIGHT_WIDTH) * STIC_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT + (state->m_top_edge_inhibit ? STIC_CARD_HEIGHT : state->m_row_delay)) * STIC_Y_SCALE, state->m_border_color);
-	intv_plot_box(state, bm, 0, (STIC_OVERSCAN_TOP_HEIGHT + STIC_BACKTAB_HEIGHT * STIC_CARD_HEIGHT) * STIC_Y_SCALE, (STIC_OVERSCAN_LEFT_WIDTH + STIC_BACKTAB_WIDTH * STIC_CARD_WIDTH - 1 + STIC_OVERSCAN_RIGHT_WIDTH) * STIC_X_SCALE, STIC_OVERSCAN_BOTTOM_HEIGHT * STIC_Y_SCALE, state->m_border_color);
+	intv_plot_box(bm, 0, 0, (STIC_OVERSCAN_LEFT_WIDTH + STIC_BACKTAB_WIDTH * STIC_CARD_WIDTH - 1 + STIC_OVERSCAN_RIGHT_WIDTH) * STIC_X_SCALE, (STIC_OVERSCAN_TOP_HEIGHT + (m_top_edge_inhibit ? STIC_CARD_HEIGHT : m_row_delay)) * STIC_Y_SCALE, m_border_color);
+	intv_plot_box(bm, 0, (STIC_OVERSCAN_TOP_HEIGHT + STIC_BACKTAB_HEIGHT * STIC_CARD_HEIGHT) * STIC_Y_SCALE, (STIC_OVERSCAN_LEFT_WIDTH + STIC_BACKTAB_WIDTH * STIC_CARD_WIDTH - 1 + STIC_OVERSCAN_RIGHT_WIDTH) * STIC_X_SCALE, STIC_OVERSCAN_BOTTOM_HEIGHT * STIC_Y_SCALE, m_border_color);
 }
 
-void intv_stic_screenrefresh(running_machine &machine)
+void intv_state::intv_stic_screenrefresh()
 {
-	intv_state *state = machine.driver_data<intv_state>();
 	int i;
 
-	if (state->m_stic_handshake != 0)
+	if (m_stic_handshake != 0)
 	{
-		state->m_stic_handshake = 0;
+		m_stic_handshake = 0;
 		// Render the background
-		render_background(machine, state->m_bitmap);
+		render_background(m_bitmap);
 		// Render the sprites into their buffers
-		render_sprites(machine);
-		for (i = 0; i < STIC_MOBS; i++) state->m_sprite[i].collision = 0;
+		render_sprites();
+		for (i = 0; i < STIC_MOBS; i++) m_sprite[i].collision = 0;
 		// Copy the sprites to the background
-		copy_sprites_to_background(machine, state->m_bitmap);
-		determine_sprite_collisions(state);
-		for (i = 0; i < STIC_MOBS; i++) state->m_stic_registers[STIC_MCR + i] |= state->m_sprite[i].collision;
+		copy_sprites_to_background(m_bitmap);
+		determine_sprite_collisions();
+		for (i = 0; i < STIC_MOBS; i++) m_stic_registers[STIC_MCR + i] |= m_sprite[i].collision;
 		/* draw the screen borders if enabled */
-		draw_borders(machine, state->m_bitmap);
+		draw_borders(m_bitmap);
 	}
 	else
 	{
 		/* STIC disabled, just fill with border color */
-		state->m_bitmap.fill(SET_COLOR(state->m_border_color));
+		m_bitmap.fill(SET_COLOR(m_border_color));
 	}
 }
 
@@ -729,7 +716,6 @@ void intv_stic_screenrefresh(running_machine &machine)
 
 	READ8_MEMBER( intv_state::intvkbd_tms9927_r )
 {
-	//intv_state *state = space.machine().driver_data<intv_state>();
 	UINT8 rv;
 	switch (offset)
 	{
@@ -752,7 +738,6 @@ void intv_stic_screenrefresh(running_machine &machine)
 
 WRITE8_MEMBER( intv_state::intvkbd_tms9927_w )
 {
-	//intv_state *state = space.machine().driver_data<intv_state>();
 	switch (offset)
 	{
 		case 3:
