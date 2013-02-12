@@ -340,7 +340,7 @@ bool debug_comment_save(running_machine &machine)
 		device_iterator iter(machine.root_device());
 		bool found_comments = false;
 		for (device_t *device = iter.first(); device != NULL; device = iter.next())
-			if (device->debug()->comment_count() > 0)
+			if (device->debug() && device->debug()->comment_count() > 0)
 			{
 				// create a node for this device
 				xml_data_node *curnode = xml_add_child(systemnode, "cpu", NULL);
