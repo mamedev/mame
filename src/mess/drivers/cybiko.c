@@ -382,16 +382,38 @@ MACHINE_CONFIG_END
 ROM_START( cybikov1 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "cyrom112.bin", 0, 0x8000, CRC(9e1f1a0f) SHA1(6fc08de6b2c67d884ec78f748e4a4bad27ee8045) )
+
+	ROM_REGION( 0x84000, "flash1", 0 )
+	ROM_LOAD( "flash1.bin", 0, 0x84000, NO_DUMP )
 ROM_END
 
 ROM_START( cybikov2 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "cyrom117.bin", 0, 0x8000, CRC(268da7bf) SHA1(135eaf9e3905e69582aabd9b06bc4de0a66780d5) )
+
+	ROM_SYSTEM_BIOS( 0, "v1358", "v1.3.58" )
+	ROM_SYSTEM_BIOS( 1, "v1357", "v1.3.57" )
+	ROM_SYSTEM_BIOS( 2, "v1355", "v1.3.55" )
+
+	ROM_REGION( 0x84000, "flash1", 0 )
+	ROMX_LOAD( "flash_v1358.bin", 0, 0x84000, CRC(e485880f) SHA1(e414d6d2f876c7c811946bcdfcb6212999412381), ROM_BIOS(1) )
+	ROMX_LOAD( "flash_v1357.bin", 0, 0x84000, CRC(9fd3c058) SHA1(dad0c3db0f11c91747db6ccc1900004432afb881), ROM_BIOS(2) )
+	ROMX_LOAD( "flash_v1355.bin", 0, 0x84000, CRC(497a5bbe) SHA1(0af611424cbf287b26c668a3109fb0861a27f603), ROM_BIOS(3) )
+
+	ROM_REGION( 0x40000, "flash2", 0 )
+	ROMX_LOAD( "cyos_v1358.bin", 0, 0x40000, CRC(05ca4ece) SHA1(eee329e8541e1e36c22acb1317378ce23ccd1e12), ROM_BIOS(1) )
+	ROMX_LOAD( "cyos_v1357.bin", 0, 0x40000, CRC(54ba7d43) SHA1(c6e0f7982e0f7a5fa65f2cecc8b27cb21909a407), ROM_BIOS(2) )
+	ROMX_LOAD( "cyos_v1355.bin", 0, 0x40000, CRC(02d3dba5) SHA1(4ed728940bbcb3d2464fc7fba14d17924ece94aa), ROM_BIOS(3) )
 ROM_END
 
 ROM_START( cybikoxt )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "cyrom150.bin", 0, 0x8000, CRC(18b9b21f) SHA1(28868d6174eb198a6cec6c3c70b6e494517229b9) )
+
+	ROM_SYSTEM_BIOS( 0, "v1508", "v1.5.08" )
+
+	ROM_REGION( 0x80000, "flashxt", 0 )
+	ROMX_LOAD( "cyos_v1508.bin", 0, 0x80000, CRC(f79400ba) SHA1(537a88e238746b3944b0cdfd4b0a9396460b2977), ROM_BIOS(1) )
 ROM_END
 
 //////////////
