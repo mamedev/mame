@@ -3027,9 +3027,6 @@ void saturn_state::stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle
 	int x_index_base, y_index, sx, sy, ex, ey;
 	int xinc, yinc;
 
-	if(stv2_current_tilemap.window_control & 6)
-		popmessage("Window Enabled for Alpha");
-
 	xinc = flipx ? -1 : 1;
 	yinc = flipy ? -1 : 1;
 
@@ -3083,9 +3080,12 @@ void saturn_state::stv_vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle
 				int x_index = x_index_base;
 				for (x = sx; x < ex; x++)
 				{
-					int c = (source[x_index]);
-					if (c != transparent_color)
-						dest[x] = alpha_blend_r32( dest[x], pal[c], alpha );;
+					if(stv_vdp2_window_process(x,y))
+					{
+						int c = (source[x_index]);
+						if (c != transparent_color)
+							dest[x] = alpha_blend_r32( dest[x], pal[c], alpha );;
+					}
 
 					x_index += xinc;
 				}
@@ -3157,12 +3157,12 @@ void saturn_state::stv_vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectan
 				int x_index = x_index_base;
 				for (x = sx; x < ex; x++)
 				{
-					if(!stv_vdp2_window_process(x,y))
-						continue;
-
-					int c = (source[x_index]);
-					if (c != transparent_color)
-						dest[x] = pal[c];
+					if(stv_vdp2_window_process(x,y))
+					{
+						int c = (source[x_index]);
+						if (c != transparent_color)
+							dest[x] = pal[c];
+					}
 
 					x_index += xinc;
 				}
@@ -5734,6 +5734,7 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 
 		if ( window_control )
 		{
+			popmessage("Window control for RBG");
 			stv2_current_tilemap.window_control = window_control;
 			stv_vdp2_apply_window_on_layer(mycliprect);
 		}
