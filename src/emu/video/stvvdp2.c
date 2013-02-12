@@ -6630,7 +6630,6 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	UINT8 sprite_priorities[8];
 	UINT8 sprite_ccr[8];
 	int sprite_color_mode = STV_VDP2_SPCLMD;
-	rectangle mycliprect;
 
 	if ( (stv_sprite_priorities_usage_valid == 1) && (stv_sprite_priorities_used[pri] == 0) )
 		return;
@@ -6712,15 +6711,14 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 											(STV_VDP2_SPW0A * 0x10) |
 											(STV_VDP2_SPW1A * 0x20) |
 											(STV_VDP2_SPSWA * 0x40);
-	mycliprect = cliprect;
 
-	stv_vdp2_apply_window_on_layer(mycliprect);
+//	stv_vdp2_apply_window_on_layer(mycliprect);
 
 	if (interlace_framebuffer == 0 && double_x == 0 )
 	{
 		if ( alpha_enabled == 0 )
 		{
-			for ( y = mycliprect.min_y; y <= mycliprect.max_y; y++ )
+			for ( y = cliprect.min_y; y <= cliprect.max_y; y++ )
 			{
 				if ( stv_sprite_priorities_usage_valid )
 					if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
@@ -6729,8 +6727,11 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				framebuffer_line = m_vdp1.framebuffer_display_lines[y];
 				bitmap_line = &bitmap.pix32(y);
 
-				for ( x = mycliprect.min_x; x <= mycliprect.max_x; x++ )
+				for ( x = cliprect.min_x; x <= cliprect.max_x; x++ )
 				{
+					if(!stv_vdp2_window_process(x,y))
+						continue;
+
 					pix = framebuffer_line[x];
 					if ( (pix & 0x8000) && sprite_color_mode)
 					{
@@ -6800,7 +6801,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 		}
 		else //alpha_enabled == 1
 		{
-			for ( y = mycliprect.min_y; y <= mycliprect.max_y; y++ )
+			for ( y = cliprect.min_y; y <= cliprect.max_y; y++ )
 			{
 				if ( stv_sprite_priorities_usage_valid )
 					if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
@@ -6809,8 +6810,11 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				framebuffer_line = m_vdp1.framebuffer_display_lines[y];
 				bitmap_line = &bitmap.pix32(y);
 
-				for ( x = mycliprect.min_x; x <= mycliprect.max_x; x++ )
+				for ( x = cliprect.min_x; x <= cliprect.max_x; x++ )
 				{
+					if(!stv_vdp2_window_process(x,y))
+						continue;
+
 					pix = framebuffer_line[x];
 					if ( (pix & 0x8000) && sprite_color_mode)
 					{
@@ -6906,7 +6910,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	}
 	else
 	{
-		for ( y = mycliprect.min_y; y <= mycliprect.max_y / (interlace_framebuffer+1); y++ )
+		for ( y = cliprect.min_y; y <= cliprect.max_y / (interlace_framebuffer+1); y++ )
 		{
 			if ( stv_sprite_priorities_usage_valid )
 				if (stv_sprite_priorities_in_fb_line[y][pri] == 0)
@@ -6923,8 +6927,11 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 				bitmap_line2 = &bitmap.pix32(2*y + 1);
 			}
 
-			for ( x = mycliprect.min_x; x <= mycliprect.max_x /(double_x+1) ; x++ )
+			for ( x = cliprect.min_x; x <= cliprect.max_x /(double_x+1) ; x++ )
 			{
+				if(!stv_vdp2_window_process(x,y))
+					continue;
+
 				pix = framebuffer_line[x];
 				if ( (pix & 0x8000) && sprite_color_mode)
 				{
