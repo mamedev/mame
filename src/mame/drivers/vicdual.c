@@ -184,7 +184,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_get_timer_value)
 
 int vicdual_is_cabinet_color(running_machine &machine)
 {
-	return (machine.root_device().ioport(COLOR_BW_PORT_TAG)->read() & 1) ? 0 : 1;
+	return (machine.root_device().ioport(COLOR_BW_PORT_TAG)->read_safe(0) & 1) ? 0 : 1;
 }
 
 
@@ -616,6 +616,13 @@ static INPUT_PORTS_START( headon )
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( headons )
+	PORT_INCLUDE( headon )
+	
+	PORT_MODIFY(COLOR_BW_PORT_TAG)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) /* no color/bw option */
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( supcrash )
 	PORT_START("IN0")
@@ -641,8 +648,6 @@ static INPUT_PORTS_START( supcrash )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x7a, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, vicdual_state,vicdual_read_coin_status, NULL)
-
-	PORT_CABINET_COLOR_OR_BW
 
 	PORT_COIN_DEFAULT
 INPUT_PORTS_END
@@ -3402,10 +3407,10 @@ GAME( 1979, sspaceatc,  sspaceat, sspaceat,  sspaceat,  driver_device, 0, ROT270
 GAME( 1979, sspacaho,   0,        sspacaho,  sspacaho,  driver_device, 0, ROT270, "Sega", "Space Attack / Head On", GAME_NO_SOUND )
 GAME( 1979, headon,     0,        headon,    headon,    driver_device, 0, ROT0,   "Gremlin", "Head On (2 players)",  GAME_IMPERFECT_SOUND )
 GAME( 1979, headon1,    headon,   headon,    headon,    driver_device, 0, ROT0,   "Gremlin", "Head On (1 player)",  GAME_IMPERFECT_SOUND )
-GAME( 1979, headons,    headon,   headons,   headon,    driver_device, 0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 1)",  GAME_IMPERFECT_SOUND )
-GAME( 1979, headonsa,   headon,   headons,   headon,    driver_device, 0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)",  GAME_NOT_WORKING ) // won't coin up?
+GAME( 1979, headons,    headon,   headons,   headons,   driver_device, 0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 1)",  GAME_IMPERFECT_SOUND )
+GAME( 1979, headonsa,   headon,   headons,   headons,   driver_device, 0, ROT0,   "bootleg (Sidam)", "Head On (Sidam bootleg, set 2)",  GAME_NOT_WORKING ) // won't coin up?
 GAME( 1979, supcrash,   headon,   headons,   supcrash,  driver_device, 0, ROT0,   "bootleg", "Super Crash (bootleg of Head On)", GAME_NO_SOUND )
-GAME( 1979, hocrash,    headon,   headons,   headon,    driver_device, 0, ROT0,   "bootleg (Fraber)", "Crash (bootleg of Head On)", GAME_IMPERFECT_SOUND )
+GAME( 1979, hocrash,    headon,   headons,   headons,   driver_device, 0, ROT0,   "bootleg (Fraber)", "Crash (bootleg of Head On)", GAME_IMPERFECT_SOUND )
 GAME( 1979, headon2,    0,        headon2,   headon2,   driver_device, 0, ROT0,   "Sega", "Head On 2",  GAME_IMPERFECT_SOUND )
 GAME( 1979, headon2s,   headon2,  headon2bw, car2,      driver_device, 0, ROT0,   "bootleg (Sidam)", "Head On 2 (Sidam bootleg)",  GAME_NOT_WORKING ) // won't coin up?
 GAME( 1979, car2,       headon2,  headon2bw, car2,      driver_device, 0, ROT0,   "bootleg (RZ Bologna)", "Car 2 (bootleg of Head On 2)",  GAME_IMPERFECT_SOUND ) // title still says 'HeadOn 2'
