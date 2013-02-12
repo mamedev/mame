@@ -1,6 +1,6 @@
 static UINT8 I386OP(shift_rotate8)(i386_state *cpustate, UINT8 modrm, UINT32 value, UINT8 shift)
 {
-	UINT8 src = value;
+	UINT32 src = value & 0xff;
 	UINT8 dst = value;
 
 	if( shift == 0 ) {
@@ -115,7 +115,7 @@ static UINT8 I386OP(shift_rotate8)(i386_state *cpustate, UINT8 modrm, UINT32 val
 			case 6:
 				shift &= 31;
 				dst = src << shift;
-				cpustate->CF = (src >> (8 - shift)) & 0x1;
+				cpustate->CF = (shift <= 8) && (src >> (8 - shift));
 				SetSZPF8(dst);
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;

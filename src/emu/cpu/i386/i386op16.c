@@ -1,6 +1,6 @@
 static UINT16 I386OP(shift_rotate16)(i386_state *cpustate, UINT8 modrm, UINT32 value, UINT8 shift)
 {
-	UINT16 src = value;
+	UINT32 src = value & 0xffff;
 	UINT16 dst = value;
 
 	if( shift == 0 ) {
@@ -114,7 +114,7 @@ static UINT16 I386OP(shift_rotate16)(i386_state *cpustate, UINT8 modrm, UINT32 v
 			case 6:
 				shift &= 31;
 				dst = src << shift;
-				cpustate->CF = (src & (1 << (16-shift))) ? 1 : 0;
+				cpustate->CF = (shift <= 16) && (src & (1 << (16-shift)));
 				SetSZPF16(dst);
 				CYCLES_RM(cpustate,modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
