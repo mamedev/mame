@@ -6076,7 +6076,7 @@ Undumped Pirates:
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="524288">
 				<rom name="full time soccer &amp; hang time basketball (europe) (unl).bin" size="524288" crc="0634c196" sha1="aefb746984b3450b90bbfaa5de21a252685ddabb" offset="000000" />
 			</dataarea>
@@ -6090,7 +6090,7 @@ Undumped Pirates:
 		<year>2000</year>
 		<publisher>Rocket Games</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
 				<rom name="full time soccer (europe) (unl).bin" size="262144" crc="b99beda2" sha1="a2b1268df08b583d033999b894638dadf32e37f4" offset="000000" />
 			</dataarea>
@@ -7476,7 +7476,7 @@ Undumped Pirates:
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
 				<rom name="hang time basketball (europe) (unl).bin" size="262144" crc="3207b7d9" sha1="340201c045c020be6de3504fdecbce1ff07a2139" offset="000000" />
 			</dataarea>
@@ -9037,7 +9037,7 @@ Undumped Pirates:
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
 				<rom name="karate joe (europe) (unl).bin" size="262144" crc="b8a54e29" sha1="bc9e760dcc851a01240b49b28cde8fe5ab18df91" offset="000000" />
 			</dataarea>
@@ -14214,7 +14214,7 @@ Undumped Pirates:
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
 				<rom name="painter (europe) (unl).bin" size="262144" crc="f4801f21" sha1="78db482d1d12b4556b6a5b995ce37a2435236a06" offset="000000" />
 			</dataarea>
@@ -14926,7 +14926,7 @@ Undumped Pirates:
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="524288">
 				<rom name="pocket smash out &amp; race time (europe) (unl).bin" size="524288" crc="0ad5b775" sha1="01f68a0a45408da9892b8cc0a4a9c688dcdd9618" offset="000000" />
 			</dataarea>
@@ -14939,7 +14939,7 @@ Undumped Pirates:
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
 				<rom name="pocket smash out (europe) (unl).bin" size="262144" crc="cbd14276" sha1="0a721164053a8b2765ea9826a0958415701ca6f5" offset="000000" />
 			</dataarea>
@@ -16516,7 +16516,7 @@ Undumped Pirates:
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="262144">
 				<rom name="race time (europe) (unl).bin" size="262144" crc="599c867d" sha1="157f15e601dfb858630a53313b71e4ecd0bb13e1" offset="000000" />
 			</dataarea>
@@ -18556,7 +18556,7 @@ Undumped Pirates:
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="524288">
 				<rom name="space invasion &amp; karate joe (europe) (unl).bin" size="524288" crc="6a184c55" sha1="96918cbd3648b227eb43e5a9711d1a9939541bea" offset="000000" />
 			</dataarea>
@@ -18571,7 +18571,7 @@ Undumped Pirates:
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="524288">
 				<rom name="space invasion &amp; painter (europe) (unl).bin" size="524288" crc="bd4c1065" sha1="a5bf26ed894576dada84f6925cc659980cf150a0" offset="000000" />
 			</dataarea>
@@ -18586,7 +18586,7 @@ Undumped Pirates:
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="slot" value="rom_atvrac" />
 			<dataarea name="rom" size="131072">
 				<rom name="space invasion (europe) (unl).bin" size="131072" crc="2b2d9868" sha1="bcf0940375a23bca6957eec2ab8e49af695aeb32" offset="000000" />
 			</dataarea>
@@ -22692,7 +22692,7 @@ Undumped Pirates:
 		<publisher>Sachen</publisher>
 		<info name="serial" value="EB-001"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="mapper" value="unknown" />
+			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="262144">
 				<rom name="beast fighter (asia) (unl).bin" size="262144" crc="018c5819" sha1="f57db0fcf9dbfc40bd1971467b46f6cacc90a3a3" offset="000000" />
 			</dataarea>
