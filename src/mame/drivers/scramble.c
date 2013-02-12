@@ -262,11 +262,11 @@ static ADDRESS_MAP_START( hunchbks_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE_LEGACY(hunchbks_mirror_r, hunchbks_mirror_w)
+	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(hunchbks_mirror_r, hunchbks_mirror_w)
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x5fff) AM_READWRITE_LEGACY(hunchbks_mirror_r, hunchbks_mirror_w)
+	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(hunchbks_mirror_r, hunchbks_mirror_w)
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE_LEGACY(hunchbks_mirror_r, hunchbks_mirror_w)
+	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(hunchbks_mirror_r, hunchbks_mirror_w)
 ADDRESS_MAP_END
 
 
@@ -342,8 +342,8 @@ static ADDRESS_MAP_START( triplep_io_map, AS_IO, 8, scramble_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("8910.1", ay8910_data_address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("8910.1", ay8910_r)
-	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(triplep_pip_r)
-	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(triplep_pap_r)
+	AM_RANGE(0x02, 0x02) AM_READ(triplep_pip_r)
+	AM_RANGE(0x03, 0x03) AM_READ(triplep_pap_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotshock_sound_io_map, AS_IO, 8, scramble_state )

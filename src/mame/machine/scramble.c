@@ -73,18 +73,18 @@ READ8_MEMBER(scramble_state::scramble_protection_r)
 }
 
 
-static READ8_HANDLER( mariner_protection_1_r )
+READ8_MEMBER(scramble_state::mariner_protection_1_r )
 {
 	return 7;
 }
 
-static READ8_HANDLER( mariner_protection_2_r )
+READ8_MEMBER(scramble_state::mariner_protection_2_r )
 {
 	return 3;
 }
 
 
-READ8_HANDLER( triplep_pip_r )
+READ8_MEMBER(scramble_state::triplep_pip_r )
 {
 	logerror("PC %04x: triplep read port 2\n",space.device().safe_pc());
 	if (space.device().safe_pc() == 0x015a) return 0xff;
@@ -92,7 +92,7 @@ READ8_HANDLER( triplep_pip_r )
 	else return 0;
 }
 
-READ8_HANDLER( triplep_pap_r )
+READ8_MEMBER(scramble_state::triplep_pap_r )
 {
 	logerror("PC %04x: triplep read port 3\n",space.device().safe_pc());
 	if (space.device().safe_pc() == 0x015d) return 0x04;
@@ -111,37 +111,35 @@ void scramble_state::cavelon_banksw()
 	membank("bank1")->set_entry(m_cavelon_bank);
 }
 
-static READ8_HANDLER( cavelon_banksw_r )
+READ8_MEMBER(scramble_state::cavelon_banksw_r )
 {
-	scramble_state *state = space.machine().driver_data<scramble_state>();
-	state->cavelon_banksw();
+	cavelon_banksw();
 
 	if ((offset >= 0x0100) && (offset <= 0x0103))
-		return state->m_ppi8255_0->read(space, offset - 0x0100);
+		return m_ppi8255_0->read(space, offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return state->m_ppi8255_1->read(space, offset - 0x0200);
+		return m_ppi8255_1->read(space, offset - 0x0200);
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( cavelon_banksw_w )
+WRITE8_MEMBER(scramble_state::cavelon_banksw_w )
 {
-	scramble_state *state = space.machine().driver_data<scramble_state>();
-	state->cavelon_banksw();
+	cavelon_banksw();
 
 	if ((offset >= 0x0100) && (offset <= 0x0103))
-		state->m_ppi8255_0->write(space, offset - 0x0100, data);
+		m_ppi8255_0->write(space, offset - 0x0100, data);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		state->m_ppi8255_1->write(space, offset - 0x0200, data);
+		m_ppi8255_1->write(space, offset - 0x0200, data);
 }
 
 
-READ8_HANDLER( hunchbks_mirror_r )
+READ8_MEMBER(scramble_state::hunchbks_mirror_r )
 {
 	return space.read_byte(0x1000+offset);
 }
 
-WRITE8_HANDLER( hunchbks_mirror_w )
+WRITE8_MEMBER(scramble_state::hunchbks_mirror_w )
 {
 	space.write_byte(0x1000+offset,data);
 }
@@ -160,7 +158,7 @@ DRIVER_INIT_MEMBER(scramble_state,scobra)
 #ifdef UNUSED_FUNCTION
 DRIVER_INIT_MEMBER(scramble_state,atlantis)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0x6803, 0x6803, FUNC(scrambold_background_enable_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x6803, 0x6803, write8_delegate(FUNC(scramble_state::scrambold_background_enable_w),this));
 }
 
 DRIVER_INIT_MEMBER(scramble_state,scramble)
@@ -192,8 +190,8 @@ DRIVER_INIT_MEMBER(scramble_state,mariner)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x5800, 0x67ff);
 	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x5800);
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x9008, 0x9008, FUNC(mariner_protection_2_r));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xb401, 0xb401, FUNC(mariner_protection_1_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x9008, 0x9008, read8_delegate(FUNC(scramble_state::mariner_protection_2_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xb401, 0xb401, read8_delegate(FUNC(scramble_state::mariner_protection_1_r),this));
 
 	/* ??? (it's NOT a background enable) */
 	/*machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x6803, 0x6803);*/
@@ -279,7 +277,7 @@ DRIVER_INIT_MEMBER(scramble_state,cavelon)
 	cavelon_banksw();
 
 	/* A15 switches memory banks */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(cavelon_banksw_r), FUNC(cavelon_banksw_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xffff, read8_delegate(FUNC(scramble_state::cavelon_banksw_r),this), write8_delegate(FUNC(scramble_state::cavelon_banksw_w),this));
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x2000, 0x2000);  /* ??? */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).nop_write(0x3800, 0x3801);  /* looks suspicously like

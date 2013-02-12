@@ -75,6 +75,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scramble_sh_7474_q_callback);
 	void cavelon_banksw();
 	inline int bit(int i,int n);
+	DECLARE_READ8_MEMBER( mariner_protection_1_r );
+	DECLARE_READ8_MEMBER( mariner_protection_2_r );
+	DECLARE_READ8_MEMBER( triplep_pip_r );
+	DECLARE_READ8_MEMBER( triplep_pap_r );
+	DECLARE_READ8_MEMBER( cavelon_banksw_r );
+	DECLARE_WRITE8_MEMBER( cavelon_banksw_w );
+	DECLARE_READ8_MEMBER( hunchbks_mirror_r );
+	DECLARE_WRITE8_MEMBER( hunchbks_mirror_w );
 };
 
 
@@ -83,14 +91,6 @@ public:
 extern const i8255_interface(scramble_ppi_0_intf);
 extern const i8255_interface(scramble_ppi_1_intf);
 extern const i8255_interface(stratgyx_ppi_1_intf);
-
-DECLARE_READ8_HANDLER( triplep_pip_r );
-DECLARE_READ8_HANDLER( triplep_pap_r );
-
-DECLARE_READ8_HANDLER( hunchbks_mirror_r );
-DECLARE_WRITE8_HANDLER( hunchbks_mirror_w );
-
-
 
 /*----------- defined in audio/scramble.c -----------*/
 
