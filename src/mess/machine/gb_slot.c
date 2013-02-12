@@ -754,7 +754,7 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 		if (tmp == companies[i].code)
 			break;
 	logerror("\tManufacturer ID:  0x%2X", tmp);
-	logerror(" [%s]\n", (companies[i].name) ? companies[i].name : "?");
+	logerror(" [%s]\n", (i < ARRAY_LENGTH(companies)) ? companies[i].name : "?");
 	logerror("\tVersion Number:   0x%2X\n", ROM[0x014c]);
 	logerror("\tComplement Check: 0x%2X\n", ROM[0x014d]);
 	logerror("\tChecksum:         0x%2X\n", ((ROM[0x014e] << 8) + ROM[0x014f]));
