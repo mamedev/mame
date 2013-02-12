@@ -1989,8 +1989,8 @@ void saturn_state::make_dir_current(UINT32 fad)
 		{
 			curentry->name[i] = sect[nextent+33+i];
 		}
-		//printf("%08x %08x %s %d/%d/%d\n",curentry->firstfad,curentry->length,curentry->name,curentry->year,curentry->month,curentry->day);
 		curentry->name[i] = '\0';   // terminate
+		//printf("%08x %08x %s %d/%d/%d\n",curentry->firstfad,curentry->length,curentry->name,curentry->year,curentry->month,curentry->day);
 
 		nextent += sect[nextent];
 		curentry++;
