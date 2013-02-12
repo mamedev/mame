@@ -303,8 +303,8 @@ READ32_MEMBER(saturn_state::saturn_scu_r)
 		case 0xa4/4:
 			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) IRQ status reg read MASK=%08x IST=%08x | ISM=%08x\n",space.device().safe_pc(),mem_mask,m_scu.ist,m_scu.ism);
 			/* TODO: Bug! trips an HW fault. Basically, it tries to read the IST bit 1 with that irq enabled. */
-			res = m_scu.ist | ~m_scu.ism;
-//			res = m_scu.ist;
+//			res = m_scu.ist | ~m_scu.ism;
+			res = m_scu.ist;
 			break;
 		case 0xc8/4:
 			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) SCU version reg read\n",space.device().safe_pc());
@@ -514,7 +514,8 @@ void saturn_state::scu_dma_direct(address_space &space, UINT8 dma_ch)
 		}
 	}
 
-	m_scu.size[dma_ch] = 0;
+	/* Burning Rangers doesn't agree with this. */
+//	m_scu.size[dma_ch] = 0;
 	if(!(DRUP(dma_ch))) m_scu.src[dma_ch] = tmp_src;
 	if(!(DWUP(dma_ch))) m_scu.dst[dma_ch] = tmp_dst;
 
