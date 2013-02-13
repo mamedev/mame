@@ -33,42 +33,41 @@ WRITE8_MEMBER(xyonix_state::xyonix_irqack_w)
 
 /* Inputs ********************************************************************/
 
-static void handle_coins(running_machine &machine, int coin)
+void xyonix_state::handle_coins(int coin)
 {
 	static const int coinage_table[4][2] = {{2,3},{2,1},{1,2},{1,1}};
-	xyonix_state *state = machine.driver_data<xyonix_state>();
 	int tmp = 0;
 
-	//popmessage("Coin %d", state->m_coin);
+	//popmessage("Coin %d", m_coin);
 
 	if (coin & 1)   // Coin 2 !
 	{
-		tmp = (state->ioport("DSW")->read() & 0xc0) >> 6;
-		state->m_coins++;
-		if (state->m_coins >= coinage_table[tmp][0])
+		tmp = (ioport("DSW")->read() & 0xc0) >> 6;
+		m_coins++;
+		if (m_coins >= coinage_table[tmp][0])
 		{
-			state->m_credits += coinage_table[tmp][1];
-			state->m_coins -= coinage_table[tmp][0];
+			m_credits += coinage_table[tmp][1];
+			m_coins -= coinage_table[tmp][0];
 		}
-		coin_lockout_global_w(machine, 0); /* Unlock all coin slots */
-		coin_counter_w(machine,1,1); coin_counter_w(machine,1,0); /* Count slot B */
+		coin_lockout_global_w(machine(), 0); /* Unlock all coin slots */
+		coin_counter_w(machine(),1,1); coin_counter_w(machine(),1,0); /* Count slot B */
 	}
 
 	if (coin & 2)   // Coin 1 !
 	{
-		tmp = (machine.root_device().ioport("DSW")->read() & 0x30) >> 4;
-		state->m_coins++;
-		if (state->m_coins >= coinage_table[tmp][0])
+		tmp = (machine().root_device().ioport("DSW")->read() & 0x30) >> 4;
+		m_coins++;
+		if (m_coins >= coinage_table[tmp][0])
 		{
-			state->m_credits += coinage_table[tmp][1];
-			state->m_coins -= coinage_table[tmp][0];
+			m_credits += coinage_table[tmp][1];
+			m_coins -= coinage_table[tmp][0];
 		}
-		coin_lockout_global_w(machine, 0); /* Unlock all coin slots */
-		coin_counter_w(machine,0,1); coin_counter_w(machine,0,0); /* Count slot A */
+		coin_lockout_global_w(machine(), 0); /* Unlock all coin slots */
+		coin_counter_w(machine(),0,1); coin_counter_w(machine(),0,0); /* Count slot A */
 	}
 
-	if (state->m_credits >= 9)
-		state->m_credits = 9;
+	if (m_credits >= 9)
+		m_credits = 9;
 }
 
 
@@ -97,7 +96,7 @@ READ8_MEMBER(xyonix_state::xyonix_io_r)
 				coin = ((ioport("P1")->read() & 0x80) >> 7) | ((ioport("P2")->read() & 0x80) >> 6);
 				if (coin ^ m_prev_coin && coin != 3)
 				{
-					if (m_credits < 9) handle_coins(machine(), coin);
+					if (m_credits < 9) handle_coins(coin);
 				}
 				m_prev_coin = coin;
 				return m_credits;

@@ -129,6 +129,13 @@ public:
 	DECLARE_WRITE8_MEMBER(tshoot_lamp_w);
 	void williams2_postload();
 	void defender_postload();
+	void state_save_register();
+	void create_palette_lookup();
+	void blitter_init(int blitter_config, const UINT8 *remap_prom);
+	inline void blit_pixel(address_space &space, int offset, int srcdata, int data, int mask, int solid);
+	int blitter_core(address_space &space, int sstart, int dstart, int w, int h, int data);
+	inline void update_blaster_banking();
+	void defender_install_io_space(address_space &space);
 };
 
 
@@ -147,11 +154,6 @@ public:
 	DECLARE_WRITE8_MEMBER(joust2_pia_3_cb1_w);
 	DECLARE_WRITE8_MEMBER(joust2_snd_cmd_w);
 };
-
-/*----------- defined in drivers/williams.c -----------*/
-
-void defender_install_io_space(address_space &space);
-
 
 /*----------- defined in machine/williams.c -----------*/
 

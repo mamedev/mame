@@ -81,6 +81,9 @@ public:
 	INTERRUPT_GEN_MEMBER(hotchase_sound_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(wecleman_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(hotchase_scanline);
+	void wecleman_unpack_sprites();
+	void bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0);
+	void hotchase_sprite_decode( int num16_banks, int bank_size );
 };
 
 /*----------- defined in video/wecleman.c -----------*/

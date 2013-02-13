@@ -28,4 +28,5 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_wwfsstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_scanline);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

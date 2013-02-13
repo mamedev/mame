@@ -33,4 +33,5 @@ public:
 	INTERRUPT_GEN_MEMBER(xxmissio_interrupt_s);
 	DECLARE_WRITE8_MEMBER(xxmissio_scroll_x_w);
 	DECLARE_WRITE8_MEMBER(xxmissio_scroll_y_w);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 };

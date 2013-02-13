@@ -53,4 +53,7 @@ public:
 	UINT32 screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(wiz_vblank_interrupt);
 	INTERRUPT_GEN_MEMBER(wiz_sound_interrupt);
+	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank, int colortype);
+	void draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int colortype);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8* sprite_ram,int bank);	
 };

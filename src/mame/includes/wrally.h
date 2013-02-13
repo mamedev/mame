@@ -25,4 +25,5 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info_wrally_screen1);
 	virtual void video_start();
 	UINT32 screen_update_wrally(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 };

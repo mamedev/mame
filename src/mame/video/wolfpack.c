@@ -118,9 +118,8 @@ void wolfpack_state::video_start()
 }
 
 
-static void draw_ship(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void wolfpack_state::draw_ship(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	wolfpack_state *state = machine.driver_data<wolfpack_state>();
 	static const UINT32 scaler[] =
 	{
 		0x00000, 0x00500, 0x00a00, 0x01000,
@@ -141,36 +140,35 @@ static void draw_ship(running_machine &machine, bitmap_ind16 &bitmap, const rect
 		0x2c000, 0x2fa00, 0x33500, 0x37000
 	};
 
-	int chop = (scaler[state->m_ship_size >> 2] * state->m_ship_h_precess) >> 16;
+	int chop = (scaler[m_ship_size >> 2] * m_ship_h_precess) >> 16;
 
 	drawgfxzoom_transpen(bitmap, cliprect,
-		machine.gfx[1],
-		state->m_ship_pic,
+		machine().gfx[1],
+		m_ship_pic,
 		0,
-		state->m_ship_reflect, 0,
-		2 * (state->m_ship_h - chop),
+		m_ship_reflect, 0,
+		2 * (m_ship_h - chop),
 		128,
-		2 * scaler[state->m_ship_size >> 2], scaler[state->m_ship_size >> 2], 0);
+		2 * scaler[m_ship_size >> 2], scaler[m_ship_size >> 2], 0);
 }
 
 
-static void draw_torpedo(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void wolfpack_state::draw_torpedo(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	wolfpack_state *state = machine.driver_data<wolfpack_state>();
 	int count = 0;
 
 	int x;
 	int y;
 
 	drawgfx_transpen(bitmap, cliprect,
-		machine.gfx[3],
-		state->m_torpedo_pic,
+		machine().gfx[3],
+		m_torpedo_pic,
 		0,
 		0, 0,
-		2 * (244 - state->m_torpedo_h),
-		224 - state->m_torpedo_v, 0);
+		2 * (244 - m_torpedo_h),
+		224 - m_torpedo_v, 0);
 
-	for (y = 16; y < 224 - state->m_torpedo_v; y++)
+	for (y = 16; y < 224 - m_torpedo_v; y++)
 	{
 		int x1;
 		int x2;
@@ -178,46 +176,45 @@ static void draw_torpedo(running_machine &machine, bitmap_ind16 &bitmap, const r
 		if (y % 16 == 1)
 			count = (count - 1) & 7;
 
-		x1 = 248 - state->m_torpedo_h - count;
-		x2 = 248 - state->m_torpedo_h + count;
+		x1 = 248 - m_torpedo_h - count;
+		x2 = 248 - m_torpedo_h + count;
 
 		for (x = 2 * x1; x < 2 * x2; x++)
-			if (state->m_LFSR[(state->m_current_index + 0x300 * y + x) % 0x8000])
+			if (m_LFSR[(m_current_index + 0x300 * y + x) % 0x8000])
 				bitmap.pix16(y, x) = 1;
 	}
 }
 
 
-static void draw_pt(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void wolfpack_state::draw_pt(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	wolfpack_state *state = machine.driver_data<wolfpack_state>();
 	rectangle rect = cliprect;
 
-	if (!(state->m_pt_pic & 0x20))
+	if (!(m_pt_pic & 0x20))
 		rect.min_x = 256;
 
-	if (!(state->m_pt_pic & 0x10))
+	if (!(m_pt_pic & 0x10))
 		rect.max_x = 255;
 
 	drawgfx_transpen(bitmap, rect,
-		machine.gfx[2],
-		state->m_pt_pic,
+		machine().gfx[2],
+		m_pt_pic,
 		0,
 		0, 0,
-		2 * state->m_pt_horz,
-		state->m_pt_pos_select ? 0x70 : 0xA0, 0);
+		2 * m_pt_horz,
+		m_pt_pos_select ? 0x70 : 0xA0, 0);
 
 	drawgfx_transpen(bitmap, rect,
-		machine.gfx[2],
-		state->m_pt_pic,
+		machine().gfx[2],
+		m_pt_pic,
 		0,
 		0, 0,
-		2 * state->m_pt_horz - 512,
-		state->m_pt_pos_select ? 0x70 : 0xA0, 0);
+		2 * m_pt_horz - 512,
+		m_pt_pos_select ? 0x70 : 0xA0, 0);
 }
 
 
-static void draw_water(colortable_t *colortable, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void wolfpack_state::draw_water(colortable_t *colortable, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	rectangle rect = cliprect;
 
@@ -269,9 +266,9 @@ UINT32 wolfpack_state::screen_update_wolfpack(screen_device &screen, bitmap_ind1
 				192 + 8 * i);
 		}
 
-	draw_pt(machine(), bitmap, cliprect);
-	draw_ship(machine(), bitmap, cliprect);
-	draw_torpedo(machine(), bitmap, cliprect);
+	draw_pt(bitmap, cliprect);
+	draw_ship(bitmap, cliprect);
+	draw_torpedo(bitmap, cliprect);
 	draw_water(machine().colortable, bitmap, cliprect);
 	return 0;
 }
@@ -287,7 +284,7 @@ void wolfpack_state::screen_eof_wolfpack(screen_device &screen, bool state)
 
 		m_helper.fill(0);
 
-		draw_ship(machine(), m_helper, m_helper.cliprect());
+		draw_ship(m_helper, m_helper.cliprect());
 
 		for (y = 128; y < 224 - m_torpedo_v; y++)
 		{

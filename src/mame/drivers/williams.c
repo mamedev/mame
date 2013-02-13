@@ -519,7 +519,7 @@ static ADDRESS_MAP_START( defender_map, AS_PROGRAM, 8, williams_state )
 ADDRESS_MAP_END
 
 
-void defender_install_io_space(address_space &space)
+void williams_state::defender_install_io_space(address_space &space)
 {
 	williams_state *state = space.machine().driver_data<williams_state>();
 	pia6821_device *pia_0 = space.machine().device<pia6821_device>("pia_0");
@@ -534,8 +534,8 @@ void defender_install_io_space(address_space &space)
 	space.install_read_handler     (0xc800, 0xcbff, 0, 0x03e0, read8_delegate(FUNC(williams_state::williams_video_counter_r),state));
 	space.install_readwrite_handler(0xcc00, 0xcc03, 0, 0x03e0, read8_delegate(FUNC(pia6821_device::read), pia_1), write8_delegate(FUNC(pia6821_device::write), pia_1));
 	space.install_readwrite_handler(0xcc04, 0xcc07, 0, 0x03e0, read8_delegate(FUNC(pia6821_device::read), pia_0), write8_delegate(FUNC(pia6821_device::write), pia_0));
-	state->membank("bank3")->set_base(space.machine().driver_data<williams_state>()->m_nvram);
-	state->membank("bank4")->set_base(space.machine().driver_data<williams_state>()->m_generic_paletteram_8);
+	membank("bank3")->set_base(space.machine().driver_data<williams_state>()->m_nvram);
+	membank("bank4")->set_base(space.machine().driver_data<williams_state>()->m_generic_paletteram_8);
 }
 
 

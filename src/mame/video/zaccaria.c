@@ -203,9 +203,8 @@ WRITE8_MEMBER(zaccaria_state::zaccaria_flip_screen_y_w)
 offsets 1 and 2 are swapped if accessed from spriteram2
 
 */
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,UINT8 *spriteram,int color,int section)
+void zaccaria_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT8 *spriteram,int color,int section)
 {
-	zaccaria_state *state = machine.driver_data<zaccaria_state>();
 	int offs,o1 = 1,o2 = 2;
 
 	if (section)
@@ -223,18 +222,18 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		if (sx == 1) continue;
 
-		if (state->flip_screen_x())
+		if (flip_screen_x())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (state->flip_screen_y())
+		if (flip_screen_y())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				(spriteram[offs + o1] & 0x3f) + (spriteram[offs + o2] & 0xc0),
 				((spriteram[offs + o2] & 0x07) << 2) | color,
 				flipx,flipy,sx,sy,0);
@@ -247,9 +246,9 @@ UINT32 zaccaria_state::screen_update_zaccaria(screen_device &screen, bitmap_ind1
 
 	// 3 layers of sprites, each with their own palette and priorities
 	// Not perfect yet, does spriteram(1) layer have a priority bit somewhere?
-	draw_sprites(machine(),bitmap,cliprect,m_spriteram2,2,1);
-	draw_sprites(machine(),bitmap,cliprect,m_spriteram,1,0);
-	draw_sprites(machine(),bitmap,cliprect,m_spriteram2+0x20,0,1);
+	draw_sprites(bitmap,cliprect,m_spriteram2,2,1);
+	draw_sprites(bitmap,cliprect,m_spriteram,1,0);
+	draw_sprites(bitmap,cliprect,m_spriteram2+0x20,0,1);
 
 	return 0;
 }

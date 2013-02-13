@@ -69,6 +69,9 @@ public:
 	TIMER_CALLBACK_MEMBER(dmaend_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(xexex_interrupt);
 	void xexex_postload();
+	void xexex_objdma( int limiter );
+	void parse_control2(  );
+	void reset_sound_region();
 };
 
 /*----------- defined in video/xexex.c -----------*/

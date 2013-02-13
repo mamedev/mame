@@ -91,14 +91,13 @@ WRITE8_MEMBER(wc90b_state::wc90b_txvideoram_w)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void wc90b_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	wc90b_state *state = machine.driver_data<wc90b_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs, sx, sy;
 
 	/* draw all visible sprites of specified priority */
-	for ( offs = state->m_spriteram.bytes() - 8 ; offs >= 0 ; offs -= 8 )
+	for ( offs = m_spriteram.bytes() - 8 ; offs >= 0 ; offs -= 8 )
 	{
 		if ( ( ~( spriteram[offs+3] >> 7 ) & 1 ) == priority )
 		{
@@ -115,7 +114,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 			sy = 240 - spriteram[offs + 1];
 
-			drawgfx_transpen( bitmap, cliprect,machine.gfx[17], code,
+			drawgfx_transpen( bitmap, cliprect,machine().gfx[17], code,
 					flags >> 4, /* color */
 					bank & 1,   /* flipx */
 					bank & 2,   /* flipy */
@@ -134,8 +133,8 @@ UINT32 wc90b_state::screen_update_wc90b(screen_device &screen, bitmap_ind16 &bit
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect, 1 );
+	draw_sprites(bitmap,cliprect, 1 );
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect, 0 );
+	draw_sprites(bitmap,cliprect, 0 );
 	return 0;
 }

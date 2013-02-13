@@ -22,4 +22,6 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_tinvader(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	int SpriteCollision(int first,int second);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

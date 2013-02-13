@@ -865,11 +865,10 @@ MACHINE_RESET_MEMBER(williams_state,blaster)
 }
 
 
-INLINE void update_blaster_banking(running_machine &machine)
+inline void williams_state::update_blaster_banking()
 {
-	williams_state *state = machine.driver_data<williams_state>();
-	state->membank("bank1")->set_entry(state->m_vram_bank * (state->m_blaster_bank + 1));
-	state->membank("bank2")->set_entry(state->m_vram_bank * (state->m_blaster_bank + 1));
+	membank("bank1")->set_entry(m_vram_bank * (m_blaster_bank + 1));
+	membank("bank2")->set_entry(m_vram_bank * (m_blaster_bank + 1));
 }
 
 
@@ -877,7 +876,7 @@ WRITE8_MEMBER(williams_state::blaster_vram_select_w)
 {
 	/* VRAM/ROM banking from bit 0 */
 	m_vram_bank = data & 0x01;
-	update_blaster_banking(machine());
+	update_blaster_banking();
 
 	/* cocktail flip from bit 1 */
 	m_cocktail = data & 0x02;
@@ -890,7 +889,7 @@ WRITE8_MEMBER(williams_state::blaster_vram_select_w)
 WRITE8_MEMBER(williams_state::blaster_bank_select_w)
 {
 	m_blaster_bank = data & 15;
-	update_blaster_banking(machine());
+	update_blaster_banking();
 }
 
 

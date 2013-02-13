@@ -15,10 +15,9 @@ void warriorb_state::video_start()
             SPRITE DRAW ROUTINE
 ************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs )
+void warriorb_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int x_offs, int y_offs )
 {
-	warriorb_state *state = machine.driver_data<warriorb_state>();
-	UINT16 *spriteram = state->m_spriteram;
+	UINT16 *spriteram = m_spriteram;
 	int offs, data, data2, tilenum, color, flipx, flipy;
 	int x, y, priority, pri_mask;
 
@@ -27,7 +26,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 #endif
 
 	/* pdrawgfx() needs us to draw sprites front to back */
-	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
 		data = spriteram[offs + 1];
 		tilenum = data & 0x7fff;
@@ -63,12 +62,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if (x > 0x3c0) x -= 0x400;
 		if (y > 0x180) y -= 0x200;
 
-		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 					tilenum,
 					color,
 					flipx,flipy,
 					x,y,
-					machine.priority_bitmap,pri_mask,0);
+					machine().priority_bitmap,pri_mask,0);
 	}
 
 #ifdef MAME_DEBUG
@@ -82,7 +81,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
                 SCREEN REFRESH
 **************************************************************/
 
-static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, device_t *tc0100scn)
+UINT32 warriorb_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, device_t *tc0100scn)
 {
 	UINT8 layer[3], nodraw;
 
@@ -101,13 +100,13 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
 	if (nodraw)
-		bitmap.fill(get_black_pen(screen.machine()), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 
 	// draw middle layer
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[1], 0, 1);
 
 	/* Sprites can be under/over the layer below text layer */
-	draw_sprites(screen.machine(), bitmap, cliprect, xoffs, 8); // draw sprites
+	draw_sprites(bitmap, cliprect, xoffs, 8); // draw sprites
 
 	// draw top(text) layer
 	tc0100scn_tilemap_draw(tc0100scn, bitmap, cliprect, layer[2], 0, 0);

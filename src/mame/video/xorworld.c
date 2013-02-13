@@ -94,10 +94,9 @@ void xorworld_state::video_start()
       1  | xxxx---- -------- | sprite color
 */
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void xorworld_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	xorworld_state *state = machine.driver_data<xorworld_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int i;
 
 	for (i = 0; i < 0x40; i += 2)
@@ -107,13 +106,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int code = (spriteram16[i+1] & 0x0ffc) >> 2;
 		int color = (spriteram16[i+1] & 0xf000) >> 12;
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, 0, 0, sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, 0, 0, sx, sy, 0);
 	}
 }
 
 UINT32 xorworld_state::screen_update_xorworld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

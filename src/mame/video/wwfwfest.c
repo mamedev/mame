@@ -138,9 +138,8 @@ TILE_GET_INFO_MEMBER(wwfwfest_state::get_bg1_tile_info)
  sprite drawing could probably be improved a bit
 *******************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void wwfwfest_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	wwfwfest_state *state = machine.driver_data<wwfwfest_state>();
 	/*- SPR RAM Format -**
 
 	  16 bytes per sprite
@@ -161,8 +160,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	**- End of Comments -*/
 
-	UINT16 *buffered_spriteram16 = state->m_spriteram->buffer();
-	gfx_element *gfx = machine.gfx[1];
+	UINT16 *buffered_spriteram16 = m_spriteram->buffer();
+	gfx_element *gfx = machine().gfx[1];
 	UINT16 *source = buffered_spriteram16;
 	UINT16 *finish = source + 0x2000/2;
 
@@ -175,7 +174,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		if (enable) {
 			xpos = +(source[5] & 0x00ff) | (source[1] & 0x0004) << 6;
 			if (xpos>512-16) xpos -=512;
-			xpos += state->m_sprite_xoff;
+			xpos += m_sprite_xoff;
 			ypos = (source[0] & 0x00ff) | (source[1] & 0x0002) << 7;
 			ypos = (256 - ypos) & 0x1ff;
 			ypos -= 16 ;
@@ -186,15 +185,15 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			number = (source[2] & 0x00ff) | (source[3] & 0x00ff) << 8;
 			colourbank = (source[4] & 0x000f);
 
-			if (state->flip_screen()) {
+			if (flip_screen()) {
 				if (flipy) flipy=0; else flipy=1;
 				if (flipx) flipx=0; else flipx=1;
-				ypos=240-ypos-state->m_sprite_xoff;
+				ypos=240-ypos-m_sprite_xoff;
 				xpos=304-xpos;
 			}
 
 			for (count=0;count<chain;count++) {
-				if (state->flip_screen()) {
+				if (flip_screen()) {
 					if (!flipy) {
 						drawgfx_transpen(bitmap,cliprect,gfx,number+count,colourbank,flipx,flipy,xpos,ypos+(16*(chain-1))-(16*count),0);
 					} else {
@@ -266,13 +265,13 @@ UINT32 wwfwfest_state::screen_update_wwfwfest(screen_device &screen, bitmap_ind1
 	if (m_pri == 0x007b) {
 		m_bg0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
-		draw_sprites(machine(), bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 		m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 
 	if (m_pri == 0x007c) {
 		m_bg0_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(machine(), bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 		m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
 		m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
 	}
@@ -280,7 +279,7 @@ UINT32 wwfwfest_state::screen_update_wwfwfest(screen_device &screen, bitmap_ind1
 	if (m_pri == 0x0078) {
 		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		m_bg0_tilemap->draw(bitmap, cliprect, 0,0);
-		draw_sprites(machine(), bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 		m_fg0_tilemap->draw(bitmap, cliprect, 0,0);
 	}
 	return 0;

@@ -207,30 +207,29 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_videoram_w)
 
 ***************************************************************************/
 
-INLINE void geebee_plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen)
+inline void warpwarp_state::geebee_plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen)
 {
 	if (cliprect.contains(x, y))
 		bitmap.pix16(y, x) = pen;
 }
 
-static void draw_ball(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen)
+void warpwarp_state::draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen)
 {
-	warpwarp_state *state = machine.driver_data<warpwarp_state>();
-	if (state->m_ball_on)
+	if (m_ball_on)
 	{
 		int x,y,i,j;
 
-		if (state->flip_screen() & 1) {
-			x = 376 - state->m_ball_h;
-			y = 280 - state->m_ball_v;
+		if (flip_screen() & 1) {
+			x = 376 - m_ball_h;
+			y = 280 - m_ball_v;
 		}
 		else {
-			x = 264 - state->m_ball_h;
-			y = 240 - state->m_ball_v;
+			x = 264 - m_ball_h;
+			y = 240 - m_ball_v;
 		}
 
-		for (i = state->m_ball_sizey;i > 0;i--)
-			for (j = state->m_ball_sizex;j > 0;j--)
+		for (i = m_ball_sizey;i > 0;i--)
+			for (j = m_ball_sizex;j > 0;j--)
 				geebee_plot(bitmap, cliprect, x-j, y-i, pen);
 	}
 }
@@ -239,6 +238,6 @@ UINT32 warpwarp_state::screen_update_geebee(screen_device &screen, bitmap_ind16 
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 
-	draw_ball(machine(), bitmap, cliprect, m_ball_pen);
+	draw_ball(bitmap, cliprect, m_ball_pen);
 	return 0;
 }

@@ -114,20 +114,19 @@ WRITE16_MEMBER(xexex_state::K053247_scattered_word_w)
 #endif
 
 
-static void xexex_objdma( running_machine &machine, int limiter )
+void xexex_state::xexex_objdma( int limiter )
 {
-	xexex_state *state = machine.driver_data<xexex_state>();
 	int counter, num_inactive;
 	UINT16 *src, *dst;
 
-	counter = state->m_frame;
-	state->m_frame = machine.primary_screen->frame_number();
-	if (limiter && counter == state->m_frame)
+	counter = m_frame;
+	m_frame = machine().primary_screen->frame_number();
+	if (limiter && counter == m_frame)
 		return; // make sure we only do DMA transfer once per frame
 
-	k053247_get_ram(state->m_k053246, &dst);
-	counter = k053247_get_dy(state->m_k053246);
-	src = state->m_spriteram;
+	k053247_get_ram(m_k053246, &dst);
+	counter = k053247_get_dy(m_k053246);
+	src = m_spriteram;
 	num_inactive = counter = 256;
 
 	do
@@ -170,23 +169,21 @@ READ16_MEMBER(xexex_state::xexex_waitskip_r)
 }
 
 
-static void parse_control2( running_machine &machine )
+void xexex_state::parse_control2(  )
 {
-	xexex_state *state = machine.driver_data<xexex_state>();
-
 	/* bit 0  is data */
 	/* bit 1  is cs (active low) */
 	/* bit 2  is clock (active high) */
 	/* bit 5  is enable irq 6 */
 	/* bit 6  is enable irq 5 */
 	/* bit 11 is watchdog */
-	state->ioport("EEPROMOUT")->write(state->m_cur_control2, 0xff);
+	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 
 	/* bit 8 = enable sprite ROM reading */
-	k053246_set_objcha_line(state->m_k053246, (state->m_cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
+	k053246_set_objcha_line(m_k053246, (m_cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 9 = disable alpha channel on K054157 plane 0 (under investigation) */
-	state->m_cur_alpha = !(state->m_cur_control2 & 0x200);
+	m_cur_alpha = !(m_cur_control2 & 0x200);
 }
 
 READ16_MEMBER(xexex_state::control2_r)
@@ -197,7 +194,7 @@ READ16_MEMBER(xexex_state::control2_r)
 WRITE16_MEMBER(xexex_state::control2_w)
 {
 	COMBINE_DATA(&m_cur_control2);
-	parse_control2(machine());
+	parse_control2();
 }
 
 
@@ -230,16 +227,15 @@ READ16_MEMBER(xexex_state::sound_status_r)
 	return soundlatch3_byte_r(space, 0);
 }
 
-static void reset_sound_region(running_machine &machine)
+void xexex_state::reset_sound_region()
 {
-	xexex_state *state = machine.driver_data<xexex_state>();
-	state->membank("bank2")->set_entry(state->m_cur_sound_region & 0x07);
+	membank("bank2")->set_entry(m_cur_sound_region & 0x07);
 }
 
 WRITE8_MEMBER(xexex_state::sound_bankswitch_w)
 {
 	m_cur_sound_region = data & 7;
-	reset_sound_region(machine());
+	reset_sound_region();
 }
 
 static void ym_set_mixing(device_t *device, double left, double right)
@@ -291,7 +287,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(xexex_state::xexex_interrupt)
 		if (k053246_is_irq_enabled(m_k053246))
 		{
 			// OBJDMA starts at the beginning of V-blank
-			xexex_objdma(machine(), 0);
+			xexex_objdma(0);
 
 			// schedule DMA end interrupt
 			m_dmadelay_timer->adjust(XE_DMADELAY);
@@ -442,8 +438,8 @@ static const k053252_interface xexex_k053252_intf =
 
 void xexex_state::xexex_postload()
 {
-	parse_control2(machine());
-	reset_sound_region(machine());
+	parse_control2();
+	reset_sound_region();
 }
 
 void xexex_state::machine_start()

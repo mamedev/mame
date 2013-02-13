@@ -413,13 +413,12 @@ WRITE16_MEMBER(wgp_state::sharedram_w)
 	COMBINE_DATA(&m_sharedram[offset]);
 }
 
-static void parse_control(running_machine &machine)
+void wgp_state::parse_control()
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
 	   if cpu B is disabled !! */
-	wgp_state *state = machine.driver_data<wgp_state>();
-	state->m_subcpu->set_input_line(INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, (m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 1 is "vibration" acc. to test mode */
 }
@@ -430,7 +429,7 @@ WRITE16_MEMBER(wgp_state::cpua_ctrl_w)/* assumes Z80 sandwiched between 68Ks */
 		data = data >> 8;   /* for Wgp */
 	m_cpua_ctrl = data;
 
-	parse_control(machine());
+	parse_control();
 
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n",space.device().safe_pc(),data);
 }
@@ -601,16 +600,15 @@ WRITE16_MEMBER(wgp_state::wgp_adinput_w)
                           SOUND
 **********************************************************/
 
-static void reset_sound_region( running_machine &machine )  /* assumes Z80 sandwiched between the 68Ks */
+void wgp_state::reset_sound_region(  )  /* assumes Z80 sandwiched between the 68Ks */
 {
-	wgp_state *state = machine.driver_data<wgp_state>();
-	state->membank("bank10")->set_entry(state->m_banknum);
+	membank("bank10")->set_entry(m_banknum);
 }
 
 WRITE8_MEMBER(wgp_state::sound_bankswitch_w)
 {
 	m_banknum = data & 7;
-	reset_sound_region(machine());
+	reset_sound_region();
 }
 
 WRITE16_MEMBER(wgp_state::wgp_sound_w)
@@ -912,8 +910,8 @@ graphics glitches.
 
 void wgp_state::wgp_postload()
 {
-	parse_control(machine());
-	reset_sound_region(machine());
+	parse_control();
+	reset_sound_region();
 }
 
 void wgp_state::machine_reset()

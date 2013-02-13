@@ -5,13 +5,12 @@
 
 /*******************************************************************/
 
-INLINE void common_get_piv_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int num )
+inline void wgp_state::common_get_piv_tile_info( tile_data &tileinfo, int tile_index, int num )
 {
-	wgp_state *state = machine.driver_data<wgp_state>();
-	UINT16 tilenum = state->m_pivram[tile_index + num * 0x1000];    /* 3 blocks of $2000 */
-	UINT16 attr = state->m_pivram[tile_index + num * 0x1000 + 0x8000];  /* 3 blocks of $2000 */
+	UINT16 tilenum = m_pivram[tile_index + num * 0x1000];    /* 3 blocks of $2000 */
+	UINT16 attr = m_pivram[tile_index + num * 0x1000 + 0x8000];  /* 3 blocks of $2000 */
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			2,
 			tilenum & 0x3fff,
 			(attr & 0x3f),  /* attr & 0x1 ?? */
@@ -20,61 +19,59 @@ INLINE void common_get_piv_tile_info( running_machine &machine, tile_data &tilei
 
 TILE_GET_INFO_MEMBER(wgp_state::get_piv0_tile_info)
 {
-	common_get_piv_tile_info(machine(), tileinfo, tile_index, 0);
+	common_get_piv_tile_info(tileinfo, tile_index, 0);
 }
 
 TILE_GET_INFO_MEMBER(wgp_state::get_piv1_tile_info)
 {
-	common_get_piv_tile_info(machine(), tileinfo, tile_index, 1);
+	common_get_piv_tile_info(tileinfo, tile_index, 1);
 }
 
 TILE_GET_INFO_MEMBER(wgp_state::get_piv2_tile_info)
 {
-	common_get_piv_tile_info(machine(), tileinfo, tile_index, 2);
+	common_get_piv_tile_info(tileinfo, tile_index, 2);
 }
 
 
-static void wgp_core_vh_start( running_machine &machine, int piv_xoffs, int piv_yoffs )
+void wgp_state::wgp_core_vh_start( int piv_xoffs, int piv_yoffs )
 {
-	wgp_state *state = machine.driver_data<wgp_state>();
+	m_piv_tilemap[0] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wgp_state::get_piv0_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_piv_tilemap[1] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wgp_state::get_piv1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_piv_tilemap[2] = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(wgp_state::get_piv2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 
-	state->m_piv_tilemap[0] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wgp_state::get_piv0_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_piv_tilemap[1] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wgp_state::get_piv1_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	state->m_piv_tilemap[2] = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(wgp_state::get_piv2_tile_info),state), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_piv_xoffs = piv_xoffs;
+	m_piv_yoffs = piv_yoffs;
 
-	state->m_piv_xoffs = piv_xoffs;
-	state->m_piv_yoffs = piv_yoffs;
-
-	state->m_piv_tilemap[0]->set_transparent_pen(0);
-	state->m_piv_tilemap[1]->set_transparent_pen(0);
-	state->m_piv_tilemap[2]->set_transparent_pen(0);
+	m_piv_tilemap[0]->set_transparent_pen(0);
+	m_piv_tilemap[1]->set_transparent_pen(0);
+	m_piv_tilemap[2]->set_transparent_pen(0);
 
 	/* flipscreen n/a */
-	state->m_piv_tilemap[0]->set_scrolldx(-piv_xoffs, 0);
-	state->m_piv_tilemap[1]->set_scrolldx(-piv_xoffs, 0);
-	state->m_piv_tilemap[2]->set_scrolldx(-piv_xoffs, 0);
-	state->m_piv_tilemap[0]->set_scrolldy(-piv_yoffs, 0);
-	state->m_piv_tilemap[1]->set_scrolldy(-piv_yoffs, 0);
-	state->m_piv_tilemap[2]->set_scrolldy(-piv_yoffs, 0);
+	m_piv_tilemap[0]->set_scrolldx(-piv_xoffs, 0);
+	m_piv_tilemap[1]->set_scrolldx(-piv_xoffs, 0);
+	m_piv_tilemap[2]->set_scrolldx(-piv_xoffs, 0);
+	m_piv_tilemap[0]->set_scrolldy(-piv_yoffs, 0);
+	m_piv_tilemap[1]->set_scrolldy(-piv_yoffs, 0);
+	m_piv_tilemap[2]->set_scrolldy(-piv_yoffs, 0);
 
 	/* We don't need tilemap_set_scroll_rows, as the custom draw routine applies rowscroll manually */
-	tc0100scn_set_colbanks(state->m_tc0100scn, 0x80, 0xc0, 0x40);
+	tc0100scn_set_colbanks(m_tc0100scn, 0x80, 0xc0, 0x40);
 
-	state->save_item(NAME(state->m_piv_ctrl_reg));
-	state->save_item(NAME(state->m_rotate_ctrl));
-	state->save_item(NAME(state->m_piv_zoom));
-	state->save_item(NAME(state->m_piv_scrollx));
-	state->save_item(NAME(state->m_piv_scrolly));
+	save_item(NAME(m_piv_ctrl_reg));
+	save_item(NAME(m_rotate_ctrl));
+	save_item(NAME(m_piv_zoom));
+	save_item(NAME(m_piv_scrollx));
+	save_item(NAME(m_piv_scrolly));
 }
 
 void wgp_state::video_start()
 {
-	wgp_core_vh_start(machine(), 32, 16);
+	wgp_core_vh_start(32, 16);
 }
 
 VIDEO_START_MEMBER(wgp_state,wgp2)
 {
-	wgp_core_vh_start(machine(), 32, 16);
+	wgp_core_vh_start(32, 16);
 }
 
 
@@ -341,17 +338,16 @@ static const UINT8 ylookup[16] =
 		2, 2, 3, 3,
 		2, 2, 3, 3 };
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
+void wgp_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
-	wgp_state *state = machine.driver_data<wgp_state>();
-	UINT16 *spriteram = state->m_spriteram;
+	UINT16 *spriteram = m_spriteram;
 	int offs, i, j, k;
 	int x, y, curx, cury;
 	int zx, zy, zoomx, zoomy, priority = 0;
 	UINT8 small_sprite, col, flipx, flipy;
 	UINT16 code, bigsprite, map_index;
 //  UINT16 rotate = 0;
-	UINT16 tile_mask = (machine.gfx[0]->elements()) - 1;
+	UINT16 tile_mask = (machine().gfx[0]->elements()) - 1;
 	static const int primasks[2] = {0x0, 0xfffc};   /* fff0 => under rhs of road only */
 
 	for (offs = 0x1ff; offs >= 0; offs--)
@@ -397,19 +393,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			/* don't know what selects 2x2 sprites: we use a nasty kludge which seems to work */
 
-			i = state->m_spritemap[map_index + 0xa];
-			j = state->m_spritemap[map_index + 0xc];
+			i = m_spritemap[map_index + 0xa];
+			j = m_spritemap[map_index + 0xc];
 			small_sprite = ((i > 0) & (i <= 8) & (j > 0) & (j <= 8));
 
 			if (small_sprite)
 			{
 				for (i = 0; i < 4; i++)
 				{
-					code = state->m_spritemap[(map_index + (i << 1))] & tile_mask;
-					col  = state->m_spritemap[(map_index + (i << 1) + 1)] & 0xf;
+					code = m_spritemap[(map_index + (i << 1))] & tile_mask;
+					col  = m_spritemap[(map_index + (i << 1) + 1)] & 0xf;
 
 					/* not known what controls priority */
-					priority = (state->m_spritemap[(map_index + (i << 1) + 1)] & 0x70) >> 4;
+					priority = (m_spritemap[(map_index + (i << 1) + 1)] & 0x70) >> 4;
 
 					flipx = 0;  // no flip xy?
 					flipy = 0;
@@ -423,24 +419,24 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 					zx = x + (((k + 1) * zoomx) / 2) - curx;
 					zy = y + (((j + 1) * zoomy) / 2) - cury;
 
-					pdrawgfxzoom_transpen(bitmap, cliprect,machine.gfx[0],
+					pdrawgfxzoom_transpen(bitmap, cliprect,machine().gfx[0],
 							code,
 							col,
 							flipx, flipy,
 							curx,cury,
 							zx << 12, zy << 12,
-							machine.priority_bitmap,primasks[((priority >> 1) &1)],0);  /* maybe >> 2 or 0...? */
+							machine().priority_bitmap,primasks[((priority >> 1) &1)],0);  /* maybe >> 2 or 0...? */
 				}
 			}
 			else
 			{
 				for (i = 0; i < 16; i++)
 				{
-					code = state->m_spritemap[(map_index + (i << 1))] & tile_mask;
-					col  = state->m_spritemap[(map_index + (i << 1) + 1)] & 0xf;
+					code = m_spritemap[(map_index + (i << 1))] & tile_mask;
+					col  = m_spritemap[(map_index + (i << 1) + 1)] & 0xf;
 
 					/* not known what controls priority */
-					priority = (state->m_spritemap[(map_index + (i << 1) + 1)] & 0x70) >> 4;
+					priority = (m_spritemap[(map_index + (i << 1) + 1)] & 0x70) >> 4;
 
 					flipx = 0;  // no flip xy?
 					flipy = 0;
@@ -454,13 +450,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 					zx = x + (((k + 1) * zoomx) / 4) - curx;
 					zy = y + (((j + 1) * zoomy) / 4) - cury;
 
-					pdrawgfxzoom_transpen(bitmap, cliprect,machine.gfx[0],
+					pdrawgfxzoom_transpen(bitmap, cliprect,machine().gfx[0],
 							code,
 							col,
 							flipx, flipy,
 							curx,cury,
 							zx << 12, zy << 12,
-							machine.priority_bitmap,primasks[((priority >> 1) &1)],0);  /* maybe >> 2 or 0...? */
+							machine().priority_bitmap,primasks[((priority >> 1) &1)],0);  /* maybe >> 2 or 0...? */
 				}
 			}
 		}
@@ -513,11 +509,10 @@ INLINE void bryan2_drawscanline( bitmap_ind16 &bitmap, int x, int y, int length,
 
 
 
-static void wgp_piv_layer_draw( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
+void wgp_state::wgp_piv_layer_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority )
 {
-	wgp_state *state = machine.driver_data<wgp_state>();
-	bitmap_ind16 &srcbitmap = state->m_piv_tilemap[layer]->pixmap();
-	bitmap_ind8 &flagsbitmap = state->m_piv_tilemap[layer]->flagsmap();
+	bitmap_ind16 &srcbitmap = m_piv_tilemap[layer]->pixmap();
+	bitmap_ind8 &flagsbitmap = m_piv_tilemap[layer]->flagsmap();
 
 	UINT16 *dst16,*src16;
 	UINT8 *tsrc;
@@ -549,15 +544,15 @@ static void wgp_piv_layer_draw( running_machine &machine, bitmap_ind16 &bitmap, 
 	   In WGP2 see: road at big hill (default course) */
 
 	/* This calculation may be wrong, the y_index one too */
-	zoomy = 0x10000 - (((state->m_piv_ctrlram[0x08 + layer] & 0xff) - 0x7f) * 512);
+	zoomy = 0x10000 - (((m_piv_ctrlram[0x08 + layer] & 0xff) - 0x7f) * 512);
 
 	if (!flipscreen)
 	{
-		sx = ((state->m_piv_scrollx[layer]) << 16);
-		sx += (state->m_piv_xoffs) * zoomx;     /* may be imperfect */
+		sx = ((m_piv_scrollx[layer]) << 16);
+		sx += (m_piv_xoffs) * zoomx;     /* may be imperfect */
 
-		y_index = (state->m_piv_scrolly[layer] << 16);
-		y_index += (state->m_piv_yoffs + min_y) * zoomy;        /* may be imperfect */
+		y_index = (m_piv_scrolly[layer] << 16);
+		y_index += (m_piv_yoffs + min_y) * zoomy;        /* may be imperfect */
 	}
 	else    /* piv tiles flipscreen n/a */
 	{
@@ -577,13 +572,13 @@ static void wgp_piv_layer_draw( running_machine &machine, bitmap_ind16 &bitmap, 
 		src_y_index = (y_index >> 16) & 0x3ff;
 		row_index = src_y_index;
 
-		row_zoom = state->m_pivram[row_index + layer * 0x400 + 0x3400] & 0xff;
+		row_zoom = m_pivram[row_index + layer * 0x400 + 0x3400] & 0xff;
 
-		row_colbank = state->m_pivram[row_index + layer * 0x400 + 0x3400] >> 8;
+		row_colbank = m_pivram[row_index + layer * 0x400 + 0x3400] >> 8;
 		a = (row_colbank & 0xe0);   /* kill bit 4 */
 		row_colbank = (((row_colbank & 0xf) << 1) | a) << 4;
 
-		row_scroll = state->m_pivram[row_index + layer * 0x1000 + 0x4000];
+		row_scroll = m_pivram[row_index + layer * 0x1000 + 0x4000];
 		a = (row_scroll & 0xffe0) >> 1; /* kill bit 4 */
 		row_scroll = ((row_scroll & 0xf) | a) & width_mask;
 
@@ -623,7 +618,7 @@ static void wgp_piv_layer_draw( running_machine &machine, bitmap_ind16 &bitmap, 
 			}
 		}
 
-		bryan2_drawscanline(bitmap, 0, y, screen_width, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, machine.priority_bitmap, priority);
+		bryan2_drawscanline(bitmap, 0, y, screen_width, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? 0 : 1, ROT0, machine().priority_bitmap, priority);
 
 		y_index += zoomy;
 		if (!machine_flip) y++; else y--;
@@ -694,19 +689,19 @@ UINT32 wgp_state::screen_update_wgp(screen_device &screen, bitmap_ind16 &bitmap,
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[0]] == 0)
 #endif
-	wgp_piv_layer_draw(machine(), bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	wgp_piv_layer_draw(bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[1]] == 0)
 #endif
-	wgp_piv_layer_draw(machine(), bitmap, cliprect, layer[1], 0, 2);
+	wgp_piv_layer_draw(bitmap, cliprect, layer[1], 0, 2);
 
 #ifdef MAME_DEBUG
 	if (m_dislayer[layer[2]] == 0)
 #endif
-	wgp_piv_layer_draw(machine(), bitmap, cliprect, layer[2], 0, 4);
+	wgp_piv_layer_draw(bitmap, cliprect, layer[2], 0, 4);
 
-	draw_sprites(machine(), bitmap, cliprect, 16);
+	draw_sprites(bitmap, cliprect, 16);
 
 /* ... then here we should apply rotation from wgp_sate_ctrl[] to the bitmap before we draw the TC0100SCN layers on it */
 	layer[0] = tc0100scn_bottomlayer(m_tc0100scn);

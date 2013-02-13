@@ -114,45 +114,43 @@ TILE_GET_INFO_MEMBER(zaxxon_state::congo_get_fg_tile_info)
  *
  *************************************/
 
-static void video_start_common(running_machine &machine, tilemap_get_info_delegate fg_tile_info)
+void zaxxon_state::video_start_common(tilemap_get_info_delegate fg_tile_info)
 {
-	zaxxon_state *state = machine.driver_data<zaxxon_state>();
-
 	/* reset globals */
-	state->m_bg_enable = 0;
-	state->m_bg_color = 0;
-	state->m_bg_position = 0;
-	state->m_fg_color = 0;
-	state->m_congo_fg_bank = 0;
-	state->m_congo_color_bank = 0;
-	memset(state->m_congo_custom, 0, sizeof(state->m_congo_custom));
+	m_bg_enable = 0;
+	m_bg_color = 0;
+	m_bg_position = 0;
+	m_fg_color = 0;
+	m_congo_fg_bank = 0;
+	m_congo_color_bank = 0;
+	memset(m_congo_custom, 0, sizeof(m_congo_custom));
 
 	/* create a background and foreground tilemap */
-	state->m_bg_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(zaxxon_state::get_bg_tile_info),state), TILEMAP_SCAN_ROWS,  8,8, 32,512);
-	state->m_fg_tilemap = &machine.tilemap().create(fg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
+	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(zaxxon_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,512);
+	m_fg_tilemap = &machine().tilemap().create(fg_tile_info, TILEMAP_SCAN_ROWS,  8,8, 32,32);
 
 	/* configure the foreground tilemap */
-	state->m_fg_tilemap->set_transparent_pen(0);
-	state->m_fg_tilemap->set_scrolldx(0, machine.primary_screen->width() - 256);
-	state->m_fg_tilemap->set_scrolldy(0, machine.primary_screen->height() - 256);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_scrolldx(0, machine().primary_screen->width() - 256);
+	m_fg_tilemap->set_scrolldy(0, machine().primary_screen->height() - 256);
 
 	/* register for save states */
-	state->save_item(NAME(state->m_bg_enable));
-	state->save_item(NAME(state->m_bg_color));
-	state->save_item(NAME(state->m_bg_position));
-	state->save_item(NAME(state->m_fg_color));
+	save_item(NAME(m_bg_enable));
+	save_item(NAME(m_bg_color));
+	save_item(NAME(m_bg_position));
+	save_item(NAME(m_fg_color));
 }
 
 
 void zaxxon_state::video_start()
 {
-	video_start_common(machine(), tilemap_get_info_delegate(FUNC(zaxxon_state::zaxxon_get_fg_tile_info),this));
+	video_start_common(tilemap_get_info_delegate(FUNC(zaxxon_state::zaxxon_get_fg_tile_info),this));
 }
 
 
 VIDEO_START_MEMBER(zaxxon_state,razmataz)
 {
-	video_start_common(machine(), tilemap_get_info_delegate(FUNC(zaxxon_state::razmataz_get_fg_tile_info),this));
+	video_start_common(tilemap_get_info_delegate(FUNC(zaxxon_state::razmataz_get_fg_tile_info),this));
 }
 
 
@@ -166,7 +164,7 @@ VIDEO_START_MEMBER(zaxxon_state,congo)
 	save_item(NAME(m_congo_color_bank));
 	save_item(NAME(m_congo_custom));
 
-	video_start_common(machine(), tilemap_get_info_delegate(FUNC(zaxxon_state::congo_get_fg_tile_info),this));
+	video_start_common(tilemap_get_info_delegate(FUNC(zaxxon_state::congo_get_fg_tile_info),this));
 }
 
 
@@ -297,24 +295,22 @@ WRITE8_MEMBER(zaxxon_state::congo_sprite_custom_w)
  *
  *************************************/
 
-static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int skew)
+void zaxxon_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int skew)
 {
-	zaxxon_state *state = machine.driver_data<zaxxon_state>();
-
 	/* only draw if enabled */
-	if (state->m_bg_enable)
+	if (m_bg_enable)
 	{
-		bitmap_ind16 &pixmap = state->m_bg_tilemap->pixmap();
-		int colorbase = state->m_bg_color + (state->m_congo_color_bank << 8);
+		bitmap_ind16 &pixmap = m_bg_tilemap->pixmap();
+		int colorbase = m_bg_color + (m_congo_color_bank << 8);
 		int xmask = pixmap.width() - 1;
 		int ymask = pixmap.height() - 1;
-		int flipmask = state->flip_screen() ? 0xff : 0x00;
-		int flipoffs = state->flip_screen() ? 0x38 : 0x40;
+		int flipmask = flip_screen() ? 0xff : 0x00;
+		int flipoffs = flip_screen() ? 0x38 : 0x40;
 		int x, y;
 
 		/* the starting X value is offset by 1 pixel (normal) or 7 pixels */
 		/* (flipped) due to a delay in the loading */
-		if (!state->flip_screen())
+		if (!flip_screen())
 			flipoffs -= 1;
 		else
 			flipoffs += 7;
@@ -331,7 +327,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 			/* base of the source row comes from VF plus the scroll value */
 			/* this is done by the 3 4-bit adders at U56, U74, U75 */
-			srcy = vf + ((state->m_bg_position << 1) ^ 0xfff) + 1;
+			srcy = vf + ((m_bg_position << 1) ^ 0xfff) + 1;
 			src = &pixmap.pix16(srcy & ymask);
 
 			/* loop over visible columns */
@@ -359,7 +355,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 	/* if not enabled, fill the background with black */
 	else
-		bitmap.fill(get_black_pen(machine), cliprect);
+		bitmap.fill(get_black_pen(machine()), cliprect);
 }
 
 
@@ -370,7 +366,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
  *
  *************************************/
 
-INLINE int find_minimum_y(UINT8 value, int flip)
+inline int zaxxon_state::find_minimum_y(UINT8 value, int flip)
 {
 	int flipmask = flip ? 0xff : 0x00;
 	int flipconst = flip ? 0xef : 0xf1;
@@ -401,7 +397,7 @@ INLINE int find_minimum_y(UINT8 value, int flip)
 }
 
 
-INLINE int find_minimum_x(UINT8 value, int flip)
+inline int zaxxon_state::find_minimum_x(UINT8 value, int flip)
 {
 	int flipmask = flip ? 0xff : 0x00;
 	int x;
@@ -415,12 +411,11 @@ INLINE int find_minimum_x(UINT8 value, int flip)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask)
+void zaxxon_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 flipxmask, UINT16 flipymask)
 {
-	zaxxon_state *state = machine.driver_data<zaxxon_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	gfx_element *gfx = machine.gfx[2];
-	int flip = state->flip_screen();
+	UINT8 *spriteram = m_spriteram;
+	gfx_element *gfx = machine().gfx[2];
+	int flip = flip_screen();
 	int flipmask = flip ? 0xff : 0x00;
 	int offs;
 
@@ -431,7 +426,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int flipy = (spriteram[offs + (flipymask >> 8)] ^ flipmask) & flipymask;
 		int flipx = (spriteram[offs + (flipxmask >> 8)] ^ flipmask) & flipxmask;
 		int code = spriteram[offs + 1];
-		int color = (spriteram[offs + 2] & 0x1f) + (state->m_congo_color_bank << 5);
+		int color = (spriteram[offs + 2] & 0x1f) + (m_congo_color_bank << 5);
 		int sx = find_minimum_x(spriteram[offs + 3], flip);
 
 		/* draw with 256 pixel offsets to ensure we wrap properly */
@@ -452,8 +447,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 UINT32 zaxxon_state::screen_update_zaxxon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(machine(), bitmap, cliprect, TRUE);
-	draw_sprites(machine(), bitmap, cliprect, 0x140, 0x180);
+	draw_background(bitmap, cliprect, TRUE);
+	draw_sprites(bitmap, cliprect, 0x140, 0x180);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -461,8 +456,8 @@ UINT32 zaxxon_state::screen_update_zaxxon(screen_device &screen, bitmap_ind16 &b
 
 UINT32 zaxxon_state::screen_update_futspy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(machine(), bitmap, cliprect, TRUE);
-	draw_sprites(machine(), bitmap, cliprect, 0x180, 0x180);
+	draw_background(bitmap, cliprect, TRUE);
+	draw_sprites(bitmap, cliprect, 0x180, 0x180);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -470,8 +465,8 @@ UINT32 zaxxon_state::screen_update_futspy(screen_device &screen, bitmap_ind16 &b
 
 UINT32 zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(machine(), bitmap, cliprect, FALSE);
-	draw_sprites(machine(), bitmap, cliprect, 0x140, 0x180);
+	draw_background(bitmap, cliprect, FALSE);
+	draw_sprites(bitmap, cliprect, 0x140, 0x180);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -479,8 +474,8 @@ UINT32 zaxxon_state::screen_update_razmataz(screen_device &screen, bitmap_ind16 
 
 UINT32 zaxxon_state::screen_update_congo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(machine(), bitmap, cliprect, TRUE);
-	draw_sprites(machine(), bitmap, cliprect, 0x280, 0x180);
+	draw_background(bitmap, cliprect, TRUE);
+	draw_sprites(bitmap, cliprect, 0x280, 0x180);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

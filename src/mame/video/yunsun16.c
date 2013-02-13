@@ -128,16 +128,15 @@ void yunsun16_state::video_start()
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void yunsun16_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	yunsun16_state *state = machine.driver_data<yunsun16_state>();
 	int offs;
-	const rectangle &visarea = machine.primary_screen->visible_area();
+	const rectangle &visarea = machine().primary_screen->visible_area();
 
 	int max_x = visarea.max_x + 1;
 	int max_y = visarea.max_y + 1;
 
-	int pri = *state->m_priorityram & 3;
+	int pri = *m_priorityram & 3;
 	int pri_mask;
 
 	switch (pri)
@@ -154,30 +153,30 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			break;
 	}
 
-	for (offs = (state->m_spriteram.bytes() - 8) / 2 ; offs >= 0; offs -= 8 / 2)
+	for (offs = (m_spriteram.bytes() - 8) / 2 ; offs >= 0; offs -= 8 / 2)
 	{
-		int x = state->m_spriteram[offs + 0];
-		int y = state->m_spriteram[offs + 1];
-		int code = state->m_spriteram[offs + 2];
-		int attr = state->m_spriteram[offs + 3];
+		int x = m_spriteram[offs + 0];
+		int y = m_spriteram[offs + 1];
+		int code = m_spriteram[offs + 2];
+		int attr = m_spriteram[offs + 3];
 		int flipx = attr & 0x20;
 		int flipy = attr & 0x40;
 
-		x += state->m_sprites_scrolldx;
-		y += state->m_sprites_scrolldy;
+		x += m_sprites_scrolldx;
+		y += m_sprites_scrolldy;
 
-		if (state->flip_screen())   // not used?
+		if (flip_screen())   // not used?
 		{
 			flipx = !flipx;     x = max_x - x - 16;
 			flipy = !flipy;     y = max_y - y - 16;
 		}
 
-		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					code,
 					attr & 0x1f,
 					flipx, flipy,
 					x,y,
-					machine.priority_bitmap,
+					machine().priority_bitmap,
 					pri_mask,15);
 	}
 }
@@ -219,6 +218,6 @@ UINT32 yunsun16_state::screen_update_yunsun16(screen_device &screen, bitmap_ind1
 		m_tilemap_0->draw(bitmap, cliprect, 0, 2);
 	}
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

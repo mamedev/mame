@@ -1287,13 +1287,13 @@ ROM_START( wecleman2 )
 	ROM_LOAD( "602a12.1a",  0x000000, 0x04000, CRC(77b9383d) SHA1(7cb970889677704d6324bb64aafc05326c4503ad) )
 ROM_END
 
-static void wecleman_unpack_sprites(running_machine &machine)
+void wecleman_state::wecleman_unpack_sprites()
 {
 	const char *region       = "gfx1";  // sprites
 
-	const UINT32 len = machine.root_device().memregion(region)->bytes();
-	UINT8 *src     = machine.root_device().memregion(region)->base() + len / 2 - 1;
-	UINT8 *dst     = machine.root_device().memregion(region)->base() + len - 1;
+	const UINT32 len = machine().root_device().memregion(region)->bytes();
+	UINT8 *src     = machine().root_device().memregion(region)->base() + len / 2 - 1;
+	UINT8 *dst     = machine().root_device().memregion(region)->base() + len - 1;
 
 	while(dst > src)
 	{
@@ -1304,9 +1304,9 @@ static void wecleman_unpack_sprites(running_machine &machine)
 	}
 }
 
-static void bitswap(running_machine &machine,UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
+void wecleman_state::bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
 {
-	UINT8 *buffer = auto_alloc_array(machine, UINT8, len);
+	UINT8 *buffer = auto_alloc_array(machine(), UINT8, len);
 	int i;
 
 	memcpy(buffer,src,len);
@@ -1315,7 +1315,7 @@ static void bitswap(running_machine &machine,UINT8 *src,size_t len,int _14,int _
 		src[i] =
 			buffer[BITSWAP24(i,23,22,21,_14,_13,_12,_11,_10,_f,_e,_d,_c,_b,_a,_9,_8,_7,_6,_5,_4,_3,_2,_1,_0)];
 	}
-	auto_free(machine, buffer);
+	auto_free(machine(), buffer);
 }
 
 /* Unpack sprites data and do some patching */
@@ -1343,18 +1343,18 @@ DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 		RAM[i] = BITSWAP8(RAM[i],7,0,1,2,3,4,5,6);
 	}
 
-	bitswap(machine(), machine().root_device().memregion("gfx1")->base(), machine().root_device().memregion("gfx1")->bytes(),
+	bitswap(machine().root_device().memregion("gfx1")->base(), machine().root_device().memregion("gfx1")->bytes(),
 			0,1,20,19,18,17,14,9,16,6,4,7,8,15,10,11,13,5,12,3,2);
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
-	wecleman_unpack_sprites(machine());
+	wecleman_unpack_sprites();
 
 	/* Bg & Fg & Txt */
-	bitswap(machine(), machine().root_device().memregion("gfx2")->base(), machine().root_device().memregion("gfx2")->bytes(),
+	bitswap(machine().root_device().memregion("gfx2")->base(), machine().root_device().memregion("gfx2")->bytes(),
 			20,19,18,17,16,15,12,7,14,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	/* Road */
-	bitswap(machine(), machine().root_device().memregion("gfx3")->base(), machine().root_device().memregion("gfx3")->bytes(),
+	bitswap(machine().root_device().memregion("gfx3")->base(), machine().root_device().memregion("gfx3")->bytes(),
 			20,19,18,17,16,15,14,7,12,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	m_spr_color_offs = 0x40;
@@ -1414,13 +1414,13 @@ ROM_END
     in a ROM module definition.  This routine unpacks each sprite nibble
     into a byte, doubling the memory consumption. */
 
-static void hotchase_sprite_decode( running_machine &machine, int num16_banks, int bank_size )
+void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 {
 	UINT8 *base, *temp;
 	int i;
 
-	base = machine.root_device().memregion("gfx1")->base(); // sprites
-	temp = auto_alloc_array(machine, UINT8,  bank_size );
+	base = machine().root_device().memregion("gfx1")->base(); // sprites
+	temp = auto_alloc_array(machine(), UINT8,  bank_size );
 
 	for( i = num16_banks; i >0; i-- ){
 		UINT8 *finish   = base + 2*bank_size*i;
@@ -1458,7 +1458,7 @@ static void hotchase_sprite_decode( running_machine &machine, int num16_banks, i
 			*dest++ = data & 0xF;
 		} while( dest<finish );
 	}
-	auto_free( machine, temp );
+	auto_free( machine(), temp );
 }
 
 /* Unpack sprites data and do some patching */
@@ -1475,7 +1475,7 @@ DRIVER_INIT_MEMBER(wecleman_state,hotchase)
 	RAM = memregion("gfx1")->base();
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
-	hotchase_sprite_decode(machine(),3,0x80000*2);  // num banks, bank len
+	hotchase_sprite_decode(3,0x80000*2);  // num banks, bank len
 
 	/* Let's copy the second half of the fg layer gfx (charset) over the first */
 	RAM = memregion("gfx3")->base();

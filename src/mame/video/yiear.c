@@ -102,14 +102,13 @@ void yiear_state::video_start()
 	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(yiear_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void yiear_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	yiear_state *state = machine.driver_data<yiear_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	UINT8 *spriteram_2 = state->m_spriteram2;
+	UINT8 *spriteram = m_spriteram;
+	UINT8 *spriteram_2 = m_spriteram2;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
+	for (offs = m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
 	{
 		int attr = spriteram[offs];
 		int code = spriteram_2[offs + 1] + 256 * (attr & 0x01);
@@ -119,7 +118,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sy = 240 - spriteram[offs + 1];
 		int sx = spriteram_2[offs];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -131,7 +130,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		}
 
 		drawgfx_transpen(bitmap, cliprect,
-			machine.gfx[1],
+			machine().gfx[1],
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -141,6 +140,6 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 UINT32 yiear_state::screen_update_yiear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

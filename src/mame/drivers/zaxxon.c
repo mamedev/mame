@@ -1472,7 +1472,7 @@ ROM_END
  *
  *************************************/
 
-static void zaxxonj_decode(running_machine &machine, const char *cputag)
+void zaxxon_state::zaxxonj_decode(const char *cputag)
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -1517,10 +1517,10 @@ static void zaxxonj_decode(running_machine &machine, const char *cputag)
 	};
 
 	int A;
-	address_space &space = machine.device(cputag)->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.root_device().memregion(cputag)->base();
-	int size = machine.root_device().memregion(cputag)->bytes();
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
+	address_space &space = machine().device(cputag)->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine().root_device().memregion(cputag)->base();
+	int size = machine().root_device().memregion(cputag)->bytes();
+	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, size);
 
 	space.set_decrypted_region(0x0000, size - 1, decrypt);
 
@@ -1559,7 +1559,7 @@ static void zaxxonj_decode(running_machine &machine, const char *cputag)
 
 DRIVER_INIT_MEMBER(zaxxon_state,zaxxonj)
 {
-	zaxxonj_decode(machine(), "maincpu");
+	zaxxonj_decode("maincpu");
 }
 
 

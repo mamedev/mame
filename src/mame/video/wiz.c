@@ -92,10 +92,9 @@ WRITE8_MEMBER(wiz_state::wiz_flipy_w)
 	m_flipy = data;
 }
 
-static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank, int colortype)
+void wiz_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank, int colortype)
 {
-	wiz_state *state = machine.driver_data<wiz_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int offs;
 
 	/* for every character in the Video RAM, check if it has been modified */
@@ -110,32 +109,31 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 		if (colortype)
 		{
-			col = (state->m_attributesram[2 * sx + 1] & 0x07);
+			col = (m_attributesram[2 * sx + 1] & 0x07);
 		}
 		else
 		{
-			col = (state->m_attributesram[2 * (offs % 32) + 1] & 0x04) + (videoram[offs] & 3);
+			col = (m_attributesram[2 * (offs % 32) + 1] & 0x04) + (videoram[offs] & 3);
 		}
 
-		scroll = (8*sy + 256 - state->m_attributesram[2 * sx]) % 256;
-		if (state->m_flipy)
+		scroll = (8*sy + 256 - m_attributesram[2 * sx]) % 256;
+		if (m_flipy)
 		{
 			scroll = (248 - scroll) % 256;
 		}
-		if (state->m_flipx) sx = 31 - sx;
+		if (m_flipx) sx = 31 - sx;
 
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[bank],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[bank],
 			videoram[offs],
-			col + 8 * state->m_palette_bank,
-			state->m_flipx,state->m_flipy,
+			col + 8 * m_palette_bank,
+			m_flipx,m_flipy,
 			8*sx,scroll,0);
 	}
 }
 
-static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int colortype)
+void wiz_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int colortype)
 {
-	wiz_state *state = machine.driver_data<wiz_state>();
 	int offs;
 
 	/* draw the frontmost playfield. They are characters, but draw them as sprites. */
@@ -149,37 +147,34 @@ static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 		if (colortype)
 		{
-			col = (state->m_attributesram2[2 * sx + 1] & 0x07);
+			col = (m_attributesram2[2 * sx + 1] & 0x07);
 		}
 		else
 		{
-			col = (state->m_colorram2[offs] & 0x07);
+			col = (m_colorram2[offs] & 0x07);
 		}
 
-		scroll = (8*sy + 256 - state->m_attributesram2[2 * sx]) % 256;
-		if (state->m_flipy)
+		scroll = (8*sy + 256 - m_attributesram2[2 * sx]) % 256;
+		if (m_flipy)
 		{
 			scroll = (248 - scroll) % 256;
 		}
-		if (state->m_flipx) sx = 31 - sx;
+		if (m_flipx) sx = 31 - sx;
 
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[state->m_char_bank[1]],
-			state->m_videoram2[offs],
-			col + 8 * state->m_palette_bank,
-			state->m_flipx,state->m_flipy,
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[m_char_bank[1]],
+			m_videoram2[offs],
+			col + 8 * m_palette_bank,
+			m_flipx,m_flipy,
 			8*sx,scroll,0);
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
-							const rectangle &cliprect, UINT8* sprite_ram,
-							int bank)
+void wiz_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8* sprite_ram,int bank)
 {
-	wiz_state *state = machine.driver_data<wiz_state>();
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
+	for (offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy;
 
@@ -189,13 +184,13 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 
 		if (!sx || !sy) continue;
 
-		if ( state->m_flipx) sx = 240 - sx;
-		if (!state->m_flipy) sy = 240 - sy;
+		if ( m_flipx) sx = 240 - sx;
+		if (!m_flipy) sy = 240 - sy;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[bank],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[bank],
 				sprite_ram[offs + 1],
-				(sprite_ram[offs + 2] & 0x07) + 8 * state->m_palette_bank,
-				state->m_flipx,state->m_flipy,
+				(sprite_ram[offs + 2] & 0x07) + 8 * m_palette_bank,
+				m_flipx,m_flipy,
 				sx,sy,0);
 	}
 }
@@ -204,10 +199,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 UINT32 wiz_state::screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgpen, cliprect);
-	draw_background(machine(), bitmap, cliprect, 2 + m_char_bank[0] , 0);
-	draw_foreground(machine(), bitmap, cliprect, 0);
-	draw_sprites(machine(), bitmap, cliprect, m_spriteram2, 4);
-	draw_sprites(machine(), bitmap, cliprect, m_spriteram  , 5);
+	draw_background(bitmap, cliprect, 2 + m_char_bank[0] , 0);
+	draw_foreground(bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, m_spriteram2, 4);
+	draw_sprites(bitmap, cliprect, m_spriteram  , 5);
 	return 0;
 }
 
@@ -216,8 +211,8 @@ UINT32 wiz_state::screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap,
 	int bank;
 
 	bitmap.fill(m_bgpen, cliprect);
-	draw_background(machine(), bitmap, cliprect, 2 + ((m_char_bank[0] << 1) | m_char_bank[1]), 0);
-	draw_foreground(machine(), bitmap, cliprect, 0);
+	draw_background(bitmap, cliprect, 2 + ((m_char_bank[0] << 1) | m_char_bank[1]), 0);
+	draw_foreground(bitmap, cliprect, 0);
 
 	const rectangle spritevisiblearea(2*8, 32*8-1, 2*8, 30*8-1);
 	const rectangle spritevisibleareaflipx(0*8, 30*8-1, 2*8, 30*8-1);
@@ -225,8 +220,8 @@ UINT32 wiz_state::screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap,
 
 	bank = 7 + *m_sprite_bank;
 
-	draw_sprites(machine(), bitmap, visible_area, m_spriteram2, 6);
-	draw_sprites(machine(), bitmap, visible_area, m_spriteram  , bank);
+	draw_sprites(bitmap, visible_area, m_spriteram2, 6);
+	draw_sprites(bitmap, visible_area, m_spriteram  , bank);
 	return 0;
 }
 
@@ -234,9 +229,9 @@ UINT32 wiz_state::screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap,
 UINT32 wiz_state::screen_update_stinger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_bgpen, cliprect);
-	draw_background(machine(), bitmap, cliprect, 2 + m_char_bank[0], 1);
-	draw_foreground(machine(), bitmap, cliprect, 1);
-	draw_sprites(machine(), bitmap, cliprect, m_spriteram2, 4);
-	draw_sprites(machine(), bitmap, cliprect, m_spriteram  , 5);
+	draw_background(bitmap, cliprect, 2 + m_char_bank[0], 1);
+	draw_foreground(bitmap, cliprect, 1);
+	draw_sprites(bitmap, cliprect, m_spriteram2, 4);
+	draw_sprites(bitmap, cliprect, m_spriteram  , 5);
 	return 0;
 }

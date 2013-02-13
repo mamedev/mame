@@ -77,28 +77,27 @@ void xxmissio_state::video_start()
 }
 
 
-static void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx)
+void xxmissio_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx)
 {
-	xxmissio_state *state = gfx->machine().driver_data<xxmissio_state>();
 	int offs;
 	int chr,col;
 	int x,y,px,py,fx,fy;
 
 	for (offs=0; offs<0x800; offs +=0x20)
 	{
-		chr = state->m_spriteram[offs];
-		col = state->m_spriteram[offs+3];
+		chr = m_spriteram[offs];
+		col = m_spriteram[offs+3];
 
-		fx = ((col & 0x10) >> 4) ^ state->m_flipscreen;
-		fy = ((col & 0x20) >> 5) ^ state->m_flipscreen;
+		fx = ((col & 0x10) >> 4) ^ m_flipscreen;
+		fy = ((col & 0x20) >> 5) ^ m_flipscreen;
 
-		x = state->m_spriteram[offs+1]*2;
-		y = state->m_spriteram[offs+2];
+		x = m_spriteram[offs+1]*2;
+		y = m_spriteram[offs+2];
 
 		chr = chr + ((col & 0x40) << 2);
 		col = col & 0x07;
 
-		if (state->m_flipscreen==0)
+		if (m_flipscreen==0)
 		{
 			px = x-8;
 			py = y;
