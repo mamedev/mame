@@ -922,7 +922,7 @@
 	
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
-				<rom name="CAGED ARTIST_1.g64" size="333744" crc="a2e05594" sha1="4950d59682683af49098e7665f81341e4c7843d1" offset="0" />
+				<rom name="caged artist_1.g64" size="333744" crc="a2e05594" sha1="4950d59682683af49098e7665f81341e4c7843d1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -948,7 +948,7 @@
 	
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="MIDU.d64" size="174848" crc="4f4d3f29" sha1="e5c1bf26cca0e0dd65c8908f4554722d1d2d492c" offset="0" />
+				<rom name="midu.d64" size="174848" crc="4f4d3f29" sha1="e5c1bf26cca0e0dd65c8908f4554722d1d2d492c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
