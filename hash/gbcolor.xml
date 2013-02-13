@@ -23799,7 +23799,7 @@ Undumped Pirates:
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc5" />
 			<dataarea name="rom" size="1048576">
-				<rom name="rockman x3 (chi).bin" size="1048576" crc="46c5b31d" sha1="70e5c1dae3bf0aee8dc901aba9e66751f2c1fc01" offset="000000" />
+				<rom name="rockman x3 (chi, alt).bin" size="1048576" crc="46c5b31d" sha1="70e5c1dae3bf0aee8dc901aba9e66751f2c1fc01" offset="000000" />
 			</dataarea>
 			<dataarea name="ram" size="8192">
 			</dataarea>
