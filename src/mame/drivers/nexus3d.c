@@ -51,6 +51,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_nexus3d(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void nexus3d_flash_reset();
 };
 
 
@@ -61,14 +62,13 @@ public:
 // Flash handling is very similar (but not 100% identical) to the stuff used in cavesh3 (command structure seems very slightly different, probably due to larger size)
 // this is just a skeleton implementation
 
-void nexus3d_flash_reset(running_machine& machine)
+void nexus3d_state::nexus3d_flash_reset()
 {
-	nexus3d_state *state = machine.driver_data<nexus3d_state>();
-	state->m_last_flash_cmd = 0x00;
-	state->m_flash_addr_seq = 0;
-	state->m_flash_addr = 0;
+	m_last_flash_cmd = 0x00;
+	m_flash_addr_seq = 0;
+	m_flash_addr = 0;
 
-	state->m_flash_page_addr = 0;
+	m_flash_page_addr = 0;
 }
 
 READ8_MEMBER(nexus3d_state::n3d_flash_r)
@@ -189,7 +189,7 @@ UINT32 nexus3d_state::screen_update_nexus3d(screen_device &screen, bitmap_rgb32 
 
 void nexus3d_state::machine_reset()
 {
-	nexus3d_flash_reset(machine());
+	nexus3d_flash_reset();
 }
 
 static MACHINE_CONFIG_START( nexus3d, nexus3d_state )

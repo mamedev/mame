@@ -100,6 +100,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_panicr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(panicr_scanline);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect );
 };
 
 
@@ -224,10 +225,9 @@ void panicr_state::video_start()
 	colortable_configure_tilemap_groups(machine().colortable, m_txttilemap, machine().gfx[0], 0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
+void panicr_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	panicr_state *state = machine.driver_data<panicr_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs,flipx,flipy,x,y,color,sprite;
 
 	for (offs = 0; offs<0x1000; offs+=16)
@@ -239,12 +239,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		if (spriteram[offs+1] & 0x40) x -= 0x100;
 
 		color = spriteram[offs+1] & 0x0f;
-		sprite = spriteram[offs+0] | (*state->m_spritebank << 8);
+		sprite = spriteram[offs+0] | (*m_spritebank << 8);
 
-		drawgfx_transmask(bitmap,cliprect,machine.gfx[3],
+		drawgfx_transmask(bitmap,cliprect,machine().gfx[3],
 				sprite,
 				color,flipx,flipy,x,y,
-				colortable_get_transpen_mask(machine.colortable, machine.gfx[3], color, 0));
+				colortable_get_transpen_mask(machine().colortable, machine().gfx[3], color, 0));
 	}
 }
 
@@ -254,7 +254,7 @@ UINT32 panicr_state::screen_update_panicr(screen_device &screen, bitmap_ind16 &b
 	m_txttilemap->mark_all_dirty();
 	m_bgtilemap->set_scrollx(0, m_scrollx);
 	m_bgtilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_txttilemap->draw(bitmap, cliprect, 0,0);
 
 	return 0;

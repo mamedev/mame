@@ -86,6 +86,7 @@ public:
 	DECLARE_READ8_MEMBER(dominob_unk_port02_r);
 	virtual void video_start();
 	UINT32 screen_update_dominob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 void dominob_state::video_start()
@@ -93,31 +94,30 @@ void dominob_state::video_start()
 	machine().gfx[0]->set_granularity(8);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void dominob_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	dominob_state *state = machine.driver_data<dominob_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int sx, sy, code;
 
-		sx = state->m_spriteram[offs];
-		sy = 248 - state->m_spriteram[offs + 1];
-		if (state->flip_screen_x()) sx = 248 - sx;
-		if (state->flip_screen_y()) sy = 248 - sy;
+		sx = m_spriteram[offs];
+		sy = 248 - m_spriteram[offs + 1];
+		if (flip_screen_x()) sx = 248 - sx;
+		if (flip_screen_y()) sy = 248 - sy;
 
-		code = state->m_spriteram[offs + 3] + ((state->m_spriteram[offs + 2] & 0x03) << 8)  ;
+		code = m_spriteram[offs + 3] + ((m_spriteram[offs + 2] & 0x03) << 8)  ;
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				2 * code,
-				((state->m_spriteram[offs + 2] & 0xf8) >> 3)  ,
-				state->flip_screen_x(),state->flip_screen_y(),
-				sx,sy + (state->flip_screen_y() ? 8 : -8),0);
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+				((m_spriteram[offs + 2] & 0xf8) >> 3)  ,
+				flip_screen_x(),flip_screen_y(),
+				sx,sy + (flip_screen_y() ? 8 : -8),0);
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				2 * code + 1,
-				((state->m_spriteram[offs + 2] & 0xf8) >> 3)  ,
-				state->flip_screen_x(),state->flip_screen_y(),
+				((m_spriteram[offs + 2] & 0xf8) >> 3)  ,
+				flip_screen_x(),flip_screen_y(),
 				sx,sy,0);
 	}
 }
@@ -158,7 +158,7 @@ UINT32 dominob_state::screen_update_dominob(screen_device &screen, bitmap_ind16 
 		}
 	}
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	return 0;
 }

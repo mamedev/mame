@@ -74,6 +74,9 @@ public:
 	UINT32 screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_gpworld);
 	TIMER_CALLBACK_MEMBER(irq_stop);
+	void gpworld_draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect);
+	inline void draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip);
+	void gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -85,9 +88,8 @@ public:
 
 
 /* VIDEO GOODS */
-static void gpworld_draw_tiles(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect)
+void gpworld_state::gpworld_draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
-	gpworld_state *state = machine.driver_data<gpworld_state>();
 	UINT8 characterX, characterY;
 
 	/* Temporarily set to 64 wide to accommodate two screens */
@@ -97,13 +99,13 @@ static void gpworld_draw_tiles(running_machine &machine, bitmap_rgb32 &bitmap,co
 		{
 			int current_screen_character = (characterY*64) + characterX;
 
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->m_tile_ram[current_screen_character],
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[0], m_tile_ram[current_screen_character],
 					characterY, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
 }
 
-INLINE void draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip)
+void gpworld_state::draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip)
 {
 	if (flip)
 	{
@@ -112,12 +114,11 @@ INLINE void draw_pixel(running_machine &machine, bitmap_rgb32 &bitmap,const rect
 	}
 
 	if (cliprect.contains(x, y))
-		bitmap.pix32(y, x) = machine.pens[color];
+		bitmap.pix32(y, x) = machine().pens[color];
 }
 
-static void gpworld_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void gpworld_state::gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	gpworld_state *state = machine.driver_data<gpworld_state>();
 	const int SPR_Y_TOP     = 0;
 	const int SPR_Y_BOTTOM  = 1;
 	const int SPR_X_LO      = 2;
@@ -126,16 +127,16 @@ static void gpworld_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap,
 	const int SPR_SKIP_HI   = 5;
 	const int SPR_GFXOFS_LO = 6;
 	const int SPR_GFXOFS_HI = 7;
-	int flip = state->flip_screen();
+	int flip = flip_screen();
 
 	int i;
 
-	UINT8 *GFX = state->memregion("gfx2")->base();
+	UINT8 *GFX = memregion("gfx2")->base();
 
 	/* Heisted from Daphne which heisted it from MAME */
 	for (i = 0; i < 0x800; i += 8)
 	{
-		UINT8 *spr_reg = state->m_sprite_ram + i;
+		UINT8 *spr_reg = m_sprite_ram + i;
 
 		if (spr_reg[SPR_Y_BOTTOM] && spr_reg[SPR_X_LO] != 0xff)
 		{
@@ -203,10 +204,10 @@ static void gpworld_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap,
 					}
 
 					/* Daphne says "don't draw the pixel if it's black". */
-					draw_pixel(machine, bitmap,cliprect,x+0,y,palette_get_color(machine, pixel1 + (sprite_color*0x10 + 0x200)),flip);
-					draw_pixel(machine, bitmap,cliprect,x+1,y,palette_get_color(machine, pixel2 + (sprite_color*0x10 + 0x200)),flip);
-					draw_pixel(machine, bitmap,cliprect,x+2,y,palette_get_color(machine, pixel3 + (sprite_color*0x10 + 0x200)),flip);
-					draw_pixel(machine, bitmap,cliprect,x+3,y,palette_get_color(machine, pixel4 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+0,y,palette_get_color(machine(), pixel1 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+1,y,palette_get_color(machine(), pixel2 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+2,y,palette_get_color(machine(), pixel3 + (sprite_color*0x10 + 0x200)),flip);
+					draw_pixel(bitmap,cliprect,x+3,y,palette_get_color(machine(), pixel4 + (sprite_color*0x10 + 0x200)),flip);
 
 					x += 4;
 
@@ -230,8 +231,8 @@ UINT32 gpworld_state::screen_update_gpworld(screen_device &screen, bitmap_rgb32 
 {
 	bitmap.fill(0, cliprect);
 
-	gpworld_draw_tiles(machine(), bitmap, cliprect);
-	gpworld_draw_sprites(machine(), bitmap, cliprect);
+	gpworld_draw_tiles(bitmap, cliprect);
+	gpworld_draw_sprites(bitmap, cliprect);
 
 	return 0;
 }

@@ -76,6 +76,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_onetwo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void set_color(int offset);
 };
 
 
@@ -137,27 +138,26 @@ WRITE8_MEMBER(onetwo_state::onetwo_soundlatch_w)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void set_color(running_machine &machine, int offset)
+void onetwo_state::set_color(int offset)
 {
-	onetwo_state *state = machine.driver_data<onetwo_state>();
 	int r, g, b;
 
-	r = state->m_paletteram[offset] & 0x1f;
-	g = state->m_paletteram2[offset] & 0x1f;
-	b = ((state->m_paletteram[offset] & 0x60) >> 2) | ((state->m_paletteram2[offset] & 0xe0) >> 5);
-	palette_set_color_rgb(machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
+	r = m_paletteram[offset] & 0x1f;
+	g = m_paletteram2[offset] & 0x1f;
+	b = ((m_paletteram[offset] & 0x60) >> 2) | ((m_paletteram2[offset] & 0xe0) >> 5);
+	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_MEMBER(onetwo_state::palette1_w)
 {
 	m_paletteram[offset] = data;
-	set_color(machine(), offset);
+	set_color(offset);
 }
 
 WRITE8_MEMBER(onetwo_state::palette2_w)
 {
 	m_paletteram2[offset] = data;
-	set_color(machine(), offset);
+	set_color(offset);
 }
 
 /*************************************

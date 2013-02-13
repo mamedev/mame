@@ -84,6 +84,7 @@ public:
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(intrq_tick);
 	TIMER_CALLBACK_MEMBER(ssi263_phoneme_tick);
+	void check_interrupt();
 };
 
 
@@ -95,16 +96,15 @@ static const UINT8 led_map[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x0
 
 /* Interrupts */
 
-static void check_interrupt(running_machine &machine)
+void thayers_state::check_interrupt()
 {
-	thayers_state *state = machine.driver_data<thayers_state>();
-	if (!state->m_timer_int || !state->m_data_rdy_int || !state->m_ssi_data_request)
+	if (!m_timer_int || !m_data_rdy_int || !m_ssi_data_request)
 	{
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 	}
 	else
 	{
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
@@ -146,14 +146,14 @@ WRITE8_MEMBER(thayers_state::timer_int_ack_w)
 {
 	m_timer_int = 1;
 
-	check_interrupt(machine());
+	check_interrupt();
 }
 
 WRITE8_MEMBER(thayers_state::data_rdy_int_ack_w)
 {
 	m_data_rdy_int = 1;
 
-	check_interrupt(machine());
+	check_interrupt();
 }
 
 WRITE8_MEMBER(thayers_state::cop_d_w)
@@ -179,7 +179,7 @@ WRITE8_MEMBER(thayers_state::cop_d_w)
 		m_data_rdy_int = 0;
 	}
 
-	check_interrupt(machine());
+	check_interrupt();
 }
 
 /* COP Communication */
@@ -475,7 +475,7 @@ static const char SSI263_PHONEMES[0x40][5] =
 TIMER_CALLBACK_MEMBER(thayers_state::ssi263_phoneme_tick)
 {
 	m_ssi_data_request = 0;
-	check_interrupt(machine());
+	check_interrupt();
 }
 
 WRITE8_MEMBER(thayers_state::ssi263_register_w)
@@ -493,7 +493,7 @@ WRITE8_MEMBER(thayers_state::ssi263_register_w)
 		ssi263.p = data & 0x3f;
 
 		m_ssi_data_request = 1;
-		check_interrupt(machine());
+		check_interrupt();
 
 		switch (ssi263.mode)
 		{

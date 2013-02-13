@@ -142,6 +142,7 @@ public:
 	UINT32 screen_update_jollyjgr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_fspider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jollyjgr_interrupt);
+	void draw_bitmap( bitmap_ind16 &bitmap );
 };
 
 
@@ -456,9 +457,8 @@ void jollyjgr_state::video_start()
 	m_bg_tilemap->set_scroll_cols(32);
 }
 
-static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
+void jollyjgr_state::draw_bitmap( bitmap_ind16 &bitmap )
 {
-	jollyjgr_state *state = machine.driver_data<jollyjgr_state>();
 	int x, y, count;
 	int i, bit0, bit1, bit2;
 	int color;
@@ -470,18 +470,18 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 		{
 			for(i = 0; i < 8; i++)
 			{
-				bit0 = (state->m_bitmap[count] >> i) & 1;
-				bit1 = (state->m_bitmap[count + 0x2000] >> i) & 1;
-				bit2 = (state->m_bitmap[count + 0x4000] >> i) & 1;
+				bit0 = (m_bitmap[count] >> i) & 1;
+				bit1 = (m_bitmap[count + 0x2000] >> i) & 1;
+				bit2 = (m_bitmap[count + 0x4000] >> i) & 1;
 				color = bit0 | (bit1 << 1) | (bit2 << 2);
 
 				if(color)
 				{
-					if(state->m_flip_x && state->m_flip_y)
+					if(m_flip_x && m_flip_y)
 						bitmap.pix16(y, x * 8 + i) = color + 32;
-					else if(state->m_flip_x && !state->m_flip_y)
+					else if(m_flip_x && !m_flip_y)
 						bitmap.pix16(255 - y, x * 8 + i) = color + 32;
-					else if(!state->m_flip_x && state->m_flip_y)
+					else if(!m_flip_x && m_flip_y)
 						bitmap.pix16(y, 255 - x * 8 - i) = color + 32;
 					else
 						bitmap.pix16(255 - y, 255 - x * 8 - i) = color + 32;
@@ -503,7 +503,7 @@ UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_ind1
 	if(m_pri) //used in Frog & Spiders level 3
 	{
 		if(!(m_bitmap_disable))
-			draw_bitmap(machine(), bitmap);
+			draw_bitmap(bitmap);
 
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
@@ -512,7 +512,7 @@ UINT32 jollyjgr_state::screen_update_jollyjgr(screen_device &screen, bitmap_ind1
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 		if(!(m_bitmap_disable))
-			draw_bitmap(machine(), bitmap);
+			draw_bitmap(bitmap);
 	}
 
 	/* Sprites are the same as in Galaxian */

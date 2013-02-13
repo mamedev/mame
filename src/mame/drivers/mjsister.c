@@ -63,6 +63,8 @@ public:
 	UINT32 screen_update_mjsister(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(dac_callback);
 	void mjsister_redraw();
+	void mjsister_plot0( int offset, UINT8 data );
+	void mjsister_plot1( int offset, UINT8 data );
 };
 
 
@@ -81,24 +83,22 @@ void mjsister_state::video_start()
 	save_item(NAME(m_videoram1));
 }
 
-static void mjsister_plot0( running_machine &machine, int offset, UINT8 data )
+void mjsister_state::mjsister_plot0( int offset, UINT8 data )
 {
-	mjsister_state *state = machine.driver_data<mjsister_state>();
 	int x, y, c1, c2;
 
 	x = offset & 0x7f;
 	y = offset / 0x80;
 
-	c1 = (data & 0x0f)        + state->m_colorbank * 0x20;
-	c2 = ((data & 0xf0) >> 4) + state->m_colorbank * 0x20;
+	c1 = (data & 0x0f)        + m_colorbank * 0x20;
+	c2 = ((data & 0xf0) >> 4) + m_colorbank * 0x20;
 
-	state->m_tmpbitmap0->pix16(y, x * 2 + 0) = c1;
-	state->m_tmpbitmap0->pix16(y, x * 2 + 1) = c2;
+	m_tmpbitmap0->pix16(y, x * 2 + 0) = c1;
+	m_tmpbitmap0->pix16(y, x * 2 + 1) = c2;
 }
 
-static void mjsister_plot1( running_machine &machine, int offset, UINT8 data )
+void mjsister_state::mjsister_plot1( int offset, UINT8 data )
 {
-	mjsister_state *state = machine.driver_data<mjsister_state>();
 	int x, y, c1, c2;
 
 	x = offset & 0x7f;
@@ -108,12 +108,12 @@ static void mjsister_plot1( running_machine &machine, int offset, UINT8 data )
 	c2 = (data & 0xf0) >> 4;
 
 	if (c1)
-		c1 += state->m_colorbank * 0x20 + 0x10;
+		c1 += m_colorbank * 0x20 + 0x10;
 	if (c2)
-		c2 += state->m_colorbank * 0x20 + 0x10;
+		c2 += m_colorbank * 0x20 + 0x10;
 
-	state->m_tmpbitmap1->pix16(y, x * 2 + 0) = c1;
-	state->m_tmpbitmap1->pix16(y, x * 2 + 1) = c2;
+	m_tmpbitmap1->pix16(y, x * 2 + 0) = c1;
+	m_tmpbitmap1->pix16(y, x * 2 + 1) = c2;
 }
 
 WRITE8_MEMBER(mjsister_state::mjsister_videoram_w)
@@ -121,12 +121,12 @@ WRITE8_MEMBER(mjsister_state::mjsister_videoram_w)
 	if (m_vrambank)
 	{
 		m_videoram1[offset] = data;
-		mjsister_plot1(machine(), offset, data);
+		mjsister_plot1(offset, data);
 	}
 	else
 	{
 		m_videoram0[offset] = data;
-		mjsister_plot0(machine(), offset, data);
+		mjsister_plot0(offset, data);
 	}
 }
 
@@ -141,8 +141,8 @@ UINT32 mjsister_state::screen_update_mjsister(screen_device &screen, bitmap_ind1
 
 		for (offs = 0; offs < 0x8000; offs++)
 		{
-			mjsister_plot0(machine(), offs, m_videoram0[offs]);
-			mjsister_plot1(machine(), offs, m_videoram1[offs]);
+			mjsister_plot0(offs, m_videoram0[offs]);
+			mjsister_plot1(offs, m_videoram1[offs]);
 		}
 		m_screen_redraw = 0;
 	}

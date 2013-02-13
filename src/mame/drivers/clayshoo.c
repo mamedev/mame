@@ -42,6 +42,8 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(reset_analog_bit);
+	UINT8 difficulty_input_port_r( int bit );
+	void create_analog_timers(  );
 };
 
 
@@ -57,12 +59,12 @@ WRITE8_MEMBER(clayshoo_state::input_port_select_w)
 }
 
 
-static UINT8 difficulty_input_port_r( running_machine &machine, int bit )
+UINT8 clayshoo_state::difficulty_input_port_r( int bit )
 {
 	UINT8 ret = 0;
 
 	/* read fake port and remap the buttons to 2 bits */
-	UINT8   raw = machine.root_device().ioport("FAKE")->read();
+	UINT8   raw = machine().root_device().ioport("FAKE")->read();
 
 	if (raw & (1 << (bit + 1)))
 		ret = 0x03;     /* expert */
@@ -83,8 +85,8 @@ READ8_MEMBER(clayshoo_state::input_port_r)
 	{
 	case 0x01:  ret = ioport("IN0")->read(); break;
 	case 0x02:  ret = ioport("IN1")->read(); break;
-	case 0x04:  ret = (ioport("IN2")->read() & 0xf0) | difficulty_input_port_r(machine(), 0) |
-						(difficulty_input_port_r(machine(), 3) << 2); break;
+	case 0x04:  ret = (ioport("IN2")->read() & 0xf0) | difficulty_input_port_r(0) |
+						(difficulty_input_port_r(3) << 2); break;
 	case 0x08:  ret = ioport("IN3")->read(); break;
 	case 0x10:
 	case 0x20:  break;  /* these two are not really used */
@@ -134,11 +136,10 @@ READ8_MEMBER(clayshoo_state::analog_r)
 }
 
 
-static void create_analog_timers( running_machine &machine )
+void clayshoo_state::create_analog_timers(  )
 {
-	clayshoo_state *state = machine.driver_data<clayshoo_state>();
-	state->m_analog_timer_1 = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(clayshoo_state::reset_analog_bit),state));
-	state->m_analog_timer_2 = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(clayshoo_state::reset_analog_bit),state));
+	m_analog_timer_1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(clayshoo_state::reset_analog_bit),this));
+	m_analog_timer_2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(clayshoo_state::reset_analog_bit),this));
 }
 
 
@@ -171,7 +172,7 @@ static I8255A_INTERFACE( ppi8255_1_intf )
 
 void clayshoo_state::machine_start()
 {
-	create_analog_timers(machine());
+	create_analog_timers();
 
 	/* register for state saving */
 	save_item(NAME(m_input_port_select));

@@ -79,6 +79,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_mlanding(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(dma_complete);
+	int start_dma();
 };
 
 
@@ -113,9 +114,8 @@ UINT32 mlanding_state::screen_update_mlanding(screen_device &screen, bitmap_ind1
 }
 
 /* Return the number of pixels processed for timing purposes? */
-static int start_dma(running_machine &machine)
+int mlanding_state::start_dma()
 {
-	mlanding_state *state = machine.driver_data<mlanding_state>();
 	/* Traverse the DMA RAM list */
 	int offs;
 
@@ -130,14 +130,14 @@ static int start_dma(running_machine &machine)
 
 		int j, k;
 
-		UINT16 attr = state->m_dma_ram[offs];
+		UINT16 attr = m_dma_ram[offs];
 
 		if (attr == 0)
 			continue;
 
-		x = state->m_dma_ram[offs + 1];
-		y = state->m_dma_ram[offs + 2];
-		colour = state->m_dma_ram[offs + 3];
+		x = m_dma_ram[offs + 1];
+		y = m_dma_ram[offs + 2];
+		colour = m_dma_ram[offs + 3];
 
 		dx = x >> 11;
 		dy = y >> 11;
@@ -172,8 +172,8 @@ static int start_dma(running_machine &machine)
 					// Draw the 8x8 chunk
 					for (y1 = 0; y1 < 8; ++y1)
 					{
-						UINT16 *src = &state->m_ml_tileram[(code * 2 * 8) + y1*2];
-						UINT16 *dst = &state->m_g_ram[(y + k*8+y1)*512/2 + (j*8+x)/2];
+						UINT16 *src = &m_ml_tileram[(code * 2 * 8) + y1*2];
+						UINT16 *dst = &m_g_ram[(y + k*8+y1)*512/2 + (j*8+x)/2];
 
 						UINT8 p2 = *src & 0xff;
 						UINT8 p1 = *src++ >> 8;
@@ -220,7 +220,7 @@ static int start_dma(running_machine &machine)
 			for(y1 = 0; y1 < dy*8; y1++)
 			{
 				int x1;
-				UINT16 *dst = &state->m_g_ram[((y + y1) * 512/2) + x/2];
+				UINT16 *dst = &m_g_ram[((y + y1) * 512/2) + x/2];
 
 				for(x1 = 0; x1 < dx*8; x1+=2)
 				{
@@ -324,7 +324,7 @@ WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 	int pixels;
 
 	// Return the number of pixels drawn?
-	pixels = start_dma(machine());
+	pixels = start_dma();
 
 	if (pixels)
 	{

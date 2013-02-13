@@ -98,6 +98,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	void intel82439tx_init();
 };
 
 #if !ENABLE_VGA
@@ -174,15 +175,14 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 	state->m_mxtc_config_reg[reg] = data;
 }
 
-static void intel82439tx_init(running_machine &machine)
+void taitowlf_state::intel82439tx_init()
 {
-	taitowlf_state *state = machine.driver_data<taitowlf_state>();
-	state->m_mxtc_config_reg[0x60] = 0x02;
-	state->m_mxtc_config_reg[0x61] = 0x02;
-	state->m_mxtc_config_reg[0x62] = 0x02;
-	state->m_mxtc_config_reg[0x63] = 0x02;
-	state->m_mxtc_config_reg[0x64] = 0x02;
-	state->m_mxtc_config_reg[0x65] = 0x02;
+	m_mxtc_config_reg[0x60] = 0x02;
+	m_mxtc_config_reg[0x61] = 0x02;
+	m_mxtc_config_reg[0x62] = 0x02;
+	m_mxtc_config_reg[0x63] = 0x02;
+	m_mxtc_config_reg[0x64] = 0x02;
+	m_mxtc_config_reg[0x65] = 0x02;
 }
 
 static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -703,7 +703,7 @@ DRIVER_INIT_MEMBER(taitowlf_state,taitowlf)
 
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, taitowlf_set_keyb_int);
 
-	intel82439tx_init(machine());
+	intel82439tx_init();
 
 	kbdc8042_init(machine(), &at8042);
 }

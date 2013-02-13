@@ -89,39 +89,39 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cham24_set_mirroring( int mirroring );
 };
 
 
 
-static void cham24_set_mirroring( running_machine &machine, int mirroring )
+void cham24_state::cham24_set_mirroring( int mirroring )
 {
-	cham24_state *state = machine.driver_data<cham24_state>();
 	switch(mirroring)
 	{
 	case PPU_MIRROR_LOW:
-		state->m_nt_page[0] = state->m_nt_page[1] = state->m_nt_page[2] = state->m_nt_page[3] = state->m_nt_ram;
+		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram;
 		break;
 	case PPU_MIRROR_HIGH:
-		state->m_nt_page[0] = state->m_nt_page[1] = state->m_nt_page[2] = state->m_nt_page[3] = state->m_nt_ram + 0x400;
+		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_HORZ:
-		state->m_nt_page[0] = state->m_nt_ram;
-		state->m_nt_page[1] = state->m_nt_ram;
-		state->m_nt_page[2] = state->m_nt_ram + 0x400;
-		state->m_nt_page[3] = state->m_nt_ram + 0x400;
+		m_nt_page[0] = m_nt_ram;
+		m_nt_page[1] = m_nt_ram;
+		m_nt_page[2] = m_nt_ram + 0x400;
+		m_nt_page[3] = m_nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_VERT:
-		state->m_nt_page[0] = state->m_nt_ram;
-		state->m_nt_page[1] = state->m_nt_ram + 0x400;
-		state->m_nt_page[2] = state->m_nt_ram;
-		state->m_nt_page[3] = state->m_nt_ram + 0x400;
+		m_nt_page[0] = m_nt_ram;
+		m_nt_page[1] = m_nt_ram + 0x400;
+		m_nt_page[2] = m_nt_ram;
+		m_nt_page[3] = m_nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_NONE:
 	default:
-		state->m_nt_page[0] = state->m_nt_ram;
-		state->m_nt_page[1] = state->m_nt_ram + 0x400;
-		state->m_nt_page[2] = state->m_nt_ram + 0x800;
-		state->m_nt_page[3] = state->m_nt_ram + 0xc00;
+		m_nt_page[0] = m_nt_ram;
+		m_nt_page[1] = m_nt_ram + 0x400;
+		m_nt_page[2] = m_nt_ram + 0x800;
+		m_nt_page[3] = m_nt_ram + 0xc00;
 		break;
 	}
 }
@@ -210,7 +210,7 @@ WRITE8_MEMBER(cham24_state::cham24_mapper_w)
 	membank("bank1")->set_base(machine().root_device().memregion("gfx1")->base() + (0x2000 * gfx_bank));
 
 	// set gfx mirroring
-	cham24_set_mirroring(machine(), gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	cham24_set_mirroring(gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	// switch PRG bank
 	if (prg_bank_page_size == 0)

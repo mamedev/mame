@@ -112,6 +112,9 @@ public:
 	UINT32 screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
 	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
+	void set_mirroring(famibox_state *state, int mirroring);
+	void famicombox_bankswitch(UINT8 bank);
+	void famicombox_reset();
 };
 
 /******************************************************
@@ -121,34 +124,34 @@ public:
 *******************************************************/
 
 #if 0
-static void set_mirroring(famibox_state *state, int mirroring)
+void famibox_state::set_mirroring(famibox_state *state, int mirroring)
 {
 	switch(mirroring)
 	{
 	case PPU_MIRROR_LOW:
-		state->m_nt_page[0] = state->m_nt_page[1] = state->m_nt_page[2] = state->m_nt_page[3] = state->m_nt_ram;
+		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram;
 		break;
 	case PPU_MIRROR_HIGH:
-		state->m_nt_page[0] = state->m_nt_page[1] = state->m_nt_page[2] = state->m_nt_page[3] = state->m_nt_ram + 0x400;
+		m_nt_page[0] = m_nt_page[1] = m_nt_page[2] = m_nt_page[3] = m_nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_HORZ:
-		state->m_nt_page[0] = state->m_nt_ram;
-		state->m_nt_page[1] = state->m_nt_ram;
-		state->m_nt_page[2] = state->m_nt_ram + 0x400;
-		state->m_nt_page[3] = state->m_nt_ram + 0x400;
+		m_nt_page[0] = m_nt_ram;
+		m_nt_page[1] = m_nt_ram;
+		m_nt_page[2] = m_nt_ram + 0x400;
+		m_nt_page[3] = m_nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_VERT:
-		state->m_nt_page[0] = state->m_nt_ram;
-		state->m_nt_page[1] = state->m_nt_ram + 0x400;
-		state->m_nt_page[2] = state->m_nt_ram;
-		state->m_nt_page[3] = state->m_nt_ram + 0x400;
+		m_nt_page[0] = m_nt_ram;
+		m_nt_page[1] = m_nt_ram + 0x400;
+		m_nt_page[2] = m_nt_ram;
+		m_nt_page[3] = m_nt_ram + 0x400;
 		break;
 	case PPU_MIRROR_NONE:
 	default:
-		state->m_nt_page[0] = state->m_nt_ram;
-		state->m_nt_page[1] = state->m_nt_ram + 0x400;
-		state->m_nt_page[2] = state->m_nt_ram + 0x800;
-		state->m_nt_page[3] = state->m_nt_ram + 0xc00;
+		m_nt_page[0] = m_nt_ram;
+		m_nt_page[1] = m_nt_ram + 0x400;
+		m_nt_page[2] = m_nt_ram + 0x800;
+		m_nt_page[3] = m_nt_ram + 0xc00;
 		break;
 	}
 }
@@ -234,7 +237,7 @@ READ8_MEMBER(famibox_state::famibox_IN1_r)
    System
 
 *******************************************************/
-static void famicombox_bankswitch(running_machine &machine, UINT8 bank)
+void famibox_state::famicombox_bankswitch(UINT8 bank)
 {
 	struct
 	{
@@ -263,25 +266,24 @@ static void famicombox_bankswitch(running_machine &machine, UINT8 bank)
 		{ 0x00, "menu",         0, 0x4000, 0x8000 },
 	};
 
-//  famibox_state *state = machine.driver_data<famibox_state>();
 
 	for (int i = 0; i < sizeof(famicombox_banks)/sizeof(famicombox_banks[0]); i++ )
 	{
 		if ( bank == famicombox_banks[i].bank ||
 				famicombox_banks[i].bank == 0 )
 		{
-			machine.root_device().membank("cpubank1")->set_base(machine.root_device().memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank1_offset);
-			machine.root_device().membank("cpubank2")->set_base(machine.root_device().memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank2_offset);
-			machine.root_device().membank("ppubank1")->set_base(machine.root_device().memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].ppubank_offset);
+			machine().root_device().membank("cpubank1")->set_base(machine().root_device().memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank1_offset);
+			machine().root_device().membank("cpubank2")->set_base(machine().root_device().memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank2_offset);
+			machine().root_device().membank("ppubank1")->set_base(machine().root_device().memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].ppubank_offset);
 			break;
 		}
 	}
 }
 
-static void famicombox_reset(running_machine &machine)
+void famibox_state::famicombox_reset()
 {
-	famicombox_bankswitch(machine, 0);
-	machine.device("maincpu")->reset();
+	famicombox_bankswitch(0);
+	machine().device("maincpu")->reset();
 }
 
 TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
@@ -290,7 +292,7 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
 	if ( BIT(m_exception_mask,1) )
 	{
 		m_exception_cause &= ~0x02;
-		famicombox_reset(machine());
+		famicombox_reset();
 	}
 }
 
@@ -305,7 +307,7 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_gameplay_timer_callback)
 		if ( BIT(m_exception_mask,4) )
 		{
 			m_exception_cause &= ~0x10;
-			famicombox_reset(machine());
+			famicombox_reset();
 		}
 	}
 }
@@ -371,7 +373,7 @@ WRITE8_MEMBER(famibox_state::famibox_system_w)
 			break;
 		case 4:
 			logerror("%s: bankswitch %x\n", machine().describe_context(), data );
-			famicombox_bankswitch(machine(), data & 0x3f);
+			famicombox_bankswitch(data & 0x3f);
 			break;
 		default:
 			logerror("%s: Unhandled famibox_system_w(%x,%02x)\n", machine().describe_context(), offset, data );
@@ -410,7 +412,7 @@ INPUT_CHANGED_MEMBER(famibox_state::famibox_keyswitch_changed)
 	if ( BIT(m_exception_mask, 3) )
 	{
 		m_exception_cause &= ~0x08;
-		famicombox_reset(machine());
+		famicombox_reset();
 	}
 }
 
@@ -427,7 +429,7 @@ INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 		if ( BIT(m_exception_mask,4) && (m_coins == 1) )
 		{
 			m_exception_cause &= ~0x10;
-			famicombox_reset(machine());
+			famicombox_reset();
 		}
 	}
 }
@@ -549,7 +551,7 @@ GFXDECODE_END
 
 void famibox_state::machine_reset()
 {
-	famicombox_bankswitch(machine(), 0);
+	famicombox_bankswitch(0);
 }
 
 void famibox_state::machine_start()
@@ -563,7 +565,7 @@ void famibox_state::machine_start()
 	machine().device("ppu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(famibox_state::famibox_nt_r), this), write8_delegate(FUNC(famibox_state::famibox_nt_w), this));
 	machine().device("ppu")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x1fff, "ppubank1");
 
-	famicombox_bankswitch(machine(), 0);
+	famicombox_bankswitch(0);
 
 
 	m_attract_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(famibox_state::famicombox_attract_timer_callback),this));

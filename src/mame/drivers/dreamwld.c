@@ -165,17 +165,17 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_dreamwld(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_dreamwld(screen_device &screen, bool state);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void dreamwld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	dreamwld_state *state = machine.driver_data<dreamwld_state>();
-	gfx_element *gfx = machine.gfx[0];
-	UINT32 *source = state->m_spritebuf1;
-	UINT32 *finish = state->m_spritebuf1 + 0x1000 / 4;
-	UINT16 *redirect = (UINT16 *)state->memregion("spritelut")->base();
+	gfx_element *gfx = machine().gfx[0];
+	UINT32 *source = m_spritebuf1;
+	UINT32 *finish = m_spritebuf1 + 0x1000 / 4;
+	UINT16 *redirect = (UINT16 *)memregion("spritelut")->base();
 
 	while (source < finish)
 	{
@@ -394,7 +394,7 @@ UINT32 dreamwld_state::screen_update_dreamwld(screen_device &screen, bitmap_ind1
 	tmptilemap0->draw(bitmap, cliprect, 0, 0);
 	tmptilemap1->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	return 0;
 }

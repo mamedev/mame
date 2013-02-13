@@ -106,6 +106,8 @@ public:
 	DECLARE_DRIVER_INIT(INIT);
 	virtual void video_start();
 	UINT32 screen_update_srmp6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void update_palette();
+	UINT32 process(UINT8 b,UINT32 dst_offset);
 };
 
 #define VERBOSE 0
@@ -122,18 +124,17 @@ static const gfx_layout tiles8x8_layout =
 	8*64
 };
 
-static void update_palette(running_machine &machine)
+void srmp6_state::update_palette()
 {
-	srmp6_state *state = machine.driver_data<srmp6_state>();
 	INT8 r, g ,b;
-	int brg = state->m_brightness - 0x60;
+	int brg = m_brightness - 0x60;
 	int i;
 
 	for(i = 0; i < 0x800; i++)
 	{
-		r = state->m_generic_paletteram_16[i] >>  0 & 0x1F;
-		g = state->m_generic_paletteram_16[i] >>  5 & 0x1F;
-		b = state->m_generic_paletteram_16[i] >> 10 & 0x1F;
+		r = m_generic_paletteram_16[i] >>  0 & 0x1F;
+		g = m_generic_paletteram_16[i] >>  5 & 0x1F;
+		b = m_generic_paletteram_16[i] >> 10 & 0x1F;
 
 		if(brg < 0) {
 			r += (r * brg) >> 5;
@@ -151,7 +152,7 @@ static void update_palette(running_machine &machine)
 			b += ((0x1F - b) * brg) >> 5;
 			if(b > 0x1F) b = 0x1F;
 		}
-		palette_set_color(machine, i, MAKE_RGB(r << 3, g << 3, b << 3));
+		palette_set_color(machine(), i, MAKE_RGB(r << 3, g << 3, b << 3));
 	}
 }
 
@@ -339,7 +340,7 @@ WRITE16_MEMBER(srmp6_state::video_regs_w)
 			data = (!data)?0x60:(data == 0x5e)?0x60:data;
 			if (m_brightness != data) {
 				m_brightness = data;
-				update_palette(machine());
+				update_palette();
 			}
 			break;
 
@@ -368,36 +369,35 @@ READ16_MEMBER(srmp6_state::video_regs_r)
 
 
 /* DMA RLE stuff - the same as CPS3 */
-static UINT32 process(running_machine &machine,UINT8 b,UINT32 dst_offset)
+UINT32 srmp6_state::process(UINT8 b,UINT32 dst_offset)
 {
-	srmp6_state *state = machine.driver_data<srmp6_state>();
 	int l=0;
 
-	UINT8 *tram=(UINT8*)state->m_tileram;
+	UINT8 *tram=(UINT8*)m_tileram;
 
-	if (state->m_lastb == state->m_lastb2)  //rle
+	if (m_lastb == m_lastb2)  //rle
 	{
 		int i;
 		int rle=(b+1)&0xff;
 
 		for(i=0;i<rle;++i)
 		{
-			tram[dst_offset + state->m_destl] = state->m_lastb;
-			machine.gfx[0]->mark_dirty((dst_offset + state->m_destl)/0x40);
+			tram[dst_offset + m_destl] = m_lastb;
+			machine().gfx[0]->mark_dirty((dst_offset + m_destl)/0x40);
 
 			dst_offset++;
 			++l;
 		}
-		state->m_lastb2 = 0xffff;
+		m_lastb2 = 0xffff;
 
 		return l;
 	}
 	else
 	{
-		state->m_lastb2 = state->m_lastb;
-		state->m_lastb = b;
-		tram[dst_offset + state->m_destl] = b;
-		machine.gfx[0]->mark_dirty((dst_offset + state->m_destl)/0x40);
+		m_lastb2 = m_lastb;
+		m_lastb = b;
+		tram[dst_offset + m_destl] = b;
+		machine().gfx[0]->mark_dirty((dst_offset + m_destl)/0x40);
 
 		return 1;
 	}
@@ -453,13 +453,13 @@ WRITE16_MEMBER(srmp6_state::srmp6_dma_w)
 				{
 					UINT8 real_byte;
 					real_byte = rom[srctab+p*2];
-					tempidx+=process(machine(),real_byte,tempidx);
+					tempidx+=process(real_byte,tempidx);
 					real_byte = rom[srctab+p*2+1];//px[DMA_XOR((current_table_address+p*2+1))];
-					tempidx+=process(machine(),real_byte,tempidx);
+					tempidx+=process(real_byte,tempidx);
 				}
 				else
 				{
-					tempidx+=process(machine(),p,tempidx);
+					tempidx+=process(p,tempidx);
 				}
 
 				ctrl<<=1;

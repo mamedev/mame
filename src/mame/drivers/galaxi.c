@@ -95,6 +95,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_galaxi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void show_out(  );
 };
 
 
@@ -213,22 +214,21 @@ UINT32 galaxi_state::screen_update_galaxi(screen_device &screen, bitmap_ind16 &b
                             Memory Maps
 ***************************************************************************/
 
-static void show_out( running_machine &machine )
+void galaxi_state::show_out(  )
 {
-//  galaxi_state *state = machine.driver_data<galaxi_state>();
-//  popmessage("%04x %04x %04x", state->m_out[0], state->m_out[1], state->m_out[2]);
+//  popmessage("%04x %04x %04x", m_out[0], m_out[1], m_out[2]);
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_500000_w)
 {
 	COMBINE_DATA(&m_out[0]);
-	show_out(machine());
+	show_out();
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_500002_w)
 {
 	COMBINE_DATA(&m_out[1]);
-	show_out(machine());
+	show_out();
 }
 
 WRITE16_MEMBER(galaxi_state::galaxi_500004_w)
@@ -263,7 +263,7 @@ WRITE16_MEMBER(galaxi_state::galaxi_500004_w)
 	}
 
 	COMBINE_DATA(&m_out[2]);
-	show_out(machine());
+	show_out();
 }
 
 CUSTOM_INPUT_MEMBER(galaxi_state::ticket_r)

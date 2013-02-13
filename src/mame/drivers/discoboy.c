@@ -87,6 +87,8 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void discoboy_setrombank( UINT8 data );
 };
 
 
@@ -95,46 +97,45 @@ void discoboy_state::video_start()
 {
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void discoboy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	discoboy_state *state = machine.driver_data<discoboy_state>();
 	int flipscreen = 0;
 	int offs, sx, sy;
 
 	for (offs = 0x1000 - 0x40; offs >= 0; offs -= 0x20)
 	{
-		int code = state->m_ram_4[offs];
-		int attr = state->m_ram_4[offs + 1];
+		int code = m_ram_4[offs];
+		int attr = m_ram_4[offs + 1];
 		int color = attr & 0x0f;
-		sx = state->m_ram_4[offs + 3] + ((attr & 0x10) << 4);
-		sy = ((state->m_ram_4[offs + 2] + 8) & 0xff) - 8;
+		sx = m_ram_4[offs + 3] + ((attr & 0x10) << 4);
+		sy = ((m_ram_4[offs + 2] + 8) & 0xff) - 8;
 		code += (attr & 0xe0) << 3;
 
 		if (code >= 0x400)
 		{
-			if ((state->m_gfxbank & 0x30) == 0x00)
+			if ((m_gfxbank & 0x30) == 0x00)
 			{
 				code = 0x400 + (code & 0x3ff);
 			}
-			else if ((state->m_gfxbank & 0x30) == 0x10)
+			else if ((m_gfxbank & 0x30) == 0x10)
 			{
 				code = 0x400 + (code & 0x3ff) + 0x400;
 			}
-			else if ((state->m_gfxbank & 0x30) == 0x20)
+			else if ((m_gfxbank & 0x30) == 0x20)
 			{
 				code = 0x400 + (code & 0x3ff) + 0x800;
 			}
-			else if ((state->m_gfxbank & 0x30) == 0x30)
+			else if ((m_gfxbank & 0x30) == 0x30)
 			{
 				code = 0x400 + (code & 0x3ff) + 0xc00;
 			}
 			else
 			{
-				code = machine.rand();
+				code = machine().rand();
 			}
 		}
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 					code,
 					color,
 					flipscreen,0,
@@ -196,15 +197,15 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 		}
 	}
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	return 0;
 }
 
 #ifdef UNUSED_FUNCTION
-void discoboy_setrombank( running_machine &machine, UINT8 data )
+void discoboy_state::discoboy_setrombank( UINT8 data )
 {
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
 	data &= 0x2f;
 	space.machine().root_device().membank("bank1")->set_base(&ROM[0x6000 + (data * 0x1000)] );
 }

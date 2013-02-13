@@ -41,6 +41,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_drtomy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 
@@ -78,22 +79,21 @@ TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_bg)
       3  | xxxxxxxx xxxxxx-- | sprite code
 */
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void drtomy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	drtomy_state *state = machine.driver_data<drtomy_state>();
 	int i, x, y, ex, ey;
-	gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 
 	static const int x_offset[2] = {0x0, 0x2};
 	static const int y_offset[2] = {0x0, 0x1};
 
 	for (i = 3; i < 0x1000 / 2; i += 4)
 	{
-		int sx = state->m_spriteram[i + 2] & 0x01ff;
-		int sy = (240 - (state->m_spriteram[i] & 0x00ff)) & 0x00ff;
-		int number = state->m_spriteram[i + 3];
-		int color = (state->m_spriteram[i + 2] & 0x1e00) >> 9;
-		int attr = (state->m_spriteram[i] & 0xfe00) >> 9;
+		int sx = m_spriteram[i + 2] & 0x01ff;
+		int sy = (240 - (m_spriteram[i] & 0x00ff)) & 0x00ff;
+		int number = m_spriteram[i + 3];
+		int color = (m_spriteram[i + 2] & 0x1e00) >> 9;
+		int attr = (m_spriteram[i] & 0xfe00) >> 9;
 
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
@@ -134,7 +134,7 @@ UINT32 drtomy_state::screen_update_drtomy(screen_device &screen, bitmap_ind16 &b
 {
 	m_tilemap_bg->draw(bitmap, cliprect, 0, 0);
 	m_tilemap_fg->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 

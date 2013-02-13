@@ -114,31 +114,34 @@ public:
 	DECLARE_WRITE8_MEMBER(oki_setbank);
 	virtual void video_start();
 	UINT32 screen_update_sliver(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b);
+	void plot_pixel_pal(int x, int y, int addr);
+	void blit_gfx();
+	void render_jpeg();
 };
 
-static void plot_pixel_rgb(sliver_state *state, int x, int y, UINT32 r, UINT32 g, UINT32 b)
+void sliver_state::plot_pixel_rgb(int x, int y, UINT32 r, UINT32 g, UINT32 b)
 {
 //  printf("plot %d %d %d\n", r,g,b);
 
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	state->m_bitmap_bg.pix32(y, x) = r | (g<<8) | (b<<16);
+	m_bitmap_bg.pix32(y, x) = r | (g<<8) | (b<<16);
 }
 
-static void plot_pixel_pal(running_machine &machine, int x, int y, int addr)
+void sliver_state::plot_pixel_pal(int x, int y, int addr)
 {
-	sliver_state *state = machine.driver_data<sliver_state>();
 	UINT32 r,g,b;
 
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	b=(state->m_colorram[addr] << 2) | (state->m_colorram[addr] & 0x3);
-	g=(state->m_colorram[addr+0x100] << 2) | (state->m_colorram[addr+0x100] & 3);
-	r=(state->m_colorram[addr+0x200] << 2) | (state->m_colorram[addr+0x200] & 3);
+	b=(m_colorram[addr] << 2) | (m_colorram[addr] & 0x3);
+	g=(m_colorram[addr+0x100] << 2) | (m_colorram[addr+0x100] & 3);
+	r=(m_colorram[addr+0x200] << 2) | (m_colorram[addr+0x200] & 3);
 
-	state->m_bitmap_fg.pix32(y, x) = r | (g<<8) | (b<<16);
+	m_bitmap_fg.pix32(y, x) = r | (g<<8) | (b<<16);
 }
 
 WRITE16_MEMBER(sliver_state::fifo_data_w)
@@ -162,22 +165,21 @@ WRITE16_MEMBER(sliver_state::fifo_data_w)
 	}
 }
 
-static void blit_gfx(running_machine &machine)
+void sliver_state::blit_gfx()
 {
-	sliver_state *state = machine.driver_data<sliver_state>();
 	int tmpptr=0;
-	const UINT8 *rom = state->memregion("user1")->base();
+	const UINT8 *rom = memregion("user1")->base();
 
-	while (tmpptr < state->m_fptr)
+	while (tmpptr < m_fptr)
 	{
 		int x,y,romdata;
 		int w,h;
-		int romoffs=state->m_fifo[tmpptr+0]+(state->m_fifo[tmpptr+1] << 8)+(state->m_fifo[tmpptr+2] << 16);
+		int romoffs=m_fifo[tmpptr+0]+(m_fifo[tmpptr+1] << 8)+(m_fifo[tmpptr+2] << 16);
 
-		w=state->m_fifo[tmpptr+3]+1;
-		h=state->m_fifo[tmpptr+4]+1;
+		w=m_fifo[tmpptr+3]+1;
+		h=m_fifo[tmpptr+4]+1;
 
-		if (state->m_fifo[tmpptr+7] == 0)
+		if (m_fifo[tmpptr+7] == 0)
 		{
 			for (y=0; y < h; y++)
 			{
@@ -186,7 +188,7 @@ static void blit_gfx(running_machine &machine)
 					romdata = rom[romoffs&0x1fffff];
 					if (romdata)
 					{
-						plot_pixel_pal(machine, state->m_fifo[tmpptr+5]+state->m_fifo[tmpptr+3]-x, state->m_fifo[tmpptr+6]+state->m_fifo[tmpptr+4]-y, romdata);
+						plot_pixel_pal(m_fifo[tmpptr+5]+m_fifo[tmpptr+3]-x, m_fifo[tmpptr+6]+m_fifo[tmpptr+4]-y, romdata);
 					}
 					romoffs++;
 				}
@@ -205,7 +207,7 @@ WRITE16_MEMBER(sliver_state::fifo_clear_w)
 
 WRITE16_MEMBER(sliver_state::fifo_flush_w)
 {
-	blit_gfx(machine());
+	blit_gfx();
 }
 
 
@@ -214,13 +216,12 @@ WRITE16_MEMBER(sliver_state::jpeg1_w)
 	COMBINE_DATA(&m_jpeg1);
 }
 
-static void render_jpeg(running_machine &machine)
+void sliver_state::render_jpeg()
 {
-	sliver_state *state = machine.driver_data<sliver_state>();
 	int x;
-	int addr = (int)state->m_jpeg2 + (((int)state->m_jpeg1) << 16);
+	int addr = (int)m_jpeg2 + (((int)m_jpeg1) << 16);
 
-	state->m_bitmap_bg.fill(0);
+	m_bitmap_bg.fill(0);
 	if (addr < 0)
 	{
 		return;
@@ -237,7 +238,7 @@ static void render_jpeg(running_machine &machine)
 		cinfo.err = jpeg_std_error(&jerr);
 		jpeg_create_decompress(&cinfo);
 
-		jpeg_mem_src(&cinfo, machine.root_device().memregion("user2")->base()+addr, machine.root_device().memregion("user2")->bytes()-addr);
+		jpeg_mem_src(&cinfo, machine().root_device().memregion("user2")->base()+addr, machine().root_device().memregion("user2")->bytes()-addr);
 
 		jpeg_read_header(&cinfo, TRUE);
 		jpeg_start_decompress(&cinfo);
@@ -256,7 +257,7 @@ static void render_jpeg(running_machine &machine)
 				UINT8 b = buffer[0][(x*3)];
 				UINT8 g = buffer[0][(x*3)+1];
 				UINT8 r = buffer[0][(x*3)+2];
-				plot_pixel_rgb(state, x - x_offset + state->m_jpeg_x, y - y_offset - state->m_jpeg_y, r, g, b);
+				plot_pixel_rgb(x - x_offset + m_jpeg_x, y - y_offset - m_jpeg_y, r, g, b);
 
 			}
 
@@ -274,7 +275,7 @@ WRITE16_MEMBER(sliver_state::jpeg2_w)
 {
 	COMBINE_DATA(&m_jpeg2);
 
-	render_jpeg(machine());
+	render_jpeg();
 
 }
 
@@ -297,7 +298,7 @@ WRITE16_MEMBER(sliver_state::io_data_w)
 		{
 			m_jpeg_x = tmpx;
 			m_jpeg_y = tmpy;
-			render_jpeg(machine());
+			render_jpeg();
 		}
 	}
 	else

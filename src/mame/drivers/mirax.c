@@ -131,6 +131,8 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_mirax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(mirax_vblank_irq);
+	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 draw_flag);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -163,10 +165,9 @@ void mirax_state::palette_init()
 }
 
 
-static void draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 draw_flag)
+void mirax_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 draw_flag)
 {
-	mirax_state *state = machine.driver_data<mirax_state>();
-	gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 	int y,x;
 	int res_x,res_y,wrapy;
 
@@ -174,29 +175,28 @@ static void draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap, const r
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = state->m_videoram[32*y+x];
-			int color = (state->m_colorram[x*2]<<8) | (state->m_colorram[(x*2)+1]);
+			int tile = m_videoram[32*y+x];
+			int color = (m_colorram[x*2]<<8) | (m_colorram[(x*2)+1]);
 			int x_scroll = (color & 0xff00)>>8;
 			tile |= ((color & 0xe0)<<3);
 
-			res_x = (state->m_flipscreen_x) ? 248-x*8 : x*8;
-			res_y = (state->m_flipscreen_y) ? 248-y*8+x_scroll : y*8-x_scroll;
-			wrapy = (state->m_flipscreen_y) ? -256 : 256;
+			res_x = (m_flipscreen_x) ? 248-x*8 : x*8;
+			res_y = (m_flipscreen_y) ? 248-y*8+x_scroll : y*8-x_scroll;
+			wrapy = (m_flipscreen_y) ? -256 : 256;
 
 			if((x <= 1 || x >= 30) ^ draw_flag)
 			{
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,(state->m_flipscreen_x),(state->m_flipscreen_y),res_x,res_y);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,(m_flipscreen_x),(m_flipscreen_y),res_x,res_y);
 				/* wrap-around */
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,(state->m_flipscreen_x),(state->m_flipscreen_y),res_x,res_y+wrapy);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,(m_flipscreen_x),(m_flipscreen_y),res_x,res_y+wrapy);
 			}
 		}
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void mirax_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	mirax_state *state = machine.driver_data<mirax_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int count;
 
 	for(count=0;count<0x200;count+=4)
@@ -208,24 +208,24 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		spr_offs = (spriteram[count+1] & 0x3f);
 		color = spriteram[count+2] & 0x7;
-		fx = (state->m_flipscreen_x) ^ ((spriteram[count+1] & 0x40) >> 6); //<- guess
-		fy = (state->m_flipscreen_y) ^ ((spriteram[count+1] & 0x80) >> 7);
+		fx = (m_flipscreen_x) ^ ((spriteram[count+1] & 0x40) >> 6); //<- guess
+		fy = (m_flipscreen_y) ^ ((spriteram[count+1] & 0x80) >> 7);
 
 		spr_offs += (spriteram[count+2] & 0xe0)<<1;
 		spr_offs += (spriteram[count+2] & 0x10)<<5;
 
-		y = (state->m_flipscreen_y) ? spriteram[count] : 0x100 - spriteram[count] - 16;
-		x = (state->m_flipscreen_x) ? 240 - spriteram[count+3] : spriteram[count+3];
+		y = (m_flipscreen_y) ? spriteram[count] : 0x100 - spriteram[count] - 16;
+		x = (m_flipscreen_x) ? 240 - spriteram[count+3] : spriteram[count+3];
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],spr_offs,color,fx,fy,x,y,0);
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],spr_offs,color,fx,fy,x,y,0);
 	}
 }
 
 UINT32 mirax_state::screen_update_mirax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_tilemap(machine(),bitmap,cliprect,1);
-	draw_sprites(machine(),bitmap,cliprect);
-	draw_tilemap(machine(),bitmap,cliprect,0);
+	draw_tilemap(bitmap,cliprect,1);
+	draw_sprites(bitmap,cliprect);
+	draw_tilemap(bitmap,cliprect,0);
 	return 0;
 }
 

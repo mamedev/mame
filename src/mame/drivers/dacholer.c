@@ -91,6 +91,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_irq);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
@@ -121,23 +122,22 @@ WRITE8_MEMBER(dacholer_state::bg_scroll_y_w)
 	m_scroll_y = data;
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void dacholer_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	dacholer_state *state = machine.driver_data<dacholer_state>();
 	int offs, code, attr, sx, sy, flipx, flipy;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
-		code = state->m_spriteram[offs + 1];
-		attr = state->m_spriteram[offs + 2];
+		code = m_spriteram[offs + 1];
+		attr = m_spriteram[offs + 2];
 
 		flipx = attr & 0x10;
 		flipy = attr & 0x20;
 
-		sx = (state->m_spriteram[offs + 3] - 128) + 256 * (attr & 0x01);
-		sy = 255 - state->m_spriteram[offs];
+		sx = (m_spriteram[offs + 3] - 128) + 256 * (attr & 0x01);
+		sy = 255 - m_spriteram[offs];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -145,7 +145,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[2],
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[2],
 				code,
 				0,
 				flipx,flipy,
@@ -167,7 +167,7 @@ UINT32 dacholer_state::screen_update_dacholer(screen_device &screen, bitmap_ind1
 	}
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

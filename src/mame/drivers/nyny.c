@@ -131,6 +131,7 @@ public:
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(update_pia_1);
 	DECLARE_WRITE8_MEMBER(ic48_1_74123_output_changed);
+	inline void shift_star_generator(  );
 };
 
 
@@ -371,10 +372,9 @@ static MC6845_UPDATE_ROW( update_row )
 }
 
 
-INLINE void shift_star_generator( running_machine &machine )
+void nyny_state::shift_star_generator(  )
 {
-	nyny_state *state = machine.driver_data<nyny_state>();
-	state->m_star_shift_reg = (state->m_star_shift_reg << 1) | (((~state->m_star_shift_reg >> 15) & 0x01) ^ ((state->m_star_shift_reg >> 2) & 0x01));
+	m_star_shift_reg = (m_star_shift_reg << 1) | (((~m_star_shift_reg >> 15) & 0x01) ^ ((m_star_shift_reg >> 2) & 0x01));
 }
 
 
@@ -408,7 +408,7 @@ static MC6845_END_UPDATE( end_update )
 			}
 
 			if (delay_counter == 0)
-				shift_star_generator(device->machine());
+				state->shift_star_generator();
 			else
 				delay_counter = delay_counter - 1;
 		}

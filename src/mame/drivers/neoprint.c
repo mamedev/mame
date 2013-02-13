@@ -57,6 +57,8 @@ public:
 	DECLARE_MACHINE_RESET(nprsp);
 	UINT32 screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift);
+	void audio_cpu_assert_nmi();
 };
 
 
@@ -73,16 +75,15 @@ xxxx xxxx xxxx xxxx [2] scroll Y, signed
 ---- ---- --?? ??xx [6] map register
 */
 
-static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift)
+void neoprint_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift)
 {
-	neoprint_state *state = machine.driver_data<neoprint_state>();
 	int i, y, x;
-	gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 	INT16 scrollx, scrolly;
 
-	i = (state->m_npvidregs[((layer*8)+0x06)/2] & 7) * 0x1000/4;
-	scrollx = ((state->m_npvidregs[((layer*8)+0x00)/2] - (0xd8 + layer*4)) & 0x03ff);
-	scrolly = ((state->m_npvidregs[((layer*8)+0x02)/2] - 0xffeb) & 0x03ff);
+	i = (m_npvidregs[((layer*8)+0x06)/2] & 7) * 0x1000/4;
+	scrollx = ((m_npvidregs[((layer*8)+0x00)/2] - (0xd8 + layer*4)) & 0x03ff);
+	scrolly = ((m_npvidregs[((layer*8)+0x02)/2] - 0xffeb) & 0x03ff);
 
 	scrollx/=2;
 	scrolly/=2;
@@ -91,14 +92,14 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 dat = state->m_npvidram[i*2] >> data_shift; // a video register?
+			UINT16 dat = m_npvidram[i*2] >> data_shift; // a video register?
 			UINT16 color;
-			if(state->m_npvidram[i*2+1] & 0x0020) // TODO: 8bpp switch?
-				color = ((state->m_npvidram[i*2+1] & 0x8000) << 1) | 0x200 | ((state->m_npvidram[i*2+1] & 0xff00) >> 7);
+			if(m_npvidram[i*2+1] & 0x0020) // TODO: 8bpp switch?
+				color = ((m_npvidram[i*2+1] & 0x8000) << 1) | 0x200 | ((m_npvidram[i*2+1] & 0xff00) >> 7);
 			else
-				color = ((state->m_npvidram[i*2+1] & 0xff00) >> 8) | ((state->m_npvidram[i*2+1] & 0x0010) << 4);
-			UINT8 fx = (state->m_npvidram[i*2+1] & 0x0040);
-			UINT8 fy = (state->m_npvidram[i*2+1] & 0x0080);
+				color = ((m_npvidram[i*2+1] & 0xff00) >> 8) | ((m_npvidram[i*2+1] & 0x0010) << 4);
+			UINT8 fx = (m_npvidram[i*2+1] & 0x0040);
+			UINT8 fy = (m_npvidram[i*2+1] & 0x0080);
 
 			drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
 			drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);
@@ -115,8 +116,8 @@ UINT32 neoprint_state::screen_update_neoprint(screen_device &screen, bitmap_ind1
 {
 	bitmap.fill(0, cliprect);
 
-	draw_layer(machine(),bitmap,cliprect,1,2);
-	draw_layer(machine(),bitmap,cliprect,0,2);
+	draw_layer(bitmap,cliprect,1,2);
+	draw_layer(bitmap,cliprect,0,2);
 
 	return 0;
 }
@@ -125,9 +126,9 @@ UINT32 neoprint_state::screen_update_nprsp(screen_device &screen, bitmap_ind16 &
 {
 	bitmap.fill(0, cliprect);
 
-	draw_layer(machine(),bitmap,cliprect,1,0);
-	draw_layer(machine(),bitmap,cliprect,2,0);
-	draw_layer(machine(),bitmap,cliprect,0,0);
+	draw_layer(bitmap,cliprect,1,0);
+	draw_layer(bitmap,cliprect,2,0);
+	draw_layer(bitmap,cliprect,0,0);
 
 	return 0;
 }
@@ -165,9 +166,9 @@ READ16_MEMBER(neoprint_state::neoprint_audio_result_r)
 	return (m_audio_result << 8) | 0x00;
 }
 
-static void audio_cpu_assert_nmi(running_machine &machine)
+void neoprint_state::audio_cpu_assert_nmi()
 {
-	machine.device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -183,7 +184,7 @@ WRITE16_MEMBER(neoprint_state::audio_command_w)
 	{
 		soundlatch_byte_w(space, 0, data >> 8);
 
-		audio_cpu_assert_nmi(machine());
+		audio_cpu_assert_nmi();
 
 		/* boost the interleave to let the audio CPU read the command */
 		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));

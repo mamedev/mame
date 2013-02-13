@@ -85,8 +85,6 @@ Dip sw.2
 #include "video/ramdac.h"
 #include "sound/dac.h"
 
-static void littlerb_draw_sprites(running_machine &machine);
-
 class littlerb_state : public driver_device
 {
 public:
@@ -173,7 +171,7 @@ public:
 
 		}
 
-		littlerb_draw_sprites(space.machine());
+		littlerb_draw_sprites();
 
 
 		m_listoffset = 0;
@@ -203,6 +201,13 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_littlerb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_scanline);
+	void littlerb_recalc_regs();
+	UINT16 littlerb_data_read(UINT16 mem_mask);
+	void littlerb_data_write(UINT16 data, UINT16 mem_mask);
+	void littlerb_recalc_address();
+	UINT8 sound_data_shift();
+	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xsize,int ysize, UINT32 fulloffs, int xpos, int ypos );
+	void littlerb_draw_sprites();
 };
 
 
@@ -291,32 +296,29 @@ littlerb_vdp_device::littlerb_vdp_device(const machine_config &mconfig, const ch
 /* end VDP device to give us our own memory map */
 
 
-static void littlerb_recalc_regs(running_machine &machine)
+void littlerb_state::littlerb_recalc_regs()
 {
-	littlerb_state *state = machine.driver_data<littlerb_state>();
-	state->m_vdp_address_low = state->m_write_address&0xffff;
-	state->m_vdp_address_high = (state->m_write_address>>16)&0xffff;
+	m_vdp_address_low = m_write_address&0xffff;
+	m_vdp_address_high = (m_write_address>>16)&0xffff;
 }
 
 
-static UINT16 littlerb_data_read(running_machine &machine, UINT16 mem_mask)
+UINT16 littlerb_state::littlerb_data_read(UINT16 mem_mask)
 {
-	littlerb_state *state = machine.driver_data<littlerb_state>();
-	UINT32 addr = state->m_write_address >> 3; // almost surely raw addresses are actually shifted by 3
-	address_space &vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
+	UINT32 addr = m_write_address >> 3; // almost surely raw addresses are actually shifted by 3
+	address_space &vdp_space = machine().device<littlerb_vdp_device>("littlerbvdp")->space();
 
 	return vdp_space.read_word(addr, mem_mask);
 }
 
-static void littlerb_data_write(running_machine &machine, UINT16 data, UINT16 mem_mask)
+void littlerb_state::littlerb_data_write(UINT16 data, UINT16 mem_mask)
 {
-	littlerb_state *state = machine.driver_data<littlerb_state>();
-	UINT32 addr = state->m_write_address >> 3; // almost surely raw addresses are actually shifted by 3
-	address_space &vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
-	int mode = state->m_vdp_writemode;
+	UINT32 addr = m_write_address >> 3; // almost surely raw addresses are actually shifted by 3
+	address_space &vdp_space = machine().device<littlerb_vdp_device>("littlerbvdp")->space();
+	int mode = m_vdp_writemode;
 
 
-	logerror("mode %04x, data %04x, mem_mask %04x (address %08x)\n", mode,  data, mem_mask, state->m_write_address >> 3);
+	logerror("mode %04x, data %04x, mem_mask %04x (address %08x)\n", mode,  data, mem_mask, m_write_address >> 3);
 
 	if ((mode!=0x3800) && (mode !=0x2000) && (mode != 0xe000) && (mode != 0xf800))
 	{
@@ -327,8 +329,8 @@ static void littlerb_data_write(running_machine &machine, UINT16 data, UINT16 me
 
 		// 2000 is used for palette writes which appears to be a RAMDAC, no auto-inc.
 		//  1ff80806 is our 'spritelist'
-		if (mode!=0x2000 && mode != 0xe000 && addr != 0x1ff80806) state->m_write_address+=0x10;
-		littlerb_recalc_regs(machine);
+		if (mode!=0x2000 && mode != 0xe000 && addr != 0x1ff80806) m_write_address+=0x10;
+		littlerb_recalc_regs();
 	}
 
 
@@ -339,10 +341,9 @@ static void littlerb_data_write(running_machine &machine, UINT16 data, UINT16 me
 
 
 
-static void littlerb_recalc_address(running_machine &machine)
+void littlerb_state::littlerb_recalc_address()
 {
-	littlerb_state *state = machine.driver_data<littlerb_state>();
-	state->m_write_address = state->m_vdp_address_low | state->m_vdp_address_high<<16;
+	m_write_address = m_vdp_address_low | m_vdp_address_high<<16;
 }
 
 READ16_MEMBER(littlerb_state::littlerb_vdp_r)
@@ -354,7 +355,7 @@ READ16_MEMBER(littlerb_state::littlerb_vdp_r)
 	{
 		case 0: res = m_vdp_address_low; break;
 		case 1: res = m_vdp_address_high; break;
-		case 2: res = littlerb_data_read(machine(), mem_mask); break;
+		case 2: res = littlerb_data_read(mem_mask); break;
 		case 3: res = m_vdp_writemode; break;
 	}
 
@@ -405,17 +406,17 @@ WRITE16_MEMBER(littlerb_state::littlerb_vdp_w)
 	{
 		case 0:
 			COMBINE_DATA(&m_vdp_address_low);
-			littlerb_recalc_address(machine());
+			littlerb_recalc_address();
 		break;
 
 		case 1:
 			COMBINE_DATA(&m_vdp_address_high);
-			littlerb_recalc_address(machine());
+			littlerb_recalc_address();
 		break;
 
 
 		case 2:
-		littlerb_data_write(machine(), data, mem_mask);
+		littlerb_data_write(data, mem_mask);
 		break;
 
 		case 3:
@@ -429,22 +430,22 @@ WRITE16_MEMBER(littlerb_state::littlerb_vdp_w)
 }
 
 /* could be slightly different (timing wise, directly related to the irqs), but certainly they smoked some bad pot for this messy way ... */
-static UINT8 sound_data_shift(running_machine &machine)
+UINT8 littlerb_state::sound_data_shift()
 {
-	return ((machine.primary_screen->frame_number() % 16) == 0) ? 8 : 0;
+	return ((machine().primary_screen->frame_number() % 16) == 0) ? 8 : 0;
 }
 
 /* l is SFX, r is BGM (they doesn't seem to share the same data ROM) */
 WRITE16_MEMBER(littlerb_state::littlerb_l_sound_w)
 {
-	m_sound_index_l = (data >> sound_data_shift(machine())) & 0xff;
+	m_sound_index_l = (data >> sound_data_shift()) & 0xff;
 	m_sound_pointer_l = 0;
 	//popmessage("%04x %04x",m_sound_index_l,m_sound_index_r);
 }
 
 WRITE16_MEMBER(littlerb_state::littlerb_r_sound_w)
 {
-	m_sound_index_r = (data >> sound_data_shift(machine())) & 0xff;
+	m_sound_index_r = (data >> sound_data_shift()) & 0xff;
 	m_sound_pointer_r = 0;
 	//popmessage("%04x %04x",m_sound_index_l,m_sound_index_r);
 }
@@ -606,11 +607,11 @@ void littlerb_state::video_start()
 
 
 
-static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int xsize,int ysize, UINT32 fulloffs, int xpos, int ypos )
+void littlerb_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xsize,int ysize, UINT32 fulloffs, int xpos, int ypos )
 {
 	int x,y;
 	fulloffs >>= 3;
-	address_space &vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
+	address_space &vdp_space = machine().device<littlerb_vdp_device>("littlerbvdp")->space();
 
 	for (y=0;y<ysize;y++)
 	{
@@ -643,18 +644,17 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, const re
 	}
 }
 
-static void littlerb_draw_sprites(running_machine &machine)
+void littlerb_state::littlerb_draw_sprites()
 {
-	littlerb_state *state = machine.driver_data<littlerb_state>();
 	int x,y,offs;
 	int xsize,ysize;
-	UINT16* spriteregion = state->m_spritelist;
+	UINT16* spriteregion = m_spritelist;
 	//littlerb_printf("frame\n");
 
 	int layer = 0;
 	int yoffset = 0;
 
-	littlerb_printf("m_listoffset %04x\n", state->m_listoffset );
+	littlerb_printf("m_listoffset %04x\n", m_listoffset );
 
 	littlerb_printf("%04x %04x %04x %04x\n", spriteregion[0], spriteregion[1], spriteregion[2], spriteregion[3]);
 
@@ -663,7 +663,7 @@ static void littlerb_draw_sprites(running_machine &machine)
 	int minx = 0 , maxx = 0x14f;
 	int miny = 0 , maxy = 0x11f;
 
-	for (offs=0;offs<(state->m_listoffset);)
+	for (offs=0;offs<(m_listoffset);)
 	{
 		UINT32 read_dword = ((spriteregion[offs+1])<<16)+ (spriteregion[offs+0]);
 
@@ -694,11 +694,11 @@ static void littlerb_draw_sprites(running_machine &machine)
 			if (spriteregion[offs+4]==0x6000)
 			{
 				if (spriteregion[offs+3] & 0x1000)
-					state->m_temp_bitmap_sprites_back->fill(0, state->m_temp_bitmap_sprites_back->cliprect());
+					m_temp_bitmap_sprites_back->fill(0, m_temp_bitmap_sprites_back->cliprect());
 			}
 			else
 			{
-				if (spriteregion[offs+1] != 0xffd6) state->m_temp_bitmap_sprites->fill(0, state->m_temp_bitmap_sprites->cliprect());
+				if (spriteregion[offs+1] != 0xffd6) m_temp_bitmap_sprites->fill(0, m_temp_bitmap_sprites->cliprect());
 			}
 
 
@@ -781,36 +781,36 @@ static void littlerb_draw_sprites(running_machine &machine)
 			// used between levels, and on boss death to clip sprite at the ground for sinking effect
 
 
-			if (clip.min_x > state->m_temp_bitmap_sprites->cliprect().max_x)
-				clip.min_x =  state->m_temp_bitmap_sprites->cliprect().max_x;
+			if (clip.min_x > m_temp_bitmap_sprites->cliprect().max_x)
+				clip.min_x =  m_temp_bitmap_sprites->cliprect().max_x;
 
-			if (clip.min_x < state->m_temp_bitmap_sprites->cliprect().min_x)
-				clip.min_x =  state->m_temp_bitmap_sprites->cliprect().min_x;
+			if (clip.min_x < m_temp_bitmap_sprites->cliprect().min_x)
+				clip.min_x =  m_temp_bitmap_sprites->cliprect().min_x;
 
-			if (clip.max_x > state->m_temp_bitmap_sprites->cliprect().max_x)
-				clip.max_x =  state->m_temp_bitmap_sprites->cliprect().max_x;
+			if (clip.max_x > m_temp_bitmap_sprites->cliprect().max_x)
+				clip.max_x =  m_temp_bitmap_sprites->cliprect().max_x;
 
-			if (clip.max_x < state->m_temp_bitmap_sprites->cliprect().min_x)
-				clip.max_x =  state->m_temp_bitmap_sprites->cliprect().min_x;
+			if (clip.max_x < m_temp_bitmap_sprites->cliprect().min_x)
+				clip.max_x =  m_temp_bitmap_sprites->cliprect().min_x;
 
 
-			if (clip.min_y > state->m_temp_bitmap_sprites->cliprect().max_y)
-				clip.min_y =  state->m_temp_bitmap_sprites->cliprect().max_y;
+			if (clip.min_y > m_temp_bitmap_sprites->cliprect().max_y)
+				clip.min_y =  m_temp_bitmap_sprites->cliprect().max_y;
 
-			if (clip.min_y < state->m_temp_bitmap_sprites->cliprect().min_y)
-				clip.min_y =  state->m_temp_bitmap_sprites->cliprect().min_y;
+			if (clip.min_y < m_temp_bitmap_sprites->cliprect().min_y)
+				clip.min_y =  m_temp_bitmap_sprites->cliprect().min_y;
 
-			if (clip.max_y > state->m_temp_bitmap_sprites->cliprect().max_y)
-				clip.max_y =  state->m_temp_bitmap_sprites->cliprect().max_y;
+			if (clip.max_y > m_temp_bitmap_sprites->cliprect().max_y)
+				clip.max_y =  m_temp_bitmap_sprites->cliprect().max_y;
 
-			if (clip.max_y < state->m_temp_bitmap_sprites->cliprect().min_y)
-				clip.max_y =  state->m_temp_bitmap_sprites->cliprect().min_y;
+			if (clip.max_y < m_temp_bitmap_sprites->cliprect().min_y)
+				clip.max_y =  m_temp_bitmap_sprites->cliprect().min_y;
 
 
 			littlerb_alt_printf("%04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5]);
 
-			if (layer==0) draw_sprite(machine, *state->m_temp_bitmap_sprites, clip,xsize,ysize,fullcode,x,y);
-			else draw_sprite(machine, *state->m_temp_bitmap_sprites_back, clip,xsize,ysize,fullcode,x,y);
+			if (layer==0) draw_sprite(*m_temp_bitmap_sprites, clip,xsize,ysize,fullcode,x,y);
+			else draw_sprite(*m_temp_bitmap_sprites_back, clip,xsize,ysize,fullcode,x,y);
 
 
 			offs += 6;

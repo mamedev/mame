@@ -62,6 +62,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_ettrivia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ettrivia_interrupt);
+	inline void get_tile_info(tile_data &tileinfo, int tile_index, UINT8 *vidram, int gfx_code);
 };
 
 
@@ -196,25 +197,24 @@ static GFXDECODE_START( ettrivia )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*4, 32 )
 GFXDECODE_END
 
-INLINE void get_tile_info(running_machine &machine, tile_data &tileinfo, int tile_index, UINT8 *vidram, int gfx_code)
+void ettrivia_state::get_tile_info(tile_data &tileinfo, int tile_index, UINT8 *vidram, int gfx_code)
 {
-	ettrivia_state *state = machine.driver_data<ettrivia_state>();
 	int code = vidram[tile_index];
-	int color = (code >> 5) + 8 * state->m_palreg;
+	int color = (code >> 5) + 8 * m_palreg;
 
-	code += state->m_gfx_bank * 0x100;
+	code += m_gfx_bank * 0x100;
 
-	SET_TILE_INFO(gfx_code,code,color,0);
+	SET_TILE_INFO_MEMBER(gfx_code,code,color,0);
 }
 
 TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_bg)
 {
-	get_tile_info(machine(), tileinfo, tile_index, m_bg_videoram, 0);
+	get_tile_info(tileinfo, tile_index, m_bg_videoram, 0);
 }
 
 TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_fg)
 {
-	get_tile_info(machine(), tileinfo, tile_index, m_fg_videoram, 1);
+	get_tile_info(tileinfo, tile_index, m_fg_videoram, 1);
 }
 
 void ettrivia_state::palette_init()

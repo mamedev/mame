@@ -59,12 +59,13 @@ public:
 	DECLARE_DRIVER_INIT(astron);
 	virtual void machine_start();
 	UINT32 screen_update_astron(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect);
+	void astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 /* VIDEO GOODS */
-static void astron_draw_characters(running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect)
+void segald_state::astron_draw_characters(bitmap_rgb32 &bitmap,const rectangle &cliprect)
 {
-	segald_state *state = machine.driver_data<segald_state>();
 	UINT8 characterX, characterY;
 
 	for (characterX = 0; characterX < 32; characterX++)
@@ -72,13 +73,13 @@ static void astron_draw_characters(running_machine &machine, bitmap_rgb32 &bitma
 		for (characterY = 0; characterY < 32; characterY++)
 		{
 			int current_screen_character = (characterY*32) + characterX;
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[0], state->m_fix_ram[current_screen_character],
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[0], m_fix_ram[current_screen_character],
 					1, 0, 0, characterX*8, characterY*8, 0);
 		}
 	}
 }
 
-static void astron_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void segald_state::astron_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* Heisted from Daphne */
 	const UINT8 SPR_Y_TOP     = 0;
@@ -90,7 +91,6 @@ static void astron_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, 
 /*  const UINT8 SPR_GFXOFS_LO = 6;*/
 /*  const UINT8 SPR_GFXOFS_HI = 7;*/
 
-	segald_state *state = machine.driver_data<segald_state>();
 	int sx,sy;
 	int spr_number;
 	int spr_base;
@@ -98,8 +98,8 @@ static void astron_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, 
 	for (spr_number = 0; spr_number < 32; spr_number++)
 	{
 		spr_base = 0x10 * spr_number;
-		sy = state->m_obj_ram[spr_base + SPR_Y_TOP];
-		sx = state->m_obj_ram[spr_base + SPR_X_LO];
+		sy = m_obj_ram[spr_base + SPR_Y_TOP];
+		sx = m_obj_ram[spr_base + SPR_X_LO];
 
 		if (sx != 0 || sy != 0)
 			logerror("Hey!  A sprite's not at 0,0 : %d %d", sx, sy);
@@ -111,8 +111,8 @@ UINT32 segald_state::screen_update_astron(screen_device &screen, bitmap_rgb32 &b
 {
 	bitmap.fill(0, cliprect);
 
-	astron_draw_characters(machine(), bitmap, cliprect);
-	astron_draw_sprites(machine(), bitmap, cliprect);
+	astron_draw_characters(bitmap, cliprect);
+	astron_draw_sprites(bitmap, cliprect);
 
 	return 0;
 }
