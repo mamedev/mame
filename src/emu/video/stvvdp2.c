@@ -2380,9 +2380,6 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 {
 	rectangle myclip;
 
-	if(stv2_current_tilemap.window_control & 6)
-		popmessage("Window Enabled for Zoomed tiles");
-
 	if (!scalex || !scaley) return;
 
 	if (gfx->has_pen_usage() && transparency == STV_TRANSPARENCY_PEN)
@@ -2492,16 +2489,15 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 						int x, x_index = x_index_base;
 						for( x=sx; x<ex; x++ )
 						{
-							dest[x] = pal[source[x_index>>16]];
+							if(stv_vdp2_window_process(x,y))
+								dest[x] = pal[source[x_index>>16]];
 							x_index += dx;
 						}
 
 						y_index += dy;
 					}
-				}
-
-				/* case 1: STV_TRANSPARENCY_PEN */
-				if (transparency == STV_TRANSPARENCY_PEN)
+				} /* case 1: STV_TRANSPARENCY_PEN */
+				else if (transparency == STV_TRANSPARENCY_PEN)
 				{
 					for( y=sy; y<ey; y++ )
 					{
@@ -2511,17 +2507,18 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 						int x, x_index = x_index_base;
 						for( x=sx; x<ex; x++ )
 						{
-							int c = source[x_index>>16];
-							if( c != transparent_color ) dest[x] = pal[c];
+							if(stv_vdp2_window_process(x,y))
+							{
+								int c = source[x_index>>16];
+								if( c != transparent_color ) dest[x] = pal[c];
+							}
 							x_index += dx;
 						}
 
 						y_index += dy;
 					}
-				}
-
-				/* case 6: STV_TRANSPARENCY_ALPHA */
-				if (transparency == STV_TRANSPARENCY_ALPHA)
+				} /* case 6: STV_TRANSPARENCY_ALPHA */
+				else if (transparency == STV_TRANSPARENCY_ALPHA)
 				{
 					for( y=sy; y<ey; y++ )
 					{
@@ -2531,17 +2528,18 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 						int x, x_index = x_index_base;
 						for( x=sx; x<ex; x++ )
 						{
-							int c = source[x_index>>16];
-							if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
+							if(stv_vdp2_window_process(x,y))
+							{
+								int c = source[x_index>>16];
+								if( c != transparent_color ) dest[x] = alpha_blend_r32(dest[x], pal[c], alpha);
+							}
 							x_index += dx;
 						}
 
 						y_index += dy;
 					}
-				}
-
-				/* case : STV_TRANSPARENCY_ADD_BLEND */
-				if (transparency == STV_TRANSPARENCY_ADD_BLEND )
+				} /* case : STV_TRANSPARENCY_ADD_BLEND */
+				else if (transparency == STV_TRANSPARENCY_ADD_BLEND )
 				{
 					for( y=sy; y<ey; y++ )
 					{
@@ -2551,19 +2549,20 @@ void saturn_state::stv_vdp2_drawgfxzoom(
 						int x, x_index = x_index_base;
 						for( x=sx; x<ex; x++ )
 						{
-							int c = source[x_index>>16];
-							if( c != transparent_color ) dest[x] = stv_add_blend(dest[x],pal[c]);
+							if(stv_vdp2_window_process(x,y))
+							{
+								int c = source[x_index>>16];
+								if( c != transparent_color ) dest[x] = stv_add_blend(dest[x],pal[c]);
+							}
 							x_index += dx;
 						}
 
 						y_index += dy;
 					}
 				}
-
 			}
 		}
 	}
-
 }
 
 void saturn_state::stv_vdp2_drawgfxzoom_rgb555(
