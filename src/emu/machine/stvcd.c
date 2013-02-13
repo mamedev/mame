@@ -958,9 +958,10 @@ void saturn_state::cd_exec_command( void )
 					return;
 				}
 
-				if (partitions[bufnum].numblks < sectnum)
+				/* TODO: Phantasy Star 2 throws this one. */
+				if (partitions[bufnum].numblks == 0)
 				{
-					printf("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
+					printf("CD: buffer is already empty\n");
 					cr_standard_return(CD_STAT_REJECT);
 					hirqreg |= (CMOK|EHST);
 					return;
