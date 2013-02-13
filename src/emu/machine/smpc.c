@@ -315,6 +315,8 @@ static TIMER_CALLBACK( stv_smpc_intback )
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int i;
 
+//	printf("%02x %02x %02x\n",state->m_smpc.intback_buf[0],state->m_smpc.intback_buf[1],state->m_smpc.intback_buf[2]);
+
 	if(state->m_smpc.intback_buf[0] != 0)
 	{
 		state->m_smpc.OREG[0] = (0x80) | ((state->m_NMI_reset & 1) << 6);
@@ -364,6 +366,12 @@ static TIMER_CALLBACK( stv_smpc_intback )
 		state->m_smpc.SR = 0x40;
 		state->m_smpc.OREG[31] = 0x10;
 		machine.scheduler().timer_set(attotime::from_usec(0), FUNC(stv_intback_peripheral),0);
+	}
+	else
+	{
+		/* Shienryu calls this, it would be plainly illegal on Saturn, I'll just return the command and clear the hs flag for now. */
+		state->m_smpc.OREG[31] = 0x10;
+		state->m_smpc.SF = 0x00;
 	}
 }
 
