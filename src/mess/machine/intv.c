@@ -574,10 +574,11 @@ DEVICE_IMAGE_LOAD_MEMBER( intv_state,intv_cart )
 		}
 		// deal with wsmlb paged rom
 
-		UINT8 *ecs_rom_region = m_region_ecs_rom->base();
 		size = image.get_software_region_length("F000_bank1");
-		if (size && ecs_rom_region) // only load if ecs is plugged in (should probably be done a different way)
+		if (size && m_region_ecs_rom) // only load if ecs is plugged in (should probably be done a different way)
 		{
+			UINT8 *ecs_rom_region = m_region_ecs_rom->base();
+
 			region = image.get_software_region("F000_bank1");
 			for (int j = 0; j < (size>>1); j++)
 			{
@@ -829,7 +830,11 @@ DEVICE_IMAGE_LOAD_MEMBER( intv_state,intvkbd_cart )
 		memory[0x4800 << 1] = 0xff;
 		memory[(0x4800 << 1) + 1] = 0xff;
 
-		intv_load_rom_file(image);
+		if (image.software_entry() == NULL)
+		{
+			return intv_load_rom_file(image);
+		}
+		// Shouldn't we report failure here???
 	}
 
 	if (strcmp(image.device().tag(),":cart2") == 0) /* Keyboard component cartridge slot */
