@@ -15,9 +15,6 @@
 
 #define VERBOSE 0
 
-static void msx_memory_init (running_machine &machine);
-static void msx_memory_set_carts (running_machine &machine);
-
 
 static int msx_probe_type (UINT8* pmem, int size)
 {
@@ -536,8 +533,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(msx_state::msx2_interrupt)
 
 INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
 {
-	int i;
-
 	m_mouse[0] = m_io_mouse0->read();
 	m_mouse_stat[0] = -1;
 	m_mouse[1] = m_io_mouse1->read();
@@ -962,7 +957,7 @@ void msx_state::msx_memory_set_carts()
 	const msx_slot_layout *layout;
 	int page;
 
-	if (!layout)
+	if (!m_layout)
 		return;
 
 	for (layout = m_layout; layout->entry != MSX_LAYOUT_LAST; layout++)
