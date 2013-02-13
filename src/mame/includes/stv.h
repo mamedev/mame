@@ -374,6 +374,8 @@ public:
 
 	UINT8 get_vblank( void );
 	UINT8 get_hblank( void );
+	int get_hcounter( void );
+	int get_vcounter( void );
 	int get_vblank_duration( void );
 	int get_hblank_duration( void );
 	int get_pixel_clock( void );

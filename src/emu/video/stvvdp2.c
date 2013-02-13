@@ -5962,11 +5962,10 @@ READ16_MEMBER ( saturn_state::saturn_vdp2_regs_r )
 			/* latch h/v signals through HV latch*/
 			if(!STV_VDP2_EXLTEN)
 			{
-				/* TODO: handle various h/v settings. */
 				if(!space.debugger_access())
 				{
-					m_vdp2.h_count = space.machine().primary_screen->hpos() & 0x3ff;
-					m_vdp2.v_count = space.machine().primary_screen->vpos() & (STV_VDP2_LSMD == 3 ? 0x7ff : 0x3ff);
+					m_vdp2.h_count = get_hcounter();
+					m_vdp2.v_count = get_vcounter();
 					/* latch flag */
 					m_vdp2.exltfg |= 1;
 				}
@@ -6251,6 +6250,55 @@ UINT8 saturn_state::get_odd_bit( void )
 		return 1;
 
 	return machine().primary_screen->frame_number() & 1;
+}
+
+/* TODO: these needs to be checked via HW tests! */
+int saturn_state::get_hcounter( void )
+{
+	int hcount;
+
+	hcount = machine().primary_screen->hpos();
+
+	switch(STV_VDP2_HRES & 6)
+	{
+		/* Normal */
+		case 0:
+			hcount &= 0x1ff;
+			hcount <<= 1;
+			break;
+		/* Hi-Res */
+		case 2:
+			hcount &= 0x3ff;
+			break;
+		/* Exclusive Normal*/
+		case 4:
+			hcount &= 0x1ff;
+			break;
+		/* Exclusive Hi-Res */
+		case 6:
+			hcount >>= 1;
+			hcount &= 0x1ff;
+			break;
+	}
+
+	return hcount;
+}
+
+int saturn_state::get_vcounter( void )
+{
+	int vcount;
+
+	vcount = machine().primary_screen->vpos();
+
+	/* Exclusive Monitor */
+	if(STV_VDP2_HRES & 4)
+		return vcount & 0x3ff;
+
+	/* Double Density Interlace */
+	if((STV_VDP2_LSMD & 3) == 3)
+		return (vcount & ~1) | (machine().primary_screen->frame_number() & 1);
+
+	return (vcount << 1); // Non-interlace
 }
 
 void saturn_state::stv_vdp2_state_save_postload( void )
