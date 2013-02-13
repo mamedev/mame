@@ -97,8 +97,22 @@ class ng_aes_state : public neogeo_state
 {
 public:
 	ng_aes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: neogeo_state(mconfig, type, tag),
-		m_tempcdc(*this,"tempcdc")
+		: neogeo_state(mconfig, type, tag)
+		, m_tempcdc(*this,"tempcdc")
+		, m_io_in2(*this, "IN2")
+		, m_io_in3(*this, "IN3")
+		, m_io_in4(*this, "IN4")
+		, m_io_in0(*this, "IN0")
+		, m_io_in1(*this, "IN1")
+		, m_io_mj01_p1(*this, "MJ01_P1")
+		, m_io_mj02_p1(*this, "MJ02_P1")
+		, m_io_mj03_p1(*this, "MJ03_P1")
+		, m_io_mj04_p1(*this, "MJ04_P1")
+		, m_io_mj01_p2(*this, "MJ01_P2")
+		, m_io_mj02_p2(*this, "MJ02_P2")
+		, m_io_mj03_p2(*this, "MJ03_P2")
+		, m_io_mj04_p2(*this, "MJ04_P2")
+		, m_io_ctrlsel(*this, "CTRLSEL")
 	{
 		NeoCDDMAAddress1 = 0;
 		NeoCDDMAAddress2 = 0;
@@ -180,6 +194,21 @@ public:
 	IRQ_CALLBACK_MEMBER(neocd_int_callback);
 
 protected:
+	required_ioport m_io_in2;
+	required_ioport m_io_in3;
+	required_ioport m_io_in4;
+	required_ioport m_io_in0;
+	required_ioport m_io_in1;
+	required_ioport m_io_mj01_p1;
+	required_ioport m_io_mj02_p1;
+	required_ioport m_io_mj03_p1;
+	required_ioport m_io_mj04_p1;
+	required_ioport m_io_mj01_p2;
+	required_ioport m_io_mj02_p2;
+	required_ioport m_io_mj03_p2;
+	required_ioport m_io_mj04_p2;
+	required_ioport m_io_ctrlsel;
+
 	void common_machine_start();
 };
 
@@ -959,7 +988,7 @@ if (NeoCDDMAAddress2 == 0x0800)  {
 READ16_MEMBER(ng_aes_state::aes_in0_r)
 {
 	UINT32 ret = 0xffff;
-	UINT32 ctrl = ioport("CTRLSEL")->read();
+	UINT32 ctrl = m_io_ctrlsel->read();
 
 	switch(ctrl & 0x0f)
 	{
@@ -967,17 +996,17 @@ READ16_MEMBER(ng_aes_state::aes_in0_r)
 		ret = 0xffff;
 		break;
 	case 0x01:
-		ret = ioport("IN0")->read();
+		ret = m_io_in0->read();
 		break;
 	case 0x02:
 		switch (m_controller_select)
 		{
-			case 0x09: ret = ioport("MJ01_P1")->read(); break;
-			case 0x12: ret = ioport("MJ02_P1")->read(); break;
-			case 0x1b: ret = ioport("MJ03_P1")->read(); break; /* player 1 normal inputs? */
-			case 0x24: ret = ioport("MJ04_P1")->read(); break;
+			case 0x09: ret = m_io_mj01_p1->read(); break;
+			case 0x12: ret = m_io_mj02_p1->read(); break;
+			case 0x1b: ret = m_io_mj03_p1->read(); break; /* player 1 normal inputs? */
+			case 0x24: ret = m_io_mj04_p1->read(); break;
 			default:
-				ret = ioport("IN0")->read();
+				ret = m_io_in0->read();
 				break;
 		}
 		break;
@@ -989,7 +1018,7 @@ READ16_MEMBER(ng_aes_state::aes_in0_r)
 READ16_MEMBER(ng_aes_state::aes_in1_r)
 {
 	UINT32 ret = 0xffff;
-	UINT32 ctrl = ioport("CTRLSEL")->read();
+	UINT32 ctrl = m_io_ctrlsel->read();
 
 	switch(ctrl & 0xf0)
 	{
@@ -997,17 +1026,17 @@ READ16_MEMBER(ng_aes_state::aes_in1_r)
 		ret = 0xffff;
 		break;
 	case 0x10:
-		ret = ioport("IN1")->read();
+		ret = m_io_in1->read();
 		break;
 	case 0x20:
 		switch (m_controller_select)
 		{
-			case 0x09: ret = ioport("MJ01_P2")->read(); break;
-			case 0x12: ret = ioport("MJ02_P2")->read(); break;
-			case 0x1b: ret = ioport("MJ03_P2")->read(); break; /* player 2 normal inputs? */
-			case 0x24: ret = ioport("MJ04_P2")->read(); break;
+			case 0x09: ret = m_io_mj01_p2->read(); break;
+			case 0x12: ret = m_io_mj02_p2->read(); break;
+			case 0x1b: ret = m_io_mj03_p2->read(); break; /* player 2 normal inputs? */
+			case 0x24: ret = m_io_mj04_p2->read(); break;
 			default:
-				ret = ioport("IN1")->read();
+				ret = m_io_in1->read();
 				break;
 		}
 		break;
@@ -1019,9 +1048,9 @@ READ16_MEMBER(ng_aes_state::aes_in1_r)
 
 READ16_MEMBER(ng_aes_state::aes_in2_r)
 {
-	UINT32 in2 = ioport("IN2")->read();
+	UINT32 in2 = m_io_in2->read();
 	UINT32 ret = in2;
-	UINT32 sel = ioport("CTRLSEL")->read();
+	UINT32 sel = m_io_ctrlsel->read();
 
 	if((sel & 0x02) && (m_controller_select == 0x24))
 		ret ^= 0x0200;
