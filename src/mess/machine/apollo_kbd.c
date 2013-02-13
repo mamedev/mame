@@ -107,6 +107,14 @@ void apollo_kbd_device::device_start()
 	m_tx_fifo.start(this);
 	m_keyboard_tty.start(this);
 
+	m_io_keyboard1 = machine().root_device().ioport("keyboard1");
+	m_io_keyboard2 = machine().root_device().ioport("keyboard2");
+	m_io_keyboard3 = machine().root_device().ioport("keyboard3");
+	m_io_keyboard4 = machine().root_device().ioport("keyboard4");
+	m_io_mouse1 = machine().root_device().ioport("mouse1");
+	m_io_mouse2 = machine().root_device().ioport("mouse2");
+	m_io_mouse3 = machine().root_device().ioport("mouse3");
+
 	m_timer = machine().scheduler().timer_alloc(FUNC(static_poll_callback), this);
 }
 
@@ -251,9 +259,9 @@ void apollo_kbd_device::mouse::read_mouse()
 	}
 	else
 	{
-		int b = m_device->machine().root_device().ioport("mouse1")->read();
-		int x = m_device->machine().root_device().ioport("mouse2")->read();
-		int y = m_device->machine().root_device().ioport("mouse3")->read();
+		int b = m_device->m_io_mouse1->read();
+		int x = m_device->m_io_mouse2->read();
+		int y = m_device->m_io_mouse3->read();
 
 		if (m_last_b < 0)
 		{

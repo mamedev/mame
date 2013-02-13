@@ -180,6 +180,14 @@ private:
 
 	apollo_kbd_device *m_device; // pointer to myself (nasty: used for cpu_context)
 
+	ioport_port *m_io_keyboard1;
+	ioport_port *m_io_keyboard2;
+	ioport_port *m_io_keyboard3;
+	ioport_port *m_io_keyboard4;
+	ioport_port *m_io_mouse1;
+	ioport_port *m_io_mouse2;
+	ioport_port *m_io_mouse3;
+
 	/* Receiver */
 	UINT32 m_rx_message;
 	UINT16 m_loopback_mode;
