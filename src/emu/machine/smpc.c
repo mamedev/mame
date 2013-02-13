@@ -285,21 +285,48 @@ static TIMER_CALLBACK( smpc_change_clock )
 	/* TODO: VDP1 / VDP2 / SCU / SCSP default power ON values? */
 }
 
+static TIMER_CALLBACK( stv_intback_peripheral )
+{
+	saturn_state *state = machine.driver_data<saturn_state>();
+
+	if (state->m_smpc.intback_stage == 2)
+	{
+		state->m_smpc.SR = (0x80 | state->m_smpc.pmode);    // pad 2, no more data, echo back pad mode set by intback
+		state->m_smpc.intback_stage = 0;
+	}
+	else
+	{
+		state->m_smpc.SR = (0xc0 | state->m_smpc.pmode);    // pad 1, more data, echo back pad mode set by intback
+		state->m_smpc.intback_stage ++;
+	}
+
+	if(!(state->m_scu.ism & IRQ_SMPC))
+		state->m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
+	else
+		state->m_scu.ist |= (IRQ_SMPC);
+
+	state->m_smpc.OREG[31] = 0x10; /* callback for last command issued */
+	state->m_smpc.SF = 0x00;    /* clear hand-shake flag */
+}
+
+
 static TIMER_CALLBACK( stv_smpc_intback )
 {
 	saturn_state *state = machine.driver_data<saturn_state>();
 	int i;
 
-	state->m_smpc.OREG[0] = (0x80) | ((state->m_NMI_reset & 1) << 6);
+	if(state->m_smpc.intback_buf[0] != 0)
+	{
+		state->m_smpc.OREG[0] = (0x80) | ((state->m_NMI_reset & 1) << 6);
 
-	for(i=0;i<7;i++)
-		state->m_smpc.OREG[1+i] = state->m_smpc.rtc_data[i];
+		for(i=0;i<7;i++)
+			state->m_smpc.OREG[1+i] = state->m_smpc.rtc_data[i];
 
-	state->m_smpc.OREG[8]=0x00;  // CTG0 / CTG1?
+		state->m_smpc.OREG[8]=0x00;  // CTG0 / CTG1?
 
-	state->m_smpc.OREG[9]=0x00;  // TODO: system region on Saturn
+		state->m_smpc.OREG[9]=0x00;  // TODO: system region on Saturn
 
-	state->m_smpc.OREG[10]= 0 << 7 |
+		state->m_smpc.OREG[10]= 0 << 7 |
 								state->m_vdp2.dotsel << 6 |
 								1 << 5 |
 								1 << 4 |
@@ -307,26 +334,39 @@ static TIMER_CALLBACK( stv_smpc_intback )
 								1 << 2 |
 								0 << 1 | //SYSRES
 								0 << 0;  //SOUNDRES
-	state->m_smpc.OREG[11]= 0 << 6; //CDRES
+		state->m_smpc.OREG[11]= 0 << 6; //CDRES
 
-	for(i=0;i<4;i++)
-		state->m_smpc.OREG[12+i]=state->m_smpc.SMEM[i];
+		for(i=0;i<4;i++)
+			state->m_smpc.OREG[12+i]=state->m_smpc.SMEM[i];
 
-	for(i=0;i<15;i++)
-		state->m_smpc.OREG[16+i]=0xff; // undefined
+		for(i=0;i<15;i++)
+			state->m_smpc.OREG[16+i]=0xff; // undefined
 
-	//  /*This is for RTC,cartridge code and similar stuff...*/
-	//if(LOG_SMPC) printf ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
-	if(!(state->m_scu.ism & IRQ_SMPC))
-		state->m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
-	else
-		state->m_scu.ist |= (IRQ_SMPC);
+		state->m_smpc.intback_stage = (state->m_smpc.intback_buf[1] & 8) >> 3; // first peripheral
+		state->m_smpc.SR = 0x40 | state->m_smpc.intback_stage << 5;
+		state->m_smpc.pmode = state->m_smpc.intback_buf[0]>>4;
 
-	/* put issued command in OREG31 */
-	state->m_smpc.OREG[31] = 0x10; // TODO: doc says 0?
-	/* clear hand-shake flag */
-	state->m_smpc.SF = 0x00;
+		//  /*This is for RTC,cartridge code and similar stuff...*/
+		//if(LOG_SMPC) printf ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
+		if(!(state->m_scu.ism & IRQ_SMPC))
+			state->m_maincpu->set_input_line_and_vector(8, HOLD_LINE, 0x47);
+		else
+			state->m_scu.ist |= (IRQ_SMPC);
+
+		/* put issued command in OREG31 */
+		state->m_smpc.OREG[31] = 0x10; // TODO: doc says 0?
+		/* clear hand-shake flag */
+		state->m_smpc.SF = 0x00;
+	}
+	else if(state->m_smpc.intback_buf[1] & 8)
+	{
+		state->m_smpc.intback_stage = (state->m_smpc.intback_buf[1] & 8) >> 3; // first peripheral
+		state->m_smpc.SR = 0x40;
+		state->m_smpc.OREG[31] = 0x10;
+		machine.scheduler().timer_set(attotime::from_usec(0), FUNC(stv_intback_peripheral),0);
+	}
 }
+
 
 /*
     [0] port status:
@@ -687,28 +727,30 @@ static void smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
 				printf ("SMPC: Status Acquire %02x %02x %02x %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],state->m_smpc.IREG[2],space.machine().primary_screen->vpos());
 			}
 
+			int timing;
+
+			timing = 100;
+
+			if(state->m_smpc.IREG[0] != 0) // non-peripheral data
+				timing += 100;
+
+			if(state->m_smpc.IREG[1] & 8) // peripheral data
+				timing += 700;
+
+			/* TODO: check if IREG[2] is setted to 0xf0 */
+			{
+				int i;
+
+				for(i=0;i<3;i++)
+					state->m_smpc.intback_buf[i] = state->m_smpc.IREG[i];
+			}
+
 			if(is_stv)
-				space.machine().scheduler().timer_set(attotime::from_usec(700), FUNC(stv_smpc_intback),0); //TODO: variable time
+			{
+				space.machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(stv_smpc_intback),0); //TODO: variable time
+			}
 			else
 			{
-				int timing;
-
-				timing = 100;
-
-				if(state->m_smpc.IREG[0] != 0) // non-peripheral data
-					timing += 100;
-
-				if(state->m_smpc.IREG[1] & 8) // peripheral data
-					timing += 700;
-
-				/* TODO: check if IREG[2] is setted to 0xf0 */
-				{
-					int i;
-
-					for(i=0;i<3;i++)
-						state->m_smpc.intback_buf[i] = state->m_smpc.IREG[i];
-				}
-
 				if(LOG_PAD_CMD) printf("INTBACK %02x %02x %d %d\n",state->m_smpc.IREG[0],state->m_smpc.IREG[1],space.machine().primary_screen->vpos(),(int)space.machine().primary_screen->frame_number());
 				space.machine().scheduler().timer_set(attotime::from_usec(timing), FUNC(saturn_smpc_intback),0); //TODO: is variable time correct?
 			}
@@ -755,7 +797,7 @@ READ8_HANDLER( stv_SMPC_r )
 		return_data = state->m_smpc.OREG[(offset-0x21) >> 1];
 
 	if (offset == 0x61) // TODO: SR
-		return_data = 0x20 ^ 0xff;
+		return_data = state->m_smpc.SR;
 
 	if (offset == 0x63)
 		return_data = state->m_smpc.SF;
@@ -780,6 +822,26 @@ WRITE8_HANDLER( stv_SMPC_w )
 
 	if(offset >= 1 && offset <= 0xd)
 		state->m_smpc.IREG[offset >> 1] = data;
+
+	if(offset == 1) //IREG0, check if a BREAK / CONTINUE request for INTBACK command
+	{
+		if(state->m_smpc.intback_stage)
+		{
+			if(data & 0x40)
+			{
+				if(LOG_PAD_CMD) printf("SMPC: BREAK request\n");
+				state->m_smpc.SR &= 0x0f;
+				state->m_smpc.intback_stage = 0;
+			}
+			else if(data & 0x80)
+			{
+				if(LOG_PAD_CMD) printf("SMPC: CONTINUE request\n");
+				space.machine().scheduler().timer_set(attotime::from_usec(700), FUNC(stv_intback_peripheral),0); /* TODO: is timing correct? */
+				state->m_smpc.OREG[31] = 0x10;
+				state->m_smpc.SF = 0x01; //TODO: set hand-shake flag?
+			}
+		}
+	}
 
 	if (offset == 0x1f) // COMREG
 	{

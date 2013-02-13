@@ -100,6 +100,7 @@ For now I'm writing this function with a command basis so I can work better with
 
 #include "emu.h"
 #include "stvprot.h"
+#include "includes/stv.h"
 
 static UINT32 a_bus[4];
 static UINT32 ctrl_index;
@@ -141,6 +142,7 @@ static READ32_HANDLER( twcup98_prot_r )
 					ctrl_index+=4;
 					return res;
 			}
+
 		}
 		return a_bus[offset];
 	}
@@ -155,6 +157,7 @@ static WRITE32_HANDLER ( twcup98_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
 	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
+
 	if(offset == 3)
 	{
 		int a_bus_vector;
@@ -177,6 +180,7 @@ static WRITE32_HANDLER ( twcup98_prot_w )
 				ctrl_index = a_bus_vector;
 				break;
 		}
+
 	}
 	//popmessage("%04x %04x",data,offset/4);
 }
