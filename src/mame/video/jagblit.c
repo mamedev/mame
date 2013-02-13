@@ -440,7 +440,7 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 				if (COMMAND & 0x40000000)
 				{
 					int intensity = srcdata & 0x00ff;
-					intensity += (INT8) (m_blitter_regs[B_Z3] >> 16);
+					intensity += (INT8) (m_blitter_regs[B_IINC] >> 16);
 					if (intensity < 0)
 						intensity = 0;
 					else if (intensity > 0xff)
