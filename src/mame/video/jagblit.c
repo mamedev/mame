@@ -296,6 +296,22 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 	adest_xmask         = (COMMAND & 0x00000800) ? a2_xmask : a1_xmask;
 	adest_ymask         = (COMMAND & 0x00000800) ? a2_ymask : a1_ymask;
 
+	int gouraud_color[4];
+	gouraud_color[0] = (m_blitter_regs[B_PATD_H] >> 16) & 0xff00;
+	gouraud_color[1] = m_blitter_regs[B_PATD_H] & 0xff00;
+	gouraud_color[2] = (m_blitter_regs[B_PATD_L] >> 16) & 0xff00;
+	gouraud_color[3] = m_blitter_regs[B_PATD_L] & 0xff00;
+
+	int gouraud_inten[4];
+	gouraud_inten[3] = m_blitter_regs[B_I0] & 0xffffff;
+	gouraud_inten[2] = m_blitter_regs[B_I1] & 0xffffff;
+	gouraud_inten[1] = m_blitter_regs[B_I2] & 0xffffff;
+	gouraud_inten[0] = m_blitter_regs[B_I3] & 0xffffff;
+
+	int gouraud_iinc = m_blitter_regs[B_IINC] & 0xffffff;
+	if (gouraud_iinc & 0x800000)
+		gouraud_iinc |= 0xff000000;
+
 	if (LOG_BLITS)
 	{
 	logerror("%s:Blit!\n", machine().describe_context());
@@ -347,41 +363,41 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 				/* load src data and Z */
 				if (COMMAND & 0x00000001)
 				{
-				srcdata = READ_PIXEL(asrc, asrcflags);
+					srcdata = READ_PIXEL(asrc, asrcflags);
 					if (COMMAND & 0x00000002)
-					srczdata = READ_ZDATA(asrc, asrcflags);
+						srczdata = READ_ZDATA(asrc, asrcflags);
 					else if (COMMAND & 0x001c020)
-					srczdata = READ_RDATA(B_SRCZ1_H, asrc, asrcflags, asrc_phrase_mode);
+						srczdata = READ_RDATA(B_SRCZ1_H, asrc, asrcflags, asrc_phrase_mode);
 				}
 				else
 				{
-				srcdata = READ_RDATA(B_SRCD_H, asrc, asrcflags, asrc_phrase_mode);
+					srcdata = READ_RDATA(B_SRCD_H, asrc, asrcflags, asrc_phrase_mode);
 					if (COMMAND & 0x001c020)
-					srczdata = READ_RDATA(B_SRCZ1_H, asrc, asrcflags, asrc_phrase_mode);
+						srczdata = READ_RDATA(B_SRCZ1_H, asrc, asrcflags, asrc_phrase_mode);
 				}
 
 				/* load dst data and Z */
 				if (COMMAND & 0x00000008)
 				{
-				dstdata = READ_PIXEL(adest, adestflags);
+					dstdata = READ_PIXEL(adest, adestflags);
 					if (COMMAND & 0x00000010)
-					dstzdata = READ_ZDATA(adest, adestflags);
+						dstzdata = READ_ZDATA(adest, adestflags);
 					else
-					dstzdata = READ_RDATA(B_DSTZ_H, adest, adestflags, adest_phrase_mode);
+						dstzdata = READ_RDATA(B_DSTZ_H, adest, adestflags, adest_phrase_mode);
 				}
 				else
 				{
-				dstdata = READ_RDATA(B_DSTD_H, adest, adestflags, adest_phrase_mode);
+					dstdata = READ_RDATA(B_DSTD_H, adest, adestflags, adest_phrase_mode);
 					if (COMMAND & 0x00000010)
-					dstzdata = READ_RDATA(B_DSTZ_H, adest, adestflags, adest_phrase_mode);
+						dstzdata = READ_RDATA(B_DSTZ_H, adest, adestflags, adest_phrase_mode);
 				}
 
 				/* handle clipping */
 				if (COMMAND & 0x00000040)
 				{
-				if (adest_x < 0 || adest_y < 0 ||
-					(adest_x >> 16) >= (m_blitter_regs[A1_CLIP] & 0x7fff) ||
-					(adest_y >> 16) >= ((m_blitter_regs[A1_CLIP] >> 16) & 0x7fff))
+					if (adest_x < 0 || adest_y < 0 ||
+						(adest_x >> 16) >= (m_blitter_regs[A1_CLIP] & 0x7fff) ||
+						(adest_y >> 16) >= ((m_blitter_regs[A1_CLIP] >> 16) & 0x7fff))
 						inhibit = 1;
 				}
 
@@ -398,12 +414,12 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 				{
 					if (!(COMMAND & 0x02000000))
 					{
-					if (srcdata == READ_RDATA(B_PATD_H, asrc, asrcflags, asrc_phrase_mode))
+						if (srcdata == READ_RDATA(B_PATD_H, asrc, asrcflags, asrc_phrase_mode))
 							inhibit = 1;
 					}
 					else
 					{
-					if (dstdata == READ_RDATA(B_PATD_H, adest, adestflags, adest_phrase_mode))
+						if (dstdata == READ_RDATA(B_PATD_H, adest, adestflags, adest_phrase_mode))
 							inhibit = 1;
 					}
 				}
@@ -413,7 +429,7 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 				{
 					/* handle patterns/additive/LFU */
 					if (COMMAND & 0x00010000)
-					writedata = READ_RDATA(B_PATD_H, adest, adestflags, adest_phrase_mode);
+						writedata = READ_RDATA(B_PATD_H, adest, adestflags, adest_phrase_mode);
 					else if (COMMAND & 0x00020000)
 					{
 						writedata = (srcdata & 0xff) + (dstdata & 0xff);
@@ -436,28 +452,41 @@ void jaguar_state::FUNCNAME(UINT32 command, UINT32 a1flags, UINT32 a2flags)
 							writedata |= srcdata & dstdata;
 					}
 
-				/* handle source shading */
-				if (COMMAND & 0x40000000)
-				{
-					int intensity = srcdata & 0x00ff;
-					intensity += (INT8) (m_blitter_regs[B_IINC] >> 16);
-					if (intensity < 0)
-						intensity = 0;
-					else if (intensity > 0xff)
-						intensity = 0xff;
-					writedata = (srcdata & 0xff00) | intensity;
-				}
+					/* handle source shading */
+					if (COMMAND & 0x40000000)
+					{
+						int intensity = srcdata & 0x00ff;
+						intensity += (INT8) (m_blitter_regs[B_IINC] >> 16);
+						if (intensity < 0)
+							intensity = 0;
+						else if (intensity > 0xff)
+							intensity = 0xff;
+						writedata = (srcdata & 0xff00) | intensity;
+					}
+
+					/* handle gouraud shading */
+					if (COMMAND & 0x1000)
+					{
+						int p = asrc_phrase_mode ? (asrc_x & 3) : 3;
+						writedata = ((gouraud_inten[p] >> 16) & 0xff) | gouraud_color[p];
+
+						int intensity = gouraud_inten[p];
+						intensity += gouraud_iinc;
+						if (intensity < 0) intensity = 0;
+						if (intensity > 0xffffff) intensity = 0xffffff;
+						gouraud_inten[p] = intensity;
+					}
 				}
 				else
 					writedata = dstdata;
 
-			if (adest_phrase_mode || (command & 0x10000000) || !inhibit)
-				{
-					/* write to the destination */
-					WRITE_PIXEL(adestflags, writedata);
-					if (COMMAND & 0x00000020)
+			if ((command & 0x10000000) || !inhibit)
+			{
+				/* write to the destination */
+				WRITE_PIXEL(adestflags, writedata);
+				if (COMMAND & 0x00000020)
 					WRITE_ZDATA(adestflags, srczdata);
-				}
+			}
 
 				/* update X/Y */
 			asrc_x = (asrc_x + asrc_xadd) & asrc_xmask;
