@@ -5734,7 +5734,7 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 
 		if ( window_control )
 		{
-			popmessage("Window control for RBG");
+			//popmessage("Window control for RBG");
 			stv2_current_tilemap.window_control = window_control;
 			stv_vdp2_apply_window_on_layer(mycliprect);
 		}

@@ -120,12 +120,26 @@ static READ32_HANDLER( twcup98_prot_r )
 	{
 		if(offset == 3)
 		{
+			UINT32 res;
 			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
 			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
 			#endif
-			switch(a_bus[3])
+			switch(a_bus[3] >> 16)
 			{
+				case 0x1212:
+					if(ctrl_index & 2)
+					{
+						res = (ROM[ctrl_index / 4] & 0xffff) << 16;
+						res |= (ROM[(ctrl_index+4) / 4] & 0xffff0000) >> 16;
+					}
+					else
+					{
+						res = ROM[ctrl_index / 4] & 0xffff0000;
+						res |= ROM[ctrl_index / 4] & 0xffff;
+					}
+					ctrl_index+=4;
+					return res;
 			}
 		}
 		return a_bus[offset];
@@ -143,17 +157,25 @@ static WRITE32_HANDLER ( twcup98_prot_w )
 	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
-		logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
+		int a_bus_vector;
+
+		a_bus_vector = a_bus[2] >> 16;
+		a_bus_vector|= (a_bus[2] & 0xffff) << 16;
+		a_bus_vector<<= 1;
 
 		//MAIN : 12120000  DATA : 0ad20069 Tecmo logo
-		if(a_bus[3] == 0x12120000 && a_bus[2] == 0x0ad20069)
-		{
-			// ...
-		}
 		//MAIN : 12120000  DATA : e332006b title screen
-		if(a_bus[3] == 0x12120000 && a_bus[2] == 0xe332006b)
+
+		/* TODO: encrypted / compressed data.
+		   Both points to a section that has a string ("TECMO" / "TITLE") */
+
+		//printf("MAIN : %08x  DATA : %08x %08x\n",a_bus[3],a_bus[2],a_bus_vector);
+
+		switch(a_bus[3] >> 16)
 		{
-			// ...
+			case 0x1212:
+				ctrl_index = a_bus_vector;
+				break;
 		}
 	}
 	//popmessage("%04x %04x",data,offset/4);
@@ -316,7 +338,12 @@ static WRITE32_HANDLER ( rsgun_prot_w )
 	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
-		//logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
+//		int a_bus_vector;
+
+//		a_bus_vector = a_bus[2] >> 16;
+//		a_bus_vector|= (a_bus[2] & 0xffff) << 16;
+//		a_bus_vector<<= 1;
+//		printf("MAIN : %08x  DATA : %08x %08x\n",a_bus[3],a_bus[2],a_bus_vector);
 		switch(a_bus[3])
 		{
 			case 0x77770000: ctrl_index = 0; break;
@@ -336,16 +363,6 @@ void install_rsgun_protection(running_machine &machine)
 *
 *************************/
 
-#define ELANDORE_CTRL_1_HUMAN   0xff7f0000
-#define ELANDORE_CTRL_2_HUMAN   0xffbf0000
-
-#define ELANDORE_CTRL_1_DRAGON  0xf9ff0000
-#define ELANDORE_CTRL_2_DRAGON  0xfbff0000
-#define ELANDORE_CTRL_3_DRAGON  0xfe7f0000
-#define ELANDORE_CTRL_4_DRAGON  0xfd7f0000
-#define ELANDORE_CTRL_5_DRAGON  0xfeff0000
-#define ELANDORE_CTRL_6_DRAGON  0xf9bf0000
-
 static READ32_HANDLER( elandore_prot_r )
 {
 	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
@@ -354,22 +371,26 @@ static READ32_HANDLER( elandore_prot_r )
 	{
 		if(offset == 3)
 		{
+			UINT32 res;
 			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
 			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
 			#endif
-			switch(a_bus[3])
+			switch(a_bus[3] >> 16)
 			{
-				case ELANDORE_CTRL_1_HUMAN:
-				case ELANDORE_CTRL_2_HUMAN:
-				case ELANDORE_CTRL_1_DRAGON:
-				case ELANDORE_CTRL_2_DRAGON:
-				case ELANDORE_CTRL_3_DRAGON:
-				case ELANDORE_CTRL_4_DRAGON:
-				case ELANDORE_CTRL_5_DRAGON:
-				case ELANDORE_CTRL_6_DRAGON:
-					//ctrl_index++;
-					return ROM[ctrl_index];
+				default:
+					if(ctrl_index & 2)
+					{
+						res = (ROM[ctrl_index / 4] & 0xffff) << 16;
+						res |= (ROM[(ctrl_index+4) / 4] & 0xffff0000) >> 16;
+					}
+					else
+					{
+						res = ROM[ctrl_index / 4] & 0xffff0000;
+						res |= ROM[ctrl_index / 4] & 0xffff;
+					}
+					ctrl_index+=4;
+					return res;
 			}
 		}
 		return a_bus[offset];
@@ -387,33 +408,17 @@ static WRITE32_HANDLER ( elandore_prot_w )
 	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
-		/* a bus value 2 seed is used too here. */
-		//logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
-		switch(a_bus[3])
+		int a_bus_vector;
+
+		a_bus_vector = a_bus[2] >> 16;
+		a_bus_vector|= (a_bus[2] & 0xffff) << 16;
+		a_bus_vector<<= 1;
+
+		//printf("MAIN : %08x  DATA : %08x %08x\n",a_bus[3],a_bus[2],a_bus_vector);
+		switch(a_bus[3] >> 16)
 		{
-			case ELANDORE_CTRL_1_HUMAN: // (human polygons)
-				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
-				break;
-			case ELANDORE_CTRL_2_HUMAN: // (human polygons)
-				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
-				break;
-			case ELANDORE_CTRL_1_DRAGON://KAIN / THUNDER (dragon polygons)
-				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
-				break;
-			case ELANDORE_CTRL_2_DRAGON://REVI CURIO / DARK (dragon polygons)
-				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
-				break;
-			case ELANDORE_CTRL_3_DRAGON://RUBONE / POISON (dragon polygons)
-				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
-				break;
-			case ELANDORE_CTRL_4_DRAGON://TINA / MAGICAL GIRL (dragon polygons)
-				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
-				break;
-			case ELANDORE_CTRL_5_DRAGON://KEYAKI / FIRE (dragon polygons)
-				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
-				break;
-			case ELANDORE_CTRL_6_DRAGON://SION / WIND (dragon polygons)
-				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
+			default:
+				ctrl_index = a_bus_vector;
 				break;
 		}
 	}
@@ -439,7 +444,9 @@ R3 is the vector pointer
 
 Directory listing for Final Fight Revenge (Saturn Version):
 
-Most of these file names could be found at relative address 0x346a0 (0x22346a0)
+In the ST-V version, most of these file names could be found at relative address 0x346a0 (0x22346a0)
+Also, there's a table at 0x260000 (0x2260000), this points to offsets to the ROM (and are sent to the protection device),
+and the size of it
 
 fad      size     file name   date
 000000aa 00003000  2000/2/8
@@ -689,8 +696,6 @@ fad      size     file name   date
 00002207 0001efc0 _WHSRCHR.BIN;1 1999/11/9
 00002203 00001cf4 _WHSRMAP.BIN;1 1999/11/9
 */
-static const UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
-
 
 static READ32_HANDLER( ffreveng_prot_r )
 {
@@ -700,21 +705,28 @@ static READ32_HANDLER( ffreveng_prot_r )
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
-			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
+			#if 0
+			UINT32 res;
 			#endif
-			switch(a_bus[3])
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
+			switch(a_bus[3] >> 16)
 			{
-				case 0x10da0000://ffreveng, boot vectors at $6080000,test mode
-					ctrl_index++;
-					if(ctrl_index > 2)
-						return 0x234;
+				case 0x10da://ffreveng, boot vectors at $6080000,test mode
+				case 0x10d7://ffreveng, boot vectors at $6080000,attract mode
+					#if 0
+					if(ctrl_index & 2)
+					{
+						res = (ROM[ctrl_index / 4] & 0xffff) << 16;
+						res |= (ROM[(ctrl_index+4) / 4] & 0xffff0000) >> 16;
+					}
 					else
-						return vector_prot[ctrl_index-1];
-				case 0x10d70000://ffreveng, boot vectors at $6080000,attract mode
-					ctrl_index++;
-					return ROM[ctrl_index];
+					{
+						res = ROM[ctrl_index / 4] & 0xffff0000;
+						res |= ROM[ctrl_index / 4] & 0xffff;
+					}
+					#endif
+					ctrl_index+=4;
+					return 0;
 			}
 		}
 		return a_bus[offset];
@@ -732,12 +744,19 @@ static WRITE32_HANDLER ( ffreveng_prot_w )
 	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
-		//logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
-		switch(a_bus[3])
+		int a_bus_vector;
+
+		a_bus_vector = a_bus[2] >> 16;
+		a_bus_vector|= (a_bus[2] & 0xffff) << 16;
+		a_bus_vector<<= 1;
+
+		printf("MAIN : %08x  DATA : %08x %08x\n",a_bus[3],a_bus[2],a_bus_vector);
+		switch(a_bus[3] >> 16)
 		{
-			/*ffreveng*/
-			case 0x10d70000: ctrl_index = 0; break;
-			case 0x10da0000: ctrl_index = 0; break;
+			case 0x10d7: ctrl_index = a_bus_vector; break;
+			case 0x10da: ctrl_index = a_bus_vector; break;
+			default:
+				ctrl_index = 0;
 		}
 	}
 	//popmessage("%04x %04x",data,offset/4);
