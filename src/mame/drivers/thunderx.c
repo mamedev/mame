@@ -178,14 +178,13 @@ this is the data written to internal ram on startup:
 // +3 : x (2 pixel units) of center of object
 // +4 : y (2 pixel units) of center of object
 
-static void run_collisions( running_machine &machine, int s0, int e0, int s1, int e1, int cm, int hm )
+void thunderx_state::run_collisions( int s0, int e0, int s1, int e1, int cm, int hm )
 {
-	thunderx_state *state = machine.driver_data<thunderx_state>();
 	UINT8* p0;
 	UINT8* p1;
 	int ii, jj;
 
-	p0 = &state->m_pmcram[16 + 5 * s0];
+	p0 = &m_pmcram[16 + 5 * s0];
 	for (ii = s0; ii < e0; ii++, p0 += 5)
 	{
 		int l0, r0, b0, t0;
@@ -199,7 +198,7 @@ static void run_collisions( running_machine &machine, int s0, int e0, int s1, in
 		t0 = p0[4] - p0[2];
 		b0 = p0[4] + p0[2];
 
-		p1 = &state->m_pmcram[16 + 5 * s1];
+		p1 = &m_pmcram[16 + 5 * s1];
 		for (jj = s1; jj < e1; jj++,p1 += 5)
 		{
 			int l1,r1,b1,t1;
@@ -230,9 +229,8 @@ static void run_collisions( running_machine &machine, int s0, int e0, int s1, in
 //
 // emulates K052591 collision detection
 
-static void calculate_collisions( running_machine &machine )
+void thunderx_state::calculate_collisions(  )
 {
-	thunderx_state *state = machine.driver_data<thunderx_state>();
 	int X0,Y0;
 	int X1,Y1;
 	int CM,HM;
@@ -256,30 +254,30 @@ static void calculate_collisions( running_machine &machine )
 	// hit mask is 40 to set bit on object 0 and object 1
 	// hit mask is 20 to set bit on object 1 only
 
-	Y0 = state->m_pmcram[0];
-	Y0 = (Y0 << 8) + state->m_pmcram[1];
+	Y0 = m_pmcram[0];
+	Y0 = (Y0 << 8) + m_pmcram[1];
 	Y0 = (Y0 - 15) / 5;
-	Y1 = (state->m_pmcram[2] - 15) / 5;
+	Y1 = (m_pmcram[2] - 15) / 5;
 
-	if (state->m_pmcram[5] < 16)
+	if (m_pmcram[5] < 16)
 	{
 		// US Thunder Cross uses this form
-		X0 = state->m_pmcram[5];
-		X0 = (X0 << 8) + state->m_pmcram[6];
+		X0 = m_pmcram[5];
+		X0 = (X0 << 8) + m_pmcram[6];
 		X0 = (X0 - 16) / 5;
-		X1 = (state->m_pmcram[7] - 16) / 5;
+		X1 = (m_pmcram[7] - 16) / 5;
 	}
 	else
 	{
 		// Japan Thunder Cross uses this form
-		X0 = (state->m_pmcram[5] - 16) / 5;
-		X1 = (state->m_pmcram[6] - 16) / 5;
+		X0 = (m_pmcram[5] - 16) / 5;
+		X1 = (m_pmcram[6] - 16) / 5;
 	}
 
-	CM = state->m_pmcram[3];
-	HM = state->m_pmcram[4];
+	CM = m_pmcram[3];
+	HM = m_pmcram[4];
 
-	run_collisions(machine, X0, Y0, X1, Y1, CM, HM);
+	run_collisions(X0, Y0, X1, Y1, CM, HM);
 }
 
 READ8_MEMBER(thunderx_state::thunderx_1f98_r)
@@ -300,7 +298,7 @@ WRITE8_MEMBER(thunderx_state::thunderx_1f98_w)
 	/* bit 2 = do collision detection when 0->1 */
 	if ((data & 4) && !(m_1f98_data & 4))
 	{
-		calculate_collisions(machine());
+		calculate_collisions();
 
 		/* 100 cycle delay is arbitrary */
 		machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(100), timer_expired_delegate(FUNC(thunderx_state::thunderx_firq_callback),this));

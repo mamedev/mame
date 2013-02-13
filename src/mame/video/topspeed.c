@@ -26,12 +26,11 @@
 
 ********************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void topspeed_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	topspeed_state *state = machine.driver_data<topspeed_state>();
-	UINT16 *spriteram = state->m_spriteram;
+	UINT16 *spriteram = m_spriteram;
 	int offs, map_offset, x, y, curx, cury, sprite_chunk;
-	UINT16 *spritemap = state->m_spritemap;
+	UINT16 *spritemap = m_spritemap;
 	UINT16 data, tilenum, code, color;
 	UINT8 flipx, flipy, priority, bad_chunks;
 	UINT8 j, k, px, py, zx, zy, zoomx, zoomy;
@@ -92,13 +91,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			zx = x + (((k + 1) * zoomx) / 8) - curx;
 			zy = y + (((j + 1) * zoomy) / 16) - cury;
 
-			pdrawgfxzoom_transpen(bitmap,cliprect,machine.gfx[0],
+			pdrawgfxzoom_transpen(bitmap,cliprect,machine().gfx[0],
 					code,
 					color,
 					flipx,flipy,
 					curx,cury,
 					zx<<12,zy<<13,
-					machine.priority_bitmap,primasks[priority],0);
+					machine().priority_bitmap,primasks[priority],0);
 		}
 
 		if (bad_chunks)
@@ -181,6 +180,6 @@ UINT32 topspeed_state::screen_update_topspeed(screen_device &screen, bitmap_ind1
 	if (m_dislayer[4] == 0)
 #endif
 
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	return 0;
 }

@@ -145,6 +145,9 @@ public:
 	INTERRUPT_GEN_MEMBER(lgtnfght_interrupt);
 	INTERRUPT_GEN_MEMBER(tmnt_vblank_irq);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
+	void sound_nmi_callback( int param );
+	inline UINT32 tmnt2_get_word( UINT32 addr );
+	void tmnt2_put_word( address_space &space, UINT32 addr, UINT16 data );
 };
 
 

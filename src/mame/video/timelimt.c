@@ -109,13 +109,12 @@ WRITE8_MEMBER(timelimt_state::timelimt_scroll_y_w)
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void timelimt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	timelimt_state *state = machine.driver_data<timelimt_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for( offs = state->m_spriteram.bytes(); offs >= 0; offs -= 4 )
+	for( offs = m_spriteram.bytes(); offs >= 0; offs -= 4 )
 	{
 		int sy = 240 - spriteram[offs];
 		int sx = spriteram[offs+3];
@@ -127,7 +126,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		code += ( attr & 0x80 ) ? 0x40 : 0x00;
 		code += ( attr & 0x40 ) ? 0x80 : 0x00;
 
-		drawgfx_transpen( bitmap, cliprect,machine.gfx[2],
+		drawgfx_transpen( bitmap, cliprect,machine().gfx[2],
 				code,
 				attr & 7,
 				flipx,flipy,
@@ -142,7 +141,7 @@ UINT32 timelimt_state::screen_update_timelimt(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->set_scrolly(0, m_scrolly);
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;

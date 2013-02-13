@@ -82,4 +82,9 @@ public:
 	UINT32 screen_update_tecmosys(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void tecmosys_prot_init(int which);
 	void tecmosys_prot_reset();
+	inline void set_color_555_tecmo(pen_t color, int rshift, int gshift, int bshift, UINT16 data);
+	void tecmosys_render_sprites_to_bitmap(bitmap_rgb32 &bitmap, UINT16 extrax, UINT16 extray );
+	void tecmosys_tilemap_copy_to_compose(UINT16 pri);
+	void tecmosys_do_final_mix(bitmap_rgb32 &bitmap);
+	void tecmosys_descramble();
 };

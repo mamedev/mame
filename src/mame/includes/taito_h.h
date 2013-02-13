@@ -31,4 +31,8 @@ public:
 	UINT32 screen_update_recordbr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dleague(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void reset_sound_region();
+	void syvalion_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	void dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	void taitoh_log_vram();
 };

@@ -165,13 +165,12 @@ WRITE16_MEMBER(toypop_state::toypop_merged_background_w)
 		m_bg_image[2*offset+1] = (data & 0xf) | ((data & 0xf0) << 4);
 }
 
-static void draw_background(running_machine &machine, bitmap_ind16 &bitmap)
+void toypop_state::draw_background(bitmap_ind16 &bitmap)
 {
-	toypop_state *state = machine.driver_data<toypop_state>();
-	pen_t pen_base = 0x300 + 0x10*state->m_palettebank;
+	pen_t pen_base = 0x300 + 0x10*m_palettebank;
 
 	// copy the background image from RAM (0x190200-0x19FDFF) to bitmap
-	if (state->m_bitmapflip)
+	if (m_bitmapflip)
 	{
 		int offs = 0xFDFE/2;
 		for (int y = 0; y < 224; y++)
@@ -179,7 +178,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap)
 			UINT16 *scanline = &bitmap.pix16(y);
 			for (int x = 0; x < 288; x+=2)
 			{
-				UINT16 data = state->m_bg_image[offs];
+				UINT16 data = m_bg_image[offs];
 				scanline[x]   = pen_base | (data & 0x0f);
 				scanline[x+1] = pen_base | (data >> 8);
 				offs--;
@@ -194,7 +193,7 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap)
 			UINT16 *scanline = &bitmap.pix16(y);
 			for (int x = 0; x < 288; x+=2)
 			{
-				UINT16 data = state->m_bg_image[offs];
+				UINT16 data = m_bg_image[offs];
 				scanline[x]   = pen_base | (data >> 8);
 				scanline[x+1] = pen_base | (data & 0x0f);
 				offs++;
@@ -212,9 +211,8 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap)
 ***************************************************************************/
 
 
-void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
+void toypop_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
 {
-	toypop_state *state = machine.driver_data<toypop_state>();
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
@@ -245,7 +243,7 @@ void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangl
 			sy -= 16 * sizey;
 			sy = (sy & 0xff) - 32;  // fix wraparound
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -256,12 +254,12 @@ void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangl
 			{
 				for (int x = 0;x <= sizex;x++)
 				{
-					drawgfx_transmask(bitmap,cliprect,machine.gfx[1],
+					drawgfx_transmask(bitmap,cliprect,machine().gfx[1],
 						sprite + gfx_offs[y ^ (sizey & flipy)][x ^ (sizex & flipx)],
 						color,
 						flipx,flipy,
 						sx + 16*x,sy + 16*y,
-						colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, 0xff));
+						colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, 0xff));
 				}
 			}
 		}
@@ -271,8 +269,8 @@ void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangl
 
 UINT32 toypop_state::screen_update_toypop(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_background(machine(), bitmap);
+	draw_background(bitmap);
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap, cliprect, m_spriteram);
+	draw_sprites(bitmap, cliprect, m_spriteram);
 	return 0;
 }

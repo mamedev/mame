@@ -18,6 +18,8 @@ public:
 		m_collision_reg(*this, "collision_reg"),
 		m_kikstart_scrollram(*this, "kikstart_scroll"){ }
 
+	typedef void (taitosj_state::*copy_layer_func_t)(bitmap_ind16 &,	
+									const rectangle &, int, int *, rectangle *);
 	UINT8 m_sndnmi_disable;
 	UINT8 m_input_port_4_f0;
 	UINT8 m_kikstart_gears[2];
@@ -95,4 +97,21 @@ public:
 	TIMER_CALLBACK_MEMBER(taitosj_mcu_status_real_w);
 	void init_common();
 	void reset_common();
+	void set_pens();
+	void compute_draw_order();
+	inline int get_sprite_xy(UINT8 which, UINT8* sx, UINT8* sy);
+	inline gfx_element *get_sprite_gfx_element(UINT8 which);
+	void check_sprite_sprite_collision();
+	void calculate_sprite_areas(int *sprites_on, rectangle *sprite_areas);
+	int check_sprite_layer_bitpattern(int which, rectangle *sprite_areas);
+	void check_sprite_layer_collision(int *sprites_on, rectangle *sprite_areas);
+	void draw_layers();
+	void draw_sprites(bitmap_ind16 &bitmap);
+	void check_collision(int *sprites_on, rectangle *sprite_areas);
+	int check_sprite_sprite_bitpattern(int sx1, int sy1, int which1,int sx2, int sy2, int which2);
+	void taitosj_copy_layer(bitmap_ind16 &bitmap, const rectangle &cliprect,int which, int *sprites_on, rectangle *sprite_areas);
+	void kikstart_copy_layer(bitmap_ind16 &bitmap, const rectangle &cliprect,int which, int *sprites_on, rectangle *sprite_areas);
+	void copy_layer(bitmap_ind16 &bitmap, const rectangle &cliprect,copy_layer_func_t copy_layer_func, int which, int *sprites_on, rectangle *sprite_areas);
+	void copy_layers(bitmap_ind16 &bitmap, const rectangle &cliprect,copy_layer_func_t copy_layer_func, int *sprites_on, rectangle *sprite_areas);
+	int video_update_common(bitmap_ind16 &bitmap, const rectangle &cliprect, copy_layer_func_t copy_layer_func);
 };

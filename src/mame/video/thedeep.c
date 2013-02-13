@@ -143,10 +143,9 @@ Offset:     Bits:       Value:
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void thedeep_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	thedeep_state *state = machine.driver_data<thedeep_state>();
-	UINT8 *s = state->m_spriteram, *end = s + state->m_spriteram.bytes();
+	UINT8 *s = m_spriteram, *end = s + m_spriteram.bytes();
 
 	while (s < end)
 	{
@@ -169,7 +168,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		if (color & 1)  sx -= 256;
 		if (attr  & 1)  sy -= 256;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			flipx = !flipx;
 			flipy = !flipy;
@@ -188,7 +187,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 			for (y = 0; y < ny; y++)
 			{
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 						code + (flipy ? (ny - y - 1) :  y),
 						color,
 						flipx,flipy,
@@ -222,7 +221,7 @@ UINT32 thedeep_state::screen_update_thedeep(screen_device &screen, bitmap_ind16 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	m_tilemap_0->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_tilemap_1->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

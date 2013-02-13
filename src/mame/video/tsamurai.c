@@ -126,14 +126,13 @@ WRITE8_MEMBER(tsamurai_state::tsamurai_fg_colorram_w)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void tsamurai_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	tsamurai_state *state = machine.driver_data<tsamurai_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	gfx_element *gfx = machine.gfx[2];
+	UINT8 *spriteram = m_spriteram;
+	gfx_element *gfx = machine().gfx[2];
 	const UINT8 *source = spriteram+32*4-4;
 	const UINT8 *finish = spriteram; /* ? */
-	state->m_flicker = 1-state->m_flicker;
+	m_flicker = 1-m_flicker;
 
 	while( source>=finish )
 	{
@@ -165,7 +164,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		/* So I'm using this specific check. -kal 11 jul 2002 */
 //      if(sprite_type == 1) sy=sy+2;
 
-		if( state->flip_screen() )
+		if( flip_screen() )
 		{
 			drawgfx_transpen( bitmap,cliprect,gfx,
 				sprite_number&0x7f,
@@ -208,7 +207,7 @@ UINT32 tsamurai_state::screen_update_tsamurai(screen_device &screen, bitmap_ind1
 	*/
 	bitmap.fill(m_bgcolor, cliprect);
 	m_background->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_foreground->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -260,6 +259,6 @@ UINT32 tsamurai_state::screen_update_vsgongf(screen_device &screen, bitmap_ind16
 	#endif
 
 	m_foreground->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	return 0;
 }

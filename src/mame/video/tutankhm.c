@@ -37,14 +37,13 @@ WRITE8_MEMBER(tutankhm_state::tutankhm_flip_screen_y_w)
  *
  *************************************/
 
-static void get_pens( running_machine &machine, pen_t *pens )
+void tutankhm_state::get_pens( pen_t *pens )
 {
-	tutankhm_state *state = machine.driver_data<tutankhm_state>();
 	offs_t i;
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
-		UINT8 data = state->m_paletteram[i];
+		UINT8 data = m_paletteram[i];
 
 		pens[i] = MAKE_RGB(pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
@@ -64,7 +63,7 @@ UINT32 tutankhm_state::screen_update_tutankhm(screen_device &screen, bitmap_rgb3
 	pen_t pens[NUM_PENS];
 	int x, y;
 
-	get_pens(machine(), pens);
+	get_pens( pens);
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{

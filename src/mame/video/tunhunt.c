@@ -138,7 +138,7 @@ Color Array Ram Assignments:
         8-E             Lines (as normal) background
         F               Hilight 3
 */
-static void set_pens(running_machine &machine)
+void tunhunt_state::set_pens()
 {
 /*
     The actual contents of the color proms (unused by this driver)
@@ -152,8 +152,7 @@ static void set_pens(running_machine &machine)
     0020:   00 f0 f0 f0 b0 b0 00 f0
             00 f0 f0 00 b0 00 f0 f0
 */
-	//const UINT8 *color_prom = machine.root_device().memregion( "proms" )->base();
-	tunhunt_state *state = machine.driver_data<tunhunt_state>();
+	//const UINT8 *color_prom = machine().root_device().memregion( "proms" )->base();
 	int color;
 	int shade;
 	int i;
@@ -161,7 +160,7 @@ static void set_pens(running_machine &machine)
 
 	for( i=0; i<16; i++ )
 	{
-		color = state->m_generic_paletteram_8[i];
+		color = m_generic_paletteram_8[i];
 		shade = 0xf^(color>>4);
 
 		color &= 0xf; /* hue select */
@@ -193,11 +192,11 @@ static void set_pens(running_machine &machine)
 		green   = APPLY_SHADE(green,shade);
 		blue    = APPLY_SHADE(blue,shade);
 
-		colortable_palette_set_color( machine.colortable,i,MAKE_RGB(red,green,blue) );
+		colortable_palette_set_color( machine().colortable,i,MAKE_RGB(red,green,blue) );
 	}
 }
 
-static void draw_motion_object(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tunhunt_state::draw_motion_object(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
  *      VSTRLO  0x1202
@@ -210,10 +209,9 @@ static void draw_motion_object(running_machine &machine, bitmap_ind16 &bitmap, c
  *          always 0x00?
  */
 
-	tunhunt_state *state = machine.driver_data<tunhunt_state>();
-	bitmap_ind16 &tmpbitmap = state->m_tmpbitmap;
-	UINT8 *spriteram = state->m_spriteram;
-	UINT8 *tunhunt_ram = state->m_workram;
+	bitmap_ind16 &tmpbitmap = m_tmpbitmap;
+	UINT8 *spriteram = m_spriteram;
+	UINT8 *tunhunt_ram = m_workram;
 	//int skip = tunhunt_ram[MOBST];
 	int x0 = 255-tunhunt_ram[MOBJV];
 	int y0 = 255-tunhunt_ram[MOBJH];
@@ -269,7 +267,7 @@ static void draw_motion_object(running_machine &machine, bitmap_ind16 &bitmap, c
 	);
 }
 
-static void draw_box(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tunhunt_state::draw_box(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
     This is unnecessarily slow, but the box priorities aren't completely understood,
@@ -289,8 +287,7 @@ static void draw_box(running_machine &machine, bitmap_ind16 &bitmap, const recta
         1280: 07 03 00      01  07 06 04 05 02 07 03 00     09 0a   0b 0c       palette select
         ->hue 06 02 ff      60  06 05 03 04 01 06 02 ff     d2 00   c2 ff
 */
-	tunhunt_state *state = machine.driver_data<tunhunt_state>();
-	UINT8 *tunhunt_ram = state->m_workram;
+	UINT8 *tunhunt_ram = m_workram;
 	int span,x,y;
 	int color;
 //  rectangle bbox;
@@ -323,8 +320,7 @@ static void draw_box(running_machine &machine, bitmap_ind16 &bitmap, const recta
 }
 
 /* "shell" graphics are 16x16 pixel tiles used for player shots and targeting cursor */
-static void draw_shell(running_machine &machine,
-		bitmap_ind16 &bitmap,
+void tunhunt_state::draw_shell(bitmap_ind16 &bitmap,
 		const rectangle &cliprect,
 		int picture_code,
 		int hposition,
@@ -341,7 +337,7 @@ static void draw_shell(running_machine &machine,
 			for( sy=0; sy<256; sy+=16 )
 			{
 				drawgfx_transpen( bitmap, cliprect,
-					machine.gfx[1],
+					machine().gfx[1],
 					picture_code,
 					0, /* color */
 					0,0, /* flip */
@@ -366,7 +362,7 @@ static void draw_shell(running_machine &machine,
 
 	*/
 	drawgfx_transpen( bitmap, cliprect,
-			machine.gfx[1],
+			machine().gfx[1],
 			picture_code,
 			0, /* color */
 			0,0, /* flip */
@@ -375,13 +371,13 @@ static void draw_shell(running_machine &machine,
 
 UINT32 tunhunt_state::screen_update_tunhunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(machine());
+	set_pens();
 
-	draw_box(machine(), bitmap, cliprect);
+	draw_box(bitmap, cliprect);
 
-	draw_motion_object(machine(), bitmap, cliprect);
+	draw_motion_object(bitmap, cliprect);
 
-	draw_shell(machine(), bitmap, cliprect,
+	draw_shell(bitmap, cliprect,
 		m_workram[SHL0PC],  /* picture code */
 		m_workram[SHEL0H],  /* hposition */
 		m_workram[SHL0V],   /* vstart */
@@ -389,7 +385,7 @@ UINT32 tunhunt_state::screen_update_tunhunt(screen_device &screen, bitmap_ind16 
 		m_workram[SHL0ST],  /* vstretch */
 		m_control&0x08 ); /* hstretch */
 
-	draw_shell(machine(), bitmap, cliprect,
+	draw_shell(bitmap, cliprect,
 		m_workram[SHL1PC],  /* picture code */
 		m_workram[SHEL1H],  /* hposition */
 		m_workram[SHL1V],   /* vstart */

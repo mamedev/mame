@@ -26,13 +26,12 @@ void triplhnt_state::video_start()
 
 TIMER_CALLBACK_MEMBER(triplhnt_state::triplhnt_hit_callback)
 {
-	triplhnt_set_collision(machine(), param);
+	triplhnt_set_collision(param);
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	triplhnt_state *state = machine.driver_data<triplhnt_state>();
 	int i;
 
 	int hit_line = 999;
@@ -42,20 +41,20 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	{
 		rectangle rect;
 
-		int j = (state->m_orga_ram[i] & 15) ^ 15;
+		int j = (m_orga_ram[i] & 15) ^ 15;
 
 		/* software sorts sprites by x and stores order in orga RAM */
 
-		int hpos = state->m_hpos_ram[j] ^ 255;
-		int vpos = state->m_vpos_ram[j] ^ 255;
-		int code = state->m_code_ram[j] ^ 255;
+		int hpos = m_hpos_ram[j] ^ 255;
+		int vpos = m_vpos_ram[j] ^ 255;
+		int code = m_code_ram[j] ^ 255;
 
 		if (hpos == 255)
 			continue;
 
 		/* sprite placement might be wrong */
 
-		if (state->m_sprite_zoom)
+		if (m_sprite_zoom)
 		{
 			rect.set(hpos - 16, hpos - 16 + 63, 196 - vpos, 196 - vpos + 63);
 		}
@@ -66,8 +65,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		/* render sprite to auxiliary bitmap */
 
-		drawgfx_opaque(state->m_helper, cliprect, machine.gfx[state->m_sprite_zoom],
-			2 * code + state->m_sprite_bank, 0, code & 8, 0,
+		drawgfx_opaque(m_helper, cliprect, machine().gfx[m_sprite_zoom],
+			2 * code + m_sprite_bank, 0, code & 8, 0,
 			rect.min_x, rect.min_y);
 
 		rect &= cliprect;
@@ -82,7 +81,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			{
 				for (y = rect.min_y; y <= rect.max_y; y++)
 				{
-					pen_t a = state->m_helper.pix16(y, x);
+					pen_t a = m_helper.pix16(y, x);
 					pen_t b = bitmap.pix16(y, x);
 
 					if (a == 2 && b == 7)
@@ -99,7 +98,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 
 	if (hit_line != 999 && hit_code != 999)
-		machine.scheduler().timer_set(machine.primary_screen->time_until_pos(hit_line), timer_expired_delegate(FUNC(triplhnt_state::triplhnt_hit_callback),state), hit_code);
+		machine().scheduler().timer_set(machine().primary_screen->time_until_pos(hit_line), timer_expired_delegate(FUNC(triplhnt_state::triplhnt_hit_callback),this), hit_code);
 }
 
 
@@ -111,7 +110,7 @@ UINT32 triplhnt_state::screen_update_triplhnt(screen_device &screen, bitmap_ind1
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	address_space &space = machine().driver_data()->generic_space();
 	discrete_sound_w(discrete, space, TRIPLHNT_BEAR_ROAR_DATA, m_playfield_ram[0xfa] & 15);

@@ -119,7 +119,7 @@ void tbowl_state::video_start()
 }
 
 
-void tbowl_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, int xscroll, UINT8* spriteram)
+void tbowl_state::tbowl_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int xscroll, UINT8* spriteram)
 {
 	int offs;
 	static const UINT8 layout[8][8] =
@@ -162,28 +162,28 @@ void tbowl_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rec
 
 					sx -= xscroll;
 
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx,sy,0 );
 
 					/* wraparound */
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx,sy-0x200,0 );
 
 					/* wraparound */
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
 							sx-0x400,sy,0 );
 
 					/* wraparound */
-					drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
+					drawgfx_transpen(bitmap,cliprect,machine().gfx[3],
 							code + layout[y][x],
 							color,
 							flipx,flipy,
@@ -208,7 +208,7 @@ UINT32 tbowl_state::screen_update_tbowl_left(screen_device &screen, bitmap_ind16
 
 	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	tbowl_draw_sprites(machine(), bitmap,cliprect, 0, m_spriteram);
+	tbowl_draw_sprites(bitmap,cliprect, 0, m_spriteram);
 	m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 
@@ -226,7 +226,7 @@ UINT32 tbowl_state::screen_update_tbowl_right(screen_device &screen, bitmap_ind1
 
 	bitmap.fill(0x100, cliprect); /* is there a register controling the colour? looks odd when screen is blank */
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	tbowl_draw_sprites(machine(), bitmap,cliprect, 32*8, m_spriteram);
+	tbowl_draw_sprites(bitmap,cliprect, 32*8, m_spriteram);
 	m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,0);
 

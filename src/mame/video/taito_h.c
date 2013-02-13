@@ -70,13 +70,12 @@ static const int zoomy_conv_table[] =
   Screen refresh
 ***************************************************************************/
 
-static void syvalion_draw_sprites( running_machine &machine,bitmap_ind16 &bitmap, const rectangle &cliprect )
+void taitoh_state::syvalion_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 
-	taitoh_state *state = machine.driver_data<taitoh_state>();
-	address_space &space = machine.driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, ex, zx;
 	int ysize;
@@ -87,11 +86,11 @@ static void syvalion_draw_sprites( running_machine &machine,bitmap_ind16 &bitmap
 
 	for (offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
 	{
-		x0        =  tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 1, 0xffff) & 0x3ff;
-		y0        =  tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 0, 0xffff) & 0x3ff;
-		zoomx     = (tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 2, 0xffff) & 0x7f00) >> 8;
-		tile_offs = (tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 3, 0xffff) & 0x1fff) << 2;
-		ysize     = size[(tc0080vco_sprram_r(state->m_tc0080vco, space, offs, 0xffff) & 0x0c00) >> 10];
+		x0        =  tc0080vco_sprram_r(m_tc0080vco, space, offs + 1, 0xffff) & 0x3ff;
+		y0        =  tc0080vco_sprram_r(m_tc0080vco, space, offs + 0, 0xffff) & 0x3ff;
+		zoomx     = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 2, 0xffff) & 0x7f00) >> 8;
+		tile_offs = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 3, 0xffff) & 0x1fff) << 2;
+		ysize     = size[(tc0080vco_sprram_r(m_tc0080vco, space, offs, 0xffff) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
@@ -113,7 +112,7 @@ static void syvalion_draw_sprites( running_machine &machine,bitmap_ind16 &bitmap
 			if (x0 >= 0x200) x0 -= 0x400;
 			if (y0 >= 0x200) y0 -= 0x400;
 
-			if (tc0080vco_flipscreen_r(state->m_tc0080vco))
+			if (tc0080vco_flipscreen_r(m_tc0080vco))
 			{
 				x0 = 497 - x0;
 				y0 = 498 - y0;
@@ -135,19 +134,19 @@ static void syvalion_draw_sprites( running_machine &machine,bitmap_ind16 &bitmap
 					{
 						int tile, color, flipx, flipy;
 
-						tile  = tc0080vco_cram_0_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x7fff;
-						color = tc0080vco_cram_1_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x001f;
-						flipx = tc0080vco_cram_1_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x0040;
-						flipy = tc0080vco_cram_1_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x0080;
+						tile  = tc0080vco_cram_0_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x7fff;
+						color = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x001f;
+						flipx = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x0040;
+						flipy = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x0080;
 
-						if (tc0080vco_flipscreen_r(state->m_tc0080vco))
+						if (tc0080vco_flipscreen_r(m_tc0080vco))
 						{
 							flipx ^= 0x0040;
 							flipy ^= 0x0080;
 						}
 
 						drawgfxzoom_transpen( bitmap, cliprect,
-									machine.gfx[0],
+									machine().gfx[0],
 									tile,
 									color,
 									flipx, flipy,
@@ -164,13 +163,12 @@ static void syvalion_draw_sprites( running_machine &machine,bitmap_ind16 &bitmap
 	}
 }
 
-static void recordbr_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void taitoh_state::recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 
-	taitoh_state *state = machine.driver_data<taitoh_state>();
-	address_space &space = machine.driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
 	int ysize;
@@ -184,12 +182,12 @@ static void recordbr_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		if (offs <  0x01b0 && priority == 0)    continue;
 		if (offs >= 0x01b0 && priority == 1)    continue;
 
-		x0        =  tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 1, 0xffff) & 0x3ff;
-		y0        =  tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 0, 0xffff) & 0x3ff;
-		zoomx     = (tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 2, 0xffff) & 0x7f00) >> 8;
-		zoomy     = (tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 2, 0xffff) & 0x007f);
-		tile_offs = (tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 3, 0xffff) & 0x1fff) << 2;
-		ysize     = size[(tc0080vco_sprram_r(state->m_tc0080vco, space, offs, 0xffff) & 0x0c00) >> 10];
+		x0        =  tc0080vco_sprram_r(m_tc0080vco, space, offs + 1, 0xffff) & 0x3ff;
+		y0        =  tc0080vco_sprram_r(m_tc0080vco, space, offs + 0, 0xffff) & 0x3ff;
+		zoomx     = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 2, 0xffff) & 0x7f00) >> 8;
+		zoomy     = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 2, 0xffff) & 0x007f);
+		tile_offs = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 3, 0xffff) & 0x1fff) << 2;
+		ysize     = size[(tc0080vco_sprram_r(m_tc0080vco, space, offs, 0xffff) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
@@ -225,7 +223,7 @@ static void recordbr_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 			if (x0 >= 0x200) x0 -= 0x400;
 			if (y0 >= 0x200) y0 -= 0x400;
 
-			if (tc0080vco_flipscreen_r(state->m_tc0080vco))
+			if (tc0080vco_flipscreen_r(m_tc0080vco))
 			{
 				x0 = 497 - x0;
 				y0 = 498 - y0;
@@ -248,19 +246,19 @@ static void recordbr_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 					{
 						int tile, color, flipx, flipy;
 
-						tile  = tc0080vco_cram_0_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x7fff;
-						color = tc0080vco_cram_1_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x001f;
-						flipx = tc0080vco_cram_1_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x0040;
-						flipy = tc0080vco_cram_1_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x0080;
+						tile  = tc0080vco_cram_0_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x7fff;
+						color = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x001f;
+						flipx = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x0040;
+						flipy = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x0080;
 
-						if (tc0080vco_flipscreen_r(state->m_tc0080vco))
+						if (tc0080vco_flipscreen_r(m_tc0080vco))
 						{
 							flipx ^= 0x0040;
 							flipy ^= 0x0080;
 						}
 
 						drawgfxzoom_transpen( bitmap, cliprect,
-									machine.gfx[0],
+									machine().gfx[0],
 									tile,
 									color,
 									flipx, flipy,
@@ -277,13 +275,12 @@ static void recordbr_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	}
 }
 
-static void dleague_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void taitoh_state::dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 
-	taitoh_state *state = machine.driver_data<taitoh_state>();
-	address_space &space = machine.driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, ex, zx;
 	int ysize;
@@ -295,12 +292,12 @@ static void dleague_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 
 	for (offs = 0x03f8 / 2; offs >= 0; offs -= 0x008 / 2)
 	{
-		x0        =  tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 1, 0xffff) & 0x3ff;
-		y0        =  tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 0, 0xffff) & 0x3ff;
-		zoomx     = (tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 2, 0xffff) & 0x7f00) >> 8;
-		tile_offs = (tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 3, 0xffff) & 0x1fff) << 2;
-		pribit    = (tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 0, 0xffff) & 0x1000) >> 12;
-		ysize     = size[(tc0080vco_sprram_r(state->m_tc0080vco, space, offs, 0xffff) & 0x0c00) >> 10];
+		x0        =  tc0080vco_sprram_r(m_tc0080vco, space, offs + 1, 0xffff) & 0x3ff;
+		y0        =  tc0080vco_sprram_r(m_tc0080vco, space, offs + 0, 0xffff) & 0x3ff;
+		zoomx     = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 2, 0xffff) & 0x7f00) >> 8;
+		tile_offs = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 3, 0xffff) & 0x1fff) << 2;
+		pribit    = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 0, 0xffff) & 0x1000) >> 12;
+		ysize     = size[(tc0080vco_sprram_r(m_tc0080vco, space, offs, 0xffff) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
@@ -320,13 +317,13 @@ static void dleague_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 				zx = (dx + ex) << 12;
 			}
 
-			if (tc0080vco_scrram_r(state->m_tc0080vco, space, 0x0002, 0xffff) & 0x8000)
+			if (tc0080vco_scrram_r(m_tc0080vco, space, 0x0002, 0xffff) & 0x8000)
 				pribit = 1;
 
 			if (x0 >= 0x200) x0 -= 0x400;
 			if (y0 >= 0x200) y0 -= 0x400;
 
-			if (tc0080vco_flipscreen_r(state->m_tc0080vco))
+			if (tc0080vco_flipscreen_r(m_tc0080vco))
 			{
 				x0 = 497 - x0;
 				y0 = 498 - y0;
@@ -350,20 +347,20 @@ static void dleague_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 						{
 							int tile, color, flipx, flipy;
 
-							tile  = tc0080vco_cram_0_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x7fff;
-							color = tc0080vco_cram_1_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x001f;
-							flipx = tc0080vco_cram_1_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x0040;
-							flipy = tc0080vco_cram_1_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x0080;
+							tile  = tc0080vco_cram_0_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x7fff;
+							color = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x001f;
+							flipx = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x0040;
+							flipy = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x0080;
 
 
-							if (tc0080vco_flipscreen_r(state->m_tc0080vco))
+							if (tc0080vco_flipscreen_r(m_tc0080vco))
 							{
 								flipx ^= 0x0040;
 								flipy ^= 0x0080;
 							}
 
 							drawgfxzoom_transpen( bitmap, cliprect,
-										machine.gfx[0],
+										machine().gfx[0],
 										tile,
 										color,
 										flipx, flipy,
@@ -383,7 +380,7 @@ static void dleague_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 
 
 
-static void taitoh_log_vram(running_machine &machine)
+void taitoh_state::taitoh_log_vram()
 {
 #ifdef MAME_DEBUG
 	// null function: the necessary pointers are now internal to taitoic.c
@@ -398,13 +395,13 @@ UINT32 taitoh_state::screen_update_syvalion(screen_device &screen, bitmap_ind16 
 {
 	tc0080vco_tilemap_update(m_tc0080vco);
 
-	taitoh_log_vram(machine());
+	taitoh_log_vram();
 
 	bitmap.fill(0, cliprect);
 
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
-	syvalion_draw_sprites(machine(), bitmap,cliprect);
+	syvalion_draw_sprites(bitmap,cliprect);
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 2, 0, 0);
 
 	return 0;
@@ -415,7 +412,7 @@ UINT32 taitoh_state::screen_update_recordbr(screen_device &screen, bitmap_ind16 
 {
 	tc0080vco_tilemap_update(m_tc0080vco);
 
-	taitoh_log_vram(machine());
+	taitoh_log_vram();
 
 	bitmap.fill(0, cliprect);
 
@@ -423,16 +420,16 @@ UINT32 taitoh_state::screen_update_recordbr(screen_device &screen, bitmap_ind16 
 	if (!machine().input().code_pressed(KEYCODE_A))
 		tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	if (!machine().input().code_pressed(KEYCODE_S))
-		recordbr_draw_sprites(machine(), bitmap, cliprect, 0);
+		recordbr_draw_sprites(bitmap, cliprect, 0);
 	if (!machine().input().code_pressed(KEYCODE_D))
 		tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
 	if (!machine().input().code_pressed(KEYCODE_F))
-		recordbr_draw_sprites(machine(), bitmap, cliprect, 1);
+		recordbr_draw_sprites(bitmap, cliprect, 1);
 #else
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
-	recordbr_draw_sprites(machine(), bitmap, cliprect, 0);
+	recordbr_draw_sprites(bitmap, cliprect, 0);
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
-	recordbr_draw_sprites(machine(), bitmap, cliprect, 1);
+	recordbr_draw_sprites(bitmap, cliprect, 1);
 #endif
 
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 2, 0, 0);
@@ -444,7 +441,7 @@ UINT32 taitoh_state::screen_update_dleague(screen_device &screen, bitmap_ind16 &
 {
 	tc0080vco_tilemap_update(m_tc0080vco);
 
-	taitoh_log_vram(machine());
+	taitoh_log_vram();
 
 	bitmap.fill(0, cliprect);
 
@@ -459,9 +456,9 @@ UINT32 taitoh_state::screen_update_dleague(screen_device &screen, bitmap_ind16 &
 		dleague_draw_sprites(machine(), bitmap, cliprect, 1);
 #else
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
-	dleague_draw_sprites (machine(), bitmap, cliprect, 0);
+	dleague_draw_sprites (bitmap, cliprect, 0);
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
-	dleague_draw_sprites (machine(), bitmap, cliprect, 1);
+	dleague_draw_sprites (bitmap, cliprect, 1);
 #endif
 
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 2, 0, 0);

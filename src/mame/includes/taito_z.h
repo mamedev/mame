@@ -89,4 +89,12 @@ public:
 	TIMER_CALLBACK_MEMBER(taitoz_interrupt6);
 	TIMER_CALLBACK_MEMBER(taitoz_cpub_interrupt5);
 	void taitoz_postload();
+	void contcirc_draw_sprites_16x8( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
+	void chasehq_draw_sprites_16x16( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
+	void bshark_draw_sprites_16x8( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
+	void sci_draw_sprites_16x8( bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
+	void aquajack_draw_sprites_16x8(bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
+	void spacegun_draw_sprites_16x8(bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
+	void parse_cpu_control(  );
+	void reset_sound_region(  );
 };

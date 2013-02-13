@@ -66,6 +66,12 @@ public:
 	INTERRUPT_GEN_MEMBER(CPUA_interrupt);
 	INTERRUPT_GEN_MEMBER(CPUB_interrupt);
 	TIMER_CALLBACK_MEMBER(twin16_sprite_tick);
+	int twin16_set_sprite_timer(  );
+	void twin16_spriteram_process(  );
+	void draw_sprites( bitmap_ind16 &bitmap );
+	void draw_layer( bitmap_ind16 &bitmap, int opaque );
+	int twin16_spriteram_process_enable(  );
+	void gfx_untangle(  );
 };
 
 /*----------- defined in drivers/twin16.c -----------*/

@@ -187,27 +187,26 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static void thedeep_maincpu_bankswitch(running_machine &machine,UINT8 bank_trig)
+void thedeep_state::thedeep_maincpu_bankswitch(UINT8 bank_trig)
 {
-	thedeep_state *state = machine.driver_data<thedeep_state>();
 	UINT8 *rom;
 	int new_rombank = bank_trig & 3;
 
-	if (state->m_rombank == new_rombank)
+	if (m_rombank == new_rombank)
 		return;
-	state->m_rombank = new_rombank;
-	rom = state->memregion("maincpu")->base();
-	state->membank("bank1")->set_base(rom + 0x10000 + state->m_rombank * 0x4000);
+	m_rombank = new_rombank;
+	rom = memregion("maincpu")->base();
+	membank("bank1")->set_base(rom + 0x10000 + m_rombank * 0x4000);
 	/* there's code which falls through from the fixed ROM to bank #1, I have to */
 	/* copy it there otherwise the CPU bank switching support will not catch it. */
-	memcpy(rom + 0x08000, rom + 0x10000 + state->m_rombank * 0x4000, 0x4000);
+	memcpy(rom + 0x08000, rom + 0x10000 + m_rombank * 0x4000, 0x4000);
 
 }
 
 WRITE8_MEMBER(thedeep_state::thedeep_p1_w)
 {
 	flip_screen_set((data & 1) ^ 1);
-	thedeep_maincpu_bankswitch(machine(),(data & 6) >> 1);
+	thedeep_maincpu_bankswitch((data & 6) >> 1);
 	logerror("P1 %02x\n",data);
 }
 

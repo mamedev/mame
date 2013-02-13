@@ -59,12 +59,12 @@ enum
 	kTalkTrack, kCrashTrack
 };
 
-static void tape_set_audio( samples_device *samples, int track, int bOn )
+void thief_state::tape_set_audio( samples_device *samples, int track, int bOn )
 {
 	samples->set_volume(track, bOn ? 1.0 : 0.0 );
 }
 
-static void tape_set_motor( samples_device *samples, int bOn )
+void thief_state::tape_set_motor( samples_device *samples, int bOn )
 {
 	if( bOn )
 	{

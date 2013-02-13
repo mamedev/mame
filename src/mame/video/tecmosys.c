@@ -70,15 +70,15 @@ WRITE16_MEMBER(tecmosys_state::fg_tilemap_w)
 }
 
 
-INLINE void set_color_555_tecmo(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+inline void tecmosys_state::set_color_555_tecmo(pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
-	palette_set_color_rgb(machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+	palette_set_color_rgb(machine(), color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
 WRITE16_MEMBER(tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w)
 {
 	COMBINE_DATA(&m_tilemap_paletteram16[offset]);
-	set_color_555_tecmo(machine(), offset+0x4000, 5, 10, 0, m_tilemap_paletteram16[offset]);
+	set_color_555_tecmo(offset+0x4000, 5, 10, 0, m_tilemap_paletteram16[offset]);
 }
 
 WRITE16_MEMBER(tecmosys_state::bg0_tilemap_lineram_w)
@@ -101,16 +101,15 @@ WRITE16_MEMBER(tecmosys_state::bg2_tilemap_lineram_w)
 
 
 
-static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_rgb32 &bitmap, UINT16 extrax, UINT16 extray )
+void tecmosys_state::tecmosys_render_sprites_to_bitmap(bitmap_rgb32 &bitmap, UINT16 extrax, UINT16 extray )
 {
-	tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	UINT8 *gfxsrc    = state->memregion       ( "gfx1" )->base();
+	UINT8 *gfxsrc    = memregion       ( "gfx1" )->base();
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */
-	state->m_sprite_bitmap.fill(0x0000);
+	m_sprite_bitmap.fill(0x0000);
 	/* there are multiple spritelists in here, to allow for buffering */
-	for (i=(state->m_spritelist*0x4000)/2;i<((state->m_spritelist+1)*0x4000)/2;i+=8)
+	for (i=(m_spritelist*0x4000)/2;i<((m_spritelist+1)*0x4000)/2;i+=8)
 	{
 		int xcnt,ycnt;
 		int drawx, drawy;
@@ -125,8 +124,8 @@ static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_r
 		int priority;
 		int zoomx, zoomy;
 
-		x = state->m_spriteram[i+0]+386;
-		y = (state->m_spriteram[i+1]+1);
+		x = m_spriteram[i+0]+386;
+		y = (m_spriteram[i+1]+1);
 
 		x-= extrax;
 		y-= extray;
@@ -137,26 +136,26 @@ static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_r
 		if (x&0x200) x-=0x400;
 		if (y&0x100) y-=0x200;
 
-		address =  state->m_spriteram[i+5]| ((state->m_spriteram[i+4]&0x000f)<<16);
+		address =  m_spriteram[i+5]| ((m_spriteram[i+4]&0x000f)<<16);
 
 		address<<=8;
 
-		flipx = (state->m_spriteram[i+4]&0x0040)>>6;
-		flipy = (state->m_spriteram[i+4]&0x0080)>>7; // used by some move effects in tkdensho
+		flipx = (m_spriteram[i+4]&0x0040)>>6;
+		flipy = (m_spriteram[i+4]&0x0080)>>7; // used by some move effects in tkdensho
 
-		zoomx = (state->m_spriteram[i+2] & 0x0fff)>>0; // zoom?
-		zoomy = (state->m_spriteram[i+3] & 0x0fff)>>0; // zoom?
+		zoomx = (m_spriteram[i+2] & 0x0fff)>>0; // zoom?
+		zoomy = (m_spriteram[i+3] & 0x0fff)>>0; // zoom?
 
 		if ((!zoomx) || (!zoomy)) continue;
 
-		ysize =  ((state->m_spriteram[i+6] & 0x00ff))*16;
-		xsize =  (((state->m_spriteram[i+6] & 0xff00)>>8))*16;
+		ysize =  ((m_spriteram[i+6] & 0x00ff))*16;
+		xsize =  (((m_spriteram[i+6] & 0xff00)>>8))*16;
 
-		colour =  ((state->m_spriteram[i+4] & 0x3f00))>>8;
+		colour =  ((m_spriteram[i+4] & 0x3f00))>>8;
 
-		priority = ((state->m_spriteram[i+4] & 0x0030))>>4;
+		priority = ((m_spriteram[i+4] & 0x0030))>>4;
 
-		if (state->m_spriteram[i+4] & 0x8000) continue;
+		if (m_spriteram[i+4] & 0x8000) continue;
 
 		for (ycnt = 0; ycnt < ysize; ycnt++)
 		{
@@ -178,7 +177,7 @@ static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_r
 				{
 					UINT8 data;
 
-					dstptr = &state->m_sprite_bitmap.pix16(drawy, drawx);
+					dstptr = &m_sprite_bitmap.pix16(drawy, drawx);
 
 
 					data =  (gfxsrc[address]);
@@ -193,15 +192,15 @@ static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_r
 	}
 }
 
-static void tecmosys_tilemap_copy_to_compose(tecmosys_state *state, UINT16 pri)
+void tecmosys_state::tecmosys_tilemap_copy_to_compose(UINT16 pri)
 {
 	int y,x;
 	UINT16 *srcptr;
 	UINT16 *dstptr;
 	for (y=0;y<240;y++)
 	{
-		srcptr = &state->m_tmp_tilemap_renderbitmap.pix16(y);
-		dstptr = &state->m_tmp_tilemap_composebitmap.pix16(y);
+		srcptr = &m_tmp_tilemap_renderbitmap.pix16(y);
+		dstptr = &m_tmp_tilemap_composebitmap.pix16(y);
 		for (x=0;x<320;x++)
 		{
 			if ((srcptr[x]&0xf)!=0x0)
@@ -210,10 +209,9 @@ static void tecmosys_tilemap_copy_to_compose(tecmosys_state *state, UINT16 pri)
 	}
 }
 
-static void tecmosys_do_final_mix(running_machine &machine, bitmap_rgb32 &bitmap)
+void tecmosys_state::tecmosys_do_final_mix(bitmap_rgb32 &bitmap)
 {
-	tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	const pen_t *paldata = machine.pens;
+	const pen_t *paldata = machine().pens;
 	int y,x;
 	UINT16 *srcptr;
 	UINT16 *srcptr2;
@@ -221,8 +219,8 @@ static void tecmosys_do_final_mix(running_machine &machine, bitmap_rgb32 &bitmap
 
 	for (y=0;y<240;y++)
 	{
-		srcptr = &state->m_tmp_tilemap_composebitmap.pix16(y);
-		srcptr2 = &state->m_sprite_bitmap.pix16(y);
+		srcptr = &m_tmp_tilemap_composebitmap.pix16(y);
+		srcptr2 = &m_sprite_bitmap.pix16(y);
 
 		dstptr = &bitmap.pix32(y);
 		for (x=0;x<320;x++)
@@ -236,17 +234,17 @@ static void tecmosys_do_final_mix(running_machine &machine, bitmap_rgb32 &bitmap
 			pri = srcptr[x] & 0xc000;
 			pri2 = srcptr2[x] & 0xc000;
 
-			penvalue = state->m_tilemap_paletteram16[srcptr[x]&0x7ff];
+			penvalue = m_tilemap_paletteram16[srcptr[x]&0x7ff];
 			colour =   paldata[(srcptr[x]&0x7ff) | 0x4000];
 
 			if (srcptr2[x]&0x3fff)
 			{
-				penvalue2 = state->m_generic_paletteram_16[srcptr2[x]&0x3fff];
+				penvalue2 = m_generic_paletteram_16[srcptr2[x]&0x3fff];
 				colour2 = paldata[srcptr2[x]&0x3fff];
 			}
 			else
 			{
-				penvalue2 = state->m_tilemap_paletteram16[srcptr[x]&0x7ff];
+				penvalue2 = m_tilemap_paletteram16[srcptr[x]&0x7ff];
 				colour2 =   paldata[(srcptr[x]&0x7ff) | 0x4000];
 			}
 
@@ -299,25 +297,25 @@ UINT32 tecmosys_state::screen_update_tecmosys(screen_device &screen, bitmap_rgb3
 
 	m_tmp_tilemap_renderbitmap.fill(0, cliprect);
 	m_bg0tilemap->draw(m_tmp_tilemap_renderbitmap, cliprect, 0,0);
-	tecmosys_tilemap_copy_to_compose(this, 0x0000);
+	tecmosys_tilemap_copy_to_compose(0x0000);
 
 	m_tmp_tilemap_renderbitmap.fill(0, cliprect);
 	m_bg1tilemap->draw(m_tmp_tilemap_renderbitmap, cliprect, 0,0);
-	tecmosys_tilemap_copy_to_compose(this, 0x4000);
+	tecmosys_tilemap_copy_to_compose(0x4000);
 
 	m_tmp_tilemap_renderbitmap.fill(0, cliprect);
 	m_bg2tilemap->draw(m_tmp_tilemap_renderbitmap, cliprect, 0,0);
-	tecmosys_tilemap_copy_to_compose(this, 0x8000);
+	tecmosys_tilemap_copy_to_compose(0x8000);
 
 	m_tmp_tilemap_renderbitmap.fill(0, cliprect);
 	m_txt_tilemap->draw(m_tmp_tilemap_renderbitmap, cliprect, 0,0);
-	tecmosys_tilemap_copy_to_compose(this, 0xc000);
+	tecmosys_tilemap_copy_to_compose(0xc000);
 
 
-	tecmosys_do_final_mix(machine(), bitmap);
+	tecmosys_do_final_mix(bitmap);
 
 	// prepare sprites for NEXT frame - causes 1 frame palette errors, but prevents sprite lag in tkdensho, which is correct?
-	tecmosys_render_sprites_to_bitmap(machine(), bitmap, m_880000regs[0x0], m_880000regs[0x1]);
+	tecmosys_render_sprites_to_bitmap(bitmap, m_880000regs[0x0], m_880000regs[0x1]);
 
 	return 0;
 }

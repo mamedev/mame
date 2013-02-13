@@ -101,4 +101,6 @@ public:
 	INTERRUPT_GEN_MEMBER(arknoid2_interrupt);
 	TIMER_CALLBACK_MEMBER(kludge_callback);
 	void tnzs_postload();
+	void mcu_reset(  );
+	void mcu_handle_coins( int coin );
 };

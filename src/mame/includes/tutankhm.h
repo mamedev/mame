@@ -33,4 +33,5 @@ public:
 	DECLARE_MACHINE_RESET(tutankhm);
 	UINT32 screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(tutankhm_interrupt);
+	void get_pens( pen_t *pens );
 };

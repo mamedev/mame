@@ -25,4 +25,6 @@ public:
 	virtual void palette_init();
 	DECLARE_PALETTE_INIT(shtrider);
 	UINT32 screen_update_travrusa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void set_scroll(  );
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };

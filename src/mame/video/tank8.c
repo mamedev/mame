@@ -34,9 +34,9 @@ void tank8_state::palette_init()
 }
 
 
-static void set_pens(tank8_state *state, colortable_t *colortable)
+void tank8_state::set_pens(colortable_t *colortable)
 {
-	if (*state->m_team & 0x01)
+	if (*m_team & 0x01)
 	{
 		colortable_palette_set_color(colortable, 0, MAKE_RGB(0xff, 0x00, 0x00)); /* red     */
 		colortable_palette_set_color(colortable, 1, MAKE_RGB(0x00, 0x00, 0xff)); /* blue    */
@@ -113,31 +113,30 @@ void tank8_state::video_start()
 }
 
 
-static int get_x_pos(tank8_state *state, int n)
+int tank8_state::get_x_pos(int n)
 {
-	return 498 - state->m_pos_h_ram[n] - 2 * (state->m_pos_d_ram[n] & 128); /* ? */
+	return 498 - m_pos_h_ram[n] - 2 * (m_pos_d_ram[n] & 128); /* ? */
 }
 
 
-static int get_y_pos(tank8_state *state, int n)
+int tank8_state::get_y_pos(int n)
 {
-	return 2 * state->m_pos_v_ram[n] - 62;
+	return 2 * m_pos_v_ram[n] - 62;
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tank8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tank8_state *state = machine.driver_data<tank8_state>();
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		UINT8 code = ~state->m_pos_d_ram[i];
+		UINT8 code = ~m_pos_d_ram[i];
 
-		int x = get_x_pos(state, i);
-		int y = get_y_pos(state, i);
+		int x = get_x_pos(i);
+		int y = get_y_pos(i);
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[(code & 0x04) ? 2 : 3],
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[(code & 0x04) ? 2 : 3],
 			code & 0x03,
 			i,
 			code & 0x10,
@@ -148,15 +147,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-static void draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tank8_state::draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tank8_state *state = machine.driver_data<tank8_state>();
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		int x = get_x_pos(state, 8 + i);
-		int y = get_y_pos(state, 8 + i);
+		int x = get_x_pos(8 + i);
+		int y = get_y_pos(8 + i);
 
 		x -= 4; /* ? */
 
@@ -170,17 +168,17 @@ static void draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 TIMER_CALLBACK_MEMBER(tank8_state::tank8_collision_callback)
 {
-	tank8_set_collision(machine(), param);
+	tank8_set_collision(param);
 }
 
 
 UINT32 tank8_state::screen_update_tank8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	set_pens(this, machine().colortable);
+	set_pens(machine().colortable);
 	m_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect);
-	draw_bullets(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
+	draw_bullets(bitmap, cliprect);
 	return 0;
 }
 
@@ -199,8 +197,8 @@ void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 		m_helper2.fill(8, visarea);
 		m_helper3.fill(8, visarea);
 
-		draw_sprites(machine(), m_helper2, visarea);
-		draw_bullets(machine(), m_helper3, visarea);
+		draw_sprites(m_helper2, visarea);
+		draw_bullets(m_helper3, visarea);
 
 		for (y = visarea.min_y; y <= visarea.max_y; y++)
 		{
@@ -262,10 +260,10 @@ void tank8_state::screen_eof_tank8(screen_device &screen, bool state)
 					if (p1[x] == 0x11)
 						index |= 0x20;
 
-					if (y - get_y_pos(this, sprite_num) >= 8)
+					if (y - get_y_pos(sprite_num) >= 8)
 						index |= 0x40; /* collision on bottom side */
 
-					if (x - get_x_pos(this, sprite_num) >= 8)
+					if (x - get_x_pos(sprite_num) >= 8)
 						index |= 0x80; /* collision on right side */
 				}
 

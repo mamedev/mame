@@ -40,4 +40,6 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_toki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };

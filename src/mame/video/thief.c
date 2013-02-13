@@ -146,7 +146,8 @@ UINT32 thief_state::screen_update_thief(screen_device &screen, bitmap_ind16 &bit
 
 /***************************************************************************/
 
-static UINT16 fetch_image_addr( coprocessor_t &thief_coprocessor ){
+UINT16 thief_state::fetch_image_addr( coprocessor_t &thief_coprocessor )
+{
 	int addr = thief_coprocessor.param[IMAGE_ADDR_LO]+256*thief_coprocessor.param[IMAGE_ADDR_HI];
 	/* auto-increment */
 	thief_coprocessor.param[IMAGE_ADDR_LO]++;

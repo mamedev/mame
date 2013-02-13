@@ -61,4 +61,5 @@ public:
 	UINT32 screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(samurai_interrupt);
 	INTERRUPT_GEN_MEMBER(vsgongf_sound_interrupt);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

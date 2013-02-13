@@ -162,6 +162,12 @@ public:
 	UINT32 screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(taitojc_vblank);
+	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 w1, UINT32 w2, UINT8 bank_type);
+	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 bank_type, UINT8 pri);
+	void taitojc_clear_frame();
+	void debug_dsp_command();
+	UINT8 mcu_comm_reg_r(address_space &space, int reg);
+	void mcu_comm_reg_w(address_space &space, int reg, UINT8 data);
 };
 
 

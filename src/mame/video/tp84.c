@@ -149,24 +149,23 @@ void tp84_state::video_start()
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tp84_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tp84_state *state = machine.driver_data<tp84_state>();
 	int offs;
-	int palette_base = ((*state->m_palette_bank & 0x07) << 4);
+	int palette_base = ((*m_palette_bank & 0x07) << 4);
 
 	for (offs = 0x5c; offs >= 0; offs -= 4)
 	{
-		int x = state->m_spriteram[offs];
-		int y = 240 - state->m_spriteram[offs + 3];
+		int x = m_spriteram[offs];
+		int y = 240 - m_spriteram[offs + 3];
 
-		int code = state->m_spriteram[offs + 1];
-		int color = palette_base | (state->m_spriteram[offs + 2] & 0x0f);
-		int flip_x = ~state->m_spriteram[offs + 2] & 0x40;
-		int flip_y =  state->m_spriteram[offs + 2] & 0x80;
+		int code = m_spriteram[offs + 1];
+		int color = palette_base | (m_spriteram[offs + 2] & 0x0f);
+		int flip_x = ~m_spriteram[offs + 2] & 0x40;
+		int flip_y =  m_spriteram[offs + 2] & 0x80;
 
-		drawgfx_transmask(bitmap, cliprect, machine.gfx[1], code, color, flip_x, flip_y, x, y,
-				colortable_get_transpen_mask(machine.colortable, machine.gfx[1], color, palette_base));
+		drawgfx_transmask(bitmap, cliprect, machine().gfx[1], code, color, flip_x, flip_y, x, y,
+				colortable_get_transpen_mask(machine().colortable, machine().gfx[1], color, palette_base));
 
 	}
 }
@@ -189,7 +188,7 @@ UINT32 tp84_state::screen_update_tp84(screen_device &screen, bitmap_ind16 &bitma
 	}
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	/* draw top status region */
 	clip.min_x = visarea.min_x;

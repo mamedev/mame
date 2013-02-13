@@ -55,21 +55,19 @@ TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
 ***************************************************************************/
 
 
-static void truxton2_create_tx_tilemap(running_machine &machine)
+void toaplan2_state::truxton2_create_tx_tilemap()
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	state->m_tx_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toaplan2_state::get_text_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	state->m_tx_tilemap->set_scroll_rows(8*32); /* line scrolling */
-	state->m_tx_tilemap->set_scroll_cols(1);
-	state->m_tx_tilemap->set_transparent_pen(0);
+	m_tx_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tx_tilemap->set_scroll_rows(8*32); /* line scrolling */
+	m_tx_tilemap->set_scroll_cols(1);
+	m_tx_tilemap->set_transparent_pen(0);
 }
 
-static void register_state_save(running_machine &machine)
+void toaplan2_state::register_state_save()
 {
-	toaplan2_state *state = machine.driver_data<toaplan2_state>();
 
-	state->save_item(NAME(state->m_tx_flip));
+	save_item(NAME(m_tx_flip));
 }
 
 void toaplan2_state::truxton2_postload()
@@ -99,7 +97,7 @@ VIDEO_START_MEMBER(toaplan2_state,toaplan2)
 		m_vdp1->custom_priority_bitmap = &m_custom_priority_bitmap;
 	}
 
-	register_state_save(machine());
+	register_state_save();
 }
 
 VIDEO_START_MEMBER(toaplan2_state,truxton2)
@@ -110,7 +108,7 @@ VIDEO_START_MEMBER(toaplan2_state,truxton2)
 	machine().gfx[2]->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
-	truxton2_create_tx_tilemap(machine());
+	truxton2_create_tx_tilemap();
 	m_tx_tilemap->set_scrolldx(0x1d4 +1, 0x2a);
 }
 
@@ -119,7 +117,7 @@ VIDEO_START_MEMBER(toaplan2_state,fixeightbl)
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	truxton2_create_tx_tilemap(machine());
+	truxton2_create_tx_tilemap();
 
 	/* This bootleg has additional layer offsets on the VDP */
 	m_vdp0->bg.extra_xoffset.normal  = -0x1d6  -26;
@@ -144,7 +142,7 @@ VIDEO_START_MEMBER(toaplan2_state,bgaregga)
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	truxton2_create_tx_tilemap(machine());
+	truxton2_create_tx_tilemap();
 	m_tx_tilemap->set_scrolldx(0x1d4, 0x2a);
 }
 
@@ -153,7 +151,7 @@ VIDEO_START_MEMBER(toaplan2_state,bgareggabl)
 	VIDEO_START_CALL_MEMBER( toaplan2 );
 
 	/* Create the Text tilemap for this game */
-	truxton2_create_tx_tilemap(machine());
+	truxton2_create_tx_tilemap();
 	m_tx_tilemap->set_scrolldx(0x04, 0x2a);
 }
 
@@ -168,7 +166,7 @@ VIDEO_START_MEMBER(toaplan2_state,batrider)
 	machine().gfx[2]->set_source(reinterpret_cast<UINT8 *>(m_tx_gfxram16.target()));
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan2_state::truxton2_postload), this));
 
-	truxton2_create_tx_tilemap(machine());
+	truxton2_create_tx_tilemap();
 	m_tx_tilemap->set_scrolldx(0x1d4, 0x2a);
 
 	/* Has special banking */

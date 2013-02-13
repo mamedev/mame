@@ -283,7 +283,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
 	if (scanline == 16)
 	{
 		logerror("/nmi CPU#3\n");
-		tubep_vblank_end(machine()); /* switch buffered sprite RAM page */
+		tubep_vblank_end(); /* switch buffered sprite RAM page */
 		machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
@@ -323,13 +323,12 @@ TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
  *
  *************************************/
 
-static void tubep_setup_save_state(running_machine &machine)
+void tubep_state::tubep_setup_save_state()
 {
-	tubep_state *state = machine.driver_data<tubep_state>();
 	/* Set up save state */
-	state_save_register_global(machine, state->m_sound_latch);
-	state_save_register_global(machine, state->m_ls74);
-	state_save_register_global(machine, state->m_ls377);
+	state_save_register_global(machine(), m_sound_latch);
+	state_save_register_global(machine(), m_ls74);
+	state_save_register_global(machine(), m_ls377);
 }
 
 
@@ -339,7 +338,7 @@ MACHINE_START_MEMBER(tubep_state,tubep)
 	/* Create interrupt timer */
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tubep_state::tubep_scanline_callback),this));
 
-	tubep_setup_save_state(machine());
+	tubep_setup_save_state();
 }
 
 
@@ -465,7 +464,7 @@ TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
 	if (scanline == 16)
 	{
 		logerror("/nmi CPU#3\n");
-		tubep_vblank_end(machine()); /* switch buffered sprite RAM page */
+		tubep_vblank_end(); /* switch buffered sprite RAM page */
 		machine().device("mcu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	/* CPU #3 MS2010-A NMI */
@@ -502,7 +501,7 @@ MACHINE_START_MEMBER(tubep_state,rjammer)
 	/* Create interrupt timer */
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tubep_state::rjammer_scanline_callback),this));
 
-	tubep_setup_save_state(machine());
+	tubep_setup_save_state();
 }
 
 MACHINE_RESET_MEMBER(tubep_state,rjammer)

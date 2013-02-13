@@ -147,6 +147,19 @@ public:
 	void rallybik_flipscreen();
 	void toaplan1_flipscreen();
 	void demonwld_restore_dsp();
+	void toaplan1_create_tilemaps();
+	void toaplan1_paletteram_alloc();
+	void toaplan1_vram_alloc();
+	void toaplan1_spritevram_alloc();
+	void toaplan1_set_scrolls();
+	void register_common();
+	void toaplan1_log_vram();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void rallybik_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	void demonwld_dsp(int enable);
+	void toaplan1_driver_savestate();
+	void demonwld_driver_savestate();
+	void vimana_driver_savestate();
 };
 
 

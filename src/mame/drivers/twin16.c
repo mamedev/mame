@@ -61,10 +61,9 @@ Known Issues:
 
 
 
-int twin16_spriteram_process_enable( running_machine &machine )
+int twin16_state::twin16_spriteram_process_enable(  )
 {
-	twin16_state *state = machine.driver_data<twin16_state>();
-	return (state->m_CPUA_register & 0x40) == 0;
+	return (m_CPUA_register & 0x40) == 0;
 }
 
 /******************************************************************************************/
@@ -125,7 +124,7 @@ WRITE16_MEMBER(twin16_state::twin16_CPUA_register_w)
 			machine().device("audiocpu")->execute().set_input_line_and_vector(0, HOLD_LINE, 0xff);
 
 		if ((old & 0x40) && (m_CPUA_register & 0x40) == 0)
-			twin16_spriteram_process(machine());
+			twin16_spriteram_process();
 
 		if ((old & 0x10) == 0 && (m_CPUA_register & 0x10))
 			machine().device("sub")->execute().set_input_line(M68K_IRQ_6, HOLD_LINE);
@@ -1298,39 +1297,38 @@ ROM_END
 
 /* Driver Initialization */
 
-static void gfx_untangle( running_machine &machine )
+void twin16_state::gfx_untangle(  )
 {
-	twin16_state *state = machine.driver_data<twin16_state>();
 	// sprite, tile data
 	int i;
-	UINT16 *temp = auto_alloc_array(machine, UINT16, 0x200000/2);
+	UINT16 *temp = auto_alloc_array(machine(), UINT16, 0x200000/2);
 
-	state->m_gfx_rom = (UINT16 *)state->memregion("gfx2")->base();
-	memcpy( temp, state->m_gfx_rom, 0x200000 );
+	m_gfx_rom = (UINT16 *)memregion("gfx2")->base();
+	memcpy( temp, m_gfx_rom, 0x200000 );
 
 	for( i=0; i<0x080000; i++ )
 	{
-		state->m_gfx_rom[i*2+0] = temp[i+0x080000];
-		state->m_gfx_rom[i*2+1] = temp[i];
+		m_gfx_rom[i*2+0] = temp[i+0x080000];
+		m_gfx_rom[i*2+1] = temp[i];
 	}
-	auto_free( machine, temp );
+	auto_free( machine(), temp );
 }
 
 DRIVER_INIT_MEMBER(twin16_state,twin16)
 {
-	gfx_untangle(machine());
+	gfx_untangle();
 	m_custom_video = 0;
 }
 
 DRIVER_INIT_MEMBER(twin16_state,fround)
 {
-	gfx_untangle(machine());
+	gfx_untangle();
 	m_custom_video = 1;
 }
 
 DRIVER_INIT_MEMBER(twin16_state,cuebrickj)
 {
-	gfx_untangle(machine());
+	gfx_untangle();
 
 	machine().device<nvram_device>("nvram")->set_base(m_cuebrickj_nvram, 0x400*0x20);
 }

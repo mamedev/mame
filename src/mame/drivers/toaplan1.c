@@ -2515,19 +2515,19 @@ ROM_END
 
 DRIVER_INIT_MEMBER(toaplan1_state,toaplan1)
 {
-	toaplan1_driver_savestate(machine());
+	toaplan1_driver_savestate();
 }
 
 DRIVER_INIT_MEMBER(toaplan1_state,demonwld)
 {
-	toaplan1_driver_savestate(machine());
-	demonwld_driver_savestate(machine());
+	toaplan1_driver_savestate();
+	demonwld_driver_savestate();
 }
 
 DRIVER_INIT_MEMBER(toaplan1_state,vimana)
 {
-	toaplan1_driver_savestate(machine());
-	vimana_driver_savestate(machine());
+	toaplan1_driver_savestate();
+	vimana_driver_savestate();
 }
 
 

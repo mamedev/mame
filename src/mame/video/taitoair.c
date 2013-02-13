@@ -69,13 +69,12 @@ static const int zoomy_conv_table[] =
   Screen refresh
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 
-	taitoair_state *state = machine.driver_data<taitoair_state>();
-	address_space &space = machine.driver_data()->generic_space();
+	address_space &space = machine().driver_data()->generic_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
 	int ysize;
@@ -90,12 +89,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if (offs <  0x01b0 && priority == 0)    continue;
 		if (offs >= 0x01b0 && priority == 1)    continue;
 
-		x0        =  tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 1, 0xffff) & 0x3ff;
-		y0        =  tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 0, 0xffff) & 0x3ff;
-		zoomx     = (tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 2, 0xffff) & 0x7f00) >> 8;
-		zoomy     = (tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 2, 0xffff) & 0x007f);
-		tile_offs = (tc0080vco_sprram_r(state->m_tc0080vco, space, offs + 3, 0xffff) & 0x1fff) << 2;
-		ysize     = size[(tc0080vco_sprram_r(state->m_tc0080vco, space, offs, 0xffff) & 0x0c00) >> 10];
+		x0        =  tc0080vco_sprram_r(m_tc0080vco, space, offs + 1, 0xffff) & 0x3ff;
+		y0        =  tc0080vco_sprram_r(m_tc0080vco, space, offs + 0, 0xffff) & 0x3ff;
+		zoomx     = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 2, 0xffff) & 0x7f00) >> 8;
+		zoomy     = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 2, 0xffff) & 0x007f);
+		tile_offs = (tc0080vco_sprram_r(m_tc0080vco, space, offs + 3, 0xffff) & 0x1fff) << 2;
+		ysize     = size[(tc0080vco_sprram_r(m_tc0080vco, space, offs, 0xffff) & 0x0c00) >> 10];
 
 		if (tile_offs)
 		{
@@ -131,7 +130,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			if (x0 >= 0x200) x0 -= 0x400;
 			if (y0 >= 0x200) y0 -= 0x400;
 
-			if (tc0080vco_flipscreen_r(state->m_tc0080vco))
+			if (tc0080vco_flipscreen_r(m_tc0080vco))
 			{
 				x0 = 497 - x0;
 				y0 = 498 - y0;
@@ -154,19 +153,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 					{
 						int tile, color, flipx, flipy;
 
-						tile  = tc0080vco_cram_0_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x7fff;
-						color = tc0080vco_cram_1_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x001f;
-						flipx = tc0080vco_cram_1_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x0040;
-						flipy = tc0080vco_cram_1_r(state->m_tc0080vco, space, tile_offs, 0xffff) & 0x0080;
+						tile  = tc0080vco_cram_0_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x7fff;
+						color = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x001f;
+						flipx = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x0040;
+						flipy = tc0080vco_cram_1_r(m_tc0080vco, space, tile_offs, 0xffff) & 0x0080;
 
-						if (tc0080vco_flipscreen_r(state->m_tc0080vco))
+						if (tc0080vco_flipscreen_r(m_tc0080vco))
 						{
 							flipx ^= 0x0040;
 							flipy ^= 0x0080;
 						}
 
 						drawgfxzoom_transpen( bitmap, cliprect,
-									machine.gfx[0],
+									machine().gfx[0],
 									tile,
 									color,
 									flipx, flipy,
@@ -183,7 +182,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	}
 }
 
-static void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 )
+void taitoair_state::fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, int color, INT32 x1, INT32 x2, INT32 sl1, INT32 sl2, INT32 y1, INT32 y2, INT32 *nx1, INT32 *nx2 )
 {
 	if (y1 > cliprect.max_y)
 		return;
@@ -258,7 +257,7 @@ static void fill_slope( bitmap_ind16 &bitmap, const rectangle &cliprect, int col
 	*nx2 = x2;
 }
 
-static void fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q )
+void taitoair_state::fill_poly( bitmap_ind16 &bitmap, const rectangle &cliprect, const struct taitoair_poly *q )
 {
 	INT32 sl1, sl2, cury, limy, x1, x2;
 	int pmin, pmax, i, ps1, ps2;
@@ -441,7 +440,7 @@ WRITE16_MEMBER(taitoair_state::dsp_frustum_bottom_w)
 }
 
 
-void multVecMtx(const INT16* vec4, const float* m, float* result)
+void taitoair_state::multVecMtx(const INT16* vec4, const float* m, float* result)
 {
 #define M(row,col)  m[col*4+row]
 	result[0] = vec4[0]*M(0,0) + vec4[1]*M(1,0) + vec4[2]*M(2,0) + vec4[3]*M(3,0);
@@ -455,10 +454,7 @@ void multVecMtx(const INT16* vec4, const float* m, float* result)
 #undef M
 }
 
-int projectEyeCoordToScreen(float* projectionMatrix,
-								const int Res,
-								INT16* eyePoint3d,
-								int type)
+int taitoair_state::projectEyeCoordToScreen(float* projectionMatrix,const int Res,INT16* eyePoint3d,int type)
 {
 	/* Return (-1, -1) if the eye point is behind camera */
 	int res = -10000;
@@ -483,7 +479,7 @@ int projectEyeCoordToScreen(float* projectionMatrix,
 	return res;
 }
 
-void airInfernoFrustum(const INT16 leftExtent, const INT16 bottomExtent, float* m)
+void taitoair_state::airInfernoFrustum(const INT16 leftExtent, const INT16 bottomExtent, float* m)
 {
 	/* Hard-coded near and far clipping planes :( */
 	float nearZ = 1.0f;
@@ -598,13 +594,13 @@ UINT32 taitoair_state::screen_update_taitoair(screen_device &screen, bitmap_ind1
 
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, 0);
 
 	copybitmap_trans(bitmap, *m_framebuffer[1], 0, 0, 0, 0, cliprect, 0);
 
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect, 1);
+	draw_sprites(bitmap, cliprect, 1);
 
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 2, 0, 0);
 

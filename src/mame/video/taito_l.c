@@ -139,65 +139,62 @@ READ8_MEMBER(taitol_state::taitol_control_r)
 	return m_cur_ctrl;
 }
 
-void taitol_chardef14_m( running_machine &machine, int offset )
+void taitol_state::taitol_chardef14_m( int offset )
 {
-	machine.gfx[2]->mark_dirty(offset / 32 + 0);
+	machine().gfx[2]->mark_dirty(offset / 32 + 0);
 }
 
-void taitol_chardef15_m( running_machine &machine, int offset )
+void taitol_state::taitol_chardef15_m( int offset )
 {
-	machine.gfx[2]->mark_dirty(offset / 32 + 128);
+	machine().gfx[2]->mark_dirty(offset / 32 + 128);
 }
 
-void taitol_chardef16_m( running_machine &machine, int offset )
+void taitol_state::taitol_chardef16_m( int offset )
 {
-	machine.gfx[2]->mark_dirty(offset / 32 + 256);
+	machine().gfx[2]->mark_dirty(offset / 32 + 256);
 }
 
-void taitol_chardef17_m( running_machine &machine, int offset )
+void taitol_state::taitol_chardef17_m( int offset )
 {
-	machine.gfx[2]->mark_dirty(offset / 32 + 384);
+	machine().gfx[2]->mark_dirty(offset / 32 + 384);
 }
 
-void taitol_chardef1c_m( running_machine &machine, int offset )
+void taitol_state::taitol_chardef1c_m( int offset )
 {
-	machine.gfx[2]->mark_dirty(offset / 32 + 512);
+	machine().gfx[2]->mark_dirty(offset / 32 + 512);
 }
 
-void taitol_chardef1d_m( running_machine &machine, int offset )
+void taitol_state::taitol_chardef1d_m( int offset )
 {
-	machine.gfx[2]->mark_dirty(offset / 32 + 640);
+	machine().gfx[2]->mark_dirty(offset / 32 + 640);
 }
 
-void taitol_chardef1e_m( running_machine &machine, int offset )
+void taitol_state::taitol_chardef1e_m( int offset )
 {
-	machine.gfx[2]->mark_dirty(offset / 32 + 768);
+	machine().gfx[2]->mark_dirty(offset / 32 + 768);
 }
 
-void taitol_chardef1f_m( running_machine &machine, int offset )
+void taitol_state::taitol_chardef1f_m( int offset )
 {
-	machine.gfx[2]->mark_dirty(offset / 32 + 896);
+	machine().gfx[2]->mark_dirty(offset / 32 + 896);
 }
 
-void taitol_bg18_m( running_machine &machine, int offset )
+void taitol_state::taitol_bg18_m( int offset )
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	state->m_bg18_tilemap->mark_tile_dirty(offset / 2);
+	m_bg18_tilemap->mark_tile_dirty(offset / 2);
 }
 
-void taitol_bg19_m( running_machine &machine, int offset )
+void taitol_state::taitol_bg19_m( int offset )
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	state->m_bg19_tilemap->mark_tile_dirty(offset / 2);
+	m_bg19_tilemap->mark_tile_dirty(offset / 2);
 }
 
-void taitol_char1a_m( running_machine &machine, int offset )
+void taitol_state::taitol_char1a_m( int offset )
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
-	state->m_ch1a_tilemap->mark_tile_dirty(offset / 2);
+	m_ch1a_tilemap->mark_tile_dirty(offset / 2);
 }
 
-void taitol_obj1b_m( running_machine &machine, int offset )
+void taitol_state::taitol_obj1b_m( int offset )
 {
 #if 0
 	if (offset >= 0x3f0 && offset <= 0x3ff)
@@ -230,9 +227,8 @@ void taitol_obj1b_m( running_machine &machine, int offset )
                  plgirs2 bullets and raimais big bosses.
 */
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void taitol_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	taitol_state *state = machine.driver_data<taitol_state>();
 	int offs;
 
 	/* at spriteram + 0x3f0 and 03f8 are the tilemap control registers; spriteram + 0x3e8 seems to be unused */
@@ -240,19 +236,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	{
 		int code, color, sx, sy, flipx, flipy;
 
-		color = state->m_buff_spriteram[offs + 2] & 0x0f;
-		code = state->m_buff_spriteram[offs] | (state->m_buff_spriteram[offs + 1] << 8);
+		color = m_buff_spriteram[offs + 2] & 0x0f;
+		code = m_buff_spriteram[offs] | (m_buff_spriteram[offs + 1] << 8);
 
-		code |= (state->m_horshoes_gfxbank & 0x03) << 10;
+		code |= (m_horshoes_gfxbank & 0x03) << 10;
 
-		sx = state->m_buff_spriteram[offs + 4] | ((state->m_buff_spriteram[offs + 5] & 1) << 8);
-		sy = state->m_buff_spriteram[offs + 6];
+		sx = m_buff_spriteram[offs + 4] | ((m_buff_spriteram[offs + 5] & 1) << 8);
+		sy = m_buff_spriteram[offs + 6];
 		if (sx >= 320)
 			sx -= 512;
-		flipx = state->m_buff_spriteram[offs + 3] & 0x01;
-		flipy = state->m_buff_spriteram[offs + 3] & 0x02;
+		flipx = m_buff_spriteram[offs + 3] & 0x01;
+		flipy = m_buff_spriteram[offs + 3] & 0x02;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			sx = 304 - sx;
 			sy = 240 - sy;
@@ -260,12 +256,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = !flipy;
 		}
 
-		pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,
-				machine.priority_bitmap,
+				machine().priority_bitmap,
 				(color & 0x08) ? 0xaa : 0x00,0);
 	}
 }
@@ -302,7 +298,7 @@ UINT32 taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 &b
 		else                    /* split priority */
 			m_bg18_tilemap->draw(bitmap, cliprect, 0,1);
 
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 
 		m_ch1a_tilemap->draw(bitmap, cliprect, 0, 0);
 	}

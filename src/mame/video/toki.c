@@ -163,15 +163,14 @@ WRITE16_MEMBER(toki_state::toki_background2_videoram16_w)
 ***************************************************************************/
 
 
-static void toki_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void toki_state::toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	toki_state *state = machine.driver_data<toki_state>();
 	int x,y,xoffs,yoffs,tile,flipx,flipy,color,offs;
 	UINT16 *sprite_word;
 
-	for (offs = (state->m_spriteram->bytes()/2)-4;offs >= 0;offs -= 4)
+	for (offs = (m_spriteram->bytes()/2)-4;offs >= 0;offs -= 4)
 	{
-		sprite_word = &state->m_spriteram->buffer()[offs];
+		sprite_word = &m_spriteram->buffer()[offs];
 
 		if ((sprite_word[2] != 0xf000) && (sprite_word[0] != 0xffff))
 		{
@@ -190,14 +189,14 @@ static void toki_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 			flipy   = 0;
 			tile    = (sprite_word[1] & 0xfff) + ((sprite_word[2] & 0x8000) >> 3);
 
-			if (state->flip_screen()) {
+			if (flip_screen()) {
 				x=240-x;
 				y=240-y;
 				if (flipx) flipx=0; else flipx=1;
 				flipy=1;
 			}
 
-			drawgfx_transpen (bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen (bitmap,cliprect,machine().gfx[1],
 					tile,
 					color,
 					flipx,flipy,
@@ -207,15 +206,14 @@ static void toki_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 }
 
 
-static void tokib_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void toki_state::tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	toki_state *state = machine.driver_data<toki_state>();
 	int x,y,tile,flipx,color,offs;
 	UINT16 *sprite_word;
 
-	for (offs = 0;offs < state->m_spriteram->bytes() / 2;offs += 4)
+	for (offs = 0;offs < m_spriteram->bytes() / 2;offs += 4)
 	{
-		sprite_word = &state->m_spriteram->buffer()[offs];
+		sprite_word = &m_spriteram->buffer()[offs];
 
 		if (sprite_word[0] == 0xf100)
 			break;
@@ -235,7 +233,7 @@ static void tokib_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,co
 			tile    = sprite_word[1] & 0x1fff;
 			color   = sprite_word[2] >> 12;
 
-			drawgfx_transpen (bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen (bitmap,cliprect,machine().gfx[1],
 					tile,
 					color,
 					flipx,0,
@@ -279,7 +277,7 @@ UINT32 toki_state::screen_update_toki(screen_device &screen, bitmap_ind16 &bitma
 		m_foreground_layer->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		m_background_layer->draw(bitmap, cliprect, 0,0);
 	}
-	toki_draw_sprites(machine(), bitmap,cliprect);
+	toki_draw_sprites(bitmap,cliprect);
 	m_text_layer->draw(bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -301,7 +299,7 @@ UINT32 toki_state::screen_update_tokib(screen_device &screen, bitmap_ind16 &bitm
 		m_background_layer->draw(bitmap, cliprect, 0,0);
 	}
 
-	tokib_draw_sprites(machine(), bitmap,cliprect);
+	tokib_draw_sprites(bitmap,cliprect);
 	m_text_layer->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

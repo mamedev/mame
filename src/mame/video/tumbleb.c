@@ -116,20 +116,19 @@ TILEMAP_MAPPER_MEMBER(tumbleb_state::tumblep_scan)
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
 }
 
-INLINE void get_bg_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base)
+inline void tumbleb_state::get_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 	int data = gfx_base[tile_index];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			gfx_bank,
-			(data & 0x0fff) | (state->m_tilebank >> 2),
+			(data & 0x0fff) | (m_tilebank >> 2),
 			data >> 12,
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tumbleb_state::get_bg1_tile_info){ get_bg_tile_info(machine(), tileinfo, tile_index, 2, m_pf1_data); }
-TILE_GET_INFO_MEMBER(tumbleb_state::get_bg2_tile_info){ get_bg_tile_info(machine(), tileinfo, tile_index, 1, m_pf2_data); }
+TILE_GET_INFO_MEMBER(tumbleb_state::get_bg1_tile_info){ get_bg_tile_info(tileinfo, tile_index, 2, m_pf1_data); }
+TILE_GET_INFO_MEMBER(tumbleb_state::get_bg2_tile_info){ get_bg_tile_info(tileinfo, tile_index, 1, m_pf2_data); }
 
 TILE_GET_INFO_MEMBER(tumbleb_state::get_fg_tile_info)
 {
@@ -142,20 +141,20 @@ TILE_GET_INFO_MEMBER(tumbleb_state::get_fg_tile_info)
 			0);
 }
 
-INLINE void get_fncywld_bg_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base)
+inline void tumbleb_state::get_fncywld_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base)
 {
 	int data = gfx_base[tile_index * 2];
 	int attr = gfx_base[tile_index * 2 + 1];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			gfx_bank,
 			data & 0x1fff,
 			attr & 0x1f,
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tumbleb_state::get_fncywld_bg1_tile_info){ get_fncywld_bg_tile_info(machine(), tileinfo, tile_index, 2, m_pf1_data); }
-TILE_GET_INFO_MEMBER(tumbleb_state::get_fncywld_bg2_tile_info){ get_fncywld_bg_tile_info(machine(), tileinfo, tile_index, 1, m_pf2_data); }
+TILE_GET_INFO_MEMBER(tumbleb_state::get_fncywld_bg1_tile_info){ get_fncywld_bg_tile_info(tileinfo, tile_index, 2, m_pf1_data); }
+TILE_GET_INFO_MEMBER(tumbleb_state::get_fncywld_bg2_tile_info){ get_fncywld_bg_tile_info(tileinfo, tile_index, 1, m_pf2_data); }
 
 TILE_GET_INFO_MEMBER(tumbleb_state::get_fncywld_fg_tile_info)
 {
@@ -170,24 +169,24 @@ TILE_GET_INFO_MEMBER(tumbleb_state::get_fncywld_fg_tile_info)
 }
 
 
-INLINE void pangpang_get_bg_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base )
+inline void tumbleb_state::pangpang_get_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base )
 {
 	int data = gfx_base[tile_index * 2 + 1];
 	int attr = gfx_base[tile_index * 2];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			gfx_bank,
 			data & 0x1fff,
 			(attr >>12) & 0xf,
 			0);
 }
 
-INLINE void pangpang_get_bg2x_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base )
+inline void tumbleb_state::pangpang_get_bg2x_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base )
 {
 	int data = gfx_base[tile_index * 2 + 1];
 	int attr = gfx_base[tile_index * 2];
 
-	SET_TILE_INFO(
+	SET_TILE_INFO_MEMBER(
 			gfx_bank,
 			(data & 0xfff) + 0x1000,
 			(attr >>12) & 0xf,
@@ -195,8 +194,8 @@ INLINE void pangpang_get_bg2x_tile_info( running_machine &machine, tile_data &ti
 }
 
 
-TILE_GET_INFO_MEMBER(tumbleb_state::pangpang_get_bg1_tile_info){ pangpang_get_bg_tile_info(machine(), tileinfo, tile_index, 2, m_pf1_data); }
-TILE_GET_INFO_MEMBER(tumbleb_state::pangpang_get_bg2_tile_info){ pangpang_get_bg2x_tile_info(machine(), tileinfo, tile_index, 1, m_pf2_data); }
+TILE_GET_INFO_MEMBER(tumbleb_state::pangpang_get_bg1_tile_info){ pangpang_get_bg_tile_info(tileinfo, tile_index, 2, m_pf1_data); }
+TILE_GET_INFO_MEMBER(tumbleb_state::pangpang_get_bg2_tile_info){ pangpang_get_bg2x_tile_info(tileinfo, tile_index, 1, m_pf2_data); }
 
 TILE_GET_INFO_MEMBER(tumbleb_state::pangpang_get_fg_tile_info)
 {
@@ -283,25 +282,24 @@ VIDEO_START_MEMBER(tumbleb_state,suprtrio)
 
 /******************************************************************************/
 
-void tumbleb_draw_common(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pf1x_offs, int pf1y_offs, int pf2x_offs, int pf2y_offs)
+void tumbleb_state::tumbleb_draw_common(bitmap_ind16 &bitmap, const rectangle &cliprect, int pf1x_offs, int pf1y_offs, int pf2x_offs, int pf2y_offs)
 {
-	tumbleb_state *state = machine.driver_data<tumbleb_state>();
 
-	state->m_pf1_tilemap->set_scrollx(0, state->m_control_0[1] + pf1x_offs);
-	state->m_pf1_tilemap->set_scrolly(0, state->m_control_0[2] + pf1y_offs);
-	state->m_pf1_alt_tilemap->set_scrollx(0, state->m_control_0[1] + pf1x_offs);
-	state->m_pf1_alt_tilemap->set_scrolly(0, state->m_control_0[2] + pf1y_offs);
-	state->m_pf2_tilemap->set_scrollx(0, state->m_control_0[3] + pf2x_offs);
-	state->m_pf2_tilemap->set_scrolly(0, state->m_control_0[4] + pf2y_offs);
+	m_pf1_tilemap->set_scrollx(0, m_control_0[1] + pf1x_offs);
+	m_pf1_tilemap->set_scrolly(0, m_control_0[2] + pf1y_offs);
+	m_pf1_alt_tilemap->set_scrollx(0, m_control_0[1] + pf1x_offs);
+	m_pf1_alt_tilemap->set_scrolly(0, m_control_0[2] + pf1y_offs);
+	m_pf2_tilemap->set_scrollx(0, m_control_0[3] + pf2x_offs);
+	m_pf2_tilemap->set_scrolly(0, m_control_0[4] + pf2y_offs);
 
-	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
+	m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	if (state->m_control_0[6] & 0x80)
-		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
+	if (m_control_0[6] & 0x80)
+		m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 	else
-		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
+		m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	machine.device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
+	machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 }
 
 UINT32 tumbleb_state::screen_update_tumblepb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -321,7 +319,7 @@ UINT32 tumbleb_state::screen_update_tumblepb(screen_device &screen, bitmap_ind16
 	else
 		offs2 = -5;
 
-	tumbleb_draw_common(machine(),bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
 
 	return 0;
 }
@@ -343,7 +341,7 @@ UINT32 tumbleb_state::screen_update_jumpkids(screen_device &screen, bitmap_ind16
 	else
 		offs2 = -5;
 
-	tumbleb_draw_common(machine(),bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
 	return 0;
 }
 
@@ -364,7 +362,7 @@ UINT32 tumbleb_state::screen_update_semicom(screen_device &screen, bitmap_ind16 
 	else
 		offs2 = -5;
 
-	tumbleb_draw_common(machine(),bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
 	return 0;
 }
 
@@ -378,7 +376,7 @@ UINT32 tumbleb_state::screen_update_semicom_altoffsets(screen_device &screen, bi
 	offsy = 2;
 	offsx2 = -5;
 
-	tumbleb_draw_common(machine(),bitmap,cliprect, offsx2, 0, offsx, offsy);
+	tumbleb_draw_common(bitmap,cliprect, offsx2, 0, offsx, offsy);
 
 	return 0;
 }
@@ -402,7 +400,7 @@ UINT32 tumbleb_state::screen_update_bcstory(screen_device &screen, bitmap_ind16 
 	else
 		offs2 = 8;
 
-	tumbleb_draw_common(machine(),bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
 	return 0;
 }
 
@@ -415,7 +413,7 @@ UINT32 tumbleb_state::screen_update_semibase(screen_device &screen, bitmap_ind16
 	offs = -1;
 	offs2 = -2;
 
-	tumbleb_draw_common(machine(),bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
 
 	return 0;
 }
@@ -429,7 +427,7 @@ UINT32 tumbleb_state::screen_update_sdfight(screen_device &screen, bitmap_ind16 
 	offs = -1;
 	offs2 = -5; // foreground scroll..
 
-	tumbleb_draw_common(machine(),bitmap,cliprect, offs2, -16, offs, 0);
+	tumbleb_draw_common(bitmap,cliprect, offs2, -16, offs, 0);
 
 	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, m_spriteram.bytes()/2);
 	return 0;
@@ -452,7 +450,7 @@ UINT32 tumbleb_state::screen_update_fncywld(screen_device &screen, bitmap_ind16 
 	else
 		offs2 = -5;
 
-	tumbleb_draw_common(machine(),bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
 
 	return 0;
 }
@@ -474,7 +472,7 @@ UINT32 tumbleb_state::screen_update_pangpang(screen_device &screen, bitmap_ind16
 	else
 		offs2 = -5;
 
-	tumbleb_draw_common(machine(),bitmap,cliprect, offs2, 0, offs, 0);
+	tumbleb_draw_common(bitmap,cliprect, offs2, 0, offs, 0);
 	return 0;
 }
 

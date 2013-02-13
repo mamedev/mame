@@ -1,3 +1,5 @@
+#include "sound/samples.h"
+
 struct coprocessor_t {
 	UINT8 *context_ram;
 	UINT8 bank;
@@ -35,4 +37,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(thief_interrupt);
+	UINT16 fetch_image_addr( coprocessor_t &thief_coprocessor );
+	void tape_set_audio( samples_device *samples, int track, int bOn );
+	void tape_set_motor( samples_device *samples, int bOn );
 };

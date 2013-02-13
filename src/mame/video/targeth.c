@@ -101,18 +101,17 @@ void targeth_state::video_start()
       3  | xx------ -------- | not used?
 */
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void targeth_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	targeth_state *state = machine.driver_data<targeth_state>();
 	int i;
-	gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 
 	for (i = 3; i < (0x1000 - 6)/2; i += 4){
-		int sx = state->m_spriteram[i+2] & 0x03ff;
-		int sy = (240 - (state->m_spriteram[i] & 0x00ff)) & 0x00ff;
-		int number = state->m_spriteram[i+3] & 0x3fff;
-		int color = (state->m_spriteram[i+2] & 0x7c00) >> 10;
-		int attr = (state->m_spriteram[i] & 0xfe00) >> 9;
+		int sx = m_spriteram[i+2] & 0x03ff;
+		int sy = (240 - (m_spriteram[i] & 0x00ff)) & 0x00ff;
+		int number = m_spriteram[i+3] & 0x3fff;
+		int color = (m_spriteram[i+2] & 0x7c00) >> 10;
+		int attr = (m_spriteram[i] & 0xfe00) >> 9;
 
 		int xflip = attr & 0x20;
 		int yflip = attr & 0x40;
@@ -139,7 +138,7 @@ UINT32 targeth_state::screen_update_targeth(screen_device &screen, bitmap_ind16 
 
 	m_pant[1]->draw(bitmap, cliprect, 0,0);
 	m_pant[0]->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 
 	return 0;
 }

@@ -294,13 +294,12 @@ WRITE16_MEMBER(topspeed_state::sharedram_w)
 	COMBINE_DATA(&m_sharedram[offset]);
 }
 
-static void parse_control( running_machine &machine )   /* assumes Z80 sandwiched between 68Ks */
+void topspeed_state::parse_control(  )   /* assumes Z80 sandwiched between 68Ks */
 {
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
 	   if cpu B is disabled !! */
-	topspeed_state *state = machine.driver_data<topspeed_state>();
-	state->m_subcpu->set_input_line(INPUT_LINE_RESET, (state->m_cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, (m_cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
@@ -310,7 +309,7 @@ WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
 
 	m_cpua_ctrl = data;
 
-	parse_control(machine());
+	parse_control();
 
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
 }
@@ -407,16 +406,15 @@ WRITE16_MEMBER(topspeed_state::topspeed_motor_w)
                         SOUND
 *****************************************************/
 
-static void reset_sound_region( running_machine &machine )
+void topspeed_state::reset_sound_region(  )
 {
-	topspeed_state *state = machine.driver_data<topspeed_state>();
-	state->membank("bank10")->set_entry(state->m_banknum);
+	membank("bank10")->set_entry(m_banknum);
 }
 
 WRITE8_MEMBER(topspeed_state::sound_bankswitch_w)/* assumes Z80 sandwiched between 68Ks */
 {
 	m_banknum = data & 7;
-	reset_sound_region(machine());
+	reset_sound_region();
 }
 
 WRITE8_MEMBER(topspeed_state::topspeed_tc0140syt_comm_w)
@@ -674,8 +672,8 @@ static const msm5205_interface msm5205_config_2 =
 
 void topspeed_state::topspeed_postload()
 {
-	parse_control(machine());
-	reset_sound_region(machine());
+	parse_control();
+	reset_sound_region();
 }
 
 void topspeed_state::machine_start()

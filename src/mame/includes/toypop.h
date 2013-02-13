@@ -54,4 +54,6 @@ public:
 	INTERRUPT_GEN_MEMBER(toypop_sound_timer_irq);
 	INTERRUPT_GEN_MEMBER(toypop_m68000_interrupt);
 	TIMER_CALLBACK_MEMBER(namcoio_run);
+	void draw_background(bitmap_ind16 &bitmap);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base);
 };

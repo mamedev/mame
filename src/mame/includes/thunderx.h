@@ -53,6 +53,8 @@ public:
 	UINT32 screen_update_scontra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(scontra_interrupt);
 	TIMER_CALLBACK_MEMBER(thunderx_firq_callback);
+	void run_collisions( int s0, int e0, int s1, int e1, int cm, int hm );
+	void calculate_collisions(  );
 };
 
 

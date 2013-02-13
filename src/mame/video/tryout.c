@@ -176,11 +176,10 @@ void tryout_state::video_start()
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void tryout_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	tryout_state *state = machine.driver_data<tryout_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	UINT8 *spriteram_2 = state->m_spriteram2;
+	UINT8 *spriteram = m_spriteram;
+	UINT8 *spriteram_2 = m_spriteram2;
 	int offs,fx,fy,x,y,color,sprite,inc;
 
 	for (offs = 0;offs < 0x7f;offs += 4)
@@ -196,7 +195,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		fy = 0;
 		inc = 16;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			x = 240 - x;
 			fx = !fx;
@@ -210,17 +209,17 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		/* Double Height */
 		if(spriteram[offs] & 0x10)
 		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				sprite,
 				color,fx,fy,x,y + inc,0);
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				sprite+1,
 				color,fx,fy,x,y,0);
 		}
 		else
 		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				sprite,
 				color,fx,fy,x,y,0);
 		}
@@ -253,7 +252,7 @@ UINT32 tryout_state::screen_update_tryout(screen_device &screen, bitmap_ind16 &b
 	{
 		m_bg_tilemap->draw(bitmap, cliprect, 0,0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-		draw_sprites(machine(), bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 	}
 
 //  popmessage("%02x %02x %02x %02x",m_gfx_control[0],m_gfx_control[1],m_gfx_control[2],scrollx);

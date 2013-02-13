@@ -114,6 +114,7 @@ public:
 	TIMER_CALLBACK_MEMBER(rockn_timer_sub_level4_callback);
 	TIMER_CALLBACK_MEMBER(rockn_timer_level1_callback);
 	TIMER_CALLBACK_MEMBER(rockn_timer_sub_level1_callback);
+	void init_rockn_timer();
 };
 
 class stepstag_state : public tetrisp2_state
@@ -136,4 +137,5 @@ public:
 	UINT32 screen_update_stepstag_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stepstag_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stepstag_mid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	inline int mypal(int x);
 };

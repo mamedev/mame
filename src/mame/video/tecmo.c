@@ -156,10 +156,9 @@ WRITE8_MEMBER(tecmo_state::tecmo_flipscreen_w)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void tecmo_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	tecmo_state *state = machine.driver_data<tecmo_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 	static const UINT8 layout[8][8] =
 	{
@@ -173,7 +172,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		{42,43,46,47,58,59,62,63}
 	};
 
-	for (offs = state->m_spriteram.bytes()-8;offs >= 0;offs -= 8)
+	for (offs = m_spriteram.bytes()-8;offs >= 0;offs -= 8)
 	{
 		int flags = spriteram[offs+3];
 		int priority = flags>>6;
@@ -184,7 +183,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			int code,xpos,ypos,flipx,flipy,priority_mask,x,y;
 			int size = spriteram[offs + 2] & 3;
 
-			if (state->m_video_type != 0)   /* gemini, silkworm */
+			if (m_video_type != 0)   /* gemini, silkworm */
 				code = which + ((bank & 0xf8) << 5);
 			else                        /* rygar */
 				code = which + ((bank & 0xf0) << 4);
@@ -197,7 +196,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			flipx = bank & 1;
 			flipy = bank & 2;
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				xpos = 256 - (8 * size) - xpos;
 				ypos = 256 - (8 * size) - ypos;
@@ -221,12 +220,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				{
 					int sx = xpos + 8*(flipx?(size-1-x):x);
 					int sy = ypos + 8*(flipy?(size-1-y):y);
-					pdrawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+					pdrawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 							code + layout[y][x],
 							flags & 0xf,
 							flipx,flipy,
 							sx,sy,
-							machine.priority_bitmap,
+							machine().priority_bitmap,
 							priority_mask,0);
 				}
 			}
@@ -243,6 +242,6 @@ UINT32 tecmo_state::screen_update_tecmo(screen_device &screen, bitmap_ind16 &bit
 	m_fg_tilemap->draw(bitmap, cliprect, 0,2);
 	m_tx_tilemap->draw(bitmap, cliprect, 0,4);
 
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	return 0;
 }

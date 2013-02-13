@@ -979,11 +979,10 @@ DIP switches are not verified
 #include "contcirc.lh"
 #include "dblaxle.lh"
 
-static void parse_cpu_control( running_machine &machine )
+void taitoz_state::parse_cpu_control(  )
 {
 	/* bit 0 enables cpu B */
-	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->m_subcpu->set_input_line(INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
+	m_subcpu->set_input_line(INPUT_LINE_RESET, (m_cpua_ctrl & 0x1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
@@ -994,7 +993,7 @@ WRITE16_MEMBER(taitoz_state::cpua_ctrl_w)
 	data &= 0xff;
 
 	m_cpua_ctrl = data;
-	parse_cpu_control(machine());
+	parse_cpu_control();
 }
 
 WRITE16_MEMBER(taitoz_state::chasehq_cpua_ctrl_w)
@@ -1404,16 +1403,15 @@ READ16_MEMBER(taitoz_state::aquajack_unknown_r)
                         SOUND
 *****************************************************/
 
-static void reset_sound_region( running_machine &machine )
+void taitoz_state::reset_sound_region(  )
 {
-	taitoz_state *state = machine.driver_data<taitoz_state>();
-	state->membank("bank10")->set_entry(state->m_banknum);
+	membank("bank10")->set_entry(m_banknum);
 }
 
 WRITE8_MEMBER(taitoz_state::sound_bankswitch_w)
 {
 	m_banknum = data & 7;
-	reset_sound_region(machine());
+	reset_sound_region();
 }
 
 WRITE16_MEMBER(taitoz_state::taitoz_sound_w)
@@ -3027,8 +3025,8 @@ static const tc0140syt_interface taitoz_tc0140syt_intf =
 
 void taitoz_state::taitoz_postload()
 {
-	parse_cpu_control(machine());
-	reset_sound_region(machine());
+	parse_cpu_control();
+	reset_sound_region();
 }
 
 MACHINE_START_MEMBER(taitoz_state,bshark)
@@ -5186,7 +5184,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(taitoz_state,taitoz)
 {
-	machine().save().register_postload(save_prepost_delegate(FUNC(parse_cpu_control), &machine()));
+	machine().save().register_postload(save_prepost_delegate(FUNC(taitoz_state::parse_cpu_control), this));
 }
 
 DRIVER_INIT_MEMBER(taitoz_state,bshark)

@@ -46,4 +46,5 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	TIMER_CALLBACK_MEMBER(soundlatch_callback);
 	TIMER_CALLBACK_MEMBER(soundirqline_callback);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

@@ -109,6 +109,16 @@ public:
 	INTERRUPT_GEN_MEMBER(wardner_interrupt);
 	void twincobr_restore_screen();
 	void twincobr_restore_dsp();
+	void twincobr_create_tilemaps();
+	void twincobr_display(int enable);
+	void twincobr_flipscreen(int flip);
+	void wardner_sprite_priority_hack();
+	void twincobr_log_vram();
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	void twincobr_dsp(int enable);
+	void toaplan0_control_w(int offset, int data);
+	void toaplan0_coin_dsp_w(address_space &space, int offset, int data);
+	void twincobr_driver_savestate();
 };
 
 

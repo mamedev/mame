@@ -21,7 +21,7 @@ public:
 	int m_flipscreen;
 
 	/* misc */
-	void (*m_current_notifier[4])(running_machine &, int);
+	void (taitol_state::*m_current_notifier[4])(int);
 	UINT8 *m_current_base[4];
 
 	int m_cur_rombank;
@@ -123,19 +123,21 @@ public:
 	void screen_eof_taitol(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	void taitol_chardef14_m( int offset );
+	void taitol_chardef15_m( int offset );
+	void taitol_chardef16_m( int offset );
+	void taitol_chardef17_m( int offset );
+	void taitol_chardef1c_m( int offset );
+	void taitol_chardef1d_m( int offset );
+	void taitol_chardef1e_m( int offset );
+	void taitol_chardef1f_m( int offset );
+	void taitol_bg18_m( int offset );
+	void taitol_bg19_m( int offset );
+	void taitol_char1a_m( int offset );
+	void taitol_obj1b_m( int offset );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void palette_notifier(int addr);
+	void state_register(  );
+	void taito_machine_reset();
+	void bank_w(address_space &space, offs_t offset, UINT8 data, int banknum );
 };
-
-/*----------- defined in video/taito_l.c -----------*/
-
-void taitol_chardef14_m(running_machine &machine, int offset);
-void taitol_chardef15_m(running_machine &machine, int offset);
-void taitol_chardef16_m(running_machine &machine, int offset);
-void taitol_chardef17_m(running_machine &machine, int offset);
-void taitol_chardef1c_m(running_machine &machine, int offset);
-void taitol_chardef1d_m(running_machine &machine, int offset);
-void taitol_chardef1e_m(running_machine &machine, int offset);
-void taitol_chardef1f_m(running_machine &machine, int offset);
-void taitol_bg18_m(running_machine &machine, int offset);
-void taitol_bg19_m(running_machine &machine, int offset);
-void taitol_char1a_m(running_machine &machine, int offset);
-void taitol_obj1b_m(running_machine &machine, int offset);

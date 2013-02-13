@@ -52,4 +52,5 @@ public:
 	DECLARE_VIDEO_START(chkun);
 	UINT32 screen_update_timeplt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(timeplt_interrupt);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

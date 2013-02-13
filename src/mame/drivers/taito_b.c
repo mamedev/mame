@@ -2743,9 +2743,9 @@ static MACHINE_CONFIG_START( selfeena, taitob_state )
 MACHINE_CONFIG_END
 
 #if 0
-static void ryujin_patch(void)
+void taitob_state::ryujin_patch(void)
 {
-	UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine().root_device().memregion("maincpu")->base();
 	rom[ 0x62/2 ] = 1;
 	//0 (already in rom) - Taito Corporation 1993
 	//1 - Taito America corp with blue FBI logo
@@ -2796,9 +2796,9 @@ static MACHINE_CONFIG_START( ryujin, taitob_state )
 MACHINE_CONFIG_END
 
 #if 0
-static void sbm_patch(void)
+void taitob_state::sbm_patch(void)
 {
-	UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16*)machine().root_device().memregion("maincpu")->base();
 	rom[ 0x7ffff/2 ] = 2; //US version
 }
 #endif

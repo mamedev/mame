@@ -387,10 +387,9 @@ READ32_MEMBER(taitojc_state::dsp_shared_r)
 
 #if DEBUG_DSP
 
-static void debug_dsp_command(running_machine &machine)
+void taitojc_state::debug_dsp_command()
 {
-	taitojc_state *state = machine.driver_data<taitojc_state>();
-	UINT16 *cmd = &state->m_dsp_shared_ram[0x1fc0/2];
+	UINT16 *cmd = &m_dsp_shared_ram[0x1fc0/2];
 
 	switch (cmd[0])
 	{
@@ -429,10 +428,10 @@ static void debug_dsp_command(running_machine &machine)
 #endif
 					for (i=0; i < ll; i++)
 					{
-						UINT16 d = state->m_dsp_shared_ram[saddr++];
+						UINT16 d = m_dsp_shared_ram[saddr++];
 						if (daddr >= 0x8000 && daddr < 0x10000)
 						{
-							state->m_debug_dsp_ram[daddr-0x8000] = d;
+							m_debug_dsp_ram[daddr-0x8000] = d;
 						}
 						daddr++;
 
@@ -472,7 +471,7 @@ static void debug_dsp_command(running_machine &machine)
 				while (!end)
 				{
 					int i;
-					UINT16 cmd = state->m_debug_dsp_ram[addr++];
+					UINT16 cmd = m_debug_dsp_ram[addr++];
 					int length = cmd & 0xff;
 
 					if ((cmd >> 11) == 6)
@@ -481,7 +480,7 @@ static void debug_dsp_command(running_machine &machine)
 					printf("   %04X (%02X): ", cmd, cmd >> 11);
 					for (i=0; i < length; i++)
 					{
-						printf("%04X ", state->m_debug_dsp_ram[addr+i]);
+						printf("%04X ", m_debug_dsp_ram[addr+i]);
 					}
 					printf("\n");
 
@@ -569,21 +568,20 @@ WRITE32_MEMBER(taitojc_state::dsp_shared_w)
 
 
 
-static UINT8 mcu_comm_reg_r(address_space &space, int reg)
+UINT8 taitojc_state::mcu_comm_reg_r(address_space &space, int reg)
 {
-	taitojc_state *state = space.machine().driver_data<taitojc_state>();
 	UINT8 r = 0;
 
 	switch (reg)
 	{
 		case 0x03:
 		{
-			r = state->m_mcu_data_main;
+			r = m_mcu_data_main;
 			break;
 		}
 		case 0x04:
 		{
-			r = state->m_mcu_comm_main | 0x14;
+			r = m_mcu_comm_main | 0x14;
 			break;
 		}
 		default:
@@ -596,17 +594,15 @@ static UINT8 mcu_comm_reg_r(address_space &space, int reg)
 	return r;
 }
 
-static void mcu_comm_reg_w(address_space &space, int reg, UINT8 data)
+void taitojc_state::mcu_comm_reg_w(address_space &space, int reg, UINT8 data)
 {
-	taitojc_state *state = space.machine().driver_data<taitojc_state>();
-
 	switch (reg)
 	{
 		case 0x00:
 		{
-			state->m_mcu_data_hc11 = data;
-			state->m_mcu_comm_hc11 &= ~0x04;
-			state->m_mcu_comm_main &= ~0x20;
+			m_mcu_data_hc11 = data;
+			m_mcu_comm_hc11 &= ~0x04;
+			m_mcu_comm_main &= ~0x20;
 			break;
 		}
 		case 0x04:
@@ -996,7 +992,7 @@ WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
 {
 	if (offset == 0)
 	{
-		taitojc_clear_frame(machine());
+		taitojc_clear_frame();
 		m_renderer->render_polygons(machine(), m_polygon_fifo, m_polygon_fifo_ptr);
 
 		m_polygon_fifo_ptr = 0;

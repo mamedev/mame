@@ -128,29 +128,28 @@ READ16_MEMBER(toaplan1_state::demonwld_BIO_r)
 }
 
 
-static void demonwld_dsp(running_machine &machine, int enable)
+void toaplan1_state::demonwld_dsp(int enable)
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->m_dsp_on = enable;
+	m_dsp_on = enable;
 	if (enable)
 	{
 		logerror("Turning DSP on and 68000 off\n");
-		machine.device("dsp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		machine.device("dsp")->execute().set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		machine().device("dsp")->execute().set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else
 	{
 		logerror("Turning DSP off\n");
-		machine.device("dsp")->execute().set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
-		machine.device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		machine().device("dsp")->execute().set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
+		machine().device("dsp")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
 void toaplan1_state::demonwld_restore_dsp()
 {
-	demonwld_dsp(machine(), m_dsp_on);
+	demonwld_dsp(m_dsp_on);
 }
 
 WRITE16_MEMBER(toaplan1_state::demonwld_dsp_ctrl_w)
@@ -163,8 +162,8 @@ WRITE16_MEMBER(toaplan1_state::demonwld_dsp_ctrl_w)
 	{
 		switch (data)
 		{
-			case 0x00:  demonwld_dsp(machine(), 1); break;  /* Enable the INT line to the DSP */
-			case 0x01:  demonwld_dsp(machine(), 0); break;  /* Inhibit the INT line to the DSP */
+			case 0x00:  demonwld_dsp(1); break;  /* Enable the INT line to the DSP */
+			case 0x01:  demonwld_dsp(0); break;  /* Inhibit the INT line to the DSP */
 			default:    logerror("68000:%04x  Writing unknown command %08x to %08x\n",space.device().safe_pcbase() ,data ,0xe0000a + offset); break;
 		}
 	}
@@ -380,13 +379,12 @@ MACHINE_RESET_MEMBER(toaplan1_state,toaplan1)
 	coin_lockout_global_w(machine(), 0);
 }
 
-void toaplan1_driver_savestate(running_machine &machine)
+void toaplan1_state::toaplan1_driver_savestate()
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->save_item(NAME(state->m_intenable));
-	state->save_item(NAME(state->m_coin_count));
-	state->save_item(NAME(state->m_unk_reset_port));
+	save_item(NAME(m_intenable));
+	save_item(NAME(m_coin_count));
+	save_item(NAME(m_unk_reset_port));
 }
 
 MACHINE_RESET_MEMBER(toaplan1_state,zerowing)/* Hack for ZeroWing and OutZone. See the video driver */
@@ -403,16 +401,15 @@ MACHINE_RESET_MEMBER(toaplan1_state,demonwld)
 	m_dsp_execute = 0;
 }
 
-void demonwld_driver_savestate(running_machine &machine)
+void toaplan1_state::demonwld_driver_savestate()
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->save_item(NAME(state->m_dsp_on));
-	state->save_item(NAME(state->m_dsp_addr_w));
-	state->save_item(NAME(state->m_main_ram_seg));
-	state->save_item(NAME(state->m_dsp_BIO));
-	state->save_item(NAME(state->m_dsp_execute));
-	machine.save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::demonwld_restore_dsp), state));
+	save_item(NAME(m_dsp_on));
+	save_item(NAME(m_dsp_addr_w));
+	save_item(NAME(m_main_ram_seg));
+	save_item(NAME(m_dsp_BIO));
+	save_item(NAME(m_dsp_execute));
+	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::demonwld_restore_dsp), this));
 }
 
 MACHINE_RESET_MEMBER(toaplan1_state,vimana)
@@ -423,12 +420,11 @@ MACHINE_RESET_MEMBER(toaplan1_state,vimana)
 	m_vimana_latch = 0;
 }
 
-void vimana_driver_savestate(running_machine &machine)
+void toaplan1_state::vimana_driver_savestate()
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->save_item(NAME(state->m_vimana_coins[0]));
-	state->save_item(NAME(state->m_vimana_coins[1]));
-	state->save_item(NAME(state->m_vimana_credits));
-	state->save_item(NAME(state->m_vimana_latch));
+	save_item(NAME(m_vimana_coins[0]));
+	save_item(NAME(m_vimana_coins[1]));
+	save_item(NAME(m_vimana_credits));
+	save_item(NAME(m_vimana_latch));
 }

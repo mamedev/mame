@@ -64,11 +64,10 @@ WRITE16_MEMBER(tigeroad_state::tigeroad_scroll_w)
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void tigeroad_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	tigeroad_state *state = machine.driver_data<tigeroad_state>();
-	UINT16 *source = &state->m_spriteram->buffer()[state->m_spriteram->bytes()/2] - 4;
-	UINT16 *finish = state->m_spriteram->buffer();
+	UINT16 *source = &m_spriteram->buffer()[m_spriteram->bytes()/2] - 4;
+	UINT16 *finish = m_spriteram->buffer();
 
 	// TODO: The Track Map should probably be drawn on top of the background tilemap...
 	//       Also convert the below into a for loop!
@@ -89,7 +88,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			if (sx > 0x100) sx -= 0x200;
 			if (sy > 0x100) sy -= 0x200;
 
-			if (state->flip_screen())
+			if (flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -98,7 +97,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			}
 
 			drawgfx_transpen(bitmap, cliprect,
-				machine.gfx[2],
+				machine().gfx[2],
 				tile_number,
 				color,
 				flipx, flipy,
@@ -158,9 +157,9 @@ void tigeroad_state::video_start()
 UINT32 tigeroad_state::screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	draw_sprites(machine(), bitmap, cliprect, 0);
+	draw_sprites(bitmap, cliprect, 0);
 	m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 1);
-	//draw_sprites(machine(), bitmap, cliprect, 1); draw priority sprites?
+	//draw_sprites(bitmap, cliprect, 1); draw priority sprites?
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 2);
 	return 0;
 }

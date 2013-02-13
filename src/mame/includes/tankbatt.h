@@ -31,4 +31,5 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_tankbatt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(tankbatt_interrupt);
+	void draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

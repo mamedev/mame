@@ -187,26 +187,25 @@ VIDEO_START_MEMBER(trackfld_state,atlantol)
 
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void trackfld_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	trackfld_state *state = machine.driver_data<trackfld_state>();
-	UINT8 *spriteram = state->m_spriteram;
-	UINT8 *spriteram_2 = state->m_spriteram2;
+	UINT8 *spriteram = m_spriteram;
+	UINT8 *spriteram_2 = m_spriteram2;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
+	for (offs = m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
 	{
 		int attr = spriteram_2[offs];
 		int code = spriteram[offs + 1];
 		int color = attr & 0x0f;
-		if (!state->m_sprites_gfx_banked)
+		if (!m_sprites_gfx_banked)
 			if (attr&1) code|=0x100; // extra tile# bit for the yiear conversion, trackfld doesn't have this many sprites so it will just get masked
 		int flipx = ~attr & 0x40;
 		int flipy = attr & 0x80;
 		int sx = spriteram[offs] - 1;
 		int sy = 240 - spriteram_2[offs + 1];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -225,19 +224,19 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 
 		drawgfx_transmask(bitmap, cliprect,
-			machine.gfx[0],
-			code + state->m_sprite_bank1 + state->m_sprite_bank2, color,
+			machine().gfx[0],
+			code + m_sprite_bank1 + m_sprite_bank2, color,
 			flipx, flipy,
 			sx, sy,
-			colortable_get_transpen_mask(machine.colortable, machine.gfx[0], color, 0));
+			colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0));
 
 		/* redraw with wraparound */
 		drawgfx_transmask(bitmap,cliprect,
-			machine.gfx[0],
-			code + state->m_sprite_bank1 + state->m_sprite_bank2, color,
+			machine().gfx[0],
+			code + m_sprite_bank1 + m_sprite_bank2, color,
 			flipx, flipy,
 			sx - 256, sy,
-			colortable_get_transpen_mask(machine.colortable, machine.gfx[0], color, 0));
+			colortable_get_transpen_mask(machine().colortable, machine().gfx[0], color, 0));
 	}
 }
 
@@ -255,6 +254,6 @@ UINT32 trackfld_state::screen_update_trackfld(screen_device &screen, bitmap_ind1
 	}
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }

@@ -67,4 +67,12 @@ public:
 	INTERRUPT_GEN_MEMBER(m6809_vb_interrupt);
 	INTERRUPT_GEN_MEMBER(m68k_vb_interrupt);
 	INTERRUPT_GEN_MEMBER(mcu_vb_interrupt);
+	inline int get_tile_addr(int tile_index);
+	void decode_bg(const char * region);
+	void decode_sprite(int gfx_index, const gfx_layout *layout, const void *data);
+	void decode_sprite16(const char * region);
+	void decode_sprite32(const char * region);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_priority);
+	inline UINT8 fix_input0(UINT8 in1, UINT8 in2);
+	inline UINT8 fix_input1(UINT8 in1, UINT8 in2);
 };

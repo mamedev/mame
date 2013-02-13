@@ -27,12 +27,11 @@ TILE_GET_INFO_MEMBER(terracre_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER( 0,data&0xff,0,0 );
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	terracre_state *state = machine.driver_data<terracre_state>();
-	const UINT8 *spritepalettebank = state->memregion("user1")->base();
-	gfx_element *pGfx = machine.gfx[2];
-	const UINT16 *pSource = state->m_spriteram;
+	const UINT8 *spritepalettebank = memregion("user1")->base();
+	gfx_element *pGfx = machine().gfx[2];
+	const UINT16 *pSource = m_spriteram;
 	int i;
 	int transparent_pen;
 
@@ -74,7 +73,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			color += 16 * (spritepalettebank[(tile>>1)&0xff] & 0x0f);
 		}
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 				sx=240-sx;
 				sy=240-sy;
@@ -201,7 +200,7 @@ UINT32 terracre_state::screen_update_amazon(screen_device &screen, bitmap_ind16 
 	else
 		m_background->draw(bitmap, cliprect, 0, 0 );
 
-	draw_sprites(machine(), bitmap,cliprect );
+	draw_sprites(bitmap,cliprect );
 	m_foreground->draw(bitmap, cliprect, 0, 0 );
 	return 0;
 }

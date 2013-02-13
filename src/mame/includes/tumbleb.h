@@ -1,6 +1,6 @@
 
 #include "video/decospr.h"
-
+#include "sound/okim6295.h"
 
 class tumbleb_state : public driver_device
 {
@@ -109,4 +109,16 @@ public:
 	UINT32 screen_update_sdfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(tumbleb2_interrupt);
 	void tumbleb_tilemap_redraw();
+	inline void get_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base);
+	inline void get_fncywld_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base);
+	inline void pangpang_get_bg_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base );
+	inline void pangpang_get_bg2x_tile_info( tile_data &tileinfo, int tile_index, int gfx_bank, UINT16 *gfx_base );
+	void tumbleb_draw_common(bitmap_ind16 &bitmap, const rectangle &cliprect, int pf1x_offs, int pf1y_offs, int pf2x_offs, int pf2y_offs);
+	void tumbleb2_set_music_bank( int bank );
+	void tumbleb2_play_sound( okim6295_device *oki, int data );
+	void process_tumbleb2_music_command( okim6295_device *oki, int data );
+	void tumblepb_patch_code(UINT16 offset);
+	void tumblepb_gfx_rearrange(int rgn);
+	void suprtrio_decrypt_code();
+	void suprtrio_decrypt_gfx();
 };

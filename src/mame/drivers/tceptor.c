@@ -95,7 +95,7 @@ WRITE8_MEMBER(tceptor_state::voice_w)
 
 
 /* fix dsw/input data to memory mapped data */
-static UINT8 fix_input0(UINT8 in1, UINT8 in2)
+UINT8 tceptor_state::fix_input0(UINT8 in1, UINT8 in2)
 {
 	UINT8 r = 0;
 
@@ -111,7 +111,7 @@ static UINT8 fix_input0(UINT8 in1, UINT8 in2)
 	return r;
 }
 
-static UINT8 fix_input1(UINT8 in1, UINT8 in2)
+UINT8 tceptor_state::fix_input1(UINT8 in1, UINT8 in2)
 {
 	UINT8 r = 0;
 

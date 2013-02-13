@@ -79,9 +79,8 @@ static const int f1dream_2450_lookup[32] = {
 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0, 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0,
 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0, 0x0003, 0x0080, 0x0006, 0x0060, 0x0000, 0x00e0, 0x000a, 0x00c0 };
 
-static void f1dream_protection_w(address_space &space)
+void tigeroad_state::f1dream_protection_w(address_space &space)
 {
-	tigeroad_state *state = space.machine().driver_data<tigeroad_state>();
 	int indx;
 	int value = 255;
 	int prevpc = space.device().safe_pcbase();
@@ -89,57 +88,57 @@ static void f1dream_protection_w(address_space &space)
 	if (prevpc == 0x244c)
 	{
 		/* Called once, when a race is started.*/
-		indx = state->m_ram16[0x3ff0/2];
-		state->m_ram16[0x3fe6/2] = f1dream_2450_lookup[indx];
-		state->m_ram16[0x3fe8/2] = f1dream_2450_lookup[++indx];
-		state->m_ram16[0x3fea/2] = f1dream_2450_lookup[++indx];
-		state->m_ram16[0x3fec/2] = f1dream_2450_lookup[++indx];
+		indx = m_ram16[0x3ff0/2];
+		m_ram16[0x3fe6/2] = f1dream_2450_lookup[indx];
+		m_ram16[0x3fe8/2] = f1dream_2450_lookup[++indx];
+		m_ram16[0x3fea/2] = f1dream_2450_lookup[++indx];
+		m_ram16[0x3fec/2] = f1dream_2450_lookup[++indx];
 	}
 	else if (prevpc == 0x613a)
 	{
 		/* Called for every sprite on-screen.*/
-		if (state->m_ram16[0x3ff6/2] < 15)
+		if (m_ram16[0x3ff6/2] < 15)
 		{
-			indx = f1dream_613ea_lookup[state->m_ram16[0x3ff6/2]] - state->m_ram16[0x3ff4/2];
+			indx = f1dream_613ea_lookup[m_ram16[0x3ff6/2]] - m_ram16[0x3ff4/2];
 			if (indx > 255)
 			{
 				indx <<= 4;
-				indx += state->m_ram16[0x3ff6/2] & 0x00ff;
+				indx += m_ram16[0x3ff6/2] & 0x00ff;
 				value = f1dream_613eb_lookup[indx];
 			}
 		}
 
-		state->m_ram16[0x3ff2/2] = value;
+		m_ram16[0x3ff2/2] = value;
 	}
 	else if (prevpc == 0x17b70)
 	{
 		/* Called only before a real race, not a time trial.*/
-		if (state->m_ram16[0x3ff0/2] >= 0x04) indx = 128;
-		else if (state->m_ram16[0x3ff0/2] > 0x02) indx = 96;
-		else if (state->m_ram16[0x3ff0/2] == 0x02) indx = 64;
-		else if (state->m_ram16[0x3ff0/2] == 0x01) indx = 32;
+		if (m_ram16[0x3ff0/2] >= 0x04) indx = 128;
+		else if (m_ram16[0x3ff0/2] > 0x02) indx = 96;
+		else if (m_ram16[0x3ff0/2] == 0x02) indx = 64;
+		else if (m_ram16[0x3ff0/2] == 0x01) indx = 32;
 		else indx = 0;
 
-		indx += state->m_ram16[0x3fee/2];
+		indx += m_ram16[0x3fee/2];
 		if (indx < 128)
 		{
-			state->m_ram16[0x3fe6/2] = f1dream_17b74_lookup[indx];
-			state->m_ram16[0x3fe8/2] = f1dream_17b74_lookup[++indx];
-			state->m_ram16[0x3fea/2] = f1dream_17b74_lookup[++indx];
-			state->m_ram16[0x3fec/2] = f1dream_17b74_lookup[++indx];
+			m_ram16[0x3fe6/2] = f1dream_17b74_lookup[indx];
+			m_ram16[0x3fe8/2] = f1dream_17b74_lookup[++indx];
+			m_ram16[0x3fea/2] = f1dream_17b74_lookup[++indx];
+			m_ram16[0x3fec/2] = f1dream_17b74_lookup[++indx];
 		}
 		else
 		{
-			state->m_ram16[0x3fe6/2] = 0x00ff;
-			state->m_ram16[0x3fe8/2] = 0x00ff;
-			state->m_ram16[0x3fea/2] = 0x00ff;
-			state->m_ram16[0x3fec/2] = 0x00ff;
+			m_ram16[0x3fe6/2] = 0x00ff;
+			m_ram16[0x3fe8/2] = 0x00ff;
+			m_ram16[0x3fea/2] = 0x00ff;
+			m_ram16[0x3fec/2] = 0x00ff;
 		}
 	}
 	else if ((prevpc == 0x27f8) || (prevpc == 0x511a) || (prevpc == 0x5142) || (prevpc == 0x516a))
 	{
 		/* The main CPU stuffs the byte for the soundlatch into 0xfffffd.*/
-		state->soundlatch_byte_w(space,2,state->m_ram16[0x3ffc/2]);
+		soundlatch_byte_w(space,2,m_ram16[0x3ffc/2]);
 	}
 }
 

@@ -28,4 +28,6 @@ public:
 	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
 	virtual void video_start();
 	UINT32 screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
+	void f1dream_protection_w(address_space &space);
 };

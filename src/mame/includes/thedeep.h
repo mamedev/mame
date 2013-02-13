@@ -52,4 +52,6 @@ public:
 	UINT32 screen_update_thedeep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(thedeep_mcu_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(thedeep_interrupt);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void thedeep_maincpu_bankswitch(UINT8 bank_trig);
 };

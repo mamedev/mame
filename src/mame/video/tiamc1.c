@@ -152,23 +152,22 @@ void tiamc1_state::video_start()
 	machine().gfx[0]->set_source(m_charram);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tiamc1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tiamc1_state *state = machine.driver_data<tiamc1_state>();
 	int offs;
 
 	for (offs = 0; offs < 16; offs++)
 	{
 		int flipx, flipy, sx, sy, spritecode;
 
-		sx = state->m_spriteram_x[offs] ^ 0xff;
-		sy = state->m_spriteram_y[offs] ^ 0xff;
-		flipx = !(state->m_spriteram_a[offs] & 0x08);
-		flipy = !(state->m_spriteram_a[offs] & 0x02);
-		spritecode = state->m_spriteram_n[offs] ^ 0xff;
+		sx = m_spriteram_x[offs] ^ 0xff;
+		sy = m_spriteram_y[offs] ^ 0xff;
+		flipx = !(m_spriteram_a[offs] & 0x08);
+		flipy = !(m_spriteram_a[offs] & 0x02);
+		spritecode = m_spriteram_n[offs] ^ 0xff;
 
-		if (!(state->m_spriteram_a[offs] & 0x01))
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
+		if (!(m_spriteram_a[offs] & 0x01))
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[1],
 				spritecode,
 				0,
 				flipx, flipy,
@@ -200,7 +199,7 @@ UINT32 tiamc1_state::screen_update_tiamc1(screen_device &screen, bitmap_ind16 &b
 		m_bg_tilemap1->draw(bitmap, cliprect, 0, 0);
 
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 
 	return 0;
 }

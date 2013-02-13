@@ -176,13 +176,12 @@ spriteram format (4 bytes per sprite):
     offset  3   xxxxxxxx    x position (8 LSB bits)
 */
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void tankbust_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	tankbust_state *state = machine.driver_data<tankbust_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
 		int code,color,sx,sy,flipx,flipy;
 
@@ -211,7 +210,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		if ((spriteram[offs+1]!=4)) //otherwise - ghost sprites
 		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 				code, color,
 				flipx,flipy,
 				sx,sy,0);
@@ -237,7 +236,7 @@ UINT32 tankbust_state::screen_update_tankbust(screen_device &screen, bitmap_ind1
 #endif
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(bitmap, cliprect, 1, 0);
 
 	m_txt_tilemap->draw(bitmap, cliprect, 0,0);

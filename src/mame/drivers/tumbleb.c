@@ -466,13 +466,13 @@ static const int tumbleb_sound_lookup[256] = {
 };
 
 /* we use channels 1,2,3 for sound effects, and channel 4 for music */
-static void tumbleb2_set_music_bank( running_machine &machine, int bank )
+void tumbleb_state::tumbleb2_set_music_bank( int bank )
 {
-	UINT8 *oki = machine.root_device().memregion("oki")->base();
+	UINT8 *oki = machine().root_device().memregion("oki")->base();
 	memcpy(&oki[0x38000], &oki[0x80000 + 0x38000 + 0x8000 * bank], 0x8000);
 }
 
-static void tumbleb2_play_sound( okim6295_device *oki, int data )
+void tumbleb_state::tumbleb2_play_sound( okim6295_device *oki, int data )
 {
 	int status = oki->read_status();
 
@@ -505,9 +505,8 @@ static void tumbleb2_play_sound( okim6295_device *oki, int data )
 // bank 7 = how to play?
 // bank 8 = boss???
 
-static void process_tumbleb2_music_command( okim6295_device *oki, int data )
+void tumbleb_state::process_tumbleb2_music_command( okim6295_device *oki, int data )
 {
-	tumbleb_state *state = oki->machine().driver_data<tumbleb_state>();
 	int status = oki->read_status();
 
 	if (data == 1) // stop?
@@ -515,89 +514,89 @@ static void process_tumbleb2_music_command( okim6295_device *oki, int data )
 		if (BIT(status, 3))
 		{
 			oki->write_command(0x40);       /* Stop playing music */
-			state->m_music_is_playing = 0;
+			m_music_is_playing = 0;
 		}
 	}
 	else
 	{
-		if (state->m_music_is_playing != data)
+		if (m_music_is_playing != data)
 		{
-			state->m_music_is_playing = data;
+			m_music_is_playing = data;
 			oki->write_command(0x40); // stop the current music
 			switch (data)
 			{
 				case 0x04: // map screen
-					state->m_music_bank = 1;
-					state->m_music_command = 0x38;
+					m_music_bank = 1;
+					m_music_command = 0x38;
 					break;
 
 				case 0x05: // america
-					state->m_music_bank = 6;
-					state->m_music_command = 0x38;
+					m_music_bank = 6;
+					m_music_command = 0x38;
 					break;
 
 				case 0x06: // asia
-					state->m_music_bank = 2;
-					state->m_music_command = 0x38;
+					m_music_bank = 2;
+					m_music_command = 0x38;
 					break;
 
 				case 0x07: // africa/egypt -- don't seem to have a tune for this one
-					state->m_music_bank = 4;
-					state->m_music_command = 0x38;
+					m_music_bank = 4;
+					m_music_command = 0x38;
 					break;
 
 				case 0x08: // antartica
-					state->m_music_bank = 3;
-					state->m_music_command = 0x38;
+					m_music_bank = 3;
+					m_music_command = 0x38;
 					break;
 
 				case 0x09: // brazil / south america
-					state->m_music_bank = 4;
-					state->m_music_command = 0x38;
+					m_music_bank = 4;
+					m_music_command = 0x38;
 					break;
 
 				case 0x0a: // japan -- don't seem to have a tune
-					state->m_music_bank = 2;
-					state->m_music_command = 0x38;
+					m_music_bank = 2;
+					m_music_command = 0x38;
 					break;
 
 				case 0x0b: // australia
-					state->m_music_bank = 5;
-					state->m_music_command = 0x38;
+					m_music_bank = 5;
+					m_music_command = 0x38;
 					break;
 
 				case 0x0c: // france/europe
-					state->m_music_bank = 6;
-					state->m_music_command = 0x38;
+					m_music_bank = 6;
+					m_music_command = 0x38;
 					break;
 
 				case 0x0d: // how to play
-					state->m_music_bank = 7;
-					state->m_music_command = 0x38;
+					m_music_bank = 7;
+					m_music_command = 0x38;
 					break;
 
 				case 0x0f: // stage clear
-					state->m_music_bank = 0;
-					state->m_music_command = 0x33;
+					m_music_bank = 0;
+					m_music_command = 0x33;
 					break;
 
 				case 0x10: // boss stage
-					state->m_music_bank = 8;
-					state->m_music_command = 0x38;
+					m_music_bank = 8;
+					m_music_command = 0x38;
 					break;
 
 				case 0x12: // world clear
-					state->m_music_bank = 0;
-					state->m_music_command = 0x34;
+					m_music_bank = 0;
+					m_music_command = 0x34;
 					break;
 
 				default: // anything else..
-					state->m_music_bank = 8;
-					state->m_music_command = 0x38;
+					m_music_bank = 8;
+					m_music_command = 0x38;
 					break;
 			}
 
-			tumbleb2_set_music_bank(oki->machine(), state->m_music_bank);
+			tumbleb2_set_music_bank(m_music_bank);
 			tumbleb2_playmusic(oki);
 		}
 	}
@@ -3192,30 +3191,30 @@ ROM_END
 /******************************************************************************/
 
 #if TUMBLEP_HACK
-void tumblepb_patch_code(running_machine &machine, UINT16 offset)
+void tumbleb_state::tumblepb_patch_code(UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;   // andi.w  #$f3ff, D0
 }
 #endif
 
 
-static void tumblepb_gfx_rearrange(running_machine &machine, int rgn)
+void tumbleb_state::tumblepb_gfx_rearrange(int rgn)
 {
 	UINT8* rom;
 	int len;
 
 	if (rgn == 1)
 	{
-		rom = machine.root_device().memregion("tilegfx")->base();
-		len = machine.root_device().memregion("tilegfx")->bytes();
+		rom = machine().root_device().memregion("tilegfx")->base();
+		len = machine().root_device().memregion("tilegfx")->bytes();
 	}
 	else
 	{
-		rom = machine.root_device().memregion("sprgfx")->base();
-		len = machine.root_device().memregion("sprgfx")->bytes();
+		rom = machine().root_device().memregion("sprgfx")->base();
+		len = machine().root_device().memregion("sprgfx")->bytes();
 	}
 
 	int i;
@@ -3237,25 +3236,25 @@ static void tumblepb_gfx_rearrange(running_machine &machine, int rgn)
 
 DRIVER_INIT_MEMBER(tumbleb_state,tumblepb)
 {
-	tumblepb_gfx_rearrange(machine(), 1);
+	tumblepb_gfx_rearrange(1);
 
 	#if TUMBLEP_HACK
-	tumblepb_patch_code(machine(), 0x000132);
+	tumblepb_patch_code(0x000132);
 	#endif
 }
 
 DRIVER_INIT_MEMBER(tumbleb_state,tumblepba)
 {
 	// rearrange the bg data instead of the sprite data on this one!
-	tumblepb_gfx_rearrange(machine(), 2);
+	tumblepb_gfx_rearrange(2);
 }
 
 DRIVER_INIT_MEMBER(tumbleb_state,tumbleb2)
 {
-	tumblepb_gfx_rearrange(machine(), 1);
+	tumblepb_gfx_rearrange(1);
 
 	#if TUMBLEP_HACK
-	tumblepb_patch_code(machine(), 0x000132);
+	tumblepb_patch_code(0x000132);
 	#endif
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x100000, 0x100001, write16_delegate(FUNC(tumbleb_state::tumbleb2_soundmcu_w),this));
 
@@ -3263,16 +3262,16 @@ DRIVER_INIT_MEMBER(tumbleb_state,tumbleb2)
 
 DRIVER_INIT_MEMBER(tumbleb_state,jumpkids)
 {
-	tumblepb_gfx_rearrange(machine(), 1);
+	tumblepb_gfx_rearrange(1);
 
 	#if TUMBLEP_HACK
-	tumblepb_patch_code(machine(), 0x00013a);
+	tumblepb_patch_code(0x00013a);
 	#endif
 }
 
 DRIVER_INIT_MEMBER(tumbleb_state,fncywld)
 {
-	tumblepb_gfx_rearrange(machine(), 1);
+	tumblepb_gfx_rearrange(1);
 
 	#if FNCYWLD_HACK
 	/* This is a hack to allow you to use the extra features
@@ -3294,7 +3293,7 @@ READ16_MEMBER(tumbleb_state::bcstory_1a0_read)
 
 DRIVER_INIT_MEMBER(tumbleb_state,bcstory)
 {
-	tumblepb_gfx_rearrange(machine(), 1);
+	tumblepb_gfx_rearrange(1);
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x180008, 0x180009, read16_delegate(FUNC(tumbleb_state::bcstory_1a0_read),this)); // io should be here??
 }
 
@@ -3308,15 +3307,15 @@ DRIVER_INIT_MEMBER(tumbleb_state,htchctch)
 	for (i = 0; i < len / 2; i++)
 		m_mainram[0x000/2 + i] = PROTDATA[i];
 
-	tumblepb_gfx_rearrange(machine(), 1);
+	tumblepb_gfx_rearrange(1);
 
 }
 
 
-static void suprtrio_decrypt_code(running_machine &machine)
+void tumbleb_state::suprtrio_decrypt_code()
 {
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
-	UINT16 *buf = auto_alloc_array(machine, UINT16, 0x80000/2);
+	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *buf = auto_alloc_array(machine(), UINT16, 0x80000/2);
 	int i;
 
 	/* decrypt main ROMs */
@@ -3328,13 +3327,13 @@ static void suprtrio_decrypt_code(running_machine &machine)
 		if ((i & 3) == 0) j ^= 0x08;
 		rom[i] = buf[j];
 	}
-	auto_free(machine, buf);
+	auto_free(machine(), buf);
 }
 
-static void suprtrio_decrypt_gfx(running_machine &machine)
+void tumbleb_state::suprtrio_decrypt_gfx()
 {
-	UINT16 *rom = (UINT16 *)machine.root_device().memregion("tilegfx")->base();
-	UINT16 *buf = auto_alloc_array(machine, UINT16, 0x100000/2);
+	UINT16 *rom = (UINT16 *)machine().root_device().memregion("tilegfx")->base();
+	UINT16 *buf = auto_alloc_array(machine(), UINT16, 0x100000/2);
 	int i;
 
 	/* decrypt tiles */
@@ -3345,13 +3344,13 @@ static void suprtrio_decrypt_gfx(running_machine &machine)
 		if (i & 1) j ^= 0x04;
 		rom[i] = buf[j];
 	}
-	auto_free(machine, buf);
+	auto_free(machine(), buf);
 }
 
 DRIVER_INIT_MEMBER(tumbleb_state,suprtrio)
 {
-	suprtrio_decrypt_code(machine());
-	suprtrio_decrypt_gfx(machine());
+	suprtrio_decrypt_code();
+	suprtrio_decrypt_gfx();
 }
 
 DRIVER_INIT_MEMBER(tumbleb_state,chokchok)
@@ -3367,7 +3366,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,chokchok)
 
 DRIVER_INIT_MEMBER(tumbleb_state,wlstar)
 {
-	tumblepb_gfx_rearrange(machine(), 1);
+	tumblepb_gfx_rearrange(1);
 
 	/* slightly different banking */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x100002, 0x100003, write16_delegate(FUNC(tumbleb_state::wlstar_tilebank_w),this));
@@ -3383,7 +3382,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,wondl96)
 
 DRIVER_INIT_MEMBER(tumbleb_state,dquizgo)
 {
-	tumblepb_gfx_rearrange(machine(), 1);
+	tumblepb_gfx_rearrange(1);
 }
 
 

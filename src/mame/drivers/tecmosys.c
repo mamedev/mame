@@ -628,10 +628,10 @@ ROM_START( tkdenshoa )
 	ROM_LOAD( "ae500w07.ad1", 0x080000, 0x080000, CRC(3734f92c) SHA1(048555b5aa89eaf983305c439ba08d32b4a1bb80) )
 ROM_END
 
-static void tecmosys_descramble(running_machine &machine)
+void tecmosys_state::tecmosys_descramble()
 {
-	UINT8 *gfxsrc  = machine.root_device().memregion( "gfx1" )->base();
-	size_t srcsize = machine.root_device().memregion( "gfx1" )->bytes();
+	UINT8 *gfxsrc  = machine().root_device().memregion( "gfx1" )->base();
+	size_t srcsize = machine().root_device().memregion( "gfx1" )->bytes();
 	int i;
 
 	for (i=0; i < srcsize; i+=4)
@@ -652,19 +652,19 @@ static void tecmosys_descramble(running_machine &machine)
 
 DRIVER_INIT_MEMBER(tecmosys_state,deroon)
 {
-	tecmosys_descramble(machine());
+	tecmosys_descramble();
 	tecmosys_prot_init(0); // machine/tecmosys.c
 }
 
 DRIVER_INIT_MEMBER(tecmosys_state,tkdensho)
 {
-	tecmosys_descramble(machine());
+	tecmosys_descramble();
 	tecmosys_prot_init(1);
 }
 
 DRIVER_INIT_MEMBER(tecmosys_state,tkdensha)
 {
-	tecmosys_descramble(machine());
+	tecmosys_descramble();
 	tecmosys_prot_init(2);
 }
 

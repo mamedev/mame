@@ -136,14 +136,13 @@ WRITE16_MEMBER(tail2nos_state::tail2nos_gfxbank_w)
 
 ***************************************************************************/
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void tail2nos_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	tail2nos_state *state = machine.driver_data<tail2nos_state>();
-	UINT16 *spriteram = state->m_spriteram;
+	UINT16 *spriteram = m_spriteram;
 	int offs;
 
 
-	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
 	{
 		int sx, sy, flipx, flipy, code, color;
 
@@ -159,7 +158,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		flipy = spriteram[offs + 2] & 0x0800;
 
 		drawgfx_transpen(bitmap,/* placement relative to zoom layer verified on the real thing */
-				cliprect,machine.gfx[1],
+				cliprect,machine().gfx[1],
 				code,
 				40 + color,
 				flipx,flipy,
@@ -172,7 +171,7 @@ UINT32 tail2nos_state::screen_update_tail2nos(screen_device &screen, bitmap_ind1
 	if (m_video_enable)
 	{
 		k051316_zoom_draw(m_k051316, bitmap, cliprect, 0, 0);
-		draw_sprites(machine(), bitmap, cliprect);
+		draw_sprites(bitmap, cliprect);
 		m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else

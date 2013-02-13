@@ -1268,40 +1268,39 @@ TIMER_CALLBACK_MEMBER(tetrisp2_state::rockn_timer_sub_level1_callback)
 	machine().device("sub")->execute().set_input_line(1, HOLD_LINE);
 }
 
-static void init_rockn_timer(running_machine &machine)
+void tetrisp2_state::init_rockn_timer()
 {
-	tetrisp2_state *state = machine.driver_data<tetrisp2_state>();
-	machine.scheduler().timer_pulse(attotime::from_msec(32), timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level1_callback),state));
-	state->m_rockn_timer_l4 = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level4_callback),state));
+	machine().scheduler().timer_pulse(attotime::from_msec(32), timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level1_callback),this));
+	m_rockn_timer_l4 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_level4_callback),this));
 
-	state_save_register_global_array(machine, state->m_systemregs);
-	state_save_register_global_array(machine, state->m_rocknms_sub_systemregs);
-	state_save_register_global(machine, state->m_rockn_protectdata);
-	state_save_register_global(machine, state->m_rockn_adpcmbank);
-	state_save_register_global(machine, state->m_rockn_soundvolume);
+	state_save_register_global_array(machine(), m_systemregs);
+	state_save_register_global_array(machine(), m_rocknms_sub_systemregs);
+	state_save_register_global(machine(), m_rockn_protectdata);
+	state_save_register_global(machine(), m_rockn_adpcmbank);
+	state_save_register_global(machine(), m_rockn_soundvolume);
 }
 
 DRIVER_INIT_MEMBER(tetrisp2_state,rockn)
 {
-	init_rockn_timer(machine());
+	init_rockn_timer();
 	m_rockn_protectdata = 1;
 }
 
 DRIVER_INIT_MEMBER(tetrisp2_state,rockn1)
 {
-	init_rockn_timer(machine());
+	init_rockn_timer();
 	m_rockn_protectdata = 1;
 }
 
 DRIVER_INIT_MEMBER(tetrisp2_state,rockn2)
 {
-	init_rockn_timer(machine());
+	init_rockn_timer();
 	m_rockn_protectdata = 2;
 }
 
 DRIVER_INIT_MEMBER(tetrisp2_state,rocknms)
 {
-	init_rockn_timer(machine());
+	init_rockn_timer();
 
 	machine().scheduler().timer_pulse(attotime::from_msec(32), timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_sub_level1_callback),this));
 	m_rockn_timer_sub_l4 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tetrisp2_state::rockn_timer_sub_level4_callback),this));
@@ -1312,13 +1311,13 @@ DRIVER_INIT_MEMBER(tetrisp2_state,rocknms)
 
 DRIVER_INIT_MEMBER(tetrisp2_state,rockn3)
 {
-	init_rockn_timer(machine());
+	init_rockn_timer();
 	m_rockn_protectdata = 4;
 }
 
 DRIVER_INIT_MEMBER(stepstag_state,stepstag)
 {
-	init_rockn_timer(machine());        // used
+	init_rockn_timer();        // used
 	m_rockn_protectdata = 1;    // unused?
 }
 

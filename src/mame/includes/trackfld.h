@@ -69,4 +69,5 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 	INTERRUPT_GEN_MEMBER(yieartf_timer_irq);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

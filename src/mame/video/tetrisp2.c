@@ -790,7 +790,7 @@ UINT32 stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitmap_
 }
 
 // scrambled palettes?
-static inline int mypal(int x)
+inline int stepstag_state::mypal(int x)
 {
 //  return pal5bit(x >> 3);
 	return pal5bit((x^0xff) >> 3);

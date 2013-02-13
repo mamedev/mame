@@ -206,81 +206,76 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf4_tile_info)
 
 ***************************************************************************/
 
-static void toaplan1_create_tilemaps(running_machine &machine)
+void toaplan1_state::toaplan1_create_tilemaps()
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->m_pf1_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf1_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_pf2_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf2_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_pf3_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf3_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
-	state->m_pf4_tilemap = &machine.tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf4_tile_info),state), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pf1_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf1_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pf2_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf2_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pf3_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf3_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
+	m_pf4_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(toaplan1_state::get_pf4_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
-	state->m_pf1_tilemap->set_transparent_pen(0);
-	state->m_pf2_tilemap->set_transparent_pen(0);
-	state->m_pf3_tilemap->set_transparent_pen(0);
-	state->m_pf4_tilemap->set_transparent_pen(0);
+	m_pf1_tilemap->set_transparent_pen(0);
+	m_pf2_tilemap->set_transparent_pen(0);
+	m_pf3_tilemap->set_transparent_pen(0);
+	m_pf4_tilemap->set_transparent_pen(0);
 
-	memset(state->m_empty_tile, 0x00, sizeof(state->m_empty_tile));
+	memset(m_empty_tile, 0x00, sizeof(m_empty_tile));
 }
 
 
-static void toaplan1_paletteram_alloc(running_machine &machine)
+void toaplan1_state::toaplan1_paletteram_alloc()
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	UINT32 bytes = (state->m_colorram1.bytes() + state->m_colorram2.bytes())/2;
-	state->m_generic_paletteram_16.allocate(bytes);
+	UINT32 bytes = (m_colorram1.bytes() + m_colorram2.bytes())/2;
+	m_generic_paletteram_16.allocate(bytes);
 }
 
-static void toaplan1_vram_alloc(running_machine &machine)
+void toaplan1_state::toaplan1_vram_alloc()
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->m_pf1_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state->m_pf2_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state->m_pf3_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
-	state->m_pf4_tilevram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
+	m_pf1_tilevram16 = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
+	m_pf2_tilevram16 = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
+	m_pf3_tilevram16 = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
+	m_pf4_tilevram16 = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_TILEVRAM_SIZE/2);
 
-	state->save_pointer(NAME(state->m_pf1_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
-	state->save_pointer(NAME(state->m_pf2_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
-	state->save_pointer(NAME(state->m_pf3_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
-	state->save_pointer(NAME(state->m_pf4_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
+	save_pointer(NAME(m_pf1_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
+	save_pointer(NAME(m_pf2_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
+	save_pointer(NAME(m_pf3_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
+	save_pointer(NAME(m_pf4_tilevram16), TOAPLAN1_TILEVRAM_SIZE/2);
 
 #ifdef MAME_DEBUG
-	state->m_display_pf1 = 1;
-	state->m_display_pf2 = 1;
-	state->m_display_pf3 = 1;
-	state->m_display_pf4 = 1;
-	state->m_displog = 0;
+	m_display_pf1 = 1;
+	m_display_pf2 = 1;
+	m_display_pf3 = 1;
+	m_display_pf4 = 1;
+	m_displog = 0;
 #endif
 }
 
-static void toaplan1_spritevram_alloc(running_machine &machine)
+void toaplan1_state::toaplan1_spritevram_alloc()
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->m_spriteram.allocate(TOAPLAN1_SPRITERAM_SIZE/2);
-	state->m_buffered_spriteram = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITERAM_SIZE/2);
-	state->m_spritesizeram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
-	state->m_buffered_spritesizeram16 = auto_alloc_array_clear(machine, UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	m_spriteram.allocate(TOAPLAN1_SPRITERAM_SIZE/2);
+	m_buffered_spriteram = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_SPRITERAM_SIZE/2);
+	m_spritesizeram16 = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	m_buffered_spritesizeram16 = auto_alloc_array_clear(machine(), UINT16, TOAPLAN1_SPRITESIZERAM_SIZE/2);
 
-	state->save_pointer(NAME(state->m_buffered_spriteram), TOAPLAN1_SPRITERAM_SIZE/2);
-	state->save_pointer(NAME(state->m_spritesizeram16), TOAPLAN1_SPRITESIZERAM_SIZE/2);
-	state->save_pointer(NAME(state->m_buffered_spritesizeram16), TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	save_pointer(NAME(m_buffered_spriteram), TOAPLAN1_SPRITERAM_SIZE/2);
+	save_pointer(NAME(m_spritesizeram16), TOAPLAN1_SPRITESIZERAM_SIZE/2);
+	save_pointer(NAME(m_buffered_spritesizeram16), TOAPLAN1_SPRITESIZERAM_SIZE/2);
 }
 
-static void toaplan1_set_scrolls(running_machine &machine)
+void toaplan1_state::toaplan1_set_scrolls()
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->m_pf1_tilemap->set_scrollx(0, (state->m_pf1_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs1));
-	state->m_pf2_tilemap->set_scrollx(0, (state->m_pf2_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs2));
-	state->m_pf3_tilemap->set_scrollx(0, (state->m_pf3_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs3));
-	state->m_pf4_tilemap->set_scrollx(0, (state->m_pf4_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs4));
-	state->m_pf1_tilemap->set_scrolly(0, (state->m_pf1_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
-	state->m_pf2_tilemap->set_scrolly(0, (state->m_pf2_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
-	state->m_pf3_tilemap->set_scrolly(0, (state->m_pf3_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
-	state->m_pf4_tilemap->set_scrolly(0, (state->m_pf4_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
+	m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs1));
+	m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs2));
+	m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs3));
+	m_pf4_tilemap->set_scrollx(0, (m_pf4_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs4));
+	m_pf1_tilemap->set_scrolly(0, (m_pf1_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+	m_pf2_tilemap->set_scrolly(0, (m_pf2_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+	m_pf3_tilemap->set_scrolly(0, (m_pf3_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+	m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
 }
 
 void toaplan1_state::rallybik_flipscreen()
@@ -297,41 +292,40 @@ void toaplan1_state::toaplan1_flipscreen()
 	toaplan1_bcu_flipscreen_w(space, 0, m_bcu_flipscreen, 0xffff);
 }
 
-static void register_common(running_machine &machine)
+void toaplan1_state::register_common()
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	state->save_item(NAME(state->m_scrollx_offs1));
-	state->save_item(NAME(state->m_scrollx_offs2));
-	state->save_item(NAME(state->m_scrollx_offs3));
-	state->save_item(NAME(state->m_scrollx_offs4));
-	state->save_item(NAME(state->m_scrolly_offs));
+	save_item(NAME(m_scrollx_offs1));
+	save_item(NAME(m_scrollx_offs2));
+	save_item(NAME(m_scrollx_offs3));
+	save_item(NAME(m_scrollx_offs4));
+	save_item(NAME(m_scrolly_offs));
 
-	state->save_item(NAME(state->m_bcu_flipscreen));
-	state->save_item(NAME(state->m_fcu_flipscreen));
-	state->save_item(NAME(state->m_reset));
+	save_item(NAME(m_bcu_flipscreen));
+	save_item(NAME(m_fcu_flipscreen));
+	save_item(NAME(m_reset));
 
-	state->save_item(NAME(state->m_pf1_scrollx));
-	state->save_item(NAME(state->m_pf1_scrolly));
-	state->save_item(NAME(state->m_pf2_scrollx));
-	state->save_item(NAME(state->m_pf2_scrolly));
-	state->save_item(NAME(state->m_pf3_scrollx));
-	state->save_item(NAME(state->m_pf3_scrolly));
-	state->save_item(NAME(state->m_pf4_scrollx));
-	state->save_item(NAME(state->m_pf4_scrolly));
+	save_item(NAME(m_pf1_scrollx));
+	save_item(NAME(m_pf1_scrolly));
+	save_item(NAME(m_pf2_scrollx));
+	save_item(NAME(m_pf2_scrolly));
+	save_item(NAME(m_pf3_scrollx));
+	save_item(NAME(m_pf3_scrolly));
+	save_item(NAME(m_pf4_scrollx));
+	save_item(NAME(m_pf4_scrolly));
 
-	state->save_item(NAME(state->m_tiles_offsetx));
-	state->save_item(NAME(state->m_tiles_offsety));
-	state->save_item(NAME(state->m_pf_voffs));
-	state->save_item(NAME(state->m_spriteram_offs));
+	save_item(NAME(m_tiles_offsetx));
+	save_item(NAME(m_tiles_offsety));
+	save_item(NAME(m_pf_voffs));
+	save_item(NAME(m_spriteram_offs));
 }
 
 
 VIDEO_START_MEMBER(toaplan1_state,rallybik)
 {
-	toaplan1_create_tilemaps(machine());
-	toaplan1_paletteram_alloc(machine());
-	toaplan1_vram_alloc(machine());
+	toaplan1_create_tilemaps();
+	toaplan1_paletteram_alloc();
+	toaplan1_vram_alloc();
 
 	m_buffered_spriteram = auto_alloc_array_clear(machine(), UINT16, m_spriteram.bytes()/2);
 	save_pointer(NAME(m_buffered_spriteram), m_spriteram.bytes()/2);
@@ -346,17 +340,17 @@ VIDEO_START_MEMBER(toaplan1_state,rallybik)
 	m_fcu_flipscreen = 0;
 	m_reset = 0;
 
-	register_common(machine());
+	register_common();
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::rallybik_flipscreen), this));
 }
 
 VIDEO_START_MEMBER(toaplan1_state,toaplan1)
 {
-	toaplan1_create_tilemaps(machine());
-	toaplan1_paletteram_alloc(machine());
-	toaplan1_vram_alloc(machine());
-	toaplan1_spritevram_alloc(machine());
+	toaplan1_create_tilemaps();
+	toaplan1_paletteram_alloc();
+	toaplan1_vram_alloc();
+	toaplan1_spritevram_alloc();
 
 	m_scrollx_offs1 = 0x1ef + 6;
 	m_scrollx_offs2 = 0x1ef + 4;
@@ -368,7 +362,7 @@ VIDEO_START_MEMBER(toaplan1_state,toaplan1)
 	m_fcu_flipscreen = 0;
 	m_reset = 1;
 
-	register_common(machine());
+	register_common();
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::toaplan1_flipscreen), this));
 }
@@ -398,7 +392,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_tile_offsets_w)
 		logerror("Tiles_offsety now = %08x\n", m_tiles_offsety);
 	}
 	m_reset = 1;
-	toaplan1_set_scrolls(machine());
+	toaplan1_set_scrolls();
 }
 
 WRITE16_MEMBER(toaplan1_state::rallybik_bcu_flipscreen_w)
@@ -424,7 +418,7 @@ WRITE16_MEMBER(toaplan1_state::rallybik_bcu_flipscreen_w)
 			m_scrollx_offs4 = 0x00d + 0;
 			m_scrolly_offs  = 0x111;
 		}
-		toaplan1_set_scrolls(machine());
+		toaplan1_set_scrolls();
 	}
 }
 
@@ -454,7 +448,7 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_bcu_flipscreen_w)
 			m_scrollx_offs4 = 0x1ef + 0;
 			m_scrolly_offs  = 0x101;
 		}
-		toaplan1_set_scrolls(machine());
+		toaplan1_set_scrolls();
 	}
 }
 
@@ -706,26 +700,25 @@ WRITE16_MEMBER(toaplan1_state::toaplan1_scroll_regs_w)
 
 
 
-static void toaplan1_log_vram(running_machine &machine)
+void toaplan1_state::toaplan1_log_vram()
 {
 #ifdef MAME_DEBUG
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	if ( machine.input().code_pressed(KEYCODE_M) )
+	if ( machine().input().code_pressed(KEYCODE_M) )
 	{
-		UINT16 *spriteram16 = state->m_spriteram;
-		UINT16 *buffered_spriteram16 = state->m_buffered_spriteram;
+		UINT16 *spriteram16 = m_spriteram;
+		UINT16 *buffered_spriteram16 = m_buffered_spriteram;
 		offs_t sprite_voffs;
-		while (machine.input().code_pressed(KEYCODE_M)) ;
-		if (state->m_spritesizeram16)           /* FCU controller */
+		while (machine().input().code_pressed(KEYCODE_M)) ;
+		if (m_spritesizeram16)           /* FCU controller */
 		{
 			int schar,sattr,sxpos,sypos,bschar,bsattr,bsxpos,bsypos;
-			UINT16 *size  = (UINT16 *)(state->m_spritesizeram16);
-			UINT16 *bsize = (UINT16 *)(state->m_buffered_spritesizeram16);
+			UINT16 *size  = (UINT16 *)(m_spritesizeram16);
+			UINT16 *bsize = (UINT16 *)(m_buffered_spritesizeram16);
 			logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 			logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
-				state->m_pf1_scrollx, state->m_pf1_scrolly, state->m_pf2_scrollx, state->m_pf2_scrolly, state->m_pf3_scrollx, state->m_pf3_scrolly, state->m_pf4_scrollx, state->m_pf4_scrolly);
-			for ( sprite_voffs = 0; sprite_voffs < state->m_spriteram.bytes()/2; sprite_voffs += 4 )
+				m_pf1_scrollx, m_pf1_scrolly, m_pf2_scrollx, m_pf2_scrolly, m_pf3_scrollx, m_pf3_scrolly, m_pf4_scrollx, m_pf4_scrolly);
+			for ( sprite_voffs = 0; sprite_voffs < m_spriteram.bytes()/2; sprite_voffs += 4 )
 			{
 				bschar = buffered_spriteram16[sprite_voffs];
 				bsattr = buffered_spriteram16[sprite_voffs + 1];
@@ -745,8 +738,8 @@ static void toaplan1_log_vram(running_machine &machine)
 			int schar,sattr,sxpos,sypos,bschar,bsattr,bsxpos,bsypos;
 			logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 			logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
-				state->m_pf1_scrollx, state->m_pf1_scrolly, state->m_pf2_scrollx, state->m_pf2_scrolly, state->m_pf3_scrollx, state->m_pf3_scrolly, state->m_pf4_scrollx, state->m_pf4_scrolly);
-			for ( sprite_voffs = 0; sprite_voffs < state->m_spriteram.bytes()/2; sprite_voffs += 4 )
+				m_pf1_scrollx, m_pf1_scrolly, m_pf2_scrollx, m_pf2_scrolly, m_pf3_scrollx, m_pf3_scrolly, m_pf4_scrollx, m_pf4_scrolly);
+			for ( sprite_voffs = 0; sprite_voffs < m_spriteram.bytes()/2; sprite_voffs += 4 )
 			{
 				bschar = buffered_spriteram16[sprite_voffs];
 				bsattr = buffered_spriteram16[sprite_voffs + 1];
@@ -763,17 +756,17 @@ static void toaplan1_log_vram(running_machine &machine)
 		}
 	}
 
-	if ( machine.input().code_pressed(KEYCODE_SLASH) )
+	if ( machine().input().code_pressed(KEYCODE_SLASH) )
 	{
-		UINT16 *size  = (UINT16 *)(state->m_spritesizeram16);
-		UINT16 *bsize = (UINT16 *)(state->m_buffered_spritesizeram16);
+		UINT16 *size  = (UINT16 *)(m_spritesizeram16);
+		UINT16 *bsize = (UINT16 *)(m_buffered_spritesizeram16);
 		offs_t offs;
-		while (machine.input().code_pressed(KEYCODE_SLASH)) ;
-		if (state->m_spritesizeram16)           /* FCU controller */
+		while (machine().input().code_pressed(KEYCODE_SLASH)) ;
+		if (m_spritesizeram16)           /* FCU controller */
 		{
 			logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 			logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
-				state->m_pf1_scrollx, state->m_pf1_scrolly, state->m_pf2_scrollx, state->m_pf2_scrolly, state->m_pf3_scrollx, state->m_pf3_scrolly, state->m_pf4_scrollx, state->m_pf4_scrolly);
+				m_pf1_scrollx, m_pf1_scrolly, m_pf2_scrollx, m_pf2_scrolly, m_pf3_scrollx, m_pf3_scrolly, m_pf4_scrollx, m_pf4_scrolly);
 			for ( offs = 0; offs < (TOAPLAN1_SPRITESIZERAM_SIZE/2); offs +=4 )
 			{
 				logerror("SizeOffs:%04x   now:%04x %04x %04x %04x    next: %04x %04x %04x %04x\n", offs,
@@ -785,24 +778,24 @@ static void toaplan1_log_vram(running_machine &machine)
 		}
 	}
 
-	if ( machine.input().code_pressed(KEYCODE_N) )
+	if ( machine().input().code_pressed(KEYCODE_N) )
 	{
 		offs_t tile_voffs;
 		int tchar[5], tattr[5];
-		while (machine.input().code_pressed(KEYCODE_N)) ;   /* BCU controller */
+		while (machine().input().code_pressed(KEYCODE_N)) ;   /* BCU controller */
 		logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 		logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
-			state->m_pf1_scrollx, state->m_pf1_scrolly, state->m_pf2_scrollx, state->m_pf2_scrolly, state->m_pf3_scrollx, state->m_pf3_scrolly, state->m_pf4_scrollx, state->m_pf4_scrolly);
+			m_pf1_scrollx, m_pf1_scrolly, m_pf2_scrollx, m_pf2_scrolly, m_pf3_scrollx, m_pf3_scrolly, m_pf4_scrollx, m_pf4_scrolly);
 		for ( tile_voffs = 0; tile_voffs < (TOAPLAN1_TILEVRAM_SIZE/2); tile_voffs += 2 )
 		{
-			tchar[1] = state->m_pf1_tilevram16[tile_voffs + 1];
-			tattr[1] = state->m_pf1_tilevram16[tile_voffs];
-			tchar[2] = state->m_pf2_tilevram16[tile_voffs + 1];
-			tattr[2] = state->m_pf2_tilevram16[tile_voffs];
-			tchar[3] = state->m_pf3_tilevram16[tile_voffs + 1];
-			tattr[3] = state->m_pf3_tilevram16[tile_voffs];
-			tchar[4] = state->m_pf4_tilevram16[tile_voffs + 1];
-			tattr[4] = state->m_pf4_tilevram16[tile_voffs];
+			tchar[1] = m_pf1_tilevram16[tile_voffs + 1];
+			tattr[1] = m_pf1_tilevram16[tile_voffs];
+			tchar[2] = m_pf2_tilevram16[tile_voffs + 1];
+			tattr[2] = m_pf2_tilevram16[tile_voffs];
+			tchar[3] = m_pf3_tilevram16[tile_voffs + 1];
+			tattr[3] = m_pf3_tilevram16[tile_voffs];
+			tchar[4] = m_pf4_tilevram16[tile_voffs + 1];
+			tattr[4] = m_pf4_tilevram16[tile_voffs];
 //          logerror("PF3 offs:%04x   Tile:%04x  Attr:%04x\n", tile_voffs, tchar, tattr);
 			logerror("$(%04x)  Attr-Tile PF1:%04x-%04x  PF2:%04x-%04x  PF3:%04x-%04x  PF4:%04x-%04x\n", tile_voffs,
 									tattr[1], tchar[1],  tattr[2], tchar[2],
@@ -810,91 +803,91 @@ static void toaplan1_log_vram(running_machine &machine)
 		}
 	}
 
-	if ( machine.input().code_pressed(KEYCODE_W) )
+	if ( machine().input().code_pressed(KEYCODE_W) )
 	{
-		while (machine.input().code_pressed(KEYCODE_W)) ;
+		while (machine().input().code_pressed(KEYCODE_W)) ;
 		logerror("Mark here\n");
 	}
-	if ( machine.input().code_pressed(KEYCODE_E) )
+	if ( machine().input().code_pressed(KEYCODE_E) )
 	{
-		while (machine.input().code_pressed(KEYCODE_E)) ;
-		state->m_displog += 1;
-		state->m_displog &= 1;
+		while (machine().input().code_pressed(KEYCODE_E)) ;
+		m_displog += 1;
+		m_displog &= 1;
 	}
-	if (state->m_displog)
+	if (m_displog)
 	{
 		logerror("Scrolls    PF1-X  PF1-Y     PF2-X  PF2-Y     PF3-X  PF3-Y     PF4-X  PF4-Y\n");
 		logerror("------>    #%04x  #%04x     #%04x  #%04x     #%04x  #%04x     #%04x  #%04x\n",
-			state->m_pf1_scrollx, state->m_pf1_scrolly, state->m_pf2_scrollx, state->m_pf2_scrolly, state->m_pf3_scrollx, state->m_pf3_scrolly, state->m_pf4_scrollx, state->m_pf4_scrolly);
+			m_pf1_scrollx, m_pf1_scrolly, m_pf2_scrollx, m_pf2_scrolly, m_pf3_scrollx, m_pf3_scrolly, m_pf4_scrollx, m_pf4_scrolly);
 	}
-	if ( machine.input().code_pressed(KEYCODE_B) )
+	if ( machine().input().code_pressed(KEYCODE_B) )
 	{
-//      while (machine.input().code_pressed(KEYCODE_B)) ;
-		state->m_scrollx_offs1 += 0x1; state->m_scrollx_offs2 += 0x1; state->m_scrollx_offs3 += 0x1; state->m_scrollx_offs4 += 0x1;
-		logerror("Scrollx_offs now = %08x\n", state->m_scrollx_offs4);
-		state->m_pf1_tilemap->set_scrollx(0, (state->m_pf1_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs1));
-		state->m_pf2_tilemap->set_scrollx(0, (state->m_pf2_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs2));
-		state->m_pf3_tilemap->set_scrollx(0, (state->m_pf3_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs3));
-		state->m_pf4_tilemap->set_scrollx(0, (state->m_pf4_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs4));
+//      while (machine().input().code_pressed(KEYCODE_B)) ;
+		m_scrollx_offs1 += 0x1; m_scrollx_offs2 += 0x1; m_scrollx_offs3 += 0x1; m_scrollx_offs4 += 0x1;
+		logerror("Scrollx_offs now = %08x\n", m_scrollx_offs4);
+		m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs1));
+		m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs2));
+		m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs3));
+		m_pf4_tilemap->set_scrollx(0, (m_pf4_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs4));
 	}
-	if ( machine.input().code_pressed(KEYCODE_V) )
+	if ( machine().input().code_pressed(KEYCODE_V) )
 	{
-//      while (machine.input().code_pressed(KEYCODE_V)) ;
-		state->m_scrollx_offs1 -= 0x1; state->m_scrollx_offs2 -= 0x1; state->m_scrollx_offs3 -= 0x1; state->m_scrollx_offs4 -= 0x1;
-		logerror("Scrollx_offs now = %08x\n", state->m_scrollx_offs4);
-		state->m_pf1_tilemap->set_scrollx(0, (state->m_pf1_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs1));
-		state->m_pf2_tilemap->set_scrollx(0, (state->m_pf2_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs2));
-		state->m_pf3_tilemap->set_scrollx(0, (state->m_pf3_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs3));
-		state->m_pf4_tilemap->set_scrollx(0, (state->m_pf4_scrollx >> 7) - (state->m_tiles_offsetx - state->m_scrollx_offs4));
+//      while (machine().input().code_pressed(KEYCODE_V)) ;
+		m_scrollx_offs1 -= 0x1; m_scrollx_offs2 -= 0x1; m_scrollx_offs3 -= 0x1; m_scrollx_offs4 -= 0x1;
+		logerror("Scrollx_offs now = %08x\n", m_scrollx_offs4);
+		m_pf1_tilemap->set_scrollx(0, (m_pf1_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs1));
+		m_pf2_tilemap->set_scrollx(0, (m_pf2_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs2));
+		m_pf3_tilemap->set_scrollx(0, (m_pf3_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs3));
+		m_pf4_tilemap->set_scrollx(0, (m_pf4_scrollx >> 7) - (m_tiles_offsetx - m_scrollx_offs4));
 	}
-	if ( machine.input().code_pressed(KEYCODE_C) )
+	if ( machine().input().code_pressed(KEYCODE_C) )
 	{
-//      while (machine.input().code_pressed(KEYCODE_C)) ;
-		state->m_scrolly_offs += 0x1;
-		logerror("Scrolly_offs now = %08x\n", state->m_scrolly_offs);
-		state->m_pf1_tilemap->set_scrolly(0, (state->m_pf1_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
-		state->m_pf2_tilemap->set_scrolly(0, (state->m_pf2_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
-		state->m_pf3_tilemap->set_scrolly(0, (state->m_pf3_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
-		state->m_pf4_tilemap->set_scrolly(0, (state->m_pf4_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
+//      while (machine().input().code_pressed(KEYCODE_C)) ;
+		m_scrolly_offs += 0x1;
+		logerror("Scrolly_offs now = %08x\n", m_scrolly_offs);
+		m_pf1_tilemap->set_scrolly(0, (m_pf1_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+		m_pf2_tilemap->set_scrolly(0, (m_pf2_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+		m_pf3_tilemap->set_scrolly(0, (m_pf3_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+		m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
 	}
-	if ( machine.input().code_pressed(KEYCODE_X) )
+	if ( machine().input().code_pressed(KEYCODE_X) )
 	{
-//      while (machine.input().code_pressed(KEYCODE_X)) ;
-		state->m_scrolly_offs -= 0x1;
-		logerror("Scrolly_offs now = %08x\n", state->m_scrolly_offs);
-		state->m_pf1_tilemap->set_scrolly(0, (state->m_pf1_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
-		state->m_pf2_tilemap->set_scrolly(0, (state->m_pf2_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
-		state->m_pf3_tilemap->set_scrolly(0, (state->m_pf3_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
-		state->m_pf4_tilemap->set_scrolly(0, (state->m_pf4_scrolly >> 7) - (state->m_tiles_offsety - state->m_scrolly_offs));
+//      while (machine().input().code_pressed(KEYCODE_X)) ;
+		m_scrolly_offs -= 0x1;
+		logerror("Scrolly_offs now = %08x\n", m_scrolly_offs);
+		m_pf1_tilemap->set_scrolly(0, (m_pf1_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+		m_pf2_tilemap->set_scrolly(0, (m_pf2_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+		m_pf3_tilemap->set_scrolly(0, (m_pf3_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
+		m_pf4_tilemap->set_scrolly(0, (m_pf4_scrolly >> 7) - (m_tiles_offsety - m_scrolly_offs));
 	}
 
-	if ( machine.input().code_pressed(KEYCODE_L) )      /* Turn Playfield 4 on/off */
+	if ( machine().input().code_pressed(KEYCODE_L) )      /* Turn Playfield 4 on/off */
 	{
-		while (machine.input().code_pressed(KEYCODE_L)) ;
-		state->m_display_pf4 += 1;
-		state->m_display_pf4 &= 1;
-		state->m_pf4_tilemap->enable(state->m_display_pf4);
+		while (machine().input().code_pressed(KEYCODE_L)) ;
+		m_display_pf4 += 1;
+		m_display_pf4 &= 1;
+		m_pf4_tilemap->enable(m_display_pf4);
 	}
-	if ( machine.input().code_pressed(KEYCODE_K) )      /* Turn Playfield 3 on/off */
+	if ( machine().input().code_pressed(KEYCODE_K) )      /* Turn Playfield 3 on/off */
 	{
-		while (machine.input().code_pressed(KEYCODE_K)) ;
-		state->m_display_pf3 += 1;
-		state->m_display_pf3 &= 1;
-		state->m_pf3_tilemap->enable(state->m_display_pf3);
+		while (machine().input().code_pressed(KEYCODE_K)) ;
+		m_display_pf3 += 1;
+		m_display_pf3 &= 1;
+		m_pf3_tilemap->enable(m_display_pf3);
 	}
-	if ( machine.input().code_pressed(KEYCODE_J) )      /* Turn Playfield 2 on/off */
+	if ( machine().input().code_pressed(KEYCODE_J) )      /* Turn Playfield 2 on/off */
 	{
-		while (machine.input().code_pressed(KEYCODE_J)) ;
-		state->m_display_pf2 += 1;
-		state->m_display_pf2 &= 1;
-		state->m_pf2_tilemap->enable(state->m_display_pf2);
+		while (machine().input().code_pressed(KEYCODE_J)) ;
+		m_display_pf2 += 1;
+		m_display_pf2 &= 1;
+		m_pf2_tilemap->enable(m_display_pf2);
 	}
-	if ( machine.input().code_pressed(KEYCODE_H) )      /* Turn Playfield 1 on/off */
+	if ( machine().input().code_pressed(KEYCODE_H) )      /* Turn Playfield 1 on/off */
 	{
-		while (machine.input().code_pressed(KEYCODE_H)) ;
-		state->m_display_pf1 += 1;
-		state->m_display_pf1 &= 1;
-		state->m_pf1_tilemap->enable(state->m_display_pf1);
+		while (machine().input().code_pressed(KEYCODE_H)) ;
+		m_display_pf1 += 1;
+		m_display_pf1 &= 1;
+		m_pf1_tilemap->enable(m_display_pf1);
 	}
 #endif
 }
@@ -1002,15 +995,14 @@ static void toaplan1_draw_sprite_custom(bitmap_ind16 &dest_bmp,const rectangle &
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void toaplan1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
-	UINT16 *source = (UINT16 *)state->m_buffered_spriteram;
-	UINT16 *size   = (UINT16 *)state->m_buffered_spritesizeram16;
-	int fcu_flipscreen = state->m_fcu_flipscreen;
+	UINT16 *source = (UINT16 *)m_buffered_spriteram;
+	UINT16 *size   = (UINT16 *)m_buffered_spritesizeram16;
+	int fcu_flipscreen = m_fcu_flipscreen;
 	int offs;
 
-	for (offs = state->m_spriteram.bytes()/2 - 4; offs >= 0; offs -= 4)
+	for (offs = m_spriteram.bytes()/2 - 4; offs >= 0; offs -= 4)
 	{
 		if (!(source[offs] & 0x8000))
 		{
@@ -1039,7 +1031,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			/****** flip the sprite layer ******/
 			if (fcu_flipscreen)
 			{
-				const rectangle &visarea = machine.primary_screen->visible_area();
+				const rectangle &visarea = machine().primary_screen->visible_area();
 
 				sx_base = visarea.width() - (sx_base + 8);  /* visarea.x = 320 */
 				sy_base = visarea.height() - (sy_base + 8); /* visarea.y = 240 */
@@ -1056,7 +1048,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 					if (fcu_flipscreen) sx = sx_base - dim_x;
 					else                sx = sx_base + dim_x;
 
-					toaplan1_draw_sprite_custom(bitmap,cliprect,machine.gfx[1],
+					toaplan1_draw_sprite_custom(bitmap,cliprect,machine().gfx[1],
 												sprite,color,
 												fcu_flipscreen,fcu_flipscreen,
 												sx,sy,
@@ -1070,13 +1062,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 
-static void rallybik_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
+void toaplan1_state::rallybik_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority )
 {
-	toaplan1_state *state = machine.driver_data<toaplan1_state>();
-	UINT16 *buffered_spriteram16 = state->m_buffered_spriteram;
+	UINT16 *buffered_spriteram16 = m_buffered_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes()/2; offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes()/2; offs += 4)
 	{
 		int attrib, sx, sy, flipx, flipy;
 		int sprite, color;
@@ -1093,7 +1084,7 @@ static void rallybik_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 				flipx = attrib & 0x100;
 				if (flipx) sx -= 15;
 				flipy = attrib & 0x200;
-				drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+				drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					sprite,
 					color,
 					flipx,flipy,
@@ -1112,7 +1103,7 @@ UINT32 toaplan1_state::screen_update_rallybik(screen_device &screen, bitmap_ind1
 {
 	int priority;
 
-	toaplan1_log_vram(machine());
+	toaplan1_log_vram();
 
 	bitmap.fill(0x120, cliprect);
 
@@ -1125,7 +1116,7 @@ UINT32 toaplan1_state::screen_update_rallybik(screen_device &screen, bitmap_ind1
 		m_pf3_tilemap->draw(bitmap, cliprect, priority, 0);
 		m_pf2_tilemap->draw(bitmap, cliprect, priority, 0);
 		m_pf1_tilemap->draw(bitmap, cliprect, priority, 0);
-		rallybik_draw_sprites(machine(), bitmap,cliprect,priority << 8);
+		rallybik_draw_sprites(bitmap,cliprect,priority << 8);
 	}
 
 	return 0;
@@ -1135,7 +1126,7 @@ UINT32 toaplan1_state::screen_update_toaplan1(screen_device &screen, bitmap_ind1
 {
 	int priority;
 
-	toaplan1_log_vram(machine());
+	toaplan1_log_vram();
 
 	machine().priority_bitmap.fill(0, cliprect);
 	bitmap.fill(0x120, cliprect);
@@ -1152,7 +1143,7 @@ UINT32 toaplan1_state::screen_update_toaplan1(screen_device &screen, bitmap_ind1
 		m_pf1_tilemap->draw(bitmap, cliprect, priority, priority, 0);
 	}
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 

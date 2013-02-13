@@ -11,12 +11,11 @@ Atari Tank 8 driver
 
 
 
-void tank8_set_collision(running_machine &machine, int index)
+void tank8_state::tank8_set_collision(int index)
 {
-	tank8_state *state = machine.driver_data<tank8_state>();
-	machine.device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
+	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
-	state->m_collision_index = index;
+	m_collision_index = index;
 }
 
 
