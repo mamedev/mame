@@ -449,11 +449,11 @@ UINT32 taitoh_state::screen_update_dleague(screen_device &screen, bitmap_ind16 &
 	if (!machine().input().code_pressed(KEYCODE_A))
 		tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	if (!machine().input().code_pressed(KEYCODE_S))
-		dleague_draw_sprites(machine(), bitmap, cliprect, 0);
+		dleague_draw_sprites(bitmap, cliprect, 0);
 	if (!machine().input().code_pressed(KEYCODE_D))
 		tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 1, 0, 0);
 	if (!machine().input().code_pressed(KEYCODE_F))
-		dleague_draw_sprites(machine(), bitmap, cliprect, 1);
+		dleague_draw_sprites(bitmap, cliprect, 1);
 #else
 	tc0080vco_tilemap_draw(m_tc0080vco, bitmap, cliprect, 0, TILEMAP_DRAW_OPAQUE, 0);
 	dleague_draw_sprites (bitmap, cliprect, 0);

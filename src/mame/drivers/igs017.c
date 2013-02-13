@@ -414,7 +414,7 @@ int igs017_state::debug_viewer(bitmap_ind16 &bitmap,const rectangle &cliprect)
 
 		bitmap.fill(0, cliprect);
 
-		draw_sprite(machine, bitmap, cliprect, 0,0, w,h, 0,0, 0, a);
+		draw_sprite(bitmap, cliprect, 0,0, w,h, 0,0, 0, a);
 
 		popmessage("a: %08X w: %03X p: %02x-%02x-%02x",a,w,m_sprites_gfx[a/3*3+0],m_sprites_gfx[a/3*3+1],m_sprites_gfx[a/3*3+2]);
 		m_debug_addr = a;
