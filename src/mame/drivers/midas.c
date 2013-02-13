@@ -79,6 +79,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start();
 	UINT32 screen_update_midas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -101,11 +102,10 @@ void midas_state::video_start()
 	m_tmap->set_transparent_pen(0);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void midas_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	midas_state *state = machine.driver_data<midas_state>();
-	UINT16 *s       =   state->m_gfxram + 0x8000;
-	UINT16 *codes   =   state->m_gfxram;
+	UINT16 *s       =   m_gfxram + 0x8000;
+	UINT16 *codes   =   m_gfxram;
 
 	int sx_old = 0, sy_old = 0, ynum_old = 0, xzoom_old = 0;
 	int xdim, ydim, xscale, yscale;
@@ -175,7 +175,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			UINT16 code     =   codes[y*2];
 			UINT16 attr     =   codes[y*2+1];
 
-			drawgfxzoom_transpen(   bitmap, cliprect, machine.gfx[0],
+			drawgfxzoom_transpen(   bitmap, cliprect, machine().gfx[0],
 							code,
 							attr >> 8,
 							attr & 1, attr & 2,
@@ -201,7 +201,7 @@ UINT32 midas_state::screen_update_midas(screen_device &screen, bitmap_ind16 &bit
 
 	bitmap.fill(4095, cliprect);
 
-	if (layers_ctrl & 2)    draw_sprites(machine(), bitmap,cliprect);
+	if (layers_ctrl & 2)    draw_sprites(bitmap,cliprect);
 	if (layers_ctrl & 1)    m_tmap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;

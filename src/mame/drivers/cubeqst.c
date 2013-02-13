@@ -59,6 +59,7 @@ public:
 	UINT32 screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank);
 	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
+	void swap_linecpu_banks();
 };
 
 
@@ -266,11 +267,10 @@ TIMER_CALLBACK_MEMBER(cubeqst_state::delayed_bank_swap)
 }
 
 
-static void swap_linecpu_banks(running_machine &machine)
+void cubeqst_state::swap_linecpu_banks()
 {
-	cubeqst_state *state = machine.driver_data<cubeqst_state>();
 	/* Best sync up before we switch banks around */
-	machine.scheduler().synchronize(timer_expired_delegate(FUNC(cubeqst_state::delayed_bank_swap),state));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cubeqst_state::delayed_bank_swap),this));
 }
 
 
@@ -290,7 +290,7 @@ WRITE16_MEMBER(cubeqst_state::reset_w)
 
 	/* Swap stack and pointer RAM banks on rising edge of display reset */
 	if (!BIT(m_reset_latch, 0) && BIT(data, 0))
-		swap_linecpu_banks(machine());
+		swap_linecpu_banks();
 
 	if (!BIT(data, 2))
 		m_laserdisc->reset();

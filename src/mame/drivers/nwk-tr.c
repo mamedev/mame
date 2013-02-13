@@ -256,6 +256,7 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(irq_off);
+	void lanc2_init();
 };
 
 
@@ -372,13 +373,12 @@ WRITE32_MEMBER(nwktr_state::sysreg_w)
 }
 
 
-static void lanc2_init(running_machine &machine)
+void nwktr_state::lanc2_init()
 {
-	nwktr_state *state = machine.driver_data<nwktr_state>();
-	state->m_fpga_uploaded = 0;
-	state->m_lanc2_ram_r = 0;
-	state->m_lanc2_ram_w = 0;
-	state->m_lanc2_ram = auto_alloc_array(machine, UINT8, 0x8000);
+	m_fpga_uploaded = 0;
+	m_lanc2_ram_r = 0;
+	m_lanc2_ram_w = 0;
+	m_lanc2_ram = auto_alloc_array(machine(), UINT8, 0x8000);
 }
 
 READ32_MEMBER(nwktr_state::lanc1_r)
@@ -781,7 +781,7 @@ DRIVER_INIT_MEMBER(nwktr_state, nwktr)
 	m_sharc_dataram = auto_alloc_array(machine(), UINT32, 0x100000/4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
-	lanc2_init(machine());
+	lanc2_init();
 }
 
 /*****************************************************************************/

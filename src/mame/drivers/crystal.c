@@ -196,23 +196,28 @@ public:
 	TIMER_CALLBACK_MEMBER(Timercb);
 	IRQ_CALLBACK_MEMBER(icallback);
 	void crystal_banksw_postload();
+	void IntReq( int num );
+	inline void Timer_w( address_space &space, int which, UINT32 data, UINT32 mem_mask );
+	inline void DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask );
+	void PatchReset(  );
+	UINT16 GetVidReg( address_space &space, UINT16 reg );
+	void SetVidReg( address_space &space, UINT16 reg, UINT16 val );
 };
 
-static void IntReq( running_machine &machine, int num )
+void crystal_state::IntReq( int num )
 {
-	crystal_state *state = machine.driver_data<crystal_state>();
-	address_space &space = state->m_maincpu->space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	UINT32 IntEn = space.read_dword(0x01800c08);
 	UINT32 IntPend = space.read_dword(0x01800c0c);
 	if (IntEn & (1 << num))
 	{
 		IntPend |= (1 << num);
 		space.write_dword(0x01800c0c, IntPend);
-		state->m_maincpu->set_input_line(SE3208_INT, ASSERT_LINE);
+		m_maincpu->set_input_line(SE3208_INT, ASSERT_LINE);
 	}
 #ifdef IDLE_LOOP_SPEEDUP
-	state->m_FlipCntRead = 0;
-	state->m_maincpu->resume(SUSPEND_REASON_SPIN);
+	m_FlipCntRead = 0;
+	m_maincpu->resume(SUSPEND_REASON_SPIN);
 #endif
 }
 
@@ -249,9 +254,9 @@ READ32_MEMBER(crystal_state::Input_r)
 	{
 		UINT8 Port4 = ioport("SYSTEM")->read();
 		if (!(Port4 & 0x10) && ((m_OldPort4 ^ Port4) & 0x10))   //coin buttons trigger IRQs
-			IntReq(machine(), 12);
+			IntReq(12);
 		if (!(Port4 & 0x20) && ((m_OldPort4 ^ Port4) & 0x20))
-			IntReq(machine(), 19);
+			IntReq(19);
 		m_OldPort4 = Port4;
 		return /*dips*/ioport("DSW")->read() | (Port4 << 16);
 	}
@@ -306,25 +311,23 @@ TIMER_CALLBACK_MEMBER(crystal_state::Timercb)
 	if (!(m_Timerctrl[which] & 2))
 		m_Timerctrl[which] &= ~1;
 
-	IntReq(machine(), num[which]);
+	IntReq(num[which]);
 }
 
-INLINE void Timer_w( address_space &space, int which, UINT32 data, UINT32 mem_mask )
+void crystal_state::Timer_w( address_space &space, int which, UINT32 data, UINT32 mem_mask )
 {
-	crystal_state *state = space.machine().driver_data<crystal_state>();
-
-	if (((data ^ state->m_Timerctrl[which]) & 1) && (data & 1)) //Timer activate
+	if (((data ^ m_Timerctrl[which]) & 1) && (data & 1)) //Timer activate
 	{
 		int PD = (data >> 8) & 0xff;
 		int TCV = space.read_dword(0x01801404 + which * 8);
 		attotime period = attotime::from_hz(43000000) * ((PD + 1) * (TCV + 1));
 
-		if (state->m_Timerctrl[which] & 2)
-			state->m_Timer[which]->adjust(period, 0, period);
+		if (m_Timerctrl[which] & 2)
+			m_Timer[which]->adjust(period, 0, period);
 		else
-			state->m_Timer[which]->adjust(period);
+			m_Timer[which]->adjust(period);
 	}
-	COMBINE_DATA(&state->m_Timerctrl[which]);
+	COMBINE_DATA(&m_Timerctrl[which]);
 }
 
 WRITE32_MEMBER(crystal_state::Timer0_w)
@@ -417,11 +420,9 @@ WRITE32_MEMBER(crystal_state::PIO_w)
 	COMBINE_DATA(&m_PIO);
 }
 
-INLINE void DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask )
+void crystal_state::DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask )
 {
-	crystal_state *state = space.machine().driver_data<crystal_state>();
-
-	if (((data ^ state->m_DMActrl[which]) & (1 << 10)) && (data & (1 << 10)))   //DMAOn
+	if (((data ^ m_DMActrl[which]) & (1 << 10)) && (data & (1 << 10)))   //DMAOn
 	{
 		UINT32 CTR = data;
 		UINT32 SRC = space.read_dword(0x01800804 + which * 0x10);
@@ -455,9 +456,9 @@ INLINE void DMA_w( address_space &space, int which, UINT32 data, UINT32 mem_mask
 		}
 		data &= ~(1 << 10);
 		space.write_dword(0x0180080C + which * 0x10, 0);
-		IntReq(space.machine(), 7 + which);
+		IntReq(7 + which);
 	}
-	COMBINE_DATA(&state->m_DMActrl[which]);
+	COMBINE_DATA(&m_DMActrl[which]);
 }
 
 READ32_MEMBER(crystal_state::DMA0_r)
@@ -515,7 +516,7 @@ static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 
 ADDRESS_MAP_END
 
-static void PatchReset( running_machine &machine )
+void crystal_state::PatchReset(  )
 {
 	//The test menu reset routine seems buggy
 	//it reads the reset vector from 0x02000000 but it should be
@@ -539,7 +540,6 @@ loop:
     JMP Loop1
 */
 
-	crystal_state *state = machine.driver_data<crystal_state>();
 
 #if 1
 	static const UINT32 Patch[] =
@@ -552,7 +552,7 @@ loop:
 		0xdef4d4fa
 	};
 
-	memcpy(state->m_reset_patch, Patch, sizeof(Patch));
+	memcpy(m_reset_patch, Patch, sizeof(Patch));
 #else
 	static const UINT8 Patch[] =
 	{
@@ -561,7 +561,7 @@ loop:
 		0x20,0x3A,0xD0,0xA1,0xFA,0xD4,0xF4,0xDE
 	};
 
-	memcpy(state->m_reset_patch, Patch, sizeof(Patch));
+	memcpy(m_reset_patch, Patch, sizeof(Patch));
 #endif
 }
 
@@ -585,7 +585,7 @@ void crystal_state::machine_start()
 	for (i = 0; i < 4; i++)
 		m_Timer[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(crystal_state::Timercb),this), (void*)(FPTR)i);
 
-	PatchReset(machine());
+	PatchReset();
 
 #ifdef IDLE_LOOP_SPEEDUP
 	save_item(NAME(m_FlipCntRead));
@@ -630,15 +630,15 @@ void crystal_state::machine_reset()
 	m_FlipCntRead = 0;
 #endif
 
-	PatchReset(machine());
+	PatchReset();
 }
 
-static UINT16 GetVidReg( address_space &space, UINT16 reg )
+UINT16 crystal_state::GetVidReg( address_space &space, UINT16 reg )
 {
 	return space.read_word(0x03000000 + reg);
 }
 
-static void SetVidReg( address_space &space, UINT16 reg, UINT16 val )
+void crystal_state::SetVidReg( address_space &space, UINT16 reg, UINT16 val )
 {
 	space.write_word(0x03000000 + reg, val);
 }
@@ -739,7 +739,7 @@ void crystal_state::screen_eof_crystal(screen_device &screen, bool state)
 
 INTERRUPT_GEN_MEMBER(crystal_state::crystal_interrupt)
 {
-	IntReq(machine(), 24);      //VRender0 VBlank
+	IntReq(24);      //VRender0 VBlank
 }
 
 static INPUT_PORTS_START(crystal)

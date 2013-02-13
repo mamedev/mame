@@ -144,6 +144,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(looping_interrupt);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -273,12 +274,11 @@ WRITE8_MEMBER(looping_state::looping_colorram_w)
  *
  *************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void looping_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const UINT8 *source;
-	looping_state *state = machine.driver_data<looping_state>();
 
-	for (source = state->m_spriteram; source < state->m_spriteram + 0x40; source += 4)
+	for (source = m_spriteram; source < m_spriteram + 0x40; source += 4)
 	{
 		int sx = source[3];
 		int sy = 240 - source[0];
@@ -287,19 +287,19 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int code  = source[1] & 0x3f;
 		int color = source[2];
 
-		if (state->flip_screen_x())
+		if (flip_screen_x())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
-		if (state->flip_screen_y())
+		if (flip_screen_y())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, flipx, flipy, sx, sy, 0);
+		drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, flipx, flipy, sx, sy, 0);
 	}
 }
 
@@ -308,7 +308,7 @@ UINT32 looping_state::screen_update_looping(screen_device &screen, bitmap_ind16 
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 

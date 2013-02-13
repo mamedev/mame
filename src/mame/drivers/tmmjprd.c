@@ -71,6 +71,10 @@ public:
 	UINT32 screen_update_tmmjprd_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(tmmjprd_blit_done);
 	TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_scanline);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int screen);
+	void ttmjprd_draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, UINT32 tiledata, UINT8* rom);
+	void ttmjprd_draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom );
+	void tmmjprd_do_blit();
 };
 
 
@@ -96,19 +100,18 @@ WRITE32_MEMBER(tmmjprd_state::tmmjprd_tilemap3_w)
 	COMBINE_DATA(&m_tilemap_ram[3][offset]);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen)
+void tmmjprd_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int screen)
 {
-	tmmjprd_state *state = machine.driver_data<tmmjprd_state>();
 	int xpos,ypos,tileno,xflip,yflip, colr;
-	gfx_element *gfx = machine.gfx[0];
+	gfx_element *gfx = machine().gfx[0];
 	int xoffs;
-	//  int todraw = (state->m_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
+	//  int todraw = (m_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
 
-//  UINT32 *source = (state->m_spriteram+ (todraw*2))-2;
-//  UINT32 *finish = state->m_spriteram;
+//  UINT32 *source = (m_spriteram+ (todraw*2))-2;
+//  UINT32 *finish = m_spriteram;
 
-	UINT32 *source = state->m_spriteram+(0xc000/4)-2;
-	UINT32 *finish = state->m_spriteram;
+	UINT32 *source = m_spriteram+(0xc000/4)-2;
+	UINT32 *finish = m_spriteram;
 	xoffs = (screen & 1)*320;
 
 	for(;source>finish;source-=2)
@@ -173,7 +176,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	}
 }
 
-static void ttmjprd_draw_tile(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, UINT32 tiledata, UINT8* rom)
+void tmmjprd_state::ttmjprd_draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, UINT32 tiledata, UINT8* rom)
 {
 	/* note, it's tile address _NOT_ tile number, 'sub-tile' access is possible, hence using the custom rendering */
 	int tileaddr = (tiledata&0x000fffff)>>0;
@@ -252,7 +255,7 @@ static void ttmjprd_draw_tile(running_machine &machine, bitmap_ind16 &bitmap, co
 	}
 }
 
-static void ttmjprd_draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom )
+void tmmjprd_state::ttmjprd_draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32*tileram, UINT32*tileregs, UINT8*rom )
 {
 	int y,x;
 	int count;
@@ -286,7 +289,7 @@ static void ttmjprd_draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap,
 		{
 			UINT32 tiledata = tileram[count];
 			// todo: handle wraparound
-			ttmjprd_draw_tile(machine,bitmap,cliprect,(x*tile_sizex)-scrollx,(y*tile_sizey)-scrolly,tile_sizex,tile_sizey, tiledata, rom);
+			ttmjprd_draw_tile(bitmap,cliprect,(x*tile_sizex)-scrollx,(y*tile_sizey)-scrolly,tile_sizex,tile_sizey, tiledata, rom);
 			count++;
 		}
 	}
@@ -299,9 +302,9 @@ UINT32 tmmjprd_state::screen_update_tmmjprd_left(screen_device &screen, bitmap_i
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	ttmjprd_draw_tilemap( machine(), bitmap, cliprect, m_tilemap_ram[3], m_tilemap_regs[3], gfxroms );
-	draw_sprites(machine(),bitmap,cliprect, 1);
-	ttmjprd_draw_tilemap( machine(), bitmap, cliprect, m_tilemap_ram[2], m_tilemap_regs[2], gfxroms );
+	ttmjprd_draw_tilemap(bitmap, cliprect, m_tilemap_ram[3], m_tilemap_regs[3], gfxroms );
+	draw_sprites(bitmap,cliprect, 1);
+	ttmjprd_draw_tilemap(bitmap, cliprect, m_tilemap_ram[2], m_tilemap_regs[2], gfxroms );
 
 	/*
 	popmessage("%08x %08x %08x %08x %08x %08x",
@@ -333,9 +336,9 @@ UINT32 tmmjprd_state::screen_update_tmmjprd_right(screen_device &screen, bitmap_
 
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	ttmjprd_draw_tilemap( machine(), bitmap, cliprect, m_tilemap_ram[1], m_tilemap_regs[1], gfxroms );
-	draw_sprites(machine(),bitmap,cliprect, 0);
-	ttmjprd_draw_tilemap( machine(), bitmap, cliprect, m_tilemap_ram[0], m_tilemap_regs[0], gfxroms );
+	ttmjprd_draw_tilemap(bitmap, cliprect, m_tilemap_ram[1], m_tilemap_regs[1], gfxroms );
+	draw_sprites(bitmap,cliprect, 0);
+	ttmjprd_draw_tilemap(bitmap, cliprect, m_tilemap_ram[0], m_tilemap_regs[0], gfxroms );
 
 	return 0;
 }
@@ -385,10 +388,9 @@ TIMER_CALLBACK_MEMBER(tmmjprd_state::tmmjprd_blit_done)
 	machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
 }
 
-static void tmmjprd_do_blit(running_machine &machine)
+void tmmjprd_state::tmmjprd_do_blit()
 {
-	tmmjprd_state *state = machine.driver_data<tmmjprd_state>();
-	UINT8 *blt_data = state->memregion("gfx1")->base();
+	UINT8 *blt_data = memregion("gfx1")->base();
 	int blt_source = (tmmjprd_blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (tmmjprd_blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (tmmjprd_blitterregs[1]&0x000000ff);
@@ -430,7 +432,7 @@ static void tmmjprd_do_blit(running_machine &machine)
 				if (!blt_amount)
 				{
 					if(BLITLOG) mame_printf_debug("end of blit list\n");
-					machine.scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(tmmjprd_state::tmmjprd_blit_done),this));
+					machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(tmmjprd_state::tmmjprd_blit_done),this));
 					return;
 				}
 
@@ -440,7 +442,7 @@ static void tmmjprd_do_blit(running_machine &machine)
 					blt_value = ((blt_data[blt_source+1]<<8)|(blt_data[blt_source+0]));
 					blt_source+=2;
 					writeoffs=blt_oddflg+blt_column;
-					state->m_tilemap_ram[blt_tilemp][writeoffs]=(state->m_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
+					m_tilemap_ram[blt_tilemp][writeoffs]=(m_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
 					tmmjprd_tilemap[blt_tilemp]->mark_tile_dirty(writeoffs);
 
 					blt_column++;
@@ -457,7 +459,7 @@ static void tmmjprd_do_blit(running_machine &machine)
 				for (loopcount=0;loopcount<blt_amount;loopcount++)
 				{
 					writeoffs=blt_oddflg+blt_column;
-					state->m_tilemap_ram[blt_tilemp][writeoffs]=(state->m_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
+					m_tilemap_ram[blt_tilemp][writeoffs]=(m_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
 					tmmjprd_tilemap[blt_tilemp]->mark_tile_dirty(writeoffs);
 					blt_column++;
 					blt_column&=0x7f;

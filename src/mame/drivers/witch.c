@@ -270,6 +270,7 @@ public:
 	UINT32 screen_update_witch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(witch_main_interrupt);
 	INTERRUPT_GEN_MEMBER(witch_sub_interrupt);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -757,20 +758,19 @@ void witch_state::video_start()
 	m_gfx1_tilemap->set_palette_offset(0x200);
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void witch_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	witch_state *state = machine.driver_data<witch_state>();
 	int i,sx,sy,tileno,flags,color;
 	int flipx=0;
 	int flipy=0;
 
 	for(i=0;i<0x800;i+=0x20) {
-		sx     = state->m_sprite_ram[i+1];
+		sx     = m_sprite_ram[i+1];
 		if(sx!=0xF8) {
-			tileno = (state->m_sprite_ram[i]<<2)  | (( state->m_sprite_ram[i+0x800] & 0x07 ) << 10 );
+			tileno = (m_sprite_ram[i]<<2)  | (( m_sprite_ram[i+0x800] & 0x07 ) << 10 );
 
-			sy     = state->m_sprite_ram[i+2];
-			flags  = state->m_sprite_ram[i+3];
+			sy     = m_sprite_ram[i+2];
+			flags  = m_sprite_ram[i+3];
 
 			flipx  = (flags & 0x10 ) ? 1 : 0;
 			flipy  = (flags & 0x20 ) ? 1 : 0;
@@ -778,22 +778,22 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			color  =  flags & 0x0f;
 
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				tileno, color,
 				flipx, flipy,
 				sx+8*flipx,sy+8*flipy,0);
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				tileno+1, color,
 				flipx, flipy,
 				sx+8-8*flipx,sy+8*flipy,0);
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				tileno+2, color,
 				flipx, flipy,
 				sx+8*flipx,sy+8-8*flipy,0);
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 				tileno+3, color,
 				flipx, flipy,
 				sx+8-8*flipx,sy+8-8*flipy,0);
@@ -812,7 +812,7 @@ UINT32 witch_state::screen_update_witch(screen_device &screen, bitmap_ind16 &bit
 
 	m_gfx1_tilemap->draw(bitmap, cliprect, 0,0);
 	m_gfx0a_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_gfx0b_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

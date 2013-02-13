@@ -159,6 +159,7 @@ public:
 	DECLARE_WRITE32_MEMBER(rso_w);
 	DECLARE_VIDEO_START(gal3);
 	UINT32 screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void update_palette(  );
 };
 
 
@@ -173,23 +174,22 @@ VIDEO_START_MEMBER(gal3_state,gal3)
 
 }
 
-static void update_palette( running_machine &machine )
+void gal3_state::update_palette(  )
 {
-	gal3_state *state = machine.driver_data<gal3_state>();
 	int i;
 	INT16 data1,data2;
 	int r,g,b;
 
 	for( i=0; i<NAMCOS21_NUM_COLORS; i++ )
 	{
-		data1 = state->m_generic_paletteram_16[0x00000/2+i];
-		data2 = state->m_generic_paletteram_16[0x10000/2+i];
+		data1 = m_generic_paletteram_16[0x00000/2+i];
+		data2 = m_generic_paletteram_16[0x10000/2+i];
 
 		r = data1>>8;
 		g = data1&0xff;
 		b = data2&0xff;
 
-		palette_set_color( machine,i, MAKE_RGB(r,g,b) );
+		palette_set_color( machine(),i, MAKE_RGB(r,g,b) );
 	}
 } /* update_palette */
 
@@ -200,7 +200,7 @@ UINT32 gal3_state::screen_update_gal3(screen_device &screen, bitmap_rgb32 &bitma
 	static int pivot = 15;
 	int pri;
 
-	update_palette(machine());
+	update_palette();
 
 	if( machine().input().code_pressed_once(KEYCODE_H)&&(pivot<15) )    pivot+=1;
 	if( machine().input().code_pressed_once(KEYCODE_J)&&(pivot>0) ) pivot-=1;

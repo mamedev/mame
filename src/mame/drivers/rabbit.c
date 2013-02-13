@@ -140,13 +140,18 @@ public:
 	UINT32 screen_update_rabbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rabbit_vblank_interrupt);
 	TIMER_CALLBACK_MEMBER(rabbit_blit_done);
+	inline void get_rabbit_tilemap_info(tile_data &tileinfo, int tile_index, int whichtilemap, int tilesize);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void rabbit_clearspritebitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprite_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void rabbit_drawtilemap( bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap );
+	void rabbit_do_blit();
 };
 
 
 /* call with tilesize = 0 for 8x8 or 1 for 16x16 */
-INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data &tileinfo, int tile_index, int whichtilemap, int tilesize)
+void rabbit_state::get_rabbit_tilemap_info(tile_data &tileinfo, int tile_index, int whichtilemap, int tilesize)
 {
-	rabbit_state *state = machine.driver_data<rabbit_state>();
 	/* fedcba98 76543210 fedcba98 76543210
 	   x                                    color mask? how exactly does it relate to color bits?
 	    xx                                  flip
@@ -155,14 +160,14 @@ INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data &tileinf
 	                xxxx                    bank
 	                     xxxxxxxx xxxxxxxx  tile
 	*/
-	int depth = (state->m_tilemap_ram[whichtilemap][tile_index]&0x10000000)>>28;
-	int tileno = state->m_tilemap_ram[whichtilemap][tile_index]&0xffff;
-	int bank = (state->m_tilemap_ram[whichtilemap][tile_index]&0x000f0000)>>16;
-	int colour = (state->m_tilemap_ram[whichtilemap][tile_index]>>20)&0xff;
-	int cmask = state->m_tilemap_ram[whichtilemap][tile_index]>>31&1;
-	int flipxy = (state->m_tilemap_ram[whichtilemap][tile_index]>>29)&3;
+	int depth = (m_tilemap_ram[whichtilemap][tile_index]&0x10000000)>>28;
+	int tileno = m_tilemap_ram[whichtilemap][tile_index]&0xffff;
+	int bank = (m_tilemap_ram[whichtilemap][tile_index]&0x000f0000)>>16;
+	int colour = (m_tilemap_ram[whichtilemap][tile_index]>>20)&0xff;
+	int cmask = m_tilemap_ram[whichtilemap][tile_index]>>31&1;
+	int flipxy = (m_tilemap_ram[whichtilemap][tile_index]>>29)&3;
 
-	if (state->m_banking)
+	if (m_banking)
 	{
 		switch (bank)
 		{
@@ -193,7 +198,7 @@ INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data &tileinf
 		colour &= 0x0f;
 		colour += 0x20;
 		tileinfo.group = 1;
-		SET_TILE_INFO(6+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
+		SET_TILE_INFO_MEMBER(6+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 	else
 	{
@@ -201,28 +206,28 @@ INLINE void get_rabbit_tilemap_info(running_machine &machine, tile_data &tileinf
 		if (cmask) colour&=0x3f; // see health bars
 		colour += 0x200;
 		tileinfo.group = 0;
-		SET_TILE_INFO(4+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
+		SET_TILE_INFO_MEMBER(4+tilesize,tileno,colour,TILE_FLIPXY(flipxy));
 	}
 }
 
 TILE_GET_INFO_MEMBER(rabbit_state::get_rabbit_tilemap0_tile_info)
 {
-	get_rabbit_tilemap_info(machine(),tileinfo,tile_index,0,1);
+	get_rabbit_tilemap_info(tileinfo,tile_index,0,1);
 }
 
 TILE_GET_INFO_MEMBER(rabbit_state::get_rabbit_tilemap1_tile_info)
 {
-	get_rabbit_tilemap_info(machine(),tileinfo,tile_index,1,1);
+	get_rabbit_tilemap_info(tileinfo,tile_index,1,1);
 }
 
 TILE_GET_INFO_MEMBER(rabbit_state::get_rabbit_tilemap2_tile_info)
 {
-	get_rabbit_tilemap_info(machine(),tileinfo,tile_index,2,1);
+	get_rabbit_tilemap_info(tileinfo,tile_index,2,1);
 }
 
 TILE_GET_INFO_MEMBER(rabbit_state::get_rabbit_tilemap3_tile_info)
 {
-	get_rabbit_tilemap_info(machine(),tileinfo,tile_index,3,0);
+	get_rabbit_tilemap_info(tileinfo,tile_index,3,0);
 }
 
 WRITE32_MEMBER(rabbit_state::rabbit_tilemap0_w)
@@ -269,17 +274,16 @@ sprites invisible at the end of a round in rabbit, why?
 
 */
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void rabbit_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	rabbit_state *state = machine.driver_data<rabbit_state>();
 	int xpos,ypos,tileno,xflip,yflip, colr;
-	gfx_element *gfx = machine.gfx[1];
-	int todraw = (state->m_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
+	gfx_element *gfx = machine().gfx[1];
+	int todraw = (m_spriteregs[5]&0x0fff0000)>>16; // how many sprites to draw (start/end reg..) what is the other half?
 
-	UINT32 *source = (state->m_spriteram+ (todraw*2))-2;
-	UINT32 *finish = state->m_spriteram;
+	UINT32 *source = (m_spriteram+ (todraw*2))-2;
+	UINT32 *finish = m_spriteram;
 
-//  state->m_sprite_bitmap->fill(0x0, state->m_sprite_clip); // sloooow
+//  m_sprite_bitmap->fill(0x0, m_sprite_clip); // sloooow
 
 	while( source>=finish )
 	{
@@ -296,8 +300,8 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		if(xpos&0x800)xpos-=0x1000;
 
-		drawgfx_transpen(*state->m_sprite_bitmap,state->m_sprite_clip,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0x20-8/*-(state->m_spriteregs[0]&0x00000fff)*/,ypos-24/*-((state->m_spriteregs[1]&0x0fff0000)>>16)*/,15);
-//      drawgfx_transpen(bitmap,cliprect,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0xa0-8/*-(state->m_spriteregs[0]&0x00000fff)*/,ypos-24+0x80/*-((state->m_spriteregs[1]&0x0fff0000)>>16)*/,0);
+		drawgfx_transpen(*m_sprite_bitmap,m_sprite_clip,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0x20-8/*-(m_spriteregs[0]&0x00000fff)*/,ypos-24/*-((m_spriteregs[1]&0x0fff0000)>>16)*/,15);
+//      drawgfx_transpen(bitmap,cliprect,gfx,tileno,colr,!xflip/*wrongdecode?*/,yflip,xpos+0xa0-8/*-(m_spriteregs[0]&0x00000fff)*/,ypos-24+0x80/*-((m_spriteregs[1]&0x0fff0000)>>16)*/,0);
 
 
 		source-=2;
@@ -307,17 +311,16 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 }
 
 /* the sprite bitmap can probably be handled better than this ... */
-static void rabbit_clearspritebitmap( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void rabbit_state::rabbit_clearspritebitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	rabbit_state *state = machine.driver_data<rabbit_state>();
 	int startx, starty;
 	int y;
 	int amountx,amounty;
 	UINT16 *dstline;
 
 	/* clears a *sensible* amount of the sprite bitmap */
-	startx = (state->m_spriteregs[0]&0x00000fff);
-	starty = (state->m_spriteregs[1]&0x0fff0000)>>16;
+	startx = (m_spriteregs[0]&0x00000fff);
+	starty = (m_spriteregs[1]&0x0fff0000)>>16;
 
 	startx-=200;
 	starty-=200;
@@ -329,15 +332,14 @@ static void rabbit_clearspritebitmap( running_machine &machine, bitmap_ind16 &bi
 
 	for (y=0; y<amounty;y++)
 	{
-		dstline = &state->m_sprite_bitmap->pix16((starty+y)&0xfff);
+		dstline = &m_sprite_bitmap->pix16((starty+y)&0xfff);
 		memset(dstline+startx,0x00,amountx*2);
 	}
 }
 
 /* todo: fix zoom, its inaccurate and this code is ugly */
-static void draw_sprite_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void rabbit_state::draw_sprite_bitmap( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	rabbit_state *state = machine.driver_data<rabbit_state>();
 
 	UINT32 x,y;
 	UINT16 *srcline;
@@ -348,16 +350,16 @@ static void draw_sprite_bitmap( running_machine &machine, bitmap_ind16 &bitmap, 
 	UINT32 xstep,ystep;
 
 	int startx, starty;
-	startx = ((state->m_spriteregs[0]&0x00000fff));
-	starty = ((state->m_spriteregs[1]&0x0fff0000)>>16);
+	startx = ((m_spriteregs[0]&0x00000fff));
+	starty = ((m_spriteregs[1]&0x0fff0000)>>16);
 
 	/* zoom compensation? */
-	startx-=((state->m_spriteregs[1]&0x000001ff)>>1);
-	starty-=((state->m_spriteregs[1]&0x000001ff)>>1);
+	startx-=((m_spriteregs[1]&0x000001ff)>>1);
+	starty-=((m_spriteregs[1]&0x000001ff)>>1);
 
 
-	xsize = ((state->m_spriteregs[2]&0x0000ffff));
-	ysize = ((state->m_spriteregs[3]&0x0000ffff));
+	xsize = ((m_spriteregs[2]&0x0000ffff));
+	ysize = ((m_spriteregs[3]&0x0000ffff));
 	xsize+=0x80;
 	ysize+=0x80;
 	xstep = ((320*128)<<16) / xsize;
@@ -370,7 +372,7 @@ static void draw_sprite_bitmap( running_machine &machine, bitmap_ind16 &bitmap, 
 
 		if ((ydrawpos >= cliprect.min_y) && (ydrawpos <= cliprect.max_y))
 		{
-			srcline = &state->m_sprite_bitmap->pix16((starty+(y>>7))&0xfff);
+			srcline = &m_sprite_bitmap->pix16((starty+(y>>7))&0xfff);
 			dstline = &bitmap.pix16(ydrawpos);
 
 			for (x=0;x<xsize;x+=0x80)
@@ -439,15 +441,14 @@ each line represents the differences on each tilemap for unknown variables
 
 */
 
-static void rabbit_drawtilemap( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap )
+void rabbit_state::rabbit_drawtilemap( bitmap_ind16 &bitmap, const rectangle &cliprect, int whichtilemap )
 {
-	rabbit_state *state = machine.driver_data<rabbit_state>();
 	INT32 startx, starty, incxx, incxy, incyx, incyy, tran;
 
-	startx=((state->m_tilemap_regs[whichtilemap][1]&0x0000ffff));  // >>4 for nonzoomed pixel scroll value
-	starty=((state->m_tilemap_regs[whichtilemap][1]&0xffff0000)>>16); // >> 20 for nonzoomed pixel scroll value
-	incxx= ((state->m_tilemap_regs[whichtilemap][3]&0x00000fff)); // 0x800 when non-zoomed
-	incyy= ((state->m_tilemap_regs[whichtilemap][4]&0x0fff0000)>>16);
+	startx=((m_tilemap_regs[whichtilemap][1]&0x0000ffff));  // >>4 for nonzoomed pixel scroll value
+	starty=((m_tilemap_regs[whichtilemap][1]&0xffff0000)>>16); // >> 20 for nonzoomed pixel scroll value
+	incxx= ((m_tilemap_regs[whichtilemap][3]&0x00000fff)); // 0x800 when non-zoomed
+	incyy= ((m_tilemap_regs[whichtilemap][4]&0x0fff0000)>>16);
 
 	incxy = 0; incyx = 0;
 	tran = 1;
@@ -457,7 +458,7 @@ static void rabbit_drawtilemap( running_machine &machine, bitmap_ind16 &bitmap, 
 	   startx/starty are also 16.16 scrolling
 	  */
 
-	state->m_tilemap[whichtilemap]->draw_roz(bitmap, cliprect, startx << 12,starty << 12,
+	m_tilemap[whichtilemap]->draw_roz(bitmap, cliprect, startx << 12,starty << 12,
 			incxx << 5,incxy << 8,incyx << 8,incyy << 5,
 			1,  /* wraparound */
 			tran ? 0 : TILEMAP_DRAW_OPAQUE,0);
@@ -485,16 +486,16 @@ UINT32 rabbit_state::screen_update_rabbit(screen_device &screen, bitmap_ind16 &b
 	/* prio isnt certain but seems to work.. */
 	for (prilevel = 0xf; prilevel >0; prilevel--)
 	{
-		if (prilevel == ((m_tilemap_regs[3][0]&0x0f000000)>>24)) rabbit_drawtilemap(machine(),bitmap,cliprect, 3);
-		if (prilevel == ((m_tilemap_regs[2][0]&0x0f000000)>>24)) rabbit_drawtilemap(machine(),bitmap,cliprect, 2);
-		if (prilevel == ((m_tilemap_regs[1][0]&0x0f000000)>>24)) rabbit_drawtilemap(machine(),bitmap,cliprect, 1);
-		if (prilevel == ((m_tilemap_regs[0][0]&0x0f000000)>>24)) rabbit_drawtilemap(machine(),bitmap,cliprect, 0);
+		if (prilevel == ((m_tilemap_regs[3][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 3);
+		if (prilevel == ((m_tilemap_regs[2][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 2);
+		if (prilevel == ((m_tilemap_regs[1][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 1);
+		if (prilevel == ((m_tilemap_regs[0][0]&0x0f000000)>>24)) rabbit_drawtilemap(bitmap,cliprect, 0);
 
 		if (prilevel == 0x09) // should it be selectable?
 		{
-			rabbit_clearspritebitmap(machine(),bitmap,cliprect);
-			draw_sprites(machine(),bitmap,cliprect);  // render to bitmap
-			draw_sprite_bitmap(machine(),bitmap,cliprect); // copy bitmap to screen
+			rabbit_clearspritebitmap(bitmap,cliprect);
+			draw_sprites(bitmap,cliprect);  // render to bitmap
+			draw_sprite_bitmap(bitmap,cliprect); // copy bitmap to screen
 		}
 	}
 	return 0;
@@ -563,19 +564,18 @@ TIMER_CALLBACK_MEMBER(rabbit_state::rabbit_blit_done)
 	machine().device("maincpu")->execute().set_input_line(m_bltirqlevel, HOLD_LINE);
 }
 
-static void rabbit_do_blit(running_machine &machine)
+void rabbit_state::rabbit_do_blit()
 {
-	rabbit_state *state = machine.driver_data<rabbit_state>();
-	UINT8 *blt_data = state->memregion("gfx1")->base();
-	int blt_source = (state->m_blitterregs[0]&0x000fffff)>>0;
-	int blt_column = (state->m_blitterregs[1]&0x00ff0000)>>16;
-	int blt_line   = (state->m_blitterregs[1]&0x000000ff);
-	int blt_tilemp = (state->m_blitterregs[2]&0x0000e000)>>13;
-	int blt_oddflg = (state->m_blitterregs[2]&0x00000001)>>0;
+	UINT8 *blt_data = memregion("gfx1")->base();
+	int blt_source = (m_blitterregs[0]&0x000fffff)>>0;
+	int blt_column = (m_blitterregs[1]&0x00ff0000)>>16;
+	int blt_line   = (m_blitterregs[1]&0x000000ff);
+	int blt_tilemp = (m_blitterregs[2]&0x0000e000)>>13;
+	int blt_oddflg = (m_blitterregs[2]&0x00000001)>>0;
 	int mask,shift;
 
 
-	if(BLITCMDLOG) mame_printf_debug("BLIT command %08x %08x %08x\n", state->m_blitterregs[0], state->m_blitterregs[1], state->m_blitterregs[2]);
+	if(BLITCMDLOG) mame_printf_debug("BLIT command %08x %08x %08x\n", m_blitterregs[0], m_blitterregs[1], m_blitterregs[2]);
 
 	if (blt_oddflg&1)
 	{
@@ -608,7 +608,7 @@ static void rabbit_do_blit(running_machine &machine)
 				if (!blt_amount)
 				{
 					if(BLITLOG) mame_printf_debug("end of blit list\n");
-					machine.scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(rabbit_state::rabbit_blit_done),state));
+					machine().scheduler().timer_set(attotime::from_usec(500), timer_expired_delegate(FUNC(rabbit_state::rabbit_blit_done),this));
 					return;
 				}
 
@@ -618,8 +618,8 @@ static void rabbit_do_blit(running_machine &machine)
 					blt_value = ((blt_data[blt_source+1]<<8)|(blt_data[blt_source+0]));
 					blt_source+=2;
 					writeoffs=blt_oddflg+blt_column;
-					state->m_tilemap_ram[blt_tilemp][writeoffs]=(state->m_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
-					state->m_tilemap[blt_tilemp]->mark_tile_dirty(writeoffs);
+					m_tilemap_ram[blt_tilemp][writeoffs]=(m_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
+					m_tilemap[blt_tilemp]->mark_tile_dirty(writeoffs);
 
 					blt_column++;
 					blt_column&=0x7f;
@@ -635,8 +635,8 @@ static void rabbit_do_blit(running_machine &machine)
 				for (loopcount=0;loopcount<blt_amount;loopcount++)
 				{
 					writeoffs=blt_oddflg+blt_column;
-					state->m_tilemap_ram[blt_tilemp][writeoffs]=(state->m_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
-					state->m_tilemap[blt_tilemp]->mark_tile_dirty(writeoffs);
+					m_tilemap_ram[blt_tilemp][writeoffs]=(m_tilemap_ram[blt_tilemp][writeoffs]&mask)|(blt_value<<shift);
+					m_tilemap[blt_tilemp]->mark_tile_dirty(writeoffs);
 					blt_column++;
 					blt_column&=0x7f;
 				}
@@ -645,7 +645,7 @@ static void rabbit_do_blit(running_machine &machine)
 
 			case 0x03: /* next line */
 				if(BLITLOG) mame_printf_debug("blit: move to next line\n");
-				blt_column = (state->m_blitterregs[1]&0x00ff0000)>>16; /* --CC---- */
+				blt_column = (m_blitterregs[1]&0x00ff0000)>>16; /* --CC---- */
 				blt_oddflg+=128;
 				break;
 
@@ -665,7 +665,7 @@ WRITE32_MEMBER(rabbit_state::rabbit_blitter_w)
 
 	if (offset == 0x0c/4)
 	{
-		rabbit_do_blit(machine());
+		rabbit_do_blit();
 	}
 }
 

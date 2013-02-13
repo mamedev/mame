@@ -72,6 +72,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_rdx_v33(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 };
 
 
@@ -116,10 +117,9 @@ TILE_GET_INFO_MEMBER(r2dx_v33_state::get_tx_tile_info)
 }
 
 /* copied from Legionnaire */
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
+void r2dx_v33_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
-	r2dx_v33_state *state = machine.driver_data<r2dx_v33_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs,fx,fy,x,y,color,sprite;
 //  int cur_pri;
 	int dx,dy,ax,ay;
@@ -160,7 +160,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+						drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 						sprite++,
 						color,fx,fy,x+ax*16,y+ay*16,15);
 					}
@@ -170,7 +170,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+						drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 						sprite++,
 						color,fx,fy,x+ax*16,y+(dy-ay-1)*16,15);
 					}
@@ -183,7 +183,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+						drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 						sprite++,
 						color,fx,fy,x+(dx-ax-1)*16,y+ay*16,15);
 					}
@@ -193,7 +193,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				for (ax=0; ax<dx; ax++)
 					for (ay=0; ay<dy; ay++)
 					{
-						drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+						drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 						sprite++,
 						color,fx,fy,x+(dx-ax-1)*16,y+(dy-ay-1)*16,15);
 					}
@@ -223,7 +223,7 @@ UINT32 r2dx_v33_state::screen_update_rdx_v33(screen_device &screen, bitmap_ind16
 	m_md_tilemap->draw(bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	draw_sprites(machine(),bitmap,cliprect,0);
+	draw_sprites(bitmap,cliprect,0);
 
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0);
 
