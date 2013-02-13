@@ -609,7 +609,7 @@ DRIVER_INIT_MEMBER(appoooh_state,robowres)
 DRIVER_INIT_MEMBER(appoooh_state,robowresb)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x1c000);
+	space.set_decrypted_region(0x0000, 0x7fff, memregion("maincpu")->base() + 0x1c000);
 }
 
 

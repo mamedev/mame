@@ -369,7 +369,7 @@ UINT32 blitz_state::screen_update_megadpkr(screen_device &screen, bitmap_ind16 &
 
 void blitz_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge

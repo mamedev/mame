@@ -744,7 +744,7 @@ static const struct priority priorities[] =
 
 PALETTE_INIT_MEMBER(megasys1_state,megasys1)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int pri_code, offset, i, order;
 
 	/* First check if we have an hand-crafted priority scheme

@@ -2704,8 +2704,8 @@ READ16_MEMBER(snowbros_state::_4in1_02_read)
 DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 {
 	UINT8 *buffer;
-	UINT8 *src = machine().root_device().memregion("maincpu")->base();
-	int len = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *src = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine(), UINT8, len);
@@ -2719,8 +2719,8 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 		auto_free(machine(), buffer);
 	}
 
-	src = machine().root_device().memregion("soundcpu")->base();
-	len = machine().root_device().memregion("soundcpu")->bytes();
+	src = memregion("soundcpu")->base();
+	len = memregion("soundcpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine(), UINT8, len);
@@ -2737,8 +2737,8 @@ DRIVER_INIT_MEMBER(snowbros_state,4in1boot)
 DRIVER_INIT_MEMBER(snowbros_state,snowbro3)
 {
 	UINT8 *buffer;
-	UINT8 *src = machine().root_device().memregion("maincpu")->base();
-	int len = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *src = memregion("maincpu")->base();
+	int len = memregion("maincpu")->bytes();
 
 	/* strange order */
 	buffer = auto_alloc_array(machine(), UINT8, len);

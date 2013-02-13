@@ -30,7 +30,7 @@
 ***************************************************************************/
 void suprloco_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 
@@ -200,7 +200,7 @@ void suprloco_state::draw_sprite(bitmap_ind16 &bitmap,const rectangle &cliprect,
 		dy = -1;
 	}
 
-	gfx2 = machine().root_device().memregion("gfx2")->base();
+	gfx2 = memregion("gfx2")->base();
 	for (row = 0;row < height;row++,adjy+=dy)
 	{
 		int color1,color2,flipx;

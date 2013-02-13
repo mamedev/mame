@@ -464,8 +464,8 @@ UINT32 igs017_state::screen_update_igs017(screen_device &screen, bitmap_ind16 &b
 
 void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
 {
-	int length = machine().root_device().memregion("maincpu")->bytes();
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	int length = memregion("maincpu")->bytes();
+	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
 	int i;
 
@@ -517,7 +517,7 @@ void igs017_state::decrypt_program_rom(int mask, int a7, int a6, int a5, int a4,
 
 void igs017_state::iqblocka_patch_rom()
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 //  rom[0x7b64] = 0xc9;
 
@@ -558,8 +558,8 @@ DRIVER_INIT_MEMBER(igs017_state,iqblockf)
 
 void igs017_state::tjsb_decrypt_sprites()
 {
-	int length = machine().root_device().memregion("sprites")->bytes();
-	UINT8 *rom = machine().root_device().memregion("sprites")->base();
+	int length = memregion("sprites")->bytes();
+	UINT8 *rom = memregion("sprites")->base();
 	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
 	int i, addr;
 
@@ -594,7 +594,7 @@ DRIVER_INIT_MEMBER(igs017_state,tjsb)
 void igs017_state::mgcs_decrypt_program_rom()
 {
 	int i;
-	UINT16 *src = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *src = (UINT16 *)memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -643,8 +643,8 @@ void igs017_state::mgcs_decrypt_program_rom()
 
 void igs017_state::mgcs_decrypt_tiles()
 {
-	int length = machine().root_device().memregion("tilemaps")->bytes();
-	UINT8 *rom = machine().root_device().memregion("tilemaps")->base();
+	int length = memregion("tilemaps")->bytes();
+	UINT8 *rom = memregion("tilemaps")->base();
 	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
 	int i;
 
@@ -660,8 +660,8 @@ void igs017_state::mgcs_decrypt_tiles()
 
 void igs017_state::mgcs_flip_sprites()
 {
-	int length = machine().root_device().memregion("sprites")->bytes();
-	UINT8 *rom = machine().root_device().memregion("sprites")->base();
+	int length = memregion("sprites")->bytes();
+	UINT8 *rom = memregion("sprites")->base();
 	int i;
 
 	for (i = 0;i < length;i+=2)
@@ -681,7 +681,7 @@ void igs017_state::mgcs_flip_sprites()
 
 void igs017_state::mgcs_patch_rom()
 {
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
 	rom[0x4e036/2] = 0x6006;
 
@@ -707,7 +707,7 @@ DRIVER_INIT_MEMBER(igs017_state,mgcs)
 // decryption is incomplete, the first part of code doesn't seem right.
 DRIVER_INIT_MEMBER(igs017_state,tarzan)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
 	int i;
 	int size = 0x40000;
 
@@ -733,7 +733,7 @@ DRIVER_INIT_MEMBER(igs017_state,tarzan)
 // by iq_132
 DRIVER_INIT_MEMBER(igs017_state,tarzana)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	int i;
 	int size = 0x80000;
 
@@ -806,7 +806,7 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 {
 	int size = 0x040000;
 
-	UINT8 *data = machine().root_device().memregion("maincpu")->base();
+	UINT8 *data = memregion("maincpu")->base();
 	UINT8 *code = auto_alloc_array(machine(), UINT8, size);
 	memcpy(code, data, size);
 
@@ -824,7 +824,7 @@ DRIVER_INIT_MEMBER(igs017_state,starzan)
 DRIVER_INIT_MEMBER(igs017_state,sdmg2)
 {
 	int i;
-	UINT16 *src = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *src = (UINT16 *)memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -881,7 +881,7 @@ DRIVER_INIT_MEMBER(igs017_state,sdmg2)
 DRIVER_INIT_MEMBER(igs017_state,mgdha)
 {
 	int i;
-	UINT16 *src = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *src = (UINT16 *)memregion("maincpu")->base();
 
 	int rom_size = 0x80000;
 
@@ -916,7 +916,7 @@ DRIVER_INIT_MEMBER(igs017_state,mgdh)
 {
 	DRIVER_INIT_CALL(mgdha);
 
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
 	// additional protection
 	rom[0x4ad50/2] = 0x4e71;
@@ -928,7 +928,7 @@ DRIVER_INIT_MEMBER(igs017_state,mgdh)
 
 void igs017_state::lhzb2_patch_rom()
 {
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
 	// Prot. checks:
 	rom[0x14786/2] = 0x6044;    // 014786: 6744    beq $147cc
@@ -939,8 +939,8 @@ void igs017_state::lhzb2_patch_rom()
 
 void igs017_state::lhzb2_decrypt_tiles()
 {
-	int length = machine().root_device().memregion("tilemaps")->bytes();
-	UINT8 *rom = machine().root_device().memregion("tilemaps")->base();
+	int length = memregion("tilemaps")->bytes();
+	UINT8 *rom = memregion("tilemaps")->base();
 	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
 	int i;
 
@@ -957,8 +957,8 @@ void igs017_state::lhzb2_decrypt_tiles()
 
 void igs017_state::lhzb2_decrypt_sprites()
 {
-	int length = machine().root_device().memregion("sprites")->bytes();
-	UINT8 *rom = machine().root_device().memregion("sprites")->base();
+	int length = memregion("sprites")->bytes();
+	UINT8 *rom = memregion("sprites")->base();
 	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
 	int i, addr;
 
@@ -983,7 +983,7 @@ void igs017_state::lhzb2_decrypt_sprites()
 DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine().root_device().memregion("maincpu")->base());
+	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -1077,7 +1077,7 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2)
 DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine().root_device().memregion("maincpu")->base());
+	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 
@@ -1141,7 +1141,7 @@ DRIVER_INIT_MEMBER(igs017_state,lhzb2a)
 
 void igs017_state::slqz2_patch_rom()
 {
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
 	// Prot. checks:
 	rom[0x1489c/2] = 0x6044;    // 01489C: 6744    beq $148e2
@@ -1152,8 +1152,8 @@ void igs017_state::slqz2_patch_rom()
 
 void igs017_state::slqz2_decrypt_tiles()
 {
-	int length = machine().root_device().memregion("tilemaps")->bytes();
-	UINT8 *rom = machine().root_device().memregion("tilemaps")->base();
+	int length = memregion("tilemaps")->bytes();
+	UINT8 *rom = memregion("tilemaps")->base();
 	UINT8 *tmp = auto_alloc_array(machine(), UINT8, length);
 	int i;
 
@@ -1170,7 +1170,7 @@ void igs017_state::slqz2_decrypt_tiles()
 DRIVER_INIT_MEMBER(igs017_state,slqz2)
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine().root_device().memregion("maincpu")->base());
+	UINT16 *src = (UINT16 *) (memregion("maincpu")->base());
 
 	int rom_size = 0x80000;
 

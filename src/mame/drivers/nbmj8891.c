@@ -53,7 +53,7 @@ TODO:
 
 DRIVER_INIT_MEMBER(nbmj8891_state,gionbana)
 {
-	UINT8 *prot = machine().root_device().memregion("protection")->base();
+	UINT8 *prot = memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -77,7 +77,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mgion)
 DRIVER_INIT_MEMBER(nbmj8891_state,omotesnd)
 {
 #if 0
-	UINT8 *prot = machine().root_device().memregion("protection")->base();
+	UINT8 *prot = memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -92,7 +92,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,omotesnd)
 #endif
 
 #if 1
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	// Protection ROM check skip
 	ROM[0x0106] = 0x00;
@@ -127,7 +127,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,msjiken)
 
 DRIVER_INIT_MEMBER(nbmj8891_state,telmahjn)
 {
-	UINT8 *prot = machine().root_device().memregion("protection")->base();
+	UINT8 *prot = memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -145,7 +145,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,telmahjn)
 
 DRIVER_INIT_MEMBER(nbmj8891_state,mgmen89)
 {
-	UINT8 *prot = machine().root_device().memregion("protection")->base();
+	UINT8 *prot = memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -163,8 +163,8 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mgmen89)
 
 DRIVER_INIT_MEMBER(nbmj8891_state,mjfocus)
 {
-	UINT8 *prot = machine().root_device().memregion("protection")->base();
-	UINT8 *ram = machine().root_device().memregion("maincpu")->base() + 0xf800;
+	UINT8 *prot = memregion("protection")->base();
+	UINT8 *ram = memregion("maincpu")->base() + 0xf800;
 	int i;
 
 	/* need to clear RAM otherwise it doesn't boot... */
@@ -186,7 +186,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjfocus)
 DRIVER_INIT_MEMBER(nbmj8891_state,mjfocusm)
 {
 #if 1
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	// Protection ROM check skip
 	ROM[0x014e] = 0x00;
@@ -198,7 +198,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjfocusm)
 
 DRIVER_INIT_MEMBER(nbmj8891_state,scandal)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	int i;
 
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
@@ -215,10 +215,10 @@ DRIVER_INIT_MEMBER(nbmj8891_state,mjnanpas)
 {
 	/* they forgot to enable the protection check in this game... */
 #if 0
-	UINT8 *prot = machine().root_device().memregion("protection")->base();
+	UINT8 *prot = memregion("protection")->base();
 	int i;
 
-	machine().root_device().memregion("maincpu")->base()[0x003d] = 0x01;    // force the protection check to be executed
+	memregion("maincpu")->base()[0x003d] = 0x01;    // force the protection check to be executed
 
 	/* this is one possible way to rearrange the protection ROM data to get the
 	   expected 0xfe1a checksum. It's probably completely wrong! But since the
@@ -276,7 +276,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,hanaoji)
 
 DRIVER_INIT_MEMBER(nbmj8891_state,pairsnb)
 {
-	UINT8 *prot = machine().root_device().memregion("protection")->base();
+	UINT8 *prot = memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -294,7 +294,7 @@ DRIVER_INIT_MEMBER(nbmj8891_state,pairsnb)
 
 DRIVER_INIT_MEMBER(nbmj8891_state,pairsten)
 {
-	UINT8 *prot = machine().root_device().memregion("protection")->base();
+	UINT8 *prot = memregion("protection")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the

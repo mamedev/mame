@@ -688,7 +688,7 @@ UINT32 decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind1
 {
 	/* THIS CODE SHOULD NOT BE IN SCREEN UPDATE !! */
 
-	if (0xc0 != (machine().root_device().ioport("IN2")->read() & 0xc0))  /* coin slots assert an NMI */
+	if (0xc0 != (ioport("IN2")->read() & 0xc0))  /* coin slots assert an NMI */
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 
 	if (0 == (m_watchdog_flip & 0x04))

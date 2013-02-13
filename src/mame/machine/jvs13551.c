@@ -148,7 +148,7 @@ bool sega_837_13551::swoutputs(UINT8 count, const UINT8 *vals)
 		return false;
 	jvs_outputs = vals[0] & 0x3f;
 	logerror("837-13551: output %02x\n", jvs_outputs);
-	machine().root_device().ioport(port_tag[11])->write_safe(jvs_outputs, 0x3f);
+	ioport(port_tag[11])->write_safe(jvs_outputs, 0x3f);
 	return true;
 }
 

@@ -275,13 +275,13 @@ INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia1->ca1_w(machine().root_device().ioport("IN0")->read() & 0x02);
+	pia1->ca1_w(ioport("IN0")->read() & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia1->ca2_w(machine().root_device().ioport("IN0")->read() & 0x01);
+	pia1->ca2_w(ioport("IN0")->read() & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia1->cb1_w(machine().root_device().ioport("XHATCH")->read());
+	pia1->cb1_w(ioport("XHATCH")->read());
 
 	/* CB2 - NOT CONNECTED */
 }

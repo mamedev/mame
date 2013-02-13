@@ -237,7 +237,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(tattack_state,tattack)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	rom[0x1b4]=0;
 	rom[0x1b5]=0;

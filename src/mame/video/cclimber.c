@@ -38,7 +38,7 @@
 ***************************************************************************/
 PALETTE_INIT_MEMBER(cclimber_state,cclimber)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -115,7 +115,7 @@ PALETTE_INIT_MEMBER(cclimber_state,cclimber)
 
 PALETTE_INIT_MEMBER(cclimber_state,swimmer)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -184,7 +184,7 @@ PALETTE_INIT_MEMBER(cclimber_state,swimmer)
 
 PALETTE_INIT_MEMBER(cclimber_state,yamato)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* chars - 12 bits RGB */
@@ -252,7 +252,7 @@ PALETTE_INIT_MEMBER(cclimber_state,yamato)
 
 PALETTE_INIT_MEMBER(cclimber_state,toprollr)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0xa0; i++)

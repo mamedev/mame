@@ -321,7 +321,7 @@ READ8_MEMBER(superqix_state::nmi_ack_r)
 
 READ8_MEMBER(superqix_state::bootleg_in0_r)
 {
-	return BITSWAP8(machine().root_device().ioport("DSW1")->read(), 0,1,2,3,4,5,6,7);
+	return BITSWAP8(ioport("DSW1")->read(), 0,1,2,3,4,5,6,7);
 }
 
 WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
@@ -512,7 +512,7 @@ READ8_MEMBER(superqix_state::pbillian_ay_port_a_r)
 {
 //  logerror("%04x: ay_port_a_r\n",space.device().safe_pc());
 	/* bits 76------  MCU status bits */
-	return (machine().rand() & 0xc0) | machine().root_device().ioport("BUTTONS")->read();
+	return (machine().rand() & 0xc0) | ioport("BUTTONS")->read();
 }
 
 
@@ -538,7 +538,7 @@ void superqix_state::machine_init_common()
 MACHINE_START_MEMBER(superqix_state,superqix)
 {
 	/* configure the banks */
-	machine().root_device().membank("bank1")->configure_entries(0, 4, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	machine_init_common();
 }
@@ -546,7 +546,7 @@ MACHINE_START_MEMBER(superqix_state,superqix)
 MACHINE_START_MEMBER(superqix_state,pbillian)
 {
 	/* configure the banks */
-	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	machine_init_common();
 }
@@ -1322,8 +1322,8 @@ DRIVER_INIT_MEMBER(superqix_state,perestro)
 	int i,j;
 
 	/* decrypt program code; the address lines are shuffled around in a non-trivial way */
-	src = machine().root_device().memregion("maincpu")->base();
-	len = machine().root_device().memregion("maincpu")->bytes();
+	src = memregion("maincpu")->base();
+	len = memregion("maincpu")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1342,8 +1342,8 @@ DRIVER_INIT_MEMBER(superqix_state,perestro)
 	}
 
 	/* decrypt gfx ROMs; simple bit swap on the address lines */
-	src = machine().root_device().memregion("gfx1")->base();
-	len = machine().root_device().memregion("gfx1")->bytes();
+	src = memregion("gfx1")->base();
+	len = memregion("gfx1")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1353,8 +1353,8 @@ DRIVER_INIT_MEMBER(superqix_state,perestro)
 		}
 	}
 
-	src = machine().root_device().memregion("gfx2")->base();
-	len = machine().root_device().memregion("gfx2")->bytes();
+	src = memregion("gfx2")->base();
+	len = memregion("gfx2")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);
@@ -1364,8 +1364,8 @@ DRIVER_INIT_MEMBER(superqix_state,perestro)
 		}
 	}
 
-	src = machine().root_device().memregion("gfx3")->base();
-	len = machine().root_device().memregion("gfx3")->bytes();
+	src = memregion("gfx3")->base();
+	len = memregion("gfx3")->bytes();
 	for (i = 0;i < len;i += 16)
 	{
 		memcpy(temp,&src[i],16);

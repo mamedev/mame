@@ -992,8 +992,8 @@ READ8_MEMBER(seibuspi_state::z80_coin_r)
 
 READ32_MEMBER(seibuspi_state::soundrom_r)
 {
-	UINT8 *sound = (UINT8*)machine().root_device().memregion("user2")->base();
-	UINT16 *sound16 = (UINT16*)machine().root_device().memregion("user2")->base();
+	UINT8 *sound = (UINT8*)memregion("user2")->base();
+	UINT16 *sound16 = (UINT16*)memregion("user2")->base();
 
 	if (mem_mask == 0x000000ff)
 	{
@@ -2217,11 +2217,11 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(seibuspi_state,sys386f2)
 {
 	int i, j;
-	UINT16 *src = (UINT16 *)machine().root_device().memregion("gfx3")->base();
+	UINT16 *src = (UINT16 *)memregion("gfx3")->base();
 	UINT16 tmp[0x40 / 2], Offset;
 
 	// sprite_reorder() only
-	for(i = 0; i < machine().root_device().memregion("gfx3")->bytes() / 0x40; i++)
+	for(i = 0; i < memregion("gfx3")->bytes() / 0x40; i++)
 	{
 		memcpy(tmp, src, 0x40);
 

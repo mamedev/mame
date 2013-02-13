@@ -379,13 +379,13 @@ READ8_MEMBER(mpu3_state::pia_ic3_porta_r)
 		case 2:
 		case 3:
 		{
-			data = (machine().root_device().ioport(portnames[m_input_strobe])->read()<<2);
+			data = (ioport(portnames[m_input_strobe])->read()<<2);
 			break;
 		}
 		case 4://DIL1
 		case 6://DIL2
 		{
-			swizzle = (machine().root_device().ioport(portnames[m_input_strobe])->read());
+			swizzle = (ioport(portnames[m_input_strobe])->read());
 			data = (((swizzle & 0x01) << 7) + ((swizzle & 0x02) << 5) + ((swizzle & 0x04) << 3)
 					+ ((swizzle & 0x08) << 1) +((swizzle & 0x10) >> 1) + ((swizzle & 0x20) >> 3));
 			break;
@@ -393,7 +393,7 @@ READ8_MEMBER(mpu3_state::pia_ic3_porta_r)
 		case 5://DIL1
 		case 7://DIL2
 		{
-			swizzle = (machine().root_device().ioport(portnames[m_input_strobe])->read());
+			swizzle = (ioport(portnames[m_input_strobe])->read());
 			data = (((swizzle & 0x80) >> 1) + ((swizzle & 0x40) << 1));
 			break;
 		}

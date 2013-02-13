@@ -101,7 +101,7 @@ public:
 
 PALETTE_INIT_MEMBER(cntsteer_state,zerotrgt)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	for (i = 0; i < machine().total_colors(); i++)
 	{
@@ -1142,8 +1142,8 @@ ROM_END
 
 void cntsteer_state::zerotrgt_rearrange_gfx( int romsize, int romarea )
 {
-	UINT8 *src = machine().root_device().memregion("gfx4")->base();
-	UINT8 *dst = machine().root_device().memregion("gfx3")->base();
+	UINT8 *src = memregion("gfx4")->base();
+	UINT8 *dst = memregion("gfx3")->base();
 	int rm;
 	int cnt1;
 
@@ -1162,7 +1162,7 @@ void cntsteer_state::zerotrgt_rearrange_gfx( int romsize, int romarea )
 #if 0
 DRIVER_INIT_MEMBER(cntsteer_state,cntsteer)
 {
-	UINT8 *RAM = machine().root_device().memregion("subcpu")->base();
+	UINT8 *RAM = memregion("subcpu")->base();
 
 	RAM[0xc2cf] = 0x43; /* Patch out Cpu 1 ram test - it never ends..?! */
 	RAM[0xc2d0] = 0x43;

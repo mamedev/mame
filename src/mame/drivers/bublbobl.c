@@ -1533,8 +1533,8 @@ ROM_END
 
 void bublbobl_state::configure_banks(  )
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
 DRIVER_INIT_MEMBER(bublbobl_state,bublbobl)
@@ -1565,7 +1565,7 @@ DRIVER_INIT_MEMBER(bublbobl_state,dland)
 {
 	// rearrange gfx to original format
 	int i;
-	UINT8* src = machine().root_device().memregion("gfx1")->base();
+	UINT8* src = memregion("gfx1")->base();
 	for (i = 0; i < 0x40000; i++)
 		src[i] = BITSWAP8(src[i],7,6,5,4,0,1,2,3);
 

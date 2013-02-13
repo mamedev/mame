@@ -506,7 +506,7 @@ WRITE8_MEMBER(homedata_state::pteacher_upd7807_portc_w)
 
 WRITE8_MEMBER(homedata_state::bankswitch_w)
 {
-	int last_bank = (machine().root_device().memregion("maincpu")->bytes() - 0x10000) / 0x4000;
+	int last_bank = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
 
 	/* last bank is fixed and is #0 for us, other banks start from #1 (hence data+1 below)*/
 	if (data < last_bank)

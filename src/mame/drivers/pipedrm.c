@@ -219,7 +219,7 @@ WRITE8_MEMBER(pipedrm_state::pipedrm_bankswitch_w )
 
 WRITE8_MEMBER(pipedrm_state::sound_bankswitch_w )
 {
-	space.machine().root_device().membank("bank2")->set_entry(data & 0x01);
+	membank("bank2")->set_entry(data & 0x01);
 }
 
 

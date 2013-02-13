@@ -748,8 +748,8 @@ void nmk16_state::mcu_run(UINT8 dsw_setting)
 	/*needed because of the uncompatibility of the dsw settings.*/
 	if(dsw_setting) // Thunder Dragon
 	{
-		dsw[0] = (machine().root_device().ioport("DSW2")->read() & 0x7);
-		dsw[1] = (machine().root_device().ioport("DSW2")->read() & 0x38) >> 3;
+		dsw[0] = (ioport("DSW2")->read() & 0x7);
+		dsw[1] = (ioport("DSW2")->read() & 0x38) >> 3;
 		for(i=0;i<2;i++)
 		{
 			switch(dsw[i] & 7)
@@ -767,8 +767,8 @@ void nmk16_state::mcu_run(UINT8 dsw_setting)
 	}
 	else // Hacha Mecha Fighter
 	{
-		dsw[0] = (machine().root_device().ioport("DSW1")->read() & 0x0700) >> 8;
-		dsw[1] = (machine().root_device().ioport("DSW1")->read() & 0x3800) >> 11;
+		dsw[0] = (ioport("DSW1")->read() & 0x0700) >> 8;
+		dsw[1] = (ioport("DSW1")->read() & 0x3800) >> 11;
 		for(i=0;i<2;i++)
 		{
 			switch(dsw[i] & 7)
@@ -786,7 +786,7 @@ void nmk16_state::mcu_run(UINT8 dsw_setting)
 	}
 
 	/*read the coin port*/
-	coin_input = (~(machine().root_device().ioport("IN0")->read()));
+	coin_input = (~(ioport("IN0")->read()));
 
 	if(coin_input & 0x01)//coin 1
 	{
@@ -1071,7 +1071,7 @@ WRITE8_MEMBER(nmk16_state::okibank_w)
 
 WRITE8_MEMBER(nmk16_state::raphero_sound_rombank_w)
 {
-	membank("bank1")->set_base(machine().root_device().memregion("audiocpu")->base() + 0x10000 + (data & 0x07) * 0x4000);
+	membank("bank1")->set_base(memregion("audiocpu")->base() + 0x10000 + (data & 0x07) * 0x4000);
 }
 
 static ADDRESS_MAP_START( raphero_sound_mem_map, AS_PROGRAM, 8, nmk16_state )
@@ -4410,16 +4410,16 @@ void nmk16_state::decode_gfx()
 
 
 	/* background */
-	rom = machine().root_device().memregion("gfx2")->base();
-	len = machine().root_device().memregion("gfx2")->bytes();
+	rom = memregion("gfx2")->base();
+	len = memregion("gfx2")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_bg[bjtwin_address_map_bg0(A)]);
 	}
 
 	/* sprites */
-	rom = machine().root_device().memregion("gfx3")->base();
-	len = machine().root_device().memregion("gfx3")->bytes();
+	rom = memregion("gfx3")->base();
+	len = memregion("gfx3")->bytes();
 	for (A = 0;A < len;A += 2)
 	{
 		UINT16 tmp = decode_word( rom[A+1]*256 + rom[A], decode_data_sprite[bjtwin_address_map_sprites(A)]);
@@ -4448,8 +4448,8 @@ void nmk16_state::decode_tdragonb()
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
 
-	rom = machine().root_device().memregion("maincpu")->base();
-	len = machine().root_device().memregion("maincpu")->bytes();
+	rom = memregion("maincpu")->base();
+	len = memregion("maincpu")->bytes();
 	for (A = 0;A < len;A += 2)
 	{
 		int h = A+NATIVE_ENDIAN_VALUE_LE_BE(1,0), l = A+NATIVE_ENDIAN_VALUE_LE_BE(0,1);
@@ -4458,15 +4458,15 @@ void nmk16_state::decode_tdragonb()
 		rom[l] = tmp & 0xff;
 	}
 
-	rom = machine().root_device().memregion("gfx2")->base();
-	len = machine().root_device().memregion("gfx2")->bytes();
+	rom = memregion("gfx2")->base();
+	len = memregion("gfx2")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 
-	rom = machine().root_device().memregion("gfx3")->base();
-	len = machine().root_device().memregion("gfx3")->bytes();
+	rom = memregion("gfx3")->base();
+	len = memregion("gfx3")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
@@ -4485,15 +4485,15 @@ void nmk16_state::decode_ssmissin()
 		{0x7,0x6,0x5,0x3,0x4,0x2,0x1,0x0},
 	};
 
-	rom = machine().root_device().memregion("gfx2")->base();
-	len = machine().root_device().memregion("gfx2")->bytes();
+	rom = memregion("gfx2")->base();
+	len = memregion("gfx2")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
 	}
 
-	rom = machine().root_device().memregion("gfx3")->base();
-	len = machine().root_device().memregion("gfx3")->bytes();
+	rom = memregion("gfx3")->base();
+	len = memregion("gfx3")->bytes();
 	for (A = 0;A < len;A++)
 	{
 		rom[A] = decode_byte( rom[A], decode_data_tdragonbgfx[0]);
@@ -4508,7 +4508,7 @@ DRIVER_INIT_MEMBER(nmk16_state,nmk)
 
 DRIVER_INIT_MEMBER(nmk16_state,hachamf)
 {
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
 	//rom[0x0006/2] = 0x7dc2;   /* replace reset vector with the "real" one */
 
@@ -4524,7 +4524,7 @@ DRIVER_INIT_MEMBER(nmk16_state,tdragonb)
 
 DRIVER_INIT_MEMBER(nmk16_state,tdragon)
 {
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
 	//rom[0x94b0/2] = 0; /* Patch out JMP to shared memory (protection) */
 	//rom[0x94b2/2] = 0x92f4;
@@ -4557,7 +4557,7 @@ DRIVER_INIT_MEMBER(nmk16_state,bjtwin)
  *  008F7E: 207C 000F 9000           movea.l #$f9000, A0
  */
 #if 0
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 	rom[0x09172/2] = 0x6006;    /* patch checksum error */
 	rom[0x08f74/2] = 0x4e71;
 #endif

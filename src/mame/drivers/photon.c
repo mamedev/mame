@@ -210,7 +210,7 @@ void photon_state::video_start()
 
 UINT32 photon_state::screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return pk8000_video_update(screen, bitmap, cliprect, machine().root_device().memregion("maincpu")->base());
+	return pk8000_video_update(screen, bitmap, cliprect, memregion("maincpu")->base());
 }
 
 static MACHINE_CONFIG_START( photon, photon_state )

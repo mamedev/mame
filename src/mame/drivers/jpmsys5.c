@@ -827,7 +827,7 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(jpmsys5_state,jpmsys5)
 {
-//  machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base()+0x20000);
+//  membank("bank1")->set_base(memregion("maincpu")->base()+0x20000);
 }
 
 MACHINE_RESET_MEMBER(jpmsys5_state,jpmsys5)

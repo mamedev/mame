@@ -32,7 +32,7 @@ static const res_net_info carjmbre_net_info =
 
 void carjmbre_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &carjmbre_decode_info, &carjmbre_net_info);

@@ -39,7 +39,7 @@
 
 void timeplt_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t palette[32];
 	int i;
 

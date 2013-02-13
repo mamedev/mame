@@ -1494,7 +1494,7 @@ UINT32 halleys_state::screen_update_halleys(screen_device &screen, bitmap_ind16 
 		bitmap.fill(m_bgcolor, cliprect);
 
 #ifdef MAME_DEBUG
-	if (machine().root_device().ioport("DEBUG")->read()) copy_scroll_xp(bitmap, m_render_layer[3], *m_scrollx0, *m_scrolly0); // not used???
+	if (ioport("DEBUG")->read()) copy_scroll_xp(bitmap, m_render_layer[3], *m_scrollx0, *m_scrolly0); // not used???
 #endif
 
 	copy_scroll_xp(bitmap, m_render_layer[2], *m_scrollx1, *m_scrolly1);

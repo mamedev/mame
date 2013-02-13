@@ -112,12 +112,12 @@ void sangho_state::pzlestar_map_banks()
 		case 2:
 			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, "bank2");
 			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x4000, 0x7fff);
-			membank("bank2")->set_base(machine().root_device().memregion("user1")->base()+ 0x18000);
+			membank("bank2")->set_base(memregion("user1")->base()+ 0x18000);
 			break;
 		case 3:
 			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x7fff, "bank2");
 			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x4000, 0x7fff);
-			membank("bank2")->set_base(machine().root_device().memregion("user1")->base()+ 0x20000 + (m_pzlestar_rom_bank*0x8000) + 0x4000);
+			membank("bank2")->set_base(memregion("user1")->base()+ 0x20000 + (m_pzlestar_rom_bank*0x8000) + 0x4000);
 			break;
 		case 1:
 			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x4000, 0x7fff);
@@ -138,7 +138,7 @@ void sangho_state::pzlestar_map_banks()
 		case 3:
 			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x8000, 0xbfff, "bank3");
 			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(0x8000, 0xbfff);
-			membank("bank3")->set_base(machine().root_device().memregion("user1")->base()+ 0x20000 + (m_pzlestar_rom_bank*0x8000));
+			membank("bank3")->set_base(memregion("user1")->base()+ 0x20000 + (m_pzlestar_rom_bank*0x8000));
 			break;
 		case 1:
 		case 2:
@@ -208,18 +208,18 @@ void sangho_state::sexyboom_map_bank(int bank)
 		else
 		{
 			// rom 0
-			membank(read_bank_name)->set_base(machine().root_device().memregion("user1")->base()+0x4000*banknum);
+			membank(read_bank_name)->set_base(memregion("user1")->base()+0x4000*banknum);
 			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 		}
 	}
 	else if (banktype == 0x82)
 	{
-		membank(read_bank_name)->set_base(machine().root_device().memregion("user1")->base()+0x20000+banknum*0x4000);
+		membank(read_bank_name)->set_base(memregion("user1")->base()+0x20000+banknum*0x4000);
 		machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 	}
 	else if (banktype == 0x80)
 	{
-		membank(read_bank_name)->set_base(machine().root_device().memregion("user1")->base()+0x120000+banknum*0x4000);
+		membank(read_bank_name)->set_base(memregion("user1")->base()+0x120000+banknum*0x4000);
 		machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 	}
 	else

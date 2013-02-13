@@ -19,7 +19,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 
 	for (i = 0; i < 2; i++)
 	{
-		switch (machine().root_device().ioport(portnames[i])->read())
+		switch (ioport(portnames[i])->read())
 		{
 		case 0x01: m_gear[i] = 1; break;
 		case 0x02: m_gear[i] = 2; break;
@@ -30,7 +30,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 	}
 
 	/* watchdog is disabled during service mode */
-	machine().watchdog_enable(machine().root_device().ioport("IN0")->read() & 0x20);
+	machine().watchdog_enable(ioport("IN0")->read() & 0x20);
 }
 
 

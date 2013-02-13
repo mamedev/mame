@@ -267,7 +267,7 @@ INPUT_PORTS_END
 
 void istellar_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -406,7 +406,7 @@ DRIVER_INIT_MEMBER(istellar_state,istellar)
 
 	#if 0
 	{
-		UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+		UINT8 *ROM = memregion("maincpu")->base();
 
 		ROM[0x4465] = 0x00;
 		ROM[0x4466] = 0x00;

@@ -737,7 +737,7 @@ WRITE8_MEMBER(tnzs_state::kabukiz_sound_bank_w)
 {
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)
-		machine().root_device().membank("audiobank")->set_entry(data & 0x07);
+		membank("audiobank")->set_entry(data & 0x07);
 }
 
 WRITE8_MEMBER(tnzs_state::kabukiz_sample_w)

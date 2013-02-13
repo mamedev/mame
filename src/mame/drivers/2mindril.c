@@ -490,8 +490,8 @@ void _2mindril_state::tile_decode()
 {
 	UINT8 lsb,msb;
 	UINT32 offset,i;
-	UINT8 *gfx = machine().root_device().memregion("gfx2")->base();
-	int size=machine().root_device().memregion("gfx2")->bytes();
+	UINT8 *gfx = memregion("gfx2")->base();
+	int size=memregion("gfx2")->bytes();
 	int data;
 
 	/* Setup ROM formats:
@@ -523,8 +523,8 @@ void _2mindril_state::tile_decode()
 		offset+=4;
 	}
 
-	gfx = machine().root_device().memregion("gfx1")->base();
-	size=machine().root_device().memregion("gfx1")->bytes();
+	gfx = memregion("gfx1")->base();
+	size=memregion("gfx1")->bytes();
 
 	offset = size/2;
 	for (i = size/2+size/4; i<size; i++)

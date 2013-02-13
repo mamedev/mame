@@ -775,7 +775,7 @@ ROM_END
 DRIVER_INIT_MEMBER(kickgoal_state,kickgoal)
 {
 #if 0 /* we should find a real fix instead  */
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
 	/* fix "bug" that prevents game from writing to EEPROM */
 	rom[0x12b0/2] = 0x0001;

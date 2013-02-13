@@ -3610,8 +3610,8 @@ ROM_END
 
 void megasys1_state::rodlandj_gfx_unmangle(const char *region)
 {
-	UINT8 *rom = machine().root_device().memregion(region)->base();
-	int size = machine().root_device().memregion(region)->bytes();
+	UINT8 *rom = memregion(region)->base();
+	int size = memregion(region)->bytes();
 	UINT8 *buffer;
 	int i;
 
@@ -3642,8 +3642,8 @@ void megasys1_state::rodlandj_gfx_unmangle(const char *region)
 
 void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 {
-	UINT8 *rom = machine().root_device().memregion(region)->base();
-	int size = machine().root_device().memregion(region)->bytes();
+	UINT8 *rom = memregion(region)->base();
+	int size = memregion(region)->bytes();
 	UINT8 *buffer;
 	int i;
 
@@ -3669,8 +3669,8 @@ void megasys1_state::jitsupro_gfx_unmangle(const char *region)
 
 void megasys1_state::stdragona_gfx_unmangle(const char *region)
 {
-	UINT8 *rom = machine().root_device().memregion(region)->base();
-	int size = machine().root_device().memregion(region)->bytes();
+	UINT8 *rom = memregion(region)->base();
+	int size = memregion(region)->bytes();
 	UINT8 *buffer;
 	int i;
 
@@ -3900,7 +3900,7 @@ DRIVER_INIT_MEMBER(megasys1_state,iganinju)
 
 	phantasm_rom_decode(machine(), "maincpu");
 
-	//ROM  = (UINT16 *) machine().root_device().memregion("maincpu")->base();
+	//ROM  = (UINT16 *) memregion("maincpu")->base();
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_r),this));
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x2f000, 0x2f009, write16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_w),this));
 
@@ -3923,7 +3923,7 @@ WRITE16_MEMBER(megasys1_state::okim6295_both_2_w)
 
 DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
 {
-	//UINT16 *ROM  = (UINT16 *) machine().root_device().memregion("maincpu")->base();
+	//UINT16 *ROM  = (UINT16 *) memregion("maincpu")->base();
 
 	astyanax_rom_decode(machine(), "maincpu");      // Code
 

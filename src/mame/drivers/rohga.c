@@ -1549,8 +1549,8 @@ DRIVER_INIT_MEMBER(rohga_state,nitrobal)
 
 DRIVER_INIT_MEMBER(rohga_state,schmeisr)
 {
-	const UINT8 *src = machine().root_device().memregion("gfx2")->base();
-	UINT8 *dst = machine().root_device().memregion("gfx1")->base();
+	const UINT8 *src = memregion("gfx2")->base();
+	UINT8 *dst = memregion("gfx1")->base();
 
 	memcpy(dst, src, 0x20000);
 	memcpy(dst + 0x20000, src + 0x80000, 0x20000);

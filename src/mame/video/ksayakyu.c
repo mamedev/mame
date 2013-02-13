@@ -32,7 +32,7 @@ WRITE8_MEMBER(ksayakyu_state::ksayakyu_videoctrl_w)
 
 void ksayakyu_state::palette_init()
 {
-	const UINT8 *prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *prom = memregion("proms")->base();
 	int r, g, b, i;
 
 	for (i = 0; i < 0x100; i++)
@@ -47,8 +47,8 @@ void ksayakyu_state::palette_init()
 
 TILE_GET_INFO_MEMBER(ksayakyu_state::get_ksayakyu_tile_info)
 {
-	int code = machine().root_device().memregion("user1")->base()[tile_index];
-	int attr = machine().root_device().memregion("user1")->base()[tile_index + 0x2000];
+	int code = memregion("user1")->base()[tile_index];
+	int attr = memregion("user1")->base()[tile_index + 0x2000];
 	code += (attr & 3) << 8;
 	SET_TILE_INFO_MEMBER(1, code, ((attr >> 2) & 0x0f) * 2, (attr & 0x80) ? TILE_FLIPX : 0);
 }

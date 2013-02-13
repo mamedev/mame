@@ -111,8 +111,8 @@ READ32_MEMBER(polygonet_state::polygonet_eeprom_r)
 	}
 	else
 	{
-		UINT8 lowInputBits = machine().root_device().ioport("IN1")->read();
-		UINT8 highInputBits = machine().root_device().ioport("IN0")->read();
+		UINT8 lowInputBits = ioport("IN1")->read();
+		UINT8 highInputBits = ioport("IN0")->read();
 		return ((highInputBits << 24) | (lowInputBits << 16));
 	}
 
@@ -136,7 +136,7 @@ WRITE32_MEMBER(polygonet_state::polygonet_eeprom_w)
 READ32_MEMBER(polygonet_state::ttl_rom_r)
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)machine().root_device().memregion("gfx1")->base();
+	ROM = (UINT32 *)memregion("gfx1")->base();
 
 	return ROM[offset];
 }
@@ -145,7 +145,7 @@ READ32_MEMBER(polygonet_state::ttl_rom_r)
 READ32_MEMBER(polygonet_state::psac_rom_r)
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)machine().root_device().memregion("gfx2")->base();
+	ROM = (UINT32 *)memregion("gfx2")->base();
 
 	return ROM[offset];
 }

@@ -131,7 +131,7 @@ WRITE_LINE_MEMBER(rpunch_state::ym2151_irq_gen)
 
 void rpunch_state::machine_reset()
 {
-	UINT8 *snd = machine().root_device().memregion("upd")->base();
+	UINT8 *snd = memregion("upd")->base();
 	memcpy(snd, snd + 0x20000, 0x20000);
 }
 

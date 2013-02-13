@@ -72,14 +72,14 @@ void dc_controller_device::fixed_status(UINT32 *dest)
 {
 	dest[0] = 0x20000000; // Controller
 	dest[1] =
-		((machine().root_device().ioport(port_tag[2]) != NULL) ? 0x010000 : 0) |
-		((machine().root_device().ioport(port_tag[3]) != NULL) ? 0x020000 : 0) |
-		((machine().root_device().ioport(port_tag[4]) != NULL) ? 0x040000 : 0) |
-		((machine().root_device().ioport(port_tag[5]) != NULL) ? 0x080000 : 0) |
-		((machine().root_device().ioport(port_tag[6]) != NULL) ? 0x100000 : 0) |
-		((machine().root_device().ioport(port_tag[7]) != NULL) ? 0x200000 : 0) |
-		(machine().root_device().ioport(port_tag[0])->active_safe(0) << 8) |
-		machine().root_device().ioport(port_tag[1])->active_safe(0); // 1st function - controller
+		((ioport(port_tag[2]) != NULL) ? 0x010000 : 0) |
+		((ioport(port_tag[3]) != NULL) ? 0x020000 : 0) |
+		((ioport(port_tag[4]) != NULL) ? 0x040000 : 0) |
+		((ioport(port_tag[5]) != NULL) ? 0x080000 : 0) |
+		((ioport(port_tag[6]) != NULL) ? 0x100000 : 0) |
+		((ioport(port_tag[7]) != NULL) ? 0x200000 : 0) |
+		(ioport(port_tag[0])->active_safe(0) << 8) |
+		ioport(port_tag[1])->active_safe(0); // 1st function - controller
 	dest[2] = 0; // No 2nd function
 	dest[3] = 0; // No 3rd function
 	dest[4] = 0x00ff; // Every region, no expansion

@@ -302,7 +302,7 @@ WRITE8_MEMBER(nightgal_state::sexygal_nsc_true_blitter_w)
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
 void nightgal_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -1264,7 +1264,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(nightgal_state,royalqn)
 {
-	UINT8 *ROM = machine().root_device().memregion("sub")->base();
+	UINT8 *ROM = memregion("sub")->base();
 
 	/* patch open bus / protection */
 	ROM[0xc27e] = 0x02;
@@ -1273,7 +1273,7 @@ DRIVER_INIT_MEMBER(nightgal_state,royalqn)
 
 DRIVER_INIT_MEMBER(nightgal_state,ngalsumr)
 {
-	UINT8 *ROM = machine().root_device().memregion("sub")->base();
+	UINT8 *ROM = memregion("sub")->base();
 
 	/* patch protection */
 	ROM[0xd6ce] = 0x02;

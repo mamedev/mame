@@ -87,7 +87,7 @@ public:
 
 void chinsan_state::palette_init()
 {
-	UINT8 *src = machine().root_device().memregion( "color_proms" )->base();
+	UINT8 *src = memregion( "color_proms" )->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)

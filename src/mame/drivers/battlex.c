@@ -307,9 +307,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(battlex_state,battlex)
 {
-	UINT8 *colormask = machine().root_device().memregion("user1")->base();
-	UINT8 *gfxdata = machine().root_device().memregion("user2")->base();
-	UINT8 *dest = machine().root_device().memregion("gfx1")->base();
+	UINT8 *colormask = memregion("user1")->base();
+	UINT8 *gfxdata = memregion("user2")->base();
+	UINT8 *dest = memregion("gfx1")->base();
 
 	int tile, line, bit;
 

@@ -102,7 +102,7 @@ ADDRESS_MAP_END
 */
 WRITE8_MEMBER(epos_state::write_prtc)
 {
-	machine().root_device().membank("bank2")->set_entry(data & 0x01);
+	membank("bank2")->set_entry(data & 0x01);
 }
 
 static I8255A_INTERFACE( ppi8255_intf )
@@ -379,12 +379,12 @@ void epos_state::machine_reset()
 
 MACHINE_START_MEMBER(epos_state,dealer)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x0000], 0x10000);
-	machine().root_device().membank("bank2")->configure_entries(0, 2, &ROM[0x6000], 0x1000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 4, &ROM[0x0000], 0x10000);
+	membank("bank2")->configure_entries(0, 2, &ROM[0x6000], 0x1000);
 
-	machine().root_device().membank("bank1")->set_entry(0);
-	machine().root_device().membank("bank2")->set_entry(0);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
 
 	MACHINE_START_CALL_MEMBER(epos);
 }
@@ -602,7 +602,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(epos_state,dealer)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int A;
 
 	/* Key 0 */

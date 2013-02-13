@@ -1664,7 +1664,7 @@ DRIVER_INIT_MEMBER(gauntlet_state,gauntlet2)
 
 DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
 {
-	UINT8 *gfx2_base = machine().root_device().memregion("gfx2")->base();
+	UINT8 *gfx2_base = memregion("gfx2")->base();
 	UINT8 *data = auto_alloc_array(machine(), UINT8, 0x8000);
 	int i;
 

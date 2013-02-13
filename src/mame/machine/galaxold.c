@@ -164,11 +164,11 @@ WRITE8_MEMBER(galaxold_state::zigzag_sillyprotection_w)
 
 DRIVER_INIT_MEMBER(galaxold_state,zigzag)
 {
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 2, &RAM[0x2000], 0x1000);
-	machine().root_device().membank("bank2")->configure_entries(0, 2, &RAM[0x2000], 0x1000);
-	machine().root_device().membank("bank1")->set_entry(0);
-	machine().root_device().membank("bank2")->set_entry(1);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &RAM[0x2000], 0x1000);
+	membank("bank2")->configure_entries(0, 2, &RAM[0x2000], 0x1000);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(1);
 }
 
 
@@ -192,7 +192,7 @@ READ8_MEMBER(galaxold_state::dingoe_3001_r)
 DRIVER_INIT_MEMBER(galaxold_state,dingoe)
 {
 	offs_t i;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	for (i = 0; i < 0x3000; i++)
 	{
@@ -299,8 +299,8 @@ DRIVER_INIT_MEMBER(galaxold_state,mooncrsu)
 
 DRIVER_INIT_MEMBER(galaxold_state,mooncrst)
 {
-	offs_t i, len = machine().root_device().memregion("maincpu")->bytes();
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	offs_t i, len = memregion("maincpu")->bytes();
+	UINT8 *rom = memregion("maincpu")->base();
 
 
 	for (i = 0;i < len;i++)
@@ -318,7 +318,7 @@ DRIVER_INIT_MEMBER(galaxold_state,moonqsr)
 {
 	offs_t i;
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
 	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
@@ -376,8 +376,8 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 		{ 1,4,1,4 }
 	};
 
-	offs_t i, len = machine().root_device().memregion("maincpu")->bytes();
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	offs_t i, len = memregion("maincpu")->bytes();
+	UINT8 *rom = memregion("maincpu")->base();
 
 
 	for (i = 0; i < len; i++)
@@ -427,7 +427,7 @@ DRIVER_INIT_MEMBER(galaxold_state,bullsdrtg)
 	int i;
 
 	// patch char supposed to be space
-	UINT8 *gfxrom = machine().root_device().memregion("gfx1")->base();
+	UINT8 *gfxrom = memregion("gfx1")->base();
 	for (i = 0; i < 8; i++)
 	{
 		gfxrom[i] = 0;

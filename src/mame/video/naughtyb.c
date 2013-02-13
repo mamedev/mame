@@ -58,7 +58,7 @@ static const res_net_info naughtyb_net_info =
 
 void naughtyb_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[2] = { 270, 130 };
 	double weights[2];
 	int i;

@@ -39,7 +39,7 @@ J Clegg
 
 void travrusa_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -115,7 +115,7 @@ void travrusa_state::palette_init()
 
 PALETTE_INIT_MEMBER(travrusa_state,shtrider)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

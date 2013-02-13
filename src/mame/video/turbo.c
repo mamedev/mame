@@ -264,7 +264,7 @@ inline UINT32 turbo_state::sprite_xscale(UINT8 dacinput, double vr1, double vr2,
 
 void turbo_state::turbo_prepare_sprites(UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr1119 = machine().root_device().memregion("proms")->base() + 0x200;
+	const UINT8 *pr1119 = memregion("proms")->base() + 0x200;
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -322,7 +322,7 @@ void turbo_state::turbo_prepare_sprites(UINT8 y, sprite_info *info)
 			        VR1 = 310 Ohm
 			        VR2 = 910 Ohm
 			*/
-			info->step[level] = sprite_xscale(xscale, 1.0e3 * machine().root_device().ioport("VR1")->read() / 100.0, 1.0e3 * machine().root_device().ioport("VR2")->read() / 100.0, 100e-12);
+			info->step[level] = sprite_xscale(xscale, 1.0e3 * ioport("VR1")->read() / 100.0, 1.0e3 * ioport("VR2")->read() / 100.0, 100e-12);
 		}
 	}
 }
@@ -385,7 +385,7 @@ UINT32 turbo_state::turbo_get_sprite_bits(const UINT8 *sprite_gfxdata, UINT8 roa
 UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 &fgpixmap = m_fg_tilemap->pixmap();
-	const UINT8 *road_gfxdata = machine().root_device().memregion("gfx3")->base();
+	const UINT8 *road_gfxdata = memregion("gfx3")->base();
 	const UINT8 *prom_base = memregion("proms")->base();
 	const UINT8 *pr1114 = prom_base + 0x000;
 	const UINT8 *pr1115 = prom_base + 0x020;
@@ -621,7 +621,7 @@ UINT32 turbo_state::screen_update_turbo(screen_device &screen, bitmap_ind16 &bit
 
 void turbo_state::subroc3d_prepare_sprites(UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr1449 = machine().root_device().memregion("proms")->base() + 0x300;
+	const UINT8 *pr1449 = memregion("proms")->base() + 0x300;
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -838,7 +838,7 @@ UINT32 turbo_state::screen_update_subroc3d(screen_device &screen, bitmap_ind16 &
 
 void turbo_state::buckrog_prepare_sprites(UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr5196 = machine().root_device().memregion("proms")->base() + 0x100;
+	const UINT8 *pr5196 = memregion("proms")->base() + 0x100;
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -956,7 +956,7 @@ UINT32 turbo_state::buckrog_get_sprite_bits(const UINT8 *sprite_gfxdata, sprite_
 UINT32 turbo_state::screen_update_buckrog(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind16 &fgpixmap = m_fg_tilemap->pixmap();
-	const UINT8 *bgcolor = machine().root_device().memregion("gfx3")->base();
+	const UINT8 *bgcolor = memregion("gfx3")->base();
 	const UINT8 *prom_base = memregion("proms")->base();
 	const UINT8 *pr5194 = prom_base + 0x000;
 	const UINT8 *pr5198 = prom_base + 0x500;

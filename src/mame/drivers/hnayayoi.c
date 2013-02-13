@@ -671,8 +671,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
 {
-	UINT8 *rom = machine().root_device().memregion("gfx1")->base();
-	int len = machine().root_device().memregion("gfx1")->bytes();
+	UINT8 *rom = memregion("gfx1")->base();
+	int len = memregion("gfx1")->bytes();
 	int i, j;
 
 	/* interestingly, the blitter data has a slight encryption */

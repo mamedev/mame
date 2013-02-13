@@ -712,7 +712,7 @@ ROM_END
 DRIVER_INIT_MEMBER(ltcasino_state,mv4in1)
 {
 	int i;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	for(i=0;i<0x10000;i++)
 		rom[i]=BITSWAP8(rom[i],7,6,5,4,3,1,2,0);
 }

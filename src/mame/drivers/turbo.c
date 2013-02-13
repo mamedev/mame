@@ -1613,7 +1613,7 @@ void turbo_state::turbo_rom_decode()
 		2,1,2,1  /* 0x5000-0x5fff */
 	};
 
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int offs, i, j;
 	UINT8 src;
 

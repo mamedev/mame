@@ -1312,7 +1312,7 @@ UINT32 dynax_state::screen_update_ddenlovr(screen_device &screen, bitmap_ind16 &
 
 #if 0
 	static int base = 0x0;
-	const UINT8 *gfx = machine().root_device().memregion("blitter")->base();
+	const UINT8 *gfx = memregion("blitter")->base();
 	int next;
 	memset(m_ddenlovr_pixmap[0], 0, 512 * 512);
 	memset(m_ddenlovr_pixmap[1], 0, 512 * 512);
@@ -8784,71 +8784,71 @@ MACHINE_RESET_MEMBER(dynax_state,ddenlovr)
 
 MACHINE_START_MEMBER(dynax_state,rongrong)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 0x20, &ROM[0x010000], 0x8000);
-	machine().root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x110000], 0x1000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x20, &ROM[0x010000], 0x8000);
+	membank("bank2")->configure_entries(0, 8,    &ROM[0x110000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(dynax_state,mmpanic)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(dynax_state,funkyfig)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	machine().root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(dynax_state,hanakanz)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	machine().root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(dynax_state,mjmyster)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
-	machine().root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
+	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(dynax_state,hparadis)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
-	machine().root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x50000], 0x1000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 8,    &ROM[0x10000], 0x8000);
+	membank("bank2")->configure_entries(0, 8,    &ROM[0x50000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(dynax_state,mjflove)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	machine().root_device().membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	membank("bank2")->configure_entries(0, 8,    &ROM[0x90000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
 
 MACHINE_START_MEMBER(dynax_state,sryudens)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
-	machine().root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
+	membank("bank2")->configure_entries(0, 0x10, &ROM[0x90000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
@@ -9766,14 +9766,14 @@ static const ay8910_interface seljan2_ay8910_interface =
 
 MACHINE_START_MEMBER(dynax_state,seljan2)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	machine().root_device().membank("bank1")->configure_entries(0x00, 0x10, &ROM[0x10000], 0x8000);
+	membank("bank1")->configure_entries(0x00, 0x10, &ROM[0x10000], 0x8000);
 	// banks 10-1f -> palette RAM
 	for (int i = 0; i < 0x10; i++)
-		machine().root_device().membank("bank1")->configure_entries(0x10+i, 1, &ROM[0x90000], 0x8000);
+		membank("bank1")->configure_entries(0x10+i, 1, &ROM[0x90000], 0x8000);
 
-	machine().root_device().membank("bank2")->configure_entries(0, 0x10, &ROM[0x98000], 0x1000);
+	membank("bank2")->configure_entries(0, 0x10, &ROM[0x98000], 0x1000);
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }

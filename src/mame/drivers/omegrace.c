@@ -590,8 +590,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(omegrace_state,omegrace)
 {
-	int i, len = machine().root_device().memregion("user1")->bytes();
-	UINT8 *prom = machine().root_device().memregion("user1")->base();
+	int i, len = memregion("user1")->bytes();
+	UINT8 *prom = memregion("user1")->base();
 
 	/* Omega Race has two pairs of the state PROM output
 	 * lines swapped before going into the decoder.

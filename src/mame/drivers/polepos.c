@@ -340,8 +340,8 @@ WRITE16_MEMBER(polepos_state::polepos_z8002_nvi_enable_w)
 }
 
 
-CUSTOM_INPUT_MEMBER(polepos_state::high_port_r){ return field.machine().root_device().ioport((const char *)param)->read() >> 4; }
-CUSTOM_INPUT_MEMBER(polepos_state::low_port_r){ return field.machine().root_device().ioport((const char *)param)->read() & 0x0f; }
+CUSTOM_INPUT_MEMBER(polepos_state::high_port_r){ return ioport((const char *)param)->read() >> 4; }
+CUSTOM_INPUT_MEMBER(polepos_state::low_port_r){ return ioport((const char *)param)->read() & 0x0f; }
 CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
 {
 	return m_auto_start_mask;
@@ -378,9 +378,9 @@ static const namco_51xx_interface namco_51xx_intf =
 
 READ8_MEMBER(polepos_state::namco_52xx_rom_r)
 {
-	UINT32 length = machine().root_device().memregion("52xx")->bytes();
+	UINT32 length = memregion("52xx")->bytes();
 logerror("ROM @ %04X\n", offset);
-	return (offset < length) ? machine().root_device().memregion("52xx")->base()[offset] : 0xff;
+	return (offset < length) ? memregion("52xx")->base()[offset] : 0xff;
 }
 
 READ8_MEMBER(polepos_state::namco_52xx_si_r)

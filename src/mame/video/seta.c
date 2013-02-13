@@ -652,7 +652,7 @@ PALETTE_INIT_MEMBER(seta_state,zingzip)
 // color prom
 PALETTE_INIT_MEMBER(seta_state,inttoote)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int x;
 	for (x = 0; x < 0x200 ; x++)
 	{
@@ -671,7 +671,7 @@ PALETTE_INIT_MEMBER(seta_state,setaroul)
 
 PALETTE_INIT_MEMBER(seta_state,usclssic)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int color, pen;
 	int x;
 

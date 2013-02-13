@@ -703,7 +703,7 @@ DRIVER_INIT_MEMBER(tehkanwc_state,teedoff)
 	    023A: 00          nop
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0x0238] = 0x00;
 	ROM[0x0239] = 0x00;

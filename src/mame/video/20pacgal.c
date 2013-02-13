@@ -25,7 +25,7 @@
 void _20pacgal_state::get_pens(pen_t *pens)
 {
 	offs_t offs;
-	UINT8 *color_prom = machine().root_device().memregion("proms")->base() + (NUM_PENS * m_game_selected);
+	UINT8 *color_prom = memregion("proms")->base() + (NUM_PENS * m_game_selected);
 
 	for (offs = 0; offs < NUM_PENS ;offs++)
 	{

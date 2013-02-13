@@ -979,9 +979,9 @@ This code is overly generic because it is used for several games in ninjakd2.c
 
 void nova2001_state::lineswap_gfx_roms(const char *region, const int bit)
 {
-	const int length = machine().root_device().memregion(region)->bytes();
+	const int length = memregion(region)->bytes();
 
-	UINT8* const src = machine().root_device().memregion(region)->base();
+	UINT8* const src = memregion(region)->base();
 
 	UINT8* const temp = auto_alloc_array(machine(), UINT8, length);
 

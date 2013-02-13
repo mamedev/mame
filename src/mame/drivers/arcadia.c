@@ -768,7 +768,7 @@ ROM_END
 
 void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
 {
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion(tag)->base();
+	UINT16 *rom = (UINT16 *)memregion(tag)->base();
 	int i;
 
 	/* only the low byte of ROMs are encrypted in these games */
@@ -777,8 +777,8 @@ void arcadia_amiga_state::generic_decode(const char *tag, int bit7, int bit6, in
 
 	#if 0
 	{
-		UINT8 *ROM = machine().root_device().memregion(tag)->base();
-		int size = machine().root_device().memregion(tag)->bytes();
+		UINT8 *ROM = memregion(tag)->base();
+		int size = memregion(tag)->bytes();
 
 		FILE *fp;
 		char filename[256];
@@ -819,10 +819,10 @@ void arcadia_amiga_state::arcadia_init()
 
 	/* set up memory */
 	m_bank1->configure_entry(0, m_chip_ram);
-	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(1, memregion("user1")->base());
 
 	/* OnePlay bios is encrypted, TenPlay is not */
-	biosrom = (UINT16 *)machine().root_device().memregion("user2")->base();
+	biosrom = (UINT16 *)memregion("user2")->base();
 	if (biosrom[0] != 0x4afc)
 		generic_decode("user2", 6, 1, 0, 2, 3, 4, 5, 7);
 }

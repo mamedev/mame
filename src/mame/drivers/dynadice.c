@@ -292,10 +292,10 @@ ROM_END
 DRIVER_INIT_MEMBER(dynadice_state,dynadice)
 {
 	int i, j;
-	UINT8 *usr1 = machine().root_device().memregion("user1")->base();
-	UINT8 *cpu2 = machine().root_device().memregion("audiocpu")->base();
-	UINT8 *gfx1 = machine().root_device().memregion("gfx1")->base();
-	UINT8 *gfx2 = machine().root_device().memregion("gfx2")->base();
+	UINT8 *usr1 = memregion("user1")->base();
+	UINT8 *cpu2 = memregion("audiocpu")->base();
+	UINT8 *gfx1 = memregion("gfx1")->base();
+	UINT8 *gfx2 = memregion("gfx2")->base();
 
 	cpu2[0x0b] = 0x23;  /* bug in game code  Dec HL -> Inc HL*/
 

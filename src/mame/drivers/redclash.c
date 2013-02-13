@@ -536,9 +536,9 @@ ROM_END
 DRIVER_INIT_MEMBER(ladybug_state,redclash)
 {
 	int i,j;
-	const UINT8 *src = machine().root_device().memregion("gfx2")->base();
-	UINT8 *dst = machine().root_device().memregion("gfx3")->base();
-	int len = machine().root_device().memregion("gfx3")->bytes();
+	const UINT8 *src = memregion("gfx2")->base();
+	UINT8 *dst = memregion("gfx3")->base();
+	int len = memregion("gfx3")->bytes();
 
 	/* rearrange the sprite graphics */
 	for (i = 0;i < len;i++)

@@ -774,7 +774,7 @@ SCREEN_UPDATE_IND16( atari )
 
 	copybitmap(bitmap, *antic.bitmap, 0, 0, 0, 0, cliprect);
 
-	new_tv_artifacts = screen.machine().root_device().ioport("artifacts")->read_safe(0);
+	new_tv_artifacts = screen.ioport("artifacts")->read_safe(0);
 	if( tv_artifacts != new_tv_artifacts )
 	{
 		tv_artifacts = new_tv_artifacts;

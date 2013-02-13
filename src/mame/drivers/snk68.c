@@ -1039,7 +1039,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(snk68_state,searchar)
 {
-	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("user1")->base());
+	membank("bank1")->set_base(memregion("user1")->base());
 }
 
 /******************************************************************************/

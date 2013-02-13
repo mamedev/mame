@@ -604,7 +604,7 @@ void dacholer_state::machine_reset()
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
 void dacholer_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];

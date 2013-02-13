@@ -901,8 +901,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(expro02_state,galsnew)
 {
-	UINT32 *src = (UINT32 *)machine().root_device().memregion("gfx3" )->base();
-	UINT32 *dst = (UINT32 *)machine().root_device().memregion("gfx2" )->base();
+	UINT32 *src = (UINT32 *)memregion("gfx3" )->base();
+	UINT32 *dst = (UINT32 *)memregion("gfx2" )->base();
 	int x, offset;
 
 

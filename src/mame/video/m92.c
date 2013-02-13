@@ -536,7 +536,7 @@ UINT32 m92_state::screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap,
 	draw_sprites(bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
-	if (machine().root_device().ioport("DSW")->read() & 0x100)
+	if (ioport("DSW")->read() & 0x100)
 		flip_screen_set(0);
 	else
 		flip_screen_set(1);
@@ -553,7 +553,7 @@ UINT32 m92_state::screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap
 	ppan_draw_sprites(bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
-	if (machine().root_device().ioport("DSW")->read() & 0x100)
+	if (ioport("DSW")->read() & 0x100)
 		flip_screen_set(0);
 	else
 		flip_screen_set(1);

@@ -232,7 +232,7 @@ void magictg_state::machine_start()
 
 void magictg_state::machine_reset()
 {
-	UINT8 *adsp_boot = (UINT8*)machine().root_device().memregion("adsp")->base();
+	UINT8 *adsp_boot = (UINT8*)memregion("adsp")->base();
 
 	zr36120_reset();
 
@@ -751,7 +751,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 
 			if (data > 0)
 			{
-				UINT8* adsp_rom = (UINT8*)space.machine().root_device().memregion("adsp")->base();
+				UINT8* adsp_rom = (UINT8*)memregion("adsp")->base();
 
 				UINT32 page = (m_adsp_regs.bdma_control >> 8) & 0xff;
 				UINT32 dir = (m_adsp_regs.bdma_control >> 2) & 1;

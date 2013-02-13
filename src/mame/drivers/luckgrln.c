@@ -1027,7 +1027,7 @@ DRIVER_INIT_MEMBER(luckgrln_state,luckgrln)
 {
 	int i;
 	UINT8 x,v;
-	UINT8* rom = machine().root_device().memregion("rom_data")->base();
+	UINT8* rom = memregion("rom_data")->base();
 
 	for (i=0;i<0x20000;i++)
 	{
@@ -1054,7 +1054,7 @@ DRIVER_INIT_MEMBER(luckgrln_state,luckgrln)
 	#endif
 
 	// ??
-//  machine().root_device().membank("bank1")->set_base(&rom[0x010000]);
+//  membank("bank1")->set_base(&rom[0x010000]);
 }
 
 

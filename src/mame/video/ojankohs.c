@@ -19,7 +19,7 @@
 
 PALETTE_INIT_MEMBER(ojankohs_state,ojankoy)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	int bit0, bit1, bit2, bit3, bit4, r, g, b;
 

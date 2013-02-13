@@ -780,7 +780,7 @@ void wheelfir_state::machine_start()
 		m_zoom_table[i]=-1;
 	}
 
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
 
 	for(int j=0;j<400;++j)
 	{
@@ -859,7 +859,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(wheelfir_state,wheelfir)
 {
-	UINT16 *RAM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
 	RAM[0xdd3da/2] = 0x4e71; //hack
 }
 

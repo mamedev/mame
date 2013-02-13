@@ -274,9 +274,9 @@ GFXDECODE_END
 
 void d9final_state::machine_reset()
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	machine().root_device().membank("bank1")->set_base(&ROM[0x10000]);
+	membank("bank1")->set_base(&ROM[0x10000]);
 }
 
 static MACHINE_CONFIG_START( d9final, d9final_state )

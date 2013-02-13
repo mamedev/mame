@@ -376,8 +376,8 @@ Screenshots available on my site at http://guru.mameworld.info/oldnews2001.html 
 
 DRIVER_INIT_MEMBER(md_boot_state,puckpkmn)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
-	size_t len = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *rom = memregion("maincpu")->base();
+	size_t len = memregion("maincpu")->bytes();
 	int i;
 
 	for (i = 0; i < len; i++)

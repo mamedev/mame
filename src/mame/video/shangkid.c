@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info){
 	}
 
 	tileinfo.category =
-		(machine().root_device().memregion( "proms" )->base()[0x800+color*4]==2)?1:0;
+		(memregion( "proms" )->base()[0x800+color*4]==2)?1:0;
 }
 
 VIDEO_START_MEMBER(shangkid_state,shangkid)
@@ -195,7 +195,7 @@ UINT32 shangkid_state::screen_update_shangkid(screen_device &screen, bitmap_ind1
 
 PALETTE_INIT_MEMBER(shangkid_state,dynamski)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

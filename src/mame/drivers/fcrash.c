@@ -1620,8 +1620,8 @@ DRIVER_INIT_MEMBER(cps_state, cawingbl)
 DRIVER_INIT_MEMBER(cps_state, sf2mdt)
 {
 	int i;
-	UINT32 gfx_size = machine().root_device().memregion( "gfx" )->bytes();
-	UINT8 *rom = machine().root_device().memregion( "gfx" )->base();
+	UINT32 gfx_size = memregion( "gfx" )->bytes();
+	UINT8 *rom = memregion( "gfx" )->base();
 	UINT8 tmp;
 
 	for( i = 0; i < gfx_size; i += 8 )

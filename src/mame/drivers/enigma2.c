@@ -707,7 +707,7 @@ ROM_END
 DRIVER_INIT_MEMBER(enigma2_state,enigma2)
 {
 	offs_t i;
-	UINT8 *rom = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *rom = memregion("audiocpu")->base();
 
 	for(i = 0; i < 0x2000; i++)
 	{

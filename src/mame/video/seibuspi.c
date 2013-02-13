@@ -500,7 +500,7 @@ VIDEO_START_MEMBER(seibuspi_state,spi)
 	for (i = 6000; i < 6016; i++) { m_alpha_table[i] = 1; }
 	for (i = 6128; i < 6144; i++) { m_alpha_table[i] = 1; }
 
-	region_length = machine().root_device().memregion("gfx2")->bytes();
+	region_length = memregion("gfx2")->bytes();
 
 	if (region_length <= 0x300000)
 	{

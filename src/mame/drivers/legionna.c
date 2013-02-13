@@ -2322,7 +2322,7 @@ ROM_END
 DRIVER_INIT_MEMBER(legionna_state,cupsoc)
 {
 	#if CUPSOC_DEBUG_MODE
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
 
 	/*Press p1 button 3 to enter into debug mode during gameplay*/
 	ROM[0xffffb/2] = 0x0000;
@@ -2334,13 +2334,13 @@ DRIVER_INIT_MEMBER(legionna_state,cupsoc)
 DRIVER_INIT_MEMBER(legionna_state,denjinmk)
 {
 	/* problem with audio comms? */
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
 	ROM[0x5fe4/2] = 0x4e71;
 }
 
 DRIVER_INIT_MEMBER(legionna_state,legiongfx)
 {
-	descramble_legionnaire_gfx(machine().root_device().memregion("gfx5")->base() );
+	descramble_legionnaire_gfx(memregion("gfx5")->base() );
 }
 
 

@@ -75,7 +75,7 @@ WRITE8_MEMBER(st0016_state::mux_select_w)
 
 WRITE8_MEMBER(st0016_state::st0016_rom_bank_w)
 {
-	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + (data* 0x4000));
+	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000));
 	st0016_rom_bank=data;
 }
 
@@ -682,13 +682,13 @@ DRIVER_INIT_MEMBER(st0016_state,nratechu)
 DRIVER_INIT_MEMBER(st0016_state,mayjinsn)
 {
 	st0016_game=4;//|0x80;
-	machine().root_device().membank("bank2")->set_base(machine().root_device().memregion("user1")->base());
+	membank("bank2")->set_base(memregion("user1")->base());
 }
 
 DRIVER_INIT_MEMBER(st0016_state,mayjisn2)
 {
 	st0016_game=4;
-	machine().root_device().membank("bank2")->set_base(machine().root_device().memregion("user1")->base());
+	membank("bank2")->set_base(memregion("user1")->base());
 }
 
 /*************************************

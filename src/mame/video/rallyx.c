@@ -57,7 +57,7 @@ needs more color combination to render its graphics.
 
 PALETTE_INIT_MEMBER(rallyx_state,rallyx)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -116,7 +116,7 @@ PALETTE_INIT_MEMBER(rallyx_state,rallyx)
 
 PALETTE_INIT_MEMBER(rallyx_state,jungler)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3]   = { 1000, 470, 220 };
 	static const int resistances_b [2]   = { 470, 220 };
 	static const int resistances_star[3] = { 150, 100 };

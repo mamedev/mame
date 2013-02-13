@@ -1783,8 +1783,8 @@ MACHINE_CONFIG_END
 */
 void cischeat_state::cischeat_untangle_sprites(const char *region)
 {
-	UINT8       *src = machine().root_device().memregion(region)->base();
-	const UINT8 *end = src + machine().root_device().memregion(region)->bytes();
+	UINT8       *src = memregion(region)->base();
+	const UINT8 *end = src + memregion(region)->bytes();
 
 	while (src < end)
 	{

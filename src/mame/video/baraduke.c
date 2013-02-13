@@ -17,7 +17,7 @@
 
 void baraduke_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	int bit0,bit1,bit2,bit3,r,g,b;
 

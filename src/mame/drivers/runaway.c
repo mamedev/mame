@@ -62,7 +62,7 @@ READ8_MEMBER(runaway_state::runaway_input_r)
 
 READ8_MEMBER(runaway_state::runaway_pot_r)
 {
-	return (machine().root_device().ioport("7000")->read() << (7 - offset)) & 0x80;
+	return (ioport("7000")->read() << (7 - offset)) & 0x80;
 }
 
 

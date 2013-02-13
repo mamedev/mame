@@ -131,10 +131,10 @@ void jedi_state::draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle 
 	int y;
 	int background_line_buffer[0x200];  /* RAM chip at 2A */
 
-	UINT8 *tx_gfx = machine().root_device().memregion("gfx1")->base();
-	UINT8 *bg_gfx = machine().root_device().memregion("gfx2")->base();
-	UINT8 *prom1 = &machine().root_device().memregion("proms")->base()[0x0000 | ((*m_smoothing_table & 0x03) << 8)];
-	UINT8 *prom2 = &machine().root_device().memregion("proms")->base()[0x0800 | ((*m_smoothing_table & 0x03) << 8)];
+	UINT8 *tx_gfx = memregion("gfx1")->base();
+	UINT8 *bg_gfx = memregion("gfx2")->base();
+	UINT8 *prom1 = &memregion("proms")->base()[0x0000 | ((*m_smoothing_table & 0x03) << 8)];
+	UINT8 *prom2 = &memregion("proms")->base()[0x0800 | ((*m_smoothing_table & 0x03) << 8)];
 	int vscroll = m_vscroll;
 	int hscroll = m_hscroll;
 	int tx_bank = *m_foreground_bank;
@@ -230,7 +230,7 @@ void jedi_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 	UINT8 *spriteram = m_spriteram;
-	UINT8 *gfx3 = machine().root_device().memregion("gfx3")->base();
+	UINT8 *gfx3 = memregion("gfx3")->base();
 
 	for (offs = 0x00; offs < 0x30; offs++)
 	{

@@ -908,9 +908,9 @@ void ninjakd2_state::machine_start()
 void ninjakd2_state::machine_reset()
 {
 	/* initialize main Z80 bank */
-	int num_banks = (machine().root_device().memregion("maincpu")->bytes() - 0x10000) / 0x4000;
-	machine().root_device().membank("bank1")->configure_entries(0, num_banks, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
-	machine().root_device().membank("bank1")->set_entry(0);
+	int num_banks = (memregion("maincpu")->bytes() - 0x10000) / 0x4000;
+	membank("bank1")->configure_entries(0, num_banks, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->set_entry(0);
 
 	m_rom_bank_mask = num_banks - 1;
 }
@@ -1418,8 +1418,8 @@ by one place all the intervening bits.
 
 void ninjakd2_state::lineswap_gfx_roms(const char *region, const int bit)
 {
-	const int length = machine().root_device().memregion(region)->bytes();
-	UINT8* const src = machine().root_device().memregion(region)->base();
+	const int length = memregion(region)->bytes();
+	UINT8* const src = memregion(region)->base();
 	UINT8* const temp = auto_alloc_array(machine(), UINT8, length);
 	const int mask = (1 << (bit + 1)) - 1;
 
@@ -1451,7 +1451,7 @@ DRIVER_INIT_MEMBER(ninjakd2_state,ninjakd2)
 DRIVER_INIT_MEMBER(ninjakd2_state,bootleg)
 {
 	address_space &space = machine().device("soundcpu")->memory().space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("soundcpu")->base() + 0x10000);
+	space.set_decrypted_region(0x0000, 0x7fff, memregion("soundcpu")->base() + 0x10000);
 
 	gfx_unscramble();
 }

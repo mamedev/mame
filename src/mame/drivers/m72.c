@@ -414,8 +414,8 @@ the NMI handler in the other games.
 #if 0
 int m72_state::find_sample(int num)
 {
-	UINT8 *rom = machine().root_device().memregion("samples")->base();
-	int len = machine().root_device().memregion("samples")->bytes();
+	UINT8 *rom = memregion("samples")->base();
+	int len = memregion("samples")->bytes();
 	int addr = 0;
 
 	while (num--)

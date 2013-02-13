@@ -224,7 +224,7 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(sc4_state,sc4)
 {
-	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
+	UINT8 *src = memregion( "maincpu" )->base();
 	// SC4 identification sequence 0x80 0x00 0xf0 0x7d
 	if (((src[0] == 0x80) && (src[2] == 0xf0)) || ((src[1] == 0x00) && (src[3] == 0x7d)))
 	{

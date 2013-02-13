@@ -412,7 +412,7 @@ DRIVER_INIT_MEMBER(scregg_state,rockduck)
 {
 	// rd2.rdh and rd1.rdj are bitswapped, but not rd3.rdg .. are they really from the same board?
 	int x;
-	UINT8 *src = machine().root_device().memregion( "gfx1" )->base();
+	UINT8 *src = memregion( "gfx1" )->base();
 
 	for (x = 0x2000; x < 0x6000; x++)
 	{

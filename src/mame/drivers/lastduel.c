@@ -473,9 +473,9 @@ MACHINE_START_MEMBER(lastduel_state,lastduel)
 
 MACHINE_START_MEMBER(lastduel_state,madgear)
 {
-	UINT8 *ROM = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
-	machine().root_device().membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
 	MACHINE_START_CALL_MEMBER(lastduel);
 }

@@ -143,8 +143,8 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(forte2_state,pesadelo)
 {
 	int i;
-	UINT8 *mem = machine().root_device().memregion("maincpu")->base();
-	int memsize = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *mem = memregion("maincpu")->base();
+	int memsize = memregion("maincpu")->bytes();
 	UINT8 *buf;
 
 	// data swap

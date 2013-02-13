@@ -384,8 +384,8 @@ UINT32 leland_state::screen_update_leland(screen_device &screen, bitmap_ind16 &b
 {
 	int y;
 
-	const UINT8 *bg_prom = machine().root_device().memregion("user1")->base();
-	const UINT8 *bg_gfx = machine().root_device().memregion("gfx1")->base();
+	const UINT8 *bg_prom = memregion("user1")->base();
+	const UINT8 *bg_gfx = memregion("gfx1")->base();
 	offs_t bg_gfx_bank_page_size = memregion("gfx1")->bytes() / 3;
 	offs_t char_bank = (((m_gfxbank >> 4) & 0x03) * 0x2000) & (bg_gfx_bank_page_size - 1);
 	offs_t prom_bank = ((m_gfxbank >> 3) & 0x01) * 0x2000;
@@ -452,7 +452,7 @@ UINT32 leland_state::screen_update_ataxx(screen_device &screen, bitmap_ind16 &bi
 {
 	int y;
 
-	const UINT8 *bg_gfx = machine().root_device().memregion("gfx1")->base();
+	const UINT8 *bg_gfx = memregion("gfx1")->base();
 	offs_t bg_gfx_bank_page_size = memregion("gfx1")->bytes() / 6;
 	offs_t bg_gfx_offs_mask = bg_gfx_bank_page_size - 1;
 

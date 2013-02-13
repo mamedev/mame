@@ -14,7 +14,7 @@
 
 void jackal_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -62,7 +62,7 @@ void jackal_state::jackal_mark_tile_dirty( int offset )
 
 TILE_GET_INFO_MEMBER(jackal_state::get_bg_tile_info)
 {
-	UINT8 *RAM = machine().root_device().memregion("master")->base();
+	UINT8 *RAM = memregion("master")->base();
 
 	int attr = RAM[0x2000 + tile_index];
 	int code = RAM[0x2400 + tile_index] + ((attr & 0xc0) << 2) + ((attr & 0x30) << 6);

@@ -117,7 +117,7 @@ static const res_net_info meyc8088_net_info =
 
 void meyc8088_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &meyc8088_decode_info, &meyc8088_net_info);

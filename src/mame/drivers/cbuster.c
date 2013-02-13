@@ -510,7 +510,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cbuster_state,twocrude)
 {
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	UINT8 *PTR;
 	int i, j;
 
@@ -527,8 +527,8 @@ DRIVER_INIT_MEMBER(cbuster_state,twocrude)
 	}
 
 	/* Rearrange the 'extra' sprite bank to be in the same format as main sprites */
-	RAM = machine().root_device().memregion("gfx3")->base() + 0x080000;
-	PTR = machine().root_device().memregion("gfx3")->base() + 0x140000;
+	RAM = memregion("gfx3")->base() + 0x080000;
+	PTR = memregion("gfx3")->base() + 0x140000;
 	for (i = 0; i < 0x20000; i += 64)
 	{
 		for (j = 0; j < 16; j += 1)

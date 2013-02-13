@@ -111,11 +111,11 @@ void simpsons_state::machine_reset()
 	m_video_bank = 0;
 
 	/* init the default banks */
-	membank("bank1")->configure_entries(0, 64, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x2000);
+	membank("bank1")->configure_entries(0, 64, memregion("maincpu")->base() + 0x10000, 0x2000);
 	membank("bank1")->set_entry(0);
 
-	membank("bank2")->configure_entries(0, 2, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0);
-	membank("bank2")->configure_entries(2, 6, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
+	membank("bank2")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0);
+	membank("bank2")->configure_entries(2, 6, memregion("audiocpu")->base() + 0x10000, 0x4000);
 	membank("bank2")->set_entry(0);
 
 	simpsons_video_banking(0);

@@ -630,8 +630,8 @@ ROM_END
 
 void tecmosys_state::tecmosys_descramble()
 {
-	UINT8 *gfxsrc  = machine().root_device().memregion( "gfx1" )->base();
-	size_t srcsize = machine().root_device().memregion( "gfx1" )->bytes();
+	UINT8 *gfxsrc  = memregion( "gfx1" )->base();
+	size_t srcsize = memregion( "gfx1" )->bytes();
 	int i;
 
 	for (i=0; i < srcsize; i+=4)

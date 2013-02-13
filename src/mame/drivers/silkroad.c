@@ -315,7 +315,7 @@ DRIVER_INIT_MEMBER(silkroad_state,silkroad)
 	   verified as correct... problem with the original which the gfx hardware
 	   didn't care about? Ideally it should be checked against a different PCB */
 
-	UINT8 *src = machine().root_device().memregion("gfx1")->base()+0x1000000;
+	UINT8 *src = memregion("gfx1")->base()+0x1000000;
 	int len = 0x0200000;
 	UINT8 *buffer;
 

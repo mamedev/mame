@@ -72,7 +72,7 @@ UINT32 route16_state::screen_update_route16(screen_device &screen, bitmap_rgb32 
 {
 	offs_t offs;
 
-	UINT8 *color_prom1 = &machine().root_device().memregion("proms")->base()[0x000];
+	UINT8 *color_prom1 = &memregion("proms")->base()[0x000];
 	UINT8 *color_prom2 = &memregion("proms")->base()[0x100];
 
 	for (offs = 0; offs < m_videoram1.bytes(); offs++)

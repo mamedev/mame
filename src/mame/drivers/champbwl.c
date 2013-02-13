@@ -534,8 +534,8 @@ void champbwl_state::screen_eof_doraemon(screen_device &screen, bool state)
 
 MACHINE_START_MEMBER(champbwl_state,doraemon)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 }
 
 static MACHINE_CONFIG_START( doraemon, champbwl_state )

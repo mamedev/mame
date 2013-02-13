@@ -205,9 +205,9 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 #ifdef UNUSED_FUNCTION
 void discoboy_state::discoboy_setrombank( UINT8 data )
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	data &= 0x2f;
-	space.machine().root_device().membank("bank1")->set_base(&ROM[0x6000 + (data * 0x1000)] );
+	space.membank("bank1")->set_base(&ROM[0x6000 + (data * 0x1000)] );
 }
 #endif
 
@@ -331,7 +331,7 @@ WRITE8_MEMBER(discoboy_state::yunsung8_sound_bankswitch_w)
 	/* Note: this is bit 5 on yunsung8.c */
 	msm5205_reset_w(device, (data & 0x08) >> 3);
 
-	machine().root_device().membank("sndbank")->set_entry(data & 0x07);
+	membank("sndbank")->set_entry(data & 0x07);
 
 	if (data != (data & (~0x0f)))
 		logerror("%s: Bank %02X\n", machine().describe_context(), data);

@@ -117,7 +117,7 @@ public:
 
 void panicr_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -176,8 +176,8 @@ TILE_GET_INFO_MEMBER(panicr_state::get_bgtile_info)
 {
 	int code,attr;
 
-	code=machine().root_device().memregion("user1")->base()[tile_index];
-	attr=machine().root_device().memregion("user2")->base()[tile_index];
+	code=memregion("user1")->base()[tile_index];
+	attr=memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
 	SET_TILE_INFO_MEMBER(
 		1,
@@ -190,8 +190,8 @@ TILE_GET_INFO_MEMBER(panicr_state::get_infotile_info)
 {
 	int code,attr;
 
-	code=machine().root_device().memregion("user1")->base()[tile_index];
-	attr=machine().root_device().memregion("user2")->base()[tile_index];
+	code=memregion("user1")->base()[tile_index];
+	attr=memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
 	SET_TILE_INFO_MEMBER(
 		2,
@@ -620,8 +620,8 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 
 	t5182_init(machine());
 
-	rom = machine().root_device().memregion("gfx1")->base();
-	size = machine().root_device().memregion("gfx1")->bytes();
+	rom = memregion("gfx1")->base();
+	size = memregion("gfx1")->bytes();
 
 	// text data lines
 	for (i = 0;i < size/2;i++)
@@ -643,8 +643,8 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	}
 
 
-	rom = machine().root_device().memregion("gfx2")->base();
-	size = machine().root_device().memregion("gfx2")->bytes();
+	rom = memregion("gfx2")->base();
+	size = memregion("gfx2")->bytes();
 
 	// tiles data lines
 	for (i = 0;i < size/4;i++)
@@ -670,8 +670,8 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	}
 
 
-	rom = machine().root_device().memregion("gfx3")->base();
-	size = machine().root_device().memregion("gfx3")->bytes();
+	rom = memregion("gfx3")->base();
+	size = memregion("gfx3")->bytes();
 
 	// sprites data lines
 	for (i = 0;i < size/2;i++)
@@ -695,8 +695,8 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 	}
 
 	//rearrange  bg tilemaps a bit....
-	rom = machine().root_device().memregion("user1")->base();
-	size = machine().root_device().memregion("user1")->bytes();
+	rom = memregion("user1")->base();
+	size = memregion("user1")->bytes();
 	memcpy(buf,rom, size);
 
 	for(j=0;j<16;j++)
@@ -707,8 +707,8 @@ DRIVER_INIT_MEMBER(panicr_state,panicr)
 		}
 	}
 
-	rom = machine().root_device().memregion("user2")->base();
-	size = machine().root_device().memregion("user2")->bytes();
+	rom = memregion("user2")->base();
+	size = memregion("user2")->bytes();
 	memcpy(buf,rom, size);
 
 	for(j=0;j<16;j++)

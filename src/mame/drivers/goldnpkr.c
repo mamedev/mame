@@ -1079,7 +1079,7 @@ UINT32 goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_ind1
 
 void goldnpkr_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   red component.
@@ -1123,7 +1123,7 @@ void goldnpkr_state::palette_init()
 
 PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge
@@ -1171,7 +1171,7 @@ PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
 
 PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 /*
     Using the original intensity line, the PCB has a bridge
     that allow (as default) turn the background dark blue.
@@ -9394,7 +9394,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,royale)
 {
 	/* $60bb, NOPing the ORA #$F0 (after read the PIA1 port B */
 
-//  UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+//  UINT8 *ROM = memregion("maincpu")->base();
 
 //  ROM[0x60bb] = 0xea;
 //  ROM[0x60bc] = 0xea;
@@ -9423,8 +9423,8 @@ DRIVER_INIT_MEMBER(goldnpkr_state,flcnw)
 {
 	/* Attempt to decrypt the MCU program (we're sooo close!) */
 
-	UINT8 *ROM = machine().root_device().memregion("mcu")->base();
-	int size = machine().root_device().memregion("mcu")->bytes();
+	UINT8 *ROM = memregion("mcu")->base();
+	int size = memregion("mcu")->bytes();
 	int start = 0x0000;
 	int i;
 
@@ -9442,7 +9442,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlsa)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xe097] = 0xea;
 	ROM[0xe098] = 0xea;
@@ -9454,7 +9454,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlsb)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xe87b] = 0xea;
 	ROM[0xe87c] = 0xea;
@@ -9466,7 +9466,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlsc)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0x453a] = 0xea;
 	ROM[0x453b] = 0xea;
@@ -9478,7 +9478,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlsww)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xf2c9] = 0xea;
 	ROM[0xf2ca] = 0xea;
@@ -9490,7 +9490,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwa)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xdf80] = 0xea;
 	ROM[0xdf81] = 0xea;
@@ -9502,7 +9502,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwc)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xe42f] = 0xea;
 	ROM[0xe430] = 0xea;
@@ -9514,7 +9514,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwd)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xe442] = 0xea;
 	ROM[0xe443] = 0xea;
@@ -9526,7 +9526,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwh)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xe4d5] = 0xea;
 	ROM[0xe4d6] = 0xea;
@@ -9538,7 +9538,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwl)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xe87c] = 0xea;
 	ROM[0xe87d] = 0xea;
@@ -9550,7 +9550,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwo)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xe7d5] = 0xea;
 	ROM[0xe7d6] = 0xea;
@@ -9562,7 +9562,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwp)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xe7d9] = 0xea;
 	ROM[0xe7da] = 0xea;
@@ -9574,7 +9574,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwr)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xe7f7] = 0xea;
 	ROM[0xe7f8] = 0xea;
@@ -9586,7 +9586,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswws)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xe8a5] = 0xea;
 	ROM[0xe8a6] = 0xea;
@@ -9598,7 +9598,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwt)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xe955] = 0xea;
 	ROM[0xe956] = 0xea;
@@ -9610,7 +9610,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwu)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xee6b] = 0xea;
 	ROM[0xee6c] = 0xea;
@@ -9622,7 +9622,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,vkdlswwv)
 	   after compare with Dallas TK data
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xf052] = 0xea;
 	ROM[0xf053] = 0xea;
@@ -9754,7 +9754,7 @@ DRIVER_INIT_MEMBER(goldnpkr_state,wstrike)
 	   after compare with a string inside the Dallas TK RAM
 	*/
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0xf2e1] = 0xea;
 	ROM[0xf2e2] = 0xea;

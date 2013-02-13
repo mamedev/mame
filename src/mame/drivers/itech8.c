@@ -703,7 +703,7 @@ WRITE8_MEMBER(itech8_state::blitter_w)
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
-		membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[0x4000 + 0xc000 * ((data >> 5) & 1)]);
+		membank("bank1")->set_base(&memregion("maincpu")->base()[0x4000 + 0xc000 * ((data >> 5) & 1)]);
 
 	/* the rest is handled by the video hardware */
 	itech8_blitter_w(space, offset, data);
@@ -713,7 +713,7 @@ WRITE8_MEMBER(itech8_state::blitter_w)
 WRITE8_MEMBER(itech8_state::rimrockn_bank_w)
 {
 	/* banking is controlled here instead of by the blitter output */
-	membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[0x4000 + 0xc000 * (data & 3)]);
+	membank("bank1")->set_base(&memregion("maincpu")->base()[0x4000 + 0xc000 * (data & 3)]);
 }
 
 

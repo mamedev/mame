@@ -141,7 +141,7 @@ READ16_MEMBER(vertigo_state::vertigo_coin_r)
 INTERRUPT_GEN_MEMBER(vertigo_state::vertigo_interrupt)
 {
 	/* Coin inputs cause IRQ6 */
-	if ((machine().root_device().ioport("COIN")->read() & 0x7) < 0x7)
+	if ((ioport("COIN")->read() & 0x7) < 0x7)
 		update_irq_encoder(INPUT_LINE_IRQ6, ASSERT_LINE);
 }
 

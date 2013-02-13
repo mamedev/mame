@@ -620,8 +620,8 @@ ROM_END
 
 void deco156_state::descramble_sound( const char *tag )
 {
-	UINT8 *rom = machine().root_device().memregion(tag)->base();
-	int length = machine().root_device().memregion(tag)->bytes();
+	UINT8 *rom = memregion(tag)->base();
+	int length = memregion(tag)->bytes();
 	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
 	UINT32 x;
 

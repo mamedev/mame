@@ -407,7 +407,7 @@ void bfm_sc2_state::on_scorpion2_reset()
 	// init rom bank ////////////////////////////////////////////////////////
 
 	{
-		UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+		UINT8 *rom = memregion("maincpu")->base();
 
 		membank("bank1")->configure_entries(0, 4, &rom[0x00000], 0x02000);
 
@@ -2192,8 +2192,8 @@ int bfm_sc2_state::sc2_find_project_string( )
 {
 	// search for the project string to find the title (usually just at ff00)
 	char title_string[4][32] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT ", "CASH ON THE NILE 2" };
-	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
-	int size = machine().root_device().memregion( "maincpu" )->bytes();
+	UINT8 *src = memregion( "maincpu" )->base();
+	int size = memregion( "maincpu" )->bytes();
 
 	for (int search=0;search<4;search++)
 	{

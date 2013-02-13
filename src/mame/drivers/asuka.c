@@ -253,7 +253,7 @@ WRITE8_MEMBER(asuka_state::sound_bankswitch_w)
 
 WRITE8_MEMBER(asuka_state::sound_bankswitch_2151_w)
 {
-	machine().root_device().membank("bank1")->set_entry(data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
 

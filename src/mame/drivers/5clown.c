@@ -545,7 +545,7 @@ UINT32 _5clown_state::screen_update_fclown(screen_device &screen, bitmap_ind16 &
 
 void _5clown_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 /*
     7654 3210
     ---- ---x   RED component.
@@ -1219,8 +1219,8 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 
 	/* Decrypting GFX by segments */
 
-	UINT8 *gfx1_src = machine().root_device().memregion( "gfx1" )->base();
-	UINT8 *gfx2_src = machine().root_device().memregion( "gfx2" )->base();
+	UINT8 *gfx1_src = memregion( "gfx1" )->base();
+	UINT8 *gfx2_src = memregion( "gfx2" )->base();
 
 	for (x = 0x2000; x < 0x3000; x++)
 	{
@@ -1240,7 +1240,7 @@ DRIVER_INIT_MEMBER(_5clown_state,fclown)
 
 	/* Decrypting sound samples */
 
-	UINT8 *samples_src = machine().root_device().memregion( "oki6295" )->base();
+	UINT8 *samples_src = memregion( "oki6295" )->base();
 
 	for (x = 0x0000; x < 0x10000; x++)
 	{

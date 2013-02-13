@@ -64,7 +64,7 @@ void firetrk_state::prom_to_palette(int number, UINT8 val)
 
 PALETTE_INIT_MEMBER(firetrk_state,montecar)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	static const UINT8 colortable_source[] =

@@ -554,7 +554,7 @@ MACHINE_CONFIG_END
 
 UINT8 mw8080bw_state::tornbase_get_cabinet_type()
 {
-	return machine().root_device().ioport(TORNBASE_CAB_TYPE_PORT_TAG)->read();
+	return ioport(TORNBASE_CAB_TYPE_PORT_TAG)->read();
 }
 
 
@@ -2581,7 +2581,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in2_control_r)
 
 int mw8080bw_state::invaders_is_cabinet_cocktail()
 {
-	return machine().root_device().ioport(INVADERS_CAB_TYPE_PORT_TAG)->read();
+	return ioport(INVADERS_CAB_TYPE_PORT_TAG)->read();
 }
 
 
@@ -2787,7 +2787,7 @@ MACHINE_CONFIG_END
 #ifdef UNUSED_FUNCTION
 UINT32 mw8080bw_state::invad2ct_coin_input_r(void *param)
 {
-	UINT32 ret = machine().root_device().ioport(INVAD2CT_COIN_INPUT_PORT_TAG)->read();
+	UINT32 ret = ioport(INVAD2CT_COIN_INPUT_PORT_TAG)->read();
 
 	coin_counter_w(machine, 0, !ret);
 

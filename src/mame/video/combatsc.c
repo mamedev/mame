@@ -12,7 +12,7 @@
 
 PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int pal;
 
 	/* allocate the colortable */
@@ -63,7 +63,7 @@ PALETTE_INIT_MEMBER(combatsc_state,combatsc)
 
 PALETTE_INIT_MEMBER(combatsc_state,combatscb)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int pal;
 
 	/* allocate the colortable */

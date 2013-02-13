@@ -556,7 +556,7 @@ DRIVER_INIT_MEMBER(jokrwild_state,jokrwild)
 *****************************************************************************/
 {
 	int i, offs;
-	UINT8 *srcp = machine().root_device().memregion( "maincpu" )->base();
+	UINT8 *srcp = memregion( "maincpu" )->base();
 
 	for (i = 0x8000; i < 0x10000; i++)
 	{

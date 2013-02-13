@@ -5367,7 +5367,7 @@ DRIVER_INIT_MEMBER(namcos22_state,airco22)
 
 DRIVER_INIT_MEMBER(namcos22_state,propcycl)
 {
-	UINT32 *pROM = (UINT32 *)machine().root_device().memregion("maincpu")->base();
+	UINT32 *pROM = (UINT32 *)memregion("maincpu")->base();
 
 	/* patch out strange routine (uninitialized-eprom related?) */
 	pROM[0x1992C/4] = 0x4E754E75;

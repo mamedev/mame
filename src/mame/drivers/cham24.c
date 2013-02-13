@@ -207,7 +207,7 @@ WRITE8_MEMBER(cham24_state::cham24_mapper_w)
 	UINT8* src = memregion("user1")->base();
 
 	// switch PPU VROM bank
-	membank("bank1")->set_base(machine().root_device().memregion("gfx1")->base() + (0x2000 * gfx_bank));
+	membank("bank1")->set_base(memregion("gfx1")->base() + (0x2000 * gfx_bank));
 
 	// set gfx mirroring
 	cham24_set_mirroring(gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);

@@ -39,7 +39,7 @@ UINT32 archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		int count;
 		int x,y,xi;
 		UINT8 pen;
-		static UINT8 *vram = machine().root_device().memregion("vram")->base();
+		static UINT8 *vram = memregion("vram")->base();
 
 		count = (0);
 

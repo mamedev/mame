@@ -57,7 +57,7 @@ WRITE8_MEMBER(snookr10_state::snookr10_colorram_w)
 
 void snookr10_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	/* GGBBBRRR */
 
 	int i;
@@ -117,7 +117,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::get_bg_tile_info)
 
 PALETTE_INIT_MEMBER(snookr10_state,apple10)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	/* GGBBBRRR */
 
 	int i, cn;

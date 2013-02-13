@@ -396,7 +396,7 @@ static UINT8 read_uint8(UINT8 *pval, int pos, const UINT8* line, int linelen)
 DRIVER_INIT_MEMBER(galaxygame_state,galaxygame)
 {
 	address_space &main = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *code = machine().root_device().memregion("code")->base();
+	UINT8 *code = memregion("code")->base();
 
 	int filepos = 0, linepos, linelen;
 	UINT8 line[256];

@@ -315,8 +315,8 @@ READ8_MEMBER(kingdrby_state::key_matrix_r)
 	UINT16 p1_val,p2_val;
 	UINT8 p1_res,p2_res;
 
-	p1_val = machine().root_device().ioport("KEY_1P")->read();
-	p2_val = machine().root_device().ioport("KEY_2P")->read();
+	p1_val = ioport("KEY_1P")->read();
+	p2_val = ioport("KEY_2P")->read();
 
 	p1_res = 0;
 	p2_res = 0;
@@ -958,7 +958,7 @@ static const ym2203_interface cowrace_ym2203_interface =
 
 PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 
@@ -984,8 +984,8 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
 
 PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
 {
-	UINT8 *raw_prom = machine().root_device().memregion("raw_prom")->base();
-	UINT8 *prom = machine().root_device().memregion("proms")->base();
+	UINT8 *raw_prom = memregion("raw_prom")->base();
+	UINT8 *prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 

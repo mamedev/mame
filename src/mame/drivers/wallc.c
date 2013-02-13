@@ -100,7 +100,7 @@ public:
 
 void wallc_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	static const int resistances_rg[2] = { 330, 220 };
@@ -262,7 +262,7 @@ DRIVER_INIT_MEMBER(wallc_state,wallc)
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	for (i=0; i<0x2000*2; i++)
 	{
@@ -277,7 +277,7 @@ DRIVER_INIT_MEMBER(wallc_state,wallca)
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	for (i=0; i<0x4000; i++)
 	{

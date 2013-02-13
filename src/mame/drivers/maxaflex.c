@@ -373,12 +373,12 @@ static const pokey_interface pokey_config = {
 
 READ8_MEMBER(maxaflex_state::maxaflex_atari_pia_pa_r)
 {
-	return atari_input_disabled() ? 0xFF : machine().root_device().ioport("djoy_0_1")->read_safe(0);
+	return atari_input_disabled() ? 0xFF : ioport("djoy_0_1")->read_safe(0);
 }
 
 READ8_MEMBER(maxaflex_state::maxaflex_atari_pia_pb_r)
 {
-	return atari_input_disabled() ? 0xFF : machine().root_device().ioport("djoy_2_3")->read_safe(0);
+	return atari_input_disabled() ? 0xFF : ioport("djoy_2_3")->read_safe(0);
 }
 
 
@@ -508,7 +508,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(maxaflex_state,a600xl)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	memcpy( rom + 0x5000, rom + 0xd000, 0x800 );
 }
 

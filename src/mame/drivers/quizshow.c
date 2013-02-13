@@ -422,8 +422,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(quizshow_state,quizshow)
 {
-	UINT8 *gfxdata = machine().root_device().memregion("user1")->base();
-	UINT8 *dest = machine().root_device().memregion("gfx1")->base();
+	UINT8 *gfxdata = memregion("user1")->base();
+	UINT8 *dest = memregion("gfx1")->base();
 
 	int tile, line;
 

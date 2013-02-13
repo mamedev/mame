@@ -575,7 +575,7 @@ encryption method! The technique is a combination of a XOR table plus
 bit-swapping */
 void raiden_state::common_decrypt()
 {
-	UINT16 *RAM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x20000; i++)
@@ -587,7 +587,7 @@ void raiden_state::common_decrypt()
 		RAM[0xc0000/2 + i] = data;
 	}
 
-	RAM = (UINT16 *)machine().root_device().memregion("sub")->base();
+	RAM = (UINT16 *)memregion("sub")->base();
 
 	for (i = 0; i < 0x20000; i++)
 	{

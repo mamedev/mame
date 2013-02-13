@@ -681,8 +681,8 @@ int bfmsys85_state::b85_find_project_string( )
 {
 	// search for the project string to find the title (usually just at ff00)
 	char title_string[7][32] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT ", "CASH ON THE NILE 2", "PR6121", "CHINA TOWN\x0d\x0a", "PROJECTNUMBER" };
-	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
-	int size = machine().root_device().memregion( "maincpu" )->bytes();
+	UINT8 *src = memregion( "maincpu" )->base();
+	int size = memregion( "maincpu" )->bytes();
 
 	for (int search=0;search<7;search++)
 	{

@@ -70,7 +70,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(goal92_state::adpcm_control_w)
 {
 	device_t *device = machine().device("msm");
-	machine().root_device().membank("bank1")->set_entry(data & 0x01);
+	membank("bank1")->set_entry(data & 0x01);
 
 	msm5205_reset_w(device, data & 0x08);
 }

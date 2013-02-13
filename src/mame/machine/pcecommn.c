@@ -38,7 +38,7 @@ WRITE8_MEMBER(pce_common_state::pce_joystick_w)
 
 UINT8 pce_common_state::joy_read()
 {
-	return machine().root_device().ioport("JOY")->read();
+	return ioport("JOY")->read();
 }
 
 READ8_MEMBER(pce_common_state::pce_joystick_r)

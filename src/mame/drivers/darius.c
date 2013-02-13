@@ -1250,7 +1250,7 @@ ROM_END
 DRIVER_INIT_MEMBER(darius_state,darius)
 {
 	/**** setup sound bank image ****/
-	UINT8 *RAM = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *RAM = memregion("audiocpu")->base();
 	int  i;
 
 	for (i = 3; i >= 0; i--)

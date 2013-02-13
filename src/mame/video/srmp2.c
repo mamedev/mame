@@ -11,7 +11,7 @@ Functions to emulate the video hardware of the machine.
 
 PALETTE_INIT_MEMBER(srmp2_state,srmp2)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -26,7 +26,7 @@ PALETTE_INIT_MEMBER(srmp2_state,srmp2)
 
 PALETTE_INIT_MEMBER(srmp2_state,srmp3)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine().total_colors(); i++)

@@ -27,8 +27,8 @@ inline void lethalj_state::get_crosshair_xy(int player, int *x, int *y)
 	int width = visarea.width();
 	int height = visarea.height();
 
-	*x = ((machine().root_device().ioport(gunnames[player * 2])->read_safe(0x00) & 0xff) * width) / 255;
-	*y = ((machine().root_device().ioport(gunnames[1 + player * 2])->read_safe(0x00) & 0xff) * height) / 255;
+	*x = ((ioport(gunnames[player * 2])->read_safe(0x00) & 0xff) * width) / 255;
+	*y = ((ioport(gunnames[1 + player * 2])->read_safe(0x00) & 0xff) * height) / 255;
 }
 
 

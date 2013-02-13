@@ -837,15 +837,15 @@ READ32_MEMBER(firebeat_state::input_r)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (machine().root_device().ioport("IN0")->read() & 0xff) << 24;
+		r |= (ioport("IN0")->read() & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (machine().root_device().ioport("IN1")->read() & 0xff) << 8;
+		r |= (ioport("IN1")->read() & 0xff) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= (machine().root_device().ioport("IN2")->read() & 0xff);
+		r |= (ioport("IN2")->read() & 0xff);
 	}
 
 	return r;
@@ -855,11 +855,11 @@ READ32_MEMBER(firebeat_state::sensor_r )
 {
 	if (offset == 0)
 	{
-		return machine().root_device().ioport("SENSOR1")->read() | 0x01000100;
+		return ioport("SENSOR1")->read() | 0x01000100;
 	}
 	else
 	{
-		return machine().root_device().ioport("SENSOR2")->read() | 0x01000100;
+		return ioport("SENSOR2")->read() | 0x01000100;
 	}
 }
 
@@ -1463,11 +1463,11 @@ READ32_MEMBER(firebeat_state::keyboard_wheel_r )
 {
 	if (offset == 0)        // Keyboard Wheel (P1)
 	{
-		return space.machine().root_device().ioport("WHEEL_P1")->read() << 24;
+		return ioport("WHEEL_P1")->read() << 24;
 	}
 	else if (offset == 2)   // Keyboard Wheel (P2)
 	{
-		return space.machine().root_device().ioport("WHEEL_P2")->read() << 24;
+		return ioport("WHEEL_P2")->read() << 24;
 	}
 
 	return 0;
@@ -1556,7 +1556,7 @@ TIMER_CALLBACK_MEMBER(firebeat_state::keyboard_timer_callback)
 
 	for (keyboard=0; keyboard < 2; keyboard++)
 	{
-		UINT32 kbstate = machine().root_device().ioport(keynames[keyboard])->read();
+		UINT32 kbstate = ioport(keynames[keyboard])->read();
 		int uart_channel = kb_uart_channel[keyboard];
 
 		if (kbstate != m_keyboard_state[keyboard])

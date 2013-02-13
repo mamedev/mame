@@ -352,7 +352,7 @@ WRITE32_MEMBER(namcos10_state::bank_w)
 
 READ32_MEMBER(namcos10_state::range_r)
 {
-	UINT32 data32 = ((const UINT32 *)(machine().root_device().memregion("user1")->base()))[offset+bank_base];
+	UINT32 data32 = ((const UINT32 *)(memregion("user1")->base()))[offset+bank_base];
 
 	UINT16 d16;
 	if(ACCESSING_BITS_16_31)

@@ -30,7 +30,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sprint8_state::input_callback)
 
 	for (i = 0; i < 8; i++)
 	{
-		UINT8 val = machine().root_device().ioport(dialnames[i])->read() >> 4;
+		UINT8 val = ioport(dialnames[i])->read() >> 4;
 
 		signed char delta = (val - m_dial[i]) & 15;
 

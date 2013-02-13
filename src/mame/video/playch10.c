@@ -16,7 +16,7 @@ WRITE8_MEMBER(playch10_state::playch10_videoram_w)
 
 void playch10_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 	int i;
 

@@ -163,7 +163,7 @@ Note: The 'rastsagaa' set's rom numbers were named as RSxx_37 through RSxx_42
 
 WRITE8_MEMBER(rastan_state::rastan_bankswitch_w)
 {
-	machine().root_device().membank("bank1")->set_entry(data & 3);
+	membank("bank1")->set_entry(data & 3);
 }
 
 

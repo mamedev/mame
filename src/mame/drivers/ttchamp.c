@@ -373,9 +373,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ttchamp_state,ttchamp)
 {
-	UINT8 *ROM1 = machine().root_device().memregion("user1")->base();
-	machine().root_device().membank("bank1")->set_base(&ROM1[0x100000]);
-	machine().root_device().membank("bank2")->set_base(&ROM1[0x180000]);
+	UINT8 *ROM1 = memregion("user1")->base();
+	membank("bank1")->set_base(&ROM1[0x100000]);
+	membank("bank2")->set_base(&ROM1[0x180000]);
 }
 
 GAME( 199?, ttchamp, 0,        ttchamp, ttchamp, ttchamp_state, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )

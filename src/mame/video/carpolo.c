@@ -66,7 +66,7 @@
 
 void carpolo_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* thanks to Jarek Burczynski for analyzing the circuit */
@@ -188,7 +188,7 @@ static void draw_alpha_line(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 void carpolo_state::remap_sprite_code(int bank, int code, int *remapped_code, int *flipy)
 {
-	UINT8* PROM = machine().root_device().memregion("user1")->base();
+	UINT8* PROM = memregion("user1")->base();
 
 	code = (bank << 4) | code;
 	*remapped_code = PROM[code] & 0x0f;

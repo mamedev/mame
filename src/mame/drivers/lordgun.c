@@ -1060,7 +1060,7 @@ ROM_END
 DRIVER_INIT_MEMBER(lordgun_state,lordgun)
 {
 	int i;
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 	int rom_size = 0x100000;
 
 	for(i = 0; i < rom_size/2; i++)

@@ -677,7 +677,7 @@ ROM_END
 
 void backfire_state::descramble_sound()
 {
-	UINT8 *rom = machine().root_device().memregion("ymz")->base();
+	UINT8 *rom = memregion("ymz")->base();
 	int length = 0x200000; // only the first rom is swapped on backfire!
 	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
 	UINT32 x;

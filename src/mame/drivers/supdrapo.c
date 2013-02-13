@@ -132,7 +132,7 @@ UINT32 supdrapo_state::screen_update_supdrapo(screen_device &screen, bitmap_ind1
 /*Maybe bit 2 & 3 of the second color prom are intensity bits? */
 void supdrapo_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 

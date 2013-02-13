@@ -44,7 +44,7 @@ READ16_MEMBER(tourtabl_state::tourtabl_read_input_port)
 {
 	static const char *const tianames[] = { "PADDLE4", "PADDLE3", "PADDLE2", "PADDLE1", "TIA_IN4", "TIA_IN5" };
 
-	return machine().root_device().ioport(tianames[offset])->read();
+	return ioport(tianames[offset])->read();
 }
 
 READ8_MEMBER(tourtabl_state::tourtabl_get_databus_contents)

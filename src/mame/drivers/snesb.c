@@ -692,7 +692,7 @@ DRIVER_INIT_MEMBER(snesb_state,kinstb)
 DRIVER_INIT_MEMBER(snesb_state,ffight2b)
 {
 	INT32 i;
-	UINT8 *rom = machine().root_device().memregion("user3")->base();
+	UINT8 *rom = memregion("user3")->base();
 
 	for(i = 0; i < 0x200000; i++)
 	{
@@ -735,7 +735,7 @@ DRIVER_INIT_MEMBER(snesb_state,ffight2b)
 DRIVER_INIT_MEMBER(snesb_state,iron)
 {
 	INT32 i;
-	UINT8 *rom = machine().root_device().memregion("user3")->base();
+	UINT8 *rom = memregion("user3")->base();
 
 	for (i = 0; i < 0x140000; i++)
 	{
@@ -759,7 +759,7 @@ DRIVER_INIT_MEMBER(snesb_state,iron)
 
 DRIVER_INIT_MEMBER(snesb_state,denseib)
 {
-	UINT8 *rom = machine().root_device().memregion("user3")->base();
+	UINT8 *rom = memregion("user3")->base();
 	INT32 i;
 
 	for (i = 0; i < 0x200000; i++)
@@ -808,8 +808,8 @@ static const UINT8  address_substitution_high[] =
 DRIVER_INIT_MEMBER(snesb_state,sblast2b)
 {
 	int i, cipherText, plainText, newAddress;
-	UINT8 *src = machine().root_device().memregion("user7")->base();
-	UINT8 *dst = machine().root_device().memregion("user3")->base();
+	UINT8 *src = memregion("user7")->base();
+	UINT8 *dst = memregion("user3")->base();
 
 	for (i =0; i < 0x80000 * 3; i++)
 	{
@@ -858,7 +858,7 @@ DRIVER_INIT_MEMBER(snesb_state,sblast2b)
 DRIVER_INIT_MEMBER(snesb_state,endless)
 {
 	INT32 i;
-	UINT8 *rom = machine().root_device().memregion("user3")->base();
+	UINT8 *rom = memregion("user3")->base();
 
 	/* there is more to this, 0x800 based block swaps? */
 	for (i = 0; i < 0x200000; i++)

@@ -27,7 +27,7 @@
 
 PALETTE_INIT_MEMBER(polepos_state,polepos)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i, j;
 
 	/* allocate the colortable */
@@ -421,7 +421,7 @@ void polepos_state::zoom_sprite(bitmap_ind16 &bitmap,int big,
 {
 	gfx_element *gfx = machine().gfx[big ? 3 : 2];
 	const UINT8 *gfxdata = gfx->get_data(code % gfx->elements());
-	UINT8 *scaling_rom = machine().root_device().memregion("gfx6")->base();
+	UINT8 *scaling_rom = memregion("gfx6")->base();
 	UINT32 transmask = colortable_get_transpen_mask(machine().colortable, gfx, color, 0x1f);
 	int coloroffs = gfx->colorbase() + color * gfx->granularity();
 	int x,y;

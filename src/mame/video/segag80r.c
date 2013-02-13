@@ -209,13 +209,13 @@ void segag80r_state::video_start()
 
 		/* background tilemap is effectively 1 screen x n screens */
 		case G80_BACKGROUND_MONSTERB:
-			m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,machine().root_device().memregion("gfx2")->bytes() / 32);
+			m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 32,memregion("gfx2")->bytes() / 32);
 			break;
 
 		/* background tilemap is effectively 4 screens x n screens */
 		case G80_BACKGROUND_PIGNEWT:
 		case G80_BACKGROUND_SINDBADM:
-			m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 128,machine().root_device().memregion("gfx2")->bytes() / 128);
+			m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(segag80r_state::bg_get_tile_info),this), TILEMAP_SCAN_ROWS,  8,8, 128,memregion("gfx2")->bytes() / 128);
 			break;
 	}
 

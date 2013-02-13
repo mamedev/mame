@@ -1402,8 +1402,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ampoker2_state,rabbitpk)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
-	int size = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *rom = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
 	int start = 0;
 	int i;
 
@@ -1454,7 +1454,7 @@ DRIVER_INIT_MEMBER(ampoker2_state,piccolop)
 
 */
 
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	/* NOP'ing the mortal jump... */
 	rom[0x154b] = 0x00;

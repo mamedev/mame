@@ -211,7 +211,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(intrscti_state,intrscti)
 {
-	UINT8 *cpu = machine().root_device().memregion( "maincpu" )->base();
+	UINT8 *cpu = memregion( "maincpu" )->base();
 	int i;
 	for (i=0;i<0x1000;i++)
 		cpu[i+0x8000]=0xc9; // ret

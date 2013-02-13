@@ -14,8 +14,8 @@ Atari Poolshark Driver
 
 DRIVER_INIT_MEMBER(poolshrk_state,poolshrk)
 {
-	UINT8* pSprite = machine().root_device().memregion("gfx1")->base();
-	UINT8* pOffset = machine().root_device().memregion("proms")->base();
+	UINT8* pSprite = memregion("gfx1")->base();
+	UINT8* pOffset = memregion("proms")->base();
 
 	int i;
 	int j;

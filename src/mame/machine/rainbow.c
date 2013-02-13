@@ -756,10 +756,10 @@ TIMER_CALLBACK_MEMBER(rbisland_state::cchip_timer)
 	coin_counter_w(machine(), 1, m_CRAM[0][8] & 0x20);
 	coin_counter_w(machine(), 0, m_CRAM[0][8] & 0x10);
 
-	m_CRAM[0][3] = machine().root_device().ioport("800007")->read();    /* STARTn + SERVICE1 */
-	m_CRAM[0][4] = machine().root_device().ioport("800009")->read();    /* COINn */
-	m_CRAM[0][5] = machine().root_device().ioport("80000B")->read();    /* Player controls + TILT */
-	m_CRAM[0][6] = machine().root_device().ioport("80000D")->read();    /* Player controls (cocktail) */
+	m_CRAM[0][3] = ioport("800007")->read();    /* STARTn + SERVICE1 */
+	m_CRAM[0][4] = ioport("800009")->read();    /* COINn */
+	m_CRAM[0][5] = ioport("80000B")->read();    /* Player controls + TILT */
+	m_CRAM[0][6] = ioport("80000D")->read();    /* Player controls (cocktail) */
 }
 
 /*************************************

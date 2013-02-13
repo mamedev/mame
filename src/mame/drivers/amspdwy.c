@@ -37,7 +37,7 @@ Sound:  YM2151
 UINT8 amspdwy_state::amspdwy_wheel_r( int index )
 {
 	static const char *const portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };
-	UINT8 wheel = machine().root_device().ioport(portnames[2 + index])->read();
+	UINT8 wheel = ioport(portnames[2 + index])->read();
 	if (wheel != m_wheel_old[index])
 	{
 		wheel = (wheel & 0x7fff) - (wheel & 0x8000);
@@ -48,7 +48,7 @@ UINT8 amspdwy_state::amspdwy_wheel_r( int index )
 
 	m_wheel_old[index] = wheel;
 	}
-	return m_wheel_return[index] | machine().root_device().ioport(portnames[index])->read();
+	return m_wheel_return[index] | ioport(portnames[index])->read();
 }
 
 READ8_MEMBER(amspdwy_state::amspdwy_wheel_0_r)
@@ -64,7 +64,7 @@ READ8_MEMBER(amspdwy_state::amspdwy_wheel_1_r)
 READ8_MEMBER(amspdwy_state::amspdwy_sound_r)
 {
 	ym2151_device *device = machine().device<ym2151_device>("ymsnd");
-	return (device->status_r(space, 0) & ~ 0x30) | machine().root_device().ioport("IN0")->read();
+	return (device->status_r(space, 0) & ~ 0x30) | ioport("IN0")->read();
 }
 
 WRITE8_MEMBER(amspdwy_state::amspdwy_sound_w)

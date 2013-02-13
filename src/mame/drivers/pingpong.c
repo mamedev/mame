@@ -572,7 +572,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pingpong_state,merlinmm)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt program code */
@@ -586,12 +586,12 @@ DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
 	int i;
 
 	/* decrypt program code */
-	ROM = machine().root_device().memregion("maincpu")->base();
+	ROM = memregion("maincpu")->base();
 	for( i = 0; i < 0x4000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* decrypt questions */
-	ROM = machine().root_device().memregion("user1")->base();
+	ROM = memregion("user1")->base();
 	for( i = 0; i < 0x40000; i++ )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 

@@ -3302,7 +3302,7 @@ void namcos23_state::machine_start()
 	m_c361.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(namcos23_state::c361_timer_cb),this));
 	m_c361.timer->adjust(attotime::never);
 
-	mips3drc_add_fastram(m_maincpu, 0, m_mainram.bytes()-1, FALSE, reinterpret_cast<UINT32 *>(machine().root_device().memshare("mainram")->ptr()));
+	mips3drc_add_fastram(m_maincpu, 0, m_mainram.bytes()-1, FALSE, reinterpret_cast<UINT32 *>(memshare("mainram")->ptr()));
 }
 
 

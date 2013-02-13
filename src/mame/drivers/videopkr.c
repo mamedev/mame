@@ -412,7 +412,7 @@ static void count_7dig(unsigned long data, UINT8 index)
 
 void videopkr_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < machine().total_colors(); j++)
@@ -439,7 +439,7 @@ void videopkr_state::palette_init()
 
 PALETTE_INIT_MEMBER(videopkr_state,babypkr)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < machine().total_colors(); j++)
@@ -470,7 +470,7 @@ PALETTE_INIT_MEMBER(videopkr_state,babypkr)
 
 PALETTE_INIT_MEMBER(videopkr_state,fortune1)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < machine().total_colors(); j++)

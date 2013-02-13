@@ -199,7 +199,7 @@ void m62_state::m62_amplify_contrast(palette_t *palette, UINT32 numcolors)
 
 void m62_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &m62_tile_decode_info, &m62_tile_net_info);
@@ -219,7 +219,7 @@ void m62_state::palette_init()
 
 PALETTE_INIT_MEMBER(m62_state,lotlot)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &lotlot_tile_decode_info, &m62_tile_net_info);
@@ -239,7 +239,7 @@ PALETTE_INIT_MEMBER(m62_state,lotlot)
 
 PALETTE_INIT_MEMBER(m62_state,battroad)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t *rgb;
 
 	// m62 palette
@@ -265,7 +265,7 @@ PALETTE_INIT_MEMBER(m62_state,battroad)
 
 PALETTE_INIT_MEMBER(m62_state,spelunk2)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &spelunk2_tile_decode_info, &m62_tile_net_info);

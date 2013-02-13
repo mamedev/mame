@@ -98,7 +98,7 @@ WRITE8_MEMBER(yunsung8_state::yunsung8_sound_bankswitch_w)
 	device_t *device = machine().device("msm");
 	msm5205_reset_w(device, data & 0x20);
 
-	machine().root_device().membank("bank2")->set_entry(data & 0x07);
+	membank("bank2")->set_entry(data & 0x07);
 
 	if (data != (data & (~0x27)))
 		logerror("%s: Bank %02X\n", machine().describe_context(), data);

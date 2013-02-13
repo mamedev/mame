@@ -235,7 +235,7 @@ H=B0: 0C,0C,0D,0D,0E,0E,0F,0F 0C,0C,2D,2D,0E,0E,2F,2F
 
 void galaxian_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	static const int rgb_resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i, minval, midval, maxval, len;
@@ -273,7 +273,7 @@ void galaxian_state::palette_init()
 			2, &rgb_resistances[1], bweights, 470, 0);
 
 	/* decode the palette first */
-	len = machine().root_device().memregion("proms")->bytes();
+	len = memregion("proms")->bytes();
 	for (i = 0; i < len; i++)
 	{
 		UINT8 bit0, bit1, bit2, r, g, b;

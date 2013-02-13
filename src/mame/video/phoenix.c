@@ -78,7 +78,7 @@ static const res_net_info survival_net_info =
 
 PALETTE_INIT_MEMBER(phoenix_state,phoenix)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	rgb_t   *rgb;
 
@@ -96,7 +96,7 @@ PALETTE_INIT_MEMBER(phoenix_state,phoenix)
 
 PALETTE_INIT_MEMBER(phoenix_state,survival)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	rgb_t   *rgb;
 
@@ -114,7 +114,7 @@ PALETTE_INIT_MEMBER(phoenix_state,survival)
 
 PALETTE_INIT_MEMBER(phoenix_state,pleiads)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	rgb_t   *rgb;
 

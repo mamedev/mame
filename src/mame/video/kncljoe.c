@@ -16,7 +16,7 @@ Knuckle Joe - (c) 1985 Taito Corporation
 
 void kncljoe_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -152,7 +152,7 @@ WRITE8_MEMBER(kncljoe_state::kncljoe_control_w)
 	if (m_sprite_bank != i)
 	{
 		m_sprite_bank = i;
-		memset(machine().root_device().memregion("maincpu")->base() + 0xf100, 0, 0x180);
+		memset(memregion("maincpu")->base() + 0xf100, 0, 0x180);
 	}
 }
 

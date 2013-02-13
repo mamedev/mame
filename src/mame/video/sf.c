@@ -9,7 +9,7 @@
 
 TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
 {
-	UINT8 *base = machine().root_device().memregion("gfx5")->base() + 2 * tile_index;
+	UINT8 *base = memregion("gfx5")->base() + 2 * tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
 {
-	UINT8 *base = machine().root_device().memregion("gfx5")->base() + 0x20000 + 2 * tile_index;
+	UINT8 *base = memregion("gfx5")->base() + 0x20000 + 2 * tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];

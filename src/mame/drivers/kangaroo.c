@@ -174,7 +174,7 @@
 
 void kangaroo_state::machine_start()
 {
-	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("gfx1")->base(), 0x2000);
+	membank("bank1")->configure_entries(0, 2, memregion("gfx1")->base(), 0x2000);
 }
 
 

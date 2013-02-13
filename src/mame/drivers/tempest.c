@@ -354,13 +354,13 @@ CUSTOM_INPUT_MEMBER(tempest_state::clock_r)
 
 READ8_MEMBER(tempest_state::input_port_1_bit_r)
 {
-	return (machine().root_device().ioport("IN1/DSW0")->read() & (1 << offset)) ? 0 : 228;
+	return (ioport("IN1/DSW0")->read() & (1 << offset)) ? 0 : 228;
 }
 
 
 READ8_MEMBER(tempest_state::input_port_2_bit_r)
 {
-	return (machine().root_device().ioport("IN2")->read() & (1 << offset)) ? 0 : 228;
+	return (ioport("IN2")->read() & (1 << offset)) ? 0 : 228;
 }
 
 

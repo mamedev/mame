@@ -4436,19 +4436,19 @@ static void init_cave(running_machine &machine)
 
 DRIVER_INIT_MEMBER(cave_state,agallet)
 {
-	UINT8 *ROM = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 	init_cave(machine());
 
-	machine().root_device().membank("bank1")->configure_entries(0, 0x02, &ROM[0x00000], 0x4000);
-	machine().root_device().membank("bank1")->configure_entries(2, 0x1e, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 0x02, &ROM[0x00000], 0x4000);
+	membank("bank1")->configure_entries(2, 0x1e, &ROM[0x10000], 0x4000);
 
-	ROM = machine().root_device().memregion("oki1")->base();
-	machine().root_device().membank("bank3")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
-	machine().root_device().membank("bank4")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	ROM = memregion("oki1")->base();
+	membank("bank3")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	membank("bank4")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
-	ROM = machine().root_device().memregion("oki2")->base();
-	machine().root_device().membank("bank5")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
-	machine().root_device().membank("bank6")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	ROM = memregion("oki2")->base();
+	membank("bank5")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	membank("bank6")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	sailormn_unpack_tiles(machine(), "layer2");
 
@@ -4574,7 +4574,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	m_time_vblank_irq = 2100;
 
 	/* setup extra ROM */
-	membank("bank1")->set_base(machine().root_device().memregion("user1")->base());
+	membank("bank1")->set_base(memregion("user1")->base());
 }
 
 
@@ -4643,7 +4643,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2)
 
 #if 1       //ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+		UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 		rom[0xd46c / 2] = 0xd482;           // kurara dash fix  0xd400 -> 0xd482
 	}
 #endif

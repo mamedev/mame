@@ -114,7 +114,7 @@ void pitnrun_state::pitnrun_spotlights()
 
 void pitnrun_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	int bit0,bit1,bit2,r,g,b;
 	for (i = 0;i < 32*3; i++)
@@ -218,13 +218,13 @@ UINT32 pitnrun_state::screen_update_pitnrun(screen_device &screen, bitmap_ind16 
 
 	if (machine().input().code_pressed_once(KEYCODE_W))
 	{
-		UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+		UINT8 *ROM = memregion("maincpu")->base();
 		ROM[0x84f6]=6; /* lap 6 = spotlight */
 	}
 
 	if (machine().input().code_pressed_once(KEYCODE_E))
 	{
-		UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+		UINT8 *ROM = memregion("maincpu")->base();
 		ROM[0x84f6]=2; /* lap 3 (trial 2)= lightnings */
 		ROM[0x8102]=1;
 	}

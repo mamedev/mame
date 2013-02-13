@@ -1226,8 +1226,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(coinmstr_state,coinmstr)
 {
-	UINT8 *rom = machine().root_device().memregion("user1")->base();
-	int length = machine().root_device().memregion("user1")->bytes();
+	UINT8 *rom = memregion("user1")->base();
+	int length = memregion("user1")->bytes();
 	UINT8 *buf = auto_alloc_array(machine(), UINT8, length);
 	int i;
 

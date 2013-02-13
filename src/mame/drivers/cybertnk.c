@@ -316,7 +316,7 @@ static void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectang
 static void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift)
 {
 	cybertnk_state *state = screen.machine().driver_data<cybertnk_state>();
-	const UINT32 *sprrom = (UINT32*)screen.machine().root_device().memregion("spr_gfx")->base();
+	const UINT32 *sprrom = (UINT32*)screen.memregion("spr_gfx")->base();
 	const pen_t *paldata = screen.machine().pens;
 
 	int miny = cliprect.min_y;
@@ -973,7 +973,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cybertnk_state,cybertnk)
 {
-	UINT32 *spr = (UINT32*)machine().root_device().memregion("spr_gfx")->base();
+	UINT32 *spr = (UINT32*)memregion("spr_gfx")->base();
 
 	for (int x = 0; x< 0x200000/4;x++)
 	{

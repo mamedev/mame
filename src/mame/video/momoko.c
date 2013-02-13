@@ -71,7 +71,7 @@ void momoko_state::momoko_draw_bg_pri( bitmap_ind16 &bitmap, int chr, int col, i
 	int xx, sx, sy, px, py, dot;
 	UINT32 gfxadr;
 	UINT8 d0, d1;
-	UINT8 *BG_GFX = machine().root_device().memregion("gfx2")->base();
+	UINT8 *BG_GFX = memregion("gfx2")->base();
 
 	for (sy = 0; sy < 8; sy++)
 	{
@@ -106,13 +106,13 @@ UINT32 momoko_state::screen_update_momoko(screen_device &screen, bitmap_ind16 &b
 	int x, y, dx, dy, rx, ry, radr, chr, sy, fx, fy, px, py, offs, col, pri, flip ;
 	UINT8 *spriteram = m_spriteram;
 
-	UINT8 *BG_MAP     = machine().root_device().memregion("user1")->base();
-	UINT8 *BG_COL_MAP = machine().root_device().memregion("user2")->base();
-	UINT8 *FG_MAP     = machine().root_device().memregion("user3")->base();
+	UINT8 *BG_MAP     = memregion("user1")->base();
+	UINT8 *BG_COL_MAP = memregion("user2")->base();
+	UINT8 *FG_MAP     = memregion("user3")->base();
 	UINT8 *TEXT_COLOR = memregion("proms")->base();
 
 
-	flip = m_flipscreen ^ (machine().root_device().ioport("FAKE")->read() & 0x01);
+	flip = m_flipscreen ^ (ioport("FAKE")->read() & 0x01);
 
 	/* draw BG layer */
 	dx = (7 - m_bg_scrollx[0]) & 7;

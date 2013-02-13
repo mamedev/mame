@@ -15,8 +15,8 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 {
 	int code,attr,pal;
 
-	code=machine().root_device().memregion("user1")->base()[tile_index]; /* TTTTTTTT */
-	attr=machine().root_device().memregion("user2")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
+	code=memregion("user1")->base()[tile_index]; /* TTTTTTTT */
+	attr=memregion("user2")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
 	code+=(attr&3)<<8;
 	pal=(attr>>4);
 
@@ -31,8 +31,8 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
 {
 	int code,attr,pal;
 
-	code=machine().root_device().memregion("user3")->base()[tile_index]; /* TTTTTTTT */
-	attr=machine().root_device().memregion("user4")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
+	code=memregion("user3")->base()[tile_index]; /* TTTTTTTT */
+	attr=memregion("user4")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
 	pal=attr>>4;
 
 	code+=(attr&3)<<8;
@@ -70,7 +70,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 
 void darkmist_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

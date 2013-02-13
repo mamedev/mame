@@ -432,7 +432,7 @@ void berzerk_state::get_pens(pen_t *pens)
 	int color;
 	double color_weights[2];
 
-	if (machine().root_device().ioport(MONITOR_TYPE_PORT_TAG)->read() == 0)
+	if (ioport(MONITOR_TYPE_PORT_TAG)->read() == 0)
 		compute_resistor_weights(0, 0xff, -1.0,
 									2, resistances_wg, color_weights, 0, 270,
 									2, resistances_wg, color_weights, 0, 270,

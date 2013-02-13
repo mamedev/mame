@@ -518,8 +518,8 @@ DRIVER_INIT_MEMBER(junofrst_state,junofrst)
 {
 	UINT8 *decrypted = konami1_decode(machine(), "maincpu");
 
-	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
-	machine().root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypted + 0x10000, 0x1000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x1000);
+	membank("bank1")->configure_decrypted_entries(0, 16, decrypted + 0x10000, 0x1000);
 }
 
 

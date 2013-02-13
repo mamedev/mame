@@ -1509,8 +1509,8 @@ DRIVER_INIT_MEMBER(gaiden_state,raiga)
 void gaiden_state::descramble_drgnbowl_gfx()
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	size_t size = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *ROM = memregion("maincpu")->base();
+	size_t size = memregion("maincpu")->bytes();
 	UINT8 *buffer = auto_alloc_array(machine(), UINT8, size);
 
 	memcpy(buffer, ROM, size);
@@ -1526,8 +1526,8 @@ void gaiden_state::descramble_drgnbowl_gfx()
 
 	auto_free(machine(), buffer);
 
-	ROM = machine().root_device().memregion("gfx2")->base();
-	size = machine().root_device().memregion("gfx2")->bytes();
+	ROM = memregion("gfx2")->base();
+	size = memregion("gfx2")->bytes();
 	buffer = auto_alloc_array(machine(), UINT8, size);
 
 	memcpy(buffer,ROM,size);
@@ -1595,8 +1595,8 @@ void gaiden_state::descramble_mastninj_gfx(UINT8* src)
 DRIVER_INIT_MEMBER(gaiden_state,mastninj)
 {
 	// rearrange the graphic roms into a format that MAME can decode
-	descramble_mastninj_gfx(machine().root_device().memregion("gfx2")->base());
-	descramble_mastninj_gfx(machine().root_device().memregion("gfx3")->base());
+	descramble_mastninj_gfx(memregion("gfx2")->base());
+	descramble_mastninj_gfx(memregion("gfx3")->base());
 	DRIVER_INIT_CALL(shadoww);
 }
 

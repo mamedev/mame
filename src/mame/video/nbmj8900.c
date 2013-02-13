@@ -143,12 +143,12 @@ WRITE8_MEMBER(nbmj8900_state::nbmj8900_romsel_w)
 {
 	m_gfxrom = (data & 0x0f);
 
-	if ((0x20000 * m_gfxrom) > (machine().root_device().memregion("gfx")->bytes() - 1))
+	if ((0x20000 * m_gfxrom) > (memregion("gfx")->bytes() - 1))
 	{
 #ifdef MAME_DEBUG
 		popmessage("GFXROM BANK OVER!!");
 #endif
-		m_gfxrom &= (machine().root_device().memregion("gfx")->bytes() / 0x20000 - 1);
+		m_gfxrom &= (memregion("gfx")->bytes() / 0x20000 - 1);
 	}
 }
 
@@ -247,12 +247,12 @@ void nbmj8900_state::nbmj8900_gfxdraw()
 	{
 		for (x = startx, ctrx = sizex; ctrx >= 0; x += skipx, ctrx--)
 		{
-			if ((gfxaddr > (machine().root_device().memregion("gfx")->bytes() - 1)))
+			if ((gfxaddr > (memregion("gfx")->bytes() - 1)))
 			{
 #ifdef MAME_DEBUG
 				popmessage("GFXROM ADDRESS OVER!!");
 #endif
-				gfxaddr &= (machine().root_device().memregion("gfx")->bytes() - 1);
+				gfxaddr &= (memregion("gfx")->bytes() - 1);
 			}
 
 			color = GFX[gfxaddr++];

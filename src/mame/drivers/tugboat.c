@@ -58,7 +58,7 @@ public:
     just four 1k resistors. */
 void tugboat_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 

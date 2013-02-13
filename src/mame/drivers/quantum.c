@@ -83,13 +83,13 @@ READ16_MEMBER(quantum_state::trackball_r)
 
 READ8_MEMBER(quantum_state::input_1_r)
 {
-	return (machine().root_device().ioport("DSW0")->read() << (7 - (offset - pokey_device::POT0_C))) & 0x80;
+	return (ioport("DSW0")->read() << (7 - (offset - pokey_device::POT0_C))) & 0x80;
 }
 
 
 READ8_MEMBER(quantum_state::input_2_r)
 {
-	return (machine().root_device().ioport("DSW1")->read() << (7 - (offset - pokey_device::POT0_C))) & 0x80;
+	return (ioport("DSW1")->read() << (7 - (offset - pokey_device::POT0_C))) & 0x80;
 }
 
 

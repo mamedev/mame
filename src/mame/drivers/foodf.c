@@ -322,7 +322,7 @@ GFXDECODE_END
 
 READ8_MEMBER(foodf_state::pot_r)
 {
-	return (machine().root_device().ioport("DSW")->read() >> offset) << 7;
+	return (ioport("DSW")->read() >> offset) << 7;
 }
 
 static const pokey_interface pokey_config =

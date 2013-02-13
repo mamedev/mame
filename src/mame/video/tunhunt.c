@@ -152,7 +152,7 @@ void tunhunt_state::set_pens()
     0020:   00 f0 f0 f0 b0 b0 00 f0
             00 f0 f0 00 b0 00 f0 f0
 */
-	//const UINT8 *color_prom = machine().root_device().memregion( "proms" )->base();
+	//const UINT8 *color_prom = memregion( "proms" )->base();
 	int color;
 	int shade;
 	int i;

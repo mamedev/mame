@@ -98,7 +98,7 @@ static const res_net_info lockon_pd_net_info =
 
 void lockon_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 1024; ++i)

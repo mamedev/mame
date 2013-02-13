@@ -54,7 +54,7 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 void galivan_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -122,7 +122,7 @@ void galivan_state::palette_init()
 
 TILE_GET_INFO_MEMBER(galivan_state::get_bg_tile_info)
 {
-	UINT8 *BGROM = machine().root_device().memregion("gfx4")->base();
+	UINT8 *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO_MEMBER(
@@ -146,7 +146,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_tx_tile_info)
 
 TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
 {
-	UINT8 *BGROM = machine().root_device().memregion("gfx4")->base();
+	UINT8 *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
 	int code = BGROM[tile_index] | ((attr & 0x03) << 8);
 	SET_TILE_INFO_MEMBER(

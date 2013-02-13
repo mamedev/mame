@@ -630,11 +630,11 @@ void savquest_state::machine_start()
 
 void savquest_state::machine_reset()
 {
-	machine().root_device().membank("bios_f0000")->set_base(machine().root_device().memregion("bios")->base() + 0x30000);
-	machine().root_device().membank("bios_e0000")->set_base(machine().root_device().memregion("bios")->base() + 0x20000);
-	machine().root_device().membank("bios_e4000")->set_base(machine().root_device().memregion("bios")->base() + 0x24000);
-	machine().root_device().membank("bios_e8000")->set_base(machine().root_device().memregion("bios")->base() + 0x28000);
-	machine().root_device().membank("bios_ec000")->set_base(machine().root_device().memregion("bios")->base() + 0x2c000);
+	membank("bios_f0000")->set_base(memregion("bios")->base() + 0x30000);
+	membank("bios_e0000")->set_base(memregion("bios")->base() + 0x20000);
+	membank("bios_e4000")->set_base(memregion("bios")->base() + 0x24000);
+	membank("bios_e8000")->set_base(memregion("bios")->base() + 0x28000);
+	membank("bios_ec000")->set_base(memregion("bios")->base() + 0x2c000);
 }
 
 static MACHINE_CONFIG_START( savquest, savquest_state )

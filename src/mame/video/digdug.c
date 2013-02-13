@@ -23,7 +23,7 @@
 
 PALETTE_INIT_MEMBER(digdug_state,digdug)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	machine().colortable = colortable_alloc(machine(), 32);
@@ -90,7 +90,7 @@ TILEMAP_MAPPER_MEMBER(digdug_state::tilemap_scan)
 
 TILE_GET_INFO_MEMBER(digdug_state::bg_get_tile_info)
 {
-	UINT8 *rom = machine().root_device().memregion("gfx4")->base();
+	UINT8 *rom = memregion("gfx4")->base();
 
 	int code = rom[tile_index | (m_bg_select << 10)];
 	/* when the background is "disabled", it is actually still drawn, but using

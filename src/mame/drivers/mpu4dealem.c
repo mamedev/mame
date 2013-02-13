@@ -76,7 +76,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i, len;
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
@@ -87,7 +87,7 @@ PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
 			3,  resistances_rg, weights_g,  1000,   0,
 			2,  resistances_b,  weights_b,  1000,   0);
 
-	len = machine().root_device().memregion("proms")->bytes();
+	len = memregion("proms")->bytes();
 	for (i = 0; i < len; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;

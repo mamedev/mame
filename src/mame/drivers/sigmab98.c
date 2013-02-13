@@ -1911,7 +1911,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sigmab98_state,gegege)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	// Protection?
 	rom[0x0bdd] = 0xc9;
@@ -1929,14 +1929,14 @@ DRIVER_INIT_MEMBER(sigmab98_state,gegege)
 	rom[0x8165] = 0x00;
 
 	// ROM banks
-	machine().root_device().membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	machine().root_device().membank("rombank")->set_entry(0);
+	membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
+	membank("rombank")->set_entry(0);
 
 	// RAM banks
 	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
 
-	machine().root_device().membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	machine().root_device().membank("rambank")->set_entry(0);
+	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
+	membank("rambank")->set_entry(0);
 }
 
 
@@ -1960,7 +1960,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sigmab98_state,pepsiman)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	// Protection?
 	rom[0x058a] = 0xc9;
@@ -1978,14 +1978,14 @@ DRIVER_INIT_MEMBER(sigmab98_state,pepsiman)
 	rom[0x8165] = 0x00;
 
 	// ROM banks
-	machine().root_device().membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	machine().root_device().membank("rombank")->set_entry(0);
+	membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
+	membank("rombank")->set_entry(0);
 
 	// RAM banks
 	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
 
-	machine().root_device().membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	machine().root_device().membank("rambank")->set_entry(0);
+	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
+	membank("rambank")->set_entry(0);
 }
 
 
@@ -2011,7 +2011,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(sigmab98_state,ucytokyu)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	// Protection?
 	rom[0x0bfa] = 0xc9;
@@ -2029,14 +2029,14 @@ DRIVER_INIT_MEMBER(sigmab98_state,ucytokyu)
 	rom[0x8165] = 0x00;
 
 	// ROM banks
-	machine().root_device().membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
-	machine().root_device().membank("rombank")->set_entry(0);
+	membank("rombank")->configure_entries(0, 0x18, rom + 0x8000, 0x1000);
+	membank("rombank")->set_entry(0);
 
 	// RAM banks
 	UINT8 *bankedram = auto_alloc_array(machine(), UINT8, 0x800 * 2);
 
-	machine().root_device().membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
-	machine().root_device().membank("rambank")->set_entry(0);
+	membank("rambank")->configure_entries(0, 2, bankedram, 0x800);
+	membank("rambank")->set_entry(0);
 }
 
 

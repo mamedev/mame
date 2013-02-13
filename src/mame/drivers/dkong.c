@@ -1611,7 +1611,7 @@ void dkong_state::braze_decrypt_rom(UINT8 *dest)
 	UINT32 mem;
 	UINT32 newmem;
 
-	ROM = machine().root_device().memregion("braze")->base();
+	ROM = memregion("braze")->base();
 
 	for (mem=0;mem<0x10000;mem++)
 	{
@@ -3030,7 +3030,7 @@ void dkong_state::drakton_decrypt_rom(UINT8 mod, int offs, int *bs)
 	UINT8 *ROM;
 	int mem;
 
-	ROM = machine().root_device().memregion("maincpu")->base();
+	ROM = memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -3056,7 +3056,7 @@ void dkong_state::drakton_decrypt_rom(UINT8 mod, int offs, int *bs)
 DRIVER_INIT_MEMBER(dkong_state,herodk)
 {
 	int A;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	/* swap data lines D3 and D4 */
 	for (A = 0;A < 0x8000;A++)
@@ -3144,7 +3144,7 @@ DRIVER_INIT_MEMBER(dkong_state,dkongx)
 
 DRIVER_INIT_MEMBER(dkong_state,dkingjr)
 {
-	UINT8 *prom = machine().root_device().memregion("proms")->base();
+	UINT8 *prom = memregion("proms")->base();
 	for( int i=0; i<0x200; ++i)
 	{
 		prom[i]^=0xff; // invert color data

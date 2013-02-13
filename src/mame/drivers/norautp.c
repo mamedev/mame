@@ -3442,9 +3442,9 @@ DRIVER_INIT_MEMBER(norautp_state,enc)
 {
 /* Attempt to decrypt the program ROM */
 
-//  UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+//  UINT8 *rom = memregion("maincpu")->base();
 //  UINT8 *buffer;
-//  int size = 0x2000; //machine().root_device().memregion("maincpu")->bytes();
+//  int size = 0x2000; //memregion("maincpu")->bytes();
 //  int start = 0;
 //  int i;
 
@@ -3481,7 +3481,7 @@ DRIVER_INIT_MEMBER(norautp_state,deb)
 /* Just for debugging purposes */
 /*   Should be removed soon    */
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x02f7] = 0xca;
 	ROM[0x02f8] = 0x18;
 	ROM[0x206c] = 0xff;
@@ -3491,7 +3491,7 @@ DRIVER_INIT_MEMBER(norautp_state,ssa)
 /* Passing the video PPI handshaking lines */
 /* Just for debugging purposes */
 {
-//  UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+//  UINT8 *ROM = memregion("maincpu")->base();
 
 //  ROM[0x073b] = 0x00;
 //  ROM[0x073c] = 0x00;

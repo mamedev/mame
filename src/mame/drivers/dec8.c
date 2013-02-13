@@ -3516,84 +3516,84 @@ DRIVER_INIT_MEMBER(dec8_state,dec8)
 /* Below, I set up the correct number of banks depending on the "maincpu" region size */
 DRIVER_INIT_MEMBER(dec8_state,lastmisn)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,shackled)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,gondo)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,garyoret)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,ghostb)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	UINT8 *RAM = machine().root_device().memregion("proms")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
+	UINT8 *RAM = memregion("proms")->base();
 
 	/* Blank out unused garbage in colour prom to avoid colour overflow */
 	memset(RAM + 0x20, 0, 0xe0);
 
-	machine().root_device().membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,meikyuh)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	UINT8 *RAM = machine().root_device().memregion("proms")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
+	UINT8 *RAM = memregion("proms")->base();
 
 	/* Blank out unused garbage in colour prom to avoid colour overflow */
 	memset(RAM + 0x20, 0, 0xe0);
 
-	machine().root_device().membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,csilver)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	UINT8 *RAM = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
+	UINT8 *RAM = memregion("audiocpu")->base();
 
-	machine().root_device().membank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
-	machine().root_device().membank("bank3")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
+	membank("bank3")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,oscar)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,srdarwin)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,cobracom)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 

@@ -77,8 +77,8 @@ static int get_lightgun_pos(screen_device &screen, int player, int *x, int *y)
 {
 	const rectangle &visarea = screen.visible_area();
 
-	int xpos = screen.machine().root_device().ioport((player == 0) ? "GUN1X" : "GUN2X")->read_safe(0xffffffff);
-	int ypos = screen.machine().root_device().ioport((player == 0) ? "GUN1Y" : "GUN2Y")->read_safe(0xffffffff);
+	int xpos = screen.ioport((player == 0) ? "GUN1X" : "GUN2X")->read_safe(0xffffffff);
+	int ypos = screen.ioport((player == 0) ? "GUN1Y" : "GUN2Y")->read_safe(0xffffffff);
 
 	if (xpos == -1 || ypos == -1)
 		return FALSE;
@@ -248,7 +248,7 @@ WRITE8_MEMBER(alg_state::alg_cia_0_porta_w)
 
 READ8_MEMBER(alg_state::alg_cia_0_porta_r)
 {
-	return machine().root_device().ioport("FIRE")->read() | 0x3f;
+	return ioport("FIRE")->read() | 0x3f;
 }
 
 
@@ -705,7 +705,7 @@ void alg_state::alg_init()
 
 	/* set up memory */
 	m_bank1->configure_entry(0, m_chip_ram);
-	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(1, memregion("user1")->base());
 }
 
 
@@ -718,8 +718,8 @@ void alg_state::alg_init()
 
 DRIVER_INIT_MEMBER(alg_state,palr1)
 {
-	UINT32 length = machine().root_device().memregion("user2")->bytes();
-	UINT8 *rom = machine().root_device().memregion("user2")->base();
+	UINT32 length = memregion("user2")->bytes();
+	UINT8 *rom = memregion("user2")->base();
 	UINT8 *original = auto_alloc_array(machine(), UINT8, length);
 	UINT32 srcaddr;
 
@@ -738,8 +738,8 @@ DRIVER_INIT_MEMBER(alg_state,palr1)
 
 DRIVER_INIT_MEMBER(alg_state,palr3)
 {
-	UINT32 length = machine().root_device().memregion("user2")->bytes();
-	UINT8 *rom = machine().root_device().memregion("user2")->base();
+	UINT32 length = memregion("user2")->bytes();
+	UINT8 *rom = memregion("user2")->base();
 	UINT8 *original = auto_alloc_array(machine(), UINT8, length);
 	UINT32 srcaddr;
 
@@ -757,8 +757,8 @@ DRIVER_INIT_MEMBER(alg_state,palr3)
 
 DRIVER_INIT_MEMBER(alg_state,palr6)
 {
-	UINT32 length = machine().root_device().memregion("user2")->bytes();
-	UINT8 *rom = machine().root_device().memregion("user2")->base();
+	UINT32 length = memregion("user2")->bytes();
+	UINT8 *rom = memregion("user2")->base();
 	UINT8 *original = auto_alloc_array(machine(), UINT8, length);
 	UINT32 srcaddr;
 
@@ -779,7 +779,7 @@ DRIVER_INIT_MEMBER(alg_state,palr6)
 DRIVER_INIT_MEMBER(alg_state,aplatoon)
 {
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
-	UINT8 *rom = machine().root_device().memregion("user2")->base();
+	UINT8 *rom = memregion("user2")->base();
 	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x40000);
 	int i;
 

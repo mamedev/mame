@@ -448,7 +448,7 @@ READ16_MEMBER(ssv_state::gdfs_eeprom_r)
 	static const char *const gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return (((m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ machine().root_device().ioport(gunnames[m_gdfs_lightgun_select])->read()) | (eeprom->read_bit() << 8);
+	return (((m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ ioport(gunnames[m_gdfs_lightgun_select])->read()) | (eeprom->read_bit() << 8);
 }
 
 WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
@@ -2531,9 +2531,9 @@ void ssv_state::init_hypreac2_common()
 // massages the data from the BPMicro-compatible dump to runnable form
 void ssv_state::init_st010()
 {
-	UINT8 *dspsrc = (UINT8 *)machine().root_device().memregion("st010")->base();
-	UINT32 *dspprg = (UINT32 *)machine().root_device().memregion("dspprg")->base();
-	UINT16 *dspdata = (UINT16 *)machine().root_device().memregion("dspdata")->base();
+	UINT8 *dspsrc = (UINT8 *)memregion("st010")->base();
+	UINT32 *dspprg = (UINT32 *)memregion("dspprg")->base();
+	UINT16 *dspdata = (UINT16 *)memregion("dspdata")->base();
 
 	// copy DSP program
 	for (int i = 0; i < 0x10000; i+= 4)
@@ -2560,7 +2560,7 @@ DRIVER_INIT_MEMBER(ssv_state,meosism)       {   init_ssv(0); }
 DRIVER_INIT_MEMBER(ssv_state,mslider)       {   init_ssv(0); }
 DRIVER_INIT_MEMBER(ssv_state,ryorioh)       {   init_ssv(0); }
 DRIVER_INIT_MEMBER(ssv_state,srmp4)        {    init_ssv(0);
-//  ((UINT16 *)machine().root_device().memregion("user1")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
+//  ((UINT16 *)memregion("user1")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
 DRIVER_INIT_MEMBER(ssv_state,srmp7)        {    init_ssv(0); }
 DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init_ssv(0); init_st010(); }

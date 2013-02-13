@@ -640,9 +640,9 @@ DRIVER_INIT_MEMBER(zn_state,coh1000c)
 
 MACHINE_RESET_MEMBER(zn_state,coh1000c)
 {
-	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
-	machine().root_device().membank( "bank2" )->set_base( machine().root_device().memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
-	machine().root_device().membank( "bank3" )->set_base( machine().root_device().memregion( "user3" )->base() ); /* country rom */
+	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* fixed game rom */
+	membank( "bank2" )->set_base( memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
+	membank( "bank3" )->set_base( memregion( "user3" )->base() ); /* country rom */
 }
 
 static ADDRESS_MAP_START( qsound_map, AS_PROGRAM, 8, zn_state )
@@ -847,9 +847,9 @@ DRIVER_INIT_MEMBER(zn_state,coh3002c)
 
 MACHINE_RESET_MEMBER(zn_state,coh3002c)
 {
-	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
-	machine().root_device().membank( "bank2" )->set_base( machine().root_device().memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
-	machine().root_device().membank( "bank3" )->set_base( machine().root_device().memregion( "user3" )->base() ); /* country rom */
+	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* fixed game rom */
+	membank( "bank2" )->set_base( memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
+	membank( "bank3" )->set_base( memregion( "user3" )->base() ); /* country rom */
 }
 
 static MACHINE_CONFIG_DERIVED( coh3002c, zn2 )
@@ -1398,7 +1398,7 @@ DRIVER_INIT_MEMBER(zn_state,coh1000w)
 
 MACHINE_RESET_MEMBER(zn_state,coh1000w)
 {
-	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
+	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* fixed game rom */
 
 	machine().device("ide")->reset();
 }
@@ -1585,7 +1585,7 @@ DRIVER_INIT_MEMBER(zn_state,coh1002e)
 
 MACHINE_RESET_MEMBER(zn_state,coh1002e)
 {
-	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* banked game rom */
+	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* banked game rom */
 }
 
 static ADDRESS_MAP_START( psarc_snd_map, AS_PROGRAM, 16, zn_state )
@@ -1727,8 +1727,8 @@ DRIVER_INIT_MEMBER(zn_state,bam2)
 
 MACHINE_RESET_MEMBER(zn_state,bam2)
 {
-	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
-	machine().root_device().membank( "bank2" )->set_base( machine().root_device().memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
+	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* fixed game rom */
+	membank( "bank2" )->set_base( memregion( "user2" )->base() + 0x400000 ); /* banked game rom */
 }
 
 static MACHINE_CONFIG_DERIVED( bam2, zn1_2mb_vram )
@@ -1974,13 +1974,13 @@ void jdredd_vblank(zn_state *state, screen_device &screen, bool vblank_state)
 
 		if( state->m_jdredd_gun_mux == 0 )
 		{
-			x = state->machine().root_device().ioport("GUN1X")->read();
-			y = state->machine().root_device().ioport("GUN1Y")->read();
+			x = state->ioport("GUN1X")->read();
+			y = state->ioport("GUN1Y")->read();
 		}
 		else
 		{
-			x = state->machine().root_device().ioport("GUN2X")->read();
-			y = state->machine().root_device().ioport("GUN2Y")->read();
+			x = state->ioport("GUN2X")->read();
+			y = state->ioport("GUN2Y")->read();
 		}
 
 		if( x > 0x393 && x < 0xcb2 &&
@@ -2053,7 +2053,7 @@ DRIVER_INIT_MEMBER(zn_state,coh1000a)
 
 MACHINE_RESET_MEMBER(zn_state,coh1000a)
 {
-	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
+	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* fixed game rom */
 	if( ( !strcmp( machine().system().name, "jdredd" ) ) ||
 		( !strcmp( machine().system().name, "jdreddb" ) ) )
 	{
@@ -2208,7 +2208,7 @@ DRIVER_INIT_MEMBER(zn_state,coh1001l)
 
 MACHINE_RESET_MEMBER(zn_state,coh1001l)
 {
-	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* banked rom */
+	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* banked rom */
 }
 
 static MACHINE_CONFIG_DERIVED( coh1001l, zn1_2mb_vram )
@@ -2250,8 +2250,8 @@ DRIVER_INIT_MEMBER(zn_state,coh1002v)
 
 MACHINE_RESET_MEMBER(zn_state,coh1002v)
 {
-	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() ); /* fixed game rom */
-	machine().root_device().membank( "bank2" )->set_base( machine().root_device().memregion( "user3" )->base() ); /* banked rom */
+	membank( "bank1" )->set_base( memregion( "user2" )->base() ); /* fixed game rom */
+	membank( "bank2" )->set_base( memregion( "user3" )->base() ); /* banked rom */
 }
 
 static MACHINE_CONFIG_DERIVED( coh1002v, zn1_2mb_vram )
@@ -2452,7 +2452,7 @@ DRIVER_INIT_MEMBER(zn_state,coh1002m)
 
 MACHINE_RESET_MEMBER(zn_state,coh1002m)
 {
-	machine().root_device().membank( "bank1" )->set_base( machine().root_device().memregion( "user2" )->base() );
+	membank( "bank1" )->set_base( memregion( "user2" )->base() );
 }
 
 READ8_MEMBER(zn_state::cbaj_z80_latch_r)

@@ -396,7 +396,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(rbisland_state::bankswitch_w)
 {
-	machine().root_device().membank("bank1")->set_entry(data & 3);
+	membank("bank1")->set_entry(data & 3);
 }
 
 READ8_MEMBER(rbisland_state::jumping_latch_r)
@@ -852,18 +852,18 @@ ROM_END
 
 DRIVER_INIT_MEMBER(rbisland_state,rbisland)
 {
-	UINT8 *ROM = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
-	machine().root_device().membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
 	rbisland_cchip_init(0);
 }
 
 DRIVER_INIT_MEMBER(rbisland_state,rbislande)
 {
-	UINT8 *ROM = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
-	machine().root_device().membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
+	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
 	rbisland_cchip_init(1);
 }

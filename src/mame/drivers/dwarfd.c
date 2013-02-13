@@ -1297,7 +1297,7 @@ DRIVER_INIT_MEMBER(dwarfd_state,dwarfd)
 	}
 
 	/* use low bit as 'interpolation' bit */
-	src = machine().root_device().memregion("gfx2")->base();
+	src = memregion("gfx2")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
 		if (src[i] & 0x10)
@@ -1328,12 +1328,12 @@ DRIVER_INIT_MEMBER(dwarfd_state,qc)
 	DRIVER_INIT_CALL(dwarfd);
 
 	// hacks for program to proceed
-	machine().root_device().memregion("maincpu")->base()[0x6564] = 0x00;
-	machine().root_device().memregion("maincpu")->base()[0x6565] = 0x00;
+	memregion("maincpu")->base()[0x6564] = 0x00;
+	memregion("maincpu")->base()[0x6565] = 0x00;
 
-	machine().root_device().memregion("maincpu")->base()[0x59b2] = 0x00;
-	machine().root_device().memregion("maincpu")->base()[0x59b3] = 0x00;
-	machine().root_device().memregion("maincpu")->base()[0x59b4] = 0x00;
+	memregion("maincpu")->base()[0x59b2] = 0x00;
+	memregion("maincpu")->base()[0x59b3] = 0x00;
+	memregion("maincpu")->base()[0x59b4] = 0x00;
 
 }
 

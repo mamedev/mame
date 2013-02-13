@@ -630,7 +630,7 @@ DRIVER_INIT_MEMBER(skykid_state,skykid)
 	int i;
 
 	/* unpack the third sprite ROM */
-	rom = machine().root_device().memregion("gfx3")->base() + 0x4000;
+	rom = memregion("gfx3")->base() + 0x4000;
 	for (i = 0;i < 0x2000;i++)
 	{
 		rom[i + 0x4000] = rom[i];       // sprite set #1, plane 3

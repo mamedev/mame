@@ -55,7 +55,7 @@ void xyonix_state::handle_coins(int coin)
 
 	if (coin & 2)   // Coin 1 !
 	{
-		tmp = (machine().root_device().ioport("DSW")->read() & 0x30) >> 4;
+		tmp = (ioport("DSW")->read() & 0x30) >> 4;
 		m_coins++;
 		if (m_coins >= coinage_table[tmp][0])
 		{

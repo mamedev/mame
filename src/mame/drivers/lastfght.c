@@ -151,7 +151,7 @@ UINT32 lastfght_state::screen_update_lastfght(screen_device &screen, bitmap_ind1
 #if 1
 	// gfx roms viewer (toggle with enter, use pgup/down to browse)
 	int x, y, count = 0;
-	UINT8 *gfxdata = machine().root_device().memregion("gfx1")->base();
+	UINT8 *gfxdata = memregion("gfx1")->base();
 	UINT8 data;
 
 	if (machine().input().code_pressed_once(KEYCODE_ENTER)) m_view_roms ^= 1;
@@ -604,7 +604,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(lastfght_state,lastfght)
 {
-	UINT16 *rom = (UINT16*)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
 
 	// pass initial check (protection ? hw?)
 	rom[0x00354 / 2] = 0x403e;

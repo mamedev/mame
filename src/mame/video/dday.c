@@ -47,7 +47,7 @@ void dday_state::start_countdown_timer()
 
 void dday_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	palette_set_shadow_factor(machine(), 1.0 / 8);

@@ -24,7 +24,7 @@
 ***************************************************************************/
 PALETTE_INIT_MEMBER(snk6502_state,snk6502)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -195,7 +195,7 @@ UINT32 snk6502_state::screen_update_snk6502(screen_device &screen, bitmap_ind16 
 
 PALETTE_INIT_MEMBER(snk6502_state,satansat)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine().total_colors(); i++)

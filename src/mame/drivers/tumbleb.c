@@ -468,7 +468,7 @@ static const int tumbleb_sound_lookup[256] = {
 /* we use channels 1,2,3 for sound effects, and channel 4 for music */
 void tumbleb_state::tumbleb2_set_music_bank( int bank )
 {
-	UINT8 *oki = machine().root_device().memregion("oki")->base();
+	UINT8 *oki = memregion("oki")->base();
 	memcpy(&oki[0x38000], &oki[0x80000 + 0x38000 + 0x8000 * bank], 0x8000);
 }
 
@@ -3194,7 +3194,7 @@ ROM_END
 void tumbleb_state::tumblepb_patch_code(UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;   // andi.w  #$f3ff, D0
 }
@@ -3208,13 +3208,13 @@ void tumbleb_state::tumblepb_gfx_rearrange(int rgn)
 
 	if (rgn == 1)
 	{
-		rom = machine().root_device().memregion("tilegfx")->base();
-		len = machine().root_device().memregion("tilegfx")->bytes();
+		rom = memregion("tilegfx")->base();
+		len = memregion("tilegfx")->bytes();
 	}
 	else
 	{
-		rom = machine().root_device().memregion("sprgfx")->base();
-		len = machine().root_device().memregion("sprgfx")->bytes();
+		rom = memregion("sprgfx")->base();
+		len = memregion("sprgfx")->bytes();
 	}
 
 	int i;
@@ -3276,7 +3276,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,fncywld)
 	#if FNCYWLD_HACK
 	/* This is a hack to allow you to use the extra features
 	   of the 2 first "Unused" Dip Switch (see notes above). */
-	UINT16 *RAM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
 	RAM[0x0005fa/2] = 0x4e71;
 	RAM[0x00060a/2] = 0x4e71;
 	#endif
@@ -3314,7 +3314,7 @@ DRIVER_INIT_MEMBER(tumbleb_state,htchctch)
 
 void tumbleb_state::suprtrio_decrypt_code()
 {
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 	UINT16 *buf = auto_alloc_array(machine(), UINT16, 0x80000/2);
 	int i;
 
@@ -3332,7 +3332,7 @@ void tumbleb_state::suprtrio_decrypt_code()
 
 void tumbleb_state::suprtrio_decrypt_gfx()
 {
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("tilegfx")->base();
+	UINT16 *rom = (UINT16 *)memregion("tilegfx")->base();
 	UINT16 *buf = auto_alloc_array(machine(), UINT16, 0x100000/2);
 	int i;
 

@@ -242,13 +242,13 @@ MACHINE_CONFIG_END
 DRIVER_INIT_MEMBER(pokechmp_state,pokechmp)
 {
 	// default sound rom bank
-	machine().root_device().membank("bank3")->configure_entries(0, 2, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
+	membank("bank3")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 
 	// default fixed area for main CPU
-	machine().root_device().membank("fixed")->set_base( machine().root_device().memregion("maincpu")->base() + 0x18000 );
+	membank("fixed")->set_base( memregion("maincpu")->base() + 0x18000 );
 
 	// default OKI sample bank
-	machine().root_device().membank("okibank")->set_base( machine().root_device().memregion("oki")->base() + 0x40000 );
+	membank("okibank")->set_base( memregion("oki")->base() + 0x40000 );
 }
 
 

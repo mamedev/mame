@@ -437,8 +437,8 @@ WRITE16_MEMBER(mystwarr_state::ddd_053936_clip_w)
 // reference: 223e5c in gaiapolis (ROMs 34j and 36m)
 READ16_MEMBER(mystwarr_state::gai_053936_tilerom_0_r)
 {
-	UINT8 *ROM1 = (UINT8 *)machine().root_device().memregion("gfx4")->base();
-	UINT8 *ROM2 = (UINT8 *)machine().root_device().memregion("gfx4")->base();
+	UINT8 *ROM1 = (UINT8 *)memregion("gfx4")->base();
+	UINT8 *ROM2 = (UINT8 *)memregion("gfx4")->base();
 
 	ROM1 += 0x20000;
 	ROM2 += 0x20000+0x40000;
@@ -448,8 +448,8 @@ READ16_MEMBER(mystwarr_state::gai_053936_tilerom_0_r)
 
 READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_0_r)
 {
-	UINT8 *ROM1 = (UINT8 *)machine().root_device().memregion("gfx4")->base();
-	UINT8 *ROM2 = (UINT8 *)machine().root_device().memregion("gfx4")->base();
+	UINT8 *ROM1 = (UINT8 *)memregion("gfx4")->base();
+	UINT8 *ROM2 = (UINT8 *)memregion("gfx4")->base();
 
 	ROM2 += 0x40000;
 
@@ -459,7 +459,7 @@ READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_0_r)
 // reference: 223e1a in gaiapolis (ROM 36j)
 READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_1_r)
 {
-	UINT8 *ROM = (UINT8 *)machine().root_device().memregion("gfx4")->base();
+	UINT8 *ROM = (UINT8 *)memregion("gfx4")->base();
 
 	return ROM[offset/2];
 }
@@ -467,7 +467,7 @@ READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_1_r)
 // reference: 223db0 in gaiapolis (ROMs 32n, 29n, 26n)
 READ16_MEMBER(mystwarr_state::gai_053936_tilerom_2_r)
 {
-	UINT8 *ROM = (UINT8 *)machine().root_device().memregion("gfx3")->base();
+	UINT8 *ROM = (UINT8 *)memregion("gfx3")->base();
 
 	offset += (m_roz_rombank * 0x100000);
 
@@ -476,7 +476,7 @@ READ16_MEMBER(mystwarr_state::gai_053936_tilerom_2_r)
 
 READ16_MEMBER(mystwarr_state::ddd_053936_tilerom_2_r)
 {
-	UINT8 *ROM = (UINT8 *)machine().root_device().memregion("gfx3")->base();
+	UINT8 *ROM = (UINT8 *)memregion("gfx3")->base();
 
 	offset += (m_roz_rombank * 0x100000);
 

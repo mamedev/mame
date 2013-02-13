@@ -413,7 +413,7 @@ static void shuffle( UINT8 *buf, int len )
 DRIVER_INIT_MEMBER(battlnts_state,rackemup)
 {
 	/* rearrange char ROM */
-	shuffle(machine().root_device().memregion("gfx1")->base(), machine().root_device().memregion("gfx1")->bytes());
+	shuffle(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 }
 
 

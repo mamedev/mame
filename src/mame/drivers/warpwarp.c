@@ -235,7 +235,7 @@ READ8_MEMBER(warpwarp_state::warpwarp_sw_r)
 /* Read Dipswitches */
 READ8_MEMBER(warpwarp_state::warpwarp_dsw1_r)
 {
-	return (machine().root_device().ioport("DSW1")->read() >> (offset & 7)) & 1;
+	return (ioport("DSW1")->read() >> (offset & 7)) & 1;
 }
 
 /* Read mux Controller Inputs */

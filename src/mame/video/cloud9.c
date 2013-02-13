@@ -24,9 +24,9 @@ void cloud9_state::video_start()
 	membank("bank1")->set_base(m_videoram);
 
 	/* get pointers to our PROMs */
-	m_syncprom = machine().root_device().memregion("proms")->base() + 0x000;
-	m_wpprom = machine().root_device().memregion("proms")->base() + 0x200;
-	m_priprom = machine().root_device().memregion("proms")->base() + 0x300;
+	m_syncprom = memregion("proms")->base() + 0x000;
+	m_wpprom = memregion("proms")->base() + 0x200;
+	m_priprom = memregion("proms")->base() + 0x300;
 
 	/* compute the color output resistor weights at startup */
 	compute_resistor_weights(0, 255, -1.0,

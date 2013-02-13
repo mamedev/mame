@@ -18,7 +18,7 @@
 
 void ironhors_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2000, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;

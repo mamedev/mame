@@ -412,7 +412,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedeep_state::thedeep_interrupt)
 	{
 		if (m_protection_command != 0x59)
 		{
-			int coins = machine().root_device().ioport("MCU")->read();
+			int coins = ioport("MCU")->read();
 			if      (coins & 1) m_protection_data = 1;
 			else if (coins & 2) m_protection_data = 2;
 			else if (coins & 4) m_protection_data = 3;

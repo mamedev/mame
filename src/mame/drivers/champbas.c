@@ -1208,9 +1208,9 @@ ROM_END
 DRIVER_INIT_MEMBER(champbas_state,champbas)
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = machine().root_device().memregion("gfx1")->base();
-	UINT8 *rom2 = machine().root_device().memregion("gfx2")->base();
-	int len = machine().root_device().memregion("gfx1")->bytes();
+	UINT8 *rom1 = memregion("gfx1")->base();
+	UINT8 *rom2 = memregion("gfx2")->base();
+	int len = memregion("gfx1")->bytes();
 	int i;
 
 	for (i = 0; i < len/2; ++i)
@@ -1225,8 +1225,8 @@ DRIVER_INIT_MEMBER(champbas_state,champbas)
 DRIVER_INIT_MEMBER(champbas_state,exctsccr)
 {
 	// chars and sprites are mixed in the same ROMs, so rearrange them for easier decoding
-	UINT8 *rom1 = machine().root_device().memregion("gfx1")->base();
-	UINT8 *rom2 = machine().root_device().memregion("gfx2")->base();
+	UINT8 *rom1 = memregion("gfx1")->base();
+	UINT8 *rom2 = memregion("gfx2")->base();
 	int i;
 
 	// planes 0,1

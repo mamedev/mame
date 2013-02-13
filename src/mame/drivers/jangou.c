@@ -103,7 +103,7 @@ public:
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
 void jangou_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -294,12 +294,12 @@ READ8_MEMBER(jangou_state::input_mux_r)
 		case 0x20: return ioport("PL2_3")->read();
 	}
 
-	return machine().root_device().ioport("IN_NOMUX")->read();
+	return ioport("IN_NOMUX")->read();
 }
 
 READ8_MEMBER(jangou_state::input_system_r)
 {
-	return machine().root_device().ioport("SYSTEM")->read();
+	return ioport("SYSTEM")->read();
 }
 
 
@@ -1361,7 +1361,7 @@ DRIVER_INIT_MEMBER(jangou_state,luckygrl)
 {
 	// this is WRONG
 	int A;
-	UINT8 *ROM = machine().root_device().memregion("cpu0")->base();
+	UINT8 *ROM = memregion("cpu0")->base();
 
 	unsigned char patn1[32] = {
 		0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0, 0x00, 0xA0,

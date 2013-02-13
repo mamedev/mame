@@ -1549,8 +1549,8 @@ static const namco_interface namco_config =
 
 ***************************************************************************/
 
-READ8_MEMBER(mappy_state::dipA_l){ return machine().root_device().ioport("DSW1")->read(); }     // dips A
-READ8_MEMBER(mappy_state::dipA_h){ return machine().root_device().ioport("DSW1")->read() >> 4; }    // dips A
+READ8_MEMBER(mappy_state::dipA_l){ return ioport("DSW1")->read(); }     // dips A
+READ8_MEMBER(mappy_state::dipA_h){ return ioport("DSW1")->read() >> 4; }    // dips A
 
 READ8_MEMBER(mappy_state::dipB_mux)// dips B
 {

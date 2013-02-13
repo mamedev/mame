@@ -307,7 +307,7 @@ void exidy440_state::exidy440_bank_select(UINT8 bank)
 
 	/* select the bank and update the bank pointer */
 	m_bank = bank;
-	membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[0x10000 + m_bank * 0x4000]);
+	membank("bank1")->set_base(&memregion("maincpu")->base()[0x10000 + m_bank * 0x4000]);
 }
 
 

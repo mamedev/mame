@@ -313,7 +313,7 @@ void nbmj8688_state::mbmj8688_gfxdraw(int gfxtype)
 		skipy = -1;
 	}
 
-	gfxlen = machine().root_device().memregion("gfx1")->bytes();
+	gfxlen = memregion("gfx1")->bytes();
 	gfxaddr = (m_mjsikaku_gfxrom << 17) + (m_blitter_src_addr << 1);
 
 //popmessage("ADDR:%08X DX:%03d DY:%03d SX:%03d SY:%03d", gfxaddr, startx, starty, sizex, sizey);

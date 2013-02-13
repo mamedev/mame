@@ -1149,7 +1149,7 @@ WRITE32_MEMBER(model2_state::model2_prot_w)
 
 READ32_MEMBER(model2_state::maxx_r)
 {
-	UINT32 *ROM = (UINT32 *)machine().root_device().memregion("maincpu")->base();
+	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 
 	if (offset <= 0x1f/4)
 	{
@@ -1845,7 +1845,7 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(model2_state::model2snd_ctrl)
 {
 	// handle sample banking
-	if (machine().root_device().memregion("scsp")->bytes() > 0x800000)
+	if (memregion("scsp")->bytes() > 0x800000)
 	{
 		UINT8 *snd = memregion("scsp")->base();
 		if (data & 0x20)

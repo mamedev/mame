@@ -201,7 +201,7 @@ WRITE8_MEMBER(photon2_state::photon2_membank_w)
 		logerror( "Unknown banking write: %02X\n", data);
 	}
 
-	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x4000*bank );
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000*bank );
 }
 
 READ8_MEMBER(photon2_state::photon2_fe_r)
@@ -314,7 +314,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(photon2_state::spec_interrupt_hack)
 
 void photon2_state::machine_reset()
 {
-	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+	membank("bank1")->set_base(memregion("maincpu")->base());
 }
 
 static MACHINE_CONFIG_START( photon2, photon2_state )

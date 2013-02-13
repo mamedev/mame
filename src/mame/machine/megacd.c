@@ -1576,11 +1576,11 @@ void sega_segacd_device::device_start()
 
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	segacd_font_bits = reinterpret_cast<UINT16 *>(machine().root_device().memshare(":segacd:segacd_font")->ptr());
-	segacd_backupram = reinterpret_cast<UINT16 *>(machine().root_device().memshare(":segacd:backupram")->ptr());
-	segacd_dataram = reinterpret_cast<UINT16 *>(machine().root_device().memshare(":segacd:dataram")->ptr());
-//  segacd_dataram2 = reinterpret_cast<UINT16 *>(machine().root_device().memshare(":segacd:dataram2")->ptr());
-	segacd_4meg_prgram = reinterpret_cast<UINT16 *>(machine().root_device().memshare(":segacd:segacd_program")->ptr());
+	segacd_font_bits = reinterpret_cast<UINT16 *>(memshare(":segacd:segacd_font")->ptr());
+	segacd_backupram = reinterpret_cast<UINT16 *>(memshare(":segacd:backupram")->ptr());
+	segacd_dataram = reinterpret_cast<UINT16 *>(memshare(":segacd:dataram")->ptr());
+//  segacd_dataram2 = reinterpret_cast<UINT16 *>(memshare(":segacd:dataram2")->ptr());
+	segacd_4meg_prgram = reinterpret_cast<UINT16 *>(memshare(":segacd:segacd_program")->ptr());
 
 	segacd_4meg_prgbank = 0;
 

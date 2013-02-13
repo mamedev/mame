@@ -59,8 +59,8 @@ DRIVER_INIT_MEMBER(nbmj8688_state,otonano)
 
 DRIVER_INIT_MEMBER(nbmj8688_state,mjcamera)
 {
-	UINT8 *rom = machine().root_device().memregion("voice")->base() + 0x20000;
-	UINT8 *prot = machine().root_device().memregion("user1")->base();
+	UINT8 *rom = memregion("voice")->base() + 0x20000;
+	UINT8 *prot = memregion("user1")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -79,7 +79,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,mjcamera)
 DRIVER_INIT_MEMBER(nbmj8688_state,kanatuen)
 {
 	/* uses the same protection data as mjcamer, but a different check */
-	UINT8 *rom = machine().root_device().memregion("voice")->base() + 0x30000;
+	UINT8 *rom = memregion("voice")->base() + 0x30000;
 
 	rom[0x0004] = 0x09;
 	rom[0x0103] = 0x0e;
@@ -93,7 +93,7 @@ DRIVER_INIT_MEMBER(nbmj8688_state,kyuhito)
 {
 #if 1
 	/* uses the same protection data as ????, but a different check */
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	rom[0x0149] = 0x00;
 	rom[0x014a] = 0x00;
@@ -105,8 +105,8 @@ DRIVER_INIT_MEMBER(nbmj8688_state,kyuhito)
 
 DRIVER_INIT_MEMBER(nbmj8688_state,idhimitu)
 {
-	UINT8 *rom = machine().root_device().memregion("voice")->base() + 0x20000;
-	UINT8 *prot = machine().root_device().memregion("user1")->base();
+	UINT8 *rom = memregion("voice")->base() + 0x20000;
+	UINT8 *prot = memregion("user1")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -130,8 +130,8 @@ DRIVER_INIT_MEMBER(nbmj8688_state,kaguya)
 
 DRIVER_INIT_MEMBER(nbmj8688_state,kaguya2)
 {
-	UINT8 *rom = machine().root_device().memregion("voice")->base() + 0x20000;
-	UINT8 *prot = machine().root_device().memregion("user1")->base();
+	UINT8 *rom = memregion("voice")->base() + 0x20000;
+	UINT8 *prot = memregion("user1")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the

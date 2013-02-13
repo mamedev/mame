@@ -221,7 +221,7 @@ UINT8 uapce_state::joy_read()
 	}
 	else
 	{
-		return machine().root_device().ioport("JOY" )->read() | 0x08;
+		return ioport("JOY" )->read() | 0x08;
 	}
 }
 

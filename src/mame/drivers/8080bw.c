@@ -770,7 +770,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state, spacecom)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	// bad byte: should be push a at RST 10h
 	ROM[0x10] = 0xf5;
@@ -2552,8 +2552,8 @@ MACHINE_CONFIG_END
 /* decrypt function for vortex */
 DRIVER_INIT_MEMBER(_8080bw_state,vortex)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
-	int length = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *rom = memregion("maincpu")->base();
+	int length = memregion("maincpu")->bytes();
 	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
 	UINT32 x;
 	for (x = 0; x < length; x++)
@@ -3071,9 +3071,9 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state,invmulti)
 {
-	UINT8 *src = machine().root_device().memregion("user1")->base();
-	int len = machine().root_device().memregion("user1")->bytes();
-	UINT8 *dest = machine().root_device().memregion("maincpu")->base();
+	UINT8 *src = memregion("user1")->base();
+	int len = memregion("user1")->bytes();
+	UINT8 *dest = memregion("maincpu")->base();
 
 	// decrypt rom
 	for (int i = 0; i < len; i++)

@@ -1285,7 +1285,7 @@ WRITE32_MEMBER(ksys573_state::security_w)
 		}
 	}
 
-	machine().root_device().ioport("OUT1")->write_safe( data, mem_mask );
+	ioport("OUT1")->write_safe( data, mem_mask );
 }
 
 READ32_MEMBER(ksys573_state::security_r)
@@ -1447,7 +1447,7 @@ void sys573_vblank(ksys573_state *state, screen_device &screen, bool vblank_stat
 	{
 		/* patch out security-plate error */
 
-		UINT32 *p_n_psxram = (UINT32 *)state->machine().root_device().memshare("share1")->ptr();
+		UINT32 *p_n_psxram = (UINT32 *)state->memshare("share1")->ptr();
 
 		/* install cd */
 
@@ -1471,7 +1471,7 @@ void sys573_vblank(ksys573_state *state, screen_device &screen, bool vblank_stat
 	{
 		/* patch out security-plate error */
 
-		UINT32 *p_n_psxram = (UINT32 *)state->machine().root_device().memshare("share1")->ptr();
+		UINT32 *p_n_psxram = (UINT32 *)state->memshare("share1")->ptr();
 		/* 8001f850: jal $8003221c */
 		if( p_n_psxram[ 0x1f850 / 4 ] == 0x0c00c887 )
 		{

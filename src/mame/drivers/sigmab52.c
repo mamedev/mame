@@ -298,7 +298,7 @@ READ8_MEMBER(sigmab52_state::unk_f700_r)
 
 WRITE8_MEMBER(sigmab52_state::unk_f710_w)
 {
-	membank("bank1" )->set_base(&machine().root_device().memregion("maincpu")->base()[0x10000 + ((data&0x80)?0x4000:0x0000)]);
+	membank("bank1" )->set_base(&memregion("maincpu")->base()[0x10000 + ((data&0x80)?0x4000:0x0000)]);
 }
 
 READ8_MEMBER(sigmab52_state::unk_f721_r)
@@ -546,11 +546,11 @@ INTERRUPT_GEN_MEMBER(sigmab52_state::timer_irq)
 
 void sigmab52_state::machine_start()
 {
-	machine().root_device().membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[0x10000 + 0x0000]);
+	membank("bank1")->set_base(&memregion("maincpu")->base()[0x10000 + 0x0000]);
 
-	machine().root_device().membank("bank2")->set_base(&machine().root_device().memregion("maincpu")->base()[0x10000 + 0xf800]);
+	membank("bank2")->set_base(&memregion("maincpu")->base()[0x10000 + 0xf800]);
 
-	machine().root_device().membank("bank3")->set_base(&machine().root_device().memregion("maincpu")->base()[0x10000 + 0x8000]);
+	membank("bank3")->set_base(&memregion("maincpu")->base()[0x10000 + 0x8000]);
 
 /*
 
@@ -564,7 +564,7 @@ void sigmab52_state::machine_start()
 */
 
 	{
-		UINT16 *rom = (UINT16*)machine().root_device().memregion("gfx1")->base();
+		UINT16 *rom = (UINT16*)memregion("gfx1")->base();
 		int i;
 
 		device_t *hd63484 = machine().device("hd63484");

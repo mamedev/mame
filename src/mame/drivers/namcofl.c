@@ -187,11 +187,11 @@ WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
 		if (data == 0)  // RAM at 00000000, ROM at 10000000
 		{
 			membank("bank1")->set_base(m_workram );
-			membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() );
+			membank("bank2")->set_base(memregion("maincpu")->base() );
 		}
 		else        // ROM at 00000000, RAM at 10000000
 		{
-			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() );
+			membank("bank1")->set_base(memregion("maincpu")->base() );
 			membank("bank2")->set_base(m_workram );
 		}
 	}

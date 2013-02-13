@@ -661,13 +661,13 @@ void xtom3d_state::machine_start()
 
 void xtom3d_state::machine_reset()
 {
-	machine().root_device().membank("bios_bank")->set_base(machine().root_device().memregion("bios")->base() + 0x10000);
-	machine().root_device().membank("bios_ext1")->set_base(machine().root_device().memregion("bios")->base() + 0);
-	machine().root_device().membank("bios_ext2")->set_base(machine().root_device().memregion("bios")->base() + 0x4000);
-	machine().root_device().membank("bios_ext3")->set_base(machine().root_device().memregion("bios")->base() + 0x8000);
-	machine().root_device().membank("bios_ext4")->set_base(machine().root_device().memregion("bios")->base() + 0xc000);
-	machine().root_device().membank("video_bank1")->set_base(machine().root_device().memregion("video_bios")->base() + 0);
-	machine().root_device().membank("video_bank2")->set_base(machine().root_device().memregion("video_bios")->base() + 0x4000);
+	membank("bios_bank")->set_base(memregion("bios")->base() + 0x10000);
+	membank("bios_ext1")->set_base(memregion("bios")->base() + 0);
+	membank("bios_ext2")->set_base(memregion("bios")->base() + 0x4000);
+	membank("bios_ext3")->set_base(memregion("bios")->base() + 0x8000);
+	membank("bios_ext4")->set_base(memregion("bios")->base() + 0xc000);
+	membank("video_bank1")->set_base(memregion("video_bios")->base() + 0);
+	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
 }
 
 static MACHINE_CONFIG_START( xtom3d, xtom3d_state )

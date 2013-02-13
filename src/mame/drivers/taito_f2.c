@@ -3026,7 +3026,7 @@ MACHINE_START_MEMBER(taitof2_state,common)
 MACHINE_START_MEMBER(taitof2_state,f2)
 {
 	MACHINE_START_CALL_MEMBER(common);
-	machine().root_device().membank("bank2")->configure_entries(0, 8, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
+	membank("bank2")->configure_entries(0, 8, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_CONFIG_START( taito_f2, taitof2_state )
@@ -5311,7 +5311,7 @@ DRIVER_INIT_MEMBER(taitof2_state,finalb)
 	int i;
 	UINT8 data;
 	UINT32 offset;
-	UINT8 *gfx = machine().root_device().memregion("gfx2")->base();
+	UINT8 *gfx = memregion("gfx2")->base();
 
 	offset = 0x100000;
 	for (i = 0x180000; i < 0x200000; i++)

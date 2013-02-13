@@ -74,7 +74,7 @@ void mystston_state::set_palette()
 	static const int resistances_b [2] = { 3300, 1500 };
 	double weights_rg[3], weights_b[2];
 
-	UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	UINT8 *color_prom = memregion("proms")->base();
 
 	compute_resistor_weights(0, 255, -1.0,
 			3, resistances_rg, weights_rg, 0, 4700,
@@ -244,7 +244,7 @@ VIDEO_RESET_MEMBER(mystston_state,mystston)
 
 UINT32 mystston_state::screen_update_mystston(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int flip = (*m_video_control & 0x80) ^ ((machine().root_device().ioport("DSW1")->read() & 0x20) << 2);
+	int flip = (*m_video_control & 0x80) ^ ((ioport("DSW1")->read() & 0x20) << 2);
 
 	set_palette();
 

@@ -133,7 +133,7 @@ WRITE16_MEMBER(pasha2_state::pasha2_misc_w)
 					case 0xb000:
 					case 0xc000:
 					case 0xd000:
-						membank("bank1")->set_base(machine().root_device().memregion("user2")->base() + 0x400 * (bank - 0x8000)); break;
+						membank("bank1")->set_base(memregion("user2")->base() + 0x400 * (bank - 0x8000)); break;
 				}
 			}
 		}

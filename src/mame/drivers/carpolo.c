@@ -336,8 +336,8 @@ DRIVER_INIT_MEMBER(carpolo_state,carpolo)
 
 
 	/* invert gfx PROM since the bits are active LO */
-	ROM = machine().root_device().memregion("gfx2")->base();
-	len = machine().root_device().memregion("gfx2")->bytes();
+	ROM = memregion("gfx2")->base();
+	len = memregion("gfx2")->bytes();
 	for (i = 0;i < len; i++)
 		ROM[i] ^= 0x0f;
 }

@@ -1534,7 +1534,7 @@ int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
 
 	logerror("baseboard: read sector lba %08x\n",lba);
 	off=(lba&0x7ff)*512;
-	data=machine().root_device().memregion("others")->base();
+	data=memregion("others")->base();
 	memcpy(buffer,data+off,512);
 	return 1;
 }

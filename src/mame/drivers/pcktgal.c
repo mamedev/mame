@@ -221,7 +221,7 @@ static const msm5205_interface msm5205_config =
 
 void pcktgal_state::machine_start()
 {
-	machine().root_device().membank("bank3")->configure_entries(0, 2, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x4000);
+	membank("bank3")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 static MACHINE_CONFIG_START( pcktgal, pcktgal_state )
@@ -425,8 +425,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pcktgal_state,pcktgal)
 {
-	UINT8 *rom = machine().root_device().memregion("gfx1")->base();
-	int len = machine().root_device().memregion("gfx1")->bytes();
+	UINT8 *rom = memregion("gfx1")->base();
+	int len = memregion("gfx1")->bytes();
 	int i,j,temp[16];
 
 	/* Tile graphics roms have some swapped lines, original version only */

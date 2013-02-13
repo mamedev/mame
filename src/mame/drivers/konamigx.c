@@ -918,14 +918,14 @@ READ32_MEMBER(konamigx_state::gx6bppspr_r)
 
 READ32_MEMBER(konamigx_state::type1_roz_r1)
 {
-	UINT32 *ROM = (UINT32 *)machine().root_device().memregion("gfx3")->base();
+	UINT32 *ROM = (UINT32 *)memregion("gfx3")->base();
 
 	return ROM[offset];
 }
 
 READ32_MEMBER(konamigx_state::type1_roz_r2)
 {
-	UINT32 *ROM = (UINT32 *)machine().root_device().memregion("gfx3")->base();
+	UINT32 *ROM = (UINT32 *)memregion("gfx3")->base();
 
 	ROM += (0x600000/2);
 

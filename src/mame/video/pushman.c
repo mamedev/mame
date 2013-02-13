@@ -15,7 +15,7 @@ TILEMAP_MAPPER_MEMBER(pushman_state::background_scan_rows)
 
 TILE_GET_INFO_MEMBER(pushman_state::get_back_tile_info)
 {
-	UINT8 *bg_map = machine().root_device().memregion("gfx4")->base();
+	UINT8 *bg_map = memregion("gfx4")->base();
 	int tile;
 
 	tile = bg_map[tile_index << 1] + (bg_map[(tile_index << 1) + 1] << 8);

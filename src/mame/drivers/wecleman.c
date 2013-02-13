@@ -1291,9 +1291,9 @@ void wecleman_state::wecleman_unpack_sprites()
 {
 	const char *region       = "gfx1";  // sprites
 
-	const UINT32 len = machine().root_device().memregion(region)->bytes();
-	UINT8 *src     = machine().root_device().memregion(region)->base() + len / 2 - 1;
-	UINT8 *dst     = machine().root_device().memregion(region)->base() + len - 1;
+	const UINT32 len = memregion(region)->bytes();
+	UINT8 *src     = memregion(region)->base() + len / 2 - 1;
+	UINT8 *dst     = memregion(region)->base() + len - 1;
 
 	while(dst > src)
 	{
@@ -1343,18 +1343,18 @@ DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 		RAM[i] = BITSWAP8(RAM[i],7,0,1,2,3,4,5,6);
 	}
 
-	bitswap(machine().root_device().memregion("gfx1")->base(), machine().root_device().memregion("gfx1")->bytes(),
+	bitswap(memregion("gfx1")->base(), memregion("gfx1")->bytes(),
 			0,1,20,19,18,17,14,9,16,6,4,7,8,15,10,11,13,5,12,3,2);
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */
 	wecleman_unpack_sprites();
 
 	/* Bg & Fg & Txt */
-	bitswap(machine().root_device().memregion("gfx2")->base(), machine().root_device().memregion("gfx2")->bytes(),
+	bitswap(memregion("gfx2")->base(), memregion("gfx2")->bytes(),
 			20,19,18,17,16,15,12,7,14,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	/* Road */
-	bitswap(machine().root_device().memregion("gfx3")->base(), machine().root_device().memregion("gfx3")->bytes(),
+	bitswap(memregion("gfx3")->base(), memregion("gfx3")->bytes(),
 			20,19,18,17,16,15,14,7,12,4,2,5,6,13,8,9,11,3,10,1,0);
 
 	m_spr_color_offs = 0x40;
@@ -1419,7 +1419,7 @@ void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 	UINT8 *base, *temp;
 	int i;
 
-	base = machine().root_device().memregion("gfx1")->base(); // sprites
+	base = memregion("gfx1")->base(); // sprites
 	temp = auto_alloc_array(machine(), UINT8,  bank_size );
 
 	for( i = num16_banks; i >0; i-- ){

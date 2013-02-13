@@ -1086,7 +1086,7 @@ const UINT32 mcd212_device::s_4bpp_color[16] =
 
 void mcd212_device::mix_lines(UINT8 *plane_a_r, UINT8 *plane_a_g, UINT8 *plane_a_b, UINT8 *plane_b_r, UINT8 *plane_b_g, UINT8 *plane_b_b, UINT32 *out)
 {
-	UINT8 debug_mode = machine().root_device().ioport("DEBUG")->read();
+	UINT8 debug_mode = ioport("DEBUG")->read();
 	UINT8 global_plane_a_disable = debug_mode & 1;
 	UINT8 global_plane_b_disable = debug_mode & 2;
 	UINT8 debug_backdrop_enable = debug_mode & 4;

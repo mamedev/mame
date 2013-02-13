@@ -638,8 +638,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(_1943_state,1943)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 }
 
 READ8_MEMBER(_1943_state::_1943b_c007_r){ return 0; }

@@ -555,8 +555,8 @@ ROM_END
 
 void crospang_state::tumblepb_gfx1_rearrange()
 {
-	UINT8 *rom = machine().root_device().memregion("gfx1")->base();
-	int len = machine().root_device().memregion("gfx1")->bytes();
+	UINT8 *rom = memregion("gfx1")->base();
+	int len = memregion("gfx1")->bytes();
 	int i;
 
 	/* gfx data is in the wrong order */

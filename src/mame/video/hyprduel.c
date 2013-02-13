@@ -339,8 +339,8 @@ void hyprduel_state::hyprduel_postload()
 
 void hyprduel_state::expand_gfx1(hyprduel_state &state)
 {
-	UINT8 *base_gfx = state.machine().root_device().memregion("gfx1")->base();
-	UINT32 length = 2 * state.machine().root_device().memregion("gfx1")->bytes();
+	UINT8 *base_gfx = state.memregion("gfx1")->base();
+	UINT32 length = 2 * state.memregion("gfx1")->bytes();
 	state.m_expanded_gfx1 = auto_alloc_array(state.machine(), UINT8, length);
 	for (int i = 0; i < length; i += 2)
 	{

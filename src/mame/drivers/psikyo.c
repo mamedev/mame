@@ -1815,13 +1815,13 @@ DRIVER_INIT_MEMBER(psikyo_state,sngkace)
 	m_ka302c_banking = 0; // SH201B doesn't have any gfx banking
 
 	/* setup audiocpu banks */
-	membank("bank1")->configure_entries(0, 4, machine().root_device().memregion("audiocpu")->base() + 0x10000, 0x8000);
+	membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x10000, 0x8000);
 
 	/* Enable other regions */
 #if 0
 	if (!strcmp(machine().system().name,"sngkace"))
 	{
-		UINT8 *ROM  =   machine().root_device().memregion("maincpu")->base();
+		UINT8 *ROM  =   memregion("maincpu")->base();
 		ROM[0x995] = 0x4e;
 		ROM[0x994] = 0x71;
 		ROM[0x997] = 0x4e;

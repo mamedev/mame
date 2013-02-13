@@ -491,9 +491,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
 			break;
 	}
 
-	m_rambase[0x004] = machine().root_device().ioport("IN2")->read();
-	m_rambase[0x005] = machine().root_device().ioport("IN1")->read();
-	m_rambase[0x006] = machine().root_device().ioport("IN0")->read();
+	m_rambase[0x004] = ioport("IN2")->read();
+	m_rambase[0x005] = ioport("IN1")->read();
+	m_rambase[0x006] = ioport("IN0")->read();
 }
 
 static MACHINE_CONFIG_DERIVED( yamyam, gundealr )

@@ -14,7 +14,7 @@
 
 void grchamp_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 100, 270, 470 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -238,7 +238,7 @@ void grchamp_state::draw_objects(int y, UINT8 *objdata)
 
 
 */
-	const UINT8 *prom = machine().root_device().memregion("proms")->base() + 0x20;
+	const UINT8 *prom = memregion("proms")->base() + 0x20;
 	gfx_element *gfx;
 	int change = (m_cpu0_out[0] & 0x20) << 3;
 	int num;
@@ -356,8 +356,8 @@ UINT32 grchamp_state::screen_update_grchamp(screen_device &screen, bitmap_rgb32 
 		MAKE_RGB(RGB_MAX,RGB_MAX,RGB_MAX)
 	};
 
-	const UINT8 *amedata = machine().root_device().memregion("gfx5")->base();
-	const UINT8 *headdata = machine().root_device().memregion("gfx6")->base();
+	const UINT8 *amedata = memregion("gfx5")->base();
+	const UINT8 *headdata = memregion("gfx6")->base();
 	const UINT8 *pldata = memregion("gfx7")->base();
 	bitmap_ind16 &lpixmap = m_left_tilemap->pixmap();
 	bitmap_ind16 &rpixmap = m_right_tilemap->pixmap();

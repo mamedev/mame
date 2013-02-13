@@ -93,7 +93,7 @@ WRITE8_MEMBER(dooyong_state::lastday_bankswitch_w)
 
 MACHINE_START_MEMBER(dooyong_state,lastday)
 {
-	machine().root_device().membank("bank1")->configure_entries(0, 8, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 WRITE8_MEMBER(dooyong_state::flip_screen_w)

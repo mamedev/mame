@@ -1163,10 +1163,10 @@ void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 MACHINE_START_MEMBER(merit_state,casino5)
 {
 	merit_state::machine_start();
-	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base() + 0x2000, 0x2000);
-	machine().root_device().membank("bank2")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base() + 0x6000, 0x2000);
-	machine().root_device().membank("bank1")->set_entry(0);
-	machine().root_device().membank("bank2")->set_entry(0);
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x2000, 0x2000);
+	membank("bank2")->configure_entries(0, 2, memregion("maincpu")->base() + 0x6000, 0x2000);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
 }
 
 static MACHINE_CONFIG_START( pitboss, merit_state )
@@ -2024,7 +2024,7 @@ DRIVER_INIT_MEMBER(merit_state,key_7)
 
 DRIVER_INIT_MEMBER(merit_state,couple)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	#if 0 //quick rom compare test
 	{
@@ -2044,7 +2044,7 @@ DRIVER_INIT_MEMBER(merit_state,couple)
 	  dumpers it's just the way it is,a.k.a. it's an "hardware" banking.
 	  update 20060118 by f205v: now we have 3 dumps from 3 different boards and they
 	  all behave the same...*/
-	machine().root_device().membank("bank1")->set_base(ROM + 0x10000 + (0x2000 * 2));
+	membank("bank1")->set_base(ROM + 0x10000 + (0x2000 * 2));
 }
 
 DRIVER_INIT_MEMBER(merit_state,dtrvwz5)

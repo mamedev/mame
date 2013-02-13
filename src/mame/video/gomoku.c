@@ -20,7 +20,7 @@
 
 void gomoku_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	int bit0, bit1, bit2, r, g, b;
 
@@ -146,8 +146,8 @@ void gomoku_state::video_start()
 
 UINT32 gomoku_state::screen_update_gomoku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *GOMOKU_BG_X = machine().root_device().memregion( "user1" )->base();
-	UINT8 *GOMOKU_BG_Y = machine().root_device().memregion( "user2" )->base();
+	UINT8 *GOMOKU_BG_X = memregion( "user1" )->base();
+	UINT8 *GOMOKU_BG_Y = memregion( "user2" )->base();
 	UINT8 *GOMOKU_BG_D = memregion( "user3" )->base();
 	int x, y;
 	int bgram;

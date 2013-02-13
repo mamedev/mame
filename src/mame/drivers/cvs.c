@@ -1574,7 +1574,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cvs_state,huncholy)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	/* patch out protection */
 	ROM[0x0082] = 0xc0;
@@ -1594,7 +1594,7 @@ DRIVER_INIT_MEMBER(cvs_state,huncholy)
 
 DRIVER_INIT_MEMBER(cvs_state,hunchbaka)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	offs_t offs;
 
@@ -1606,7 +1606,7 @@ DRIVER_INIT_MEMBER(cvs_state,hunchbaka)
 
 DRIVER_INIT_MEMBER(cvs_state,superbik)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	/* patch out protection */
 	ROM[0x0079] = 0xc0;
@@ -1634,7 +1634,7 @@ DRIVER_INIT_MEMBER(cvs_state,superbik)
 
 DRIVER_INIT_MEMBER(cvs_state,hero)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	/* patch out protection */
 	ROM[0x0087] = 0xc0;
@@ -1656,7 +1656,7 @@ DRIVER_INIT_MEMBER(cvs_state,hero)
 
 DRIVER_INIT_MEMBER(cvs_state,raiders)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	offs_t offs;
 

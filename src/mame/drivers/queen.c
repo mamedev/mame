@@ -528,8 +528,8 @@ void queen_state::machine_start()
 
 void queen_state::machine_reset()
 {
-	machine().root_device().membank("bios_bank")->set_base(machine().root_device().memregion("bios")->base() + 0x30000);
-	machine().root_device().membank("bios_ext")->set_base(machine().root_device().memregion("bios")->base() + 0x20000);
+	membank("bios_bank")->set_base(memregion("bios")->base() + 0x30000);
+	membank("bios_ext")->set_base(memregion("bios")->base() + 0x20000);
 }
 
 

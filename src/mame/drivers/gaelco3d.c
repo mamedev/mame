@@ -214,7 +214,7 @@ MACHINE_RESET_MEMBER(gaelco3d_state,common)
 	/* allocate a timer for feeding the autobuffer */
 	m_adsp_autobuffer_timer = machine().device<timer_device>("adsp_timer");
 
-	membank("bank1")->configure_entries(0, 256, machine().root_device().memregion("user1")->base(), 0x4000);
+	membank("bank1")->configure_entries(0, 256, memregion("user1")->base(), 0x4000);
 	membank("bank1")->set_entry(0);
 
 	/* keep the TMS32031 halted until the code is ready to go */

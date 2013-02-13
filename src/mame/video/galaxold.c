@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "includes/galaxold.h"
 
-#define STARS_COLOR_BASE        (machine().root_device().memregion("proms")->bytes())
+#define STARS_COLOR_BASE        (memregion("proms")->bytes())
 #define BULLETS_COLOR_BASE      (STARS_COLOR_BASE + 64)
 #define BACKGROUND_COLOR_BASE   (BULLETS_COLOR_BASE + 2)
 
@@ -45,12 +45,12 @@
 ***************************************************************************/
 PALETTE_INIT_MEMBER(galaxold_state,galaxold)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i, len;
 
 
 	/* first, the character/sprite palette */
-	len = machine().root_device().memregion("proms")->bytes();
+	len = memregion("proms")->bytes();
 	for (i = 0;i < len;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -120,12 +120,12 @@ PALETTE_INIT_MEMBER(galaxold_state,stratgyx)
 
 PALETTE_INIT_MEMBER(galaxold_state,rockclim)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i, len;
 
 
 	/* first, the character/sprite palette */
-	len = machine().root_device().memregion("proms")->bytes();
+	len = memregion("proms")->bytes();
 	for (i = 0;i < len;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -169,7 +169,7 @@ PALETTE_INIT_MEMBER(galaxold_state,rockclim)
 ***************************************************************************/
 PALETTE_INIT_MEMBER(galaxold_state,darkplnt)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 
@@ -289,12 +289,12 @@ PALETTE_INIT_MEMBER(galaxold_state,mariner)
 /* swapped r/g/b hook-up */
 PALETTE_INIT_MEMBER(galaxold_state,dambustr)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int base = BACKGROUND_COLOR_BASE;
 	int i, len;
 
 	/* first, the character/sprite palette */
-	len = machine().root_device().memregion("proms")->bytes();
+	len = memregion("proms")->bytes();
 
 	for (i = 0;i < len;i++)
 	{
@@ -1001,7 +1001,7 @@ void galaxold_state::mariner_modify_charcode(UINT16 *code, UINT8 x)
 
 	/* bit 0 of the PROM controls character banking */
 
-	prom = machine().root_device().memregion("user2")->base();
+	prom = memregion("user2")->base();
 
 	*code |= ((prom[x] & 0x01) << 8);
 }
@@ -1545,7 +1545,7 @@ void galaxold_state::mariner_draw_stars(bitmap_ind16 &bitmap, const rectangle &c
 
 	/* bit 2 of the PROM controls star visibility */
 
-	prom = machine().root_device().memregion("user2")->base();
+	prom = memregion("user2")->base();
 
 	for (offs = 0;offs < STAR_COUNT;offs++)
 	{

@@ -243,7 +243,7 @@ WRITE8_MEMBER(cshooter_state::cshooter_c700_w)
 
 WRITE8_MEMBER(cshooter_state::bank_w)
 {
-	membank("bank1")->set_base(&machine().root_device().memregion("user1")->base()[0x4000*((data>>4)&3)]);
+	membank("bank1")->set_base(&memregion("user1")->base()[0x4000*((data>>4)&3)]);
 }
 
 
@@ -667,19 +667,19 @@ ROM_END
 DRIVER_INIT_MEMBER(cshooter_state,cshooter)
 {
 	/* temp so it boots */
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	rom[0xa2] = 0x00;
 	rom[0xa3] = 0x00;
 	rom[0xa4] = 0x00;
-	machine().root_device().membank("bank1")->set_base(&machine().root_device().memregion("user1")->base()[0]);
+	membank("bank1")->set_base(&memregion("user1")->base()[0]);
 }
 
 DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int A;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
 	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
@@ -709,7 +709,7 @@ DRIVER_INIT_MEMBER(cshooter_state,cshootere)
 			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
 	}
 
-	machine().root_device().membank("bank1")->set_base(&machine().root_device().memregion("user1")->base()[0]);
+	membank("bank1")->set_base(&memregion("user1")->base()[0]);
 	seibu_sound_decrypt(machine(),"audiocpu",0x2000);
 }
 

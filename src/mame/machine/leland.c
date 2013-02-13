@@ -445,7 +445,7 @@ TIMER_CALLBACK_MEMBER(leland_state::ataxx_interrupt_callback)
 INTERRUPT_GEN_MEMBER(leland_state::leland_master_interrupt)
 {
 	/* check for coins here */
-	if ((machine().root_device().ioport("IN1")->read() & 0x0e) != 0x0e)
+	if ((ioport("IN1")->read() & 0x0e) != 0x0e)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -810,7 +810,7 @@ void leland_state::ataxx_init_eeprom(const UINT16 *data)
 
 READ8_MEMBER(leland_state::ataxx_eeprom_r)
 {
-	int port = machine().root_device().ioport("IN2")->read();
+	int port = ioport("IN2")->read();
 	if (LOG_EEPROM) logerror("%s:EE read\n", machine().describe_context());
 	return port;
 }
@@ -1400,8 +1400,8 @@ READ8_MEMBER(leland_state::leland_raster_r)
 void leland_state::leland_rotate_memory(const char *cpuname)
 {
 	int startaddr = 0x10000;
-	int banks = (machine().root_device().memregion(cpuname)->bytes() - startaddr) / 0x8000;
-	UINT8 *ram = machine().root_device().memregion(cpuname)->base();
+	int banks = (memregion(cpuname)->bytes() - startaddr) / 0x8000;
+	UINT8 *ram = memregion(cpuname)->base();
 	UINT8 temp[0x2000];
 	int i;
 

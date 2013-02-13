@@ -238,13 +238,13 @@ static const gfx_layout tilelayout =
 
 DRIVER_INIT_MEMBER(aquarium_state,aquarium)
 {
-	UINT8 *Z80 = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *Z80 = memregion("audiocpu")->base();
 
 	/* The BG tiles are 5bpp, this rearranges the data from
 	   the roms containing the 1bpp data so we can decode it
 	   correctly */
-	UINT8 *DAT2 = machine().root_device().memregion("gfx1")->base() + 0x080000;
-	UINT8 *DAT = machine().root_device().memregion("user1")->base();
+	UINT8 *DAT2 = memregion("gfx1")->base() + 0x080000;
+	UINT8 *DAT = memregion("user1")->base();
 	int len = 0x0200000;
 
 	for (len = 0; len < 0x020000; len++)
@@ -259,8 +259,8 @@ DRIVER_INIT_MEMBER(aquarium_state,aquarium)
 		DAT2[len * 4 + 2] |= (DAT[len] & 0x01) << 3;
 	}
 
-	DAT2 = machine().root_device().memregion("gfx4")->base() + 0x080000;
-	DAT = machine().root_device().memregion("user2")->base();
+	DAT2 = memregion("gfx4")->base() + 0x080000;
+	DAT = memregion("user2")->base();
 
 	for (len = 0; len < 0x020000; len++)
 	{
@@ -275,8 +275,8 @@ DRIVER_INIT_MEMBER(aquarium_state,aquarium)
 	}
 
 	/* configure and set up the sound bank */
-	machine().root_device().membank("bank1")->configure_entries(0, 7, &Z80[0x18000], 0x8000);
-	machine().root_device().membank("bank1")->set_entry(1);
+	membank("bank1")->configure_entries(0, 7, &Z80[0x18000], 0x8000);
+	membank("bank1")->set_entry(1);
 }
 
 

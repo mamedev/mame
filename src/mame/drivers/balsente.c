@@ -2076,8 +2076,8 @@ void balsente_state::expand_roms(UINT8 cd_rom_mask)
 
 	UINT8 *temp = auto_alloc_array(machine(), UINT8, 0x20000);
 	{
-		UINT8 *rom = machine().root_device().memregion("maincpu")->base();
-		UINT32 len = machine().root_device().memregion("maincpu")->bytes();
+		UINT8 *rom = memregion("maincpu")->base();
+		UINT32 len = memregion("maincpu")->bytes();
 		UINT32 base;
 
 		for (base = 0x10000; base < len; base += 0x30000)
@@ -2150,7 +2150,7 @@ DRIVER_INIT_MEMBER(balsente_state,stocker)   { expand_roms(EXPAND_ALL);  config_
 DRIVER_INIT_MEMBER(balsente_state,triviag1)  { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 0 /* noanalog */); }
 DRIVER_INIT_MEMBER(balsente_state,triviag2)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	memcpy(&rom[0x20000], &rom[0x28000], 0x4000);
 	memcpy(&rom[0x24000], &rom[0x28000], 0x4000);
 	expand_roms(EXPAND_NONE); config_shooter_adc(FALSE, 0 /* noanalog */);

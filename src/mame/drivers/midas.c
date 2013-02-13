@@ -870,7 +870,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(midas_state,livequiz)
 {
-	UINT16 *rom = (UINT16 *) machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *) memregion("maincpu")->base();
 
 	// PROTECTION CHECKS
 	rom[0x13345a/2] =   0x4e75;

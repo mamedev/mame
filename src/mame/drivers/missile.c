@@ -1217,7 +1217,7 @@ ROM_END
 DRIVER_INIT_MEMBER(missile_state,suprmatk)
 {
 	int i;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	for (i = 0; i < 0x40; i++)
 	{
@@ -1290,8 +1290,8 @@ DRIVER_INIT_MEMBER(missile_state,suprmatk)
 
 DRIVER_INIT_MEMBER(missile_state,missilem)
 {
-	UINT8 *src = machine().root_device().memregion("user1")->base();
-	UINT8 *dest = machine().root_device().memregion("maincpu")->base();
+	UINT8 *src = memregion("user1")->base();
+	UINT8 *dest = memregion("maincpu")->base();
 
 	// decrypt rom and put in maincpu region (result looks correct, but is untested)
 	for (int i = 0; i < 0x10000; i++)

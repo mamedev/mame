@@ -298,9 +298,9 @@ WRITE32_MEMBER(crystal_state::Banksw_w)
 {
 	m_Bank = (data >> 1) & 7;
 	if (m_Bank <= 2)
-		membank("bank1")->set_base(machine().root_device().memregion("user1")->base() + m_Bank * 0x1000000);
+		membank("bank1")->set_base(memregion("user1")->base() + m_Bank * 0x1000000);
 	else
-		membank("bank1")->set_base(machine().root_device().memregion("user2")->base());
+		membank("bank1")->set_base(memregion("user2")->base());
 }
 
 TIMER_CALLBACK_MEMBER(crystal_state::Timercb)
@@ -376,7 +376,7 @@ READ32_MEMBER(crystal_state::FlashCmd_r)
 	{
 		if (m_Bank <= 2)
 		{
-			UINT32 *ptr = (UINT32*)(machine().root_device().memregion("user1")->base() + m_Bank * 0x1000000);
+			UINT32 *ptr = (UINT32*)(memregion("user1")->base() + m_Bank * 0x1000000);
 			return ptr[0];
 		}
 		else
@@ -955,7 +955,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(crystal_state,crysking)
 {
-	UINT16 *Rom = (UINT16*) machine().root_device().memregion("user1")->base();
+	UINT16 *Rom = (UINT16*) memregion("user1")->base();
 
 	//patch the data feed by the protection
 
@@ -974,7 +974,7 @@ DRIVER_INIT_MEMBER(crystal_state,crysking)
 
 DRIVER_INIT_MEMBER(crystal_state,evosocc)
 {
-	UINT16 *Rom = (UINT16*) machine().root_device().memregion("user1")->base();
+	UINT16 *Rom = (UINT16*) memregion("user1")->base();
 	Rom += 0x1000000 * 2 / 2;
 
 	Rom[WORD_XOR_LE(0x97388E/2)] = 0x90FC;  //PUSH R2..R7
@@ -992,7 +992,7 @@ DRIVER_INIT_MEMBER(crystal_state,evosocc)
 
 DRIVER_INIT_MEMBER(crystal_state,topbladv)
 {
-	UINT16 *Rom = (UINT16*) machine().root_device().memregion("user1")->base();
+	UINT16 *Rom = (UINT16*) memregion("user1")->base();
 
 	Rom[WORD_XOR_LE(0x12d7a/2)] = 0x90FC;   //PUSH R7-R6-R5-R4-R3-R2
 	Rom[WORD_XOR_LE(0x12d7c/2)] = 0x9001;   //PUSH R0
@@ -1010,7 +1010,7 @@ DRIVER_INIT_MEMBER(crystal_state,topbladv)
 
 DRIVER_INIT_MEMBER(crystal_state,officeye)
 {
-	UINT16 *Rom = (UINT16*) machine().root_device().memregion("user1")->base();
+	UINT16 *Rom = (UINT16*) memregion("user1")->base();
 
 	Rom[WORD_XOR_LE(0x9c9e/2)] = 0x901C;    //PUSH R4-R3-R2
 	Rom[WORD_XOR_LE(0x9ca0/2)] = 0x9001;    //PUSH R0

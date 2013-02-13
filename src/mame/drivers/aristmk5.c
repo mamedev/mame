@@ -361,13 +361,13 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 {
-	UINT8 *SRAM    = machine().root_device().memregion("sram")->base();
-	UINT8 *SRAM_NZ = machine().root_device().memregion("sram")->base();
+	UINT8 *SRAM    = memregion("sram")->base();
+	UINT8 *SRAM_NZ = memregion("sram")->base();
 
 	archimedes_driver_init();
 
-	machine().root_device().membank("sram_bank")->configure_entries(0, 4,    &SRAM[0],    0x20000);
-	machine().root_device().membank("sram_bank_nz")->configure_entries(0, 4, &SRAM_NZ[0], 0x20000);
+	membank("sram_bank")->configure_entries(0, 4,    &SRAM[0],    0x20000);
+	membank("sram_bank_nz")->configure_entries(0, 4, &SRAM_NZ[0], 0x20000);
 }
 
 
@@ -398,9 +398,9 @@ void aristmk5_state::machine_reset()
 		UINT8 op_mode;
 		static const char *const rom_region[] = { "set_chip_4.04", "set_chip_4.4", "clear_chip", "game_prg" };
 
-		op_mode = machine().root_device().ioport("ROM_LOAD")->read();
+		op_mode = ioport("ROM_LOAD")->read();
 
-		PRG = machine().root_device().memregion(rom_region[op_mode & 3])->base();
+		PRG = memregion(rom_region[op_mode & 3])->base();
 
 		if(PRG!=NULL)
 

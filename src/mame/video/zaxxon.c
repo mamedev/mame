@@ -17,7 +17,7 @@
 
 void zaxxon_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -68,8 +68,8 @@ void zaxxon_state::palette_init()
 
 TILE_GET_INFO_MEMBER(zaxxon_state::get_bg_tile_info)
 {
-	const UINT8 *source = machine().root_device().memregion("tilemap_dat")->base();
-	int size = machine().root_device().memregion("tilemap_dat")->bytes() / 2;
+	const UINT8 *source = memregion("tilemap_dat")->base();
+	int size = memregion("tilemap_dat")->bytes() / 2;
 	int eff_index = tile_index & (size - 1);
 	int code = source[eff_index] + 256 * (source[eff_index + size] & 3);
 	int color = source[eff_index + size] >> 4;

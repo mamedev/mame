@@ -184,7 +184,7 @@ CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_get_timer_value)
 
 int vicdual_state::vicdual_is_cabinet_color()
 {
-	return (machine().root_device().ioport(COLOR_BW_PORT_TAG)->read_safe(0) & 1) ? 0 : 1;
+	return (ioport(COLOR_BW_PORT_TAG)->read_safe(0) & 1) ? 0 : 1;
 }
 
 

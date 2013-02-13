@@ -205,8 +205,8 @@ void magtouch_state::machine_start()
 
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, magtouch_set_keyb_int);
 
-	machine().root_device().membank("rombank")->configure_entries(0, 0x80, machine().root_device().memregion("game_prg")->base(), 0x8000 );
-	machine().root_device().membank("rombank")->set_entry(0);
+	membank("rombank")->configure_entries(0, 0x80, memregion("game_prg")->base(), 0x8000 );
+	membank("rombank")->set_entry(0);
 
 //  microtouch_init(machine(), magtouch_microtouch_tx_callback, NULL);
 }

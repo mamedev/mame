@@ -123,13 +123,13 @@ void kingofb_state::ringking_get_rgb_data( const UINT8 *color_prom, int i, int *
 
 PALETTE_INIT_MEMBER(kingofb_state,kingofb)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	palette_init_common(color_prom, &kingofb_state::kingofb_get_rgb_data);
 }
 
 PALETTE_INIT_MEMBER(kingofb_state,ringking)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	palette_init_common(color_prom, &kingofb_state::ringking_get_rgb_data);
 }
 

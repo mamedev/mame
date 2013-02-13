@@ -239,8 +239,8 @@ UINT32 n8080_state::screen_update_sheriff(screen_device &screen, bitmap_ind16 &b
 
 UINT32 n8080_state::screen_update_helifire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int SUN_BRIGHTNESS = machine().root_device().ioport("POT0")->read();
-	int SEA_BRIGHTNESS = machine().root_device().ioport("POT1")->read();
+	int SUN_BRIGHTNESS = ioport("POT0")->read();
+	int SEA_BRIGHTNESS = ioport("POT1")->read();
 
 	static const int wave[8] = { 0, 1, 2, 2, 2, 1, 0, 0 };
 

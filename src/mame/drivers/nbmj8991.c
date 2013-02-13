@@ -62,8 +62,8 @@ void nbmj8991_state::machine_reset()
 	device_t *audiocpu = machine().device("audiocpu");
 	if (audiocpu != NULL && audiocpu->type() == Z80)
 	{
-		machine().root_device().membank("bank1")->configure_entries(0, 4, machine().root_device().memregion("audiocpu")->base() + 0x8000, 0x8000);
-		machine().root_device().membank("bank1")->set_entry(0);
+		membank("bank1")->configure_entries(0, 4, memregion("audiocpu")->base() + 0x8000, 0x8000);
+		membank("bank1")->set_entry(0);
 	}
 	MACHINE_RESET_CALL_LEGACY(nb1413m3);
 }
@@ -100,7 +100,7 @@ DRIVER_INIT_MEMBER(nbmj8991_state,vanilla)
 
 DRIVER_INIT_MEMBER(nbmj8991_state,finalbny)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	int i;
 
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
@@ -126,7 +126,7 @@ DRIVER_INIT_MEMBER(nbmj8991_state,hyouban)
 DRIVER_INIT_MEMBER(nbmj8991_state,galkaika)
 {
 #if 1
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -137,7 +137,7 @@ DRIVER_INIT_MEMBER(nbmj8991_state,galkaika)
 DRIVER_INIT_MEMBER(nbmj8991_state,tokyogal)
 {
 #if 1
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -148,7 +148,7 @@ DRIVER_INIT_MEMBER(nbmj8991_state,tokyogal)
 DRIVER_INIT_MEMBER(nbmj8991_state,tokimbsj)
 {
 #if 1
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;

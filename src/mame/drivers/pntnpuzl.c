@@ -380,7 +380,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pntnpuzl_state,pip)
 {
-//  UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+//  UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 //  rom[0x2696/2] = 0x4e71;
 //  rom[0x26a0/2] = 0x4e71;
 

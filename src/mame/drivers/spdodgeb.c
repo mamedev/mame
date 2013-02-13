@@ -132,7 +132,7 @@ void spdodgeb_state::mcu63705_update_inputs()
 	{
 		int curr[2];
 
-		curr[p] = machine().root_device().ioport(p ? "P2" : "P1")->read() & 0x30;
+		curr[p] = ioport(p ? "P2" : "P1")->read() & 0x30;
 
 		if (m_jumped[p]) buttons[p] = 0; /* jump only momentarily flips the buttons */
 		else buttons[p] = curr[p];
@@ -143,8 +143,8 @@ void spdodgeb_state::mcu63705_update_inputs()
 		m_prev[p] = curr[p];
 	}
 
-	m_inputs[0] = machine().root_device().ioport("P1")->read() & 0xcf;
-	m_inputs[1] = machine().root_device().ioport("P2")->read() & 0x0f;
+	m_inputs[0] = ioport("P1")->read() & 0xcf;
+	m_inputs[1] = ioport("P2")->read() & 0x0f;
 	m_inputs[2] = m_running[0] | buttons[0];
 	m_inputs[3] = m_running[1] | buttons[1];
 }

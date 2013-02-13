@@ -2083,14 +2083,14 @@ ROM_END
 void mitchell_state::bootleg_decode(  )
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x50000);
-	machine().root_device().membank("bank1")->configure_decrypted_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x60000, 0x4000);
+	space.set_decrypted_region(0x0000, 0x7fff, memregion("maincpu")->base() + 0x50000);
+	membank("bank1")->configure_decrypted_entries(0, 16, memregion("maincpu")->base() + 0x60000, 0x4000);
 }
 
 
 void mitchell_state::configure_banks(  )
 {
-	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -2217,9 +2217,9 @@ DRIVER_INIT_MEMBER(mitchell_state,blockbl)
 DRIVER_INIT_MEMBER(mitchell_state,mstworld)
 {
 	/* descramble the program rom .. */
-	int len = machine().root_device().memregion("maincpu")->bytes();
+	int len = memregion("maincpu")->bytes();
 	UINT8* source = auto_alloc_array(machine(), UINT8, len);
-	UINT8* dst = machine().root_device().memregion("maincpu")->base() ;
+	UINT8* dst = memregion("maincpu")->base() ;
 	int x;
 
 	static const int tablebank[]=

@@ -907,18 +907,18 @@ void hornet_state::machine_start()
 
 void hornet_state::machine_reset()
 {
-	UINT8 *usr3 = machine().root_device().memregion("user3")->base();
-	UINT8 *usr5 = machine().root_device().memregion("user5")->base();
+	UINT8 *usr3 = memregion("user3")->base();
+	UINT8 *usr5 = memregion("user5")->base();
 	if (usr3 != NULL)
 	{
-		machine().root_device().membank("bank1")->configure_entries(0, machine().root_device().memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
-		machine().root_device().membank("bank1")->set_entry(0);
+		membank("bank1")->configure_entries(0, memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
+		membank("bank1")->set_entry(0);
 	}
 
 	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
-		machine().root_device().membank("bank5")->set_base(usr5);
+		membank("bank5")->set_base(usr5);
 }
 
 static double adc12138_input_callback( device_t *device, UINT8 input )
@@ -1042,21 +1042,21 @@ MACHINE_CONFIG_END
 
 MACHINE_RESET_MEMBER(hornet_state,hornet_2board)
 {
-	UINT8 *usr3 = machine().root_device().memregion("user3")->base();
-	UINT8 *usr5 = machine().root_device().memregion("user5")->base();
+	UINT8 *usr3 = memregion("user3")->base();
+	UINT8 *usr5 = memregion("user5")->base();
 
 	if (usr3 != NULL)
 	{
-		machine().root_device().membank("bank1")->configure_entries(0, machine().root_device().memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
-		machine().root_device().membank("bank1")->set_entry(0);
+		membank("bank1")->configure_entries(0, memregion("user3")->bytes() / 0x10000, usr3, 0x10000);
+		membank("bank1")->set_entry(0);
 	}
 	machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	machine().device("dsp2")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
 	{
-		machine().root_device().membank("bank5")->set_base(usr5);
-		machine().root_device().membank("bank6")->set_base(usr5);
+		membank("bank5")->set_base(usr5);
+		membank("bank6")->set_base(usr5);
 	}
 }
 

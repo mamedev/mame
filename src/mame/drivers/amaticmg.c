@@ -519,7 +519,7 @@ UINT32 amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_ind
 
 void amaticmg_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 
@@ -546,11 +546,11 @@ void amaticmg_state::palette_init()
 
 PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int r, g, b;
 	int i;
 
-	for (i = 0; i < machine().root_device().memregion("proms")->bytes(); i+=2)
+	for (i = 0; i < memregion("proms")->bytes(); i+=2)
 	{
 		b = ((color_prom[1] & 0xf8) >> 3);
 		g = ((color_prom[0] & 0xc0) >> 6) | ((color_prom[1] & 0x7) << 2);
@@ -848,9 +848,9 @@ static I8255A_INTERFACE( ppi8255_intf_1 )
 
 void amaticmg_state::machine_start()
 {
-	UINT8 *rombank = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rombank = memregion("maincpu")->base();
 
-	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &rombank[0x8000], 0x4000);
+	membank("bank1")->configure_entries(0, 0x10, &rombank[0x8000], 0x4000);
 }
 
 void amaticmg_state::machine_reset()
@@ -1081,9 +1081,9 @@ void amaticmg_state::decrypt(int key1, int key2)
 	UINT8 plaintext;
 	int newaddress;
 
-	UINT8 *src = machine().root_device().memregion("mainprg")->base();
-	UINT8 *dest = machine().root_device().memregion("maincpu")->base();
-	int len = machine().root_device().memregion("mainprg")->bytes();
+	UINT8 *src = memregion("mainprg")->base();
+	UINT8 *dest = memregion("maincpu")->base();
+	int len = memregion("mainprg")->bytes();
 
 	for (int i = 0; i < len; i++)
 	{

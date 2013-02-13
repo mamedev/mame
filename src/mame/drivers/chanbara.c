@@ -99,7 +99,7 @@ public:
 
 void chanbara_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i, red, green, blue;
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -462,9 +462,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chanbara_state,chanbara)
 {
-	UINT8   *src = machine().root_device().memregion("gfx4")->base();
-	UINT8   *dst = machine().root_device().memregion("gfx3")->base() + 0x4000;
-	UINT8   *bg = machine().root_device().memregion("user1")->base();
+	UINT8   *src = memregion("gfx4")->base();
+	UINT8   *dst = memregion("gfx3")->base() + 0x4000;
+	UINT8   *bg = memregion("user1")->base();
 
 	int i;
 	for (i = 0; i < 0x1000; i++)
@@ -475,7 +475,7 @@ DRIVER_INIT_MEMBER(chanbara_state,chanbara)
 		dst[i + 0x2000] = (src[i + 0x1000] & 0x0f) << 4;
 	}
 
-	machine().root_device().membank("bank1")->configure_entries(0, 2, &bg[0x0000], 0x4000);
+	membank("bank1")->configure_entries(0, 2, &bg[0x0000], 0x4000);
 }
 
 GAME( 1985, chanbara, 0,  chanbara, chanbara, chanbara_state, chanbara, ROT270, "Data East", "Chanbara", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )

@@ -124,7 +124,7 @@ WRITE16_MEMBER(seta2_state::seta2_sound_bank_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *ROM = memregion( "x1snd" )->base();
-		int banks = (machine().root_device().memregion( "x1snd" )->bytes() - 0x100000) / 0x20000;
+		int banks = (memregion( "x1snd" )->bytes() - 0x100000) / 0x20000;
 		if (data >= banks)
 		{
 			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",space.device().safe_pc(),data);
@@ -2175,14 +2175,14 @@ INTERRUPT_GEN_MEMBER(seta2_state::funcube_sub_timer_irq)
 	}
 	else
 	{
-		UINT8 press   = machine().root_device().ioport("TOUCH_PRESS")->read();
+		UINT8 press   = ioport("TOUCH_PRESS")->read();
 		UINT8 release = m_funcube_press && !press;
 
 		if ( press || release )
 		{
 			m_funcube_serial_fifo[0] = press ? 0xfe : 0xfd;
-			m_funcube_serial_fifo[1] = machine().root_device().ioport("TOUCH_X")->read();
-			m_funcube_serial_fifo[2] = machine().root_device().ioport("TOUCH_Y")->read();
+			m_funcube_serial_fifo[1] = ioport("TOUCH_X")->read();
+			m_funcube_serial_fifo[2] = ioport("TOUCH_Y")->read();
 			m_funcube_serial_fifo[3] = 0xff;
 			m_funcube_serial_count = 4;
 		}
@@ -2491,8 +2491,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(seta2_state,funcube)
 {
-	UINT32 *main_cpu = (UINT32 *) machine().root_device().memregion("maincpu")->base();
-	UINT16 *sub_cpu  = (UINT16 *) machine().root_device().memregion("sub")->base();
+	UINT32 *main_cpu = (UINT32 *) memregion("maincpu")->base();
+	UINT16 *sub_cpu  = (UINT16 *) memregion("sub")->base();
 
 	main_cpu[0x064/4] = 0x0000042a; // PIC protection?
 
@@ -2502,8 +2502,8 @@ DRIVER_INIT_MEMBER(seta2_state,funcube)
 
 DRIVER_INIT_MEMBER(seta2_state,funcube2)
 {
-	UINT32 *main_cpu = (UINT32 *) machine().root_device().memregion("maincpu")->base();
-	UINT16 *sub_cpu  = (UINT16 *) machine().root_device().memregion("sub")->base();
+	UINT32 *main_cpu = (UINT32 *) memregion("maincpu")->base();
+	UINT16 *sub_cpu  = (UINT16 *) memregion("sub")->base();
 
 	main_cpu[0xa5c/4] = 0x4e713e3c;       // PIC protection?
 	main_cpu[0xa74/4] = 0x4e713e3c;
@@ -2515,8 +2515,8 @@ DRIVER_INIT_MEMBER(seta2_state,funcube2)
 
 DRIVER_INIT_MEMBER(seta2_state,funcube3)
 {
-	UINT32 *main_cpu = (UINT32 *) machine().root_device().memregion("maincpu")->base();
-	UINT16 *sub_cpu  = (UINT16 *) machine().root_device().memregion("sub")->base();
+	UINT32 *main_cpu = (UINT32 *) memregion("maincpu")->base();
+	UINT16 *sub_cpu  = (UINT16 *) memregion("sub")->base();
 
 	main_cpu[0x008bc/4] = 0x4a804e71;
 	main_cpu[0x19f0c/4] = 0x4e714e71;

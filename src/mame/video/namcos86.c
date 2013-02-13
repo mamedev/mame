@@ -34,7 +34,7 @@ Namco System 86 Video Hardware
 
 void namcos86_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	rgb_t palette[512];
 

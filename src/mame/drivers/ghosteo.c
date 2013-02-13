@@ -382,11 +382,11 @@ READ32_MEMBER( ghosteo_state::touryuu_port_10000000_r )
 	UINT32 data = 0xFFFFFFFF;
 	switch (port_g)
 	{
-		case 0x8 : data = machine().root_device().ioport( "10000000-08")->read(); break;
-		case 0x9 : data = machine().root_device().ioport( "10000000-09")->read(); break;
-		case 0xA : data = machine().root_device().ioport( "10000000-0A")->read(); break;
-		case 0xB : data = machine().root_device().ioport( "10000000-0B")->read(); break;
-		case 0xC : data = machine().root_device().ioport( "10000000-0C")->read(); break;
+		case 0x8 : data = ioport( "10000000-08")->read(); break;
+		case 0x9 : data = ioport( "10000000-09")->read(); break;
+		case 0xA : data = ioport( "10000000-0A")->read(); break;
+		case 0xB : data = ioport( "10000000-0B")->read(); break;
+		case 0xC : data = ioport( "10000000-0C")->read(); break;
 	}
 //  logerror( "touryuu_port_10000000_r (%08X) -> %08X\n", port_g, data);
 	return data;
@@ -591,7 +591,7 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 
 void ghosteo_state::machine_start()
 {
-	m_flash = (UINT8 *)machine().root_device().memregion( "user1")->base();
+	m_flash = (UINT8 *)memregion( "user1")->base();
 }
 
 void ghosteo_state::machine_reset()

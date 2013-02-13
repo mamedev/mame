@@ -482,7 +482,7 @@ void ddayjlc_state::machine_reset()
 
 void ddayjlc_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -667,8 +667,8 @@ DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
 		UINT8 *src, *dst, *temp;
 		temp = auto_alloc_array(machine(), UINT8, 0x10000);
 		src = temp;
-		dst = machine().root_device().memregion("gfx1")->base();
-		length = machine().root_device().memregion("gfx1")->bytes();
+		dst = memregion("gfx1")->base();
+		length = memregion("gfx1")->bytes();
 		memcpy(src, dst, length);
 		newadr = 0;
 		oldaddr = 0;
@@ -682,8 +682,8 @@ DRIVER_INIT_MEMBER(ddayjlc_state,ddayjlc)
 		auto_free(machine(), temp);
 	}
 
-	machine().root_device().membank("bank1")->configure_entries(0, 3, machine().root_device().memregion("user1")->base(), 0x4000);
-	machine().root_device().membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 3, memregion("user1")->base(), 0x4000);
+	membank("bank1")->set_entry(0);
 }
 
 GAME( 1984, ddayjlc,  0,       ddayjlc, ddayjlc, ddayjlc_state, ddayjlc, ROT90, "Jaleco", "D-Day (Jaleco set 1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

@@ -1481,7 +1481,7 @@ DRIVER_INIT_MEMBER(eolith_state,eolith)
 	i8051_set_serial_tx_callback(machine().device("soundcpu"), soundcpu_to_qs1000);
 
 	// Configure the sound ROM banking
-	machine().root_device().membank("sound_bank")->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);
+	membank("sound_bank")->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);
 }
 
 DRIVER_INIT_MEMBER(eolith_state,landbrk)
@@ -1507,7 +1507,7 @@ DRIVER_INIT_MEMBER(eolith_state,landbrka)
 DRIVER_INIT_MEMBER(eolith_state,hidctch2)
 {
 	//it fails compares in memory like in landbrka
-	UINT32 *rombase = (UINT32*)machine().root_device().memregion("maincpu")->base();
+	UINT32 *rombase = (UINT32*)memregion("maincpu")->base();
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
 	DRIVER_INIT_CALL(eolith);

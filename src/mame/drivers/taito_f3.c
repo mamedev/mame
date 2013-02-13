@@ -121,7 +121,7 @@ WRITE32_MEMBER(taito_f3_state::f3_sound_reset_1_w)
 WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
 {
 	if (m_f3_game==KIRAMEKI) {
-		UINT16 *rom = (UINT16 *)machine().root_device().memregion("audiocpu")->base();
+		UINT16 *rom = (UINT16 *)memregion("audiocpu")->base();
 		UINT32 idx;
 
 		idx = (offset << 1) & 0x1e;

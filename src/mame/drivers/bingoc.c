@@ -102,7 +102,7 @@ WRITE8_MEMBER(bingoc_state::bingoc_play_w)
 	---- --x- sound rom banking
 	---- ---x start-stop sample
 	*/
-	UINT8 *upd = machine().root_device().memregion("upd")->base();
+	UINT8 *upd = memregion("upd")->base();
 	memcpy(&upd[0x00000], &upd[0x20000 + (((data & 2)>>1) * 0x20000)], 0x20000);
 	upd7759_start_w(device, data & 1);
 //  printf("%02x\n",data);

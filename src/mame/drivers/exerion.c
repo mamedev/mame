@@ -549,8 +549,8 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = machine().root_device().memregion("gfx1")->base();
-	length = machine().root_device().memregion("gfx1")->bytes();
+	dst = memregion("gfx1")->base();
+	length = memregion("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -567,8 +567,8 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 
 	/* make a temporary copy of the sprite data */
 	src = temp;
-	dst = machine().root_device().memregion("gfx2")->base();
-	length = machine().root_device().memregion("gfx2")->bytes();
+	dst = memregion("gfx2")->base();
+	length = memregion("gfx2")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the sprites */
@@ -590,7 +590,7 @@ DRIVER_INIT_MEMBER(exerion_state,exerion)
 
 DRIVER_INIT_MEMBER(exerion_state,exerionb)
 {
-	UINT8 *ram = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ram = memregion("maincpu")->base();
 	int addr;
 
 	/* the program ROMs have data lines D1 and D2 swapped. Decode them. */

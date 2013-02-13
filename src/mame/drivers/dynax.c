@@ -275,7 +275,7 @@ WRITE8_MEMBER(dynax_state::jantouki_sound_rombank_w)
 
 WRITE8_MEMBER(dynax_state::hnoridur_rombank_w)
 {
-	int bank_n = (machine().root_device().memregion("maincpu")->bytes() - 0x10000) / 0x8000;
+	int bank_n = (memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
 	//logerror("%04x: rom bank = %02x\n", space.device().safe_pc(), data);
 	if (data < bank_n)
@@ -743,7 +743,7 @@ READ8_MEMBER(dynax_state::yarunara_input_r)
 
 WRITE8_MEMBER(dynax_state::yarunara_rombank_w)
 {
-		int bank_n = (machine().root_device().memregion("maincpu")->bytes() - 0x10000) / 0x8000;
+		int bank_n = (memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
 		//logerror("%04x: rom bank = %02x\n", space.device().safe_pc(), data);
 		if (data < bank_n)
@@ -4317,27 +4317,27 @@ MACHINE_RESET_MEMBER(dynax_state,dynax)
 
 MACHINE_START_MEMBER(dynax_state,hanamai)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 0x10, &ROM[0x8000], 0x8000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 0x10, &ROM[0x8000], 0x8000);
 
 	MACHINE_START_CALL_MEMBER(dynax);
 }
 
 MACHINE_START_MEMBER(dynax_state,hnoridur)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	int bank_n = (machine().root_device().memregion("maincpu")->bytes() - 0x10000) / 0x8000;
+	UINT8 *ROM = memregion("maincpu")->base();
+	int bank_n = (memregion("maincpu")->bytes() - 0x10000) / 0x8000;
 
-	machine().root_device().membank("bank1")->configure_entries(0, bank_n, &ROM[0x10000], 0x8000);
+	membank("bank1")->configure_entries(0, bank_n, &ROM[0x10000], 0x8000);
 
 	MACHINE_START_CALL_MEMBER(dynax);
 }
 
 MACHINE_START_MEMBER(dynax_state,htengoku)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	machine().root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
+	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
 
 	MACHINE_START_CALL_MEMBER(dynax);
 }
@@ -5432,7 +5432,7 @@ ROM_END
 DRIVER_INIT_MEMBER(dynax_state,blktouch)
 {
 	// fearsome encryption ;-)
-	UINT8   *src = (UINT8 *)machine().root_device().memregion("maincpu")->base();
+	UINT8   *src = (UINT8 *)memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x90000; i++)
@@ -5441,7 +5441,7 @@ DRIVER_INIT_MEMBER(dynax_state,blktouch)
 
 	}
 
-	src = (UINT8 *)machine().root_device().memregion("gfx1")->base();
+	src = (UINT8 *)memregion("gfx1")->base();
 
 	for (i = 0; i < 0xc0000; i++)
 	{
@@ -5454,8 +5454,8 @@ DRIVER_INIT_MEMBER(dynax_state,maya)
 {
 	/* Address lines scrambling on 1 z80 rom */
 	int i;
-	UINT8   *gfx = (UINT8 *)machine().root_device().memregion("gfx1")->base();
-	UINT8   *rom = machine().root_device().memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
+	UINT8   *gfx = (UINT8 *)memregion("gfx1")->base();
+	UINT8   *rom = memregion("maincpu")->base() + 0x28000, *end = rom + 0x10000;
 	for ( ; rom < end; rom += 8)
 	{
 		UINT8 temp[8];
@@ -6265,8 +6265,8 @@ ROM_END
 DRIVER_INIT_MEMBER(dynax_state,mjelct3)
 {
 	int i;
-	UINT8   *rom = machine().root_device().memregion("maincpu")->base();
-	size_t  size = machine().root_device().memregion("maincpu")->bytes();
+	UINT8   *rom = memregion("maincpu")->base();
+	size_t  size = memregion("maincpu")->bytes();
 	UINT8   *rom1 = auto_alloc_array(machine(), UINT8, size);
 
 	memcpy(rom1, rom, size);
@@ -6278,8 +6278,8 @@ DRIVER_INIT_MEMBER(dynax_state,mjelct3)
 DRIVER_INIT_MEMBER(dynax_state,mjelct3a)
 {
 	int i, j;
-	UINT8   *rom = machine().root_device().memregion("maincpu")->base();
-	size_t  size = machine().root_device().memregion("maincpu")->bytes();
+	UINT8   *rom = memregion("maincpu")->base();
+	size_t  size = memregion("maincpu")->bytes();
 	UINT8   *rom1 = auto_alloc_array(machine(), UINT8, size);
 
 	memcpy(rom1, rom, size);

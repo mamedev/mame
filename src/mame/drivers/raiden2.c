@@ -697,7 +697,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 //  case 0x6ca:
 //      logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-//      space.machine().root_device().membank("bank1")->set_entry((data >> 15) & 1);
+//      space.membank("bank1")->set_entry((data >> 15) & 1);
 
 
 void raiden2_state::combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
@@ -928,7 +928,7 @@ WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
 
 		/* probably bit 3 is from 6c9 */
 		/* TODO: this doesn't work! */
-		space.machine().root_device().membank("mainbank")->set_entry(8 | (cop_bank & 0x7000) >> 12);
+		membank("mainbank")->set_entry(8 | (cop_bank & 0x7000) >> 12);
 	}
 }
 
@@ -1227,7 +1227,7 @@ WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
 {
 	if(ACCESSING_BITS_8_15) {
 		logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-		space.machine().root_device().membank("mainbank")->set_entry(!((data >> 15) & 1));
+		membank("mainbank")->set_entry(!((data >> 15) & 1));
 		prg_bank = ((data >> 15) & 1);
 	}
 }
@@ -3100,25 +3100,25 @@ ROM_END
 
 DRIVER_INIT_MEMBER(raiden2_state,raiden2)
 {
-	machine().root_device().membank("mainbank")->configure_entries(0, 2, machine().root_device().memregion("mainprg")->base(), 0x20000);
+	membank("mainbank")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
 	raiden2_decrypt_sprites(machine());
 }
 
 DRIVER_INIT_MEMBER(raiden2_state,raidendx)
 {
-	machine().root_device().membank("mainbank")->configure_entries(0, 0x10, machine().root_device().memregion("mainprg")->base(), 0x20000);
+	membank("mainbank")->configure_entries(0, 0x10, memregion("mainprg")->base(), 0x20000);
 	raiden2_decrypt_sprites(machine());
 }
 
 DRIVER_INIT_MEMBER(raiden2_state,xsedae)
 {
 	/* doesn't have banking */
-	//machine().root_device().membank("mainbank")->configure_entries(0, 2, machine().root_device().memregion("mainprg")->base(), 0x20000);
+	//membank("mainbank")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
 }
 
 DRIVER_INIT_MEMBER(raiden2_state,zeroteam)
 {
-	machine().root_device().membank("mainbank")->configure_entries(0, 2, machine().root_device().memregion("mainprg")->base(), 0x20000);
+	membank("mainbank")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
 	zeroteam_decrypt_sprites(machine());
 }
 

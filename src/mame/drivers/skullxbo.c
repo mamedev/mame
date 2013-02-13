@@ -607,7 +607,7 @@ ROM_END
 DRIVER_INIT_MEMBER(skullxbo_state,skullxbo)
 {
 	atarijsa_init(machine(), "FF5802", 0x0080);
-	memset(machine().root_device().memregion("gfx1")->base() + 0x170000, 0, 0x20000);
+	memset(memregion("gfx1")->base() + 0x170000, 0, 0x20000);
 }
 
 

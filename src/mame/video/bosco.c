@@ -16,7 +16,7 @@
 
 PALETTE_INIT_MEMBER(bosco_state,bosco)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	machine().colortable = colortable_alloc(machine(), 32+64);

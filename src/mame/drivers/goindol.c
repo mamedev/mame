@@ -371,7 +371,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(goindol_state,goindol)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 
 	/* I hope that's all patches to avoid protection */

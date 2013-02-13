@@ -155,9 +155,9 @@ void rastersp_state::machine_start()
 
 	m_palette = auto_alloc_array(machine(), UINT16, 0x8000);
 
-	machine().root_device().membank("bank1")->set_base(m_dram);
-	machine().root_device().membank("bank2")->set_base(&m_dram[0x10000/4]);
-	machine().root_device().membank("bank3")->set_base(&m_dram[0x300000/4]);
+	membank("bank1")->set_base(m_dram);
+	membank("bank2")->set_base(&m_dram[0x10000/4]);
+	membank("bank3")->set_base(&m_dram[0x300000/4]);
 
 #if USE_SPEEDUP_HACK
 	machine().device("dsp")->memory().space(AS_PROGRAM).install_read_handler(0x809923, 0x809923, read32_delegate(FUNC(rastersp_state::dsp_speedup_r), this));

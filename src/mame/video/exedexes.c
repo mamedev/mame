@@ -33,7 +33,7 @@
 
 void exedexes_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -125,7 +125,7 @@ WRITE8_MEMBER(exedexes_state::exedexes_gfxctrl_w)
 
 TILE_GET_INFO_MEMBER(exedexes_state::get_bg_tile_info)
 {
-	UINT8 *tilerom = machine().root_device().memregion("gfx5")->base();
+	UINT8 *tilerom = memregion("gfx5")->base();
 
 	int attr = tilerom[tile_index];
 	int code = attr & 0x3f;
@@ -137,7 +137,7 @@ TILE_GET_INFO_MEMBER(exedexes_state::get_bg_tile_info)
 
 TILE_GET_INFO_MEMBER(exedexes_state::get_fg_tile_info)
 {
-	int code = machine().root_device().memregion("gfx5")->base()[tile_index];
+	int code = memregion("gfx5")->base()[tile_index];
 
 	SET_TILE_INFO_MEMBER(2, code, 0, 0);
 }

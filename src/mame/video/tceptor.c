@@ -20,7 +20,7 @@
 
 void tceptor_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -238,7 +238,7 @@ void tceptor_state::decode_bg(const char * region)
 	};
 
 	int gfx_index = m_bg;
-	UINT8 *src = machine().root_device().memregion(region)->base() + 0x8000;
+	UINT8 *src = memregion(region)->base() + 0x8000;
 	UINT8 *buffer;
 	int len = 0x8000;
 	int i;
@@ -256,7 +256,7 @@ void tceptor_state::decode_bg(const char * region)
 	auto_free(machine(), buffer);
 
 	/* decode the graphics */
-	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), bg_layout, machine().root_device().memregion(region)->base(), 64, 2048));
+	machine().gfx[gfx_index] = auto_alloc(machine(), gfx_element(machine(), bg_layout, memregion(region)->base(), 64, 2048));
 }
 
 void tceptor_state::decode_sprite(int gfx_index, const gfx_layout *layout, const void *data)
@@ -285,8 +285,8 @@ void tceptor_state::decode_sprite16(const char * region)
 		2*16*16
 	};
 
-	UINT8 *src = machine().root_device().memregion(region)->base();
-	int len = machine().root_device().memregion(region)->bytes();
+	UINT8 *src = memregion(region)->base();
+	int len = memregion(region)->bytes();
 	UINT8 *dst;
 	int i, y;
 
@@ -336,8 +336,8 @@ void tceptor_state::decode_sprite32(const char * region)
 		2*32*32
 	};
 
-	UINT8 *src = machine().root_device().memregion(region)->base();
-	int len = machine().root_device().memregion(region)->bytes();
+	UINT8 *src = memregion(region)->base();
+	int len = memregion(region)->bytes();
 	int total = spr32_layout.total;
 	int size = spr32_layout.charincrement / 8;
 	UINT8 *dst;

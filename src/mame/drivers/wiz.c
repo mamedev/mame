@@ -1054,8 +1054,8 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 		{ 5,7,3, 0x28 }
 	};
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
-	int size = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *rom = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, size);
 	int A;
 	const UINT8 *tbl;

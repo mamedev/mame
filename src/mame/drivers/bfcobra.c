@@ -445,7 +445,7 @@ UINT8* bfcobra_state::blitter_get_addr(UINT32 addr)
 		addr &= 0xffff;
 		addr += (m_bank_data[0] & 1) ? 0x10000 : 0;
 
-		return (UINT8*)(machine().root_device().memregion("user1")->base() + addr + ((m_bank_data[0] >> 1) * 0x20000));
+		return (UINT8*)(memregion("user1")->base() + addr + ((m_bank_data[0] >> 1) * 0x20000));
 	}
 	else if (addr >= 0x20000 && addr < 0x40000)
 	{
@@ -1037,7 +1037,7 @@ void bfcobra_state::z80_bank(int num, int data)
 	{
 		UINT32 offset = ((m_bank_data[0] >> 1) * 0x20000) + ((0x4000 * data) ^ ((m_bank_data[0] & 1) ? 0 : 0x10000));
 
-		membank(bank_names[num - 1])->set_base(machine().root_device().memregion("user1")->base() + offset);
+		membank(bank_names[num - 1])->set_base(memregion("user1")->base() + offset);
 	}
 	else if (data < 0x10)
 	{
@@ -1148,7 +1148,7 @@ READ8_MEMBER(bfcobra_state::fddata_r)
 				}
 
 				fdc.offset = (BPT * fdc.track*2) + (fdc.side ? BPT : 0) + (BPS * (fdc.sector-1)) + fdc.byte_pos++;
-				val = *(machine().root_device().memregion("user2")->base() + fdc.offset);
+				val = *(memregion("user2")->base() + fdc.offset);
 
 				/* Move on to next sector? */
 				if (fdc.byte_pos == 1024)
@@ -1708,7 +1708,7 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 	UINT8 *tmp;
 
 	tmp = auto_alloc_array(machine(), UINT8, 0x8000);
-	rom = machine().root_device().memregion("audiocpu")->base() + 0x8000;
+	rom = memregion("audiocpu")->base() + 0x8000;
 	memcpy(tmp, rom, 0x8000);
 
 	for (i = 0; i < 0x8000; i++)
@@ -1737,7 +1737,7 @@ DRIVER_INIT_MEMBER(bfcobra_state,bfcobra)
 	m_bank_data[3] = 0;
 
 	/* Fixed 16kB ROM region */
-	membank("bank4")->set_base(machine().root_device().memregion("user1")->base());
+	membank("bank4")->set_base(memregion("user1")->base());
 
 	/* TODO: Properly sort out the data ACIA */
 	m_data_r = 1;

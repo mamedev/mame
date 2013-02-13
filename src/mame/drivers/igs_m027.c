@@ -284,7 +284,7 @@ void igs_m027_state::sdwx_gfx_decrypt()
 {
 	int i;
 	unsigned rom_size = 0x80000;
-	UINT8 *src = (UINT8 *) (machine().root_device().memregion("gfx1")->base());
+	UINT8 *src = (UINT8 *) (memregion("gfx1")->base());
 	UINT8 *result_data = auto_alloc_array(machine(), UINT8, rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -844,7 +844,7 @@ ROM_END
 
 void igs_m027_state::pgm_create_dummy_internal_arm_region()
 {
-	UINT16 *temp16 = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *temp16 = (UINT16 *)memregion("maincpu")->base();
 
 	// fill with RX 14
 	int i;

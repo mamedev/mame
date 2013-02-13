@@ -129,7 +129,7 @@ void lucky74_state::palette_init()
    We're constructing a double-sized palette with one half for each state.
 */
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	static const int resistances_rgb[4] = { 2000, 1000, 470, 220 };
 	double weights_r[4], weights_g[4], weights_b[4];

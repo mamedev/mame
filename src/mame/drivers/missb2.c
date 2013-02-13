@@ -78,7 +78,7 @@ UINT32 missb2_state::screen_update_missb2(screen_device &screen, bitmap_ind16 &b
 
 	sx = 0;
 
-	prom = machine().root_device().memregion("proms")->base();
+	prom = memregion("proms")->base();
 	for (offs = 0; offs < m_objectram.bytes(); offs += 4)
 	{
 		/* skip empty sprites */
@@ -574,14 +574,14 @@ ROM_END
 
 void missb2_state::configure_banks()
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	UINT8 *SLAVE = machine().root_device().memregion("slave")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
+	UINT8 *SLAVE = memregion("slave")->base();
 
-	machine().root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	/* 2009-11 FP: isn't there a way to configure both at once? */
-	machine().root_device().membank("bank2")->configure_entries(0, 7, &SLAVE[0x8000], 0x1000);
-	machine().root_device().membank("bank3")->configure_entries(0, 7, &SLAVE[0x9000], 0x1000);
+	membank("bank2")->configure_entries(0, 7, &SLAVE[0x8000], 0x1000);
+	membank("bank3")->configure_entries(0, 7, &SLAVE[0x9000], 0x1000);
 }
 
 DRIVER_INIT_MEMBER(missb2_state,missb2)

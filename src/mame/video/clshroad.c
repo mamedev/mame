@@ -42,7 +42,7 @@ WRITE8_MEMBER(clshroad_state::clshroad_flipscreen_w)
 
 PALETTE_INIT_MEMBER(clshroad_state,clshroad)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	for (i = 0;i < 256;i++)
 		palette_set_color_rgb(machine(),i,  pal4bit(color_prom[i + 256 * 0]),
@@ -52,7 +52,7 @@ PALETTE_INIT_MEMBER(clshroad_state,clshroad)
 
 PALETTE_INIT_MEMBER(clshroad_state,firebatl)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

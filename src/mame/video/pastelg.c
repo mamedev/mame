@@ -16,7 +16,7 @@
 ******************************************************************************/
 void pastelg_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -194,7 +194,7 @@ void pastelg_state::pastelg_gfxdraw()
 		incy = -1;
 	}
 
-	gfxlen = machine().root_device().memregion("gfx1")->bytes();
+	gfxlen = memregion("gfx1")->bytes();
 	gfxaddr = (m_gfxrom << 16) + m_blitter_src_addr;
 
 	readflag = 0;

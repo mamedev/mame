@@ -284,7 +284,7 @@ static const ay8910_interface ay8910_config =
 
 void carrera_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int br_bit0, br_bit1, bit0, bit1, r, g, b;
 	int i;
 

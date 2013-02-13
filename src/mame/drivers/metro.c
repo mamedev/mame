@@ -6339,7 +6339,7 @@ DRIVER_INIT_MEMBER(metro_state,balcube)
 
 DRIVER_INIT_MEMBER(metro_state,dharmak)
 {
-	UINT8 *src = machine().root_device().memregion( "gfx1" )->base();
+	UINT8 *src = memregion( "gfx1" )->base();
 	int i;
 
 	for (i = 0; i < 0x200000; i += 4)

@@ -1345,7 +1345,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(liberate_state,prosport)
 {
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int i;
 
 	/* Main cpu has the nibbles swapped */
@@ -1366,7 +1366,7 @@ DRIVER_INIT_MEMBER(liberate_state,liberate)
 	int A;
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	space.set_decrypted_region(0x0000, 0xffff, decrypted);
 
@@ -1377,7 +1377,7 @@ DRIVER_INIT_MEMBER(liberate_state,liberate)
 		decrypted[A] = (decrypted[A] & 0x7d) | ((decrypted[A] & 0x02) << 6) | ((decrypted[A] & 0x80) >> 6);
 	}
 
-	machine().root_device().membank("bank1")->configure_decrypted_entry(0, decrypted + 0x8000);
+	membank("bank1")->configure_decrypted_entry(0, decrypted + 0x8000);
 }
 
 /*************************************

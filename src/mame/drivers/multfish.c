@@ -491,7 +491,7 @@ A12 <-> A13
 */
 
 	UINT32 i,j,jscr,romoffset;
-	UINT8 *multfish_gfx = machine().root_device().memregion("gfx")->base();
+	UINT8 *multfish_gfx = memregion("gfx")->base();
 	UINT8 *temprom = auto_alloc_array(machine(), UINT8, multfish_ROM_SIZE);
 
 

@@ -261,8 +261,8 @@ void psikyo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
 	UINT16 *spritelist = (UINT16 *)(m_spritebuf2 + 0x1800 / 4);
-	UINT8 *TILES = machine().root_device().memregion("spritelut")->base();    // Sprites LUT
-	int TILES_LEN = machine().root_device().memregion("spritelut")->bytes();
+	UINT8 *TILES = memregion("spritelut")->base();    // Sprites LUT
+	int TILES_LEN = memregion("spritelut")->bytes();
 
 	int width = machine().primary_screen->width();
 	int height = machine().primary_screen->height();
@@ -379,8 +379,8 @@ void psikyo_state::draw_sprites_bootleg( bitmap_ind16 &bitmap, const rectangle &
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
 	UINT16 *spritelist = (UINT16 *)(m_spritebuf2 + 0x1800 / 4);
-	UINT8 *TILES = machine().root_device().memregion("spritelut")->base();    // Sprites LUT
-	int TILES_LEN = machine().root_device().memregion("spritelut")->bytes();
+	UINT8 *TILES = memregion("spritelut")->base();    // Sprites LUT
+	int TILES_LEN = memregion("spritelut")->bytes();
 
 	int width = machine().primary_screen->width();
 	int height = machine().primary_screen->height();
@@ -523,7 +523,7 @@ UINT32 psikyo_state::screen_update_psikyo(screen_device &screen, bitmap_ind16 &b
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(~machine().root_device().ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
+	flip_screen_set(~ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
@@ -696,7 +696,7 @@ UINT32 psikyo_state::screen_update_psikyo_bootleg(screen_device &screen, bitmap_
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(~machine().root_device().ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
+	flip_screen_set(~ioport("DSW")->read() & 0x00010000);       // hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 

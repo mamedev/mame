@@ -86,7 +86,7 @@ WRITE8_MEMBER(thedeep_state::thedeep_vram_1_w)
 
 void thedeep_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	for (i = 0;i < 512;i++)
 		palette_set_color_rgb(machine(),i,pal4bit(color_prom[0x400 + i] >> 0),pal4bit(color_prom[0x400 + i] >> 4),pal4bit(color_prom[0x200 + i] >> 0));

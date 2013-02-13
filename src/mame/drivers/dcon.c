@@ -376,7 +376,7 @@ ROM_END
 /***************************************************************************/
 DRIVER_INIT_MEMBER(dcon_state,sdgndmps)
 {
-	UINT16 *RAM = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
 	RAM[0x1356/2] = 0x4e71; /* beq -> nop */
 	RAM[0x1358/2] = 0x4e71;
 

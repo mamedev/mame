@@ -64,7 +64,7 @@ static const res_net_info mario_net_info_std =
 ***************************************************************************/
 void mario_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t   *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &mario_decode_info, &mario_net_info);
@@ -199,7 +199,7 @@ UINT32 mario_state::screen_update_mario(screen_device &screen, bitmap_ind16 &bit
 {
 	int t;
 
-	t = machine().root_device().ioport("MONITOR")->read();
+	t = ioport("MONITOR")->read();
 	if (t != m_monitor)
 	{
 		m_monitor = t;

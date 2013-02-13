@@ -1101,8 +1101,8 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
 	*                                                   *
 	\***************************************************/
 
-	UINT8 *qrom = machine().root_device().memregion("questions")->base();
-	UINT32 length = machine().root_device().memregion("questions")->bytes();
+	UINT8 *qrom = memregion("questions")->base();
+	UINT32 length = memregion("questions")->bytes();
 	UINT32 address;
 
 	for (address = 0; address < length; address++)

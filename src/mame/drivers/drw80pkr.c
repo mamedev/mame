@@ -348,7 +348,7 @@ UINT32 drw80pkr_state::screen_update_drw80pkr(screen_device &screen, bitmap_ind1
 
 void drw80pkr_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int j;
 
 	for (j = 0; j < machine().total_colors(); j++)
@@ -406,7 +406,7 @@ GFXDECODE_END
 
 DRIVER_INIT_MEMBER(drw80pkr_state,drw80pkr)
 {
-	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base(), 0x1000);
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base(), 0x1000);
 }
 
 

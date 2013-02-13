@@ -39,14 +39,14 @@ TILEMAP_MAPPER_MEMBER(deadang_state::bg_scan)
 
 TILE_GET_INFO_MEMBER(deadang_state::get_pf3_tile_info)
 {
-	const UINT16 *bgMap = (const UINT16 *)machine().root_device().memregion("gfx6")->base();
+	const UINT16 *bgMap = (const UINT16 *)memregion("gfx6")->base();
 	int code= bgMap[tile_index];
 	SET_TILE_INFO_MEMBER(4,code&0x7ff,code>>12,0);
 }
 
 TILE_GET_INFO_MEMBER(deadang_state::get_pf2_tile_info)
 {
-	const UINT16 *bgMap = (const UINT16 *)machine().root_device().memregion("gfx7")->base();
+	const UINT16 *bgMap = (const UINT16 *)memregion("gfx7")->base();
 	int code= bgMap[tile_index];
 	SET_TILE_INFO_MEMBER(3,code&0x7ff,code>>12,0);
 }

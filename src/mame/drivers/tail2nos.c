@@ -28,7 +28,7 @@ WRITE16_MEMBER(tail2nos_state::sound_command_w)
 
 WRITE8_MEMBER(tail2nos_state::sound_bankswitch_w)
 {
-	machine().root_device().membank("bank3")->set_entry(data & 0x01);
+	membank("bank3")->set_entry(data & 0x01);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )

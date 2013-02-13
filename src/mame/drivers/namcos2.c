@@ -5163,7 +5163,7 @@ DRIVER_INIT_MEMBER(namcos2_state,metlhawk)
 {
 	/* unscramble sprites */
 	int i, j, k, l;
-	UINT8 *data = machine().root_device().memregion("gfx1")->base();
+	UINT8 *data = memregion("gfx1")->base();
 	for(i=0; i<0x200000; i+=32*32)
 	{
 		for(j=0; j<32*32; j+=32*4)
@@ -5296,7 +5296,7 @@ DRIVER_INIT_MEMBER(namcos2_state,bubbletr)
 
 DRIVER_INIT_MEMBER(namcos2_state,luckywld)
 {
-	UINT8 *pData = (UINT8 *)machine().root_device().memregion( "gfx5" )->base();
+	UINT8 *pData = (UINT8 *)memregion( "gfx5" )->base();
 	int i;
 	for( i=0; i<32*0x4000; i++ )
 	{ /* unscramble gfx mask */

@@ -2515,7 +2515,7 @@ MACHINE_CONFIG_END
 
 void galaxian_state::decode_mooncrst(int length, UINT8 *dest)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int offs;
 
 	for (offs = 0; offs < length; offs++)
@@ -2577,8 +2577,8 @@ void galaxian_state::decode_checkman()
 		{ 0,2,0,2 },
 		{ 1,4,1,4 }
 	};
-	UINT8 *rombase = machine().root_device().memregion("maincpu")->base();
-	UINT32 romlength = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *rombase = memregion("maincpu")->base();
+	UINT32 romlength = memregion("maincpu")->bytes();
 	UINT32 offs;
 
 	for (offs = 0; offs < romlength; offs++)
@@ -2594,8 +2594,8 @@ void galaxian_state::decode_checkman()
 
 void galaxian_state::decode_dingoe()
 {
-	UINT8 *rombase = machine().root_device().memregion("maincpu")->base();
-	UINT32 romlength = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *rombase = memregion("maincpu")->base();
+	UINT32 romlength = memregion("maincpu")->bytes();
 	UINT32 offs;
 
 	for (offs = 0; offs < romlength; offs++)
@@ -2617,7 +2617,7 @@ void galaxian_state::decode_dingoe()
 
 void galaxian_state::decode_frogger_sound()
 {
-	UINT8 *rombase = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *rombase = memregion("audiocpu")->base();
 	UINT32 offs;
 
 	/* the first ROM of the sound CPU has data lines D0 and D1 swapped */
@@ -2628,7 +2628,7 @@ void galaxian_state::decode_frogger_sound()
 
 void galaxian_state::decode_frogger_gfx()
 {
-	UINT8 *rombase = machine().root_device().memregion("gfx1")->base();
+	UINT8 *rombase = memregion("gfx1")->base();
 	UINT32 offs;
 
 	/* the 2nd gfx ROM has data lines D0 and D1 swapped */
@@ -2639,8 +2639,8 @@ void galaxian_state::decode_frogger_gfx()
 
 void galaxian_state::decode_anteater_gfx()
 {
-	UINT32 romlength = machine().root_device().memregion("gfx1")->bytes();
-	UINT8 *rombase = machine().root_device().memregion("gfx1")->base();
+	UINT32 romlength = memregion("gfx1")->bytes();
+	UINT8 *rombase = memregion("gfx1")->base();
 	UINT8 *scratch = auto_alloc_array(machine(), UINT8, romlength);
 	UINT32 offs;
 
@@ -2659,8 +2659,8 @@ void galaxian_state::decode_anteater_gfx()
 
 void galaxian_state::decode_losttomb_gfx()
 {
-	UINT32 romlength = machine().root_device().memregion("gfx1")->bytes();
-	UINT8 *rombase = machine().root_device().memregion("gfx1")->base();
+	UINT32 romlength = memregion("gfx1")->bytes();
+	UINT8 *rombase = memregion("gfx1")->base();
 	UINT8 *scratch = auto_alloc_array(machine(), UINT8, romlength);
 	UINT32 offs;
 
@@ -2684,7 +2684,7 @@ void galaxian_state::decode_superbon()
 
 	/* Deryption worked out by hand by Chris Hardy. */
 
-	RAM = machine().root_device().memregion("maincpu")->base();
+	RAM = memregion("maincpu")->base();
 
 	for (i = 0;i < 0x1000;i++)
 	{
@@ -2843,7 +2843,7 @@ DRIVER_INIT_MEMBER(galaxian_state,mooncrst)
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::mooncrst_extend_tile_info, &galaxian_state::mooncrst_extend_sprite_info);
 
 	/* decrypt program code */
-	decode_mooncrst(0x8000, machine().root_device().memregion("maincpu")->base());
+	decode_mooncrst(0x8000, memregion("maincpu")->base());
 }
 
 
@@ -3125,14 +3125,14 @@ DRIVER_INIT_MEMBER(galaxian_state,kong)
 	space.install_ram(0x8000, 0x87ff);
 
 	/* extend ROM */
-	space.install_rom(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base());
+	space.install_rom(0x0000, 0x7fff, memregion("maincpu")->base());
 }
 
 
 void galaxian_state::mshuttle_decode(const UINT8 convtable[8][16])
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x10000);
 	int A;
 
@@ -3230,8 +3230,8 @@ DRIVER_INIT_MEMBER(galaxian_state,fantastc)
 		3, 7, 7, 7  // ok!
 	};
 
-	UINT8* romdata = machine().root_device().memregion("maincpu")->base();
-	assert(machine().root_device().memregion("maincpu")->bytes() == 0x8000);
+	UINT8* romdata = memregion("maincpu")->base();
+	assert(memregion("maincpu")->bytes() == 0x8000);
 	UINT8 buf[0x8000];
 	memcpy(buf, romdata, 0x8000);
 

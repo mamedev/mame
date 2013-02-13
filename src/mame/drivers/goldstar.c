@@ -6183,7 +6183,7 @@ PALETTE_INIT_MEMBER(goldstar_state,cm)
 	for (i = 0; i < 0x100; i++)
 	{
 		UINT8 data;
-		UINT8*proms = machine().root_device().memregion("proms")->base();
+		UINT8*proms = memregion("proms")->base();
 
 		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
 
@@ -6198,7 +6198,7 @@ PALETTE_INIT_MEMBER(goldstar_state,cmast91)
 	{
 		int r,g,b;
 
-		UINT8*proms = machine().root_device().memregion("proms")->base();
+		UINT8*proms = memregion("proms")->base();
 
 		b = proms[0x000 + i] << 4;
 		g = proms[0x100 + i] << 4;
@@ -6216,7 +6216,7 @@ PALETTE_INIT_MEMBER(goldstar_state,lucky8)
 	UINT8 data;
 	UINT8 *proms;
 
-	proms = machine().root_device().memregion("proms")->base();
+	proms = memregion("proms")->base();
 	for (i = 0; i < 0x100; i++)
 	{
 		data = proms[0x000 + i] | (proms[0x100 + i] << 4);
@@ -6224,7 +6224,7 @@ PALETTE_INIT_MEMBER(goldstar_state,lucky8)
 		palette_set_color_rgb(machine(), i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
 	}
 
-	proms = machine().root_device().memregion("proms2")->base();
+	proms = memregion("proms2")->base();
 	for (i=0; i < 0x20; i++)
 	{
 		data = proms[i];
@@ -6601,7 +6601,7 @@ PALETTE_INIT_MEMBER(goldstar_state,magodds)
 	{
 		int r,g,b;
 
-		UINT8*proms = machine().root_device().memregion("proms")->base();
+		UINT8*proms = memregion("proms")->base();
 
 		b = proms[0x000 + i] << 4;
 		g = proms[0x100 + i] << 4;
@@ -8728,7 +8728,7 @@ YM2203
 DRIVER_INIT_MEMBER(goldstar_state,magoddsc)
 {
 	int A;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	for (A = 0;A < 0x8000;A++)
 	{
@@ -9980,7 +9980,7 @@ READ8_MEMBER(goldstar_state::fixedval7d_r )
 DRIVER_INIT_MEMBER(goldstar_state,fb2010)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -10893,7 +10893,7 @@ ROM_END
 DRIVER_INIT_MEMBER(goldstar_state,goldstar)
 {
 	int A;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	for (A = 0;A < 0x10000;A++)
 	{
@@ -10978,8 +10978,8 @@ UINT8 goldstar_state::chry10_decrypt(UINT8 cipherText)
 
 DRIVER_INIT_MEMBER(goldstar_state,chry10)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	int size = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *ROM = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
 	int start = 0;
 
 	int i;
@@ -11002,8 +11002,8 @@ DRIVER_INIT_MEMBER(goldstar_state,chry10)
 
 DRIVER_INIT_MEMBER(goldstar_state,cb3)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	int size = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *ROM = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
 	int start = 0;
 
 	int i;
@@ -11021,7 +11021,7 @@ DRIVER_INIT_MEMBER(goldstar_state,cb3)
 DRIVER_INIT_MEMBER(goldstar_state,chrygld)
 {
 	int A;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	do_blockswaps(ROM);
 
 	// a data bitswap
@@ -11037,7 +11037,7 @@ DRIVER_INIT_MEMBER(goldstar_state,chrygld)
 
 DRIVER_INIT_MEMBER(goldstar_state,cm)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -11048,7 +11048,7 @@ DRIVER_INIT_MEMBER(goldstar_state,cm)
 
 DRIVER_INIT_MEMBER(goldstar_state,cmv4)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -11059,7 +11059,7 @@ DRIVER_INIT_MEMBER(goldstar_state,cmv4)
 
 DRIVER_INIT_MEMBER(goldstar_state,cmast91)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 /*  forcing PPI mode 0 for all, and A, B & C as input.
     the mixed modes 2-0 are not working properly.
@@ -11070,7 +11070,7 @@ DRIVER_INIT_MEMBER(goldstar_state,cmast91)
 
 DRIVER_INIT_MEMBER(goldstar_state,lucky8a)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	ROM[0x0010] = 0x21;
 }
@@ -11078,7 +11078,7 @@ DRIVER_INIT_MEMBER(goldstar_state,lucky8a)
 DRIVER_INIT_MEMBER(goldstar_state,nfb96sea)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	for (i = 0;i < 0x10000;i++)
 	{
@@ -11111,7 +11111,7 @@ READ8_MEMBER(goldstar_state::fixedvala8_r)
 DRIVER_INIT_MEMBER(goldstar_state,schery97)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -11138,7 +11138,7 @@ READ8_MEMBER(goldstar_state::fixedval38_r)
 DRIVER_INIT_MEMBER(goldstar_state,schery97a)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -11166,7 +11166,7 @@ READ8_MEMBER(goldstar_state::fixedvalea_r)
 DRIVER_INIT_MEMBER(goldstar_state,skill98)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -11192,7 +11192,7 @@ READ8_MEMBER(goldstar_state::fixedval68_r)
 DRIVER_INIT_MEMBER(goldstar_state,nfb96_c1)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -11218,7 +11218,7 @@ READ8_MEMBER(goldstar_state::fixedval58_r)
 DRIVER_INIT_MEMBER(goldstar_state,nfb96_c2)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -11254,7 +11254,7 @@ READ8_MEMBER(goldstar_state::fixedvalaa_r)
 DRIVER_INIT_MEMBER(goldstar_state,nfb96_d)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -11286,7 +11286,7 @@ READ8_MEMBER(goldstar_state::fixedvalbe_r)
 DRIVER_INIT_MEMBER(goldstar_state,nfb96_dk)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -11317,7 +11317,7 @@ READ8_MEMBER(goldstar_state::fixedval84_r)
 DRIVER_INIT_MEMBER(goldstar_state,rp35)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -11344,7 +11344,7 @@ READ8_MEMBER(goldstar_state::fixedvalb2_r)
 DRIVER_INIT_MEMBER(goldstar_state,rp36)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -11371,7 +11371,7 @@ READ8_MEMBER(goldstar_state::fixedval48_r)
 DRIVER_INIT_MEMBER(goldstar_state,rp36c3)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -11404,7 +11404,7 @@ READ8_MEMBER(goldstar_state::fixedval74_r)
 DRIVER_INIT_MEMBER(goldstar_state,po33)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -11437,7 +11437,7 @@ READ8_MEMBER(goldstar_state::fixedvalc7_r)
 DRIVER_INIT_MEMBER(goldstar_state,match133)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	for (i = 0;i < 0x10000;i++)
 	{
 		UINT8 x = ROM[i];
@@ -11460,7 +11460,7 @@ DRIVER_INIT_MEMBER(goldstar_state,match133)
 DRIVER_INIT_MEMBER(goldstar_state,cherrys)
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	unsigned char rawData[256] = {
 		0xCC, 0xCD, 0xCE, 0xCF, 0xC8, 0xC9, 0xCA, 0xCB, 0xC4, 0xC5, 0xC6, 0xC7,
@@ -11497,21 +11497,21 @@ DRIVER_INIT_MEMBER(goldstar_state,cherrys)
 /* todo: remove these patches! */
 DRIVER_INIT_MEMBER(goldstar_state,unkch1)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x9d52] = 0x00;
 	ROM[0x9d53] = 0x00;
 }
 
 DRIVER_INIT_MEMBER(goldstar_state,unkch3)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x9b86] = 0x00;
 	ROM[0x9b87] = 0x00;
 }
 
 DRIVER_INIT_MEMBER(goldstar_state,unkch4)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	ROM[0x9a6e] = 0x00;
 	ROM[0x9a6f] = 0x00;
 }

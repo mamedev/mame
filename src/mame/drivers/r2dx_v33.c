@@ -248,7 +248,7 @@ UINT32 r2dx_v33_state::screen_update_rdx_v33(screen_device &screen, bitmap_ind16
 		if(frame == 5)
 		{
 			int i,data;
-			static UINT8 *rom = space.machine().root_device().memregion("mainprg")->base();
+			static UINT8 *rom = memregion("mainprg")->base();
 
 			for(i=0;i<0x800;i+=2)
 			{
@@ -752,30 +752,30 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,rdx_v33)
 {
-	machine().root_device().membank("bank1")->configure_entries(0, 0x20, machine().root_device().memregion("mainprg")->base(), 0x20000);
+	membank("bank1")->configure_entries(0, 0x20, memregion("mainprg")->base(), 0x20000);
 
 	raiden2_decrypt_sprites(machine());
 
-	machine().root_device().membank("bank1")->set_entry(1);
+	membank("bank1")->set_entry(1);
 }
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,nzerotea)
 {
-	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("mainprg")->base(), 0x20000);
+	membank("bank1")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
 
 	zeroteam_decrypt_sprites(machine());
 
-	machine().root_device().membank("bank1")->set_entry(1);
+	membank("bank1")->set_entry(1);
 }
 
 DRIVER_INIT_MEMBER(r2dx_v33_state,zerotm2k)
 {
-	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("mainprg")->base(), 0x20000);
+	membank("bank1")->configure_entries(0, 2, memregion("mainprg")->base(), 0x20000);
 
 	// sprites are NOT encrypted
 	//zeroteam_decrypt_sprites(machine());
 
-	machine().root_device().membank("bank1")->set_entry(1);
+	membank("bank1")->set_entry(1);
 
 }
 

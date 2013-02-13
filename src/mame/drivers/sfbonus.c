@@ -1338,9 +1338,9 @@ GFXDECODE_END
 
 void sfbonus_state::machine_reset()
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	machine().root_device().membank("bank1")->set_base(&ROM[0]);
+	membank("bank1")->set_base(&ROM[0]);
 }
 
 
@@ -5888,9 +5888,9 @@ void sfbonus_state::sfbonus_bitswap(
 						UINT8 xor7, UINT8 b70, UINT8 b71, UINT8 b72, UINT8 b73, UINT8 b74, UINT8 b75, UINT8 b76,UINT8 b77 )
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	for(i = 0; i < machine().root_device().memregion("maincpu")->bytes(); i++)
+	for(i = 0; i < memregion("maincpu")->bytes(); i++)
 	{
 		UINT8 x = ROM[i];
 

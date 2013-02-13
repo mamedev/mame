@@ -712,7 +712,7 @@ void segas24_state::reset_control_w(UINT8 data)
 
 void segas24_state::reset_bank()
 {
-	if (machine().root_device().memregion("romboard")->base())
+	if (memregion("romboard")->base())
 	{
 		membank("bank1")->set_entry(curbank & 15);
 		membank("bank2")->set_entry(curbank & 15);

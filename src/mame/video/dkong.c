@@ -205,7 +205,7 @@ static const res_net_info radarscp_grid_net_info =
 
 PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t   *rgb;
 	int i;
 
@@ -235,7 +235,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 #ifdef UNUSED_FUNCTION
 PALETTE_INIT_MEMBER(dkong_state,dkong4b)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	int r,g,b;
 
@@ -273,7 +273,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong4b)
 
 PALETTE_INIT_MEMBER(dkong_state,radarscp)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	int r,g,b;
 
@@ -336,7 +336,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp)
 
 PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	int r,g,b;
 
@@ -435,7 +435,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 
 PALETTE_INIT_MEMBER(dkong_state,dkong3)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t   *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &dkong3_decode_info, &dkong3_net_info);

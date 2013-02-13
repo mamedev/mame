@@ -591,8 +591,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(segald_state,astron)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 2, &ROM[0x8000], 0x4000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &ROM[0x8000], 0x4000);
 }
 
 

@@ -227,7 +227,7 @@ UINT32 cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb32 
 
 UINT32 cinemat_state::screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int sw_option = machine().root_device().ioport("INPUTS")->read();
+	int sw_option = ioport("INPUTS")->read();
 
 	screen_update_cinemat(screen, bitmap, cliprect);
 

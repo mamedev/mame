@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(drmicro_state::get_bg2_tile_info)
 
 void drmicro_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

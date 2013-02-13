@@ -844,8 +844,8 @@ ROM_END
 DRIVER_INIT_MEMBER(igs009_state,jingbell)
 {
 	int i;
-	UINT8 *rom  = (UINT8 *)machine().root_device().memregion("maincpu")->base();
-	size_t size = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *rom  = (UINT8 *)memregion("maincpu")->base();
+	size_t size = memregion("maincpu")->bytes();
 
 	for (i=0; i<size; i++)
 	{

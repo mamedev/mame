@@ -343,9 +343,9 @@ static const ay8910_interface ay8910_config =
 
 void poker72_state::machine_reset()
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
-	machine().root_device().membank("bank1")->set_base(&ROM[0]);
+	membank("bank1")->set_base(&ROM[0]);
 }
 
 static MACHINE_CONFIG_START( poker72, poker72_state )
@@ -394,7 +394,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(poker72_state,poker72)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	rom[0x4a9] = 0x28;
 }

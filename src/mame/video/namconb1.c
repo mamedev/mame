@@ -163,7 +163,7 @@ NB1objcode2tile( running_machine &machine, int code )
 
 VIDEO_START_MEMBER(namconb1_state,namconb1)
 {
-	namco_tilemap_init(NAMCONB1_TILEGFX, machine().root_device().memregion(NAMCONB1_TILEMASKREGION)->base(), NB1TilemapCB );
+	namco_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), NB1TilemapCB );
 	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(NB1objcode2tile), &machine()));
 } /* namconb1 */
 
@@ -223,7 +223,7 @@ NB2objcode2tile( running_machine &machine, int code )
 
 VIDEO_START_MEMBER(namconb1_state,namconb2)
 {
-	namco_tilemap_init(NAMCONB1_TILEGFX, machine().root_device().memregion(NAMCONB1_TILEMASKREGION)->base(), NB2TilemapCB );
+	namco_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), NB2TilemapCB );
 	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(NB2objcode2tile), &machine()));
 	c169_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
 } /* namconb2_vh_start */

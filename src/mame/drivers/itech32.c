@@ -631,7 +631,7 @@ READ32_MEMBER(itech32_state::gtclass_prot_result_r)
 
 WRITE8_MEMBER(itech32_state::sound_bank_w)
 {
-	membank("bank1")->set_base(&machine().root_device().memregion("soundcpu")->base()[0x10000 + data * 0x4000]);
+	membank("bank1")->set_base(&memregion("soundcpu")->base()[0x10000 + data * 0x4000]);
 }
 
 

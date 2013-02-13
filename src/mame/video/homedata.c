@@ -312,7 +312,7 @@ finish:
 
 PALETTE_INIT_MEMBER(homedata_state,mrokumei)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* initialize 555 RGB palette */
@@ -335,7 +335,7 @@ PALETTE_INIT_MEMBER(homedata_state,mrokumei)
 
 PALETTE_INIT_MEMBER(homedata_state,reikaids)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* initialize 555 RGB palette */
@@ -358,7 +358,7 @@ PALETTE_INIT_MEMBER(homedata_state,reikaids)
 
 PALETTE_INIT_MEMBER(homedata_state,pteacher)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* initialize 555 RGB palette */
@@ -381,7 +381,7 @@ PALETTE_INIT_MEMBER(homedata_state,pteacher)
 
 PALETTE_INIT_MEMBER(homedata_state,mirderby)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -780,7 +780,7 @@ WRITE8_MEMBER(homedata_state::reikaids_blitter_start_w)
 
 WRITE8_MEMBER(homedata_state::pteacher_blitter_start_w)
 {
-	pteacher_handleblit(space, (m_blitter_bank >> 5) * 0x10000 & (machine().root_device().memregion("user1")->bytes() - 1));
+	pteacher_handleblit(space, (m_blitter_bank >> 5) * 0x10000 & (memregion("user1")->bytes() - 1));
 }
 
 

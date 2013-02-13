@@ -446,7 +446,7 @@ static const ay8910_interface survival_ay8910_interface =
 
 MACHINE_RESET_MEMBER(phoenix_state,phoenix)
 {
-	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x4000);
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000);
 }
 
 

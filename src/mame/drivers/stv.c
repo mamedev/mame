@@ -1062,7 +1062,7 @@ DEVICE_IMAGE_LOAD_MEMBER( saturn_state, stv_cart )
 	if (image.software_entry() == NULL)
 		return IMAGE_INIT_FAIL;
 
-	UINT8 *ROM = image.device().machine().root_device().memregion(this_cart->region)->base();
+	UINT8 *ROM = image.device().memregion(this_cart->region)->base();
 	UINT32 length = image.get_software_region_length("rom");
 
 	memcpy(ROM, image.get_software_region("rom"), length);
@@ -1565,7 +1565,7 @@ by Sega titles,and this is a Sunsoft game)It's likely to be a left-over...
 
 DRIVER_INIT_MEMBER(saturn_state,sanjeon)
 {
-	UINT8 *src    = machine().root_device().memregion       ( "game0" )->base();
+	UINT8 *src    = memregion       ( "game0" )->base();
 	int x;
 
 	for (x=0;x<0x3000000;x++)

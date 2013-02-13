@@ -1572,7 +1572,7 @@ WRITE64_MEMBER(model3_state::model3_sys_w)
 				data >>= 56;
 				data = (~data) & 0x7;
 
-				membank("bank1")->set_base(machine().root_device().memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+				membank("bank1")->set_base(memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
 			}
 			if (ACCESSING_BITS_24_31)
 			{
@@ -1832,8 +1832,8 @@ WRITE64_MEMBER(model3_state::daytona2_rombank_w)
 	{
 		data >>= 56;
 		data = (~data) & 0xf;
-		membank("bank1")->set_base(machine().root_device().memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
-		membank("bank2")->set_base(machine().root_device().memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+		membank("bank1")->set_base(memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
+		membank("bank2")->set_base(memregion( "user1" )->base() + 0x800000 + (data * 0x800000)); /* banked CROM */
 	}
 }
 
@@ -5257,7 +5257,7 @@ ROM_END
 WRITE16_MEMBER(model3_state::model3snd_ctrl)
 {
 	// handle sample banking
-	if (machine().root_device().memregion("scsp2")->bytes() > 0x800000)
+	if (memregion("scsp2")->bytes() > 0x800000)
 	{
 		UINT8 *snd = memregion("scsp2")->base();
 		if (data & 0x20)
@@ -5662,7 +5662,7 @@ DRIVER_INIT_MEMBER(model3_state,lemans24)
 
 DRIVER_INIT_MEMBER(model3_state,vf3)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_10);
 
@@ -5745,7 +5745,7 @@ DRIVER_INIT_MEMBER(model3_state,getbass)
 
 DRIVER_INIT_MEMBER(model3_state,vs2)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5755,7 +5755,7 @@ DRIVER_INIT_MEMBER(model3_state,vs2)
 
 DRIVER_INIT_MEMBER(model3_state,vs298)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5766,7 +5766,7 @@ DRIVER_INIT_MEMBER(model3_state,vs298)
 
 DRIVER_INIT_MEMBER(model3_state,vs2v991)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5776,7 +5776,7 @@ DRIVER_INIT_MEMBER(model3_state,vs2v991)
 
 DRIVER_INIT_MEMBER(model3_state,vs299b)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5786,7 +5786,7 @@ DRIVER_INIT_MEMBER(model3_state,vs299b)
 
 DRIVER_INIT_MEMBER(model3_state,vs299a)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5796,7 +5796,7 @@ DRIVER_INIT_MEMBER(model3_state,vs299a)
 
 DRIVER_INIT_MEMBER(model3_state,vs299)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 
 	DRIVER_INIT_CALL(model3_20);
 
@@ -5837,7 +5837,7 @@ DRIVER_INIT_MEMBER(model3_state,harleya)
 
 DRIVER_INIT_MEMBER(model3_state,srally2)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x7c0c4^4)/4] = 0x60000000;
@@ -5847,7 +5847,7 @@ DRIVER_INIT_MEMBER(model3_state,srally2)
 
 DRIVER_INIT_MEMBER(model3_state,swtrilgy)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0xf0e48^4)/4] = 0x60000000;
@@ -5858,7 +5858,7 @@ DRIVER_INIT_MEMBER(model3_state,swtrilgy)
 
 DRIVER_INIT_MEMBER(model3_state,swtrilga)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0xf6dd0^4)/4] = 0x60000000;
@@ -5866,7 +5866,7 @@ DRIVER_INIT_MEMBER(model3_state,swtrilga)
 
 DRIVER_INIT_MEMBER(model3_state,von2)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x189168^4)/4] = 0x60000000;
@@ -5878,7 +5878,7 @@ DRIVER_INIT_MEMBER(model3_state,von2)
 
 DRIVER_INIT_MEMBER(model3_state,dirtdvls)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x0600a0^4)/4] = 0x60000000;
@@ -5920,7 +5920,7 @@ DRIVER_INIT_MEMBER(model3_state,dayto2pe)
 
 DRIVER_INIT_MEMBER(model3_state,spikeout)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
@@ -5929,7 +5929,7 @@ DRIVER_INIT_MEMBER(model3_state,spikeout)
 
 DRIVER_INIT_MEMBER(model3_state,spikeofe)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x6059cc^4)/4] = 0x60000000;
@@ -5938,7 +5938,7 @@ DRIVER_INIT_MEMBER(model3_state,spikeofe)
 
 DRIVER_INIT_MEMBER(model3_state,eca)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x535580^4)/4] = 0x60000000;
@@ -5948,7 +5948,7 @@ DRIVER_INIT_MEMBER(model3_state,eca)
 
 DRIVER_INIT_MEMBER(model3_state,skichamp)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x5263c8^4)/4] = 0x60000000;
@@ -5959,7 +5959,7 @@ DRIVER_INIT_MEMBER(model3_state,skichamp)
 
 DRIVER_INIT_MEMBER(model3_state,oceanhun)
 {
-	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)memregion("user1")->base();
 	DRIVER_INIT_CALL(model3_20);
 
 	rom[(0x57995c^4)/4] = 0x60000000;   // decrementer

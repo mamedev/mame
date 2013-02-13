@@ -11,7 +11,7 @@
 
 PALETTE_INIT_MEMBER(gsword_state,josvolly)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -45,7 +45,7 @@ PALETTE_INIT_MEMBER(gsword_state,josvolly)
 
 PALETTE_INIT_MEMBER(gsword_state,gsword)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

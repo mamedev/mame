@@ -111,7 +111,7 @@ enum
 
 PALETTE_INIT_MEMBER(tx1_state,tx1)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	static const res_net_info tx1_net_info =
@@ -1243,7 +1243,7 @@ UINT32 tx1_state::screen_update_tx1_right(screen_device &screen, bitmap_ind16 &b
 
 PALETTE_INIT_MEMBER(tx1_state,buggyboy)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)

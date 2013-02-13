@@ -1611,7 +1611,7 @@ static void hng64_reorder(running_machine &machine, UINT8* gfxregion, size_t gfx
 
 DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)
 {
-	hng64_reorder(machine(), machine().root_device().memregion("scrtile")->base(), machine().root_device().memregion("scrtile")->bytes());
+	hng64_reorder(machine(), memregion("scrtile")->base(), memregion("scrtile")->bytes());
 }
 
 #define HACK_REGION

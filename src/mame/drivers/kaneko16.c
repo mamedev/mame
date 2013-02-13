@@ -635,14 +635,14 @@ ADDRESS_MAP_END
 void kaneko16_state::kaneko16_common_oki_bank_w(  const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize )
 {
 	UINT32 bankaddr;
-	UINT8* samples = machine().root_device().memregion(tag)->base();
-	size_t length = machine().root_device().memregion(tag)->bytes();
+	UINT8* samples = memregion(tag)->base();
+	size_t length = memregion(tag)->bytes();
 
 	bankaddr = fixedsize + (bankedsize * bank);
 
 	if (bankaddr <= (length-bankedsize))
 	{
-		machine().root_device().membank(bankname)->set_base(samples + bankaddr);
+		membank(bankname)->set_base(samples + bankaddr);
 	}
 }
 
@@ -2157,8 +2157,8 @@ MACHINE_CONFIG_END
 */
 void kaneko16_state::kaneko16_unscramble_tiles(const char *region)
 {
-	UINT8 *RAM  =   machine().root_device().memregion(region)->base();
-	int size            =   machine().root_device().memregion(region)->bytes();
+	UINT8 *RAM  =   memregion(region)->base();
+	int size            =   memregion(region)->bytes();
 	int i;
 
 	if (RAM == NULL)    return;
@@ -2183,11 +2183,11 @@ void kaneko16_state::kaneko16_expand_sample_banks(const char *region)
 	int bank;
 	UINT8 *src0;
 
-	if (machine().root_device().memregion(region)->bytes() < 0x40000 * 16)
+	if (memregion(region)->bytes() < 0x40000 * 16)
 		fatalerror("gtmr SOUND1 region too small\n");
 
 	/* bank 0 maps to itself, so we just leave it alone */
-	src0 = machine().root_device().memregion(region)->base();
+	src0 = memregion(region)->base();
 	for (bank = 15; bank > 0; bank--)
 	{
 		UINT8 *srcn = src0 + 0x10000 * (bank < 3 ? 3 : bank);

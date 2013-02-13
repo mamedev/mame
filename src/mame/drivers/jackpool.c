@@ -298,7 +298,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(jackpool_state,jackpool)
 {
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
 	/* patch NVRAM routine */
 	rom[0x9040/2] = 0x6602;

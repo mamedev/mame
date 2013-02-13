@@ -289,10 +289,10 @@ void glass_state::glass_ROM16_split_gfx( const char *src_reg, const char *dst_re
 	int i;
 
 	/* get a pointer to the source data */
-	UINT8 *src = (UINT8 *)machine().root_device().memregion(src_reg)->base();
+	UINT8 *src = (UINT8 *)memregion(src_reg)->base();
 
 	/* get a pointer to the destination data */
-	UINT8 *dst = (UINT8 *)machine().root_device().memregion(dst_reg)->base();
+	UINT8 *dst = (UINT8 *)memregion(dst_reg)->base();
 
 	/* fill destination areas with the proper data */
 	for (i = 0; i < length / 2; i++)

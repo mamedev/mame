@@ -59,7 +59,7 @@ tilt the mirror up and down, and the monitor left and right.
 
 PALETTE_INIT_MEMBER(stactics_state,stactics)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x400; i++)
@@ -299,7 +299,7 @@ void stactics_state::set_indicator_leds(int data, const char *output_name, int b
 void stactics_state::update_artwork()
 {
 	int i;
-	UINT8 *beam_region = machine().root_device().memregion("user1")->base();
+	UINT8 *beam_region = memregion("user1")->base();
 
 	/* set the lamps first */
 	output_set_indexed_value("base_lamp", 4, m_lamps[0] & 0x01);

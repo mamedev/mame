@@ -886,9 +886,9 @@ static const struct pit8253_config calchase_pit8254_config =
 
 void calchase_state::machine_reset()
 {
-	//machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base() + 0x10000);
-	machine().root_device().membank("bios_bank")->set_base(machine().root_device().memregion("bios")->base() + 0x10000);
-	machine().root_device().membank("bios_ext")->set_base(machine().root_device().memregion("bios")->base() + 0);
+	//membank("bank1")->set_base(memregion("bios")->base() + 0x10000);
+	membank("bios_bank")->set_base(memregion("bios")->base() + 0x10000);
+	membank("bios_ext")->set_base(memregion("bios")->base() + 0);
 }
 
 static void set_gate_a20(running_machine &machine, int a20)

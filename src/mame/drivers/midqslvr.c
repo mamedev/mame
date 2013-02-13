@@ -669,13 +669,13 @@ void midqslvr_state::machine_start()
 
 void midqslvr_state::machine_reset()
 {
-	machine().root_device().membank("bios_bank")->set_base(machine().root_device().memregion("bios")->base() + 0x70000);
-	machine().root_device().membank("bios_ext1")->set_base(machine().root_device().memregion("bios")->base() + 0x60000);
-	machine().root_device().membank("bios_ext2")->set_base(machine().root_device().memregion("bios")->base() + 0x64000);
-	machine().root_device().membank("bios_ext3")->set_base(machine().root_device().memregion("bios")->base() + 0x68000);
-	machine().root_device().membank("bios_ext4")->set_base(machine().root_device().memregion("bios")->base() + 0x6c000);
-	machine().root_device().membank("video_bank1")->set_base(machine().root_device().memregion("video_bios")->base() + 0);
-	machine().root_device().membank("video_bank2")->set_base(machine().root_device().memregion("video_bios")->base() + 0x4000);
+	membank("bios_bank")->set_base(memregion("bios")->base() + 0x70000);
+	membank("bios_ext1")->set_base(memregion("bios")->base() + 0x60000);
+	membank("bios_ext2")->set_base(memregion("bios")->base() + 0x64000);
+	membank("bios_ext3")->set_base(memregion("bios")->base() + 0x68000);
+	membank("bios_ext4")->set_base(memregion("bios")->base() + 0x6c000);
+	membank("video_bank1")->set_base(memregion("video_bios")->base() + 0);
+	membank("video_bank2")->set_base(memregion("video_bios")->base() + 0x4000);
 }
 
 static MACHINE_CONFIG_START( midqslvr, midqslvr_state )

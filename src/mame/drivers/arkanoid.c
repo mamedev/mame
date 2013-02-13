@@ -1668,7 +1668,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,tetrsark)
 
 DRIVER_INIT_MEMBER(arkanoid_state,hexa)
 {
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 #if 0
 
 
@@ -1682,12 +1682,12 @@ DRIVER_INIT_MEMBER(arkanoid_state,hexa)
 	RAM[0x0126] = 0x00;
 #endif
 
-	machine().root_device().membank("bank1")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
 }
 
 DRIVER_INIT_MEMBER(arkanoid_state,brixian)
 {
-	UINT8 *RAM = machine().root_device().memregion("protdata")->base();
+	UINT8 *RAM = memregion("protdata")->base();
 
 	for (int i=0x000;i<0x200;i++)
 		m_protram[i+0x600] = RAM[i];

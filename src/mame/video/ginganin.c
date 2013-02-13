@@ -76,7 +76,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 {
-	UINT8 *gfx = machine().root_device().memregion("gfx5")->base();
+	UINT8 *gfx = memregion("gfx5")->base();
 	int code = gfx[2 * tile_index + 0] * 256 + gfx[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(
 			BG_GFX,

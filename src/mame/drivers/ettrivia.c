@@ -219,7 +219,7 @@ TILE_GET_INFO_MEMBER(ettrivia_state::get_tile_info_fg)
 
 void ettrivia_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	static const int resistances[2] = { 270, 130 };
 	double weights[2];
 	int i;
@@ -292,7 +292,7 @@ static const ay8910_interface ay8912_interface_3 =
 
 INTERRUPT_GEN_MEMBER(ettrivia_state::ettrivia_interrupt)
 {
-	if( machine().root_device().ioport("COIN")->read() & 0x01 )
+	if( ioport("COIN")->read() & 0x01 )
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
 		device.execute().set_input_line(0, HOLD_LINE);

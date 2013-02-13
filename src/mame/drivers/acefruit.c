@@ -604,7 +604,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(acefruit_state,sidewndr)
 {
-	UINT8 *ROM = machine().root_device().memregion( "maincpu" )->base();
+	UINT8 *ROM = memregion( "maincpu" )->base();
 	/* replace "ret nc" ( 0xd0 ) with "di" */
 	ROM[ 0 ] = 0xf3;
 	/* this is either a bad dump or the cpu core should set the carry flag on reset */

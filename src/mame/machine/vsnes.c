@@ -427,7 +427,7 @@ DRIVER_INIT_MEMBER(vsnes_state,vskonami)
 {
 	/* We do manual banking, in case the code falls through */
 	/* Copy the initial banks */
-	UINT8 *prg = machine().root_device().memregion("maincpu")->base();
+	UINT8 *prg = memregion("maincpu")->base();
 	memcpy(&prg[0x08000], &prg[0x18000], 0x8000);
 
 	/* banking is done with writes to the $8000-$ffff area */
@@ -944,7 +944,7 @@ DRIVER_INIT_MEMBER(vsnes_state,platoon)
 	/* when starting a mapper 68 game  the first 16K ROM bank in the cart is loaded into $8000
 	the LAST 16K ROM bank is loaded into $C000. The last 16K of ROM cannot be swapped. */
 
-	UINT8 *prg = machine().root_device().memregion("maincpu")->base();
+	UINT8 *prg = memregion("maincpu")->base();
 	memcpy(&prg[0x08000], &prg[0x10000], 0x4000);
 	memcpy(&prg[0x0c000], &prg[0x2c000], 0x4000);
 
@@ -1001,7 +1001,7 @@ WRITE8_MEMBER(vsnes_state::vsdual_vrom_banking)
 
 DRIVER_INIT_MEMBER(vsnes_state,vsdual)
 {
-	UINT8 *prg = machine().root_device().memregion("maincpu")->base();
+	UINT8 *prg = memregion("maincpu")->base();
 
 	/* vrom switching is enabled with bit 2 of $4016 */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x4016, 0x4016, write8_delegate(FUNC(vsnes_state::vsdual_vrom_banking),this));

@@ -900,7 +900,7 @@ DRIVER_INIT_MEMBER(maygay1b_state,m1)
 	//AM_RANGE(0x2420, 0x2421) AM_WRITE(latch_ch2_w ) // oki
 	// if there is no OKI region disable writes here, the rom might be missing, so alert user
 
-	UINT8 *okirom = machine().root_device().memregion( "msm6376" )->base();
+	UINT8 *okirom = memregion( "msm6376" )->base();
 
 	if (!okirom) {
 		machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x2420, 0x2421, write8_delegate(FUNC(maygay1b_state::m1ab_no_oki_w), this));
@@ -908,7 +908,7 @@ DRIVER_INIT_MEMBER(maygay1b_state,m1)
 	// print out the rom id / header info to give us some hints
 	// note this isn't always correct, alley cat has 'Calpsyo' still in the ident string?
 	{
-		UINT8 *cpu = machine().root_device().memregion( "maincpu" )->base();
+		UINT8 *cpu = memregion( "maincpu" )->base();
 		int base = 0xff20;
 		for (int i=0;i<14;i++)
 		{

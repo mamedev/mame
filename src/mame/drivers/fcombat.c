@@ -329,8 +329,8 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = machine().root_device().memregion("gfx1")->base();
-	length = machine().root_device().memregion("gfx1")->bytes();
+	dst = memregion("gfx1")->base();
+	length = memregion("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -347,8 +347,8 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 
 	/* make a temporary copy of the sprite data */
 	src = temp;
-	dst = machine().root_device().memregion("gfx2")->base();
-	length = machine().root_device().memregion("gfx2")->bytes();
+	dst = memregion("gfx2")->base();
+	length = memregion("gfx2")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the sprites */
@@ -368,8 +368,8 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = machine().root_device().memregion("gfx3")->base();
-	length = machine().root_device().memregion("gfx3")->bytes();
+	dst = memregion("gfx3")->base();
+	length = memregion("gfx3")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -387,8 +387,8 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 	}
 
 	src = temp;
-	dst = machine().root_device().memregion("user1")->base();
-	length = machine().root_device().memregion("user1")->bytes();
+	dst = memregion("user1")->base();
+	length = memregion("user1")->bytes();
 	memcpy(src, dst, length);
 
 	for (oldaddr = 0; oldaddr < 32; oldaddr++)
@@ -399,8 +399,8 @@ DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 
 
 	src = temp;
-	dst = machine().root_device().memregion("user2")->base();
-	length = machine().root_device().memregion("user2")->bytes();
+	dst = memregion("user2")->base();
+	length = memregion("user2")->bytes();
 	memcpy(src, dst, length);
 
 	for (oldaddr = 0; oldaddr < 32; oldaddr++)

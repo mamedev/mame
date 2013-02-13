@@ -692,8 +692,8 @@ ROM_END
 void deco_mlc_state::descramble_sound(  )
 {
 	/* the same as simpl156 / heavy smash? */
-	UINT8 *rom = machine().root_device().memregion("ymz")->base();
-	int length = machine().root_device().memregion("ymz")->bytes();
+	UINT8 *rom = memregion("ymz")->base();
+	int length = memregion("ymz")->bytes();
 	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
 
 	UINT32 x;

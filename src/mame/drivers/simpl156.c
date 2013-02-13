@@ -1020,8 +1020,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 {
-	UINT8 *rom = machine().root_device().memregion("okimusic")->base();
-	int length = machine().root_device().memregion("okimusic")->bytes();
+	UINT8 *rom = memregion("okimusic")->base();
+	int length = memregion("okimusic")->bytes();
 	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
 
 	UINT32 x;

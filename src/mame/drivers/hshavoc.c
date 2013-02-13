@@ -118,7 +118,7 @@ ROM_END
 DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 {
 	int x;
-	UINT16 *src = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *src = (UINT16 *)memregion("maincpu")->base();
 
 	static const UINT16 typedat[16] = {
 		1,1,1,1, 1,1,1,1,

@@ -319,8 +319,8 @@ UINT32 jchan_state::screen_update_jchan(screen_device &screen, bitmap_ind16 &bit
 	m_sprite_bitmap_1->fill(0x0000, cliprect);
 	m_sprite_bitmap_2->fill(0x0000, cliprect);
 
-	m_spritegen1->skns_draw_sprites(machine(), *m_sprite_bitmap_1, cliprect, m_sprite_ram32_1, 0x4000, machine().root_device().memregion("gfx1")->base(), machine().root_device().memregion ("gfx1")->bytes(), m_sprite_regs32_1 );
-	m_spritegen2->skns_draw_sprites(machine(), *m_sprite_bitmap_2, cliprect, m_sprite_ram32_2, 0x4000, machine().root_device().memregion("gfx2")->base(), memregion ("gfx2")->bytes(), m_sprite_regs32_2 );
+	m_spritegen1->skns_draw_sprites(machine(), *m_sprite_bitmap_1, cliprect, m_sprite_ram32_1, 0x4000, memregion("gfx1")->base(), memregion ("gfx1")->bytes(), m_sprite_regs32_1 );
+	m_spritegen2->skns_draw_sprites(machine(), *m_sprite_bitmap_2, cliprect, m_sprite_ram32_2, 0x4000, memregion("gfx2")->base(), memregion ("gfx2")->bytes(), m_sprite_regs32_2 );
 
 	// ignoring priority bits for now - might use alpha too, check 0x8000 of palette writes
 	for (y=0;y<240;y++)

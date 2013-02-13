@@ -85,16 +85,16 @@ void pengadvb_state::mem_map_banks()
 			// BIOS
 			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x5fff, "bank21" );
 			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x6000, 0x7fff, "bank22" );
-			membank("bank21")->set_base(machine().root_device().memregion("maincpu")->base() + 0x4000);
-			membank("bank22")->set_base(machine().root_device().memregion("maincpu")->base() + 0x4000 + 0x2000);
+			membank("bank21")->set_base(memregion("maincpu")->base() + 0x4000);
+			membank("bank22")->set_base(memregion("maincpu")->base() + 0x4000 + 0x2000);
 			break;
 
 		case 1:
 			// game
 			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x5fff, "bank21" );
 			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x6000, 0x7fff, "bank22" );
-			membank("bank21")->set_base(machine().root_device().memregion("game")->base() + m_mem_banks[0]*0x2000);
-			membank("bank22")->set_base(machine().root_device().memregion("game")->base() + m_mem_banks[1]*0x2000);
+			membank("bank21")->set_base(memregion("game")->base() + m_mem_banks[0]*0x2000);
+			membank("bank22")->set_base(memregion("game")->base() + m_mem_banks[1]*0x2000);
 			break;
 
 		default:
@@ -109,8 +109,8 @@ void pengadvb_state::mem_map_banks()
 			// game
 			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x8000, 0x9fff, "bank31" );
 			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xa000, 0xbfff, "bank32" );
-			membank("bank31")->set_base(machine().root_device().memregion("game")->base() + m_mem_banks[2]*0x2000);
-			membank("bank32")->set_base(machine().root_device().memregion("game")->base() + m_mem_banks[3]*0x2000);
+			membank("bank31")->set_base(memregion("game")->base() + m_mem_banks[2]*0x2000);
+			membank("bank32")->set_base(memregion("game")->base() + m_mem_banks[3]*0x2000);
 			break;
 
 		default:
@@ -188,7 +188,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER(pengadvb_state::pengadvb_psg_port_a_r)
 {
-	return machine().root_device().ioport("IN0")->read();
+	return ioport("IN0")->read();
 }
 
 static const ay8910_interface pengadvb_ay8910_interface =
@@ -219,7 +219,7 @@ READ8_MEMBER(pengadvb_state::pengadvb_ppi_port_b_r)
 {
 	i8255_device *ppi = machine().device<i8255_device>("ppi8255");
 	if ((ppi->read(space, 2) & 0x0f) == 0)
-		return machine().root_device().ioport("IN1")->read();
+		return ioport("IN1")->read();
 
 	return 0xff;
 }
@@ -290,8 +290,8 @@ MACHINE_CONFIG_END
 
 void pengadvb_state::pengadvb_decrypt(const char* region)
 {
-	UINT8 *mem = machine().root_device().memregion(region)->base();
-	int memsize = machine().root_device().memregion(region)->bytes();
+	UINT8 *mem = memregion(region)->base();
+	int memsize = memregion(region)->bytes();
 	UINT8 *buf;
 	int i;
 

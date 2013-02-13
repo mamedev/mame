@@ -77,8 +77,8 @@ INTERRUPT_GEN_MEMBER(xxmissio_state::xxmissio_interrupt_s)
 
 void xxmissio_state::machine_start()
 {
-	machine().root_device().membank("bank1")->configure_entries(0, 8, machine().root_device().memregion("user1")->base(), 0x4000);
-	machine().root_device().membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 8, memregion("user1")->base(), 0x4000);
+	membank("bank1")->set_entry(0);
 }
 
 /****************************************************************************/

@@ -50,9 +50,9 @@ Memo:
 
 void niyanpai_state::niyanpai_soundbank_w(int data)
 {
-	UINT8 *SNDROM = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *SNDROM = memregion("audiocpu")->base();
 
-	machine().root_device().membank("bank1")->set_base(&SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
+	membank("bank1")->set_base(&SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
 READ8_MEMBER(niyanpai_state::niyanpai_sound_r)

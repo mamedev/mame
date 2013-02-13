@@ -627,7 +627,7 @@ int atarisy1_state::get_bank(UINT8 prom1, UINT8 prom2, int bpp)
 		return m_bank_gfx[bpp - 4][bank_index];
 
 	/* if the bank is out of range, call it 0 */
-	memory_region *tiles = machine().root_device().memregion("tiles");
+	memory_region *tiles = memregion("tiles");
 	if (0x80000 * (bank_index - 1) >= tiles->bytes())
 		return 0;
 

@@ -20,7 +20,7 @@
 
 void gridlee_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -155,7 +155,7 @@ UINT32 gridlee_state::screen_update_gridlee(screen_device &screen, bitmap_ind16 
 	}
 
 	/* draw the sprite images */
-	gfx = machine().root_device().memregion("gfx1")->base();
+	gfx = memregion("gfx1")->base();
 	for (i = 0; i < 32; i++)
 	{
 		UINT8 *sprite = m_spriteram + i * 4;

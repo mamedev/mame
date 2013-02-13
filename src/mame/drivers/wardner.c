@@ -596,7 +596,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(wardner_state,wardner)
 {
-	m_ROM = machine().root_device().memregion("maincpu")->base();
+	m_ROM = memregion("maincpu")->base();
 	twincobr_driver_savestate();   /* Save-State stuff in src/machine/twincobr.c */
 }
 

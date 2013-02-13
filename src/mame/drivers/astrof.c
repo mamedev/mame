@@ -231,8 +231,8 @@ void astrof_state::astrof_get_pens( pen_t *pens )
 void astrof_state::tomahawk_get_pens( pen_t *pens )
 {
 	offs_t i;
-	UINT8 *prom = machine().root_device().memregion("proms")->base();
-	UINT8 config = machine().root_device().ioport("FAKE")->read_safe(0x00);
+	UINT8 *prom = memregion("proms")->base();
+	UINT8 config = ioport("FAKE")->read_safe(0x00);
 
 	for (i = 0; i < TOMAHAWK_NUM_PENS; i++)
 	{
@@ -1258,8 +1258,8 @@ ROM_END
 DRIVER_INIT_MEMBER(astrof_state,abattle)
 {
 	/* use the protection PROM to decrypt the ROMs */
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
-	UINT8 *prom = machine().root_device().memregion("user1")->base();
+	UINT8 *rom = memregion("maincpu")->base();
+	UINT8 *prom = memregion("user1")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1273,7 +1273,7 @@ DRIVER_INIT_MEMBER(astrof_state,abattle)
 
 DRIVER_INIT_MEMBER(astrof_state,afire)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)
@@ -1287,7 +1287,7 @@ DRIVER_INIT_MEMBER(astrof_state,afire)
 
 DRIVER_INIT_MEMBER(astrof_state,sstarbtl)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int i;
 
 	for(i = 0xd000; i < 0x10000; i++)

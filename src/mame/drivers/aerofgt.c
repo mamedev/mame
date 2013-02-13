@@ -1300,9 +1300,9 @@ MACHINE_START_MEMBER(aerofgt_state,common)
 
 MACHINE_START_MEMBER(aerofgt_state,aerofgt)
 {
-	UINT8 *rom = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *rom = memregion("audiocpu")->base();
 
-	machine().root_device().membank("bank1")->configure_entries(0, 4, &rom[0x10000], 0x8000);
+	membank("bank1")->configure_entries(0, 4, &rom[0x10000], 0x8000);
 
 	MACHINE_START_CALL_MEMBER(common);
 }
@@ -1316,7 +1316,7 @@ MACHINE_RESET_MEMBER(aerofgt_state,aerofgt)
 {
 	MACHINE_RESET_CALL_MEMBER(common);
 
-	machine().root_device().membank("bank1")->set_entry(0); /* needed by spinlbrk */
+	membank("bank1")->set_entry(0); /* needed by spinlbrk */
 }
 
 static MACHINE_CONFIG_START( pspikes, aerofgt_state )

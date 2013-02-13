@@ -377,7 +377,7 @@ UINT32 goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_ind1
 
 	if (m_cm_enable_reg &0x04)
 	{
-		if (machine().root_device().memregion("user1")->base())
+		if (memregion("user1")->base())
 		{
 			gfx_element *gfx = machine().gfx[2];
 			int girlyscroll = (INT8)((m_cm_girl_scroll & 0xf0));
@@ -419,7 +419,7 @@ UINT32 goldstar_state::screen_update_bingowng(screen_device &screen, bitmap_ind1
 
 	if (m_cm_enable_reg &0x04)
 	{
-		if (machine().root_device().memregion("user1")->base())
+		if (memregion("user1")->base())
 		{
 			gfx_element *gfx = machine().gfx[2];
 			int girlyscroll = (INT8)((m_cm_girl_scroll & 0xf0));

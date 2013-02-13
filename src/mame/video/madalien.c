@@ -16,7 +16,7 @@
 
 PALETTE_INIT_MEMBER(madalien_state,madalien)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -248,7 +248,7 @@ WRITE8_MEMBER(madalien_state::madalien_charram_w)
 
 UINT32 madalien_state::screen_update_madalien(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int flip = BIT(machine().root_device().ioport("DSW")->read(), 6) && BIT(*m_video_control, 0);
+	int flip = BIT(ioport("DSW")->read(), 6) && BIT(*m_video_control, 0);
 
 	// bits #0 and #1 define scrolling mode
 	//

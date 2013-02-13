@@ -67,7 +67,7 @@ UINT32 calomega_state::screen_update_calomega(screen_device &screen, bitmap_ind1
 
 void calomega_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   red component.

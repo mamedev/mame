@@ -3244,9 +3244,9 @@ DRIVER_INIT_MEMBER(deco32_state,captaven)
 extern void process_dvi_data(UINT8* dvi_data, int offset, int regionsize);
 DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 {
-	UINT32 *ROM = (UINT32 *)machine().root_device().memregion("maincpu")->base();
-	const UINT8 *SRC_RAM = machine().root_device().memregion("gfx1")->base();
-	UINT8 *DST_RAM = machine().root_device().memregion("gfx2")->base();
+	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	const UINT8 *SRC_RAM = memregion("gfx1")->base();
+	UINT8 *DST_RAM = memregion("gfx2")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -3259,7 +3259,7 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 
 #if 0
 	{
-		UINT8 *ROM = machine().root_device().memregion("dvi")->base();
+		UINT8 *ROM = memregion("dvi")->base();
 
 		FILE *fp;
 		char filename[256];
@@ -3274,11 +3274,11 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 #endif
 
 	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
-	process_dvi_data(machine().root_device().memregion("dvi")->base(),0x000000, 0x1000000);
-	process_dvi_data(machine().root_device().memregion("dvi")->base(),0x580000, 0x1000000);
-	process_dvi_data(machine().root_device().memregion("dvi")->base(),0x800000, 0x1000000);
-	process_dvi_data(machine().root_device().memregion("dvi")->base(),0xB10000, 0x1000000);
-	process_dvi_data(machine().root_device().memregion("dvi")->base(),0xB80000, 0x1000000);
+	process_dvi_data(memregion("dvi")->base(),0x000000, 0x1000000);
+	process_dvi_data(memregion("dvi")->base(),0x580000, 0x1000000);
+	process_dvi_data(memregion("dvi")->base(),0x800000, 0x1000000);
+	process_dvi_data(memregion("dvi")->base(),0xB10000, 0x1000000);
+	process_dvi_data(memregion("dvi")->base(),0xB80000, 0x1000000);
 
 }
 
@@ -3292,8 +3292,8 @@ DRIVER_INIT_MEMBER(deco32_state,fghthist)
 
 DRIVER_INIT_MEMBER(dragngun_state,lockload)
 {
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
-//  UINT32 *ROM = (UINT32 *)machine().root_device().memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
+//  UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -3309,7 +3309,7 @@ DRIVER_INIT_MEMBER(dragngun_state,lockload)
 
 DRIVER_INIT_MEMBER(deco32_state,tattass)
 {
-	UINT8 *RAM = machine().root_device().memregion("gfx1")->base();
+	UINT8 *RAM = memregion("gfx1")->base();
 	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
@@ -3317,7 +3317,7 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	RAM = machine().root_device().memregion("gfx2")->base();
+	RAM = memregion("gfx2")->base();
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
@@ -3330,7 +3330,7 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 
 DRIVER_INIT_MEMBER(deco32_state,nslasher)
 {
-	UINT8 *RAM = machine().root_device().memregion("gfx1")->base();
+	UINT8 *RAM = memregion("gfx1")->base();
 	UINT8 *tmp = auto_alloc_array(machine(), UINT8, 0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
@@ -3338,7 +3338,7 @@ DRIVER_INIT_MEMBER(deco32_state,nslasher)
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);
 
-	RAM = machine().root_device().memregion("gfx2")->base();
+	RAM = memregion("gfx2")->base();
 	memcpy(tmp,RAM+0x80000,0x80000);
 	memcpy(RAM+0x80000,RAM+0x100000,0x80000);
 	memcpy(RAM+0x100000,tmp,0x80000);

@@ -23,7 +23,7 @@
 
 PALETTE_INIT_MEMBER(gberet_state,gberet)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

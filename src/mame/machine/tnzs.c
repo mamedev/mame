@@ -673,7 +673,7 @@ void tnzs_state::tnzs_postload()
 MACHINE_START_MEMBER(tnzs_state,jpopnics)
 {
 	UINT8 *SUB = memregion("sub")->base();
-	m_ROM = machine().root_device().memregion("maincpu")->base();
+	m_ROM = memregion("maincpu")->base();
 	m_bankedram = auto_alloc_array(machine(), UINT8, 0x8000); // 2 banks of 0x4000
 
 	membank("subbank")->configure_entries(0, 4, &SUB[0x08000], 0x2000);

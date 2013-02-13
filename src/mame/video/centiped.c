@@ -278,7 +278,7 @@ WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
 
 PALETTE_INIT_MEMBER(centiped_state,warlords)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -403,7 +403,7 @@ WRITE8_MEMBER(centiped_state::mazeinv_paletteram_w)
 	m_generic_paletteram_8[offset] = data;
 
 	/* the value passed in is a look-up index into the color PROM */
-	milliped_set_color(offset, ~machine().root_device().memregion("proms")->base()[~data & 0x0f]);
+	milliped_set_color(offset, ~memregion("proms")->base()[~data & 0x0f]);
 }
 
 
@@ -448,7 +448,7 @@ UINT32 centiped_state::screen_update_centiped(screen_device &screen, bitmap_ind1
 UINT32 centiped_state::screen_update_warlords(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT8 *spriteram = m_spriteram;
-	int upright_mode = machine().root_device().ioport("IN0")->read() & 0x80;
+	int upright_mode = ioport("IN0")->read() & 0x80;
 	int offs;
 
 	/* if the cocktail/upright switch flipped, force refresh */

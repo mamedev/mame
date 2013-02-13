@@ -263,8 +263,8 @@ WRITE16_MEMBER(metro_state::metro_window_w)
 
 void metro_state::expand_gfx1()
 {
-	UINT8 *base_gfx =   machine().root_device().memregion("gfx1")->base();
-	UINT32 length   =   machine().root_device().memregion("gfx1")->bytes() * 2;
+	UINT8 *base_gfx =   memregion("gfx1")->base();
+	UINT32 length   =   memregion("gfx1")->bytes() * 2;
 
 	m_expanded_gfx1 = auto_alloc_array(machine(), UINT8, length);
 

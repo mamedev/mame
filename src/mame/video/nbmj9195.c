@@ -242,7 +242,7 @@ void nbmj9195_state::nbmj9195_gfxdraw(int vram)
 		skipy = -1;
 	}
 
-	gfxlen = machine().root_device().memregion("gfx1")->bytes();
+	gfxlen = memregion("gfx1")->bytes();
 	gfxaddr = ((m_blitter_src_addr[vram] + 2) & 0x00ffffff);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)

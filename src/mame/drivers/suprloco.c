@@ -281,9 +281,9 @@ DRIVER_INIT_MEMBER(suprloco_state,suprloco)
 	int i, j, k, color_source, color_dest;
 	UINT8 *source, *dest, *lookup;
 
-	source = machine().root_device().memregion("gfx1")->base();
+	source = memregion("gfx1")->base();
 	dest   = source + 0x6000;
-	lookup = machine().root_device().memregion("proms")->base() + 0x0200;
+	lookup = memregion("proms")->base() + 0x0200;
 
 	for (i = 0; i < 0x80; i++, lookup += 8)
 	{

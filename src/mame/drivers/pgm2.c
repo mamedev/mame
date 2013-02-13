@@ -390,7 +390,7 @@ static void iga_u12_decode(UINT16* rom, int len, int ixor)
 
 DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 {
-	UINT16 *src = (UINT16 *)machine().root_device().memregion("spritesa")->base();
+	UINT16 *src = (UINT16 *)memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x2000000, 0x4761);
 	iga_u16_decode(src, 0x2000000, 0xc79f);
@@ -398,7 +398,7 @@ DRIVER_INIT_MEMBER(pgm2_state,orleg2)
 
 DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 {
-	UINT16 *src = (UINT16 *)machine().root_device().memregion("spritesa")->base();
+	UINT16 *src = (UINT16 *)memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x2000000, 0xa193);
 	iga_u16_decode(src, 0x2000000, 0xb780);
@@ -406,7 +406,7 @@ DRIVER_INIT_MEMBER(pgm2_state,kov2nl)
 
 DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 {
-	UINT16 *src = (UINT16 *)machine().root_device().memregion("spritesa")->base();
+	UINT16 *src = (UINT16 *)memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x800000, 0x1e96);
 	iga_u16_decode(src, 0x800000, 0x869c);
@@ -416,7 +416,7 @@ DRIVER_INIT_MEMBER(pgm2_state,ddpdojh)
 
 DRIVER_INIT_MEMBER(pgm2_state,kov3)
 {
-	UINT16 *src = (UINT16 *)machine().root_device().memregion("spritesa")->base();
+	UINT16 *src = (UINT16 *)memregion("spritesa")->base();
 
 	iga_u12_decode(src, 0x2000000, 0x956d);
 	iga_u16_decode(src, 0x2000000, 0x3d17);

@@ -724,8 +724,8 @@ static const struct pit8253_config voyager_pit8254_config =
 
 void voyager_state::machine_reset()
 {
-	//machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base() + 0x10000);
-	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base());
+	//membank("bank1")->set_base(memregion("bios")->base() + 0x10000);
+	membank("bank1")->set_base(memregion("bios")->base());
 }
 
 static void set_gate_a20(running_machine &machine, int a20)

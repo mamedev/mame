@@ -87,7 +87,7 @@ WRITE16_MEMBER(twin16_state::videoram16_w)
 
 READ16_MEMBER(twin16_state::extra_rom_r)
 {
-	return ((UINT16 *)machine().root_device().memregion("gfx3")->base())[offset];
+	return ((UINT16 *)memregion("gfx3")->base())[offset];
 }
 
 READ16_MEMBER(twin16_state::twin16_gfx_rom1_r)

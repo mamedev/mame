@@ -620,7 +620,7 @@ void gamecstl_state::machine_start()
 
 void gamecstl_state::machine_reset()
 {
-	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("bios")->base() + 0x30000);
+	membank("bank1")->set_base(memregion("bios")->base() + 0x30000);
 
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(gamecstl_state::irq_callback),this));
 }

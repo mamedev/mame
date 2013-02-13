@@ -486,10 +486,10 @@ static const namco_interface namco_config =
 
 ***************************************************************************/
 
-READ8_MEMBER(toypop_state::dipA_l){ return machine().root_device().ioport("DSW1")->read(); }                // dips A
-READ8_MEMBER(toypop_state::dipA_h){ return machine().root_device().ioport("DSW1")->read() >> 4; }           // dips A
-READ8_MEMBER(toypop_state::dipB_l){ return machine().root_device().ioport("DSW2")->read(); }                // dips B
-READ8_MEMBER(toypop_state::dipB_h){ return machine().root_device().ioport("DSW2")->read() >> 4; }           // dips B
+READ8_MEMBER(toypop_state::dipA_l){ return ioport("DSW1")->read(); }                // dips A
+READ8_MEMBER(toypop_state::dipA_h){ return ioport("DSW1")->read() >> 4; }           // dips A
+READ8_MEMBER(toypop_state::dipB_l){ return ioport("DSW2")->read(); }                // dips B
+READ8_MEMBER(toypop_state::dipB_h){ return ioport("DSW2")->read() >> 4; }           // dips B
 
 WRITE8_MEMBER(toypop_state::out_coin0)
 {

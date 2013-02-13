@@ -497,8 +497,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(_1942_state,1942)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x4000);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x4000);
 }
 
 

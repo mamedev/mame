@@ -667,8 +667,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(rmhaihai_state,rmhaihai)
 {
-	UINT8 *rom = machine().root_device().memregion("gfx1")->base();
-	int size = machine().root_device().memregion("gfx1")->bytes();
+	UINT8 *rom = memregion("gfx1")->base();
+	int size = memregion("gfx1")->bytes();
 	int a,b;
 
 	size /= 2;

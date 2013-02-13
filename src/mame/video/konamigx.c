@@ -1872,7 +1872,7 @@ WRITE32_MEMBER(konamigx_state::konamigx_type3_psac2_bank_w)
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
 	{
 	int tileno, colour, flip;
-	UINT8 *tmap = machine().root_device().memregion("gfx4")->base();
+	UINT8 *tmap = memregion("gfx4")->base();
 
 	int base_index = tile_index;
 
@@ -1893,7 +1893,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
 TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
 	{
 	int tileno, colour, flip;
-	UINT8 *tmap = machine().root_device().memregion("gfx4")->base()+0x20000;
+	UINT8 *tmap = memregion("gfx4")->base()+0x20000;
 
 	int base_index = tile_index;
 

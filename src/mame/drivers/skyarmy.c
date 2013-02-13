@@ -89,7 +89,7 @@ WRITE8_MEMBER(skyarmy_state::skyarmy_colorram_w)
 
 void skyarmy_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < 32;i++)

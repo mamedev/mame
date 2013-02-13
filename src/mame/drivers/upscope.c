@@ -220,7 +220,7 @@ WRITE8_MEMBER(upscope_state::upscope_cia_1_porta_w)
 		if (data & 4)
 		{
 			if (LOG_IO) logerror("Internal register (%d) read\n", m_nvram_address_latch);
-			m_nvram_data_latch = (m_nvram_address_latch == 0) ? machine().root_device().ioport("IO0")->read() : 0xff;
+			m_nvram_data_latch = (m_nvram_address_latch == 0) ? ioport("IO0")->read() : 0xff;
 		}
 
 		/* if SEL == 0, we read NVRAM */
@@ -404,7 +404,7 @@ DRIVER_INIT_MEMBER(upscope_state,upscope)
 
 	/* set up memory */
 	m_bank1->configure_entry(0, m_chip_ram);
-	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(1, memregion("user1")->base());
 }
 
 

@@ -69,8 +69,8 @@
 
 READ8_MEMBER(mcr68_state::zwackery_port_2_r)
 {
-	int result = machine().root_device().ioport("IN2")->read();
-	int wheel = machine().root_device().ioport("IN5")->read();
+	int result = ioport("IN2")->read();
+	int wheel = ioport("IN5")->read();
 
 	return result | ((wheel >> 2) & 0x3e);
 }

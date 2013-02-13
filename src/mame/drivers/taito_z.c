@@ -3052,9 +3052,9 @@ MACHINE_START_MEMBER(taitoz_state,bshark)
 
 MACHINE_START_MEMBER(taitoz_state,taitoz)
 {
-	int banks = (machine().root_device().memregion("audiocpu")->bytes() - 0xc000) / 0x4000;
+	int banks = (memregion("audiocpu")->bytes() - 0xc000) / 0x4000;
 
-	machine().root_device().membank("bank10")->configure_entries(0, banks, machine().root_device().memregion("audiocpu")->base() + 0xc000, 0x4000);
+	membank("bank10")->configure_entries(0, banks, memregion("audiocpu")->base() + 0xc000, 0x4000);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(taitoz_state::taitoz_postload), this));
 

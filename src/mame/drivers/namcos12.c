@@ -1187,7 +1187,7 @@ static void namcos12_rom_read( namcos12_state *state, UINT32 *p_n_psxram, UINT32
 	INT32 n_ramleft;
 
 	// TODO: the check for going past the end of ram should be in dma.c
-	UINT32 m_n_psxramsize = state->machine().root_device().memshare("share1")->bytes();
+	UINT32 m_n_psxramsize = state->memshare("share1")->bytes();
 
 	if(state->m_has_tektagt_dma && !state->m_n_dmaoffset)
 	{
@@ -1208,8 +1208,8 @@ static void namcos12_rom_read( namcos12_state *state, UINT32 *p_n_psxram, UINT32
 		verboselog( state->machine(), 1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
 	}
 
-	source = (UINT16 *) state->machine().root_device().memregion( n_region )->base();
-	n_romleft = ( state->machine().root_device().memregion( n_region )->bytes() - n_offset ) / 4;
+	source = (UINT16 *) state->memregion( n_region )->base();
+	n_romleft = ( state->memregion( n_region )->bytes() - n_offset ) / 4;
 	if( n_size > n_romleft )
 	{
 		verboselog( state->machine(), 1, "namcos12_rom_read dma truncated %d to %d passed end of rom\n", n_size, n_romleft );
@@ -1604,7 +1604,7 @@ DRIVER_INIT_MEMBER(namcos12_state,ptblank2)
 	DRIVER_INIT_CALL(namcos12);
 
 	/* patch out wait for dma 5 to complete */
-	*( (UINT32 *)( machine().root_device().memregion( "user1" )->base() + 0x331c4 ) ) = 0;
+	*( (UINT32 *)( memregion( "user1" )->base() + 0x331c4 ) ) = 0;
 
 	system11gun_install(machine());
 }

@@ -32,7 +32,7 @@ TODO:
 WRITE8_MEMBER(darkmist_state::darkmist_hw_w)
 {
 	m_hw=data;
-	membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[0x010000+((data&0x80)?0x4000:0)]);
+	membank("bank1")->set_base(&memregion("maincpu")->base()[0x010000+((data&0x80)?0x4000:0)]);
 }
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
@@ -318,8 +318,8 @@ void darkmist_state::decrypt_gfx()
 	int size;
 	int i;
 
-	rom = machine().root_device().memregion("gfx1")->base();
-	size = machine().root_device().memregion("gfx1")->bytes();
+	rom = memregion("gfx1")->base();
+	size = memregion("gfx1")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -341,8 +341,8 @@ void darkmist_state::decrypt_gfx()
 	}
 
 
-	rom = machine().root_device().memregion("gfx2")->base();
-	size = machine().root_device().memregion("gfx2")->bytes();
+	rom = memregion("gfx2")->base();
+	size = memregion("gfx2")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -364,8 +364,8 @@ void darkmist_state::decrypt_gfx()
 	}
 
 
-	rom = machine().root_device().memregion("gfx3")->base();
-	size = machine().root_device().memregion("gfx3")->bytes();
+	rom = memregion("gfx3")->base();
+	size = memregion("gfx3")->bytes();
 
 	/* data lines */
 	for (i = 0;i < size/2;i++)
@@ -392,7 +392,7 @@ void darkmist_state::decrypt_gfx()
 void darkmist_state::decrypt_snd()
 {
 	int i;
-	UINT8 *ROM = machine().root_device().memregion("t5182")->base();
+	UINT8 *ROM = memregion("t5182")->base();
 
 	for(i=0x8000;i<0x10000;i++)
 		ROM[i] = BITSWAP8(ROM[i], 7,1,2,3,4,5,6,0);
@@ -402,7 +402,7 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int i, len;
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x10000);
 	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, 0x8000);
 
@@ -437,11 +437,11 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 	}
 
 	space.set_decrypted_region(0x0000, 0x7fff, decrypt);
-	space.machine().root_device().membank("bank1")->set_base(&ROM[0x010000]);
+	membank("bank1")->set_base(&ROM[0x010000]);
 
 	/* adr line swaps */
-	ROM = machine().root_device().memregion("user1")->base();
-	len = machine().root_device().memregion("user1")->bytes();
+	ROM = memregion("user1")->base();
+	len = memregion("user1")->bytes();
 	memcpy( buffer, ROM, len );
 
 	for(i=0;i<len;i++)
@@ -449,24 +449,24 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
 	}
 
-	ROM = machine().root_device().memregion("user2")->base();
-	len = machine().root_device().memregion("user2")->bytes();
+	ROM = memregion("user2")->base();
+	len = memregion("user2")->bytes();
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,6,5,4,3,2,14,13,12,11,8,7,1,0,10,9)];
 	}
 
-	ROM = machine().root_device().memregion("user3")->base();
-	len = machine().root_device().memregion("user3")->bytes();
+	ROM = memregion("user3")->base();
+	len = memregion("user3")->bytes();
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{
 		ROM[i]=buffer[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14 ,5,4,3,2,11,10,9,8,13,12,1,0,7,6)];
 	}
 
-	ROM = machine().root_device().memregion("user4")->base();
-	len = machine().root_device().memregion("user4")->bytes();
+	ROM = memregion("user4")->base();
+	len = memregion("user4")->bytes();
 	memcpy( buffer, ROM, len );
 	for(i=0;i<len;i++)
 	{

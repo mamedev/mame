@@ -238,7 +238,7 @@ void sliver_state::render_jpeg()
 		cinfo.err = jpeg_std_error(&jerr);
 		jpeg_create_decompress(&cinfo);
 
-		jpeg_mem_src(&cinfo, machine().root_device().memregion("user2")->base()+addr, machine().root_device().memregion("user2")->bytes()-addr);
+		jpeg_mem_src(&cinfo, memregion("user2")->base()+addr, memregion("user2")->bytes()-addr);
 
 		jpeg_read_header(&cinfo, TRUE);
 		jpeg_start_decompress(&cinfo);

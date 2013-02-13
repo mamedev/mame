@@ -283,20 +283,20 @@ READ8_MEMBER(suprgolf_state::pedal_extra_bits_r)
 {
 	UINT8 p1_sht_sw,p2_sht_sw;
 
-	p1_sht_sw = (machine().root_device().ioport("P1_RELEASE")->read() & 0x80)>>7;
-	p2_sht_sw = (machine().root_device().ioport("P2_RELEASE")->read() & 0x80)>>6;
+	p1_sht_sw = (ioport("P1_RELEASE")->read() & 0x80)>>7;
+	p2_sht_sw = (ioport("P2_RELEASE")->read() & 0x80)>>6;
 
 	return p1_sht_sw | p2_sht_sw;
 }
 
 READ8_MEMBER(suprgolf_state::p1_r)
 {
-	return (machine().root_device().ioport("P1")->read() & 0xf0) | ((machine().root_device().ioport("P1_ANALOG")->read() & 0xf));
+	return (ioport("P1")->read() & 0xf0) | ((ioport("P1_ANALOG")->read() & 0xf));
 }
 
 READ8_MEMBER(suprgolf_state::p2_r)
 {
-	return (machine().root_device().ioport("P2")->read() & 0xf0) | ((machine().root_device().ioport("P2_ANALOG")->read() & 0xf));
+	return (ioport("P2")->read() & 0xf0) | ((ioport("P2_ANALOG")->read() & 0xf));
 }
 
 static ADDRESS_MAP_START( suprgolf_map, AS_PROGRAM, 8, suprgolf_state )
@@ -632,7 +632,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(suprgolf_state,suprgolf)
 {
-	UINT8 *ROM = machine().root_device().memregion("user2")->base();
+	UINT8 *ROM = memregion("user2")->base();
 
 	ROM[0x74f4-0x4000] = 0x00;
 	ROM[0x74f5-0x4000] = 0x00;

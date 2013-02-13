@@ -432,7 +432,7 @@ DRIVER_INIT_MEMBER(m58_state,yard85)
 	// on these sets the content of the sprite color PROM needs reversing
 	//  are the proms on the other sets from bootleg boards, or hand modified?
 	UINT8* buffer = auto_alloc_array(machine(), UINT8, 0x10);
-	UINT8* region = machine().root_device().memregion("proms")->base();
+	UINT8* region = memregion("proms")->base();
 	int i;
 
 	for (i=0;i<0x10;i++)

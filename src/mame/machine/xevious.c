@@ -165,10 +165,10 @@ READ8_MEMBER( xevious_state::battles_input_port_r )
 	switch ( offset )
 	{
 		default:
-		case 0: return ~BITSWAP8(machine().root_device().ioport("IN0H")->read(),7,6,5,4,2,3,1,0);
-		case 1: return ~machine().root_device().ioport("IN1L")->read();
-		case 2: return ~machine().root_device().ioport("IN1H")->read();
-		case 3: return ~machine().root_device().ioport("IN0L")->read();
+		case 0: return ~BITSWAP8(ioport("IN0H")->read(),7,6,5,4,2,3,1,0);
+		case 1: return ~ioport("IN1L")->read();
+		case 2: return ~ioport("IN1H")->read();
+		case 3: return ~ioport("IN0L")->read();
 	}
 }
 

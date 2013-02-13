@@ -709,7 +709,7 @@ UINT8 *kchamp_state::decrypt_code()
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine(), UINT8, 0x10000);
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int A;
 
 	space.set_decrypted_region(0x0000, 0xffff, decrypted);

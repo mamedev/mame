@@ -27,7 +27,7 @@
 
 void dcheese_state::palette_init()
 {
-	const UINT16 *src = (UINT16 *)machine().root_device().memregion("user1")->base();
+	const UINT16 *src = (UINT16 *)memregion("user1")->base();
 	int i;
 
 	/* really 65536 colors, but they don't use the later ones so we can stay */

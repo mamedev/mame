@@ -46,7 +46,7 @@ static const res_net_info popper_net_info =
 
 void popper_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	rgb_t   *rgb;
 
 	rgb = compute_res_net_all(machine(), color_prom, &popper_decode_info, &popper_net_info);

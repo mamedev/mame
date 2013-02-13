@@ -268,7 +268,7 @@ UINT32 _8080bw_state::screen_update_polaris(screen_device &screen, bitmap_rgb32 
 
 	invadpt2_get_pens(pens);
 
-	color_map_base = machine().root_device().memregion("proms")->base();
+	color_map_base = memregion("proms")->base();
 	cloud_gfx = memregion("user1")->base();
 
 	for (offs = 0; offs < m_main_ram.bytes(); offs++)

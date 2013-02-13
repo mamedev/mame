@@ -456,11 +456,11 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(segas1x_bootleg_state::upd7759_bank_w)//*
 {
 	device_t *device = machine().device("7759");
-	int offs, size = machine().root_device().memregion("soundcpu")->bytes() - 0x10000;
+	int offs, size = memregion("soundcpu")->bytes() - 0x10000;
 
 	upd7759_reset_w(device, data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	machine().root_device().membank("bank1")->set_base(machine().root_device().memregion("soundcpu")->base() + offs);
+	membank("bank1")->set_base(memregion("soundcpu")->base() + offs);
 }
 
 
@@ -3326,7 +3326,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb1)
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,bayrouteb2)
 {
-	UINT8 *mem = machine().root_device().memregion("soundcpu")->base();
+	UINT8 *mem = memregion("soundcpu")->base();
 
 	memcpy(mem, mem + 0x10000, 0x8000);
 
@@ -3342,7 +3342,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,goldnaxeb2)
 
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,tturfbl)
 {
-	UINT8 *mem = machine().root_device().memregion("soundcpu")->base();
+	UINT8 *mem = memregion("soundcpu")->base();
 
 	memcpy(mem, mem + 0x10000, 0x8000);
 
@@ -3374,7 +3374,7 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,fpointbl)
 /* Tetris-based */
 DRIVER_INIT_MEMBER(segas1x_bootleg_state,beautyb)
 {
-	UINT16*rom = (UINT16*)machine().root_device().memregion( "maincpu" )->base();
+	UINT16*rom = (UINT16*)memregion( "maincpu" )->base();
 	int x;
 
 	for (x = 0; x < 0x8000; x++)

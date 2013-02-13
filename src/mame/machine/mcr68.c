@@ -20,7 +20,7 @@
 
 READ8_MEMBER(mcr68_state::zwackery_port_1_r)
 {
-	UINT8 ret = machine().root_device().ioport("IN1")->read();
+	UINT8 ret = ioport("IN1")->read();
 
 	downcast<pia6821_device *>(machine().device("pia1"))->set_port_a_z_mask(ret);
 
@@ -30,7 +30,7 @@ READ8_MEMBER(mcr68_state::zwackery_port_1_r)
 
 READ8_MEMBER(mcr68_state::zwackery_port_3_r)
 {
-	UINT8 ret = machine().root_device().ioport("IN3")->read();
+	UINT8 ret = ioport("IN3")->read();
 
 	downcast<pia6821_device *>(machine().device("pia2"))->set_port_a_z_mask(ret);
 

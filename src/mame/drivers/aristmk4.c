@@ -1567,12 +1567,12 @@ static MC6845_INTERFACE( mc6845_intf )
 
 READ8_MEMBER(aristmk4_state::pa1_r)
 {
-	return (machine().root_device().ioport("SW3")->read() << 4) + machine().root_device().ioport("SW4")->read();
+	return (ioport("SW3")->read() << 4) + ioport("SW4")->read();
 }
 
 READ8_MEMBER(aristmk4_state::pb1_r)
 {
-	return (machine().root_device().ioport("SW5")->read() << 4) + machine().root_device().ioport("SW6")->read();
+	return (ioport("SW5")->read() << 4) + ioport("SW6")->read();
 }
 
 READ8_MEMBER(aristmk4_state::pc1_r)
@@ -1594,7 +1594,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 /* same as Casino Winner HW */
 void aristmk4_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < machine().total_colors();i++)
@@ -1634,7 +1634,7 @@ void aristmk4_state::machine_start()
 void aristmk4_state::machine_reset()
 {
 	/* mark 4 has a link on the motherboard to switch between 1.5MHz and 3MHz clock speed */
-	switch(machine().root_device().ioport("LK13")->read())  // CPU speed control... 3mhz or 1.5MHz
+	switch(ioport("LK13")->read())  // CPU speed control... 3mhz or 1.5MHz
 	{
 	case 0x00:
 		machine().device("maincpu")->set_unscaled_clock(MAIN_CLOCK/4);  // 3 MHz
@@ -1663,7 +1663,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_state::aristmk4_pf)
 	Note: The use of 1 Hz in the timer is to avoid unintentional triggering the NMI ( ie.. hold down L for at least 1 second )
 	*/
 
-	if(machine().root_device().ioport("powerfail")->read()) // send NMI signal if L pressed
+	if(ioport("powerfail")->read()) // send NMI signal if L pressed
 	{
 	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE );
 	}

@@ -267,7 +267,7 @@ WRITE8_MEMBER(galpani2_state::galpani2_coin_lockout_w)
 
 WRITE8_MEMBER(galpani2_state::galpani2_oki1_bank_w)
 {
-	UINT8 *ROM = machine().root_device().memregion("oki1")->base();
+	UINT8 *ROM = memregion("oki1")->base();
 	logerror("%s : %s bank %08X\n",machine().describe_context(),tag(),data);
 	memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 }

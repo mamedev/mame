@@ -477,9 +477,9 @@ UINT8 drgnmst_state::drgnmst_asciitohex( UINT8 data )
 
 DRIVER_INIT_MEMBER(drgnmst_state,drgnmst)
 {
-	UINT8 *drgnmst_PICROM_HEX = machine().root_device().memregion("user1")->base();
-	UINT16 *drgnmst_PICROM = (UINT16 *)machine().root_device().memregion("audiocpu")->base();
-	UINT8 *drgnmst_PCM = machine().root_device().memregion("oki1")->base();
+	UINT8 *drgnmst_PICROM_HEX = memregion("user1")->base();
+	UINT16 *drgnmst_PICROM = (UINT16 *)memregion("audiocpu")->base();
+	UINT8 *drgnmst_PCM = memregion("oki1")->base();
 	INT32   offs, data;
 	UINT16  src_pos = 0;
 	UINT16  dst_pos = 0;

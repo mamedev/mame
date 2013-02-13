@@ -2661,7 +2661,7 @@ UINT32 dc_state::screen_update_dc(screen_device &screen, bitmap_rgb32 &bitmap, c
 		pvr_drawframebuffer(machine(),bitmap,cliprect);
 
 	// update this here so we only do string lookup once per frame
-	debug_dip_status = machine().root_device().ioport("MAMEDEBUG")->read();
+	debug_dip_status = ioport("MAMEDEBUG")->read();
 
 	return 0;
 }

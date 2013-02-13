@@ -36,7 +36,7 @@ Credits:
 INTERRUPT_GEN_MEMBER(thief_state::thief_interrupt)
 {
 	/* SLAM switch causes an NMI if it's pressed */
-	if( (machine().root_device().ioport("P2")->read() & 0x10) == 0 )
+	if( (ioport("P2")->read() & 0x10) == 0 )
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	else
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -634,8 +634,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(thief_state,thief)
 {
-	UINT8 *dest = machine().root_device().memregion( "maincpu" )->base();
-	const UINT8 *source = machine().root_device().memregion( "cpu1" )->base();
+	UINT8 *dest = memregion( "maincpu" )->base();
+	const UINT8 *source = memregion( "cpu1" )->base();
 
 	/* C8 is mapped (banked) in CPU1's address space; it contains Z80 code */
 	memcpy( &dest[0xe010], &source[0x290], 0x20 );

@@ -65,7 +65,7 @@ void mexico86_state::mcu_simulate(  )
 		int i;
 		int coin_curr;
 
-		coin_curr = ~machine().root_device().ioport("IN0")->read() & 1;
+		coin_curr = ~ioport("IN0")->read() & 1;
 		if (coin_curr && !m_coin_last && m_protection_ram[0x01] < 9)
 		{
 			m_protection_ram[0x01]++;    // increase credits counter
@@ -75,8 +75,8 @@ void mexico86_state::mcu_simulate(  )
 
 		m_protection_ram[0x04] = 0x3c;   // coin inputs
 
-		m_protection_ram[0x02] = BITSWAP8(machine().root_device().ioport("IN1")->read(), 7,6,5,4,2,3,1,0); // player 1
-		m_protection_ram[0x03] = BITSWAP8(machine().root_device().ioport("IN2")->read(), 7,6,5,4,2,3,1,0); // player 2
+		m_protection_ram[0x02] = BITSWAP8(ioport("IN1")->read(), 7,6,5,4,2,3,1,0); // player 1
+		m_protection_ram[0x03] = BITSWAP8(ioport("IN2")->read(), 7,6,5,4,2,3,1,0); // player 2
 
 		if (m_protection_ram[0x19] == 0xaa)  // player 2 active
 			m_protection_ram[0x1b] = m_protection_ram[0x03];

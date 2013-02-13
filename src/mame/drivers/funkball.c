@@ -543,7 +543,7 @@ WRITE32_MEMBER(funkball_state::biu_ctrl_w)
 			if (data & 0x1 << i*4)      // enable RAM access to region 0xe0000 - 0xfffff
 				membank(banknames[i])->set_base(m_bios_ram + (0x4000 * i));
 			else                    // disable RAM access (reads go to BIOS ROM)
-				membank(banknames[i])->set_base(machine().root_device().memregion("bios")->base() + (0x4000 * i));
+				membank(banknames[i])->set_base(memregion("bios")->base() + (0x4000 * i));
 		}
 	}
 }

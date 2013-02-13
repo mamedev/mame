@@ -524,7 +524,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(hitpoker_state,hitpoker)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	// init nvram
 	machine().device<nvram_device>("nvram")->set_base(m_eeprom_data, sizeof(m_eeprom_data));

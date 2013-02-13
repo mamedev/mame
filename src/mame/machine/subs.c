@@ -25,7 +25,7 @@ subs_interrupt
 INTERRUPT_GEN_MEMBER(subs_state::subs_interrupt)
 {
 	/* only do NMI interrupt if not in TEST mode */
-	if ((machine().root_device().ioport("IN1")->read() & 0x40)==0x40)
+	if ((ioport("IN1")->read() & 0x40)==0x40)
 		device.execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
 

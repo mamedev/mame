@@ -107,7 +107,7 @@
 
 INTERRUPT_GEN_MEMBER(capbowl_state::capbowl_interrupt)
 {
-	if (machine().root_device().ioport("SERVICE")->read() & 1)                      /* get status of the F2 key */
+	if (ioport("SERVICE")->read() & 1)                      /* get status of the F2 key */
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);    /* trigger self test */
 }
 
@@ -491,10 +491,10 @@ ROM_END
 
 DRIVER_INIT_MEMBER(capbowl_state,capbowl)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	/* configure ROM banks in 0x0000-0x3fff */
-	machine().root_device().membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
+	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 }
 
 

@@ -508,8 +508,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(blmbycar_state,blmbycar)
 {
-	UINT16 *RAM  = (UINT16 *) machine().root_device().memregion("maincpu")->base();
-	size_t size = machine().root_device().memregion("maincpu")->bytes() / 2;
+	UINT16 *RAM  = (UINT16 *) memregion("maincpu")->base();
+	size_t size = memregion("maincpu")->bytes() / 2;
 	int i;
 
 	for (i = 0; i < size; i++)

@@ -22,7 +22,7 @@
 
 PALETTE_INIT_MEMBER(appoooh_state,appoooh)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine().total_colors(); i++)
@@ -61,7 +61,7 @@ PALETTE_INIT_MEMBER(appoooh_state,appoooh)
 
 PALETTE_INIT_MEMBER(appoooh_state,robowres)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine().total_colors(); i++)

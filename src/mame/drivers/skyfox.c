@@ -423,8 +423,8 @@ ROM_END
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
 DRIVER_INIT_MEMBER(skyfox_state,skyfox)
 {
-	UINT8 *RAM = machine().root_device().memregion("gfx1")->base();
-	UINT8 *end = RAM + machine().root_device().memregion("gfx1")->bytes();
+	UINT8 *RAM = memregion("gfx1")->base();
+	UINT8 *end = RAM + memregion("gfx1")->bytes();
 	UINT8 buf[32 * 32];
 
 	while (RAM < end)

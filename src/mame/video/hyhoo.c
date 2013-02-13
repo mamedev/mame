@@ -102,7 +102,7 @@ void hyhoo_state::hyhoo_gfxdraw()
 		skipy = -1;
 	}
 
-	gfxlen = machine().root_device().memregion("gfx1")->bytes();
+	gfxlen = memregion("gfx1")->bytes();
 	gfxaddr = (m_gfxrom << 17) + (m_blitter_src_addr << 1);
 
 	for (y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)

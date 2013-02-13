@@ -2045,8 +2045,8 @@ DRIVER_INIT_MEMBER(cninja_state,stoneage)
 
 DRIVER_INIT_MEMBER(cninja_state,mutantf)
 {
-	const UINT8 *src = machine().root_device().memregion("gfx2")->base();
-	UINT8 *dst = machine().root_device().memregion("gfx1")->base();
+	const UINT8 *src = memregion("gfx2")->base();
+	UINT8 *dst = memregion("gfx1")->base();
 
 	/* The 16x16 graphic has some 8x8 chars in it - decode them in GFX1 */
 	memcpy(dst + 0x50000, dst + 0x10000, 0x10000);

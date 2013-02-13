@@ -64,7 +64,7 @@ UINT8 clayshoo_state::difficulty_input_port_r( int bit )
 	UINT8 ret = 0;
 
 	/* read fake port and remap the buttons to 2 bits */
-	UINT8   raw = machine().root_device().ioport("FAKE")->read();
+	UINT8   raw = ioport("FAKE")->read();
 
 	if (raw & (1 << (bit + 1)))
 		ret = 0x03;     /* expert */

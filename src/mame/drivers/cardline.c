@@ -187,7 +187,7 @@ GFXDECODE_END
 
 void cardline_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i,r,g,b,data;
 	int bit0,bit1,bit2;
 	for (i = 0;i < machine().total_colors();i++)

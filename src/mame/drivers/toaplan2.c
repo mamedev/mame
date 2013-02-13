@@ -422,9 +422,9 @@ DRIVER_INIT_MEMBER(toaplan2_state,fixeight)
 
 DRIVER_INIT_MEMBER(toaplan2_state,fixeightbl)
 {
-	UINT8 *ROM = machine().root_device().memregion("oki")->base();
+	UINT8 *ROM = memregion("oki")->base();
 
-	machine().root_device().membank("bank1")->configure_entries(0, 5, &ROM[0x30000], 0x10000);
+	membank("bank1")->configure_entries(0, 5, &ROM[0x30000], 0x10000);
 }
 
 
@@ -436,7 +436,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,vfive)
 
 DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
 {
-	UINT16 *ROM = (UINT16 *)(machine().root_device().memregion("maincpu")->base());
+	UINT16 *ROM = (UINT16 *)(memregion("maincpu")->base());
 
 	for (int i = 0; i < (0x040000/2); i += 4)
 	{
@@ -450,10 +450,10 @@ DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
 
 DRIVER_INIT_MEMBER(toaplan2_state,bgaregga)
 {
-	UINT8 *Z80 = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *Z80 = memregion("audiocpu")->base();
 
 	// seems to only use banks 0x0a to 0x0f
-	machine().root_device().membank("bank1")->configure_entries(8, 8, Z80, 0x4000);
+	membank("bank1")->configure_entries(8, 8, Z80, 0x4000);
 }
 
 

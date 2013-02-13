@@ -99,7 +99,7 @@ void polygonet_state::video_start()
 	assert(m_ttl_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* decode the ttl layer's gfx */
-	machine().gfx[m_ttl_gfx_index] = auto_alloc(machine(), gfx_element(machine(), charlayout, machine().root_device().memregion("gfx1")->base(), machine().total_colors() / 16, 0));
+	machine().gfx[m_ttl_gfx_index] = auto_alloc(machine(), gfx_element(machine(), charlayout, memregion("gfx1")->base(), machine().total_colors() / 16, 0));
 
 	/* create the tilemap */
 	m_ttl_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(polygonet_state::ttl_get_tile_info),this), tilemap_mapper_delegate(FUNC(polygonet_state::plygonet_scan),this),  8, 8, 64, 32);

@@ -288,7 +288,7 @@ WRITE8_MEMBER(ashnojoe_state::ym2203_write_a)
 
 WRITE8_MEMBER(ashnojoe_state::ym2203_write_b)
 {
-	machine().root_device().membank("bank4")->set_entry(data & 0x0f);
+	membank("bank4")->set_entry(data & 0x0f);
 }
 
 static const ym2203_interface ym2203_config =
@@ -456,10 +456,10 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ashnojoe_state,ashnojoe)
 {
-	UINT8 *ROM = machine().root_device().memregion("adpcm")->base();
-	machine().root_device().membank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
+	UINT8 *ROM = memregion("adpcm")->base();
+	membank("bank4")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
 
-	machine().root_device().membank("bank4")->set_entry(0);
+	membank("bank4")->set_entry(0);
 }
 
 GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe_state, ashnojoe, ROT0, "Wave / Taito Corporation", "Success Joe (World)",   GAME_SUPPORTS_SAVE )

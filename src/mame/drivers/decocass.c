@@ -1607,7 +1607,7 @@ READ8_MEMBER(decocass_state::cdsteljn_input_r )
 	if(offset & 6)
 		return decocass_input_r(space,offset);
 
-	res = machine().root_device().ioport(portnames[offset & 1][m_mux_data])->read();
+	res = ioport(portnames[offset & 1][m_mux_data])->read();
 
 	return res;
 }

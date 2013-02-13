@@ -207,7 +207,7 @@ void spacefb_state::draw_starfield(screen_device &screen, bitmap_rgb32 &bitmap, 
 void spacefb_state::get_sprite_pens(pen_t *pens)
 {
 	static const double fade_weights[] = { 1.0, 1.5, 2.5, 4.0 };
-	const UINT8 *prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < NUM_SPRITE_PENS; i++)

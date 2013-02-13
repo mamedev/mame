@@ -338,7 +338,7 @@ INPUT_PORTS_END
 void gunpey_state::palette_init()
 {
 	int i,r,g,b,val;
-	UINT8 *blit_rom = machine().root_device().memregion("blit_data")->base();
+	UINT8 *blit_rom = memregion("blit_data")->base();
 
 	for (i = 0; i < 512; i+=2)
 	{
@@ -413,7 +413,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	/* patch SLOOOOW cycle checks ... */
 	rom[0x848b5] = 0x7e;

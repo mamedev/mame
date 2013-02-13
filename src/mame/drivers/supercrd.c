@@ -190,7 +190,7 @@ public:
 
 PALETTE_INIT_MEMBER(supercrd_state, supercrd)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	static const int resistances_rb[3] = { 1000, 470, 220 };
 	static const int resistances_g [2] = { 470, 220 };

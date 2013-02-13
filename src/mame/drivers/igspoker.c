@@ -1926,7 +1926,7 @@ ROM_END
 DRIVER_INIT_MEMBER(igspoker_state,cpoker)
 {
 	int A;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1940,7 +1940,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cpoker)
 
 DRIVER_INIT_MEMBER(igspoker_state,cpokert)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -1970,7 +1970,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cpokert)
 DRIVER_INIT_MEMBER(igspoker_state,cska)
 {
 	int A;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -1987,7 +1987,7 @@ DRIVER_INIT_MEMBER(igspoker_state,cska)
 DRIVER_INIT_MEMBER(igspoker_state,igs_ncs)
 {
 	int A;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -2148,7 +2148,7 @@ Clocks
 
 DRIVER_INIT_MEMBER(igspoker_state,igs_ncs2)
 {
-	UINT8 *src = (UINT8 *) (machine().root_device().memregion("maincpu")->base());
+	UINT8 *src = (UINT8 *) (memregion("maincpu")->base());
 	int i;
 
 	for(i = 0; i < 0x10000; i++)
@@ -2225,8 +2225,8 @@ DRIVER_INIT_MEMBER(igspoker_state,chleague)
 	int length;
 	UINT8 *rom;
 
-	rom = machine().root_device().memregion("maincpu")->base();
-	length = machine().root_device().memregion("maincpu")->bytes();
+	rom = memregion("maincpu")->base();
+	length = memregion("maincpu")->bytes();
 	for (A = 0;A < length;A++)
 	{
 		if ((A & 0x09C0) == 0x0880) rom[A] ^= 0x20;
@@ -2289,8 +2289,8 @@ DRIVER_INIT_MEMBER(igspoker_state,number10)
 	UINT8 *tmp;
 	UINT8 *rom;
 
-	rom = machine().root_device().memregion("maincpu")->base();
-	length = machine().root_device().memregion("maincpu")->bytes();
+	rom = memregion("maincpu")->base();
+	length = memregion("maincpu")->bytes();
 	for (A = 0;A < length;A++)
 	{
 		if ((A & 0x09C0) == 0x0880) rom[A] ^= 0x20;
@@ -2319,8 +2319,8 @@ DRIVER_INIT_MEMBER(igspoker_state,number10)
 	rom[0xeed] = 0xc3;
 
 	/* Descramble graphic */
-	rom = machine().root_device().memregion("gfx1")->base();
-	length = machine().root_device().memregion("gfx1")->bytes();
+	rom = memregion("gfx1")->base();
+	length = memregion("gfx1")->bytes();
 	tmp = auto_alloc_array(machine(), UINT8, length);
 	memcpy(tmp,rom,length);
 	for (A = 0;A < length;A++)
@@ -2368,7 +2368,7 @@ ROM_END
 DRIVER_INIT_MEMBER(igspoker_state,cpokerpk)
 {
 	int A;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	for (A=0x0714; A < 0xF000; A+=0x1000)
 		rom[A] ^= 0x20;
@@ -2422,7 +2422,7 @@ ROM_END
 DRIVER_INIT_MEMBER(igspoker_state,pktet346)
 {
 	int A;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)

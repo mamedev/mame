@@ -68,7 +68,7 @@ VIDEO_START_MEMBER(hitme_state,barricad)
 UINT32 hitme_state::screen_update_hitme(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* the card width resistor comes from an input port, scaled to the range 0-25 kOhms */
-	double width_resist = machine().root_device().ioport("WIDTH")->read() * 25000 / 100;
+	double width_resist = ioport("WIDTH")->read() * 25000 / 100;
 	/* this triggers a oneshot for the following length of time */
 	double width_duration = 0.45 * 1000e-12 * width_resist;
 	/* the dot clock runs at the standard horizontal frequency * 320+16 clocks per scanline */
@@ -130,7 +130,7 @@ UINT8 hitme_state::read_port_and_t0( int port )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	UINT8 val = machine().root_device().ioport(portnames[port])->read();
+	UINT8 val = ioport(portnames[port])->read();
 	if (machine().time() > m_timeout_time)
 		val ^= 0x80;
 	return val;

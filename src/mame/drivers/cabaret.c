@@ -360,7 +360,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(cabaret_state,cabaret)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */

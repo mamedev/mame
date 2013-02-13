@@ -52,7 +52,7 @@ Notes:
 
 DRIVER_INIT_MEMBER(suna8_state,hardhead)
 {
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
@@ -67,15 +67,15 @@ DRIVER_INIT_MEMBER(suna8_state,hardhead)
 			rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0) ^ 0x58;
 	}
 
-	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /* Non encrypted bootleg */
 DRIVER_INIT_MEMBER(suna8_state,hardhedb)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0x7fff, machine().root_device().memregion("maincpu")->base() + 0x48000);
-	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	space.set_decrypted_region(0x0000, 0x7fff, memregion("maincpu")->base() + 0x48000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -85,8 +85,8 @@ DRIVER_INIT_MEMBER(suna8_state,hardhedb)
 UINT8 *suna8_state::brickzn_decrypt()
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8   *RAM    =   machine().root_device().memregion("maincpu")->base();
-	size_t  size    =   machine().root_device().memregion("maincpu")->bytes();
+	UINT8   *RAM    =   memregion("maincpu")->base();
+	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt = auto_alloc_array(machine(), UINT8, size);
 	int i;
 
@@ -131,7 +131,7 @@ UINT8 *suna8_state::brickzn_decrypt()
 
 DRIVER_INIT_MEMBER(suna8_state,brickzn)
 {
-	UINT8   *RAM    =   machine().root_device().memregion("maincpu")->base();
+	UINT8   *RAM    =   memregion("maincpu")->base();
 	UINT8   *decrypt = brickzn_decrypt();
 	int i;
 
@@ -162,15 +162,15 @@ DRIVER_INIT_MEMBER(suna8_state,brickzn)
 	decrypt[0x2593] = 0x00; // HALT -> NOP
 
 	// Data banks: 00-0f normal data decryption, 10-1f alternate data decryption:
-	machine().root_device().membank("bank1")->configure_entries(0, 16*2, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
 	// Opcode banks: 00-1f normal opcode decryption:
-	machine().root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
-	machine().root_device().membank("bank1")->configure_decrypted_entries(16, 16, decrypt + 0x10000, 0x4000);
+	membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
+	membank("bank1")->configure_decrypted_entries(16, 16, decrypt + 0x10000, 0x4000);
 }
 
 DRIVER_INIT_MEMBER(suna8_state,brickznv4)
 {
-	UINT8   *RAM    =   machine().root_device().memregion("maincpu")->base();
+	UINT8   *RAM    =   memregion("maincpu")->base();
 	UINT8   *decrypt = brickzn_decrypt();
 	int i;
 
@@ -201,10 +201,10 @@ DRIVER_INIT_MEMBER(suna8_state,brickznv4)
 	decrypt[0x256c] = 0x00; // HALT -> NOP
 
 	// Data banks: 00-0f normal data decryption, 10-1f alternate data decryption:
-	machine().root_device().membank("bank1")->configure_entries(0, 16*2, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 16*2, memregion("maincpu")->base() + 0x10000, 0x4000);
 	// Opcode banks: 00-1f normal opcode decryption:
-	machine().root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
-	machine().root_device().membank("bank1")->configure_decrypted_entries(16, 16, decrypt + 0x10000, 0x4000);
+	membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
+	membank("bank1")->configure_decrypted_entries(16, 16, decrypt + 0x10000, 0x4000);
 }
 
 
@@ -215,8 +215,8 @@ DRIVER_INIT_MEMBER(suna8_state,brickznv4)
 DRIVER_INIT_MEMBER(suna8_state,hardhea2)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8   *RAM    =   machine().root_device().memregion("maincpu")->base();
-	size_t  size    =   machine().root_device().memregion("maincpu")->bytes();
+	UINT8   *RAM    =   memregion("maincpu")->base();
+	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
 	UINT8 x;
 	int i;
@@ -290,8 +290,8 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x41;
 	}
 
-	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
-	machine().root_device().membank("bank2")->configure_entries(0, 2, auto_alloc_array(machine(), UINT8, 0x2000 * 2), 0x2000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank2")->configure_entries(0, 2, auto_alloc_array(machine(), UINT8, 0x2000 * 2), 0x2000);
 }
 
 
@@ -302,8 +302,8 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 DRIVER_INIT_MEMBER(suna8_state,starfigh)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8   *RAM    =   machine().root_device().memregion("maincpu")->base();
-	size_t  size    =   machine().root_device().memregion("maincpu")->bytes();
+	UINT8   *RAM    =   memregion("maincpu")->base();
+	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
 	UINT8 x;
 	int i;
@@ -377,7 +377,7 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 	decrypt[0x2696] = 0xc9; // work ram writes disable, corrupt next routine
 	decrypt[0x4e9a] = 0x00; // work ram writes disable, flip background sprite
 
-	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -388,8 +388,8 @@ DRIVER_INIT_MEMBER(suna8_state,starfigh)
 DRIVER_INIT_MEMBER(suna8_state,sparkman)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8   *RAM    =   machine().root_device().memregion("maincpu")->base();
-	size_t  size    =   machine().root_device().memregion("maincpu")->bytes();
+	UINT8   *RAM    =   memregion("maincpu")->base();
+	size_t  size    =   memregion("maincpu")->bytes();
 	UINT8   *decrypt =  auto_alloc_array(machine(), UINT8, size);
 	UINT8 x;
 	int i;
@@ -461,7 +461,7 @@ DRIVER_INIT_MEMBER(suna8_state,sparkman)
 	decrypt[0x1ac4] = 0x00;
 	decrypt[0x1ac5] = 0x00;
 
-	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -2772,7 +2772,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(suna8_state,suna8)
 {
-	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 GAME( 1988, sranger,   0,        rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA",               "Super Ranger (v2.0)",         0 )

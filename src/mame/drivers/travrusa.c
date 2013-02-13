@@ -448,7 +448,7 @@ ROM_END
 DRIVER_INIT_MEMBER(travrusa_state,motorace)
 {
 	int A, j;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 	UINT8 *buffer = auto_alloc_array(machine(), UINT8, 0x2000);
 
 	memcpy(buffer, rom, 0x2000);
@@ -466,7 +466,7 @@ DRIVER_INIT_MEMBER(travrusa_state,motorace)
 DRIVER_INIT_MEMBER(travrusa_state,shtridra)
 {
 	int A;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	/* D3/D4  and  D5/D6 swapped */
 	for (A = 0; A < 0x2000; A++)

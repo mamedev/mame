@@ -3868,7 +3868,7 @@ extern void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_x
 
 DRIVER_INIT_MEMBER(ace_sp_state,ace_cr)
 {
-	descramble_crystal(machine().root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
+	descramble_crystal(memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
 }
 
 DRIVER_INIT_MEMBER(ace_sp_state,ace_sp)

@@ -144,8 +144,8 @@ MACHINE_RESET_MEMBER(shangkid_state,shangkid)
 {
 	machine().device("bbx")->execute().set_input_line(INPUT_LINE_HALT, 1 );
 
-	machine().root_device().membank("bank1")->set_entry(0);
-	machine().root_device().membank("bank2")->set_entry(0);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
 }
 
 /***************************************************************************************/

@@ -957,7 +957,7 @@ READ8_MEMBER(route16_state::routex_prot_read)
 
 DRIVER_INIT_MEMBER(route16_state,route16)
 {
-	UINT8 *ROM = machine().root_device().memregion("cpu1")->base();
+	UINT8 *ROM = memregion("cpu1")->base();
 	/* Is this actually a bootleg? some of the protection has
 	   been removed */
 
@@ -972,7 +972,7 @@ DRIVER_INIT_MEMBER(route16_state,route16)
 
 DRIVER_INIT_MEMBER(route16_state,route16a)
 {
-	UINT8 *ROM = machine().root_device().memregion("cpu1")->base();
+	UINT8 *ROM = memregion("cpu1")->base();
 	/* TO DO : Replace these patches with simulation of the protection device */
 
 	/* patch the protection */

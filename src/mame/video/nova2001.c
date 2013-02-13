@@ -10,7 +10,7 @@
 
 PALETTE_INIT_MEMBER(nova2001_state,nova2001)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* Color #1 is used for palette animation.          */

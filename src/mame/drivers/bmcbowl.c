@@ -241,7 +241,7 @@ WRITE16_MEMBER(bmcbowl_state::scroll_w)
 
 READ8_MEMBER(bmcbowl_state::via_b_in)
 {
-	return machine().root_device().ioport("IN3")->read();
+	return ioport("IN3")->read();
 }
 
 

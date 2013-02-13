@@ -168,7 +168,7 @@ void taitol_state::taito_machine_reset()
 	}
 
 	m_cur_rombank = m_cur_rombank2 = 0;
-	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+	membank("bank1")->set_base(memregion("maincpu")->base());
 
 	machine().gfx[2]->set_source(m_rambanks);
 
@@ -359,7 +359,7 @@ WRITE8_MEMBER(taitol_state::rombankswitch_w)
 
 		//logerror("robs %d, %02x (%04x)\n", offset, data, space.device().safe_pc());
 		m_cur_rombank = data;
-		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x2000 * m_cur_rombank);
+		membank("bank1")->set_base(memregion("maincpu")->base() + 0x2000 * m_cur_rombank);
 	}
 }
 
@@ -378,7 +378,7 @@ WRITE8_MEMBER(taitol_state::rombank2switch_w)
 		//logerror("robs2 %02x (%04x)\n", data, space.device().safe_pc());
 
 		m_cur_rombank2 = data;
-		membank("bank6")->set_base(machine().root_device().memregion("slave")->base() + 0x4000 * m_cur_rombank2);
+		membank("bank6")->set_base(memregion("slave")->base() + 0x4000 * m_cur_rombank2);
 	}
 }
 
@@ -2651,7 +2651,7 @@ DRIVER_INIT_MEMBER(taitol_state,plottinga)
 				v |= 1 << (7 - j);
 		tab[i] = v;
 	}
-	p = machine().root_device().memregion("maincpu")->base();
+	p = memregion("maincpu")->base();
 	for (i = 0; i < 0x10000; i++)
 	{
 		*p = tab[*p];

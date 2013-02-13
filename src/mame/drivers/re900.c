@@ -114,7 +114,7 @@ public:
 
 READ8_MEMBER(re900_state::re_psg_portA_r)
 {
-	if ((machine().root_device().ioport("IN0")->read() & 0x01) == 0)
+	if ((ioport("IN0")->read() & 0x01) == 0)
 	{
 		output_set_lamp_value(0,1);     // Operator Key ON
 	}
@@ -124,7 +124,7 @@ READ8_MEMBER(re900_state::re_psg_portA_r)
 		output_set_lamp_value(0,0);     // Operator Key OFF
 	}
 
-	return machine().root_device().ioport("IN0")->read();
+	return ioport("IN0")->read();
 }
 
 READ8_MEMBER(re900_state::re_psg_portB_r)

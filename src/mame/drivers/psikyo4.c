@@ -183,7 +183,7 @@ READ32_MEMBER(psikyo4_state::ps4_eeprom_r)
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		return machine().root_device().ioport("JP4")->read();
+		return ioport("JP4")->read();
 	}
 
 //  logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -318,7 +318,7 @@ WRITE32_MEMBER(psikyo4_state::ps4_vidregs_w)
 	if (offset == 2) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)    // Bank
-			membank("bank2")->set_base(machine().root_device().memregion("gfx1")->base() + 0x2000 * (m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
+			membank("bank2")->set_base(memregion("gfx1")->base() + 0x2000 * (m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
 	}
 }
 
@@ -960,8 +960,8 @@ void psikyo4_state::install_hotgmck_pcm_bank()
 
 DRIVER_INIT_MEMBER(psikyo4_state,hotgmck)
 {
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->set_base(&RAM[0x100000]);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("bank1")->set_base(&RAM[0x100000]);
 	install_hotgmck_pcm_bank();    // Banked PCM ROM
 }
 

@@ -346,7 +346,7 @@ READ8_MEMBER(opwolf_state::z80_input2_r)
 
 WRITE8_MEMBER(opwolf_state::sound_bankswitch_w)
 {
-	machine().root_device().membank("bank10")->set_entry((data - 1) & 0x03);
+	membank("bank10")->set_entry((data - 1) & 0x03);
 }
 
 /***********************************************************

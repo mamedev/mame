@@ -4,7 +4,7 @@
 
 void mermaid_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -35,7 +35,7 @@ void mermaid_state::palette_init()
 
 PALETTE_INIT_MEMBER(mermaid_state,rougien)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

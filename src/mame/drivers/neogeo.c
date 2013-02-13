@@ -654,7 +654,7 @@ WRITE16_MEMBER(neogeo_state::main_cpu_bank_select_w)
 void neogeo_state::neogeo_main_cpu_banking_init()
 {
 	/* create vector banks */
-	m_bank_vectors->configure_entry(0, machine().root_device().memregion("mainbios")->base());
+	m_bank_vectors->configure_entry(0, memregion("mainbios")->base());
 	m_bank_vectors->configure_entry(1, m_region_maincpu->base());
 
 	if (m_is_cartsys)
@@ -1298,21 +1298,21 @@ DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 			size = image.get_software_region_length("audiocpu");
 			machine().memory().region_free(":audiocpu");
 			machine().memory().region_alloc(":audiocpu",size+0x10000,1, ENDIANNESS_LITTLE);
-			memcpy(machine().root_device().memregion("audiocpu")->base(),image.get_software_region("audiocpu"),size);
-			memcpy(machine().root_device().memregion("audiocpu")->base()+0x10000,image.get_software_region("audiocpu"),size); // avoid reloading in XML, should just improve banking instead tho?
+			memcpy(memregion("audiocpu")->base(),image.get_software_region("audiocpu"),size);
+			memcpy(memregion("audiocpu")->base()+0x10000,image.get_software_region("audiocpu"),size); // avoid reloading in XML, should just improve banking instead tho?
 		}
 
 
 		size = image.get_software_region_length("ymsnd");
 		machine().memory().region_free(":ymsnd");
 		machine().memory().region_alloc(":ymsnd",size,1, ENDIANNESS_LITTLE);
-		memcpy(machine().root_device().memregion("ymsnd")->base(),image.get_software_region("ymsnd"),size);
+		memcpy(memregion("ymsnd")->base(),image.get_software_region("ymsnd"),size);
 		if(image.get_software_region("ymsnd.deltat") != NULL)
 		{
 			size = image.get_software_region_length("ymsnd.deltat");
 			machine().memory().region_free(":ymsnd.deltat");
 			machine().memory().region_alloc(":ymsnd.deltat",size,1, ENDIANNESS_LITTLE);
-			memcpy(machine().root_device().memregion("ymsnd.deltat")->base(),image.get_software_region("ymsnd.deltat"),size);
+			memcpy(memregion("ymsnd.deltat")->base(),image.get_software_region("ymsnd.deltat"),size);
 		}
 		else
 			machine().memory().region_free(":ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
@@ -1320,14 +1320,14 @@ DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 		size = image.get_software_region_length("sprites");
 		machine().memory().region_free(":sprites");
 		machine().memory().region_alloc(":sprites",size,1, ENDIANNESS_LITTLE);
-		memcpy(machine().root_device().memregion("sprites")->base(),image.get_software_region("sprites"),size);
+		memcpy(memregion("sprites")->base(),image.get_software_region("sprites"),size);
 		// Reset the reference to the region
 		m_region_sprites.findit();
 		if(image.get_software_region("audiocrypt") != NULL)  // encrypted Z80 code
 		{
 			size = image.get_software_region_length("audiocrypt");
 			machine().memory().region_alloc(":audiocrypt",size,1, ENDIANNESS_LITTLE);
-			memcpy(machine().root_device().memregion("audiocrypt")->base(),image.get_software_region("audiocrypt"),size);
+			memcpy(memregion("audiocrypt")->base(),image.get_software_region("audiocrypt"),size);
 			// allocate the audiocpu region to decrypt data into
 			machine().memory().region_free(":audiocpu");
 			machine().memory().region_alloc(":audiocpu",size+0x10000,1, ENDIANNESS_LITTLE);
@@ -1335,7 +1335,7 @@ DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 
 		// setup cartridge ROM area
 		m_maincpu->space(AS_PROGRAM).install_read_bank(0x000080,0x0fffff,"cart_rom");
-		machine().root_device().membank("cart_rom")->set_base(m_region_maincpu->base() + 0x80);
+		membank("cart_rom")->set_base(m_region_maincpu->base() + 0x80);
 
 		// handle possible protection
 		mvs_install_protection(image);

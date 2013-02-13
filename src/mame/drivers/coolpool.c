@@ -519,7 +519,7 @@ READ16_MEMBER(coolpool_state::dsp_rom_r)
 {
 	UINT8 *rom = memregion("user2")->base();
 
-	return rom[m_iop_romaddr & (machine().root_device().memregion("user2")->bytes() - 1)];
+	return rom[m_iop_romaddr & (memregion("user2")->bytes() - 1)];
 }
 
 
@@ -1177,8 +1177,8 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
 	UINT16 *rom;
 
 	/* decrypt the main program ROMs */
-	rom = (UINT16 *)machine().root_device().memregion("user1")->base();
-	len = machine().root_device().memregion("user1")->bytes();
+	rom = (UINT16 *)memregion("user1")->base();
+	len = memregion("user1")->bytes();
 	for (a = 0;a < len/2;a++)
 	{
 		int hi,lo,nhi,nlo;
@@ -1201,8 +1201,8 @@ DRIVER_INIT_MEMBER(coolpool_state,9ballsht)
 	}
 
 	/* decrypt the sub data ROMs */
-	rom = (UINT16 *)machine().root_device().memregion("user2")->base();
-	len = machine().root_device().memregion("user2")->bytes();
+	rom = (UINT16 *)memregion("user2")->base();
+	len = memregion("user2")->bytes();
 	for (a = 1;a < len/2;a+=4)
 	{
 		/* just swap bits 1 and 2 of the address */

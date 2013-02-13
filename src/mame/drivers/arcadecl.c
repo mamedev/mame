@@ -387,7 +387,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(arcadecl_state,sparkz)
 {
-	memset(machine().root_device().memregion("gfx1")->base(), 0, machine().root_device().memregion("gfx1")->bytes());
+	memset(memregion("gfx1")->base(), 0, memregion("gfx1")->bytes());
 }
 
 

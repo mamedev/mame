@@ -541,7 +541,7 @@ GFXDECODE_END
 DRIVER_INIT_MEMBER(jackie_state,jackie)
 {
 	int A;
-	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+	UINT8 *rom = memregion("maincpu")->base();
 
 	for (A = 0;A < 0xf000;A++)
 	{

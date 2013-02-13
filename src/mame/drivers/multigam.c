@@ -331,7 +331,7 @@ WRITE8_MEMBER(multigam_state::multigam_switch_prg_rom)
 
 WRITE8_MEMBER(multigam_state::multigam_switch_gfx_rom)
 {
-	membank("bank1")->set_base(machine().root_device().memregion("gfx1")->base() + (0x2000 * (data & 0x3f)));
+	membank("bank1")->set_base(memregion("gfx1")->base() + (0x2000 * (data & 0x3f)));
 	set_mirroring(data & 0x40 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	m_game_gfx_bank = data;
 };
@@ -341,7 +341,7 @@ WRITE8_MEMBER(multigam_state::multigam_mapper2_w)
 {
 	if (m_game_gfx_bank & 0x80)
 	{
-		membank("bank1")->set_base(machine().root_device().memregion("gfx1")->base() + (0x2000 * ((data & 0x3) + (m_game_gfx_bank & 0x3c))));
+		membank("bank1")->set_base(memregion("gfx1")->base() + (0x2000 * ((data & 0x3) + (m_game_gfx_bank & 0x3c))));
 	}
 	else
 	{
@@ -533,7 +533,7 @@ WRITE8_MEMBER(multigam_state::multigam3_mmc3_rom_switch_w)
 			}
 			else
 			{
-				membank("bank10")->set_base(machine().root_device().memregion("maincpu")->base() + 0x6000);
+				membank("bank10")->set_base(memregion("maincpu")->base() + 0x6000);
 			}
 			if (data & 0x40)
 			{
@@ -617,7 +617,7 @@ WRITE8_MEMBER(multigam_state::multigm3_switch_prg_rom)
 	else
 	{
 		space.install_write_handler(0x8000, 0xffff, write8_delegate(FUNC(multigam_state::multigm3_mapper2_w),this) );
-		membank("bank10")->set_base(machine().root_device().memregion("maincpu")->base() + 0x6000);
+		membank("bank10")->set_base(memregion("maincpu")->base() + 0x6000);
 	}
 
 	if (data & 0x80)
@@ -1380,8 +1380,8 @@ DRIVER_INIT_MEMBER(multigam_state,multigm3)
 
 	const UINT8 decode[16]  = { 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a };
 
-	multigm3_decrypt(machine().root_device().memregion("maincpu")->base(), machine().root_device().memregion("maincpu")->bytes(), decode );
-	multigm3_decrypt(machine().root_device().memregion("user1")->base(), machine().root_device().memregion("user1")->bytes(), decode );
+	multigm3_decrypt(memregion("maincpu")->base(), memregion("maincpu")->bytes(), decode );
+	multigm3_decrypt(memregion("user1")->base(), memregion("user1")->bytes(), decode );
 
 	m_multigmc_mmc3_6000_ram = auto_alloc_array(machine(), UINT8, 0x2000);
 
@@ -1398,7 +1398,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 	int i;
 	int addr;
 
-	rom = machine().root_device().memregion("maincpu")->base();
+	rom = memregion("maincpu")->base();
 	size = 0x8000;
 	memcpy(buf, rom, size);
 	for (i = 0; i < size; i++)
@@ -1407,7 +1407,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 		rom[i] = buf[addr];
 	}
 
-	rom = machine().root_device().memregion("user1")->base();
+	rom = memregion("user1")->base();
 	size = 0x80000;
 	memcpy(buf, rom, size);
 	for (i = 0; i < size; i++)
@@ -1415,7 +1415,7 @@ DRIVER_INIT_MEMBER(multigam_state,multigmt)
 		addr = BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,8,11,12,10,9,7,6,5,4,3,2,1,0);
 		rom[i] = buf[addr];
 	}
-	rom = machine().root_device().memregion("gfx1")->base();
+	rom = memregion("gfx1")->base();
 	size = 0x80000;
 	memcpy(buf, rom, size);
 	for (i = 0; i < size; i++)

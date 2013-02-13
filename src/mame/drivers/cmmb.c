@@ -143,11 +143,11 @@ READ8_MEMBER(cmmb_state::cmmb_input_r)
 
 /*
     {
-        UINT8 *ROM = space.machine().root_device().memregion("maincpu")->base();
+        UINT8 *ROM = space.memregion("maincpu")->base();
         UINT32 bankaddress;
 
         bankaddress = 0x10000 + (0x10000 * (data & 0x03));
-        space.machine().root_device().membank("bank1")->set_base(&ROM[bankaddress]);
+        space.membank("bank1")->set_base(&ROM[bankaddress]);
     }
 */
 

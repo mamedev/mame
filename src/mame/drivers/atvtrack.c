@@ -333,7 +333,7 @@ void atvtrack_state::machine_start()
 	UINT8 *src, *dst;
 
 	m_nandaddressstep = 0;
-	m_nandregion = machine().root_device().memregion("maincpu");
+	m_nandregion = memregion("maincpu");
 	address_space &as = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	dst = (UINT8 *)(as.get_write_ptr(0x0c7f0000));
 	src = m_nandregion->base()+0x10;

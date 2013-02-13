@@ -1122,14 +1122,14 @@ static void ym3438_irq_handler(device_t *device, int state)
 WRITE8_MEMBER(segas32_state::sound_bank_lo_w)
 {
 	m_sound_bank = (m_sound_bank & ~0x3f) | (data & 0x3f);
-	membank("bank1")->set_base(machine().root_device().memregion("soundcpu")->base() + 0x100000 + 0x2000 * m_sound_bank);
+	membank("bank1")->set_base(memregion("soundcpu")->base() + 0x100000 + 0x2000 * m_sound_bank);
 }
 
 
 WRITE8_MEMBER(segas32_state::sound_bank_hi_w)
 {
 	m_sound_bank = (m_sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
-	membank("bank1")->set_base(machine().root_device().memregion("soundcpu")->base() + 0x100000 + 0x2000 * m_sound_bank);
+	membank("bank1")->set_base(memregion("soundcpu")->base() + 0x100000 + 0x2000 * m_sound_bank);
 }
 
 

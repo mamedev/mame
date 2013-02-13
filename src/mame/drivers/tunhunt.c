@@ -90,31 +90,31 @@ READ8_MEMBER(tunhunt_state::tunhunt_button_r)
 
 READ8_MEMBER(tunhunt_state::dsw2_0r)
 {
-	return (machine().root_device().ioport("DSW")->read()&0x0100)?0x80:0x00;
+	return (ioport("DSW")->read()&0x0100)?0x80:0x00;
 }
 
 
 READ8_MEMBER(tunhunt_state::dsw2_1r)
 {
-	return (machine().root_device().ioport("DSW")->read()&0x0200)?0x80:0x00;
+	return (ioport("DSW")->read()&0x0200)?0x80:0x00;
 }
 
 
 READ8_MEMBER(tunhunt_state::dsw2_2r)
 {
-	return (machine().root_device().ioport("DSW")->read()&0x0400)?0x80:0x00;
+	return (ioport("DSW")->read()&0x0400)?0x80:0x00;
 }
 
 
 READ8_MEMBER(tunhunt_state::dsw2_3r)
 {
-	return (machine().root_device().ioport("DSW")->read()&0x0800)?0x80:0x00;
+	return (ioport("DSW")->read()&0x0800)?0x80:0x00;
 }
 
 
 READ8_MEMBER(tunhunt_state::dsw2_4r)
 {
-	return (machine().root_device().ioport("DSW")->read()&0x1000)?0x80:0x00;
+	return (ioport("DSW")->read()&0x1000)?0x80:0x00;
 }
 
 

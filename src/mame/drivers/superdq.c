@@ -84,7 +84,7 @@ UINT32 superdq_state::screen_update_superdq(screen_device &screen, bitmap_rgb32 
 
 void superdq_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	static const int resistances[3] = { 820, 390, 200 };
 	double rweights[3], gweights[3], bweights[2];

@@ -836,7 +836,7 @@ C3D54*
 
 DRIVER_INIT_MEMBER(vaportra_state,vaportra)
 {
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int i;
 
 	for (i = 0x00000; i < 0x80000; i++)

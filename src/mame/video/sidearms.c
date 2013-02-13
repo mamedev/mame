@@ -217,7 +217,7 @@ void sidearms_state::sidearms_draw_starfield( bitmap_ind16 &bitmap )
 	_vcount_191 = m_vcount_191;
 	_hcount_191 = m_hcount_191 & 0xff;
 
-	sf_rom = machine().root_device().memregion("user1")->base();
+	sf_rom = memregion("user1")->base();
 
 #if 0 // old loop (for reference; easier to read)
 	if (!flipon)

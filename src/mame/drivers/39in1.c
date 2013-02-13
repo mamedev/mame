@@ -1545,7 +1545,7 @@ void _39in1_state::pxa255_start()
 
 void _39in1_state::machine_start()
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x80000; i += 2)
@@ -1558,7 +1558,7 @@ void _39in1_state::machine_start()
 
 MACHINE_START_MEMBER(_39in1_state,60in1)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x80000; i += 2)

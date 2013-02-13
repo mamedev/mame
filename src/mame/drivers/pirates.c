@@ -341,11 +341,11 @@ void pirates_state::pirates_decrypt_68k()
 	UINT16 *buf, *rom;
 	int i;
 
-	rom_size = machine().root_device().memregion("maincpu")->bytes();
+	rom_size = memregion("maincpu")->bytes();
 
 	buf = auto_alloc_array(machine(), UINT16, rom_size/2);
 
-	rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	rom = (UINT16 *)memregion("maincpu")->base();
 	memcpy (buf, rom, rom_size);
 
 	for (i=0; i<rom_size/2; i++)
@@ -370,11 +370,11 @@ void pirates_state::pirates_decrypt_p()
 	UINT8 *buf, *rom;
 	int i;
 
-	rom_size = machine().root_device().memregion("gfx1")->bytes();
+	rom_size = memregion("gfx1")->bytes();
 
 	buf = auto_alloc_array(machine(), UINT8, rom_size);
 
-	rom = machine().root_device().memregion("gfx1")->base();
+	rom = memregion("gfx1")->base();
 	memcpy (buf, rom, rom_size);
 
 	for (i=0; i<rom_size/4; i++)
@@ -394,11 +394,11 @@ void pirates_state::pirates_decrypt_s()
 	UINT8 *buf, *rom;
 	int i;
 
-	rom_size = machine().root_device().memregion("gfx2")->bytes();
+	rom_size = memregion("gfx2")->bytes();
 
 	buf = auto_alloc_array(machine(), UINT8, rom_size);
 
-	rom = machine().root_device().memregion("gfx2")->base();
+	rom = memregion("gfx2")->base();
 	memcpy (buf, rom, rom_size);
 
 	for (i=0; i<rom_size/4; i++)
@@ -419,11 +419,11 @@ void pirates_state::pirates_decrypt_oki()
 	UINT8 *buf, *rom;
 	int i;
 
-	rom_size = machine().root_device().memregion("oki")->bytes();
+	rom_size = memregion("oki")->bytes();
 
 	buf = auto_alloc_array(machine(), UINT8, rom_size);
 
-	rom = machine().root_device().memregion("oki")->base();
+	rom = memregion("oki")->base();
 	memcpy (buf, rom, rom_size);
 
 	for (i=0; i<rom_size; i++)
@@ -437,7 +437,7 @@ void pirates_state::pirates_decrypt_oki()
 
 DRIVER_INIT_MEMBER(pirates_state,pirates)
 {
-	UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 
 	pirates_decrypt_68k();
 	pirates_decrypt_p();

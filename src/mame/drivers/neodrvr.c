@@ -9506,8 +9506,8 @@ DRIVER_INIT_MEMBER(neogeo_state,kof2002b)
 	kof2002_decrypt_68k(machine());
 	neo_pcm2_swap(machine(), 0);
 	neogeo_cmc50_m1_decrypt(machine());
-	kof2002b_gfx_decrypt(machine(), machine().root_device().memregion("sprites")->base(),0x4000000);
-	kof2002b_gfx_decrypt(machine(), machine().root_device().memregion("fixed")->base(),0x20000);
+	kof2002b_gfx_decrypt(machine(), memregion("sprites")->base(),0x4000000);
+	kof2002b_gfx_decrypt(machine(), memregion("fixed")->base(),0x20000);
 }
 
 DRIVER_INIT_MEMBER(neogeo_state,kf2k2pls)
@@ -9916,7 +9916,7 @@ DRIVER_INIT_MEMBER(neogeo_state,sbp)
 
 	/* the game code clears the text overlay used ingame immediately after writing it.. why? protection? sloppy code that the hw ignores? imperfect emulation? */
 	{
-		UINT16* rom = (UINT16*)machine().root_device().memregion("maincpu")->base();
+		UINT16* rom = (UINT16*)memregion("maincpu")->base();
 
 		rom[0x2a6f8/2] = 0x4e71;
 		rom[0x2a6fa/2] = 0x4e71;

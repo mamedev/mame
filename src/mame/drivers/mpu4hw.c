@@ -2583,7 +2583,7 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default_big)
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	DRIVER_INIT_CALL(m4default);
 
-	int size = machine().root_device().memregion( "maincpu" )->bytes();
+	int size = memregion( "maincpu" )->bytes();
 	if (size<=0x10000)
 	{
 		printf("extended banking selected on set <=0x10000 in size, ignoring");
@@ -2643,13 +2643,13 @@ void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_xor)
 DRIVER_INIT_MEMBER(mpu4_state,crystal)
 {
 	DRIVER_INIT_CALL(m_frkstn);
-	descramble_crystal(machine().root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
+	descramble_crystal(memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
 }
 
 DRIVER_INIT_MEMBER(mpu4_state,crystali)
 {
 	DRIVER_INIT_CALL(m_frkstn);
-	descramble_crystal(machine().root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0xff); // invert after decrypt?!
+	descramble_crystal(memregion( "maincpu" )->base(), 0x0000, 0x10000, 0xff); // invert after decrypt?!
 }
 
 /* generate a 50 Hz signal (based on an RC time) */

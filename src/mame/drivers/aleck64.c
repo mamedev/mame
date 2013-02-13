@@ -834,7 +834,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(n64_state,aleck64)
 {
-	UINT8 *rom = machine().root_device().memregion("user2")->base();
+	UINT8 *rom = memregion("user2")->base();
 
 	rom[0x67c] = 0;
 	rom[0x67d] = 0;

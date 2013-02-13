@@ -238,7 +238,7 @@ INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
 			case 3: movement_flip_flop = m_ttl7474_1a_1;    dir_flip_flop = m_ttl7474_1a_2; break;
 		}
 
-		port_value = machine().root_device().ioport(portnames[player])->read();
+		port_value = ioport(portnames[player])->read();
 
 		if (port_value != m_last_wheel_value[player])
 		{
@@ -256,7 +256,7 @@ INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
 
 
 	/* finally read the accelerator pedals */
-	port_value = machine().root_device().ioport("PEDALS")->read();
+	port_value = ioport("PEDALS")->read();
 
 	for (player = 0; player < 4; player++)
 	{

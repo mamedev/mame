@@ -114,7 +114,7 @@ void popeye_state::convert_color_prom(const UINT8 *color_prom)
 
 void popeye_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	m_invertmask = 0xff;
 
 	convert_color_prom(color_prom);
@@ -122,7 +122,7 @@ void popeye_state::palette_init()
 
 PALETTE_INIT_MEMBER(popeye_state,popeyebl)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	m_invertmask = 0x00;
 
 	convert_color_prom(color_prom);

@@ -1220,7 +1220,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dsp_pointrom_addr_w)
 
 READ16_MEMBER(namcos21_state::winrun_dsp_pointrom_data_r)
 {
-	UINT16 *ptrom = (UINT16 *)machine().root_device().memregion("user2")->base();
+	UINT16 *ptrom = (UINT16 *)memregion("user2")->base();
 	return ptrom[m_winrun_pointrom_addr++];
 } /* winrun_dsp_pointrom_data_r */
 
@@ -1262,7 +1262,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(namcos21_state::gpu_data_r)
 {
-	const UINT16 *pSrc = (UINT16 *)machine().root_device().memregion( "user3" )->base();
+	const UINT16 *pSrc = (UINT16 *)memregion( "user3" )->base();
 	return pSrc[offset];
 }
 
@@ -1280,7 +1280,7 @@ WRITE16_MEMBER(namcos21_state::winrun_dspbios_w)
 	COMBINE_DATA( &m_winrun_dspbios[offset] );
 	if( offset==0xfff )
 	{
-		UINT16 *mem = (UINT16 *)machine().root_device().memregion("dsp")->base();
+		UINT16 *mem = (UINT16 *)memregion("dsp")->base();
 		memcpy( mem, m_winrun_dspbios, 0x2000 );
 		m_winrun_dsp_alive = 1;
 	}
@@ -2259,7 +2259,7 @@ DRIVER_INIT_MEMBER(namcos21_state,cybsled)
 
 DRIVER_INIT_MEMBER(namcos21_state,solvalou)
 {
-	UINT16 *mem = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *mem = (UINT16 *)memregion("maincpu")->base();
 	mem[0x20ce4/2+1] = 0x0000; // $200128
 	mem[0x20cf4/2+0] = 0x4e71; // 2nd ptr_booting
 	mem[0x20cf4/2+1] = 0x4e71;

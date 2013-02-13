@@ -331,7 +331,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(citycon_state,citycon)
 {
-	UINT8 *rom = machine().root_device().memregion("gfx1")->base();
+	UINT8 *rom = memregion("gfx1")->base();
 	int i;
 
 	/*

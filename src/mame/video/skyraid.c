@@ -108,7 +108,7 @@ void skyraid_state::draw_missiles(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 void skyraid_state::draw_trapezoid(bitmap_ind16& dst, bitmap_ind16& src)
 {
-	const UINT8* p = machine().root_device().memregion("user2")->base();
+	const UINT8* p = memregion("user2")->base();
 
 	int x;
 	int y;

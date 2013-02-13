@@ -127,7 +127,7 @@ public:
 
 void cyclemb_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -1020,13 +1020,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cyclemb_state,cyclemb)
 {
-	machine().root_device().membank("bank1")->configure_entries(0, 4, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x760;
 }
 
 DRIVER_INIT_MEMBER(cyclemb_state,skydest)
 {
-	machine().root_device().membank("bank1")->configure_entries(0, 4, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x1000);
+	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x554;
 }
 

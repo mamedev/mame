@@ -1210,7 +1210,7 @@ void md_base_state::megadriv_init_common()
 		//printf("GENESIS Sound Z80 cpu found '%s'\n", _genesis_snd_z80_cpu->tag() );
 
 		genz80.z80_prgram = auto_alloc_array(machine(), UINT8, 0x2000);
-		machine().root_device().membank("bank1")->set_base(genz80.z80_prgram );
+		membank("bank1")->set_base(genz80.z80_prgram );
 	}
 
 	/* Look to see if this system has the 32x Master SH2 */
@@ -1260,7 +1260,7 @@ void md_base_state::megadriv_init_common()
 		  some games specify a single address, (start 200001, end 200001)
 		  this usually means there is serial eeprom instead */
 		int i;
-		UINT16 *rom = (UINT16*)machine().root_device().memregion("maincpu")->base();
+		UINT16 *rom = (UINT16*)memregion("maincpu")->base();
 
 		mame_printf_debug("DEBUG:: Header: Backup RAM string (ignore for games without)\n");
 		for (i=0;i<12;i++)
@@ -1379,7 +1379,7 @@ SCREEN_VBLANK(megadriv)
 {
 	md_base_state *state = screen.machine().driver_data<md_base_state>();
 
-	if (screen.machine().root_device().ioport(":RESET")->read_safe(0x00) & 0x01)
+	if (screen.ioport(":RESET")->read_safe(0x00) & 0x01)
 		screen.machine().device(":maincpu")->execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// rising edge

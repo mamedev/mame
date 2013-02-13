@@ -220,7 +220,7 @@ UINT32 miniboy7_state::screen_update_miniboy7(screen_device &screen, bitmap_ind1
 
 void miniboy7_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 /*  FIXME... Can't get the correct palette.
     sometimes RGB bits are inverted, disregarding the 4th bit.
 

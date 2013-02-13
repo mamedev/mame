@@ -788,7 +788,7 @@ READ8_MEMBER( vega_state::ins8154_pb_r )
 
 READ8_MEMBER(vega_state::randomizer )
 {
-	return (machine().root_device().ioport("IN1")->read()&7)|(machine().rand()&(~7));
+	return (ioport("IN1")->read()&7)|(machine().rand()&(~7));
 }
 
 
@@ -900,8 +900,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(vega_state, vega)
 {
-	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->configure_entries(0, 2, &ROM[0x1000], 0x800);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &ROM[0x1000], 0x800);
 }
 
 GAME( 1982, vega,   0, vega, vega, vega_state, vega, ROT270, "Olympia", "Vega", 0 )

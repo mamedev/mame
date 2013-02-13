@@ -465,7 +465,7 @@ UINT32 undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind1
 	/* See if we should draw artificial gun targets */
 	/* (not yet implemented...) */
 
-	if (machine().root_device().ioport("FAKE")->read() & 0x1)   /* Fake DSW */
+	if (ioport("FAKE")->read() & 0x1)   /* Fake DSW */
 	{
 		popmessage("Gunsights on");
 	}

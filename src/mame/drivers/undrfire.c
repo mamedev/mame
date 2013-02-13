@@ -967,8 +967,8 @@ ROM_END
 DRIVER_INIT_MEMBER(undrfire_state,undrfire)
 {
 	UINT32 offset,i;
-	UINT8 *gfx = machine().root_device().memregion("gfx3")->base();
-	int size=machine().root_device().memregion("gfx3")->bytes();
+	UINT8 *gfx = memregion("gfx3")->base();
+	int size=memregion("gfx3")->bytes();
 	int data;
 
 	/* make piv tile GFX format suitable for gfxdecode */
@@ -996,8 +996,8 @@ DRIVER_INIT_MEMBER(undrfire_state,undrfire)
 DRIVER_INIT_MEMBER(undrfire_state,cbombers)
 {
 	UINT32 offset,i;
-	UINT8 *gfx = machine().root_device().memregion("gfx3")->base();
-	int size=machine().root_device().memregion("gfx3")->bytes();
+	UINT8 *gfx = memregion("gfx3")->base();
+	int size=memregion("gfx3")->bytes();
 	int data;
 
 

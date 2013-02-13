@@ -683,7 +683,7 @@ void bfm_sc1_state::machine_reset()
 
 // init rom bank ////////////////////////////////////////////////////////////////////
 	{
-		UINT8 *rom = machine().root_device().memregion("maincpu")->base();
+		UINT8 *rom = memregion("maincpu")->base();
 
 		membank("bank1")->configure_entries(0, 4, &rom[0x0000], 0x02000);
 		membank("bank1")->set_entry(m_defaultbank);
@@ -1178,8 +1178,8 @@ int bfm_sc1_state::sc1_find_project_string( )
 {
 	// search for the project string to find the title (usually just at ff00)
 	char title_string[7][32] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT ", "CASH ON THE NILE 2", "PR6121", "CHINA TOWN\x0d\x0a", "PROJECTNUMBER" };
-	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
-	int size = machine().root_device().memregion( "maincpu" )->bytes();
+	UINT8 *src = memregion( "maincpu" )->base();
+	int size = memregion( "maincpu" )->bytes();
 
 	for (int search=0;search<7;search++)
 	{

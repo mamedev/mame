@@ -339,7 +339,7 @@ READ32_MEMBER(psikyosh_state::psh_eeprom_r)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		return machine().root_device().ioport("JP4")->read();
+		return ioport("JP4")->read();
 	}
 
 	logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -1215,8 +1215,8 @@ DRIVER_INIT_MEMBER(psikyosh_state,s1945ii)
 
 DRIVER_INIT_MEMBER(psikyosh_state,daraku)
 {
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->set_base(&RAM[0x100000]);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("bank1")->set_base(&RAM[0x100000]);
 	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
@@ -1227,15 +1227,15 @@ DRIVER_INIT_MEMBER(psikyosh_state,sbomberb)
 
 DRIVER_INIT_MEMBER(psikyosh_state,gunbird2)
 {
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->set_base(&RAM[0x100000]);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("bank1")->set_base(&RAM[0x100000]);
 	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 
 DRIVER_INIT_MEMBER(psikyosh_state,s1945iii)
 {
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
-	machine().root_device().membank("bank1")->set_base(&RAM[0x100000]);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("bank1")->set_base(&RAM[0x100000]);
 	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 }
 

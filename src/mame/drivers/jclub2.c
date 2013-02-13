@@ -995,10 +995,10 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 	// the eeprom contains the game ID, which must be valid for it to boot
 	// is there a way (key sequence) to reprogram it??
 	// I bet the original sets need similar get further in their boot sequence
-	UINT8  *eeprom = (UINT8 *)  machine().root_device().memregion("eeprom")->base();
+	UINT8  *eeprom = (UINT8 *)  memregion("eeprom")->base();
 	if (eeprom != NULL)
 	{
-		size_t len = machine().root_device().memregion("eeprom")->bytes();
+		size_t len = memregion("eeprom")->bytes();
 		UINT8* temp = (UINT8*)auto_alloc_array(machine(), UINT8, len);
 		int i;
 		for (i = 0; i < len; i++)

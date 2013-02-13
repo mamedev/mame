@@ -661,7 +661,7 @@
 WRITE_LINE_MEMBER(calomega_state::tx_rx_clk)
 {
 	int trx_clk;
-	UINT8 dsw2 = machine().root_device().ioport("SW2")->read();
+	UINT8 dsw2 = ioport("SW2")->read();
 	trx_clk = UART_CLOCK * dsw2 / 128;
 	acia6850_device *acia = machine().device<acia6850_device>("acia6850_0");
 	acia->set_rx_clock(trx_clk);
@@ -679,7 +679,7 @@ READ8_MEMBER(calomega_state::s903_mux_port_r)
 		case 0x80: return ioport("IN0-3")->read();
 	}
 
-	return machine().root_device().ioport("FRQ")->read();   /* bit7 used for 50/60 Hz selector */
+	return ioport("FRQ")->read();   /* bit7 used for 50/60 Hz selector */
 }
 
 WRITE8_MEMBER(calomega_state::s903_mux_w)
@@ -699,7 +699,7 @@ READ8_MEMBER(calomega_state::s905_mux_port_r)
 		case 0x08: return ioport("IN0-3")->read();
 	}
 
-	return machine().root_device().ioport("FRQ")->read();   /* bit6 used for 50/60 Hz selector */
+	return ioport("FRQ")->read();   /* bit6 used for 50/60 Hz selector */
 }
 
 WRITE8_MEMBER(calomega_state::s905_mux_w)
@@ -714,7 +714,7 @@ READ8_MEMBER(calomega_state::pia0_ain_r)
 {
 	/* Valid input port. Each polled value is stored at $0538 */
 	logerror("PIA0: Port A in\n");
-	return machine().root_device().ioport("IN0")->read();
+	return ioport("IN0")->read();
 }
 
 READ8_MEMBER(calomega_state::pia0_bin_r)
@@ -3909,7 +3909,7 @@ DRIVER_INIT_MEMBER(calomega_state,standard)
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = machine().root_device().memregion( "proms" )->base();
+	UINT8 *BPR = memregion( "proms" )->base();
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -3921,7 +3921,7 @@ DRIVER_INIT_MEMBER(calomega_state,standard)
 DRIVER_INIT_MEMBER(calomega_state,elgrande)
 {
 	int x;
-	UINT8 *BPR = machine().root_device().memregion( "proms" )->base();
+	UINT8 *BPR = memregion( "proms" )->base();
 
 	/* background color is adjusted through RGB pots */
 	for (x = 0x0000; x < 0x0400; x++)
@@ -3935,7 +3935,7 @@ DRIVER_INIT_MEMBER(calomega_state,jjpoker)
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = machine().root_device().memregion( "proms" )->base();
+	UINT8 *BPR = memregion( "proms" )->base();
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -3948,7 +3948,7 @@ DRIVER_INIT_MEMBER(calomega_state,comg080)
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = machine().root_device().memregion( "proms" )->base();
+	UINT8 *BPR = memregion( "proms" )->base();
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -3960,7 +3960,7 @@ DRIVER_INIT_MEMBER(calomega_state,comg080)
 	   Start = $2042;  NMI = $26f8;
 	   Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.
 	*/
-	UINT8 *PRGROM = machine().root_device().memregion( "maincpu" )->base();
+	UINT8 *PRGROM = memregion( "maincpu" )->base();
 
 	PRGROM[0x3ff8] = 0x8e; /* checked by code */
 	PRGROM[0x3ff9] = 0x97; /* checked by code */

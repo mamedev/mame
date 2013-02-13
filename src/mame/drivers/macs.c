@@ -141,7 +141,7 @@ READ8_MEMBER(macs_state::macs_input_r)
 
 WRITE8_MEMBER(macs_state::macs_rom_bank_w)
 {
-	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + (data* 0x4000) + macs_cart_slot*0x400000 );
+	membank("bank1")->set_base(memregion("maincpu")->base() + (data* 0x4000) + macs_cart_slot*0x400000 );
 
 	m_st0016_rom_bank=data;
 }
@@ -710,10 +710,10 @@ MACHINE_RESET_MEMBER(macs_state,macs)
 		macs_ram1[0x1ff9]=0x07;
 		#endif
 
-		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() );
+		membank("bank1")->set_base(memregion("maincpu")->base() );
 		membank("bank2")->set_base(macs_ram1+0x800);
 		membank("bank3")->set_base(macs_ram1+0x10000);
-		membank("bank4")->set_base(machine().root_device().memregion("maincpu")->base() );
+		membank("bank4")->set_base(memregion("maincpu")->base() );
 }
 
 DRIVER_INIT_MEMBER(macs_state,macs)

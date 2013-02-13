@@ -1274,7 +1274,7 @@ DIRECT_UPDATE_MEMBER(cps3_state::cps3_direct_handler)
 	/* BIOS ROM */
 	if (address < 0x80000)
 	{
-		direct.explicit_configure(0x00000, 0x7ffff, 0x7ffff, *direct.space().machine().root_device().memregion("user1"));
+		direct.explicit_configure(0x00000, 0x7ffff, 0x7ffff, *memregion("user1"));
 		return ~0;
 	}
 	/* RAM */

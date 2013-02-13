@@ -125,7 +125,7 @@ WRITE8_MEMBER(bwing_state::bwing_scrollreg_w)
 	}
 
 	#if BW_DEBUG
-		(machine().root_device().memregion(REGION_CPU1)->base())[0x1b10 + offset] = data;
+		(memregion(REGION_CPU1)->base())[0x1b10 + offset] = data;
 	#endif
 }
 

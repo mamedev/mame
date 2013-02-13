@@ -369,7 +369,7 @@ UINT32 alpha68k_state::screen_update_alpha68k_I(screen_device &screen, bitmap_in
 
 PALETTE_INIT_MEMBER(alpha68k_state,kyros)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -397,7 +397,7 @@ PALETTE_INIT_MEMBER(alpha68k_state,kyros)
 
 PALETTE_INIT_MEMBER(alpha68k_state,paddlem)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

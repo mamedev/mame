@@ -1298,10 +1298,10 @@ DRIVER_INIT_MEMBER(tatsumi_state,apache3)
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	m_rom_sprite_lookup1 = machine().root_device().memregion("gfx2")->base();
-	m_rom_sprite_lookup2 = machine().root_device().memregion("gfx3")->base();
-	m_rom_clut0 = machine().root_device().memregion("gfx2")->base()+ 0x100000 - 0x800;
-	m_rom_clut1 = machine().root_device().memregion("gfx3")->base()+ 0x100000 - 0x800;
+	m_rom_sprite_lookup1 = memregion("gfx2")->base();
+	m_rom_sprite_lookup2 = memregion("gfx3")->base();
+	m_rom_clut0 = memregion("gfx2")->base()+ 0x100000 - 0x800;
+	m_rom_clut1 = memregion("gfx3")->base()+ 0x100000 - 0x800;
 
 	tatsumi_reset(machine());
 
@@ -1325,10 +1325,10 @@ DRIVER_INIT_MEMBER(tatsumi_state,roundup5)
 	}
 
 	// Copy sprite & palette data out of GFX rom area
-	m_rom_sprite_lookup1 = machine().root_device().memregion("gfx2")->base();
-	m_rom_sprite_lookup2 = machine().root_device().memregion("gfx3")->base();
-	m_rom_clut0 = machine().root_device().memregion("gfx2")->base()+ 0xc0000 - 0x800;
-	m_rom_clut1 = machine().root_device().memregion("gfx3")->base()+ 0xc0000 - 0x800;
+	m_rom_sprite_lookup1 = memregion("gfx2")->base();
+	m_rom_sprite_lookup2 = memregion("gfx3")->base();
+	m_rom_clut0 = memregion("gfx2")->base()+ 0xc0000 - 0x800;
+	m_rom_clut1 = memregion("gfx3")->base()+ 0xc0000 - 0x800;
 
 	tatsumi_reset(machine());
 }
@@ -1350,19 +1350,19 @@ DRIVER_INIT_MEMBER(tatsumi_state,cyclwarr)
 		src2+=32;
 	}
 
-	dst = machine().root_device().memregion("maincpu")->base();
+	dst = memregion("maincpu")->base();
 	memcpy(m_cyclwarr_cpua_ram,dst,8);
 	membank("bank1")->set_base(dst);
 
-	dst = machine().root_device().memregion("sub")->base();
+	dst = memregion("sub")->base();
 	memcpy(m_cyclwarr_cpub_ram,dst,8);
 	membank("bank2")->set_base(dst);
 
 	// Copy sprite & palette data out of GFX rom area
-	m_rom_sprite_lookup1 = machine().root_device().memregion("gfx2")->base();
-	m_rom_sprite_lookup2 = machine().root_device().memregion("gfx3")->base();
-	m_rom_clut0 = machine().root_device().memregion("gfx2")->base() + len1 - 0x1000;
-	m_rom_clut1 = machine().root_device().memregion("gfx3")->base() + len2 - 0x1000;
+	m_rom_sprite_lookup1 = memregion("gfx2")->base();
+	m_rom_sprite_lookup2 = memregion("gfx3")->base();
+	m_rom_clut0 = memregion("gfx2")->base() + len1 - 0x1000;
+	m_rom_clut1 = memregion("gfx3")->base() + len2 - 0x1000;
 
 	tatsumi_reset(machine());
 }

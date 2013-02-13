@@ -122,7 +122,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 1: /* ext rom */
 		{
-			UINT8 *mem = machine().root_device().memregion("extrom")->base();
+			UINT8 *mem = memregion("extrom")->base();
 			membank("bank1")->set_base(mem+0x4000);
 			membank("bank2")->set_base(mem+0x6000);
 		}
@@ -130,7 +130,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = machine().root_device().memregion("banked")->base();
+			UINT8 *mem = memregion("banked")->base();
 			membank("bank1")->set_base(mem+0x2000*m_bank[0]);
 			membank("bank2")->set_base(mem+0x2000*m_bank[1]);
 		}
@@ -138,7 +138,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 3: /* unknown */
 		{
-			UINT8 *mem = machine().root_device().memregion("banked")->base();
+			UINT8 *mem = memregion("banked")->base();
 			membank("bank1")->set_base(mem+0x18000);
 			membank("bank2")->set_base(mem+0x18000);
 		}
@@ -150,7 +150,7 @@ void sfkick_state::sfkick_remap_banks()
 	{
 		case 0: /* bios - upper part */
 		{
-			UINT8 *mem = machine().root_device().memregion("bios")->base();
+			UINT8 *mem = memregion("bios")->base();
 			membank("bank3")->set_base(mem+0x4000);
 			membank("bank4")->set_base(mem+0x6000);
 		}
@@ -159,7 +159,7 @@ void sfkick_state::sfkick_remap_banks()
 		case 1:  /* unknown */
 		case 3:
 		{
-			UINT8 *mem = machine().root_device().memregion("banked")->base();
+			UINT8 *mem = memregion("banked")->base();
 			membank("bank3")->set_base(mem+0x18000);
 			membank("bank4")->set_base(mem+0x18000);
 		}
@@ -167,7 +167,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = machine().root_device().memregion("banked")->base();
+			UINT8 *mem = memregion("banked")->base();
 			membank("bank3")->set_base(mem+0x2000*m_bank[2]);
 			membank("bank4")->set_base(mem+0x2000*m_bank[3]);
 		}
@@ -179,7 +179,7 @@ void sfkick_state::sfkick_remap_banks()
 	{
 		case 0: /* cartridge */
 		{
-			UINT8 *mem = machine().root_device().memregion("cartridge")->base();
+			UINT8 *mem = memregion("cartridge")->base();
 			membank("bank5")->set_base(mem+0x4000);
 			membank("bank6")->set_base(mem+0x6000);
 		}
@@ -188,7 +188,7 @@ void sfkick_state::sfkick_remap_banks()
 		case 1: /* unknown */
 		case 3:
 		{
-			UINT8 *mem = machine().root_device().memregion("banked")->base();
+			UINT8 *mem = memregion("banked")->base();
 			membank("bank5")->set_base(mem+0x18000);
 			membank("bank6")->set_base(mem+0x18000);
 		}
@@ -196,7 +196,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = machine().root_device().memregion("banked")->base();
+			UINT8 *mem = memregion("banked")->base();
 			membank("bank5")->set_base(mem+0x2000*m_bank[4]);
 			membank("bank6")->set_base(mem+0x2000*m_bank[5]);
 		}
@@ -209,7 +209,7 @@ void sfkick_state::sfkick_remap_banks()
 		case 0: /* unknown */
 		case 1:
 		{
-			UINT8 *mem = machine().root_device().memregion("banked")->base();
+			UINT8 *mem = memregion("banked")->base();
 			membank("bank7")->set_base(mem+0x18000);
 			membank("bank8")->set_base(mem+0x18000);
 		}
@@ -217,7 +217,7 @@ void sfkick_state::sfkick_remap_banks()
 
 		case 2: /* banked */
 		{
-			UINT8 *mem = machine().root_device().memregion("banked")->base();
+			UINT8 *mem = memregion("banked")->base();
 			membank("bank7")->set_base(mem+0x2000*m_bank[6]);
 			membank("bank8")->set_base(mem+0x2000*m_bank[7]);
 		}

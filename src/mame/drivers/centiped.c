@@ -524,10 +524,10 @@ inline int centiped_state::read_trackball(int idx, int switch_port)
 
 	/* if we're to read the dipswitches behind the trackball data, do it now */
 	if (m_dsw_select)
-		return (machine().root_device().ioport(portnames[switch_port])->read() & 0x7f) | m_sign[idx];
+		return (ioport(portnames[switch_port])->read() & 0x7f) | m_sign[idx];
 
 	/* get the new position and adjust the result */
-	newpos = machine().root_device().ioport(tracknames[idx])->read();
+	newpos = ioport(tracknames[idx])->read();
 	if (newpos != m_oldpos[idx])
 	{
 		m_sign[idx] = (newpos - m_oldpos[idx]) & 0x80;
@@ -535,7 +535,7 @@ inline int centiped_state::read_trackball(int idx, int switch_port)
 	}
 
 	/* blend with the bits from the switch port */
-	return (machine().root_device().ioport(portnames[switch_port])->read() & 0x70) | (m_oldpos[idx] & 0x0f) | m_sign[idx];
+	return (ioport(portnames[switch_port])->read() & 0x70) | (m_oldpos[idx] & 0x0f) | m_sign[idx];
 }
 
 
@@ -2179,8 +2179,8 @@ DRIVER_INIT_MEMBER(centiped_state,bullsdrt)
 
 DRIVER_INIT_MEMBER(centiped_state,multiped)
 {
-	UINT8 *src = machine().root_device().memregion("user1")->base();
-	UINT8 *dest = machine().root_device().memregion("maincpu")->base();
+	UINT8 *src = memregion("user1")->base();
+	UINT8 *dest = memregion("maincpu")->base();
 
 	// descramble rom and put in maincpu region
 	for (int i = 0; i < 0x10000; i++)

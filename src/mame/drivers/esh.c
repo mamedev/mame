@@ -229,7 +229,7 @@ INPUT_PORTS_END
 
 void esh_state::palette_init()
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* Oddly enough, the top 4 bits of each byte is 0 */

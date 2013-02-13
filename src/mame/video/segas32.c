@@ -1623,8 +1623,8 @@ int segas32_state::draw_one_sprite(UINT16 *data, int xoffs, int yoffs, const rec
 	};
 
 	bitmap_ind16 &bitmap = *m_layer_data[(!m_is_multi32 || !(data[3] & 0x0800)) ? MIXER_LAYER_SPRITES_2 : MIXER_LAYER_MULTISPR_2].bitmap;
-	UINT8 numbanks = machine().root_device().memregion("gfx2")->bytes() / 0x400000;
-	const UINT32 *spritebase = (const UINT32 *)machine().root_device().memregion("gfx2")->base();
+	UINT8 numbanks = memregion("gfx2")->bytes() / 0x400000;
+	const UINT32 *spritebase = (const UINT32 *)memregion("gfx2")->base();
 
 	int indirect = data[0] & 0x2000;
 	int indlocal = data[0] & 0x1000;

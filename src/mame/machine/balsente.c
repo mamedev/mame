@@ -52,8 +52,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::balsente_interrupt_timer)
 		/* we latch the beam values on the first interrupt after VBLANK */
 		if (param == 64)
 		{
-			m_shooter_x = machine().root_device().ioport("FAKEX")->read();
-			m_shooter_y = machine().root_device().ioport("FAKEY")->read();
+			m_shooter_x = ioport("FAKEX")->read();
+			m_shooter_y = ioport("FAKEY")->read();
 		}
 
 		/* which bits get returned depends on which scanline we're at */
@@ -278,7 +278,7 @@ WRITE8_MEMBER(balsente_state::balsente_rombank2_select_w)
 	int bank = data & 7;
 
 	/* top bit controls which half of the ROMs to use (Name that Tune only) */
-	if (machine().root_device().memregion("maincpu")->bytes() > 0x40000) bank |= (data >> 4) & 8;
+	if (memregion("maincpu")->bytes() > 0x40000) bank |= (data >> 4) & 8;
 
 	/* when they set the AB bank, it appears as though the CD bank is reset */
 	if (data & 0x20)
@@ -548,7 +548,7 @@ INTERRUPT_GEN_MEMBER(balsente_state::balsente_update_analog_inputs)
 	/* ports are read once a frame, just at varying intervals. To get around this, we */
 	/* read all the analog inputs at VBLANK time and just return the cached values. */
 	for (i = 0; i < 4; i++)
-		m_analog_input_data[i] = machine().root_device().ioport(analog[i])->read();
+		m_analog_input_data[i] = ioport(analog[i])->read();
 }
 
 

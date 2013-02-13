@@ -1420,7 +1420,7 @@ void segag80r_state::monsterb_expand_gfx(const char *region)
 
 	/* expand the background ROMs; A11/A12 of each ROM is independently controlled via */
 	/* banking */
-	dest = machine().root_device().memregion(region)->base();
+	dest = memregion(region)->base();
 	temp = auto_alloc_array(machine(), UINT8, 0x4000);
 	memcpy(temp, dest, 0x4000);
 

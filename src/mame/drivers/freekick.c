@@ -611,7 +611,7 @@ MACHINE_RESET_MEMBER(freekick_state,freekick)
 
 MACHINE_START_MEMBER(freekick_state,pbillrd)
 {
-	machine().root_device().membank("bank1")->configure_entries(0, 2, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	MACHINE_START_CALL_MEMBER(freekick);
 }
@@ -1136,7 +1136,7 @@ ROM_END
 DRIVER_INIT_MEMBER(freekick_state,gigasb)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	space.set_decrypted_region(0x0000, 0xbfff, machine().root_device().memregion("maincpu")->base() + 0x10000);
+	space.set_decrypted_region(0x0000, 0xbfff, memregion("maincpu")->base() + 0x10000);
 }
 
 

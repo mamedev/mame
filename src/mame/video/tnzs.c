@@ -32,7 +32,7 @@
 
 PALETTE_INIT_MEMBER(tnzs_state,arknoid2)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i, col;
 
 	for (i = 0; i < machine().total_colors(); i++)

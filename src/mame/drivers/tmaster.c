@@ -1651,7 +1651,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(tmaster_state,tm4k)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x834ce/2] = 0x4e75;
@@ -1672,7 +1672,7 @@ Protection resembles that of tm5k rather than tm4ka:
 
 DRIVER_INIT_MEMBER(tmaster_state,tm4ka)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x83476/2] = 0x4e75;
@@ -1694,7 +1694,7 @@ Protection starts:
 
 DRIVER_INIT_MEMBER(tmaster_state,tm4kca)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x83470/2] = 0x4e75;
@@ -1716,7 +1716,7 @@ Protection starts:
 
 DRIVER_INIT_MEMBER(tmaster_state,tm4kb)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x82b7a/2] = 0x4e75;
@@ -1737,7 +1737,7 @@ Protection starts:
 
 DRIVER_INIT_MEMBER(tmaster_state,tm5k)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x96002/2] = 0x4e75;
@@ -1760,7 +1760,7 @@ Protection starts:
 
 DRIVER_INIT_MEMBER(tmaster_state,tm5kca)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x95ffe/2] = 0x4e75;
@@ -1772,7 +1772,7 @@ DRIVER_INIT_MEMBER(tmaster_state,tm5kca)
 
 DRIVER_INIT_MEMBER(tmaster_state,tm5ka)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x96b30/2] = 0x4e75;
@@ -1793,7 +1793,7 @@ Protection starts:
 
 DRIVER_INIT_MEMBER(tmaster_state,tm7k)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x81730/2] = 0x4e75;
@@ -1816,7 +1816,7 @@ Protection starts:
 
 DRIVER_INIT_MEMBER(tmaster_state,tm7ka)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x81594/2] = 0x4e75;
@@ -1839,7 +1839,7 @@ Protection starts:
 
 DRIVER_INIT_MEMBER(tmaster_state,tm7keval)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x8949e/2] = 0x4e75;
@@ -1862,7 +1862,7 @@ Protection starts:
 
 DRIVER_INIT_MEMBER(tmaster_state,tm8k)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x78b70/2] = 0x4e75;
@@ -1919,7 +1919,7 @@ DRIVER_INIT_MEMBER(tmaster_state,galgames)
 
 DRIVER_INIT_MEMBER(tmaster_state,galgame2)
 {
-	UINT16 *ROM = (UINT16 *)machine().root_device().memregion( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
 
 	// Patch BIOS to see the game code as first cartridge (until the PIC therein is emulated)
 	ROM[0x118da/2] = 0x4a06;

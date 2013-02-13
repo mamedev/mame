@@ -575,7 +575,7 @@ UINT32 subsino_state::screen_update_stisub_reels(screen_device &screen, bitmap_i
 
 PALETTE_INIT_MEMBER(subsino_state,subsino_2proms)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -602,7 +602,7 @@ PALETTE_INIT_MEMBER(subsino_state,subsino_2proms)
 
 PALETTE_INIT_MEMBER(subsino_state,subsino_3proms)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -3529,7 +3529,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(subsino_state,smoto16)
 {
-	UINT8 *rom = machine().root_device().memregion( "maincpu" )->base();
+	UINT8 *rom = memregion( "maincpu" )->base();
 	rom[0x12d0] = 0x20; // "ERROR 951010"
 }
 
@@ -3750,13 +3750,13 @@ DRIVER_INIT_MEMBER(subsino_state,sharkpye)
 
 DRIVER_INIT_MEMBER(subsino_state,smoto20)
 {
-	UINT8 *rom = machine().root_device().memregion( "maincpu" )->base();
+	UINT8 *rom = memregion( "maincpu" )->base();
 	rom[0x12e1] = 0x20; // "ERROR 951010"
 }
 
 DRIVER_INIT_MEMBER(subsino_state,tisub)
 {
-	UINT8 *rom = machine().root_device().memregion( "maincpu" )->base();
+	UINT8 *rom = memregion( "maincpu" )->base();
 
 	DRIVER_INIT_CALL(victor5);
 
@@ -3771,7 +3771,7 @@ DRIVER_INIT_MEMBER(subsino_state,tisub)
 
 DRIVER_INIT_MEMBER(subsino_state,tisuba)
 {
-	UINT8 *rom = machine().root_device().memregion( "maincpu" )->base();
+	UINT8 *rom = memregion( "maincpu" )->base();
 
 	DRIVER_INIT_CALL(victor5);
 

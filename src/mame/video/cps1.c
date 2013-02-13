@@ -1531,13 +1531,13 @@ MACHINE_RESET_MEMBER(cps_state,cps)
 		   by the cpu core as a 32-bit branch. This branch would make the
 		   game crash (address error, since it would branch to an odd address)
 		   if location 180ca6 (outside ROM space) isn't 0. Protection check? */
-		UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+		UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 		rom[0x11756 / 2] = 0x4e71;
 	}
 	else if (strcmp(gamename, "ghouls") == 0)
 	{
 		/* Patch out self-test... it takes forever */
-		UINT16 *rom = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+		UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
 		rom[0x61964 / 2] = 0x4ef9;
 		rom[0x61966 / 2] = 0x0000;
 		rom[0x61968 / 2] = 0x0400;

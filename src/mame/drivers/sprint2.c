@@ -85,7 +85,7 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 
 			m_dial[i] += delta;
 
-			switch (machine().root_device().ioport(i ? "GEAR_P2" : "GEAR_P1")->read() & 15)
+			switch (ioport(i ? "GEAR_P2" : "GEAR_P1")->read() & 15)
 			{
 			case 1: m_gear[i] = 1; break;
 			case 2: m_gear[i] = 2; break;

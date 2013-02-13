@@ -78,8 +78,8 @@ void stactics_state::move_motor()
 		/* monitor motor under joystick control */
 	if (*m_motor_on & 0x01)
 	{
-		int ip3 = machine().root_device().ioport("IN3")->read();
-		int ip4 = machine().root_device().ioport("FAKE")->read();
+		int ip3 = ioport("IN3")->read();
+		int ip4 = ioport("FAKE")->read();
 
 		/* up */
 		if (((ip4 & 0x01) == 0) && (m_vert_pos > -128))

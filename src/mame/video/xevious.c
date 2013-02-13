@@ -26,7 +26,7 @@
 ***************************************************************************/
 PALETTE_INIT_MEMBER(xevious_state,xevious)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 	#define TOTAL_COLORS(gfxn) (machine().gfx[gfxn]->colors() * machine().gfx[gfxn]->granularity())
 
@@ -100,7 +100,7 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 
 PALETTE_INIT_MEMBER(xevious_state,battles)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	machine().colortable = colortable_alloc(machine(), 128+1);

@@ -25,8 +25,8 @@
 void epos_state::get_pens( pen_t *pens )
 {
 	offs_t i;
-	const UINT8 *prom = machine().root_device().memregion("proms")->base();
-	int len = machine().root_device().memregion("proms")->bytes();
+	const UINT8 *prom = memregion("proms")->base();
+	int len = memregion("proms")->bytes();
 
 	for (i = 0; i < len; i++)
 	{

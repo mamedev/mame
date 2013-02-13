@@ -77,7 +77,7 @@ static pen_t magspot_map_color( running_machine &machine, UINT8 x, UINT8 y )
 
 PALETTE_INIT_MEMBER(cosmic_state,panic)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -119,7 +119,7 @@ PALETTE_INIT_MEMBER(cosmic_state,panic)
 
 PALETTE_INIT_MEMBER(cosmic_state,cosmica)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -179,7 +179,7 @@ PALETTE_INIT_MEMBER(cosmic_state,cosmicg)
 
 PALETTE_INIT_MEMBER(cosmic_state,magspot)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -213,7 +213,7 @@ PALETTE_INIT_MEMBER(cosmic_state,magspot)
 
 PALETTE_INIT_MEMBER(cosmic_state,nomnlnd)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const UINT8 *color_prom = memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

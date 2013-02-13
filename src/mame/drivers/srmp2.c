@@ -258,7 +258,7 @@ UINT8 srmp2_state::iox_key_matrix_calc(UINT8 p_side)
 
 		for (t = 0 ; t < 8 ; t ++)
 		{
-			if (!(machine().root_device().ioport(keynames[j+p_side])->read() & ( 1 << t )))
+			if (!(ioport(keynames[j+p_side])->read() & ( 1 << t )))
 			{
 				return (i + t) | (p_side ? 0x20 : 0x00);
 			}

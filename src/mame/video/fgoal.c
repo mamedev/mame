@@ -46,7 +46,7 @@ UINT32 fgoal_state::screen_update_fgoal(screen_device &screen, bitmap_ind16 &bit
 
 	/* draw color overlay foreground and background */
 
-	if (m_fgoal_player == 1 && (machine().root_device().ioport("IN1")->read() & 0x40))
+	if (m_fgoal_player == 1 && (ioport("IN1")->read() & 0x40))
 	{
 		drawgfxzoom_opaque(m_fgbitmap, cliprect, machine().gfx[0],
 			0, (m_fgoal_player << 2) | m_current_color,

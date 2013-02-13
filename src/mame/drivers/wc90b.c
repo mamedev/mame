@@ -124,11 +124,11 @@ WRITE8_MEMBER(wc90b_state::adpcm_control_w)
 {
 	device_t *device = machine().device("msm");
 	int bankaddress;
-	UINT8 *ROM = machine().root_device().memregion("audiocpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	machine().root_device().membank("bank3")->set_base(&ROM[bankaddress]);
+	membank("bank3")->set_base(&ROM[bankaddress]);
 
 	msm5205_reset_w(device,data & 0x08);
 }

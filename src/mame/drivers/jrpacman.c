@@ -412,7 +412,7 @@ DRIVER_INIT_MEMBER(jrpacman_state,jrpacman)
 		{ 0,0 }
 	};
 
-	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int i, j, A;
 
 	for (i = A = 0; table[i].count; i++)

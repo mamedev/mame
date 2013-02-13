@@ -442,7 +442,7 @@ DRIVER_INIT_MEMBER(amiga_state,mquake)
 
 	/* set up memory */
 	m_bank1->configure_entry(0, m_chip_ram);
-	m_bank1->configure_entry(1, machine().root_device().memregion("user1")->base());
+	m_bank1->configure_entry(1, memregion("user1")->base());
 }
 
 
