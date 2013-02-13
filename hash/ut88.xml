@@ -9,7 +9,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="ut88_cass">
 			<dataarea name="cass" size="6665">
-				<rom name="basic80.rk8" size="6665" crc="38d15a6a" sha1="df9e126fa8d118a1ff4b883115b7f10c393a765d" offset="0" />
+				<rom name="basic80.rku" size="6665" crc="38d15a6a" sha1="df9e126fa8d118a1ff4b883115b7f10c393a765d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
