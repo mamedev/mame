@@ -145,7 +145,7 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 		UINT8 *rom_region = image.get_software_region("rom");
 		size = size_aligned = image.get_software_region_length("rom");
 
-		mem = auto_alloc_array(image.device().machine(), UINT8, size_aligned);
+		mem = auto_alloc_array(machine(), UINT8, size_aligned);
 		memcpy(mem, rom_region, size_aligned);
 	}
 	else
@@ -164,7 +164,7 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 		while (size_aligned < size)
 			size_aligned *= 2;
 
-		mem = auto_alloc_array(image.device().machine(),UINT8,size_aligned);
+		mem = auto_alloc_array(machine(),UINT8,size_aligned);
 		if (!mem)
 		{
 			logerror ("cart #%d: error: failed to allocate memory for cartridge\n", id);
@@ -216,10 +216,10 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 		int old_size_aligned = size_aligned;
 
 		size_aligned = 0x10000;
-		mem = auto_alloc_array(image.device().machine(),UINT8, 0x10000);
+		mem = auto_alloc_array(machine(),UINT8, 0x10000);
 		if (!mem)
 		{
-			auto_free(image.device().machine(),old_mem);
+			auto_free(machine(),old_mem);
 			logerror ("cart #%d: error: cannot allocate memory\n", id);
 			return IMAGE_INIT_FAIL;
 		}
@@ -236,7 +236,7 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 
 		/* Copy old contents to newly claimed memory */
 		memcpy(mem,old_mem,old_size_aligned);
-		auto_free(image.device().machine(),old_mem);
+		auto_free(machine(),old_mem);
 	}
 
 	/* mapper type 0 (ROM) might need moving around a bit */
@@ -303,7 +303,7 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 		type = SLOT_ROM;
 
 	/* allocate and set slot_state for this cartridge */
-	st = auto_alloc(image.device().machine(),slot_state);
+	st = auto_alloc(machine(),slot_state);
 	if (!st)
 	{
 		logerror ("cart #%d: error: cannot allocate memory for cartridge state\n", id);
@@ -312,7 +312,7 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 	memset (st, 0, sizeof (slot_state));
 
 	st->m_type = type;
-	sramfile = auto_alloc_array(image.device().machine(), char, strlen (image.filename () + 1));
+	sramfile = auto_alloc_array(machine(), char, strlen (image.filename () + 1));
 
 	if (sramfile)
 	{
@@ -326,14 +326,14 @@ DEVICE_IMAGE_LOAD_MEMBER(msx_state,msx_cart)
 		st->m_sramfile = sramfile;
 	}
 
-	if (msx_slot_list[type].init (image.device().machine(), st, 0, mem, size_aligned))
+	if (msx_slot_list[type].init (machine(), st, 0, mem, size_aligned))
 		return IMAGE_INIT_FAIL;
 
 	if (msx_slot_list[type].loadsram)
-		msx_slot_list[type].loadsram (image.device().machine(), st);
+		msx_slot_list[type].loadsram (machine(), st);
 
 	m_cart_state[id] = st;
-	msx_memory_set_carts (image.device().machine());
+	msx_memory_set_carts();
 
 	return IMAGE_INIT_PASS;
 }
@@ -360,7 +360,9 @@ DEVICE_IMAGE_UNLOAD_MEMBER(msx_state, msx_cart)
 
 void msx_vdp_interrupt(device_t *, v99x8_device &device, int i)
 {
-	device.machine().device("maincpu")->execute().set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
+	msx_state *state = device.machine().driver_data<msx_state>();
+
+	state->m_maincpu->set_input_line(0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 void msx_state::msx_ch_reset_core ()
@@ -519,16 +521,16 @@ static const UINT8 cc_ex[0x100] = {
 
 DRIVER_INIT_MEMBER(msx_state,msx)
 {
-	machine().device("maincpu")->execute().set_input_line_vector(0, 0xff);
+	m_maincpu->set_input_line_vector(0, 0xff);
 
-	msx_memory_init (machine());
+	msx_memory_init();
 
-	z80_set_cycle_tables( machine().device("maincpu"), cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
+	z80_set_cycle_tables( m_maincpu, cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex );
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(msx_state::msx2_interrupt)
 {
-	m_v9938->set_resolution(machine().root_device().ioport("DSW")->read() & 0x03);
+	m_v9938->set_resolution(m_io_dsw->read() & 0x03);
 	m_v9938->interrupt();
 }
 
@@ -536,11 +538,10 @@ INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
 {
 	int i;
 
-	for (i=0; i<2; i++)
-	{
-		m_mouse[i] = ioport(i ? "MOUSE1" : "MOUSE0")->read();
-		m_mouse_stat[i] = -1;
-	}
+	m_mouse[0] = m_io_mouse0->read();
+	m_mouse_stat[0] = -1;
+	m_mouse[1] = m_io_mouse1->read();
+	m_mouse_stat[1] = -1;
 }
 
 /*
@@ -554,10 +555,10 @@ READ8_MEMBER(msx_state::msx_psg_port_a_r)
 
 	data = (m_cass->input() > 0.0038 ? 0x80 : 0);
 
-	if ( (m_psg_b ^ ioport("DSW")->read() ) & 0x40)
+	if ( (m_psg_b ^ m_io_dsw->read() ) & 0x40)
 	{
 		/* game port 2 */
-		UINT8 inp = ioport("JOY1")->read();
+		UINT8 inp = m_io_joy1->read();
 		if ( !(inp & 0x80) )
 		{
 			/* joystick */
@@ -576,7 +577,7 @@ READ8_MEMBER(msx_state::msx_psg_port_a_r)
 	else
 	{
 		/* game port 1 */
-		UINT8 inp = ioport("JOY0")->read();
+		UINT8 inp = m_io_joy0->read();
 		if ( !(inp & 0x80) )
 		{
 			/* joystick */
@@ -625,26 +626,26 @@ WRITE8_MEMBER(msx_state::msx_psg_port_b_w)
 
 WRITE8_MEMBER(msx_state::msx_printer_strobe_w)
 {
-	machine().device<centronics_device>("centronics")->strobe_w(BIT(data, 1));
+	m_centronics->strobe_w(BIT(data, 1));
 }
 
 WRITE8_MEMBER(msx_state::msx_printer_data_w)
 {
-	if (machine().root_device().ioport("DSW")->read() & 0x80)
+	if (m_io_dsw->read() & 0x80)
 		/* SIMPL emulation */
-		machine().device<dac_device>("dac")->write_signed8(data);
+		m_dac->write_signed8(data);
 	else
-		machine().device<centronics_device>("centronics")->write(machine().driver_data()->generic_space(), 0, data);
+		m_centronics->write(space, 0, data);
 }
 
 READ8_MEMBER(msx_state::msx_printer_status_r)
 {
 	UINT8 result = 0xfd;
 
-	if (machine().root_device().ioport("DSW")->read() & 0x80)
+	if (m_io_dsw->read() & 0x80)
 		return 0xff;
 
-	result |= machine().device<centronics_device>("centronics")->busy_r() << 1;
+	result |= m_centronics->busy_r() << 1;
 
 	return result;
 }
@@ -789,12 +790,12 @@ READ8_MEMBER( msx_state::msx_ppi_port_b_r )
 {
 	UINT8 result = 0xff;
 	int row, data;
-	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
+	ioport_port *keynames[] = { m_io_key0, m_io_key1, m_io_key2, m_io_key3, m_io_key4, m_io_key5 };
 
 	row = keylatch;
 	if (row <= 10)
 	{
-		data = ioport(keynames[row / 2])->read();
+		data = keynames[row / 2]->read();
 
 		if (BIT(row, 0))
 			data >>= 8;
@@ -809,9 +810,8 @@ READ8_MEMBER( msx_state::msx_ppi_port_b_r )
  *
  ***********************************************************************/
 
-static void msx_memory_init (running_machine &machine)
+void msx_state::msx_memory_init()
 {
-	msx_state *state = machine.driver_data<msx_state>();
 	int prim, sec, page, extent, option;
 	int size = 0;
 	const msx_slot_layout *layout= (msx_slot_layout*)NULL;
@@ -820,19 +820,19 @@ static void msx_memory_init (running_machine &machine)
 	slot_state *st;
 	UINT8 *mem = NULL;
 
-	state->m_empty = auto_alloc_array(machine, UINT8, 0x4000);
-	memset (state->m_empty, 0xff, 0x4000);
+	m_empty = auto_alloc_array(machine(), UINT8, 0x4000);
+	memset (m_empty, 0xff, 0x4000);
 
 	for (prim=0; prim<4; prim++) {
 		for (sec=0; sec<4; sec++) {
 			for (page=0; page<4; page++) {
-				state->m_all_state[prim][sec][page]= (slot_state*)NULL;
+				m_all_state[prim][sec][page]= (slot_state*)NULL;
 			}
 		}
 	}
 
 	for (driver = msx_driver_list; driver->name[0]; driver++) {
-		if (!strcmp (driver->name, machine.system().name)) {
+		if (!strcmp (driver->name, machine().system().name)) {
 			layout = driver->layout;
 		}
 	}
@@ -843,7 +843,7 @@ static void msx_memory_init (running_machine &machine)
 		return;
 	}
 
-	state->layout = layout;
+	m_layout = layout;
 
 	for (; layout->entry != MSX_LAYOUT_LAST; layout++) {
 		switch (layout->entry) {
@@ -854,7 +854,7 @@ static void msx_memory_init (running_machine &machine)
 			extent = layout->page_extent;
 
 			if (layout->slot_secondary) {
-				state->m_slot_expanded[layout->slot_primary]= TRUE;
+				m_slot_expanded[layout->slot_primary]= TRUE;
 			}
 
 			slot = &msx_slot_list[layout->type];
@@ -874,20 +874,20 @@ static void msx_memory_init (running_machine &machine)
 
 			st = (slot_state*)NULL;
 			if (layout->type == SLOT_CARTRIDGE1) {
-				st = state->m_cart_state[0];
+				st = m_cart_state[0];
 				if (!st) {
 					slot = &msx_slot_list[SLOT_SOUNDCARTRIDGE];
 					size = 0x20000;
 				}
 			}
 			if (layout->type == SLOT_CARTRIDGE2) {
-				st = state->m_cart_state[1];
+				st = m_cart_state[1];
 				if (!st) {
 					/* Check whether the optional FM-PAC rom is present */
 					option = 0x10000;
 					size = 0x10000;
-					mem = machine.root_device().memregion("maincpu")->base() + option;
-					if (machine.root_device().memregion("maincpu")->bytes() >= size + option && mem[0] == 'A' && mem[1] == 'B') {
+					mem = m_region_maincpu->base() + option;
+					if (m_region_maincpu->bytes() >= size + option && mem[0] == 'A' && mem[1] == 'B') {
 						slot = &msx_slot_list[SLOT_FMPAC];
 					}
 					else {
@@ -900,16 +900,16 @@ static void msx_memory_init (running_machine &machine)
 				switch (slot->mem_type) {
 				case MSX_MEM_HANDLER:
 				case MSX_MEM_ROM:
-					mem = machine.root_device().memregion("maincpu")->base() + option;
+					mem = m_region_maincpu->base() + option;
 					break;
 				case MSX_MEM_RAM:
 					mem = NULL;
 					break;
 				}
-				st = auto_alloc_clear (machine, slot_state);
+				st = auto_alloc_clear (machine(), slot_state);
 				memset (st, 0, sizeof (slot_state));
 
-				if (slot->init (machine, st, layout->slot_page, mem, size)) {
+				if (slot->init (machine(), st, layout->slot_page, mem, size)) {
 					continue;
 				}
 			}
@@ -920,15 +920,15 @@ static void msx_memory_init (running_machine &machine)
 							"page + extent > 3\n");
 					break;
 				}
-				state->m_all_state[prim][sec][page] = st;
+				m_all_state[prim][sec][page] = st;
 				page++;
 			}
 			break;
 		case MSX_LAYOUT_KANJI_ENTRY:
-			state->m_kanji_mem = machine.root_device().memregion("maincpu")->base() + layout->option;
+			m_kanji_mem = m_region_maincpu->base() + layout->option;
 			break;
 		case MSX_LAYOUT_RAMIO_SET_BITS_ENTRY:
-			state->m_ramio_set_bits = (UINT8)layout->option;
+			m_ramio_set_bits = (UINT8)layout->option;
 			break;
 		}
 	}
@@ -957,16 +957,15 @@ void msx_state::msx_memory_reset ()
 	}
 }
 
-static void msx_memory_set_carts (running_machine &machine)
+void msx_state::msx_memory_set_carts()
 {
-	msx_state *state = machine.driver_data<msx_state>();
 	const msx_slot_layout *layout;
 	int page;
 
-	if (!state->layout)
+	if (!layout)
 		return;
 
-	for (layout = state->layout; layout->entry != MSX_LAYOUT_LAST; layout++)
+	for (layout = m_layout; layout->entry != MSX_LAYOUT_LAST; layout++)
 	{
 		if (layout->entry == MSX_LAYOUT_SLOT_ENTRY)
 		{
@@ -974,13 +973,13 @@ static void msx_memory_set_carts (running_machine &machine)
 			{
 			case SLOT_CARTRIDGE1:
 				for (page=0; page<4; page++)
-					state->m_all_state[layout->slot_primary][layout->slot_secondary][page]
-						= state->m_cart_state[0];
+					m_all_state[layout->slot_primary][layout->slot_secondary][page]
+						= m_cart_state[0];
 				break;
 			case SLOT_CARTRIDGE2:
 				for (page=0; page<4; page++)
-					state->m_all_state[layout->slot_primary][layout->slot_secondary][page]
-						= state->m_cart_state[1];
+					m_all_state[layout->slot_primary][layout->slot_secondary][page]
+						= m_cart_state[1];
 				break;
 			}
 		}

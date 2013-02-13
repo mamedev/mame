@@ -343,11 +343,10 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(msx_state::msx_ay8910_w)
 {
-	device_t *device = machine().device("ay8910");
 	if ( offset & 1 )
-		ay8910_data_w( device, space, offset, data );
+		ay8910_data_w( m_ay8910, space, offset, data );
 	else
-		ay8910_address_w( device, space, offset, data );
+		ay8910_address_w( m_ay8910, space, offset, data );
 }
 
 

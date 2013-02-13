@@ -38,12 +38,40 @@ class msx_state : public driver_device
 {
 public:
 	msx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_v9938(*this, "v9938"),
-	m_cass(*this, CASSETTE_TAG),
-	m_ym(*this, "ym2413"),
-	m_dac(*this, "dac"),
-	m_rtc(*this, TC8521_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_v9938(*this, "v9938")
+		, m_cass(*this, CASSETTE_TAG)
+		, m_ay8910(*this, "ay8910")
+		, m_ym(*this, "ym2413")
+		, m_k051649(*this, "k051649")
+		, m_dac(*this, "dac")
+		, m_centronics(*this, "centronics")
+		, m_rtc(*this, TC8521_TAG)
+		, m_wd179x(*this, "wd179x")
+		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
+		, m_bank3(*this, "bank3")
+		, m_bank4(*this, "bank4")
+		, m_bank5(*this, "bank5")
+		, m_bank6(*this, "bank6")
+		, m_bank7(*this, "bank7")
+		, m_bank8(*this, "bank8")
+		, m_bank9(*this, "bank9")
+		, m_bank10(*this, "bank10")
+		, m_bank11(*this, "bank11")
+		, m_region_maincpu(*this, "maincpu")
+		, m_io_joy0(*this, "JOY0")
+		, m_io_joy1(*this, "JOY1")
+		, m_io_dsw(*this, "DSW")
+		, m_io_mouse0(*this, "MOUSE0")
+		, m_io_mouse1(*this, "MOUSE1")
+		, m_io_key0(*this, "KEY0")
+		, m_io_key1(*this, "KEY1")
+		, m_io_key2(*this, "KEY2")
+		, m_io_key3(*this, "KEY3")
+		, m_io_key4(*this, "KEY4")
+		, m_io_key5(*this, "KEY5")
 	{ }
 
 	DECLARE_WRITE8_MEMBER(msx_page0_w);
@@ -89,7 +117,7 @@ public:
 	UINT8 *m_kanji_mem;
 	int m_kanji_latch;
 	/* memory */
-	const msx_slot_layout *layout;
+	const msx_slot_layout *m_layout;
 	slot_state *m_cart_state[MSX_MAX_CARTS];
 	slot_state *m_state[4];
 	const msx_slot *m_slot[4];
@@ -110,11 +138,16 @@ public:
 	void msx_ch_reset_core ();
 	void msx_memory_reset ();
 
+	required_device<cpu_device> m_maincpu;
 	optional_device<v9938_device> m_v9938;
 	required_device<cassette_image_device> m_cass;
+	required_device<device_t> m_ay8910;
 	required_device<ym2413_device> m_ym;
+	optional_device<device_t> m_k051649;
 	required_device<dac_device> m_dac;
+	required_device<centronics_device> m_centronics;
 	optional_device<rp5c01_device> m_rtc;
+	optional_device<device_t> m_wd179x;
 	DECLARE_READ8_MEMBER(msx_psg_port_a_r);
 	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
 	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
@@ -130,9 +163,36 @@ public:
 	DECLARE_WRITE8_MEMBER(msx_printer_strobe_w);
 	DECLARE_WRITE8_MEMBER(msx_printer_data_w);
 	DECLARE_READ8_MEMBER(msx_printer_status_r);
+	void msx_memory_init();
+	void msx_memory_set_carts();
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( msx_cart );
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( msx_cart );
+
+	required_memory_bank m_bank1;
+	required_memory_bank m_bank2;
+	required_memory_bank m_bank3;
+	required_memory_bank m_bank4;
+	required_memory_bank m_bank5;
+	required_memory_bank m_bank6;
+	required_memory_bank m_bank7;
+	required_memory_bank m_bank8;
+	required_memory_bank m_bank9;
+	required_memory_bank m_bank10;
+	required_memory_bank m_bank11;
+protected:
+	required_memory_region m_region_maincpu;
+	required_ioport m_io_joy0;
+	required_ioport m_io_joy1;
+	required_ioport m_io_dsw;
+	required_ioport m_io_mouse0;
+	required_ioport m_io_mouse1;
+	required_ioport m_io_key0;
+	required_ioport m_io_key1;
+	required_ioport m_io_key2;
+	required_ioport m_io_key3;
+	required_ioport m_io_key4;
+	required_ioport m_io_key5;
 };
 
 
