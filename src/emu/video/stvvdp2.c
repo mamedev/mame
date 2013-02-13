@@ -6467,39 +6467,6 @@ void saturn_state::stv_vdp2_fade_effects( void )
 	//popmessage("%04x %04x %04x %04x %04x %04x",STV_VDP2_COAR,STV_VDP2_COAG,STV_VDP2_COAB,STV_VDP2_COBR,STV_VDP2_COBG,STV_VDP2_COBB);
 }
 
-/******************************************************************************************
-
-ST-V VDP2 window effect function version 0.04
-
-How it works: returns 0 if the requested pixel is drawnable,1 if it isn't.
-For tilemap and sprite layer, clipping rectangle is changed.
-
-Done:
--Basic support(w0 or w1),bitmaps only.
--W0 (outside) for tilemaps and sprite layer.
--Window logic.
-
-Not Done:
--Complete Windows on cells.A split between cells and bitmaps is in progress...
--w0 & w1 at the same time.
--Line window.
--Color Calculation.
--Rotation parameter Window (already done?).
-
-Window Registers are hooked up like this ATM:
-    x--- ---- UNUSED
-    -x-- ---- Sprite Window Area
-    --x- ---- Window 1 Area
-    ---x ---- Window 0 Area
-                  (0 = Inside,1 = Outside)
-    ---- x--- Sprite Window Enable
-    ---- -x-- Window 1 Enable
-    ---- --x- Window 0 Enable
-                  (0 = Disabled,1 = Enabled)
-    ---- ---x Window Logic
-                  (0 = OR,1 = AND)
-******************************************************************************************/
-
 void saturn_state::stv_vdp2_get_window0_coordinates(int *s_x, int *e_x, int *s_y, int *e_y)
 {
 	/*W0*/

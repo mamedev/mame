@@ -202,7 +202,7 @@ void saturn_state::cd_exec_command( void )
 				/* Guess: X-Men COTA sequence is 0x48->0x48->0x04(01)->0x04(00)->0x30 then 0x10, without this game throws a FAD reject error */
 				/* X-Men vs. SF is even fussier, sequence is  0x04 (1) 0x04 (0) 0x03 (0) 0x03 (1) 0x30 */
 				#if 0
-				for(i=0;i<MAX_FILTERS;i++)
+				for(int i=0;i<MAX_FILTERS;i++)
 				{
 					filters[i].fad = 0;
 					filters[i].range = 0xffffffff;

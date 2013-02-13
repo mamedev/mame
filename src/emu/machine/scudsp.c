@@ -71,7 +71,7 @@ Changelog:
   0A    D208000D    JMP NZ,$D
   0B    00000000    NOP
   0C    F8000000    ENDI
-  ...
+
   40    00863502                                            MOV M0,A  MOV M2,PL
   41    10003009    ADD                                               MOV ALL,MC0
   42    D3400042    JMP T0,$42
@@ -916,6 +916,12 @@ void dsp_execute_program(address_space &dmaspace)
 		}
 
 		cycles_run++;
+
+		/* If we run this many cycles guess that the SCU DSP stalled, throw a fatalerror */
+		if(cycles_run > 1000000)
+		{
+			fatalerror("SCU DSP stalled");
+		}
 
 	} while( cont );
 #if DEBUG_DSP
