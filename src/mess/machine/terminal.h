@@ -96,6 +96,7 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(rx_w) { m_tbit = state; check_for_start(state); }
 	DECLARE_READ_LINE_MEMBER(tx_r);
+	virtual void tx(UINT8 state) { rx_w(state); }
 	virtual ioport_constructor device_input_ports() const;
 
 	DECLARE_INPUT_CHANGED_MEMBER(update_frame);
