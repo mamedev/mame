@@ -1532,7 +1532,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 
 	//popmessage("%08x %d T0 %d T1 %d %08x",m_scu.ism ^ 0xffffffff,max_y,m_scu_regs[36],m_scu_regs[37],m_scu_regs[38]);
 
-	if(scanline == (vblank_line)*y_step)
+	if(scanline == (0)*y_step)
 	{
 		video_update_vdp1();
 
