@@ -178,21 +178,33 @@ static READ32_HANDLER( sss_prot_r )
 	{
 		if(offset == 3)
 		{
+			UINT32 res;
+
 			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
 			#ifdef MAME_DEBUG
 			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
 			#endif
-			switch(a_bus[3])
+			switch(a_bus[3]>>16)
 			{
-				case 0x2c5b0000://sss
-				case 0x47f10000:
-				case 0xfcda0000:
-				case 0xb5e60000:
-				case 0x392c0000:
-				case 0x77c30000:
-				case 0x8a620000:
-					ctrl_index++;
-					return ROM[ctrl_index];
+				case 0x2c5b:
+				case 0x47f1:
+				case 0xfcda:
+				case 0xb5e6:
+				case 0x392c:
+				case 0x77c3:
+				case 0x8a62:
+					if(ctrl_index & 2)
+					{
+						res = (ROM[ctrl_index / 4] & 0xffff) << 16;
+						res |= (ROM[(ctrl_index+4) / 4] & 0xffff0000) >> 16;
+					}
+					else
+					{
+						res = ROM[ctrl_index / 4] & 0xffff0000;
+						res |= ROM[ctrl_index / 4] & 0xffff;
+					}
+					ctrl_index+=4;
+					return res;
 			}
 		}
 		return a_bus[offset];
@@ -210,17 +222,41 @@ static WRITE32_HANDLER ( sss_prot_w )
 	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
 	if(offset == 3)
 	{
-		//logerror("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
-		switch(a_bus[3])
+		int a_bus_vector;
+
+		a_bus_vector = a_bus[2] >> 16;
+		a_bus_vector|= (a_bus[2] & 0xffff) << 16;
+		a_bus_vector<<= 1;
+
+		/*
+MAIN : 2c5b0000  DATA : 000000a6 014c0000
+MAIN : 47f10000  DATA : 0f9800a6 014c1f30
+MAIN : fcda0000  DATA : 1d4800a6 014c3a90
+MAIN : b5e60000  DATA : 29e300a6 014c53c6
+MAIN : 392c0000  DATA : 38e900a6 014c71d2
+MAIN : 77c30000  DATA : 462500a6 014c8c4a
+MAIN : 8a620000  DATA : 555c00a6 014caab8
+		*/
+
+//		printf("MAIN : %08x  DATA : %08x %08x\n",a_bus[3],a_bus[2],a_bus_vector);
+		switch(a_bus[3] >> 16)
 		{
-			case 0x2c5b0000: ctrl_index = (0x145ffac/4)-1; break;
-			case 0x47f10000: ctrl_index = ((0x145ffac+0xbaf0)/4)-1; break;
-			case 0xfcda0000: ctrl_index = ((0x145ffac+0x12fd0)/4)-1; break;
-			case 0xb5e60000: ctrl_index = ((0x145ffac+0x1a4c4)/4)-1; break;
-			case 0x392c0000: ctrl_index = ((0x145ffac+0x219b0)/4)-1; break;
-			case 0x77c30000: ctrl_index = ((0x145ffac+0x28ea0)/4)-1; break;
-			case 0x8a620000: ctrl_index = ((0x145ffac+0x30380)/4)-1; break;
+			/* Note: only the first value is TRUSTED (because it's tested in the code).
+			   Others are hand-tuned by checking if there isn't any garbage during display. */
+			case 0x2c5b: ctrl_index = (a_bus_vector-0x60054); break;
+			case 0x47f1: ctrl_index = (a_bus_vector-0x56498); break;
+			case 0xfcda: ctrl_index = (a_bus_vector-0x50b0c); break;
+			case 0xb5e6: ctrl_index = (a_bus_vector-0x4af56); break;
+			case 0x392c: ctrl_index = (a_bus_vector-0x45876); break;
+			case 0x77c3: ctrl_index = (a_bus_vector-0x3fe02); break;
+			case 0x8a62: ctrl_index = (a_bus_vector-0x3a784); break;
+			default:
+				ctrl_index = 0;
+				popmessage("Unknown SSS seed %04x, contact MAMEdev",a_bus[3] >> 16);
+				break;
 		}
+
+//		printf("%08x\n",ctrl_index);
 	}
 }
 
