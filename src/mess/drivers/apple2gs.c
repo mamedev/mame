@@ -69,6 +69,7 @@
 #include "machine/a2alfam2.h"
 #include "machine/a2midi.h"
 #include "machine/a2vulcan.h"
+#include "machine/a2ssc.h"
 
 static const gfx_layout apple2gs_text_layout =
 {
@@ -296,6 +297,8 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("alfam2", A2BUS_ALFAM2)    /* ALF Apple Music II */
 	SLOT_INTERFACE("midi", A2BUS_MIDI)  /* Generic 6840+6850 MIDI board */
 	SLOT_INTERFACE("vulcan", A2BUS_VULCAN)  /* AE Vulcan IDE card */
+	SLOT_INTERFACE("vulcan", A2BUS_VULCAN)	/* AE Vulcan IDE card */
+	SLOT_INTERFACE("ssc", A2BUS_SSC)    /* Apple Super Serial Card */
 //    SLOT_INTERFACE("softcard", A2BUS_SOFTCARD)  /* Microsoft SoftCard */  // appears not to be IIgs compatible?
 //    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
