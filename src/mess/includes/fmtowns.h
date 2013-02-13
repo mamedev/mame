@@ -37,6 +37,7 @@ struct towns_cdrom_controller
 	UINT32 lba_last;
 	UINT32 cdda_current;
 	UINT32 cdda_length;
+	bool software_tx;
 	emu_timer* read_timer;
 };
 
@@ -238,8 +239,9 @@ class towns_state : public driver_device
 	UINT8 speaker_get_spk();
 	void speaker_set_spkrdata(UINT8 data);
 	void speaker_set_input(UINT8 data);
+	UINT8 towns_cdrom_read_byte_software();
 
-	private:
+private:
 	static const device_timer_id TIMER_RTC = 0;
 	static const device_timer_id TIMER_FREERUN = 1;
 	static const device_timer_id TIMER_INTERVAL2 = 2;

@@ -1449,6 +1449,41 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_cdrom_read_byte)
 	}
 }
 
+UINT8 towns_state::towns_cdrom_read_byte_software()
+{
+	UINT8 ret;
+	if(m_towns_cd.buffer_ptr < 0) // transfer has ended
+		return 0x00;
+
+	ret = m_towns_cd.buffer[m_towns_cd.buffer_ptr++];
+
+	if(m_towns_cd.buffer_ptr >= 2048)
+	{  // end of transfer
+		m_towns_cd.status &= ~0x10;  // no longer transferring by DMA
+		m_towns_cd.status &= ~0x20;  // no longer transferring by software
+		logerror("CD: end of software transfer (LBA=%08x)\n",m_towns_cd.lba_current);
+		if(m_towns_cd.lba_current >= m_towns_cd.lba_last)
+		{
+			m_towns_cd.extra_status = 0;
+			towns_cd_set_status(machine(),0x06,0x00,0x00,0x00);
+			towns_cdrom_set_irq(machine(),TOWNS_CD_IRQ_DMA,1);
+			m_towns_cd.buffer_ptr = -1;
+			m_towns_cd.status |= 0x01;  // ready
+		}
+		else
+		{
+			cdrom_read_data(m_cdrom->get_cdrom_file(),++m_towns_cd.lba_current,m_towns_cd.buffer,CD_TRACK_MODE1);
+			m_towns_cd.extra_status = 0;
+			towns_cd_set_status(machine(),0x21,0x00,0x00,0x00);
+			towns_cdrom_set_irq(machine(),TOWNS_CD_IRQ_DMA,1);
+			m_towns_cd.status &= ~0x10;
+			m_towns_cd.status |= 0x20;
+			m_towns_cd.buffer_ptr = -1;
+		}
+	}
+	return ret;
+}
+
 static void towns_cdrom_read(cdrom_image_device* device)
 {
 	// MODE 1 read
@@ -1492,8 +1527,16 @@ static void towns_cdrom_read(cdrom_image_device* device)
 	else
 	{
 		cdrom_read_data(device->get_cdrom_file(),state->m_towns_cd.lba_current,state->m_towns_cd.buffer,CD_TRACK_MODE1);
-		state->m_towns_cd.status |= 0x10;  // DMA transfer begin
-		state->m_towns_cd.status &= ~0x20;  // not a software transfer
+		if(state->m_towns_cd.software_tx)
+		{
+			state->m_towns_cd.status &= ~0x10;  // not a DMA transfer
+			state->m_towns_cd.status |= 0x20;  // software transfer
+		}
+		else
+		{
+			state->m_towns_cd.status |= 0x10;  // DMA transfer begin
+			state->m_towns_cd.status &= ~0x20;  // not a software transfer
+		}
 //      state->m_towns_cd.buffer_ptr = 0;
 //      state->m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
 		if(state->m_towns_cd.command & 0x20)
@@ -1504,7 +1547,10 @@ static void towns_cdrom_read(cdrom_image_device* device)
 		else
 		{
 			state->m_towns_cd.extra_status = 0;
-			towns_cd_set_status(device->machine(),0x22,0x00,0x00,0x00);
+			if(state->m_towns_cd.software_tx)
+				towns_cd_set_status(device->machine(),0x21,0x00,0x00,0x00);
+			else
+				towns_cd_set_status(device->machine(),0x22,0x00,0x00,0x00);
 		}
 	}
 }
@@ -1802,6 +1848,11 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
                 }*/
 			}
 			return ret;
+		case 0x02:  // data transfer (used in software transfers)
+			if(m_towns_cd.software_tx)
+			{
+				return towns_cdrom_read_byte_software();
+			}
 		default:
 			return 0x00;
 	}
@@ -1839,11 +1890,18 @@ WRITE8_MEMBER(towns_state::towns_cdrom_w)
 			logerror("CD: parameter %02x added\n",data);
 			break;
 		case 0x03:
-			// TODO: software transfer mode (bit 3)
+			if(data & 0x08)  // software transfer
+			{
+				m_towns_cd.status &= ~0x10;  // no DMA transfer
+				m_towns_cd.status |= 0x20;
+				m_towns_cd.software_tx = true;
+				m_towns_cd.buffer_ptr = 0;
+			}
 			if(data & 0x10)
 			{
 				m_towns_cd.status |= 0x10;  // DMA transfer begin
 				m_towns_cd.status &= ~0x20;  // not a software transfer
+				m_towns_cd.software_tx = false;
 				if(m_towns_cd.buffer_ptr < 0)
 				{
 					m_towns_cd.buffer_ptr = 0;
@@ -2798,7 +2856,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( townssj, towns )
 
-	MCFG_CPU_REPLACE("maincpu",I486, 66000000)
+	MCFG_CPU_REPLACE("maincpu",PENTIUM, 66000000)
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
