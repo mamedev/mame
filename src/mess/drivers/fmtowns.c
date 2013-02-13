@@ -2856,7 +2856,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( townssj, towns )
 
-	MCFG_CPU_REPLACE("maincpu",PENTIUM, 66000000)
+	MCFG_CPU_REPLACE("maincpu",I486, 66000000)
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)
