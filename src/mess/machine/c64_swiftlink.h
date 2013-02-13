@@ -16,7 +16,10 @@
 #include "emu.h"
 #include "machine/c64exp.h"
 #include "machine/mos6551.h"
+#include "machine/null_modem.h"
 #include "machine/serial.h"
+#include "machine/terminal.h"
+
 
 
 
@@ -27,7 +30,7 @@
 // ======================> c64_swiftlink_cartridge_device
 
 class c64_swiftlink_cartridge_device : public device_t,
-									public device_c64_expansion_card_interface
+										public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction

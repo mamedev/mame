@@ -38,6 +38,8 @@ const device_type C64_SWIFTLINK = &device_creator<c64_swiftlink_cartridge_device
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( rs232_devices )
+	SLOT_INTERFACE("serial_terminal", SERIAL_TERMINAL)
+	SLOT_INTERFACE("null_modem", NULL_MODEM)
 SLOT_INTERFACE_END
 
 static const rs232_port_interface rs232_intf =
