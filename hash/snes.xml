@@ -6,13 +6,13 @@
   - Maintainers : Fabio Priuli, Yakushi~Kabuto
   - Cart profiles : Yakushi~Kabuto
   - Documentation and redump (significant contributors):
+  - - d4s (extremely rare material)
   - - Yakushi~Kabuto (~1160 carts)
-  - - byuu (149 carts)
+  - - byuu (200 carts)
   - - badinsults (~350 carts)
   - - JohnDie (~180 carts)
   - - Zidanax (~130 carts)
   - - Ecco and RedScorpion (72 carts)
-  - - d4s (extremely rare material)
 -->
 
 <!--
@@ -64,6 +64,8 @@ Undumped
           o   PCB pic    1994 Nintendo PowerFest / Competition
           o   PCB pic    Bio Metal / Prototype 19930716 | Activision
           o   PCB pic    The Brainies / Prototype 19930522
+          o   Video      Burn-In/Test Cartridge Rev D / Not for sale, final
+          ?              Fatal Fury / Prototype 19921224
           o   Inter rev  Fighter's History / Initial release prior to Rev A
           ?              Ignition Factor, The / Prototype
           o   PCB pic    Jammit / Prototype 19940301 | GTE Entertainment
@@ -152,9 +154,9 @@ Undumped
 -->
 
 <!--
-Documentation of Super Famicom PCB codes
+Documentation of Super Famicom PCB labels
 
-The code printed on the PCB can be analysed as four parts: [Code 1]-[Code 2]-[Code 3]-[Code 4]
+The labels printed on the PCB can be analysed as four parts: [Code 1]-[Code 2]-[Code 3]-[Code 4]
 The "[Code 2]" part can also be analyzed as four (or sometimes five) subparts which will be detailed below.
 
 Code 1
@@ -235,8 +237,8 @@ Code 4 (This suffix only appears on "EA," "MAXI," and "WEI" PCBs.)
 -1 : PCB revision 1
 -2 : PCB revision 2
 
-Miscellaneous Codes
-===================
+Miscellaneous Labels
+====================
 BSMC-AF-1   : On "Broadcast Satellaview-X" media cartridge.
 BSMC-CR-1   : On "Broadcast Satellaview-X" media cartridge.
 GPC-RAMC-S1 : Game Processing Cassette
@@ -245,12 +247,36 @@ SGB-R-10    : On "Super Game Boy" interface cartridge.
 SHVC-MMSA-1 : On "Nintendo Power" flash cartridge.
 SHVC-SGB2-1 : On "Super Game Boy 2" interface cartridge.
 
-Cartridge Models
-================
-SNSP-006 : Standard PAL cartridge
-SNS-006  : Standard North American cartridge
-SHVC-006 : Standard Japanese cartridge
-SNSN-006 : Standard Honk Kong cartridge
+CIC Chips (W.I.P)
+=========
+Nintendo CIC are anti copy protection lockout chips,
+they are present in almost every single licensed cartridge, sometimes built into another chip.
+There are also several CIC clones used in unlicensed cartridges.
+
+CIC types:
+
+-D411 : NTSC
+-F411 : NTSC and processing chip
+-D413 : PAL
+-F413 : PAL and processing chip
+
+Known revisions and their timeline approximaions (W.I.P):
+
+- 1990/36,1992/21  ⊆ t(D411)
+- 1992/31,1995/03] ⊆ t(D411A)
+-[1995/03,1998/43  ⊆ t(D411B)
+
+-?                 ⊆ t(F411)  //maybe used in star fox early protoypes
+- 1993/03,1994/33  ⊆ t(F411A)
+- 1995/20,2000/13  ⊆ t(F411B)
+
+- 1992/18,1992/22  ⊆ t(D413)
+- 1992/24,1994/50  ⊆ t(D413A)
+- 1995/06,1997/35  ⊆ t(D413B)
+
+-?                 ⊆ t(F413)
+-?                 ⊆ t(F413A)
+-?                 ⊆ t(F413B)
 -->
 
 <!--
@@ -267,7 +293,7 @@ Cartridges labels (W.I.P)
 
 - US catalogue product code:
   SNS-xy-USA, and later, SNS-AxyE-USA
-  Prefix M/ : Made in mexico
+  Prefix M/ : Made in mexico ('made', not just 'assembled')
   Prefix DIS- or suffix -DIS : Display (not for sale)
 
 - Europe catalogue product code:
@@ -322,6 +348,21 @@ SNSP-NOE             : Nintendo of Europe (usually Germany)
 SNSP-UKV             : United Kingdom
 SNSN-HKG             : Hong Kong
 
+Cartridge Models:
+SNSP-006 : Standard PAL cartridge, very similar to Japanese ones
+SNSP-027 : PAL Super Game Boy cartridge
+SNS-006  : Standard North American cartridge, shape differs from Japanese ones and constitutes the only region protection between North America and Japan
+SNS-011  : (To be confirmed) Cleaning
+SNS-027  : North American Super Game Boy cartridge
+SNSN-006 : Standard Honk Kong cartridge
+SHVC-006 : Standard Japanese cartridge
+SHVC-027 : Japanese Super Game Boy cartridge
+SHVC-028 : Broadcast Satellaview-X cassette (衛星放送対応カセット), large cartridge with a slot for a BS-X memory pak
+SHVC-031 : Broadcast Satellaview-X memory pak, small cartridges hosting a 8Mbit Flash ROM for downloadable titles from the BS-X library
+SHVC-039 : (To be confirmed) Broadcast Satellaview-X ROM pak, unlike memory paks, these cartridges host a permanent ROM and can not be flashed
+SHVC-040 : Broadcast Satellaview-X cassette (衛星放送対応カセット), later revision although the difference is unclear
+SHVC-041 : Super Famicom memory cassette (SFメモリカセット), white cartridges hosting flashed titles from the 'Nintendo Power' library
+SHVC-042 : Super Game Boy 2 cartridge, only released in Japan
 -->
 
 <!--
@@ -2796,7 +2837,7 @@ List of non retail cartridges
 
 	<software name="testcart">
 		<!-- Lord Nightmare -->
-		<description>Test Cartridge / Super NES Service Version D (USA)</description>
+		<description>Burn-In/Test Cartridge Rev D (USA, Prototype)</description>
 		<year>1991</year>
 		<publisher>Nintendo</publisher>
 		<info name="serial" value="PN23278" />
@@ -4457,7 +4498,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9441 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="2097152">
@@ -4479,7 +4520,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="D411A (AA)" />
+			<feature name="lockout" value="D411A 9313 AA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -4492,6 +4533,30 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 <!-- wip-a -->
+	<software name="asp" cloneof="desertf">
+		<description>A.S.P. - Air Strike Patrol (USA)</description>
+		<year>1995</year>
+		<publisher>Seta</publisher>
+		<info name="serial" value="SNS-4A-USA" />
+		<info name="release" value="199501xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-21" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9447 CB" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-4a-0.u1" size="1048576" crc="05c0da54" sha1="57122ef7a84fbe0355ecc7e0648e39f56854a5f6" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aaahhrmu" cloneof="aaahhrm">
 		<description>Aaahh!!! Real Monsters (USA)</description>
 		<year>1995</year>
@@ -4503,7 +4568,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="MAXI-1A0N-30-2" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9716 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -4526,7 +4591,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (B)" />
+			<feature name="lockout" value="D411A 9341 B" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -4573,7 +4638,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 256K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9444 CB" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -4645,7 +4710,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411 (C)" />
+			<feature name="lockout" value="D411 9133 C" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -4692,7 +4757,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9252 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1572864">
@@ -4730,7 +4795,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411 (BA)" />
+			<feature name="lockout" value="D411 C152 05 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -4749,7 +4814,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (AA)" />
+			<feature name="lockout" value="D411A 9303 AA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -4768,7 +4833,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (AA)" />
+			<feature name="lockout" value="D411A 9453 AA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 <!-- Alternat cartridge made in Mexico
@@ -4797,7 +4862,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CC)" />
+			<feature name="lockout" value="D411A 9421 CC" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="2097152">
@@ -4817,7 +4882,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CC)" />
+			<feature name="lockout" value="D411A 9344 CC" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -4838,7 +4903,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9427 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1572864">
@@ -4859,7 +4924,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (AA)" />
+			<feature name="lockout" value="D411A 9450 AA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -4878,7 +4943,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (AA)" />
+			<feature name="lockout" value="D411A 9317 AA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -4897,7 +4962,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9430 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -4918,7 +4983,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9440 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1310720">
@@ -4938,7 +5003,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-10, SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA), D411A (CA)" /> <!-- Notes: D411A (BA) in -10 pcb, D411A (CA) in -20 pcb -->
+			<feature name="lockout" value="D411A 9303 BA, D411A (CA)" /> <!-- Notes: D411A 9303 BA in -10 pcb, D411A (CA) in -20 pcb -->
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -4969,7 +5034,7 @@ List of perfect retail cartridges rom dumps
 		<description>Aero the Acro-Bat 2 (USA)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
-		<info name="serial" value="SNS-AE2E-USA" />
+		<info name="serial" value="SNS-AE2E-USA, M/SNS-AE2E-LTN" />
 		<info name="release" value="199411xx" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A0N-20" />
@@ -4978,12 +5043,12 @@ List of perfect retail cartridges rom dumps
 			<feature name="lockout" value="D411A (BA)" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
-<!-- Alternate Latin America cartridge
-        <info name="serial" value="SNS-AE2E-LTN" />
+<!-- M/SNS-AE2E-LTN cartridge, PCB revision -30
+        <info name="serial" value="M/SNS-AE2E-LTN" />
             <feature name="pcb" value="SHVC-1A0N-30" />
             <feature name="u1" value="U1 MASK ROM" />
             <feature name="u2" value="U2 CIC" />
-            <feature name="lockout" value="D411B (CB)" />
+            <feature name="lockout" value="D411B 9604 CB" />
             <feature name="cart_model" value="SNS-006" />
             <feature name="cart_back_label" value="" />
 -->
@@ -5005,7 +5070,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9249 BA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -5029,7 +5094,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9427 BA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -5076,7 +5141,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (B)" />
+			<feature name="lockout" value="D411B 9509 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -5135,30 +5200,6 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
-	<software name="asp" cloneof="desertf">
-		<description>A.S.P. - Air Strike Patrol (USA)</description>
-		<year>1995</year>
-		<publisher>Seta</publisher>
-		<info name="serial" value="SNS-4A-USA" />
-		<info name="release" value="199501xx" />
-		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="SHVC-1A3M-21" />
-			<feature name="u1" value="U1 MASK ROM(N)" />
-			<feature name="u2" value="U2 64K SRAM" />
-			<feature name="u3" value="U3 MAD-1" />
-			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
-			<feature name="battery" value="BATT CR2032" />
-			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="" />
-			<dataarea name="rom" size="1048576">
-				<rom name="sns-4a-0.u1" size="1048576" crc="05c0da54" sha1="57122ef7a84fbe0355ecc7e0648e39f56854a5f6" offset="0x000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="akumajo" cloneof="scvania4">
 		<description>Akumajou Dracula (Jpn)</description>
 		<year>1991</year>
@@ -5189,7 +5230,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9438 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -5252,7 +5293,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="MAXI-1A0N-30-2" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9725 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 <!-- Later majesco cartridge (1999)
@@ -5389,7 +5430,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9316 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -5410,7 +5451,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9313 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -5430,7 +5471,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9313 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -5467,7 +5508,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1J0N-10" />
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9427 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -5486,7 +5527,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9353 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -5506,7 +5547,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="MJSC-1A0N-30-2" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9835 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -5615,7 +5656,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="MAXI-1A0N-30-2" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9725 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -5637,7 +5678,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411 (BB)" />
+			<feature name="lockout" value="D411 9214 BB" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -5660,7 +5701,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9530 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -5745,7 +5786,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9735 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -5765,7 +5806,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1J0N-01" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9346 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -5882,7 +5923,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-02" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411 (BB)" />
+			<feature name="lockout" value="D411 C208 11BB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -5891,6 +5932,25 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 <!-- wip-b -->
+	<software name="bobu" cloneof="bob">
+		<description>B.O.B. (USA)</description>
+		<year>1993</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SNS-B4-USA" />
+		<info name="release" value="199306xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9309 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-b4-0.u1" size="1048576" crc="4f593c46" sha1="8b9efe5107285c776b24241a0a93f54f23a46e09" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bahamut">
 		<description>Bahamut Lagoon (Jpn)</description>
 		<year>1996</year>
@@ -6006,7 +6066,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 74HCU04" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9440 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -6027,7 +6087,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (C)" />
+			<feature name="lockout" value="D411A 9348 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -6049,7 +6109,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CC)" />
+			<feature name="lockout" value="D411A 9415 CC" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1572864">
@@ -6071,7 +6131,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411B (A)" />
+			<feature name="lockout" value="D411B 9507 A" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1572864">
@@ -6091,7 +6151,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (CC)" />
+			<feature name="lockout" value="D411B 9603 CC" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -6113,7 +6173,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9444 BA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -6153,7 +6213,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1J0N-20" />
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (B), D411B (C)" />
+			<feature name="lockout" value="D411B 9526 B, D411B (C)" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="3145728">
@@ -6192,7 +6252,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-10" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9309 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="1048576">
@@ -6253,7 +6313,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (B)" />
+			<feature name="lockout" value="D411A 9349 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -6275,7 +6335,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (C)" />
+			<feature name="lockout" value="D411A 9342 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -6313,15 +6373,15 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-02" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" /> <!-- 9236 -->
+			<feature name="lockout" value="D411A 9236 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN" />
-<!-- revision
+<!-- PCB revision -20
         <info name="serial" value="SNS-BT-USA" />
             <feature name="pcb" value="SHVC-1A0N-20" />
             <feature name="u1" value="U1 MASK ROM" />
             <feature name="u2" value="U2 CIC" />
-            <feature name="lockout" value="D411A (AA)" /> <!- - 9249 - ->
+            <feature name="lockout" value="D411A 9249 AA" />
             <feature name="cart_model" value="SNS-006" />
             <feature name="cart_back_label" value="" />
 -->
@@ -6434,7 +6494,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9309 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -6547,7 +6607,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (B)" />
+			<feature name="lockout" value="D411A 9319 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -6590,9 +6650,9 @@ List of perfect retail cartridges rom dumps
 <!-- later cartridge assembled in Mexico
         <info name="serial" value="SNS-UL-USA" />
             <feature name="pcb" value="MAXI-1A0N-30-1" />
-            <feature name="u1" value="U1 MASK ROM" /> ROM LABEL : SNS-PUL
+            <feature name="u1" value="U1 MASK ROM" /> <!- - ROM LABEL : 'SNS-PUL' - ->
             <feature name="u2" value="U2 CIC" />
-            <feature name="lockout" value="D411B (C)" />
+            <feature name="lockout" value="D411B 9715 C" />
             <feature name="cart_model" value="SNS-006" />
             <feature name="cart_back_label" value="" />
 -->
@@ -6632,7 +6692,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9402 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -6651,7 +6711,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="MAXI-1A0N-30-2" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9713 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -6670,7 +6730,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9352 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -6689,7 +6749,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-10" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9303 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="524288">
@@ -6708,7 +6768,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-10" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9307 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -6754,7 +6814,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411B (B)" />
+			<feature name="lockout" value="D411B 9527 B" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -6777,7 +6837,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9444 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -6798,7 +6858,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411 (BA)" />
+			<feature name="lockout" value="D411 9141 BA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -6820,7 +6880,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1J0N-10" />
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9353 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -6848,6 +6908,26 @@ List of perfect retail cartridges rom dumps
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-3k-0 p0.u1" size="524288" crc="31d5a572" sha1="1bc7d709ba14658535179ecf2bb3e733e65fead5" offset="0x000000" />
 				<rom name="shvc-3k-0 p1.u2" size="524288" crc="e3ae6448" sha1="7d9f8d29cfbd08359ee9c11f958298a618680cfd" offset="0x080000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biometalu" cloneof="biometal">
+		<description>Bio Metal (USA)</description>
+		<year>1993</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="SNS-BV-USA" />
+		<info name="release" value="199311xx" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9304 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-bv-0.u1" size="1048576" crc="53d8410e" sha1="b2f13be7ec7e955ef8fdd398bca44e06b690a8e2" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6936,6 +7016,25 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="blackthr" cloneof="blackhwk">
+		<description>Blackthorne (USA)</description>
+		<year>1994</year>
+		<publisher>Interplay</publisher>
+		<info name="serial" value="SNS-6Z-USA" />
+		<info name="release" value="199409xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9426 CA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-6z-0.u1" size="1048576" crc="856beab1" sha1="bcac87c7a982d8eb90cbf30a6c34fbabde135ff7" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blazeonj" cloneof="blazeon">
 		<description>BlaZeon (Jpn)</description>
 		<year>1992</year>
@@ -6952,6 +7051,25 @@ List of perfect retail cartridges rom dumps
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-bl-0.u1" size="1048576" crc="ad2effc3" sha1="b59e45c1b885fb67c9e0964e3daccc69d809ed63" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blazeon">
+		<description>BlaZeon - The Bio-Cyborg Challenge (USA)</description>
+		<year>1992</year>
+		<publisher>Atlus</publisher>
+		<info name="serial" value="SNS-BL-USA" />
+		<info name="release" value="199210xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9238 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-bl-0.u1" size="1048576" crc="3b01d0a3" sha1="b0bed10b3332e6c1e02c09e1bf89a35d56cc3c69" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6997,6 +7115,25 @@ List of perfect retail cartridges rom dumps
 			<feature name="cart_back_label" value="SNSP-NOE" />
 			<dataarea name="rom" size="524288">
 				<rom name="spal-b6-0.u1" size="524288" crc="4a62057d" sha1="4ca07bc7319303952bc4b036eb3322dff3212d29" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluesbu" cloneof="bluesb">
+		<description>The Blues Brothers (USA)</description>
+		<year>1993</year>
+		<publisher>Titus</publisher>
+		<info name="serial" value="SNS-B6-USA" />
+		<info name="release" value="199306xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9322 CA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-b6-0.u1" size="524288" crc="82b97464" sha1="ad516a2bb9e7a8c9ecccdfbb491ba3dcc92a0519" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7061,11 +7198,30 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9435 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-abne-0.u1" size="1048576" crc="597aa981" sha1="e9b6482ff501b35db2aaffd1e2fca4f4be82034b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="boogeru" cloneof="booger">
+		<description>Boogerman - A Pick and Flick Adventure (USA)</description>
+		<year>1995</year>
+		<publisher>Interplay</publisher>
+		<info name="serial" value="M/SNS-AB4E-USA" />
+		<info name="release" value="199512xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J0N-20" />
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411B 9528 C" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="3145728">
+				<rom name="sns-ab4e-0.u1" size="3145728" crc="1899aaff" sha1="aa6afbec0c111943df266f93143aa1082659070e" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7080,11 +7236,142 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411A 9227 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-ll-0.u1" size="1048576" crc="c0b632c0" sha1="1cbe6c3fd218c7fbd434d9951bbd9cc8eee049d2" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brainlrd">
+		<description>Brain Lord (USA)</description>
+		<year>1994</year>
+		<publisher>Enix</publisher>
+		<info name="serial" value="SNS-3B-USA" />
+		<info name="release" value="199408xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2J3M-11" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 64KSRAM" />
+			<feature name="u4" value="U4 MAD-1" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411A 9404 BA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1572864">
+				<rom name="sns-3b-0 p0.u1" size="1048576" crc="69c13f9a" sha1="dd748ce925a8e00bc825a2f296a12c512a7cf864" offset="0x000000" />
+				<rom name="sns-3b-0 p1.u2" size="524288"  crc="ee8257bb" sha1="f8d166726ed864fca0bb4cc7e3a01dd8d0fce9ce" offset="0x100000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brainiesu" cloneof="brainies">
+		<description>The Brainies (USA)</description>
+		<year>1996</year>
+		<publisher>Titus</publisher>
+		<info name="serial" value="M/SNS-B7-USA" />
+		<info name="release" value="199604xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411B 9531 C" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-b7-0.u1" size="524288" crc="718cb0df" sha1="ba2e624390925f0993b5ccf74072e168fbfe4606" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="draculau" cloneof="dracula">
+		<description>Bram Stoker's Dracula (USA)</description>
+		<year>1993</year>
+		<publisher>Sony Imagesoft</publisher>
+		<info name="serial" value="SNS-5D-USA" />
+		<info name="release" value="199309xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9338 CB" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-5d-0.u1" size="1048576" crc="5cece690" sha1="618eea2886004652fa707daf56d8ad04c3c17094" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brandish">
+		<description>Brandish (USA)</description>
+		<year>1995</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="SNS-QF-USA" />
+		<info name="release" value="199502xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2J5M-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 256K SRAM" />
+			<feature name="u4" value="U4 MAD-1/R" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411A 9451 A" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1572864">
+				<rom name="sns-qf-0 p0.u1" size="1048576" crc="e3a5d52f" sha1="c0124d84a3c534e9c51b9f8b4da7fe0887b5da5e" offset="0x000000" />
+				<rom name="sns-qf-0 p1.u2" size="524288"  crc="c440682b" sha1="11e0923ca2259b61d8057dcf3875ad0cd68cef34" offset="0x100000" />
+			</dataarea>
+			<dataarea name="nvram" size="32768">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brawlbrou" cloneof="brawlbro">
+		<description>Brawl Brothers (USA)</description>
+		<year>1993</year>
+		<publisher>Jaleco</publisher>
+		<info name="serial" value="SNS-RE-USA" />
+		<info name="release" value="199304xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-10" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9306 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-re-0 p0.u1" size="1048576" crc="d21d844b" sha1="144c402a0a1117e5f3bad98d309d329283d60a7c" offset="0x000000" />
+				<rom name="sns-re-0 p1.u2" size="1048576" crc="70162288" sha1="bf393af9c56cee2933d8e2d47cec34a2d906a006" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="breaktru">
+		<description>BreakThru! (USA)</description>
+		<year>1995</year>
+		<publisher>Spectrum Holobyte</publisher>
+		<info name="serial" value="SNS-ABXE-USA" />
+		<info name="release" value="199501xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9450 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-abxe-0.u1" size="524288" crc="e6c0b5da" sha1="1cee68420e5032821993a67cd79d0b49d729178c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7158,7 +7445,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u3" value="U3 64KSRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411A 9421 BA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
@@ -7210,7 +7497,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411B 9616 CB" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -7218,6 +7505,104 @@ List of perfect retail cartridges rom dumps
 				<rom name="sns-af2e-0.u1" size="3145728" crc="67cdacc5" sha1="1f7707e606b7e9fa8fb3908bbddfcb5dea93d776" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bretth95">
+		<description>Brett Hull Hockey '95 (USA)</description>
+		<year>1995</year>
+		<publisher>Accolade</publisher>
+		<info name="serial" value="SNS-ABHE-USA" />
+		<info name="release" value="199501xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9447 CA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-abhe-0.u1" size="2097152" crc="9ebfe809" sha1="c6045c56d1b7acb07b46305fd306e2963b639f9c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bretthu" cloneof="bretth">
+		<description>Brett Hull Hockey (USA)</description>
+		<year>1994</year>
+		<publisher>Accolade</publisher>
+		<info name="serial" value="SNS-5Y-USA" />
+		<info name="release" value="199401xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9351 CC" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-5y-0 p0.u1" size="1048576" crc="d839cffc" sha1="461d1e5b99264c72325cddceefc8f4f9952b1710" offset="0x000000" />
+				<rom name="sns-5y-0 p1.u2" size="1048576" crc="8a62b622" sha1="8871cacd7885031509d08da92896c7ca1fa39093" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bronkie">
+		<description>Bronkie the Bronchiasaurus (USA)</description>
+		<year>1995</year>
+		<publisher>Raya Systems</publisher>
+		<info name="serial" value="M/SNS-AB6E-USA" />
+		<info name="release" value="199509xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411B 9520 B" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-ab6e-0.u1" size="1048576" crc="1200f3cf" sha1="139ada7133889126735440968ad58f47fa93a341" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brunswck">
+		<description>Brunswick World Tournament of Champions (USA)</description>
+		<year>1997</year>
+		<publisher>T*HQ</publisher>
+		<info name="serial" value="SNS-AWUE-USA" />
+		<info name="release" value="199708xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J0N-20" />
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411B 9723 C" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-awue-0.u1" size="2097152" crc="52e4dc92" sha1="d883015b5d2774fca45e89c04e029e88e7cd6112" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brutalu" cloneof="brutal">
+		<description>Brutal - Paws of Fury (USA)</description>
+		<year>1994</year>
+		<publisher>CyberSoft</publisher>
+		<info name="serial" value="SNS-ABLE-USA" />
+		<info name="release" value="199412xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9448 AA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-able-0.u1" size="2097152" crc="8fe49f80" sha1="746af6b97acf857b786b4e3adc1ca8e627dae3dd" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7240,7 +7625,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="A, B" />
 			<feature name="cart_model" value="SHVC-028" />
-			<feature name="cart_back_label" value="G728389 SHVC-ZBSJ-JPN" />
+			<feature name="cart_back_label" value="G728389" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-zbsj-1.u2" size="1048576" crc="f51f07a0" sha1="604556b2e62860af18db5a77f2956ebc75450020" offset="0x000000" />
 			</dataarea>
@@ -7259,11 +7644,30 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1J0N-10" />
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411A 9436 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-abbe-0.u1" size="2097152" crc="d0d172fa" sha1="c501d8779891a501ca4674cc39fc9d82cc05eb8c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bubsyu" cloneof="bubsy">
+		<description>Bubsy in Claws Encounters of the Furred Kind (USA)</description>
+		<year>1993</year>
+		<publisher>Accolade</publisher>
+		<info name="serial" value="SNS-UY-USA" />
+		<info name="release" value="199305xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9314 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-uy-0.u1" size="2097152" crc="444a52c1" sha1="9f6ff6264e0361e074f9cfee2ec4976866a781c5" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7301,12 +7705,31 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411A 9343 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="1572864">
 				<rom name="sns-r7-0 p0.u1" size="1048576" crc="c5c37b96" sha1="b56f9a2a11babfc7ef6a3f08f60d8306a21e8845" offset="0x000000" />
 				<rom name="sns-r7-0 p1.u2" size="524288"  crc="49d7e8ff" sha1="2925a472017de3d23e808b6e01f252d00d887114" offset="0x100000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bullvsblu" cloneof="bullvsbl">
+		<description>Bulls vs Blazers and the NBA Playoffs (USA, Rev. A)</description>
+		<year>1992</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="serial" value="SNS-BU-USA-1" />
+		<info name="release" value="199212xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9306 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-bu-1.u1" size="1048576" crc="c2e91694" sha1="8130855e4db139a74025d4d08740fb55d5de19ce" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7321,15 +7744,34 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411A 9450 CB" />
 			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="D411A (CB)" />
+			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
 				<rom name="sns-ayke-0.u1" size="524288" crc="3266fd23" sha1="43b8da73ee83c82b3a70092503f26c73e2333eee" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
 <!-- wip-c -->
+	<software name="cacoma">
+		<description>Cacoma Knight in Bizyland (USA)</description>
+		<year>1993</year>
+		<publisher>Seta</publisher>
+		<info name="serial" value="SNS-CC-USA" />
+		<info name="release" value="199306xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9317 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-cc-0.u1" size="524288" crc="ba921443" sha1="d5502cbb7a86b214867a43675f5ca64ed45478ca" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="calripkn">
 		<description>Cal Ripken Jr. Baseball (Euro)</description>
 		<year>1992</year>
@@ -7348,6 +7790,25 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="calripknu" cloneof="calripkn">
+		<description>Cal Ripken Jr. Baseball (USA)</description>
+		<year>1992</year>
+		<publisher>Mindscape</publisher>
+		<info name="serial" value="SNS-CJ-USA-1" />
+		<info name="release" value="199212xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9313 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-cj-0.u1" size="1048576" crc="ce2eaa41" sha1="c82ef847ec4b01948dbab5e93c2d3fa9053296d8" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="calgame2u" cloneof="calgame2">
 		<description>California Games II (USA)</description>
 		<year>1993</year>
@@ -7358,11 +7819,37 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9249 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-c2-0.u1" size="1048576" crc="21392b00" sha1="e564dc4ea326bbaeca281b7aa8015a21fca3f81e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cdalecup">
+		<description>Cannondale Cup (USA)</description>
+		<year>1994</year>
+		<publisher>American Softworks</publisher>
+		<info name="serial" value="SNS-ASCE-USA" />
+		<info name="release" value="199411xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A1M-01" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 16K SRAM" />
+			<feature name="u4" value="U4 MAD-1/R" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D411A 9439 CB" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1572864">
+				<rom name="sns-asce-0 p0.u1" size="1048576" crc="05bd2f3d" sha1="6be40a5ba5e8964f52dd47ca3a8f235ab6256aa7" offset="0x000000" />
+				<rom name="sns-asce-0 p1.u2" size="524288"  crc="6da67c29" sha1="9cd1afb72166e24ee61c75df0c855e0b5689ab90" offset="0x100000" />
+			</dataarea>
+			<dataarea name="nvram" size="2048">
 			</dataarea>
 		</part>
 	</software>
@@ -7377,11 +7864,34 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9334 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-nl-0.u1" size="1048576" crc="bd0a0c0e" sha1="2d4f33f1b72f158916ca2560ef42b9b831e50393" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="capcomss" cloneof="sshotout">
+		<description>Capcom's Soccer Shootout (USA)</description>
+		<year>1994</year>
+		<publisher>Capcom</publisher>
+		<info name="serial" value="SNS-JL-USA" />
+		<info name="release" value="199406xx" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-11" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9419 B" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1572864">
+				<rom name="sns-jl-0 p0.u1" size="1048576" crc="977beae3" sha1="3ac2f885cb8249ace53bc88122678daaa1e3005f" offset="0x000000" />
+				<rom name="sns-jl-0 p1.u2" size="524288"  crc="47b5e3d9" sha1="1965ff403496bf9e8e72e6a3b80f64385003737f" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7417,6 +7927,15 @@ List of perfect retail cartridges rom dumps
 			<feature name="lockout" value="" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
+<!-- PCB revision -20
+        <info name="serial" value="SNS-6A-USA" />
+            <feature name="pcb" value="SHVC-1A0N-20" />
+            <feature name="u1" value="U1 MASK ROM" />
+            <feature name="u2" value="U2 CIC" />
+            <feature name="lockout" value="D411A 9326 CB" />
+            <feature name="cart_model" value="SNS-006" />
+            <feature name="cart_back_label" value="" />
+-->
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-6a-0.u1" size="1048576" crc="456ab5c8" sha1="8634cb94412de777197a462759393c074efff061" offset="0x000000" />
 			</dataarea>
@@ -7434,11 +7953,30 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1J0N-20" />
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9523 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-qm-0.u1" size="2097152" crc="81db73c7" sha1="9c28b15e170a1975acf0953ff66185a3c5c988ac" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="captnovo">
+		<description>Captain Novolin (USA)</description>
+		<year>1992</year>
+		<publisher>Raya Systems</publisher>
+		<info name="serial" value="SNS-CP-USA" />
+		<info name="release" value="199211xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9242 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-cp-0.u1" size="524288" crc="9fd460a4" sha1="72cfb569819da4e799bf8fa1a6f023664cc7069b" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7521,6 +8059,25 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="carrieru" cloneof="carrier">
+		<description>Carrier Aces (USA)</description>
+		<year>1995</year>
+		<publisher>CyberSoft</publisher>
+		<info name="serial" value="SNS-ACAE-USA" />
+		<info name="release" value="199501xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9448 CA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-acae-0.u1" size="2097152" crc="8bc5b8de" sha1="10e4754153e22116bcf3f9082fe6fe193748732e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="casper">
 		<description>Casper (Euro)</description>
 		<year>1997</year>
@@ -7539,6 +8096,45 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="casperu" cloneof="casper">
+		<description>Casper (USA)</description>
+		<year>1996</year>
+		<publisher>Natsume</publisher>
+		<info name="serial" value="M/SNS-AXCE-USA" />
+		<info name="release" value="199612xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411B 9614 CB" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-axce-0.u1" size="1048576" crc="a3b745bc" sha1="59d578d2c1762627da0d13e6b4c2b56a08b72f5b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cvaniadx" cloneof="cvaniavk">
+		<description>Castlevania - Dracula X (USA)</description>
+		<year>1995</year>
+		<publisher>Konami</publisher>
+		<info name="serial" value="M/SNS-ADZE-USA" />
+		<info name="release" value="199509xx" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411B 9519 B" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-adze-0.u1" size="2097152" crc="7c4887e1" sha1="3bdaeafa81aa17c91a8b42d0fa8c5b26e3fd6b80" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+<!--wip-cb-->
 	<software name="cbchara">
 		<description>CB Chara Wars - Ushinawareta Gag (Jpn)</description>
 		<year>1992</year>
@@ -7598,6 +8194,110 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="champwcsu" cloneof="champwcs">
+		<description>Champions - World Class Soccer (USA)</description>
+		<year>1994</year>
+		<publisher>Acclain Entertainment</publisher>
+		<info name="serial" value="SNS-8W-USA" />
+		<info name="release" value="199404xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9408 BA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-8w-0.u1" size="1048576" crc="bcd59d08" sha1="573b316e5b08f47dc0c8e339e2dc3101c4f74afc" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champoolu" cloneof="champool">
+		<description>Championship Pool (USA)</description>
+		<year>1993</year>
+		<publisher>Mindscape</publisher>
+		<info name="serial" value="SNS-5P-USA" />
+		<info name="release" value="199311xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="MAXI-1A0N-30-2" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411B 9742 C" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-p-5p-0.u1" size="1048576" crc="98ef8414" sha1="c27615dffc57e0a5b9250a0613ac9b77ebe86256" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="champs94">
+		<description>Championship Soccer '94 (USA)</description>
+		<year>1994</year>
+		<publisher>Sony Imagesoft</publisher>
+		<info name="serial" value="SNS-67-USA" />
+		<info name="release" value="199406xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-20" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9418 BA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-67-0.u1" size="524288" crc="6b953095" sha1="94fe929852cf0794f64a58d689accf7abeecc40b" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chavez"> <!-- todo : cloneof Riddick Bowe Boxing? -->
+		<description>Chavez (USA)</description>
+		<year>1994</year>
+		<publisher>ASC Games</publisher>
+		<info name="serial" value="SNS-ZV-USA" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A1M-01" />
+			<feature name="u1" value="U1 MASKROM(N)" />
+			<feature name="u2" value="U2 16K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9344 BA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="524288">
+				<rom name="sns-zv-0.u1" size="524288" crc="a9d604ea" sha1="856c5c858b278e97df7b41828fbd757d7e0c0321" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="2048">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chavez2"> <!-- todo : cloneof Boxing Legends of the Ring? -->
+		<description>Chavez II (USA)</description>
+		<year>1994</year>
+		<publisher>American Softworks</publisher>
+		<info name="serial" value="SNS-AC2E-USA" />
+		<info name="release" value="199411xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9421 C" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-ac2e-0.u1" size="1048576" crc="86981887" sha1="12b8e3a04cbac7de8181a5ebb8546489a5df0937" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chessmstu" cloneof="chessmst">
 		<description>The Chessmaster (USA)</description>
 		<year>1991</year>
@@ -7608,11 +8308,52 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411 C131 01 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
 				<rom name="sns-ch-0.u1" size="524288" crc="bc671e15" sha1="549966c7960ceeac332c7b4512761bb26483d29f" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chester">
+		<description>Chester Cheetah - Too Cool to Fool (USA)</description>
+		<year>1992</year>
+		<publisher>Kaneko</publisher>
+		<info name="serial" value="SNS-CE-USA" />
+		<info name="release" value="199212xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9246 AA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-ce-0.u1" size="1048576" crc="552bf16a" sha1="804e40d9f651760654d36807f5c8e6ced9643eac" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chesterw">
+		<description>Chester Cheetah - Wild Wild Quest (USA)</description>
+		<year>1994</year>
+		<publisher>Kaneko</publisher>
+		<info name="serial" value="SNS-7C-USA" />
+		<info name="release" value="199403xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2A0N-11" />
+			<feature name="u1" value="U1 P0" />
+			<feature name="u2" value="U2 P1" />
+			<feature name="u3" value="U3 74LS00" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9338 B" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="cart_back_label" value="920214" />
+			<dataarea name="rom" size="1310720">
+				<rom name="sns-7c-0 p0.u1" size="1048576" crc="0712b0e3" sha1="05a221957dedb8d41a5130c403c800ff5820f8c4" offset="0x000000" />
+				<rom name="sns-7c-0 p1.u2" size="262144"  crc="f3a8d284" sha1="9a8cf0fbb4e99163069bed16b7250ab70caaa942" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7640,16 +8381,25 @@ List of perfect retail cartridges rom dumps
 	<software name="choplft3u" cloneof="choplft3">
 		<description>Choplifter III - Rescue &amp; Survive (USA)</description>
 		<year>1994</year>
-		<publisher>Extreme Entertainment Group</publisher>
-		<info name="serial" value="SNS-3C-USA" />
+		<publisher>Extreme Entertainment Group / Electro Brain</publisher>
+		<info name="serial" value="SNS-3C-USA (Extreme), SNS-3C-USA-1 (Electro Brain)" />
 		<info name="release" value="199401xx" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411A 9352 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
+<!-- Electro Brain re-release, Label revision -1, PCB revision -30
+        <info name="serial" value="SNS-3C-USA-1" />
+            <feature name="pcb" value="SHVC-1A0N-30" />
+            <feature name="u1" value="U1 MASK ROM" />
+            <feature name="u2" value="U2 CIC" />
+            <feature name="lockout" value="D411B 9740 C" />
+            <feature name="cart_model" value="SNS-006" />
+            <feature name="cart_back_label" value="" />
+-->
 			<dataarea name="rom" size="524288">
 				<rom name="sns-3c-0.u1" size="524288" crc="1d2eae52" sha1="4010d63e6d7eb0f7ea47a0796f3af008ab98f22e" offset="0x000000" />
 			</dataarea>
@@ -7767,7 +8517,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411B 9529 B" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -7832,6 +8582,25 @@ List of perfect retail cartridges rom dumps
 		</part>
 	</software>
 
+	<software name="chuckrcku" cloneof="chuckrck">
+		<description>Chuck Rock (USA)</description>
+		<year>1992</year>
+		<publisher>Sony Imagesoft</publisher>
+		<info name="serial" value="SNS-CK-USA" />
+		<info name="release" value="199212xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-10" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411A 9239 CA" />
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="1048576">
+				<rom name="sns-ck-0.u1" size="1048576" crc="e237ec45" sha1="3ffafb846909d6ef3dd8a8715362d2c4489cb3f1" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="claymateu" cloneof="claymate">
 		<description>Claymates (USA)</description>
 		<year>1994</year>
@@ -7843,7 +8612,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1J0N-10" />
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9408 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -8037,7 +8806,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411A 9313 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="1048576">
@@ -8325,7 +9094,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411 9147 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA" />
 			<dataarea name="rom" size="1048576">
@@ -8344,7 +9113,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411A 9237 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -8790,7 +9559,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u3" value="U3 16K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D413A 9436 BA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNSP-006" />
 			<feature name="cart_back_label" value="SNSP-FAH, SNSP-NOE" />
@@ -8833,7 +9602,7 @@ List of perfect retail cartridges rom dumps
 		<description>Donkey Kong Country (USA, Rev. B)</description>
 		<year>1994</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="SNS-8X-USA-1 (PCMS)" />
+		<info name="serial" value="SNS-8X-USA, SNS-8X-USA-1 (PCMS)" />
 		<info name="release" value="199411xx" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
@@ -8842,11 +9611,24 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411B 9534 C" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_revision" value="B" />
 			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
+			<feature name="cart_back_label" value="" />
+<!-- PCMS cartridge
+        <info name="serial" value="SNS-8X-USA-1 (PCMS)" />
+            <feature name="pcb" value="SHVC-1J1M-20" />
+            <feature name="u1" value="U1 MASK ROM(N)" />
+            <feature name="u2" value="U2 16K SRAM" />
+            <feature name="u3" value="U3 MAD-1" />
+            <feature name="u4" value="U4 CIC" />
+            <feature name="lockout" value="D411B A9748 AA" />
+            <feature name="battery" value="BATT CR2032" />
+            <feature name="cart_revision" value="B" />
+            <feature name="cart_model" value="SNS-006" />
+            <feature name="cart_back_label" value="SNS-USA/CAN-1" />
+-->
 			<dataarea name="rom" size="4194304">
 				<rom name="sns-8x-2.u1" size="4194304" crc="762af827" sha1="cd606e77ab2034438e06891cd2d067dad69b4d1a" offset="0x000000" />
 			</dataarea>
@@ -8909,7 +9691,7 @@ List of perfect retail cartridges rom dumps
 		<description>Donkey Kong Country 2 - Diddy's Kong Quest (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="SNS-ADNE-USA, M/SNS-ADNE-USA (Made in Mexico)" />
+		<info name="serial" value="SNS-ADNE-USA" />
 		<info name="release" value="199512xx" />
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="snes_cart">
@@ -8918,7 +9700,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411B 9506 C" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -8967,7 +9749,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="" />
+			<feature name="lockout" value="D411B 9611 CB" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="M/SNS-USA/CAN-1" />
@@ -9016,7 +9798,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 CIC" />
 			<feature name="lockout" value="" />
 			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="D411A (BA)" />
+			<feature name="cart_back_label" value="D411A 9307 BA" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sns-dm-0.u1" size="1048576" crc="ceeb7c32" sha1="5b7294665583510468d257f4896e825f642ad95f" offset="0x000000" />
 			</dataarea>
@@ -9118,7 +9900,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (C)" />
+			<feature name="lockout" value="D411A 9425 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="3145728">
@@ -9139,7 +9921,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1J0N-20" />
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9521 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -9500,7 +10282,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-10" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9304 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -9546,7 +10328,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411 (B)" />
+			<feature name="lockout" value="D411 C130 22 B" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -9830,7 +10612,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1J0N-10" />
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9427 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -9902,7 +10684,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 CIC" />
 			<feature name="lockout" value="" />
 			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="D411A (CB)" />
+			<feature name="cart_back_label" value="D411A 9414 CB" />
 			<dataarea name="rom" size="2097152">
 				<rom name="sns-ev-0.u1" size="2097152" crc="8606d69b" sha1="e954d294c6b5ac5be30099c13e75cc290909964a" offset="0x000000" />
 			</dataarea>
@@ -9921,7 +10703,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9423 CA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -9998,7 +10780,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9437 BA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -10113,7 +10895,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (AA)" />
+			<feature name="lockout" value="D411A 9318 AA" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1048576">
@@ -10153,7 +10935,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (AA)" />
+			<feature name="lockout" value="D411A 9302 AA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1572864">
@@ -10680,7 +11462,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411 (C)" />
+			<feature name="lockout" value="D411 9129 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -10725,7 +11507,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9328 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1310720">
@@ -10873,7 +11655,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-10" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9324 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -10956,7 +11738,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9440 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -10975,7 +11757,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (B)" />
+			<feature name="lockout" value="D411A 9418 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -11913,7 +12695,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411 (B)" />
+			<feature name="lockout" value="D411 C133 05 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -12170,7 +12952,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u4" value="U4 CIC" />
 			<feature name="lockout" value="" />
 			<feature name="cart_model" value="SNS-006" />
-			<feature name="cart_back_label" value="D411A (BA)" />
+			<feature name="cart_back_label" value="D411A 9443 BA" />
 			<dataarea name="rom" size="1572864">
 				<rom name="sns-ahie-0 p0.u1" size="1048576" crc="1934905b" sha1="568e1e9df46cbd303c4a69ca1f4cd99c7265aa01" offset="0x000000" />
 				<!-- the second rom should be good but its size needs to be confirmed -->
@@ -12587,7 +13369,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9338 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -12663,7 +13445,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9304 CA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -13832,7 +14614,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9525 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -14068,7 +14850,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411B (B)" />
+			<feature name="lockout" value="D411B 9519 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2621440">
@@ -14088,7 +14870,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9302 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -14899,7 +15681,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 74HCU04" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9252 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -14975,7 +15757,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (C)" />
+			<feature name="lockout" value="D411A 9343 C" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
@@ -15044,7 +15826,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1J0N-01" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9304 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -15372,7 +16154,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 256K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9636 C" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -15549,7 +16331,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9309 CB" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -15686,7 +16468,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9344 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1572864">
@@ -15707,7 +16489,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (B)" />
+			<feature name="lockout" value="D411B 9508 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -16546,7 +17328,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9512 C" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
@@ -16928,7 +17710,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9308 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -17042,7 +17824,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9327 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1" />
 			<dataarea name="rom" size="1048576">
@@ -17061,7 +17843,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (B)" />
+			<feature name="lockout" value="D411B 9526 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -18028,7 +18810,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9411 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -18240,7 +19022,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9528 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -18560,7 +19342,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9434 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -18579,7 +19361,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9430 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -18689,7 +19471,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (B)" />
+			<feature name="lockout" value="D411B 9506 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -18730,7 +19512,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (AA)" />
+			<feature name="lockout" value="D411A 9445 AA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="4194304">
@@ -18750,7 +19532,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411 (BB)" />
+			<feature name="lockout" value="D411 9209 BB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -18847,7 +19629,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9251 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -18931,7 +19713,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-02" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411 (BB)" />
+			<feature name="lockout" value="D411 9214 BB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -19090,7 +19872,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9351 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1572864">
@@ -19156,7 +19938,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u3" value="U3 256K SRAM" />
 			<feature name="u4" value="U4 MAD-1/R" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9348 CB" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -19415,7 +20197,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9323 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -19530,7 +20312,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9439 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="4194304">
@@ -19877,7 +20659,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9447 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -20893,7 +21675,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411 (BA)" />
+			<feature name="lockout" value="D411 C151 08 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -20952,7 +21734,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (AA)" />
+			<feature name="lockout" value="D411A 9444 AA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1572864">
@@ -21024,7 +21806,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411 (CB)" />
+			<feature name="lockout" value="D411 9212 CB" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -21072,7 +21854,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9402 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -21152,7 +21934,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (AA)" />
+			<feature name="lockout" value="D411A 9453 AA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -21208,7 +21990,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (B)" />
+			<feature name="lockout" value="D411A 9339 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -21498,7 +22280,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9252 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -21518,7 +22300,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9441 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -21789,7 +22571,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u3" value="U3 P2" />
 			<feature name="u4" value="U4 LS139" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="D411A (AA)" />
+			<feature name="lockout" value="D411A 9316 AA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2621440">
@@ -22051,7 +22833,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411 (A)" />
+			<feature name="lockout" value="D411 9103 A" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -22131,7 +22913,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1J0N-10" />
 			<feature name="u1" value="U1 MASKROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9303 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -22305,7 +23087,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-10" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9312 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -23385,7 +24167,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9408 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -23545,8 +24327,8 @@ List of perfect retail cartridges rom dumps
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1310720">
-				<rom name="shvc-lg-0.u1" size="1048576" crc="2f528111" sha1="3f6bf35e5e0ea8feb8ab7969faf3772c8782f4d3" offset="0x000000" />
-				<rom name="shvc-lg-0.u2" size="262144"  crc="8929b402" sha1="c783c4756aaa002d794b96e353327361bd6f3019" offset="0x100000" />
+				<rom name="shvc-lg-0 p0.u1" size="1048576" crc="2f528111" sha1="3f6bf35e5e0ea8feb8ab7969faf3772c8782f4d3" offset="0x000000" />
+				<rom name="shvc-lg-0 p1.u2" size="262144"  crc="8929b402" sha1="c783c4756aaa002d794b96e353327361bd6f3019" offset="0x100000" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>
@@ -23573,8 +24355,8 @@ List of perfect retail cartridges rom dumps
 			<feature name="cart_model" value="SHVC-006" />
 			<feature name="cart_back_label" value="920214" />
 			<dataarea name="rom" size="1310720">
-				<rom name="shvc-lg-1.u1" size="1048576" crc="977f7a3e" sha1="fe56add7a600f87408792b5a258a5d25f5cf96df" offset="0x000000" />
-				<rom name="shvc-lg-1.u2" size="262144"  crc="8929b402" sha1="c783c4756aaa002d794b96e353327361bd6f3019" offset="0x100000" />
+				<rom name="shvc-lg-1 p0.u1" size="1048576" crc="977f7a3e" sha1="fe56add7a600f87408792b5a258a5d25f5cf96df" offset="0x000000" />
+				<rom name="shvc-lg-1 p1.u2" size="262144"  crc="8929b402" sha1="c783c4756aaa002d794b96e353327361bd6f3019" offset="0x100000" />
 			</dataarea>
 			<dataarea name="nvram" size="2048">
 			</dataarea>
@@ -24188,7 +24970,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u4" value="U4 74LS139" />
 			<feature name="u5" value="U5 74HCU04" />
 			<feature name="u6" value="U6 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9247 CA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -24416,7 +25198,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="u4" value="U4 74HCU04" />
 			<feature name="u5" value="U5 MM1026AF" />
 			<feature name="u6" value="U6 CIC" />
-			<feature name="lockout" value="F411B (C)" />
+			<feature name="lockout" value="F411B 9544 C" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006, SNSN-006" />
 			<feature name="cart_back_label" value="SNS-USA/CAN-1, SNSN-HKG" />
@@ -24832,7 +25614,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411 (BA)" />
+			<feature name="lockout" value="D411 C144 07 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -25235,7 +26017,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-01" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411 (B)" />
+			<feature name="lockout" value="D411 C127 05 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -25459,7 +26241,7 @@ Alternate board (XL-1)
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (AA)" />
+			<feature name="lockout" value="D411A 9316 AA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -25478,7 +26260,7 @@ Alternate board (XL-1)
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9327 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -25948,7 +26730,7 @@ Alternate board (XL-1)
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9532 C" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -26532,7 +27314,7 @@ Alternate board (XL-1)
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9304 BA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -26995,7 +27777,7 @@ Alternate board (XL-1)
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9243 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -27054,7 +27836,7 @@ Alternate board (XL-1)
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9423 CA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -27247,7 +28029,7 @@ Alternate board (XL-1)
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9353 CB" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -27472,7 +28254,7 @@ Alternate board (XL-1)
 			<feature name="u2" value="U2 64K SRAM" />
 			<feature name="u3" value="U3 MAD-1" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (CB)" />
+			<feature name="lockout" value="D411A 9314 CB" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -27565,7 +28347,7 @@ Alternate board (XL-1)
 			<feature name="u2" value="U2 P1" />
 			<feature name="u3" value="U3 74LS00" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411A (B)" />
+			<feature name="lockout" value="D411A 9415 B" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1572864">
@@ -28099,7 +28881,7 @@ Alternate board (XL-1)
 			<feature name="u3" value="U3 64K SRAM" />
 			<feature name="u4" value="U4 MAD-1" />
 			<feature name="u5" value="U5 CIC" />
-			<feature name="lockout" value="D411B (C)" />
+			<feature name="lockout" value="D411B 9521 C" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -28267,7 +29049,7 @@ Alternate board (XL-1)
 			<feature name="pcb" value="SHVC-1A0N-02" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9231 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
@@ -28653,7 +29435,7 @@ Alternate board (XL-1)
 			<feature name="u2" value="U2 16K SRAM" />
 			<feature name="u3" value="U3 74LS139" />
 			<feature name="u4" value="U4 CIC" />
-			<feature name="lockout" value="D411 (BA)" />
+			<feature name="lockout" value="D411 9148 BA" />
 			<feature name="battery" value="BATT CR2032" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
@@ -29269,7 +30051,7 @@ Alternate board (XL-1)
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CC)" />
+			<feature name="lockout" value="D411A 9420 CC" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="2097152">
@@ -29288,7 +30070,7 @@ Alternate board (XL-1)
 			<feature name="pcb" value="SHVC-1A0N-20" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (BA)" />
+			<feature name="lockout" value="D411A 9351 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="1048576">
@@ -29320,11 +30102,32 @@ List of verified retail cartridges rom dumps
 			<feature name="pcb" value="SHVC-1A0N-10" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
 			<feature name="u2" value="U2 CIC" />
-			<feature name="lockout" value="D411A (CA)" />
+			<feature name="lockout" value="D411A 9239 CA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
 			<dataarea name="rom" size="524288">
 				<rom name="sns-by-0.u1" size="524288" crc="6810aa95" sha1="3a1238f88cafe6e25b07a10682fb93bdd559f771" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathretu" cloneof="deathret">
+		<!-- single cartridge source: byuu -->
+		<description>The Death and Return of Superman (USA, Rev. A)</description>
+		<year>1994</year>
+		<publisher>Sunsoft</publisher>
+		<info name="serial" value="M/SNS-9D-LTN" />
+		<info name="release" value="199408xx" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-30" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="D411B 9635 C" />
+			<feature name="cart_revision" value="A" /> <!-- Notes: confirmation needed -->
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-9d-1.u1" size="2097152" crc="012ef33d" sha1="a789268ab40a5bbc35f58743c936a87e0cbcda5c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29383,14 +30186,15 @@ List of verified retail cartridges rom dumps
 
 	<software name="gsaver" supported="no">
 		<!-- single cartridge source: d4s -->
-		<description>Game Saver (Euro, v1.7)</description>
+		<description>SNES Game Saver (Euro, v1.7)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
-			<feature name="pcb" value="B104-05-A1" /> <!-- CONFIRMATION NEEDED -->
-			<feature name="u1" value="Toshiba TMM20160P-12" />
-			<feature name="cart_model" value="n/a" /> <!-- can be plugged in any snes model, twice the height of a standard cart, a slot for a snes cart on the back -->
-			<feature name="cart_back_label" value="n/a" />
+			<feature name="pcb" value="B104-05-A1?" /> <!-- CONFIRMATION NEEDED -->
+			<feature name="u1?" value="Toshiba TMM2016 ?P-12" /> <!-- General-Purpose Static RAM -->
+			<feature name="u2?" value="?" /> <!-- program ROM? -->
+			<feature name="network" value="158047" /> <!-- slot for a snes cart on the back -->
+			<feature name="cart_model" value="n/a" /> <!-- can be plugged in any snes model, twice the height of a standard cart -->
 			<dataarea name="rom" size="32768">
 				<rom name="game saver (europe) (v1.7) (unl).sfc" size="32768" crc="f2225203" sha1="eb4bda191200e8bd4a1d6aa29d00b9afb0c92c1d" offset="0x000000" />
 			</dataarea>
@@ -29680,6 +30484,33 @@ List of verified retail cartridges rom dumps
 				<rom name="shvc-tjej-0.u1" size="1048576" crc="673468c8" sha1="f3344c19bccca1cf1647a72c1a113a702b5bdf8b" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="262144">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kengriff">
+		<!-- single cartridge source: byuu -->
+		<description>Ken Griffey Jr. Presents Major League Baseball (USA, Rev. A)</description>
+		<year>1994</year>
+		<publisher>Nintendo</publisher>
+		<info name="serial" value="SNS-JR-USA" />
+		<info name="release" value="199403xx" />
+		<sharedfeat name="compatibility" value="NTSC"/>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-21" />
+			<feature name="u1" value="U1 MASK ROM(N)" />
+			<feature name="u2" value="U2 64K SRAM" />
+			<feature name="u3" value="U3 MAD-1" />
+			<feature name="u4" value="U4 CIC" />
+			<feature name="lockout" value="D411A 9427 BA" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_revision" value="A" /> <!-- Notes: confirmation needed -->
+			<feature name="cart_model" value="SNS-006" />
+			<feature name="cart_back_label" value="" />
+			<dataarea name="rom" size="2097152">
+				<rom name="sns-jr-1.u1" size="2097152" crc="12b592f2" sha1="3be613d0173682711e1da59252cb91e839551633" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -31414,19 +32245,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="bobu" cloneof="bob">
-		<description>B.O.B. (USA)</description>
-		<year>1993</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SNS-B4-USA" />
-		<info name="release" value="199306xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="b.o.b. (usa).sfc" size="1048576" crc="4f593c46" sha1="8b9efe5107285c776b24241a0a93f54f23a46e09" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bakumats">
 		<description>Bakumatsu Kourinden Oni (Jpn)</description>
 		<year>1996</year>
@@ -31979,20 +32797,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="biometalu" cloneof="biometal">
-		<description>Bio Metal (USA)</description>
-		<year>1993</year>
-		<publisher>Activision</publisher>
-		<info name="serial" value="SNS-BV-USA" />
-		<info name="release" value="199311xx" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="bio metal (usa).sfc" size="1048576" crc="53d8410e" sha1="b2f13be7ec7e955ef8fdd398bca44e06b690a8e2" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bishinzk">
 		<description>Bishin Densetsu Zoku (Jpn)</description>
 		<year>1993</year>
@@ -32149,18 +32953,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="blackthr" cloneof="blackhwk">
-		<description>Blackthorne (USA)</description>
-		<year>1994</year>
-		<publisher>Interplay</publisher>
-		<info name="release" value="199409xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="blackthorne (usa).sfc" size="1048576" crc="856beab1" sha1="bcac87c7a982d8eb90cbf30a6c34fbabde135ff7" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="blackthrj" cloneof="blackhwk">
 		<description>Blackthorne - Fukushuu no Kuroki Toge (Jpn)</description>
 		<year>1995</year>
@@ -32171,18 +32963,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="blackthorne - fukushuu no kuroki toge (japan).sfc" size="1048576" crc="edf476b3" sha1="f7b38c81596973336e72cf4b8a5c575e23ded515" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="blazeon">
-		<description>BlaZeon - The Bio-Cyborg Challenge (USA)</description>
-		<year>1992</year>
-		<publisher>Atlus</publisher>
-		<info name="release" value="199210xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="blazeon - the bio-cyborg challenge (usa).sfc" size="1048576" crc="3b01d0a3" sha1="b0bed10b3332e6c1e02c09e1bf89a35d56cc3c69" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32233,18 +33013,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="blues brothers, the (japan).sfc" size="524288" crc="362620d2" sha1="bd052490d6d57b92841fe4e97eddaa159e660d78" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bluesbu" cloneof="bluesb">
-		<description>The Blues Brothers (USA)</description>
-		<year>1993</year>
-		<publisher>Titus</publisher>
-		<info name="release" value="199306xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="blues brothers, the (usa).sfc" size="524288" crc="82b97464" sha1="ad516a2bb9e7a8c9ecccdfbb491ba3dcc92a0519" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32304,18 +33072,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="boogeru" cloneof="booger">
-		<description>Boogerman - A Pick and Flick Adventure (USA)</description>
-		<year>1995</year>
-		<publisher>Interplay</publisher>
-		<info name="release" value="199512xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="3145728">
-				<rom name="boogerman - a pick and flick adventure (usa).sfc" size="3145728" crc="1899aaff" sha1="aa6afbec0c111943df266f93143aa1082659070e" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bountysw">
 		<description>Bounty Sword (Jpn)</description>
 		<year>1995</year>
@@ -32359,20 +33115,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="brainlrd">
-		<description>Brain Lord (USA)</description>
-		<year>1994</year>
-		<publisher>Enix</publisher>
-		<info name="release" value="199408xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="brain lord (usa).sfc" size="1572864" crc="ac443d87" sha1="1398a08d66980f8a9f73e0ae20ed5c518b3859e8" offset="0x000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="brainies">
 		<description>The Brainies (Euro)</description>
 		<year>1996</year>
@@ -32380,18 +33122,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="brainies, the (europe).sfc" size="524288" crc="de551746" sha1="d56e4c729b295055df70bb37111bef1021173f6f" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="brainiesu" cloneof="brainies">
-		<description>The Brainies (USA)</description>
-		<year>1996</year>
-		<publisher>Titus</publisher>
-		<info name="release" value="199604xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="brainies, the (usa).sfc" size="524288" crc="718cb0df" sha1="ba2e624390925f0993b5ccf74072e168fbfe4606" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32418,18 +33148,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="draculau" cloneof="dracula">
-		<description>Bram Stoker's Dracula (USA)</description>
-		<year>1993</year>
-		<publisher>Sony Imagesoft</publisher>
-		<info name="release" value="199309xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="bram stoker's dracula (usa).sfc" size="1048576" crc="5cece690" sha1="618eea2886004652fa707daf56d8ad04c3c17094" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="brandishj" cloneof="brandish">
 		<description>Brandish (Jpn)</description>
 		<year>1994</year>
@@ -32440,20 +33158,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="brandish (japan).sfc" size="1572864" crc="a087b6ad" sha1="138b4e89918dff0018b72217e56b7071f621f2b6" offset="0x000000" />
-			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="brandish">
-		<description>Brandish (USA)</description>
-		<year>1995</year>
-		<publisher>Koei</publisher>
-		<info name="release" value="199502xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="brandish (usa).sfc" size="1572864" crc="74f70a0b" sha1="eab3718608f1657f484b27c6f684527fc27f2ba1" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>
@@ -32492,18 +33196,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="brawlbrou" cloneof="brawlbro">
-		<description>Brawl Brothers (USA)</description>
-		<year>1993</year>
-		<publisher>Jaleco</publisher>
-		<info name="release" value="199304xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="brawl brothers (usa).sfc" size="1572864" crc="e822065c" sha1="01bf09e99d9b7baa88f852293ec941cf863f7009" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="brawlbro">
 		<description>Brawl Brothers - Rival Turf! 2 (Euro)</description>
 		<year>1993</year>
@@ -32511,18 +33203,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1572864">
 				<rom name="brawl brothers - rival turf! 2 (europe).sfc" size="1572864" crc="410cee18" sha1="3c613aaa25d26148ffd36e65a9696ef69dce5d9f" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="breaktru">
-		<description>BreakThru! (USA)</description>
-		<year>1995</year>
-		<publisher>Spectrum Holobyte</publisher>
-		<info name="release" value="199501xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="breakthru! (usa).sfc" size="524288" crc="e6c0b5da" sha1="1cee68420e5032821993a67cd79d0b49d729178c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32556,18 +33236,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="bretth95">
-		<description>Brett Hull Hockey '95 (USA)</description>
-		<year>1995</year>
-		<publisher>Accolade</publisher>
-		<info name="release" value="199501xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="brett hull hockey '95 (usa).sfc" size="2097152" crc="9ebfe809" sha1="c6045c56d1b7acb07b46305fd306e2963b639f9c" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bretth">
 		<description>Brett Hull Hockey (Euro)</description>
 		<year>1994</year>
@@ -32575,42 +33243,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="brett hull hockey (europe).sfc" size="2097152" crc="77bbf192" sha1="e9c08c471d76deb1b2ef40a8d11020e1247b496c" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bretthu" cloneof="bretth">
-		<description>Brett Hull Hockey (USA)</description>
-		<year>1994</year>
-		<publisher>Accolade</publisher>
-		<info name="release" value="199401xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="brett hull hockey (usa).sfc" size="2097152" crc="fbe35998" sha1="179d3c01b6492e4a8180acd90aa0fb49a2d8687a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bronkie">
-		<description>Bronkie the Bronchiasaurus (USA)</description>
-		<year>1995</year>
-		<publisher>Raya Systems</publisher>
-		<info name="release" value="199509xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="bronkie the bronchiasaurus (usa) (en,es).sfc" size="1048576" crc="1200f3cf" sha1="139ada7133889126735440968ad58f47fa93a341" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="brunswck">
-		<description>Brunswick World Tournament of Champions (USA)</description>
-		<year>1997</year>
-		<publisher>T*HQ</publisher>
-		<info name="release" value="199708xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="brunswick world tournament of champions (usa).sfc" size="2097152" crc="52e4dc92" sha1="d883015b5d2774fca45e89c04e029e88e7cd6112" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32633,18 +33265,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="brutal - paws of fury (usa) (beta).sfc" size="2097152" crc="49ad3f9c" sha1="a52c3278c96a073ae8fbbc5ac656630b9b70a25f" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="brutalu" cloneof="brutal">
-		<description>Brutal - Paws of Fury (USA)</description>
-		<year>1994</year>
-		<publisher>CyberSoft</publisher>
-		<info name="release" value="199412xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="brutal - paws of fury (usa).sfc" size="2097152" crc="8fe49f80" sha1="746af6b97acf857b786b4e3adc1ca8e627dae3dd" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32682,18 +33302,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="bubsyu" cloneof="bubsy">
-		<description>Bubsy in Claws Encounters of the Furred Kind (USA)</description>
-		<year>1993</year>
-		<publisher>Accolade</publisher>
-		<info name="release" value="199305xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="bubsy in claws encounters of the furred kind (usa).sfc" size="2097152" crc="444a52c1" sha1="9f6ff6264e0361e074f9cfee2ec4976866a781c5" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="bugsbhac" cloneof="bugsbrab">
 		<description>Bugs Bunny - Hachamecha Daibouken (Jpn)</description>
 		<year>1994</year>
@@ -32726,18 +33334,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="bulls vs blazers and the nba playoffs (europe).sfc" size="1048576" crc="f605c0ac" sha1="3831742dd5035555fb15a56d49260691d9845b90" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="bullvsblu" cloneof="bullvsbl">
-		<description>Bulls vs Blazers and the NBA Playoffs (USA, Rev. A)</description>
-		<year>1992</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="release" value="199212xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="bulls vs blazers and the nba playoffs (usa) (rev 1).sfc" size="1048576" crc="c2e91694" sha1="8130855e4db139a74025d4d08740fb55d5de19ce" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32801,18 +33397,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="cacoma">
-		<description>Cacoma Knight in Bizyland (USA)</description>
-		<year>1993</year>
-		<publisher>Seta</publisher>
-		<info name="release" value="199306xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="cacoma knight in bizyland (usa).sfc" size="524288" crc="ba921443" sha1="d5502cbb7a86b214867a43675f5ca64ed45478ca" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="calripknup" cloneof="calripkn">
 		<description>Cal Ripken Jr. Baseball (USA, Prototype)</description>
 		<year>1992</year>
@@ -32820,18 +33404,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="cal ripken jr. baseball (usa) (beta).sfc" size="1048576" crc="f48dc221" sha1="dc1f07bea830f1a5f0858791b4b1cb5a03f6588a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="calripknu" cloneof="calripkn">
-		<description>Cal Ripken Jr. Baseball (USA)</description>
-		<year>1992</year>
-		<publisher>Mindscape</publisher>
-		<info name="release" value="199212xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="cal ripken jr. baseball (usa).sfc" size="1048576" crc="ce2eaa41" sha1="c82ef847ec4b01948dbab5e93c2d3fa9053296d8" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32888,33 +33460,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="cdalecup">
-		<description>Cannondale Cup (USA)</description>
-		<year>1994</year>
-		<publisher>American Softworks</publisher>
-		<info name="release" value="199411xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="cannondale cup (usa).sfc" size="1572864" crc="b95fe0a0" sha1="f4d77083dc87467612eda2ae251c6a9bb9500911" offset="0x000000" />
-			</dataarea>
-			<dataarea name="nvram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="capcomss" cloneof="sshotout">
-		<description>Capcom's Soccer Shootout (USA)</description>
-		<year>1994</year>
-		<publisher>Capcom</publisher>
-		<info name="release" value="199406xx" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1572864">
-				<rom name="capcom's soccer shootout (usa).sfc" size="1572864" crc="ee314ae5" sha1="630d8a2d25f7caa8dbb5c317c1f35707094538ec" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="captcomm">
 		<description>Captain Commando (Euro)</description>
 		<year>1995</year>
@@ -32936,18 +33481,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="captain commando (japan).sfc" size="2097152" crc="e5423eb6" sha1="7dd0f042760277e21bd7bcb9512dab462f9f5985" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="captnovo">
-		<description>Captain Novolin (USA)</description>
-		<year>1992</year>
-		<publisher>Raya Systems</publisher>
-		<info name="release" value="199211xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="captain novolin (usa) (en,fr,es).sfc" size="524288" crc="9fd460a4" sha1="72cfb569819da4e799bf8fa1a6f023664cc7069b" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -33021,18 +33554,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="carrieru" cloneof="carrier">
-		<description>Carrier Aces (USA)</description>
-		<year>1995</year>
-		<publisher>CyberSoft</publisher>
-		<info name="release" value="199501xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="carrier aces (usa).sfc" size="2097152" crc="8bc5b8de" sha1="10e4754153e22116bcf3f9082fe6fe193748732e" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="casperj" cloneof="casper">
 		<description>Casper (Jpn)</description>
 		<year>1997</year>
@@ -33049,31 +33570,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="casperu" cloneof="casper">
-		<description>Casper (USA)</description>
-		<year>1996</year>
-		<publisher>Natsume</publisher>
-		<info name="release" value="199612xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="casper (usa).sfc" size="1048576" crc="a3b745bc" sha1="59d578d2c1762627da0d13e6b4c2b56a08b72f5b" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cvaniadx" cloneof="cvaniavk">
-		<description>Castlevania - Dracula X (USA)</description>
-		<year>1995</year>
-		<publisher>Konami</publisher>
-		<info name="release" value="199509xx" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="castlevania - dracula x (usa).sfc" size="2097152" crc="7c4887e1" sha1="3bdaeafa81aa17c91a8b42d0fa8c5b26e3fd6b80" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="cvaniavk">
 		<description>Castlevania - Vampire's Kiss (Euro)</description>
 		<year>1995</year>
@@ -33086,18 +33582,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="champwcsu" cloneof="champwcs">
-		<description>Champions - World Class Soccer (USA)</description>
-		<year>1994</year>
-		<publisher>Acclain Entertainment</publisher>
-		<info name="release" value="199404xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="champions - world class soccer (usa) (en,fr,de,es).sfc" size="1048576" crc="bcd59d08" sha1="573b316e5b08f47dc0c8e339e2dc3101c4f74afc" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="champool">
 		<description>Championship Pool (Euro)</description>
 		<year>1993</year>
@@ -33105,32 +33589,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="championship pool (europe).sfc" size="1048576" crc="2905c3dd" sha1="ca2903b442130b85c8304f9863ecefb1bd0923b1" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="champoolu" cloneof="champool">
-		<description>Championship Pool (USA)</description>
-		<year>1993</year>
-		<publisher>Mindscape</publisher>
-		<info name="release" value="199311xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="championship pool (usa).sfc" size="1048576" crc="98ef8414" sha1="c27615dffc57e0a5b9250a0613ac9b77ebe86256" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="champs94">
-		<description>Championship Soccer '94 (USA)</description>
-		<year>1994</year>
-		<publisher>Sony Imagesoft</publisher>
-		<info name="release" value="199406xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="championship soccer '94 (usa) (en,fr,de,it).sfc" size="524288" crc="6b953095" sha1="94fe929852cf0794f64a58d689accf7abeecc40b" offset="0x000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
 			</dataarea>
 		</part>
 	</software>
@@ -33175,31 +33633,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="chavez">
-		<description>Chavez (USA)</description>
-		<year>1994</year>
-		<publisher>ASC Games</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="chavez (usa).sfc" size="524288" crc="a9d604ea" sha1="856c5c858b278e97df7b41828fbd757d7e0c0321" offset="0x000000" />
-			</dataarea>
-			<dataarea name="nvram" size="2048">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chavez2">
-		<description>Chavez II (USA)</description>
-		<year>1994</year>
-		<publisher>American Softworks</publisher>
-		<info name="release" value="199411xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="chavez ii (usa).sfc" size="1048576" crc="86981887" sha1="12b8e3a04cbac7de8181a5ebb8546489a5df0937" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chessmst">
 		<description>The Chessmaster (Euro)</description>
 		<year>1991</year>
@@ -33225,18 +33658,6 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="chester">
-		<description>Chester Cheetah - Too Cool to Fool (USA)</description>
-		<year>1992</year>
-		<publisher>Kaneko</publisher>
-		<info name="release" value="199212xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="chester cheetah - too cool to fool (usa).sfc" size="1048576" crc="552bf16a" sha1="804e40d9f651760654d36807f5c8e6ced9643eac" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chesterwp" cloneof="chesterw">
 		<description>Chester Cheetah - Wild Wild Quest (USA, Prototype)</description>
 		<year>1994</year>
@@ -33244,18 +33665,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1310720">
 				<rom name="chester cheetah - wild wild quest (usa) (beta).sfc" size="1310720" crc="bc27bca6" sha1="bb162d28d631fc327ebc9bf87e22dc7e718cb52a" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chesterw">
-		<description>Chester Cheetah - Wild Wild Quest (USA)</description>
-		<year>1994</year>
-		<publisher>Kaneko</publisher>
-		<info name="release" value="199403xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1310720">
-				<rom name="chester cheetah - wild wild quest (usa).sfc" size="1310720" crc="557fe962" sha1="c9cd39c331bee418f846a26ae5b2df238e0ed198" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -33375,18 +33784,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="chuck rock (usa) (beta).sfc" size="1048576" crc="c024f88f" sha1="ed4b190b5a6d7c2cdaa6a73d734d345e766d363c" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chuckrcku" cloneof="chuckrck">
-		<description>Chuck Rock (USA)</description>
-		<year>1992</year>
-		<publisher>Sony Imagesoft</publisher>
-		<info name="release" value="199212xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="chuck rock (usa).sfc" size="1048576" crc="e237ec45" sha1="3ffafb846909d6ef3dd8a8715362d2c4489cb3f1" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -34278,18 +34675,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="death and return of superman, the (usa).sfc" size="2097152" crc="a567957c" sha1="a509da90497b3c29c8763fdefd4808e55ea4b35c" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="deathretu" cloneof="deathret">
-		<description>The Death and Return of Superman (USA, Rev. A?)</description>
-		<year>1994</year>
-		<publisher>Sunsoft</publisher>
-		<info name="release" value="199408xx" />
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="death and return of superman, the (ntsc)(eng)(1.1).sfc" size="2097152" crc="012ef33d" sha1="a789268ab40a5bbc35f58743c936a87e0cbcda5c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -41057,22 +41442,6 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="keiba eight special (japan).sfc" size="1048576" crc="a5faefaa" sha1="af2e7ace9edc1d1d6d109ee0e28c8a61bdd22b0e" offset="0x000000" />
-			</dataarea>
-			<dataarea name="nvram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kengriff">
-		<description>Ken Griffey Jr. Presents Major League Baseball (USA, Rev. A?)</description>
-		<year>1994</year>
-		<publisher>Nintendo</publisher>
-		<info name="serial" value="SNS-JR-USA" />
-		<info name="release" value="199403xx" />
-		<sharedfeat name="compatibility" value="NTSC"/>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="ken griffey jr. presents major league baseball (ntsc)(eng)(1.1).sfc" size="2097152" crc="12b592f2" sha1="3be613d0173682711e1da59252cb91e839551633" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -62102,7 +62471,7 @@ List of unclassified roms
 	</software>
 
 	<software name="xbandj" cloneof="xband">
-		<!-- This is the dump of the BIOS of a snes modem device, TODO: move this to the snes clones list -->
+		<!-- Notes: this is the dump of the BIOS of a snes modem device, TODO: move this to the snes clones list -->
 		<description>X Band (Jpn)</description>
 		<year>1995</year>
 		<publisher>Catapult Entertainment</publisher>
@@ -62114,7 +62483,7 @@ List of unclassified roms
 	</software>
 
 	<software name="xband">
-		<!-- This is the dump of the BIOS of a snes modem device, TODO: move this to the snes clones list -->
+		<!-- Notes: this is the dump of the BIOS of a snes modem device, TODO: move this to the snes clones list -->
 		<description>X Band (USA)</description>
 		<year>1994</year>
 		<publisher>Catapult Entertainment</publisher>
