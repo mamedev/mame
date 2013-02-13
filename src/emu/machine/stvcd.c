@@ -916,10 +916,9 @@ void saturn_state::cd_exec_command( void )
 					return;
 				}
 
-				if (partitions[bufnum].numblks == 0)
+				if (partitions[bufnum].numblks < sectnum)
 				{
-					printf("CD: buffer is empty\n");
-					/* TODO: why this is happening? */
+					printf("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
 					cr_standard_return(CD_STAT_REJECT);
 					hirqreg |= (CMOK|EHST);
 					return;
@@ -959,10 +958,9 @@ void saturn_state::cd_exec_command( void )
 					return;
 				}
 
-				if (partitions[bufnum].numblks == 0)
+				if (partitions[bufnum].numblks < sectnum)
 				{
-					printf("CD: buffer is empty\n");
-					/* TODO: why this is happening? */
+					printf("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
 					cr_standard_return(CD_STAT_REJECT);
 					hirqreg |= (CMOK|EHST);
 					return;
@@ -1010,9 +1008,10 @@ void saturn_state::cd_exec_command( void )
 					return;
 				}
 
-				if (partitions[bufnum].numblks == 0)
+				/* Yoshimoto Mahjong uses the REJECT status to verify when the data is ready. */
+				if (partitions[bufnum].numblks < sectnum)
 				{
-					printf("CD: buffer is empty\n");
+					printf("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
 					/* TODO: why this is happening? */
 					cr_standard_return(CD_STAT_REJECT);
 					hirqreg |= (CMOK|EHST);
