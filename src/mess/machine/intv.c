@@ -16,7 +16,7 @@ WRITE16_MEMBER( intv_state::intvkbd_dualport16_w )
 	COMBINE_DATA(&m_intvkbd_dualport_ram[offset]);
 
 	/* copy the LSB over to the 6502 OP RAM, in case they are opcodes */
-	RAM  = memregion("keyboard")->base();
+	RAM  = m_region_keyboard->base();
 	RAM[offset] = (UINT8) (data >> 0);
 }
 
@@ -33,7 +33,7 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
 	m_intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
 
 	/* copy over to the 6502 OP RAM, in case they are opcodes */
-	RAM  = memregion("keyboard")->base();
+	RAM  = m_region_keyboard->base();
 	RAM[offset] = data;
 }
 
@@ -657,7 +657,7 @@ TIMER_CALLBACK_MEMBER(intv_state::intv_btb_fill)
 {
 	UINT8 column;
 	UINT8 row = m_backtab_row;
-	//machine().device("maincpu")->execute().adjust_icount(-STIC_ROW_FETCH);
+	//m_maincpu->adjust_icount(-STIC_ROW_FETCH);
 	for(column=0; column < STIC_BACKTAB_WIDTH; column++)
 	{
 		m_backtab_buffer[row][column] = m_ram16[column + row * STIC_BACKTAB_WIDTH];
@@ -674,8 +674,7 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 	m_backtab_row = 0;
 	UINT8 row;
 	m_maincpu->adjust_icount(-(12*STIC_ROW_BUSRQ+STIC_FRAME_BUSRQ)); // Account for stic cycle stealing
-	machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")
-		->cycles_to_attotime(STIC_VBLANK_END), timer_expired_delegate(FUNC(intv_state::intv_interrupt_complete),this));
+	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(STIC_VBLANK_END), timer_expired_delegate(FUNC(intv_state::intv_interrupt_complete),this));
 	for (row=0; row < STIC_BACKTAB_HEIGHT; row++)
 	{
 		machine().scheduler().timer_set(m_maincpu
