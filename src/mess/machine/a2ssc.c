@@ -9,6 +9,9 @@
 #include "emu.h"
 #include "includes/apple2.h"
 #include "machine/a2ssc.h"
+#include "machine/terminal.h"
+#include "machine/null_modem.h"
+#include "machine/serial.h"
 
 
 /***************************************************************************
@@ -23,10 +26,27 @@ const device_type A2BUS_SSC = &device_creator<a2bus_ssc_device>;
 
 #define SSC_ROM_REGION  "ssc_rom"
 #define SSC_ACIA_TAG    "ssc_acia"
+#define SSC_RS232_TAG	"ssc_rs232"
 
+static SLOT_INTERFACE_START( rs232_devices )
+	SLOT_INTERFACE("serial_terminal", SERIAL_TERMINAL)
+	SLOT_INTERFACE("null_modem", NULL_MODEM)
+SLOT_INTERFACE_END
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(SSC_ACIA_TAG, mos6551_device, rxd_w),
+	DEVCB_DEVICE_LINE_MEMBER(SSC_ACIA_TAG, mos6551_device, dcd_w),
+	DEVCB_DEVICE_LINE_MEMBER(SSC_ACIA_TAG, mos6551_device, dsr_w),
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(SSC_ACIA_TAG, mos6551_device, cts_w)
+};
 
 MACHINE_CONFIG_FRAGMENT( ssc )
 	MCFG_MOS6551_ADD(SSC_ACIA_TAG, XTAL_1_8432MHz, DEVWRITELINE(DEVICE_SELF, a2bus_ssc_device, acia_irq_w))
+	MCFG_MOS6551_RXD_TXD_CALLBACKS(NULL, DEVWRITELINE(SSC_RS232_TAG, rs232_port_device, tx))
+
+	MCFG_RS232_PORT_ADD(SSC_RS232_TAG, rs232_intf, rs232_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
 ROM_START( ssc )
@@ -160,7 +180,7 @@ void a2bus_ssc_device::device_reset()
 
 UINT8 a2bus_ssc_device::read_cnxx(address_space &space, UINT8 offset)
 {
-	return m_rom[offset+0x700];
+	return m_rom[(offset&0xff)+0x700];
 }
 
 /*-------------------------------------------------
@@ -212,7 +232,6 @@ void a2bus_ssc_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data
 		case 0xb:
 			m_acia->write(space, offset-8, data);
 			break;
-
 	}
 }
 
