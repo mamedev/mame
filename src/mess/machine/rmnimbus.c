@@ -2030,8 +2030,8 @@ static void nimbus_bank_memory(running_machine &machine)
 
 		if(LOG_RAM) logerror("mapped %s",bank);
 
-		if((block_ofs < ramblocks[ramblock][map_blockno].blocksize) &&
-			(map_blocks[map_blockno]!=NULL) && (map_blockno>-1))
+		if((map_blockno>-1) && (block_ofs < ramblocks[ramblock][map_blockno].blocksize) &&
+			(map_blocks[map_blockno]!=NULL))
 		{
 			map_base=(ramsel==0x07) ? map_blocks[map_blockno] : &map_blocks[map_blockno][block_ofs*1024];
 
