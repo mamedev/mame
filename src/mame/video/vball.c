@@ -66,60 +66,56 @@ WRITE8_MEMBER(vball_state::vb_attrib_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-void vb_bgprombank_w( running_machine &machine, int bank )
+void vball_state::vb_bgprombank_w( int bank )
 {
-	vball_state *state = machine.driver_data<vball_state>();
 	int i;
 	UINT8* color_prom;
 
-	if (bank==state->m_vb_bgprombank) return;
+	if (bank==m_vb_bgprombank) return;
 
-	color_prom = state->memregion("proms")->base() + bank*0x80;
+	color_prom = memregion("proms")->base() + bank*0x80;
 	for (i=0;i<128;i++, color_prom++) {
-		palette_set_color_rgb(machine,i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
+		palette_set_color_rgb(machine(),i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
 						pal4bit(color_prom[0x800] >> 0));
 	}
-	state->m_vb_bgprombank=bank;
+	m_vb_bgprombank=bank;
 }
 
-void vb_spprombank_w( running_machine &machine, int bank )
+void vball_state::vb_spprombank_w( int bank )
 {
-	vball_state *state = machine.driver_data<vball_state>();
 
 	int i;
 	UINT8* color_prom;
 
-	if (bank==state->m_vb_spprombank) return;
+	if (bank==m_vb_spprombank) return;
 
-	color_prom = state->memregion("proms")->base()+0x400 + bank*0x80;
+	color_prom = memregion("proms")->base()+0x400 + bank*0x80;
 	for (i=128;i<256;i++,color_prom++)  {
-		palette_set_color_rgb(machine,i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
+		palette_set_color_rgb(machine(),i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
 						pal4bit(color_prom[0x800] >> 0));
 	}
-	state->m_vb_spprombank=bank;
+	m_vb_spprombank=bank;
 }
 
-void vb_mark_all_dirty( running_machine &machine )
+void vball_state::vb_mark_all_dirty(  )
 {
-	vball_state *state = machine.driver_data<vball_state>();
-	state->m_bg_tilemap->mark_all_dirty();
+	m_bg_tilemap->mark_all_dirty();
 }
 
 #define DRAW_SPRITE( order, sx, sy ) drawgfx_transpen( bitmap, \
 					cliprect,gfx, \
 					(which+order),color,flipx,flipy,sx,sy,0);
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void vball_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vball_state *state = machine.driver_data<vball_state>();
-	gfx_element *gfx = machine.gfx[1];
-	UINT8 *src = state->m_spriteram;
+	gfx_element *gfx = machine().gfx[1];
+	UINT8 *src = m_spriteram;
 	int i;
 
 /*  240-Y    S|X|CLR|WCH WHICH    240-X
     xxxxxxxx x|x|xxx|xxx xxxxxxxx xxxxxxxx
 */
-	for (i = 0;i < state->m_spriteram.bytes();i += 4)
+	for (i = 0;i < m_spriteram.bytes();i += 4)
 	{
 		int attr = src[i+1];
 		int which = src[i+2]+((attr & 0x07)<<8);
@@ -131,7 +127,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int flipy = 0;
 		int dy = -16;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -168,6 +164,6 @@ UINT32 vball_state::screen_update_vb(screen_device &screen, bitmap_ind16 &bitmap
 		//logerror("scrollx[%d] = %d\n",i,m_vb_scrollx[i]);
 	}
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	return 0;
 }

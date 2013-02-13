@@ -101,6 +101,9 @@ public:
 	DECLARE_PALETTE_INIT(vsdual);
 	UINT32 screen_update_vsnes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_vsnes_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void v_set_videorom_bank(  int start, int count, int vrom_start_bank );
+	void mapper4_set_prg(  );
+	void mapper4_set_chr(  );
 };
 
 /*----------- defined in video/vsnes.c -----------*/

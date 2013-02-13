@@ -478,25 +478,23 @@ READ16_MEMBER(volfied_state::volfied_cchip_ram_r)
  *
  *************************************/
 
-void volfied_cchip_init( running_machine &machine )
+void volfied_state::volfied_cchip_init(  )
 {
-	volfied_state *state = machine.driver_data<volfied_state>();
 
-	state->m_cchip_ram = auto_alloc_array_clear(machine, UINT8, 0x400 * 8);
+	m_cchip_ram = auto_alloc_array_clear(machine(), UINT8, 0x400 * 8);
 
-	state->save_item(NAME(state->m_current_bank));
-	state->save_item(NAME(state->m_current_cmd));
-	state->save_item(NAME(state->m_current_flag));
-	state->save_item(NAME(state->m_cc_port));
-	state->save_pointer(NAME(state->m_cchip_ram), 0x400 * 8);
+	save_item(NAME(m_current_bank));
+	save_item(NAME(m_current_cmd));
+	save_item(NAME(m_current_flag));
+	save_item(NAME(m_cc_port));
+	save_pointer(NAME(m_cchip_ram), 0x400 * 8);
 }
 
-void volfied_cchip_reset( running_machine &machine )
+void volfied_state::volfied_cchip_reset(  )
 {
-	volfied_state *state = machine.driver_data<volfied_state>();
 
-	state->m_current_bank = 0;
-	state->m_current_flag = 0;
-	state->m_cc_port = 0;
-	state->m_current_cmd = 0;
+	m_current_bank = 0;
+	m_current_flag = 0;
+	m_cc_port = 0;
+	m_current_cmd = 0;
 }

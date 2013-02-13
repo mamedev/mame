@@ -94,7 +94,7 @@ VBlank = 58Hz
 #define PIXEL_CLOCK     MAIN_CLOCK / 2
 
 /* Based on ddragon driver */
-INLINE int scanline_to_vcount(int scanline)
+inline int vball_state::scanline_to_vcount(int scanline)
 {
 	int vcount = scanline + 8;
 	if (vcount < 0x100)
@@ -162,7 +162,7 @@ WRITE8_MEMBER(vball_state::vb_bankswitch_w)
 	if (m_gfxset != ((data  & 0x20) ^ 0x20))
 	{
 		m_gfxset = (data  & 0x20) ^ 0x20;
-			vb_mark_all_dirty(machine());
+			vb_mark_all_dirty();
 	}
 	m_vb_scrolly_hi = (data & 0x40) << 2;
 }
@@ -188,8 +188,8 @@ WRITE8_MEMBER(vball_state::vb_scrollx_hi_w)
 {
 	flip_screen_set(~data&1);
 	m_vb_scrollx_hi = (data & 0x02) << 7;
-	vb_bgprombank_w(machine(), (data >> 2) & 0x07);
-	vb_spprombank_w(machine(), (data >> 5) & 0x07);
+	vb_bgprombank_w((data >> 2) & 0x07);
+	vb_spprombank_w((data >> 5) & 0x07);
 	//logerror("%04x: vb_scrollx_hi = %d\n", space.device().safe_pcbase(), m_vb_scrollx_hi);
 }
 

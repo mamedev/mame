@@ -166,14 +166,13 @@ WRITE8_MEMBER(vulgus_state::vulgus_palette_bank_w)
 
 ***************************************************************************/
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void vulgus_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	vulgus_state *state = machine.driver_data<vulgus_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
 
-	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
+	for (offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		int code,i,col,sx,sy,dir;
 
@@ -183,7 +182,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		sx = spriteram[offs + 3];
 		sy = spriteram[offs + 2];
 		dir = 1;
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -195,17 +194,17 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		do
 		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 					code + i,
 					col,
-					state->flip_screen(),state->flip_screen(),
+					flip_screen(),flip_screen(),
 					sx, sy + 16 * i * dir,15);
 
 			/* draw again with wraparound */
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 					code + i,
 					col,
-					state->flip_screen(),state->flip_screen(),
+					flip_screen(),flip_screen(),
 					sx, sy + 16 * i * dir -  dir * 256,15);
 			i--;
 		} while (i >= 0);
@@ -218,7 +217,7 @@ UINT32 vulgus_state::screen_update_vulgus(screen_device &screen, bitmap_ind16 &b
 	m_bg_tilemap->set_scrolly(0, m_scroll_low[0] + 256 * m_scroll_high[0]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0,0);
-	draw_sprites(machine(), bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 	return 0;
 }

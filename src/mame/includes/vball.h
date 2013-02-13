@@ -33,11 +33,9 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_vb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(vball_scanline);
+	void vb_bgprombank_w( int bank );
+	void vb_spprombank_w( int bank );
+	void vb_mark_all_dirty(  );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	inline int scanline_to_vcount(int scanline);
 };
-
-
-/*----------- defined in video/vball.c -----------*/
-
-void vb_bgprombank_w(running_machine &machine, int bank);
-void vb_spprombank_w(running_machine &machine, int bank);
-void vb_mark_all_dirty(running_machine &machine);

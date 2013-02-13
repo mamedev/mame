@@ -48,7 +48,7 @@ static const double crazy_coaster_angles[3] = {0, 0.1631, 0.3305};
 static const double unknown_game_angles[3] = {0,0.16666666, 0.33333333};
 
 
-static int vectrex_verify_cart(char *data)
+int vectrex_state::vectrex_verify_cart(char *data)
 {
 	/* Verify the file is accepted by the Vectrex bios */
 	if (!memcmp(data,"g GCE", 5))

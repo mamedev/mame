@@ -66,7 +66,7 @@ WRITE16_MEMBER(volfied_state::volfied_sprite_ctrl_w)
                 SCREEN REFRESH
 *******************************************************/
 
-static void refresh_pixel_layer( running_machine &machine, bitmap_ind16 &bitmap )
+void volfied_state::refresh_pixel_layer( bitmap_ind16 &bitmap )
 {
 	int x, y;
 
@@ -90,12 +90,11 @@ static void refresh_pixel_layer( running_machine &machine, bitmap_ind16 &bitmap 
 
 	*********************************************************/
 
-	volfied_state *state = machine.driver_data<volfied_state>();
-	UINT16* p = state->m_video_ram;
-	int width = machine.primary_screen->width();
-	int height = machine.primary_screen->height();
+	UINT16* p = m_video_ram;
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
 
-	if (state->m_video_ctrl & 1)
+	if (m_video_ctrl & 1)
 		p += 0x20000;
 
 	for (y = 0; y < height; y++)
@@ -124,7 +123,7 @@ static void refresh_pixel_layer( running_machine &machine, bitmap_ind16 &bitmap 
 UINT32 volfied_state::screen_update_volfied(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	machine().priority_bitmap.fill(0, cliprect);
-	refresh_pixel_layer(machine(), bitmap);
+	refresh_pixel_layer(bitmap);
 	pc090oj_draw_sprites(m_pc090oj, bitmap, cliprect, 0);
 	return 0;
 }

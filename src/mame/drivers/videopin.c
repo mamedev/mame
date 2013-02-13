@@ -22,24 +22,23 @@
 
 
 
-static void update_plunger(running_machine &machine)
+void videopin_state::update_plunger()
 {
-	videopin_state *state = machine.driver_data<videopin_state>();
-	UINT8 val = state->ioport("IN2")->read();
+	UINT8 val = ioport("IN2")->read();
 
-	if (state->m_prev != val)
+	if (m_prev != val)
 	{
 		if (val == 0)
 		{
-			state->m_time_released = machine.time();
+			m_time_released = machine().time();
 
-			if (!state->m_mask)
-				machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			if (!m_mask)
+				machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		}
 		else
-			state->m_time_pushed = machine.time();
+			m_time_pushed = machine().time();
 
-		state->m_prev = val;
+		m_prev = val;
 	}
 }
 
@@ -48,7 +47,7 @@ TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
 {
 	int scanline = param;
 
-	update_plunger(machine());
+	update_plunger();
 
 	machine().device("maincpu")->execute().set_input_line(0, ASSERT_LINE);
 
@@ -72,16 +71,15 @@ void videopin_state::machine_reset()
 }
 
 
-static double calc_plunger_pos(running_machine &machine)
+double videopin_state::calc_plunger_pos()
 {
-	videopin_state *state = machine.driver_data<videopin_state>();
-	return (machine.time().as_double() - state->m_time_released.as_double()) * (state->m_time_released.as_double() - state->m_time_pushed.as_double() + 0.2);
+	return (machine().time().as_double() - m_time_released.as_double()) * (m_time_released.as_double() - m_time_pushed.as_double() + 0.2);
 }
 
 
 READ8_MEMBER(videopin_state::videopin_misc_r)
 {
-	double plunger = calc_plunger_pos(machine());
+	double plunger = calc_plunger_pos();
 
 	// The plunger of the ball shooter has a black piece of
 	// plastic (flag) attached to it. When the plunger flag passes

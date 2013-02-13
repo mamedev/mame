@@ -122,12 +122,11 @@ WRITE8_MEMBER(vastar_state::vastar_bg2videoram_w)
 // for Planet Probe more cases appear correct if we draw the list in reverse
 // order, but it's also possible we should be drawing 2 swapped lists in
 // forward order instead
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void vastar_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	vastar_state *state = machine.driver_data<vastar_state>();
-	UINT8 *spriteram = state->m_spriteram1;
-	UINT8 *spriteram_2 = state->m_spriteram2;
-	UINT8 *spriteram_3 = state->m_spriteram3;
+	UINT8 *spriteram = m_spriteram1;
+	UINT8 *spriteram_2 = m_spriteram2;
+	UINT8 *spriteram_3 = m_spriteram3;
 	int offs;
 
 //  for (offs = 0; offs < 0x40; offs += 2)
@@ -145,7 +144,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		flipx = spriteram_3[offs] & 0x02;
 		flipy = spriteram_3[offs] & 0x01;
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			flipx = !flipx;
 			flipy = !flipy;
@@ -153,16 +152,16 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		if (spriteram_2[offs] & 0x08)   /* double width */
 		{
-			if (!state->flip_screen())
+			if (!flip_screen())
 				sy = 224 - sy;
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 					code/2,
 					color,
 					flipx,flipy,
 					sx,sy,0);
 			/* redraw with wraparound */
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[2],
 					code/2,
 					color,
 					flipx,flipy,
@@ -170,10 +169,10 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		}
 		else
 		{
-			if (!state->flip_screen())
+			if (!flip_screen())
 				sy = 240 - sy;
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					code,
 					color,
 					flipx,flipy,
@@ -196,7 +195,7 @@ UINT32 vastar_state::screen_update_vastar(screen_device &screen, bitmap_ind16 &b
 	{
 	case 0:
 		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(machine(), bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 		m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
@@ -204,13 +203,13 @@ UINT32 vastar_state::screen_update_vastar(screen_device &screen, bitmap_ind16 &b
 	case 1: // ?? planet probe
 		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
-		draw_sprites(machine(), bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
 		break;
 
 	case 2:
 		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
-		draw_sprites(machine(), bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 		m_bg1_tilemap->draw(bitmap, cliprect, 0,0);
 		m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
@@ -220,7 +219,7 @@ UINT32 vastar_state::screen_update_vastar(screen_device &screen, bitmap_ind16 &b
 		m_bg1_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE,0);
 		m_bg2_tilemap->draw(bitmap, cliprect, 0,0);
 		m_fg_tilemap->draw(bitmap, cliprect, 0,0);
-		draw_sprites(machine(), bitmap,cliprect);
+		draw_sprites(bitmap,cliprect);
 		break;
 
 	default:

@@ -163,21 +163,20 @@ MACHINE_RESET_MEMBER(vsnes_state,vsdual)
  *
  *************************************/
 
-static void v_set_videorom_bank( running_machine& machine, int start, int count, int vrom_start_bank )
+void vsnes_state::v_set_videorom_bank(  int start, int count, int vrom_start_bank )
 {
-	vsnes_state *state = machine.driver_data<vsnes_state>();
 	int i;
 
 	assert(start + count <= 8);
 
-	vrom_start_bank &= (state->m_vrom_banks - 1);
-	assert(vrom_start_bank + count <= state->m_vrom_banks);
+	vrom_start_bank &= (m_vrom_banks - 1);
+	assert(vrom_start_bank + count <= m_vrom_banks);
 
 	/* bank_size_in_kb is used to determine how large the "bank" parameter is */
 	/* count determines the size of the area mapped */
 	for (i = 0; i < count; i++)
 	{
-		state->membank(chr_banknames[i + start])->set_entry(vrom_start_bank + i);
+		membank(chr_banknames[i + start])->set_entry(vrom_start_bank + i);
 	}
 }
 
@@ -210,7 +209,7 @@ MACHINE_START_MEMBER(vsnes_state,vsnes)
 			ppu1_space.install_read_bank(0x0400 * i, 0x0400 * i + 0x03ff, chr_banknames[i]);
 			membank(chr_banknames[i])->configure_entries(0, m_vrom_banks, m_vrom[0], 0x400);
 		}
-		v_set_videorom_bank(machine(), 0, 8, 0);
+		v_set_videorom_bank(0, 8, 0);
 	}
 	else
 	{
@@ -325,7 +324,7 @@ void vsnes_state::v_set_mirroring(int ppu, int mirroring)
 WRITE8_MEMBER(vsnes_state::vsnormal_vrom_banking)
 {
 	/* switch vrom */
-	v_set_videorom_bank(machine(), 0, 8, (data & 4) ? 8 : 0);
+	v_set_videorom_bank(0, 8, (data & 4) ? 8 : 0);
 
 	/* bit 1 ( data & 2 ) enables writes to extra ram, we ignore it */
 
@@ -349,7 +348,7 @@ WRITE8_MEMBER(vsnes_state::gun_in0_w)
 	if (m_do_vrom_bank)
 	{
 		/* switch vrom */
-		v_set_videorom_bank(machine(), 0, 8, (data & 4) ? 8 : 0);
+		v_set_videorom_bank(0, 8, (data & 4) ? 8 : 0);
 	}
 
 	/* here we do things a little different */
@@ -415,11 +414,11 @@ WRITE8_MEMBER(vsnes_state::vskonami_rom_banking)
 		break;
 
 		case 6: /* vrom bank 0 */
-			v_set_videorom_bank(machine(), 0, 4, data * 4);
+			v_set_videorom_bank(0, 4, data * 4);
 		break;
 
 		case 7: /* vrom bank 1 */
-			v_set_videorom_bank(machine(), 4, 4, data * 4);
+			v_set_videorom_bank(4, 4, data * 4);
 		break;
 	}
 }
@@ -539,12 +538,12 @@ WRITE8_MEMBER(vsnes_state::drmario_rom_banking)
 
 			case 1: /* video rom banking - bank 0 - 4k or 8k */
 				if (!m_vram)
-					v_set_videorom_bank(machine(), 0, (m_vrom4k) ? 4 : 8, m_drmario_shiftreg * 4);
+					v_set_videorom_bank(0, (m_vrom4k) ? 4 : 8, m_drmario_shiftreg * 4);
 			break;
 
 			case 2: /* video rom banking - bank 1 - 4k only */
 				if (m_vrom4k && !m_vram)
-					v_set_videorom_bank(machine(), 4, 4, m_drmario_shiftreg * 4);
+					v_set_videorom_bank(4, 4, m_drmario_shiftreg * 4);
 			break;
 
 			case 3: /* program banking */
@@ -621,31 +620,29 @@ DRIVER_INIT_MEMBER(vsnes_state,vsvram)
 /**********************************************************************************/
 
 
-static void mapper4_set_prg( running_machine &machine )
+void vsnes_state::mapper4_set_prg(  )
 {
-	vsnes_state *state = machine.driver_data<vsnes_state>();
-	UINT8 *prg = state->memregion("maincpu")->base();
-	UINT8 prg_flip = (state->m_MMC3_cmd & 0x40) ? 2 : 0;
+	UINT8 *prg = memregion("maincpu")->base();
+	UINT8 prg_flip = (m_MMC3_cmd & 0x40) ? 2 : 0;
 
-	memcpy(&prg[0x8000], &prg[0x2000 * (state->m_MMC3_prg_bank[0 ^ prg_flip] & state->m_MMC3_prg_mask) + 0x10000], 0x2000);
-	memcpy(&prg[0xa000], &prg[0x2000 * (state->m_MMC3_prg_bank[1] & state->m_MMC3_prg_mask) + 0x10000], 0x2000);
-	memcpy(&prg[0xc000], &prg[0x2000 * (state->m_MMC3_prg_bank[2 ^ prg_flip] & state->m_MMC3_prg_mask) + 0x10000], 0x2000);
-	memcpy(&prg[0xe000], &prg[0x2000 * (state->m_MMC3_prg_bank[3] & state->m_MMC3_prg_mask) + 0x10000], 0x2000);
+	memcpy(&prg[0x8000], &prg[0x2000 * (m_MMC3_prg_bank[0 ^ prg_flip] & m_MMC3_prg_mask) + 0x10000], 0x2000);
+	memcpy(&prg[0xa000], &prg[0x2000 * (m_MMC3_prg_bank[1] & m_MMC3_prg_mask) + 0x10000], 0x2000);
+	memcpy(&prg[0xc000], &prg[0x2000 * (m_MMC3_prg_bank[2 ^ prg_flip] & m_MMC3_prg_mask) + 0x10000], 0x2000);
+	memcpy(&prg[0xe000], &prg[0x2000 * (m_MMC3_prg_bank[3] & m_MMC3_prg_mask) + 0x10000], 0x2000);
 }
 
-static void mapper4_set_chr( running_machine &machine )
+void vsnes_state::mapper4_set_chr(  )
 {
-	vsnes_state *state = machine.driver_data<vsnes_state>();
-	UINT8 chr_page = (state->m_MMC3_cmd & 0x80) >> 5;
+	UINT8 chr_page = (m_MMC3_cmd & 0x80) >> 5;
 
-	v_set_videorom_bank(machine, chr_page ^ 0, 1, state->m_MMC3_chr_bank[0] & ~0x01);
-	v_set_videorom_bank(machine, chr_page ^ 1, 1, state->m_MMC3_chr_bank[0] |  0x01);
-	v_set_videorom_bank(machine, chr_page ^ 2, 1, state->m_MMC3_chr_bank[1] & ~0x01);
-	v_set_videorom_bank(machine, chr_page ^ 3, 1, state->m_MMC3_chr_bank[1] |  0x01);
-	v_set_videorom_bank(machine, chr_page ^ 4, 1, state->m_MMC3_chr_bank[2]);
-	v_set_videorom_bank(machine, chr_page ^ 5, 1, state->m_MMC3_chr_bank[3]);
-	v_set_videorom_bank(machine, chr_page ^ 6, 1, state->m_MMC3_chr_bank[4]);
-	v_set_videorom_bank(machine, chr_page ^ 7, 1, state->m_MMC3_chr_bank[5]);
+	v_set_videorom_bank(chr_page ^ 0, 1, m_MMC3_chr_bank[0] & ~0x01);
+	v_set_videorom_bank(chr_page ^ 1, 1, m_MMC3_chr_bank[0] |  0x01);
+	v_set_videorom_bank(chr_page ^ 2, 1, m_MMC3_chr_bank[1] & ~0x01);
+	v_set_videorom_bank(chr_page ^ 3, 1, m_MMC3_chr_bank[1] |  0x01);
+	v_set_videorom_bank(chr_page ^ 4, 1, m_MMC3_chr_bank[2]);
+	v_set_videorom_bank(chr_page ^ 5, 1, m_MMC3_chr_bank[3]);
+	v_set_videorom_bank(chr_page ^ 6, 1, m_MMC3_chr_bank[4]);
+	v_set_videorom_bank(chr_page ^ 7, 1, m_MMC3_chr_bank[5]);
 }
 
 #define BOTTOM_VISIBLE_SCANLINE 239     /* The bottommost visible scanline */
@@ -684,11 +681,11 @@ WRITE8_MEMBER(vsnes_state::mapper4_w)
 
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
-				mapper4_set_prg(machine());
+				mapper4_set_prg();
 
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
-				mapper4_set_chr(machine());
+				mapper4_set_chr();
 			break;
 
 		case 0x0001: /* $8001 */
@@ -698,12 +695,12 @@ WRITE8_MEMBER(vsnes_state::mapper4_w)
 				case 0: case 1: // these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
 					m_MMC3_chr_bank[cmd] = data;
-					mapper4_set_chr(machine());
+					mapper4_set_chr();
 					break;
 				case 6:
 				case 7:
 					m_MMC3_prg_bank[cmd - 6] = data;
-					mapper4_set_prg(machine());
+					mapper4_set_prg();
 					break;
 			}
 			break;
@@ -915,19 +912,19 @@ WRITE8_MEMBER(vsnes_state::mapper68_rom_banking)
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-		v_set_videorom_bank(machine(), 0, 2, data * 2);
+		v_set_videorom_bank(0, 2, data * 2);
 
 		break;
 		case 0x1000:
-		v_set_videorom_bank(machine(), 2, 2, data * 2);
+		v_set_videorom_bank(2, 2, data * 2);
 
 		break;
 		case 0x2000:
-		v_set_videorom_bank(machine(), 4, 2, data * 2);
+		v_set_videorom_bank(4, 2, data * 2);
 
 		break;
 		case 0x3000: /* ok? */
-		v_set_videorom_bank(machine(), 6, 2, data * 2);
+		v_set_videorom_bank(6, 2, data * 2);
 
 		break;
 

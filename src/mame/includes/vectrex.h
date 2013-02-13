@@ -124,6 +124,7 @@ protected:
 	void vectrex_multiplexer(int mux);
 	void vectrex_add_point(int x, int y, rgb_t color, int intensity);
 	void vectrex_add_point_stereo(int x, int y, rgb_t color, int intensity);
+	int vectrex_verify_cart(char *data);
 };
 
 /*---------- defined in video/vectrex.c -----------*/

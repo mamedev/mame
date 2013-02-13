@@ -41,9 +41,8 @@ void vigilant_state::video_reset()
  There are three background ROMs, each one contains a 512x256 picture.
  Redraw them if the palette changes.
  **************************************************************************/
-static void update_background(running_machine &machine)
+void vigilant_state::update_background()
 {
-	vigilant_state *state = machine.driver_data<vigilant_state>();
 	int row,col,page;
 	int charcode;
 
@@ -57,8 +56,8 @@ static void update_background(running_machine &machine)
 		{
 			for( col=0; col<512; col+=32 )
 			{
-				drawgfx_opaque(*state->m_bg_bitmap,
-						state->m_bg_bitmap->cliprect(),machine.gfx[2],
+				drawgfx_opaque(*m_bg_bitmap,
+						m_bg_bitmap->cliprect(),machine().gfx[2],
 						charcode,
 						row < 128 ? 0 : 1,
 						0,0,
@@ -159,12 +158,11 @@ WRITE8_MEMBER(vigilant_state::vigilant_rear_color_w)
  ???
  **************************************************************************/
 
-static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int opaque )
+void vigilant_state::draw_foreground(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int opaque )
 {
-	vigilant_state *state = machine.driver_data<vigilant_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int offs;
-	int scroll = -(state->m_horiz_scroll_low + state->m_horiz_scroll_high);
+	int scroll = -(m_horiz_scroll_low + m_horiz_scroll_high);
 
 
 	for (offs = 0; offs < 0x1000; offs += 2)
@@ -183,7 +181,7 @@ static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, cons
 				{
 					sx = (sx + scroll) & 0x1ff;
 
-					drawgfx_transmask(bitmap,bottomvisiblearea,machine.gfx[0],
+					drawgfx_transmask(bitmap,bottomvisiblearea,machine().gfx[0],
 							tile_number,
 							color,
 							0,0,
@@ -196,7 +194,7 @@ static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, cons
 			if (sy >= 48)
 				sx = (sx + scroll) & 0x1ff;
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[0],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[0],
 					tile_number,
 					color,
 					0,0,
@@ -208,29 +206,27 @@ static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, cons
 
 
 
-static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void vigilant_state::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	vigilant_state *state = machine.driver_data<vigilant_state>();
-	int scrollx = 0x17a + 16*8 - (state->m_rear_horiz_scroll_low + state->m_rear_horiz_scroll_high);
+	int scrollx = 0x17a + 16*8 - (m_rear_horiz_scroll_low + m_rear_horiz_scroll_high);
 
 
-	if (state->m_rear_refresh)
+	if (m_rear_refresh)
 	{
-		update_background(machine);
-		state->m_rear_refresh=0;
+		update_background();
+		m_rear_refresh=0;
 	}
 
-	copyscrollbitmap(bitmap,*state->m_bg_bitmap,1,&scrollx,0,0,bottomvisiblearea);
+	copyscrollbitmap(bitmap,*m_bg_bitmap,1,&scrollx,0,0,bottomvisiblearea);
 }
 
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void vigilant_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	vigilant_state *state = machine.driver_data<vigilant_state>();
-	UINT8 *spriteram = state->m_spriteram;
+	UINT8 *spriteram = m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram.bytes();offs += 8)
+	for (offs = 0;offs < m_spriteram.bytes();offs += 8)
 	{
 		int code,color,sx,sy,flipx,flipy,h,y;
 
@@ -252,7 +248,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			if (flipy) c += h-1-y;
 			else c += y;
 
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					c,
 					color,
 					flipx,flipy,
@@ -281,7 +277,7 @@ UINT32 vigilant_state::screen_update_kikcubic(screen_device &screen, bitmap_ind1
 				sx,sy);
 	}
 
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_sprites(bitmap,cliprect);
 	return 0;
 }
 
@@ -310,16 +306,16 @@ UINT32 vigilant_state::screen_update_vigilant(screen_device &screen, bitmap_ind1
 
 	if (m_rear_disable)  /* opaque foreground */
 	{
-		draw_foreground(machine(),bitmap,cliprect,0,1);
-		draw_sprites(machine(),bitmap,bottomvisiblearea);
-		draw_foreground(machine(),bitmap,cliprect,1,0);
+		draw_foreground(bitmap,cliprect,0,1);
+		draw_sprites(bitmap,bottomvisiblearea);
+		draw_foreground(bitmap,cliprect,1,0);
 	}
 	else
 	{
-		draw_background(machine(),bitmap,cliprect);
-		draw_foreground(machine(),bitmap,cliprect,0,0);
-		draw_sprites(machine(),bitmap,bottomvisiblearea);
-		draw_foreground(machine(),bitmap,cliprect,1,0); // priority tiles
+		draw_background(bitmap,cliprect);
+		draw_foreground(bitmap,cliprect,0,0);
+		draw_sprites(bitmap,bottomvisiblearea);
+		draw_foreground(bitmap,cliprect,1,0); // priority tiles
 	}
 	return 0;
 }

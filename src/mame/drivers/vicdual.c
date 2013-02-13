@@ -135,13 +135,13 @@ INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
  *
  *************************************/
 
-static int get_vcounter(running_machine &machine)
+int vicdual_state::get_vcounter()
 {
-	int vcounter = machine.primary_screen->vpos();
+	int vcounter = machine().primary_screen->vpos();
 
 	/* the vertical synch counter gets incremented at the end of HSYNC,
 	   compensate for this */
-	if (machine.primary_screen->hpos() >= VICDUAL_HSEND)
+	if (machine().primary_screen->hpos() >= VICDUAL_HSEND)
 		vcounter = (vcounter + 1) % VICDUAL_VTOTAL;
 
 	return vcounter;
@@ -150,13 +150,13 @@ static int get_vcounter(running_machine &machine)
 
 CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_get_64v)
 {
-	return (get_vcounter(machine()) >> 6) & 0x01;
+	return (get_vcounter() >> 6) & 0x01;
 }
 
 
 CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_get_vblank_comp)
 {
-	return (get_vcounter(machine()) < VICDUAL_VBSTART);
+	return (get_vcounter() < VICDUAL_VBSTART);
 }
 
 
@@ -182,9 +182,9 @@ CUSTOM_INPUT_MEMBER(vicdual_state::vicdual_get_timer_value)
 #define COLOR_BW_PORT_TAG       "COLOR_BW"
 
 
-int vicdual_is_cabinet_color(running_machine &machine)
+int vicdual_state::vicdual_is_cabinet_color()
 {
-	return (machine.root_device().ioport(COLOR_BW_PORT_TAG)->read_safe(0) & 1) ? 0 : 1;
+	return (machine().root_device().ioport(COLOR_BW_PORT_TAG)->read_safe(0) & 1) ? 0 : 1;
 }
 
 

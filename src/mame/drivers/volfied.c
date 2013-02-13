@@ -233,7 +233,7 @@ static const ym2203_interface ym2203_config =
 
 void volfied_state::machine_start()
 {
-	volfied_cchip_init(machine());
+	volfied_cchip_init();
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
@@ -242,7 +242,7 @@ void volfied_state::machine_start()
 
 void volfied_state::machine_reset()
 {
-	volfied_cchip_reset(machine());
+	volfied_cchip_reset();
 }
 
 static const pc090oj_interface volfied_pc090oj_intf =

@@ -90,11 +90,10 @@ public:
 	UINT32 screen_update_vicdual_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_vicdual_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_vicdual_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	int get_vcounter();
+	int vicdual_is_cabinet_color();
 };
 
-/*----------- defined in drivers/vicdual.c -----------*/
-
-int vicdual_is_cabinet_color(running_machine &machine);
 
 /*----------- defined in audio/vicdual.c -----------*/
 

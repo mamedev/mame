@@ -217,14 +217,13 @@ VIDEO_START_MEMBER(unico_state,zeropnt2)
 
 ***************************************************************************/
 
-static void unico_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void unico_state::unico_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	unico_state *state = machine.driver_data<unico_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram16 = m_spriteram;
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (state->m_spriteram.bytes()-8)/2; offs >= 0 ; offs -= 8/2 )
+	for ( offs = (m_spriteram.bytes()-8)/2; offs >= 0 ; offs -= 8/2 )
 	{
 		int x, startx, endx, incx;
 
@@ -250,8 +249,8 @@ static void unico_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,co
 			case 3:     pri_mask = 0x00;            // above all
 		}
 
-		sx  +=  state->m_sprites_scrolldx;
-		sy  +=  state->m_sprites_scrolldy;
+		sx  +=  m_sprites_scrolldx;
+		sy  +=  m_sprites_scrolldy;
 
 		sx  =   (sx & 0x1ff) - (sx & 0x200);
 		sy  =   (sy & 0x1ff) - (sy & 0x200);
@@ -261,25 +260,24 @@ static void unico_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,co
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			pdrawgfx_transpen(  bitmap, cliprect, machine.gfx[0],
+			pdrawgfx_transpen(  bitmap, cliprect, machine().gfx[0],
 						code++,
 						attr & 0x1f,
 						flipx, flipy,
 						x, sy,
-						machine.priority_bitmap,
+						machine().priority_bitmap,
 						pri_mask,0x00   );
 		}
 	}
 }
 
-static void zeropnt2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void unico_state::zeropnt2_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	unico_state *state = machine.driver_data<unico_state>();
-	UINT32 *spriteram32 = reinterpret_cast<UINT32 *>(state->m_spriteram.target());
+	UINT32 *spriteram32 = reinterpret_cast<UINT32 *>(m_spriteram.target());
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (state->m_spriteram.bytes()-8)/4; offs >= 0 ; offs -= 8/4 )
+	for ( offs = (m_spriteram.bytes()-8)/4; offs >= 0 ; offs -= 8/4 )
 	{
 		int x, startx, endx, incx;
 
@@ -305,8 +303,8 @@ static void zeropnt2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 			case 3:     pri_mask = 0x00;            // above all
 		}
 
-		sx  +=  state->m_sprites_scrolldx;
-		sy  +=  state->m_sprites_scrolldy;
+		sx  +=  m_sprites_scrolldx;
+		sy  +=  m_sprites_scrolldy;
 
 		sx  =   (sx & 0x1ff) - (sx & 0x200);
 		sy  =   (sy & 0x1ff) - (sy & 0x200);
@@ -316,12 +314,12 @@ static void zeropnt2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 
 		for (x = startx ; x != endx ; x += incx)
 		{
-			pdrawgfx_transpen(  bitmap, cliprect, machine.gfx[0],
+			pdrawgfx_transpen(  bitmap, cliprect, machine().gfx[0],
 						code++,
 						attr & 0x1f,
 						flipx, flipy,
 						x, sy,
-						machine.priority_bitmap,
+						machine().priority_bitmap,
 						pri_mask,0x00   );
 		}
 	}
@@ -371,7 +369,7 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 	if (layers_ctrl & 4)    m_tilemap[2]->draw(bitmap, cliprect, 0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)    unico_draw_sprites(screen.machine(), bitmap,cliprect);
+	if (layers_ctrl & 8)    unico_draw_sprites(bitmap,cliprect);
 
 	return 0;
 }
@@ -410,7 +408,7 @@ if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed
 	if (layers_ctrl & 4)    m_tilemap[2]->draw(bitmap, cliprect, 0,4);
 
 	/* Sprites are drawn last, using pdrawgfx */
-	if (layers_ctrl & 8)    zeropnt2_draw_sprites(screen.machine(), bitmap,cliprect);
+	if (layers_ctrl & 8)    zeropnt2_draw_sprites(bitmap,cliprect);
 
 	return 0;
 }

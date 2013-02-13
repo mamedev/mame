@@ -138,7 +138,7 @@ UINT32 vicdual_state::screen_update_vicdual_color(screen_device &screen, bitmap_
 
 UINT32 vicdual_state::screen_update_vicdual_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (vicdual_is_cabinet_color(machine()))
+	if (vicdual_is_cabinet_color())
 		screen_update_vicdual_color(screen, bitmap, cliprect);
 	else
 		screen_update_vicdual_bw(screen, bitmap, cliprect);
