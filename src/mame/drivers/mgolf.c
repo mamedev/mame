@@ -40,6 +40,8 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_mgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	void update_plunger(  );
+	double calc_plunger_pos();
 };
 
 
@@ -92,24 +94,23 @@ UINT32 mgolf_state::screen_update_mgolf(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-static void update_plunger( running_machine &machine )
+void mgolf_state::update_plunger(  )
 {
-	mgolf_state *state = machine.driver_data<mgolf_state>();
-	UINT8 val = state->ioport("BUTTON")->read();
+	UINT8 val = ioport("BUTTON")->read();
 
-	if (state->m_prev != val)
+	if (m_prev != val)
 	{
 		if (val == 0)
 		{
-			state->m_time_released = machine.time();
+			m_time_released = machine().time();
 
-			if (!state->m_mask)
-				state->m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+			if (!m_mask)
+				m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		}
 		else
-			state->m_time_pushed = machine.time();
+			m_time_pushed = machine().time();
 
-		state->m_prev = val;
+		m_prev = val;
 	}
 }
 
@@ -118,7 +119,7 @@ TIMER_CALLBACK_MEMBER(mgolf_state::interrupt_callback)
 {
 	int scanline = param;
 
-	update_plunger(machine());
+	update_plunger();
 
 	generic_pulse_irq_line(*m_maincpu, 0, 1);
 
@@ -131,10 +132,9 @@ TIMER_CALLBACK_MEMBER(mgolf_state::interrupt_callback)
 }
 
 
-static double calc_plunger_pos(running_machine &machine)
+double mgolf_state::calc_plunger_pos()
 {
-	mgolf_state *state = machine.driver_data<mgolf_state>();
-	return (machine.time().as_double() - state->m_time_released.as_double()) * (state->m_time_released.as_double() - state->m_time_pushed.as_double() + 0.2);
+	return (machine().time().as_double() - m_time_released.as_double()) * (m_time_released.as_double() - m_time_pushed.as_double() + 0.2);
 }
 
 
@@ -163,7 +163,7 @@ READ8_MEMBER(mgolf_state::mgolf_dial_r)
 
 READ8_MEMBER(mgolf_state::mgolf_misc_r)
 {
-	double plunger = calc_plunger_pos(machine()); /* see Video Pinball */
+	double plunger = calc_plunger_pos(); /* see Video Pinball */
 
 	UINT8 val = ioport("61")->read();
 

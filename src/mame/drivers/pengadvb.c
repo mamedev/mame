@@ -47,13 +47,14 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	void pengadvb_postload();
+	void mem_map_banks();
+	void pengadvb_decrypt(const char* region);
 };
 
 
 
-static void mem_map_banks(running_machine &machine)
+void pengadvb_state::mem_map_banks()
 {
-	pengadvb_state *state = machine.driver_data<pengadvb_state>();
 	/*  memorymap: (rest is assumed unmapped)
 	    slot 0
 	        0000-7fff   BIOS ROM
@@ -64,70 +65,70 @@ static void mem_map_banks(running_machine &machine)
 	*/
 
 	// page 0 (0000-3fff)
-	switch(state->m_mem_map & 3)
+	switch(m_mem_map & 3)
 	{
 		case 0:
 			// BIOS
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1" );
-			state->membank("bank1")->set_base(state->memregion("maincpu")->base());
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1" );
+			membank("bank1")->set_base(memregion("maincpu")->base());
 			break;
 
 		default:
-			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x0000, 0x3fff);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x0000, 0x3fff);
 			break;
 	}
 
 	// page 1 (4000-7fff)
-	switch(state->m_mem_map >> 2 & 3)
+	switch(m_mem_map >> 2 & 3)
 	{
 		case 0:
 			// BIOS
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x5fff, "bank21" );
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x6000, 0x7fff, "bank22" );
-			state->membank("bank21")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000);
-			state->membank("bank22")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000 + 0x2000);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x5fff, "bank21" );
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x6000, 0x7fff, "bank22" );
+			membank("bank21")->set_base(machine().root_device().memregion("maincpu")->base() + 0x4000);
+			membank("bank22")->set_base(machine().root_device().memregion("maincpu")->base() + 0x4000 + 0x2000);
 			break;
 
 		case 1:
 			// game
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x5fff, "bank21" );
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x6000, 0x7fff, "bank22" );
-			state->membank("bank21")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[0]*0x2000);
-			state->membank("bank22")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[1]*0x2000);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x4000, 0x5fff, "bank21" );
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x6000, 0x7fff, "bank22" );
+			membank("bank21")->set_base(machine().root_device().memregion("game")->base() + m_mem_banks[0]*0x2000);
+			membank("bank22")->set_base(machine().root_device().memregion("game")->base() + m_mem_banks[1]*0x2000);
 			break;
 
 		default:
-			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x4000, 0x7fff);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x4000, 0x7fff);
 			break;
 	}
 
 	// page 2 (8000-bfff)
-	switch(state->m_mem_map >> 4 & 3)
+	switch(m_mem_map >> 4 & 3)
 	{
 		case 1:
 			// game
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x8000, 0x9fff, "bank31" );
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xa000, 0xbfff, "bank32" );
-			state->membank("bank31")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[2]*0x2000);
-			state->membank("bank32")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[3]*0x2000);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0x8000, 0x9fff, "bank31" );
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xa000, 0xbfff, "bank32" );
+			membank("bank31")->set_base(machine().root_device().memregion("game")->base() + m_mem_banks[2]*0x2000);
+			membank("bank32")->set_base(machine().root_device().memregion("game")->base() + m_mem_banks[3]*0x2000);
 			break;
 
 		default:
-			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x8000, 0xbfff);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0x8000, 0xbfff);
 			break;
 	}
 
 	// page 3 (c000-ffff)
-	switch(state->m_mem_map >> 6 & 3)
+	switch(m_mem_map >> 6 & 3)
 	{
 		case 3:
 			// RAM
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xc000, 0xffff, "bank4" );
-			state->membank("bank4")->set_base(state->m_main_mem);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(0xc000, 0xffff, "bank4" );
+			membank("bank4")->set_base(m_main_mem);
 			break;
 
 		default:
-			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0xc000, 0xffff);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_read(0xc000, 0xffff);
 			break;
 	}
 }
@@ -144,7 +145,7 @@ WRITE8_MEMBER(pengadvb_state::mem_w)
 	{
 		// ROM bankswitch
 		m_mem_banks[(offset - 0x4000) >> 13] = data & 0xf;
-		mem_map_banks(machine());
+		mem_map_banks();
 	}
 }
 
@@ -210,7 +211,7 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_a_w)
 	if (data != m_mem_map)
 	{
 		m_mem_map = data;
-		mem_map_banks(machine());
+		mem_map_banks();
 	}
 }
 
@@ -247,7 +248,7 @@ static TMS9928A_INTERFACE(pengadvb_tms9928a_interface)
 
 void pengadvb_state::pengadvb_postload()
 {
-	mem_map_banks(machine());
+	mem_map_banks();
 }
 
 void pengadvb_state::machine_start()
@@ -262,7 +263,7 @@ void pengadvb_state::machine_reset()
 {
 	m_mem_map = 0;
 	m_mem_banks[0] = m_mem_banks[1] = m_mem_banks[2] = m_mem_banks[3] = 0;
-	mem_map_banks(machine());
+	mem_map_banks();
 }
 
 
@@ -287,10 +288,10 @@ static MACHINE_CONFIG_START( pengadvb, pengadvb_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static void pengadvb_decrypt(running_machine &machine, const char* region)
+void pengadvb_state::pengadvb_decrypt(const char* region)
 {
-	UINT8 *mem = machine.root_device().memregion(region)->base();
-	int memsize = machine.root_device().memregion(region)->bytes();
+	UINT8 *mem = machine().root_device().memregion(region)->base();
+	int memsize = machine().root_device().memregion(region)->bytes();
 	UINT8 *buf;
 	int i;
 
@@ -301,19 +302,19 @@ static void pengadvb_decrypt(running_machine &machine, const char* region)
 	}
 
 	// address line swap
-	buf = auto_alloc_array(machine, UINT8, memsize);
+	buf = auto_alloc_array(machine(), UINT8, memsize);
 	memcpy(buf, mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{
 		mem[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,14,13,5,11,10,9,8,7,6,12,4,3,2,1,0)];
 	}
-	auto_free(machine, buf);
+	auto_free(machine(), buf);
 }
 
 DRIVER_INIT_MEMBER(pengadvb_state,pengadvb)
 {
-	pengadvb_decrypt(machine(), "maincpu");
-	pengadvb_decrypt(machine(), "game");
+	pengadvb_decrypt("maincpu");
+	pengadvb_decrypt("game");
 
 	m_main_mem = auto_alloc_array(machine(), UINT8, 0x4000);
 }

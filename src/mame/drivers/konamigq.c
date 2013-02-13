@@ -84,6 +84,8 @@ public:
 	DECLARE_DRIVER_INIT(konamigq);
 	DECLARE_MACHINE_START(konamigq);
 	DECLARE_MACHINE_RESET(konamigq);
+	void scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 };
 
 /* Sound */
@@ -250,23 +252,23 @@ static const k054539_interface k054539_config =
 
 /* SCSI */
 
-static void scsi_dma_read( konamigq_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void konamigq_state::scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
-	UINT8 *sector_buffer = state->m_sector_buffer;
+	UINT8 *sector_buffer = m_sector_buffer;
 	int i;
 	int n_this;
 
 	while( n_size > 0 )
 	{
-		if( n_size > sizeof( state->m_sector_buffer ) / 4 )
+		if( n_size > sizeof( m_sector_buffer ) / 4 )
 		{
-			n_this = sizeof( state->m_sector_buffer ) / 4;
+			n_this = sizeof( m_sector_buffer ) / 4;
 		}
 		else
 		{
 			n_this = n_size;
 		}
-		state->m_am53cf96->dma_read_data( n_this * 4, sector_buffer );
+		m_am53cf96->dma_read_data( n_this * 4, sector_buffer );
 		n_size -= n_this;
 
 		i = 0;
@@ -284,7 +286,7 @@ static void scsi_dma_read( konamigq_state *state, UINT32 *p_n_psxram, UINT32 n_a
 	}
 }
 
-static void scsi_dma_write( konamigq_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void konamigq_state::scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
 }
 
@@ -310,8 +312,8 @@ static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( konamigq_map )
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( scsi_dma_read ), (konamigq_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( scsi_dma_write ), (konamigq_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( konamigq_state::scsi_dma_read ), (konamigq_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( konamigq_state::scsi_dma_write ), (konamigq_state *) owner ) )
 
 	MCFG_CPU_ADD( "soundcpu", M68000, 8000000 )
 	MCFG_CPU_PROGRAM_MAP( konamigq_sound_map)

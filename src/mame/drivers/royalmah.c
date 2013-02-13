@@ -200,6 +200,8 @@ public:
 	INTERRUPT_GEN_MEMBER(suzume_irq);
 	INTERRUPT_GEN_MEMBER(mjtensin_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(janptr96_interrupt);
+	void mjtensin_update_rombank();
+	void cafetime_update_rombank();
 };
 
 
@@ -1056,20 +1058,19 @@ READ8_MEMBER(royalmah_state::mjtensin_p3_r)
 	return 0xff;
 }
 
-static void mjtensin_update_rombank(running_machine &machine)
+void royalmah_state::mjtensin_update_rombank()
 {
-	royalmah_state *state = machine.driver_data<royalmah_state>();
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x10000 + state->m_rombank * 0x8000 );
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x8000 );
 }
 WRITE8_MEMBER(royalmah_state::mjtensin_p4_w)
 {
 	m_rombank = (m_rombank & 0xf0) | (data & 0x0f);
-	mjtensin_update_rombank(machine());
+	mjtensin_update_rombank();
 }
 WRITE8_MEMBER(royalmah_state::mjtensin_6ff3_w)
 {
 	m_rombank = (data << 4) | (m_rombank & 0x0f);
-	mjtensin_update_rombank(machine());
+	mjtensin_update_rombank();
 }
 
 static ADDRESS_MAP_START( mjtensin_map, AS_PROGRAM, 8, royalmah_state )
@@ -1098,20 +1099,19 @@ ADDRESS_MAP_END
                                 Mahjong Cafe Time
 ****************************************************************************/
 
-static void cafetime_update_rombank(running_machine &machine)
+void royalmah_state::cafetime_update_rombank()
 {
-	royalmah_state *state = machine.driver_data<royalmah_state>();
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x10000 + state->m_rombank * 0x8000 );
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0x10000 + m_rombank * 0x8000 );
 }
 WRITE8_MEMBER(royalmah_state::cafetime_p4_w)
 {
 	m_rombank = (m_rombank & 0xf0) | (data & 0x0f);
-	cafetime_update_rombank(machine());
+	cafetime_update_rombank();
 }
 WRITE8_MEMBER(royalmah_state::cafetime_p3_w)
 {
 	m_rombank = (m_rombank & 0x0f) | ((data & 0x0c) << 2);
-	cafetime_update_rombank(machine());
+	cafetime_update_rombank();
 }
 
 WRITE8_MEMBER(royalmah_state::cafetime_dsw_w)

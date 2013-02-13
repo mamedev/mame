@@ -60,6 +60,7 @@ public:
 	DECLARE_DRIVER_INIT(a600xl);
 	DECLARE_MACHINE_RESET(supervisor_board);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
+	int atari_input_disabled();
 };
 
 
@@ -263,10 +264,9 @@ INPUT_CHANGED_MEMBER(maxaflex_state::coin_inserted)
 		machine().device("mcu")->execute().set_input_line(M6805_IRQ_LINE, HOLD_LINE );
 }
 
-int atari_input_disabled(running_machine &machine)
+int maxaflex_state::atari_input_disabled()
 {
-	maxaflex_state *state = machine.driver_data<maxaflex_state>();
-	return (state->m_portB_out & 0x80) == 0x00;
+	return (m_portB_out & 0x80) == 0x00;
 }
 
 
@@ -373,12 +373,12 @@ static const pokey_interface pokey_config = {
 
 READ8_MEMBER(maxaflex_state::maxaflex_atari_pia_pa_r)
 {
-	return atari_input_disabled(machine()) ? 0xFF : machine().root_device().ioport("djoy_0_1")->read_safe(0);
+	return atari_input_disabled() ? 0xFF : machine().root_device().ioport("djoy_0_1")->read_safe(0);
 }
 
 READ8_MEMBER(maxaflex_state::maxaflex_atari_pia_pb_r)
 {
-	return atari_input_disabled(machine()) ? 0xFF : machine().root_device().ioport("djoy_2_3")->read_safe(0);
+	return atari_input_disabled() ? 0xFF : machine().root_device().ioport("djoy_2_3")->read_safe(0);
 }
 
 

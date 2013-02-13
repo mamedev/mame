@@ -148,11 +148,12 @@ public:
 	virtual void machine_start();
 	UINT32 screen_update_rblaster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank );
 };
 
-static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank )
+void deco_ld_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT8 *spriteram, UINT16 tile_bank )
 {
-	gfx_element *gfx = machine.gfx[1];
+	gfx_element *gfx = machine().gfx[1];
 	int i,spr_offs,x,y,col,fx,fy;
 
 	/*
@@ -202,8 +203,8 @@ UINT32 deco_ld_state::screen_update_rblaster(screen_device &screen, bitmap_rgb32
 
 	bitmap.fill(0, cliprect);
 
-	draw_sprites(machine(), bitmap,cliprect,m_vram1,0x000);
-	draw_sprites(machine(), bitmap,cliprect,m_vram0,0x100);
+	draw_sprites(bitmap,cliprect,m_vram1,0x000);
+	draw_sprites(bitmap,cliprect,m_vram0,0x100);
 
 	for (y=0;y<32;y++)
 	{

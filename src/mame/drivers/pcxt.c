@@ -126,6 +126,9 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	UINT8 pcxt_speaker_get_spk();
+	void pcxt_speaker_set_spkrdata(UINT8 data);
+	void pcxt_speaker_set_input(UINT8 data);
 };
 
 UINT32 pcxt_state::screen_update_tetriskr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -235,32 +238,29 @@ Pit8253
 *********************************/
 
 // pc_speaker_get_spk, pc_speaker_set_spkrdata, and pc_speaker_set_input already exists in MESS, can the implementations be merged?
-UINT8 pcxt_speaker_get_spk(running_machine &machine)
+UINT8 pcxt_state::pcxt_speaker_get_spk()
 {
-	pcxt_state *state = machine.driver_data<pcxt_state>();
-	return state->m_pc_spkrdata & state->m_pc_input;
+	return m_pc_spkrdata & m_pc_input;
 }
 
-void pcxt_speaker_set_spkrdata(running_machine &machine, UINT8 data)
+void pcxt_state::pcxt_speaker_set_spkrdata(UINT8 data)
 {
-	device_t *speaker = machine.device("speaker");
-	pcxt_state *state = machine.driver_data<pcxt_state>();
-	state->m_pc_spkrdata = data ? 1 : 0;
-	speaker_level_w( speaker, pcxt_speaker_get_spk(machine) );
+	device_t *speaker = machine().device("speaker");
+	m_pc_spkrdata = data ? 1 : 0;
+	speaker_level_w( speaker, pcxt_speaker_get_spk() );
 }
 
-void pcxt_speaker_set_input(running_machine &machine, UINT8 data)
+void pcxt_state::pcxt_speaker_set_input(UINT8 data)
 {
-	device_t *speaker = machine.device("speaker");
-	pcxt_state *state = machine.driver_data<pcxt_state>();
-	state->m_pc_input = data ? 1 : 0;
-	speaker_level_w( speaker, pcxt_speaker_get_spk(machine) );
+	device_t *speaker = machine().device("speaker");
+	m_pc_input = data ? 1 : 0;
+	speaker_level_w( speaker, pcxt_speaker_get_spk() );
 }
 
 
 WRITE_LINE_MEMBER(pcxt_state::ibm5150_pit8253_out2_changed)
 {
-	pcxt_speaker_set_input( machine(), state );
+	pcxt_speaker_set_input( state );
 }
 
 
@@ -330,7 +330,7 @@ WRITE8_MEMBER(pcxt_state::port_b_w)
 {
 	/* PPI controller port B*/
 	pit8253_gate2_w(m_pit8253, BIT(data, 0));
-	pcxt_speaker_set_spkrdata( machine(), data & 0x02 );
+	pcxt_speaker_set_spkrdata( data & 0x02 );
 	m_port_b_data = data;
 // device_t *beep = machine().device("beep");
 // device_t *cvsd = machine().device("cvsd");

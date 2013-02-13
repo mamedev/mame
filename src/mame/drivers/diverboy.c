@@ -71,6 +71,7 @@ public:
 	virtual void machine_start();
 	virtual void video_start();
 	UINT32 screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 
@@ -78,11 +79,10 @@ void diverboy_state::video_start()
 {
 }
 
-static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void diverboy_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	diverboy_state *state = machine.driver_data<diverboy_state>();
-	UINT16 *source = state->m_spriteram;
-	UINT16 *finish = source + (state->m_spriteram.bytes() / 2);
+	UINT16 *source = m_spriteram;
+	UINT16 *finish = source + (m_spriteram.bytes() / 2);
 
 	while (source < finish)
 	{
@@ -100,9 +100,9 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 
 		bank = (source[1] & 0x0002) >> 1;
 
-		if (!flash || (machine.primary_screen->frame_number() & 1))
+		if (!flash || (machine().primary_screen->frame_number() & 1))
 		{
-			drawgfx_transpen(bitmap,cliprect,machine.gfx[bank],
+			drawgfx_transpen(bitmap,cliprect,machine().gfx[bank],
 					number,
 					colr,
 					0,0,
@@ -117,7 +117,7 @@ static void draw_sprites( running_machine& machine, bitmap_ind16 &bitmap, const 
 UINT32 diverboy_state::screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  bitmap.fill(get_black_pen(machine()), cliprect);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 

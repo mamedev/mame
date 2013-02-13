@@ -112,6 +112,7 @@ public:
 	UINT32 screen_update_sandscrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sandscrp(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(sandscrp_interrupt);
+	void update_irq_state();
 };
 
 
@@ -149,13 +150,12 @@ void sandscrp_state::machine_reset()
 
 
 /* Update the IRQ state based on all possible causes */
-static void update_irq_state(running_machine &machine)
+void sandscrp_state::update_irq_state()
 {
-	sandscrp_state *state = machine.driver_data<sandscrp_state>();
-	if (state->m_vblank_irq || state->m_sprite_irq || state->m_unknown_irq)
-		machine.device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
+	if (m_vblank_irq || m_sprite_irq || m_unknown_irq)
+		machine().device("maincpu")->execute().set_input_line(1, ASSERT_LINE);
 	else
-		machine.device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(1, CLEAR_LINE);
 }
 
 
@@ -164,7 +164,7 @@ static void update_irq_state(running_machine &machine)
 INTERRUPT_GEN_MEMBER(sandscrp_state::sandscrp_interrupt)
 {
 	m_vblank_irq = 1;
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 
@@ -175,7 +175,7 @@ void sandscrp_state::screen_eof_sandscrp(screen_device &screen, bool state)
 	{
 		device_t *pandora = machine().device("pandora");
 		m_sprite_irq = 1;
-		update_irq_state(machine());
+		update_irq_state();
 		pandora_eof(pandora);
 	}
 }
@@ -202,7 +202,7 @@ WRITE16_MEMBER(sandscrp_state::sandscrp_irq_cause_w)
 		if (data & 0x20)    m_vblank_irq  = 0;
 	}
 
-	update_irq_state(machine());
+	update_irq_state();
 }
 
 

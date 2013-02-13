@@ -298,6 +298,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vid_o2_callback);
 	DECLARE_WRITE8_MEMBER(vid_o3_callback);
 	DECLARE_READ8_MEMBER(pia_ic5_porta_track_r);
+	void mpu4vid_char_cheat( int address);
 };
 
 
@@ -2018,41 +2019,40 @@ DRIVER_INIT_MEMBER(mpu4vid_state,prizeinv)
 	m_current_chr_table = prizeinv_data;
 }
 
-void mpu4vid_char_cheat(running_machine& machine, int address)
+void mpu4vid_state::mpu4vid_char_cheat( int address)
 {
-	mpu4_state *state = machine.driver_data<mpu4_state>();
-	UINT8* cheattable = state->memregion( "video" )->base()+address;
-	state->m_current_chr_table = blank_data;
+	UINT8* cheattable = memregion( "video" )->base()+address;
+	m_current_chr_table = blank_data;
 	for (int i=0;i<72;i++)
 	{
-		state->m_current_chr_table[i].response = cheattable++[0];
-		state->m_current_chr_table[i].call = cheattable++[0];
+		m_current_chr_table[i].response = cheattable++[0];
+		m_current_chr_table[i].call = cheattable++[0];
 	}
 }
 
 DRIVER_INIT_MEMBER(mpu4vid_state,v4barqst)
 {
-	mpu4vid_char_cheat(machine(),0x154);
+	mpu4vid_char_cheat(0x154);
 }
 
 DRIVER_INIT_MEMBER(mpu4vid_state,v4barqst2)
 {
-	mpu4vid_char_cheat(machine(),0x15c);
+	mpu4vid_char_cheat(0x15c);
 }
 
 DRIVER_INIT_MEMBER(mpu4vid_state,v4wize)
 {
-	mpu4vid_char_cheat(machine(),0x16c);
+	mpu4vid_char_cheat(0x16c);
 }
 
 DRIVER_INIT_MEMBER(mpu4vid_state,v4cmazeb)
 {
-	mpu4vid_char_cheat(machine(),0x4c6);
+	mpu4vid_char_cheat(0x4c6);
 }
 
 DRIVER_INIT_MEMBER(mpu4vid_state,v4opt3)
 {
-	mpu4vid_char_cheat(machine(),0x164);
+	mpu4vid_char_cheat(0x164);
 }
 
 

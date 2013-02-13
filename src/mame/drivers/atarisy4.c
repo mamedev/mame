@@ -60,6 +60,12 @@ public:
 	DECLARE_MACHINE_RESET(airrace);
 	UINT32 screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
+	void image_mem_to_screen( bool clip);
+	void draw_polygon(UINT16 color);
+	void execute_gpu_command();
+	inline UINT8 hex_to_ascii(UINT8 in);
+	void load_ldafile(address_space &space, const UINT8 *file);
+	void load_hexfile(address_space &space, const UINT8 *file);
 };
 
 
@@ -207,7 +213,7 @@ INLINE UINT32 xy_to_screen_addr(UINT32 x, UINT32 y)
 	return (y * 4096) + offset + x;
 }
 
-static void image_mem_to_screen(atarisy4_state *state, bool clip)
+void atarisy4_state::image_mem_to_screen(bool clip)
 {
 	INT16 y = gpu.gr[1] - 0x200;
 	UINT16 h = gpu.gr[3];
@@ -230,14 +236,14 @@ static void image_mem_to_screen(atarisy4_state *state, bool clip)
 			{
 				if (x >= 0 && x <= 511)
 				{
-					UINT16 pix = state->m_screen_ram[xy_to_screen_addr(x,y) >> 1];
+					UINT16 pix = m_screen_ram[xy_to_screen_addr(x,y) >> 1];
 
 					if (x & 1)
 						pix = (pix & (0x00ff)) | gpu.idr << 8;
 					else
 						pix = (pix & (0xff00)) | gpu.idr;
 
-					state->m_screen_ram[xy_to_screen_addr(x,y) >> 1] = pix;
+					m_screen_ram[xy_to_screen_addr(x,y) >> 1] = pix;
 				}
 				++x;
 			}
@@ -266,17 +272,17 @@ static void draw_scanline(void *dest, INT32 scanline, const poly_extent *extent,
 	}
 }
 
-static void draw_polygon(atarisy4_state *state, UINT16 color)
+void atarisy4_state::draw_polygon(UINT16 color)
 {
 	int i;
 	rectangle clip;
 	poly_vertex v1, v2, v3;
-	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(state->m_poly);
+	poly_extra_data *extra = (poly_extra_data *)poly_get_extra_data(m_poly);
 
 	clip.set(0, 511, 0, 511);
 
 	extra->color = color;
-	extra->screen_ram = state->m_screen_ram;
+	extra->screen_ram = m_screen_ram;
 
 	v1.x = gpu.points[0].x;
 	v1.y = gpu.points[0].y;
@@ -290,7 +296,7 @@ static void draw_polygon(atarisy4_state *state, UINT16 color)
 		v3.x = gpu.points[i].x;
 		v3.y = gpu.points[i].y;
 
-		poly_render_triangle(state->m_poly, 0, clip, draw_scanline, 1, &v1, &v2, &v3);
+		poly_render_triangle(m_poly, 0, clip, draw_scanline, 1, &v1, &v2, &v3);
 		v2 = v3;
 	}
 }
@@ -323,9 +329,8 @@ static void draw_polygon(atarisy4_state *state, UINT16 color)
     PFVR    0x2B    Polygon vector relative
     PFC     0x2C    Polygon close
 */
-void execute_gpu_command(running_machine &machine)
+void atarisy4_state::execute_gpu_command()
 {
-	atarisy4_state *state = machine.driver_data<atarisy4_state>();
 	switch (gpu.ecr)
 	{
 		case 0x04:
@@ -378,18 +383,18 @@ void execute_gpu_command(running_machine &machine)
 
 			for (i = 0; i < gpu.gr[3]; ++i)
 			{
-				UINT16 val = state->m_screen_ram[offset >> 1];
+				UINT16 val = m_screen_ram[offset >> 1];
 				val >>= (~offset & 1) << 3;
 
 				if (gpu.gr[4] & 0x10)
-					state->m_r_color_table[table_offs] = val;
+					m_r_color_table[table_offs] = val;
 				if (gpu.gr[4] & 0x20)
-					state->m_g_color_table[table_offs] = val;
+					m_g_color_table[table_offs] = val;
 				if (gpu.gr[4] & 0x40)
-					state->m_b_color_table[table_offs] = val;
+					m_b_color_table[table_offs] = val;
 
 				/* Update */
-				palette_set_color(machine, table_offs, MAKE_RGB(state->m_r_color_table[table_offs], state->m_g_color_table[table_offs], state->m_b_color_table[table_offs]));
+				palette_set_color(machine(), table_offs, MAKE_RGB(m_r_color_table[table_offs], m_g_color_table[table_offs], m_b_color_table[table_offs]));
 
 				++table_offs;
 				++offset;
@@ -399,12 +404,12 @@ void execute_gpu_command(running_machine &machine)
 		}
 		case 0x20:
 		{
-			image_mem_to_screen(state, false);
+			image_mem_to_screen(false);
 			break;
 		}
 		case 0x21:
 		{
-			image_mem_to_screen(state, true);
+			image_mem_to_screen(true);
 			break;
 		}
 		case 0x28:
@@ -439,8 +444,8 @@ void execute_gpu_command(running_machine &machine)
 		}
 		case 0x2c:
 		{
-			draw_polygon(state, gpu.gr[2]);
-			poly_wait(state->m_poly, "Normal");
+			draw_polygon(gpu.gr[2]);
+			poly_wait(m_poly, "Normal");
 			break;
 		}
 		default:
@@ -476,7 +481,7 @@ WRITE16_MEMBER(atarisy4_state::gpu_w)
 		case 0x17:
 		{
 			gpu.ecr = data;
-			execute_gpu_command(machine());
+			execute_gpu_command();
 			break;
 		}
 		case 0x1a:  gpu.far = data;     break;
@@ -795,7 +800,7 @@ ROM_END
  *
  *************************************/
 
-INLINE UINT8 hex_to_ascii(UINT8 in)
+UINT8 atarisy4_state::hex_to_ascii(UINT8 in)
 {
 	if (in < 0x3a)
 		return in - 0x30;
@@ -805,7 +810,7 @@ INLINE UINT8 hex_to_ascii(UINT8 in)
 		return in;
 }
 
-void load_ldafile(address_space &space, const UINT8 *file)
+void atarisy4_state::load_ldafile(address_space &space, const UINT8 *file)
 {
 #define READ_CHAR()     file[i++]
 	int i = 0;
@@ -859,7 +864,7 @@ void load_ldafile(address_space &space, const UINT8 *file)
 }
 
 /* Load memory space with data from a Tektronix-Extended HEX file */
-void load_hexfile(address_space &space, const UINT8 *file)
+void atarisy4_state::load_hexfile(address_space &space, const UINT8 *file)
 {
 #define READ_HEX_CHAR()     hex_to_ascii(file[i++])
 

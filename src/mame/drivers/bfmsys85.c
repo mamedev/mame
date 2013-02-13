@@ -113,6 +113,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(timer_irq);
+	int b85_find_project_string( );
 };
 
 #define MASTER_CLOCK    (XTAL_4MHz)
@@ -676,12 +677,12 @@ ROM_START( b85cb7p )
 ROM_END
 
 
-int b85_find_project_string(running_machine &machine )
+int bfmsys85_state::b85_find_project_string( )
 {
 	// search for the project string to find the title (usually just at ff00)
 	char title_string[7][32] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT ", "CASH ON THE NILE 2", "PR6121", "CHINA TOWN\x0d\x0a", "PROJECTNUMBER" };
-	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
-	int size = machine.root_device().memregion( "maincpu" )->bytes();
+	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
+	int size = machine().root_device().memregion( "maincpu" )->bytes();
 
 	for (int search=0;search<7;search++)
 	{
@@ -754,12 +755,12 @@ int b85_find_project_string(running_machine &machine )
 DRIVER_INIT_MEMBER(bfmsys85_state,decode)
 {
 	bfm_decode_mainrom(machine(),"maincpu", m_codec_data);
-	b85_find_project_string(machine());
+	b85_find_project_string();
 }
 
 DRIVER_INIT_MEMBER(bfmsys85_state,nodecode)
 {
-	b85_find_project_string(machine());
+	b85_find_project_string();
 }
 
 // PROJECT NUMBER 5539  2P CASH EXPLOSION  GAME No 39-350-190 -   29-MAR-1989 11:45:25

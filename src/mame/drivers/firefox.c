@@ -100,6 +100,8 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(video_timer_callback);
+	void set_rgba( int start, int index, unsigned char *palette_ram );
+	void firq_gen(phillips_22vp931_device &laserdisc, int state);
 };
 
 
@@ -258,26 +260,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(firefox_state::video_timer_callback)
 	machine().device("maincpu")->execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE );
 }
 
-static void set_rgba( running_machine &machine, int start, int index, unsigned char *palette_ram )
+void firefox_state::set_rgba( int start, int index, unsigned char *palette_ram )
 {
 	int r = palette_ram[ index ];
 	int g = palette_ram[ index + 256 ];
 	int b = palette_ram[ index + 512 ];
 	int a = ( b & 3 ) * 0x55;
 
-	palette_set_color( machine, start + index, MAKE_ARGB( a, r, g, b ) );
+	palette_set_color( machine(), start + index, MAKE_ARGB( a, r, g, b ) );
 }
 
 WRITE8_MEMBER(firefox_state::tile_palette_w)
 {
 	m_tile_palette[ offset ] = data;
-	set_rgba( machine(), 0, offset & 0xff, m_tile_palette );
+	set_rgba( 0, offset & 0xff, m_tile_palette );
 }
 
 WRITE8_MEMBER(firefox_state::sprite_palette_w)
 {
 	m_sprite_palette[ offset ] = data;
-	set_rgba( machine(), 256, offset & 0xff, m_sprite_palette );
+	set_rgba( 256, offset & 0xff, m_sprite_palette );
 }
 
 WRITE8_MEMBER(firefox_state::firefox_objram_bank_w)
@@ -476,10 +478,10 @@ WRITE8_MEMBER(firefox_state::firefox_coin_counter_w)
 
 
 
-static void firq_gen(running_machine &machine, phillips_22vp931_device &laserdisc, int state)
+void firefox_state::firq_gen(phillips_22vp931_device &laserdisc, int state)
 {
 	if (state)
-		machine.device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
+		machine().device("maincpu")->execute().set_input_line(M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 
@@ -489,7 +491,7 @@ void firefox_state::machine_start()
 	m_nvram_1c = machine().device<x2212_device>("nvram_1c");
 	m_nvram_1d = machine().device<x2212_device>("nvram_1d");
 
-	m_laserdisc->set_data_ready_callback(phillips_22vp931_device::data_ready_delegate(FUNC(firq_gen), &machine()));
+	m_laserdisc->set_data_ready_callback(phillips_22vp931_device::data_ready_delegate(FUNC(firefox_state::firq_gen), this));
 
 	m_control_num = 0;
 	m_sprite_bank = 0;

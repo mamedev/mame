@@ -69,6 +69,7 @@ public:
 	UINT32 screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
+	void update_nmi_state();
 };
 
 
@@ -201,20 +202,19 @@ READ8_MEMBER(sbrkout_state::switches_r)
 }
 
 
-static void update_nmi_state(running_machine &machine)
+void sbrkout_state::update_nmi_state()
 {
-	sbrkout_state *state = machine.driver_data<sbrkout_state>();
-	if ((state->m_pot_trigger[0] & ~state->m_pot_mask[0]) | (state->m_pot_trigger[1] & ~state->m_pot_mask[1]))
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if ((m_pot_trigger[0] & ~m_pot_mask[0]) | (m_pot_trigger[1] & ~m_pot_mask[1]))
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 TIMER_CALLBACK_MEMBER(sbrkout_state::pot_trigger_callback)
 {
 	m_pot_trigger[param] = 1;
-	update_nmi_state(machine());
+	update_nmi_state();
 }
 
 
@@ -222,7 +222,7 @@ WRITE8_MEMBER(sbrkout_state::pot_mask1_w)
 {
 	m_pot_mask[0] = ~offset & 1;
 	m_pot_trigger[0] = 0;
-	update_nmi_state(machine());
+	update_nmi_state();
 }
 
 
@@ -230,7 +230,7 @@ WRITE8_MEMBER(sbrkout_state::pot_mask2_w)
 {
 	m_pot_mask[1] = ~offset & 1;
 	m_pot_trigger[1] = 0;
-	update_nmi_state(machine());
+	update_nmi_state();
 }
 
 

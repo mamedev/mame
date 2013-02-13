@@ -97,23 +97,24 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_popobear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(popobear_irq);
+	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8 layer_n);
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };
 
 void popobear_state::video_start()
 {
 }
 
-static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8 layer_n)
+void popobear_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect, UINT8 layer_n)
 {
-	popobear_state *state = machine.driver_data<popobear_state>();
 	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-	UINT8* vram = reinterpret_cast<UINT8 *>(state->m_vram.target());
-	UINT16* vreg = (UINT16 *)state->m_vregs;
+	UINT8* vram = reinterpret_cast<UINT8 *>(m_vram.target());
+	UINT16* vreg = (UINT16 *)m_vregs;
 	int count;
 	const UINT8 vreg_base[] = { 0x10/2, 0x14/2 };
 	int xscroll,yscroll;
 
-//  count = (state->m_vregs[vreg_base[layer_n]]<<5);
+//  count = (m_vregs[vreg_base[layer_n]]<<5);
 //  count &= 0xfc000;
 	count = (0xf0000+layer_n*0x4000);
 	if(layer_n & 2)
@@ -154,21 +155,21 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 					color = (vram[((xi+yi*1024)+xtile+ytile) & 0xfffff] & 0xff);
 
 					if(cliprect.contains(xoffs+1, yoffs) && color)
-						bitmap.pix16(yoffs, xoffs+1) = machine.pens[color];
+						bitmap.pix16(yoffs, xoffs+1) = machine().pens[color];
 
 					if(cliprect.contains(xoffs+1, yoffs+512) && color)
-						bitmap.pix16(yoffs+512, xoffs+1) = machine.pens[color];
+						bitmap.pix16(yoffs+512, xoffs+1) = machine().pens[color];
 
 					//if(cliprect.contains(xoffs+1, yoffs+256) && color)
-					//  bitmap.pix16(yoffs+512, xoffs+1) = machine.pens[color];
+					//  bitmap.pix16(yoffs+512, xoffs+1) = machine().pens[color];
 
 					color = (vram[((xi+1+yi*1024)+xtile+ytile) & 0xfffff] & 0xff);
 
 					if(cliprect.contains(xoffs, yoffs) && color)
-						bitmap.pix16(yoffs, xoffs) = machine.pens[color];
+						bitmap.pix16(yoffs, xoffs) = machine().pens[color];
 
 					if(cliprect.contains(xoffs, yoffs+512) && color)
-						bitmap.pix16(yoffs+512, xoffs) = machine.pens[color];
+						bitmap.pix16(yoffs+512, xoffs) = machine().pens[color];
 				}
 			}
 
@@ -177,19 +178,18 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	}
 }
 
-static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void popobear_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	popobear_state *state = machine.driver_data<popobear_state>();
 	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
-	UINT8* vram = reinterpret_cast<UINT8 *>(state->m_spr.target());
+	UINT8* vram = reinterpret_cast<UINT8 *>(m_spr.target());
 	int i;
 	#if 0
 	static int bank_test = 1;
 
-	if(machine.input().code_pressed_once(KEYCODE_Z))
+	if(machine().input().code_pressed_once(KEYCODE_Z))
 		bank_test<<=1;
 
-	if(machine.input().code_pressed_once(KEYCODE_X))
+	if(machine().input().code_pressed_once(KEYCODE_X))
 		bank_test>>=1;
 
 	popmessage("%02x",bank_test);
@@ -242,14 +242,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 				y_res = (y_dir) ? y+(height - yi) : y+yi;
 
 				if(cliprect.contains(x_res, y_res) && color)
-					bitmap.pix16(y_res, x_res) = machine.pens[color+0x100+color_bank];
+					bitmap.pix16(y_res, x_res) = machine().pens[color+0x100+color_bank];
 
 				color = (vram[spr_num+1] & 0xff);
 				x_res = (x_dir) ? x+1+(width - xi) : x+0+xi;
 				y_res = (y_dir) ? y+(height - yi) : y+yi;
 
 				if(cliprect.contains(x_res, y_res) && color)
-					bitmap.pix16(y_res, x_res) = machine.pens[color+0x100+color_bank];
+					bitmap.pix16(y_res, x_res) = machine().pens[color+0x100+color_bank];
 
 				spr_num+=2;
 			}
@@ -263,11 +263,11 @@ UINT32 popobear_state::screen_update_popobear(screen_device &screen, bitmap_ind1
 
 	//popmessage("%04x",m_vregs[0/2]);
 
-	draw_layer(machine(),bitmap,cliprect,3);
-	draw_layer(machine(),bitmap,cliprect,2);
-	draw_layer(machine(),bitmap,cliprect,1);
-	draw_layer(machine(),bitmap,cliprect,0);
-	draw_sprites(machine(),bitmap,cliprect);
+	draw_layer(bitmap,cliprect,3);
+	draw_layer(bitmap,cliprect,2);
+	draw_layer(bitmap,cliprect,1);
+	draw_layer(bitmap,cliprect,0);
+	draw_sprites(bitmap,cliprect);
 
 	return 0;
 }

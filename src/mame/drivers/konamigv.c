@@ -170,6 +170,8 @@ public:
 	DECLARE_DRIVER_INIT(konamigv);
 	DECLARE_DRIVER_INIT(btchamp);
 	DECLARE_MACHINE_START(konamigv);
+	void scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 };
 
 /* EEPROM handlers */
@@ -210,17 +212,17 @@ ADDRESS_MAP_END
 
 /* SCSI */
 
-static void scsi_dma_read( konamigv_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void konamigv_state::scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
-	UINT8 *sector_buffer = state->m_sector_buffer;
+	UINT8 *sector_buffer = m_sector_buffer;
 	int i;
 	int n_this;
 
 	while( n_size > 0 )
 	{
-		if( n_size > sizeof( state->m_sector_buffer ) / 4 )
+		if( n_size > sizeof( m_sector_buffer ) / 4 )
 		{
-			n_this = sizeof( state->m_sector_buffer ) / 4;
+			n_this = sizeof( m_sector_buffer ) / 4;
 		}
 		else
 		{
@@ -229,12 +231,12 @@ static void scsi_dma_read( konamigv_state *state, UINT32 *p_n_psxram, UINT32 n_a
 		if( n_this < 2048 / 4 )
 		{
 			/* non-READ commands */
-			state->m_am53cf96->dma_read_data( n_this * 4, sector_buffer );
+			m_am53cf96->dma_read_data( n_this * 4, sector_buffer );
 		}
 		else
 		{
 			/* assume normal 2048 byte data for now */
-			state->m_am53cf96->dma_read_data( 2048, sector_buffer );
+			m_am53cf96->dma_read_data( 2048, sector_buffer );
 			n_this = 2048 / 4;
 		}
 		n_size -= n_this;
@@ -254,17 +256,17 @@ static void scsi_dma_read( konamigv_state *state, UINT32 *p_n_psxram, UINT32 n_a
 	}
 }
 
-static void scsi_dma_write( konamigv_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void konamigv_state::scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
-	UINT8 *sector_buffer = state->m_sector_buffer;
+	UINT8 *sector_buffer = m_sector_buffer;
 	int i;
 	int n_this;
 
 	while( n_size > 0 )
 	{
-		if( n_size > sizeof( state->m_sector_buffer ) / 4 )
+		if( n_size > sizeof( m_sector_buffer ) / 4 )
 		{
-			n_this = sizeof( state->m_sector_buffer ) / 4;
+			n_this = sizeof( m_sector_buffer ) / 4;
 		}
 		else
 		{
@@ -284,7 +286,7 @@ static void scsi_dma_write( konamigv_state *state, UINT32 *p_n_psxram, UINT32 n_
 			n_this--;
 		}
 
-		state->m_am53cf96->dma_write_data( n_this * 4, sector_buffer );
+		m_am53cf96->dma_write_data( n_this * 4, sector_buffer );
 	}
 }
 
@@ -307,8 +309,8 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	MCFG_CPU_ADD( "maincpu", CXD8530BQ, XTAL_67_7376MHz )
 	MCFG_CPU_PROGRAM_MAP( konamigv_map )
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( scsi_dma_read ), (konamigv_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( scsi_dma_write ), (konamigv_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( konamigv_state::scsi_dma_read ), (konamigv_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( konamigv_state::scsi_dma_write ), (konamigv_state *) owner ) )
 
 	MCFG_MACHINE_START_OVERRIDE(konamigv_state, konamigv )
 

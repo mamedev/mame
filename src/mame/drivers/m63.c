@@ -186,6 +186,7 @@ public:
 	UINT32 screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(snd_irq);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 
@@ -313,30 +314,29 @@ VIDEO_START_MEMBER(m63_state,m63)
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void m63_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	m63_state *state = machine.driver_data<m63_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
+	for (offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
-		int code = state->m_spriteram[offs + 1] | ((state->m_spriteram[offs + 2] & 0x10) << 4);
-		int color = (state->m_spriteram[offs + 2] & 0x0f) + (state->m_pal_bank << 4);
-		int flipx = state->m_spriteram[offs + 2] & 0x20;
+		int code = m_spriteram[offs + 1] | ((m_spriteram[offs + 2] & 0x10) << 4);
+		int color = (m_spriteram[offs + 2] & 0x0f) + (m_pal_bank << 4);
+		int flipx = m_spriteram[offs + 2] & 0x20;
 		int flipy = 0;
-		int sx = state->m_spriteram[offs + 3];
-		int sy = state->m_sy_offset - state->m_spriteram[offs];
+		int sx = m_spriteram[offs + 3];
+		int sy = m_sy_offset - m_spriteram[offs];
 
-		if (state->flip_screen())
+		if (flip_screen())
 		{
 			sx = 240 - sx;
-			sy = state->m_sy_offset - sy;
+			sy = m_sy_offset - sy;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
 
 		drawgfx_transpen(bitmap, cliprect,
-			machine.gfx[2],
+			machine().gfx[2],
 			code, color,
 			flipx, flipy,
 			sx, sy, 0);
@@ -345,7 +345,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		if (sx > 0xf0)
 		{
 			drawgfx_transpen(bitmap, cliprect,
-			machine.gfx[2],
+			machine().gfx[2],
 			code, color,
 			flipx, flipy,
 			sx - 0x100, sy, 0);
@@ -362,7 +362,7 @@ UINT32 m63_state::screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap,
 		m_bg_tilemap->set_scrolly(col, m_scrollram[col * 8]);
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	return 0;
 }

@@ -372,6 +372,9 @@ public:
 	UINT32 screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(irq_off);
+	int jvs_encode_data(UINT8 *in, int length);
+	int jvs_decode_data(UINT8 *in, UINT8 *out, int length);
+	void jamma_jvs_cmd_exec();
 };
 
 
@@ -1140,8 +1143,6 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-static void jamma_jvs_cmd_exec(running_machine &machine);
-
 static void jamma_jvs_w(device_t *device, UINT8 data)
 {
 	hornet_state *state = device->machine().driver_data<hornet_state>();
@@ -1151,10 +1152,10 @@ static void jamma_jvs_w(device_t *device, UINT8 data)
 	state->m_jvs_sdata_ptr++;
 
 	if (state->m_jvs_sdata_ptr >= 3 && state->m_jvs_sdata_ptr >= 3 + state->m_jvs_sdata[2])
-		jamma_jvs_cmd_exec(device->machine());
+		state->jamma_jvs_cmd_exec();
 }
 
-static int jvs_encode_data(running_machine &machine, UINT8 *in, int length)
+int hornet_state::jvs_encode_data(UINT8 *in, int length)
 {
 	int inptr = 0;
 	int sum = 0;
@@ -1165,25 +1166,25 @@ static int jvs_encode_data(running_machine &machine, UINT8 *in, int length)
 		if (b == 0xe0)
 		{
 			sum += 0xd0 + 0xdf;
-			ppc4xx_spu_receive_byte(machine.device("maincpu"), 0xd0);
-			ppc4xx_spu_receive_byte(machine.device("maincpu"), 0xdf);
+			ppc4xx_spu_receive_byte(machine().device("maincpu"), 0xd0);
+			ppc4xx_spu_receive_byte(machine().device("maincpu"), 0xdf);
 		}
 		else if (b == 0xd0)
 		{
 			sum += 0xd0 + 0xcf;
-			ppc4xx_spu_receive_byte(machine.device("maincpu"), 0xd0);
-			ppc4xx_spu_receive_byte(machine.device("maincpu"), 0xcf);
+			ppc4xx_spu_receive_byte(machine().device("maincpu"), 0xd0);
+			ppc4xx_spu_receive_byte(machine().device("maincpu"), 0xcf);
 		}
 		else
 		{
 			sum += b;
-			ppc4xx_spu_receive_byte(machine.device("maincpu"), b);
+			ppc4xx_spu_receive_byte(machine().device("maincpu"), b);
 		}
 	}
 	return sum;
 }
 
-static int jvs_decode_data(UINT8 *in, UINT8 *out, int length)
+int hornet_state::jvs_decode_data(UINT8 *in, UINT8 *out, int length)
 {
 	int outptr = 0;
 	int inptr = 0;
@@ -1205,9 +1206,8 @@ static int jvs_decode_data(UINT8 *in, UINT8 *out, int length)
 	return outptr;
 }
 
-static void jamma_jvs_cmd_exec(running_machine &machine)
+void hornet_state::jamma_jvs_cmd_exec()
 {
-	hornet_state *state = machine.driver_data<hornet_state>();
 	UINT8 byte_num;
 	UINT8 data[1024], rdata[1024];
 #if 0
@@ -1216,19 +1216,19 @@ static void jamma_jvs_cmd_exec(running_machine &machine)
 	int rdata_ptr;
 	int sum;
 
-//  sync = state->m_jvs_sdata[0];
-//  node = state->m_jvs_sdata[1];
-	byte_num = state->m_jvs_sdata[2];
+//  sync = m_jvs_sdata[0];
+//  node = m_jvs_sdata[1];
+	byte_num = m_jvs_sdata[2];
 
 #if 0
 	length =
 #endif
-		jvs_decode_data(&state->m_jvs_sdata[3], data, byte_num-1);
+		jvs_decode_data(&m_jvs_sdata[3], data, byte_num-1);
 #if 0
 	printf("jvs input data:\n");
 	for (i=0; i < byte_num; i++)
 	{
-		printf("%02X ", state->m_jvs_sdata[3+i]);
+		printf("%02X ", m_jvs_sdata[3+i]);
 	}
 	printf("\n");
 
@@ -1271,13 +1271,13 @@ static void jamma_jvs_cmd_exec(running_machine &machine)
 
 	// write jvs return data
 	sum = 0x00 + (rdata_ptr+1);
-	ppc4xx_spu_receive_byte(machine.device("maincpu"), 0xe0);           // sync
-	ppc4xx_spu_receive_byte(machine.device("maincpu"), 0x00);           // node
-	ppc4xx_spu_receive_byte(machine.device("maincpu"), rdata_ptr + 1);  // num of bytes
-	sum += jvs_encode_data(machine, rdata, rdata_ptr);
-	ppc4xx_spu_receive_byte(machine.device("maincpu"), sum - 1);        // checksum
+	ppc4xx_spu_receive_byte(machine().device("maincpu"), 0xe0);           // sync
+	ppc4xx_spu_receive_byte(machine().device("maincpu"), 0x00);           // node
+	ppc4xx_spu_receive_byte(machine().device("maincpu"), rdata_ptr + 1);  // num of bytes
+	sum += jvs_encode_data(rdata, rdata_ptr);
+	ppc4xx_spu_receive_byte(machine().device("maincpu"), sum - 1);        // checksum
 
-	state->m_jvs_sdata_ptr = 0;
+	m_jvs_sdata_ptr = 0;
 }
 
 /*****************************************************************************/

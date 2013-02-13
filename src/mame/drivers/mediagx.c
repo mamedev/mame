@@ -200,6 +200,14 @@ public:
 	DECLARE_READ32_MEMBER(speedup11_r);
 	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
+	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void ad1847_reg_write(int reg, UINT8 data);
+	inline UINT32 generic_speedup(address_space &space, int idx);
+	void report_speedups();
+	void install_speedups(const speedup_entry *entries, int count);
+	void init_mediagx();
 };
 
 // Display controller registers
@@ -252,7 +260,7 @@ void mediagx_state::video_start()
 	}
 }
 
-static void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
+void mediagx_state::draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y)
 {
 	int i,j;
 	const UINT8 *dp;
@@ -278,44 +286,43 @@ static void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_eleme
 	}
 }
 
-static void draw_framebuffer(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void mediagx_state::draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i, j;
 	int width, height;
-	int line_delta = (state->m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
+	int line_delta = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
 
-	width = (state->m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
-	if (state->m_disp_ctrl_reg[DC_TIMING_CFG] & 0x8000)     // pixel double
+	width = (m_disp_ctrl_reg[DC_H_TIMING_1] & 0x7ff) + 1;
+	if (m_disp_ctrl_reg[DC_TIMING_CFG] & 0x8000)     // pixel double
 	{
 		width >>= 1;
 	}
 	width += 4;
 
-	height = (state->m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
+	height = (m_disp_ctrl_reg[DC_V_TIMING_1] & 0x7ff) + 1;
 
-	if ( (width != state->m_frame_width || height != state->m_frame_height) &&
+	if ( (width != m_frame_width || height != m_frame_height) &&
 			(width > 1 && height > 1 && width <= 640 && height <= 480) )
 	{
 		rectangle visarea;
 
-		state->m_frame_width = width;
-		state->m_frame_height = height;
+		m_frame_width = width;
+		m_frame_height = height;
 
 		visarea.set(0, width - 1, 0, height - 1);
-		machine.primary_screen->configure(width, height * 262 / 240, visarea, machine.primary_screen->frame_period().attoseconds);
+		machine().primary_screen->configure(width, height * 262 / 240, visarea, machine().primary_screen->frame_period().attoseconds);
 	}
 
-	if (state->m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)        // 8-bit mode
+	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)        // 8-bit mode
 	{
-		UINT8 *framebuf = (UINT8*)&state->m_vram[state->m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
-		UINT8 *pal = state->m_pal;
+		UINT8 *framebuf = (UINT8*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		UINT8 *pal = m_pal;
 
-		for (j=0; j < state->m_frame_height; j++)
+		for (j=0; j < m_frame_height; j++)
 		{
 			UINT32 *p = &bitmap.pix32(j);
 			UINT8 *si = &framebuf[j * line_delta];
-			for (i=0; i < state->m_frame_width; i++)
+			for (i=0; i < m_frame_width; i++)
 			{
 				int c = *si++;
 				int r = pal[(c*3)+0] << 2;
@@ -328,16 +335,16 @@ static void draw_framebuffer(running_machine &machine, bitmap_rgb32 &bitmap, con
 	}
 	else            // 16-bit
 	{
-		UINT16 *framebuf = (UINT16*)&state->m_vram[state->m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
+		UINT16 *framebuf = (UINT16*)&m_vram[m_disp_ctrl_reg[DC_FB_ST_OFFSET]/4];
 
 		// RGB 5-6-5 mode
-		if ((state->m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x2) == 0)
+		if ((m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x2) == 0)
 		{
-			for (j=0; j < state->m_frame_height; j++)
+			for (j=0; j < m_frame_height; j++)
 			{
 				UINT32 *p = &bitmap.pix32(j);
 				UINT16 *si = &framebuf[j * (line_delta/2)];
-				for (i=0; i < state->m_frame_width; i++)
+				for (i=0; i < m_frame_width; i++)
 				{
 					UINT16 c = *si++;
 					int r = ((c >> 11) & 0x1f) << 3;
@@ -351,11 +358,11 @@ static void draw_framebuffer(running_machine &machine, bitmap_rgb32 &bitmap, con
 		// RGB 5-5-5 mode
 		else
 		{
-			for (j=0; j < state->m_frame_height; j++)
+			for (j=0; j < m_frame_height; j++)
 			{
 				UINT32 *p = &bitmap.pix32(j);
 				UINT16 *si = &framebuf[j * (line_delta/2)];
-				for (i=0; i < state->m_frame_width; i++)
+				for (i=0; i < m_frame_width; i++)
 				{
 					UINT16 c = *si++;
 					int r = ((c >> 10) & 0x1f) << 3;
@@ -369,12 +376,11 @@ static void draw_framebuffer(running_machine &machine, bitmap_rgb32 &bitmap, con
 	}
 }
 
-static void draw_cga(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void mediagx_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i, j;
-	gfx_element *gfx = machine.gfx[0];
-	UINT32 *cga = state->m_cga_ram;
+	gfx_element *gfx = machine().gfx[0];
+	UINT32 *cga = m_cga_ram;
 	int index = 0;
 
 	for (j=0; j < 25; j++)
@@ -397,11 +403,11 @@ UINT32 mediagx_state::screen_update_mediagx(screen_device &screen, bitmap_rgb32 
 {
 	bitmap.fill(0, cliprect);
 
-	draw_framebuffer(machine(), bitmap, cliprect);
+	draw_framebuffer( bitmap, cliprect);
 
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)   // don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
-		draw_cga(machine(), bitmap, cliprect);
+		draw_cga(bitmap, cliprect);
 	}
 	return 0;
 }
@@ -749,9 +755,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
 	m_dacr_ptr = 0;
 }
 
-static void ad1847_reg_write(running_machine &machine, int reg, UINT8 data)
+void mediagx_state::ad1847_reg_write(int reg, UINT8 data)
 {
-	mediagx_state *state = machine.driver_data<mediagx_state>();
 	static const int divide_factor[] = { 3072, 1536, 896, 768, 448, 384, 512, 2560 };
 
 	switch (reg)
@@ -760,14 +765,14 @@ static void ad1847_reg_write(running_machine &machine, int reg, UINT8 data)
 		{
 			if (data & 0x1)
 			{
-				state->m_ad1847_sample_rate = 16934400 / divide_factor[(data >> 1) & 0x7];
+				m_ad1847_sample_rate = 16934400 / divide_factor[(data >> 1) & 0x7];
 			}
 			else
 			{
-				state->m_ad1847_sample_rate = 24576000 / divide_factor[(data >> 1) & 0x7];
+				m_ad1847_sample_rate = 24576000 / divide_factor[(data >> 1) & 0x7];
 			}
 
-			dmadac_set_frequency(&state->m_dmadac[0], 2, state->m_ad1847_sample_rate);
+			dmadac_set_frequency(&m_dmadac[0], 2, m_ad1847_sample_rate);
 
 			if (data & 0x20)
 			{
@@ -782,7 +787,7 @@ static void ad1847_reg_write(running_machine &machine, int reg, UINT8 data)
 
 		default:
 		{
-			state->m_ad1847_regs[reg] = data;
+			m_ad1847_regs[reg] = data;
 			break;
 		}
 	}
@@ -818,7 +823,7 @@ WRITE32_MEMBER(mediagx_state::ad1847_w)
 	else if (offset == 3)
 	{
 		int reg = (data >> 8) & 0xf;
-		ad1847_reg_write(machine(), reg, data & 0xff);
+		ad1847_reg_write(reg, data & 0xff);
 	}
 }
 
@@ -1233,29 +1238,25 @@ static void mediagx_set_keyb_int(running_machine &machine, int _state)
 	pic8259_ir1_w(state->m_pic8259_1, _state);
 }
 
-static void init_mediagx(running_machine &machine)
+void mediagx_state::init_mediagx()
 {
-	mediagx_state *state = machine.driver_data<mediagx_state>();
+	m_frame_width = m_frame_height = 1;
 
-	state->m_frame_width = state->m_frame_height = 1;
+	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
 
-	init_pc_common(machine, PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
-
-	kbdc8042_init(machine, &at8042);
+	kbdc8042_init(machine(), &at8042);
 }
 
 #if SPEEDUP_HACKS
 
-INLINE UINT32 generic_speedup(address_space &space, int idx)
+UINT32 mediagx_state::generic_speedup(address_space &space, int idx)
 {
-	mediagx_state *state = space.machine().driver_data<mediagx_state>();
-
-	if (space.device().safe_pc() == state->m_speedup_table[idx].pc)
+	if (space.device().safe_pc() == m_speedup_table[idx].pc)
 	{
-		state->m_speedup_hits[idx]++;
+		m_speedup_hits[idx]++;
 		space.device().execute().spin_until_interrupt();
 	}
-	return state->m_main_ram[state->m_speedup_table[idx].offset/4];
+	return m_main_ram[m_speedup_table[idx].offset/4];
 }
 
 READ32_MEMBER(mediagx_state::speedup0_r) { return generic_speedup(space, 0); }
@@ -1279,34 +1280,32 @@ static const struct { read32_delegate func; } speedup_handlers[] =
 };
 
 #ifdef MAME_DEBUG
-static void report_speedups(running_machine &machine)
+void mediagx_state::report_speedups()
 {
-	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i;
 
-	for (i = 0; i < state->m_speedup_count; i++)
-		printf("Speedup %2d: offs=%06X pc=%06X hits=%d\n", i, state->m_speedup_table[i].offset, state->m_speedup_table[i].pc, state->m_speedup_hits[i]);
+	for (i = 0; i < m_speedup_count; i++)
+		printf("Speedup %2d: offs=%06X pc=%06X hits=%d\n", i, m_speedup_table[i].offset, m_speedup_table[i].pc, m_speedup_hits[i]);
 }
 #endif
 
-static void install_speedups(running_machine &machine, const speedup_entry *entries, int count)
+void mediagx_state::install_speedups(const speedup_entry *entries, int count)
 {
-	mediagx_state *state = machine.driver_data<mediagx_state>();
 	int i;
 
 	assert(count < ARRAY_LENGTH(speedup_handlers));
 
-	state->m_speedup_table = entries;
-	state->m_speedup_count = count;
+	m_speedup_table = entries;
+	m_speedup_count = count;
 
 	for (i = 0; i < count; i++) {
 		read32_delegate func = speedup_handlers[i].func;
-		func.late_bind(*state);
-		machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(entries[i].offset, entries[i].offset + 3, func);
+		func.late_bind(*this);
+		machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(entries[i].offset, entries[i].offset + 3, func);
 	}
 
 #ifdef MAME_DEBUG
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(report_speedups), &machine));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(report_speedups), &machine));
 #endif
 }
 
@@ -1328,10 +1327,10 @@ static const speedup_entry a51site4_speedups[] =
 
 DRIVER_INIT_MEMBER(mediagx_state,a51site4)
 {
-	init_mediagx(machine());
+	init_mediagx();
 
 #if SPEEDUP_HACKS
-	install_speedups(machine(), a51site4_speedups, ARRAY_LENGTH(a51site4_speedups));
+	install_speedups(a51site4_speedups, ARRAY_LENGTH(a51site4_speedups));
 #endif
 }
 

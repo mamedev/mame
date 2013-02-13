@@ -91,6 +91,7 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	void intel82439tx_init();
 };
 
 
@@ -134,15 +135,14 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 	state->m_mxtc_config_reg[reg] = data;
 }
 
-static void intel82439tx_init(running_machine &machine)
+void queen_state::intel82439tx_init()
 {
-	queen_state *state = machine.driver_data<queen_state>();
-	state->m_mxtc_config_reg[0x60] = 0x02;
-	state->m_mxtc_config_reg[0x61] = 0x02;
-	state->m_mxtc_config_reg[0x62] = 0x02;
-	state->m_mxtc_config_reg[0x63] = 0x02;
-	state->m_mxtc_config_reg[0x64] = 0x02;
-	state->m_mxtc_config_reg[0x65] = 0x02;
+	m_mxtc_config_reg[0x60] = 0x02;
+	m_mxtc_config_reg[0x61] = 0x02;
+	m_mxtc_config_reg[0x62] = 0x02;
+	m_mxtc_config_reg[0x63] = 0x02;
+	m_mxtc_config_reg[0x64] = 0x02;
+	m_mxtc_config_reg[0x65] = 0x02;
 }
 
 static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -521,7 +521,7 @@ void queen_state::machine_start()
 	init_pc_common(machine(), PCCOMMON_KEYBOARD_AT, queen_set_keyb_int);
 
 	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(queen_state::irq_callback),this));
-	intel82439tx_init(machine());
+	intel82439tx_init();
 
 	kbdc8042_init(machine(), &at8042);
 }

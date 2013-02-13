@@ -88,6 +88,7 @@ public:
 
 	void laserdisc_w(UINT8 data);
 	void laserdisc_response_w(UINT8 data);
+	DECLARE_PALETTE_INIT( cops );
 };
 
 void cops_state::video_start()
@@ -617,7 +618,7 @@ void cops_state::machine_reset()
 }
 
 
-static PALETTE_INIT( cops )
+PALETTE_INIT_MEMBER( cops_state,cops )
 {
 }
 
@@ -635,7 +636,7 @@ static MACHINE_CONFIG_START( cops, cops_state )
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MCFG_PALETTE_INIT(cops)
+	MCFG_PALETTE_INIT_OVERRIDE(cops_state,cops)
 	MCFG_PALETTE_LENGTH(8)
 
 	/* via */

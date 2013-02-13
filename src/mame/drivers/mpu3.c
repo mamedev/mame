@@ -188,6 +188,12 @@ emu_timer *m_ic21_timer;
 	TIMER_CALLBACK_MEMBER(ic21_timeout);
 	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
 	TIMER_DEVICE_CALLBACK_MEMBER(ic10_callback);
+	void update_triacs();
+	void mpu3_stepper_reset();
+	void ic11_update(mpu3_state *state);
+	void ic21_output(mpu3_state *state,int data);
+	void ic21_setup(mpu3_state *state);
+	void mpu3_config_common();
 };
 
 #define DISPLAY_PORT 0
@@ -195,12 +201,11 @@ emu_timer *m_ic21_timer;
 #define BWB_FUNCTIONALITY 2
 
 
-static void update_triacs(running_machine &machine)
+void mpu3_state::update_triacs()
 {
-	mpu3_state *state = machine.driver_data<mpu3_state>();
 	int i,triacdata;
 
-	triacdata=state->m_triac_ic3 + (state->m_triac_ic4 << 8) + (state->m_triac_ic5 << 9);
+	triacdata=m_triac_ic3 + (m_triac_ic4 << 8) + (m_triac_ic5 << 9);
 
 	for (i = 0; i < 8; i++)
 	{
@@ -209,23 +214,22 @@ static void update_triacs(running_machine &machine)
 }
 
 /* called if board is reset */
-static void mpu3_stepper_reset(running_machine &machine)
+void mpu3_state::mpu3_stepper_reset()
 {
-	mpu3_state *state = machine.driver_data<mpu3_state>();
 	int pattern = 0,reel;
 	for (reel = 0; reel < 6; reel++)
 	{
 		stepper_reset_position(reel);
 		if (stepper_optic_state(reel)) pattern |= 1<<reel;
 	}
-	state->m_optic_pattern = pattern;
+	m_optic_pattern = pattern;
 }
 
 void mpu3_state::machine_reset()
 {
 	m_vfd->reset();
 
-	mpu3_stepper_reset(machine());
+	mpu3_stepper_reset();
 
 	m_lamp_strobe   = 0;
 	m_led_strobe    = 0;
@@ -292,29 +296,29 @@ IC23 is a 74LS138 1-of-8 Decoder
 
 It is used as a multiplexer for the LEDs, lamp selects and inputs.*/
 
-static void ic11_update(mpu3_state *state)
+void mpu3_state::ic11_update(mpu3_state *state)
 {
-	if (!state->m_IC11G2A)
+	if (!m_IC11G2A)
 	{
-		if (!state->m_IC11G2B)
+		if (!m_IC11G2B)
 		{
-			if (state->m_IC11G1)
+			if (m_IC11G1)
 			{
-				if ( state->m_IC11GA )  state->m_input_strobe |= 0x01;
-				else                    state->m_input_strobe &= ~0x01;
+				if ( m_IC11GA )  m_input_strobe |= 0x01;
+				else                    m_input_strobe &= ~0x01;
 
-				if ( state->m_IC11GB )  state->m_input_strobe |= 0x02;
-				else                    state->m_input_strobe &= ~0x02;
+				if ( m_IC11GB )  m_input_strobe |= 0x02;
+				else                    m_input_strobe &= ~0x02;
 
-				if ( state->m_IC11GC )  state->m_input_strobe |= 0x04;
-				else                    state->m_input_strobe &= ~0x04;
+				if ( m_IC11GC )  m_input_strobe |= 0x04;
+				else                    m_input_strobe &= ~0x04;
 			}
 		}
 	}
 	else
-	if ((state->m_IC11G2A)||(state->m_IC11G2B)||(!state->m_IC11G1))
+	if ((m_IC11G2A)||(m_IC11G2B)||(!m_IC11G1))
 	{
-		state->m_input_strobe = 0x00;
+		m_input_strobe = 0x00;
 	}
 }
 
@@ -338,20 +342,20 @@ t/ns = .34 * 47 * 2.2e6 [ 1+ (1/47)]
 
 This seems less stable than the revised version used in MPU4
 */
-static void ic21_output(mpu3_state *state,int data)
+void mpu3_state::ic21_output(mpu3_state *state,int data)
 {
-	state->m_IC11G1 = data;
+	m_IC11G1 = data;
 	ic11_update(state);
 }
 
-static void ic21_setup(mpu3_state *state)
+void mpu3_state::ic21_setup(mpu3_state *state)
 {
-	if (state->m_IC11GA)
+	if (m_IC11GA)
 	{
 		{
-			state->m_ic11_active=1;
+			m_ic11_active=1;
 			ic21_output(state,1);
-			state->m_ic21_timer->adjust(attotime::from_nsec( (0.34 * 47 * 2200000) *(1+(1/47))));
+			m_ic21_timer->adjust(attotime::from_nsec( (0.34 * 47 * 2200000) *(1+(1/47))));
 		}
 	}
 }
@@ -783,15 +787,14 @@ static const stepper_interface mpu3_reel_interface =
 };
 
 /* Common configurations */
-static void mpu3_config_common(running_machine &machine)
+void mpu3_state::mpu3_config_common()
 {
-	mpu3_state *state = machine.driver_data<mpu3_state>();
-	state->m_ic21_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(mpu3_state::ic21_timeout),state));
+	m_ic21_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mpu3_state::ic21_timeout),this));
 }
 
 void mpu3_state::machine_start()
 {
-	mpu3_config_common(machine());
+	mpu3_config_common();
 
 	/* setup 8 mechanical meters */
 	MechMtr_config(machine(),8);
@@ -861,7 +864,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpu3_state::gen_50hz)
 	m_signal_50hz = m_signal_50hz?0:1;
 	machine().device<ptm6840_device>("ptm_ic2")->set_c1(m_signal_50hz);
 	machine().device<pia6821_device>("pia_ic3")->cb1_w(~m_signal_50hz);
-	update_triacs(machine());
+	update_triacs();
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mpu3_state::ic10_callback)

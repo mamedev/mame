@@ -80,27 +80,27 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_egghunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
 };
 
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect )
+void egghunt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	egghunt_state *state = machine.driver_data<egghunt_state>();
 	int flipscreen = 0;
 	int offs, sx, sy;
 
 	for (offs = 0x1000 - 0x40; offs >= 0; offs -= 0x20)
 	{
-		int code = state->m_spram[offs];
-		int attr = state->m_spram[offs + 1];
+		int code = m_spram[offs];
+		int attr = m_spram[offs + 1];
 		int color = attr & 0x0f;
-		sx = state->m_spram[offs + 3] + ((attr & 0x10) << 4);
-		sy = ((state->m_spram[offs + 2] + 8) & 0xff) - 8;
+		sx = m_spram[offs + 3] + ((attr & 0x10) << 4);
+		sy = ((m_spram[offs + 2] + 8) & 0xff) - 8;
 		code += (attr & 0xe0) << 3;
 
 		if (attr & 0xe0)
 		{
-			switch(state->m_gfx_banking & 0x30)
+			switch(m_gfx_banking & 0x30)
 			{
 	//          case 0x00:
 	//          case 0x10: code += 0; break;
@@ -114,7 +114,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 			sx = 496 - sx;
 			sy = 240 - sy;
 		}
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
+		drawgfx_transpen(bitmap,cliprect,machine().gfx[1],
 					code,
 					color,
 					flipscreen,flipscreen,
@@ -183,7 +183,7 @@ void egghunt_state::video_start()
 UINT32 egghunt_state::screen_update_egghunt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 

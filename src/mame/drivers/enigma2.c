@@ -93,6 +93,11 @@ public:
 	UINT32 screen_update_enigma2a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_clear_callback);
 	TIMER_CALLBACK_MEMBER(interrupt_assert_callback);
+	inline UINT16 vpos_to_vysnc_chain_counter( int vpos );
+	inline int vysnc_chain_counter_to_vpos( UINT16 counter );
+	void create_interrupt_timers(  );
+	void start_interrupt_timers(  );
+	void get_pens(pen_t *pens);
 };
 
 
@@ -103,13 +108,13 @@ public:
  *************************************/
 
 
-INLINE UINT16 vpos_to_vysnc_chain_counter( int vpos )
+UINT16 enigma2_state::vpos_to_vysnc_chain_counter( int vpos )
 {
 	return vpos + VCOUNTER_START;
 }
 
 
-INLINE int vysnc_chain_counter_to_vpos( UINT16 counter )
+int enigma2_state::vysnc_chain_counter_to_vpos( UINT16 counter )
 {
 	return counter - VCOUNTER_START;
 }
@@ -144,26 +149,24 @@ TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_assert_callback)
 }
 
 
-static void create_interrupt_timers( running_machine &machine )
+void enigma2_state::create_interrupt_timers(  )
 {
-	enigma2_state *state = machine.driver_data<enigma2_state>();
-	state->m_interrupt_clear_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(enigma2_state::interrupt_clear_callback),state));
-	state->m_interrupt_assert_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(enigma2_state::interrupt_assert_callback),state));
+	m_interrupt_clear_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(enigma2_state::interrupt_clear_callback),this));
+	m_interrupt_assert_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(enigma2_state::interrupt_assert_callback),this));
 }
 
 
-static void start_interrupt_timers( running_machine &machine )
+void enigma2_state::start_interrupt_timers(  )
 {
-	enigma2_state *state = machine.driver_data<enigma2_state>();
 	int vpos = vysnc_chain_counter_to_vpos(INT_TRIGGER_COUNT_1);
-	state->m_interrupt_assert_timer->adjust(machine.primary_screen->time_until_pos(vpos));
+	m_interrupt_assert_timer->adjust(machine().primary_screen->time_until_pos(vpos));
 }
 
 
 
 void enigma2_state::machine_start()
 {
-	create_interrupt_timers(machine());
+	create_interrupt_timers();
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
 	m_audiocpu = machine().device<cpu_device>("audiocpu");
@@ -185,7 +188,7 @@ void enigma2_state::machine_reset()
 	m_sound_latch = 0;
 	m_blink_count = 0;
 
-	start_interrupt_timers(machine());
+	start_interrupt_timers();
 }
 
 
@@ -195,7 +198,7 @@ void enigma2_state::machine_reset()
  *
  *************************************/
 
-static void get_pens(pen_t *pens)
+void enigma2_state::get_pens(pen_t *pens)
 {
 	offs_t i;
 

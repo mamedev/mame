@@ -93,6 +93,9 @@ public:
 	UINT32 screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
+	void zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void zerotrgt_rearrange_gfx( int romsize, int romarea );
 };
 
 
@@ -174,29 +177,28 @@ Sprite list:
 [2] xxxx xxxx X attribute
 [3] xxxx xxxx sprite number
 */
-static void zerotrgt_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void cntsteer_state::zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 	int offs;
 
 	for (offs = 0; offs < 0x200; offs += 4)
 	{
 		int multi, fx, fy, sx, sy, code, color;
 
-		if ((state->m_spriteram[offs + 1] & 1) == 1)
+		if ((m_spriteram[offs + 1] & 1) == 1)
 			continue;
 
-		code = state->m_spriteram[offs + 3] + ((state->m_spriteram[offs + 1] & 0xc0) << 2);
-		sx = (state->m_spriteram[offs + 2]);
-		sy = 0xf0 - state->m_spriteram[offs];
-		color = 0x10 + ((state->m_spriteram[offs + 1] & 0x20) >> 4) + ((state->m_spriteram[offs + 1] & 0x8)>>3);
+		code = m_spriteram[offs + 3] + ((m_spriteram[offs + 1] & 0xc0) << 2);
+		sx = (m_spriteram[offs + 2]);
+		sy = 0xf0 - m_spriteram[offs];
+		color = 0x10 + ((m_spriteram[offs + 1] & 0x20) >> 4) + ((m_spriteram[offs + 1] & 0x8)>>3);
 
-		fx = !(state->m_spriteram[offs + 1] & 0x04);
-		fy = (state->m_spriteram[offs + 1] & 0x02);
+		fx = !(m_spriteram[offs + 1] & 0x04);
+		fy = (m_spriteram[offs + 1] & 0x02);
 
-		multi = state->m_spriteram[offs + 1] & 0x10;
+		multi = m_spriteram[offs + 1] & 0x10;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -209,17 +211,17 @@ static void zerotrgt_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		{
 			if (fy)
 			{
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, fx, fy, sx, sy, 0);
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code + 1, color, fx, fy, sx, sy - 16, 0);
+				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, fx, fy, sx, sy, 0);
+				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code + 1, color, fx, fy, sx, sy - 16, 0);
 			}
 			else
 			{
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, fx, fy, sx, sy - 16, 0);
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code + 1, color, fx, fy, sx, sy, 0);
+				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, fx, fy, sx, sy - 16, 0);
+				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code + 1, color, fx, fy, sx, sy, 0);
 			}
 		}
 		else
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, fx, fy, sx, sy, 0);
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, fx, fy, sx, sy, 0);
 	}
 }
 
@@ -232,29 +234,28 @@ static void zerotrgt_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
      ---- --xx tile bank
 */
 
-static void cntsteer_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void cntsteer_state::cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	cntsteer_state *state = machine.driver_data<cntsteer_state>();
 	int offs;
 
 	for (offs = 0; offs < 0x80; offs += 4)
 	{
 		int multi, fx, fy, sx, sy, code, color;
 
-		if ((state->m_spriteram[offs + 0] & 1) == 0)
+		if ((m_spriteram[offs + 0] & 1) == 0)
 			continue;
 
-		code = state->m_spriteram[offs + 1] + ((state->m_spriteram[offs + 0x80] & 0x03) << 8);
-		sx = 0x100 - state->m_spriteram[offs + 3];
-		sy = 0x100 - state->m_spriteram[offs + 2];
-		color = 0x10 + ((state->m_spriteram[offs + 0x80] & 0x70) >> 4);
+		code = m_spriteram[offs + 1] + ((m_spriteram[offs + 0x80] & 0x03) << 8);
+		sx = 0x100 - m_spriteram[offs + 3];
+		sy = 0x100 - m_spriteram[offs + 2];
+		color = 0x10 + ((m_spriteram[offs + 0x80] & 0x70) >> 4);
 
-		fx = (state->m_spriteram[offs + 0] & 0x04);
-		fy = (state->m_spriteram[offs + 0] & 0x02);
+		fx = (m_spriteram[offs + 0] & 0x04);
+		fy = (m_spriteram[offs + 0] & 0x02);
 
-		multi = state->m_spriteram[offs + 0] & 0x10;
+		multi = m_spriteram[offs + 0] & 0x10;
 
-		if (state->m_flipscreen)
+		if (m_flipscreen)
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -267,17 +268,17 @@ static void cntsteer_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		{
 			if (fy)
 			{
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, fx, fy, sx, sy, 0);
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code + 1, color, fx, fy, sx, sy - 16, 0);
+				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, fx, fy, sx, sy, 0);
+				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code + 1, color, fx, fy, sx, sy - 16, 0);
 			}
 			else
 			{
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, fx, fy, sx, sy - 16, 0);
-				drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code + 1, color, fx, fy, sx, sy, 0);
+				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, fx, fy, sx, sy - 16, 0);
+				drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code + 1, color, fx, fy, sx, sy, 0);
 			}
 		}
 		else
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[1], code, color, fx, fy, sx, sy, 0);
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[1], code, color, fx, fy, sx, sy, 0);
 	}
 }
 
@@ -324,7 +325,7 @@ UINT32 cntsteer_state::screen_update_zerotrgt(screen_device &screen, bitmap_ind1
 						0, 0);
 	}
 
-	zerotrgt_draw_sprites(machine(), bitmap, cliprect);
+	zerotrgt_draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -371,7 +372,7 @@ UINT32 cntsteer_state::screen_update_cntsteer(screen_device &screen, bitmap_ind1
 						0, 0);
 	}
 
-	cntsteer_draw_sprites(machine(), bitmap, cliprect);
+	cntsteer_draw_sprites(bitmap, cliprect);
 	m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	return 0;
@@ -1139,10 +1140,10 @@ ROM_END
 
 /***************************************************************************/
 
-static void zerotrgt_rearrange_gfx( running_machine &machine, int romsize, int romarea )
+void cntsteer_state::zerotrgt_rearrange_gfx( int romsize, int romarea )
 {
-	UINT8 *src = machine.root_device().memregion("gfx4")->base();
-	UINT8 *dst = machine.root_device().memregion("gfx3")->base();
+	UINT8 *src = machine().root_device().memregion("gfx4")->base();
+	UINT8 *dst = machine().root_device().memregion("gfx3")->base();
 	int rm;
 	int cnt1;
 
@@ -1174,7 +1175,7 @@ DRIVER_INIT_MEMBER(cntsteer_state,cntsteer)
 
 DRIVER_INIT_MEMBER(cntsteer_state,zerotrgt)
 {
-	zerotrgt_rearrange_gfx(machine(), 0x02000, 0x10000);
+	zerotrgt_rearrange_gfx(0x02000, 0x10000);
 }
 
 

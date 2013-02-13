@@ -114,6 +114,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
+	int gp3_is_alpha_pen(int pen);
 };
 
 
@@ -150,38 +151,37 @@ void galpani3_state::video_start()
 
 
 
-static int gp3_is_alpha_pen(running_machine &machine, int pen)
+int galpani3_state::gp3_is_alpha_pen(int pen)
 {
-	galpani3_state *state = machine.driver_data<galpani3_state>();
 	UINT16 dat = 0;
 
 	if (pen<0x4000)
 	{
-		dat = state->m_generic_paletteram_16[pen];
+		dat = m_generic_paletteram_16[pen];
 	}
 	else if (pen<0x4100)
 	{
-		dat = state->m_grap2_0->m_framebuffer_palette[pen&0xff];
+		dat = m_grap2_0->m_framebuffer_palette[pen&0xff];
 	}
 	else if (pen<0x4200)
 	{
-		dat = state->m_grap2_1->m_framebuffer_palette[pen&0xff];
+		dat = m_grap2_1->m_framebuffer_palette[pen&0xff];
 	}
 	else if (pen<0x4300)
 	{
-		dat = state->m_grap2_2->m_framebuffer_palette[pen&0xff];
+		dat = m_grap2_2->m_framebuffer_palette[pen&0xff];
 	}
 	else if (pen<0x4301)
 	{
-		dat = state->m_grap2_0->m_framebuffer_bgcol;
+		dat = m_grap2_0->m_framebuffer_bgcol;
 	}
 	else if (pen<0x4302)
 	{
-		dat = state->m_grap2_1->m_framebuffer_bgcol;
+		dat = m_grap2_1->m_framebuffer_bgcol;
 	}
 	else if (pen<0x4303)
 	{
-		dat = state->m_grap2_2->m_framebuffer_bgcol;
+		dat = m_grap2_2->m_framebuffer_bgcol;
 	}
 
 	if (dat&0x8000) return 1;
@@ -259,7 +259,7 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 						UINT16 pen = dat1+0x4000;
 						UINT32 pal = paldata[pen];
 
-						if (gp3_is_alpha_pen(machine(), pen))
+						if (gp3_is_alpha_pen(pen))
 						{
 							int r,g,b;
 							r = (pal & 0x00ff0000)>>16;
@@ -287,7 +287,7 @@ UINT32 galpani3_state::screen_update_galpani3(screen_device &screen, bitmap_rgb3
 						UINT16 pen = dat2+0x4100;
 						UINT32 pal = paldata[pen];
 
-						if (gp3_is_alpha_pen(machine(), pen))
+						if (gp3_is_alpha_pen(pen))
 						{
 							int r,g,b;
 							r = (pal & 0x00ff0000)>>16;

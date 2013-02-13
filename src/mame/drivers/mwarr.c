@@ -100,6 +100,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_mwarr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 
@@ -404,12 +405,11 @@ void mwarr_state::video_start()
 	save_item(NAME(m_sprites_buffer));
 }
 
-static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
+void mwarr_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	mwarr_state *state = machine.driver_data<mwarr_state>();
-	const UINT16 *source = state->m_sprites_buffer + 0x800 - 4;
-	const UINT16 *finish = state->m_sprites_buffer;
-	gfx_element *gfx = machine.gfx[0];
+	const UINT16 *source = m_sprites_buffer + 0x800 - 4;
+	const UINT16 *finish = m_sprites_buffer;
+	gfx_element *gfx = machine().gfx[0];
 	int x, y, color, flipx, dy, pri, pri_mask, i;
 
 	while (source >= finish)
@@ -437,7 +437,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 							color,
 							flipx,0,
 							x,y+i*16,
-							machine.priority_bitmap,pri_mask,0 );
+							machine().priority_bitmap,pri_mask,0 );
 
 				/* wrap around x */
 				pdrawgfx_transpen( bitmap,
@@ -447,7 +447,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 							color,
 							flipx,0,
 							x-1024,y+i*16,
-							machine.priority_bitmap,pri_mask,0 );
+							machine().priority_bitmap,pri_mask,0 );
 
 				/* wrap around y */
 				pdrawgfx_transpen( bitmap,
@@ -457,7 +457,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 							color,
 							flipx,0,
 							x,y-512+i*16,
-							machine.priority_bitmap,pri_mask,0 );
+							machine().priority_bitmap,pri_mask,0 );
 
 				/* wrap around x & y */
 				pdrawgfx_transpen( bitmap,
@@ -467,7 +467,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 							color,
 							flipx,0,
 							x-1024,y-512+i*16,
-							machine.priority_bitmap,pri_mask,0 );
+							machine().priority_bitmap,pri_mask,0 );
 			}
 		}
 
@@ -525,7 +525,7 @@ UINT32 mwarr_state::screen_update_mwarr(screen_device &screen, bitmap_ind16 &bit
 	m_mlow_tilemap->draw(bitmap, cliprect, 0, 0x02);
 	m_mhigh_tilemap->draw(bitmap, cliprect, 0, 0x04);
 	m_tx_tilemap->draw(bitmap, cliprect, 0, 0x10);
-	draw_sprites(machine(), bitmap, cliprect);
+	draw_sprites(bitmap, cliprect);
 	return 0;
 }
 

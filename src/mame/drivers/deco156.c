@@ -59,6 +59,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
+	void descramble_sound( const char *tag );
 };
 
 
@@ -617,11 +618,11 @@ ROM_END
 
 /**********************************************************************************/
 
-static void descramble_sound( running_machine &machine, const char *tag )
+void deco156_state::descramble_sound( const char *tag )
 {
-	UINT8 *rom = machine.root_device().memregion(tag)->base();
-	int length = machine.root_device().memregion(tag)->bytes();
-	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
+	UINT8 *rom = machine().root_device().memregion(tag)->base();
+	int length = machine().root_device().memregion(tag)->bytes();
+	UINT8 *buf1 = auto_alloc_array(machine(), UINT8, length);
 	UINT32 x;
 
 	for (x = 0; x < length; x++)
@@ -640,21 +641,21 @@ static void descramble_sound( running_machine &machine, const char *tag )
 
 	memcpy(rom,buf1,length);
 
-	auto_free(machine, buf1);
+	auto_free(machine(), buf1);
 }
 
 DRIVER_INIT_MEMBER(deco156_state,hvysmsh)
 {
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco156_decrypt(machine());
-	descramble_sound(machine(), "oki2");
+	descramble_sound("oki2");
 }
 
 DRIVER_INIT_MEMBER(deco156_state,wcvol95)
 {
 	deco56_decrypt_gfx(machine(), "gfx1"); /* 141 */
 	deco156_decrypt(machine());
-	descramble_sound(machine(), "ymz");
+	descramble_sound("ymz");
 }
 
 

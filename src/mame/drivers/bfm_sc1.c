@@ -181,6 +181,9 @@ public:
 	virtual void machine_reset();
 	INTERRUPT_GEN_MEMBER(timer_irq);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
+	void Scorpion1_SetSwitchState(int strobe, int data, int state);
+	int Scorpion1_GetSwitchState(int strobe, int data);
+	int sc1_find_project_string( );
 };
 
 #define VFD_RESET  0x20
@@ -192,19 +195,19 @@ public:
 
 ///////////////////////////////////////////////////////////////////////////
 
-static void Scorpion1_SetSwitchState(bfm_sc1_state *drvstate, int strobe, int data, int state)
+void bfm_sc1_state::Scorpion1_SetSwitchState(int strobe, int data, int state)
 {
-	if ( state ) drvstate->m_sc1_Inputs[strobe] |=  (1<<data);
-	else         drvstate->m_sc1_Inputs[strobe] &= ~(1<<data);
+	if ( state ) m_sc1_Inputs[strobe] |=  (1<<data);
+	else         m_sc1_Inputs[strobe] &= ~(1<<data);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 #ifdef UNUSED_FUNCTION
-static int Scorpion1_GetSwitchState(bfm_sc1_state *drvstate, int strobe, int data)
+int bfm_sc1_state::Scorpion1_GetSwitchState(int strobe, int data)
 {
 	int state = 0;
 
-	if ( strobe < 7 && data < 8 ) state = (drvstate->sc1_Inputs[strobe] & (1<<data))?1:0;
+	if ( strobe < 7 && data < 8 ) state = (sc1_Inputs[strobe] & (1<<data))?1:0;
 
 	return state;
 }
@@ -1171,12 +1174,12 @@ void bfm_sc1_state::sc1_common_init(int reels, int decrypt, int defaultbank)
 }
 
 
-int sc1_find_project_string(running_machine &machine )
+int bfm_sc1_state::sc1_find_project_string( )
 {
 	// search for the project string to find the title (usually just at ff00)
 	char title_string[7][32] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT ", "CASH ON THE NILE 2", "PR6121", "CHINA TOWN\x0d\x0a", "PROJECTNUMBER" };
-	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
-	int size = machine.root_device().memregion( "maincpu" )->bytes();
+	UINT8 *src = machine().root_device().memregion( "maincpu" )->base();
+	int size = machine().root_device().memregion( "maincpu" )->bytes();
 
 	for (int search=0;search<7;search++)
 	{
@@ -1252,21 +1255,21 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,toppoker)
 	sc1_common_init(3,1, 3);
 	adder2_decode_char_roms(machine()); // decode GFX roms
 	MechMtr_config(machine(),8);
-	sc1_find_project_string(machine());
+	sc1_find_project_string();
 }
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,lotse)
 {
 	sc1_common_init(6,1, 3);
 	MechMtr_config(machine(),8);
-	sc1_find_project_string(machine());
+	sc1_find_project_string();
 }
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,lotse_bank0)
 {
 	sc1_common_init(6,1, 0);
 	MechMtr_config(machine(),8);
-	sc1_find_project_string(machine());
+	sc1_find_project_string();
 }
 
 
@@ -1274,14 +1277,14 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt)
 {
 	sc1_common_init(6,0, 3);
 	MechMtr_config(machine(),8);
-	sc1_find_project_string(machine());
+	sc1_find_project_string();
 }
 
 DRIVER_INIT_MEMBER(bfm_sc1_state,nocrypt_bank0)
 {
 	sc1_common_init(6,0, 0);
 	MechMtr_config(machine(),8);
-	sc1_find_project_string(machine());
+	sc1_find_project_string();
 }
 
 
@@ -1291,7 +1294,7 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,rou029)
 {
 	sc1_common_init(6,0, 3);
 	MechMtr_config(machine(),8);
-	sc1_find_project_string(machine());
+	sc1_find_project_string();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -1301,11 +1304,11 @@ DRIVER_INIT_MEMBER(bfm_sc1_state,clatt)
 	sc1_common_init(6,1, 3);
 	MechMtr_config(machine(),8);
 
-	Scorpion1_SetSwitchState(this,3,2,1);
-	Scorpion1_SetSwitchState(this,3,3,1);
-	Scorpion1_SetSwitchState(this,3,6,1);
-	Scorpion1_SetSwitchState(this,4,1,1);
-	sc1_find_project_string(machine());
+	Scorpion1_SetSwitchState(3,2,1);
+	Scorpion1_SetSwitchState(3,3,1);
+	Scorpion1_SetSwitchState(3,6,1);
+	Scorpion1_SetSwitchState(4,1,1);
+	sc1_find_project_string();
 }
 
 

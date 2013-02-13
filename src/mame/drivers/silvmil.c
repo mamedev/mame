@@ -113,6 +113,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tumblepb_gfx1_rearrange();
 };
 
 
@@ -394,10 +395,10 @@ ROM_START( silvmil )
 ROM_END
 
 
-static void tumblepb_gfx1_rearrange(running_machine &machine)
+void silvmil_state::tumblepb_gfx1_rearrange()
 {
-	UINT8 *rom = machine.root_device().memregion("gfx1")->base();
-	int len = machine.root_device().memregion("gfx1")->bytes();
+	UINT8 *rom = machine().root_device().memregion("gfx1")->base();
+	int len = machine().root_device().memregion("gfx1")->bytes();
 	int i;
 
 	/* gfx data is in the wrong order */
@@ -417,7 +418,7 @@ static void tumblepb_gfx1_rearrange(running_machine &machine)
 
 DRIVER_INIT_MEMBER(silvmil_state,silvmil)
 {
-	tumblepb_gfx1_rearrange(machine());
+	tumblepb_gfx1_rearrange();
 }
 
 GAME( 1995, silvmil, 0, silvmil, silvmil, silvmil_state, silvmil, ROT270, "Para", "Silver Millennium", 0 )

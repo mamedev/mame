@@ -395,7 +395,7 @@ public:
 	void gfx_write_reg(running_machine &machine, UINT64 data);
 
 	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
-
+	inline rgb_t texture_fetch(UINT32 *texture, int u, int v, int width, int format);
 private:
 	bitmap_rgb32 *m_framebuffer;
 	bitmap_rgb32 *m_backbuffer;
@@ -724,6 +724,7 @@ public:
 	UINT32 screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cobra_vblank);
 	void cobra_video_exit();
+	int decode_debug_state_value(int v);
 };
 
 void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
@@ -772,7 +773,7 @@ void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, c
 	}
 }
 
-INLINE rgb_t texture_fetch(UINT32 *texture, int u, int v, int width, int format)
+rgb_t cobra_renderer::texture_fetch(UINT32 *texture, int u, int v, int width, int format)
 {
 	UINT32 texel = texture[((v * width) + u) / 2];
 
@@ -1020,7 +1021,7 @@ UINT32 cobra_state::screen_update_cobra(screen_device &screen, bitmap_rgb32 &bit
 
 /*****************************************************************************/
 
-static int decode_debug_state_value(int v)
+int cobra_state::decode_debug_state_value(int v)
 {
 	switch (v)
 	{
