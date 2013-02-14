@@ -13,21 +13,48 @@
 
 ***************************************************************************/
 
+#include "sound/okim6295.h"
+
 
 class megasys1_state : public driver_device
 {
 public:
 	megasys1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_vregs(*this, "vregs"),
-		m_objectram(*this, "objectram"),
-		m_scrollram(*this, "scrollram"),
-		m_ram(*this, "ram"){ }
+		: driver_device(mconfig, type, tag)
+		, m_vregs(*this, "vregs")
+		, m_objectram(*this, "objectram")
+		, m_scrollram(*this, "scrollram")
+		, m_ram(*this, "ram")
+		, m_maincpu(*this, "maincpu")
+		, m_audiocpu(*this, "audiocpu")
+		, m_oki1(*this, "oki1")
+		, m_oki2(*this, "oki2")
+		, m_region_maincpu(*this, "maincpu")
+		, m_region_oki1(*this, "oki1")
+		, m_io_system(*this, "SYSTEM")
+		, m_io_p1(*this, "P1")
+		, m_io_p2(*this, "P2")
+		, m_io_dsw(*this, "DSW")
+		, m_io_dsw1(*this, "DSW1")
+		, m_io_dsw2(*this, "DSW2")
+	{ }
 
 	required_shared_ptr<UINT16> m_vregs;
 	required_shared_ptr<UINT16> m_objectram;
 	required_shared_ptr_array<UINT16,3> m_scrollram;
 	required_shared_ptr<UINT16> m_ram;
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	optional_device<okim6295_device> m_oki1;
+	optional_device<okim6295_device> m_oki2;
+	required_memory_region m_region_maincpu;
+	optional_memory_region m_region_oki1;
+	required_ioport m_io_system;
+	required_ioport m_io_p1;
+	required_ioport m_io_p2;
+	optional_ioport m_io_dsw;
+	optional_ioport m_io_dsw1;
+	optional_ioport m_io_dsw2;
 
 	UINT16 *m_spriteram;
 	UINT16 m_ip_select;

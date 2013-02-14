@@ -124,7 +124,6 @@ RAM         RW      0f0000-0f3fff       0e0000-0effff?      <
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
-#include "sound/okim6295.h"
 #include "machine/jalcrpt.h"
 #include "includes/megasys1.h"
 
@@ -160,13 +159,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if(scanline == 0)
-		machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+		m_maincpu->set_input_line(1, HOLD_LINE);
 
 	if(scanline == 128)
-		machine().device("maincpu")->execute().set_input_line(3, HOLD_LINE);
+		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
@@ -196,13 +195,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1B_scanline)
 	int scanline = param;
 
 	if(scanline == 240) // vblank-out irq
-		machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+		m_maincpu->set_input_line(4, HOLD_LINE);
 
 	if(scanline == 0)
-		machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+		m_maincpu->set_input_line(2, HOLD_LINE);
 
 	if(scanline == 128)
-		machine().device("maincpu")->execute().set_input_line(1, HOLD_LINE);
+		m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
 
@@ -235,11 +234,11 @@ READ16_MEMBER(megasys1_state::ip_select_r)
 
 	switch (i)
 	{
-			case 0 :    return ioport("SYSTEM")->read();
-			case 1 :    return ioport("P1")->read();
-			case 2 :    return ioport("P2")->read();
-			case 3 :    return ioport("DSW1")->read();
-			case 4 :    return ioport("DSW2")->read();
+			case 0 :    return m_io_system->read();
+			case 1 :    return m_io_p1->read();
+			case 2 :    return m_io_p2->read();
+			case 3 :    return m_io_dsw1->read();
+			case 4 :    return m_io_dsw2->read();
 			default  :  return 0x0006;
 	}
 }
@@ -247,7 +246,7 @@ READ16_MEMBER(megasys1_state::ip_select_r)
 WRITE16_MEMBER(megasys1_state::ip_select_w)
 {
 	COMBINE_DATA(&m_ip_select);
-	machine().device("maincpu")->execute().set_input_line(2, HOLD_LINE);
+	m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 
@@ -374,25 +373,23 @@ ADDRESS_MAP_END
 WRITE_LINE_MEMBER(megasys1_state::sound_irq)
 {
 	if (state)
-		subdevice("soundcpu")->execute().set_input_line(4, HOLD_LINE);
+		m_audiocpu->set_input_line(4, HOLD_LINE);
 }
 
 READ8_MEMBER(megasys1_state::oki_status_1_r)
 {
-	device_t *device = machine().device("oki1");
 	if (m_ignore_oki_status == 1)
 		return 0;
 	else
-		return downcast<okim6295_device *>(device)->read_status();
+		return m_oki1->read_status();
 }
 
 READ8_MEMBER(megasys1_state::oki_status_2_r)
 {
-	device_t *device = machine().device("oki1");
 	if (m_ignore_oki_status == 1)
 		return 0;
 	else
-		return downcast<okim6295_device *>(device)->read_status();
+		return m_oki1->read_status();
 }
 /***************************************************************************
                             [ Sound CPU - System A ]
@@ -1373,8 +1370,8 @@ READ16_MEMBER(megasys1_state::protection_peekaboo_r)
 	switch (m_protection_val)
 	{
 		case 0x02:  return 0x03;
-		case 0x51:  return ioport("P1")->read();
-		case 0x52:  return ioport("P2")->read();
+		case 0x51:  return m_io_p1->read();
+		case 0x52:  return m_io_p2->read();
 		default:    return m_protection_val;
 	}
 }
@@ -1385,7 +1382,7 @@ WRITE16_MEMBER(megasys1_state::protection_peekaboo_w)
 
 	if ((m_protection_val & 0x90) == 0x90)
 	{
-		UINT8 *RAM = memregion("oki1")->base();
+		UINT8 *RAM = m_region_oki1->base();
 		int new_bank = (m_protection_val & 0x7) % 7;
 
 		if (m_bank != new_bank)
@@ -1395,7 +1392,7 @@ WRITE16_MEMBER(megasys1_state::protection_peekaboo_w)
 		}
 	}
 
-	machine().device("maincpu")->execute().set_input_line(4, HOLD_LINE);
+	m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
 /*************************************
@@ -1462,7 +1459,7 @@ static MACHINE_CONFIG_START( system_A, megasys1_state )
 	MCFG_CPU_PROGRAM_MAP(megasys1A_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
+	MCFG_CPU_ADD("audiocpu", M68000, SOUND_CPU_CLOCK) /* 7MHz verified */
 	MCFG_CPU_PROGRAM_MAP(megasys1A_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(120000))
@@ -1515,7 +1512,7 @@ static MACHINE_CONFIG_DERIVED( system_B, system_A )
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(megasys1_state, megasys1B_scanline)
 
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(megasys1B_sound_map)
 MACHINE_CONFIG_END
 
@@ -1576,7 +1573,7 @@ static MACHINE_CONFIG_DERIVED( system_C, system_A )
 	MCFG_TIMER_MODIFY("scantimer")
 	MCFG_TIMER_DRIVER_CALLBACK(megasys1_state, megasys1B_scanline)
 
-	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(megasys1B_sound_map)
 MACHINE_CONFIG_END
 
@@ -1639,7 +1636,7 @@ MACHINE_CONFIG_END
 
 static void irq_handler(device_t *device, int irq)
 {
-	device->machine().device("soundcpu")->execute().set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
+	device->machine().driver_data<megasys1_state>()->m_audiocpu->set_input_line(0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1660,7 +1657,7 @@ static MACHINE_CONFIG_START( system_Z, megasys1_state )
 	MCFG_CPU_PROGRAM_MAP(megasys1A_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", megasys1_state, megasys1A_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
 	MCFG_CPU_PROGRAM_MAP(z80_sound_map)
 	MCFG_CPU_IO_MAP(z80_sound_io_map)
 
@@ -1736,7 +1733,7 @@ ROM_START( 64street )
 	ROM_LOAD16_BYTE( "64th_03.rom", 0x000000, 0x040000, CRC(ed6c6942) SHA1(f610b31548ed4889a43d77be286b9bfabf700064) )
 	ROM_LOAD16_BYTE( "64th_02.rom", 0x000001, 0x040000, CRC(0621ed1d) SHA1(97d3e84cced23865157c5a15cbf5b7671c1dbae1) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "64th_08.rom", 0x000000, 0x010000, CRC(632be0c1) SHA1(626073037249d96ac70b2d11b2dd72b22bac49c7) )
 	ROM_LOAD16_BYTE( "64th_07.rom", 0x000001, 0x010000, CRC(13595d01) SHA1(e730a530ca232aab883217fa12804075cb2aa640) )
 
@@ -1772,7 +1769,7 @@ ROM_START( 64streetj )
 	ROM_LOAD16_BYTE( "91105-3.bin", 0x000000, 0x040000, CRC(a211a83b) SHA1(423d8f273f1520f6a37f1255bb2d343a6bbd790a) )
 	ROM_LOAD16_BYTE( "91105-2.bin", 0x000001, 0x040000, CRC(27c1f436) SHA1(d7936523549cfcd99ba98c6776ebd225b245867b) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "64th_08.rom", 0x000000, 0x010000, CRC(632be0c1) SHA1(626073037249d96ac70b2d11b2dd72b22bac49c7) )
 	ROM_LOAD16_BYTE( "64th_07.rom", 0x000001, 0x010000, CRC(13595d01) SHA1(e730a530ca232aab883217fa12804075cb2aa640) )
 
@@ -1819,7 +1816,7 @@ ROM_START( astyanax )
 	ROM_LOAD16_BYTE( "astyan3.bin", 0x40000, 0x10000, CRC(097b53a6) SHA1(80952b2e685cefa8dd7c31b1ec54c4de924a84eb) )
 	ROM_LOAD16_BYTE( "astyan4.bin", 0x40001, 0x10000, CRC(1e1cbdb2) SHA1(5d076233d5ed6fdd9f0ecf64453325c14d33e879) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "astyan5.bin",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
 	ROM_LOAD16_BYTE( "astyan6.bin",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
 
@@ -1867,7 +1864,7 @@ ROM_START( lordofk )
 	ROM_LOAD16_BYTE( "lokj03.bin", 0x40000, 0x20000, CRC(d8702c91) SHA1(bdf0ed1f116b0c8589a5b6c61e6f441b5afa38cb) )
 	ROM_LOAD16_BYTE( "lokj04.bin", 0x40001, 0x20000, CRC(eccbf8c9) SHA1(f37fb6a536f6344d6d68c8193de4db5d70b29c0a) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "astyan5.bin",  0x000000, 0x010000, CRC(11c74045) SHA1(00310a08a1c9a08050004e39b111b940142f8dea) )
 	ROM_LOAD16_BYTE( "astyan6.bin",  0x000001, 0x010000, CRC(eecd4b16) SHA1(2078e900b53347aad008a8ce7191f4e5541d4df0) )
 
@@ -1954,7 +1951,7 @@ ROM_START( avspirit )
 	ROM_LOAD16_BYTE(  "spirit06.rom", 0x000001, 0x020000, CRC(609f71fe) SHA1(ab1bfe211763fb855477645267223e7fd4d6b6da) )
 	ROM_CONTINUE (                    0x080001, 0x020000 )
 
-	ROM_REGION( 0x40000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "spirit01.rom",  0x000000, 0x020000, CRC(d02ec045) SHA1(465b61d89ca06e7e0a42c42efb6919c964ad0f93) )
 	ROM_LOAD16_BYTE( "spirit02.rom",  0x000001, 0x020000, CRC(30213390) SHA1(9334978d3568b36215ed29789501f7cbaf6651ea) )
 
@@ -1991,7 +1988,7 @@ ROM_START( phantasm )
 	ROM_LOAD16_BYTE( "phntsm03.bin", 0x040000, 0x010000, CRC(1d96ce20) SHA1(2fb79160ea0dd18b5713691e4cf195d27ac4e3c3) )
 	ROM_LOAD16_BYTE( "phntsm04.bin", 0x040001, 0x010000, CRC(dc0c4994) SHA1(c3c72336b5032ef237490b095d3270de5803738c) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "phntsm05.bin", 0x000000, 0x010000, CRC(3b169b4a) SHA1(81c46fc94887c0cea363848b5c831dcf3b5b76de) )
 	ROM_LOAD16_BYTE( "phntsm06.bin", 0x000001, 0x010000, CRC(df2dfb2e) SHA1(b2542fa478917d44dffcf9e11ff7eaac6019676d) )
 
@@ -2069,7 +2066,7 @@ ROM_START( monkelf )
 	ROM_LOAD16_BYTE(  "5", 0x000001, 0x020000, CRC(6c45465d) SHA1(ae30c3f14617ffe99622a019eb64880ac14bf7cf) )
 	ROM_CONTINUE (                   0x080001, 0x020000 )
 
-	ROM_REGION( 0x40000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "4",  0x000000, 0x020000, CRC(d02ec045) SHA1(465b61d89ca06e7e0a42c42efb6919c964ad0f93) )
 	ROM_LOAD16_BYTE( "3",  0x000001, 0x020000, CRC(30213390) SHA1(9334978d3568b36215ed29789501f7cbaf6651ea) )
 
@@ -2130,7 +2127,7 @@ ROM_START( bigstrik )
 	ROM_LOAD16_BYTE( "91105v11.3", 0x000000, 0x020000, CRC(5d6e08ec) SHA1(4b80a5073cd0b0142cad094816b935d750ac11fb) )
 	ROM_LOAD16_BYTE( "91105v11.2", 0x000001, 0x020000, CRC(2120f05b) SHA1(a769cf8c3a4fa6a3f604edf45ce6db35979826cb) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "91105v10.8", 0x000000, 0x010000, CRC(7dd69ece) SHA1(e8dc3cbce8cb3f549384cd114f8fc0e6c72462f3) )
 	ROM_LOAD16_BYTE( "91105v10.7", 0x000001, 0x010000, CRC(bc2c1508) SHA1(110dece929f9b452eb287c736d394d1022a09d75) )
 
@@ -2178,7 +2175,7 @@ ROM_START( chimerab )
 	ROM_LOAD16_BYTE( "prg3.bin", 0x000000, 0x040000, CRC(70f1448f) SHA1(60aaee1cf7aa15ffa4962d947747b0ae7cdcfd8a) )
 	ROM_LOAD16_BYTE( "prg2.bin", 0x000001, 0x040000, CRC(821dbb85) SHA1(df204db38995ff4c898b8a0121834ec1b84b215c) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "prg8.bin", 0x000000, 0x010000, CRC(a682b1ca) SHA1(66f5d5a73f5e8cba87eac09c55eee59117d94f7b) )
 	ROM_LOAD16_BYTE( "prg7.bin", 0x000001, 0x010000, CRC(83b9982d) SHA1(68e7d344ebfffe19822c4cf9f7b13cb51f23537a) )
 
@@ -2266,7 +2263,7 @@ ROM_START( cybattlr )
 	ROM_LOAD16_BYTE( "cb_03.rom", 0x000000, 0x040000, CRC(bee20587) SHA1(3c1d546c63a3d6f8a63b7dee1c8e99a7091d774d) )
 	ROM_LOAD16_BYTE( "cb_02.rom", 0x000001, 0x040000, CRC(2ed14c50) SHA1(4ed01ea5c5e59c3c012d9a4d5257be78220758c1) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "cb_08.rom", 0x000000, 0x010000, CRC(bf7b3558) SHA1(6046b965d61560e0227437f00f1ff1f7dbc16232) )
 	ROM_LOAD16_BYTE( "cb_07.rom", 0x000001, 0x010000, CRC(85d219d7) SHA1(a9628efc5eddefad739363ff0b2f37a2d095df86) )
 
@@ -2328,7 +2325,7 @@ ROM_START( edf )
 	ROM_LOAD16_BYTE( "edf_06.rom",  0x000001, 0x020000, CRC(94da2f0c) SHA1(ae6aef03d61d244a857a9dc824be230c35f4c978) )
 	ROM_CONTINUE (                  0x080001, 0x020000 )
 
-	ROM_REGION( 0x40000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "edf1.f5",  0x000000, 0x020000, CRC(2290ea19) SHA1(64c9394bd4d5569d68833d2e57abaf2f1af5be97) )
 	ROM_LOAD16_BYTE( "edf2.f3",  0x000001, 0x020000, CRC(ce93643e) SHA1(686bf0ec104af8c97624a782e0d60afe170fd945) )
 
@@ -2364,7 +2361,7 @@ ROM_START( edfu )
 	ROM_LOAD16_BYTE( "edf6.b3",  0x000001, 0x020000, CRC(4797de97) SHA1(dcfcc376a49853c938d772808efe421ba4ba24da) )
 	ROM_CONTINUE (               0x080001, 0x020000 )
 
-	ROM_REGION( 0x40000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "edf1.f5",  0x000000, 0x020000, CRC(2290ea19) SHA1(64c9394bd4d5569d68833d2e57abaf2f1af5be97) )
 	ROM_LOAD16_BYTE( "edf2.f3",  0x000001, 0x020000, CRC(ce93643e) SHA1(686bf0ec104af8c97624a782e0d60afe170fd945) )
 
@@ -2448,7 +2445,7 @@ ROM_START( hachoo )
 	ROM_LOAD16_BYTE( "hacho02.rom", 0x000000, 0x020000, CRC(49489c27) SHA1(21c31e1b41ca6c7e78803e5a2e7c49f7b885d0e3) )
 	ROM_LOAD16_BYTE( "hacho01.rom", 0x000001, 0x020000, CRC(97fc9515) SHA1(192660061af6a5bddccf7cfffcbfa368c4030de9) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "hacho05.rom", 0x000000, 0x010000, CRC(6271f74f) SHA1(2fe0f8adf3cdafe13a9107c36f24f1a525d06a05) )
 	ROM_LOAD16_BYTE( "hacho06.rom", 0x000001, 0x010000, CRC(db9e743c) SHA1(77a3691b48eed389bfcdead5f307415dce47247e) )
 
@@ -2531,7 +2528,7 @@ ROM_START( hayaosi1 )
 	ROM_LOAD16_BYTE( "6", 0x000001, 0x020000, CRC(341f8057) SHA1(958d9fc870bc13a9c1720d21776b5239db771ce2) )
 	ROM_CONTINUE (                  0x080001, 0x020000 )
 
-	ROM_REGION( 0x40000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "1", 0x00000, 0x20000, CRC(b088b27e) SHA1(198e2520ce4f9b19ea108e09ff00f7e27768f290) )
 	ROM_LOAD16_BYTE( "2", 0x00001, 0x20000, CRC(cebc7b16) SHA1(18b166560ffff7c43cec3d52e4b2da79256dfb2e) )
 
@@ -2585,7 +2582,7 @@ ROM_START( kazan )
 	ROM_LOAD16_BYTE( "iga_03.bin", 0x040000, 0x010000, CRC(de5937ad) SHA1(d3039e5391feb925ea10f33a1363bf3ffc1ebb3d) )
 	ROM_LOAD16_BYTE( "iga_04.bin", 0x040001, 0x010000, CRC(afaf0480) SHA1(b8d0ec859a94941650bdd2b01e98d054d49fef67) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "iga_05.bin", 0x000000, 0x010000, CRC(13580868) SHA1(bfcd11b294b64af81a0403a3e9370c42a9859b6b) )
 	ROM_LOAD16_BYTE( "iga_06.bin", 0x000001, 0x010000, CRC(7904d5dd) SHA1(4cd9fdab601a90c997a041a9f7966a9a233e897b) )
 
@@ -2631,7 +2628,7 @@ ROM_START( iganinju )
 	ROM_LOAD16_BYTE( "iga_03.bin", 0x040000, 0x010000, CRC(de5937ad) SHA1(d3039e5391feb925ea10f33a1363bf3ffc1ebb3d) )
 	ROM_LOAD16_BYTE( "iga_04.bin", 0x040001, 0x010000, CRC(afaf0480) SHA1(b8d0ec859a94941650bdd2b01e98d054d49fef67) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "iga_05.bin", 0x000000, 0x010000, CRC(13580868) SHA1(bfcd11b294b64af81a0403a3e9370c42a9859b6b) )
 	ROM_LOAD16_BYTE( "iga_06.bin", 0x000001, 0x010000, CRC(7904d5dd) SHA1(4cd9fdab601a90c997a041a9f7966a9a233e897b) )
 
@@ -2690,7 +2687,7 @@ ROM_START( jitsupro )
 	ROM_LOAD16_BYTE( "jp_2.bin", 0x000000, 0x020000, CRC(5d842ff2) SHA1(69032601c0e67c5c78fad1cb2bb4f1b59014fe5a) )
 	ROM_LOAD16_BYTE( "jp_1.bin", 0x000001, 0x020000, CRC(0056edec) SHA1(529a5181f7d791930e238bc115daeae1ab9a63ad) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "jp_5.bin", 0x000000, 0x010000, CRC(84454e9e) SHA1(a506d44349a670e57d9dba3ec6a9de2597ba2cdb) ) // 11xxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD16_BYTE( "jp_6.bin", 0x000001, 0x010000, CRC(1fa9b75b) SHA1(d0e3640333f737658542ed4a8758d62f6d64ae05) ) // 11xxxxxxxxxxxxxx = 0xFF
 
@@ -2758,7 +2755,7 @@ ROM_START( kickoff )
 	ROM_LOAD16_BYTE( "kioff03.rom", 0x000000, 0x010000, CRC(3b01be65) SHA1(110b4e02053073c0315aba1eca8c19afe5fafb33) )
 	ROM_LOAD16_BYTE( "kioff01.rom", 0x000001, 0x010000, CRC(ae6e68a1) SHA1(aac54e13dd33420712a869e6f46fb9b94fde9e34) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "kioff09.rom", 0x000000, 0x010000, CRC(1770e980) SHA1(0c9dd30765432c64bc6c320c0948c471b52ae084) )
 	ROM_LOAD16_BYTE( "kioff19.rom", 0x000001, 0x010000, CRC(1b03bbe4) SHA1(ef778712c293af15bda37f0425892023747ec479) )
 
@@ -2811,7 +2808,7 @@ ROM_START( lomakai )
 	ROM_LOAD16_BYTE( "lom_30.rom", 0x000000, 0x020000, CRC(ba6d65b8) SHA1(4c83e57c977b2be82a99a4a61ab8fd5f7099ae38) )
 	ROM_LOAD16_BYTE( "lom_20.rom", 0x000001, 0x020000, CRC(56a00dc2) SHA1(5d97f89d384e12d70cbb5aabd6ce309e5cfb5497) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )        /* Sound CPU Code (Z80) */
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound CPU Code (Z80) */
 	ROM_LOAD( "lom_01.rom",  0x0000, 0x10000, CRC(46e85e90) SHA1(905899346f7cd91e76d0e303258149c3d16604e0) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* Scroll 0 */
@@ -2834,7 +2831,7 @@ ROM_START( makaiden )
 	ROM_LOAD16_BYTE( "makaiden.3a", 0x000000, 0x020000, CRC(87cf81d1) SHA1(c4410a86a01c683368dbc3daca61e21931885650) )
 	ROM_LOAD16_BYTE( "makaiden.2a", 0x000001, 0x020000, CRC(d40e0fea) SHA1(0f8a0440f63f52508ab44c3a8eb5b7f03ccca49d) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 )        /* Sound CPU Code (Z80) */
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound CPU Code (Z80) */
 	ROM_LOAD( "lom_01.rom",  0x0000, 0x10000, CRC(46e85e90) SHA1(905899346f7cd91e76d0e303258149c3d16604e0) )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* Scroll 0 */
@@ -2912,7 +2909,7 @@ ROM_START( p47 )
 	ROM_LOAD16_BYTE( "p47us3.bin", 0x000000, 0x020000, CRC(022e58b8) SHA1(87db59e409977358d9a7b689f2d69bef056328d9) )
 	ROM_LOAD16_BYTE( "p47us1.bin", 0x000001, 0x020000, CRC(ed926bd8) SHA1(5cf3e7b9b23667eaa8ebcff0803a7b881c7b83cf) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "p47j_9.bin",  0x000000, 0x010000, CRC(ffcf318e) SHA1(c675968c931a7e8e00ae83e49e8cef3fd193da57) )
 	ROM_LOAD16_BYTE( "p47j_19.bin", 0x000001, 0x010000, CRC(adb8c12e) SHA1(31590b037133f81a52779dbd4f2b5ac5b59198ae) )
 
@@ -2953,7 +2950,7 @@ ROM_START( p47j )
 	ROM_LOAD16_BYTE( "p47j_3.bin", 0x000000, 0x020000, CRC(11c655e5) SHA1(a2bfd6538ac81a5f20fa77460ba045584313413a) )
 	ROM_LOAD16_BYTE( "p47j_1.bin", 0x000001, 0x020000, CRC(0a5998de) SHA1(9f474c6c9b125fc7c41a44dbaacf3ba3800df8b5) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "p47j_9.bin",  0x000000, 0x010000, CRC(ffcf318e) SHA1(c675968c931a7e8e00ae83e49e8cef3fd193da57) )
 	ROM_LOAD16_BYTE( "p47j_19.bin", 0x000001, 0x010000, CRC(adb8c12e) SHA1(31590b037133f81a52779dbd4f2b5ac5b59198ae) )
 
@@ -3129,7 +3126,7 @@ ROM_START( plusalph )
 	ROM_LOAD16_BYTE( "pa-rom3.bin", 0x040000, 0x010000, CRC(1b739835) SHA1(3aaa9545a7f578a9775311dcd44504870f3b1544) )
 	ROM_LOAD16_BYTE( "pa-rom4.bin", 0x040001, 0x010000, CRC(ff760e80) SHA1(dd06306a516a2d5e49cf8f2343ddc26405b309a9) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "pa-rom5.bin", 0x000000, 0x010000, CRC(ddc2739b) SHA1(dee31660428baea44c73dec238ed7f39a6771fe6) )
 	ROM_LOAD16_BYTE( "pa-rom6.bin", 0x000001, 0x010000, CRC(f6f8a167) SHA1(60d5c9db18d8f6704b68ccde5d026174679cec36) )
 
@@ -3209,7 +3206,7 @@ ROM_START( rodland )
 	ROM_LOAD16_BYTE( "rl_03.rom", 0x040000, 0x010000, CRC(62fdf6d7) SHA1(ffde7e7f5b3b548bc980b9dee767f693046ecab2) )
 	ROM_LOAD16_BYTE( "rl_04.rom", 0x040001, 0x010000, CRC(44163c86) SHA1(1c56d79531af0312e7cd3dc66cf61b55dd1a6e51) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "rl_05.rom", 0x000000, 0x010000, CRC(c1617c28) SHA1(1b3440055c083b74270fe06b5f42e7d1337efeca) )
 	ROM_LOAD16_BYTE( "rl_06.rom", 0x000001, 0x010000, CRC(663392b2) SHA1(99052639e934d1ca18888c9c7fa061c1d3508fd4) )
 
@@ -3248,7 +3245,7 @@ ROM_START( rodlandj )
 	ROM_LOAD16_BYTE( "rl_3.bin", 0x040000, 0x010000, CRC(c5b1075f) SHA1(a8bcc0e9dbb4b731bc0b7e5a8e0efc3d142505b9) )
 	ROM_LOAD16_BYTE( "rl_4.bin", 0x040001, 0x010000, CRC(9ec61048) SHA1(71b6af054a528af04e23affff635a9358537cd3b) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "rl_05.rom", 0x000000, 0x010000, CRC(c1617c28) SHA1(1b3440055c083b74270fe06b5f42e7d1337efeca) )
 	ROM_LOAD16_BYTE( "rl_06.rom", 0x000001, 0x010000, CRC(663392b2) SHA1(99052639e934d1ca18888c9c7fa061c1d3508fd4) )
 
@@ -3286,7 +3283,7 @@ ROM_START( rodlandjb )
 	ROM_LOAD16_BYTE( "rl_3.bin", 0x040000, 0x010000, CRC(c5b1075f) SHA1(a8bcc0e9dbb4b731bc0b7e5a8e0efc3d142505b9) )
 	ROM_LOAD16_BYTE( "rl_4.bin", 0x040001, 0x010000, CRC(9ec61048) SHA1(71b6af054a528af04e23affff635a9358537cd3b) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "rl02.bin", 0x000000, 0x010000, CRC(d26eae8f) SHA1(1c6d514e6d006f78fa7b24d18a3eb4c5a4c5cbce) )
 	ROM_LOAD16_BYTE( "rl01.bin", 0x000001, 0x010000, CRC(04cf24bc) SHA1(e754cce3c83a7088daf90e753fbb0df9ef7fc9be) )
 
@@ -3334,7 +3331,7 @@ ROM_START( stdragon )
 	ROM_LOAD16_BYTE( "jsd-02.bin", 0x000000, 0x020000, CRC(cc29ab19) SHA1(e145eeb01fad313e300f0c614c0e7a5c1d75d7d9) )
 	ROM_LOAD16_BYTE( "jsd-01.bin", 0x000001, 0x020000, CRC(67429a57) SHA1(f3c20fabed97ac5c2fe3e891f9c8c86478453a6c) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "jsd-05.bin", 0x000000, 0x010000, CRC(8c04feaa) SHA1(57e86fd88dc72d123a41f0dee80a16be38ac2e81) )
 	ROM_LOAD16_BYTE( "jsd-06.bin", 0x000001, 0x010000, CRC(0bb62f3a) SHA1(68d9f161ba2568f8e046b1a40127bbb973d7a884) )
 
@@ -3402,7 +3399,7 @@ ROM_START( stdragona )
 	ROM_LOAD16_BYTE( "jsda-02.bin", 0x000000, 0x020000, CRC(d65d4154) SHA1(f77886590a092743c829fb52b5de0ca8ef51c122) )
 	ROM_LOAD16_BYTE( "jsda-01.bin", 0x000001, 0x020000, CRC(c40c8ee1) SHA1(346b16519f35d7bdb283d87f6f89f54d3b7eefe2) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "jsd-05.bin", 0x000000, 0x010000, CRC(8c04feaa) SHA1(57e86fd88dc72d123a41f0dee80a16be38ac2e81) )
 	ROM_LOAD16_BYTE( "jsd-06.bin", 0x000001, 0x010000, CRC(0bb62f3a) SHA1(68d9f161ba2568f8e046b1a40127bbb973d7a884) )
 
@@ -3454,7 +3451,7 @@ ROM_START( soldam )
 	ROM_LOAD16_BYTE( "3ver1.bin", 0x040000, 0x010000, CRC(c5382a07) SHA1(5342775f2925772e23bb460e88cd2b7e524e57fa) )
 	ROM_LOAD16_BYTE( "4ver1.bin", 0x040001, 0x010000, CRC(1df7816f) SHA1(7c069470ec0e884eae5a52581f2be17d9e692105) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "5ver1.bin", 0x000000, 0x010000, CRC(d1019a67) SHA1(32d77914a67c009bf1bb397772f195594f7cc03f) )
 	ROM_LOAD16_BYTE( "6ver1.bin", 0x000001, 0x010000, CRC(3ed219b4) SHA1(afffa5596027181ae94488d54d6266f8a7ead180) )
 
@@ -3488,7 +3485,7 @@ ROM_START( soldamj )
 	ROM_LOAD16_BYTE( "3ver1.bin",   0x040000, 0x010000, CRC(c5382a07) SHA1(5342775f2925772e23bb460e88cd2b7e524e57fa) )
 	ROM_LOAD16_BYTE( "4ver1.bin",   0x040001, 0x010000, CRC(1df7816f) SHA1(7c069470ec0e884eae5a52581f2be17d9e692105) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "5ver1.bin", 0x000000, 0x010000, CRC(d1019a67) SHA1(32d77914a67c009bf1bb397772f195594f7cc03f) )
 	ROM_LOAD16_BYTE( "6ver1.bin", 0x000001, 0x010000, CRC(3ed219b4) SHA1(afffa5596027181ae94488d54d6266f8a7ead180) )
 
@@ -3527,7 +3524,7 @@ ROM_START( tshingena )
 	ROM_LOAD16_BYTE( "takeda2.bin", 0x000000, 0x020000, CRC(6ddfc9f3) SHA1(0ce1b8eae31453db0b2081717d7dbda9ea7d5a60) )
 	ROM_LOAD16_BYTE( "takeda1.bin", 0x000001, 0x020000, CRC(1afc6b7d) SHA1(b56da1b8c5b417a88a2952491c2d5472bb783945) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "takeda5.bin", 0x000000, 0x010000, CRC(fbdc51c0) SHA1(bc6036c556275f7eccd7741d23437a98b0aa13bb) )
 	ROM_LOAD16_BYTE( "takeda6.bin", 0x000001, 0x010000, CRC(8fa65b69) SHA1(23a2d60435f235366f877ac79ac1506a99cfae9c) )
 
@@ -3570,7 +3567,7 @@ ROM_START( tshingen )
 	ROM_LOAD16_BYTE( "shing_02.rom", 0x000000, 0x020000, CRC(d9ab5b78) SHA1(c7622ec11a636dc7a6bcad02556a98aa0a9fb043) )
 	ROM_LOAD16_BYTE( "shing_01.rom", 0x000001, 0x020000, CRC(a9d2de20) SHA1(b53205722ae19305a1c373abbbac4fbcbcb0b0f0) )
 
-	ROM_REGION( 0x20000, "soundcpu", 0 )        /* Sound CPU Code */
+	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
 	ROM_LOAD16_BYTE( "takeda5.bin", 0x000000, 0x010000, CRC(fbdc51c0) SHA1(bc6036c556275f7eccd7741d23437a98b0aa13bb) )
 	ROM_LOAD16_BYTE( "takeda6.bin", 0x000001, 0x010000, CRC(8fa65b69) SHA1(23a2d60435f235366f877ac79ac1506a99cfae9c) )
 
@@ -3731,7 +3728,7 @@ DRIVER_INIT_MEMBER(megasys1_state,64street)
 
 READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
 {
-	UINT16 *ROM  = (UINT16 *) memregion("maincpu")->base();
+	UINT16 *ROM  = (UINT16 *) m_region_maincpu->base();
 
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -3770,8 +3767,8 @@ WRITE16_MEMBER(megasys1_state::megasys1A_mcu_hs_w)
 DRIVER_INIT_MEMBER(megasys1_state,astyanax)
 {
 	astyanax_rom_decode(machine(), "maincpu");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,avspirit)
@@ -3783,8 +3780,8 @@ DRIVER_INIT_MEMBER(megasys1_state,avspirit)
 	m_ip_select_values[4] = 0x34;
 
 	// has twice less RAM
-	machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_readwrite(0x060000, 0x06ffff);
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_ram(0x070000, 0x07ffff, m_ram);
+	m_maincpu->space(AS_PROGRAM).unmap_readwrite(0x060000, 0x06ffff);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x070000, 0x07ffff, m_ram);
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,bigstrik)
@@ -3826,7 +3823,7 @@ DRIVER_INIT_MEMBER(megasys1_state,edf)
 
 READ16_MEMBER(megasys1_state::edfbl_input_r)
 {
-	const char *const in_names[] = { "SYSTEM", "P1", "P2", "DSW1", "DSW2" };
+	ioport_port *in_names[] = { m_io_system, m_io_p1, m_io_p2, m_io_dsw1, m_io_dsw2 };
 	UINT16 res;
 
 	res = 0;
@@ -3837,7 +3834,7 @@ READ16_MEMBER(megasys1_state::edfbl_input_r)
 		case 0x04/2:
 		case 0x06/2:
 		case 0x08/2:
-		case 0x0a/2: res = ioport(in_names[offset-1])->read(); break;
+		case 0x0a/2: res = in_names[offset-1]->read(); break;
 	}
 
 	return res;
@@ -3846,8 +3843,8 @@ READ16_MEMBER(megasys1_state::edfbl_input_r)
 DRIVER_INIT_MEMBER(megasys1_state,edfbl)
 {
 	//device_t *oki1 = machine().device("oki1");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::edfbl_input_r),this));
-	//machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(*oki1, 0xe000e, 0xe000f, FUNC(soundlatch_byte_w));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::edfbl_input_r),this));
+	//m_maincpu->space(AS_PROGRAM).install_legacy_write_handler(*oki1, 0xe000e, 0xe000f, FUNC(soundlatch_byte_w));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,hayaosi1)
@@ -3861,7 +3858,7 @@ DRIVER_INIT_MEMBER(megasys1_state,hayaosi1)
 
 READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
 {
-	UINT16 *ROM  = (UINT16 *) memregion("maincpu")->base();
+	UINT16 *ROM  = (UINT16 *) m_region_maincpu->base();
 
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -3900,9 +3897,9 @@ DRIVER_INIT_MEMBER(megasys1_state,iganinju)
 
 	phantasm_rom_decode(machine(), "maincpu");
 
-	//ROM  = (UINT16 *) memregion("maincpu")->base();
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x2f000, 0x2f009, write16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_w),this));
+	//ROM  = (UINT16 *) m_region_maincpu->base();
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2f000, 0x2f009, write16_delegate(FUNC(megasys1_state::iganinju_mcu_hs_w),this));
 
 	//ROM[0x00006e/2] = 0x0420; // the only game that does
 								// not like lev 3 interrupts
@@ -3910,36 +3907,34 @@ DRIVER_INIT_MEMBER(megasys1_state,iganinju)
 
 WRITE16_MEMBER(megasys1_state::okim6295_both_1_w)
 {
-	okim6295_device *oki = machine().device<okim6295_device>("oki1");
-	if (ACCESSING_BITS_0_7) oki->write_command((data >> 0) & 0xff );
-	else                oki->write_command((data >> 8) & 0xff );
+	if (ACCESSING_BITS_0_7) m_oki1->write_command((data >> 0) & 0xff );
+	else                    m_oki1->write_command((data >> 8) & 0xff );
 }
 WRITE16_MEMBER(megasys1_state::okim6295_both_2_w)
 {
-	okim6295_device *oki = machine().device<okim6295_device>("oki2");
-	if (ACCESSING_BITS_0_7) oki->write_command((data >> 0) & 0xff );
-	else                oki->write_command((data >> 8) & 0xff );
+	if (ACCESSING_BITS_0_7) m_oki2->write_command((data >> 0) & 0xff );
+	else                    m_oki2->write_command((data >> 8) & 0xff );
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,jitsupro)
 {
-	//UINT16 *ROM  = (UINT16 *) memregion("maincpu")->base();
+	//UINT16 *ROM  = (UINT16 *) m_region_maincpu->base();
 
 	astyanax_rom_decode(machine(), "maincpu");      // Code
 
 	jitsupro_gfx_unmangle("gfx1");   // Gfx
 	jitsupro_gfx_unmangle("gfx4");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x20000, 0x20009, write16_delegate(FUNC(megasys1_state::megasys1A_mcu_hs_w),this));
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	machine().device("soundcpu")->memory().space(AS_PROGRAM).install_write_handler(0xa0000, 0xa0003, write16_delegate(FUNC(megasys1_state::okim6295_both_1_w),this));
-	machine().device("soundcpu")->memory().space(AS_PROGRAM).install_write_handler(0xc0000, 0xc0003, write16_delegate(FUNC(megasys1_state::okim6295_both_2_w),this));
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xa0000, 0xa0003, write16_delegate(FUNC(megasys1_state::okim6295_both_1_w),this));
+	m_audiocpu->space(AS_PROGRAM).install_write_handler(0xc0000, 0xc0003, write16_delegate(FUNC(megasys1_state::okim6295_both_2_w),this));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,peekaboo)
 {
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x100000, 0x100001, read16_delegate(FUNC(megasys1_state::protection_peekaboo_r),this), write16_delegate(FUNC(megasys1_state::protection_peekaboo_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x100000, 0x100001, read16_delegate(FUNC(megasys1_state::protection_peekaboo_r),this), write16_delegate(FUNC(megasys1_state::protection_peekaboo_w),this));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,phantasm)
@@ -3974,20 +3969,20 @@ DRIVER_INIT_MEMBER(megasys1_state,soldamj)
 {
 	astyanax_rom_decode(machine(), "maincpu");
 	/* Sprite RAM is mirrored */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,soldam)
 {
 	phantasm_rom_decode(machine(), "maincpu");
 	/* Sprite RAM is mirrored */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8c000, 0x8cfff, read16_delegate(FUNC(megasys1_state::soldamj_spriteram16_r),this), write16_delegate(FUNC(megasys1_state::soldamj_spriteram16_w),this));
 }
 
 
 READ16_MEMBER(megasys1_state::stdragon_mcu_hs_r)
 {
-	UINT16 *ROM  = (UINT16 *) memregion("maincpu")->base();
+	UINT16 *ROM  = (UINT16 *) m_region_maincpu->base();
 
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
@@ -4017,8 +4012,8 @@ WRITE16_MEMBER(megasys1_state::stdragon_mcu_hs_w)
 DRIVER_INIT_MEMBER(megasys1_state,stdragon)
 {
 	phantasm_rom_decode(machine(), "maincpu");
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
 }
 
 DRIVER_INIT_MEMBER(megasys1_state,stdragona)
@@ -4028,13 +4023,13 @@ DRIVER_INIT_MEMBER(megasys1_state,stdragona)
 	stdragona_gfx_unmangle("gfx1");
 	stdragona_gfx_unmangle("gfx4");
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x00000, 0x3ffff, read16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0x23ff0, 0x23ff9, write16_delegate(FUNC(megasys1_state::stdragon_mcu_hs_w),this));
 }
 
 READ16_MEMBER(megasys1_state::monkelf_input_r)
 {
-	const char *const in_names[] = { "P1", "P2", "DSW1", "DSW2", "SYSTEM" };
+	ioport_port *in_names[] = { m_io_p1, m_io_p2, m_io_dsw1, m_io_dsw2, m_io_system };
 	UINT16 res;
 
 	res = 0xffff;
@@ -4045,7 +4040,7 @@ READ16_MEMBER(megasys1_state::monkelf_input_r)
 		case 0x04/2:
 		case 0x06/2:
 		case 0x08/2:
-		case 0x0a/2: res = ioport(in_names[offset-1])->read(); break;
+		case 0x0a/2: res = in_names[offset-1]->read(); break;
 	}
 
 	return res;
@@ -4055,10 +4050,10 @@ DRIVER_INIT_MEMBER(megasys1_state,monkelf)
 {
 	DRIVER_INIT_CALL(avspirit);
 
-	UINT16 *ROM = (UINT16*)memregion("maincpu")->base();
+	UINT16 *ROM = (UINT16*)m_region_maincpu->base();
 	ROM[0x00744/2] = 0x4e71; // weird check, 0xe000e R is a port-based trap?
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::monkelf_input_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xe0000, 0xe000f, read16_delegate(FUNC(megasys1_state::monkelf_input_r),this));
 }
 
 /*************************************
