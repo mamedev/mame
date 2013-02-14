@@ -70,7 +70,7 @@ void n64_periphs::device_start()
 
 void n64_periphs::device_reset()
 {
-	UINT32 *cart = (UINT32*)memregion("user2")->base();
+	UINT32 *cart = (UINT32*)machine().root_device().memregion("user2")->base();
 
 	maincpu = machine().device("maincpu");
 	rspcpu = machine().device("rsp");
@@ -1411,7 +1411,7 @@ TIMER_CALLBACK_MEMBER(n64_periphs::pi_dma_callback)
 
 void n64_periphs::pi_dma_tick()
 {
-	UINT16 *cart16 = (UINT16*)memregion("user2")->base();
+	UINT16 *cart16;
 	UINT16 *dram16 = (UINT16*)rdram;
 
 	UINT32 cart_addr = (pi_cart_addr & 0x0fffffff) >> 1;
@@ -1424,12 +1424,13 @@ void n64_periphs::pi_dma_tick()
 	}
 	else if((cart_addr & 0x03000000) == 0x03000000 && dd_present)
 	{
-		cart16 = (UINT16*)memregion("ddipl")->base();
+		cart16 = (UINT16*)machine().root_device().memregion("ddipl")->base();
 		cart_addr = (pi_cart_addr & 0x003fffff) >> 1;
 	}
 	else
 	{
-		cart_addr &= ((memregion("user2")->bytes() >> 1) - 1);
+		cart16 = (UINT16*)machine().root_device().memregion("user2")->base();
+		cart_addr &= ((machine().root_device().memregion("user2")->bytes() >> 1) - 1);
 	}
 
 	//printf("%08x Cart, %08x Dram\n", cart_addr << 1, dram_addr << 1); fflush(stdout);
@@ -1780,9 +1781,9 @@ int n64_periphs::pif_channel_handle_command(int channel, int slength, UINT8 *sda
 				case 1: //p2 inputs
 				{
 					//printf("Read p%d inputs\n", channel + 1);
-					buttons = ioport(portnames[(channel*3) + 0])->read();
-					x = ioport(portnames[(channel*3) + 1])->read() - 128;
-					y = ioport(portnames[(channel*3) + 2])->read() - 128;
+					buttons = machine().root_device().ioport(portnames[(channel*3) + 0])->read();
+					x = machine().root_device().ioport(portnames[(channel*3) + 1])->read() - 128;
+					y = machine().root_device().ioport(portnames[(channel*3) + 2])->read() - 128;
 
 					rdata[0] = (buttons >> 8) & 0xff;
 					rdata[1] = (buttons >> 0) & 0xff;
