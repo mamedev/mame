@@ -7350,9 +7350,9 @@ List of perfect retail cartridges rom dumps
 			<feature name="lockout" value="D411A 9306 BA" />
 			<feature name="cart_model" value="SNS-006" />
 			<feature name="cart_back_label" value="" />
-			<dataarea name="rom" size="2097152">
+			<dataarea name="rom" size="1572864">
 				<rom name="sns-re-0 p0.u1" size="1048576" crc="d21d844b" sha1="144c402a0a1117e5f3bad98d309d329283d60a7c" offset="0x000000" />
-				<rom name="sns-re-0 p1.u2" size="1048576" crc="70162288" sha1="bf393af9c56cee2933d8e2d47cec34a2d906a006" offset="0x100000" />
+				<rom name="sns-re-0 p1.u2" size="524288" crc="70162288" sha1="bf393af9c56cee2933d8e2d47cec34a2d906a006" offset="0x100000" />
 			</dataarea>
 		</part>
 	</software>

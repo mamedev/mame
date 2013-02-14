@@ -2509,6 +2509,30 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="visicalc">
+		<description>VisiCalc</description>
+		<year>1982</year>
+		<publisher>VisiCorp</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="161562">
+				<rom name="visicalc.imd" size="161562" crc="23089a93" sha1="70f3914e07c52657294fe618a341c25f8c423189" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="strecalc">
+		<description>StretchCalc</description>
+		<year>1983</year>
+		<publisher>Multisoft</publisher>
+		<info name="version" value="1.2" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="132528">
+				<rom name="stretchcalc.imd" size="132528" crc="a2a5a643" sha1="637ac58f73041299e7d7141be6f6c00172a79e42" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- OS -->
 
 	<software name="cpm8610">

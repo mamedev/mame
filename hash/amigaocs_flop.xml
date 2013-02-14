@@ -125,7 +125,7 @@
 	<!-- these files were found in the TOSEC SPS / CAPS -->
 
 	<software name="actfgkixx" cloneof="actionfg" supported="no">
-		<description>Action Fighter (Kixx) (EU) (en)</description>
+		<description>Action Fighter (Kixx)</description>
 		<year>1989</year>
 		<publisher>KIXX</publisher>
 		<info name="SPS Release" value="3040" />
@@ -136,14 +136,14 @@
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="978321">
-				<rom name="(sps3040)actionfighter_disk1.ipf" size="978321" crc="795e1dfd" sha1="8fa4beb3cd9150249821f2d90b3c572bab4b3e11" offset="0"/>
+				<rom name="(sps3040)actionfighter (amiga + pc disk).ipf" size="978321" crc="795e1dfd" sha1="8fa4beb3cd9150249821f2d90b3c572bab4b3e11" offset="0"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="918252">
-				<rom name="(sps3040)actionfighter_disk2.ipf" size="918252" crc="809bfb3b" sha1="a6b2a61b6fd30f671706bf3da37f479bf24fd0d3" offset="0"/>
+				<rom name="(sps3040)actionfighter (pc disk).ipf" size="918252" crc="809bfb3b" sha1="a6b2a61b6fd30f671706bf3da37f479bf24fd0d3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -718,23 +718,24 @@
 	</software>
 
 	<software name="sf1" supported="no">
-		<!-- SPS (CAPS) release 3041 -->
-		<description>Street Fighter (Kixx) (EU) (en)</description>
+		<description>Street Fighter (Kixx)</description>
 		<!-- budget, standalone -->
 		<!-- (Amiga, OCS, PAL) -->
 		<!-- (PC, PAL) -->
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>KIXX</publisher>
+		<info name="SPS Release" value="3041" />
+
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="991457">
-				<rom name="(sps3041)streetfighter_disk1.ipf" size="991457" crc="218d38da" sha1="045b4c14dc1523f33b55e2986357a07908caa8a6" offset="0"/>
+				<rom name="(sps3041)streetfighter (amiga + pc disk).ipf" size="991457" crc="218d38da" sha1="045b4c14dc1523f33b55e2986357a07908caa8a6" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="918252">
-				<rom name="(sps3041)streetfighter_disk2.ipf" size="918252" crc="ae97b7e1" sha1="9fc6cebe832e0e19192c428fb93f4ad9a827b2a3" offset="0"/>
+				<rom name="(sps3041)streetfighter (pc disk).ipf" size="918252" crc="ae97b7e1" sha1="9fc6cebe832e0e19192c428fb93f4ad9a827b2a3" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
