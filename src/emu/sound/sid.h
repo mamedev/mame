@@ -16,9 +16,6 @@ struct SID6581_t
 	device_t *device;
 	sound_stream *mixer_channel; // mame stream/ mixer channel
 
-	devcb_resolved_read8 in_potx_func;
-	devcb_resolved_read8 in_poty_func;
-
 	int type;
 	UINT32 clock;
 

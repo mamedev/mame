@@ -129,12 +129,12 @@ machine_config_constructor c64_magic_formel_cartridge_device::device_mconfig_add
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( c64_magic_formel )
+//  INPUT_CHANGED_MEMBER( freeze )
 //-------------------------------------------------
 
 INPUT_CHANGED_MEMBER( c64_magic_formel_cartridge_device::freeze )
 {
-	if (!newval && (m_pb7_ff & m_cb2_ff))
+	if (newval && (m_pb7_ff & m_cb2_ff))
 	{
 		m_cb2_ff = 0;
 
@@ -146,9 +146,14 @@ INPUT_CHANGED_MEMBER( c64_magic_formel_cartridge_device::freeze )
 	}
 }
 
+
+//-------------------------------------------------
+//  INPUT_PORTS( c64_magic_formel )
+//-------------------------------------------------
+
 static INPUT_PORTS_START( c64_magic_formel )
 	PORT_START("FREEZE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Freeze") PORT_CHANGED_MEMBER(DEVICE_SELF, c64_magic_formel_cartridge_device, freeze, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_magic_formel_cartridge_device, freeze, 0)
 INPUT_PORTS_END
 
 

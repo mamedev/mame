@@ -36,13 +36,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
-	// not really public
-	DECLARE_READ8_MEMBER( dma_cd_r );
-	DECLARE_WRITE8_MEMBER( dma_cd_w );
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( dma_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	DECLARE_WRITE_LINE_MEMBER( opl_irq_w );
 
 protected:
 	// device-level overrides

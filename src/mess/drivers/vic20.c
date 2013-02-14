@@ -71,46 +71,6 @@ block of RAM instead of 8.
 
 
 //**************************************************************************
-//  MACROS/CONSTANTS
-//**************************************************************************
-
-enum
-{
-	BLK0 = 0,
-	BLK1,
-	BLK2,
-	BLK3,
-	BLK4,
-	BLK5,
-	BLK6,
-	BLK7
-};
-
-
-enum
-{
-	RAM0 = 0,
-	RAM1,
-	RAM2,
-	RAM3,
-	RAM4,
-	RAM5,
-	RAM6,
-	RAM7
-};
-
-
-enum
-{
-	IO0 = 4,
-	COLOR = 5,
-	IO2 = 6,
-	IO3 = 7
-};
-
-
-
-//**************************************************************************
 //  MEMORY MANAGEMENT
 //**************************************************************************
 
@@ -341,11 +301,6 @@ ADDRESS_MAP_END
 //  INPUT_PORTS( vic20 )
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( vic20_state::restore_w )
-{
-	m_via0->write_ca1(newval);
-}
-
 static INPUT_PORTS_START( vic20 )
 	PORT_START( "ROW0" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Del  Inst") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
@@ -428,7 +383,7 @@ static INPUT_PORTS_START( vic20 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)              PORT_CHAR('2') PORT_CHAR('"')
 
 	PORT_START( "RESTORE" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESTORE") PORT_CODE(KEYCODE_PRTSCR) PORT_CHANGED_MEMBER(DEVICE_SELF, vic20_state, restore_w, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESTORE") PORT_CODE(KEYCODE_PRTSCR) PORT_WRITE_LINE_DEVICE_MEMBER(M6522_0_TAG, via6522_device, write_ca1)
 
 	PORT_START( "LOCK" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
@@ -755,6 +710,10 @@ void vic20_state::machine_start()
 void vic20_state::machine_reset()
 {
 	m_maincpu->reset();
+
+	m_vic->reset();
+	m_via0->reset();
+	m_via1->reset();
 
 	m_iec->reset();
 	m_exp->reset();

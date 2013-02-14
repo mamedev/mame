@@ -43,12 +43,6 @@ public:
 	DECLARE_WRITE8_MEMBER( tpi_pa_w );
 	DECLARE_READ8_MEMBER( tpi_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi_pc_w );
-	DECLARE_READ8_MEMBER( dma_cd_r );
-	DECLARE_WRITE8_MEMBER( dma_cd_w );
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( dma_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
 
 protected:
 	// device-level overrides

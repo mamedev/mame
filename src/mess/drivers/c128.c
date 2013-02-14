@@ -1278,7 +1278,7 @@ WRITE_LINE_MEMBER( c128_state::iec_data_w )
 //  C64_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c128_state::exp_dma_r )
+READ8_MEMBER( c128_state::exp_dma_cd_r )
 {
 	int ba = 0, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -1286,7 +1286,7 @@ READ8_MEMBER( c128_state::exp_dma_r )
 	return read_memory(space, offset, vma, ba, aec, z80io);
 }
 
-WRITE8_MEMBER( c128_state::exp_dma_w )
+WRITE8_MEMBER( c128_state::exp_dma_cd_w )
 {
 	int ba = 0, aec = 1, z80io = 1;
 	offs_t vma = 0;
@@ -1322,16 +1322,6 @@ WRITE_LINE_MEMBER( c128_state::exp_reset_w )
 		machine_reset();
 	}
 }
-
-static C64_EXPANSION_INTERFACE( expansion_intf )
-{
-	DEVCB_DRIVER_MEMBER(c128_state, exp_dma_r),
-	DEVCB_DRIVER_MEMBER(c128_state, exp_dma_w),
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, exp_irq_w),
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, exp_nmi_w),
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, exp_dma_w),
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, exp_reset_w)
-};
 
 
 //-------------------------------------------------
@@ -1410,8 +1400,12 @@ void c128_state::machine_reset()
 	m_reset = 1;
 
 	m_mmu->reset();
+	m_vic->reset();
+	m_vdc->reset();
+	m_sid->reset();
 	m_cia1->reset();
 	m_cia2->reset();
+
 	m_iec->reset();
 	m_exp->reset();
 	m_user->reset();
@@ -1469,7 +1463,9 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS8564_TAG, mos8564_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACKS(DEVWRITELINE(DEVICE_SELF, c128_state, exp_irq_w), DEVWRITELINE(DEVICE_SELF, c128_state, exp_nmi_w), DEVWRITELINE(DEVICE_SELF, c128_state, exp_reset_w))
+	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF, c128_state, exp_dma_cd_r), DEVWRITE8(DEVICE_SELF, c128_state, exp_dma_cd_w), DEVWRITELINE(DEVICE_SELF, c128_state, exp_dma_w))
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
@@ -1588,7 +1584,9 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS8566_TAG, mos8566_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACKS(DEVWRITELINE(DEVICE_SELF, c128_state, exp_irq_w), DEVWRITELINE(DEVICE_SELF, c128_state, exp_nmi_w), DEVWRITELINE(DEVICE_SELF, c128_state, exp_reset_w))
+	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF, c128_state, exp_dma_cd_r), DEVWRITE8(DEVICE_SELF, c128_state, exp_dma_cd_w), DEVWRITELINE(DEVICE_SELF, c128_state, exp_dma_w))
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list

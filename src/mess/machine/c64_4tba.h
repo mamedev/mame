@@ -34,8 +34,6 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const;
 
-	DECLARE_INPUT_CHANGED_MEMBER( fire3 );
-
 protected:
 	// device-level overrides
 	virtual void device_config_complete() { m_shortname = "c64_4tba"; }

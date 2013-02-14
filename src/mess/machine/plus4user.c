@@ -60,15 +60,6 @@ plus4_user_port_device::plus4_user_port_device(const machine_config &mconfig, co
 
 
 //-------------------------------------------------
-//  plus4_user_port_device - destructor
-//-------------------------------------------------
-
-plus4_user_port_device::~plus4_user_port_device()
-{
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -84,8 +75,10 @@ void plus4_user_port_device::device_start()
 
 void plus4_user_port_device::device_reset()
 {
-	breset_w(ASSERT_LINE);
-	breset_w(CLEAR_LINE);
+	if (get_card_device())
+	{
+		get_card_device()->reset();
+	}
 }
 
 
@@ -101,4 +94,3 @@ WRITE_LINE_MEMBER( plus4_user_port_device::dtr_w ) { if (m_cart != NULL) m_cart-
 WRITE_LINE_MEMBER( plus4_user_port_device::rts_w ) { if (m_cart != NULL) m_cart->plus4_rts_w(state); }
 WRITE_LINE_MEMBER( plus4_user_port_device::rxc_w ) { if (m_cart != NULL) m_cart->plus4_rxc_w(state); }
 WRITE_LINE_MEMBER( plus4_user_port_device::atn_w ) { if (m_cart != NULL) m_cart->plus4_atn_w(state); }
-WRITE_LINE_MEMBER( plus4_user_port_device::breset_w ) { if (m_cart != NULL) m_cart->plus4_breset_w(state); }

@@ -372,12 +372,12 @@ static C64H156_INTERFACE( ga_intf )
 
 READ8_MEMBER( c1551_device::exp_dma_r )
 {
-	return m_slot->dma_cd_r(offset);
+	return m_slot->dma_cd_r(space, offset);
 }
 
 WRITE8_MEMBER( c1551_device::exp_dma_w )
 {
-	m_slot->dma_cd_w(offset, data);
+	m_slot->dma_cd_w(space, offset, data);
 }
 
 WRITE_LINE_MEMBER( c1551_device::exp_irq_w )
@@ -513,6 +513,8 @@ void c1551_device::device_reset()
 	m_maincpu->reset();
 
 	m_tpi0->reset();
+	
+	m_exp->reset();
 
 	// initialize gate array
 	m_ga->test_w(1);
@@ -596,19 +598,4 @@ void c1551_device::plus4_cd_w(address_space &space, offs_t offset, UINT8 data, i
 	}
 
 	m_exp->cd_w(space, offset, data, ba, cs0, c1l, c2l, cs1, c1h, c2h);
-}
-
-
-//-------------------------------------------------
-//  plus4_breset_w - buffered reset write
-//-------------------------------------------------
-
-void c1551_device::plus4_breset_w(int state)
-{
-	if (state == ASSERT_LINE)
-	{
-		device_reset();
-	}
-
-	m_exp->breset_w(state);
 }

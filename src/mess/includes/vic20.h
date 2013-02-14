@@ -109,10 +109,42 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
-	DECLARE_INPUT_CHANGED_MEMBER( restore_w );
-
 	// keyboard state
 	int m_key_col;
+
+	enum
+	{
+		BLK0 = 0,
+		BLK1,
+		BLK2,
+		BLK3,
+		BLK4,
+		BLK5,
+		BLK6,
+		BLK7
+	};
+
+
+	enum
+	{
+		RAM0 = 0,
+		RAM1,
+		RAM2,
+		RAM3,
+		RAM4,
+		RAM5,
+		RAM6,
+		RAM7
+	};
+
+
+	enum
+	{
+		IO0 = 4,
+		COLOR = 5,
+		IO2 = 6,
+		IO3 = 7
+	};
 };
 
 #endif

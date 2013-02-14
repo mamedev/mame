@@ -143,6 +143,6 @@ void vic1010_device::vic20_res_w(int state)
 {
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
-		m_expansion_slot[i]->port_res_w(state);
+		m_expansion_slot[i]->reset();
 	}
 }

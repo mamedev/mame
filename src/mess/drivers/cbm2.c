@@ -2066,6 +2066,8 @@ MACHINE_RESET_MEMBER( cbm2_state, cbm2 )
 
 	m_maincpu->reset();
 
+	if (m_crtc) m_crtc->reset();
+	m_sid->reset();
 	m_tpi1->reset();
 	m_tpi2->reset();
 	m_acia->reset();
@@ -2082,6 +2084,8 @@ MACHINE_RESET_MEMBER( cbm2_state, cbm2 )
 MACHINE_RESET_MEMBER( p500_state, p500 )
 {
 	MACHINE_RESET_CALL_MEMBER(cbm2);
+
+	m_vic->reset();
 
 	m_statvid = 1;
 	m_vicdotsel = 1;

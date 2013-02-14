@@ -63,7 +63,6 @@ class plus4_user_port_device : public device_t,
 public:
 	// construction/destruction
 	plus4_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~plus4_user_port_device();
 
 	// computer interface
 	DECLARE_READ8_MEMBER( p_r );
@@ -76,7 +75,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rts_w );
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
-	DECLARE_WRITE_LINE_MEMBER( breset_w );
 
 protected:
 	// device-level overrides
@@ -109,9 +107,6 @@ public:
 	virtual void plus4_rts_w(int state) { };
 	virtual void plus4_rxc_w(int state) { };
 	virtual void plus4_atn_w(int state) { };
-
-	// reset
-	virtual void plus4_breset_w(int state) { };
 
 protected:
 	plus4_user_port_device *m_slot;

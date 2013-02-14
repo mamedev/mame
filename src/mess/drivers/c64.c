@@ -474,6 +474,7 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 static INPUT_PORTS_START( c64gs )
+	// no keyboard
 INPUT_PORTS_END
 
 
@@ -946,12 +947,12 @@ WRITE8_MEMBER( c64gs_state::cpu_w )
 //  C64_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( c64_state::exp_dma_r )
+READ8_MEMBER( c64_state::exp_dma_cd_r )
 {
 	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
 }
 
-WRITE8_MEMBER( c64_state::exp_dma_w )
+WRITE8_MEMBER( c64_state::exp_dma_cd_w )
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
@@ -987,16 +988,6 @@ WRITE_LINE_MEMBER( c64_state::exp_reset_w )
 		machine_reset();
 	}
 }
-
-static C64_EXPANSION_INTERFACE( expansion_intf )
-{
-	DEVCB_DRIVER_MEMBER(c64_state, exp_dma_r),
-	DEVCB_DRIVER_MEMBER(c64_state, exp_dma_w),
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_irq_w),
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_nmi_w),
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_dma_w),
-	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_reset_w)
-};
 
 
 //-------------------------------------------------
@@ -1060,8 +1051,11 @@ void c64_state::machine_reset()
 {
 	m_maincpu->reset();
 
+	m_vic->reset();
+	m_sid->reset();
 	m_cia1->reset();
 	m_cia2->reset();
+	
 	m_iec->reset();
 	m_exp->reset();
 	m_user->reset();
@@ -1111,7 +1105,9 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6567_TAG, mos6567_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACKS(DEVWRITELINE(DEVICE_SELF, c64_state, exp_irq_w), DEVWRITELINE(DEVICE_SELF, c64_state, exp_nmi_w), DEVWRITELINE(DEVICE_SELF, c64_state, exp_reset_w))
+	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, exp_dma_cd_r), DEVWRITE8(DEVICE_SELF, c64_state, exp_dma_cd_w), DEVWRITELINE(DEVICE_SELF, c64_state, exp_dma_w))
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -1220,7 +1216,9 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACKS(DEVWRITELINE(DEVICE_SELF, c64_state, exp_irq_w), DEVWRITELINE(DEVICE_SELF, c64_state, exp_nmi_w), DEVWRITELINE(DEVICE_SELF, c64_state, exp_reset_w))
+	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, exp_dma_cd_r), DEVWRITE8(DEVICE_SELF, c64_state, exp_dma_cd_w), DEVWRITELINE(DEVICE_SELF, c64_state, exp_dma_w))
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -1307,7 +1305,9 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6569_TAG, mos6569_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACKS(DEVWRITELINE(DEVICE_SELF, c64_state, exp_irq_w), DEVWRITELINE(DEVICE_SELF, c64_state, exp_nmi_w), DEVWRITELINE(DEVICE_SELF, c64_state, exp_reset_w))
+	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF, c64_state, exp_dma_cd_r), DEVWRITE8(DEVICE_SELF, c64_state, exp_dma_cd_w), DEVWRITELINE(DEVICE_SELF, c64_state, exp_dma_w))
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg,t64", CBM_QUICKLOAD_DELAY_SECONDS)
 

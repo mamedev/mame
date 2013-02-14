@@ -123,7 +123,24 @@ void mos6581_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 
 READ8_MEMBER( mos6581_device::read )
 {
-	return sid6581_port_r(machine(), m_token, offset);
+	UINT8 data = 0;
+
+	switch (offset & 0x1f)
+	{
+	case 0x19:
+		data = m_read_potx(0);
+		break;
+
+	case 0x1a:
+		data = m_read_poty(0);
+		break;
+
+	default:
+		data = sid6581_port_r(machine(), m_token, offset);
+		break;
+	}
+
+	return data;
 }
 
 

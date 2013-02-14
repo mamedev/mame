@@ -82,7 +82,6 @@ class c64_user_port_device : public device_t,
 public:
 	// construction/destruction
 	c64_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~c64_user_port_device();
 
 	// computer interface
 	DECLARE_READ8_MEMBER( pb_r );
@@ -90,16 +89,15 @@ public:
 	DECLARE_READ_LINE_MEMBER( pa2_r );
 	DECLARE_WRITE_LINE_MEMBER( pa2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc2_w );
-	DECLARE_WRITE_LINE_MEMBER( port_reset_w );
+	DECLARE_WRITE_LINE_MEMBER( atn_w );
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( sp1_w );
-	DECLARE_WRITE_LINE_MEMBER( cnt1_w );
-	DECLARE_WRITE_LINE_MEMBER( sp2_w );
-	DECLARE_WRITE_LINE_MEMBER( cnt2_w );
-	DECLARE_WRITE_LINE_MEMBER( flag2_w );
-	DECLARE_WRITE_LINE_MEMBER( atn_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	DECLARE_WRITE_LINE_MEMBER( cnt1_w ) { m_out_cnt1_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( sp1_w ) { m_out_sp1_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( cnt2_w ) { m_out_cnt2_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( sp2_w ) { m_out_sp2_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( flag2_w ) { m_out_flag2_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( reset_w ) { m_out_reset_func(state); }
 
 protected:
 	// device-level overrides
@@ -114,7 +112,7 @@ protected:
 	devcb_resolved_write_line   m_out_flag2_func;
 	devcb_resolved_write_line   m_out_reset_func;
 
-	device_c64_user_port_interface *m_cart;
+	device_c64_user_port_interface *m_card;
 };
 
 
@@ -139,9 +137,6 @@ public:
 	virtual void c64_cnt2_w(int state) { };
 	virtual void c64_sp2_w(int state) { };
 	virtual void c64_atn_w(int state) { };
-
-	// reset
-	virtual void c64_reset_w(int state) { };
 
 protected:
 	c64_user_port_device *m_slot;

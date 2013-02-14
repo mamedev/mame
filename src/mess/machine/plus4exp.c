@@ -184,15 +184,6 @@ plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &m
 
 
 //-------------------------------------------------
-//  plus4_expansion_slot_device - destructor
-//-------------------------------------------------
-
-plus4_expansion_slot_device::~plus4_expansion_slot_device()
-{
-}
-
-
-//-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
@@ -227,7 +218,7 @@ void plus4_expansion_slot_device::device_config_complete()
 
 void plus4_expansion_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_plus4_expansion_card_interface *>(get_card_device());
+	m_card = dynamic_cast<device_plus4_expansion_card_interface *>(get_card_device());
 
 	// resolve callbacks
 	m_in_dma_cd_func.resolve(m_in_dma_cd_cb, *this);
@@ -251,8 +242,10 @@ void plus4_expansion_slot_device::device_start()
 
 void plus4_expansion_slot_device::device_reset()
 {
-	breset_w(ASSERT_LINE);
-	breset_w(CLEAR_LINE);
+	if (get_card_device())
+	{
+		get_card_device()->reset();
+	}
 }
 
 
@@ -262,7 +255,7 @@ void plus4_expansion_slot_device::device_reset()
 
 bool plus4_expansion_slot_device::call_load()
 {
-	if (m_cart)
+	if (m_card)
 	{
 		size_t size = 0;
 
@@ -273,22 +266,22 @@ bool plus4_expansion_slot_device::call_load()
 		else
 		{
 			size = get_software_region_length("c1l");
-			if (size) memcpy(m_cart->plus4_c1l_pointer(machine(), size), get_software_region("c1l"), size);
+			if (size) memcpy(m_card->plus4_c1l_pointer(machine(), size), get_software_region("c1l"), size);
 
 			size = get_software_region_length("c1h");
-			if (size) memcpy(m_cart->plus4_c1h_pointer(machine(), size), get_software_region("c1h"), size);
+			if (size) memcpy(m_card->plus4_c1h_pointer(machine(), size), get_software_region("c1h"), size);
 
 			size = get_software_region_length("c2l");
-			if (size) memcpy(m_cart->plus4_c2l_pointer(machine(), size), get_software_region("c2l"), size);
+			if (size) memcpy(m_card->plus4_c2l_pointer(machine(), size), get_software_region("c2l"), size);
 
 			size = get_software_region_length("c2h");
-			if (size) memcpy(m_cart->plus4_c2h_pointer(machine(), size), get_software_region("c2h"), size);
+			if (size) memcpy(m_card->plus4_c2h_pointer(machine(), size), get_software_region("c2h"), size);
 
 			size = get_software_region_length("ram");
-			if (size) memset(m_cart->plus4_ram_pointer(machine(), size), 0, size);
+			if (size) memset(m_card->plus4_ram_pointer(machine(), size), 0, size);
 
 			size = get_software_region_length("nvram");
-			if (size) memset(m_cart->plus4_nvram_pointer(machine(), size), 0, size);
+			if (size) memset(m_card->plus4_nvram_pointer(machine(), size), 0, size);
 		}
 	}
 
@@ -324,9 +317,9 @@ const char * plus4_expansion_slot_device::get_default_card_software(const machin
 
 UINT8 plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
-	if (m_cart != NULL)
+	if (m_card != NULL)
 	{
-		data = m_cart->plus4_cd_r(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+		data = m_card->plus4_cd_r(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 	}
 
 	return data;
@@ -339,55 +332,8 @@ UINT8 plus4_expansion_slot_device::cd_r(address_space &space, offs_t offset, UIN
 
 void plus4_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
 {
-	if (m_cart != NULL)
+	if (m_card != NULL)
 	{
-		m_cart->plus4_cd_w(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
+		m_card->plus4_cd_w(space, offset, data, ba, cs0, c1l, c1h, cs1, c2l, c2h);
 	}
-}
-
-
-//-------------------------------------------------
-//  breset_w - buffered reset write
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( plus4_expansion_slot_device::breset_w )
-{
-	if (m_cart != NULL)
-	{
-		m_cart->plus4_breset_w(state);
-	}
-}
-
-
-//-------------------------------------------------
-//  dma_cd_r - DMA read
-//-------------------------------------------------
-
-UINT8 plus4_expansion_slot_device::dma_cd_r(offs_t offset)
-{
-	return m_in_dma_cd_func(offset);
-}
-
-
-//-------------------------------------------------
-//  dma_cd_w - DMA write
-//-------------------------------------------------
-
-void plus4_expansion_slot_device::dma_cd_w(offs_t offset, UINT8 data)
-{
-	m_out_dma_cd_func(offset, data);
-}
-
-
-WRITE_LINE_MEMBER( plus4_expansion_slot_device::irq_w ) { m_out_irq_func(state); }
-WRITE_LINE_MEMBER( plus4_expansion_slot_device::aec_w ) { m_out_aec_func(state); }
-
-
-//-------------------------------------------------
-//  phi2 - system clock frequency
-//-------------------------------------------------
-
-int plus4_expansion_slot_device::phi2()
-{
-	return clock();
 }

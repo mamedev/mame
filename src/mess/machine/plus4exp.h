@@ -94,21 +94,18 @@ class plus4_expansion_slot_device : public device_t,
 public:
 	// construction/destruction
 	plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~plus4_expansion_slot_device();
 
 	// computer interface
 	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 	void cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER( breset_w );
 
 	// cartridge interface
-	UINT8 dma_cd_r(offs_t offset);
-	void dma_cd_w(offs_t offset, UINT8 data);
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( aec_w );
-	int phi2();
-	int dotclock();
+	DECLARE_READ8_MEMBER( dma_cd_r ) { return m_in_dma_cd_func(offset); }
+	DECLARE_WRITE8_MEMBER( dma_cd_w ) { m_out_dma_cd_func(offset, data); }
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_out_irq_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( aec_w ) { m_out_aec_func(state); }
+	int phi2() { return clock(); }
 
 protected:
 	// device-level overrides
@@ -139,7 +136,7 @@ protected:
 	devcb_resolved_write_line   m_out_irq_func;
 	devcb_resolved_write_line   m_out_aec_func;
 
-	device_plus4_expansion_card_interface *m_cart;
+	device_plus4_expansion_card_interface *m_card;
 };
 
 
@@ -165,7 +162,6 @@ public:
 	// runtime
 	virtual UINT8 plus4_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { return data; };
 	virtual void plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { };
-	virtual void plus4_breset_w(int state) { };
 
 protected:
 	plus4_expansion_slot_device *m_slot;

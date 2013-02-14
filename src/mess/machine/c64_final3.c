@@ -18,31 +18,30 @@
 const device_type C64_FINAL3 = &device_creator<c64_final3_cartridge_device>;
 
 
-INPUT_CHANGED_MEMBER( c64_final3_cartridge_device::reset )
-{
-	if (!newval)
-	{
-		device_reset();
-	}
-
-	m_slot->reset_w(newval ? CLEAR_LINE : ASSERT_LINE);
-}
+//-------------------------------------------------
+//  INPUT_CHANGED_MEMBER( freeze )
+//-------------------------------------------------
 
 INPUT_CHANGED_MEMBER( c64_final3_cartridge_device::freeze )
 {
-	if (!newval)
+	if (newval)
 	{
 		m_game = 0;
 		m_hidden = 0;
 	}
 
-	m_slot->nmi_w(newval ? CLEAR_LINE : ASSERT_LINE);
+	m_slot->nmi_w(newval);
 }
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( c64_final3 )
+//-------------------------------------------------
 
 static INPUT_PORTS_START( c64_final3 )
 	PORT_START("SW")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F11) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_final3_cartridge_device, reset, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_final3_cartridge_device, freeze, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F11) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_expansion_slot_device, reset_w)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_final3_cartridge_device, freeze, 0)
 INPUT_PORTS_END
 
 

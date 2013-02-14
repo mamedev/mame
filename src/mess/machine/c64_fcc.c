@@ -95,19 +95,9 @@ machine_config_constructor c64_final_chesscard_device::device_mconfig_additions(
 //  INPUT_PORTS( c64_fcc )
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( c64_final_chesscard_device::reset )
-{
-	if (!newval)
-	{
-		device_reset();
-	}
-
-	m_slot->reset_w(newval ? CLEAR_LINE : ASSERT_LINE);
-}
-
 static INPUT_PORTS_START( c64_fcc )
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F11) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_final_chesscard_device, reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F11) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_expansion_slot_device, reset_w)
 INPUT_PORTS_END
 
 

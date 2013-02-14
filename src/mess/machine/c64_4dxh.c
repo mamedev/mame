@@ -20,14 +20,13 @@
 const device_type C64_4DXH = &device_creator<c64_4dxh_device>;
 
 
-INPUT_CHANGED_MEMBER( c64_4dxh_device::fire4 )
-{
-	m_slot->sp2_w(newval);
-}
+//-------------------------------------------------
+//  INPUT_PORTS( c64_4dxh )
+//-------------------------------------------------
 
-static INPUT_PORTS_START( c64_4player )
+static INPUT_PORTS_START( c64_4dxh )
 	PORT_START("SP2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_4dxh_device, fire4, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_user_port_device, sp2_w)
 
 	PORT_START("PB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -50,7 +49,7 @@ INPUT_PORTS_END
 
 ioport_constructor c64_4dxh_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( c64_4player );
+	return INPUT_PORTS_NAME( c64_4dxh );
 }
 
 

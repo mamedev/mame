@@ -209,7 +209,7 @@ READ8_MEMBER( c64_cpm_cartridge_device::dma_r )
 	{
 		offs_t addr = (offset + 0x1000) & 0xffff;
 
-		data = m_slot->dma_cd_r(addr);
+		data = m_slot->dma_cd_r(space, addr);
 	}
 
 	return data;
@@ -226,6 +226,6 @@ WRITE8_MEMBER( c64_cpm_cartridge_device::dma_w )
 	{
 		offs_t addr = (offset + 0x1000) & 0xffff;
 
-		m_slot->dma_cd_w(addr, data);
+		m_slot->dma_cd_w(space, addr, data);
 	}
 }

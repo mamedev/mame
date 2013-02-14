@@ -57,51 +57,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  C64_EXPANSION_INTERFACE( expansion_intf )
-//-------------------------------------------------
-
-READ8_MEMBER( c64_supercpu_device::dma_cd_r )
-{
-	return m_slot->dma_cd_r(offset);
-}
-
-WRITE8_MEMBER( c64_supercpu_device::dma_cd_w )
-{
-	m_slot->dma_cd_w(offset, data);
-}
-
-WRITE_LINE_MEMBER( c64_supercpu_device::irq_w )
-{
-	m_slot->irq_w(state);
-}
-
-WRITE_LINE_MEMBER( c64_supercpu_device::nmi_w )
-{
-	m_slot->nmi_w(state);
-}
-
-WRITE_LINE_MEMBER( c64_supercpu_device::dma_w )
-{
-	m_slot->dma_w(state);
-}
-
-WRITE_LINE_MEMBER( c64_supercpu_device::reset_w )
-{
-	m_slot->reset_w(state);
-}
-
-static C64_EXPANSION_INTERFACE( expansion_intf )
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_supercpu_device, dma_cd_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_supercpu_device, dma_cd_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_supercpu_device, irq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_supercpu_device, nmi_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_supercpu_device, dma_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_supercpu_device, reset_w)
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_supercpu )
 //-------------------------------------------------
 
@@ -109,7 +64,7 @@ static MACHINE_CONFIG_FRAGMENT( c64_supercpu )
 	MCFG_CPU_ADD(G65816_TAG, G65816, 1000000)
 	MCFG_CPU_PROGRAM_MAP(c64_supercpu_map)
 
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, 0, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
 
 
@@ -128,16 +83,6 @@ machine_config_constructor c64_supercpu_device::device_mconfig_additions() const
 //  INPUT_PORTS( c64_supercpu )
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( c64_supercpu_device::reset )
-{
-	if (!newval)
-	{
-		device_reset();
-	}
-
-	m_slot->reset_w(newval ? CLEAR_LINE : ASSERT_LINE);
-}
-
 static INPUT_PORTS_START( c64_supercpu )
 	PORT_START("FRONT")
 	PORT_DIPNAME( 0x01, 0x01, "Unit" )
@@ -151,7 +96,7 @@ static INPUT_PORTS_START( c64_supercpu )
 	PORT_DIPSETTING(    0x00, "Turbo" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F11) PORT_CHANGED_MEMBER(DEVICE_SELF, c64_supercpu_device, reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F11) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_expansion_slot_device, reset_w)
 INPUT_PORTS_END
 
 
@@ -163,6 +108,7 @@ ioport_constructor c64_supercpu_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( c64_supercpu );
 }
+
 
 
 //**************************************************************************

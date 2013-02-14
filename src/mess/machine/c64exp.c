@@ -12,14 +12,6 @@
 
 
 //**************************************************************************
-//  MACROS/CONSTANTS
-//**************************************************************************
-
-#define LOG 0
-
-
-
-//**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
@@ -142,48 +134,14 @@ UINT8* device_c64_expansion_card_interface::c64_nvram_pointer(running_machine &m
 c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, C64_EXPANSION_SLOT, "C64 expansion port", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+		m_read_dma_cd(*this),
+		m_write_dma_cd(*this),
+		m_write_irq(*this),
+		m_write_nmi(*this),
+		m_write_dma(*this),
+		m_write_reset(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  c64_expansion_slot_device - destructor
-//-------------------------------------------------
-
-c64_expansion_slot_device::~c64_expansion_slot_device()
-{
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void c64_expansion_slot_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const c64_expansion_slot_interface *intf = reinterpret_cast<const c64_expansion_slot_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<c64_expansion_slot_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_dma_cd_cb, 0, sizeof(m_in_dma_cd_cb));
-		memset(&m_out_dma_cd_cb, 0, sizeof(m_out_dma_cd_cb));
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-		memset(&m_out_dma_cb, 0, sizeof(m_out_dma_cb));
-		memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
-	}
-
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -193,15 +151,15 @@ void c64_expansion_slot_device::device_config_complete()
 
 void c64_expansion_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_c64_expansion_card_interface *>(get_card_device());
+	m_card = dynamic_cast<device_c64_expansion_card_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_in_dma_cd_func.resolve(m_in_dma_cd_cb, *this);
-	m_out_dma_cd_func.resolve(m_out_dma_cd_cb, *this);
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
-	m_out_dma_func.resolve(m_out_dma_cb, *this);
-	m_out_reset_func.resolve(m_out_reset_cb, *this);
+	m_read_dma_cd.resolve_safe(0);
+	m_write_dma_cd.resolve_safe();
+	m_write_irq.resolve_safe();
+	m_write_nmi.resolve_safe();
+	m_write_dma.resolve_safe();
+	m_write_reset.resolve_safe();
 
 	// inherit bus clock
 	if (clock() == 0)
@@ -219,8 +177,10 @@ void c64_expansion_slot_device::device_start()
 
 void c64_expansion_slot_device::device_reset()
 {
-	port_reset_w(ASSERT_LINE);
-	port_reset_w(CLEAR_LINE);
+	if (get_card_device())
+	{
+		get_card_device()->reset();
+	}
 }
 
 
@@ -230,7 +190,7 @@ void c64_expansion_slot_device::device_reset()
 
 bool c64_expansion_slot_device::call_load()
 {
-	if (m_cart)
+	if (m_card)
 	{
 		size_t size = 0;
 
@@ -240,26 +200,26 @@ bool c64_expansion_slot_device::call_load()
 
 			if (!mame_stricmp(filetype(), "80"))
 			{
-				fread(m_cart->c64_roml_pointer(machine(), size), size);
-				m_cart->m_exrom = (0);
+				fread(m_card->c64_roml_pointer(machine(), size), size);
+				m_card->m_exrom = (0);
 
 				if (size == 0x4000)
 				{
-					m_cart->m_game = 0;
+					m_card->m_game = 0;
 				}
 			}
 			else if (!mame_stricmp(filetype(), "a0"))
 			{
-				fread(m_cart->c64_romh_pointer(machine(), 0x2000), 0x2000);
+				fread(m_card->c64_romh_pointer(machine(), 0x2000), 0x2000);
 
-				m_cart->m_exrom = 0;
-				m_cart->m_game = 0;
+				m_card->m_exrom = 0;
+				m_card->m_game = 0;
 			}
 			else if (!mame_stricmp(filetype(), "e0"))
 			{
-				fread(m_cart->c64_romh_pointer(machine(), 0x2000), 0x2000);
+				fread(m_card->c64_romh_pointer(machine(), 0x2000), 0x2000);
 
-				m_cart->m_game = 0;
+				m_card->m_game = 0;
 			}
 			else if (!mame_stricmp(filetype(), "crt"))
 			{
@@ -273,14 +233,14 @@ bool c64_expansion_slot_device::call_load()
 					UINT8 *roml = NULL;
 					UINT8 *romh = NULL;
 
-					if (roml_size) roml = m_cart->c64_roml_pointer(machine(), roml_size);
-					if (romh_size) romh = m_cart->c64_romh_pointer(machine(), romh_size);
+					if (roml_size) roml = m_card->c64_roml_pointer(machine(), roml_size);
+					if (romh_size) romh = m_card->c64_romh_pointer(machine(), romh_size);
 
 					cbm_crt_read_data(m_file, roml, romh);
 				}
 
-				m_cart->m_exrom = exrom;
-				m_cart->m_game = game;
+				m_card->m_exrom = exrom;
+				m_card->m_game = game;
 			}
 		}
 		else
@@ -290,31 +250,31 @@ bool c64_expansion_slot_device::call_load()
 			if (size)
 			{
 				// Ultimax (VIC-10) cartridge
-				memcpy(m_cart->c64_romh_pointer(machine(), size), get_software_region("uprom"), size);
+				memcpy(m_card->c64_romh_pointer(machine(), size), get_software_region("uprom"), size);
 
 				size = get_software_region_length("lorom");
-				if (size) memcpy(m_cart->c64_roml_pointer(machine(), size), get_software_region("lorom"), size);
+				if (size) memcpy(m_card->c64_roml_pointer(machine(), size), get_software_region("lorom"), size);
 
-				m_cart->m_exrom = 1;
-				m_cart->m_game = 0;
+				m_card->m_exrom = 1;
+				m_card->m_game = 0;
 			}
 			else
 			{
 				// Commodore 64/128 cartridge
 				size = get_software_region_length("roml");
-				if (size) memcpy(m_cart->c64_roml_pointer(machine(), size), get_software_region("roml"), size);
+				if (size) memcpy(m_card->c64_roml_pointer(machine(), size), get_software_region("roml"), size);
 
 				size = get_software_region_length("romh");
-				if (size) memcpy(m_cart->c64_romh_pointer(machine(), size), get_software_region("romh"), size);
+				if (size) memcpy(m_card->c64_romh_pointer(machine(), size), get_software_region("romh"), size);
 
 				size = get_software_region_length("ram");
-				if (size) memset(m_cart->c64_ram_pointer(machine(), size), 0, size);
+				if (size) memset(m_card->c64_ram_pointer(machine(), size), 0, size);
 
 				size = get_software_region_length("nvram");
-				if (size) memset(m_cart->c64_nvram_pointer(machine(), size), 0, size);
+				if (size) memset(m_card->c64_nvram_pointer(machine(), size), 0, size);
 
-				if (get_feature("exrom") != NULL) m_cart->m_exrom = atol(get_feature("exrom"));
-				if (get_feature("game") != NULL) m_cart->m_game = atol(get_feature("game"));
+				if (get_feature("exrom") != NULL) m_card->m_exrom = atol(get_feature("exrom"));
+				if (get_feature("game") != NULL) m_card->m_game = atol(get_feature("game"));
 			}
 		}
 	}
@@ -361,9 +321,9 @@ const char * c64_expansion_slot_device::get_default_card_software(const machine_
 
 UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (m_cart != NULL)
+	if (m_card != NULL)
 	{
-		data = m_cart->c64_cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+		data = m_card->c64_cd_r(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 	}
 
 	return data;
@@ -376,9 +336,9 @@ UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8
 
 void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (m_cart != NULL)
+	if (m_card != NULL)
 	{
-		m_cart->c64_cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
+		m_card->c64_cd_w(space, offset, data, sphi2, ba, roml, romh, io1, io2);
 	}
 }
 
@@ -391,9 +351,9 @@ int c64_expansion_slot_device::game_r(offs_t offset, int sphi2, int ba, int rw, 
 {
 	int state = 1;
 
-	if (m_cart != NULL)
+	if (m_card != NULL)
 	{
-		state = m_cart->c64_game_r(offset, sphi2, ba, rw, hiram);
+		state = m_card->c64_game_r(offset, sphi2, ba, rw, hiram);
 	}
 
 	return state;
@@ -408,59 +368,10 @@ int c64_expansion_slot_device::exrom_r(offs_t offset, int sphi2, int ba, int rw,
 {
 	int state = 1;
 
-	if (m_cart != NULL)
+	if (m_card != NULL)
 	{
-		state = m_cart->c64_exrom_r(offset, sphi2, ba, rw, hiram);
+		state = m_card->c64_exrom_r(offset, sphi2, ba, rw, hiram);
 	}
 
 	return state;
-}
-
-
-WRITE_LINE_MEMBER( c64_expansion_slot_device::port_reset_w ) { if (m_cart != NULL) m_cart->c64_reset_w(state); }
-
-
-//-------------------------------------------------
-//  dma_cd_r - DMA read
-//-------------------------------------------------
-
-UINT8 c64_expansion_slot_device::dma_cd_r(offs_t offset)
-{
-	return m_in_dma_cd_func(offset);
-}
-
-
-//-------------------------------------------------
-//  dma_cd_w - DMA write
-//-------------------------------------------------
-
-void c64_expansion_slot_device::dma_cd_w(offs_t offset, UINT8 data)
-{
-	m_out_dma_cd_func(offset, data);
-}
-
-
-WRITE_LINE_MEMBER( c64_expansion_slot_device::irq_w ) { m_out_irq_func(state); }
-WRITE_LINE_MEMBER( c64_expansion_slot_device::nmi_w ) { m_out_nmi_func(state); }
-WRITE_LINE_MEMBER( c64_expansion_slot_device::dma_w ) { m_out_dma_func(state); }
-WRITE_LINE_MEMBER( c64_expansion_slot_device::reset_w ) { m_out_reset_func(state); }
-
-
-//-------------------------------------------------
-//  phi2 - system clock frequency
-//-------------------------------------------------
-
-int c64_expansion_slot_device::phi2()
-{
-	return clock();
-}
-
-
-//-------------------------------------------------
-//  dotclock - dot clock frequency
-//-------------------------------------------------
-
-int c64_expansion_slot_device::dotclock()
-{
-	return phi2() * 8;
 }

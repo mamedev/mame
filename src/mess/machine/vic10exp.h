@@ -92,22 +92,18 @@ class vic10_expansion_slot_device : public device_t,
 public:
 	// construction/destruction
 	vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~vic10_expansion_slot_device();
 
 	// computer interface
 	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram);
 	void cd_w(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram);
 	DECLARE_READ_LINE_MEMBER( p0_r );
 	DECLARE_WRITE_LINE_MEMBER( p0_w );
-	DECLARE_WRITE_LINE_MEMBER( port_res_w );
 
 	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( sp_w );
 	DECLARE_WRITE_LINE_MEMBER( cnt_w );
 	DECLARE_WRITE_LINE_MEMBER( res_w );
-
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -138,7 +134,7 @@ protected:
 	devcb_resolved_write_line   m_out_cnt_func;
 	devcb_resolved_write_line   m_out_res_func;
 
-	device_vic10_expansion_card_interface *m_cart;
+	device_vic10_expansion_card_interface *m_card;
 };
 
 
@@ -167,7 +163,6 @@ protected:
 	virtual void vic10_p0_w(int state) { };
 	virtual void vic10_sp_w(int state) { };
 	virtual void vic10_cnt_w(int state) { };
-	virtual void vic10_res_w(int state) { };
 
 	vic10_expansion_slot_device *m_slot;
 

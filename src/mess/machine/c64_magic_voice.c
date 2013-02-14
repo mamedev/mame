@@ -46,51 +46,6 @@ static const tpi6525_interface tpi_intf =
 
 
 //-------------------------------------------------
-//  C64_EXPANSION_INTERFACE( expansion_intf )
-//-------------------------------------------------
-
-READ8_MEMBER( c64_magic_voice_cartridge_device::dma_cd_r )
-{
-	return m_slot->dma_cd_r(offset);
-}
-
-WRITE8_MEMBER( c64_magic_voice_cartridge_device::dma_cd_w )
-{
-	m_slot->dma_cd_w(offset, data);
-}
-
-WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::irq_w )
-{
-	m_slot->irq_w(state);
-}
-
-WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::nmi_w )
-{
-	m_slot->nmi_w(state);
-}
-
-WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::dma_w )
-{
-	m_slot->dma_w(state);
-}
-
-WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::reset_w )
-{
-	m_slot->reset_w(state);
-}
-
-static C64_EXPANSION_INTERFACE( expansion_intf )
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, dma_cd_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, dma_cd_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, irq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, nmi_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, dma_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_magic_voice_cartridge_device, reset_w)
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_magic_voice )
 //-------------------------------------------------
 
@@ -102,7 +57,7 @@ static MACHINE_CONFIG_FRAGMENT( c64_magic_voice )
 	MCFG_T6721A_EOS_HANDLER(DEVWRITELINE(MOS6525_TAG, tpi6525_device, i2_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, 0, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
 
 

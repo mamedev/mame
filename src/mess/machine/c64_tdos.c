@@ -90,58 +90,13 @@ static MC6852_INTERFACE( ssda_intf )
 
 
 //-------------------------------------------------
-//  C64_EXPANSION_INTERFACE( expansion_intf )
-//-------------------------------------------------
-
-READ8_MEMBER( c64_tdos_cartridge_device::dma_cd_r )
-{
-	return m_slot->dma_cd_r(offset);
-}
-
-WRITE8_MEMBER( c64_tdos_cartridge_device::dma_cd_w )
-{
-	m_slot->dma_cd_w(offset, data);
-}
-
-WRITE_LINE_MEMBER( c64_tdos_cartridge_device::irq_w )
-{
-	m_slot->irq_w(state);
-}
-
-WRITE_LINE_MEMBER( c64_tdos_cartridge_device::nmi_w )
-{
-	m_slot->nmi_w(state);
-}
-
-WRITE_LINE_MEMBER( c64_tdos_cartridge_device::dma_w )
-{
-	m_slot->dma_w(state);
-}
-
-WRITE_LINE_MEMBER( c64_tdos_cartridge_device::reset_w )
-{
-	m_slot->reset_w(state);
-}
-
-static C64_EXPANSION_INTERFACE( expansion_intf )
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_tdos_cartridge_device, dma_cd_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_tdos_cartridge_device, dma_cd_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_tdos_cartridge_device, irq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_tdos_cartridge_device, nmi_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_tdos_cartridge_device, dma_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c64_tdos_cartridge_device, reset_w)
-};
-
-
-//-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( c64_multiscreen )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( c64_tdos )
 	MCFG_MC6852_ADD(MC68A52P_TAG, XTAL_6_5MHz, ssda_intf)
-
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, 0, expansion_intf, c64_expansion_cards, NULL, NULL)
+    
+    MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
 
 
