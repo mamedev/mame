@@ -73,12 +73,10 @@ public:
 	void update_timers(int scanline);
 	void decode_gfx(UINT16 *pflookup, UINT16 *molookup);
 	int get_bank(UINT8 prom1, UINT8 prom2, int bpp);
+	DECLARE_READ16_MEMBER( atarisy1_int3state_r );
+	DECLARE_WRITE16_MEMBER( atarisy1_spriteram_w );
+	DECLARE_WRITE16_MEMBER( atarisy1_bankselect_w );
+	DECLARE_WRITE16_MEMBER( atarisy1_xscroll_w );
+	DECLARE_WRITE16_MEMBER( atarisy1_yscroll_w );
+	DECLARE_WRITE16_MEMBER( atarisy1_priority_w );
 };
-
-DECLARE_READ16_HANDLER( atarisy1_int3state_r );
-
-DECLARE_WRITE16_HANDLER( atarisy1_spriteram_w );
-DECLARE_WRITE16_HANDLER( atarisy1_bankselect_w );
-DECLARE_WRITE16_HANDLER( atarisy1_xscroll_w );
-DECLARE_WRITE16_HANDLER( atarisy1_yscroll_w );
-DECLARE_WRITE16_HANDLER( atarisy1_priority_w );

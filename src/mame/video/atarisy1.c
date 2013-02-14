@@ -195,12 +195,11 @@ VIDEO_START_MEMBER(atarisy1_state,atarisy1)
  *
  *************************************/
 
-WRITE16_HANDLER( atarisy1_bankselect_w )
+WRITE16_MEMBER( atarisy1_state::atarisy1_bankselect_w )
 {
-	atarisy1_state *state = space.machine().driver_data<atarisy1_state>();
-	UINT16 oldselect = *state->m_bankselect;
+	UINT16 oldselect = *m_bankselect;
 	UINT16 newselect = oldselect, diff;
-	int scanline = space.machine().primary_screen->vpos();
+	int scanline = machine().primary_screen->vpos();
 
 	/* update memory */
 	COMBINE_DATA(&newselect);
@@ -209,27 +208,27 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
 	/* sound CPU reset */
 	if (diff & 0x0080)
 	{
-		space.machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
-		if (!(newselect & 0x0080)) state->sound_cpu_reset();
+		machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
+		if (!(newselect & 0x0080)) sound_cpu_reset();
 	}
 
 	/* if MO or playfield banks change, force a partial update */
 	if (diff & 0x003c)
-		space.machine().primary_screen->update_partial(scanline);
+		machine().primary_screen->update_partial(scanline);
 
 	/* motion object bank select */
 	atarimo_set_bank(0, (newselect >> 3) & 7);
-	state->update_timers(scanline);
+	update_timers(scanline);
 
 	/* playfield bank select */
 	if (diff & 0x0004)
 	{
-		state->m_playfield_tile_bank = (newselect >> 2) & 1;
-		state->m_playfield_tilemap->mark_all_dirty();
+		m_playfield_tile_bank = (newselect >> 2) & 1;
+		m_playfield_tilemap->mark_all_dirty();
 	}
 
 	/* stash the new value */
-	*state->m_bankselect = newselect;
+	*m_bankselect = newselect;
 }
 
 
@@ -240,17 +239,16 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
  *
  *************************************/
 
-WRITE16_HANDLER( atarisy1_priority_w )
+WRITE16_MEMBER( atarisy1_state::atarisy1_priority_w )
 {
-	atarisy1_state *state = space.machine().driver_data<atarisy1_state>();
-	UINT16 oldpens = state->m_playfield_priority_pens;
+	UINT16 oldpens = m_playfield_priority_pens;
 	UINT16 newpens = oldpens;
 
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newpens);
 	if (oldpens != newpens)
-		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
-	state->m_playfield_priority_pens = newpens;
+		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_playfield_priority_pens = newpens;
 }
 
 
@@ -261,22 +259,21 @@ WRITE16_HANDLER( atarisy1_priority_w )
  *
  *************************************/
 
-WRITE16_HANDLER( atarisy1_xscroll_w )
+WRITE16_MEMBER( atarisy1_state::atarisy1_xscroll_w )
 {
-	atarisy1_state *state = space.machine().driver_data<atarisy1_state>();
-	UINT16 oldscroll = *state->m_xscroll;
+	UINT16 oldscroll = *m_xscroll;
 	UINT16 newscroll = oldscroll;
 
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newscroll);
 	if (oldscroll != newscroll)
-		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
+		machine().primary_screen->update_partial(machine().primary_screen->vpos());
 
 	/* set the new scroll value */
-	state->m_playfield_tilemap->set_scrollx(0, newscroll);
+	m_playfield_tilemap->set_scrollx(0, newscroll);
 
 	/* update the data */
-	*state->m_xscroll = newscroll;
+	*m_xscroll = newscroll;
 }
 
 
@@ -293,31 +290,30 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_reset_yscroll_callback)
 }
 
 
-WRITE16_HANDLER( atarisy1_yscroll_w )
+WRITE16_MEMBER( atarisy1_state::atarisy1_yscroll_w )
 {
-	atarisy1_state *state = space.machine().driver_data<atarisy1_state>();
-	UINT16 oldscroll = *state->m_yscroll;
+	UINT16 oldscroll = *m_yscroll;
 	UINT16 newscroll = oldscroll;
-	int scanline = space.machine().primary_screen->vpos();
+	int scanline = machine().primary_screen->vpos();
 	int adjusted_scroll;
 
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newscroll);
-	space.machine().primary_screen->update_partial(scanline);
+	machine().primary_screen->update_partial(scanline);
 
 	/* because this latches a new value into the scroll base,
 	   we need to adjust for the scanline */
 	adjusted_scroll = newscroll;
-	if (scanline <= space.machine().primary_screen->visible_area().max_y)
+	if (scanline <= machine().primary_screen->visible_area().max_y)
 		adjusted_scroll -= (scanline + 1);
-	state->m_playfield_tilemap->set_scrolly(0, adjusted_scroll);
+	m_playfield_tilemap->set_scrolly(0, adjusted_scroll);
 
 	/* but since we've adjusted it, we must reset it to the normal value
 	   once we hit scanline 0 again */
-	state->m_yscroll_reset_timer->adjust(space.machine().primary_screen->time_until_pos(0), newscroll);
+	m_yscroll_reset_timer->adjust(machine().primary_screen->time_until_pos(0), newscroll);
 
 	/* update the data */
-	*state->m_yscroll = newscroll;
+	*m_yscroll = newscroll;
 }
 
 
@@ -328,9 +324,8 @@ WRITE16_HANDLER( atarisy1_yscroll_w )
  *
  *************************************/
 
-WRITE16_HANDLER( atarisy1_spriteram_w )
+WRITE16_MEMBER( atarisy1_state::atarisy1_spriteram_w )
 {
-	atarisy1_state *state = space.machine().driver_data<atarisy1_state>();
 	int active_bank = atarimo_get_bank(0);
 	int oldword = atarimo_0_spriteram_r(space, offset, mem_mask);
 	int newword = oldword;
@@ -345,7 +340,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 		{
 			/* if the timer is in the active bank, update the display list */
 			atarimo_0_spriteram_w(space, offset, data, 0xffff);
-			state->update_timers(space.machine().primary_screen->vpos());
+			update_timers(machine().primary_screen->vpos());
 		}
 
 		/* if we're about to modify data in the active sprite bank, make sure the video is up-to-date */
@@ -353,7 +348,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 		/* renders the next scanline's sprites to the line buffers, but Road Runner still glitches */
 		/* without the extra +1 */
 		else
-			space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos() + 2);
+			machine().primary_screen->update_partial(machine().primary_screen->vpos() + 2);
 	}
 
 	/* let the MO handler do the basic work */
@@ -400,10 +395,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3_callback)
  *
  *************************************/
 
-READ16_HANDLER( atarisy1_int3state_r )
+READ16_MEMBER( atarisy1_state::atarisy1_int3state_r )
 {
-	atarigen_state *atarigen = space.machine().driver_data<atarigen_state>();
-	return atarigen->m_scanline_int_state ? 0x0080 : 0x0000;
+	return m_scanline_int_state ? 0x0080 : 0x0000;
 }
 
 

@@ -87,7 +87,7 @@ VIDEO_START_MEMBER(klax_state,klax)
  *
  *************************************/
 
-WRITE16_HANDLER( klax_latch_w )
+WRITE16_MEMBER( klax_state::klax_latch_w )
 {
 }
 

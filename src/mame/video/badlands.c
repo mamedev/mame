@@ -89,15 +89,14 @@ VIDEO_START_MEMBER(badlands_state,badlands)
  *
  *************************************/
 
-WRITE16_HANDLER( badlands_pf_bank_w )
+WRITE16_MEMBER( badlands_state::badlands_pf_bank_w )
 {
-	badlands_state *state = space.machine().driver_data<badlands_state>();
 	if (ACCESSING_BITS_0_7)
-		if (state->m_playfield_tile_bank != (data & 1))
+		if (m_playfield_tile_bank != (data & 1))
 		{
-			space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
-			state->m_playfield_tile_bank = data & 1;
-			state->m_playfield_tilemap->mark_all_dirty();
+			machine().primary_screen->update_partial(machine().primary_screen->vpos());
+			m_playfield_tile_bank = data & 1;
+			m_playfield_tilemap->mark_all_dirty();
 		}
 }
 

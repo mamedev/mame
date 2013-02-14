@@ -22,26 +22,24 @@ PALETTE_INIT_MEMBER(galpanic_state,galpanic)
 
 
 
-WRITE16_HANDLER( galpanic_bgvideoram_w )
+WRITE16_MEMBER(galpanic_state::galpanic_bgvideoram_w)
 {
-	galpanic_state *state = space.machine().driver_data<galpanic_state>();
 	int sx,sy;
 
 
-	data = COMBINE_DATA(&state->m_bgvideoram[offset]);
+	data = COMBINE_DATA(&m_bgvideoram[offset]);
 
 	sy = offset / 256;
 	sx = offset % 256;
 
-	state->m_bitmap.pix16(sy, sx) = 1024 + (data >> 1);
+	m_bitmap.pix16(sy, sx) = 1024 + (data >> 1);
 }
 
-WRITE16_HANDLER( galpanic_paletteram_w )
+WRITE16_MEMBER(galpanic_state::galpanic_paletteram_w)
 {
-	galpanic_state *state = space.machine().driver_data<galpanic_state>();
-	data = COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	data = COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	/* bit 0 seems to be a transparency flag for the front bitmap */
-	palette_set_color_rgb(space.machine(),offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+	palette_set_color_rgb(machine(),offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 

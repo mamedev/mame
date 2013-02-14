@@ -50,9 +50,5 @@ public:
 	DECLARE_VIDEO_START(atarigx2);
 	UINT32 screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_atarigx2(screen_device &screen, bool state);
+	DECLARE_WRITE16_MEMBER( atarigx2_mo_control_w );
 };
-
-
-/*----------- defined in video/atarigx2.c -----------*/
-DECLARE_WRITE16_HANDLER( atarigx2_mo_control_w );
-void atarigx2_scanline_update(screen_device &screen, int scanline);

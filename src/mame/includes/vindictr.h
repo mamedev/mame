@@ -25,11 +25,5 @@ public:
 	DECLARE_MACHINE_RESET(vindictr);
 	DECLARE_VIDEO_START(vindictr);
 	UINT32 screen_update_vindictr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE16_MEMBER( vindictr_paletteram_w );
 };
-
-
-/*----------- defined in video/vindictr.c -----------*/
-
-DECLARE_WRITE16_HANDLER( vindictr_paletteram_w );
-
-void vindictr_scanline_update(screen_device &screen, int scanline);

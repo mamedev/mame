@@ -25,12 +25,8 @@ public:
 	UINT32 screen_update_skullxbo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(irq_gen);
 	void skullxbo_scanline_update(int scanline);
+	DECLARE_WRITE16_MEMBER( skullxbo_playfieldlatch_w );
+	DECLARE_WRITE16_MEMBER( skullxbo_xscroll_w );
+	DECLARE_WRITE16_MEMBER( skullxbo_yscroll_w );
+	DECLARE_WRITE16_MEMBER( skullxbo_mobmsb_w );
 };
-
-/*----------- defined in video/skullxbo.c -----------*/
-DECLARE_WRITE16_HANDLER( skullxbo_playfieldlatch_w );
-DECLARE_WRITE16_HANDLER( skullxbo_xscroll_w );
-DECLARE_WRITE16_HANDLER( skullxbo_yscroll_w );
-DECLARE_WRITE16_HANDLER( skullxbo_mobmsb_w );
-
-void skullxbo_scanline_update(running_machine &machine, int param);

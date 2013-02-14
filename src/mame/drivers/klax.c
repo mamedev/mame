@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16, klax_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(eeprom_r, eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(eeprom_enable_w)
-	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("P1") AM_WRITE_LEGACY(klax_latch_w)
+	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("P1") AM_WRITE(klax_latch_w)
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("P2")
 	AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)

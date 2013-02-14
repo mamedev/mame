@@ -34,7 +34,5 @@ public:
 	DECLARE_MACHINE_RESET(badlandsb);
 	UINT32 screen_update_badlands(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
+	DECLARE_WRITE16_MEMBER( badlands_pf_bank_w );
 };
-
-/*----------- defined in video/badlands.c -----------*/
-DECLARE_WRITE16_HANDLER( badlands_pf_bank_w );

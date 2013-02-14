@@ -116,20 +116,19 @@ VIDEO_START_MEMBER(gauntlet_state,gauntlet)
  *
  *************************************/
 
-WRITE16_HANDLER( gauntlet_xscroll_w )
+WRITE16_MEMBER( gauntlet_state::gauntlet_xscroll_w )
 {
-	gauntlet_state *state = space.machine().driver_data<gauntlet_state>();
-	UINT16 oldxscroll = *state->m_xscroll;
-	COMBINE_DATA(state->m_xscroll);
+	UINT16 oldxscroll = *m_xscroll;
+	COMBINE_DATA(m_xscroll);
 
 	/* if something changed, force a partial update */
-	if (*state->m_xscroll != oldxscroll)
+	if (*m_xscroll != oldxscroll)
 	{
-		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
+		machine().primary_screen->update_partial(machine().primary_screen->vpos());
 
 		/* adjust the scrolls */
-		state->m_playfield_tilemap->set_scrollx(0, *state->m_xscroll);
-		atarimo_set_xscroll(0, *state->m_xscroll & 0x1ff);
+		m_playfield_tilemap->set_scrollx(0, *m_xscroll);
+		atarimo_set_xscroll(0, *m_xscroll & 0x1ff);
 	}
 }
 
@@ -141,27 +140,26 @@ WRITE16_HANDLER( gauntlet_xscroll_w )
  *
  *************************************/
 
-WRITE16_HANDLER( gauntlet_yscroll_w )
+WRITE16_MEMBER( gauntlet_state::gauntlet_yscroll_w )
 {
-	gauntlet_state *state = space.machine().driver_data<gauntlet_state>();
-	UINT16 oldyscroll = *state->m_yscroll;
-	COMBINE_DATA(state->m_yscroll);
+	UINT16 oldyscroll = *m_yscroll;
+	COMBINE_DATA(m_yscroll);
 
 	/* if something changed, force a partial update */
-	if (*state->m_yscroll != oldyscroll)
+	if (*m_yscroll != oldyscroll)
 	{
-		space.machine().primary_screen->update_partial(space.machine().primary_screen->vpos());
+		machine().primary_screen->update_partial(machine().primary_screen->vpos());
 
 		/* if the bank changed, mark all tiles dirty */
-		if (state->m_playfield_tile_bank != (*state->m_yscroll & 3))
+		if (m_playfield_tile_bank != (*m_yscroll & 3))
 		{
-			state->m_playfield_tile_bank = *state->m_yscroll & 3;
-			state->m_playfield_tilemap->mark_all_dirty();
+			m_playfield_tile_bank = *m_yscroll & 3;
+			m_playfield_tilemap->mark_all_dirty();
 		}
 
 		/* adjust the scrolls */
-		state->m_playfield_tilemap->set_scrolly(0, *state->m_yscroll >> 7);
-		atarimo_set_yscroll(0, (*state->m_yscroll >> 7) & 0x1ff);
+		m_playfield_tilemap->set_scrolly(0, *m_yscroll >> 7);
+		atarimo_set_yscroll(0, (*m_yscroll >> 7) & 0x1ff);
 	}
 }
 

@@ -55,14 +55,18 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt2);
 	void galpani2_mcu_nmi1();
 	void galpani2_mcu_nmi2();
+	/*----------- defined in video/galpani2.c -----------*/
+	inline void galpani2_bg8_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);
+	inline void galpani2_palette_w(offs_t offset, UINT16 data, UINT16 mem_mask, int _n_);
+
+	DECLARE_WRITE16_MEMBER( galpani2_palette_0_w );
+	DECLARE_WRITE16_MEMBER( galpani2_palette_1_w );
+
+	DECLARE_WRITE16_MEMBER( galpani2_bg8_0_w );
+	DECLARE_WRITE16_MEMBER( galpani2_bg8_1_w );
+
+	DECLARE_WRITE16_MEMBER( galpani2_bg15_w );
 };
 
 
-/*----------- defined in video/galpani2.c -----------*/
-DECLARE_WRITE16_HANDLER( galpani2_palette_0_w );
-DECLARE_WRITE16_HANDLER( galpani2_palette_1_w );
 
-DECLARE_WRITE16_HANDLER( galpani2_bg8_0_w );
-DECLARE_WRITE16_HANDLER( galpani2_bg8_1_w );
-
-DECLARE_WRITE16_HANDLER( galpani2_bg15_w );

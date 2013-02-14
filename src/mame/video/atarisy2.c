@@ -114,7 +114,7 @@ VIDEO_START_MEMBER(atarisy2_state,atarisy2)
  *
  *************************************/
 
-WRITE16_HANDLER( atarisy2_state::xscroll_w )
+WRITE16_MEMBER( atarisy2_state::xscroll_w )
 {
 	UINT16 oldscroll = *m_xscroll;
 	UINT16 newscroll = oldscroll;
@@ -145,7 +145,7 @@ TIMER_CALLBACK_MEMBER(atarisy2_state::reset_yscroll_callback)
 }
 
 
-WRITE16_HANDLER( atarisy2_state::yscroll_w )
+WRITE16_MEMBER( atarisy2_state::yscroll_w )
 {
 	UINT16 oldscroll = *m_yscroll;
 	UINT16 newscroll = oldscroll;
@@ -180,7 +180,7 @@ WRITE16_HANDLER( atarisy2_state::yscroll_w )
  *
  *************************************/
 
-WRITE16_HANDLER( atarisy2_state::paletteram_w )
+WRITE16_MEMBER( atarisy2_state::paletteram_w )
 {
 	static const int intensity_table[16] =
 	{
@@ -215,7 +215,7 @@ WRITE16_HANDLER( atarisy2_state::paletteram_w )
  *
  *************************************/
 
-READ16_HANDLER( atarisy2_state::slapstic_r )
+READ16_MEMBER( atarisy2_state::slapstic_r )
 {
 	int result = m_slapstic_base[offset];
 	slapstic_tweak(space, offset);
@@ -226,7 +226,7 @@ READ16_HANDLER( atarisy2_state::slapstic_r )
 }
 
 
-WRITE16_HANDLER( atarisy2_state::slapstic_w )
+WRITE16_MEMBER( atarisy2_state::slapstic_w )
 {
 	slapstic_tweak(space, offset);
 
@@ -242,7 +242,7 @@ WRITE16_HANDLER( atarisy2_state::slapstic_w )
  *
  *************************************/
 
-READ16_HANDLER( atarisy2_state::videoram_r )
+READ16_MEMBER( atarisy2_state::videoram_r )
 {
 	int offs = offset | m_videobank;
 	if (offs >= 0xc00 && offs < 0x1000)
@@ -254,7 +254,7 @@ READ16_HANDLER( atarisy2_state::videoram_r )
 }
 
 
-WRITE16_HANDLER( atarisy2_state::videoram_w )
+WRITE16_MEMBER( atarisy2_state::videoram_w )
 {
 	int offs = offset | m_videobank;
 

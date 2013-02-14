@@ -220,25 +220,25 @@ inline void cyberbal_state::set_palette_entry(int entry, UINT16 value)
  *
  *************************************/
 
-WRITE16_HANDLER(cyberbal_state::paletteram_0_w)
+WRITE16_MEMBER(cyberbal_state::paletteram_0_w)
 {
 	COMBINE_DATA(&m_paletteram_0[offset]);
 	set_palette_entry(offset, m_paletteram_0[offset]);
 }
 
-READ16_HANDLER(cyberbal_state::paletteram_0_r)
+READ16_MEMBER(cyberbal_state::paletteram_0_r)
 {
 	return m_paletteram_0[offset];
 }
 
 
-WRITE16_HANDLER(cyberbal_state::paletteram_1_w)
+WRITE16_MEMBER(cyberbal_state::paletteram_1_w)
 {
 	COMBINE_DATA(&m_paletteram_1[offset]);
 	set_palette_entry(offset + 0x800, m_paletteram_1[offset]);
 }
 
-READ16_HANDLER(cyberbal_state::paletteram_1_r)
+READ16_MEMBER(cyberbal_state::paletteram_1_r)
 {
 	return m_paletteram_1[offset];
 }

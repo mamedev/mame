@@ -105,16 +105,15 @@ VIDEO_START_MEMBER(vindictr_state,vindictr)
  *
  *************************************/
 
-WRITE16_HANDLER( vindictr_paletteram_w )
+WRITE16_MEMBER( vindictr_state::vindictr_paletteram_w )
 {
 	static const int ztable[16] =
 		{ 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11 };
 	int c;
 
 	/* first blend the data */
-	vindictr_state *state = space.machine().driver_data<vindictr_state>();
-	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
-	data = state->m_generic_paletteram_16[offset];
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	data = m_generic_paletteram_16[offset];
 
 	/* now generate colors at all 16 intensities */
 	for (c = 0; c < 8; c++)
@@ -124,7 +123,7 @@ WRITE16_HANDLER( vindictr_paletteram_w )
 		int g = ((data >> 4) & 15) * i;
 		int b = ((data >> 0) & 15) * i;
 
-		palette_set_color(space.machine(),offset + c*2048,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),offset + c*2048,MAKE_RGB(r,g,b));
 	}
 }
 

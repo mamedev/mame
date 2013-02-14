@@ -290,18 +290,18 @@ static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x304000, 0x30401f) AM_DEVREADWRITE("kan_spr", kaneko16_sprite_device, kaneko16_sprites_regs_r, kaneko16_sprites_regs_w)
 	AM_RANGE(0x308000, 0x308001) AM_WRITENOP                                        // ? 0 at startup
 	AM_RANGE(0x30c000, 0x30c001) AM_WRITENOP                                        // ? hblank effect ?
-	AM_RANGE(0x310000, 0x3101ff) AM_RAM_WRITE_LEGACY(galpani2_palette_0_w) AM_SHARE("palette.0")    // ?
+	AM_RANGE(0x310000, 0x3101ff) AM_RAM_WRITE(galpani2_palette_0_w) AM_SHARE("palette.0")    // ?
 	AM_RANGE(0x314000, 0x314001) AM_WRITENOP                                        // ? flip backgrounds ?
 	AM_RANGE(0x318000, 0x318001) AM_READWRITE(galpani2_eeprom_r, galpani2_eeprom_w) // EEPROM
 	AM_RANGE(0x380000, 0x387fff) AM_RAM                                             // Palette?
 	AM_RANGE(0x388000, 0x38ffff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram" )   // Palette
 	AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP                                        // ? at startup of service mode
 
-	AM_RANGE(0x400000, 0x43ffff) AM_RAM_WRITE_LEGACY(galpani2_bg8_0_w) AM_SHARE("bg8.0")    // Background 0
+	AM_RANGE(0x400000, 0x43ffff) AM_RAM_WRITE(galpani2_bg8_0_w) AM_SHARE("bg8.0")    // Background 0
 	AM_RANGE(0x440000, 0x440001) AM_RAM AM_SHARE("bg8_scrollx.0")           // Background 0 Scroll X
 	AM_RANGE(0x480000, 0x480001) AM_RAM AM_SHARE("bg8_scrolly.0")           // Background 0 Scroll Y
 	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP                                        // ? 0 at startup only
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE_LEGACY(galpani2_bg8_1_w) AM_SHARE("bg8.1")    // Background 1
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(galpani2_bg8_1_w) AM_SHARE("bg8.1")    // Background 1
 	AM_RANGE(0x540000, 0x540001) AM_RAM AM_SHARE("bg8_scrollx.1")           // Background 1 Scroll X
 
 	AM_RANGE(0x540572, 0x540573) AM_READNOP                                         // ? galpani2 at F0A4
@@ -354,7 +354,7 @@ READ16_MEMBER(galpani2_state::galpani2_bankedrom_r)
 static ADDRESS_MAP_START( galpani2_mem2, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM                                                             // ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("ram2")                                        // Work RAM
-	AM_RANGE(0x400000, 0x4fffff) AM_RAM_WRITE_LEGACY(galpani2_bg15_w) AM_SHARE("bg15")  // bg15
+	AM_RANGE(0x400000, 0x4fffff) AM_RAM_WRITE(galpani2_bg15_w) AM_SHARE("bg15")  // bg15
 	AM_RANGE(0x500000, 0x5fffff) AM_RAM                                                             // bg15
 	AM_RANGE(0x600000, 0x600001) AM_NOP // ? 0 at startup only
 	AM_RANGE(0x640000, 0x640001) AM_WRITENOP                                // ? 0 at startup only

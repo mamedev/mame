@@ -19,7 +19,5 @@ public:
 	DECLARE_MACHINE_RESET(klax);
 	DECLARE_VIDEO_START(klax);
 	UINT32 screen_update_klax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE16_MEMBER( klax_latch_w );	
 };
-
-/*----------- defined in video/klax.c -----------*/
-DECLARE_WRITE16_HANDLER( klax_latch_w );
