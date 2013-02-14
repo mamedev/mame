@@ -614,13 +614,20 @@ public:
 	DECLARE_READ8_MEMBER(tlcs_ide1_r);
 	DECLARE_WRITE8_MEMBER(tlcs_ide1_w);
 	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void taitotz_exit();
+	void draw_tile(taitotz_state *state, UINT32 pos, UINT32 tile);
+	UINT32 video_mem_r(taitotz_state *state, UINT32 address);
+	void video_mem_w(taitotz_state *state, UINT32 address, UINT32 data);
+	UINT32 video_reg_r(taitotz_state *state, UINT32 reg);
+	void video_reg_w(taitotz_state *state, UINT32 reg, UINT32 data);
+	void init_taitotz_152();
+	void init_taitotz_111a();
 };
 
 /*
-static void taitotz_exit(running_machine &machine)
+void taitotz_state::taitotz_exit()
 {
 
-    taitotz_state *state = machine.driver_data<taitotz_state>();
 
     FILE *file;
     int i;
@@ -628,30 +635,30 @@ static void taitotz_exit(running_machine &machine)
     file = fopen("screen_ram.bin","wb");
     for (i=0; i < 0x200000; i++)
     {
-        fputc((UINT8)(state->m_screen_ram[i] >> 24), file);
-        fputc((UINT8)(state->m_screen_ram[i] >> 16), file);
-        fputc((UINT8)(state->m_screen_ram[i] >> 8), file);
-        fputc((UINT8)(state->m_screen_ram[i] >> 0), file);
+        fputc((UINT8)(m_screen_ram[i] >> 24), file);
+        fputc((UINT8)(m_screen_ram[i] >> 16), file);
+        fputc((UINT8)(m_screen_ram[i] >> 8), file);
+        fputc((UINT8)(m_screen_ram[i] >> 0), file);
     }
     fclose(file);
 
     file = fopen("frame_ram.bin","wb");
     for (i=0; i < 0x80000; i++)
     {
-        fputc((UINT8)(state->m_frame_ram[i] >> 24), file);
-        fputc((UINT8)(state->m_frame_ram[i] >> 16), file);
-        fputc((UINT8)(state->m_frame_ram[i] >> 8), file);
-        fputc((UINT8)(state->m_frame_ram[i] >> 0), file);
+        fputc((UINT8)(m_frame_ram[i] >> 24), file);
+        fputc((UINT8)(m_frame_ram[i] >> 16), file);
+        fputc((UINT8)(m_frame_ram[i] >> 8), file);
+        fputc((UINT8)(m_frame_ram[i] >> 0), file);
     }
     fclose(file);
 
     file = fopen("texture_ram.bin","wb");
     for (i=0; i < 0x800000; i++)
     {
-        fputc((UINT8)(state->m_texture_ram[i] >> 24), file);
-        fputc((UINT8)(state->m_texture_ram[i] >> 16), file);
-        fputc((UINT8)(state->m_texture_ram[i] >> 8), file);
-        fputc((UINT8)(state->m_texture_ram[i] >> 0), file);
+        fputc((UINT8)(m_texture_ram[i] >> 24), file);
+        fputc((UINT8)(m_texture_ram[i] >> 16), file);
+        fputc((UINT8)(m_texture_ram[i] >> 8), file);
+        fputc((UINT8)(m_texture_ram[i] >> 0), file);
     }
     fclose(file);
 
@@ -1396,7 +1403,7 @@ UINT32 taitotz_state::screen_update_taitotz(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-static void draw_tile(taitotz_state *state, UINT32 pos, UINT32 tile)
+void taitotz_state::draw_tile(taitotz_state *state, UINT32 pos, UINT32 tile)
 {
 	int tileu = (tile & 0x1f) * 16;
 	int tilev = ((tile >> 5)) * 16;
@@ -1404,8 +1411,8 @@ static void draw_tile(taitotz_state *state, UINT32 pos, UINT32 tile)
 	int tilex = (pos & 0x1f) * 16;
 	int tiley = ((pos >> 5) & 0x1f) * 16;
 
-	UINT16 *src_tile = (UINT16*)&state->m_screen_ram[0x180000];
-	UINT16 *dst = (UINT16*)&state->m_screen_ram[state->m_scr_base];
+	UINT16 *src_tile = (UINT16*)&m_screen_ram[0x180000];
+	UINT16 *dst = (UINT16*)&m_screen_ram[m_scr_base];
 
 	int v = tilev;
 
@@ -1438,19 +1445,19 @@ static void draw_tile(taitotz_state *state, UINT32 pos, UINT32 tile)
     batlgr2 into 0x9e0000
 */
 
-static UINT32 video_mem_r(taitotz_state *state, UINT32 address)
+UINT32 taitotz_state::video_mem_r(taitotz_state *state, UINT32 address)
 {
 	if (address >= 0x800000 && address < 0x1000000)
 	{
-		return state->m_screen_ram[address - 0x800000];
+		return m_screen_ram[address - 0x800000];
 	}
 	else if (address >= 0x1000000 && address < 0x1800000)
 	{
-		return state->m_texture_ram[address - 0x1000000];
+		return m_texture_ram[address - 0x1000000];
 	}
 	else if (address >= 0x1800000 && address < 0x1880000)
 	{
-		return state->m_frame_ram[address - 0x1800000];
+		return m_frame_ram[address - 0x1800000];
 	}
 	else
 	{
@@ -1459,19 +1466,19 @@ static UINT32 video_mem_r(taitotz_state *state, UINT32 address)
 	}
 }
 
-static void video_mem_w(taitotz_state *state, UINT32 address, UINT32 data)
+void taitotz_state::video_mem_w(taitotz_state *state, UINT32 address, UINT32 data)
 {
 	if (address >= 0x800000 && address < 0x1000000)
 	{
-		state->m_screen_ram[address - 0x800000] = data;
+		m_screen_ram[address - 0x800000] = data;
 	}
 	else if (address >= 0x1000000 && address < 0x1800000)
 	{
-		state->m_texture_ram[address - 0x1000000] = data;
+		m_texture_ram[address - 0x1000000] = data;
 	}
 	else if (address >= 0x1800000 && address < 0x1880000)
 	{
-		state->m_frame_ram[address - 0x1800000] = data;
+		m_frame_ram[address - 0x1800000] = data;
 	}
 	else
 	{
@@ -1479,7 +1486,7 @@ static void video_mem_w(taitotz_state *state, UINT32 address, UINT32 data)
 	}
 }
 
-static UINT32 video_reg_r(taitotz_state *state, UINT32 reg)
+UINT32 taitotz_state::video_reg_r(taitotz_state *state, UINT32 reg)
 {
 	switch ((reg >> 28) & 0xf)
 	{
@@ -1487,8 +1494,8 @@ static UINT32 video_reg_r(taitotz_state *state, UINT32 reg)
 		{
 			if (reg == 0x10000105)      // Gets spammed a lot. Probably a status register.
 			{
-				state->m_reg105 ^= 0xffffffff;
-				return state->m_reg105;
+				m_reg105 ^= 0xffffffff;
+				return m_reg105;
 			}
 
 			logerror("video_reg_r: reg: %08X\n", reg);
@@ -1503,7 +1510,7 @@ static UINT32 video_reg_r(taitotz_state *state, UINT32 reg)
 
 			if (subreg < 0x10)
 			{
-				return state->m_video_unk_reg[subreg];
+				return m_video_unk_reg[subreg];
 			}
 			break;
 		}
@@ -1542,7 +1549,7 @@ video_reg_w: r: 20000003 d: 019501AA
 video_reg_w: r: 20000004 d: 00000000
 */
 
-static void video_reg_w(taitotz_state *state, UINT32 reg, UINT32 data)
+void taitotz_state::video_reg_w(taitotz_state *state, UINT32 reg, UINT32 data)
 {
 	switch ((reg >> 28) & 0xf)
 	{
@@ -1563,7 +1570,7 @@ static void video_reg_w(taitotz_state *state, UINT32 reg, UINT32 data)
 			int subreg = reg & 0xfffffff;
 			if (subreg < 0x10)
 			{
-				state->m_video_unk_reg[subreg] = data;
+				m_video_unk_reg[subreg] = data;
 			}
 			logerror("video_reg_w: reg: %08X data: %08X\n", reg, data);
 			break;
@@ -1577,8 +1584,8 @@ static void video_reg_w(taitotz_state *state, UINT32 reg, UINT32 data)
 		}
 	case 0xb:       // RAM write?
 		{
-			video_mem_w(state, state->m_video_ram_ptr, data);
-			state->m_video_ram_ptr++;
+			video_mem_w(state, m_video_ram_ptr, data);
+			m_video_ram_ptr++;
 			break;
 		}
 	default:
@@ -2596,17 +2603,17 @@ MACHINE_CONFIG_END
 
 
 // Init for BIOS v1.52
-static void init_taitotz_152(running_machine &machine)
+void taitotz_state::init_taitotz_152()
 {
-	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
 	rom[(0x2c87c^4)/4] = 0x38600000;    // skip sound load timeout...
 //  rom[(0x2c620^4)/4] = 0x48000014;    // ID check skip (not needed with correct serial number)
 }
 
 // Init for BIOS 1.11a
-static void init_taitotz_111a(running_machine &machine)
+void taitotz_state::init_taitotz_111a()
 {
-	UINT32 *rom = (UINT32*)machine.root_device().memregion("user1")->base();
+	UINT32 *rom = (UINT32*)machine().root_device().memregion("user1")->base();
 	rom[(0x2b748^4)/4] = 0x480000b8;    // skip sound load timeout
 }
 
@@ -2624,7 +2631,7 @@ static const char RAIZPIN_HDD_SERIAL[] =            // "691934013492        "
 
 DRIVER_INIT_MEMBER(taitotz_state,landhigh)
 {
-	init_taitotz_152(machine());
+	init_taitotz_152();
 
 	m_hdd_serial_number = LANDHIGH_HDD_SERIAL;
 
@@ -2635,7 +2642,7 @@ DRIVER_INIT_MEMBER(taitotz_state,landhigh)
 
 DRIVER_INIT_MEMBER(taitotz_state,batlgear)
 {
-	init_taitotz_111a(machine());
+	init_taitotz_111a();
 
 	// unknown, not used by BIOS 1.11a
 	m_hdd_serial_number = NULL;
@@ -2647,7 +2654,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgear)
 
 DRIVER_INIT_MEMBER(taitotz_state,batlgr2)
 {
-	init_taitotz_152(machine());
+	init_taitotz_152();
 
 	m_hdd_serial_number = BATLGR2_HDD_SERIAL;
 
@@ -2658,7 +2665,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgr2)
 
 DRIVER_INIT_MEMBER(taitotz_state,batlgr2a)
 {
-	init_taitotz_152(machine());
+	init_taitotz_152();
 
 	m_hdd_serial_number = BATLGR2A_HDD_SERIAL;
 
@@ -2669,7 +2676,7 @@ DRIVER_INIT_MEMBER(taitotz_state,batlgr2a)
 
 DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
 {
-	init_taitotz_111a(machine());
+	init_taitotz_111a();
 
 	// unknown, not used by BIOS 1.11a
 	m_hdd_serial_number = NULL;
@@ -2681,7 +2688,7 @@ DRIVER_INIT_MEMBER(taitotz_state,pwrshovl)
 
 DRIVER_INIT_MEMBER(taitotz_state,raizpin)
 {
-	init_taitotz_152(machine());
+	init_taitotz_152();
 
 	m_hdd_serial_number = RAIZPIN_HDD_SERIAL;
 

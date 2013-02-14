@@ -1096,9 +1096,13 @@ public:
 	DECLARE_DRIVER_INIT(ghlpanic);
 	DECLARE_DRIVER_INIT(ptblank2);
 	DECLARE_MACHINE_RESET(namcos12);
+	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
+	void namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	void namcos12_sub_irq( screen_device &screen, bool vblank_state );
+	void system11gun_install(  );
 };
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
+inline void ATTR_PRINTF(3,4) namcos12_state::verboselog( int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -1107,19 +1111,19 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", machine.describe_context(), buf );
+		logerror( "%s: %s", machine().describe_context(), buf );
 	}
 }
 
 WRITE32_MEMBER(namcos12_state::sharedram_w)
 {
-	verboselog( machine(), 1, "sharedram_w( %08x, %08x, %08x )\n", ( offset * 4 ), data, mem_mask );
+	verboselog(1, "sharedram_w( %08x, %08x, %08x )\n", ( offset * 4 ), data, mem_mask );
 	COMBINE_DATA( &m_sharedram[ offset ] );
 }
 
 READ32_MEMBER(namcos12_state::sharedram_r)
 {
-	verboselog( machine(), 1, "sharedram_r( %08x, %08x ) %08x\n", ( offset * 4 ), mem_mask, m_sharedram[ offset ] );
+	verboselog(1, "sharedram_r( %08x, %08x ) %08x\n", ( offset * 4 ), mem_mask, m_sharedram[ offset ] );
 	return m_sharedram[ offset ];
 }
 
@@ -1159,7 +1163,7 @@ WRITE32_MEMBER(namcos12_state::bankoffset_w)
 
 	membank( "bank1" )->set_entry( m_n_bankoffset );
 
-	verboselog( machine(), 1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
+	verboselog(1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
 }
 
 WRITE32_MEMBER(namcos12_state::dmaoffset_w)
@@ -1172,10 +1176,10 @@ WRITE32_MEMBER(namcos12_state::dmaoffset_w)
 	{
 		m_n_dmaoffset = ( ( offset * 4 ) + 2 ) | ( data & 0xffff0000 );
 	}
-	verboselog( machine(), 1, "dmaoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_dmaoffset );
+	verboselog(1, "dmaoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_dmaoffset );
 }
 
-static void namcos12_rom_read( namcos12_state *state, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void namcos12_state::namcos12_rom_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
 	const char *n_region;
 	int n_offset;
@@ -1187,32 +1191,32 @@ static void namcos12_rom_read( namcos12_state *state, UINT32 *p_n_psxram, UINT32
 	INT32 n_ramleft;
 
 	// TODO: the check for going past the end of ram should be in dma.c
-	UINT32 m_n_psxramsize = state->memshare("share1")->bytes();
+	UINT32 m_n_psxramsize = memshare("share1")->bytes();
 
-	if(state->m_has_tektagt_dma && !state->m_n_dmaoffset)
+	if(m_has_tektagt_dma && !m_n_dmaoffset)
 	{
 		n_region = "user2";
-		n_offset = state->m_n_tektagdmaoffset & 0x7fffffff;
-		verboselog( state->machine(), 1, "namcos12_rom_read( %08x, %08x ) tektagt %08x\n", n_address, n_size, n_offset );
+		n_offset = m_n_tektagdmaoffset & 0x7fffffff;
+		verboselog(1, "namcos12_rom_read( %08x, %08x ) tektagt %08x\n", n_address, n_size, n_offset );
 	}
-	else if( ( state->m_n_dmaoffset >= 0x80000000 ) || ( state->m_n_dmabias == 0x1f300000 ) )
+	else if( ( m_n_dmaoffset >= 0x80000000 ) || ( m_n_dmabias == 0x1f300000 ) )
 	{
 		n_region = "user1";
-		n_offset = state->m_n_dmaoffset & 0x003fffff;
-		verboselog( state->machine(), 1, "namcos12_rom_read( %08x, %08x ) boot %08x\n", n_address, n_size, n_offset );
+		n_offset = m_n_dmaoffset & 0x003fffff;
+		verboselog(1, "namcos12_rom_read( %08x, %08x ) boot %08x\n", n_address, n_size, n_offset );
 	}
 	else
 	{
 		n_region = "user2";
-		n_offset = state->m_n_dmaoffset & 0x7fffffff;
-		verboselog( state->machine(), 1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
+		n_offset = m_n_dmaoffset & 0x7fffffff;
+		verboselog(1, "namcos12_rom_read( %08x, %08x ) game %08x\n", n_address, n_size, n_offset );
 	}
 
-	source = (UINT16 *) state->memregion( n_region )->base();
-	n_romleft = ( state->memregion( n_region )->bytes() - n_offset ) / 4;
+	source = (UINT16 *) memregion( n_region )->base();
+	n_romleft = ( memregion( n_region )->bytes() - n_offset ) / 4;
 	if( n_size > n_romleft )
 	{
-		verboselog( state->machine(), 1, "namcos12_rom_read dma truncated %d to %d passed end of rom\n", n_size, n_romleft );
+		verboselog(1, "namcos12_rom_read dma truncated %d to %d passed end of rom\n", n_size, n_romleft );
 		n_size = n_romleft;
 	}
 
@@ -1221,7 +1225,7 @@ static void namcos12_rom_read( namcos12_state *state, UINT32 *p_n_psxram, UINT32
 	n_ramleft = ( m_n_psxramsize - n_address ) / 4;
 	if( n_size > n_ramleft )
 	{
-		verboselog( state->machine(), 1, "namcos12_rom_read dma truncated %d to %d passed end of ram\n", n_size, n_ramleft );
+		verboselog(1, "namcos12_rom_read dma truncated %d to %d passed end of ram\n", n_size, n_ramleft );
 		n_size = n_ramleft;
 	}
 
@@ -1238,9 +1242,9 @@ static void namcos12_rom_read( namcos12_state *state, UINT32 *p_n_psxram, UINT32
 	}
 }
 
-static void namcos12_sub_irq( namcos12_state *state, screen_device &screen, bool vblank_state )
+void namcos12_state::namcos12_sub_irq( screen_device &screen, bool vblank_state )
 {
-	irq1_line_pulse( state->machine().device( "sub" ) );
+	irq1_line_pulse( *machine().device( "sub" ) );
 }
 
 WRITE32_MEMBER(namcos12_state::s12_dma_bias_w)
@@ -1279,11 +1283,11 @@ WRITE32_MEMBER(namcos12_state::system11gun_w)
 		output_set_value("P2_Start_lamp", (~data & 0x04)>>2);
 
 
-		verboselog( machine(), 1, "system11gun_w: outputs (%08x %08x)\n", data, mem_mask );
+		verboselog(1, "system11gun_w: outputs (%08x %08x)\n", data, mem_mask );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		verboselog( machine(), 2, "system11gun_w: start reading (%08x %08x)\n", data, mem_mask );
+		verboselog(2, "system11gun_w: start reading (%08x %08x)\n", data, mem_mask );
 	}
 }
 
@@ -1305,15 +1309,14 @@ READ32_MEMBER(namcos12_state::system11gun_r)
 		data = ( ioport("LIGHT1_Y")->read() ) | ( ( ioport("LIGHT1_Y")->read() + 1 ) << 16 );
 		break;
 	}
-	verboselog( machine(), 2, "system11gun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog(2, "system11gun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-static void system11gun_install( running_machine &machine )
+void namcos12_state::system11gun_install(  )
 {
-	namcos12_state *state = machine.driver_data<namcos12_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x1f788000, 0x1f788003, write32_delegate(FUNC(namcos12_state::system11gun_w),state));
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler (0x1f780000, 0x1f78000f, read32_delegate(FUNC(namcos12_state::system11gun_r),state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x1f788000, 0x1f788003, write32_delegate(FUNC(namcos12_state::system11gun_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler (0x1f780000, 0x1f78000f, read32_delegate(FUNC(namcos12_state::system11gun_r),this));
 }
 
 WRITE32_MEMBER(namcos12_state::kcoff_w)
@@ -1606,14 +1609,14 @@ DRIVER_INIT_MEMBER(namcos12_state,ptblank2)
 	/* patch out wait for dma 5 to complete */
 	*( (UINT32 *)( memregion( "user1" )->base() + 0x331c4 ) ) = 0;
 
-	system11gun_install(machine());
+	system11gun_install();
 }
 
 DRIVER_INIT_MEMBER(namcos12_state,ghlpanic)
 {
 	DRIVER_INIT_CALL(namcos12);
 
-	system11gun_install(machine());
+	system11gun_install();
 }
 
 static MACHINE_CONFIG_START( coh700, namcos12_state )
@@ -1621,7 +1624,7 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	MCFG_CPU_ADD( "maincpu", CXD8661R, XTAL_100MHz )
 	MCFG_CPU_PROGRAM_MAP( namcos12_map)
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( namcos12_rom_read ), (namcos12_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( namcos12_state::namcos12_rom_read ), (namcos12_state *) owner ) )
 
 	MCFG_CPU_ADD("sub", H83002, 16737350 )
 	MCFG_CPU_PROGRAM_MAP( s12h8rwmap)
@@ -1633,7 +1636,7 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
-	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( namcos12_sub_irq ), (namcos12_state *) owner ) )
+	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( namcos12_state::namcos12_sub_irq ), (namcos12_state *) owner ) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

@@ -393,15 +393,19 @@ public:
 	DECLARE_DRIVER_INIT(coh3002t_mp);
 	DECLARE_DRIVER_INIT(coh3002t);
 	DECLARE_MACHINE_RESET(coh3002t);
+	void rf5c296_reg_w(ATTR_UNUSED UINT8 reg, UINT8 data);
+	UINT8 rf5c296_reg_r(ATTR_UNUSED UINT8 reg);
+	UINT32 gen_flash_r(intelfsh16_device *device, offs_t offset, UINT32 mem_mask);
+	void gen_flash_w(intelfsh16_device *device, offs_t offset, UINT32 data, UINT32 mem_mask);
+	void install_handlers(int mode);
 };
 
 
 // rf5c296 is very inaccurate at that point, it hardcodes the gnet config
 
-static void rf5c296_reg_w(ATTR_UNUSED running_machine &machine, UINT8 reg, UINT8 data)
+void taitogn_state::rf5c296_reg_w(ATTR_UNUSED UINT8 reg, UINT8 data)
 {
-	taitogn_state *state = machine.driver_data<taitogn_state>();
-	//  fprintf(stderr, "rf5c296_reg_w %02x, %02x (%s)\n", reg, data, machine.describe_context());
+	//  fprintf(stderr, "rf5c296_reg_w %02x, %02x (%s)\n", reg, data, machine().describe_context());
 	switch (reg)
 	{
 		// Interrupt and General Control Register
@@ -409,10 +413,10 @@ static void rf5c296_reg_w(ATTR_UNUSED running_machine &machine, UINT8 reg, UINT8
 			// Check for card reset
 			if (!(data & 0x40))
 			{
-				ide_controller_device *card = (ide_controller_device *) machine.device(":card");
+				ide_controller_device *card = (ide_controller_device *) machine().device(":card");
 
 				card->reset();
-				state->m_locked = 0x1ff;
+				m_locked = 0x1ff;
 				card->ide_set_gnet_readlock(1);
 			}
 		break;
@@ -422,9 +426,9 @@ static void rf5c296_reg_w(ATTR_UNUSED running_machine &machine, UINT8 reg, UINT8
 	}
 }
 
-static UINT8 rf5c296_reg_r(ATTR_UNUSED running_machine &machine, UINT8 reg)
+UINT8 taitogn_state::rf5c296_reg_r(ATTR_UNUSED UINT8 reg)
 {
-	//  fprintf(stderr, "rf5c296_reg_r %02x (%s)\n", reg, machine.describe_context());
+	//  fprintf(stderr, "rf5c296_reg_r %02x (%s)\n", reg, machine().describe_context());
 	return 0x00;
 }
 
@@ -439,7 +443,7 @@ WRITE32_MEMBER(taitogn_state::rf5c296_io_w)
 		if(ACCESSING_BITS_0_7)
 			m_rf5c296_reg = data;
 		if(ACCESSING_BITS_8_15)
-			rf5c296_reg_w(machine(), m_rf5c296_reg, data >> 8);
+			rf5c296_reg_w(m_rf5c296_reg, data >> 8);
 	}
 }
 
@@ -455,7 +459,7 @@ READ32_MEMBER(taitogn_state::rf5c296_io_r)
 		if(ACCESSING_BITS_0_7)
 			res |= m_rf5c296_reg;
 		if(ACCESSING_BITS_8_15)
-			res |= rf5c296_reg_r(machine(), m_rf5c296_reg) << 8;
+			res |= rf5c296_reg_r(m_rf5c296_reg) << 8;
 		return res;
 	}
 
@@ -507,7 +511,7 @@ WRITE32_MEMBER(taitogn_state::rf5c296_mem_w)
 
 // Flash handling
 
-static UINT32 gen_flash_r(intelfsh16_device *device, offs_t offset, UINT32 mem_mask)
+UINT32 taitogn_state::gen_flash_r(intelfsh16_device *device, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 res = 0;
 	offset *= 2;
@@ -518,7 +522,7 @@ static UINT32 gen_flash_r(intelfsh16_device *device, offs_t offset, UINT32 mem_m
 	return res;
 }
 
-static void gen_flash_w(intelfsh16_device *device, offs_t offset, UINT32 data, UINT32 mem_mask)
+void taitogn_state::gen_flash_w(intelfsh16_device *device, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	offset *= 2;
 	if(ACCESSING_BITS_0_15)
@@ -578,22 +582,21 @@ WRITE32_MEMBER(taitogn_state::flash_s3_w)
 	gen_flash_w(m_sndflash[2], offset, data, mem_mask);
 }
 
-static void install_handlers(running_machine &machine, int mode)
+void taitogn_state::install_handlers(int mode)
 {
-	taitogn_state *state = machine.driver_data<taitogn_state>();
-	address_space &a = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &a = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	if(mode == 0) {
 		// Mode 0 has access to the subbios, the mn102 flash and the rf5c296 mem zone
-		a.install_readwrite_handler(0x1f000000, 0x1f1fffff, read32_delegate(FUNC(taitogn_state::flash_subbios_r),state), write32_delegate(FUNC(taitogn_state::flash_subbios_w),state));
-		a.install_readwrite_handler(0x1f200000, 0x1f2fffff, read32_delegate(FUNC(taitogn_state::rf5c296_mem_r),state), write32_delegate(FUNC(taitogn_state::rf5c296_mem_w),state));
-		a.install_readwrite_handler(0x1f300000, 0x1f37ffff, read32_delegate(FUNC(taitogn_state::flash_mn102_r),state), write32_delegate(FUNC(taitogn_state::flash_mn102_w),state));
+		a.install_readwrite_handler(0x1f000000, 0x1f1fffff, read32_delegate(FUNC(taitogn_state::flash_subbios_r),this), write32_delegate(FUNC(taitogn_state::flash_subbios_w),this));
+		a.install_readwrite_handler(0x1f200000, 0x1f2fffff, read32_delegate(FUNC(taitogn_state::rf5c296_mem_r),this), write32_delegate(FUNC(taitogn_state::rf5c296_mem_w),this));
+		a.install_readwrite_handler(0x1f300000, 0x1f37ffff, read32_delegate(FUNC(taitogn_state::flash_mn102_r),this), write32_delegate(FUNC(taitogn_state::flash_mn102_w),this));
 		a.nop_readwrite(0x1f380000, 0x1f5fffff);
 
 	} else {
 		// Mode 1 has access to the 3 samples flashes
-		a.install_readwrite_handler(0x1f000000, 0x1f1fffff, read32_delegate(FUNC(taitogn_state::flash_s1_r),state), write32_delegate(FUNC(taitogn_state::flash_s1_w),state));
-		a.install_readwrite_handler(0x1f200000, 0x1f3fffff, read32_delegate(FUNC(taitogn_state::flash_s2_r),state), write32_delegate(FUNC(taitogn_state::flash_s2_w),state));
-		a.install_readwrite_handler(0x1f400000, 0x1f5fffff, read32_delegate(FUNC(taitogn_state::flash_s3_r),state), write32_delegate(FUNC(taitogn_state::flash_s3_w),state));
+		a.install_readwrite_handler(0x1f000000, 0x1f1fffff, read32_delegate(FUNC(taitogn_state::flash_s1_r),this), write32_delegate(FUNC(taitogn_state::flash_s1_w),this));
+		a.install_readwrite_handler(0x1f200000, 0x1f3fffff, read32_delegate(FUNC(taitogn_state::flash_s2_r),this), write32_delegate(FUNC(taitogn_state::flash_s2_w),this));
+		a.install_readwrite_handler(0x1f400000, 0x1f5fffff, read32_delegate(FUNC(taitogn_state::flash_s3_r),this), write32_delegate(FUNC(taitogn_state::flash_s3_w),this));
 	}
 }
 
@@ -634,7 +637,7 @@ WRITE32_MEMBER(taitogn_state::control_w)
 #endif
 
 	if((p ^ m_control) & 0x04)
-		install_handlers(machine(), m_control & 4 ? 1 : 0);
+		install_handlers(m_control & 4 ? 1 : 0);
 }
 
 WRITE32_MEMBER(taitogn_state::control2_w)
@@ -785,7 +788,7 @@ DRIVER_INIT_MEMBER(taitogn_state,coh3002t_mp)
 MACHINE_RESET_MEMBER(taitogn_state,coh3002t)
 {
 	m_locked = 0x1ff;
-	install_handlers(machine(), 0);
+	install_handlers(0);
 	m_control = 0;
 
 	ide_controller_device *card = (ide_controller_device *) machine().device(":card");

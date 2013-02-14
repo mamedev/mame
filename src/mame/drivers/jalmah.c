@@ -207,6 +207,16 @@ public:
 	UINT32 screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(jalmah_mcu_sim);
+	void jalmah_priority_system();
+	void draw_sc0_layer(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sc1_layer(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sc2_layer(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sc3_layer(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void daireika_palette_dma(UINT16 val);
+	void daireika_mcu_run();
+	void mjzoomin_mcu_run();
+	void urashima_mcu_run();
+	void second_mcu_run();
 };
 
 
@@ -366,76 +376,71 @@ etc.)
 In the end the final results always are one bit assigned to each priority (i.e. most
 priority = 8, then 4, 2 and finally 1).
 ***************************************************************************************/
-static void jalmah_priority_system(running_machine &machine)
+void jalmah_state::jalmah_priority_system()
 {
-	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT8 *pri_rom = state->memregion("user1")->base();
+	UINT8 *pri_rom = memregion("user1")->base();
 	UINT8 i;
 	UINT8 prinum[0x10];
 
-	state->m_sc0_prin = 0;
-	state->m_sc1_prin = 0;
-	state->m_sc2_prin = 0;
-	state->m_sc3_prin = 0;
+	m_sc0_prin = 0;
+	m_sc1_prin = 0;
+	m_sc2_prin = 0;
+	m_sc3_prin = 0;
 
 	for(i=0;i<0x10;i++)
 	{
-		prinum[i] = pri_rom[i+state->m_pri*0x10];
+		prinum[i] = pri_rom[i+m_pri*0x10];
 
-		if(prinum[i] == 0) { state->m_sc0_prin++; }
-		if(prinum[i] == 1) { state->m_sc1_prin++; }
-		if(prinum[i] == 2) { state->m_sc2_prin++; }
-		if(prinum[i] == 3) { state->m_sc3_prin++; }
+		if(prinum[i] == 0) { m_sc0_prin++; }
+		if(prinum[i] == 1) { m_sc1_prin++; }
+		if(prinum[i] == 2) { m_sc2_prin++; }
+		if(prinum[i] == 3) { m_sc3_prin++; }
 	}
 
-	//popmessage("%02x %02x %02x %02x",state->m_sc0_prin,state->m_sc1_prin,state->m_sc2_prin,state->m_sc3_prin);
+	//popmessage("%02x %02x %02x %02x",m_sc0_prin,m_sc1_prin,m_sc2_prin,m_sc3_prin);
 }
 
-static void draw_sc0_layer(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void jalmah_state::draw_sc0_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jalmah_state *state = machine.driver_data<jalmah_state>();
-	switch(state->m_jm_vregs[0] & 3)
+	switch(m_jm_vregs[0] & 3)
 	{
-		case 0: state->m_sc0_tilemap_0->draw(bitmap, cliprect, 0,0); break;
-		case 1: state->m_sc0_tilemap_1->draw(bitmap, cliprect, 0,0); break;
-		case 2: state->m_sc0_tilemap_2->draw(bitmap, cliprect, 0,0); break;
-		case 3: state->m_sc0_tilemap_3->draw(bitmap, cliprect, 0,0); break;
+		case 0: m_sc0_tilemap_0->draw(bitmap, cliprect, 0,0); break;
+		case 1: m_sc0_tilemap_1->draw(bitmap, cliprect, 0,0); break;
+		case 2: m_sc0_tilemap_2->draw(bitmap, cliprect, 0,0); break;
+		case 3: m_sc0_tilemap_3->draw(bitmap, cliprect, 0,0); break;
 	}
 }
 
-static void draw_sc1_layer(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void jalmah_state::draw_sc1_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jalmah_state *state = machine.driver_data<jalmah_state>();
-	switch(state->m_jm_vregs[1] & 3)
+	switch(m_jm_vregs[1] & 3)
 	{
-		case 0: state->m_sc1_tilemap_0->draw(bitmap, cliprect, 0,0); break;
-		case 1: state->m_sc1_tilemap_1->draw(bitmap, cliprect, 0,0); break;
-		case 2: state->m_sc1_tilemap_2->draw(bitmap, cliprect, 0,0); break;
-		case 3: state->m_sc1_tilemap_3->draw(bitmap, cliprect, 0,0); break;
+		case 0: m_sc1_tilemap_0->draw(bitmap, cliprect, 0,0); break;
+		case 1: m_sc1_tilemap_1->draw(bitmap, cliprect, 0,0); break;
+		case 2: m_sc1_tilemap_2->draw(bitmap, cliprect, 0,0); break;
+		case 3: m_sc1_tilemap_3->draw(bitmap, cliprect, 0,0); break;
 	}
 }
 
-static void draw_sc2_layer(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void jalmah_state::draw_sc2_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jalmah_state *state = machine.driver_data<jalmah_state>();
-	switch(state->m_jm_vregs[2] & 3)
+	switch(m_jm_vregs[2] & 3)
 	{
-		case 0: state->m_sc2_tilemap_0->draw(bitmap, cliprect, 0,0); break;
-		case 1: state->m_sc2_tilemap_1->draw(bitmap, cliprect, 0,0); break;
-		case 2: state->m_sc2_tilemap_2->draw(bitmap, cliprect, 0,0); break;
-		case 3: state->m_sc2_tilemap_3->draw(bitmap, cliprect, 0,0); break;
+		case 0: m_sc2_tilemap_0->draw(bitmap, cliprect, 0,0); break;
+		case 1: m_sc2_tilemap_1->draw(bitmap, cliprect, 0,0); break;
+		case 2: m_sc2_tilemap_2->draw(bitmap, cliprect, 0,0); break;
+		case 3: m_sc2_tilemap_3->draw(bitmap, cliprect, 0,0); break;
 	}
 }
 
-static void draw_sc3_layer(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void jalmah_state::draw_sc3_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	jalmah_state *state = machine.driver_data<jalmah_state>();
-	switch(state->m_jm_vregs[3] & 3)
+	switch(m_jm_vregs[3] & 3)
 	{
 		case 0:
-		case 1: state->m_sc3_tilemap_0->draw(bitmap, cliprect, 0,0); break;
-		case 2: state->m_sc3_tilemap_2->draw(bitmap, cliprect, 0,0); break;
-		case 3: state->m_sc3_tilemap_3->draw(bitmap, cliprect, 0,0); break;
+		case 1: m_sc3_tilemap_0->draw(bitmap, cliprect, 0,0); break;
+		case 2: m_sc3_tilemap_2->draw(bitmap, cliprect, 0,0); break;
+		case 3: m_sc3_tilemap_3->draw(bitmap, cliprect, 0,0); break;
 	}
 }
 
@@ -443,7 +448,7 @@ UINT32 jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 &b
 {
 	UINT16 *jm_scrollram = m_jm_scrollram;
 	UINT8 cur_prin;
-	jalmah_priority_system(machine());
+	jalmah_priority_system();
 
 	m_sc0_tilemap_0->set_scrollx(0, jm_scrollram[0] & 0xfff);
 	m_sc0_tilemap_1->set_scrollx(0, jm_scrollram[0] & 0x7ff);
@@ -490,10 +495,10 @@ UINT32 jalmah_state::screen_update_jalmah(screen_device &screen, bitmap_ind16 &b
 
 	for(cur_prin=1;cur_prin<=0x8;cur_prin<<=1)
 	{
-		if(cur_prin==m_sc0_prin) { draw_sc0_layer(machine(),bitmap,cliprect); }
-		if(cur_prin==m_sc1_prin) { draw_sc1_layer(machine(),bitmap,cliprect); }
-		if(cur_prin==m_sc2_prin) { draw_sc2_layer(machine(),bitmap,cliprect); }
-		if(cur_prin==m_sc3_prin) { draw_sc3_layer(machine(),bitmap,cliprect); }
+		if(cur_prin==m_sc0_prin) { draw_sc0_layer(bitmap,cliprect); }
+		if(cur_prin==m_sc1_prin) { draw_sc1_layer(bitmap,cliprect); }
+		if(cur_prin==m_sc2_prin) { draw_sc2_layer(bitmap,cliprect); }
+		if(cur_prin==m_sc3_prin) { draw_sc3_layer(bitmap,cliprect); }
 	}
 
 	return 0;
@@ -712,7 +717,7 @@ xxxx ---- MCU program revision
 
 
 #define MCU_READ(tag, _bit_, _offset_, _retval_) \
-if((0xffff - machine.root_device().ioport(tag)->read()) & _bit_) { jm_shared_ram[_offset_] = _retval_; }
+if((0xffff - ioport(tag)->read()) & _bit_) { jm_shared_ram[_offset_] = _retval_; }
 
 /*Funky "DMA" / protection thing*/
 /*---- -x-- "DMA" execute.*/
@@ -728,10 +733,9 @@ WRITE16_MEMBER(jalmah_state::urashima_dma_w)
 }
 
 /*same as $f00c0 sub-routine,but with additional work-around,to remove from here...*/
-static void daireika_palette_dma(running_machine &machine, UINT16 val)
+void jalmah_state::daireika_palette_dma(UINT16 val)
 {
-	//jalmah_state *state = machine.driver_data<jalmah_state>();
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 index_1, index_2, src_addr, tmp_addr;
 	/*a0=301c0+jm_shared_ram[0x540/2] & 0xf00 */
 	/*a1=88000*/
@@ -750,25 +754,24 @@ static void daireika_palette_dma(running_machine &machine, UINT16 val)
 }
 
 /*RAM-based protection handlings*/
-static void daireika_mcu_run(running_machine &machine)
+void jalmah_state::daireika_mcu_run()
 {
-	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
+	UINT16 *jm_shared_ram = m_jm_shared_ram;
 
-	if(((jm_shared_ram[0x550/2] & 0xf00) == 0x700) && ((jm_shared_ram[0x540/2] & 0xf00) != state->m_dma_old))
+	if(((jm_shared_ram[0x550/2] & 0xf00) == 0x700) && ((jm_shared_ram[0x540/2] & 0xf00) != m_dma_old))
 	{
-		state->m_dma_old = jm_shared_ram[0x540/2] & 0xf00;
-		daireika_palette_dma(machine,((jm_shared_ram[0x540/2] & 0x0f00) >> 8));
+		m_dma_old = jm_shared_ram[0x540/2] & 0xf00;
+		daireika_palette_dma(((jm_shared_ram[0x540/2] & 0x0f00) >> 8));
 	}
 
-	if(state->m_test_mode)  //service_mode
+	if(m_test_mode)  //service_mode
 	{
-		jm_shared_ram[0x000/2] = machine.root_device().ioport("KEY0")->read();
-		jm_shared_ram[0x002/2] = machine.root_device().ioport("KEY1")->read();
-		jm_shared_ram[0x004/2] = machine.root_device().ioport("KEY2")->read();
-		jm_shared_ram[0x006/2] = machine.root_device().ioport("KEY3")->read();
-		jm_shared_ram[0x008/2] = machine.root_device().ioport("KEY4")->read();
-		jm_shared_ram[0x00a/2] = machine.root_device().ioport("KEY5")->read();
+		jm_shared_ram[0x000/2] = ioport("KEY0")->read();
+		jm_shared_ram[0x002/2] = ioport("KEY1")->read();
+		jm_shared_ram[0x004/2] = ioport("KEY2")->read();
+		jm_shared_ram[0x006/2] = ioport("KEY3")->read();
+		jm_shared_ram[0x008/2] = ioport("KEY4")->read();
+		jm_shared_ram[0x00a/2] = ioport("KEY5")->read();
 	}
 	else
 	{
@@ -795,24 +798,23 @@ static void daireika_mcu_run(running_machine &machine)
 		MCU_READ("KEY1", 0x0002, 0x000/2, 0x13);        /*CHI   (trusted)*/
 		MCU_READ("KEY0", 0x0004, 0x000/2, 0x14);        /*START1*/
 	}
-	state->m_prg_prot++;
-	if(state->m_prg_prot > 0x10) { state->m_prg_prot = 0; }
-	jm_shared_ram[0x00e/2] = state->m_prg_prot;
+	m_prg_prot++;
+	if(m_prg_prot > 0x10) { m_prg_prot = 0; }
+	jm_shared_ram[0x00e/2] = m_prg_prot;
 }
 
-static void mjzoomin_mcu_run(running_machine &machine)
+void jalmah_state::mjzoomin_mcu_run()
 {
-	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
+	UINT16 *jm_shared_ram = m_jm_shared_ram;
 
-	if(state->m_test_mode)  //service_mode
+	if(m_test_mode)  //service_mode
 	{
-		jm_shared_ram[0x000/2] = state->ioport("KEY0")->read();
-		jm_shared_ram[0x002/2] = state->ioport("KEY1")->read();
-		jm_shared_ram[0x004/2] = state->ioport("KEY2")->read();
-		jm_shared_ram[0x006/2] = state->ioport("KEY3")->read();
-		jm_shared_ram[0x008/2] = state->ioport("KEY4")->read();
-		jm_shared_ram[0x00a/2] = state->ioport("KEY5")->read();
+		jm_shared_ram[0x000/2] = ioport("KEY0")->read();
+		jm_shared_ram[0x002/2] = ioport("KEY1")->read();
+		jm_shared_ram[0x004/2] = ioport("KEY2")->read();
+		jm_shared_ram[0x006/2] = ioport("KEY3")->read();
+		jm_shared_ram[0x008/2] = ioport("KEY4")->read();
+		jm_shared_ram[0x00a/2] = ioport("KEY5")->read();
 	}
 	else
 	{
@@ -839,25 +841,24 @@ static void mjzoomin_mcu_run(running_machine &machine)
 		MCU_READ("KEY1", 0x0002, 0x000/2, 0x13);        /*CHI   (trusted)*/
 		MCU_READ("KEY0", 0x0004, 0x000/2, 0x14);        /*START1*/
 	}
-	jm_shared_ram[0x00c/2] = machine.rand() & 0xffff;
-	state->m_prg_prot++;
-	if(state->m_prg_prot > 0x10) { state->m_prg_prot = 0; }
-	jm_shared_ram[0x00e/2] = state->m_prg_prot;
+	jm_shared_ram[0x00c/2] = machine().rand() & 0xffff;
+	m_prg_prot++;
+	if(m_prg_prot > 0x10) { m_prg_prot = 0; }
+	jm_shared_ram[0x00e/2] = m_prg_prot;
 }
 
-static void urashima_mcu_run(running_machine &machine)
+void jalmah_state::urashima_mcu_run()
 {
-	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
+	UINT16 *jm_shared_ram = m_jm_shared_ram;
 
-	if(state->m_test_mode)  //service_mode
+	if(m_test_mode)  //service_mode
 	{
-		jm_shared_ram[0x300/2] = state->ioport("KEY0")->read();
-		jm_shared_ram[0x302/2] = state->ioport("KEY1")->read();
-		jm_shared_ram[0x304/2] = state->ioport("KEY2")->read();
-		jm_shared_ram[0x306/2] = state->ioport("KEY3")->read();
-		jm_shared_ram[0x308/2] = state->ioport("KEY4")->read();
-		jm_shared_ram[0x30a/2] = state->ioport("KEY5")->read();
+		jm_shared_ram[0x300/2] = ioport("KEY0")->read();
+		jm_shared_ram[0x302/2] = ioport("KEY1")->read();
+		jm_shared_ram[0x304/2] = ioport("KEY2")->read();
+		jm_shared_ram[0x306/2] = ioport("KEY3")->read();
+		jm_shared_ram[0x308/2] = ioport("KEY4")->read();
+		jm_shared_ram[0x30a/2] = ioport("KEY5")->read();
 	}
 	else
 	{
@@ -884,21 +885,20 @@ static void urashima_mcu_run(running_machine &machine)
 		MCU_READ("KEY1", 0x0002, 0x300/2, 0x13);        /*CHI   (trusted)*/
 		MCU_READ("KEY0", 0x0004, 0x300/2, 0x14);        /*START1*/
 	}
-	jm_shared_ram[0x30c/2] = machine.rand() & 0xffff;
-	state->m_prg_prot++;
-	if(state->m_prg_prot > 0x10) { state->m_prg_prot = 0; }
-	jm_shared_ram[0x30e/2] = state->m_prg_prot;
+	jm_shared_ram[0x30c/2] = machine().rand() & 0xffff;
+	m_prg_prot++;
+	if(m_prg_prot > 0x10) { m_prg_prot = 0; }
+	jm_shared_ram[0x30e/2] = m_prg_prot;
 }
 
-static void second_mcu_run(running_machine &machine)
+void jalmah_state::second_mcu_run()
 {
-	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
-	if(state->m_test_mode)  //service_mode
+	UINT16 *jm_shared_ram = m_jm_shared_ram;
+	if(m_test_mode)  //service_mode
 	{
-		jm_shared_ram[0x200/2] = state->ioport("KEY0")->read();
-		jm_shared_ram[0x202/2] = state->ioport("KEY1")->read();
-		jm_shared_ram[0x204/2] = state->ioport("KEY2")->read();
+		jm_shared_ram[0x200/2] = ioport("KEY0")->read();
+		jm_shared_ram[0x202/2] = ioport("KEY1")->read();
+		jm_shared_ram[0x204/2] = ioport("KEY2")->read();
 	}
 	else
 	{
@@ -927,7 +927,7 @@ static void second_mcu_run(running_machine &machine)
 
 //      MCU_READ("KEY0", 0x0004, 0x7b8/2, 0x03);        /*START1(correct?)  */
 	}
-	jm_shared_ram[0x20c/2] = machine.rand() & 0xffff; //kakumei2
+	jm_shared_ram[0x20c/2] = machine().rand() & 0xffff; //kakumei2
 
 }
 
@@ -943,12 +943,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(jalmah_state::jalmah_mcu_sim)
 		    #define KAKUMEI2_MCU (0x22)
 		    #define SUCHIPI_MCU  (0x23)
 		*/
-			case MJZOOMIN_MCU: mjzoomin_mcu_run(machine()); break;
-			case DAIREIKA_MCU: daireika_mcu_run(machine()); break;
-			case URASHIMA_MCU: urashima_mcu_run(machine()); break;
+			case MJZOOMIN_MCU: mjzoomin_mcu_run(); break;
+			case DAIREIKA_MCU: daireika_mcu_run(); break;
+			case URASHIMA_MCU: urashima_mcu_run(); break;
 			case KAKUMEI_MCU:
 			case KAKUMEI2_MCU:
-			case SUCHIPI_MCU:  second_mcu_run(machine()); break;
+			case SUCHIPI_MCU:  second_mcu_run(); break;
 	}
 }
 

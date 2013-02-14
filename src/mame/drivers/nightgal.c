@@ -127,6 +127,7 @@ protected:
 	required_ioport m_io_dswc;
 
 	UINT8 nightgal_gfx_nibble( int niboffset );
+	void plot_nightgal_gfx_pixel( UINT8 pix, int x, int y );
 };
 
 
@@ -176,18 +177,17 @@ UINT8 nightgal_state::nightgal_gfx_nibble( int niboffset )
 	}
 }
 
-static void plot_nightgal_gfx_pixel( running_machine &machine, UINT8 pix, int x, int y )
+void nightgal_state::plot_nightgal_gfx_pixel( UINT8 pix, int x, int y )
 {
-	nightgal_state *state = machine.driver_data<nightgal_state>();
 	if (y >= 512) return;
 	if (x >= 512) return;
 	if (y < 0) return;
 	if (x < 0) return;
 
 	if (x & 1)
-		state->m_blit_buffer[(y * 256) + (x >> 1)] = (state->m_blit_buffer[(y * 256) + (x >> 1)] & 0x0f) | ((pix << 4) & 0xf0);
+		m_blit_buffer[(y * 256) + (x >> 1)] = (m_blit_buffer[(y * 256) + (x >> 1)] & 0x0f) | ((pix << 4) & 0xf0);
 	else
-		state->m_blit_buffer[(y * 256) + (x >> 1)] = (state->m_blit_buffer[(y * 256) + (x >> 1)] & 0xf0) | (pix & 0x0f);
+		m_blit_buffer[(y * 256) + (x >> 1)] = (m_blit_buffer[(y * 256) + (x >> 1)] & 0xf0) | (pix & 0x0f);
 }
 
 WRITE8_MEMBER(nightgal_state::nsc_true_blitter_w)
@@ -231,7 +231,7 @@ WRITE8_MEMBER(nightgal_state::nsc_true_blitter_w)
 					dat = cur_pen_lo | (cur_pen_hi << 4);
 
 					if ((dat & 0xff) != 0)
-						plot_nightgal_gfx_pixel(machine(), dat, drawx, drawy);
+						plot_nightgal_gfx_pixel(dat, drawx, drawy);
 
 					if (!flipx)
 						count--;
@@ -286,7 +286,7 @@ WRITE8_MEMBER(nightgal_state::sexygal_nsc_true_blitter_w)
 					dat = cur_pen_lo | cur_pen_hi << 4;
 
 					if ((dat & 0xff) != 0)
-						plot_nightgal_gfx_pixel(machine(), dat, drawx, drawy);
+						plot_nightgal_gfx_pixel(dat, drawx, drawy);
 
 					if (!flipx)
 						count--;

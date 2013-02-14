@@ -245,6 +245,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(meritm_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank_end_tick);
+	void ds1204_w( ds1204_t *ds1204, int rst, int clk, int dq );
+	int ds1204_r(ds1204_t *ds1204);
+	void ds1204_init(const UINT8* key, const UINT8* nvram);
+	void meritm_crt250_switch_banks(  );
+	void meritm_switch_banks(  );
+	UINT8 binary_to_BCD(UINT8 data);
 };
 
 
@@ -265,7 +271,7 @@ public:
 #define DS1204_STATE_WRITE_SECURITY_MATCH   3
 #define DS1204_STATE_READ_NVRAM         4
 
-static void ds1204_w( ds1204_t *ds1204, int rst, int clk, int dq )
+void meritm_state::ds1204_w( ds1204_t *ds1204, int rst, int clk, int dq )
 {
 	//logerror("ds1204_w: rst = %d, clk = %d, dq = %d\n", rst, clk, dq );
 	if ( rst == 0 )
@@ -344,26 +350,25 @@ static void ds1204_w( ds1204_t *ds1204, int rst, int clk, int dq )
 	}
 };
 
-static int ds1204_r(ds1204_t *ds1204)
+int meritm_state::ds1204_r(ds1204_t *ds1204)
 {
 	//logerror("ds1204_r\n");
 	return ds1204->out_bit;
 };
 
-static void ds1204_init(running_machine &machine, const UINT8* key, const UINT8* nvram)
+void meritm_state::ds1204_init(const UINT8* key, const UINT8* nvram)
 {
-	meritm_state *state = machine.driver_data<meritm_state>();
-	memset(&state->m_ds1204, 0, sizeof(state->m_ds1204));
+	memset(&m_ds1204, 0, sizeof(m_ds1204));
 	if (key)
-		memcpy(state->m_ds1204.key, key, sizeof(state->m_ds1204.key));
+		memcpy(m_ds1204.key, key, sizeof(m_ds1204.key));
 	if (nvram)
-		memcpy(state->m_ds1204.nvram, nvram, sizeof(state->m_ds1204.nvram));
+		memcpy(m_ds1204.nvram, nvram, sizeof(m_ds1204.nvram));
 
-	state_save_register_item(machine, "ds1204", NULL, 0, state->m_ds1204.state);
-	state_save_register_item(machine, "ds1204", NULL, 0, state->m_ds1204.read_ptr);
-	state_save_register_item(machine, "ds1204", NULL, 0, state->m_ds1204.last_clk);
-	state_save_register_item(machine, "ds1204", NULL, 0, state->m_ds1204.out_bit);
-	state_save_register_item_array(machine, "ds1204", NULL, 0, state->m_ds1204.command);
+	state_save_register_item(machine(), "ds1204", NULL, 0, m_ds1204.state);
+	state_save_register_item(machine(), "ds1204", NULL, 0, m_ds1204.read_ptr);
+	state_save_register_item(machine(), "ds1204", NULL, 0, m_ds1204.last_clk);
+	state_save_register_item(machine(), "ds1204", NULL, 0, m_ds1204.out_bit);
+	state_save_register_item_array(machine(), "ds1204", NULL, 0, m_ds1204.command);
 };
 
 /*************************************
@@ -498,45 +503,43 @@ UINT32 meritm_state::screen_update_meritm(screen_device &screen, bitmap_ind16 &b
  *************************************/
 
 
-static void meritm_crt250_switch_banks( running_machine &machine )
+void meritm_state::meritm_crt250_switch_banks(  )
 {
-	meritm_state *state = machine.driver_data<meritm_state>();
-	int rombank = (state->m_bank & 0x07) ^ 0x07;
+	int rombank = (m_bank & 0x07) ^ 0x07;
 
-	//logerror( "CRT250: Switching banks: rom = %0x (bank = %x)\n", rombank, state->m_bank );
-	state->membank("bank1")->set_entry(rombank );
+	//logerror( "CRT250: Switching banks: rom = %0x (bank = %x)\n", rombank, m_bank );
+	membank("bank1")->set_entry(rombank );
 };
 
 WRITE8_MEMBER(meritm_state::meritm_crt250_bank_w)
 {
-	meritm_crt250_switch_banks(machine());
+	meritm_crt250_switch_banks();
 };
 
-static void meritm_switch_banks( running_machine &machine )
+void meritm_state::meritm_switch_banks(  )
 {
-	meritm_state *state = machine.driver_data<meritm_state>();
-	int rambank = (state->m_psd_a15 >> 2) & 0x3;
-	int rombank = (((state->m_bank >> 3) & 0x3) << 5) |
-				(((state->m_psd_a15 >> 1) & 0x1) << 4) |
-				(((state->m_bank & 0x07) ^ 0x07) << 1) |
-				(state->m_psd_a15 & 0x1);
+	int rambank = (m_psd_a15 >> 2) & 0x3;
+	int rombank = (((m_bank >> 3) & 0x3) << 5) |
+				(((m_psd_a15 >> 1) & 0x1) << 4) |
+				(((m_bank & 0x07) ^ 0x07) << 1) |
+				(m_psd_a15 & 0x1);
 
-	//logerror( "Switching banks: rom = %0x (bank = %x), ram = %0x\n", rombank, state->m_bank, rambank);
-	state->membank("bank1")->set_entry(rombank );
-	state->membank("bank2")->set_entry(rombank | 0x01);
-	state->membank("bank3")->set_entry(rambank);
+	//logerror( "Switching banks: rom = %0x (bank = %x), ram = %0x\n", rombank, m_bank, rambank);
+	membank("bank1")->set_entry(rombank );
+	membank("bank2")->set_entry(rombank | 0x01);
+	membank("bank3")->set_entry(rambank);
 };
 
 WRITE8_MEMBER(meritm_state::meritm_psd_a15_w)
 {
 	m_psd_a15 = data;
 	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, space.device().safe_pc() );
-	meritm_switch_banks(machine());
+	meritm_switch_banks();
 };
 
 WRITE8_MEMBER(meritm_state::meritm_bank_w)
 {
-	meritm_switch_banks(machine());
+	meritm_switch_banks();
 };
 
 /*************************************
@@ -626,7 +629,7 @@ WRITE8_MEMBER(meritm_state::meritm_ds1644_w)
 	}
 };
 
-static UINT8 binary_to_BCD(UINT8 data)
+UINT8 meritm_state::binary_to_BCD(UINT8 data)
 {
 	data %= 100;
 
@@ -1107,7 +1110,7 @@ void meritm_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base(), 0x10000);
 	m_bank = 0xff;
-	meritm_crt250_switch_banks(machine());
+	meritm_crt250_switch_banks();
 	MACHINE_START_CALL_MEMBER(merit_common);
 	state_save_register_global(machine(), m_bank);
 
@@ -1135,7 +1138,7 @@ MACHINE_START_MEMBER(meritm_state,meritm_crt260)
 	membank("bank3")->configure_entries(0, 4, m_ram, 0x2000);
 	m_bank = 0xff;
 	m_psd_a15 = 0;
-	meritm_switch_banks(machine());
+	meritm_switch_banks();
 	MACHINE_START_CALL_MEMBER(merit_common);
 	pc16552d_init(machine(), 0, UART_CLK, NULL, pc16650d_tx_callback);
 	state_save_register_global(machine(), m_bank);
@@ -2003,7 +2006,7 @@ DRIVER_INIT_MEMBER(meritm_state,pitbossm)
 	static const UINT8 pitbossm_ds1204_nvram[16] =
 		{ 0x16, 0x90, 0xa0, 0x52, 0xd8, 0x6c, 0x12, 0xaf, 0x36, 0x22, 0x61, 0x35, 0x0d, 0x58, 0x0c, 0x00 };
 
-	ds1204_init(machine(), pitbossm_ds1204_key, pitbossm_ds1204_nvram);
+	ds1204_init(pitbossm_ds1204_key, pitbossm_ds1204_nvram);
 
 };
 
@@ -2015,7 +2018,7 @@ DRIVER_INIT_MEMBER(meritm_state,pbst30)
 	static const UINT8 pbst30b_ds1204_nvram[16] =
 		{ 0x3e, 0x9a, 0x3c, 0x3f, 0x1d, 0x51, 0x72, 0xc9, 0x28, 0x2c, 0x1d, 0x2d, 0x0e, 0x56, 0x41, 0x00 };
 
-	ds1204_init(machine(), pbst30b_ds1204_key, pbst30b_ds1204_nvram);
+	ds1204_init(pbst30b_ds1204_key, pbst30b_ds1204_nvram);
 
 };
 
@@ -2027,7 +2030,7 @@ DRIVER_INIT_MEMBER(meritm_state,pbst30b)
 	static const UINT8 pbst30b_ds1204_nvram[16] =
 		{ 0xa9, 0xdb, 0x41, 0xf8, 0xe4, 0x42, 0x20, 0x6e, 0xde, 0xaf, 0x4f, 0x046, 0x3d, 0x55, 0x44, 0x00 };
 
-	ds1204_init(machine(), pbst30b_ds1204_key, pbst30b_ds1204_nvram);
+	ds1204_init(pbst30b_ds1204_key, pbst30b_ds1204_nvram);
 
 };
 
@@ -2039,7 +2042,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat2)
 	static const UINT8 pitbosmt_ds1204_nvram[16] =
 		{ 0x00, 0xfe, 0x03, 0x03, 0x08, 0x00, 0xa2, 0x03, 0x4b, 0x07, 0x00, 0xe6, 0x02, 0xd3, 0x05, 0x00 };
 
-	ds1204_init(machine(), pitbosmt_ds1204_key, pitbosmt_ds1204_nvram);
+	ds1204_init(pitbosmt_ds1204_key, pitbosmt_ds1204_nvram);
 
 };
 
@@ -2051,7 +2054,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat3)
 	static const UINT8 megat3_ds1204_nvram[16] =
 		{ 0x51, 0xa1, 0xc0, 0x7c, 0x27, 0x6e, 0x51, 0xb9, 0xa5, 0xb2, 0x27, 0x0c, 0xb9, 0x88, 0x82, 0x2c };
 
-	ds1204_init(machine(), megat3_ds1204_key, megat3_ds1204_nvram);
+	ds1204_init(megat3_ds1204_key, megat3_ds1204_nvram);
 
 };
 
@@ -2063,7 +2066,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat3te)
 	static const UINT8 megat3_ds1204_nvram[16] =
 		{ 0x99, 0x53, 0xfc, 0x29, 0x3a, 0x95, 0x8b, 0x58, 0xca, 0xca, 0x00, 0xc2, 0x30, 0x62, 0x0b, 0x96 };
 
-	ds1204_init(machine(), megat3_ds1204_key, megat3_ds1204_nvram);
+	ds1204_init(megat3_ds1204_key, megat3_ds1204_nvram);
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 
@@ -2074,7 +2077,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat4)
 	static const UINT8 megat4_ds1204_nvram[16] =
 		{ 0xe3, 0x08, 0x39, 0xd8, 0x4c, 0xbb, 0xc4, 0xf8, 0xf0, 0xe2, 0xd8, 0x77, 0xa8, 0x3d, 0x95, 0x02 };
 
-	ds1204_init(machine(), 0, megat4_ds1204_nvram);
+	ds1204_init(0, megat4_ds1204_nvram);
 }
 
 DRIVER_INIT_MEMBER(meritm_state,megat4c)
@@ -2085,7 +2088,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat4c)
 	static const UINT8 megat4_ds1204_nvram[16] =
 		{ 0xe3, 0x08, 0x39, 0xd8, 0x4c, 0xbb, 0xc4, 0xf8, 0xf0, 0xe2, 0xd8, 0x77, 0xa8, 0x3d, 0x95, 0x02 };
 
-	ds1204_init(machine(), megat4c_ds1204_key, megat4_ds1204_nvram);
+	ds1204_init(megat4c_ds1204_key, megat4_ds1204_nvram);
 }
 
 DRIVER_INIT_MEMBER(meritm_state,megat4te)
@@ -2093,7 +2096,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat4te)
 	static const UINT8 megat4te_ds1204_nvram[16] =
 		{ 0x05, 0x21, 0x96, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00 };
 
-	ds1204_init(machine(), 0, megat4te_ds1204_nvram);
+	ds1204_init(0, megat4te_ds1204_nvram);
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 
@@ -2104,7 +2107,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat4st)
 	static const UINT8 megat4te_ds1204_nvram[16] =
 		{ 0x11, 0x04, 0x96, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00 };
 
-	ds1204_init(machine(), 0, megat4te_ds1204_nvram);
+	ds1204_init(0, megat4te_ds1204_nvram);
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 
@@ -2115,7 +2118,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat5)
 	static const UINT8 megat5_ds1204_nvram[16] =
 		{ 0x06, 0x23, 0x97, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00 };
 
-	ds1204_init(machine(), 0, megat5_ds1204_nvram);
+	ds1204_init(0, megat5_ds1204_nvram);
 
 }
 
@@ -2124,7 +2127,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat5t)
 	static const UINT8 megat5_ds1204_nvram[16] =
 		{ 0x08, 0x22, 0x97, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00 };
 
-	ds1204_init(machine(), 0, megat5_ds1204_nvram);
+	ds1204_init(0, megat5_ds1204_nvram);
 
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), this), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), this));
 
@@ -2135,7 +2138,7 @@ DRIVER_INIT_MEMBER(meritm_state,megat6)
 	static const UINT8 megat6_ds1204_nvram[16] =
 		{ 0x07, 0x15, 0x98, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00 };
 
-	ds1204_init(machine(), 0, megat6_ds1204_nvram);
+	ds1204_init(0, megat6_ds1204_nvram);
 
 }
 

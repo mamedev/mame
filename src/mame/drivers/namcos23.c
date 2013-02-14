@@ -1486,16 +1486,37 @@ public:
 	UINT32 screen_update_s23(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(s23_interrupt);
 	TIMER_CALLBACK_MEMBER(c361_timer_cb);
+	UINT8 nthbyte(const UINT32 *pSource, int offs);
+	UINT16 nthword(const UINT32 *pSource, int offs);
+	inline INT32 u32_to_s24(UINT32 v);
+	inline INT32 u32_to_s10(UINT32 v);
+	INT32 *p3d_getv(UINT16 id);
+	INT16 *p3d_getm(UINT16 id);
+	void p3d_matrix_set(const UINT16 *p, int size);
+	void p3d_vector_set(const UINT16 *p, int size);
+	void p3d_scaling_set(const UINT16 *p, int size);
+	void p3d_vector_matrix_mul(const UINT16 *p, int size);
+	void p3d_matrix_vector_mul(const UINT16 *p, int size);
+	void p3d_matrix_matrix_mul(const UINT16 *p, int size);
+	void p3d_render(const UINT16 *p, int size, bool use_scaling);
+	void p3d_flush(const UINT16 *p, int size);
+	void p3d_dma(address_space &space, UINT32 adr, UINT32 size);
+	void render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv);
+	void render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z);
+	void render_project(poly_vertex &pv);
+	void render_one_model(const namcos23_render_entry *re);
+	void render_flush(bitmap_rgb32 &bitmap);
+	void render_run(bitmap_rgb32 &bitmap);
 };
 
 
-static UINT8 nthbyte(const UINT32 *pSource, int offs)
+UINT8 namcos23_state::nthbyte(const UINT32 *pSource, int offs)
 {
 	pSource += offs/4;
 	return (pSource[0]<<((offs&3)*8))>>24;
 }
 
-static UINT16 nthword(const UINT32 *pSource, int offs)
+UINT16 namcos23_state::nthword(const UINT32 *pSource, int offs)
 {
 	pSource += offs/2;
 	return (pSource[0]<<((offs&1)*16))>>16;
@@ -1513,12 +1534,12 @@ static UINT16 nthword(const UINT32 *pSource, int offs)
 
 // 3D hardware, to throw at least in part in video/namcos23.c
 
-INLINE INT32 u32_to_s24(UINT32 v)
+inline INT32 namcos23_state::u32_to_s24(UINT32 v)
 {
 	return v & 0x800000 ? v | 0xff000000 : v & 0xffffff;
 }
 
-INLINE INT32 u32_to_s10(UINT32 v)
+inline INT32 namcos23_state::u32_to_s10(UINT32 v)
 {
 	return v & 0x200 ? v | 0xfffffe00 : v & 0x1ff;
 }
@@ -1533,48 +1554,48 @@ INLINE UINT8 light(UINT8 c, float l)
 	return UINT8(l);
 }
 
-static INT32 *p3d_getv(namcos23_state *state, UINT16 id)
+INT32 *namcos23_state::p3d_getv(UINT16 id)
 {
 	if(id == 0x8000)
-		return state->m_light_vector;
+		return m_light_vector;
 	if(id >= 0x100)
 	{
-		memset(state->m_spv, 0, sizeof(state->m_spv));
-		return state->m_spv;
+		memset(m_spv, 0, sizeof(m_spv));
+		return m_spv;
 	}
-	return state->m_vectors[id];
+	return m_vectors[id];
 }
 
-static INT16 *p3d_getm(namcos23_state *state, UINT16 id)
+INT16 *namcos23_state::p3d_getm(UINT16 id)
 {
 	if(id >= 0x100)
 	{
-		memset(state->m_spm, 0, sizeof(state->m_spm));
-		return state->m_spm;
+		memset(m_spm, 0, sizeof(m_spm));
+		return m_spm;
 	}
-	return state->m_matrices[id];
+	return m_matrices[id];
 }
 
-static void p3d_matrix_set(namcos23_state *state, const UINT16 *p, int size)
+void namcos23_state::p3d_matrix_set(const UINT16 *p, int size)
 {
 	if(size != 10)
 	{
 		logerror("WARNING: p3d_matrix_set with size %d\n", size);
 		return;
 	}
-	INT16 *t = p3d_getm(state, *p++);
+	INT16 *t = p3d_getm(*p++);
 	for(int i=0; i<9; i++)
 		t[i] = *p++;
 }
 
-static void p3d_vector_set(namcos23_state *state, const UINT16 *p, int size)
+void namcos23_state::p3d_vector_set(const UINT16 *p, int size)
 {
 	if(size != 7)
 	{
 		logerror("WARNING: p3d_vector_set with size %d\n", size);
 		return;
 	}
-	INT32 *t = p3d_getv(state, *p++);
+	INT32 *t = p3d_getv(*p++);
 	for(int i=0; i<3; i++)
 	{
 		t[i] = u32_to_s24((p[0] << 16) | p[1]);
@@ -1583,17 +1604,17 @@ static void p3d_vector_set(namcos23_state *state, const UINT16 *p, int size)
 }
 
 
-static void p3d_scaling_set(namcos23_state *state, const UINT16 *p, int size)
+void namcos23_state::p3d_scaling_set(const UINT16 *p, int size)
 {
 	if(size != 1)
 	{
 		logerror("WARNING: p3d_scaling_set with size %d\n", size);
 		return;
 	}
-	state->m_scaling = *p;
+	m_scaling = *p;
 }
 
-static void p3d_vector_matrix_mul(namcos23_state *state, const UINT16 *p, int size)
+void namcos23_state::p3d_vector_matrix_mul(const UINT16 *p, int size)
 {
 	if(size != 4)
 	{
@@ -1603,16 +1624,16 @@ static void p3d_vector_matrix_mul(namcos23_state *state, const UINT16 *p, int si
 	if(p[2] != 0xffff)
 		logerror("WARNING: p3d_vector_matrix_mul with +2=%04x\n", p[2]);
 
-	INT32 *t       = p3d_getv(state, p[0]);
-	const INT16 *m = p3d_getm(state, p[1]);
-	const INT32 *v = p3d_getv(state, p[3]);
+	INT32 *t       = p3d_getv(p[0]);
+	const INT16 *m = p3d_getm(p[1]);
+	const INT32 *v = p3d_getv(p[3]);
 
 	t[0] = INT32((m[0]*INT64(v[0]) + m[3]*INT64(v[1]) + m[6]*INT64(v[2])) >> 14);
 	t[1] = INT32((m[1]*INT64(v[0]) + m[4]*INT64(v[1]) + m[7]*INT64(v[2])) >> 14);
 	t[2] = INT32((m[2]*INT64(v[0]) + m[5]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14);
 }
 
-static void p3d_matrix_vector_mul(namcos23_state *state, const UINT16 *p, int size)
+void namcos23_state::p3d_matrix_vector_mul(const UINT16 *p, int size)
 {
 	if(size != 4)
 	{
@@ -1622,9 +1643,9 @@ static void p3d_matrix_vector_mul(namcos23_state *state, const UINT16 *p, int si
 	if(p[2] != 0xffff)
 		logerror("WARNING: p3d_matrix_vector_mul with +2=%04x\n", p[2]);
 
-	INT32 *t       = p3d_getv(state, p[0]);
-	const INT16 *m = p3d_getm(state, p[1]);
-	const INT32 *v = p3d_getv(state, p[3]);
+	INT32 *t       = p3d_getv(p[0]);
+	const INT16 *m = p3d_getm(p[1]);
+	const INT32 *v = p3d_getv(p[3]);
 
 	t[0] = INT32((m[0]*INT64(v[0]) + m[1]*INT64(v[1]) + m[2]*INT64(v[2])) >> 14);
 	t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[7]*INT64(v[2])) >> 14);
@@ -1632,7 +1653,7 @@ static void p3d_matrix_vector_mul(namcos23_state *state, const UINT16 *p, int si
 }
 
 
-static void p3d_matrix_matrix_mul(namcos23_state *state, const UINT16 *p, int size)
+void namcos23_state::p3d_matrix_matrix_mul(const UINT16 *p, int size)
 {
 	if(size != 4)
 	{
@@ -1642,9 +1663,9 @@ static void p3d_matrix_matrix_mul(namcos23_state *state, const UINT16 *p, int si
 	if(p[2] != 0xffff)
 		logerror("WARNING: p3d_matrix_matrix_mul with +2=%04x\n", p[2]);
 
-	INT16 *t        = p3d_getm(state, p[0]);
-	const INT16 *m1 = p3d_getm(state, p[1]);
-	const INT16 *m2 = p3d_getm(state, p[3]);
+	INT16 *t        = p3d_getm(p[0]);
+	const INT16 *m1 = p3d_getm(p[1]);
+	const INT16 *m2 = p3d_getm(p[3]);
 
 	t[0] = INT16((m1[0]*m2[0] + m1[1]*m2[3] + m1[2]*m2[6]) >> 14);
 	t[1] = INT16((m1[0]*m2[1] + m1[1]*m2[4] + m1[2]*m2[7]) >> 14);
@@ -1658,9 +1679,9 @@ static void p3d_matrix_matrix_mul(namcos23_state *state, const UINT16 *p, int si
 }
 
 
-static void p3d_render(namcos23_state *state, const UINT16 *p, int size, bool use_scaling)
+void namcos23_state::p3d_render(const UINT16 *p, int size, bool use_scaling)
 {
-	render_t &render = state->m_render;
+	render_t &render = m_render;
 
 	if(size != 3)
 	{
@@ -1677,13 +1698,13 @@ static void p3d_render(namcos23_state *state, const UINT16 *p, int size, bool us
 	}
 
 	// Vector and matrix may be inverted
-	const INT16 *m = p3d_getm(state, p[1]);
-	const INT32 *v = p3d_getv(state, p[2]);
+	const INT16 *m = p3d_getm(p[1]);
+	const INT32 *v = p3d_getv(p[2]);
 
 	namcos23_render_entry *re = render.entries[render.cur] + render.count[render.cur];
 	re->type = MODEL;
 	re->model.model = p[0];
-	re->model.scaling = use_scaling ? state->m_scaling / 16384.0 : 1.0;
+	re->model.scaling = use_scaling ? m_scaling / 16384.0 : 1.0;
 	memcpy(re->model.m, m, sizeof(re->model.m));
 	memcpy(re->model.v, v, sizeof(re->model.v));
 	if(0)
@@ -1698,9 +1719,9 @@ static void p3d_render(namcos23_state *state, const UINT16 *p, int size, bool us
 }
 
 
-static void p3d_flush(namcos23_state *state, const UINT16 *p, int size)
+void namcos23_state::p3d_flush(const UINT16 *p, int size)
 {
-	render_t &render = state->m_render;
+	render_t &render = m_render;
 
 	if(size != 0)
 	{
@@ -1713,9 +1734,8 @@ static void p3d_flush(namcos23_state *state, const UINT16 *p, int size)
 	render.count[render.cur]++;
 }
 
-static void p3d_dma(address_space &space, UINT32 adr, UINT32 size)
+void namcos23_state::p3d_dma(address_space &space, UINT32 adr, UINT32 size)
 {
-	namcos23_state *state = space.machine().driver_data<namcos23_state>();
 	UINT16 buffer[256];
 	adr &= 0x1fffffff;
 	int pos = 0;
@@ -1753,15 +1773,15 @@ static void p3d_dma(address_space &space, UINT32 adr, UINT32 size)
 
 		switch(h1)
 		{
-			case 0x0040: p3d_matrix_set(state, buffer, psize); break;
-			case 0x0050: p3d_vector_set(state, buffer, psize); break;
-			case 0x0000: p3d_matrix_matrix_mul(state, buffer, psize); break;
-			case 0x0810: p3d_matrix_vector_mul(state, buffer, psize); break;
-			case 0x1010: p3d_vector_matrix_mul(state, buffer, psize); break;
-			case 0x4400: p3d_scaling_set(state, buffer, psize); break;
-			case 0x8000: p3d_render(state, buffer, psize, false); break;
-			case 0x8080: p3d_render(state, buffer, psize, true); break;
-			case 0xc000: p3d_flush(state, buffer, psize); break;
+			case 0x0040: p3d_matrix_set(buffer, psize); break;
+			case 0x0050: p3d_vector_set(buffer, psize); break;
+			case 0x0000: p3d_matrix_matrix_mul(buffer, psize); break;
+			case 0x0810: p3d_matrix_vector_mul(buffer, psize); break;
+			case 0x1010: p3d_vector_matrix_mul(buffer, psize); break;
+			case 0x4400: p3d_scaling_set(buffer, psize); break;
+			case 0x8000: p3d_render(buffer, psize, false); break;
+			case 0x8080: p3d_render(buffer, psize, true); break;
+			case 0xc000: p3d_flush(buffer, psize); break;
 			default:
 				if(0)
 				{
@@ -1840,21 +1860,21 @@ static void render_scanline(void *dest, INT32 scanline, const poly_extent *exten
 	}
 }
 
-static void render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv)
+void namcos23_state::render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv)
 {
 	pv.x =    (INT32((re->model.m[0]*INT64(xi) + re->model.m[3]*INT64(yi) + re->model.m[6]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[0])/16384.0;
 	pv.y =    (INT32((re->model.m[1]*INT64(xi) + re->model.m[4]*INT64(yi) + re->model.m[7]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[1])/16384.0;
 	pv.p[0] = (INT32((re->model.m[2]*INT64(xi) + re->model.m[5]*INT64(yi) + re->model.m[8]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[2])/16384.0;
 }
 
-static void render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z)
+void namcos23_state::render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z)
 {
 	x = (re->model.m[0]*xi + re->model.m[3]*yi + re->model.m[6]*zi) >> 14;
 	y = (re->model.m[1]*xi + re->model.m[4]*yi + re->model.m[7]*zi) >> 14;
 	z = (re->model.m[2]*xi + re->model.m[5]*yi + re->model.m[8]*zi) >> 14;
 }
 
-static void render_project(poly_vertex &pv)
+void namcos23_state::render_project(poly_vertex &pv)
 {
 	// 768 validated by the title screen size on tc2:
 	// texture is 640x480, x range is 3.125, y range is 2.34375, z is 3.75
@@ -1886,23 +1906,22 @@ static UINT32 render_texture_lookup_nocache_point(running_machine &machine, cons
 	return pens[color];
 }
 
-static void render_one_model(running_machine &machine, const namcos23_render_entry *re)
+void namcos23_state::render_one_model(const namcos23_render_entry *re)
 {
-	namcos23_state *state = machine.driver_data<namcos23_state>();
-	render_t &render = state->m_render;
-	UINT32 adr = state->m_ptrom[re->model.model];
-	if(adr >= state->m_ptrom_limit)
+	render_t &render = m_render;
+	UINT32 adr = m_ptrom[re->model.model];
+	if(adr >= m_ptrom_limit)
 	{
 		logerror("WARNING: model %04x base address %08x out-of-bounds - pointram?\n", re->model.model, adr);
 		return;
 	}
 
-	while(adr < state->m_ptrom_limit)
+	while(adr < m_ptrom_limit)
 	{
 		poly_vertex pv[15];
 
-		UINT32 type = state->m_ptrom[adr++];
-		UINT32 h    = state->m_ptrom[adr++];
+		UINT32 type = m_ptrom[adr++];
+		UINT32 h    = m_ptrom[adr++];
 
 
 		float tbase = (type >> 24) << 12;
@@ -1923,16 +1942,16 @@ static void render_one_model(running_machine &machine, const namcos23_render_ent
 			adr += ne;
 		}
 		else
-			light = state->m_ptrom[adr++];
+			light = m_ptrom[adr++];
 
 		float minz = FLT_MAX;
 		float maxz = FLT_MIN;
 
 		for(int i=0; i<ne; i++)
 		{
-			UINT32 v1 = state->m_ptrom[adr++];
-			UINT32 v2 = state->m_ptrom[adr++];
-			UINT32 v3 = state->m_ptrom[adr++];
+			UINT32 v1 = m_ptrom[adr++];
+			UINT32 v2 = m_ptrom[adr++];
+			UINT32 v3 = m_ptrom[adr++];
 
 			render_apply_transform(u32_to_s24(v1), u32_to_s24(v2), u32_to_s24(v3), re, pv[i]);
 			pv[i].p[1] = (((v1 >> 20) & 0xf00) | ((v2 >> 24 & 0xff))) + 0.5;
@@ -1953,14 +1972,14 @@ static void render_one_model(running_machine &machine, const namcos23_render_ent
 				break;
 			case 3:
 			{
-				UINT32 norm = state->m_ptrom[extptr++];
+				UINT32 norm = m_ptrom[extptr++];
 				INT32 nx = u32_to_s10(norm >> 20);
 				INT32 ny = u32_to_s10(norm >> 10);
 				INT32 nz = u32_to_s10(norm);
 				INT32 nrx, nry, nrz;
 				render_apply_matrot(nx, ny, nz, re, nrx, nry, nrz);
 
-				float lsi = float(nrx*state->m_light_vector[0] + nry*state->m_light_vector[1] + nrz*state->m_light_vector[2])/4194304.0;
+				float lsi = float(nrx*m_light_vector[0] + nry*m_light_vector[1] + nrz*m_light_vector[2])/4194304.0;
 				if(lsi < 0)
 					lsi = 0;
 
@@ -1987,9 +2006,9 @@ static void render_one_model(running_machine &machine, const namcos23_render_ent
 			}
 			p->zkey = 0.5*(minz+maxz);
 			p->front = !(h & 0x00000001);
-			p->rd.machine = &machine;
+			p->rd.machine = &machine();
 			p->rd.texture_lookup = render_texture_lookup_nocache_point;
-			p->rd.pens = machine.pens + (color << 8);
+			p->rd.pens = machine().pens + (color << 8);
 			render.poly_count++;
 		}
 
@@ -2009,10 +2028,9 @@ static int render_poly_compare(const void *i1, const void *i2)
 	return p1->zkey < p2->zkey ? 1 : p1->zkey > p2->zkey ? -1 : 0;
 }
 
-static void render_flush(running_machine &machine, bitmap_rgb32 &bitmap)
+void namcos23_state::render_flush(bitmap_rgb32 &bitmap)
 {
-	namcos23_state *state = machine.driver_data<namcos23_state>();
-	render_t &render = state->m_render;
+	render_t &render = m_render;
 
 	if(!render.poly_count)
 		return;
@@ -2034,10 +2052,9 @@ static void render_flush(running_machine &machine, bitmap_rgb32 &bitmap)
 	render.poly_count = 0;
 }
 
-static void render_run(running_machine &machine, bitmap_rgb32 &bitmap)
+void namcos23_state::render_run(bitmap_rgb32 &bitmap)
 {
-	namcos23_state *state = machine.driver_data<namcos23_state>();
-	render_t &render = state->m_render;
+	render_t &render = m_render;
 	const namcos23_render_entry *re = render.entries[!render.cur];
 
 	render.poly_count = 0;
@@ -2046,15 +2063,15 @@ static void render_run(running_machine &machine, bitmap_rgb32 &bitmap)
 		switch(re->type)
 		{
 		case MODEL:
-			render_one_model(machine, re);
+			render_one_model(re);
 			break;
 		case FLUSH:
-			render_flush(machine, bitmap);
+			render_flush(bitmap);
 			break;
 		}
 		re++;
 	}
-	render_flush(machine, bitmap);
+	render_flush(bitmap);
 
 	poly_wait(render.polymgr, "render_run");
 }
@@ -2138,7 +2155,7 @@ UINT32 namcos23_state::screen_update_s23(screen_device &screen, bitmap_rgb32 &bi
 	update_mixer();
 	bitmap.fill(m_c404.bgcolor, cliprect);
 
-	render_run(machine(), bitmap);
+	render_run(bitmap);
 
 	m_bgtilemap->set_palette_offset(m_c404.palbase);
 	if (m_c404.layer & 4)

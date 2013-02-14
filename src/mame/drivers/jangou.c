@@ -91,6 +91,8 @@ public:
 	DECLARE_MACHINE_RESET(common);
 	UINT32 screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(cvsd_bit_timer_callback);
+	UINT8 jangou_gfx_nibble( UINT16 niboffset );
+	void plot_jangou_gfx_pixel( UINT8 pix, int x, int y );
 };
 
 
@@ -177,9 +179,9 @@ h [$16]
 w [$17]
 */
 
-static UINT8 jangou_gfx_nibble( running_machine &machine, UINT16 niboffset )
+UINT8 jangou_state::jangou_gfx_nibble( UINT16 niboffset )
 {
-	const UINT8 *const blit_rom = machine.root_device().memregion("gfx")->base();
+	const UINT8 *const blit_rom = memregion("gfx")->base();
 
 	if (niboffset & 1)
 		return (blit_rom[(niboffset >> 1) & 0xffff] & 0xf0) >> 4;
@@ -187,18 +189,17 @@ static UINT8 jangou_gfx_nibble( running_machine &machine, UINT16 niboffset )
 		return (blit_rom[(niboffset >> 1) & 0xffff] & 0x0f);
 }
 
-static void plot_jangou_gfx_pixel( running_machine &machine, UINT8 pix, int x, int y )
+void jangou_state::plot_jangou_gfx_pixel( UINT8 pix, int x, int y )
 {
-	jangou_state *state = machine.driver_data<jangou_state>();
 	if (y < 0 || y >= 512)
 		return;
 	if (x < 0 || x >= 512)
 		return;
 
 	if (x & 1)
-		state->m_blit_buffer[(y * 256) + (x >> 1)] = (state->m_blit_buffer[(y * 256) + (x >> 1)] & 0x0f) | ((pix << 4) & 0xf0);
+		m_blit_buffer[(y * 256) + (x >> 1)] = (m_blit_buffer[(y * 256) + (x >> 1)] & 0x0f) | ((pix << 4) & 0xf0);
 	else
-		state->m_blit_buffer[(y * 256) + (x >> 1)] = (state->m_blit_buffer[(y * 256) + (x >> 1)] & 0xf0) | (pix & 0x0f);
+		m_blit_buffer[(y * 256) + (x >> 1)] = (m_blit_buffer[(y * 256) + (x >> 1)] & 0xf0) | (pix & 0x0f);
 }
 
 WRITE8_MEMBER(jangou_state::blitter_process_w)
@@ -233,14 +234,14 @@ WRITE8_MEMBER(jangou_state::blitter_process_w)
 			{
 				int drawx = (x + xcount) & 0xff;
 				int drawy = (y + ycount) & 0xff;
-				UINT8 dat = jangou_gfx_nibble(machine(), src + count);
+				UINT8 dat = jangou_gfx_nibble(src + count);
 				UINT8 cur_pen_hi = m_pen_data[(dat & 0xf0) >> 4];
 				UINT8 cur_pen_lo = m_pen_data[(dat & 0x0f) >> 0];
 
 				dat = cur_pen_lo | (cur_pen_hi << 4);
 
 				if ((dat & 0xff) != 0)
-					plot_jangou_gfx_pixel(machine(), dat, drawx, drawy);
+					plot_jangou_gfx_pixel(dat, drawx, drawy);
 
 				if (!flipx)
 					count--;

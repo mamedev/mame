@@ -351,6 +351,13 @@ public:
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
+	const char* epic_get_register_name(UINT32 reg);
+	void epic_update_interrupts();
+	void mpc8240_interrupt(int irq);
+	void mpc8240_epic_init();
+	void mpc8240_epic_reset(void);
+	int ds2430_insert_cmd_bit(int bit);
+	void DS2430_w(int bit);
 };
 
 UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -454,8 +461,6 @@ WRITE64_MEMBER(viper_state::pci_config_data_w)
 /*****************************************************************************/
 // MPC8240 Embedded Programmable Interrupt Controller (EPIC)
 
-static void mpc8240_interrupt(running_machine &machine, int irq);
-
 #define MPC8240_IRQ0                0
 #define MPC8240_IRQ1                1
 #define MPC8240_IRQ2                2
@@ -530,7 +535,7 @@ struct MPC8240_EPIC
 static MPC8240_EPIC epic;
 
 #if VIPER_DEBUG_EPIC_REGS
-static const char* epic_get_register_name(UINT32 reg)
+const viper_state::char* epic_get_register_name(UINT32 reg)
 {
 	switch (reg >> 16)
 	{
@@ -663,11 +668,11 @@ TIMER_CALLBACK_MEMBER(viper_state::epic_global_timer_callback)
 		epic.global_timer[timer_num].timer->reset();
 	}
 
-	mpc8240_interrupt(machine(), MPC8240_GTIMER0_IRQ + timer_num);
+	mpc8240_interrupt(MPC8240_GTIMER0_IRQ + timer_num);
 }
 
 
-static void epic_update_interrupts(running_machine &machine)
+void viper_state::epic_update_interrupts()
 {
 	int i;
 
@@ -709,11 +714,11 @@ static void epic_update_interrupts(running_machine &machine)
 			printf("vector = %02X\n", epic.iack);
 #endif
 
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 	else
 	{
-		machine.device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
@@ -783,7 +788,7 @@ READ32_MEMBER(viper_state::epic_r)
 							if (epic.i2c_cr & 0x40)
 							{
 								printf("I2C interrupt\n");
-								mpc8240_interrupt(machine(), MPC8240_I2C_IRQ);
+								mpc8240_interrupt(MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
 								epic.i2c_sr |= 0x2;
@@ -802,7 +807,7 @@ READ32_MEMBER(viper_state::epic_r)
 							/*if (epic.i2c_cr & 0x40)
 							{
 							    printf("I2C interrupt\n");
-							    mpc8240_interrupt(machine, MPC8240_I2C_IRQ);
+							    mpc8240_interrupt(MPC8240_I2C_IRQ);
 
 							    // set interrupt flag in status register
 							    epic.i2c_sr |= 0x2;
@@ -886,7 +891,7 @@ READ32_MEMBER(viper_state::epic_r)
 			{
 				case 0x00a0:            // Offset 0x600A0 - IACK
 				{
-					epic_update_interrupts(machine());
+					epic_update_interrupts();
 
 					if (epic.active_irq >= 0)
 					{
@@ -988,7 +993,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 #if VIPER_DEBUG_EPIC_I2C
 								printf("I2C interrupt\n");
 #endif
-								mpc8240_interrupt(machine(), MPC8240_I2C_IRQ);
+								mpc8240_interrupt(MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
 								epic.i2c_sr |= 0x2;
@@ -1010,7 +1015,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 #if VIPER_DEBUG_EPIC_I2C
 								printf("I2C interrupt\n");
 #endif
-								mpc8240_interrupt(machine(), MPC8240_I2C_IRQ);
+								mpc8240_interrupt(MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
 								epic.i2c_sr |= 0x2;
@@ -1051,7 +1056,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].priority = (data >> 16) & 0xf;
 					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].vector = data & 0xff;
 
-					epic_update_interrupts(machine());
+					epic_update_interrupts();
 					break;
 				}
 				case 0x1130:            // Offset 0x41130 - Global timer 0 destination register
@@ -1063,7 +1068,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 
 					epic.irq[MPC8240_GTIMER0_IRQ + timer_num].destination = data & 0x1;
 
-					epic_update_interrupts(machine());
+					epic_update_interrupts();
 					break;
 				}
 				case 0x1110:            // Offset 0x41110 - Global timer 0 base count register
@@ -1123,7 +1128,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 					epic.irq[MPC8240_IRQ0 + irq].priority = (data >> 16) & 0xf;
 					epic.irq[MPC8240_IRQ0 + irq].vector = data & 0xff;
 
-					epic_update_interrupts(machine());
+					epic_update_interrupts();
 					break;
 				}
 				case 0x1020:            // Offset 0x51020 - I2C IRQ vector/priority register
@@ -1132,7 +1137,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 					epic.irq[MPC8240_I2C_IRQ].priority = (data >> 16) & 0xf;
 					epic.irq[MPC8240_I2C_IRQ].vector = data & 0xff;
 
-					epic_update_interrupts(machine());
+					epic_update_interrupts();
 					break;
 				}
 				case 0x0210:            // Offset 0x50210 - IRQ0 destination register
@@ -1156,13 +1161,13 @@ WRITE32_MEMBER(viper_state::epic_w)
 
 					epic.irq[MPC8240_IRQ0 + irq].destination = data & 0x1;
 
-					epic_update_interrupts(machine());
+					epic_update_interrupts();
 					break;
 				}
 				case 0x1030:            // Offset 0x51030 - I2C IRQ destination register
 				{
 					epic.irq[MPC8240_I2C_IRQ].destination = data & 0x1;
-					epic_update_interrupts(machine());
+					epic_update_interrupts();
 					break;
 				}
 			}
@@ -1182,7 +1187,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 					epic.irq[epic.active_irq].active = 0;
 					epic.active_irq = -1;
 
-					epic_update_interrupts(machine());
+					epic_update_interrupts();
 					break;
 			}
 			break;
@@ -1200,22 +1205,21 @@ WRITE64_MEMBER(viper_state::epic_64be_w)
 }
 */
 
-static void mpc8240_interrupt(running_machine &machine, int irq)
+void viper_state::mpc8240_interrupt(int irq)
 {
 	epic.irq[irq].pending = 1;
-	epic_update_interrupts(machine);
+	epic_update_interrupts();
 }
 
-static void mpc8240_epic_init(running_machine &machine)
+void viper_state::mpc8240_epic_init()
 {
-	viper_state *state = machine.driver_data<viper_state>();
-	epic.global_timer[0].timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),state));
-	epic.global_timer[1].timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),state));
-	epic.global_timer[2].timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),state));
-	epic.global_timer[3].timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),state));
+	epic.global_timer[0].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
+	epic.global_timer[1].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
+	epic.global_timer[2].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
+	epic.global_timer[3].timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::epic_global_timer_callback),this));
 }
 
-static void mpc8240_epic_reset(void)
+void viper_state::mpc8240_epic_reset(void)
 {
 	int i;
 
@@ -1706,7 +1710,7 @@ READ64_MEMBER(viper_state::unk1_r)
 }
 
 
-static int ds2430_insert_cmd_bit(int bit)
+int viper_state::ds2430_insert_cmd_bit(int bit)
 {
 	ds2430_data <<= 1;
 	ds2430_data |= bit & 1;
@@ -1722,7 +1726,7 @@ static int ds2430_insert_cmd_bit(int bit)
 	return 0;
 }
 
-static void DS2430_w(int bit)
+void viper_state::DS2430_w(int bit)
 {
 	switch (ds2430_state)
 	{
@@ -1986,20 +1990,21 @@ static const powerpc_config viper_ppc_cfg =
 
 INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
 {
-	mpc8240_interrupt(machine(), MPC8240_IRQ0);
+	mpc8240_interrupt(MPC8240_IRQ0);
 	//mpc8240_interrupt(device.machine, MPC8240_IRQ3);
 }
 
 static void voodoo_vblank(device_t *device, int state)
 {
-	mpc8240_interrupt(device->machine(), MPC8240_IRQ4);
+	viper_state *drvstate = device->machine().driver_data<viper_state>();
+	drvstate->mpc8240_interrupt(MPC8240_IRQ4);
 }
 
 void viper_state::machine_start()
 {
 	ds2430_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(viper_state::ds2430_timer_callback),this));
 	ds2430_bit_timer = machine().device<timer_device>("ds2430_timer2");
-	mpc8240_epic_init(machine());
+	mpc8240_epic_init();
 
 	/* set conservative DRC options */
 	ppcdrc_set_options(machine().device("maincpu"), PPCDRC_COMPATIBLE_OPTIONS);

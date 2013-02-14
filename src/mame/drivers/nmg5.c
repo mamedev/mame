@@ -279,6 +279,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_bitmap( bitmap_ind16 &bitmap );
 };
 
 
@@ -854,9 +855,8 @@ void nmg5_state::video_start()
 
 
 
-static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
+void nmg5_state::draw_bitmap( bitmap_ind16 &bitmap )
 {
-	nmg5_state *state = machine.driver_data<nmg5_state>();
 	int yyy = 256;
 	int xxx = 512 / 4;
 	UINT16 x, y, count;
@@ -869,13 +869,13 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 	{
 		for (x = 0; x < xxx; x++)
 		{
-			pix = (state->m_bitmap[count] & 0xf000) >> 12;
+			pix = (m_bitmap[count] & 0xf000) >> 12;
 			if (pix) bitmap.pix16(y + yoff, x * 4 + 0 + xoff) = pix + 0x300;
-			pix = (state->m_bitmap[count] & 0x0f00) >> 8;
+			pix = (m_bitmap[count] & 0x0f00) >> 8;
 			if (pix) bitmap.pix16(y + yoff, x * 4 + 1 + xoff) = pix + 0x300;
-			pix = (state->m_bitmap[count] & 0x00f0) >> 4;
+			pix = (m_bitmap[count] & 0x00f0) >> 4;
 			if (pix) bitmap.pix16(y + yoff, x * 4 + 2 + xoff) = pix + 0x300;
-			pix = (state->m_bitmap[count] & 0x000f) >> 0;
+			pix = (m_bitmap[count] & 0x000f) >> 0;
 			if (pix) bitmap.pix16(y + yoff, x * 4 + 3 + xoff) = pix + 0x300;
 
 			count++;
@@ -897,30 +897,30 @@ UINT32 nmg5_state::screen_update_nmg5(screen_device &screen, bitmap_ind16 &bitma
 	{
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_bitmap(machine(), bitmap);
+		draw_bitmap(bitmap);
 	}
 	else if (m_priority_reg == 1)
 	{
-		draw_bitmap(machine(), bitmap);
+		draw_bitmap(bitmap);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else if (m_priority_reg == 2)
 	{
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-		draw_bitmap(machine(), bitmap);
+		draw_bitmap(bitmap);
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 	}
 	else if (m_priority_reg == 3)
 	{
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-		draw_bitmap(machine(), bitmap);
+		draw_bitmap(bitmap);
 	}
 	else if (m_priority_reg == 7)
 	{
 		m_fg_tilemap->draw(bitmap, cliprect, 0, 0);
-		draw_bitmap(machine(), bitmap);
+		draw_bitmap(bitmap);
 		m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
 	}
 	return 0;

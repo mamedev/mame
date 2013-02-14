@@ -351,6 +351,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_dwarfd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(dwarfd_interrupt);
+	void drawCrt( bitmap_rgb32 &bitmap,const rectangle &cliprect );
 };
 
 
@@ -783,9 +784,8 @@ void dwarfd_state::video_start()
 {
 }
 
-static void drawCrt( running_machine &machine, bitmap_rgb32 &bitmap,const rectangle &cliprect )
+void dwarfd_state::drawCrt( bitmap_rgb32 &bitmap,const rectangle &cliprect )
 {
-	dwarfd_state *state = machine.driver_data<dwarfd_state>();
 	int x, y;
 	for (y = 0; y < maxy; y++)
 	{
@@ -804,7 +804,7 @@ static void drawCrt( running_machine &machine, bitmap_rgb32 &bitmap,const rectan
 			while (b == 0)
 			{
 				if (count < 0x8000)
-					tile = state->m_videobuf[count++];
+					tile = m_videobuf[count++];
 				else
 						return;
 
@@ -823,19 +823,19 @@ static void drawCrt( running_machine &machine, bitmap_rgb32 &bitmap,const rectan
 					}
 					if ((tile & 0xc0) == 0x80)
 					{
-						state->m_bank = (tile >> 2) & 3;
+						m_bank = (tile >> 2) & 3;
 					}
 					if ((tile & 0xc0) == 0xc0)
 					{
 						b = 1;
-						tile = machine.rand() & 0x7f;//(tile >> 2) & 0xf;
+						tile = machine().rand() & 0x7f;//(tile >> 2) & 0xf;
 					}
 				}
 				else
 					b = 1;
 			}
-			drawgfx_transpen(bitmap, cliprect, machine.gfx[0],
-				tile + (state->m_bank + bank2) * 128,
+			drawgfx_transpen(bitmap, cliprect, machine().gfx[0],
+				tile + (m_bank + bank2) * 128,
 				0,
 				0, 0,
 				x*8,y*8,0);
@@ -847,7 +847,7 @@ static void drawCrt( running_machine &machine, bitmap_rgb32 &bitmap,const rectan
 UINT32 dwarfd_state::screen_update_dwarfd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(get_black_pen(machine()), cliprect);
-	drawCrt(machine(), bitmap, cliprect);
+	drawCrt(bitmap, cliprect);
 	return 0;
 }
 

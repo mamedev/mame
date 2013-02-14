@@ -121,6 +121,11 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void skydest_i8741_reset();
 };
 
 
@@ -157,30 +162,27 @@ void cyclemb_state::video_start()
 {
 }
 
-static void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 	int x,y,count;
-	UINT8 flip_screen = state->flip_screen();
-
 	count = 0;
 
 	for (y=0;y<32;y++)
 	{
 		for (x=0;x<64;x++)
 		{
-			int attr = state->m_cram[count];
-			int tile = (state->m_vram[count]) | ((attr & 3)<<8);
+			int attr = m_cram[count];
+			int tile = (m_vram[count]) | ((attr & 3)<<8);
 			int color = ((attr & 0xf8) >> 3) ^ 0x1f;
 			int odd_line = y & 1 ? 0x40 : 0x00;
-	//      int sx_offs = flip_screen ? 512 : 0
-			int scrollx = ((state->m_vram[(y/2)+odd_line]) + (state->m_cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
+	//      int sx_offs = flip_screen() ? 512 : 0
+			int scrollx = ((m_vram[(y/2)+odd_line]) + (m_cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
 
 			if(!(attr & 4))
 				color += 0x20;//screen.machine().rand();
 
-			if(flip_screen)
+			if(flip_screen())
 			{
 				drawgfx_opaque(bitmap,cliprect,gfx,tile,color,1,1,512-(x*8)-scrollx,256-(y*8));
 				/* wrap-around */
@@ -209,10 +211,8 @@ static void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
 	bank 3
 	---- ---x [1] sprite enable flag?
 	*/
-static void cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
-	UINT8 flip_screen = state->flip_screen();
 	UINT8 col,fx,fy,region;
 	UINT16 spr_offs,i;
 	INT16 x,y;
@@ -228,27 +228,27 @@ static void cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	for(i=0;i<0x40;i+=2)
 	{
-		y = 0xf1 - state->m_obj2_ram[i];
-		x = state->m_obj2_ram[i+1] - 56;
-		spr_offs = (state->m_obj1_ram[i+0]);
-		spr_offs += ((state->m_obj3_ram[i+0] & 3) << 8);
-		col = (state->m_obj1_ram[i+1] & 0x3f);
-		region = ((state->m_obj3_ram[i] & 0x10) >> 4) + 1;
+		y = 0xf1 - m_obj2_ram[i];
+		x = m_obj2_ram[i+1] - 56;
+		spr_offs = (m_obj1_ram[i+0]);
+		spr_offs += ((m_obj3_ram[i+0] & 3) << 8);
+		col = (m_obj1_ram[i+1] & 0x3f);
+		region = ((m_obj3_ram[i] & 0x10) >> 4) + 1;
 		if(region == 2)
 		{
 			spr_offs >>= 2;
-			//spr_offs += ((state->m_obj3_ram[i+0] & 3) << 5);
+			//spr_offs += ((m_obj3_ram[i+0] & 3) << 5);
 			y-=16;
 		}
 
-		if(state->m_obj3_ram[i+1] & 1)
+		if(m_obj3_ram[i+1] & 1)
 			x+=256;
-		//if(state->m_obj3_ram[i+1] & 2)
+		//if(m_obj3_ram[i+1] & 2)
 //              x-=256;
-		fx = (state->m_obj3_ram[i+0] & 4) >> 2;
-		fy = (state->m_obj3_ram[i+0] & 8) >> 3;
+		fx = (m_obj3_ram[i+0] & 4) >> 2;
+		fy = (m_obj3_ram[i+0] & 8) >> 3;
 
-		if(flip_screen)
+		if(flip_screen())
 		{
 			fx = !fx;
 			fy = !fy;
@@ -258,12 +258,10 @@ static void cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-static void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
 	gfx_element *gfx = screen.machine().gfx[0];
 	int x,y;
-	//UINT8 flip_screen = state->flip_screen();
 
 
 	for (y=0;y<32;y++)
@@ -272,13 +270,13 @@ static void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
 		{
 			/* upper bits of the first address of cram seems to be related to colour cycling */
 
-			int attr = state->m_cram[x+y*64];
-			int tile = (state->m_vram[x+y*64]) | ((attr & 3)<<8);
+			int attr = m_cram[x+y*64];
+			int tile = (m_vram[x+y*64]) | ((attr & 3)<<8);
 			int color = ((attr & 0xfc) >> 2);
-			int scrollx = state->m_vram[0*64+0];
-			scrollx |= (state->m_cram[0*64+0] & 0x01)<<8;
+			int scrollx = m_vram[0*64+0];
+			scrollx |= (m_cram[0*64+0] & 0x01)<<8;
 
-			int cycle = (state->m_cram[0*64+0] & 0xf0)>>4;
+			int cycle = (m_cram[0*64+0] & 0xf0)>>4;
 
 			color ^= 0x3f;
 			// hardcoded to thie palette bit?
@@ -288,9 +286,9 @@ static void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
 
 			int scrolly;
 			if (x<32)
-				scrolly = state->m_vram[(x)*64+0];
+				scrolly = m_vram[(x)*64+0];
 			else
-				scrolly = state->m_vram[(x-32)*64+1];
+				scrolly = m_vram[(x-32)*64+1];
 
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,x*8+scrollx,((y*8)-scrolly)&0xff);
@@ -313,42 +311,40 @@ static void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, co
     ---- ---x [1] sprite enable flag?
 */
 
-static void skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	cyclemb_state *state = screen.machine().driver_data<cyclemb_state>();
-	UINT8 flip_screen = state->flip_screen();
 	UINT8 col,fx,fy,region;
 	UINT16 spr_offs,i;
 	INT16 x,y;
 
-//  popmessage("%d %d",state->m_obj2_ram[0x0d], 0xf1 - state->m_obj2_ram[0x0c+1] + 68);
+//  popmessage("%d %d",m_obj2_ram[0x0d], 0xf1 - m_obj2_ram[0x0c+1] + 68);
 
 	for(i=0;i<0x80;i+=2)
 	{
-		y = state->m_obj2_ram[i] - 1;
-		x = state->m_obj2_ram[i+1];
+		y = m_obj2_ram[i] - 1;
+		x = m_obj2_ram[i+1];
 
-		if(state->m_obj3_ram[i+1] & 1)
+		if(m_obj3_ram[i+1] & 1)
 			x |= 0x100;
 
 			x = 0x138 - x;
 
-		spr_offs = (state->m_obj1_ram[i+0]);
-		spr_offs += ((state->m_obj3_ram[i+0] & 3) << 8);
-		col = (state->m_obj1_ram[i+1] & 0x3f);
-		region = ((state->m_obj3_ram[i] & 0x10) >> 4) + 1;
+		spr_offs = (m_obj1_ram[i+0]);
+		spr_offs += ((m_obj3_ram[i+0] & 3) << 8);
+		col = (m_obj1_ram[i+1] & 0x3f);
+		region = ((m_obj3_ram[i] & 0x10) >> 4) + 1;
 		if(region == 2)
 		{
 			spr_offs >>= 2;
-		//  spr_offs += ((state->m_obj3_ram[i+0] & 3) << 5);
+		//  spr_offs += ((m_obj3_ram[i+0] & 3) << 5);
 			x-=16;
 		}
 
 
-		fx = (state->m_obj3_ram[i+0] & 4) >> 2;
-		fy = (state->m_obj3_ram[i+0] & 8) >> 3;
+		fx = (m_obj3_ram[i+0] & 4) >> 2;
+		fy = (m_obj3_ram[i+0] & 8) >> 3;
 
-		if(flip_screen)
+		if(flip_screen())
 		{
 			fx = !fx;
 			fy = !fy;
@@ -407,15 +403,14 @@ WRITE8_MEMBER(cyclemb_state::cyclemb_flip_w)
 	// a bunch of other things are setted here
 }
 
-static void skydest_i8741_reset(running_machine &machine)
+void cyclemb_state::skydest_i8741_reset()
 {
-	cyclemb_state *state = machine.driver_data<cyclemb_state>();
 
-	state->m_mcu[0].rxd = 0;
-	state->m_mcu[0].txd = 0;
-	state->m_mcu[0].rst = 0;
-	state->m_mcu[0].state = 0;
-	state->m_mcu[0].packet_type = 0;
+	m_mcu[0].rxd = 0;
+	m_mcu[0].txd = 0;
+	m_mcu[0].rst = 0;
+	m_mcu[0].state = 0;
+	m_mcu[0].packet_type = 0;
 }
 
 READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
@@ -595,7 +590,7 @@ ADDRESS_MAP_END
 
 void cyclemb_state::machine_reset()
 {
-	skydest_i8741_reset(machine());
+	skydest_i8741_reset();
 }
 
 

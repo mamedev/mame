@@ -268,6 +268,8 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(assert_lp_cb);
+	void peplus_load_superdata(const char *bank_name);
+	void peplus_init();
 };
 
 static const UINT8  id_022[8] = { 0x00, 0x01, 0x04, 0x09, 0x13, 0x16, 0x18, 0x00 };
@@ -311,18 +313,17 @@ static MC6845_INTERFACE( mc6845_intf )
 * Memory Copy *
 ***************/
 
-static void peplus_load_superdata(running_machine &machine, const char *bank_name)
+void peplus_state::peplus_load_superdata(const char *bank_name)
 {
-	peplus_state *state = machine.driver_data<peplus_state>();
-	UINT8 *super_data = state->memregion(bank_name)->base();
+	UINT8 *super_data = memregion(bank_name)->base();
 
 	/* Distribute Superboard Data */
-	memcpy(state->m_s3000_ram, &super_data[0x3000], 0x1000);
-	memcpy(state->m_s5000_ram, &super_data[0x5000], 0x1000);
-	memcpy(state->m_s7000_ram, &super_data[0x7000], 0x1000);
-	memcpy(state->m_sb000_ram, &super_data[0xb000], 0x1000);
-	memcpy(state->m_sd000_ram, &super_data[0xd000], 0x1000);
-	memcpy(state->m_sf000_ram, &super_data[0xf000], 0x1000);
+	memcpy(m_s3000_ram, &super_data[0x3000], 0x1000);
+	memcpy(m_s5000_ram, &super_data[0x5000], 0x1000);
+	memcpy(m_s7000_ram, &super_data[0x7000], 0x1000);
+	memcpy(m_sb000_ram, &super_data[0xb000], 0x1000);
+	memcpy(m_sd000_ram, &super_data[0xd000], 0x1000);
+	memcpy(m_sf000_ram, &super_data[0xf000], 0x1000);
 }
 
 
@@ -431,7 +432,7 @@ WRITE8_MEMBER(peplus_state::peplus_cmos_w)
 	if (offset == 0x1fff && m_wingboard && data < 5)
 	{
 		sprintf(bank_name, "user%d", data + 1);
-		peplus_load_superdata(machine(), bank_name);
+		peplus_load_superdata(bank_name);
 	}
 
 	m_cmos_ram[offset] = data;
@@ -1377,11 +1378,10 @@ MACHINE_CONFIG_END
 *****************/
 
 /* Normal board */
-static void peplus_init(running_machine &machine)
+void peplus_state::peplus_init()
 {
-	peplus_state *state = machine.driver_data<peplus_state>();
 	/* default : no address to patch in program RAM to enable autohold feature */
-	state->m_autohold_addr = 0;
+	m_autohold_addr = 0;
 }
 
 
@@ -1394,7 +1394,7 @@ DRIVER_INIT_MEMBER(peplus_state,peplus)
 {
 	m_wingboard = FALSE;
 	m_jumper_e16_e17 = FALSE;
-	peplus_init(machine());
+	peplus_init();
 }
 
 /* Superboard */
@@ -1402,9 +1402,9 @@ DRIVER_INIT_MEMBER(peplus_state,peplussb)
 {
 	m_wingboard = FALSE;
 	m_jumper_e16_e17 = FALSE;
-	peplus_load_superdata(machine(), "user1");
+	peplus_load_superdata("user1");
 
-	peplus_init(machine());
+	peplus_init();
 }
 
 /* Superboard with Attached Wingboard */
@@ -1412,9 +1412,9 @@ DRIVER_INIT_MEMBER(peplus_state,peplussbw)
 {
 	m_wingboard = TRUE;
 	m_jumper_e16_e17 = TRUE;
-	peplus_load_superdata(machine(), "user1");
+	peplus_load_superdata("user1");
 
-	peplus_init(machine());
+	peplus_init();
 }
 
 

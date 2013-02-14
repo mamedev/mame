@@ -496,25 +496,22 @@ public:
 	virtual void machine_reset();
 	UINT32 screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(galileo_timer_callback);
+	void ethernet_interrupt_machine(int state);
+	void update_vblank_irq();
+	UINT32 pci_bridge_r(address_space &space, UINT8 reg, UINT8 type);
+	void pci_bridge_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data);
+	UINT32 pci_3dfx_r(address_space &space, UINT8 reg, UINT8 type);
+	void pci_3dfx_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data);
+	UINT32 pci_ide_r(address_space &space, UINT8 reg, UINT8 type);
+	void pci_ide_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data);
+	void update_galileo_irqs();
+	int galileo_dma_fetch_next(address_space &space, int which);
+	void galileo_perform_dma(address_space &space, int which);
+	void galileo_reset();
+	void widget_reset();
+	void update_widget_irq();
+	void init_common(int ioasic, int serialnum, int yearoffs, int config);
 };
-
-
-/*************************************
- *
- *  Prototypes
- *
- *************************************/
-
-static void vblank_assert(device_t *device, int state);
-static void update_vblank_irq(running_machine &machine);
-static void galileo_reset(running_machine &machine);
-
-static void galileo_perform_dma(address_space &space, int which);
-static void voodoo_stall(device_t *device, int stall);
-static void widget_reset(running_machine &machine);
-static void update_widget_irq(running_machine &machine);
-
-
 
 /*************************************
  *
@@ -607,9 +604,9 @@ void seattle_state::machine_reset()
 	}
 
 	/* reset the other devices */
-	galileo_reset(machine());
+	galileo_reset();
 	if (m_board_config == SEATTLE_WIDGET_CONFIG)
-		widget_reset(machine());
+		widget_reset();
 }
 
 
@@ -633,23 +630,23 @@ WRITE_LINE_MEMBER(seattle_state::ide_interrupt)
  *
  *************************************/
 
-static void ethernet_interrupt_machine(running_machine &machine, int state)
+void seattle_state::ethernet_interrupt_machine(int state)
 {
-	seattle_state *drvstate = machine.driver_data<seattle_state>();
-	drvstate->m_ethernet_irq_state = state;
-	if (drvstate->m_board_config == FLAGSTAFF_CONFIG)
+	m_ethernet_irq_state = state;
+	if (m_board_config == FLAGSTAFF_CONFIG)
 	{
-		UINT8 assert = drvstate->m_ethernet_irq_state && (*drvstate->m_interrupt_enable & (1 << ETHERNET_IRQ_SHIFT));
-		if (drvstate->m_ethernet_irq_num != 0)
-			machine.device("maincpu")->execute().set_input_line(drvstate->m_ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
+		UINT8 assert = m_ethernet_irq_state && (*m_interrupt_enable & (1 << ETHERNET_IRQ_SHIFT));
+		if (m_ethernet_irq_num != 0)
+			machine().device("maincpu")->execute().set_input_line(m_ethernet_irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 	}
-	else if (drvstate->m_board_config == SEATTLE_WIDGET_CONFIG)
-		update_widget_irq(machine);
+	else if (m_board_config == SEATTLE_WIDGET_CONFIG)
+		update_widget_irq();
 }
 
 static void ethernet_interrupt(device_t *device, int state)
 {
-	ethernet_interrupt_machine(device->machine(), state);
+	seattle_state *drvstate = device->machine().driver_data<seattle_state>();
+	drvstate->ethernet_interrupt_machine(state);
 }
 
 
@@ -728,8 +725,8 @@ WRITE32_MEMBER(seattle_state::interrupt_config_w)
 	}
 
 	/* update the states */
-	update_vblank_irq(machine());
-	ethernet_interrupt_machine(machine(), m_ethernet_irq_state);
+	update_vblank_irq();
+	ethernet_interrupt_machine(m_ethernet_irq_state);
 }
 
 
@@ -740,9 +737,9 @@ WRITE32_MEMBER(seattle_state::seattle_interrupt_enable_w)
 	if (old != *m_interrupt_enable)
 	{
 		if (m_vblank_latch)
-			update_vblank_irq(machine());
+			update_vblank_irq();
 		if (m_ethernet_irq_state)
-			ethernet_interrupt_machine(machine(), m_ethernet_irq_state);
+			ethernet_interrupt_machine(m_ethernet_irq_state);
 	}
 }
 
@@ -754,19 +751,18 @@ WRITE32_MEMBER(seattle_state::seattle_interrupt_enable_w)
  *
  *************************************/
 
-static void update_vblank_irq(running_machine &machine)
+void seattle_state::update_vblank_irq()
 {
-	seattle_state *drvstate = machine.driver_data<seattle_state>();
 	int state = CLEAR_LINE;
 
 	/* skip if no interrupt configured */
-	if (drvstate->m_vblank_irq_num == 0)
+	if (m_vblank_irq_num == 0)
 		return;
 
 	/* if the VBLANK has been latched, and the interrupt is enabled, assert */
-	if (drvstate->m_vblank_latch && (*drvstate->m_interrupt_enable & (1 << VBLANK_IRQ_SHIFT)))
+	if (m_vblank_latch && (*m_interrupt_enable & (1 << VBLANK_IRQ_SHIFT)))
 		state = ASSERT_LINE;
-	machine.device("maincpu")->execute().set_input_line(drvstate->m_vblank_irq_num, state);
+	machine().device("maincpu")->execute().set_input_line(m_vblank_irq_num, state);
 }
 
 
@@ -774,7 +770,7 @@ WRITE32_MEMBER(seattle_state::vblank_clear_w)
 {
 	/* clear the latch and update the IRQ */
 	m_vblank_latch = 0;
-	update_vblank_irq(machine());
+	update_vblank_irq();
 }
 
 
@@ -788,7 +784,7 @@ static void vblank_assert(device_t *device, int state)
 	if ((state && !(*drvstate->m_interrupt_enable & 0x100)) || (!state && (*drvstate->m_interrupt_enable & 0x100)))
 	{
 		drvstate->m_vblank_latch = 1;
-		update_vblank_irq(device->machine());
+		drvstate->update_vblank_irq();
 	}
 }
 
@@ -800,10 +796,9 @@ static void vblank_assert(device_t *device, int state)
  *
  *************************************/
 
-static UINT32 pci_bridge_r(address_space &space, UINT8 reg, UINT8 type)
+UINT32 seattle_state::pci_bridge_r(address_space &space, UINT8 reg, UINT8 type)
 {
-	seattle_state *state = space.machine().driver_data<seattle_state>();
-	UINT32 result = state->m_galileo.pci_bridge_regs[reg];
+	UINT32 result = m_galileo.pci_bridge_regs[reg];
 
 	switch (reg)
 	{
@@ -822,10 +817,9 @@ static UINT32 pci_bridge_r(address_space &space, UINT8 reg, UINT8 type)
 }
 
 
-static void pci_bridge_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
-{
-	seattle_state *state = space.machine().driver_data<seattle_state>();
-	state->m_galileo.pci_bridge_regs[reg] = data;
+void seattle_state::pci_bridge_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
+{	
+	m_galileo.pci_bridge_regs[reg] = data;
 	if (LOG_PCI)
 		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", space.device().safe_pc(), reg, type, data);
 }
@@ -838,10 +832,9 @@ static void pci_bridge_w(address_space &space, UINT8 reg, UINT8 type, UINT32 dat
  *
  *************************************/
 
-static UINT32 pci_3dfx_r(address_space &space, UINT8 reg, UINT8 type)
-{
-	seattle_state *state = space.machine().driver_data<seattle_state>();
-	UINT32 result = state->m_galileo.pci_3dfx_regs[reg];
+UINT32 seattle_state::pci_3dfx_r(address_space &space, UINT8 reg, UINT8 type)
+{	
+	UINT32 result = m_galileo.pci_3dfx_regs[reg];
 
 	switch (reg)
 	{
@@ -860,21 +853,20 @@ static UINT32 pci_3dfx_r(address_space &space, UINT8 reg, UINT8 type)
 }
 
 
-static void pci_3dfx_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
+void seattle_state::pci_3dfx_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
 {
-	seattle_state *state = space.machine().driver_data<seattle_state>();
-	state->m_galileo.pci_3dfx_regs[reg] = data;
+	m_galileo.pci_3dfx_regs[reg] = data;
 
 	switch (reg)
 	{
 		case 0x04:      /* address register */
-			state->m_galileo.pci_3dfx_regs[reg] &= 0xff000000;
+			m_galileo.pci_3dfx_regs[reg] &= 0xff000000;
 			if (data != 0x08000000)
 				logerror("3dfx not mapped where we expect it! (%08X)\n", data);
 			break;
 
 		case 0x10:      /* initEnable register */
-			voodoo_set_init_enable(state->m_voodoo, data);
+			voodoo_set_init_enable(m_voodoo, data);
 			break;
 	}
 	if (LOG_PCI)
@@ -889,10 +881,9 @@ static void pci_3dfx_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
  *
  *************************************/
 
-static UINT32 pci_ide_r(address_space &space, UINT8 reg, UINT8 type)
+UINT32 seattle_state::pci_ide_r(address_space &space, UINT8 reg, UINT8 type)
 {
-	seattle_state *state = space.machine().driver_data<seattle_state>();
-	UINT32 result = state->m_galileo.pci_ide_regs[reg];
+	UINT32 result = m_galileo.pci_ide_regs[reg];
 
 	switch (reg)
 	{
@@ -911,10 +902,9 @@ static UINT32 pci_ide_r(address_space &space, UINT8 reg, UINT8 type)
 }
 
 
-static void pci_ide_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
+void seattle_state::pci_ide_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
 {
-	seattle_state *state = space.machine().driver_data<seattle_state>();
-	state->m_galileo.pci_ide_regs[reg] = data;
+	m_galileo.pci_ide_regs[reg] = data;
 	if (LOG_PCI)
 		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", space.device().safe_pc(), reg, type, data);
 }
@@ -927,15 +917,14 @@ static void pci_ide_w(address_space &space, UINT8 reg, UINT8 type, UINT32 data)
  *
  *************************************/
 
-static void update_galileo_irqs(running_machine &machine)
+void seattle_state::update_galileo_irqs()
 {
-	seattle_state *drvstate = machine.driver_data<seattle_state>();
 	int state = CLEAR_LINE;
 
 	/* if any unmasked interrupts are live, we generate */
-	if (drvstate->m_galileo.reg[GREG_INT_STATE] & drvstate->m_galileo.reg[GREG_INT_MASK])
+	if (m_galileo.reg[GREG_INT_STATE] & m_galileo.reg[GREG_INT_MASK])
 		state = ASSERT_LINE;
-	machine.device("maincpu")->execute().set_input_line(GALILEO_IRQ_NUM, state);
+	machine().device("maincpu")->execute().set_input_line(GALILEO_IRQ_NUM, state);
 
 	if (LOG_GALILEO)
 		logerror("Galileo IRQ %s\n", (state == ASSERT_LINE) ? "asserted" : "cleared");
@@ -963,7 +952,7 @@ TIMER_CALLBACK_MEMBER(seattle_state::galileo_timer_callback)
 
 	/* trigger the interrupt */
 	m_galileo.reg[GREG_INT_STATE] |= 1 << (GINT_T0EXP_SHIFT + which);
-	update_galileo_irqs(machine());
+	update_galileo_irqs();
 }
 
 
@@ -974,10 +963,9 @@ TIMER_CALLBACK_MEMBER(seattle_state::galileo_timer_callback)
  *
  *************************************/
 
-static int galileo_dma_fetch_next(address_space &space, int which)
+int seattle_state::galileo_dma_fetch_next(address_space &space, int which)
 {
-	seattle_state *state = space.machine().driver_data<seattle_state>();
-	galileo_data &galileo = state->m_galileo;
+	galileo_data &galileo = m_galileo;
 	offs_t address = 0;
 	UINT32 data;
 
@@ -991,7 +979,7 @@ static int galileo_dma_fetch_next(address_space &space, int which)
 		if (galileo.reg[GREG_DMA0_CONTROL + which] & 0x400)
 		{
 			galileo.reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_galileo_irqs(space.machine());
+			update_galileo_irqs();
 		}
 		galileo.reg[GREG_DMA0_CONTROL + which] &= ~0x5000;
 		return 0;
@@ -1016,10 +1004,9 @@ static int galileo_dma_fetch_next(address_space &space, int which)
 }
 
 
-static void galileo_perform_dma(address_space &space, int which)
+void seattle_state::galileo_perform_dma(address_space &space, int which)
 {
-	seattle_state *state = space.machine().driver_data<seattle_state>();
-	galileo_data &galileo = state->m_galileo;
+	galileo_data &galileo = m_galileo;
 	do
 	{
 		offs_t srcaddr = galileo.reg[GREG_DMA0_SOURCE + which];
@@ -1061,7 +1048,7 @@ static void galileo_perform_dma(address_space &space, int which)
 			while (bytesleft >= 4)
 			{
 				/* if the voodoo is stalled, stop early */
-				if (state->m_voodoo_stalled)
+				if (m_voodoo_stalled)
 				{
 					if (LOG_DMA)
 						logerror("Stalled on voodoo with %d bytes left\n", bytesleft);
@@ -1069,7 +1056,7 @@ static void galileo_perform_dma(address_space &space, int which)
 				}
 
 				/* write the data and advance */
-				voodoo_w(state->m_voodoo, space, (dstaddr & 0xffffff) / 4, space.read_dword(srcaddr), 0xffffffff);
+				voodoo_w(m_voodoo, space, (dstaddr & 0xffffff) / 4, space.read_dword(srcaddr), 0xffffffff);
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft -= 4;
@@ -1102,7 +1089,7 @@ static void galileo_perform_dma(address_space &space, int which)
 		if (!(galileo.reg[GREG_DMA0_CONTROL + which] & 0x400))
 		{
 			galileo.reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_galileo_irqs(space.machine());
+			update_galileo_irqs();
 		}
 	} while (galileo_dma_fetch_next(space, which));
 
@@ -1117,10 +1104,9 @@ static void galileo_perform_dma(address_space &space, int which)
  *
  *************************************/
 
-static void galileo_reset(running_machine &machine)
+void seattle_state::galileo_reset()
 {
-	seattle_state *state = machine.driver_data<seattle_state>();
-	memset(&state->m_galileo.reg, 0, sizeof(state->m_galileo.reg));
+	memset(&m_galileo.reg, 0, sizeof(m_galileo.reg));
 }
 
 
@@ -1296,7 +1282,7 @@ WRITE32_MEMBER(seattle_state::galileo_w)
 			if (LOG_GALILEO)
 				logerror("%08X:Galileo write to IRQ clear = %08X & %08X\n", offset*4, data, mem_mask);
 			galileo.reg[offset] = oldata & data;
-			update_galileo_irqs(machine());
+			update_galileo_irqs();
 			break;
 
 		case GREG_CONFIG_DATA:
@@ -1411,7 +1397,7 @@ static void voodoo_stall(device_t *device, int stall)
 				state->m_galileo.dma_stalled_on_voodoo[which] = FALSE;
 
 				/* resume execution */
-				galileo_perform_dma(space, which);
+				state->galileo_perform_dma(space, which);
 				break;
 			}
 
@@ -1550,25 +1536,23 @@ WRITE32_MEMBER(seattle_state::ethernet_w)
  *
  *************************************/
 
-static void widget_reset(running_machine &machine)
+void seattle_state::widget_reset()
 {
-	seattle_state *state = machine.driver_data<seattle_state>();
-	UINT8 saved_irq = state->m_widget.irq_num;
-	memset(&state->m_widget, 0, sizeof(state->m_widget));
-	state->m_widget.irq_num = saved_irq;
+	UINT8 saved_irq = m_widget.irq_num;
+	memset(&m_widget, 0, sizeof(m_widget));
+	m_widget.irq_num = saved_irq;
 }
 
 
-static void update_widget_irq(running_machine &machine)
+void seattle_state::update_widget_irq()
 {
-	seattle_state *drvstate = machine.driver_data<seattle_state>();
-	UINT8 state = drvstate->m_ethernet_irq_state << WINT_ETHERNET_SHIFT;
-	UINT8 mask = drvstate->m_widget.irq_mask;
-	UINT8 assert = ((mask & state) != 0) && (*drvstate->m_interrupt_enable & (1 << WIDGET_IRQ_SHIFT));
+	UINT8 state = m_ethernet_irq_state << WINT_ETHERNET_SHIFT;
+	UINT8 mask = m_widget.irq_mask;
+	UINT8 assert = ((mask & state) != 0) && (*m_interrupt_enable & (1 << WIDGET_IRQ_SHIFT));
 
 	/* update the IRQ state */
-	if (drvstate->m_widget.irq_num != 0)
-		machine.device("maincpu")->execute().set_input_line(drvstate->m_widget.irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
+	if (m_widget.irq_num != 0)
+		machine().device("maincpu")->execute().set_input_line(m_widget.irq_num, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -1617,7 +1601,7 @@ WRITE32_MEMBER(seattle_state::widget_w)
 
 		case WREG_INTERRUPT:
 			m_widget.irq_mask = data;
-			update_widget_irq(machine());
+			update_widget_irq();
 			break;
 
 		case WREG_ANALOG:
@@ -2856,33 +2840,32 @@ ROM_END
  *
  *************************************/
 
-static void init_common(running_machine &machine, int ioasic, int serialnum, int yearoffs, int config)
+void seattle_state::init_common(int ioasic, int serialnum, int yearoffs, int config)
 {
-	seattle_state *state = machine.driver_data<seattle_state>();
 
 	/* initialize the subsystems */
-	midway_ioasic_init(machine, ioasic, serialnum, yearoffs, ioasic_irq);
+	midway_ioasic_init(machine(),ioasic, serialnum, yearoffs, ioasic_irq);
 
 	/* switch off the configuration */
-	state->m_board_config = config;
+	m_board_config = config;
 	switch (config)
 	{
 		case PHOENIX_CONFIG:
 			/* original Phoenix board only has 4MB of RAM */
-			machine.device("maincpu")->memory().space(AS_PROGRAM).unmap_readwrite(0x00400000, 0x007fffff);
+			machine().device("maincpu")->memory().space(AS_PROGRAM).unmap_readwrite(0x00400000, 0x007fffff);
 			break;
 
 		case SEATTLE_WIDGET_CONFIG:
 			/* set up the widget board */
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16c00000, 0x16c0001f, read32_delegate(FUNC(seattle_state::widget_r),state), write32_delegate(FUNC(seattle_state::widget_w),state));
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16c00000, 0x16c0001f, read32_delegate(FUNC(seattle_state::widget_r),this), write32_delegate(FUNC(seattle_state::widget_w),this));
 			break;
 
 		case FLAGSTAFF_CONFIG:
 			/* set up the analog inputs */
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x14000000, 0x14000003, read32_delegate(FUNC(seattle_state::analog_port_r),state), write32_delegate(FUNC(seattle_state::analog_port_w),state));
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x14000000, 0x14000003, read32_delegate(FUNC(seattle_state::analog_port_r),this), write32_delegate(FUNC(seattle_state::analog_port_w),this));
 
 			/* set up the ethernet controller */
-			machine.device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16c00000, 0x16c0003f, read32_delegate(FUNC(seattle_state::ethernet_r),state), write32_delegate(FUNC(seattle_state::ethernet_w),state));
+			machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16c00000, 0x16c0003f, read32_delegate(FUNC(seattle_state::ethernet_r),this), write32_delegate(FUNC(seattle_state::ethernet_w),this));
 			break;
 	}
 }
@@ -2891,7 +2874,7 @@ static void init_common(running_machine &machine, int ioasic, int serialnum, int
 DRIVER_INIT_MEMBER(seattle_state,wg3dh)
 {
 	dcs2_init(machine(), 2, 0x3839);
-	init_common(machine(), MIDWAY_IOASIC_STANDARD, 310/* others? */, 80, PHOENIX_CONFIG);
+	init_common(MIDWAY_IOASIC_STANDARD, 310/* others? */, 80, PHOENIX_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(machine().device("maincpu"), 0x8004413C, 0x0C0054B4, 250);     /* confirmed */
@@ -2903,7 +2886,7 @@ DRIVER_INIT_MEMBER(seattle_state,wg3dh)
 DRIVER_INIT_MEMBER(seattle_state,mace)
 {
 	dcs2_init(machine(), 2, 0x3839);
-	init_common(machine(), MIDWAY_IOASIC_MACE, 319/* others? */, 80, SEATTLE_CONFIG);
+	init_common(MIDWAY_IOASIC_MACE, 319/* others? */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(machine().device("maincpu"), 0x800108F8, 0x8C420000, 250);     /* confirmed */
@@ -2913,7 +2896,7 @@ DRIVER_INIT_MEMBER(seattle_state,mace)
 DRIVER_INIT_MEMBER(seattle_state,sfrush)
 {
 	cage_init(machine(), 0x5236);
-	init_common(machine(), MIDWAY_IOASIC_STANDARD, 315/* no alternates */, 100, FLAGSTAFF_CONFIG);
+	init_common(MIDWAY_IOASIC_STANDARD, 315/* no alternates */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(machine().device("maincpu"), 0x80059F34, 0x3C028012, 250);     /* confirmed */
@@ -2925,7 +2908,7 @@ DRIVER_INIT_MEMBER(seattle_state,sfrush)
 DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
 {
 	cage_init(machine(), 0x5329);
-	init_common(machine(), MIDWAY_IOASIC_SFRUSHRK, 331/* unknown */, 100, FLAGSTAFF_CONFIG);
+	init_common(MIDWAY_IOASIC_SFRUSHRK, 331/* unknown */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(machine().device("maincpu"), 0x800343E8, 0x3C028012, 250);     /* confirmed */
@@ -2938,7 +2921,7 @@ DRIVER_INIT_MEMBER(seattle_state,sfrushrk)
 DRIVER_INIT_MEMBER(seattle_state,calspeed)
 {
 	dcs2_init(machine(), 2, 0x39c0);
-	init_common(machine(), MIDWAY_IOASIC_CALSPEED, 328/* others? */, 100, SEATTLE_WIDGET_CONFIG);
+	init_common(MIDWAY_IOASIC_CALSPEED, 328/* others? */, 100, SEATTLE_WIDGET_CONFIG);
 	midway_ioasic_set_auto_ack(1);
 
 	/* speedups */
@@ -2950,7 +2933,7 @@ DRIVER_INIT_MEMBER(seattle_state,calspeed)
 DRIVER_INIT_MEMBER(seattle_state,vaportrx)
 {
 	dcs2_init(machine(), 2, 0x39c2);
-	init_common(machine(), MIDWAY_IOASIC_VAPORTRX, 324/* 334? unknown */, 100, SEATTLE_WIDGET_CONFIG);
+	init_common(MIDWAY_IOASIC_VAPORTRX, 324/* 334? unknown */, 100, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(machine().device("maincpu"), 0x80049F14, 0x3C028020, 250);     /* confirmed */
@@ -2962,7 +2945,7 @@ DRIVER_INIT_MEMBER(seattle_state,vaportrx)
 DRIVER_INIT_MEMBER(seattle_state,biofreak)
 {
 	dcs2_init(machine(), 2, 0x3835);
-	init_common(machine(), MIDWAY_IOASIC_STANDARD, 231/* no alternates */, 80, SEATTLE_CONFIG);
+	init_common(MIDWAY_IOASIC_STANDARD, 231/* no alternates */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
 }
@@ -2971,7 +2954,7 @@ DRIVER_INIT_MEMBER(seattle_state,biofreak)
 DRIVER_INIT_MEMBER(seattle_state,blitz)
 {
 	dcs2_init(machine(), 2, 0x39c2);
-	init_common(machine(), MIDWAY_IOASIC_BLITZ99, 444/* or 528 */, 80, SEATTLE_CONFIG);
+	init_common(MIDWAY_IOASIC_BLITZ99, 444/* or 528 */, 80, SEATTLE_CONFIG);
 
 	/* for some reason, the code in the ROM appears buggy; this is a small patch to fix it */
 	m_rombase[0x934/4] += 4;
@@ -2985,7 +2968,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz)
 DRIVER_INIT_MEMBER(seattle_state,blitz99)
 {
 	dcs2_init(machine(), 2, 0x0afb);
-	init_common(machine(), MIDWAY_IOASIC_BLITZ99, 481/* or 484 or 520 */, 80, SEATTLE_CONFIG);
+	init_common(MIDWAY_IOASIC_BLITZ99, 481/* or 484 or 520 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(machine().device("maincpu"), 0x8014E41C, 0x3C038025, 250);     /* confirmed */
@@ -2996,7 +2979,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz99)
 DRIVER_INIT_MEMBER(seattle_state,blitz2k)
 {
 	dcs2_init(machine(), 2, 0x0b5d);
-	init_common(machine(), MIDWAY_IOASIC_BLITZ99, 494/* or 498 */, 80, SEATTLE_CONFIG);
+	init_common(MIDWAY_IOASIC_BLITZ99, 494/* or 498 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(machine().device("maincpu"), 0x8015773C, 0x3C038025, 250);     /* confirmed */
@@ -3007,7 +2990,7 @@ DRIVER_INIT_MEMBER(seattle_state,blitz2k)
 DRIVER_INIT_MEMBER(seattle_state,carnevil)
 {
 	dcs2_init(machine(), 2, 0x0af7);
-	init_common(machine(), MIDWAY_IOASIC_CARNEVIL, 469/* 469 or 486 or 528 */, 80, SEATTLE_CONFIG);
+	init_common(MIDWAY_IOASIC_CARNEVIL, 469/* 469 or 486 or 528 */, 80, SEATTLE_CONFIG);
 
 	/* set up the gun */
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0x16800000, 0x1680001f, read32_delegate(FUNC(seattle_state::carnevil_gun_r),this), write32_delegate(FUNC(seattle_state::carnevil_gun_w),this));
@@ -3021,7 +3004,7 @@ DRIVER_INIT_MEMBER(seattle_state,carnevil)
 DRIVER_INIT_MEMBER(seattle_state,hyprdriv)
 {
 	dcs2_init(machine(), 2, 0x0af7);
-	init_common(machine(), MIDWAY_IOASIC_HYPRDRIV, 469/* unknown */, 80, SEATTLE_WIDGET_CONFIG);
+	init_common(MIDWAY_IOASIC_HYPRDRIV, 469/* unknown */, 80, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
 	mips3drc_add_hotspot(machine().device("maincpu"), 0x801643BC, 0x3C03801B, 250);     /* confirmed */

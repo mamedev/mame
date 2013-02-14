@@ -269,6 +269,13 @@ public:
 	TIMER_CALLBACK_MEMBER(blitter_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(halleys_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(benberob_scanline);
+	void halleys_decode_rgb(UINT32 *r, UINT32 *g, UINT32 *b, int addr, int data);
+	void copy_scroll_op(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy);
+	void copy_scroll_xp(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy);
+	void copy_fixed_xp(bitmap_ind16 &bitmap, UINT16 *source);
+	void copy_fixed_2b(bitmap_ind16 &bitmap, UINT16 *source);
+	void filter_bitmap(bitmap_ind16 &bitmap, int mask);
+	void init_common();
 };
 
 
@@ -1159,14 +1166,13 @@ void halleys_state::palette_init()
 	}
 }
 
-static void halleys_decode_rgb(running_machine &machine, UINT32 *r, UINT32 *g, UINT32 *b, int addr, int data)
+void halleys_state::halleys_decode_rgb(UINT32 *r, UINT32 *g, UINT32 *b, int addr, int data)
 {
 /*
     proms contain:
         00 00 00 00 c5 0b f3 17 fd cf 1f ef df bf 7f ff
         00 00 00 00 01 61 29 26 0b f5 e2 17 57 fb cf f7
 */
-	halleys_state *state = machine.driver_data<halleys_state>();
 	int latch1_273, latch2_273;
 	UINT8 *sram_189;
 	UINT8 *prom_6330;
@@ -1174,10 +1180,10 @@ static void halleys_decode_rgb(running_machine &machine, UINT32 *r, UINT32 *g, U
 	int bit0, bit1, bit2, bit3, bit4;
 
 	// the four 16x4-bit SN74S189 SRAM chips are assumed be the game's 32-byte palette RAM
-	sram_189 = state->m_generic_paletteram_8;
+	sram_189 = m_generic_paletteram_8;
 
 	// each of the three 32-byte 6330 PROM is wired to an RGB component output
-	prom_6330 = state->memregion("proms")->base();
+	prom_6330 = memregion("proms")->base();
 
 	// latch1 holds 8 bits from the selected palette RAM address
 	latch1_273 = sram_189[addr];
@@ -1229,7 +1235,7 @@ WRITE8_MEMBER(halleys_state::halleys_paletteram_IIRRGGBB_w)
 	palette_set_color(machine(), offset+SP_ALPHA, MAKE_RGB(r, g, b));
 	palette_set_color(machine(), offset+SP_COLLD, MAKE_RGB(r, g, b));
 
-	halleys_decode_rgb(machine(), &r, &g, &b, offset, 0);
+	halleys_decode_rgb(&r, &g, &b, offset, 0);
 	palette_set_color(machine(), offset+0x20, MAKE_RGB(r, g, b));
 }
 
@@ -1263,7 +1269,7 @@ void halleys_state::video_start()
 }
 
 
-static void copy_scroll_op(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
+void halleys_state::copy_scroll_op(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 {
 //--------------------------------------------------------------------------
 
@@ -1300,7 +1306,7 @@ static void copy_scroll_op(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 }
 
 
-static void copy_scroll_xp(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
+void halleys_state::copy_scroll_xp(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 {
 //--------------------------------------------------------------------------
 
@@ -1358,7 +1364,7 @@ static void copy_scroll_xp(bitmap_ind16 &bitmap, UINT16 *source, int sx, int sy)
 
 
 
-static void copy_fixed_xp(bitmap_ind16 &bitmap, UINT16 *source)
+void halleys_state::copy_fixed_xp(bitmap_ind16 &bitmap, UINT16 *source)
 {
 	UINT16 *esi, *edi;
 	int dst_pitch, ecx, edx;
@@ -1393,7 +1399,7 @@ static void copy_fixed_xp(bitmap_ind16 &bitmap, UINT16 *source)
 }
 
 
-static void copy_fixed_2b(bitmap_ind16 &bitmap, UINT16 *source)
+void halleys_state::copy_fixed_2b(bitmap_ind16 &bitmap, UINT16 *source)
 {
 	UINT16 *esi, *edi;
 	int dst_pitch, ecx, edx;
@@ -1440,15 +1446,14 @@ static void copy_fixed_2b(bitmap_ind16 &bitmap, UINT16 *source)
 }
 
 
-static void filter_bitmap(running_machine &machine, bitmap_ind16 &bitmap, int mask)
+void halleys_state::filter_bitmap(bitmap_ind16 &bitmap, int mask)
 {
-	halleys_state *state = machine.driver_data<halleys_state>();
 	int dst_pitch;
 
 	UINT32 *pal_ptr, *edi;
 	int esi, eax, ebx, ecx, edx;
 
-	pal_ptr = state->m_internal_palette;
+	pal_ptr = m_internal_palette;
 	esi = mask | 0xffffff00;
 	edi = (UINT32*)&bitmap.pix16(VIS_MINY, VIS_MINX + CLIP_W);
 	dst_pitch = bitmap.rowpixels() >> 1;
@@ -1504,7 +1509,7 @@ UINT32 halleys_state::screen_update_halleys(screen_device &screen, bitmap_ind16 
 	// HALF-HACK: apply RGB filter when the following conditions are met
 	i = m_io_ram[0xa0];
 	j = m_io_ram[0xa1];
-	if (m_io_ram[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(machine(), bitmap, i);
+	if (m_io_ram[0x2b] && (i>0xc6 && i<0xfe) && (j==0xc0 || j==0xed)) filter_bitmap(bitmap, i);
 	return 0;
 }
 
@@ -2148,44 +2153,43 @@ ROM_END
 //**************************************************************************
 // Driver Initializations
 
-static void init_common(running_machine &machine)
+void halleys_state::init_common()
 {
-	halleys_state *state = machine.driver_data<halleys_state>();
 	UINT8 *buf, *rom;
 	int addr, i;
 	UINT8 al, ah, dl, dh;
 
 
 	// allocate memory for unpacked graphics
-	buf = auto_alloc_array(machine, UINT8, 0x100000);
-	state->m_gfx_plane02 = buf;
-	state->m_gfx_plane13 = buf + 0x80000;
+	buf = auto_alloc_array(machine(), UINT8, 0x100000);
+	m_gfx_plane02 = buf;
+	m_gfx_plane13 = buf + 0x80000;
 
 
 	// allocate memory for render layers
-	buf = auto_alloc_array(machine, UINT8, SCREEN_BYTESIZE * MAX_LAYERS);
-	for (i=0; i<MAX_LAYERS; buf+=SCREEN_BYTESIZE, i++) state->m_render_layer[i] = (UINT16*)buf;
+	buf = auto_alloc_array(machine(), UINT8, SCREEN_BYTESIZE * MAX_LAYERS);
+	for (i=0; i<MAX_LAYERS; buf+=SCREEN_BYTESIZE, i++) m_render_layer[i] = (UINT16*)buf;
 
 
 	// allocate memory for pre-processed ROMs
-	state->m_gfx1_base = auto_alloc_array(machine, UINT8, 0x20000);
+	m_gfx1_base = auto_alloc_array(machine(), UINT8, 0x20000);
 
 
 	// allocate memory for alpha table
-	state->m_alpha_table = auto_alloc_array(machine, UINT32, 0x10000);
+	m_alpha_table = auto_alloc_array(machine(), UINT32, 0x10000);
 
 
 	// allocate memory for internal palette
-	state->m_internal_palette = auto_alloc_array(machine, UINT32, PALETTE_SIZE);
+	m_internal_palette = auto_alloc_array(machine(), UINT32, PALETTE_SIZE);
 
 
 	// allocate memory for hardware collision list
-	state->m_collision_list = auto_alloc_array(machine, UINT8, MAX_SPRITES);
+	m_collision_list = auto_alloc_array(machine(), UINT8, MAX_SPRITES);
 
 
 	// decrypt main program ROM
-	rom = state->m_cpu1_base = state->memregion("maincpu")->base();
-	buf = state->m_gfx1_base;
+	rom = m_cpu1_base = memregion("maincpu")->base();
+	buf = m_gfx1_base;
 
 	for (i=0; i<0x10000; i++)
 	{
@@ -2197,15 +2201,15 @@ static void init_common(running_machine &machine)
 
 
 	// swap graphics ROM addresses and unpack each pixel
-	rom = machine.root_device().memregion("gfx1")->base();
-	buf = state->m_gfx_plane02;
+	rom = memregion("gfx1")->base();
+	buf = m_gfx_plane02;
 
 	for (i=0xffff; i>=0; i--)
 	{
 		al = rom[i];
 		ah = rom[i+0x10000];
-		state->m_gfx1_base[0xffff-i] = al;
-		state->m_gfx1_base[0x1ffff-i] = ah;
+		m_gfx1_base[0xffff-i] = al;
+		m_gfx1_base[0x1ffff-i] = ah;
 
 		buf[0] = dl = (al    & 1) | (ah<<2 & 4);  dl <<= 1;
 		buf[1] = dh = (al>>1 & 1) | (ah<<1 & 4);  dh <<= 1;
@@ -2233,7 +2237,7 @@ DRIVER_INIT_MEMBER(halleys_state,benberob)
 {
 	m_game_id = GAME_BENBEROB;
 
-	init_common(machine());
+	init_common();
 
 	m_blitter_reset_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(halleys_state::blitter_reset),this));
 }
@@ -2244,7 +2248,7 @@ DRIVER_INIT_MEMBER(halleys_state,halleys)
 	m_game_id = GAME_HALLEYS;
 	m_collision_detection = 0xb114;
 
-	init_common(machine());
+	init_common();
 }
 
 DRIVER_INIT_MEMBER(halleys_state,halley87)
@@ -2252,7 +2256,7 @@ DRIVER_INIT_MEMBER(halleys_state,halley87)
 	m_game_id = GAME_HALLEYS;
 	m_collision_detection = 0xb10d;
 
-	init_common(machine());
+	init_common();
 }
 
 
