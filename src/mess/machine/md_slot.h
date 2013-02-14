@@ -5,7 +5,7 @@
  TYPE DEFINITIONS
  ***************************************************************************/
 
-#define MD_ADDR(a)  rom_bank_map[((a) / 0x10000) & 0x3f] * 0x10000 + ((a) & 0xffff)
+#define MD_ADDR(a)  (rom_bank_map[((a << 1) / 0x10000) & 0x3f] * 0x10000 + ((a << 1) & 0xffff))/2
 
 /* PCB */
 enum
