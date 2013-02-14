@@ -4769,7 +4769,8 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 		/* Dragon Ball Z 0x3800 - 0x2c00 */
 		/* Assault Suit Leynos 2 0x0200*/
 		/* Bug! 0x8800 */
-		if(STV_VDP2_SFPRMD & ~0xff75)
+		/* Wonder 3 0x0018 */
+		if(STV_VDP2_SFPRMD & ~0xff7d)
 			popmessage("Special Priority Mode enabled %04x, contact MAMEdev",STV_VDP2_SFPRMD);
 	}
 }

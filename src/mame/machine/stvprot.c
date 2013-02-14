@@ -113,6 +113,21 @@ static UINT8 char_offset; //helper to jump the decoding of the NULL chars.
 *
 ************************/
 
+/*
+ 0x200214
+ 0x20de94
+ wpset 0x200214,0x20de94-0x200214,r
+ dump twcup98.dmp,0x200214,0x20de94-0x200214,4,0,0
+ protection tests the data 0x201220 at
+ bp 0x6009a9e
+ with 0x60651f8
+ */
+
+static UINT32 twcup_prot_data[8] =
+{
+	0x23232323, 0x23232323, 0x4c4c4c4c, 0x4c156301
+};
+
 static READ32_HANDLER( twcup98_prot_r )
 {
 	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
@@ -139,6 +154,10 @@ static READ32_HANDLER( twcup98_prot_r )
 						res = ROM[ctrl_index / 4] & 0xffff0000;
 						res |= ROM[ctrl_index / 4] & 0xffff;
 					}
+
+					if(ctrl_index >= 0xD215A4+0x100c && ctrl_index < 0xD215A4+0x100c+8*4)
+						res = twcup_prot_data[(ctrl_index-(0xD215A4+0x100c))/4];
+
 					ctrl_index+=4;
 					return res;
 			}
