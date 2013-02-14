@@ -21,11 +21,15 @@ class palm_state : public driver_device
 {
 public:
 	palm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_lsi(*this, MC68328_TAG),
-	m_dac(*this, "dac"),
-	m_ram(*this, RAM_TAG)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_lsi(*this, MC68328_TAG)
+		, m_dac(*this, "dac")
+		, m_ram(*this, RAM_TAG)
+		, m_io_penx(*this, "PENX")
+		, m_io_peny(*this, "PENY")
+		, m_io_penb(*this, "PENB")
+		, m_io_portd(*this, "PORTD")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -51,6 +55,11 @@ public:
 	DECLARE_WRITE16_MEMBER(palm_spim_out);
 	DECLARE_READ16_MEMBER(palm_spim_in);
 	DECLARE_WRITE8_MEMBER(palm_dac_transition);
+
+	required_ioport m_io_penx;
+	required_ioport m_io_peny;
+	required_ioport m_io_penb;
+	required_ioport m_io_portd;
 };
 
 static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
@@ -62,7 +71,7 @@ static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, cons
 
 INPUT_CHANGED_MEMBER(palm_state::pen_check)
 {
-	UINT8 button = machine().root_device().ioport("PENB")->read();
+	UINT8 button = m_io_penb->read();
 
 	if(button)
 		mc68328_set_penirq_line(m_lsi, 1);
@@ -72,7 +81,7 @@ INPUT_CHANGED_MEMBER(palm_state::pen_check)
 
 INPUT_CHANGED_MEMBER(palm_state::button_check)
 {
-	UINT8 button_state = machine().root_device().ioport("PORTD")->read();
+	UINT8 button_state = m_io_portd->read();
 
 	mc68328_set_port_d_lines(m_lsi, button_state, (int)(FPTR)param);
 }
@@ -105,8 +114,8 @@ READ16_MEMBER(palm_state::palm_spim_in)
 static void palm_spim_exchange( device_t *device )
 {
 	palm_state *state = device->machine().driver_data<palm_state>();
-	UINT8 x = device->machine().root_device().ioport("PENX")->read();
-	UINT8 y = state->ioport("PENY")->read();
+	UINT8 x = state->m_io_penx->read();
+	UINT8 y = state->m_io_peny->read();
 
 	switch( state->m_port_f_latch & 0x0f )
 	{
@@ -122,10 +131,10 @@ static void palm_spim_exchange( device_t *device )
 
 void palm_state::machine_start()
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	space.install_read_bank (0x000000, machine().device<ram_device>(RAM_TAG)->size() - 1, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
-	space.install_write_bank(0x000000, machine().device<ram_device>(RAM_TAG)->size() - 1, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
-	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	space.install_read_bank (0x000000, m_ram->size() - 1, m_ram->size() - 1, 0, "bank1");
+	space.install_write_bank(0x000000, m_ram->size() - 1, m_ram->size() - 1, 0, "bank1");
+	membank("bank1")->set_base(m_ram->pointer());
 
 	save_item(NAME(m_port_f_latch));
 	save_item(NAME(m_spim_data));
@@ -138,8 +147,8 @@ void palm_state::machine_reset()
 {
 	// Copy boot ROM
 	UINT8* bios = machine().root_device().memregion("bios")->base();
-	memset(machine().device<ram_device>(RAM_TAG)->pointer(), 0, machine().device<ram_device>(RAM_TAG)->size());
-	memcpy(machine().device<ram_device>(RAM_TAG)->pointer(), bios, 0x20000);
+	memset(m_ram->pointer(), 0, m_ram->size());
+	memcpy(m_ram->pointer(), bios, 0x20000);
 
 	m_maincpu->reset();
 }
