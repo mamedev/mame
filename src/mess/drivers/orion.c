@@ -12,15 +12,12 @@
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
-#include "sound/speaker.h"
 #include "sound/wave.h"
-#include "machine/mc146818.h"
 #include "imagedev/cassette.h"
 #include "imagedev/cartslot.h"
 #include "formats/smx_dsk.h"
 #include "formats/rk_cas.h"
 #include "includes/orion.h"
-#include "machine/ram.h"
 
 /* Address maps */
 
