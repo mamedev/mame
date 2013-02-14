@@ -43,6 +43,7 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 	m_rcv_baud = 0;
 	m_tra_flags = 0;
 	m_rcv_register_data = 0x8000;
+	m_rcv_bit_count = 0;
 }
 
 device_serial_interface::~device_serial_interface()
@@ -194,6 +195,7 @@ void device_serial_interface::receive_register_extract()
 	receive_register_reset();
 
 	/* strip off stop bits and parity */
+	assert(m_rcv_bit_count >0 && m_rcv_bit_count <= 16);
 	data = m_rcv_register_data>>(16-m_rcv_bit_count);
 
 	/* mask off other bits so data byte has 0's in unused bits */
