@@ -168,8 +168,8 @@ DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_nmi_delay_count)
 
 	if (!m_nmi_delay_counter)
 	{
-		machine().device("z80ne")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
-		machine().device("z80ne")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
+		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	return address;
 }
@@ -180,7 +180,7 @@ DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_nmi_delay_count)
  */
 DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_reset_delay_count)
 {
-	address_space &space = machine().device("z80ne")->memory().space(AS_PROGRAM);
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/*
 	 * TODO: when debugger is active, his memory access causes this callback
 	 *
@@ -191,7 +191,7 @@ DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_reset_delay_count)
 	if (!m_reset_delay_counter)
 	{
 		/* remove this callback */
-		machine().device("z80ne")->memory().space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
+		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
 		/* and switch to RAM bank at address 0x0000 */
 		m_bank1->set_entry( 0 ); /* RAM at 0x0000 (bank 1) */
 	}
