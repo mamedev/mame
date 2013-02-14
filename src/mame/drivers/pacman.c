@@ -1357,12 +1357,12 @@ static ADDRESS_MAP_START( nmouse_portmap, AS_IO, 8, pacman_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( theglobp_portmap, AS_IO, 8, pacman_state )
-	AM_RANGE(0x00, 0xff) AM_READ_LEGACY(theglobp_decrypt_rom)   /* Switch protection logic */
+	AM_RANGE(0x00, 0xff) AM_READ(theglobp_decrypt_rom)   /* Switch protection logic */
 	AM_IMPORT_FROM(writeport)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( acitya_portmap, AS_IO, 8, pacman_state )
-	AM_RANGE(0x00, 0xff) AM_READ_LEGACY(acitya_decrypt_rom) /* Switch protection logic */
+	AM_RANGE(0x00, 0xff) AM_READ(acitya_decrypt_rom) /* Switch protection logic */
 	AM_IMPORT_FROM(writeport)
 ADDRESS_MAP_END
 
@@ -6033,12 +6033,12 @@ DRIVER_INIT_MEMBER(pacman_state,woodpek)
 
 DRIVER_INIT_MEMBER(pacman_state,pacplus)
 {
-	pacplus_decode(machine());
+	pacplus_decode();
 }
 
 DRIVER_INIT_MEMBER(pacman_state,jumpshot)
 {
-	jumpshot_decode(machine());
+	jumpshot_decode();
 }
 
 DRIVER_INIT_MEMBER(pacman_state,drivfrcp)

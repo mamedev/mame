@@ -16,13 +16,13 @@ David Widel d_widel@hotmail.com
 #include "includes/pacman.h"
 
 
-static void acitya_decrypt_rom_8(running_machine &machine)
+void pacman_state::acitya_decrypt_rom_8()
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.root_device().memregion("maincpu")->base();
+	RAM = memregion("maincpu")->base();
 
 
 	for (mem=0;mem<0x4000;mem++)
@@ -51,13 +51,13 @@ static void acitya_decrypt_rom_8(running_machine &machine)
 }
 
 
-static void acitya_decrypt_rom_9(running_machine &machine)
+void pacman_state::acitya_decrypt_rom_9()
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.root_device().memregion("maincpu")->base();
+	RAM = memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -83,13 +83,13 @@ static void acitya_decrypt_rom_9(running_machine &machine)
 	return;
 }
 
-static void acitya_decrypt_rom_A(running_machine &machine)
+void pacman_state::acitya_decrypt_rom_A()
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.root_device().memregion("maincpu")->base();
+	RAM = memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -115,13 +115,13 @@ static void acitya_decrypt_rom_A(running_machine &machine)
 	return;
 }
 
-static void acitya_decrypt_rom_B(running_machine &machine)
+void pacman_state::acitya_decrypt_rom_B()
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.root_device().memregion("maincpu")->base();
+	RAM = memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -150,26 +150,25 @@ static void acitya_decrypt_rom_B(running_machine &machine)
 }
 
 
-READ8_HANDLER( acitya_decrypt_rom )
+READ8_MEMBER(pacman_state::acitya_decrypt_rom )
 {
-	pacman_state *state = space.machine().driver_data<pacman_state>();
 	if (offset & 0x01)
 	{
-		state->m_counter = (state->m_counter - 1) & 0x0F;
+		m_counter = (m_counter - 1) & 0x0F;
 	}
 	else
 	{
-		state->m_counter = (state->m_counter + 1) & 0x0F;
+		m_counter = (m_counter + 1) & 0x0F;
 	}
 
-	switch(state->m_counter)
+	switch(m_counter)
 	{
-		case 0x08:  state->membank ("bank1")->set_entry (0);        break;
-		case 0x09:  state->membank ("bank1")->set_entry (1);        break;
-		case 0x0A:  state->membank ("bank1")->set_entry (2);        break;
-		case 0x0B:  state->membank ("bank1")->set_entry (3);        break;
+		case 0x08:  membank ("bank1")->set_entry (0);        break;
+		case 0x09:  membank ("bank1")->set_entry (1);        break;
+		case 0x0A:  membank ("bank1")->set_entry (2);        break;
+		case 0x0B:  membank ("bank1")->set_entry (3);        break;
 		default:
-			logerror("Invalid counter = %02X\n",state->m_counter);
+			logerror("Invalid counter = %02X\n",m_counter);
 			break;
 	}
 
@@ -184,10 +183,10 @@ MACHINE_START_MEMBER(pacman_state,acitya)
 	/* While the PAL supports up to 16 decryption methods, only four
 	    are actually used in the PAL.  Therefore, we'll take a little
 	    memory overhead and decrypt the ROMs using each method in advance. */
-	acitya_decrypt_rom_8(machine());
-	acitya_decrypt_rom_9(machine());
-	acitya_decrypt_rom_A(machine());
-	acitya_decrypt_rom_B(machine());
+	acitya_decrypt_rom_8();
+	acitya_decrypt_rom_9();
+	acitya_decrypt_rom_A();
+	acitya_decrypt_rom_B();
 
 	membank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
 

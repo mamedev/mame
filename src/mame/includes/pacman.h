@@ -125,10 +125,6 @@ public:
 	DECLARE_VIDEO_START(pacman);
 	DECLARE_PALETTE_INIT(pacman);
 	DECLARE_VIDEO_START(birdiy);
-	DECLARE_MACHINE_START(theglobp);
-	DECLARE_MACHINE_RESET(theglobp);
-	DECLARE_MACHINE_START(acitya);
-	DECLARE_MACHINE_RESET(acitya);
 	DECLARE_VIDEO_START(s2650games);
 	DECLARE_MACHINE_RESET(mschamp);
 	DECLARE_MACHINE_RESET(superabc);
@@ -145,16 +141,30 @@ public:
 	void korosuke_rom_decode();
 	void eyes_decode(UINT8 *data);
 	void mspacman_install_patches(UINT8 *ROM);
+	
+	// theglopb.c
+	void theglobp_decrypt_rom_8();
+	void theglobp_decrypt_rom_9();
+	void theglobp_decrypt_rom_A();
+	void theglobp_decrypt_rom_B();
+	DECLARE_READ8_MEMBER(theglobp_decrypt_rom);
+	DECLARE_MACHINE_START(theglobp);
+	DECLARE_MACHINE_RESET(theglobp);
+
+	// pacplus.c
+	UINT8 pacplus_decrypt(int addr, UINT8 e);
+	void pacplus_decode();
+
+	// jumpshot.c
+	UINT8 jumpshot_decrypt(int addr, UINT8 e);
+	void jumpshot_decode();
+	
+	// acitya.c
+	void acitya_decrypt_rom_8();
+	void acitya_decrypt_rom_9();
+	void acitya_decrypt_rom_A();
+	void acitya_decrypt_rom_B();
+	DECLARE_READ8_MEMBER(acitya_decrypt_rom);
+	DECLARE_MACHINE_START(acitya);
+	DECLARE_MACHINE_RESET(acitya);	
 };
-
-/*----------- defined in machine/pacplus.c -----------*/
-void pacplus_decode(running_machine &machine);
-
-/*----------- defined in machine/jumpshot.c -----------*/
-void jumpshot_decode(running_machine &machine);
-
-/*----------- defined in machine/theglobp.c -----------*/
-DECLARE_READ8_HANDLER( theglobp_decrypt_rom );
-
-/*----------- defined in machine/acitya.c -------------*/
-DECLARE_READ8_HANDLER( acitya_decrypt_rom );

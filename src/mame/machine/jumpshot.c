@@ -2,7 +2,7 @@
 #include "includes/pacman.h"
 
 
-static UINT8 decrypt(int addr, UINT8 e)
+UINT8 pacman_state::jumpshot_decrypt(int addr, UINT8 e)
 {
 	static const UINT8 swap_xor_table[6][9] =
 	{
@@ -39,16 +39,16 @@ static UINT8 decrypt(int addr, UINT8 e)
 }
 
 
-void jumpshot_decode(running_machine &machine)
+void pacman_state::jumpshot_decode()
 {
 	int i;
 	UINT8 *RAM;
 
 	/* CPU ROMs */
 
-	RAM = machine.root_device().memregion("maincpu")->base();
+	RAM = memregion("maincpu")->base();
 	for (i = 0; i < 0x4000; i++)
 	{
-		RAM[i] = decrypt(i,RAM[i]);
+		RAM[i] = jumpshot_decrypt(i,RAM[i]);
 	}
 }
