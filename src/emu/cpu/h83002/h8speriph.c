@@ -406,7 +406,6 @@ void h8s_dtce_check(h83xx_state *h8,  int vecnum)
 void h8s_periph_reset(h83xx_state *h8)
 {
 	int tpu_max = h8->tpu_max;
-	h8->tpu_max = tpu_max;
 	if ((h8->device->type() == H8S2241) || (h8->device->type() == H8S2246))
 	{
 		memcpy( h8->per_regs, H8S_RESET_H8S_IO_224x, sizeof( h8->per_regs));
@@ -661,8 +660,8 @@ static TIMER_CALLBACK( h8s_tmr_callback)
 
 void h8s_tpu_init(h83xx_state *h8)
 {
-	const int tpu_max = ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394) || (h8->device->type() == H8S2655)) ? 6 : 3;
-	for (int i = 0; i < tpu_max; i++)
+	h8->tpu_max = ((h8->device->type() == H8S2323) || (h8->device->type() == H8S2394) || (h8->device->type() == H8S2655)) ? 6 : 3;
+	for (int i = 0; i < h8->tpu_max; i++)
 	{
 		h8->tpu[i].timer = h8->device->machine().scheduler().timer_alloc(FUNC(h8s_tpu_callback), h8);
 		h8->tpu[i].timer->adjust(attotime::never, i);
