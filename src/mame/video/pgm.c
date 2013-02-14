@@ -16,7 +16,7 @@
 // bg pri is 2
 // sprite already here is 1 / 3
 
-INLINE void pgm_draw_pix( int xdrawpos, int pri, UINT16* dest, UINT8* destpri, UINT16 srcdat)
+inline void pgm_state::pgm_draw_pix( int xdrawpos, int pri, UINT16* dest, UINT8* destpri, UINT16 srcdat)
 {
 	if ((xdrawpos >= 0) && (xdrawpos < 448))
 	{
@@ -39,7 +39,7 @@ INLINE void pgm_draw_pix( int xdrawpos, int pri, UINT16* dest, UINT8* destpri, U
 	}
 }
 
-INLINE void pgm_draw_pix_nopri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat)
+inline void pgm_state::pgm_draw_pix_nopri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat)
 {
 	if ((xdrawpos >= 0) && (xdrawpos < 448))
 	{
@@ -51,7 +51,7 @@ INLINE void pgm_draw_pix_nopri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT
 	}
 }
 
-INLINE void pgm_draw_pix_pri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat)
+inline void pgm_state::pgm_draw_pix_pri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat)
 {
 	if ((xdrawpos >= 0) && (xdrawpos < 448))
 	{
@@ -71,16 +71,15 @@ INLINE void pgm_draw_pix_pri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16
   for complex zoomed cases
 *************************************************************************/
 
-static void draw_sprite_line( running_machine &machine, int wide, UINT16* dest, UINT8* destpri, int xzoom, int xgrow, int flip, int xpos, int pri, int realxsize, int palt, int draw )
+void pgm_state::draw_sprite_line( int wide, UINT16* dest, UINT8* destpri, int xzoom, int xgrow, int flip, int xpos, int pri, int realxsize, int palt, int draw )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
 	int xcnt,xcntdraw;
 	int xzoombit;
 	int xoffset = 0;
 	int xdrawpos = 0;
 
-	UINT8 *adata = state->m_sprite_a_region;
-	size_t  adatasize = state->m_sprite_a_region_size - 1;
+	UINT8 *adata = m_sprite_a_region;
+	size_t  adatasize = m_sprite_a_region_size - 1;
 
 	UINT16 msk;
 	UINT16 srcdat;
@@ -92,14 +91,14 @@ static void draw_sprite_line( running_machine &machine, int wide, UINT16* dest, 
 	{
 		int x;
 
-		msk = ((state->m_bdata[(state->m_boffset + 1) & state->m_bdatasize] << 8) |( state->m_bdata[(state->m_boffset + 0) & state->m_bdatasize] << 0));
+		msk = ((m_bdata[(m_boffset + 1) & m_bdatasize] << 8) |( m_bdata[(m_boffset + 0) & m_bdatasize] << 0));
 
 		for (x = 0; x < 16; x++)
 		{
 			if (!(msk & 0x0001))
 			{
-				srcdat = adata[state->m_aoffset & adatasize] + palt * 32;
-				state->m_aoffset++;
+				srcdat = adata[m_aoffset & adatasize] + palt * 32;
+				m_aoffset++;
 
 				if (draw)
 				{
@@ -159,11 +158,11 @@ static void draw_sprite_line( running_machine &machine, int wide, UINT16* dest, 
 
 		}
 
-		state->m_boffset += 2;
+		m_boffset += 2;
 	}
 }
 
-static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri )
+void pgm_state::draw_sprite_new_zoomed( int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri )
 {
 	int ycnt;
 	int ydrawpos;
@@ -175,11 +174,11 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 	int xcnt = 0;
 
 
-	state->m_aoffset = (state->m_bdata[(state->m_boffset + 3) & state->m_bdatasize] << 24) | (state->m_bdata[(state->m_boffset + 2) & state->m_bdatasize] << 16) |
-				(state->m_bdata[(state->m_boffset + 1) & state->m_bdatasize] << 8) | (state->m_bdata[(state->m_boffset + 0) & state->m_bdatasize] << 0);
-	state->m_aoffset = state->m_aoffset >> 2; state->m_aoffset *= 3;
+	m_aoffset = (m_bdata[(m_boffset + 3) & m_bdatasize] << 24) | (m_bdata[(m_boffset + 2) & m_bdatasize] << 16) |
+				(m_bdata[(m_boffset + 1) & m_bdatasize] << 8) | (m_bdata[(m_boffset + 0) & m_bdatasize] << 0);
+	m_aoffset = m_aoffset >> 2; m_aoffset *= 3;
 
-	state->m_boffset+=4;
+	m_boffset+=4;
 
 	/* precalculate where drawing will end, for flipped zoomed cases. */
 	/* if we're to avoid pre-decoding the data for each sprite each time we draw then we have to draw the sprite data
@@ -224,8 +223,8 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 
 		if (yzoombit == 1 && ygrow == 1) // double this line
 		{
-			int temp_aoffset = state->m_aoffset;
-			int temp_boffset = state->m_boffset;
+			int temp_aoffset = m_aoffset;
+			int temp_boffset = m_boffset;
 
 			if (!(flip & 0x02))
 				ydrawpos = ypos + ycntdraw;
@@ -236,18 +235,18 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 			{
 				dest = &bitmap.pix16(ydrawpos);
 				destpri = &priority_bitmap.pix8(ydrawpos);
-				draw_sprite_line(machine, wide, dest, destpri, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 1);
+				draw_sprite_line(wide, dest, destpri, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 1);
 			}
 			else
 			{
-				draw_sprite_line(machine, wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
+				draw_sprite_line(wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
 			}
 
 			ycntdraw++;
 
 			// we need to draw this line again, so restore our pointers to previous values
-			state->m_aoffset = temp_aoffset;
-			state->m_boffset = temp_boffset;
+			m_aoffset = temp_aoffset;
+			m_boffset = temp_boffset;
 
 			if (!(flip & 0x02))
 				ydrawpos = ypos + ycntdraw;
@@ -258,11 +257,11 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 			{
 				dest = &bitmap.pix16(ydrawpos);
 				destpri = &priority_bitmap.pix8(ydrawpos);
-				draw_sprite_line(machine, wide, dest, destpri, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 1);
+				draw_sprite_line(wide, dest, destpri, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 1);
 			}
 			else
 			{
-				draw_sprite_line(machine, wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
+				draw_sprite_line(wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
 
 				if (!(flip & 0x02))
 				{
@@ -282,7 +281,7 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 		else if (yzoombit == 1 && ygrow == 0)
 		{
 			/* skip this line */
-			draw_sprite_line(machine, wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
+			draw_sprite_line(wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
 		}
 		else /* normal line */
 		{
@@ -295,11 +294,11 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 			{
 				dest = &bitmap.pix16(ydrawpos);
 				destpri = &priority_bitmap.pix8(ydrawpos);
-				draw_sprite_line(machine, wide, dest, destpri, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 1);
+				draw_sprite_line(wide, dest, destpri, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 1);
 			}
 			else
 			{
-				draw_sprite_line(machine, wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
+				draw_sprite_line(wide, NULL, NULL, xzoom, xgrow, flip, xpos, pri, realxsize, palt, 0);
 
 				if (!(flip & 0x02))
 				{
@@ -322,14 +321,13 @@ static void draw_sprite_new_zoomed( pgm_state *state, running_machine &machine, 
 }
 
 
-static void draw_sprite_line_basic( running_machine &machine, int wide, UINT16* dest, UINT8* destpri, int flip, int xpos, int pri, int realxsize, int palt, int draw )
+void pgm_state::draw_sprite_line_basic( int wide, UINT16* dest, UINT8* destpri, int flip, int xpos, int pri, int realxsize, int palt, int draw )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
 	int xcnt,xcntdraw;
 	int xoffset = 0;
 	int xdrawpos = 0;
-	UINT8 *adata = state->m_sprite_a_region;
-	size_t  adatasize = state->m_sprite_a_region_size - 1;
+	UINT8 *adata = m_sprite_a_region;
+	size_t  adatasize = m_sprite_a_region_size - 1;
 
 	UINT16 msk;
 	UINT16 srcdat;
@@ -343,14 +341,14 @@ static void draw_sprite_line_basic( running_machine &machine, int wide, UINT16* 
 		{
 			int x;
 
-			msk = ((state->m_bdata[(state->m_boffset + 1) & state->m_bdatasize] << 8) |( state->m_bdata[(state->m_boffset + 0) & state->m_bdatasize] << 0));
+			msk = ((m_bdata[(m_boffset + 1) & m_bdatasize] << 8) |( m_bdata[(m_boffset + 0) & m_bdatasize] << 0));
 
 			for (x = 0; x < 16; x++)
 			{
 				if (!(msk & 0x0001))
 				{
-					srcdat = adata[state->m_aoffset & adatasize] + palt * 32;
-					state->m_aoffset++;
+					srcdat = adata[m_aoffset & adatasize] + palt * 32;
+					m_aoffset++;
 
 					if (draw)
 					{
@@ -376,7 +374,7 @@ static void draw_sprite_line_basic( running_machine &machine, int wide, UINT16* 
 				msk >>= 1;
 			}
 
-			state->m_boffset += 2;
+			m_boffset += 2;
 		}
 	}
 	else
@@ -385,14 +383,14 @@ static void draw_sprite_line_basic( running_machine &machine, int wide, UINT16* 
 		{
 			int x;
 
-			msk = ((state->m_bdata[(state->m_boffset + 1) & state->m_bdatasize] << 8) |( state->m_bdata[(state->m_boffset + 0) & state->m_bdatasize] << 0));
+			msk = ((m_bdata[(m_boffset + 1) & m_bdatasize] << 8) |( m_bdata[(m_boffset + 0) & m_bdatasize] << 0));
 
 			for (x = 0; x < 16; x++)
 			{
 				if (!(msk & 0x0001))
 				{
-					srcdat = adata[state->m_aoffset & adatasize] + palt * 32;
-					state->m_aoffset++;
+					srcdat = adata[m_aoffset & adatasize] + palt * 32;
+					m_aoffset++;
 
 					if (draw)
 					{
@@ -418,7 +416,7 @@ static void draw_sprite_line_basic( running_machine &machine, int wide, UINT16* 
 				msk >>= 1;
 			}
 
-			state->m_boffset += 2;
+			m_boffset += 2;
 		}
 	}
 }
@@ -428,7 +426,7 @@ static void draw_sprite_line_basic( running_machine &machine, int wide, UINT16* 
   simplified version for non-zoomed cases, a bit faster
 *************************************************************************/
 
-static void draw_sprite_new_basic( pgm_state *state, running_machine &machine, int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, int pri )
+void pgm_state::draw_sprite_new_basic( int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, int pri )
 {
 	int ycnt;
 	int ydrawpos;
@@ -436,11 +434,11 @@ static void draw_sprite_new_basic( pgm_state *state, running_machine &machine, i
 	UINT8* destpri;
 	int ycntdraw;
 
-	state->m_aoffset = (state->m_bdata[(state->m_boffset + 3) & state->m_bdatasize] << 24) | (state->m_bdata[(state->m_boffset + 2) & state->m_bdatasize] << 16) |
-				(state->m_bdata[(state->m_boffset + 1) & state->m_bdatasize] << 8) | (state->m_bdata[(state->m_boffset + 0) & state->m_bdatasize] << 0);
-	state->m_aoffset = state->m_aoffset >> 2; state->m_aoffset *= 3;
+	m_aoffset = (m_bdata[(m_boffset + 3) & m_bdatasize] << 24) | (m_bdata[(m_boffset + 2) & m_bdatasize] << 16) |
+				(m_bdata[(m_boffset + 1) & m_bdatasize] << 8) | (m_bdata[(m_boffset + 0) & m_bdatasize] << 0);
+	m_aoffset = m_aoffset >> 2; m_aoffset *= 3;
 
-	state->m_boffset+=4;
+	m_boffset+=4;
 
 	int realysize = high-1;
 	int realxsize = (wide * 16)-1;
@@ -460,11 +458,11 @@ static void draw_sprite_new_basic( pgm_state *state, running_machine &machine, i
 		{
 			dest = &bitmap.pix16(ydrawpos);
 			destpri = &priority_bitmap.pix8(ydrawpos);
-			draw_sprite_line_basic(machine, wide, dest, destpri, flip, xpos, pri, realxsize, palt, 1);
+			draw_sprite_line_basic(wide, dest, destpri, flip, xpos, pri, realxsize, palt, 1);
 		}
 		else
 		{
-			draw_sprite_line_basic(machine, wide, NULL, NULL, flip, xpos, pri, realxsize, palt, 0);
+			draw_sprite_line_basic(wide, NULL, NULL, flip, xpos, pri, realxsize, palt, 0);
 
 			if (!(flip & 0x02))
 			{
@@ -484,7 +482,7 @@ static void draw_sprite_new_basic( pgm_state *state, running_machine &machine, i
 }
 
 
-static void draw_sprites( pgm_state *state, running_machine &machine, bitmap_ind16& spritebitmap, UINT16 *sprite_source, bitmap_ind8& priority_bitmap )
+void pgm_state::draw_sprites( bitmap_ind16& spritebitmap, UINT16 *sprite_source, bitmap_ind8& priority_bitmap )
 {
 	/* ZZZZ Zxxx xxxx xxxx
 	   zzzz z-yy yyyy yyyy
@@ -493,7 +491,7 @@ static void draw_sprites( pgm_state *state, running_machine &machine, bitmap_ind
 	   wwww wwwh hhhh hhhh
 	*/
 
-	const UINT16 *finish = state->m_spritebufferram + (0xa00 / 2);
+	const UINT16 *finish = m_spritebufferram + (0xa00 / 2);
 
 	UINT16* start = sprite_source;
 
@@ -521,7 +519,7 @@ static void draw_sprites( pgm_state *state, running_machine &machine, bitmap_ind
 
 		UINT32 xzoom, yzoom;
 
-		UINT16* sprite_zoomtable = &state->m_videoregs[0x1000 / 2];
+		UINT16* sprite_zoomtable = &m_videoregs[0x1000 / 2];
 
 		if (xgrow)
 		{
@@ -544,9 +542,9 @@ static void draw_sprites( pgm_state *state, running_machine &machine, bitmap_ind
 
 		//if ((priority == 1) && (pri == 0)) break;
 
-		state->m_boffset = boff;
-		if ((!xzoom) && (!yzoom)) draw_sprite_new_basic(state, machine, wide, high, xpos, ypos, palt, flip, spritebitmap, priority_bitmap, pri );
-		else draw_sprite_new_zoomed(state, machine, wide, high, xpos, ypos, palt, flip, spritebitmap, priority_bitmap, xzoom, xgrow, yzoom, ygrow, pri );
+		m_boffset = boff;
+		if ((!xzoom) && (!yzoom)) draw_sprite_new_basic(wide, high, xpos, ypos, palt, flip, spritebitmap, priority_bitmap, pri );
+		else draw_sprite_new_zoomed(wide, high, xpos, ypos, palt, flip, spritebitmap, priority_bitmap, xzoom, xgrow, yzoom, ygrow, pri );
 
 		sprite_source -= 5;
 	}
@@ -650,7 +648,7 @@ UINT32 pgm_state::screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap,
 
 	m_bg_tilemap->draw(bitmap, cliprect, 0, 2);
 
-	draw_sprites(this, machine(), bitmap, m_spritebufferram, machine().priority_bitmap);
+	draw_sprites(bitmap, m_spritebufferram, machine().priority_bitmap);
 
 	m_tx_tilemap->set_scrolly(0, m_videoregs[0x5000/2]);
 	m_tx_tilemap->set_scrollx(0, m_videoregs[0x6000/2]); // Check

@@ -15,63 +15,60 @@
 
 /*** ASIC 3 (oriental legends protection) ****************************************/
 
-static void asic3_compute_hold(running_machine &machine)
+void pgm_asic3_state::asic3_compute_hold()
 {
-	pgm_asic3_state *state = machine.driver_data<pgm_asic3_state>();
-
 	// The mode is dependent on the region
 	static const int modes[4] = { 1, 1, 3, 2 };
-	int mode = modes[machine.root_device().ioport("Region")->read() & 3];
+	int mode = modes[ioport("Region")->read() & 3];
 
 	switch (mode)
 	{
 	case 1:
-		state->m_asic3_hold =
-			(state->m_asic3_hold << 1)
+		m_asic3_hold =
+			(m_asic3_hold << 1)
 				^ 0x2bad
-				^ BIT(state->m_asic3_hold, 15) ^ BIT(state->m_asic3_hold, 10) ^ BIT(state->m_asic3_hold, 8) ^ BIT(state->m_asic3_hold, 5)
-				^ BIT(state->m_asic3_z, state->m_asic3_y)
-				^ (BIT(state->m_asic3_x, 0) << 1) ^ (BIT(state->m_asic3_x, 1) << 6) ^ (BIT(state->m_asic3_x, 2) << 10) ^ (BIT(state->m_asic3_x, 3) << 14);
+				^ BIT(m_asic3_hold, 15) ^ BIT(m_asic3_hold, 10) ^ BIT(m_asic3_hold, 8) ^ BIT(m_asic3_hold, 5)
+				^ BIT(m_asic3_z, m_asic3_y)
+				^ (BIT(m_asic3_x, 0) << 1) ^ (BIT(m_asic3_x, 1) << 6) ^ (BIT(m_asic3_x, 2) << 10) ^ (BIT(m_asic3_x, 3) << 14);
 		break;
 	case 2:
-		state->m_asic3_hold =
-			(state->m_asic3_hold << 1)
+		m_asic3_hold =
+			(m_asic3_hold << 1)
 				^ 0x2bad
-				^ BIT(state->m_asic3_hold, 15) ^ BIT(state->m_asic3_hold, 7) ^ BIT(state->m_asic3_hold, 6) ^ BIT(state->m_asic3_hold, 5)
-				^ BIT(state->m_asic3_z, state->m_asic3_y)
-				^ (BIT(state->m_asic3_x, 0) << 4) ^ (BIT(state->m_asic3_x, 1) << 6) ^ (BIT(state->m_asic3_x, 2) << 10) ^ (BIT(state->m_asic3_x, 3) << 12);
+				^ BIT(m_asic3_hold, 15) ^ BIT(m_asic3_hold, 7) ^ BIT(m_asic3_hold, 6) ^ BIT(m_asic3_hold, 5)
+				^ BIT(m_asic3_z, m_asic3_y)
+				^ (BIT(m_asic3_x, 0) << 4) ^ (BIT(m_asic3_x, 1) << 6) ^ (BIT(m_asic3_x, 2) << 10) ^ (BIT(m_asic3_x, 3) << 12);
 		break;
 	case 3:
-		state->m_asic3_hold =
-			(state->m_asic3_hold << 1)
+		m_asic3_hold =
+			(m_asic3_hold << 1)
 				^ 0x2bad
-				^ BIT(state->m_asic3_hold, 15) ^ BIT(state->m_asic3_hold, 10) ^ BIT(state->m_asic3_hold, 8) ^ BIT(state->m_asic3_hold, 5)
-				^ BIT(state->m_asic3_z, state->m_asic3_y)
-				^ (BIT(state->m_asic3_x, 0) << 4) ^ (BIT(state->m_asic3_x, 1) << 6) ^ (BIT(state->m_asic3_x, 2) << 10) ^ (BIT(state->m_asic3_x, 3) << 12);
+				^ BIT(m_asic3_hold, 15) ^ BIT(m_asic3_hold, 10) ^ BIT(m_asic3_hold, 8) ^ BIT(m_asic3_hold, 5)
+				^ BIT(m_asic3_z, m_asic3_y)
+				^ (BIT(m_asic3_x, 0) << 4) ^ (BIT(m_asic3_x, 1) << 6) ^ (BIT(m_asic3_x, 2) << 10) ^ (BIT(m_asic3_x, 3) << 12);
 		break;
 	}
 }
 
-READ16_HANDLER( pgm_asic3_r )
+READ16_MEMBER(pgm_asic3_state::pgm_asic3_r )
 {
-	pgm_asic3_state *state = space.machine().driver_data<pgm_asic3_state>();
 	UINT8 res = 0;
 	/* region is supplied by the protection device */
 
-	switch (state->m_asic3_reg)
+	switch (m_asic3_reg)
 	{
-	case 0x00: res = (state->m_asic3_latch[0] & 0xf7) | ((state->ioport("Region")->read() << 3) & 0x08); break;
-	case 0x01: res = state->m_asic3_latch[1]; break;
-	case 0x02: res = (state->m_asic3_latch[2] & 0x7f) | ((state->ioport("Region")->read() << 6) & 0x80); break;
+	case 0x00: res = (m_asic3_latch[0] & 0xf7) | ((ioport("Region")->read() << 3) & 0x08); break;
+	case 0x01: res = m_asic3_latch[1]; break;
+	case 0x02: res = (m_asic3_latch[2] & 0x7f) | ((ioport("Region")->read() << 6) & 0x80); break;
 	case 0x03:
-		res = (BIT(state->m_asic3_hold, 15) << 0)
-			| (BIT(state->m_asic3_hold, 12) << 1)
-			| (BIT(state->m_asic3_hold, 13) << 2)
-			| (BIT(state->m_asic3_hold, 10) << 3)
-			| (BIT(state->m_asic3_hold, 7) << 4)
-			| (BIT(state->m_asic3_hold, 9) << 5)
-			| (BIT(state->m_asic3_hold, 2) << 6)
-			| (BIT(state->m_asic3_hold, 5) << 7);
+		res = (BIT(m_asic3_hold, 15) << 0)
+			| (BIT(m_asic3_hold, 12) << 1)
+			| (BIT(m_asic3_hold, 13) << 2)
+			| (BIT(m_asic3_hold, 10) << 3)
+			| (BIT(m_asic3_hold, 7) << 4)
+			| (BIT(m_asic3_hold, 9) << 5)
+			| (BIT(m_asic3_hold, 2) << 6)
+			| (BIT(m_asic3_hold, 5) << 7);
 		break;
 	case 0x20: res = 0x49; break;
 	case 0x21: res = 0x47; break;
@@ -96,48 +93,44 @@ READ16_HANDLER( pgm_asic3_r )
 	return res;
 }
 
-WRITE16_HANDLER( pgm_asic3_w )
+WRITE16_MEMBER(pgm_asic3_state::pgm_asic3_w )
 {
-	pgm_asic3_state *state = space.machine().driver_data<pgm_asic3_state>();
-
 	if(ACCESSING_BITS_0_7)
 	{
-		if (state->m_asic3_reg < 3)
-			state->m_asic3_latch[state->m_asic3_reg] = data << 1;
-		else if (state->m_asic3_reg == 0xa0)
-			state->m_asic3_hold = 0;
-		else if (state->m_asic3_reg == 0x40)
+		if (m_asic3_reg < 3)
+			m_asic3_latch[m_asic3_reg] = data << 1;
+		else if (m_asic3_reg == 0xa0)
+			m_asic3_hold = 0;
+		else if (m_asic3_reg == 0x40)
 		{
-			state->m_asic3_h2 = state->m_asic3_h1;
-			state->m_asic3_h1 = data;
+			m_asic3_h2 = m_asic3_h1;
+			m_asic3_h1 = data;
 		}
-		else if (state->m_asic3_reg == 0x48)
+		else if (m_asic3_reg == 0x48)
 		{
-			state->m_asic3_x = 0;
-			if (!(state->m_asic3_h2 & 0x0a))
-				state->m_asic3_x |= 8;
-			if (!(state->m_asic3_h2 & 0x90))
-				state->m_asic3_x |= 4;
-			if (!(state->m_asic3_h1 & 0x06))
-				state->m_asic3_x |= 2;
-			if (!(state->m_asic3_h1 & 0x90))
-				state->m_asic3_x |= 1;
+			m_asic3_x = 0;
+			if (!(m_asic3_h2 & 0x0a))
+				m_asic3_x |= 8;
+			if (!(m_asic3_h2 & 0x90))
+				m_asic3_x |= 4;
+			if (!(m_asic3_h1 & 0x06))
+				m_asic3_x |= 2;
+			if (!(m_asic3_h1 & 0x90))
+				m_asic3_x |= 1;
 		}
-		else if(state->m_asic3_reg >= 0x80 && state->m_asic3_reg <= 0x87)
+		else if(m_asic3_reg >= 0x80 && m_asic3_reg <= 0x87)
 		{
-			state->m_asic3_y = state->m_asic3_reg & 7;
-			state->m_asic3_z = data;
-			asic3_compute_hold(space.machine());
+			m_asic3_y = m_asic3_reg & 7;
+			m_asic3_z = data;
+			asic3_compute_hold();
 		}
 	}
 }
 
-WRITE16_HANDLER( pgm_asic3_reg_w )
+WRITE16_MEMBER(pgm_asic3_state::pgm_asic3_reg_w )
 {
-	pgm_asic3_state *state = space.machine().driver_data<pgm_asic3_state>();
-
 	if(ACCESSING_BITS_0_7)
-		state->m_asic3_reg = data & 0xff;
+		m_asic3_reg = data & 0xff;
 }
 
 
@@ -148,10 +141,10 @@ WRITE16_HANDLER( pgm_asic3_reg_w )
 
 DRIVER_INIT_MEMBER(pgm_asic3_state,orlegend)
 {
-	pgm_basic_init(machine());
+	pgm_basic_init();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xC0400e, 0xC0400f, FUNC(pgm_asic3_r), FUNC(pgm_asic3_w));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xC04000, 0xC04001, FUNC(pgm_asic3_reg_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xC0400e, 0xC0400f, read16_delegate(FUNC(pgm_asic3_state::pgm_asic3_r),this), write16_delegate(FUNC(pgm_asic3_state::pgm_asic3_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xC04000, 0xC04001, write16_delegate(FUNC(pgm_asic3_state::pgm_asic3_reg_w),this));
 
 	m_asic3_reg = 0;
 	m_asic3_latch[0] = 0;

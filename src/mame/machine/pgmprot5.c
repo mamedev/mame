@@ -26,16 +26,8 @@
 
 /* Dragon World 2 */
 
-static int protection_address;
-
-static UINT16 dw2_asic_reg[2];
-static UINT8 dw2_asic_z;
-static UINT8 dw2_asic_y;
-static UINT16 dw2_asic_hold;
-
-READ16_HANDLER( dw2_d80000_r )
+READ16_MEMBER(pgm_state::dw2_d80000_r )
 {
-//  pgm_state *state = space.machine().driver_data<pgm_state>();
 	UINT16 ret;
 /*  UINT16 test;
 
@@ -54,22 +46,20 @@ READ16_HANDLER( dw2_d80000_r )
             logerror("%06x: warning, reading with igs003_reg = %02x\n", space.device().safe_pc(), dw2_asic_reg[0]);
     }
 
-    test = BITSWAP16(state->m_mainram[protection_address], 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff; // original hack
+    test = BITSWAP16(m_mainram[protection_address], 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff; // original hack
 */
 	// This bitswap seems to also be common to a few IGS protection devices (igs011.c, Oriental Legend)
 	ret = BITSWAP16(dw2_asic_hold, 14,11,8,6,4,3,1,0, 5,2,9,7,10,13,12,15) & 0xff;
 /*
-    if ((ret != test) || (dw2_asic_hold != state->m_mainram[protection_address])) {
-        logerror ("Protection calculation error: SIMRET: %2.2x, HACKRET: %2.2x, SIMHOLD: %4.4x, REALHOLD: %4.4x\n", ret, test, dw2_asic_hold, state->m_mainram[protection_address]);
+    if ((ret != test) || (dw2_asic_hold != m_mainram[protection_address])) {
+        logerror ("Protection calculation error: SIMRET: %2.2x, HACKRET: %2.2x, SIMHOLD: %4.4x, REALHOLD: %4.4x\n", ret, test, dw2_asic_hold, m_mainram[protection_address]);
     }
 */
 	return ret;
 }
 
-WRITE16_HANDLER( dw2_d80000_w )
+WRITE16_MEMBER(pgm_state::dw2_d80000_w )
 {
-	pgm_state *state = space.machine().driver_data<pgm_state>();
-
 	COMBINE_DATA(&dw2_asic_reg[offset]);
 
 	if (offset == 0)
@@ -82,7 +72,7 @@ WRITE16_HANDLER( dw2_d80000_w )
 			// initialized. Ok to use as reset??
 			// The last "hold" value used is stored in NVRAM. Otherwise we either
 			// need to set the "hold" value as non-volatile or wipe NVRAM.
-			dw2_asic_hold = state->m_mainram[protection_address]; // hack
+			dw2_asic_hold = m_mainram[protection_address]; // hack
 		break;
 
 		case 0x09: // Used only on init...
@@ -155,15 +145,15 @@ WRITE16_HANDLER( dw2_d80000_w )
 }
 
 // What purpose to writes to this region serve? Written, but never read back? Must be related to the protection device?
-WRITE16_HANDLER(dw2_unk_w)
+WRITE16_MEMBER(pgm_state::dw2_unk_w)
 {
 //  logerror("%06x: warning, writing to address %6.6x = %4.4x\n", space.device().safe_pc(), 0xd00000+(offset*2), data);
 }
 
-static void pgm_dw2_decrypt(running_machine &machine)
+void pgm_state::pgm_dw2_decrypt()
 {
 	int i;
-	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base()+0x100000);
+	UINT16 *src = (UINT16 *) (memregion("maincpu")->base()+0x100000);
 
 	int rom_size = 0x80000;
 
@@ -180,22 +170,22 @@ static void pgm_dw2_decrypt(running_machine &machine)
 	}
 }
 
-static void drgwld2_common_init(running_machine &machine)
+void pgm_state::drgwld2_common_init()
 {
-	pgm_basic_init(machine);
-	pgm_dw2_decrypt(machine);
+	pgm_basic_init();
+	pgm_dw2_decrypt();
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0xd80000, 0xd80003, FUNC(dw2_d80000_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xd80000, 0xd80003, FUNC(dw2_d80000_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_write_handler(0xd00000, 0xd00fff, FUNC(dw2_unk_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0xd80000, 0xd80003, read16_delegate(FUNC(pgm_state::dw2_d80000_r),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd80000, 0xd80003, write16_delegate(FUNC(pgm_state::dw2_d80000_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0xd00000, 0xd00fff, write16_delegate(FUNC(pgm_state::dw2_unk_w),this));
 }
 
 DRIVER_INIT_MEMBER(pgm_state,drgw2)
 {
 	/* incomplete? */
-	UINT16 *mem16 = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
 
-	drgwld2_common_init(machine());
+	drgwld2_common_init();
 
 	protection_address = 0xcb7e/2; // $80cb7e;
 
@@ -209,9 +199,9 @@ DRIVER_INIT_MEMBER(pgm_state,drgw2)
 
 DRIVER_INIT_MEMBER(pgm_state,dw2v100x)
 {
-	UINT16 *mem16 = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
 
-	drgwld2_common_init(machine());
+	drgwld2_common_init();
 
 	protection_address = 0xcb7e/2; // $80cb7e;
 
@@ -225,9 +215,9 @@ DRIVER_INIT_MEMBER(pgm_state,dw2v100x)
 
 DRIVER_INIT_MEMBER(pgm_state,drgw2c)
 {
-	UINT16 *mem16 = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
 
-	drgwld2_common_init(machine());
+	drgwld2_common_init();
 
 	protection_address = 0xeece/2; // $80eece;
 
@@ -241,9 +231,9 @@ DRIVER_INIT_MEMBER(pgm_state,drgw2c)
 
 DRIVER_INIT_MEMBER(pgm_state,drgw2j)
 {
-	UINT16 *mem16 = (UINT16 *)machine().root_device().memregion("maincpu")->base();
+	UINT16 *mem16 = (UINT16 *)memregion("maincpu")->base();
 
-	drgwld2_common_init(machine());
+	drgwld2_common_init();
 
 	protection_address = 0x91cc/2; // $8091cc;
 

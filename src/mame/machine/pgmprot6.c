@@ -20,7 +20,7 @@
 #include "emu.h"
 #include "includes/pgm.h"
 
-static UINT32 olds_prot_addr( UINT16 addr )
+UINT32 pgm_028_025_state::olds_prot_addr( UINT16 addr )
 {
 	UINT32 mode = addr & 0xff;
 	UINT32 offset = addr >> 8;
@@ -69,18 +69,16 @@ static UINT32 olds_prot_addr( UINT16 addr )
 	return realaddr;
 }
 
-static UINT32 olds_read_reg( running_machine &machine, UINT16 addr )
+UINT32 pgm_028_025_state::olds_read_reg(UINT16 addr )
 {
-	pgm_028_025_state *state = machine.driver_data<pgm_028_025_state>();
 	UINT32 protaddr = (olds_prot_addr(addr) - 0x400000) / 2;
-	return state->m_sharedprotram[protaddr] << 16 | state->m_sharedprotram[protaddr + 1];
+	return m_sharedprotram[protaddr] << 16 | m_sharedprotram[protaddr + 1];
 }
 
-static void olds_write_reg( running_machine &machine, UINT16 addr, UINT32 val )
+void pgm_028_025_state::olds_write_reg( UINT16 addr, UINT32 val )
 {
-	pgm_028_025_state *state = machine.driver_data<pgm_028_025_state>();
-	state->m_sharedprotram[(olds_prot_addr(addr) - 0x400000) / 2]     = val >> 16;
-	state->m_sharedprotram[(olds_prot_addr(addr) - 0x400000) / 2 + 1] = val & 0xffff;
+	m_sharedprotram[(olds_prot_addr(addr) - 0x400000) / 2]     = val >> 16;
+	m_sharedprotram[(olds_prot_addr(addr) - 0x400000) / 2 + 1] = val & 0xffff;
 }
 
 MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
@@ -104,41 +102,39 @@ MACHINE_RESET_MEMBER(pgm_028_025_state,olds)
 	}
 }
 
-static READ16_HANDLER( olds_r )
+READ16_MEMBER(pgm_028_025_state::olds_r )
 {
-	pgm_028_025_state *state = space.machine().driver_data<pgm_028_025_state>();
 	UINT16 res = 0;
 
 	if (offset == 1)
 	{
-		if (state->m_kb_cmd == 1)
-			res = state->m_kb_reg & 0x7f;
-		if (state->m_kb_cmd == 2)
-			res = state->m_olds_bs | 0x80;
-		if (state->m_kb_cmd == 3)
-			res = state->m_olds_cmd3;
-		else if (state->m_kb_cmd == 5)
+		if (m_kb_cmd == 1)
+			res = m_kb_reg & 0x7f;
+		if (m_kb_cmd == 2)
+			res = m_olds_bs | 0x80;
+		if (m_kb_cmd == 3)
+			res = m_olds_cmd3;
+		else if (m_kb_cmd == 5)
 		{
-			UINT32 protvalue = 0x900000 | state->ioport("Region")->read(); // region from protection device.
-			res = (protvalue >> (8 * (state->m_kb_ptr - 1))) & 0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
+			UINT32 protvalue = 0x900000 | ioport("Region")->read(); // region from protection device.
+			res = (protvalue >> (8 * (m_kb_ptr - 1))) & 0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", space.device().safe_pc(), state->m_kb_cmd, res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", space.device().safe_pc(), m_kb_cmd, res);
 	return res;
 }
 
-static WRITE16_HANDLER( olds_w )
+WRITE16_MEMBER(pgm_028_025_state::olds_w )
 {
-	pgm_028_025_state *state = space.machine().driver_data<pgm_028_025_state>();
 	if (offset == 0)
-		state->m_kb_cmd = data;
+		m_kb_cmd = data;
 	else //offset==2
 	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",space.device().safe_pc(), state->m_kb_cmd, data);
-		if (state->m_kb_cmd == 0)
-			state->m_kb_reg = data;
-		else if(state->m_kb_cmd == 2)   //a bitswap=
+		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",space.device().safe_pc(), m_kb_cmd, data);
+		if (m_kb_cmd == 0)
+			m_kb_reg = data;
+		else if(m_kb_cmd == 2)   //a bitswap=
 		{
 			int reg = 0;
 			if (data & 0x01)
@@ -149,11 +145,11 @@ static WRITE16_HANDLER( olds_w )
 				reg |= 0x20;
 			if (data & 0x08)
 				reg |= 0x10;
-			state->m_olds_bs = reg;
+			m_olds_bs = reg;
 		}
-		else if (state->m_kb_cmd == 3)
+		else if (m_kb_cmd == 3)
 		{
-			UINT16 cmd = state->m_sharedprotram[0x3026 / 2];
+			UINT16 cmd = m_sharedprotram[0x3026 / 2];
 			switch (cmd)
 			{
 				case 0x11:
@@ -161,11 +157,11 @@ static WRITE16_HANDLER( olds_w )
 						break;
 				case 0x64:
 					{
-						UINT16 cmd0 = state->m_sharedprotram[0x3082 / 2];
-						UINT16 val0 = state->m_sharedprotram[0x3050 / 2];   //CMD_FORMAT
+						UINT16 cmd0 = m_sharedprotram[0x3082 / 2];
+						UINT16 val0 = m_sharedprotram[0x3050 / 2];   //CMD_FORMAT
 						{
 							if ((cmd0 & 0xff) == 0x2)
-								olds_write_reg(space.machine(), val0, olds_read_reg(space.machine(), val0) + 0x10000);
+								olds_write_reg(val0, olds_read_reg(val0) + 0x10000);
 						}
 						break;
 					}
@@ -173,31 +169,30 @@ static WRITE16_HANDLER( olds_w )
 				default:
 						break;
 			}
-			state->m_olds_cmd3 = ((data >> 4) + 1) & 0x3;
+			m_olds_cmd3 = ((data >> 4) + 1) & 0x3;
 		}
-		else if (state->m_kb_cmd == 4)
-			state->m_kb_ptr = data;
-		else if(state->m_kb_cmd == 0x20)
-			state->m_kb_ptr++;
+		else if (m_kb_cmd == 4)
+			m_kb_ptr = data;
+		else if(m_kb_cmd == 0x20)
+			m_kb_ptr++;
 	}
 }
 
-static READ16_HANDLER( olds_prot_swap_r )
+READ16_MEMBER(pgm_028_025_state::olds_prot_swap_r )
 {
-	pgm_state *state = space.machine().driver_data<pgm_state>();
 	if (space.device().safe_pc() < 0x100000)        //bios
-		return state->m_mainram[0x178f4 / 2];
+		return m_mainram[0x178f4 / 2];
 	else                        //game
-		return state->m_mainram[0x178d8 / 2];
+		return m_mainram[0x178d8 / 2];
 
 }
 
 DRIVER_INIT_MEMBER(pgm_028_025_state,olds)
 {
-	pgm_basic_init(machine());
+	pgm_basic_init();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xdcb400, 0xdcb403, FUNC(olds_r), FUNC(olds_w));
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x8178f4, 0x8178f5, FUNC(olds_prot_swap_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xdcb400, 0xdcb403, read16_delegate(FUNC(pgm_028_025_state::olds_r),this), write16_delegate(FUNC(pgm_028_025_state::olds_w),this));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x8178f4, 0x8178f5, read16_delegate(FUNC(pgm_028_025_state::olds_prot_swap_r),this));
 
 	m_kb_cmd = 0;
 	m_kb_reg = 0;

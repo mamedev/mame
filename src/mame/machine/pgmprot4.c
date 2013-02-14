@@ -33,13 +33,13 @@
 */
 
 
-void pgm_dw3_decrypt(running_machine &machine)
+void pgm_022_025_state::pgm_dw3_decrypt()
 {
 //  int i;
 //  UINT16 *src=(UINT16 *) (OP_ROM+0x100000);
 
 	int i;
-	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base()+0x100000);
+	UINT16 *src = (UINT16 *) (memregion("maincpu")->base()+0x100000);
 
 	int rom_size = 0x100000;
 
@@ -64,13 +64,13 @@ void pgm_dw3_decrypt(running_machine &machine)
 	}
 }
 
-void pgm_killbld_decrypt(running_machine &machine)
+void pgm_022_025_state::pgm_killbld_decrypt()
 {
 //  int i;
 //  UINT16 *src=(UINT16 *) (OP_ROM+0x100000);
 
 	int i;
-	UINT16 *src = (UINT16 *) (machine.root_device().memregion("maincpu")->base()+0x100000);
+	UINT16 *src = (UINT16 *) (memregion("maincpu")->base()+0x100000);
 
 	int rom_size = 0x200000;
 
@@ -88,9 +88,8 @@ void pgm_killbld_decrypt(running_machine &machine)
 
 
 
-static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT16 size, UINT16 mode)
+void pgm_022_025_state::IGS022_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT16 mode)
 {
-	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 	UINT16 param;
 	/*
 	P_SRC =0x300290 (offset from prot rom base)
@@ -162,17 +161,17 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
 		};
 		*/
 		int x;
-		UINT16 *PROTROM = (UINT16*)machine.root_device().memregion("igs022data")->base();
+		UINT16 *PROTROM = (UINT16*)memregion("igs022data")->base();
 
 		for (x = 0; x < size; x++)
 		{
-			//UINT16 *RAMDUMP = (UINT16*)space.machine().root_device().memregion("user2")->base();
+			//UINT16 *RAMDUMP = (UINT16*)memregion("user2")->base();
 			//UINT16 dat = RAMDUMP[dst + x];
 
 			UINT16 dat2 = PROTROM[src + x];
 
 			UINT8 extraoffset = param&0xfe; // the lowest bit changed the table addressing in tests, see 'rawDataOdd' table instead.. it's still related to the main one, not identical
-			UINT8* dectable = (UINT8*)machine.root_device().memregion("igs022data")->base();//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
+			UINT8* dectable = (UINT8*)memregion("igs022data")->base();//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
 			UINT16 extraxor = ((dectable[((x*2)+0+extraoffset)&0xff]) << 8) | (dectable[((x*2)+1+extraoffset)&0xff] << 0);
 
 			dat2 = ((dat2 & 0x00ff)<<8) | ((dat2 & 0xff00)>>8);
@@ -185,12 +184,12 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
 			//if (dat!=dat2)
 			//  printf("Mode %04x Param %04x Mismatch %04x %04x\n", mode, param, dat, dat2);
 
-			state->m_sharedprotram[dst + x] = dat2;
+			m_sharedprotram[dst + x] = dat2;
 		}
 
 		/* Killing Blade: hack, patches out some additional security checks... we need to emulate them instead! */
 		// different region IGS025 devices supply different sequences - we currently only have the china sequence for Killing Blade
-		//if ((mode==3) && (param==0x54) && (src*2==0x2120) && (dst*2==0x2600)) state->m_sharedprotram[0x2600 / 2] = 0x4e75;
+		//if ((mode==3) && (param==0x54) && (src*2==0x2120) && (dst*2==0x2600)) m_sharedprotram[0x2600 / 2] = 0x4e75;
 
 	}
 	if (mode == 4)
@@ -203,20 +202,20 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
 	{
 		/* mode 5 seems to be a straight copy */
 		int x;
-		UINT16 *PROTROM = (UINT16*)machine.root_device().memregion("igs022data")->base();
+		UINT16 *PROTROM = (UINT16*)memregion("igs022data")->base();
 		for (x = 0; x < size; x++)
 		{
 			UINT16 dat = PROTROM[src + x];
 
 
-			state->m_sharedprotram[dst + x] = dat;
+			m_sharedprotram[dst + x] = dat;
 		}
 	}
 	else if (mode == 6)
 	{
 		/* mode 6 seems to swap bytes and nibbles */
 		int x;
-		UINT16 *PROTROM = (UINT16*)machine.root_device().memregion("igs022data")->base();
+		UINT16 *PROTROM = (UINT16*)memregion("igs022data")->base();
 		for (x = 0; x < size; x++)
 		{
 			UINT16 dat = PROTROM[src + x];
@@ -226,7 +225,7 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
 					((dat & 0x00f0) << 4)|
 					((dat & 0x000f) << 12);
 
-			state->m_sharedprotram[dst + x] = dat;
+			m_sharedprotram[dst + x] = dat;
 		}
 	}
 	else if (mode == 7)
@@ -246,16 +245,15 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
 
 // the internal MCU boot code automatically does this DMA
 // and puts the version # of the data rom in ram
-static void IGS022_reset(running_machine& machine)
+void pgm_022_025_state::IGS022_reset()
 {
 	int i;
-	UINT16 *PROTROM = (UINT16*)machine.root_device().memregion("igs022data")->base();
-	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
+	UINT16 *PROTROM = (UINT16*)memregion("igs022data")->base();
 	UINT16 tmp;
 
 	// fill ram with A5 patern
 	for (i = 0; i < 0x4000/2; i++)
-		state->m_sharedprotram[i] = 0xa55a;
+		m_sharedprotram[i] = 0xa55a;
 
 	// the auto-dma
 	UINT16 src = PROTROM[0x100 / 2];
@@ -272,97 +270,94 @@ static void IGS022_reset(running_machine& machine)
 
 	printf("Auto-DMA %04x %04x %04x %04x\n",src,dst,size,mode);
 
-	IGS022_do_dma(machine,src,dst,size,mode);
+	IGS022_do_dma(src,dst,size,mode);
 
 	// there is also a version ID? (or is it some kind of checksum) that is stored in the data rom, and gets copied..
 	// Dragon World 3 checks it
 	tmp = PROTROM[0x114/2];
 	tmp = ((tmp & 0xff00) >> 8) | ((tmp & 0x00ff) << 8);
-	state->m_sharedprotram[0x2a2/2] = tmp;
+	m_sharedprotram[0x2a2/2] = tmp;
 }
 
-static void IGS022_handle_command(running_machine& machine)
+void pgm_022_025_state::IGS022_handle_command()
 {
-	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
-	UINT16 cmd = state->m_sharedprotram[0x200/2];
+	UINT16 cmd = m_sharedprotram[0x200/2];
 	//mame_printf_debug("command %04x\n", cmd);
 	if (cmd == 0x6d)    //Store values to asic ram
 	{
-		UINT32 p1 = (state->m_sharedprotram[0x298/2] << 16) | state->m_sharedprotram[0x29a/2];
-		UINT32 p2 = (state->m_sharedprotram[0x29c/2] << 16) | state->m_sharedprotram[0x29e/2];
+		UINT32 p1 = (m_sharedprotram[0x298/2] << 16) | m_sharedprotram[0x29a/2];
+		UINT32 p2 = (m_sharedprotram[0x29c/2] << 16) | m_sharedprotram[0x29e/2];
 
 		if ((p2 & 0xffff) == 0x9)   //Set value
 		{
 			int reg = (p2 >> 16) & 0xffff;
 			if (reg & 0x200)
-				state->m_kb_regs[reg & 0xff] = p1;
+				m_kb_regs[reg & 0xff] = p1;
 		}
 		if ((p2 & 0xffff) == 0x6)   //Add value
 		{
 			int src1 = (p1 >> 16) & 0xff;
 			int src2 = (p1 >> 0) & 0xff;
 			int dst = (p2 >> 16) & 0xff;
-			state->m_kb_regs[dst] = state->m_kb_regs[src2] - state->m_kb_regs[src1];
+			m_kb_regs[dst] = m_kb_regs[src2] - m_kb_regs[src1];
 		}
 		if ((p2 & 0xffff) == 0x1)   //Add Imm?
 		{
 			int reg = (p2 >> 16) & 0xff;
 			int imm = (p1 >> 0) & 0xffff;
-			state->m_kb_regs[reg] += imm;
+			m_kb_regs[reg] += imm;
 		}
 		if ((p2 & 0xffff) == 0xa)   //Get value
 		{
 			int reg = (p1 >> 16) & 0xFF;
-			state->m_sharedprotram[0x29c/2] = (state->m_kb_regs[reg] >> 16) & 0xffff;
-			state->m_sharedprotram[0x29e/2] = state->m_kb_regs[reg] & 0xffff;
+			m_sharedprotram[0x29c/2] = (m_kb_regs[reg] >> 16) & 0xffff;
+			m_sharedprotram[0x29e/2] = m_kb_regs[reg] & 0xffff;
 		}
 	}
 	if(cmd == 0x4f) //memcpy with encryption / scrambling
 	{
-		UINT16 src = state->m_sharedprotram[0x290 / 2] >> 1; // ?
-		UINT32 dst = state->m_sharedprotram[0x292 / 2];
-		UINT16 size = state->m_sharedprotram[0x294 / 2];
-		UINT16 mode = state->m_sharedprotram[0x296 / 2];
+		UINT16 src = m_sharedprotram[0x290 / 2] >> 1; // ?
+		UINT32 dst = m_sharedprotram[0x292 / 2];
+		UINT16 size = m_sharedprotram[0x294 / 2];
+		UINT16 mode = m_sharedprotram[0x296 / 2];
 
-		IGS022_do_dma(machine, src,dst,size,mode);
+		IGS022_do_dma(src,dst,size,mode);
 	}
 
 }
 
 
-static WRITE16_HANDLER( killbld_igs025_prot_w )
+WRITE16_MEMBER(pgm_022_025_state::killbld_igs025_prot_w )
 {
 //  mame_printf_debug("killbrd prot r\n");
-//  return 0;
-	pgm_022_025_state *state = space.machine().driver_data<pgm_022_025_state>();
+//  return 0;	
 	offset &= 0xf;
 
 	if (offset == 0)
-		state->m_kb_cmd = data;
+		m_kb_cmd = data;
 	else //offset==2
 	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X\n", space.device().safe_pc(), state->m_kb_cmd, data);
-		if (state->m_kb_cmd == 0)
-			state->m_kb_reg = data;
-		else if (state->m_kb_cmd == 2)
+		logerror("%06X: ASIC25 W CMD %X  VAL %X\n", space.device().safe_pc(), m_kb_cmd, data);
+		if (m_kb_cmd == 0)
+			m_kb_reg = data;
+		else if (m_kb_cmd == 2)
 		{
 			if (data == 1)  //Execute cmd
 			{
-				IGS022_handle_command(space.machine());
-				state->m_kb_reg++;
+				IGS022_handle_command();
+				m_kb_reg++;
 			}
 		}
-		else if (state->m_kb_cmd == 4)
-			state->m_kb_ptr = data;
-		else if (state->m_kb_cmd == 0x20)
-			state->m_kb_ptr++;
+		else if (m_kb_cmd == 4)
+			m_kb_ptr = data;
+		else if (m_kb_cmd == 0x20)
+			m_kb_ptr++;
 	}
 }
 
-static READ16_HANDLER( killbld_igs025_prot_r )
+READ16_MEMBER(pgm_022_025_state::killbld_igs025_prot_r )
 {
 //  mame_printf_debug("killbld prot w\n");
-	pgm_022_025_state *state = space.machine().driver_data<pgm_022_025_state>();
 	UINT16 res ;
 
 	offset &= 0xf;
@@ -370,33 +365,33 @@ static READ16_HANDLER( killbld_igs025_prot_r )
 
 	if (offset == 1)
 	{
-		if (state->m_kb_cmd == 1)
+		if (m_kb_cmd == 1)
 		{
-			res = state->m_kb_reg & 0x7f;
+			res = m_kb_reg & 0x7f;
 		}
-		else if (state->m_kb_cmd == 5)
+		else if (m_kb_cmd == 5)
 		{
 			UINT8 kb_region_sequence[11] = {0x17, 0x14, 0x91, 0x89, 0x21, 0xD5, 0x7C, 0x65, 0x8F, 0x8E, 0xE1};
 			UINT8 ret;
 
 			// this isn't properly understood.. should be some kind of bitswap / xor / shift..based on values written to 0x22/0x23 etc.?
 			// return hardcoded china sequence results for now, avoids rom patch
-			if (state->m_kb_region_sequence_position < 11)
+			if (m_kb_region_sequence_position < 11)
 			{
-				ret = kb_region_sequence[state->m_kb_region_sequence_position];
-				state->m_kb_region_sequence_position++;
+				ret = kb_region_sequence[m_kb_region_sequence_position];
+				m_kb_region_sequence_position++;
 			}
 			else
 			{
-				UINT32 protvalue = 0x89911400 | space.machine().root_device().ioport("Region")->read();
-				ret = (protvalue >> (8 * (state->m_kb_ptr - 1))) & 0xff;
+				UINT32 protvalue = 0x89911400 | ioport("Region")->read();
+				ret = (protvalue >> (8 * (m_kb_ptr - 1))) & 0xff;
 			}
 
 			res = 0x3f00 | ret;  // always 0x3fxx in logged behavior...
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", space.device().safe_pc(), state->m_kb_cmd, res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", space.device().safe_pc(), m_kb_cmd, res);
 	return res;
 }
 
@@ -407,7 +402,7 @@ MACHINE_RESET_MEMBER(pgm_022_025_state,killbld)
 {
 	MACHINE_RESET_CALL_MEMBER(pgm);
 	/* fill the protection ram with a5 + auto dma */
-	IGS022_reset(machine());
+	IGS022_reset();
 
 	// Reset IGS025 stuff
 	m_kb_cmd = 0;
@@ -423,10 +418,10 @@ MACHINE_RESET_MEMBER(pgm_022_025_state,killbld)
 
 DRIVER_INIT_MEMBER(pgm_022_025_state,killbld)
 {
-	pgm_basic_init(machine());
-	pgm_killbld_decrypt(machine());
+	pgm_basic_init();
+	pgm_killbld_decrypt();
 
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xd40000, 0xd40003, FUNC(killbld_igs025_prot_r), FUNC(killbld_igs025_prot_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xd40000, 0xd40003, read16_delegate(FUNC(pgm_022_025_state::killbld_igs025_prot_r),this), write16_delegate(FUNC(pgm_022_025_state::killbld_igs025_prot_w),this));
 
 	m_kb_cmd = 0;
 	m_kb_reg = 0;
@@ -445,7 +440,7 @@ MACHINE_RESET_MEMBER(pgm_022_025_state,dw3)
 {
 	MACHINE_RESET_CALL_MEMBER(pgm);
 	/* fill the protection ram with a5 + auto dma */
-	IGS022_reset(machine());
+	IGS022_reset();
 
 	/* game won't boot unless various values are in protection RAM
 	 - these should almost certainly end up there as the result of executing the protection
@@ -495,25 +490,20 @@ MACHINE_RESET_MEMBER(pgm_022_025_state,dw3)
 
 
 
-static int reg;
-static int ptr=0;
-
 #define DW3BITSWAP(s,d,bs,bd)  d=((d&(~(1<<bd)))|(((s>>bs)&1)<<bd))
-static UINT8 dw3_swap;
-static WRITE16_HANDLER( drgw3_igs025_prot_w )
-{
-	pgm_022_025_state *state = space.machine().driver_data<pgm_022_025_state>();
 
+WRITE16_MEMBER(pgm_022_025_state::drgw3_igs025_prot_w )
+{
 	offset&=0xf;
 
 	if(offset==0)
-		state->m_kb_cmd=data;
+		m_kb_cmd=data;
 	else //offset==2
 	{
-		printf("%06X: ASIC25 W CMD %X  VAL %X\n",space.device().safe_pc(),state->m_kb_cmd,data);
-		if(state->m_kb_cmd==0)
+		printf("%06X: ASIC25 W CMD %X  VAL %X\n",space.device().safe_pc(),m_kb_cmd,data);
+		if(m_kb_cmd==0)
 			reg=data;
-		else if(state->m_kb_cmd==3) //??????????
+		else if(m_kb_cmd==3) //??????????
 		{
 			dw3_swap = data;
 
@@ -521,16 +511,14 @@ static WRITE16_HANDLER( drgw3_igs025_prot_w )
 		}
 		//else if(kb_cmd==4)
 		//  ptr=data;
-		else if(state->m_kb_cmd==0x20)
+		else if(m_kb_cmd==0x20)
 			ptr++;
 	}
 }
 
-static READ16_HANDLER( drgw3_igs025_prot_r )
+READ16_MEMBER(pgm_022_025_state::drgw3_igs025_prot_r )
 {
-//  mame_printf_debug("killbld prot w\n");
-	pgm_022_025_state *state = space.machine().driver_data<pgm_022_025_state>();
-
+//  mame_printf_debug("killbld prot w\n");	
 	UINT16 res ;
 
 	offset&=0xf;
@@ -538,7 +526,7 @@ static READ16_HANDLER( drgw3_igs025_prot_r )
 
 	if(offset==1)
 	{
-		if(state->m_kb_cmd==0)  //swap
+		if(m_kb_cmd==0)  //swap
 		{
 				UINT8 v1=(dw3_swap+1)&0x7F;
 				UINT8 v2=0;
@@ -554,28 +542,28 @@ static READ16_HANDLER( drgw3_igs025_prot_r )
 				res=v2;
 
 		}
-		else if(state->m_kb_cmd==1)
+		else if(m_kb_cmd==1)
 		{
 			res=reg&0x7f;
 		}
-		else if(state->m_kb_cmd==5)
+		else if(m_kb_cmd==5)
 		{
 			UINT32 protvalue;
-			protvalue = 0x60000|space.machine().root_device().ioport("Region")->read();
+			protvalue = 0x60000|ioport("Region")->read();
 			res=(protvalue>>(8*(ptr-1)))&0xff;
 
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",space.device().safe_pc(),state->m_kb_cmd,res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",space.device().safe_pc(),m_kb_cmd,res);
 	return res;
 }
 
 
 DRIVER_INIT_MEMBER(pgm_022_025_state,drgw3)
 {
-	pgm_basic_init(machine());
-
+	pgm_basic_init();
+	ptr = 0;
 /*
     {
         int x;
@@ -587,9 +575,9 @@ DRIVER_INIT_MEMBER(pgm_022_025_state,drgw3)
         }
     }
 */
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0xDA5610, 0xDA5613, FUNC(drgw3_igs025_prot_r), FUNC(drgw3_igs025_prot_w));
+	machine().device("maincpu")->memory().space(AS_PROGRAM).install_readwrite_handler(0xDA5610, 0xDA5613, read16_delegate(FUNC(pgm_022_025_state::drgw3_igs025_prot_r),this), write16_delegate(FUNC(pgm_022_025_state::drgw3_igs025_prot_w),this));
 
-	pgm_dw3_decrypt(machine());
+	pgm_dw3_decrypt();
 }
 
 

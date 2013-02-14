@@ -3700,16 +3700,16 @@ ROM_END
 /* This function expands the 32x32 5-bit data into a format which is easier to
    decode in MAME */
 
-static void expand_32x32x5bpp(running_machine &machine)
+void pgm_state::expand_32x32x5bpp()
 {
-	UINT8 *src = machine.root_device().memregion( "tiles" )->base();
+	UINT8 *src = memregion( "tiles" )->base();
 	gfx_layout glcopy;
 	glcopy = *(&pgm32_charlayout);
 
-	size_t  srcsize = machine.root_device().memregion( "tiles" )->bytes();
+	size_t  srcsize = memregion( "tiles" )->bytes();
 	int cnt, pix;
 	size_t gfx2_size_needed = ((srcsize/5)*8)+0x1000;
-	UINT8 *dst = auto_alloc_array(machine, UINT8, gfx2_size_needed);
+	UINT8 *dst = auto_alloc_array(machine(), UINT8, gfx2_size_needed);
 
 
 	for (cnt = 0; cnt < srcsize/5 ; cnt ++)
@@ -3734,7 +3734,7 @@ static void expand_32x32x5bpp(running_machine &machine)
 
 	glcopy.total = (gfx2_size_needed / glcopy.charincrement)*8;
 
-	machine.gfx[1] = auto_alloc(machine, gfx_element(machine, glcopy, (UINT8 *)dst, 32, 0x400));
+	machine().gfx[1] = auto_alloc(machine(), gfx_element(machine(), glcopy, (UINT8 *)dst, 32, 0x400));
 
 
 }
@@ -3742,51 +3742,48 @@ static void expand_32x32x5bpp(running_machine &machine)
 /* This function expands the sprite colour data (in the A Roms) from 3 pixels
    in each word to a byte per pixel making it easier to use */
 
-static void expand_colourdata( running_machine &machine )
+void pgm_state::expand_colourdata(  )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
-	UINT8 *src = state->memregion( "sprcol" )->base();
-	size_t srcsize = state->memregion( "sprcol" )->bytes();
+	UINT8 *src = memregion( "sprcol" )->base();
+	size_t srcsize = memregion( "sprcol" )->bytes();
 	int cnt;
 	size_t needed = srcsize / 2 * 3;
 
 	/* work out how much ram we need to allocate to expand the sprites into
 	   and be able to mask the offset */
-	state->m_sprite_a_region_size = 1;
-	while (state->m_sprite_a_region_size < needed)
-		state->m_sprite_a_region_size <<= 1;
+	m_sprite_a_region_size = 1;
+	while (m_sprite_a_region_size < needed)
+		m_sprite_a_region_size <<= 1;
 
-	state->m_sprite_a_region = auto_alloc_array(machine, UINT8, state->m_sprite_a_region_size);
+	m_sprite_a_region = auto_alloc_array(machine(), UINT8, m_sprite_a_region_size);
 
 	for (cnt = 0 ; cnt < srcsize / 2 ; cnt++)
 	{
 		UINT16 colpack;
 
 		colpack = ((src[cnt * 2]) | (src[cnt * 2 + 1] << 8));
-		state->m_sprite_a_region[cnt * 3 + 0] = (colpack >> 0 ) & 0x1f;
-		state->m_sprite_a_region[cnt * 3 + 1] = (colpack >> 5 ) & 0x1f;
-		state->m_sprite_a_region[cnt * 3 + 2] = (colpack >> 10) & 0x1f;
+		m_sprite_a_region[cnt * 3 + 0] = (colpack >> 0 ) & 0x1f;
+		m_sprite_a_region[cnt * 3 + 1] = (colpack >> 5 ) & 0x1f;
+		m_sprite_a_region[cnt * 3 + 2] = (colpack >> 10) & 0x1f;
 	}
 }
 
-void pgm_basic_init( running_machine &machine, bool set_bank)
+void pgm_state::pgm_basic_init( bool set_bank)
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	UINT8 *ROM = memregion("maincpu")->base();
+	if (set_bank) membank("bank1")->set_base(&ROM[0x100000]);
 
-	UINT8 *ROM = state->memregion("maincpu")->base();
-	if (set_bank) state->membank("bank1")->set_base(&ROM[0x100000]);
+	expand_32x32x5bpp();
+	expand_colourdata();
 
-	expand_32x32x5bpp(machine);
-	expand_colourdata(machine);
-
-	state->m_bg_videoram = &state->m_videoram[0];
-	state->m_tx_videoram = &state->m_videoram[0x4000/2];
-	state->m_rowscrollram = &state->m_videoram[0x7000/2];
+	m_bg_videoram = &m_videoram[0];
+	m_tx_videoram = &m_videoram[0x4000/2];
+	m_rowscrollram = &m_videoram[0x7000/2];
 }
 
 DRIVER_INIT_MEMBER(pgm_state,pgm)
 {
-	pgm_basic_init(machine());
+	pgm_basic_init();
 }
 
 

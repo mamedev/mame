@@ -119,6 +119,31 @@ public:
 	UINT32 screen_update_pgm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_pgm(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(pgm_interrupt);
+	
+	// from pgmprot5.c
+	int protection_address;
+
+	UINT16 dw2_asic_reg[2];
+	UINT8 dw2_asic_z;
+	UINT8 dw2_asic_y;
+	UINT16 dw2_asic_hold;
+	
+	DECLARE_READ16_MEMBER( dw2_d80000_r );
+	DECLARE_WRITE16_MEMBER( dw2_d80000_w );
+	DECLARE_WRITE16_MEMBER(dw2_unk_w);
+	void pgm_dw2_decrypt();
+	void drgwld2_common_init();	
+	inline void pgm_draw_pix( int xdrawpos, int pri, UINT16* dest, UINT8* destpri, UINT16 srcdat);
+	inline void pgm_draw_pix_nopri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat);
+	inline void pgm_draw_pix_pri( int xdrawpos, UINT16* dest, UINT8* destpri, UINT16 srcdat);
+	void draw_sprite_line( int wide, UINT16* dest, UINT8* destpri, int xzoom, int xgrow, int flip, int xpos, int pri, int realxsize, int palt, int draw );
+	void draw_sprite_new_zoomed( int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, UINT32 xzoom, int xgrow, UINT32 yzoom, int ygrow, int pri );
+	void draw_sprite_line_basic( int wide, UINT16* dest, UINT8* destpri, int flip, int xpos, int pri, int realxsize, int palt, int draw );
+	void draw_sprite_new_basic( int wide, int high, int xpos, int ypos, int palt, int flip, bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, int pri );
+	void draw_sprites( bitmap_ind16& spritebitmap, UINT16 *sprite_source, bitmap_ind8& priority_bitmap );
+	void expand_32x32x5bpp();
+	void expand_colourdata(  );
+	void pgm_basic_init( bool set_bank = true);
 };
 
 
@@ -141,6 +166,10 @@ public:
 	UINT16        m_asic3_hold;
 
 	DECLARE_DRIVER_INIT(orlegend);
+	void asic3_compute_hold();
+	DECLARE_READ16_MEMBER( pgm_asic3_r );
+	DECLARE_WRITE16_MEMBER( pgm_asic3_w );
+	DECLARE_WRITE16_MEMBER( pgm_asic3_reg_w );	
 };
 
 
@@ -175,7 +204,7 @@ public:
 	// puzzli2
 	INT32 m_puzzli_54_trigger;
 
-	typedef void (*pgm_arm_sim_command_handler)(pgm_arm_type1_state *state, int pc);
+	typedef void (pgm_arm_type1_state::*pgm_arm_sim_command_handler)(int pc);
 
 	pgm_arm_sim_command_handler arm_sim_handler;
 
@@ -206,6 +235,35 @@ public:
 	DECLARE_DRIVER_INIT(kovboot);
 	DECLARE_DRIVER_INIT(oldsplus);
 	DECLARE_MACHINE_START(pgm_arm_type1);
+	
+	DECLARE_READ32_MEMBER( pgm_arm7_type1_protlatch_r );
+	DECLARE_WRITE32_MEMBER( pgm_arm7_type1_protlatch_w );
+	DECLARE_READ16_MEMBER( pgm_arm7_type1_68k_protlatch_r );
+	DECLARE_WRITE16_MEMBER( pgm_arm7_type1_68k_protlatch_w );
+	DECLARE_READ16_MEMBER( pgm_arm7_type1_ram_r );
+	DECLARE_WRITE16_MEMBER( pgm_arm7_type1_ram_w );
+	DECLARE_READ32_MEMBER( pgm_arm7_type1_unk_r );
+	DECLARE_READ32_MEMBER( pgm_arm7_type1_exrom_r );
+	DECLARE_READ32_MEMBER( pgm_arm7_type1_shareram_r );
+	DECLARE_WRITE32_MEMBER( pgm_arm7_type1_shareram_w );
+	void pgm_arm7_type1_latch_init();
+	DECLARE_READ16_MEMBER( kovsh_fake_region_r );
+	DECLARE_WRITE16_MEMBER( kovshp_asic27a_write_word );
+	void pgm_decode_kovlsqh2_tiles();
+	void pgm_decode_kovlsqh2_sprites(UINT8 *src );
+	void pgm_decode_kovlsqh2_samples();
+	void pgm_decode_kovqhsgs_program();
+	void pgm_decode_kovqhsgs2_program();
+	DECLARE_READ16_MEMBER( pgm_arm7_type1_sim_r );
+	void command_handler_ddp3(int pc);
+	void command_handler_puzzli2(int pc);
+	void command_handler_py2k2(int pc);
+	void command_handler_pstars(int pc);
+	void command_handler_kov(int pc);
+	void command_handler_oldsplus(int pc);
+	DECLARE_WRITE16_MEMBER( pgm_arm7_type1_sim_w );
+	DECLARE_READ16_MEMBER( pgm_arm7_type1_sim_protram_r );
+	DECLARE_READ16_MEMBER( pstars_arm7_type1_sim_protram_r );	
 };
 
 /* for machine/pgmprot2.c type games */
@@ -233,6 +291,20 @@ public:
 	DECLARE_DRIVER_INIT(dw2001);
 	DECLARE_DRIVER_INIT(dwpc);
 	DECLARE_MACHINE_START(pgm_arm_type2);
+	DECLARE_READ32_MEMBER( arm7_latch_arm_r );
+	DECLARE_WRITE32_MEMBER( arm7_latch_arm_w );
+	DECLARE_READ32_MEMBER( arm7_shareram_r );
+	DECLARE_WRITE32_MEMBER( arm7_shareram_w );
+	DECLARE_READ16_MEMBER( arm7_latch_68k_r );
+	DECLARE_WRITE16_MEMBER( arm7_latch_68k_w );
+	DECLARE_READ16_MEMBER( arm7_ram_r );
+	DECLARE_WRITE16_MEMBER( arm7_ram_w );
+	void kov2_latch_init();
+	DECLARE_WRITE32_MEMBER( martmast_arm_region_w );
+	DECLARE_WRITE32_MEMBER( kov2_arm_region_w );
+	DECLARE_WRITE32_MEMBER( ddp2_arm_region_w );
+	DECLARE_READ32_MEMBER( ddp2_speedup_r );
+	DECLARE_READ16_MEMBER( ddp2_main_speedup_r );
 };
 
 
@@ -262,6 +334,22 @@ public:
 	DECLARE_DRIVER_INIT(dmnfrnt);
 	DECLARE_DRIVER_INIT(happy6);
 	DECLARE_MACHINE_START(pgm_arm_type3);
+	DECLARE_WRITE32_MEMBER( svg_arm7_ram_sel_w );
+	DECLARE_READ32_MEMBER( svg_arm7_shareram_r );
+	DECLARE_WRITE32_MEMBER( svg_arm7_shareram_w );
+	DECLARE_READ16_MEMBER( svg_m68k_ram_r );
+	DECLARE_WRITE16_MEMBER( svg_m68k_ram_w );
+	DECLARE_READ16_MEMBER( svg_68k_nmi_r );
+	DECLARE_WRITE16_MEMBER( svg_68k_nmi_w );
+	DECLARE_WRITE16_MEMBER( svg_latch_68k_w );
+	DECLARE_READ16_MEMBER( svg_latch_68k_r );
+	DECLARE_READ32_MEMBER( svg_latch_arm_r );
+	DECLARE_WRITE32_MEMBER( svg_latch_arm_w );
+	void svg_basic_init();
+	void pgm_create_dummy_internal_arm_region();
+	void svg_latch_init();
+	DECLARE_READ32_MEMBER( dmnfrnt_speedup_r );
+	DECLARE_READ16_MEMBER( dmnfrnt_main_speedup_r );
 };
 
 
@@ -278,12 +366,24 @@ public:
 	int           m_kb_ptr;
 	int           m_kb_region_sequence_position;
 	UINT32        m_kb_regs[0x10];
+	int 		  reg;
+	int 		  ptr;
+	UINT8 		  dw3_swap;
 	required_shared_ptr<UINT16> m_sharedprotram;
 
 	DECLARE_DRIVER_INIT(killbld);
 	DECLARE_DRIVER_INIT(drgw3);
 	DECLARE_MACHINE_RESET(killbld);
 	DECLARE_MACHINE_RESET(dw3);
+	void pgm_dw3_decrypt();
+	void pgm_killbld_decrypt();
+	void IGS022_do_dma(UINT16 src, UINT16 dst, UINT16 size, UINT16 mode);
+	void IGS022_reset();
+	void IGS022_handle_command();
+	DECLARE_WRITE16_MEMBER( killbld_igs025_prot_w );
+	DECLARE_READ16_MEMBER( killbld_igs025_prot_r );
+	DECLARE_WRITE16_MEMBER( drgw3_igs025_prot_w );
+	DECLARE_READ16_MEMBER( drgw3_igs025_prot_r );
 };
 
 /* for machine/pgmprot6.c type games */
@@ -304,14 +404,19 @@ public:
 
 	DECLARE_DRIVER_INIT(olds);
 	DECLARE_MACHINE_RESET(olds);
+	
+	UINT32 olds_prot_addr( UINT16 addr );
+	UINT32 olds_read_reg( UINT16 addr );
+	void olds_write_reg( UINT16 addr, UINT32 val );
+	DECLARE_READ16_MEMBER( olds_r );
+	DECLARE_WRITE16_MEMBER( olds_w );
+	DECLARE_READ16_MEMBER( olds_prot_swap_r );
 };
 
 
 
 
 /*----------- defined in drivers/pgm.c -----------*/
-
-void pgm_basic_init( running_machine &machine, bool set_bank  = true );
 
 INPUT_PORTS_EXTERN( pgm );
 
