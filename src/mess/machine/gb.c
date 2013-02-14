@@ -149,7 +149,7 @@ void gb_state::gb_init()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	gb_sound_w(machine().device("custom"), space, 0x16, 0x00);       /* Initialize sound hardware */
+	gb_sound_w(m_custom, space, 0x16, 0x00);       /* Initialize sound hardware */
 
 	m_divcount = 0;
 	m_triggering_irq = 0;
@@ -244,9 +244,9 @@ MACHINE_RESET_MEMBER(gb_state,gbpocket)
 	m_bios_disable = TRUE;
 
 	/* Initialize the Sound registers */
-	gb_sound_w(machine().device("custom"), generic_space(), 0x16,0x80);
-	gb_sound_w(machine().device("custom"), generic_space(), 0x15,0xF3);
-	gb_sound_w(machine().device("custom"), generic_space(), 0x14,0x77);
+	gb_sound_w(m_custom, generic_space(), 0x16,0x80);
+	gb_sound_w(m_custom, generic_space(), 0x15,0xF3);
+	gb_sound_w(m_custom, generic_space(), 0x14,0x77);
 
 	m_divcount = 0xABC8;
 }
@@ -339,7 +339,7 @@ WRITE8_MEMBER(gb_state::gb_io_w)
 		break;
 	case 0x0F:                      /* IF - Interrupt flag */
 		data &= 0x1F;
-		machine().device<lr35902_cpu_device>(":maincpu")->set_if( data );
+		m_maincpu->set_if( data );
 		break;
 	}
 
@@ -893,12 +893,12 @@ WRITE8_MEMBER(gb_state::sgb_io_w)
 /* Interrupt Enable register */
 READ8_MEMBER(gb_state::gb_ie_r)
 {
-	return machine().device<lr35902_cpu_device>(":maincpu")->get_ie();
+	return m_maincpu->get_ie();
 }
 
 WRITE8_MEMBER(gb_state::gb_ie_w)
 {
-	machine().device<lr35902_cpu_device>(":maincpu")->set_ie( data & 0x1F );
+	m_maincpu->set_ie( data & 0x1F );
 }
 
 /* IO read */
@@ -918,7 +918,7 @@ READ8_MEMBER(gb_state::gb_io_r)
 			return m_gb_io[offset];
 		case 0x0F:
 			/* Make sure the internal states are up to date */
-			return 0xE0 | machine().device<lr35902_cpu_device>(":maincpu")->get_if();
+			return 0xE0 | m_maincpu->get_if();
 		default:
 			/* It seems unsupported registers return 0xFF */
 			return 0xFF;
@@ -1003,7 +1003,7 @@ WRITE8_MEMBER(gb_state::gbc_io2_w)
 	switch( offset )
 	{
 		case 0x0D:  /* KEY1 - Prepare speed switch */
-			machine().device<lr35902_cpu_device>(":maincpu")->set_speed(data);
+			m_maincpu->set_speed(data);
 			return;
 		case 0x10:  /* BFF - Bios disable */
 			m_bios_disable = TRUE;
@@ -1027,7 +1027,7 @@ READ8_MEMBER(gb_state::gbc_io2_r)
 	switch( offset )
 	{
 	case 0x0D:  /* KEY1 */
-		return machine().device<lr35902_cpu_device>(":maincpu")->get_speed();
+		return m_maincpu->get_speed();
 	case 0x16:  /* RP - Infrared port */
 		break;
 	case 0x30:  /* SVBK - RAM bank select */
@@ -1132,25 +1132,25 @@ static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 
 
 WRITE8_MEMBER(megaduck_state::megaduck_sound_w1)
 {
-	gb_sound_w(machine().device("custom"), space, megaduck_sound_offsets[offset], data );
+	gb_sound_w(m_custom, space, megaduck_sound_offsets[offset], data );
 }
 
 READ8_MEMBER(megaduck_state::megaduck_sound_r1)
 {
-	return gb_sound_r( machine().device("custom"), space, megaduck_sound_offsets[offset] );
+	return gb_sound_r( m_custom, space, megaduck_sound_offsets[offset] );
 }
 
 WRITE8_MEMBER(megaduck_state::megaduck_sound_w2)
 {
 	switch(offset)
 	{
-		case 0x00:  gb_sound_w(machine().device("custom"), space, 0x10, data ); break;
-		case 0x01:  gb_sound_w(machine().device("custom"), space, 0x12, data ); break;
-		case 0x02:  gb_sound_w(machine().device("custom"), space, 0x11, data ); break;
-		case 0x03:  gb_sound_w(machine().device("custom"), space, 0x13, data ); break;
-		case 0x04:  gb_sound_w(machine().device("custom"), space, 0x14, data ); break;
-		case 0x05:  gb_sound_w(machine().device("custom"), space, 0x16, data ); break;
-		case 0x06:  gb_sound_w(machine().device("custom"), space, 0x15, data ); break;
+		case 0x00:  gb_sound_w(m_custom, space, 0x10, data ); break;
+		case 0x01:  gb_sound_w(m_custom, space, 0x12, data ); break;
+		case 0x02:  gb_sound_w(m_custom, space, 0x11, data ); break;
+		case 0x03:  gb_sound_w(m_custom, space, 0x13, data ); break;
+		case 0x04:  gb_sound_w(m_custom, space, 0x14, data ); break;
+		case 0x05:  gb_sound_w(m_custom, space, 0x16, data ); break;
+		case 0x06:  gb_sound_w(m_custom, space, 0x15, data ); break;
 		case 0x07:
 		case 0x08:
 		case 0x09:
@@ -1166,5 +1166,5 @@ WRITE8_MEMBER(megaduck_state::megaduck_sound_w2)
 
 READ8_MEMBER(megaduck_state::megaduck_sound_r2)
 {
-	return gb_sound_r(machine().device("custom"), space, 0x10 + megaduck_sound_offsets[offset]);
+	return gb_sound_r(m_custom, space, 0x10 + megaduck_sound_offsets[offset]);
 }

@@ -113,6 +113,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_cartslot(*this, "gbslot")
 		, m_maincpu(*this, "maincpu")
+		, m_custom(*this, "custom")
 		, m_region_maincpu(*this, "maincpu")
 		, m_rambank(*this, "cgb_ram")
 		, m_inputs(*this, "INPUTS")
@@ -208,6 +209,7 @@ public:
 
 protected:
 	required_device<lr35902_cpu_device> m_maincpu;
+	required_device<device_t> m_custom;
 	required_memory_region m_region_maincpu;
 	optional_memory_bank m_rambank;   // cgb
 	required_ioport m_inputs;
@@ -235,10 +237,8 @@ class megaduck_state : public gb_state
 {
 public:
 	megaduck_state(const machine_config &mconfig, device_type type, const char *tag)
-	: gb_state(mconfig, type, tag)
-	, m_cartslot(*this, "duckslot")
-	, m_maincpu(*this, "maincpu")
-	, m_inputs(*this, "INPUTS")
+		: gb_state(mconfig, type, tag)
+		, m_cartslot(*this, "duckslot")
 	{ }
 
 	DECLARE_READ8_MEMBER(megaduck_video_r);
@@ -255,10 +255,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bank1_w);
 	DECLARE_WRITE8_MEMBER(bank2_w);
 	optional_device<megaduck_cart_slot_device> m_cartslot;
-
-protected:
-	required_device<lr35902_cpu_device> m_maincpu;
-	required_ioport m_inputs;
 };
 
 
