@@ -110,13 +110,26 @@ public:
 	inline void consume_rle(int count);
 	void perform_blit(address_space &space);
 	void itech8_update_interrupts(int periodic, int tms34061, int blitter);
+	
+	/*----------- defined in machine/slikshot.c -----------*/
+
+	DECLARE_READ8_MEMBER( slikz80_port_r );
+	DECLARE_WRITE8_MEMBER( slikz80_port_w );
+
+	DECLARE_READ8_MEMBER( slikshot_z80_r );
+	DECLARE_READ8_MEMBER( slikshot_z80_control_r );
+	DECLARE_WRITE8_MEMBER( slikshot_z80_control_w );
+
+	void inters_to_vels(UINT16 inter1, UINT16 inter2, UINT16 inter3, UINT8 beams,
+							UINT8 *xres, UINT8 *vxres, UINT8 *vyres);
+	void vels_to_inters(UINT8 x, UINT8 vx, UINT8 vy,
+							UINT16 *inter1, UINT16 *inter2, UINT16 *inter3, UINT8 *beams);
+	void inters_to_words(UINT16 inter1, UINT16 inter2, UINT16 inter3, UINT8 *beams,
+							UINT16 *word1, UINT16 *word2, UINT16 *word3);
+							
+	void words_to_sensors(UINT16 word1, UINT16 word2, UINT16 word3, UINT8 beams,
+							UINT16 *sens0, UINT16 *sens1, UINT16 *sens2, UINT16 *sens3);
+	void compute_sensors();
+	TIMER_CALLBACK_MEMBER( delayed_z80_control_w );
 };
 
-/*----------- defined in machine/slikshot.c -----------*/
-
-DECLARE_READ8_HANDLER( slikz80_port_r );
-DECLARE_WRITE8_HANDLER( slikz80_port_w );
-
-DECLARE_READ8_HANDLER( slikshot_z80_r );
-DECLARE_READ8_HANDLER( slikshot_z80_control_r );
-DECLARE_WRITE8_HANDLER( slikshot_z80_control_w );

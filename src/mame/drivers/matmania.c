@@ -93,8 +93,8 @@ static ADDRESS_MAP_START( maniach_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(maniach_sh_command_w)
 	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP   /* ?? */
-	AM_RANGE(0x3040, 0x3040) AM_READWRITE_LEGACY(maniach_mcu_r,maniach_mcu_w)
-	AM_RANGE(0x3041, 0x3041) AM_READ_LEGACY(maniach_mcu_status_r)
+	AM_RANGE(0x3040, 0x3040) AM_READWRITE(maniach_mcu_r,maniach_mcu_w)
+	AM_RANGE(0x3041, 0x3041) AM_READ(maniach_mcu_status_r)
 	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -120,12 +120,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maniach_mcu_map, AS_PROGRAM, 8, matmania_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(maniach_68705_port_a_r,maniach_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(maniach_68705_port_b_r,maniach_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(maniach_68705_port_c_r,maniach_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(maniach_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(maniach_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE_LEGACY(maniach_68705_ddr_c_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(maniach_68705_port_a_r,maniach_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(maniach_68705_port_b_r,maniach_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(maniach_68705_port_c_r,maniach_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(maniach_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(maniach_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(maniach_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

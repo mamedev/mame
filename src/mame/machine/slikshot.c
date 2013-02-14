@@ -170,7 +170,7 @@ static void words_to_inters(UINT16 word1, UINT16 word2, UINT16 word3, UINT8 beam
  *
  *************************************/
 
-static void inters_to_vels(UINT16 inter1, UINT16 inter2, UINT16 inter3, UINT8 beams,
+void itech8_state::inters_to_vels(UINT16 inter1, UINT16 inter2, UINT16 inter3, UINT8 beams,
 							UINT8 *xres, UINT8 *vxres, UINT8 *vyres)
 {
 	UINT32 _27d8, _27c2;
@@ -243,7 +243,7 @@ static void inters_to_vels(UINT16 inter1, UINT16 inter2, UINT16 inter3, UINT8 be
  *
  *************************************/
 
-static void vels_to_inters(UINT8 x, UINT8 vx, UINT8 vy,
+void itech8_state::vels_to_inters(UINT8 x, UINT8 vx, UINT8 vy,
 							UINT16 *inter1, UINT16 *inter2, UINT16 *inter3, UINT8 *beams)
 {
 	UINT32 _27d8;
@@ -296,7 +296,7 @@ static void vels_to_inters(UINT8 x, UINT8 vx, UINT8 vy,
  *
  *************************************/
 
-static void inters_to_words(UINT16 inter1, UINT16 inter2, UINT16 inter3, UINT8 *beams,
+void itech8_state::inters_to_words(UINT16 inter1, UINT16 inter2, UINT16 inter3, UINT8 *beams,
 							UINT16 *word1, UINT16 *word2, UINT16 *word3)
 {
 	UINT16 word2mod;
@@ -358,7 +358,7 @@ static void inters_to_words(UINT16 inter1, UINT16 inter2, UINT16 inter3, UINT8 *
  *
  *************************************/
 
-static void words_to_sensors(UINT16 word1, UINT16 word2, UINT16 word3, UINT8 beams,
+void itech8_state::words_to_sensors(UINT16 word1, UINT16 word2, UINT16 word3, UINT8 beams,
 							UINT16 *sens0, UINT16 *sens1, UINT16 *sens2, UINT16 *sens3)
 {
 	/* if bit 0 of the beams is set, sensor 1 fired first; otherwise sensor 0 fired */
@@ -382,23 +382,22 @@ static void words_to_sensors(UINT16 word1, UINT16 word2, UINT16 word3, UINT8 bea
  *
  *************************************/
 
-static void compute_sensors(running_machine &machine)
-{
-	itech8_state *state = machine.driver_data<itech8_state>();
+void itech8_state::compute_sensors()
+{	
 	UINT16 inter1, inter2, inter3;
 	UINT16 word1 = 0, word2 = 0, word3 = 0;
 	UINT8 beams;
 
 	/* skip if we're not ready */
-	if (state->m_sensor0 != 0 || state->m_sensor1 != 0 || state->m_sensor2 != 0 || state->m_sensor3 != 0)
+	if (m_sensor0 != 0 || m_sensor1 != 0 || m_sensor2 != 0 || m_sensor3 != 0)
 		return;
 
 	/* reverse map the inputs */
-	vels_to_inters(state->m_curx, state->m_curvx, state->m_curvy, &inter1, &inter2, &inter3, &beams);
+	vels_to_inters(m_curx, m_curvx, m_curvy, &inter1, &inter2, &inter3, &beams);
 	inters_to_words(inter1, inter2, inter3, &beams, &word1, &word2, &word3);
-	words_to_sensors(word1, word2, word3, beams, &state->m_sensor0, &state->m_sensor1, &state->m_sensor2, &state->m_sensor3);
+	words_to_sensors(word1, word2, word3, beams, &m_sensor0, &m_sensor1, &m_sensor2, &m_sensor3);
 
-	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", machine.time().as_double(), state->m_sensor0, state->m_sensor1, state->m_sensor2, state->m_sensor3);
+	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", machine().time().as_double(), m_sensor0, m_sensor1, m_sensor2, m_sensor3);
 }
 
 
@@ -409,25 +408,24 @@ static void compute_sensors(running_machine &machine)
  *
  *************************************/
 
-READ8_HANDLER( slikz80_port_r )
+READ8_MEMBER(itech8_state::slikz80_port_r )
 {
-	itech8_state *state = space.machine().driver_data<itech8_state>();
 	int result = 0;
 
 	/* if we have nothing, return 0x03 */
-	if (!state->m_sensor0 && !state->m_sensor1 && !state->m_sensor2 && !state->m_sensor3)
-		return 0x03 | (state->m_z80_clear_to_send << 7);
+	if (!m_sensor0 && !m_sensor1 && !m_sensor2 && !m_sensor3)
+		return 0x03 | (m_z80_clear_to_send << 7);
 
 	/* 1 bit for each sensor */
-	if (state->m_sensor0)
-		result |= 1, state->m_sensor0--;
-	if (state->m_sensor1)
-		result |= 2, state->m_sensor1--;
-	if (state->m_sensor2)
-		result |= 4, state->m_sensor2--;
-	if (state->m_sensor3)
-		result |= 8, state->m_sensor3--;
-	result |= state->m_z80_clear_to_send << 7;
+	if (m_sensor0)
+		result |= 1, m_sensor0--;
+	if (m_sensor1)
+		result |= 2, m_sensor1--;
+	if (m_sensor2)
+		result |= 4, m_sensor2--;
+	if (m_sensor3)
+		result |= 8, m_sensor3--;
+	result |= m_z80_clear_to_send << 7;
 
 	return result;
 }
@@ -440,11 +438,10 @@ READ8_HANDLER( slikz80_port_r )
  *
  *************************************/
 
-WRITE8_HANDLER( slikz80_port_w )
+WRITE8_MEMBER(itech8_state::slikz80_port_w )
 {
-	itech8_state *state = space.machine().driver_data<itech8_state>();
-	state->m_z80_port_val = data;
-	state->m_z80_clear_to_send = 0;
+	m_z80_port_val = data;
+	m_z80_clear_to_send = 0;
 }
 
 
@@ -455,12 +452,11 @@ WRITE8_HANDLER( slikz80_port_w )
  *
  *************************************/
 
-READ8_HANDLER( slikshot_z80_r )
+READ8_MEMBER(itech8_state::slikshot_z80_r )
 {
-	itech8_state *state = space.machine().driver_data<itech8_state>();
 	/* allow the Z80 to send us stuff now */
-	state->m_z80_clear_to_send = 1;
-	return state->m_z80_port_val;
+	m_z80_clear_to_send = 1;
+	return m_z80_port_val;
 }
 
 
@@ -471,10 +467,9 @@ READ8_HANDLER( slikshot_z80_r )
  *
  *************************************/
 
-READ8_HANDLER( slikshot_z80_control_r )
+READ8_MEMBER(itech8_state::slikshot_z80_control_r )
 {
-	itech8_state *state = space.machine().driver_data<itech8_state>();
-	return state->m_z80_ctrl;
+	return m_z80_ctrl;
 }
 
 
@@ -485,35 +480,34 @@ READ8_HANDLER( slikshot_z80_control_r )
  *
  *************************************/
 
-static TIMER_CALLBACK( delayed_z80_control_w )
+TIMER_CALLBACK_MEMBER( itech8_state::delayed_z80_control_w )
 {
-	itech8_state *state = machine.driver_data<itech8_state>();
 	int data = param;
 
 	/* bit 4 controls the reset line on the Z80 */
 
 	/* this is a big kludge: only allow a reset if the Z80 is stopped */
 	/* at its endpoint; otherwise, we never get a result from the Z80 */
-	if ((data & 0x10) || machine.device("sub")->state().state_int(Z80_PC) == 0x13a)
+	if ((data & 0x10) || machine().device("sub")->state().state_int(Z80_PC) == 0x13a)
 	{
-		machine.device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		machine().device("sub")->execute().set_input_line(INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* on the rising edge, make the crosshair visible again */
-		if ((data & 0x10) && !(state->m_z80_ctrl & 0x10))
-			state->m_crosshair_vis = 1;
+		if ((data & 0x10) && !(m_z80_ctrl & 0x10))
+			m_crosshair_vis = 1;
 	}
 
 	/* boost the interleave whenever this is written to */
-	machine.scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 
 	/* stash the new value */
-	state->m_z80_ctrl = data;
+	m_z80_ctrl = data;
 }
 
 
-WRITE8_HANDLER( slikshot_z80_control_w )
+WRITE8_MEMBER(itech8_state::slikshot_z80_control_w )
 {
-	space.machine().scheduler().synchronize(FUNC(delayed_z80_control_w), data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(itech8_state::delayed_z80_control_w),this), data);
 }
 
 
@@ -593,7 +587,7 @@ UINT32 itech8_state::screen_update_slikshot(screen_device &screen, bitmap_rgb32 
 		if (temp >=  0x90) temp =  0x90;
 		m_curx = temp;
 
-		compute_sensors(machine());
+		compute_sensors();
 //      popmessage("V=%02x,%02x  X=%02x", m_curvx, m_curvy, m_curx);
 		m_crosshair_vis = 0;
 	}

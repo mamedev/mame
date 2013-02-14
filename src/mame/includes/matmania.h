@@ -61,19 +61,17 @@ public:
 	DECLARE_MACHINE_RESET(maniach);
 	UINT32 screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	/*----------- defined in machine/maniach.c -----------*/
+	DECLARE_READ8_MEMBER( maniach_68705_port_a_r );
+	DECLARE_WRITE8_MEMBER( maniach_68705_port_a_w );
+	DECLARE_READ8_MEMBER( maniach_68705_port_b_r );
+	DECLARE_WRITE8_MEMBER( maniach_68705_port_b_w );
+	DECLARE_READ8_MEMBER( maniach_68705_port_c_r );
+	DECLARE_WRITE8_MEMBER( maniach_68705_port_c_w );
+	DECLARE_WRITE8_MEMBER( maniach_68705_ddr_a_w );
+	DECLARE_WRITE8_MEMBER( maniach_68705_ddr_b_w );
+	DECLARE_WRITE8_MEMBER( maniach_68705_ddr_c_w );
+	DECLARE_WRITE8_MEMBER( maniach_mcu_w );
+	DECLARE_READ8_MEMBER( maniach_mcu_r );
+	DECLARE_READ8_MEMBER( maniach_mcu_status_r );	
 };
-
-/*----------- defined in machine/maniach.c -----------*/
-
-DECLARE_READ8_HANDLER( maniach_68705_port_a_r );
-DECLARE_WRITE8_HANDLER( maniach_68705_port_a_w );
-DECLARE_READ8_HANDLER( maniach_68705_port_b_r );
-DECLARE_WRITE8_HANDLER( maniach_68705_port_b_w );
-DECLARE_READ8_HANDLER( maniach_68705_port_c_r );
-DECLARE_WRITE8_HANDLER( maniach_68705_port_c_w );
-DECLARE_WRITE8_HANDLER( maniach_68705_ddr_a_w );
-DECLARE_WRITE8_HANDLER( maniach_68705_ddr_b_w );
-DECLARE_WRITE8_HANDLER( maniach_68705_ddr_c_w );
-DECLARE_WRITE8_HANDLER( maniach_mcu_w );
-DECLARE_READ8_HANDLER( maniach_mcu_r );
-DECLARE_READ8_HANDLER( maniach_mcu_status_r );

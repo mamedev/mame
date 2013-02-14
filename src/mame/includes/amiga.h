@@ -459,11 +459,9 @@ public:
 	int m_aga_sprite_dma_used_words[8];
 
 	DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
-	DECLARE_DRIVER_INIT(mquake);
 	DECLARE_DRIVER_INIT(amiga);
 	DECLARE_DRIVER_INIT(cdtv);
 	DECLARE_DRIVER_INIT(a3000);
-	DECLARE_MACHINE_RESET(mquake);
 	DECLARE_MACHINE_RESET(amiga);
 	DECLARE_VIDEO_START(amiga);
 	DECLARE_PALETTE_INIT(amiga);
