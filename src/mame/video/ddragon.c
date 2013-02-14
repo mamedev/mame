@@ -105,17 +105,6 @@ VIDEO_START_MEMBER(ddragon_state,ddragon)
 	m_bg_tilemap->set_scrolldy(-8, -8);
 }
 
-VIDEO_START_MEMBER(ddragon_state,chinagat)
-{
-	m_bg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddragon_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(ddragon_state::background_scan),this), 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(tilemap_get_info_delegate(FUNC(ddragon_state::get_fg_16color_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-
-	m_fg_tilemap->set_transparent_pen(0);
-	m_fg_tilemap->set_scrolldy(-8, -8);
-	m_bg_tilemap->set_scrolldy(-8, -8);
-}
-
-
 /***************************************************************************
 
   Memory handlers
