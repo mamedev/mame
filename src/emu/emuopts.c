@@ -235,7 +235,7 @@ bool emu_options::add_slot_options(bool isfirst)
 	slot_interface_iterator iter(config.root_device());
 	for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
-		if (slot->fixed() || slot->all_internal()) continue;
+		if (slot->fixed()) continue;
 		// first device? add the header as to be pretty
 		if (first && isfirst)
 		{
