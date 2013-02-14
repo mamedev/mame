@@ -53,7 +53,7 @@ device_t* device_slot_interface::get_card_device()
 	return dev;
 }
 
-const bool device_slot_interface::all_internal()
+const bool device_slot_interface::all_internal() const
 {
 	for (int i = 0; m_slot_interfaces && m_slot_interfaces[i].name != NULL; i++)
 		if (!m_slot_interfaces[i].internal)
