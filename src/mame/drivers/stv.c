@@ -632,32 +632,6 @@ DRIVER_INIT_MEMBER(saturn_state,danchiq)
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5);
 }
 
-/*
-060011AE: AND     #$0F,R0
-060011B0: MOV     #$5E,R1
-060011B2: ADD     R5,R1
-060011B4: MOV.B   R0,@R1
-060011B6: MOV     R5,R0
-060011B8: ADD     #$70,R0
-
-060011BA: MOV.B   @(R0,R4),R0 <- reads 0x02020000,cause of the crash
-060011BC: RTS
-060011BE: NOP
-060131AA: CMP/EQ  #$01,R0
-060131AC: BT      $0601321C
-060131AE: CMP/EQ  #$02,R0
-060131B0: BT      $0601324A
-
-TODO: understand where it gets 0x02020000,it must be 0x0000000
-
-bp 6001d5a
-bp 6001d22 (60ffef0)
-
-
-(?) wpset 60cf888,4,r
-
-*/
-
 DRIVER_INIT_MEMBER(saturn_state,astrass)
 {
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x60011ba);
@@ -830,7 +804,7 @@ DRIVER_INIT_MEMBER(saturn_state,smleague)
 	DRIVER_INIT_CALL(stv);
 
 	/* tight sync to avoid dead locks */
-	m_minit_boost = m_sinit_boost = 0;
+	m_minit_boost = m_sinit_boost = 5000;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5000);
 }
 
@@ -841,7 +815,7 @@ DRIVER_INIT_MEMBER(saturn_state,finlarch)
 	DRIVER_INIT_CALL(stv);
 
 	/* tight sync to avoid dead locks */
-	m_minit_boost = m_sinit_boost = 0;
+	m_minit_boost = m_sinit_boost = 5000;
 	m_minit_boost_timeslice = m_sinit_boost_timeslice = attotime::from_usec(5000);
 }
 
@@ -857,12 +831,9 @@ DRIVER_INIT_MEMBER(saturn_state,maruchan)
 
 DRIVER_INIT_MEMBER(saturn_state,pblbeach)
 {
-	//sh2drc_add_pcflush(machine().device("maincpu"), 0x605eb78);
+	sh2drc_add_pcflush(machine().device("maincpu"), 0x605eb78);
 
 	DRIVER_INIT_CALL(stv);
-
-//  m_instadma_hack = 1;
-
 }
 
 DRIVER_INIT_MEMBER(saturn_state,shanhigw)

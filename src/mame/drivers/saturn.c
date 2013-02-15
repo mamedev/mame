@@ -23,8 +23,8 @@ TODO:
 - IC13 games on the dev bios doesn't even load the cartridge / crashes the emulation at start-up,
   rom rearrange needed?
 - SCU DSP still has its fair share of issues, it also needs to be converted to CPU structure;
-- Add the RS232c interface (serial port), needed by fhboxers.
-- Video emulation bugs: check stvvdp2.c file.
+- Add the RS232c interface (serial port), needed by fhboxers (accesses some ports in the a-bus dummy range).
+- Video emulation is nowhere near perfection.
 - Reimplement the idle skip if possible.
 - Properly emulate the protection chips, used by several games (check stvprot.c for more info)
 - Move SCU device into its respective file;
@@ -32,53 +32,28 @@ TODO:
 
 (per-game issues)
 - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose;
+
 - smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MCFG_INTERLEAVE number,might need strict
-  SH-2 synching.
-- groovef / myfairld: why do we get 2 credits on startup? Cause might be by a communication with the M68k
+  SH-2 synching or it's actually a m68k comms issue.
+
+- groovef: ugly back screen color, caused by incorrect usage of the Color Calculation function.
+
 - myfairld: Apparently this game gives a black screen (either test mode and in-game mode),but let it wait for about
   10 seconds and the game will load everything. This is because of a hellishly slow m68k sub-routine located at 54c2.
   Likely to not be a bug but an in-game design issue.
-- danchih: hanafuda panel doesn't work.
-- findlove: controls doesn't work? Playing with the debugger at location $6063720 it makes it get furter,but controls
-  still doesn't work, missing irq?
+
+- danchih / danchiq: currently hangs randomly (regression).
+
 - batmanfr: Missing sound,caused by an extra ADSP chip which is on the cart.The CPU is a
   ADSP-2181,and it's the same used by NBA Jam Extreme (ZN game).
+
 - vfremix: when you play as Akira, there is a problem with third match: game doesn't upload all textures
   and tiles and doesn't enable display, although gameplay is normal - wait a while to get back
   to title screen after losing a match
 
-===================================================================================================
+- vfremix: various problems with SCU DSP: Jeffry causes a black screen hang. Akira's kick sometimes
+  sends the opponent out of the ring from whatever position.
 
-Hardware overview:
-------------------
--two SH-2 CPUs,in a master/slave configuration.The master cpu is used to
-boot-up and to do the most of the work,the slave one does extra work that could be
-too much for a single cpu.They both shares all the existant devices;
--a M68000 CPU,used to drive sound(the SCSP chip).The program is uploaded via the
-SH-2 cpus;
--a SMPC (System Manager & Peripheral Control),used to drive all the
-devices on the board;
--a SCU (System Control Unit),mainly used to do DMA operations and to drive interrupts,it
-also has a DSP;
--an (optional for the ST-V) SH-1 CPU,used to be the CD driver;
--An A-Bus,where the cart ROM area is located;
--A B-Bus,where the Video Hardware & the SCU sections are located;
--Two VDPs chips(named as 1 & 2),used for the video section:
- -VDP1 is used to render sprites & polygons.
- -VDP2 is for the tilemap system,there are:
- 4 effective normal layers;
- 2 roz layers;
- 1 back layer;
- 1 line layer;
- The VDP2 is capable of the following things (in order):
- -dynamic resolution (up to 704x512) & various interlacing modes;
- -mosaic process;
- -scrolling,scaling,horizontal & vertical cell scrolling & linescroll for the
-  normal planes, the roz ones can also rotate;
- -versatile window system,used for various effects;
- -alpha-blending,refered as Color Calculation in the docs;
- -shadow effects;
- -global rgb brightness control,separate for every plane;
 
 ****************************************************************************************************/
 
