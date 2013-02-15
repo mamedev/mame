@@ -102,6 +102,9 @@ struct jaguar_cpu_state
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
+
+	UINT32		internal_ram_start;
+	UINT32		internal_ram_end;
 };
 
 
@@ -427,6 +430,17 @@ static void init_common(int isdsp, legacy_cpu_device *device, device_irq_acknowl
 	device->save_item(NAME(jaguar->ctrl));
 	device->save_item(NAME(jaguar->ppc));
 	device->machine().save().register_postload(save_prepost_delegate(FUNC(jaguar_postload), jaguar));
+
+	if (isdsp)
+	{
+		jaguar->internal_ram_start = 0xf1b000;
+		jaguar->internal_ram_end = 0xf1cfff;
+	}
+	else
+	{
+		jaguar->internal_ram_start = 0xf03000;
+		jaguar->internal_ram_end = 0xf03fff;
+	}
 }
 
 
@@ -805,20 +819,41 @@ void load_r15rn_rn(jaguar_cpu_state *jaguar, UINT16 op)
 void loadb_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)
 {
 	UINT32 r1 = jaguar->r[(op >> 5) & 31];
-	jaguar->r[op & 31] = READBYTE(jaguar, r1);
+	if (r1 >= jaguar->internal_ram_start && r1 <= jaguar->internal_ram_end)
+	{
+		jaguar->r[op & 31] = READLONG(jaguar, r1 & ~3);
+	}
+	else
+	{
+		jaguar->r[op & 31] = READBYTE(jaguar, r1);
+	}
 }
 
 void loadw_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)
 {
 	UINT32 r1 = jaguar->r[(op >> 5) & 31];
-	jaguar->r[op & 31] = READWORD(jaguar, r1);
+	if (r1 >= jaguar->internal_ram_start && r1 <= jaguar->internal_ram_end)
+	{
+		jaguar->r[op & 31] = READLONG(jaguar, r1 & ~3);
+	}
+	else
+	{
+		jaguar->r[op & 31] = READWORD(jaguar, r1);
+	}
 }
 
 void loadp_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)   /* GPU only */
 {
 	UINT32 r1 = jaguar->r[(op >> 5) & 31];
-	jaguar->ctrl[G_HIDATA] = READWORD(jaguar, r1);
-	jaguar->r[op & 31] = READWORD(jaguar, r1+4);
+	if (r1 >= jaguar->internal_ram_start && r1 <= jaguar->internal_ram_end)
+	{
+		jaguar->r[op & 31] = READLONG(jaguar, r1 & ~3);
+	}
+	else
+	{
+		jaguar->ctrl[G_HIDATA] = READLONG(jaguar, r1);
+		jaguar->r[op & 31] = READLONG(jaguar, r1+4);
+	}
 }
 
 void mirror_rn(jaguar_cpu_state *jaguar, UINT16 op) /* DSP only */
@@ -1151,20 +1186,41 @@ void store_rn_r15rn(jaguar_cpu_state *jaguar, UINT16 op)
 void storeb_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)
 {
 	UINT32 r1 = jaguar->r[(op >> 5) & 31];
-	WRITEBYTE(jaguar, r1, jaguar->r[op & 31]);
+	if (r1 >= jaguar->internal_ram_start && r1 <= jaguar->internal_ram_end)
+	{
+		WRITELONG(jaguar, r1 & ~3, jaguar->r[op & 31]);
+	}
+	else
+	{
+		WRITEBYTE(jaguar, r1, jaguar->r[op & 31]);
+	}
 }
 
 void storew_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)
 {
 	UINT32 r1 = jaguar->r[(op >> 5) & 31];
-	WRITEWORD(jaguar, r1, jaguar->r[op & 31]);
+	if (r1 >= jaguar->internal_ram_start && r1 <= jaguar->internal_ram_end)
+	{
+		WRITELONG(jaguar, r1 & ~3, jaguar->r[op & 31]);
+	}
+	else
+	{
+		WRITEWORD(jaguar, r1, jaguar->r[op & 31]);
+	}
 }
 
 void storep_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)  /* GPU only */
 {
 	UINT32 r1 = jaguar->r[(op >> 5) & 31];
-	WRITELONG(jaguar, r1, jaguar->ctrl[G_HIDATA]);
-	WRITELONG(jaguar, r1+4, jaguar->r[op & 31]);
+	if (r1 >= jaguar->internal_ram_start && r1 <= jaguar->internal_ram_end)
+	{
+		WRITELONG(jaguar, r1 & ~3, jaguar->r[op & 31]);
+	}
+	else
+	{
+		WRITELONG(jaguar, r1, jaguar->ctrl[G_HIDATA]);
+		WRITELONG(jaguar, r1+4, jaguar->r[op & 31]);
+	}
 }
 
 void sub_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)
@@ -1182,9 +1238,10 @@ void subc_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)
 	int dreg = op & 31;
 	UINT32 r1 = jaguar->r[(op >> 5) & 31];
 	UINT32 r2 = jaguar->r[dreg];
-	UINT32 res = r2 - r1 - ((jaguar->FLAGS >> 1) & 1);
+	UINT32 c = ((jaguar->FLAGS >> 1) & 1);
+	UINT32 res = r2 - r1 - c;
 	jaguar->r[dreg] = res;
-	CLR_ZNC(jaguar); SET_ZNC_SUB(jaguar, r2, r1, res);
+	CLR_ZNC(jaguar); SET_ZNC_SUB(jaguar, r2, r1 + c, res);
 }
 
 void subq_n_rn(jaguar_cpu_state *jaguar, UINT16 op)
