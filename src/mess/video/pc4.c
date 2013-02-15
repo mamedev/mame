@@ -33,7 +33,7 @@ UINT32 pc4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 						else
 						{
 							//draw CGROM characters
-							bitmap.pix16(l*9 + y, i*6 + x) = BIT(machine().root_device().memregion("charset")->base()[m_ddram[char_pos]*8+y], 4-x);
+							bitmap.pix16(l*9 + y, i*6 + x) = BIT(m_region_charset->base()[m_ddram[char_pos]*8+y], 4-x);
 
 						}
 

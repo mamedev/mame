@@ -31,12 +31,15 @@
 
 READ8_MEMBER( pc4_state::kb_r )
 {
-	static const char *const bitnames[] = {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7"};
 	UINT8 data = 0xff;
 
 	for (int line=0; line<8; line++)
+	{
 		if (!(offset & (1<<line)))
-			data &= ioport(bitnames[line])->read();
+		{
+			data &= io_port[line]->read();
+		}
+	}
 
 	return data;
 }
@@ -44,7 +47,7 @@ READ8_MEMBER( pc4_state::kb_r )
 WRITE8_MEMBER( pc4_state::bank_w )
 {
 	//printf("set bank %x\n", data);
-	membank("rombank")->set_entry(data&0x07);
+	m_rombank->set_entry(data&0x07);
 }
 
 WRITE8_MEMBER( pc4_state::beep_w )
@@ -179,14 +182,20 @@ GFXDECODE_END
 
 void pc4_state::machine_start()
 {
-	UINT8* rom_base = (UINT8 *)machine().root_device().memregion("maincpu")->base();
+	static const char *const bitnames[] = {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7"};
+	UINT8* rom_base = (UINT8 *)memregion("maincpu")->base();
 
-	membank("rombank")->configure_entries(0, 8, rom_base, 0x4000);
-	membank("rombank")->set_entry(0);
+	m_rombank->configure_entries(0, 8, rom_base, 0x4000);
+	m_rombank->set_entry(0);
 
 	m_busy_timer = timer_alloc(BUSY_TIMER);
 	m_blink_timer = timer_alloc(BLINKING_TIMER);
 	m_blink_timer->adjust(attotime::from_msec(409), 0, attotime::from_msec(409));
+
+    for (int i=0; i<8; i++)
+	{
+		io_port[i] = ioport(bitnames[i]);
+	}
 
 	m_ac = 0;
 	m_ac_mode = 0;
