@@ -203,7 +203,7 @@ void hd66421_device::plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color
 	bitmap.pix16(y, x) = (UINT16)color;
 }
 
-void hd66421_device::update_screen(bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT32 hd66421_device::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	pen_t pen[4];
 
@@ -251,4 +251,6 @@ void hd66421_device::update_screen(bitmap_ind16 &bitmap, const rectangle &clipre
 		rectangle rect(0, HD66421_WIDTH - 1, 0, HD66421_HEIGHT - 1);
 		bitmap.fill(get_white_pen(machine()), rect);
 	}
+	
+	return 0;
 }

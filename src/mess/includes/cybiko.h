@@ -46,9 +46,11 @@ class cybiko_state : public driver_device
 public:
 	cybiko_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
 	m_crtc(*this, "hd66421"),
 	m_speaker(*this, SPEAKER_TAG),
 	m_rtc(*this, "rtc"),
+	m_ram(*this, RAM_TAG),
 	m_flash1(*this, "flash1"),
 	m_flash2(*this, "flash2"),
 	m_flashxt(*this, "flashxt")
@@ -75,27 +77,26 @@ public:
 	void cybiko_rs232_pin_txd(int data);
 	int cybiko_rs232_pin_rxd();
 	int cybiko_rs232_rx_queue();
+	void cybiko_rs232_init();
+	void cybiko_rs232_exit();
+	void cybiko_rs232_reset();
 
+	required_device<cpu_device> m_maincpu;
 	required_device<hd66421_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pcf8593_device> m_rtc;
+	required_device<ram_device> m_ram;
 	optional_device<at45db041_device> m_flash1;
 	optional_device<intelfsh8_device> m_flash2;
 	optional_device<intelfsh16_device> m_flashxt;
 	DECLARE_DRIVER_INIT(cybikoxt);
-	DECLARE_DRIVER_INIT(cybikov1);
-	DECLARE_DRIVER_INIT(cybikov2);
+	DECLARE_DRIVER_INIT(cybiko);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void palette_init();
-	DECLARE_MACHINE_START(cybikov2);
-	DECLARE_MACHINE_RESET(cybikov2);
-	DECLARE_MACHINE_START(cybikoxt);
-	DECLARE_MACHINE_RESET(cybikoxt);
-	UINT32 screen_update_cybiko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void machine_stop_cybikov1();
-	void machine_stop_cybikov2();
-	void machine_stop_cybikoxt();
+	void machine_stop_cybiko();
 };
+
+NVRAM_HANDLER( cybikoxt );
 
 #endif /* CYBIKO_H_ */

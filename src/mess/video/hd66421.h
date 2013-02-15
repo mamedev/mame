@@ -49,7 +49,7 @@ public:
 	DECLARE_READ8_MEMBER( reg_dat_r );
 	DECLARE_WRITE8_MEMBER( reg_dat_w );
 
-	void update_screen(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides

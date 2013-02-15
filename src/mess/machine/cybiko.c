@@ -17,154 +17,60 @@
 
 #define RAMDISK_SIZE (512 * 1024)
 
-/////////////////////////
-// FUNCTION PROTOTYPES //
-/////////////////////////
-
-// state->m_rs232
-static void cybiko_rs232_init(running_machine &machine);
-static void cybiko_rs232_exit(void);
-static void cybiko_rs232_reset(void);
 
 ////////////////////////
 // DRIVER INIT & EXIT //
 ////////////////////////
 
-static void init_ram_handler(running_machine &machine, offs_t start, offs_t size, offs_t mirror)
-{
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_bank(start, start + size - 1, 0, mirror - size, "bank1");
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_bank(start, start + size - 1, 0, mirror - size, "bank1");
-	machine.root_device().membank( "bank1" )->set_base( machine.device<ram_device>(RAM_TAG)->pointer());
-}
-
-DRIVER_INIT_MEMBER(cybiko_state,cybikov1)
+DRIVER_INIT_MEMBER(cybiko_state,cybiko)
 {
 	_logerror( 0, ("init_cybikov1\n"));
-	init_ram_handler(machine(), 0x200000, machine().device<ram_device>(RAM_TAG)->size(), 0x200000);
-}
-
-DRIVER_INIT_MEMBER(cybiko_state,cybikov2)
-{
-	_logerror( 0, ("init_cybikov2\n"));
-	init_ram_handler(machine(), 0x200000, machine().device<ram_device>(RAM_TAG)->size(), 0x200000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, 0, 0x200000 - m_ram->size(), m_ram->pointer());
 }
 
 DRIVER_INIT_MEMBER(cybiko_state,cybikoxt)
 {
 	_logerror( 0, ("init_cybikoxt\n"));
-	init_ram_handler(machine(), 0x400000, machine().device<ram_device>(RAM_TAG)->size(), 0x200000);
+	m_maincpu->space(AS_PROGRAM).install_ram(0x400000, 0x400000 + m_ram->size() - 1, 0, 0x200000 - m_ram->size(), m_ram->pointer());
 }
 
 ///////////////////
 // MACHINE START //
 ///////////////////
 
-static emu_file *nvram_system_fopen( running_machine &machine, UINT32 openflags, const char *name)
+NVRAM_HANDLER( cybikoxt )
 {
-	file_error filerr;
-	astring fname(machine.system().name, PATH_SEPARATOR, name, ".nv");
-	emu_file *file = global_alloc(emu_file(machine.options().nvram_directory(), openflags));
-	filerr = file->open(fname.cstr());
-	if (filerr == FILERR_NONE)
-		return file;
+	address_space &space =  machine.driver_data<cybiko_state>()->m_maincpu->space(AS_PROGRAM);
+	UINT8 *buffer = global_alloc_array(UINT8, RAMDISK_SIZE);
 
-	global_free(file);
-	return NULL;
-}
-
-typedef void (nvram_load_func)(running_machine &machine, emu_file *file);
-
-static int nvram_system_load( running_machine &machine, const char *name, nvram_load_func _nvram_load, int required)
-{
-	emu_file *file;
-	file = nvram_system_fopen( machine, OPEN_FLAG_READ, name);
-	if (!file)
+	if (read_or_write)
 	{
-		if (required) mame_printf_error( "nvram load failed (%s)\n", name);
-		return FALSE;
+		for (offs_t offs = 0; offs < RAMDISK_SIZE; offs++)
+			buffer[offs] = space.read_byte(0x400000 + offs);
+
+		file->write(buffer, RAMDISK_SIZE);
 	}
-	(*_nvram_load)(machine, file);
-	global_free(file);
-	return TRUE;
-}
-
-typedef void (nvram_save_func)(running_machine &machine, emu_file *file);
-
-static int nvram_system_save( running_machine &machine, const char *name, nvram_save_func _nvram_save)
-{
-	emu_file *file;
-	file = nvram_system_fopen( machine, OPEN_FLAG_CREATE | OPEN_FLAG_WRITE | OPEN_FLAG_CREATE_PATHS, name);
-	if (!file)
+	else
 	{
-		mame_printf_error( "nvram save failed (%s)\n", name);
-		return FALSE;
-	}
-	(*_nvram_save)(machine, file);
-	global_free(file);
-	return TRUE;
-}
+		if (file)
+			file->read(buffer, RAMDISK_SIZE);
+		else
+			memset(buffer, 0, RAMDISK_SIZE);
 
-static void cybiko_ramdisk_load(running_machine &machine, emu_file *file)
-{
-	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
-#ifdef LSB_FIRST
-	UINT8 *temp = (UINT8*)malloc( RAMDISK_SIZE);
-	file->read( temp, RAMDISK_SIZE);
-	for (int i = 0; i < RAMDISK_SIZE; i += 2)
-	{
-		ram[i+0] = temp[i+1];
-		ram[i+1] = temp[i+0];
+		for (offs_t offs = 0; offs < RAMDISK_SIZE; offs++)
+			space.write_byte(0x400000 + offs, buffer[offs]);
 	}
-	free( temp);
-#else
-	file->read( ram, RAMDISK_SIZE);
-#endif
-}
 
-static void cybiko_ramdisk_save(running_machine &machine, emu_file *file)
-{
-	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
-#ifdef LSB_FIRST
-	UINT8 *temp = (UINT8*)malloc( RAMDISK_SIZE);
-	for (int i = 0; i < RAMDISK_SIZE; i += 2)
-	{
-		temp[i+0] = ram[i+1];
-		temp[i+1] = ram[i+0];
-	}
-	file->write( temp, RAMDISK_SIZE);
-	free( temp);
-#else
-	file->write( ram, RAMDISK_SIZE);
-#endif
+	global_free(buffer);
 }
 
 void cybiko_state::machine_start()
 {
 	_logerror( 0, ("machine_start_cybikov1\n"));
 	// serial port
-	cybiko_rs232_init(machine());
+	cybiko_rs232_init();
 	// other
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cybiko_state::machine_stop_cybikov1),this));
-}
-
-MACHINE_START_MEMBER(cybiko_state,cybikov2)
-{
-	_logerror( 0, ("machine_start_cybikov2\n"));
-	// serial port
-	cybiko_rs232_init(machine());
-	// other
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cybiko_state::machine_stop_cybikov2),this));
-}
-
-MACHINE_START_MEMBER(cybiko_state,cybikoxt)
-{
-	_logerror( 0, ("machine_start_cybikoxt\n"));
-	// ramdisk
-	nvram_system_load( machine(), "ramdisk", cybiko_ramdisk_load, 0);
-	// serial port
-	cybiko_rs232_init(machine());
-	// other
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cybiko_state::machine_stop_cybikoxt),this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cybiko_state::machine_stop_cybiko),this));
 }
 
 ///////////////////
@@ -177,41 +83,13 @@ void cybiko_state::machine_reset()
 	cybiko_rs232_reset();
 }
 
-MACHINE_RESET_MEMBER(cybiko_state,cybikov2)
-{
-	_logerror( 0, ("machine_reset_cybikov2\n"));
-	cybiko_rs232_reset();
-}
-
-MACHINE_RESET_MEMBER(cybiko_state,cybikoxt)
-{
-	_logerror( 0, ("machine_reset_cybikoxt\n"));
-	cybiko_rs232_reset();
-}
-
 //////////////////
 // MACHINE STOP //
 //////////////////
 
-void cybiko_state::machine_stop_cybikov1()
+void cybiko_state::machine_stop_cybiko()
 {
 	_logerror( 0, ("machine_stop_cybikov1\n"));
-	// serial port
-	cybiko_rs232_exit();
-}
-
-void cybiko_state::machine_stop_cybikov2()
-{
-	_logerror( 0, ("machine_stop_cybikov2\n"));
-	// serial port
-	cybiko_rs232_exit();
-}
-
-void cybiko_state::machine_stop_cybikoxt()
-{
-	_logerror( 0, ("machine_stop_cybikoxt\n"));
-	// ramdisk
-	nvram_system_save( machine(), "ramdisk", cybiko_ramdisk_save);
 	// serial port
 	cybiko_rs232_exit();
 }
@@ -221,20 +99,19 @@ void cybiko_state::machine_stop_cybikoxt()
 ///////////
 
 
-static void cybiko_rs232_init(running_machine &machine)
+void cybiko_state::cybiko_rs232_init()
 {
-	cybiko_state *state = machine.driver_data<cybiko_state>();
 	_logerror( 0, ("cybiko_rs232_init\n"));
-	memset( &state->m_rs232, 0, sizeof( state->m_rs232));
-//  machine.scheduler().timer_pulse(TIME_IN_HZ( 10), FUNC(rs232_timer_callback));
+	memset( &m_rs232, 0, sizeof(m_rs232));
+//  machine().scheduler().timer_pulse(TIME_IN_HZ( 10), FUNC(rs232_timer_callback));
 }
 
-static void cybiko_rs232_exit()
+void cybiko_state::cybiko_rs232_exit()
 {
 	_logerror( 0, ("cybiko_rs232_exit\n"));
 }
 
-static void cybiko_rs232_reset()
+void cybiko_state::cybiko_rs232_reset()
 {
 	_logerror( 0, ("cybiko_rs232_reset\n"));
 }

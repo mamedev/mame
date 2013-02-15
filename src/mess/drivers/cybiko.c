@@ -296,24 +296,12 @@ void cybiko_state::palette_init()
 }
 
 ////////////////////
-// SCREEN UPDATE  //
-////////////////////
-
-UINT32 cybiko_state::screen_update_cybiko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	hd66421_device *hd66421 = machine().device<hd66421_device>( "hd66421" );
-	hd66421->update_screen(bitmap, cliprect);
-	return 0;
-}
-
-
-////////////////////
 // MACHINE DRIVER //
 ////////////////////
 
 static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	// cpu
-	MCFG_CPU_ADD( "maincpu", H8S2241, 11059200 )
+	MCFG_CPU_ADD( "maincpu", H8S2241, XTAL_11_0592MHz )
 	MCFG_CPU_PROGRAM_MAP( cybikov1_mem )
 	MCFG_CPU_IO_MAP( cybikov1_io )
 	// screen
@@ -321,7 +309,7 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_SCREEN_REFRESH_RATE( 60 )
 	MCFG_SCREEN_SIZE( HD66421_WIDTH, HD66421_HEIGHT )
 	MCFG_SCREEN_VISIBLE_AREA( 0, HD66421_WIDTH - 1, 0, HD66421_HEIGHT - 1 )
-	MCFG_SCREEN_UPDATE_DRIVER(cybiko_state, screen_update_cybiko)
+	MCFG_SCREEN_UPDATE_DEVICE("hd66421", hd66421_device, update_screen)
 
 	// video
 	MCFG_HD66421_ADD("hd66421")
@@ -344,12 +332,10 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cybikov2, cybikov1)
 	// cpu
-	MCFG_CPU_REPLACE("maincpu", H8S2246, 11059200)
+	MCFG_CPU_REPLACE("maincpu", H8S2246, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(cybikov2_mem )
 	MCFG_CPU_IO_MAP(cybikov2_io )
 	// machine
-	MCFG_MACHINE_START_OVERRIDE(cybiko_state,cybikov2)
-	MCFG_MACHINE_RESET_OVERRIDE(cybiko_state,cybikov2)
 	MCFG_SST_39VF020_ADD("flash2")
 
 	/* internal ram */
@@ -360,14 +346,14 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
 	// cpu
-	MCFG_CPU_REPLACE("maincpu", H8S2323, 18432000)
+	MCFG_CPU_REPLACE("maincpu", H8S2323, XTAL_18_432MHz)
 	MCFG_CPU_PROGRAM_MAP(cybikoxt_mem )
 	MCFG_CPU_IO_MAP(cybikoxt_io )
 	// machine
-	MCFG_MACHINE_START_OVERRIDE(cybiko_state,cybikoxt)
-	MCFG_MACHINE_RESET_OVERRIDE(cybiko_state,cybikoxt)
 	MCFG_DEVICE_REMOVE("flash1")
 	MCFG_SST_39VF400A_ADD("flashxt")
+
+	MCFG_NVRAM_HANDLER( cybikoxt )
 
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -421,6 +407,6 @@ ROM_END
 //////////////
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT     INIT        COMPANY       FULLNAME                FLAGS */
-COMP( 2000, cybikov1,   0,          0,      cybikov1,   cybiko, cybiko_state,   cybikov1,   "Cybiko Inc", "Cybiko Classic (V1)",  GAME_IMPERFECT_SOUND )
-COMP( 2000, cybikov2,   cybikov1,   0,      cybikov2,   cybiko, cybiko_state,   cybikov2,   "Cybiko Inc", "Cybiko Classic (V2)",  GAME_IMPERFECT_SOUND )
+COMP( 2000, cybikov1,   0,          0,      cybikov1,   cybiko, cybiko_state,   cybiko  ,   "Cybiko Inc", "Cybiko Classic (V1)",  GAME_IMPERFECT_SOUND )
+COMP( 2000, cybikov2,   cybikov1,   0,      cybikov2,   cybiko, cybiko_state,   cybiko  ,   "Cybiko Inc", "Cybiko Classic (V2)",  GAME_IMPERFECT_SOUND )
 COMP( 2001, cybikoxt,   cybikov1,   0,      cybikoxt,   cybikoxt, cybiko_state, cybikoxt,   "Cybiko Inc", "Cybiko Xtreme",        GAME_IMPERFECT_SOUND )
