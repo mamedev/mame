@@ -11,12 +11,15 @@
 #include "machine/ecb_grip.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
+#include "machine/serial.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
 
 #define Z80_TAG         "z1"
 #define UPD765_TAG      "z38"
 #define UPD1990A_TAG    "z43"
+#define RS232_A_TAG		"rs232a"
+#define RS232_B_TAG		"rs232b"
 
 // ------------------------------------------------------------------------
 
@@ -38,6 +41,8 @@ public:
 			m_floppy0(*this, UPD765_TAG":0"),
 			m_floppy1(*this, UPD765_TAG":1"),
 			m_ecb(*this, ECBBUS_TAG),
+			m_rs232a(*this, RS232_A_TAG),
+			m_rs232b(*this, RS232_B_TAG),
 			m_rom(*this, Z80_TAG),
 			m_j4(*this, "J4"),
 			m_j5(*this, "J5")
@@ -50,6 +55,8 @@ public:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<ecbbus_device> m_ecb;
+	required_device<rs232_port_device> m_rs232a;
+	required_device<rs232_port_device> m_rs232b;
 	required_memory_region m_rom;
 	required_ioport m_j4;
 	required_ioport m_j5;

@@ -178,9 +178,11 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 		break;
 
 	case 2: // _RTS
+		m_rs232a->rts_w(fb);
 		break;
 
 	case 3: // TX
+		m_rs232a->tx(fb);
 		break;
 
 	case 4: // _MSTOP
@@ -192,6 +194,7 @@ void prof80_state::ls259_w(int fa, int sa, int fb, int sb)
 		break;
 
 	case 5: // TXP
+		m_rs232b->tx(fb);
 		break;
 
 	case 6: // TSTB
@@ -262,9 +265,11 @@ READ8_MEMBER( prof80_state::status_r )
 	UINT8 data = 0;
 
 	// serial receive
+	data |= !m_rs232a->rx();
 
 	// clear to send
-	data |= 0x10;
+	data |= m_rs232a->cts_r() << 4;
+	data |= m_rs232b->cts_r() << 7;
 
 	// floppy index
 	data |= (m_floppy0->get_device() ? m_floppy0->get_device()->idx_r() : m_floppy1->get_device() ? m_floppy1->get_device()->idx_r() : 1) << 5;
@@ -523,6 +528,20 @@ static SLOT_INTERFACE_START( prof80_ecb_cards )
 SLOT_INTERFACE_END
 
 
+//-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -609,6 +628,10 @@ static MACHINE_CONFIG_START( prof80, prof80_state )
 	MCFG_ECBBUS_SLOT_ADD(3, "ecb_3", prof80_ecb_cards, NULL, NULL)
 	MCFG_ECBBUS_SLOT_ADD(4, "ecb_4", prof80_ecb_cards, NULL, NULL)
 	MCFG_ECBBUS_SLOT_ADD(5, "ecb_5", prof80_ecb_cards, NULL, NULL)
+
+	// V24
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
