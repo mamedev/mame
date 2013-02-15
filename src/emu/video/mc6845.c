@@ -1037,6 +1037,7 @@ void mc6845_device::device_start()
 	m_hsync_on_pos = m_vsync_on_pos = 0;
 	m_hsync_off_pos = m_vsync_off_pos = 0;
 	m_vsync = m_hsync = 0;
+	m_cur = 0;
 	m_line_counter = 0;
 	m_horiz_disp = m_vert_disp = 0;
 	m_vert_sync_pos = 0;
