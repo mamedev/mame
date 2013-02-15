@@ -34,6 +34,32 @@ DRIVER_INIT_MEMBER(cybiko_state,cybikoxt)
 	m_maincpu->space(AS_PROGRAM).install_ram(0x400000, 0x400000 + m_ram->size() - 1, 0, 0x200000 - m_ram->size(), m_ram->pointer());
 }
 
+QUICKLOAD_LOAD( cybiko )
+{
+	running_machine &machine = image.device().machine();
+	cybiko_state *state = machine.driver_data<cybiko_state>();
+
+	image.fread(state->m_flash1->get_ptr(), MIN(image.length(), 0x84000));
+
+	return IMAGE_INIT_PASS;
+}
+
+QUICKLOAD_LOAD( cybikoxt )
+{
+	running_machine &machine = image.device().machine();
+	cybiko_state *state = machine.driver_data<cybiko_state>();
+	address_space &dest = state->m_maincpu->space(AS_PROGRAM);
+	UINT32 size = MIN(image.length(), 0x84000);
+
+	UINT8 *buffer = global_alloc_array(UINT8, size);
+	image.fread(buffer, size);
+	for (int byte = 0; byte < size; byte++)
+		dest.write_byte(0x400000 + byte, buffer[byte]);
+	global_free(buffer);
+
+	return IMAGE_INIT_PASS;
+}
+
 ///////////////////
 // MACHINE START //
 ///////////////////

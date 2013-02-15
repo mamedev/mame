@@ -44,6 +44,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(si_w);
 	DECLARE_READ_LINE_MEMBER(so_r);
 
+	UINT8 *get_ptr() {  return m_data;  }
+
 protected:
 	// device-level overrides
 	virtual void device_start();

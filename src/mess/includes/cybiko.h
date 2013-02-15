@@ -27,6 +27,7 @@
 #include "machine/at45dbxx.h"
 #include "machine/intelfsh.h"
 #include "machine/ram.h"
+#include "imagedev/snapquik.h"
 
 struct CYBIKO_RS232_PINS
 {
@@ -98,5 +99,7 @@ public:
 };
 
 NVRAM_HANDLER( cybikoxt );
+QUICKLOAD_LOAD( cybiko );
+QUICKLOAD_LOAD( cybikoxt );
 
 #endif /* CYBIKO_H_ */

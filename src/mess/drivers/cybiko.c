@@ -328,6 +328,9 @@ static MACHINE_CONFIG_START( cybikov1, cybiko_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
 	MCFG_RAM_EXTRA_OPTIONS("1M")
+
+	/* quickload */
+	MCFG_QUICKLOAD_ADD("quickload", cybiko, "bin,nv", 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cybikov2, cybikov1)
@@ -358,6 +361,10 @@ static MACHINE_CONFIG_DERIVED( cybikoxt, cybikov1)
 	/* internal ram */
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("2M")
+
+	/* quickload */
+	MCFG_DEVICE_REMOVE("quickload")
+	MCFG_QUICKLOAD_ADD("quickload", cybikoxt, "bin,nv", 0)
 MACHINE_CONFIG_END
 
 
