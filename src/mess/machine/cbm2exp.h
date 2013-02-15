@@ -67,18 +67,17 @@ class cbm2_expansion_slot_device : public device_t,
 public:
 	// construction/destruction
 	cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~cbm2_expansion_slot_device();
 
 	// computer interface
 	UINT8 read(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3);
 	void write(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3);
 
 	// cartridge interface
-	int phi2();
+	int phi2() { return clock(); }
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
+	virtual void device_config_complete() { update_names(); }
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -100,7 +99,7 @@ protected:
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 
-	device_cbm2_expansion_card_interface *m_cart;
+	device_cbm2_expansion_card_interface *m_card;
 };
 
 

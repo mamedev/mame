@@ -82,18 +82,23 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cnt_w );
 	DECLARE_WRITE_LINE_MEMBER( sp_w );
 
+	// cartridge interface
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_out_irq_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( cia_sp_w ) { m_out_sp_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( cia_cnt_w ) { m_out_cnt_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( flag_w ) { m_out_flag_func(state); }
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-	virtual void device_reset();
 
 	devcb_resolved_write_line   m_out_irq_func;
 	devcb_resolved_write_line   m_out_sp_func;
 	devcb_resolved_write_line   m_out_cnt_func;
 	devcb_resolved_write_line   m_out_flag_func;
 
-	device_cbm2_user_port_interface *m_cart;
+	device_cbm2_user_port_interface *m_card;
 };
 
 

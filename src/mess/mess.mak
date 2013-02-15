@@ -894,6 +894,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/c64_system3.o   \
 	$(MESS_MACHINE)/c64_tdos.o  \
 	$(MESS_MACHINE)/c64_turbo232.o  \
+	$(MESS_MACHINE)/c64_vic1011.o  \
 	$(MESS_MACHINE)/c64_vizastar.o  \
 	$(MESS_MACHINE)/c64_vw64.o  \
 	$(MESS_MACHINE)/c64_warp_speed.o    \
@@ -910,6 +911,7 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_MACHINE)/vic20user.o \
 	$(MESS_MACHINE)/vic20_megacart.o    \
 	$(MESS_MACHINE)/vic1010.o   \
+	$(MESS_MACHINE)/vic1011.o   \
 	$(MESS_MACHINE)/vic1110.o   \
 	$(MESS_MACHINE)/vic1111.o   \
 	$(MESS_MACHINE)/vic1112.o   \

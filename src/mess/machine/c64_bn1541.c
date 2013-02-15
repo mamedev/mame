@@ -116,7 +116,7 @@ void c64_bn1541_device::parallel_strobe_w(int state)
 {
 	if (LOG) logerror("1541 parallel strobe %u\n", state);
 
-	m_slot->flag2_w(state);
+	m_slot->cia_flag2_w(state);
 }
 
 

@@ -22,6 +22,7 @@
 const device_type VIC20_EXPANSION_SLOT = &device_creator<vic20_expansion_slot_device>;
 
 
+
 //**************************************************************************
 //  DEVICE VIC20_EXPANSION CARD INTERFACE
 //**************************************************************************
@@ -158,36 +159,11 @@ device_vic20_expansion_card_interface::~device_vic20_expansion_card_interface()
 vic20_expansion_slot_device::vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, VIC20_EXPANSION_SLOT, "VIC-20 expansion port", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+		m_write_irq(*this),
+		m_write_nmi(*this),
+		m_write_res(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vic20_expansion_slot_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const vic20_expansion_slot_interface *intf = reinterpret_cast<const vic20_expansion_slot_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<vic20_expansion_slot_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_nmi_cb, 0, sizeof(m_out_nmi_cb));
-		memset(&m_out_res_cb, 0, sizeof(m_out_res_cb));
-	}
-
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -200,9 +176,9 @@ void vic20_expansion_slot_device::device_start()
 	m_card = dynamic_cast<device_vic20_expansion_card_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_nmi_func.resolve(m_out_nmi_cb, *this);
-	m_out_res_func.resolve(m_out_res_cb, *this);
+	m_write_irq.resolve_safe();
+	m_write_nmi.resolve_safe();
+	m_write_res.resolve_safe();
 
 	// inherit bus clock
 	if (clock() == 0)
@@ -339,7 +315,3 @@ void vic20_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT
 		m_card->vic20_cd_w(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}
 }
-
-WRITE_LINE_MEMBER( vic20_expansion_slot_device::irq_w ) { m_out_irq_func(state); }
-WRITE_LINE_MEMBER( vic20_expansion_slot_device::nmi_w ) { m_out_nmi_func(state); }
-WRITE_LINE_MEMBER( vic20_expansion_slot_device::res_w ) { m_out_res_func(state); }

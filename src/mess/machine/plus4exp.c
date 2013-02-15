@@ -178,37 +178,12 @@ UINT8* device_plus4_expansion_card_interface::plus4_nvram_pointer(running_machin
 plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PLUS4_EXPANSION_SLOT, "Expansion Port", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+		m_write_irq(*this),
+		m_read_dma_cd(*this),
+		m_write_dma_cd(*this),
+		m_write_aec(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void plus4_expansion_slot_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const plus4_expansion_slot_interface *intf = reinterpret_cast<const plus4_expansion_slot_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<plus4_expansion_slot_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_in_dma_cd_cb, 0, sizeof(m_in_dma_cd_cb));
-		memset(&m_out_dma_cd_cb, 0, sizeof(m_out_dma_cd_cb));
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_aec_cb, 0, sizeof(m_out_aec_cb));
-	}
-
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -221,10 +196,10 @@ void plus4_expansion_slot_device::device_start()
 	m_card = dynamic_cast<device_plus4_expansion_card_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_in_dma_cd_func.resolve(m_in_dma_cd_cb, *this);
-	m_out_dma_cd_func.resolve(m_out_dma_cd_cb, *this);
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_aec_func.resolve(m_out_aec_cb, *this);
+	m_write_irq.resolve_safe();
+	m_read_dma_cd.resolve_safe(0xff);
+	m_write_dma_cd.resolve_safe();
+	m_write_aec.resolve_safe();
 
 	// inherit bus clock
 	if (clock() == 0)

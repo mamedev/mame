@@ -63,11 +63,6 @@ public:
 	DECLARE_READ8_MEMBER( tpi1_pc_r );
 	DECLARE_WRITE8_MEMBER( tpi1_pc_w );
 
-	DECLARE_READ8_MEMBER( exp_dma_r );
-	DECLARE_WRITE8_MEMBER( exp_dma_w );
-	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( exp_aec_w );
-
 protected:
 	// device-level overrides
 	virtual void device_config_complete() { m_shortname = "c1551"; }

@@ -108,37 +108,12 @@ UINT8* device_vic10_expansion_card_interface::vic10_exram_pointer(running_machin
 vic10_expansion_slot_device::vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, VIC10_EXPANSION_SLOT, "VIC-10 expansion port", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
-		device_image_interface(mconfig, *this)
+		device_image_interface(mconfig, *this),
+		m_write_irq(*this),
+		m_write_res(*this),
+		m_write_cnt(*this),
+		m_write_sp(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vic10_expansion_slot_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const vic10_expansion_slot_interface *intf = reinterpret_cast<const vic10_expansion_slot_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<vic10_expansion_slot_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-		memset(&m_out_sp_cb, 0, sizeof(m_out_sp_cb));
-		memset(&m_out_cnt_cb, 0, sizeof(m_out_cnt_cb));
-		memset(&m_out_res_cb, 0, sizeof(m_out_res_cb));
-	}
-
-	// set brief and instance name
-	update_names();
 }
 
 
@@ -151,10 +126,10 @@ void vic10_expansion_slot_device::device_start()
 	m_card = dynamic_cast<device_vic10_expansion_card_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_sp_func.resolve(m_out_sp_cb, *this);
-	m_out_cnt_func.resolve(m_out_cnt_cb, *this);
-	m_out_res_func.resolve(m_out_res_cb, *this);
+	m_write_irq.resolve_safe();
+	m_write_res.resolve_safe();
+	m_write_cnt.resolve_safe();
+	m_write_sp.resolve_safe();
 
 	// inherit bus clock
 	if (clock() == 0)
@@ -300,7 +275,3 @@ void vic10_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT
 
 READ_LINE_MEMBER( vic10_expansion_slot_device::p0_r ) { int state = 0; if (m_card != NULL) state = m_card->vic10_p0_r(); return state; }
 WRITE_LINE_MEMBER( vic10_expansion_slot_device::p0_w ) { if (m_card != NULL) m_card->vic10_p0_w(state); }
-WRITE_LINE_MEMBER( vic10_expansion_slot_device::irq_w ) { m_out_irq_func(state); }
-WRITE_LINE_MEMBER( vic10_expansion_slot_device::sp_w ) { m_out_sp_func(state); if (m_card != NULL) m_card->vic10_sp_w(state); }
-WRITE_LINE_MEMBER( vic10_expansion_slot_device::cnt_w ) { m_out_cnt_func(state); if (m_card != NULL) m_card->vic10_cnt_w(state); }
-WRITE_LINE_MEMBER( vic10_expansion_slot_device::res_w ) { m_out_res_func(state); }

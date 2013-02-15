@@ -49,7 +49,7 @@ inline void c128_state::check_interrupts()
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, irq);
 
 	m_subcpu->set_input_line(M8502_IRQ_LINE, irq);
-	m_subcpu->set_input_line(INPUT_LINE_NMI, nmi);
+	m_subcpu->set_input_line(M8502_NMI_LINE, nmi);
 }
 
 

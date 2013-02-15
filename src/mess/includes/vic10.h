@@ -103,6 +103,7 @@ public:
 	DECLARE_WRITE8_MEMBER( cpu_w );
 
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
 	// interrupt state
 	int m_cia_irq;

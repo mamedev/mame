@@ -367,39 +367,6 @@ static C64H156_INTERFACE( ga_intf )
 
 
 //-------------------------------------------------
-//  PLUS4_EXPANSION_INTERFACE( expansion_intf )
-//-------------------------------------------------
-
-READ8_MEMBER( c1551_device::exp_dma_r )
-{
-	return m_slot->dma_cd_r(space, offset);
-}
-
-WRITE8_MEMBER( c1551_device::exp_dma_w )
-{
-	m_slot->dma_cd_w(space, offset, data);
-}
-
-WRITE_LINE_MEMBER( c1551_device::exp_irq_w )
-{
-	m_slot->irq_w(state);
-}
-
-WRITE_LINE_MEMBER( c1551_device::exp_aec_w )
-{
-	m_slot->aec_w(state);
-}
-
-static PLUS4_EXPANSION_INTERFACE( expansion_intf )
-{
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, exp_dma_r),
-	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, c1551_device, exp_dma_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c1551_device, exp_irq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c1551_device, exp_aec_w)
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( c1551 )
 //-------------------------------------------------
 
@@ -416,7 +383,7 @@ static MACHINE_CONFIG_FRAGMENT( c1551 )
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
 
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, 0, expansion_intf, plus4_expansion_cards, NULL, NULL)
+	MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD()
 MACHINE_CONFIG_END
 
 

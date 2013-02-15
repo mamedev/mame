@@ -80,7 +80,6 @@ class vic20_user_port_device : public device_t,
 public:
 	// construction/destruction
 	vic20_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~vic20_user_port_device();
 
 	// computer interface
 	DECLARE_READ8_MEMBER( pb_r );
@@ -96,23 +95,23 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( port_reset_w );
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( light_pen_w );
-	DECLARE_WRITE_LINE_MEMBER( via_cb1_w );
-	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	DECLARE_WRITE_LINE_MEMBER( light_pen_w ) { m_out_light_pen_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( via_cb1_w ) { m_out_cb1_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( via_cb2_w ) { m_out_cb2_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( reset_w ) { m_out_reset_func(state); }
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 	devcb_resolved_write_line   m_out_light_pen_func;
 	devcb_resolved_write_line   m_out_cb1_func;
 	devcb_resolved_write_line   m_out_cb2_func;
 	devcb_resolved_write_line   m_out_reset_func;
 
-	device_vic20_user_port_interface *m_cart;
+	device_vic20_user_port_interface *m_card;
 };
 
 
@@ -137,9 +136,6 @@ public:
 	virtual void vic20_cb1_w(int state) { };
 	virtual void vic20_cb2_w(int state) { };
 	virtual void vic20_atn_w(int state) { };
-
-	// reset
-	virtual void vic20_reset_w(int state) { };
 
 protected:
 	vic20_user_port_device *m_slot;

@@ -22,8 +22,8 @@
 #include "sound/mos6560.h"
 
 #define M6502_TAG       "ue10"
-#define M6522_0_TAG     "uab3"
-#define M6522_1_TAG     "uab1"
+#define M6522_1_TAG     "uab3"
+#define M6522_2_TAG     "uab1"
 #define M6560_TAG       "ub7"
 #define M6561_TAG       "ub7"
 #define IEC_TAG         "iec"
@@ -36,8 +36,8 @@ public:
 	vic20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 			m_maincpu(*this, M6502_TAG),
-			m_via0(*this, M6522_0_TAG),
 			m_via1(*this, M6522_1_TAG),
+			m_via2(*this, M6522_2_TAG),
 			m_vic(*this, M6560_TAG),
 			m_iec(*this, CBM_IEC_TAG),
 			m_joy1(*this, CONTROL1_TAG),
@@ -62,8 +62,8 @@ public:
 	{ }
 
 	required_device<m6502_device> m_maincpu;
-	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
+	required_device<via6522_device> m_via2;
 	required_device<mos6560_device> m_vic;
 	required_device<cbm_iec_device> m_iec;
 	required_device<vcs_control_port_device> m_joy1;
@@ -97,15 +97,15 @@ public:
 	DECLARE_READ8_MEMBER( vic_lighty_cb );
 	DECLARE_READ8_MEMBER( vic_lightbut_cb );
 
-	DECLARE_READ8_MEMBER( via0_pa_r );
-	DECLARE_WRITE8_MEMBER( via0_pa_w );
-	DECLARE_READ_LINE_MEMBER( via0_ca1_r );
-
 	DECLARE_READ8_MEMBER( via1_pa_r );
-	DECLARE_READ8_MEMBER( via1_pb_r );
-	DECLARE_WRITE8_MEMBER( via1_pb_w );
-	DECLARE_WRITE_LINE_MEMBER( via1_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( via1_cb2_w );
+	DECLARE_WRITE8_MEMBER( via1_pa_w );
+	DECLARE_READ_LINE_MEMBER( via1_ca1_r );
+
+	DECLARE_READ8_MEMBER( via2_pa_r );
+	DECLARE_READ8_MEMBER( via2_pb_r );
+	DECLARE_WRITE8_MEMBER( via2_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( via2_ca2_w );
+	DECLARE_WRITE_LINE_MEMBER( via2_cb2_w );
 
 	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 

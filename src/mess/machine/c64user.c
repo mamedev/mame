@@ -124,3 +124,7 @@ READ_LINE_MEMBER( c64_user_port_device::pa2_r ) { int state = 1; if (m_card != N
 WRITE_LINE_MEMBER( c64_user_port_device::pa2_w ) { if (m_card != NULL) m_card->c64_pa2_w(state); }
 WRITE_LINE_MEMBER( c64_user_port_device::pc2_w ) { if (m_card != NULL) m_card->c64_pc2_w(state); }
 WRITE_LINE_MEMBER( c64_user_port_device::atn_w ) { if (m_card != NULL) m_card->c64_atn_w(state); }
+WRITE_LINE_MEMBER( c64_user_port_device::cnt1_w ) { if (m_card != NULL) m_card->c64_cnt1_w(state); }
+WRITE_LINE_MEMBER( c64_user_port_device::sp1_w ) { if (m_card != NULL) m_card->c64_sp1_w(state); }
+WRITE_LINE_MEMBER( c64_user_port_device::cnt2_w ) { if (m_card != NULL) m_card->c64_cnt2_w(state); }
+WRITE_LINE_MEMBER( c64_user_port_device::sp2_w ) { if (m_card != NULL) m_card->c64_sp2_w(state); }

@@ -120,4 +120,6 @@ private:
 
 extern const device_type RS232_PORT;
 
+SLOT_INTERFACE_EXTERN( default_rs232_devices );
+
 #endif

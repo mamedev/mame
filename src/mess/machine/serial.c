@@ -133,3 +133,11 @@ WRITE_LINE_MEMBER( rs232_port_device::rts_w )
 		out_cts(state);
 	}
 }
+
+#include "machine/null_modem.h"
+#include "machine/terminal.h"
+
+SLOT_INTERFACE_START( default_rs232_devices )
+	SLOT_INTERFACE("serial_terminal", SERIAL_TERMINAL)
+	SLOT_INTERFACE("null_modem", NULL_MODEM)
+SLOT_INTERFACE_END

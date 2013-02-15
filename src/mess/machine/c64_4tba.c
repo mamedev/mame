@@ -26,7 +26,7 @@ const device_type C64_4TBA = &device_creator<c64_4tba_device>;
 
 static INPUT_PORTS_START( c64_4tba )
 	PORT_START("SP2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_user_port_device, sp2_w)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF_OWNER, c64_user_port_device, cia_sp2_w)
 
 	PORT_START("PB")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -106,5 +106,5 @@ int c64_4tba_device::c64_pa2_r()
 
 void c64_4tba_device::c64_cnt1_w(int level)
 {
-	m_slot->cnt2_w(level);
+	m_slot->cia_cnt2_w(level);
 }

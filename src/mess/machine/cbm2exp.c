@@ -165,34 +165,12 @@ cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mco
 
 
 //-------------------------------------------------
-//  cbm2_expansion_slot_device - destructor
-//-------------------------------------------------
-
-cbm2_expansion_slot_device::~cbm2_expansion_slot_device()
-{
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void cbm2_expansion_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void cbm2_expansion_slot_device::device_start()
 {
-	m_cart = dynamic_cast<device_cbm2_expansion_card_interface *>(get_card_device());
+	m_card = dynamic_cast<device_cbm2_expansion_card_interface *>(get_card_device());
 
 	// inherit bus clock
 	if (clock() == 0)
@@ -221,7 +199,7 @@ bool cbm2_expansion_slot_device::call_load()
 {
 	size_t size = 0;
 
-	if (m_cart)
+	if (m_card)
 	{
 		if (software_entry() == NULL)
 		{
@@ -229,33 +207,33 @@ bool cbm2_expansion_slot_device::call_load()
 
 			if (!mame_stricmp(filetype(), "20"))
 			{
-				fread(m_cart->cbm2_bank1_pointer(machine(), size), size);
+				fread(m_card->cbm2_bank1_pointer(machine(), size), size);
 			}
 			else if (!mame_stricmp(filetype(), "40"))
 			{
-				fread(m_cart->cbm2_bank2_pointer(machine(), size), size);
+				fread(m_card->cbm2_bank2_pointer(machine(), size), size);
 			}
 			else if (!mame_stricmp(filetype(), "60"))
 			{
-				fread(m_cart->cbm2_bank3_pointer(machine(), size), size);
+				fread(m_card->cbm2_bank3_pointer(machine(), size), size);
 			}
 		}
 		else
 		{
 			size = get_software_region_length("bank1");
-			if (size) memcpy(m_cart->cbm2_bank1_pointer(machine(), size), get_software_region("bank1"), size);
+			if (size) memcpy(m_card->cbm2_bank1_pointer(machine(), size), get_software_region("bank1"), size);
 
 			size = get_software_region_length("bank2");
-			if (size) memcpy(m_cart->cbm2_bank2_pointer(machine(), size), get_software_region("bank2"), size);
+			if (size) memcpy(m_card->cbm2_bank2_pointer(machine(), size), get_software_region("bank2"), size);
 
 			size = get_software_region_length("bank3");
-			if (size) memcpy(m_cart->cbm2_bank3_pointer(machine(), size), get_software_region("bank3"), size);
+			if (size) memcpy(m_card->cbm2_bank3_pointer(machine(), size), get_software_region("bank3"), size);
 
 			size = get_software_region_length("ram");
-			if (size) memset(m_cart->cbm2_ram_pointer(machine(), size), 0, size);
+			if (size) memset(m_card->cbm2_ram_pointer(machine(), size), 0, size);
 
 			size = get_software_region_length("nvram");
-			if (size) memset(m_cart->cbm2_nvram_pointer(machine(), size), 0, size);
+			if (size) memset(m_card->cbm2_nvram_pointer(machine(), size), 0, size);
 		}
 	}
 
@@ -291,9 +269,9 @@ const char * cbm2_expansion_slot_device::get_default_card_software(const machine
 
 UINT8 cbm2_expansion_slot_device::read(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3)
 {
-	if (m_cart != NULL)
+	if (m_card != NULL)
 	{
-		data = m_cart->cbm2_bd_r(space, offset, data, csbank1, csbank2, csbank3);
+		data = m_card->cbm2_bd_r(space, offset, data, csbank1, csbank2, csbank3);
 	}
 
 	return data;
@@ -306,18 +284,8 @@ UINT8 cbm2_expansion_slot_device::read(address_space &space, offs_t offset, UINT
 
 void cbm2_expansion_slot_device::write(address_space &space, offs_t offset, UINT8 data, int csbank1, int csbank2, int csbank3)
 {
-	if (m_cart != NULL)
+	if (m_card != NULL)
 	{
-		m_cart->cbm2_bd_w(space, offset, data, csbank1, csbank2, csbank3);
+		m_card->cbm2_bd_w(space, offset, data, csbank1, csbank2, csbank3);
 	}
-}
-
-
-//-------------------------------------------------
-//  phi2 - system clock frequency
-//-------------------------------------------------
-
-int cbm2_expansion_slot_device::phi2()
-{
-	return clock();
 }

@@ -90,13 +90,17 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pa2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc2_w );
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
+	DECLARE_WRITE_LINE_MEMBER( cnt1_w );
+	DECLARE_WRITE_LINE_MEMBER( sp1_w );
+	DECLARE_WRITE_LINE_MEMBER( cnt2_w );
+	DECLARE_WRITE_LINE_MEMBER( sp2_w );
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( cnt1_w ) { m_out_cnt1_func(state); }
-	DECLARE_WRITE_LINE_MEMBER( sp1_w ) { m_out_sp1_func(state); }
-	DECLARE_WRITE_LINE_MEMBER( cnt2_w ) { m_out_cnt2_func(state); }
-	DECLARE_WRITE_LINE_MEMBER( sp2_w ) { m_out_sp2_func(state); }
-	DECLARE_WRITE_LINE_MEMBER( flag2_w ) { m_out_flag2_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( cia_cnt1_w ) { m_out_cnt1_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( cia_sp1_w ) { m_out_sp1_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( cia_cnt2_w ) { m_out_cnt2_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( cia_sp2_w ) { m_out_sp2_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( cia_flag2_w ) { m_out_flag2_func(state); }
 	DECLARE_WRITE_LINE_MEMBER( reset_w ) { m_out_reset_func(state); }
 
 protected:

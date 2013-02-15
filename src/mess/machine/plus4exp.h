@@ -56,14 +56,18 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define PLUS4_EXPANSION_INTERFACE(_name) \
-	const plus4_expansion_slot_interface (_name) =
-
-
-#define MCFG_PLUS4_EXPANSION_SLOT_ADD(_tag, _clock, _config, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_PLUS4_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot, _def_inp, _irq) \
 	MCFG_DEVICE_ADD(_tag, PLUS4_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
+	downcast<plus4_expansion_slot_device *>(device)->set_irq_callback(DEVCB2_##_irq); \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+
+#define MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD() \
+	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, 0, plus4_expansion_cards, NULL, NULL, DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, irq_w)) \
+	MCFG_PLUS4_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_r), DEVWRITE8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_w), DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, aec_w))
+
+
+#define MCFG_PLUS4_EXPANSION_SLOT_DMA_CALLBACKS(_read, _write, _aec) \
+	downcast<plus4_expansion_slot_device *>(device)->set_dma_callbacks(DEVCB2_##_read, DEVCB2_##_write, DEVCB2_##_aec);
 
 
 
@@ -71,23 +75,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> plus4_expansion_slot_interface
-
-struct plus4_expansion_slot_interface
-{
-	devcb_read8         m_in_dma_cd_cb;
-	devcb_write8        m_out_dma_cd_cb;
-	devcb_write_line    m_out_irq_cb;
-	devcb_write_line    m_out_aec_cb;
-};
-
-
 // ======================> plus4_expansion_slot_device
 
 class device_plus4_expansion_card_interface;
 
 class plus4_expansion_slot_device : public device_t,
-									public plus4_expansion_slot_interface,
 									public device_slot_interface,
 									public device_image_interface
 {
@@ -95,21 +87,28 @@ public:
 	// construction/destruction
 	plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
+
+	template<class _read, class _write, class _aec> void set_dma_callbacks(_read read, _write write, _aec aec) {
+		m_read_dma_cd.set_callback(read);
+		m_write_dma_cd.set_callback(write);
+		m_write_aec.set_callback(aec);
+	}
+
 	// computer interface
 	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 	void cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// cartridge interface
-	DECLARE_READ8_MEMBER( dma_cd_r ) { return m_in_dma_cd_func(offset); }
-	DECLARE_WRITE8_MEMBER( dma_cd_w ) { m_out_dma_cd_func(offset, data); }
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_out_irq_func(state); }
-	DECLARE_WRITE_LINE_MEMBER( aec_w ) { m_out_aec_func(state); }
+	DECLARE_READ8_MEMBER( dma_cd_r ) { return m_read_dma_cd(offset); }
+	DECLARE_WRITE8_MEMBER( dma_cd_w ) { m_write_dma_cd(offset, data); }
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
+	DECLARE_WRITE_LINE_MEMBER( aec_w ) { m_write_aec(state); }
 	int phi2() { return clock(); }
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
+	virtual void device_config_complete() { update_names(); }
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -131,10 +130,10 @@ protected:
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 
-	devcb_resolved_read8        m_in_dma_cd_func;
-	devcb_resolved_write8       m_out_dma_cd_func;
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_write_line   m_out_aec_func;
+	devcb2_write_line   m_write_irq;
+	devcb2_read8        m_read_dma_cd;
+	devcb2_write8       m_write_dma_cd;
+	devcb2_write_line   m_write_aec;
 
 	device_plus4_expansion_card_interface *m_card;
 };

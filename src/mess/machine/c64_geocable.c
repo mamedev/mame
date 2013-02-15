@@ -32,7 +32,7 @@ const device_type C64_GEOCABLE = &device_creator<c64_geocable_device>;
 
 WRITE_LINE_MEMBER( c64_geocable_device::busy_w )
 {
-	m_slot->flag2_w(state);
+	m_slot->cia_flag2_w(state);
 }
 
 static const centronics_interface centronics_intf =

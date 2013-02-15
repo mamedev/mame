@@ -641,30 +641,12 @@ WRITE_LINE_MEMBER( plus4_state::acia_irq_w )
 //  PLUS4_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::exp_dma_r )
-{
-	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
-}
-
-WRITE8_MEMBER( plus4_state::exp_dma_w )
-{
-	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
-}
-
 WRITE_LINE_MEMBER( plus4_state::exp_irq_w )
 {
 	m_exp_irq = state;
 
 	check_interrupts();
 }
-
-static PLUS4_EXPANSION_INTERFACE( expansion_intf )
-{
-	DEVCB_DRIVER_MEMBER(plus4_state, exp_dma_r),
-	DEVCB_DRIVER_MEMBER(plus4_state, exp_dma_w),
-	DEVCB_DRIVER_LINE_MEMBER(plus4_state, exp_irq_w),
-	DEVCB_CPU_INPUT_LINE(MOS7501_TAG, INPUT_LINE_HALT)
-};
 
 
 
@@ -754,7 +736,8 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(PLUS4_USER_PORT_TAG, plus4_user_port_device, atn_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, expansion_intf, plus4_expansion_cards, "c1551", NULL)
+	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, plus4_expansion_cards, "c1551", NULL, DEVWRITELINE(DEVICE_SELF, plus4_state, exp_irq_w))
+	MCFG_PLUS4_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF, plus4_state, read), DEVWRITE8(DEVICE_SELF, plus4_state, write), INPUTLINE(MOS7501_TAG, INPUT_LINE_HALT))
 	MCFG_PLUS4_USER_PORT_ADD(PLUS4_USER_PORT_TAG, plus4_user_port_cards, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
@@ -799,7 +782,8 @@ static MACHINE_CONFIG_START( pal, plus4_state )
 	MCFG_CBM_IEC_BUS_ATN_CALLBACK(DEVWRITELINE(PLUS4_USER_PORT_TAG, plus4_user_port_device, atn_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_17_73447MHz/20, expansion_intf, plus4_expansion_cards, "c1551", NULL)
+	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_17_73447MHz/20, plus4_expansion_cards, "c1551", NULL, DEVWRITELINE(DEVICE_SELF, plus4_state, exp_irq_w))
+	MCFG_PLUS4_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF, plus4_state, read), DEVWRITE8(DEVICE_SELF, plus4_state, write), INPUTLINE(MOS7501_TAG, INPUT_LINE_HALT))
 	MCFG_PLUS4_USER_PORT_ADD(PLUS4_USER_PORT_TAG, plus4_user_port_cards, NULL, NULL)
 	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 

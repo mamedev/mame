@@ -19,43 +19,16 @@ const device_type VIC1010 = &device_creator<vic1010_device>;
 
 
 //-------------------------------------------------
-//  VIC20_EXPANSION_INTERFACE( expansion_intf )
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( vic1010_device::irq_w )
-{
-	m_slot->irq_w(state);
-}
-
-WRITE_LINE_MEMBER( vic1010_device::nmi_w )
-{
-	m_slot->nmi_w(state);
-}
-
-WRITE_LINE_MEMBER( vic1010_device::res_w )
-{
-	m_slot->res_w(state);
-}
-
-static VIC20_EXPANSION_INTERFACE( expansion_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vic1010_device, irq_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vic1010_device, nmi_w),
-	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vic1010_device, res_w)
-};
-
-
-//-------------------------------------------------
 //  MACHINE_DRIVER( vic1010 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( vic1010 )
-	MCFG_VIC20_EXPANSION_SLOT_ADD("slot1", 0, expansion_intf, vic20_expansion_cards, NULL, NULL)
-	MCFG_VIC20_EXPANSION_SLOT_ADD("slot2", 0, expansion_intf, vic20_expansion_cards, NULL, NULL)
-	MCFG_VIC20_EXPANSION_SLOT_ADD("slot3", 0, expansion_intf, vic20_expansion_cards, NULL, NULL)
-	MCFG_VIC20_EXPANSION_SLOT_ADD("slot4", 0, expansion_intf, vic20_expansion_cards, NULL, NULL)
-	MCFG_VIC20_EXPANSION_SLOT_ADD("slot5", 0, expansion_intf, vic20_expansion_cards, NULL, NULL)
-	MCFG_VIC20_EXPANSION_SLOT_ADD("slot6", 0, expansion_intf, vic20_expansion_cards, NULL, NULL)
+	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot1")
+	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot2")
+	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot3")
+	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot4")
+	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot5")
+	MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD("slot6")
 MACHINE_CONFIG_END
 
 
@@ -81,7 +54,13 @@ machine_config_constructor vic1010_device::device_mconfig_additions() const
 
 vic1010_device::vic1010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, VIC1010, "VIC1010", tag, owner, clock),
-		device_vic20_expansion_card_interface(mconfig, *this)
+		device_vic20_expansion_card_interface(mconfig, *this),
+		m_slot1(*this, "slot1"),
+		m_slot2(*this, "slot2"),
+		m_slot3(*this, "slot3"),
+		m_slot4(*this, "slot4"),
+		m_slot5(*this, "slot5"),
+		m_slot6(*this, "slot6")
 {
 }
 
@@ -93,12 +72,25 @@ vic1010_device::vic1010_device(const machine_config &mconfig, const char *tag, d
 void vic1010_device::device_start()
 {
 	// find devices
-	m_expansion_slot[0] = dynamic_cast<vic20_expansion_slot_device *>(subdevice("slot1"));
-	m_expansion_slot[1] = dynamic_cast<vic20_expansion_slot_device *>(subdevice("slot2"));
-	m_expansion_slot[2] = dynamic_cast<vic20_expansion_slot_device *>(subdevice("slot3"));
-	m_expansion_slot[3] = dynamic_cast<vic20_expansion_slot_device *>(subdevice("slot4"));
-	m_expansion_slot[4] = dynamic_cast<vic20_expansion_slot_device *>(subdevice("slot5"));
-	m_expansion_slot[5] = dynamic_cast<vic20_expansion_slot_device *>(subdevice("slot6"));
+	m_expansion_slot[0] = m_slot1;
+	m_expansion_slot[1] = m_slot2;
+	m_expansion_slot[2] = m_slot3;
+	m_expansion_slot[3] = m_slot4;
+	m_expansion_slot[4] = m_slot5;
+	m_expansion_slot[5] = m_slot6;
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void vic1010_device::device_reset()
+{
+	for (int i = 0; i < MAX_SLOTS; i++)
+	{
+		m_expansion_slot[i]->reset();
+	}
 }
 
 
@@ -131,18 +123,5 @@ void vic1010_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data,
 	for (int i = 0; i < MAX_SLOTS; i++)
 	{
 		m_expansion_slot[i]->cd_w(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
-	}
-}
-
-
-//-------------------------------------------------
-//  vic20_res_w - reset write
-//-------------------------------------------------
-
-void vic1010_device::vic20_res_w(int state)
-{
-	for (int i = 0; i < MAX_SLOTS; i++)
-	{
-		m_expansion_slot[i]->reset();
 	}
 }

@@ -90,7 +90,7 @@ public:
 
 	template<class _irq, class _nmi, class _reset> void set_irq_callbacks(_irq irq, _nmi nmi, _reset reset) {
 		m_write_irq.set_callback(irq);
-		m_write_dma_cd.set_callback(nmi);
+		m_write_nmi.set_callback(nmi);
 		m_write_reset.set_callback(reset);
 	}
 

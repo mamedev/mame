@@ -54,14 +54,16 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define VIC10_EXPANSION_INTERFACE(_name) \
-	const vic10_expansion_slot_interface (_name) =
-
-
-#define MCFG_VIC10_EXPANSION_SLOT_ADD(_tag, _clock, _config, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_VIC10_EXPANSION_SLOT_ADD(_tag, _clock, _slot_intf, _def_slot, _def_inp) \
 	MCFG_DEVICE_ADD(_tag, VIC10_EXPANSION_SLOT, _clock) \
-	MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
+
+
+#define MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACKS(_irq, _res) \
+	downcast<vic10_expansion_slot_device *>(device)->set_irq_callbacks(DEVCB2_##_irq, DEVCB2_##_res);
+
+#define MCFG_VIC10_EXPANSION_SLOT_SERIAL_CALLBACKS(_cnt, _sp) \
+	downcast<vic10_expansion_slot_device *>(device)->set_serial_callbacks(DEVCB2_##_cnt, DEVCB2_##_sp);
 
 
 
@@ -69,29 +71,27 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> vic10_expansion_slot_interface
-
-struct vic10_expansion_slot_interface
-{
-	devcb_write_line    m_out_irq_cb;
-	devcb_write_line    m_out_sp_cb;
-	devcb_write_line    m_out_cnt_cb;
-	devcb_write_line    m_out_res_cb;
-};
-
-
 // ======================> vic10_expansion_slot_device
 
 class device_vic10_expansion_card_interface;
 
 class vic10_expansion_slot_device : public device_t,
-									public vic10_expansion_slot_interface,
 									public device_slot_interface,
 									public device_image_interface
 {
 public:
 	// construction/destruction
 	vic10_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	template<class _irq, class _res> void set_irq_callbacks(_irq irq, _res res) {
+		m_write_irq.set_callback(irq);
+		m_write_res.set_callback(res);
+	}
+
+	template<class _cnt, class _sp> void set_serial_callbacks(_cnt cnt, _sp sp) {
+		m_write_cnt.set_callback(cnt);
+		m_write_sp.set_callback(sp);
+	}
 
 	// computer interface
 	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram);
@@ -100,14 +100,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( p0_w );
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( sp_w );
-	DECLARE_WRITE_LINE_MEMBER( cnt_w );
-	DECLARE_WRITE_LINE_MEMBER( res_w );
+	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
+	DECLARE_WRITE_LINE_MEMBER( res_w ) { m_write_res(state); }
+	DECLARE_WRITE_LINE_MEMBER( cnt_w ) { m_write_cnt(state); }
+	DECLARE_WRITE_LINE_MEMBER( sp_w ) { m_write_sp(state); }
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
+	virtual void device_config_complete() { update_names(); }
 	virtual void device_start();
 	virtual void device_reset();
 
@@ -129,10 +129,10 @@ protected:
 	// slot interface overrides
 	virtual const char * get_default_card_software(const machine_config &config, emu_options &options);
 
-	devcb_resolved_write_line   m_out_irq_func;
-	devcb_resolved_write_line   m_out_sp_func;
-	devcb_resolved_write_line   m_out_cnt_func;
-	devcb_resolved_write_line   m_out_res_func;
+	devcb2_write_line   m_write_irq;
+	devcb2_write_line   m_write_res;
+	devcb2_write_line   m_write_cnt;
+	devcb2_write_line   m_write_sp;
 
 	device_vic10_expansion_card_interface *m_card;
 };

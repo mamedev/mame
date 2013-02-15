@@ -16,9 +16,7 @@
 #include "emu.h"
 #include "machine/c64exp.h"
 #include "machine/mos6551.h"
-#include "machine/null_modem.h"
 #include "machine/serial.h"
-#include "machine/terminal.h"
 
 
 

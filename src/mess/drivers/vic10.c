@@ -23,8 +23,9 @@
 
 void vic10_state::check_interrupts()
 {
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_cia_irq || m_vic_irq || m_exp_irq);
+	m_maincpu->set_input_line(M6502_IRQ_LINE, m_cia_irq || m_vic_irq || m_exp_irq);
 }
+
 
 
 //**************************************************************************
@@ -529,7 +530,7 @@ WRITE8_MEMBER( vic10_state::cpu_w )
 
 
 //-------------------------------------------------
-//  C64_EXPANSION_INTERFACE( expansion_intf )
+//  VIC10_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( vic10_state::exp_irq_w )
@@ -539,13 +540,13 @@ WRITE_LINE_MEMBER( vic10_state::exp_irq_w )
 	check_interrupts();
 }
 
-static VIC10_EXPANSION_INTERFACE( expansion_intf )
+WRITE_LINE_MEMBER( vic10_state::exp_reset_w )
 {
-	DEVCB_DRIVER_LINE_MEMBER(vic10_state, exp_irq_w),
-	DEVCB_DEVICE_LINE_MEMBER(MOS6526_TAG, mos6526_device, sp_w),
-	DEVCB_DEVICE_LINE_MEMBER(MOS6526_TAG, mos6526_device, cnt_w),
-	DEVCB_CPU_INPUT_LINE(M6510_TAG, INPUT_LINE_RESET)
-};
+	if (state == ASSERT_LINE)
+	{
+		machine_reset();
+	}
+}
 
 
 
@@ -629,7 +630,9 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS6566_TAG, mos6566_device, lp_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL2_TAG, vcs_control_port_devices, "joy", NULL)
-	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, VIC6566_CLOCK, expansion_intf, vic10_expansion_cards, NULL, NULL)
+	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, VIC6566_CLOCK, vic10_expansion_cards, NULL, NULL)
+	MCFG_VIC10_EXPANSION_SLOT_IRQ_CALLBACKS(DEVWRITELINE(DEVICE_SELF, vic10_state, exp_irq_w), DEVWRITELINE(DEVICE_SELF, vic10_state, exp_reset_w))
+	MCFG_VIC10_EXPANSION_SLOT_SERIAL_CALLBACKS(DEVWRITELINE(MOS6526_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_TAG, mos6526_device, sp_w))
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vic10")

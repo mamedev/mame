@@ -100,7 +100,7 @@ void cbm2_user_port_device::device_config_complete()
 
 void cbm2_user_port_device::device_start()
 {
-	m_cart = dynamic_cast<device_cbm2_user_port_interface *>(get_card_device());
+	m_card = dynamic_cast<device_cbm2_user_port_interface *>(get_card_device());
 
 	// resolve callbacks
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
@@ -110,23 +110,14 @@ void cbm2_user_port_device::device_start()
 }
 
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void cbm2_user_port_device::device_reset()
-{
-}
-
-
-READ8_MEMBER( cbm2_user_port_device::d1_r ) { UINT8 data = 0xff; if (m_cart != NULL) data = m_cart->cbm2_d1_r(space, offset); return data; }
-WRITE8_MEMBER( cbm2_user_port_device::d1_w ) { if (m_cart != NULL) m_cart->cbm2_d1_w(space, offset, data); }
-READ8_MEMBER( cbm2_user_port_device::d2_r ) { UINT8 data = 0xff; if (m_cart != NULL) data = m_cart->cbm2_d2_r(space, offset); return data; }
-WRITE8_MEMBER( cbm2_user_port_device::d2_w ) { if (m_cart != NULL) m_cart->cbm2_d2_w(space, offset, data); }
-READ_LINE_MEMBER( cbm2_user_port_device::pb2_r ) { return m_cart ? m_cart->cbm2_pb2_r() : 1; }
-WRITE_LINE_MEMBER( cbm2_user_port_device::pb2_w ) { if (m_cart != NULL) m_cart->cbm2_pb2_w(state); }
-READ_LINE_MEMBER( cbm2_user_port_device::pb3_r ) { return m_cart ? m_cart->cbm2_pb3_r() : 1; }
-WRITE_LINE_MEMBER( cbm2_user_port_device::pb3_w ) { if (m_cart != NULL) m_cart->cbm2_pb3_w(state); }
-WRITE_LINE_MEMBER( cbm2_user_port_device::pc_w ) { if (m_cart != NULL) m_cart->cbm2_pc_w(state); }
-WRITE_LINE_MEMBER( cbm2_user_port_device::cnt_w ) { if (m_cart != NULL) m_cart->cbm2_cnt_w(state); }
-WRITE_LINE_MEMBER( cbm2_user_port_device::sp_w ) { if (m_cart != NULL) m_cart->cbm2_sp_w(state); }
+READ8_MEMBER( cbm2_user_port_device::d1_r ) { UINT8 data = 0xff; if (m_card != NULL) data = m_card->cbm2_d1_r(space, offset); return data; }
+WRITE8_MEMBER( cbm2_user_port_device::d1_w ) { if (m_card != NULL) m_card->cbm2_d1_w(space, offset, data); }
+READ8_MEMBER( cbm2_user_port_device::d2_r ) { UINT8 data = 0xff; if (m_card != NULL) data = m_card->cbm2_d2_r(space, offset); return data; }
+WRITE8_MEMBER( cbm2_user_port_device::d2_w ) { if (m_card != NULL) m_card->cbm2_d2_w(space, offset, data); }
+READ_LINE_MEMBER( cbm2_user_port_device::pb2_r ) { return m_card ? m_card->cbm2_pb2_r() : 1; }
+WRITE_LINE_MEMBER( cbm2_user_port_device::pb2_w ) { if (m_card != NULL) m_card->cbm2_pb2_w(state); }
+READ_LINE_MEMBER( cbm2_user_port_device::pb3_r ) { return m_card ? m_card->cbm2_pb3_r() : 1; }
+WRITE_LINE_MEMBER( cbm2_user_port_device::pb3_w ) { if (m_card != NULL) m_card->cbm2_pb3_w(state); }
+WRITE_LINE_MEMBER( cbm2_user_port_device::pc_w ) { if (m_card != NULL) m_card->cbm2_pc_w(state); }
+WRITE_LINE_MEMBER( cbm2_user_port_device::cnt_w ) { if (m_card != NULL) m_card->cbm2_cnt_w(state); }
+WRITE_LINE_MEMBER( cbm2_user_port_device::sp_w ) { if (m_card != NULL) m_card->cbm2_sp_w(state); }

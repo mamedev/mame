@@ -60,15 +60,6 @@ pet_user_port_device::pet_user_port_device(const machine_config &mconfig, const 
 
 
 //-------------------------------------------------
-//  pet_user_port_device - destructor
-//-------------------------------------------------
-
-pet_user_port_device::~pet_user_port_device()
-{
-}
-
-
-//-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
@@ -98,7 +89,7 @@ void pet_user_port_device::device_config_complete()
 
 void pet_user_port_device::device_start()
 {
-	m_cart = dynamic_cast<device_pet_user_port_interface *>(get_card_device());
+	m_card = dynamic_cast<device_pet_user_port_interface *>(get_card_device());
 
 	// resolve callbacks
 	m_out_ca1_func.resolve(m_out_ca1_cb, *this);
@@ -115,9 +106,9 @@ void pet_user_port_device::device_reset()
 }
 
 
-READ8_MEMBER( pet_user_port_device::pa_r ) { UINT8 data = 0xff; if (m_cart != NULL) data = m_cart->pet_pa_r(space, offset); return data; }
-WRITE8_MEMBER( pet_user_port_device::pa_w ) { if (m_cart != NULL) m_cart->pet_pa_w(space, offset, data); }
-READ_LINE_MEMBER( pet_user_port_device::ca1_r ) { int state = 1; if (m_cart != NULL) state = m_cart->pet_ca1_r(); return state; }
-WRITE_LINE_MEMBER( pet_user_port_device::ca1_w ) { if (m_cart != NULL) m_cart->pet_ca1_w(state); }
-READ_LINE_MEMBER( pet_user_port_device::cb2_r ) { int state = 1; if (m_cart != NULL) state = m_cart->pet_cb2_r(); return state; }
-WRITE_LINE_MEMBER( pet_user_port_device::cb2_w ) { if (m_cart != NULL) m_cart->pet_cb2_w(state); }
+READ8_MEMBER( pet_user_port_device::pa_r ) { UINT8 data = 0xff; if (m_card != NULL) data = m_card->pet_pa_r(space, offset); return data; }
+WRITE8_MEMBER( pet_user_port_device::pa_w ) { if (m_card != NULL) m_card->pet_pa_w(space, offset, data); }
+READ_LINE_MEMBER( pet_user_port_device::ca1_r ) { int state = 1; if (m_card != NULL) state = m_card->pet_ca1_r(); return state; }
+WRITE_LINE_MEMBER( pet_user_port_device::ca1_w ) { if (m_card != NULL) m_card->pet_ca1_w(state); }
+READ_LINE_MEMBER( pet_user_port_device::cb2_r ) { int state = 1; if (m_card != NULL) state = m_card->pet_cb2_r(); return state; }
+WRITE_LINE_MEMBER( pet_user_port_device::cb2_w ) { if (m_card != NULL) m_card->pet_cb2_w(state); }

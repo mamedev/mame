@@ -78,7 +78,6 @@ class pet_user_port_device : public device_t,
 public:
 	// construction/destruction
 	pet_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual ~pet_user_port_device();
 
 	// computer interface
 	DECLARE_READ8_MEMBER( pa_r );
@@ -87,6 +86,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ca1_w );
 	DECLARE_READ_LINE_MEMBER( cb2_r );
 	DECLARE_WRITE_LINE_MEMBER( cb2_w );
+
+	// cartridge interface
+	DECLARE_WRITE_LINE_MEMBER( via_ca1_w ) { m_out_ca1_func(state); }
+	DECLARE_WRITE_LINE_MEMBER( via_cb2_w ) { m_out_cb2_func(state); }
 
 protected:
 	// device-level overrides
@@ -97,7 +100,7 @@ protected:
 	devcb_resolved_write_line   m_out_ca1_func;
 	devcb_resolved_write_line   m_out_cb2_func;
 
-	device_pet_user_port_interface *m_cart;
+	device_pet_user_port_interface *m_card;
 };
 
 

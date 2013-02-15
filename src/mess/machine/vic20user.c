@@ -60,15 +60,6 @@ vic20_user_port_device::vic20_user_port_device(const machine_config &mconfig, co
 
 
 //-------------------------------------------------
-//  vic20_user_port_device - destructor
-//-------------------------------------------------
-
-vic20_user_port_device::~vic20_user_port_device()
-{
-}
-
-
-//-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
@@ -99,7 +90,7 @@ void vic20_user_port_device::device_config_complete()
 
 void vic20_user_port_device::device_start()
 {
-	m_cart = dynamic_cast<device_vic20_user_port_interface *>(get_card_device());
+	m_card = dynamic_cast<device_vic20_user_port_interface *>(get_card_device());
 
 	// resolve callbacks
 	m_out_light_pen_func.resolve(m_out_light_pen_cb, *this);
@@ -115,24 +106,20 @@ void vic20_user_port_device::device_start()
 
 void vic20_user_port_device::device_reset()
 {
-	port_reset_w(ASSERT_LINE);
-	port_reset_w(CLEAR_LINE);
+	if (get_card_device())
+	{
+		get_card_device()->reset();
+	}
 }
 
 
-READ8_MEMBER( vic20_user_port_device::pb_r ) { UINT8 data = 0xff; if (m_cart != NULL) data = m_cart->vic20_pb_r(space, offset); return data; }
-WRITE8_MEMBER( vic20_user_port_device::pb_w ) { if (m_cart != NULL) m_cart->vic20_pb_w(space, offset, data); }
-READ_LINE_MEMBER( vic20_user_port_device::joy0_r ) { int state = 1; if (m_cart != NULL) state = m_cart->vic20_joy0_r(); return state; }
-READ_LINE_MEMBER( vic20_user_port_device::joy1_r ) { int state = 1; if (m_cart != NULL) state = m_cart->vic20_joy1_r(); return state; }
-READ_LINE_MEMBER( vic20_user_port_device::joy2_r ) { int state = 1; if (m_cart != NULL) state = m_cart->vic20_joy2_r(); return state; }
-READ_LINE_MEMBER( vic20_user_port_device::light_pen_r ) { int state = 1; if (m_cart != NULL) state = m_cart->vic20_light_pen_r(); return state; }
-READ_LINE_MEMBER( vic20_user_port_device::cassette_switch_r ) { int state = 1; if (m_cart != NULL) state = m_cart->vic20_cassette_switch_r(); return state; }
-WRITE_LINE_MEMBER( vic20_user_port_device::cb1_w ) { if (m_cart != NULL) m_cart->vic20_cb1_w(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::cb2_w ) { if (m_cart != NULL) m_cart->vic20_cb2_w(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::atn_w ) { if (m_cart != NULL) m_cart->vic20_atn_w(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::port_reset_w ) { if (m_cart != NULL) m_cart->vic20_reset_w(state); }
-
-WRITE_LINE_MEMBER( vic20_user_port_device::light_pen_w ) { m_out_light_pen_func(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::via_cb1_w ) { m_out_cb1_func(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::via_cb2_w ) { m_out_cb2_func(state); }
-WRITE_LINE_MEMBER( vic20_user_port_device::reset_w ) { m_out_reset_func(state); }
+READ8_MEMBER( vic20_user_port_device::pb_r ) { UINT8 data = 0xff; if (m_card != NULL) data = m_card->vic20_pb_r(space, offset); return data; }
+WRITE8_MEMBER( vic20_user_port_device::pb_w ) { if (m_card != NULL) m_card->vic20_pb_w(space, offset, data); }
+READ_LINE_MEMBER( vic20_user_port_device::joy0_r ) { int state = 1; if (m_card != NULL) state = m_card->vic20_joy0_r(); return state; }
+READ_LINE_MEMBER( vic20_user_port_device::joy1_r ) { int state = 1; if (m_card != NULL) state = m_card->vic20_joy1_r(); return state; }
+READ_LINE_MEMBER( vic20_user_port_device::joy2_r ) { int state = 1; if (m_card != NULL) state = m_card->vic20_joy2_r(); return state; }
+READ_LINE_MEMBER( vic20_user_port_device::light_pen_r ) { int state = 1; if (m_card != NULL) state = m_card->vic20_light_pen_r(); return state; }
+READ_LINE_MEMBER( vic20_user_port_device::cassette_switch_r ) { int state = 1; if (m_card != NULL) state = m_card->vic20_cassette_switch_r(); return state; }
+WRITE_LINE_MEMBER( vic20_user_port_device::cb1_w ) { if (m_card != NULL) m_card->vic20_cb1_w(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::cb2_w ) { if (m_card != NULL) m_card->vic20_cb2_w(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::atn_w ) { if (m_card != NULL) m_card->vic20_atn_w(state); }
