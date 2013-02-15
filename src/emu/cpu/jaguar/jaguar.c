@@ -597,9 +597,10 @@ void addc_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)
 	int dreg = op & 31;
 	UINT32 r1 = jaguar->r[(op >> 5) & 31];
 	UINT32 r2 = jaguar->r[dreg];
-	UINT32 res = r2 + r1 + ((jaguar->FLAGS >> 1) & 1);
+	UINT32 c = ((jaguar->FLAGS >> 1) & 1);
+	UINT32 res = r2 + r1 + c;
 	jaguar->r[dreg] = res;
-	CLR_ZNC(jaguar); SET_ZNC_ADD(jaguar, r2, r1, res);
+	CLR_ZNC(jaguar); SET_ZNC_ADD(jaguar, r2, r1 + c, res);
 }
 
 void addq_n_rn(jaguar_cpu_state *jaguar, UINT16 op)
