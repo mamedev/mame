@@ -1606,15 +1606,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
 {
 	int scanline = param;
-	int max_y = machine().primary_screen->height();
 	int y_step,vblank_line;
 
-	y_step = 2;
+	int y_step,vblank_line;
 
-	if((max_y == 263 && m_vdp2.pal == 0) || (max_y == 313 && m_vdp2.pal == 1))
-		y_step = 1;
-
-	vblank_line = (m_vdp2.pal) ? 288 : 240;
+	vblank_line = get_vblank_start_position();
+	y_step = get_ystep_count();
 
 	if(scanline == vblank_line*y_step)
 		m_slave->set_input_line_and_vector(0x6, HOLD_LINE, 0x43);
