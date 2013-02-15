@@ -1608,8 +1608,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
 	int scanline = param;
 	int y_step,vblank_line;
 
-	int y_step,vblank_line;
-
 	vblank_line = get_vblank_start_position();
 	y_step = get_ystep_count();
 
