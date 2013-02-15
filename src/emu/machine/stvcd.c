@@ -252,6 +252,7 @@ void saturn_state::cd_exec_command( void )
 			switch (xfertype32)
 			{
 				case XFERTYPE32_GETSECTOR:
+				case XFERTYPE32_PUTSECTOR:
 					hirqreg |= EHST;
 					break;
 
@@ -1037,15 +1038,23 @@ void saturn_state::cd_exec_command( void )
 
 		case 0x64:    // put sector data
 			/* TODO: After Burner 2, Out Run, Fantasy Zone and Dungeon Master Nexus trips this */
-			// ...
 			{
-				//UINT8 sectnum = cr4 & 0xff;
-				//UINT8 filtnum = cr3>>8;
+				UINT8 sectnum = cr4 & 0xff;
+				UINT8 bufnum = cr3>>8;
 
+				xfertype32 = XFERTYPE32_PUTSECTOR;
 
+				cd_stat |= CD_STAT_TRANS;
+
+				xferoffs = 0;
+				xfersect = 0;
+				xferdnum = 0;
+				xfersectpos = 0;
+				xfersectnum = sectnum;
+				transpart = &partitions[bufnum];
 			}
 
-			hirqreg |= (CMOK|EHST);
+			hirqreg |= (CMOK|ECPY|DRDY);
 			cr_standard_return(cd_stat);
 			break;
 
@@ -1816,7 +1825,8 @@ WRITE32_MEMBER( saturn_state::stvcd_w )
 			break;
 
 		default:
-			CDROM_LOG(("Unknown CD write %x @ %x\n", data, offset))
+			printf("Unknown CD write %x @ %x\n", data, offset);
+			//xferdnum = 0x8c00;
 			break;
 	}
 }
