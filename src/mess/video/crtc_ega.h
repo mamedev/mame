@@ -155,7 +155,6 @@ private:
 
 	/* other internal state */
 	UINT8   m_register_address_latch;
-	UINT8   m_hpixels_per_column;
 	bool    m_cursor_state; /* 0 = off, 1 = on */
 	UINT8   m_cursor_blink_count;
 
