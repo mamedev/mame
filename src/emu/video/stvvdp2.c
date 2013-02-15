@@ -6252,6 +6252,28 @@ UINT8 saturn_state::get_odd_bit( void )
 	return machine().primary_screen->frame_number() & 1;
 }
 
+int saturn_state::get_vblank_start_position( void )
+{
+	int vblank_line;
+
+	vblank_line = (m_vdp2.pal) ? 288 : 240;
+
+	return vblank_line;
+}
+
+int saturn_state::get_ystep_count( void )
+{
+	int max_y = machine().primary_screen->height();
+	int y_step;
+
+	y_step = 2;
+
+	if((max_y == 263 && m_vdp2.pal == 0) || (max_y == 313 && m_vdp2.pal == 1))
+		y_step = 1;
+
+	return y_step;
+}
+
 /* TODO: these needs to be checked via HW tests! */
 int saturn_state::get_hcounter( void )
 {

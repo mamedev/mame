@@ -151,7 +151,6 @@ public:
 	DECLARE_WRITE32_MEMBER(magzun_ioga_w32);
 	DECLARE_READ32_MEMBER(magzun_hef_hack_r);
 	DECLARE_READ32_MEMBER(magzun_rx_hack_r);
-	DECLARE_READ32_MEMBER(astrass_hack_r);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
@@ -381,6 +380,8 @@ public:
 	int get_pixel_clock( void );
 	UINT8 get_odd_bit( void );
 	void stv_vdp2_dynamic_res_change( void );
+	int get_vblank_start_position( void );
+	int get_ystep_count( void );
 
 	void refresh_palette_data( void );
 	int stv_vdp2_window_process(int x,int y);

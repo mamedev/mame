@@ -658,19 +658,10 @@ bp 6001d22 (60ffef0)
 
 */
 
-READ32_MEMBER(saturn_state::astrass_hack_r)
-{
-	if(space.device().safe_pc() == 0x60011ba) return 0x00000000;
-
-	return m_workram_h[0x000770/4];
-}
-
 DRIVER_INIT_MEMBER(saturn_state,astrass)
 {
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x60011ba);
 	sh2drc_add_pcflush(machine().device("maincpu"), 0x605b9da);
-
-	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x06000770, 0x06000773, read32_delegate(FUNC(saturn_state::astrass_hack_r),this));
 
 	install_astrass_protection(machine());
 
