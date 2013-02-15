@@ -18,6 +18,7 @@
 #include "machine/mos6551.h"
 #include "machine/mos6702.h"
 #include "machine/petexp.h"
+#include "machine/serial.h"
 
 
 

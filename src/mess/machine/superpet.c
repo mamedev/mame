@@ -16,8 +16,9 @@
 //**************************************************************************
 
 #define M6809_TAG       "u4"
-#define M6551_TAG       "u23"
+#define MOS6551_TAG     "u23"
 #define MOS6702_TAG     "u2"
+#define RS232_TAG       "rs232"
 
 
 
@@ -54,6 +55,20 @@ const rom_entry *superpet_device::device_rom_region() const
 
 
 //-------------------------------------------------
+//  rs232_port_interface rs232_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(MOS6551_TAG, mos6551_device, rxd_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6551_TAG, mos6551_device, dcd_w),
+	DEVCB_DEVICE_LINE_MEMBER(MOS6551_TAG, mos6551_device, dsr_w),
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(MOS6551_TAG, mos6551_device, cts_w)
+};
+
+
+//-------------------------------------------------
 //  ADDRESS_MAP( superpet_mem )
 //-------------------------------------------------
 
@@ -70,8 +85,12 @@ static MACHINE_CONFIG_FRAGMENT( superpet )
 	MCFG_CPU_ADD(M6809_TAG, M6809, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(superpet_mem)
 
-	MCFG_MOS6551_ADD(M6551_TAG, XTAL_1_8432MHz, DEVWRITELINE(DEVICE_SELF, superpet_device, acia_irq_w))
 	MCFG_MOS6702_ADD(MOS6702_TAG, XTAL_16MHz/16)
+
+	MCFG_MOS6551_ADD(MOS6551_TAG, XTAL_1_8432MHz, DEVWRITELINE(DEVICE_SELF, superpet_device, acia_irq_w))
+	MCFG_MOS6551_RXD_TXD_CALLBACKS(NULL, DEVWRITELINE(RS232_TAG, rs232_port_device, tx))
+
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 MACHINE_CONFIG_END
 
 
@@ -146,7 +165,7 @@ superpet_device::superpet_device(const machine_config &mconfig, const char *tag,
 	device_t(mconfig, SUPERPET, "SuperPET", tag, owner, clock),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_maincpu(*this, M6809_TAG),
-	m_acia(*this, M6551_TAG),
+	m_acia(*this, MOS6551_TAG),
 	m_dongle(*this, MOS6702_TAG),
 	m_rom(*this, M6809_TAG),
 	m_ram(*this, "ram"),
