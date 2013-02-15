@@ -691,4 +691,11 @@ void crtc_ega_device::device_reset()
 	m_line_address = 0;
 	m_horiz_disp = 0;
 	m_cursor_x = 0;
+	m_horiz_blank_start = 0;
+	m_horiz_blank_end = 0;
+	m_vert_disp_end = 0;
+	m_vert_retr_start = 0;
+	m_vert_blank_start = 0;
+	m_line_counter = 0;
+	m_raster_counter = 0;
 }
