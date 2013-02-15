@@ -504,9 +504,6 @@ static ABCBUS_INTERFACE( abcbus_intf )
 //  rs232_port_interface rs232_intf
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( rs232_devices )
-SLOT_INTERFACE_END
-
 static const rs232_port_interface rs232_intf =
 {
 	DEVCB_NULL,
@@ -624,7 +621,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc80_cassette_interface)
 	MCFG_ABC80_KEYBOARD_ADD(kb_intf)
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "slow", abc830_slow)
-	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, default_rs232_devices, NULL, NULL)
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 
 	// internal ram

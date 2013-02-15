@@ -211,6 +211,19 @@ public:
 	void tx_w(int which, int state) { m_channel[which].tx_w(state); }
 	void sync_w(int which, int state) { m_channel[which].sync_w(state); }
 
+	DECLARE_WRITE_LINE_MEMBER( ctsa_w ) { cts_w(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( ctsb_w ) { cts_w(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( dcda_w ) { dcd_w(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( dcdb_w ) { dcd_w(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( ria_w ) { ri_w(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( rib_w ) { ri_w(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( rxa_w ) { rx_w(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( rxb_w ) { rx_w(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( txa_w ) { tx_w(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( txb_w ) { tx_w(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( synca_w ) { sync_w(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { sync_w(1, state); }
+
 private:
 	// device-level overrides
 	virtual void device_config_complete();

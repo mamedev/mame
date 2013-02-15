@@ -740,10 +740,10 @@ static Z80DART_INTERFACE( sio_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_B_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -766,10 +766,10 @@ static Z80DART_INTERFACE( abc800_dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -804,10 +804,10 @@ static Z80DART_INTERFACE( abc802_dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -837,10 +837,10 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 {
 	0, 0, 0, 0,
 
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, rx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, serial_port_device, tx),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, dtr_w),
+	DEVCB_DEVICE_LINE_MEMBER(RS232_A_TAG, rs232_port_device, rts_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -921,16 +921,13 @@ static ABCBUS_INTERFACE( abcbus_intf )
 //  rs232_port_interface rs232a_intf
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( rs232_devices )
-SLOT_INTERFACE_END
-
 static const rs232_port_interface rs232a_intf =
 {
 	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, dcda_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE_MEMBER(Z80DART_TAG, z80dart_device, ctsa_w)
 };
 
 
@@ -941,10 +938,10 @@ static const rs232_port_interface rs232a_intf =
 static const rs232_port_interface rs232b_intf =
 {
 	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, dcda_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DEVICE_LINE_MEMBER(Z80SIO_TAG, z80dart_device, ctsa_w)
 };
 
 
@@ -1206,8 +1203,8 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cass_intf)
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, rs232_devices, NULL, NULL)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
 	MCFG_ABC800_KEYBOARD_ADD(abc800_kb_intf)
 
 	// ABC bus
@@ -1248,8 +1245,8 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cass_intf)
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, rs232_devices, NULL, NULL)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
 	MCFG_ABC800_KEYBOARD_ADD(abc800_kb_intf)
 
 	// ABC bus
@@ -1290,8 +1287,8 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cass_intf)
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, rs232_devices, NULL, NULL)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
 	MCFG_ABC55_ADD(kb_intf)
 
 	// ABC bus
@@ -1322,8 +1319,8 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
-	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, rs232_devices, NULL, NULL)
-	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
 	MCFG_ABC77_ADD(kb_intf)
 
 	// ABC bus
