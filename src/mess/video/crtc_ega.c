@@ -624,6 +624,47 @@ void crtc_ega_device::device_start()
 	m_max_ras_addr = 0x1f;
 	m_vert_total = 0x3ff;
 
+	m_ena_vert_access = 0;
+	m_de_skew = 0;
+	m_horiz_retr_start = 0;
+	m_horiz_retr_end = 0;
+	m_horiz_retr_skew = 0;
+	m_preset_row_scan = 0;
+	m_byte_panning = 0;
+	m_scan_doubling = 0;
+	m_cursor_start_ras = 0x20;
+	m_cursor_disable = 0;
+	m_cursor_end_ras = 0;
+	m_cursor_skew = 0;
+	m_disp_start_addr = 0;
+	m_light_pen_addr = 0;
+	m_vert_retr_end = 0;
+	m_protect = 0;
+	m_bandwidth = 0;
+	m_offset = 0;
+	m_underline_loc = 0;
+	m_vert_blank_end = 0;
+	m_mode_control = 0;
+	m_line_compare = 0;
+	m_register_address_latch = 0;
+	m_cursor_state = false;
+	m_cursor_blink_count = 0;
+	m_cur = 0;
+	m_hsync = 0;
+	m_vsync = 0;
+	m_vblank = 0;
+	m_de = 0;
+	m_character_counter = 0;
+	m_hsync_width_counter = 0;
+	m_vsync_width_counter = 0;
+	m_line_enable_ff = false;
+	m_vsync_ff = 0;
+	m_adjust_active = 0;
+
+	m_current_disp_addr = 0;
+	m_light_pen_latched = FALSE;
+	m_has_valid_parameters = false;
+
 	/* register for state saving */
 	save_item(NAME(m_hpixels_per_column));
 	save_item(NAME(m_register_address_latch));
