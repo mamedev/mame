@@ -951,12 +951,12 @@ static const msm5205_interface msm5205_interface2 =
 
 MACHINE_START_MEMBER(cps_state,fcrash)
 {
-	UINT8 *ROM = memregion("soundcpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("soundcpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_msm_1 = machine().device<msm5205_device>("msm1");
 	m_msm_2 = machine().device<msm5205_device>("msm2");
 
@@ -981,7 +981,7 @@ MACHINE_START_MEMBER(cps_state,fcrash)
 MACHINE_START_MEMBER(cps_state,kodb)
 {
 	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("soundcpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 
 	m_layer_enable_reg = 0x20;
 	m_layer_mask_reg[0] = 0x2e;
@@ -1013,12 +1013,12 @@ MACHINE_START_MEMBER(cps_state, cawingbl)
 
 MACHINE_START_MEMBER(cps_state, sf2mdt)
 {
-	UINT8 *ROM = memregion("soundcpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("soundcpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_msm_1 = machine().device<msm5205_device>("msm1");
 	m_msm_2 = machine().device<msm5205_device>("msm2");
 
@@ -1042,12 +1042,12 @@ MACHINE_START_MEMBER(cps_state, sf2mdt)
 
 MACHINE_START_MEMBER(cps_state, knightsb)
 {
-	UINT8 *ROM = memregion("soundcpu")->base();
+	UINT8 *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 
 	m_maincpu = machine().device<cpu_device>("maincpu");
-	m_audiocpu = machine().device<cpu_device>("soundcpu");
+	m_audiocpu = machine().device<cpu_device>("audiocpu");
 	m_msm_1 = machine().device<msm5205_device>("msm1");
 	m_msm_2 = machine().device<msm5205_device>("msm2");
 	m_layer_enable_reg = 0x20;
@@ -1078,7 +1078,7 @@ static MACHINE_CONFIG_START( fcrash, cps_state )
 	MCFG_CPU_PROGRAM_MAP(fcrash_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 24000000/6) /* ? */
+	MCFG_CPU_ADD("audiocpu", Z80, 24000000/6) /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,fcrash)
@@ -1137,7 +1137,7 @@ static MACHINE_CONFIG_START( kodb, cps_state )
 	MCFG_CPU_PROGRAM_MAP(fcrash_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 3579545)
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(kodb_sound_map)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,kodb)
@@ -1160,7 +1160,7 @@ static MACHINE_CONFIG_START( kodb, cps_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("2151", XTAL_3_579545MHz)  /* verified on pcb */
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
@@ -1176,7 +1176,7 @@ static MACHINE_CONFIG_START( sf2mdt, cps_state )
 	MCFG_CPU_PROGRAM_MAP(fcrash_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  irq4_line_hold) /* triggers the sprite ram and scroll writes */
 
-	MCFG_CPU_ADD("soundcpu", Z80, 3579545)
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(sf2mdt_z80map)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, sf2mdt)
@@ -1221,7 +1221,7 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state, cps1_interrupt) // to get past ETC screen
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", cps_state, ganbare_interrupt, "screen", 0, 1) // to activate 98xxxx writes
 
-	MCFG_CPU_ADD("soundcpu", Z80, 29821000 / 8)
+	MCFG_CPU_ADD("audiocpu", Z80, 29821000 / 8)
 	MCFG_CPU_PROGRAM_MAP(knightsb_z80map)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, knightsb)
@@ -1244,7 +1244,7 @@ static MACHINE_CONFIG_START( knightsb, cps_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("2151", 29821000 / 8)
-	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", 0))
+	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.35)
 	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
@@ -1270,7 +1270,7 @@ ROM_START( fcrash )
 	ROM_LOAD16_BYTE( "6.bin",  0xc0000, 0x20000, CRC(d4bf37f6) SHA1(f47e1cc9aa3b3019ee57f59715e3a611acf9fe3e) )
 	ROM_LOAD16_BYTE( "2.bin",  0xc0001, 0x20000, CRC(07ac8f43) SHA1(7a41b003c76adaabd3f94929cc163461b70e0ed9) )
 
-	ROM_REGION( 0x30000, "soundcpu", 0 ) /* Audio CPU + Sample Data */
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Audio CPU + Sample Data */
 	ROM_LOAD( "1.bin",   0x00000, 0x20000, CRC(5b276c14) SHA1(73e53c077d4e3c1b919eee28b29e34176ee204f8) )
 	ROM_RELOAD(          0x10000, 0x20000 )
 
@@ -1335,7 +1335,7 @@ ROM_START( kodb )
 	ROM_LOAD16_BYTE( "3.ic172",    0x00000, 0x080000, CRC(036dd74c) SHA1(489344e56863429e86b4c362b82d89819c1d6afb) )
 	ROM_LOAD16_BYTE( "4.ic171",    0x00001, 0x080000, CRC(3e4b7295) SHA1(3245640bae7d141238051dfe5c7683d05c6d3848) )
 
-	ROM_REGION( 0x18000, "soundcpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_REGION( 0x18000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "1.ic28",        0x00000, 0x08000, CRC(01cae60c) SHA1(b2cdd883fd859f0b701230831aca1f1a74ad6087) )
 	ROM_CONTINUE(              0x10000, 0x08000 )
 
@@ -1415,7 +1415,7 @@ ROM_START( knightsb )
 	ROMX_LOAD( "kr_gfx6.rom",  0x200004, 0x80000, BAD_DUMP CRC(0200bc3d) SHA1(c900b1be2b4e49b951e5c1e3fd1e19d21b82986e) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "kr_gfx8.rom",  0x200006, 0x80000, BAD_DUMP CRC(0bb2b4e7) SHA1(983b800925d58e4aeb4e5105f93ed5faf66d009c) , ROM_GROUPWORD | ROM_SKIP(6) )
 
-	ROM_REGION( 0x50000, "soundcpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "1.ic26",     0x00000, 0x40000, CRC(bd6f9cc1) SHA1(9f33cccef224d2204736a9eae761196866bd6e41) )
 	ROM_RELOAD(            0x10000, 0x40000 )
 ROM_END
@@ -1431,7 +1431,7 @@ ROM_START( cawingbl )
 	ROMX_LOAD( "caw5.bin", 0x000002, 0x80000, CRC(30dd78db) SHA1(e0295001d6f5fb4a9276c432f971e88f73c5e39a) , ROM_SKIP(3) )
 	ROMX_LOAD( "caw4.bin", 0x000003, 0x80000, CRC(4937fc41) SHA1(dac179715be483a521df8e515afc1fb7a2cd8f13) , ROM_SKIP(3) )
 
-	ROM_REGION( 0x30000, "soundcpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "caw3.bin",  0x00000, 0x20000, CRC(ffe16cdc) SHA1(8069ea69f0b89d61c35995c8040a4989d7be9c1f) )
 	ROM_RELOAD(            0x10000, 0x20000 )
 ROM_END
@@ -1465,7 +1465,7 @@ ROM_START( cawingb2 )
 	ROMX_LOAD( "14.14",     0x180002, 0x20000, CRC(344a8270) SHA1(fdb588a7ba60783225e3b5c72446f79625de4f9c) , ROM_SKIP(3) )
 	ROMX_LOAD( "16.16",     0x180003, 0x20000, CRC(b991ad91) SHA1(5c59131ddf068cb54d23f8836293360fbc967d58) , ROM_SKIP(3) )
 
-	ROM_REGION( 0x30000, "soundcpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
 	ROM_LOAD( "5.a",       0x00000, 0x20000, CRC(ffe16cdc) SHA1(8069ea69f0b89d61c35995c8040a4989d7be9c1f) )
 	ROM_RELOAD(            0x10000, 0x20000 )
 ROM_END
@@ -1518,7 +1518,7 @@ ROM_START( sf2mdt )
 	ROMX_LOAD( "14.ic85",   0x400004, 0x80000, CRC(7d9f1a67) SHA1(6deb7fff867c42b13a32bb11eda798cfdb4cbaa8) , ROM_GROUPWORD | ROM_SKIP(6) )
 	ROMX_LOAD( "17.ic83",   0x400006, 0x80000, CRC(91a9a05d) SHA1(5266ceddd2df925e79b4200843dec2f7aa9297b3) , ROM_GROUPWORD | ROM_SKIP(6) )
 
-	ROM_REGION( 0x30000, "soundcpu", 0 ) /* Sound program + samples  */
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound program + samples  */
 	ROM_LOAD( "5.ic26",    0x00000, 0x20000, CRC(17d5ba8a) SHA1(6ff3b8860d7e1fdee3561846f645eb4d3a8965ec) )
 	ROM_RELOAD(            0x10000, 0x20000 )
 ROM_END
@@ -1539,7 +1539,7 @@ ROM_START( sf2mdta )
 	ROMX_LOAD( "pf6 sh070.ic88", 0x400000, 0x100000, CRC(9b5b09d7) SHA1(698a6aab41e495bd0c37a19aee16a84f04d15797), ROM_GROUPWORD | ROM_SKIP(2) )
 	ROMX_LOAD( "pf9 sh001.ic91", 0x400002, 0x100000, CRC(9f25090e) SHA1(12ff0431ef6550db446985c8914ac7d78eec6b6d), ROM_GROUPWORD | ROM_SKIP(2) )
 
-	ROM_REGION( 0x30000, "soundcpu", 0 ) /* Sound program + samples  */
+	ROM_REGION( 0x30000, "audiocpu", 0 ) /* Sound program + samples  */
 	ROM_LOAD( "1.ic28",    0x00000, 0x20000, CRC(d5bee9cc) SHA1(e638cb5ce7a22c18b60296a7defe8b03418da56c) )
 	ROM_RELOAD(            0x10000, 0x20000 )
 ROM_END
@@ -1554,7 +1554,7 @@ static MACHINE_CONFIG_START( sgyxz, cps_state )
 	MCFG_CPU_PROGRAM_MAP(fcrash_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cps_state,  cps1_interrupt)
 
-//  MCFG_CPU_ADD("soundcpu", Z80, 3579545)
+//  MCFG_CPU_ADD("audiocpu", Z80, 3579545)
 //  MCFG_CPU_PROGRAM_MAP(sub_map)
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state,kodb)
@@ -1585,7 +1585,7 @@ ROM_START( sgyxz )
 	ROM_LOAD16_BYTE("sgyxz_gfx1.bin", 0x000000, 0x200000, CRC(a60be9f6) SHA1(2298a4b6a2c83b76dc106a1efa19606b298d378a) ) // 'picture 1'
 	ROM_LOAD16_BYTE("sgyxz_gfx2.bin", 0x000001, 0x200000, CRC(6ad9d048) SHA1(d47212d28d0a1ce349e4c59e5d0d99c541b3458e) ) // 'picture 2'
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* Z80 code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code */
 	ROM_LOAD( "sgyxz_snd2.bin", 0x00000, 0x10000,  CRC(210c376f) SHA1(0d937c86078d0a106f5636b7daf5fc0266c2c2ec) )
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
