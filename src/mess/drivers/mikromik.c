@@ -702,6 +702,49 @@ void mm1_state::fdc_drq_w(bool state)
 }
 
 
+//-------------------------------------------------
+//  rs232_port_interface rs232a_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232a_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232b_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232b_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
+//-------------------------------------------------
+//  rs232_port_interface rs232c_intf
+//-------------------------------------------------
+
+static const rs232_port_interface rs232c_intf =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(UPD7201_TAG, upd7201_device, ctsb_w)
+};
+
+
+
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -776,9 +819,11 @@ static MACHINE_CONFIG_START( mm1, mm1_state )
 	MCFG_PIT8253_ADD(I8253_TAG, pit_intf)
 	MCFG_UPD765A_ADD(UPD765_TAG, /* XTAL_16MHz/2/2 */ true, true)
 	MCFG_UPD7201_ADD(UPD7201_TAG, XTAL_6_144MHz/2, mpsc_intf)
-
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":0", mm1_floppies, "525qd", 0, mm1_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD(UPD765_TAG ":1", mm1_floppies, "525qd", 0, mm1_state::floppy_formats)
+	MCFG_RS232_PORT_ADD(RS232_A_TAG, rs232a_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_B_TAG, rs232b_intf, default_rs232_devices, NULL, NULL)
+	MCFG_RS232_PORT_ADD(RS232_C_TAG, rs232c_intf, default_rs232_devices, NULL, NULL)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)

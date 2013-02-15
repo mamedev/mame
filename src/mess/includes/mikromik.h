@@ -10,6 +10,7 @@
 #include "machine/i8212.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/serial.h"
 #include "machine/upd7201.h"
 #include "machine/upd765.h"
 #include "sound/speaker.h"
@@ -25,6 +26,9 @@
 #define I8275_TAG       "ic59"
 #define UPD7201_TAG     "ic11"
 #define UPD7220_TAG     "ic101"
+#define RS232_A_TAG		"rs232a"
+#define RS232_B_TAG		"rs232b"
+#define RS232_C_TAG		"rs232c"
 
 class mm1_state : public driver_device
 {
@@ -42,6 +46,9 @@ public:
 			m_speaker(*this, SPEAKER_TAG),
 			m_floppy0(*this, UPD765_TAG ":0:525qd"),
 			m_floppy1(*this, UPD765_TAG ":1:525qd"),
+			m_rs232a(*this, RS232_A_TAG),
+			m_rs232b(*this, RS232_B_TAG),
+			m_rs232c(*this, RS232_C_TAG),
 			m_ram(*this, RAM_TAG),
 			m_rom(*this, I8085A_TAG),
 			m_mmu_rom(*this, "address"),
@@ -77,6 +84,9 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<floppy_image_device> m_floppy0;
 	required_device<floppy_image_device> m_floppy1;
+	required_device<rs232_port_device> m_rs232a;
+	required_device<rs232_port_device> m_rs232b;
+	required_device<rs232_port_device> m_rs232c;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_memory_region m_mmu_rom;
