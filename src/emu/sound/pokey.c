@@ -272,12 +272,14 @@ void pokey_device::device_start()
 	m_p5 = 0;
 	m_p9 = 0;
 	m_p17 = 0;
+	m_ALLPOT = 0x00;
 
 	m_pot_counter = 0;
 	m_kbd_cnt = 0;
 	m_out_filter = 0;
-	m_output =0;
-
+	m_output = 0;
+	m_kbd_state = 0;
+	
 	/* reset more internal state */
 	for (i=0; i<3; i++)
 	{
