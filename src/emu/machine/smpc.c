@@ -661,6 +661,11 @@ static TIMER_CALLBACK( smpc_nmi_set )
 }
 
 
+TIMER_CALLBACK_MEMBER( saturn_state::smpc_audio_reset_line_pulse )
+{
+	m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+}
+
 /********************************************
  *
  * COMREG sub-routine

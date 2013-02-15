@@ -1381,6 +1381,16 @@ TIMER_CALLBACK_MEMBER(saturn_state::stv_rtc_increment)
 	//if((m_smpc.rtc_data[0] & 0xf0) >= 0xa0)               { m_smpc.rtc_data[0] = 0; } //roll over
 }
 
+/* Official documentation says that the "RESET/TAS opcodes aren't supported", but Out Run definitely contradicts with it.
+   Since that m68k can't reset itself via the RESET opcode I suppose that the SMPC actually do it by reading an i/o
+   connected to this opcode. */
+static void m68k_reset_callback(device_t *device)
+{
+	saturn_state *state = device->machine().driver_data<saturn_state>();
+	device->machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(saturn_state::smpc_audio_reset_line_pulse), state));
+	printf("m68k RESET opcode triggered\n");
+}
+
 MACHINE_START_MEMBER(saturn_state,stv)
 {
 	system_time systime;
@@ -1421,6 +1431,8 @@ MACHINE_START_MEMBER(saturn_state,stv)
 	m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
 
 	m_stv_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(saturn_state::stv_rtc_increment),this));
+
+	m68k_set_reset_callback(m_audiocpu, m68k_reset_callback);
 }
 
 
@@ -1466,6 +1478,8 @@ MACHINE_START_MEMBER(saturn_state,saturn)
 	m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
 
 	m_stv_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(saturn_state::stv_rtc_increment),this));
+
+	m68k_set_reset_callback(m_audiocpu, m68k_reset_callback);
 }
 
 

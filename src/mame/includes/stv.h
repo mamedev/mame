@@ -249,6 +249,7 @@ public:
 
 	UINT8 smpc_direct_mode(UINT8 pad_n);
 	UINT8 smpc_th_control_mode(UINT8 pad_n);
+	TIMER_CALLBACK_MEMBER( smpc_audio_reset_line_pulse );
 	DECLARE_READ8_MEMBER( saturn_SMPC_r );
 	DECLARE_WRITE8_MEMBER( saturn_SMPC_w );
 
@@ -694,7 +695,6 @@ public:
 	direntryT *curdir;       // current directory
 	int numfiles;            // # of entries in current directory
 	int firstfile;           // first non-directory file
-
 
 	// ST-V specific
 	void install_stvbios_speedups( void );

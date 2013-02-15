@@ -294,7 +294,8 @@ WRITE16_MEMBER( saturn_state::saturn_vdp1_regs_w )
 			if ( VDP1_LOG ) logerror( "VDP1: Erase lower-right coord set: %08X\n", data );
 			break;
 		case 0x0c/2:
-			if ( VDP1_LOG ) logerror( "VDP1: Draw forced termination register write: %08X\n", data );
+		case 0x0e/2: // After Burner 2 / Out Run / Fantasy Zone writes here with a dword ...
+			if ( VDP1_LOG ) logerror( "VDP1: Draw forced termination register write: %08X %08X\n", offset*2, data );
 			break;
 		default:
 			printf("Warning: write to unknown VDP1 reg %08x %08x\n",offset*2,data);
