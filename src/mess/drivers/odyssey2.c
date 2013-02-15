@@ -29,6 +29,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
 		, m_i8244(*this, "i8244")
+		, m_sp0256(*this, "sp0256_speech")
 		, m_user1(*this, "user1")
 		, m_bank1(*this, "bank1")
 		, m_bank2(*this, "bank2")
@@ -45,6 +46,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<i8244_device> m_i8244;
+	required_device<sp0256_device> m_sp0256;
 
 	int m_the_voice_lrq_state;
 	UINT8 m_ram[256];
@@ -331,7 +333,7 @@ WRITE_LINE_MEMBER(odyssey2_state::the_voice_lrq_callback)
 
 READ8_MEMBER(odyssey2_state::t0_read)
 {
-	return ( m_the_voice_lrq_state == ASSERT_LINE ) ? 0 : 1;
+	return sp0256_lrq_r( m_sp0256 ) ? 1 : 0;
 }
 
 
@@ -432,11 +434,12 @@ WRITE8_MEMBER(odyssey2_state::io_write)
 			if ( data & 0x20 )
 			{
 				logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, m_p1 );
-				sp0256_ALD_w( machine().device("sp0256_speech"), space, 0, offset & 0x7F );
+				sp0256_ALD_w( m_sp0256, space, 0, offset & 0x7F );
 			}
 			else
 			{
 				/* TODO: Reset sp0256 in this case */
+				m_sp0256->reset();
 			}
 		}
 	}
@@ -833,6 +836,10 @@ static MACHINE_CONFIG_START( g7400, g7400_state )
 	MCFG_I8245_ADD( "i8244", 3540000 * 2, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( g7400_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
+	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
+	MCFG_SOUND_CONFIG(the_voice_sp0256)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_SOFTWARE_LIST_ADD("cart_list","g7400")
@@ -862,6 +869,10 @@ static MACHINE_CONFIG_START( odyssey3, g7400_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_I8244_ADD( "i8244", 3540000 * 2, "screen", WRITELINE( odyssey2_state, irq_callback ), WRITE16( g7400_state, scanline_postprocess ) )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_SOUND_ADD("sp0256_speech", SP0256, 3120000)
+	MCFG_SOUND_CONFIG(the_voice_sp0256)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_FRAGMENT_ADD(odyssey2_cartslot)
 	MCFG_DEVICE_REMOVE("cart_list")
