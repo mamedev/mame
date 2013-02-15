@@ -593,29 +593,14 @@ WRITE32_MEMBER(jaguar_state::misc_control_w)
  *
  *************************************/
 
-// shouldn't the DSPs be doing this calc, why is this needed for Jaguar?
 READ32_MEMBER(jaguar_state::gpuctrl_r)
 {
-	UINT32 result = jaguargpu_ctrl_r(m_gpu, offset);
-
-	if (!m_is_cojag)
-	{
-		if (m_protection_check != 1) return result;
-
-		m_protection_check++;
-		m_gpu_ram[0] = 0x3d0dead;
-		return 0x80000000;
-	}
-	else
-		return result;
+	return jaguargpu_ctrl_r(m_gpu, offset);
 }
 
 
 WRITE32_MEMBER(jaguar_state::gpuctrl_w)
 {
-	if (!m_is_cojag)
-		if ((!m_protection_check) && (offset == 5) && (data == 1)) m_protection_check++;
-
 	jaguargpu_ctrl_w(m_gpu, offset, data, mem_mask);
 }
 
