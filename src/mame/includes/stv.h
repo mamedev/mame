@@ -631,6 +631,7 @@ public:
 	UINT16 cd_readWord(UINT32 addr);
 	void cd_writeWord(UINT32 addr, UINT16 data);
 	UINT32 cd_readLong(UINT32 addr);
+	void cd_writeLong(UINT32 addr, UINT32 data);
 
 	void cd_readTOC(void);
 	void cd_readblock(UINT32 fad, UINT8 *dat);

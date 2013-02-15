@@ -1039,22 +1039,36 @@ void saturn_state::cd_exec_command( void )
 		case 0x64:    // put sector data
 			/* TODO: After Burner 2, Out Run, Fantasy Zone and Dungeon Master Nexus trips this */
 			{
-				UINT8 sectnum = cr4 & 0xff;
-				UINT8 bufnum = cr3>>8;
+				UINT32 sectnum = cr4 & 0xff;
+				UINT32 sectofs = cr2;
+				UINT32 bufnum = cr3>>8;
 
 				xfertype32 = XFERTYPE32_PUTSECTOR;
+
+				/*TODO: eventual errors? */
+
+				cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
+
 
 				cd_stat |= CD_STAT_TRANS;
 
 				xferoffs = 0;
 				xfersect = 0;
 				xferdnum = 0;
-				xfersectpos = 0;
+				xfersectpos = sectofs;
 				xfersectnum = sectnum;
 				transpart = &partitions[bufnum];
+
+				// allocate the blocks
+				for (int i = xfersectpos; i < xfersectpos+xfersectnum; i++)
+				{
+					transpart->blocks[i] = cd_alloc_block(&transpart->bnum[i]);
+					transpart->size += transpart->blocks[i]->size;
+					transpart->numblks++;
+				}
 			}
 
-			hirqreg |= (CMOK|ECPY|DRDY);
+			hirqreg |= (CMOK|ECPY|DRDY); // TODO: is ECPY ok?
 			cr_standard_return(cd_stat);
 			break;
 
@@ -1700,6 +1714,52 @@ UINT32 saturn_state::cd_readLong(UINT32 addr)
 	}
 }
 
+void saturn_state::cd_writeLong(UINT32 addr, UINT32 data)
+{
+	switch (addr & 0xffff)
+	{
+		case 0x8000:
+			switch (xfertype32)
+			{
+				case XFERTYPE32_PUTSECTOR:
+					// make sure we have sectors left
+					if (xfersect < xfersectnum)
+					{
+						// get next longword
+						transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 0] = (data >> 24) & 0xff;
+						transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 1] = (data >> 16) & 0xff;
+						transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 2] = (data >> 8) & 0xff;
+						transpart->blocks[xfersectpos+xfersect]->data[xferoffs + 3] = (data >> 0) & 0xff;
+
+						xferdnum += 4;
+						xferoffs += 4;
+
+						// did we run out of sector?
+						if (xferoffs >= transpart->blocks[xfersectpos+xfersect]->size)
+						{
+							CDROM_LOG(("CD: finished xfer of block %d of %d\n", xfersect+1, xfersectnum))
+
+							xferoffs = 0;
+							xfersect++;
+						}
+					}
+					else    // sectors are done
+					{
+						xfertype32 = XFERTYPE32_INVALID;
+					}
+					break;
+
+				default:
+					printf("CD: unhandled 32-bit transfer type write\n");
+					break;
+			}
+			break;
+
+		default:
+			break;
+	}
+}
+
 void saturn_state::cd_writeWord(UINT32 addr, UINT16 data)
 {
 	switch(addr & 0xffff)
@@ -1809,6 +1869,13 @@ WRITE32_MEMBER( saturn_state::stvcd_w )
 
 	switch (offset)
 	{
+		case 0x18000:
+			if (mem_mask == 0xffffffff)
+				cd_writeLong(offset, data);
+			else
+				printf("CD: Unknown data buffer write @ mask = %08x\n", mem_mask);
+			break;
+
 		case 0x90008:
 		case 0x9000a:
 		case 0x9000c:
