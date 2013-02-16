@@ -139,7 +139,7 @@ teleprinter_device::teleprinter_device(const machine_config &mconfig, const char
 
 void teleprinter_device::scroll_line()
 {
-	memcpy(m_buffer,m_buffer+TELEPRINTER_WIDTH,(TELEPRINTER_HEIGHT-1)*TELEPRINTER_WIDTH);
+	memmove(m_buffer,m_buffer+TELEPRINTER_WIDTH,(TELEPRINTER_HEIGHT-1)*TELEPRINTER_WIDTH);
 	memset(m_buffer + TELEPRINTER_WIDTH*(TELEPRINTER_HEIGHT-1),0x20,TELEPRINTER_WIDTH);
 }
 

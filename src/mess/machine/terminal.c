@@ -152,7 +152,7 @@ generic_terminal_device::generic_terminal_device(const machine_config &mconfig, 
 
 void generic_terminal_device::scroll_line()
 {
-	memcpy(m_buffer,m_buffer+TERMINAL_WIDTH,(TERMINAL_HEIGHT-1)*TERMINAL_WIDTH);
+	memmove(m_buffer,m_buffer+TERMINAL_WIDTH,(TERMINAL_HEIGHT-1)*TERMINAL_WIDTH);
 	memset(m_buffer + TERMINAL_WIDTH*(TERMINAL_HEIGHT-1),0x20,TERMINAL_WIDTH);
 }
 
