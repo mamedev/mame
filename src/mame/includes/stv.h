@@ -474,7 +474,11 @@ public:
 		UINT8  plane_size;
 		UINT8  colour_ram_address_offset;
 		UINT8  fade_control;
-		UINT8  window_control;
+		struct{
+			UINT8 logic;
+			UINT8 enabled[2];
+			UINT8 area[2];
+		}window_control;
 
 		UINT8  line_screen_enabled;
 		UINT8  mosaic_screen_enabled;
