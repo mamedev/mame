@@ -48,10 +48,6 @@ const device_type MD_ROM_SQUIR = &device_creator<md_rom_squir_device>;
 const device_type MD_ROM_TOPF = &device_creator<md_rom_topf_device>;
 const device_type MD_ROM_RADICA = &device_creator<md_rom_radica_device>;
 
-// below ones are currently unused, because the protection is patched out
-const device_type MD_ROM_MULAN = &device_creator<md_std_rom_device>;
-const device_type MD_ROM_POKE2 = &device_creator<md_std_rom_device>;
-
 
 md_std_rom_device::md_std_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 					: device_t(mconfig, type, name, tag, owner, clock),
@@ -227,11 +223,11 @@ void md_rom_lion2_device::device_start()
 
 void md_rom_lion3_device::device_start()
 {
-	m_prot_data = 0;
-	m_prot_cmd = 0;
+	m_reg[0] = 0;
+	m_reg[1] = 0;
+	m_reg[2] = 0;
 	m_bank = 0;
-	save_item(NAME(m_prot_data));
-	save_item(NAME(m_prot_cmd));
+	save_item(NAME(m_reg));
 	save_item(NAME(m_bank));
 }
 
@@ -570,7 +566,7 @@ READ16_MEMBER(md_rom_kof98_device::read)
 /*-------------------------------------------------
  KOF 99
  -------------------------------------------------*/
-// gfx glitch with the new code... uninitialized ram somewhere?
+
 READ16_MEMBER(md_rom_kof99_device::read_a13)
 {
 	if (offset == 0x00/2)   return 0x00;    // startup protection check, chinese message if != 0
@@ -600,78 +596,79 @@ WRITE16_MEMBER(md_rom_lion2_device::write)
  LION KING 3
  -------------------------------------------------*/
 
+// TODO: Sould Edge vs Samurai Spirits uses this same mechanism (or a very similar one)
+// but expects to bankswitch more than the first 32k chunk...
+
 READ16_MEMBER(md_rom_lion3_device::read)
 {
 	if (offset < 0x8000/2)
 		return m_rom[offset + (m_bank * 0x8000)/2];
 	else if (offset >= 0x600000/2 && offset < 0x700000/2)
 	{
-		UINT16 retdata = 0;
 		switch (offset & 0x7)
 		{
+			case 0:
+				return m_reg[0];
+			case 1:
+				return m_reg[1];
 			case 2:
-				if (m_prot_cmd == 0)
-					retdata = (m_prot_data << 1);
-				else if (m_prot_cmd == 1)
-					retdata = (m_prot_data >> 1);
-				else if (m_prot_cmd == 2)
-				{
-					retdata = m_prot_data >> 4;
-					retdata |= (m_prot_data & 0x0f) << 4;
-				}
-				else
-				{
-					/* printf("unk prot case %d\n", m_prot_cmd); */
-					retdata =  (BIT(m_prot_data, 7) << 0);
-					retdata |= (BIT(m_prot_data, 6) << 1);
-					retdata |= (BIT(m_prot_data, 5) << 2);
-					retdata |= (BIT(m_prot_data, 4) << 3);
-					retdata |= (BIT(m_prot_data, 3) << 4);
-					retdata |= (BIT(m_prot_data, 2) << 5);
-					retdata |= (BIT(m_prot_data, 1) << 6);
-					retdata |= (BIT(m_prot_data, 0) << 7);
-				}
-				break;
-
+				return m_reg[2];
 			default:
 				logerror("protection read, unknown offset %x\n", offset & 0x7);
 				break;
 		}
-		return retdata;
+		return 0;
 	}
 
-	return m_rom[offset];
+	return m_rom[MD_ADDR(offset)];
 }
 
 WRITE16_MEMBER(md_rom_lion3_device::write)
 {
 	if (offset >= 0x600000/2 && offset < 0x700000/2)
 	{
+//		printf("protection write, offset %d data %d\n", offset & 0x7, data);
 		switch (offset & 0x7)
 		{
 			case 0x0:
-				m_prot_data = data;
+				m_reg[0] = data & 0xff;
 				break;
 			case 0x1:
-				m_prot_cmd = data;
+				m_reg[1] = data & 0xff;
 				break;
 			default:
 				logerror("protection write, unknown offset %d\n", offset & 0x7);
 				break;
 		}
-	}
-	if (offset >= 0x700000/2 && offset < 0x800000/2)
-	{
-		switch (offset & 0x7)
+
+		// update m_reg[2]
+		switch (m_reg[1] & 3)
 		{
 			case 0x0:
-				m_bank = data & 0xffff;
+				m_reg[2] = (m_reg[0] << 1);
 				break;
+			case 0x1:
+				m_reg[2] = (m_reg[0] >> 1);
+				break;
+			case 0x2:
+				m_reg[2] = (m_reg[0] >> 4) | ((m_reg[0] & 0x0f) << 4);
+				break;
+			case 0x3:
 			default:
-				logerror("bank write, unknown offset %d\n", offset & 0x7);
+				m_reg[2] =  (BIT(m_reg[0], 7) << 0)
+						| (BIT(m_reg[0], 6) << 1)
+						| (BIT(m_reg[0], 5) << 2)
+						| (BIT(m_reg[0], 4) << 3)
+						| (BIT(m_reg[0], 3) << 4)
+						| (BIT(m_reg[0], 2) << 5)
+						| (BIT(m_reg[0], 1) << 6)
+						| (BIT(m_reg[0], 0) << 7);
 				break;
 		}
+		
 	}
+	if (offset >= 0x700000/2)
+		m_bank = data & 0xff;
 }
 
 /*-------------------------------------------------

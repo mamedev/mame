@@ -270,8 +270,6 @@ static const md_slot slot_list[] =
 	{ LIONK3, "rom_lion3" },
 	{ MC_PIRATE, "rom_mcpir" },
 	{ MJLOVER, "rom_mjlov" },
-	{ MULAN, "rom_mulan"},
-	{ POKEMON2, "rom_poke2"},
 	{ REALTEC, "rom_realtec" },
 	{ REDCL_EN, "rom_redcl" },
 	{ REDCLIFF, "rom_redcl" },
@@ -562,30 +560,6 @@ void base_md_cart_slot_device::setup_custom_mappers()
 			// decrypt
 			for (int x = 0; x < 0x200000/2; x++)
 				ROM16[x] = ROM16[x + 2] ^ 0x4040;
-			break;
-
-		// patch out protection in a bunch of titles...
-		case POKEMON2:
-			/*todo: emulate protection instead
-			 006036:e000
-			 002540:6026
-			 001ed0:6026
-			 002476:6022
-			 */
-			ROM16[0x06036/2] = 0xe000;
-			ROM16[0x02540/2] = 0x6026;
-			ROM16[0x01ed0/2] = 0x6026;
-			ROM16[0x02476/2] = 0x6022;
-			ROM16[0x7e300/2] = 0x60fe;
-			break;
-		case MULAN:
-			/*todo: emulate protection instead
-			 006036:e000
-			 +more?
-			 */
-			//  ROM16[0x01ed0/2] = 0xe000;
-			//  ROM16[0x02540/2] = 0xe000;
-			ROM16[0x06036/2] = 0xe000;
 			break;
 	}
 }

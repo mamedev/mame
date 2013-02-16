@@ -16686,7 +16686,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_poke2" />
+			<feature name="slot" value="rom_lion3" />
 			<dataarea name="rom" size="2097152">
 				<rom name="pocket monsters 2 (unl).bin" size="2097152" crc="30f7031f" sha1="dae100dfaee1b5b7816731cb2f43bcda3da273b7" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -21397,7 +21397,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="supdaisn">
-		<description>Super Daisenryaku (Jpn, Rev. 02)</description>
+		<description>Super Daisenryaku (Jpn, Rev. A)</description>
 		<year>1989</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-4501-02"/>
@@ -26582,12 +26582,12 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="huamul">
+	<software name="mulan">
 		<description>Hua Mu Lan - Mulan (Chi)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_mulan" />
+			<feature name="slot" value="rom_lion3" />
 			<dataarea name="rom" size="2097152">
 				<rom name="hua mu lan - mulan (chi) (unl).bin" size="2097152" crc="796882b8" sha1="d8936c1023db646e1e20f9208b68271afbd6dbf4" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -26873,6 +26873,20 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+<!-- Dump with CRC d65d83d4 is hacked to bypass protection -->
+	<software name="ttoon3">
+		<description>Tiny Toon Adventures 3 (Tw)</description>
+		<year>199?</year>
+		<publisher>Gamtec?</publisher>
+		<info name="serial" value="MT-601"/>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_squir" />
+			<dataarea name="rom" size="1048576">
+				<rom name="tiny toon adventures 3 (unl).bin" size="1048576" crc="f22f569d" sha1="6c68e4c7a5a14f926dc69ea5d5a452d9ead29a8e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="topfight">
 		<description>Top Fighter 2000 MK VIII</description>
 		<year>199?</year>
@@ -27069,7 +27083,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<info name="alt_title" value="Shi Zi Wang 3 - The Lion King 3 (Box?)"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_lion3" />
 			<dataarea name="rom" size="4194304">
 				<rom name="lion_king_3.bin" size="2097152" crc="87e86943" sha1="0ef55dc45536963c8748192a4cb4864a87b03102" offset="000000" loadflag="load16_word_swap" />
 				<rom size="2097152" offset="0x200000" loadflag="reload" />
@@ -27129,6 +27142,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_lion3" />
 			<dataarea name="rom" size="2097152">
 				<rom name="soul edge vs samurai spirits (unl).bin" size="2097152" crc="b11bd611" sha1="28cef4b6829a791c56d4764812d0b345595c8389" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -28022,18 +28036,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="tank 2011 (unl).bin" size="524288" crc="03739820" sha1="8682718f2c2ad80eaf7d62e977d6827490d8e906" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="ttoon3">
-		<description>Tiny Toon Adventures 3 (Tw, Cracked)</description>
-		<year>199?</year>
-		<publisher>Gamtec?</publisher>
-		<info name="serial" value="MT-601"/>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="tiny toon adventures 3 (unl).bin" size="1048576" crc="d65d83d4" sha1="47b1ad463389d709fb49c7cef8fd033a6f95a301" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

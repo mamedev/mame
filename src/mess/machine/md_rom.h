@@ -235,7 +235,7 @@ public:
 	virtual DECLARE_WRITE16_MEMBER(write);
 
 private:
-	UINT8 m_prot_data, m_prot_cmd;
+	UINT8 m_reg[3];
 	UINT16 m_bank;
 };
 

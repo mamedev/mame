@@ -345,9 +345,6 @@ static SLOT_INTERFACE_START(md_cart)
 	SLOT_INTERFACE_INTERNAL("rom_soulb",  MD_ROM_SOULB)
 	SLOT_INTERFACE_INTERNAL("rom_squir",  MD_ROM_SQUIR)
 	SLOT_INTERFACE_INTERNAL("rom_topf",  MD_ROM_TOPF)
-// these have protection patched out, instead of emulated!
-	SLOT_INTERFACE_INTERNAL("rom_mulan",  MD_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_poke2",  MD_STD_ROM)
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( ms_megadriv, md_cons_state )

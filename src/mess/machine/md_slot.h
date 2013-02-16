@@ -53,9 +53,6 @@ enum
 	LIONK3,                      /* Lion King 3, Super Donkey Kong 99, Super King Kong 99 */
 	MC_PIRATE,                   /* Super 19 in 1, Super 15 in 1, 12 in 1 and a few more multicarts */
 	MJLOVER,                     /* Mahjong Lover */
-	MULAN,                       /* Hua Mu Lan - Mulan */
-	POKEMON,                     /* Pocket Monster */
-	POKEMON2,                    /* Pocket Monster 2 */
 	REALTEC,                     /* Whac a Critter/Mallet legend, Defend the Earth, Funnyworld/Ballonboy */
 	REDCLIFF,                    /* Romance of the Three Kingdoms - Battle of Red Cliffs, already decoded from .mdx format */
 	REDCL_EN,                    /* The encoded version... */
