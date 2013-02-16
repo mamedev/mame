@@ -101,6 +101,7 @@ void aakart_device::device_reset()
 	m_status = STATUS_NORMAL;
 	m_new_command = 0;
 	m_rx = -1;
+	m_mouse_enable = 0;
 }
 
 //-------------------------------------------------
