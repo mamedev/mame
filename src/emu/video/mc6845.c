@@ -1048,6 +1048,7 @@ void mc6845_device::device_start()
 	m_update_ready_bit = 0;
 	m_line_address = 0;
 	m_current_disp_addr = 0;
+	m_disp_start_addr = 0;
 
 	save_item(NAME(m_show_border_area));
 	save_item(NAME(m_hpixels_per_column));
