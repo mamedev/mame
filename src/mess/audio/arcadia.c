@@ -63,6 +63,16 @@ void arcadia_sound_device::device_start()
 }
 
 //-------------------------------------------------
+//  device_start - device-specific reset
+//-------------------------------------------------
+void arcadia_sound_device::device_reset()
+{
+	memset(m_reg, 0, sizeof(m_reg));
+	m_omode = 0;
+	m_pos = 0;
+}
+
+//-------------------------------------------------
 //  sound_stream_update - handle update requests for
 //  our sound stream
 //-------------------------------------------------
