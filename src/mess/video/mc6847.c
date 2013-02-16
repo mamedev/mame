@@ -171,6 +171,10 @@ void mc6847_friend_device::device_start(void)
 	m_body_scanlines = 0;
 	m_wide = false;
 	m_recording_scanline = false;
+	m_physical_scanline = 0;
+	m_logical_scanline_zone = 0;
+	m_field_sync = false;
+	m_horizontal_sync = false;
 	set_geometry(25, 192, false);
 
 	/* save states */
