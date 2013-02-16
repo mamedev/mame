@@ -798,6 +798,7 @@ void saturn_state::cd_exec_command( void )
 				else
 				{
 					cr4 = partitions[bufnum].numblks;
+					//printf("Partition %08x %04x\n",bufnum,cr4);
 				}
 
 				hirqreg |= (CMOK|DRDY);
@@ -1072,20 +1073,41 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0x65:
-			popmessage("Copy Sector data, contact MAMEdev");
+			popmessage("Move Sector data, contact MAMEdev");
 			hirqreg |= (CMOK);
 			break;
 
-		case 0x66:    // move sector data
+		case 0x66:    // copy sector data
 			/* TODO: Sword & Sorcery / Riglord Saga 2 */
 			{
-				//UINT8 src_filter = (cr3>>8)&0xff;
-				//UINT8 dst_filter = cr4;
-				cd_stat |= CD_STAT_TRANS;
-				//debugger_break(machine());
+				UINT32 src_filter = (cr3>>8)&0xff;
+				UINT32 dst_filter = cr1&0xff;
+				UINT32 sectnum = cr4 & 0xff;
+
+				//cd_stat |= CD_STAT_TRANS;
+				//transpart = &partitions[dst_filter];
+
+				for (int i = 0; i < sectnum; i++)
+				{
+					// allocate the dst blocks
+					partitions[dst_filter].blocks[i] = cd_alloc_block(&partitions[dst_filter].bnum[i]);
+					partitions[dst_filter].size += partitions[dst_filter].blocks[i]->size;
+					partitions[dst_filter].numblks++;
+
+					//copy data
+					for(int j = 0; j < sectlenin; j++)
+						partitions[dst_filter].blocks[i]->data[j] = partitions[src_filter].blocks[i]->data[j];
+
+					//deallocate the src blocks
+					//partitions[src_filter].size -= partitions[src_filter].blocks[i]->size;
+					//cd_free_block(partitions[src_filter].blocks[i]);
+					//partitions[src_filter].blocks[i] = (blockT *)NULL;
+					//partitions[src_filter].bnum[i] = 0xff;
+				}
+
 			}
 
-			hirqreg |= (CMOK|ECPY|DRDY);
+			hirqreg |= (CMOK|ECPY);
 			cr_standard_return(cd_stat);
 			break;
 
