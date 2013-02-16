@@ -304,6 +304,7 @@ void cosmac_device::device_start()
 
 void cosmac_device::device_reset()
 {
+	m_ie = 0;
 }
 
 
