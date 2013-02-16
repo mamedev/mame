@@ -217,6 +217,7 @@ void saa5050_device::device_start()
 void saa5050_device::device_reset()
 {
 	m_ra = 0;
+	m_double_height_bottom_row = 0;
 }
 
 
