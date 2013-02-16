@@ -44,6 +44,7 @@ device_serial_interface::device_serial_interface(const machine_config &mconfig, 
 	m_tra_flags = 0;
 	m_rcv_register_data = 0x8000;
 	m_rcv_bit_count = 0;
+	m_connection_state = 0;
 }
 
 device_serial_interface::~device_serial_interface()
