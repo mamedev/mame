@@ -181,6 +181,9 @@ void tms99xx_device::device_start()
 	// set our instruction counter
 	m_icountptr = &m_icount;
 
+	m_state_any = 0;
+	PC = 0;
+
 	// add the states for the debugger
 	for (int i=0; i < 20; i++)
 	{
