@@ -1,11 +1,16 @@
 #include "cpu/upd7725/upd7725.h"
 #include "video/st0020.h"
+#include "machine/eeprom.h"
+
 
 class ssv_state : public driver_device
 {
 public:
 	ssv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_ensoniq(*this, "ensoniq"),
+		m_eeprom(*this, "eeprom"),
 		m_dsp(*this, "dsp"),
 		m_mainram(*this, "mainram"),
 		m_spriteram(*this, "spriteram"),
@@ -15,8 +20,25 @@ public:
 		m_gdfs_tmapram(*this, "gdfs_tmapram"),
 		m_gdfs_tmapscroll(*this, "gdfs_tmapscroll"),
 		m_gdfs_st0020(*this, "st0020_spr"),
-		m_input_sel(*this, "input_sel"){ }
+		m_input_sel(*this, "input_sel"),
+		m_region_gfx1(*this, "gfx1"),
+		m_io_gunx1(*this, "GUNX1"),
+		m_io_guny1(*this, "GUNY1"),
+		m_io_gunx2(*this, "GUNX2"),
+		m_io_guny2(*this, "GUNY2"),
+		m_io_key0(*this, "KEY0"),
+		m_io_key1(*this, "KEY1"),
+		m_io_key2(*this, "KEY2"),
+		m_io_key3(*this, "KEY3"),
+		m_io_service(*this, "SERVICE"),
+		m_io_paddle(*this, "PADDLE"),
+		m_io_trackx(*this, "TRACKX"),
+		m_io_tracky(*this, "TRACKY")
+	{ }
 
+	required_device<cpu_device> m_maincpu;
+	required_device<device_t> m_ensoniq;
+	optional_device<eeprom_device> m_eeprom;
 	optional_device<upd96050_device> m_dsp;
 
 	required_shared_ptr<UINT16> m_mainram;
@@ -139,7 +161,19 @@ public:
 	void init_ssv(int interrupt_ultrax);
 	void init_hypreac2_common();
 	void init_st010();
-};
 
-/*----------- defined in video/ssv.c -----------*/
-void ssv_enable_video(running_machine &machine, int enable);
+protected:
+	required_memory_region m_region_gfx1;
+	optional_ioport m_io_gunx1;
+	optional_ioport m_io_guny1;
+	optional_ioport m_io_gunx2;
+	optional_ioport m_io_guny2;
+	optional_ioport m_io_key0;
+	optional_ioport m_io_key1;
+	optional_ioport m_io_key2;
+	optional_ioport m_io_key3;
+	optional_ioport m_io_service;
+	optional_ioport m_io_paddle;
+	optional_ioport m_io_trackx;
+	optional_ioport m_io_tracky;
+};

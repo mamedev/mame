@@ -162,7 +162,6 @@ Notes:
 #include "emu.h"
 #include "cpu/v810/v810.h"
 #include "cpu/v60/v60.h"
-#include "machine/eeprom.h"
 #include "machine/nvram.h"
 #include "sound/es5506.h"
 #include "includes/ssv.h"
@@ -178,7 +177,7 @@ Notes:
 /* Update the IRQ state based on all possible causes */
 void ssv_state::update_irq_state()
 {
-	machine().device("maincpu")->execute().set_input_line(0, (m_requested_int & m_irq_enable)? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, (m_requested_int & m_irq_enable)? ASSERT_LINE : CLEAR_LINE);
 }
 
 IRQ_CALLBACK_MEMBER(ssv_state::ssv_irq_callback)
@@ -317,7 +316,7 @@ WRITE16_MEMBER(ssv_state::ssv_lockout_inv_w)
 void ssv_state::machine_reset()
 {
 	m_requested_int = 0;
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ssv_state::ssv_irq_callback),this));
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(ssv_state::ssv_irq_callback),this));
 	membank("bank1")->set_base(memregion("user1")->base());
 }
 
@@ -444,17 +443,13 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::gdfs_eeprom_r)
 {
-	device_t *device = machine().device("eeprom");
-	static const char *const gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
+	ioport_port *gun[] = { m_io_gunx1, m_io_guny1, m_io_gunx2, m_io_guny2 };
 
-	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return (((m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ ioport(gunnames[m_gdfs_lightgun_select])->read()) | (eeprom->read_bit() << 8);
+	return (((m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ gun[m_gdfs_lightgun_select]->read()) | (m_eeprom->read_bit() << 8);
 }
 
 WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
 {
-	device_t *device = machine().device("eeprom");
-
 	if (data & ~0x7b00)
 		logerror("%s - Unknown EEPROM bit written %04X\n",machine().describe_context(),data);
 
@@ -464,14 +459,13 @@ WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
 //      data & 0x0001 ?
 
 		// latch the bit
-		eeprom_device *eeprom = downcast<eeprom_device *>(device);
-		eeprom->write_bit(data & 0x4000);
+		m_eeprom->write_bit(data & 0x4000);
 
 		// reset line asserted: reset.
-		eeprom->set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
+		m_eeprom->set_cs_line((data & 0x1000) ? CLEAR_LINE : ASSERT_LINE );
 
 		// clock line asserted: write latch or select next bit to read
-		eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->set_clock_line((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE );
 
 		if (!(m_gdfs_eeprom_old & 0x0800) && (data & 0x0800))   // rising clock
 			m_gdfs_lightgun_select = (data & 0x0300) >> 8;
@@ -511,10 +505,10 @@ READ16_MEMBER(ssv_state::hypreact_input_r)
 {
 	UINT16 input_sel = *m_input_sel;
 
-	if (input_sel & 0x0001) return ioport("KEY0")->read();
-	if (input_sel & 0x0002) return ioport("KEY1")->read();
-	if (input_sel & 0x0004) return ioport("KEY2")->read();
-	if (input_sel & 0x0008) return ioport("KEY3")->read();
+	if (input_sel & 0x0001) return m_io_key0->read();
+	if (input_sel & 0x0002) return m_io_key1->read();
+	if (input_sel & 0x0004) return m_io_key2->read();
+	if (input_sel & 0x0008) return m_io_key3->read();
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",space.device().safe_pc(),input_sel);
 	return 0xffff;
 }
@@ -634,10 +628,10 @@ READ16_MEMBER(ssv_state::srmp4_input_r)
 {
 	UINT16 input_sel = *m_input_sel;
 
-	if (input_sel & 0x0002) return ioport("KEY0")->read();
-	if (input_sel & 0x0004) return ioport("KEY1")->read();
-	if (input_sel & 0x0008) return ioport("KEY2")->read();
-	if (input_sel & 0x0010) return ioport("KEY3")->read();
+	if (input_sel & 0x0002) return m_io_key0->read();
+	if (input_sel & 0x0004) return m_io_key1->read();
+	if (input_sel & 0x0008) return m_io_key2->read();
+	if (input_sel & 0x0010) return m_io_key3->read();
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",space.device().safe_pc(),input_sel);
 	return 0xffff;
 }
@@ -669,11 +663,10 @@ WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		device_t *device = machine().device("ensoniq");
 		int bank = 0x400000/2 * (data & 1); // UINT16 address
 		int voice;
 		for (voice = 0; voice < 32; voice++)
-			es5506_voice_bank_w(device, voice, bank);
+			es5506_voice_bank_w(m_ensoniq, voice, bank);
 	}
 //  popmessage("%04X",data);
 }
@@ -682,10 +675,10 @@ READ16_MEMBER(ssv_state::srmp7_input_r)
 {
 	UINT16 input_sel = *m_input_sel;
 
-	if (input_sel & 0x0002) return ioport("KEY0")->read();
-	if (input_sel & 0x0004) return ioport("KEY1")->read();
-	if (input_sel & 0x0008) return ioport("KEY2")->read();
-	if (input_sel & 0x0010) return ioport("KEY3")->read();
+	if (input_sel & 0x0002) return m_io_key0->read();
+	if (input_sel & 0x0004) return m_io_key1->read();
+	if (input_sel & 0x0008) return m_io_key2->read();
+	if (input_sel & 0x0010) return m_io_key3->read();
 	logerror("CPU #0 PC %06X: unknown input read: %04X\n",space.device().safe_pc(),input_sel);
 	return 0xffff;
 }
@@ -728,7 +721,11 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::sxyreact_ballswitch_r)
 {
-	return ioport("SERVICE")->read_safe(0);
+	if ( m_io_service )
+	{
+		return m_io_service->read();
+	}
+	return 0;
 }
 
 READ16_MEMBER(ssv_state::sxyreact_dial_r)
@@ -742,7 +739,7 @@ WRITE16_MEMBER(ssv_state::sxyreact_dial_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0x20)
-			m_sxyreact_serial = ioport("PADDLE")->read_safe(0) & 0xff;
+			m_sxyreact_serial = ( m_io_paddle ? m_io_paddle->read() : 0 ) & 0xff;
 
 		if ( (m_sxyreact_dial & 0x40) && !(data & 0x40) )   // $40 -> $00
 			m_sxyreact_serial <<= 1;                        // shift 1 bit
@@ -857,8 +854,8 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::eaglshot_gfxrom_r)
 {
-	UINT8 *rom  =   memregion("gfx1")->base();
-	size_t size =   memregion("gfx1")->bytes();
+	UINT8 *rom  =   m_region_gfx1->base();
+	size_t size =   m_region_gfx1->bytes();
 
 	offset = offset * 2 + m_gfxrom_select * 0x200000;
 
@@ -880,11 +877,11 @@ READ16_MEMBER(ssv_state::eaglshot_trackball_r)
 {
 	switch(m_trackball_select)
 	{
-		case 0x60:  return (ioport("TRACKX")->read() >> 8) & 0xff;
-		case 0x40:  return (ioport("TRACKX")->read() >> 0) & 0xff;
+		case 0x60:  return (m_io_trackx->read() >> 8) & 0xff;
+		case 0x40:  return (m_io_trackx->read() >> 0) & 0xff;
 
-		case 0x70:  return (ioport("TRACKY")->read() >> 8) & 0xff;
-		case 0x50:  return (ioport("TRACKY")->read() >> 0) & 0xff;
+		case 0x70:  return (m_io_tracky->read() >> 8) & 0xff;
+		case 0x50:  return (m_io_tracky->read() >> 0) & 0xff;
 	}
 	return 0;
 }
