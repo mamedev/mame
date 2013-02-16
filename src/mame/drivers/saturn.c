@@ -1388,6 +1388,7 @@ static void m68k_reset_callback(device_t *device)
 {
 	saturn_state *state = device->machine().driver_data<saturn_state>();
 	device->machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(saturn_state::smpc_audio_reset_line_pulse), state));
+
 	printf("m68k RESET opcode triggered\n");
 }
 

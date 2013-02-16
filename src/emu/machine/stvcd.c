@@ -1037,7 +1037,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0x64:    // put sector data
-			/* TODO: After Burner 2, Out Run, Fantasy Zone and Dungeon Master Nexus trips this */
+			/* After Burner 2, Out Run, Fantasy Zone and Dungeon Master Nexus trips this */
 			{
 				UINT32 sectnum = cr4 & 0xff;
 				UINT32 sectofs = cr2;
@@ -1048,7 +1048,6 @@ void saturn_state::cd_exec_command( void )
 				/*TODO: eventual errors? */
 
 				cd_getsectoroffsetnum(bufnum, &sectofs, &sectnum);
-
 
 				cd_stat |= CD_STAT_TRANS;
 
@@ -1068,7 +1067,7 @@ void saturn_state::cd_exec_command( void )
 				}
 			}
 
-			hirqreg |= (CMOK|ECPY|DRDY); // TODO: is ECPY ok?
+			hirqreg |= (CMOK|DRDY);
 			cr_standard_return(cd_stat);
 			break;
 
@@ -1082,9 +1081,11 @@ void saturn_state::cd_exec_command( void )
 			{
 				//UINT8 src_filter = (cr3>>8)&0xff;
 				//UINT8 dst_filter = cr4;
+				cd_stat |= CD_STAT_TRANS;
+				//debugger_break(machine());
 			}
 
-			hirqreg |= (CMOK|ECPY);
+			hirqreg |= (CMOK|ECPY|DRDY);
 			cr_standard_return(cd_stat);
 			break;
 
