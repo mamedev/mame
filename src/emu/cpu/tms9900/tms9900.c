@@ -215,6 +215,9 @@ void tms99xx_device::device_reset()
 {
 	if (VERBOSE>3) LOG("tms99xx: Device reset\n");
 	m_reset = true;
+	m_check_ready = false;
+	m_wait_state = false;
+	ST = 0;
 }
 
 const char* tms99xx_device::s_statename[20] =
