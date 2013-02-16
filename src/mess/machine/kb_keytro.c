@@ -429,6 +429,7 @@ void pc_kbd_keytronic_pc3270_device::device_reset()
 {
 	/* set default values */
 	m_p3 = 0xff;
+	m_last_write_addr = 0;
 }
 
 
