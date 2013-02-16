@@ -428,6 +428,7 @@ void luxor_55_21046_device::device_start()
 void luxor_55_21046_device::device_reset()
 {
 	m_cs = false;
+	m_data_in = 0;
 }
 
 
