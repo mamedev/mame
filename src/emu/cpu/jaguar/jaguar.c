@@ -998,15 +998,14 @@ void or_rn_rn(jaguar_cpu_state *jaguar, UINT16 op)
 void pack_rn(jaguar_cpu_state *jaguar, UINT16 op)       /* GPU only */
 {
 	int dreg = op & 31;
-	UINT32 r1 = jaguar->r[(op >> 5) & 31];
+	int pack = (op >> 5) & 31;
 	UINT32 r2 = jaguar->r[dreg];
 	UINT32 res;
-	if (r1 == 0)    /* PACK */
+	if (pack == 0)    /* PACK */
 		res = ((r2 >> 10) & 0xf000) | ((r2 >> 5) & 0x0f00) | (r2 & 0xff);
 	else            /* UNPACK */
 		res = ((r2 & 0xf000) << 10) | ((r2 & 0x0f00) << 5) | (r2 & 0xff);
 	jaguar->r[dreg] = res;
-	CLR_ZN(jaguar); SET_ZN(jaguar, res);
 }
 
 void resmac_rn(jaguar_cpu_state *jaguar, UINT16 op)
