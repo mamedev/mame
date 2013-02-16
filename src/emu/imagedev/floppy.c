@@ -213,6 +213,7 @@ void floppy_image_device::device_start()
 	cyl = 0;
 	ss  = 0;
 	stp = 1;
+	wpt = 0;
 	dskchg = exists() ? 1 : 0;
 	index_timer = timer_alloc(0);
 	image_dirty = false;
