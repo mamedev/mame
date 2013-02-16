@@ -1844,6 +1844,7 @@ void sega_32x_device::device_reset()
 	m_sh2_master_cmdint_enable = m_sh2_slave_cmdint_enable = 0;
 	sh2_master_pwmint_enable = sh2_slave_pwmint_enable = 0;
 	m_sh2_master_vint_pending = m_sh2_slave_vint_pending = 0;
+	m_sh2_hint_in_vbl = 0;
 
 	// start in a reset state
 	m_sh2_are_running = 0;
@@ -1859,7 +1860,6 @@ void sega_32x_device::device_reset()
 	m_32x_displaymode = 0;
 	m_32x_240mode = 0;
 
-
 	current_fifo_block = fifo_block_a;
 	current_fifo_readblock = fifo_block_b;
 	current_fifo_write_pos = 0;
@@ -1868,7 +1868,16 @@ void sega_32x_device::device_reset()
 	fifo_block_b_full = 0;
 
 	m_32x_hcount_compare_val = -1;
+	m_32x_hcount_reg = 0;
 
+	m_32x_fb_swap = 0;
+
+	m_pwm_tm_reg = 0;
+	m_pwm_cycle = 0;
+	m_pwm_ctrl = 0;
+
+	m_lch_index_w = 0;
+	m_rch_index_w = 0;
 
 // moved from init
 
