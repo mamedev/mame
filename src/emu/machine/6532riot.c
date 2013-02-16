@@ -524,8 +524,10 @@ void riot6532_device::device_start()
 void riot6532_device::device_reset()
 {
 	/* reset I/O states */
+	m_port[0].m_in = 0;
 	m_port[0].m_out = 0;
 	m_port[0].m_ddr = 0;
+	m_port[1].m_in = 0;
 	m_port[1].m_out = 0;
 	m_port[1].m_ddr = 0;
 
