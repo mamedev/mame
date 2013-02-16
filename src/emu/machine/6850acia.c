@@ -154,6 +154,7 @@ void acia6850_device::device_reset()
 	m_tx_state = START;
 	m_irq = 0;
 	m_rts = 0;
+	m_ctrl = 0;
 
 	m_out_irq_func(CLEAR_LINE);
 
