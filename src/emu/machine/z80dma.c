@@ -229,6 +229,7 @@ void z80dma_device::device_reset()
 	m_dma_enabled = 0;
 	m_read_num_follow = m_read_cur_follow = 0;
 	m_reset_pointer = 0;
+	m_is_read = false;
 
 	// disable interrupts
 	WR3 &= ~0x20;
