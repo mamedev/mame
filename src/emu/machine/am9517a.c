@@ -466,6 +466,8 @@ void am9517a_device::device_reset()
 	m_msb = 0;
 	m_current_channel = -1;
 	m_last_channel = 3;
+	m_hreq = -1;
+	m_eop = 0;
 
 	set_hreq(0);
 	set_eop(ASSERT_LINE);
