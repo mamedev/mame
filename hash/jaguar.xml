@@ -18,7 +18,10 @@ Are the following undumped?
 				<!-- The original dump, released in a custom .j01 format, was the following one
 				<rom name="air cars.j01" size="2097152" crc="cbfd822a" sha1="9d1ecdb230f94d8145520ba03d187a19d6851a75" offset="000000" />
 				-->
+				<!-- below dump has a bad bit
 				<rom name="air cars.j64" size="2097152" crc="237d5643" sha1="1842ba3823131d48623f733709eac85e770868df" offset="000000" />
+				-->
+				<rom name="air cars.j64" size="2097152" crc="40e1a1d0" sha1="533c497761cc802624708108bc9ef6e7c4f40296" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
