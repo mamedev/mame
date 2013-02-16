@@ -488,7 +488,6 @@ void lc89510_temp_device::CDD_Reset(void)
 void lc89510_temp_device::CDC_Reset(void)
 {
 	memset(CDC_BUFFER, 0x00, ((16 * 1024 * 2) + SECTOR_SIZE));
-	LC8951UpdateHeader();
 
 	LC8951RegistersW[REG_W_DACL] = LC8951RegistersW[REG_W_DACH] = LC8951RegistersW[REG_W_DBCL] = LC8951RegistersW[REG_W_DBCH] = LC8951RegistersW[REG_W_PTH] = LC8951RegistersW[REG_W_PTL] = LC8951RegistersW[REG_W_SBOUT] = LC8951RegistersW[REG_W_IFCTRL] = LC8951RegistersW[REG_W_CTRL0] = LC8951RegistersW[REG_W_CTRL1] =
 		LC8951RegistersW[REG_W_CTRL2] = LC8951RegistersR[REG_R_HEAD1] = LC8951RegistersR[REG_R_HEAD2] = LC8951RegistersR[REG_R_HEAD3] = LC8951RegistersR[REG_R_STAT0] = LC8951RegistersR[REG_R_STAT1] = LC8951RegistersR[REG_R_STAT2] = CDC_DECODE = 0;
@@ -498,8 +497,8 @@ void lc89510_temp_device::CDC_Reset(void)
 	LC8951RegistersW[REG_W_WAL] = wa & 0xff; LC8951RegistersW[REG_W_WAH] = (wa >> 8) &0xff;
 	LC8951RegistersR[REG_R_HEAD0] = 0x01;
 	LC8951RegistersR[REG_R_STAT3] = 0x80;
-
-
+	
+	LC8951UpdateHeader();
 }
 
 
