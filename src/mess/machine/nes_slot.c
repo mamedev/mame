@@ -1,6 +1,6 @@
 #include "emu.h"
-#include "machine/nes_slot.h"
 #include "hashfile.h"
+#include "machine/nes_slot.h"
 
 #define NES_BATTERY_SIZE 0x2000
 
@@ -1112,9 +1112,9 @@ bool nes_cart_slot_device::call_load()
 
 void nes_cart_slot_device::call_unload()
 {
-	if (m_cart->get_battery_size())
+	if (m_cart && m_cart->get_battery_size())
 		battery_save(m_cart->get_battery_base(), m_cart->get_battery_size());
-	if (m_cart->get_mapper_bram_size())
+	if (m_cart && m_cart->get_mapper_bram_size())
 		battery_save(m_cart->get_mapper_bram_base(), m_cart->get_mapper_bram_size());
 }
 
