@@ -547,6 +547,10 @@ void tms9902_device::reset_uart()
 	m_BRKON = false;
 	m_BRKout = false;
 
+	m_DSCH = false;
+	m_TIMELP = false;
+	m_INT = false;
+
 	m_TMR = 0;
 	m_STOPB = 0;
 	m_RCL = 0;
