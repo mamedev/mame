@@ -3355,6 +3355,7 @@ void saturn_state::draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 	int scrolly = stv2_current_tilemap.scrolly;
 	int r,g,b;
 	UINT32 dot_data;
+	int xf, yf;
 
 	xsize = (stv2_current_tilemap.bitmap_size & 2) ? 1024 : 512;
 	ysize = (stv2_current_tilemap.bitmap_size & 1) ? 512 : 256;
@@ -3369,8 +3370,13 @@ void saturn_state::draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &clip
 			if(!stv_vdp2_window_process(xdst,ydst))
 				continue;
 
-			xsrc = (xdst + scrollx) & (xsize_mask-1);
-			ysrc = (ydst + scrolly) & (ysize_mask-1);
+			xf = stv2_current_tilemap.incx * xdst;
+			xf>>=16;
+			yf = stv2_current_tilemap.incy * ydst;
+			yf>>=16;
+
+			xsrc = (xf + scrollx) & (xsize_mask-1);
+			ysrc = (yf + scrolly) & (ysize_mask-1);
 			src_offs = (xsrc + (ysrc*xsize));
 			src_offs *= 4;
 			src_offs += map_offset;
@@ -3440,7 +3446,7 @@ void saturn_state::stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectan
 		//  case 0: draw_4bpp_bitmap(bitmap,cliprect); return;
 			case 1: draw_8bpp_bitmap(bitmap,cliprect); return;
 			case 3: draw_rgb15_bitmap(bitmap,cliprect); return;
-		//  case 4: draw_rgb32_bitmap(bitmap,cliprect); return;
+			case 4: draw_rgb32_bitmap(bitmap,cliprect); return;
 		}
 
 		/* intentional fall-through*/
