@@ -239,6 +239,7 @@ void rp5c01_device::device_start()
 
 void rp5c01_device::device_reset()
 {
+	memset(m_reg, 0, sizeof(m_reg));
 	set_current_time(machine());
 }
 
