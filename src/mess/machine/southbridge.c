@@ -221,6 +221,7 @@ void southbridge_device::device_reset()
 	m_at_speaker_input = 0;
 	m_dma_channel = -1;
 	m_cur_eop = false;
+	m_nmi_enabled = 0;
 }
 
 
