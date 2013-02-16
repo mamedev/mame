@@ -85,14 +85,6 @@ i2cmem_device::i2cmem_device( const machine_config &mconfig, const char *tag, de
 	m_sdar( 1 ),
 	m_state( STATE_IDLE )
 {
-	m_address_bits = 0;
-
-	int i = m_data_size - 1;
-	while( i > 0 )
-	{
-		m_address_bits++;
-		i >>= 1;
-	}
 }
 
 
@@ -109,6 +101,21 @@ void i2cmem_device::device_config_complete()
 	if (intf != NULL)
 	{
 		*static_cast<i2cmem_interface *>(this) = *intf;
+	}
+	else
+	{
+		m_slave_address = 0;
+		m_page_size = 0;
+		m_data_size = 0;
+	}
+
+	m_address_bits = 0;
+
+	int i = m_data_size - 1;
+	while( i > 0 )
+	{
+		m_address_bits++;
+		i >>= 1;
 	}
 
 	m_space_config = address_space_config( "i2cmem", ENDIANNESS_BIG, 8,  m_address_bits, 0, *ADDRESS_MAP_NAME( i2cmem_map8 ) );
