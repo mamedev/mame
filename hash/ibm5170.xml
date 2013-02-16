@@ -679,6 +679,97 @@ Missing files come here
 		</part>
 	</software>
 
+<!-- SDK's-->
+
+	<software name="win23sdk">
+		<description>Windows 2.03 SDK</description>
+		<year>1988</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="lgsamp.img" size="737280" crc="e99b3f65" sha1="33a94f251c46d2afda7859f79d595a0013d7e2be" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="samples.img" size="737280" crc="1b24660c" sha1="2e317489cd6f08d371951abd8404bc585e213096" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="softdev1.img" size="737280" crc="8d43ccb8" sha1="9441d2cf5215fd0029cd7029fb0e48439682a18a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="softdev2.img" size="737280" crc="38507da0" sha1="96c10e6493a5e6ba0e66fc054782115ab0b191e3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="utils.img" size="737280" crc="29d9ff07" sha1="bc59bc9011ef6b8e0667acd93cfa1ced68b22b2e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win3sdk">
+		<description>Windows 3.0 SDK</description>
+		<year>1990</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="debug files 2 (050-151-032).img" size="737280" crc="e238b341" sha1="63e78f3e07ab626d0ed8752384f12535d1844837" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="debug tools 2 - debug files 1 (050-151-031).img" size="737280" crc="560a4fed" sha1="c543e5a4e330b62191b0dcae2fa45c4e3588814a" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="development tools 1 (050-151-029).img" size="737280" crc="d920a200" sha1="70ff9eaef1802e606d81d90e90b8eefaba6c1540" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="development tools 2 - debug tools 1 (050-151-030).img" size="737280" crc="6c353dc7" sha1="609356e84bb8100e1736718bfb537e794b26ed0c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="include files, sample source code 1 (050-151-035).img" size="737280" crc="e704e7cd" sha1="8cae5fd6320a53d37e9f2d4598264fef8cd56f9c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="link libraries 1 (050-151-033).img" size="737280" crc="c152995c" sha1="46be42851a98b9c9e8a63b087e730426335f7bbf" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="link libraries 2 (050-151-034).img" size="737280" crc="3dd278d0" sha1="b3efdf6e9233a490f401e930d2eabc8007534fbe" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="online reference (advisor format) (050-151-037).img" size="737280" crc="54d14c76" sha1="c9f0d665cb55e819f954bc312b6b1c7ffba8623b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="online reference (windows help format) (050-151-038).img" size="737280" crc="18899701" sha1="c0ea127f35431cc575357b1fd9da1b0fcc184c2f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<dataarea name="flop" size="737280">
+				<rom name="sample source code 2 (050-151-036).img" size="737280" crc="fa050647" sha1="d9a10b58ad2208a6531d9d7627533a3800a69137" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- Game Disks -->
 
 	<software name="amd80gad">
@@ -1390,7 +1481,7 @@ Missing files come here
 	</software>
 
 	<!-- IPF's Dual format-->
-	<software name="actfgkixx" supported="no">
+	<software name="actfgkix" supported="no">
 		<description>Action Fighter (Kixx)</description>
 		<year>1989</year>
 		<publisher>KIXX</publisher>

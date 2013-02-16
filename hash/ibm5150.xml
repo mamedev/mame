@@ -2533,6 +2533,50 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<!-- SDK -->
+
+	<software name="win13sdk">
+		<description>Windows 1.03 SDK</description>
+		<year>1986</year>
+		<publisher>Microsoft</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="utilities disk 1 (050-150-078).img" size="368640" crc="f2675ca3" sha1="352eb818acaf30119309300399c2acc9433efb8d" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="utilities disk 2 (050-150-079).img" size="368640" crc="96264321" sha1="fd34ac2c00f5d44aedf9f9a11fc54439450cfd7f" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="libraries and include files disk (c) (050-150-080).img" size="368640" crc="34478d1b" sha1="334134cd115cbae61603776bf16e86066a3f0dc6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="libraries, include files, and sample source disk (pascal) (050-150-081).img" size="368640" crc="f3004306" sha1="affaeff13576e4f451a21c1bf3b39a8f475039c0" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="symbol and debug libraries (050-150-082).img" size="368640" crc="2f58fe8d" sha1="7682ce2d95372735f1d20776e5024faa0db25369" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="sample source code disk 1 (050-150-083).img" size="368640" crc="27a18dcd" sha1="2fcd89cd8239ba5435b754c3ff1b653461143c8e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="sample source code disk 2 (050-150-084).img" size="368640" crc="8e762502" sha1="540e0a40059a25f5c16a8545e65421a9d0febdf8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- OS -->
 
 	<software name="cpm8610">

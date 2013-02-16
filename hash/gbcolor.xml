@@ -22925,9 +22925,24 @@ Undumped Pirates:
 
 <!-- Other Asian Pirate dumps to sort -->
 
+	<software name="emodao">
+		<description>E Mo Dao (Chi, Ripped from 8 in 1 multicart)</description>
+		<year>200?</year>
+		<publisher>Vast Fame</publisher>
+		<info name="alt_title" value="惡魔島"/>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_mbc5" />
+			<dataarea name="rom" size="524288">
+				<rom name="e mo dao (unlicensed, chinese) (multicart rip).bin" size="524288" crc="2b2acb79" sha1="929784599694efc6db16163f5bf91e49c2e459fc" offset="000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="qtdsheng">
 		<description>Qi Tian Da Sheng - Sun Wu Kong (Chi, Ripped from 8 in 1 multicart)</description>
-		<year>2001</year>
+		<year>200?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="齊天大聖 - 孫悟空"/>
 		<part name="cart" interface="gameboy_cart">
