@@ -244,6 +244,7 @@ private:
 	static UINT64 get_current_pc(symbol_table &table, void *ref);
 	static UINT64 get_cycles(symbol_table &table, void *ref);
 	static UINT64 get_totalcycles(symbol_table &table, void *ref);
+	static UINT64 get_lastinstructioncycles(symbol_table &table, void *ref);
 	static UINT64 get_logunmap(symbol_table &table, void *ref);
 	static void set_logunmap(symbol_table &table, void *ref, UINT64 value);
 	static UINT64 get_state(symbol_table &table, void *ref);
@@ -275,6 +276,8 @@ private:
 	int                     m_stopirq;                  // stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT
 	int                     m_stopexception;            // stop exception number for DEBUG_FLAG_STOP_EXCEPTION
 	attotime                m_endexectime;              // ending time of the current execution
+	UINT64					m_total_cycles;				// current total cycles
+	UINT64					m_last_total_cycles;		// last total cycles
 
 	// history
 	offs_t                  m_pc_history[HISTORY_SIZE]; // history of recent PCs

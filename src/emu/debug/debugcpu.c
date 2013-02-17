@@ -1649,6 +1649,8 @@ device_debug::device_debug(device_t &device)
 		m_stopirq(0),
 		m_stopexception(0),
 		m_endexectime(attotime::zero),
+		m_total_cycles(0),
+		m_last_total_cycles(0),
 		m_pc_history_index(0),
 		m_bplist(NULL),
 		m_trace(NULL),
@@ -1675,6 +1677,7 @@ device_debug::device_debug(device_t &device)
 		{
 			m_symtable.add("cycles", NULL, get_cycles);
 			m_symtable.add("totalcycles", NULL, get_totalcycles);
+			m_symtable.add("lastinstructioncycles", NULL, get_lastinstructioncycles);
 		}
 
 		// add entries to enable/disable unmap reporting for each space
@@ -1856,6 +1859,10 @@ void device_debug::instruction_hook(offs_t curpc)
 
 	// update the history
 	m_pc_history[m_pc_history_index++ % HISTORY_SIZE] = curpc;
+
+	// update total cycles
+	m_last_total_cycles = m_total_cycles;
+	m_total_cycles = m_exec->total_cycles();
 
 	// are we tracing?
 	if (m_trace != NULL)
@@ -3075,7 +3082,20 @@ UINT64 device_debug::get_cycles(symbol_table &table, void *ref)
 UINT64 device_debug::get_totalcycles(symbol_table &table, void *ref)
 {
 	device_t *device = reinterpret_cast<device_t *>(table.globalref());
-	return device->debug()->m_exec->total_cycles();
+	return device->debug()->m_total_cycles;
+}
+
+
+//-------------------------------------------------
+//  get_lastinstructioncycles - getter callback for the
+//  'lastinstructioncycles' symbol
+//-------------------------------------------------
+
+UINT64 device_debug::get_lastinstructioncycles(symbol_table &table, void *ref)
+{
+	device_t *device = reinterpret_cast<device_t *>(table.globalref());
+	device_debug *debug = device->debug();
+	return debug->m_total_cycles - debug->m_last_total_cycles;
 }
 
 
