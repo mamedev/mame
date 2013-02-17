@@ -1721,7 +1721,7 @@ bit->  /----15----|----14----|----13----|----12----|----11----|----10----|----09
 
 	#define STV_VDP2_LWTA1U (m_vdp2_regs[0x0dc/2])
 
-	#define STV_VDP2_W1LWE  ((STV_VDP2_LWTA0U & 0x8000) >> 15)
+	#define STV_VDP2_W1LWE  ((STV_VDP2_LWTA1U & 0x8000) >> 15)
 
 
 /* 1800de - Line Window Table Address (W1)

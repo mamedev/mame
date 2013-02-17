@@ -1015,7 +1015,6 @@ void saturn_state::cd_exec_command( void )
 				if (partitions[bufnum].numblks < sectnum)
 				{
 					printf("CD: buffer is not full %08x %08x\n",partitions[bufnum].numblks,sectnum);
-					/* TODO: why this is happening? */
 					cr_standard_return(CD_STAT_REJECT);
 					hirqreg |= (CMOK|EHST);
 					return;
@@ -1063,6 +1062,8 @@ void saturn_state::cd_exec_command( void )
 				for (int i = xfersectpos; i < xfersectpos+xfersectnum; i++)
 				{
 					transpart->blocks[i] = cd_alloc_block(&transpart->bnum[i]);
+					if(transpart->size == -1)
+						transpart->size = 0;
 					transpart->size += transpart->blocks[i]->size;
 					transpart->numblks++;
 				}
@@ -1091,6 +1092,8 @@ void saturn_state::cd_exec_command( void )
 				{
 					// allocate the dst blocks
 					partitions[dst_filter].blocks[i] = cd_alloc_block(&partitions[dst_filter].bnum[i]);
+					if(partitions[dst_filter].size == -1)
+						partitions[dst_filter].size = 0;
 					partitions[dst_filter].size += partitions[dst_filter].blocks[i]->size;
 					partitions[dst_filter].numblks++;
 
@@ -2360,9 +2363,8 @@ saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype,
 
 	// update the status of the partition
 	if (filterprt->size == -1)
-	{
 		filterprt->size = 0;
-	}
+
 	filterprt->size += filterprt->blocks[filterprt->numblks]->size;
 	filterprt->numblks++;
 
