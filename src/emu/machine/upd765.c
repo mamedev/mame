@@ -140,6 +140,10 @@ void upd765_family_device::device_start()
 				flopi[i].dev = NULL;
 		} else
 			flopi[i].dev = NULL;
+
+		flopi[i].main_state = IDLE;
+		flopi[i].sub_state = IDLE;
+		flopi[i].live = false;
 	}
 	cur_rate = 250000;
 	tc = false;
