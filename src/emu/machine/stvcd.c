@@ -2223,10 +2223,13 @@ void saturn_state::cd_readTOC(void)
 
 saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype, UINT8 *p_ok)
 {
-	int match = 1, keepgoing = 2;
+	int match, keepgoing;
 	partitionT *filterprt = (partitionT *)NULL;
 
 	CDROM_LOG(("cd_filterdata, trktype %d\n", trktype))
+	match = 1;
+	keepgoing = 2;
+	lastbuf = flt->condtrue;
 
 	// loop on the filters
 	do
@@ -2238,11 +2241,9 @@ saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype,
 			if ((cd_curfad < flt->fad) || (cd_curfad > (flt->fad + flt->range)))
 			{
 				printf("curfad reject %08x %08x %08x %08x\n",cd_curfad,fadstoplay,flt->fad,flt->fad+flt->range);
-				//match = 0;
-				lastbuf = flt->condfalse;
-				flt = &filters[lastbuf];
-
-				keepgoing--;
+				match = 0;
+				//lastbuf = flt->condfalse;
+				//flt = &filters[lastbuf];
 			}
 		}
 
@@ -2252,7 +2253,7 @@ saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype,
 			{
 				if (curblock.fnum != flt->fid)
 				{
-					logerror("fnum reject\n");
+					printf("fnum reject\n");
 					match = 0;
 				}
 			}
@@ -2261,7 +2262,7 @@ saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype,
 			{
 				if (curblock.chan != flt->chan)
 				{
-					logerror("channel number reject\n");
+					printf("channel number reject\n");
 					match = 0;
 				}
 			}
@@ -2270,7 +2271,7 @@ saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype,
 			{
 				if((curblock.subm & flt->smmask) != flt->smval)
 				{
-					logerror("sub mode reject\n");
+					printf("sub mode reject\n");
 					match = 0;
 				}
 			}
@@ -2279,7 +2280,7 @@ saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype,
 			{
 				if((curblock.cinf & flt->cimask) != flt->cival)
 				{
-					logerror("coding information reject\n");
+					printf("coding information reject\n");
 					match = 0;
 				}
 			}
@@ -2292,8 +2293,8 @@ saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype,
 
 		if (match)
 		{
-			lastbuf = flt->condtrue;
-			filterprt = &partitions[lastbuf];
+			//lastbuf = flt->condtrue;
+			//filterprt = &partitions[lastbuf];
 			// we're done
 			keepgoing = 0;
 		}
@@ -2302,7 +2303,7 @@ saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype,
 			lastbuf = flt->condfalse;
 
 			// reject sector if no match on either connector
-			if ((lastbuf == 0xff) || (keepgoing < 2))
+			if ((lastbuf == 0xff) || (keepgoing == 0))
 			{
 				*p_ok = 0;
 				return (partitionT *)NULL;
@@ -2310,11 +2311,14 @@ saturn_state::partitionT *saturn_state::cd_filterdata(filterT *flt, int trktype,
 
 			// try again using the filter that was on the "false" connector
 			flt = &filters[lastbuf];
+			match = 1;
 
 			// and exit if we fail
 			keepgoing--;
 		}
 	} while (keepgoing);
+
+	filterprt = &partitions[lastbuf];
 
 	// try to allocate a block
 	filterprt->blocks[filterprt->numblks] = cd_alloc_block(&filterprt->bnum[filterprt->numblks]);
