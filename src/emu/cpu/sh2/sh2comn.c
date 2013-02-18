@@ -869,8 +869,7 @@ void sh2_recalc_irq(sh2_state *sh2)
 			vector = (sh2->m[0x68]) & 0x7f;
 		}
 	}
-
-	if((sh2->m[0x67] & 6) == 6 && sh2->dma_irq[1]) {
+	else if((sh2->m[0x67] & 6) == 6 && sh2->dma_irq[1]) {
 		level = (sh2->m[0x38] >> 8) & 15;
 		if(level > irq) {
 			irq = level;
