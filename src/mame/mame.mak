@@ -1793,6 +1793,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/fresh.o \
 	$(DRIVERS)/freekick.o $(VIDEO)/freekick.o \
 	$(DRIVERS)/funkball.o \
+	$(DRIVERS)/gambl186.o \
 	$(DRIVERS)/galaxi.o \
 	$(DRIVERS)/galgame.o \
 	$(DRIVERS)/gamecstl.o \
