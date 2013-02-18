@@ -70,6 +70,12 @@
 #define CD_STAT_WAIT     0x8000     // waiting for command if set, else executed immediately
 #define CD_STAT_REJECT   0xff00     // ultra-fatal error.
 
+int saturn_state::get_timing_command(void)
+{
+	/* TODO: calculate timings based off command params */
+	return 16667;
+}
+
 /* FIXME: assume Saturn CD-ROMs to have a 2 secs pre-gap for now. */
 int saturn_state::get_track_index(void)
 {
@@ -1298,23 +1304,8 @@ void saturn_state::cd_exec_command( void )
 
 TIMER_DEVICE_CALLBACK_MEMBER( saturn_state::stv_sh1_sim )
 {
-	sh1_timer->adjust(attotime::from_hz(16667));
-
 	if((cmd_pending == 0xf) && (!(hirqreg & CMOK)))
-	{
 		cd_exec_command();
-		return;
-	}
-
-	/* TODO: doesn't boot if a disk isn't in? */
-	/* TODO: Check out when this really happens. (Daytona USA original version definitely wants it to be on).*/
-	//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-		hirqreg |= SCDQ;
-
-	if(cd_stat & CD_STAT_PERI)
-	{
-		cr_standard_return(cd_stat);
-	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( saturn_state::stv_sector_cb )
@@ -1329,6 +1320,16 @@ TIMER_DEVICE_CALLBACK_MEMBER( saturn_state::stv_sector_cb )
 		sector_timer->adjust(attotime::from_hz(75));    // 75 sectors / second = 150kBytes/second (cdda track ignores cd_speed setting)
 	else
 		sector_timer->adjust(attotime::from_hz(75*cd_speed));   // 75 / 150 sectors / second = 150 / 300kBytes/second
+
+	/* TODO: doesn't boot if a disk isn't in? */
+	/* TODO: Check out when this really happens. (Daytona USA original version definitely wants it to be on).*/
+	//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
+		hirqreg |= SCDQ;
+
+	if(cd_stat & CD_STAT_PERI)
+	{
+		cr_standard_return(cd_stat);
+	}
 }
 
 // global functions
@@ -1420,7 +1421,6 @@ void saturn_state::stvcd_reset( void )
 	sector_timer = machine().device<timer_device>("sector_timer");
 	sector_timer->adjust(attotime::from_hz(150));   // 150 sectors / second = 300kBytes/second
 	sh1_timer = machine().device<timer_device>("sh1_cmd");
-	sh1_timer->adjust(attotime::from_hz(16667));
 }
 
 saturn_state::blockT *saturn_state::cd_alloc_block(UINT8 *blknum)
@@ -1794,11 +1794,6 @@ void saturn_state::cd_writeWord(UINT32 addr, UINT16 data)
 	case 0x000a:
 //      CDROM_LOG(("%s:WW HIRQ: %04x & %04x => %04x\n", machine().describe_context(), hirqreg, data, hirqreg & data))
 		hirqreg &= data;
-		if(!(hirqreg & CMOK))
-		{
-			sh1_timer->reset();
-			sh1_timer->adjust(attotime::from_hz(16667));
-		}
 		return;
 	case 0x000c:
 	case 0x000e:
@@ -1830,6 +1825,7 @@ void saturn_state::cd_writeWord(UINT32 addr, UINT16 data)
 //      CDROM_LOG(("WW CR4: %04x\n", data))
 		cr4 = data;
 		cmd_pending |= 8;
+		sh1_timer->adjust(attotime::from_hz(get_timing_command()));
 		break;
 	default:
 		CDROM_LOG(("CD: WW %08x %04x\n", addr, data))

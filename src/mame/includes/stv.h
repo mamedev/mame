@@ -395,7 +395,7 @@ public:
 	void stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_4bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-//  void draw_11bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void draw_11bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_rgb32_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -694,6 +694,7 @@ public:
 	UINT8 cdda_maxrepeat;
 	UINT8 cdda_repeat_count;
 	UINT8 tray_is_closed;
+	int get_timing_command( void );
 
 	direntryT curroot;       // root entry of current filesystem
 	direntryT *curdir;       // current directory

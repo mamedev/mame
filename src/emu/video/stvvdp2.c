@@ -3289,6 +3289,64 @@ void saturn_state::draw_8bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &clipr
 	}
 }
 
+void saturn_state::draw_11bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int xsize, ysize, xsize_mask, ysize_mask;
+	int xsrc,ysrc,xdst,ydst;
+	int src_offs;
+	UINT8* vram = m_vdp2.gfx_decode;
+	UINT32 map_offset = stv2_current_tilemap.bitmap_map * 0x20000;
+	int scrollx = stv2_current_tilemap.scrollx;
+	int scrolly = stv2_current_tilemap.scrolly;
+	UINT16 dot_data;
+	UINT16 pal_bank;
+	int xf, yf;
+
+	xsize = (stv2_current_tilemap.bitmap_size & 2) ? 1024 : 512;
+	ysize = (stv2_current_tilemap.bitmap_size & 1) ? 512 : 256;
+
+	xsize_mask = (stv2_current_tilemap.linescroll_enable) ? 1024 : xsize;
+	ysize_mask = (stv2_current_tilemap.vertical_linescroll_enable) ? 512 : ysize;
+
+	pal_bank = 0;
+	if(stv2_current_tilemap.fade_control & 1)
+		pal_bank = ((stv2_current_tilemap.fade_control & 2) ? (2*2048) : (2048));
+
+	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
+	{
+		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
+		{
+			if(!stv_vdp2_window_process(xdst,ydst))
+				continue;
+
+			xf = stv2_current_tilemap.incx * xdst;
+			xf>>=16;
+			yf = stv2_current_tilemap.incy * ydst;
+			yf>>=16;
+
+			xsrc = (xf + scrollx) & (xsize_mask-1);
+			ysrc = (yf + scrolly) & (ysize_mask-1);
+			src_offs = (xsrc + (ysrc*xsize));
+			src_offs *= 2;
+			src_offs += map_offset;
+			src_offs &= 0x7ffff;
+
+			dot_data = ((vram[src_offs]<<8)|(vram[src_offs+1]<<0)) & 0x7ff;
+
+			if ((dot_data != 0) || (stv2_current_tilemap.transparency == STV_TRANSPARENCY_NONE))
+			{
+				dot_data += pal_bank;
+
+				if ( stv2_current_tilemap.colour_calculation_enabled == 0 )
+					bitmap.pix32(ydst, xdst) = machine().pens[dot_data];
+				else
+					bitmap.pix32(ydst, xdst) = alpha_blend_r32(bitmap.pix32(ydst, xdst), machine().pens[dot_data], stv2_current_tilemap.alpha);
+			}
+		}
+	}
+}
+
+
 void saturn_state::draw_rgb15_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int xsize, ysize, xsize_mask, ysize_mask;
@@ -3417,6 +3475,7 @@ void saturn_state::stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectan
 		{
 			case 0: draw_4bpp_bitmap(bitmap,cliprect); return;
 			case 1: draw_8bpp_bitmap(bitmap,cliprect); return;
+			case 2: draw_11bpp_bitmap(bitmap, cliprect); return;
 			case 3: draw_rgb15_bitmap(bitmap,cliprect); return;
 			case 4: draw_rgb32_bitmap(bitmap,cliprect); return;
 		}
@@ -3433,6 +3492,7 @@ void saturn_state::stv_vdp2_draw_basic_bitmap(bitmap_rgb32 &bitmap, const rectan
 		{
 		//  case 0: draw_4bpp_bitmap(bitmap,cliprect); return;
 			case 1: draw_8bpp_bitmap(bitmap,cliprect); return;
+		//	case 2: draw_11bpp_bitmap(bitmap, cliprect); return;
 			case 3: draw_rgb15_bitmap(bitmap,cliprect); return;
 			case 4: draw_rgb32_bitmap(bitmap,cliprect); return;
 		}
