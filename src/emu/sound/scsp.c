@@ -811,7 +811,7 @@ static void SCSP_UpdateReg(scsp_state *scsp, address_space &space, int reg)
 			{
 				CheckPendingIRQ(scsp);
 
-				if(scsp->udata.data[0x1e/2] & 0x630)
+				if(scsp->udata.data[0x1e/2] & 0x610)
 					popmessage("SCSP SCIEB enabled %04x, contact MAMEdev",scsp->udata.data[0x1e/2]);
 			}
 			break;
@@ -819,7 +819,8 @@ static void SCSP_UpdateReg(scsp_state *scsp, address_space &space, int reg)
 		case 0x21:
 			if(scsp->Master)
 			{
-				//printf("%04x\n",scsp->udata.data[0x20/2]);
+				if(scsp->udata.data[0x1e/2] & scsp->udata.data[0x20/2] & 0x20)
+					popmessage("SCSP SCIPD write %04x, contact MAMEdev",scsp->udata.data[0x20/2]);
 			}
 			break;
 		case 0x22:  //SCIRE
