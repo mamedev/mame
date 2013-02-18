@@ -137,6 +137,7 @@ struct sh2_state
 	emu_timer *timer;
 	emu_timer *dma_current_active_timer[2];
 	int     dma_timer_active[2];
+	UINT8  dma_irq[2];
 
 	int active_dma_incs[2];
 	int active_dma_incd[2];

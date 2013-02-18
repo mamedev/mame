@@ -805,6 +805,7 @@ static CPU_RESET( sh2 )
 	sh2->frc_base = 0;
 	sh2->frt_input = sh2->internal_irq_level = sh2->internal_irq_vector = 0;
 	sh2->dma_timer_active[0] = sh2->dma_timer_active[1] = 0;
+	sh2->dma_irq[0] = sh2->dma_irq[1] = 0;
 
 	sh2->ftcsr_read_callback = f;
 	sh2->irq_callback = save_irqcallback;

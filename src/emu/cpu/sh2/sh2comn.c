@@ -418,6 +418,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 		LOG(("SH2.%s: DMA %d complete\n", sh2->device->tag(), dma));
 		sh2->m[0x63+4*dma] |= 2;
 		sh2->dma_timer_active[dma] = 0;
+		sh2->dma_irq[dma] |= 1;
 		sh2_recalc_irq(sh2);
 
 	}
@@ -860,19 +861,21 @@ void sh2_recalc_irq(sh2_state *sh2)
 	}
 
 	// DMA irqs
-	if((sh2->m[0x63] & 6) == 6) {
+	if((sh2->m[0x63] & 6) == 6 && sh2->dma_irq[0]) {
 		level = (sh2->m[0x38] >> 8) & 15;
 		if(level > irq) {
 			irq = level;
-			vector = (sh2->m[0x68] >> 24) & 0x7f;
+			sh2->dma_irq[0] &= ~1;
+			vector = (sh2->m[0x68]) & 0x7f;
 		}
 	}
 
-	if((sh2->m[0x67] & 6) == 6) {
+	if((sh2->m[0x67] & 6) == 6 && sh2->dma_irq[1]) {
 		level = (sh2->m[0x38] >> 8) & 15;
 		if(level > irq) {
 			irq = level;
-			vector = (sh2->m[0x6a] >> 24) & 0x7f;
+			sh2->dma_irq[1] &= ~1;
+			vector = (sh2->m[0x6a]) & 0x7f;
 		}
 	}
 
@@ -894,6 +897,8 @@ void sh2_exception(sh2_state *sh2, const char *message, int irqline)
 		if (sh2->internal_irq_level == irqline)
 		{
 			vector = sh2->internal_irq_vector;
+			/* avoid spurious irqs with this (TODO: needs a better fix) */
+			sh2->internal_irq_level = -1;
 			LOG(("SH-2 '%s' exception #%d (internal vector: $%x) after [%s]\n", sh2->device->tag(), irqline, vector, message));
 		}
 		else
@@ -1024,4 +1029,5 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_ackno
 	device->save_item(NAME(sh2->internal_irq_level));
 	device->save_item(NAME(sh2->internal_irq_vector));
 	device->save_item(NAME(sh2->dma_timer_active));
+	device->save_item(NAME(sh2->dma_irq));
 }
