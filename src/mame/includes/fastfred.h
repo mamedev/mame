@@ -66,18 +66,15 @@ public:
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE8_MEMBER(fastfred_videoram_w);
+	DECLARE_WRITE8_MEMBER(fastfred_attributes_w);
+	DECLARE_WRITE8_MEMBER(fastfred_charbank1_w);
+	DECLARE_WRITE8_MEMBER(fastfred_charbank2_w);
+	DECLARE_WRITE8_MEMBER(fastfred_colorbank1_w);
+	DECLARE_WRITE8_MEMBER(fastfred_colorbank2_w);
+	DECLARE_WRITE8_MEMBER(fastfred_flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(fastfred_flip_screen_y_w);
+
+	DECLARE_WRITE8_MEMBER(imago_fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(imago_charbank_w);	
 };
-
-/*----------- defined in video/fastfred.c -----------*/
-
-DECLARE_WRITE8_HANDLER( fastfred_videoram_w );
-DECLARE_WRITE8_HANDLER( fastfred_attributes_w );
-DECLARE_WRITE8_HANDLER( fastfred_charbank1_w );
-DECLARE_WRITE8_HANDLER( fastfred_charbank2_w );
-DECLARE_WRITE8_HANDLER( fastfred_colorbank1_w );
-DECLARE_WRITE8_HANDLER( fastfred_colorbank2_w );
-DECLARE_WRITE8_HANDLER( fastfred_flip_screen_x_w );
-DECLARE_WRITE8_HANDLER( fastfred_flip_screen_y_w );
-
-DECLARE_WRITE8_HANDLER( imago_fg_videoram_w );
-DECLARE_WRITE8_HANDLER( imago_charbank_w );

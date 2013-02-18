@@ -52,12 +52,14 @@ public:
 	void screen_eof_asuka(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(cadash_interrupt);
 	TIMER_CALLBACK_MEMBER(cadash_interrupt5);
+	
+	/*----------- defined in machine/bonzeadv.c -----------*/
+	void WriteLevelData();
+	void WriteRestartPos(int level );
+
+	DECLARE_READ16_MEMBER( bonzeadv_cchip_ctrl_r );
+	DECLARE_READ16_MEMBER( bonzeadv_cchip_ram_r );
+	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_ctrl_w );
+	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_bank_w );
+	DECLARE_WRITE16_MEMBER( bonzeadv_cchip_ram_w );	
 };
-
-/*----------- defined in machine/bonzeadv.c -----------*/
-
-DECLARE_READ16_HANDLER( bonzeadv_cchip_ctrl_r );
-DECLARE_READ16_HANDLER( bonzeadv_cchip_ram_r );
-DECLARE_WRITE16_HANDLER( bonzeadv_cchip_ctrl_w );
-DECLARE_WRITE16_HANDLER( bonzeadv_cchip_bank_w );
-DECLARE_WRITE16_HANDLER( bonzeadv_cchip_ram_w );

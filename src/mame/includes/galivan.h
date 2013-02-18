@@ -60,8 +60,3 @@ public:
 	UINT32 screen_update_ninjemak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
-
-/*----------- defined in video/galivan.c -----------*/
-
-DECLARE_WRITE8_HANDLER( ninjemak_scrollx_w );
-DECLARE_WRITE8_HANDLER( ninjemak_scrolly_w );

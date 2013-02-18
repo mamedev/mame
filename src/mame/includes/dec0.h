@@ -115,10 +115,3 @@ public:
 	UINT32 screen_update_automat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_secretab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
-
-/*----------- defined in machine/dec0.c -----------*/
-
-DECLARE_READ16_HANDLER( slyspy_controls_r );
-
-extern void dec0_i8751_write(running_machine &machine, int data);
-extern void dec0_i8751_reset(running_machine &machine);

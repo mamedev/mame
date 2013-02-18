@@ -59,7 +59,7 @@ public:
 	int draw_video(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool alt_sprites);
 
 	// temp hack
-	DECLARE_READ16_HANDLER(temp_read_handler_r)
+	DECLARE_READ16_MEMBER(temp_read_handler_r)
 	{
 		return 0xffff;
 	}

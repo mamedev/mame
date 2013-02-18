@@ -302,21 +302,20 @@ static const struct cchip_mapping *const levelData[]=
 	level08
 };
 
-static void WriteLevelData( running_machine &machine )
+void asuka_state::WriteLevelData()
 {
-	asuka_state *state = machine.driver_data<asuka_state>();
 	int i;
 
 	for (i = 0; i < 13; i++)
 	{
-		UINT16 v = CLEV[state->m_current_round][i];
+		UINT16 v = CLEV[m_current_round][i];
 
-		state->m_cval[2 * i + 0] = v & 0xff;
-		state->m_cval[2 * i + 1] = v >> 8;
+		m_cval[2 * i + 0] = v & 0xff;
+		m_cval[2 * i + 1] = v >> 8;
 	}
 }
 
-static void WriteRestartPos( running_machine &machine, int level )
+void asuka_state::WriteRestartPos(int level )
 {
 	/*
 	    Cval0/1 = scroll x position
@@ -328,10 +327,8 @@ static void WriteRestartPos( running_machine &machine, int level )
 	    on the map, which is then given to the C-Chip in order
 	    for the restart position to be returned.
 	*/
-
-	asuka_state *state = machine.driver_data<asuka_state>();
-	int x = state->m_cval[0] + 256 * state->m_cval[1] + state->m_cval[4] + 256 * state->m_cval[5];
-	int y = state->m_cval[2] + 256 * state->m_cval[3] + state->m_cval[6] + 256 * state->m_cval[7];
+	int x = m_cval[0] + 256 * m_cval[1] + m_cval[4] + 256 * m_cval[5];
+	int y = m_cval[2] + 256 * m_cval[3] + m_cval[6] + 256 * m_cval[7];
 
 	const struct cchip_mapping* thisLevel = levelData[level];
 
@@ -340,17 +337,17 @@ static void WriteRestartPos( running_machine &machine, int level )
 		if (x >= thisLevel->xmin && x < thisLevel->xmax &&
 			y >= thisLevel->ymin && y < thisLevel->ymax)
 		{
-			state->m_cval[0] = thisLevel->sx & 0xff;
-			state->m_cval[1] = thisLevel->sx >> 8;
-			state->m_cval[2] = thisLevel->sy & 0xff;
-			state->m_cval[3] = thisLevel->sy >> 8;
-			state->m_cval[4] = thisLevel->px & 0xff;
-			state->m_cval[5] = thisLevel->px >> 8;
-			state->m_cval[6] = thisLevel->py & 0xff;
-			state->m_cval[7] = thisLevel->py >> 8;
+			m_cval[0] = thisLevel->sx & 0xff;
+			m_cval[1] = thisLevel->sx >> 8;
+			m_cval[2] = thisLevel->sy & 0xff;
+			m_cval[3] = thisLevel->sy >> 8;
+			m_cval[4] = thisLevel->px & 0xff;
+			m_cval[5] = thisLevel->px >> 8;
+			m_cval[6] = thisLevel->py & 0xff;
+			m_cval[7] = thisLevel->py >> 8;
 
 			// Restart position found ok
-			state->m_restart_status = 0;
+			m_restart_status = 0;
 
 			return;
 		}
@@ -359,7 +356,7 @@ static void WriteRestartPos( running_machine &machine, int level )
 	}
 
 	// No restart position found for this position (cval0-7 confirmed unchanged in this case)
-	state->m_restart_status = 0xff;
+	m_restart_status = 0xff;
 }
 
 
@@ -369,54 +366,51 @@ static void WriteRestartPos( running_machine &machine, int level )
  *
  *************************************/
 
-WRITE16_HANDLER( bonzeadv_cchip_ctrl_w )
+WRITE16_MEMBER(asuka_state::bonzeadv_cchip_ctrl_w)
 {
 	/* value 2 is written here */
 }
 
-WRITE16_HANDLER( bonzeadv_cchip_bank_w )
+WRITE16_MEMBER(asuka_state::bonzeadv_cchip_bank_w)
 {
-	asuka_state *state = space.machine().driver_data<asuka_state>();
-	state->m_current_bank = data & 7;
+	m_current_bank = data & 7;
 }
 
-WRITE16_HANDLER( bonzeadv_cchip_ram_w )
+WRITE16_MEMBER(asuka_state::bonzeadv_cchip_ram_w)
 {
-	asuka_state *state = space.machine().driver_data<asuka_state>();
-
 //  if (space.device().safe_pc()!=0xa028)
 //  logerror("%08x:  write %04x %04x cchip\n", space.device().safe_pc(), offset, data);
 
-	if (state->m_current_bank == 0)
+	if (m_current_bank == 0)
 	{
 		if (offset == 0x08)
 		{
-			state->m_cc_port = data;
+			m_cc_port = data;
 
-			coin_lockout_w(space.machine(), 1, data & 0x80);
-			coin_lockout_w(space.machine(), 0, data & 0x40);
-			coin_counter_w(space.machine(), 1, data & 0x20);
-			coin_counter_w(space.machine(), 0, data & 0x10);
+			coin_lockout_w(machine(), 1, data & 0x80);
+			coin_lockout_w(machine(), 0, data & 0x40);
+			coin_counter_w(machine(), 1, data & 0x20);
+			coin_counter_w(machine(), 0, data & 0x10);
 		}
 
 		if (offset == 0x0e && data != 0x00)
 		{
-			WriteRestartPos(space.machine(), state->m_current_round);
+			WriteRestartPos(m_current_round);
 		}
 
 		if (offset == 0x0f && data != 0x00)
 		{
-			WriteLevelData(space.machine());
+			WriteLevelData();
 		}
 
 		if (offset == 0x10)
 		{
-			state->m_current_round = data;
+			m_current_round = data;
 		}
 
 		if (offset >= 0x11 && offset <= 0x2a)
 		{
-			state->m_cval[offset - 0x11] = data;
+			m_cval[offset - 0x11] = data;
 		}
 	}
 }
@@ -427,7 +421,7 @@ WRITE16_HANDLER( bonzeadv_cchip_ram_w )
  *
  *************************************/
 
-READ16_HANDLER( bonzeadv_cchip_ctrl_r )
+READ16_MEMBER(asuka_state::bonzeadv_cchip_ctrl_r)
 {
 	/*
 	    Bit 2 = Error signal
@@ -436,31 +430,29 @@ READ16_HANDLER( bonzeadv_cchip_ctrl_r )
 	return 0x01; /* Return 0x05 for C-Chip error */
 }
 
-READ16_HANDLER( bonzeadv_cchip_ram_r )
+READ16_MEMBER(asuka_state::bonzeadv_cchip_ram_r)
 {
-	asuka_state *state = space.machine().driver_data<asuka_state>();
-
 //  logerror("%08x:  read %04x cchip\n", space.device().safe_pc(), offset);
 
-	if (state->m_current_bank == 0)
+	if (m_current_bank == 0)
 	{
 		switch (offset)
 		{
-		case 0x03: return state->ioport("800007")->read();    /* STARTn + SERVICE1 */
-		case 0x04: return state->ioport("800009")->read();    /* COINn */
-		case 0x05: return state->ioport("80000B")->read();    /* Player controls + TILT */
-		case 0x06: return state->ioport("80000D")->read();    /* Player controls (cocktail) */
-		case 0x08: return state->m_cc_port;
+		case 0x03: return ioport("800007")->read();    /* STARTn + SERVICE1 */
+		case 0x04: return ioport("800009")->read();    /* COINn */
+		case 0x05: return ioport("80000B")->read();    /* Player controls + TILT */
+		case 0x06: return ioport("80000D")->read();    /* Player controls (cocktail) */
+		case 0x08: return m_cc_port;
 		}
 
 		if (offset == 0x0e)
 		{
-			return state->m_restart_status; /* 0xff signals error, 0 signals ok */
+			return m_restart_status; /* 0xff signals error, 0 signals ok */
 		}
 
 		if (offset >= 0x11 && offset <= 0x2a)
 		{
-			return state->m_cval[offset - 0x11];
+			return m_cval[offset - 0x11];
 		}
 	}
 

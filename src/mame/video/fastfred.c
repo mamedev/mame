@@ -113,18 +113,16 @@ VIDEO_START_MEMBER(fastfred_state,fastfred)
  *
  *************************************/
 
-WRITE8_HANDLER( fastfred_videoram_w )
-{
-	fastfred_state *state = space.machine().driver_data<fastfred_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+WRITE8_MEMBER(fastfred_state::fastfred_videoram_w )
+{	
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( fastfred_attributes_w )
+WRITE8_MEMBER(fastfred_state::fastfred_attributes_w )
 {
-	fastfred_state *state = space.machine().driver_data<fastfred_state>();
-	if (state->m_attributesram[offset] != data)
+	if (m_attributesram[offset] != data)
 	{
 		if (offset & 0x01)
 		{
@@ -132,93 +130,87 @@ WRITE8_HANDLER( fastfred_attributes_w )
 			int i;
 
 			for (i = offset / 2; i < 0x0400; i += 32)
-				state->m_bg_tilemap->mark_tile_dirty(i);
+				m_bg_tilemap->mark_tile_dirty(i);
 		}
 		else
 		{
 			/* coloumn scroll */
-			state->m_bg_tilemap->set_scrolly(offset / 2, data);
+			m_bg_tilemap->set_scrolly(offset / 2, data);
 		}
 
-		state->m_attributesram[offset] = data;
+		m_attributesram[offset] = data;
 	}
 }
 
 
-WRITE8_HANDLER( fastfred_charbank1_w )
+WRITE8_MEMBER(fastfred_state::fastfred_charbank1_w )
 {
-	fastfred_state *state = space.machine().driver_data<fastfred_state>();
-	UINT16 new_data = (state->m_charbank & 0x0200) | ((data & 0x01) << 8);
+	UINT16 new_data = (m_charbank & 0x0200) | ((data & 0x01) << 8);
 
-	if (new_data != state->m_charbank)
+	if (new_data != m_charbank)
 	{
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 
-		state->m_charbank = new_data;
+		m_charbank = new_data;
 	}
 }
 
-WRITE8_HANDLER( fastfred_charbank2_w )
+WRITE8_MEMBER(fastfred_state::fastfred_charbank2_w )
 {
-	fastfred_state *state = space.machine().driver_data<fastfred_state>();
-	UINT16 new_data = (state->m_charbank & 0x0100) | ((data & 0x01) << 9);
+	UINT16 new_data = (m_charbank & 0x0100) | ((data & 0x01) << 9);
 
-	if (new_data != state->m_charbank)
+	if (new_data != m_charbank)
 	{
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 
-		state->m_charbank = new_data;
+		m_charbank = new_data;
 	}
 }
 
 
-WRITE8_HANDLER( fastfred_colorbank1_w )
+WRITE8_MEMBER(fastfred_state::fastfred_colorbank1_w )
 {
-	fastfred_state *state = space.machine().driver_data<fastfred_state>();
-	UINT8 new_data = (state->m_colorbank & 0x10) | ((data & 0x01) << 3);
+	UINT8 new_data = (m_colorbank & 0x10) | ((data & 0x01) << 3);
 
-	if (new_data != state->m_colorbank)
+	if (new_data != m_colorbank)
 	{
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 
-		state->m_colorbank = new_data;
+		m_colorbank = new_data;
 	}
 }
 
-WRITE8_HANDLER( fastfred_colorbank2_w )
+WRITE8_MEMBER(fastfred_state::fastfred_colorbank2_w )
 {
-	fastfred_state *state = space.machine().driver_data<fastfred_state>();
-	UINT8 new_data = (state->m_colorbank & 0x08) | ((data & 0x01) << 4);
+	UINT8 new_data = (m_colorbank & 0x08) | ((data & 0x01) << 4);
 
-	if (new_data != state->m_colorbank)
+	if (new_data != m_colorbank)
 	{
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 
-		state->m_colorbank = new_data;
+		m_colorbank = new_data;
 	}
 }
 
 
 
-WRITE8_HANDLER( fastfred_flip_screen_x_w )
+WRITE8_MEMBER(fastfred_state::fastfred_flip_screen_x_w )
 {
-	fastfred_state *state = space.machine().driver_data<fastfred_state>();
-	if (state->flip_screen_x() != (data & 0x01))
+	if (flip_screen_x() != (data & 0x01))
 	{
-		state->flip_screen_x_set(data & 0x01);
+		flip_screen_x_set(data & 0x01);
 
-		state->m_bg_tilemap->set_flip((state->flip_screen_x() ? TILEMAP_FLIPX : 0) | (state->flip_screen_y() ? TILEMAP_FLIPY : 0));
+		m_bg_tilemap->set_flip((flip_screen_x() ? TILEMAP_FLIPX : 0) | (flip_screen_y() ? TILEMAP_FLIPY : 0));
 	}
 }
 
-WRITE8_HANDLER( fastfred_flip_screen_y_w )
+WRITE8_MEMBER(fastfred_state::fastfred_flip_screen_y_w )
 {
-	fastfred_state *state = space.machine().driver_data<fastfred_state>();
-	if (state->flip_screen_y() != (data & 0x01))
+	if (flip_screen_y() != (data & 0x01))
 	{
-		state->flip_screen_y_set(data & 0x01);
+		flip_screen_y_set(data & 0x01);
 
-		state->m_bg_tilemap->set_flip((state->flip_screen_x() ? TILEMAP_FLIPX : 0) | (state->flip_screen_y() ? TILEMAP_FLIPY : 0));
+		m_bg_tilemap->set_flip((flip_screen_x() ? TILEMAP_FLIPX : 0) | (flip_screen_y() ? TILEMAP_FLIPY : 0));
 	}
 }
 
@@ -325,20 +317,18 @@ TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_web)
 	SET_TILE_INFO_MEMBER(3, tile_index & 0x1ff, 0, 0);
 }
 
-WRITE8_HANDLER( imago_fg_videoram_w )
+WRITE8_MEMBER(fastfred_state::imago_fg_videoram_w )
 {
-	fastfred_state *state = space.machine().driver_data<fastfred_state>();
-	state->m_imago_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_imago_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( imago_charbank_w )
+WRITE8_MEMBER(fastfred_state::imago_charbank_w )
 {
-	fastfred_state *state = space.machine().driver_data<fastfred_state>();
-	if( state->m_charbank != data )
+	if( m_charbank != data )
 	{
-		state->m_charbank = data;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_charbank = data;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 

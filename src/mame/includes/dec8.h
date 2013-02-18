@@ -135,9 +135,3 @@ public:
 	TIMER_CALLBACK_MEMBER(dec8_i8751_timer_callback);
 	void srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 };
-
-/*----------- defined in video/dec8.c -----------*/
-DECLARE_WRITE8_HANDLER( dec8_bac06_0_w );
-DECLARE_WRITE8_HANDLER( dec8_bac06_1_w );
-DECLARE_WRITE8_HANDLER( dec8_pf1_data_w );
-DECLARE_READ8_HANDLER( dec8_pf1_data_r );
