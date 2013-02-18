@@ -1175,7 +1175,7 @@ MACHINE_RESET_MEMBER(ng_aes_state,neogeo)
 
 	m_maincpu->reset();
 
-	neogeo_reset_rng(machine());
+	neogeo_reset_rng();
 
 	start_interrupt_timers();
 

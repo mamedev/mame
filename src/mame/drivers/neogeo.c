@@ -1051,7 +1051,7 @@ void neogeo_state::machine_reset()
 
 	m_maincpu->reset();
 
-	neogeo_reset_rng(machine());
+	neogeo_reset_rng();
 
 	start_interrupt_timers();
 
