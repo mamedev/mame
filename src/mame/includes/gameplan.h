@@ -81,6 +81,10 @@ public:
 	DECLARE_READ8_MEMBER(vblank_r);
 	void gameplan_get_pens( pen_t *pens );
 	void leprechn_get_pens( pen_t *pens );
+	DECLARE_WRITE_LINE_MEMBER(via_irq);
+	DECLARE_READ8_MEMBER(trvquest_question_r);
+	DECLARE_WRITE8_MEMBER(trvquest_coin_w);
+	DECLARE_WRITE8_MEMBER(trvquest_misc_w);
 };
 
 /*----------- defined in video/gameplan.c -----------*/

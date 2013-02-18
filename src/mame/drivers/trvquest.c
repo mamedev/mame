@@ -41,19 +41,17 @@ Notes:
 #include "includes/gameplan.h"
 #include "machine/nvram.h"
 
-static READ8_HANDLER( trvquest_question_r )
+READ8_MEMBER(gameplan_state::trvquest_question_r)
 {
-	gameplan_state *state = space.machine().driver_data<gameplan_state>();
-
-	return state->memregion("questions")->base()[*state->m_trvquest_question * 0x2000 + offset];
+	return memregion("questions")->base()[*m_trvquest_question * 0x2000 + offset];
 }
 
-static WRITE8_DEVICE_HANDLER( trvquest_coin_w )
+WRITE8_MEMBER(gameplan_state::trvquest_coin_w)
 {
-	coin_counter_w(space.machine(), 0, ~data & 1);
+	coin_counter_w(machine(), 0, ~data & 1);
 }
 
-static WRITE8_DEVICE_HANDLER( trvquest_misc_w )
+WRITE8_MEMBER(gameplan_state::trvquest_misc_w)
 {
 	// data & 1 -> led on/off ?
 }
@@ -67,7 +65,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, gameplan_state )
 	AM_RANGE(0x3830, 0x3831) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x3840, 0x3841) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x3850, 0x3850) AM_READNOP //watchdog_reset_r ?
-	AM_RANGE(0x8000, 0x9fff) AM_READ_LEGACY(trvquest_question_r)
+	AM_RANGE(0x8000, 0x9fff) AM_READ(trvquest_question_r)
 	AM_RANGE(0xa000, 0xa000) AM_WRITEONLY AM_SHARE("trvquest_q")
 	AM_RANGE(0xa000, 0xa000) AM_READNOP // bogus read from the game code when reads question roms
 	AM_RANGE(0xb000, 0xffff) AM_ROM
@@ -147,29 +145,12 @@ static INPUT_PORTS_START( trvquest )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static TIMER_CALLBACK( via_irq_delayed )
-{
-	gameplan_state *state = machine.driver_data<gameplan_state>();
-	state->m_maincpu->set_input_line(0, param);
-}
-
-static void via_irq( device_t *device, int state )
-{
-	// from gameplan.c
-
-	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
-	   cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
-	   leave time for the program to see the flag change. */
-	device->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(via_irq_delayed), state);
-}
-
-
 static const via6522_interface via_1_interface =
 {
 	/*inputs : A/B         */ DEVCB_INPUT_PORT("IN0"), DEVCB_INPUT_PORT("IN1"),
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B         */ DEVCB_NULL, DEVCB_NULL,
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(trvquest_coin_w), DEVCB_NULL,
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,trvquest_coin_w), DEVCB_NULL,
 	/*irq                  */ DEVCB_NULL
 };
 
@@ -178,8 +159,8 @@ static const via6522_interface via_2_interface =
 	/*inputs : A/B         */ DEVCB_INPUT_PORT("UNK"), DEVCB_INPUT_PORT("DSW"),
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*outputs: A/B         */ DEVCB_NULL, DEVCB_NULL,
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(trvquest_misc_w), DEVCB_NULL,
-	/*irq                  */ DEVCB_LINE(via_irq)
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_MEMBER(gameplan_state,trvquest_misc_w), DEVCB_NULL,
+	/*irq                  */ DEVCB_DRIVER_LINE_MEMBER(gameplan_state,via_irq)
 };
 
 

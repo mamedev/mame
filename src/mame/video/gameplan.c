@@ -205,13 +205,12 @@ TIMER_CALLBACK_MEMBER(gameplan_state::via_irq_delayed)
 }
 
 
-static void via_irq(device_t *device, int state)
+WRITE_LINE_MEMBER(gameplan_state::via_irq)
 {
-	gameplan_state *driver_state = device->machine().driver_data<gameplan_state>();
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
 	   cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
 	   leave time for the program to see the flag change. */
-	device->machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(gameplan_state::via_irq_delayed),driver_state), state);
+	machine().scheduler().timer_set(attotime::from_usec(50), timer_expired_delegate(FUNC(gameplan_state::via_irq_delayed),this), state);
 }
 
 
@@ -228,7 +227,7 @@ const via6522_interface gameplan_via_0_interface =
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,                             /*inputs : CA/B1,CA/B2 */
 	DEVCB_DRIVER_MEMBER(gameplan_state,video_data_w), DEVCB_DRIVER_MEMBER(gameplan_state,gameplan_video_command_w),     /*outputs: A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(gameplan_state,video_command_trigger_w), DEVCB_NULL,   /*outputs: CA/B1,CA/B2 */
-	DEVCB_LINE(via_irq)                                                         /*irq                  */
+	DEVCB_DRIVER_LINE_MEMBER(gameplan_state,via_irq)                                                         /*irq                  */
 };
 
 
@@ -238,7 +237,7 @@ const via6522_interface leprechn_via_0_interface =
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,                             /*inputs : CA/B1,CA/B2 */
 	DEVCB_DRIVER_MEMBER(gameplan_state,video_data_w), DEVCB_DRIVER_MEMBER(gameplan_state,leprechn_video_command_w),     /*outputs: A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_DRIVER_LINE_MEMBER(gameplan_state,video_command_trigger_w), DEVCB_NULL,   /*outputs: CA/B1,CA/B2 */
-	DEVCB_LINE(via_irq)                                                         /*irq                  */
+	DEVCB_DRIVER_LINE_MEMBER(gameplan_state,via_irq)                                                         /*irq                  */
 };
 
 
