@@ -747,6 +747,53 @@ ROM_START( chinhero2 )
 	ROM_LOAD( "ic42",         0xa60, 0x020, CRC(2ccfe10a) SHA1(d89ea91e5da436805fca9ded9b33609f4a862724) ) /* sound cpu banking */
 ROM_END
 
+ROM_START( chinhero3 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 code (main) */
+	ROM_LOAD( "1-11-22.ic2",        0x0000, 0x4000, CRC(9b24f886) SHA1(ac34c353bae68d2fa716b0dd9f5e41edcf59ad2a) )
+	ROM_LOAD( "2-11-22.ic3",        0x4000, 0x4000, CRC(39c66686) SHA1(e19ef3116c848f76e516f1de08bfe4be306753ca) )
+	ROM_LOAD( "3-11-22.ic4",        0x8000, 0x2000, CRC(2d51135e) SHA1(58892495ee51a43fa02f2421b1d6fe4c48d7c8a7) ) // other boards use a rom with both halves identical here instead of a smaller one.
+
+	ROM_REGION( 0x10000, "bbx", 0 ) /* Z80 code (coprocessor) */
+	ROM_LOAD( "4-11-22.ic31",        0x0000, 0x4000, CRC(6ab2e836) SHA1(61c84c0b685e29bac8020a0051586267ecd20166) )
+
+	// nothing below was dumped on this set, assuming to be the same.
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound) */
+	ROM_LOAD( "5.128",        0x0000, 0x4000, CRC(4e4f3f92) SHA1(57d0485f8a0110f5448b554d2fab1caba52551fd) )
+	ROM_LOAD( "ic49.10",      0x4000, 0x2000, CRC(8c0e43d1) SHA1(acaead801b4782875c8b6092e987b73f9973f8b0) )
+
+	ROM_REGION( 0x4000, "gfx1", ROMREGION_INVERT ) /* tiles */
+	ROM_LOAD( "ic21.11",      0x0000, 0x2000, CRC(3a37fb45) SHA1(4c631cf924f1e1dfea6db3f014ab7d9cb9f4b0c4) )
+	ROM_LOAD( "ic22.12",      0x2000, 0x2000, CRC(bc21c002) SHA1(4fc5e4dfe8331a3feb1c370a8aca9c8303eb7b4e) )
+
+	ROM_REGION( 0x6000, "gfx2", ROMREGION_INVERT ) /* sprites */
+	ROM_LOAD( "ic114.18",     0x0000, 0x2000, CRC(fc4183a8) SHA1(4bc891a9e16cd84ce353180705cc8fcadf414a49) )
+	ROM_LOAD( "ic113.17",     0x2000, 0x2000, CRC(d713d7fe) SHA1(8dd97f96a1190c5be5e19721227dd80adf060b4d) )
+	ROM_LOAD(  "ic99.13",     0x4000, 0x2000, CRC(a8e2a3f4) SHA1(db9f954d4b46660f5f1cb4122838e6418f92d0a3) )
+
+	ROM_REGION( 0x6000, "gfx3", ROMREGION_INVERT ) /* sprites */
+	ROM_LOAD( "ic112.16",     0x0000, 0x2000, CRC(dd5170ca) SHA1(e0a9d1dbc021a8ad84dd7d1bd7e390e51e6328b7) )
+	ROM_LOAD( "ic111.15",     0x2000, 0x2000, CRC(20f6052e) SHA1(e22ddb3fb90ff8df5ce7fda6a26c1b9fce2f59ab) )
+	ROM_LOAD( "ic110.14",     0x4000, 0x2000, CRC(9bc2d568) SHA1(a4ee8822709645b0dc088635c0a9c263fb5a2245) )
+
+	ROM_REGION( 0xa80, "proms", 0 )
+	ROM_LOAD( "v_ic36_r",     0x000, 0x100, CRC(16ae1692) SHA1(e287b96890da4815350af72e9f2189d0c72313b6) ) /* red */
+	ROM_LOAD( "v_ic35_g",     0x100, 0x100, CRC(b3d0a074) SHA1(e955fda8cb8df389507e17b7b4609e845e5ef0c4) ) /* green */
+	ROM_LOAD( "v_ic27_b",     0x200, 0x100, CRC(353a2d11) SHA1(76f21e3e092024592d9ccd33ae69c438254c5755) ) /* blue */
+
+	ROM_LOAD( "v_ic28_m",     0x300, 0x100, CRC(7ca273c1) SHA1(20d85547d96bea8b310c943c45e4978a7e5b5585) ) /* unknown */
+	ROM_LOAD( "v_ic69",       0x400, 0x200, CRC(410d6f86) SHA1(3cfaef3702dbda3e7c7eb84a93561e36778aec3e) ) /* zoom */
+	ROM_LOAD( "v_ic108",      0x600, 0x200, CRC(d33c02ae) SHA1(1a2146ae404a5e8a701e1d547a8409a376d4bee4) ) /* zoom */
+
+	ROM_LOAD( "v_ic12",       0x800, 0x100, CRC(0de07e89) SHA1(5655bce6ff3abad63f5b31add402cdbb51c323f0) ) /* tile pen priority */
+	ROM_LOAD( "v_ic15_p",     0x900, 0x100, CRC(7e0a0581) SHA1(e355a6ef21a65a1e828d7bd5b0f2224b06438b4a) ) /* sprite pen transparency */
+	ROM_LOAD( "v_ic8",        0xa00, 0x020, CRC(4c62974d) SHA1(fd5970b5ba1d9e986515ae06c2e83f8bf20b3cdc) )
+
+	ROM_LOAD( "ic8",          0xa20, 0x020, CRC(84bcd9af) SHA1(5a5afeb6aedb8ac6ac49fb8da62df57fbd8b1780) ) /* main CPU banking */
+	ROM_LOAD( "ic22",         0xa40, 0x020, CRC(84bcd9af) SHA1(5a5afeb6aedb8ac6ac49fb8da62df57fbd8b1780) ) /* coprocessor banking */
+	ROM_LOAD( "ic42",         0xa60, 0x020, CRC(2ccfe10a) SHA1(d89ea91e5da436805fca9ded9b33609f4a862724) ) /* sound cpu banking */
+ROM_END
+
 /*
 
 CPU
@@ -970,7 +1017,8 @@ ROM_END
 
 GAME( 1984, dynamski, 0,        dynamski, dynamski, driver_device, 0,        ROT90, "Taiyo", "Dynamic Ski", GAME_NO_COCKTAIL )
 GAME( 1984, chinhero, 0,        chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero", 0 ) // by Nihon Game?
-GAME( 1984, chinhero2,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero (older)", 0 )
+GAME( 1984, chinhero2,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero (older, set 1)", 0 )
+GAME( 1984, chinhero3,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo", "Chinese Hero (older, set 2)", 0 )
 GAME( 1984, chinherot,chinhero, chinhero, chinhero, shangkid_state, chinhero, ROT90, "Taiyo (Taito license)", "Chinese Heroe (Taito)", 0 )
 GAME( 1985, shangkid, 0,        shangkid, shangkid, shangkid_state, shangkid, ROT0,  "Taiyo (Data East license)", "Shanghai Kid", GAME_NO_COCKTAIL )
 GAME( 1985, hiryuken, shangkid, shangkid, shangkid, shangkid_state, shangkid, ROT0,  "Taiyo (Taito license)", "Hokuha Syourin Hiryu no Ken", GAME_NO_COCKTAIL )
