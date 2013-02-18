@@ -36,6 +36,7 @@ public:
 	UINT8 m_tty_key_data;
 	int m_tty_cnt;
 	virtual void machine_reset();
+	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
 };
 
 WRITE8_MEMBER( mod8_state::out_w )
@@ -82,14 +83,14 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mod8 )
 INPUT_PORTS_END
 
-static IRQ_CALLBACK ( mod8_irq_callback )
+IRQ_CALLBACK_MEMBER(mod8_state::mod8_irq_callback)
 {
 	return 0xC0; // LAA - NOP equivalent
 }
 
 void mod8_state::machine_reset()
 {
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(mod8_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(mod8_state::mod8_irq_callback),this));	
 }
 
 WRITE8_MEMBER( mod8_state::kbd_put )

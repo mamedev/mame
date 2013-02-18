@@ -41,7 +41,8 @@ public:
 	UINT32 screen_update_galaxy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(galaxy_interrupt);
 	TIMER_CALLBACK_MEMBER(gal_video);
-
+	IRQ_CALLBACK_MEMBER(galaxy_irq_callback);
+	void galaxy_set_timer();
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
@@ -53,8 +54,5 @@ protected:
 
 /*----------- defined in machine/galaxy.c -----------*/
 SNAPSHOT_LOAD( galaxy );
-
-/*----------- defined in video/galaxy.c -----------*/
-void galaxy_set_timer(running_machine &machine);
 
 #endif /* GALAXY_H_ */

@@ -46,11 +46,10 @@ INTERRUPT_GEN_MEMBER(galaxy_state::galaxy_interrupt)
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-static IRQ_CALLBACK ( galaxy_irq_callback )
+IRQ_CALLBACK_MEMBER(galaxy_state::galaxy_irq_callback)
 {
-	galaxy_state *state = device->machine().driver_data<galaxy_state>();
-	galaxy_set_timer(device->machine());
-	state->m_interrupts_enabled = TRUE;
+	galaxy_set_timer();
+	m_interrupts_enabled = TRUE;
 	return 0xff;
 }
 
@@ -187,7 +186,7 @@ MACHINE_RESET_MEMBER(galaxy_state,galaxy)
 	if (ioport("ROM2")->read())
 		membank("bank10")->set_base(memregion("maincpu")->base() + 0x1000);
 
-	m_maincpu->set_irq_acknowledge_callback(galaxy_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxy_state::galaxy_irq_callback),this));
 	m_interrupts_enabled = TRUE;
 }
 
@@ -201,7 +200,7 @@ MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
 	UINT8 *ROM = memregion("maincpu")->base();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_maincpu->set_irq_acknowledge_callback(galaxy_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(galaxy_state::galaxy_irq_callback),this));
 
 	ROM[0x0037] = 0x29;
 	ROM[0x03f9] = 0xcd;

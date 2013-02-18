@@ -181,6 +181,7 @@ public:
 	DECLARE_DRIVER_INIT(sq1);
 	DECLARE_DRIVER_INIT(denib);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
 };
 
 FLOPPY_FORMATS_MEMBER( esq5505_state::floppy_formats )
@@ -191,29 +192,29 @@ static SLOT_INTERFACE_START( ensoniq_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-static int maincpu_irq_acknowledge_callback(device_t *device, int irqnum) {
+IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
+{
 	// We immediately update the interrupt presented to the CPU, so that it doesn't
 	// end up retrying the same interrupt over and over. We then return the appropriate vector.
-	esq5505_state *esq5505 = device->machine().driver_data<esq5505_state>();
 	int vector = 0;
-	switch(irqnum) {
+	switch(irqline) {
 	case 1:
-	esq5505->otis_irq_state = 0;
+	otis_irq_state = 0;
 	vector = M68K_INT_ACK_AUTOVECTOR;
 	break;
 	case 2:
-	esq5505->dmac_irq_state = 0;
-	vector = esq5505->dmac_irq_vector;
+	dmac_irq_state = 0;
+	vector = dmac_irq_vector;
 	break;
 	case 3:
-	esq5505->duart_irq_state = 0;
-	vector = esq5505->duart_irq_vector;
+	duart_irq_state = 0;
+	vector = duart_irq_vector;
 	break;
 	default:
-	printf("\nUnexpected IRQ ACK Callback: IRQ %d\n", irqnum);
+	printf("\nUnexpected IRQ ACK Callback: IRQ %d\n", irqline);
 	return 0;
 	}
-	esq5505->update_irq_to_maincpu();
+	update_irq_to_maincpu();
 	return vector;
 }
 
@@ -221,7 +222,7 @@ void esq5505_state::machine_reset()
 {
 	m_rom = (UINT16 *)(void *)machine().root_device().memregion("osrom")->base();
 	m_ram = (UINT16 *)(void *)machine().root_device().memshare("osram")->ptr();
-	m_maincpu->set_irq_acknowledge_callback(maincpu_irq_acknowledge_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(esq5505_state::maincpu_irq_acknowledge_callback),this));
 }
 
 void esq5505_state::update_irq_to_maincpu() {

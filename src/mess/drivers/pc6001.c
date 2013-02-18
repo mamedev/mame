@@ -266,7 +266,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc6001_8255_portc_w);
 	DECLARE_READ8_MEMBER(pc6001_8255_portc_r);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pc6001_cass);
-
+	IRQ_CALLBACK_MEMBER(pc6001_irq_callback);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_cassette;
@@ -1906,11 +1906,10 @@ INTERRUPT_GEN_MEMBER(pc6001_state::pc6001sr_interrupt)
 	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-static IRQ_CALLBACK ( pc6001_irq_callback )
+IRQ_CALLBACK_MEMBER(pc6001_state::pc6001_irq_callback)
 {
-	pc6001_state *state = device->machine().driver_data<pc6001_state>();
-	device->execute().set_input_line(0, CLEAR_LINE);
-	return state->m_irq_vector;
+	device.execute().set_input_line(0, CLEAR_LINE);
+	return m_irq_vector;
 }
 
 READ8_MEMBER(pc6001_state::pc6001_8255_porta_r)
@@ -2156,7 +2155,7 @@ void pc6001_state::machine_reset()
 
 	m_port_c_8255=0;
 
-	m_maincpu->set_irq_acknowledge_callback(pc6001_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc6001_state::pc6001_irq_callback),this));
 	m_cas_switch = 0;
 	m_cas_offset = 0;
 	m_timer_irq_mask = 1;
@@ -2173,7 +2172,7 @@ MACHINE_RESET_MEMBER(pc6001_state,pc6001m2)
 
 	m_port_c_8255=0;
 
-	m_maincpu->set_irq_acknowledge_callback(pc6001_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc6001_state::pc6001_irq_callback),this));
 	m_cas_switch = 0;
 	m_cas_offset = 0;
 
@@ -2208,7 +2207,7 @@ MACHINE_RESET_MEMBER(pc6001_state,pc6001sr)
 
 	m_port_c_8255=0;
 
-	m_maincpu->set_irq_acknowledge_callback(pc6001_irq_callback);
+	m_maincpu->set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(pc6001_state::pc6001_irq_callback),this));
 	m_cas_switch = 0;
 	m_cas_offset = 0;
 

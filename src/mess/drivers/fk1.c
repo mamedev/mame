@@ -54,6 +54,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_callback);
+	IRQ_CALLBACK_MEMBER(fk1_irq_callback);
 };
 
 
@@ -404,12 +405,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::keyboard_callback)
 0 ? PRINTER
 */
 
-static IRQ_CALLBACK (fk1_irq_callback)
+IRQ_CALLBACK_MEMBER(fk1_state::fk1_irq_callback)
 {
-	fk1_state *state = device->machine().driver_data<fk1_state>();
-
-	logerror("IRQ %02x\n", state->m_int_vector*2);
-	return state->m_int_vector * 2;
+	logerror("IRQ %02x\n", m_int_vector*2);
+	return m_int_vector * 2;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::vsync_callback)
@@ -430,7 +429,7 @@ void fk1_state::machine_reset()
 	membank("bank3")->set_base(ram + 0x8000);
 	membank("bank4")->set_base(ram + 0xc000);
 
-	machine().device("maincpu")->execute().set_irq_acknowledge_callback(fk1_irq_callback);
+	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(fk1_state::fk1_irq_callback),this));
 }
 
 UINT32 fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

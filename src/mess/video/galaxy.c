@@ -102,11 +102,10 @@ TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)
 	}
 }
 
-void galaxy_set_timer(running_machine &machine)
+void galaxy_state::galaxy_set_timer()
 {
-	galaxy_state *state = machine.driver_data<galaxy_state>();
-	state->m_gal_cnt = 0;
-	state->m_gal_video_timer->adjust(attotime::zero, 0, attotime::from_hz(6144000 / 8));
+	m_gal_cnt = 0;
+	m_gal_video_timer->adjust(attotime::zero, 0, attotime::from_hz(6144000 / 8));
 }
 
 void galaxy_state::video_start()

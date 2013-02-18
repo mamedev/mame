@@ -54,6 +54,7 @@ public:
 	TIMER_CALLBACK_MEMBER(poly88_cassette_timer_callback);
 	TIMER_CALLBACK_MEMBER(setup_machine_state);
 	DECLARE_WRITE_LINE_MEMBER(poly88_usart_rxready);
+	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
 
 protected:
 	required_device<cpu_device> m_maincpu;
