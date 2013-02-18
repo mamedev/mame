@@ -3,6 +3,7 @@
     a2mockingboard.c
 
     Implementation of the Sweet Micro Systems Mockingboard card
+    and friends.
 
 *********************************************************************/
 
@@ -20,6 +21,7 @@
 #define AY2_TAG "mockbd_ay2"
 #define AY3_TAG "mockbd_ay3"
 #define AY4_TAG "mockbd_ay4"
+#define E2P_TMS_TAG "tms5220"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -27,6 +29,7 @@
 
 const device_type A2BUS_MOCKINGBOARD = &device_creator<a2bus_mockingboard_device>;
 const device_type A2BUS_PHASOR = &device_creator<a2bus_phasor_device>;
+const device_type A2BUS_ECHOPLUS = &device_creator<a2bus_echoplus_device>;
 
 static const ay8910_interface mockingboard_ay8910_interface =
 {
@@ -90,6 +93,23 @@ MACHINE_CONFIG_FRAGMENT( phasor )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker2", 1.0)
 MACHINE_CONFIG_END
 
+MACHINE_CONFIG_FRAGMENT( echoplus )
+	MCFG_VIA6522_ADD(VIA1_TAG, 1022727, mockingboard_via1_intf)
+	MCFG_VIA6522_ADD(VIA2_TAG, 1022727, mockingboard_via2_intf)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD(AY1_TAG, AY8913, 1022727)
+	MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD(AY2_TAG, AY8913, 1022727)
+	MCFG_SOUND_CONFIG(mockingboard_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MCFG_SPEAKER_STANDARD_MONO("echosp")
+	MCFG_SOUND_ADD(E2P_TMS_TAG, TMS5220, 720000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "echosp", 1.0)
+MACHINE_CONFIG_END
+
 //-------------------------------------------------
 //  machine_config_additions - device-specific
 //  machine configurations
@@ -103,6 +123,11 @@ machine_config_constructor a2bus_ayboard_device::device_mconfig_additions() cons
 machine_config_constructor a2bus_phasor_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( phasor );
+}
+
+machine_config_constructor a2bus_echoplus_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( echoplus );
 }
 
 //**************************************************************************
@@ -137,6 +162,15 @@ a2bus_phasor_device::a2bus_phasor_device(const machine_config &mconfig, const ch
 	m_PhasorNative = false;
 }
 
+a2bus_echoplus_device::a2bus_echoplus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+	a2bus_ayboard_device(mconfig, A2BUS_ECHOPLUS, "Street Electronics Echo Plus", tag, owner, clock),
+	m_tms(*this, E2P_TMS_TAG)
+{
+	m_shortname = "a2echop";
+	m_isPhasor = false;
+	m_PhasorNative = false;
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -156,7 +190,7 @@ void a2bus_ayboard_device::device_reset()
 }
 
 /*-------------------------------------------------
-    read_cnxx - called for reads from this card's c0nx space
+    read_cnxx - called for reads from this card's cnxx space
 -------------------------------------------------*/
 
 UINT8 a2bus_ayboard_device::read_cnxx(address_space &space, UINT8 offset)
@@ -508,3 +542,25 @@ void a2bus_ayboard_device::write_c0nx(address_space &space, UINT8 offset, UINT8 
 		m_PhasorNative = (offset & 1) ? true : false;
 	}
 }
+
+UINT8 a2bus_echoplus_device::read_c0nx(address_space &space, UINT8 offset)
+{
+	switch (offset)
+	{
+		case 0:
+			return 0x1f | tms5220_status_r(m_tms, space, 0);
+	}
+
+	return 0;
+}
+
+void a2bus_echoplus_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+{
+	switch (offset)
+	{
+		case 0:
+			tms5220_data_w(m_tms, space, offset, data);
+			break;
+	}
+}
+

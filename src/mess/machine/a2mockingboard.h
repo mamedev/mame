@@ -13,6 +13,7 @@
 #include "machine/a2bus.h"
 #include "machine/6522via.h"
 #include "sound/ay8910.h"
+#include "sound/tms5220.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -77,8 +78,22 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 };
 
+class a2bus_echoplus_device : public a2bus_ayboard_device
+{
+public:
+	a2bus_echoplus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	virtual UINT8 read_c0nx(address_space &space, UINT8 offset);
+	virtual void write_c0nx(address_space &space, UINT8 offset, UINT8 data);
+
+	required_device<tms5220_device> m_tms;
+
+	virtual machine_config_constructor device_mconfig_additions() const;
+};
+
 // device type definition
 extern const device_type A2BUS_MOCKINGBOARD;
 extern const device_type A2BUS_PHASOR;
+extern const device_type A2BUS_ECHOPLUS;
 
 #endif  /* __A2BUS_MOCKINGBOARD__ */
