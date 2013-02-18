@@ -41,12 +41,20 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(psx_setopbase);
 	DECLARE_DRIVER_INIT(psx);
 	DECLARE_MACHINE_RESET(psx);
+	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
+	void psxexe_conv32( UINT32 *p_uint32 );
+	int load_psxexe( cpu_device *cpu, unsigned char *p_n_file, int n_len );
+	void cpe_set_register( cpu_device *cpu, int n_reg, int n_value );
+	int load_cpe( cpu_device *cpu, unsigned char *p_n_file, int n_len );
+	int load_psf( cpu_device *cpu, unsigned char *p_n_file, int n_len );
+	void cd_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	void cd_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
 };
 
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
+inline void ATTR_PRINTF(3,4)  psx1_state::verboselog( int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -55,12 +63,12 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", machine.describe_context(), buf );
+		logerror( "%s: %s", machine().describe_context(), buf );
 	}
 }
 
 
-static void psxexe_conv32( UINT32 *p_uint32 )
+void psx1_state::psxexe_conv32( UINT32 *p_uint32 )
 {
 	UINT8 *p_uint8;
 
@@ -72,7 +80,7 @@ static void psxexe_conv32( UINT32 *p_uint32 )
 		( p_uint8[ 3 ] << 24 );
 }
 
-static int load_psxexe( cpu_device *cpu, unsigned char *p_n_file, int n_len )
+int psx1_state::load_psxexe( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 {
 	struct PSXEXE_HEADER
 	{
@@ -165,7 +173,7 @@ static int load_psxexe( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 	return 0;
 }
 
-static void cpe_set_register( cpu_device *cpu, int n_reg, int n_value )
+void psx1_state::cpe_set_register( cpu_device *cpu, int n_reg, int n_value )
 {
 	if( n_reg < 0x80 && ( n_reg % 4 ) == 0 )
 	{
@@ -208,7 +216,7 @@ static void cpe_set_register( cpu_device *cpu, int n_reg, int n_value )
 	}
 }
 
-static int load_cpe( cpu_device *cpu, unsigned char *p_n_file, int n_len )
+int psx1_state::load_cpe( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 {
 	if( n_len >= 4 &&
 		memcmp( p_n_file, "CPE\001", 4 ) == 0 )
@@ -343,7 +351,7 @@ static int load_cpe( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 	return 0;
 }
 
-static int load_psf( cpu_device *cpu, unsigned char *p_n_file, int n_len )
+int psx1_state::load_psf( cpu_device *cpu, unsigned char *p_n_file, int n_len )
 {
 	int n_return;
 	unsigned long n_crc;
@@ -463,14 +471,14 @@ static QUICKLOAD_LOAD( psx_exe_load )
 
 /* ----------------------------------------------------------------------- */
 
-static void cd_dma_read( psxcd_device *psxcd, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void psx1_state::cd_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
 	UINT8 *psxram = (UINT8 *) p_n_psxram;
-
+	psxcd_device *psxcd = machine().device<psxcd_device>("cdrom");
 	psxcd->start_dma(psxram + n_address, n_size*4);
 }
 
-static void cd_dma_write( psxcd_device *psxcd, UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void psx1_state::cd_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
 	printf("cd_dma_write?!: addr %x, size %x\n", n_address, n_size);
 }
@@ -524,8 +532,8 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 
 	MCFG_PSXCD_ADD("cdrom")
 	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( cd_dma_read ), (psxcd_device *) device ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( cd_dma_write ), (psxcd_device *) device ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( psx1_state::cd_dma_read ), (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( psx1_state::cd_dma_write ), (psx1_state *) owner ) )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( psxpal, psx1_state )
@@ -559,8 +567,8 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 
 	MCFG_PSXCD_ADD("cdrom")
 	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( cd_dma_read ), (psxcd_device *) device ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( cd_dma_write ), (psxcd_device *) device ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( psx1_state::cd_dma_read ), (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( psx1_state::cd_dma_write ), (psx1_state *) owner ) )
 MACHINE_CONFIG_END
 
 ROM_START( psj )
