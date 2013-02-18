@@ -36,18 +36,6 @@ SYSINTR_GPS      = INT_EINT3, INT_EINT8_23 (EINT18)
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		logerror( "%s: %s", machine.describe_context( ), buf);
-	}
-}
 
 #define BIT(x,n) (((x)>>(n))&1)
 #define BITS(x,m,n) (((x)>>(n))&(((UINT32)1<<((m)-(n)+1))-1))
@@ -64,8 +52,22 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
+	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ...);
 };
 
+
+inline void ATTR_PRINTF(3,4) gizmondo_state::verboselog( int n_level, const char *s_fmt, ...)
+{
+	if (VERBOSE_LEVEL >= n_level)
+	{
+		va_list v;
+		char buf[32768];
+		va_start( v, s_fmt);
+		vsprintf( buf, s_fmt, v);
+		va_end( v);
+		logerror( "%s: %s", machine().describe_context( ), buf);
+	}
+}
 /*******************************************************************************
     ...
 *******************************************************************************/

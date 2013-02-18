@@ -143,13 +143,20 @@ public:
 	required_device<device_t> m_lpt0;
 	required_device<pit8254_device> m_pit;
 	required_device<dac_device> m_dac;
+	inline void ATTR_PRINTF(3,4) verboselog(int n_level, const char *s_fmt, ... );
+	void int3_raise_local0_irq(UINT8 source_mask);
+	void int3_lower_local0_irq(UINT8 source_mask);
+	void int3_raise_local1_irq(UINT8 source_mask);
+	void int3_lower_local1_irq(UINT8 source_mask);
+	void dump_chain(address_space &space, UINT32 ch_base);
+	void rtc_update();
 };
 
 
 #define VERBOSE_LEVEL ( 0 )
 
 
-INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, const char *s_fmt, ... )
+inline void ATTR_PRINTF(3,4) ip22_state::verboselog(int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -158,7 +165,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog(running_machine &machine, int n_level, c
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", machine.device("maincpu")->safe_pc(), buf);
+		logerror("%08x: %s", machine().device("maincpu")->safe_pc(), buf);
 	}
 }
 
@@ -209,41 +216,38 @@ static const struct pit8253_config ip22_pit8254_config =
 #define INT3_LOCAL1_RETRACE (0x80)
 
 // raise a local0 interrupt
-static void int3_raise_local0_irq(running_machine &machine, UINT8 source_mask)
+void ip22_state::int3_raise_local0_irq(UINT8 source_mask)
 {
-	ip22_state *state = machine.driver_data<ip22_state>();
 	// signal the interrupt is pending
-	state->m_int3_regs[0] |= source_mask;
+	m_int3_regs[0] |= source_mask;
 
 	// if it's not masked, also assert it now at the CPU
-	if (state->m_int3_regs[1] & source_mask)
-		state->m_maincpu->set_input_line(MIPS3_IRQ0, ASSERT_LINE);
+	if (m_int3_regs[1] & source_mask)
+		m_maincpu->set_input_line(MIPS3_IRQ0, ASSERT_LINE);
 }
 
 // lower a local0 interrupt
-static void int3_lower_local0_irq(ip22_state *state, UINT8 source_mask)
+void ip22_state::int3_lower_local0_irq(UINT8 source_mask)
 {
-	state->m_int3_regs[0] &= ~source_mask;
+	m_int3_regs[0] &= ~source_mask;
 }
 
 #ifdef UNUSED_FUNCTION
 // raise a local1 interrupt
-static void int3_raise_local1_irq(running_machine &machine, UINT8 source_mask)
+void ip22_state::int3_raise_local1_irq(UINT8 source_mask)
 {
-	ip22_state *state = machine.driver_data<ip22_state>();
 	// signal the interrupt is pending
-	state->m_int3_regs[2] |= source_mask;
+	m_int3_regs[2] |= source_mask;
 
 	// if it's not masked, also assert it now at the CPU
-	if (state->m_int3_regs[2] & source_mask)
-		state->m_maincpu->set_input_line(MIPS3_IRQ1, ASSERT_LINE);
+	if (m_int3_regs[2] & source_mask)
+		m_maincpu->set_input_line(MIPS3_IRQ1, ASSERT_LINE);
 }
 
 // lower a local1 interrupt
-static void int3_lower_local1_irq(UINT8 source_mask)
+void ip22_state::int3_lower_local1_irq(UINT8 source_mask)
 {
-	ip22_state *state = machine.driver_data<ip22_state>();
-	state->m_int3_regs[2] &= ~source_mask;
+	m_int3_regs[2] &= ~source_mask;
 }
 #endif
 
@@ -254,14 +258,14 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 	{
 	case 0x004/4:
 		ret8 = pc_lpt_control_r(m_lpt0, space, 0) ^ 0x0d;
-		//verboselog(( machine, 0, "Parallel Control Read: %02x\n", ret8 );
+		//verboselog(0, "Parallel Control Read: %02x\n", ret8 );
 		return ret8;
 	case 0x008/4:
 		ret8 = pc_lpt_status_r(m_lpt0, space, 0) ^ 0x80;
-		//verboselog(( machine, 0, "Parallel Status Read: %02x\n", ret8 );
+		//verboselog(0, "Parallel Status Read: %02x\n", ret8 );
 		return ret8;
 	case 0x030/4:
-		//verboselog(( machine, 2, "Serial 1 Command Transfer Read, 0x1fbd9830: %02x\n", 0x04 );
+		//verboselog(2, "Serial 1 Command Transfer Read, 0x1fbd9830: %02x\n", 0x04 );
 		switch(space.device().safe_pc())
 		{
 			case 0x9fc1d9e4:    // interpreter (ip244415)
@@ -274,7 +278,7 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 		}
 		return 0x00000004;
 	case 0x038/4:
-		//verboselog(( machine, 2, "Serial 2 Command Transfer Read, 0x1fbd9838: %02x\n", 0x04 );
+		//verboselog(2, "Serial 2 Command Transfer Read, 0x1fbd9838: %02x\n", 0x04 );
 		return 0x00000004;
 	case 0x40/4:
 		return kbdc8042_8_r(space, 0);
@@ -298,22 +302,22 @@ READ32_MEMBER(ip22_state::hpc3_pbus6_r)
 		return m_int3_regs[offset-0x80/4];
 	case 0xb0/4:
 		ret8 = pit8253_r(m_pit, space, 0);
-		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
+		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 0 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb4/4:
 		ret8 = pit8253_r(m_pit, space, 1);
-		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
+		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 1 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb8/4:
 		ret8 = pit8253_r(m_pit, space, 2);
-		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
+		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 2 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xbc/4:
 		ret8 = pit8253_r(m_pit, space, 3);
-		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
+		//verboselog(0, "HPC PBUS6 IOC4 Timer Control Word Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	default:
-		//verboselog(( machine, 0, "Unknown HPC PBUS6 Read: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), mem_mask );
+		//verboselog(0, "Unknown HPC PBUS6 Read: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), mem_mask );
 		return 0;
 	}
 	return 0;
@@ -326,18 +330,18 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 	switch( offset )
 	{
 	case 0x004/4:
-		//verboselog(( machine, 0, "Parallel Control Write: %08x\n", data );
+		//verboselog(0, "Parallel Control Write: %08x\n", data );
 		pc_lpt_control_w(m_lpt0, space, 0, data ^ 0x0d);
 		//m_nIOC_ParCntl = data;
 		break;
 	case 0x030/4:
 		if( ( data & 0x000000ff ) >= 0x20 )
 		{
-			//verboselog(( machine, 2, "Serial 1 Command Transfer Write: %02x: %c\n", data & 0x000000ff, data & 0x000000ff );
+			//verboselog(2, "Serial 1 Command Transfer Write: %02x: %c\n", data & 0x000000ff, data & 0x000000ff );
 		}
 		else
 		{
-			//verboselog(( machine, 2, "Serial 1 Command Transfer Write: %02x\n", data & 0x000000ff );
+			//verboselog(2, "Serial 1 Command Transfer Write: %02x\n", data & 0x000000ff );
 		}
 		cChar = data & 0x000000ff;
 		if( cChar >= 0x20 || cChar == 0x0d || cChar == 0x0a )
@@ -348,11 +352,11 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 	case 0x034/4:
 		if( ( data & 0x000000ff ) >= 0x20 )
 		{
-			//verboselog(( machine, 2, "Serial 1 Data Transfer Write: %02x: %c\n", data & 0x000000ff, data & 0x000000ff );
+			//verboselog(2, "Serial 1 Data Transfer Write: %02x: %c\n", data & 0x000000ff, data & 0x000000ff );
 		}
 		else
 		{
-			//verboselog(( machine, 2, "Serial 1 Data Transfer Write: %02x\n", data & 0x000000ff );
+			//verboselog(2, "Serial 1 Data Transfer Write: %02x\n", data & 0x000000ff );
 		}
 		cChar = data & 0x000000ff;
 		if( cChar >= 0x20 || cChar == 0x0d || cChar == 0x0a )
@@ -393,23 +397,23 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus6_w)
 
 		break;
 	case 0xb0/4:
-		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Write: 0x%08x (%08x)\n", data, mem_mask );
+		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 0 Register Write: 0x%08x (%08x)\n", data, mem_mask );
 		pit8253_w(m_pit, space, 0, data & 0x000000ff);
 		return;
 	case 0xb4/4:
-		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Write: 0x%08x (%08x)\n", data, mem_mask );
+		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 1 Register Write: 0x%08x (%08x)\n", data, mem_mask );
 		pit8253_w(m_pit, space, 1, data & 0x000000ff);
 		return;
 	case 0xb8/4:
-		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Write: 0x%08x (%08x)\n", data, mem_mask );
+		//verboselog(0, "HPC PBUS6 IOC4 Timer Counter 2 Register Write: 0x%08x (%08x)\n", data, mem_mask );
 		pit8253_w(m_pit, space, 2, data & 0x000000ff);
 		return;
 	case 0xbc/4:
-		//verboselog(( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Write: 0x%08x (%08x)\n", data, mem_mask );
+		//verboselog(0, "HPC PBUS6 IOC4 Timer Control Word Register Write: 0x%08x (%08x)\n", data, mem_mask );
 		pit8253_w(m_pit, space, 3, data & 0x000000ff);
 		return;
 	default:
-		//verboselog(( machine, 0, "Unknown HPC PBUS6 Write: 0x%08x: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), data, mem_mask );
+		//verboselog(0, "Unknown HPC PBUS6 Write: 0x%08x: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), data, mem_mask );
 		break;
 	}
 }
@@ -565,42 +569,40 @@ WRITE32_MEMBER(ip22_state::hpc3_pbus4_w)
 	}
 }
 
-#define RTC_SECONDS state->m_RTC.nRegs[0x00]
-#define RTC_SECONDS_A   state->m_RTC.nRegs[0x01]
-#define RTC_MINUTES state->m_RTC.nRegs[0x02]
-#define RTC_MINUTES_A   state->m_RTC.nRegs[0x03]
-#define RTC_HOURS   state->m_RTC.nRegs[0x04]
-#define RTC_HOURS_A state->m_RTC.nRegs[0x05]
-#define RTC_DAYOFWEEK   state->m_RTC.nRegs[0x06]
-#define RTC_DAYOFMONTH  state->m_RTC.nRegs[0x07]
-#define RTC_MONTH   state->m_RTC.nRegs[0x08]
-#define RTC_YEAR    state->m_RTC.nRegs[0x09]
-#define RTC_REGISTERA   state->m_RTC.nRegs[0x0a]
-#define RTC_REGISTERB   state->m_RTC.nRegs[0x0b]
-#define RTC_REGISTERC   state->m_RTC.nRegs[0x0c]
-#define RTC_REGISTERD   state->m_RTC.nRegs[0x0d]
-#define RTC_MODELBYTE   state->m_RTC.nRegs[0x40]
-#define RTC_SERBYTE0    state->m_RTC.nRegs[0x41]
-#define RTC_SERBYTE1    state->m_RTC.nRegs[0x42]
-#define RTC_SERBYTE2    state->m_RTC.nRegs[0x43]
-#define RTC_SERBYTE3    state->m_RTC.nRegs[0x44]
-#define RTC_SERBYTE4    state->m_RTC.nRegs[0x45]
-#define RTC_SERBYTE5    state->m_RTC.nRegs[0x46]
-#define RTC_CRC     state->m_RTC.nRegs[0x47]
-#define RTC_CENTURY state->m_RTC.nRegs[0x48]
-#define RTC_DAYOFMONTH_A state->m_RTC.nRegs[0x49]
-#define RTC_EXTCTRL0    state->m_RTC.nRegs[0x4a]
-#define RTC_EXTCTRL1    state->m_RTC.nRegs[0x4b]
-#define RTC_RTCADDR2    state->m_RTC.nRegs[0x4e]
-#define RTC_RTCADDR3    state->m_RTC.nRegs[0x4f]
-#define RTC_RAMLSB  state->m_RTC.nRegs[0x50]
-#define RTC_RAMMSB  state->m_RTC.nRegs[0x51]
-#define RTC_WRITECNT    state->m_RTC.nRegs[0x5e]
+#define RTC_SECONDS m_RTC.nRegs[0x00]
+#define RTC_SECONDS_A   m_RTC.nRegs[0x01]
+#define RTC_MINUTES m_RTC.nRegs[0x02]
+#define RTC_MINUTES_A   m_RTC.nRegs[0x03]
+#define RTC_HOURS   m_RTC.nRegs[0x04]
+#define RTC_HOURS_A m_RTC.nRegs[0x05]
+#define RTC_DAYOFWEEK   m_RTC.nRegs[0x06]
+#define RTC_DAYOFMONTH  m_RTC.nRegs[0x07]
+#define RTC_MONTH   m_RTC.nRegs[0x08]
+#define RTC_YEAR    m_RTC.nRegs[0x09]
+#define RTC_REGISTERA   m_RTC.nRegs[0x0a]
+#define RTC_REGISTERB   m_RTC.nRegs[0x0b]
+#define RTC_REGISTERC   m_RTC.nRegs[0x0c]
+#define RTC_REGISTERD   m_RTC.nRegs[0x0d]
+#define RTC_MODELBYTE   m_RTC.nRegs[0x40]
+#define RTC_SERBYTE0    m_RTC.nRegs[0x41]
+#define RTC_SERBYTE1    m_RTC.nRegs[0x42]
+#define RTC_SERBYTE2    m_RTC.nRegs[0x43]
+#define RTC_SERBYTE3    m_RTC.nRegs[0x44]
+#define RTC_SERBYTE4    m_RTC.nRegs[0x45]
+#define RTC_SERBYTE5    m_RTC.nRegs[0x46]
+#define RTC_CRC     m_RTC.nRegs[0x47]
+#define RTC_CENTURY m_RTC.nRegs[0x48]
+#define RTC_DAYOFMONTH_A m_RTC.nRegs[0x49]
+#define RTC_EXTCTRL0    m_RTC.nRegs[0x4a]
+#define RTC_EXTCTRL1    m_RTC.nRegs[0x4b]
+#define RTC_RTCADDR2    m_RTC.nRegs[0x4e]
+#define RTC_RTCADDR3    m_RTC.nRegs[0x4f]
+#define RTC_RAMLSB  m_RTC.nRegs[0x50]
+#define RTC_RAMMSB  m_RTC.nRegs[0x51]
+#define RTC_WRITECNT    m_RTC.nRegs[0x5e]
 
 READ32_MEMBER(ip22_state::rtc_r)
 {
-	ip22_state *state = machine().driver_data<ip22_state>();
-
 	if( offset <= 0x0d )
 	{
 		switch( offset )
@@ -729,7 +731,6 @@ READ32_MEMBER(ip22_state::rtc_r)
 
 WRITE32_MEMBER(ip22_state::rtc_w)
 {
-	ip22_state *state = machine().driver_data<ip22_state>();
 	RTC_WRITECNT++;
 
 //  mame_printf_info("RTC_W: offset %x => %x (PC=%x)\n", data, offset, activecpu_get_pc());
@@ -1196,7 +1197,6 @@ TIMER_CALLBACK_MEMBER(ip22_state::ip22_timer)
 
 void ip22_state::machine_reset()
 {
-	ip22_state *state = machine().driver_data<ip22_state>();
 	m_HPC3.nenetr_nbdp = 0x80000000;
 	m_HPC3.nenetr_cbp = 0x80000000;
 	m_nIntCounter = 0;
@@ -1210,10 +1210,10 @@ void ip22_state::machine_reset()
 
 	m_PBUS_DMA.nActive = 0;
 
-	mips3drc_set_options(state->m_maincpu, MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
+	mips3drc_set_options(m_maincpu, MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
-static void dump_chain(address_space &space, UINT32 ch_base)
+void ip22_state::dump_chain(address_space &space, UINT32 ch_base)
 {
 	printf("node: %08x %08x %08x (len = %x)\n", space.read_dword(ch_base), space.read_dword(ch_base+4), space.read_dword(ch_base+8), space.read_dword(ch_base+4) & 0x3fff);
 
@@ -1260,7 +1260,7 @@ static void scsi_irq(running_machine &machine, int state)
 
 				printf("DMA to device: %d words @ %x\n", words, wptr);
 
-				dump_chain(space, drvstate->m_HPC3.nSCSI0Descriptor);
+				drvstate->dump_chain(space, drvstate->m_HPC3.nSCSI0Descriptor);
 
 				if (words <= (512/4))
 				{
@@ -1401,7 +1401,7 @@ static void scsi_irq(running_machine &machine, int state)
 
 //              mame_printf_info("DMA from device: %d words @ %x\n", words, wptr);
 
-				dump_chain(space, drvstate->m_HPC3.nSCSI0Descriptor);
+				drvstate->dump_chain(space, drvstate->m_HPC3.nSCSI0Descriptor);
 
 				if (words <= (1024/4))
 				{
@@ -1463,11 +1463,11 @@ static void scsi_irq(running_machine &machine, int state)
 		drvstate->m_HPC3.nSCSI0DMACtrl &= ~HPC3_DMACTRL_ENABLE;
 
 		// set the interrupt
-		int3_raise_local0_irq(machine, INT3_LOCAL0_SCSI0);
+		drvstate->int3_raise_local0_irq(INT3_LOCAL0_SCSI0);
 	}
 	else
 	{
-		int3_lower_local0_irq(drvstate, INT3_LOCAL0_SCSI0);
+		drvstate->int3_lower_local0_irq(INT3_LOCAL0_SCSI0);
 	}
 }
 
@@ -1514,7 +1514,7 @@ static INPUT_PORTS_START( ip225015 )
 	PORT_INCLUDE( at_keyboard )     /* IN4 - IN11 */
 INPUT_PORTS_END
 
-static void rtc_update(ip22_state *state)
+void ip22_state::rtc_update()
 {
 	RTC_SECONDS++;
 
@@ -1584,7 +1584,7 @@ INTERRUPT_GEN_MEMBER(ip22_state::ip22_vbl)
 //  if( m_nIntCounter == 60 )
 	{
 		m_nIntCounter = 0;
-		rtc_update(this);
+		rtc_update();
 	}
 }
 

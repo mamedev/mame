@@ -25,6 +25,7 @@ public:
 	DECLARE_MACHINE_START(n64dd);
 	INTERRUPT_GEN_MEMBER(n64_reset_poll);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(n64_cart);
+	void mempak_format(UINT8* pak);
 };
 
 READ32_MEMBER(n64_mess_state::dd_null_r)
@@ -141,7 +142,7 @@ static const mips3_config config =
 	62500000            /* system clock */
 };
 
-static void mempak_format(UINT8* pak)
+void n64_mess_state::mempak_format(UINT8* pak)
 {
 	unsigned char pak_header[] =
 	{

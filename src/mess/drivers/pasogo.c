@@ -74,6 +74,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(vg230_timer);
 	DECLARE_WRITE_LINE_MEMBER(pasogo_pic8259_set_int_line);
 	IRQ_CALLBACK_MEMBER(pasogo_irq_callback);
+	void vg230_reset();
+	void vg230_init();
 };
 
 
@@ -107,15 +109,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(pasogo_state::vg230_timer)
 	}
 }
 
-static void vg230_reset(running_machine &machine)
+void pasogo_state::vg230_reset()
 {
-	pasogo_state *state = machine.driver_data<pasogo_state>();
-	vg230_t *vg230 = &state->m_vg230;
+	vg230_t *vg230 = &m_vg230;
 	system_time systime;
 
 	memset(vg230, 0, sizeof(*vg230));
 	vg230->pmu.write_protected=TRUE;
-	machine.base_datetime(systime);
+	machine().base_datetime(systime);
 
 	vg230->rtc.seconds= systime.local_time.second;
 	vg230->rtc.minutes= systime.local_time.minute;
@@ -125,9 +126,9 @@ static void vg230_reset(running_machine &machine)
 	vg230->bios_timer.data=0x7200; // HACK
 }
 
-static void vg230_init(running_machine &machine)
+void pasogo_state::vg230_init()
 {
-	vg230_reset(machine);
+	vg230_reset();
 }
 
 
@@ -547,7 +548,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pasogo_state,pasogo)
 {
-	vg230_init(machine());
+	vg230_init();
 	memset(&m_ems, 0, sizeof(m_ems));
 	membank( "bank27" )->set_base( machine().root_device().memregion("user1")->base() + 0x00000 );
 	membank( "bank28" )->set_base( memregion("maincpu")->base() + 0xb8000/*?*/ );

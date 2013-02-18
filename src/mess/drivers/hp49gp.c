@@ -11,19 +11,6 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		logerror( "%s: %s", machine.describe_context( ), buf);
-	}
-}
-
 struct lcd_spi_t
 {
 	int l1;
@@ -47,6 +34,11 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
+	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ...);
+	void lcd_spi_reset( );
+	void lcd_spi_init( );
+	void lcd_spi_line_w( int line, int data);
+	int lcd_spi_line_r( int line);
 };
 
 /***************************************************************************
@@ -62,99 +54,109 @@ enum
 	LCD_SPI_LINE_3
 };
 
-static void lcd_spi_reset( running_machine &machine)
+inline void ATTR_PRINTF(3,4) hp49gp_state::verboselog( int n_level, const char *s_fmt, ...)
 {
-	hp49gp_state *hp49gp = machine.driver_data<hp49gp_state>();
-	verboselog( machine, 5, "lcd_spi_reset\n");
-	hp49gp->m_lcd_spi.l1 = 0;
-	hp49gp->m_lcd_spi.data = 0;
-	hp49gp->m_lcd_spi.l3 = 0;
+	if (VERBOSE_LEVEL >= n_level)
+	{
+		va_list v;
+		char buf[32768];
+		va_start( v, s_fmt);
+		vsprintf( buf, s_fmt, v);
+		va_end( v);
+		logerror( "%s: %s", machine().describe_context( ), buf);
+	}
 }
 
-static void lcd_spi_init( running_machine &machine)
+void hp49gp_state::lcd_spi_reset( )
 {
-	verboselog( machine, 5, "lcd_spi_init\n");
-	lcd_spi_reset( machine);
+	verboselog( 5, "lcd_spi_reset\n");
+	m_lcd_spi.l1 = 0;
+	m_lcd_spi.data = 0;
+	m_lcd_spi.l3 = 0;
 }
 
-static void lcd_spi_line_w( running_machine &machine, int line, int data)
+void hp49gp_state::lcd_spi_init( )
 {
-	hp49gp_state *hp49gp = machine.driver_data<hp49gp_state>();
+	verboselog( 5, "lcd_spi_init\n");
+	lcd_spi_reset();
+}
+
+void hp49gp_state::lcd_spi_line_w( int line, int data)
+{
 	switch (line)
 	{
 		case LCD_SPI_LINE_1 :
 		{
-			if (data != hp49gp->m_lcd_spi.l1)
+			if (data != m_lcd_spi.l1)
 			{
 				if (data == 0)
 				{
-					hp49gp->m_lcd_spi.shift = 0;
-					hp49gp->m_lcd_spi.bits = 0;
+					m_lcd_spi.shift = 0;
+					m_lcd_spi.bits = 0;
 				}
-				verboselog( machine, 5, "LCD_SPI_LINE_1 <- %d\n", data);
-				hp49gp->m_lcd_spi.l1 = data;
+				verboselog( 5, "LCD_SPI_LINE_1 <- %d\n", data);
+				m_lcd_spi.l1 = data;
 			}
 		}
 		break;
 		case LCD_SPI_LINE_DATA :
 		{
-			if (data != hp49gp->m_lcd_spi.data)
+			if (data != m_lcd_spi.data)
 			{
-				verboselog( machine, 5, "LCD_SPI_LINE_DATA <- %d\n", data);
-				hp49gp->m_lcd_spi.data = data;
+				verboselog( 5, "LCD_SPI_LINE_DATA <- %d\n", data);
+				m_lcd_spi.data = data;
 			}
 		}
 		break;
 		case LCD_SPI_LINE_3 :
 		{
-			if (data != hp49gp->m_lcd_spi.l3)
+			if (data != m_lcd_spi.l3)
 			{
-				if ((data != 0) && (hp49gp->m_lcd_spi.l1 == 0))
+				if ((data != 0) && (m_lcd_spi.l1 == 0))
 				{
-					verboselog( machine, 5, "LCD SPI write bit %d\n", hp49gp->m_lcd_spi.data ? 1 : 0);
-					if (hp49gp->m_lcd_spi.bits < 8)
+					verboselog( 5, "LCD SPI write bit %d\n", m_lcd_spi.data ? 1 : 0);
+					if (m_lcd_spi.bits < 8)
 					{
-						hp49gp->m_lcd_spi.shift = (hp49gp->m_lcd_spi.shift << 1) | (hp49gp->m_lcd_spi.data ? 1 : 0);
+						m_lcd_spi.shift = (m_lcd_spi.shift << 1) | (m_lcd_spi.data ? 1 : 0);
 					}
-					hp49gp->m_lcd_spi.bits++;
-					if (hp49gp->m_lcd_spi.bits == 8)
+					m_lcd_spi.bits++;
+					if (m_lcd_spi.bits == 8)
 					{
-						verboselog( machine, 5, "LCD SPI write byte %02X\n", hp49gp->m_lcd_spi.shift);
+						verboselog( 5, "LCD SPI write byte %02X\n", m_lcd_spi.shift);
 					}
-					else if (hp49gp->m_lcd_spi.bits == 9)
+					else if (m_lcd_spi.bits == 9)
 					{
-						verboselog( machine, 5, "LCD SPI write ack %d\n", (hp49gp->m_lcd_spi.data ? 1 : 0));
+						verboselog( 5, "LCD SPI write ack %d\n", (m_lcd_spi.data ? 1 : 0));
 					}
 				}
-				verboselog( machine, 5, "LCD_SPI_LINE_3 <- %d\n", data);
-				hp49gp->m_lcd_spi.l3 = data;
+				verboselog( 5, "LCD_SPI_LINE_3 <- %d\n", data);
+				m_lcd_spi.l3 = data;
 			}
 		}
 		break;
 	}
 }
 
-static int lcd_spi_line_r( running_machine &machine, int line)
+int hp49gp_state::lcd_spi_line_r( int line)
 {
-	hp49gp_state *hp49gp = machine.driver_data<hp49gp_state>();
 	switch (line)
 	{
 		case LCD_SPI_LINE_1 :
 		{
-			verboselog( machine, 7, "LCD_SPI_LINE_1 -> %d\n", hp49gp->m_lcd_spi.l1);
-			return hp49gp->m_lcd_spi.l1;
+			verboselog( 7, "LCD_SPI_LINE_1 -> %d\n", m_lcd_spi.l1);
+			return m_lcd_spi.l1;
 		}
 		break;
 		case LCD_SPI_LINE_DATA :
 		{
-			verboselog( machine, 7, "LCD_SPI_LINE_DATA -> %d\n", hp49gp->m_lcd_spi.data);
-			return hp49gp->m_lcd_spi.data;
+			verboselog( 7, "LCD_SPI_LINE_DATA -> %d\n", m_lcd_spi.data);
+			return m_lcd_spi.data;
 		}
 		break;
 		case LCD_SPI_LINE_3 :
 		{
-			verboselog( machine, 7, "LCD_SPI_LINE_3 -> %d\n", hp49gp->m_lcd_spi.l3);
-			return hp49gp->m_lcd_spi.l3;
+			verboselog( 7, "LCD_SPI_LINE_3 -> %d\n", m_lcd_spi.l3);
+			return m_lcd_spi.l3;
 		}
 		break;
 	}
@@ -178,9 +180,9 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 		{
 			data = data | 0x0008;
 			data = data & ~0x3200;
-			data |= (lcd_spi_line_r( device->machine(), LCD_SPI_LINE_1) ? 1 : 0) << 9;
-			data |= (lcd_spi_line_r( device->machine(), LCD_SPI_LINE_DATA) ? 1 : 0) << 12;
-			data |= (lcd_spi_line_r( device->machine(), LCD_SPI_LINE_3) ? 1 : 0) << 13;
+			data |= (hp49gp->lcd_spi_line_r( LCD_SPI_LINE_1) ? 1 : 0) << 9;
+			data |= (hp49gp->lcd_spi_line_r( LCD_SPI_LINE_DATA) ? 1 : 0) << 12;
+			data |= (hp49gp->lcd_spi_line_r( LCD_SPI_LINE_3) ? 1 : 0) << 13;
 		}
 		break;
 		case S3C2410_GPIO_PORT_E :
@@ -222,9 +224,9 @@ static void s3c2410_gpio_port_w( device_t *device, int port, UINT32 mask, UINT32
 	{
 		case S3C2410_GPIO_PORT_D :
 		{
-			lcd_spi_line_w( device->machine(), LCD_SPI_LINE_1, BIT( data, 9) ? 1 : 0);
-			lcd_spi_line_w( device->machine(), LCD_SPI_LINE_DATA, BIT( data, 12) ? 1 : 0);
-			lcd_spi_line_w( device->machine(), LCD_SPI_LINE_3, BIT( data, 13) ? 1 : 0);
+			hp49gp->lcd_spi_line_w( LCD_SPI_LINE_1, BIT( data, 9) ? 1 : 0);
+			hp49gp->lcd_spi_line_w( LCD_SPI_LINE_DATA, BIT( data, 12) ? 1 : 0);
+			hp49gp->lcd_spi_line_w( LCD_SPI_LINE_3, BIT( data, 13) ? 1 : 0);
 		}
 		break;
 	}
@@ -269,7 +271,7 @@ DRIVER_INIT_MEMBER(hp49gp_state,hp49gp)
 {
 	UINT8 *rom = (UINT8 *)machine().root_device().memregion( "maincpu")->base();
 	memcpy( m_steppingstone, rom, 1024);
-	lcd_spi_init( machine());
+	lcd_spi_init();
 }
 
 static S3C2410_INTERFACE( hp49gp_s3c2410_intf )

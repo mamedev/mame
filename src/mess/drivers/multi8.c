@@ -70,6 +70,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	void multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -101,9 +102,9 @@ void multi8_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-static void multi8_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width)
+void multi8_state::multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width)
 {
-	if(!machine.primary_screen->visible_area().contains(x, y))
+	if(!machine().primary_screen->visible_area().contains(x, y))
 		return;
 
 	if(width)
@@ -148,7 +149,7 @@ UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &b
 				else
 					color = (pen_b) | (pen_r << 1) | (pen_g << 2);
 
-				multi8_draw_pixel(machine(),bitmap, y, x*8+xi,m_pen_clut[color], 0);
+				multi8_draw_pixel(bitmap, y, x*8+xi,m_pen_clut[color], 0);
 			}
 			count++;
 		}
@@ -176,7 +177,7 @@ UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &b
 						pen = (m_p_chargen[tile*8+yi] >> (7-xi) & 1) ? color : 0;
 
 					if(pen)
-						multi8_draw_pixel(machine(),bitmap, y*mc6845_tile_height+yi, x*8+xi, pen, (m_display_reg & 0x40) == 0x00);
+						multi8_draw_pixel(bitmap, y*mc6845_tile_height+yi, x*8+xi, pen, (m_display_reg & 0x40) == 0x00);
 				}
 			}
 
@@ -201,7 +202,7 @@ UINT32 multi8_state::screen_update_multi8(screen_device &screen, bitmap_ind16 &b
 					for (yc=0; yc<(mc6845_tile_height-(mc6845_cursor_y_start & 7)); yc++)
 					{
 						for (xc=0; xc<8; xc++)
-							multi8_draw_pixel(machine(),bitmap, y*mc6845_tile_height+yc, x*8+xc,0x07,(m_display_reg & 0x40) == 0x00);
+							multi8_draw_pixel(bitmap, y*mc6845_tile_height+yc, x*8+xc,0x07,(m_display_reg & 0x40) == 0x00);
 
 					}
 				}

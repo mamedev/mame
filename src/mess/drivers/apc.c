@@ -157,6 +157,7 @@ protected:
 
 	virtual void video_start();
 	virtual void palette_init();
+	inline void set_dma_channel(int channel, int state);
 };
 
 void apc_state::video_start()
@@ -955,16 +956,15 @@ WRITE8_MEMBER(apc_state::apc_dma_write_byte)
 	program.write_byte(addr, data);
 }
 
-static void set_dma_channel(running_machine &machine, int channel, int state)
+inline void apc_state::set_dma_channel(int channel, int state)
 {
-	apc_state *drvstate = machine.driver_data<apc_state>();
-	if (!state) drvstate->m_dack = channel;
+	if (!state) m_dack = channel;
 }
 
-WRITE_LINE_MEMBER(apc_state::apc_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma_channel(machine(), 0, state); }
-WRITE_LINE_MEMBER(apc_state::apc_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(machine(), 1, state); }
-WRITE_LINE_MEMBER(apc_state::apc_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(machine(), 2, state); }
-WRITE_LINE_MEMBER(apc_state::apc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(machine(), 3, state); }
+WRITE_LINE_MEMBER(apc_state::apc_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma_channel(0, state); }
+WRITE_LINE_MEMBER(apc_state::apc_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(1, state); }
+WRITE_LINE_MEMBER(apc_state::apc_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(2, state); }
+WRITE_LINE_MEMBER(apc_state::apc_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(3, state); }
 
 READ8_MEMBER(apc_state::fdc_r)
 {

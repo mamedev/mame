@@ -181,19 +181,19 @@ public:
 	DECLARE_DRIVER_INIT(sol20);
 	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
 	TIMER_CALLBACK_MEMBER(sol20_boot);
+	cassette_image_device *cassette_device_image();
 };
 
 
 /* timer to read cassette waveforms */
 
 
-static cassette_image_device *cassette_device_image(running_machine &machine)
+cassette_image_device *sol20_state::cassette_device_image()
 {
-	sol20_state *state = machine.driver_data<sol20_state>();
-	if (state->m_sol20_fa & 0x40)
-		return machine.device<cassette_image_device>(CASSETTE2_TAG);
+	if (m_sol20_fa & 0x40)
+		return machine().device<cassette_image_device>(CASSETTE2_TAG);
 	else
-		return machine.device<cassette_image_device>(CASSETTE_TAG);
+		return machine().device<cassette_image_device>(CASSETTE_TAG);
 }
 
 
@@ -210,7 +210,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 
 			m_cass_data.input.length++;
 
-			cass_ws = ((cassette_device_image(machine()))->input() > +0.02) ? 1 : 0;
+			cass_ws = ((cassette_device_image())->input() > +0.02) ? 1 : 0;
 
 			if (cass_ws != m_cass_data.input.level)
 			{
@@ -239,7 +239,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 4)))
 				{
 					m_cass_data.output.level ^= 1;          // toggle output this, except on 2nd half of low bit
-					cassette_device_image(machine())->output(m_cass_data.output.level ? -1.0 : +1.0);
+					cassette_device_image()->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;
@@ -248,7 +248,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 			/* loading a tape */
 			m_cass_data.input.length++;
 
-			cass_ws = ((cassette_device_image(machine()))->input() > +0.02) ? 1 : 0;
+			cass_ws = ((cassette_device_image())->input() > +0.02) ? 1 : 0;
 
 			if (cass_ws != m_cass_data.input.level || m_cass_data.input.length == 10)
 			{
@@ -279,7 +279,7 @@ TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
 				if (!((m_cass_data.output.bit == 0) && (m_cass_data.output.length & 8)))
 				{
 					m_cass_data.output.level ^= 1;          // toggle output this, except on 2nd half of low bit
-					cassette_device_image(machine())->output(m_cass_data.output.level ? -1.0 : +1.0);
+					cassette_device_image()->output(m_cass_data.output.level ? -1.0 : +1.0);
 				}
 			}
 			return;

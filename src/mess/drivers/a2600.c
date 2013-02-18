@@ -153,12 +153,26 @@ protected:
 	void install_banks(int count, unsigned init);
 
 	UINT8   *m_cart;
+	int detect_modeDC();
+	int detect_modef6();
+	int detect_mode3E();
+	int detect_modeSS();
+	int detect_modeFE();
+	int detect_modeE0();
+	int detect_modeCV();
+	int detect_modeFV();
+	int detect_modeJVP();
+	int detect_modeE7();
+	int detect_modeUA();
+	int detect_8K_mode3F();
+	int detect_32K_mode3F();
+	int detect_super_chip();
+	unsigned long detect_2600controllers();
 };
 
 
 
-#define CART machine.root_device().memregion("user1")->base()
-#define CART_MEMBER machine().root_device().memregion("user1")->base()
+#define CART machine().root_device().memregion("user1")->base()
 
 #define MASTER_CLOCK_NTSC   3579545
 #define MASTER_CLOCK_PAL    3546894
@@ -191,16 +205,15 @@ enum
 
 static const UINT16 supported_screen_heights[4] = { 262, 312, 328, 342 };
 
-static int detect_modeDC(running_machine &machine)
+int a2600_state::detect_modeDC()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i,numfound = 0;
 	// signature is also in 'video reflex'.. maybe figure out that controller port someday...
 	static const unsigned char signature[3] = { 0x8d, 0xf0, 0xff };
-	if (state->m_cart_size == 0x10000)
+	if (m_cart_size == 0x10000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - sizeof signature; i++)
+		for (i = 0; i < m_cart_size - sizeof signature; i++)
 		{
 			if (!memcmp(&cart[i], signature,sizeof signature))
 			{
@@ -212,15 +225,14 @@ static int detect_modeDC(running_machine &machine)
 	return 0;
 }
 
-static int detect_modef6(running_machine &machine)
+int a2600_state::detect_modef6()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i, numfound = 0;
 	static const unsigned char signature[3] = { 0x8d, 0xf6, 0xff };
-	if (state->m_cart_size == 0x4000)
+	if (m_cart_size == 0x4000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - sizeof signature; i++)
+		for (i = 0; i < m_cart_size - sizeof signature; i++)
 		{
 			if (!memcmp(&cart[i], signature, sizeof signature))
 			{
@@ -232,19 +244,18 @@ static int detect_modef6(running_machine &machine)
 	return 0;
 }
 
-static int detect_mode3E(running_machine &machine)
+int a2600_state::detect_mode3E()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	// this one is a little hacky.. looks for STY $3e, which is unique to
 	// 'not boulderdash', but is the only example i have (cow)
 	// Would have used STA $3e, but 'Alien' and 'Star Raiders' do that for unknown reasons
 
 	int i,numfound = 0;
 	static const unsigned char signature[3] = { 0x84, 0x3e, 0x9d };
-	if (state->m_cart_size == 0x0800 || state->m_cart_size == 0x1000)
+	if (m_cart_size == 0x0800 || m_cart_size == 0x1000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - sizeof signature; i++)
+		for (i = 0; i < m_cart_size - sizeof signature; i++)
 		{
 			if (!memcmp(&cart[i], signature,sizeof signature))
 			{
@@ -256,15 +267,14 @@ static int detect_mode3E(running_machine &machine)
 	return 0;
 }
 
-static int detect_modeSS(running_machine &machine)
+int a2600_state::detect_modeSS()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i,numfound = 0;
 	static const unsigned char signature[5] = { 0xbd, 0xe5, 0xff, 0x95, 0x81 };
-	if (state->m_cart_size == 0x0800 || state->m_cart_size == 0x1000)
+	if (m_cart_size == 0x0800 || m_cart_size == 0x1000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - sizeof signature; i++)
+		for (i = 0; i < m_cart_size - sizeof signature; i++)
 		{
 			if (!memcmp(&cart[i], signature,sizeof signature))
 			{
@@ -276,9 +286,8 @@ static int detect_modeSS(running_machine &machine)
 	return 0;
 }
 
-static int detect_modeFE(running_machine &machine)
+int a2600_state::detect_modeFE()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][5] =  {
 									{ 0x20, 0x00, 0xd0, 0xc6, 0xc5 },
@@ -286,10 +295,10 @@ static int detect_modeFE(running_machine &machine)
 									{ 0xd0, 0xfb, 0x20, 0x73, 0xfe },
 									{ 0x20, 0x00, 0xf0, 0x84, 0xd6 }
 	};
-	if (state->m_cart_size == 0x2000)
+	if (m_cart_size == 0x2000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
@@ -304,9 +313,8 @@ static int detect_modeFE(running_machine &machine)
 	return 0;
 }
 
-static int detect_modeE0(running_machine &machine)
+int a2600_state::detect_modeE0()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] =  {
 									{ 0x8d, 0xe0, 0x1f },
@@ -316,10 +324,10 @@ static int detect_modeE0(running_machine &machine)
 									{ 0xad, 0xed, 0xff },
 									{ 0xad, 0xf3, 0xbf }
 	};
-	if (state->m_cart_size == 0x2000)
+	if (m_cart_size == 0x2000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
@@ -334,18 +342,17 @@ static int detect_modeE0(running_machine &machine)
 	return 0;
 }
 
-static int detect_modeCV(running_machine &machine)
+int a2600_state::detect_modeCV()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] = {
 									{ 0x9d, 0xff, 0xf3 },
 									{ 0x99, 0x00, 0xf4 }
 	};
-	if (state->m_cart_size == 0x0800 || state->m_cart_size == 0x1000)
+	if (m_cart_size == 0x0800 || m_cart_size == 0x1000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
@@ -360,17 +367,16 @@ static int detect_modeCV(running_machine &machine)
 	return 0;
 }
 
-static int detect_modeFV(running_machine &machine)
+int a2600_state::detect_modeFV()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] = {
 									{ 0x2c, 0xd0, 0xff }
 	};
-	if (state->m_cart_size == 0x2000)
+	if (m_cart_size == 0x2000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
@@ -380,24 +386,23 @@ static int detect_modeFV(running_machine &machine)
 				}
 			}
 		}
-		state->m_FVlocked = 0;
+		m_FVlocked = 0;
 	}
 	if (numfound) return 1;
 	return 0;
 }
 
-static int detect_modeJVP(running_machine &machine)
+int a2600_state::detect_modeJVP()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][4] = {
 									{ 0x2c, 0xc0, 0xef, 0x60 },
 									{ 0x8d, 0xa0, 0x0f, 0xf0 }
 	};
-	if (state->m_cart_size == 0x4000 || state->m_cart_size == 0x2000)
+	if (m_cart_size == 0x4000 || m_cart_size == 0x2000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
@@ -412,18 +417,17 @@ static int detect_modeJVP(running_machine &machine)
 	return 0;
 }
 
-static int detect_modeE7(running_machine &machine)
+int a2600_state::detect_modeE7()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i,j,numfound = 0;
 	static const unsigned char signatures[][3] = {
 									{ 0xad, 0xe5, 0xff },
 									{ 0x8d, 0xe7, 0xff }
 	};
-	if (state->m_cart_size == 0x2000 || state->m_cart_size == 0x4000)
+	if (m_cart_size == 0x2000 || m_cart_size == 0x4000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]) && !numfound; j++)
 			{
@@ -438,15 +442,14 @@ static int detect_modeE7(running_machine &machine)
 	return 0;
 }
 
-static int detect_modeUA(running_machine &machine)
+int a2600_state::detect_modeUA()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i,numfound = 0;
 	static const unsigned char signature[3] = { 0x8d, 0x40, 0x02 };
-	if (state->m_cart_size == 0x2000)
+	if (m_cart_size == 0x2000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - sizeof signature; i++)
+		for (i = 0; i < m_cart_size - sizeof signature; i++)
 		{
 			if (!memcmp(&cart[i], signature,sizeof signature))
 			{
@@ -458,17 +461,16 @@ static int detect_modeUA(running_machine &machine)
 	return 0;
 }
 
-static int detect_8K_mode3F(running_machine &machine)
+int a2600_state::detect_8K_mode3F()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i,numfound = 0;
 	static const unsigned char signature1[4] = { 0xa9, 0x01, 0x85, 0x3f };
 	static const unsigned char signature2[4] = { 0xa9, 0x02, 0x85, 0x3f };
 	// have to look for two signatures because 'not boulderdash' gives false positive otherwise
-	if (state->m_cart_size == 0x2000)
+	if (m_cart_size == 0x2000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - sizeof signature1; i++)
+		for (i = 0; i < m_cart_size - sizeof signature1; i++)
 		{
 			if (!memcmp(&cart[i], signature1,sizeof signature1))
 			{
@@ -484,15 +486,14 @@ static int detect_8K_mode3F(running_machine &machine)
 	return 0;
 }
 
-static int detect_32K_mode3F(running_machine &machine)
+int a2600_state::detect_32K_mode3F()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i,numfound = 0;
 	static const unsigned char signature[4] = { 0xa9, 0x0e, 0x85, 0x3f };
-	if (state->m_cart_size >= 0x8000)
+	if (m_cart_size >= 0x8000)
 	{
 		UINT8 *cart = CART;
-		for (i = 0; i < state->m_cart_size - sizeof signature; i++)
+		for (i = 0; i < m_cart_size - sizeof signature; i++)
 		{
 			if (!memcmp(&cart[i], signature,sizeof signature))
 			{
@@ -504,9 +505,8 @@ static int detect_32K_mode3F(running_machine &machine)
 	return 0;
 }
 
-static int detect_super_chip(running_machine &machine)
+int a2600_state::detect_super_chip()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 	int i,j;
 	UINT8 *cart = CART;
 	static const unsigned char signatures[][5] = {
@@ -514,9 +514,9 @@ static int detect_super_chip(running_machine &machine)
 									{ 0xae, 0xf6, 0xff, 0x4c, 0x00 } // off the wall
 	};
 
-	if (state->m_cart_size == 0x4000)
+	if (m_cart_size == 0x4000)
 	{
-		for (i = 0; i < state->m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+		for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 		{
 			for (j = 0; j < (sizeof signatures/sizeof signatures[0]); j++)
 			{
@@ -527,7 +527,7 @@ static int detect_super_chip(running_machine &machine)
 			}
 		}
 	}
-	for (i = 0x1000; i < state->m_cart_size; i += 0x1000)
+	for (i = 0x1000; i < m_cart_size; i += 0x1000)
 	{
 		if (memcmp(cart, cart + i, 0x100))
 		{
@@ -619,7 +619,7 @@ DEVICE_IMAGE_LOAD_MEMBER( a2600_state, a2600_cart )
 		}
 	}
 
-	if (!(m_cart_size == 0x4000 && detect_modef6(machine())))
+	if (!(m_cart_size == 0x4000 && detect_modef6()))
 	{
 		while (m_cart_size > 0x00800)
 		{
@@ -1458,16 +1458,15 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 	memset( m_riot_ram, 0x00, 0x80 );
 	m_current_reset_bank_counter = 0xFF;
 	m_dpc.oscillator = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(a2600_state::modeDPC_timer_callback),this));
-	m_cart = CART_MEMBER;
+	m_cart = CART;
 	m_modeSS_last_address = 0;
 }
 
 
 #ifdef UNUSED_FUNCTIONS
 // try to detect 2600 controller setup. returns 32bits with left/right controller info
-static unsigned long detect_2600controllers(running_machine &machine)
+unsigned a2600_state::long detect_2600controllers()
 {
-	a2600_state *state = machine.driver_data<a2600_state>();
 #define JOYS 0x001
 #define PADD 0x002
 #define KEYP 0x004
@@ -1513,10 +1512,10 @@ static unsigned long detect_2600controllers(running_machine &machine)
 	// it can be fixed here with a new signature (note that the Coleco Gemini has this setup also)
 	left = JOYS+PADD; right = JOYS+PADD;
 	// default for bad dumps and roms too large to have special controllers
-	if ((state->m_cart_size > 0x4000) || (state->m_cart_size & 0x7ff)) return (left << 16) + right;
+	if ((m_cart_size > 0x4000) || (m_cart_size & 0x7ff)) return (left << 16) + right;
 
 	cart = CART;
-	for (i = 0; i < state->m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
+	for (i = 0; i < m_cart_size - (sizeof signatures/sizeof signatures[0]); i++)
 	{
 		for (j = 0; j < (sizeof signatures/sizeof signatures[0]); j++)
 		{
@@ -1553,18 +1552,18 @@ void a2600_state::machine_reset()
 	m_current_reset_bank_counter++;
 
 	/* auto-detect bank mode */
-	if (m_banking_mode == 0xff) if (detect_modeDC(machine())) m_banking_mode = modeDC;
-	if (m_banking_mode == 0xff) if (detect_mode3E(machine())) m_banking_mode = mode3E;
-	if (m_banking_mode == 0xff) if (detect_modeFE(machine())) m_banking_mode = modeFE;
-	if (m_banking_mode == 0xff) if (detect_modeSS(machine())) m_banking_mode = modeSS;
-	if (m_banking_mode == 0xff) if (detect_modeE0(machine())) m_banking_mode = modeE0;
-	if (m_banking_mode == 0xff) if (detect_modeCV(machine())) m_banking_mode = modeCV;
-	if (m_banking_mode == 0xff) if (detect_modeFV(machine())) m_banking_mode = modeFV;
-	if (m_banking_mode == 0xff) if (detect_modeJVP(machine())) m_banking_mode = modeJVP;
-	if (m_banking_mode == 0xff) if (detect_modeUA(machine())) m_banking_mode = modeUA;
-	if (m_banking_mode == 0xff) if (detect_8K_mode3F(machine())) m_banking_mode = mode3F;
-	if (m_banking_mode == 0xff) if (detect_32K_mode3F(machine())) m_banking_mode = mode3F;
-	if (m_banking_mode == 0xff) if (detect_modeE7(machine())) m_banking_mode = modeE7;
+	if (m_banking_mode == 0xff) if (detect_modeDC()) m_banking_mode = modeDC;
+	if (m_banking_mode == 0xff) if (detect_mode3E()) m_banking_mode = mode3E;
+	if (m_banking_mode == 0xff) if (detect_modeFE()) m_banking_mode = modeFE;
+	if (m_banking_mode == 0xff) if (detect_modeSS()) m_banking_mode = modeSS;
+	if (m_banking_mode == 0xff) if (detect_modeE0()) m_banking_mode = modeE0;
+	if (m_banking_mode == 0xff) if (detect_modeCV()) m_banking_mode = modeCV;
+	if (m_banking_mode == 0xff) if (detect_modeFV()) m_banking_mode = modeFV;
+	if (m_banking_mode == 0xff) if (detect_modeJVP()) m_banking_mode = modeJVP;
+	if (m_banking_mode == 0xff) if (detect_modeUA()) m_banking_mode = modeUA;
+	if (m_banking_mode == 0xff) if (detect_8K_mode3F()) m_banking_mode = mode3F;
+	if (m_banking_mode == 0xff) if (detect_32K_mode3F()) m_banking_mode = mode3F;
+	if (m_banking_mode == 0xff) if (detect_modeE7()) m_banking_mode = modeE7;
 
 	if (m_banking_mode == 0xff)
 	{
@@ -1607,7 +1606,7 @@ void a2600_state::machine_reset()
 
 	if (m_cart_size == 0x2000 || m_cart_size == 0x4000 || m_cart_size == 0x8000)
 	{
-		chip = detect_super_chip(machine());
+		chip = detect_super_chip();
 	}
 
 	/* Super chip games:
@@ -1648,7 +1647,7 @@ void a2600_state::machine_reset()
 
 	case modeF8:
 		m_current_reset_bank_counter = 0;
-		if (!memcmp(&CART_MEMBER[0x1ffc],snowwhite,sizeof(snowwhite)))
+		if (!memcmp(&CART[0x1ffc],snowwhite,sizeof(snowwhite)))
 		{
 			install_banks(1, 0x0000);
 		}
@@ -1809,7 +1808,7 @@ void a2600_state::machine_reset()
 	case modeSS:
 		space.install_read_handler(0x1000, 0x1fff, read8_delegate(FUNC(a2600_state::modeSS_r),this));
 		m_bank_base[1] = m_extra_RAM->base() + 2 * 0x800;
-		m_bank_base[2] = CART_MEMBER;
+		m_bank_base[2] = CART;
 		membank("bank1")->set_base(m_bank_base[1] );
 		membank("bank2")->set_base(m_bank_base[2] );
 		m_modeSS_write_enabled = 0;
@@ -1842,8 +1841,8 @@ void a2600_state::machine_reset()
 		break;
 
 	case mode32in1:
-		membank("bank1")->set_base(CART_MEMBER + m_current_reset_bank_counter * 0x800 );
-		membank("bank2")->set_base(CART_MEMBER + m_current_reset_bank_counter * 0x800 );
+		membank("bank1")->set_base(CART + m_current_reset_bank_counter * 0x800 );
+		membank("bank2")->set_base(CART + m_current_reset_bank_counter * 0x800 );
 		break;
 
 	case modeJVP:

@@ -63,6 +63,7 @@ public:
 	DECLARE_WRITE8_MEMBER(jr100_via_write_a);
 	DECLARE_WRITE8_MEMBER(jr100_via_write_b);
 	DECLARE_WRITE_LINE_MEMBER(jr100_via_write_cb2);
+	UINT32 readByLittleEndian(UINT8 *buf,int pos);
 
 protected:
 	required_device<via6522_device> m_via;
@@ -329,7 +330,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(jr100_state::sound_tick)
 	}
 }
 
-static UINT32 readByLittleEndian(UINT8 *buf,int pos)
+UINT32 jr100_state::readByLittleEndian(UINT8 *buf,int pos)
 {
 	return buf[pos] + (buf[pos+1] << 8) + (buf[pos+2] << 16) + (buf[pos+3] << 24);
 }
@@ -352,16 +353,16 @@ static QUICKLOAD_LOAD(jr100)
 		return IMAGE_INIT_FAIL;
 	}
 	int pos = 4;
-	if (readByLittleEndian(buf,pos)!=1) {
+	if (state->readByLittleEndian(buf,pos)!=1) {
 		// not version 1 of PRG file
 		return IMAGE_INIT_FAIL;
 	}
 	pos += 4;
-	UINT32 len =readByLittleEndian(buf,pos); pos+= 4;
+	UINT32 len =state->readByLittleEndian(buf,pos); pos+= 4;
 	pos += len; // skip name
-	UINT32 start_address = readByLittleEndian(buf,pos); pos+= 4;
-	UINT32 code_length   = readByLittleEndian(buf,pos); pos+= 4;
-	UINT32 flag          = readByLittleEndian(buf,pos); pos+= 4;
+	UINT32 start_address = state->readByLittleEndian(buf,pos); pos+= 4;
+	UINT32 code_length   = state->readByLittleEndian(buf,pos); pos+= 4;
+	UINT32 flag          = state->readByLittleEndian(buf,pos); pos+= 4;
 
 	UINT32 end_address = start_address + code_length - 1;
 	// copy code

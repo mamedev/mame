@@ -204,6 +204,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
 	DECLARE_WRITE_LINE_MEMBER(i8251_rts);
+	UINT8 vram_read();
+	void vram_write(UINT8 data);
 };
 
 // vram access functions:
@@ -228,43 +230,41 @@ public:
 	 */
 
 // returns one nybble from vram array based on X and Y regs
-static UINT8 vram_read(running_machine &machine)
+UINT8 vk100_state::vram_read()
 {
-	vk100_state *state = machine.driver_data<vk100_state>();
 	// XFinal is (X'&0x3FC)|(X&0x3)
-	UINT16 XFinal = state->m_trans[(state->m_vgX&0x3FC)>>2]<<2|(state->m_vgX&0x3); // appears correct
+	UINT16 XFinal = m_trans[(m_vgX&0x3FC)>>2]<<2|(m_vgX&0x3); // appears correct
 	// EA is the effective ram address for a 16-bit block
-	UINT16 EA = ((state->m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
+	UINT16 EA = ((m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
 	// block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
-	UINT16 block = state->m_vram[(EA<<1)+1] | (state->m_vram[(EA<<1)]<<8);
+	UINT16 block = m_vram[(EA<<1)+1] | (m_vram[(EA<<1)]<<8);
 	// nybbleNum is which of the four nybbles within the block to address. should NEVER be 3!
 	UINT8 nybbleNum = (XFinal&0xC)>>2;
 	return (block>>(4*nybbleNum))&0xF;
 }
 
-static void vram_write(running_machine &machine, UINT8 data)
+void vk100_state::vram_write(UINT8 data)
 {
-	vk100_state *state = machine.driver_data<vk100_state>();
 	// XFinal is (X'&0x3FC)|(X&0x3)
-	UINT16 XFinal = state->m_trans[(state->m_vgX&0x3FC)>>2]<<2|(state->m_vgX&0x3); // appears correct
+	UINT16 XFinal = m_trans[(m_vgX&0x3FC)>>2]<<2|(m_vgX&0x3); // appears correct
 	// EA is the effective ram address for a 16-bit block
-	UINT16 EA = ((state->m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
+	UINT16 EA = ((m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
 	// block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
-	UINT16 block = state->m_vram[(EA<<1)+1] | (state->m_vram[(EA<<1)]<<8);
+	UINT16 block = m_vram[(EA<<1)+1] | (m_vram[(EA<<1)]<<8);
 	// nybbleNum is which of the four nybbles within the block to address. should NEVER be 3!
 	UINT8 nybbleNum = (XFinal&0xC)>>2;
 	block &= ~((UINT16)0xF<<(nybbleNum*4)); // mask out the part we want to replace
 	block |= data<<(nybbleNum*4); // write the new part
 	// NOTE: this next part may have to be made conditional on VG_MODE
 	// check if the attribute nybble is supposed to be modified, and if so do so
-	if (state->VG_WOPS&0x08) block = (block&0x0FFF)|(((UINT16)state->VG_WOPS&0xF0)<<8);
-	state->m_vram[(EA<<1)+1] = block&0xFF; // write block back to vram
-	state->m_vram[(EA<<1)] = (block&0xFF00)>>8; // ''
+	if (VG_WOPS&0x08) block = (block&0x0FFF)|(((UINT16)VG_WOPS&0xF0)<<8);
+	m_vram[(EA<<1)+1] = block&0xFF; // write block back to vram
+	m_vram[(EA<<1)] = (block&0xFF00)>>8; // ''
 }
 
 TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 {
-	UINT8 thisNyb = vram_read(machine()); // read in the nybble
+	UINT8 thisNyb = vram_read(); // read in the nybble
 	// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
 	UINT8 newNyb = m_pattern[((m_vgPAT&m_vgPAT_Mask)?0x200:0)|((VG_WOPS&7)<<6)|((m_vgX&3)<<4)|thisNyb]; // calculate new nybble based on pattern rom
 	// finally write the block back to ram depending on the VG_MODE (sort of a hack until we get the vector and synd and dir roms all hooked up)
@@ -275,11 +275,11 @@ TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
 		case 1: // dot: only write the LAST pixel in the chain? TODO: some fallthrough magic here?
 			if ((m_vgDownCount) == 0x00)
 			{
-				vram_write(machine(), newNyb); // write out the modified nybble
+				vram_write(newNyb); // write out the modified nybble
 			}
 			break;
 		case 2: // vec: draw the vector
-				vram_write(machine(), newNyb); // write out the modified nybble
+				vram_write(newNyb); // write out the modified nybble
 			break;
 		case 3: // er: erase: special case here: wipe the entire screen (except for color/attrib?) and then set done.
 			for (int i = 0; i < 0x8000; i++)
@@ -576,7 +576,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
 #ifdef SYSTAT_A_VERBOSE
 	if (m_maincpu->pc() != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", m_maincpu->pc());
 #endif
-	return ((m_vgGO?0:1)<<7)|(vram_read(machine())<<3)|(((m_dipsw->read()>>dipswitchLUT[offset])&1)?0x4:0)|(m_vsync?0x2:0);
+	return ((m_vgGO?0:1)<<7)|(vram_read()<<3)|(((m_dipsw->read()>>dipswitchLUT[offset])&1)?0x4:0)|(m_vsync?0x2:0);
 }
 
 /* port 0x48: "SYSTAT B"; NOT documented in the tech manual at all.

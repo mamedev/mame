@@ -120,6 +120,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	DECLARE_WRITE_LINE_MEMBER(smc777_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(smc777_fdc_drq_w);
+	void check_floppy_inserted();
 };
 
 
@@ -371,7 +372,7 @@ WRITE8_MEMBER(smc777_state::smc777_fbuf_w)
 }
 
 
-static void check_floppy_inserted(running_machine &machine)
+void smc777_state::check_floppy_inserted()
 {
 	int f_num;
 	floppy_image_legacy *floppy;
@@ -380,15 +381,15 @@ static void check_floppy_inserted(running_machine &machine)
 	/* FIXME: floppy drive 1 doesn't work? */
 	for(f_num=0;f_num<2;f_num++)
 	{
-		floppy = flopimg_get_image(floppy_get_device(machine, f_num));
-		floppy_mon_w(floppy_get_device(machine, f_num), (floppy != NULL) ? 0 : 1);
-		floppy_drive_set_ready_state(floppy_get_device(machine, f_num), (floppy != NULL) ? 1 : 0,0);
+		floppy = flopimg_get_image(floppy_get_device(machine(), f_num));
+		floppy_mon_w(floppy_get_device(machine(), f_num), (floppy != NULL) ? 0 : 1);
+		floppy_drive_set_ready_state(floppy_get_device(machine(), f_num), (floppy != NULL) ? 1 : 0,0);
 	}
 }
 
 READ8_MEMBER(smc777_state::smc777_fdc1_r)
 {
-	check_floppy_inserted(machine());
+	check_floppy_inserted();
 
 	switch(offset)
 	{
@@ -411,7 +412,7 @@ READ8_MEMBER(smc777_state::smc777_fdc1_r)
 
 WRITE8_MEMBER(smc777_state::smc777_fdc1_w)
 {
-	check_floppy_inserted(machine());
+	check_floppy_inserted();
 
 	switch(offset)
 	{

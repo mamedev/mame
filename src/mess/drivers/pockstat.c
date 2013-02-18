@@ -127,6 +127,10 @@ public:
 	TIMER_CALLBACK_MEMBER(timer_tick);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pockstat_flash );
+	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
+	UINT32 ps_intc_get_interrupt_line(UINT32 line);
+	void ps_intc_set_interrupt_line(UINT32 line, int state);
+	void ps_timer_start(int index);
 };
 
 
@@ -157,7 +161,7 @@ static const int CPU_FREQ[16] =
 #define ENABLE_VERBOSE_LOG  (0)
 
 #if ENABLE_VERBOSE_LOG
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
+inline void ATTR_PRINTF(3,4) pockstat_state::verboselog( int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -166,38 +170,12 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%s: %s", machine.describe_context(), buf );
+		logerror( "%s: %s", machine().describe_context(), buf );
 	}
 }
 #else
 #define verboselog(x,y,z,...)
 #endif
-
-
-// Flash TLB
-
-
-
-// Interrupt Controller
-static UINT32 ps_intc_get_interrupt_line(running_machine &machine, UINT32 line);
-static void ps_intc_set_interrupt_line(running_machine &machine, UINT32 line, int state);
-
-
-
-// Timers
-
-static void ps_timer_start(running_machine &machine, int index);
-
-
-
-// Clock
-
-
-
-// RTC
-
-
-
 
 #define PS_INT_BTN_ACTION       0x00000001 // "Action button"
 #define PS_INT_BTN_RIGHT        0x00000002 // "Right button"
@@ -222,19 +200,19 @@ READ32_MEMBER(pockstat_state::ps_ftlb_r)
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(machine(), 0, "ps_ftlb_r: FlashROM TLB Control = %08x & %08x\n", m_ftlb_regs.control, mem_mask );
+			verboselog(0, "ps_ftlb_r: FlashROM TLB Control = %08x & %08x\n", m_ftlb_regs.control, mem_mask );
 			return m_ftlb_regs.control | 1; // ???
 		case 0x0004/4:
-			verboselog(machine(), 0, "ps_ftlb_r: Unknown (F_STAT) = %08x & %08x\n", m_ftlb_regs.stat, mem_mask );
+			verboselog(0, "ps_ftlb_r: Unknown (F_STAT) = %08x & %08x\n", m_ftlb_regs.stat, mem_mask );
 			return m_ftlb_regs.stat;
 		case 0x0008/4:
-			verboselog(machine(), 0, "ps_ftlb_r: FlashROM TLB Valid Tag = %08x & %08x\n", m_ftlb_regs.valid, mem_mask );
+			verboselog(0, "ps_ftlb_r: FlashROM TLB Valid Tag = %08x & %08x\n", m_ftlb_regs.valid, mem_mask );
 			return m_ftlb_regs.valid;
 		case 0x000c/4:
-			verboselog(machine(), 0, "ps_ftlb_r: Unknown (F_WAIT1) = %08x & %08x\n", m_ftlb_regs.wait1, mem_mask );
+			verboselog(0, "ps_ftlb_r: Unknown (F_WAIT1) = %08x & %08x\n", m_ftlb_regs.wait1, mem_mask );
 			return m_ftlb_regs.wait1;
 		case 0x0010/4:
-			verboselog(machine(), 0, "ps_ftlb_r: Unknown (F_WAIT2) = %08x & %08x\n", m_ftlb_regs.wait2 | 0x04, mem_mask );
+			verboselog(0, "ps_ftlb_r: Unknown (F_WAIT2) = %08x & %08x\n", m_ftlb_regs.wait2 | 0x04, mem_mask );
 			return m_ftlb_regs.wait2 | 0x04;
 		case 0x0100/4:
 		case 0x0104/4:
@@ -252,13 +230,13 @@ READ32_MEMBER(pockstat_state::ps_ftlb_r)
 		case 0x0134/4:
 		case 0x0138/4:
 		case 0x013c/4:
-			verboselog(machine(), 0, "ps_ftlb_r: FlashROM TLB Entry %d = %08x & %08x\n", offset - 0x100/4, m_ftlb_regs.entry[offset - 0x100/4], mem_mask );
+			verboselog(0, "ps_ftlb_r: FlashROM TLB Entry %d = %08x & %08x\n", offset - 0x100/4, m_ftlb_regs.entry[offset - 0x100/4], mem_mask );
 			return m_ftlb_regs.entry[offset - 0x100/4];
 		case 0x0300/4:
-			verboselog(machine(), 0, "ps_ftlb_r: Unknown (F_SN) = %08x & %08x\n", m_ftlb_regs.serial, mem_mask );
+			verboselog(0, "ps_ftlb_r: Unknown (F_SN) = %08x & %08x\n", m_ftlb_regs.serial, mem_mask );
 			return m_ftlb_regs.serial;
 		default:
-			verboselog(machine(), 0, "ps_ftlb_r: Unknown Register %08x & %08x\n", 0x06000000 + (offset << 2), mem_mask );
+			verboselog(0, "ps_ftlb_r: Unknown Register %08x & %08x\n", 0x06000000 + (offset << 2), mem_mask );
 			break;
 	}
 	return 0;
@@ -269,23 +247,23 @@ WRITE32_MEMBER(pockstat_state::ps_ftlb_w)
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(machine(), 0, "ps_ftlb_w: FlashROM TLB Control = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_ftlb_w: FlashROM TLB Control = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&m_ftlb_regs.control);
 			break;
 		case 0x0004/4:
-			verboselog(machine(), 0, "ps_ftlb_w: Unknown (F_STAT) = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_ftlb_w: Unknown (F_STAT) = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&m_ftlb_regs.stat);
 			break;
 		case 0x0008/4:
-			verboselog(machine(), 0, "ps_ftlb_w: FlashROM TLB Valid Tag = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_ftlb_w: FlashROM TLB Valid Tag = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&m_ftlb_regs.valid);
 			break;
 		case 0x000c/4:
-			verboselog(machine(), 0, "ps_ftlb_w: Unknown (F_WAIT1) = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_ftlb_w: Unknown (F_WAIT1) = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&m_ftlb_regs.wait1);
 			break;
 		case 0x0010/4:
-			verboselog(machine(), 0, "ps_ftlb_w: Unknown (F_WAIT2) = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_ftlb_w: Unknown (F_WAIT2) = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&m_ftlb_regs.wait2);
 			break;
 		case 0x0100/4:
@@ -304,59 +282,57 @@ WRITE32_MEMBER(pockstat_state::ps_ftlb_w)
 		case 0x0134/4:
 		case 0x0138/4:
 		case 0x013c/4:
-			verboselog(machine(), 0, "ps_ftlb_w: FlashROM TLB Entry %d = %08x & %08x\n", offset - 0x100/4, data, mem_mask );
+			verboselog(0, "ps_ftlb_w: FlashROM TLB Entry %d = %08x & %08x\n", offset - 0x100/4, data, mem_mask );
 			COMBINE_DATA(&m_ftlb_regs.entry[offset - 0x100/4]);
 			break;
 		case 0x0300/4:
-			verboselog(machine(), 0, "ps_ftlb_w: Unknown (F_SN) = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_ftlb_w: Unknown (F_SN) = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&m_ftlb_regs.serial);
 			break;
 		default:
-			verboselog(machine(), 0, "ps_ftlb_w: Unknown Register %08x = %08x & %08x\n", 0x06000000 + (offset << 2), data, mem_mask );
+			verboselog(0, "ps_ftlb_w: Unknown Register %08x = %08x & %08x\n", 0x06000000 + (offset << 2), data, mem_mask );
 			break;
 	}
 }
 
-static UINT32 ps_intc_get_interrupt_line(running_machine &machine, UINT32 line)
+UINT32 pockstat_state::ps_intc_get_interrupt_line(UINT32 line)
 {
-	pockstat_state *state = machine.driver_data<pockstat_state>();
-	return state->m_intc_regs.status & line;
+	return m_intc_regs.status & line;
 }
 
-static void ps_intc_set_interrupt_line(running_machine &machine, UINT32 line, int state)
+void pockstat_state::ps_intc_set_interrupt_line(UINT32 line, int state)
 {
-	pockstat_state *drvstate = machine.driver_data<pockstat_state>();
-	//printf( "%08x %d %08x %08x %08x\n", line, state, drvstate->m_intc_regs.hold, drvstate->m_intc_regs.status, drvstate->m_intc_regs.enable );
+	//printf( "%08x %d %08x %08x %08x\n", line, state, drvm_intc_regs.hold, drvm_intc_regs.status, drvm_intc_regs.enable );
 	if(line)
 	{
 		if(state)
 		{
-			drvstate->m_intc_regs.status |= line & PS_INT_STATUS_MASK;
-			drvstate->m_intc_regs.hold |= line &~ PS_INT_STATUS_MASK;
-			//printf( " Setting %08x, status = %08x, hold = %08x\n", line, drvstate->m_intc_regs.status, drvstate->m_intc_regs.hold );
+			m_intc_regs.status |= line & PS_INT_STATUS_MASK;
+			m_intc_regs.hold |= line &~ PS_INT_STATUS_MASK;
+			//printf( " Setting %08x, status = %08x, hold = %08x\n", line, m_intc_regs.status, m_intc_regs.hold );
 		}
 		else
 		{
-			drvstate->m_intc_regs.status &= ~line;
-			drvstate->m_intc_regs.hold &= ~line;
-			//printf( "Clearing %08x, status = %08x, hold = %08x\n", line, drvstate->m_intc_regs.status, drvstate->m_intc_regs.hold );
+			m_intc_regs.status &= ~line;
+			m_intc_regs.hold &= ~line;
+			//printf( "Clearing %08x, status = %08x, hold = %08x\n", line, m_intc_regs.status, m_intc_regs.hold );
 		}
 	}
-	if(drvstate->m_intc_regs.hold & drvstate->m_intc_regs.enable & PS_INT_IRQ_MASK)
+	if(m_intc_regs.hold & m_intc_regs.enable & PS_INT_IRQ_MASK)
 	{
-		machine.device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		machine.device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(ARM7_IRQ_LINE, CLEAR_LINE);
 	}
-	if(drvstate->m_intc_regs.hold & drvstate->m_intc_regs.enable & PS_INT_FIQ_MASK)
+	if(m_intc_regs.hold & m_intc_regs.enable & PS_INT_FIQ_MASK)
 	{
-		machine.device("maincpu")->execute().set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
+		machine().device("maincpu")->execute().set_input_line(ARM7_FIRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		machine.device("maincpu")->execute().set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
+		machine().device("maincpu")->execute().set_input_line(ARM7_FIRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -365,22 +341,22 @@ READ32_MEMBER(pockstat_state::ps_intc_r)
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(machine(), 0, "ps_intc_r: Held Interrupt = %08x & %08x\n", m_intc_regs.hold, mem_mask );
+			verboselog(0, "ps_intc_r: Held Interrupt = %08x & %08x\n", m_intc_regs.hold, mem_mask );
 			return m_intc_regs.hold;
 		case 0x0004/4:
-			verboselog(machine(), 0, "ps_intc_r: Interrupt Status = %08x & %08x\n", m_intc_regs.status, mem_mask );
+			verboselog(0, "ps_intc_r: Interrupt Status = %08x & %08x\n", m_intc_regs.status, mem_mask );
 			return m_intc_regs.status;
 		case 0x0008/4:
-			verboselog(machine(), 0, "ps_intc_r: Interrupt Enable = %08x & %08x\n", m_intc_regs.enable, mem_mask );
+			verboselog(0, "ps_intc_r: Interrupt Enable = %08x & %08x\n", m_intc_regs.enable, mem_mask );
 			return m_intc_regs.enable;
 		case 0x000c/4:
-			verboselog(machine(), 0, "ps_intc_r: Interrupt Mask (Invalid Read) = %08x & %08x\n", 0, mem_mask );
+			verboselog(0, "ps_intc_r: Interrupt Mask (Invalid Read) = %08x & %08x\n", 0, mem_mask );
 			return 0;
 		case 0x0010/4:
-			verboselog(machine(), 0, "ps_intc_r: Interrupt Acknowledge (Invalid Read) = %08x & %08x\n", 0, mem_mask );
+			verboselog(0, "ps_intc_r: Interrupt Acknowledge (Invalid Read) = %08x & %08x\n", 0, mem_mask );
 			return 0;
 		default:
-			verboselog(machine(), 0, "ps_intc_r: Unknown Register %08x & %08x\n", 0x0a000000 + (offset << 2), mem_mask );
+			verboselog(0, "ps_intc_r: Unknown Register %08x & %08x\n", 0x0a000000 + (offset << 2), mem_mask );
 			break;
 	}
 	return 0;
@@ -391,54 +367,53 @@ WRITE32_MEMBER(pockstat_state::ps_intc_w)
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(machine(), 0, "ps_intc_w: Held Interrupt (Invalid Write) = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_intc_w: Held Interrupt (Invalid Write) = %08x & %08x\n", data, mem_mask );
 			break;
 		case 0x0004/4:
-			verboselog(machine(), 0, "ps_intc_w: Interrupt Status (Invalid Write) = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_intc_w: Interrupt Status (Invalid Write) = %08x & %08x\n", data, mem_mask );
 			break;
 		case 0x0008/4:
-			verboselog(machine(), 0, "ps_intc_w: Interrupt Enable = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_intc_w: Interrupt Enable = %08x & %08x\n", data, mem_mask );
 			m_intc_regs.enable |= data;
 			//COMBINE_DATA(&m_intc_regs.enable);
 			//m_intc_regs.status &= m_intc_regs.enable;
 			//m_intc_regs.hold &= m_intc_regs.enable;
-			ps_intc_set_interrupt_line(machine(), 0, 0);
+			ps_intc_set_interrupt_line(0, 0);
 			break;
 		case 0x000c/4:
-			verboselog(machine(), 0, "ps_intc_w: Interrupt Mask = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_intc_w: Interrupt Mask = %08x & %08x\n", data, mem_mask );
 			m_intc_regs.enable &= ~data;
 			COMBINE_DATA(&m_intc_regs.mask);
 			//m_intc_regs.status &= m_intc_regs.enable;
 			//m_intc_regs.hold &= m_intc_regs.enable;
-			ps_intc_set_interrupt_line(machine(), 0, 0);
+			ps_intc_set_interrupt_line(0, 0);
 			break;
 		case 0x0010/4:
-			verboselog(machine(), 0, "ps_intc_w: Interrupt Acknowledge = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_intc_w: Interrupt Acknowledge = %08x & %08x\n", data, mem_mask );
 			m_intc_regs.hold &= ~data;
 			m_intc_regs.status &= ~data;
-			ps_intc_set_interrupt_line(machine(), 0, 0);
+			ps_intc_set_interrupt_line(0, 0);
 			//COMBINE_DATA(&m_intc_regs.acknowledge);
 			break;
 		default:
-			verboselog(machine(), 0, "ps_intc_w: Unknown Register %08x = %08x & %08x\n", 0x0a000000 + (offset << 2), data, mem_mask );
+			verboselog(0, "ps_intc_w: Unknown Register %08x = %08x & %08x\n", 0x0a000000 + (offset << 2), data, mem_mask );
 			break;
 	}
 }
 
 TIMER_CALLBACK_MEMBER(pockstat_state::timer_tick)
 {
-	ps_intc_set_interrupt_line(machine(), param == 2 ? PS_INT_TIMER2 : (param == 1 ? PS_INT_TIMER1 : PS_INT_TIMER0), 1);
+	ps_intc_set_interrupt_line(param == 2 ? PS_INT_TIMER2 : (param == 1 ? PS_INT_TIMER1 : PS_INT_TIMER0), 1);
 	//printf( "Timer %d is calling back\n", param );
 	m_timer_regs.timer[param].count = m_timer_regs.timer[param].period;
-	ps_timer_start(machine(), param);
+	ps_timer_start(param);
 }
 
-static void ps_timer_start(running_machine &machine, int index)
+void pockstat_state::ps_timer_start(int index)
 {
-	pockstat_state *state = machine.driver_data<pockstat_state>();
 	int divisor = 1;
 	attotime period;
-	switch(state->m_timer_regs.timer[index].control & 3)
+	switch(m_timer_regs.timer[index].control & 3)
 	{
 		case 0:
 		case 3:
@@ -451,9 +426,9 @@ static void ps_timer_start(running_machine &machine, int index)
 			divisor = 256;
 			break;
 	}
-	period = attotime::from_hz(CPU_FREQ[state->m_clock_regs.mode & 0x0f] / 2) * divisor;
-	period = period * state->m_timer_regs.timer[index].count;
-	state->m_timer_regs.timer[index].timer->adjust(period, index);
+	period = attotime::from_hz(CPU_FREQ[m_clock_regs.mode & 0x0f] / 2) * divisor;
+	period = period * m_timer_regs.timer[index].count;
+	m_timer_regs.timer[index].timer->adjust(period, index);
 }
 
 READ32_MEMBER(pockstat_state::ps_timer_r)
@@ -463,12 +438,12 @@ READ32_MEMBER(pockstat_state::ps_timer_r)
 		case 0x0000/4:
 		case 0x0010/4:
 		case 0x0020/4:
-			verboselog(machine(), 0, "ps_timer_r: Timer %d Period = %08x & %08x\n", offset / (0x10/4), m_timer_regs.timer[offset / (0x10/4)].period, mem_mask );
+			verboselog(0, "ps_timer_r: Timer %d Period = %08x & %08x\n", offset / (0x10/4), m_timer_regs.timer[offset / (0x10/4)].period, mem_mask );
 			return m_timer_regs.timer[offset / (0x10/4)].period;
 		case 0x0004/4:
 		case 0x0014/4:
 		case 0x0024/4:
-			verboselog(machine(), 0, "ps_timer_r: Timer %d Count = %08x & %08x\n", offset / (0x10/4), m_timer_regs.timer[offset / (0x10/4)].count, mem_mask );
+			verboselog(0, "ps_timer_r: Timer %d Count = %08x & %08x\n", offset / (0x10/4), m_timer_regs.timer[offset / (0x10/4)].count, mem_mask );
 			if(m_timer_regs.timer[offset / (0x10/4)].control & 4)
 			{
 				m_timer_regs.timer[offset / (0x10/4)].count--;
@@ -482,10 +457,10 @@ READ32_MEMBER(pockstat_state::ps_timer_r)
 		case 0x0008/4:
 		case 0x0018/4:
 		case 0x0028/4:
-			verboselog(machine(), 0, "ps_timer_r: Timer %d Control = %08x & %08x\n", offset / (0x10/4), m_timer_regs.timer[offset / (0x10/4)].control, mem_mask );
+			verboselog(0, "ps_timer_r: Timer %d Control = %08x & %08x\n", offset / (0x10/4), m_timer_regs.timer[offset / (0x10/4)].control, mem_mask );
 			return m_timer_regs.timer[offset / (0x10/4)].control;
 		default:
-			verboselog(machine(), 0, "ps_timer_r: Unknown Register %08x & %08x\n", 0x0a800000 + (offset << 2), mem_mask );
+			verboselog(0, "ps_timer_r: Unknown Register %08x & %08x\n", 0x0a800000 + (offset << 2), mem_mask );
 			break;
 	}
 	return 0;
@@ -498,23 +473,23 @@ WRITE32_MEMBER(pockstat_state::ps_timer_w)
 		case 0x0000/4:
 		case 0x0010/4:
 		case 0x0020/4:
-			verboselog(machine(), 0, "ps_timer_w: Timer %d Period = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
+			verboselog(0, "ps_timer_w: Timer %d Period = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
 			COMBINE_DATA(&m_timer_regs.timer[offset / (0x10/4)].period);
 			break;
 		case 0x0004/4:
 		case 0x0014/4:
 		case 0x0024/4:
-			verboselog(machine(), 0, "ps_timer_w: Timer %d Count = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
+			verboselog(0, "ps_timer_w: Timer %d Count = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
 			COMBINE_DATA(&m_timer_regs.timer[offset / (0x10/4)].count);
 			break;
 		case 0x0008/4:
 		case 0x0018/4:
 		case 0x0028/4:
-			verboselog(machine(), 0, "ps_timer_w: Timer %d Control = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
+			verboselog(0, "ps_timer_w: Timer %d Control = %08x & %08x\n", offset / (0x10/4), data, mem_mask );
 			COMBINE_DATA(&m_timer_regs.timer[offset / (0x10/4)].control);
 			if(m_timer_regs.timer[offset / (0x10/4)].control & 4)
 			{
-				ps_timer_start(machine(), offset / (0x10/4));
+				ps_timer_start(offset / (0x10/4));
 			}
 			else
 			{
@@ -522,7 +497,7 @@ WRITE32_MEMBER(pockstat_state::ps_timer_w)
 			}
 			break;
 		default:
-			verboselog(machine(), 0, "ps_timer_w: Unknown Register %08x = %08x & %08x\n", 0x0a800000 + (offset << 2), data, mem_mask );
+			verboselog(0, "ps_timer_w: Unknown Register %08x = %08x & %08x\n", 0x0a800000 + (offset << 2), data, mem_mask );
 			break;
 	}
 }
@@ -532,13 +507,13 @@ READ32_MEMBER(pockstat_state::ps_clock_r)
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(machine(), 0, "ps_clock_r: Clock Mode = %08x & %08x\n", m_clock_regs.mode | 0x10, mem_mask );
+			verboselog(0, "ps_clock_r: Clock Mode = %08x & %08x\n", m_clock_regs.mode | 0x10, mem_mask );
 			return m_clock_regs.mode | PS_CLOCK_STEADY;
 		case 0x0004/4:
-			verboselog(machine(), 0, "ps_clock_r: Clock Control = %08x & %08x\n", m_clock_regs.control, mem_mask );
+			verboselog(0, "ps_clock_r: Clock Control = %08x & %08x\n", m_clock_regs.control, mem_mask );
 			return m_clock_regs.control;
 		default:
-			verboselog(machine(), 0, "ps_clock_r: Unknown Register %08x & %08x\n", 0x0b000000 + (offset << 2), mem_mask );
+			verboselog(0, "ps_clock_r: Unknown Register %08x & %08x\n", 0x0b000000 + (offset << 2), mem_mask );
 			break;
 	}
 	return 0;
@@ -549,16 +524,16 @@ WRITE32_MEMBER(pockstat_state::ps_clock_w)
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(machine(), 0, "ps_clock_w: Clock Mode = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_clock_w: Clock Mode = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&m_clock_regs.mode);
 			machine().device("maincpu")->set_unscaled_clock(CPU_FREQ[m_clock_regs.mode & 0x0f]);
 			break;
 		case 0x0004/4:
-			verboselog(machine(), 0, "ps_clock_w: Clock Control = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_clock_w: Clock Control = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&m_clock_regs.control);
 			break;
 		default:
-			verboselog(machine(), 0, "ps_clock_w: Unknown Register %08x = %08x & %08x\n", 0x0b000000 + (offset << 2), data, mem_mask );
+			verboselog(0, "ps_clock_w: Unknown Register %08x = %08x & %08x\n", 0x0b000000 + (offset << 2), data, mem_mask );
 			break;
 	}
 }
@@ -566,7 +541,7 @@ WRITE32_MEMBER(pockstat_state::ps_clock_w)
 TIMER_CALLBACK_MEMBER(pockstat_state::rtc_tick)
 {
 	//printf( "RTC is calling back\n" );
-	ps_intc_set_interrupt_line(machine(), PS_INT_RTC, ps_intc_get_interrupt_line(machine(), PS_INT_RTC) ? 0 : 1);
+	ps_intc_set_interrupt_line(PS_INT_RTC, ps_intc_get_interrupt_line(PS_INT_RTC) ? 0 : 1);
 	if(!(m_rtc_regs.mode & 1))
 	{
 		m_rtc_regs.time++;
@@ -614,19 +589,19 @@ READ32_MEMBER(pockstat_state::ps_rtc_r)
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(machine(), 0, "ps_rtc_r: RTC Mode = %08x & %08x\n", m_rtc_regs.mode, mem_mask );
+			verboselog(0, "ps_rtc_r: RTC Mode = %08x & %08x\n", m_rtc_regs.mode, mem_mask );
 			return m_rtc_regs.mode;
 		case 0x0004/4:
-			verboselog(machine(), 0, "ps_rtc_r: RTC Control = %08x & %08x\n", m_rtc_regs.control, mem_mask );
+			verboselog(0, "ps_rtc_r: RTC Control = %08x & %08x\n", m_rtc_regs.control, mem_mask );
 			return m_rtc_regs.control;
 		case 0x0008/4:
-			verboselog(machine(), 0, "ps_rtc_r: RTC Time = %08x & %08x\n", m_rtc_regs.time, mem_mask );
+			verboselog(0, "ps_rtc_r: RTC Time = %08x & %08x\n", m_rtc_regs.time, mem_mask );
 			return m_rtc_regs.time;
 		case 0x000c/4:
-			verboselog(machine(), 0, "ps_rtc_r: RTC Date = %08x & %08x\n", m_rtc_regs.date, mem_mask );
+			verboselog(0, "ps_rtc_r: RTC Date = %08x & %08x\n", m_rtc_regs.date, mem_mask );
 			return m_rtc_regs.date;
 		default:
-			verboselog(machine(), 0, "ps_rtc_r: Unknown Register %08x & %08x\n", 0x0b800000 + (offset << 2), mem_mask );
+			verboselog(0, "ps_rtc_r: Unknown Register %08x & %08x\n", 0x0b800000 + (offset << 2), mem_mask );
 			break;
 	}
 	return 0;
@@ -637,11 +612,11 @@ WRITE32_MEMBER(pockstat_state::ps_rtc_w)
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(machine(), 0, "ps_rtc_w: RTC Mode = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_rtc_w: RTC Mode = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&m_rtc_regs.mode);
 			break;
 		case 0x0004/4:
-			verboselog(machine(), 0, "ps_rtc_w: RTC Control = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_rtc_w: RTC Control = %08x & %08x\n", data, mem_mask );
 			if(m_rtc_regs.control == 1 && data == 1)
 			{
 				switch(m_rtc_regs.mode >> 1)
@@ -738,7 +713,7 @@ WRITE32_MEMBER(pockstat_state::ps_rtc_w)
 			}
 			break;
 		default:
-			verboselog(machine(), 0, "ps_rtc_w: Unknown Register %08x = %08x & %08x\n", 0x0b800000 + (offset << 2), data, mem_mask );
+			verboselog(0, "ps_rtc_w: Unknown Register %08x = %08x & %08x\n", 0x0b800000 + (offset << 2), data, mem_mask );
 			break;
 	}
 }
@@ -749,10 +724,10 @@ READ32_MEMBER(pockstat_state::ps_lcd_r)
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(machine(), 0, "ps_lcd_r: LCD Control = %08x & %08x\n", m_lcd_control | 0x100, mem_mask );
+			verboselog(0, "ps_lcd_r: LCD Control = %08x & %08x\n", m_lcd_control | 0x100, mem_mask );
 			return m_lcd_control;
 		default:
-			verboselog(machine(), 0, "ps_lcd_r: Unknown Register %08x & %08x\n", 0x0d000000 + (offset << 2), mem_mask );
+			verboselog(0, "ps_lcd_r: Unknown Register %08x & %08x\n", 0x0d000000 + (offset << 2), mem_mask );
 			break;
 	}
 	return 0;
@@ -763,11 +738,11 @@ WRITE32_MEMBER(pockstat_state::ps_lcd_w)
 	switch(offset)
 	{
 		case 0x0000/4:
-			verboselog(machine(), 0, "ps_lcd_w: LCD Control = %08x & %08x\n", data, mem_mask );
+			verboselog(0, "ps_lcd_w: LCD Control = %08x & %08x\n", data, mem_mask );
 			COMBINE_DATA(&m_lcd_control);
 			break;
 		default:
-			verboselog(machine(), 0, "ps_lcd_w: Unknown Register %08x = %08x & %08x\n", 0x0d000000 + (offset << 2), data, mem_mask );
+			verboselog(0, "ps_lcd_w: Unknown Register %08x = %08x & %08x\n", 0x0d000000 + (offset << 2), data, mem_mask );
 			break;
 	}
 }
@@ -776,11 +751,11 @@ INPUT_CHANGED_MEMBER(pockstat_state::input_update)
 {
 	UINT32 buttons = machine().root_device().ioport("BUTTONS")->read();
 
-	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_ACTION, (buttons &  1) ? 1 : 0);
-	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_RIGHT, (buttons &  2) ? 1 : 0);
-	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_LEFT,  (buttons &  4) ? 1 : 0);
-	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_DOWN,  (buttons &  8) ? 1 : 0);
-	ps_intc_set_interrupt_line(machine(), PS_INT_BTN_UP,    (buttons & 16) ? 1 : 0);
+	ps_intc_set_interrupt_line(PS_INT_BTN_ACTION, (buttons &  1) ? 1 : 0);
+	ps_intc_set_interrupt_line(PS_INT_BTN_RIGHT, (buttons &  2) ? 1 : 0);
+	ps_intc_set_interrupt_line(PS_INT_BTN_LEFT,  (buttons &  4) ? 1 : 0);
+	ps_intc_set_interrupt_line(PS_INT_BTN_DOWN,  (buttons &  8) ? 1 : 0);
+	ps_intc_set_interrupt_line(PS_INT_BTN_UP,    (buttons & 16) ? 1 : 0);
 }
 
 READ32_MEMBER(pockstat_state::ps_rombank_r)
@@ -830,13 +805,13 @@ WRITE32_MEMBER(pockstat_state::ps_flash_w)
 
 READ32_MEMBER(pockstat_state::ps_audio_r)
 {
-	verboselog(machine(), 0, "ps_audio_r: Unknown Read: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), 0x10, mem_mask);
+	verboselog(0, "ps_audio_r: Unknown Read: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), 0x10, mem_mask);
 	return 0;
 }
 
 WRITE32_MEMBER(pockstat_state::ps_audio_w)
 {
-	verboselog(machine(), 0, "ps_audio_w: Unknown Write: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), data, mem_mask);
+	verboselog(0, "ps_audio_w: Unknown Write: %08x = %08x & %08x\n", 0xd800000 + (offset << 2), data, mem_mask);
 }
 
 WRITE32_MEMBER(pockstat_state::ps_dac_w)

@@ -152,6 +152,19 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
 	IRQ_CALLBACK_MEMBER(pc88va_irq_callback);
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 calc_kanji_rom_addr(UINT8 jis1,UINT8 jis2,int x,int y);
+	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void tsp_sprite_enable(UINT32 spr_offset, UINT8 sw_bit);
+	void execute_sync_cmd();
+	void execute_dspon_cmd();
+	void execute_dspdef_cmd();
+	void execute_curdef_cmd();
+	void execute_actscr_cmd();
+	void execute_curs_cmd();
+	void execute_emul_cmd();
+	void execute_spron_cmd();
+	void execute_sprsw_cmd();
 };
 
 
@@ -160,13 +173,12 @@ void pc88va_state::video_start()
 {
 }
 
-static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void pc88va_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
-	UINT16 *tvram = (UINT16 *)(*state->memregion("tvram"));
+	UINT16 *tvram = (UINT16 *)(*memregion("tvram"));
 	int offs,i;
 
-	offs = state->m_tsp.spr_offset;
+	offs = m_tsp.spr_offset;
 	for(i=0;i<(0x100);i+=(8))
 	{
 		int xp,yp,sw,md,xsize,ysize,spda,fg_col,bc;
@@ -221,7 +233,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 						pen = pen & 1 ? fg_col : (bc) ? 8 : -1;
 
 						if(pen != -1) //transparent pen
-							bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = machine.pens[pen];
+							bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = machine().pens[pen];
 					}
 					spr_count+=2;
 				}
@@ -246,7 +258,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 						pen = (BITSWAP16(tvram[(spda+spr_count) / 2],7,6,5,4,3,2,1,0,15,14,13,12,11,10,9,8)) >> (16-(x_s*8)) & 0xf;
 
 						//if(bc != -1) //transparent pen
-						bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = machine.pens[pen];
+						bitmap.pix32(yp+y_i, xp+x_i+(x_s)) = machine().pens[pen];
 					}
 					spr_count+=2;
 				}
@@ -256,7 +268,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 }
 
 /* TODO: this is either a result of an hand-crafted ROM or the JIS stuff is really attribute related ... */
-static UINT32 calc_kanji_rom_addr(UINT8 jis1,UINT8 jis2,int x,int y)
+UINT32 pc88va_state::calc_kanji_rom_addr(UINT8 jis1,UINT8 jis2,int x,int y)
 {
 	if(jis1 < 0x30)
 		return ((jis2 & 0x60) << 8) + ((jis1 & 0x07) << 10) + ((jis2 & 0x1f) << 5);
@@ -270,11 +282,10 @@ static UINT32 calc_kanji_rom_addr(UINT8 jis1,UINT8 jis2,int x,int y)
 	return 0;
 }
 
-static void draw_text(running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void pc88va_state::draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
-	UINT8 *tvram = machine.root_device().memregion("tvram")->base();
-	UINT8 *kanji = state->memregion("kanji")->base();
+	UINT8 *tvram = machine().root_device().memregion("tvram")->base();
+	UINT8 *kanji = memregion("kanji")->base();
 	int xi,yi;
 	int x,y;
 	int res_x,res_y;
@@ -288,12 +299,12 @@ static void draw_text(running_machine &machine, bitmap_rgb32 &bitmap, const rect
 	//UINT8 blink,dwidc,dwid,uline,hline;
 	UINT8 screen_fg_col,screen_bg_col;
 
-	count = (tvram[state->m_tsp.tvram_vreg_offset+0] | tvram[state->m_tsp.tvram_vreg_offset+1] << 8);
+	count = (tvram[m_tsp.tvram_vreg_offset+0] | tvram[m_tsp.tvram_vreg_offset+1] << 8);
 
-	attr_mode = tvram[state->m_tsp.tvram_vreg_offset+0xa] & 0x1f;
+	attr_mode = tvram[m_tsp.tvram_vreg_offset+0xa] & 0x1f;
 	/* Note: bug in docs has the following two reversed */
-	screen_fg_col = (tvram[state->m_tsp.tvram_vreg_offset+0xb] & 0xf0) >> 4;
-	screen_bg_col = tvram[state->m_tsp.tvram_vreg_offset+0xb] & 0x0f;
+	screen_fg_col = (tvram[m_tsp.tvram_vreg_offset+0xb] & 0xf0) >> 4;
+	screen_bg_col = tvram[m_tsp.tvram_vreg_offset+0xb] & 0x0f;
 
 	for(y=0;y<13;y++)
 	{
@@ -305,7 +316,7 @@ static void draw_text(running_machine &machine, bitmap_rgb32 &bitmap, const rect
 
 			tile_num = calc_kanji_rom_addr(jis1,jis2,x,y);
 
-			attr = (tvram[count+state->m_tsp.attr_offset] & 0x00ff);
+			attr = (tvram[count+m_tsp.attr_offset] & 0x00ff);
 
 			fg_col = bg_col = reverse = secret = 0; //blink = dwidc = dwid = uline = hline = 0;
 
@@ -442,7 +453,7 @@ static void draw_text(running_machine &machine, bitmap_rgb32 &bitmap, const rect
 					if(secret) { pen = 0; } //hide text
 
 					if(pen != -1) //transparent
-						bitmap.pix32(res_y, res_x) = machine.pens[pen];
+						bitmap.pix32(res_y, res_x) = machine().pens[pen];
 				}
 			}
 
@@ -496,8 +507,8 @@ UINT32 pc88va_state::screen_update_pc88va(screen_device &screen, bitmap_rgb32 &b
 			{
 				switch(cur_pri_lv & 3) // (palette color mode)
 				{
-					case 0: draw_text(machine(),bitmap,cliprect); break;
-					case 1: if(m_tsp.spr_on) { draw_sprites(machine(),bitmap,cliprect); } break;
+					case 0: draw_text(bitmap,cliprect); break;
+					case 1: if(m_tsp.spr_on) { draw_sprites(bitmap,cliprect); } break;
 					case 2: /* A = graphic 0 */ break;
 					case 3: /* B = graphic 1 */ break;
 				}
@@ -697,18 +708,17 @@ WRITE8_MEMBER(pc88va_state::idp_command_w)
 	}
 }
 
-static void tsp_sprite_enable(running_machine &machine, UINT32 spr_offset, UINT8 sw_bit)
+void pc88va_state::tsp_sprite_enable(UINT32 spr_offset, UINT8 sw_bit)
 {
-	address_space &space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	space.write_word(spr_offset, space.read_word(spr_offset) & ~0x200);
 	space.write_word(spr_offset, space.read_word(spr_offset) | (sw_bit & 0x200));
 }
 
 /* TODO: very preliminary, needs something showable first */
-static void execute_sync_cmd(running_machine &machine)
+void pc88va_state::execute_sync_cmd()
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
 	    ???? ???? [0] - unknown
 	    ???? ???? [1] - unknown
@@ -736,8 +746,8 @@ static void execute_sync_cmd(running_machine &machine)
 	//printf("V border end: %d\n",(sync_cmd[0xc]));
 	//printf("V blank end: %d\n",(sync_cmd[0xd]));
 
-	x_vis_area = state->m_buf_ram[4] * 4;
-	y_vis_area = (state->m_buf_ram[0xa])|((state->m_buf_ram[0xb] & 0x40)<<2);
+	x_vis_area = m_buf_ram[4] * 4;
+	y_vis_area = (m_buf_ram[0xa])|((m_buf_ram[0xb] & 0x40)<<2);
 
 	visarea.set(0, x_vis_area - 1, 0, y_vis_area - 1);
 
@@ -748,24 +758,22 @@ static void execute_sync_cmd(running_machine &machine)
 
 	refresh = HZ_TO_ATTOSECONDS(60);
 
-	machine.primary_screen->configure(640, 480, visarea, refresh);
+	machine().primary_screen->configure(640, 480, visarea, refresh);
 }
 
-static void execute_dspon_cmd(running_machine &machine)
+void pc88va_state::execute_dspon_cmd()
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
 	[0] text table offset (hi word)
 	[1] unknown
 	[2] unknown
 	*/
-	state->m_tsp.tvram_vreg_offset = state->m_buf_ram[0] << 8;
-	state->m_tsp.disp_on = 1;
+	m_tsp.tvram_vreg_offset = m_buf_ram[0] << 8;
+	m_tsp.disp_on = 1;
 }
 
-static void execute_dspdef_cmd(running_machine &machine)
+void pc88va_state::execute_dspdef_cmd()
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
 	[0] attr offset (lo word)
 	[1] attr offset (hi word)
@@ -774,16 +782,15 @@ static void execute_dspdef_cmd(running_machine &machine)
 	[4] hline vertical position
 	[5] blink number
 	*/
-	state->m_tsp.attr_offset = state->m_buf_ram[0] | state->m_buf_ram[1] << 8;
-	state->m_tsp.pitch = (state->m_buf_ram[2] & 0xf0) >> 4;
-	state->m_tsp.line_height = state->m_buf_ram[3] + 1;
-	state->m_tsp.h_line_pos = state->m_buf_ram[4];
-	state->m_tsp.blink = (state->m_buf_ram[5] & 0xf8) >> 3;
+	m_tsp.attr_offset = m_buf_ram[0] | m_buf_ram[1] << 8;
+	m_tsp.pitch = (m_buf_ram[2] & 0xf0) >> 4;
+	m_tsp.line_height = m_buf_ram[3] + 1;
+	m_tsp.h_line_pos = m_buf_ram[4];
+	m_tsp.blink = (m_buf_ram[5] & 0xf8) >> 3;
 }
 
-static void execute_curdef_cmd(running_machine &machine)
+void pc88va_state::execute_curdef_cmd()
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
 	xxxx x--- [0] Sprite Cursor number (sprite RAM entry)
 	---- --x- [0] show cursor bit (actively modifies the spriteram entry)
@@ -791,27 +798,25 @@ static void execute_curdef_cmd(running_machine &machine)
 	*/
 
 	/* TODO: needs basic sprite emulation */
-	state->m_tsp.curn = (state->m_buf_ram[0] & 0xf8);
-	state->m_tsp.curn_blink = (state->m_buf_ram[0] & 1);
+	m_tsp.curn = (m_buf_ram[0] & 0xf8);
+	m_tsp.curn_blink = (m_buf_ram[0] & 1);
 
-	tsp_sprite_enable(machine, 0xa0000 + state->m_tsp.spr_offset + state->m_tsp.curn, (state->m_buf_ram[0] & 2) << 8);
+	tsp_sprite_enable(0xa0000 + m_tsp.spr_offset + m_tsp.curn, (m_buf_ram[0] & 2) << 8);
 }
 
-static void execute_actscr_cmd(running_machine &machine)
+void pc88va_state::execute_actscr_cmd()
 {
-	//pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
 	This command assigns a strip where the cursor is located.
 	xxxx xxxx [0] strip ID * 32 (???)
 	*/
 
 	/* TODO: no idea about this command */
-	//printf("ACTSCR: %02x\n",state->m_buf_ram[0]);
+	//printf("ACTSCR: %02x\n",m_buf_ram[0]);
 }
 
-static void execute_curs_cmd(running_machine &machine)
+void pc88va_state::execute_curs_cmd()
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
 	[0] Cursor Position Y (lo word)
 	[1] Cursor Position Y (hi word)
@@ -819,11 +824,11 @@ static void execute_curs_cmd(running_machine &machine)
 	[3] Cursor Position X (hi word)
 	*/
 
-	state->m_tsp.cur_pos_y = state->m_buf_ram[0] | state->m_buf_ram[1] << 8;
-	state->m_tsp.cur_pos_x = state->m_buf_ram[2] | state->m_buf_ram[3] << 8;
+	m_tsp.cur_pos_y = m_buf_ram[0] | m_buf_ram[1] << 8;
+	m_tsp.cur_pos_x = m_buf_ram[2] | m_buf_ram[3] << 8;
 }
 
-static void execute_emul_cmd(running_machine &machine)
+void pc88va_state::execute_emul_cmd()
 {
 	/*
 	[0] Emulate target strip ID x 32
@@ -836,9 +841,8 @@ static void execute_emul_cmd(running_machine &machine)
 	//popmessage("Warning: TSP executes EMUL command, contact MESSdev");
 }
 
-static void execute_spron_cmd(running_machine &machine)
+void pc88va_state::execute_spron_cmd()
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
 	[0] Sprite Table Offset (hi word)
 	[1] (unknown / reserved)
@@ -846,21 +850,20 @@ static void execute_spron_cmd(running_machine &machine)
 	---- --x- [2] MG: all sprites are 2x zoomed vertically when 1
 	---- ---x [2] GR: 1 to enable the group collision detection
 	*/
-	state->m_tsp.spr_offset = state->m_buf_ram[0] << 8;
-	state->m_tsp.spr_on = 1;
-	printf("SPR TABLE %02x %02x %02x\n",state->m_buf_ram[0],state->m_buf_ram[1],state->m_buf_ram[2]);
+	m_tsp.spr_offset = m_buf_ram[0] << 8;
+	m_tsp.spr_on = 1;
+	printf("SPR TABLE %02x %02x %02x\n",m_buf_ram[0],m_buf_ram[1],m_buf_ram[2]);
 }
 
-static void execute_sprsw_cmd(running_machine &machine)
+void pc88va_state::execute_sprsw_cmd()
 {
-	pc88va_state *state = machine.driver_data<pc88va_state>();
 	/*
 	Toggle an individual sprite in the sprite ram entry
 	[0] xxxx x--- target sprite number
 	[0] ---- --x- sprite off/on switch
 	*/
 
-	tsp_sprite_enable(machine, 0xa0000 + state->m_tsp.spr_offset + (state->m_buf_ram[0] & 0xf8), (state->m_buf_ram[0] & 2) << 8);
+	tsp_sprite_enable(0xa0000 + m_tsp.spr_offset + (m_buf_ram[0] & 0xf8), (m_buf_ram[0] & 2) << 8);
 }
 
 WRITE8_MEMBER(pc88va_state::idp_param_w)
@@ -876,15 +879,15 @@ WRITE8_MEMBER(pc88va_state::idp_param_w)
 		m_buf_index = 0;
 		switch(m_cmd)
 		{
-			case SYNC:      execute_sync_cmd(machine());    break;
-			case DSPON:     execute_dspon_cmd(machine());   break;
-			case DSPDEF:    execute_dspdef_cmd(machine()); break;
-			case CURDEF:    execute_curdef_cmd(machine()); break;
-			case ACTSCR:    execute_actscr_cmd(machine()); break;
-			case CURS:      execute_curs_cmd(machine());   break;
-			case EMUL:      execute_emul_cmd(machine());   break;
-			case SPRON:     execute_spron_cmd(machine());  break;
-			case SPRSW:     execute_sprsw_cmd(machine());   break;
+			case SYNC:      execute_sync_cmd();    break;
+			case DSPON:     execute_dspon_cmd();   break;
+			case DSPDEF:    execute_dspdef_cmd(); break;
+			case CURDEF:    execute_curdef_cmd(); break;
+			case ACTSCR:    execute_actscr_cmd(); break;
+			case CURS:      execute_curs_cmd();   break;
+			case EMUL:      execute_emul_cmd();   break;
+			case SPRON:     execute_spron_cmd();  break;
+			case SPRSW:     execute_sprsw_cmd();   break;
 
 			default:
 				//printf("%02x\n",data);

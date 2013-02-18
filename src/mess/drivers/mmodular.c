@@ -205,9 +205,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_update_irq2);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_update_irq_academy);
 	void common_chess_start();
+	UINT8 convert_imputmask(UINT8 input);
+	UINT8 convertMCIV2LED(UINT8 codedchar);
+	void write_IOenable(unsigned char data,address_space &space);
 };
 
-static UINT8 convert_imputmask(UINT8 input)
+UINT8 polgar_state::convert_imputmask(UINT8 input)
 {
 	input^=0xff;
 	switch (input) {
@@ -513,7 +516,7 @@ WRITE8_MEMBER(polgar_state::polgar_write_LED)
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
-static UINT8 convertMCIV2LED(UINT8 codedchar)
+UINT8 polgar_state::convertMCIV2LED(UINT8 codedchar)
 {
 	UINT8 data = 0;
 	if (BIT(codedchar,0)) data |= 0x80;
@@ -857,7 +860,8 @@ WRITE16_MEMBER(polgar_state::write_LCD_data)
 
 }
 
-static void write_IOenable(unsigned char data,address_space &space) {
+void polgar_state::write_IOenable(unsigned char data,address_space &space)
+{
 	hd44780_device * hd44780 = space.machine().device<hd44780_device>("hd44780");
 	device_t *speaker = space.machine().device("beep");
 

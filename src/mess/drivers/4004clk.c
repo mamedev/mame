@@ -30,6 +30,9 @@ public:
 	UINT8 m_timer;
 	virtual void machine_start();
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
+	UINT8 nixie_to_num(UINT16 val);
+	inline void output_set_nixie_value(int index, int value);
+	inline void output_set_neon_value(int index, int value);
 };
 
 READ8_MEMBER(nixieclock_state::data_r)
@@ -37,7 +40,7 @@ READ8_MEMBER(nixieclock_state::data_r)
 	return ioport("INPUT")->read() & 0x0f;
 }
 
-static UINT8 nixie_to_num(UINT16 val)
+UINT8 nixieclock_state::nixie_to_num(UINT16 val)
 {
 	if (BIT(val,0)) return 0;
 	if (BIT(val,1)) return 1;
@@ -52,12 +55,12 @@ static UINT8 nixie_to_num(UINT16 val)
 	return 10;
 }
 
-INLINE void output_set_nixie_value(int index, int value)
+inline void nixieclock_state::output_set_nixie_value(int index, int value)
 {
 	output_set_indexed_value("nixie", index, value);
 }
 
-INLINE void output_set_neon_value(int index, int value)
+inline void nixieclock_state::output_set_neon_value(int index, int value)
 {
 	output_set_indexed_value("neon", index, value);
 }

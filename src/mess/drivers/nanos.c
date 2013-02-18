@@ -90,6 +90,7 @@ protected:
 	required_ioport m_line5;
 	required_ioport m_line6;
 	required_ioport m_linec;
+	UINT8 row_number(UINT8 code);
 };
 
 
@@ -366,7 +367,8 @@ WRITE8_MEMBER(nanos_state::nanos_port_b_w)
 	}
 }
 
-static UINT8 row_number(UINT8 code) {
+UINT8 nanos_state::row_number(UINT8 code)
+{
 	if BIT(code,0) return 0;
 	if BIT(code,1) return 1;
 	if BIT(code,2) return 2;

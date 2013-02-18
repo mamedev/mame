@@ -196,6 +196,12 @@ public:
 	virtual void machine_reset();
 	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
 	DECLARE_WRITE8_MEMBER(dectalk_kbd_put);
+	void dectalk_outfifo_check ();
+	void dectalk_clear_all_fifos(  );
+	void dectalk_x2212_store(  );
+	void dectalk_x2212_recall(  );
+	void dectalk_semaphore_w ( UINT16 data );
+	UINT16 dectalk_outfifo_r (  );
 };
 
 
@@ -247,79 +253,73 @@ static const duart68681_config dectalk_duart68681_config =
 #define SPC_INITIALIZE state->m_m68k_spcflags_latch&0x1 // speech initialize flag
 #define SPC_IRQ_ENABLED ((state->m_m68k_spcflags_latch&0x40)>>6) // irq enable flag
 
-static void dectalk_outfifo_check (running_machine &machine)
+void dectalk_state::dectalk_outfifo_check ()
 {
-	dectalk_state *state = machine.driver_data<dectalk_state>();
 	// check if output fifo is full; if it isn't, set the int on the dsp
-	if (((state->m_outfifo_head_ptr-1)&0xF) != state->m_outfifo_tail_ptr)
-	machine.device("dsp")->execute().set_input_line(0, ASSERT_LINE); // TMS32010 INT
+	if (((m_outfifo_head_ptr-1)&0xF) != m_outfifo_tail_ptr)
+	machine().device("dsp")->execute().set_input_line(0, ASSERT_LINE); // TMS32010 INT
 	else
-	machine.device("dsp")->execute().set_input_line(0, CLEAR_LINE); // TMS32010 INT
+	machine().device("dsp")->execute().set_input_line(0, CLEAR_LINE); // TMS32010 INT
 }
 
-static void dectalk_clear_all_fifos( running_machine &machine )
+void dectalk_state::dectalk_clear_all_fifos(  )
 {
-	dectalk_state *state = machine.driver_data<dectalk_state>();
 	// clear fifos (TODO: memset would work better here...)
 	int i;
-	for (i=0; i<16; i++) state->m_outfifo[i] = 0;
-	for (i=0; i<32; i++) state->m_infifo[i] = 0;
-	state->m_outfifo_tail_ptr = state->m_outfifo_head_ptr = 0;
-	state->m_infifo_tail_ptr = state->m_infifo_head_ptr = 0;
-	dectalk_outfifo_check(machine);
+	for (i=0; i<16; i++) m_outfifo[i] = 0;
+	for (i=0; i<32; i++) m_infifo[i] = 0;
+	m_outfifo_tail_ptr = m_outfifo_head_ptr = 0;
+	m_infifo_tail_ptr = m_infifo_head_ptr = 0;
+	dectalk_outfifo_check();
 }
 
-static void dectalk_x2212_store( running_machine &machine )
+void dectalk_state::dectalk_x2212_store(  )
 {
-	dectalk_state *state = machine.driver_data<dectalk_state>();
-	UINT8 *nvram = state->memregion("nvram")->base();
+	UINT8 *nvram = memregion("nvram")->base();
 	int i;
 	for (i = 0; i < 256; i++)
-	nvram[i] = state->m_x2214_sram[i];
+	nvram[i] = m_x2214_sram[i];
 #ifdef NVRAM_LOG
 	logerror("nvram store done\n");
 #endif
 }
 
-static void dectalk_x2212_recall( running_machine &machine )
+void dectalk_state::dectalk_x2212_recall(  )
 {
-	dectalk_state *state = machine.driver_data<dectalk_state>();
-	UINT8 *nvram = state->memregion("nvram")->base();
+	UINT8 *nvram = memregion("nvram")->base();
 	int i;
 	for (i = 0; i < 256; i++)
-	state->m_x2214_sram[i] = nvram[i];
+	m_x2214_sram[i] = nvram[i];
 #ifdef NVRAM_LOG
 	logerror("nvram recall done\n");
 #endif
 }
 
 // helper for dsp infifo_semaphore flag to make dealing with interrupts easier
-static void dectalk_semaphore_w ( running_machine &machine, UINT16 data )
+void dectalk_state::dectalk_semaphore_w ( UINT16 data )
 {
-	dectalk_state *state = machine.driver_data<dectalk_state>();
-	state->m_infifo_semaphore = data&1;
-	if ((state->m_infifo_semaphore == 1) && (state->m_m68k_spcflags_latch&0x40))
+	m_infifo_semaphore = data&1;
+	if ((m_infifo_semaphore == 1) && (m_m68k_spcflags_latch&0x40))
 	{
 #ifdef VERBOSE
 		logerror("speech int fired!\n");
 #endif
-		machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
+		machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_5, ASSERT_LINE, M68K_INT_ACK_AUTOVECTOR);
 	}
 	else
-	machine.device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
+	machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_5, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
 }
 
 // read the output fifo and set the interrupt line active on the dsp
-static UINT16 dectalk_outfifo_r ( running_machine &machine )
+UINT16 dectalk_state::dectalk_outfifo_r (  )
 {
-	dectalk_state *state = machine.driver_data<dectalk_state>();
 	UINT16 data = 0xFFFF;
-	data = state->m_outfifo[state->m_outfifo_tail_ptr];
+	data = m_outfifo[m_outfifo_tail_ptr];
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
-	//if (state->m_outfifo_tail_ptr != state->m_outfifo_head_ptr) state->m_outfifo_tail_ptr++; // technically correct but doesn't match sn74ls224 sheet
-	if (((state->m_outfifo_head_ptr-1)&0xF) != state->m_outfifo_tail_ptr) state->m_outfifo_tail_ptr++; // matches sn74ls224 sheet
-	state->m_outfifo_tail_ptr&=0xF;
-	dectalk_outfifo_check(machine);
+	//if (m_outfifo_tail_ptr != m_outfifo_head_ptr) m_outfifo_tail_ptr++; // technically correct but doesn't match sn74ls224 sheet
+	if (((m_outfifo_head_ptr-1)&0xF) != m_outfifo_tail_ptr) m_outfifo_tail_ptr++; // matches sn74ls224 sheet
+	m_outfifo_tail_ptr&=0xF;
+	dectalk_outfifo_check();
 	return ((data&0xfff0)^0x8000); // yes this is right, top bit is inverted and bottom 4 are ignored
 	//return data; // not right but want to get it working first
 }
@@ -331,13 +331,13 @@ static void dectalk_reset(device_t *device)
 	state->m_hack_self_test = 0; // hack
 	// stuff that is DIRECTLY affected by the RESET line
 	state->m_statusLED = 0; // clear status led latch
-	dectalk_x2212_recall(device->machine()); // nvram recall
+	state->dectalk_x2212_recall(); // nvram recall
 	state->m_m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	state->m_m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
 	device->machine().device("duart68681")->reset(); // reset the DUART
 	// stuff that is INDIRECTLY affected by the RESET line
-	dectalk_clear_all_fifos(device->machine()); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
-	dectalk_semaphore_w(device->machine(), 0); // on the original state->m_dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
+	state->dectalk_clear_all_fifos(); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
+	state->dectalk_semaphore_w(0); // on the original state->m_dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
 	state->m_spc_error_latch = 0; // spc error latch is cleared on /reset
 	device->machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 	state->m_tlc_tonedetect = 0; // TODO, needed for selftest pass
@@ -362,7 +362,7 @@ READ8_MEMBER(dectalk_state::nvram_read)// read from x2212 nvram chip and possibl
 		logerror("m68k: nvram read at %08X: %02X\n", offset, data);
 #endif
 	if (offset&0x200) // if a9 is set, do a /RECALL
-	dectalk_x2212_recall(machine());
+	dectalk_x2212_recall();
 	return data;
 }
 
@@ -383,7 +383,7 @@ WRITE8_MEMBER(dectalk_state::nvram_write)// write to X2212 NVRAM chip and possib
 #endif
 	m_x2214_sram[offset&0xff] = (UINT8)data&0x0f; // TODO: should this be before or after a possible /STORE? I'm guessing before.
 	if (offset&0x200) // if a9 is set, do a /STORE
-	dectalk_x2212_store(machine());
+	dectalk_x2212_store();
 }
 
 WRITE16_MEMBER(dectalk_state::m68k_infifo_w)// 68k write to the speech input fifo
@@ -434,11 +434,11 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 #ifdef SPC_LOG_68K
 		logerror(" | 0x01: initialize speech: fifos reset, clear error+semaphore latches and dsp reset\n");
 #endif
-		dectalk_clear_all_fifos(machine());
+		dectalk_clear_all_fifos();
 		machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 		// clear the two speech side latches
 		m_spc_error_latch = 0;
-		dectalk_semaphore_w(machine(), 0);
+		dectalk_semaphore_w(0);
 	}
 	else // (data&0x1) == 0
 	{
@@ -454,7 +454,7 @@ WRITE16_MEMBER(dectalk_state::m68k_spcflags_w)// 68k write to the speech flags (
 #endif
 		// clear the two speech side latches
 		m_spc_error_latch = 0;
-		dectalk_semaphore_w(machine(), 0);
+		dectalk_semaphore_w(0);
 	}
 	if ((data&0x40) == 0x40) // bit 6 - spc irq enable
 	{
@@ -572,7 +572,7 @@ WRITE16_MEMBER(dectalk_state::spc_latch_outfifo_error_stats)// latch 74ls74 @ E6
 #ifdef SPC_LOG_DSP
 	logerror("dsp: set fifo semaphore and set error status = %01X\n",data&1);
 #endif
-	dectalk_semaphore_w(machine(), (~m_simulate_outfifo_error)&1); // always set to 1 here, unless outfifo error.
+	dectalk_semaphore_w((~m_simulate_outfifo_error)&1); // always set to 1 here, unless outfifo error.
 	m_spc_error_latch = (data&1);
 }
 
@@ -608,7 +608,7 @@ WRITE16_MEMBER(dectalk_state::spc_outfifo_data_w)
 	m_outfifo[m_outfifo_head_ptr] = data;
 	m_outfifo_head_ptr++;
 	m_outfifo_head_ptr&=0xF;
-	//dectalk_outfifo_check(machine()); // commented to allow int to clear
+	//dectalk_outfifo_check(); // commented to allow int to clear
 }
 
 READ16_MEMBER(dectalk_state::spc_semaphore_r)// Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
@@ -703,7 +703,7 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 {
 	UINT16 data;
 	dac_device *speaker = machine().device<dac_device>("dac");
-	data = dectalk_outfifo_r(machine());
+	data = dectalk_outfifo_r();
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
 #endif
@@ -714,7 +714,7 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
 DRIVER_INIT_MEMBER(dectalk_state,dectalk)
 {
-	dectalk_clear_all_fifos(machine());
+	dectalk_clear_all_fifos();
 	m_simulate_outfifo_error = 0;
 	machine().scheduler().timer_set(attotime::from_hz(10000), timer_expired_delegate(FUNC(dectalk_state::outfifo_read_cb),this));
 }

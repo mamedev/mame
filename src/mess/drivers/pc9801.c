@@ -655,6 +655,7 @@ public:
 
 	DECLARE_DRIVER_INIT(pc9801_kanji);
 	IRQ_CALLBACK_MEMBER(irq_callback);
+	inline void set_dma_channel(int channel, int state);
 };
 
 
@@ -3036,16 +3037,15 @@ WRITE8_MEMBER(pc9801_state::pc9801_dma_write_byte)
 	program.write_byte(addr, data);
 }
 
-static void set_dma_channel(running_machine &machine, int channel, int state)
+void pc9801_state::set_dma_channel(int channel, int state)
 {
-	pc9801_state *drvstate = machine.driver_data<pc9801_state>();
-	if (!state) drvstate->m_dack = channel;
+	if (!state) m_dack = channel;
 }
 
-WRITE_LINE_MEMBER(pc9801_state::pc9801_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma_channel(machine(), 0, state); }
-WRITE_LINE_MEMBER(pc9801_state::pc9801_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(machine(), 1, state); }
-WRITE_LINE_MEMBER(pc9801_state::pc9801_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(machine(), 2, state); }
-WRITE_LINE_MEMBER(pc9801_state::pc9801_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(machine(), 3, state); }
+WRITE_LINE_MEMBER(pc9801_state::pc9801_dack0_w){ /*printf("%02x 0\n",state);*/ set_dma_channel(0, state); }
+WRITE_LINE_MEMBER(pc9801_state::pc9801_dack1_w){ /*printf("%02x 1\n",state);*/ set_dma_channel(1, state); }
+WRITE_LINE_MEMBER(pc9801_state::pc9801_dack2_w){ /*printf("%02x 2\n",state);*/ set_dma_channel(2, state); }
+WRITE_LINE_MEMBER(pc9801_state::pc9801_dack3_w){ /*printf("%02x 3\n",state);*/ set_dma_channel(3, state); }
 
 READ8_MEMBER(pc9801_state::fdc_2hd_r)
 {

@@ -199,6 +199,8 @@ public:
 	DECLARE_READ8_MEMBER(vtech1_printer_r);
 	DECLARE_WRITE8_MEMBER(vtech1_strobe_w);
 	DECLARE_READ8_MEMBER(vtech1_mc6847_videoram_r);
+	void vtech1_get_track();
+	void vtech1_put_track();
 };
 
 
@@ -283,41 +285,39 @@ static void vtech1_load_proc(device_image_interface &image)
 		vtech1->m_fdc_wrprot[id] = 0x80;
 }
 
-static void vtech1_get_track(running_machine &machine)
+void vtech1_state::vtech1_get_track()
 {
-	vtech1_state *vtech1 = machine.driver_data<vtech1_state>();
-	device_image_interface *image = dynamic_cast<device_image_interface *>(floppy_get_device(machine,vtech1->m_drive));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(floppy_get_device(machine(),m_drive));
 
 	/* drive selected or and image file ok? */
-	if (vtech1->m_drive >= 0 && image->exists())
+	if (m_drive >= 0 && image->exists())
 	{
 		int size, offs;
 		size = TRKSIZE_VZ;
-		offs = TRKSIZE_VZ * vtech1->m_fdc_track_x2[vtech1->m_drive]/2;
+		offs = TRKSIZE_VZ * m_fdc_track_x2[m_drive]/2;
 		image->fseek(offs, SEEK_SET);
-		size = image->fread(vtech1->m_fdc_data, size);
+		size = image->fread(m_fdc_data, size);
 		if (LOG_VTECH1_FDC)
 			logerror("get track @$%05x $%04x bytes\n", offs, size);
 	}
-	vtech1->m_fdc_offs = 0;
-	vtech1->m_fdc_write = 0;
+	m_fdc_offs = 0;
+	m_fdc_write = 0;
 }
 
-static void vtech1_put_track(running_machine &machine)
+void vtech1_state::vtech1_put_track()
 {
-	vtech1_state *vtech1 = machine.driver_data<vtech1_state>();
 
 
 	/* drive selected and image file ok? */
-	if (vtech1->m_drive >= 0 && floppy_get_device(machine,vtech1->m_drive) != NULL)
+	if (m_drive >= 0 && floppy_get_device(machine(),m_drive) != NULL)
 	{
 		int size, offs;
-		device_image_interface *image = dynamic_cast<device_image_interface *>(floppy_get_device(machine,vtech1->m_drive));
-		offs = TRKSIZE_VZ * vtech1->m_fdc_track_x2[vtech1->m_drive]/2;
-		image->fseek(offs + vtech1->m_fdc_start, SEEK_SET);
-		size = image->fwrite(&vtech1->m_fdc_data[vtech1->m_fdc_start], vtech1->m_fdc_write);
+		device_image_interface *image = dynamic_cast<device_image_interface *>(floppy_get_device(machine(),m_drive));
+		offs = TRKSIZE_VZ * m_fdc_track_x2[m_drive]/2;
+		image->fseek(offs + m_fdc_start, SEEK_SET);
+		size = image->fwrite(&m_fdc_data[m_fdc_start], m_fdc_write);
 		if (LOG_VTECH1_FDC)
-			logerror("put track @$%05X+$%X $%04X/$%04X bytes\n", offs, vtech1->m_fdc_start, size, vtech1->m_fdc_write);
+			logerror("put track @$%05X+$%X $%04X/$%04X bytes\n", offs, m_fdc_start, size, m_fdc_write);
 	}
 }
 
@@ -380,7 +380,7 @@ WRITE8_MEMBER(vtech1_state::vtech1_fdc_w)
 		{
 			m_drive = drive;
 			if (m_drive >= 0)
-				vtech1_get_track(machine());
+				vtech1_get_track();
 		}
 		if (m_drive >= 0)
 		{
@@ -394,7 +394,7 @@ WRITE8_MEMBER(vtech1_state::vtech1_fdc_w)
 				if (LOG_VTECH1_FDC)
 					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepout track #%2d.%d\n", offset, data, m_drive, m_fdc_track_x2[m_drive]/2,5*(m_fdc_track_x2[m_drive]&1));
 				if ((m_fdc_track_x2[m_drive] & 1) == 0)
-					vtech1_get_track(machine());
+					vtech1_get_track();
 			}
 			else
 			if ((PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI3(m_fdc_latch)) ||
@@ -407,7 +407,7 @@ WRITE8_MEMBER(vtech1_state::vtech1_fdc_w)
 				if (LOG_VTECH1_FDC)
 					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepin track #%2d.%d\n", offset, data, m_drive, m_fdc_track_x2[m_drive]/2,5*(m_fdc_track_x2[m_drive]&1));
 				if ((m_fdc_track_x2[m_drive] & 1) == 0)
-					vtech1_get_track(machine());
+					vtech1_get_track();
 			}
 			if ((data & 0x40) == 0)
 			{
@@ -452,7 +452,7 @@ WRITE8_MEMBER(vtech1_state::vtech1_fdc_w)
 				{
 					/* data written to track before? */
 					if (m_fdc_write)
-						vtech1_put_track(machine());
+						vtech1_put_track();
 				}
 				m_fdc_bits = 8;
 				m_fdc_write = 0;

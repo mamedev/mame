@@ -196,14 +196,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(pit8253_clk0_irq);
 	DECLARE_WRITE_LINE_MEMBER(mz2500_rtc_alarm_irq);
 
-	void draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr);
-	void draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr);
-	void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
-	void draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri);
-	void draw_cg256_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri);
-	void draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect);
-	void draw_cg_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
+	void draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr);
+	void draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr);
+	void draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
+	void draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri);
+	void draw_cg256_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri);
+	void draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_cg_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 
+	void mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,UINT16  pen,UINT8 width,UINT8 height);
+	void mz2500_reconfigure_screen();
+	UINT8 pal_256_param(int index, int param);
+	void mz2500_reset(mz2500_state *state, UINT8 type);
 };
 
 
@@ -212,7 +216,6 @@ public:
 #define WRAM_RESET 0
 #define IPL_RESET 1
 
-static void mz2500_reset(mz2500_state *state, UINT8 type);
 static const UINT8 bank_reset_val[2][8] =
 {
 	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
@@ -236,30 +239,30 @@ void mz2500_state::video_start()
 */
 
 /* helper function, to draw stuff without getting crazy with height / width conditions :) */
-static void mz2500_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int x,int y,UINT16  pen,UINT8 width,UINT8 height)
+void mz2500_state::mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,UINT16  pen,UINT8 width,UINT8 height)
 {
 	if(width && height)
 	{
-		bitmap.pix16(y*2+0, x*2+0) = machine.pens[pen];
-		bitmap.pix16(y*2+0, x*2+1) = machine.pens[pen];
-		bitmap.pix16(y*2+1, x*2+0) = machine.pens[pen];
-		bitmap.pix16(y*2+1, x*2+1) = machine.pens[pen];
+		bitmap.pix16(y*2+0, x*2+0) = machine().pens[pen];
+		bitmap.pix16(y*2+0, x*2+1) = machine().pens[pen];
+		bitmap.pix16(y*2+1, x*2+0) = machine().pens[pen];
+		bitmap.pix16(y*2+1, x*2+1) = machine().pens[pen];
 	}
 	else if(width)
 	{
-		bitmap.pix16(y, x*2+0) = machine.pens[pen];
-		bitmap.pix16(y, x*2+1) = machine.pens[pen];
+		bitmap.pix16(y, x*2+0) = machine().pens[pen];
+		bitmap.pix16(y, x*2+1) = machine().pens[pen];
 	}
 	else if(height)
 	{
-		bitmap.pix16(y*2+0, x) = machine.pens[pen];
-		bitmap.pix16(y*2+1, x) = machine.pens[pen];
+		bitmap.pix16(y*2+0, x) = machine().pens[pen];
+		bitmap.pix16(y*2+1, x) = machine().pens[pen];
 	}
 	else
-		bitmap.pix16(y, x) = machine.pens[pen];
+		bitmap.pix16(y, x) = machine().pens[pen];
 }
 
-void mz2500_state::draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr)
+void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,UINT16 map_addr)
 {
 	UINT8 *vram = m_main_ram; // TODO
 	int x,y,count,xi,yi;
@@ -337,7 +340,7 @@ void mz2500_state::draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,con
 					if(pen)
 					{
 						if((res_y) >= 0 && (res_y) < 200*y_step)
-							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(m_pal_select ? 0x00 : 0x10),0,0);
+							mz2500_draw_pixel(bitmap,res_x,res_y,pen+(m_pal_select ? 0x00 : 0x10),0,0);
 					}
 				}
 			}
@@ -348,7 +351,7 @@ void mz2500_state::draw_80x25(running_machine &machine, bitmap_ind16 &bitmap,con
 	}
 }
 
-void mz2500_state::draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr)
+void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,UINT16 map_addr)
 {
 	UINT8 *vram = m_main_ram; // TODO
 	int x,y,count,xi,yi;
@@ -427,7 +430,7 @@ void mz2500_state::draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,con
 					if(pen)
 					{
 						if((res_y) >= 0 && (res_y) < 200*y_step)
-							mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen+(m_pal_select ? 0x00 : 0x10),m_scr_x_size == 640,0);
+							mz2500_draw_pixel(bitmap,res_x,res_y,pen+(m_pal_select ? 0x00 : 0x10),m_scr_x_size == 640,0);
 					}
 				}
 			}
@@ -438,7 +441,7 @@ void mz2500_state::draw_40x25(running_machine &machine, bitmap_ind16 &bitmap,con
 	}
 }
 
-void mz2500_state::draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
+void mz2500_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
 	UINT32 count;
 	UINT8 *vram = m_main_ram; // TODO
@@ -471,7 +474,7 @@ void mz2500_state::draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitma
 
 				{
 					//if(pri == ((m_clut256[pen] & 0x100) >> 8))
-					mz2500_draw_pixel(machine,bitmap,res_x,res_y,pen,0,0);
+					mz2500_draw_pixel(bitmap,res_x,res_y,pen,0,0);
 				}
 			}
 			count++;
@@ -479,7 +482,7 @@ void mz2500_state::draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitma
 	}
 }
 
-void mz2500_state::draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri)
+void mz2500_state::draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri)
 {
 	UINT32 count;
 	UINT8 *vram = m_main_ram; //TODO
@@ -526,7 +529,7 @@ void mz2500_state::draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitm
 					pen |= pen_bit[pen_i];
 
 				if(pri == ((m_clut16[pen] & 0x10) >> 4) && m_clut16[pen] != 0x00 && pen_mask) //correct?
-					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(m_clut16[pen] & 0x0f)+0x10,(x_size == 320 && m_scr_x_size == 640),cg_interlace == 2);
+					mz2500_draw_pixel(bitmap,res_x,res_y,(m_clut16[pen] & 0x0f)+0x10,(x_size == 320 && m_scr_x_size == 640),cg_interlace == 2);
 			}
 			count++;
 			count&=((base_mask<<8) | 0xff);
@@ -536,7 +539,7 @@ void mz2500_state::draw_cg16_screen(running_machine &machine, bitmap_ind16 &bitm
 	}
 }
 
-void mz2500_state::draw_cg256_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri)
+void mz2500_state::draw_cg256_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri)
 {
 	UINT32 count;
 	UINT8 *vram = m_main_ram;
@@ -583,7 +586,7 @@ void mz2500_state::draw_cg256_screen(running_machine &machine, bitmap_ind16 &bit
 					pen |= pen_bit[pen_i];
 
 				if(pri == ((m_clut256[pen] & 0x100) >> 8))
-					mz2500_draw_pixel(machine,bitmap,res_x,res_y,(m_clut256[pen] & 0xff)+0x100,m_scr_x_size == 640,cg_interlace == 2);
+					mz2500_draw_pixel(bitmap,res_x,res_y,(m_clut256[pen] & 0xff)+0x100,m_scr_x_size == 640,cg_interlace == 2);
 			}
 			count++;
 			count&=((base_mask<<8) | 0xff);
@@ -593,7 +596,7 @@ void mz2500_state::draw_cg256_screen(running_machine &machine, bitmap_ind16 &bit
 	}
 }
 
-void mz2500_state::draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void mz2500_state::draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	UINT16 base_addr;
 
@@ -603,7 +606,7 @@ void mz2500_state::draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap
 //  popmessage("%d %d %d %d",m_tv_hs,(m_tv_he),m_tv_vs,(m_tv_ve));
 
 	if(m_text_col_size)
-		draw_80x25(machine,bitmap,cliprect,base_addr);
+		draw_80x25(bitmap,cliprect,base_addr);
 	else
 	{
 		int tv_mode;
@@ -613,24 +616,24 @@ void mz2500_state::draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap
 		switch(tv_mode & 3)
 		{
 			case 0: //mixed 6bpp mode, TODO
-				draw_40x25(machine,bitmap,cliprect,0,base_addr);
+				draw_40x25(bitmap,cliprect,0,base_addr);
 				break;
 			case 1:
-				draw_40x25(machine,bitmap,cliprect,0,base_addr);
+				draw_40x25(bitmap,cliprect,0,base_addr);
 				break;
 			case 2:
-				draw_40x25(machine,bitmap,cliprect,1,base_addr);
+				draw_40x25(bitmap,cliprect,1,base_addr);
 				break;
 			case 3:
-				draw_40x25(machine,bitmap,cliprect,1,base_addr);
-				draw_40x25(machine,bitmap,cliprect,0,base_addr);
+				draw_40x25(bitmap,cliprect,1,base_addr);
+				draw_40x25(bitmap,cliprect,0,base_addr);
 				break;
 			//default: popmessage("%02x %02x %02x",tv_mode & 3,m_text_reg[1],m_text_reg[2]); break;
 		}
 	}
 }
 
-void mz2500_state::draw_cg_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
+void mz2500_state::draw_cg_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
 	//popmessage("%02x %02x",m_cg_reg[0x0e],m_cg_reg[0x18]);
 
@@ -639,24 +642,24 @@ void mz2500_state::draw_cg_screen(running_machine &machine, bitmap_ind16 &bitmap
 		case 0x00:
 			break;
 		case 0x03:
-			draw_cg4_screen(machine,bitmap,cliprect,0);
+			draw_cg4_screen(bitmap,cliprect,0);
 			break;
 		case 0x14:
-			draw_cg16_screen(machine,bitmap,cliprect,0,320,pri);
-			draw_cg16_screen(machine,bitmap,cliprect,1,320,pri);
+			draw_cg16_screen(bitmap,cliprect,0,320,pri);
+			draw_cg16_screen(bitmap,cliprect,1,320,pri);
 			break;
 		case 0x15:
-			draw_cg16_screen(machine,bitmap,cliprect,1,320,pri);
-			draw_cg16_screen(machine,bitmap,cliprect,0,320,pri);
+			draw_cg16_screen(bitmap,cliprect,1,320,pri);
+			draw_cg16_screen(bitmap,cliprect,0,320,pri);
 			break;
 		case 0x17:
-			draw_cg16_screen(machine,bitmap,cliprect,0,640,pri);
+			draw_cg16_screen(bitmap,cliprect,0,640,pri);
 			break;
 		case 0x1d:
-			draw_cg256_screen(machine,bitmap,cliprect,0,pri);
+			draw_cg256_screen(bitmap,cliprect,0,pri);
 			break;
 		case 0x97:
-			draw_cg16_screen(machine,bitmap,cliprect,2,640,pri);
+			draw_cg16_screen(bitmap,cliprect,2,640,pri);
 			break;
 		default:
 			popmessage("Unsupported CG mode %02x, contact MESS dev",m_cg_reg[0x0e]);
@@ -671,9 +674,9 @@ UINT32 mz2500_state::screen_update_mz2500(screen_device &screen, bitmap_ind16 &b
 	if(m_screen_enable)
 		return 0;
 
-	draw_cg_screen(machine(),bitmap,cliprect,0);
-	draw_tv_screen(machine(),bitmap,cliprect);
-	draw_cg_screen(machine(),bitmap,cliprect,1);
+	draw_cg_screen(bitmap,cliprect,0);
+	draw_tv_screen(bitmap,cliprect);
+	draw_cg_screen(bitmap,cliprect,1);
 	//  popmessage("%02x (%02x %02x) (%02x %02x) (%02x %02x) (%02x %02x)",m_cg_reg[0x0f],m_cg_reg[0x10],m_cg_reg[0x11],m_cg_reg[0x12],m_cg_reg[0x13],m_cg_reg[0x14],m_cg_reg[0x15],m_cg_reg[0x16],m_cg_reg[0x17]);
 	//  popmessage("%02x",m_text_reg[0x0f]);
 
@@ -681,46 +684,45 @@ UINT32 mz2500_state::screen_update_mz2500(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-static void mz2500_reconfigure_screen(running_machine &machine)
+void mz2500_state::mz2500_reconfigure_screen()
 {
-	mz2500_state *state = machine.driver_data<mz2500_state>();
 	rectangle visarea;
 
-	if((state->m_cg_reg[0x0e] & 0x1f) == 0x17 || (state->m_cg_reg[0x0e] & 0x1f) == 0x03 || state->m_text_col_size)
-		state->m_scr_x_size = 640;
+	if((m_cg_reg[0x0e] & 0x1f) == 0x17 || (m_cg_reg[0x0e] & 0x1f) == 0x03 || m_text_col_size)
+		m_scr_x_size = 640;
 	else
-		state->m_scr_x_size = 320;
+		m_scr_x_size = 320;
 
-	if((state->m_cg_reg[0x0e] & 0x1f) == 0x03)
-		state->m_scr_y_size = 400;
+	if((m_cg_reg[0x0e] & 0x1f) == 0x03)
+		m_scr_y_size = 400;
 	else
-		state->m_scr_y_size = 200 * ((state->m_text_font_reg) ? 1 : 2);
+		m_scr_y_size = 200 * ((m_text_font_reg) ? 1 : 2);
 
-	visarea.set(0, state->m_scr_x_size - 1, 0, state->m_scr_y_size - 1);
+	visarea.set(0, m_scr_x_size - 1, 0, m_scr_y_size - 1);
 
-	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,state->m_cg_reg[0x0e]);
+	//popmessage("%d %d %d %d %02x",vs,ve,hs,he,m_cg_reg[0x0e]);
 
-	machine.primary_screen->configure(720, 480, visarea, machine.primary_screen->frame_period().attoseconds);
+	machine().primary_screen->configure(720, 480, visarea, machine().primary_screen->frame_period().attoseconds);
 
 	/* calculate CG window parameters here */
-	state->m_cg_vs = (state->m_cg_reg[0x08]) | ((state->m_cg_reg[0x09]<<8) & 1);
-	state->m_cg_ve = (state->m_cg_reg[0x0a]) | ((state->m_cg_reg[0x0b]<<8) & 1);
-	state->m_cg_hs = ((state->m_cg_reg[0x0c] & 0x7f)*8);
-	state->m_cg_he = ((state->m_cg_reg[0x0d] & 0x7f)*8);
+	m_cg_vs = (m_cg_reg[0x08]) | ((m_cg_reg[0x09]<<8) & 1);
+	m_cg_ve = (m_cg_reg[0x0a]) | ((m_cg_reg[0x0b]<<8) & 1);
+	m_cg_hs = ((m_cg_reg[0x0c] & 0x7f)*8);
+	m_cg_he = ((m_cg_reg[0x0d] & 0x7f)*8);
 
-	if(state->m_scr_x_size == 320)
+	if(m_scr_x_size == 320)
 	{
-		state->m_cg_hs /= 2;
-		state->m_cg_he /= 2;
+		m_cg_hs /= 2;
+		m_cg_he /= 2;
 	}
 
 	/* calculate TV window parameters here */
 	{
 		int x_offs,y_offs;
 
-		state->m_monitor_type = ((state->m_text_reg[0x0f] & 0x08) >> 3);
+		m_monitor_type = ((m_text_reg[0x0f] & 0x08) >> 3);
 
-		switch((state->m_monitor_type|state->m_text_col_size<<1) & 3)
+		switch((m_monitor_type|m_text_col_size<<1) & 3)
 		{
 			default:
 			case 0: x_offs = 64; break;
@@ -728,25 +730,25 @@ static void mz2500_reconfigure_screen(running_machine &machine)
 			case 2: x_offs = 72; break;
 			case 3: x_offs = 88; break;
 		}
-		//printf("%d %d %d\n",x_offs,(state->m_text_reg[7] & 0x7f) * 8,(state->m_text_reg[8] & 0x7f)* 8);
+		//printf("%d %d %d\n",x_offs,(m_text_reg[7] & 0x7f) * 8,(m_text_reg[8] & 0x7f)* 8);
 
-		y_offs = (state->m_monitor_type) ? 76 : 34;
+		y_offs = (m_monitor_type) ? 76 : 34;
 
-		state->m_tv_hs = ((state->m_text_reg[7] & 0x7f)*8) - x_offs;
-		state->m_tv_he = ((state->m_text_reg[8] & 0x7f)*8) - x_offs;
-		state->m_tv_vs = (state->m_text_reg[3]*2) - y_offs;
-		state->m_tv_ve = (state->m_text_reg[5]*2) - y_offs;
+		m_tv_hs = ((m_text_reg[7] & 0x7f)*8) - x_offs;
+		m_tv_he = ((m_text_reg[8] & 0x7f)*8) - x_offs;
+		m_tv_vs = (m_text_reg[3]*2) - y_offs;
+		m_tv_ve = (m_text_reg[5]*2) - y_offs;
 
-		if(state->m_scr_x_size == 320)
+		if(m_scr_x_size == 320)
 		{
-			state->m_tv_hs /= 2;
-			state->m_tv_he /= 2;
+			m_tv_hs /= 2;
+			m_tv_he /= 2;
 		}
 
-		if(state->m_scr_y_size == 200)
+		if(m_scr_y_size == 200)
 		{
-			state->m_tv_vs /= 2;
-			state->m_tv_ve /= 2;
+			m_tv_vs /= 2;
+			m_tv_ve /= 2;
 		}
 	}
 }
@@ -1050,7 +1052,7 @@ TVRAM / CRTC registers
 [0x0f] ---- x--- sets monitor type interlace / progressive
 */
 
-static UINT8 pal_256_param(int index, int param)
+UINT8 mz2500_state::pal_256_param(int index, int param)
 {
 	UINT8 val = 0;
 
@@ -1084,7 +1086,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_tv_crtc_w)
 			#endif
 			//popmessage("%d %02x %d %02x %d %d",m_text_reg[3],m_text_reg[4],m_text_reg[5],m_text_reg[6],m_text_reg[7]*8,m_text_reg[8]*8);
 
-			mz2500_reconfigure_screen(machine());
+			mz2500_reconfigure_screen();
 
 			if(m_text_reg_index == 0x0a) // set 256 color palette
 			{
@@ -1140,7 +1142,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_tv_crtc_w)
 		case 3:
 			/* Font size reg */
 			m_text_font_reg = data & 1;
-			mz2500_reconfigure_screen(machine());
+			mz2500_reconfigure_screen();
 			break;
 	}
 }
@@ -1389,7 +1391,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_cg_data_w)
 	}
 
 	{
-		mz2500_reconfigure_screen(machine());
+		mz2500_reconfigure_screen();
 	}
 
 	if(m_cg_reg_index & 0x80) //enable auto-inc
@@ -1722,12 +1724,12 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static void mz2500_reset(mz2500_state *state, UINT8 type)
+void mz2500_state::mz2500_reset(mz2500_state *state, UINT8 type)
 {
 	int i;
 
 	for(i=0;i<8;i++)
-		state->m_bank_val[i] = bank_reset_val[type][i];
+		m_bank_val[i] = bank_reset_val[type][i];
 }
 
 static const gfx_layout mz2500_pcg_layout_1bpp =
@@ -1945,7 +1947,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_pio1_porta_w)
 	{
 		m_text_col_size = ((data & 0x20) >> 5);
 		m_prev_col_val = m_text_col_size;
-		mz2500_reconfigure_screen(machine());
+		mz2500_reconfigure_screen();
 	}
 	m_key_mux = data & 0x1f;
 }

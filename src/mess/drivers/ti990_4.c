@@ -63,6 +63,7 @@ public:
 	virtual void video_start();
 	UINT32 screen_update_ti990_4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ti990_4_line_interrupt);
+	void idle_callback(int state);
 };
 
 
@@ -88,7 +89,7 @@ INTERRUPT_GEN_MEMBER(ti990_4_state::ti990_4_line_interrupt)
 }
 
 #ifdef UNUSED_FUNCTION
-static void idle_callback(int state)
+void ti990_4_state::idle_callback(int state)
 {
 }
 #endif

@@ -71,19 +71,6 @@ end
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		logerror( "%s: %s", machine.describe_context(), buf);
-	}
-}
-
 class palmz22_state : public driver_device
 {
 public:
@@ -102,7 +89,22 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(palmz22_input_changed);
+	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ...);
 };
+
+
+inline void ATTR_PRINTF(3,4) palmz22_state::verboselog( int n_level, const char *s_fmt, ...)
+{
+	if (VERBOSE_LEVEL >= n_level)
+	{
+		va_list v;
+		char buf[32768];
+		va_start( v, s_fmt);
+		vsprintf( buf, s_fmt, v);
+		va_end( v);
+		logerror( "%s: %s", machine().describe_context(), buf);
+	}
+}
 
 /***************************************************************************
     MACHINE HARDWARE
@@ -113,14 +115,14 @@ public:
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 {
 	palmz22_state *state = space.machine().driver_data<palmz22_state>();
-	verboselog( space.machine(), 9, "s3c2410_nand_command_w %02X\n", data);
+	state->verboselog(9, "s3c2410_nand_command_w %02X\n", data);
 	state->m_nand->command_w(data);
 }
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 {
 	palmz22_state *state = space.machine().driver_data<palmz22_state>();
-	verboselog( space.machine(), 9, "s3c2410_nand_address_w %02X\n", data);
+	state->verboselog(9, "s3c2410_nand_address_w %02X\n", data);
 	state->m_nand->address_w(data);
 }
 
@@ -128,14 +130,14 @@ static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 {
 	palmz22_state *state = space.machine().driver_data<palmz22_state>();
 	UINT8 data = state->m_nand->data_r();
-	verboselog( space.machine(), 9, "s3c2410_nand_data_r %02X\n", data);
+	state->verboselog(9, "s3c2410_nand_data_r %02X\n", data);
 	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_data_w )
 {
 	palmz22_state *state = space.machine().driver_data<palmz22_state>();
-	verboselog( space.machine(), 9, "s3c2410_nand_data_w %02X\n", data);
+	state->verboselog(9, "s3c2410_nand_data_w %02X\n", data);
 	state->m_nand->data_w(data);
 }
 
@@ -143,7 +145,7 @@ ATTR_UNUSED static READ8_DEVICE_HANDLER( s3c2410_nand_busy_r )
 {
 	palmz22_state *state = device->machine().driver_data<palmz22_state>();
 	UINT8 data = state->m_nand->is_busy();
-	verboselog( device->machine(), 9, "s3c2410_nand_busy_r %02X\n", data);
+	state->verboselog(9, "s3c2410_nand_busy_r %02X\n", data);
 	return data;
 }
 
@@ -212,6 +214,7 @@ static int s3c2410_core_pin_r( device_t *device, int pin)
 
 static READ32_DEVICE_HANDLER( s3c2410_adc_data_r )
 {
+	palmz22_state *state = device->machine().driver_data<palmz22_state>();
 	UINT32 data = 0;
 	switch (offset)
 	{
@@ -220,7 +223,7 @@ static READ32_DEVICE_HANDLER( s3c2410_adc_data_r )
 		case 2 + 0 : data = space.machine().root_device().ioport( "PENX")->read(); break;
 		case 2 + 1 : data = 0x3FF - space.machine().root_device().ioport( "PENY")->read(); break;
 	}
-	verboselog( space.machine(), 5,  "s3c2410_adc_data_r %08X\n", data);
+	state->verboselog(5,  "s3c2410_adc_data_r %08X\n", data);
 	return data;
 }
 

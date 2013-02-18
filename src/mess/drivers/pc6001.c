@@ -299,6 +299,9 @@ protected:
 	UINT8 check_joy_press();
 	UINT8 check_keyboard_press();
 	void vram_bank_change(UINT8 vram_bank);
+	ATTR_CONST UINT8 pc6001_get_attributes(UINT8 c,int scanline, int pos);
+	const UINT8 *pc6001_get_video_ram(int scanline);
+	UINT8 pc6001_get_char_rom(UINT8 ch, int line);
 };
 
 
@@ -838,11 +841,10 @@ WRITE8_MEMBER(pc6001_state::pc6001_system_latch_w)
 }
 
 #if 0
-static ATTR_CONST UINT8 pc6001_get_attributes(running_machine &machine, UINT8 c,int scanline, int pos)
+ATTR_CONST pc6001_state::UINT8 pc6001_get_attributes(UINT8 c,int scanline, int pos)
 {
-	pc6001_state *state = machine.driver_data<pc6001_state>();
 	UINT8 result = 0x00;
-	UINT8 val = state->m_video_ram [(scanline / 12) * 0x20 + pos];
+	UINT8 val = m_video_ram [(scanline / 12) * 0x20 + pos];
 
 	if (val & 0x01) {
 		result |= M6847_INV;
@@ -854,13 +856,12 @@ static ATTR_CONST UINT8 pc6001_get_attributes(running_machine &machine, UINT8 c,
 	return result;
 }
 
-static const UINT8 *pc6001_get_video_ram(running_machine &machine, int scanline)
+const pc6001_state::UINT8 *pc6001_get_video_ram(int scanline)
 {
-	pc6001_state *state = machine.driver_data<pc6001_state>();
-	return state->m_video_ram +0x0200+ (scanline / 12) * 0x20;
+	return m_video_ram +0x0200+ (scanline / 12) * 0x20;
 }
 
-static UINT8 pc6001_get_char_rom(running_machine &machine, UINT8 ch, int line)
+UINT8 pc6001_state::pc6001_get_char_rom(UINT8 ch, int line)
 {
 	UINT8 *gfx = m_region_gfx1->base();
 	return gfx[ch*16+line];

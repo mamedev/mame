@@ -63,6 +63,7 @@ public:
 	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
+	UINT8 bit_sel(UINT8 data);
 };
 
 
@@ -107,7 +108,7 @@ READ8_MEMBER( vt100_state::vt100_flags_r )
 	return ret;
 }
 
-static UINT8 bit_sel(UINT8 data)
+UINT8 vt100_state::bit_sel(UINT8 data)
 {
 	if (!BIT(data,7)) return 0x70;
 	if (!BIT(data,6)) return 0x60;

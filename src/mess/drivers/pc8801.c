@@ -484,6 +484,7 @@ public:
 	DECLARE_READ8_MEMBER(opn_porta_r);
 	DECLARE_READ8_MEMBER(opn_portb_r);
 	IRQ_CALLBACK_MEMBER(pc8801_irq_callback);
+	void pc8801_raise_irq(UINT8 irq,UINT8 state);
 };
 
 
@@ -2268,20 +2269,19 @@ static const cassette_interface pc88_cassette_interface =
 };
 
 #ifdef USE_PROPER_I8214
-void pc8801_raise_irq(running_machine &machine,UINT8 irq,UINT8 state)
+void pc8801_state::pc8801_raise_irq(UINT8 irq,UINT8 state)
 {
-	pc8801_state *drvstate = machine.driver_data<pc8801_state>();
 	if(state)
 	{
-		drvstate->m_int_state |= irq;
+		drvm_int_state |= irq;
 
-		drvstate->m_pic->r_w(~irq);
+		drvm_pic->r_w(~irq);
 
 		m_maincpu->set_input_line(0,ASSERT_LINE);
 	}
 	else
 	{
-		//drvstate->m_int_state &= ~irq;
+		//drvm_int_state &= ~irq;
 
 		//m_maincpu->set_input_line(0,CLEAR_LINE);
 	}

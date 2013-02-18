@@ -13,19 +13,6 @@
 
 #define VERBOSE_LEVEL ( 0 )
 
-INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		logerror( "%s: %s", machine.describe_context(), buf);
-	}
-}
-
 class mini2440_state : public driver_device
 {
 public:
@@ -53,7 +40,21 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
+	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ...);
 };
+
+inline void ATTR_PRINTF(3,4) mini2440_state::verboselog( int n_level, const char *s_fmt, ...)
+{
+	if (VERBOSE_LEVEL >= n_level)
+	{
+		va_list v;
+		char buf[32768];
+		va_start( v, s_fmt);
+		vsprintf( buf, s_fmt, v);
+		va_end( v);
+		logerror( "%s: %s", machine().describe_context(), buf);
+	}
+}
 
 /***************************************************************************
     MACHINE HARDWARE
@@ -87,7 +88,7 @@ static void s3c2440_gpio_port_w( device_t *device, int port, UINT32 mask, UINT32
 	{
 		case S3C2440_GPIO_PORT_B :
 		{
-			verboselog( device->machine(), 5,  "LED %d %d %d %d\n", BIT( data, 5), BIT( data, 6), BIT( data, 7), BIT( data, 8));
+			state->verboselog(5,  "LED %d %d %d %d\n", BIT( data, 5), BIT( data, 6), BIT( data, 7), BIT( data, 8));
 		}
 		break;
 	}
@@ -166,7 +167,7 @@ static READ32_DEVICE_HANDLER( s3c2440_adc_data_r )
 		case 2 + 0 : data = state->m_penx->read(); break;
 		case 2 + 1 : data = 915 - state->m_peny->read() + 90; break;
 	}
-	verboselog( space.machine(), 5,  "s3c2440_adc_data_r %08X\n", data);
+	state->verboselog(5,  "s3c2440_adc_data_r %08X\n", data);
 	return data;
 }
 

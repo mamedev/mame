@@ -116,6 +116,9 @@ public:
 
 	void fdc_irq(bool state);
 	TIMER_CALLBACK_MEMBER(pio_timer);
+	void draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
+	void draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
+	void draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width);
 };
 
 #define VDP_CLOCK XTAL_3_579545MHz/4
@@ -132,9 +135,9 @@ VIDEO_START_MEMBER(pasopia7_state,pasopia7)
 	m_p7_pal = auto_alloc_array(machine(), UINT8, 0x10);
 }
 
-static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
+void pasopia7_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
-	UINT8 *vram = machine.root_device().memregion("vram")->base();
+	UINT8 *vram = machine().root_device().memregion("vram")->base();
 	int x,y,xi,yi;
 	int count;
 
@@ -155,7 +158,7 @@ static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const
 
 					color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-					bitmap.pix16(y+yi, x+xi) = machine.pens[color];
+					bitmap.pix16(y+yi, x+xi) = machine().pens[color];
 				}
 				count+=8;
 			}
@@ -163,11 +166,10 @@ static void draw_cg4_screen(running_machine &machine, bitmap_ind16 &bitmap,const
 	}
 }
 
-static void draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
+void pasopia7_state::draw_tv_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
-	pasopia7_state *state = machine.driver_data<pasopia7_state>();
-	UINT8 *vram = machine.root_device().memregion("vram")->base();
-	UINT8 *gfx_data = state->memregion("font")->base();
+	UINT8 *vram = machine().root_device().memregion("vram")->base();
+	UINT8 *gfx_data = memregion("font")->base();
 	int x,y,xi,yi;
 	int count;
 
@@ -188,31 +190,31 @@ static void draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const 
 					int pen;
 					pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
 
-					bitmap.pix16(y*8+yi, x*8+xi) = machine.pens[pen];
+					bitmap.pix16(y*8+yi, x*8+xi) = machine().pens[pen];
 				}
 			}
 
 			// draw cursor
-			if(state->m_cursor_addr*8 == count)
+			if(m_cursor_addr*8 == count)
 			{
 				int xc,yc,cursor_on;
 
 				cursor_on = 0;
-				switch(state->m_cursor_raster & 0x60)
+				switch(m_cursor_raster & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(machine.primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(machine.primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(state->m_cursor_raster & 7));yc++)
+					for(yc=0;yc<(8-(m_cursor_raster & 7));yc++)
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							bitmap.pix16(y*8-yc+7, x*8+xc) = machine.pens[7];
+							bitmap.pix16(y*8-yc+7, x*8+xc) = machine().pens[7];
 						}
 					}
 				}
@@ -222,11 +224,10 @@ static void draw_tv_screen(running_machine &machine, bitmap_ind16 &bitmap,const 
 	}
 }
 
-static void draw_mixed_screen(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
+void pasopia7_state::draw_mixed_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int width)
 {
-	pasopia7_state *state = machine.driver_data<pasopia7_state>();
-	UINT8 *vram = machine.root_device().memregion("vram")->base();
-	UINT8 *gfx_data = state->memregion("font")->base();
+	UINT8 *vram = machine().root_device().memregion("vram")->base();
+	UINT8 *gfx_data = memregion("font")->base();
 	int x,y,xi,yi;
 	int count;
 
@@ -254,7 +255,7 @@ static void draw_mixed_screen(running_machine &machine, bitmap_ind16 &bitmap,con
 
 						pen =  pen_g<<2 | pen_r<<1 | pen_b<<0;
 
-						bitmap.pix16(y*8+yi, x*8+xi) = machine.pens[pen];
+						bitmap.pix16(y*8+yi, x*8+xi) = machine().pens[pen];
 					}
 				}
 				else
@@ -266,32 +267,32 @@ static void draw_mixed_screen(running_machine &machine, bitmap_ind16 &bitmap,con
 						int pen;
 						pen = ((gfx_data[tile*8+yi]>>(7-xi)) & 1) ? color : 0;
 
-						bitmap.pix16(y*8+yi, x*8+xi) = machine.pens[pen];
+						bitmap.pix16(y*8+yi, x*8+xi) = machine().pens[pen];
 					}
 				}
 			}
 
 			// draw cursor
-			if(state->m_cursor_addr*8 == count)
+			if(m_cursor_addr*8 == count)
 			{
 				int xc,yc,cursor_on;
 
 				cursor_on = 0;
-				switch(state->m_cursor_raster & 0x60)
+				switch(m_cursor_raster & 0x60)
 				{
 					case 0x00: cursor_on = 1; break; //always on
 					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(machine.primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(machine.primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+					case 0x40: if(machine().primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(machine().primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
 				}
 
 				if(cursor_on)
 				{
-					for(yc=0;yc<(8-(state->m_cursor_raster & 7));yc++)
+					for(yc=0;yc<(8-(m_cursor_raster & 7));yc++)
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							bitmap.pix16(y*8-yc+7, x*8+xc) = machine.pens[7];
+							bitmap.pix16(y*8-yc+7, x*8+xc) = machine().pens[7];
 						}
 					}
 				}
@@ -311,11 +312,11 @@ UINT32 pasopia7_state::screen_update_pasopia7(screen_device &screen, bitmap_ind1
 	width = m_x_width ? 80 : 40;
 
 	if(m_gfx_mode)
-		draw_mixed_screen(machine(),bitmap,cliprect,width);
+		draw_mixed_screen(bitmap,cliprect,width);
 	else
 	{
-		draw_cg4_screen(machine(),bitmap,cliprect,width);
-		draw_tv_screen(machine(),bitmap,cliprect,width);
+		draw_cg4_screen(bitmap,cliprect,width);
+		draw_tv_screen(bitmap,cliprect,width);
 	}
 
 	return 0;

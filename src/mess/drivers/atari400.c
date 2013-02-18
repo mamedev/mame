@@ -341,6 +341,9 @@ protected:
 	void a1200xl_mmu(UINT8 new_mmu);
 	void xegs_mmu(UINT8 new_mmu);
 	void a800_setup_mappers(int type);
+	int a800_get_pcb_id(const char *pcb);
+	int a800_get_type(device_image_interface &image);
+	int a800_check_cart_type(device_image_interface &image);
 };
 
 /**************************************************************
@@ -1180,7 +1183,7 @@ static const a800_pcb pcb_list[] =
 	{"N/A", A800_UNKNOWN}
 };
 
-static int a800_get_pcb_id(const char *pcb)
+int a400_state::a800_get_pcb_id(const char *pcb)
 {
 	int i;
 
@@ -1374,7 +1377,7 @@ void a400_state::a800_setup_mappers(int type)
 }
 
 
-static int a800_get_type(device_image_interface &image)
+int a400_state::a800_get_type(device_image_interface &image)
 {
 	UINT8 header[16];
 	image.fread(header, 0x10);
@@ -1439,7 +1442,7 @@ static int a800_get_type(device_image_interface &image)
 }
 
 
-static int a800_check_cart_type(device_image_interface &image)
+int a400_state::a800_check_cart_type(device_image_interface &image)
 {
 	const char  *pcb_name;
 	int type = A800_UNKNOWN;

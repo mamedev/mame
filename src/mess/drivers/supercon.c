@@ -117,6 +117,8 @@ protected:
 	required_ioport m_board_7;
 	required_ioport m_board_8;
 	void mouse_update();
+	int get_first_cleared_bit(UINT8 data);
+	int get_first_bit(UINT8 data);
 };
 
 
@@ -199,7 +201,7 @@ void supercon_state::clear_pieces()
 	}
 }
 
-static int get_first_cleared_bit(UINT8 data)
+int supercon_state::get_first_cleared_bit(UINT8 data)
 {
 	int i;
 
@@ -210,7 +212,7 @@ static int get_first_cleared_bit(UINT8 data)
 	return NOT_VALID;
 }
 
-static int get_first_bit(UINT8 data)
+int supercon_state::get_first_bit(UINT8 data)
 {
 	int i;
 

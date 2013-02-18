@@ -131,6 +131,11 @@ public:
 	INTERRUPT_GEN_MEMBER(assert_irq);
 	TIMER_CALLBACK_MEMBER(clear_speech_cb);
 	TIMER_CALLBACK_MEMBER(clear_irq_cb);
+	void socrates_set_rom_bank();
+	void socrates_set_ram_bank();
+	void socrates_update_kb();
+	void socrates_check_kb_latch();
+	rgb_t socrates_create_color(UINT8 color);
 };
 
 
@@ -140,51 +145,48 @@ public:
 
 /* Devices */
 
-static void socrates_set_rom_bank( running_machine &machine )
+void socrates_state::socrates_set_rom_bank(  )
 {
-	socrates_state *state = machine.driver_data<socrates_state>();
-	state->membank( "bank1" )->set_base( state->memregion("maincpu")->base() + ( state->m_rom_bank * 0x4000 ));
+	membank( "bank1" )->set_base( memregion("maincpu")->base() + ( m_rom_bank * 0x4000 ));
 }
 
-static void socrates_set_ram_bank( running_machine &machine )
+void socrates_state::socrates_set_ram_bank(  )
 {
-	socrates_state *state = machine.driver_data<socrates_state>();
-	state->membank( "bank2" )->set_base( machine.root_device().memregion("vram")->base() + ( (state->m_ram_bank&0x3) * 0x4000 )); // window 0
-	state->membank( "bank3" )->set_base( state->memregion("vram")->base() + ( ((state->m_ram_bank&0xC)>>2) * 0x4000 )); // window 1
+	membank( "bank2" )->set_base( machine().root_device().memregion("vram")->base() + ( (m_ram_bank&0x3) * 0x4000 )); // window 0
+	membank( "bank3" )->set_base( memregion("vram")->base() + ( ((m_ram_bank&0xC)>>2) * 0x4000 )); // window 1
 }
 
-static void socrates_update_kb( running_machine &machine )
+void socrates_state::socrates_update_kb(  )
 {
-	socrates_state *state = machine.driver_data<socrates_state>();
 	static const char *const rownames[] = { "keyboard_40", "keyboard_41", "keyboard_42", "keyboard_43", "keyboard_44" };
 	int row, keyvalue, powerof2;
 	int shift = 0;
 	// first check that the kb latch[1] is clear; if it isn't, don't touch it!
-	if ((state->m_kb_latch_low[1] != 0) || (state->m_kb_latch_high[1] != 1)) return;
+	if ((m_kb_latch_low[1] != 0) || (m_kb_latch_high[1] != 1)) return;
 	// next check for joypad buttons
-	keyvalue = machine.root_device().ioport("keyboard_jp")->read();
+	keyvalue = machine().root_device().ioport("keyboard_jp")->read();
 	if (keyvalue != 0)
 	{
-		state->m_kb_latch_low[1] = (keyvalue & 0xFF0)>>4;
-		state->m_kb_latch_high[1] = 0x80 | (keyvalue & 0xF);
+		m_kb_latch_low[1] = (keyvalue & 0xFF0)>>4;
+		m_kb_latch_high[1] = 0x80 | (keyvalue & 0xF);
 		return; // get out of this function; due to the way key priorities work, we're done here.
 	}
 	// next check for mouse movement.
 	// this isn't written yet, so write me please!
 	// next check if shift is down
-	shift = machine.root_device().ioport("keyboard_50")->read();
+	shift = machine().root_device().ioport("keyboard_50")->read();
 	// find key low and high byte ok keyboard section
 	for (row = 4; row>=0; row--)
 	{
-		keyvalue = machine.root_device().ioport(rownames[row])->read();
+		keyvalue = machine().root_device().ioport(rownames[row])->read();
 		if (keyvalue != 0)
 		{
 			for (powerof2 = 9; powerof2 >= 0; powerof2--)
 			{
 				if ((keyvalue&(1<<powerof2)) == (1<<powerof2))
 				{
-					state->m_kb_latch_low[1] = (shift?0x50:0x40)+row;
-					state->m_kb_latch_high[1] = (0x80 | powerof2);
+					m_kb_latch_low[1] = (shift?0x50:0x40)+row;
+					m_kb_latch_high[1] = (0x80 | powerof2);
 					return; // get out of the for loop; due to the way key priorities work, we're done here.
 				}
 			}
@@ -193,30 +195,29 @@ static void socrates_update_kb( running_machine &machine )
 	// no key was pressed... check if shift was hit then?
 	if (shift != 0)
 	{
-		state->m_kb_latch_low[1] = 0x50;
-		state->m_kb_latch_high[1] = 0x80;
+		m_kb_latch_low[1] = 0x50;
+		m_kb_latch_high[1] = 0x80;
 	}
 }
 
-static void socrates_check_kb_latch( running_machine &machine ) // if kb[1] is full and kb[0] is not, shift [1] to [0] and clear [1]
+void socrates_state::socrates_check_kb_latch(  ) // if kb[1] is full and kb[0] is not, shift [1] to [0] and clear [1]
 {
-	socrates_state *state = machine.driver_data<socrates_state>();
-	if (((state->m_kb_latch_low[1] != 0) || (state->m_kb_latch_high[1] != 1)) &&
-	((state->m_kb_latch_low[0] == 0) && (state->m_kb_latch_high[0] == 1)))
+	if (((m_kb_latch_low[1] != 0) || (m_kb_latch_high[1] != 1)) &&
+	((m_kb_latch_low[0] == 0) && (m_kb_latch_high[0] == 1)))
 	{
-		state->m_kb_latch_low[0] = state->m_kb_latch_low[1];
-		state->m_kb_latch_low[1] = 0;
-		state->m_kb_latch_high[0] = state->m_kb_latch_high[1];
-		state->m_kb_latch_high[1] = 1;
+		m_kb_latch_low[0] = m_kb_latch_low[1];
+		m_kb_latch_low[1] = 0;
+		m_kb_latch_high[0] = m_kb_latch_high[1];
+		m_kb_latch_high[1] = 1;
 	}
 }
 
 void socrates_state::machine_reset()
 {
 	m_rom_bank = 0xF3; // actually set semi-randomly on real console but we need to initialize it somewhere...
-	socrates_set_rom_bank( machine() );
+	socrates_set_rom_bank();
 	m_ram_bank = 0;  // the actual console sets it semi randomly on power up, and the bios cleans it up.
-	socrates_set_ram_bank( machine() );
+	socrates_set_ram_bank();
 	m_kb_latch_low[0] = 0xFF;
 	m_kb_latch_high[0] = 0x8F;
 	m_kb_latch_low[1] = 0x00;
@@ -253,7 +254,7 @@ READ8_MEMBER(socrates_state::socrates_rom_bank_r)
 WRITE8_MEMBER(socrates_state::socrates_rom_bank_w)
 {
 	m_rom_bank = data;
-	socrates_set_rom_bank(machine());
+	socrates_set_rom_bank();
 }
 
 READ8_MEMBER(socrates_state::socrates_ram_bank_r)
@@ -264,7 +265,7 @@ READ8_MEMBER(socrates_state::socrates_ram_bank_r)
 WRITE8_MEMBER(socrates_state::socrates_ram_bank_w)
 {
 	m_ram_bank = data&0xF;
-	socrates_set_ram_bank(machine());
+	socrates_set_ram_bank();
 }
 
 READ8_MEMBER(socrates_state::read_f3)// used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
@@ -449,15 +450,15 @@ end hd38880 info.*/
 
 READ8_MEMBER(socrates_state::socrates_keyboard_low_r)// keyboard code low
 {
-	socrates_update_kb(machine());
-	socrates_check_kb_latch(machine());
+	socrates_update_kb();
+	socrates_check_kb_latch();
 	return m_kb_latch_low[0];
 }
 
 READ8_MEMBER(socrates_state::socrates_keyboard_high_r)// keyboard code high
 {
-	socrates_update_kb(machine());
-	socrates_check_kb_latch(machine());
+	socrates_update_kb();
+	socrates_check_kb_latch();
 	return m_kb_latch_high[0];
 }
 
@@ -510,7 +511,7 @@ WRITE8_MEMBER(socrates_state::socrates_scroll_w)
 // gamma: this needs to be messed with... may differ on different systems... attach to slider somehow?
 #define GAMMA 1.5
 
-static rgb_t socrates_create_color(UINT8 color)
+rgb_t socrates_state::socrates_create_color(UINT8 color)
 {
 	rgb_t composedcolor;
 	static const double lumatable[256] = {

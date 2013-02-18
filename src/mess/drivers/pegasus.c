@@ -87,6 +87,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_3);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_4);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pegasus_cart_5);
+	void pegasus_decrypt_rom( UINT16 addr );
 };
 
 TIMER_DEVICE_CALLBACK_MEMBER(pegasus_state::pegasus_firq)
@@ -419,9 +420,9 @@ GFXDECODE_END
 
 /* An encrypted single rom starts with 02, decrypted with 20. Not sure what
     multipart roms will have. */
-static void pegasus_decrypt_rom( running_machine &machine, UINT16 addr )
+void pegasus_state::pegasus_decrypt_rom( UINT16 addr )
 {
-	UINT8 b, *ROM = machine.root_device().memregion("maincpu")->base();
+	UINT8 b, *ROM = machine().root_device().memregion("maincpu")->base();
 	UINT16 i, j;
 	UINT8 buff[0x1000];
 	if (ROM[addr] == 0x02)
@@ -441,7 +442,7 @@ static void pegasus_decrypt_rom( running_machine &machine, UINT16 addr )
 DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_1 )
 {
 	image.fread(image.device().machine().root_device().memregion("maincpu")->base() + 0x0000, 0x1000);
-	pegasus_decrypt_rom( image.device().machine(), 0x0000 );
+	pegasus_decrypt_rom( 0x0000 );
 
 	return IMAGE_INIT_PASS;
 }
@@ -449,7 +450,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_1 )
 DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_2 )
 {
 	image.fread(image.device().machine().root_device().memregion("maincpu")->base() + 0x1000, 0x1000);
-	pegasus_decrypt_rom( image.device().machine(), 0x1000 );
+	pegasus_decrypt_rom( 0x1000 );
 
 	return IMAGE_INIT_PASS;
 }
@@ -457,7 +458,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_2 )
 DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_3 )
 {
 	image.fread(image.device().machine().root_device().memregion("maincpu")->base() + 0x2000, 0x1000);
-	pegasus_decrypt_rom( image.device().machine(), 0x2000 );
+	pegasus_decrypt_rom( 0x2000 );
 
 	return IMAGE_INIT_PASS;
 }
@@ -465,7 +466,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_3 )
 DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_4 )
 {
 	image.fread(image.device().machine().root_device().memregion("maincpu")->base() + 0xc000, 0x1000);
-	pegasus_decrypt_rom( image.device().machine(), 0xc000 );
+	pegasus_decrypt_rom( 0xc000 );
 
 	return IMAGE_INIT_PASS;
 }
@@ -473,7 +474,7 @@ DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_4 )
 DEVICE_IMAGE_LOAD_MEMBER( pegasus_state, pegasus_cart_5 )
 {
 	image.fread( image.device().machine().root_device().memregion("maincpu")->base() + 0xd000, 0x1000);
-	pegasus_decrypt_rom( image.device().machine(), 0xd000 );
+	pegasus_decrypt_rom( 0xd000 );
 
 	return IMAGE_INIT_PASS;
 }
@@ -492,7 +493,7 @@ void pegasus_state::machine_reset()
 
 DRIVER_INIT_MEMBER(pegasus_state,pegasus)
 {
-	pegasus_decrypt_rom( machine(), 0xf000 );
+	pegasus_decrypt_rom( 0xf000 );
 }
 
 static MACHINE_CONFIG_START( pegasus, pegasus_state )

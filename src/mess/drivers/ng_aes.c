@@ -210,6 +210,7 @@ protected:
 	required_ioport m_io_ctrlsel;
 
 	void common_machine_start();
+	INT32 SekIdle(INT32 nCycles);
 };
 
 
@@ -688,7 +689,7 @@ void ng_aes_state::set_DMA_regs(int offset, UINT16 wordValue)
 
 
 
-static INT32 SekIdle(INT32 nCycles)
+INT32 ng_aes_state::SekIdle(INT32 nCycles)
 {
 	return nCycles;
 }

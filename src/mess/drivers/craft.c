@@ -13,7 +13,7 @@
 #define ENABLE_VERBOSE_LOG (0)
 
 #if ENABLE_VERBOSE_LOG
-INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt, ...)
+inline void craft_state::verboselog(int n_level, const char *s_fmt, ...)
 {
 	if( VERBOSE_LEVEL >= n_level )
 	{
@@ -22,7 +22,7 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", machine.device("maincpu")->safe_pc(), buf );
+		logerror( "%08x: %s", machine().device("maincpu")->safe_pc(), buf );
 	}
 }
 #else
@@ -76,6 +76,9 @@ public:
 	DECLARE_DRIVER_INIT(craft);
 	virtual void machine_reset();
 	UINT32 screen_update_craft(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+#if ENABLE_VERBOSE_LOG	
+	inline void verboselog(int n_level, const char *s_fmt, ...);
+#endif	
 };
 
 void craft_state::machine_start()

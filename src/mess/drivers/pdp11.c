@@ -92,6 +92,7 @@ public:
 	virtual void machine_reset();
 	DECLARE_MACHINE_RESET(pdp11ub2);
 	DECLARE_MACHINE_RESET(pdp11qb);
+	void load9312prom(UINT8 *desc, UINT8 *src, int size);
 };
 
 WRITE16_MEMBER(pdp11_state::term_w)
@@ -248,7 +249,7 @@ void pdp11_state::machine_reset()
 	}
 }
 
-static void load9312prom(UINT8 *desc, UINT8 *src, int size)
+void pdp11_state::load9312prom(UINT8 *desc, UINT8 *src, int size)
 {
 	//   3   2   1   8
 	//   7   6   5   4
