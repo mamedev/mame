@@ -2028,6 +2028,15 @@ ROM_START( dgone )
 	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
 ROM_END
 
+ROM_START( ssam88s )
+	ROM_REGION(0x100000,"maincpu", 0)
+	ROM_LOAD( "samsung_samtron_88s_vers_2.0a.bin",  0xf8000, 0x08000, CRC(d1252a91) SHA1(469d15b6ecd7b70234975dc12c6bda4212a66652))
+
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
+
 ROM_START( iskr1031 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_SYSTEM_BIOS(0, "v1", "v1")
@@ -2356,6 +2365,7 @@ COMP( 1989, mc1502,     ibm5150,    0,          mc1502,     mc1502, pc_state,   
 
 COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga, pc_state,      pccga,      "Zenith Data Systems", "SuperSport", 0)
 
+
 COMP( 1983, m24,        ibm5150,    0,          olivetti,   pccga, pc_state,      pccga,      "Olivetti", "M24", GAME_NOT_WORKING)
 COMP( 1987, m240,       ibm5150,    0,          olivetti,   pccga, pc_state,      pccga,      "Olivetti", "M240", GAME_NOT_WORKING)
 COMP( 198?, olivm15,    ibm5150,    0,          olivm15,    0, driver_device,       0,          "Olivetti", "M15", GAME_NOT_WORKING | GAME_NO_SOUND)
@@ -2370,3 +2380,4 @@ COMP( 1988, sx16,       ibm5150,    0,          pccga,      pccga, pc_state,    
 COMP( 198?, mbc16,      ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Sanyo", "MBC-16" , GAME_NOT_WORKING)
 
 COMP( 198?, ataripc3,   ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Atari", "PC-3" , GAME_NOT_WORKING)
+COMP( 1989, ssam88s,      ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Samsung", "Samtron 88S" , GAME_NOT_WORKING)
