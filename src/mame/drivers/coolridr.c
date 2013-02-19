@@ -323,7 +323,7 @@ public:
 	UINT8 m_vblank;
 	int m_scsp_last_line;
 	UINT8 an_mux_data;
-	UINT8 sound_data;
+
 
 	DECLARE_READ32_MEMBER(sysh1_unk_r);
 	DECLARE_WRITE32_MEMBER(sysh1_unk_w);
@@ -342,7 +342,6 @@ public:
 	DECLARE_READ8_MEMBER(analog_mux_r);
 	DECLARE_WRITE8_MEMBER(analog_mux_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
 	DECLARE_WRITE_LINE_MEMBER(scsp_to_main_irq);
 	DECLARE_DRIVER_INIT(coolridr);
 	virtual void machine_start();
@@ -383,11 +382,14 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 	if (which==1)
 	{
 		count += 0x20000/4;
-		color += 0x5e;
+//		color += 0x5e;
+		color += 2;
 	}
 	else
 	{
-		color += 0x4e;
+//		color += 0x4e;
+//		color += 0x0;
+
 	}
 
 	for (y=0;y<64;y++)
@@ -467,20 +469,11 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_rgb
 /* unknown purpose */
 READ32_MEMBER(coolridr_state::sysh1_unk_r)
 {
-	if(offset == 8)
-		return sound_data;
-
-	if(offset != 2)
-		printf("%08x\n",offset);
-
 	return m_h1_unk[offset];
 }
 
 WRITE32_MEMBER(coolridr_state::sysh1_unk_w)
 {
-	if(offset != 8) // 8 = sound irq ack?
-		printf("%08x %08x\n",offset,data);
-
 	COMBINE_DATA(&m_h1_unk[offset]);
 }
 
@@ -776,17 +769,19 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 }
 
 
+// NOTE, this gets called from the blitter code above AND the DMA code below.. addresses from each are probably wrong
 WRITE32_MEMBER(coolridr_state::sysh1_pal_w)
 {
 	int r,g,b;
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	r = ((data & 0x00007c00) >> 10);
-	g = ((data & 0x000003e0) >> 5);
-	b = ((data & 0x0000001f) >> 0);
+	r = ((m_generic_paletteram_32[offset] & 0x00007c00) >> 10);
+	g = ((m_generic_paletteram_32[offset] & 0x000003e0) >> 5);
+	b = ((m_generic_paletteram_32[offset] & 0x0000001f) >> 0);
 	palette_set_color_rgb(machine(),(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
-	r = ((data & 0x7c000000) >> 26);
-	g = ((data & 0x03e00000) >> 21);
-	b = ((data & 0x001f0000) >> 16);
+	r = ((m_generic_paletteram_32[offset] & 0x7c000000) >> 26);
+	g = ((m_generic_paletteram_32[offset] & 0x03e00000) >> 21);
+	b = ((m_generic_paletteram_32[offset] & 0x001f0000) >> 16);
 	palette_set_color_rgb(machine(),offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
@@ -841,8 +836,15 @@ static void sysh1_dma_transfer( address_space &space, UINT16 dma_index )
 
 			dst |= 0x3c00000; //to paletteram FIXME: unknown offset
 			//size/=2;
+
+			// this is used when transfering palettes written by the blitter? maybe?
+			//  it might be a better indication of where blitter command 0xe0 should REALLY write data (at 0x3e00000)...
 			if((src & 0xff00000) == 0x3e00000)
-				return; //FIXME: kludge to avoid palette corruption
+			{
+				src &= 0xfffff;
+				src |= 0x3c00000;
+			}
+			//	return; //FIXME: kludge to avoid palette corruption
 			//debugger_break(space.machine());
 		}
 
@@ -900,7 +902,7 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
 	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_SHARE("h1_vram")//bg vram
-	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM AM_SHARE("paletteram2") // palettes get written here, but the actual used ones seem to get sent via blitter??
+	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_SHARE("paletteram") // palettes get written here, but the actual used ones seem to get sent via blitter??
 	AM_RANGE(0x03d00000, 0x03dfffff) AM_RAM_WRITE(sysh1_char_w) AM_SHARE("h1_charram") //FIXME: half size
 	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") //FIXME: not all of it
 
@@ -970,9 +972,9 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x03200000, 0x0327ffff) AM_READWRITE16(h1_soundram2_r, h1_soundram2_w,0xffffffff) //AM_SHARE("soundram2")
 	AM_RANGE(0x03300000, 0x03300fff) AM_DEVREADWRITE16_LEGACY("scsp2", scsp_r, scsp_w, 0xffffffff)
 
-//	AM_RANGE(0x04000000, 0x0400001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xffffffff)
-	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_unk_r,sysh1_unk_w) AM_SHARE("h1_unk")
-//	AM_RANGE(0x04200000, 0x0420003f) AM_RAM
+	AM_RANGE(0x04000000, 0x0400001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xffffffff)
+	AM_RANGE(0x04000020, 0x0400003f) AM_READWRITE(sysh1_unk_r,sysh1_unk_w) AM_SHARE("h1_unk")
+	AM_RANGE(0x04200000, 0x0420003f) AM_RAM /* hi-word for DMA? */
 
 	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
 	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
@@ -993,18 +995,16 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 ADDRESS_MAP_END
 
-WRITE8_MEMBER( coolridr_state::sound_to_sh1_w)
-{
-	sound_data = data;
-}
-
+// SH-1 or SH-2 almost certainly copies the program down to here: the ROM containing the program is 32-bit wide and the 68000 is 16-bit
+// the SCSP is believed to be hardcoded to decode the first 4 MB like this for a master/slave config
+// (see also Model 3):
 static ADDRESS_MAP_START( system_h1_sound_map, AS_PROGRAM, 16, coolridr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1",0) AM_SHARE("soundram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp1", scsp_r, scsp_w)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2",0) AM_SHARE("soundram2")
 	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE_LEGACY("scsp2", scsp_r, scsp_w)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM
-	AM_RANGE(0x900000, 0x900001) AM_WRITE8(sound_to_sh1_w,0x00ff)
+	AM_RANGE(0x900000, 0x900001) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -1469,8 +1469,7 @@ static const scsp_interface scsp_config =
 static const scsp_interface scsp2_interface =
 {
 	0,
-	NULL,
-	DEVCB_DRIVER_LINE_MEMBER(coolridr_state, scsp_to_main_irq)
+	NULL
 };
 
 #define MAIN_CLOCK XTAL_28_63636MHz
