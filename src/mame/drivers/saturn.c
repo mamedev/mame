@@ -277,9 +277,11 @@ READ32_MEMBER(saturn_state::saturn_scu_r)
 			break;
 		case 0xa4/4:
 			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) IRQ status reg read MASK=%08x IST=%08x | ISM=%08x\n",space.device().safe_pc(),mem_mask,m_scu.ist,m_scu.ism);
-			/* TODO: Bug! trips an HW fault. Basically, it tries to read the IST bit 1 with that irq enabled. */
-			res = m_scu.ist | ~m_scu.ism;
-//			res = m_scu.ist;
+			/* TODO: Bug! trips an HW fault. Basically, it tries to read the IST bit 1 with that irq enabled.
+		       Densetsu no Ogre Battle doesn't like this, so it needs investigation ...
+			*/
+//			res = m_scu.ist | ~m_scu.ism;
+			res = m_scu.ist;
 			break;
 		case 0xc8/4:
 			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) SCU version reg read\n",space.device().safe_pc());

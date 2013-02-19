@@ -734,7 +734,7 @@ void saturn_state::cd_exec_command( void )
 			if(cr1 & 0x40)
 			{
 				for(i=0;i<MAX_FILTERS;i++)
-					filters[i].condtrue = i;
+					filters[i].condtrue = 0xff;
 			}
 
 			/* reset filter conditions*/
