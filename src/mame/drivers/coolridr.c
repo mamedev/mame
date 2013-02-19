@@ -278,7 +278,8 @@ public:
 		m_txt_vram(*this, "txt_vram"),
 		m_sysh1_txt_blit(*this, "sysh1_txt_blit"),
 		m_sysh1_workram_h(*this, "sysh1_workrah"),
-		m_h1_unk(*this, "h1_unk")
+		m_h1_unk(*this, "h1_unk"),
+		m_soundram(*this, "soundram")
 		{ }
 
 	// Blitter state
@@ -304,12 +305,13 @@ public:
 	required_shared_ptr<UINT32> m_sysh1_txt_blit;
 	required_shared_ptr<UINT32> m_sysh1_workram_h;
 	required_shared_ptr<UINT32> m_h1_unk;
+	required_shared_ptr<UINT16> m_soundram;
 	bitmap_rgb32 m_temp_bitmap_sprites;
 	bitmap_rgb32 m_temp_bitmap_sprites2;
 	UINT32 m_test_offs;
 	int m_color;
 	UINT8 m_vblank;
-
+	int m_scsp_last_line;
 
 
 	DECLARE_READ32_MEMBER(sysh1_unk_r);
@@ -323,6 +325,7 @@ public:
 	DECLARE_READ32_MEMBER(coolridr_hack1_r);
 	DECLARE_READ32_MEMBER(coolridr_hack2_r);
 	DECLARE_DRIVER_INIT(coolridr);
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which);
@@ -423,7 +426,7 @@ UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_rgb
 	if(m_test_offs > 0x100000*4)
 		m_test_offs = 0;
 
-	popmessage("%08x %04x",m_test_offs,m_color);
+//	popmessage("%08x %04x",m_test_offs,m_color);
 
 	return screen_update_coolridr(screen,bitmap,cliprect,0);
 }
@@ -560,7 +563,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				{
 					const UINT32 memOffset = data;
 					bitmap_rgb32* drawbitmap;
-					
+
 					// guess, you can see the different sizes of bike cross from the left screen to the right where the attract text is
 					if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 						drawbitmap = &m_temp_bitmap_sprites;
@@ -588,11 +591,11 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							{
 								for (int y = 1; y < 15; y++)
 								{
-									
+
 									UINT32 color = 0xffffffff;
 									// HACKS to draw coloured blocks in easy to distinguish colours
 									if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
-									{	
+									{
 										if (m_colorNumber == 0x5b)
 											color = 0xffff0000;
 										else if (m_colorNumber == 0x5d)
@@ -816,10 +819,11 @@ ADDRESS_MAP_END
 // the SCSP is believed to be hardcoded to decode the first 4 MB like this for a master/slave config
 // (see also Model 3):
 static ADDRESS_MAP_START( system_h1_sound_map, AS_PROGRAM, 16, coolridr_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-//  AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp1", scsp_r, scsp_w)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1",0) AM_SHARE("soundram")
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp1", scsp_r, scsp_w)
+	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2",0)
+	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE_LEGACY("scsp2", scsp_r, scsp_w)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM
-//  AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE_LEGACY("scsp2", scsp_r, scsp_w)
 ADDRESS_MAP_END
 
 
@@ -1219,10 +1223,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
 	}
 }
 
+
+void coolridr_state::machine_start()
+{
+//  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+//	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+
+//	memcpy(memregion("soundcpu")->base(), memregion("maincpu")->base()+0x100000, 0x80000);
+//	m_soundcpu->reset();
+}
+
 void coolridr_state::machine_reset()
 {
 //  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+//	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+
+	memcpy(m_soundram, memregion("soundcpu")->base()+0x80000, 0x80000);
+	m_soundcpu->reset();
 }
 
 
@@ -1238,6 +1255,31 @@ static I8237_INTERFACE( dmac_intf )
 		DEVCB_NULL/*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack1_w)*/,
 		DEVCB_NULL/*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack2_w)*/,
 		DEVCB_NULL/*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack3_w)*/ }
+};
+
+static void scsp_irq(device_t *device, int irq)
+{
+	coolridr_state *state = device->machine().driver_data<coolridr_state>();
+	if (irq > 0)
+	{
+		state->m_scsp_last_line = irq;
+		device->machine().device("soundcpu")->execute().set_input_line(irq, ASSERT_LINE);
+	}
+	else
+		device->machine().device("soundcpu")->execute().set_input_line(-irq, CLEAR_LINE);
+}
+
+static const scsp_interface scsp_config =
+{
+	0,
+	scsp_irq,
+	DEVCB_NULL
+};
+
+static const scsp_interface scsp2_interface =
+{
+	0,
+	NULL
 };
 
 #define MAIN_CLOCK XTAL_28_63636MHz
@@ -1276,6 +1318,16 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_PALETTE_LENGTH(0x10000)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("scsp1", SCSP, 0)
+	MCFG_SOUND_CONFIG(scsp_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
+
+	MCFG_SOUND_ADD("scsp2", SCSP, 0)
+	MCFG_SOUND_CONFIG(scsp2_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 ROM_START( coolridr )
@@ -1299,7 +1351,7 @@ ROM_START( coolridr )
 	ROM_REGION32_BE( 0x100000, "ram_gfx", ROMREGION_ERASE00 ) /* SH2 code */
 
 	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )   /* 68000 */
-	ROM_COPY( "maincpu", 0x100000, 0x000000, 0x080000 ) //hardcoded from SH-2 roms? no, It doesn't seem so... (missing a DMA transfer for it?)
+	ROM_COPY( "maincpu", 0x100000, 0x080000, 0x080000 ) //hardcoded from SH-2 roms? no, It doesn't seem so... (missing a DMA transfer for it?)
 
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
@@ -1317,6 +1369,12 @@ ROM_START( coolridr )
 	ROM_LOAD32_WORD_SWAP( "mpr-17648.ic9", 0x1800000, 0x0400000, CRC(bf184cce) SHA1(62c004ea279f9a649d21426369336c2e1f9d24da) )
 	ROM_LOAD32_WORD_SWAP( "mpr-17644.ic5", 0x2000002, 0x0400000, CRC(80199c79) SHA1(e525d8ee9f9176101629853e50cca73b02b16a38) )
 	ROM_LOAD32_WORD_SWAP( "mpr-17649.ic10",0x2000000, 0x0400000, CRC(618c47ae) SHA1(5b69ad36fcf8e70d34c3b2fc71412ce953c5ceb3) )
+
+	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
+	ROM_FILL( 0x000000, 0x80000, 0 )
+
+	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
+	ROM_FILL( 0x000000, 0x80000, 0 )
 ROM_END
 
 #if 0
