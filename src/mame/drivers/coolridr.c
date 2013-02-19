@@ -575,7 +575,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 					m_hCellCount = (data & 0x0000ffff);
 				}
 				else if (m_blitterSerialCount == 7)
-				{		
+				{
 					m_vOrigin = (data & 0xffff0000) >> 16;
 					m_hOrigin = (data & 0x0000ffff);
 					//printf("%04x %04x\n", m_vOrigin, m_hOrigin);
@@ -626,7 +626,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 						// invalid?
 						break;
 					}
-					
+
 					switch (m_hOrigin & 3)
 					{
 					case 0:
@@ -662,7 +662,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 								if (spriteNumber == 0x20 || spriteNumber == 0x00)
 									continue;
 
-							
+
 							int blockwide = ((16*m_hZoom)/0x40)-1;
 							int blockhigh = ((16*m_vZoom)/0x40)-1;
 							// hack
@@ -909,7 +909,7 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
 	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x05ff0000, 0x05ffffff) AM_RAM /*???*/
-	AM_RANGE(0x06000000, 0x06000fff) AM_RAM //?
+	AM_RANGE(0x06000000, 0x060001ff) AM_RAM // backup RAM
 	AM_RANGE(0x06100000, 0x06100003) AM_READ_PORT("IN0") AM_WRITENOP
 	AM_RANGE(0x06100004, 0x06100007) AM_READ_PORT("IN1")
 	AM_RANGE(0x06100008, 0x0610000b) AM_READ_PORT("IN5")
@@ -933,6 +933,7 @@ static ADDRESS_MAP_START( system_h1_sound_map, AS_PROGRAM, 16, coolridr_state )
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2",0) AM_SHARE("soundram2")
 	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE_LEGACY("scsp2", scsp_r, scsp_w)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM
+	AM_RANGE(0x900000, 0x900001) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -1313,7 +1314,7 @@ static INPUT_PORTS_START( coolridr )
 INPUT_PORTS_END
 
 
-// IRQs 4, 6 (& 8?) are valid on SH-2
+// IRQs 4 & 6 are valid on SH-2
 INTERRUPT_GEN_MEMBER(coolridr_state::system_h1)
 {
 	device.execute().set_input_line(4, HOLD_LINE);
@@ -1326,8 +1327,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
 
 	switch(scanline)
 	{
-		case 512:m_subcpu->set_input_line(0xa, HOLD_LINE); break;
-		case 256:m_subcpu->set_input_line(0xc, HOLD_LINE); break;
+		case 400:m_subcpu->set_input_line(0xc, HOLD_LINE); break;
+		//case 256:m_subcpu->set_input_line(0xa, HOLD_LINE); break;
 		case 0:m_subcpu->set_input_line(0xe, HOLD_LINE); break;
 	}
 }
@@ -1380,7 +1381,8 @@ static void scsp_irq(device_t *device, int irq)
 
 WRITE_LINE_MEMBER(coolridr_state::scsp_to_main_irq)
 {
-	// ...
+	/* reads from some buffers, communication with 0x900000 from m68k? */
+	m_subcpu->set_input_line(0xa, HOLD_LINE);
 }
 
 static const scsp_interface scsp_config =
