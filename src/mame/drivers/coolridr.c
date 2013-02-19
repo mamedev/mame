@@ -499,6 +499,17 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				// Could be a full clear of VRAM?
 				for(UINT32 vramAddr = 0x3f40000; vramAddr < 0x3f4ffff; vramAddr+=4)
 					space.write_dword(vramAddr, 0x00000000);
+
+				m_blitterSerialCount = 0;
+			}
+			else if (m_blitterMode == 0xe0)
+			{
+				// uploads 16-bit values, a palette maybe?
+				m_blitterSerialCount = 0;
+			}
+			else
+			{
+				printf("set unknown blit mode %02x\n", m_blitterMode);
 			}
 			break;
 		}
@@ -619,7 +630,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 									}
 
 									if (drawbitmap->cliprect().contains(pixelOffsetX+x, pixelOffsetY+y))
-										drawbitmap->pix32(pixelOffsetY+y, pixelOffsetX+x) = color;
+										if (drawbitmap->pix32(pixelOffsetY+y, pixelOffsetX+x)==0) drawbitmap->pix32(pixelOffsetY+y, pixelOffsetX+x) = color;
 								}
 							}
 						}
@@ -629,8 +640,15 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				m_blitterSerialCount++;
 			}
 			// ??
-			else if (m_blitterMode == 0x10)
+			else if (m_blitterMode == 0x10) // at startup
 			{
+				//printf("blit mode %02x %02x %08x\n", m_blitterMode, m_blitterSerialCount,  data);
+				m_blitterSerialCount++;
+			}
+			else if (m_blitterMode == 0xe0) // when going into game (in units of 0x10 writes)
+			{
+				//printf("blit mode %02x %02x %08x\n", m_blitterMode, m_blitterSerialCount,  data);
+				m_blitterSerialCount++;
 			}
 			else
 			{
