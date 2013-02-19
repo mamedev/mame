@@ -294,6 +294,11 @@ public:
 	int m_vPosition;
 	int m_hPosition;
 
+	UINT16 m_vOrigin;
+	UINT16 m_hOrigin;
+	UINT16 m_vZoom;
+	UINT16 m_hZoom;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
@@ -569,6 +574,17 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 					m_vCellCount = (data & 0xffff0000) >> 16;
 					m_hCellCount = (data & 0x0000ffff);
 				}
+				else if (m_blitterSerialCount == 7)
+				{		
+					m_vOrigin = (data & 0xffff0000) >> 16;
+					m_hOrigin = (data & 0x0000ffff);
+					//printf("%04x %04x\n", m_vOrigin, m_hOrigin);
+				}
+				else if (m_blitterSerialCount == 8)
+				{
+					m_vZoom = (data & 0xffff0000) >> 16;
+					m_hZoom = (data & 0x0000ffff);
+				}
 				else if (m_blitterSerialCount == 9)
 				{
 					m_vPosition = (data & 0xffff0000) >> 16;
@@ -588,26 +604,75 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 					else // 0x90, 0xa0, 0xb0, 0xc0
 						drawbitmap = &m_temp_bitmap_sprites2;
 
+					int sizex = m_hCellCount * 16 * m_hZoom;
+					int sizey = m_vCellCount * 16 * m_vZoom;
+					m_hPosition *= 0x40;
+					m_vPosition *= 0x40;
+
+					switch (m_vOrigin & 3)
+					{
+					case 0:
+						// top
+						break;
+					case 1:
+						m_vPosition -= sizey / 2 ;
+						// middle?
+						break;
+					case 2:
+						m_vPosition -= sizey;
+						// bottom?
+						break;
+					case 3:
+						// invalid?
+						break;
+					}
+					
+					switch (m_hOrigin & 3)
+					{
+					case 0:
+						// left
+						break;
+					case 1:
+						m_hPosition -= sizex / 2;
+						// middle?
+						break;
+					case 2:
+						m_hPosition -= sizex;
+						// right?
+						break;
+					case 3:
+						// invalid?
+						break;
+					}
+
 					// Splat some sprites
 					for (int h = 0; h < m_hCellCount; h++)
 					{
 						for (int v = 0; v < m_vCellCount; v++)
 						{
-							const int pixelOffsetX = (m_hPosition) + (h*16);
-							const int pixelOffsetY = (m_vPosition) + (v*16);
+							const int pixelOffsetX = ((m_hPosition) + (h* 16 * m_hZoom)) / 0x40;
+							const int pixelOffsetY = ((m_vPosition) + (v* 16 * m_vZoom)) / 0x40;
 
 							// It's unknown if it's row-major or column-major
 							// TODO: Study the CRT test and "Cool Riders" logo for clues.
 							UINT8 spriteNumber = space.read_byte(memOffset + h + (v*h));
 
 							// DEBUG: For demo purposes, skip &spaces and NULL characters
-							if (spriteNumber == 0x20 || spriteNumber == 0x00)
-								continue;
+							if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
+								if (spriteNumber == 0x20 || spriteNumber == 0x00)
+									continue;
+
+							
+							int blockwide = ((16*m_hZoom)/0x40)-1;
+							int blockhigh = ((16*m_vZoom)/0x40)-1;
+							// hack
+							if (blockwide<=0) blockwide = 1;
+							if (blockhigh<=0) blockhigh = 1;
 
 							// DEBUG: Draw 16x16 block
-							for (int x = 1; x < 15; x++)
+							for (int x = 0; x < blockwide; x++)
 							{
-								for (int y = 1; y < 15; y++)
+								for (int y = 0; y < blockhigh; y++)
 								{
 
 									UINT32 color = 0xffffffff;
@@ -635,6 +700,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 									{
 										color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 16);
 									}
+
 
 									if (drawbitmap->cliprect().contains(pixelOffsetX+x, pixelOffsetY+y))
 										if (drawbitmap->pix32(pixelOffsetY+y, pixelOffsetX+x)==0) drawbitmap->pix32(pixelOffsetY+y, pixelOffsetX+x) = color;
@@ -1351,15 +1417,15 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 512)
-	//MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383) // this resolution is right for test mode, but too low for the game, it can probably change
-	MCFG_SCREEN_VISIBLE_AREA(0,639, 0, 479)
+	MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383) // the game uses this resolution
+	//MCFG_SCREEN_VISIBLE_AREA(0,639, 0, 479) // the 'for use in Japan screen uses this resolution' (Outrunners also uses the higher res for this screen on system 32..)
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr1)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 512)
-	//MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383)
-	MCFG_SCREEN_VISIBLE_AREA(0,639, 0, 479)
+	MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383) // the game uses this resolution
+	//MCFG_SCREEN_VISIBLE_AREA(0,639, 0, 479) // the 'for use in ... screen uses this resolution'
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr2)
 
 
@@ -1452,4 +1518,4 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
 }
 
-GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders (US)",GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND ) // was marked 'US' but clearly uploads a Japan warning, might be a jumper select
