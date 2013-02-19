@@ -10,9 +10,9 @@ Title            System     Date
 GO!GO!           deniam-16b 1995/10/11
 Logic Pro        deniam-16b 1996/10/20
 Karian Cross     deniam-16b 1997/04/17
-LOTTERY GAME     deniam-16c 1997/05/21
+LOTTERY GAME     deniam-16c 1997/05/21 UNDUMPED
 Logic Pro 2      deniam-16c 1997/06/20
-Propose          deniam-16c 1997/06/21
+Propose          deniam-16c 1997/06/21 UNDUMPED
 
 They call the hardware "deniam-16", but it's actually pretty much identical to
 Sega System 16.
@@ -21,6 +21,7 @@ Sega System 16.
 Notes:
 
 - The logicpr2 OKIM6295 ROM has four banks, but the game seems to only use 0 and 1.
+  (the latter two banks are identical/nearly so to the first two?)
 - logicpro dip switches might be wrong (using the logicpr2 ones)
 - flip screen is not supported but these games don't use it (no flip screen dip
   and no cocktail mode)
@@ -69,6 +70,7 @@ WRITE16_MEMBER(deniam_state::deniam16c_oki_rom_bank_w)
 	device_t *device = machine().device("oki");
 	if (ACCESSING_BITS_0_7)
 	{
+		if ((data&0xFE) != 0) popmessage("OKI bank was not 0 or 1! contact MAMEDEV!");
 		okim6295_device *oki = downcast<okim6295_device *>(device);
 		oki->set_bank_base((data & 0x01) ? 0x40000 : 0x00000);
 	}
@@ -119,10 +121,11 @@ static ADDRESS_MAP_START( deniam16c_map, AS_PROGRAM, 16, deniam_state )
 	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
 	AM_RANGE(0xc40004, 0xc40005) AM_WRITE(deniam_irq_ack_w)
+	AM_RANGE(0xc40006, 0xc40007) AM_WRITE(deniam16c_oki_rom_bank_w)
 	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
-	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2") AM_WRITENOP
-	AM_RANGE(0xc44006, 0xc44007) AM_READNOP AM_WRITE(deniam16c_oki_rom_bank_w) /* read unused? */
+	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2")
+	AM_RANGE(0xc44006, 0xc44007) AM_READNOP /* read unused? extra input port/dipswitches? */
 	AM_RANGE(0xc40008, 0xc4000b) AM_DEVWRITE8_LEGACY("ymsnd", ym3812_w, 0xff00)
 	AM_RANGE(0xc4400a, 0xc4400b) AM_READ_PORT("DSW") /* probably YM3812 input port */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
@@ -262,7 +265,10 @@ void deniam_state::machine_start()
 
 void deniam_state::machine_reset()
 {
-	/* logicpr2 does not reset the bank base on startup */
+	/* logicpr2 does not reset the bank base on startup, though it probably
+	doesn't matter since the coinup sfx (sample borrowed from 'tyrian' on PC)
+	exists in both banks; it properly sets the bank as soon as the ufo sfx
+	plays or a player character is selected on the character select screen */
 	machine().device<okim6295_device>("oki")->set_bank_base(0x00000);
 }
 
@@ -431,4 +437,4 @@ ROM_END
 GAME( 1996, logicpro, 0,        deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Croquis (Germany)", GAME_SUPPORTS_SAVE )
 GAME( 1996, karianx,  0,        deniam16b, karianx, deniam_state,  karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", GAME_SUPPORTS_SAVE )
-GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, deniam_state, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)", GAME_SUPPORTS_SAVE )
