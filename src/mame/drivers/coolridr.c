@@ -472,7 +472,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				m_textOffset = (data & 0x0000ffff);
 				m_blitterSerialCount = 0;
 			}
-			else if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
+			else if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60
+				  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
 			{
 				// The blitter function(s).
 				// After this is set a fixed count of 11 32-bit words are sent to the data register.
@@ -506,7 +507,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				//  printf("\n");
 				//}
 			}
-			else if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
+			else if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60
+				  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
 			{
 				// Serialized 32-bit words in order of appearance:
 				//  0: 00000000 - totally unknown : always seems to be zero
@@ -546,9 +548,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 					bitmap_rgb32* drawbitmap;
 					
 					// guess, you can see the different sizes of bike cross from the left screen to the right where the attract text is
-					if (m_blitterMode == 0x30) 
+					if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 						drawbitmap = &m_temp_bitmap_sprites;
-					else // 0x90
+					else // 0x90, 0xa0, 0xb0, 0xc0
 						drawbitmap = &m_temp_bitmap_sprites2;
 
 					// Splat some sprites
@@ -592,23 +594,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 
 				m_blitterSerialCount++;
 			}
-			// are these blits to other layers, road, object etc?
-			else if (m_blitterMode == 0xa0)
-			{
-				// ?
-			}
-			else if (m_blitterMode == 0xb0)
-			{
-				// ?
-			}
-			else if (m_blitterMode == 0x40)
-			{
-				// ?
-			}
-			else if (m_blitterMode == 0x50)
-			{
-				// ?
-			}
+			// ??
 			else
 			{
 				logerror("unk blit mode %02x\n", m_blitterMode);
