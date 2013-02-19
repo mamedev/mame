@@ -252,7 +252,7 @@ Note: This hardware appears to have been designed as a test-bed for a new RLE ba
 #include "cpu/m68000/m68000.h"
 #include "sound/scsp.h"
 #include "machine/am9517a.h"
-
+#include "rendlay.h"
 
 class coolridr_state : public driver_device
 {
@@ -305,6 +305,7 @@ public:
 	required_shared_ptr<UINT32> m_sysh1_workram_h;
 	required_shared_ptr<UINT32> m_h1_unk;
 	bitmap_rgb32 m_temp_bitmap_sprites;
+	bitmap_rgb32 m_temp_bitmap_sprites2;
 	UINT32 m_test_offs;
 	int m_color;
 	UINT8 m_vblank;
@@ -324,7 +325,9 @@ public:
 	DECLARE_DRIVER_INIT(coolridr);
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which);
+	UINT32 screen_update_coolridr1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_coolridr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(system_h1);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
 };
@@ -336,16 +339,51 @@ public:
 void coolridr_state::video_start()
 {
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2);
 	m_test_offs = 0x2000;
 }
 
-UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
 	/* planes seems to basically be at 0x8000 and 0x28000... */
 	gfx_element *gfx = machine().gfx[2];
 	UINT32 count;
 	int y,x;
 
+	count = m_test_offs/4;
+
+	for (y=0;y<64;y++)
+	{
+		for (x=0;x<128;x+=2)
+		{
+			int tile;
+
+			tile = (m_h1_vram[count] & 0x0fff0000) >> 16;
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,m_color,0,0,(x+0)*16,y*16);
+
+			tile = (m_h1_vram[count] & 0x00000fff) >> 0;
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,m_color,0,0,(x+1)*16,y*16);
+
+			count++;
+		}
+	}
+
+	if (which==0)
+	{
+		copybitmap_trans(bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
+		m_temp_bitmap_sprites.fill(0, cliprect);
+	}
+	else
+	{
+		copybitmap_trans(bitmap, m_temp_bitmap_sprites2, 0, 0, 0, 0, cliprect, 0);
+		m_temp_bitmap_sprites2.fill(0, cliprect);
+	}
+
+	return 0;
+}
+
+UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
 
 	if(machine().input().code_pressed(KEYCODE_Z))
 		m_test_offs+=4;
@@ -374,31 +412,14 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 	if(m_test_offs > 0x100000*4)
 		m_test_offs = 0;
 
-	count = m_test_offs/4;
-
 	popmessage("%08x %04x",m_test_offs,m_color);
 
-	for (y=0;y<64;y++)
-	{
-		for (x=0;x<128;x+=2)
-		{
-			int tile;
+	return screen_update_coolridr(screen,bitmap,cliprect,0);
+}
 
-			tile = (m_h1_vram[count] & 0x0fff0000) >> 16;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,m_color,0,0,(x+0)*16,y*16);
-
-			tile = (m_h1_vram[count] & 0x00000fff) >> 0;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,m_color,0,0,(x+1)*16,y*16);
-
-			count++;
-		}
-	}
-
-	copybitmap_trans(bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
-	m_temp_bitmap_sprites.fill(0, cliprect);
-
-
-	return 0;
+UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return screen_update_coolridr(screen,bitmap,cliprect,1);
 }
 
 /* end video */
@@ -522,14 +543,21 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				else if (m_blitterSerialCount == 11)
 				{
 					const UINT32 memOffset = data;
+					bitmap_rgb32* drawbitmap;
+					
+					// guess, you can see the different sizes of bike cross from the left screen to the right where the attract text is
+					if (m_blitterMode == 0x30) 
+						drawbitmap = &m_temp_bitmap_sprites;
+					else // 0x90
+						drawbitmap = &m_temp_bitmap_sprites2;
 
 					// Splat some sprites
 					for (int h = 0; h < m_hCellCount; h++)
 					{
 						for (int v = 0; v < m_vCellCount; v++)
 						{
-							const int pixelOffsetX = m_hPosition + (h*16);
-							const int pixelOffsetY = m_vPosition + (v*16);
+							const int pixelOffsetX = (m_hPosition) + (h*16);
+							const int pixelOffsetY = (m_vPosition) + (v*16);
 
 							// It's unknown if it's row-major or column-major
 							// TODO: Study the CRT test and "Cool Riders" logo for clues.
@@ -553,7 +581,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 										color = 0xff0000ff;
 									else
 										color = 0xff00ffff;
-									m_temp_bitmap_sprites.pix32(pixelOffsetY+y, pixelOffsetX+x) = color;
+
+									if (drawbitmap->cliprect().contains(pixelOffsetX+x, pixelOffsetY+y))
+										drawbitmap->pix32(pixelOffsetY+y, pixelOffsetX+x) = color;
 								}
 							}
 						}
@@ -561,6 +591,27 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				}
 
 				m_blitterSerialCount++;
+			}
+			// are these blits to other layers, road, object etc?
+			else if (m_blitterMode == 0xa0)
+			{
+				// ?
+			}
+			else if (m_blitterMode == 0xb0)
+			{
+				// ?
+			}
+			else if (m_blitterMode == 0x40)
+			{
+				// ?
+			}
+			else if (m_blitterMode == 0x50)
+			{
+				// ?
+			}
+			else
+			{
+				logerror("unk blit mode %02x\n", m_blitterMode);
 			}
 			break;
 		}
@@ -1174,27 +1225,36 @@ static I8237_INTERFACE( dmac_intf )
 static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_CPU_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz
 	MCFG_CPU_PROGRAM_MAP(system_h1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", coolridr_state, system_h1)
+	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", coolridr_state, system_h1)
 
 	MCFG_CPU_ADD("soundcpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(system_h1_sound_map)
 
 	MCFG_CPU_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 mhz
 	MCFG_CPU_PROGRAM_MAP(coolridr_submap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_sub, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_sub, "lscreen", 0, 1)
 
 	MCFG_I8237_ADD("i8237", 16000000, dmac_intf)
 
 	MCFG_GFXDECODE(coolridr)
 
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(128*8+22, 64*8+44)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 128*8-1, 0*8, 64*8-1) //TODO: these are just two different screens
-	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr)
+	MCFG_SCREEN_SIZE(640, 512)
+	//MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383) // this resolution is right for test mode, but too low for the game, it can probably change
+	MCFG_SCREEN_VISIBLE_AREA(0,639, 0, 479)
+	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr1)
+
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(640, 512)
+	//MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383)
+	MCFG_SCREEN_VISIBLE_AREA(0,639, 0, 479)
+	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr2)
+
 
 	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 MACHINE_CONFIG_END
 
@@ -1219,7 +1279,7 @@ ROM_START( coolridr )
 	ROM_REGION32_BE( 0x100000, "ram_gfx", ROMREGION_ERASE00 ) /* SH2 code */
 
 	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )   /* 68000 */
-	ROM_COPY( "maincpu", 0x100000, 0x000000, 0x080000 ) //hardcoded from SH-2 roms? no, It doesn't seem so...
+	ROM_COPY( "maincpu", 0x100000, 0x000000, 0x080000 ) //hardcoded from SH-2 roms? no, It doesn't seem so... (missing a DMA transfer for it?)
 
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
