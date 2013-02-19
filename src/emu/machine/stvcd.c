@@ -724,17 +724,18 @@ void saturn_state::cd_exec_command( void )
 			}
 
 			/* reset false filter output conditions */
+			/* TODO: check these two. */
 			if(cr1 & 0x80)
 			{
 				for(i=0;i<MAX_FILTERS;i++)
-					filters[i].condfalse = 0xff;
+					filters[i].condfalse = 0;
 			}
 
 			/* reset true filter output conditions */
 			if(cr1 & 0x40)
 			{
 				for(i=0;i<MAX_FILTERS;i++)
-					filters[i].condtrue = 0xff;
+					filters[i].condtrue = 0;
 			}
 
 			/* reset filter conditions*/
