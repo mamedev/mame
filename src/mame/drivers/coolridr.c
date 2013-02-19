@@ -289,8 +289,8 @@ public:
 	UINT32 m_colorNumber;
 	UINT16 m_vCellCount;
 	UINT16 m_hCellCount;
-	UINT16 m_vPosition;
-	UINT16 m_hPosition;
+	int m_vPosition;
+	int m_hPosition;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -343,14 +343,25 @@ void coolridr_state::video_start()
 	m_test_offs = 0x2000;
 }
 
+// might be a page 'map / base' setup somewhere, but it's just used for ingame backgrounds
+/* 0x00000 - 0x1ffff = screen 1 */
+/* 0x20000 - 0x3ffff = screen 2 */
+/* 0x40000 - 0xfffff = ? */
 UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
 	/* planes seems to basically be at 0x8000 and 0x28000... */
 	gfx_element *gfx = machine().gfx[2];
 	UINT32 count;
 	int y,x;
-
+	int color;
 	count = m_test_offs/4;
+	color = m_color;
+
+	if (which==1)
+	{
+		count += 0x20000/4;
+		color += 2;
+	}
 
 	for (y=0;y<64;y++)
 	{
@@ -359,10 +370,10 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 			int tile;
 
 			tile = (m_h1_vram[count] & 0x0fff0000) >> 16;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,m_color,0,0,(x+0)*16,y*16);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x+0)*16,y*16);
 
 			tile = (m_h1_vram[count] & 0x00000fff) >> 0;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,m_color,0,0,(x+1)*16,y*16);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x+1)*16,y*16);
 
 			count++;
 		}
@@ -541,6 +552,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				{
 					m_vPosition = (data & 0xffff0000) >> 16;
 					m_hPosition = (data & 0x0000ffff);
+
+					if (m_hPosition & 0x8000) m_hPosition -= 0x10000;
+					if (m_vPosition & 0x8000) m_vPosition -= 0x10000;
 				}
 				else if (m_blitterSerialCount == 11)
 				{
@@ -595,6 +609,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				m_blitterSerialCount++;
 			}
 			// ??
+			else if (m_blitterMode == 0x10)
+			{
+			}
 			else
 			{
 				logerror("unk blit mode %02x\n", m_blitterMode);
