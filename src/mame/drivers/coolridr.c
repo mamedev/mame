@@ -321,6 +321,7 @@ public:
 	int m_color;
 	UINT8 m_vblank;
 	int m_scsp_last_line;
+	UINT8 an_mux_data;
 
 
 	DECLARE_READ32_MEMBER(sysh1_unk_r);
@@ -339,7 +340,7 @@ public:
 	DECLARE_WRITE16_MEMBER(h1_soundram2_w);
 	DECLARE_READ8_MEMBER(analog_mux_r);
 	DECLARE_WRITE8_MEMBER(analog_mux_w);
-	UINT8 an_mux_data;
+	DECLARE_WRITE8_MEMBER(lamps_w);
 	DECLARE_WRITE_LINE_MEMBER(scsp_to_main_irq);
 	DECLARE_DRIVER_INIT(coolridr);
 	virtual void machine_start();
@@ -920,6 +921,19 @@ WRITE8_MEMBER( coolridr_state::analog_mux_w )
 	an_mux_data = data;
 }
 
+WRITE8_MEMBER( coolridr_state::lamps_w )
+{
+	/*
+	x--- ---- P2 Music select Lamp
+	-x-- ---- P1 Music select Lamp
+	--x- ---- P2 Race Leader Lamp
+	---x ---- P1 Race Leader Lamp
+	---- x--- P2 Start Lamp
+	---- -x-- P1 Start Lamp
+	---- ---x (used in game?)
+	*/
+}
+
 static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_SHARE("share2")
 
@@ -939,7 +953,7 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x05ff0000, 0x05ffffff) AM_RAM /*???*/
 	AM_RANGE(0x06000000, 0x060001ff) AM_RAM // backup RAM
-	AM_RANGE(0x06100000, 0x06100003) AM_READ_PORT("IN0") AM_WRITENOP
+	AM_RANGE(0x06100000, 0x06100003) AM_READ_PORT("IN0") AM_WRITE8(lamps_w,0x000000ff)
 	AM_RANGE(0x06100004, 0x06100007) AM_READ_PORT("IN1")
 	AM_RANGE(0x06100008, 0x0610000b) AM_READ_PORT("IN5")
 	AM_RANGE(0x0610000c, 0x0610000f) AM_READ_PORT("IN6")
