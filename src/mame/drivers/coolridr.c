@@ -668,7 +668,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 #ifdef FAKE_ASCII_ROM
 							if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
 							{
-								
+
 								drawgfx_opaque(*drawbitmap,drawbitmap->cliprect(), machine().gfx[3],spriteNumber,0,0,0,pixelOffsetX,pixelOffsetY);
 								continue;
 							}
@@ -1346,17 +1346,16 @@ INTERRUPT_GEN_MEMBER(coolridr_state::system_h1)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-//IRQs 10,12 and 14 are valid on SH-1 instead
 TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
 {
 	int scanline = param;
 
-	switch(scanline)
-	{
-		case 400:m_subcpu->set_input_line(0xc, HOLD_LINE); break;
-		//case 256:m_subcpu->set_input_line(0xa, HOLD_LINE); break;
-		case 0:m_subcpu->set_input_line(0xe, HOLD_LINE); break;
-	}
+	/* 10: reads from 0x4000000 (sound irq?) */
+	/* 12: reads from inputs (so presumably V-Blank) */
+	/* 14: tries to r/w to 0x62***** area (network irq?) */
+
+	if(scanline == 384)
+		m_subcpu->set_input_line(0xc, HOLD_LINE);
 }
 
 
@@ -1407,8 +1406,7 @@ static void scsp_irq(device_t *device, int irq)
 
 WRITE_LINE_MEMBER(coolridr_state::scsp_to_main_irq)
 {
-	/* reads from some buffers, communication with 0x900000 from m68k? */
-	m_subcpu->set_input_line(0xa, HOLD_LINE);
+	m_subcpu->set_input_line(0xe, HOLD_LINE);
 }
 
 static const scsp_interface scsp_config =
