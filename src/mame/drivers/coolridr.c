@@ -301,6 +301,7 @@ public:
 	UINT16 m_vZoom;
 	UINT16 m_hZoom;
 
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
@@ -382,7 +383,11 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 	if (which==1)
 	{
 		count += 0x20000/4;
-		color += 2;
+		color += 0x5e;
+	}
+	else
+	{
+		color += 0x4e;
 	}
 
 	for (y=0;y<64;y++)
@@ -417,7 +422,7 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 
 UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-
+#if 0
 	if(machine().input().code_pressed(KEYCODE_Z))
 		m_test_offs+=4;
 
@@ -444,6 +449,8 @@ UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_rgb
 
 	if(m_test_offs > 0x100000*4)
 		m_test_offs = 0;
+
+#endif
 
 //	popmessage("%08x %04x",m_test_offs,m_color);
 
@@ -533,8 +540,13 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 			}
 			else if (m_blitterMode == 0xe0)
 			{
-				// uploads 16-bit values, a palette maybe?
+				// uploads palettes...
+				// does NOT upload the palette for the WDUD screen when set to US mode this way..
 				m_blitterSerialCount = 0;
+				m_textOffset = (data & 0x0000ffff)>>2; // it's a byte offset
+
+			//	printf("set e0 %08x\n", data);
+
 			}
 			else
 			{
@@ -746,8 +758,13 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 			}
 			else if (m_blitterMode == 0xe0) // when going into game (in units of 0x10 writes)
 			{
+				// it writes the palette for the bgs here, with fade effects?
+				//  is this the only way for the tile colours to be actually used, or does this just go to memory somewhere too?
 				//printf("blit mode %02x %02x %08x\n", m_blitterMode, m_blitterSerialCount,  data);
-				m_blitterSerialCount++;
+				
+				sysh1_pal_w(space,m_textOffset,data,0xffffffff);
+				m_textOffset++;
+
 			}
 			else
 			{
@@ -762,15 +779,14 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 WRITE32_MEMBER(coolridr_state::sysh1_pal_w)
 {
 	int r,g,b;
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	r = ((m_generic_paletteram_32[offset] & 0x00007c00) >> 10);
-	g = ((m_generic_paletteram_32[offset] & 0x000003e0) >> 5);
-	b = ((m_generic_paletteram_32[offset] & 0x0000001f) >> 0);
+	r = ((data & 0x00007c00) >> 10);
+	g = ((data & 0x000003e0) >> 5);
+	b = ((data & 0x0000001f) >> 0);
 	palette_set_color_rgb(machine(),(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
-	r = ((m_generic_paletteram_32[offset] & 0x7c000000) >> 26);
-	g = ((m_generic_paletteram_32[offset] & 0x03e00000) >> 21);
-	b = ((m_generic_paletteram_32[offset] & 0x001f0000) >> 16);
+	r = ((data & 0x7c000000) >> 26);
+	g = ((data & 0x03e00000) >> 21);
+	b = ((data & 0x001f0000) >> 16);
 	palette_set_color_rgb(machine(),offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
@@ -884,7 +900,7 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
 	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_SHARE("h1_vram")//bg vram
-	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_SHARE("paletteram")
+	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM AM_SHARE("paletteram2") // palettes get written here, but the actual used ones seem to get sent via blitter??
 	AM_RANGE(0x03d00000, 0x03dfffff) AM_RAM_WRITE(sysh1_char_w) AM_SHARE("h1_charram") //FIXME: half size
 	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") //FIXME: not all of it
 
@@ -1032,10 +1048,10 @@ static const gfx_layout fakeascii =
 
 static GFXDECODE_START( coolridr )
 //  GFXDECODE_ENTRY( "maincpu_data", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx_data", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx5", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "ram_gfx", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "fakeascii", 0x18000, fakeascii, 0, 16 )
+	GFXDECODE_ENTRY( "gfx_data", 0, tiles8x8_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( "gfx5", 0, tiles8x8_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( "ram_gfx", 0, tiles8x8_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( "fakeascii", 0x18000, fakeascii, 0x1000, 16 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( coolridr )
@@ -1406,6 +1422,9 @@ void coolridr_state::machine_reset()
 
 	memcpy(m_soundram, memregion("soundcpu")->base()+0x80000, 0x80000);
 	m_soundcpu->reset();
+
+
+
 }
 
 
