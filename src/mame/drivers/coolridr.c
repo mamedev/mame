@@ -588,15 +588,32 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							{
 								for (int y = 1; y < 15; y++)
 								{
-									UINT32 color;
-									if (m_colorNumber == 0x5b)
-										color = 0xffff0000;
-									else if (m_colorNumber == 0x5d)
-										color = 0xff00ff00;
-									else if (m_colorNumber == 0x5e)
-										color = 0xff0000ff;
-									else
-										color = 0xff00ffff;
+									
+									UINT32 color = 0xffffffff;
+									// HACKS to draw coloured blocks in easy to distinguish colours
+									if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
+									{	
+										if (m_colorNumber == 0x5b)
+											color = 0xffff0000;
+										else if (m_colorNumber == 0x5d)
+											color = 0xff00ff00;
+										else if (m_colorNumber == 0x5e)
+											color = 0xff0000ff;
+										else
+											color = 0xff00ffff;
+									}
+									else if (m_blitterMode == 0x40 || m_blitterMode == 0xa0)
+									{
+										color = 0xff000000 | (((m_colorNumber & 0xff) | 0x80)-0x40);
+									}
+									else if (m_blitterMode == 0x50 || m_blitterMode == 0xb0)
+									{
+										color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 8);
+									}
+									else if (m_blitterMode == 0x60 || m_blitterMode == 0xc0)
+									{
+										color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 16);
+									}
 
 									if (drawbitmap->cliprect().contains(pixelOffsetX+x, pixelOffsetY+y))
 										drawbitmap->pix32(pixelOffsetY+y, pixelOffsetX+x) = color;
