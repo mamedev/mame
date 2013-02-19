@@ -18,48 +18,6 @@
 #include "emu.h"
 #include "rf5c400.h"
 
-struct rf5c400_channel
-{
-	UINT16  startH;
-	UINT16  startL;
-	UINT16  freq;
-	UINT16  endL;
-	UINT16  endHloopH;
-	UINT16  loopL;
-	UINT16  pan;
-	UINT16  effect;
-	UINT16  volume;
-
-	UINT16  attack;
-	UINT16  decay;
-	UINT16  release;
-
-	UINT16  cutoff;
-
-	UINT64 pos;
-	UINT64 step;
-	UINT16 keyon;
-
-	UINT8 env_phase;
-	double env_level;
-	double env_step;
-	double env_scale;
-};
-
-struct rf5c400_state
-{
-	INT16 *rom;
-	UINT32 rom_length;
-
-	sound_stream *stream;
-
-	double env_ar_table[0x9f];
-	double env_dr_table[0x9f];
-	double env_rr_table[0x9f];
-
-	rf5c400_channel channels[32];
-};
-
 static int volume_table[256];
 static double pan_table[0x64];
 
@@ -75,7 +33,8 @@ static double pan_table[0x64];
 #define ENV_MAX_RR          0x54
 
 /* PCM type */
-enum {
+enum
+{
 	TYPE_MASK       = 0x00C0,
 	TYPE_16         = 0x0000,
 	TYPE_8LOW       = 0x0040,
@@ -83,7 +42,8 @@ enum {
 };
 
 /* envelope phase */
-enum {
+enum
+{
 	PHASE_NONE      = 0,
 	PHASE_ATTACK,
 	PHASE_DECAY,
@@ -91,31 +51,49 @@ enum {
 };
 
 
-INLINE rf5c400_state *get_safe_token(device_t *device)
+// device type definition
+const device_type RF5C400 = &device_creator<rf5c400_device>;
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  rf5c400_device - constructor
+//-------------------------------------------------
+
+rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, RF5C400, "RF5C400", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_rom(NULL),
+	  m_rom_length(0),
+	  m_stream(NULL)
 {
-	assert(device != NULL);
-	assert(device->type() == RF5C400);
-	return (rf5c400_state *)downcast<rf5c400_device *>(device)->token();
+	memset(m_env_ar_table, 0, sizeof(double)*0x9f);
+	memset(m_env_dr_table, 0, sizeof(double)*0x9f);
+	memset(m_env_rr_table, 0, sizeof(double)*0x9f);
 }
 
 
-/*****************************************************************************/
 
-static UINT8 decode80(UINT8 val)
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void rf5c400_device::device_start()
 {
-	if (val & 0x80)
-	{
-		val = (val & 0x7f) + 0x1f;
-	}
-
-	return val;
+	rf5c400_init_chip();
 }
 
-static STREAM_UPDATE( rf5c400_update )
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	int i, ch;
-	rf5c400_state *info = (rf5c400_state *)param;
-	INT16 *rom = info->rom;
+	INT16 *rom = m_rom;
 	UINT32 end, loop;
 	UINT64 pos;
 	UINT8 vol, lvol, rvol, type;
@@ -127,7 +105,7 @@ static STREAM_UPDATE( rf5c400_update )
 
 	for (ch=0; ch < 32; ch++)
 	{
-		rf5c400_channel *channel = &info->channels[ch];
+		rf5c400_channel *channel = &m_channels[ch];
 		stream_sample_t *buf0 = outputs[0];
 		stream_sample_t *buf1 = outputs[1];
 
@@ -189,7 +167,7 @@ static STREAM_UPDATE( rf5c400_update )
 					else
 					{
 						env_step =
-							info->env_dr_table[decode80(channel->decay >> 8)];
+							m_env_dr_table[decode80(channel->decay >> 8)];
 					}
 					env_rstep = env_step * channel->env_scale;
 				}
@@ -220,7 +198,7 @@ static STREAM_UPDATE( rf5c400_update )
 			*buf1++ += sample * pan_table[rvol];
 
 			pos += channel->step;
-			if ( (pos>>16) > info->rom_length || (pos>>16) > end)
+			if ( (pos>>16) > m_rom_length || (pos>>16) > end)
 			{
 				pos -= loop<<16;
 				pos &= U64(0xFFFFFF0000);
@@ -235,12 +213,25 @@ static STREAM_UPDATE( rf5c400_update )
 	}
 }
 
-static void rf5c400_init_chip(device_t *device, rf5c400_state *info)
+
+/*****************************************************************************/
+
+UINT8 rf5c400_device::decode80(UINT8 val)
+{
+	if (val & 0x80)
+	{
+		val = (val & 0x7f) + 0x1f;
+	}
+
+	return val;
+}
+
+void rf5c400_device::rf5c400_init_chip()
 {
 	int i;
 
-	info->rom = *device->region();
-	info->rom_length = device->region()->bytes() / 2;
+	m_rom = *region();
+	m_rom_length = region()->bytes() / 2;
 
 	// init volume table
 	{
@@ -262,102 +253,95 @@ static void rf5c400_init_chip(device_t *device, rf5c400_state *info)
 		double r;
 
 		// attack
-		r = 1.0 / (ENV_AR_SPEED * (device->clock() / 384));
+		r = 1.0 / (ENV_AR_SPEED * (clock() / 384));
 		for (i = 0; i < ENV_MIN_AR; i++)
 		{
-			info->env_ar_table[i] = 1.0;
+			m_env_ar_table[i] = 1.0;
 		}
 		for (i = ENV_MIN_AR; i < ENV_MAX_AR; i++)
 		{
-			info->env_ar_table[i] =
+			m_env_ar_table[i] =
 				r * (ENV_MAX_AR - i) / (ENV_MAX_AR - ENV_MIN_AR);
 		}
 		for (i = ENV_MAX_AR; i < 0x9f; i++)
 		{
-			info->env_ar_table[i] = 0.0;
+			m_env_ar_table[i] = 0.0;
 		}
 
 		// decay
-		r = -5.0 / (ENV_DR_SPEED * (device->clock() / 384));
+		r = -5.0 / (ENV_DR_SPEED * (clock() / 384));
 		for (i = 0; i < ENV_MIN_DR; i++)
 		{
-			info->env_dr_table[i] = r;
+			m_env_dr_table[i] = r;
 		}
 		for (i = ENV_MIN_DR; i < ENV_MAX_DR; i++)
 		{
-			info->env_dr_table[i] =
+			m_env_dr_table[i] =
 				r * (ENV_MAX_DR - i) / (ENV_MAX_DR - ENV_MIN_DR);
 		}
 		for (i = ENV_MAX_DR; i < 0x9f; i++)
 		{
-			info->env_dr_table[i] = 0.0;
+			m_env_dr_table[i] = 0.0;
 		}
 
 		// release
-		r = -5.0 / (ENV_RR_SPEED * (device->clock() / 384));
+		r = -5.0 / (ENV_RR_SPEED * (clock() / 384));
 		for (i = 0; i < ENV_MIN_RR; i++)
 		{
-			info->env_rr_table[i] = r;
+			m_env_rr_table[i] = r;
 		}
 		for (i = ENV_MIN_RR; i < ENV_MAX_RR; i++)
 		{
-			info->env_rr_table[i] =
+			m_env_rr_table[i] =
 				r * (ENV_MAX_RR - i) / (ENV_MAX_RR - ENV_MIN_RR);
 		}
 		for (i = ENV_MAX_RR; i < 0x9f; i++)
 		{
-			info->env_rr_table[i] = 0.0;
+			m_env_rr_table[i] = 0.0;
 		}
 	}
 
 	// init channel info
 	for (i = 0; i < 32; i++)
 	{
-		info->channels[i].env_phase = PHASE_NONE;
-		info->channels[i].env_level = 0.0;
-		info->channels[i].env_step  = 0.0;
-		info->channels[i].env_scale  = 1.0;
+		m_channels[i].env_phase = PHASE_NONE;
+		m_channels[i].env_level = 0.0;
+		m_channels[i].env_step  = 0.0;
+		m_channels[i].env_scale  = 1.0;
 	}
 
-	for (i = 0; i < ARRAY_LENGTH(info->channels); i++)
+	for (i = 0; i < ARRAY_LENGTH(m_channels); i++)
 	{
-		device->save_item(NAME(info->channels[i].startH), i);
-		device->save_item(NAME(info->channels[i].startL), i);
-		device->save_item(NAME(info->channels[i].freq), i);
-		device->save_item(NAME(info->channels[i].endL), i);
-		device->save_item(NAME(info->channels[i].endHloopH), i);
-		device->save_item(NAME(info->channels[i].loopL), i);
-		device->save_item(NAME(info->channels[i].pan), i);
-		device->save_item(NAME(info->channels[i].effect), i);
-		device->save_item(NAME(info->channels[i].volume), i);
-		device->save_item(NAME(info->channels[i].attack), i);
-		device->save_item(NAME(info->channels[i].decay), i);
-		device->save_item(NAME(info->channels[i].release), i);
-		device->save_item(NAME(info->channels[i].cutoff), i);
-		device->save_item(NAME(info->channels[i].pos), i);
-		device->save_item(NAME(info->channels[i].step), i);
-		device->save_item(NAME(info->channels[i].keyon), i);
-		device->save_item(NAME(info->channels[i].env_phase), i);
-		device->save_item(NAME(info->channels[i].env_level), i);
-		device->save_item(NAME(info->channels[i].env_step), i);
-		device->save_item(NAME(info->channels[i].env_scale), i);
+		save_item(NAME(m_channels[i].startH), i);
+		save_item(NAME(m_channels[i].startL), i);
+		save_item(NAME(m_channels[i].freq), i);
+		save_item(NAME(m_channels[i].endL), i);
+		save_item(NAME(m_channels[i].endHloopH), i);
+		save_item(NAME(m_channels[i].loopL), i);
+		save_item(NAME(m_channels[i].pan), i);
+		save_item(NAME(m_channels[i].effect), i);
+		save_item(NAME(m_channels[i].volume), i);
+		save_item(NAME(m_channels[i].attack), i);
+		save_item(NAME(m_channels[i].decay), i);
+		save_item(NAME(m_channels[i].release), i);
+		save_item(NAME(m_channels[i].cutoff), i);
+		save_item(NAME(m_channels[i].pos), i);
+		save_item(NAME(m_channels[i].step), i);
+		save_item(NAME(m_channels[i].keyon), i);
+		save_item(NAME(m_channels[i].env_phase), i);
+		save_item(NAME(m_channels[i].env_level), i);
+		save_item(NAME(m_channels[i].env_step), i);
+		save_item(NAME(m_channels[i].env_scale), i);
 	}
 
-	info->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock()/384, info, rf5c400_update);
+	m_stream = stream_alloc(0, 2, clock()/384);
 }
 
-
-static DEVICE_START( rf5c400 )
-{
-	rf5c400_state *info = get_safe_token(device);
-
-	rf5c400_init_chip(device, info);
-}
 
 /*****************************************************************************/
 
 static UINT16 rf5c400_status = 0;
-READ16_DEVICE_HANDLER( rf5c400_r )
+READ16_MEMBER( rf5c400_device::rf5c400_r )
 {
 	switch(offset)
 	{
@@ -375,10 +359,8 @@ READ16_DEVICE_HANDLER( rf5c400_r )
 	return 0;
 }
 
-WRITE16_DEVICE_HANDLER( rf5c400_w )
+WRITE16_MEMBER( rf5c400_device::rf5c400_w )
 {
-	rf5c400_state *info = get_safe_token(device);
-
 	if (offset < 0x400)
 	{
 		switch(offset)
@@ -395,34 +377,34 @@ WRITE16_DEVICE_HANDLER( rf5c400_w )
 				switch ( data & 0x60 )
 				{
 					case 0x60:
-						info->channels[ch].pos =
-							((info->channels[ch].startH & 0xFF00) << 8) | info->channels[ch].startL;
-						info->channels[ch].pos <<= 16;
+						m_channels[ch].pos =
+							((m_channels[ch].startH & 0xFF00) << 8) | m_channels[ch].startL;
+						m_channels[ch].pos <<= 16;
 
-						info->channels[ch].env_phase = PHASE_ATTACK;
-						info->channels[ch].env_level = 0.0;
-						info->channels[ch].env_step  =
-							info->env_ar_table[decode80(info->channels[ch].attack >> 8)];
+						m_channels[ch].env_phase = PHASE_ATTACK;
+						m_channels[ch].env_level = 0.0;
+						m_channels[ch].env_step  =
+							m_env_ar_table[decode80(m_channels[ch].attack >> 8)];
 						break;
 					case 0x40:
-						if (info->channels[ch].env_phase != PHASE_NONE)
+						if (m_channels[ch].env_phase != PHASE_NONE)
 						{
-							info->channels[ch].env_phase = PHASE_RELEASE;
-							if (info->channels[ch].release & 0x0080)
+							m_channels[ch].env_phase = PHASE_RELEASE;
+							if (m_channels[ch].release & 0x0080)
 							{
-								info->channels[ch].env_step = 0.0;
+								m_channels[ch].env_step = 0.0;
 							}
 							else
 							{
-								info->channels[ch].env_step =
-									info->env_rr_table[decode80(info->channels[ch].release >> 8)];
+								m_channels[ch].env_step =
+									m_env_rr_table[decode80(m_channels[ch].release >> 8)];
 							}
 						}
 						break;
 					default:
-						info->channels[ch].env_phase = PHASE_NONE;
-						info->channels[ch].env_level = 0.0;
-						info->channels[ch].env_step  = 0.0;
+						m_channels[ch].env_phase = PHASE_NONE;
+						m_channels[ch].env_level = 0.0;
+						m_channels[ch].env_step  = 0.0;
 						break;
 				}
 				break;
@@ -446,11 +428,11 @@ WRITE16_DEVICE_HANDLER( rf5c400_w )
 
 			default:
 			{
-				//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", device->machine().describe_context(), data, offset, mem_mask);
+				//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X\n", machine().describe_context(), data, offset, mem_mask);
 				break;
 			}
 		}
-		//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X at %08X\n", device->machine().describe_context(), data, offset, mem_mask);
+		//mame_printf_debug("%s:rf5c400_w: %08X, %08X, %08X at %08X\n", machine().describe_context(), data, offset, mem_mask);
 	}
 	else
 	{
@@ -458,7 +440,7 @@ WRITE16_DEVICE_HANDLER( rf5c400_w )
 		int ch = (offset >> 5) & 0x1f;
 		int reg = (offset & 0x1f);
 
-		rf5c400_channel *channel = &info->channels[ch];
+		rf5c400_channel *channel = &m_channels[ch];
 
 		switch (reg)
 		{
@@ -554,42 +536,4 @@ WRITE16_DEVICE_HANDLER( rf5c400_w )
 			}
 		}
 	}
-}
-
-const device_type RF5C400 = &device_creator<rf5c400_device>;
-
-rf5c400_device::rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, RF5C400, "RF5C400", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(rf5c400_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void rf5c400_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void rf5c400_device::device_start()
-{
-	DEVICE_START_NAME( rf5c400 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void rf5c400_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }

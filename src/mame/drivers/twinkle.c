@@ -748,7 +748,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(shared_68k_r, shared_68k_w )
 	AM_RANGE(0x300000, 0x30000f) AM_READWRITE(twinkle_ide_r, twinkle_ide_w)
 	// 34000E = ???
-	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE_LEGACY("rfsnd", rf5c400_r, rf5c400_w)
+	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)
 	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w )    // 8 MB window wave RAM
 ADDRESS_MAP_END
 
@@ -884,7 +884,7 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_SOUND_ROUTE( 0, "speakerleft", 0.75 )
 	MCFG_SOUND_ROUTE( 1, "speakerright", 0.75 )
 
-	MCFG_SOUND_ADD("rfsnd", RF5C400, 32000000/2)
+	MCFG_RF5C400_ADD("rfsnd", 32000000/2)
 	MCFG_SOUND_ROUTE(0, "speakerleft", 1.0)
 	MCFG_SOUND_ROUTE(1, "speakerright", 1.0)
 

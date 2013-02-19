@@ -74,11 +74,11 @@ WRITE8_MEMBER(hcastle_state::sound_bank_w)
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, hcastle_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE_LEGACY("konami2", k051649_waveform_r, k051649_waveform_w)
-	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE_LEGACY("konami2", k051649_frequency_w)
-	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE_LEGACY("konami2", k051649_volume_w)
-	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE_LEGACY("konami2", k051649_keyonoff_w)
-	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE_LEGACY("konami2", k051649_test_r, k051649_test_w)
+	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("konami2", k051649_device, k051649_waveform_r, k051649_waveform_w)
+	AM_RANGE(0x9880, 0x9889) AM_DEVWRITE("konami2", k051649_device, k051649_frequency_w)
+	AM_RANGE(0x988a, 0x988e) AM_DEVWRITE("konami2", k051649_device, k051649_volume_w)
+	AM_RANGE(0x988f, 0x988f) AM_DEVWRITE("konami2", k051649_device, k051649_keyonoff_w)
+	AM_RANGE(0x98e0, 0x98ff) AM_DEVREADWRITE("konami2", k051649_device, k051649_test_r, k051649_test_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami1", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(sound_bank_w) /* 7232 bankswitch */
@@ -244,7 +244,7 @@ static MACHINE_CONFIG_START( hcastle, hcastle_state )
 	MCFG_SOUND_CONFIG(ym3812_config)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MCFG_SOUND_ADD("konami2", K051649, 3579545/2)
+	MCFG_K051649_ADD("konami2", 3579545/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 

@@ -18,27 +18,6 @@
 #define MAX_SAMPLE_CHUNK    10000
 
 
-/* struct describing a playing ADPCM chip */
-struct es8712_state
-{
-	UINT8 playing;          /* 1 if we're actively playing */
-
-	UINT32 base_offset;     /* pointer to the base memory location */
-	UINT32 sample;          /* current sample number */
-	UINT32 count;           /* total samples to play */
-
-	UINT32 signal;          /* current ADPCM signal */
-	UINT32 step;            /* current ADPCM step */
-
-	UINT32 start;           /* starting address for the next loop */
-	UINT32 end;             /* ending address for the next loop */
-	UINT8  repeat;          /* Repeat current sample when 1 */
-
-	INT32 bank_offset;
-	UINT8 *region_base;     /* pointer to the base of the region */
-	sound_stream *stream;   /* which stream are we playing on? */
-};
-
 /* step size index shift table */
 static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 
@@ -46,21 +25,96 @@ static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 static int diff_lookup[49*16];
 
 
-INLINE es8712_state *get_safe_token(device_t *device)
+// device type definition
+const device_type ES8712 = &device_creator<es8712_device>;
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  es8712_device - constructor
+//-------------------------------------------------
+
+es8712_device::es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, ES8712, "ES8712", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_playing(0),
+	  m_base_offset(0),
+	  m_sample(0),
+	  m_count(0),
+	  m_signal(0),
+	  m_step(0),
+	  m_start(0),
+	  m_end(0),
+	  m_repeat(0),
+	  m_bank_offset(0),
+	  m_region_base(NULL),
+	  m_stream(NULL)
 {
-	assert(device != NULL);
-	assert(device->type() == ES8712);
-	return (es8712_state *)downcast<es8712_device *>(device)->token();
 }
 
 
-/**********************************************************************************************
+//-------------------------------------------------
+//  device_start - start emulation of an ES8712 chip
+//-------------------------------------------------
 
-     compute_tables -- compute the difference tables
+void es8712_device::device_start()
+{
+	compute_tables();
 
-***********************************************************************************************/
+	m_start = 0;
+	m_end = 0;
+	m_repeat = 0;
 
-static void compute_tables(void)
+	m_bank_offset = 0;
+	m_region_base = *region();
+
+	/* generate the name and create the stream */
+	m_stream = stream_alloc(0, 1, clock());
+
+	/* initialize the rest of the structure */
+	m_signal = -2;
+
+	es8712_state_save_register();
+}
+
+
+//-------------------------------------------------
+//  device_reset - stop emulation of an ES8712-compatible chip
+//-------------------------------------------------
+
+void es8712_device::device_reset()
+{
+	if (m_playing)
+	{
+		/* update the stream, then turn it off */
+		m_stream->update();
+		m_playing = 0;
+		m_repeat = 0;
+	}
+}
+
+
+//-------------------------------------------------
+//  sound_stream_update - update the sound chip so that it is in sync with CPU execution
+//-------------------------------------------------
+
+void es8712_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	stream_sample_t *buffer = outputs[0];
+
+	/* generate them into our buffer */
+	generate_adpcm(buffer, samples);
+}
+
+
+//-------------------------------------------------
+//   compute_tables -- compute the difference tables
+//-------------------------------------------------
+
+void es8712_device::compute_tables()
 {
 	/* nibble to bit map */
 	static const int nbl2bit[16][4] =
@@ -92,23 +146,20 @@ static void compute_tables(void)
 }
 
 
+//-------------------------------------------------
+//  generate_adpcm -- general ADPCM decoding routine
+//-------------------------------------------------
 
-/**********************************************************************************************
-
-    generate_adpcm -- general ADPCM decoding routine
-
-***********************************************************************************************/
-
-static void generate_adpcm(es8712_state *chip, stream_sample_t *buffer, int samples)
+void es8712_device::generate_adpcm(stream_sample_t *buffer, int samples)
 {
 	/* if this chip is active */
-	if (chip->playing)
+	if (m_playing)
 	{
-		UINT8 *base = chip->region_base + chip->bank_offset + chip->base_offset;
-		int sample = chip->sample;
-		int signal = chip->signal;
-		int count = chip->count;
-		int step = chip->step;
+		UINT8 *base = m_region_base + m_bank_offset + m_base_offset;
+		int sample = m_sample;
+		int signal = m_signal;
+		int count = m_count;
+		int step = m_step;
 		int val;
 
 		/* loop while we still have samples to generate */
@@ -138,7 +189,7 @@ static void generate_adpcm(es8712_state *chip, stream_sample_t *buffer, int samp
 			/* next! */
 			if (++sample >= count)
 			{
-				if (chip->repeat)
+				if (m_repeat)
 				{
 					sample = 0;
 					signal = -2;
@@ -146,16 +197,16 @@ static void generate_adpcm(es8712_state *chip, stream_sample_t *buffer, int samp
 				}
 				else
 				{
-					chip->playing = 0;
+					m_playing = 0;
 					break;
 				}
 			}
 		}
 
 		/* update the parameters */
-		chip->sample = sample;
-		chip->signal = signal;
-		chip->step = step;
+		m_sample = sample;
+		m_signal = signal;
+		m_step = step;
 	}
 
 	/* fill the rest with silence */
@@ -164,165 +215,85 @@ static void generate_adpcm(es8712_state *chip, stream_sample_t *buffer, int samp
 }
 
 
-/**********************************************************************************************
 
-    es8712_update -- update the sound chip so that it is in sync with CPU execution
+//-------------------------------------------------
+//   state save support for MAME
+//-------------------------------------------------
 
-***********************************************************************************************/
-
-static STREAM_UPDATE( es8712_update )
+void es8712_device::es8712_state_save_register()
 {
-	stream_sample_t *buffer = outputs[0];
-	es8712_state *chip = (es8712_state *)param;
+	save_item(NAME(m_bank_offset));
 
-	/* generate them into our buffer */
-	generate_adpcm(chip, buffer, samples);
+	save_item(NAME(m_playing));
+	save_item(NAME(m_sample));
+	save_item(NAME(m_count));
+	save_item(NAME(m_signal));
+	save_item(NAME(m_step));
+
+	save_item(NAME(m_base_offset));
+
+	save_item(NAME(m_start));
+	save_item(NAME(m_end));
+	save_item(NAME(m_repeat));
 }
 
 
 
-/**********************************************************************************************
 
-     state save support for MAME
+//-------------------------------------------------
+//   es8712_set_bank_base -- set the base of the bank on a given chip
+//-------------------------------------------------
 
-***********************************************************************************************/
-
-static void es8712_state_save_register(es8712_state *chip, device_t *device)
+void es8712_device::set_bank_base(int base)
 {
-	device->save_item(NAME(chip->bank_offset));
-
-	device->save_item(NAME(chip->playing));
-	device->save_item(NAME(chip->sample));
-	device->save_item(NAME(chip->count));
-	device->save_item(NAME(chip->signal));
-	device->save_item(NAME(chip->step));
-
-	device->save_item(NAME(chip->base_offset));
-
-	device->save_item(NAME(chip->start));
-	device->save_item(NAME(chip->end));
-	device->save_item(NAME(chip->repeat));
+	m_stream->update();
+	m_bank_offset = base;
 }
 
 
+//-------------------------------------------------
+//  es8712_set_frequency -- dynamically adjusts the frequency of a given ADPCM chip
+//-------------------------------------------------
 
-/**********************************************************************************************
-
-    DEVICE_START( es8712 ) -- start emulation of an ES8712 chip
-
-***********************************************************************************************/
-
-static DEVICE_START( es8712 )
+void es8712_device::set_frequency(int frequency)
 {
-	es8712_state *chip = get_safe_token(device);
-
-	compute_tables();
-
-	chip->start = 0;
-	chip->end = 0;
-	chip->repeat = 0;
-
-	chip->bank_offset = 0;
-	chip->region_base = *device->region();
-
-	/* generate the name and create the stream */
-	chip->stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), chip, es8712_update);
-
-	/* initialize the rest of the structure */
-	chip->signal = -2;
-
-	es8712_state_save_register(chip, device);
-}
-
-
-
-/*************************************************************************************
-
-     DEVICE_RESET( es8712 ) -- stop emulation of an ES8712-compatible chip
-
-**************************************************************************************/
-
-static DEVICE_RESET( es8712 )
-{
-	es8712_state *chip = get_safe_token(device);
-
-	if (chip->playing)
-	{
-		/* update the stream, then turn it off */
-		chip->stream->update();
-		chip->playing = 0;
-		chip->repeat = 0;
-	}
-}
-
-
-/****************************************************************************
-
-    es8712_set_bank_base -- set the base of the bank on a given chip
-
-*****************************************************************************/
-
-void es8712_set_bank_base(device_t *device, int base)
-{
-	es8712_state *chip = get_safe_token(device);
-	chip->stream->update();
-	chip->bank_offset = base;
-}
-
-
-/****************************************************************************
-
-    es8712_set_frequency -- dynamically adjusts the frequency of a given ADPCM chip
-
-*****************************************************************************/
-
-void es8712_set_frequency(device_t *device, int frequency)
-{
-	es8712_state *chip = get_safe_token(device);
-
 	/* update the stream and set the new base */
-	chip->stream->update();
-	chip->stream->set_sample_rate(frequency);
+	m_stream->update();
+	m_stream->set_sample_rate(frequency);
 }
 
 
+//-------------------------------------------------
+//  play -- Begin playing the addressed sample
+//-------------------------------------------------
 
-/**********************************************************************************************
-
-    es8712_play -- Begin playing the addressed sample
-
-***********************************************************************************************/
-
-void es8712_play(device_t *device)
+void es8712_device::play()
 {
-	es8712_state *chip = get_safe_token(device);
-
-
-	if (chip->start < chip->end)
+	if (m_start < m_end)
 	{
-		if (!chip->playing)
+		if (!m_playing)
 		{
-			chip->playing = 1;
-			chip->base_offset = chip->start;
-			chip->sample = 0;
-			chip->count = 2 * (chip->end - chip->start + 1);
-			chip->repeat = 0;//1;
+			m_playing = 1;
+			m_base_offset = m_start;
+			m_sample = 0;
+			m_count = 2 * (m_end - m_start + 1);
+			m_repeat = 0;//1;
 
 			/* also reset the ADPCM parameters */
-			chip->signal = -2;
-			chip->step = 0;
+			m_signal = -2;
+			m_step = 0;
 		}
 	}
 	/* invalid samples go here */
 	else
 	{
-		logerror("ES871295:'%s' requested to play invalid sample range %06x-%06x\n",device->tag(),chip->start,chip->end);
+		logerror("ES871295:'%s' requested to play invalid sample range %06x-%06x\n", tag(), m_start, m_end);
 
-		if (chip->playing)
+		if (m_playing)
 		{
 			/* update the stream */
-			chip->stream->update();
-			chip->playing = 0;
+			m_stream->update();
+			m_playing = 0;
 		}
 	}
 }
@@ -353,74 +324,25 @@ void es8712_play(device_t *device)
  *
 ***********************************************************************************************/
 
-WRITE8_DEVICE_HANDLER( es8712_w )
+WRITE8_MEMBER( es8712_device::es8712_w )
 {
-	es8712_state *chip = get_safe_token(device);
 	switch (offset)
 	{
-		case 00:    chip->start &= 0x000fff00;
-					chip->start |= ((data & 0xff) <<  0); break;
-		case 01:    chip->start &= 0x000f00ff;
-					chip->start |= ((data & 0xff) <<  8); break;
-		case 02:    chip->start &= 0x0000ffff;
-					chip->start |= ((data & 0x0f) << 16); break;
-		case 03:    chip->end   &= 0x000fff00;
-					chip->end   |= ((data & 0xff) <<  0); break;
-		case 04:    chip->end   &= 0x000f00ff;
-					chip->end   |= ((data & 0xff) <<  8); break;
-		case 05:    chip->end   &= 0x0000ffff;
-					chip->end   |= ((data & 0x0f) << 16); break;
+		case 00:    m_start &= 0x000fff00;
+					m_start |= ((data & 0xff) <<  0); break;
+		case 01:    m_start &= 0x000f00ff;
+					m_start |= ((data & 0xff) <<  8); break;
+		case 02:    m_start &= 0x0000ffff;
+					m_start |= ((data & 0x0f) << 16); break;
+		case 03:    m_end   &= 0x000fff00;
+					m_end   |= ((data & 0xff) <<  0); break;
+		case 04:    m_end   &= 0x000f00ff;
+					m_end   |= ((data & 0xff) <<  8); break;
+		case 05:    m_end   &= 0x0000ffff;
+					m_end   |= ((data & 0x0f) << 16); break;
 		case 06:
-				es8712_play(device);
-				break;
+					play(); break;
 		default:    break;
 	}
-	chip->start &= 0xfffff; chip->end &= 0xfffff;
-}
-
-const device_type ES8712 = &device_creator<es8712_device>;
-
-es8712_device::es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, ES8712, "ES8712", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(es8712_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void es8712_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void es8712_device::device_start()
-{
-	DEVICE_START_NAME( es8712 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void es8712_device::device_reset()
-{
-	DEVICE_RESET_NAME( es8712 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void es8712_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	m_start &= 0xfffff; m_end &= 0xfffff;
 }

@@ -354,13 +354,13 @@ static READ8_HANDLER (konami_scc_bank5)
 	{
 		if ((offset & 0xff) >= 0xe0)
 		{
-			return k051649_test_r(drvstate->m_k051649, space, offset & 0xff);
+			return drvstate->m_k051649->test_r(space, offset & 0xff);
 		}
 		return 0xff;
 	}
 	else
 	{
-		return k051649_waveform_r(drvstate->m_k051649, space, offset & 0x7f);
+		return drvstate->m_k051649->waveform_r(space, offset & 0x7f);
 	}
 }
 
@@ -431,27 +431,27 @@ MSX_SLOT_WRITE(konami_scc)
 
 		if (offset < 0x80)
 		{
-			k051649_waveform_w (drvstate->m_k051649, space, offset, val);
+			drvstate->m_k051649->waveform_w (space, offset, val);
 		}
 		else if (offset < 0xa0)
 		{
 			offset &= 0xf;
 			if (offset < 0xa)
 			{
-				k051649_frequency_w (drvstate->m_k051649, space, offset, val);
+				drvstate->m_k051649->frequency_w (space, offset, val);
 			}
 			else if (offset < 0xf)
 			{
-				k051649_volume_w (drvstate->m_k051649, space, offset - 0xa, val);
+				drvstate->m_k051649->volume_w (space, offset - 0xa, val);
 			}
 			else
 			{
-				k051649_keyonoff_w (drvstate->m_k051649, space, 0, val);
+				drvstate->m_k051649->keyonoff_w (space, 0, val);
 			}
 		}
 		else if (offset >= 0xe0)
 		{
-			k051649_test_w (drvstate->m_k051649, space, offset, val);
+			drvstate->m_k051649->test_w (space, offset, val);
 		}
 	}
 	else if (addr >= 0xb000 && addr < 0xb800)
@@ -2197,7 +2197,7 @@ static  READ8_HANDLER (soundcartridge_scc)
 
 	if (reg < 0x80)
 	{
-		return k051649_waveform_r (state->m_k051649, space, reg);
+		return state->m_k051649->waveform_r (space, reg);
 	}
 	else if (reg < 0xa0)
 	{
@@ -2206,11 +2206,11 @@ static  READ8_HANDLER (soundcartridge_scc)
 	else if (reg < 0xc0)
 	{
 		/* read wave 5 */
-		return k051649_waveform_r (state->m_k051649, space, 0x80 + (reg & 0x1f));
+		return state->m_k051649->waveform_r (space, 0x80 + (reg & 0x1f));
 	}
 	else if (reg < 0xe0)
 	{
-		return k051649_test_r (state->m_k051649, space, reg);
+		return state->m_k051649->test_r (space, reg);
 	}
 
 	return 0xff;
@@ -2231,11 +2231,11 @@ static  READ8_HANDLER (soundcartridge_sccp)
 
 	if (reg < 0xa0)
 	{
-		return k052539_waveform_r (state->m_k051649, space, reg);
+		return state->m_k051649->waveform_r (space, reg);
 	}
 	else if (reg >= 0xc0 && reg < 0xe0)
 	{
-		return k051649_test_r (state->m_k051649, space, reg);
+		return state->m_k051649->test_r (space, reg);
 	}
 
 	return 0xff;
@@ -2345,7 +2345,7 @@ MSX_SLOT_WRITE(soundcartridge)
 
 			if (offset < 0x80)
 			{
-				k051649_waveform_w (drvstate->m_k051649, space, offset, val);
+				drvstate->m_k051649->waveform_w (space, offset, val);
 			}
 			else if (offset < 0xa0)
 			{
@@ -2353,20 +2353,20 @@ MSX_SLOT_WRITE(soundcartridge)
 
 				if (offset < 0xa)
 				{
-					k051649_frequency_w (drvstate->m_k051649, space, offset, val);
+					drvstate->m_k051649->frequency_w (space, offset, val);
 				}
 				else if (offset < 0x0f)
 				{
-					k051649_volume_w (drvstate->m_k051649, space, offset - 0xa, val);
+					drvstate->m_k051649->volume_w (space, offset - 0xa, val);
 				}
 				else if (offset == 0x0f)
 				{
-					k051649_keyonoff_w (drvstate->m_k051649, space, 0, val);
+					drvstate->m_k051649->keyonoff_w (space, 0, val);
 				}
 			}
 			else if (offset < 0xe0)
 			{
-				k051649_test_w (drvstate->m_k051649, space, offset, val);
+				drvstate->m_k051649->test_w (space, offset, val);
 			}
 		}
 	}
@@ -2394,7 +2394,7 @@ MSX_SLOT_WRITE(soundcartridge)
 
 			if (offset < 0xa0)
 			{
-				k052539_waveform_w (drvstate->m_k051649, space, offset, val);
+				drvstate->m_k051649->waveform_w (space, offset, val);
 			}
 			else if (offset < 0xc0)
 			{
@@ -2402,20 +2402,20 @@ MSX_SLOT_WRITE(soundcartridge)
 
 				if (offset < 0x0a)
 				{
-					k051649_frequency_w (drvstate->m_k051649, space, offset, val);
+					drvstate->m_k051649->frequency_w (space, offset, val);
 				}
 				else if (offset < 0x0f)
 				{
-					k051649_volume_w (drvstate->m_k051649, space, offset - 0x0a, val);
+					drvstate->m_k051649->volume_w (space, offset - 0x0a, val);
 				}
 				else if (offset == 0x0f)
 				{
-					k051649_keyonoff_w (drvstate->m_k051649, space, 0, val);
+					drvstate->m_k051649->keyonoff_w (space, 0, val);
 				}
 			}
 			else if (offset < 0xe0)
 			{
-				k051649_test_w (drvstate->m_k051649, space, offset, val);
+				drvstate->m_k051649->test_w (space, offset, val);
 			}
 		}
 	}

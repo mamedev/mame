@@ -143,7 +143,7 @@ public:
 	required_device<cassette_image_device> m_cass;
 	required_device<device_t> m_ay8910;
 	required_device<ym2413_device> m_ym;
-	optional_device<device_t> m_k051649;
+	optional_device<k051649_device> m_k051649;
 	required_device<dac_device> m_dac;
 	required_device<centronics_device> m_centronics;
 	optional_device<rp5c01_device> m_rtc;

@@ -1986,7 +1986,7 @@ static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM                                           // Main RAM
 	AM_RANGE(0x70000000, 0x7003ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_comram_r, sub_comram_w)         // Double buffered shared RAM between Main and Sub
 //  AM_RANGE(0x78000000, 0x780000ff) AM_MIRROR(0x80000000) AM_NOP                                           // SCSI controller (unused)
-	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE16_LEGACY("rfsnd", rf5c400_r, rf5c400_w, 0xffffffff)
+	AM_RANGE(0x78040000, 0x7804ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE16("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w, 0xffffffff)
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata0_r, sub_ata0_w)
 	AM_RANGE(0x780c0010, 0x780c001f) AM_MIRROR(0x80000000) AM_READWRITE(sub_ata1_r, sub_ata1_w)
 	AM_RANGE(0x78200000, 0x782000ff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_reg_r, k001604_reg_w)              // PSAC registers
@@ -3251,7 +3251,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("rfsnd", RF5C400, XTAL_16_9344MHz)
+	MCFG_RF5C400_ADD("rfsnd", XTAL_16_9344MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

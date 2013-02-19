@@ -661,7 +661,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, hornet_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM     /* Work RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE_LEGACY("rfsnd", rf5c400_r, rf5c400_w)      /* Ricoh RF5C400 */
+	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_device, rf5c400_r, rf5c400_w)      /* Ricoh RF5C400 */
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("k056800", k056800_sound_r, k056800_sound_w)
 	AM_RANGE(0x480000, 0x480001) AM_WRITENOP
 	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP
@@ -1030,7 +1030,7 @@ static MACHINE_CONFIG_START( hornet, hornet_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("rfsnd", RF5C400, 16934400)  // value from Guru readme, gives 44100 Hz sample rate
+	MCFG_RF5C400_ADD("rfsnd", 16934400)  // value from Guru readme, gives 44100 Hz sample rate
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 

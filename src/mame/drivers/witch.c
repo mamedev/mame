@@ -524,7 +524,7 @@ static ADDRESS_MAP_START( map_sub, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0x8010, 0x8016) AM_READ(read_8010) AM_DEVWRITE_LEGACY("essnd", es8712_w)
+	AM_RANGE(0x8010, 0x8016) AM_READ(read_8010) AM_DEVWRITE("essnd", es8712_device, es8712_w)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE("share2")
@@ -855,7 +855,7 @@ static MACHINE_CONFIG_START( witch, witch_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("essnd", ES8712, 8000) /* ?? */
+	MCFG_ES8712_ADD("essnd", 8000) /* ?? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)   /* 1.5MHz?? */

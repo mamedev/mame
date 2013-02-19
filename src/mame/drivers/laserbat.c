@@ -687,8 +687,8 @@ void laserbat_state::machine_start()
 	m_s2636_3 = machine().device("s2636_3");
 	m_pia = machine().device<pia6821_device>("pia");
 	m_sn = machine().device("snsnd");
-	m_tms1 = machine().device("tms1");
-	m_tms2 = machine().device("tms2");
+	m_tms1 = machine().device<tms3615_device>("tms1");
+	m_tms2 = machine().device<tms3615_device>("tms2");
 	m_ay1 = machine().device("ay1");
 	m_ay2 = machine().device("ay2");
 
@@ -769,10 +769,10 @@ static MACHINE_CONFIG_START( laserbat, laserbat_state )
 	MCFG_SOUND_ADD("snsnd", SN76477, 0) // output not connected
 	MCFG_SOUND_CONFIG(laserbat_sn76477_interface)
 
-	MCFG_SOUND_ADD("tms1", TMS3615, 4000000/8/2) // 250 kHz, from second chip's clock out
+	MCFG_TMS3615_ADD("tms1", 4000000/8/2) // 250 kHz, from second chip's clock out
 	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
 
-	MCFG_SOUND_ADD("tms2", TMS3615, 4000000/8) // 500 kHz
+	MCFG_TMS3615_ADD("tms2", 4000000/8) // 500 kHz
 	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
 MACHINE_CONFIG_END
 

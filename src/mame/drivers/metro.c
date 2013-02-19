@@ -1828,7 +1828,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(metro_state::vmetal_control_w)
 {
-	device_t *device = machine().device("essnd");
+	es8712_device *device = machine().device<es8712_device>("essnd");
 	/* Lower nibble is the coin control bits shown in
 	   service mode, but in game mode they're different */
 	coin_counter_w(machine(), 0, data & 0x04);
@@ -1839,12 +1839,12 @@ WRITE8_MEMBER(metro_state::vmetal_control_w)
 	if ((data & 0x40) == 0)
 		device->reset();
 	else
-		es8712_play(device);
+		device->play();
 
 	if (data & 0x10)
-		es8712_set_bank_base(device, 0x100000);
+		device->set_bank_base(0x100000);
 	else
-		es8712_set_bank_base(device, 0x000000);
+		device->set_bank_base(0x000000);
 
 	if (data & 0xa0)
 		logerror("%s: Writing unknown bits %04x to $200000\n",machine().describe_context(),data);
@@ -1882,8 +1882,8 @@ WRITE8_MEMBER(metro_state::vmetal_es8712_w)
 	16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
 	*/
 
-	device_t *device = machine().device("essnd");
-	es8712_w(device, space, offset, data);
+	es8712_device *device = machine().device<es8712_device>("essnd");
+	device->es8712_w(space, offset, data);
 	logerror("%s: Writing %04x to ES8712 offset %02x\n", machine().describe_context(), data, offset);
 }
 
@@ -4409,7 +4409,7 @@ static MACHINE_CONFIG_START( vmetal, metro_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 
-	MCFG_SOUND_ADD("essnd", ES8712, 12000)
+	MCFG_ES8712_ADD("essnd", 12000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 

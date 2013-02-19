@@ -55,8 +55,8 @@ public:
 	device_t *m_s2636_3;
 	pia6821_device *m_pia;
 	device_t *m_sn;
-	device_t *m_tms1;
-	device_t *m_tms2;
+	tms3615_device *m_tms1;
+	tms3615_device *m_tms2;
 	device_t *m_ay1;
 	device_t *m_ay2;
 

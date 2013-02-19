@@ -29,86 +29,101 @@
 #define DEF_GAIN    8
 
 
-/* this structure defines the parameters for a channel */
-struct k051649_sound_channel
+// device type definition
+const device_type K051649 = &device_creator<k051649_device>;
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  k051649_device - constructor
+//-------------------------------------------------
+
+k051649_device::k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, K051649, "K051649", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_stream(NULL),
+	  m_mclock(0),
+      m_rate(0),
+	  m_mixer_table(NULL),
+	  m_mixer_lookup(NULL),
+	  m_mixer_buffer(NULL),
+	  m_test(0)
 {
-	unsigned long counter;
-	int frequency;
-	int volume;
-	int key;
-	signed char waveram[32];
-};
-
-struct k051649_state
-{
-	k051649_sound_channel channel_list[5];
-
-	/* global sound parameters */
-	sound_stream * stream;
-	int mclock,rate;
-
-	/* mixer tables and internal buffers */
-	INT16 *mixer_table;
-	INT16 *mixer_lookup;
-	short *mixer_buffer;
-
-	/* chip registers */
-	UINT8 test;
-};
-
-INLINE k051649_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == K051649);
-	return (k051649_state *)downcast<k051649_device *>(device)->token();
 }
 
-/* build a table to divide by the number of voices */
-static void make_mixer_table(running_machine &machine, k051649_state *info, int voices)
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void k051649_device::device_start()
 {
+	// get stream channels 
+	m_rate = clock()/16;
+	m_stream = stream_alloc(0, 1, m_rate);
+	m_mclock = clock();
+
+	// allocate a buffer to mix into - 1 second's worth should be more than enough 
+	m_mixer_buffer = auto_alloc_array(machine(), short, 2 * m_rate);
+
+	// build the mixer table 
+	make_mixer_table(5);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void k051649_device::device_reset()
+{
+	k051649_sound_channel *voice = m_channel_list;
 	int i;
 
-	/* allocate memory */
-	info->mixer_table = auto_alloc_array(machine, INT16, 512 * voices);
-
-	/* find the middle of the table */
-	info->mixer_lookup = info->mixer_table + (256 * voices);
-
-	/* fill in the table - 16 bit case */
-	for (i = 0; i < (voices * 256); i++)
-	{
-		int val = i * DEF_GAIN * 16 / voices;
-		if (val > 32767) val = 32767;
-		info->mixer_lookup[ i] = val;
-		info->mixer_lookup[-i] = -val;
+	// reset all the voices 
+	for (i = 0; i < 5; i++)
+    {
+		voice[i].frequency = 0;
+		voice[i].volume = 0xf;
+		voice[i].counter = 0;
+		voice[i].key = 0;
 	}
+
+	// other parameters
+	m_test = 0;
 }
 
 
-/* generate sound to the mix buffer */
-static STREAM_UPDATE( k051649_update )
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	k051649_state *info = (k051649_state *)param;
-	k051649_sound_channel *voice=info->channel_list;
+	k051649_sound_channel *voice=m_channel_list;
 	stream_sample_t *buffer = outputs[0];
 	short *mix;
 	int i,j;
 
-	/* zap the contents of the mixer buffer */
-	memset(info->mixer_buffer, 0, samples * sizeof(short));
+	// zap the contents of the mixer buffer 
+	memset(m_mixer_buffer, 0, samples * sizeof(short));
 
-	for (j = 0; j < 5; j++) {
-		/* channel is halted for freq < 9 */
+	for (j = 0; j < 5; j++)
+    {
+		// channel is halted for freq < 9 
 		if (voice[j].frequency > 8)
 		{
 			const signed char *w = voice[j].waveram;
 			int v=voice[j].volume * voice[j].key;
 			int c=voice[j].counter;
-			int step = ((INT64)info->mclock * (1 << FREQ_BITS)) / (float)((voice[j].frequency + 1) * 16 * (info->rate / 32)) + 0.5;
+			int step = ((INT64)m_mclock * (1 << FREQ_BITS)) / (float)((voice[j].frequency + 1) * 16 * (m_rate / 32)) + 0.5;
 
-			mix = info->mixer_buffer;
+			mix = m_mixer_buffer;
 
-			/* add our contribution */
+			// add our contribution 
 			for (i = 0; i < samples; i++)
 			{
 				int offs;
@@ -118,211 +133,156 @@ static STREAM_UPDATE( k051649_update )
 				*mix++ += (w[offs] * v)>>3;
 			}
 
-			/* update the counter for this voice */
+			// update the counter for this voice 
 			voice[j].counter = c;
 		}
 	}
 
-	/* mix it down */
-	mix = info->mixer_buffer;
+	// mix it down 
+	mix = m_mixer_buffer;
 	for (i = 0; i < samples; i++)
-		*buffer++ = info->mixer_lookup[*mix++];
+		*buffer++ = m_mixer_lookup[*mix++];
 }
 
-static DEVICE_START( k051649 )
-{
-	k051649_state *info = get_safe_token(device);
-
-	/* get stream channels */
-	info->rate = device->clock()/16;
-	info->stream = device->machine().sound().stream_alloc(*device, 0, 1, info->rate, info, k051649_update);
-	info->mclock = device->clock();
-
-	/* allocate a buffer to mix into - 1 second's worth should be more than enough */
-	info->mixer_buffer = auto_alloc_array(device->machine(), short, 2 * info->rate);
-
-	/* build the mixer table */
-	make_mixer_table(device->machine(), info, 5);
-}
-
-static DEVICE_RESET( k051649 )
-{
-	k051649_state *info = get_safe_token(device);
-	k051649_sound_channel *voice = info->channel_list;
-	int i;
-
-	/* reset all the voices */
-	for (i = 0; i < 5; i++) {
-		voice[i].frequency = 0;
-		voice[i].volume = 0xf;
-		voice[i].counter = 0;
-		voice[i].key = 0;
-	}
-
-	/* other parameters */
-	info->test = 0;
-}
 
 /********************************************************************************/
 
-WRITE8_DEVICE_HANDLER( k051649_waveform_w )
-{
-	k051649_state *info = get_safe_token(device);
 
-	/* waveram is read-only? */
-	if (info->test & 0x40 || (info->test & 0x80 && offset >= 0x60))
+WRITE8_MEMBER( k051649_device::k051649_waveform_w )
+{
+	// waveram is read-only? 
+	if (m_test & 0x40 || (m_test & 0x80 && offset >= 0x60))
 		return;
 
-	info->stream->update();
+	m_stream->update();
 
 	if (offset >= 0x60)
 	{
-		/* channel 5 shares waveram with channel 4 */
-		info->channel_list[3].waveram[offset&0x1f]=data;
-		info->channel_list[4].waveram[offset&0x1f]=data;
+		// channel 5 shares waveram with channel 4 
+		m_channel_list[3].waveram[offset&0x1f]=data;
+		m_channel_list[4].waveram[offset&0x1f]=data;
 	}
 	else
-		info->channel_list[offset>>5].waveram[offset&0x1f]=data;
+		m_channel_list[offset>>5].waveram[offset&0x1f]=data;
 }
 
-READ8_DEVICE_HANDLER ( k051649_waveform_r )
-{
-	k051649_state *info = get_safe_token(device);
 
-	/* test-register bits 6/7 expose the internal counter */
-	if (info->test & 0xc0)
+READ8_MEMBER ( k051649_device::k051649_waveform_r )
+{
+	// test-register bits 6/7 expose the internal counter 
+	if (m_test & 0xc0)
 	{
-		info->stream->update();
+		m_stream->update();
 
 		if (offset >= 0x60)
-			offset += (info->channel_list[3 + (info->test >> 6 & 1)].counter >> FREQ_BITS);
-		else if (info->test & 0x40)
-			offset += (info->channel_list[offset>>5].counter >> FREQ_BITS);
+			offset += (m_channel_list[3 + (m_test >> 6 & 1)].counter >> FREQ_BITS);
+		else if (m_test & 0x40)
+			offset += (m_channel_list[offset>>5].counter >> FREQ_BITS);
 	}
-	return info->channel_list[offset>>5].waveram[offset&0x1f];
+	return m_channel_list[offset>>5].waveram[offset&0x1f];
 }
 
-WRITE8_DEVICE_HANDLER( k052539_waveform_w )
-{
-	k051649_state *info = get_safe_token(device);
 
-	/* waveram is read-only? */
-	if (info->test & 0x40)
+WRITE8_MEMBER( k051649_device::k052539_waveform_w )
+{
+	// waveram is read-only? 
+	if (m_test & 0x40)
 		return;
 
-	info->stream->update();
-	info->channel_list[offset>>5].waveram[offset&0x1f]=data;
+	m_stream->update();
+	m_channel_list[offset>>5].waveram[offset&0x1f]=data;
 }
 
-READ8_DEVICE_HANDLER ( k052539_waveform_r )
-{
-	k051649_state *info = get_safe_token(device);
 
-	/* test-register bit 6 exposes the internal counter */
-	if (info->test & 0x40)
+READ8_MEMBER ( k051649_device::k052539_waveform_r )
+{
+	// test-register bit 6 exposes the internal counter 
+	if (m_test & 0x40)
 	{
-		info->stream->update();
-		offset += (info->channel_list[offset>>5].counter >> FREQ_BITS);
+		m_stream->update();
+		offset += (m_channel_list[offset>>5].counter >> FREQ_BITS);
 	}
-	return info->channel_list[offset>>5].waveram[offset&0x1f];
+	return m_channel_list[offset>>5].waveram[offset&0x1f];
 }
 
-WRITE8_DEVICE_HANDLER( k051649_volume_w )
+
+WRITE8_MEMBER( k051649_device::k051649_volume_w )
 {
-	k051649_state *info = get_safe_token(device);
-	info->stream->update();
-	info->channel_list[offset&0x7].volume=data&0xf;
+	m_stream->update();
+	m_channel_list[offset&0x7].volume=data&0xf;
 }
 
-WRITE8_DEVICE_HANDLER( k051649_frequency_w )
+
+WRITE8_MEMBER( k051649_device::k051649_frequency_w )
 {
-	k051649_state *info = get_safe_token(device);
 	int freq_hi = offset & 1;
 	offset >>= 1;
 
-	info->stream->update();
+	m_stream->update();
 
-	/* test-register bit 5 resets the internal counter */
-	if (info->test & 0x20)
-		info->channel_list[offset].counter = ~0;
-	else if (info->channel_list[offset].frequency < 9)
-		info->channel_list[offset].counter |= ((1 << FREQ_BITS) - 1);
+	// test-register bit 5 resets the internal counter 
+	if (m_test & 0x20)
+		m_channel_list[offset].counter = ~0;
+	else if (m_channel_list[offset].frequency < 9)
+		m_channel_list[offset].counter |= ((1 << FREQ_BITS) - 1);
 
-	/* update frequency */
+	// update frequency 
 	if (freq_hi)
-		info->channel_list[offset].frequency = (info->channel_list[offset].frequency & 0x0ff) | (data << 8 & 0xf00);
+		m_channel_list[offset].frequency = (m_channel_list[offset].frequency & 0x0ff) | (data << 8 & 0xf00);
 	else
-		info->channel_list[offset].frequency = (info->channel_list[offset].frequency & 0xf00) | data;
+		m_channel_list[offset].frequency = (m_channel_list[offset].frequency & 0xf00) | data;
 }
 
-WRITE8_DEVICE_HANDLER( k051649_keyonoff_w )
+
+WRITE8_MEMBER( k051649_device::k051649_keyonoff_w )
 {
 	int i;
-	k051649_state *info = get_safe_token(device);
-	info->stream->update();
+	m_stream->update();
 
-	for (i = 0; i < 5; i++) {
-		info->channel_list[i].key=data&1;
+	for (i = 0; i < 5; i++)
+    {
+		m_channel_list[i].key=data&1;
 		data >>= 1;
 	}
 }
 
-WRITE8_DEVICE_HANDLER( k051649_test_w )
+
+WRITE8_MEMBER( k051649_device::k051649_test_w )
 {
-	k051649_state *info = get_safe_token(device);
-	info->test = data;
+	m_test = data;
 }
 
-READ8_DEVICE_HANDLER ( k051649_test_r )
+
+READ8_MEMBER ( k051649_device::k051649_test_r )
 {
-	/* reading the test register sets it to $ff! */
-	k051649_test_w(device, space, offset, 0xff);
+	// reading the test register sets it to $ff! 
+	k051649_test_w(space, offset, 0xff);
 	return 0xff;
 }
 
-const device_type K051649 = &device_creator<k051649_device>;
 
-k051649_device::k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K051649, "K051649", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
+//-------------------------------------------------
+// build a table to divide by the number of voices
+//-------------------------------------------------
+
+void k051649_device::make_mixer_table(int voices)
 {
-	m_token = global_alloc_clear(k051649_state);
+	int i;
+
+	// allocate memory 
+	m_mixer_table = auto_alloc_array(machine(), INT16, 512 * voices);
+
+	// find the middle of the table 
+	m_mixer_lookup = m_mixer_table + (256 * voices);
+
+	// fill in the table - 16 bit case 
+	for (i = 0; i < (voices * 256); i++)
+	{
+		int val = i * DEF_GAIN * 16 / voices;
+		if (val > 32767) val = 32767;
+		m_mixer_lookup[ i] = val;
+		m_mixer_lookup[-i] = -val;
+	}
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
 
-void k051649_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void k051649_device::device_start()
-{
-	DEVICE_START_NAME( k051649 )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void k051649_device::device_reset()
-{
-	DEVICE_RESET_NAME( k051649 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}
