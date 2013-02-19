@@ -322,7 +322,7 @@ public:
 	UINT8 m_vblank;
 	int m_scsp_last_line;
 	UINT8 an_mux_data;
-
+	UINT8 sound_data;
 
 	DECLARE_READ32_MEMBER(sysh1_unk_r);
 	DECLARE_WRITE32_MEMBER(sysh1_unk_w);
@@ -341,6 +341,7 @@ public:
 	DECLARE_READ8_MEMBER(analog_mux_r);
 	DECLARE_WRITE8_MEMBER(analog_mux_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
+	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
 	DECLARE_WRITE_LINE_MEMBER(scsp_to_main_irq);
 	DECLARE_DRIVER_INIT(coolridr);
 	virtual void machine_start();
@@ -459,11 +460,20 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_rgb
 /* unknown purpose */
 READ32_MEMBER(coolridr_state::sysh1_unk_r)
 {
+	if(offset == 8)
+		return sound_data;
+
+	if(offset != 2)
+		printf("%08x\n",offset);
+
 	return m_h1_unk[offset];
 }
 
 WRITE32_MEMBER(coolridr_state::sysh1_unk_w)
 {
+	if(offset != 8) // 8 = sound irq ack?
+		printf("%08x %08x\n",offset,data);
+
 	COMBINE_DATA(&m_h1_unk[offset]);
 }
 
@@ -944,9 +954,9 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x03200000, 0x0327ffff) AM_READWRITE16(h1_soundram2_r, h1_soundram2_w,0xffffffff) //AM_SHARE("soundram2")
 	AM_RANGE(0x03300000, 0x03300fff) AM_DEVREADWRITE16_LEGACY("scsp2", scsp_r, scsp_w, 0xffffffff)
 
-	AM_RANGE(0x04000000, 0x0400001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xffffffff)
-	AM_RANGE(0x04000020, 0x0400003f) AM_READWRITE(sysh1_unk_r,sysh1_unk_w) AM_SHARE("h1_unk")
-	AM_RANGE(0x04200000, 0x0420003f) AM_RAM /* hi-word for DMA? */
+//	AM_RANGE(0x04000000, 0x0400001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xffffffff)
+	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_unk_r,sysh1_unk_w) AM_SHARE("h1_unk")
+//	AM_RANGE(0x04200000, 0x0420003f) AM_RAM
 
 	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
 	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
@@ -967,16 +977,18 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 ADDRESS_MAP_END
 
-// SH-1 or SH-2 almost certainly copies the program down to here: the ROM containing the program is 32-bit wide and the 68000 is 16-bit
-// the SCSP is believed to be hardcoded to decode the first 4 MB like this for a master/slave config
-// (see also Model 3):
+WRITE8_MEMBER( coolridr_state::sound_to_sh1_w)
+{
+	sound_data = data;
+}
+
 static ADDRESS_MAP_START( system_h1_sound_map, AS_PROGRAM, 16, coolridr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1",0) AM_SHARE("soundram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp1", scsp_r, scsp_w)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2",0) AM_SHARE("soundram2")
 	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE_LEGACY("scsp2", scsp_r, scsp_w)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM
-	AM_RANGE(0x900000, 0x900001) AM_WRITENOP
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(sound_to_sh1_w,0x00ff)
 ADDRESS_MAP_END
 
 
@@ -1438,7 +1450,8 @@ static const scsp_interface scsp_config =
 static const scsp_interface scsp2_interface =
 {
 	0,
-	NULL
+	NULL,
+	DEVCB_DRIVER_LINE_MEMBER(coolridr_state, scsp_to_main_irq)
 };
 
 #define MAIN_CLOCK XTAL_28_63636MHz
