@@ -254,6 +254,8 @@ Note: This hardware appears to have been designed as a test-bed for a new RLE ba
 #include "machine/am9517a.h"
 #include "rendlay.h"
 
+//#define FAKE_ASCII_ROM
+
 class coolridr_state : public driver_device
 {
 public:
@@ -481,6 +483,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 {
 	COMBINE_DATA(&m_sysh1_txt_blit[offset]);
 
+
 	switch(offset)
 	{
 		// The mode register
@@ -661,6 +664,15 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
 								if (spriteNumber == 0x20 || spriteNumber == 0x00)
 									continue;
+
+#ifdef FAKE_ASCII_ROM
+							if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
+							{
+								
+								drawgfx_opaque(*drawbitmap,drawbitmap->cliprect(), machine().gfx[3],spriteNumber,0,0,0,pixelOffsetX,pixelOffsetY);
+								continue;
+							}
+#endif
 
 
 							int blockwide = ((16*m_hZoom)/0x40)-1;
@@ -962,11 +974,25 @@ static const gfx_layout test =
 };
 #endif
 
+
+static const gfx_layout fakeascii =
+{
+	16,16,
+	512,
+	4,
+	{ 0,1,2,3 },
+	{ 0*4,0*4,1*4,1*4,2*4,2*4,3*4,3*4,4*4,4*4,5*4,5*4,6*4,6*4, 7*4,7*4 },
+	{ 0*8*4,0*8*4, 1*8*4,1*8*4, 2*8*4,2*8*4, 3*8*4,3*8*4, 4*8*4,4*8*4, 5*8*4,5*8*4, 6*8*4,6*8*4, 7*8*4,7*8*4 },
+	8*8*4
+};
+
+
 static GFXDECODE_START( coolridr )
 //  GFXDECODE_ENTRY( "maincpu_data", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx_data", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles8x8_layout, 0, 16 )
 	GFXDECODE_ENTRY( "ram_gfx", 0, tiles8x8_layout, 0, 16 )
+	GFXDECODE_ENTRY( "fakeascii", 0x18000, fakeascii, 0, 16 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( coolridr )
@@ -1491,6 +1517,12 @@ ROM_START( coolridr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
+
+
+	ROM_REGION( 0x2800000, "fakeascii", ROMREGION_ERASEFF )
+#ifdef FAKE_ASCII_ROM
+	ROM_LOAD( "video", 0x000000, 0x020000,  CRC(8857ec5a) SHA1(5bed14933af060cb4a1ce6a961c4ca1467a1cbc2) ) // dump of the orunners video ram so we can use the charset (its 8x8 not 16x16 tho, but who cares)
+#endif
 ROM_END
 
 #if 0
@@ -1520,4 +1552,4 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
 }
 
-GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND ) // was marked 'US' but clearly uploads a Japan warning, might be a jumper select
+GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND ) // region is set in test mode
