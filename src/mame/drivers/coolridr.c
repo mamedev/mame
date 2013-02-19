@@ -279,7 +279,8 @@ public:
 		m_sysh1_txt_blit(*this, "sysh1_txt_blit"),
 		m_sysh1_workram_h(*this, "sysh1_workrah"),
 		m_h1_unk(*this, "h1_unk"),
-		m_soundram(*this, "soundram")
+		m_soundram(*this, "soundram"),
+		m_soundram2(*this, "soundram2")
 		{ }
 
 	// Blitter state
@@ -306,6 +307,7 @@ public:
 	required_shared_ptr<UINT32> m_sysh1_workram_h;
 	required_shared_ptr<UINT32> m_h1_unk;
 	required_shared_ptr<UINT16> m_soundram;
+	required_shared_ptr<UINT16> m_soundram2;
 	bitmap_rgb32 m_temp_bitmap_sprites;
 	bitmap_rgb32 m_temp_bitmap_sprites2;
 	UINT32 m_test_offs;
@@ -324,6 +326,11 @@ public:
 	DECLARE_WRITE32_MEMBER(sysh1_char_w);
 	DECLARE_READ32_MEMBER(coolridr_hack1_r);
 	DECLARE_READ32_MEMBER(coolridr_hack2_r);
+	DECLARE_READ16_MEMBER(h1_soundram_r);
+	DECLARE_READ16_MEMBER(h1_soundram2_r);
+	DECLARE_WRITE16_MEMBER(h1_soundram_w);
+	DECLARE_WRITE16_MEMBER(h1_soundram2_w);
+	DECLARE_WRITE_LINE_MEMBER(scsp_to_main_irq);
 	DECLARE_DRIVER_INIT(coolridr);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -798,17 +805,35 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 ADDRESS_MAP_END
 
+READ16_MEMBER( coolridr_state::h1_soundram_r)
+{
+	return m_soundram[offset];
+}
+
+READ16_MEMBER( coolridr_state::h1_soundram2_r)
+{
+	return m_soundram2[offset];
+}
+
+WRITE16_MEMBER( coolridr_state::h1_soundram_w)
+{
+	COMBINE_DATA(&m_soundram[offset]);
+}
+
+WRITE16_MEMBER( coolridr_state::h1_soundram2_w)
+{
+	COMBINE_DATA(&m_soundram2[offset]);
+}
+
 static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_SHARE("share2")
 
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM //communication RAM
 
-	AM_RANGE(0x03008800, 0x03008803) AM_RAM /*???*/
-	AM_RANGE(0x03008900, 0x03008903) AM_RAM /*???*/
-	AM_RANGE(0x03100400, 0x03100403) AM_RAM /*irq enable?*/
-	AM_RANGE(0x03208800, 0x03208803) AM_RAM /*???*/
-	AM_RANGE(0x03208900, 0x03208903) AM_RAM /*???*/
-	AM_RANGE(0x03300400, 0x03300403) AM_RAM /*irq enable?*/
+	AM_RANGE(0x03000000, 0x0307ffff) AM_READWRITE16(h1_soundram_r, h1_soundram_w,0xffffffff) //AM_SHARE("soundram")
+	AM_RANGE(0x03100000, 0x03100fff) AM_DEVREADWRITE16_LEGACY("scsp1", scsp_r, scsp_w, 0xffffffff)
+	AM_RANGE(0x03200000, 0x0327ffff) AM_READWRITE16(h1_soundram2_r, h1_soundram2_w,0xffffffff) //AM_SHARE("soundram2")
+	AM_RANGE(0x03300000, 0x03300fff) AM_DEVREADWRITE16_LEGACY("scsp2", scsp_r, scsp_w, 0xffffffff)
 
 	AM_RANGE(0x04000000, 0x0400001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x04000020, 0x0400003f) AM_READWRITE(sysh1_unk_r,sysh1_unk_w) AM_SHARE("h1_unk")
@@ -839,7 +864,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( system_h1_sound_map, AS_PROGRAM, 16, coolridr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1",0) AM_SHARE("soundram")
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp1", scsp_r, scsp_w)
-	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2",0)
+	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2",0) AM_SHARE("soundram2")
 	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE_LEGACY("scsp2", scsp_r, scsp_w)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM
 ADDRESS_MAP_END
@@ -1287,11 +1312,16 @@ static void scsp_irq(device_t *device, int irq)
 		device->machine().device("soundcpu")->execute().set_input_line(-irq, CLEAR_LINE);
 }
 
+WRITE_LINE_MEMBER(coolridr_state::scsp_to_main_irq)
+{
+	// ...
+}
+
 static const scsp_interface scsp_config =
 {
 	0,
 	scsp_irq,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(coolridr_state, scsp_to_main_irq)
 };
 
 static const scsp_interface scsp2_interface =
