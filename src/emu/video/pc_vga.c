@@ -2676,7 +2676,7 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 				res = s3.reg_lock2;
 				break;
 			case 0x42: // CR42 Mode Control
-				res = 0x0d; // hardcode to non-interlace
+				res = s3.cr42 & 0x0f;  // bit 5 set if interlaced, leave it unset for now.
 				break;
 			case 0x45:
 				res = s3.cursor_mode;
@@ -2718,6 +2718,13 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 				break;
 			case 0x55:
 				res = s3.extended_dac_ctrl;
+				break;
+			case 0x5c:
+				// if VGA dot clock is set to 3 (misc reg bits 2-3), then selected dot clock is read, otherwise read VGA clock select
+				if((vga.miscellaneous_output & 0xc) == 0x0c)
+					res = s3.cr42 & 0x0f;
+				else
+					res = (vga.miscellaneous_output & 0xc) >> 2;
 				break;
 			case 0x67:
 				res = s3.ext_misc_ctrl_2;
@@ -2837,7 +2844,6 @@ void s3_vga_device::s3_crtc_reg_write(UINT8 index, UINT8 data)
 				s3.memory_config = data;
 				vga.crtc.start_addr_latch &= ~0x30000;
 				vga.crtc.start_addr_latch |= ((data & 0x30) << 12);
-				//popmessage("%02x",data);
 				s3_define_video_mode();
 				break;
 			case 0x35:
@@ -2987,7 +2993,7 @@ bit  0-5  Pattern Display Start Y-Pixel Position.
 				vga.crtc.start_addr_latch &= ~0xc0000;
 				vga.crtc.start_addr_latch |= ((data & 0x3) << 18);
 				svga.bank_w = (svga.bank_w & 0xcf) | ((data & 0x0c) << 2);
-				svga.bank_r = svga.bank_r;
+				svga.bank_r = svga.bank_w;
 				s3_define_video_mode();
 				break;
 			case 0x53:
@@ -3042,7 +3048,9 @@ bit    0  Horizontal Total bit 8. Bit 8 of the Horizontal Total register (3d4h
 				vga.crtc.horz_total = (vga.crtc.horz_total & 0xfeff) | ((data & 0x01) << 8);
 				vga.crtc.horz_disp_end = (vga.crtc.horz_disp_end & 0xfeff) | ((data & 0x02) << 7);
 				vga.crtc.horz_blank_start = (vga.crtc.horz_blank_start & 0xfeff) | ((data & 0x04) << 6);
+				vga.crtc.horz_blank_end = (vga.crtc.horz_blank_end & 0xffbf) | ((data & 0x08) << 3);
 				vga.crtc.horz_retrace_start = (vga.crtc.horz_retrace_start & 0xfeff) | ((data & 0x10) << 4);
+				vga.crtc.horz_retrace_end = (vga.crtc.horz_retrace_end & 0xffdf) | (data & 0x20);
 				s3_define_video_mode();
 				break;
 /*
