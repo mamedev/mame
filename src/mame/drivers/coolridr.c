@@ -413,9 +413,10 @@ public:
 	UINT32 m_blit1; // ?
 	UINT32 m_blit2; // ?
 	UINT32 m_blit3; // ?
+	UINT32 m_blit4_unused;
 	UINT32 m_blit4; // ?
 
-	UINT32 m_blit5; // indirection enable + other bits?
+	UINT32 m_blit5_unused; // indirection enable + other bits?
 	int m_indirect_tile_enable; // from m_blit5
 	int m_indirect_zoom_enable; // from m_blit5
 
@@ -695,7 +696,10 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				//  1: xxxxxxxx - "Color Number" (all bits or just lower 16/8?)
 				//  2: 00000000 - unknown : OT flag?  (transparency)
 				//  3: 00000000 - unknown : RF flag?  (90 degree rotation)
-				//  4: 07000000 - unknown : VF flag?  (vertically flipped)
+				//  4: 07000000 - unknown (draw mode?)
+				//  4: 00010000 - unknown (set on a few object)
+				//  4: 00000100 - y-flip?
+				//  4: 00000001 - x-flip?
 				//  5: 00010000 - enable indirect text tile lookup
 				//  5: 00000001 - enable line-zoom(?) lookup (road)
 				//  6: vvvv---- - "Vertical Cell Count"
@@ -731,7 +735,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 
 					 // 00??0uuu  
 					 // ?? seems to be 00 or 7f
-					 // uuu, at least 11 bits used, maybe 12
+					 // uuu, at least 11 bits used, maybe 12 usually the same as m_blit1? leftover?
 
 				}
 				else if (m_blitterSerialCount == 3)
@@ -743,22 +747,26 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				}
 				else if (m_blitterSerialCount == 4)
 				{
-					m_blit4 = data;
+					m_blit4_unused = data & 0xf8fefefe;
+					m_blit4 = data & 0x07010101;
 
-					//0x000y0z
-					// x = 1, 2, 3 or 7
-					// y = 0 or 1
-					// z = 0 or 1
+					if (m_blit4_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, m_blit4_unused);
+
+					// ---- -111 ---- ---v ---- ---u ---- ---x
+					// 1 = used bits? (unknown purpose.. might be object colour mode)
+					// x = x-flip?
+					// u = probably y-flip? used on a few objects here and there...
+					// v = unknown, not used much, occasional object
 				}
 				else if (m_blitterSerialCount == 5)
 				{
-					m_blit5 = data&0xfffefffe;
+					m_blit5_unused = data&0xfffefffe;
 					// this might enable the text indirection thing?
 					m_indirect_tile_enable = (data & 0x00010000)>>16;
 					m_indirect_zoom_enable = (data & 0x00000001);
 
 
-					if (m_blit5) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, m_blit5);
+					if (m_blit5_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, m_blit5_unused);
 					// 00010000 (text)
 					// 00000001 (other)
 
@@ -815,7 +823,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 					{
 						// with this bit enabled m_blit10 is a look up to the zoom(?) value eg. 03f42600
 						//UINT32 temp = space.read_dword(m_blit10);
-						//printf("road type blit %08x %08x %08x %08x %08x %08x %04x %04x %04x %04x %08x %08x (TEMP %08x) %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4, m_blit5, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, temp, m_vPosition, m_hPosition);
+						//printf("road type blit %08x %08x %08x %08x %08x(%08x) %08x %04x %04x %04x %04x %08x %08x (TEMP %08x) %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4_unused, m_blit4, m_blit5_unused, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, temp, m_vPosition, m_hPosition);
 					
 						/* for the horizontal road during attract there are tables 0x480 bytes long (0x120 dwords) and the value passed points to the start of them */
 						/* cell sizes for those are are 0011 (v) 0007 (h) with zoom factors of 0020 (half v) 0040 (normal h) */
@@ -823,7 +831,23 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 
 					}
 
+		
+					int random;
 					
+					random = 0;
+
+					// not used much..
+					if (m_blit4 &0x00010000)
+					{
+					//	printf("type blit %08x %08x %08x %08x %08x(%08x) %08x %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4_unused, m_blit4, m_blit5_unused, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition);
+						m_colorNumber = machine().rand() | 0xff000000;
+						random = 1;
+					}
+					else
+					{
+						
+					}
+				
 					bitmap_rgb32* drawbitmap;
 
 					// 0x30 - 0x60 are definitely the left screen, 0x90 - 0xc0 are definitely the right screen.. the modes seem priority related
@@ -873,6 +897,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 						break;
 					}
 
+
 					// Splat some sprites
 					for (int h = 0; h < m_hCellCount; h++)
 					{
@@ -908,41 +933,47 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							if (blockwide<=0) blockwide = 1;
 							if (blockhigh<=0) blockhigh = 1;
 
-							// DEBUG: Draw 16x16 block
-							for (int x = 0; x < blockwide; x++)
+
+							UINT32 color = 0xffffffff;
+							// HACKS to draw coloured blocks in easy to distinguish colours
+							if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
 							{
-								for (int y = 0; y < blockhigh; y++)
+								if (m_colorNumber == 0x5b)
+									color = 0xffff0000;
+								else if (m_colorNumber == 0x5d)
+									color = 0xff00ff00;
+								else if (m_colorNumber == 0x5e)
+									color = 0xff0000ff;
+								else
+									color = 0xff00ffff;
+							}
+							else if (m_blitterMode == 0x40 || m_blitterMode == 0xa0)
+							{
+								color = 0xff000000 | (((m_colorNumber & 0xff) | 0x80)-0x40);
+							}
+							else if (m_blitterMode == 0x50 || m_blitterMode == 0xb0)
+							{
+								color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 8);
+							}
+							else if (m_blitterMode == 0x60 || m_blitterMode == 0xc0)
+							{
+								color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 16);
+							}
+							if (random == 1)
+								color = m_colorNumber;
+
+							// DEBUG: Draw 16x16 block
+							for (int y = 0; y < blockhigh; y++)
+							{
+								int drawy = pixelOffsetY+y;
+								if ((drawy>383) || (drawy<0)) continue;
+
+								for (int x = 0; x < blockwide; x++)
 								{
+									int drawx = pixelOffsetX+x;
+									if ((drawx>=495 || drawx<0)) continue;
 
-									UINT32 color = 0xffffffff;
-									// HACKS to draw coloured blocks in easy to distinguish colours
-									if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
-									{
-										if (m_colorNumber == 0x5b)
-											color = 0xffff0000;
-										else if (m_colorNumber == 0x5d)
-											color = 0xff00ff00;
-										else if (m_colorNumber == 0x5e)
-											color = 0xff0000ff;
-										else
-											color = 0xff00ffff;
-									}
-									else if (m_blitterMode == 0x40 || m_blitterMode == 0xa0)
-									{
-										color = 0xff000000 | (((m_colorNumber & 0xff) | 0x80)-0x40);
-									}
-									else if (m_blitterMode == 0x50 || m_blitterMode == 0xb0)
-									{
-										color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 8);
-									}
-									else if (m_blitterMode == 0x60 || m_blitterMode == 0xc0)
-									{
-										color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 16);
-									}
-
-
-									if (drawbitmap->cliprect().contains(pixelOffsetX+x, pixelOffsetY+y))
-										if (drawbitmap->pix32(pixelOffsetY+y, pixelOffsetX+x)==0) drawbitmap->pix32(pixelOffsetY+y, pixelOffsetX+x) = color;
+									if (drawbitmap->pix32(drawy,drawx)==0) drawbitmap->pix32(drawy, drawx) = color;
 								}
 							}
 						}
