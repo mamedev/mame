@@ -384,7 +384,11 @@ public:
 	UINT32 m_blit2; // ?
 	UINT32 m_blit3; // ?
 	UINT32 m_blit4; // ?
-	UINT32 m_blit5; // ?
+
+	UINT32 m_blit5; // indirection enable + other bits?
+	int m_indirect_tile_enable; // from m_blit5
+	int m_indirect_zoom_enable; // from m_blit5
+
 	UINT32 m_blit10; // an address
 
 	required_device<cpu_device> m_maincpu;
@@ -662,7 +666,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				//  2: 00000000 - unknown : OT flag?  (transparency)
 				//  3: 00000000 - unknown : RF flag?  (90 degree rotation)
 				//  4: 07000000 - unknown : VF flag?  (vertically flipped)
-				//  5: 00010000 - unknown : HF flag?  (horizontally flipped) (or mode... )
+				//  5: 00010000 - enable indirect text tile lookup
+				//  5: 00000001 - enable line-zoom(?) lookup (road)
 				//  6: vvvv---- - "Vertical Cell Count"
 				//  6: ----hhhh - "Horizontal Cell Count"
 				//  7: 00000000 - unknown : "Vertical|Horizontal Zoom Centers"?
@@ -717,10 +722,13 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				}
 				else if (m_blitterSerialCount == 5)
 				{
-					m_blit5 = data;
+					m_blit5 = data&0xfffefffe;
 					// this might enable the text indirection thing?
+					m_indirect_tile_enable = (data & 0x00010000)>>16;
+					m_indirect_zoom_enable = (data & 0x00000001);
 
-				//	if (data!=0) printf("blit %08x\n", data);
+
+					if (m_blit5) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, m_blit5);
 					// 00010000 (text)
 					// 00000001 (other)
 
@@ -772,7 +780,15 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 					//if (m_blit10==0) return;
 					//if (m_blit0==0) return;
 
-					const UINT32 memOffset = data;
+					//if (m_blit10!=0)
+					if (m_indirect_zoom_enable)
+					{
+						// with this bit enabled m_blit10 is a look up to the zoom(?) value eg. 03f42600
+
+						//printf("road type blit %08x %08x %08x %08x %08x %08x %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4, m_blit5, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition);
+					}
+
+					
 					bitmap_rgb32* drawbitmap;
 
 					// guess, you can see the different sizes of bike cross from the left screen to the right where the attract text is
@@ -832,21 +848,23 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 
 							// It's unknown if it's row-major or column-major
 							// TODO: Study the CRT test and "Cool Riders" logo for clues.
-							UINT8 spriteNumber = space.read_byte(memOffset + h + (v*h));
+							UINT8 spriteNumber = 0;
 
-							// DEBUG: For demo purposes, skip &spaces and NULL characters
-							if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
+							// with this bit enabled the tile numbers gets looked up using 'data' (which would be m_blit11) (eg 03f40000 for startup text)
+							// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
+							if (m_indirect_tile_enable)
+							{
+								const UINT32 memOffset = data;
+								spriteNumber = space.read_byte(memOffset + h + (v*h));
+
+								// DEBUG: For demo purposes, skip &spaces and NULL characters
 								if (spriteNumber == 0x20 || spriteNumber == 0x00)
 									continue;
-
 #ifdef FAKE_ASCII_ROM
-							if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
-							{
-
 								drawgfx_opaque(*drawbitmap,drawbitmap->cliprect(), machine().gfx[3],spriteNumber,0,0,0,pixelOffsetX,pixelOffsetY);
 								continue;
-							}
 #endif
+							}
 
 
 							int blockwide = ((16*m_hZoom)/0x40)-1;
