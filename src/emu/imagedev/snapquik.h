@@ -23,6 +23,7 @@ public:
 
 	// image-level overrides
 	virtual bool call_load();
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { return load_software(swlist, swname, start_entry); }
 	virtual iodevice_t image_type() const { return IO_SNAPSHOT; }
 
 	virtual bool is_readable()  const { return 1; }
@@ -30,12 +31,13 @@ public:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return 0; }
 	virtual bool is_reset_on_load() const { return 0; }
-	virtual const char *image_interface() const { return NULL; }
+	virtual const char *image_interface() const { return m_interface; }
 	virtual const char *file_extensions() const { return m_file_extensions; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	void timer_callback();
 	void set_handler(snapquick_load_func load, const char *ext, seconds_t sec) { m_load = load; m_file_extensions = ext; m_delay_seconds = sec; };
+	void set_interface(const char *_interface) { m_interface = _interface; }
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -43,6 +45,7 @@ protected:
 
 	snapquick_load_func m_load;                 /* loading function */
 	const char *        m_file_extensions;      /* file extensions */
+	const char *        m_interface;
 	seconds_t           m_delay_seconds;        /* loading delay (seconds) */
 	attoseconds_t       m_delay_attoseconds;    /* loading delay (attoseconds) */
 	emu_timer           *m_timer;
@@ -79,8 +82,14 @@ extern const device_type QUICKLOAD;
 	MCFG_DEVICE_ADD(_tag, SNAPSHOT, 0) \
 	static_cast<snapshot_image_device *>(device)->set_handler(SNAPSHOT_LOAD_NAME(_load), _file_extensions, _delay);
 
+#define MCFG_SNAPSHOT_INTERFACE(_interface)                         \
+	static_cast<snapshot_image_device *>(device)->set_interface(_interface);
+
 #define MCFG_QUICKLOAD_ADD(_tag, _load, _file_extensions, _delay)   \
 	MCFG_DEVICE_ADD(_tag, QUICKLOAD, 0) \
 	static_cast<quickload_image_device *>(device)->set_handler(QUICKLOAD_LOAD_NAME(_load), _file_extensions, _delay);
+
+#define MCFG_QUICKLOAD_INTERFACE(_interface)                         \
+	static_cast<quickload_image_device *>(device)->set_interface(_interface);
 
 #endif /* __SNAPQUIK_H__ */

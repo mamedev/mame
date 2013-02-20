@@ -19,6 +19,7 @@ const device_type SNAPSHOT = &device_creator<snapshot_image_device>;
 snapshot_image_device::snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, SNAPSHOT, "Snapshot", tag, owner, clock),
 		device_image_interface(mconfig, *this),
+		m_interface(NULL),
 		m_delay_attoseconds(0)
 {
 }
@@ -26,6 +27,7 @@ snapshot_image_device::snapshot_image_device(const machine_config &mconfig, cons
 snapshot_image_device::snapshot_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, type, name, tag, owner, clock),
 		device_image_interface(mconfig, *this),
+		m_interface(NULL),
 		m_delay_attoseconds(0)
 {
 }
