@@ -796,7 +796,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 						if (m_b3romoffset!=0)
 						{
 #if 0
-							// if we look in rom IC6 (+0x1400000) then the word before our offset is very often 0x0000
+							// if we look in rom IC6 (+0x1400000) then the word before our offset is very often 0x0000 probably indicating that's the last word used
 							printf("rom offset %08x, previous values : ", m_b3romoffset);
 							for (int i=0;i<10;i++)
 							{
@@ -806,7 +806,11 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							printf("\n");
 #endif
 #if 0
-							// if we look in rom IC6 (+0x1400000) then the word before our offset is very often 0x0000 probably indicating that's the last word used
+							// look at the values actually at the address we're using.. 
+							// often have a similar form to
+							// 0002, 0020, 0000, 0200, 2000, 0002, 0020, 0000, 0200, 2000,
+							//   1     2     3     4     5     6     7     8     9    10
+							// so you can see 1/6  2/7,  3/8,  4/9,  5/10 are often similar or the same
 							printf("rom offset %08x, values : ", m_b3romoffset);
 							for (int i=0;i<10;i++)
 							{
