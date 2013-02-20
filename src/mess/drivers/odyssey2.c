@@ -333,7 +333,7 @@ WRITE_LINE_MEMBER(odyssey2_state::the_voice_lrq_callback)
 
 READ8_MEMBER(odyssey2_state::t0_read)
 {
-	return sp0256_lrq_r( m_sp0256 ) ? 1 : 0;
+	return sp0256_lrq_r( m_sp0256 ) ? 0 : 1;
 }
 
 
@@ -438,7 +438,6 @@ WRITE8_MEMBER(odyssey2_state::io_write)
 			}
 			else
 			{
-				/* TODO: Reset sp0256 in this case */
 				m_sp0256->reset();
 			}
 		}

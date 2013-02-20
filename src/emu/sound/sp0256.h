@@ -79,6 +79,9 @@ public:
 
 	// access to legacy token
 	void *token() const { assert(m_token != NULL); return m_token; }
+
+	TIMER_CALLBACK_MEMBER(set_lrq_timer_proc);
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
@@ -90,6 +93,7 @@ protected:
 private:
 	// internal state
 	void *m_token;
+	emu_timer *m_lrq_timer;
 };
 
 extern const device_type SP0256;

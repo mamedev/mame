@@ -1275,12 +1275,17 @@ READ_LINE_DEVICE_HANDLER( sp0256_lrq_r )
 {
 	sp0256_state *sp = get_safe_token(device);
 
+	// force stream update
+	sp->stream->update();
+
 	return sp->lrq == 0x8000;
 }
 
 READ_LINE_DEVICE_HANDLER( sp0256_sby_r )
 {
 	sp0256_state *sp = get_safe_token(device);
+
+	// TODO: force stream update??
 
 	return sp->sby_line;
 }
@@ -1390,7 +1395,17 @@ void sp0256_device::device_config_complete()
 void sp0256_device::device_start()
 {
 	DEVICE_START_NAME( sp0256 )(this);
+
+	m_lrq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sp0256_device::set_lrq_timer_proc),this));
 }
+
+TIMER_CALLBACK_MEMBER(sp0256_device::set_lrq_timer_proc)
+{
+	sp0256_state *sp = get_safe_token(this);
+
+	sp->lrq = 0x8000;
+}
+
 
 //-------------------------------------------------
 //  device_reset - device-specific reset
@@ -1399,6 +1414,10 @@ void sp0256_device::device_start()
 void sp0256_device::device_reset()
 {
 	DEVICE_RESET_NAME( sp0256 )(this);
+
+	sp0256_state *sp = get_safe_token(this);
+	sp->lrq = 0;
+	m_lrq_timer->adjust( attotime::from_ticks( 50, m_clock ) );
 }
 
 //-------------------------------------------------
