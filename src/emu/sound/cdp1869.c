@@ -376,6 +376,7 @@ void cdp1869_device::device_start()
 
 	// allocate timers
 	m_prd_timer = timer_alloc();
+	m_dispoff = 0;
 	update_prd_changed_timer();
 
 	// initialize palette
@@ -389,6 +390,15 @@ void cdp1869_device::device_start()
 	m_tonediv = 0;
 	m_tonefreq = 0;
 	m_toneamp = 0;
+	m_dblpage = 0;
+	m_line16 = 0;
+	m_line9 = 0;
+	m_fresvert = 0;
+	m_freshorz = 0;
+	m_hma = 0;
+	m_col = 0;
+	m_incr = 0;
+	m_signal = 0;
 
 	// register for state saving
 	save_item(NAME(m_prd));
