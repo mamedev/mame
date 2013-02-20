@@ -928,7 +928,7 @@ UINT8 saturn_state::smpc_th_control_mode(UINT8 pad_n)
 	const char *const padnames[] = { "JOY1", "JOY2" };
 	UINT8 res = 0;
 
-	th = (pad_n == 0) ? ((m_smpc.PDR1>>5) & 3) : ((m_smpc.PDR2>>6) & 3);
+	th = (pad_n == 0) ? ((m_smpc.PDR1>>5) & 3) : ((m_smpc.PDR2>>5) & 3);
 
 	if (LOG_SMPC) printf("SMPC: SH-2 TH control mode, returning pad data %d for phase %d\n",pad_n+1, th);
 
