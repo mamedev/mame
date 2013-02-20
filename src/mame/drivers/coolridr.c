@@ -300,7 +300,8 @@ public:
 	UINT16 m_hOrigin;
 	UINT16 m_vZoom;
 	UINT16 m_hZoom;
-
+	UINT32 m_blit0; // ?
+	UINT32 m_blit10; // an address
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -507,6 +508,12 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				m_textBytesToWrite = (data & 0xff000000) >> 24;
 				m_textOffset = (data & 0x0000ffff);
 				m_blitterSerialCount = 0;
+				
+				// this is ONLY used when there is text on the screen
+				
+				//printf("set mode %08x\n", data);
+
+			
 			}
 			else if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60
 				  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
@@ -515,6 +522,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				// After this is set a fixed count of 11 32-bit words are sent to the data register.
 				// The lower word always seems to be 0x0001 and the upper byte always 0xac.
 				m_blitterSerialCount = 0;
+
+				// form 0xacMM-xxx   ac = fixed value for this mode?  MM = modes above.  -xxx = some kind of offset? but it doesn't increment for each blit like the textOffset / paletteOffset stuff, investigate  
+
 			}
 			else if (m_blitterMode == 0x10)
 			{
@@ -575,14 +585,33 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				//  8: 00400040 - unknown : "Vertical|Horizontal Zoom Ratios"?
 				//  9: xxxx---- - "Display Vertical Position"
 				//  9: ----yyyy - "Display Horizontal Position"
-				// 10: 00000000 - unknown : always seems to be zero
-				// 11: ........ - complex - likely an address into bytes uploaded by mode 0xf4
+				// 10: 00000000 - unknown : always seems to be zero - NO, for some things (not text) it's also a reference to 3f40000 region like #11
+				// 11: ........ - complex - likely an address into bytes uploaded by mode 0xf4  (likely, it's only used when text is present otherwise it's always 0, some indirect tile mode I guess)
 				//                (See ifdef'ed out code below for a closer examination)
 
 				// Serialized counts
-				if (m_blitterSerialCount == 1)
+				if (m_blitterSerialCount == 0)
+				{
+					// set to 0x00000001 on some objects during the 'film strip' part of attract, otherwise 0
+					// those objects don't seem visible anyway so might have some special meaning
+					m_blit0 = data;
+				//	if (data!=0) printf("blit %08x\n", data);
+				}
+				else if (m_blitterSerialCount == 1)
 				{
 					m_colorNumber = (data & 0x000000ff);    // Probably more bits
+				}
+				else if (m_blitterSerialCount == 2)
+				{
+				}
+				else if (m_blitterSerialCount == 3)
+				{
+				}
+				else if (m_blitterSerialCount == 4)
+				{
+				}
+				else if (m_blitterSerialCount == 5)
+				{
 				}
 				else if (m_blitterSerialCount == 6)
 				{
@@ -608,8 +637,29 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 					if (m_hPosition & 0x8000) m_hPosition -= 0x10000;
 					if (m_vPosition & 0x8000) m_vPosition -= 0x10000;
 				}
+				else if (m_blitterSerialCount == 10)
+				{
+					// this is an address on some objects..
+					// to be specific, the center line of the road (actual road object? which currently gets shown as a single pixel column?)
+					// and the horizontal road used in the background of the title screen (which currently looks normal)
+					// I guess it's some kind of indirect way to do a line effect?
+					m_blit10 = data;
+
+				//	if (data!=0) printf("blit %08x\n", data);
+				}
 				else if (m_blitterSerialCount == 11)
 				{
+					// for text objects this is an address containing the 8-bit tile numbers to use for ASCII text
+					// I guess the tiles are decoded by a DMA operation earlier, from the compressed ROM?
+
+					// we also use this to trigger the actual draw operation
+
+					//printf("blit %08x\n", data);
+					
+					// debug, hide objects without m_blit10 set
+					//if (m_blit10==0) return;
+					//if (m_blit0==0) return;
+
 					const UINT32 memOffset = data;
 					bitmap_rgb32* drawbitmap;
 
@@ -733,6 +783,11 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 						}
 					}
 				}
+				else
+				{
+					printf("more than 11 dwords (%d) in blit?\n", m_blitterSerialCount);
+				}
+
 
 				m_blitterSerialCount++;
 			}
