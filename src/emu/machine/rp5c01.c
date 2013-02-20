@@ -176,6 +176,8 @@ rp5c01_device::rp5c01_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, RP5C01, "RP5C01", tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
+		m_mode(0),
+		m_reset(0),
 		m_alarm(1),
 		m_alarm_on(1),
 		m_1hz(1),
