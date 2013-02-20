@@ -245,6 +245,85 @@ Note: This hardware appears to have been designed as a test-bed for a new RLE ba
 
 ******************************************************************************************************/
 
+/*
+
+some Sprite compression notes from Charles and Andrew 
+
+OK so here's what we know. Andrew and I were playing with the ROMs and
+Guru traced out connections on the board at the time:
+
+The ten graphics ROMs are IC1-IC10. Each is 16 bits, and all have a
+common enable and common A20 input. All data lines are unique; nothing
+is shared.
+
+There are two independent address buses:
+- One drives A0-A19 of IC1-IC5
+- The other drives A0-A19 of IC6-IC10
+
+So the ROMs are arranged as 4,194,304 x 160-bit words (very wide), and
+are divided into two banks of 2,097,152 x 160-bit words per bank,
+where the common A20 input selects which bank is currently being used.
+This bank bit may not come from the graphics hardware and could just
+be a spare I/O pin on some other chip, we don't know.
+
+Then, within the current bank selected, the video chip can generate
+independent addresses for IC1-5 and IC6-10 in parallel, so that it can
+read 80 bits from IC1-5 at one address, and 80 bits from IC6-10 at
+another address simultaneously. Or it can drive the same address and
+read a 160-bit word at once. Regardless both addresses are restricted
+to the same bank as defined through A20.
+
+From looking at the ROMs there seem to be structures that may be
+tables. A table would be needed to associate a tile number with RLE
+data in ROM, so that would be a likely function of tables in the ROM.
+It may be that the split address design allows the chip to read table
+data from one 80-bit port while reading in graphics data from the
+other.
+
+Now this next bit is just an interpretation of what's in the patent,
+so you probably already know it:
+
+The primitive unit of graphics data is a 10-bit word (hence all the
+multiples of 10 listed above, e.g. 80 and 160-bit words) The top two
+bits define the type:
+
+0,x : $000 : Type A (3-bit color code, 5-bit run length, 1 bit "cell" flag)
+1,x : $800 : Type B (7-bit color code, 2-bit run length)
+1,1 : $C00 : Type C (8-bit color code)
+
+Because the top two bits (which identify the type) are shared with the
+color code, this limits the range of colors somewhat. E.g. one of the
+patent diagrams shows the upper 4 bits of a Type A pixel moved into
+the bottom four bits of the color RAM index, but for type A the most
+significant bit is always zero. So that 4-bit quantity is always 0-7
+which is why type A has a limit of 8 colors.
+
+This is why one of the later diagrams shows the Type B pixel ANDed
+with 7F and the Type C pixel ANDed with 3FF, to indicate the two
+indicator bits are being stripped out and the remaining value is
+somewhat truncated.
+
+We figured due to the colorful graphics in the game there would be a
+large groups of Type C pixels, but we could never find an
+rearrangement of data and address bits that yielded a large number of
+words with bits 9,8 set. Some of the data looks like it's linear, and
+some of it looks like bitplanes. Perhaps tables are linear and
+graphics are planar.
+
+We tried the usual stuff; assuming the 16-bit words from each ROM was
+a 160-pixel wide array of 10-bit elements (linear), or assuming each
+bit from each ROM was a single bit of a 10-bit word so 16 bits defined
+16 10-bit words in parallel (planar), and never got useful output.
+
+There may be some weird data/address scrambling done to put data in an
+order easiest for the hardware to process, which would be
+non-intuitive.
+
+Also the two indicator bits may have different polarities, maybe 0,0
+is Type C instead of 1,1.
+
+*/
+
 
 #include "emu.h"
 #include "debugger.h"
