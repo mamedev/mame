@@ -688,17 +688,16 @@ else
 DEFS += -DSDLMAME_X11
 LIBS += -lX11 -lXinerama
 
-# the new debugger relies on GTK+ in addition to the base SDLMAME needs
-# Non-X11 builds can not use the debugger
-INCPATH += `pkg-config --cflags-only-I gtk+-2.0` `pkg-config --cflags-only-I gconf-2.0`
-CCOMFLAGS += `pkg-config --cflags-only-other gtk+-2.0` `pkg-config --cflags-only-other gconf-2.0`
-LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
-#CCOMFLAGS += -DGTK_DISABLE_DEPRECATED
-
 # The newer debugger uses QT
 ifdef USE_QTDEBUG
 INCPATH += `pkg-config QtGui --cflags`
 LIBS += `pkg-config QtGui --libs`
+else
+# the old-new debugger relies on GTK+ in addition to the base SDLMAME needs
+# Non-X11 builds can not use the debugger
+INCPATH += `pkg-config --cflags-only-I gtk+-2.0` `pkg-config --cflags-only-I gconf-2.0`
+CCOMFLAGS += `pkg-config --cflags-only-other gtk+-2.0` `pkg-config --cflags-only-other gconf-2.0`
+LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
 endif
 
 # some systems still put important things in a different prefix
