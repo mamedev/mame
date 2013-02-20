@@ -97,10 +97,10 @@ cdp1871_device::cdp1871_device(const machine_config &mconfig, const char *tag, d
 		m_inhibit(false),
 		m_sense(0),
 		m_drive(0),
-		m_next_da(CLEAR_LINE),
-		m_next_rpt(CLEAR_LINE),
 		m_da(0),
-		m_rpt(0)
+		m_next_da(CLEAR_LINE),
+		m_rpt(0),
+		m_next_rpt(CLEAR_LINE)
 {
 }
 
