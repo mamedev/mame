@@ -763,11 +763,12 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 						if (m_blit2_unused!=0) printf("blit1 unknown bits set %08x\n", data);
 						if (m_b1mode)
 						{
-							if (m_b2tpen != 0x7f) printf("m_b1mode 1, m_b2tpen!=0x7f");
+							if (m_b2tpen != 0x7f) printf("m_b1mode 1, m_b2tpen!=0x7f\n");
 						}
 						else
 						{
-							if (m_b2tpen != 0x00) printf("m_b1mode 0, m_b2tpen!=0x00");
+							// 0x01/0x02 trips in rare cases (start of one of the attract levels) maybe this is some kind of alpha instead?
+							if ((m_b2tpen != 0x00) && (m_b2tpen != 0x01) && (m_b2tpen != 0x02)) printf("m_b1mode 0, m_b2tpen!=0x00,0x01 or 0x02 (is %02x)\n", m_b2tpen);
 						}
 
 						 // 00??0uuu  
@@ -960,12 +961,23 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 
 
 						// Splat some sprites
-						for (int h = 0; h < m_hCellCount; h++)
+						for (int v = 0; v < m_vCellCount; v++)
 						{
-							for (int v = 0; v < m_vCellCount; v++)
+							const int pixelOffsetY = ((m_vPosition) + (v* 16 * m_vZoom)) / 0x40;
+							if (pixelOffsetY>383)
+							{
+								v = m_vCellCount;
+								continue;
+							}
+
+							for (int h = 0; h < m_hCellCount; h++)
 							{
 								const int pixelOffsetX = ((m_hPosition) + (h* 16 * m_hZoom)) / 0x40;
-								const int pixelOffsetY = ((m_vPosition) + (v* 16 * m_vZoom)) / 0x40;
+								if (pixelOffsetX>495)
+								{
+									h = m_hCellCount;
+									continue;
+								}
 
 								// It's unknown if it's row-major or column-major
 								// TODO: Study the CRT test and "Cool Riders" logo for clues.
@@ -1024,17 +1036,19 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 									color = m_b1colorNumber;
 
 								// DEBUG: Draw 16x16 block
+								UINT32* line;
 								for (int y = 0; y < blockhigh; y++)
 								{
-									int drawy = pixelOffsetY+y;
+									const int drawy = pixelOffsetY+y;
 									if ((drawy>383) || (drawy<0)) continue;
+									line = &drawbitmap->pix32(drawy);
 
 									for (int x = 0; x < blockwide; x++)
 									{
-										int drawx = pixelOffsetX+x;
+										const int drawx = pixelOffsetX+x;
 										if ((drawx>=495 || drawx<0)) continue;
 
-										if (drawbitmap->pix32(drawy,drawx)==0) drawbitmap->pix32(drawy, drawx) = color;
+										if (line[drawx]==0) line[drawx] = color;
 									}
 								}
 							}
