@@ -1016,7 +1016,38 @@ static unsigned short SCSP_r16(scsp_state *scsp, address_space &space, unsigned 
 			v= *((unsigned short *) (scsp->DSP.MADRS+(addr-0x780)/2));
 		else if(addr<0xC00)
 			v= *((unsigned short *) (scsp->DSP.MPRO+(addr-0x800)/2));
-
+		else if(addr<0xE00)
+		{
+			if(addr & 2)
+				v= scsp->DSP.TEMP[(addr >> 2) & 0x7f] & 0xffff;
+			else
+				v= scsp->DSP.TEMP[(addr >> 2) & 0x7f] >> 16;
+		}
+		else if(addr<0xE80)
+		{
+			if(addr & 2)
+				v= scsp->DSP.MEMS[(addr >> 2) & 0x1f] & 0xffff;
+			else
+				v= scsp->DSP.MEMS[(addr >> 2) & 0x1f] >> 16;
+		}
+		else if(addr<0xEC0)
+		{
+			if(addr & 2)
+				v= scsp->DSP.MIXS[(addr >> 2) & 0xf] & 0xffff;
+			else
+				v= scsp->DSP.MIXS[(addr >> 2) & 0xf] >> 16;
+		}
+		else if(addr<0xEE0)
+			v= *((unsigned short *) (scsp->DSP.EFREG+(addr-0xec0)/2));
+		else
+		{
+			/* TODO: Kyuutenkai reads from 0xee0/0xee2, it's an undocumented "DSP internal buffer" register ... */
+			logerror("SCSP: Reading from unmapped register %08x\n",addr);
+			if(addr == 0xee0)
+				v= scsp->DSP.TEMP[0] >> 16;
+			if(addr == 0xee2)
+				v= scsp->DSP.TEMP[0] & 0xffff;
+		}
 	}
 	return v;
 }
