@@ -605,6 +605,8 @@ void mc6847_base_device::device_start()
 	setup_fixed_mode(config->m_in_ag_func,      MODE_AG);
 	setup_fixed_mode(config->m_in_css_func,     MODE_CSS);
 
+	m_dirty = false;
+
 	/* state save */
 	save_item(NAME(m_dirty));
 	save_item(NAME(m_mode));
