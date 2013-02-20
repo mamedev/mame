@@ -11,7 +11,8 @@
 *  Special thanks to leeeeee for helping figure out what the led selftest codes actually mean
 *
 *  This driver dedicated in memory of Dennis Klatt and Jonathan Allen, without whose
-*  original work MITalk and hence KlattTalk and DECTALK would never have existed.
+*  original work MITalk and hence KlattTalk and DECTALK would never have existed, and
+*  in memory of Martin Minow, who wrote much of the Dectalk DTC-01 code.
 *
 *  TODO:
 *  * DUART:
