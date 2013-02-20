@@ -323,6 +323,10 @@ static MACHINE_CONFIG_START( svmu, svmu_state )
 	/* devices */
 	MCFG_ATMEL_29C010_ADD("flash")
 	MCFG_QUICKLOAD_ADD("quickload", svmu, "vms,bin", 0)
+	MCFG_QUICKLOAD_INTERFACE("svmu_quik")
+
+	/* Software lists */
+	MCFG_SOFTWARE_LIST_ADD("quik_list", "svmu")
 MACHINE_CONFIG_END
 
 

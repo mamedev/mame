@@ -241,6 +241,7 @@ hash/svi318_cart.xml svneol=native#text/xml
 hash/svi318_cass.xml svneol=native#text/xml
 hash/svi318_flop.xml svneol=native#text/xml
 hash/svision.xml svneol=native#text/xml
+hash/svmu.xml svneol=native#text/xml
 hash/tandy200.xml svneol=native#text/xml
 hash/tandy2k.xml svneol=native#text/xml
 hash/tandy6k.xml svneol=native#text/xml
