@@ -1041,7 +1041,40 @@ static unsigned short SCSP_r16(scsp_state *scsp, address_space &space, unsigned 
 			v= *((unsigned short *) (scsp->DSP.EFREG+(addr-0xec0)/2));
 		else
 		{
-			/* TODO: Kyuutenkai reads from 0xee0/0xee2, it's an undocumented "DSP internal buffer" register ... */
+			/*
+			TODO: Kyuutenkai reads from 0xee0/0xee2, it's an undocumented "DSP internal buffer" register ...
+			004A3A: 207C 0010 0EE0             movea.l #$100ee0, A0
+			004A40: 43EA 0090                  lea     ($90,A2), A1
+			004A44: 6100 0254                  bsr     $4c9a
+			004A48: 207C 0010 0EE2             movea.l #$100ee2, A0
+			004A4E: 43EA 0092                  lea     ($92,A2), A1
+			004A52: 6100 0246                  bsr     $4c9a
+			004A56: 207C 0010 0ED2             movea.l #$100ed2, A0
+			004A5C: 43EA 0094                  lea     ($94,A2), A1
+			004A60: 6100 0238                  bsr     $4c9a
+			004A64: 3540 0096                  move.w  D0, ($96,A2)
+			004A68: 207C 0010 0ED4             movea.l #$100ed4, A0
+			004A6E: 43EA 0098                  lea     ($98,A2), A1
+			004A72: 6100 0226                  bsr     $4c9a
+			004A76: 3540 009A                  move.w  D0, ($9a,A2)
+			004A7A: 207C 0010 0ED6             movea.l #$100ed6, A0
+			004A80: 43EA 009C                  lea     ($9c,A2), A1
+			004A84: 6100 0214                  bsr     $4c9a
+			004A88: 3540 009E                  move.w  D0, ($9e,A2)
+			004A8C: 4E75                       rts
+
+				004C9A: 48E7 4000                  movem.l D1, -(A7)
+				004C9E: 3010                       move.w  (A0), D0 ;reads from 0x100ee0/ee2
+				004CA0: 4A40                       tst.w   D0
+				004CA2: 6A00 0004                  bpl     $4ca8
+				004CA6: 4440                       neg.w   D0
+				004CA8: 3211                       move.w  (A1), D1
+				004CAA: D041                       add.w   D1, D0
+				004CAC: E248                       lsr.w   #1, D0
+				004CAE: 3280                       move.w  D0, (A1) ;writes to RAM buffer 0x790/0x792
+				004CB0: 4CDF 0002                  movem.l (A7)+, D1
+				004CB4: 4E75                       rts
+			*/
 			logerror("SCSP: Reading from unmapped register %08x\n",addr);
 			if(addr == 0xee0)
 				v= scsp->DSP.TEMP[0] >> 16;
