@@ -796,7 +796,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 						if (m_b3romoffset!=0)
 						{
 #if 0
-							// if we look in rom IC6 (+0x1400000) then the word before our offset is very often 0x0000 probably indicating that's the last word used
+							// if we look in rom IC6 (+0x2400000) then the word before our offset is very often 0x0000 probably indicating that's the last word used
 							printf("rom offset %08x, previous values : ", m_b3romoffset);
 							for (int i=0;i<10;i++)
 							{
@@ -808,7 +808,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 #if 0
 							// look at the values actually at the address we're using.. 
 							// often have a similar form to
-							// 0002, 0020, 0000, 0200, 2000, 0002, 0020, 0000, 0200, 2000,
+							// 0008, 0000, 8000, 0800, 0080, 0008, 0000, 8000, 0800, 0080,
 							//   1     2     3     4     5     6     7     8     9    10
 							// so you can see 1/6  2/7,  3/8,  4/9,  5/10 are often similar or the same
 							printf("rom offset %08x, values : ", m_b3romoffset);
@@ -819,13 +819,14 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							}
 							printf("\n");
 
-							// this looks interesting..
-							// rom offset 00015f26, values : 2001, 0012, 0020, 0100, 1200, 2001, 0012, 0020, 0100, 1200,
-							// rom offset 00016550, values : 0002, 0020, 0000, 0200, 2000, 0002, 0020, 0000, 0200, 2000,
-							// rom offset 00016644, values : 3201, 2013, 0032, 0120, 1300, 3201, 2013, 0032, 0120, 1300,
 
-							// there is a strong bias towards certain bits being 0 in the first words
-							//  xxxx x0xx 0xxx xxx0 xx0x   xxxx x0xx 0xxx xxx0 xx0x
+							// these are used for slider bars in test mode
+							//	rom offset 00140000, values : 0008, 0000, 8000, 0800, 0080, 0008, 0000, 8000, 0800, 0080,
+							//	rom offset 00140008, values : 0004, 9000, 4900, 0490, 0049, 0004, 9000, 4900, 0490, 0049,
+							
+							// or as groups of 10-bits  00080 00080 00080 00080 00080 00080 00080 00080
+							// or as groups of 10-bits  00049 00049 00049 00049 00049 00049 00049 00049
+			
 #endif
 						}
 						
@@ -1999,17 +2000,19 @@ ROM_START( coolridr )
 
 	/* these are compressed sprite data */
 	ROM_REGION( 0x2800000, "gfx5", ROMREGION_ERASEFF )
-	ROM_LOAD( "mpr-17640.ic1", 0x0000000, 0x0400000, CRC(981e3e69) SHA1(d242055e0359ec4b5fac4676b2f974fbc974cc68) )
-	ROM_LOAD( "mpr-17641.ic2", 0x0400000, 0x0400000, CRC(fccc3dae) SHA1(0df7fd8b1110ba9063dc4dc40301267229cb9a35) )
-	ROM_LOAD( "mpr-17642.ic3", 0x0800000, 0x0400000, CRC(1a5bcc73) SHA1(a7df04c0a326323ea185db5f55b3e0449d76c535) )
-	ROM_LOAD( "mpr-17643.ic4", 0x0c00000, 0x0400000, CRC(5100f23b) SHA1(659c2300399ff1cbd24fb1eb18cfd6c26e06fd96) )
-	ROM_LOAD( "mpr-17644.ic5", 0x1000000, 0x0400000, CRC(80199c79) SHA1(e525d8ee9f9176101629853e50cca73b02b16a38) )
-	ROM_LOAD( "mpr-17645.ic6", 0x1400000, 0x0400000, CRC(56968d07) SHA1(e88c3d66ea05affb4681a25d155f097bd1b5a84b) )
-	ROM_LOAD( "mpr-17646.ic7", 0x1800000, 0x0400000, CRC(b77eb2ad) SHA1(b832c0f1798aca39adba840d56ae96a75346670a) )
-	ROM_LOAD( "mpr-17647.ic8", 0x1c00000, 0x0400000, CRC(9dd9330c) SHA1(c91a7f497c1f4bd283bd683b06dff88893724d51) )
-	ROM_LOAD( "mpr-17648.ic9", 0x2000000, 0x0400000, CRC(bf184cce) SHA1(62c004ea279f9a649d21426369336c2e1f9d24da) )
-	ROM_LOAD( "mpr-17649.ic10",0x2400000, 0x0400000, CRC(618c47ae) SHA1(5b69ad36fcf8e70d34c3b2fc71412ce953c5ceb3) )
-	                                                     
+	ROM_LOAD16_WORD_SWAP( "mpr-17644.ic5", 0x0000000, 0x0400000, CRC(80199c79) SHA1(e525d8ee9f9176101629853e50cca73b02b16a38) ) // 0004
+	ROM_LOAD16_WORD_SWAP( "mpr-17643.ic4", 0x0400000, 0x0400000, CRC(5100f23b) SHA1(659c2300399ff1cbd24fb1eb18cfd6c26e06fd96) ) // 9000
+	ROM_LOAD16_WORD_SWAP( "mpr-17642.ic3", 0x0800000, 0x0400000, CRC(1a5bcc73) SHA1(a7df04c0a326323ea185db5f55b3e0449d76c535) ) // 4900
+	ROM_LOAD16_WORD_SWAP( "mpr-17641.ic2", 0x0c00000, 0x0400000, CRC(fccc3dae) SHA1(0df7fd8b1110ba9063dc4dc40301267229cb9a35) ) // 0490
+	ROM_LOAD16_WORD_SWAP( "mpr-17640.ic1", 0x1000000, 0x0400000, CRC(981e3e69) SHA1(d242055e0359ec4b5fac4676b2f974fbc974cc68) ) // 0049
+	ROM_LOAD16_WORD_SWAP( "mpr-17649.ic10",0x1400000, 0x0400000, CRC(618c47ae) SHA1(5b69ad36fcf8e70d34c3b2fc71412ce953c5ceb3) ) // 0004
+	ROM_LOAD16_WORD_SWAP( "mpr-17648.ic9", 0x1800000, 0x0400000, CRC(bf184cce) SHA1(62c004ea279f9a649d21426369336c2e1f9d24da) ) // 9000
+	ROM_LOAD16_WORD_SWAP( "mpr-17647.ic8", 0x1c00000, 0x0400000, CRC(9dd9330c) SHA1(c91a7f497c1f4bd283bd683b06dff88893724d51) ) // 4900
+	ROM_LOAD16_WORD_SWAP( "mpr-17646.ic7", 0x2000000, 0x0400000, CRC(b77eb2ad) SHA1(b832c0f1798aca39adba840d56ae96a75346670a) ) // 0490
+	ROM_LOAD16_WORD_SWAP( "mpr-17645.ic6", 0x2400000, 0x0400000, CRC(56968d07) SHA1(e88c3d66ea05affb4681a25d155f097bd1b5a84b) ) // 0049
+         
+
+
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 
