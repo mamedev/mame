@@ -352,6 +352,7 @@ public:
 	UINT32 screen_update_coolridr1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_coolridr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(system_h1);
+	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_main);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
 };
 
@@ -1454,9 +1455,16 @@ INPUT_PORTS_END
 
 
 // IRQs 4 & 6 are valid on SH-2
-INTERRUPT_GEN_MEMBER(coolridr_state::system_h1)
+TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_main)
 {
-	device.execute().set_input_line(4, HOLD_LINE);
+	int scanline = param;
+
+	if(scanline == 384)
+		m_maincpu->set_input_line(4, HOLD_LINE);
+
+	if(scanline == 0)
+		m_maincpu->set_input_line(6, HOLD_LINE);
+
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
@@ -1543,14 +1551,14 @@ static const scsp_interface scsp2_interface =
 static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_CPU_ADD("maincpu", SH2, MAIN_CLOCK)  // 28 mhz
 	MCFG_CPU_PROGRAM_MAP(system_h1_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", coolridr_state, system_h1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_main, "lscreen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", M68000, 11289600) //256 x 44100 Hz = 11.2896 MHz
 	MCFG_CPU_PROGRAM_MAP(system_h1_sound_map)
 
 	MCFG_CPU_ADD("sub", SH1, 16000000)  // SH7032 HD6417032F20!! 16 mhz
 	MCFG_CPU_PROGRAM_MAP(coolridr_submap)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", coolridr_state, system_h1_sub, "lscreen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, system_h1_sub, "lscreen", 0, 1)
 
 	MCFG_I8237_ADD("i8237", 16000000, dmac_intf)
 
@@ -1639,18 +1647,11 @@ ROM_START( coolridr )
 #endif
 ROM_END
 
-#if 0
-READ32_MEMBER(coolridr_state::coolridr_hack1_r)
-{
-	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
-	if(pc == 0x6012374 || pc == 0x6012392)
-		return 0;
 
-	return m_sysh1_workram_h[0xd88a4/4];
-}
-#endif
-
-/*TODO: there must be an irq line with custom vector located somewhere that writes to here...*/
+/*
+TODO: both irq routines writes 1 to 0x60d8894, sets up the Watchdog timer then expect that this buffer goes low IN the irq routine.
+      Cache issue? Shared RAM?
+*/
 READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 {
 	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
