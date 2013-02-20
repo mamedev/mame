@@ -1044,7 +1044,7 @@ static unsigned short SCSP_r16(scsp_state *scsp, address_space &space, unsigned 
 			/*
 			TODO: Kyuutenkai reads from 0xee0/0xee2, it's an undocumented "DSP internal buffer" register ...
 			004A3A: 207C 0010 0EE0             movea.l #$100ee0, A0
-			004A40: 43EA 0090                  lea     ($90,A2), A1
+			004A40: 43EA 0090                  lea     ($90,A2), A1 ;A2=0x700
 			004A44: 6100 0254                  bsr     $4c9a
 			004A48: 207C 0010 0EE2             movea.l #$100ee2, A0
 			004A4E: 43EA 0092                  lea     ($92,A2), A1
