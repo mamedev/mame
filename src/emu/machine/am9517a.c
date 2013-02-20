@@ -376,7 +376,8 @@ am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, d
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
 		m_hack(0),
-		m_ready(1)
+		m_ready(1),
+		m_command(0)
 {
 }
 
