@@ -11,7 +11,7 @@
 *  Special thanks to leeeeee for helping figure out what the led selftest codes actually mean
 *
 *  This driver dedicated in memory of Dennis Klatt and Jonathan Allen, without whose
-*  original work MITalk and hence KlattTalk and DECTALK would hever have existed.
+*  original work MITalk and hence KlattTalk and DECTALK would never have existed.
 *
 *  TODO:
 *  * DUART:
@@ -865,7 +865,7 @@ ROM_START( dectalk )
 	 * t = programmable chip type (e = eprom, otprom or mask rom; a,b,f = proms of various sorts; there are others for plas and pals)
 	 * o = size of rom
 	 *   for eproms/otproms or mask roms it is: e1 = 0x400, e2 = 0x800, e3 = 0x1000, e4 = 0x2000, e5 = 0x4000, e6 = 0x8000, etc)
-	 *   for proms it is: a1 = 82s123(0x20, 8b TS); a2 = 82s129(0x100 4b TS); a9 = 82s131(0x200 4b TS); b1 = 82s135(0x100 8b TS); f1 = 82s137(0x400 4b TS); f4 = 82s191(0x800 8b TS); s0(mc68hc05); m2(i8051 or other MCS-51) (there are more)
+	 *   for proms it is: a1 = 82s123(0x20, 8b TS); a2 = 82s129(0x100 4b TS); a9 = 82s131(0x200 4b TS); b1 = 82s135(0x100 8b TS); f1 = 82s137(0x400 4b TS); f4 = 82s191(0x800 8b TS); s0 = MC68HC05; m2 = i8051 or other MCS-51; (there are more)
 	 */
 	ROM_LOAD16_BYTE("23-123e5.e8", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044)) // Label: "SP8510123E5" @ E8
 	ROM_LOAD16_BYTE("23-119e5.e22", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac)) // Label: "SP8510119E5" @ E22
