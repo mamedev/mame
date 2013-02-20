@@ -692,7 +692,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
 			{
 				// Serialized 32-bit words in order of appearance:
-				//  0: 00000000 - totally unknown : always seems to be zero
+				//  0: 00000000 - unknown, 0x00000000 or 0x00000001, 0 seems to be regular sprite, 1 seems to change meaning of below, possible clip area?
 				//  1: xxxxxxxx - "Color Number" (all bits or just lower 16/8?)
 				//  2: 00000000 - unknown : OT flag?  (transparency)
 				//  3: 00000000 - unknown : RF flag?  (90 degree rotation)
@@ -717,7 +717,16 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				{
 					// set to 0x00000001 on some objects during the 'film strip' part of attract, otherwise 0
 					// those objects don't seem visible anyway so might have some special meaning
+					// this is also set at times during the game
+					//
+					// the sprites with 1 set appear to have 0x00000000 in everything after the 4th write (m_blit4 and above)
+					// so likely have some other meaning and are NOT regular sprite data				
 					m_blit0 = data;
+
+					
+
+
+
 				//	if (data!=0) printf("blit %08x\n", data);
 				}
 				else if (m_blitterSerialCount == 1)
@@ -807,173 +816,189 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				}
 				else if (m_blitterSerialCount == 11)
 				{
-					// for text objects this is an address containing the 8-bit tile numbers to use for ASCII text
-					// I guess the tiles are decoded by a DMA operation earlier, from the compressed ROM?
-
-					// we also use this to trigger the actual draw operation
-
-					//printf("blit %08x\n", data);
-					
-					// debug, hide objects without m_blit10 set
-					//if (m_blit10==0) return;
-					//if (m_blit0==0) return;
-
-					//if (m_blit10!=0)
-					if (m_indirect_zoom_enable)
+					if (m_blit0 & 1)
 					{
-						// with this bit enabled m_blit10 is a look up to the zoom(?) value eg. 03f42600
-						//UINT32 temp = space.read_dword(m_blit10);
-						//printf("road type blit %08x %08x %08x %08x %08x(%08x) %08x %04x %04x %04x %04x %08x %08x (TEMP %08x) %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4_unused, m_blit4, m_blit5_unused, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, temp, m_vPosition, m_hPosition);
-					
-						/* for the horizontal road during attract there are tables 0x480 bytes long (0x120 dwords) and the value passed points to the start of them */
-						/* cell sizes for those are are 0011 (v) 0007 (h) with zoom factors of 0020 (half v) 0040 (normal h) */
-						/* tables seem to be 2x 8-bit values, possibly zoom + linescroll, although ingame ones seem to be 2x16-bit (corrupt? more meaning) */
+						// NOT A SPRITE
 
-					}
+						// these are something else, not sprites?  It still writes 11 dwords I think they have a different meaning
+						// it might be a clipping area set? looks potentially like co-ordinates at least
+						//printf("NON-SPRITE blit %08x %08x %08x %08x %08x(%08x) %08x %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4_unused, m_blit4, m_blit5_unused, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition);
 
-		
-					int random;
-					
-					random = 0;
-
-					// not used much..
-					if (m_blit4 &0x00010000)
-					{
-					//	printf("type blit %08x %08x %08x %08x %08x(%08x) %08x %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4_unused, m_blit4, m_blit5_unused, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition);
-						m_colorNumber = machine().rand() | 0xff000000;
-						random = 1;
 					}
 					else
 					{
-						
-					}
-				
-					bitmap_rgb32* drawbitmap;
+						// SPRITES / BLITS
 
-					// 0x30 - 0x60 are definitely the left screen, 0x90 - 0xc0 are definitely the right screen.. the modes seem priority related
-					if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
-						drawbitmap = &m_temp_bitmap_sprites;
-					else // 0x90, 0xa0, 0xb0, 0xc0
-						drawbitmap = &m_temp_bitmap_sprites2;
+						// for text objects this is an address containing the 8-bit tile numbers to use for ASCII text
+						// I guess the tiles are decoded by a DMA operation earlier, from the compressed ROM?
 
-					int sizex = m_hCellCount * 16 * m_hZoom;
-					int sizey = m_vCellCount * 16 * m_vZoom;
-					m_hPosition *= 0x40;
-					m_vPosition *= 0x40;
+						// we also use this to trigger the actual draw operation
 
-					switch (m_vOrigin & 3)
-					{
-					case 0:
-						// top
-						break;
-					case 1:
-						m_vPosition -= sizey / 2 ;
-						// middle?
-						break;
-					case 2:
-						m_vPosition -= sizey;
-						// bottom?
-						break;
-					case 3:
-						// invalid?
-						break;
-					}
+						//printf("blit %08x\n", data);
+					
+						// debug, hide objects without m_blit10 set
+						//if (m_blit10==0) return;
+						//if (m_blit0==0) return;
 
-					switch (m_hOrigin & 3)
-					{
-					case 0:
-						// left
-						break;
-					case 1:
-						m_hPosition -= sizex / 2;
-						// middle?
-						break;
-					case 2:
-						m_hPosition -= sizex;
-						// right?
-						break;
-					case 3:
-						// invalid?
-						break;
-					}
-
-
-					// Splat some sprites
-					for (int h = 0; h < m_hCellCount; h++)
-					{
-						for (int v = 0; v < m_vCellCount; v++)
+						//if (m_blit10!=0)
+						if (m_indirect_zoom_enable)
 						{
-							const int pixelOffsetX = ((m_hPosition) + (h* 16 * m_hZoom)) / 0x40;
-							const int pixelOffsetY = ((m_vPosition) + (v* 16 * m_vZoom)) / 0x40;
+							// with this bit enabled m_blit10 is a look up to the zoom(?) value eg. 03f42600
+							//UINT32 temp = space.read_dword(m_blit10);
+							//printf("road type blit %08x %08x %08x %08x %08x(%08x) %08x %04x %04x %04x %04x %08x %08x (TEMP %08x) %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4_unused, m_blit4, m_blit5_unused, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, temp, m_vPosition, m_hPosition);
+					
+							/* for the horizontal road during attract there are tables 0x480 bytes long (0x120 dwords) and the value passed points to the start of them */
+							/* cell sizes for those are are 0011 (v) 0007 (h) with zoom factors of 0020 (half v) 0040 (normal h) */
+							/* tables seem to be 2x 8-bit values, possibly zoom + linescroll, although ingame ones seem to be 2x16-bit (corrupt? more meaning) */
 
-							// It's unknown if it's row-major or column-major
-							// TODO: Study the CRT test and "Cool Riders" logo for clues.
-							UINT8 spriteNumber = 0;
+						}
 
-							// with this bit enabled the tile numbers gets looked up using 'data' (which would be m_blit11) (eg 03f40000 for startup text)
-							// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
-							if (m_indirect_tile_enable)
+		
+						int random;
+					
+						random = 0;
+
+						// not used much..
+						/*
+						if (m_blit4 &0x00010000)
+						{
+							printf("type blit %08x %08x %08x %08x %08x(%08x) %08x %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4_unused, m_blit4, m_blit5_unused, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition);
+							m_colorNumber = machine().rand() | 0xff000000;
+							random = 1;
+						}
+						else
+						{
+							
+						}
+						*/
+
+						bitmap_rgb32* drawbitmap;
+
+						// 0x30 - 0x60 are definitely the left screen, 0x90 - 0xc0 are definitely the right screen.. the modes seem priority related
+						if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
+							drawbitmap = &m_temp_bitmap_sprites;
+						else // 0x90, 0xa0, 0xb0, 0xc0
+							drawbitmap = &m_temp_bitmap_sprites2;
+
+						int sizex = m_hCellCount * 16 * m_hZoom;
+						int sizey = m_vCellCount * 16 * m_vZoom;
+						m_hPosition *= 0x40;
+						m_vPosition *= 0x40;
+
+						switch (m_vOrigin & 3)
+						{
+						case 0:
+							// top
+							break;
+						case 1:
+							m_vPosition -= sizey / 2 ;
+							// middle?
+							break;
+						case 2:
+							m_vPosition -= sizey;
+							// bottom?
+							break;
+						case 3:
+							// invalid?
+							break;
+						}
+
+						switch (m_hOrigin & 3)
+						{
+						case 0:
+							// left
+							break;
+						case 1:
+							m_hPosition -= sizex / 2;
+							// middle?
+							break;
+						case 2:
+							m_hPosition -= sizex;
+							// right?
+							break;
+						case 3:
+							// invalid?
+							break;
+						}
+
+
+						// Splat some sprites
+						for (int h = 0; h < m_hCellCount; h++)
+						{
+							for (int v = 0; v < m_vCellCount; v++)
 							{
-								const UINT32 memOffset = data;
-								spriteNumber = space.read_byte(memOffset + h + (v*h));
+								const int pixelOffsetX = ((m_hPosition) + (h* 16 * m_hZoom)) / 0x40;
+								const int pixelOffsetY = ((m_vPosition) + (v* 16 * m_vZoom)) / 0x40;
 
-								// DEBUG: For demo purposes, skip &spaces and NULL characters
-								if (spriteNumber == 0x20 || spriteNumber == 0x00)
-									continue;
-#ifdef FAKE_ASCII_ROM
-								drawgfx_opaque(*drawbitmap,drawbitmap->cliprect(), machine().gfx[3],spriteNumber,0,0,0,pixelOffsetX,pixelOffsetY);
-								continue;
-#endif
-							}
+								// It's unknown if it's row-major or column-major
+								// TODO: Study the CRT test and "Cool Riders" logo for clues.
+								UINT8 spriteNumber = 0;
 
-
-							int blockwide = ((16*m_hZoom)/0x40)-1;
-							int blockhigh = ((16*m_vZoom)/0x40)-1;
-							// hack
-							if (blockwide<=0) blockwide = 1;
-							if (blockhigh<=0) blockhigh = 1;
-
-
-							UINT32 color = 0xffffffff;
-							// HACKS to draw coloured blocks in easy to distinguish colours
-							if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
-							{
-								if (m_colorNumber == 0x5b)
-									color = 0xffff0000;
-								else if (m_colorNumber == 0x5d)
-									color = 0xff00ff00;
-								else if (m_colorNumber == 0x5e)
-									color = 0xff0000ff;
-								else
-									color = 0xff00ffff;
-							}
-							else if (m_blitterMode == 0x40 || m_blitterMode == 0xa0)
-							{
-								color = 0xff000000 | (((m_colorNumber & 0xff) | 0x80)-0x40);
-							}
-							else if (m_blitterMode == 0x50 || m_blitterMode == 0xb0)
-							{
-								color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 8);
-							}
-							else if (m_blitterMode == 0x60 || m_blitterMode == 0xc0)
-							{
-								color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 16);
-							}
-							if (random == 1)
-								color = m_colorNumber;
-
-							// DEBUG: Draw 16x16 block
-							for (int y = 0; y < blockhigh; y++)
-							{
-								int drawy = pixelOffsetY+y;
-								if ((drawy>383) || (drawy<0)) continue;
-
-								for (int x = 0; x < blockwide; x++)
+								// with this bit enabled the tile numbers gets looked up using 'data' (which would be m_blit11) (eg 03f40000 for startup text)
+								// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
+								if (m_indirect_tile_enable)
 								{
-									int drawx = pixelOffsetX+x;
-									if ((drawx>=495 || drawx<0)) continue;
+									const UINT32 memOffset = data;
+									spriteNumber = space.read_byte(memOffset + h + (v*h));
 
-									if (drawbitmap->pix32(drawy,drawx)==0) drawbitmap->pix32(drawy, drawx) = color;
+									// DEBUG: For demo purposes, skip &spaces and NULL characters
+									if (spriteNumber == 0x20 || spriteNumber == 0x00)
+										continue;
+	#ifdef FAKE_ASCII_ROM
+									drawgfx_opaque(*drawbitmap,drawbitmap->cliprect(), machine().gfx[3],spriteNumber,0,0,0,pixelOffsetX,pixelOffsetY);
+									continue;
+	#endif
+								}
+
+
+								int blockwide = ((16*m_hZoom)/0x40)-1;
+								int blockhigh = ((16*m_vZoom)/0x40)-1;
+								// hack
+								if (blockwide<=0) blockwide = 1;
+								if (blockhigh<=0) blockhigh = 1;
+
+
+								UINT32 color = 0xffffffff;
+								// HACKS to draw coloured blocks in easy to distinguish colours
+								if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
+								{
+									if (m_colorNumber == 0x5b)
+										color = 0xffff0000;
+									else if (m_colorNumber == 0x5d)
+										color = 0xff00ff00;
+									else if (m_colorNumber == 0x5e)
+										color = 0xff0000ff;
+									else
+										color = 0xff00ffff;
+								}
+								else if (m_blitterMode == 0x40 || m_blitterMode == 0xa0)
+								{
+									color = 0xff000000 | (((m_colorNumber & 0xff) | 0x80)-0x40);
+								}
+								else if (m_blitterMode == 0x50 || m_blitterMode == 0xb0)
+								{
+									color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 8);
+								}
+								else if (m_blitterMode == 0x60 || m_blitterMode == 0xc0)
+								{
+									color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 16);
+								}
+								if (random == 1)
+									color = m_colorNumber;
+
+								// DEBUG: Draw 16x16 block
+								for (int y = 0; y < blockhigh; y++)
+								{
+									int drawy = pixelOffsetY+y;
+									if ((drawy>383) || (drawy<0)) continue;
+
+									for (int x = 0; x < blockwide; x++)
+									{
+										int drawx = pixelOffsetX+x;
+										if ((drawx>=495 || drawx<0)) continue;
+
+										if (drawbitmap->pix32(drawy,drawx)==0) drawbitmap->pix32(drawy, drawx) = color;
+									}
 								}
 							}
 						}
