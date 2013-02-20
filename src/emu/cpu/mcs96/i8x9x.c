@@ -75,6 +75,7 @@ void i8x9x_device::device_reset()
 	ad_result = 0;
 	ad_done = 0;
 	sp_stat = 0;
+	serial_send_timer = 0;
 }
 
 void i8x9x_device::commit_hso_cam()
