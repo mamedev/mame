@@ -374,7 +374,6 @@ public:
 		m_blitterSerialCount(0x00),
 		m_blitterMode(0x00),
 		m_textOffset(0x0000),
-		m_colorNumber(0x00000000),
 		m_vCellCount(0x0000),
 		m_hCellCount(0x0000),
 		m_vPosition(0x0000),
@@ -399,7 +398,6 @@ public:
 	INT16  m_blitterSerialCount;
 	UINT8  m_blitterMode;
 	UINT16 m_textOffset;
-	UINT32 m_colorNumber;
 	UINT16 m_vCellCount;
 	UINT16 m_hCellCount;
 	int m_vPosition;
@@ -410,8 +408,13 @@ public:
 	UINT16 m_vZoom;
 	UINT16 m_hZoom;
 	UINT32 m_blit0; // ?
-	UINT32 m_blit1; // ?
-	UINT32 m_blit2; // ?
+	UINT32 m_blit1_unused; // ?
+	UINT32 m_b1mode; // ?
+	UINT32 m_b1colorNumber;
+	UINT32 m_blit2_unused; // ?
+	UINT32 m_b2tpen;
+	UINT32 m_b2colorNumber;
+
 	UINT32 m_blit3; // ?
 	UINT32 m_blit4_unused;
 	UINT32 m_blit4; // ?
@@ -476,6 +479,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
 };
 
+#define PRINT_BLIT_STUFF \
+	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x %08x(%08x) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1_unused,m_b1mode,m_b1colorNumber, m_blit2_unused,m_b2tpen,m_b2colorNumber, m_blit3, m_blit4_unused, m_blit4, m_blit5_unused, m_indirect_tile_enable, m_indirect_zoom_enable, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition); \
 
 
 /* video */
@@ -693,9 +698,11 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 			{
 				// Serialized 32-bit words in order of appearance:
 				//  0: 00000000 - unknown, 0x00000000 or 0x00000001, 0 seems to be regular sprite, 1 seems to change meaning of below, possible clip area?
-				//  1: xxxxxxxx - "Color Number" (all bits or just lower 16/8?)
-				//  2: 00000000 - unknown : OT flag?  (transparency)
-				//  3: 00000000 - unknown : RF flag?  (90 degree rotation)
+				//  1: 00010000 - unknown, color mode? (7bpp select?) set on player bike object
+				//  1: 00000xxx - "Color Number" (all bits or just lower 16/8?)
+				//  2: 007f0000 - unknown, transpen? set to 0x7f whenever the 'color mode' bit in (1) is set, otherwise 0
+				//  2: 00000xxx - unknown, usually a copy of color number, leftover?
+				//  3: 001fffff - offset to compressed data? (it's 0 on text objects tho, but maybe the ascii tiles are a special decode to go with the indirect mode)
 				//  4: 07000000 - unknown (draw mode?)
 				//  4: 00010000 - unknown (set on a few object)
 				//  4: 00000100 - y-flip?
@@ -731,20 +738,42 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				}
 				else if (m_blitterSerialCount == 1)
 				{
-					// 000u0ccc  - c = colour? u = 0/1
-					m_blit1 = data;
+					m_blit1_unused = 0; m_b1mode = 0; m_b1colorNumber = 0;
 
-					m_colorNumber = (data & 0x000000ff);    // Probably more bits
-				//	if (data!=0) printf("blit %08x\n", data);
+					if (!(m_blit0 & 1)) // don't bother for non-sprites
+					{
+						// 000u0ccc  - c = colour? u = 0/1
+						m_blit1_unused = data & 0xfffef800;
+						m_b1mode = (data & 0x00010000)>>16;
+						m_b1colorNumber = (data & 0x000007ff);    // Probably more bits
+				
+						if (m_blit1_unused!=0) printf("blit1 unknown bits set %08x\n", data);
+					}
 				}
 				else if (m_blitterSerialCount == 2)
 				{
-					// seems to be more complex than just transparency
-					m_blit2 = data;
+					if (!(m_blit0 & 1)) // don't bother for non-sprites
+					{	
+					
+						// seems to be more complex than just transparency
+						m_blit2_unused = data&0xff80f800;
+						m_b2tpen = (data & 0x007f0000)>>16;
+						m_b2colorNumber = (data & 0x000007ff);
+					
+						if (m_blit2_unused!=0) printf("blit1 unknown bits set %08x\n", data);
+						if (m_b1mode)
+						{
+							if (m_b2tpen != 0x7f) printf("m_b1mode 1, m_b2tpen!=0x7f");
+						}
+						else
+						{
+							if (m_b2tpen != 0x00) printf("m_b1mode 0, m_b2tpen!=0x00");
+						}
 
-					 // 00??0uuu  
-					 // ?? seems to be 00 or 7f
-					 // uuu, at least 11 bits used, maybe 12 usually the same as m_blit1? leftover?
+						 // 00??0uuu  
+						 // ?? seems to be 00 or 7f, set depending on b1mode
+						 // uuu, at least 11 bits used, maybe 12 usually the same as m_blit1_unused? leftover?
+					}
 
 				}
 				else if (m_blitterSerialCount == 3)
@@ -822,8 +851,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 
 						// these are something else, not sprites?  It still writes 11 dwords I think they have a different meaning
 						// it might be a clipping area set? looks potentially like co-ordinates at least
-						//printf("NON-SPRITE blit %08x %08x %08x %08x %08x(%08x) %08x %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4_unused, m_blit4, m_blit5_unused, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition);
-
+						//printf("non sprite: ");
+						//PRINT_BLIT_STUFF
 					}
 					else
 					{
@@ -845,8 +874,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 						{
 							// with this bit enabled m_blit10 is a look up to the zoom(?) value eg. 03f42600
 							//UINT32 temp = space.read_dword(m_blit10);
-							//printf("road type blit %08x %08x %08x %08x %08x(%08x) %08x %04x %04x %04x %04x %08x %08x (TEMP %08x) %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4_unused, m_blit4, m_blit5_unused, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, temp, m_vPosition, m_hPosition);
-					
+							//PRINT_BLIT_STUFF		
 							/* for the horizontal road during attract there are tables 0x480 bytes long (0x120 dwords) and the value passed points to the start of them */
 							/* cell sizes for those are are 0011 (v) 0007 (h) with zoom factors of 0020 (half v) 0040 (normal h) */
 							/* tables seem to be 2x 8-bit values, possibly zoom + linescroll, although ingame ones seem to be 2x16-bit (corrupt? more meaning) */
@@ -862,8 +890,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 						/*
 						if (m_blit4 &0x00010000)
 						{
-							printf("type blit %08x %08x %08x %08x %08x(%08x) %08x %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4_unused, m_blit4, m_blit5_unused, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition);
-							m_colorNumber = machine().rand() | 0xff000000;
+							//PRINT_BLIT_STUFF
+							m_b1colorNumber = machine().rand() | 0xff000000;
 							random = 1;
 						}
 						else
@@ -871,6 +899,15 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							
 						}
 						*/
+
+						//if (m_b1mode)
+						//{
+							//PRINT_BLIT_STUFF
+						//}
+						//else
+						//{
+						//	return;
+						//}
 
 						bitmap_rgb32* drawbitmap;
 
@@ -962,29 +999,29 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 								// HACKS to draw coloured blocks in easy to distinguish colours
 								if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
 								{
-									if (m_colorNumber == 0x5b)
+									if (m_b1colorNumber == 0x5b)
 										color = 0xffff0000;
-									else if (m_colorNumber == 0x5d)
+									else if (m_b1colorNumber == 0x5d)
 										color = 0xff00ff00;
-									else if (m_colorNumber == 0x5e)
+									else if (m_b1colorNumber == 0x5e)
 										color = 0xff0000ff;
 									else
 										color = 0xff00ffff;
 								}
 								else if (m_blitterMode == 0x40 || m_blitterMode == 0xa0)
 								{
-									color = 0xff000000 | (((m_colorNumber & 0xff) | 0x80)-0x40);
+									color = 0xff000000 | (((m_b1colorNumber & 0xff) | 0x80)-0x40);
 								}
 								else if (m_blitterMode == 0x50 || m_blitterMode == 0xb0)
 								{
-									color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 8);
+									color = 0xff000000 | ((((m_b1colorNumber & 0xff) | 0x80)-0x40) << 8);
 								}
 								else if (m_blitterMode == 0x60 || m_blitterMode == 0xc0)
 								{
-									color = 0xff000000 | ((((m_colorNumber & 0xff) | 0x80)-0x40) << 16);
+									color = 0xff000000 | ((((m_b1colorNumber & 0xff) | 0x80)-0x40) << 16);
 								}
 								if (random == 1)
-									color = m_colorNumber;
+									color = m_b1colorNumber;
 
 								// DEBUG: Draw 16x16 block
 								for (int y = 0; y < blockhigh; y++)
