@@ -627,7 +627,7 @@ public:
 	void stvcd_set_tray_open(void);
 	void stvcd_set_tray_close(void);
 
-	int get_track_index(void);
+	int get_track_index(UINT32 fad);
 	void cr_standard_return(UINT16 cur_status);
 	void cd_free_block(blockT *blktofree);
 	void cd_defragblocks(partitionT *part);
@@ -684,6 +684,7 @@ public:
 	UINT16 hirqmask, hirqreg;
 	UINT16 cd_stat;
 	UINT32 cd_curfad;// = 0;
+	UINT32 cd_fad_seek;
 	UINT32 fadstoplay;// = 0;
 	UINT32 in_buffer;// = 0;    // amount of data in the buffer
 	int oddframe;// = 0;

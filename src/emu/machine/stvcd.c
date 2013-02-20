@@ -77,17 +77,17 @@ int saturn_state::get_timing_command(void)
 }
 
 /* FIXME: assume Saturn CD-ROMs to have a 2 secs pre-gap for now. */
-int saturn_state::get_track_index(void)
+int saturn_state::get_track_index(UINT32 fad)
 {
 	UINT32 rel_fad;
 	UINT8 track;
 
-	if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, cd_curfad)) != CD_TRACK_AUDIO)
+	if(cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, fad)) != CD_TRACK_AUDIO)
 		return 1;
 
-	track = cdrom_get_track( cdrom, cd_curfad );
+	track = cdrom_get_track( cdrom, fad );
 
-	rel_fad = cd_curfad - cdrom_get_track_start( cdrom, track );
+	rel_fad = fad - cdrom_get_track_start( cdrom, track );
 
 	if(rel_fad < 150)
 		return 0;
@@ -97,10 +97,23 @@ int saturn_state::get_track_index(void)
 
 void saturn_state::cr_standard_return(UINT16 cur_status)
 {
-	cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
-	cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track); // TODO: fix current track
-	cr3 = (get_track_index()<<8) | (cd_curfad>>16); //index & 0xff00
-	cr4 = cd_curfad;
+	if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
+	{
+		/* During seek state, values returned are from the target position */
+		UINT8 seek_track = cdrom_get_track(cdrom, cd_fad_seek-150);
+
+		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf);
+		cr2 =  (seek_track == 0xff) ? 0xffff : ((cdrom_get_adr_control(cdrom, seek_track)<<8) | seek_track);
+		cr3 = (get_track_index(cd_fad_seek)<<8) | (cd_fad_seek>>16); //index & 0xff00
+		cr4 = cd_fad_seek;
+	}
+	else
+	{
+		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
+		cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track); // TODO: fix current track
+		cr3 = (get_track_index(cd_curfad)<<8) | (cd_curfad>>16); //index & 0xff00
+		cr4 = cd_curfad;
+	}
 	cd_stat |= CD_STAT_PERI;
 }
 
@@ -332,7 +345,9 @@ void saturn_state::cd_exec_command( void )
 					if(((start_pos)>>8) != 0)
 					{
 						cur_track = (start_pos)>>8;
-						cd_curfad = cdrom_get_track_start(cdrom, cur_track-1);
+						cd_fad_seek = cdrom_get_track_start(cdrom, cur_track-1);
+						cd_stat = CD_STAT_SEEK;
+						cdda_pause_audio( machine().device( "cdda" ), 0 );
 					}
 					else
 					{
@@ -510,7 +525,7 @@ void saturn_state::cd_exec_command( void )
 					xfercount = 0;
 					subqbuf[0] = 0x01 | ((cdrom_get_track_type(cdrom, cdrom_get_track(cdrom, track+1)) == CD_TRACK_AUDIO) ? 0x00 : 0x40);
 					subqbuf[1] = dec_2_bcd(track+1);
-					subqbuf[2] = dec_2_bcd(get_track_index());
+					subqbuf[2] = dec_2_bcd(get_track_index(cd_curfad));
 					subqbuf[3] = dec_2_bcd((msf_rel >> 16) & 0xff);
 					subqbuf[4] = dec_2_bcd((msf_rel >> 8) & 0xff);
 					subqbuf[5] = dec_2_bcd((msf_rel >> 0) & 0xff);
@@ -2427,6 +2442,30 @@ saturn_state::partitionT *saturn_state::cd_read_filtered_sector(INT32 fad, UINT8
 // loads in data set up by a CD-block PLAY command
 void saturn_state::cd_playdata( void )
 {
+	if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
+	{
+		//UINT8 seek_track = cdrom_get_track(cdrom, cd_fad_seek-150);
+
+		/* Zero Divide wants this TODO: timings. */
+		if((cd_fad_seek - cd_curfad) > (750*cd_speed))
+			cd_curfad += (750*cd_speed);
+		else if((cd_fad_seek < cd_curfad) < (-750*cd_speed))
+			cd_curfad -= (750*cd_speed);
+		else
+		{
+			cd_curfad = cd_fad_seek;
+			cd_stat = CD_STAT_PLAY;
+		}
+
+		#if 0
+		cr1 = cd_stat | 0x00; //options << 4 | repeat & 0xf
+		cr2 = (cdrom_get_adr_control(cdrom, seek_track)<<8 | seek_track);
+		cr3 = (get_track_index(cd_fad_seek)<<8) | (cd_fad_seek>>16); //index & 0xff00
+		cr4 = cd_fad_seek;
+		#endif
+		return;
+	}
+
 	if ((cd_stat & 0x0f00) == CD_STAT_PLAY)
 	{
 		if (fadstoplay)
@@ -2490,7 +2529,7 @@ void saturn_state::cd_readblock(UINT32 fad, UINT8 *dat)
 {
 	if (cdrom)
 	{
-		cdrom_read_data(cdrom, fad-150, dat, CD_TRACK_MODE1);
+		cdrom_read_data(cdrom, fad-150, dat, CD_TRACK_MODE1, true);
 	}
 }
 
