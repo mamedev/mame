@@ -301,6 +301,11 @@ public:
 	UINT16 m_vZoom;
 	UINT16 m_hZoom;
 	UINT32 m_blit0; // ?
+	UINT32 m_blit1; // ?
+	UINT32 m_blit2; // ?
+	UINT32 m_blit3; // ?
+	UINT32 m_blit4; // ?
+	UINT32 m_blit5; // ?
 	UINT32 m_blit10; // an address
 
 	required_device<cpu_device> m_maincpu;
@@ -578,7 +583,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				//  2: 00000000 - unknown : OT flag?  (transparency)
 				//  3: 00000000 - unknown : RF flag?  (90 degree rotation)
 				//  4: 07000000 - unknown : VF flag?  (vertically flipped)
-				//  5: 00010000 - unknown : HF flag?  (horizontally flipped)
+				//  5: 00010000 - unknown : HF flag?  (horizontally flipped) (or mode... )
 				//  6: vvvv---- - "Vertical Cell Count"
 				//  6: ----hhhh - "Horizontal Cell Count"
 				//  7: 00000000 - unknown : "Vertical|Horizontal Zoom Centers"?
@@ -599,19 +604,47 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				}
 				else if (m_blitterSerialCount == 1)
 				{
+					// 000u0ccc  - c = colour? u = 0/1
+					m_blit1 = data;
+
 					m_colorNumber = (data & 0x000000ff);    // Probably more bits
+				//	if (data!=0) printf("blit %08x\n", data);
 				}
 				else if (m_blitterSerialCount == 2)
 				{
+					// seems to be more complex than just transparency
+					m_blit2 = data;
+
+					 // 00??0uuu  
+					 // ?? seems to be 00 or 7f
+					 // uuu, at least 11 bits used, maybe 12
+
 				}
 				else if (m_blitterSerialCount == 3)
 				{
+					m_blit3 = data;
+					// 0000xxxx
+					//  to
+					// 001fxxxx
 				}
 				else if (m_blitterSerialCount == 4)
 				{
+					m_blit4 = data;
+
+					//0x000y0z
+					// x = 1, 2, 3 or 7
+					// y = 0 or 1
+					// z = 0 or 1
 				}
 				else if (m_blitterSerialCount == 5)
 				{
+					m_blit5 = data;
+					// this might enable the text indirection thing?
+
+				//	if (data!=0) printf("blit %08x\n", data);
+					// 00010000 (text)
+					// 00000001 (other)
+
 				}
 				else if (m_blitterSerialCount == 6)
 				{
