@@ -796,6 +796,8 @@ void saturn_state::cd_exec_command( void )
 				cr1 = cd_stat;
 				cr2 = 0;
 				cr3 = 0;
+				if(cr1 & 0xff || cr2 || cr3 & 0xff || cr4)
+					printf("Get # sectors used with params %04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
 
 				// is the partition empty?
 				if (partitions[bufnum].size == -1)

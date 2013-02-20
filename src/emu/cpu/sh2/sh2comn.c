@@ -571,6 +571,38 @@ WRITE32_HANDLER( sh2_internal_w )
 
 		// Watchdog
 	case 0x20: // WTCNT, RSTCSR
+		if((sh2->m[0x20] & 0xff000000) == 0x5a000000)
+			sh2->wtcnt = (sh2->m[0x20] >> 16) & 0xff;
+
+		if((sh2->m[0x20] & 0xff000000) == 0xa5000000)
+		{
+			/*
+			WTCSR
+			x--- ---- Overflow in IT mode
+			-x-- ---- Timer mode (0: IT 1: watchdog)
+			--x- ---- Timer enable
+			---1 1---
+			---- -xxx Clock select
+			*/
+
+			sh2->wtcsr = (sh2->m[0x20] >> 16) & 0xff;
+		}
+
+		if((sh2->m[0x20] & 0x0000ff00) == 0x00005a00)
+		{
+			// -x-- ---- RSTE (1: resets wtcnt when overflows 0: no reset)
+			// --x- ---- RSTS (0: power-on reset 1: Manual reset)
+			// ...
+		}
+
+		if((sh2->m[0x20] & 0x0000ff00) == 0x0000a500)
+		{
+			// clear WOVF
+			// ...
+		}
+
+
+
 		break;
 
 		// Standby and cache
@@ -728,6 +760,9 @@ READ32_HANDLER( sh2_internal_r )
 			return (sh2->ocra << 16) | (sh2->m[5] & 0xffff);
 	case 0x06: // ICR
 		return sh2->icr << 16;
+
+	case 0x20:
+		return (((sh2->wtcsr | 0x18) & 0xff) << 24)  | ((sh2->wtcnt & 0xff) << 16);
 
 	case 0x24: // SBYCR, CCR
 		return sh2->m[0x24] & ~0x3000; /* bit 4-5 of CCR are always zero */
@@ -1029,4 +1064,6 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_ackno
 	device->save_item(NAME(sh2->internal_irq_vector));
 	device->save_item(NAME(sh2->dma_timer_active));
 	device->save_item(NAME(sh2->dma_irq));
+	device->save_item(NAME(sh2->wtcnt));
+	device->save_item(NAME(sh2->wtcsr));
 }

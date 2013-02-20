@@ -146,6 +146,8 @@ struct sh2_state
 	UINT32 active_dma_src[2];
 	UINT32 active_dma_dst[2];
 	UINT32 active_dma_count[2];
+	UINT16 wtcnt;
+	UINT8 wtcsr;
 
 	int     is_slave, cpu_type;
 	int  (*dma_callback_kludge)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
