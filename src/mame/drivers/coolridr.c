@@ -7,6 +7,7 @@
 
     TODO:
     - decode compressed GFX ROMs for "sprite" blitter (6,141,122 is the patent number)
+	  http://www.google.com/patents/US6141122
     - DMA is still a bit of a mystery;
     - video emulation is pratically non-existant;
     - SCSP;
@@ -321,6 +322,35 @@ non-intuitive.
 
 Also the two indicator bits may have different polarities, maybe 0,0
 is Type C instead of 1,1.
+
+--- CORRECTION from Charles 20/02/13
+
+I was just playing around with decoding this morning, and now I feel
+certain the ordering is to take the 16-bit output of each of the 10
+ROMs at a given address and divide that 160-bit word into sixteen
+10-bit words.
+
+When you do this, you get some kind of animation at 0x3898E0 which is
+eight sequential frames of an object with a solid color fill in the
+background. Because the size is constant it may be all Type C pixels
+(e.g. no run-length) so that could be a good place to start with
+shuffling bits/addresses to see how to get a lot of $3xx pixels.
+
+There's a similar animation at 0x73CEC0, smaller object, 32 frames.
+
+I think the 'background' data behind the object in both cases might be
+a pen number that continuously increases, maybe for flashing effect as
+you cycle through the animation. Otherwise you'd expect the background
+pixels to be the same in each frame.
+
+I also wonder if a pixel value of 0000 (type A with run length=0)
+indicates a single dot since there are a lot of 0000 words.
+
+There may be some bit/byte/address swapping needed to still get valid
+output. And the tables may be encoded differently, there's a large one
+at 0xDE60.
+
+
 
 */
 
@@ -784,14 +814,19 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 					if (m_indirect_zoom_enable)
 					{
 						// with this bit enabled m_blit10 is a look up to the zoom(?) value eg. 03f42600
+						//UINT32 temp = space.read_dword(m_blit10);
+						//printf("road type blit %08x %08x %08x %08x %08x %08x %04x %04x %04x %04x %08x %08x (TEMP %08x) %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4, m_blit5, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, temp, m_vPosition, m_hPosition);
+					
+						/* for the horizontal road during attract there are tables 0x480 bytes long (0x120 dwords) and the value passed points to the start of them */
+						/* cell sizes for those are are 0011 (v) 0007 (h) with zoom factors of 0020 (half v) 0040 (normal h) */
+						/* tables seem to be 2x 8-bit values, possibly zoom + linescroll, although ingame ones seem to be 2x16-bit (corrupt? more meaning) */
 
-						//printf("road type blit %08x %08x %08x %08x %08x %08x %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1, m_blit2, m_blit3, m_blit4, m_blit5, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition);
 					}
 
 					
 					bitmap_rgb32* drawbitmap;
 
-					// guess, you can see the different sizes of bike cross from the left screen to the right where the attract text is
+					// 0x30 - 0x60 are definitely the left screen, 0x90 - 0xc0 are definitely the right screen.. the modes seem priority related
 					if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 						drawbitmap = &m_temp_bitmap_sprites;
 					else // 0x90, 0xa0, 0xb0, 0xc0
