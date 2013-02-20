@@ -5877,73 +5877,72 @@ ROM_START( scorpion )
 	ROM_CONTINUE(             0x5800, 0x0800 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "32_a4.7c",     0x0000, 0x1000, CRC(361b8a36) SHA1(550ac5f721aaa9fea5f6d63ba590d6b367525c23) )
-	ROM_LOAD( "32_a5.7d",     0x1000, 0x1000, CRC(addecdd4) SHA1(ba28f1d9c7c6b5e8ecef56a4b3f64be13fc10d43) )
+	ROM_LOAD( "igr_scorpion_32_a4.ic12", 0x0000, 0x1000, CRC(361b8a36) SHA1(550ac5f721aaa9fea5f6d63ba590d6b367525c23) )
+	ROM_LOAD( "igr_scorpion_32_a5.ic13", 0x1000, 0x1000, CRC(addecdd4) SHA1(ba28f1d9c7c6b5e8ecef56a4b3f64be13fc10d43) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "32_f5.5f",     0x0000, 0x1000, CRC(1e5da9d6) SHA1(ca8b27e6dd40e4ca13e7e6b5f813bafca78b62f4) )
-	ROM_LOAD( "32_h5.5h",     0x1000, 0x1000, CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) )
+	ROM_LOAD( "igr_scorpion_32_f5.ic72", 0x0000, 0x1000, CRC(1e5da9d6) SHA1(ca8b27e6dd40e4ca13e7e6b5f813bafca78b62f4) )
+	ROM_LOAD( "igr_scorpion_32_h5.ic73", 0x1000, 0x1000, CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) )
 
 	ROM_REGION( 0x3000, "digitalker", 0 ) /* Digitalker speech samples */
-	ROM_LOAD( "32_a3.6e",     0x0000, 0x1000, CRC(279ae6f9) SHA1(a93b1d68c9f4b6ad62fdb8816285e61bd3b4b884) )
-	ROM_LOAD( "32_a2.6d",     0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
-	ROM_LOAD( "32_a1.6c",     0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
+	ROM_LOAD( "igr_scorpion_32_a3.ic25", 0x0000, 0x1000, CRC(04abf178) SHA1(2e7f231413d9ec461ca21840f31d1d6b8b17c4d5) )
+	ROM_LOAD( "igr_scorpion_32_a2.ic24", 0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
+	ROM_LOAD( "igr_scorpion_32_a1.ic23", 0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "prom.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+	ROM_LOAD( "mmi6331_6e.ic59", 0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) /* BPROM type MMI 6331 */
 ROM_END
 
-ROM_START( scorpiona )
-	/* this dump is bad (at least one rom) */
+ROM_START( scorpiona ) /* Scorpion was developed by I.G.R. and original labels have "I.G.R. SCORPION" printed them */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "scor_d2.bin",  0x0000, 0x1000, BAD_DUMP CRC(c5b9daeb) SHA1(faf7a22013dd5f063eb8f506f3722cfd5522539a) )
-	ROM_LOAD( "scor_e2.bin",  0x1000, 0x1000, BAD_DUMP CRC(82308d05) SHA1(26bc7c8b3ea0020fd1b93f6aaa29d82d04ae64b2) )
-	ROM_LOAD( "scor_g2.bin",  0x2000, 0x1000, BAD_DUMP CRC(756b09cd) SHA1(9aec34e063fe8c0d1392db09daea2875d06eec46) )
-	ROM_LOAD( "scor_h2.bin",  0x3000, 0x1000, BAD_DUMP CRC(a0457b93) SHA1(5ed32e117a97660dae001bd97fcb3f31e0debb24) )
-	ROM_LOAD( "scor_k2.bin",  0x5800, 0x0800, BAD_DUMP CRC(42ec34d8) SHA1(b358d10a96490f325420b992e8e03bb3884e415a) )
-	ROM_LOAD( "scor_l2.bin",  0x6000, 0x0800, BAD_DUMP CRC(6623da33) SHA1(99110005d00c80d674bde5d21608f50b85ee488c) )
+	ROM_LOAD( "igr_scorpion_32_d2.ic109",  0x0000, 0x1000, CRC(c5b9daeb) SHA1(faf7a22013dd5f063eb8f506f3722cfd5522539a) )
+	ROM_LOAD( "igr_scorpion_32_e2.ic110",  0x1000, 0x1000, CRC(82308d05) SHA1(26bc7c8b3ea0020fd1b93f6aaa29d82d04ae64b2) )
+	ROM_LOAD( "igr_scorpion_32_g2.ic111",  0x2000, 0x1000, CRC(756b09cd) SHA1(9aec34e063fe8c0d1392db09daea2875d06eec46) )
+	ROM_LOAD( "igr_scorpion_32_h2.ic112",  0x3000, 0x1000, CRC(667ad8be) SHA1(2b2dcd32d52c0173a1fd93da9a8a1ccb669c7d55) )
+	ROM_LOAD( "igr_scorpion_16_k2.ic113",  0x5800, 0x0800, CRC(42ec34d8) SHA1(b358d10a96490f325420b992e8e03bb3884e415a) )
+	ROM_LOAD( "igr_scorpion_16_l2.ic114",  0x6000, 0x0800, CRC(6623da33) SHA1(99110005d00c80d674bde5d21608f50b85ee488c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "32_a4.7c",     0x0000, 0x1000, CRC(361b8a36) SHA1(550ac5f721aaa9fea5f6d63ba590d6b367525c23) )
-	ROM_LOAD( "32_a5.7d",     0x1000, 0x1000, CRC(addecdd4) SHA1(ba28f1d9c7c6b5e8ecef56a4b3f64be13fc10d43) )
+	ROM_LOAD( "igr_scorpion_32_a4.ic12", 0x0000, 0x1000, CRC(361b8a36) SHA1(550ac5f721aaa9fea5f6d63ba590d6b367525c23) )
+	ROM_LOAD( "igr_scorpion_32_a5.ic13", 0x1000, 0x1000, CRC(addecdd4) SHA1(ba28f1d9c7c6b5e8ecef56a4b3f64be13fc10d43) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "scor_f5.bin",  0x0000, 0x1000, CRC(60180a38) SHA1(518c1267523139aa4e27860012a722b67fe25b6d) )
-	ROM_LOAD( "32_h5.5h",     0x1000, 0x1000, CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) )
+	ROM_LOAD( "igr_scorpion_32_f5.ic72", 0x0000, 0x1000, CRC(1e5da9d6) SHA1(ca8b27e6dd40e4ca13e7e6b5f813bafca78b62f4) )
+	ROM_LOAD( "igr_scorpion_32_h5.ic73", 0x1000, 0x1000, CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) )
 
 	ROM_REGION( 0x3000, "digitalker", 0 ) /* Digitalker speech samples */
-	ROM_LOAD( "scor_a3.bin",  0x0000, 0x1000, CRC(04abf178) SHA1(2e7f231413d9ec461ca21840f31d1d6b8b17c4d5) )
-	ROM_LOAD( "scor_a2.bin",  0x1000, 0x1000, CRC(452d6354) SHA1(3d5397fddcc17b4d03b9cdc53a6439f159d1bfcc) )
-	ROM_LOAD( "32_a1.6c",     0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
+	ROM_LOAD( "igr_scorpion_32_a3.ic25", 0x0000, 0x1000, CRC(04abf178) SHA1(2e7f231413d9ec461ca21840f31d1d6b8b17c4d5) )
+	ROM_LOAD( "igr_scorpion_32_a2.ic24", 0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
+	ROM_LOAD( "igr_scorpion_32_a1.ic23", 0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "prom.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+	ROM_LOAD( "mmi6331_6e.ic59", 0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) /* BPROM type MMI 6331 */
 ROM_END
 
 ROM_START( scorpionb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ic109.2d",         0x0000, 0x1000, CRC(f54688c9) SHA1(2881d5238733353b9c277a2829d157688a87601b) )
-	ROM_LOAD( "ic110.2e",         0x1000, 0x1000, CRC(91aaaa12) SHA1(2a5e5eb5aeec5637ee4675930f67158a969e0d5d) )
-	ROM_LOAD( "ic111.2g",         0x2000, 0x1000, CRC(4c3720da) SHA1(5b2758c8a91f9463bf98abf2b52af946c5e90cf0) )
-	ROM_LOAD( "ic112.2h",         0x3000, 0x1000, CRC(53e2a983) SHA1(cfe272055a92793de76dd1cff617b13281815485) )
-	ROM_LOAD( "ic113.2k",         0x6000, 0x0800, CRC(e4ad299a) SHA1(712cab86eadeba9e859f7bae98eb289f00d2e217) )
-	ROM_CONTINUE(             0x5800, 0x0800 )
+	ROM_LOAD( "ic109.2d", 0x0000, 0x1000, CRC(f54688c9) SHA1(2881d5238733353b9c277a2829d157688a87601b) )
+	ROM_LOAD( "ic110.2e", 0x1000, 0x1000, CRC(91aaaa12) SHA1(2a5e5eb5aeec5637ee4675930f67158a969e0d5d) )
+	ROM_LOAD( "ic111.2g", 0x2000, 0x1000, CRC(4c3720da) SHA1(5b2758c8a91f9463bf98abf2b52af946c5e90cf0) )
+	ROM_LOAD( "ic112.2h", 0x3000, 0x1000, CRC(53e2a983) SHA1(cfe272055a92793de76dd1cff617b13281815485) )
+	ROM_LOAD( "ic113.2k", 0x6000, 0x0800, CRC(e4ad299a) SHA1(712cab86eadeba9e859f7bae98eb289f00d2e217) )
+	ROM_CONTINUE(         0x5800, 0x0800 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "32_a4.7c",     0x0000, 0x1000, CRC(361b8a36) SHA1(550ac5f721aaa9fea5f6d63ba590d6b367525c23) ) // missing in this dump
-	ROM_LOAD( "ic13.7d",     0x1000, 0x1000, CRC(addecdd4) SHA1(ba28f1d9c7c6b5e8ecef56a4b3f64be13fc10d43) )
+	ROM_LOAD( "igr_scorpion_32_a4.ic12", 0x0000, 0x1000, CRC(361b8a36) SHA1(550ac5f721aaa9fea5f6d63ba590d6b367525c23) ) /* missing from this set */
+	ROM_LOAD( "igr_scorpion_32_a5.ic13", 0x1000, 0x1000, CRC(addecdd4) SHA1(ba28f1d9c7c6b5e8ecef56a4b3f64be13fc10d43) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "ic72.5f",     0x0000, 0x1000, CRC(1e5da9d6) SHA1(ca8b27e6dd40e4ca13e7e6b5f813bafca78b62f4) )
-	ROM_LOAD( "ic73.5h",     0x1000, 0x1000, CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) )
+	ROM_LOAD( "igr_scorpion_32_f5.ic72", 0x0000, 0x1000, CRC(1e5da9d6) SHA1(ca8b27e6dd40e4ca13e7e6b5f813bafca78b62f4) )
+	ROM_LOAD( "igr_scorpion_32_h5.ic73", 0x1000, 0x1000, CRC(a57adb0a) SHA1(d97c7dc4a6c5efb59cc0148e2498156c682c6714) )
 
 	ROM_REGION( 0x3000, "digitalker", 0 ) /* Digitalker speech samples */
-	ROM_LOAD( "ic25.6e",     0x0000, 0x1000, CRC(04abf178) SHA1(2e7f231413d9ec461ca21840f31d1d6b8b17c4d5) )
-	ROM_LOAD( "ic24.6d",     0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
-	ROM_LOAD( "ic23.6c",     0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
+	ROM_LOAD( "igr_scorpion_32_a3.ic25", 0x0000, 0x1000, CRC(04abf178) SHA1(2e7f231413d9ec461ca21840f31d1d6b8b17c4d5) )
+	ROM_LOAD( "igr_scorpion_32_a2.ic24", 0x1000, 0x1000, CRC(90352dd4) SHA1(62c261a2f2fbd8eff31d5c72cf532d5e43d86dd3) )
+	ROM_LOAD( "igr_scorpion_32_a1.ic23", 0x2000, 0x1000, CRC(3bf2452d) SHA1(7a163e0ef108dd40d3beab5e9805886e45be744b) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "prom.6e",      0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+	ROM_LOAD( "mmi6331_6e.ic59", 0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) /* BPROM type MMI 6331 */
 ROM_END
 
 ROM_START( scorpionmc )
@@ -6711,7 +6710,7 @@ GAME( 1981, atlantis2,atlantis, theend,   atlantis, galaxian_state, atlantis, RO
 
 /* Scorpion hardware; based on Scramble but with a 3rd AY-8910 and a speech chip */
 GAME( 1982, scorpion, 0,        scorpion, scorpion, galaxian_state, scorpion, ROT90,  "Zaccaria", "Scorpion (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-GAME( 1982, scorpiona,scorpion, scorpion, scorpion, galaxian_state, scorpion, ROT90,  "Zaccaria", "Scorpion (set 2)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
+GAME( 1982, scorpiona,scorpion, scorpion, scorpion, galaxian_state, scorpion, ROT90,  "Zaccaria", "Scorpion (set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1982, scorpionb,scorpion, scorpion, scorpion, galaxian_state, scorpion, ROT90,  "Zaccaria", "Scorpion (set 3)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 19??, scorpionmc,scorpion,mooncrst, scorpnmc, galaxian_state, scorpnmc, ROT90,  "bootleg? (Dorneer)", "Scorpion (Moon Cresta hardware)", GAME_SUPPORTS_SAVE )
 GAME( 19??, aracnis,   scorpion,mooncrst, aracnis, galaxian_state,  scorpnmc, ROT90,  "bootleg",  "Aracnis (bootleg of Scorpion on Moon Cresta hardware)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
