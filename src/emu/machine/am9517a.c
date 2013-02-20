@@ -433,6 +433,11 @@ void am9517a_device::device_start()
 		m_channel[i].m_in_ior_func.resolve(m_in_ior_cb[i], *this);
 		m_channel[i].m_out_iow_func.resolve(m_out_iow_cb[i], *this);
 		m_channel[i].m_out_dack_func.resolve(m_out_dack_cb[i], *this);
+		m_channel[i].m_address = 0;
+		m_channel[i].m_count = 0;
+		m_channel[i].m_base_address = 0;
+		m_channel[i].m_base_count = 0;
+		m_channel[i].m_mode = 0;
 	}
 
 	// state saving
