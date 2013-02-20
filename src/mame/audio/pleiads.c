@@ -40,7 +40,7 @@ struct n_state
 
 struct pleiads_sound_state
 {
-	device_t *m_tms;
+	tms36xx_device *m_tms;
 	sound_stream *m_channel;
 
 	int m_sound_latch_a;
@@ -451,7 +451,7 @@ WRITE8_DEVICE_HANDLER( pleiads_sound_control_b_w )
 	if (pitch == 3)
 		pitch = 2;  /* 2 and 3 are the same */
 
-	tms36xx_note_w(state->m_tms, pitch, note);
+	state->m_tms->tms36xx_note_w(pitch, note);
 
 	state->m_channel->update();
 	state->m_sound_latch_b = data;
@@ -477,7 +477,7 @@ static DEVICE_START( common_sh_start )
 	UINT32 shiftreg;
 
 	state->m_pc4.level = PC4_MIN;
-	state->m_tms = device->machine().device("tms");
+	state->m_tms = device->machine().device<tms36xx_device>("tms");
 	state->m_poly18 = auto_alloc_array(device->machine(), UINT32, 1ul << (18-5));
 
 	shiftreg = 0;

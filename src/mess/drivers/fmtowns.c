@@ -2181,7 +2181,7 @@ static ADDRESS_MAP_START(towns_mem, AS_PROGRAM, 32, towns_state)
 	AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
 	AM_RANGE(0xc2140000, 0xc2141fff) AM_READWRITE8(towns_cmos_r,towns_cmos_w,0xffffffff) // CMOS (mirror?)
 	AM_RANGE(0xc2180000, 0xc21fffff) AM_ROM AM_REGION("user",0x080000)  // F20 ROM
-	AM_RANGE(0xc2200000, 0xc220ffff) AM_DEVREADWRITE8_LEGACY("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
+	AM_RANGE(0xc2200000, 0xc220ffff) AM_DEVREADWRITE8("pcm", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w, 0xffffffff)  // WAVE RAM
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
@@ -2207,7 +2207,7 @@ static ADDRESS_MAP_START(marty_mem, AS_PROGRAM, 32, towns_state)
 	AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // IC Memory Card (is this usable on the Marty?)
 	AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
 	AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
-	AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8_LEGACY("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
+	AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w, 0xffffffff)  // WAVE RAM
 	AM_RANGE(0x00fc0000, 0x00ffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
@@ -2234,7 +2234,7 @@ static ADDRESS_MAP_START(ux_mem, AS_PROGRAM, 32, towns_state)
 	AM_RANGE(0x00e00000, 0x00e7ffff) AM_ROM AM_REGION("user",0x000000)  // OS
 	AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
 	AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
-	AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8_LEGACY("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
+	AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w, 0xffffffff)  // WAVE RAM
 	AM_RANGE(0x00fc0000, 0x00ffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
@@ -2274,7 +2274,7 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
 	AM_RANGE(0x04d8,0x04df) AM_DEVREADWRITE8_LEGACY("fm",ym3438_r,ym3438_w,0x00ff00ff)
 	AM_RANGE(0x04e0,0x04e3) AM_READWRITE8(towns_volume_r,towns_volume_w,0xffffffff)  // R/W  -- volume ports
 	AM_RANGE(0x04e8,0x04ef) AM_READWRITE8(towns_sound_ctrl_r,towns_sound_ctrl_w,0xffffffff)
-	AM_RANGE(0x04f0,0x04fb) AM_DEVWRITE8_LEGACY("pcm",rf5c68_w,0xffffffff)
+	AM_RANGE(0x04f0,0x04fb) AM_DEVWRITE8("pcm", rf5c68_device, rf5c68_w, 0xffffffff)
 	// CRTC / Video
 	AM_RANGE(0x05c8,0x05cb) AM_READWRITE8(towns_video_5c8_r, towns_video_5c8_w, 0xffffffff)
 	// System ports
@@ -2793,7 +2793,7 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_SOUND_ADD("fm", YM3438, 53693100 / 7) // actual clock speed unknown
 	MCFG_SOUND_CONFIG(ym3438_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("pcm", RF5C68, 53693100 / 7)  // actual clock speed unknown
+	MCFG_RF5C68_ADD("pcm", 53693100 / 7)  // actual clock speed unknown
 	MCFG_SOUND_CONFIG(rf5c68_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 	MCFG_SOUND_ADD("cdda",CDDA,0)

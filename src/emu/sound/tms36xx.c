@@ -11,37 +11,6 @@
 /* the frequencies are later adjusted by "* clock / FSCALE" */
 #define FSCALE  1024
 
-struct tms_state {
-	char *subtype;      /* subtype name MM6221AA, TMS3615 or TMS3617 */
-	sound_stream * channel; /* returned by stream_create() */
-
-	int samplerate;     /* output sample rate */
-
-	int basefreq;       /* chip's base frequency */
-	int octave;         /* octave select of the TMS3615 */
-
-	int speed;          /* speed of the tune */
-	int tune_counter;   /* tune counter */
-	int note_counter;   /* note counter */
-
-	int voices;         /* active voices */
-	int shift;          /* shift toggles between 0 and 6 to allow decaying voices */
-	int vol[12];        /* (decaying) volume of harmonics notes */
-	int vol_counter[12];/* volume adjustment counter */
-	int decay[12];      /* volume adjustment rate - dervied from decay */
-
-	int counter[12];    /* tone frequency counter */
-	int frequency[12];  /* tone frequency */
-	int output;         /* output signal bits */
-	int enable;         /* mask which harmoics */
-
-	int tune_num;       /* tune currently playing */
-	int tune_ofs;       /* note currently playing */
-	int tune_max;       /* end of tune */
-
-	const tms36xx_interface *intf;
-};
-
 #define C(n)    (int)((FSCALE<<(n-1))*1.18921)  /* 2^(3/12) */
 #define Cx(n)   (int)((FSCALE<<(n-1))*1.25992)  /* 2^(4/12) */
 #define D(n)    (int)((FSCALE<<(n-1))*1.33484)  /* 2^(5/12) */
@@ -299,62 +268,133 @@ static const int tune4[13*6] = {
 static const int *const tunes[] = {NULL,tune1,tune2,tune3,tune4};
 
 #define DECAY(voice)                                            \
-	if( tms->vol[voice] > VMIN )                                \
+	if( m_vol[voice] > VMIN )                                   \
 	{                                                           \
 		/* decay of first voice */                              \
-		tms->vol_counter[voice] -= tms->decay[voice];           \
-		while( tms->vol_counter[voice] <= 0 )                   \
+		m_vol_counter[voice] -= m_decay[voice];                 \
+		while( m_vol_counter[voice] <= 0 )                      \
 		{                                                       \
-			tms->vol_counter[voice] += samplerate;              \
-			if( tms->vol[voice]-- <= VMIN )                     \
+			m_vol_counter[voice] += samplerate;                 \
+			if( m_vol[voice]-- <= VMIN )                        \
 			{                                                   \
-				tms->frequency[voice] = 0;                      \
-				tms->vol[voice] = VMIN;                         \
+				m_frequency[voice] = 0;                         \
+				m_vol[voice] = VMIN;                            \
 				break;                                          \
 			}                                                   \
 		}                                                       \
 	}
 
 #define RESTART(voice)                                          \
-	if( tunes[tms->tune_num][tms->tune_ofs*6+voice] )           \
+	if( tunes[m_tune_num][m_tune_ofs*6+voice] )                 \
 	{                                                           \
-		tms->frequency[tms->shift+voice] =                      \
-			tunes[tms->tune_num][tms->tune_ofs*6+voice] *       \
-			(tms->basefreq << tms->octave) / FSCALE;            \
-		tms->vol[tms->shift+voice] = VMAX;                      \
+		m_frequency[m_shift+voice] =                            \
+			tunes[m_tune_num][m_tune_ofs*6+voice] *             \
+			(m_basefreq << m_octave) / FSCALE;                  \
+		m_vol[m_shift+voice] = VMAX;                            \
 	}
 
 #define TONE(voice)                                             \
-	if( (tms->enable & (1<<voice)) && tms->frequency[voice] )   \
+	if( (m_enable & (1<<voice)) && m_frequency[voice] )         \
 	{                                                           \
 		/* first note */                                        \
-		tms->counter[voice] -= tms->frequency[voice];           \
-		while( tms->counter[voice] <= 0 )                       \
+		m_counter[voice] -= m_frequency[voice];                 \
+		while( m_counter[voice] <= 0 )                          \
 		{                                                       \
-			tms->counter[voice] += samplerate;                  \
-			tms->output ^= 1 << voice;                          \
+			m_counter[voice] += samplerate;                     \
+			m_output ^= 1 << voice;                             \
 		}                                                       \
-		if (tms->output & tms->enable & (1 << voice))           \
-			sum += tms->vol[voice];                             \
+		if (m_output & m_enable & (1 << voice))                 \
+			sum += m_vol[voice];                                \
 	}
 
 
-INLINE tms_state *get_safe_token(device_t *device)
+
+// device type definition
+const device_type TMS36XX = &device_creator<tms36xx_device>;
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  tms36xx_device - constructor
+//-------------------------------------------------
+
+tms36xx_device::tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, TMS36XX, "TMS36XX", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_subtype(NULL),
+	  m_channel(NULL),
+	  m_samplerate(0),
+	  m_basefreq(0),
+	  m_octave(0),
+	  m_speed(0),
+	  m_tune_counter(0),
+	  m_note_counter(0),
+	  m_voices(0),
+	  m_shift(0),
+	  m_output(0),
+	  m_enable(0),
+	  m_tune_num(0),
+	  m_tune_ofs(0),
+	  m_tune_max(0),
+	  m_intf(NULL)
 {
-	assert(device != NULL);
-	assert(device->type() == TMS36XX);
-	return (tms_state *)downcast<tms36xx_device *>(device)->token();
+	memset(m_vol, 0, sizeof(int)*12);
+	memset(m_vol_counter, 0, sizeof(int)*12);
+	memset(m_decay, 0, sizeof(int)*12);
+	memset(m_counter, 0, sizeof(int)*12);
+	memset(m_frequency, 0, sizeof(int)*12);
 }
 
 
-static STREAM_UPDATE( tms36xx_sound_update )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void tms36xx_device::device_start()
 {
-	tms_state *tms = (tms_state *)param;
-	int samplerate = tms->samplerate;
+	int j;
+	int enable;
+
+	m_intf = (const tms36xx_interface *)static_config();
+
+	m_channel = stream_alloc(0, 1, clock() * 64);
+	m_samplerate = clock() * 64;
+	m_basefreq = clock();
+	enable = 0;
+	for (j = 0; j < 6; j++)
+	{
+		if( m_intf->decay[j] > 0 )
+		{
+			m_decay[j+0] = m_decay[j+6] = VMAX / m_intf->decay[j];
+			enable |= 0x41 << j;
+		}
+	}
+	m_speed = (m_intf->speed > 0) ? VMAX / m_intf->speed : VMAX;
+	tms3617_enable(enable);
+
+	LOG(("TMS36xx samplerate    %d\n", m_samplerate));
+	LOG(("TMS36xx basefreq      %d\n", m_basefreq));
+	LOG(("TMS36xx decay         %d,%d,%d,%d,%d,%d\n",
+		m_decay[0], m_decay[1], m_decay[2],
+		m_decay[3], m_decay[4], m_decay[5]));
+	LOG(("TMS36xx speed         %d\n", m_speed));
+}
+
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void tms36xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	int samplerate = m_samplerate;
 	stream_sample_t *buffer = outputs[0];
 
 	/* no tune played? */
-	if( !tunes[tms->tune_num] || tms->voices == 0 )
+	if( !tunes[m_tune_num] || m_voices == 0 )
 	{
 		while (--samples >= 0)
 			buffer[samples] = 0;
@@ -370,23 +410,23 @@ static STREAM_UPDATE( tms36xx_sound_update )
 		DECAY( 6) DECAY( 7) DECAY( 8) DECAY( 9) DECAY(10) DECAY(11)
 
 		/* musical note timing */
-		tms->tune_counter -= tms->speed;
-		if( tms->tune_counter <= 0 )
+		m_tune_counter -= m_speed;
+		if( m_tune_counter <= 0 )
 		{
-			int n = (-tms->tune_counter / samplerate) + 1;
-			tms->tune_counter += n * samplerate;
+			int n = (-m_tune_counter / samplerate) + 1;
+			m_tune_counter += n * samplerate;
 
-			if( (tms->note_counter -= n) <= 0 )
+			if( (m_note_counter -= n) <= 0 )
 			{
-				tms->note_counter += VMAX;
-				if (tms->tune_ofs < tms->tune_max)
+				m_note_counter += VMAX;
+				if (m_tune_ofs < m_tune_max)
 				{
 					/* shift to the other 'bank' of voices */
-					tms->shift ^= 6;
+					m_shift ^= 6;
 					/* restart one 'bank' of voices */
 					RESTART(0) RESTART(1) RESTART(2)
 					RESTART(3) RESTART(4) RESTART(5)
-					tms->tune_ofs++;
+					m_tune_ofs++;
 				}
 			}
 		}
@@ -395,73 +435,95 @@ static STREAM_UPDATE( tms36xx_sound_update )
 		TONE( 0) TONE( 1) TONE( 2) TONE( 3) TONE( 4) TONE( 5)
 		TONE( 6) TONE( 7) TONE( 8) TONE( 9) TONE(10) TONE(11)
 
-		*buffer++ = sum / tms->voices;
+		*buffer++ = sum / m_voices;
 	}
 }
 
-static void tms36xx_reset_counters(tms_state *tms)
-{
-	tms->tune_counter = 0;
-	tms->note_counter = 0;
-	memset(tms->vol_counter, 0, sizeof(tms->vol_counter));
-	memset(tms->counter, 0, sizeof(tms->counter));
-}
 
-void mm6221aa_tune_w(device_t *device, int tune)
-{
-	tms_state *tms = get_safe_token(device);
+//-------------------------------------------------
+//  MM6221AA interface functions
+//-------------------------------------------------
 
+void tms36xx_device::mm6221aa_tune_w(int tune)
+{
 	/* which tune? */
 	tune &= 3;
-	if( tune == tms->tune_num )
+	if( tune == m_tune_num )
 		return;
 
-	LOG(("%s tune:%X\n", tms->subtype, tune));
+	LOG(("%s tune:%X\n", m_subtype, tune));
 
 	/* update the stream before changing the tune */
-	tms->channel->update();
+	m_channel->update();
 
-	tms->tune_num = tune;
-	tms->tune_ofs = 0;
-	tms->tune_max = 96; /* fixed for now */
+	m_tune_num = tune;
+	m_tune_ofs = 0;
+	m_tune_max = 96; /* fixed for now */
 }
 
-void tms36xx_note_w(device_t *device, int octave, int note)
-{
-	tms_state *tms = get_safe_token(device);
 
+//-------------------------------------------------
+//  TMS3615/17 interface functions
+//-------------------------------------------------
+
+void tms36xx_device::tms36xx_note_w(int octave, int note)
+{
 	octave &= 3;
 	note &= 15;
 
 	if (note > 12)
 		return;
 
-	LOG(("%s octave:%X note:%X\n", tms->subtype, octave, note));
+	LOG(("%s octave:%X note:%X\n", m_subtype, octave, note));
 
 	/* update the stream before changing the tune */
-	tms->channel->update();
+	m_channel->update();
 
 	/* play a single note from 'tune 4', a list of the 13 tones */
-	tms36xx_reset_counters(tms);
-	tms->octave = octave;
-	tms->tune_num = 4;
-	tms->tune_ofs = note;
-	tms->tune_max = note + 1;
+	tms36xx_reset_counters();
+	m_octave = octave;
+	m_tune_num = 4;
+	m_tune_ofs = note;
+	m_tune_max = note + 1;
 }
 
-static void tms3617_enable(tms_state *tms, int enable)
+
+//-------------------------------------------------
+//  TMS3617 interface functions
+//-------------------------------------------------
+      
+void tms36xx_device::tms3617_enable_w(int enable)
+{
+	tms3617_enable(enable);
+}
+
+
+//-------------------------------------------------
+//  Locals
+//-------------------------------------------------
+
+void tms36xx_device::tms36xx_reset_counters()
+{
+	m_tune_counter = 0;
+	m_note_counter = 0;
+	memset(m_vol_counter, 0, sizeof(m_vol_counter));
+	memset(m_counter, 0, sizeof(m_counter));
+}
+
+
+void tms36xx_device::tms3617_enable(int enable)
 {
 	int i, bits = 0;
 
 	/* duplicate the 6 voice enable bits */
 	enable = (enable & 0x3f) | ((enable & 0x3f) << 6);
-	if (enable == tms->enable)
+	if (enable == m_enable)
 		return;
 
 	/* update the stream before changing the tune */
-	tms->channel->update();
+	m_channel->update();
 
-	LOG(("%s enable voices", tms->subtype));
+	LOG(("%s enable voices", m_subtype));
 	for (i = 0; i < 6; i++)
 	{
 		if (enable & (1 << i))
@@ -480,83 +542,7 @@ static void tms3617_enable(tms_state *tms, int enable)
 		}
 	}
 	/* set the enable mask and number of active voices */
-	tms->enable = enable;
-	tms->voices = bits;
+	m_enable = enable;
+	m_voices = bits;
 	LOG(("%s\n", bits ? "" : " none"));
-}
-
-void tms3617_enable_w(device_t *device, int enable)
-{
-	tms_state *tms = get_safe_token(device);
-	tms3617_enable(tms, enable);
-}
-
-static DEVICE_START( tms36xx )
-{
-	int j;
-	tms_state *tms = get_safe_token(device);
-	int enable;
-
-	tms->intf = (const tms36xx_interface *)device->static_config();
-
-	tms->channel = device->machine().sound().stream_alloc(*device, 0, 1, device->clock() * 64, tms, tms36xx_sound_update);
-	tms->samplerate = device->clock() * 64;
-	tms->basefreq = device->clock();
-	enable = 0;
-	for (j = 0; j < 6; j++)
-	{
-		if( tms->intf->decay[j] > 0 )
-		{
-			tms->decay[j+0] = tms->decay[j+6] = VMAX / tms->intf->decay[j];
-			enable |= 0x41 << j;
-		}
-	}
-	tms->speed = (tms->intf->speed > 0) ? VMAX / tms->intf->speed : VMAX;
-	tms3617_enable(tms,enable);
-
-	LOG(("TMS36xx samplerate    %d\n", tms->samplerate));
-	LOG(("TMS36xx basefreq      %d\n", tms->basefreq));
-	LOG(("TMS36xx decay         %d,%d,%d,%d,%d,%d\n",
-		tms->decay[0], tms->decay[1], tms->decay[2],
-		tms->decay[3], tms->decay[4], tms->decay[5]));
-	LOG(("TMS36xx speed         %d\n", tms->speed));
-}
-
-
-const device_type TMS36XX = &device_creator<tms36xx_device>;
-
-tms36xx_device::tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, TMS36XX, "TMS36XX", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(tms_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void tms36xx_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void tms36xx_device::device_start()
-{
-	DEVICE_START_NAME( tms36xx )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void tms36xx_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
 }

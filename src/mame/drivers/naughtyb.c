@@ -441,7 +441,7 @@ static MACHINE_CONFIG_START( naughtyb, naughtyb_state )
 	/* uses the TMS3615NS for sound */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("tms", TMS36XX, 350)
+	MCFG_TMS36XX_ADD("tms", 350)
 	MCFG_SOUND_CONFIG(tms3615_interface)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 
@@ -472,7 +472,7 @@ static MACHINE_CONFIG_START( popflame, naughtyb_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("tms", TMS36XX, 350)
+	MCFG_TMS36XX_ADD("tms", 350)
 	MCFG_SOUND_CONFIG(tms3615_interface)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 

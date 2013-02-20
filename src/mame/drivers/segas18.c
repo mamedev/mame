@@ -615,8 +615,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas18_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x10000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE_LEGACY("rfsnd", rf5c68_w)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE_LEGACY("rfsnd", rf5c68_mem_r, rf5c68_mem_w)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rfsnd", rf5c68_device, rf5c68_w)
+	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE("rfsnd", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1285,7 +1285,7 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 	MCFG_SOUND_ADD("ym2", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MCFG_SOUND_ADD("rfsnd", RF5C68, 10000000)
+	MCFG_RF5C68_ADD("rfsnd", 10000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

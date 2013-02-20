@@ -85,9 +85,9 @@ ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, sega_segacd_device )
 
 	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE(segacd_backupram_r,segacd_backupram_w) AM_SHARE("backupram") // backup RAM, odd bytes only!
 
-	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8_LEGACY("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
-	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8_LEGACY("rfsnd", rf5c68_r, 0x00ff)
-	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8_LEGACY("rfsnd", rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
+	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8("rfsnd", rf5c68_device, rf5c68_w, 0x00ff)  // PCM, RF5C164
+	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8("rfsnd", rf5c68_device, rf5c68_r, 0x00ff)
+	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8("rfsnd", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
 
 
 	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
@@ -147,7 +147,7 @@ static MACHINE_CONFIG_FRAGMENT( segacd_fragment )
 
 
 
-	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
+	MCFG_RF5C68_ADD("rfsnd", SEGACD_CLOCK) // RF5C164!
 	MCFG_SOUND_ROUTE( 0, ":lspeaker", 0.50 )
 	MCFG_SOUND_ROUTE( 1, ":rspeaker", 0.50 )
 

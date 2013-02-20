@@ -1224,8 +1224,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( system32_sound_map, AS_PROGRAM, 8, segas32_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x100000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE_LEGACY("rfsnd", rf5c68_w)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE_LEGACY("rfsnd", rf5c68_mem_r, rf5c68_mem_w)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rfsnd", rf5c68_device, rf5c68_w)
+	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE("rfsnd", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("z80_shared_ram")
 ADDRESS_MAP_END
 
@@ -2222,7 +2222,7 @@ static MACHINE_CONFIG_START( system32, segas32_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MCFG_SOUND_ADD("rfsnd", RF5C68, RFC_CLOCK/4)
+	MCFG_RF5C68_ADD("rfsnd", RFC_CLOCK/4)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 MACHINE_CONFIG_END

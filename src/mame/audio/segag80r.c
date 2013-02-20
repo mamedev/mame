@@ -865,7 +865,7 @@ MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 	MCFG_SAMPLES_ADD("samples", monsterb_samples_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("music", TMS36XX, 247)
+	MCFG_TMS36XX_ADD("music", 247)
 	MCFG_SOUND_CONFIG(monsterb_tms3617_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -900,15 +900,15 @@ static SOUND_START( monsterb )
 
 WRITE8_MEMBER(segag80r_state::monsterb_sound_a_w)
 {
-	device_t *tms = machine().device("music");
+	tms36xx_device *tms = machine().device<tms36xx_device>("music");
 	int enable_val;
 
 	/* Lower four data lines get decoded into 13 control lines */
-	tms36xx_note_w(tms, 0, data & 15);
+	tms->tms36xx_note_w(0, data & 15);
 
 	/* Top four data lines address an 82S123 ROM that enables/disables voices */
 	enable_val = machine().root_device().memregion("prom")->base()[(data & 0xF0) >> 4];
-	tms3617_enable_w(tms, enable_val >> 2);
+	tms->tms3617_enable_w(enable_val >> 2);
 }
 
 

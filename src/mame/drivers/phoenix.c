@@ -472,7 +472,7 @@ static MACHINE_CONFIG_START( phoenix, phoenix_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("tms",  TMS36XX, 372)
+	MCFG_TMS36XX_ADD("tms",  372)
 	MCFG_SOUND_CONFIG(phoenix_tms36xx_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
@@ -497,7 +497,7 @@ static MACHINE_CONFIG_DERIVED( pleiads, phoenix )
 	MCFG_PALETTE_INIT_OVERRIDE(phoenix_state,pleiads)
 
 	/* sound hardware */
-	MCFG_SOUND_REPLACE("tms", TMS36XX, 247)
+	MCFG_TMS36XX_REPLACE("tms", 247)
 	MCFG_SOUND_CONFIG(pleiads_tms36xx_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 

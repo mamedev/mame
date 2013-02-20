@@ -69,7 +69,7 @@ struct phoenix_sound_state
 	sound_stream *      m_channel;
 	UINT32 *                m_poly18;
 	device_t *m_discrete;
-	device_t *m_tms;
+	tms36xx_device *m_tms;
 };
 
 INLINE phoenix_sound_state *get_safe_token( device_t *device )
@@ -531,7 +531,7 @@ WRITE8_DEVICE_HANDLER( phoenix_sound_control_b_w )
 	discrete_sound_w(state->m_discrete, space, PHOENIX_EFFECT_1_FREQ, data & 0x10);
 
 	/* update the tune that the MM6221AA is playing */
-	mm6221aa_tune_w(state->m_tms, data >> 6);
+	state->m_tms->mm6221aa_tune_w(data >> 6);
 }
 
 static DEVICE_START( phoenix_sound )
@@ -546,7 +546,7 @@ static DEVICE_START( phoenix_sound )
 	memset(&state->m_noise_state, 0, sizeof(state->m_noise_state));
 
 	state->m_discrete = device->machine().device("discrete");
-	state->m_tms = device->machine().device("tms");
+	state->m_tms = device->machine().device<tms36xx_device>("tms");
 
 	state->m_poly18 = auto_alloc_array(device->machine(), UINT32, 1ul << (18-5));
 
