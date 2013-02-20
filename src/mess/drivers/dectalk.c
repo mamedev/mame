@@ -10,6 +10,9 @@
 *  which has been invaluable for work on this driver.
 *  Special thanks to leeeeee for helping figure out what the led selftest codes actually mean
 *
+*  This driver dedicated in memory of Dennis Klatt and Jonathan Allen, without whose
+*  original work MITalk and hence KlattTalk and DECTALK would hever have existed.
+*
 *  TODO:
 *  * DUART:
 *    * <DONE> DUART needs to be reset on reset line activation. as is it works ok, but it should be done anyway.
@@ -48,9 +51,10 @@
 *    FE 03 - RAM check fail @ 0x88000-0x8bfff, ram at E34 or E47 "
 *    FE 04 - RAM check fail @ 0x8c000-0x8ffff, ram at E33 or E46 "
 *    FE 05 - RAM check fail @ 0x90000-0x93fff, ram at E32 or E44 "
+*    FE 0F - RAM check fail at multiple addresses
 *    FD 00 - DUART test & DUART interrupt test (test code at $046C)
 *    FC 00 - This test doesn't exist. Some vestiges of it may remain in code for the FD and FB tests.
-*    FB 00 - TMS32010 extensive tests (test code at $051E): test spc interrupt [works] and make dtmf tone to test tlc interrupt [fails in mess, requires dtmf detection on output]
+*    FB 00 - TMS32010 extensive tests (test code at $051E): test spc interrupt [works] and make dtmf tone to test tlc interrupt [fails in mess, requires dtmf detection on output; this test is actually patented! US 4,552,992]
 *    Jump to $102C to skip the self tests
 *    During normal operation:
 (table taken from http://www3.sympatico.ca/n.rieck/docs/DECtalk_notes.html )
@@ -123,6 +127,83 @@ TLC is INT level 4
 SPC is INT level 5
 DUART is INT level 6
 */
+/* dtc-03 post by dave conroy from usenet comp.sys.dec on 12/2011:
+> Wow.  were they better than the DTC01? (OK, I guess they had to be.)
+
+I worked on both of these at DEC (in fact, I think if you look in the
+options and modules
+list, you will see my initials in the "responsible engineer" column
+for the DTC03).
+
+The goals of the DTC03 were lower cost, better letter to sound rules,
+and better packaging for large systems (it was pretty inconvenient to
+set up 30-40 of
+the big DTC01 boxes).
+
+The hardware was quite different. The DTC01 used a Motorola 68000 and
+a TI DSP, connected
+together by a big bank of (expensive) fifo chips. The DTC03 used then
+(then new) Intel 80186 and the same
+TI DSP, connected together by DMA (the DTC03 design was done in a way
+that used *all* of the
+capabilities of the 80186 to reduce the cost). The DTC01 used the
+packaging of the VT240, and the DTC03
+used the packaging of a family of rack-mounted modems whose part
+number escapes me. The
+same guy (Rich Ellison) designed both of them. The DTC03 also had an
+"option module" system which
+was intended to allow non-US systems to be built without needing to
+change the common
+parts (because it was on an independent module, and could override all
+of the telephone control ESC
+sequences, it could be taken through the approval process in
+isolation), although it was used
+to build some semi-custom systems as well.
+
+The code in the DSP and the code that transformed a stream of phonemes
+into a stream
+of control commands for the DSP was pretty much the same in DTC01/
+DTC03, and was based on the work of
+Dennis Klatt of MIT (Dennis actually wrote a lot of this code). The
+letter to sound system
+in DTC01 was the final step in the evolution of a set of letter-to-
+sound rules that had been floating around DEC
+for a long time; the bulk of the work getting them to work in the
+DTC01 was done by
+Martin Minow. The letter to sound system in DTC03 was a new design by
+myself and Tony Vitale,
+an ex-professor of linguistics from Cornell. Most people thought it
+worked much
+better; in reality, it's big advantage was it made far fewer stupid
+stress-placement mistakes because
+it did a much better job of understanding prefixes and suffixes.
+
+Dave Conroy 
+*/
+/*
+There are 3 things on the pins. Serial I/O. The telephone line. Power.
+
+I believe the power is +5 and +12/-12. The +5 is for the logic,
+and the +12/-12 is for the RS232 buffers and all of the analog stuff
+in the anti-aliasing
+filter, which is built from a pile of op-amps and stuff.
+
+The serial I/O pins go straight to the RS232 buffers and
+onward to the UART (an SCN2661, if my memory is correct).
+
+The telephone pins go to the option connectors and the on-board
+telephone line interface for the USA/Canada. Audio is available
+somewhere on the
+option connectors, but a really easy way to get at it is to take the
+phone off-hook (send a "dial" command with an empty phone number
+string)
+and use the telephone pins as a transformer-coupled audio output. This
+is what we
+used to do in the lab all the time.
+
+dgc (dg(no!spam)cx@mac.com) 
+*/
+
 // USE_LOOSE_TIMING makes the cpu interleave much lower and boosts it on fifo and flag writes by the 68k and semaphore sets by the dsp
 #define USE_LOOSE_TIMING 1
 // generic logs like led state, and common writes for dsp and spc such as the speech int
@@ -157,7 +238,6 @@ public:
 
 	UINT8 m_data[8]; // hack to prevent gcc bitching about struct pointers. not used.
 	UINT8 m_x2214_sram[256]; // NVRAM chip's temp sram space
-	UINT8 m_statusLED;
 	// input fifo, between m68k and tms32010
 	UINT16 m_infifo[32]; // technically eight 74LS224 4bit*16stage FIFO chips, arranged as a 32 stage, 16-bit wide fifo
 	UINT8 m_infifo_tail_ptr;
@@ -330,14 +410,13 @@ static void dectalk_reset(device_t *device)
 	dectalk_state *state = device->machine().driver_data<dectalk_state>();
 	state->m_hack_self_test = 0; // hack
 	// stuff that is DIRECTLY affected by the RESET line
-	state->m_statusLED = 0; // clear status led latch
 	state->dectalk_x2212_recall(); // nvram recall
 	state->m_m68k_spcflags_latch = 1; // initial status is speech reset(d0) active and spc int(d6) disabled
 	state->m_m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
 	device->machine().device("duart68681")->reset(); // reset the DUART
 	// stuff that is INDIRECTLY affected by the RESET line
 	state->dectalk_clear_all_fifos(); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
-	state->dectalk_semaphore_w(0); // on the original state->m_dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
+	state->dectalk_semaphore_w(0); // on the original dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
 	state->m_spc_error_latch = 0; // spc error latch is cleared on /reset
 	device->machine().device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // speech reset forces the CLR line active on the tms32010
 	state->m_tlc_tonedetect = 0; // TODO, needed for selftest pass
@@ -368,7 +447,6 @@ READ8_MEMBER(dectalk_state::nvram_read)// read from x2212 nvram chip and possibl
 
 WRITE8_MEMBER(dectalk_state::led_write)
 {
-	m_statusLED = data&0xFF;
 	popmessage("LED status: %02X\n", data&0xFF);
 #ifdef VERBOSE
 	logerror("m68k: LED status: %02X\n", data&0xFF);
@@ -709,6 +787,13 @@ TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
 #endif
 	machine().scheduler().timer_set(attotime::from_hz(10000), timer_expired_delegate(FUNC(dectalk_state::outfifo_read_cb),this));
 	speaker->write_signed16(data);
+	// hack for break key, requires hacked up duart core so disabled for now
+	// also it doesn't work well, the setup menu is badly corrupt
+	/*device_t *duart = machine().device("duart68681");
+	if (machine.input().code_pressed(KEYCODE_F1))
+		duart68681_rx_break(duart, 1, 1);
+	else
+		duart68681_rx_break(duart, 1, 0);*/
 }
 
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
@@ -770,28 +855,46 @@ MACHINE_CONFIG_END
 ROM_START( dectalk )
 	ROM_REGION16_BE(0x40000,"maincpu", 0)
 	// dectalk dtc-01 firmware v2.0 (first half: 23Jul84 tag; second half: 02Jul84 tag), all roms are 27128 eproms
-	// technically the correct rom names are probably 23-123e5.e8, etc, but the chips they were dumped from were NOT labeled that way
-	ROM_LOAD16_BYTE("sp8510123e5.e8", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044)) // Label: "SP8510123E5" @ E8
-	ROM_LOAD16_BYTE("sp8510119e5.e22", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac)) // Label: "SP8510119E5" @ E22
-	ROM_LOAD16_BYTE("sp8510124e5.e7", 0x08000, 0x4000, CRC(9edeafcb) SHA1(7724babf4ae5d77c0b4200f608d599058d04b25c)) // Label: "SP8510124E5" @ E7
-	ROM_LOAD16_BYTE("sp8510120e5.e21", 0x08001, 0x4000, CRC(f2a346a6) SHA1(af5e4ea0b3631f7d6f16c22e86a33fa2cb520ee0)) // Label: "SP8510120E5" @ E21
-	ROM_LOAD16_BYTE("sp8510125e5.e6", 0x10000, 0x4000, CRC(1c0100d1) SHA1(1b60cd71dfa83408b17e13f683b6bf3198c905cc)) // Label: "SP8510125E5" @ E6
-	ROM_LOAD16_BYTE("sp8510121e5.e20", 0x10001, 0x4000, CRC(4cb081bd) SHA1(4ad0b00628a90085cd7c78a354256c39fd14db6c)) // Label: "SP8510121E5" @ E20
-	ROM_LOAD16_BYTE("sp8510126e5.e5", 0x18000, 0x4000, CRC(7823dedb) SHA1(e2b2415eec838ddd46094f2fea93fd289dd0caa2)) // Label: "SP8510126E5" @ E5
-	ROM_LOAD16_BYTE("sp8510122e5.e19", 0x18001, 0x4000, CRC(b86370e6) SHA1(92ab22a24484ad0d0f5c8a07347105509999f3ee)) // Label: "SP8510122E5" @ E19
-	ROM_LOAD16_BYTE("sp8510103e5.e4", 0x20000, 0x4000, CRC(35aac6b9) SHA1(b5aec0bf37a176ff4d66d6a10357715957662ebd)) // Label: "SP8510103E5" @ E4
-	ROM_LOAD16_BYTE("sp8510095e5.e18", 0x20001, 0x4000, CRC(2296fe39) SHA1(891f3a3b4ce75ef14001257bc8f1f60463a9a7cb)) // Label: "SP8510095E5" @ E18
-	ROM_LOAD16_BYTE("sp8510104e5.e3", 0x28000, 0x4000, CRC(9658b43c) SHA1(4d6808f67cbdd316df23adc8ddf701df57aa854a)) // Label: "SP8510104E5" @ E3
-	ROM_LOAD16_BYTE("sp8510096e5.e17", 0x28001, 0x4000, CRC(cf236077) SHA1(496c69e52cfa013173f7b9c500ce544a03ad01f7)) // Label: "SP8510096E5" @ E17
-	ROM_LOAD16_BYTE("sp8510105e5.e2", 0x30000, 0x4000, CRC(09cddd28) SHA1(de0c25687bab3ff0c88c98622092e0b58331aa16)) // Label: "SP8510105E5" @ E2
-	ROM_LOAD16_BYTE("sp8510097e5.e16", 0x30001, 0x4000, CRC(49434da1) SHA1(c450abae0ccf372d7eb87370b8a8c97a45e164d3)) // Label: "SP8510097E5" @ E16
-	ROM_LOAD16_BYTE("sp8510106e5.e1", 0x38000, 0x4000, CRC(a389ab31) SHA1(355348bfc96a04193136cdde3418366e6476c3ca)) // Label: "SP8510106E5" @ E1
-	ROM_LOAD16_BYTE("sp8510098e5.e15", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872)) // Label: "SP8510098E5" @ E15
+	// technically the correct rom names are 23-123e5.e8, etc, but the chips they were dumped from were NOT labeled that way
+	// labels were SP8510123E5 etc, which means the chips were burned at dec in week 10, 1985
+	/* the labels dec uses for most non-factory-programmed eproms, proms and pals is something like SPddddnnnto or WBddddnnto
+	 * where:
+	 * SP or WB = ?
+	 * dddd is a 4 digit datecode with yyww (i.e. 8510 = week 10, 1985)
+	 * nnn = the dec internal rom number for that type
+	 * t = programmable chip type (e = eprom, otprom or mask rom; a,b,f = proms of various sorts; there are others for plas and pals)
+	 * o = size of rom
+	 *   for eproms/otproms or mask roms it is: e1 = 0x400, e2 = 0x800, e3 = 0x1000, e4 = 0x2000, e5 = 0x4000, e6 = 0x8000, etc)
+	 *   for proms it is: a1 = 82s123(0x20, 8b TS); a2 = 82s129(0x100 4b TS); a9 = 82s131(0x200 4b TS); b1 = 82s135(0x100 8b TS); f1 = 82s137(0x400 4b TS); f4 = 82s191(0x800 8b TS); s0(mc68hc05); m2(i8051 or other MCS-51) (there are more)
+	 */
+	ROM_LOAD16_BYTE("23-123e5.e8", 0x00000, 0x4000, CRC(03e1eefa) SHA1(e586de03e113683c2534fca1f3f40ba391193044)) // Label: "SP8510123E5" @ E8
+	ROM_LOAD16_BYTE("23-119e5.e22", 0x00001, 0x4000, CRC(af20411f) SHA1(7954bb56b7591f8954403a22d34de31c7d5441ac)) // Label: "SP8510119E5" @ E22
+	ROM_LOAD16_BYTE("23-124e5.e7", 0x08000, 0x4000, CRC(9edeafcb) SHA1(7724babf4ae5d77c0b4200f608d599058d04b25c)) // Label: "SP8510124E5" @ E7
+	ROM_LOAD16_BYTE("23-120e5.e21", 0x08001, 0x4000, CRC(f2a346a6) SHA1(af5e4ea0b3631f7d6f16c22e86a33fa2cb520ee0)) // Label: "SP8510120E5" @ E21
+	ROM_LOAD16_BYTE("23-125e5.e6", 0x10000, 0x4000, CRC(1c0100d1) SHA1(1b60cd71dfa83408b17e13f683b6bf3198c905cc)) // Label: "SP8510125E5" @ E6
+	ROM_LOAD16_BYTE("23-121e5.e20", 0x10001, 0x4000, CRC(4cb081bd) SHA1(4ad0b00628a90085cd7c78a354256c39fd14db6c)) // Label: "SP8510121E5" @ E20
+	ROM_LOAD16_BYTE("23-126e5.e5", 0x18000, 0x4000, CRC(7823dedb) SHA1(e2b2415eec838ddd46094f2fea93fd289dd0caa2)) // Label: "SP8510126E5" @ E5
+	ROM_LOAD16_BYTE("23-122e5.e19", 0x18001, 0x4000, CRC(b86370e6) SHA1(92ab22a24484ad0d0f5c8a07347105509999f3ee)) // Label: "SP8510122E5" @ E19
+	ROM_LOAD16_BYTE("23-103e5.e4", 0x20000, 0x4000, CRC(35aac6b9) SHA1(b5aec0bf37a176ff4d66d6a10357715957662ebd)) // Label: "SP8510103E5" @ E4
+	ROM_LOAD16_BYTE("23-095e5.e18", 0x20001, 0x4000, CRC(2296fe39) SHA1(891f3a3b4ce75ef14001257bc8f1f60463a9a7cb)) // Label: "SP8510095E5" @ E18
+	ROM_LOAD16_BYTE("23-104e5.e3", 0x28000, 0x4000, CRC(9658b43c) SHA1(4d6808f67cbdd316df23adc8ddf701df57aa854a)) // Label: "SP8510104E5" @ E3
+	ROM_LOAD16_BYTE("23-096e5.e17", 0x28001, 0x4000, CRC(cf236077) SHA1(496c69e52cfa013173f7b9c500ce544a03ad01f7)) // Label: "SP8510096E5" @ E17
+	ROM_LOAD16_BYTE("23-105e5.e2", 0x30000, 0x4000, CRC(09cddd28) SHA1(de0c25687bab3ff0c88c98622092e0b58331aa16)) // Label: "SP8510105E5" @ E2
+	ROM_LOAD16_BYTE("23-097e5.e16", 0x30001, 0x4000, CRC(49434da1) SHA1(c450abae0ccf372d7eb87370b8a8c97a45e164d3)) // Label: "SP8510097E5" @ E16
+	ROM_LOAD16_BYTE("23-106e5.e1", 0x38000, 0x4000, CRC(a389ab31) SHA1(355348bfc96a04193136cdde3418366e6476c3ca)) // Label: "SP8510106E5" @ E1
+	ROM_LOAD16_BYTE("23-098e5.e15", 0x38001, 0x4000, CRC(3d8910e7) SHA1(01921e77b46c2d4845023605239c45ffa4a35872)) // Label: "SP8510098E5" @ E15
+
+	/* the undumped 1.8 or 2.0 (beta?) version likely has roms:
+	23-091e5.e22, 23-092e5.e21, 23-093e5.e20, 23-094e5.e19, 
+	23-099e5.e8, 23-100e5.e7, 23-101e5.e6, 23-102e5.e5
+	and shares the 23-103e5 thru 106e5, and 095e5 thru 098e5 roms with
+	the 2.0 version above
+	*/
 
 	ROM_REGION(0x2000,"dsp", 0)
-	// dectalk dtc-01 'klsyn' tms32010 firmware v2.0, both proms are 82s191 equivalent
-	ROM_LOAD16_BYTE("lm8506205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
-	ROM_LOAD16_BYTE("lm8504204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
+	// dectalk dtc-01 'klsyn' tms32010 firmware v2.0?, both proms are 82s191 equivalent
+	ROM_LOAD16_BYTE("23-205f4.e70", 0x000, 0x800, CRC(ed76a3ad) SHA1(3136bae243ef48721e21c66fde70dab5fc3c21d0)) // Label: "LM8506205F4 // M1-76161-5" @ E70
+	ROM_LOAD16_BYTE("23-204f4.e69", 0x001, 0x800, CRC(79bb54ff) SHA1(9409f90f7a397b041e4440341f2d7934cb479285)) // Label: "LM8504204F4 // 78S191" @ E69
 
 	ROM_REGION(0x100,"nvram", 0) // default nvram image is at 0x1A7AE in main rom, read lsn first so 0x0005 in rom becomes 05 00 00 00 etc for all words of main rom
 	ROM_FILL(0x00, 0xff, 0x00) // blank it first;
