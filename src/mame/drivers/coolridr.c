@@ -818,6 +818,14 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							printf("%04x, ", testvalue);
 							}
 							printf("\n");
+
+							// this looks interesting..
+							// rom offset 00015f26, values : 2001, 0012, 0020, 0100, 1200, 2001, 0012, 0020, 0100, 1200,
+							// rom offset 00016550, values : 0002, 0020, 0000, 0200, 2000, 0002, 0020, 0000, 0200, 2000,
+							// rom offset 00016644, values : 3201, 2013, 0032, 0120, 1300, 3201, 2013, 0032, 0120, 1300,
+
+							// there is a strong bias towards certain bits being 0 in the first words
+							//  xxxx x0xx 0xxx xxx0 xx0x   xxxx x0xx 0xxx xxx0 xx0x
 #endif
 						}
 						
