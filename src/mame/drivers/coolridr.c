@@ -486,24 +486,22 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_w)
 	address_space &main_space = m_maincpu->space(AS_PROGRAM);
 	address_space &sound_space = m_soundcpu->space(AS_PROGRAM);
 
+	//printf("%08x %08x\n",offset*4,m_h1_unk[offset]);
+
 	if(offset == 8)
 	{
-		//bit 16 probably halts m68k
+		//probably writing to upper word disables m68k, to lower word enables it
+		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data) ? ASSERT_LINE : CLEAR_LINE);
 		return;
 	}
 
 	if(offset == 2)
 	{
-		if(!(data & 1) && (m_h1_unk[2] & 1)) // 1 -> 0 transition enables DMA
+		if(data & 1 && (!(m_h1_unk[2] & 1))) // 0 -> 1 transition enables DMA
 		{
 			UINT32 src = m_h1_unk[0];
 			UINT32 dst = m_h1_unk[1];
-			UINT32 size = 0x200; // TODO
-
-			if(src == 0x100000) // DMA for m68k program, TODO
-				return;
-
-			//printf("%08x %08x %08x\n",src,dst,size);
+			UINT32 size = (m_h1_unk[2]>>16)*0x40;
 
 			for(int i = 0;i < size; i+=2)
 			{
@@ -516,16 +514,13 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_w)
 
 	if(offset == 6)
 	{
-		if(!(data & 1) && (m_h1_unk[6] & 1)) // 1 -> 0 transition enables DMA
+		if(data & 1 && (!(m_h1_unk[6] & 1))) // 0 -> 1 transition enables DMA
 		{
 			UINT32 src = m_h1_unk[4];
 			UINT32 dst = m_h1_unk[5];
-			UINT32 size = 0x200; // TODO
+			UINT32 size = (m_h1_unk[6]>>16)*0x40;
 
-			if(src == 0x100000) // DMA for m68k program, TODO
-				return;
-
-			//printf("%08x %08x %08x\n",src,dst,size);
+			//printf("%08x %08x %08x %02x\n",src,dst,size,sound_data);
 
 			for(int i = 0;i < size; i+=2)
 			{
@@ -538,7 +533,6 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_w)
 
 	COMBINE_DATA(&m_h1_unk[offset]);
 
-	//printf("%08x %08x\n",offset*4,m_h1_unk[offset]);
 }
 
 
@@ -1485,11 +1479,10 @@ void coolridr_state::machine_start()
 void coolridr_state::machine_reset()
 {
 //  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-//	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
-	memcpy(m_soundram, memregion("soundcpu")->base()+0x80000, 0x80000);
-	m_soundcpu->reset();
-
+//	memcpy(m_soundram, memregion("soundcpu")->base()+0x80000, 0x80000);
+//  m_soundcpu->reset();
 
 
 }
