@@ -280,7 +280,7 @@ public:
 		m_txt_vram(*this, "txt_vram"),
 		m_sysh1_txt_blit(*this, "sysh1_txt_blit"),
 		m_sysh1_workram_h(*this, "sysh1_workrah"),
-		m_h1_unk(*this, "h1_unk"),
+		m_sound_dma(*this, "sound_dma"),
 		m_soundram(*this, "soundram"),
 		m_soundram2(*this, "soundram2")
 		{ }
@@ -313,7 +313,7 @@ public:
 	required_shared_ptr<UINT32> m_txt_vram;
 	required_shared_ptr<UINT32> m_sysh1_txt_blit;
 	required_shared_ptr<UINT32> m_sysh1_workram_h;
-	required_shared_ptr<UINT32> m_h1_unk;
+	required_shared_ptr<UINT32> m_sound_dma;
 	required_shared_ptr<UINT16> m_soundram;
 	required_shared_ptr<UINT16> m_soundram2;
 	bitmap_rgb32 m_temp_bitmap_sprites;
@@ -325,8 +325,8 @@ public:
 	UINT8 an_mux_data;
 	UINT8 sound_data;
 
-	DECLARE_READ32_MEMBER(sysh1_unk_r);
-	DECLARE_WRITE32_MEMBER(sysh1_unk_w);
+	DECLARE_READ32_MEMBER(sysh1_sound_dma_r);
+	DECLARE_WRITE32_MEMBER(sysh1_sound_dma_w);
 	DECLARE_READ32_MEMBER(sysh1_ioga_r);
 	DECLARE_WRITE32_MEMBER(sysh1_ioga_w);
 	DECLARE_WRITE32_MEMBER(sysh1_txt_blit_w);
@@ -467,73 +467,6 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_rgb
 
 /* end video */
 
-/* unknown purpose */
-READ32_MEMBER(coolridr_state::sysh1_unk_r)
-{
-	if(offset == 8)
-		return sound_data;
-
-	if(offset == 2 || offset == 6) // DMA status
-		return 0;
-
-	printf("%08x\n",offset);
-
-	return m_h1_unk[offset];
-}
-
-WRITE32_MEMBER(coolridr_state::sysh1_unk_w)
-{
-	address_space &main_space = m_maincpu->space(AS_PROGRAM);
-	address_space &sound_space = m_soundcpu->space(AS_PROGRAM);
-
-	//printf("%08x %08x\n",offset*4,m_h1_unk[offset]);
-
-	if(offset == 8)
-	{
-		//probably writing to upper word disables m68k, to lower word enables it
-		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data) ? ASSERT_LINE : CLEAR_LINE);
-		return;
-	}
-
-	if(offset == 2)
-	{
-		if(data & 1 && (!(m_h1_unk[2] & 1))) // 0 -> 1 transition enables DMA
-		{
-			UINT32 src = m_h1_unk[0];
-			UINT32 dst = m_h1_unk[1];
-			UINT32 size = (m_h1_unk[2]>>16)*0x40;
-
-			for(int i = 0;i < size; i+=2)
-			{
-				sound_space.write_word(dst,main_space.read_word(src));
-				src+=2;
-				dst+=2;
-			}
-		}
-	}
-
-	if(offset == 6)
-	{
-		if(data & 1 && (!(m_h1_unk[6] & 1))) // 0 -> 1 transition enables DMA
-		{
-			UINT32 src = m_h1_unk[4];
-			UINT32 dst = m_h1_unk[5];
-			UINT32 size = (m_h1_unk[6]>>16)*0x40;
-
-			//printf("%08x %08x %08x %02x\n",src,dst,size,sound_data);
-
-			for(int i = 0;i < size; i+=2)
-			{
-				sound_space.write_word(dst,main_space.read_word(src));
-				src+=2;
-				dst+=2;
-			}
-		}
-	}
-
-	COMBINE_DATA(&m_h1_unk[offset]);
-
-}
 
 
 /* According to Guru, this is actually the same I/O chip of Sega Model 2 HW */
@@ -1021,6 +954,78 @@ WRITE8_MEMBER( coolridr_state::lamps_w )
 	*/
 }
 
+
+READ32_MEMBER(coolridr_state::sysh1_sound_dma_r)
+{
+	if(offset == 8)
+	{
+		//popmessage("%02x",sound_data);
+		/* TODO: this probably stalls the DMA transfers. */
+		return sound_data;
+	}
+
+	if(offset == 2 || offset == 6) // DMA status
+		return 0;
+
+	printf("%08x\n",offset);
+
+	return m_sound_dma[offset];
+}
+
+WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
+{
+	address_space &main_space = m_maincpu->space(AS_PROGRAM);
+	address_space &sound_space = m_soundcpu->space(AS_PROGRAM);
+
+	//printf("%08x %08x\n",offset*4,m_h1_unk[offset]);
+
+	if(offset == 8)
+	{
+		//probably writing to upper word disables m68k, to lower word enables it
+		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data) ? ASSERT_LINE : CLEAR_LINE);
+		return;
+	}
+
+	if(offset == 2)
+	{
+		if(data & 1 && (!(m_sound_dma[2] & 1))) // 0 -> 1 transition enables DMA
+		{
+			UINT32 src = m_sound_dma[0];
+			UINT32 dst = m_sound_dma[1];
+			UINT32 size = (m_sound_dma[2]>>16)*0x40;
+
+			for(int i = 0;i < size; i+=2)
+			{
+				sound_space.write_word(dst,main_space.read_word(src));
+				src+=2;
+				dst+=2;
+			}
+		}
+	}
+
+	if(offset == 6)
+	{
+		if(data & 1 && (!(m_sound_dma[6] & 1))) // 0 -> 1 transition enables DMA
+		{
+			UINT32 src = m_sound_dma[4];
+			UINT32 dst = m_sound_dma[5];
+			UINT32 size = (m_sound_dma[6]>>16)*0x40;
+
+			//printf("%08x %08x %08x %02x\n",src,dst,size,sound_data);
+
+			for(int i = 0;i < size; i+=2)
+			{
+				sound_space.write_word(dst,main_space.read_word(src));
+				src+=2;
+				dst+=2;
+			}
+		}
+	}
+
+	COMBINE_DATA(&m_sound_dma[offset]);
+}
+
+
 static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_SHARE("share2")
 
@@ -1032,7 +1037,7 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x03300000, 0x03300fff) AM_DEVREADWRITE16_LEGACY("scsp2", scsp_r, scsp_w, 0xffffffff)
 
 //	AM_RANGE(0x04000000, 0x0400001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xffffffff)
-	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_unk_r,sysh1_unk_w) AM_SHARE("h1_unk")
+	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_sound_dma_r,sysh1_sound_dma_w) AM_SHARE("h1_unk")
 //	AM_RANGE(0x04200000, 0x0420003f) AM_RAM /* hi-word for DMA? */
 
 	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
@@ -1458,7 +1463,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
 {
 	int scanline = param;
 
-	/* 10: reads from 0x4000000 (sound irq?) */
+	/* 10: reads from 0x4000000 (sound irq) */
 	/* 12: reads from inputs (so presumably V-Blank) */
 	/* 14: tries to r/w to 0x62***** area (network irq?) */
 
