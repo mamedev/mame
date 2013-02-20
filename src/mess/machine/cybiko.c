@@ -49,7 +49,7 @@ QUICKLOAD_LOAD( cybikoxt )
 	running_machine &machine = image.device().machine();
 	cybiko_state *state = machine.driver_data<cybiko_state>();
 	address_space &dest = state->m_maincpu->space(AS_PROGRAM);
-	UINT32 size = MIN(image.length(), 0x84000);
+	UINT32 size = MIN(image.length(), RAMDISK_SIZE);
 
 	UINT8 *buffer = global_alloc_array(UINT8, size);
 	image.fread(buffer, size);
@@ -195,16 +195,6 @@ int cybiko_state::cybiko_rs232_rx_queue()
 /////////////////////////
 // READ/WRITE HANDLERS //
 /////////////////////////
-
-READ8_MEMBER( cybiko_state::cybikov2_flash_r )
-{
-	return m_flash2->read(offset);
-}
-
-READ16_MEMBER( cybiko_state::cybikoxt_flash_r )
-{
-	return m_flashxt->read(offset);
-}
 
 READ16_MEMBER( cybiko_state::cybiko_lcd_r )
 {

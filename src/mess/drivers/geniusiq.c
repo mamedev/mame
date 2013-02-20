@@ -206,14 +206,12 @@ public:
 	geniusiq_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_flash(*this, "flash"),
 		m_vram(*this, "vram"),
 		m_mouse_gfx(*this, "mouse_gfx"),
 		m_cart_state(IQ128_NO_CART)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<intelfsh8_device> m_flash;
 	required_shared_ptr<UINT16> m_vram;
 	required_shared_ptr<UINT16> m_mouse_gfx;
 
@@ -222,8 +220,6 @@ public:
 	virtual void palette_init();
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_READ8_MEMBER(flash_r);
-	DECLARE_WRITE8_MEMBER(flash_w);
 	DECLARE_READ16_MEMBER(input_r);
 	DECLARE_WRITE16_MEMBER(mouse_pos_w);
 	DECLARE_INPUT_CHANGED_MEMBER(send_input);
@@ -336,16 +332,6 @@ UINT32 geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		}
 
 	return 0;
-}
-
-READ8_MEMBER(geniusiq_state::flash_r)
-{
-	return m_flash->read(offset);
-}
-
-WRITE8_MEMBER(geniusiq_state::flash_w)
-{
-	m_flash->write(offset, data);
 }
 
 READ16_MEMBER( geniusiq_state::cart_state_r )
@@ -478,7 +464,7 @@ static ADDRESS_MAP_START(geniusiq_mem, AS_PROGRAM, 16, geniusiq_state)
 	AM_RANGE(0x200000, 0x23FFFF) AM_RAM
 	AM_RANGE(0x300000, 0x30FFFF) AM_RAM     AM_SHARE("vram")
 	AM_RANGE(0x310000, 0x31FFFF) AM_RAM
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_READWRITE8(flash_r, flash_w, 0x00ff)
+	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x0e0000) AM_DEVREADWRITE8("flash", intelfsh8_device, read, write, 0x00ff)
 	AM_RANGE(0x600300, 0x600301) AM_READ(input_r)
 	//AM_RANGE(0x600500, 0x60050f)                      // read during IRQ 5
 	//AM_RANGE(0x600600, 0x600605)                      // sound ??

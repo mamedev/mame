@@ -165,6 +165,8 @@ public:
 	// public interface
 	UINT8 read(offs_t offset) { return read_full(offset); }
 	void write(offs_t offset, UINT8 data) { write_full(offset, data); }
+	DECLARE_READ8_MEMBER(read) { return read_full(offset); }
+	DECLARE_WRITE8_MEMBER(write) { write_full(offset, data); }
 
 	UINT8 read_raw(offs_t offset) { return m_addrspace[0]->read_byte(offset); }
 	void write_raw(offs_t offset, UINT8 data) { m_addrspace[0]->write_byte(offset, data); }
@@ -183,6 +185,8 @@ public:
 	// public interface
 	UINT16 read(offs_t offset) { return read_full(offset); }
 	void write(offs_t offset, UINT16 data) { write_full(offset, data); }
+	DECLARE_READ16_MEMBER(read) { return read_full(offset); }
+	DECLARE_WRITE16_MEMBER(write) { write_full(offset, data); }
 
 	UINT16 read_raw(offs_t offset) { return m_addrspace[0]->read_word(offset * 2); }
 	void write_raw(offs_t offset, UINT16 data) { m_addrspace[0]->write_word(offset * 2, data); }

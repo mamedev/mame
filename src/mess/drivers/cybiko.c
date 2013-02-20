@@ -80,7 +80,7 @@ ADDRESS_MAP_END
 // 256 kbyte ram + 256 kbyte memory mapped flash
 static ADDRESS_MAP_START( cybikov2_mem, AS_PROGRAM, 16, cybiko_state )
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
-	AM_RANGE( 0x100000, 0x13ffff ) AM_READ8(cybikov2_flash_r, 0xffff) AM_MIRROR( 0x0c0000 )
+	AM_RANGE( 0x100000, 0x13ffff ) AM_DEVREAD8("flash2", sst_39vf020_device, read, 0xffff) AM_MIRROR( 0x0c0000 )
 	AM_RANGE( 0x600000, 0x600001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w ) AM_MIRROR( 0x1ffffe )
 	AM_RANGE( 0xe00000, 0xffdbff ) AM_READ( cybikov2_key_r )
 ADDRESS_MAP_END
@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( cybikoxt_mem, AS_PROGRAM, 16, cybiko_state )
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM AM_MIRROR( 0x038000 )
 	AM_RANGE( 0x100000, 0x100001 ) AM_READWRITE( cybiko_lcd_r, cybiko_lcd_w )
 	AM_RANGE( 0x200000, 0x200003 ) AM_WRITE( cybiko_usb_w )
-	AM_RANGE( 0x600000, 0x67ffff ) AM_READ(cybikoxt_flash_r) AM_MIRROR( 0x180000 )
+	AM_RANGE( 0x600000, 0x67ffff ) AM_DEVREAD("flashxt", sst_39vf400a_device, read) AM_MIRROR( 0x180000 )
 	AM_RANGE( 0xe00000, 0xefffff ) AM_READ( cybikoxt_key_r )
 ADDRESS_MAP_END
 
