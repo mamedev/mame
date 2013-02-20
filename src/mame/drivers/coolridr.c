@@ -415,7 +415,8 @@ public:
 	UINT32 m_b2tpen;
 	UINT32 m_b2colorNumber;
 
-	UINT32 m_blit3; // ?
+	UINT32 m_blit3_unused; // ?
+	UINT32 m_b3romoffset; //
 	UINT32 m_blit4_unused;
 	UINT32 m_blit4; // ?
 
@@ -480,7 +481,7 @@ public:
 };
 
 #define PRINT_BLIT_STUFF \
-	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x %08x(%08x) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1_unused,m_b1mode,m_b1colorNumber, m_blit2_unused,m_b2tpen,m_b2colorNumber, m_blit3, m_blit4_unused, m_blit4, m_blit5_unused, m_indirect_tile_enable, m_indirect_zoom_enable, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition); \
+	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1_unused,m_b1mode,m_b1colorNumber, m_blit2_unused,m_b2tpen,m_b2colorNumber, m_blit3_unused,m_b3romoffset, m_blit4_unused, m_blit4, m_blit5_unused, m_indirect_tile_enable, m_indirect_zoom_enable, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition); \
 
 
 /* video */
@@ -711,8 +712,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				//  5: 00000001 - enable line-zoom(?) lookup (road)
 				//  6: vvvv---- - "Vertical Cell Count"
 				//  6: ----hhhh - "Horizontal Cell Count"
-				//  7: 00000000 - unknown : "Vertical|Horizontal Zoom Centers"?
-				//  8: 00400040 - unknown : "Vertical|Horizontal Zoom Ratios"?
+				//  7: 00030003 - "Vertical|Horizontal Origin point"
+				//  8: 00ff00ff - "Vertical|Horizontal Zoom Ratios"
 				//  9: xxxx---- - "Display Vertical Position"
 				//  9: ----yyyy - "Display Horizontal Position"
 				// 10: 00000000 - unknown : always seems to be zero - NO, for some things (not text) it's also a reference to 3f40000 region like #11
@@ -779,10 +780,18 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				}
 				else if (m_blitterSerialCount == 3)
 				{
-					m_blit3 = data;
-					// 0000xxxx
-					//  to
-					// 001fxxxx
+					if (!(m_blit0 & 1)) // don't bother for non-sprites
+					{	
+						m_blit3_unused = data & 0xffe00000;
+						m_b3romoffset = data & 0x001fffff;
+						// if this is an offset into the compressed data then it's probably a word offset into each rom (each is 0x400000 bytes) with the data from all 10 being used in parallel as per the notes from Charles
+						// this needs verifying as it could instead be an index into some other ram area already decompressed..
+						// 0000xxxx
+						//  to
+						// 001fxxxx
+
+						if (m_blit3_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, m_blit4_unused);
+					}
 				}
 				else if (m_blitterSerialCount == 4)
 				{
@@ -903,7 +912,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 
 						//if (m_b1mode)
 						//{
-							//PRINT_BLIT_STUFF
+						//	PRINT_BLIT_STUFF
 						//}
 						//else
 						//{
@@ -1960,7 +1969,7 @@ ROM_START( coolridr )
 	ROM_LOAD32_WORD_SWAP( "mpr-17648.ic9", 0x1800000, 0x0400000, CRC(bf184cce) SHA1(62c004ea279f9a649d21426369336c2e1f9d24da) )
 	ROM_LOAD32_WORD_SWAP( "mpr-17644.ic5", 0x2000002, 0x0400000, CRC(80199c79) SHA1(e525d8ee9f9176101629853e50cca73b02b16a38) )
 	ROM_LOAD32_WORD_SWAP( "mpr-17649.ic10",0x2000000, 0x0400000, CRC(618c47ae) SHA1(5b69ad36fcf8e70d34c3b2fc71412ce953c5ceb3) )
-
+	                                                     
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 
