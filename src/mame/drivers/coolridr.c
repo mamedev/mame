@@ -1649,8 +1649,14 @@ ROM_END
 
 
 /*
-TODO: both irq routines writes 1 to 0x60d8894, sets up the Watchdog timer then expect that this buffer goes low IN the irq routine.
-      Cache issue? Shared RAM?
+TODO: both irq routines writes 1 to 0x60d8894, sets up the Watchdog timer then expect that this buffer goes low IN the irq routines.
+	  The Watchdog Timer is setted up with these params:
+	  0xee for wtcnt
+	  0x39 for wtcsr (enable irq (bit 5), enable timer (bit 4), clock select divider / 64 (bits 2-0))
+	  vector is 0x7f (so VBR+0x1fc)
+	  level is 0xf
+... and indeed the Watchdog irq routine effectively clears this RAM buffer. What the manual doesn't say is that the Watchdog timer irq
+    presumably is an NMI if this is even possible ...
 */
 READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 {
