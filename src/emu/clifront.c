@@ -290,13 +290,13 @@ int cli_frontend::execute(int argc, char **argv)
 		fprintf(stderr, "Out of memory!\n");
 		m_result = MAMERR_FATALERROR;
 	}
-
-	// handle any other exceptions
 	catch (...)
 	{
 		fprintf(stderr, "Caught unhandled exception\n");
 		m_result = MAMERR_FATALERROR;
 	}
+
+	_7z_file_cache_clear();
 
 	return m_result;
 }
