@@ -248,7 +248,7 @@ Note: This hardware appears to have been designed as a test-bed for a new RLE ba
 
 /*
 
-some Sprite compression notes from Charles and Andrew 
+some Sprite compression notes from Charles and Andrew
 
 OK so here's what we know. Andrew and I were playing with the ROMs and
 Guru traced out connections on the board at the time:
@@ -427,7 +427,7 @@ public:
 	UINT32 m_blit10; // an address
 
 	UINT16 m_tempshape[16*16];
-	
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
@@ -449,7 +449,7 @@ public:
 	UINT8 m_vblank;
 	int m_scsp_last_line;
 	UINT8 an_mux_data;
-	UINT8 sound_data;
+	UINT8 sound_data, sound_fifo_full;
 
 	UINT8* m_compressedgfx;
 	UINT32 get_20bit_data(UINT32 romoffset, int _20bitwordnum);
@@ -472,7 +472,8 @@ public:
 	DECLARE_READ8_MEMBER(analog_mux_r);
 	DECLARE_WRITE8_MEMBER(analog_mux_w);
 	DECLARE_WRITE8_MEMBER(lamps_w);
-	DECLARE_WRITE_LINE_MEMBER(scsp_to_main_irq);
+	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
+	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
 	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
 	DECLARE_DRIVER_INIT(coolridr);
 	virtual void machine_start();
@@ -691,12 +692,12 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				m_textBytesToWrite = (data & 0xff000000) >> 24;
 				m_textOffset = (data & 0x0000ffff);
 				m_blitterSerialCount = 0;
-				
+
 				// this is ONLY used when there is text on the screen
-				
+
 				//printf("set mode %08x\n", data);
 
-			
+
 			}
 			else if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60
 				  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
@@ -706,7 +707,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				// The lower word always seems to be 0x0001 and the upper byte always 0xac.
 				m_blitterSerialCount = 0;
 
-				// form 0xacMM-xxx   ac = fixed value for this mode?  MM = modes above.  -xxx = some kind of offset? but it doesn't increment for each blit like the textOffset / paletteOffset stuff, investigate  
+				// form 0xacMM-xxx   ac = fixed value for this mode?  MM = modes above.  -xxx = some kind of offset? but it doesn't increment for each blit like the textOffset / paletteOffset stuff, investigate
 
 			}
 			else if (m_blitterMode == 0x10)
@@ -786,10 +787,10 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 					// this is also set at times during the game
 					//
 					// the sprites with 1 set appear to have 0x00000000 in everything after the 4th write (m_blit4 and above)
-					// so likely have some other meaning and are NOT regular sprite data				
+					// so likely have some other meaning and are NOT regular sprite data
 					m_blit0 = data;
 
-					
+
 
 
 
@@ -805,20 +806,20 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 						m_blit1_unused = data & 0xfffef800;
 						m_b1mode = (data & 0x00010000)>>16;
 						m_b1colorNumber = (data & 0x000007ff);    // Probably more bits
-				
+
 						if (m_blit1_unused!=0) printf("blit1 unknown bits set %08x\n", data);
 					}
 				}
 				else if (m_blitterSerialCount == 2)
 				{
 					if (!(m_blit0 & 1)) // don't bother for non-sprites
-					{	
-					
+					{
+
 						// seems to be more complex than just transparency
 						m_blit2_unused = data&0xff80f800;
 						m_b2tpen = (data & 0x007f0000)>>16;
 						m_b2colorNumber = (data & 0x000007ff);
-					
+
 						if (m_blit2_unused!=0) printf("blit1 unknown bits set %08x\n", data);
 						if (m_b1mode)
 						{
@@ -830,7 +831,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							if ((m_b2tpen != 0x00) && (m_b2tpen != 0x01) && (m_b2tpen != 0x02)) printf("m_b1mode 0, m_b2tpen!=0x00,0x01 or 0x02 (is %02x)\n", m_b2tpen);
 						}
 
-						 // 00??0uuu  
+						 // 00??0uuu
 						 // ?? seems to be 00 or 7f, set depending on b1mode
 						 // uuu, at least 11 bits used, maybe 12 usually the same as m_blit1_unused? leftover?
 					}
@@ -839,7 +840,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				else if (m_blitterSerialCount == 3)
 				{
 					if (!(m_blit0 & 1)) // don't bother for non-sprites
-					{	
+					{
 						m_blit3_unused = data & 0xffe00000;
 						m_b3romoffset = (data & 0x001fffff)*2;
 						// if this is an offset into the compressed data then it's probably a word offset into each rom (each is 0x400000 bytes) with the data from all 10 being used in parallel as per the notes from Charles
@@ -862,7 +863,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							printf("\n");
 #endif
 #if 0
-							// look at the values actually at the address we're using.. 
+							// look at the values actually at the address we're using..
 							// often have a similar form to
 							// 0008, 0000, 8000, 0800, 0080, 0008, 0000, 8000, 0800, 0080,
 							//   1     2     3     4     5     6     7     8     9    10
@@ -870,7 +871,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							if (m_b3romoffset == 0x0000848e)
 							{
 								printf("rom offset %08x, values : \n", m_b3romoffset);
-							
+
 								for (int b=0;b<8;b++)
 								{
 									for (int i=0;i<8;i++)
@@ -896,25 +897,25 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 
 
 
-		
+
 
 							// these are used for slider bars in test mode
 							//	rom offset 00140000, values : 0008, 0000, 8000, 0800, 0080, 0008, 0000, 8000, 0800, 0080,
 							//	rom offset 00140008, values : 0004, 9000, 4900, 0490, 0049, 0004, 9000, 4900, 0490, 0049,
-							
+
 							// or as groups of 20-bits  00080 00080 00080 00080 00080 00080 00080 00080
 							// or as groups of 20-bits  00049 00049 00049 00049 00049 00049 00049 00049
-			
+
 #endif
 						}
-						
+
 
 					}
 				}
 				else if (m_blitterSerialCount == 4)
 				{
 					if (!(m_blit0 & 1)) // don't bother for non-sprites
-					{	
+					{
 						m_blit4_unused = data & 0xf8fefefe;
 						m_blit4 = data & 0x07010101;
 
@@ -995,7 +996,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 						// we also use this to trigger the actual draw operation
 
 						//printf("blit %08x\n", data);
-					
+
 						// debug, hide objects without m_blit10 set
 						//if (m_blit10==0) return;
 						//if (m_blit0==0) return;
@@ -1005,7 +1006,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 						{
 							// with this bit enabled m_blit10 is a look up to the zoom(?) value eg. 03f42600
 							//UINT32 temp = space.read_dword(m_blit10);
-							//PRINT_BLIT_STUFF		
+							//PRINT_BLIT_STUFF
 							/* for the horizontal road during attract there are tables 0x480 bytes long (0x120 dwords) and the value passed points to the start of them */
 							/* cell sizes for those are are 0011 (v) 0007 (h) with zoom factors of 0020 (half v) 0040 (normal h) */
 							/* tables seem to be 2x 8-bit values, possibly zoom + linescroll, although ingame ones seem to be 2x16-bit (corrupt? more meaning) */
@@ -1140,7 +1141,7 @@ x100(0x200) - 07b78 07c6b 07d5b 07e04 07ee7 07fd9 0806a 001a0 001a0 001a0 001a0 
 
 01a0(0x340) - 0403f 0003e 0f83e 0f83e 0f83a dd37e 05b2c e0f3c cf014 cb33c c5b16 c5800 0f83e 0f83e 0cb2c 01b2c // the compressed data referenced by (0x340)
 01b0(0x360) - 03374 de349 d0f83 d0f9a d0f83 02b9a e0f16 e8f16 d9688 c5a89 00b2c 00b7e e6365 d2348 c8b31 b7720
-	          c838a e4372 e0f43 d0f0e d2369 ce6dd da741 d07a7 c3b3c cf35c cf383 cf322 d2348 b7739 c8339 d0711			  
+	          c838a e4372 e0f43 d0f0e d2369 ce6dd da741 d07a7 c3b3c cf35c cf383 cf322 d2348 b7739 c8339 d0711
 */
 
 
@@ -1179,14 +1180,14 @@ investigate this sprite
 									{
 											int lookupnum = h + (v*m_hCellCount);
 											UINT32 spriteNumber = get_20bit_data( m_b3romoffset, lookupnum);
-											
+
 #if 0
 											printf("%05x (%08x,%d)  ",spriteNumber, (m_b3romoffset + (spriteNumber>>3)), spriteNumber&7 );
 
 
 											if ((h == m_hCellCount-1))
 												printf("\n");
-											
+
 											if ((h == m_hCellCount-1) && (v == m_vCellCount-1))
 												printf("\n");
 #endif
@@ -1197,7 +1198,7 @@ investigate this sprite
 											if ((compdataoffset >= 0x016590) && (compdataoffset<=0x0165e6) && (h==0))
 											{
 												printf("%05x (%08x,%d) | ",spriteNumber, compdataoffset, spriteNumber&7 );
-												
+
 
 												//00200 (00016590,0)  00200 (00016590,0)
 												//00210 (00016592,0)  00210 (00016592,0)
@@ -1213,12 +1214,12 @@ investigate this sprite
 
 													// as 10-bit (pretty, I like this)
 													/*                                                                                   |this is where 210 starts
-													00200 (00016590,0) | 00f 03e 03e 03e 03e 03e 03e 03e 257 257 257 257 257 257 257 257 (00f 257) 
+													00200 (00016590,0) | 00f 03e 03e 03e 03e 03e 03e 03e 257 257 257 257 257 257 257 257 (00f 257)
 													00210 (00016592,0) | 00f 257 257 257 257 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 237 237 237 237 237 237 237 237 237 237 237 237 237 237 237 237 (00f 237) - these lines are 64 lone
 													00251 (0001659a,1) | 00f 237 237 237 237 237 237 237 237 237 237 237 237 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f (00f 21f)
 													00292 (000165a2,2) | 00f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 24f 24f 24f 24f 24f 24f 24f 24f 24f 24f 24f 24f 0be 0be 0be 0be (00f 0be)
 													002b7 (000165a6,7) | 00f 0be 0be 0be 263 263 263 263 07e 07e 07e 07e 05e (00f 07e)
-													002c4 (000165a8,4) | 00f 07e 07e 05e 247 247 247 247 247 247 247 247 247 247 247 247 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f (00f 20f) 
+													002c4 (000165a8,4) | 00f 07e 07e 05e 247 247 247 247 247 247 247 247 247 247 247 247 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f (00f 20f)
 													002f4 (000165ae,4) | 00f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b (00f 23b)
 													00335 (000165b6,5) | 00f 23b 23b 23b 23b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 24b 24b 24b 24b 24b 24b 24b 24b 24b 24b 24b 24b 0de (00f 0fe)
 													00373 (000165be,3) | 00f 0fe 0fe 0fe 0fe 0fe 0fe 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 00f 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 267 267 267 267 17e 17e 17e 17e 15e (00f 17e)
@@ -1246,26 +1247,26 @@ investigate this sprite
 						for (int v = 0; v < m_vCellCount; v++)
 						{
 							const int pixelOffsetY = ((m_vPosition) + (v* 16 * m_vZoom)) / 0x40;
-							
+
 							if (pixelOffsetY>383)
 							{
 								v = m_vCellCount;
 								continue;
 							}
-							
+
 
 							for (int h = 0; h < m_hCellCount; h++)
 							{
 								const int pixelOffsetX = ((m_hPosition) + (h* 16 * m_hZoom)) / 0x40;
-								
+
 								if (pixelOffsetX>495)
 								{
 									h = m_hCellCount;
 									continue;
 								}
-									
+
 								int lookupnum = h + (v*m_hCellCount);
-								
+
 								// with this bit enabled the tile numbers gets looked up using 'data' (which would be m_blit11) (eg 03f40000 for startup text)
 								// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
 								if (m_indirect_tile_enable)
@@ -1276,7 +1277,7 @@ investigate this sprite
 
 
 								// these should be 'cell numbers' (tile numbers) which look up RLE data?
-								UINT32 spriteNumber = get_20bit_data( m_b3romoffset, lookupnum );		
+								UINT32 spriteNumber = get_20bit_data( m_b3romoffset, lookupnum );
 
 								int i = 1;// skip first 10 bits for now
 								int data_written = 0;
@@ -1285,7 +1286,7 @@ investigate this sprite
 								{
 
 									UINT16 compdata = get_10bit_data( m_b3romoffset, spriteNumber + i);
-									
+
 									if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
 									{
 										// mm ccrr rrr0
@@ -1323,10 +1324,10 @@ investigate this sprite
 									i++;
 								}
 
-									
 
-									
-								
+
+
+
 
 								int blockwide = ((16*m_hZoom)/0x40)-1;
 								int blockhigh = ((16*m_vZoom)/0x40)-1;
@@ -1352,7 +1353,7 @@ investigate this sprite
 											if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
 									}
 								}
-								
+
 #if 0 // this one does zooming
 								// DEBUG: Draw 16x16 block
 								UINT32* line;
@@ -1612,7 +1613,12 @@ READ32_MEMBER(coolridr_state::sysh1_sound_dma_r)
 	if(offset == 8)
 	{
 		//popmessage("%02x",sound_data);
-		/* TODO: this probably stalls the DMA transfers. */
+		/*
+		Checked in irq routine
+		--x- ---- second SCSP
+		---x ---- first SCSP
+		*/
+		m_subcpu->set_input_line(0xe, CLEAR_LINE);
 		return sound_data;
 	}
 
@@ -1711,9 +1717,12 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 ADDRESS_MAP_END
 
+/* TODO: what is this for, mixing? */
 WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
 {
-	sound_data = data;
+	sound_fifo_full = data & 0x80;
+//	sound_data = data;
+//	printf("%02x sound\n",data);
 }
 
 static ADDRESS_MAP_START( system_h1_sound_map, AS_PROGRAM, 16, coolridr_state )
@@ -2170,23 +2179,31 @@ static void scsp_irq(device_t *device, int irq)
 		device->machine().device("soundcpu")->execute().set_input_line(-irq, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(coolridr_state::scsp_to_main_irq)
+/* TODO: how to clear the vector? */
+WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
 {
-	m_subcpu->set_input_line(0xe, HOLD_LINE);
+	m_subcpu->set_input_line(0xe, ASSERT_LINE);
+	sound_data = 0x10;
+}
+
+WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
+{
+	m_subcpu->set_input_line(0xe, ASSERT_LINE);
+	sound_data = 0x20;
 }
 
 static const scsp_interface scsp_config =
 {
 	0,
 	scsp_irq,
-	DEVCB_DRIVER_LINE_MEMBER(coolridr_state, scsp_to_main_irq)
+	DEVCB_DRIVER_LINE_MEMBER(coolridr_state, scsp1_to_sh1_irq)
 };
 
 static const scsp_interface scsp2_interface =
 {
 	0,
 	NULL,
-	DEVCB_DRIVER_LINE_MEMBER(coolridr_state, scsp_to_main_irq)
+	DEVCB_DRIVER_LINE_MEMBER(coolridr_state, scsp2_to_sh1_irq)
 };
 
 #define MAIN_CLOCK XTAL_28_63636MHz
@@ -2275,7 +2292,7 @@ ROM_START( coolridr )
 	ROM_LOAD16_WORD_SWAP( "mpr-17647.ic8", 0x1c00000, 0x0400000, CRC(9dd9330c) SHA1(c91a7f497c1f4bd283bd683b06dff88893724d51) ) // 4900
 	ROM_LOAD16_WORD_SWAP( "mpr-17646.ic7", 0x2000000, 0x0400000, CRC(b77eb2ad) SHA1(b832c0f1798aca39adba840d56ae96a75346670a) ) // 0490
 	ROM_LOAD16_WORD_SWAP( "mpr-17645.ic6", 0x2400000, 0x0400000, CRC(56968d07) SHA1(e88c3d66ea05affb4681a25d155f097bd1b5a84b) ) // 0049
-         
+
 
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
