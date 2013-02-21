@@ -2461,7 +2461,6 @@ ROM_START( coolridr )
 	ROM_REGION32_BE( 0x100000, "ram_gfx", ROMREGION_ERASE00 ) /* SH2 code */
 
 	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )   /* 68000 */
-	ROM_COPY( "maincpu", 0x100000, 0x080000, 0x080000 ) //hardcoded from SH-2 roms? no, It doesn't seem so... (missing a DMA transfer for it?)
 
 	ROM_REGION( 0x100000, "sub", 0 ) /* SH1 */
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
