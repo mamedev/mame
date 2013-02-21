@@ -444,7 +444,6 @@ public:
 	required_shared_ptr<UINT16> m_soundram2;
 	bitmap_rgb32 m_temp_bitmap_sprites;
 	bitmap_rgb32 m_temp_bitmap_sprites2;
-	UINT32 m_test_offs;
 	int m_color;
 	UINT8 m_vblank;
 	int m_scsp_last_line;
@@ -499,7 +498,6 @@ void coolridr_state::video_start()
 {
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2);
-	m_test_offs = 0x2000;
 }
 
 // might be a page 'map / base' setup somewhere, but it's just used for ingame backgrounds
@@ -513,8 +511,10 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 	UINT32 count;
 	int y,x;
 	int color;
-	count = m_test_offs/4;
+	count = 0/4;
 	color = m_color;
+	int scrollx;
+	int scrolly;
 
 	if (which==1)
 	{
@@ -529,17 +529,35 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 
 	}
 
+	scrollx = (m_framebuffer_vram[(0x9bac+which*0x40)/4] >> 16) & 0x7ff;
+	scrolly = m_framebuffer_vram[(0x9bac+which*0x40)/4] & 0x3ff;
+
+	/* TODO: optimize! */
 	for (y=0;y<64;y++)
 	{
 		for (x=0;x<128;x+=2)
 		{
 			int tile;
+			int res_x,res_y;
+
+			res_x = ((x+0)*16)-scrollx;
+			res_y = (y*16)-scrolly;
 
 			tile = (m_h1_vram[count] & 0x0fff0000) >> 16;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x+0)*16,y*16);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y+1024);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y+1024);
+
+			res_x = ((x+1)*16)-scrollx;
+			res_y = (y*16)-scrolly;
 
 			tile = (m_h1_vram[count] & 0x00000fff) >> 0;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,(x+1)*16,y*16);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y+1024);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y+1024);
+
 
 			count++;
 		}
@@ -562,36 +580,15 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 #if 0
-	if(machine().input().code_pressed(KEYCODE_Z))
-		m_test_offs+=4;
-
-	if(machine().input().code_pressed(KEYCODE_X))
-		m_test_offs-=4;
-
-	if(machine().input().code_pressed(KEYCODE_C))
-		m_test_offs+=0x40;
-
-	if(machine().input().code_pressed(KEYCODE_V))
-		m_test_offs-=0x40;
-
-	if(machine().input().code_pressed(KEYCODE_B))
-		m_test_offs+=0x400;
-
-	if(machine().input().code_pressed(KEYCODE_N))
-		m_test_offs-=0x400;
-
 	if(machine().input().code_pressed_once(KEYCODE_A))
 		m_color++;
 
 	if(machine().input().code_pressed_once(KEYCODE_S))
 		m_color--;
 
-	if(m_test_offs > 0x100000*4)
-		m_test_offs = 0;
-
 #endif
 
-//	popmessage("%08x %04x",m_test_offs,m_color);
+//	popmessage("%04x",m_color);
 
 	return screen_update_coolridr(screen,bitmap,cliprect,0);
 }
@@ -2159,7 +2156,7 @@ void coolridr_state::machine_start()
 
 	for (int i=0;i<(0x800000*8)/2;i++)
 	{
-		m_expanded_10bit_gfx[i] = get_10bit_data( 0, i); 
+		m_expanded_10bit_gfx[i] = get_10bit_data( 0, i);
 	}
 
 	if (0)
@@ -2169,13 +2166,13 @@ void coolridr_state::machine_start()
 		sprintf(filename,"expanded_%s_gfx", machine().system().name);
 		fp=fopen(filename, "w+b");
 		if (fp)
-		{	
+		{
 			for (int i=0;i<(0x800000*8);i++)
 			{
 				fwrite((UINT8*)m_expanded_10bit_gfx+(i^1), 1, 1, fp);
 			}
 			fclose(fp);
-			
+
 		}
 	}
 
