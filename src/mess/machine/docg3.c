@@ -766,6 +766,15 @@ void diskonchip_g3_device::device_start()
 	m_data_size[1] = m_planes * m_blocks * m_pages * 16;
 	m_data_size[2] = m_blocks * 8;
 
+	m_device = 0;
+	m_block = 0;
+	m_page = 0;
+	m_transfersize = 0;
+	m_plane = 0;
+	m_test = 0;
+
+	memset(m_sec_2, 0, sizeof(m_sec_2));
+
 	m_data[0] = auto_alloc_array( machine(), UINT8, m_data_size[0]);
 	m_data[1] = auto_alloc_array( machine(), UINT8, m_data_size[1]);
 	m_data[2] = auto_alloc_array( machine(), UINT8, m_data_size[2]);
