@@ -426,6 +426,8 @@ public:
 
 	UINT32 m_blit10; // an address
 
+	UINT16 m_tempshape[16*16];
+	
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
@@ -671,7 +673,7 @@ UINT16 coolridr_state::get_10bit_data(UINT32 romoffset, int _10bitwordnum)
 WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 {
 	COMBINE_DATA(&m_sysh1_txt_blit[offset]);
-
+	const pen_t *clut = &machine().pens[0];
 
 	switch(offset)
 	{
@@ -1216,7 +1218,7 @@ investigate this sprite
 												//00200 (00016590,0)  00200 (00016590,0)
 												//00210 (00016592,0)  00210 (00016592,0)
 
-												for (int i=0;i<18;i++)
+												for (int i=0;i<8*12;i++)
 												{
 													UINT16 compdata = get_10bit_data( m_b3romoffset, spriteNumber + i);
 													printf("%03x ", compdata);
@@ -1227,24 +1229,24 @@ investigate this sprite
 
 													// as 10-bit (pretty, I like this)
 													/*                                                                                   |this is where 210 starts
-													00200 (00016590,0) | 00f 03e 03e 03e 03e 03e 03e 03e 257 257 257 257 257 257 257 257(00f 257)
-													00210 (00016592,0) | 00f 257 257 257 257 207 207 207 207 207 207 207 207 207 207 207 207 207
-													00251 (0001659a,1) | 00f 237 237 237 237 237 237 237 237 237 237 237 237 22f 22f 22f 22f 22f
-													00292 (000165a2,2) | 00f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f
-													002b7 (000165a6,7) | 00f 0be 0be 0be 263 263 263 263 07e 07e 07e 07e 05e 00f 07e 07e 05e 247
-													002c4 (000165a8,4) | 00f 07e 07e 05e 247 247 247 247 247 247 247 247 247 247 247 247 20f 20f
-													002f4 (000165ae,4) | 00f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 233 233 233 233 233
-													00335 (000165b6,5) | 00f 23b 23b 23b 23b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b
-													00373 (000165be,3) | 00f 0fe 0fe 0fe 0fe 0fe 0fe 223 223 223 223 223 223 223 223 223 223 223
-													0038a (000165c1,2) | 00f 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223
-													003ac (000165c5,4) | 00f 17e 15e 1be 1be 1be 1be 1be 19e 217 217 217 217 217 217 217 217 00f
-													003bd (000165c7,5) | 00f 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217
-													003fe (000165cf,6) | 00f 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b
-													00419 (000165d3,1) | 00f 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203
-													0045a (000165db,2) | 00f 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 253
-													0049b (000165e3,3) | 00f 213 213 213 213 213 213 213 213 13e 13e 13e 13e 13e 13e 21b 21b 21b
-													004b2 (000165e6,2) | 000 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b
-													*/
+													00200 (00016590,0) | 00f 03e 03e 03e 03e 03e 03e 03e 257 257 257 257 257 257 257 257 (00f 257) 
+													00210 (00016592,0) | 00f 257 257 257 257 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 237 237 237 237 237 237 237 237 237 237 237 237 237 237 237 237 (00f 237) - these lines are 64 lone
+													00251 (0001659a,1) | 00f 237 237 237 237 237 237 237 237 237 237 237 237 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f (00f 21f)
+													00292 (000165a2,2) | 00f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 24f 24f 24f 24f 24f 24f 24f 24f 24f 24f 24f 24f 0be 0be 0be 0be (00f 0be)
+													002b7 (000165a6,7) | 00f 0be 0be 0be 263 263 263 263 07e 07e 07e 07e 05e (00f 07e)
+													002c4 (000165a8,4) | 00f 07e 07e 05e 247 247 247 247 247 247 247 247 247 247 247 247 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f (00f 20f) 
+													002f4 (000165ae,4) | 00f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b (00f 23b)
+													00335 (000165b6,5) | 00f 23b 23b 23b 23b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 24b 24b 24b 24b 24b 24b 24b 24b 24b 24b 24b 24b 0de (00f 0fe)
+													00373 (000165be,3) | 00f 0fe 0fe 0fe 0fe 0fe 0fe 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 00f 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 267 267 267 267 17e 17e 17e 17e 15e (00f 17e)
+													0038a (000165c1,2) | 00f 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 267 267 267 267 17e 17e 17e 17e 15e (00f 17e)
+													003ac (000165c5,4) | 00f 17e 15e 1be 1be 1be 1be 1be 19e 217 217 217 217 217 217 217 217 (00f 217)
+													003bd (000165c7,5) | 00f 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 243 243 243 243 243 243 243 243 243 243 243 243 243 243 243 243 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b (00f 22b)
+													003fe (000165cf,6) | 00f 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 1fe 1fe 1fe 1fe 1fe 1de (00f 203)
+													00419 (000165d3,1) | 00f 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 (00f 227)
+													0045a (000165db,2) | 00f 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 253 253 253 253 253 253 253 253 253 253 253 253 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 (00f 213)
+													0049b (000165e3,3) | 00f 213 213 213 213 213 213 213 213 13e 13e 13e 13e 13e 13e 21b 21b 21b 21b 21b 21b 21b 21b (000 21b)
+													004b2 (000165e6,2) | 000 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 25f 25f 25f 25f 25b 25b 25b 25b 25b 25b 25b 25b 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f (000 000)
+																										*/
 												}
 												printf("\n");
 											}
@@ -1305,6 +1307,53 @@ investigate this sprite
 									// these should be 'cell numbers' (tile numbers) which look up RLE data?
 									spriteNumber = get_20bit_data( m_b3romoffset, lookupnum);		
 
+									int i = 1;// skip first 10 bits for now
+									int data_written = 0;
+
+									while (data_written<256)
+									{
+
+										UINT16 compdata = get_10bit_data( m_b3romoffset, spriteNumber + i);
+									
+										if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
+										{
+											// mm ccrr rrr0
+											int encodelength = (compdata & 0x03e)>>1;
+											int data = (compdata & 0x3c0) >> 6;
+
+											while (data_written<256 && encodelength >=0)
+											{
+												m_tempshape[data_written] = data;
+												encodelength--;
+												data_written++;
+											}
+										}
+										else if ((compdata & 0x300) == 0x200)
+										{
+											// mm cccc ccrr
+											int encodelength = (compdata & 0x003);
+											int data = (compdata & 0x3fc) >> 6;
+
+											while (data_written<256 && encodelength >=0)
+											{
+												m_tempshape[data_written] = data;
+												encodelength--;
+												data_written++;
+											}
+
+										}
+										else
+										{
+											// mm cccc cccc
+											m_tempshape[data_written] = data&0xff;
+											data_written++;
+										}
+
+										i++;
+									}
+
+									
+									//
 									//if (spriteNumber == 0x00)
 									//	continue;
 									
@@ -1347,6 +1396,26 @@ investigate this sprite
 
 								// DEBUG: Draw 16x16 block
 								UINT32* line;
+								for (int y = 0; y < 16; y++)
+								{
+									const int drawy = pixelOffsetY+y;
+									if ((drawy>383) || (drawy<0)) continue;
+									line = &drawbitmap->pix32(drawy);
+
+									for (int x = 0; x < 16; x++)
+									{
+										const int drawx = pixelOffsetX+x;
+										if ((drawx>=495 || drawx<0)) continue;
+
+										UINT16 pix = m_tempshape[y*16+x];
+										if (pix )
+											if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+									}
+								}
+								color++;
+#if 0 // this one does zooming
+								// DEBUG: Draw 16x16 block
+								UINT32* line;
 								for (int y = 0; y < blockhigh; y++)
 								{
 									const int drawy = pixelOffsetY+y;
@@ -1361,6 +1430,8 @@ investigate this sprite
 										if (line[drawx]==0) line[drawx] = color;
 									}
 								}
+#endif
+
 							}
 						}
 
