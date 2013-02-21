@@ -4,9 +4,9 @@
 
 *************************************************************************/
 
-#include "devlegcy.h"
-#include "sound/discrete.h"
+#include "sound/filter.h"
 #include "sound/tms5220.h"
+#include "sound/discrete.h"
 
 
 class polepos_state : public driver_device
@@ -93,30 +93,33 @@ public:
 /*----------- defined in audio/polepos.c -----------*/
 
 class polepos_sound_device : public device_t,
-									public device_sound_interface
+							 public device_sound_interface
 {
 public:
 	polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~polepos_sound_device() { global_free(m_token); }
+	~polepos_sound_device() { }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+public:
+    DECLARE_WRITE8_MEMBER( polepos_engine_sound_lsb_w );
+    DECLARE_WRITE8_MEMBER( polepos_engine_sound_msb_w );
+
 private:
-	// internal state
-	void *m_token;
+	UINT32 m_current_position;
+	int m_sample_msb;
+	int m_sample_lsb;
+	int m_sample_enable;
+	sound_stream *m_stream;
+	filter2_context m_filter_engine[3];
 };
 
 extern const device_type POLEPOS;
-
-DECLARE_WRITE8_DEVICE_HANDLER( polepos_engine_sound_lsb_w );
-DECLARE_WRITE8_DEVICE_HANDLER( polepos_engine_sound_msb_w );
 
 DISCRETE_SOUND_EXTERN( polepos );

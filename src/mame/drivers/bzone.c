@@ -283,9 +283,9 @@ READ8_MEMBER(bzone_state::redbaron_joy_r)
 
 WRITE8_MEMBER(bzone_state::redbaron_joysound_w)
 {
-	device_t *device = machine().device("custom");
+	redbaron_sound_device *device = machine().device<redbaron_sound_device>("custom");
 	m_rb_input_select = data & 1;
-	redbaron_sounds_w(device, space, offset, data);
+	device->redbaron_sounds_w(space, offset, data);
 }
 
 

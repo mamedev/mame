@@ -6,7 +6,7 @@
 
 ***************************************************************************/
 
-#include "devlegcy.h"
+#include "sound/samples.h"
 
 
 #define GRIDLEE_MASTER_CLOCK    (20000000)
@@ -67,27 +67,34 @@ public:
 
 /*----------- defined in audio/gridlee.c -----------*/
 
-DECLARE_WRITE8_DEVICE_HANDLER( gridlee_sound_w );
-
 class gridlee_sound_device : public device_t,
-									public device_sound_interface
+							 public device_sound_interface
 {
 public:
 	gridlee_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~gridlee_sound_device() { global_free(m_token); }
+	~gridlee_sound_device() { }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+public:
+    DECLARE_WRITE8_MEMBER( gridlee_sound_w );
+
 private:
-	// internal state
-	void *m_token;
+	/* tone variables */
+	UINT32 m_tone_step;
+	UINT32 m_tone_fraction;
+	UINT8 m_tone_volume;
+
+	/* sound streaming variables */
+	sound_stream *m_stream;
+	samples_device *m_samples;
+	double m_freq_to_step;
+	UINT8 m_sound_data[24];
 };
 
 extern const device_type GRIDLEE;

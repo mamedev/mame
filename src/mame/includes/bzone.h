@@ -4,7 +4,6 @@
 
 *************************************************************************/
 
-#include "devlegcy.h"
 #include "sound/discrete.h"
 
 #define BZONE_MASTER_CLOCK (XTAL_12_096MHz)
@@ -38,29 +37,53 @@ public:
 /*----------- defined in audio/bzone.c -----------*/
 MACHINE_CONFIG_EXTERN( bzone_audio );
 
+
 /*----------- defined in audio/redbaron.c -----------*/
 
-DECLARE_WRITE8_DEVICE_HANDLER( redbaron_sounds_w );
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+// ======================> redbaron_sound_device
 
 class redbaron_sound_device : public device_t,
-									public device_sound_interface
+							  public device_sound_interface
 {
 public:
 	redbaron_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~redbaron_sound_device() { global_free(m_token); }
+	~redbaron_sound_device() { }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+public:
+    DECLARE_WRITE8_MEMBER( redbaron_sounds_w );
+
 private:
-	// internal state
-	void *m_token;
+	INT16 *m_vol_lookup;
+
+	INT16 m_vol_crash[16];
+
+	sound_stream *m_channel;
+	int m_latch;
+	int m_poly_counter;
+	int m_poly_shift;
+
+	int m_filter_counter;
+
+	int m_crash_amp;
+	int m_shot_amp;
+	int m_shot_amp_counter;
+
+	int m_squeal_amp;
+	int m_squeal_amp_counter;
+	int m_squeal_off_counter;
+	int m_squeal_on_counter;
+	int m_squeal_out;
 };
 
 extern const device_type REDBARON;

@@ -3,7 +3,6 @@
     Sound handler
 ****************************************************************************/
 #include "emu.h"
-#include "sound/filter.h"
 #include "machine/rescap.h"
 #include "namco52.h"
 #include "namco54.h"
@@ -14,21 +13,11 @@
 #define POLEPOS_R166        1000.0
 #define POLEPOS_R167        2200.0
 #define POLEPOS_R168        4700.0
+
 /* resistor values when shorted by 4066 running at 5V */
 #define POLEPOS_R166_SHUNT  1.0/(1.0/POLEPOS_R166 + 1.0/250)
 #define POLEPOS_R167_SHUNT  1.0/(1.0/POLEPOS_R166 + 1.0/250)
 #define POLEPOS_R168_SHUNT  1.0/(1.0/POLEPOS_R166 + 1.0/250)
-
-struct polepos_sound_state
-{
-	UINT32 m_current_position;
-	int m_sample_msb;
-	int m_sample_lsb;
-	int m_sample_enable;
-	sound_stream *m_stream;
-	filter2_context m_filter_engine[3];
-};
-
 
 static const double volume_table[8] =
 {
@@ -45,20 +34,72 @@ static const double volume_table[8] =
 static const double r_filt_out[3] = {RES_K(4.7), RES_K(7.5), RES_K(10)};
 static const double r_filt_total = 1.0 / (1.0/RES_K(4.7) + 1.0/RES_K(7.5) + 1.0/RES_K(10));
 
-INLINE polepos_sound_state *get_safe_token( device_t *device )
-{
-	assert(device != NULL);
-	assert(device->type() == POLEPOS);
 
-	return (polepos_sound_state *)downcast<polepos_sound_device *>(device)->token();
+
+
+// device type definition
+const device_type POLEPOS = &device_creator<polepos_sound_device>;
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  polepos_sound_device - constructor
+//-------------------------------------------------
+
+polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, POLEPOS, "Pole Position Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_current_position(0),
+	  m_sample_msb(0),
+	  m_sample_lsb(0),
+	  m_sample_enable(0),
+	  m_stream(NULL)
+{
 }
 
-/************************************/
-/* Stream updater                   */
-/************************************/
-static STREAM_UPDATE( engine_sound_update )
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void polepos_sound_device::device_start()
 {
-	polepos_sound_state *state = get_safe_token(device);
+	m_stream = stream_alloc(0, 1, OUTPUT_RATE);
+	m_sample_msb = m_sample_lsb = 0;
+	m_sample_enable = 0;
+
+	/* setup the filters */
+	filter_opamp_m_bandpass_setup(this, RES_K(220), RES_K(33), RES_K(390), CAP_U(.01),  CAP_U(.01),
+									&m_filter_engine[0]);
+	filter_opamp_m_bandpass_setup(this, RES_K(150), RES_K(22), RES_K(330), CAP_U(.0047),  CAP_U(.0047),
+									&m_filter_engine[1]);
+	/* Filter 3 is a little different.  Because of the input capacitor, it is
+	 * a high pass filter. */
+	filter2_setup(this, FILTER_HIGHPASS, 950, Q_TO_DAMP(.707), 1, &m_filter_engine[2]);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void polepos_sound_device::device_reset()
+{
+	int loop;
+	for (loop = 0; loop < 3; loop++)
+		filter2_reset(&m_filter_engine[loop]);
+}
+
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void polepos_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
 	UINT32 step, clock, slot;
 	UINT8 *base;
 	double volume, i_total;
@@ -66,98 +107,65 @@ static STREAM_UPDATE( engine_sound_update )
 	int loop;
 
 	/* if we're not enabled, just fill with 0 */
-	if (!state->m_sample_enable)
+	if (!m_sample_enable)
 	{
 		memset(buffer, 0, samples * sizeof(*buffer));
 		return;
 	}
 
 	/* determine the effective clock rate */
-	clock = (device->machine().device("maincpu")->unscaled_clock() / 16) * ((state->m_sample_msb + 1) * 64 + state->m_sample_lsb + 1) / (64*64);
+	clock = (machine().device("maincpu")->unscaled_clock() / 16) * ((m_sample_msb + 1) * 64 + m_sample_lsb + 1) / (64*64);
 	step = (clock << 12) / OUTPUT_RATE;
 
 	/* determine the volume */
-	slot = (state->m_sample_msb >> 3) & 7;
+	slot = (m_sample_msb >> 3) & 7;
 	volume = volume_table[slot];
-	base = &device->machine().root_device().memregion("engine")->base()[slot * 0x800];
+	base = &machine().root_device().memregion("engine")->base()[slot * 0x800];
 
 	/* fill in the sample */
 	while (samples--)
 	{
-		state->m_filter_engine[0].x0 = (3.4 / 255 * base[(state->m_current_position >> 12) & 0x7ff] - 2) * volume;
-		state->m_filter_engine[1].x0 = state->m_filter_engine[0].x0;
-		state->m_filter_engine[2].x0 = state->m_filter_engine[0].x0;
+		m_filter_engine[0].x0 = (3.4 / 255 * base[(m_current_position >> 12) & 0x7ff] - 2) * volume;
+		m_filter_engine[1].x0 = m_filter_engine[0].x0;
+		m_filter_engine[2].x0 = m_filter_engine[0].x0;
 
 		i_total = 0;
 		for (loop = 0; loop < 3; loop++)
 		{
-			filter2_step(&state->m_filter_engine[loop]);
+			filter2_step(&m_filter_engine[loop]);
 			/* The op-amp powered @ 5V will clip to 0V & 3.5V.
 			 * Adjusted to vRef of 2V, we will clip as follows: */
-			if (state->m_filter_engine[loop].y0 > 1.5) state->m_filter_engine[loop].y0 = 1.5;
-			if (state->m_filter_engine[loop].y0 < -2)  state->m_filter_engine[loop].y0 = -2;
+			if (m_filter_engine[loop].y0 > 1.5) m_filter_engine[loop].y0 = 1.5;
+			if (m_filter_engine[loop].y0 < -2)  m_filter_engine[loop].y0 = -2;
 
-			i_total += state->m_filter_engine[loop].y0 / r_filt_out[loop];
+			i_total += m_filter_engine[loop].y0 / r_filt_out[loop];
 		}
 		i_total *= r_filt_total * 32000/2;  /* now contains voltage adjusted by final gain */
 
 		*buffer++ = (int)i_total;
-		state->m_current_position += step;
+		m_current_position += step;
 	}
 }
 
-/************************************/
-/* Sound handler start              */
-/************************************/
-static DEVICE_START( polepos_sound )
-{
-	polepos_sound_state *state = get_safe_token(device);
-	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, OUTPUT_RATE, NULL, engine_sound_update);
-	state->m_sample_msb = state->m_sample_lsb = 0;
-	state->m_sample_enable = 0;
-
-	/* setup the filters */
-	filter_opamp_m_bandpass_setup(device, RES_K(220), RES_K(33), RES_K(390), CAP_U(.01),  CAP_U(.01),
-									&state->m_filter_engine[0]);
-	filter_opamp_m_bandpass_setup(device, RES_K(150), RES_K(22), RES_K(330), CAP_U(.0047),  CAP_U(.0047),
-									&state->m_filter_engine[1]);
-	/* Filter 3 is a little different.  Because of the input capacitor, it is
-	 * a high pass filter. */
-	filter2_setup(device, FILTER_HIGHPASS, 950, Q_TO_DAMP(.707), 1,
-									&state->m_filter_engine[2]);
-}
-
-/************************************/
-/* Sound handler reset              */
-/************************************/
-static DEVICE_RESET( polepos_sound )
-{
-	polepos_sound_state *state = get_safe_token(device);
-	int loop;
-	for (loop = 0; loop < 3; loop++)
-		filter2_reset(&state->m_filter_engine[loop]);
-}
 
 /************************************/
 /* Write LSB of engine sound        */
 /************************************/
-WRITE8_DEVICE_HANDLER( polepos_engine_sound_lsb_w )
+WRITE8_MEMBER( polepos_sound_device::polepos_engine_sound_lsb_w )
 {
-	polepos_sound_state *state = get_safe_token(device);
 	/* Update stream first so all samples at old frequency are updated. */
-	state->m_stream->update();
-	state->m_sample_lsb = data & 62;
-	state->m_sample_enable = data & 1;
+	m_stream->update();
+	m_sample_lsb = data & 62;
+	m_sample_enable = data & 1;
 }
 
 /************************************/
 /* Write MSB of engine sound        */
 /************************************/
-WRITE8_DEVICE_HANDLER( polepos_engine_sound_msb_w )
+WRITE8_MEMBER( polepos_sound_device::polepos_engine_sound_msb_w )
 {
-	polepos_sound_state *state = get_safe_token(device);
-	state->m_stream->update();
-	state->m_sample_msb = data & 63;
+	m_stream->update();
+	m_sample_msb = data & 63;
 }
 
 
@@ -178,13 +186,13 @@ WRITE8_DEVICE_HANDLER( polepos_engine_sound_msb_w )
 #define POLEPOS_54XX_DAC_R (1.0 / (1.0 / RES_K(47) + 1.0 / RES_K(22) + 1.0 / RES_K(10) + 1.0 / RES_K(4.7)))
 static const discrete_dac_r1_ladder polepos_54xx_dac =
 {
-	4,              /* number of DAC bits */
-					/* 54XX_0   54XX_1  54XX_2 */
-	{ RES_K(47),    /* R124,    R136,   R152 */
-		RES_K(22),  /* R120,    R132,   R142 */
-		RES_K(10),  /* R119,    R131,   R138 */
-		RES_K(4.7)},    /* R118,    R126,   R103 */
-	0, 0, 0, 0      /* nothing extra */
+	4,               /* number of DAC bits */
+					 /* 54XX_0   54XX_1  54XX_2 */
+	{ RES_K(47),     /* R124,    R136,   R152 */
+		RES_K(22),   /* R120,    R132,   R142 */
+		RES_K(10),   /* R119,    R131,   R138 */
+		RES_K(4.7)}, /* R118,    R126,   R103 */
+	0, 0, 0, 0       /* nothing extra */
 };
 
 #define POLEPOS_52XX_DAC_R (1.0 / (1.0 / RES_K(100) + 1.0 / RES_K(47) + 1.0 / RES_K(22) + 1.0 / RES_K(10)))
@@ -245,6 +253,7 @@ static const discrete_op_amp_filt_info polepos_chanl3_filt =
 	5,                  /* vP */
 	0                   /* vN */
 };
+
 
 DISCRETE_SOUND_START(polepos)
 
@@ -350,49 +359,3 @@ DISCRETE_SOUND_START(polepos)
 DISCRETE_SOUND_END
 
 
-const device_type POLEPOS = &device_creator<polepos_sound_device>;
-
-polepos_sound_device::polepos_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, POLEPOS, "Pole Position Custom", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(polepos_sound_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void polepos_sound_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void polepos_sound_device::device_start()
-{
-	DEVICE_START_NAME( polepos_sound )(this);
-}
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void polepos_sound_device::device_reset()
-{
-	DEVICE_RESET_NAME( polepos_sound )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void polepos_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
-}

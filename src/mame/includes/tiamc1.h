@@ -1,4 +1,3 @@
-#include "devlegcy.h"
 
 class tiamc1_state : public driver_device
 {
@@ -40,30 +39,75 @@ public:
 
 /*----------- defined in audio/tiamc1.c -----------*/
 
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+struct timer8253chan
+{
+    timer8253chan() :
+	  count(0),
+	  cnval(0),
+	  bcdMode(0),
+	  cntMode(0),
+	  valMode(0),
+	  gate(0),
+	  output(0),
+	  loadCnt(0),
+	  enable(0)
+    {}
+            
+	UINT16 count;
+	UINT16 cnval;
+	UINT8 bcdMode;
+	UINT8 cntMode;
+	UINT8 valMode;
+	UINT8 gate;
+	UINT8 output;
+	UINT8 loadCnt;
+	UINT8 enable;
+};
+
+struct timer8253struct
+{
+    struct timer8253chan channel[3];
+};
+
+
+// ======================> qsound_device
+
 class tiamc1_sound_device : public device_t,
-									public device_sound_interface
+							public device_sound_interface
 {
 public:
 	tiamc1_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~tiamc1_sound_device() { global_free(m_token); }
+	~tiamc1_sound_device() { }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+public:
+    DECLARE_WRITE8_MEMBER( tiamc1_timer0_w );
+    DECLARE_WRITE8_MEMBER( tiamc1_timer1_w );
+    DECLARE_WRITE8_MEMBER( tiamc1_timer1_gate_w );
+
 private:
-	// internal state
-	void *m_token;
+    void timer8253_reset(struct timer8253struct *t);
+    void timer8253_tick(struct timer8253struct *t,int chn);
+    void timer8253_wr(struct timer8253struct *t, int reg, UINT8 val);
+    char timer8253_get_output(struct timer8253struct *t, int chn);
+    void timer8253_set_gate(struct timer8253struct *t, int chn, UINT8 gate);
+
+private:
+	sound_stream *m_channel;
+	int m_timer1_divider;
+
+	timer8253struct m_timer0;
+	timer8253struct m_timer1;
 };
 
 extern const device_type TIAMC1;
-
-
-DECLARE_WRITE8_DEVICE_HANDLER( tiamc1_timer0_w );
-DECLARE_WRITE8_DEVICE_HANDLER( tiamc1_timer1_w );
-DECLARE_WRITE8_DEVICE_HANDLER( tiamc1_timer1_gate_w );
