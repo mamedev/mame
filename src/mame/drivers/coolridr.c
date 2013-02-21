@@ -361,6 +361,7 @@ at 0xDE60.
 #include "cpu/m68000/m68000.h"
 #include "sound/scsp.h"
 #include "machine/am9517a.h"
+#include "machine/nvram.h"
 #include "rendlay.h"
 
 
@@ -381,7 +382,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_subcpu(*this,"sub"),
 		m_soundcpu(*this,"soundcpu"),
-		m_dmac(*this, "i8237"),
+		//m_dmac(*this, "i8237"),
 		m_h1_vram(*this, "h1_vram"),
 		m_h1_charram(*this, "h1_charram"),
 		m_framebuffer_vram(*this, "fb_vram"),
@@ -435,7 +436,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<am9517a_device> m_dmac;
+	//required_device<am9517a_device> m_dmac;
 
 	required_shared_ptr<UINT32> m_h1_vram;
 	required_shared_ptr<UINT32> m_h1_charram;
@@ -1823,7 +1824,7 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
 	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x05ff0000, 0x05ffffff) AM_RAM /*???*/
-	AM_RANGE(0x06000000, 0x060001ff) AM_RAM // backup RAM
+	AM_RANGE(0x06000000, 0x060001ff) AM_RAM AM_SHARE("nvram") // backup RAM
 	AM_RANGE(0x06100000, 0x06100003) AM_READ_PORT("IN0") AM_WRITE8(lamps_w,0x000000ff)
 	AM_RANGE(0x06100004, 0x06100007) AM_READ_PORT("IN1")
 	AM_RANGE(0x06100008, 0x0610000b) AM_READ_PORT("IN5")
@@ -2405,7 +2406,8 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_CPU_PROGRAM_MAP(coolridr_submap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, system_h1_sub, "lscreen", 0, 1)
 
-	MCFG_I8237_ADD("i8237", 16000000, dmac_intf)
+//	MCFG_I8237_ADD("i8237", 16000000, dmac_intf)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_GFXDECODE(coolridr)
 
@@ -2422,7 +2424,6 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383) // the game uses this resolution
 	//MCFG_SCREEN_VISIBLE_AREA(0,639, 0, 479) // the 'for use in ... screen uses this resolution'
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr2)
-
 
 	MCFG_PALETTE_LENGTH(0x10000)
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
