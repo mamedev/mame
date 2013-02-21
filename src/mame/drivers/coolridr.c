@@ -800,8 +800,12 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							printf("rom offset %08x, previous values : ", m_b3romoffset);
 							for (int i=0;i<10;i++)
 							{
-							UINT16 testvalue = m_compressedgfx[i*0x400000 + m_b3romoffset - 2] << 8 | m_compressedgfx[i*0x0400000 + m_b3romoffset - 1];
-							printf("%04x, ", testvalue);
+								UINT16 testvalue = m_compressedgfx[i*0x400000 + m_b3romoffset - 2] << 8 | m_compressedgfx[i*0x0400000 + m_b3romoffset - 1];
+								if ((i==0) || (i==5)) printf("%04x", testvalue);
+								if ((i==1) || (i==6)) printf("%01x %03x", (testvalue & 0xf000) >> 12, testvalue & 0x0fff);
+								if ((i==2) || (i==7)) printf("%02x %02x", (testvalue & 0xff00) >> 8, testvalue & 0x00ff);
+								if ((i==3) || (i==8)) printf("%03x %01x", (testvalue & 0xfff0) >> 4, testvalue & 0x000f);
+								if ((i==4) || (i==9)) printf("%04x ", testvalue);
 							}
 							printf("\n");
 #endif
@@ -814,8 +818,13 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							printf("rom offset %08x, values : ", m_b3romoffset);
 							for (int i=0;i<10;i++)
 							{
-							UINT16 testvalue = m_compressedgfx[i*0x400000 + m_b3romoffset] << 8 | m_compressedgfx[i*0x0400000 + m_b3romoffset +1];
-							printf("%04x, ", testvalue);
+								UINT16 testvalue = m_compressedgfx[i*0x400000 + m_b3romoffset] << 8 | m_compressedgfx[i*0x0400000 + m_b3romoffset +1];
+								if ((i==0) || (i==5)) printf("%04x", testvalue);
+								if ((i==1) || (i==6)) printf("%01x %03x", (testvalue & 0xf000) >> 12, testvalue & 0x0fff);
+								if ((i==2) || (i==7)) printf("%02x %02x", (testvalue & 0xff00) >> 8, testvalue & 0x00ff);
+								if ((i==3) || (i==8)) printf("%03x %01x", (testvalue & 0xfff0) >> 4, testvalue & 0x000f);
+								if ((i==4) || (i==9)) printf("%04x ", testvalue);
+
 							}
 							printf("\n");
 
@@ -824,8 +833,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							//	rom offset 00140000, values : 0008, 0000, 8000, 0800, 0080, 0008, 0000, 8000, 0800, 0080,
 							//	rom offset 00140008, values : 0004, 9000, 4900, 0490, 0049, 0004, 9000, 4900, 0490, 0049,
 							
-							// or as groups of 10-bits  00080 00080 00080 00080 00080 00080 00080 00080
-							// or as groups of 10-bits  00049 00049 00049 00049 00049 00049 00049 00049
+							// or as groups of 20-bits  00080 00080 00080 00080 00080 00080 00080 00080
+							// or as groups of 20-bits  00049 00049 00049 00049 00049 00049 00049 00049
 			
 #endif
 						}
@@ -1452,7 +1461,7 @@ ADDRESS_MAP_END
 
 
 
-static const gfx_layout tiles8x8_layout =
+static const gfx_layout tiles16x16_layout =
 {
 	16,16,
 	RGN_FRAC(1,1),
@@ -1462,6 +1471,7 @@ static const gfx_layout tiles8x8_layout =
 	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
 	16*128
 };
+
 
 #if 0
 static const gfx_layout test =
@@ -1490,10 +1500,10 @@ static const gfx_layout fakeascii =
 
 
 static GFXDECODE_START( coolridr )
-//  GFXDECODE_ENTRY( "maincpu_data", 0, tiles8x8_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx_data", 0, tiles8x8_layout, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx5", 0, tiles8x8_layout, 0, 0x100 )
-	GFXDECODE_ENTRY( "ram_gfx", 0, tiles8x8_layout, 0, 0x100 )
+//  GFXDECODE_ENTRY( "maincpu_data", 0, tiles16x16_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx_data", 0, tiles16x16_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( "gfx5", 0, tiles16x16_layout, 0, 0x100 )
+	GFXDECODE_ENTRY( "ram_gfx", 0, tiles16x16_layout, 0, 0x100 )
 	GFXDECODE_ENTRY( "fakeascii", 0x18000, fakeascii, 0x1000, 16 )
 GFXDECODE_END
 
