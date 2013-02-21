@@ -63,6 +63,7 @@ PmDeviceID find_default_device(char *path, int input, PmDeviceID id)
 	}
 	strcat(full_name, pref_3);
 	inf = fopen(full_name, "r");
+	free(full_name);
 	if (!inf) goto nopref; // cannot open preference file
 	// We're not going to build or link in a full XML parser.
 	// Instead, find the path string and quoute. Then, look for
