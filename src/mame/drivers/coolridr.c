@@ -2333,7 +2333,7 @@ void coolridr_state::machine_reset()
 
 }
 
-
+#if 0
 static I8237_INTERFACE( dmac_intf )
 {
 	DEVCB_NULL, //DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dma_hrq_changed),
@@ -2347,6 +2347,7 @@ static I8237_INTERFACE( dmac_intf )
 		DEVCB_NULL/*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack2_w)*/,
 		DEVCB_NULL/*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack3_w)*/ }
 };
+#endif
 
 static void scsp_irq(device_t *device, int irq)
 {
