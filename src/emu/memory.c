@@ -1661,7 +1661,7 @@ address_space::address_space(memory_manager &manager, device_memory_interface &m
 
 address_space::~address_space()
 {
-	global_free(&m_direct);
+	auto_free(m_manager.machine(), &m_direct);
 	global_free(m_map);
 }
 
