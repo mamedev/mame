@@ -452,6 +452,8 @@ public:
 	UINT8 sound_data, sound_fifo_full;
 
 	UINT8* m_compressedgfx;
+	UINT16* m_expanded_10bit_gfx;
+
 	UINT32 get_20bit_data(UINT32 romoffset, int _20bitwordnum);
 	UINT16 get_10bit_data(UINT32 romoffset, int _10bitwordnum);
 
@@ -620,55 +622,6 @@ WRITE32_MEMBER(coolridr_state::sysh1_ioga_w)
 
 
 
-#define READ_COMPRESSED_ROM(chip) \
-	m_compressedgfx[(chip)*0x400000 + romoffset] << 8 | m_compressedgfx[(chip)*0x0400000 + romoffset +1]; \
-
-// this helps you feth the 20bit words from an address in the compressed data
-UINT32 coolridr_state::get_20bit_data(UINT32 romoffset, int _20bitwordnum)
-{
-	UINT16 testvalue, testvalue2;
-
-	int temp = _20bitwordnum & 3;
-	int inc = 0;
-	if (_20bitwordnum&4) inc = 5;
-
-	romoffset += (_20bitwordnum>>3)*2;
-
-
-
-	if (temp==0)
-	{
-		testvalue  = READ_COMPRESSED_ROM(0+inc);
-		testvalue2 = READ_COMPRESSED_ROM(1+inc);
-		return (testvalue << 4) | (testvalue2 & 0xf000) >> 12;
-	}
-	else if (temp==1)
-	{
-		testvalue  = READ_COMPRESSED_ROM(1+inc);
-		testvalue2 = READ_COMPRESSED_ROM(2+inc);
-		return ((testvalue & 0x0fff) << 8) | (testvalue2 & 0xff00) >> 8;
-	}
-	else if (temp==2)
-	{
-		testvalue  = READ_COMPRESSED_ROM(2+inc);
-		testvalue2 = READ_COMPRESSED_ROM(3+inc);
-		return ((testvalue & 0x00ff) << 12) | (testvalue2 & 0xfff0) >> 4;
-	}
-	else // temp == 3
-	{
-		testvalue  = READ_COMPRESSED_ROM(3+inc);
-		testvalue2 = READ_COMPRESSED_ROM(4+inc);
-		return ((testvalue & 0x000f) << 16) | (testvalue2);
-	}
-
-}
-
-UINT16 coolridr_state::get_10bit_data(UINT32 romoffset, int _10bitwordnum)
-{
-	UINT32 data = get_20bit_data(romoffset, _10bitwordnum>>1);
-	if (_10bitwordnum&1) return data & 0x3ff;
-	else return (data>>10) & 0x3ff;
-}
 
 /* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
 WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
@@ -1170,7 +1123,7 @@ investigate this sprite
 
 #if 0
 						// logging only
-						if (!m_indirect_tile_enable)
+						//if (!m_indirect_tile_enable)
 						{
 							//if (m_hCellCount==0x10)
 							{
@@ -1179,6 +1132,11 @@ investigate this sprite
 									for (int h = 0; h < m_hCellCount; h++)
 									{
 											int lookupnum = h + (v*m_hCellCount);
+											if (m_indirect_tile_enable)
+											{
+												const UINT32 memOffset = data;
+												lookupnum = space.read_byte(memOffset + h + (v*m_hCellCount));
+											}
 											UINT32 spriteNumber = get_20bit_data( m_b3romoffset, lookupnum);
 
 #if 0
@@ -1195,7 +1153,7 @@ investigate this sprite
 											int compdataoffset = (m_b3romoffset + (spriteNumber>>3));
 											// do some logging for the sprite mentioned above 'investigate this sprite' looking at compressed data used in the first column
 											//if ((compdataoffset==0x3e9030) && (h==0))
-											if ((compdataoffset >= 0x016590) && (compdataoffset<=0x0165e6) && (h==0))
+											if (v==0)
 											{
 												printf("%05x (%08x,%d) | ",spriteNumber, compdataoffset, spriteNumber&7 );
 
@@ -1277,7 +1235,7 @@ investigate this sprite
 
 
 								// these should be 'cell numbers' (tile numbers) which look up RLE data?
-								UINT32 spriteNumber = get_20bit_data( m_b3romoffset, lookupnum );
+								UINT32 spriteNumber = (m_expanded_10bit_gfx[ (m_b3romoffset << 3) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (m_b3romoffset << 3) + (lookupnum<<1) + 1 ]);
 
 								int i = 1;// skip first 10 bits for now
 								int data_written = 0;
@@ -1285,13 +1243,17 @@ investigate this sprite
 								while (data_written<256)
 								{
 
-									UINT16 compdata = get_10bit_data( m_b3romoffset, spriteNumber + i);
+									UINT16 compdata = m_expanded_10bit_gfx[ (m_b3romoffset << 3) + spriteNumber + i];
 
 									if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
 									{
 										// mm ccrr rrr0
 										int encodelength = (compdata & 0x03e)>>1;
 										int data = (compdata & 0x3c0) >> 6;
+
+										// guess, blank tiles have the following form
+										// 00120 (00000024,0) | 010 03f
+										if (compdata&1) encodelength = 255;
 
 										while (data_written<256 && encodelength >=0)
 										{
@@ -2130,6 +2092,58 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
 }
 
 
+
+
+#define READ_COMPRESSED_ROM(chip) \
+	m_compressedgfx[(chip)*0x400000 + romoffset] << 8 | m_compressedgfx[(chip)*0x0400000 + romoffset +1]; \
+
+// this helps you feth the 20bit words from an address in the compressed data
+UINT32 coolridr_state::get_20bit_data(UINT32 romoffset, int _20bitwordnum)
+{
+	UINT16 testvalue, testvalue2;
+
+	int temp = _20bitwordnum & 3;
+	int inc = 0;
+	if (_20bitwordnum&4) inc = 5;
+
+	romoffset += (_20bitwordnum>>3)*2;
+
+
+
+	if (temp==0)
+	{
+		testvalue  = READ_COMPRESSED_ROM(0+inc);
+		testvalue2 = READ_COMPRESSED_ROM(1+inc);
+		return (testvalue << 4) | (testvalue2 & 0xf000) >> 12;
+	}
+	else if (temp==1)
+	{
+		testvalue  = READ_COMPRESSED_ROM(1+inc);
+		testvalue2 = READ_COMPRESSED_ROM(2+inc);
+		return ((testvalue & 0x0fff) << 8) | (testvalue2 & 0xff00) >> 8;
+	}
+	else if (temp==2)
+	{
+		testvalue  = READ_COMPRESSED_ROM(2+inc);
+		testvalue2 = READ_COMPRESSED_ROM(3+inc);
+		return ((testvalue & 0x00ff) << 12) | (testvalue2 & 0xfff0) >> 4;
+	}
+	else // temp == 3
+	{
+		testvalue  = READ_COMPRESSED_ROM(3+inc);
+		testvalue2 = READ_COMPRESSED_ROM(4+inc);
+		return ((testvalue & 0x000f) << 16) | (testvalue2);
+	}
+
+}
+
+UINT16 coolridr_state::get_10bit_data(UINT32 romoffset, int _10bitwordnum)
+{
+	UINT32 data = get_20bit_data(romoffset, _10bitwordnum>>1);
+	if (_10bitwordnum&1) return data & 0x3ff;
+	else return (data>>10) & 0x3ff;
+}
+
 void coolridr_state::machine_start()
 {
 //  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -2138,6 +2152,32 @@ void coolridr_state::machine_start()
 //	memcpy(memregion("soundcpu")->base(), memregion("maincpu")->base()+0x100000, 0x80000);
 //	m_soundcpu->reset();
 	m_compressedgfx = memregion( "gfx5" )->base();
+	size_t  size    = memregion( "gfx5" )->bytes();
+
+	// we're expanding 10bit packed data to 16bits(10 used)
+	m_expanded_10bit_gfx = auto_alloc_array(machine(), UINT16, ((size/10)*16)/2);
+
+	for (int i=0;i<(0x800000*8)/2;i++)
+	{
+		m_expanded_10bit_gfx[i] = get_10bit_data( 0, i); 
+	}
+
+	if (0)
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"expanded_%s_gfx", machine().system().name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{	
+			for (int i=0;i<(0x800000*8);i++)
+			{
+				fwrite((UINT8*)m_expanded_10bit_gfx+(i^1), 1, 1, fp);
+			}
+			fclose(fp);
+			
+		}
+	}
 
 }
 
@@ -2292,7 +2332,6 @@ ROM_START( coolridr )
 	ROM_LOAD16_WORD_SWAP( "mpr-17647.ic8", 0x1c00000, 0x0400000, CRC(9dd9330c) SHA1(c91a7f497c1f4bd283bd683b06dff88893724d51) ) // 4900
 	ROM_LOAD16_WORD_SWAP( "mpr-17646.ic7", 0x2000000, 0x0400000, CRC(b77eb2ad) SHA1(b832c0f1798aca39adba840d56ae96a75346670a) ) // 0490
 	ROM_LOAD16_WORD_SWAP( "mpr-17645.ic6", 0x2400000, 0x0400000, CRC(56968d07) SHA1(e88c3d66ea05affb4681a25d155f097bd1b5a84b) ) // 0049
-
 
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
