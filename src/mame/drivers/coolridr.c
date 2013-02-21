@@ -419,6 +419,8 @@ public:
 	UINT32 m_b3romoffset; //
 	UINT32 m_blit4_unused;
 	UINT32 m_blit4; // ?
+	UINT32 m_b4flipx;
+	UINT32 m_b4flipy;
 
 	UINT32 m_blit5_unused; // indirection enable + other bits?
 	int m_indirect_tile_enable; // from m_blit5
@@ -489,7 +491,7 @@ public:
 };
 
 #define PRINT_BLIT_STUFF \
-	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1_unused,m_b1mode,m_b1colorNumber, m_blit2_unused,m_b2tpen,m_b2colorNumber, m_blit3_unused,m_b3romoffset, m_blit4_unused, m_blit4, m_blit5_unused, m_indirect_tile_enable, m_indirect_zoom_enable, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition); \
+	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x, %d, %d) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1_unused,m_b1mode,m_b1colorNumber, m_blit2_unused,m_b2tpen,m_b2colorNumber, m_blit3_unused,m_b3romoffset, m_blit4_unused, m_blit4, m_b4flipy, m_b4flipx, m_blit5_unused, m_indirect_tile_enable, m_indirect_zoom_enable, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition); \
 
 
 /* video */
@@ -871,15 +873,16 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 					if (!(m_blit0 & 1)) // don't bother for non-sprites
 					{
 						m_blit4_unused = data & 0xf8fefefe;
-						m_blit4 = data & 0x07010101;
-
+						m_blit4 = data & 0x07010000;
+						m_b4flipx = data & 0x00000001;
+						m_b4flipy = (data & 0x00000100)>>8;
 						if (m_blit4_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, m_blit4_unused);
 
-						// ---- -111 ---- ---v ---- ---u ---- ---x
+						// ---- -111 ---- ---r ---- ---y ---- ---x
 						// 1 = used bits? (unknown purpose.. might be object colour mode)
-						// x = x-flip?
-						// u = probably y-flip? used on a few objects here and there...
-						// v = unknown, not used much, occasional object
+						// x = x-flip
+						// y = y-flip
+						// r = unknown, not used much, occasional object - rotate
 					}
 				}
 				else if (m_blitterSerialCount == 5)
@@ -1201,6 +1204,7 @@ investigate this sprite
 							}
 						}
 #endif
+						UINT32 lastSpriteNumber = 0xffffffff;
 
 						// Splat some sprites
 						for (int v = 0; v < m_vCellCount; v++)
@@ -1224,69 +1228,91 @@ investigate this sprite
 									continue;
 								}
 
-								int lookupnum = h + (v*m_hCellCount);
+								int lookupnum;
 
 								// with this bit enabled the tile numbers gets looked up using 'data' (which would be m_blit11) (eg 03f40000 for startup text)
 								// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
 								if (m_indirect_tile_enable)
 								{
-									const UINT32 memOffset = data;
-									lookupnum = space.read_byte(memOffset + h + (v*m_hCellCount));
+									lookupnum = space.read_byte(data + h + (v*m_hCellCount));
 								}
-
-
-								// these should be 'cell numbers' (tile numbers) which look up RLE data?
-								UINT32 spriteNumber = (m_expanded_10bit_gfx[ (m_b3romoffset << 3) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (m_b3romoffset << 3) + (lookupnum<<1) + 1 ]);
-
-								int i = 1;// skip first 10 bits for now
-								int data_written = 0;
-
-								while (data_written<256)
+								else
 								{
-
-									UINT16 compdata = m_expanded_10bit_gfx[ (m_b3romoffset << 3) + spriteNumber + i];
-
-									if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
+									if (!m_b4flipy)
 									{
-										// mm ccrr rrr0
-										int encodelength = (compdata & 0x03e)>>1;
-										int data = (compdata & 0x3c0) >> 6;
-
-										// guess, blank tiles have the following form
-										// 00120 (00000024,0) | 010 03f
-										if (compdata&1) encodelength = 255;
-
-										while (data_written<256 && encodelength >=0)
-										{
-											m_tempshape[data_written] = data;
-											encodelength--;
-											data_written++;
-										}
-									}
-									else if ((compdata & 0x300) == 0x200)
-									{
-										// mm cccc ccrr
-										int encodelength = (compdata & 0x003);
-										int data = (compdata & 0x3fc) >> 6;
-
-										while (data_written<256 && encodelength >=0)
-										{
-											m_tempshape[data_written] = data;
-											encodelength--;
-											data_written++;
-										}
-
+										if (!m_b4flipx)
+											lookupnum = h + (v*m_hCellCount);
+										else
+											lookupnum = (m_hCellCount-h-1) + (v*m_hCellCount);
 									}
 									else
 									{
-										// mm cccc cccc
-										m_tempshape[data_written] = data&0xff;
-										data_written++;
-									}
+										if (!m_b4flipx)
+											lookupnum = h + ((m_vCellCount-v-1)*m_hCellCount);
+										else
+											lookupnum = (m_hCellCount-h-1) + ((m_vCellCount-v-1)*m_hCellCount);
 
-									i++;
+									}
 								}
 
+								
+								// these should be 'cell numbers' (tile numbers) which look up RLE data?
+								UINT32 spriteNumber = (m_expanded_10bit_gfx[ (m_b3romoffset << 3) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (m_b3romoffset << 3) + (lookupnum<<1) + 1 ]);
+
+								// skip the decoding if it's the same tile as last time!
+								if (spriteNumber != lastSpriteNumber)
+								{
+									lastSpriteNumber = spriteNumber;
+
+									int i = 1;// skip first 10 bits for now
+									int data_written = 0;
+
+									while (data_written<256)
+									{
+
+										UINT16 compdata = m_expanded_10bit_gfx[ (m_b3romoffset << 3) + spriteNumber + i];
+
+										if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
+										{
+											// mm ccrr rrr0
+											int encodelength = (compdata & 0x03e)>>1;
+											int data = (compdata & 0x3c0) >> 6;
+
+											// guess, blank tiles have the following form
+											// 00120 (00000024,0) | 010 03f
+											if (compdata&1) encodelength = 255;
+
+											while (data_written<256 && encodelength >=0)
+											{
+												m_tempshape[data_written] = data;
+												encodelength--;
+												data_written++;
+											}
+										}
+										else if ((compdata & 0x300) == 0x200)
+										{
+											// mm cccc ccrr
+											int encodelength = (compdata & 0x003);
+											int data = (compdata & 0x3fc) >> 6;
+
+											while (data_written<256 && encodelength >=0)
+											{
+												m_tempshape[data_written] = data;
+												encodelength--;
+												data_written++;
+											}
+
+										}
+										else
+										{
+											// mm cccc cccc
+											m_tempshape[data_written] = data&0xff;
+											data_written++;
+										}
+
+										i++;
+									}
+								}
 
 
 
@@ -1300,20 +1326,72 @@ investigate this sprite
 
 								// DEBUG: Draw 16x16 block
 								UINT32* line;
-								for (int y = 0; y < 16; y++)
-								{
-									const int drawy = pixelOffsetY+y;
-									if ((drawy>383) || (drawy<0)) continue;
-									line = &drawbitmap->pix32(drawy);
-
-									for (int x = 0; x < 16; x++)
+								if (m_b4flipy)
+								{						
+									for (int y = 0; y < 16; y++)
 									{
-										const int drawx = pixelOffsetX+x;
-										if ((drawx>=495 || drawx<0)) continue;
+										const int drawy = pixelOffsetY+y;
+										if ((drawy>383) || (drawy<0)) continue;
+										line = &drawbitmap->pix32(drawy);
 
-										UINT16 pix = m_tempshape[y*16+x];
-										if (pix )
-											if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+										if (m_b4flipx)
+										{
+											for (int x = 0; x < 16; x++)
+											{
+												const int drawx = pixelOffsetX+x;
+												if ((drawx>=495 || drawx<0)) continue;
+
+												UINT16 pix = m_tempshape[(15-y)*16+(15-x)];
+												if (pix )
+													if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+											}
+										}
+										else
+										{
+											for (int x = 0; x < 16; x++)
+											{
+												const int drawx = pixelOffsetX+x;
+												if ((drawx>=495 || drawx<0)) continue;
+
+												UINT16 pix = m_tempshape[(15-y)*16+x];
+												if (pix )
+													if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+											}
+										}
+									}
+								}
+								else
+								{
+									for (int y = 0; y < 16; y++)
+									{
+										const int drawy = pixelOffsetY+y;
+										if ((drawy>383) || (drawy<0)) continue;
+										line = &drawbitmap->pix32(drawy);
+
+										if (m_b4flipx)
+										{
+											for (int x = 0; x < 16; x++)
+											{
+												const int drawx = pixelOffsetX+x;
+												if ((drawx>=495 || drawx<0)) continue;
+
+												UINT16 pix = m_tempshape[y*16+(15-x)];
+												if (pix )
+													if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+											}
+										}
+										else
+										{
+											for (int x = 0; x < 16; x++)
+											{
+												const int drawx = pixelOffsetX+x;
+												if ((drawx>=495 || drawx<0)) continue;
+
+												UINT16 pix = m_tempshape[y*16+x];
+												if (pix )
+													if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+											}
+										}
 									}
 								}
 
