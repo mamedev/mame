@@ -191,10 +191,9 @@ DMA TODO:
 #define DRUP(_lv_)                    (m_scu_regs[5+(_lv_*8)] & 0x00010000)
 #define DWUP(_lv_)                    (m_scu_regs[5+(_lv_*8)] & 0x00000100)
 
-#define DMA_STATUS              (m_scu_regs[31])
 /*These macros sets the various DMA status flags.*/
-#define DnMV_1(_ch_) DMA_STATUS|=(0x10 << 4 * _ch_)
-#define DnMV_0(_ch_) DMA_STATUS&=~(0x10 << 4 * _ch_)
+#define DnMV_1(_ch_) m_scu.status|=(0x10 << 4 * _ch_)
+#define DnMV_0(_ch_) m_scu.status&=~(0x10 << 4 * _ch_)
 
 /*For area checking*/
 #define BIOS_BUS(var)   (var & 0x07000000) == 0
@@ -258,11 +257,11 @@ READ32_MEMBER(saturn_state::saturn_scu_r)
 		case 0x5c/4:
 		//  Super Major League and Shin Megami Tensei - Akuma Zensho reads from there (undocumented), DMA status mirror?
 			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
-			res = m_scu_regs[0x7c/4];
+			res = m_scu.status;
 			break;
 		case 0x7c/4:
 			if(LOG_SCU && !space.debugger_access()) logerror("(PC=%08x) DMA status reg read\n",space.device().safe_pc());
-			res = m_scu_regs[offset];
+			res = m_scu.status;
 			break;
 		case 0x80/4:
 			res = dsp_prg_ctrl_r(space);
@@ -366,7 +365,10 @@ WRITE32_MEMBER(saturn_state::saturn_scu_w)
 			m_scu.ist &= m_scu_regs[offset];
 			scu_test_pending_irq();
 			break;
-		case 0xa8/4: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",m_scu_regs[42]); break;
+		case 0xa8/4:
+			/* This sends an irq signal to the extra devices connected to the A-Bus, not really needed for now. */
+			//if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",m_scu_regs[42]);
+			break;
 		case 0xc4/4: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",m_scu_regs[49]); break;
 		default: if(LOG_SCU) logerror("Warning: unused SCU reg set %d = %08x\n",offset,data);
 	}
@@ -1663,6 +1665,16 @@ WRITE32_MEMBER(saturn_state::saturn_cs1_w)
 		m_cart_backupram[offset*2+1] = (data & 0x000000ff) >> 0;
 }
 
+void saturn_state::scu_reset(void)
+{
+	m_scu.ism = 0xbfff;
+	m_scu.ist = 0;
+	m_scu.start_factor[0] = 7;
+	m_scu.start_factor[1] = 7;
+	m_scu.start_factor[2] = 7;
+	m_scu.status = 0;
+}
+
 MACHINE_RESET_MEMBER(saturn_state,saturn)
 {
 	m_scsp_last_line = 0;
@@ -1673,11 +1685,12 @@ MACHINE_RESET_MEMBER(saturn_state,saturn)
 
 	m_smpc.SR = 0x40;   // this bit is always on according to docs
 
+	scu_reset();
+
 	m_en_68k = 0;
 	m_NMI_reset = 0;
 	m_smpc.slave_on = 0;
 
-	m_scu_regs[31] = 0; //DMA_STATUS = 0;
 
 	//memset(stv_m_workram_l, 0, 0x100000);
 	//memset(stv_m_workram_h, 0, 0x100000);
@@ -1732,12 +1745,6 @@ MACHINE_RESET_MEMBER(saturn_state,saturn)
 		machine().device("slave")->memory().space(AS_PROGRAM).install_readwrite_handler(0x04000000, 0x04000000 | mask, read32_delegate(FUNC(saturn_state::saturn_cs1_r),this), write32_delegate(FUNC(saturn_state::saturn_cs1_w),this));
 	}
 
-
-	/* TODO: default value is probably 7 */
-	m_scu.start_factor[0] = -1;
-	m_scu.start_factor[1] = -1;
-	m_scu.start_factor[2] = -1;
-
 	m_vdp2.old_crmd = -1;
 	m_vdp2.old_tvmd = -1;
 
@@ -1766,10 +1773,7 @@ MACHINE_RESET_MEMBER(saturn_state,stv)
 	m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 	m_prev_bankswitch = 0xff;
 
-	/* TODO: default value is probably 7 */
-	m_scu.start_factor[0] = -1;
-	m_scu.start_factor[1] = -1;
-	m_scu.start_factor[2] = -1;
+	scu_reset();
 
 	m_vdp2.old_crmd = -1;
 	m_vdp2.old_tvmd = -1;
@@ -1913,11 +1917,11 @@ void saturn_state::saturn_init_driver(int rgn)
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-	m_scu_regs = auto_alloc_array(machine(), UINT32, 0x100/4);
-	m_scsp_regs = auto_alloc_array(machine(), UINT16, 0x1000/2);
-	m_cart_dram = auto_alloc_array(machine(), UINT32, 0x400000/4);
-	m_backupram = auto_alloc_array(machine(), UINT8, 0x8000);
-	m_cart_backupram = auto_alloc_array(machine(), UINT8, 0x400000);
+	m_scu_regs = auto_alloc_array_clear(machine(), UINT32, 0x100/4);
+	m_scsp_regs = auto_alloc_array_clear(machine(), UINT16, 0x1000/2);
+	m_cart_dram = auto_alloc_array_clear(machine(), UINT32, 0x400000/4);
+	m_backupram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
+	m_cart_backupram = auto_alloc_array_clear(machine(), UINT8, 0x400000);
 }
 
 DRIVER_INIT_MEMBER(saturn_state,saturnus)

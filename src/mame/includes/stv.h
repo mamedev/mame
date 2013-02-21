@@ -47,7 +47,10 @@ public:
 		UINT32    ist;
 		UINT32    ism;
 		UINT32    illegal_factor[3];
+		UINT32    status;
 	}m_scu;
+
+	void scu_reset(void);
 
 	int       m_minit_boost;
 	int       m_sinit_boost;
