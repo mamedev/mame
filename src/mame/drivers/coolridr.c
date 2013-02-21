@@ -424,6 +424,7 @@ public:
 	UINT32 m_blit4; // ?
 	UINT32 m_b4flipx;
 	UINT32 m_b4flipy;
+	UINT32 m_b4rotate;
 
 	UINT32 m_blit5_unused; // indirection enable + other bits?
 	int m_indirect_tile_enable; // from m_blit5
@@ -471,7 +472,6 @@ public:
 	DECLARE_WRITE32_MEMBER(sysh1_pal_w);
 	DECLARE_WRITE32_MEMBER(sysh1_dma_w);
 	DECLARE_WRITE32_MEMBER(sysh1_char_w);
-	DECLARE_READ32_MEMBER(coolridr_hack1_r);
 	DECLARE_READ32_MEMBER(coolridr_hack2_r);
 	DECLARE_READ16_MEMBER(h1_soundram_r);
 	DECLARE_READ16_MEMBER(h1_soundram2_r);
@@ -499,7 +499,7 @@ public:
 };
 
 #define PRINT_BLIT_STUFF \
-	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x, %d, %d) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1_unused,m_b1mode,m_b1colorNumber, m_blit2_unused,m_b2tpen,m_b2colorNumber, m_blit3_unused,m_b3romoffset, m_blit4_unused, m_blit4, m_b4flipy, m_b4flipx, m_blit5_unused, m_indirect_tile_enable, m_indirect_zoom_enable, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition); \
+	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x, %d, %d, %d) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", m_blit0, m_blit1_unused,m_b1mode,m_b1colorNumber, m_blit2_unused,m_b2tpen,m_b2colorNumber, m_blit3_unused,m_b3romoffset, m_blit4_unused, m_blit4, m_b4flipy,m_b4rotate, m_b4flipx, m_blit5_unused, m_indirect_tile_enable, m_indirect_zoom_enable, m_vCellCount, m_hCellCount, m_vZoom, m_hZoom, m_blit10, data, m_vPosition, m_hPosition); \
 
 
 /* video */
@@ -956,9 +956,10 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 					if (!(m_blit0 & 1)) // don't bother for non-sprites
 					{
 						m_blit4_unused = data & 0xf8fefefe;
-						m_blit4 = data & 0x07010000;
+						m_blit4 = data & 0x07000000;
 						m_b4flipx = data & 0x00000001;
 						m_b4flipy = (data & 0x00000100)>>8;
+						m_b4rotate = (data & 0x00010000)>>16;
 						if (m_blit4_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, m_blit4_unused);
 
 						// ---- -111 ---- ---r ---- ---y ---- ---x
@@ -1028,6 +1029,20 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 					}
 					else
 					{
+						UINT16 used_hCellCount = m_hCellCount;
+						UINT16 used_vCellCount = m_vCellCount;
+						UINT16 used_flipx = m_b4flipx;
+						UINT16 used_flipy = m_b4flipy;
+
+						if (m_b4rotate)
+						{
+							used_hCellCount = m_vCellCount;
+							used_vCellCount = m_hCellCount;
+							used_flipx = m_b4flipy;
+							used_flipy = m_b4flipx;
+							// do the zoom params rotate?
+						}
+
 						// SPRITES / BLITS
 
 						// for text objects this is an address containing the 8-bit tile numbers to use for ASCII text
@@ -1053,15 +1068,6 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 
 						}
 
-						//if (m_b1mode)
-						//{
-						//	PRINT_BLIT_STUFF
-						//}
-						//else
-						//{
-						//	return;
-						//}
-
 						bitmap_rgb32* drawbitmap;
 
 						// 0x30 - 0x60 are definitely the left screen, 0x90 - 0xc0 are definitely the right screen.. the modes seem priority related
@@ -1070,8 +1076,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 						else // 0x90, 0xa0, 0xb0, 0xc0
 							drawbitmap = &m_temp_bitmap_sprites2;
 
-						int sizex = m_hCellCount * 16 * m_hZoom;
-						int sizey = m_vCellCount * 16 * m_vZoom;
+						int sizex = used_hCellCount * 16 * m_hZoom;
+						int sizey = used_vCellCount * 16 * m_vZoom;
 						m_hPosition *= 0x40;
 						m_vPosition *= 0x40;
 
@@ -1111,203 +1117,26 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							break;
 						}
 
-/*
-
--- a blit with tile numbers (in the compressed gfx roms) referencing compressed data in same roms
-
-
-type blit 00000000 00000000(0, 32d) 00000000(00, 32d) 00000000(3e8ffc) 00000000(00000000) 00000000(0,0) 000d 0010 0040 0040 00000000 00000000 80 -48
-0x00(0x000) - 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0
-0x10(0x020) - 07668 076ef 0771d 07742 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0
-0x20(0x040) - 07772 0784b 07913 079fe 07aef 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0
-0x30(0x060) - 07b78 07c6b 07d5b 07e04 07ee7 07fd9 0806a 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0
-0x40(0x080) - 080ba 0819c 0827e 0835d 08445 0852f 08612 0870c 0878a 087f0 0887d 0891c 0897a 089bf 089e9 08a22
-0x50(0x0a0) - 08a6e 08b5f 08c4e 08d3d 08e1b 08efa 08fdb 090b7 09198 0927a 09365 0944c 09536 0961b 096f1 097db
-0x60(0x0c0) - 098c7 099ae 09a8b 09b70 09c4a 09d32 09e1a 09ef4 09fcf 0a0b3 0a18b 0a274 0a34f 0a42e 0a506 0a5c3
-0x70(0x0e0) - 0a6a2 0a78a 0a883 0a968 0aa56 0ab44 0ac2c 0ad0b 0add8 0aea8 0af72 0b046 0b10a 0b1da 0b298 0b333
-0x80(0x100) - 0b3d1 0b49e 0b57a 0b658 0b730 0b7fe 0b8bc 0b986 0ba39 0bae6 0bb83 0bc28 0bc7e 0bcc7 0bd68 0be11
-0x90(0x120) - 0bed1 0bf72 0c013 0c0be 0c160 0c210 0c2b1 0c356 0c3f5 0c492 0c52c 0c5b1 0c65a 0c70b 0c7a8 0c864
-0xa0(0x140) - 0c91a 0c9bb 0ca5b 0caf8 0cbbc 0cc6c 0cd24 0cdc9 0ce7c 0cf15 0cfb5 0d039 0d0ca 0d178 0d207 0d2c0
-0xb0(0x160) - 0d371 0d409 0d4a4 0d548 0d619 0d6ad 0d744 0d7f6 0d8bc 0d95f 0da00 0da83 0db1b 0dbc0 0dc50 0dd06
-0xc0(0x180) - 0ddb7 0de52 0deef 0df91 0e063 0e0ef 0e180 0e217 0e2d4 0e368 0e400 0e485 0e519 0e5be 0e650 0e702
-
-0xd0(0x1a0) - 0403f 0003e 0f83e 0f83e 0f83a dd37e 05b2c e0f3c cf014 cb33c c5b16 c5800 0f83e 0f83e 0cb2c 01b2c // the compressed data referenced by 1a0
-0xe0(0x1c0) - 03374 de349 d0f83 d0f9a d0f83 02b9a e0f16 e8f16 d9688 c5a89 00b2c 00b7e e6365 d2348 c8b31 b7720
-			  c838a e4372 e0f43 d0f0e d2369 ce6dd da741 d07a7 c3b3c cf35c cf383 cf322 d2348 b7739 c8339 d0711
-			  a6288 c3b0e d7335 cd70e c5b16 a2722 d96dc 0003e 0f83e 0f804 cb395 d7f2c 04396 e478a e0f16 e2791
-  			  df80e e0f3c c3b0e c5b16 c3b5c e2b7e dd808 c5b0e c5a88 a6322 b7765 d738f dd806 c82dc c8b48 d2339
-			  be341 ce722 d737e 01b05 be348 ce739 c8305 dcf73 c8365 d7376 01360 d06dd c82f8 d8305 c17a7 b7365
-			  d732c 00b20 da6dd d0760 be755 be362 b73a3 d0f76 e5800 0f83e 0f83e 0f83e 0f81e e5b2c 03b34 02000
-			  0f83e 0f83c dd01c e401a e4316 06376 c5a88 06b90 c381a cb30e 06334 e0e98 05b7e d72dc c8814 dfb16
-			  c8339 a2003 04b2c d7289 d96dc 04334 e0f16 c8a98 cc6dc 04396 e633c c5a88 b7288 01b2c ddb74 cb37e
-			  e633c cf383 e0f4d cf002 cb374 d0f5c cf335 cf316 a2316 c5b0e e0f4d 00374 e2b72 d370e e2716 c5b22
-			  c8b16 c5ba3 c3b3c ddb72 cf33c cf30e c5b0e c8a98 d9716 a2722 a6343 d730e c3b16 a2365 b7322 a2365
-			  b7348 d8b41 c8383 d730e a22dd c8320 c8b22 b7348 c8341 c833b cf316 c5b22 ce6f8 d6348 ce6dc c8305
-  			  c9f27 be360 e2716 c8b48 d8373 d0720 dcf05 c9f38 ce338 ce327 c5a88 b7339 d06f8 c8327 ce327 ce338
-			  ce392 ce338 a2322 ce720 be348 d0727 e5387 e7394 ce30b c2f10 c5adc d06f9 ce755 e4b38 e7387 e1f10
-			  d5b56 cfb65 ce705 c9f27 be327 c4310 e1f0b d775d cfb9c 8c320 a4338 e1f38 c9f0b ce387 e7356 d773e
-			  cfb56 8c00f d2348 c8b22 b7322 a2365 c3b0e c3b89 c8a88 a6365 a2716 c8b48 d2322 b7288 c5a88 d9722
-
--- another blit, referencing the same compressed data
-
-type blit 00000000 00000000(0, 32d) 00000000(00, 32d) 00000000(3e8fc8) 00000000(00000000) 00000000(0,0) 000d 0010 0040 0040 00000000 00000000 64 136
-0x00(0x000) - 00340 00340 00340 00340 00340 00340 00340 00340 00340 00340 00340 00342 00357 003ae 00411 00340
-0x10(0x020) - 00340 00340 00340 00340 00340 00340 00340 00340 00340 00340 0041f 00443 00523 0061d 0070a 007f2
-0x20(0x040) - 00340 00340 00340 00340 00340 00340 00340 008b5 008ea 00928 0098a 00a44 00b01 00ba0 00c73 00d21
-0x30(0x060) - 00340 00340 00340 00dc7 00df2 00e85 00f5a 01053 01149 01239 0131d 013ea 014d5 015b9 0168c 01736
-0x40(0x080) - 017ff 00340 0181d 0183c 01911 01a05 01ae9 01bd5 01cca 01db6 01e4c 01ebe 01fa9 02069 02138 02210
-0x50(0x0a0) - 022f3 023d0 024a6 02577 0264c 02732 0281c 028f7 029e1 02a8c 02b11 02ba8 02c7d 02d60 02e3b 02f28
-0x60(0x0c0) - 0300e 030d6 031a4 0326b 0331e 033d8 034a0 03575 0363d 03730 03818 038f5 039dd 03ac6 03b9c 03c80
-0x70(0x0e0) - 03d66 03e0a 03ec1 03f60 04016 040d7 04179 0421c 042db 0437c 0442e 044d2 04567 04630 0470b 047e1
-0x80(0x100) - 048b3 04963 04a1a 04abc 04b69 04c20 04ce0 04d78 04e27 04ec9 04f65 0500f 050cf 05173 05227 052d0
-0x90(0x120) - 05390 05438 054e6 05583 0563f 056ee 057a5 05859 05926 059cf 05a5f 05b01 05ba8 05c5e 05d33 05dea
-0xa0(0x140) - 05e82 05f2b 05fda 06078 0613a 061df 06298 06345 06410 064c2 0655a 065f0 06682 06731 067cc 06861
-0xb0(0x160) - 068fa 069a3 06a54 06078 0613a 06af2 06baa 06c59 06d0e 06dbc 06e5b 06ef0 06fa2 07051 07101 071b9
-0xc0(0x180) - 05390 05438 054e6 06078 0613a 07276 0732c 06c59 073d9 07488 06e5b 06ef0 07528 075ca 07686 07747
-
-0xd0(0x1a0) - 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 // this is the data pointed to by the blit above, we reference past it for the compressed data this time
-0xe0(0x1c0) - 07668 076ef 0771d 07742 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0
-0xf0(0x1e0) - 07772 0784b 07913 079fe 07aef 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0
-x100(0x200) - 07b78 07c6b 07d5b 07e04 07ee7 07fd9 0806a 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0 001a0
-0110(0x220) - 080ba 0819c 0827e 0835d 08445 0852f 08612 0870c 0878a 087f0 0887d 0891c 0897a 089bf 089e9 08a22
-0120(0x240) - 08a6e 08b5f 08c4e 08d3d 08e1b 08efa 08fdb 090b7 09198 0927a 09365 0944c 09536 0961b 096f1 097db
-0130(0x260) - 098c7 099ae 09a8b 09b70 09c4a 09d32 09e1a 09ef4 09fcf 0a0b3 0a18b 0a274 0a34f 0a42e 0a506 0a5c3
-0140(0x280) - 0a6a2 0a78a 0a883 0a968 0aa56 0ab44 0ac2c 0ad0b 0add8 0aea8 0af72 0b046 0b10a 0b1da 0b298 0b333
-0150(0x2a0) - 0b3d1 0b49e 0b57a 0b658 0b730 0b7fe 0b8bc 0b986 0ba39 0bae6 0bb83 0bc28 0bc7e 0bcc7 0bd68 0be11
-0160(0x2c0) - 0bed1 0bf72 0c013 0c0be 0c160 0c210 0c2b1 0c356 0c3f5 0c492 0c52c 0c5b1 0c65a 0c70b 0c7a8 0c864
-0170(0x2e0) - 0c91a 0c9bb 0ca5b 0caf8 0cbbc 0cc6c 0cd24 0cdc9 0ce7c 0cf15 0cfb5 0d039 0d0ca 0d178 0d207 0d2c0
-0180(0x300) - 0d371 0d409 0d4a4 0d548 0d619 0d6ad 0d744 0d7f6 0d8bc 0d95f 0da00 0da83 0db1b 0dbc0 0dc50 0dd06
-0190(0x320) - 0ddb7 0de52 0deef 0df91 0e063 0e0ef 0e180 0e217 0e2d4 0e368 0e400 0e485 0e519 0e5be 0e650 0e702
-
-01a0(0x340) - 0403f 0003e 0f83e 0f83e 0f83a dd37e 05b2c e0f3c cf014 cb33c c5b16 c5800 0f83e 0f83e 0cb2c 01b2c // the compressed data referenced by (0x340)
-01b0(0x360) - 03374 de349 d0f83 d0f9a d0f83 02b9a e0f16 e8f16 d9688 c5a89 00b2c 00b7e e6365 d2348 c8b31 b7720
-	          c838a e4372 e0f43 d0f0e d2369 ce6dd da741 d07a7 c3b3c cf35c cf383 cf322 d2348 b7739 c8339 d0711
-*/
-
-
-/*
-investigate this sprite
-(much wider, all columns the same)
-00200 (00016590,0)  00200 (00016590,0)
-00210 (00016592,0)  00210 (00016592,0)
-00251 (0001659a,1)  00251 (0001659a,1)
-00292 (000165a2,2)  00292 (000165a2,2)
-002b7 (000165a6,7)  002b7 (000165a6,7)
-002c4 (000165a8,4)  002c4 (000165a8,4)
-002f4 (000165ae,4)  002f4 (000165ae,4)
-00335 (000165b6,5)  00335 (000165b6,5)
-00373 (000165be,3)  00373 (000165be,3)
-0038a (000165c1,2)  0038a (000165c1,2)
-003ac (000165c5,4)  003ac (000165c5,4)
-003bd (000165c7,5)  003bd (000165c7,5)
-003fe (000165cf,6)  003fe (000165cf,6)
-00419 (000165d3,1)  00419 (000165d3,1)
-0045a (000165db,2)  0045a (000165db,2)
-0049b (000165e3,3)  0049b (000165e3,3)
-004b2 (000165e6,2)  004b2 (000165e6,2)
-
-*/
-
-#if 0
-						// logging only
-						//if (!m_indirect_tile_enable)
-						{
-							//if (m_hCellCount==0x10)
-							{
-								for (int v = 0; v < m_vCellCount/*+16*/; v++)
-								{
-									for (int h = 0; h < m_hCellCount; h++)
-									{
-											int lookupnum = h + (v*m_hCellCount);
-											if (m_indirect_tile_enable)
-											{
-												const UINT32 memOffset = data;
-												lookupnum = space.read_byte(memOffset + h + (v*m_hCellCount));
-											}
-											UINT32 spriteNumber = get_20bit_data( m_b3romoffset, lookupnum);
-
-#if 0
-											printf("%05x (%08x,%d)  ",spriteNumber, (m_b3romoffset + (spriteNumber>>3)), spriteNumber&7 );
-
-
-											if ((h == m_hCellCount-1))
-												printf("\n");
-
-											if ((h == m_hCellCount-1) && (v == m_vCellCount-1))
-												printf("\n");
-#endif
-#if 1
-											int compdataoffset = (m_b3romoffset + (spriteNumber>>3));
-											// do some logging for the sprite mentioned above 'investigate this sprite' looking at compressed data used in the first column
-											//if ((compdataoffset==0x3e9030) && (h==0))
-											if (v==0)
-											{
-												printf("%05x (%08x,%d) | ",spriteNumber, compdataoffset, spriteNumber&7 );
-
-
-												//00200 (00016590,0)  00200 (00016590,0)
-												//00210 (00016592,0)  00210 (00016592,0)
-
-												for (int i=0;i<8*12;i++)
-												{
-													UINT16 compdata = get_10bit_data( m_b3romoffset, spriteNumber + i);
-													printf("%03x ", compdata);
-
-													// as 20-bit
-													//	00200 (00016590,0) | 03c3e 0f83e 0f83e 0f83e 95e57 95e57 95e57 95e57 (03e57)
-													//	00210 (00016592,0) | 03e57 95e57 95e07 81e07 81e07 81e07 81e07 81e07 81e07
-
-													// as 10-bit (pretty, I like this)
-													/*                                                                                   |this is where 210 starts
-													00200 (00016590,0) | 00f 03e 03e 03e 03e 03e 03e 03e 257 257 257 257 257 257 257 257 (00f 257)
-													00210 (00016592,0) | 00f 257 257 257 257 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 207 237 237 237 237 237 237 237 237 237 237 237 237 237 237 237 237 (00f 237) - these lines are 64 lone
-													00251 (0001659a,1) | 00f 237 237 237 237 237 237 237 237 237 237 237 237 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 22f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f (00f 21f)
-													00292 (000165a2,2) | 00f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 24f 24f 24f 24f 24f 24f 24f 24f 24f 24f 24f 24f 0be 0be 0be 0be (00f 0be)
-													002b7 (000165a6,7) | 00f 0be 0be 0be 263 263 263 263 07e 07e 07e 07e 05e (00f 07e)
-													002c4 (000165a8,4) | 00f 07e 07e 05e 247 247 247 247 247 247 247 247 247 247 247 247 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f (00f 20f)
-													002f4 (000165ae,4) | 00f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 233 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b 23b (00f 23b)
-													00335 (000165b6,5) | 00f 23b 23b 23b 23b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 24b 24b 24b 24b 24b 24b 24b 24b 24b 24b 24b 24b 0de (00f 0fe)
-													00373 (000165be,3) | 00f 0fe 0fe 0fe 0fe 0fe 0fe 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 00f 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 267 267 267 267 17e 17e 17e 17e 15e (00f 17e)
-													0038a (000165c1,2) | 00f 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 267 267 267 267 17e 17e 17e 17e 15e (00f 17e)
-													003ac (000165c5,4) | 00f 17e 15e 1be 1be 1be 1be 1be 19e 217 217 217 217 217 217 217 217 (00f 217)
-													003bd (000165c7,5) | 00f 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 243 243 243 243 243 243 243 243 243 243 243 243 243 243 243 243 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b (00f 22b)
-													003fe (000165cf,6) | 00f 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 1fe 1fe 1fe 1fe 1fe 1de (00f 203)
-													00419 (000165d3,1) | 00f 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 (00f 227)
-													0045a (000165db,2) | 00f 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 253 253 253 253 253 253 253 253 253 253 253 253 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 213 (00f 213)
-													0049b (000165e3,3) | 00f 213 213 213 213 213 213 213 213 13e 13e 13e 13e 13e 13e 21b 21b 21b 21b 21b 21b 21b 21b (000 21b)
-													004b2 (000165e6,2) | 000 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 25f 25f 25f 25f 25b 25b 25b 25b 25b 25b 25b 25b 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f 23f (000 000)
-																										*/
-												}
-												printf("\n");
-											}
-#endif
-
-									}
-								}
-							}
-						}
-#endif
 						UINT32 lastSpriteNumber = 0xffffffff;
-
 						// Splat some sprites
-						for (int v = 0; v < m_vCellCount; v++)
+						for (int v = 0; v < used_vCellCount; v++)
 						{
 							const int pixelOffsetY = ((m_vPosition) + (v* 16 * m_vZoom)) / 0x40;
 
 							if (pixelOffsetY>383)
 							{
-								v = m_vCellCount;
+								v = used_vCellCount;
 								continue;
 							}
 
 
-							for (int h = 0; h < m_hCellCount; h++)
+							for (int h = 0; h < used_hCellCount; h++)
 							{
 								const int pixelOffsetX = ((m_hPosition) + (h* 16 * m_hZoom)) / 0x40;
 
 								if (pixelOffsetX>495)
 								{
-									h = m_hCellCount;
+									h = used_hCellCount;
 									continue;
 								}
 
@@ -1317,24 +1146,45 @@ investigate this sprite
 								// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
 								if (m_indirect_tile_enable)
 								{
-									lookupnum = space.read_byte(data + h + (v*m_hCellCount));
+									lookupnum = space.read_byte(data + h + (v*used_hCellCount));
 								}
 								else
 								{
-									if (!m_b4flipy)
+									if (!m_b4rotate)
 									{
-										if (!m_b4flipx)
-											lookupnum = h + (v*m_hCellCount);
+										if (!used_flipy)
+										{
+											if (!used_flipx)
+												lookupnum = h + (v*used_hCellCount);
+											else
+												lookupnum = (used_hCellCount-h-1) + (v*used_hCellCount);
+										}
 										else
-											lookupnum = (m_hCellCount-h-1) + (v*m_hCellCount);
+										{
+											if (!used_flipx)
+												lookupnum = h + ((used_vCellCount-v-1)*used_hCellCount);
+											else
+												lookupnum = (used_hCellCount-h-1) + ((used_vCellCount-v-1)*used_hCellCount);
+
+										}
 									}
 									else
 									{
-										if (!m_b4flipx)
-											lookupnum = h + ((m_vCellCount-v-1)*m_hCellCount);
+										if (!used_flipy)
+										{
+											if (!used_flipx)
+												lookupnum = v + (h*used_vCellCount);
+											else
+												lookupnum = (used_vCellCount-v-1) + (h*used_vCellCount);
+										}
 										else
-											lookupnum = (m_hCellCount-h-1) + ((m_vCellCount-v-1)*m_hCellCount);
+										{
+											if (!used_flipx)
+												lookupnum = v + ((used_hCellCount-h-1)*used_vCellCount);
+											else
+												lookupnum = (used_vCellCount-v-1) + ((used_hCellCount-h-1)*used_vCellCount);
 
+										}
 									}
 								}
 
@@ -1409,75 +1259,148 @@ investigate this sprite
 
 								// DEBUG: Draw 16x16 block
 								UINT32* line;
-								if (m_b4flipy)
+								if (m_b4rotate)
 								{
-									for (int y = 0; y < 16; y++)
+									if (used_flipy)
 									{
-										const int drawy = pixelOffsetY+y;
-										if ((drawy>383) || (drawy<0)) continue;
-										line = &drawbitmap->pix32(drawy);
-
-										if (m_b4flipx)
+										for (int y = 0; y < 16; y++)
 										{
-											for (int x = 0; x < 16; x++)
-											{
-												const int drawx = pixelOffsetX+x;
-												if ((drawx>=495 || drawx<0)) continue;
+											const int drawy = pixelOffsetY+y;
+											if ((drawy>383) || (drawy<0)) continue;
+											line = &drawbitmap->pix32(drawy);
 
-												UINT16 pix = m_tempshape[(15-y)*16+(15-x)];
-												if (pix )
-													if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+											if (used_flipx)
+											{
+												for (int x = 0; x < 16; x++)
+												{
+													const int drawx = pixelOffsetX+x;
+													if ((drawx>=495 || drawx<0)) continue;
+
+													UINT16 pix = m_tempshape[(15-x)*16+(15-y)];
+													if (pix )
+														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+												}
 											}
-										}
-										else
-										{
-											for (int x = 0; x < 16; x++)
+											else
 											{
-												const int drawx = pixelOffsetX+x;
-												if ((drawx>=495 || drawx<0)) continue;
+												for (int x = 0; x < 16; x++)
+												{
+													const int drawx = pixelOffsetX+x;
+													if ((drawx>=495 || drawx<0)) continue;
 
-												UINT16 pix = m_tempshape[(15-y)*16+x];
-												if (pix )
-													if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+													UINT16 pix = m_tempshape[(15-x)*16+y];
+													if (pix )
+														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+												}
 											}
 										}
 									}
+									else
+									{
+										for (int y = 0; y < 16; y++)
+										{
+											const int drawy = pixelOffsetY+y;
+											if ((drawy>383) || (drawy<0)) continue;
+											line = &drawbitmap->pix32(drawy);
+
+											if (used_flipx)
+											{
+												for (int x = 0; x < 16; x++)
+												{
+													const int drawx = pixelOffsetX+x;
+													if ((drawx>=495 || drawx<0)) continue;
+
+													UINT16 pix = m_tempshape[x*16+(15-y)];
+													if (pix )
+														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+												}
+											}
+											else
+											{
+												for (int x = 0; x < 16; x++)
+												{
+													const int drawx = pixelOffsetX+x;
+													if ((drawx>=495 || drawx<0)) continue;
+
+													UINT16 pix = m_tempshape[x*16+y];
+													if (pix )
+														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+												}
+											}
+										}
+									}								
 								}
 								else
 								{
-									for (int y = 0; y < 16; y++)
+									if (used_flipy)
 									{
-										const int drawy = pixelOffsetY+y;
-										if ((drawy>383) || (drawy<0)) continue;
-										line = &drawbitmap->pix32(drawy);
-
-										if (m_b4flipx)
+										for (int y = 0; y < 16; y++)
 										{
-											for (int x = 0; x < 16; x++)
-											{
-												const int drawx = pixelOffsetX+x;
-												if ((drawx>=495 || drawx<0)) continue;
+											const int drawy = pixelOffsetY+y;
+											if ((drawy>383) || (drawy<0)) continue;
+											line = &drawbitmap->pix32(drawy);
 
-												UINT16 pix = m_tempshape[y*16+(15-x)];
-												if (pix )
-													if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+											if (used_flipx)
+											{
+												for (int x = 0; x < 16; x++)
+												{
+													const int drawx = pixelOffsetX+x;
+													if ((drawx>=495 || drawx<0)) continue;
+
+													UINT16 pix = m_tempshape[(15-y)*16+(15-x)];
+													if (pix )
+														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+												}
+											}
+											else
+											{
+												for (int x = 0; x < 16; x++)
+												{
+													const int drawx = pixelOffsetX+x;
+													if ((drawx>=495 || drawx<0)) continue;
+
+													UINT16 pix = m_tempshape[(15-y)*16+x];
+													if (pix )
+														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+												}
 											}
 										}
-										else
+									}
+									else
+									{
+										for (int y = 0; y < 16; y++)
 										{
-											for (int x = 0; x < 16; x++)
-											{
-												const int drawx = pixelOffsetX+x;
-												if ((drawx>=495 || drawx<0)) continue;
+											const int drawy = pixelOffsetY+y;
+											if ((drawy>383) || (drawy<0)) continue;
+											line = &drawbitmap->pix32(drawy);
 
-												UINT16 pix = m_tempshape[y*16+x];
-												if (pix )
-													if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+											if (used_flipx)
+											{
+												for (int x = 0; x < 16; x++)
+												{
+													const int drawx = pixelOffsetX+x;
+													if ((drawx>=495 || drawx<0)) continue;
+
+													UINT16 pix = m_tempshape[y*16+(15-x)];
+													if (pix )
+														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+												}
+											}
+											else
+											{
+												for (int x = 0; x < 16; x++)
+												{
+													const int drawx = pixelOffsetX+x;
+													if ((drawx>=495 || drawx<0)) continue;
+
+													UINT16 pix = m_tempshape[y*16+x];
+													if (pix )
+														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+												}
 											}
 										}
 									}
 								}
-
 #if 0 // this one does zooming
 								// DEBUG: Draw 16x16 block
 								UINT32* line;
@@ -2415,15 +2338,13 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383) // the game uses this resolution
-	//MCFG_SCREEN_VISIBLE_AREA(0,639, 0, 479) // the 'for use in Japan screen uses this resolution' (Outrunners also uses the higher res for this screen on system 32..)
+	MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383) 
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr1)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383) // the game uses this resolution
-	//MCFG_SCREEN_VISIBLE_AREA(0,639, 0, 479) // the 'for use in ... screen uses this resolution'
+	MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr2)
 
 	MCFG_PALETTE_LENGTH(0x10000)
@@ -2515,16 +2436,27 @@ TODO: both irq routines writes 1 to 0x60d8894, sets up the Watchdog timer then e
 READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 {
 	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
+
+
 	if(pc == 0x6002cba || pc == 0x6002d42)
 		return 0;
 
+	// with the non-recompiler pc returns +2
+	if(pc == 0x06002cbc || pc == 0x06002d44)
+		return 0;
+	
 	return m_sysh1_workram_h[0xd8894/4];
 }
 
+
+
 DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 {
-//  machine().device("maincpu")->memory().space(AS_PROGRAM).install_legacy_read_handler(0x60d88a4, 0x060d88a7, FUNC(coolridr_hack1_r) );
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
+
+
+	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine().device("sub"), SH2DRC_FASTEST_OPTIONS);
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND ) // region is set in test mode, this set is for Japan, USA and Export (all regions)
