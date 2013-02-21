@@ -109,6 +109,10 @@ void saturn_state::cr_standard_return(UINT16 cur_status)
 	}
 	else
 	{
+		/*
+		TODO:
+		- Whizz: wpset 0x608f030,4,w,wpdata==0x100&&pc!=0x6040006
+		*/
 		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
 		cr2 = (cur_track == 0xff) ? 0xffff : (cdrom_get_adr_control(cdrom, cur_track)<<8 | cur_track); // TODO: fix current track
 		cr3 = (get_track_index(cd_curfad)<<8) | (cd_curfad>>16); //index & 0xff00
@@ -858,11 +862,11 @@ void saturn_state::cd_exec_command( void )
 
 		case 0x53:    // get actual block size
 			CDROM_LOG(("%s:CD: Get actual block size\n", machine().describe_context()))
-			hirqreg |= (CMOK|ESEL);
 			cr1 = cd_stat | ((calcsize>>16)&0xff);
 			cr2 = (calcsize & 0xffff);
 			cr3 = 0;
 			cr4 = 0;
+			hirqreg |= (CMOK|ESEL);
 			break;
 
 		case 0x54:    // get sector info
@@ -1454,6 +1458,7 @@ saturn_state::blockT *saturn_state::cd_alloc_block(UINT8 *blknum)
 			if (freeblocks <= 0)
 			{
 				buffull = 1;
+				printf("buffull in cd_alloc_block\n");
 			}
 
 			blocks[i].size = sectlenin;
@@ -2444,8 +2449,6 @@ void saturn_state::cd_playdata( void )
 {
 	if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
 	{
-		//UINT8 seek_track = cdrom_get_track(cdrom, cd_fad_seek-150);
-
 		/* Zero Divide wants this TODO: timings. */
 		if((cd_fad_seek - cd_curfad) > (750*cd_speed))
 			cd_curfad += (750*cd_speed);
@@ -2457,12 +2460,6 @@ void saturn_state::cd_playdata( void )
 			cd_stat = CD_STAT_PLAY;
 		}
 
-		#if 0
-		cr1 = cd_stat | 0x00; //options << 4 | repeat & 0xf
-		cr2 = (cdrom_get_adr_control(cdrom, seek_track)<<8 | seek_track);
-		cr3 = (get_track_index(cd_fad_seek)<<8) | (cd_fad_seek>>16); //index & 0xff00
-		cr4 = cd_fad_seek;
-		#endif
 		return;
 	}
 
