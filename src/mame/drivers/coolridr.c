@@ -511,22 +511,22 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 	UINT32 count;
 	int y,x;
 	int color;
-	count = 0/4;
-	color = m_color;
 	int scrollx;
 	int scrolly;
+
+	count = 0/4;
+	m_color = 0;
 
 	if (which==1)
 	{
 		count += 0x20000/4;
 //		color += 0x5e;
-		color += 2;
+		m_color = 2;
 	}
 	else
 	{
 //		color += 0x4e;
 //		color += 0x0;
-
 	}
 
 	scrollx = (m_framebuffer_vram[(0x9bac+which*0x40)/4] >> 16) & 0x7ff;
@@ -544,19 +544,23 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 			res_y = (y*16)-scrolly;
 
 			tile = (m_h1_vram[count] & 0x0fff0000) >> 16;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y+1024);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y+1024);
+			color = m_color + ((tile & 0x800) >> 11) * 4;
+
+			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y+1024);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y+1024);
 
 			res_x = ((x+1)*16)-scrollx;
 			res_y = (y*16)-scrolly;
 
 			tile = (m_h1_vram[count] & 0x00000fff) >> 0;
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y+1024);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y+1024);
+			color = m_color + ((tile & 0x800) >> 11) * 4;
+
+			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y+1024);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y+1024);
 
 
 			count++;
