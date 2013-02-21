@@ -1161,9 +1161,9 @@ x100(0x200) - 07b78 07c6b 07d5b 07e04 07ee7 07fd9 0806a 001a0 001a0 001a0 001a0 
 									{
 											int lookupnum = h + (v*m_hCellCount);
 											UINT32 spriteNumber = get_20bit_data( m_b3romoffset, lookupnum);
-											// it's actually an offset on 10 bit boundaries?..
+											
 
-											printf("%05x ",spriteNumber );
+											printf("%05x (%08x,%d)  ",spriteNumber, (m_b3romoffset + (spriteNumber>>3)), spriteNumber&7 );
 
 
 											if ((h == m_hCellCount-1))
