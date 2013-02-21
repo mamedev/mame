@@ -46618,7 +46618,7 @@
 
 	<!-- Identifying Top By Topo (S) (4 faces) (1990) [Original] [TAPE] [COMPILATION].zip... -->
 	<software name="topbytop" supported="no">
-	<description>Top By Topo (Spa) (4 faces) [Original] [TAPE] [COMPILATION].zip</description>
+		<description>Top By Topo (Spa) (4 faces) [Original] [TAPE] [COMPILATION].zip</description>
 			<year>1991</year>
 			<publisher>&lt;unknown&gt;</publisher>
 			<part name="cass" interface="cpc_cass">

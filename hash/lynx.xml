@@ -722,7 +722,7 @@ Known undumped prototypes:
 		<year>1997</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="lynx_cart">
-		<feature name="rotation" value="LEFT" />
+			<feature name="rotation" value="LEFT" />
 			<dataarea name="rom" size="262144">
 				<rom name="raiden (usa) (v3.0).bin" size="262144" crc="bcd10c3a" sha1="df48f69a7257a40844812e5b0bda9efdf093b7f6" offset="000000" />
 			</dataarea>

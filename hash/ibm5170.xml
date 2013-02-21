@@ -15,15 +15,15 @@ Missing files come here
 		<year>1993</year>
 		<publisher>Knowledge Dynamics Corp,</publisher>
 		<part name="flop1" interface="floppy_5_25">
-		<feature name="disk_serial" value="02042 036214.330A" />
-		<feature name="disk_label" value="Programs" />
+			<feature name="disk_serial" value="02042 036214.330A" />
+			<feature name="disk_label" value="Programs" />
 			<dataarea name="flop" size="368640">
 				<rom name="disk 1.img" size="368640" crc="db07d99a" sha1="121ad3c636a69dae3a8eee96ef2ebf1152e9d00f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="disk_serial" value="02043 036214.330A" />
-		<feature name="disk_label" value="Additional Pragrams and Microsoft GW-Basic Interpreter" />
+			<feature name="disk_serial" value="02043 036214.330A" />
+			<feature name="disk_label" value="Additional Pragrams and Microsoft GW-Basic Interpreter" />
 			<dataarea name="flop" size="368640">
 				<rom name="disk 2.img" size="368640" crc="bef8e643" sha1="97df57499e009101d04bd696d23024b4d220e297" offset="0" />
 			</dataarea>
@@ -36,19 +36,19 @@ Missing files come here
 		<publisher>Microsoft</publisher>
 		<info name="OEM" value="Mecer" />
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="disk_serial" value="0044238" />
+			<feature name="disk_serial" value="0044238" />
 			<dataarea name="flop" size="737280">
 				<rom name="operating 1.img" size="737280" crc="c54fe610" sha1="27756a10edbe33f76ff2239062af05dbfdc93979" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-		<feature name="disk_serial" value="0045925" />
+			<feature name="disk_serial" value="0045925" />
 			<dataarea name="flop" size="737280">
 				<rom name="operating 2.img" size="737280" crc="9aa5c1a4" sha1="15cc58e267601b30a594372aea1ff3dbb73ea335" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-		<feature name="disk_serial" value="0044171" />
+			<feature name="disk_serial" value="0044171" />
 			<dataarea name="flop" size="737280">
 				<rom name="operating 3.img" size="737280" crc="6248317a" sha1="c7ff3a04eb01cab3efb05b6b52ec8b8a36b9b269" offset="0" />
 			</dataarea>
@@ -366,7 +366,7 @@ Missing files come here
 		<publisher>KYE Systems Corp.</publisher>
 		<info name="alt_title" value="MouseMate Software Scroll Mouse for Windows XP/Me/98/2000/2003" />
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="disk_serial" value="12060321100-B" />
+			<feature name="disk_serial" value="12060321100-B" />
 			<dataarea name="flop" size="1474560">
 				<rom name="scroll mouse.img" size="1474560" crc="5ed59ff2" sha1="da4405fda8f12616f0fe4ab71ca0aac92933b22e" offset="0" />
 			</dataarea>
@@ -672,7 +672,7 @@ Missing files come here
 		<publisher>IMSI</publisher>
 		<info name="alt_title" value="WinDelete 3.0 For Win 3.x Version 3.0 - 16 Bit" />
 		<part name="flop1" interface="floppy_3_5">
-		<feature name="disk_serial" value="03WDXW3001" />
+			<feature name="disk_serial" value="03WDXW3001" />
 			<dataarea name="flop" size="1474560">
 				<rom name="wdel3.img" size="1474560" crc="9c2e76b9" sha1="b6b6f18726ce0f4ae1aeb2c33b8e4793ca15f87a" offset="0" />
 			</dataarea>
@@ -1224,7 +1224,7 @@ Missing files come here
 
 	<!-- PC Gamer Germany -->
 	<!-- October 1992 undumped
-	<info name="Contents" value="Soul Magican / Atom Demo" />-->
+		<info name="Contents" value="Soul Magican / Atom Demo" />-->
 
 	<software name="pcga9211">
 		<description>PC Games Coverdisk (November 1992) (German)</description>
@@ -1239,7 +1239,7 @@ Missing files come here
 	</software>
 
 	<!-- December 1992 undumped
-	<info name="Contents" value="Ween the Prophecy Demo" />-->
+		<info name="Contents" value="Ween the Prophecy Demo" />-->
 
 	<software name="pcga9301">
 		<description>PC Games Coverdisk (January 1993) (German)</description>
@@ -1266,13 +1266,13 @@ Missing files come here
 	</software>
 
 	<!-- March 1993 undumped
-	<info name="Contents" value="Ween the Prophecy Demo" />-->
+		<info name="Contents" value="Ween the Prophecy Demo" />-->
 
 	<!-- April 1993 undumped
-	<info name="Contents" value="Zool Demo" />-->
+		<info name="Contents" value="Zool Demo" />-->
 
 	<!-- May 1993 undumped
-	<info name="Contents" value="Tornado Demo" />-->
+		<info name="Contents" value="Tornado Demo" />-->
 
 	<software name="pcga9306">
 		<description>PC Games Coverdisk (June 1993) (German)</description>
@@ -1311,7 +1311,7 @@ Missing files come here
 	</software>
 
 	<!-- September 1993 undumped
-	<info name="Contents" value="Ambush at Sorinor Demo" />-->
+		<info name="Contents" value="Ambush at Sorinor Demo" />-->
 
 	<software name="pcga9310">
 		<description>PC Games Coverdisk (October 1993) (German)</description>
@@ -1326,13 +1326,13 @@ Missing files come here
 	</software>
 
 	<!-- November 1993 undumped
-	<info name="Contents" value="Energie Manager Demo" />-->
+		<info name="Contents" value="Energie Manager Demo" />-->
 
 	<!-- December 1993 undumped
-	<info name="Contents" value="Micro Machines Demo" />-->
+		<info name="Contents" value="Micro Machines Demo" />-->
 
 	<!-- January 1994 undumped
-	<info name="Contents" value="Android Demo" />-->
+		<info name="Contents" value="Android Demo" />-->
 
 	<software name="pcga9402">
 		<description>PC Games Coverdisk (February 1994) (German)</description>
@@ -1347,7 +1347,7 @@ Missing files come here
 	</software>
 
 	<!-- March 1994 undumped
-	<info name="Contents" value="Pinball Fantasies Demo" />-->
+		<info name="Contents" value="Pinball Fantasies Demo" />-->
 
 	<software name="pcga9404">
 		<description>PC Games Coverdisk (April 1994) (German)</description>
@@ -1386,22 +1386,22 @@ Missing files come here
 	</software>
 
 	<!-- July 1994 undumped
-	<info name="Contents" value="Tubular Worlds / Empire Soccer Demo" />-->
+		<info name="Contents" value="Tubular Worlds / Empire Soccer Demo" />-->
 
 	<!-- August 1994 undumped
-	<info name="Contents" value="Der Clou Demo / 3 New Doom Level" />-->
+		<info name="Contents" value="Der Clou Demo / 3 New Doom Level" />-->
 
 	<!-- September 1994 undumped
-	<info name="Contents" value="Tony and Friends in Kellogg's Land Demo" />-->
+		<info name="Contents" value="Tony and Friends in Kellogg's Land Demo" />-->
 
 	<!-- October 1994 undumped
-	<info name="Contents" value="Cool Spot / Cheat It Demo" />-->
+		<info name="Contents" value="Cool Spot / Cheat It Demo" />-->
 
 	<!-- November 1994 undumped
-	<info name="Contents" value="Bundesliga Manager Hattrick / 3 New Doom Level / Cheat it Demo" />-->
+		<info name="Contents" value="Bundesliga Manager Hattrick / 3 New Doom Level / Cheat it Demo" />-->
 
 	<!-- December 1994 undumped
-	<info name="Contents" value="Desert Strike Demo / Bundesliga Manager Hattrick Update" />-->
+		<info name="Contents" value="Desert Strike Demo / Bundesliga Manager Hattrick Update" />-->
 
 	<software name="pcga9501">
 		<description>PC Games Coverdisk (January 1995) (German)</description>

@@ -20,7 +20,7 @@
 		<year>1988</year>
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cart" interface="kc_cart">
-		<feature name="cart_id" value="0xfb" />
+			<feature name="cart_id" value="0xfb" />
 			<dataarea name="rom" size="0x2000">
 				<rom name="m012.bin" size="0x2000" crc="02263b40" sha1="b1fe2880dab227a277243161377a4e41f1d3f67e" offset="0" />
 			</dataarea>
@@ -32,7 +32,7 @@
 		<year>1989</year>
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cart" interface="kc_cart">
-		<feature name="cart_id" value="0xfb" />
+			<feature name="cart_id" value="0xfb" />
 			<dataarea name="rom" size="0x2000">
 				<rom name="m026.bin" size="0x2000" crc="501dfa5f" sha1="6e95a5a16e555c1e768b27dfa5216a2b648c2297" offset="0" />
 			</dataarea>
@@ -44,7 +44,7 @@
 		<year>1989</year>
 		<publisher>VEB Mikroelektronik</publisher>
 		<part name="cart" interface="kc_cart">
-		<feature name="cart_id" value="0xfb" />
+			<feature name="cart_id" value="0xfb" />
 			<dataarea name="rom" size="0x2000">
 				<rom name="m027.bin" size="0x2000" crc="16a61a21" sha1="04fe21279ebcf07e2dae4b9a462a43023b117e6a" offset="0" />
 			</dataarea>

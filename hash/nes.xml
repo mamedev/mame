@@ -62453,7 +62453,7 @@ Also notice that VRAM & WRAM are probably incorrect for some of these sets, at t
 			<feature name="pcb" value="SUBOR-BOARD-1" />
 			<feature name="peripheral" value="sub_keyboard" />
 			<dataarea name="prg" size="131072">
-			<rom name="subor v1.0 (r) [a1].prg" size="131072" crc="82f1fb96" sha1="5da695bea9f4d93c553969dc95dad1ae88a6e478" offset="00000" status="baddump" />
+				<rom name="subor v1.0 (r) [a1].prg" size="131072" crc="82f1fb96" sha1="5da695bea9f4d93c553969dc95dad1ae88a6e478" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k? VRAM on cartridge -->
 			<dataarea name="vram" size="8192">

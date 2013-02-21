@@ -20645,7 +20645,7 @@ List of perfect retail cartridges rom dumps
 			<feature name="cart_back_label" value="901121" />
 			<dataarea name="rom" size="1048576">
 				<rom name="shvc-bs-0.u1" size="1048576" crc="aae842d2" sha1="50902e52bdc65c6da11c582acd42d5a231c54486" offset="0x000000" />
-		</dataarea>
+			</dataarea>
 		</part>
 	</software>
 
@@ -31193,9 +31193,9 @@ List of unconfirmed retail cartridge roms
 		<info name="serial" value="BSMC-ZS5J-JPN" />
 		<info name="release" value="19960301" />
 		<part name="cart" interface="snes_cart">
-		<feature name="pcb" value="BSMC-CR-01" />
-		<feature name="u1" value="U1 MASKROM" />
-		<feature name="cart_model" value="SHVC-031" />
+			<feature name="pcb" value="BSMC-CR-01" />
+			<feature name="u1" value="U1 MASKROM" />
+			<feature name="cart_model" value="SHVC-031" />
 			<dataarea name="rom" size="524288">
 				<rom name="bsmc-zs5j-0.u1" size="524288" crc="4c3439c2" sha1="c974673e0365dadc54afcf8dd2e6b41b512c6fe7" offset="0x000000" />
 			</dataarea>

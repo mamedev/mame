@@ -961,7 +961,7 @@ Compiled by K1W1
 		<part name="cart" interface="a800_cart">
 			<feature name="cart_type" value="standard 16k" />
 			<dataarea name="rom" size="16384">
-			<rom name="ataritexte" size="16384" crc="2aff4a94" sha1="db1198a5f7e03012d99a1bc9560316059f1c1c6a" offset="0" /> <!-- Verified -->
+				<rom name="ataritexte" size="16384" crc="2aff4a94" sha1="db1198a5f7e03012d99a1bc9560316059f1c1c6a" offset="0" /> <!-- Verified -->
 			</dataarea>
 		</part>
 	</software>

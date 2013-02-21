@@ -6294,7 +6294,7 @@
 				<rom name="242-v3.v3" offset="0x800000" size="0x400000" crc="044ea4e1" sha1="062a2f2e52098d73bc31c9ad66f5db8080395ce8" />               <!-- TC5332204 -->
 				<rom name="242-v4.v4" offset="0xc00000" size="0x400000" crc="7985ea30" sha1="54ed5f0324de6164ea81943ebccb3e8d298368ec" />               <!-- TC5332204 -->
 			</dataarea>
-		<dataarea name="sprites" size="0x4000000">
+			<dataarea name="sprites" size="0x4000000">
 				<rom loadflag="load16_byte" name="242-c1.c1" offset="0x000000" size="0x800000" crc="e564ecd6" sha1="78f22787a204f26bae9b2b1c945ddbc27143352f" />                <!-- Plane 0,1 -->              <!-- TC5364205 -->
 				<rom loadflag="load16_byte" name="242-c2.c2" offset="0x000001" size="0x800000" crc="bd959b60" sha1="2c97c59e77c9a3fe7d664e741d37944f3d56c10b" />                <!-- Plane 2,3 -->              <!-- TC5364205 -->
 				<rom loadflag="load16_byte" name="242-c3.c3" offset="0x1000000" size="0x800000" crc="22127b4f" sha1="bd0d00f889d9da7c6ac48f287d9ed8c605ae22cf" />               <!-- Plane 0,1 -->              <!-- TC5364205 -->

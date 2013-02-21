@@ -446,7 +446,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="26-3019" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="2048">
-			<rom name="diagnostics v2.0 (1982)(26-3019)(tandy).rom" size="2048" crc="8cd56308" sha1="3292b08ddc686590defe65b663c84578d24cc0a2" offset="0" />
+				<rom name="diagnostics v2.0 (1982)(26-3019)(tandy).rom" size="2048" crc="8cd56308" sha1="3292b08ddc686590defe65b663c84578d24cc0a2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -458,7 +458,7 @@ Compiled by K1W1 and Cowering (from GoodCoCo)
 		<info name="serial" value="26-3019" />
 		<part name="cart" interface="coco_cart">
 			<dataarea name="rom" size="2048">
-			<rom name="diagnostics (1980)(26-3019)(tandy)[!].rom" size="2048" crc="d5257b50" sha1="e359c48fc325c9ab243335653a5f8cae4f8fbd7e" offset="0" />
+				<rom name="diagnostics (1980)(26-3019)(tandy)[!].rom" size="2048" crc="d5257b50" sha1="e359c48fc325c9ab243335653a5f8cae4f8fbd7e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
