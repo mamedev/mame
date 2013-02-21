@@ -364,6 +364,7 @@ at 0xDE60.
 #include "rendlay.h"
 
 
+
 class coolridr_state : public driver_device
 {
 public:
@@ -912,16 +913,19 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 				}
 				else if (m_blitterSerialCount == 4)
 				{
-					m_blit4_unused = data & 0xf8fefefe;
-					m_blit4 = data & 0x07010101;
+					if (!(m_blit0 & 1)) // don't bother for non-sprites
+					{	
+						m_blit4_unused = data & 0xf8fefefe;
+						m_blit4 = data & 0x07010101;
 
-					if (m_blit4_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, m_blit4_unused);
+						if (m_blit4_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, m_blit4_unused);
 
-					// ---- -111 ---- ---v ---- ---u ---- ---x
-					// 1 = used bits? (unknown purpose.. might be object colour mode)
-					// x = x-flip?
-					// u = probably y-flip? used on a few objects here and there...
-					// v = unknown, not used much, occasional object
+						// ---- -111 ---- ---v ---- ---u ---- ---x
+						// 1 = used bits? (unknown purpose.. might be object colour mode)
+						// x = x-flip?
+						// u = probably y-flip? used on a few objects here and there...
+						// v = unknown, not used much, occasional object
+					}
 				}
 				else if (m_blitterSerialCount == 5)
 				{
@@ -1007,25 +1011,6 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							/* tables seem to be 2x 8-bit values, possibly zoom + linescroll, although ingame ones seem to be 2x16-bit (corrupt? more meaning) */
 
 						}
-
-		
-						int random;
-					
-						random = 0;
-
-						// not used much..
-						/*
-						if (m_blit4 &0x00010000)
-						{
-							//PRINT_BLIT_STUFF
-							m_b1colorNumber = machine().rand() | 0xff000000;
-							random = 1;
-						}
-						else
-						{
-							
-						}
-						*/
 
 						//if (m_b1mode)
 						//{
@@ -1278,113 +1263,76 @@ investigate this sprite
 									h = m_hCellCount;
 									continue;
 								}
-								
-
-								// It's unknown if it's row-major or column-major
-								// TODO: Study the CRT test and "Cool Riders" logo for clues.
-								UINT32 spriteNumber = 0;
-
-								{
-									int lookupnum = h + (v*m_hCellCount);
-								
-									// with this bit enabled the tile numbers gets looked up using 'data' (which would be m_blit11) (eg 03f40000 for startup text)
-									// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
-									if (m_indirect_tile_enable)
-									{
-										const UINT32 memOffset = data;
-										lookupnum = space.read_byte(memOffset + h + (v*m_hCellCount));
-									}
-
-
-									// these should be 'cell numbers' (tile numbers) which look up RLE data?
-									spriteNumber = get_20bit_data( m_b3romoffset, lookupnum);		
-
-									int i = 1;// skip first 10 bits for now
-									int data_written = 0;
-
-									while (data_written<256)
-									{
-
-										UINT16 compdata = get_10bit_data( m_b3romoffset, spriteNumber + i);
 									
-										if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
-										{
-											// mm ccrr rrr0
-											int encodelength = (compdata & 0x03e)>>1;
-											int data = (compdata & 0x3c0) >> 6;
+								int lookupnum = h + (v*m_hCellCount);
+								
+								// with this bit enabled the tile numbers gets looked up using 'data' (which would be m_blit11) (eg 03f40000 for startup text)
+								// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
+								if (m_indirect_tile_enable)
+								{
+									const UINT32 memOffset = data;
+									lookupnum = space.read_byte(memOffset + h + (v*m_hCellCount));
+								}
 
-											while (data_written<256 && encodelength >=0)
-											{
-												m_tempshape[data_written] = data;
-												encodelength--;
-												data_written++;
-											}
+
+								// these should be 'cell numbers' (tile numbers) which look up RLE data?
+								UINT32 spriteNumber = get_20bit_data( m_b3romoffset, lookupnum );		
+
+								int i = 1;// skip first 10 bits for now
+								int data_written = 0;
+
+								while (data_written<256)
+								{
+
+									UINT16 compdata = get_10bit_data( m_b3romoffset, spriteNumber + i);
+									
+									if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
+									{
+										// mm ccrr rrr0
+										int encodelength = (compdata & 0x03e)>>1;
+										int data = (compdata & 0x3c0) >> 6;
+
+										while (data_written<256 && encodelength >=0)
+										{
+											m_tempshape[data_written] = data;
+											encodelength--;
+											data_written++;
 										}
-										else if ((compdata & 0x300) == 0x200)
-										{
-											// mm cccc ccrr
-											int encodelength = (compdata & 0x003);
-											int data = (compdata & 0x3fc) >> 6;
+									}
+									else if ((compdata & 0x300) == 0x200)
+									{
+										// mm cccc ccrr
+										int encodelength = (compdata & 0x003);
+										int data = (compdata & 0x3fc) >> 6;
 
-											while (data_written<256 && encodelength >=0)
-											{
-												m_tempshape[data_written] = data;
-												encodelength--;
-												data_written++;
-											}
-
-										}
-										else
+										while (data_written<256 && encodelength >=0)
 										{
-											// mm cccc cccc
-											m_tempshape[data_written] = data&0xff;
+											m_tempshape[data_written] = data;
+											encodelength--;
 											data_written++;
 										}
 
-										i++;
+									}
+									else
+									{
+										// mm cccc cccc
+										m_tempshape[data_written] = data&0xff;
+										data_written++;
 									}
 
-									
-									//
-									//if (spriteNumber == 0x00)
-									//	continue;
-									
+									i++;
 								}
+
+									
+
+									
+								
 
 								int blockwide = ((16*m_hZoom)/0x40)-1;
 								int blockhigh = ((16*m_vZoom)/0x40)-1;
 								// hack
 								if (blockwide<=0) blockwide = 1;
 								if (blockhigh<=0) blockhigh = 1;
-
-
-								UINT32 color = 0xffffffff;
-								// HACKS to draw coloured blocks in easy to distinguish colours
-								if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
-								{
-									if (m_b1colorNumber == 0x5b)
-										color = 0xffff0000;
-									else if (m_b1colorNumber == 0x5d)
-										color = 0xff00ff00;
-									else if (m_b1colorNumber == 0x5e)
-										color = 0xff0000ff;
-									else
-										color = 0xff00ffff;
-								}
-								else if (m_blitterMode == 0x40 || m_blitterMode == 0xa0)
-								{
-									color = 0xff000000 | (((m_b1colorNumber & 0xff) | 0x80)-0x40);
-								}
-								else if (m_blitterMode == 0x50 || m_blitterMode == 0xb0)
-								{
-									color = 0xff000000 | ((((m_b1colorNumber & 0xff) | 0x80)-0x40) << 8);
-								}
-								else if (m_blitterMode == 0x60 || m_blitterMode == 0xc0)
-								{
-									color = 0xff000000 | ((((m_b1colorNumber & 0xff) | 0x80)-0x40) << 16);
-								}
-								if (random == 1)
-									color = m_b1colorNumber;
 
 								// DEBUG: Draw 16x16 block
 								UINT32* line;
@@ -1404,7 +1352,7 @@ investigate this sprite
 											if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
 									}
 								}
-								color++;
+								
 #if 0 // this one does zooming
 								// DEBUG: Draw 16x16 block
 								UINT32* line;
