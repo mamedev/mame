@@ -451,6 +451,7 @@ public:
 
 	UINT8* m_compressedgfx;
 	UINT32 get_20bit_data(UINT32 romoffset, int _20bitwordnum);
+	UINT16 get_10bit_data(UINT32 romoffset, int _10bitwordnum);
 
 	DECLARE_READ32_MEMBER(sysh1_sound_dma_r);
 	DECLARE_WRITE32_MEMBER(sysh1_sound_dma_w);
@@ -657,6 +658,13 @@ UINT32 coolridr_state::get_20bit_data(UINT32 romoffset, int _20bitwordnum)
 		return ((testvalue & 0x000f) << 16) | (testvalue2);
 	}
 
+}
+
+UINT16 coolridr_state::get_10bit_data(UINT32 romoffset, int _10bitwordnum)
+{
+	UINT32 data = get_20bit_data(romoffset, _10bitwordnum>>1);
+	if (_10bitwordnum&1) return data & 0x3ff;
+	else return (data>>10) & 0x3ff;
 }
 
 /* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
@@ -1149,11 +1157,35 @@ x100(0x200) - 07b78 07c6b 07d5b 07e04 07ee7 07fd9 0806a 001a0 001a0 001a0 001a0 
 	          c838a e4372 e0f43 d0f0e d2369 ce6dd da741 d07a7 c3b3c cf35c cf383 cf322 d2348 b7739 c8339 d0711			  
 */
 
+
+/*
+investigate this sprite
+(much wider, all columns the same)
+00200 (00016590,0)  00200 (00016590,0)
+00210 (00016592,0)  00210 (00016592,0)
+00251 (0001659a,1)  00251 (0001659a,1)
+00292 (000165a2,2)  00292 (000165a2,2)
+002b7 (000165a6,7)  002b7 (000165a6,7)
+002c4 (000165a8,4)  002c4 (000165a8,4)
+002f4 (000165ae,4)  002f4 (000165ae,4)
+00335 (000165b6,5)  00335 (000165b6,5)
+00373 (000165be,3)  00373 (000165be,3)
+0038a (000165c1,2)  0038a (000165c1,2)
+003ac (000165c5,4)  003ac (000165c5,4)
+003bd (000165c7,5)  003bd (000165c7,5)
+003fe (000165cf,6)  003fe (000165cf,6)
+00419 (000165d3,1)  00419 (000165d3,1)
+0045a (000165db,2)  0045a (000165db,2)
+0049b (000165e3,3)  0049b (000165e3,3)
+004b2 (000165e6,2)  004b2 (000165e6,2)
+
+*/
+
 #if 0
 						// logging only
 						if (!m_indirect_tile_enable)
 						{
-							if (m_hCellCount==0x10)
+							//if (m_hCellCount==0x10)
 							{
 								for (int v = 0; v < m_vCellCount/*+16*/; v++)
 								{
@@ -1162,7 +1194,7 @@ x100(0x200) - 07b78 07c6b 07d5b 07e04 07ee7 07fd9 0806a 001a0 001a0 001a0 001a0 
 											int lookupnum = h + (v*m_hCellCount);
 											UINT32 spriteNumber = get_20bit_data( m_b3romoffset, lookupnum);
 											
-
+#if 0
 											printf("%05x (%08x,%d)  ",spriteNumber, (m_b3romoffset + (spriteNumber>>3)), spriteNumber&7 );
 
 
@@ -1171,6 +1203,53 @@ x100(0x200) - 07b78 07c6b 07d5b 07e04 07ee7 07fd9 0806a 001a0 001a0 001a0 001a0 
 											
 											if ((h == m_hCellCount-1) && (v == m_vCellCount-1))
 												printf("\n");
+#endif
+#if 1
+											int compdataoffset = (m_b3romoffset + (spriteNumber>>3));
+											// do some logging for the sprite mentioned above 'investigate this sprite' looking at compressed data used in the first column
+											//if ((compdataoffset==0x3e9030) && (h==0))
+											if ((compdataoffset >= 0x016590) && (compdataoffset<=0x0165e6) && (h==0))
+											{
+												printf("%05x (%08x,%d) | ",spriteNumber, compdataoffset, spriteNumber&7 );
+												
+
+												//00200 (00016590,0)  00200 (00016590,0)
+												//00210 (00016592,0)  00210 (00016592,0)
+
+												for (int i=0;i<18;i++)
+												{
+													UINT16 compdata = get_10bit_data( m_b3romoffset, spriteNumber + i);
+													printf("%03x ", compdata);
+
+													// as 20-bit
+													//	00200 (00016590,0) | 03c3e 0f83e 0f83e 0f83e 95e57 95e57 95e57 95e57 (03e57)
+													//	00210 (00016592,0) | 03e57 95e57 95e07 81e07 81e07 81e07 81e07 81e07 81e07
+
+													// as 10-bit (pretty, I like this)
+													/*                                                                                   |this is where 210 starts
+													00200 (00016590,0) | 00f 03e 03e 03e 03e 03e 03e 03e 257 257 257 257 257 257 257 257(00f 257)
+													00210 (00016592,0) | 00f 257 257 257 257 207 207 207 207 207 207 207 207 207 207 207 207 207
+													00251 (0001659a,1) | 00f 237 237 237 237 237 237 237 237 237 237 237 237 22f 22f 22f 22f 22f
+													00292 (000165a2,2) | 00f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f 21f
+													002b7 (000165a6,7) | 00f 0be 0be 0be 263 263 263 263 07e 07e 07e 07e 05e 00f 07e 07e 05e 247
+													002c4 (000165a8,4) | 00f 07e 07e 05e 247 247 247 247 247 247 247 247 247 247 247 247 20f 20f
+													002f4 (000165ae,4) | 00f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 20f 233 233 233 233 233
+													00335 (000165b6,5) | 00f 23b 23b 23b 23b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b 20b
+													00373 (000165be,3) | 00f 0fe 0fe 0fe 0fe 0fe 0fe 223 223 223 223 223 223 223 223 223 223 223
+													0038a (000165c1,2) | 00f 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223 223
+													003ac (000165c5,4) | 00f 17e 15e 1be 1be 1be 1be 1be 19e 217 217 217 217 217 217 217 217 00f
+													003bd (000165c7,5) | 00f 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217 217
+													003fe (000165cf,6) | 00f 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b 22b
+													00419 (000165d3,1) | 00f 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203 203
+													0045a (000165db,2) | 00f 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 227 253
+													0049b (000165e3,3) | 00f 213 213 213 213 213 213 213 213 13e 13e 13e 13e 13e 13e 21b 21b 21b
+													004b2 (000165e6,2) | 000 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b 21b
+													*/
+												}
+												printf("\n");
+											}
+#endif
+
 									}
 								}
 							}
