@@ -318,6 +318,8 @@ static void MainCheckPendingIRQ(scsp_state *scsp, UINT16 irq_type)
 
 	if(scsp->mcipd & scsp->mcieb)
 		scsp->main_irq(1);
+	else
+		scsp->main_irq(0);
 }
 
 static void ResetInterrupts(scsp_state *scsp)

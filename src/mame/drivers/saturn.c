@@ -1298,13 +1298,16 @@ void scsp_irq(device_t *device, int irq)
 
 WRITE_LINE_MEMBER(saturn_state::scsp_to_main_irq)
 {
-	if(!(m_scu.ism & IRQ_SOUND_REQ))
+	if(state)
 	{
-		m_maincpu->set_input_line_and_vector(9, HOLD_LINE, 0x46);
-		scu_do_transfer(5);
+		if(!(m_scu.ism & IRQ_SOUND_REQ))
+		{
+			m_maincpu->set_input_line_and_vector(9, HOLD_LINE, 0x46);
+			scu_do_transfer(5);
+		}
+		else
+			m_scu.ist |= (IRQ_SOUND_REQ);
 	}
-	else
-		m_scu.ist |= (IRQ_SOUND_REQ);
 }
 
 static const scsp_interface scsp_config =

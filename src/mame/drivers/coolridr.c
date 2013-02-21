@@ -1581,7 +1581,6 @@ READ32_MEMBER(coolridr_state::sysh1_sound_dma_r)
 		--x- ---- second SCSP
 		---x ---- first SCSP
 		*/
-		m_subcpu->set_input_line(0xe, CLEAR_LINE);
 		return sound_data;
 	}
 
@@ -2201,17 +2200,22 @@ static void scsp_irq(device_t *device, int irq)
 		device->machine().device("soundcpu")->execute().set_input_line(-irq, CLEAR_LINE);
 }
 
-/* TODO: how to clear the vector? */
 WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
 {
-	m_subcpu->set_input_line(0xe, ASSERT_LINE);
-	sound_data = 0x10;
+	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
+	if(state)
+		sound_data |= 0x10;
+	else
+		sound_data &= ~0x10;
 }
 
 WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
 {
-	m_subcpu->set_input_line(0xe, ASSERT_LINE);
-	sound_data = 0x20;
+	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
+	if(state)
+		sound_data |= 0x20;
+	else
+		sound_data &= ~0x20;
 }
 
 static const scsp_interface scsp_config =
