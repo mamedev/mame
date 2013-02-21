@@ -363,7 +363,6 @@ at 0xDE60.
 #include "machine/am9517a.h"
 #include "rendlay.h"
 
-//#define FAKE_ASCII_ROM
 
 class coolridr_state : public driver_device
 {
@@ -1285,25 +1284,18 @@ investigate this sprite
 								// TODO: Study the CRT test and "Cool Riders" logo for clues.
 								UINT32 spriteNumber = 0;
 
-								// with this bit enabled the tile numbers gets looked up using 'data' (which would be m_blit11) (eg 03f40000 for startup text)
-								// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
-								if (m_indirect_tile_enable)
-								{
-									const UINT32 memOffset = data;
-									spriteNumber = space.read_byte(memOffset + h + (v*m_hCellCount));
-
-									// DEBUG: For demo purposes, skip &spaces and NULL characters
-									if (spriteNumber == 0x20 || spriteNumber == 0x00)
-										continue;
-	#ifdef FAKE_ASCII_ROM
-									drawgfx_opaque(*drawbitmap,drawbitmap->cliprect(), machine().gfx[3],spriteNumber,0,0,0,pixelOffsetX,pixelOffsetY);
-									continue;
-	#endif
-								}
-								else
 								{
 									int lookupnum = h + (v*m_hCellCount);
-									
+								
+									// with this bit enabled the tile numbers gets looked up using 'data' (which would be m_blit11) (eg 03f40000 for startup text)
+									// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
+									if (m_indirect_tile_enable)
+									{
+										const UINT32 memOffset = data;
+										lookupnum = space.read_byte(memOffset + h + (v*m_hCellCount));
+									}
+
+
 									// these should be 'cell numbers' (tile numbers) which look up RLE data?
 									spriteNumber = get_20bit_data( m_b3romoffset, lookupnum);		
 
@@ -1813,16 +1805,6 @@ static const gfx_layout test =
 #endif
 
 
-static const gfx_layout fakeascii =
-{
-	16,16,
-	512,
-	4,
-	{ 0,1,2,3 },
-	{ 0*4,0*4,1*4,1*4,2*4,2*4,3*4,3*4,4*4,4*4,5*4,5*4,6*4,6*4, 7*4,7*4 },
-	{ 0*8*4,0*8*4, 1*8*4,1*8*4, 2*8*4,2*8*4, 3*8*4,3*8*4, 4*8*4,4*8*4, 5*8*4,5*8*4, 6*8*4,6*8*4, 7*8*4,7*8*4 },
-	8*8*4
-};
 
 
 static GFXDECODE_START( coolridr )
@@ -1830,7 +1812,6 @@ static GFXDECODE_START( coolridr )
 	GFXDECODE_ENTRY( "gfx_data", 0, tiles16x16_layout, 0, 0x100 )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles16x16_layout, 0, 0x100 )
 	GFXDECODE_ENTRY( "ram_gfx", 0, tiles16x16_layout, 0, 0x100 )
-	GFXDECODE_ENTRY( "fakeascii", 0x18000, fakeascii, 0x1000, 16 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( coolridr )
@@ -2354,12 +2335,6 @@ ROM_START( coolridr )
 
 	ROM_REGION( 0x80000, "scsp2", 0 )   /* second SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
-
-
-	ROM_REGION( 0x2800000, "fakeascii", ROMREGION_ERASEFF )
-#ifdef FAKE_ASCII_ROM
-	ROM_LOAD( "video", 0x000000, 0x020000,  CRC(8857ec5a) SHA1(5bed14933af060cb4a1ce6a961c4ca1467a1cbc2) ) // dump of the orunners video ram so we can use the charset (its 8x8 not 16x16 tho, but who cares)
-#endif
 ROM_END
 
 
