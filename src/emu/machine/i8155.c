@@ -201,9 +201,9 @@ inline void i8155_device::write_port(int port, UINT8 data)
 i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, I8155, "Intel 8155", tag, owner, clock),
 		device_memory_interface(mconfig, *this),
-		m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, NULL, *ADDRESS_MAP_NAME(i8155)),
 		m_command(0),
-		m_status(0)
+		m_status(0),
+		m_space_config("ram", ENDIANNESS_LITTLE, 8, 8, 0, NULL, *ADDRESS_MAP_NAME(i8155))
 {
 }
 
