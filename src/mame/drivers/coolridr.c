@@ -450,6 +450,7 @@ public:
 	UINT8 sound_data;
 
 	UINT8* m_compressedgfx;
+	UINT32 get_20bit_data(UINT32 romoffset, int _20bitwordnum);
 
 	DECLARE_READ32_MEMBER(sysh1_sound_dma_r);
 	DECLARE_WRITE32_MEMBER(sysh1_sound_dma_w);
@@ -612,6 +613,51 @@ WRITE32_MEMBER(coolridr_state::sysh1_ioga_w)
 }
 #endif
 
+
+
+
+#define READ_COMPRESSED_ROM(chip) \
+	m_compressedgfx[(chip)*0x400000 + romoffset] << 8 | m_compressedgfx[(chip)*0x0400000 + romoffset +1]; \
+
+// this helps you feth the 20bit words from an address in the compressed data
+UINT32 coolridr_state::get_20bit_data(UINT32 romoffset, int _20bitwordnum)
+{
+	UINT16 testvalue, testvalue2;
+
+	int temp = _20bitwordnum & 3;
+	int inc = 0;
+	if (_20bitwordnum&4) inc = 5;
+
+	romoffset += (_20bitwordnum>>3)*2;
+
+
+
+	if (temp==0)
+	{
+		testvalue  = READ_COMPRESSED_ROM(0+inc);
+		testvalue2 = READ_COMPRESSED_ROM(1+inc);
+		return (testvalue << 4) | (testvalue2 & 0xf000) >> 12;
+	}
+	else if (temp==1)
+	{
+		testvalue  = READ_COMPRESSED_ROM(1+inc);
+		testvalue2 = READ_COMPRESSED_ROM(2+inc);
+		return ((testvalue & 0x0fff) << 8) | (testvalue2 & 0xff00) >> 8;
+	}
+	else if (temp==2)
+	{
+		testvalue  = READ_COMPRESSED_ROM(2+inc);
+		testvalue2 = READ_COMPRESSED_ROM(3+inc);
+		return ((testvalue & 0x00ff) << 12) | (testvalue2 & 0xfff0) >> 4;
+	}
+	else // temp == 3
+	{
+		testvalue  = READ_COMPRESSED_ROM(3+inc);
+		testvalue2 = READ_COMPRESSED_ROM(4+inc);
+		return ((testvalue & 0x000f) << 16) | (testvalue2);
+	}
+
+}
 
 /* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
 WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
@@ -798,14 +844,10 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 #if 0
 							// if we look in rom IC6 (+0x2400000) then the word before our offset is very often 0x0000 probably indicating that's the last word used
 							printf("rom offset %08x, previous values : ", m_b3romoffset);
-							for (int i=0;i<10;i++)
+							for (int i=0;i<8;i++)
 							{
-								UINT16 testvalue = m_compressedgfx[i*0x400000 + m_b3romoffset - 2] << 8 | m_compressedgfx[i*0x0400000 + m_b3romoffset - 1];
-								if ((i==0) || (i==5)) printf("%04x", testvalue);
-								if ((i==1) || (i==6)) printf("%01x %03x", (testvalue & 0xf000) >> 12, testvalue & 0x0fff);
-								if ((i==2) || (i==7)) printf("%02x %02x", (testvalue & 0xff00) >> 8, testvalue & 0x00ff);
-								if ((i==3) || (i==8)) printf("%03x %01x", (testvalue & 0xfff0) >> 4, testvalue & 0x000f);
-								if ((i==4) || (i==9)) printf("%04x ", testvalue);
+								UINT32 dat20 = get_20bit_data( m_b3romoffset, i);
+								printf("%05x ",dat20);
 							}
 							printf("\n");
 #endif
@@ -815,19 +857,36 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							// 0008, 0000, 8000, 0800, 0080, 0008, 0000, 8000, 0800, 0080,
 							//   1     2     3     4     5     6     7     8     9    10
 							// so you can see 1/6  2/7,  3/8,  4/9,  5/10 are often similar or the same
-							printf("rom offset %08x, values : ", m_b3romoffset);
-							for (int i=0;i<10;i++)
+							if (m_b3romoffset == 0x0000848e)
 							{
-								UINT16 testvalue = m_compressedgfx[i*0x400000 + m_b3romoffset] << 8 | m_compressedgfx[i*0x0400000 + m_b3romoffset +1];
-								if ((i==0) || (i==5)) printf("%04x", testvalue);
-								if ((i==1) || (i==6)) printf("%01x %03x", (testvalue & 0xf000) >> 12, testvalue & 0x0fff);
-								if ((i==2) || (i==7)) printf("%02x %02x", (testvalue & 0xff00) >> 8, testvalue & 0x00ff);
-								if ((i==3) || (i==8)) printf("%03x %01x", (testvalue & 0xfff0) >> 4, testvalue & 0x000f);
-								if ((i==4) || (i==9)) printf("%04x ", testvalue);
-
+								printf("rom offset %08x, values : \n", m_b3romoffset);
+							
+								for (int b=0;b<8;b++)
+								{
+									for (int i=0;i<8;i++)
+									{
+										UINT32 dat20 = get_20bit_data( m_b3romoffset, i+b*8);
+										printf("%05x ",dat20);
+									}
+									printf("\n");
+								}
+								printf("\n");
 							}
-							printf("\n");
+							/*
+							rom offset 0000848e, values :
+							00a00 00a00 00a00 00a00 00a00 00a02 00a3d 00a98
+							00afa 00b3f 00b95 00be9 00c4d 00c89 00a00 00cd3
+							00d17 00d4b 00d94 00dee 00e50 00eb0 00f16 00f62
+							00fce 00a00 00a00 00a00 00a00 00a00 00a00 00a00
+							00a00 00a00 00a00 00a00 00ff2 0101d 01060 0109d
+							010d2 01112 01148 01194 011be 00a00 011f1 0121c
+							0123f 01272 012af 012f0 0132c 01377 013af 01400
+							00a00 00a00 00a00 00a00 00a00 00a00 00000 00000
+							*/
 
+
+
+		
 
 							// these are used for slider bars in test mode
 							//	rom offset 00140000, values : 0008, 0000, 8000, 0800, 0080, 0008, 0000, 8000, 0800, 0080,
@@ -1039,7 +1098,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 
 								// It's unknown if it's row-major or column-major
 								// TODO: Study the CRT test and "Cool Riders" logo for clues.
-								UINT8 spriteNumber = 0;
+								UINT32 spriteNumber = 0;
 
 								// with this bit enabled the tile numbers gets looked up using 'data' (which would be m_blit11) (eg 03f40000 for startup text)
 								// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
@@ -1056,7 +1115,27 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 									continue;
 	#endif
 								}
+								else
+								{
+									int lookupnum = h + (v*h);
+									
+									// these should be 'cell numbers' (tile numbers) which look up RLE data?
+									spriteNumber = get_20bit_data( m_b3romoffset, lookupnum);
+									/*
 
+									printf("%05x ",spriteNumber);
+									//if ((h == m_hCellCount-1) && (v == m_vCellCount-1))
+									//	printf("\n");
+
+									if ((h == m_hCellCount-1))
+										printf("\n");
+
+									*/
+
+									//if (spriteNumber == 0x00)
+									//	continue;
+									
+								}
 
 								int blockwide = ((16*m_hZoom)/0x40)-1;
 								int blockhigh = ((16*m_vZoom)/0x40)-1;
@@ -1111,6 +1190,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 								}
 							}
 						}
+
+						//printf("\n");
+
 					}
 				}
 				else
