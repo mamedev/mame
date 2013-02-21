@@ -2867,7 +2867,7 @@
 		<publisher>Control Data</publisher>
 		<info name="serial" value="PHM 3122"/>
 		<part name="cart" interface="ti99_cart">
-			<feature name="pcb" value="standard"/>
+			<feature name="pcb" value="gromemu"/>
 			<dataarea name="grom_socket" size="0x7800">
 				<rom name="phm3122g.bin" size="0x7800" crc="3c9819cd" sha1="2dbbadb059fd8e3c30e9467f3e2f679502bcdb9c" offset="0x0000" />
 			</dataarea>
