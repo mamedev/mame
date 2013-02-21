@@ -124,6 +124,8 @@ enum
 
 tms9995_device::tms9995_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, TMS9995, "TMS9995", tag, owner, clock),
+		m_state_any(0),
+		PC_debug(0),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
 		m_io_config("cru", ENDIANNESS_BIG, 8, 16),
 		m_prgspace(NULL),
@@ -1476,10 +1478,17 @@ void tms9995_device::service_interrupt()
 		m_hold_state = false;
 		m_wait_state = false;
 		m_lowbyte = false;
+		m_check_hold = false;
+		m_word_access = false;
+		m_int4_active = false;
 
 		m_pass = 0;
 		m_instindex = 0;
 		m_instruction = &m_decoded[m_instindex];
+
+		memset(m_flag, 0, sizeof(m_flag));
+
+		ST = 0;
 
 		// The auto-wait state generation is turned on when the READY line is cleared
 		// on RESET.
