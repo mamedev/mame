@@ -507,7 +507,7 @@ void coolridr_state::video_start()
 UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
 	/* planes seems to basically be at 0x8000 and 0x28000... */
-	gfx_element *gfx = machine().gfx[2];
+	gfx_element *gfx = machine().gfx[0];
 	UINT32 count;
 	int y,x;
 	int color;
@@ -1501,7 +1501,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_char_w)
 		gfx[offset*4+2] = (m_h1_charram[offset] & 0x0000ff00) >> 8;
 		gfx[offset*4+3] = (m_h1_charram[offset] & 0x000000ff) >> 0;
 
-		machine().gfx[2]->mark_dirty(offset/64); //*4/256
+		machine().gfx[0]->mark_dirty(offset/64); //*4/256
 	}
 }
 
@@ -1711,26 +1711,7 @@ static const gfx_layout tiles16x16_layout =
 };
 
 
-#if 0
-static const gfx_layout test =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 0*4,1*4,2*4,3*4,4*4,5*4,6*4, 7*4 },
-	{ 0*8*4, 1*8*4, 2*8*4, 3*8*4, 4*8*4, 5*8*4, 6*8*4, 7*8*4 },
-	8*8*4
-};
-#endif
-
-
-
-
 static GFXDECODE_START( coolridr )
-//  GFXDECODE_ENTRY( "maincpu_data", 0, tiles16x16_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx_data", 0, tiles16x16_layout, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx5", 0, tiles16x16_layout, 0, 0x100 )
 	GFXDECODE_ENTRY( "ram_gfx", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
@@ -2152,8 +2133,8 @@ void coolridr_state::machine_start()
 
 //	memcpy(memregion("soundcpu")->base(), memregion("maincpu")->base()+0x100000, 0x80000);
 //	m_soundcpu->reset();
-	m_compressedgfx = memregion( "gfx5" )->base();
-	size_t  size    = memregion( "gfx5" )->bytes();
+	m_compressedgfx = memregion( "compressedgfx" )->base();
+	size_t  size    = memregion( "compressedgfx" )->bytes();
 
 	// we're expanding 10bit packed data to 16bits(10 used)
 	m_expanded_10bit_gfx = auto_alloc_array(machine(), UINT16, ((size/10)*16)/2);
@@ -2322,7 +2303,7 @@ ROM_START( coolridr )
 	ROM_LOAD16_WORD_SWAP( "ep17662.12", 0x000000, 0x020000,  CRC(50d66b1f) SHA1(f7b7f2f5b403a13b162f941c338a3e1207762a0b) )
 
 	/* these are compressed sprite data */
-	ROM_REGION( 0x2800000, "gfx5", ROMREGION_ERASEFF )
+	ROM_REGION( 0x2800000, "compressedgfx", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "mpr-17644.ic5", 0x0000000, 0x0400000, CRC(80199c79) SHA1(e525d8ee9f9176101629853e50cca73b02b16a38) ) // 0004
 	ROM_LOAD16_WORD_SWAP( "mpr-17643.ic4", 0x0400000, 0x0400000, CRC(5100f23b) SHA1(659c2300399ff1cbd24fb1eb18cfd6c26e06fd96) ) // 9000
 	ROM_LOAD16_WORD_SWAP( "mpr-17642.ic3", 0x0800000, 0x0400000, CRC(1a5bcc73) SHA1(a7df04c0a326323ea185db5f55b3e0449d76c535) ) // 4900
@@ -2368,4 +2349,5 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
 }
 
-GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND ) // region is set in test mode
+GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND ) // region is set in test mode, this set is for Japan, USA and Export (all regions)
+
