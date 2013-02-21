@@ -400,6 +400,8 @@ public:
 	UINT16 m_textOffset;
 	UINT16 m_vCellCount;
 	UINT16 m_hCellCount;
+	UINT32 m_blitterClearMode;
+	INT16 m_blitterClearCount;
 	int m_vPosition;
 	int m_hPosition;
 
@@ -446,6 +448,8 @@ public:
 	required_shared_ptr<UINT16> m_soundram2;
 	bitmap_rgb32 m_temp_bitmap_sprites;
 	bitmap_rgb32 m_temp_bitmap_sprites2;
+	bitmap_rgb32 m_screen1_bitmap;
+	bitmap_rgb32 m_screen2_bitmap;
 	int m_color;
 	UINT8 m_vblank;
 	int m_scsp_last_line;
@@ -488,6 +492,9 @@ public:
 	INTERRUPT_GEN_MEMBER(system_h1);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_main);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
+
+	void sysh1_dma_transfer( address_space &space, UINT16 dma_index );
+
 };
 
 #define PRINT_BLIT_STUFF \
@@ -500,6 +507,8 @@ void coolridr_state::video_start()
 {
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2);
+	machine().primary_screen->register_screen_bitmap(m_screen1_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_screen2_bitmap);
 }
 
 // might be a page 'map / base' setup somewhere, but it's just used for ingame backgrounds
@@ -571,13 +580,11 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 
 	if (which==0)
 	{
-		copybitmap_trans(bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, cliprect, 0);
-		m_temp_bitmap_sprites.fill(0, cliprect);
+		copybitmap_trans(bitmap, m_screen1_bitmap, 0, 0, 0, 0, cliprect, 0);
 	}
 	else
 	{
-		copybitmap_trans(bitmap, m_temp_bitmap_sprites2, 0, 0, 0, 0, cliprect, 0);
-		m_temp_bitmap_sprites2.fill(0, cliprect);
+		copybitmap_trans(bitmap, m_screen2_bitmap, 0, 0, 0, 0, cliprect, 0);
 	}
 
 	return 0;
@@ -624,7 +631,11 @@ WRITE32_MEMBER(coolridr_state::sysh1_ioga_w)
 
 
 
+/*
+			if(type == 4)
 
+
+*/
 
 /* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
 WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
@@ -634,6 +645,77 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 
 	switch(offset)
 	{
+		/*
+		This does the fb display/clear phases of blitter data processed in the previous frame.
+		And yes, game effectively runs at 30 Hz (because data processing happens on even frames, actual display transfer happens on odd frames).
+		screen 1
+		8c200000 06
+		00000001 07
+		0000017f 07 Y range (upper start, lower end)
+		000701f7 07 X range (upper start, lower end)
+		00000007 07 enable?
+		screen 2
+		8c800000 06
+		00000001 07
+		0000017f 07
+		020703f7 07
+		00000207 07 enable plus clear?
+		*/
+		case 0x06:
+			m_blitterClearMode = m_sysh1_txt_blit[offset];
+
+			if(m_blitterClearMode != 0x8c200000 && m_blitterClearMode != 0x8c800000)
+				printf("Blitter Clear used with param %08x\n",m_blitterClearMode);
+
+			m_blitterClearCount = 0;
+			break;
+
+		case 0x07:
+			if(m_blitterClearCount == 0)
+			{
+				if(m_sysh1_txt_blit[offset] != 1)
+					printf("Blitter Clear Count == 0 used with param %08x\n",m_sysh1_txt_blit[offset]);
+			}
+			else if(m_blitterClearCount == 1)
+			{
+				if(m_sysh1_txt_blit[offset] != 0x17f)
+					printf("Blitter Clear Count == 1 used with param %08x\n",m_sysh1_txt_blit[offset]);
+			}
+			else if(m_blitterClearCount == 2)
+			{
+				if(m_sysh1_txt_blit[offset] != 0x000701f7 && m_sysh1_txt_blit[offset] != 0x020703f7)
+					printf("Blitter Clear Count == 2 used with param %08x\n",m_sysh1_txt_blit[offset]);
+			}
+			else if(m_blitterClearCount == 3)
+			{
+				if(m_sysh1_txt_blit[offset] != 0x00000007 && m_sysh1_txt_blit[offset] != 0x00000207)
+					printf("Blitter Clear Count == 3 used with param %08x\n",m_sysh1_txt_blit[offset]);
+
+				{
+					const rectangle& visarea = machine().primary_screen->visible_area();
+
+					if(m_blitterClearMode == 0x8c200000)
+					{
+						copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, visarea);
+						m_temp_bitmap_sprites.fill(0, visarea);
+					}
+
+					if(m_blitterClearMode == 0x8c800000)
+					{
+						copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2, 0, 0, 0, 0, visarea);
+						m_temp_bitmap_sprites2.fill(0, visarea);
+					}
+				}
+			}
+			else
+			{
+				printf("Blitter Clear Count == %02x used with param %08x\n",m_blitterClearCount,m_sysh1_txt_blit[offset]);
+			}
+
+
+			m_blitterClearCount++;
+			break;
+
 		// The mode register
 		case 0x04:
 		{
@@ -1255,7 +1337,7 @@ investigate this sprite
 									}
 								}
 
-								
+
 								// these should be 'cell numbers' (tile numbers) which look up RLE data?
 								UINT32 spriteNumber = (m_expanded_10bit_gfx[ (m_b3romoffset << 3) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (m_b3romoffset << 3) + (lookupnum<<1) + 1 ]);
 
@@ -1327,7 +1409,7 @@ investigate this sprite
 								// DEBUG: Draw 16x16 block
 								UINT32* line;
 								if (m_b4flipy)
-								{						
+								{
 									for (int y = 0; y < 16; y++)
 									{
 										const int drawy = pixelOffsetY+y;
@@ -1473,19 +1555,18 @@ WRITE32_MEMBER(coolridr_state::sysh1_pal_w)
 
 
 /* FIXME: this seems to do a hell lot of stuff, it's not ST-V SCU but still somewhat complex :/ */
-static void sysh1_dma_transfer( address_space &space, UINT16 dma_index )
+void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index )
 {
-	coolridr_state *state = space.machine().driver_data<coolridr_state>();
 	UINT32 src,dst,size,type,s_i;
 	UINT8 end_dma_mark;
 
 	end_dma_mark = 0;
 
 	do{
-		src = (state->m_framebuffer_vram[(0+dma_index)/4] & 0x0fffffff);
-		dst = (state->m_framebuffer_vram[(4+dma_index)/4]);
-		size = state->m_framebuffer_vram[(8+dma_index)/4];
-		type = (state->m_framebuffer_vram[(0+dma_index)/4] & 0xf0000000) >> 28;
+		src = (m_framebuffer_vram[(0+dma_index)/4] & 0x0fffffff);
+		dst = (m_framebuffer_vram[(4+dma_index)/4]);
+		size = m_framebuffer_vram[(8+dma_index)/4];
+		type = (m_framebuffer_vram[(0+dma_index)/4] & 0xf0000000) >> 28;
 
 		#if 0
 		if(type == 0xc || type == 0xd || type == 0xe)
