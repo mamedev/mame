@@ -2495,7 +2495,21 @@ TODO: both irq routines writes 1 to 0x60d8894, sets up the Watchdog timer then e
 	  vector is 0x7f (so VBR+0x1fc)
 	  level is 0xf
 ... and indeed the Watchdog irq routine effectively clears this RAM buffer. What the manual doesn't say is that the Watchdog timer irq
-    presumably is an NMI if this is even possible ...
+    presumably is treated as an NMI by the SH-2 CPU and not really a "normal" irq exception.
+    For the record, here's the ITI code snippet:
+    06002DE4: 2F36   MOV.L   R3,@-SP
+	06002DE6: E300   MOV     #$00,R3
+	06002DE8: 2F26   MOV.L   R2,@-SP
+	06002DEA: D20B   MOV.L   @($2C,PC),R2
+	06002DEC: 2230   MOV.B   R3,@R2 ;writes 0 to the RAM buffer 0x60d8896
+	06002DEE: 9305   MOV.W   @($000A,PC),R3
+	06002DF0: 9205   MOV.W   @($000A,PC),R2
+	06002DF2: 2231   MOV.W   R3,@R2 ;writes 0x19, disables the watchdog timer
+	06002DF4: 62F6   MOV.L   @SP+,R2
+	06002DF6: 63F6   MOV.L   @SP+,R3
+	06002DF8: 002B   RTE
+	06002DFA: 0009   NOP
+
 */
 READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 {
