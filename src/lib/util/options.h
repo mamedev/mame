@@ -70,6 +70,7 @@ const int OPTION_PRIORITY_NORMAL    = 100;          // normal priority
 const int OPTION_PRIORITY_HIGH      = 150;          // high priority
 const int OPTION_PRIORITY_MAXIMUM   = 255;          // maximum priority
 
+const UINT32 OPTION_FLAG_INTERNAL = 0x40000000;
 
 
 //**************************************************************************
@@ -114,6 +115,7 @@ public:
 		UINT32 flags() const { return m_flags; }
 		bool is_header() const { return type() == OPTION_HEADER; }
 		bool is_command() const { return type() == OPTION_COMMAND; }
+		bool is_internal() const { return m_flags & OPTION_FLAG_INTERNAL; }
 		bool has_range() const { return (m_minimum && m_maximum); }
 		int priority() const { return m_priority; }
 

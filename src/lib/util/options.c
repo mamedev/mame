@@ -512,25 +512,28 @@ const char *core_options::output_ini(astring &buffer, const core_options *diff)
 		// otherwise, output entries for all non-command items
 		else if (!curentry->is_command())
 		{
-			// look up counterpart in diff, if diff is specified
-			if (diff == NULL || strcmp(value, diff->value(name)) != 0)
+			if ( !curentry->is_internal() )
 			{
-				// output header, if we have one
-				if (last_header != NULL)
+				// look up counterpart in diff, if diff is specified
+				if (diff == NULL || strcmp(value, diff->value(name)) != 0)
 				{
-					if (num_valid_headers++)
-						buffer.catprintf("\n");
-					buffer.catprintf("#\n# %s\n#\n", last_header);
-					last_header = NULL;
-				}
+					// output header, if we have one
+					if (last_header != NULL)
+					{
+						if (num_valid_headers++)
+							buffer.catprintf("\n");
+						buffer.catprintf("#\n# %s\n#\n", last_header);
+						last_header = NULL;
+					}
 
-				// and finally output the data, skip if unadorned
-				if (!is_unadorned)
-				{
-					if (strchr(value, ' ') != NULL)
-						buffer.catprintf("%-25s \"%s\"\n", name, value);
-					else
-						buffer.catprintf("%-25s %s\n", name, value);
+					// and finally output the data, skip if unadorned
+					if (!is_unadorned)
+					{
+						if (strchr(value, ' ') != NULL)
+							buffer.catprintf("%-25s \"%s\"\n", name, value);
+						else
+							buffer.catprintf("%-25s %s\n", name, value);
+					}
 				}
 			}
 		}
