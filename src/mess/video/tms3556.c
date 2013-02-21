@@ -84,7 +84,9 @@ tms3556_device::tms3556_device(const machine_config &mconfig, const char *tag, d
 		m_reg_ptr(0),
 		m_reg_access_phase(0),
 		m_magical_mystery_flag(0),
-		m_scanline(0)
+		m_scanline(0),
+		m_blink(0),
+		m_blink_count(0)
 {
 	for (int i = 0; i < 8; i++)
 	{
