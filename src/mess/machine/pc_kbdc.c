@@ -69,7 +69,9 @@ const device_type PC_KBDC = &device_creator<pc_kbdc_device>;
 //-------------------------------------------------
 pc_kbdc_device::pc_kbdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, PC_KBDC, "PC_KBDC", tag, owner, clock),
+		m_clock_state(-1),
 		m_data_state(-1),
+		m_kb_clock_state(1),
 		m_kb_data_state(1),
 		m_keyboard( NULL )
 {
