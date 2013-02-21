@@ -1076,25 +1076,54 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 							break;
 						}
 
+#if 0
+						// logging only
+						if (!m_indirect_tile_enable)
+						{
+							//if (m_hCellCount==0xf)
+							{
+								for (int v = 0; v < m_vCellCount; v++)
+								{
+									for (int h = 0; h < m_hCellCount; h++)
+									{
+											int lookupnum = h + (v*m_hCellCount);
+											UINT32 spriteNumber = get_20bit_data( m_b3romoffset, lookupnum);
+					
+											printf("%05x ",spriteNumber);
+											//if ((h == m_hCellCount-1) && (v == m_vCellCount-1))
+											//	printf("\n");
+
+											if ((h == m_hCellCount-1))
+												printf("\n");
+						
+									}
+								}
+							}
+						}
+#endif
 
 						// Splat some sprites
 						for (int v = 0; v < m_vCellCount; v++)
 						{
 							const int pixelOffsetY = ((m_vPosition) + (v* 16 * m_vZoom)) / 0x40;
+							
 							if (pixelOffsetY>383)
 							{
 								v = m_vCellCount;
 								continue;
 							}
+							
 
 							for (int h = 0; h < m_hCellCount; h++)
 							{
 								const int pixelOffsetX = ((m_hPosition) + (h* 16 * m_hZoom)) / 0x40;
+								
 								if (pixelOffsetX>495)
 								{
 									h = m_hCellCount;
 									continue;
 								}
+								
 
 								// It's unknown if it's row-major or column-major
 								// TODO: Study the CRT test and "Cool Riders" logo for clues.
@@ -1105,7 +1134,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 								if (m_indirect_tile_enable)
 								{
 									const UINT32 memOffset = data;
-									spriteNumber = space.read_byte(memOffset + h + (v*h));
+									spriteNumber = space.read_byte(memOffset + h + (v*m_hCellCount));
 
 									// DEBUG: For demo purposes, skip &spaces and NULL characters
 									if (spriteNumber == 0x20 || spriteNumber == 0x00)
@@ -1117,20 +1146,10 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 								}
 								else
 								{
-									int lookupnum = h + (v*h);
+									int lookupnum = h + (v*m_hCellCount);
 									
 									// these should be 'cell numbers' (tile numbers) which look up RLE data?
-									spriteNumber = get_20bit_data( m_b3romoffset, lookupnum);
-									/*
-
-									printf("%05x ",spriteNumber);
-									//if ((h == m_hCellCount-1) && (v == m_vCellCount-1))
-									//	printf("\n");
-
-									if ((h == m_hCellCount-1))
-										printf("\n");
-
-									*/
+									spriteNumber = get_20bit_data( m_b3romoffset, lookupnum);		
 
 									//if (spriteNumber == 0x00)
 									//	continue;
