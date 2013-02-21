@@ -1717,7 +1717,7 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 ADDRESS_MAP_END
 
-/* TODO: what is this for, mixing? */
+/* TODO: what is this for, volume mixing? MIDI? */
 WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
 {
 	sound_fifo_full = data & 0x80;
