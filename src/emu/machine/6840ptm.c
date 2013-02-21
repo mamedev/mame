@@ -159,12 +159,15 @@ void ptm6840_device::device_reset()
 	m_t3_divisor             = 1;
 	m_status_read_since_int = 0;
 	m_IRQ                   = 0;
+	m_t3_scaler				= 0;
 	for (int i = 0; i < 3; i++)
 	{
 		m_counter[i] = 0xffff;
 		m_latch[i]   = 0xffff;
 		m_output[i]  = 0;
 		m_fired[i]   = 0;
+		m_enabled[i] = 0;
+		m_mode[i] = 0;
 	}
 }
 
