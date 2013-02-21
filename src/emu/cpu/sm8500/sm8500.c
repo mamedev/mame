@@ -35,6 +35,11 @@ sm8500_cpu_device::sm8500_cpu_device(const machine_config &mconfig, const char *
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_dma_func(*this)
 	, m_timer_func(*this)
+	, m_PC(0)
+	, m_SYS(0)
+	, m_SP(0)
+	, m_PS0(0)
+	, m_PS1(0)
 {
 }
 
