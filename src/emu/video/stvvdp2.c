@@ -4472,8 +4472,9 @@ void saturn_state::stv_vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle 
 		/* Magical Drop III 0x200 -> color calculation window */
 		/* Ide Yousuke Meijin No Shin Jissen Mahjong 0x0303 */
 		/* Decathlete 0x088 */
-		if(STV_VDP2_WCTLD & 0x2000)
-			popmessage("Special window enabled %04x, contact MAMEdev",STV_VDP2_WCTLD);
+		/* Sexy Parodius 0x2300 */
+//		if(STV_VDP2_WCTLD & 0x2000)
+//			popmessage("Special window enabled %04x, contact MAMEdev",STV_VDP2_WCTLD);
 
 		/* Shining Force III, After Burner 2 (doesn't make a proper use tho?) */
 		/* Layer Section */

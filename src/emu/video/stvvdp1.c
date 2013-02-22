@@ -182,8 +182,23 @@ READ16_MEMBER( saturn_state::saturn_vdp1_regs_r )
 
 void saturn_state::stv_clear_framebuffer( int which_framebuffer )
 {
+	int start_x, end_x, start_y, end_y;
+
+	/*
+	TODO: needs to check in Hi-Res mode
+	*/
+	start_x = STV_VDP1_EWLR_X1 * 8;
+	start_y = STV_VDP1_EWLR_Y1;
+	end_x = STV_VDP1_EWRR_X3 * 8;
+	end_y = STV_VDP1_EWRR_Y3+1;
+//	popmessage("%d %d %d %d",STV_VDP1_EWLR_X1,STV_VDP1_EWLR_Y1,STV_VDP1_EWRR_X3,STV_VDP1_EWRR_Y3);
+
+	for(int y=start_y;y<end_y;y++)
+		for(int x=start_x;x<end_x;x++)
+			m_vdp1.framebuffer[ which_framebuffer ][(x+y*512)] = m_vdp1.ewdr;
+
 	if ( VDP1_LOG ) logerror( "Clearing %d framebuffer\n", m_vdp1.framebuffer_current_draw );
-	memset( m_vdp1.framebuffer[ which_framebuffer ], m_vdp1.ewdr, 1024 * 256 * sizeof(UINT16) * 2 );
+//	memset( m_vdp1.framebuffer[ which_framebuffer ], m_vdp1.ewdr, 1024 * 256 * sizeof(UINT16) * 2 );
 }
 
 

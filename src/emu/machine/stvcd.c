@@ -688,6 +688,16 @@ void saturn_state::cd_exec_command( void )
 				cr2 = 0;
 				cr3 = 0;
 				cr4 = 0;
+
+
+				if(machine().input().code_pressed(KEYCODE_Z))
+				{
+					cr1 = cd_stat | (machine().rand() & 0xff);
+					cr2 = machine().rand();
+					cr3 = machine().rand();
+					cr4 = machine().rand();
+				}
+
 				hirqreg |= (CMOK|ESEL);
 			}
 			break;
