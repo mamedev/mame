@@ -1248,14 +1248,19 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 								}
 
 
+								if (!m_hZoom || !m_vZoom)
+								{
+									m_blitterSerialCount++;
+									return;
+								}
+
+								int blockwide = ((16*m_hZoom)/0x40);
+								int blockhigh = ((16*m_vZoom)/0x40);
+	
 
 
-
-								int blockwide = ((16*m_hZoom)/0x40)-1;
-								int blockhigh = ((16*m_vZoom)/0x40)-1;
-								// hack
-								if (blockwide<=0) blockwide = 1;
-								if (blockhigh<=0) blockhigh = 1;
+								UINT32 incx = 0x8000000 / m_hZoom;
+								UINT32 incy = 0x8000000 / m_vZoom;
 
 								// DEBUG: Draw 16x16 block
 								UINT32* line;
@@ -1268,6 +1273,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 											const int drawy = pixelOffsetY+y;
 											if ((drawy>383) || (drawy<0)) continue;
 											line = &drawbitmap->pix32(drawy);
+											int realy = ((y*incy)>>21);
 
 											if (used_flipx)
 											{
@@ -1275,8 +1281,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 												{
 													const int drawx = pixelOffsetX+x;
 													if ((drawx>=495 || drawx<0)) continue;
+													int realx = ((x*incx)>>21);
 
-													UINT16 pix = m_tempshape[(15-x)*16+(15-y)];
+													UINT16 pix = m_tempshape[(15-realx)*16+(15-realy)];
 													if (pix )
 														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
 												}
@@ -1287,8 +1294,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 												{
 													const int drawx = pixelOffsetX+x;
 													if ((drawx>=495 || drawx<0)) continue;
+													int realx = ((x*incx)>>21);
 
-													UINT16 pix = m_tempshape[(15-x)*16+y];
+													UINT16 pix = m_tempshape[(15-realx)*16+realy];
 													if (pix )
 														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
 												}
@@ -1302,6 +1310,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 											const int drawy = pixelOffsetY+y;
 											if ((drawy>383) || (drawy<0)) continue;
 											line = &drawbitmap->pix32(drawy);
+											int realy = ((y*incy)>>21);
 
 											if (used_flipx)
 											{
@@ -1309,8 +1318,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 												{
 													const int drawx = pixelOffsetX+x;
 													if ((drawx>=495 || drawx<0)) continue;
+													int realx = ((x*incx)>>21);
 
-													UINT16 pix = m_tempshape[x*16+(15-y)];
+													UINT16 pix = m_tempshape[realx*16+(15-realy)];
 													if (pix )
 														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
 												}
@@ -1321,8 +1331,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 												{
 													const int drawx = pixelOffsetX+x;
 													if ((drawx>=495 || drawx<0)) continue;
+													int realx = ((x*incx)>>21);
 
-													UINT16 pix = m_tempshape[x*16+y];
+													UINT16 pix = m_tempshape[realx*16+realy];
 													if (pix )
 														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
 												}
@@ -1330,7 +1341,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 										}
 									}								
 								}
-								else
+								else // no rotate
 								{
 									if (used_flipy)
 									{
@@ -1339,6 +1350,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 											const int drawy = pixelOffsetY+y;
 											if ((drawy>383) || (drawy<0)) continue;
 											line = &drawbitmap->pix32(drawy);
+											int realy = ((y*incy)>>21);
 
 											if (used_flipx)
 											{
@@ -1346,8 +1358,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 												{
 													const int drawx = pixelOffsetX+x;
 													if ((drawx>=495 || drawx<0)) continue;
+													int realx = ((x*incx)>>21);
 
-													UINT16 pix = m_tempshape[(15-y)*16+(15-x)];
+													UINT16 pix = m_tempshape[(15-realy)*16+(15-realx)];
 													if (pix )
 														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
 												}
@@ -1358,42 +1371,48 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 												{
 													const int drawx = pixelOffsetX+x;
 													if ((drawx>=495 || drawx<0)) continue;
-
-													UINT16 pix = m_tempshape[(15-y)*16+x];
+													int realx = ((x*incx)>>21);
+													UINT16 pix = m_tempshape[(15-realy)*16+realx];
 													if (pix )
 														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
 												}
 											}
 										}
 									}
-									else
+									else // no rotate, no flipy
 									{
-										for (int y = 0; y < 16; y++)
+										for (int y = 0; y < blockhigh; y++)
 										{
 											const int drawy = pixelOffsetY+y;
 											if ((drawy>383) || (drawy<0)) continue;
 											line = &drawbitmap->pix32(drawy);
+											int realy = ((y*incy)>>21);
 
 											if (used_flipx)
 											{
-												for (int x = 0; x < 16; x++)
+												for (int x = 0; x < blockwide; x++)
 												{
 													const int drawx = pixelOffsetX+x;
 													if ((drawx>=495 || drawx<0)) continue;
+													int realx = ((x*incx)>>21);
 
-													UINT16 pix = m_tempshape[y*16+(15-x)];
+													UINT16 pix = m_tempshape[realy*16+(15-realx)];
 													if (pix )
 														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
 												}
 											}
-											else
+
+
+
+											else // no rotate, no flipy, no flipx
 											{
-												for (int x = 0; x < 16; x++)
+												for (int x = 0; x < blockwide; x++)
 												{
 													const int drawx = pixelOffsetX+x;
 													if ((drawx>=495 || drawx<0)) continue;
+													int realx = ((x*incx)>>21);
 
-													UINT16 pix = m_tempshape[y*16+x];
+													UINT16 pix = m_tempshape[realy*16+realx];
 													if (pix )
 														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
 												}
