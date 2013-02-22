@@ -2450,13 +2450,27 @@ void saturn_state::cd_playdata( void )
 {
 	if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
 	{
+		INT32 fad_diff;
+		//printf("PRE %08x %08x %08x %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad);
+
+		fad_diff = (cd_fad_seek - cd_curfad);
+
 		/* Zero Divide wants this TODO: timings. */
-		if((cd_fad_seek - cd_curfad) > (750*cd_speed))
+		if(fad_diff > (750*cd_speed))
+		{
+			//printf("PRE FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad,750*cd_speed);
 			cd_curfad += (750*cd_speed);
-		else if((cd_fad_seek - cd_curfad) < (-750*cd_speed))
+			//printf("POST FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, 750*cd_speed);
+		}
+		else if(fad_diff < (-750*cd_speed))
+		{
+			//printf("PRE REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
 			cd_curfad -= (750*cd_speed);
+			//printf("POST REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
+		}
 		else
 		{
+			//printf("Ready\n");
 			cd_curfad = cd_fad_seek;
 			cd_stat = CD_STAT_PLAY;
 		}
