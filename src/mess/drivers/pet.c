@@ -271,7 +271,6 @@ READ8_MEMBER( pet_state::read )
 WRITE8_MEMBER( pet_state::write )
 {
 	int sel = offset >> 12;
-	int norom = m_exp->norom_r(space, offset, sel);
 
 	switch (sel)
 	{
