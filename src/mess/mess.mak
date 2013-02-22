@@ -505,7 +505,7 @@ $(MESSOBJ)/mame.a: \
 $(MESSOBJ)/shared.a: \
 	$(MESS_AUDIO)/mea8000.o     \
 	$(MESS_AUDIO)/spchroms.o    \
-	$(MESS_DEVICES)/microdrv.o  \
+	$(MESS_MACHINE)/microdrv.o  \
 	$(MESS_MACHINE)/74145.o     \
 	$(MESS_MACHINE)/8530scc.o   \
 	$(MESS_MACHINE)/at45dbxx.o  \
@@ -549,8 +549,8 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_VIDEO)/tms3556.o     \
 	$(MESS_VIDEO)/upd7220.o     \
 	$(MESS_MACHINE)/applefdc.o  \
-	$(MESS_DEVICES)/sonydriv.o  \
-	$(MESS_DEVICES)/appldriv.o  \
+	$(MESS_MACHINE)/sonydriv.o  \
+	$(MESS_MACHINE)/appldriv.o  \
 	$(MESS_MACHINE)/dp8390.o    \
 	$(MESS_MACHINE)/ne1000.o    \
 	$(MESS_MACHINE)/ne2000.o    \

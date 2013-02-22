@@ -20,7 +20,7 @@
 #include "machine/6522via.h"
 #include "machine/ay3600.h"
 #include "machine/applefdc.h"
-#include "devices/appldriv.h"
+#include "machine/appldriv.h"
 #include "machine/mos6551.h"
 #include "machine/ram.h"
 

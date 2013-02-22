@@ -38,7 +38,6 @@ MAME_LAYOUT = $(MAMEOBJ)/layout
 
 # MESS directories
 MESS_AUDIO = $(MESSOBJ)/audio
-MESS_DEVICES = $(MESSOBJ)/devices
 MESS_DRIVERS = $(MESSOBJ)/drivers
 MESS_FORMATS = $(MESSOBJ)/formats
 MESS_LAYOUT = $(MESSOBJ)/layout
@@ -54,7 +53,6 @@ OBJDIRS += \
 	$(MAME_MACHINE) \
 	$(MAME_VIDEO) \
 	$(MESS_AUDIO) \
-	$(MESS_DEVICES) \
 	$(MESS_DRIVERS) \
 	$(MESS_FORMATS) \
 	$(MESS_LAYOUT) \

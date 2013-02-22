@@ -20,7 +20,7 @@
 #include "machine/6522via.h"
 #include "machine/a2bus.h"
 #include "machine/ram.h"
-#include "devices/appldriv.h"
+#include "machine/appldriv.h"
 
 static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
 	AM_RANGE(0x0000, 0x00FF) AM_READWRITE(apple3_00xx_r, apple3_00xx_w)

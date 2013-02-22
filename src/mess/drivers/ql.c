@@ -80,7 +80,7 @@
 #include "imagedev/flopdrv.h"
 #include "imagedev/printer.h"
 #include "machine/ram.h"
-#include "devices/microdrv.h"
+#include "machine/microdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/zx8302.h"
 #include "sound/speaker.h"
