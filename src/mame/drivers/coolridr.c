@@ -613,6 +613,14 @@ WRITE32_MEMBER(coolridr_state::sysh1_ioga_w)
 }
 #endif
 
+#define DRAW_PIX \
+	if (pix) \
+	{ \
+		{ \
+			if (!line[drawx]) line[drawx] = clut[pix+0x4000]; \
+		} \
+	} \
+
 /* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
 void coolridr_state::blit_current_sprite(address_space &space)
 {
@@ -760,7 +768,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	// to be specific, the center line of the road (actual road object? which currently gets shown as a single pixel column?)
 	// and the horizontal road used in the background of the title screen (which currently looks normal)
 	// I guess it's some kind of indirect way to do a line effect?
-	//UINT32 blit10 =  m_spriteblit[10];
+	UINT32 blit10 =  m_spriteblit[10];
 
 	/************* m_spriteblit[11] *************/
 	
@@ -788,16 +796,10 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 	// we also use this to trigger the actual draw operation
 
-	if (indirect_zoom_enable)
-	{
-		// with this bit enabled blit10 is a look up to the zoom(?) value eg. 03f42600
-		//UINT32 temp = space.read_dword(blit10);
-		//PRINT_BLIT_STUFF
-		/* for the horizontal road during attract there are tables 0x480 bytes long (0x120 dwords) and the value passed points to the start of them */
-		/* cell sizes for those are are 0011 (v) 0007 (h) with zoom factors of 0020 (half v) 0040 (normal h) */
-		/* tables seem to be 2x 8-bit values, possibly zoom + linescroll, although ingame ones seem to be 2x16-bit (corrupt? more meaning) */
 
-	}
+
+	
+
 
 	bitmap_rgb32* drawbitmap;
 
@@ -807,9 +809,8 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	else // 0x90, 0xa0, 0xb0, 0xc0
 		drawbitmap = &m_temp_bitmap_sprites2;
 
-	int sizex = used_hCellCount * 16 * hZoom;
 	int sizey = used_vCellCount * 16 * vZoom;
-	hPosition *= 0x40;
+
 	vPosition *= 0x40;
 
 	switch (vOrigin & 3)
@@ -830,23 +831,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		break;
 	}
 
-	switch (hOrigin & 3)
-	{
-	case 0:
-		// left
-		break;
-	case 1:
-		hPosition -= sizex / 2;
-		// middle?
-		break;
-	case 2:
-		hPosition -= sizex;
-		// right?
-		break;
-	case 3:
-		// invalid?
-		break;
-	}
+
 
 	UINT32 lastSpriteNumber = 0xffffffff;
 	// Splat some sprites
@@ -861,15 +846,59 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		}
 
 
+
+		UINT16 hZoomTable[16];
+		int hPositionTable[16];
+
+		for (int idx=0;idx<16;idx++)
+		{
+			if (indirect_zoom_enable)
+			{
+				UINT32 dword = space.read_dword(blit10);
+
+				hZoomTable[idx] = (dword>>16); // add original value?
+				int linescroll = dword&0xffff;
+				if (linescroll & 0x8000) linescroll -= 0x10000;
+
+				hPositionTable[idx] = linescroll + hPosition;
+				blit10+=4;
+
+
+			}
+			else
+			{
+				hZoomTable[idx] = hZoom;
+				hPositionTable[idx] = hPosition;
+			}
+
+
+			int sizex = used_hCellCount * 16 * hZoomTable[idx];
+				
+			hPositionTable[idx] *= 0x40;
+
+			switch (hOrigin & 3)
+			{
+			case 0:
+				// left
+				break;
+			case 1:
+				hPositionTable[idx] -= sizex / 2;
+				// middle?
+				break;
+			case 2:
+				hPositionTable[idx] -= sizex;
+				// right?
+				break;
+			case 3:
+				// invalid?
+				break;
+			}
+
+		}
+
+
 		for (int h = 0; h < used_hCellCount; h++)
 		{
-			const int pixelOffsetX = ((hPosition) + (h* 16 * hZoom)) / 0x40;
-
-			if (pixelOffsetX>495)
-			{
-				h = used_hCellCount;
-				continue;
-			}
 
 			int lookupnum;
 
@@ -918,6 +947,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 					}
 				}
 			}
+
 
 
 			// these should be 'cell numbers' (tile numbers) which look up RLE data?
@@ -980,22 +1010,23 @@ void coolridr_state::blit_current_sprite(address_space &space)
 			}
 
 
-			if (!hZoom || !vZoom)
+			if (!vZoom)
 			{
 				m_blitterSerialCount++;
 				return;
 			}
 
-			int blockwide = ((16*hZoom)/0x40);
 			int blockhigh = ((16*vZoom)/0x40);
 
 
 
-			UINT32 incx = 0x8000000 / hZoom;
 			UINT32 incy = 0x8000000 / vZoom;
 
 			// DEBUG: Draw 16x16 block
 			UINT32* line;
+
+
+	
 
 			if (blit_rotate)
 			{
@@ -1003,22 +1034,29 @@ void coolridr_state::blit_current_sprite(address_space &space)
 				{
 					for (int y = 0; y < blockhigh; y++)
 					{
+						int realy = ((y*incy)>>21);
+						if (!hZoomTable[realy])
+							continue;
+						const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40;
 						const int drawy = pixelOffsetY+y;
 						if ((drawy>383) || (drawy<0)) continue;
 						line = &drawbitmap->pix32(drawy);
-						int realy = ((y*incy)>>21);
+						int blockwide = ((16*hZoomTable[realy])/0x40);
+						UINT32 incx = 0x8000000 / hZoomTable[realy];
+
 
 						if (used_flipx)
 						{
 							for (int x = 0; x < blockwide; x++)
 							{
+								
+
 								const int drawx = pixelOffsetX+x;
 								if ((drawx>=495 || drawx<0)) continue;
 								int realx = ((x*incx)>>21);
 
 								UINT16 pix = tempshape[(15-realx)*16+(15-realy)];
-								if (pix )
-									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+								DRAW_PIX
 							}
 						}
 						else
@@ -1030,8 +1068,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 								int realx = ((x*incx)>>21);
 
 								UINT16 pix = tempshape[(15-realx)*16+realy];
-								if (pix )
-									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+								DRAW_PIX
 							}
 						}
 					}
@@ -1040,10 +1077,16 @@ void coolridr_state::blit_current_sprite(address_space &space)
 				{
 					for (int y = 0; y < blockhigh; y++)
 					{
+						int realy = ((y*incy)>>21);
+						if (!hZoomTable[realy])
+							continue;	
+						const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40;
 						const int drawy = pixelOffsetY+y;
 						if ((drawy>383) || (drawy<0)) continue;
 						line = &drawbitmap->pix32(drawy);
-						int realy = ((y*incy)>>21);
+						int blockwide = ((16*hZoomTable[realy])/0x40);
+						UINT32 incx = 0x8000000 / hZoomTable[realy];
+
 
 						if (used_flipx)
 						{
@@ -1054,8 +1097,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 								int realx = ((x*incx)>>21);
 
 								UINT16 pix = tempshape[realx*16+(15-realy)];
-								if (pix )
-									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+								DRAW_PIX
 							}
 						}
 						else
@@ -1067,8 +1109,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 								int realx = ((x*incx)>>21);
 
 								UINT16 pix = tempshape[realx*16+realy];
-								if (pix )
-									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+								DRAW_PIX
 							}
 						}
 					}
@@ -1080,10 +1121,16 @@ void coolridr_state::blit_current_sprite(address_space &space)
 				{
 					for (int y = 0; y < blockhigh; y++)
 					{
+						int realy = ((y*incy)>>21);
+						if (!hZoomTable[realy])
+							continue;
+						const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40;
 						const int drawy = pixelOffsetY+y;
 						if ((drawy>383) || (drawy<0)) continue;
 						line = &drawbitmap->pix32(drawy);
-						int realy = ((y*incy)>>21);
+						int blockwide = ((16*hZoomTable[realy])/0x40);
+						UINT32 incx = 0x8000000 / hZoomTable[realy];
+
 
 						if (used_flipx)
 						{
@@ -1094,8 +1141,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 								int realx = ((x*incx)>>21);
 
 								UINT16 pix = tempshape[(15-realy)*16+(15-realx)];
-								if (pix )
-									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+								DRAW_PIX
 							}
 						}
 						else
@@ -1106,8 +1152,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 								if ((drawx>=495 || drawx<0)) continue;
 								int realx = ((x*incx)>>21);
 								UINT16 pix = tempshape[(15-realy)*16+realx];
-								if (pix )
-									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+								DRAW_PIX
 							}
 						}
 					}
@@ -1116,10 +1161,16 @@ void coolridr_state::blit_current_sprite(address_space &space)
 				{
 					for (int y = 0; y < blockhigh; y++)
 					{
+						int realy = ((y*incy)>>21);
+						if (!hZoomTable[realy])
+							continue;
+						const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40;
 						const int drawy = pixelOffsetY+y;
 						if ((drawy>383) || (drawy<0)) continue;
 						line = &drawbitmap->pix32(drawy);
-						int realy = ((y*incy)>>21);
+						int blockwide = ((16*hZoomTable[realy])/0x40);
+						UINT32 incx = 0x8000000 / hZoomTable[realy];
+
 
 						if (used_flipx)
 						{
@@ -1130,8 +1181,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 								int realx = ((x*incx)>>21);
 
 								UINT16 pix = tempshape[realy*16+(15-realx)];
-								if (pix )
-									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+								DRAW_PIX
 							}
 						}
 
@@ -1146,8 +1196,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 								int realx = ((x*incx)>>21);
 
 								UINT16 pix = tempshape[realy*16+realx];
-								if (pix )
-									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+								DRAW_PIX
 							}
 						}
 					}
@@ -1595,7 +1644,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 	if(offset == 8)
 	{
 		//probably writing to upper word disables m68k, to lower word enables it
-		machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, (data) ? ASSERT_LINE : CLEAR_LINE);
+		m_soundcpu->set_input_line(INPUT_LINE_RESET, (data) ? ASSERT_LINE : CLEAR_LINE);
 		return;
 	}
 
@@ -2121,7 +2170,7 @@ UINT16 coolridr_state::get_10bit_data(UINT32 romoffset, int _10bitwordnum)
 void coolridr_state::machine_start()
 {
 //  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-//	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+//	m_soundcpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 //	memcpy(memregion("soundcpu")->base(), memregion("maincpu")->base()+0x100000, 0x80000);
 //	m_soundcpu->reset();
@@ -2158,7 +2207,7 @@ void coolridr_state::machine_start()
 void coolridr_state::machine_reset()
 {
 //  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	machine().device("soundcpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 //	memcpy(m_soundram, memregion("soundcpu")->base()+0x80000, 0x80000);
 //  m_soundcpu->reset();
@@ -2188,10 +2237,10 @@ static void scsp_irq(device_t *device, int irq)
 	if (irq > 0)
 	{
 		state->m_scsp_last_line = irq;
-		device->machine().device("soundcpu")->execute().set_input_line(irq, ASSERT_LINE);
+		state->m_soundcpu->set_input_line(irq, ASSERT_LINE);
 	}
 	else
-		device->machine().device("soundcpu")->execute().set_input_line(-irq, CLEAR_LINE);
+		state->m_soundcpu->set_input_line(-irq, CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
