@@ -613,6 +613,28 @@ WRITE32_MEMBER(coolridr_state::sysh1_ioga_w)
 }
 #endif
 
+#define YLOOP_START \
+	for (int y = 0; y < blockhigh; y++) \
+	{ \
+		int realy = ((y*incy)>>21); \
+		if (!hZoomTable[realy]) \
+			continue;	 \
+		const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40; \
+		const int drawy = pixelOffsetY+y; \
+		if ((drawy>383) || (drawy<0)) continue; \
+		line = &drawbitmap->pix32(drawy); \
+		int blockwide = ((16*hZoomTable[realy])/0x40); \
+		UINT32 incx = 0x8000000 / hZoomTable[realy]; \
+
+#define XLOOP_START \
+	for (int x = 0; x < blockwide; x++) \
+	{ \
+		const int drawx = pixelOffsetX+x; \
+		if ((drawx>=495 || drawx<0)) continue; \
+		int realx = ((x*incx)>>21); \
+
+
+
 #define DRAW_PIX \
 	if (pix) \
 	{ \
@@ -731,7 +753,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	int indirect_zoom_enable = (m_spriteblit[5] & 0x00000001);
 
 
-	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, blit5_unused);
+	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", 5, blit5_unused);
 	// 00010000 (text)
 	// 00000001 (other)
 
@@ -745,8 +767,12 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 	/************* m_spriteblit[7] *************/
 
-	UINT16 vOrigin = (m_spriteblit[7] & 0xffff0000) >> 16;
-	UINT16 hOrigin = (m_spriteblit[7] & 0x0000ffff);
+	UINT16 vOrigin = (m_spriteblit[7] & 0x00030000) >> 16;
+	UINT16 hOrigin = (m_spriteblit[7] & 0x00000003);
+	UINT16 OriginUnused = (m_spriteblit[7] & 0xfffcfffc);
+
+	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", 7, OriginUnused);
+
 	//printf("%04x %04x\n", vOrigin, hOrigin);
 
 	/************* m_spriteblit[8] *************/
@@ -852,13 +878,16 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 		for (int idx=0;idx<16;idx++)
 		{
+
 			if (indirect_zoom_enable)
 			{
 				UINT32 dword = space.read_dword(blit10);
 
-				hZoomTable[idx] = (dword>>16); // add original value?
-				int linescroll = dword&0xffff;
-				if (linescroll & 0x8000) linescroll -= 0x10000;
+				hZoomTable[idx] = hZoom + (dword>>16); // add original value?
+				
+				// bit 0x8000 does get set too, but only on some lines, might have another meaning?
+				int linescroll = dword&0x7fff;
+				if (linescroll & 0x4000) linescroll -= 0x8000;
 
 				hPositionTable[idx] = linescroll + hPosition;
 				blit10+=4;
@@ -871,8 +900,8 @@ void coolridr_state::blit_current_sprite(address_space &space)
 				hPositionTable[idx] = hPosition;
 			}
 
-
-			int sizex = used_hCellCount * 16 * hZoomTable[idx];
+			// DON'T use the table hZoom in this calc? (road..)
+			int sizex = used_hCellCount * 16 * hZoom;
 				
 			hPositionTable[idx] *= 0x40;
 
@@ -896,6 +925,8 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 		}
 
+		//if ((hOrigin & 3) != 1)
+		//	return;
 
 		for (int h = 0; h < used_hCellCount; h++)
 		{
@@ -1032,28 +1063,11 @@ void coolridr_state::blit_current_sprite(address_space &space)
 			{
 				if (used_flipy)
 				{
-					for (int y = 0; y < blockhigh; y++)
-					{
-						int realy = ((y*incy)>>21);
-						if (!hZoomTable[realy])
-							continue;
-						const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40;
-						const int drawy = pixelOffsetY+y;
-						if ((drawy>383) || (drawy<0)) continue;
-						line = &drawbitmap->pix32(drawy);
-						int blockwide = ((16*hZoomTable[realy])/0x40);
-						UINT32 incx = 0x8000000 / hZoomTable[realy];
-
+					YLOOP_START
 
 						if (used_flipx)
 						{
-							for (int x = 0; x < blockwide; x++)
-							{
-								
-
-								const int drawx = pixelOffsetX+x;
-								if ((drawx>=495 || drawx<0)) continue;
-								int realx = ((x*incx)>>21);
+							XLOOP_START
 
 								UINT16 pix = tempshape[(15-realx)*16+(15-realy)];
 								DRAW_PIX
@@ -1061,11 +1075,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 						}
 						else
 						{
-							for (int x = 0; x < blockwide; x++)
-							{
-								const int drawx = pixelOffsetX+x;
-								if ((drawx>=495 || drawx<0)) continue;
-								int realx = ((x*incx)>>21);
+							XLOOP_START
 
 								UINT16 pix = tempshape[(15-realx)*16+realy];
 								DRAW_PIX
@@ -1075,26 +1085,12 @@ void coolridr_state::blit_current_sprite(address_space &space)
 				}
 				else
 				{
-					for (int y = 0; y < blockhigh; y++)
-					{
-						int realy = ((y*incy)>>21);
-						if (!hZoomTable[realy])
-							continue;	
-						const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40;
-						const int drawy = pixelOffsetY+y;
-						if ((drawy>383) || (drawy<0)) continue;
-						line = &drawbitmap->pix32(drawy);
-						int blockwide = ((16*hZoomTable[realy])/0x40);
-						UINT32 incx = 0x8000000 / hZoomTable[realy];
+					YLOOP_START
 
 
 						if (used_flipx)
 						{
-							for (int x = 0; x < blockwide; x++)
-							{
-								const int drawx = pixelOffsetX+x;
-								if ((drawx>=495 || drawx<0)) continue;
-								int realx = ((x*incx)>>21);
+							XLOOP_START
 
 								UINT16 pix = tempshape[realx*16+(15-realy)];
 								DRAW_PIX
@@ -1102,11 +1098,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 						}
 						else
 						{
-							for (int x = 0; x < blockwide; x++)
-							{
-								const int drawx = pixelOffsetX+x;
-								if ((drawx>=495 || drawx<0)) continue;
-								int realx = ((x*incx)>>21);
+							XLOOP_START
 
 								UINT16 pix = tempshape[realx*16+realy];
 								DRAW_PIX
@@ -1119,26 +1111,11 @@ void coolridr_state::blit_current_sprite(address_space &space)
 			{
 				if (used_flipy)
 				{
-					for (int y = 0; y < blockhigh; y++)
-					{
-						int realy = ((y*incy)>>21);
-						if (!hZoomTable[realy])
-							continue;
-						const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40;
-						const int drawy = pixelOffsetY+y;
-						if ((drawy>383) || (drawy<0)) continue;
-						line = &drawbitmap->pix32(drawy);
-						int blockwide = ((16*hZoomTable[realy])/0x40);
-						UINT32 incx = 0x8000000 / hZoomTable[realy];
-
+					YLOOP_START
 
 						if (used_flipx)
 						{
-							for (int x = 0; x < blockwide; x++)
-							{
-								const int drawx = pixelOffsetX+x;
-								if ((drawx>=495 || drawx<0)) continue;
-								int realx = ((x*incx)>>21);
+							XLOOP_START
 
 								UINT16 pix = tempshape[(15-realy)*16+(15-realx)];
 								DRAW_PIX
@@ -1146,11 +1123,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 						}
 						else
 						{
-							for (int x = 0; x < blockwide; x++)
-							{
-								const int drawx = pixelOffsetX+x;
-								if ((drawx>=495 || drawx<0)) continue;
-								int realx = ((x*incx)>>21);
+							XLOOP_START
 								UINT16 pix = tempshape[(15-realy)*16+realx];
 								DRAW_PIX
 							}
@@ -1159,41 +1132,20 @@ void coolridr_state::blit_current_sprite(address_space &space)
 				}
 				else // no rotate, no flipy
 				{
-					for (int y = 0; y < blockhigh; y++)
-					{
-						int realy = ((y*incy)>>21);
-						if (!hZoomTable[realy])
-							continue;
-						const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40;
-						const int drawy = pixelOffsetY+y;
-						if ((drawy>383) || (drawy<0)) continue;
-						line = &drawbitmap->pix32(drawy);
-						int blockwide = ((16*hZoomTable[realy])/0x40);
-						UINT32 incx = 0x8000000 / hZoomTable[realy];
+					YLOOP_START
 
 
 						if (used_flipx)
 						{
-							for (int x = 0; x < blockwide; x++)
-							{
-								const int drawx = pixelOffsetX+x;
-								if ((drawx>=495 || drawx<0)) continue;
-								int realx = ((x*incx)>>21);
+							XLOOP_START
 
 								UINT16 pix = tempshape[realy*16+(15-realx)];
 								DRAW_PIX
 							}
 						}
-
-
-
 						else // no rotate, no flipy, no flipx
 						{
-							for (int x = 0; x < blockwide; x++)
-							{
-								const int drawx = pixelOffsetX+x;
-								if ((drawx>=495 || drawx<0)) continue;
-								int realx = ((x*incx)>>21);
+							XLOOP_START
 
 								UINT16 pix = tempshape[realy*16+realx];
 								DRAW_PIX
@@ -1201,6 +1153,8 @@ void coolridr_state::blit_current_sprite(address_space &space)
 						}
 					}
 				}
+
+
 			}
 		}
 	}
