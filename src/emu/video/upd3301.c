@@ -199,11 +199,19 @@ upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, d
 		m_data_fifo_pos(0),
 		m_attr_fifo_pos(0),
 		m_input_fifo(0),
+		m_me(0),
 		m_h(80),
 		m_l(20),
 		m_r(10),
 		m_v(6),
-		m_z(32)
+		m_z(32),
+		m_attr_blink(0),
+		m_attr_frame(0),
+		m_cm(0),
+		m_cx(0),
+		m_cy(0),
+		m_cursor_blink(0),
+		m_cursor_frame(0)
 {
 }
 
