@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    formats/z80bin.h
+    machine/z80bin.h
 
     Quickload code for Z80 bin format
 
@@ -11,10 +11,6 @@
 #ifndef __Z80_BIN__
 #define __Z80_BIN__
 
-#include "imagedev/snapquik.h"
-
-QUICKLOAD_LOAD( sorcerer );
-QUICKLOAD_LOAD( super80 );
-QUICKLOAD_LOAD( mbee_z80bin );
+int z80bin_load_file(device_image_interface *image, const char *file_type, UINT16 *exec_addr, UINT16 *start_addr, UINT16 *end_addr );
 
 #endif

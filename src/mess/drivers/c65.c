@@ -57,11 +57,24 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 #include "machine/cbmipt.h"
 #include "video/vic4567.h"
 #include "includes/cbm.h"
-#include "formats/cbm_snqk.h"
+#include "machine/cbm_snqk.h"
 #include "includes/c64_legacy.h"
 #include "includes/c65.h"
 #include "machine/cbmiec.h"
 #include "machine/ram.h"
+
+static void cbm_c65_quick_sethiaddress( running_machine &machine, UINT16 hiaddress )
+{
+	address_space &space = machine.firstcpu->space(AS_PROGRAM);
+
+	space.write_byte(0x82, hiaddress & 0xff);
+	space.write_byte(0x83, hiaddress >> 8);
+}
+
+static QUICKLOAD_LOAD( cbm_c65 )
+{
+	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_c65_quick_sethiaddress);
+}
 
 /*************************************
  *

@@ -28,6 +28,10 @@
 #define VA13 BIT(va, 13)
 #define VA12 BIT(va, 12)
 
+static QUICKLOAD_LOAD( cbm_c64 )
+{
+	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_quick_sethiaddress);
+}
 
 
 //**************************************************************************

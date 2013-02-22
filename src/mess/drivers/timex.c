@@ -153,10 +153,123 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "sound/speaker.h"
 #include "sound/ay8910.h"
 #include "formats/tzx_cas.h"
-#include "formats/spec_snqk.h"
-#include "formats/timex_dck.h"
+#include "machine/spec_snqk.h"
 #include "machine/beta.h"
 #include "machine/ram.h"
+
+enum
+{
+	TIMEX_CART_NONE,
+	TIMEX_CART_DOCK,
+	TIMEX_CART_EXROM,
+	TIMEX_CART_HOME
+};
+
+struct timex_cart_t
+{
+	int type;
+	UINT8 chunks;
+	UINT8 *data;
+};
+
+static timex_cart_t timex_cart;
+
+
+DEVICE_IMAGE_LOAD_LEGACY( timex_cart )
+{
+	int file_size;
+	UINT8 * file_data;
+
+	int chunks_in_file = 0;
+
+	int i;
+
+	logerror ("Trying to load cart\n");
+
+	file_size = image.length();
+
+	if (file_size < 0x09)
+	{
+		logerror ("Bad file size\n");
+		return IMAGE_INIT_FAIL;
+	}
+
+	file_data = (UINT8 *)malloc(file_size);
+	if (file_data == NULL)
+	{
+		logerror ("Memory allocating error\n");
+		return IMAGE_INIT_FAIL;
+	}
+
+	image.fread(file_data, file_size);
+
+	for (i=0; i<8; i++)
+		if(file_data[i+1]&0x02) chunks_in_file++;
+
+	if (chunks_in_file*0x2000+0x09 != file_size)
+	{
+		free (file_data);
+		logerror ("File corrupted\n");
+		return IMAGE_INIT_FAIL;
+	}
+
+	switch (file_data[0x00])
+	{
+		case 0x00:  logerror ("DOCK cart\n");
+				timex_cart.type = TIMEX_CART_DOCK;
+				timex_cart.data = (UINT8*) malloc (0x10000);
+				if (!timex_cart.data)
+				{
+					free (file_data);
+					logerror ("Memory allocate error\n");
+					return IMAGE_INIT_FAIL;
+				}
+				chunks_in_file = 0;
+				for (i=0; i<8; i++)
+				{
+					timex_cart.chunks = timex_cart.chunks | ((file_data[i+1]&0x01)<<i);
+					if (file_data[i+1]&0x02)
+					{
+						memcpy (timex_cart.data+i*0x2000, file_data+0x09+chunks_in_file*0x2000, 0x2000);
+						chunks_in_file++;
+					}
+					else
+					{
+						if (file_data[i+1]&0x01)
+							memset (timex_cart.data+i*0x2000, 0x00, 0x2000);
+						else
+							memset (timex_cart.data+i*0x2000, 0xff, 0x2000);
+					}
+				}
+				free (file_data);
+				break;
+
+		default:    logerror ("Cart type not supported\n");
+				free (file_data);
+				timex_cart.type = TIMEX_CART_NONE;
+				return IMAGE_INIT_FAIL;
+	}
+
+	logerror ("Cart loaded\n");
+	logerror ("Chunks %02x\n", timex_cart.chunks);
+	return IMAGE_INIT_PASS;
+}
+
+DEVICE_IMAGE_UNLOAD_LEGACY( timex_cart )
+{
+	if (timex_cart.data)
+	{
+		free (timex_cart.data);
+		timex_cart.data = NULL;
+	}
+	timex_cart.type = TIMEX_CART_NONE;
+	timex_cart.chunks = 0x00;
+}
+
+const timex_cart_t *timex_cart_data(void)
+{
+	return &timex_cart;
+}
 
 static const ay8910_interface spectrum_ay_interface =
 {

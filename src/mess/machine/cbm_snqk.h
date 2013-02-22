@@ -11,13 +11,8 @@
 
 #define CBM_QUICKLOAD_DELAY_SECONDS 3
 
-QUICKLOAD_LOAD( cbm_pet1 );
-QUICKLOAD_LOAD( cbm_pet );
-QUICKLOAD_LOAD( cbm_c16 );
-QUICKLOAD_LOAD( cbm_c64 );
-QUICKLOAD_LOAD( cbm_vc20 );
-QUICKLOAD_LOAD( cbmb );
-QUICKLOAD_LOAD( p500 );
-QUICKLOAD_LOAD( cbm_c65 );
+int general_cbm_loadsnap( device_image_interface &image, const char *file_type, int snapshot_size,
+								offs_t offset, void (*cbm_sethiaddress)(running_machine &machine, UINT16 hiaddress) );
+void cbm_quick_sethiaddress( running_machine &machine, UINT16 hiaddress );
 
 #endif  /* __CBM_SNQK_H__ */

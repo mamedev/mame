@@ -29,7 +29,23 @@
 #define A0 BIT(offset, 0)
 #define VA12 BIT(va, 12)
 
+static void cbmb_quick_sethiaddress(running_machine &machine, UINT16 hiaddress)
+{
+	address_space &space = machine.firstcpu->space(AS_PROGRAM);
 
+	space.write_byte(0xf0046, hiaddress & 0xff);
+	space.write_byte(0xf0047, hiaddress >> 8);
+}
+
+static QUICKLOAD_LOAD( cbmb )
+{
+	return general_cbm_loadsnap(image, file_type, quickload_size, 0x10000, cbmb_quick_sethiaddress);
+}
+
+static QUICKLOAD_LOAD( p500 )
+{
+	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbmb_quick_sethiaddress);
+}
 
 //**************************************************************************
 //  ADDRESS DECODING

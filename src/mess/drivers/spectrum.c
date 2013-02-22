@@ -278,7 +278,7 @@ SamRam
 #include "sound/wave.h"
 #include "includes/spectrum.h"
 #include "formats/tzx_cas.h"
-#include "formats/spec_snqk.h"
+#include "machine/spec_snqk.h"
 
 
 /****************************************************************************************************/

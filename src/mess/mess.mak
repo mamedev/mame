@@ -555,7 +555,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/ne1000.o    \
 	$(MESS_MACHINE)/ne2000.o    \
 	$(MESS_MACHINE)/3c503.o     \
-	$(MESS_FORMATS)/z80bin.o    \
+	$(MESS_MACHINE)/z80bin.o    \
 	$(MESS_MACHINE)/mb8795.o    \
 	$(MESS_MACHINE)/midiinport.o    \
 	$(MESS_MACHINE)/midioutport.o   \
@@ -958,8 +958,8 @@ $(MESSOBJ)/cbm.a:               \
 	$(MESS_VIDEO)/vic4567.o     \
 	$(MESS_VIDEO)/mos6566.o     \
 	$(MESS_DRIVERS)/c900.o      \
-	$(MESS_FORMATS)/cbm_snqk.o  \
-	$(MESS_FORMATS)/cbm_crt.o   \
+	$(MESS_MACHINE)/cbm_snqk.o  \
+	$(MESS_MACHINE)/cbm_crt.o   \
 
 $(MESSOBJ)/cccp.a:              \
 	$(MESS_DRIVERS)/argo.o      \
@@ -1705,8 +1705,7 @@ $(MESSOBJ)/sinclair.a:          \
 	$(MESS_DRIVERS)/atm.o       \
 	$(MESS_DRIVERS)/pentagon.o  \
 	$(MESS_MACHINE)/beta.o      \
-	$(MESS_FORMATS)/spec_snqk.o \
-	$(MESS_FORMATS)/timex_dck.o \
+	$(MESS_MACHINE)/spec_snqk.o \
 	$(MESS_DRIVERS)/ql.o        \
 	$(MESS_VIDEO)/zx8301.o      \
 	$(MESS_MACHINE)/zx8302.o    \

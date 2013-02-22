@@ -33,6 +33,11 @@
 
 
 
+static QUICKLOAD_LOAD( cbm_c16 )
+{
+	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_quick_sethiaddress);
+}
+
 //**************************************************************************
 //  INTERRUPTS
 //**************************************************************************

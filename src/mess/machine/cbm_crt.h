@@ -1,6 +1,6 @@
 /*********************************************************************
 
-    formats/cbm_crt.h
+    machine/cbm_crt.h
 
     Commodore VIC-20/C64 cartridge images
 

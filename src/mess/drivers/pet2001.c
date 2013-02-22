@@ -152,7 +152,22 @@ ROM sockets:  UA3   2K or 4K character
 
 #include "includes/pet2001.h"
 
+static void cbm_pet_quick_sethiaddress( running_machine &machine, UINT16 hiaddress )
+{
+	address_space &space = machine.firstcpu->space(AS_PROGRAM);
 
+	space.write_byte(0x2e, hiaddress & 0xff);
+	space.write_byte(0x2c, hiaddress & 0xff);
+	space.write_byte(0x2a, hiaddress & 0xff);
+	space.write_byte(0x2f, hiaddress >> 8);
+	space.write_byte(0x2d, hiaddress >> 8);
+	space.write_byte(0x2b, hiaddress >> 8);
+}
+
+static QUICKLOAD_LOAD( cbm_pet )
+{
+	return general_cbm_loadsnap(image, file_type, quickload_size, 0, cbm_pet_quick_sethiaddress);
+}
 
 //**************************************************************************
 //  INTERRUPTS

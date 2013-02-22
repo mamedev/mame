@@ -5,6 +5,7 @@
 *******************************************************************************/
 
 #include "includes/sorcerer.h"
+#include "machine/z80bin.h"
 
 #if SORCERER_USING_RS232
 
@@ -417,4 +418,72 @@ void sorcerer_state::machine_reset()
 
 	membank("boot")->set_entry(1);
 	machine().scheduler().timer_set(attotime::from_usec(10), timer_expired_delegate(FUNC(sorcerer_state::sorcerer_reset),this));
+}
+
+
+/*-------------------------------------------------
+    QUICKLOAD_LOAD( sorcerer )
+-------------------------------------------------*/
+
+QUICKLOAD_LOAD( sorcerer )
+{
+	UINT16 execute_address, start_address, end_address;
+	int autorun;
+	/* load the binary into memory */
+	if (z80bin_load_file(&image, file_type, &execute_address, &start_address, &end_address) == IMAGE_INIT_FAIL)
+		return IMAGE_INIT_FAIL;
+
+	/* is this file executable? */
+	if (execute_address != 0xffff)
+	{
+		/* check to see if autorun is on (I hate how this works) */
+		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
+
+		address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+
+		if ((execute_address >= 0xc000) && (execute_address <= 0xdfff) && (space.read_byte(0xdffa) != 0xc3))
+			return IMAGE_INIT_FAIL;     /* can't run a program if the cartridge isn't in */
+
+		/* Since Exidy Basic is by Microsoft, it needs some preprocessing before it can be run.
+		1. A start address of 01D5 indicates a basic program which needs its pointers fixed up.
+		2. If autorunning, jump to C689 (command processor), else jump to C3DD (READY prompt).
+		Important addresses:
+		    01D5 = start (load) address of a conventional basic program
+		    C858 = an autorun basic program will have this exec address on the tape
+		    C3DD = part of basic that displays READY and lets user enter input */
+
+		if ((start_address == 0x1d5) || (execute_address == 0xc858))
+		{
+			UINT8 i;
+			static const UINT8 data[]={
+				0xcd, 0x26, 0xc4,   // CALL C426    ;set up other pointers
+				0x21, 0xd4, 1,      // LD HL,01D4   ;start of program address (used by C689)
+				0x36, 0,        // LD (HL),00   ;make sure dummy end-of-line is there
+				0xc3, 0x89, 0xc6    // JP C689  ;run program
+			};
+
+			for (i = 0; i < ARRAY_LENGTH(data); i++)
+				space.write_byte(0xf01f + i, data[i]);
+
+			if (!autorun)
+				space.write_word(0xf028,0xc3dd);
+
+			/* tell BASIC where program ends */
+			space.write_byte(0x1b7, end_address & 0xff);
+			space.write_byte(0x1b8, (end_address >> 8) & 0xff);
+
+			if ((execute_address != 0xc858) && autorun)
+				space.write_word(0xf028, execute_address);
+
+			image.device().machine().device("maincpu")->state().set_pc(0xf01f);
+		}
+		else
+		{
+			if (autorun)
+				image.device().machine().device("maincpu")->state().set_pc(execute_address);
+		}
+
+	}
+
+	return IMAGE_INIT_PASS;
 }

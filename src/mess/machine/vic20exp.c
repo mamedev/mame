@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "formats/cbm_crt.h"
+#include "machine/cbm_crt.h"
 #include "machine/vic20exp.h"
 #include "formats/imageutl.h"
 

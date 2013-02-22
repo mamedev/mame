@@ -4,7 +4,7 @@
 #define __C128__
 
 #include "emu.h"
-#include "formats/cbm_snqk.h"
+#include "machine/cbm_snqk.h"
 #include "cpu/m6502/m8502.h"
 #include "machine/6526cia.h"
 #include "machine/c64exp.h"

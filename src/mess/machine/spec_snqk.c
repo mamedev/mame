@@ -1,6 +1,6 @@
 /***************************************************************************
 
-  mess/formats/spec_snqk.c
+  mess/machine/spec_snqk.c
 
   TODO:
 
@@ -30,7 +30,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
 #include "sound/ay8910.h"
-#include "formats/spec_snqk.h"
+#include "machine/spec_snqk.h"
 
 #define LOAD_REG(_cpu, _reg, _data) \
 		do { \

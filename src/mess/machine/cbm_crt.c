@@ -1,12 +1,12 @@
 /*********************************************************************
 
-    formats/cbm_crt.c
+    machine/cbm_crt.c
 
     Commodore VIC-20/C64 cartridge images
 
 *********************************************************************/
 
-#include "formats/cbm_crt.h"
+#include "machine/cbm_crt.h"
 
 
 

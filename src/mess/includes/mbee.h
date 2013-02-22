@@ -216,7 +216,7 @@ extern const wd17xx_interface mbee_wd17xx_interface;
 extern const z80pio_interface mbee_z80pio_intf;
 
 QUICKLOAD_LOAD( mbee );
-
+QUICKLOAD_LOAD( mbee_z80bin );
 
 /*----------- defined in video/mbee.c -----------*/
 

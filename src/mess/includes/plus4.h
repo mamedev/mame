@@ -5,7 +5,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m7501.h"
-#include "formats/cbm_snqk.h"
+#include "machine/cbm_snqk.h"
 #include "machine/cbmiec.h"
 #include "machine/cbmipt.h"
 #include "machine/mos6529.h"

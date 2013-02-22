@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6509.h"
 #include "cpu/i86/i86.h"
-#include "formats/cbm_snqk.h"
+#include "machine/cbm_snqk.h"
 #include "includes/cbm.h"
 #include "machine/6525tpi.h"
 #include "machine/cbm2exp.h"

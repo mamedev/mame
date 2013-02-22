@@ -91,7 +91,6 @@
 
 #include "emu.h"
 #include "includes/mbee.h"
-#include "formats/z80bin.h"
 
 #define XTAL_13_5MHz 13500000
 

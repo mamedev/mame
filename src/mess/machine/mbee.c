@@ -10,7 +10,7 @@
 
 #include "emu.h"
 #include "includes/mbee.h"
-
+#include "machine/z80bin.h"
 
 /***********************************************************
 
@@ -811,6 +811,45 @@ QUICKLOAD_LOAD( mbee )
 		}
 
 		if (sw) cpu->state().set_pc(0x100);
+	}
+
+	return IMAGE_INIT_PASS;
+}
+
+
+/*-------------------------------------------------
+    QUICKLOAD_LOAD( mbee_z80bin )
+-------------------------------------------------*/
+
+QUICKLOAD_LOAD( mbee_z80bin )
+{
+	UINT16 execute_address, start_addr, end_addr;
+	int autorun;
+
+	/* load the binary into memory */
+	if (z80bin_load_file(&image, file_type, &execute_address, &start_addr, &end_addr) == IMAGE_INIT_FAIL)
+		return IMAGE_INIT_FAIL;
+
+	/* is this file executable? */
+	if (execute_address != 0xffff)
+	{
+		/* check to see if autorun is on (I hate how this works) */
+		autorun = image.device().machine().root_device().ioport("CONFIG")->read_safe(0xFF) & 1;
+
+		device_t *cpu = image.device().machine().device("maincpu");
+		address_space &space = image.device().machine().device("maincpu")->memory().space(AS_PROGRAM);
+
+		space.write_word(0xa6, execute_address);            /* fix the EXEC command */
+
+		if (autorun)
+		{
+			space.write_word(0xa2, execute_address);        /* fix warm-start vector to get around some copy-protections */
+			cpu->state().set_pc(execute_address);
+		}
+		else
+		{
+			space.write_word(0xa2, 0x8517);
+		}
 	}
 
 	return IMAGE_INIT_PASS;

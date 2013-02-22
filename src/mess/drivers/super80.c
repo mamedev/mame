@@ -183,7 +183,6 @@ hardware.
 
 #include "super80.lh"
 #include "includes/super80.h"
-#include "formats/z80bin.h"
 
 #define MASTER_CLOCK    (XTAL_12MHz)
 #define PIXEL_CLOCK (MASTER_CLOCK/2)
