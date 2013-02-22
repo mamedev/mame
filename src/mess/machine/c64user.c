@@ -54,36 +54,14 @@ device_c64_user_port_interface::~device_c64_user_port_interface()
 
 c64_user_port_device::c64_user_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
 		device_t(mconfig, C64_USER_PORT, "C64 user port", tag, owner, clock),
-		device_slot_interface(mconfig, *this)
+		device_slot_interface(mconfig, *this),
+		m_write_cnt1(*this),
+		m_write_sp1(*this),
+		m_write_cnt2(*this),
+		m_write_sp2(*this),
+		m_write_flag2(*this),
+		m_write_reset(*this)
 {
-}
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void c64_user_port_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const c64_user_port_interface *intf = reinterpret_cast<const c64_user_port_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<c64_user_port_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-		memset(&m_out_cnt1_cb, 0, sizeof(m_out_cnt1_cb));
-		memset(&m_out_sp1_cb, 0, sizeof(m_out_sp1_cb));
-		memset(&m_out_cnt2_cb, 0, sizeof(m_out_cnt2_cb));
-		memset(&m_out_sp2_cb, 0, sizeof(m_out_sp2_cb));
-		memset(&m_out_flag2_cb, 0, sizeof(m_out_flag2_cb));
-		memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
-	}
 }
 
 
@@ -96,12 +74,12 @@ void c64_user_port_device::device_start()
 	m_card = dynamic_cast<device_c64_user_port_interface *>(get_card_device());
 
 	// resolve callbacks
-	m_out_cnt1_func.resolve(m_out_cnt1_cb, *this);
-	m_out_sp1_func.resolve(m_out_sp1_cb, *this);
-	m_out_cnt2_func.resolve(m_out_cnt2_cb, *this);
-	m_out_sp2_func.resolve(m_out_sp2_cb, *this);
-	m_out_flag2_func.resolve(m_out_flag2_cb, *this);
-	m_out_reset_func.resolve(m_out_reset_cb, *this);
+	m_write_cnt1.resolve_safe();
+	m_write_sp1.resolve_safe();
+	m_write_cnt2.resolve_safe();
+	m_write_sp2.resolve_safe();
+	m_write_flag2.resolve_safe();
+	m_write_reset.resolve_safe();
 }
 
 

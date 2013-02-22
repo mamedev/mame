@@ -72,6 +72,26 @@ public:
 	UINT8 dma_bd_r(offs_t offset);
 	void dma_bd_w(offs_t offset, UINT8 data);
 	int phi2();
+	
+	enum
+	{
+		SEL0 = 0,
+		SEL1,
+		SEL2,
+		SEL3,
+		SEL4,
+		SEL5,
+		SEL6,
+		SEL7,
+		SEL8,
+		SEL9,
+		SELA,
+		SELB,
+		SELC,
+		SELD,
+		SELE,
+		SELF
+	};
 
 protected:
 	// device-level overrides

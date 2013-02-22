@@ -57,39 +57,22 @@ protected:
 	virtual int pet_diag_r();
 	virtual void pet_irq_w(int state);
 
-	enum
-	{
-		SEL0 = 0,
-		SEL1,
-		SEL2,
-		SEL3,
-		SEL4,
-		SEL5,
-		SEL6,
-		SEL7,
-		SEL8,
-		SEL9,
-		SELA,
-		SELB,
-		SELC,
-		SELD,
-		SELE,
-		SELF
-	};
-
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6551_device> m_acia;
 	required_device<mos6702_device> m_dongle;
 	required_memory_region m_rom;
 	optional_shared_ptr<UINT8> m_ram;
-	required_ioport m_sw1;
-	required_ioport m_sw2;
+	required_ioport m_io_sw1;
+	required_ioport m_io_sw2;
 
-	inline void update_cpu(int cpu);
+	inline void update_cpu();
+	inline bool is_ram_writable();
 
 	UINT8 m_system;
 	UINT8 m_bank;
+	UINT8 m_sw1;
+	UINT8 m_sw2;
 	int m_sel9_rom;
 	int m_pet_irq;
 	int m_acia_irq;

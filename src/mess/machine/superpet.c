@@ -111,8 +111,16 @@ machine_config_constructor superpet_device::device_mconfig_additions() const
 
 static INPUT_PORTS_START( superpet )
 	PORT_START("SW1")
+	PORT_DIPNAME( 0x03, 0x02, "RAM" )
+	PORT_DIPSETTING(    0x00, "Read Only" )
+	PORT_DIPSETTING(    0x01, "Read/Write" )
+	PORT_DIPSETTING(    0x02, "System Port" )
 
 	PORT_START("SW2")
+	PORT_DIPNAME( 0x03, 0x02, "CPU" )
+	PORT_DIPSETTING(    0x00, "6809" )
+	PORT_DIPSETTING(    0x01, "6502" )
+	PORT_DIPSETTING(    0x02, "System Port" )
 INPUT_PORTS_END
 
 
@@ -135,8 +143,10 @@ ioport_constructor superpet_device::device_input_ports() const
 //  update_cpu -
 //-------------------------------------------------
 
-inline void superpet_device::update_cpu(int cpu)
+inline void superpet_device::update_cpu()
 {
+	int cpu = (m_sw2 == 2) ? BIT(m_system, 0) : m_sw2;
+
 	if (cpu)
 	{
 		// 6502 active
@@ -149,6 +159,16 @@ inline void superpet_device::update_cpu(int cpu)
 		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 		machine().firstcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
+}
+
+
+//-------------------------------------------------
+//  is_ram_writable -
+//-------------------------------------------------
+
+inline bool superpet_device::is_ram_writable()
+{
+	return (m_sw1 == 2) ? BIT(m_system, 1) : m_sw1;
 }
 
 
@@ -169,8 +189,8 @@ superpet_device::superpet_device(const machine_config &mconfig, const char *tag,
 	m_dongle(*this, MOS6702_TAG),
 	m_rom(*this, M6809_TAG),
 	m_ram(*this, "ram"),
-	m_sw1(*this, "SW1"),
-	m_sw2(*this, "SW2"),
+	m_io_sw1(*this, "SW1"),
+	m_io_sw2(*this, "SW2"),
 	m_system(0),
 	m_bank(0),
 	m_sel9_rom(0),
@@ -209,8 +229,10 @@ void superpet_device::device_reset()
 	m_system = 0;
 	m_bank = 0;
 	m_sel9_rom = 0;
+	m_sw1 = m_io_sw1->read();
+	m_sw2 = m_io_sw2->read();
 
-	update_cpu(BIT(m_system, 0));
+	update_cpu();
 }
 
 
@@ -234,7 +256,7 @@ UINT8 superpet_device::pet_bd_r(address_space &space, offs_t offset, UINT8 data,
 
 	switch (sel)
 	{
-	case SEL9:
+	case pet_expansion_slot_device::SEL9:
 		if (m_sel9_rom)
 		{
 			data = m_rom->base()[offset - 0x9000];
@@ -245,14 +267,18 @@ UINT8 superpet_device::pet_bd_r(address_space &space, offs_t offset, UINT8 data,
 		}
 		break;
 
-	case SELA: case SELB: case SELC: case SELD: case SELF:
+	case pet_expansion_slot_device::SELA:
+	case pet_expansion_slot_device::SELB:
+	case pet_expansion_slot_device::SELC:
+	case pet_expansion_slot_device::SELD:
+	case pet_expansion_slot_device::SELF:
 		if (!norom)
 		{
 			data = m_rom->base()[offset - 0x9000];
 		}
 		break;
 
-	case SELE:
+	case pet_expansion_slot_device::SELE:
 		if (!norom && !BIT(offset, 11))
 		{
 			data = m_rom->base()[offset - 0x9000];
@@ -289,8 +315,8 @@ void superpet_device::pet_bd_w(address_space &space, offs_t offset, UINT8 data, 
 {
 	switch (sel)
 	{
-	case SEL9:
-		if (!m_sel9_rom && BIT(m_system, 1))
+	case pet_expansion_slot_device::SEL9:
+		if (!m_sel9_rom && is_ram_writable())
 		{
 			m_ram[((m_bank & 0x0f) << 12) | (offset & 0xfff)] = data;
 		}
@@ -334,7 +360,7 @@ void superpet_device::pet_bd_w(address_space &space, offs_t offset, UINT8 data, 
 			*/
 
 			m_system = data;
-			update_cpu(BIT(m_system, 0));
+			update_cpu();
 			printf("SYSTEM %02x\n", data);
 		}
 		break;

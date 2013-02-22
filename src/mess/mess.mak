@@ -821,11 +821,12 @@ $(MESSOBJ)/casio.a:             \
 	$(MESS_VIDEO)/hd44352.o     \
 
 $(MESSOBJ)/cbm.a:               \
-	$(MESS_DRIVERS)/pet2001.o   \
+	$(MESS_DRIVERS)/pet.o   	\
 	$(MESS_MACHINE)/petcass.o   \
-	$(MESS_MACHINE)/petexp.o   \
+	$(MESS_MACHINE)/petexp.o   	\
 	$(MESS_MACHINE)/petuser.o   \
-	$(MESS_MACHINE)/superpet.o   \
+	$(MESS_MACHINE)/pet_64k.o   \
+	$(MESS_MACHINE)/superpet.o  \
 	$(MESS_MACHINE)/mos6702.o   \
 	$(MESS_DRIVERS)/c64.o       \
 	$(MESS_MACHINE)/c64_legacy.o       \

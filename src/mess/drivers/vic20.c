@@ -450,16 +450,11 @@ WRITE8_MEMBER( vic20_state::via1_pa_w )
 	m_iec->atn_w(!BIT(data, 7));
 }
 
-READ_LINE_MEMBER( vic20_state::via1_ca1_r )
-{
-	return m_restore->read();
-}
-
 static const via6522_interface via1_intf =
 {
 	DEVCB_DRIVER_MEMBER(vic20_state, via1_pa_r),
 	DEVCB_DEVICE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, pb_r),
-	DEVCB_DRIVER_LINE_MEMBER(vic20_state, via1_ca1_r),
+	DEVCB_INPUT_PORT("RESTORE"),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -469,7 +464,7 @@ static const via6522_interface via1_intf =
 	DEVCB_DEVICE_LINE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, cb1_w),
 	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT_TAG, pet_datassette_port_device, motor_w),
 	DEVCB_DEVICE_LINE_MEMBER(VIC20_USER_PORT_TAG, vic20_user_port_device, cb2_w),
-	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_NMI)
+	DEVCB_CPU_INPUT_LINE(M6502_TAG, M6502_NMI_LINE)
 };
 
 

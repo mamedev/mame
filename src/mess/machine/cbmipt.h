@@ -90,6 +90,7 @@
 #include "machine/diag264_lb_user.h"
 #include "machine/fd2000.h"
 #include "machine/interpod.h"
+#include "machine/pet_64k.h"
 #include "machine/plus4_sid.h"
 #include "machine/plus4_std.h"
 #include "machine/serialbox.h"

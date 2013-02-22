@@ -99,7 +99,6 @@ public:
 
 	DECLARE_READ8_MEMBER( via1_pa_r );
 	DECLARE_WRITE8_MEMBER( via1_pa_w );
-	DECLARE_READ_LINE_MEMBER( via1_ca1_r );
 
 	DECLARE_READ8_MEMBER( via2_pa_r );
 	DECLARE_READ8_MEMBER( via2_pb_r );

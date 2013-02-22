@@ -3,7 +3,6 @@
     TODO:
 
     - connect CAPS LOCK to charom A12 on international variants
-    - expansion DMA
 
 */
 
@@ -1329,21 +1328,6 @@ WRITE_LINE_MEMBER( c128_state::exp_reset_w )
 }
 
 
-//-------------------------------------------------
-//  C64_USER_PORT_INTERFACE( user_intf )
-//-------------------------------------------------
-
-static C64_USER_PORT_INTERFACE( user_intf )
-{
-	DEVCB_DEVICE_LINE_MEMBER(MOS6526_1_TAG, mos6526_device, sp_w),
-	DEVCB_DEVICE_LINE_MEMBER(MOS6526_1_TAG, mos6526_device, cnt_w),
-	DEVCB_DEVICE_LINE_MEMBER(MOS6526_2_TAG, mos6526_device, sp_w),
-	DEVCB_DEVICE_LINE_MEMBER(MOS6526_2_TAG, mos6526_device, cnt_w),
-	DEVCB_DEVICE_LINE_MEMBER(MOS6526_2_TAG, mos6526_device, flag_w),
-	DEVCB_DRIVER_LINE_MEMBER(c128_state, exp_reset_w)
-};
-
-
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -1398,9 +1382,6 @@ void c128_state::machine_start()
 
 void c128_state::machine_reset()
 {
-	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-	m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-
 	m_maincpu->reset();
 	m_reset = 1;
 
@@ -1463,7 +1444,6 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt2_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp2_w))
 	MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(DEVICE_SELF, c128_state, cia2_pa_r), DEVWRITE8(DEVICE_SELF, c128_state, cia2_pa_w))
 	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(C64_USER_PORT_TAG, c64_user_port_device, pb_r), DEVWRITE8(C64_USER_PORT_TAG, c64_user_port_device, pb_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, pc2_w))
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", NULL, DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS8564_TAG, mos8564_device, lp_w))
@@ -1471,7 +1451,10 @@ static MACHINE_CONFIG_START( ntsc, c128_state )
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACKS(DEVWRITELINE(DEVICE_SELF, c128_state, exp_irq_w), DEVWRITELINE(DEVICE_SELF, c128_state, exp_nmi_w), DEVWRITELINE(DEVICE_SELF, c128_state, exp_reset_w))
 	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF, c128_state, exp_dma_cd_r), DEVWRITE8(DEVICE_SELF, c128_state, exp_dma_cd_w), DEVWRITELINE(DEVICE_SELF, c128_state, exp_dma_w))
-	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
+	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, c64_user_port_cards, NULL, NULL, DEVWRITELINE(DEVICE_SELF, c128_state, exp_reset_w))
+	MCFG_C64_USER_PORT_CIA1_CALLBACKS(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
+	MCFG_C64_USER_PORT_CIA2_CALLBACKS(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, sp_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
+	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
@@ -1584,7 +1567,6 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, cnt2_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, sp2_w))
 	MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(DEVICE_SELF, c128_state, cia2_pa_r), DEVWRITE8(DEVICE_SELF, c128_state, cia2_pa_w))
 	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(C64_USER_PORT_TAG, c64_user_port_device, pb_r), DEVWRITE8(C64_USER_PORT_TAG, c64_user_port_device, pb_w), DEVWRITELINE(C64_USER_PORT_TAG, c64_user_port_device, pc2_w))
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 	MCFG_PET_DATASSETTE_PORT_ADD(PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c1530", NULL, DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
 	MCFG_VCS_CONTROL_PORT_ADD(CONTROL1_TAG, vcs_control_port_devices, NULL, NULL)
 	MCFG_VCS_CONTROL_PORT_TRIGGER_HANDLER(DEVWRITELINE(MOS8566_TAG, mos8566_device, lp_w))
@@ -1592,7 +1574,10 @@ static MACHINE_CONFIG_START( pal, c128_state )
 	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACKS(DEVWRITELINE(DEVICE_SELF, c128_state, exp_irq_w), DEVWRITELINE(DEVICE_SELF, c128_state, exp_nmi_w), DEVWRITELINE(DEVICE_SELF, c128_state, exp_reset_w))
 	MCFG_C64_EXPANSION_SLOT_DMA_CALLBACKS(DEVREAD8(DEVICE_SELF, c128_state, exp_dma_cd_r), DEVWRITE8(DEVICE_SELF, c128_state, exp_dma_cd_w), DEVWRITELINE(DEVICE_SELF, c128_state, exp_dma_w))
-	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
+	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, c64_user_port_cards, NULL, NULL, DEVWRITELINE(DEVICE_SELF, c128_state, exp_reset_w))
+	MCFG_C64_USER_PORT_CIA1_CALLBACKS(DEVWRITELINE(MOS6526_1_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_1_TAG, mos6526_device, sp_w))
+	MCFG_C64_USER_PORT_CIA2_CALLBACKS(DEVWRITELINE(MOS6526_2_TAG, mos6526_device, cnt_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, sp_w), DEVWRITELINE(MOS6526_2_TAG, mos6526_device, flag_w))
+	MCFG_QUICKLOAD_ADD("quickload", cbm_c64, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
 
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
