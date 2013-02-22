@@ -169,6 +169,8 @@ void i8275x_device::device_start()
 
 void i8275x_device::device_reset()
 {
+	memset(m_buffer, 0, sizeof(m_buffer));
+
 	m_status &= ~ST_IE;
 
 	m_out_irq_func(CLEAR_LINE);
