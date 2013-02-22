@@ -291,6 +291,7 @@ void huc6260_device::device_reset()
 	m_blur = 0;
 	m_pixels_per_clock = 4;
 	m_height = 263;
+	m_pixel_clock = 0;
 
 	m_last_v = m_screen->vpos();
 	m_last_h = m_screen->hpos();
