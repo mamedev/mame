@@ -352,6 +352,7 @@ static TIMER_CALLBACK( timerA_cb )
 	scsp->udata.data[0x18/2]|=scsp->TimCnt[0]>>8;
 
 	CheckPendingIRQ(scsp);
+	MainCheckPendingIRQ(scsp, 0x40);
 }
 
 static TIMER_CALLBACK( timerB_cb )
@@ -867,7 +868,7 @@ static void SCSP_UpdateReg(scsp_state *scsp, address_space &space, int reg)
 			scsp->mcieb = scsp->udata.data[0x2a/2];
 
 			MainCheckPendingIRQ(scsp, 0);
-			if(scsp->mcieb & ~0x20)
+			if(scsp->mcieb & ~0x60)
 				popmessage("SCSP MCIEB enabled %04x, contact MAMEdev",scsp->mcieb);
 			break;
 		case 0x2c:
