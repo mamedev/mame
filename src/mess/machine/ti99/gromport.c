@@ -963,7 +963,6 @@ void gkracker_device::device_start()
 	m_ram_ptr = memregion(GKRACKER_NVRAM_TAG)->base();
 	m_grom_ptr = memregion(GKRACKER_ROM_TAG)->base();
 	m_cartridge = NULL;
-	m_grom_address = 0; // for the GROM emulation
 	for (int i=1; i < 6; i++) m_gk_switch[i] = 0;
 	m_gromport = static_cast<gromport_device*>(owner());
 }
@@ -975,6 +974,9 @@ void gkracker_device::device_reset()
 	m_gk_switch[3] = ioport(GKSWITCH3_TAG)->read();
 	m_gk_switch[4] = ioport(GKSWITCH4_TAG)->read();
 	m_gk_switch[5] = ioport(GKSWITCH5_TAG)->read();
+	m_grom_address = 0; // for the GROM emulation
+	m_ram_page = 0;
+	m_waddr_LSB = false;
 }
 
 static MACHINE_CONFIG_FRAGMENT( gkracker_slot )
@@ -1097,6 +1099,16 @@ void ti99_cartridge_device::prepare_cartridge()
 	memory_region *regr;
 	memory_region *regr2;
 
+	// Initialize some values.
+	m_pcb->m_rom_page = 0;
+	m_pcb->m_rom_ptr = NULL;
+	m_pcb->m_rom2_ptr = NULL;
+	m_pcb->m_ram_size = 0;
+	m_pcb->m_ram_ptr = NULL;
+	m_pcb->m_ram_page = 0;
+
+	for (int i=0; i < 5; i++) m_pcb->m_grom[i] = NULL;
+
 	m_pcb->m_grom_size = m_softlist? get_software_region_length("grom_socket") : m_rpk->get_resource_length("grom_socket");
 	if (VERBOSE>6) LOG("gromport: grom_socket.size=0x%04x\n", m_pcb->m_grom_size);
 
@@ -1106,6 +1118,7 @@ void ti99_cartridge_device::prepare_cartridge()
 		grom_ptr = m_softlist? get_software_region("grom_socket") : (UINT8*)m_rpk->get_contents_of_socket("grom_socket");
 		memcpy(regg->base(), grom_ptr, m_pcb->m_grom_size);
 		m_pcb->m_grom_ptr = regg->base();   // for gromemu
+		m_pcb->m_grom_address = 0;          // for gromemu
 
 		// Find the GROMs and keep their pointers
 		m_pcb->set_grom_pointer(0, subdevice(GROM3_TAG));
@@ -1122,6 +1135,8 @@ void ti99_cartridge_device::prepare_cartridge()
 		regr = memregion(CARTROM_TAG);
 		m_pcb->m_rom_ptr = m_softlist? get_software_region("rom_socket") : (UINT8*)m_rpk->get_contents_of_socket("rom_socket");
 		memcpy(regr->base(), m_pcb->m_rom_ptr, m_pcb->m_rom_size);
+		// Set both pointers to the same region for now
+		m_pcb->m_rom_ptr = m_pcb->m_rom2_ptr = regr->base();
 	}
 
 	rom2_length = m_softlist? get_software_region_length("rom2_socket") : m_rpk->get_resource_length("rom2_socket");
@@ -1131,6 +1146,7 @@ void ti99_cartridge_device::prepare_cartridge()
 		regr2 = memregion(CARTROM2_TAG);
 		m_pcb->m_rom2_ptr = m_softlist? get_software_region("rom2_socket") : (UINT8*)m_rpk->get_contents_of_socket("rom2_socket");
 		memcpy(regr2->base(), m_pcb->m_rom2_ptr, rom2_length);
+		m_pcb->m_rom2_ptr = regr2->base();
 	}
 
 	// NVRAM cartridges are not supported by softlists (we need to find a way to load the nvram contents first)

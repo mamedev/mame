@@ -191,7 +191,6 @@ private:
 	int     m_active_slot;
 	int     m_fixed_slot;
 	int     m_next_free_slot;
-	int     m_numcart;
 	ti99_cartridge_device*  m_cartridge[NUMBER_OF_CARTRIDGE_SLOTS];
 
 	void    set_slot(int slotnumber);
@@ -276,8 +275,10 @@ protected:
 	UINT8*              m_rom_ptr;
 	UINT8*              m_rom2_ptr;
 	UINT8*              m_ram_ptr;
-	UINT8*              m_grom_ptr; // for gromemu
-
+	int                 m_rom_page;     // for some cartridge types
+	UINT8*              m_grom_ptr;     // for gromemu
+	int                 m_grom_address; // for gromemu
+	int                 m_ram_page;     // for super
 private:
 };
 
@@ -297,9 +298,6 @@ public:
 	~ti99_paged_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-
-private:
-	int     m_rom_page;
 };
 
 /********************** Mini Memory ***********************************/
@@ -322,9 +320,6 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	void    crureadz(offs_t offset, UINT8 *value);
 	void    cruwrite(offs_t offset, UINT8 data);
-
-private:
-	int     m_ram_page;
 };
 
 /************************* MBX  ***************************************/
@@ -335,8 +330,6 @@ public:
 	~ti99_mbx_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
-private:
-	int     m_rom_page;
 };
 
 /********************** Paged 379i ************************************/
@@ -349,7 +342,6 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 private:
 	int     get_paged379i_bank(int rompage);
-	int     m_rom_page;
 };
 
 /********************** Paged CRU  ************************************/
@@ -362,8 +354,6 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 	void    crureadz(offs_t offset, UINT8 *value);
 	void    cruwrite(offs_t offset, UINT8 data);
-private:
-	int     m_rom_page;
 };
 
 /********************** GROM emulation cartridge  ************************************/
@@ -371,14 +361,13 @@ private:
 class ti99_gromemu_cartridge : public ti99_cartridge_pcb
 {
 public:
+	ti99_gromemu_cartridge() {  m_grom_address = 0; }
 	~ti99_gromemu_cartridge() { };
 	DECLARE_READ8Z_MEMBER(readz);
 	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_READ8Z_MEMBER(gromemureadz);
 	DECLARE_WRITE8_MEMBER(gromemuwrite);
 private:
-	int     m_rom_page;
-	int     m_grom_address;
 	bool    m_waddr_LSB;
 };
 
