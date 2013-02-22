@@ -92,7 +92,7 @@
 	  Angelique Special (Japan) [T-7615G]                                                   | (angspec)
 	  Angelique Special (Japan) (Premium Box) [T-7622G]                                     |  @@
 	  Angelique Special (Japan) (Premium Pack) [T-7650G]                                    |  @@
-	  Angelique Special 2 (Japan) [T-7627G]                                                 | (angspec2)
+	  Angelique Special 2 (Japan) [T-7627G]                                                 | ########MISSING########
 	  Angelique Special 2 (Japan) (Premium Box) [T-7638G]                                   |  @@
 	  Another Memories (Japan) [T-38001G]                                                   | (amemorie)
 	  Aponashi Girls: Olympos (Japan) (Shokai Gentei Cell Ga Package A) [T-4304G]           | - are these the same disc as the B package?
@@ -14979,22 +14979,6 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Angelique Special 2 (T-7627G)... -->
-	<software name="angspec2" supported="no">
-		<description>Angelique Special 2 (Jpn)</description>
-		<year>1997</year>
-		<publisher>Koei</publisher>
-		<info name="serial" value="T-7627G"/>
-		<info name="release" value="19970404"/>
-		<info name="alt_title" value="アンジェリークSpecial 2"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="sat_cdrom">
-			<diskarea name="cdrom">
-				<disk name="angelique special 2 (t-7627g)" sha1="bf4cf624354eebba9217940e4fe5d50fcd291053" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Identifying Another Memories (J) (T-38001G)... -->
 	<software name="amemorie" supported="no">
 		<description>Another Memories (Jpn)</description>
@@ -17289,6 +17273,21 @@ Olympic Soccer (Fra) T-7904H-09
 		<part name="cdrom" interface="sat_cdrom">
 			<diskarea name="cdrom">
 				<disk name="fushigi no kuni no angelique (t-7634g)" sha1="64435d182f5ad08ba1ee7f0dc89b067699b0802b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fushangea" cloneof="fushange" supported="no">
+		<description>Fushigi no Kuni no Angelique (Jpn) (Alt)</description>
+		<year>1997</year>
+		<publisher>Koei</publisher>
+		<info name="serial" value="T-7634G"/>
+		<info name="release" value="19970228"/>
+		<info name="alt_title" value="ふしぎの国のアンジェリーク"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="sat_cdrom">
+			<diskarea name="cdrom">
+				<disk name="fushigi no kuni no angelique (t-7634g) (alt)" sha1="bf4cf624354eebba9217940e4fe5d50fcd291053" />
 			</diskarea>
 		</part>
 	</software>
