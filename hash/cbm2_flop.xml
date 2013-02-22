@@ -2,54 +2,6 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="cbm2_flop" description="Commodore CBM-II diskettes">
 
-	<software name="2031demo">
-		<description>Commodore 2031 LP Floppy Diskette Drive Test/Demo Diskette</description>
-		<year>198?</year>
-		<publisher>Commodore</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="174848">
-				<rom name="2031lp-demo.d64" size="174848" crc="9c697562" sha1="940da4a6638058d6899fb629738d7ad8605b3976" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="8250test">
-		<description>Commodore 8250LP Floppy Disk Drive Test/Demo Diskette</description>
-		<year>198?</year>
-		<publisher>Commodore</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1066496">
-				<rom name="8250lp-demo.d82" size="1066496" crc="cbd23e48" sha1="acedaa2e77f7a113bfe77760eb67ba45099b50db" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="1001test">
-		<description>Commodore SFD-1001 Floppy Disk Drive Test/Demo Diskette</description>
-		<year>198?</year>
-		<publisher>Commodore</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1066496">
-				<rom name="sfd1001-demo.d82" size="1066496" crc="83b12b13" sha1="316fa89b4553ff1d411dc14ffcdd477c1fb284da" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="1001testa" cloneof="1001test">
-		<description>Commodore SFD-1001 Floppy Disk Drive Test/Demo Diskette (8050 Format)</description>
-		<year>198?</year>
-		<publisher>Commodore</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="533248">
-				<rom name="sfdtest8050fmt.d80" size="533248" crc="3845c0b9" sha1="56473932a35f2caedf370c51f1debd8664a14b5b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="burnin">
 		<description>Factory Burn In Diagnostics for B Series</description>
 		<year>1983</year>
@@ -123,30 +75,6 @@
 		</part>
 	</software>
 
-	<software name="cpm10">
-		<description>CP/M 86 v1.0</description>
-		<year>1983</year>
-		<publisher>Commodore</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="533248">
-				<rom name="cpm8610.d80" size="533248" crc="83e8d3c0" sha1="0fd8946985da419abdaccefdbe6dd91a8edcb3d5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="cpm11" cloneof="cpm10">
-		<description>CP/M 86 v1.1</description>
-		<year>1983</year>
-		<publisher>Commodore</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="533248">
-				<rom name="cpm8611.d80" size="533248" crc="1d479584" sha1="e9ed5aae765cb8e5e7f35397095f57d8c55e3b33" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="proxa7k">
 		<description>Proxa 7000</description>
 		<year>198?</year>
@@ -176,6 +104,98 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="cpm6509">
+		<description>CP/M 6509</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="6509bioscpm-d0.d80" size="533248" crc="b5333233" sha1="83907995853a8aa38e8fb5609841f2f91f513758" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="6509bioscpm-d1.d80" size="533248" crc="bc746f8c" sha1="f1bfafb60aee1acd2afd00fa165675a787a4d14a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fastbus">
+		<description>B-128 Fast Bus</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="b-128 fast bus.d80" size="533248" crc="04cb3692" sha1="4d60d77a4a25aeafa608c7198d8fb59f4b135518" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diags">
+		<description>B128/256 Diags</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="b128-256diags.d80" size="533248" crc="8082fe73" sha1="86cf972e13ff729b4916e9995c51658973a1c50d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beeline">
+		<description>BeeLine (v2.0)</description>
+		<year>1986</year>
+		<publisher>J &amp; K Lemkelde</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="beeline.d80" size="533248" crc="e2a2a13c" sha1="3c8c26b7ef402c8f39429302ac2bf754ca974635" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="normcopy">
+		<description>Norm's Copier for the 8050</description>
+		<year>198?</year>
+		<publisher>Jesse Knight</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="norm's copier.d80" size="533248" crc="913907cf" sha1="16c824ee1001fd9682b2fb627003529b30fa5e31" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superbse">
+		<description>Superbase 700 (v2.06)</description>
+		<year>1983</year>
+		<publisher>Precision Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="superbase 700.d80" size="533248" crc="4c4b1b9e" sha1="70ab9636609de2eb2a1a7963b6b5eafdfa98cb89" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supersc2">
+		<description>Superscript II (v1.0)</description>
+		<year>1982</year>
+		<publisher>Precision Software</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="533248">
+				<rom name="superscriptii.d80" size="533248" crc="e3da7e0d" sha1="e9e303857ee4b0c0655050a97142f75b2ad13838" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- CBUG -->
 
 	<software name="cbug02">
 		<description>CBUG #2</description>
@@ -1725,92 +1745,52 @@
 		</part>
 	</software>
 
-	<software name="bioscpm">
-		<description>6509 BIOS CP/M</description>
+	<!-- Test/Demo -->
+
+	<software name="2031demo">
+		<description>Commodore 2031 LP Floppy Diskette Drive Test/Demo Diskette</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Commodore</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="533248">
-				<rom name="6509bioscpm-d0.d80" size="533248" crc="b5333233" sha1="83907995853a8aa38e8fb5609841f2f91f513758" offset="0" />
-			</dataarea>
-		</part>
-
-		<part name="flop2" interface="floppy_5_25">
-			<dataarea name="flop" size="533248">
-				<rom name="6509bioscpm-d1.d80" size="533248" crc="bc746f8c" sha1="f1bfafb60aee1acd2afd00fa165675a787a4d14a" offset="0" />
+			<dataarea name="flop" size="174848">
+				<rom name="2031lp-demo.d64" size="174848" crc="9c697562" sha1="940da4a6638058d6899fb629738d7ad8605b3976" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="fastbus">
-		<description>B-128 Fast Bus</description>
+	<software name="8250test">
+		<description>Commodore 8250LP Floppy Disk Drive Test/Demo Diskette</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Commodore</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="533248">
-				<rom name="b-128 fast bus.d80" size="533248" crc="04cb3692" sha1="4d60d77a4a25aeafa608c7198d8fb59f4b135518" offset="0" />
+			<dataarea name="flop" size="1066496">
+				<rom name="8250lp-demo.d82" size="1066496" crc="cbd23e48" sha1="acedaa2e77f7a113bfe77760eb67ba45099b50db" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="diags">
-		<description>B128/256 Diags</description>
+	<software name="1001test">
+		<description>Commodore SFD-1001 Floppy Disk Drive Test/Demo Diskette</description>
 		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Commodore</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="533248">
-				<rom name="b128-256diags.d80" size="533248" crc="8082fe73" sha1="86cf972e13ff729b4916e9995c51658973a1c50d" offset="0" />
+			<dataarea name="flop" size="1066496">
+				<rom name="sfd1001-demo.d82" size="1066496" crc="83b12b13" sha1="316fa89b4553ff1d411dc14ffcdd477c1fb284da" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="beeline">
-		<description>BeeLine (v2.0)</description>
-		<year>1986</year>
-		<publisher>J &amp; K Lemkelde</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="533248">
-				<rom name="beeline.d80" size="533248" crc="e2a2a13c" sha1="3c8c26b7ef402c8f39429302ac2bf754ca974635" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="normcopy">
-		<description>Norm's Copier for the 8050</description>
+	<software name="1001test_ss" cloneof="1001test">
+		<description>Commodore SFD-1001 Floppy Disk Drive Test/Demo Diskette (8050 Format)</description>
 		<year>198?</year>
-		<publisher>Jesse Knight</publisher>
+		<publisher>Commodore</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
-				<rom name="norm's copier.d80" size="533248" crc="913907cf" sha1="16c824ee1001fd9682b2fb627003529b30fa5e31" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="superbse">
-		<description>Superbase 700 (v2.06)</description>
-		<year>1983</year>
-		<publisher>Precision Software</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="533248">
-				<rom name="superbase 700.d80" size="533248" crc="4c4b1b9e" sha1="70ab9636609de2eb2a1a7963b6b5eafdfa98cb89" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="supersc2">
-		<description>Superscript II (v1.0)</description>
-		<year>1982</year>
-		<publisher>Precision Software</publisher>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="533248">
-				<rom name="superscriptii.d80" size="533248" crc="e3da7e0d" sha1="e9e303857ee4b0c0655050a97142f75b2ad13838" offset="0" />
+				<rom name="sfdtest8050fmt.d80" size="533248" crc="3845c0b9" sha1="56473932a35f2caedf370c51f1debd8664a14b5b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
