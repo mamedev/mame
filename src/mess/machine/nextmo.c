@@ -18,6 +18,7 @@ ADDRESS_MAP_END
 
 nextmo_device::nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 		: device_t(mconfig, NEXTMO, "NeXT Magneto-optical drive", tag, owner, clock)
+		, r4(0)
 {
 }
 
