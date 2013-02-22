@@ -507,11 +507,11 @@ void tms9901_device::device_reset(void)
 
 	m_int_state = 0;
 	m_old_int_state = -1;
-	m_clock_register = 0;
 	field_interrupts();
 
 	m_clock_mode = false;
-
+	
+	m_clock_register = 0;
 	timer_reload();
 }
 
@@ -537,6 +537,8 @@ void tms9901_device::device_start(void)
 	}
 
 	m_interrupt.resolve(intf->interrupt_callback, *this);
+	
+	m_clock_register = 0;
 }
 
 const device_type TMS9901 = &device_creator<tms9901_device>;
