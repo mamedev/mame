@@ -114,7 +114,7 @@ int pet_expansion_slot_device::norom_r(address_space &space, offs_t offset, int 
 //  read - buffered data read
 //-------------------------------------------------
 
-UINT8 pet_expansion_slot_device::read(address_space &space, offs_t offset, UINT8 data, int sel)
+UINT8 pet_expansion_slot_device::read(address_space &space, offs_t offset, UINT8 data, int &sel)
 {
 	if (m_card != NULL)
 	{
@@ -129,7 +129,7 @@ UINT8 pet_expansion_slot_device::read(address_space &space, offs_t offset, UINT8
 //  write - buffered data write
 //-------------------------------------------------
 
-void pet_expansion_slot_device::write(address_space &space, offs_t offset, UINT8 data, int sel)
+void pet_expansion_slot_device::write(address_space &space, offs_t offset, UINT8 data, int &sel)
 {
 	if (m_card != NULL)
 	{

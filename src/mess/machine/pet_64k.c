@@ -123,7 +123,7 @@ int pet_64k_expansion_device::pet_norom_r(address_space &space, offs_t offset, i
 //  pet_bd_r - buffered data read
 //-------------------------------------------------
 
-UINT8 pet_64k_expansion_device::pet_bd_r(address_space &space, offs_t offset, UINT8 data, int sel)
+UINT8 pet_64k_expansion_device::pet_bd_r(address_space &space, offs_t offset, UINT8 data, int &sel)
 {
 	if (BIT(m_ctrl, 7))
 	{
@@ -133,6 +133,7 @@ UINT8 pet_64k_expansion_device::pet_bd_r(address_space &space, offs_t offset, UI
 			if (!BIT(m_ctrl, 5))
 			{
 				data = read_ram(offset);
+				sel = pet_expansion_slot_device::SEL_NONE;
 			}
 			break;
 
@@ -140,6 +141,7 @@ UINT8 pet_64k_expansion_device::pet_bd_r(address_space &space, offs_t offset, UI
 			if (!BIT(m_ctrl, 6) || !BIT(offset, 11))
 			{
 				data = read_ram(offset);
+				sel = pet_expansion_slot_device::SEL_NONE;
 			}
 			break;
 
@@ -162,7 +164,7 @@ UINT8 pet_64k_expansion_device::pet_bd_r(address_space &space, offs_t offset, UI
 //  pet_bd_w - buffered data write
 //-------------------------------------------------
 
-void pet_64k_expansion_device::pet_bd_w(address_space &space, offs_t offset, UINT8 data, int sel)
+void pet_64k_expansion_device::pet_bd_w(address_space &space, offs_t offset, UINT8 data, int &sel)
 {
 	if (BIT(m_ctrl, 7))
 	{
@@ -172,6 +174,7 @@ void pet_64k_expansion_device::pet_bd_w(address_space &space, offs_t offset, UIN
 			if (!BIT(m_ctrl, 5))
 			{
 				write_ram(offset, data);
+				sel = pet_expansion_slot_device::SEL_NONE;
 			}
 			break;
 
@@ -179,6 +182,7 @@ void pet_64k_expansion_device::pet_bd_w(address_space &space, offs_t offset, UIN
 			if (!BIT(m_ctrl, 6) || !BIT(offset, 11))
 			{
 				write_ram(offset, data);	
+				sel = pet_expansion_slot_device::SEL_NONE;
 			}
 			break;
 
@@ -195,7 +199,6 @@ void pet_64k_expansion_device::pet_bd_w(address_space &space, offs_t offset, UIN
 
 	if (offset == 0xfff0)
 	{
-		printf("CTRL %02x\n", data);
 		m_ctrl = data;
 	}
 }

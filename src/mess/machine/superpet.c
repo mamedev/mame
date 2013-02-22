@@ -250,7 +250,7 @@ int superpet_device::pet_norom_r(address_space &space, offs_t offset, int sel)
 //  pet_bd_r - buffered data read
 //-------------------------------------------------
 
-UINT8 superpet_device::pet_bd_r(address_space &space, offs_t offset, UINT8 data, int sel)
+UINT8 superpet_device::pet_bd_r(address_space &space, offs_t offset, UINT8 data, int &sel)
 {
 	int norom = pet_norom_r(space, offset, sel);
 
@@ -311,7 +311,7 @@ UINT8 superpet_device::pet_bd_r(address_space &space, offs_t offset, UINT8 data,
 //  pet_bd_w - buffered data write
 //-------------------------------------------------
 
-void superpet_device::pet_bd_w(address_space &space, offs_t offset, UINT8 data, int sel)
+void superpet_device::pet_bd_w(address_space &space, offs_t offset, UINT8 data, int &sel)
 {
 	switch (sel)
 	{

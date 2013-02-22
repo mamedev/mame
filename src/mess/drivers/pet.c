@@ -213,6 +213,8 @@ READ8_MEMBER( pet_state::read )
 	int norom = m_exp->norom_r(space, offset, sel);
 	UINT8 data = 0;
 
+	data = m_exp->read(space, offset, data, sel);
+
 	switch (sel)
 	{
 	case SEL0: case SEL1: case SEL2: case SEL3: case SEL4: case SEL5: case SEL6: case SEL7:
@@ -260,7 +262,7 @@ READ8_MEMBER( pet_state::read )
 		break;
 	}
 
-	return m_exp->read(space, offset, data, sel);
+	return data;
 }
 
 
@@ -271,6 +273,8 @@ READ8_MEMBER( pet_state::read )
 WRITE8_MEMBER( pet_state::write )
 {
 	int sel = offset >> 12;
+
+	m_exp->write(space, offset, data, sel);
 
 	switch (sel)
 	{
@@ -314,8 +318,6 @@ WRITE8_MEMBER( pet_state::write )
 		}
 		break;
 	}
-
-	m_exp->write(space, offset, data, sel);
 }
 
 

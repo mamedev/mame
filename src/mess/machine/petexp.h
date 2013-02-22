@@ -63,8 +63,8 @@ public:
 
 	// computer interface
 	int norom_r(address_space &space, offs_t offset, int sel);
-	UINT8 read(address_space &space, offs_t offset, UINT8 data, int sel);
-	void write(address_space &space, offs_t offset, UINT8 data, int sel);
+	UINT8 read(address_space &space, offs_t offset, UINT8 data, int &sel);
+	void write(address_space &space, offs_t offset, UINT8 data, int &sel);
 	DECLARE_READ_LINE_MEMBER( diag_r );
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 
@@ -75,6 +75,7 @@ public:
 	
 	enum
 	{
+		SEL_NONE = -1,
 		SEL0 = 0,
 		SEL1,
 		SEL2,
@@ -119,8 +120,8 @@ public:
 protected:
 	// runtime
 	virtual int pet_norom_r(address_space &space, offs_t offset, int sel) { return 1; }
-	virtual UINT8 pet_bd_r(address_space &space, offs_t offset, UINT8 data, int sel) { return data; };
-	virtual void pet_bd_w(address_space &space, offs_t offset, UINT8 data, int sel) { };
+	virtual UINT8 pet_bd_r(address_space &space, offs_t offset, UINT8 data, int &sel) { return data; };
+	virtual void pet_bd_w(address_space &space, offs_t offset, UINT8 data, int &sel) { };
 	virtual int pet_diag_r() { return 1; }
 	virtual void pet_irq_w(int state) { }
 
