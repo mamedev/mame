@@ -109,6 +109,7 @@ hd61830_device::hd61830_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, HD61830, "Hitachi HD61830", tag, owner, clock),
 		device_memory_interface(mconfig, *this),
 		m_bf(false),
+		m_cac(0),
 		m_blink(0),
 		m_space_config("videoram", ENDIANNESS_LITTLE, 8, 16, 0, NULL, *ADDRESS_MAP_NAME(hd61830)),
 		m_region_hd61830(*this, "hd61830")
