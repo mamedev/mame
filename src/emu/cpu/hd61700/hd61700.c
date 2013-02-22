@@ -101,7 +101,11 @@ const device_type HD61700 = &device_creator<hd61700_cpu_device>;
 
 hd61700_cpu_device::hd61700_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: cpu_device(mconfig, HD61700, "HD61700", tag, owner, clock),
-		m_program_config("program", ENDIANNESS_BIG, 16, 18, -1)
+		m_program_config("program", ENDIANNESS_BIG, 16, 18, -1),
+		m_ppc(0x0000),
+		m_curpc(0x0000),
+		m_pc(0),
+		m_flags(0)
 {
 	// ...
 }
