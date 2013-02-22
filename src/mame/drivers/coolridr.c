@@ -996,11 +996,12 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 			// DEBUG: Draw 16x16 block
 			UINT32* line;
+
 			if (blit_rotate)
 			{
 				if (used_flipy)
 				{
-					for (int y = 0; y < 16; y++)
+					for (int y = 0; y < blockhigh; y++)
 					{
 						const int drawy = pixelOffsetY+y;
 						if ((drawy>383) || (drawy<0)) continue;
@@ -1009,7 +1010,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 						if (used_flipx)
 						{
-							for (int x = 0; x < 16; x++)
+							for (int x = 0; x < blockwide; x++)
 							{
 								const int drawx = pixelOffsetX+x;
 								if ((drawx>=495 || drawx<0)) continue;
@@ -1022,7 +1023,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 						}
 						else
 						{
-							for (int x = 0; x < 16; x++)
+							for (int x = 0; x < blockwide; x++)
 							{
 								const int drawx = pixelOffsetX+x;
 								if ((drawx>=495 || drawx<0)) continue;
@@ -1037,7 +1038,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 				}
 				else
 				{
-					for (int y = 0; y < 16; y++)
+					for (int y = 0; y < blockhigh; y++)
 					{
 						const int drawy = pixelOffsetY+y;
 						if ((drawy>383) || (drawy<0)) continue;
@@ -1046,7 +1047,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 						if (used_flipx)
 						{
-							for (int x = 0; x < 16; x++)
+							for (int x = 0; x < blockwide; x++)
 							{
 								const int drawx = pixelOffsetX+x;
 								if ((drawx>=495 || drawx<0)) continue;
@@ -1059,7 +1060,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 						}
 						else
 						{
-							for (int x = 0; x < 16; x++)
+							for (int x = 0; x < blockwide; x++)
 							{
 								const int drawx = pixelOffsetX+x;
 								if ((drawx>=495 || drawx<0)) continue;
@@ -1077,7 +1078,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 			{
 				if (used_flipy)
 				{
-					for (int y = 0; y < 16; y++)
+					for (int y = 0; y < blockhigh; y++)
 					{
 						const int drawy = pixelOffsetY+y;
 						if ((drawy>383) || (drawy<0)) continue;
@@ -1086,7 +1087,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 						if (used_flipx)
 						{
-							for (int x = 0; x < 16; x++)
+							for (int x = 0; x < blockwide; x++)
 							{
 								const int drawx = pixelOffsetX+x;
 								if ((drawx>=495 || drawx<0)) continue;
@@ -1099,7 +1100,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 						}
 						else
 						{
-							for (int x = 0; x < 16; x++)
+							for (int x = 0; x < blockwide; x++)
 							{
 								const int drawx = pixelOffsetX+x;
 								if ((drawx>=495 || drawx<0)) continue;
