@@ -474,6 +474,16 @@ void m6809_base_device::device_start()
 	state_add(M6809_Y,         "Y",         m_y.w.l).mask(0xffff);
 	state_add(M6809_DP,        "DP",        m_dp.w.l).mask(0xffff);
 
+	// initialize variables
+	m_cc = 0;
+	m_pc.d = 0;
+	m_s.d = 0;
+	m_u.d = 0;
+	m_d.d = 0;
+	m_x.d = 0;
+	m_y.d = 0;
+	m_dp.d = 0;
+
 	// setup regtable
 	save_item(NAME(PC));
 	save_item(NAME(PPC));
