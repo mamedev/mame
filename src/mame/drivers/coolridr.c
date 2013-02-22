@@ -394,6 +394,7 @@ public:
 	UINT16 m_textBytesToWrite;
 	INT16  m_blitterSerialCount;
 	UINT8  m_blitterMode;
+	UINT16 m_blitterAddr;
 	UINT16 m_textOffset;
 	UINT32 m_blitterClearMode;
 	INT16 m_blitterClearCount;
@@ -425,8 +426,8 @@ public:
 	required_shared_ptr<UINT32> m_sound_dma;
 	required_shared_ptr<UINT16> m_soundram;
 	required_shared_ptr<UINT16> m_soundram2;
-	bitmap_rgb32 m_temp_bitmap_sprites;
-	bitmap_rgb32 m_temp_bitmap_sprites2;
+	bitmap_rgb32 m_temp_bitmap_sprites[4];
+	bitmap_rgb32 m_temp_bitmap_sprites2[4];
 	bitmap_rgb32 m_screen1_bitmap;
 	bitmap_rgb32 m_screen2_bitmap;
 	int m_color;
@@ -489,8 +490,17 @@ public:
 
 void coolridr_state::video_start()
 {
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites[0]);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2[0]);
+
+	// testing, not right
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites[1]);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2[1]);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites[2]);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2[2]);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites[3]);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2[3]);
+
 	machine().primary_screen->register_screen_bitmap(m_screen1_bitmap);
 	machine().primary_screen->register_screen_bitmap(m_screen2_bitmap);
 }
@@ -720,14 +730,10 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	/************* m_spriteblit[3] *************/
 
 	UINT32 blit3_unused = m_spriteblit[3] & 0xffe00000;
-	UINT32 b3romoffset = (m_spriteblit[3] & 0x001fffff)*2;
-	// if this is an offset into the compressed m_spriteblit[3] then it's probably a word offset into each rom (each is 0x400000 bytes) with the m_spriteblit[3] from all 10 being used in parallel as per the notes from Charles
-	// this needs verifying as it could instead be an index into some other ram area already decompressed..
-	// 0000xxxx
-	//  to
-	// 001fxxxx
+	UINT32 b3romoffset = (m_spriteblit[3] & 0x001fffff)*16;
 
-	if (blit3_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, blit3_unused);
+
+	if (blit3_unused) printf("unknown bits in blit word %d -  %08x\n", 3, blit3_unused);
 	
 
 	/************* m_spriteblit[4] *************/
@@ -737,7 +743,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	UINT32 blit_flipx = m_spriteblit[4] & 0x00000001;
 	UINT32 blit_flipy = (m_spriteblit[4] & 0x00000100)>>8;
 	UINT32 blit_rotate = (m_spriteblit[4] & 0x00010000)>>16;
-	if (blit4_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, blit4_unused);
+	if (blit4_unused) printf("unknown bits in blit word %d -  %08x\n", 4, blit4_unused);
 
 	// ---- -111 ---- ---r ---- ---y ---- ---x
 	// 1 = used bits? (unknown purpose.. might be object colour mode)
@@ -790,10 +796,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 	/************* m_spriteblit[10] *************/
 
-	// this is an address on some objects..
-	// to be specific, the center line of the road (actual road object? which currently gets shown as a single pixel column?)
-	// and the horizontal road used in the background of the title screen (which currently looks normal)
-	// I guess it's some kind of indirect way to do a line effect?
+	// pointer to per-line zoom and scroll data for sprites
 	UINT32 blit10 =  m_spriteblit[10];
 
 	/************* m_spriteblit[11] *************/
@@ -829,11 +832,21 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 	bitmap_rgb32* drawbitmap;
 
+	/* test code, not right 0x30 is always text, 0x40 hud, 0x50 99% of game objects and 0x60 some background objects, but it doesn't seem directly priority related*/
+	/*
 	// 0x30 - 0x60 are definitely the left screen, 0x90 - 0xc0 are definitely the right screen.. the modes seem priority related
 	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
-		drawbitmap = &m_temp_bitmap_sprites;
+		drawbitmap = &m_temp_bitmap_sprites[(m_blitterMode-0x30)>>4];
 	else // 0x90, 0xa0, 0xb0, 0xc0
-		drawbitmap = &m_temp_bitmap_sprites2;
+		drawbitmap = &m_temp_bitmap_sprites2[(m_blitterMode-0x90)>>4];
+	*/
+
+	
+	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
+		drawbitmap = &m_temp_bitmap_sprites[0];
+	else // 0x90, 0xa0, 0xb0, 0xc0
+		drawbitmap = &m_temp_bitmap_sprites2[0];
+	
 
 	int sizey = used_vCellCount * 16 * vZoom;
 
@@ -925,8 +938,6 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 		}
 
-		//if ((hOrigin & 3) != 1)
-		//	return;
 
 		for (int h = 0; h < used_hCellCount; h++)
 		{
@@ -982,7 +993,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 
 			// these should be 'cell numbers' (tile numbers) which look up RLE data?
-			UINT32 spriteNumber = (m_expanded_10bit_gfx[ (b3romoffset << 3) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (b3romoffset << 3) + (lookupnum<<1) + 1 ]);
+			UINT32 spriteNumber = (m_expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]);
 			UINT16 tempshape[16*16];
 			
 			// skip the decoding if it's the same tile as last time!
@@ -996,7 +1007,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 				while (data_written<256)
 				{
 
-					UINT16 compdata = m_expanded_10bit_gfx[ (b3romoffset << 3) + spriteNumber + i];
+					UINT16 compdata = m_expanded_10bit_gfx[ (b3romoffset) + spriteNumber + i];
 
 					if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
 					{
@@ -1188,6 +1199,20 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 		// The lower word always seems to be 0x0001 and the upper byte always 0xac.
 		m_blitterSerialCount = 0;
 
+		m_blitterAddr = data & 0x00000fff;
+
+		// maybe it's actually treated like RAM, and blittermode determines the nature of the write (forward inc, backward inc, no inc etc.)
+		// the m_blitterAddr when used does increase by 6 each time
+
+		// not seen this triggered
+		if ((data & 0xff000000) != 0xac000000)
+			printf("blitter mode set without upper bits equal 0xac000000\n");
+
+		// nor this
+		if (data & 0x0000f000)
+			printf("blitter mode with mask 0x0000f000\n");
+
+
 		// form 0xacMM-xxx   ac = fixed value for this mode?  MM = modes above.  -xxx = some kind of offset? but it doesn't increment for each blit like the textOffset / paletteOffset stuff, investigate
 
 	}
@@ -1325,16 +1350,19 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 		{
 			const rectangle& visarea = machine().primary_screen->visible_area();
 
+			// test code
+			int i = 0;
+
 			if(m_blitterClearMode == 0x8c200000)
 			{
-				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, visarea);
-				m_temp_bitmap_sprites.fill(0, visarea);
+				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites[i], 0, 0, 0, 0, visarea);
+				m_temp_bitmap_sprites[i].fill(0, visarea);
 			}
 
 			if(m_blitterClearMode == 0x8c800000)
 			{
-				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2, 0, 0, 0, 0, visarea);
-				m_temp_bitmap_sprites2.fill(0, visarea);
+				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2[i], 0, 0, 0, 0, visarea);
+				m_temp_bitmap_sprites2[i].fill(0, visarea);
 			}
 		}
 	}
@@ -1358,6 +1386,25 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
 		{
 			printf("sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
 		}
+		break;
+
+		case 0x01:
+		{
+			// writes on startup
+			// sysh1_unk_blit_w unhandled offset 0001 01010101 ffffffff
+		}
+		break;
+
+		case 0x02:
+		{
+
+			// writes 3d0dxxxx / 3d0exxxx before a level start.. tilemaps transfer?
+
+			//printf("sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
+
+		
+		}
+		break;
 
 	}
 }
