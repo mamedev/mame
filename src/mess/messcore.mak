@@ -28,7 +28,6 @@ EMUSRC = $(SRC)/emu
 EMUOBJ = $(OBJ)/emu
 
 # MAME directories
-EMU_AUDIO = $(EMUOBJ)/audio
 EMU_MACHINE = $(EMUOBJ)/machine
 EMU_VIDEO = $(EMUOBJ)/video
 MAME_AUDIO = $(MAMEOBJ)/audio
@@ -47,7 +46,6 @@ MESS_MACHINE = $(MESSOBJ)/machine
 MESS_VIDEO = $(MESSOBJ)/video
 
 OBJDIRS += \
-	$(EMU_AUDIO) \
 	$(EMU_MACHINE) \
 	$(EMU_VIDEO) \
 	$(MAME_AUDIO) \
