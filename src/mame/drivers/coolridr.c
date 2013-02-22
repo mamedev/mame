@@ -1277,6 +1277,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 			printf("blitter mode with mask 0x0000f000\n");
 
 
+
+		//if (m_blitterMode<0x80)  printf("blitter set screen %d mode %02x addr? %04x\n", (data&0x00800000)>>23, ((data & 0x00ff0000)>>16)-0x30, data & 0x00000fff);
+
 		// form 0xacMM-xxx   ac = fixed value for this mode?  MM = modes above.  -xxx = some kind of offset? but it doesn't increment for each blit like the textOffset / paletteOffset stuff, investigate
 
 	}
@@ -1428,6 +1431,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2[i], 0, 0, 0, 0, visarea);
 				m_temp_bitmap_sprites2[i].fill(0, visarea);
 			}
+
+			//printf("frame\n");
 		}
 	}
 	else
@@ -1505,71 +1510,114 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 		size = m_framebuffer_vram[(8+dma_index)/4];
 		type = (m_framebuffer_vram[(0+dma_index)/4] & 0xf0000000) >> 28;
 
-		#if 0
-		if(type == 0xc || type == 0xd || type == 0xe)
-			printf("* %08x %08x %08x %08x\n",src,dst,size,type);
-		else if(type != 0 && type != 0x4)
-			printf("%08x %08x %08x %08x\n",src,dst,size,type);
-		#endif
 
-		if(type == 0x3 || type == 0x4)
+
+		switch (type)
 		{
-			//type 3 sets a DMA state->m_param, type 4 sets some kind of table? Skip it for now
-			dma_index+=4;
-			continue;
+			case 0x0:
+				end_dma_mark = 1; //end of DMA list
+				break;
+
+			default:
+				// on startup
+				//unhandled dma type 01 03e09b80
+				//unhandled dma type 02 03e0dc00
+				//unhandled dma type 02 07e0ee00
+
+				printf("unhandled dma type %02x %08x\n", type, src);
+				dma_index+=4;
+				break;
+
+			case 0x3:
+				//type 3 sets a DMA state->m_param, type 4 sets some kind of table? Skip it for now
+				/* per screen - on transitions */
+				if (src & 0x04000000)
+				{
+					//printf("screen 2 unhandled dma type %02x %08x\n", type, src& ~0x04000000);
+				}
+				else
+				{
+					//printf("screen 1 unhandled dma type %02x %08x\n", type, src& ~0x04000000);
+				}
+				
+				dma_index+=4;
+				break;
+
+			case 0x4:
+				/* per screen - on transitions */
+				/* some kind of brightness effect for the sprites? */
+
+				if (src & 0x04000000)
+				{
+					// screen 2...
+					//printf("screen 2 unhandled dma type %02x %08x\n", type, src& ~0x04000000);
+				}
+				else
+				{
+					// screen 1
+					//printf("screen 1 unhandled dma type %02x %08x\n", type, src& ~0x04000000);
+				}
+
+				//type 3 sets a DMA state->m_param, type 4 sets some kind of table? Skip it for now
+				dma_index+=4;
+				break;
+
+			case 0xc:
+				dst &= 0xfffff;
+
+				dst |= 0x3000000; //to videoram, FIXME: unknown offset
+				size*=2;
+
+				for(s_i=0;s_i<size;s_i+=4)
+				{
+					space.write_dword(dst,space.read_dword(src));
+					dst+=4;
+					src+=4;
+				}
+				dma_index+=0xc;
+				break;
+
+			case 0xd:
+				dst &= 0xfffff;
+
+				dst |= 0x3d00000; //to charram, FIXME: unknown offset
+				size*=2;
+
+				for(s_i=0;s_i<size;s_i+=4)
+				{
+					space.write_dword(dst,space.read_dword(src));
+					dst+=4;
+					src+=4;
+				}
+				dma_index+=0xc;
+				break;
+
+			case 0xe:
+				dst &= 0xfffff;
+
+				dst |= 0x3c00000; //to paletteram FIXME: unknown offset
+				//size/=2;
+
+				// this is used when transfering palettes written by the blitter? maybe?
+				//  it might be a better indication of where blitter command 0xe0 should REALLY write data (at 0x3e00000)...
+				if((src & 0xff00000) == 0x3e00000)
+				{
+					src &= 0xfffff;
+					src |= 0x3c00000;
+				}
+
+				for(s_i=0;s_i<size;s_i+=4)
+				{
+					space.write_dword(dst,space.read_dword(src));
+					dst+=4;
+					src+=4;
+				}
+				dma_index+=0xc;
+				break;
 		}
 
-		if(type == 0xc)
-		{
-			dst &= 0xfffff;
 
-			dst |= 0x3000000; //to videoram, FIXME: unknown offset
-			size*=2;
-		}
-		if(type == 0xd)
-		{
-			dst &= 0xfffff;
 
-			dst |= 0x3d00000; //to charram, FIXME: unknown offset
-			size*=2;
-		}
-
-		if(type == 0xe)
-		{
-			dst &= 0xfffff;
-
-			dst |= 0x3c00000; //to paletteram FIXME: unknown offset
-			//size/=2;
-
-			// this is used when transfering palettes written by the blitter? maybe?
-			//  it might be a better indication of where blitter command 0xe0 should REALLY write data (at 0x3e00000)...
-			if((src & 0xff00000) == 0x3e00000)
-			{
-				src &= 0xfffff;
-				src |= 0x3c00000;
-			}
-			//	return; //FIXME: kludge to avoid palette corruption
-			//debugger_break(space.machine());
-		}
-
-		if(type == 0xc || type == 0xd || type == 0xe)
-		{
-			for(s_i=0;s_i<size;s_i+=4)
-			{
-				space.write_dword(dst,space.read_dword(src));
-				dst+=4;
-				src+=4;
-			}
-		}
-		else
-		{
-			//printf("%08x %08x %08x %08x\n",src,dst,size,type);
-		}
-
-		if(type == 0x00)
-			end_dma_mark = 1; //end of DMA list
-
-		dma_index+=0xc;
 
 	}while(!end_dma_mark );
 }
