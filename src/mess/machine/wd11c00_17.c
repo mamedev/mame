@@ -211,6 +211,7 @@ inline void wd11c00_17_device::select()
 wd11c00_17_device::wd11c00_17_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, WD11C00_17, "Western Digital WD11C00-17", tag, owner, clock),
 		m_status(0),
+		m_ra(0),
 		m_irq5(CLEAR_LINE),
 		m_drq3(CLEAR_LINE),
 		m_busy(1),
