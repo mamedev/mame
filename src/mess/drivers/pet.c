@@ -198,7 +198,7 @@ void pet_state::update_speaker()
 {
 	if (m_speaker)
 	{
-	speaker_level_w(m_speaker, !(m_via_cb2 || m_pia1_pa7));
+		speaker_level_w(m_speaker, !(m_via_cb2 || m_pia1_pa7));
 	}
 }
 
@@ -216,48 +216,48 @@ READ8_MEMBER( pet_state::read )
 	switch (sel)
 	{
 	case SEL0: case SEL1: case SEL2: case SEL3: case SEL4: case SEL5: case SEL6: case SEL7:
-	if (offset < m_ram->size())
-	{
-		data = m_ram->pointer()[offset];
-	}
-	break;
+		if (offset < m_ram->size())
+		{
+			data = m_ram->pointer()[offset];
+		}
+		break;
 
 	case SEL8:
-	data = m_video_ram[offset & (m_video_ram_size - 1)];
-	break;
+		data = m_video_ram[offset & (m_video_ram_size - 1)];
+		break;
 
 	case SEL9: case SELA: case SELB: case SELC: case SELD: case SELF:
-	if (norom)
-	{
-		data = m_rom->base()[offset - 0x9000];
-	}
-	break;
+		if (norom)
+		{
+			data = m_rom->base()[offset - 0x9000];
+		}
+		break;
 
 	case SELE:
-	if (BIT(offset, 11))
-	{
-		if (BIT(offset, 4))
+		if (BIT(offset, 11))
 		{
-		data = m_pia1->read(space, offset & 0x03);
+			if (BIT(offset, 4))
+			{
+				data = m_pia1->read(space, offset & 0x03);
+			}
+			if (BIT(offset, 5))
+			{
+				data = m_pia2->read(space, offset & 0x03);
+			}
+			if (BIT(offset, 6))
+			{
+				data = m_via->read(space, offset & 0x0f);
+			}
+			if (m_crtc && BIT(offset, 7) && BIT(offset, 0))
+			{
+				data = m_crtc->register_r(space, 0);
+			}
 		}
-		if (BIT(offset, 5))
+		else if (norom)
 		{
-		data = m_pia2->read(space, offset & 0x03);
+			data = m_rom->base()[offset - 0x9000];
 		}
-		if (BIT(offset, 6))
-		{
-		data = m_via->read(space, offset & 0x0f);
-		}
-		if (m_crtc && BIT(offset, 7) && BIT(offset, 0))
-		{
-		data = m_crtc->register_r(space, 0);
-		}
-	}
-	else if (norom)
-	{
-		data = m_rom->base()[offset - 0x9000];
-	}
-	break;
+		break;
 	}
 
 	return m_exp->read(space, offset, data, sel);
@@ -271,48 +271,49 @@ READ8_MEMBER( pet_state::read )
 WRITE8_MEMBER( pet_state::write )
 {
 	int sel = offset >> 12;
+	int norom = m_exp->norom_r(space, offset, sel);
 
 	switch (sel)
 	{
 	case SEL0: case SEL1: case SEL2: case SEL3: case SEL4: case SEL5: case SEL6: case SEL7:
-	if (offset < m_ram->size())
-	{
-		m_ram->pointer()[offset] = data;
-	}
-	break;
+		if (offset < m_ram->size())
+		{
+			m_ram->pointer()[offset] = data;
+		}
+		break;
 
 	case SEL8:
-	m_video_ram[offset & (m_video_ram_size - 1)] = data;
-	break;
+		m_video_ram[offset & (m_video_ram_size - 1)] = data;
+		break;
 
 	case SELE:
-	if (BIT(offset, 11))
-	{
-		if (BIT(offset, 4))
+		if (BIT(offset, 11))
 		{
-		m_pia1->write(space, offset & 0x03, data);
+			if (BIT(offset, 4))
+			{
+				m_pia1->write(space, offset & 0x03, data);
+			}
+			if (BIT(offset, 5))
+			{
+				m_pia2->write(space, offset & 0x03, data);
+			}
+			if (BIT(offset, 6))
+			{
+				m_via->write(space, offset & 0x0f, data);
+			}
+			if (m_crtc && BIT(offset, 7))
+			{
+				if (BIT(offset, 0))
+				{
+					m_crtc->register_w(space, 0, data);
+				}
+				else
+				{
+					m_crtc->address_w(space, 0, data);
+				}
+			}
 		}
-		if (BIT(offset, 5))
-		{
-		m_pia2->write(space, offset & 0x03, data);
-		}
-		if (BIT(offset, 6))
-		{
-		m_via->write(space, offset & 0x0f, data);
-		}
-		if (m_crtc && BIT(offset, 7))
-		{
-		if (BIT(offset, 0))
-		{
-			m_crtc->register_w(space, 0, data);
-		}
-		else
-		{
-			m_crtc->address_w(space, 0, data);
-		}
-		}
-	}
-	break;
+		break;
 	}
 
 	m_exp->write(space, offset, data, sel);
@@ -918,22 +919,22 @@ UINT32 pet_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 {
 	for (int y = 0; y < 200; y++)
 	{
-	for (int sx = 0; sx < 40; sx++)
-	{
-		int sy = y / 8;
-		offs_t video_addr = (sy * 40) + sx;
-		UINT8 lsd = m_video_ram[video_addr];
-
-		int ra = y & 0x07;
-		offs_t char_addr = (m_graphic << 10) | ((lsd & 0x7f) << 3) | ra;
-		UINT8 data = m_char_rom->base()[char_addr];
-
-		for (int x = 0; x < 8; x++, data <<= 1)
+		for (int sx = 0; sx < 40; sx++)
 		{
-		int color = (BIT(data, 7) ^ BIT(lsd, 7)) && m_blanktv;
-		bitmap.pix32(y, (sx * 8) + x) = RGB_MONOCHROME_GREEN[color];
+			int sy = y / 8;
+			offs_t video_addr = (sy * 40) + sx;
+			UINT8 lsd = m_video_ram[video_addr];
+
+			int ra = y & 0x07;
+			offs_t char_addr = (m_graphic << 10) | ((lsd & 0x7f) << 3) | ra;
+			UINT8 data = m_char_rom->base()[char_addr];
+
+			for (int x = 0; x < 8; x++, data <<= 1)
+			{
+			int color = (BIT(data, 7) ^ BIT(lsd, 7)) && m_blanktv;
+			bitmap.pix32(y, (sx * 8) + x) = RGB_MONOCHROME_GREEN[color];
+			}
 		}
-	}
 	}
 
 	return 0;
@@ -952,37 +953,37 @@ static MC6845_UPDATE_ROW( pet80_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-	UINT8 lsd = 0, data = 0;
-	UINT8 rra = ra & 0x07;
-	int no_row = !(BIT(ra, 3) || BIT(ra, 4));
-	int invert = BIT(ma, 12);
-	int chr_option = BIT(ma, 13);
+		UINT8 lsd = 0, data = 0;
+		UINT8 rra = ra & 0x07;
+		int no_row = !(BIT(ra, 3) || BIT(ra, 4));
+		int invert = BIT(ma, 12);
+		int chr_option = BIT(ma, 13);
 
-	// even character
+		// even character
 
-	lsd = state->m_video_ram[((ma + column) << 1) & 0x7ff];
+		lsd = state->m_video_ram[((ma + column) << 1) & 0x7ff];
 
-	offs_t char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-	data = state->m_char_rom->base()[char_addr & char_rom_mask];
+		offs_t char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
+		data = state->m_char_rom->base()[char_addr & char_rom_mask];
 
-	for (int bit = 0; bit < 8; bit++, data <<= 1)
-	{
-		int video = !((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert;
-		bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[video];
-	}
+		for (int bit = 0; bit < 8; bit++, data <<= 1)
+		{
+			int video = !((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert;
+			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[video];
+		}
 
-	// odd character
+		// odd character
 
-	lsd = state->m_video_ram[(((ma + column) << 1) + 1) & 0x7ff];
+		lsd = state->m_video_ram[(((ma + column) << 1) + 1) & 0x7ff];
 
-	char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-	data = state->m_char_rom->base()[char_addr & char_rom_mask];
+		char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
+		data = state->m_char_rom->base()[char_addr & char_rom_mask];
 
-	for (int bit = 0; bit < 8; bit++, data <<= 1)
-	{
-		int video = !((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert;
-		bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[video];
-	}
+		for (int bit = 0; bit < 8; bit++, data <<= 1)
+		{
+			int video = !((BIT(data, 7) ^ BIT(lsd, 7)) && no_row) ^ invert;
+			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[video];
+		}
 	}
 }
 
@@ -1021,16 +1022,16 @@ MACHINE_START_MEMBER( pet_state, pet )
 
 	for (offs_t offset = 0; offset < m_ram->size(); offset++)
 	{
-	m_ram->pointer()[offset] = data;
-	if (!(offset % 64)) data ^= 0xff;
+		m_ram->pointer()[offset] = data;
+		if (!(offset % 64)) data ^= 0xff;
 	}
 
 	data = 0xff;
 
 	for (offs_t offset = 0; offset < m_video_ram_size; offset++)
 	{
-	m_video_ram[offset] = data;
-	if (!(offset % 64)) data ^= 0xff;
+		m_video_ram[offset] = data;
+		if (!(offset % 64)) data ^= 0xff;
 	}
 
 	// state saving
