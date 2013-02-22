@@ -715,16 +715,16 @@ OP_HANDLER( addr_r )
 	{
 		r16 = *src16Reg + *dst16Reg;
 		CLR_NZVC;
-		*dst16Reg = r16;
 		SET_FLAGS16(*src16Reg,*dst16Reg,r16);
+		*dst16Reg = r16;
 	}
 	else
 	{
 		r8 = *src8Reg + *dst8Reg;
 		CLR_NZVC;
 		/* SET_H(*src8Reg,*src8Reg,r8);*/ /*Experimentation prooved this not to be the case */
-		*dst8Reg = r8;
 		SET_FLAGS8(*src8Reg,*dst8Reg,r8);
+		*dst8Reg = r8;
 	}
 }
 
@@ -1822,7 +1822,7 @@ OP_HANDLER( decd )
 	UINT32 r;
 	r = D - 1;
 	CLR_NZVC;
-	SET_FLAGS16(D,D,r)
+	SET_FLAGS16(D,1,r)
 	D = r;
 }
 
@@ -1832,7 +1832,7 @@ OP_HANDLER( decw )
 	UINT32 r;
 	r = W - 1;
 	CLR_NZVC;
-	SET_FLAGS16(W,W,r)
+	SET_FLAGS16(W,1,r)
 	W = r;
 }
 
@@ -1868,7 +1868,7 @@ OP_HANDLER( incd )
 	UINT32 r;
 	r = D + 1;
 	CLR_NZVC;
-	SET_FLAGS16(D,D,r)
+	SET_FLAGS16(D,1,r)
 	D = r;
 }
 
@@ -1878,7 +1878,7 @@ OP_HANDLER( incw )
 	UINT32 r;
 	r = W + 1;
 	CLR_NZVC;
-	SET_FLAGS16(W,W,r)
+	SET_FLAGS16(W,1,r)
 	W = r;
 }
 
