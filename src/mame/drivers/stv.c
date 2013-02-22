@@ -929,7 +929,7 @@ static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16, stv_state )
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( stv, saturn_state )
+static MACHINE_CONFIG_START( stv, stv_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz

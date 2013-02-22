@@ -14,7 +14,8 @@ public:
 			m_workram_h(*this, "workram_h"),
 			m_sound_ram(*this, "sound_ram"),
 			m_fake_comms(*this, "fake")
-			{ }
+	{
+	}
 
 	required_shared_ptr<UINT32> m_workram_l;
 	required_shared_ptr<UINT32> m_workram_h;
@@ -648,6 +649,11 @@ public:
 class stv_state : public saturn_state
 {
 public:
+	stv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: saturn_state(mconfig, type, tag)
+	{
+	}
+
 	DECLARE_DRIVER_INIT(astrass);
 	DECLARE_DRIVER_INIT(batmanfr);
 	DECLARE_DRIVER_INIT(finlarch);
