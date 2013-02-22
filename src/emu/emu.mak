@@ -255,6 +255,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/s3c2410.o     \
 	$(EMUMACHINE)/s3c2440.o     \
 	$(EMUMACHINE)/s3520cf.o     \
+	$(EMUMACHINE)/saturn.o      \
 	$(EMUMACHINE)/scsibus.o     \
 	$(EMUMACHINE)/scsicb.o      \
 	$(EMUMACHINE)/scsicd.o      \
@@ -265,7 +266,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/secflash.o    \
 	$(EMUMACHINE)/seibu_cop.o   \
 	$(EMUMACHINE)/smc91c9x.o    \
-	$(EMUMACHINE)/smpc.o      \
+	$(EMUMACHINE)/smpc.o        \
 	$(EMUMACHINE)/stvcd.o       \
 	$(EMUMACHINE)/tc009xlvc.o   \
 	$(EMUMACHINE)/timekpr.o     \
