@@ -2380,7 +2380,6 @@ $(MACHINE)/megacd.o:  $(LAYOUT)/megacd.lh
 
 $(DRIVERS)/galaxian.o:  $(MAMESRC)/drivers/galdrvr.c
 $(DRIVERS)/neogeo.o:    $(MAMESRC)/drivers/neodrvr.c
-$(DRIVERS)/saturn.o:    $(MAMESRC)/drivers/stv.c
 $(MACHINE)/snes.o:      $(MAMESRC)/machine/snesobc1.c \
 			$(MAMESRC)/machine/snescx4.c \
 			$(MAMESRC)/machine/cx4ops.c \
