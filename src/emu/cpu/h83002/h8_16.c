@@ -312,10 +312,7 @@ static void h8_GenException(h83xx_state *h8, UINT8 vectornr)
 	// push PC on stack
 	// extended mode stack push!
 	h8_setreg32(h8, H8_SP, h8_getreg32(h8, H8_SP)-4);
-	h8_mem_write32(h8, h8_getreg32(h8, H8_SP), h8->pc);
-	// push ccr
-	h8_setreg32(h8, H8_SP, h8_getreg32(h8, H8_SP)-2);
-	h8_mem_write16(h8, h8_getreg32(h8, H8_SP), h8_get_ccr(h8));
+	h8_mem_write32(h8, h8_getreg32(h8, H8_SP), h8->pc | (h8_get_ccr(h8)<<24));
 
 	// generate address from vector
 	h8_set_ccr(h8, h8_get_ccr(h8) | 0x80);

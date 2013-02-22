@@ -875,33 +875,10 @@ ROM_END
 
 DRIVER_INIT_MEMBER(coinmvga_state,colorama)
 {
-	UINT16 *ROM;
-	ROM = (UINT16 *)memregion("maincpu")->base();
-
-	// rte in non-irq routines? wtf? patch them to rts...
-	ROM[0x02B476/2] = 0x5470;
-	ROM[0x02AE3A/2] = 0x5470;
-	ROM[0x02A9FC/2] = 0x5470;
-	ROM[0x02AA3A/2] = 0x5470;
-
-	ROM[0x02729e/2] = 0x5470;
-	ROM[0x029fb4/2] = 0x5470;
-	ROM[0x02a224/2] = 0x5470;
-	ROM[0x02a94e/2] = 0x5470;
 }
 
 DRIVER_INIT_MEMBER(coinmvga_state,cmrltv75)
 {
-	UINT16 *ROM;
-	ROM = (UINT16 *)memregion("maincpu")->base();
-
-	// rte in non-irq routines? wtf? patch them to rts...
-	ROM[0x056fd6/2] = 0x5470;
-	ROM[0x05655c/2] = 0x5470;
-	ROM[0x05659a/2] = 0x5470;
-	ROM[0x05699a/2] = 0x5470;
-
-	//...
 }
 
 
