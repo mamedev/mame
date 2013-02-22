@@ -752,6 +752,8 @@ void isa8_cga_device::device_reset()
 	m_mode_control = 0;
 	m_vsync = 0;
 	m_hsync = 0;
+	m_color_select = 0;
+	memset(m_palette_lut_2bpp, 0, sizeof(m_palette_lut_2bpp));
 }
 
 /***************************************************************************
