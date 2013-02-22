@@ -76,6 +76,13 @@ Optional further steps:
 
 If ever in forth mode you can return to the editor with the forth word (without quotes) "re"
 
+Canon cat gate array ASIC markings:
+GA1 (prototype): D65013CW276 [same as final]
+GA1 (final): NH4-5001 276 [schematic: upD65013CW-276]
+GA2 (prototype): D65013CW208 [DIFFERENT FROM FINAL! larger asic used here, shrank for final?]
+GA2 (final): NH4-5002 191 [schematic: upD65012CW-191]
+GA3 (prototype): D65013CW141 [same as final? typo 65013 vs 65012?]
+GA3 (final): NH4-5003 141 [schematic: upD65012CW-141]
 
 Canon cat credits easter egg:
 * hold either leap key, then simultaneously hold shift, then type Q W E R A S D F Z X C V and release all the keys
@@ -83,15 +90,32 @@ Canon cat credits easter egg:
 
 Canon Cat credits details: (WIP)
 Scott Kim - responsible for fonts on swyft and cat
+Ralph Voorhees - Model construction and mockups (swyft 'flat cat')
+
+Cat HLSL stuff:
+*scanlines: 
+the cat has somewhat visible and fairly close scanlines with very little fuzziness
+try hlsl options:
+hlsl_prescale_x           4
+hlsl_prescale_y           4
+scanline_alpha            0.3
+scanline_size             1.0
+scanline_height           0.7
+scanline_bright_scale     1.0
+scanline_bright_offset    0.6
+*phosphor persistence of the original cat CRT is VERY LONG and fades to a greenish-yellow color, though the main color itself is white
+try hlsl option:
+phosphor_life             0.93,0.95,0.87
+which is fairly close but may actually be too SHORT compared to the real thing.
 
 
 Swyft versions:
 There are at least 4 variants of machines called 'swyft':
 * The earliest desktop units which use plexi or rubber-tooled case and an
   angled monitor; about a dozen were made and at least two of clear plexi.
-  These are sometimes called "wrinkled" swyfts. 5.25" drive, may be able to
-  read Apple2 Swyftware and Swyftcard-created disks.
- It is possible no prototypes of this type got beyond the 'runs forth console only' stage.
+  These are sometimes called "wrinkled" swyfts. 5.25" drive, they may be able
+  to read Apple2 Swyftware/Swyftdisk and Swyftcard-created disks.
+  It is possible no prototypes of this type got beyond the 'runs forth console only' stage.
   http://archive.computerhistory.org/resources/access/physical-object/2011/09/102746929.01.01.lg.JPG
   http://www.digibarn.com/collections/systems/swyft/Swyft-No2-05-1271.jpg
   http://www.digibarn.com/friends/jef-raskin/slides/iai/A%20-687%20SWYFTPRO.JPG
@@ -99,11 +123,13 @@ There are at least 4 variants of machines called 'swyft':
   case and just a keyboard. Model SP0001
   http://www.digibarn.com/collections/systems/swyft/Image82.jpg
 * The later "ur-cat" desktop units which use a machine tooled case and look
-  more or less like the canon cat. about 100-200 were made. 3.5" drive.
-  These have a fully functional EDDE editor as the cat does, and can even compile forth programs.
+  more or less like the canon cat. Around 100-200 were made. 3.5" drive.
+  These have a fully functional EDDE editor as the cat does, and can even compile
+  forth programs.
   (the 'swyft' driver is based on one of these)
 * The very late portable LCD units with a dark grey case and a row of hotkey
-  buttons below the screen.
+  buttons below the screen. Not dumped yet. At least one functional prototype exists.
+  At least one plastic mockup exists with no innards.
   http://www.digibarn.com/collections/systems/swyft/swyft.jpg
 
 Canon Cat versions:
@@ -115,6 +141,8 @@ There is really only one version of the cat which saw wide release, the US versi
 As for prototypes/dev cat machines, a few minor variants exist:
 * Prototype cat motherboards used 16k*4bit drams instead of 64k*4bit as the
   final system did and hence max out at 128k of dram instead of 512k.
+  One of the gate arrays is also different, and the motherboard is arranged
+  differently. The IC9 "buserr" PAL is not used, even on the prototype.
   The final system included 256k of dram and can be upgraded to 512k.
 * At least some developer units were modified to have an external BNC
   connector, ostensibly to display the internal screen's video externally.
@@ -302,6 +330,7 @@ public:
 	UINT8 m_video_invert;
 	UINT16 m_pr_cont;
 	UINT8 m_keyboard_line;
+	UINT8 m_floppy_control;
 
 	TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
@@ -371,15 +400,20 @@ WRITE16_MEMBER( cat_state::cat_video_control_w )
 }
 
 // Floppy control register (called fd.cont in the cat source code)
-	/* FEDCBA98 (76543210 is ignored)
-	 * |||||||\-- ?always low? (may be some sort of 'reset' or debug bit? the cat code explicitly clears this bit but never sets it)
+	/* FEDCBA98 (76543210 is open bus)
+	 * |||||||\-- unknown[1] (may be some sort of 'reset' or debug bit? the cat code explicitly clears this bit but never sets it)
 	 * ||||||\--- WRITE GATE: 0 = write head disabled, 1 = write head enabled (verified from cat source code)
-	 * |||||\---- ?always high? (leftover debug bit? unused by cat code)
+	 * |||||\---- unknown[2] (leftover debug bit? unused by cat code)
 	 * ||||\----- /DIRECTION: 1 = in, 0 = out (verified from forth cmd)
 	 * |||\------ /SIDESEL: 1 = side1, 0 = side0 (verified from forth cmd)
 	 * ||\------- STEP: 1 = STEP active, 0 = STEP inactive (verified from cat source code)
 	 * |\-------- MOTOR ON: 1 = on, 0 = off (verified)
 	 * \--------- /DRIVESELECT: 1 = drive 0, 0 = drive 1 (verified from forth cmd)
+	 * all 8 bits 'stick' on write and are readable at this register as well
+	 * [1] writing this bit as high seems to 'freeze' floppy acquisition so
+	 *   the value at the floppy_data_r register is held rather than updated
+	 *   with new data from the shifter/mfm clock/data separator
+	 * [2] this bit's function is unknown. it could possibly be an FM vs MFM selector bit, where high = MFM, low = FM ? or MFM vs GCR?
 	 */
 // 0x800000-0x800001 read
 READ16_MEMBER( cat_state::cat_floppy_control_r )
@@ -387,7 +421,7 @@ READ16_MEMBER( cat_state::cat_floppy_control_r )
 #ifdef DEBUG_FLOPPY_CONTROL_R
 	fprintf(stderr,"Read from Floppy Status address %06X\n", 0x800000+(offset<<1));
 #endif
-	return 0x0480;
+	return (m_floppy_control << 8)|0x80; // LOW 8 BITS ARE OPEN BUS
 }
 // 0x800000-0x800001 write
 WRITE16_MEMBER( cat_state::cat_floppy_control_w )
@@ -395,6 +429,7 @@ WRITE16_MEMBER( cat_state::cat_floppy_control_w )
 #ifdef DEBUG_FLOPPY_CONTROL_W
 	fprintf(stderr,"Write to Floppy Control address %06X, data %04X\n", 0x800000+(offset<<1), data);
 #endif
+	m_floppy_control = (data >> 8)&0xFF;
 }
 
 // 0x800002-0x800003 read = 0x0080, see open bus
@@ -427,7 +462,7 @@ WRITE16_MEMBER( cat_state::cat_floppy_data_w )
 }
 
 // 0x800008-0x800009: Floppy status register (called fd.status in the cat source code)
-	/* FEDCBA98 (76543210 is ignored)
+	/* FEDCBA98 (76543210 is open bus)
 	 * |||||||\-- ? always low
 	 * ||||||\--- ? always low
 	 * |||||\---- READY: 1 = ready, 0 = not ready (verified from cat source code)
@@ -443,7 +478,7 @@ READ16_MEMBER( cat_state::cat_floppy_status_r )
 #ifdef DEBUG_FLOPPY_STATUS_R
 	fprintf(stderr,"Read from Floppy Status address %06X\n", 0x800008+(offset<<1));
 #endif
-	return 0x0080;
+	return 0x2480;
 }
 
 // 0x80000a-0x80000b
@@ -488,9 +523,9 @@ WRITE16_MEMBER( cat_state::cat_printer_control_w )
 {
 	/*
 	 * FEDCBA98 (76543210 is ignored)
-	 * |||||||\-- CC line enable (verified from cat source code)
-	 * ||||||\--- LEDE line enable (verified from cat source code)
-	 * |||||\---- ?
+	 * |||||||\-- CC line enable (pin 34) (verified from cat source code)
+	 * ||||||\--- LEDE line enable (pin 33) (verified from cat source code)
+	 * |||||\---- ? May control pin 32?
 	 * ||||\----- ? always seems to be written as high?
 	 * |||\------ ?
 	 * ||\------- ?
@@ -585,12 +620,11 @@ READ16_MEMBER( cat_state::cat_0080_r )
 68k address map:
 a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  a3  a2  a1  (a0 via UDS/LDS)
 *i  *i  *   x   x   *   *   *   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       *GATE ARRAY 2 DECODES THESE LINES TO ENABLE THIS AREA* (a23 and a22 are indirectly decoded via the /RAMROMCS and /IOCS lines from gate array 1)
-0   0   0   0   x   0   a   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   b       R   ROM (ab: 00=ic4 01=ic2 10=ic5 11=ic3) (EPROM 27C512 x 4) [controlled via GA2 /ROMCS]
-0   0   0   0   x   1   0   0   x   x   *   *   *   *   *   *   *   *   *   *   *   *   *   0       RW  SVRAM ic11 d4364 (battery backed) [controlled via GA2 /RAMCS]
-0   0   0   0   x   1   x   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   0       O   OPEN BUS (reads as 0x2e) [may be controlled via GA2 /RAMCS?]
-0   0   0   0   x   1   1   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   0       O   OPEN BUS (reads as 0x2e) [may be controlled via GA2 /RAMCS?]
-0   0   0   0   x   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   1       O   OPEN BUS (reads as 0x80) [may be controlled via GA2 /RAMCS?]
-0   0   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x       O   BUS CONFLICT (reads as random garbage, corrupted copy based on when a20 is 0, some sort of bus collision? note GA2 can't see a20 so /ROMCS and /RAMCS lines are probably active here as above)
+0   0   0   x   x   0   a   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   b       R   ROM (ab: 00=ic4 01=ic2 10=ic5 11=ic3) (EPROM 27C512 x 4) [controlled via GA2 /ROMCS]
+0   0   0   x   x   1   0   0   x   x   *   *   *   *   *   *   *   *   *   *   *   *   *   0       RW  SVRAM ic11 d4364 (battery backed) [controlled via GA2 /RAMCS]
+0   0   0   x   x   1   x   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   0       O   OPEN BUS (reads as 0x2e) [may be controlled via GA2 /RAMCS?]
+0   0   0   x   x   1   1   0   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   0       O   OPEN BUS (reads as 0x2e) [may be controlled via GA2 /RAMCS?]
+0   0   0   x   x   1   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   x   1       O   OPEN BUS (reads as 0x80) [may be controlled via GA2 /RAMCS?]
 0   0   1   x   x   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   0       R   SVROM 2 ic7 (not present on cat as sold, open bus reads as 0x2e) [controlled via GA2 /SVCS0]
 0   0   1   x   x   0   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   1       R   SVROM 0 ic6 (MASK ROM tc531000) [controlled via GA2 /SVCS0]
 0   0   1   x   x   1   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   *   0       O   OPEN BUS (reads as 0x2e) [controlled via GA2 /SVCS1] *SEE BELOW*
@@ -627,8 +661,8 @@ a23 a22 a21 a20 a19 a18 a17 a16 a15 a14 a13 a12 a11 a10 a9  a8  a7  a6  a5  a4  
 
 static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x080000) // 256 KB ROM
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("svram") AM_MIRROR(0x08C000)// SRAM powered by battery
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM AM_MIRROR(0x180000) // 256 KB ROM
+	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("svram") AM_MIRROR(0x18C000)// SRAM powered by battery
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("svrom",0x0000) AM_MIRROR(0x180000) // SV ROM
 	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_SHARE("p_videoram") AM_MIRROR(0x180000) // 512 KB RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_READWRITE(cat_2e80_r,cat_video_control_w) AM_MIRROR(0x180000) // Gate Array #1: Video
@@ -805,7 +839,9 @@ MACHINE_START_MEMBER(cat_state,cat)
 MACHINE_RESET_MEMBER(cat_state,cat)
 {
 	machine().device("maincpu")->execute().set_irq_acknowledge_callback(device_irq_acknowledge_delegate(FUNC(cat_state::cat_int_ack),this));
+	m_duart_inp = 0;
 	m_6ms_counter = 0;
+	m_floppy_control = 0;
 	m_keyboard_timer->adjust(attotime::zero, 0, attotime::from_hz(120));
 	m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL_19_968MHz/2)/65536));
 }
@@ -1043,9 +1079,9 @@ ROM_START( cat )
 	/* Romspace here is a little strange: there are 3 rom sockets on the board:
 	 * svrom-0 maps to 200000-21ffff every ODD byte (d8-d0)
 	 * svrom-1 maps to 200000-21ffff every EVEN byte (d15-d7)
-	 *  (since no rom is in the socket; it reads as open bus 0x2E)
+	 *  (since no rom is in the socket; it reads as open bus, sometimes 0x2E)
 	 * svrom-2 maps to 240000-25ffff every ODD byte (d8-d0)
-	 *  (since no rom is in the socket; it reads as open bus 0x80)
+	 *  (since no rom is in the socket; it reads as open bus, sometimes 0x80)
 	 * there is no svrom-3; 240000-25ffff EVEN always reads as 0x2E
 	 * since ROM_FILL16BE(0x0, 0x80000, 0x2e80) doesn't exist, the
 	 * even bytes and latter chunk of the svrom space need to be filled in
@@ -1060,6 +1096,19 @@ ROM_START( cat )
 	 */
 	ROMX_LOAD( "uv1__nh7-0684__hn62301apc11__7h1.ic6", 0x00000, 0x20000, CRC(229ca210) SHA1(564b57647a34acdd82159993a3990a412233da14), ROM_SKIP(1)) // this is a 28pin tc531000 mask rom, 128KB long; "US" SVROM
 
+	/* There is an unpopulated PAL16L8 at IC9 whose original purpose (based
+	 * on the schematics) was probably to cause a 68k bus error when
+	 * memory in certain ranges when accessed (likely so 'forth gone insane'
+	 * won't destroy the contents of ram and svram).
+	 * Its connections are (where Ix = inp on pin x, Ox = out on pin x):
+	 * I1 = A23, I2 = A22, I3 = A2, I4 = R/W, I5 = A5, I6 = FC2, I7 = gnd,
+	 * I8 = A1, I9 = gnd, I11 = gnd, O16 = /BERR,
+	 * I14 = REMAP (connects to emulator 'shadow rom' board or to gnd when unused)
+	 * Based on the inputs and outputs of this pal, almost if not the entire
+	 * open bus and mirrored areas of the cat address space could be made
+	 * to cause bus errors. REMAP was probably used to 'open up' the A00000-A7ffff
+	 * shadow rom/ram area and make it writable without erroring.
+	 */
 ROM_END
 
 /* Driver */
