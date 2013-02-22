@@ -1646,7 +1646,6 @@ $(MESSOBJ)/sega.a:              \
 	$(MAME_DRIVERS)/saturn.o    \
 	$(MESS_MACHINE)/sms.o       \
 	$(MESS_DRIVERS)/sms.o       \
-	$(MAME_MACHINE)/stvprot.o   \
 	$(MESS_DRIVERS)/svmu.o      \
 
 $(MESSOBJ)/sgi.a:               \

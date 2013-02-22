@@ -138,71 +138,10 @@ public:
 	legacy_cpu_device* m_audiocpu;
 
 	bitmap_rgb32 m_tmpbitmap;
-	DECLARE_READ8_MEMBER(stv_ioga_r);
-	DECLARE_WRITE8_MEMBER(stv_ioga_w);
-	DECLARE_READ8_MEMBER(critcrsh_ioga_r);
-	DECLARE_READ8_MEMBER(magzun_ioga_r);
-	DECLARE_WRITE8_MEMBER(magzun_ioga_w);
-	DECLARE_READ8_MEMBER(stvmp_ioga_r);
-	DECLARE_WRITE8_MEMBER(stvmp_ioga_w);
-	DECLARE_READ32_MEMBER(stv_ioga_r32);
-	DECLARE_WRITE32_MEMBER(stv_ioga_w32);
-	DECLARE_READ32_MEMBER(critcrsh_ioga_r32);
-	DECLARE_READ32_MEMBER(stvmp_ioga_r32);
-	DECLARE_WRITE32_MEMBER(stvmp_ioga_w32);
-	DECLARE_READ32_MEMBER(magzun_ioga_r32);
-	DECLARE_WRITE32_MEMBER(magzun_ioga_w32);
-	DECLARE_READ32_MEMBER(magzun_hef_hack_r);
-	DECLARE_READ32_MEMBER(magzun_rx_hack_r);
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
 	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
-	DECLARE_DRIVER_INIT(astrass);
-	DECLARE_DRIVER_INIT(batmanfr);
-	DECLARE_DRIVER_INIT(finlarch);
-	DECLARE_DRIVER_INIT(decathlt);
-	DECLARE_DRIVER_INIT(sanjeon);
-	DECLARE_DRIVER_INIT(puyosun);
-	DECLARE_DRIVER_INIT(winterht);
-	DECLARE_DRIVER_INIT(gaxeduel);
-	DECLARE_DRIVER_INIT(rsgun);
-	DECLARE_DRIVER_INIT(groovef);
-	DECLARE_DRIVER_INIT(sandor);
-	DECLARE_DRIVER_INIT(cottonbm);
-	DECLARE_DRIVER_INIT(smleague);
-	DECLARE_DRIVER_INIT(nameclv3);
-	DECLARE_DRIVER_INIT(danchiq);
-	DECLARE_DRIVER_INIT(hanagumi);
-	DECLARE_DRIVER_INIT(cotton2);
-	DECLARE_DRIVER_INIT(seabass);
-	DECLARE_DRIVER_INIT(stv);
-	DECLARE_DRIVER_INIT(thunt);
-	DECLARE_DRIVER_INIT(critcrsh);
-	DECLARE_DRIVER_INIT(stvmp);
-	DECLARE_DRIVER_INIT(sasissu);
-	DECLARE_DRIVER_INIT(dnmtdeka);
-	DECLARE_DRIVER_INIT(ffreveng);
-	DECLARE_DRIVER_INIT(fhboxers);
-	DECLARE_DRIVER_INIT(pblbeach);
-	DECLARE_DRIVER_INIT(sss);
-	DECLARE_DRIVER_INIT(diehard);
-	DECLARE_DRIVER_INIT(danchih);
-	DECLARE_DRIVER_INIT(shienryu);
-	DECLARE_DRIVER_INIT(elandore);
-	DECLARE_DRIVER_INIT(prikura);
-	DECLARE_DRIVER_INIT(maruchan);
-	DECLARE_DRIVER_INIT(colmns97);
-	DECLARE_DRIVER_INIT(grdforce);
-	DECLARE_DRIVER_INIT(suikoenb);
-	DECLARE_DRIVER_INIT(magzun);
-	DECLARE_DRIVER_INIT(shanhigw);
-	DECLARE_DRIVER_INIT(sokyugrt);
-	DECLARE_DRIVER_INIT(vfremix);
-	DECLARE_DRIVER_INIT(twcup98);
-	DECLARE_DRIVER_INIT(znpwfv);
-	DECLARE_DRIVER_INIT(othellos);
-	DECLARE_DRIVER_INIT(mausuke);
 
 	DECLARE_DRIVER_INIT(saturnus);
 	DECLARE_DRIVER_INIT(saturneu);
@@ -210,8 +149,6 @@ public:
 	DECLARE_MACHINE_START(saturn);
 	DECLARE_MACHINE_RESET(saturn);
 	DECLARE_VIDEO_START(stv_vdp2);
-	DECLARE_MACHINE_START(stv);
-	DECLARE_MACHINE_RESET(stv);
 	UINT32 screen_update_saturn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_stv_vdp2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(saturn_scanline);
@@ -257,7 +194,6 @@ public:
 	DECLARE_WRITE8_MEMBER( saturn_SMPC_w );
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( sat_cart );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart );
 
 	DECLARE_READ16_MEMBER ( saturn_vdp1_regs_r );
 	DECLARE_READ32_MEMBER ( saturn_vdp1_vram_r );
@@ -705,8 +641,82 @@ public:
 	int numfiles;            // # of entries in current directory
 	int firstfile;           // first non-directory file
 
-	// ST-V specific
+	static void m68k_reset_callback(device_t *device);
+	int DectoBCD(int num);
+};
+
+class stv_state : public saturn_state
+{
+public:
+	DECLARE_DRIVER_INIT(astrass);
+	DECLARE_DRIVER_INIT(batmanfr);
+	DECLARE_DRIVER_INIT(finlarch);
+	DECLARE_DRIVER_INIT(decathlt);
+	DECLARE_DRIVER_INIT(sanjeon);
+	DECLARE_DRIVER_INIT(puyosun);
+	DECLARE_DRIVER_INIT(winterht);
+	DECLARE_DRIVER_INIT(gaxeduel);
+	DECLARE_DRIVER_INIT(rsgun);
+	DECLARE_DRIVER_INIT(groovef);
+	DECLARE_DRIVER_INIT(sandor);
+	DECLARE_DRIVER_INIT(cottonbm);
+	DECLARE_DRIVER_INIT(smleague);
+	DECLARE_DRIVER_INIT(nameclv3);
+	DECLARE_DRIVER_INIT(danchiq);
+	DECLARE_DRIVER_INIT(hanagumi);
+	DECLARE_DRIVER_INIT(cotton2);
+	DECLARE_DRIVER_INIT(seabass);
+	DECLARE_DRIVER_INIT(stv);
+	DECLARE_DRIVER_INIT(thunt);
+	DECLARE_DRIVER_INIT(critcrsh);
+	DECLARE_DRIVER_INIT(stvmp);
+	DECLARE_DRIVER_INIT(sasissu);
+	DECLARE_DRIVER_INIT(dnmtdeka);
+	DECLARE_DRIVER_INIT(ffreveng);
+	DECLARE_DRIVER_INIT(fhboxers);
+	DECLARE_DRIVER_INIT(pblbeach);
+	DECLARE_DRIVER_INIT(sss);
+	DECLARE_DRIVER_INIT(diehard);
+	DECLARE_DRIVER_INIT(danchih);
+	DECLARE_DRIVER_INIT(shienryu);
+	DECLARE_DRIVER_INIT(elandore);
+	DECLARE_DRIVER_INIT(prikura);
+	DECLARE_DRIVER_INIT(maruchan);
+	DECLARE_DRIVER_INIT(colmns97);
+	DECLARE_DRIVER_INIT(grdforce);
+	DECLARE_DRIVER_INIT(suikoenb);
+	DECLARE_DRIVER_INIT(magzun);
+	DECLARE_DRIVER_INIT(shanhigw);
+	DECLARE_DRIVER_INIT(sokyugrt);
+	DECLARE_DRIVER_INIT(vfremix);
+	DECLARE_DRIVER_INIT(twcup98);
+	DECLARE_DRIVER_INIT(znpwfv);
+	DECLARE_DRIVER_INIT(othellos);
+	DECLARE_DRIVER_INIT(mausuke);
+
+	DECLARE_READ8_MEMBER(stv_ioga_r);
+	DECLARE_WRITE8_MEMBER(stv_ioga_w);
+	DECLARE_READ8_MEMBER(critcrsh_ioga_r);
+	DECLARE_READ8_MEMBER(magzun_ioga_r);
+	DECLARE_WRITE8_MEMBER(magzun_ioga_w);
+	DECLARE_READ8_MEMBER(stvmp_ioga_r);
+	DECLARE_WRITE8_MEMBER(stvmp_ioga_w);
+	DECLARE_READ32_MEMBER(stv_ioga_r32);
+	DECLARE_WRITE32_MEMBER(stv_ioga_w32);
+	DECLARE_READ32_MEMBER(critcrsh_ioga_r32);
+	DECLARE_READ32_MEMBER(stvmp_ioga_r32);
+	DECLARE_WRITE32_MEMBER(stvmp_ioga_w32);
+	DECLARE_READ32_MEMBER(magzun_ioga_r32);
+	DECLARE_WRITE32_MEMBER(magzun_ioga_w32);
+	DECLARE_READ32_MEMBER(magzun_hef_hack_r);
+	DECLARE_READ32_MEMBER(magzun_rx_hack_r);
+
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart );
+
 	void install_stvbios_speedups( void );
+
+	DECLARE_MACHINE_START(stv);
+	DECLARE_MACHINE_RESET(stv);
 };
 
 #define MASTER_CLOCK_352 57272720

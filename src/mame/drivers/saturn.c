@@ -64,7 +64,6 @@ TODO:
 #include "machine/scudsp.h"
 #include "sound/scsp.h"
 #include "sound/cdda.h"
-#include "machine/stvprot.h"
 #include "machine/smpc.h"
 #include "includes/stv.h"
 #include "imagedev/chd_cd.h"
@@ -78,7 +77,7 @@ TODO:
 #define LOG_IRQ  0
 #define LOG_IOGA 0
 
-static int DectoBCD(int num)
+int saturn_state::DectoBCD(int num)
 {
 	int i, cnt = 0, tmp, res = 0;
 
@@ -1391,58 +1390,13 @@ TIMER_CALLBACK_MEMBER(saturn_state::stv_rtc_increment)
 /* Official documentation says that the "RESET/TAS opcodes aren't supported", but Out Run definitely contradicts with it.
    Since that m68k can't reset itself via the RESET opcode I suppose that the SMPC actually do it by reading an i/o
    connected to this opcode. */
-static void m68k_reset_callback(device_t *device)
+void saturn_state::m68k_reset_callback(device_t *device)
 {
 	saturn_state *state = device->machine().driver_data<saturn_state>();
 	device->machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(saturn_state::smpc_audio_reset_line_pulse), state));
 
 	printf("m68k RESET opcode triggered\n");
 }
-
-MACHINE_START_MEMBER(saturn_state,stv)
-{
-	system_time systime;
-	machine().base_datetime(systime);
-
-	m_maincpu = downcast<legacy_cpu_device*>( machine().device<cpu_device>("maincpu") );
-	m_slave = downcast<legacy_cpu_device*>( machine().device("slave") );
-	m_audiocpu = downcast<legacy_cpu_device*>( machine().device<cpu_device>("audiocpu") );
-
-	scsp_set_ram_base(machine().device("scsp"), m_sound_ram);
-
-	// save states
-	state_save_register_global_pointer(machine(), m_scu_regs, 0x100/4);
-	state_save_register_global_pointer(machine(), m_scsp_regs,  0x1000/2);
-	state_save_register_global(machine(), m_NMI_reset);
-	state_save_register_global(machine(), m_en_68k);
-//  state_save_register_global(machine(), scanline);
-	state_save_register_global(machine(), m_smpc.IOSEL1);
-	state_save_register_global(machine(), m_smpc.IOSEL2);
-	state_save_register_global(machine(), m_smpc.EXLE1);
-	state_save_register_global(machine(), m_smpc.EXLE2);
-	state_save_register_global(machine(), m_smpc.PDR1);
-	state_save_register_global(machine(), m_smpc.PDR2);
-	state_save_register_global(machine(), m_port_sel);
-	state_save_register_global(machine(), m_mux_data);
-	state_save_register_global(machine(), m_scsp_last_line);
-
-	stv_register_protection_savestates(machine()); // machine/stvprot.c
-
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(saturn_state::stvcd_exit), this));
-
-	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
-	m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
-	m_smpc.rtc_data[2] = (systime.local_time.weekday << 4) | (systime.local_time.month+1);
-	m_smpc.rtc_data[3] = DectoBCD(systime.local_time.mday);
-	m_smpc.rtc_data[4] = DectoBCD(systime.local_time.hour);
-	m_smpc.rtc_data[5] = DectoBCD(systime.local_time.minute);
-	m_smpc.rtc_data[6] = DectoBCD(systime.local_time.second);
-
-	m_stv_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(saturn_state::stv_rtc_increment),this));
-
-	m68k_set_reset_callback(m_audiocpu, m68k_reset_callback);
-}
-
 
 MACHINE_START_MEMBER(saturn_state,saturn)
 {
@@ -1487,7 +1441,7 @@ MACHINE_START_MEMBER(saturn_state,saturn)
 
 	m_stv_rtc_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(saturn_state::stv_rtc_increment),this));
 
-	m68k_set_reset_callback(m_audiocpu, m68k_reset_callback);
+	m68k_set_reset_callback(m_audiocpu, &saturn_state::m68k_reset_callback);
 }
 
 
@@ -1751,33 +1705,6 @@ MACHINE_RESET_MEMBER(saturn_state,saturn)
 	m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
 }
 
-
-MACHINE_RESET_MEMBER(saturn_state,stv)
-{
-	m_scsp_last_line = 0;
-
-	// don't let the slave cpu and the 68k go anywhere
-	machine().device("slave")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
-	m_en_68k = 0;
-	m_NMI_reset = 0;
-
-	m_port_sel = m_mux_data = 0;
-
-	machine().device("maincpu")->set_unscaled_clock(MASTER_CLOCK_320/2);
-	machine().device("slave")->set_unscaled_clock(MASTER_CLOCK_320/2);
-
-	stvcd_reset();
-
-	m_stv_rtc_timer->adjust(attotime::zero, 0, attotime::from_seconds(1));
-	m_prev_bankswitch = 0xff;
-
-	scu_reset();
-
-	m_vdp2.old_crmd = -1;
-	m_vdp2.old_tvmd = -1;
-}
 
 struct cdrom_interface saturn_cdrom =
 {
