@@ -5933,6 +5933,7 @@ int saturn_state::get_pixel_clock( void )
 	return res/divider;
 }
 
+/* TODO: hblank position and hblank firing doesn't really match HW behaviour. */
 UINT8 saturn_state::get_hblank( void )
 {
 	const rectangle &visarea = machine().primary_screen->visible_area();
@@ -5949,10 +5950,7 @@ UINT8 saturn_state::get_vblank( void )
 	int cur_v,vblank;
 	cur_v = machine().primary_screen->vpos();
 
-	vblank = (m_vdp2.pal) ? 288 : 240;
-
-	if((STV_VDP2_LSMD & 3) == 3)
-		vblank<<=1;
+	vblank = get_vblank_start_position() * get_ystep_count();
 
 	if (cur_v >= vblank)
 		return 1;
@@ -5973,9 +5971,13 @@ UINT8 saturn_state::get_odd_bit( void )
 
 int saturn_state::get_vblank_start_position( void )
 {
+	/* TODO: test says that second setting happens at 241, might need further investigation ... */
+	const int d_vres[4] = { 224, 240, 256, 256 };
+	int vres_mask;
 	int vblank_line;
 
-	vblank_line = (m_vdp2.pal) ? 288 : 240;
+	vres_mask = (m_vdp2.pal << 1)|1; //PAL uses mask 3, NTSC uses mask 1
+	vblank_line = d_vres[STV_VDP2_VRES & vres_mask];
 
 	return vblank_line;
 }
@@ -6039,7 +6041,8 @@ int saturn_state::get_vcounter( void )
 	if((STV_VDP2_LSMD & 3) == 3)
 		return (vcount & ~1) | (machine().primary_screen->frame_number() & 1);
 
-	return (vcount << 1); // Non-interlace
+	/* docs says << 1, but according to HW tests it's a typo. */
+	return (vcount & 0x1ff); // Non-interlace
 }
 
 void saturn_state::stv_vdp2_state_save_postload( void )
