@@ -84,6 +84,5 @@ extern const via6522_interface microtan_via6522_0;
 extern const via6522_interface microtan_via6522_1;
 
 SNAPSHOT_LOAD( microtan );
-QUICKLOAD_LOAD( microtan_hexfile );
-
+QUICKLOAD_LOAD( microtan );
 #endif /* MICROTAN_H_ */

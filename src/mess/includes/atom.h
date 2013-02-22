@@ -11,7 +11,6 @@
 #include "imagedev/flopdrv.h"
 #include "machine/ram.h"
 #include "imagedev/snapquik.h"
-#include "formats/atom_atm.h"
 #include "formats/atom_tap.h"
 #include "formats/basicdsk.h"
 #include "formats/uef_cas.h"

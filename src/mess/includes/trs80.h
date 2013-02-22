@@ -18,7 +18,6 @@
 #include "imagedev/flopdrv.h"
 #include "imagedev/snapquik.h"
 #include "formats/trs_cas.h"
-#include "formats/trs_cmd.h"
 #include "formats/trs_dsk.h"
 
 
@@ -192,5 +191,7 @@ protected:
 /*----------- defined in machine/trs80.c -----------*/
 
 extern const wd17xx_interface trs80_wd17xx_interface;
+
+QUICKLOAD_LOAD( trs80_cmd );
 
 #endif  /* TRS80_H_ */

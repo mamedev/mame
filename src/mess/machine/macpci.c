@@ -13,7 +13,7 @@
 #include "machine/8530scc.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/applefdc.h"
-#include "devices/sonydriv.h"
+#include "machine/sonydriv.h"
 #include "includes/macpci.h"
 #include "debug/debugcpu.h"
 #include "machine/ram.h"

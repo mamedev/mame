@@ -51,7 +51,7 @@
 #include "machine/ncr5380.h"
 #include "machine/applefdc.h"
 #include "machine/swim.h"
-#include "devices/sonydriv.h"
+#include "machine/sonydriv.h"
 #include "formats/ap_dsk35.h"
 #include "machine/ram.h"
 #include "machine/scsibus.h"

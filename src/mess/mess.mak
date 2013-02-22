@@ -580,7 +580,6 @@ $(MESSOBJ)/acorn.a:             \
 	$(MESS_DRIVERS)/a7000.o     \
 	$(MESS_DRIVERS)/acrnsys1.o  \
 	$(MESS_DRIVERS)/atom.o      \
-	$(MESS_FORMATS)/atom_atm.o  \
 	$(MESS_VIDEO)/bbc.o         \
 	$(MESS_MACHINE)/bbc.o       \
 	$(MESS_DRIVERS)/bbc.o       \
@@ -810,7 +809,6 @@ $(MESSOBJ)/canon.a:             \
 
 $(MESSOBJ)/cantab.a:            \
 	$(MESS_DRIVERS)/ace.o       \
-	$(MESS_FORMATS)/ace_ace.o   \
 
 $(MESSOBJ)/casio.a:             \
 	$(MESS_DRIVERS)/casloopy.o  \
@@ -1017,7 +1015,6 @@ $(MESSOBJ)/cromemco.a:          \
 
 $(MESSOBJ)/comx.a:              \
 	$(MESS_DRIVERS)/comx35.o    \
-	$(MESS_FORMATS)/comx35_comx.o   \
 	$(MESS_MACHINE)/comxpl80.o  \
 	$(MESS_VIDEO)/comx35.o      \
 	$(MESS_MACHINE)/comxexp.o   \
@@ -1578,7 +1575,6 @@ $(MESSOBJ)/radio.a:             \
 
 $(MESSOBJ)/rca.a:               \
 	$(MESS_DRIVERS)/studio2.o   \
-	$(MESS_FORMATS)/studio2_st2.o   \
 	$(MESS_DRIVERS)/vip.o       \
 	$(MESS_MACHINE)/vip_byteio.o    \
 	$(MESS_MACHINE)/vip_exp.o   \
@@ -1769,7 +1765,6 @@ $(MESSOBJ)/tangerin.a:          \
 	$(MESS_VIDEO)/microtan.o    \
 	$(MESS_MACHINE)/microtan.o  \
 	$(MESS_DRIVERS)/microtan.o  \
-	$(MESS_FORMATS)/m65_snqk.o  \
 	$(MESS_DRIVERS)/oric.o      \
 	$(MESS_VIDEO)/oric.o        \
 	$(MESS_MACHINE)/oric.o      \
@@ -1914,7 +1909,6 @@ $(MESSOBJ)/trs.a:               \
 	$(MESS_DRIVERS)/mc10.o      \
 	$(MESS_MACHINE)/trs80.o     \
 	$(MESS_VIDEO)/trs80.o       \
-	$(MESS_FORMATS)/trs_cmd.o   \
 	$(MESS_DRIVERS)/trs80.o     \
 	$(MESS_DRIVERS)/trs80m2.o   \
 	$(MESS_MACHINE)/trs80m2kb.o \

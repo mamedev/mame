@@ -6,7 +6,6 @@
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
-#include "formats/comx35_comx.h"
 #include "imagedev/cassette.h"
 #include "imagedev/printer.h"
 #include "imagedev/snapquik.h"

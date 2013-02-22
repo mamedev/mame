@@ -13,7 +13,7 @@
 #include "cpu/m6502/m6504.h"
 #include "cpu/cop400/cop400.h"
 #include "includes/lisa.h"
-#include "devices/sonydriv.h"
+#include "machine/sonydriv.h"
 #include "machine/applefdc.h"
 #include "formats/ap_dsk35.h"
 #include "machine/6522via.h"

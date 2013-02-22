@@ -49,7 +49,6 @@
 
 /* Devices */
 #include "imagedev/cassette.h"
-#include "formats/m65_snqk.h"
 
 
 static ADDRESS_MAP_START( microtan_map, AS_PROGRAM, 8, microtan_state )
