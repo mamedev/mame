@@ -846,4 +846,14 @@ void huc6270_device::device_reset()
 	m_dvssr_written = 0;
 	m_satb_countdown = 0;
 	m_raster_count = 0x4000;
+	m_vert_to_go = 0;
+	m_vert_state = HUC6270_VSW;
+	m_horz_steps = 0;
+	m_horz_to_go = 0;
+	m_horz_state = HUC6270_HDS;
+	m_hsync = 0;
+	m_vsync = 0;
+	m_dma_enabled = 0;
+
+	memset(m_sat, 0, sizeof(m_sat));
 }
