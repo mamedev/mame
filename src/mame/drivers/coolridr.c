@@ -445,7 +445,12 @@ public:
 	DECLARE_WRITE32_MEMBER(sysh1_sound_dma_w);
 	DECLARE_READ32_MEMBER(sysh1_ioga_r);
 	DECLARE_WRITE32_MEMBER(sysh1_ioga_w);
-	DECLARE_WRITE32_MEMBER(sysh1_txt_blit_w);
+	DECLARE_WRITE32_MEMBER(sysh1_unk_blit_w);
+	DECLARE_WRITE32_MEMBER(sysh1_blit_mode_w);
+	DECLARE_WRITE32_MEMBER(sysh1_blit_data_w);
+	DECLARE_WRITE32_MEMBER(sysh1_fb_mode_w);
+	DECLARE_WRITE32_MEMBER(sysh1_fb_data_w);
+
 	DECLARE_WRITE32_MEMBER(sysh1_pal_w);
 	DECLARE_WRITE32_MEMBER(sysh1_dma_w);
 	DECLARE_WRITE32_MEMBER(sysh1_char_w);
@@ -467,6 +472,7 @@ public:
 	UINT32 screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which);
 	UINT32 screen_update_coolridr1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	UINT32 screen_update_coolridr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void blit_current_sprite(address_space &space);
 	INTERRUPT_GEN_MEMBER(system_h1);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_main);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
@@ -607,766 +613,748 @@ WRITE32_MEMBER(coolridr_state::sysh1_ioga_w)
 }
 #endif
 
-
-
-/*
-			if(type == 4)
-
-
-*/
-
 /* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
-WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
+void coolridr_state::blit_current_sprite(address_space &space)
 {
-	COMBINE_DATA(&m_sysh1_txt_blit[offset]);
 	const pen_t *clut = &machine().pens[0];
 
-	switch(offset)
+	// Serialized 32-bit words in order of appearance:
+	//  0: 00000000 - unknown, 0x00000000 or 0x00000001, 0 seems to be regular sprite, 1 seems to change meaning of below, possible clip area?
+	//  1: 00010000 - unknown, color mode? (7bpp select?) set on player bike object
+	//  1: 00000xxx - "Color Number" (all bits or just lower 16/8?)
+	//  2: 007f0000 - unknown, transpen? set to 0x7f whenever the 'color mode' bit in (1) is set, otherwise 0
+	//  2: 00000xxx - unknown, usually a copy of color number, leftover?
+	//  3: 001fffff - offset to compressed data? (it's 0 on text objects tho, but maybe the ascii tiles are a special decode to go with the indirect mode)
+	//  4: 07000000 - unknown (draw mode?)
+	//  4: 00010000 - unknown (set on a few object)
+	//  4: 00000100 - y-flip?
+	//  4: 00000001 - x-flip?
+	//  5: 00010000 - enable indirect text tile lookup
+	//  5: 00000001 - enable line-zoom(?) lookup (road)
+	//  6: vvvv---- - "Vertical Cell Count"
+	//  6: ----hhhh - "Horizontal Cell Count"
+	//  7: 00030003 - "Vertical|Horizontal Origin point"
+	//  8: 00ff00ff - "Vertical|Horizontal Zoom Ratios"
+	//  9: xxxx---- - "Display Vertical Position"
+	//  9: ----yyyy - "Display Horizontal Position"
+	// 10: 00000000 - unknown : always seems to be zero - NO, for some things (not text) it's also a reference to 3f40000 region like #11
+	// 11: ........ - indirect tile mode ram address (used for text)
+
+
+	// first parse the bits
+
+	/************* m_spriteblit[0] *************/
+
+	// set to 0x00000001 on some objects during the 'film strip' part of attract, otherwise 0
+	// those objects don't seem visible anyway so might have some special meaning
+	// this is also set at times during the game
+	//
+	// the sprites with 1 set appear to have 0x00000000 in everything after the 4th write (blit4 and above)
+	// so likely have some other meaning and are NOT regular sprite data
+	UINT32 blit0 = m_spriteblit[0];
+
+	// abort early..
+	if (blit0!=0)
+		return;
+
+	/************* m_spriteblit[1] *************/
+	
+	// 000u0ccc  - c = colour? u = 0/1
+	UINT32 blit1_unused = m_spriteblit[1] & 0xfffef800;
+	UINT32 b1mode = (m_spriteblit[1] & 0x00010000)>>16;
+	//UINT32 b1colorNumber = (m_spriteblit[1] & 0x000007ff);    // Probably more bits
+
+	if (blit1_unused!=0) printf("blit1 unknown bits set %08x\n", m_spriteblit[1]);
+
+	/************* m_spriteblit[3] *************/
+	
+	// seems to be more complex than just transparency
+	UINT32 blit2_unused = m_spriteblit[2]&0xff80f800;
+	UINT32 b2tpen = (m_spriteblit[2] & 0x007f0000)>>16;
+	//UINT32 b2colorNumber = (m_spriteblit[2] & 0x000007ff);
+
+	if (blit2_unused!=0) printf("blit1 unknown bits set %08x\n", m_spriteblit[2]);
+	if (b1mode)
 	{
-		/*
-		This does the fb display/clear phases of blitter data processed in the previous frame.
-		And yes, game effectively runs at 30 Hz (because data processing happens on even frames, actual display transfer happens on odd frames).
-		screen 1
-		8c200000 06
-		00000001 07
-		0000017f 07 Y range (upper start, lower end)
-		000701f7 07 X range (upper start, lower end)
-		00000007 07 enable?
-		screen 2
-		8c800000 06
-		00000001 07
-		0000017f 07
-		020703f7 07
-		00000207 07 enable plus clear?
-		*/
-		case 0x06:
-			m_blitterClearMode = m_sysh1_txt_blit[offset];
+		if (b2tpen != 0x7f) printf("b1mode 1, b2tpen!=0x7f\n");
+	}
+	else
+	{
+		// 0x01/0x02 trips in rare cases (start of one of the attract levels) maybe this is some kind of alpha instead?
+		if ((b2tpen != 0x00) && (b2tpen != 0x01) && (b2tpen != 0x02)) printf("b1mode 0, b2tpen!=0x00,0x01 or 0x02 (is %02x)\n", b2tpen);
+	}
+	 // 00??0uuu
+	 // ?? seems to be 00 or 7f, set depending on b1mode
+	 // uuu, at least 11 bits used, maybe 12 usually the same as blit1_unused? leftover?
 
-			if(m_blitterClearMode != 0x8c200000 && m_blitterClearMode != 0x8c800000)
-				printf("Blitter Clear used with param %08x\n",m_blitterClearMode);
+	/************* m_spriteblit[3] *************/
 
-			m_blitterClearCount = 0;
-			break;
+	UINT32 blit3_unused = m_spriteblit[3] & 0xffe00000;
+	UINT32 b3romoffset = (m_spriteblit[3] & 0x001fffff)*2;
+	// if this is an offset into the compressed m_spriteblit[3] then it's probably a word offset into each rom (each is 0x400000 bytes) with the m_spriteblit[3] from all 10 being used in parallel as per the notes from Charles
+	// this needs verifying as it could instead be an index into some other ram area already decompressed..
+	// 0000xxxx
+	//  to
+	// 001fxxxx
 
-		case 0x07:
-			if(m_blitterClearCount == 0)
-			{
-				if(m_sysh1_txt_blit[offset] != 1)
-					printf("Blitter Clear Count == 0 used with param %08x\n",m_sysh1_txt_blit[offset]);
-			}
-			else if(m_blitterClearCount == 1)
-			{
-				if(m_sysh1_txt_blit[offset] != 0x17f)
-					printf("Blitter Clear Count == 1 used with param %08x\n",m_sysh1_txt_blit[offset]);
-			}
-			else if(m_blitterClearCount == 2)
-			{
-				if(m_sysh1_txt_blit[offset] != 0x000701f7 && m_sysh1_txt_blit[offset] != 0x020703f7)
-					printf("Blitter Clear Count == 2 used with param %08x\n",m_sysh1_txt_blit[offset]);
-			}
-			else if(m_blitterClearCount == 3)
-			{
-				if(m_sysh1_txt_blit[offset] != 0x00000007 && m_sysh1_txt_blit[offset] != 0x00000207)
-					printf("Blitter Clear Count == 3 used with param %08x\n",m_sysh1_txt_blit[offset]);
+	if (blit3_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, blit3_unused);
+	
 
-				{
-					const rectangle& visarea = machine().primary_screen->visible_area();
+	/************* m_spriteblit[4] *************/
 
-					if(m_blitterClearMode == 0x8c200000)
-					{
-						copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, visarea);
-						m_temp_bitmap_sprites.fill(0, visarea);
-					}
+	UINT32 blit4_unused = m_spriteblit[4] & 0xf8fefefe;
+	//UINT32 blit4 = m_spriteblit[4] & 0x07000000;
+	UINT32 blit_flipx = m_spriteblit[4] & 0x00000001;
+	UINT32 blit_flipy = (m_spriteblit[4] & 0x00000100)>>8;
+	UINT32 blit_rotate = (m_spriteblit[4] & 0x00010000)>>16;
+	if (blit4_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, blit4_unused);
 
-					if(m_blitterClearMode == 0x8c800000)
-					{
-						copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2, 0, 0, 0, 0, visarea);
-						m_temp_bitmap_sprites2.fill(0, visarea);
-					}
-				}
-			}
-			else
-			{
-				printf("Blitter Clear Count == %02x used with param %08x\n",m_blitterClearCount,m_sysh1_txt_blit[offset]);
-			}
+	// ---- -111 ---- ---r ---- ---y ---- ---x
+	// 1 = used bits? (unknown purpose.. might be object colour mode)
+	// x = x-flip
+	// y = y-flip
+	// r = unknown, not used much, occasional object - rotate
+
+	/************* m_spriteblit[5] *************/
+
+	UINT32 blit5_unused = m_spriteblit[5]&0xfffefffe;
+	// this might enable the text indirection thing?
+	int indirect_tile_enable = (m_spriteblit[5] & 0x00010000)>>16;
+	int indirect_zoom_enable = (m_spriteblit[5] & 0x00000001);
 
 
-			m_blitterClearCount++;
-			break;
+	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, blit5_unused);
+	// 00010000 (text)
+	// 00000001 (other)
 
-		// The mode register
-		case 0x04:
+
+
+
+	/************* m_spriteblit[6] *************/
+
+	UINT16 vCellCount = (m_spriteblit[6] & 0xffff0000) >> 16;
+	UINT16 hCellCount = (m_spriteblit[6] & 0x0000ffff);
+
+	/************* m_spriteblit[7] *************/
+
+	UINT16 vOrigin = (m_spriteblit[7] & 0xffff0000) >> 16;
+	UINT16 hOrigin = (m_spriteblit[7] & 0x0000ffff);
+	//printf("%04x %04x\n", vOrigin, hOrigin);
+
+	/************* m_spriteblit[8] *************/
+
+	UINT16 vZoom = (m_spriteblit[8] & 0xffff0000) >> 16;
+	UINT16 hZoom = (m_spriteblit[8] & 0x0000ffff);
+
+	/************* m_spriteblit[9] *************/
+
+	int vPosition = (m_spriteblit[9] & 0xffff0000) >> 16;
+	int hPosition = (m_spriteblit[9] & 0x0000ffff);
+
+	if (hPosition & 0x8000) hPosition -= 0x10000;
+	if (vPosition & 0x8000) vPosition -= 0x10000;
+
+	/************* m_spriteblit[10] *************/
+
+	// this is an address on some objects..
+	// to be specific, the center line of the road (actual road object? which currently gets shown as a single pixel column?)
+	// and the horizontal road used in the background of the title screen (which currently looks normal)
+	// I guess it's some kind of indirect way to do a line effect?
+	//UINT32 blit10 =  m_spriteblit[10];
+
+	/************* m_spriteblit[11] *************/
+	
+	UINT32 textlookup =  m_spriteblit[11];
+
+	/* DRAW */
+	UINT16 used_hCellCount = hCellCount;
+	UINT16 used_vCellCount = vCellCount;
+	UINT16 used_flipx = blit_flipx;
+	UINT16 used_flipy = blit_flipy;
+
+	if (blit_rotate)
+	{
+		used_hCellCount = vCellCount;
+		used_vCellCount = hCellCount;
+		used_flipx = blit_flipy;
+		used_flipy = blit_flipx;
+		// do the zoom params rotate?
+	}
+
+	// SPRITES / BLITS
+
+	// for text objects this is an address containing the 8-bit tile numbers to use for ASCII text
+	// I guess the tiles are decoded by a DMA operation earlier, from the compressed ROM?
+
+	// we also use this to trigger the actual draw operation
+
+	if (indirect_zoom_enable)
+	{
+		// with this bit enabled blit10 is a look up to the zoom(?) value eg. 03f42600
+		//UINT32 temp = space.read_dword(blit10);
+		//PRINT_BLIT_STUFF
+		/* for the horizontal road during attract there are tables 0x480 bytes long (0x120 dwords) and the value passed points to the start of them */
+		/* cell sizes for those are are 0011 (v) 0007 (h) with zoom factors of 0020 (half v) 0040 (normal h) */
+		/* tables seem to be 2x 8-bit values, possibly zoom + linescroll, although ingame ones seem to be 2x16-bit (corrupt? more meaning) */
+
+	}
+
+	bitmap_rgb32* drawbitmap;
+
+	// 0x30 - 0x60 are definitely the left screen, 0x90 - 0xc0 are definitely the right screen.. the modes seem priority related
+	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
+		drawbitmap = &m_temp_bitmap_sprites;
+	else // 0x90, 0xa0, 0xb0, 0xc0
+		drawbitmap = &m_temp_bitmap_sprites2;
+
+	int sizex = used_hCellCount * 16 * hZoom;
+	int sizey = used_vCellCount * 16 * vZoom;
+	hPosition *= 0x40;
+	vPosition *= 0x40;
+
+	switch (vOrigin & 3)
+	{
+	case 0:
+		// top
+		break;
+	case 1:
+		vPosition -= sizey / 2 ;
+		// middle?
+		break;
+	case 2:
+		vPosition -= sizey;
+		// bottom?
+		break;
+	case 3:
+		// invalid?
+		break;
+	}
+
+	switch (hOrigin & 3)
+	{
+	case 0:
+		// left
+		break;
+	case 1:
+		hPosition -= sizex / 2;
+		// middle?
+		break;
+	case 2:
+		hPosition -= sizex;
+		// right?
+		break;
+	case 3:
+		// invalid?
+		break;
+	}
+
+	UINT32 lastSpriteNumber = 0xffffffff;
+	// Splat some sprites
+	for (int v = 0; v < used_vCellCount; v++)
+	{
+		const int pixelOffsetY = ((vPosition) + (v* 16 * vZoom)) / 0x40;
+
+		if (pixelOffsetY>383)
 		{
-			m_blitterMode = (data & 0x00ff0000) >> 16;
-
-			if (m_blitterMode == 0xf4)
-			{
-				// Some sort of addressing state.
-				// In the case of text, simply writes 4 characters per 32-bit word.
-				// These values may be loaded into RAM somewhere as they are written.
-				// The number of characters is determined by the upper-most 8 bits.
-				m_textBytesToWrite = (data & 0xff000000) >> 24;
-				m_textOffset = (data & 0x0000ffff);
-				m_blitterSerialCount = 0;
-
-				// this is ONLY used when there is text on the screen
-
-				//printf("set mode %08x\n", data);
-
-
-			}
-			else if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60
-				  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
-			{
-				// The blitter function(s).
-				// After this is set a fixed count of 11 32-bit words are sent to the data register.
-				// The lower word always seems to be 0x0001 and the upper byte always 0xac.
-				m_blitterSerialCount = 0;
-
-				// form 0xacMM-xxx   ac = fixed value for this mode?  MM = modes above.  -xxx = some kind of offset? but it doesn't increment for each blit like the textOffset / paletteOffset stuff, investigate
-
-			}
-			else if (m_blitterMode == 0x10)
-			{
-				// Could be a full clear of VRAM?
-				for(UINT32 vramAddr = 0x3f40000; vramAddr < 0x3f4ffff; vramAddr+=4)
-					space.write_dword(vramAddr, 0x00000000);
-
-				m_blitterSerialCount = 0;
-			}
-			else if (m_blitterMode == 0xe0)
-			{
-				// uploads palettes...
-				// does NOT upload the palette for the WDUD screen when set to US mode this way..
-				m_blitterSerialCount = 0;
-				m_textOffset = (data & 0x0000ffff)>>2; // it's a byte offset
-
-			//	printf("set e0 %08x\n", data);
-
-			}
-			else
-			{
-				printf("set unknown blit mode %02x\n", m_blitterMode);
-			}
-			break;
+			v = used_vCellCount;
+			continue;
 		}
 
-		// The data register
-		case 0x05:
+
+		for (int h = 0; h < used_hCellCount; h++)
 		{
-			if (m_blitterMode == 0xf4)
-			{
-				// Uploads a series of bytes that index into the encoded sprite table
-				const size_t memOffset = 0x03f40000 + m_textOffset + m_blitterSerialCount;
-				space.write_dword(memOffset, data);
-				m_blitterSerialCount += 0x04;
+			const int pixelOffsetX = ((hPosition) + (h* 16 * hZoom)) / 0x40;
 
-				// DEBUG: Uncomment to see the ASCII strings as they are being blitted
-				//if (m_blitterSerialCount >= m_textBytesToWrite)
-				//{
-				//  for (int i = 0; i < m_textBytesToWrite+1; i++)
-				//      printf("%c", read_byte(0x03f40000 + m_textOffset + i));
-				//  printf("\n");
-				//}
+			if (pixelOffsetX>495)
+			{
+				h = used_hCellCount;
+				continue;
 			}
-			else if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60
-				  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
-			{
-				// Serialized 32-bit words in order of appearance:
-				//  0: 00000000 - unknown, 0x00000000 or 0x00000001, 0 seems to be regular sprite, 1 seems to change meaning of below, possible clip area?
-				//  1: 00010000 - unknown, color mode? (7bpp select?) set on player bike object
-				//  1: 00000xxx - "Color Number" (all bits or just lower 16/8?)
-				//  2: 007f0000 - unknown, transpen? set to 0x7f whenever the 'color mode' bit in (1) is set, otherwise 0
-				//  2: 00000xxx - unknown, usually a copy of color number, leftover?
-				//  3: 001fffff - offset to compressed data? (it's 0 on text objects tho, but maybe the ascii tiles are a special decode to go with the indirect mode)
-				//  4: 07000000 - unknown (draw mode?)
-				//  4: 00010000 - unknown (set on a few object)
-				//  4: 00000100 - y-flip?
-				//  4: 00000001 - x-flip?
-				//  5: 00010000 - enable indirect text tile lookup
-				//  5: 00000001 - enable line-zoom(?) lookup (road)
-				//  6: vvvv---- - "Vertical Cell Count"
-				//  6: ----hhhh - "Horizontal Cell Count"
-				//  7: 00030003 - "Vertical|Horizontal Origin point"
-				//  8: 00ff00ff - "Vertical|Horizontal Zoom Ratios"
-				//  9: xxxx---- - "Display Vertical Position"
-				//  9: ----yyyy - "Display Horizontal Position"
-				// 10: 00000000 - unknown : always seems to be zero - NO, for some things (not text) it's also a reference to 3f40000 region like #11
-				// 11: ........ - complex - likely an address into bytes uploaded by mode 0xf4  (likely, it's only used when text is present otherwise it's always 0, some indirect tile mode I guess)
-				//                (See ifdef'ed out code below for a closer examination)
 
-				// Serialized counts
-				if (m_blitterSerialCount < 12)
+			int lookupnum;
+
+			// with this bit enabled the tile numbers gets looked up using 'data' (which would be blit11) (eg 03f40000 for startup text)
+			// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
+			if (indirect_tile_enable)
+			{
+				lookupnum = space.read_byte(textlookup + h + (v*used_hCellCount));
+			}
+			else
+			{
+				if (!blit_rotate)
 				{
-					m_spriteblit[m_blitterSerialCount] = data;
-					m_blitterSerialCount++;
+					if (!used_flipy)
+					{
+						if (!used_flipx)
+							lookupnum = h + (v*used_hCellCount);
+						else
+							lookupnum = (used_hCellCount-h-1) + (v*used_hCellCount);
+					}
+					else
+					{
+						if (!used_flipx)
+							lookupnum = h + ((used_vCellCount-v-1)*used_hCellCount);
+						else
+							lookupnum = (used_hCellCount-h-1) + ((used_vCellCount-v-1)*used_hCellCount);
+
+					}
 				}
 				else
 				{
-					printf("more than 11 dwords (%d) in blit?\n", m_blitterSerialCount);
-				}
+					if (!used_flipy)
+					{
+						if (!used_flipx)
+							lookupnum = v + (h*used_vCellCount);
+						else
+							lookupnum = (used_vCellCount-v-1) + (h*used_vCellCount);
+					}
+					else
+					{
+						if (!used_flipx)
+							lookupnum = v + ((used_hCellCount-h-1)*used_vCellCount);
+						else
+							lookupnum = (used_vCellCount-v-1) + ((used_hCellCount-h-1)*used_vCellCount);
 
-				// use the 11th blit write also as the trigger
-				if (m_blitterSerialCount == 12)
+					}
+				}
+			}
+
+
+			// these should be 'cell numbers' (tile numbers) which look up RLE data?
+			UINT32 spriteNumber = (m_expanded_10bit_gfx[ (b3romoffset << 3) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (b3romoffset << 3) + (lookupnum<<1) + 1 ]);
+			UINT16 tempshape[16*16];
+			
+			// skip the decoding if it's the same tile as last time!
+			if (spriteNumber != lastSpriteNumber)
+			{
+				lastSpriteNumber = spriteNumber;
+
+				int i = 1;// skip first 10 bits for now
+				int data_written = 0;
+
+				while (data_written<256)
 				{
-					// first parse the bits
 
-					/************* m_spriteblit[0] *************/
+					UINT16 compdata = m_expanded_10bit_gfx[ (b3romoffset << 3) + spriteNumber + i];
 
-					// set to 0x00000001 on some objects during the 'film strip' part of attract, otherwise 0
-					// those objects don't seem visible anyway so might have some special meaning
-					// this is also set at times during the game
-					//
-					// the sprites with 1 set appear to have 0x00000000 in everything after the 4th write (blit4 and above)
-					// so likely have some other meaning and are NOT regular sprite data
-					UINT32 blit0 = m_spriteblit[0];
-
-					// abort early..
-					if (blit0!=0)
-						return;
-
-					/************* m_spriteblit[1] *************/
-					
-					// 000u0ccc  - c = colour? u = 0/1
-					UINT32 blit1_unused = m_spriteblit[1] & 0xfffef800;
-					UINT32 b1mode = (m_spriteblit[1] & 0x00010000)>>16;
-					//UINT32 b1colorNumber = (m_spriteblit[1] & 0x000007ff);    // Probably more bits
-
-					if (blit1_unused!=0) printf("blit1 unknown bits set %08x\n", m_spriteblit[1]);
-			
-					/************* m_spriteblit[3] *************/
-					
-					// seems to be more complex than just transparency
-					UINT32 blit2_unused = m_spriteblit[2]&0xff80f800;
-					UINT32 b2tpen = (m_spriteblit[2] & 0x007f0000)>>16;
-					//UINT32 b2colorNumber = (m_spriteblit[2] & 0x000007ff);
-
-					if (blit2_unused!=0) printf("blit1 unknown bits set %08x\n", m_spriteblit[2]);
-					if (b1mode)
+					if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
 					{
-						if (b2tpen != 0x7f) printf("b1mode 1, b2tpen!=0x7f\n");
+						// mm ccrr rrr0
+						int encodelength = (compdata & 0x03e)>>1;
+						int rledata = (compdata & 0x3c0) >> 6;
+
+						// guess, blank tiles have the following form
+						// 00120 (00000024,0) | 010 03f
+						if (compdata&1) encodelength = 255;
+
+						while (data_written<256 && encodelength >=0)
+						{
+							tempshape[data_written] = rledata;
+							encodelength--;
+							data_written++;
+						}
+					}
+					else if ((compdata & 0x300) == 0x200)
+					{
+						// mm cccc ccrr
+						int encodelength = (compdata & 0x003);
+						int rledata = (compdata & 0x3fc) >> 6;
+
+						while (data_written<256 && encodelength >=0)
+						{
+							tempshape[data_written] = rledata;
+							encodelength--;
+							data_written++;
+						}
+
 					}
 					else
 					{
-						// 0x01/0x02 trips in rare cases (start of one of the attract levels) maybe this is some kind of alpha instead?
-						if ((b2tpen != 0x00) && (b2tpen != 0x01) && (b2tpen != 0x02)) printf("b1mode 0, b2tpen!=0x00,0x01 or 0x02 (is %02x)\n", b2tpen);
+						// mm cccc cccc
+						tempshape[data_written] = compdata&0xff;
+						data_written++;
 					}
-					 // 00??0uuu
-					 // ?? seems to be 00 or 7f, set depending on b1mode
-					 // uuu, at least 11 bits used, maybe 12 usually the same as blit1_unused? leftover?
-			
-					/************* m_spriteblit[3] *************/
 
-					UINT32 blit3_unused = m_spriteblit[3] & 0xffe00000;
-					UINT32 b3romoffset = (m_spriteblit[3] & 0x001fffff)*2;
-					// if this is an offset into the compressed m_spriteblit[3] then it's probably a word offset into each rom (each is 0x400000 bytes) with the m_spriteblit[3] from all 10 being used in parallel as per the notes from Charles
-					// this needs verifying as it could instead be an index into some other ram area already decompressed..
-					// 0000xxxx
-					//  to
-					// 001fxxxx
-
-					if (blit3_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, blit3_unused);
-					
-
-					/************* m_spriteblit[4] *************/
-
-					UINT32 blit4_unused = m_spriteblit[4] & 0xf8fefefe;
-					//UINT32 blit4 = m_spriteblit[4] & 0x07000000;
-					UINT32 blit_flipx = m_spriteblit[4] & 0x00000001;
-					UINT32 blit_flipy = (m_spriteblit[4] & 0x00000100)>>8;
-					UINT32 blit_rotate = (m_spriteblit[4] & 0x00010000)>>16;
-					if (blit4_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, blit4_unused);
-
-					// ---- -111 ---- ---r ---- ---y ---- ---x
-					// 1 = used bits? (unknown purpose.. might be object colour mode)
-					// x = x-flip
-					// y = y-flip
-					// r = unknown, not used much, occasional object - rotate
-				
-					/************* m_spriteblit[5] *************/
-
-					UINT32 blit5_unused = m_spriteblit[5]&0xfffefffe;
-					// this might enable the text indirection thing?
-					int indirect_tile_enable = (m_spriteblit[5] & 0x00010000)>>16;
-					int indirect_zoom_enable = (m_spriteblit[5] & 0x00000001);
+					i++;
+				}
+			}
 
 
-					if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", m_blitterSerialCount, blit5_unused);
-					// 00010000 (text)
-					// 00000001 (other)
+			if (!hZoom || !vZoom)
+			{
+				m_blitterSerialCount++;
+				return;
+			}
+
+			int blockwide = ((16*hZoom)/0x40);
+			int blockhigh = ((16*vZoom)/0x40);
 
 
 
+			UINT32 incx = 0x8000000 / hZoom;
+			UINT32 incy = 0x8000000 / vZoom;
 
-					/************* m_spriteblit[6] *************/
-
-					UINT16 vCellCount = (m_spriteblit[6] & 0xffff0000) >> 16;
-					UINT16 hCellCount = (m_spriteblit[6] & 0x0000ffff);
-			
-					/************* m_spriteblit[7] *************/
-		
-					UINT16 vOrigin = (m_spriteblit[7] & 0xffff0000) >> 16;
-					UINT16 hOrigin = (m_spriteblit[7] & 0x0000ffff);
-					//printf("%04x %04x\n", vOrigin, hOrigin);
-			
-					/************* m_spriteblit[8] *************/
-
-					UINT16 vZoom = (m_spriteblit[8] & 0xffff0000) >> 16;
-					UINT16 hZoom = (m_spriteblit[8] & 0x0000ffff);
-			
-					/************* m_spriteblit[9] *************/
-
-					int vPosition = (m_spriteblit[9] & 0xffff0000) >> 16;
-					int hPosition = (m_spriteblit[9] & 0x0000ffff);
-
-					if (hPosition & 0x8000) hPosition -= 0x10000;
-					if (vPosition & 0x8000) vPosition -= 0x10000;
-			
-					/************* m_spriteblit[10] *************/
-
-					// this is an address on some objects..
-					// to be specific, the center line of the road (actual road object? which currently gets shown as a single pixel column?)
-					// and the horizontal road used in the background of the title screen (which currently looks normal)
-					// I guess it's some kind of indirect way to do a line effect?
-					//UINT32 blit10 =  m_spriteblit[10];
-
-					/************* m_spriteblit[11] *************/
-					
-					UINT32 textlookup =  m_spriteblit[11];
-
-					/* DRAW */
-					
-					if (blit0 & 1)
+			// DEBUG: Draw 16x16 block
+			UINT32* line;
+			if (blit_rotate)
+			{
+				if (used_flipy)
+				{
+					for (int y = 0; y < 16; y++)
 					{
-						// NOT A SPRITE
+						const int drawy = pixelOffsetY+y;
+						if ((drawy>383) || (drawy<0)) continue;
+						line = &drawbitmap->pix32(drawy);
+						int realy = ((y*incy)>>21);
 
-						// these are something else, not sprites?  It still writes 11 dwords I think they have a different meaning
-						// it might be a clipping area set? looks potentially like co-ordinates at least
-						//printf("non sprite: ");
-						//PRINT_BLIT_STUFF
-					}
-					else
-					{
-						UINT16 used_hCellCount = hCellCount;
-						UINT16 used_vCellCount = vCellCount;
-						UINT16 used_flipx = blit_flipx;
-						UINT16 used_flipy = blit_flipy;
-
-						if (blit_rotate)
+						if (used_flipx)
 						{
-							used_hCellCount = vCellCount;
-							used_vCellCount = hCellCount;
-							used_flipx = blit_flipy;
-							used_flipy = blit_flipx;
-							// do the zoom params rotate?
-						}
-
-						// SPRITES / BLITS
-
-						// for text objects this is an address containing the 8-bit tile numbers to use for ASCII text
-						// I guess the tiles are decoded by a DMA operation earlier, from the compressed ROM?
-
-						// we also use this to trigger the actual draw operation
-
-				
-						//if (blit10!=0)
-						if (indirect_zoom_enable)
-						{
-							// with this bit enabled blit10 is a look up to the zoom(?) value eg. 03f42600
-							//UINT32 temp = space.read_dword(blit10);
-							//PRINT_BLIT_STUFF
-							/* for the horizontal road during attract there are tables 0x480 bytes long (0x120 dwords) and the value passed points to the start of them */
-							/* cell sizes for those are are 0011 (v) 0007 (h) with zoom factors of 0020 (half v) 0040 (normal h) */
-							/* tables seem to be 2x 8-bit values, possibly zoom + linescroll, although ingame ones seem to be 2x16-bit (corrupt? more meaning) */
-
-						}
-
-						bitmap_rgb32* drawbitmap;
-
-						// 0x30 - 0x60 are definitely the left screen, 0x90 - 0xc0 are definitely the right screen.. the modes seem priority related
-						if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
-							drawbitmap = &m_temp_bitmap_sprites;
-						else // 0x90, 0xa0, 0xb0, 0xc0
-							drawbitmap = &m_temp_bitmap_sprites2;
-
-						int sizex = used_hCellCount * 16 * hZoom;
-						int sizey = used_vCellCount * 16 * vZoom;
-						hPosition *= 0x40;
-						vPosition *= 0x40;
-
-						switch (vOrigin & 3)
-						{
-						case 0:
-							// top
-							break;
-						case 1:
-							vPosition -= sizey / 2 ;
-							// middle?
-							break;
-						case 2:
-							vPosition -= sizey;
-							// bottom?
-							break;
-						case 3:
-							// invalid?
-							break;
-						}
-
-						switch (hOrigin & 3)
-						{
-						case 0:
-							// left
-							break;
-						case 1:
-							hPosition -= sizex / 2;
-							// middle?
-							break;
-						case 2:
-							hPosition -= sizex;
-							// right?
-							break;
-						case 3:
-							// invalid?
-							break;
-						}
-
-						UINT32 lastSpriteNumber = 0xffffffff;
-						// Splat some sprites
-						for (int v = 0; v < used_vCellCount; v++)
-						{
-							const int pixelOffsetY = ((vPosition) + (v* 16 * vZoom)) / 0x40;
-
-							if (pixelOffsetY>383)
+							for (int x = 0; x < 16; x++)
 							{
-								v = used_vCellCount;
-								continue;
-							}
+								const int drawx = pixelOffsetX+x;
+								if ((drawx>=495 || drawx<0)) continue;
+								int realx = ((x*incx)>>21);
 
-
-							for (int h = 0; h < used_hCellCount; h++)
-							{
-								const int pixelOffsetX = ((hPosition) + (h* 16 * hZoom)) / 0x40;
-
-								if (pixelOffsetX>495)
-								{
-									h = used_hCellCount;
-									continue;
-								}
-
-								int lookupnum;
-
-								// with this bit enabled the tile numbers gets looked up using 'data' (which would be blit11) (eg 03f40000 for startup text)
-								// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
-								if (indirect_tile_enable)
-								{
-									lookupnum = space.read_byte(textlookup + h + (v*used_hCellCount));
-								}
-								else
-								{
-									if (!blit_rotate)
-									{
-										if (!used_flipy)
-										{
-											if (!used_flipx)
-												lookupnum = h + (v*used_hCellCount);
-											else
-												lookupnum = (used_hCellCount-h-1) + (v*used_hCellCount);
-										}
-										else
-										{
-											if (!used_flipx)
-												lookupnum = h + ((used_vCellCount-v-1)*used_hCellCount);
-											else
-												lookupnum = (used_hCellCount-h-1) + ((used_vCellCount-v-1)*used_hCellCount);
-
-										}
-									}
-									else
-									{
-										if (!used_flipy)
-										{
-											if (!used_flipx)
-												lookupnum = v + (h*used_vCellCount);
-											else
-												lookupnum = (used_vCellCount-v-1) + (h*used_vCellCount);
-										}
-										else
-										{
-											if (!used_flipx)
-												lookupnum = v + ((used_hCellCount-h-1)*used_vCellCount);
-											else
-												lookupnum = (used_vCellCount-v-1) + ((used_hCellCount-h-1)*used_vCellCount);
-
-										}
-									}
-								}
-
-
-								// these should be 'cell numbers' (tile numbers) which look up RLE data?
-								UINT32 spriteNumber = (m_expanded_10bit_gfx[ (b3romoffset << 3) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (b3romoffset << 3) + (lookupnum<<1) + 1 ]);
-								UINT16 tempshape[16*16];
-								
-								// skip the decoding if it's the same tile as last time!
-								if (spriteNumber != lastSpriteNumber)
-								{
-									lastSpriteNumber = spriteNumber;
-
-									int i = 1;// skip first 10 bits for now
-									int data_written = 0;
-
-									while (data_written<256)
-									{
-
-										UINT16 compdata = m_expanded_10bit_gfx[ (b3romoffset << 3) + spriteNumber + i];
-
-										if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
-										{
-											// mm ccrr rrr0
-											int encodelength = (compdata & 0x03e)>>1;
-											int rledata = (compdata & 0x3c0) >> 6;
-
-											// guess, blank tiles have the following form
-											// 00120 (00000024,0) | 010 03f
-											if (compdata&1) encodelength = 255;
-
-											while (data_written<256 && encodelength >=0)
-											{
-												tempshape[data_written] = rledata;
-												encodelength--;
-												data_written++;
-											}
-										}
-										else if ((compdata & 0x300) == 0x200)
-										{
-											// mm cccc ccrr
-											int encodelength = (compdata & 0x003);
-											int rledata = (compdata & 0x3fc) >> 6;
-
-											while (data_written<256 && encodelength >=0)
-											{
-												tempshape[data_written] = rledata;
-												encodelength--;
-												data_written++;
-											}
-
-										}
-										else
-										{
-											// mm cccc cccc
-											tempshape[data_written] = compdata&0xff;
-											data_written++;
-										}
-
-										i++;
-									}
-								}
-
-
-								if (!hZoom || !vZoom)
-								{
-									m_blitterSerialCount++;
-									return;
-								}
-
-								int blockwide = ((16*hZoom)/0x40);
-								int blockhigh = ((16*vZoom)/0x40);
-	
-
-
-								UINT32 incx = 0x8000000 / hZoom;
-								UINT32 incy = 0x8000000 / vZoom;
-
-								// DEBUG: Draw 16x16 block
-								UINT32* line;
-								if (blit_rotate)
-								{
-									if (used_flipy)
-									{
-										for (int y = 0; y < 16; y++)
-										{
-											const int drawy = pixelOffsetY+y;
-											if ((drawy>383) || (drawy<0)) continue;
-											line = &drawbitmap->pix32(drawy);
-											int realy = ((y*incy)>>21);
-
-											if (used_flipx)
-											{
-												for (int x = 0; x < 16; x++)
-												{
-													const int drawx = pixelOffsetX+x;
-													if ((drawx>=495 || drawx<0)) continue;
-													int realx = ((x*incx)>>21);
-
-													UINT16 pix = tempshape[(15-realx)*16+(15-realy)];
-													if (pix )
-														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
-												}
-											}
-											else
-											{
-												for (int x = 0; x < 16; x++)
-												{
-													const int drawx = pixelOffsetX+x;
-													if ((drawx>=495 || drawx<0)) continue;
-													int realx = ((x*incx)>>21);
-
-													UINT16 pix = tempshape[(15-realx)*16+realy];
-													if (pix )
-														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
-												}
-											}
-										}
-									}
-									else
-									{
-										for (int y = 0; y < 16; y++)
-										{
-											const int drawy = pixelOffsetY+y;
-											if ((drawy>383) || (drawy<0)) continue;
-											line = &drawbitmap->pix32(drawy);
-											int realy = ((y*incy)>>21);
-
-											if (used_flipx)
-											{
-												for (int x = 0; x < 16; x++)
-												{
-													const int drawx = pixelOffsetX+x;
-													if ((drawx>=495 || drawx<0)) continue;
-													int realx = ((x*incx)>>21);
-
-													UINT16 pix = tempshape[realx*16+(15-realy)];
-													if (pix )
-														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
-												}
-											}
-											else
-											{
-												for (int x = 0; x < 16; x++)
-												{
-													const int drawx = pixelOffsetX+x;
-													if ((drawx>=495 || drawx<0)) continue;
-													int realx = ((x*incx)>>21);
-
-													UINT16 pix = tempshape[realx*16+realy];
-													if (pix )
-														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
-												}
-											}
-										}
-									}								
-								}
-								else // no rotate
-								{
-									if (used_flipy)
-									{
-										for (int y = 0; y < 16; y++)
-										{
-											const int drawy = pixelOffsetY+y;
-											if ((drawy>383) || (drawy<0)) continue;
-											line = &drawbitmap->pix32(drawy);
-											int realy = ((y*incy)>>21);
-
-											if (used_flipx)
-											{
-												for (int x = 0; x < 16; x++)
-												{
-													const int drawx = pixelOffsetX+x;
-													if ((drawx>=495 || drawx<0)) continue;
-													int realx = ((x*incx)>>21);
-
-													UINT16 pix = tempshape[(15-realy)*16+(15-realx)];
-													if (pix )
-														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
-												}
-											}
-											else
-											{
-												for (int x = 0; x < 16; x++)
-												{
-													const int drawx = pixelOffsetX+x;
-													if ((drawx>=495 || drawx<0)) continue;
-													int realx = ((x*incx)>>21);
-													UINT16 pix = tempshape[(15-realy)*16+realx];
-													if (pix )
-														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
-												}
-											}
-										}
-									}
-									else // no rotate, no flipy
-									{
-										for (int y = 0; y < blockhigh; y++)
-										{
-											const int drawy = pixelOffsetY+y;
-											if ((drawy>383) || (drawy<0)) continue;
-											line = &drawbitmap->pix32(drawy);
-											int realy = ((y*incy)>>21);
-
-											if (used_flipx)
-											{
-												for (int x = 0; x < blockwide; x++)
-												{
-													const int drawx = pixelOffsetX+x;
-													if ((drawx>=495 || drawx<0)) continue;
-													int realx = ((x*incx)>>21);
-
-													UINT16 pix = tempshape[realy*16+(15-realx)];
-													if (pix )
-														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
-												}
-											}
-
-
-
-											else // no rotate, no flipy, no flipx
-											{
-												for (int x = 0; x < blockwide; x++)
-												{
-													const int drawx = pixelOffsetX+x;
-													if ((drawx>=495 || drawx<0)) continue;
-													int realx = ((x*incx)>>21);
-
-													UINT16 pix = tempshape[realy*16+realx];
-													if (pix )
-														if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
-												}
-											}
-										}
-									}
-								}
-
-
+								UINT16 pix = tempshape[(15-realx)*16+(15-realy)];
+								if (pix )
+									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
 							}
 						}
+						else
+						{
+							for (int x = 0; x < 16; x++)
+							{
+								const int drawx = pixelOffsetX+x;
+								if ((drawx>=495 || drawx<0)) continue;
+								int realx = ((x*incx)>>21);
 
-						//printf("\n");
-
+								UINT16 pix = tempshape[(15-realx)*16+realy];
+								if (pix )
+									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+							}
+						}
 					}
 				}
+				else
+				{
+					for (int y = 0; y < 16; y++)
+					{
+						const int drawy = pixelOffsetY+y;
+						if ((drawy>383) || (drawy<0)) continue;
+						line = &drawbitmap->pix32(drawy);
+						int realy = ((y*incy)>>21);
 
-			}
-			// ??
-			else if (m_blitterMode == 0x10) // at startup
-			{
-				//printf("blit mode %02x %02x %08x\n", m_blitterMode, m_blitterSerialCount,  data);
-				m_blitterSerialCount++;
-			}
-			else if (m_blitterMode == 0xe0) // when going into game (in units of 0x10 writes)
-			{
-				// it writes the palette for the bgs here, with fade effects?
-				//  is this the only way for the tile colours to be actually used, or does this just go to memory somewhere too?
-				//printf("blit mode %02x %02x %08x\n", m_blitterMode, m_blitterSerialCount,  data);
+						if (used_flipx)
+						{
+							for (int x = 0; x < 16; x++)
+							{
+								const int drawx = pixelOffsetX+x;
+								if ((drawx>=495 || drawx<0)) continue;
+								int realx = ((x*incx)>>21);
 
-				sysh1_pal_w(space,m_textOffset,data,0xffffffff);
-				m_textOffset++;
+								UINT16 pix = tempshape[realx*16+(15-realy)];
+								if (pix )
+									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+							}
+						}
+						else
+						{
+							for (int x = 0; x < 16; x++)
+							{
+								const int drawx = pixelOffsetX+x;
+								if ((drawx>=495 || drawx<0)) continue;
+								int realx = ((x*incx)>>21);
 
+								UINT16 pix = tempshape[realx*16+realy];
+								if (pix )
+									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+							}
+						}
+					}
+				}								
 			}
-			else
+			else // no rotate
 			{
-				logerror("unk blit mode %02x\n", m_blitterMode);
+				if (used_flipy)
+				{
+					for (int y = 0; y < 16; y++)
+					{
+						const int drawy = pixelOffsetY+y;
+						if ((drawy>383) || (drawy<0)) continue;
+						line = &drawbitmap->pix32(drawy);
+						int realy = ((y*incy)>>21);
+
+						if (used_flipx)
+						{
+							for (int x = 0; x < 16; x++)
+							{
+								const int drawx = pixelOffsetX+x;
+								if ((drawx>=495 || drawx<0)) continue;
+								int realx = ((x*incx)>>21);
+
+								UINT16 pix = tempshape[(15-realy)*16+(15-realx)];
+								if (pix )
+									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+							}
+						}
+						else
+						{
+							for (int x = 0; x < 16; x++)
+							{
+								const int drawx = pixelOffsetX+x;
+								if ((drawx>=495 || drawx<0)) continue;
+								int realx = ((x*incx)>>21);
+								UINT16 pix = tempshape[(15-realy)*16+realx];
+								if (pix )
+									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+							}
+						}
+					}
+				}
+				else // no rotate, no flipy
+				{
+					for (int y = 0; y < blockhigh; y++)
+					{
+						const int drawy = pixelOffsetY+y;
+						if ((drawy>383) || (drawy<0)) continue;
+						line = &drawbitmap->pix32(drawy);
+						int realy = ((y*incy)>>21);
+
+						if (used_flipx)
+						{
+							for (int x = 0; x < blockwide; x++)
+							{
+								const int drawx = pixelOffsetX+x;
+								if ((drawx>=495 || drawx<0)) continue;
+								int realx = ((x*incx)>>21);
+
+								UINT16 pix = tempshape[realy*16+(15-realx)];
+								if (pix )
+									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+							}
+						}
+
+
+
+						else // no rotate, no flipy, no flipx
+						{
+							for (int x = 0; x < blockwide; x++)
+							{
+								const int drawx = pixelOffsetX+x;
+								if ((drawx>=495 || drawx<0)) continue;
+								int realx = ((x*incx)>>21);
+
+								UINT16 pix = tempshape[realy*16+realx];
+								if (pix )
+									if (line[drawx]==0) line[drawx] = clut[pix+0x4000];
+							}
+						}
+					}
+				}
 			}
-			break;
 		}
+	}
+}
+
+WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
+{
+	m_blitterMode = (data & 0x00ff0000) >> 16;
+
+	if (m_blitterMode == 0xf4)
+	{
+		// Some sort of addressing state.
+		// In the case of text, simply writes 4 characters per 32-bit word.
+		// These values may be loaded into RAM somewhere as they are written.
+		// The number of characters is determined by the upper-most 8 bits.
+		m_textBytesToWrite = (data & 0xff000000) >> 24;
+		m_textOffset = (data & 0x0000ffff);
+		m_blitterSerialCount = 0;
+
+		// this is ONLY used when there is text on the screen
+
+		//printf("set mode %08x\n", data);
+
+
+	}
+	else if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60
+		  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
+	{
+		// The blitter function(s).
+		// After this is set a fixed count of 11 32-bit words are sent to the data register.
+		// The lower word always seems to be 0x0001 and the upper byte always 0xac.
+		m_blitterSerialCount = 0;
+
+		// form 0xacMM-xxx   ac = fixed value for this mode?  MM = modes above.  -xxx = some kind of offset? but it doesn't increment for each blit like the textOffset / paletteOffset stuff, investigate
+
+	}
+	else if (m_blitterMode == 0x10)
+	{
+		// Could be a full clear of VRAM?
+		for(UINT32 vramAddr = 0x3f40000; vramAddr < 0x3f4ffff; vramAddr+=4)
+			space.write_dword(vramAddr, 0x00000000);
+
+		m_blitterSerialCount = 0;
+	}
+	else if (m_blitterMode == 0xe0)
+	{
+		// uploads palettes...
+		// does NOT upload the palette for the WDUD screen when set to US mode this way..
+		m_blitterSerialCount = 0;
+		m_textOffset = (data & 0x0000ffff);
+
+	//	printf("set e0 %08x\n", data);
+
+	}
+	else
+	{
+		printf("set unknown blit mode %02x\n", m_blitterMode);
+	}
+}
+
+WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
+{
+	if (m_blitterMode == 0xf4)
+	{
+		// Uploads a series of bytes that index into the encoded sprite table
+		const size_t memOffset = 0x03f40000 + m_textOffset + m_blitterSerialCount;
+		space.write_dword(memOffset, data);
+		m_blitterSerialCount += 0x04;
+	}
+	else if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60
+		  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
+	{
+		// Serialized counts
+		if (m_blitterSerialCount < 12)
+		{
+			m_spriteblit[m_blitterSerialCount] = data;
+			m_blitterSerialCount++;
+		}
+		else
+		{
+			printf("more than 11 dwords (%d) in blit?\n", m_blitterSerialCount);
+		}
+
+		// use the 11th blit write also as the trigger
+		if (m_blitterSerialCount == 12)
+		{
+			blit_current_sprite(space);
+		}
+
+	}
+	// ??
+	else if (m_blitterMode == 0x10) // at startup
+	{
+		//printf("blit mode %02x %02x %08x\n", m_blitterMode, m_blitterSerialCount,  data);
+		m_blitterSerialCount++;
+	}
+	else if (m_blitterMode == 0xe0) // when going into game (in units of 0x10 writes)
+	{
+		// it writes the palette for the bgs here, with fade effects?
+		//  is this the only way for the tile colours to be actually used, or does this just go to memory somewhere too?
+		//printf("blit mode %02x %02x %08x\n", m_blitterMode, m_blitterSerialCount,  data);
+
+		// maybe should write to a different address, see dma hack in other code
+		const size_t memOffset = 0x3c00000 + m_textOffset + m_blitterSerialCount;
+		space.write_dword(memOffset, data);
+		m_blitterSerialCount += 0x04;
+
+	}
+	else
+	{
+		logerror("unk blit mode %02x\n", m_blitterMode);
+	}
+}
+
+WRITE32_MEMBER(coolridr_state::sysh1_fb_mode_w)
+{
+	/*
+	This does the fb display/clear phases of blitter data processed in the previous frame.
+	And yes, game effectively runs at 30 Hz (because data processing happens on even frames, actual display transfer happens on odd frames).
+	screen 1
+	8c200000 06
+	00000001 07
+	0000017f 07 Y range (upper start, lower end)
+	000701f7 07 X range (upper start, lower end)
+	00000007 07 enable?
+	screen 2
+	8c800000 06
+	00000001 07
+	0000017f 07
+	020703f7 07
+	00000207 07 enable plus clear?
+	*/
+
+	COMBINE_DATA(&m_blitterClearMode);
+
+/*
+	if(m_blitterClearMode != 0x8c200000 && m_blitterClearMode != 0x8c800000)
+		printf("Blitter Clear used with param %08x\n",m_blitterClearMode);
+*/
+
+	m_blitterClearCount = 0;
+}
+
+WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
+{
+	if(m_blitterClearCount == 0)
+	{
+		if(data != 1)
+			printf("Blitter Clear Count == 0 used with param %08x\n",data);
+	}
+	else if(m_blitterClearCount == 1)
+	{
+		if(data != 0x17f)
+			printf("Blitter Clear Count == 1 used with param %08x\n",data);
+	}
+	else if(m_blitterClearCount == 2)
+	{
+		/*
+		if(data != 0x000701f7 && m_sysh1_txt_blit[offset] != 0x020703f7)
+			printf("Blitter Clear Count == 2 used with param %08x\n",data);
+		*/
+	}
+	else if(m_blitterClearCount == 3)
+	{
+		if(data != 0x00000007 && data != 0x00000207)
+			printf("Blitter Clear Count == 3 used with param %08x\n",data);
+
+		{
+			const rectangle& visarea = machine().primary_screen->visible_area();
+
+			if(m_blitterClearMode == 0x8c200000)
+			{
+				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, visarea);
+				m_temp_bitmap_sprites.fill(0, visarea);
+			}
+
+			if(m_blitterClearMode == 0x8c800000)
+			{
+				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2, 0, 0, 0, 0, visarea);
+				m_temp_bitmap_sprites2.fill(0, visarea);
+			}
+		}
+	}
+	else
+	{
+		printf("Blitter Clear Count == %02x used with param %08x\n",m_blitterClearCount,m_sysh1_txt_blit[offset]);
+	}
+
+	m_blitterClearCount++;
+}
+
+
+
+WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
+{
+	COMBINE_DATA(&m_sysh1_txt_blit[offset]);
+
+	switch(offset)
+	{		
+		default:
+		{
+			printf("sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
+		}
+
 	}
 }
 
@@ -1475,6 +1463,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
 {
 	COMBINE_DATA(&m_framebuffer_vram[offset]);
 
+	// is this real, or just work ram for the actual blitter?
 	if(offset*4 == 0x000)
 	{
 		if((m_framebuffer_vram[offset] & 0xff00000) == 0xfe00000)
@@ -1509,7 +1498,17 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM AM_SHARE("txt_vram")//text tilemap + "lineram"
-	AM_RANGE(0x04000000, 0x0400003f) AM_RAM_WRITE(sysh1_txt_blit_w) AM_SHARE("sysh1_txt_blit")
+	AM_RANGE(0x04000000, 0x0400000f) AM_RAM_WRITE(sysh1_unk_blit_w) AM_SHARE("sysh1_txt_blit")
+	AM_RANGE(0x04000010, 0x04000013) AM_WRITE(sysh1_blit_mode_w)
+	AM_RANGE(0x04000014, 0x04000017) AM_WRITE(sysh1_blit_data_w)
+	AM_RANGE(0x04000018, 0x0400001b) AM_WRITE(sysh1_fb_mode_w)
+	AM_RANGE(0x0400001c, 0x0400001f) AM_WRITE(sysh1_fb_data_w)
+
+
+
+	
+	
+	
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("sysh1_workrah")
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share1")
 
