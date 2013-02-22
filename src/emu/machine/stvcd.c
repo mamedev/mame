@@ -2453,7 +2453,7 @@ void saturn_state::cd_playdata( void )
 		/* Zero Divide wants this TODO: timings. */
 		if((cd_fad_seek - cd_curfad) > (750*cd_speed))
 			cd_curfad += (750*cd_speed);
-		else if((cd_fad_seek < cd_curfad) < (-750*cd_speed))
+		else if((cd_fad_seek - cd_curfad) < (-750*cd_speed))
 			cd_curfad -= (750*cd_speed);
 		else
 		{
