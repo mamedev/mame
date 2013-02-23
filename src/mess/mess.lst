@@ -1164,9 +1164,11 @@ socrates  // 1988 Socrates Educational Video System (USA)
 socratfc  // 1988 Socrates SAITOUT (French Canada)
 profweis  // 1988 (Yeno) Proffesor Weiss-Alles (Germany)
 gl8008cx
-iq128_fr // 1997 Genius PC (France) / Genius IQ 128 (Germany)
-iq128
+iq128_fr // 1997 Genius PC (France)
+iq128    // 1997 Genius IQ 128 (Germany)
 iqtv512 // IQ TV512 (Germany)
+misterx // 1988 (Yeno) MisterX
+pc2000 // 1993 PreComputer 2000
 
 // Tangerine
 microtan  // 1979 Microtan 65
@@ -1864,7 +1866,6 @@ craft // Craft, by [lft]
 
 //********** To sort (mostly skeleton drivers) *****************************
 
-pc2000 // VTech PreComputer 2000
 a5105
 bcs3
 bcs3a

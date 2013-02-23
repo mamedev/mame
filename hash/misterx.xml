@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="misterx" description="Yeno MisterX cartridges">
+	<software name="ftrivia">
+		<description>Fantasie-Trivia</description>
+		<year>1989</year>
+		<publisher>Video Technology / Yeno</publisher>
+		<part name="cart" interface="pc1000_cart">
+			<feature name="pcb_type" value="ftrivia" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="27-5041-00-0.bin" size="0x20000" crc="cf68c0ec" sha1="d582f454195a416e4bcc235558af0311b543aab0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="allgeme2">
+		<description>Allgemeinwissen II</description>
+		<year>1989</year>
+		<publisher>Video Technology / Yeno</publisher>
+		<part name="cart" interface="pc1000_cart">
+			<feature name="pcb_type" value="allgeme2" />
+			<dataarea name="rom" size="0x20000">
+				<rom name="27-5041-00-0.bin" size="0x20000" crc="cf68c0ec" sha1="d582f454195a416e4bcc235558af0311b543aab0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

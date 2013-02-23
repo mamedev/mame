@@ -113,6 +113,8 @@ void hd44780_device::device_start()
 	save_item(NAME(m_ddram));
 	save_item(NAME(m_cgram));
 	save_item(NAME(m_nibble));
+	save_item(NAME(m_rs_state));
+	save_item(NAME(m_rw_state));
 }
 
 //-------------------------------------------------
@@ -140,6 +142,8 @@ void hd44780_device::device_reset()
 	m_blink      = false;
 	m_nibble     = false;
 	m_first_cmd  = true;
+	m_rs_state   = 0;
+	m_rw_state   = 0;
 
 	set_busy_flag(1520);
 }
@@ -210,6 +214,36 @@ void hd44780_device::update_ac(int direction)
 	}
 }
 
+void hd44780_device::shift_display(int direction)
+{
+	if (direction == 1)
+	{
+		if(m_disp_shift == 0x4f)
+			m_disp_shift = 0x00;
+		else
+			m_disp_shift++;
+	}
+	else
+	{
+		if(m_disp_shift == 0x00)
+			m_disp_shift = 0x4f;
+		else
+			m_disp_shift--;
+	}
+}
+
+void hd44780_device::update_nibble(int rs, int rw)
+{
+	if (m_rs_state != rs || m_rw_state != rw)
+	{
+		m_rs_state = rs;
+		m_rw_state = rw;
+		m_nibble = false;
+	}
+
+	m_nibble = !m_nibble;
+}
+
 inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8 pos, UINT8 y, UINT8 x, int state)
 {
 	if (m_pixel_update_func != NULL)
@@ -261,19 +295,9 @@ UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 		for (int line=0; line<m_num_line; line++)
 		{
-			UINT8 line_base = line * 0x40;
-
 			for (int pos=0; pos<line_size; pos++)
 			{
-				INT16 char_pos = line_base + pos + m_disp_shift;
-
-				while (char_pos < 0 || (char_pos - line_base) >= line_size)
-				{
-					if (char_pos < 0)
-						char_pos += line_size;
-					else if (char_pos - line_base >= line_size)
-						char_pos -= line_size;
-				}
+				UINT16 char_pos = line * 0x40 + ((pos + m_disp_shift) % line_size);
 
 				int char_base = 0;
 				if (m_ddram[char_pos] < 0x10)
@@ -343,7 +367,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 {
 	if (m_data_len == 4)
 	{
-		m_nibble = !m_nibble;
+		update_nibble(0, 0);
 
 		if (m_nibble)
 		{
@@ -399,7 +423,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 		if (LOG) logerror("HD44780 '%s': %s shift %d\n", tag(), BIT(m_ir, 3) ? "display" : "cursor",  direct);
 
 		if (BIT(m_ir, 3))
-			m_disp_shift += direct;
+			shift_display(direct);
 		else
 			update_ac(direct);
 
@@ -452,7 +476,7 @@ READ8_MEMBER(hd44780_device::control_read)
 	if (m_data_len == 4)
 	{
 		if (!space.debugger_access())
-			m_nibble = !m_nibble;
+			update_nibble(0, 1);
 
 		if (m_nibble)
 			return (m_busy_flag ? 0x80 : 0) | (m_ac & 0x70);
@@ -475,7 +499,7 @@ WRITE8_MEMBER(hd44780_device::data_write)
 
 	if (m_data_len == 4)
 	{
-		m_nibble = !m_nibble;
+		update_nibble(1, 0);
 
 		if (m_nibble)
 		{
@@ -501,7 +525,7 @@ WRITE8_MEMBER(hd44780_device::data_write)
 
 	update_ac(m_direction);
 	if (m_shift_on)
-		m_disp_shift += m_direction;
+		shift_display(m_direction);
 	set_busy_flag(41);
 }
 
@@ -514,7 +538,7 @@ READ8_MEMBER(hd44780_device::data_read)
 	if (m_data_len == 4)
 	{
 		if (!space.debugger_access())
-			m_nibble = !m_nibble;
+			update_nibble(1, 1);
 
 		if (m_nibble)
 			return data & 0xf0;
