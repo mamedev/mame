@@ -743,16 +743,16 @@ OP_HANDLER( adcr )
 	{
 		r16 = *src16Reg + *dst16Reg + (CC & CC_C);
 		CLR_NZVC;
-		*dst16Reg = r16;
 		SET_FLAGS16(*src16Reg,*dst16Reg,r16);
+		*dst16Reg = r16;
 	}
 	else
 	{
 		r8 = *src8Reg + *dst8Reg + (CC & CC_C);
 		CLR_NZVC;
 		/* SET_H(*src8Reg,*src8Reg,r8);*/ /*Experimentation prooved this not to be the case */
-		*dst8Reg = r8;
 		SET_FLAGS8(*src8Reg,*dst8Reg,r8);
+		*dst8Reg = r8;
 	}
 }
 
@@ -772,15 +772,15 @@ OP_HANDLER( subr )
 	{
 		r16 = (UINT32)*dst16Reg - (UINT32)*src16Reg;
 		CLR_NZVC;
-		*dst16Reg = r16;
 		SET_FLAGS16((UINT32)*dst16Reg,(UINT32)*src16Reg,r16);
+		*dst16Reg = r16;
 	}
 	else
 	{
 		r8 = *dst8Reg - *src8Reg;
 		CLR_NZVC;
-		*dst8Reg = r8;
 		SET_FLAGS8(*dst8Reg,*src8Reg,r8);
+		*dst8Reg = r8;
 	}
 }
 
@@ -800,15 +800,15 @@ OP_HANDLER( sbcr )
 	{
 		r16 = (UINT32)*dst16Reg - (UINT32)*src16Reg - (CC & CC_C);
 		CLR_NZVC;
-		*dst16Reg = r16;
 		SET_FLAGS16((UINT32)*dst16Reg,(UINT32)*src16Reg,r16);
+		*dst16Reg = r16;
 	}
 	else
 	{
 		r8 = *dst8Reg - *src8Reg - (CC & CC_C);
 		CLR_NZVC;
-		*dst8Reg = r8;
 		SET_FLAGS8(*dst8Reg,*src8Reg,r8);
+		*dst8Reg = r8;
 	}
 }
 
@@ -828,15 +828,15 @@ OP_HANDLER( andr )
 	{
 		r16 = *src16Reg & *dst16Reg;
 		CLR_NZV;
-		*dst16Reg = r16;
 		SET_NZ16(r16);
+		*dst16Reg = r16;
 	}
 	else
 	{
 		r8 = *src8Reg & *dst8Reg;
 		CLR_NZV;
-		*dst8Reg = r8;
 		SET_NZ8(r8);
+		*dst8Reg = r8;
 	}
 }
 
@@ -856,15 +856,15 @@ OP_HANDLER( orr )
 	{
 		r16 = *src16Reg | *dst16Reg;
 		CLR_NZV;
-		*dst16Reg = r16;
 		SET_NZ16(r16);
+		*dst16Reg = r16;
 	}
 	else
 	{
 		r8 = *src8Reg | *dst8Reg;
 		CLR_NZV;
-		*dst8Reg = r8;
 		SET_NZ8(r8);
+		*dst8Reg = r8;
 	}
 }
 
@@ -884,15 +884,15 @@ OP_HANDLER( eorr )
 	{
 		r16 = *src16Reg ^ *dst16Reg;
 		CLR_NZV;
-		*dst16Reg = r16;
 		SET_NZ16(r16);
+		*dst16Reg = r16;
 	}
 	else
 	{
 		r8 = *src8Reg ^ *dst8Reg;
 		CLR_NZV;
-		*dst8Reg = r8;
 		SET_NZ8(r8);
+		*dst8Reg = r8;
 	}
 }
 
