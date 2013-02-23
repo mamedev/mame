@@ -910,6 +910,9 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 			continue;
 		}
 
+		// I don't know, the Rainbow is a non-zoomed sprite and won't link unless you move one half
+		if (used_flipx)
+			hPositionx -= 1;
 
 		UINT16 hZoomTable[16];
 		int hPositionTable[16];
@@ -1518,7 +1521,11 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 {
 	m_blitterMode = (data & 0x00ff0000) >> 16;
 
-	if (m_blitterMode == 0xf4)
+	if (m_blitterMode == 0x4f)
+	{
+		/* used during end sequence, purpose unknown */
+	}
+	else if (m_blitterMode == 0xf4)
 	{
 		// Some sort of addressing state.
 		// In the case of text, simply writes 4 characters per 32-bit word.
