@@ -512,53 +512,41 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 {
 	/* planes seems to basically be at 0x8000 and 0x28000... */
 	gfx_element *gfx = machine().gfx[0];
-	UINT32 count;
+	UINT32 base_offset;
+	UINT32 tile_offset;
 	int y,x;
 	int color;
 	int scrollx;
 	int scrolly;
 
-	count = 0;
-	m_color = 0;
-
-	if (which==1)
-	{
-		count += 0x20000;
-//		color += 0x5e;
-		m_color = 2;
-	}
-	else
-	{
-//		color += 0x4e;
-//		color += 0x0;
-	}
-
 	scrollx = (m_framebuffer_vram[(0x9bac+which*0x40)/4] >> 16) & 0x7ff;
 	scrolly = m_framebuffer_vram[(0x9bac+which*0x40)/4] & 0x3ff;
 
-	/* TODO: optimize! */
+	base_offset = which * 0x20000;
+	m_color = which * 2;
+
 	for (y=0;y<64;y++)
 	{
 		for (x=0;x<128;x++)
 		{
 			int tile;
 			int res_x,res_y;
-			UINT16 cur_ptr;
+			UINT16 cur_tile;
 
 			res_x = (x*16)-scrollx;
 			res_y = (y*16)-scrolly;
+			tile_offset = (x+y*128)*2;
+			tile_offset+= base_offset;
 
-			cur_ptr = (m_h1_vram[count]<<8)|m_h1_vram[count+1];
+			cur_tile = (m_h1_vram[tile_offset]<<8)|m_h1_vram[tile_offset+1];
 
-			tile = cur_ptr & 0x07ff;
-			color = m_color + ((cur_ptr & 0x0800) >> 11) * 4;
+			tile = cur_tile & 0x07ff;
+			color = m_color + ((cur_tile & 0x0800) >> 11) * 4;
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y+1024);
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y+1024);
-
-			count+=2;
 		}
 	}
 
