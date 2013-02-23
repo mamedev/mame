@@ -252,6 +252,28 @@ tandy2k_keyboard_device::tandy2k_keyboard_device(const machine_config &mconfig, 
 {
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void tandy2k_keyboard_device::device_config_complete()
+{ 
+	m_shortname = "tandy2kb"; 
+
+	// inherit a copy of the static data
+	const tandy2k_keyboard_interface *intf = reinterpret_cast<const tandy2k_keyboard_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<tandy2k_keyboard_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
+		memset(&m_out_data_cb, 0, sizeof(m_out_data_cb));
+	}
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
