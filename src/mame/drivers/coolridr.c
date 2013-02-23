@@ -386,7 +386,10 @@ public:
 		m_sound_dma(*this, "sound_dma"),
 		m_soundram(*this, "soundram"),
 		m_soundram2(*this, "soundram2")
-		{ }
+	{
+		m_work_queue[0] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
+		m_work_queue[1] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
+	}
 
 	// Blitter state
 	UINT16 m_textBytesToWrite;
@@ -471,6 +474,9 @@ public:
 	UINT16 *m_h1_vram;
 	UINT16 *m_h1_pcg;
 	UINT16 *m_h1_pal;
+
+	osd_work_queue *    m_work_queue[2]; // work queue, one per screen
+	static void *draw_tile_row_threaded(void *param, int threadid);
 };
 
 #define PRINT_BLIT_STUFF \
@@ -619,6 +625,15 @@ WRITE32_MEMBER(coolridr_state::sysh1_ioga_w)
 }
 #endif
 
+struct cool_render_object
+{
+	UINT8* indirect_tiles;
+	UINT32* indirect_zoom;
+	UINT32 spriteblit[12];
+	bitmap_rgb32* drawbitmap;
+	coolridr_state* state;
+};
+
 #define YLOOP_START \
 	for (int y = 0; y < blockhigh; y++) \
 	{ \
@@ -664,8 +679,511 @@ TODO: fix anything that isn't text.
 	} \
 
 
-//m_rearranged_16bit_gfx
-//m_expanded_10bit_gfx
+//object->rearranged_16bit_gfx
+//object->expanded_10bit_gfx
+
+
+
+
+
+void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
+{
+	cool_render_object *object = reinterpret_cast<cool_render_object *>(param);
+	bitmap_rgb32* drawbitmap = object->drawbitmap;
+	
+	UINT16* rearranged_16bit_gfx = object->state->m_rearranged_16bit_gfx;
+	UINT16* expanded_10bit_gfx = object->state->m_expanded_10bit_gfx;
+	
+
+
+	/************* object->spriteblit[1] *************/
+
+	// 000u0ccc  - c = colour? u = 0/1
+	UINT32 blit1_unused = object->spriteblit[1] & 0xfffef800;
+	UINT32 b1mode = (object->spriteblit[1] & 0x00010000)>>16;
+	UINT32 b1colorNumber = (object->spriteblit[1] & 0x000007ff);    // Probably more bits
+
+	if (blit1_unused!=0) printf("blit1 unknown bits set %08x\n", object->spriteblit[1]);
+
+	/************* object->spriteblit[3] *************/
+
+	// seems to be more complex than just transparency
+	UINT32 blit2_unused = object->spriteblit[2]&0xff80f800;
+	UINT32 b2tpen = (object->spriteblit[2] & 0x007f0000)>>16;
+	UINT32 b2colorNumber = (object->spriteblit[2] & 0x000007ff);
+
+	if (b2colorNumber != b1colorNumber)
+	{
+	//	b1colorNumber = space.machine().rand()&0xfff;
+	}
+		
+
+//	if(b1colorNumber > 0x60 || b2colorNumber)
+//		printf("%08x %08x\n",b1colorNumber,b2colorNumber);
+
+
+	if (blit2_unused!=0) printf("blit1 unknown bits set %08x\n", object->spriteblit[2]);
+	if (b1mode)
+	{
+		if (b2tpen != 0x7f) printf("b1mode 1, b2tpen!=0x7f\n");
+	}
+	else
+	{
+		// 0x01/0x02 trips in rare cases (start of one of the attract levels) maybe this is some kind of alpha instead?
+		if ((b2tpen != 0x00) && (b2tpen != 0x01) && (b2tpen != 0x02)) printf("b1mode 0, b2tpen!=0x00,0x01 or 0x02 (is %02x)\n", b2tpen);
+	}
+	 // 00??0uuu
+	 // ?? seems to be 00 or 7f, set depending on b1mode
+	 // uuu, at least 11 bits used, maybe 12 usually the same as blit1_unused? leftover?
+
+	/************* object->spriteblit[3] *************/
+
+	UINT32 blit3_unused = object->spriteblit[3] & 0xffe00000;
+	UINT32 b3romoffset = (object->spriteblit[3] & 0x001fffff)*16;
+
+	if (blit3_unused) printf("unknown bits in blit word %d -  %08x\n", 3, blit3_unused);
+
+
+	/************* object->spriteblit[4] *************/
+
+	UINT32 blit4_unused = object->spriteblit[4] & 0xf8fefefe;
+	//UINT32 blit4 = object->spriteblit[4] & 0x07000000;
+	UINT32 blit_flipx = object->spriteblit[4] & 0x00000001;
+	UINT32 blit_flipy = (object->spriteblit[4] & 0x00000100)>>8;
+	UINT32 blit_rotate = (object->spriteblit[4] & 0x00010000)>>16;
+	if (blit4_unused) printf("unknown bits in blit word %d -  %08x\n", 4, blit4_unused);
+
+	// ---- -111 ---- ---r ---- ---y ---- ---x
+	// 1 = used bits? (unknown purpose.. might be object colour mode)
+	// x = x-flip
+	// y = y-flip
+	// r = unknown, not used much, occasional object - rotate
+
+	/************* object->spriteblit[5] *************/
+
+	UINT32 blit5_unused = object->spriteblit[5]&0xfffefffe;
+	// this might enable the text indirection thing?
+	int indirect_tile_enable = (object->spriteblit[5] & 0x00010000)>>16;
+	int indirect_zoom_enable = (object->spriteblit[5] & 0x00000001);
+
+
+	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", 5, blit5_unused);
+	// 00010000 (text)
+	// 00000001 (other)
+
+
+
+
+	/************* object->spriteblit[6] *************/
+
+	UINT16 vCellCount = (object->spriteblit[6] & 0x03ff0000) >> 16;
+	UINT16 hCellCount = (object->spriteblit[6] & 0x000003ff);
+
+	/************* object->spriteblit[7] *************/
+
+	UINT16 vOrigin = (object->spriteblit[7] & 0x00030000) >> 16;
+	UINT16 hOrigin = (object->spriteblit[7] & 0x00000003);
+	UINT16 OriginUnused = (object->spriteblit[7] & 0xfffcfffc);
+
+	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", 7, OriginUnused);
+
+	//printf("%04x %04x\n", vOrigin, hOrigin);
+
+	/************* object->spriteblit[8] *************/
+
+	UINT16 vZoom = (object->spriteblit[8] & 0xffff0000) >> 16;
+	UINT16 hZoom = (object->spriteblit[8] & 0x0000ffff);
+
+	/************* object->spriteblit[9] *************/
+
+	int vPosition = (object->spriteblit[9] & 0xffff0000) >> 16;
+	int hPosition = (object->spriteblit[9] & 0x0000ffff);
+
+	if (hPosition & 0x8000) hPosition -= 0x10000;
+	if (vPosition & 0x8000) vPosition -= 0x10000;
+
+	/************* object->spriteblit[10] *************/
+
+	// pointer to per-line zoom and scroll data for sprites
+	UINT32 blit10 = 0; // we've cached the data here already
+
+	/************* object->spriteblit[11] *************/
+
+	//UINT32 textlookup = 0; // we've cached the data here already
+
+
+
+	/* DRAW */
+	UINT16 used_hCellCount = hCellCount;
+	UINT16 used_vCellCount = vCellCount;
+	UINT16 used_flipx = blit_flipx;
+	UINT16 used_flipy = blit_flipy;
+
+	if (blit_rotate)
+	{
+		used_hCellCount = vCellCount;
+		used_vCellCount = hCellCount;
+		used_flipx = blit_flipy;
+		used_flipy = blit_flipx;
+		// do the zoom params rotate?
+	}
+
+	// SPRITES / BLITS
+
+	// for text objects this is an address containing the 8-bit tile numbers to use for ASCII text
+	// I guess the tiles are decoded by a DMA operation earlier, from the compressed ROM?
+
+	// we also use this to trigger the actual draw operation
+
+
+
+
+
+
+
+
+	int sizey = used_vCellCount * 16 * vZoom;
+
+	vPosition *= 0x40;
+
+	switch (vOrigin & 3)
+	{
+	case 0:
+		// top
+		break;
+	case 1:
+		vPosition -= sizey / 2 ;
+		// middle?
+		break;
+	case 2:
+		vPosition -= sizey;
+		// bottom?
+		break;
+	case 3:
+		// invalid?
+		break;
+	}
+
+
+
+	// Splat some sprites
+	for (int v = 0; v < used_vCellCount; v++)
+	{
+
+
+		const int pixelOffsetY = ((vPosition) + (v* 16 * vZoom)) / 0x40;
+
+		if (pixelOffsetY>383)
+		{
+			v = used_vCellCount;
+			continue;
+		}
+
+
+		UINT16 hZoomTable[16];
+		int hPositionTable[16];
+
+
+		for (int idx=0;idx<16;idx++)
+		{
+
+			if (indirect_zoom_enable)
+			{
+				UINT32 dword = object->indirect_zoom[blit10];
+
+				hZoomTable[idx] = hZoom + (dword>>16); // add original value?
+
+				// bit 0x8000 does get set too, but only on some lines, might have another meaning?
+				int linescroll = dword&0x7fff;
+				if (linescroll & 0x4000) linescroll -= 0x8000;
+
+				hPositionTable[idx] = linescroll + hPosition;
+				blit10++;
+
+
+			}
+			else
+			{
+				hZoomTable[idx] = hZoom;
+				hPositionTable[idx] = hPosition;
+			}
+
+			// DON'T use the table hZoom in this calc? (road..)
+			int sizex = used_hCellCount * 16 * hZoom;
+
+			hPositionTable[idx] *= 0x40;
+
+			switch (hOrigin & 3)
+			{
+			case 0:
+				// left
+				break;
+			case 1:
+				hPositionTable[idx] -= sizex / 2;
+				// middle?
+				break;
+			case 2:
+				hPositionTable[idx] -= sizex;
+				// right?
+				break;
+			case 3:
+				// invalid?
+				break;
+			}
+
+		}
+
+
+		for (int h = 0; h < used_hCellCount; h++)
+		{
+			
+
+
+			UINT32 lastSpriteNumber = 0xffffffff;
+
+			int lookupnum;
+
+			// with this bit enabled the tile numbers gets looked up using 'data' (which would be blit11) (eg 03f40000 for startup text)
+			// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
+			if (indirect_tile_enable)
+			{
+				// this doesn't handle the various flip modes..
+				lookupnum = object->indirect_tiles[h + (v*used_hCellCount)];
+			}
+			else
+			{
+				if (!blit_rotate)
+				{
+					if (!used_flipy)
+					{
+						if (!used_flipx)
+							lookupnum = h + (v*used_hCellCount);
+						else
+							lookupnum = (used_hCellCount-h-1) + (v*used_hCellCount);
+					}
+					else
+					{
+						if (!used_flipx)
+							lookupnum = h + ((used_vCellCount-v-1)*used_hCellCount);
+						else
+							lookupnum = (used_hCellCount-h-1) + ((used_vCellCount-v-1)*used_hCellCount);
+
+					}
+				}
+				else
+				{
+					if (!used_flipy)
+					{
+						if (!used_flipx)
+							lookupnum = v + (h*used_vCellCount);
+						else
+							lookupnum = (used_vCellCount-v-1) + (h*used_vCellCount);
+					}
+					else
+					{
+						if (!used_flipx)
+							lookupnum = v + ((used_hCellCount-h-1)*used_vCellCount);
+						else
+							lookupnum = (used_vCellCount-v-1) + ((used_hCellCount-h-1)*used_vCellCount);
+
+					}
+				}
+			}
+
+			// these should be 'cell numbers' (tile numbers) which look up RLE data?
+			UINT32 spriteNumber = (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]);
+			UINT16 tempshape[16*16];
+			
+			int color_offs = (0x7b20 + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */
+
+			// skip the decoding if it's the same tile as last time!
+			if (spriteNumber != lastSpriteNumber)
+			{
+				lastSpriteNumber = spriteNumber;
+
+				int i = 1;// skip first 10 bits for now
+				int data_written = 0;
+
+				while (data_written<256)
+				{
+
+					UINT16 compdata = expanded_10bit_gfx[ (b3romoffset) + spriteNumber + i];
+
+					if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
+					{
+						// mm ccrr rrr0
+						int encodelength = (compdata & 0x03e)>>1;
+						int rledata = (compdata & 0x1c0) >> 6;
+
+						// guess, blank tiles have the following form
+						// 00120 (00000024,0) | 010 03f
+						if (compdata&1) encodelength = 255;
+
+						while (data_written<256 && encodelength >=0)
+						{
+							tempshape[data_written] = rearranged_16bit_gfx[color_offs + rledata];
+							encodelength--;
+							data_written++;
+						}
+					}
+					else if ((compdata & 0x300) == 0x200)
+					{
+						// mm cccc ccrr
+						int encodelength = (compdata & 0x003);
+						int rledata = (compdata & 0x0fc) >> 2;
+
+						while (data_written<256 && encodelength >=0)
+						{
+							tempshape[data_written] = rearranged_16bit_gfx[color_offs + rledata + 8]; // + 0x8 crt test, most of red, green, start of blue
+							encodelength--;
+							data_written++;
+						}
+
+					}
+					else
+					{
+						int rledata = (compdata & 0x0ff);
+						// mm cccc cccc
+						tempshape[data_written] = rearranged_16bit_gfx[color_offs + rledata + 0x48]; // +0x48 crt test end of blue, start of white
+						data_written++;
+					}
+
+					i++;
+				}
+			}
+
+
+			if (!vZoom)
+			{
+				// abort, but make sure we clean up
+				goto end;
+			}
+
+			int blockhigh = ((16*vZoom)/0x40);
+
+
+
+			UINT32 incy = 0x8000000 / vZoom;
+
+			// DEBUG: Draw 16x16 block
+			UINT32* line;
+
+
+
+			if (blit_rotate)
+			{
+				if (used_flipy)
+				{
+					YLOOP_START
+
+						if (used_flipx)
+						{
+							XLOOP_START
+
+								UINT16 pix = tempshape[(15-realx)*16+(15-realy)];
+								DRAW_PIX
+							}
+						}
+						else
+						{
+							XLOOP_START
+
+								UINT16 pix = tempshape[(15-realx)*16+realy];
+								DRAW_PIX
+							}
+						}
+					}
+				}
+				else
+				{
+					YLOOP_START
+
+
+						if (used_flipx)
+						{
+							XLOOP_START
+
+								UINT16 pix = tempshape[realx*16+(15-realy)];
+								DRAW_PIX
+							}
+						}
+						else
+						{
+							XLOOP_START
+
+								UINT16 pix = tempshape[realx*16+realy];
+								DRAW_PIX
+							}
+						}
+					}
+				}
+			}
+			else // no rotate
+			{
+				if (used_flipy)
+				{
+					YLOOP_START
+
+						if (used_flipx)
+						{
+							XLOOP_START
+
+								UINT16 pix = tempshape[(15-realy)*16+(15-realx)];
+								DRAW_PIX
+							}
+						}
+						else
+						{
+							XLOOP_START
+								UINT16 pix = tempshape[(15-realy)*16+realx];
+								DRAW_PIX
+							}
+						}
+					}
+				}
+				else // no rotate, no flipy
+				{
+					YLOOP_START
+
+
+						if (used_flipx)
+						{
+							XLOOP_START
+
+								UINT16 pix = tempshape[realy*16+(15-realx)];
+								DRAW_PIX
+							}
+						}
+						else // no rotate, no flipy, no flipx
+						{
+							XLOOP_START
+
+								UINT16 pix = tempshape[realy*16+realx];
+								DRAW_PIX
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+
+	end:
+
+	if (object->indirect_tiles)
+		free(object->indirect_tiles);
+
+	if (object->indirect_zoom)
+		free(object->indirect_zoom);
+
+	free (object);
+
+	return NULL;
+
+}
+
+
 
 /* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
 void coolridr_state::blit_current_sprite(address_space &space)
@@ -772,497 +1290,65 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		return;
 	}
 
+	cool_render_object* testobject = (cool_render_object *)malloc(sizeof(cool_render_object));
 
+	testobject->state = this;
 
+	for (int i=0;i<12;i++)
+		testobject->spriteblit[i] = m_spriteblit[i];	
 
-	/************* m_spriteblit[1] *************/
+	// cache some values that are looked up from RAM to be safe.. alternatively we could stall the rendering if they get written to, but they're a direct memory pointer..
+	int test_indirect_tile_enable = (m_spriteblit[5] & 0x00010000)>>16;
 
-	// 000u0ccc  - c = colour? u = 0/1
-	UINT32 blit1_unused = m_spriteblit[1] & 0xfffef800;
-	UINT32 b1mode = (m_spriteblit[1] & 0x00010000)>>16;
-	UINT32 b1colorNumber = (m_spriteblit[1] & 0x000007ff);    // Probably more bits
-
-	if (blit1_unused!=0) printf("blit1 unknown bits set %08x\n", m_spriteblit[1]);
-
-	/************* m_spriteblit[3] *************/
-
-	// seems to be more complex than just transparency
-	UINT32 blit2_unused = m_spriteblit[2]&0xff80f800;
-	UINT32 b2tpen = (m_spriteblit[2] & 0x007f0000)>>16;
-	UINT32 b2colorNumber = (m_spriteblit[2] & 0x000007ff);
-
-	if (b2colorNumber != b1colorNumber)
+	if (test_indirect_tile_enable)
 	{
-	//	b1colorNumber = space.machine().rand()&0xfff;
-	}
-
-
-//	if(b1colorNumber > 0x60 || b2colorNumber)
-//		printf("%08x %08x\n",b1colorNumber,b2colorNumber);
-
-
-	if (blit2_unused!=0) printf("blit1 unknown bits set %08x\n", m_spriteblit[2]);
-	if (b1mode)
-	{
-		if (b2tpen != 0x7f) printf("b1mode 1, b2tpen!=0x7f\n");
+		UINT32 test_textlookup =  m_spriteblit[11];
+		UINT16 test_hCellCount = (m_spriteblit[6] & 0x00003ff);
+		UINT16 test_vCellCount = (m_spriteblit[6] & 0x03ff0000) >> 16;
+		int bytes = test_vCellCount*test_hCellCount;
+		testobject->indirect_tiles = (UINT8*)malloc(bytes);
+		for (int i=0;i<bytes;i++)
+		{
+			testobject->indirect_tiles[i] = space.read_byte(test_textlookup + i);
+		}
 	}
 	else
 	{
-		// 0x01/0x02 trips in rare cases (start of one of the attract levels) maybe this is some kind of alpha instead?
-		if ((b2tpen != 0x00) && (b2tpen != 0x01) && (b2tpen != 0x02)) printf("b1mode 0, b2tpen!=0x00,0x01 or 0x02 (is %02x)\n", b2tpen);
+		testobject->indirect_tiles = NULL;
 	}
-	 // 00??0uuu
-	 // ?? seems to be 00 or 7f, set depending on b1mode
-	 // uuu, at least 11 bits used, maybe 12 usually the same as blit1_unused? leftover?
 
-	/************* m_spriteblit[3] *************/
-
-	UINT32 blit3_unused = m_spriteblit[3] & 0xffe00000;
-	UINT32 b3romoffset = (m_spriteblit[3] & 0x001fffff)*16;
-
-	if (blit3_unused) printf("unknown bits in blit word %d -  %08x\n", 3, blit3_unused);
-
-
-	/************* m_spriteblit[4] *************/
-
-	UINT32 blit4_unused = m_spriteblit[4] & 0xf8fefefe;
-	//UINT32 blit4 = m_spriteblit[4] & 0x07000000;
-	UINT32 blit_flipx = m_spriteblit[4] & 0x00000001;
-	UINT32 blit_flipy = (m_spriteblit[4] & 0x00000100)>>8;
-	UINT32 blit_rotate = (m_spriteblit[4] & 0x00010000)>>16;
-	if (blit4_unused) printf("unknown bits in blit word %d -  %08x\n", 4, blit4_unused);
-
-	// ---- -111 ---- ---r ---- ---y ---- ---x
-	// 1 = used bits? (unknown purpose.. might be object colour mode)
-	// x = x-flip
-	// y = y-flip
-	// r = unknown, not used much, occasional object - rotate
-
-	/************* m_spriteblit[5] *************/
-
-	UINT32 blit5_unused = m_spriteblit[5]&0xfffefffe;
-	// this might enable the text indirection thing?
-	int indirect_tile_enable = (m_spriteblit[5] & 0x00010000)>>16;
-	int indirect_zoom_enable = (m_spriteblit[5] & 0x00000001);
-
-
-	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", 5, blit5_unused);
-	// 00010000 (text)
-	// 00000001 (other)
-
-
-
-
-	/************* m_spriteblit[6] *************/
-
-	UINT16 vCellCount = (m_spriteblit[6] & 0xffff0000) >> 16;
-	UINT16 hCellCount = (m_spriteblit[6] & 0x0000ffff);
-
-	/************* m_spriteblit[7] *************/
-
-	UINT16 vOrigin = (m_spriteblit[7] & 0x00030000) >> 16;
-	UINT16 hOrigin = (m_spriteblit[7] & 0x00000003);
-	UINT16 OriginUnused = (m_spriteblit[7] & 0xfffcfffc);
-
-	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", 7, OriginUnused);
-
-	//printf("%04x %04x\n", vOrigin, hOrigin);
-
-	/************* m_spriteblit[8] *************/
-
-	UINT16 vZoom = (m_spriteblit[8] & 0xffff0000) >> 16;
-	UINT16 hZoom = (m_spriteblit[8] & 0x0000ffff);
-
-	/************* m_spriteblit[9] *************/
-
-	int vPosition = (m_spriteblit[9] & 0xffff0000) >> 16;
-	int hPosition = (m_spriteblit[9] & 0x0000ffff);
-
-	if (hPosition & 0x8000) hPosition -= 0x10000;
-	if (vPosition & 0x8000) vPosition -= 0x10000;
-
-	/************* m_spriteblit[10] *************/
-
-	// pointer to per-line zoom and scroll data for sprites
-	UINT32 blit10 =  m_spriteblit[10];
-
-	/************* m_spriteblit[11] *************/
-
-	UINT32 textlookup =  m_spriteblit[11];
-
-
-
-	/* DRAW */
-	UINT16 used_hCellCount = hCellCount;
-	UINT16 used_vCellCount = vCellCount;
-	UINT16 used_flipx = blit_flipx;
-	UINT16 used_flipy = blit_flipy;
-
-	if (blit_rotate)
+	int test_indirect_zoom_enable = (m_spriteblit[5] & 0x00000001);
+	if (test_indirect_zoom_enable)
 	{
-		used_hCellCount = vCellCount;
-		used_vCellCount = hCellCount;
-		used_flipx = blit_flipy;
-		used_flipy = blit_flipx;
-		// do the zoom params rotate?
+		UINT32 test_blit10 =  m_spriteblit[10];	
+		UINT16 test_vCellCount = (m_spriteblit[6] & 0x03ff0000) >> 16;
+		int bytes = test_vCellCount * 4 * 16;
+		testobject->indirect_zoom = (UINT32*)malloc(bytes);
+		for (int i=0;i<bytes/4;i++)
+		{
+			testobject->indirect_zoom[i] = space.read_dword(test_blit10 + i*4);
+		}
 	}
-
-	// SPRITES / BLITS
-
-	// for text objects this is an address containing the 8-bit tile numbers to use for ASCII text
-	// I guess the tiles are decoded by a DMA operation earlier, from the compressed ROM?
-
-	// we also use this to trigger the actual draw operation
-
-
-
-
-
-
-	bitmap_rgb32* drawbitmap;
-
-	/* test code, not right 0x30 is always text, 0x40 hud, 0x50 99% of game objects and 0x60 some background objects, but it doesn't seem directly priority related*/
-	/*
-	// 0x30 - 0x60 are definitely the left screen, 0x90 - 0xc0 are definitely the right screen.. the modes seem priority related
+	else
+	{
+		testobject->indirect_zoom = NULL;
+	}		
+	osd_work_queue *queue;
+	// which queue, which bitmap
 	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
-		drawbitmap = &m_temp_bitmap_sprites[(m_blitterMode-0x30)>>4];
-	else // 0x90, 0xa0, 0xb0, 0xc0
-		drawbitmap = &m_temp_bitmap_sprites2[(m_blitterMode-0x90)>>4];
-	*/
-
-
-	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
-		drawbitmap = &m_temp_bitmap_sprites[0];
-	else // 0x90, 0xa0, 0xb0, 0xc0
-		drawbitmap = &m_temp_bitmap_sprites2[0];
-
-
-	int sizey = used_vCellCount * 16 * vZoom;
-
-	vPosition *= 0x40;
-
-	switch (vOrigin & 3)
 	{
-	case 0:
-		// top
-		break;
-	case 1:
-		vPosition -= sizey / 2 ;
-		// middle?
-		break;
-	case 2:
-		vPosition -= sizey;
-		// bottom?
-		break;
-	case 3:
-		// invalid?
-		break;
+		testobject->drawbitmap = &m_temp_bitmap_sprites[0];
+		queue = m_work_queue[0];
+	}
+	else // 0x90, 0xa0, 0xb0, 0xc0
+	{
+		testobject->drawbitmap = &m_temp_bitmap_sprites2[0];
+		queue = m_work_queue[1];
 	}
 
-
-
-	UINT32 lastSpriteNumber = 0xffffffff;
-	// Splat some sprites
-	for (int v = 0; v < used_vCellCount; v++)
-	{
-		const int pixelOffsetY = ((vPosition) + (v* 16 * vZoom)) / 0x40;
-
-		if (pixelOffsetY>383)
-		{
-			v = used_vCellCount;
-			continue;
-		}
-
-
-
-		UINT16 hZoomTable[16];
-		int hPositionTable[16];
-
-		for (int idx=0;idx<16;idx++)
-		{
-
-			if (indirect_zoom_enable)
-			{
-				UINT32 dword = space.read_dword(blit10);
-
-				hZoomTable[idx] = hZoom + (dword>>16); // add original value?
-
-				// bit 0x8000 does get set too, but only on some lines, might have another meaning?
-				int linescroll = dword&0x7fff;
-				if (linescroll & 0x4000) linescroll -= 0x8000;
-
-				hPositionTable[idx] = linescroll + hPosition;
-				blit10+=4;
-
-
-			}
-			else
-			{
-				hZoomTable[idx] = hZoom;
-				hPositionTable[idx] = hPosition;
-			}
-
-			// DON'T use the table hZoom in this calc? (road..)
-			int sizex = used_hCellCount * 16 * hZoom;
-
-			hPositionTable[idx] *= 0x40;
-
-			switch (hOrigin & 3)
-			{
-			case 0:
-				// left
-				break;
-			case 1:
-				hPositionTable[idx] -= sizex / 2;
-				// middle?
-				break;
-			case 2:
-				hPositionTable[idx] -= sizex;
-				// right?
-				break;
-			case 3:
-				// invalid?
-				break;
-			}
-
-		}
-//	printf("%08x %08x %08x %04x %04x\n",textlookup,m_spriteblit[3],b3romoffset,b1colorNumber,b2colorNumber);
-		//PRINT_BLIT_STUFF
-
-		for (int h = 0; h < used_hCellCount; h++)
-		{
-
-			int lookupnum;
-
-			// with this bit enabled the tile numbers gets looked up using 'data' (which would be blit11) (eg 03f40000 for startup text)
-			// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
-			if (indirect_tile_enable)
-			{
-				lookupnum = space.read_byte(textlookup + h + (v*used_hCellCount));
-			}
-			else
-			{
-				if (!blit_rotate)
-				{
-					if (!used_flipy)
-					{
-						if (!used_flipx)
-							lookupnum = h + (v*used_hCellCount);
-						else
-							lookupnum = (used_hCellCount-h-1) + (v*used_hCellCount);
-					}
-					else
-					{
-						if (!used_flipx)
-							lookupnum = h + ((used_vCellCount-v-1)*used_hCellCount);
-						else
-							lookupnum = (used_hCellCount-h-1) + ((used_vCellCount-v-1)*used_hCellCount);
-
-					}
-				}
-				else
-				{
-					if (!used_flipy)
-					{
-						if (!used_flipx)
-							lookupnum = v + (h*used_vCellCount);
-						else
-							lookupnum = (used_vCellCount-v-1) + (h*used_vCellCount);
-					}
-					else
-					{
-						if (!used_flipx)
-							lookupnum = v + ((used_hCellCount-h-1)*used_vCellCount);
-						else
-							lookupnum = (used_vCellCount-v-1) + ((used_hCellCount-h-1)*used_vCellCount);
-
-					}
-				}
-			}
-
-
-
-			// these should be 'cell numbers' (tile numbers) which look up RLE data?
-			UINT32 spriteNumber = (m_expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]);
-			UINT16 tempshape[16*16];
-
-			int color_offs = (0x7b20 + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */
-
-			// skip the decoding if it's the same tile as last time!
-			if (spriteNumber != lastSpriteNumber)
-			{
-				lastSpriteNumber = spriteNumber;
-
-				int i = 1;// skip first 10 bits for now
-				int data_written = 0;
-
-				while (data_written<256)
-				{
-
-					UINT16 compdata = m_expanded_10bit_gfx[ (b3romoffset) + spriteNumber + i];
-
-					if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
-					{
-						// mm ccrr rrr0
-						int encodelength = (compdata & 0x03e)>>1;
-						int rledata = (compdata & 0x1c0) >> 6;
-
-						// guess, blank tiles have the following form
-						// 00120 (00000024,0) | 010 03f
-						if (compdata&1) encodelength = 255;
-
-						while (data_written<256 && encodelength >=0)
-						{
-							tempshape[data_written] = m_rearranged_16bit_gfx[color_offs + rledata];
-							encodelength--;
-							data_written++;
-						}
-					}
-					else if ((compdata & 0x300) == 0x200)
-					{
-						// mm cccc ccrr
-						int encodelength = (compdata & 0x003);
-						int rledata = (compdata & 0x0fc) >> 2;
-
-						while (data_written<256 && encodelength >=0)
-						{
-							tempshape[data_written] = m_rearranged_16bit_gfx[color_offs + rledata + 8]; // + 0x8 crt test, most of red, green, start of blue
-							encodelength--;
-							data_written++;
-						}
-
-					}
-					else
-					{
-						int rledata = (compdata & 0x0ff);
-						// mm cccc cccc
-						tempshape[data_written] = m_rearranged_16bit_gfx[color_offs + rledata + 0x48]; // +0x48 crt test end of blue, start of white
-						data_written++;
-					}
-
-					i++;
-				}
-			}
-
-
-			if (!vZoom)
-			{
-				m_blitterSerialCount++;
-				return;
-			}
-
-			int blockhigh = ((16*vZoom)/0x40);
-
-
-
-			UINT32 incy = 0x8000000 / vZoom;
-
-			// DEBUG: Draw 16x16 block
-			UINT32* line;
-
-
-
-
-			if (blit_rotate)
-			{
-				if (used_flipy)
-				{
-					YLOOP_START
-
-						if (used_flipx)
-						{
-							XLOOP_START
-
-								UINT16 pix = tempshape[(15-realx)*16+(15-realy)];
-								DRAW_PIX
-							}
-						}
-						else
-						{
-							XLOOP_START
-
-								UINT16 pix = tempshape[(15-realx)*16+realy];
-								DRAW_PIX
-							}
-						}
-					}
-				}
-				else
-				{
-					YLOOP_START
-
-
-						if (used_flipx)
-						{
-							XLOOP_START
-
-								UINT16 pix = tempshape[realx*16+(15-realy)];
-								DRAW_PIX
-							}
-						}
-						else
-						{
-							XLOOP_START
-
-								UINT16 pix = tempshape[realx*16+realy];
-								DRAW_PIX
-							}
-						}
-					}
-				}
-			}
-			else // no rotate
-			{
-				if (used_flipy)
-				{
-					YLOOP_START
-
-						if (used_flipx)
-						{
-							XLOOP_START
-
-								UINT16 pix = tempshape[(15-realy)*16+(15-realx)];
-								DRAW_PIX
-							}
-						}
-						else
-						{
-							XLOOP_START
-								UINT16 pix = tempshape[(15-realy)*16+realx];
-								DRAW_PIX
-							}
-						}
-					}
-				}
-				else // no rotate, no flipy
-				{
-					YLOOP_START
-
-
-						if (used_flipx)
-						{
-							XLOOP_START
-
-								UINT16 pix = tempshape[realy*16+(15-realx)];
-								DRAW_PIX
-							}
-						}
-						else // no rotate, no flipy, no flipx
-						{
-							XLOOP_START
-
-								UINT16 pix = tempshape[realy*16+realx];
-								DRAW_PIX
-							}
-						}
-					}
-				}
-
-
-			}
-		}
-	}
+	osd_work_item_queue(queue, draw_tile_row_threaded, testobject, WORK_ITEM_FLAG_AUTO_RELEASE);
 }
+
 
 WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 {
@@ -1451,12 +1537,14 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 
 			if(m_blitterClearMode == 0x8c200000)
 			{
+				osd_work_queue_wait(m_work_queue[0], osd_ticks_per_second() * 100);
 				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites[i], 0, 0, 0, 0, visarea);
 				m_temp_bitmap_sprites[i].fill(0, visarea);
 			}
 
 			if(m_blitterClearMode == 0x8c800000)
 			{
+				osd_work_queue_wait(m_work_queue[1], osd_ticks_per_second() * 100);
 				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2[i], 0, 0, 0, 0, visarea);
 				m_temp_bitmap_sprites2[i].fill(0, visarea);
 			}
