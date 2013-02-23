@@ -22,11 +22,12 @@ enum
 	GB_MBC_MBC6,         /*    ?? ROM,  32KB SRAM                         */
 	GB_MBC_MBC7,         /*    ?? ROM,    ?? RAM                          */
 	GB_MBC_WISDOM,       /*    ?? ROM,    ?? RAM - Wisdom tree controller */
-	GB_MBC_MBC1_KOR,     /*   1MB ROM,    ?? RAM - Korean MBC1 variant    */
+	GB_MBC_MBC1_COL,     /*   1MB ROM,    ?? RAM - MBC1 variant for multigame carts    */
 	GB_MBC_YONGYONG,     /*    ?? ROM,    ?? RAM - Appears in Sonic 3D Blast 5 pirate */
 	GB_MBC_LASAMA,       /*    ?? ROM,    ?? RAM - Appears in La Sa Ma */
 	GB_MBC_ATVRACIN,
 	GB_MBC_CAMERA,
+	GB_MBC_SINTAX,
 	GB_MBC_MEGADUCK,     /* MEGADUCK style banking                        */
 	GB_MBC_UNKNOWN       /* Unknown mapper                                */
 };

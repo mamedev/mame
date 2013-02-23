@@ -44,17 +44,17 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_ram);
 };
 
-// ======================> gb_rom_mbc1k_device
+// ======================> gb_rom_mbc1col_device
 
-class gb_rom_mbc1k_device : public gb_rom_mbc_device
+class gb_rom_mbc1col_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
-	gb_rom_mbc1k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gb_rom_mbc1col_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
 	virtual void device_start();
-	virtual void device_config_complete() { m_shortname = "gb_rom_mbc1k"; }
+	virtual void device_config_complete() { m_shortname = "gb_rom_mbc1col"; }
 
 	virtual DECLARE_READ8_MEMBER(read_rom);
 	virtual DECLARE_WRITE8_MEMBER(write_bank);
@@ -172,10 +172,33 @@ public:
 	UINT8 m_bank_mask, m_bank, m_reg;
 };
 
+// ======================> gb_rom_sintax_device
+class gb_rom_sintax_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_sintax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_config_complete() { m_shortname = "gb_rom_sintax"; }
+	void set_xor_for_bank(UINT8 bank);
+	
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_ram);
+	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	UINT8 m_bank_mask, m_bank, m_reg;
+
+	UINT8 m_currentxor, m_xor2, m_xor3, m_xor4, m_xor5, m_sintax_mode;
+};
+
+
 
 // device type definition
 extern const device_type GB_ROM_MBC1;
-extern const device_type GB_ROM_MBC1K;
+extern const device_type GB_ROM_MBC1_COL;
 extern const device_type GB_ROM_MBC2;
 extern const device_type GB_ROM_MBC3;
 extern const device_type GB_ROM_MBC4;
@@ -183,5 +206,6 @@ extern const device_type GB_ROM_MBC5;
 extern const device_type GB_ROM_MBC6;
 extern const device_type GB_ROM_MBC7;
 extern const device_type GB_ROM_MMM01;
+extern const device_type GB_ROM_SINTAX;
 
 #endif

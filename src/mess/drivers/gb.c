@@ -456,26 +456,6 @@ space. This mapper uses 32KB sized banks.
 static const UINT16 mgb_cpu_regs[6] = { 0xFFB0, 0x0013, 0x00D8, 0x014D, 0xFFFE, 0x0100 };   /* Game Boy Pocket / Super Game Boy 2 */
 static const UINT16 megaduck_cpu_regs[6] = { 0x0000, 0x0000, 0x0000, 0x0000, 0xFFFE, 0x0000 };  /* Megaduck */
 
-static ADDRESS_MAP_START(gb_map, AS_PROGRAM, 8, gb_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x00ff) AM_ROMBANK("bank5")                    /* BIOS or ROM */
-	AM_RANGE(0x0100, 0x01ff) AM_ROMBANK("bank10")                   /* ROM bank */
-	AM_RANGE(0x0200, 0x08ff) AM_ROMBANK("bank6")
-	AM_RANGE(0x0900, 0x3fff) AM_ROMBANK("bank11")
-	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")                    /* 8KB/16KB switched ROM bank */
-	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank4")                    /* 8KB/16KB switched ROM bank */
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w ) /* 8k VRAM */
-	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank2")                    /* 8k switched RAM bank (cartridge) */
-	AM_RANGE(0xc000, 0xfdff) AM_RAM                     /* 8k low RAM, echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w )  /* OAM RAM */
-	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w )        /* I/O */
-	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE_LEGACY("custom", gb_sound_r, gb_sound_w )      /* sound registers */
-	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
-	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE_LEGACY("custom", gb_wave_r, gb_wave_w )        /* Wave ram */
-	AM_RANGE(0xff40, 0xff7f) AM_READWRITE(gb_video_r, gb_io2_w)     /* Video controller & BIOS flip-flop */
-	AM_RANGE(0xff80, 0xfffe) AM_RAM                     /* High RAM */
-	AM_RANGE(0xffff, 0xffff) AM_READWRITE(gb_ie_r, gb_ie_w )        /* Interrupt enable register */
-ADDRESS_MAP_END
 
 READ8_MEMBER(gb_state::gb_cart_r)
 {
@@ -647,10 +627,36 @@ static INPUT_PORTS_START( gameboy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( gb_common, gb_state )
+static SLOT_INTERFACE_START(gb_cart)
+	SLOT_INTERFACE_INTERNAL("rom",  GB_STD_ROM)
+	SLOT_INTERFACE_INTERNAL("rom_mbc1",  GB_ROM_MBC1)
+	SLOT_INTERFACE_INTERNAL("rom_mbc1col",  GB_ROM_MBC1_COL)
+	SLOT_INTERFACE_INTERNAL("rom_mbc2",  GB_ROM_MBC2)
+	SLOT_INTERFACE_INTERNAL("rom_mbc3",  GB_ROM_MBC3)
+	SLOT_INTERFACE_INTERNAL("rom_huc1",  GB_ROM_MBC3)
+	SLOT_INTERFACE_INTERNAL("rom_huc3",  GB_ROM_MBC3)
+	SLOT_INTERFACE_INTERNAL("rom_mbc5",  GB_ROM_MBC5)
+	SLOT_INTERFACE_INTERNAL("rom_mbc6",  GB_ROM_MBC6)
+	SLOT_INTERFACE_INTERNAL("rom_mbc7",  GB_ROM_MBC7)
+	SLOT_INTERFACE_INTERNAL("rom_tama5",  GB_ROM_TAMA5)
+	SLOT_INTERFACE_INTERNAL("rom_mmm01",  GB_ROM_MMM01)
+	SLOT_INTERFACE_INTERNAL("rom_wisdom",  GB_ROM_WISDOM)
+	SLOT_INTERFACE_INTERNAL("rom_yong",  GB_ROM_YONG)
+	SLOT_INTERFACE_INTERNAL("rom_lasama",  GB_ROM_LASAMA)
+	SLOT_INTERFACE_INTERNAL("rom_atvrac",  GB_ROM_ATVRAC)
+	SLOT_INTERFACE_INTERNAL("rom_camera",  GB_STD_ROM)
+	SLOT_INTERFACE_INTERNAL("rom_sintax",  GB_ROM_SINTAX)
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START(megaduck_cart)
+	SLOT_INTERFACE_INTERNAL("rom",  MEGADUCK_ROM)
+SLOT_INTERFACE_END
+
+
+static MACHINE_CONFIG_START( gameboy, gb_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", LR35902, 4194304)           /* 4.194304 MHz */
-	MCFG_CPU_PROGRAM_MAP(gb_map)
+	MCFG_CPU_PROGRAM_MAP(gameboy_map)
 	MCFG_LR35902_TIMER_CB( WRITE8( gb_state, gb_timer_callback ) )
 	MCFG_LR35902_HALT_BUG
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gb_state,  gb_scanline_interrupt)  /* 1 dummy int each frame */
@@ -678,36 +684,8 @@ static MACHINE_CONFIG_START( gb_common, gb_state )
 	MCFG_SOUND_ADD("custom", GAMEBOY, 0)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_CONFIG_END
 
-static SLOT_INTERFACE_START(gb_cart)
-	SLOT_INTERFACE_INTERNAL("rom",  GB_STD_ROM)
-	SLOT_INTERFACE_INTERNAL("rom_mbc1",  GB_ROM_MBC1)
-	SLOT_INTERFACE_INTERNAL("rom_mbc1k",  GB_ROM_MBC1K)
-	SLOT_INTERFACE_INTERNAL("rom_mbc2",  GB_ROM_MBC2)
-	SLOT_INTERFACE_INTERNAL("rom_mbc3",  GB_ROM_MBC3)
-	SLOT_INTERFACE_INTERNAL("rom_huc1",  GB_ROM_MBC3)
-	SLOT_INTERFACE_INTERNAL("rom_huc3",  GB_ROM_MBC3)
-	SLOT_INTERFACE_INTERNAL("rom_mbc5",  GB_ROM_MBC5)
-	SLOT_INTERFACE_INTERNAL("rom_mbc6",  GB_ROM_MBC6)
-	SLOT_INTERFACE_INTERNAL("rom_mbc7",  GB_ROM_MBC7)
-	SLOT_INTERFACE_INTERNAL("rom_tama5",  GB_ROM_TAMA5)
-	SLOT_INTERFACE_INTERNAL("rom_mmm01",  GB_ROM_MMM01)
-	SLOT_INTERFACE_INTERNAL("rom_wisdom",  GB_ROM_WISDOM)
-	SLOT_INTERFACE_INTERNAL("rom_yong",  GB_ROM_YONG)
-	SLOT_INTERFACE_INTERNAL("rom_lasama",  GB_ROM_LASAMA)
-	SLOT_INTERFACE_INTERNAL("rom_atvrac",  GB_ROM_ATVRAC)
-	SLOT_INTERFACE_INTERNAL("rom_camera",  GB_STD_ROM)
-SLOT_INTERFACE_END
-
-static SLOT_INTERFACE_START(megaduck_cart)
-	SLOT_INTERFACE_INTERNAL("rom",  MEGADUCK_ROM)
-SLOT_INTERFACE_END
-
-static MACHINE_CONFIG_DERIVED( gameboy, gb_common )
-	MCFG_CPU_REPLACE("maincpu", LR35902, 4194304)           /* 4.194304 MHz */
-	MCFG_CPU_PROGRAM_MAP(gameboy_map)
-
+	/* cartslot */
 	MCFG_GB_CARTRIDGE_ADD("gbslot", gb_cart, NULL, NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","gameboy")

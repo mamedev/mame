@@ -2150,7 +2150,7 @@
 		</part>
 	</software>
 
-	<software name="bombcoll" supported="no">
+	<software name="bombcoll">
 		<!-- Notes: SGB enhanced -->
 		<description>Bomberman Collection (Jpn)</description>
 		<year>1996</year>
@@ -2159,7 +2159,7 @@
 		<info name="release" value="19960721"/>
 		<info name="alt_title" value="ボンバーマンコレクション"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
+			<feature name="slot" value="rom_mbc1col" />
 			<dataarea name="rom" size="1048576">
 				<rom name="bomberman collection (japan).bin" size="1048576" crc="509a6b73" sha1="385f8fafa53a83f8f65e1e619fe124bbf7db4a98" offset="000000" />
 			</dataarea>
@@ -6502,7 +6502,7 @@
 		</part>
 	</software>
 
-	<software name="genjincl" supported="no">
+	<software name="genjincl">
 		<!-- Notes: SGB enhanced -->
 		<description>Genjin Collection (Jpn)</description>
 		<year>1996</year>
@@ -6511,7 +6511,7 @@
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="原人コレクション GB原人, GB原人2, GB原人ランド"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
+			<feature name="slot" value="rom_mbc1col" />
 			<dataarea name="rom" size="1048576">
 				<rom name="genjin collection (japan).bin" size="1048576" crc="b2eedd36" sha1="a9f953e2a3680078e51cb42fac44edf81991737b" offset="000000" />
 			</dataarea>
@@ -10859,7 +10859,7 @@
 		</part>
 	</software>
 
-	<software name="4in1to" supported="no">
+	<software name="4in1to">
 		<description>Mani 4 in 1 (Chi, DMG-603 CHN)</description>
 		<year>19??</year>
 		<publisher>Mani</publisher>
@@ -10868,20 +10868,6 @@
 			<feature name="slot" value="rom_mmm01" />
 			<dataarea name="rom" size="524288">
 				<rom name="4 in 1 (dmg-603 chn) [raw dump].bin" size="524288" crc="c373ac09" sha1="0030295574e4c518ff5cdf20febf6b6737426468" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Menu moved to the beginning of the dump. We should handle differently the banking for the original dump to work? -->
-	<software name="4in1toh" cloneof="4in1to">
-		<description>Mani 4 in 1 (Chi, DMG-603 CHN, Hacked)</description>
-		<year>19??</year>
-		<publisher>Mani</publisher>
-		<info name="serial" value="DMG-603-CHN"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mmm01" />
-			<dataarea name="rom" size="524288">
-				<rom name="4 in 1 (dmg-603 chn) [menu first].bin" size="524288" crc="a997c237" sha1="0c8fb3700512fd6b98cda2df1cb2e650bacfc217" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11969,7 +11955,7 @@
 		<info name="release" value="19960809"/>
 		<info name="alt_title" value="桃太郎コレクション"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
+			<feature name="slot" value="rom_mbc1col" />
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="momotarou collection (japan).bin" size="1048576" crc="ad376905" sha1="cd7088d13f5b80f32c0fae95a57969f6f33a9a02" offset="000000" />
@@ -12339,7 +12325,7 @@
 		<publisher>Acclaim Entertainment</publisher>
 		<info name="serial" value="DMG-AK2E-USA"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
+			<feature name="slot" value="rom_mbc1col" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mortal kombat i &amp; ii (usa, europe).bin" size="1048576" crc="55300d0a" sha1="e337489255b33367ce26194fc4038346d3388bd9" offset="000000" />
 			</dataarea>
@@ -19543,7 +19529,7 @@
 		<info name="release" value="19960913"/>
 		<info name="alt_title" value="スーパーチャイニーズランド1・2・3'"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
+			<feature name="slot" value="rom_mbc1col" />
 			<dataarea name="rom" size="1048576">
 				<rom name="super chinese land 1.2.3' (japan).bin" size="1048576" crc="7d1d8fdc" sha1="2c2a1c2de0c2a88bc0a73b44f04f2ca434573d68" offset="000000" />
 			</dataarea>

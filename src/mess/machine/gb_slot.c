@@ -200,7 +200,7 @@ struct gb_slot
 static const gb_slot slot_list[] =
 {
 	{ GB_MBC_MBC1, "rom_mbc1" },
-	{ GB_MBC_MBC1_KOR, "rom_mbc1k" },
+	{ GB_MBC_MBC1_COL, "rom_mbc1col" },
 	{ GB_MBC_MBC2, "rom_mbc2" },
 	{ GB_MBC_MBC3, "rom_mbc3" },
 	{ GB_MBC_MBC5, "rom_mbc5" },
@@ -214,6 +214,7 @@ static const gb_slot slot_list[] =
 	{ GB_MBC_YONGYONG, "rom_yong" },
 	{ GB_MBC_LASAMA, "rom_lasama" },
 	{ GB_MBC_ATVRACIN, "rom_atvrac" },
+	{ GB_MBC_SINTAX, "rom_sintax" },
 	{ GB_MBC_CAMERA, "rom_camera" }
 };
 
@@ -520,11 +521,33 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		}
 	}
 
-	/* Check if we're dealing with a Korean variant of the MBC1 mapper */
+	// Check for some unlicensed games
+	if (type == GB_MBC_MBC5)
+	{
+		int count = 0;
+		for (int i = 0x0184; i < 0x0184 + 0x30; i++)
+		{
+			count += ROM[i];
+		}
+		if (count == 4876)
+		{
+//			printf("Niutoude!\n");
+//			type = GB_MBC_NIUTOUDE;
+		}
+		if (count == 4138 || count == 4125)
+		{
+			// Zhi Huan Wang uses 4138
+			// most sintax use 4125
+			printf("Sintax %d!\n", count);
+			type = GB_MBC_SINTAX;
+		}
+	}
+	
+	/* Check if we're dealing with the multigame variant of the MBC1 mapper */
 	if (type == GB_MBC_MBC1)
 	{
 		if (ROM[0x13f] == 0x42 && ROM[0x140] == 0x32 && ROM[0x141] == 0x43 && ROM[0x142] == 0x4B)
-			type = GB_MBC_MBC1_KOR;
+			type = GB_MBC_MBC1_COL;
 	}
 
 	return type;
