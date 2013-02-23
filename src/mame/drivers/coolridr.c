@@ -395,6 +395,7 @@ public:
 	UINT16 m_textBytesToWrite;
 	INT16  m_blitterSerialCount;
 	UINT8  m_blitterMode;
+	UINT8  m_blittype;
 	UINT16 m_blitterAddr;
 	UINT16 m_textOffset;
 	UINT32 m_blitterClearMode;
@@ -417,6 +418,9 @@ public:
 	required_shared_ptr<UINT16> m_soundram2;
 	bitmap_rgb32 m_temp_bitmap_sprites[4];
 	bitmap_rgb32 m_temp_bitmap_sprites2[4];
+	bitmap_ind16 m_zbuffer_bitmap;
+	bitmap_ind16 m_zbuffer_bitmap2;
+
 	bitmap_rgb32 m_screen1_bitmap;
 	bitmap_rgb32 m_screen2_bitmap;
 	int m_color;
@@ -492,6 +496,11 @@ void coolridr_state::video_start()
 {
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites[0]);
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2[0]);
+	machine().primary_screen->register_screen_bitmap(m_zbuffer_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_zbuffer_bitmap2);
+
+
+	
 
 	// testing, not right
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites[1]);
@@ -631,6 +640,9 @@ struct cool_render_object
 	UINT32* indirect_zoom;
 	UINT32 spriteblit[12];
 	bitmap_rgb32* drawbitmap;
+	bitmap_ind16* zbitmap;
+	UINT16 zpri;
+	UINT8 blittype;
 	coolridr_state* state;
 };
 
@@ -644,14 +656,27 @@ struct cool_render_object
 		const int drawy = pixelOffsetY+y; \
 		if ((drawy>383) || (drawy<0)) continue; \
 		line = &drawbitmap->pix32(drawy); \
+		zline = &object->zbitmap->pix16(drawy); \
 		int blockwide = ((16*hZoomTable[realy])/0x40); \
 		UINT32 incx = 0x8000000 / hZoomTable[realy]; \
+
+
+
+#define YLOOP_START_NO_LINEZOOM \
+	for (int y = 0; y < blockhigh; y++) \
+	{ \
+		int realy = ((y*incy)>>21); \
+		const int drawy = pixelOffsetY+y; \
+		if ((drawy>383) || (drawy<0)) continue; \
+		line = &drawbitmap->pix32(drawy); \
+		zline = &object->zbitmap->pix16(drawy); \
+
 
 #define XLOOP_START \
 	for (int x = 0; x < blockwide; x++) \
 	{ \
 		const int drawx = pixelOffsetX+x; \
-		if ((drawx>=495 || drawx<0)) continue; \
+		if ((drawx>495 || drawx<0)) continue; \
 		int realx = ((x*incx)>>21); \
 
 
@@ -663,17 +688,66 @@ struct cool_render_object
 of each rom ... ROM 1 + 2 gives the full palette data for each pixel, in even/odd order.
 TODO: fix anything that isn't text.
 */
+
+// because of our copy bitmap any black pens get removed.. obviously this is wrong
+
 #define DRAW_PIX \
-	if (pix) \
+	if (pix&0x7fff) \
 	{ \
+		if (object->blittype==0) \
 		{ \
-			if (!line[drawx]) \
+			if (object->zpri < zline[drawx]) \
 			{ \
-				int r,g,b; \
-				r = pal5bit((pix >> 10) & 0x1f); \
-				g = pal5bit((pix >> 5) & 0x1f); \
-				b = pal5bit((pix >> 0) & 0x1f); \
-				line[drawx] = r<<16 | g<<8 | b; \
+				{ \
+					int r,g,b; \
+					r = pal5bit((pix >> 10) & 0x1f); \
+					g = pal5bit((pix >> 5) & 0x1f); \
+					b = pal5bit((pix >> 0) & 0x1f); \
+					line[drawx] = r<<16 | g<<8 | b; \
+					zline[drawx] = object->zpri; \
+				} \
+			} \
+		} \
+		else if (object->blittype==1) \
+		{ \
+			if (object->zpri < zline[drawx]) \
+			{ \
+				{ \
+					int r,g,b; \
+					r = pal5bit((pix >> 10) & 0x1f); \
+					g = pal5bit((pix >> 5) & 0x1f); \
+					b = pal5bit((pix >> 0) & 0x1f); \
+					line[drawx] = r<<16 | g<<8 | b; \
+					zline[drawx] = object->zpri; \
+				} \
+			} \
+		} \
+		if (object->blittype==2) \
+		{ \
+			if (object->zpri < zline[drawx]) \
+			{ \
+				{ \
+					int r,g,b; \
+					r = pal5bit((pix >> 10) & 0x1f); \
+					g = pal5bit((pix >> 5) & 0x1f); \
+					b = pal5bit((pix >> 0) & 0x1f); \
+					line[drawx] = r<<16 | g<<8 | b; \
+					zline[drawx] = object->zpri; \
+				} \
+			} \
+		} \
+		if (object->blittype==3) \
+		{ \
+			if (object->zpri < zline[drawx]) \
+			{ \
+				{ \
+					int r,g,b; \
+					r = pal5bit((pix >> 10) & 0x1f); \
+					g = pal5bit((pix >> 5) & 0x1f); \
+					b = pal5bit((pix >> 0) & 0x1f); \
+					line[drawx] = r<<16 | g<<8 | b; \
+					zline[drawx] = object->zpri; \
+				} \
 			} \
 		} \
 	} \
@@ -797,9 +871,9 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 	/************* object->spriteblit[9] *************/
 
 	int vPosition = (object->spriteblit[9] & 0xffff0000) >> 16;
-	int hPosition = (object->spriteblit[9] & 0x0000ffff);
+	int hPositionx = (object->spriteblit[9] & 0x0000ffff);
 
-	if (hPosition & 0x8000) hPosition -= 0x10000;
+	if (hPositionx & 0x8000) hPositionx -= 0x10000;
 	if (vPosition & 0x8000) vPosition -= 0x10000;
 
 	/************* object->spriteblit[10] *************/
@@ -882,12 +956,11 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 
 		UINT16 hZoomTable[16];
 		int hPositionTable[16];
+		int hPosition = 0;
 
-
-		for (int idx=0;idx<16;idx++)
+		if (indirect_zoom_enable)
 		{
-
-			if (indirect_zoom_enable)
+			for (int idx=0;idx<16;idx++)
 			{
 				UINT32 dword = object->indirect_zoom[blit10];
 
@@ -897,21 +970,39 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 				int linescroll = dword&0x7fff;
 				if (linescroll & 0x4000) linescroll -= 0x8000;
 
-				hPositionTable[idx] = linescroll + hPosition;
+				hPositionTable[idx] = linescroll + hPositionx;
 				blit10++;
 
+				// DON'T use the table hZoom in this calc? (road..)
+				int sizex = used_hCellCount * 16 * hZoom;
 
-			}
-			else
-			{
-				hZoomTable[idx] = hZoom;
-				hPositionTable[idx] = hPosition;
-			}
+				hPositionTable[idx] *= 0x40;
 
-			// DON'T use the table hZoom in this calc? (road..)
+				switch (hOrigin & 3)
+				{
+				case 0:
+					// left
+					break;
+				case 1:
+					hPositionTable[idx] -= sizex / 2;
+					// middle?
+					break;
+				case 2:
+					hPositionTable[idx] -= sizex;
+					// right?
+					break;
+				case 3:
+					// invalid?
+					break;
+				}
+			}
+		}
+		else
+		{
+
 			int sizex = used_hCellCount * 16 * hZoom;
 
-			hPositionTable[idx] *= 0x40;
+			hPosition = hPositionx * 0x40;
 
 			switch (hOrigin & 3)
 			{
@@ -919,25 +1010,28 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 				// left
 				break;
 			case 1:
-				hPositionTable[idx] -= sizex / 2;
+				hPosition -= sizex / 2;
 				// middle?
 				break;
 			case 2:
-				hPositionTable[idx] -= sizex;
+				hPosition -= sizex;
 				// right?
 				break;
 			case 3:
 				// invalid?
 				break;
 			}
-
 		}
+
 
 
 		for (int h = 0; h < used_hCellCount; h++)
 		{
-			
-
+			if (!indirect_zoom_enable)
+			{
+			//	int offs = ((hPosition) + (h* 16 * hZoom)) / 0x40;
+			//	if (offs>495) continue;
+			}
 
 			UINT32 lastSpriteNumber = 0xffffffff;
 
@@ -1067,106 +1161,213 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 
 			// DEBUG: Draw 16x16 block
 			UINT32* line;
+			UINT16* zline;
 
 
-
-			if (blit_rotate)
+			if (indirect_zoom_enable)
 			{
-				if (used_flipy)
+				if (blit_rotate)
 				{
-					YLOOP_START
+					if (used_flipy)
+					{
+						YLOOP_START
 
-						if (used_flipx)
-						{
-							XLOOP_START
+							if (used_flipx)
+							{
+								XLOOP_START
 
-								UINT16 pix = tempshape[(15-realx)*16+(15-realy)];
-								DRAW_PIX
+									UINT16 pix = tempshape[(15-realx)*16+(15-realy)];
+									DRAW_PIX
+								}
+							}
+							else
+							{
+								XLOOP_START
+
+									UINT16 pix = tempshape[(15-realx)*16+realy];
+									DRAW_PIX
+								}
 							}
 						}
-						else
-						{
-							XLOOP_START
+					}
+					else
+					{
+						YLOOP_START
 
-								UINT16 pix = tempshape[(15-realx)*16+realy];
-								DRAW_PIX
+							if (used_flipx)
+							{
+								XLOOP_START
+
+									UINT16 pix = tempshape[realx*16+(15-realy)];
+									DRAW_PIX
+								}
+							}
+							else
+							{
+								XLOOP_START
+
+									UINT16 pix = tempshape[realx*16+realy];
+									DRAW_PIX
+								}
 							}
 						}
 					}
 				}
-				else
+				else // no rotate
 				{
-					YLOOP_START
+					if (used_flipy)
+					{
+						YLOOP_START
 
+							if (used_flipx)
+							{
+								XLOOP_START
 
-						if (used_flipx)
-						{
-							XLOOP_START
-
-								UINT16 pix = tempshape[realx*16+(15-realy)];
-								DRAW_PIX
+									UINT16 pix = tempshape[(15-realy)*16+(15-realx)];
+									DRAW_PIX
+								}
+							}
+							else
+							{
+								XLOOP_START
+									UINT16 pix = tempshape[(15-realy)*16+realx];
+									DRAW_PIX
+								}
 							}
 						}
-						else
-						{
-							XLOOP_START
+					}
+					else // no rotate, no flipy
+					{
+						YLOOP_START
 
-								UINT16 pix = tempshape[realx*16+realy];
-								DRAW_PIX
+							if (used_flipx)
+							{
+								XLOOP_START
+
+									UINT16 pix = tempshape[realy*16+(15-realx)];
+									DRAW_PIX
+								}
+							}
+							else // no rotate, no flipy, no flipx
+							{
+								XLOOP_START
+
+									UINT16 pix = tempshape[realy*16+realx];
+									DRAW_PIX
+								}
 							}
 						}
 					}
 				}
 			}
-			else // no rotate
+			else  // no indirect zoom
 			{
-				if (used_flipy)
+				if (!hZoom)
 				{
-					YLOOP_START
+					// abort, but make sure we clean up
+					goto end;
+				}
+				const int pixelOffsetX = ((hPosition) + (h* 16 * hZoom)) / 0x40;
+				int blockwide = ((16*hZoom)/0x40);
+				UINT32 incx = 0x8000000 / hZoom;
 
-						if (used_flipx)
-						{
-							XLOOP_START
+				if (blit_rotate)
+				{
+					if (used_flipy)
+					{
+						YLOOP_START_NO_LINEZOOM
 
-								UINT16 pix = tempshape[(15-realy)*16+(15-realx)];
-								DRAW_PIX
+							if (used_flipx)
+							{
+								XLOOP_START
+
+									UINT16 pix = tempshape[(15-realx)*16+(15-realy)];
+									DRAW_PIX
+								}
+							}
+							else
+							{
+								XLOOP_START
+
+									UINT16 pix = tempshape[(15-realx)*16+realy];
+									DRAW_PIX
+								}
 							}
 						}
-						else
-						{
-							XLOOP_START
-								UINT16 pix = tempshape[(15-realy)*16+realx];
-								DRAW_PIX
+					}
+					else
+					{
+						YLOOP_START_NO_LINEZOOM
+
+							if (used_flipx)
+							{
+								XLOOP_START
+
+									UINT16 pix = tempshape[realx*16+(15-realy)];
+									DRAW_PIX
+								}
+							}
+							else
+							{
+								XLOOP_START
+
+									UINT16 pix = tempshape[realx*16+realy];
+									DRAW_PIX
+								}
 							}
 						}
 					}
 				}
-				else // no rotate, no flipy
+				else // no rotate
 				{
-					YLOOP_START
+					if (used_flipy)
+					{
+						YLOOP_START_NO_LINEZOOM
 
+							if (used_flipx)
+							{
+								XLOOP_START
 
-						if (used_flipx)
-						{
-							XLOOP_START
-
-								UINT16 pix = tempshape[realy*16+(15-realx)];
-								DRAW_PIX
+									UINT16 pix = tempshape[(15-realy)*16+(15-realx)];
+									DRAW_PIX
+								}
+							}
+							else
+							{
+								XLOOP_START
+									UINT16 pix = tempshape[(15-realy)*16+realx];
+									DRAW_PIX
+								}
 							}
 						}
-						else // no rotate, no flipy, no flipx
-						{
-							XLOOP_START
+					}
+					else // no rotate, no flipy
+					{
+						YLOOP_START_NO_LINEZOOM
 
-								UINT16 pix = tempshape[realy*16+realx];
-								DRAW_PIX
+							if (used_flipx)
+							{
+								XLOOP_START
+
+									UINT16 pix = tempshape[realy*16+(15-realx)];
+									DRAW_PIX
+								}
+							}
+							else // no rotate, no flipy, no flipx
+							{
+								XLOOP_START
+
+									UINT16 pix = tempshape[realy*16+realx];
+									DRAW_PIX
+								}
 							}
 						}
 					}
 				}
-			}
+			} // end no indirect zoom
 		}
 	}
+	
 
 
 	end:
@@ -1333,16 +1534,22 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	{
 		testobject->indirect_zoom = NULL;
 	}		
+
+	testobject->zpri = m_blitterAddr;
+	testobject->blittype = m_blittype;
+
 	osd_work_queue *queue;
 	// which queue, which bitmap
 	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 	{
 		testobject->drawbitmap = &m_temp_bitmap_sprites[0];
+		testobject->zbitmap = &m_zbuffer_bitmap;
 		queue = m_work_queue[0];
 	}
 	else // 0x90, 0xa0, 0xb0, 0xc0
 	{
 		testobject->drawbitmap = &m_temp_bitmap_sprites2[0];
+		testobject->zbitmap = &m_zbuffer_bitmap2;
 		queue = m_work_queue[1];
 	}
 
@@ -1377,6 +1584,14 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 		// After this is set a fixed count of 11 32-bit words are sent to the data register.
 		// The lower word always seems to be 0x0001 and the upper byte always 0xac.
 		m_blitterSerialCount = 0;
+
+		if (m_blitterMode>=0x80)
+			m_blittype = m_blitterMode - 0x90;
+		else
+			m_blittype = m_blitterMode - 0x30;
+
+		m_blittype>>=4;
+
 
 		m_blitterAddr = data & 0x00000fff;
 
@@ -1448,7 +1663,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
 		// use the 11th blit write also as the trigger
 		if (m_blitterSerialCount == 12)
 		{
-			blit_current_sprite(space);
+			//if (m_blittype==2)
+				blit_current_sprite(space);
 		}
 
 	}
@@ -1540,6 +1756,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				osd_work_queue_wait(m_work_queue[0], osd_ticks_per_second() * 100);
 				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites[i], 0, 0, 0, 0, visarea);
 				m_temp_bitmap_sprites[i].fill(0, visarea);
+				m_zbuffer_bitmap.fill(0xffff, visarea);
 			}
 
 			if(m_blitterClearMode == 0x8c800000)
@@ -1547,6 +1764,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				osd_work_queue_wait(m_work_queue[1], osd_ticks_per_second() * 100);
 				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2[i], 0, 0, 0, 0, visarea);
 				m_temp_bitmap_sprites2[i].fill(0, visarea);
+				m_zbuffer_bitmap2.fill(0xffff, visarea);
 			}
 
 			//printf("frame\n");
