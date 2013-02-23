@@ -67,7 +67,8 @@ void psxcontrollerports_device::ack()
 }
 
 device_psx_controller_interface::device_psx_controller_interface(const machine_config &mconfig, device_t &device) :
-		device_slot_card_interface(mconfig, device)
+		device_slot_card_interface(mconfig, device),
+		m_ack(true)
 {
 }
 
