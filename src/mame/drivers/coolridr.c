@@ -644,19 +644,40 @@ WRITE32_MEMBER(coolridr_state::sysh1_ioga_w)
 		int realx = ((x*incx)>>21); \
 
 
-
+/* the two tables that the patent claims are located at:
+	0x1ec800
+	0x1f0000
+	0x3ec800
+	0x3f0000
+of each rom ... ROM 1 + 2 gives the full palette data for each pixel, in even/odd order.
+TODO: fix anything that isn't text.
+*/
 #define DRAW_PIX \
 	if (pix) \
 	{ \
 		{ \
-			if (!line[drawx]) line[drawx] = clut[pix+0x4000]; \
+			if (!line[drawx]) \
+			{ \
+				int r,g,b; \
+				int dot; \
+				int color_offs; \
+				color_offs = (b1colorNumber & 0x3ff)*0x40; \
+				color_offs+= pix & 0x3e; \
+				color_offs+= (pix & 0x01)*0x400000; \
+				color_offs+= 0x1ec800; \
+				dot = (m_compressedgfx[color_offs+0]<<8) | m_compressedgfx[color_offs+1]; \
+				r = pal5bit((dot >> 10) & 0x1f); \
+				g = pal5bit((dot >> 5) & 0x1f); \
+				b = pal5bit((dot >> 0) & 0x1f); \
+				line[drawx] = r<<16 | g<<8 | b; \
+			} \
 		} \
 	} \
 
 /* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
 void coolridr_state::blit_current_sprite(address_space &space)
 {
-	const pen_t *clut = &machine().pens[0];
+//	const pen_t *clut = &machine().pens[0];
 
 	// Serialized 32-bit words in order of appearance:
 	//  0: 00000000 - unknown, 0x00000000 or 0x00000001, 0 seems to be regular sprite, 1 seems to change meaning of below, possible clip area?
@@ -766,7 +787,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	// 000u0ccc  - c = colour? u = 0/1
 	UINT32 blit1_unused = m_spriteblit[1] & 0xfffef800;
 	UINT32 b1mode = (m_spriteblit[1] & 0x00010000)>>16;
-	//UINT32 b1colorNumber = (m_spriteblit[1] & 0x000007ff);    // Probably more bits
+	UINT32 b1colorNumber = (m_spriteblit[1] & 0x000007ff);    // Probably more bits
 
 	if (blit1_unused!=0) printf("blit1 unknown bits set %08x\n", m_spriteblit[1]);
 
@@ -775,7 +796,11 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	// seems to be more complex than just transparency
 	UINT32 blit2_unused = m_spriteblit[2]&0xff80f800;
 	UINT32 b2tpen = (m_spriteblit[2] & 0x007f0000)>>16;
-	//UINT32 b2colorNumber = (m_spriteblit[2] & 0x000007ff);
+//	UINT32 b2colorNumber = (m_spriteblit[2] & 0x000001ff);
+
+//	if(b1colorNumber > 0x60 || b2colorNumber)
+//		printf("%08x %08x\n",b1colorNumber,b2colorNumber);
+
 
 	if (blit2_unused!=0) printf("blit1 unknown bits set %08x\n", m_spriteblit[2]);
 	if (b1mode)
@@ -795,7 +820,6 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 	UINT32 blit3_unused = m_spriteblit[3] & 0xffe00000;
 	UINT32 b3romoffset = (m_spriteblit[3] & 0x001fffff)*16;
-
 
 	if (blit3_unused) printf("unknown bits in blit word %d -  %08x\n", 3, blit3_unused);
 
@@ -866,6 +890,8 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	/************* m_spriteblit[11] *************/
 
 	UINT32 textlookup =  m_spriteblit[11];
+
+
 
 	/* DRAW */
 	UINT16 used_hCellCount = hCellCount;
@@ -1001,6 +1027,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 			}
 
 		}
+//	printf("%08x %08x %08x %04x %04x\n",textlookup,m_spriteblit[3],b3romoffset,b1colorNumber,b2colorNumber);
 
 
 		for (int h = 0; h < used_hCellCount; h++)
@@ -2290,6 +2317,8 @@ void coolridr_state::machine_reset()
 //  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
+
+
 //	memcpy(m_soundram, memregion("soundcpu")->base()+0x80000, 0x80000);
 //  m_soundcpu->reset();
 
@@ -2439,7 +2468,6 @@ ROM_START( coolridr )
 	ROM_LOAD16_WORD_SWAP( "mpr-17647.ic8", 0x1c00000, 0x0400000, CRC(9dd9330c) SHA1(c91a7f497c1f4bd283bd683b06dff88893724d51) ) // 4900
 	ROM_LOAD16_WORD_SWAP( "mpr-17646.ic7", 0x2000000, 0x0400000, CRC(b77eb2ad) SHA1(b832c0f1798aca39adba840d56ae96a75346670a) ) // 0490
 	ROM_LOAD16_WORD_SWAP( "mpr-17645.ic6", 0x2400000, 0x0400000, CRC(56968d07) SHA1(e88c3d66ea05affb4681a25d155f097bd1b5a84b) ) // 0049
-
 
 	ROM_REGION( 0x80000, "scsp1", 0 )   /* first SCSP's RAM */
 	ROM_FILL( 0x000000, 0x80000, 0 )
