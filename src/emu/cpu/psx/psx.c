@@ -1796,6 +1796,7 @@ void psxcpu_device::device_reset()
 	m_delayr = 0;
 	m_delayv = 0;
 	m_berr = 0;
+	m_biu = 0;
 
 	m_multiplier_operation = MULTIPLIER_OPERATION_IDLE;
 
