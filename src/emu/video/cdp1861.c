@@ -103,6 +103,7 @@ void cdp1861_device::device_reset()
 
 	m_disp = 0;
 	m_dmaout = 0;
+	m_dispon = 0;
 
 	m_out_int_func(CLEAR_LINE);
 	m_out_dmao_func(CLEAR_LINE);
