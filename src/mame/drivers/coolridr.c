@@ -484,7 +484,7 @@ public:
 };
 
 #define PRINT_BLIT_STUFF \
-	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x, %d, %d, %d) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", blit0, blit1_unused,b1mode,b1colorNumber, blit2_unused,b2tpen,b2colorNumber, blit3_unused,b3romoffset, blit4_unused, blit4, blit_flipy,blit_rotate, blit_flipx, blit5_unused, indirect_tile_enable, indirect_zoom_enable, vCellCount, hCellCount, vZoom, hZoom, blit10, data, vPosition, hPosition); \
+	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x, %d, %d, %d) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", blit0, blit1_unused,b1mode,b1colorNumber, blit2_unused,b2tpen,b2colorNumber, blit3_unused,b3romoffset, blit4_unused, blit4, blit_flipy,blit_rotate, blit_flipx, blit5_unused, indirect_tile_enable, indirect_zoom_enable, vCellCount, hCellCount, vZoom, hZoom, blit10, textlookup, vPosition, hPosition); \
 
 
 /* video */
@@ -794,7 +794,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	// seems to be more complex than just transparency
 	UINT32 blit2_unused = m_spriteblit[2]&0xff80f800;
 	UINT32 b2tpen = (m_spriteblit[2] & 0x007f0000)>>16;
-//	UINT32 b2colorNumber = (m_spriteblit[2] & 0x000001ff);
+	//UINT32 b2colorNumber = (m_spriteblit[2] & 0x000001ff);
 
 //	if(b1colorNumber > 0x60 || b2colorNumber)
 //		printf("%08x %08x\n",b1colorNumber,b2colorNumber);
@@ -1026,7 +1026,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 		}
 //	printf("%08x %08x %08x %04x %04x\n",textlookup,m_spriteblit[3],b3romoffset,b1colorNumber,b2colorNumber);
-
+		//PRINT_BLIT_STUFF
 
 		for (int h = 0; h < used_hCellCount; h++)
 		{
@@ -1126,7 +1126,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 						while (data_written<256 && encodelength >=0)
 						{
-							tempshape[data_written] = m_rearranged_16bit_gfx[color_offs + rledata];
+							tempshape[data_written] = m_rearranged_16bit_gfx[color_offs + rledata + 8];
 							encodelength--;
 							data_written++;
 						}
@@ -1136,7 +1136,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 					{
 						int rledata = (compdata & 0x0ff);
 						// mm cccc cccc
-						tempshape[data_written] = m_rearranged_16bit_gfx[color_offs + rledata];
+						tempshape[data_written] = m_rearranged_16bit_gfx[color_offs + rledata + 0x48]; // +0x48 crt test end of blue, start of white
 						data_written++;
 					}
 
