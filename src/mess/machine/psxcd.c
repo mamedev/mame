@@ -151,6 +151,9 @@ void psxcd_device::device_start()
 		m_timers[i] = timer_alloc(i, NULL);
 		m_timerinuse[i] = false;
 	}
+
+	for(int i = 0; i < 3; ++i)
+		curpos[i] = 0;
 }
 
 //
