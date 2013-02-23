@@ -257,6 +257,29 @@ trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, 
 
 
 //-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void trs80m2_keyboard_device::device_config_complete()
+{
+	m_shortname = "trs80m2kb";
+
+	// inherit a copy of the static data
+	const trs80m2_keyboard_interface *intf = reinterpret_cast<const trs80m2_keyboard_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<trs80m2_keyboard_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
+	}
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
