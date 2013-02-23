@@ -468,9 +468,9 @@ public:
 
 	void sysh1_dma_transfer( address_space &space, UINT16 dma_index );
 
-	UINT8 *m_h1_vram;
-	UINT8 *m_h1_pcg;
-	UINT8 *m_h1_pal;
+	UINT16 *m_h1_vram;
+	UINT16 *m_h1_pcg;
+	UINT16 *m_h1_pal;
 };
 
 #define PRINT_BLIT_STUFF \
@@ -498,9 +498,9 @@ void coolridr_state::video_start()
 	machine().primary_screen->register_screen_bitmap(m_screen1_bitmap);
 	machine().primary_screen->register_screen_bitmap(m_screen2_bitmap);
 
-	m_h1_vram = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
-	m_h1_pcg = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
-	m_h1_pal = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
+	m_h1_vram = auto_alloc_array_clear(machine(), UINT16, VRAM_SIZE);
+	m_h1_pcg = auto_alloc_array_clear(machine(), UINT16, VRAM_SIZE);
+	m_h1_pal = auto_alloc_array_clear(machine(), UINT16, VRAM_SIZE);
 
 	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
 	save_pointer(NAME(m_h1_pcg), VRAM_SIZE);
@@ -548,22 +548,22 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 			xisrc = (xdst + scrollx) & (xi_mask);
 			yisrc = (ydst + scrolly) & (yi_mask);
 			src_offs = (xsrc + (ysrc*xsize));
-			src_offs *= 2;
 			src_offs += base_offset;
 
-			cur_tile = (m_h1_vram[src_offs]<<8)|m_h1_vram[src_offs+1];
+			cur_tile = m_h1_vram[src_offs];
 
 			tile = cur_tile & 0x07ff;
 			color = m_color + ((cur_tile & 0x0800) >> 11) * 4;
 
 			/* we have a tile number, fetch into the PCG RAM */
 			pcg_offs = (xisrc+yisrc*xi_size)+tile*xi_size*yi_size;
-			dot_data = m_h1_pcg[pcg_offs] & 0xff;
+			dot_data = m_h1_pcg[pcg_offs/2];
+			dot_data>>= ((pcg_offs & 1) ^ 1) * 8;
+			dot_data&= 0xff;
 			dot_data+= color<<8;
-			dot_data*= 2;
 
 			/* finally, take the palette data (TODO: apply RGB control) */
-			pal_data = m_h1_pal[dot_data]<<8|m_h1_pal[dot_data+1];
+			pal_data = m_h1_pal[dot_data];
 			r = pal5bit((pal_data >> 10) & 0x1f);
 			g = pal5bit((pal_data >> 5) & 0x1f);
 			b = pal5bit((pal_data >> 0) & 0x1f);
@@ -1515,6 +1515,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 	UINT8 end_dma_mark;
 	UINT8 cmd;
 	UINT8 is_dma;
+	UINT16 *dst_ptr;
 
 	end_dma_mark = 0;
 
@@ -1535,7 +1536,9 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				size = m_framebuffer_vram[(8+dma_index)/4];
 				if(dst & 0xfff00000)
 					printf("unk values to %02x dst %08x\n",cmd,dst);
-				dst &= 0x000fffff;
+				dst_ptr = m_h1_vram;
+				dst &= 0x000ffffe;
+				dst >>= 1;
 				is_dma = 1;
 				dma_index+=0xc;
 				break;
@@ -1546,9 +1549,10 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				size = m_framebuffer_vram[(8+dma_index)/4];
 				if(dst & 0xfff00000)
 					printf("unk values to %02x dst %08x\n",cmd,dst);
-				dst &= 0x000fffff;
-				is_dma = 3;
-				//printf("%08x %08x %08x %02x\n",src,dst,size,cmd);
+				dst_ptr = m_h1_pcg;
+				dst &= 0x000ffffe;
+				dst >>= 1;
+				is_dma = 1;
 				dma_index+=0xc;
 				break;
 
@@ -1559,9 +1563,10 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				/* Note: there are also some reads at 0x3e00000. This tells us that the DMA thing actually mirrors at 0x3c00000 too. */
 				if(dst & 0xfff00000)
 					printf("unk values to %02x dst %08x\n",cmd,dst);
-				dst &= 0x000fffff;
-				is_dma = 2;
-				//printf("%08x %08x %08x %02x\n",src,dst,size,cmd);
+				dst_ptr = m_h1_pal;
+				dst &= 0x000ffffe;
+				dst >>= 1;
+				is_dma = 1;
 				dma_index+=0xc;
 				break;
 
@@ -1584,46 +1589,12 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				break;
 		}
 
-	/* TODO: clean-up at a later stage (once that I properly rewrite everything) */
-	if(is_dma == 1)
+	if(is_dma)
 	{
-		UINT16 read_src;
-
 		for(int i=0;i<size;i+=2)
 		{
-			read_src = space.read_word(src);
-
-			m_h1_vram[dst] = read_src >> 8;
-			m_h1_vram[dst+1] = read_src & 0xff;
-			dst+=2;
-			src+=2;
-		}
-	}
-	else if(is_dma == 2)
-	{
-		UINT16 read_src;
-
-		for(int i=0;i<size;i+=2)
-		{
-			read_src = space.read_word(src);
-
-			m_h1_pal[dst] = read_src >> 8;
-			m_h1_pal[dst+1] = read_src & 0xff;
-			dst+=2;
-			src+=2;
-		}
-	}
-	else if(is_dma == 3)
-	{
-		UINT16 read_src;
-
-		for(int i=0;i<size;i+=2)
-		{
-			read_src = space.read_word(src);
-
-			m_h1_pcg[dst] = read_src >> 8;
-			m_h1_pcg[dst+1] = read_src & 0xff;
-			dst+=2;
+			dst_ptr[dst] = space.read_word(src);
+			dst++;
 			src+=2;
 		}
 	}
