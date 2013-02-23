@@ -2,7 +2,8 @@
 #include "siodev.h"
 
 psxsiodev_device::psxsiodev_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, type, name, tag, owner, clock)
+	device_t(mconfig, type, name, tag, owner, clock),
+	m_dataout(0)
 {
 }
 
