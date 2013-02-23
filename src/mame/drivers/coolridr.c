@@ -794,7 +794,13 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	// seems to be more complex than just transparency
 	UINT32 blit2_unused = m_spriteblit[2]&0xff80f800;
 	UINT32 b2tpen = (m_spriteblit[2] & 0x007f0000)>>16;
-	//UINT32 b2colorNumber = (m_spriteblit[2] & 0x000001ff);
+	UINT32 b2colorNumber = (m_spriteblit[2] & 0x000007ff);
+
+	if (b2colorNumber != b1colorNumber)
+	{
+	//	b1colorNumber = space.machine().rand()&0xfff;
+	}
+		
 
 //	if(b1colorNumber > 0x60 || b2colorNumber)
 //		printf("%08x %08x\n",b1colorNumber,b2colorNumber);
@@ -1085,8 +1091,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 			UINT32 spriteNumber = (m_expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]);
 			UINT16 tempshape[16*16];
 			
-			int color_offs = (b1colorNumber & 0x3ff)*0x40 * 5; /* yes, * 5 */
-			color_offs+= 0x1ec800 * 5; /* ?? */
+			int color_offs = (0x7b20 + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */
 
 			// skip the decoding if it's the same tile as last time!
 			if (spriteNumber != lastSpriteNumber)
