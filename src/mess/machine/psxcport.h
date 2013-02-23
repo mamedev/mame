@@ -115,7 +115,7 @@ public:
 
 protected:
 	virtual void device_start() {}
-	virtual void device_reset() { m_tx = true; m_ack = true; }
+	virtual void device_reset() { m_tx = true; }
 	virtual void device_config_complete();
 
 private:
