@@ -173,6 +173,8 @@ lc8670_cpu_device::lc8670_cpu_device(const machine_config &mconfig, const char *
 		m_program_config("program", ENDIANNESS_BIG, 8, 16, 0),
 		m_data_config("data", ENDIANNESS_BIG, 8, 9, 0, ADDRESS_MAP_NAME(lc8670_internal_map)),
 		m_io_config("io", ENDIANNESS_BIG, 8, 8, 0),
+		m_pc(0),
+		m_ppc(0),
 		m_bankswitch_func(*this)
 {
 }
