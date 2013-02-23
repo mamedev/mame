@@ -660,20 +660,9 @@ TODO: fix anything that isn't text.
 			if (!line[drawx]) \
 			{ \
 				int r,g,b; \
-				UINT16 dot; \
-				int color_offs; \
-				/* color_offs = (b1colorNumber & 0x3ff)*0x40;*/ \
-				/* color_offs+= (pix & 0x38)>>2; */ \
-				/* color_offs+= (pix & 0x07)*0x400000; */ \
-				/* color_offs+= 0x1ec800; */ \
-				/* dot = (m_compressedgfx[color_offs+0]<<8) | m_compressedgfx[color_offs+1]; */ \
-				color_offs = (b1colorNumber & 0x3ff)*0x40 * 5; /* yes, * 5 */ \
-				color_offs+= (pix & 0x3f);  \
-				color_offs+= 0x1ec800 * 5; \
-				dot = (m_rearranged_16bit_gfx[color_offs]); \
-				r = pal5bit((dot >> 10) & 0x1f); \
-				g = pal5bit((dot >> 5) & 0x1f); \
-				b = pal5bit((dot >> 0) & 0x1f); \
+				r = pal5bit((pix >> 10) & 0x1f); \
+				g = pal5bit((pix >> 5) & 0x1f); \
+				b = pal5bit((pix >> 0) & 0x1f); \
 				line[drawx] = r<<16 | g<<8 | b; \
 			} \
 		} \
@@ -1095,6 +1084,9 @@ void coolridr_state::blit_current_sprite(address_space &space)
 			// these should be 'cell numbers' (tile numbers) which look up RLE data?
 			UINT32 spriteNumber = (m_expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]);
 			UINT16 tempshape[16*16];
+			
+			int color_offs = (b1colorNumber & 0x3ff)*0x40 * 5; /* yes, * 5 */
+			color_offs+= 0x1ec800 * 5; /* ?? */
 
 			// skip the decoding if it's the same tile as last time!
 			if (spriteNumber != lastSpriteNumber)
@@ -1121,7 +1113,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 						while (data_written<256 && encodelength >=0)
 						{
-							tempshape[data_written] = rledata;
+							tempshape[data_written] = m_rearranged_16bit_gfx[color_offs + rledata];
 							encodelength--;
 							data_written++;
 						}
@@ -1134,7 +1126,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 						while (data_written<256 && encodelength >=0)
 						{
-							tempshape[data_written] = rledata;
+							tempshape[data_written] = m_rearranged_16bit_gfx[color_offs + rledata];
 							encodelength--;
 							data_written++;
 						}
@@ -1142,8 +1134,9 @@ void coolridr_state::blit_current_sprite(address_space &space)
 					}
 					else
 					{
+						int rledata = (compdata & 0x0ff);
 						// mm cccc cccc
-						tempshape[data_written] = compdata&0xff;
+						tempshape[data_written] = m_rearranged_16bit_gfx[color_offs + rledata];
 						data_written++;
 					}
 
