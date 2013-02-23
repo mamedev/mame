@@ -800,7 +800,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	{
 	//	b1colorNumber = space.machine().rand()&0xfff;
 	}
-		
+
 
 //	if(b1colorNumber > 0x60 || b2colorNumber)
 //		printf("%08x %08x\n",b1colorNumber,b2colorNumber);
@@ -1090,7 +1090,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 			// these should be 'cell numbers' (tile numbers) which look up RLE data?
 			UINT32 spriteNumber = (m_expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]);
 			UINT16 tempshape[16*16];
-			
+
 			int color_offs = (0x7b20 + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */
 
 			// skip the decoding if it's the same tile as last time!
@@ -1581,15 +1581,11 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				src = (m_framebuffer_vram[(0+dma_index)/4] & 0x03ffffff);
 				dst = (m_framebuffer_vram[(4+dma_index)/4]);
 				size = m_framebuffer_vram[(8+dma_index)/4];
-				/*
-				special: copy palette RAM to palette RAM (otherwise attract mode tries to read from tile data)
-				*/
-				if((src & 0x03f00000) == 0x03e00000)
-					src &= ~0x00200000;
+				/* Note: there are also some reads at 0x3e00000. This tells us that the DMA thing actually mirrors at 0x3c00000 too. */
 				if(dst & 0xfff00000)
 					printf("unk values to %02x dst %08x\n",cmd,dst);
 				dst &= 0x000fffff;
-				dst |= 0x03c00000;
+				dst |= 0x03800000;
 				is_dma = 1;
 				//printf("%08x %08x %08x %02x\n",src,dst,size,cmd);
 				dma_index+=0xc;
@@ -1660,8 +1656,8 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
 	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_SHARE("h1_vram")//bg vram TODO: fake region
-	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_SHARE("paletteram")
-	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram")
+	AM_RANGE(0x03800000, 0x0380ffff) AM_RAM_WRITE(sysh1_pal_w) AM_SHARE("paletteram")
+	AM_RANGE(0x03c00000, 0x03c1ffff) AM_MIRROR(0x00200000) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") /* mostly mapped at 0x03e00000 */
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM AM_SHARE("txt_vram")//text tilemap + "lineram"
