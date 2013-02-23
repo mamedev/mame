@@ -60,6 +60,10 @@ void psxrcnt_device::device_start()
 		state_save_register_item( machine(), "psxroot", NULL, n, root_counter[ n ].n_mode );
 		state_save_register_item( machine(), "psxroot", NULL, n, root_counter[ n ].n_target );
 		state_save_register_item( machine(), "psxroot", NULL, n, root_counter[ n ].n_start );
+		root_counter[ n ].n_count = 0;
+		root_counter[ n ].n_mode = 0;
+		root_counter[ n ].n_target = 0;
+		root_counter[ n ].n_start = 0;
 	}
 }
 
