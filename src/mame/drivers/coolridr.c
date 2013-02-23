@@ -402,7 +402,6 @@ public:
 	// store the blit params here
 	UINT32 m_spriteblit[12];
 
-	
 
 
 
@@ -410,7 +409,8 @@ public:
 
 
 
-	
+
+
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -757,12 +757,12 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		// abort early
 		return;
 	}
-	
+
 
 
 
 	/************* m_spriteblit[1] *************/
-	
+
 	// 000u0ccc  - c = colour? u = 0/1
 	UINT32 blit1_unused = m_spriteblit[1] & 0xfffef800;
 	UINT32 b1mode = (m_spriteblit[1] & 0x00010000)>>16;
@@ -771,7 +771,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	if (blit1_unused!=0) printf("blit1 unknown bits set %08x\n", m_spriteblit[1]);
 
 	/************* m_spriteblit[3] *************/
-	
+
 	// seems to be more complex than just transparency
 	UINT32 blit2_unused = m_spriteblit[2]&0xff80f800;
 	UINT32 b2tpen = (m_spriteblit[2] & 0x007f0000)>>16;
@@ -798,7 +798,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 
 	if (blit3_unused) printf("unknown bits in blit word %d -  %08x\n", 3, blit3_unused);
-	
+
 
 	/************* m_spriteblit[4] *************/
 
@@ -864,7 +864,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	UINT32 blit10 =  m_spriteblit[10];
 
 	/************* m_spriteblit[11] *************/
-	
+
 	UINT32 textlookup =  m_spriteblit[11];
 
 	/* DRAW */
@@ -891,7 +891,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 
 
-	
+
 
 
 	bitmap_rgb32* drawbitmap;
@@ -905,12 +905,12 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		drawbitmap = &m_temp_bitmap_sprites2[(m_blitterMode-0x90)>>4];
 	*/
 
-	
+
 	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 		drawbitmap = &m_temp_bitmap_sprites[0];
 	else // 0x90, 0xa0, 0xb0, 0xc0
 		drawbitmap = &m_temp_bitmap_sprites2[0];
-	
+
 
 	int sizey = used_vCellCount * 16 * vZoom;
 
@@ -961,7 +961,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 				UINT32 dword = space.read_dword(blit10);
 
 				hZoomTable[idx] = hZoom + (dword>>16); // add original value?
-				
+
 				// bit 0x8000 does get set too, but only on some lines, might have another meaning?
 				int linescroll = dword&0x7fff;
 				if (linescroll & 0x4000) linescroll -= 0x8000;
@@ -979,7 +979,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 			// DON'T use the table hZoom in this calc? (road..)
 			int sizex = used_hCellCount * 16 * hZoom;
-				
+
 			hPositionTable[idx] *= 0x40;
 
 			switch (hOrigin & 3)
@@ -1059,7 +1059,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 			// these should be 'cell numbers' (tile numbers) which look up RLE data?
 			UINT32 spriteNumber = (m_expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (m_expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]);
 			UINT16 tempshape[16*16];
-			
+
 			// skip the decoding if it's the same tile as last time!
 			if (spriteNumber != lastSpriteNumber)
 			{
@@ -1132,7 +1132,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 			UINT32* line;
 
 
-	
+
 
 			if (blit_rotate)
 			{
@@ -1180,7 +1180,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 							}
 						}
 					}
-				}								
+				}
 			}
 			else // no rotate
 			{
@@ -1450,7 +1450,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
 	COMBINE_DATA(&m_sysh1_txt_blit[offset]);
 
 	switch(offset)
-	{		
+	{
 		default:
 		{
 			printf("sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
@@ -1471,7 +1471,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
 
 			//printf("sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
 
-		
+
 		}
 		break;
 
@@ -1495,129 +1495,100 @@ WRITE32_MEMBER(coolridr_state::sysh1_pal_w)
 	palette_set_color_rgb(machine(),offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
-
-/* FIXME: this seems to do a hell lot of stuff, it's not ST-V SCU but still somewhat complex :/ */
 void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index )
 {
-	UINT32 src,dst,size,type,s_i;
+	UINT32 src,dst,size;
 	UINT8 end_dma_mark;
+	UINT8 cmd;
+	UINT8 is_dma;
 
 	end_dma_mark = 0;
 
 	do{
-		src = (m_framebuffer_vram[(0+dma_index)/4] & 0x0fffffff);
-		dst = (m_framebuffer_vram[(4+dma_index)/4]);
-		size = m_framebuffer_vram[(8+dma_index)/4];
-		type = (m_framebuffer_vram[(0+dma_index)/4] & 0xf0000000) >> 28;
+		cmd = (m_framebuffer_vram[(0+dma_index)/4] & 0xfc000000) >> 24;
 
+		is_dma = 0;
 
-
-		switch (type)
+		switch(cmd)
 		{
-			case 0x0:
-				end_dma_mark = 1; //end of DMA list
+			case 0x00: /* end of list marker */
+				//printf("end of list reached\n");
+				end_dma_mark = 1;
+				break;
+			case 0xc0: /* to internal buffer VRAM */
+				src = (m_framebuffer_vram[(0+dma_index)/4] & 0x03ffffff);
+				dst = (m_framebuffer_vram[(4+dma_index)/4]);
+				size = m_framebuffer_vram[(8+dma_index)/4];
+				if(dst & 0xfff00000)
+					printf("unk values to %02x dst %08x\n",cmd,dst);
+				dst &= 0x000fffff;
+				dst |= 0x03000000;
+				size*=2;
+				is_dma = 1;
+				//printf("%08x %08x %08x %02x\n",src,dst,size,cmd);
+				dma_index+=0xc;
 				break;
 
+			case 0xd0: /* to internal buffer PCG */
+				src = (m_framebuffer_vram[(0+dma_index)/4] & 0x03ffffff);
+				dst = (m_framebuffer_vram[(4+dma_index)/4]);
+				size = m_framebuffer_vram[(8+dma_index)/4];
+				if(dst & 0xfff00000)
+					printf("unk values to %02x dst %08x\n",cmd,dst);
+				dst &= 0x000fffff;
+				dst |= 0x05800000;
+				size*=2;
+				is_dma = 1;
+				//printf("%08x %08x %08x %02x\n",src,dst,size,cmd);
+				dma_index+=0xc;
+				break;
+
+			case 0xe0: /* to palette RAM */
+				src = (m_framebuffer_vram[(0+dma_index)/4] & 0x03ffffff);
+				dst = (m_framebuffer_vram[(4+dma_index)/4]);
+				size = m_framebuffer_vram[(8+dma_index)/4];
+				/*
+				special: copy palette RAM to palette RAM (otherwise attract mode tries to read from tile data)
+				*/
+				if((src & 0x03f00000) == 0x03e00000)
+					src &= ~0x00200000;
+				if(dst & 0xfff00000)
+					printf("unk values to %02x dst %08x\n",cmd,dst);
+				dst &= 0x000fffff;
+				dst |= 0x03c00000;
+				is_dma = 1;
+				//printf("%08x %08x %08x %02x\n",src,dst,size,cmd);
+				dma_index+=0xc;
+				break;
+
+			case 0x04: /* init - value 0x040c80d2 (unknown purpose, slave mode?) */
+			case 0x10: /* sets up look-up for tilemap video registers */
+			case 0x20: /* unknown table */
+			case 0x24: /* unknown table */
+			case 0x30: /* screen 1 - 0x80 at boot, then 0x808080  */
+			case 0x34: /* screen 2 / */
+			case 0x40: /* screen 1 - almost certainly RGB brightness (at least bits 4 - 0) */
+			case 0x44: /* screen 2 / */
+			case 0x50: /* screen 1 - unknown */
+			case 0x54: /* screen 2 / */
+				//printf("%02x %08x\n",cmd,m_framebuffer_vram[(0+dma_index)/4]);
+				dma_index+=4;
+				break;
 			default:
-				// on startup
-				//unhandled dma type 01 03e09b80
-				//unhandled dma type 02 03e0dc00
-				//unhandled dma type 02 07e0ee00
-
-				printf("unhandled dma type %02x %08x\n", type, src);
+				printf("%02x %08x\n",cmd,m_framebuffer_vram[(0+dma_index)/4]);
 				dma_index+=4;
-				break;
-
-			case 0x3:
-				//type 3 sets a DMA state->m_param, type 4 sets some kind of table? Skip it for now
-				/* per screen - on transitions */
-				if (src & 0x04000000)
-				{
-					//printf("screen 2 unhandled dma type %02x %08x\n", type, src& ~0x04000000);
-				}
-				else
-				{
-					//printf("screen 1 unhandled dma type %02x %08x\n", type, src& ~0x04000000);
-				}
-				
-				dma_index+=4;
-				break;
-
-			case 0x4:
-				/* per screen - on transitions */
-				/* some kind of brightness effect for the sprites? */
-
-				if (src & 0x04000000)
-				{
-					// screen 2...
-					//printf("screen 2 unhandled dma type %02x %08x\n", type, src& ~0x04000000);
-				}
-				else
-				{
-					// screen 1
-					//printf("screen 1 unhandled dma type %02x %08x\n", type, src& ~0x04000000);
-				}
-
-				//type 3 sets a DMA state->m_param, type 4 sets some kind of table? Skip it for now
-				dma_index+=4;
-				break;
-
-			case 0xc:
-				dst &= 0xfffff;
-
-				dst |= 0x3000000; //to videoram, FIXME: unknown offset
-				size*=2;
-
-				for(s_i=0;s_i<size;s_i+=4)
-				{
-					space.write_dword(dst,space.read_dword(src));
-					dst+=4;
-					src+=4;
-				}
-				dma_index+=0xc;
-				break;
-
-			case 0xd:
-				dst &= 0xfffff;
-
-				dst |= 0x3d00000; //to charram, FIXME: unknown offset
-				size*=2;
-
-				for(s_i=0;s_i<size;s_i+=4)
-				{
-					space.write_dword(dst,space.read_dword(src));
-					dst+=4;
-					src+=4;
-				}
-				dma_index+=0xc;
-				break;
-
-			case 0xe:
-				dst &= 0xfffff;
-
-				dst |= 0x3c00000; //to paletteram FIXME: unknown offset
-				//size/=2;
-
-				// this is used when transfering palettes written by the blitter? maybe?
-				//  it might be a better indication of where blitter command 0xe0 should REALLY write data (at 0x3e00000)...
-				if((src & 0xff00000) == 0x3e00000)
-				{
-					src &= 0xfffff;
-					src |= 0x3c00000;
-				}
-
-				for(s_i=0;s_i<size;s_i+=4)
-				{
-					space.write_dword(dst,space.read_dword(src));
-					dst+=4;
-					src+=4;
-				}
-				dma_index+=0xc;
 				break;
 		}
 
-
-
+	if(is_dma)
+	{
+		for(int i=0;i<size;i+=4)
+		{
+			space.write_dword(dst,space.read_dword(src));
+			dst+=4;
+			src+=4;
+		}
+	}
 
 	}while(!end_dma_mark );
 }
@@ -1626,10 +1597,10 @@ WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
 {
 	COMBINE_DATA(&m_framebuffer_vram[offset]);
 
-	// is this real, or just work ram for the actual blitter?
 	if(offset*4 == 0x000)
 	{
-		if((m_framebuffer_vram[offset] & 0xff00000) == 0xfe00000)
+		/* enable */
+		if((m_framebuffer_vram[offset] & 0xff000000) == 0x0f000000)
 			sysh1_dma_transfer(space, m_framebuffer_vram[offset] & 0xffff);
 	}
 }
@@ -1654,10 +1625,9 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
 	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
-	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_SHARE("h1_vram")//bg vram
-	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_SHARE("paletteram") // palettes get written here, but the actual used ones seem to get sent via blitter??
-	AM_RANGE(0x03d00000, 0x03dfffff) AM_RAM_WRITE(sysh1_char_w) AM_SHARE("h1_charram") //FIXME: half size
-	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") //FIXME: not all of it
+	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_SHARE("h1_vram")//bg vram TODO: fake region
+	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_SHARE("paletteram")
+	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram")
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM AM_SHARE("txt_vram")//text tilemap + "lineram"
@@ -1667,16 +1637,14 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x04000018, 0x0400001b) AM_WRITE(sysh1_fb_mode_w)
 	AM_RANGE(0x0400001c, 0x0400001f) AM_WRITE(sysh1_fb_data_w)
 
+	AM_RANGE(0x05800000, 0x058fffff) AM_RAM_WRITE(sysh1_char_w) AM_SHARE("h1_charram") //TODO: fake region
 
-
-	
-	
-	
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("sysh1_workrah")
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share1")
 
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 ADDRESS_MAP_END
+
 
 READ16_MEMBER( coolridr_state::h1_soundram_r)
 {
@@ -2410,7 +2378,7 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383) 
+	MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr1)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
@@ -2516,7 +2484,7 @@ READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 	// with the non-recompiler pc returns +2
 	if(pc == 0x06002cbc || pc == 0x06002d44)
 		return 0;
-	
+
 	return m_sysh1_workram_h[0xd8894/4];
 }
 
