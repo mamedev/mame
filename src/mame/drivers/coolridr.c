@@ -470,7 +470,7 @@ public:
 
 	UINT8 *m_h1_vram;
 	UINT8 *m_h1_pcg;
-
+	UINT8 *m_h1_pal;
 };
 
 #define PRINT_BLIT_STUFF \
@@ -500,9 +500,11 @@ void coolridr_state::video_start()
 
 	m_h1_vram = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
 	m_h1_pcg = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
+	m_h1_pal = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
 
 	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
 	save_pointer(NAME(m_h1_pcg), VRAM_SIZE);
+	save_pointer(NAME(m_h1_pal), VRAM_SIZE);
 }
 
 // might be a page 'map / base' setup somewhere, but it's just used for ingame backgrounds
@@ -538,7 +540,8 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
 		{
 			UINT16 cur_tile;
-			UINT16 dot_data;
+			UINT16 dot_data,pal_data;
+			int r,g,b;
 
 			xsrc = ((xdst + scrollx) >> 4) & (xsize_mask);
 			ysrc = ((ydst + scrolly) >> 4) & (ysize_mask);
@@ -557,8 +560,15 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 			pcg_offs = (xisrc+yisrc*xi_size)+tile*xi_size*yi_size;
 			dot_data = m_h1_pcg[pcg_offs] & 0xff;
 			dot_data+= color<<8;
+			dot_data*= 2;
 
-			bitmap.pix32(ydst, xdst) = machine().pens[dot_data];
+			/* finally, take the palette data (TODO: apply RGB control) */
+			pal_data = m_h1_pal[dot_data]<<8|m_h1_pal[dot_data+1];
+			r = pal5bit((pal_data >> 10) & 0x1f);
+			g = pal5bit((pal_data >> 5) & 0x1f);
+			b = pal5bit((pal_data >> 0) & 0x1f);
+
+			bitmap.pix32(ydst, xdst) = r<<16 | g<<8 | b;
 		}
 	}
 
@@ -576,17 +586,6 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 
 UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-#if 0
-	if(machine().input().code_pressed_once(KEYCODE_A))
-		m_color++;
-
-	if(machine().input().code_pressed_once(KEYCODE_S))
-		m_color--;
-
-#endif
-
-//	popmessage("%04x",m_color);
-
 	return screen_update_coolridr(screen,bitmap,cliprect,0);
 }
 
@@ -1508,21 +1507,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
 }
 
 
-// NOTE, this gets called from the blitter code above AND the DMA code below.. addresses from each are probably wrong
-WRITE32_MEMBER(coolridr_state::sysh1_pal_w)
-{
-	int r,g,b;
-	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	r = ((m_generic_paletteram_32[offset] & 0x00007c00) >> 10);
-	g = ((m_generic_paletteram_32[offset] & 0x000003e0) >> 5);
-	b = ((m_generic_paletteram_32[offset] & 0x0000001f) >> 0);
-	palette_set_color_rgb(machine(),(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
-	r = ((m_generic_paletteram_32[offset] & 0x7c000000) >> 26);
-	g = ((m_generic_paletteram_32[offset] & 0x03e00000) >> 21);
-	b = ((m_generic_paletteram_32[offset] & 0x001f0000) >> 16);
-	palette_set_color_rgb(machine(),offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
-}
 
 void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index )
 {
@@ -1575,7 +1560,6 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				if(dst & 0xfff00000)
 					printf("unk values to %02x dst %08x\n",cmd,dst);
 				dst &= 0x000fffff;
-				dst |= 0x03800000;
 				is_dma = 2;
 				//printf("%08x %08x %08x %02x\n",src,dst,size,cmd);
 				dma_index+=0xc;
@@ -1617,11 +1601,16 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 	}
 	else if(is_dma == 2)
 	{
-		for(int i=0;i<size;i+=4)
+		UINT16 read_src;
+
+		for(int i=0;i<size;i+=2)
 		{
-			space.write_dword(dst,space.read_dword(src));
-			dst+=4;
-			src+=4;
+			read_src = space.read_word(src);
+
+			m_h1_pal[dst] = read_src >> 8;
+			m_h1_pal[dst+1] = read_src & 0xff;
+			dst+=2;
+			src+=2;
 		}
 	}
 	else if(is_dma == 3)
@@ -1659,7 +1648,6 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
 	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
-	AM_RANGE(0x03800000, 0x0380ffff) AM_RAM_WRITE(sysh1_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x03c00000, 0x03c1ffff) AM_MIRROR(0x00200000) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") /* mostly mapped at 0x03e00000 */
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
