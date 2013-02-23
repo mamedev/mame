@@ -307,6 +307,8 @@ void ti99_datamux_device::device_reset(void)
 	}
 	if (VERBOSE>8) LOG("datamux: Device count = %d\n", m_devices.count());
 	m_ready(ASSERT_LINE);
+
+	m_waitcount = 0;
 }
 
 INPUT_PORTS_START( datamux )
