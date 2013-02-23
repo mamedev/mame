@@ -543,8 +543,8 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 			UINT16 dot_data,pal_data;
 			int r,g,b;
 
-			xsrc = ((xdst + scrollx) >> 4) & (xsize_mask);
-			ysrc = ((ydst + scrolly) >> 4) & (ysize_mask);
+			xsrc = ((xdst + scrollx) & (xsize_mask)) >> 4;
+			ysrc = ((ydst + scrolly) & (ysize_mask)) >> 4;
 			xisrc = (xdst + scrollx) & (xi_mask);
 			yisrc = (ydst + scrolly) & (yi_mask);
 			src_offs = (xsrc + (ysrc*xsize));
