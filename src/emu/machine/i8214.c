@@ -127,6 +127,8 @@ void i8214_device::device_start()
 	m_out_int_func.resolve(m_out_int_cb, *this);
 	m_out_enlg_func.resolve(m_out_enlg_cb, *this);
 
+	m_int_dis = 0;
+
 	// register for state saving
 	save_item(NAME(m_inte));
 	save_item(NAME(m_int_dis));
