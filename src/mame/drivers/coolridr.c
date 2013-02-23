@@ -438,6 +438,7 @@ public:
 
 	UINT8* m_compressedgfx;
 	UINT16* m_expanded_10bit_gfx;
+	UINT16* m_rearranged_16bit_gfx;
 
 	UINT32 get_20bit_data(UINT32 romoffset, int _20bitwordnum);
 	UINT16 get_10bit_data(UINT32 romoffset, int _10bitwordnum);
@@ -659,13 +660,17 @@ TODO: fix anything that isn't text.
 			if (!line[drawx]) \
 			{ \
 				int r,g,b; \
-				int dot; \
+				UINT16 dot; \
 				int color_offs; \
-				color_offs = (b1colorNumber & 0x3ff)*0x40; \
-				color_offs+= pix & 0x3e; \
-				color_offs+= (pix & 0x01)*0x400000; \
-				color_offs+= 0x1ec800; \
-				dot = (m_compressedgfx[color_offs+0]<<8) | m_compressedgfx[color_offs+1]; \
+				/* color_offs = (b1colorNumber & 0x3ff)*0x40;*/ \
+				/* color_offs+= (pix & 0x38)>>2; */ \
+				/* color_offs+= (pix & 0x07)*0x400000; */ \
+				/* color_offs+= 0x1ec800; */ \
+				/* dot = (m_compressedgfx[color_offs+0]<<8) | m_compressedgfx[color_offs+1]; */ \
+				color_offs = (b1colorNumber & 0x3ff)*0x40 * 5; /* yes, * 5 */ \
+				color_offs+= (pix & 0x3f);  \
+				color_offs+= 0x1ec800 * 5; \
+				dot = (m_rearranged_16bit_gfx[color_offs]); \
 				r = pal5bit((dot >> 10) & 0x1f); \
 				g = pal5bit((dot >> 5) & 0x1f); \
 				b = pal5bit((dot >> 0) & 0x1f); \
@@ -673,6 +678,10 @@ TODO: fix anything that isn't text.
 			} \
 		} \
 	} \
+
+
+//m_rearranged_16bit_gfx
+//m_expanded_10bit_gfx
 
 /* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
 void coolridr_state::blit_current_sprite(address_space &space)
@@ -2292,6 +2301,28 @@ void coolridr_state::machine_start()
 	{
 		m_expanded_10bit_gfx[i] = get_10bit_data( 0, i);
 	}
+
+	// do a rearranged version too with just the 16-bit words in a different order, palettes seem to
+	// be referenced this way?!
+	m_rearranged_16bit_gfx = auto_alloc_array(machine(), UINT16, size/2);
+
+	UINT16* compressed = (UINT16*)memregion( "compressedgfx" )->base();
+	int count = 0;
+	for (int i=0;i<size/2/10;i++)
+	{
+		m_rearranged_16bit_gfx[count+0] = ((compressed[i+((0x0400000/2)*0)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*0)]&0xff00) >> 8);
+		m_rearranged_16bit_gfx[count+1] = ((compressed[i+((0x0400000/2)*1)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*1)]&0xff00) >> 8);
+		m_rearranged_16bit_gfx[count+2] = ((compressed[i+((0x0400000/2)*2)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*2)]&0xff00) >> 8);
+		m_rearranged_16bit_gfx[count+3] = ((compressed[i+((0x0400000/2)*3)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*3)]&0xff00) >> 8);
+		m_rearranged_16bit_gfx[count+4] = ((compressed[i+((0x0400000/2)*4)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*4)]&0xff00) >> 8);
+		m_rearranged_16bit_gfx[count+5] = ((compressed[i+((0x0400000/2)*5)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*5)]&0xff00) >> 8);
+		m_rearranged_16bit_gfx[count+6] = ((compressed[i+((0x0400000/2)*6)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*6)]&0xff00) >> 8);
+		m_rearranged_16bit_gfx[count+7] = ((compressed[i+((0x0400000/2)*7)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*7)]&0xff00) >> 8);
+		m_rearranged_16bit_gfx[count+8] = ((compressed[i+((0x0400000/2)*8)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*8)]&0xff00) >> 8);
+		m_rearranged_16bit_gfx[count+9] = ((compressed[i+((0x0400000/2)*9)]&0x00ff) << 8) | ((compressed[i+((0x0400000/2)*9)]&0xff00) >> 8);
+		count+=10;
+	}
+
 
 	if (0)
 	{
