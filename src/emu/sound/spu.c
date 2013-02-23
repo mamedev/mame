@@ -1028,6 +1028,7 @@ void spu_device::device_reset()
 {
 	cur_reverb_preset = NULL;
 	cur_frame_sample = 0;
+	cur_generate_sample = 0;
 
 	sample_cache::cache_size = 0;
 
