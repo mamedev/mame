@@ -317,6 +317,7 @@ void snug_enhanced_video_device::device_reset()
 	m_select_value = 0x74000;
 	m_dsr_page = 0;
 	m_RAMEN = false;
+	m_selected = false;
 }
 
 void snug_enhanced_video_device::device_stop()
