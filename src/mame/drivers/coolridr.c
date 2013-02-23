@@ -543,20 +543,26 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 			UINT16 dot_data,pal_data;
 			int r,g,b;
 
+			/* base tile scrolling */
 			xsrc = ((xdst + scrollx) & (xsize_mask)) >> 4;
 			ysrc = ((ydst + scrolly) & (ysize_mask)) >> 4;
+			/* apply fractional scrolling */
 			xisrc = (xdst + scrollx) & (xi_mask);
 			yisrc = (ydst + scrolly) & (yi_mask);
+			/* do the tile offset calc */
 			src_offs = (xsrc + (ysrc*xsize));
 			src_offs += base_offset;
 
+			/* fetch tilemap data */
 			cur_tile = m_h1_vram[src_offs];
 
+			/* split proper tile reading and apply color too */
 			tile = cur_tile & 0x07ff;
 			color = m_color + ((cur_tile & 0x0800) >> 11) * 4;
 
-			/* we have a tile number, fetch into the PCG RAM */
+			/* we have a tile number, fetch the PCG RAM */
 			pcg_offs = (xisrc+yisrc*xi_size)+tile*xi_size*yi_size;
+			/* the dot offset calculation */
 			dot_data = m_h1_pcg[pcg_offs/2];
 			dot_data>>= ((pcg_offs & 1) ^ 1) * 8;
 			dot_data&= 0xff;
@@ -568,6 +574,7 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 			g = pal5bit((pal_data >> 5) & 0x1f);
 			b = pal5bit((pal_data >> 0) & 0x1f);
 
+			/* put on the screen */
 			bitmap.pix32(ydst, xdst) = r<<16 | g<<8 | b;
 		}
 	}
