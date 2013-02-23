@@ -530,6 +530,8 @@ void crt9007_device::device_start()
 void crt9007_device::device_reset()
 {
 	m_disp = 0;
+	m_vs = 0;
+	m_cblank = 0;
 
 	// HS = 1
 	m_out_hs_func(1);
