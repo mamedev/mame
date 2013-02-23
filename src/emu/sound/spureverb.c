@@ -33,11 +33,16 @@ reverb::reverb(const int hz, const int maxdelay)
 {
 	for (int c=0; c<2; c++)
 	{
-		for (int f=0; f<4; f++)
+		for (int f=0; f<4; f++) {
 			y[c][f]=new signed short [maxdelay];
+			memset(y[c][f], 0, sizeof(signed short) * maxdelay);
+		}
 		x[c]=new signed short [maxdelay];
+		memset(x[c], 0, sizeof(signed short) * maxdelay);
 		ax[c]=new signed short [maxdelay];
+		memset(ax[c], 0, sizeof(signed short) * maxdelay);
 		ay[c]=new signed short [maxdelay];
+		memset(ay[c], 0, sizeof(signed short) * maxdelay);
 	}
 	memset(bx1,0,sizeof(bx1));
 	memset(by1,0,sizeof(by1));
