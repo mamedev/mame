@@ -141,6 +141,7 @@ void mb89352_device::device_start()
 	m_line_status = 0x00;
 	m_spc_status = 0x01;  // presumably the data reg is empty to start with
 	m_error_status = 0x00;
+	m_transfer_count = 0;
 	if(m_transfer_count == 0)
 		m_spc_status |= SSTS_TC_ZERO;
 	m_ints = 0x00;
@@ -173,6 +174,7 @@ void mb89352_device::device_reset()
 	m_error_status = 0x00;
 	m_transfer_count = 0;
 	m_spc_status = 0x05;  // presumably the data reg is empty to start with
+	m_busfree_int_enable = 0;
 }
 
 void mb89352_device::device_stop()
