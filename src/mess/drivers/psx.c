@@ -18,6 +18,8 @@
 #include "machine/psxcd.h"
 #include "machine/psxcport.h"
 
+#define PSXCD_TAG   "psxcd"
+
 class psx1_state : public driver_device
 {
 public:
@@ -474,7 +476,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 void psx1_state::cd_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
 {
 	UINT8 *psxram = (UINT8 *) p_n_psxram;
-	psxcd_device *psxcd = machine().device<psxcd_device>("cdrom");
+	psxcd_device *psxcd = machine().device<psxcd_device>(PSXCD_TAG);
 	psxcd->start_dma(psxram + n_address, n_size*4);
 }
 
@@ -530,7 +532,7 @@ static MACHINE_CONFIG_START( psxntsc, psx1_state )
 	MCFG_PSX_CD_READ_HANDLER( DEVREAD8( PSXCD_TAG, psxcd_device, read ) )
 	MCFG_PSX_CD_WRITE_HANDLER( DEVWRITE8( PSXCD_TAG, psxcd_device, write ) )
 
-	MCFG_PSXCD_ADD("cdrom")
+	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
 	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( psx1_state::cd_dma_read ), (psx1_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( psx1_state::cd_dma_write ), (psx1_state *) owner ) )
@@ -558,14 +560,14 @@ static MACHINE_CONFIG_START( psxpal, psx1_state )
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", psx_exe_load, "cpe,exe,psf,psx", 0)
 
-	MCFG_CDROM_ADD("cdrom",psx_cdrom)
+	MCFG_CDROM_ADD("cdrom", psx_cdrom)
 	MCFG_SOFTWARE_LIST_ADD("cd_list","psx")
 
 	MCFG_DEVICE_MODIFY( "maincpu" )
 	MCFG_PSX_CD_READ_HANDLER( DEVREAD8( PSXCD_TAG, psxcd_device, read ) )
 	MCFG_PSX_CD_WRITE_HANDLER( DEVWRITE8( PSXCD_TAG, psxcd_device, write ) )
 
-	MCFG_PSXCD_ADD("cdrom")
+	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
 	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
 	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( psx1_state::cd_dma_read ), (psx1_state *) owner ) )
 	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( psx1_state::cd_dma_write ), (psx1_state *) owner ) )

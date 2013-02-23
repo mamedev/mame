@@ -19,14 +19,12 @@ const int num_commands=0x20;
 //
 //
 
-#define PSXCD_TAG   "psxcd"
-
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_PSXCD_ADD(_devname) \
-	MCFG_DEVICE_ADD(PSXCD_TAG, PSXCD, 0) \
+#define MCFG_PSXCD_ADD(_tag, _devname) \
+	MCFG_DEVICE_ADD(_tag, PSXCD, 0) \
 	MCFG_PSXCD_DEVNAME(_devname)
 
 #define MCFG_PSXCD_IRQ_HANDLER(_devcb) \
