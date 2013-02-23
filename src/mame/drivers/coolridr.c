@@ -379,7 +379,6 @@ public:
 		m_subcpu(*this,"sub"),
 		m_soundcpu(*this,"soundcpu"),
 		//m_dmac(*this, "i8237"),
-		m_h1_charram(*this, "h1_charram"),
 		m_framebuffer_vram(*this, "fb_vram"),
 		m_txt_vram(*this, "txt_vram"),
 		m_sysh1_txt_blit(*this, "sysh1_txt_blit"),
@@ -406,7 +405,6 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	//required_device<am9517a_device> m_dmac;
 
-	required_shared_ptr<UINT32> m_h1_charram;
 	required_shared_ptr<UINT32> m_framebuffer_vram;
 	required_shared_ptr<UINT32> m_txt_vram;
 	required_shared_ptr<UINT32> m_sysh1_txt_blit;
@@ -471,6 +469,7 @@ public:
 	void sysh1_dma_transfer( address_space &space, UINT16 dma_index );
 
 	UINT8 *m_h1_vram;
+	UINT8 *m_h1_pcg;
 
 };
 
@@ -500,8 +499,10 @@ void coolridr_state::video_start()
 	machine().primary_screen->register_screen_bitmap(m_screen2_bitmap);
 
 	m_h1_vram = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
+	m_h1_pcg = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
 
 	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
+	save_pointer(NAME(m_h1_pcg), VRAM_SIZE);
 }
 
 // might be a page 'map / base' setup somewhere, but it's just used for ingame backgrounds
@@ -511,13 +512,20 @@ void coolridr_state::video_start()
 UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
 	/* planes seems to basically be at 0x8000 and 0x28000... */
-	gfx_element *gfx = machine().gfx[0];
 	UINT32 base_offset;
-	UINT32 tile_offset;
-	int y,x;
-	int color;
+	int xsrc,ysrc,ydst,xdst;
+	int xisrc,yisrc;
+	int tile,color;
 	int scrollx;
 	int scrolly;
+	#define xsize_mask 2048-1
+	#define ysize_mask 1024-1
+	#define xsize 128
+	#define xi_size 16
+	#define yi_size 16
+	#define xi_mask xi_size-1
+	#define yi_mask yi_size-1
+	UINT32 src_offs,pcg_offs;
 
 	scrollx = (m_framebuffer_vram[(0x9bac+which*0x40)/4] >> 16) & 0x7ff;
 	scrolly = m_framebuffer_vram[(0x9bac+which*0x40)/4] & 0x3ff;
@@ -525,28 +533,32 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 	base_offset = which * 0x20000;
 	m_color = which * 2;
 
-	for (y=0;y<64;y++)
+	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
 	{
-		for (x=0;x<128;x++)
+		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
 		{
-			int tile;
-			int res_x,res_y;
 			UINT16 cur_tile;
+			UINT16 dot_data;
 
-			res_x = (x*16)-scrollx;
-			res_y = (y*16)-scrolly;
-			tile_offset = (x+y*128)*2;
-			tile_offset+= base_offset;
+			xsrc = ((xdst + scrollx) >> 4) & (xsize_mask);
+			ysrc = ((ydst + scrolly) >> 4) & (ysize_mask);
+			xisrc = (xdst + scrollx) & (xi_mask);
+			yisrc = (ydst + scrolly) & (yi_mask);
+			src_offs = (xsrc + (ysrc*xsize));
+			src_offs *= 2;
+			src_offs += base_offset;
 
-			cur_tile = (m_h1_vram[tile_offset]<<8)|m_h1_vram[tile_offset+1];
+			cur_tile = (m_h1_vram[src_offs]<<8)|m_h1_vram[src_offs+1];
 
 			tile = cur_tile & 0x07ff;
 			color = m_color + ((cur_tile & 0x0800) >> 11) * 4;
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y+1024);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y+1024);
+			/* we have a tile number, fetch into the PCG RAM */
+			pcg_offs = (xisrc+yisrc*xi_size)+tile*xi_size*yi_size;
+			dot_data = m_h1_pcg[pcg_offs] & 0xff;
+			dot_data+= color<<8;
+
+			bitmap.pix32(ydst, xdst) = machine().pens[dot_data];
 		}
 	}
 
@@ -1514,7 +1526,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_pal_w)
 
 void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index )
 {
-	UINT32 src,dst,size;
+	UINT32 src = 0,dst = 0,size = 0;
 	UINT8 end_dma_mark;
 	UINT8 cmd;
 	UINT8 is_dma;
@@ -1550,9 +1562,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				if(dst & 0xfff00000)
 					printf("unk values to %02x dst %08x\n",cmd,dst);
 				dst &= 0x000fffff;
-				dst |= 0x05800000;
-				size*=2;
-				is_dma = 2;
+				is_dma = 3;
 				//printf("%08x %08x %08x %02x\n",src,dst,size,cmd);
 				dma_index+=0xc;
 				break;
@@ -1614,6 +1624,20 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 			src+=4;
 		}
 	}
+	else if(is_dma == 3)
+	{
+		UINT16 read_src;
+
+		for(int i=0;i<size;i+=2)
+		{
+			read_src = space.read_word(src);
+
+			m_h1_pcg[dst] = read_src >> 8;
+			m_h1_pcg[dst+1] = read_src & 0xff;
+			dst+=2;
+			src+=2;
+		}
+	}
 
 	}while(!end_dma_mark );
 }
@@ -1630,21 +1654,6 @@ WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
 	}
 }
 
-WRITE32_MEMBER(coolridr_state::sysh1_char_w)
-{
-	COMBINE_DATA(&m_h1_charram[offset]);
-
-	{
-		UINT8 *gfx = memregion("ram_gfx")->base();
-
-		gfx[offset*4+0] = (m_h1_charram[offset] & 0xff000000) >> 24;
-		gfx[offset*4+1] = (m_h1_charram[offset] & 0x00ff0000) >> 16;
-		gfx[offset*4+2] = (m_h1_charram[offset] & 0x0000ff00) >> 8;
-		gfx[offset*4+3] = (m_h1_charram[offset] & 0x000000ff) >> 0;
-
-		machine().gfx[0]->mark_dirty(offset/64); //*4/256
-	}
-}
 
 static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
@@ -1660,8 +1669,6 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x04000014, 0x04000017) AM_WRITE(sysh1_blit_data_w)
 	AM_RANGE(0x04000018, 0x0400001b) AM_WRITE(sysh1_fb_mode_w)
 	AM_RANGE(0x0400001c, 0x0400001f) AM_WRITE(sysh1_fb_data_w)
-
-	AM_RANGE(0x05800000, 0x058fffff) AM_RAM_WRITE(sysh1_char_w) AM_SHARE("h1_charram") //TODO: fake region
 
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_SHARE("sysh1_workrah")
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share1")
