@@ -71,6 +71,7 @@ void wd_fdc_t::device_start()
 	t_sector = timer_alloc(TM_SECTOR);
 	dden = disable_mfm;
 	floppy = 0;
+	status = 0x00;
 
 	save_item(NAME(status));
 	save_item(NAME(command));
