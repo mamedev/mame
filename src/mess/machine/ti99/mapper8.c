@@ -559,6 +559,7 @@ void ti998_mapper_device::device_reset()
 	m_dsr_selected = false;
 	m_CRUS = true;
 	m_PTGE = false;
+	m_waitcount = 0;
 
 	// Clean mapper
 	for (int i=0; i < 16; i++) m_pas_offset[i] = 0;
