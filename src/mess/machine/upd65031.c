@@ -279,6 +279,7 @@ void upd65031_device::device_reset()
 	m_tack = 0;
 	m_com = 0;
 	m_flash = 0;
+	m_mode = 0;
 	set_mode(STATE_AWAKE);
 
 	if (m_out_mem_cb)
