@@ -1105,7 +1105,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 					{
 						// mm ccrr rrr0
 						int encodelength = (compdata & 0x03e)>>1;
-						int rledata = (compdata & 0x3c0) >> 6;
+						int rledata = (compdata & 0x1c0) >> 6;
 
 						// guess, blank tiles have the following form
 						// 00120 (00000024,0) | 010 03f
@@ -1122,11 +1122,11 @@ void coolridr_state::blit_current_sprite(address_space &space)
 					{
 						// mm cccc ccrr
 						int encodelength = (compdata & 0x003);
-						int rledata = (compdata & 0x3fc) >> 6;
+						int rledata = (compdata & 0x0fc) >> 2;
 
 						while (data_written<256 && encodelength >=0)
 						{
-							tempshape[data_written] = m_rearranged_16bit_gfx[color_offs + rledata + 8];
+							tempshape[data_written] = m_rearranged_16bit_gfx[color_offs + rledata + 8]; // + 0x8 crt test, most of red, green, start of blue
 							encodelength--;
 							data_written++;
 						}
