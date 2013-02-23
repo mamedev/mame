@@ -258,6 +258,27 @@ victor9k_keyboard_device::victor9k_keyboard_device(const machine_config &mconfig
 {
 }
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void victor9k_keyboard_device::device_config_complete()
+{
+	m_shortname = "victor9kb";
+
+	// inherit a copy of the static data
+	const victor9k_keyboard_interface *intf = reinterpret_cast<const victor9k_keyboard_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<victor9k_keyboard_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_out_kbrdy_cb, 0, sizeof(m_out_kbrdy_cb));
+	}
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
