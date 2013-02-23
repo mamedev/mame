@@ -94,6 +94,10 @@ void microdrive_image_device::device_start()
 	m_bit_timer = timer_alloc();
 	m_bit_timer->adjust(attotime::zero, 0, attotime::from_hz(MDV_BITRATE));
 	m_bit_timer->enable(0);
+
+	m_clk = 0;
+	m_comms_in = 0;
+	m_comms_out = 0;
 }
 
 bool microdrive_image_device::call_load()
