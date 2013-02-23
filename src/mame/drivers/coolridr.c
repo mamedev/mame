@@ -694,60 +694,15 @@ TODO: fix anything that isn't text.
 #define DRAW_PIX \
 	if (pix&0x7fff) \
 	{ \
-		if (object->blittype==0) \
+		if (object->zpri < zline[drawx]) \
 		{ \
-			if (object->zpri < zline[drawx]) \
 			{ \
-				{ \
-					int r,g,b; \
-					r = pal5bit((pix >> 10) & 0x1f); \
-					g = pal5bit((pix >> 5) & 0x1f); \
-					b = pal5bit((pix >> 0) & 0x1f); \
-					line[drawx] = r<<16 | g<<8 | b; \
-					zline[drawx] = object->zpri; \
-				} \
-			} \
-		} \
-		else if (object->blittype==1) \
-		{ \
-			if (object->zpri < zline[drawx]) \
-			{ \
-				{ \
-					int r,g,b; \
-					r = pal5bit((pix >> 10) & 0x1f); \
-					g = pal5bit((pix >> 5) & 0x1f); \
-					b = pal5bit((pix >> 0) & 0x1f); \
-					line[drawx] = r<<16 | g<<8 | b; \
-					zline[drawx] = object->zpri; \
-				} \
-			} \
-		} \
-		if (object->blittype==2) \
-		{ \
-			if (object->zpri < zline[drawx]) \
-			{ \
-				{ \
-					int r,g,b; \
-					r = pal5bit((pix >> 10) & 0x1f); \
-					g = pal5bit((pix >> 5) & 0x1f); \
-					b = pal5bit((pix >> 0) & 0x1f); \
-					line[drawx] = r<<16 | g<<8 | b; \
-					zline[drawx] = object->zpri; \
-				} \
-			} \
-		} \
-		if (object->blittype==3) \
-		{ \
-			if (object->zpri < zline[drawx]) \
-			{ \
-				{ \
-					int r,g,b; \
-					r = pal5bit((pix >> 10) & 0x1f); \
-					g = pal5bit((pix >> 5) & 0x1f); \
-					b = pal5bit((pix >> 0) & 0x1f); \
-					line[drawx] = r<<16 | g<<8 | b; \
-					zline[drawx] = object->zpri; \
-				} \
+				int r,g,b; \
+				r = pal5bit((pix >> 10) & 0x1f); \
+				g = pal5bit((pix >> 5) & 0x1f); \
+				b = pal5bit((pix >> 0) & 0x1f); \
+				line[drawx] = r<<16 | g<<8 | b; \
+				zline[drawx] = object->zpri; \
 			} \
 		} \
 	} \
@@ -821,7 +776,9 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 	/************* object->spriteblit[4] *************/
 
 	UINT32 blit4_unused = object->spriteblit[4] & 0xf8fefefe;
-	//UINT32 blit4 = object->spriteblit[4] & 0x07000000;
+	//UINT32 blit4 = (object->spriteblit[4] & 0x07000000)>>24;
+	//object->zpri = 7-blit4;
+	
 	UINT32 blit_flipx = object->spriteblit[4] & 0x00000001;
 	UINT32 blit_flipy = (object->spriteblit[4] & 0x00000100)>>8;
 	UINT32 blit_rotate = (object->spriteblit[4] & 0x00010000)>>16;
@@ -1535,7 +1492,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		testobject->indirect_zoom = NULL;
 	}		
 
-	testobject->zpri = m_blitterAddr;
+	testobject->zpri = m_blitterAddr | m_blittype<<12;
 	testobject->blittype = m_blittype;
 
 	osd_work_queue *queue;
@@ -1663,8 +1620,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
 		// use the 11th blit write also as the trigger
 		if (m_blitterSerialCount == 12)
 		{
-			//if (m_blittype==2)
-				blit_current_sprite(space);
+			blit_current_sprite(space);
 		}
 
 	}
