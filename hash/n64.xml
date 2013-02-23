@@ -7843,6 +7843,17 @@ Canceled games (possibly never got to the proto stage)
 	</software>
 
 	<software name="sfrushu" cloneof="sfrush">
+		<description>San Francisco Rush - Extreme Racing (USA, Rev. A)</description>
+		<year>1997</year>
+		<publisher>Midway</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="san francisco rush extreme racing v1.1 - usa - carrot.bin" size="8388608" crc="ba05b83f" sha1="867c475e65844a421d51af3a75414d46899b404c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sfrushu1" cloneof="sfrush">
 		<description>San Francisco Rush - Extreme Racing (USA)</description>
 		<year>1997</year>
 		<publisher>Midway</publisher>

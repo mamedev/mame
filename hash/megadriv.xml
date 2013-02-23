@@ -6,7 +6,6 @@
     2IN1 (COSMIC SPACEHEAD FANTASTIC DIZZY) PAL
     ADVANCED DAISENRYAKU            JAPAN       we have Rev A, Rev 0 needed (does it exist?)
     ARNOLD PALMER TOURNAMENT GOLF       PAL
-    AWESOME POSSUM              JAPAN
     BATTLE SQUADRON             PAL
     BEAVIS & BUTTHEAD               PAL
     CAPTAIN PLANET              ASIA
@@ -2795,6 +2794,20 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="awesome possum (usa) (beta).bin" size="2097152" crc="0158dc53" sha1="8728f7d18c75e132b98917b96ade5d42c0d4a0cb" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awepossmj" cloneof="awepossm">
+		<description>Awesome Possum (Jpn)</description>
+		<year>1993</year>
+		<publisher>Tengen</publisher>
+		<info name="serial" value="T-48153"/>
+		<info name="release" value="19931225"/>
+		<info name="alt_title" value="オーサム ポッサム"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="awesome possum (japan).bin" size="2097152" crc="8c64445e" sha1="a34a81e8601d18781b352c1febf9ded6a1c398db" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

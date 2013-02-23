@@ -38042,6 +38042,33 @@ The cart also contained a non-empty SRAM save which we currently include in the 
 		</part>
 	</software>
 
+
+<!-- SDK demos -->
+
+	<software name="dolphin">
+		<description>Dolphin Demo</description>
+		<year>2001?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="492196">
+				<rom name="dolphin.bin" size="492196" crc="75f90391" sha1="c24caa9785290be8a07543306cae4a0e777b11c6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yoshi">
+		<description>Yoshi Demo</description>
+		<year>2001?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="2273956">
+				<rom name="yoshi.bin" size="2273956" crc="954d2619" sha1="89fe5c0b5489a14f5f9bb1d4ebde998f07c4f939" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
+
 <!-- NON-GAME CARTRIDGES -->
 
 <!-- e-Reader -->
