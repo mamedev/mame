@@ -137,10 +137,12 @@ void i8237_device::device_reset()
 	m_mask = 0x00;
 	m_hrq = 0;
 	m_hlda = 0;
-	m_chan[0].m_mode = 0;
-	m_chan[1].m_mode = 0;
-	m_chan[2].m_mode = 0;
-	m_chan[3].m_mode = 0;
+	for(int i = 0; i < 4; ++i)
+	{
+		m_chan[i].m_mode = 0;
+		m_chan[i].m_address = 0;
+		m_chan[i].m_count = 0;
+	}
 
 	m_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 }
