@@ -379,7 +379,6 @@ public:
 		m_subcpu(*this,"sub"),
 		m_soundcpu(*this,"soundcpu"),
 		//m_dmac(*this, "i8237"),
-		m_h1_vram(*this, "h1_vram"),
 		m_h1_charram(*this, "h1_charram"),
 		m_framebuffer_vram(*this, "fb_vram"),
 		m_txt_vram(*this, "txt_vram"),
@@ -402,22 +401,11 @@ public:
 	// store the blit params here
 	UINT32 m_spriteblit[12];
 
-
-
-
-
-
-
-
-
-
-
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
 	//required_device<am9517a_device> m_dmac;
 
-	required_shared_ptr<UINT32> m_h1_vram;
 	required_shared_ptr<UINT32> m_h1_charram;
 	required_shared_ptr<UINT32> m_framebuffer_vram;
 	required_shared_ptr<UINT32> m_txt_vram;
@@ -447,6 +435,7 @@ public:
 	DECLARE_WRITE32_MEMBER(sysh1_sound_dma_w);
 	DECLARE_READ32_MEMBER(sysh1_ioga_r);
 	DECLARE_WRITE32_MEMBER(sysh1_ioga_w);
+	DECLARE_READ32_MEMBER(sysh1_unk_blit_r);
 	DECLARE_WRITE32_MEMBER(sysh1_unk_blit_w);
 	DECLARE_WRITE32_MEMBER(sysh1_blit_mode_w);
 	DECLARE_WRITE32_MEMBER(sysh1_blit_data_w);
@@ -481,13 +470,18 @@ public:
 
 	void sysh1_dma_transfer( address_space &space, UINT16 dma_index );
 
+	UINT8 *m_h1_vram;
+
 };
 
 #define PRINT_BLIT_STUFF \
 	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x, %d, %d, %d) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", blit0, blit1_unused,b1mode,b1colorNumber, blit2_unused,b2tpen,b2colorNumber, blit3_unused,b3romoffset, blit4_unused, blit4, blit_flipy,blit_rotate, blit_flipx, blit5_unused, indirect_tile_enable, indirect_zoom_enable, vCellCount, hCellCount, vZoom, hZoom, blit10, textlookup, vPosition, hPosition); \
 
 
+
 /* video */
+
+#define VRAM_SIZE 0x100000
 
 void coolridr_state::video_start()
 {
@@ -504,6 +498,10 @@ void coolridr_state::video_start()
 
 	machine().primary_screen->register_screen_bitmap(m_screen1_bitmap);
 	machine().primary_screen->register_screen_bitmap(m_screen2_bitmap);
+
+	m_h1_vram = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
+
+	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
 }
 
 // might be a page 'map / base' setup somewhere, but it's just used for ingame backgrounds
@@ -520,12 +518,12 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 	int scrollx;
 	int scrolly;
 
-	count = 0/4;
+	count = 0;
 	m_color = 0;
 
 	if (which==1)
 	{
-		count += 0x20000/4;
+		count += 0x20000;
 //		color += 0x5e;
 		m_color = 2;
 	}
@@ -541,35 +539,26 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 	/* TODO: optimize! */
 	for (y=0;y<64;y++)
 	{
-		for (x=0;x<128;x+=2)
+		for (x=0;x<128;x++)
 		{
 			int tile;
 			int res_x,res_y;
+			UINT16 cur_ptr;
 
-			res_x = ((x+0)*16)-scrollx;
+			res_x = (x*16)-scrollx;
 			res_y = (y*16)-scrolly;
 
-			tile = (m_h1_vram[count] & 0x0fff0000) >> 16;
-			color = m_color + ((tile & 0x800) >> 11) * 4;
+			cur_ptr = (m_h1_vram[count]<<8)|m_h1_vram[count+1];
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y+1024);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y+1024);
+			tile = cur_ptr & 0x07ff;
+			color = m_color + ((cur_ptr & 0x0800) >> 11) * 4;
 
-			res_x = ((x+1)*16)-scrollx;
-			res_y = (y*16)-scrolly;
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y+1024);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y+1024);
 
-			tile = (m_h1_vram[count] & 0x00000fff) >> 0;
-			color = m_color + ((tile & 0x800) >> 11) * 4;
-
-			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y+1024);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y+1024);
-
-
-			count++;
+			count+=2;
 		}
 	}
 
@@ -1477,6 +1466,12 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 	m_blitterClearCount++;
 }
 
+READ32_MEMBER(coolridr_state::sysh1_unk_blit_r)
+{
+//	if(offset == 0x0c/4) reads
+
+	return m_sysh1_txt_blit[offset];
+}
 
 
 WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
@@ -1501,7 +1496,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
 		case 0x02:
 		{
 
-			// writes 3d0dxxxx / 3d0exxxx before a level start.. tilemaps transfer?
+			// writes 3d0dxxxx / 3d0exxxx before a level start.. offset for a transfer read at 0x400000c, stored in work RAM H
 
 			//printf("sysh1_unk_blit_w unhandled offset %04x %08x %08x\n", offset, data, mem_mask);
 
@@ -1556,10 +1551,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				if(dst & 0xfff00000)
 					printf("unk values to %02x dst %08x\n",cmd,dst);
 				dst &= 0x000fffff;
-				dst |= 0x03000000;
-				size*=2;
 				is_dma = 1;
-				//printf("%08x %08x %08x %02x\n",src,dst,size,cmd);
 				dma_index+=0xc;
 				break;
 
@@ -1572,7 +1564,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				dst &= 0x000fffff;
 				dst |= 0x05800000;
 				size*=2;
-				is_dma = 1;
+				is_dma = 2;
 				//printf("%08x %08x %08x %02x\n",src,dst,size,cmd);
 				dma_index+=0xc;
 				break;
@@ -1586,7 +1578,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 					printf("unk values to %02x dst %08x\n",cmd,dst);
 				dst &= 0x000fffff;
 				dst |= 0x03800000;
-				is_dma = 1;
+				is_dma = 2;
 				//printf("%08x %08x %08x %02x\n",src,dst,size,cmd);
 				dma_index+=0xc;
 				break;
@@ -1610,7 +1602,22 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				break;
 		}
 
-	if(is_dma)
+	/* TODO: clean-up at a later stage (once that I properly rewrite everything) */
+	if(is_dma == 1)
+	{
+		UINT16 read_src;
+
+		for(int i=0;i<size;i+=2)
+		{
+			read_src = space.read_word(src);
+
+			m_h1_vram[dst] = read_src >> 8;
+			m_h1_vram[dst+1] = read_src & 0xff;
+			dst+=2;
+			src+=2;
+		}
+	}
+	else if(is_dma == 2)
 	{
 		for(int i=0;i<size;i+=4)
 		{
@@ -1655,13 +1662,12 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
 	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
-	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_SHARE("h1_vram")//bg vram TODO: fake region
 	AM_RANGE(0x03800000, 0x0380ffff) AM_RAM_WRITE(sysh1_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x03c00000, 0x03c1ffff) AM_MIRROR(0x00200000) AM_RAM_WRITE(sysh1_dma_w) AM_SHARE("fb_vram") /* mostly mapped at 0x03e00000 */
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM AM_SHARE("txt_vram")//text tilemap + "lineram"
-	AM_RANGE(0x04000000, 0x0400000f) AM_RAM_WRITE(sysh1_unk_blit_w) AM_SHARE("sysh1_txt_blit")
+	AM_RANGE(0x04000000, 0x0400000f) AM_READWRITE(sysh1_unk_blit_r,sysh1_unk_blit_w) AM_SHARE("sysh1_txt_blit")
 	AM_RANGE(0x04000010, 0x04000013) AM_WRITE(sysh1_blit_mode_w)
 	AM_RANGE(0x04000014, 0x04000017) AM_WRITE(sysh1_blit_data_w)
 	AM_RANGE(0x04000018, 0x0400001b) AM_WRITE(sysh1_fb_mode_w)
@@ -2280,11 +2286,6 @@ UINT16 coolridr_state::get_10bit_data(UINT32 romoffset, int _10bitwordnum)
 
 void coolridr_state::machine_start()
 {
-//  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-//	m_soundcpu->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-
-//	memcpy(memregion("soundcpu")->base(), memregion("maincpu")->base()+0x100000, 0x80000);
-//	m_soundcpu->reset();
 	m_compressedgfx = memregion( "compressedgfx" )->base();
 	size_t  size    = memregion( "compressedgfx" )->bytes();
 
@@ -2552,5 +2553,5 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 	sh2drc_set_options(machine().device("sub"), SH2DRC_FASTEST_OPTIONS);
 }
 
-GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND ) // region is set in test mode, this set is for Japan, USA and Export (all regions)
+GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // region is set in test mode, this set is for Japan, USA and Export (all regions)
 
