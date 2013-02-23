@@ -99,6 +99,10 @@ v30mz_cpu_device::v30mz_cpu_device(const machine_config &mconfig, const char *ta
 	: cpu_device(mconfig, V30MZ, "V30MZ", tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0)
+	, m_ip(0)
+	, m_TF(0)
+	, m_int_vector(0)
+	, m_pc(0)
 {
 	static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
 
