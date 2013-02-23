@@ -1696,6 +1696,20 @@ static pic8259_interface ext_pic_intf =
 //  tpi6525_interface ext_tpi_intf
 //-------------------------------------------------
 
+void cbm2_state::set_busy2(int state)
+{
+	m_busy2 = state;
+
+	if (m_busy2)
+	{
+		m_busen1 = m_dramon;
+	}
+	else
+	{
+		m_busen1 = 0;
+	}
+}
+
 READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
 {
 	/*
@@ -1703,11 +1717,11 @@ READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
 	    bit     description
 
 	    0       _BUSY1
-	    1       CIA PB1
-	    2       CIA PB2
-	    3       CIA PB3
-	    4       CIA PB4
-	    5       CIA PB5
+	    1       _BUSY2
+	    2       _REQ
+	    3       _ACK
+	    4       DATA/_CMD
+	    5       DIR
 	    6       1
 	    7       1
 
@@ -1718,8 +1732,11 @@ READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
 	// _BUSY1
 	data |= !m_busen1;
 
+	// _BUSY2
+	data |= m_busy2 << 1;
+
 	// CIA
-	data = m_ext_cia->pb_r() & 0x3e;
+	data |= m_ext_tpi_pb & m_ext_cia_pb & 0x3c;
 
 	return data;
 }
@@ -1730,8 +1747,8 @@ WRITE8_MEMBER( cbm2_state::ext_tpi_pb_w )
 
 	    bit     description
 
-	    0       U22B CL
-	    1
+	    0       
+	    1 		_BUSY2
 	    2
 	    3
 	    4
@@ -1741,14 +1758,15 @@ WRITE8_MEMBER( cbm2_state::ext_tpi_pb_w )
 
 	*/
 
+	m_ext_tpi_pb = data;
+
 	// _BUSY2
-	if (!BIT(data, 0))
+	if (!BIT(data, 1))
 	{
-		logerror("BUSY2 1\n");
-		m_busy2 = 1;
-		m_busen1 = m_dramon;
+		set_busy2(0);
 	}
 
+	// FLAG
 	m_ext_cia->flag_w(BIT(data, 6));
 }
 
@@ -1763,7 +1781,7 @@ WRITE8_MEMBER( cbm2_state::ext_tpi_pc_w )
 	    2
 	    3
 	    4
-	    5       U22B CLK
+	    5       BSYCLK
 	    6
 	    7
 
@@ -1772,9 +1790,7 @@ WRITE8_MEMBER( cbm2_state::ext_tpi_pc_w )
 	// _BUSY2
 	if (BIT(data, 5))
 	{
-		logerror("BUSY2 1\n");
-		m_busy2 = 1;
-		m_busen1 = m_dramon;
+		set_busy2(1);
 	}
 }
 
@@ -1796,6 +1812,11 @@ static const tpi6525_interface ext_tpi_intf =
 //  MOS6526_INTERFACE( ext_cia_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( cbm2_state::ext_cia_irq_w )
+{
+	m_tpi1->i3_w(!state);
+}
+
 READ8_MEMBER( cbm2_state::ext_cia_pb_r )
 {
 	/*
@@ -1803,11 +1824,11 @@ READ8_MEMBER( cbm2_state::ext_cia_pb_r )
 	    bit     description
 
 	    0       _BUSY1
-	    1       TPI PB1
-	    2       TPI PB2
-	    3       TPI PB3
-	    4       TPI PB4
-	    5       TPI PB5
+	    1       _BUSY2
+	    2       _REQ
+	    3       _ACK
+	    4       DATA/_CMD
+	    5       DIR
 	    6       1
 	    7       1
 
@@ -1818,8 +1839,11 @@ READ8_MEMBER( cbm2_state::ext_cia_pb_r )
 	// _BUSY1
 	data |= !m_busen1;
 
+	// _BUSY2
+	data |= m_busy2 << 1;
+
 	// TPI
-	data |= tpi6525_portb_r(m_ext_tpi, space, 0) & 0x3e;
+	data |= m_ext_tpi_pb & m_ext_cia_pb & 0x3c;
 
 	return data;
 }
@@ -1830,29 +1854,28 @@ WRITE8_MEMBER( cbm2_state::ext_cia_pb_w )
 
 	    bit     description
 
-	    0       U22B CL
-	    1
+	    0       
+	    1 		_BUSY2
 	    2
 	    3
 	    4
 	    5
-	    6       PIC IR0, U29B CL, U22B PR
-	    7       PIC IR7
+	    6       _INT1
+	    7       _INT2
 
 	*/
 
+	m_ext_cia_pb = data;
+
 	// _BUSY2
-	if (!BIT(data, 0))
+	if (!BIT(data, 1))
 	{
-		logerror("BUSY2 1\n");
-		m_busy2 = 1;
-		m_busen1 = m_dramon;
+		set_busy2(0);
 	}
-	else if (!BIT(data, 6))
+
+	if (!BIT(data, 6))
 	{
-		logerror("BUSY2 0\n");
-		m_busy2 = 0;
-		m_busen1 = 0;
+		set_busy2(0);
 	}
 
 	m_ext_pic->ir0_w(!BIT(data, 6));
@@ -2076,6 +2099,9 @@ MACHINE_RESET_MEMBER( cbm2_state, cbm2 )
 	m_graphics = 1;
 	m_tpi1_irq = CLEAR_LINE;
 	m_user_irq = CLEAR_LINE;
+
+m_ext_tpi_pb = 0xff;
+m_ext_cia_pb = 0xff;
 
 	m_maincpu->reset();
 
@@ -2399,9 +2425,9 @@ static MACHINE_CONFIG_DERIVED( bx256hp, b256hp )
 
 	MCFG_PIC8259_ADD(EXT_I8259A_TAG, ext_pic_intf)
 	MCFG_TPI6525_ADD(EXT_MOS6525_TAG, ext_tpi_intf)
-	MCFG_MOS6526_ADD(EXT_MOS6526_TAG, XTAL_18MHz/9, 60, DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i3_w))
+	MCFG_MOS6526_ADD(EXT_MOS6526_TAG, XTAL_18MHz/9, 60, DEVWRITELINE(DEVICE_SELF, cbm2_state, ext_cia_irq_w))
 	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w), DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, sp_w))
-	//MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(EXT_MOS6525_TAG, tpi6525_porta_r), NULL)
+	MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(EXT_MOS6525_TAG, tpi6525_device, pa_r), NULL)
 	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(DEVICE_SELF, cbm2_state, ext_cia_pb_r), DEVWRITE8(DEVICE_SELF, cbm2_state, ext_cia_pb_w), NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list2", "bx256hp_flop")
@@ -2458,9 +2484,9 @@ static MACHINE_CONFIG_DERIVED( cbm730, cbm720 )
 
 	MCFG_PIC8259_ADD(EXT_I8259A_TAG, ext_pic_intf)
 	MCFG_TPI6525_ADD(EXT_MOS6525_TAG, ext_tpi_intf)
-	MCFG_MOS6526_ADD(EXT_MOS6526_TAG, XTAL_18MHz/9, 50, DEVWRITELINE(MOS6525_1_TAG, tpi6525_device, i3_w))
+	MCFG_MOS6526_ADD(EXT_MOS6526_TAG, XTAL_18MHz/9, 50, DEVWRITELINE(DEVICE_SELF, cbm2_state, ext_cia_irq_w))
 	MCFG_MOS6526_SERIAL_CALLBACKS(DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, cnt_w), DEVWRITELINE(CBM2_USER_PORT_TAG, cbm2_user_port_device, sp_w))
-	//MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(EXT_MOS6525_TAG, tpi6525_porta_r), NULL)
+	MCFG_MOS6526_PORT_A_CALLBACKS(DEVREAD8(EXT_MOS6525_TAG, tpi6525_device, pa_r), NULL)
 	MCFG_MOS6526_PORT_B_CALLBACKS(DEVREAD8(DEVICE_SELF, cbm2_state, ext_cia_pb_r), DEVWRITE8(DEVICE_SELF, cbm2_state, ext_cia_pb_w), NULL)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list2", "bx256hp_flop")

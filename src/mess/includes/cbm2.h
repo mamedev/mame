@@ -175,6 +175,7 @@ public:
 		int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs);
 
 	UINT8 read_keyboard();
+	void set_busy2(int state);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -206,6 +207,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ext_tpi_pb_w );
 	DECLARE_WRITE8_MEMBER( ext_tpi_pc_w );
 
+	DECLARE_WRITE_LINE_MEMBER( ext_cia_irq_w );
 	DECLARE_READ8_MEMBER( ext_cia_pb_r );
 	DECLARE_WRITE8_MEMBER( ext_cia_pb_w );
 
@@ -233,6 +235,9 @@ public:
 	UINT8 m_tpi2_pa;
 	UINT8 m_tpi2_pb;
 	UINT8 m_cia_pa;
+
+	UINT8 m_ext_cia_pb;
+	UINT8 m_ext_tpi_pb;
 
 	// timers
 	emu_timer *m_todclk_timer;

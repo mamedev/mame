@@ -74,6 +74,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( i3_w );
 	DECLARE_WRITE_LINE_MEMBER( i4_w );
 
+	DECLARE_READ8_MEMBER( pa_r );
+	DECLARE_READ8_MEMBER( pb_r );
+	DECLARE_READ8_MEMBER( pc_r );
+
 protected:
 	// device-level overrides
 	virtual void device_config_complete();

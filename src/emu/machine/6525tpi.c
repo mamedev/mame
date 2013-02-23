@@ -391,6 +391,11 @@ WRITE8_DEVICE_HANDLER( tpi6525_portc_w )
 }
 
 
+READ8_MEMBER( tpi6525_device::pa_r ) { return tpi6525_porta_r(this, space, 0); }
+READ8_MEMBER( tpi6525_device::pb_r ) { return tpi6525_portb_r(this, space, 0); }
+READ8_MEMBER( tpi6525_device::pc_r ) { return tpi6525_portc_r(this, space, 0); }
+
+
 READ8_DEVICE_HANDLER( tpi6525_r )
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
