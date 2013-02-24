@@ -424,8 +424,6 @@ public:
 
 	bitmap_rgb32 m_screen1_bitmap;
 	bitmap_rgb32 m_screen2_bitmap;
-	int m_color;
-	UINT8 m_vblank;
 	int m_scsp_last_line;
 	UINT8 an_mux_data;
 	UINT8 sound_data, sound_fifo_full;
@@ -477,8 +475,11 @@ public:
 	void sysh1_dma_transfer( address_space &space, UINT16 dma_index );
 
 	UINT16 *m_h1_vram;
-	UINT16 *m_h1_pcg;
+	UINT8 *m_h1_pcg;
 	UINT16 *m_h1_pal;
+	void flush_pal_data( UINT16 offset );
+	int m_gfx_index;
+	int m_color_bank;
 
 	osd_work_queue *    m_work_queue[2]; // work queue, one per screen
 	static void *draw_tile_row_threaded(void *param, int threadid);
@@ -493,15 +494,32 @@ public:
 
 #define VRAM_SIZE 0x100000
 
+static const gfx_layout h1_tile_layout =
+{
+	16,16,
+	0x800,
+	8,
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120 },
+	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
+	16*128
+};
+
+
 void coolridr_state::video_start()
 {
+	/* find first empty slot to decode gfx */
+	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
+		if (machine().gfx[m_gfx_index] == 0)
+			break;
+
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites[0]);
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2[0]);
 	machine().primary_screen->register_screen_bitmap(m_zbuffer_bitmap);
 	machine().primary_screen->register_screen_bitmap(m_zbuffer_bitmap2);
 
 
-	
+
 
 	// testing, not right
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites[1]);
@@ -514,13 +532,7 @@ void coolridr_state::video_start()
 	machine().primary_screen->register_screen_bitmap(m_screen1_bitmap);
 	machine().primary_screen->register_screen_bitmap(m_screen2_bitmap);
 
-	m_h1_vram = auto_alloc_array_clear(machine(), UINT16, VRAM_SIZE);
-	m_h1_pcg = auto_alloc_array_clear(machine(), UINT16, VRAM_SIZE);
-	m_h1_pal = auto_alloc_array_clear(machine(), UINT16, VRAM_SIZE);
-
-	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pcg), VRAM_SIZE);
-	save_pointer(NAME(m_h1_pal), VRAM_SIZE);
+	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), h1_tile_layout, m_h1_pcg, 8, 0));
 }
 
 // might be a page 'map / base' setup somewhere, but it's just used for ingame backgrounds
@@ -532,71 +544,36 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 	/* planes seems to basically be at 0x8000 and 0x28000... */
 #if 1
 	UINT32 base_offset;
-	int xsrc,ysrc,ydst,xdst;
-	int xisrc,yisrc;
 	int tile,color;
 	int scrollx;
 	int scrolly;
-	#define xsize_mask 2048-1
-	#define ysize_mask 1024-1
-	#define xsize 128
-	#define xi_size 16
-	#define yi_size 16
-	#define xi_mask xi_size-1
-	#define yi_mask yi_size-1
-	UINT32 src_offs,pcg_offs;
+	gfx_element *gfx = machine().gfx[m_gfx_index];
 
 	scrollx = (m_framebuffer_vram[(0x9bac+which*0x40)/4] >> 16) & 0x7ff;
 	scrolly = m_framebuffer_vram[(0x9bac+which*0x40)/4] & 0x3ff;
 
-	base_offset = which * 0x20000;
-	m_color = which * 2;
+	base_offset = (which * 0x20000)/2;
+	m_color_bank = which * 2;
 
-	// drawgfx was a lot faster, and I think can handle what we need, even if there
-	// are RGB effects I think it will be cheaper to manipulate the palette...
-	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
-	{
-		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
-		{
-			UINT16 cur_tile;
-			UINT16 dot_data,pal_data;
-			int r,g,b;
+ 	for (int y=0;y<64;y++)
+ 	{
+		for (int x=0;x<128;x++)
+ 		{
+ 			int res_x,res_y;
 
-			/* base tile scrolling */
-			xsrc = ((xdst + scrollx) & (xsize_mask)) >> 4;
-			ysrc = ((ydst + scrolly) & (ysize_mask)) >> 4;
-			/* apply fractional scrolling */
-			xisrc = (xdst + scrollx) & (xi_mask);
-			yisrc = (ydst + scrolly) & (yi_mask);
-			/* do the tile offset calc */
-			src_offs = (xsrc + (ysrc*xsize));
-			src_offs += base_offset;
+			res_x = (x*16)-scrollx;
+ 			res_y = (y*16)-scrolly;
 
-			/* fetch tilemap data */
-			cur_tile = m_h1_vram[src_offs];
+			tile = (m_h1_vram[x+y*128+base_offset] & 0x0fff);
+			color = m_color_bank + ((tile & 0x800) >> 11) * 4;
 
-			/* split proper tile reading and apply color too */
-			tile = cur_tile & 0x07ff;
-			color = m_color + ((cur_tile & 0x0800) >> 11) * 4;
-
-			/* we have a tile number, fetch the PCG RAM */
-			pcg_offs = (xisrc+yisrc*xi_size)+tile*xi_size*yi_size;
-			/* the dot offset calculation */
-			dot_data = m_h1_pcg[pcg_offs/2];
-			dot_data>>= ((pcg_offs & 1) ^ 1) * 8;
-			dot_data&= 0xff;
-			dot_data+= color<<8;
-
-			/* finally, take the palette data (TODO: apply RGB control) */
-			pal_data = m_h1_pal[dot_data];
-			r = pal5bit((pal_data >> 10) & 0x1f);
-			g = pal5bit((pal_data >> 5) & 0x1f);
-			b = pal5bit((pal_data >> 0) & 0x1f);
-
-			/* put on the screen */
-			bitmap.pix32(ydst, xdst) = r<<16 | g<<8 | b;
+			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y+1024);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y+1024);
 		}
 	}
+
 #endif
 	if (which==0)
 	{
@@ -626,19 +603,6 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_rgb
 
 
 
-/* According to Guru, this is actually the same I/O chip of Sega Model 2 HW */
-#if 0
-READ32_MEMBER(coolridr_state::sysh1_ioga_r)
-{
-	//return machine().rand();//h1_ioga[offset];
-	return h1_ioga[offset];
-}
-
-WRITE32_MEMBER(coolridr_state::sysh1_ioga_w)
-{
-	COMBINE_DATA(&h1_ioga[offset]);
-}
-#endif
 
 struct cool_render_object
 {
@@ -836,10 +800,10 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 {
 	cool_render_object *object = reinterpret_cast<cool_render_object *>(param);
 	bitmap_rgb32* drawbitmap = object->drawbitmap;
-	
+
 	UINT16* rearranged_16bit_gfx = object->state->m_rearranged_16bit_gfx;
 	UINT16* expanded_10bit_gfx = object->state->m_expanded_10bit_gfx;
-	
+
 
 
 	/************* object->spriteblit[1] *************/
@@ -862,7 +826,7 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 	{
 	//	b1colorNumber = space.machine().rand()&0xfff;
 	}
-		
+
 
 //	if(b1colorNumber > 0x60 || b2colorNumber)
 //		printf("%08x %08x\n",b1colorNumber,b2colorNumber);
@@ -895,7 +859,7 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 	UINT32 blit4_unused = object->spriteblit[4] & 0xf8fefefe;
 	//UINT32 blit4 = (object->spriteblit[4] & 0x07000000)>>24;
 	//object->zpri = 7-blit4;
-	
+
 	UINT32 blit_flipx = object->spriteblit[4] & 0x00000001;
 	UINT32 blit_flipy = (object->spriteblit[4] & 0x00000100)>>8;
 	UINT32 blit_rotate = (object->spriteblit[4] & 0x00010000)>>16;
@@ -1189,10 +1153,10 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 			// these should be 'cell numbers' (tile numbers) which look up RLE data?
 			UINT32 spriteNumber = (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]);
 			UINT16 tempshape[16*16];
-			
+
 			int color_offs = (0x7b20 + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */
 			UINT16 blankcount = 256;
-			
+
 			if (used_flipy)
 			{
 				if (used_flipx)
@@ -1353,7 +1317,7 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 			} // end no indirect zoom
 		}
 	}
-	
+
 
 
 	end:
@@ -1482,7 +1446,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	testobject->state = this;
 
 	for (int i=0;i<12;i++)
-		testobject->spriteblit[i] = m_spriteblit[i];	
+		testobject->spriteblit[i] = m_spriteblit[i];
 
 	// cache some values that are looked up from RAM to be safe.. alternatively we could stall the rendering if they get written to, but they're a direct memory pointer..
 	int test_indirect_tile_enable = (m_spriteblit[5] & 0x00010000)>>16;
@@ -1507,7 +1471,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	int test_indirect_zoom_enable = (m_spriteblit[5] & 0x00000001);
 	if (test_indirect_zoom_enable)
 	{
-		UINT32 test_blit10 =  m_spriteblit[10];	
+		UINT32 test_blit10 =  m_spriteblit[10];
 		UINT16 test_vCellCount = (m_spriteblit[6] & 0x03ff0000) >> 16;
 		int bytes = test_vCellCount * 4 * 16;
 		testobject->indirect_zoom = (UINT32*)malloc(bytes);
@@ -1519,7 +1483,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	else
 	{
 		testobject->indirect_zoom = NULL;
-	}		
+	}
 
 	testobject->zpri = m_blitterAddr | m_blittype<<12;
 	testobject->blittype = m_blittype;
@@ -1819,22 +1783,26 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
 }
 
 
-
+void coolridr_state::flush_pal_data( UINT16 offset )
+{
+	int r,g,b;
+	r = ((m_h1_pal[offset] & 0x7c00) >> 10);
+	g = ((m_h1_pal[offset] & 0x03e0) >> 5);
+	b = ((m_h1_pal[offset] & 0x001f) >> 0);
+	palette_set_color_rgb(machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
+}
 
 void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index )
 {
 	UINT32 src = 0,dst = 0,size = 0;
 	UINT8 end_dma_mark;
 	UINT8 cmd;
-	UINT8 is_dma;
-	UINT16 *dst_ptr;
 
 	end_dma_mark = 0;
 
 	do{
 		cmd = (m_framebuffer_vram[(0+dma_index)/4] & 0xfc000000) >> 24;
 
-		is_dma = 0;
 
 		switch(cmd)
 		{
@@ -1846,12 +1814,18 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				src = (m_framebuffer_vram[(0+dma_index)/4] & 0x03ffffff);
 				dst = (m_framebuffer_vram[(4+dma_index)/4]);
 				size = m_framebuffer_vram[(8+dma_index)/4];
-				if(dst & 0xfff00000)
+				if(dst & 0xfff00001)
 					printf("unk values to %02x dst %08x\n",cmd,dst);
-				dst_ptr = m_h1_vram;
 				dst &= 0x000ffffe;
 				dst >>= 1;
-				is_dma = 1;
+
+				for(int i=0;i<size;i+=2)
+				{
+					m_h1_vram[dst] = space.read_word(src);
+					dst++;
+					src+=2;
+				}
+
 				dma_index+=0xc;
 				break;
 
@@ -1861,10 +1835,17 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				size = m_framebuffer_vram[(8+dma_index)/4];
 				if(dst & 0xfff00000)
 					printf("unk values to %02x dst %08x\n",cmd,dst);
-				dst_ptr = m_h1_pcg;
-				dst &= 0x000ffffe;
-				dst >>= 1;
-				is_dma = 1;
+				dst &= 0x000fffff;
+
+				/* TODO: might as well improve the dirty handling */
+				for(int i=0;i<size;i++)
+				{
+					m_h1_pcg[dst] = space.read_byte(src);
+					machine().gfx[m_gfx_index]->mark_dirty(dst/256);
+					dst++;
+					src++;
+				}
+
 				dma_index+=0xc;
 				break;
 
@@ -1873,12 +1854,19 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				dst = (m_framebuffer_vram[(4+dma_index)/4]);
 				size = m_framebuffer_vram[(8+dma_index)/4];
 				/* Note: there are also some reads at 0x3e00000. This tells us that the DMA thing actually mirrors at 0x3c00000 too. */
-				if(dst & 0xfff00000)
+				if(dst & 0xfff00001)
 					printf("unk values to %02x dst %08x\n",cmd,dst);
-				dst_ptr = m_h1_pal;
 				dst &= 0x000ffffe;
 				dst >>= 1;
-				is_dma = 1;
+
+				for(int i=0;i<size;i+=2)
+				{
+					m_h1_pal[dst] = space.read_word(src);
+					flush_pal_data(dst);
+					dst++;
+					src+=2;
+				}
+
 				dma_index+=0xc;
 				break;
 
@@ -1900,16 +1888,6 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				dma_index+=4;
 				break;
 		}
-
-	if(is_dma)
-	{
-		for(int i=0;i<size;i+=2)
-		{
-			dst_ptr[dst] = space.read_word(src);
-			dst++;
-			src+=2;
-		}
-	}
 
 	}while(!end_dma_mark );
 }
@@ -2123,20 +2101,10 @@ ADDRESS_MAP_END
 
 
 
-static const gfx_layout tiles16x16_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	8,
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120 },
-	{ 0*128, 1*128, 2*128, 3*128, 4*128, 5*128, 6*128, 7*128, 8*128, 9*128, 10*128, 11*128, 12*128, 13*128, 14*128, 15*128 },
-	16*128
-};
 
 
 static GFXDECODE_START( coolridr )
-	GFXDECODE_ENTRY( "ram_gfx", 0, tiles16x16_layout, 0, 0x100 )
+//	GFXDECODE_ENTRY( NULL, 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( coolridr )
@@ -2602,6 +2570,13 @@ void coolridr_state::machine_start()
 		}
 	}
 
+	m_h1_vram = auto_alloc_array_clear(machine(), UINT16, VRAM_SIZE);
+	m_h1_pcg = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
+	m_h1_pal = auto_alloc_array_clear(machine(), UINT16, VRAM_SIZE);
+
+	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
+	save_pointer(NAME(m_h1_pcg), VRAM_SIZE);
+	save_pointer(NAME(m_h1_pal), VRAM_SIZE);
 }
 
 void coolridr_state::machine_reset()
@@ -2740,8 +2715,6 @@ ROM_START( coolridr )
 	ROM_LOAD32_WORD_SWAP( "mp17655.16", 0x0800000, 0x0200000, CRC(02903cf2) SHA1(16d555fda144e0f1b62b428e9158a0e8ebf7084e) )
 	ROM_LOAD32_WORD_SWAP( "mp17656.17", 0x0c00002, 0x0200000, CRC(945c89e3) SHA1(8776d74f73898d948aae3c446d7c710ad0407603) )
 	ROM_LOAD32_WORD_SWAP( "mp17657.18", 0x0c00000, 0x0200000, CRC(74676b1f) SHA1(b4a9003a052bde93bebfa4bef9e8dff65003c3b2) )
-
-	ROM_REGION32_BE( 0x100000, "ram_gfx", ROMREGION_ERASE00 ) /* SH2 code */
 
 	ROM_REGION( 0x100000, "soundcpu", ROMREGION_ERASE00 )   /* 68000 */
 
