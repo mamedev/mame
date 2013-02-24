@@ -550,6 +550,8 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 	base_offset = which * 0x20000;
 	m_color = which * 2;
 
+	// drawgfx was a lot faster, and I think can handle what we need, even if there
+	// are RGB effects I think it will be cheaper to manipulate the palette...
 	for(ydst=cliprect.min_y;ydst<=cliprect.max_y;ydst++)
 	{
 		for(xdst=cliprect.min_x;xdst<=cliprect.max_x;xdst++)
@@ -596,11 +598,13 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 
 	if (which==0)
 	{
-		copybitmap_trans(bitmap, m_screen1_bitmap, 0, 0, 0, 0, cliprect, 0);
+		// will probably need a custom function
+		copybitmap_trans(bitmap, m_screen1_bitmap, 0, 0, 0, 0, cliprect, 0xff000000);
 	}
 	else
 	{
-		copybitmap_trans(bitmap, m_screen2_bitmap, 0, 0, 0, 0, cliprect, 0);
+		// will probably need a custom function
+		copybitmap_trans(bitmap, m_screen2_bitmap, 0, 0, 0, 0, cliprect, 0xff000000);
 	}
 
 	return 0;
@@ -689,10 +693,9 @@ of each rom ... ROM 1 + 2 gives the full palette data for each pixel, in even/od
 TODO: fix anything that isn't text.
 */
 
-// because of our copy bitmap any black pens get removed.. obviously this is wrong
 
 #define DRAW_PIX \
-	if (pix&0x7fff) \
+	if (pix != 0x8000) \
 	{ \
 		if (object->zpri < zline[drawx]) \
 		{ \
@@ -705,6 +708,13 @@ TODO: fix anything that isn't text.
 				zline[drawx] = object->zpri; \
 			} \
 		} \
+	} \
+	else \
+	{ \
+		/* some alpha sprites have 0x8000 set */ \
+		/* but some regular ones text do too? */ \
+		/* how do we tell the difference between them? */ \
+		/* how would you have a black 0x0000 in an alpha sprite?? */ \
 	} \
 
 
@@ -1063,7 +1073,7 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 
 					UINT16 compdata = expanded_10bit_gfx[ (b3romoffset) + spriteNumber + i];
 
-					if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100))
+					if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100)) // 3bpp
 					{
 						// mm ccrr rrr0
 						int encodelength = (compdata & 0x03e)>>1;
@@ -1073,14 +1083,14 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 						// 00120 (00000024,0) | 010 03f
 						if (compdata&1) encodelength = 255;
 
-						while (data_written<256 && encodelength >=0)
+						while (data_written<256 && encodelength >=0) // 6bpp
 						{
 							tempshape[data_written] = rearranged_16bit_gfx[color_offs + rledata];
 							encodelength--;
 							data_written++;
 						}
 					}
-					else if ((compdata & 0x300) == 0x200)
+					else if ((compdata & 0x300) == 0x200) // 8bpp
 					{
 						// mm cccc ccrr
 						int encodelength = (compdata & 0x003);
@@ -1718,7 +1728,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 			{
 				osd_work_queue_wait(m_work_queue[0], osd_ticks_per_second() * 100);
 				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites[i], 0, 0, 0, 0, visarea);
-				m_temp_bitmap_sprites[i].fill(0, visarea);
+				m_temp_bitmap_sprites[i].fill(0xff000000, visarea);
 				m_zbuffer_bitmap.fill(0xffff, visarea);
 			}
 
@@ -1726,7 +1736,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 			{
 				osd_work_queue_wait(m_work_queue[1], osd_ticks_per_second() * 100);
 				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2[i], 0, 0, 0, 0, visarea);
-				m_temp_bitmap_sprites2[i].fill(0, visarea);
+				m_temp_bitmap_sprites2[i].fill(0xff000000, visarea);
 				m_zbuffer_bitmap2.fill(0xffff, visarea);
 			}
 
