@@ -419,6 +419,12 @@ void towns_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case TIMER_WAIT:
 		wait_end();
 		break;
+	case TIMER_CDSTATUS:
+		towns_cd_status_ready();
+		break;
+	case TIMER_CDDA:
+		towns_delay_cdda((cdrom_image_device*)ptr);
+		break;
 	}
 }
 void towns_state::freerun_inc()
@@ -1364,7 +1370,7 @@ static void towns_cdrom_set_irq(running_machine &machine,int line,int state)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(towns_state::towns_cd_status_ready)
+void towns_state::towns_cd_status_ready()
 {
 	m_towns_cd.status |= 0x02;  // status read request
 	m_towns_cd.status |= 0x01;  // ready
@@ -1372,15 +1378,14 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_cd_status_ready)
 	towns_cdrom_set_irq((running_machine&)machine(),TOWNS_CD_IRQ_MPU,1);
 }
 
-static void towns_cd_set_status(running_machine &machine, UINT8 st0, UINT8 st1, UINT8 st2, UINT8 st3)
+void towns_state::towns_cd_set_status(UINT8 st0, UINT8 st1, UINT8 st2, UINT8 st3)
 {
-	towns_state* state = machine.driver_data<towns_state>();
-	state->m_towns_cd.cmd_status[0] = st0;
-	state->m_towns_cd.cmd_status[1] = st1;
-	state->m_towns_cd.cmd_status[2] = st2;
-	state->m_towns_cd.cmd_status[3] = st3;
+	m_towns_cd.cmd_status[0] = st0;
+	m_towns_cd.cmd_status[1] = st1;
+	m_towns_cd.cmd_status[2] = st2;
+	m_towns_cd.cmd_status[3] = st3;
 	// wait a bit
-	machine.scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(towns_state::towns_cd_status_ready),state), 0, &machine);
+	m_towns_status_timer->adjust(attotime::from_msec(1),0,attotime::never);
 }
 
 static UINT8 towns_cd_get_track(running_machine &machine)
@@ -1431,7 +1436,7 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_cdrom_read_byte)
 			if(m_towns_cd.lba_current >= m_towns_cd.lba_last)
 			{
 				m_towns_cd.extra_status = 0;
-				towns_cd_set_status(device->machine(),0x06,0x00,0x00,0x00);
+				towns_cd_set_status(0x06,0x00,0x00,0x00);
 				towns_cdrom_set_irq(device->machine(),TOWNS_CD_IRQ_DMA,1);
 				m_towns_cd.buffer_ptr = -1;
 				m_towns_cd.status |= 0x01;  // ready
@@ -1439,7 +1444,7 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_cdrom_read_byte)
 			else
 			{
 				m_towns_cd.extra_status = 0;
-				towns_cd_set_status(device->machine(),0x22,0x00,0x00,0x00);
+				towns_cd_set_status(0x22,0x00,0x00,0x00);
 				towns_cdrom_set_irq(device->machine(),TOWNS_CD_IRQ_DMA,1);
 				cdrom_read_data(m_cdrom->get_cdrom_file(),++m_towns_cd.lba_current,m_towns_cd.buffer,CD_TRACK_MODE1);
 				m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
@@ -1465,7 +1470,7 @@ UINT8 towns_state::towns_cdrom_read_byte_software()
 		if(m_towns_cd.lba_current >= m_towns_cd.lba_last)
 		{
 			m_towns_cd.extra_status = 0;
-			towns_cd_set_status(machine(),0x06,0x00,0x00,0x00);
+			towns_cd_set_status(0x06,0x00,0x00,0x00);
 			towns_cdrom_set_irq(machine(),TOWNS_CD_IRQ_DMA,1);
 			m_towns_cd.buffer_ptr = -1;
 			m_towns_cd.status |= 0x01;  // ready
@@ -1474,7 +1479,7 @@ UINT8 towns_state::towns_cdrom_read_byte_software()
 		{
 			cdrom_read_data(m_cdrom->get_cdrom_file(),++m_towns_cd.lba_current,m_towns_cd.buffer,CD_TRACK_MODE1);
 			m_towns_cd.extra_status = 0;
-			towns_cd_set_status(machine(),0x21,0x00,0x00,0x00);
+			towns_cd_set_status(0x21,0x00,0x00,0x00);
 			towns_cdrom_set_irq(machine(),TOWNS_CD_IRQ_DMA,1);
 			m_towns_cd.status &= ~0x10;
 			m_towns_cd.status |= 0x20;
@@ -1484,7 +1489,7 @@ UINT8 towns_state::towns_cdrom_read_byte_software()
 	return ret;
 }
 
-static void towns_cdrom_read(cdrom_image_device* device)
+void towns_state::towns_cdrom_read(cdrom_image_device* device)
 {
 	// MODE 1 read
 	// load data into buffer to be sent via DMA1 channel 3
@@ -1493,133 +1498,128 @@ static void towns_cdrom_read(cdrom_image_device* device)
 	// parameters:
 	//          3 bytes: MSF of first sector to read
 	//          3 bytes: MSF of last sector to read
-	towns_state* state = device->machine().driver_data<towns_state>();
 	UINT32 lba1,lba2,track;
 
-	lba1 = state->m_towns_cd.parameter[7] << 16;
-	lba1 += state->m_towns_cd.parameter[6] << 8;
-	lba1 += state->m_towns_cd.parameter[5];
-	lba2 = state->m_towns_cd.parameter[4] << 16;
-	lba2 += state->m_towns_cd.parameter[3] << 8;
-	lba2 += state->m_towns_cd.parameter[2];
-	state->m_towns_cd.lba_current = msf_to_lbafm(lba1);
-	state->m_towns_cd.lba_last = msf_to_lbafm(lba2);
+	lba1 = m_towns_cd.parameter[7] << 16;
+	lba1 += m_towns_cd.parameter[6] << 8;
+	lba1 += m_towns_cd.parameter[5];
+	lba2 = m_towns_cd.parameter[4] << 16;
+	lba2 += m_towns_cd.parameter[3] << 8;
+	lba2 += m_towns_cd.parameter[2];
+	m_towns_cd.lba_current = msf_to_lbafm(lba1);
+	m_towns_cd.lba_last = msf_to_lbafm(lba2);
 
 	// first track starts at 00:02:00 - this is hardcoded in the boot procedure
-	track = cdrom_get_track(device->get_cdrom_file(),state->m_towns_cd.lba_current);
+	track = cdrom_get_track(device->get_cdrom_file(),m_towns_cd.lba_current);
 	if(track < 2)
 	{  // recalculate LBA
-		state->m_towns_cd.lba_current -= 150;
-		state->m_towns_cd.lba_last -= 150;
+		m_towns_cd.lba_current -= 150;
+		m_towns_cd.lba_last -= 150;
 	}
 
 	// parameter 7 = sector count?
-	if(state->m_towns_cd.parameter[1] != 0)
-		state->m_towns_cd.lba_last += state->m_towns_cd.parameter[1];
+	if(m_towns_cd.parameter[1] != 0)
+		m_towns_cd.lba_last += m_towns_cd.parameter[1];
 
-	logerror("CD: Mode 1 read from LBA next:%i last:%i track:%i\n",state->m_towns_cd.lba_current,state->m_towns_cd.lba_last,track);
+	logerror("CD: Mode 1 read from LBA next:%i last:%i track:%i\n",m_towns_cd.lba_current,m_towns_cd.lba_last,track);
 
-	if(state->m_towns_cd.lba_current > state->m_towns_cd.lba_last)
+	if(m_towns_cd.lba_current > m_towns_cd.lba_last)
 	{
-		state->m_towns_cd.extra_status = 0;
-		towns_cd_set_status(device->machine(),0x01,0x00,0x00,0x00);
+		m_towns_cd.extra_status = 0;
+		towns_cd_set_status(0x01,0x00,0x00,0x00);
 	}
 	else
 	{
-		cdrom_read_data(device->get_cdrom_file(),state->m_towns_cd.lba_current,state->m_towns_cd.buffer,CD_TRACK_MODE1);
-		if(state->m_towns_cd.software_tx)
+		cdrom_read_data(device->get_cdrom_file(),m_towns_cd.lba_current,m_towns_cd.buffer,CD_TRACK_MODE1);
+		if(m_towns_cd.software_tx)
 		{
-			state->m_towns_cd.status &= ~0x10;  // not a DMA transfer
-			state->m_towns_cd.status |= 0x20;  // software transfer
+			m_towns_cd.status &= ~0x10;  // not a DMA transfer
+			m_towns_cd.status |= 0x20;  // software transfer
 		}
 		else
 		{
-			state->m_towns_cd.status |= 0x10;  // DMA transfer begin
-			state->m_towns_cd.status &= ~0x20;  // not a software transfer
+			m_towns_cd.status |= 0x10;  // DMA transfer begin
+			m_towns_cd.status &= ~0x20;  // not a software transfer
 		}
-//      state->m_towns_cd.buffer_ptr = 0;
-//      state->m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
-		if(state->m_towns_cd.command & 0x20)
+//      m_towns_cd.buffer_ptr = 0;
+//      m_towns_cd.read_timer->adjust(attotime::from_hz(300000),1);
+		if(m_towns_cd.command & 0x20)
 		{
-			state->m_towns_cd.extra_status = 2;
-			towns_cd_set_status(device->machine(),0x00,0x00,0x00,0x00);
+			m_towns_cd.extra_status = 2;
+			towns_cd_set_status(0x00,0x00,0x00,0x00);
 		}
 		else
 		{
-			state->m_towns_cd.extra_status = 0;
-			if(state->m_towns_cd.software_tx)
-				towns_cd_set_status(device->machine(),0x21,0x00,0x00,0x00);
+			m_towns_cd.extra_status = 0;
+			if(m_towns_cd.software_tx)
+				towns_cd_set_status(0x21,0x00,0x00,0x00);
 			else
-				towns_cd_set_status(device->machine(),0x22,0x00,0x00,0x00);
+				towns_cd_set_status(0x22,0x00,0x00,0x00);
 		}
 	}
 }
 
-static void towns_cdrom_play_cdda(cdrom_image_device* device)
+void towns_state::towns_cdrom_play_cdda(cdrom_image_device* device)
 {
 	// PLAY AUDIO
 	// Plays CD-DA audio from the specified MSF
 	// Parameters:
 	//          3 bytes: starting MSF of audio to play
 	//          3 bytes: ending MSF of audio to play (can span multiple tracks)
-	towns_state* state = device->machine().driver_data<towns_state>();
 	UINT32 lba1,lba2;
-	device_t* cdda = state->m_cdda;
 
-	lba1 = state->m_towns_cd.parameter[7] << 16;
-	lba1 += state->m_towns_cd.parameter[6] << 8;
-	lba1 += state->m_towns_cd.parameter[5];
-	lba2 = state->m_towns_cd.parameter[4] << 16;
-	lba2 += state->m_towns_cd.parameter[3] << 8;
-	lba2 += state->m_towns_cd.parameter[2];
-	state->m_towns_cd.cdda_current = msf_to_lbafm(lba1);
-	state->m_towns_cd.cdda_length = msf_to_lbafm(lba2) - state->m_towns_cd.cdda_current;
+	lba1 = m_towns_cd.parameter[7] << 16;
+	lba1 += m_towns_cd.parameter[6] << 8;
+	lba1 += m_towns_cd.parameter[5];
+	lba2 = m_towns_cd.parameter[4] << 16;
+	lba2 += m_towns_cd.parameter[3] << 8;
+	lba2 += m_towns_cd.parameter[2];
+	m_towns_cd.cdda_current = msf_to_lbafm(lba1);
+	m_towns_cd.cdda_length = msf_to_lbafm(lba2) - m_towns_cd.cdda_current;
 
-	cdda_set_cdrom(cdda,device->get_cdrom_file());
-	cdda_start_audio(cdda,state->m_towns_cd.cdda_current,state->m_towns_cd.cdda_length);
-	logerror("CD: CD-DA start from LBA:%i length:%i\n",state->m_towns_cd.cdda_current,state->m_towns_cd.cdda_length);
-	if(state->m_towns_cd.command & 0x20)
+	cdda_set_cdrom(m_cdda,device->get_cdrom_file());
+	cdda_start_audio(m_cdda,m_towns_cd.cdda_current,m_towns_cd.cdda_length);
+	logerror("CD: CD-DA start from LBA:%i length:%i\n",m_towns_cd.cdda_current,m_towns_cd.cdda_length);
+	if(m_towns_cd.command & 0x20)
 	{
-		state->m_towns_cd.extra_status = 1;
-		towns_cd_set_status(device->machine(),0x00,0x03,0x00,0x00);
+		m_towns_cd.extra_status = 1;
+		towns_cd_set_status(0x00,0x03,0x00,0x00);
 	}
 }
 
-TIMER_CALLBACK_MEMBER(towns_state::towns_delay_cdda)
+void towns_state::towns_delay_cdda(cdrom_image_device* dev)
 {
-	towns_cdrom_play_cdda((cdrom_image_device*)ptr);
+	towns_cdrom_play_cdda(dev);
 }
 
-static void towns_cdrom_execute_command(cdrom_image_device* device)
+void towns_state::towns_cdrom_execute_command(cdrom_image_device* device)
 {
-	towns_state* state = device->machine().driver_data<towns_state>();
-
 	if(device->get_cdrom_file() == NULL)
 	{  // No CD in drive
-		if(state->m_towns_cd.command & 0x20)
+		if(m_towns_cd.command & 0x20)
 		{
-			state->m_towns_cd.extra_status = 0;
-			towns_cd_set_status(device->machine(),0x10,0x00,0x00,0x00);
+			m_towns_cd.extra_status = 0;
+			towns_cd_set_status(0x10,0x00,0x00,0x00);
 		}
 	}
 	else
 	{
-		state->m_towns_cd.status &= ~0x02;
-		switch(state->m_towns_cd.command & 0x9f)
+		m_towns_cd.status &= ~0x02;
+		switch(m_towns_cd.command & 0x9f)
 		{
 			case 0x00:  // Seek
-				if(state->m_towns_cd.command & 0x20)
+				if(m_towns_cd.command & 0x20)
 				{
-					state->m_towns_cd.extra_status = 1;
-					towns_cd_set_status(device->machine(),0x00,0x00,0x00,0x00);
+					m_towns_cd.extra_status = 1;
+					towns_cd_set_status(0x00,0x00,0x00,0x00);
 				}
 				logerror("CD: Command 0x00: SEEK\n");
 				break;
 			case 0x01:  // unknown
-				if(state->m_towns_cd.command & 0x20)
+				if(m_towns_cd.command & 0x20)
 				{
-					state->m_towns_cd.extra_status = 0;
-					towns_cd_set_status(device->machine(),0x00,0xff,0xff,0xff);
+					m_towns_cd.extra_status = 0;
+					towns_cd_set_status(0x00,0xff,0xff,0xff);
 				}
 				logerror("CD: Command 0x01: unknown\n");
 				break;
@@ -1629,69 +1629,70 @@ static void towns_cdrom_execute_command(cdrom_image_device* device)
 				break;
 			case 0x04:  // Play Audio Track
 				logerror("CD: Command 0x04: PLAY CD-DA\n");
-				device->machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(towns_state::towns_delay_cdda),state), 0, device);
+				m_towns_cdda_timer->set_ptr(device);
+				m_towns_cdda_timer->adjust(attotime::from_msec(1),0,attotime::never);
 				break;
 			case 0x05:  // Read TOC
 				logerror("CD: Command 0x05: READ TOC\n");
-				state->m_towns_cd.extra_status = 1;
-				towns_cd_set_status(device->machine(),0x00,0x00,0x00,0x00);
+				m_towns_cd.extra_status = 1;
+				towns_cd_set_status(0x00,0x00,0x00,0x00);
 				break;
 			case 0x06:  // Read CD-DA state?
 				logerror("CD: Command 0x06: READ CD-DA STATE\n");
-				state->m_towns_cd.extra_status = 1;
-				towns_cd_set_status(device->machine(),0x00,0x00,0x00,0x00);
+				m_towns_cd.extra_status = 1;
+				towns_cd_set_status(0x00,0x00,0x00,0x00);
 				break;
 			case 0x80:  // set state
 				logerror("CD: Command 0x80: set state\n");
-				if(state->m_towns_cd.command & 0x20)
+				if(m_towns_cd.command & 0x20)
 				{
-					state->m_towns_cd.extra_status = 0;
-					if(cdda_audio_active(state->m_cdda) && !cdda_audio_paused(state->m_cdda))
-						towns_cd_set_status(device->machine(),0x00,0x03,0x00,0x00);
+					m_towns_cd.extra_status = 0;
+					if(cdda_audio_active(m_cdda) && !cdda_audio_paused(m_cdda))
+						towns_cd_set_status(0x00,0x03,0x00,0x00);
 					else
-						towns_cd_set_status(device->machine(),0x00,0x01,0x00,0x00);
+						towns_cd_set_status(0x00,0x01,0x00,0x00);
 
 				}
 				break;
 			case 0x81:  // set state (CDDASET)
-				if(state->m_towns_cd.command & 0x20)
+				if(m_towns_cd.command & 0x20)
 				{
-					state->m_towns_cd.extra_status = 0;
-					towns_cd_set_status(device->machine(),0x00,0x00,0x00,0x00);
+					m_towns_cd.extra_status = 0;
+					towns_cd_set_status(0x00,0x00,0x00,0x00);
 				}
 				logerror("CD: Command 0x81: set state (CDDASET)\n");
 				break;
 			case 0x84:   // Stop CD audio track  -- generates no status output?
-				if(state->m_towns_cd.command & 0x20)
+				if(m_towns_cd.command & 0x20)
 				{
-					state->m_towns_cd.extra_status = 1;
-					towns_cd_set_status(device->machine(),0x00,0x00,0x00,0x00);
+					m_towns_cd.extra_status = 1;
+					towns_cd_set_status(0x00,0x00,0x00,0x00);
 				}
-				cdda_pause_audio(state->m_cdda,1);
+				cdda_pause_audio(m_cdda,1);
 				logerror("CD: Command 0x84: STOP CD-DA\n");
 				break;
 			case 0x85:   // Stop CD audio track (difference from 0x84?)
-				if(state->m_towns_cd.command & 0x20)
+				if(m_towns_cd.command & 0x20)
 				{
-					state->m_towns_cd.extra_status = 1;
-					towns_cd_set_status(device->machine(),0x00,0x00,0x00,0x00);
+					m_towns_cd.extra_status = 1;
+					towns_cd_set_status(0x00,0x00,0x00,0x00);
 				}
-				cdda_pause_audio(state->m_cdda,1);
+				cdda_pause_audio(m_cdda,1);
 				logerror("CD: Command 0x85: STOP CD-DA\n");
 				break;
 			case 0x87:  // Resume CD-DA playback
-				if(state->m_towns_cd.command & 0x20)
+				if(m_towns_cd.command & 0x20)
 				{
-					state->m_towns_cd.extra_status = 1;
-					towns_cd_set_status(device->machine(),0x00,0x03,0x00,0x00);
+					m_towns_cd.extra_status = 1;
+					towns_cd_set_status(0x00,0x03,0x00,0x00);
 				}
-				cdda_pause_audio(state->m_cdda,0);
+				cdda_pause_audio(m_cdda,0);
 				logerror("CD: Command 0x87: RESUME CD-DA\n");
 				break;
 			default:
-				state->m_towns_cd.extra_status = 0;
-				towns_cd_set_status(device->machine(),0x10,0x00,0x00,0x00);
-				logerror("CD: Unknown or unimplemented command %02x\n",state->m_towns_cd.command);
+				m_towns_cd.extra_status = 0;
+				towns_cd_set_status(0x10,0x00,0x00,0x00);
+				logerror("CD: Unknown or unimplemented command %02x\n",m_towns_cd.command);
 		}
 	}
 }
@@ -1726,16 +1727,16 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 					switch(m_towns_cd.command & 0x9f)
 					{
 						case 0x00:  // seek
-							towns_cd_set_status(space.machine(),0x04,0x00,0x00,0x00);
+							towns_cd_set_status(0x04,0x00,0x00,0x00);
 							m_towns_cd.extra_status = 0;
 							break;
 						case 0x02:  // read
 							if(m_towns_cd.extra_status == 2)
-								towns_cd_set_status(space.machine(),0x22,0x00,0x00,0x00);
+								towns_cd_set_status(0x22,0x00,0x00,0x00);
 							m_towns_cd.extra_status = 0;
 							break;
 						case 0x04:  // play cdda
-							towns_cd_set_status(space.machine(),0x07,0x00,0x00,0x00);
+							towns_cd_set_status(0x07,0x00,0x00,0x00);
 							m_towns_cd.extra_status = 0;
 							break;
 						case 0x05:  // read toc
@@ -1743,21 +1744,21 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 							{
 								case 1:
 								case 3:
-									towns_cd_set_status(space.machine(),0x16,0x00,0x00,0x00);
+									towns_cd_set_status(0x16,0x00,0x00,0x00);
 									m_towns_cd.extra_status++;
 									break;
 								case 2: // st1 = first track number (BCD)
-									towns_cd_set_status(space.machine(),0x17,0x01,0x00,0x00);
+									towns_cd_set_status(0x17,0x01,0x00,0x00);
 									m_towns_cd.extra_status++;
 									break;
 								case 4: // st1 = last track number (BCD)
-									towns_cd_set_status(space.machine(),0x17,
+									towns_cd_set_status(0x17,
 										byte_to_bcd(cdrom_get_last_track(m_cdrom->get_cdrom_file())),
 										0x00,0x00);
 									m_towns_cd.extra_status++;
 									break;
 								case 5:  // st1 = control/adr of track 0xaa?
-									towns_cd_set_status(space.machine(),0x16,
+									towns_cd_set_status(0x16,
 										cdrom_get_adr_control(m_cdrom->get_cdrom_file(),0xaa),
 										0xaa,0x00);
 									m_towns_cd.extra_status++;
@@ -1765,14 +1766,14 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 								case 6:  // st1/2/3 = address of track 0xaa? (BCD)
 									addr = cdrom_get_track_start(m_cdrom->get_cdrom_file(),0xaa);
 									addr = lba_to_msf(addr);
-									towns_cd_set_status(space.machine(),0x17,
+									towns_cd_set_status(0x17,
 										(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
 									m_towns_cd.extra_status++;
 									break;
 								default:  // same as case 5 and 6, but for each individual track
 									if(m_towns_cd.extra_status & 0x01)
 									{
-										towns_cd_set_status(space.machine(),0x16,
+										towns_cd_set_status(0x16,
 											((cdrom_get_adr_control(m_cdrom->get_cdrom_file(),(m_towns_cd.extra_status/2)-3) & 0x0f) << 4)
 											| ((cdrom_get_adr_control(m_cdrom->get_cdrom_file(),(m_towns_cd.extra_status/2)-3) & 0xf0) >> 4),
 											(m_towns_cd.extra_status/2)-3,0x00);
@@ -1782,7 +1783,7 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 									{
 										addr = cdrom_get_track_start(m_cdrom->get_cdrom_file(),(m_towns_cd.extra_status/2)-4);
 										addr = lba_to_msf(addr);
-										towns_cd_set_status(space.machine(),0x17,
+										towns_cd_set_status(0x17,
 											(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
 										if(((m_towns_cd.extra_status/2)-3) >= cdrom_get_last_track(m_cdrom->get_cdrom_file()))
 										{
@@ -1798,39 +1799,39 @@ READ8_MEMBER(towns_state::towns_cdrom_r)
 							switch(m_towns_cd.extra_status)
 							{
 								case 1:  // st2 = track number
-									towns_cd_set_status(space.machine(),0x18,
+									towns_cd_set_status(0x18,
 										0x00,towns_cd_get_track(space.machine()),0x00);
 									m_towns_cd.extra_status++;
 									break;
 								case 2:  // st0/1/2 = MSF from beginning of current track
 									addr = cdda_get_audio_lba(m_cdda);
 									addr = lba_to_msf(addr - m_towns_cd.cdda_current);
-									towns_cd_set_status(space.machine(),0x19,
+									towns_cd_set_status(0x19,
 										(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
 									m_towns_cd.extra_status++;
 									break;
 								case 3:  // st1/2 = current MSF
 									addr = cdda_get_audio_lba(m_cdda);
 									addr = lba_to_msf(addr);  // this data is incorrect, but will do until exact meaning is found
-									towns_cd_set_status(space.machine(),0x19,
+									towns_cd_set_status(0x19,
 										0x00,(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8);
 									m_towns_cd.extra_status++;
 									break;
 								case 4:
 									addr = cdda_get_audio_lba(m_cdda);
 									addr = lba_to_msf(addr);  // this data is incorrect, but will do until exact meaning is found
-									towns_cd_set_status(space.machine(),0x20,
+									towns_cd_set_status(0x20,
 										addr & 0x0000ff,0x00,0x00);
 									m_towns_cd.extra_status = 0;
 									break;
 							}
 							break;
 						case 0x84:
-							towns_cd_set_status(space.machine(),0x11,0x00,0x00,0x00);
+							towns_cd_set_status(0x11,0x00,0x00,0x00);
 							m_towns_cd.extra_status = 0;
 							break;
 						case 0x85:
-							towns_cd_set_status(space.machine(),0x12,0x00,0x00,0x00);
+							towns_cd_set_status(0x12,0x00,0x00,0x00);
 							m_towns_cd.extra_status = 0;
 							break;
 					}
@@ -2564,6 +2565,8 @@ void towns_state::driver_start()
 	m_towns_wait_timer = timer_alloc(TIMER_WAIT);
 	m_towns_freerun_counter = timer_alloc(TIMER_FREERUN);
 	m_towns_intervaltimer2 = timer_alloc(TIMER_INTERVAL2);
+	m_towns_status_timer = timer_alloc(TIMER_CDSTATUS);
+	m_towns_cdda_timer = timer_alloc(TIMER_CDDA);
 
 	// CD-ROM init
 	m_towns_cd.read_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(towns_state::towns_cdrom_read_byte),this), (void*)machine().device("dma_1"));
@@ -2856,7 +2859,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( townssj, towns )
 
-	MCFG_CPU_REPLACE("maincpu",I486, 66000000)
+	MCFG_CPU_REPLACE("maincpu",PENTIUM, 66000000)
 	MCFG_CPU_PROGRAM_MAP(towns_mem)
 	MCFG_CPU_IO_MAP(towns_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", towns_state,  towns_vsync_irq)

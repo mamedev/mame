@@ -149,6 +149,8 @@ class towns_state : public driver_device
 	UINT8 m_timer1;
 
 	emu_timer* m_towns_wait_timer;
+	emu_timer* m_towns_status_timer;
+	emu_timer* m_towns_cdda_timer;
 	struct towns_cdrom_controller m_towns_cd;
 	struct towns_video_controller m_video;
 
@@ -248,17 +250,23 @@ private:
 	static const device_timer_id TIMER_KEYBOARD = 3;
 	static const device_timer_id TIMER_MOUSE = 4;
 	static const device_timer_id TIMER_WAIT = 5;
+	static const device_timer_id TIMER_CDSTATUS = 6;
+	static const device_timer_id TIMER_CDDA = 7;
 	void rtc_second();
 	void freerun_inc();
 	void intervaltimer2_timeout();
 	void poll_keyboard();
 	void mouse_timeout();
 	void wait_end();
+	void towns_cd_set_status(UINT8 st0, UINT8 st1, UINT8 st2, UINT8 st3);
+	void towns_cdrom_execute_command(cdrom_image_device* device);
+	void towns_cdrom_play_cdda(cdrom_image_device* device);
+	void towns_cdrom_read(cdrom_image_device* device);
+	void towns_cd_status_ready();
+	void towns_delay_cdda(cdrom_image_device* dev);
 public:
 	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
-	TIMER_CALLBACK_MEMBER(towns_cd_status_ready);
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
-	TIMER_CALLBACK_MEMBER(towns_delay_cdda);
 	TIMER_CALLBACK_MEMBER(towns_sprite_done);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);
 	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
