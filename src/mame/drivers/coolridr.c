@@ -481,6 +481,7 @@ public:
 	int m_gfx_index;
 	int m_color_bank;
 	UINT32 m_rgb_ctrl[2];
+	UINT32 m_pen_fill[2];
 
 	osd_work_queue *    m_work_queue[2]; // work queue, one per screen
 	static void *draw_tile_row_threaded(void *param, int threadid);
@@ -567,22 +568,34 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 	base_offset = (which * 0x20000)/2;
 	m_color_bank = which * 2;
 
- 	for (int y=0;y<64;y++)
- 	{
-		for (int x=0;x<128;x++)
+	if(m_pen_fill[which])
+	{
+		int bg_r,bg_g,bg_b;
+		/* logic here is a bit of a guess. */
+		bg_r = (((m_pen_fill[which] >> 16) & 0x7f) << 1) | (((m_pen_fill[which] >> 16) & 0x80) >> 7);
+		bg_g = (((m_pen_fill[which] >> 8) & 0x7f) << 1) | (((m_pen_fill[which] >> 8) & 0x80) >> 7);
+		bg_b = (((m_pen_fill[which] >> 0) & 0x7f) << 1) | (((m_pen_fill[which] >> 0) & 0x80) >> 7);
+		bitmap.fill(MAKE_ARGB(0xff,bg_r,bg_g,bg_b),cliprect);
+	}
+	else
+	{
+ 		for (int y=0;y<64;y++)
  		{
- 			int res_x,res_y;
+			for (int x=0;x<128;x++)
+ 			{
+ 				int res_x,res_y;
 
-			res_x = (x*16)-scrollx;
- 			res_y = (y*16)-scrolly;
+				res_x = (x*16)-scrollx;
+ 				res_y = (y*16)-scrolly;
 
-			tile = (m_h1_vram[x+y*128+base_offset] & 0x0fff);
-			color = m_color_bank + ((tile & 0x800) >> 11) * 4;
+				tile = (m_h1_vram[x+y*128+base_offset] & 0x0fff);
+				color = m_color_bank + ((tile & 0x800) >> 11) * 4;
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y+1024);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y+1024);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y+1024);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y+1024);
+			}
 		}
 	}
 
@@ -1913,13 +1926,15 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 
 			case 0x04: /* init - value 0x040c80d2 (unknown purpose, slave mode?) */
 			case 0x10: /* sets up look-up for tilemap video registers */
-			case 0x20: /* unknown table */
-			case 0x24: /* unknown table */
-			case 0x30: /* screen 1 - 0x80 at boot, then 0x808080  */
-			case 0x34: /* screen 2 / */
+			case 0x20: /* screen 1 - linescroll/zoom table? (default values) */
+			case 0x24: /* screen 2 / */
 			case 0x50: /* screen 1 - unknown */
 			case 0x54: /* screen 2 / */
-				//printf("%02x %08x\n",cmd,m_framebuffer_vram[(0+dma_index)/4]);
+				dma_index+=4;
+				break;
+			case 0x30: /* screen 1 - 0x80 at boot, then 0x808080  */
+			case 0x34: /* screen 2 / */
+				m_pen_fill[(cmd & 4) >> 2] = m_framebuffer_vram[(0+dma_index)/4] & 0xffffff;
 				dma_index+=4;
 				break;
 			case 0x40: /* screen 1 - almost certainly RGB brightness (at least bits 4 - 0) */
