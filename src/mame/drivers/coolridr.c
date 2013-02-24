@@ -540,10 +540,21 @@ void coolridr_state::video_start()
 /* 0x00000 - 0x1ffff = screen 1 */
 /* 0x20000 - 0x3ffff = screen 2 */
 /* 0x40000 - 0xfffff = ? */
+/*
+	vregs are setted up with one of DMA commands (see below)
+	0x3e09b80 screen 1 base, 0x3e9bc0 screen 2 base
+	[+0x1c] ---- ---- ---- ---- ---- ---- ---- -x-- disabled on screen 1, enabled on screen 2 (tile offset start?)
+	[+0x1c] ---- ---- ---- ---- ---- ---- ---- ---x Enabled on bike select screen in tandem with +0x3c, solid pen fill?
+	[+0x2c] ---- -xxx xxxx xxxx ---- --yy yyyy yyyy scrolling registers
+	[+0x34] 1111 1111 2222 2222 3333 3333 4444 4444 - Almost surely Sega "map" registers
+	[+0x38] 5555 5555 6666 6666 7777 7777 8888 8888 /
+	[+0x3c] ---- ---- ---- ---- xxxx xxxx xxxx xxxx 0x11b8 on bike select, solid pen value?
+	(everything else is unknown at current time)
+*/
+
 UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
 	/* planes seems to basically be at 0x8000 and 0x28000... */
-#if 1
 	UINT32 base_offset;
 	int tile,color;
 	int scrollx;
@@ -575,7 +586,6 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 		}
 	}
 
-#endif
 	if (which==0)
 	{
 		// will probably need a custom function
@@ -1802,7 +1812,7 @@ void coolridr_state::flush_pal_data( UINT16 offset )
 		if(g < 0) { g = 0; }
 		if(b < 0) { b = 0; }
 	}
-	else if(rgb_setting == 0x920) /* at bike select, addition */
+	else if(rgb_setting == 0x920) /* at bike select / outside tunnels, addition */
 	{
 		r += rgb_gradient;
 		g += rgb_gradient;
