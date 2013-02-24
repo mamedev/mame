@@ -364,7 +364,8 @@ at 0xDE60.
 #include "machine/nvram.h"
 #include "rendlay.h"
 
-
+#define CLIPWIDTH (496-1)
+#define CLIPHIGH (384-1)
 
 class coolridr_state : public driver_device
 {
@@ -529,6 +530,7 @@ void coolridr_state::video_start()
 UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
 	/* planes seems to basically be at 0x8000 and 0x28000... */
+#if 1
 	UINT32 base_offset;
 	int xsrc,ysrc,ydst,xdst;
 	int xisrc,yisrc;
@@ -595,7 +597,7 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 			bitmap.pix32(ydst, xdst) = r<<16 | g<<8 | b;
 		}
 	}
-
+#endif
 	if (which==0)
 	{
 		// will probably need a custom function
@@ -714,16 +716,21 @@ struct cool_render_object
 		if (!hZoomTable[realy]) \
 			continue;	 \
 		const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40; \
+		const int pixelOffsetnextX = ((hPositionTable[realy]) + ((h+1)* 16 * hZoomTable[realy])) / 0x40; \
 		const int drawy = pixelOffsetY+y; \
-		if ((drawy>383) || (drawy<0)) continue; \
+		if ((drawy>CLIPHIGH) || (drawy<0)) continue; \
 		line = &drawbitmap->pix32(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
-		int blockwide = ((16*hZoomTable[realy])/0x40); \
+		int blockwide = pixelOffsetnextX-pixelOffsetX; \
+		if (pixelOffsetX+blockwide <0) \
+			continue; \
+		if (pixelOffsetX>CLIPWIDTH) \
+			continue; \
 		UINT32 incx = 0x8000000 / hZoomTable[realy]; \
 		for (int x = 0; x < blockwide; x++) \
 		{ \
 			const int drawx = pixelOffsetX+x; \
-			if ((drawx>495 || drawx<0)) continue; \
+			if ((drawx>CLIPWIDTH || drawx<0)) continue; \
 			int realx = ((x*incx)>>21); \
 
 #define YXLOOP_END \
@@ -736,13 +743,26 @@ struct cool_render_object
 	{ \
 		int realy = ((y*incy)>>21); \
 		const int drawy = pixelOffsetY+y; \
-		if ((drawy>383) || (drawy<0)) continue; \
+		if ((drawy>CLIPHIGH) || (drawy<0)) continue; \
 		line = &drawbitmap->pix32(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
 		for (int x = 0; x < blockwide; x++) \
 		{ \
 			const int drawx = pixelOffsetX+x; \
-			if ((drawx>495 || drawx<0)) continue; \
+			if ((drawx>CLIPWIDTH || drawx<0)) continue; \
+			int realx = ((x*incx)>>21); \
+
+#define YXLOOP_START_NO_LINEZOOM_NO_XCLIP \
+	for (int y = 0; y < blockhigh; y++) \
+	{ \
+		int realy = ((y*incy)>>21); \
+		const int drawy = pixelOffsetY+y; \
+		if ((drawy>CLIPHIGH) || (drawy<0)) continue; \
+		line = &drawbitmap->pix32(drawy); \
+		zline = &object->zbitmap->pix16(drawy); \
+		for (int x = 0; x < blockwide; x++) \
+		{ \
+			const int drawx = pixelOffsetX+x; \
 			int realx = ((x*incx)>>21); \
 
 
@@ -750,15 +770,24 @@ struct cool_render_object
 	for (int y = 0; y < 16; y++) \
 	{ \
 		const int drawy = pixelOffsetY+y; \
-		if ((drawy>383) || (drawy<0)) continue; \
+		if ((drawy>CLIPHIGH) || (drawy<0)) continue; \
 		line = &drawbitmap->pix32(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
 		for (int x = 0; x < 16; x++) \
 		{ \
 			const int drawx = pixelOffsetX+x; \
-			if ((drawx>495 || drawx<0)) continue; \
+			if ((drawx>CLIPWIDTH || drawx<0)) continue; \
 
-
+#define YXLOOP_START_NO_ZOOM_NO_XCLIP \
+	for (int y = 0; y < 16; y++) \
+	{ \
+		const int drawy = pixelOffsetY+y; \
+		if ((drawy>CLIPHIGH) || (drawy<0)) continue; \
+		line = &drawbitmap->pix32(drawy); \
+		zline = &object->zbitmap->pix16(drawy); \
+		for (int x = 0; x < 16; x++) \
+		{ \
+			const int drawx = pixelOffsetX+x; \
 
 
 
@@ -781,7 +810,7 @@ TODO: fix anything that isn't text.
 				int r,g,b; \
 				r = pal5bit((pix >> 10) & 0x1f); \
 				g = pal5bit((pix >> 5) & 0x1f); \
-				b = pal5bit((pix >> 0) & 0x1f); \
+				 b = pal5bit((pix >> 0) & 0x1f); \
 				line[drawx] = r<<16 | g<<8 | b; \
 				zline[drawx] = object->zpri; \
 			} \
@@ -913,6 +942,22 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 	UINT16 vZoom = (object->spriteblit[8] & 0xffff0000) >> 16;
 	UINT16 hZoom = (object->spriteblit[8] & 0x0000ffff);
 
+	// if we have no vertical zoom value there's no point in going any further
+	// because there are no known vertical indirect modes
+	if (!vZoom)
+	{
+		// abort, but make sure we clean up
+		if (object->indirect_tiles)
+			free(object->indirect_tiles);
+
+		if (object->indirect_zoom)
+			free(object->indirect_zoom);
+
+		free (object);
+
+		return NULL;
+	}
+
 	/************* object->spriteblit[9] *************/
 
 	int vPosition = (object->spriteblit[9] & 0xffff0000) >> 16;
@@ -991,8 +1036,16 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 
 
 		const int pixelOffsetY = ((vPosition) + (v* 16 * vZoom)) / 0x40;
+		const int pixelOffsetnextY = ((vPosition) + ((v+1)* 16 * vZoom)) / 0x40;
 
-		if (pixelOffsetY>383)
+		int blockhigh = pixelOffsetnextY - pixelOffsetY;
+
+		if (pixelOffsetY+blockhigh<0)
+			continue;
+
+
+
+		if (pixelOffsetY>CLIPHIGH)
 		{
 			v = used_vCellCount;
 			continue;
@@ -1079,7 +1132,7 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 			if (!indirect_zoom_enable)
 			{
 			//	int offs = ((hPosition) + (h* 16 * hZoom)) / 0x40;
-			//	if (offs>495) continue;
+			//	if (offs>CLIPWIDTH) continue;
 			}
 
 			UINT32 lastSpriteNumber = 0xffffffff;
@@ -1166,13 +1219,8 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 			if (blankcount==0)
 				continue;
 
-			if (!vZoom)
-			{
-				// abort, but make sure we clean up
-				goto end;
-			}
 
-			int blockhigh = ((16*vZoom)/0x40);
+
 
 
 
@@ -1212,40 +1260,94 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 				{
 					const int pixelOffsetX = ((hPosition/0x40) + (h* 16));
 
-					if (blit_rotate)
+					if (pixelOffsetX+16 < 0)
+						continue;
+
+					if (pixelOffsetX>CLIPWIDTH)
+						continue;
+
+					if (pixelOffsetX>=0 && pixelOffsetX+16<CLIPWIDTH)
 					{
-						YXLOOP_START_NO_ZOOM
-						UINT16 pix = tempshape[x*16+y];
-						DRAW_PIX
-						YXLOOP_END
+						if (blit_rotate)
+						{
+							YXLOOP_START_NO_ZOOM_NO_XCLIP
+							UINT16 pix = tempshape[x*16+y];
+							DRAW_PIX
+							YXLOOP_END
+						}
+						else // no rotate
+						{
+							YXLOOP_START_NO_ZOOM_NO_XCLIP
+							UINT16 pix = tempshape[y*16+x];
+							DRAW_PIX
+							YXLOOP_END
+						}
 					}
-					else // no rotate
+					else
 					{
-						YXLOOP_START_NO_ZOOM
-						UINT16 pix = tempshape[y*16+x];
-						DRAW_PIX
-						YXLOOP_END
+						if (blit_rotate)
+						{
+							YXLOOP_START_NO_ZOOM
+							UINT16 pix = tempshape[x*16+y];
+							DRAW_PIX
+							YXLOOP_END
+						}
+						else // no rotate
+						{
+							YXLOOP_START_NO_ZOOM
+							UINT16 pix = tempshape[y*16+x];
+							DRAW_PIX
+							YXLOOP_END
+						}
 					}
 				}
 				else // zoomed
 				{
 					const int pixelOffsetX = ((hPosition) + (h* 16 * hZoom)) / 0x40;
-					int blockwide = ((16*hZoom)/0x40);
+					const int pixelOffsetnextX = ((hPosition) + ((h+1)* 16 * hZoom)) / 0x40;
+
+					int blockwide = pixelOffsetnextX-pixelOffsetX;
 					UINT32 incx = 0x8000000 / hZoom;
 
-					if (blit_rotate)
+					if (pixelOffsetX+blockwide < 0)
+						continue;
+
+					if (pixelOffsetX>CLIPWIDTH)
+						continue;
+
+					if (pixelOffsetX>=0 && pixelOffsetX+blockwide<CLIPWIDTH)
 					{
-						YXLOOP_START_NO_LINEZOOM
-						UINT16 pix = tempshape[realx*16+realy];
-						DRAW_PIX
-						YXLOOP_END
+						if (blit_rotate)
+						{
+							YXLOOP_START_NO_LINEZOOM_NO_XCLIP
+							UINT16 pix = tempshape[realx*16+realy];
+							DRAW_PIX
+							YXLOOP_END
+						}
+						else // no rotate
+						{
+							YXLOOP_START_NO_LINEZOOM_NO_XCLIP
+							UINT16 pix = tempshape[realy*16+realx];
+							DRAW_PIX
+							YXLOOP_END
+						}
 					}
-					else // no rotate
+					else
 					{
-						YXLOOP_START_NO_LINEZOOM
-						UINT16 pix = tempshape[realy*16+realx];
-						DRAW_PIX
-						YXLOOP_END
+						if (blit_rotate)
+						{
+							YXLOOP_START_NO_LINEZOOM
+							UINT16 pix = tempshape[realx*16+realy];
+							DRAW_PIX
+							YXLOOP_END
+						}
+						else // no rotate
+						{
+							YXLOOP_START_NO_LINEZOOM
+							UINT16 pix = tempshape[realy*16+realx];
+							DRAW_PIX
+							YXLOOP_END
+						}
 					}
 				} // end zoomed
 			} // end no indirect zoom
@@ -2597,13 +2699,13 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383)
+	MCFG_SCREEN_VISIBLE_AREA(0,CLIPWIDTH, 0, CLIPHIGH)
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr1)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0,495, 0, 383)
+	MCFG_SCREEN_VISIBLE_AREA(0,CLIPWIDTH, 0, CLIPHIGH)
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr2)
 
 	MCFG_PALETTE_LENGTH(0x10000)
