@@ -499,7 +499,7 @@ public:
 static const gfx_layout h1_tile_layout =
 {
 	16,16,
-	0x800,
+	0x1000,
 	8,
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120 },
@@ -544,29 +544,17 @@ void coolridr_state::video_start()
 /*
 	vregs are setted up with one of DMA commands (see below)
 	0x3e09b80 screen 1 base, 0x3e9bc0 screen 2 base
-	[+0x1c] ---- ---- ---- ---- ---- ---- ---- -x-- disabled on screen 1, enabled on screen 2 (tile offset start?)
-	[+0x1c] ---- ---- ---- ---- ---- ---- ---- ---x Enabled on bike select screen in tandem with +0x3c, solid pen fill?
+	[+0x1c] ---- ---- ---- ---- ---- ---- ---- -xxx tile offset start * 0x8000
 	[+0x2c] ---- -xxx xxxx xxxx ---- --yy yyyy yyyy scrolling registers
 	[+0x34] 1111 1111 2222 2222 3333 3333 4444 4444 - Almost surely Sega "map" registers
 	[+0x38] 5555 5555 6666 6666 7777 7777 8888 8888 /
-	[+0x3c] ---- ---- ---- ---- xxxx xxxx xxxx xxxx 0x11b8 on bike select, solid pen value?
+	[+0x3c] x--- ---- ---- ---- xxxx xxxx xxxx xxxx 0x11b8 on bike select, 0xffffffff otherwise, transparent pen value?
 	(everything else is unknown at current time)
 */
 
 UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
 	/* planes seems to basically be at 0x8000 and 0x28000... */
-	UINT32 base_offset;
-	int tile,color;
-	int scrollx;
-	int scrolly;
-	gfx_element *gfx = machine().gfx[m_gfx_index];
-
-	scrollx = (m_framebuffer_vram[(0x9bac+which*0x40)/4] >> 16) & 0x7ff;
-	scrolly = m_framebuffer_vram[(0x9bac+which*0x40)/4] & 0x3ff;
-
-	base_offset = (which * 0x20000)/2;
-	m_color_bank = which * 2;
 
 	if(m_pen_fill[which])
 	{
@@ -579,6 +567,25 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 	}
 	else
 	{
+		UINT32 base_offset;
+		int tile,vram_data,color;
+		int scrollx;
+		int scrolly;
+		UINT8 transpen_setting;
+		gfx_element *gfx = machine().gfx[m_gfx_index];
+		#define VREG(_offs) \
+			m_framebuffer_vram[(0x9b80+_offs+which*0x40)/4]
+
+		scrollx = (VREG(0x2c) >> 16) & 0x7ff;
+		scrolly = VREG(0x2c) & 0x3ff;
+
+		base_offset = (VREG(0x1c) * 0x8000)/2;
+		m_color_bank = which * 2;
+		/* TODO: the whole transpen logic might be incorrect */
+		transpen_setting = (VREG(0x3c) & 0x80000000) >> 31;
+
+		bitmap.fill(MAKE_ARGB(0xff,(VREG(0x3c) >> 16) & 0xff,(VREG(0x3c) >> 8) & 0xff,VREG(0x3c) & 0xff),cliprect);
+
  		for (int y=0;y<64;y++)
  		{
 			for (int x=0;x<128;x++)
@@ -588,13 +595,15 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 				res_x = (x*16)-scrollx;
  				res_y = (y*16)-scrolly;
 
-				tile = (m_h1_vram[x+y*128+base_offset] & 0x0fff);
-				color = m_color_bank + ((tile & 0x800) >> 11) * 4;
+				vram_data = (m_h1_vram[x+y*128+base_offset] & 0xffff);
+				color = m_color_bank + ((vram_data & 0x800) >> 11) * 4;
+				/* bike select enables bits 15-12, pretty sure one of these is tile bank (because there's a solid pen on 0x3ff / 0x7ff). */
+				tile = (vram_data & 0x7ff) | ((vram_data & 0x8000) >> 4);
 
-				drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y);
-				drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y);
-				drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x,res_y+1024);
-				drawgfx_opaque(bitmap,cliprect,gfx,tile & 0x7ff,color,0,0,res_x+2048,res_y+1024);
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y,transpen_setting ? -1 : 0);
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y,transpen_setting ? -1 : 0);
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y+1024,transpen_setting ? -1 : 0);
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y+1024,transpen_setting ? -1 : 0);
 			}
 		}
 	}
