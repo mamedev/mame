@@ -297,8 +297,8 @@ They can run the same software and accept the same devices and extensions.
 
 static ADDRESS_MAP_START ( to7, AS_PROGRAM, 8, thomson_state )
 
-	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE_LEGACY(to7_cartridge_w ) /* 4 * 16 KB */
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE_LEGACY(to7_vram_w )
+	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE(to7_cartridge_w ) /* 4 * 16 KB */
+	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to7_vram_w )
 	AM_RANGE ( 0x6000, 0x7fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 1 * 8 KB */
 	AM_RANGE ( 0x8000, 0xbfff ) AM_NOP       /* 16 KB (for extension) */
 	AM_RANGE ( 0xc000, 0xdfff ) AM_NOP       /*  8 KB (for extension) */
@@ -306,12 +306,12 @@ static ADDRESS_MAP_START ( to7, AS_PROGRAM, 8, thomson_state )
 	AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
 	AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
 	AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE_LEGACY(to7_floppy_r, to7_floppy_w )
+	AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE(to7_floppy_r, to7_floppy_w )
 	AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE( "pia_2", pia6821_device, read_alt, write_alt )
 	AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
 	AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
+	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE(to7_modem_mea8000_r, to7_modem_mea8000_w )
 	AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
@@ -563,6 +563,12 @@ static INPUT_PORTS_START ( t9000 )
 	PORT_INCLUDE ( to7 )
 INPUT_PORTS_END
 
+static WRITE_LINE_DEVICE_HANDLER(thomson_index_callback)
+{
+    device->machine().driver_data<thomson_state>()->thomson_index_callback(device, state);
+}
+
+
 static const floppy_interface thomson_floppy_interface =
 {
 	DEVCB_LINE(thomson_index_callback),
@@ -615,8 +621,8 @@ const serial_image_interface to7_modem_config =
 
 static MACHINE_CONFIG_START( to7, thomson_state )
 
-	MCFG_MACHINE_START ( to7 )
-	MCFG_MACHINE_RESET ( to7 )
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, to7 )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to7 )
 
 /* cpu */
 	MCFG_CPU_ADD ( "maincpu", M6809, 1000000 )
@@ -628,12 +634,12 @@ static MACHINE_CONFIG_START( to7, thomson_state )
 	MCFG_SCREEN_SIZE ( THOM_TOTAL_WIDTH * 2, THOM_TOTAL_HEIGHT )
 	MCFG_SCREEN_VISIBLE_AREA ( 0, THOM_TOTAL_WIDTH * 2 - 1,
 				0, THOM_TOTAL_HEIGHT - 1 )
-	MCFG_SCREEN_UPDATE_STATIC ( thom )
-	MCFG_SCREEN_VBLANK_STATIC ( thom )
+	MCFG_SCREEN_UPDATE_DRIVER( thomson_state, screen_update_thom )
+	MCFG_SCREEN_VBLANK_DRIVER( thomson_state, thom_vblank )
 
 	MCFG_PALETTE_LENGTH ( 4097 ) /* 12-bit color + transparency */
 	MCFG_PALETTE_INIT ( thom )
-	MCFG_VIDEO_START ( thom )
+	MCFG_VIDEO_START_OVERRIDE( thomson_state, thom )
 	MCFG_DEFAULT_LAYOUT( layout_thomson )
 
 /* sound */
@@ -758,21 +764,21 @@ In arabic mode, Ctrl+E / Ctrl+X to start / stop typing in-line latin.
 
 static ADDRESS_MAP_START ( to770, AS_PROGRAM, 8, thomson_state )
 
-	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(to7_cartridge_w ) /* 4 * 16 KB */
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
+	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to7_cartridge_w ) /* 4 * 16 KB */
+	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
 	AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
 	AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 6 * 16 KB */
 	AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
 	AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
 	AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
 	AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE_LEGACY(to7_floppy_r, to7_floppy_w )
+	AM_RANGE ( 0xe7d0, 0xe7df ) AM_READWRITE(to7_floppy_r, to7_floppy_w )
 	AM_RANGE ( 0xe7e0, 0xe7e3 ) AM_DEVREADWRITE( "pia_2", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE_LEGACY(to770_gatearray_r, to770_gatearray_w )
+	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE(to770_gatearray_r, to770_gatearray_w )
 	AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
 	AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
+	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE(to7_modem_mea8000_r, to7_modem_mea8000_w )
 	AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
@@ -861,8 +867,8 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( to770, to7 )
-	MCFG_MACHINE_START ( to770 )
-	MCFG_MACHINE_RESET ( to770 )
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, to770 )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to770 )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( to770)
@@ -951,19 +957,19 @@ Differences include:
 
 static ADDRESS_MAP_START ( mo5, AS_PROGRAM, 8, thomson_state )
 
-	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE_LEGACY(to770_vram_w )
+	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to770_vram_w )
 	AM_RANGE ( 0x2000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK )
 	AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
 	AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE_LEGACY(mo5_ext_w )
+	AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE(mo5_ext_w )
 	AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xa7d0, 0xa7df ) AM_READWRITE_LEGACY(to7_floppy_r, to7_floppy_w )
+	AM_RANGE ( 0xa7d0, 0xa7df ) AM_READWRITE(to7_floppy_r, to7_floppy_w )
 	AM_RANGE ( 0xa7e0, 0xa7e3 ) AM_DEVREADWRITE( "pia_2", pia6821_device, read_alt, write_alt )
-	AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE_LEGACY(mo5_gatearray_r, mo5_gatearray_w )
+	AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE(mo5_gatearray_r, mo5_gatearray_w )
 	AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
 	AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r, mea8000_w)
-	AM_RANGE ( 0xb000, 0xefff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(mo5_cartridge_w )
+	AM_RANGE ( 0xb000, 0xefff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(mo5_cartridge_w )
 	AM_RANGE ( 0xf000, 0xffff ) AM_ROM       /* system bios */
 
 /* 0x10000 - 0x1ffff: 16 KB integrated BASIC / 64 KB external cartridge */
@@ -1045,8 +1051,8 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( mo5, to7 )
-	MCFG_MACHINE_START ( mo5 )
-	MCFG_MACHINE_RESET ( mo5 )
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5 )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5 )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( mo5)
@@ -1153,23 +1159,23 @@ It was replaced quickly with the improved TO9+.
 
 static ADDRESS_MAP_START ( to9, AS_PROGRAM, 8, thomson_state )
 
-	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE_LEGACY(to9_cartridge_w )/* 4 * 16 KB */
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE_LEGACY(to770_vram_w )
+	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK ) AM_WRITE(to9_cartridge_w )/* 4 * 16 KB */
+	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK ) AM_WRITE(to770_vram_w )
 	AM_RANGE ( 0x6000, 0x9fff ) AM_RAMBANK   ( THOM_BASE_BANK ) /* 16 KB */
 	AM_RANGE ( 0xa000, 0xdfff ) AM_RAMBANK   ( THOM_RAM_BANK )  /* 10 * 16 KB */
 	AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
 	AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
 	AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
 	AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE_LEGACY(to9_floppy_r, to9_floppy_w )
-	AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE_LEGACY(to9_vreg_r, to9_vreg_w )
-	AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE_LEGACY(to9_kbd_r, to9_kbd_w )
-	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE_LEGACY(to9_gatearray_r, to9_gatearray_w )
+	AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE(to9_floppy_r, to9_floppy_w )
+	AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE(to9_vreg_r, to9_vreg_w )
+	AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE(to9_kbd_r, to9_kbd_w )
+	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE(to9_gatearray_r, to9_gatearray_w )
 	AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-/*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE_LEGACY(to9_ieee_r, to9_ieee_w ) */
-	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+/*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
+	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
 	AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
+	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE(to7_modem_mea8000_r, to7_modem_mea8000_w )
 	AM_RANGE ( 0xe800, 0xffff ) AM_ROM       /* system bios  */
 
 /* 0x10000 - 0x1ffff:  64 KB external ROM cartridge */
@@ -1386,8 +1392,8 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( to9, to7 )
-	MCFG_MACHINE_START ( to9 )
-	MCFG_MACHINE_RESET ( to9 )
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9 )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9 )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( to9)
@@ -1476,24 +1482,24 @@ The TO8D is simply a TO8 with an integrated 3"1/2 floppy drive.
 
 static ADDRESS_MAP_START ( to8, AS_PROGRAM, 8, thomson_state )
 
-	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(to8_cartridge_w ) /* 4 * 16 KB */
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
-	AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
-	AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE_LEGACY(to8_sys_hi_w )
-	AM_RANGE ( 0xa000, 0xbfff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE_LEGACY(to8_data_lo_w )
-	AM_RANGE ( 0xc000, 0xdfff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE_LEGACY(to8_data_hi_w )
+	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to8_cartridge_w ) /* 4 * 16 KB */
+	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
+	AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
+	AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE(to8_sys_hi_w )
+	AM_RANGE ( 0xa000, 0xbfff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE(to8_data_lo_w )
+	AM_RANGE ( 0xc000, 0xdfff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE(to8_data_hi_w )
 	AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK ) /* 2 * 2 KB */
 	AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
 	AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
 	AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE_LEGACY(to8_floppy_r, to8_floppy_w )
-	AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE_LEGACY(to8_vreg_r, to8_vreg_w )
-	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE_LEGACY(to8_gatearray_r, to8_gatearray_w )
+	AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE(to8_floppy_r, to8_floppy_w )
+	AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE(to8_vreg_r, to8_vreg_w )
+	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE(to8_gatearray_r, to8_gatearray_w )
 	AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-/*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE_LEGACY(to9_ieee_r, to9_ieee_w ) */
-	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+/*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
+	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
 	AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
+	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE(to7_modem_mea8000_r, to7_modem_mea8000_w )
 	AM_RANGE ( 0xe800, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK ) /* 2 * 6 KB */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
@@ -1603,8 +1609,8 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( to8, to7 )
-	MCFG_MACHINE_START ( to8 )
-	MCFG_MACHINE_RESET ( to8 )
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, to8 )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to8 )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( to8)
@@ -1671,25 +1677,25 @@ The differences with the TO8 are:
 
 static ADDRESS_MAP_START ( to9p, AS_PROGRAM, 8, thomson_state )
 
-	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(to8_cartridge_w ) /* 4 * 16 KB */
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
-	AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
-	AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE_LEGACY(to8_sys_hi_w )
-	AM_RANGE ( 0xa000, 0xbfff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE_LEGACY(to8_data_lo_w )
-	AM_RANGE ( 0xc000, 0xdfff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE_LEGACY(to8_data_hi_w )
+	AM_RANGE ( 0x0000, 0x3fff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(to8_cartridge_w ) /* 4 * 16 KB */
+	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
+	AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
+	AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE(to8_sys_hi_w )
+	AM_RANGE ( 0xa000, 0xbfff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE(to8_data_lo_w )
+	AM_RANGE ( 0xc000, 0xdfff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE(to8_data_hi_w )
 	AM_RANGE ( 0xe000, 0xe7bf ) AM_ROMBANK   ( THOM_FLOP_BANK ) /* 2 * 2 KB */
 	AM_RANGE ( 0xe7c0, 0xe7c7 ) AM_DEVREADWRITE_LEGACY("mc6846", mc6846_r, mc6846_w)
 	AM_RANGE ( 0xe7c8, 0xe7cb ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
 	AM_RANGE ( 0xe7cc, 0xe7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE_LEGACY(to8_floppy_r, to8_floppy_w )
-	AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE_LEGACY(to8_vreg_r, to8_vreg_w )
-	AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE_LEGACY(to9_kbd_r, to9_kbd_w )
-	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE_LEGACY(to8_gatearray_r, to8_gatearray_w )
+	AM_RANGE ( 0xe7d0, 0xe7d9 ) AM_READWRITE(to8_floppy_r, to8_floppy_w )
+	AM_RANGE ( 0xe7da, 0xe7dd ) AM_READWRITE(to8_vreg_r, to8_vreg_w )
+	AM_RANGE ( 0xe7de, 0xe7df ) AM_READWRITE(to9_kbd_r, to9_kbd_w )
+	AM_RANGE ( 0xe7e4, 0xe7e7 ) AM_READWRITE(to8_gatearray_r, to8_gatearray_w )
 	AM_RANGE ( 0xe7e8, 0xe7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-/*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE_LEGACY(to9_ieee_r, to9_ieee_w ) */
-	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+/*   AM_RANGE ( 0xe7f0, 0xe7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
+	AM_RANGE ( 0xe7f2, 0xe7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
 	AM_RANGE ( 0xe7f8, 0xe7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE_LEGACY(to7_modem_mea8000_r, to7_modem_mea8000_w )
+	AM_RANGE ( 0xe7fe, 0xe7ff ) AM_READWRITE(to7_modem_mea8000_r, to7_modem_mea8000_w )
 	AM_RANGE ( 0xe800, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK ) /* 2 * 6 KB */
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
@@ -1750,8 +1756,8 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( to9p, to7 )
-	MCFG_MACHINE_START ( to9p )
-	MCFG_MACHINE_RESET ( to9p )
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, to9p )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, to9p )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( to9p)
@@ -1833,24 +1839,24 @@ a PC XT.
 
 static ADDRESS_MAP_START ( mo6, AS_PROGRAM, 8, thomson_state )
 
-	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
-	AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE_LEGACY(to8_sys_hi_w )
-	AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE_LEGACY(to8_data_lo_w )
-	AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE_LEGACY(to8_data_hi_w )
+	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
+	AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
+	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE(to8_sys_hi_w )
+	AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE(to8_data_lo_w )
+	AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE(to8_data_hi_w )
 	AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
 	AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE_LEGACY(mo6_ext_w )
+	AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE(mo6_ext_w )
 	AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE_LEGACY(to7_floppy_r, to7_floppy_w )
-	AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE_LEGACY(mo6_vreg_r, mo6_vreg_w )
-	AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE_LEGACY(mo6_gatearray_r, mo6_gatearray_w )
+	AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE(to7_floppy_r, to7_floppy_w )
+	AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE(mo6_vreg_r, mo6_vreg_w )
+	AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE(mo6_gatearray_r, mo6_gatearray_w )
 	AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-/*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE_LEGACY(to9_ieee_r, to9_ieee_w )*/
-	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+/*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w )*/
+	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
 	AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r, mea8000_w)
 	AM_RANGE ( 0xb000, 0xefff ) AM_ROMBANK   ( THOM_CART_BANK )
-								AM_WRITE_LEGACY(mo6_cartridge_w )
+								AM_WRITE(mo6_cartridge_w )
 	AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
@@ -2080,8 +2086,8 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( mo6, to7 )
-	MCFG_MACHINE_START ( mo6 )
-	MCFG_MACHINE_RESET ( mo6 )
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo6 )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo6 )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( mo6)
@@ -2146,26 +2152,26 @@ Here are the differences between the MO6 and MO5NR:
 
 static ADDRESS_MAP_START ( mo5nr, AS_PROGRAM, 8, thomson_state )
 
-	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE_LEGACY(to770_vram_w )
-	AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE_LEGACY(to8_sys_lo_w )
-	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE_LEGACY(to8_sys_hi_w )
-	AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE_LEGACY(to8_data_lo_w )
-	AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE_LEGACY(to8_data_hi_w )
+	AM_RANGE ( 0x0000, 0x1fff ) AM_READ_BANK ( THOM_VRAM_BANK) AM_WRITE(to770_vram_w )
+	AM_RANGE ( 0x2000, 0x3fff ) AM_READ_BANK ( TO8_SYS_LO) AM_WRITE(to8_sys_lo_w )
+	AM_RANGE ( 0x4000, 0x5fff ) AM_READ_BANK ( TO8_SYS_HI) AM_WRITE(to8_sys_hi_w )
+	AM_RANGE ( 0x6000, 0x7fff ) AM_READ_BANK ( TO8_DATA_LO) AM_WRITE(to8_data_lo_w )
+	AM_RANGE ( 0x8000, 0x9fff ) AM_READ_BANK ( TO8_DATA_HI) AM_WRITE(to8_data_hi_w )
 	AM_RANGE ( 0xa000, 0xa7bf ) AM_ROMBANK   ( THOM_FLOP_BANK )
 	AM_RANGE ( 0xa7c0, 0xa7c3 ) AM_DEVREADWRITE( "pia_0", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE_LEGACY(mo6_ext_w )
+	AM_RANGE ( 0xa7cb, 0xa7cb ) AM_WRITE(mo6_ext_w )
 	AM_RANGE ( 0xa7cc, 0xa7cf ) AM_DEVREADWRITE( "pia_1", pia6821_device, read_alt, write_alt)
-	AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE_LEGACY(mo5nr_net_r, mo5nr_net_w )
-	AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE_LEGACY(mo6_vreg_r, mo6_vreg_w )
+	AM_RANGE ( 0xa7d0, 0xa7d9 ) AM_READWRITE(mo5nr_net_r, mo5nr_net_w )
+	AM_RANGE ( 0xa7da, 0xa7dd ) AM_READWRITE(mo6_vreg_r, mo6_vreg_w )
 	AM_RANGE ( 0xa7e1, 0xa7e1 ) AM_DEVREADWRITE("centronics", centronics_device, read, write)
-	AM_RANGE ( 0xa7e3, 0xa7e3 ) AM_READWRITE_LEGACY(mo5nr_prn_r, mo5nr_prn_w )
-	AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE_LEGACY(mo6_gatearray_r, mo6_gatearray_w )
+	AM_RANGE ( 0xa7e3, 0xa7e3 ) AM_READWRITE(mo5nr_prn_r, mo5nr_prn_w )
+	AM_RANGE ( 0xa7e4, 0xa7e7 ) AM_READWRITE(mo6_gatearray_r, mo6_gatearray_w )
 	AM_RANGE ( 0xa7e8, 0xa7eb ) AM_DEVREADWRITE( "acia",  mos6551_device, read, write )
-/*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE_LEGACY(to9_ieee_r, to9_ieee_w ) */
-	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE_LEGACY(to7_midi_r, to7_midi_w )
+/*   AM_RANGE ( 0xa7f0, 0xa7f7 ) AM_READWRITE(to9_ieee_r, to9_ieee_w ) */
+	AM_RANGE ( 0xa7f2, 0xa7f3 ) AM_READWRITE(to7_midi_r, to7_midi_w )
 	AM_RANGE ( 0xa7f8, 0xa7fb ) AM_DEVREADWRITE( "pia_3", pia6821_device, read_alt, write_alt)
 	AM_RANGE ( 0xa7fe, 0xa7ff ) AM_DEVREADWRITE_LEGACY("mea8000", mea8000_r, mea8000_w)
-	AM_RANGE ( 0xb000, 0xefff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE_LEGACY(mo6_cartridge_w ) /* 4 * 16 KB */
+	AM_RANGE ( 0xb000, 0xefff ) AM_READ_BANK ( THOM_CART_BANK) AM_WRITE(mo6_cartridge_w ) /* 4 * 16 KB */
 	AM_RANGE ( 0xf000, 0xffff ) AM_ROMBANK   ( TO8_BIOS_BANK )
 
 /* 0x10000 - 0x1ffff: 64 KB external ROM cartridge */
@@ -2307,8 +2313,8 @@ INPUT_PORTS_END
 /* ------------ driver ------------ */
 
 static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
-	MCFG_MACHINE_START ( mo5nr )
-	MCFG_MACHINE_RESET ( mo5nr )
+	MCFG_MACHINE_START_OVERRIDE( thomson_state, mo5nr )
+	MCFG_MACHINE_RESET_OVERRIDE( thomson_state, mo5nr )
 
 	MCFG_CPU_MODIFY( "maincpu" )
 	MCFG_CPU_PROGRAM_MAP ( mo5nr)
