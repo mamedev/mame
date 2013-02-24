@@ -364,8 +364,10 @@ at 0xDE60.
 #include "machine/nvram.h"
 #include "rendlay.h"
 
-#define CLIPWIDTH (496-1)
-#define CLIPHIGH (384-1)
+#define CLIPMAXX_FULL (496-1)
+#define CLIPMAXY_FULL (384-1)
+#define CLIPMINX_FULL (0)
+#define CLIPMINY_FULL (0)
 
 class coolridr_state : public driver_device
 {
@@ -404,6 +406,10 @@ public:
 
 	// store the blit params here
 	UINT32 m_spriteblit[12];
+
+	UINT32 m_clipvals[2][3];
+
+
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -488,7 +494,7 @@ public:
 	UINT32 m_pen_fill[2];
 
 	osd_work_queue *    m_work_queue[2]; // work queue, one per screen
-	static void *draw_tile_row_threaded(void *param, int threadid);
+	static void *draw_object_threaded(void *param, int threadid);
 };
 
 #define PRINT_BLIT_STUFF \
@@ -654,6 +660,7 @@ struct cool_render_object
 	UINT16 zpri;
 	UINT8 blittype;
 	coolridr_state* state;
+	UINT32 clipvals[3];
 };
 
 #define RLE_BLOCK(writeaddrxor) \
@@ -722,19 +729,19 @@ struct cool_render_object
 		const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40; \
 		const int pixelOffsetnextX = ((hPositionTable[realy]) + ((h+1)* 16 * hZoomTable[realy])) / 0x40; \
 		const int drawy = pixelOffsetY+y; \
-		if ((drawy>CLIPHIGH) || (drawy<0)) continue; \
+		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
 		line = &drawbitmap->pix32(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
 		int blockwide = pixelOffsetnextX-pixelOffsetX; \
-		if (pixelOffsetX+blockwide <0) \
+		if (pixelOffsetX+blockwide <clipminX) \
 			continue; \
-		if (pixelOffsetX>CLIPWIDTH) \
+		if (pixelOffsetX>clipmaxX) \
 			continue; \
 		UINT32 incx = 0x8000000 / hZoomTable[realy]; \
 		for (int x = 0; x < blockwide; x++) \
 		{ \
 			const int drawx = pixelOffsetX+x; \
-			if ((drawx>CLIPWIDTH || drawx<0)) continue; \
+			if ((drawx>clipmaxX || drawx<clipminX)) continue; \
 			int realx = ((x*incx)>>21); \
 
 #define YXLOOP_END \
@@ -747,13 +754,13 @@ struct cool_render_object
 	{ \
 		int realy = ((y*incy)>>21); \
 		const int drawy = pixelOffsetY+y; \
-		if ((drawy>CLIPHIGH) || (drawy<0)) continue; \
+		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
 		line = &drawbitmap->pix32(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
 		for (int x = 0; x < blockwide; x++) \
 		{ \
 			const int drawx = pixelOffsetX+x; \
-			if ((drawx>CLIPWIDTH || drawx<0)) continue; \
+			if ((drawx>clipmaxX || drawx<clipminX)) continue; \
 			int realx = ((x*incx)>>21); \
 
 #define YXLOOP_START_NO_LINEZOOM_NO_XCLIP \
@@ -761,7 +768,7 @@ struct cool_render_object
 	{ \
 		int realy = ((y*incy)>>21); \
 		const int drawy = pixelOffsetY+y; \
-		if ((drawy>CLIPHIGH) || (drawy<0)) continue; \
+		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
 		line = &drawbitmap->pix32(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
 		for (int x = 0; x < blockwide; x++) \
@@ -774,19 +781,19 @@ struct cool_render_object
 	for (int y = 0; y < 16; y++) \
 	{ \
 		const int drawy = pixelOffsetY+y; \
-		if ((drawy>CLIPHIGH) || (drawy<0)) continue; \
+		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
 		line = &drawbitmap->pix32(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
 		for (int x = 0; x < 16; x++) \
 		{ \
 			const int drawx = pixelOffsetX+x; \
-			if ((drawx>CLIPWIDTH || drawx<0)) continue; \
+			if ((drawx>clipmaxX || drawx<clipminX)) continue; \
 
 #define YXLOOP_START_NO_ZOOM_NO_XCLIP \
 	for (int y = 0; y < 16; y++) \
 	{ \
 		const int drawy = pixelOffsetY+y; \
-		if ((drawy>CLIPHIGH) || (drawy<0)) continue; \
+		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
 		line = &drawbitmap->pix32(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
 		for (int x = 0; x < 16; x++) \
@@ -836,7 +843,7 @@ TODO: fix anything that isn't text.
 
 
 
-void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
+void *coolridr_state::draw_object_threaded(void *param, int threadid)
 {
 	cool_render_object *object = reinterpret_cast<cool_render_object *>(param);
 	bitmap_rgb32* drawbitmap = object->drawbitmap;
@@ -844,6 +851,10 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 	UINT16* rearranged_16bit_gfx = object->state->m_rearranged_16bit_gfx;
 	UINT16* expanded_10bit_gfx = object->state->m_expanded_10bit_gfx;
 
+	UINT16 clipminX = CLIPMINX_FULL;
+	UINT16 clipmaxX = CLIPMAXX_FULL;
+	UINT16 clipminY = CLIPMINY_FULL;
+	UINT16 clipmaxY = CLIPMAXY_FULL;
 
 
 	/************* object->spriteblit[1] *************/
@@ -866,6 +877,8 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 	{
 	//	b1colorNumber = space.machine().rand()&0xfff;
 	}
+
+
 
 
 //	if(b1colorNumber > 0x60 || b2colorNumber)
@@ -979,7 +992,82 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 
 	//UINT32 textlookup = 0; // we've cached the data here already
 
+	/*
+		sample data from attract mode 'filmstrip'
 
+		you can see it's screen regions at least, gets enabled in certain game situations too
+		interestingly there is a bit to determine the screen number this applies to, even if that should already be implied from m_blitterMode
+
+		screen 1 clipping(?)
+		                    
+		unknown sprite list type 1 - 00000001 003f00f0 027801f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 03e001f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 000700e3 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 010c01f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+
+		unknown sprite list type 1 - 00000001 003f00f0 027401f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 03dc01f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 000700df 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 010801f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+
+		unknown sprite list type 1 - 00000001 003f00f0 027001f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 03d801f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 000700db 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 010401f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+
+		unknown sprite list type 1 - 00000001 003f00f0 019c01f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 030401f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 00070007 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 0030016f 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+
+		screen 2 clipping
+
+		unknown sprite list type 1 - 00000001 003f00f0 039803f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 050003f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 02070203 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 022c036b 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+
+		unknown sprite list type 1 - 00000001 003f00f0 039403f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 04fc03f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 020701ff 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 02280367 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+
+		unknown sprite list type 1 - 00000001 003f00f0 039003f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 04f803f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 020701fb 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		unknown sprite list type 1 - 00000001 003f00f0 02240363 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+		                                                
+	  NOTE, we only copy across [1] [2] and [3]   as [0] [1] and [2]
+	    the 3rd dword seems to be some kind of offset, it's 0x207 on the 2nd screen, and the actual x-clip rects are also higher on that screen?
+
+		note this is practically the same format as the sysh1_fb_data_w commands..
+	*/                                                               
+
+	// how does this really work? there's more to it
+	// used in film strip attract mode, and between stages
+	if (object->clipvals[2] & 0x0000007)
+	{
+#if 0
+		clipminX = (((object->clipvals[1]&0xffff0000)>>16) >> 3);
+		if (clipminX<CLIPMINX_FULL) clipminX = CLIPMINX_FULL;
+		if (clipminX>CLIPMAXX_FULL) clipminX = CLIPMAXX_FULL;
+		clipmaxX = (((object->clipvals[1]&0xffff0000)>>16) >> 3) + (((object->clipvals[1]&0x0000ffff)>>0) >> 3);
+		if (clipmaxX<CLIPMINX_FULL) clipmaxX = CLIPMINX_FULL;
+		if (clipmaxX>CLIPMAXX_FULL) clipmaxX = CLIPMAXX_FULL;
+		if (clipminX>clipmaxX) clipminX = clipmaxX;
+	
+		clipminY = ((object->clipvals[0]&0xffff0000)>>16);
+		if (clipminY<CLIPMINY_FULL) clipminY = CLIPMINY_FULL;
+		if (clipminY>CLIPMAXY_FULL) clipminY = CLIPMAXY_FULL;
+		clipmaxY = ((object->clipvals[0]&0x0000ffff)>>0);
+		if (clipmaxY<CLIPMINY_FULL) clipmaxY = CLIPMINY_FULL;
+		if (clipmaxY>CLIPMAXY_FULL) clipmaxY = CLIPMAXY_FULL;
+		if (clipminY>clipmaxY) clipminY = clipmaxY;
+#endif		
+
+
+//		b1colorNumber = object->state->machine().rand()&0xfff;
+	}
 
 	/* DRAW */
 	UINT16 used_hCellCount = hCellCount;
@@ -1049,7 +1137,7 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 
 
 
-		if (pixelOffsetY>CLIPHIGH)
+		if (pixelOffsetY>clipmaxY)
 		{
 			v = used_vCellCount;
 			continue;
@@ -1136,7 +1224,7 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 			if (!indirect_zoom_enable)
 			{
 			//	int offs = ((hPosition) + (h* 16 * hZoom)) / 0x40;
-			//	if (offs>CLIPWIDTH) continue;
+			//	if (offs>clipmaxX) continue;
 			}
 
 			UINT32 lastSpriteNumber = 0xffffffff;
@@ -1264,13 +1352,13 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 				{
 					const int pixelOffsetX = ((hPosition/0x40) + (h* 16));
 
-					if (pixelOffsetX+16 < 0)
+					if (pixelOffsetX+16 < clipminX)
 						continue;
 
-					if (pixelOffsetX>CLIPWIDTH)
+					if (pixelOffsetX>clipmaxX)
 						continue;
 
-					if (pixelOffsetX>=0 && pixelOffsetX+16<CLIPWIDTH)
+					if (pixelOffsetX>=clipminX && pixelOffsetX+16<clipmaxX)
 					{
 						if (blit_rotate)
 						{
@@ -1313,13 +1401,13 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 					int blockwide = pixelOffsetnextX-pixelOffsetX;
 					UINT32 incx = 0x8000000 / hZoom;
 
-					if (pixelOffsetX+blockwide < 0)
+					if (pixelOffsetX+blockwide < clipminX)
 						continue;
 
-					if (pixelOffsetX>CLIPWIDTH)
+					if (pixelOffsetX>clipmaxX)
 						continue;
 
-					if (pixelOffsetX>=0 && pixelOffsetX+blockwide<CLIPWIDTH)
+					if (pixelOffsetX>=clipminX && pixelOffsetX+blockwide<clipmaxX)
 					{
 						if (blit_rotate)
 						{
@@ -1424,52 +1512,20 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	{
 		//printf("unknown sprite list type 1 - %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x %08x\n", m_spriteblit[0], m_spriteblit[1],m_spriteblit[2],m_spriteblit[3],m_spriteblit[4],m_spriteblit[5],m_spriteblit[6],m_spriteblit[7],m_spriteblit[8],m_spriteblit[9],m_spriteblit[10],m_spriteblit[10]);
 
-		/*
-		sample data from attract mode 'filmstrip'
+	
 
-		you can see it's screen regions at least, gets enabled in certain game situations too
-		interestingly there is a bit to determine the screen number this applies to, even if that should already be implied from m_blitterMode
-
-		screen 1 clipping(?)
-
-		unknown sprite list type 1 - 00000001 003f00f0 027801f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 03e001f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 000700e3 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 010c01f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-
-		unknown sprite list type 1 - 00000001 003f00f0 027401f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 03dc01f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 000700df 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 010801f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-
-		unknown sprite list type 1 - 00000001 003f00f0 027001f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 03d801f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 000700db 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 010401f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-
-		unknown sprite list type 1 - 00000001 003f00f0 019c01f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 030401f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 00070007 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 0030016f 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-
-		screen 2 clipping
-
-		unknown sprite list type 1 - 00000001 003f00f0 039803f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 050003f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 02070203 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 022c036b 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-
-		unknown sprite list type 1 - 00000001 003f00f0 039403f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 04fc03f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 020701ff 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 02280367 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-
-		unknown sprite list type 1 - 00000001 003f00f0 039003f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 04f803f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 020701fb 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		unknown sprite list type 1 - 00000001 003f00f0 02240363 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		*/
-
+		if (m_blitterMode&0x80)
+		{
+			m_clipvals[1][0] = m_spriteblit[1];
+			m_clipvals[1][1] = m_spriteblit[2];
+			m_clipvals[1][2] = m_spriteblit[3];
+		}
+		else
+		{
+			m_clipvals[0][0] = m_spriteblit[1];
+			m_clipvals[0][1] = m_spriteblit[2];
+			m_clipvals[0][2] = m_spriteblit[3];
+		}
 
 		// abort early
 		return;
@@ -1527,23 +1583,32 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 	testobject->zpri = m_blitterAddr | m_blittype<<12;
 	testobject->blittype = m_blittype;
-
 	osd_work_queue *queue;
 	// which queue, which bitmap
 	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 	{
 		testobject->drawbitmap = &m_temp_bitmap_sprites[0];
 		testobject->zbitmap = &m_zbuffer_bitmap;
+		// pass these from the type 1 writes
+		testobject->clipvals[0] = m_clipvals[0][0];
+		testobject->clipvals[1] = m_clipvals[0][1];
+		testobject->clipvals[2] = m_clipvals[0][2];
+
 		queue = m_work_queue[0];
 	}
 	else // 0x90, 0xa0, 0xb0, 0xc0
 	{
 		testobject->drawbitmap = &m_temp_bitmap_sprites2[0];
 		testobject->zbitmap = &m_zbuffer_bitmap2;
+		// pass these from the type 1 writes
+		testobject->clipvals[0] = m_clipvals[1][0];
+		testobject->clipvals[1] = m_clipvals[1][1];
+		testobject->clipvals[2] = m_clipvals[1][2];
+
 		queue = m_work_queue[1];
 	}
 
-	osd_work_item_queue(queue, draw_tile_row_threaded, testobject, WORK_ITEM_FLAG_AUTO_RELEASE);
+	osd_work_item_queue(queue, draw_object_threaded, testobject, WORK_ITEM_FLAG_AUTO_RELEASE);
 }
 
 
@@ -1760,14 +1825,21 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites[i], 0, 0, 0, 0, visarea);
 				m_temp_bitmap_sprites[i].fill(0xff000000, visarea);
 				m_zbuffer_bitmap.fill(0xffff, visarea);
+				// almost certainly wrong
+				m_clipvals[0][0] = 0;
+				m_clipvals[0][1] = 0;
+				m_clipvals[0][2] = 0;
 			}
-
-			if(m_blitterClearMode == 0x8c800000)
+			else if(m_blitterClearMode == 0x8c800000)
 			{
 				osd_work_queue_wait(m_work_queue[1], osd_ticks_per_second() * 100);
 				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2[i], 0, 0, 0, 0, visarea);
 				m_temp_bitmap_sprites2[i].fill(0xff000000, visarea);
 				m_zbuffer_bitmap2.fill(0xffff, visarea);
+				// almost certainly wrong
+				m_clipvals[1][0] = 0;
+				m_clipvals[1][1] = 0;
+				m_clipvals[1][2] = 0;
 			}
 
 			//printf("frame\n");
@@ -2760,13 +2832,13 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_ADD("lscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0,CLIPWIDTH, 0, CLIPHIGH)
+	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr1)
 
 	MCFG_SCREEN_ADD("rscreen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0,CLIPWIDTH, 0, CLIPHIGH)
+	MCFG_SCREEN_VISIBLE_AREA(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL)
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr2)
 
 	MCFG_PALETTE_LENGTH(0x10000)
