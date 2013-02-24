@@ -478,9 +478,13 @@ public:
 	UINT8 *m_h1_pcg;
 	UINT16 *m_h1_pal;
 	void flush_pal_data( UINT16 offset );
+	void apply_rgb_control(int screen_num,int *r, int *g, int *b);
 	int m_gfx_index;
 	int m_color_bank;
-	UINT32 m_rgb_ctrl[2];
+	struct {
+		UINT32 setting;
+		UINT8 gradient;
+	}m_rgb_ctrl[2];
 	UINT32 m_pen_fill[2];
 
 	osd_work_queue *    m_work_queue[2]; // work queue, one per screen
@@ -554,11 +558,10 @@ void coolridr_state::video_start()
 
 UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
-	/* planes seems to basically be at 0x8000 and 0x28000... */
+	int bg_r,bg_g,bg_b;
 
 	if(m_pen_fill[which])
 	{
-		int bg_r,bg_g,bg_b;
 		/* logic here is a bit of a guess. */
 		bg_r = (((m_pen_fill[which] >> 16) & 0x7f) << 1) | (((m_pen_fill[which] >> 16) & 0x80) >> 7);
 		bg_g = (((m_pen_fill[which] >> 8) & 0x7f) << 1) | (((m_pen_fill[which] >> 8) & 0x80) >> 7);
@@ -583,8 +586,12 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 		m_color_bank = which * 2;
 		/* TODO: the whole transpen logic might be incorrect */
 		transpen_setting = (VREG(0x3c) & 0x80000000) >> 31;
+		bg_r = (VREG(0x3c) >> 10) & 0x1f;
+		bg_g = (VREG(0x3c) >> 5) & 0x1f;
+		bg_b = (VREG(0x3c) >> 0) & 0x1f;
+		apply_rgb_control(which,&bg_r,&bg_g,&bg_b);
 
-		bitmap.fill(MAKE_ARGB(0xff,(VREG(0x3c) >> 16) & 0xff,(VREG(0x3c) >> 8) & 0xff,VREG(0x3c) & 0xff),cliprect);
+		bitmap.fill(MAKE_ARGB(0xff,pal5bit(bg_r),pal5bit(bg_g),pal5bit(bg_b)),cliprect);
 
  		for (int y=0;y<64;y++)
  		{
@@ -1815,43 +1822,49 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
 	}
 }
 
+void coolridr_state::apply_rgb_control(int screen_num,int *r, int *g, int *b)
+{
+	if(!m_rgb_ctrl[screen_num].gradient)
+		return;
+
+	if(m_rgb_ctrl[screen_num].setting == 0x1240) /* fade-in / outs */
+	{
+		*r -= m_rgb_ctrl[screen_num].gradient;
+		*g -= m_rgb_ctrl[screen_num].gradient;
+		*b -= m_rgb_ctrl[screen_num].gradient;
+		if(*r < 0) { *r = 0; }
+		if(*g < 0) { *g = 0; }
+		if(*b < 0) { *b = 0; }
+	}
+	else if(m_rgb_ctrl[screen_num].setting == 0x920) /* at bike select / outside tunnels, addition */
+	{
+		*r += m_rgb_ctrl[screen_num].gradient;
+		*g += m_rgb_ctrl[screen_num].gradient;
+		*b += m_rgb_ctrl[screen_num].gradient;
+		if(*r > 0x1f) { *r = 0x1f; }
+		if(*g > 0x1f) { *g = 0x1f; }
+		if(*b > 0x1f) { *b = 0x1f; }
+	}
+	else if(m_rgb_ctrl[screen_num].setting == 0x800) /* when you get hit TODO: algo might be different. */
+	{
+		*g &= (0x1f - m_rgb_ctrl[screen_num].gradient);
+		*b &= (0x1f - m_rgb_ctrl[screen_num].gradient);
+	}
+	else
+	{
+		popmessage("%08x %08x",m_rgb_ctrl[screen_num].setting,m_rgb_ctrl[screen_num].gradient);
+	}
+}
+
 void coolridr_state::flush_pal_data( UINT16 offset )
 {
 	int r,g,b;
 	int screen_type = (offset & 0x400) >> 10;
-	int rgb_setting = m_rgb_ctrl[screen_type] & ~0x1f;
-	int rgb_gradient = m_rgb_ctrl[screen_type] & 0x1f;
 
 	r = ((m_h1_pal[offset] & 0x7c00) >> 10);
 	g = ((m_h1_pal[offset] & 0x03e0) >> 5);
 	b = ((m_h1_pal[offset] & 0x001f) >> 0);
-	if(rgb_setting == 0x1240) /* fade-in / outs */
-	{
-		r -= rgb_gradient;
-		g -= rgb_gradient;
-		b -= rgb_gradient;
-		if(r < 0) { r = 0; }
-		if(g < 0) { g = 0; }
-		if(b < 0) { b = 0; }
-	}
-	else if(rgb_setting == 0x920) /* at bike select / outside tunnels, addition */
-	{
-		r += rgb_gradient;
-		g += rgb_gradient;
-		b += rgb_gradient;
-		if(r > 0x1f) { r = 0x1f; }
-		if(g > 0x1f) { g = 0x1f; }
-		if(b > 0x1f) { b = 0x1f; }
-	}
-	else if(rgb_setting == 0x800) /* when you get hit TODO: algo might be different. */
-	{
-		g &= (0x1f - rgb_gradient);
-		b &= (0x1f - rgb_gradient);
-	}
-	else if(rgb_gradient)
-	{
-		popmessage("%08x %08x",rgb_setting,rgb_gradient);
-	}
+	apply_rgb_control(screen_type,&r,&g,&b);
 
 	palette_set_color_rgb(machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
@@ -1948,7 +1961,8 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				break;
 			case 0x40: /* screen 1 - almost certainly RGB brightness (at least bits 4 - 0) */
 			case 0x44: /* screen 2 / */
-				m_rgb_ctrl[(cmd & 4) >> 2] = m_framebuffer_vram[(0+dma_index)/4] & 0xffffff;
+				m_rgb_ctrl[(cmd & 4) >> 2].setting = m_framebuffer_vram[(0+dma_index)/4] & 0xffffe0;
+				m_rgb_ctrl[(cmd & 4) >> 2].gradient = m_framebuffer_vram[(0+dma_index)/4] & 0x1f;
 				for(int i=((cmd & 4) * 0x100);i<((cmd & 4) * 0x100)+0x400;i++)
 					flush_pal_data( i );
 				dma_index+=4;
