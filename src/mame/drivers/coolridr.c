@@ -1576,7 +1576,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 		if ((data & 0xff000000) != 0xac000000)
 			printf("blitter mode set without upper bits equal 0xac000000\n");
 
-		// nor this
+		// i've seen this triggered once or twice
+		// might be there are more z-bits, or it's just overflowing when there are too many sprites
 		if (data & 0x0000f000)
 			printf("blitter mode with mask 0x0000f000\n");
 
@@ -1646,6 +1647,15 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
 	{
 		//printf("blit mode %02x %02x %08x\n", m_blitterMode, m_blitterSerialCount,  data);
 		m_blitterSerialCount++;
+
+		//blit mode 10 00 00000003
+		//blit mode 10 01 00000002
+		//blit mode 10 02 00007b20  << this is the palette base for the sprites
+		//blit mode 10 00 00000002
+		//blit mode 10 01 00000001
+		//blit mode 10 02 00040204
+		//blit mode 10 03 00000000
+
 	}
 	else if (m_blitterMode == 0xe0) // when going into game (in units of 0x10 writes)
 	{
