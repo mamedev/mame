@@ -650,7 +650,64 @@ struct cool_render_object
 	coolridr_state* state;
 };
 
-#define YLOOP_START \
+#define RLE_BLOCK(writeaddrxor) \
+	/* skip the decoding if it's the same tile as last time! */ \
+	if (spriteNumber != lastSpriteNumber) \
+	{ \
+		lastSpriteNumber = spriteNumber; \
+       \
+		int i = 1;/* skip first 10 bits for now */ \
+		int data_written = 0; \
+ \
+		while (data_written<256) \
+		{ \
+ \
+			const UINT16 compdata = expanded_10bit_gfx[ (b3romoffset) + spriteNumber + i]; \
+ \
+			if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100)) /* 3bpp */ \
+			{ \
+				/* mm ccrr rrr0 */ \
+				int encodelength = (compdata & 0x03e)>>1; \
+				const UINT16 rledata =  rearranged_16bit_gfx[color_offs + ((compdata & 0x1c0) >> 6)]; \
+				/* guess, blank tiles have the following form */ \
+				/* 00120 (00000024,0) | 010 03f */ \
+				if (compdata&1) encodelength = 255; \
+ \
+				while (data_written<256 && encodelength >=0) \
+				{ \
+					tempshape[data_written^writeaddrxor] = rledata; \
+					if (tempshape[data_written^writeaddrxor]==0x8000) blankcount--; \
+					encodelength--; \
+					data_written++; \
+				} \
+			} \
+			else if ((compdata & 0x300) == 0x200) /* 6bpp */ \
+			{ \
+				/* mm cccc ccrr */ \
+				int encodelength = (compdata & 0x003);			 \
+				const UINT16 rledata = rearranged_16bit_gfx[color_offs + ((compdata & 0x0fc) >> 2) + 8]; \
+				while (data_written<256 && encodelength >=0) \
+				{ \
+					tempshape[data_written^writeaddrxor] = rledata; /* + 0x8 crt test, most of red, green, start of blue */ \
+					if (tempshape[data_written^writeaddrxor]==0x8000) blankcount--; \
+					encodelength--; \
+					data_written++; \
+				} \
+			} \
+			else /* 8bpp */ \
+			{ \
+				/* mm cccc cccc */ \
+				tempshape[data_written^writeaddrxor] = rearranged_16bit_gfx[color_offs + (compdata & 0x0ff) + 0x48]; /* +0x48 crt test end of blue, start of white */ \
+				if (tempshape[data_written^writeaddrxor]==0x8000) blankcount--; \
+				data_written++; \
+			} \
+ \
+			i++; \
+		} \
+	} \
+
+
+#define YXLOOP_START \
 	for (int y = 0; y < blockhigh; y++) \
 	{ \
 		int realy = ((y*incy)>>21); \
@@ -663,10 +720,18 @@ struct cool_render_object
 		zline = &object->zbitmap->pix16(drawy); \
 		int blockwide = ((16*hZoomTable[realy])/0x40); \
 		UINT32 incx = 0x8000000 / hZoomTable[realy]; \
+		for (int x = 0; x < blockwide; x++) \
+		{ \
+			const int drawx = pixelOffsetX+x; \
+			if ((drawx>495 || drawx<0)) continue; \
+			int realx = ((x*incx)>>21); \
+
+#define YXLOOP_END \
+		} \
+	} \
 
 
-
-#define YLOOP_START_NO_LINEZOOM \
+#define YXLOOP_START_NO_LINEZOOM \
 	for (int y = 0; y < blockhigh; y++) \
 	{ \
 		int realy = ((y*incy)>>21); \
@@ -674,14 +739,27 @@ struct cool_render_object
 		if ((drawy>383) || (drawy<0)) continue; \
 		line = &drawbitmap->pix32(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
+		for (int x = 0; x < blockwide; x++) \
+		{ \
+			const int drawx = pixelOffsetX+x; \
+			if ((drawx>495 || drawx<0)) continue; \
+			int realx = ((x*incx)>>21); \
 
 
-#define XLOOP_START \
-	for (int x = 0; x < blockwide; x++) \
+#define YXLOOP_START_NO_ZOOM \
+	for (int y = 0; y < 16; y++) \
 	{ \
-		const int drawx = pixelOffsetX+x; \
-		if ((drawx>495 || drawx<0)) continue; \
-		int realx = ((x*incx)>>21); \
+		const int drawy = pixelOffsetY+y; \
+		if ((drawy>383) || (drawy<0)) continue; \
+		line = &drawbitmap->pix32(drawy); \
+		zline = &object->zbitmap->pix16(drawy); \
+		for (int x = 0; x < 16; x++) \
+		{ \
+			const int drawx = pixelOffsetX+x; \
+			if ((drawx>495 || drawx<0)) continue; \
+
+
+
 
 
 /* the two tables that the patent claims are located at:
@@ -921,8 +999,9 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 		}
 
 		// I don't know, the Rainbow is a non-zoomed sprite and won't link unless you move one half
-		if (used_flipx)
-			hPositionx -= 1;
+		//  (fixed in the hOrigin handling instead)
+		//if (used_flipx)
+		//	hPositionx -= 1;
 
 		UINT16 hZoomTable[16];
 		int hPositionTable[16];
@@ -958,7 +1037,7 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 					// middle?
 					break;
 				case 2:
-					hPositionTable[idx] -= sizex;
+					hPositionTable[idx] -= sizex-1;
 					// right?
 					break;
 				case 3:
@@ -984,7 +1063,7 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 				// middle?
 				break;
 			case 2:
-				hPosition -= sizex;
+				hPosition -= sizex-1;
 				// right?
 				break;
 			case 3:
@@ -1059,63 +1138,33 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 			UINT16 tempshape[16*16];
 			
 			int color_offs = (0x7b20 + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */
-
-			// skip the decoding if it's the same tile as last time!
-			if (spriteNumber != lastSpriteNumber)
+			UINT16 blankcount = 256;
+			
+			if (used_flipy)
 			{
-				lastSpriteNumber = spriteNumber;
-
-				int i = 1;// skip first 10 bits for now
-				int data_written = 0;
-
-				while (data_written<256)
+				if (used_flipx)
 				{
-
-					UINT16 compdata = expanded_10bit_gfx[ (b3romoffset) + spriteNumber + i];
-
-					if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100)) // 3bpp
-					{
-						// mm ccrr rrr0
-						int encodelength = (compdata & 0x03e)>>1;
-						int rledata = (compdata & 0x1c0) >> 6;
-
-						// guess, blank tiles have the following form
-						// 00120 (00000024,0) | 010 03f
-						if (compdata&1) encodelength = 255;
-
-						while (data_written<256 && encodelength >=0) // 6bpp
-						{
-							tempshape[data_written] = rearranged_16bit_gfx[color_offs + rledata];
-							encodelength--;
-							data_written++;
-						}
-					}
-					else if ((compdata & 0x300) == 0x200) // 8bpp
-					{
-						// mm cccc ccrr
-						int encodelength = (compdata & 0x003);
-						int rledata = (compdata & 0x0fc) >> 2;
-
-						while (data_written<256 && encodelength >=0)
-						{
-							tempshape[data_written] = rearranged_16bit_gfx[color_offs + rledata + 8]; // + 0x8 crt test, most of red, green, start of blue
-							encodelength--;
-							data_written++;
-						}
-
-					}
-					else
-					{
-						int rledata = (compdata & 0x0ff);
-						// mm cccc cccc
-						tempshape[data_written] = rearranged_16bit_gfx[color_offs + rledata + 0x48]; // +0x48 crt test end of blue, start of white
-						data_written++;
-					}
-
-					i++;
+					RLE_BLOCK(0xff)
+				}
+				else
+				{
+					RLE_BLOCK(0xf0)
+				}
+			}
+			else
+			{	if (used_flipx)
+				{
+					RLE_BLOCK(0x0f)
+				}
+				else
+				{
+					RLE_BLOCK(0x00)
 				}
 			}
 
+
+			if (blankcount==0)
+				continue;
 
 			if (!vZoom)
 			{
@@ -1138,96 +1187,17 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 			{
 				if (blit_rotate)
 				{
-					if (used_flipy)
-					{
-						YLOOP_START
-
-							if (used_flipx)
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[(15-realx)*16+(15-realy)];
-									DRAW_PIX
-								}
-							}
-							else
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[(15-realx)*16+realy];
-									DRAW_PIX
-								}
-							}
-						}
-					}
-					else
-					{
-						YLOOP_START
-
-							if (used_flipx)
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[realx*16+(15-realy)];
-									DRAW_PIX
-								}
-							}
-							else
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[realx*16+realy];
-									DRAW_PIX
-								}
-							}
-						}
-					}
+					YXLOOP_START
+					UINT16 pix = tempshape[realx*16+realy];
+					DRAW_PIX
+					YXLOOP_END
 				}
 				else // no rotate
 				{
-					if (used_flipy)
-					{
-						YLOOP_START
-
-							if (used_flipx)
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[(15-realy)*16+(15-realx)];
-									DRAW_PIX
-								}
-							}
-							else
-							{
-								XLOOP_START
-									UINT16 pix = tempshape[(15-realy)*16+realx];
-									DRAW_PIX
-								}
-							}
-						}
-					}
-					else // no rotate, no flipy
-					{
-						YLOOP_START
-
-							if (used_flipx)
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[realy*16+(15-realx)];
-									DRAW_PIX
-								}
-							}
-							else // no rotate, no flipy, no flipx
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[realy*16+realx];
-									DRAW_PIX
-								}
-							}
-						}
-					}
+					YXLOOP_START
+					UINT16 pix = tempshape[realy*16+realx];
+					DRAW_PIX
+					YXLOOP_END
 				}
 			}
 			else  // no indirect zoom
@@ -1237,103 +1207,47 @@ void *coolridr_state::draw_tile_row_threaded(void *param, int threadid)
 					// abort, but make sure we clean up
 					goto end;
 				}
-				const int pixelOffsetX = ((hPosition) + (h* 16 * hZoom)) / 0x40;
-				int blockwide = ((16*hZoom)/0x40);
-				UINT32 incx = 0x8000000 / hZoom;
 
-				if (blit_rotate)
+				if ((hZoom==0x40) && (vZoom==0x40)) // non-zoomed
 				{
-					if (used_flipy)
+					const int pixelOffsetX = ((hPosition/0x40) + (h* 16));
+
+					if (blit_rotate)
 					{
-						YLOOP_START_NO_LINEZOOM
-
-							if (used_flipx)
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[(15-realx)*16+(15-realy)];
-									DRAW_PIX
-								}
-							}
-							else
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[(15-realx)*16+realy];
-									DRAW_PIX
-								}
-							}
-						}
+						YXLOOP_START_NO_ZOOM
+						UINT16 pix = tempshape[x*16+y];
+						DRAW_PIX
+						YXLOOP_END
 					}
-					else
+					else // no rotate
 					{
-						YLOOP_START_NO_LINEZOOM
-
-							if (used_flipx)
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[realx*16+(15-realy)];
-									DRAW_PIX
-								}
-							}
-							else
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[realx*16+realy];
-									DRAW_PIX
-								}
-							}
-						}
+						YXLOOP_START_NO_ZOOM
+						UINT16 pix = tempshape[y*16+x];
+						DRAW_PIX
+						YXLOOP_END
 					}
 				}
-				else // no rotate
+				else // zoomed
 				{
-					if (used_flipy)
+					const int pixelOffsetX = ((hPosition) + (h* 16 * hZoom)) / 0x40;
+					int blockwide = ((16*hZoom)/0x40);
+					UINT32 incx = 0x8000000 / hZoom;
+
+					if (blit_rotate)
 					{
-						YLOOP_START_NO_LINEZOOM
-
-							if (used_flipx)
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[(15-realy)*16+(15-realx)];
-									DRAW_PIX
-								}
-							}
-							else
-							{
-								XLOOP_START
-									UINT16 pix = tempshape[(15-realy)*16+realx];
-									DRAW_PIX
-								}
-							}
-						}
+						YXLOOP_START_NO_LINEZOOM
+						UINT16 pix = tempshape[realx*16+realy];
+						DRAW_PIX
+						YXLOOP_END
 					}
-					else // no rotate, no flipy
+					else // no rotate
 					{
-						YLOOP_START_NO_LINEZOOM
-
-							if (used_flipx)
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[realy*16+(15-realx)];
-									DRAW_PIX
-								}
-							}
-							else // no rotate, no flipy, no flipx
-							{
-								XLOOP_START
-
-									UINT16 pix = tempshape[realy*16+realx];
-									DRAW_PIX
-								}
-							}
-						}
+						YXLOOP_START_NO_LINEZOOM
+						UINT16 pix = tempshape[realy*16+realx];
+						DRAW_PIX
+						YXLOOP_END
 					}
-				}
+				} // end zoomed
 			} // end no indirect zoom
 		}
 	}
