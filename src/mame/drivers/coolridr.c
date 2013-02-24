@@ -426,7 +426,7 @@ public:
 	bitmap_rgb32 m_screen2_bitmap;
 	int m_scsp_last_line;
 	UINT8 an_mux_data;
-	UINT8 sound_data, sound_fifo_full;
+	UINT8 sound_data, sound_fifo;
 
 	UINT8* m_compressedgfx;
 	UINT16* m_expanded_10bit_gfx;
@@ -2101,6 +2101,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 			UINT32 dst = m_sound_dma[1];
 			UINT32 size = (m_sound_dma[2]>>16)*0x40;
 
+			//printf("%08x %08x %08x %02x\n",src,dst,size,sound_fifo);
+
 			for(int i = 0;i < size; i+=2)
 			{
 				sound_space.write_word(dst,main_space.read_word(src));
@@ -2118,7 +2120,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 			UINT32 dst = m_sound_dma[5];
 			UINT32 size = (m_sound_dma[6]>>16)*0x40;
 
-			//printf("%08x %08x %08x %02x\n",src,dst,size,sound_data);
+			//printf("%08x %08x %08x %02x\n",src,dst,size,sound_fifo);
 
 			for(int i = 0;i < size; i+=2)
 			{
@@ -2169,7 +2171,7 @@ ADDRESS_MAP_END
 /* TODO: what is this for, volume mixing? MIDI? */
 WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
 {
-	sound_fifo_full = data & 0x80;
+	sound_fifo = data;
 //	sound_data = data;
 //	printf("%02x sound\n",data);
 }
@@ -2179,7 +2181,7 @@ static ADDRESS_MAP_START( system_h1_sound_map, AS_PROGRAM, 16, coolridr_state )
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp1", scsp_r, scsp_w)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2",0) AM_SHARE("soundram2")
 	AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE_LEGACY("scsp2", scsp_r, scsp_w)
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM
+	AM_RANGE(0x800000, 0x80ffff) AM_MIRROR(0x200000) AM_RAM
 	AM_RANGE(0x900000, 0x900001) AM_WRITE8(sound_to_sh1_w,0x00ff)
 ADDRESS_MAP_END
 
