@@ -711,7 +711,7 @@ struct cool_render_object
 			{ \
 				/* mm cccc cccc */ \
 				UINT16 rawdat = (compdata & 0x0ff); \
-				if (rawdat > (b2altpenmask + 0x48)) /* does this have to be turned on by b1mode? does it affect the other colour depths too? */ \
+				if (b1mode && (rawdat > (b2altpenmask + 0x48))) /* does this have to be turned on by b1mode? road ends up with some bad pixels otherwise but maybe the calc is wrong... does it affect the other colour depths too? */ \
 					tempshape[data_written^writeaddrxor] = rearranged_16bit_gfx[color_offs2 + (rawdat )+0x48]; /* bike wheels + brake light */ \
 				else \
 					tempshape[data_written^writeaddrxor] = rearranged_16bit_gfx[color_offs + (rawdat )+0x48]; /* +0x48 crt test end of blue, start of white */ \
