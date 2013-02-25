@@ -388,12 +388,21 @@ public:
 		m_sysh1_workram_h(*this, "sysh1_workrah"),
 		m_sound_dma(*this, "sound_dma"),
 		m_soundram(*this, "soundram"),
-		m_soundram2(*this, "soundram2")
+		m_soundram2(*this, "soundram2"),
+		m_io_an0(*this, "AN0"),
+		m_io_an1(*this, "AN1"),
+		m_io_an2(*this, "AN2"),
+		m_io_an3(*this, "AN3"),
+		m_io_an4(*this, "AN4"),
+		m_io_an5(*this, "AN5"),
+		m_io_an6(*this, "AN6"),
+		m_io_an7(*this, "AN7"),
+		m_io_config(*this, "CONFIG")
 	{
 		m_work_queue[0] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 		m_work_queue[1] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 	}
-
+	
 	// Blitter state
 	UINT16 m_textBytesToWrite;
 	INT16  m_blitterSerialCount;
@@ -423,6 +432,16 @@ public:
 	required_shared_ptr<UINT32> m_sound_dma;
 	required_shared_ptr<UINT16> m_soundram;
 	required_shared_ptr<UINT16> m_soundram2;
+	required_ioport m_io_an0;
+	required_ioport m_io_an1;
+	required_ioport m_io_an2;
+	required_ioport m_io_an3;
+	required_ioport m_io_an4;
+	required_ioport m_io_an5;
+	required_ioport m_io_an6;
+	required_ioport m_io_an7;
+	required_ioport m_io_config;
+
 	bitmap_rgb32 m_temp_bitmap_sprites[4];
 	bitmap_rgb32 m_temp_bitmap_sprites2[4];
 	bitmap_ind16 m_zbuffer_bitmap;
@@ -495,6 +514,7 @@ public:
 
 	osd_work_queue *    m_work_queue[2]; // work queue, one per screen
 	static void *draw_object_threaded(void *param, int threadid);
+	int m_usethreads;
 };
 
 #define PRINT_BLIT_STUFF \
@@ -1800,7 +1820,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 				m_clipvals[0][2] = m_spriteblit[3];
 				m_clipblitterMode[0] = m_blitterMode;
 			}
-			printf("(mode %02x) unknown sprite list type 1 - %04x %04x %04x %04x (%08x %08x %08x)\n", m_blitterMode, (m_spriteblit[1]&0xffff0000)>>16,(m_spriteblit[1]&0x0000ffff)>>0, ((m_spriteblit[2]&0xffff0000)>>16)-((m_spriteblit[3]&0x0000ffff)>>0),((m_spriteblit[2]&0x0000ffff)>>0)-((m_spriteblit[3]&0x0000ffff)>>0),    m_spriteblit[1],m_spriteblit[2],m_spriteblit[3]);
+			//printf("(mode %02x) unknown sprite list type 1 - %04x %04x %04x %04x (%08x %08x %08x)\n", m_blitterMode, (m_spriteblit[1]&0xffff0000)>>16,(m_spriteblit[1]&0x0000ffff)>>0, ((m_spriteblit[2]&0xffff0000)>>16)-((m_spriteblit[3]&0x0000ffff)>>0),((m_spriteblit[2]&0x0000ffff)>>0)-((m_spriteblit[3]&0x0000ffff)>>0),    m_spriteblit[1],m_spriteblit[2],m_spriteblit[3]);
 
 		}
 
@@ -1885,7 +1905,14 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		queue = m_work_queue[1];
 	}
 
-	osd_work_item_queue(queue, draw_object_threaded, testobject, WORK_ITEM_FLAG_AUTO_RELEASE);
+	if (m_usethreads)
+	{
+		osd_work_item_queue(queue, draw_object_threaded, testobject, WORK_ITEM_FLAG_AUTO_RELEASE);
+	}
+	else
+	{
+		draw_object_threaded((void*)testobject,0);
+	}
 }
 
 
@@ -2384,8 +2411,18 @@ WRITE16_MEMBER( coolridr_state::h1_soundram2_w)
 
 READ8_MEMBER( coolridr_state::analog_mux_r )
 {
-	static const char *const adcnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
-	UINT8 adc_data = ioport(adcnames[an_mux_data])->read_safe(0);
+	UINT8 adc_data = 0;
+	switch(an_mux_data)
+	{
+		case 0x0: adc_data = m_io_an0->read(); break;
+		case 0x1: adc_data = m_io_an1->read(); break;
+		case 0x2: adc_data = m_io_an2->read(); break;
+		case 0x3: adc_data = m_io_an3->read(); break;
+		case 0x4: adc_data = m_io_an4->read(); break;
+		case 0x5: adc_data = m_io_an5->read(); break;
+		case 0x6: adc_data = m_io_an6->read(); break;
+		case 0x7: adc_data = m_io_an7->read(); break;
+	}
 	an_mux_data++;
 	an_mux_data &= 0x7;
 	return adc_data;
@@ -2875,6 +2912,13 @@ static INPUT_PORTS_START( coolridr )
 
 	PORT_START("AN7")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+
+	// driver debug
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x01, "Use Threading Code" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -3027,7 +3071,7 @@ void coolridr_state::machine_reset()
 //	memcpy(m_soundram, memregion("soundcpu")->base()+0x80000, 0x80000);
 //  m_soundcpu->reset();
 
-
+	m_usethreads = m_io_config->read()&1;
 }
 
 #if 0
