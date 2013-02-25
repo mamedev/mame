@@ -408,7 +408,7 @@ public:
 	UINT32 m_spriteblit[12];
 
 	UINT32 m_clipvals[2][3];
-
+	UINT8  m_clipblitterMode[2]; // hack
 
 
 	required_device<cpu_device> m_maincpu;
@@ -1314,8 +1314,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		if (clipminY>clipmaxY) clipminY = clipmaxY;
 	
 
-
-//		b1colorNumber = object->state->machine().rand()&0xfff;
+		//b1colorNumber = object->state->machine().rand()&0xfff;
 	}
 
 	/* DRAW */
@@ -1765,17 +1764,44 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 		if (m_blitterMode&0x80)
 		{
-			m_clipvals[1][0] = m_spriteblit[1];
-			m_clipvals[1][1] = m_spriteblit[2];
-			m_clipvals[1][2] = m_spriteblit[3];
+			// HACK...
+			// the end sequences do this.. 4f / af cliprects
+			//(mode 4f) unknown sprite list type 1 - 0054 0105 0059 0198 (00540105 0060019f 00000007)
+			//(mode 50) unknown sprite list type 1 - 0000 017f 0000 01f0 (0000017f 000701f7 00000007)
+			// THEN writes the sprite that needs to be clipped(!)
+			// this ends up disabling the cliprect before the sprite that actually needs it
+			//
+			// all other cliprect blits seem to be written after mode 50, so this hack just prevents
+			// writes with a higher value than the last one from taking effect, fixing the ending...
+			// especially noticable with 'LoveMachine'
+			// (mode 4f) unknown sprite list type 1 - 0054 0105 0059 0198 (00540105 0060019f 00000007)
+			// (mode 50) unknown sprite list type 1 - 0000 017f 0000 01f0 (0000017f 000701f7 00000007)
+			// said ending also ends up drawing a red bar under the image, which isn't clipped out and
+			// is sent before the clip window anyway(?)...
+
+			// lightning also needs clipping (doesn't have the red bar problem)
+			// (mode 4f) unknown sprite list type 1 - 0054 0105 0059 0198 (00540105 0060019f 00000007)
+
+			if (m_clipblitterMode[1] >= m_blitterMode)
+			{
+				m_clipvals[1][0] = m_spriteblit[1];
+				m_clipvals[1][1] = m_spriteblit[2];
+				m_clipvals[1][2] = m_spriteblit[3];
+				m_clipblitterMode[1] = m_blitterMode;
+			}
 
 		}
 		else
 		{
-			m_clipvals[0][0] = m_spriteblit[1];
-			m_clipvals[0][1] = m_spriteblit[2];
-			m_clipvals[0][2] = m_spriteblit[3];
-			//printf("unknown sprite list type 1 - %04x %04x %04x %04x (%08x %08x %08x)\n", (m_spriteblit[1]&0xffff0000)>>16,(m_spriteblit[1]&0x0000ffff)>>0, ((m_spriteblit[2]&0xffff0000)>>16)-((m_spriteblit[3]&0x0000ffff)>>0),((m_spriteblit[2]&0x0000ffff)>>0)-((m_spriteblit[3]&0x0000ffff)>>0),    m_spriteblit[1],m_spriteblit[2],m_spriteblit[3]);
+			if (m_clipblitterMode[0] >= m_blitterMode)
+			{
+				m_clipvals[0][0] = m_spriteblit[1];
+				m_clipvals[0][1] = m_spriteblit[2];
+				m_clipvals[0][2] = m_spriteblit[3];
+				m_clipblitterMode[0] = m_blitterMode;
+			}
+			printf("(mode %02x) unknown sprite list type 1 - %04x %04x %04x %04x (%08x %08x %08x)\n", m_blitterMode, (m_spriteblit[1]&0xffff0000)>>16,(m_spriteblit[1]&0x0000ffff)>>0, ((m_spriteblit[2]&0xffff0000)>>16)-((m_spriteblit[3]&0x0000ffff)>>0),((m_spriteblit[2]&0x0000ffff)>>0)-((m_spriteblit[3]&0x0000ffff)>>0),    m_spriteblit[1],m_spriteblit[2],m_spriteblit[3]);
+
 		}
 
 		// abort early
@@ -1836,7 +1862,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	testobject->blittype = m_blittype;
 	osd_work_queue *queue;
 	// which queue, which bitmap
-	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60)
+	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x4f || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 	{
 		testobject->drawbitmap = &m_temp_bitmap_sprites[0];
 		testobject->zbitmap = &m_zbuffer_bitmap;
@@ -1847,7 +1873,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 		queue = m_work_queue[0];
 	}
-	else // 0x90, 0xa0, 0xb0, 0xc0
+	else // 0x90, 0xa0, 0xaf, 0xb0, 0xc0
 	{
 		testobject->drawbitmap = &m_temp_bitmap_sprites2[0];
 		testobject->zbitmap = &m_zbuffer_bitmap2;
@@ -1867,11 +1893,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 {
 	m_blitterMode = (data & 0x00ff0000) >> 16;
 
-	if (m_blitterMode == 0x4f)
-	{
-		/* used during end sequence, purpose unknown */
-	}
-	else if (m_blitterMode == 0xf4)
+
+	if (m_blitterMode == 0xf4)
 	{
 		// Some sort of addressing state.
 		// In the case of text, simply writes 4 characters per 32-bit word.
@@ -1887,9 +1910,12 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 
 
 	}
-	else if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60
-		  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
+	else if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x4f || m_blitterMode == 0x50 || m_blitterMode == 0x60
+		  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xaf || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
 	{
+		// 4f / af are used to send the clipping window during the end sequence, I don't know if the 'f' bit has any special meaning
+		// we need a hack for the blit window to set by them to work at all
+
 		// The blitter function(s).
 		// After this is set a fixed count of 11 32-bit words are sent to the data register.
 		// The lower word always seems to be 0x0001 and the upper byte always 0xac.
@@ -1914,8 +1940,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_mode_w)
 
 		// i've seen this triggered once or twice
 		// might be there are more z-bits, or it's just overflowing when there are too many sprites
-		if (data & 0x0000f000)
-			printf("blitter mode with mask 0x0000f000\n");
+		// also set on the 4f/af cliprect during the ending
+		//if (data & 0x0000f000)
+		//	printf("blitter mode with mask 0x0000f000 (%08x)\n", data & 0x0000f000);
 
 
 
@@ -1957,8 +1984,8 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
 		space.write_dword(memOffset, data);
 		m_blitterSerialCount += 0x04;
 	}
-	else if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x50 || m_blitterMode == 0x60
-		  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
+	else if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x4f || m_blitterMode == 0x50 || m_blitterMode == 0x60
+		  || m_blitterMode == 0x90 || m_blitterMode == 0xa0 || m_blitterMode == 0xaf || m_blitterMode == 0xb0 || m_blitterMode == 0xc0)
 	{
 		// Serialized counts
 		if (m_blitterSerialCount < 12)
@@ -2007,7 +2034,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_blit_data_w)
 	}
 	else
 	{
-		logerror("unk blit mode %02x\n", m_blitterMode);
+		printf("unk blit mode %02x\n", m_blitterMode);
 	}
 }
 
@@ -2080,6 +2107,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				m_clipvals[0][0] = 0;
 				m_clipvals[0][1] = 0;
 				m_clipvals[0][2] = 0;
+				m_clipblitterMode[0] = 0xff;
 			}
 			else if(m_blitterClearMode == 0x8c800000)
 			{
@@ -2091,6 +2119,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				m_clipvals[1][0] = 0;
 				m_clipvals[1][1] = 0;
 				m_clipvals[1][2] = 0;
+				m_clipblitterMode[1] = 0xff;
 			}
 
 			//printf("frame\n");
