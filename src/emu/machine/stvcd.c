@@ -2409,15 +2409,15 @@ saturn_state::partitionT *saturn_state::cd_read_filtered_sector(INT32 fad, UINT8
 		// now get a raw 2352 byte sector - if it's mode 1, get mode1_raw
 		if ((trktype == CD_TRACK_MODE1) || (trktype == CD_TRACK_MODE1_RAW))
 		{
-			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_MODE1_RAW, true);
+			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_MODE1_RAW);
 		}
 		else if (trktype != CD_TRACK_AUDIO) // if not audio it must be mode 2 so get mode2_raw
 		{
-			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_MODE2_RAW, true);
+			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_MODE2_RAW);
 		}
 		else
 		{
-			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_AUDIO, true);
+			cdrom_read_data(cdrom, fad-150, curblock.data, CD_TRACK_AUDIO);
 		}
 
 		curblock.size = sectlenin;
@@ -2541,7 +2541,7 @@ void saturn_state::cd_readblock(UINT32 fad, UINT8 *dat)
 {
 	if (cdrom)
 	{
-		cdrom_read_data(cdrom, fad-150, dat, CD_TRACK_MODE1, true);
+		cdrom_read_data(cdrom, fad-150, dat, CD_TRACK_MODE1);
 	}
 }
 
