@@ -533,33 +533,6 @@ void isa16_device::device_start()
 	m_out_drq7_func.resolve(m_out_drq7_cb, *this);
 }
 
-void isa16_device::install16_device(device_t *dev, offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_device_func rhandler, const char* rhandler_name, write16_device_func whandler, const char *whandler_name)
-{
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 16:
-			m_maincpu->space(AS_IO).install_legacy_readwrite_handler(*dev, start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0);
-			break;
-		case 32:
-			if ((start % 4) == 0) {
-				if ((end-start)==1) {
-					m_maincpu->space(AS_IO).install_legacy_readwrite_handler(*dev, start, end+2, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0x0000ffff);
-				} else {
-					m_maincpu->space(AS_IO).install_legacy_readwrite_handler(*dev, start, end,   mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffffffff);
-				}
-			} else {
-				// we handle just misalligned by 2
-				m_maincpu->space(AS_IO).install_legacy_readwrite_handler(*dev, start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name,0xffff0000);
-			}
-
-			break;
-		default:
-			fatalerror("ISA16: Bus width %d not supported\n", buswidth);
-			break;
-	}
-}
-
 void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_delegate rhandler, write16_delegate whandler)
 {
 	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
@@ -579,34 +552,6 @@ void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_
 			} else {
 				// we handle just misalligned by 2
 				m_maincpu->space(AS_IO).install_readwrite_handler(start-2, end, mask, mirror, rhandler, whandler, 0xffff0000);
-			}
-
-			break;
-		default:
-			fatalerror("ISA16: Bus width %d not supported\n", buswidth);
-			break;
-	}
-}
-
-void isa16_device::install16_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read16_space_func rhandler, const char* rhandler_name, write16_space_func whandler, const char *whandler_name)
-{
-	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
-	switch(buswidth)
-	{
-		case 16:
-			m_maincpu->space(AS_IO).install_legacy_readwrite_handler(start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name, 0);
-			break;
-		case 32:
-			m_maincpu->space(AS_IO).install_legacy_readwrite_handler(start, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name, 0xffffffff);
-			if ((start % 4) == 0) {
-				if ((end-start)==1) {
-					m_maincpu->space(AS_IO).install_legacy_readwrite_handler(start, end+2, mask, mirror, rhandler, rhandler_name, whandler, whandler_name, 0x0000ffff);
-				} else {
-					m_maincpu->space(AS_IO).install_legacy_readwrite_handler(start, end,   mask, mirror, rhandler, rhandler_name, whandler, whandler_name, 0xffffffff);
-				}
-			} else {
-				// we handle just misalligned by 2
-				m_maincpu->space(AS_IO).install_legacy_readwrite_handler(start-2, end, mask, mirror, rhandler, rhandler_name, whandler, whandler_name, 0xffff0000);
 			}
 
 			break;
