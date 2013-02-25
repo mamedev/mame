@@ -710,7 +710,11 @@ struct cool_render_object
 			else /* 8bpp */ \
 			{ \
 				/* mm cccc cccc */ \
-				tempshape[data_written^writeaddrxor] = rearranged_16bit_gfx[color_offs + (compdata & 0x0ff) + 0x48]; /* +0x48 crt test end of blue, start of white */ \
+				UINT16 rawdat = (compdata & 0x0ff); \
+				if (rawdat > (b2altpenmask + 0x48)) /* does this have to be turned on by b1mode? does it affect the other colour depths too? */ \
+					tempshape[data_written^writeaddrxor] = rearranged_16bit_gfx[color_offs2 + (rawdat )+0x48]; /* bike wheels + brake light */ \
+				else \
+					tempshape[data_written^writeaddrxor] = rearranged_16bit_gfx[color_offs + (rawdat )+0x48]; /* +0x48 crt test end of blue, start of white */ \
 				if (tempshape[data_written^writeaddrxor]==0x8000) blankcount--; \
 				data_written++; \
 			} \
@@ -866,11 +870,17 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 	if (blit1_unused!=0) printf("blit1 unknown bits set %08x\n", object->spriteblit[1]);
 
+
+	if (b1mode)
+	{
+	//	b1colorNumber = object->state->machine().rand()&0xfff;
+	}
+
 	/************* object->spriteblit[3] *************/
 
 	// seems to be more complex than just transparency
 	UINT32 blit2_unused = object->spriteblit[2]&0xff80f800;
-	UINT32 b2tpen = (object->spriteblit[2] & 0x007f0000)>>16;
+	UINT32 b2altpenmask = (object->spriteblit[2] & 0x007f0000)>>16;
 	UINT32 b2colorNumber = (object->spriteblit[2] & 0x000007ff);
 
 	if (b2colorNumber != b1colorNumber)
@@ -888,12 +898,12 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	if (blit2_unused!=0) printf("blit1 unknown bits set %08x\n", object->spriteblit[2]);
 	if (b1mode)
 	{
-		if (b2tpen != 0x7f) printf("b1mode 1, b2tpen!=0x7f\n");
+		if (b2altpenmask != 0x7f) printf("b1mode 1, b2altpenmask!=0x7f\n");
 	}
 	else
 	{
 		// 0x01/0x02 trips in rare cases (start of one of the attract levels) maybe this is some kind of alpha instead?
-		if ((b2tpen != 0x00) && (b2tpen != 0x01) && (b2tpen != 0x02)) printf("b1mode 0, b2tpen!=0x00,0x01 or 0x02 (is %02x)\n", b2tpen);
+		if ((b2altpenmask != 0x00) && (b2altpenmask != 0x01) && (b2altpenmask != 0x02)) printf("b1mode 0, b2altpenmask!=0x00,0x01 or 0x02 (is %02x)\n", b2altpenmask);
 	}
 	 // 00??0uuu
 	 // ?? seems to be 00 or 7f, set depending on b1mode
@@ -1522,6 +1532,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 			UINT16 tempshape[16*16];
 
 			int color_offs = (0x7b20 + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */
+			int color_offs2 = (0x7b20 + (b2colorNumber & 0x7ff))*0x40 * 5;
 			UINT16 blankcount = 256;
 
 			if (used_flipy)
