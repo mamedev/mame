@@ -851,10 +851,10 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	UINT16* rearranged_16bit_gfx = object->state->m_rearranged_16bit_gfx;
 	UINT16* expanded_10bit_gfx = object->state->m_expanded_10bit_gfx;
 
-	UINT16 clipminX = CLIPMINX_FULL;
-	UINT16 clipmaxX = CLIPMAXX_FULL;
-	UINT16 clipminY = CLIPMINY_FULL;
-	UINT16 clipmaxY = CLIPMAXY_FULL;
+	INT16 clipminX = CLIPMINX_FULL;
+	INT16 clipmaxX = CLIPMAXX_FULL;
+	INT16 clipminY = CLIPMINY_FULL;
+	INT16 clipmaxY = CLIPMAXY_FULL;
 
 
 	/************* object->spriteblit[1] *************/
@@ -1280,11 +1280,11 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	// used in film strip attract mode, and between stages
 	if (object->clipvals[2] & 0x0000007) // clearly this isn't the enable flag, probably just enabled until next frame / it gets disabled
 	{
-
-		UINT16 minx = ((object->clipvals[1]&0xffff0000)>>16) - (((object->clipvals[2]&0x0000ffff)>>0));
-		UINT16 maxx = ((object->clipvals[1]&0x0000ffff)>>0)  - (((object->clipvals[2]&0x0000ffff)>>0));
-		UINT16 miny = ((object->clipvals[0]&0xffff0000)>>16); // maybe subtract the top 16 bits of clipvals[2], but not used?
-		UINT16 maxy = ((object->clipvals[0]&0x0000ffff)>>0);
+		// these go negative when things scroll off the left in attract mode
+		INT16 minx = ((object->clipvals[1]&0xffff0000)>>16) - (((object->clipvals[2]&0x0000ffff)>>0));
+		INT16 maxx = ((object->clipvals[1]&0x0000ffff)>>0)  - (((object->clipvals[2]&0x0000ffff)>>0));
+		INT16 miny = ((object->clipvals[0]&0xffff0000)>>16); // maybe subtract the top 16 bits of clipvals[2], but not used?
+		INT16 maxy = ((object->clipvals[0]&0x0000ffff)>>0);
 
 
 		clipminX = minx -1;
