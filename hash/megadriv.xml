@@ -26133,7 +26133,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="beggarp">
+	<software name="beggarp" supported="partial">
 		<description>Beggar Prince (Euro, USA)</description>
 		<year>2005</year>
 		<publisher>Super Fighter Team</publisher>
