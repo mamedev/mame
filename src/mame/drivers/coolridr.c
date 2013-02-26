@@ -687,6 +687,7 @@ struct cool_render_object
 	/* skip the decoding if it's the same tile as last time! */ \
 	if (spriteNumber != lastSpriteNumber) \
 	{ \
+		blankcount = 256;\
 		lastSpriteNumber = spriteNumber; \
        \
 		int i = 1;/* skip first 10 bits for now */ \
@@ -744,7 +745,81 @@ struct cool_render_object
 	} \
 
 
-#define YXLOOP_START \
+#define CHECK_DECODE \
+	if (used_flipy) \
+	{ \
+		if (used_flipx) \
+		{ \
+			RLE_BLOCK(0xff) \
+		} \
+		else \
+		{ \
+			RLE_BLOCK(0xf0) \
+		} \
+	} \
+	else \
+	{	if (used_flipx) \
+		{ \
+			RLE_BLOCK(0x0f) \
+		} \
+		else \
+		{ \
+			RLE_BLOCK(0x00) \
+		} \
+	} \
+	if (blankcount==0) \
+		continue; \
+
+#define GET_SPRITE_NUMBER \
+	int lookupnum; \
+	/* with this bit enabled the tile numbers gets looked up using 'data' (which would be blit11) (eg 03f40000 for startup text) */ \
+	/* this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites */ \
+	if (indirect_tile_enable) \
+	{ \
+		/* this doesn't handle the various flip modes.. */ \
+		lookupnum = object->indirect_tiles[h + (v*used_hCellCount)]; \
+	} \
+	else \
+	{ \
+		if (!blit_rotate) \
+		{ \
+			if (!used_flipy) \
+			{ \
+				if (!used_flipx) \
+					lookupnum = h + (v*used_hCellCount); \
+				else \
+					lookupnum = (used_hCellCount-h-1) + (v*used_hCellCount); \
+			} \
+			else \
+			{ \
+				if (!used_flipx) \
+					lookupnum = h + ((used_vCellCount-v-1)*used_hCellCount); \
+				else \
+					lookupnum = (used_hCellCount-h-1) + ((used_vCellCount-v-1)*used_hCellCount); \
+			} \
+		} \
+		else \
+		{ \
+			if (!used_flipy) \
+			{ \
+				if (!used_flipx) \
+					lookupnum = v + (h*used_vCellCount); \
+				else \
+					lookupnum = (used_vCellCount-v-1) + (h*used_vCellCount); \
+			} \
+			else \
+			{ \
+				if (!used_flipx) \
+					lookupnum = v + ((used_hCellCount-h-1)*used_vCellCount); \
+				else \
+					lookupnum = (used_vCellCount-v-1) + ((used_hCellCount-h-1)*used_vCellCount); \
+			} \
+		} \
+	} \
+	UINT32 spriteNumber = (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]); \
+
+
+#define YXLOOP_START_1 \
 	for (int y = 0; y < blockhigh; y++) \
 	{ \
 		int realy = ((y*incy)>>21); \
@@ -761,12 +836,77 @@ struct cool_render_object
 			continue; \
 		if (pixelOffsetX>clipmaxX) \
 			continue; \
-		UINT32 incx = 0x8000000 / hZoomTable[realy]; \
-		for (int x = 0; x < blockwide; x++) \
+		\
+		if (pixelOffsetX>=clipminX && pixelOffsetX+blockwide<clipmaxX) \
 		{ \
-			const int drawx = pixelOffsetX+x; \
-			if ((drawx>clipmaxX || drawx<clipminX)) continue; \
-			int realx = ((x*incx)>>21); \
+			UINT32 incx = 0x8000000 / hZoomTable[realy]; \
+			for (int x = 0; x < blockwide; x++) \
+			{ \
+				const int drawx = pixelOffsetX+x; \
+				int realx = ((x*incx)>>21); \
+				const UINT16 &pix = tempshape[realx*16+realy]; \
+				DRAW_PIX \
+			} \
+		} \
+		else \
+		{ \
+			UINT32 incx = 0x8000000 / hZoomTable[realy]; \
+			for (int x = 0; x < blockwide; x++) \
+			{ \
+				const int drawx = pixelOffsetX+x; \
+				if ((drawx>clipmaxX || drawx<clipminX)) continue; \
+				int realx = ((x*incx)>>21); \
+				const UINT16 &pix = tempshape[realx*16+realy]; \
+				DRAW_PIX \
+			} \
+		} \
+	} \
+
+
+#define YXLOOP_START_2 \
+	for (int y = 0; y < blockhigh; y++) \
+	{ \
+		int realy = ((y*incy)>>21); \
+		if (!hZoomTable[realy]) \
+			continue;	 \
+		const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40; \
+		const int pixelOffsetnextX = ((hPositionTable[realy]) + ((h+1)* 16 * hZoomTable[realy])) / 0x40; \
+		const int drawy = pixelOffsetY+y; \
+		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
+		line = &drawbitmap->pix32(drawy); \
+		zline = &object->zbitmap->pix16(drawy); \
+		int blockwide = pixelOffsetnextX-pixelOffsetX; \
+		if (pixelOffsetX+blockwide <clipminX) \
+			continue; \
+		if (pixelOffsetX>clipmaxX) \
+			continue; \
+		if (pixelOffsetX>=clipminX && pixelOffsetX+blockwide<clipmaxX) \
+		{ \
+			UINT32 incx = 0x8000000 / hZoomTable[realy]; \
+			for (int x = 0; x < blockwide; x++) \
+			{ \
+				const int drawx = pixelOffsetX+x; \
+				int realx = ((x*incx)>>21); \
+				const UINT16 &pix = tempshape[realy*16+realx]; \
+				DRAW_PIX \
+			} \
+		} \
+		else \
+		{ \
+			UINT32 incx = 0x8000000 / hZoomTable[realy]; \
+			for (int x = 0; x < blockwide; x++) \
+			{ \
+				const int drawx = pixelOffsetX+x; \
+				int realx = ((x*incx)>>21); \
+				if ((drawx>clipmaxX || drawx<clipminX)) continue; \
+				const UINT16 &pix = tempshape[realy*16+realx]; \
+				DRAW_PIX \
+			} \
+		} \
+	} \
+
+
+
 
 #define YXLOOP_END \
 		} \
@@ -842,11 +982,7 @@ TODO: fix anything that isn't text.
 		if (object->zpri < zline[drawx]) \
 		{ \
 			{ \
-				int r,g,b; \
-				r = pal5bit((pix >> 10) & 0x1f); \
-				g = pal5bit((pix >> 5) & 0x1f); \
-				 b = pal5bit((pix >> 0) & 0x1f); \
-				line[drawx] = r<<16 | g<<8 | b; \
+				line[drawx] = (pal5bit((pix >> 10) & 0x1f)<<16)|(pal5bit((pix >> 5) & 0x1f)<<8)|pal5bit((pix >> 0) & 0x1f); \
 				zline[drawx] = object->zpri; \
 			} \
 		} \
@@ -1485,100 +1621,14 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 			}
 		}
 
-
+		UINT32 lastSpriteNumber = 0xffffffff;
+		UINT16 tempshape[16*16];
+		UINT16 blankcount = 0;
+		int color_offs = (0x7b20 + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */ \
+		int color_offs2 = (0x7b20 + (b2colorNumber & 0x7ff))*0x40 * 5; \
 
 		for (int h = 0; h < used_hCellCount; h++)
 		{
-			if (!indirect_zoom_enable)
-			{
-			//	int offs = ((hPosition) + (h* 16 * hZoom)) / 0x40;
-			//	if (offs>clipmaxX) continue;
-			}
-
-			UINT32 lastSpriteNumber = 0xffffffff;
-
-			int lookupnum;
-
-			// with this bit enabled the tile numbers gets looked up using 'data' (which would be blit11) (eg 03f40000 for startup text)
-			// this allows text strings to be written as 8-bit ascii in one area (using command 0x10), and drawn using multi-width sprites
-			if (indirect_tile_enable)
-			{
-				// this doesn't handle the various flip modes..
-				lookupnum = object->indirect_tiles[h + (v*used_hCellCount)];
-			}
-			else
-			{
-				if (!blit_rotate)
-				{
-					if (!used_flipy)
-					{
-						if (!used_flipx)
-							lookupnum = h + (v*used_hCellCount);
-						else
-							lookupnum = (used_hCellCount-h-1) + (v*used_hCellCount);
-					}
-					else
-					{
-						if (!used_flipx)
-							lookupnum = h + ((used_vCellCount-v-1)*used_hCellCount);
-						else
-							lookupnum = (used_hCellCount-h-1) + ((used_vCellCount-v-1)*used_hCellCount);
-
-					}
-				}
-				else
-				{
-					if (!used_flipy)
-					{
-						if (!used_flipx)
-							lookupnum = v + (h*used_vCellCount);
-						else
-							lookupnum = (used_vCellCount-v-1) + (h*used_vCellCount);
-					}
-					else
-					{
-						if (!used_flipx)
-							lookupnum = v + ((used_hCellCount-h-1)*used_vCellCount);
-						else
-							lookupnum = (used_vCellCount-v-1) + ((used_hCellCount-h-1)*used_vCellCount);
-
-					}
-				}
-			}
-
-			// these should be 'cell numbers' (tile numbers) which look up RLE data?
-			UINT32 spriteNumber = (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]);
-			UINT16 tempshape[16*16];
-
-			int color_offs = (0x7b20 + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */
-			int color_offs2 = (0x7b20 + (b2colorNumber & 0x7ff))*0x40 * 5;
-			UINT16 blankcount = 256;
-
-			if (used_flipy)
-			{
-				if (used_flipx)
-				{
-					RLE_BLOCK(0xff)
-				}
-				else
-				{
-					RLE_BLOCK(0xf0)
-				}
-			}
-			else
-			{	if (used_flipx)
-				{
-					RLE_BLOCK(0x0f)
-				}
-				else
-				{
-					RLE_BLOCK(0x00)
-				}
-			}
-
-
-			if (blankcount==0)
-				continue;
 
 
 
@@ -1594,19 +1644,19 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 			if (indirect_zoom_enable)
 			{
+				GET_SPRITE_NUMBER
+				CHECK_DECODE
+
+
 				if (blit_rotate)
 				{
-					YXLOOP_START
-					UINT16 pix = tempshape[realx*16+realy];
-					DRAW_PIX
-					YXLOOP_END
+					YXLOOP_START_1
+
 				}
 				else // no rotate
 				{
-					YXLOOP_START
-					UINT16 pix = tempshape[realy*16+realx];
-					DRAW_PIX
-					YXLOOP_END
+					YXLOOP_START_2
+
 				}
 			}
 			else  // no indirect zoom
@@ -1627,19 +1677,22 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 					if (pixelOffsetX>clipmaxX)
 						continue;
 
+					GET_SPRITE_NUMBER
+					CHECK_DECODE
+
 					if (pixelOffsetX>=clipminX && pixelOffsetX+16<clipmaxX)
 					{
 						if (blit_rotate)
 						{
 							YXLOOP_START_NO_ZOOM_NO_XCLIP
-							UINT16 pix = tempshape[x*16+y];
+							const UINT16 &pix = tempshape[x*16+y];
 							DRAW_PIX
 							YXLOOP_END
 						}
 						else // no rotate
 						{
 							YXLOOP_START_NO_ZOOM_NO_XCLIP
-							UINT16 pix = tempshape[y*16+x];
+							const UINT16 &pix = tempshape[y*16+x];
 							DRAW_PIX
 							YXLOOP_END
 						}
@@ -1649,14 +1702,14 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 						if (blit_rotate)
 						{
 							YXLOOP_START_NO_ZOOM
-							UINT16 pix = tempshape[x*16+y];
+							const UINT16 &pix = tempshape[x*16+y];
 							DRAW_PIX
 							YXLOOP_END
 						}
 						else // no rotate
 						{
 							YXLOOP_START_NO_ZOOM
-							UINT16 pix = tempshape[y*16+x];
+							const UINT16 &pix = tempshape[y*16+x];
 							DRAW_PIX
 							YXLOOP_END
 						}
@@ -1676,19 +1729,22 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 					if (pixelOffsetX>clipmaxX)
 						continue;
 
+					GET_SPRITE_NUMBER
+					CHECK_DECODE
+
 					if (pixelOffsetX>=clipminX && pixelOffsetX+blockwide<clipmaxX)
 					{
 						if (blit_rotate)
 						{
 							YXLOOP_START_NO_LINEZOOM_NO_XCLIP
-							UINT16 pix = tempshape[realx*16+realy];
+							const UINT16 &pix = tempshape[realx*16+realy];
 							DRAW_PIX
 							YXLOOP_END
 						}
 						else // no rotate
 						{
 							YXLOOP_START_NO_LINEZOOM_NO_XCLIP
-							UINT16 pix = tempshape[realy*16+realx];
+							const UINT16 &pix = tempshape[realy*16+realx];
 							DRAW_PIX
 							YXLOOP_END
 						}
@@ -1698,14 +1754,14 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 						if (blit_rotate)
 						{
 							YXLOOP_START_NO_LINEZOOM
-							UINT16 pix = tempshape[realx*16+realy];
+							const UINT16 &pix = tempshape[realx*16+realy];
 							DRAW_PIX
 							YXLOOP_END
 						}
 						else // no rotate
 						{
 							YXLOOP_START_NO_LINEZOOM
-							UINT16 pix = tempshape[realy*16+realx];
+							const UINT16 &pix = tempshape[realy*16+realx];
 							DRAW_PIX
 							YXLOOP_END
 						}
