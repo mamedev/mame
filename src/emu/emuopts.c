@@ -475,6 +475,9 @@ void emu_options::parse_standard_inis(astring &error_string)
 	if (parent != -1)
 		parse_one_ini(driver_list::driver(parent).name, OPTION_PRIORITY_PARENT_INI, &error_string);
 	parse_one_ini(cursystem->name, OPTION_PRIORITY_DRIVER_INI, &error_string);
+
+	// Re-evaluate slot options after loading ini files
+	update_slot_options();
 }
 
 
