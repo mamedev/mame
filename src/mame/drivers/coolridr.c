@@ -401,6 +401,9 @@ public:
 	{
 		m_work_queue[0] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 		m_work_queue[1] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
+		decode[0].current_object = 0;
+		decode[1].current_object = 0;
+
 	}
 
 	// Blitter state
@@ -515,6 +518,53 @@ public:
 	osd_work_queue *    m_work_queue[2]; // work queue, one per screen
 	static void *draw_object_threaded(void *param, int threadid);
 	int m_usethreads;
+
+#define DECODECACHE_NUMOBJECTCACHES (128)
+
+#define DECODECACHE_NUMSPRITETILES (16*16)
+
+	// decode cache
+	struct objectcache
+	{
+		// these needs to be all the elements actually going to affect the decode of an individual tile for any given object
+		UINT32 lastromoffset;
+		UINT16 lastused_flipx;
+		UINT16 lastused_flipy;
+		UINT32 lastblit_rotate;
+		UINT32 lastb1mode;
+		UINT32 lastb1colorNumber;
+		UINT32 lastb2colorNumber;
+		UINT32 lastb2altpenmask;
+		UINT16 lastused_hCellCount;
+		UINT16 lastused_vCellCount;
+		int repeatcount;
+
+		struct dectile
+		{
+			UINT16 tempshape_multi[16*16];
+			bool tempshape_multi_decoded;
+			bool is_blank;
+		};
+
+		dectile tiles[DECODECACHE_NUMSPRITETILES];
+
+	};
+
+	
+	struct objcachemanager
+	{
+		int current_object;
+		objectcache objcache[DECODECACHE_NUMOBJECTCACHES];
+
+		// fallback decode buffer for certain cases (indirect sprites, sprites too big for our buffer..)
+		UINT16 tempshape[16*16];
+	};
+
+	objcachemanager decode[2];
+
+
+
+
 };
 
 #define PRINT_BLIT_STUFF \
@@ -681,68 +731,83 @@ struct cool_render_object
 	UINT8 blittype;
 	coolridr_state* state;
 	UINT32 clipvals[3];
+	int screen;
 };
 
 #define RLE_BLOCK(writeaddrxor) \
 	/* skip the decoding if it's the same tile as last time! */ \
-	if (spriteNumber != lastSpriteNumber) \
+	if (!current_decoded) \
 	{ \
-		blankcount = 256;\
-		lastSpriteNumber = spriteNumber; \
-       \
-		int i = 1;/* skip first 10 bits for now */ \
-		int data_written = 0; \
- \
-		while (data_written<256) \
+		lastSpriteNumber = 0xffffffff; /* this optimization is currently broken, so hack it to be disabled here */ \
+		if (spriteNumber != lastSpriteNumber) \
 		{ \
- \
-			const UINT16 compdata = expanded_10bit_gfx[ (b3romoffset) + spriteNumber + i]; \
- \
-			if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100)) /* 3bpp */ \
+			blankcount = 256;\
+			lastSpriteNumber = spriteNumber; \
+		   \
+			int i = 1;/* skip first 10 bits for now */ \
+			int data_written = 0; \
+	 \
+			while (data_written<256) \
 			{ \
-				/* mm ccrr rrr0 */ \
-				int encodelength = (compdata & 0x03e)>>1; \
-				const UINT16 rledata =  rearranged_16bit_gfx[color_offs + ((compdata & 0x1c0) >> 6)]; \
-				/* guess, blank tiles have the following form */ \
-				/* 00120 (00000024,0) | 010 03f */ \
-				if (compdata&1) encodelength = 255; \
- \
-				while (data_written<256 && encodelength >=0) \
+	 \
+				const UINT16 compdata = expanded_10bit_gfx[ (b3romoffset) + spriteNumber + i]; \
+	 \
+				if (((compdata & 0x300) == 0x000) || ((compdata & 0x300) == 0x100)) /* 3bpp */ \
 				{ \
-					tempshape[data_written^writeaddrxor] = rledata; \
+					/* mm ccrr rrr0 */ \
+					int encodelength = (compdata & 0x03e)>>1; \
+					const UINT16 rledata =  rearranged_16bit_gfx[color_offs + ((compdata & 0x1c0) >> 6)]; \
+					/* guess, blank tiles have the following form */ \
+					/* 00120 (00000024,0) | 010 03f */ \
+					if (compdata&1) encodelength = 255; \
+	 \
+					while (data_written<256 && encodelength >=0) \
+					{ \
+						tempshape[data_written^writeaddrxor] = rledata; \
+						if (tempshape[data_written^writeaddrxor]==0x8000) blankcount--; \
+						encodelength--; \
+						data_written++; \
+					} \
+				} \
+				else if ((compdata & 0x300) == 0x200) /* 6bpp */ \
+				{ \
+					/* mm cccc ccrr */ \
+					int encodelength = (compdata & 0x003);			 \
+					const UINT16 rledata = rearranged_16bit_gfx[color_offs + ((compdata & 0x0fc) >> 2) + 8]; \
+					while (data_written<256 && encodelength >=0) \
+					{ \
+						tempshape[data_written^writeaddrxor] = rledata; /* + 0x8 crt test, most of red, green, start of blue */ \
+						if (tempshape[data_written^writeaddrxor]==0x8000) blankcount--; \
+						encodelength--; \
+						data_written++; \
+					} \
+				} \
+				else /* 8bpp */ \
+				{ \
+					/* mm cccc cccc */ \
+					UINT16 rawdat = (compdata & 0x0ff); \
+					if (b1mode && (rawdat > (b2altpenmask + 0x48))) /* does this have to be turned on by b1mode? road ends up with some bad pixels otherwise but maybe the calc is wrong... does it affect the other colour depths too? */ \
+						tempshape[data_written^writeaddrxor] = rearranged_16bit_gfx[color_offs2 + (rawdat )+0x48]; /* bike wheels + brake light */ \
+					else \
+						tempshape[data_written^writeaddrxor] = rearranged_16bit_gfx[color_offs + (rawdat )+0x48]; /* +0x48 crt test end of blue, start of white */ \
 					if (tempshape[data_written^writeaddrxor]==0x8000) blankcount--; \
-					encodelength--; \
 					data_written++; \
 				} \
+	 \
+				i++; \
 			} \
-			else if ((compdata & 0x300) == 0x200) /* 6bpp */ \
+			if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES) \
 			{ \
-				/* mm cccc ccrr */ \
-				int encodelength = (compdata & 0x003);			 \
-				const UINT16 rledata = rearranged_16bit_gfx[color_offs + ((compdata & 0x0fc) >> 2) + 8]; \
-				while (data_written<256 && encodelength >=0) \
-				{ \
-					tempshape[data_written^writeaddrxor] = rledata; /* + 0x8 crt test, most of red, green, start of blue */ \
-					if (tempshape[data_written^writeaddrxor]==0x8000) blankcount--; \
-					encodelength--; \
-					data_written++; \
-				} \
-			} \
-			else /* 8bpp */ \
-			{ \
-				/* mm cccc cccc */ \
-				UINT16 rawdat = (compdata & 0x0ff); \
-				if (b1mode && (rawdat > (b2altpenmask + 0x48))) /* does this have to be turned on by b1mode? road ends up with some bad pixels otherwise but maybe the calc is wrong... does it affect the other colour depths too? */ \
-					tempshape[data_written^writeaddrxor] = rearranged_16bit_gfx[color_offs2 + (rawdat )+0x48]; /* bike wheels + brake light */ \
+				object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded = true; \
+				if (blankcount==0) \
+					object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = true; \
 				else \
-					tempshape[data_written^writeaddrxor] = rearranged_16bit_gfx[color_offs + (rawdat )+0x48]; /* +0x48 crt test end of blue, start of white */ \
-				if (tempshape[data_written^writeaddrxor]==0x8000) blankcount--; \
-				data_written++; \
+					object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank = false; \
+				/* if (object->screen==0) printf("marking offset %04x as decoded (sprite number %08x ptr %08x)\n", v*used_hCellCount + h, spriteNumber, ((UINT64)(void*)tempshape)&0xffffffff);*/ \
 			} \
- \
-			i++; \
 		} \
 	} \
+
 
 
 #define CHECK_DECODE \
@@ -767,8 +832,15 @@ struct cool_render_object
 			RLE_BLOCK(0x00) \
 		} \
 	} \
-	if (blankcount==0) \
-		continue; \
+	if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES) \
+	{ \
+		if (object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].is_blank == true) \
+				continue; \
+	} \
+	else \
+		if (blankcount==0) continue; \
+
+
 
 #define GET_SPRITE_NUMBER \
 	int lookupnum; \
@@ -819,101 +891,90 @@ struct cool_render_object
 	UINT32 spriteNumber = (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) +0 ] << 10) | (expanded_10bit_gfx[ (b3romoffset) + (lookupnum<<1) + 1 ]); \
 
 
-#define YXLOOP_START_1 \
+#define DO_XCLIP_REAL \
+	if (drawx>clipmaxX) { break; } \
+	if (drawx<clipminX) { drawx++; continue; } \
+
+#define DO_XCLIP_NONE \
+
+
+#define GET_CURRENT_LINESCROLLZOOM \
+	UINT32 dword = object->indirect_zoom[v*16+realy]; \
+	UINT16 hZoomTable = hZoom + (dword>>16); \
+	/* bit 0x8000 does get set too, but only on some lines, might have another meaning? */ \
+	int linescroll = dword&0x7fff; \
+	if (linescroll & 0x4000) linescroll -= 0x8000; \
+	int hPositionTable = linescroll + hPositionx; \
+	/* DON'T use the table hZoom in this calc? (road..) */ \
+	int sizex = used_hCellCount * 16 * hZoom; \
+	hPositionTable *= 0x40; \
+	switch (hOrigin & 3) \
+	{ \
+	case 0: \
+		/* left */ \
+		break; \
+	case 1: \
+		hPositionTable -= sizex / 2; \
+		/* middle? */ \
+		break; \
+	case 2: \
+		hPositionTable -= sizex-1; \
+		/* right? */ \
+		break; \
+	case 3: \
+		/* invalid? */ \
+		break; \
+	} \
+
+
+
+
+#define YXLOOP \
+	int drawy = pixelOffsetY; \
 	for (int y = 0; y < blockhigh; y++) \
 	{ \
 		int realy = ((y*incy)>>21); \
-		if (!hZoomTable[realy]) \
-			continue;	 \
-		const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40; \
-		const int pixelOffsetnextX = ((hPositionTable[realy]) + ((h+1)* 16 * hZoomTable[realy])) / 0x40; \
-		const int drawy = pixelOffsetY+y; \
-		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
+		GET_CURRENT_LINESCROLLZOOM \
+		UINT16 hZoomHere = hZoomTable; \
+		if (!hZoomHere) { drawy++; continue; } \
+		const int pixelOffsetX = ((hPositionTable) + (h* 16 * hZoomHere)) / 0x40; \
+		const int pixelOffsetnextX = ((hPositionTable) + ((h+1)* 16 * hZoomHere)) / 0x40; \
+		if (drawy>clipmaxY) { break; }; \
+		if (drawy<clipminY) { drawy++; continue; }; \
 		line = &drawbitmap->pix32(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
 		int blockwide = pixelOffsetnextX-pixelOffsetX; \
-		if (pixelOffsetX+blockwide <clipminX) \
-			continue; \
-		if (pixelOffsetX>clipmaxX) \
-			continue; \
-		\
+		if (pixelOffsetX+blockwide <clipminX) { drawy++; continue; } \
+		if (pixelOffsetX>clipmaxX)  { drawy++; continue; } \
 		if (pixelOffsetX>=clipminX && pixelOffsetX+blockwide<clipmaxX) \
 		{ \
-			UINT32 incx = 0x8000000 / hZoomTable[realy]; \
+			UINT32 incx = 0x8000000 / hZoomHere; \
+			int drawx = pixelOffsetX; \
 			for (int x = 0; x < blockwide; x++) \
 			{ \
-				const int drawx = pixelOffsetX+x; \
+				DO_XCLIP_NONE \
 				int realx = ((x*incx)>>21); \
-				const UINT16 &pix = tempshape[realx*16+realy]; \
-				DRAW_PIX \
+				GET_PIX; \
+				DRAW_PIX; \
 			} \
 		} \
 		else \
 		{ \
-			UINT32 incx = 0x8000000 / hZoomTable[realy]; \
+			UINT32 incx = 0x8000000 / hZoomHere; \
+			int drawx = pixelOffsetX; \
 			for (int x = 0; x < blockwide; x++) \
 			{ \
-				const int drawx = pixelOffsetX+x; \
-				if ((drawx>clipmaxX || drawx<clipminX)) continue; \
+				DO_XCLIP_REAL \
 				int realx = ((x*incx)>>21); \
-				const UINT16 &pix = tempshape[realx*16+realy]; \
-				DRAW_PIX \
+				GET_PIX; \
+				DRAW_PIX; \
 			} \
 		} \
+		drawy++; \
 	} \
 
 
-#define YXLOOP_START_2 \
-	for (int y = 0; y < blockhigh; y++) \
-	{ \
-		int realy = ((y*incy)>>21); \
-		if (!hZoomTable[realy]) \
-			continue;	 \
-		const int pixelOffsetX = ((hPositionTable[realy]) + (h* 16 * hZoomTable[realy])) / 0x40; \
-		const int pixelOffsetnextX = ((hPositionTable[realy]) + ((h+1)* 16 * hZoomTable[realy])) / 0x40; \
-		const int drawy = pixelOffsetY+y; \
-		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
-		line = &drawbitmap->pix32(drawy); \
-		zline = &object->zbitmap->pix16(drawy); \
-		int blockwide = pixelOffsetnextX-pixelOffsetX; \
-		if (pixelOffsetX+blockwide <clipminX) \
-			continue; \
-		if (pixelOffsetX>clipmaxX) \
-			continue; \
-		if (pixelOffsetX>=clipminX && pixelOffsetX+blockwide<clipmaxX) \
-		{ \
-			UINT32 incx = 0x8000000 / hZoomTable[realy]; \
-			for (int x = 0; x < blockwide; x++) \
-			{ \
-				const int drawx = pixelOffsetX+x; \
-				int realx = ((x*incx)>>21); \
-				const UINT16 &pix = tempshape[realy*16+realx]; \
-				DRAW_PIX \
-			} \
-		} \
-		else \
-		{ \
-			UINT32 incx = 0x8000000 / hZoomTable[realy]; \
-			for (int x = 0; x < blockwide; x++) \
-			{ \
-				const int drawx = pixelOffsetX+x; \
-				int realx = ((x*incx)>>21); \
-				if ((drawx>clipmaxX || drawx<clipminX)) continue; \
-				const UINT16 &pix = tempshape[realy*16+realx]; \
-				DRAW_PIX \
-			} \
-		} \
-	} \
-
-
-
-
-#define YXLOOP_END \
-		} \
-	} \
-
-
-#define YXLOOP_START_NO_LINEZOOM \
+#define YXLOOP_NO_LINEZOOM \
 	for (int y = 0; y < blockhigh; y++) \
 	{ \
 		int realy = ((y*incy)>>21); \
@@ -921,48 +982,33 @@ struct cool_render_object
 		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
 		line = &drawbitmap->pix32(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
+		int drawx = pixelOffsetX; \
 		for (int x = 0; x < blockwide; x++) \
 		{ \
-			const int drawx = pixelOffsetX+x; \
-			if ((drawx>clipmaxX || drawx<clipminX)) continue; \
+			DO_XCLIP \
 			int realx = ((x*incx)>>21); \
+			GET_PIX; \
+			DRAW_PIX \
+		} \
+	} \
 
-#define YXLOOP_START_NO_LINEZOOM_NO_XCLIP \
-	for (int y = 0; y < blockhigh; y++) \
+
+
+#define YXLOOP_NO_ZOOM \
+	for (int realy = 0; realy < 16; realy++) \
 	{ \
-		int realy = ((y*incy)>>21); \
-		const int drawy = pixelOffsetY+y; \
+		const int drawy = pixelOffsetY+realy; \
 		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
 		line = &drawbitmap->pix32(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
-		for (int x = 0; x < blockwide; x++) \
+		int drawx = pixelOffsetX; \
+		for (int realx = 0; realx < 16; realx++) \
 		{ \
-			const int drawx = pixelOffsetX+x; \
-			int realx = ((x*incx)>>21); \
-
-
-#define YXLOOP_START_NO_ZOOM \
-	for (int y = 0; y < 16; y++) \
-	{ \
-		const int drawy = pixelOffsetY+y; \
-		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
-		line = &drawbitmap->pix32(drawy); \
-		zline = &object->zbitmap->pix16(drawy); \
-		for (int x = 0; x < 16; x++) \
-		{ \
-			const int drawx = pixelOffsetX+x; \
-			if ((drawx>clipmaxX || drawx<clipminX)) continue; \
-
-#define YXLOOP_START_NO_ZOOM_NO_XCLIP \
-	for (int y = 0; y < 16; y++) \
-	{ \
-		const int drawy = pixelOffsetY+y; \
-		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
-		line = &drawbitmap->pix32(drawy); \
-		zline = &object->zbitmap->pix16(drawy); \
-		for (int x = 0; x < 16; x++) \
-		{ \
-			const int drawx = pixelOffsetX+x; \
+			DO_XCLIP \
+			GET_PIX; \
+			DRAW_PIX \
+		} \
+	} \
 
 
 
@@ -994,19 +1040,46 @@ TODO: fix anything that isn't text.
 		/* how do we tell the difference between them? */ \
 		/* how would you have a black 0x0000 in an alpha sprite?? */ \
 	} \
+	drawx++; \
+
 
 
 //object->rearranged_16bit_gfx
 //object->expanded_10bit_gfx
 
+#define GET_PIX_ROTATED \
+	 UINT16 pix = tempshape[realx*16+realy]; \
 
-
+#define GET_PIX_NORMAL \
+	 UINT16 pix = tempshape[realy*16+realx]; \
 
 
 void *coolridr_state::draw_object_threaded(void *param, int threadid)
 {
 	cool_render_object *object = reinterpret_cast<cool_render_object *>(param);
 	bitmap_rgb32* drawbitmap = object->drawbitmap;
+
+	/************* object->spriteblit[3] *************/
+
+	UINT32 blit3_unused = object->spriteblit[3] & 0xffe00000;
+	UINT32 b3romoffset = (object->spriteblit[3] & 0x001fffff)*16;
+
+	if (blit3_unused) printf("unknown bits in blit word %d -  %08x\n", 3, blit3_unused);
+
+	/************* object->spriteblit[5] *************/
+
+	UINT32 blit5_unused = object->spriteblit[5]&0xfffefffe;
+	// this might enable the text indirection thing?
+	int indirect_tile_enable = (object->spriteblit[5] & 0x00010000)>>16;
+	int indirect_zoom_enable = (object->spriteblit[5] & 0x00000001);
+
+
+	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", 5, blit5_unused);
+	// 00010000 (text)
+	// 00000001 (other)
+
+
+
 
 	UINT16* rearranged_16bit_gfx = object->state->m_rearranged_16bit_gfx;
 	UINT16* expanded_10bit_gfx = object->state->m_expanded_10bit_gfx;
@@ -1065,12 +1138,6 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	 // ?? seems to be 00 or 7f, set depending on b1mode
 	 // uuu, at least 11 bits used, maybe 12 usually the same as blit1_unused? leftover?
 
-	/************* object->spriteblit[3] *************/
-
-	UINT32 blit3_unused = object->spriteblit[3] & 0xffe00000;
-	UINT32 b3romoffset = (object->spriteblit[3] & 0x001fffff)*16;
-
-	if (blit3_unused) printf("unknown bits in blit word %d -  %08x\n", 3, blit3_unused);
 
 
 	/************* object->spriteblit[4] *************/
@@ -1089,18 +1156,6 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	// x = x-flip
 	// y = y-flip
 	// r = unknown, not used much, occasional object - rotate
-
-	/************* object->spriteblit[5] *************/
-
-	UINT32 blit5_unused = object->spriteblit[5]&0xfffefffe;
-	// this might enable the text indirection thing?
-	int indirect_tile_enable = (object->spriteblit[5] & 0x00010000)>>16;
-	int indirect_zoom_enable = (object->spriteblit[5] & 0x00000001);
-
-
-	if (blit5_unused) printf("unknown bits in blit word %d -  %08x\n", 5, blit5_unused);
-	// 00010000 (text)
-	// 00000001 (other)
 
 
 
@@ -1152,7 +1207,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	/************* object->spriteblit[10] *************/
 
 	// pointer to per-line zoom and scroll data for sprites
-	UINT32 blit10 = 0; // we've cached the data here already
+	//UINT32 blit10 = 0; // we've cached the data here already
 
 	/************* object->spriteblit[11] *************/
 
@@ -1497,7 +1552,64 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 
 
+	int size = used_hCellCount * used_vCellCount;
 
+	UINT16* tempshape;
+	int screen = object->screen;
+	int use_object = 0;
+
+	if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES)
+	{
+		int found = -1;
+
+		for (int k=0;k<DECODECACHE_NUMOBJECTCACHES;k++)
+		{
+			if(((object->state->decode[screen].objcache[k].lastromoffset == b3romoffset)) &&
+			   ((object->state->decode[screen].objcache[k].lastused_flipx == used_flipx)) &&
+			   ((object->state->decode[screen].objcache[k].lastused_flipy == used_flipy)) &&
+			   ((object->state->decode[screen].objcache[k].lastblit_rotate == blit_rotate)) &&
+			   ((object->state->decode[screen].objcache[k].lastb1mode == b1mode)) &&
+			   ((object->state->decode[screen].objcache[k].lastb1colorNumber == b1colorNumber)) &&
+			   ((object->state->decode[screen].objcache[k].lastb2colorNumber == b2colorNumber)) &&
+   			   ((object->state->decode[screen].objcache[k].lastused_hCellCount == used_hCellCount)) &&
+   			   ((object->state->decode[screen].objcache[k].lastused_vCellCount == used_vCellCount)) &&
+			   ((object->state->decode[screen].objcache[k].lastb2altpenmask == b2altpenmask)))
+			{
+				found = k;
+				break;
+			}
+		}
+
+		if (found != -1)
+		{
+			object->state->decode[screen].objcache[found].repeatcount++;
+			use_object = found;
+		}
+		else
+		{
+			use_object = object->state->decode[screen].current_object;
+
+			// dirty the cache
+			for (int i=0;i<DECODECACHE_NUMSPRITETILES;i++)
+				object->state->decode[screen].objcache[use_object].tiles[i].tempshape_multi_decoded = false;
+
+			object->state->decode[screen].objcache[use_object].lastromoffset = b3romoffset;
+			object->state->decode[screen].objcache[use_object].lastused_flipx = used_flipx;
+			object->state->decode[screen].objcache[use_object].lastused_flipy = used_flipy;
+			object->state->decode[screen].objcache[use_object].lastblit_rotate = blit_rotate;
+			object->state->decode[screen].objcache[use_object].lastb1mode = b1mode;
+			object->state->decode[screen].objcache[use_object].lastb1colorNumber = b1colorNumber;
+			object->state->decode[screen].objcache[use_object].lastb2colorNumber = b2colorNumber;
+			object->state->decode[screen].objcache[use_object].lastused_hCellCount = used_hCellCount;
+			object->state->decode[screen].objcache[use_object].lastused_vCellCount = used_vCellCount;
+			object->state->decode[screen].objcache[use_object].lastb2altpenmask = b2altpenmask;
+			object->state->decode[screen].objcache[use_object].repeatcount = 0;
+
+			object->state->decode[screen].current_object++;
+			if (object->state->decode[screen].current_object >= DECODECACHE_NUMOBJECTCACHES)
+				object->state->decode[screen].current_object = 0;
+		}
+	}
 
 
 
@@ -1552,50 +1664,11 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		//if (used_flipx)
 		//	hPositionx -= 1;
 
-		UINT16 hZoomTable[16];
-		int hPositionTable[16];
 		int hPosition = 0;
 
-		if (indirect_zoom_enable)
-		{
-			for (int idx=0;idx<16;idx++)
-			{
-				UINT32 dword = object->indirect_zoom[blit10];
 
-				hZoomTable[idx] = hZoom + (dword>>16); // add original value?
-
-				// bit 0x8000 does get set too, but only on some lines, might have another meaning?
-				int linescroll = dword&0x7fff;
-				if (linescroll & 0x4000) linescroll -= 0x8000;
-
-				hPositionTable[idx] = linescroll + hPositionx;
-				blit10++;
-
-				// DON'T use the table hZoom in this calc? (road..)
-				int sizex = used_hCellCount * 16 * hZoom;
-
-				hPositionTable[idx] *= 0x40;
-
-				switch (hOrigin & 3)
-				{
-				case 0:
-					// left
-					break;
-				case 1:
-					hPositionTable[idx] -= sizex / 2;
-					// middle?
-					break;
-				case 2:
-					hPositionTable[idx] -= sizex-1;
-					// right?
-					break;
-				case 3:
-					// invalid?
-					break;
-				}
-			}
-		}
-		else
+		
+		if (!indirect_zoom_enable)
 		{
 
 			int sizex = used_hCellCount * 16 * hZoom;
@@ -1622,7 +1695,6 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		}
 
 		UINT32 lastSpriteNumber = 0xffffffff;
-		UINT16 tempshape[16*16];
 		UINT16 blankcount = 0;
 		int color_offs = (0x7b20 + (b1colorNumber & 0x7ff))*0x40 * 5; /* yes, * 5 */ \
 		int color_offs2 = (0x7b20 + (b2colorNumber & 0x7ff))*0x40 * 5; \
@@ -1630,7 +1702,25 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		for (int h = 0; h < used_hCellCount; h++)
 		{
 
-
+			int current_decoded = false;
+			
+			if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES)
+			{
+				tempshape = object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi;
+				current_decoded = object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi_decoded;
+				/*
+				if (object->screen==0)
+				{
+					if (current_decoded) printf("setting temp shape to %04x tile is marked as decoded %08x \n", v*used_hCellCount + h, ((UINT64)(void*)tempshape)&0xffffffff);
+					else printf("setting temp shape to %04x tile is marked as NOT decoded %08x \n", v*used_hCellCount + h, ((UINT64)(void*)tempshape)&0xffffffff);
+				}
+				*/
+			}
+			else
+			{
+				//if (object->screen==0) printf("using base tempshape\n");
+				tempshape = object->state->decode[screen].tempshape;
+			}
 
 
 
@@ -1650,12 +1740,15 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 				if (blit_rotate)
 				{
-					YXLOOP_START_1
-
+					#define GET_PIX GET_PIX_ROTATED
+					YXLOOP	
+                    #undef GET_PIX
 				}
 				else // no rotate
 				{
-					YXLOOP_START_2
+					#define GET_PIX GET_PIX_NORMAL
+					YXLOOP	
+                    #undef GET_PIX
 
 				}
 			}
@@ -1684,34 +1777,38 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 					{
 						if (blit_rotate)
 						{
-							YXLOOP_START_NO_ZOOM_NO_XCLIP
-							const UINT16 &pix = tempshape[x*16+y];
-							DRAW_PIX
-							YXLOOP_END
+							#define DO_XCLIP DO_XCLIP_NONE
+							#define GET_PIX GET_PIX_ROTATED
+							YXLOOP_NO_ZOOM
+							#undef GET_PIX
+							#undef DO_XCLIP
 						}
 						else // no rotate
 						{
-							YXLOOP_START_NO_ZOOM_NO_XCLIP
-							const UINT16 &pix = tempshape[y*16+x];
-							DRAW_PIX
-							YXLOOP_END
+							#define DO_XCLIP DO_XCLIP_NONE
+							#define GET_PIX GET_PIX_NORMAL
+							YXLOOP_NO_ZOOM
+							#undef GET_PIX
+							#undef DO_XCLIP
 						}
 					}
 					else
 					{
 						if (blit_rotate)
 						{
-							YXLOOP_START_NO_ZOOM
-							const UINT16 &pix = tempshape[x*16+y];
-							DRAW_PIX
-							YXLOOP_END
+							#define DO_XCLIP DO_XCLIP_REAL
+							#define GET_PIX GET_PIX_ROTATED
+							YXLOOP_NO_ZOOM
+							#undef GET_PIX
+							#undef DO_XCLIP
 						}
 						else // no rotate
 						{
-							YXLOOP_START_NO_ZOOM
-							const UINT16 &pix = tempshape[y*16+x];
-							DRAW_PIX
-							YXLOOP_END
+							#define DO_XCLIP DO_XCLIP_REAL
+							#define GET_PIX GET_PIX_NORMAL
+							YXLOOP_NO_ZOOM
+							#undef GET_PIX
+							#undef DO_XCLIP
 						}
 					}
 				}
@@ -1736,34 +1833,38 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 					{
 						if (blit_rotate)
 						{
-							YXLOOP_START_NO_LINEZOOM_NO_XCLIP
-							const UINT16 &pix = tempshape[realx*16+realy];
-							DRAW_PIX
-							YXLOOP_END
+							#define DO_XCLIP DO_XCLIP_NONE
+							#define GET_PIX GET_PIX_ROTATED
+							YXLOOP_NO_LINEZOOM
+							#undef GET_PIX
+							#undef DO_XCLIP
 						}
 						else // no rotate
 						{
-							YXLOOP_START_NO_LINEZOOM_NO_XCLIP
-							const UINT16 &pix = tempshape[realy*16+realx];
-							DRAW_PIX
-							YXLOOP_END
+							#define DO_XCLIP DO_XCLIP_NONE
+							#define GET_PIX GET_PIX_NORMAL
+							YXLOOP_NO_LINEZOOM
+							#undef GET_PIX
+							#undef DO_XCLIP
 						}
 					}
 					else
 					{
 						if (blit_rotate)
 						{
-							YXLOOP_START_NO_LINEZOOM
-							const UINT16 &pix = tempshape[realx*16+realy];
-							DRAW_PIX
-							YXLOOP_END
+							#define DO_XCLIP DO_XCLIP_REAL
+							#define GET_PIX GET_PIX_ROTATED
+							YXLOOP_NO_LINEZOOM
+							#undef GET_PIX
+							#undef DO_XCLIP
 						}
 						else // no rotate
 						{
-							YXLOOP_START_NO_LINEZOOM
-							const UINT16 &pix = tempshape[realy*16+realx];
-							DRAW_PIX
-							YXLOOP_END
+							#define DO_XCLIP DO_XCLIP_REAL
+							#define GET_PIX GET_PIX_NORMAL
+							YXLOOP_NO_LINEZOOM
+							#undef GET_PIX
+							#undef DO_XCLIP
 						}
 					}
 				} // end zoomed
@@ -1946,7 +2047,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		testobject->clipvals[0] = m_clipvals[0][0];
 		testobject->clipvals[1] = m_clipvals[0][1];
 		testobject->clipvals[2] = m_clipvals[0][2];
-
+		testobject->screen = 0;
 		queue = m_work_queue[0];
 	}
 	else // 0x90, 0xa0, 0xaf, 0xb0, 0xc0
@@ -1957,7 +2058,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		testobject->clipvals[0] = m_clipvals[1][0];
 		testobject->clipvals[1] = m_clipvals[1][1];
 		testobject->clipvals[2] = m_clipvals[1][2];
-
+		testobject->screen = 1;
 		queue = m_work_queue[1];
 	}
 
