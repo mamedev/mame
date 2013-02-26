@@ -26138,7 +26138,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>2005</year>
 		<publisher>Super Fighter Team</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_beggar" />
+			<feature name="slot" value="rom_beggarp" />
 			<dataarea name="rom" size="4194304">
 				<rom name="beggar prince (unl).bin" size="4194304" crc="f3af46cd" sha1="f481b970756c482d8f408c4bab8902172837e7d8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -26150,7 +26150,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1996</year>
 		<publisher>C&amp;E</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_beggar" />
+			<feature name="slot" value="rom_xinqig" />
 			<dataarea name="rom" size="4194304">
 				<rom name="xin qi gai wang zi (chi) (alt) (unl).bin" size="4194304" crc="da5a4bfe" sha1="75f8003a6388814c1880347882b244549da62158" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
@@ -26162,7 +26162,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<year>1996</year>
 		<publisher>C&amp;E</publisher>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_beggar" />
+			<feature name="slot" value="rom_xinqig" />
 			<dataarea name="rom" size="4194304">
 				<rom name="xin qi gai wang zi (chi) (unl).bin" size="4194304" crc="dd2f38b5" sha1="4a7494d8601149f43ba7e3595a0b2340cde2e9ba" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>

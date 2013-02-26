@@ -21,7 +21,8 @@ enum
 	// Cart + NVRAM
 	SEGA_SRAM, SEGA_FRAM,
 	HARDBALL95,                  /* Hardball 95 uses different sram start address */
-	BEGGAR,                      /* Beggar Prince / Xin Qigai Wangzi uses different sram start address and has no valid header */
+	XINQIG,                   /* Xin Qigai Wangzi uses different sram start address and has no valid header */
+	BEGGARP,                     /* Beggar Prince uses different sram start address + bankswitch tricks */
 	WUKONG,                      /* Legend of Wukong uses different sram start address + bankswitch trick for last 128K of ROM */
 
 	// EEPROM

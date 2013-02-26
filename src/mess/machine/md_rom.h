@@ -483,6 +483,26 @@ private:
 	UINT8 m_bank;
 };
 
+// ======================> md_rom_beggarp_device
+
+class md_rom_beggarp_device : public md_std_rom_device
+{
+public:
+	// construction/destruction
+	md_rom_beggarp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_config_complete() { m_shortname = "md_rom_beggarp"; }
+	
+	// reading and writing
+	virtual DECLARE_READ16_MEMBER(read);
+	virtual DECLARE_WRITE16_MEMBER(write);
+	virtual DECLARE_WRITE16_MEMBER(write_a13);
+
+	UINT8 m_mode, m_lock;
+};
+
 // ======================> md_rom_wukong_device
 
 class md_rom_wukong_device : public md_std_rom_device
@@ -499,7 +519,7 @@ public:
 	virtual DECLARE_READ16_MEMBER(read);
 	virtual DECLARE_WRITE16_MEMBER(write);
 	virtual DECLARE_WRITE16_MEMBER(write_a13);
-
+	
 	UINT8 m_mode;
 };
 
@@ -533,6 +553,7 @@ extern const device_type MD_ROM_SSF2;
 extern const device_type MD_ROM_SQUIR;
 extern const device_type MD_ROM_TOPF;
 extern const device_type MD_ROM_RADICA;
+extern const device_type MD_ROM_BEGGARP;
 extern const device_type MD_ROM_WUKONG;
 
 #endif

@@ -240,7 +240,8 @@ static const md_slot slot_list[] =
 	{ SEGA_SRAM, "rom_sram" },
 	{ SEGA_FRAM, "rom_fram" },
 	{ HARDBALL95, "rom_hardbl95" },
-	{ BEGGAR, "rom_beggar"},
+	{ XINQIG, "rom_xinqig"},
+	{ BEGGARP, "rom_beggarp"},
 	{ WUKONG, "rom_wukong"},
 
 	{ SEGA_EEPROM, "rom_eeprom" },
@@ -633,12 +634,18 @@ void base_md_cart_slot_device::setup_nvram()
 			m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
 			break;
-		case BEGGAR:
+		case XINQIG:
 			m_cart->m_nvram_start = 0x400000;
 			m_cart->m_nvram_end = m_cart->m_nvram_start + 0xffff;
 			m_cart->nvram_alloc(machine(), m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
 			m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
+			break;
+		case BEGGARP:
+			m_cart->m_nvram_start = 0x3c0000;
+			m_cart->m_nvram_end = m_cart->m_nvram_start + 0xffff;
+			m_cart->nvram_alloc(machine(), 0x8000);	// 32K mirrored
+			m_cart->m_nvram_active = 1;
 			break;
 		case WUKONG:
 			m_cart->m_nvram_start = 0x3c0000;
