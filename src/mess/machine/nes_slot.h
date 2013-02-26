@@ -114,7 +114,7 @@ public:
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return m_must_be_loaded; }
 	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
-	virtual bool is_reset_on_load() const { return 0; }
+	virtual bool is_reset_on_load() const { return 1; }
 	virtual const char *image_interface() const { return "nes_cart"; }
 	virtual const char *file_extensions() const { return "nes,unf,unif"; }
 	virtual const option_guide *create_option_guide() const { return NULL; }

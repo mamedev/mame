@@ -163,7 +163,7 @@ public:
 	virtual bool is_writeable() const { return 0; }
 	virtual bool is_creatable() const { return 0; }
 	virtual bool must_be_loaded() const { return 1; }
-	virtual bool is_reset_on_load() const { return 0; }
+	virtual bool is_reset_on_load() const { return 1; }
 	virtual const option_guide *create_option_guide() const { return NULL; }
 
 	// slot interface overrides
