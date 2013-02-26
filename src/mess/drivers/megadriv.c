@@ -530,6 +530,9 @@ static MACHINE_CONFIG_START( genesis_32x, md_cons_state )
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list","NTSC-U")
+	
+	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, NULL, NULL)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
 
@@ -562,6 +565,9 @@ static MACHINE_CONFIG_START( mdj_32x, md_cons_state )
 
 	MCFG_SOFTWARE_LIST_ADD("cart_list","32x")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list","NTSC-J")
+	
+	MCFG_MD_CARTRIDGE_ADD("mdslot", md_cart, NULL, NULL)
+	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
 
@@ -663,9 +669,12 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
+	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
 
 	MCFG_DEVICE_ADD("segacd", SEGA_SEGACD_US, 0)
-	//MCFG_QUANTUM_PERFECT_CPU("32x_master_sh2")
+	MCFG_CDROM_ADD( "cdrom",scd_cdrom )
+	
+	MCFG_SOFTWARE_LIST_ADD("cd_list","segacd")
 MACHINE_CONFIG_END
 
 
