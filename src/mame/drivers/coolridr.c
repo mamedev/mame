@@ -402,7 +402,7 @@ public:
 		m_work_queue[0] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 		m_work_queue[1] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 	}
-	
+
 	// Blitter state
 	UINT16 m_textBytesToWrite;
 	INT16  m_blitterSerialCount;
@@ -1029,7 +1029,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		interestingly there is a bit to determine the screen number this applies to, even if that should already be implied from m_blitterMode
 
 		screen 1 clipping(?)
-		                    
+
 		unknown sprite list type 1 - 00000001 003f00f0 027801f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
 		unknown sprite list type 1 - 00000001 003f00f0 03e001f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
 		unknown sprite list type 1 - 00000001 003f00f0 000700e3 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
@@ -1066,14 +1066,14 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		unknown sprite list type 1 - 00000001 003f00f0 04f803f7 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
 		unknown sprite list type 1 - 00000001 003f00f0 020701fb 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
 		unknown sprite list type 1 - 00000001 003f00f0 02240363 00000207 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-		                                                
+
 	  NOTE, we only copy across [1] [2] and [3]   as [0] [1] and [2]
 	    the 3rd dword seems to be some kind of offset, it's 0x207 on the 2nd screen, and the actual x-clip rects are also higher on that screen?
 
 		note this is practically the same format as the sysh1_fb_data_w commands..
-	
-	
-	
+
+
+
 		between stages (screen 1)
 		unknown sprite list type 1 - 00000001 000000a4 000701f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
 		unknown sprite list type 1 - 00000001 0000017f 000701f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
@@ -1301,10 +1301,10 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		unknown sprite list type 1 - 00000001 0000017f 000701f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
 		unknown sprite list type 1 - 00000001 0000017f 000701f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
 		unknown sprite list type 1 - 00000001 0000017f 000701f7 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-	
+
 	romania
 		unknown sprite list type 1 - 00000001 00000001 00000001 00000007 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-	*/                                                               
+	*/
 
 	// how does this really work? there's more to it
 	// used in film strip attract mode, and between stages
@@ -1324,7 +1324,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		if (clipmaxX<CLIPMINX_FULL) clipmaxX = CLIPMINX_FULL;
 		if (clipmaxX>CLIPMAXX_FULL) clipmaxX = CLIPMAXX_FULL;
 		if (clipminX>clipmaxX) clipminX = clipmaxX;
-	
+
 		clipminY = miny -1;
 		if (clipminY<CLIPMINY_FULL) clipminY = CLIPMINY_FULL;
 		if (clipminY>CLIPMAXY_FULL) clipminY = CLIPMAXY_FULL;
@@ -1332,7 +1332,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		if (clipmaxY<CLIPMINY_FULL) clipmaxY = CLIPMINY_FULL;
 		if (clipmaxY>CLIPMAXY_FULL) clipmaxY = CLIPMAXY_FULL;
 		if (clipminY>clipmaxY) clipminY = clipmaxY;
-	
+
 
 		//b1colorNumber = object->state->machine().rand()&0xfff;
 	}
@@ -1780,7 +1780,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	else if (blit0==1)
 	{
 
-	
+
 
 		if (m_blitterMode&0x80)
 		{
@@ -2226,8 +2226,12 @@ void coolridr_state::apply_rgb_control(int screen_num,int *r, int *g, int *b)
 	}
 	else if(m_rgb_ctrl[screen_num].setting == 0x800) /* when you get hit TODO: algo might be different. */
 	{
-		*g &= (0x1f - m_rgb_ctrl[screen_num].gradient);
-		*b &= (0x1f - m_rgb_ctrl[screen_num].gradient);
+		*r += m_rgb_ctrl[screen_num].gradient;
+		*g -= m_rgb_ctrl[screen_num].gradient;
+		*b -= m_rgb_ctrl[screen_num].gradient;
+		if(*r > 0x1f) { *r = 0x1f; }
+		if(*g < 0) { *g = 0; }
+		if(*b < 0) { *b = 0; }
 	}
 	else
 	{
@@ -2238,7 +2242,7 @@ void coolridr_state::apply_rgb_control(int screen_num,int *r, int *g, int *b)
 void coolridr_state::flush_pal_data( UINT16 offset )
 {
 	int r,g,b;
-	int screen_type = (offset & 0x400) >> 10;
+	int screen_type = (offset & 0x200) >> 9;
 
 	r = ((m_h1_pal[offset] & 0x7c00) >> 10);
 	g = ((m_h1_pal[offset] & 0x03e0) >> 5);
@@ -2342,8 +2346,15 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 			case 0x44: /* screen 2 / */
 				m_rgb_ctrl[(cmd & 4) >> 2].setting = m_framebuffer_vram[(0+dma_index)/4] & 0xffffe0;
 				m_rgb_ctrl[(cmd & 4) >> 2].gradient = m_framebuffer_vram[(0+dma_index)/4] & 0x1f;
-				for(int i=((cmd & 4) * 0x100);i<((cmd & 4) * 0x100)+0x400;i++)
+
+				/* 0x000-0x1ff - 0x400-0x5ff screen 1 */
+				/* 0x200-0x3ff - 0x600-0x7ff screen 2 */
+				for(int i=((cmd & 4) << 7);i<((cmd & 4) << 7)+0x200;i++)
+				{
 					flush_pal_data( i );
+					flush_pal_data( i + 0x400 );
+				}
+
 				dma_index+=4;
 				break;
 			default:
