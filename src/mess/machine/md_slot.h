@@ -22,6 +22,7 @@ enum
 	SEGA_SRAM, SEGA_FRAM,
 	HARDBALL95,                  /* Hardball 95 uses different sram start address */
 	BEGGAR,                      /* Beggar Prince / Xin Qigai Wangzi uses different sram start address and has no valid header */
+	WUKONG,                      /* Legend of Wukong uses different sram start address + bankswitch trick for last 128K of ROM */
 
 	// EEPROM
 	SEGA_EEPROM,                 /* Wonder Boy V / Evander Holyfield's Boxing / Greatest Heavyweights of the Ring / Sports Talk Baseball / Megaman */

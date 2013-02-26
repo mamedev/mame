@@ -48,6 +48,7 @@ const device_type MD_ROM_REDCL = &device_creator<md_rom_redcl_device>;
 const device_type MD_ROM_SQUIR = &device_creator<md_rom_squir_device>;
 const device_type MD_ROM_TOPF = &device_creator<md_rom_topf_device>;
 const device_type MD_ROM_RADICA = &device_creator<md_rom_radica_device>;
+const device_type MD_ROM_WUKONG = &device_creator<md_rom_wukong_device>;
 
 
 md_std_rom_device::md_std_rom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
@@ -192,6 +193,11 @@ md_rom_radica_device::md_rom_radica_device(const machine_config &mconfig, const 
 {
 }
 
+md_rom_wukong_device::md_rom_wukong_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: md_std_rom_device(mconfig, MD_ROM_WUKONG, "MD Legend of Wukong", tag, owner, clock)
+{
+}
+
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -284,6 +290,12 @@ void md_rom_radica_device::device_start()
 {
 	m_bank = 0;
 	save_item(NAME(m_bank));
+}
+
+void md_rom_wukong_device::device_start()
+{
+	m_mode = 0;
+	save_item(NAME(m_mode));
 }
 
 /*-------------------------------------------------
@@ -1042,3 +1054,55 @@ READ16_MEMBER(md_rom_radica_device::read_a13)
 		m_bank = offset & 0x3f;
 	return 0;
 }
+
+
+/*-------------------------------------------------
+ LEGEND OF WUKONG 
+ This game uses cart which is the same as SEGA_SRAM 
+ + bankswitch mechanism for last 128k of the image:
+ first 2MB of ROM is loaded in 0-0x200000 and
+ mirrored in 0x200000-0x400000, but depending on 
+ bit7 of the value written at 0xe00/2 accesses to
+ 0x200000-0x21ffff go either to the "physical" address
+ (i.e. last 128K of ROM) or to the "memory" address
+ (i.e. mirror of first 128K)
+ -------------------------------------------------*/
+
+READ16_MEMBER(md_rom_wukong_device::read)
+{
+	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active)
+		return m_nvram[offset - m_nvram_start/2];
+
+	// here can access both last 128K of the ROM and the first 128K, depending of bit7 of m_mode
+	if (offset >= 0x200000/2 && offset < 0x220000/2)	
+		return !m_mode ? m_rom[offset] : m_rom[offset & 0xffff];
+	else if (offset < 0x400000/2)
+		return m_rom[offset & 0xfffff];
+	else
+		return 0xffff;
+}
+
+WRITE16_MEMBER(md_rom_wukong_device::write)
+{
+	if (offset < 0x100000/2)	// it actually writes to 0xe00/2
+		m_mode = BIT(data, 7);
+
+	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active && !m_nvram_readonly)
+		m_nvram[offset - m_nvram_start/2] = data;
+}
+
+WRITE16_MEMBER(md_rom_wukong_device::write_a13)
+{
+	if (offset == 0xf0/2)
+	{
+		/* unsure if this is actually supposed to toggle or just switch on? yet to encounter game that uses this */
+		m_nvram_active = BIT(data, 0);
+		m_nvram_readonly = BIT(data, 1);
+		
+		// since a lot of generic carts ends up here if loaded from fullpath
+		// we turn on nvram (with m_nvram_handlers_installed) only if they toggle it on by writing here!
+		if (m_nvram_active)
+			m_nvram_handlers_installed = 1;
+	}
+}
+

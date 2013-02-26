@@ -25747,6 +25747,20 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="wukong">
+		<description>Legend of Wukong (Euro, USA)</description>
+		<year>2008</year>
+		<publisher>Super Fighter Team</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_wukong" />
+			<dataarea name="rom" size="2228224">
+				<rom name="legend of wukong (unl).bin" size="2228224" crc="72f11771" sha1="4ef41e4caccab118014abb8e079c7e5668a4f468" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+			<dataarea name="sram" size="16384">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wukongc" cloneof="wukong">
 		<description>Wu Kong Wai Zhuan (Chi)</description>
 		<year>1996</year>
 		<publisher>Ming</publisher>
@@ -26120,7 +26134,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 	</software>
 
 	<software name="beggarp">
-		<description>Beggar Prince (USA)</description>
+		<description>Beggar Prince (Euro, USA)</description>
 		<year>2005</year>
 		<publisher>Super Fighter Team</publisher>
 		<part name="cart" interface="megadriv_cart">

@@ -241,6 +241,7 @@ static const md_slot slot_list[] =
 	{ SEGA_FRAM, "rom_fram" },
 	{ HARDBALL95, "rom_hardbl95" },
 	{ BEGGAR, "rom_beggar"},
+	{ WUKONG, "rom_wukong"},
 
 	{ SEGA_EEPROM, "rom_eeprom" },
 	{ NBA_JAM, "rom_nbajam" },
@@ -638,6 +639,12 @@ void base_md_cart_slot_device::setup_nvram()
 			m_cart->nvram_alloc(machine(), m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
 			m_cart->m_nvram_active = 1;
 			m_cart->m_nvram_handlers_installed = 1;
+			break;
+		case WUKONG:
+			m_cart->m_nvram_start = 0x3c0000;
+			m_cart->m_nvram_end = m_cart->m_nvram_start + 0x3fff;
+			m_cart->nvram_alloc(machine(), m_cart->m_nvram_end - m_cart->m_nvram_start + 1);
+			m_cart->m_nvram_active = 1;
 			break;
 	}
 }
