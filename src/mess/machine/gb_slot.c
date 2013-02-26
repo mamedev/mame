@@ -215,6 +215,7 @@ static const gb_slot slot_list[] =
 	{ GB_MBC_LASAMA, "rom_lasama" },
 	{ GB_MBC_ATVRACIN, "rom_atvrac" },
 	{ GB_MBC_SINTAX, "rom_sintax" },
+	{ GB_MBC_CHONGWU, "rom_chong" },
 	{ GB_MBC_CAMERA, "rom_camera" }
 };
 

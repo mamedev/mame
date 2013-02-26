@@ -105,6 +105,7 @@ class gb_rom_mbc5_device : public gb_rom_mbc_device
 {
 public:
 	// construction/destruction
+	gb_rom_mbc5_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	gb_rom_mbc5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// device-level overrides
@@ -172,6 +173,22 @@ public:
 	UINT8 m_bank_mask, m_bank, m_reg;
 };
 
+// ======================> gb_rom_chongwu_device
+
+class gb_rom_chongwu_device : public gb_rom_mbc5_device
+{
+public:
+	// construction/destruction
+	gb_rom_chongwu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_config_complete() { m_shortname = "gb_rom_chongwu"; }
+	
+	virtual DECLARE_READ8_MEMBER(read_rom);
+	UINT8 m_protection_checked;
+};
+
 // ======================> gb_rom_sintax_device
 class gb_rom_sintax_device : public gb_rom_mbc_device
 {
@@ -207,5 +224,6 @@ extern const device_type GB_ROM_MBC6;
 extern const device_type GB_ROM_MBC7;
 extern const device_type GB_ROM_MMM01;
 extern const device_type GB_ROM_SINTAX;
+extern const device_type GB_ROM_CHONGWU;
 
 #endif

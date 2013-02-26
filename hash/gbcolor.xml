@@ -23361,32 +23361,21 @@ Undumped Pirates:
 	</software>
 
 <!-- 1byte difference between this and the hacked version... check what is about! -->
-	<software name="chongwu" supported="no">
+	<software name="chongwu">
+    <!-- at 0x1e0 starts a routine which (at 0x1ec) reads from $41c3, then compares
+         the value with 0x5d. if comparison fails, the code enters a routine at 0x780
+         where it gets stuck. if comparison works, then the code goes to 0x150 as the 
+         patched version does (because the single modified byte replaces the jump to 
+         0x1e0 with the jump to 0x150). Not sure yet if current workaround is correct... -->
 		<description>Chong Wu Xiao Jing Ling - Jie Jin Ta Zhi Wang (Chi)</description>
 		<year>20??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="宠物小精灵 结金塔之王"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
+			<feature name="slot" value="rom_chong" />
 			<!-- cartridge ram -->
 			<dataarea name="rom" size="1048576">
 				<rom name="chong wu xiao jing ling - jie jin ta zhi wang (unlicensed, chinese) [raw dump].bin" size="1048576" crc="620e785d" sha1="74da832c2eeb27a4260fe6f42514539473f48b11" offset="000000" />
-			</dataarea>
-			<dataarea name="nvram" size="32768">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="chongwuh" cloneof="chongwu">
-		<description>Chong Wu Xiao Jing Ling - Jie Jin Ta Zhi Wang (Chi, Hacked)</description>
-		<year>20??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="alt_title" value="宠物小精灵 结金塔之王"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc5" />
-			<!-- cartridge ram -->
-			<dataarea name="rom" size="1048576">
-				<rom name="chong wu xiao jing ling - jie jin ta zhi wang (unlicensed, chinese) [fixed].bin" size="1048576" crc="24ee5c85" sha1="9fc1a8a1a75fd535980aee8966f4d5f8609e5ef5" offset="000000" />
 			</dataarea>
 			<dataarea name="nvram" size="32768">
 			</dataarea>

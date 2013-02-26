@@ -25,6 +25,7 @@ const device_type GB_ROM_MBC6 = &device_creator<gb_rom_mbc6_device>;
 const device_type GB_ROM_MBC7 = &device_creator<gb_rom_mbc7_device>;
 const device_type GB_ROM_MMM01 = &device_creator<gb_rom_mmm01_device>;
 const device_type GB_ROM_SINTAX = &device_creator<gb_rom_sintax_device>;
+const device_type GB_ROM_CHONGWU = &device_creator<gb_rom_chongwu_device>;
 
 
 gb_rom_mbc_device::gb_rom_mbc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
@@ -53,6 +54,11 @@ gb_rom_mbc3_device::gb_rom_mbc3_device(const machine_config &mconfig, const char
 {
 }
 
+gb_rom_mbc5_device::gb_rom_mbc5_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
+					: gb_rom_mbc_device(mconfig, type, name, tag, owner, clock)
+{
+}
+
 gb_rom_mbc5_device::gb_rom_mbc5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: gb_rom_mbc_device(mconfig, GB_ROM_MBC5, "GB MBC5 Carts", tag, owner, clock)
 {
@@ -75,6 +81,11 @@ gb_rom_mmm01_device::gb_rom_mmm01_device(const machine_config &mconfig, const ch
 
 gb_rom_sintax_device::gb_rom_sintax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: gb_rom_mbc_device(mconfig, GB_ROM_SINTAX, "GB MBC5 Sintax Carts", tag, owner, clock)
+{
+}
+
+gb_rom_chongwu_device::gb_rom_chongwu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: gb_rom_mbc5_device(mconfig, GB_ROM_CHONGWU, "GB Chong Wu Xiao Jing Ling", tag, owner, clock)
 {
 }
 
@@ -273,6 +284,25 @@ void gb_rom_sintax_device::device_start()
 	save_item(NAME(m_xor3));
 	save_item(NAME(m_xor4));
 	save_item(NAME(m_xor5));
+}
+
+void gb_rom_chongwu_device::device_start()
+{
+	has_timer = FALSE;
+	has_rumble = FALSE;
+	
+	m_latch_bank = 0;
+	m_latch_bank2 = 1;
+	m_ram_bank = 0;
+	m_ram_enable = 0;
+	m_mode = 0;
+	m_protection_checked = 0;
+	save_item(NAME(m_latch_bank));
+	save_item(NAME(m_latch_bank2));
+	save_item(NAME(m_ram_bank));
+	save_item(NAME(m_ram_enable));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_protection_checked));
 }
 
 
@@ -727,6 +757,24 @@ WRITE8_MEMBER(gb_rom_mmm01_device::write_bank)
 	}
 }
 
+// MBC5 variant used by Chong Wu Xiao Jing Ling (this appears to be a re-release of a Li Cheng / Niutoude game,
+// given that it contains the Niutoude logo, with most protection checks patched out)
+
+READ8_MEMBER(gb_rom_chongwu_device::read_rom)
+{
+	// protection check at the first read here...
+	if (offset == 0x41c3 && !m_protection_checked)
+	{
+		m_protection_checked = 1;
+		return 0x5d;
+	}
+
+	if (offset < 0x4000)
+		return m_rom[rom_bank_map[m_latch_bank] * 0x4000 + (offset & 0x3fff)];
+	else
+		return m_rom[rom_bank_map[m_latch_bank2] * 0x4000 + (offset & 0x3fff)];
+}
+
 // MBC5 variant used by Sintax games
 
 void gb_rom_sintax_device::set_xor_for_bank(UINT8 bank)
@@ -809,7 +857,7 @@ WRITE8_MEMBER(gb_rom_sintax_device::write_bank)
 			m_sintax_mode = data;
 			write_bank(space, 0x2000, 1);	//force a fake bank switch
 		}
-		printf("sintax mode %x\n", m_sintax_mode & 0xf);
+//		printf("sintax mode %x\n", m_sintax_mode & 0xf);
 	}
 	else if (offset >= 0x7000)
 	{
@@ -848,3 +896,4 @@ WRITE8_MEMBER(gb_rom_sintax_device::write_ram)
 	if (m_ram && m_ram_enable)
 		m_ram[ram_bank_map[m_ram_bank] * 0x2000 + (offset & 0x1fff)] = data;
 }
+
