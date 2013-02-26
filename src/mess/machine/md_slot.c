@@ -277,6 +277,7 @@ static const md_slot slot_list[] =
 	{ SBUBBOB, "rom_sbubl" },
 	{ SMB, "rom_smb" },
 	{ SMB2, "rom_smb2" },
+	{ SMW64, "rom_smw64" },
 	{ SMOUSE, "rom_smouse" },
 	{ SOULBLAD, "rom_soulblad" },
 	{ SQUIRRELK, "rom_squir" },

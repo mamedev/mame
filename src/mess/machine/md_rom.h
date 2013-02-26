@@ -369,6 +369,28 @@ public:
 	virtual DECLARE_READ16_MEMBER(read_a13);
 };
 
+// ======================> md_rom_smw64_device
+
+class md_rom_smw64_device : public md_std_rom_device
+{
+public:
+	// construction/destruction
+	md_rom_smw64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_config_complete() { m_shortname = "md_rom_smw64"; }
+	
+	// reading and writing
+	virtual DECLARE_READ16_MEMBER(read);
+	virtual DECLARE_WRITE16_MEMBER(write);
+	
+private:
+	UINT32 m_latch0, m_latch1;
+	UINT16 m_reg[6];
+	UINT16 m_ctrl[3];
+};
+
 // ======================> md_rom_smouse_device
 
 class md_rom_smouse_device : public md_std_rom_device
@@ -484,15 +506,12 @@ extern const device_type MD_ROM_RX3;
 extern const device_type MD_ROM_SBUBL;
 extern const device_type MD_ROM_SMB;
 extern const device_type MD_ROM_SMB2;
+extern const device_type MD_ROM_SMW64;
 extern const device_type MD_ROM_SMOUSE;
 extern const device_type MD_ROM_SOULB;
 extern const device_type MD_ROM_SSF2;
 extern const device_type MD_ROM_SQUIR;
 extern const device_type MD_ROM_TOPF;
 extern const device_type MD_ROM_RADICA;
-
-// this are currently unused... protection is directly patched out!
-extern const device_type MD_ROM_MULAN;
-extern const device_type MD_ROM_POKE2;
 
 #endif

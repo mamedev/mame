@@ -21,7 +21,7 @@ enum
 	// Cart + NVRAM
 	SEGA_SRAM, SEGA_FRAM,
 	HARDBALL95,                  /* Hardball 95 uses different sram start address */
-	BEGGAR,                      /* Xin Qigai Wangzi uses different sram start address and has no valid header */
+	BEGGAR,                      /* Beggar Prince / Xin Qigai Wangzi uses different sram start address and has no valid header */
 
 	// EEPROM
 	SEGA_EEPROM,                 /* Wonder Boy V / Evander Holyfield's Boxing / Greatest Heavyweights of the Ring / Sports Talk Baseball / Megaman */
@@ -60,6 +60,7 @@ enum
 	SBUBBOB,                     /* Super Bubble Bobble */
 	SMB,                         /* Super Mario Bros. */
 	SMB2,                        /* Super Mario Bros. 2 */
+	SMW64,                       /* Super Mario World 64 */
 	SMOUSE,                      /* Smart Mouse */
 	SOULBLAD,                    /* Soul Blade */
 	SQUIRRELK,                   /* Squirrel King */

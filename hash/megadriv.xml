@@ -26119,7 +26119,19 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="xinqig1" cloneof="xinqig">
+	<software name="beggarp">
+		<description>Beggar Prince (USA)</description>
+		<year>2005</year>
+		<publisher>Super Fighter Team</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_beggar" />
+			<dataarea name="rom" size="4194304">
+				<rom name="beggar prince (unl).bin" size="4194304" crc="f3af46cd" sha1="f481b970756c482d8f408c4bab8902172837e7d8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xinqig1" cloneof="beggarp">
 		<description>Xin Qi Gai Wang Zi (Chi, Alt)</description>
 		<year>1996</year>
 		<publisher>C&amp;E</publisher>
@@ -26131,7 +26143,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="xinqig">
+	<software name="xinqig" cloneof="beggarp">
 		<description>Xin Qi Gai Wang Zi (Chi)</description>
 		<year>1996</year>
 		<publisher>C&amp;E</publisher>
@@ -26863,6 +26875,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="smw64">
+		<description>Super Mario World 64</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_smw64" />
+			<dataarea name="rom" size="1048576">
+				<rom name="super mario world 64 (unl).bin" size="1048576" crc="e7ac4161" sha1="2ccf970fffd173f1984e69617c330a8f297f3481" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="redcliff">
 		<description>The Battle of Red Cliffs - Romance of the Three Kingdoms</description>
 		<year>199?</year>
@@ -27300,6 +27324,28 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="chipndal">
+		<description>Chip 'n Dale Rescue Rangers (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="468616">
+				<rom name="chip and dale rescue rangers (unl).bin" size="468616" crc="09614862" sha1="d58c3b171ce88638d15df681670a8eb5725210a4" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chipndl2">
+		<description>Chip 'n Dale Rescue Rangers 2 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="616952">
+				<rom name="chip and dale rescue rangers 2 (unl).bin" size="616952" crc="51eebddc" sha1="21d62ac2307147d733141e22399bb04616f977df" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="commconq">
 		<description>Command &amp; Conquer (Prototype)</description>
 		<year>199?</year>
@@ -27340,6 +27386,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="crash bandicoot.bin" size="4194304" crc="e06bd944" sha1="bfd7271b76c1ce6a4f8b7f6e610a63cc88ae6627" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darkwing">
+		<description>Darkwing Duck (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="644592">
+				<rom name="darkwing duck (unl).bin" size="644592" crc="922d49ff" sha1="ae238741113de481147ab20baee74d9c723453b5" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -27386,6 +27443,28 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="domino (unl).bin" size="1048576" crc="a64409be" sha1="7000ea86d91bbb5642425b6a6f577fab9e2b3a51" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dbfb">
+		<description>Dragon Ball Final Bout (Chi?)</description>
+		<year>1998</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="dragon ball final bout (unl).bin" size="2097152" crc="63847005" sha1="6014cbf37fbabc51df581f7a93a1f8df09a66665" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="felix">
+		<description>Felix the Cat (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="737528">
+				<rom name="felix the cat (unl).bin" size="737528" crc="90c4655c" sha1="6954e0c76a3585d74c7394b574d8e01cf4edb577" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -27684,6 +27763,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<info name="alt_title" value="Mario 3 Вокруг света"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
+				<rom name="mario 3 (unl)[a1].bin" size="2097152" crc="6f630ebd" sha1="167f17f3a9d24f5d3ed1fbf7d7310fae53015258" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mario3d" cloneof="mario3">
+		<description>Mario 3 - Vokrug Sveta (Rus, Demo?)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Mario 3 Вокруг света"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
 				<rom name="mario 3 (unl).bin" size="2097152" crc="69f5b02f" sha1="7c2ebe7c88503bc719d5bcecae183619a7be503c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -27697,30 +27788,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="mario 4 (unl).bin" size="2097152" crc="96b0ecd9" sha1="6c9444268413b76d698ea432cbceb4cdc9a6cfaf" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- Needs emulation of the protection. -->
-	<software name="smario64" supported="no">
-		<description>Super Mario World 64</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super mario world 64 (unl).bin" size="1048576" crc="e7ac4161" sha1="2ccf970fffd173f1984e69617c330a8f297f3481" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- This can be removed when protected version is emulated correctly -->
-	<software name="smario64h" cloneof="smario64">
-		<description>Super Mario World 64 (Hacked Protection)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="super mario world 64 (hacked).bin" size="1048576" crc="a20f98aa" sha1="47fd007173419906ecdc7b0efc7d49f42de70c91" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -27876,6 +27943,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4063232">
 				<rom name="rick dangerous (unl).bin" size="4063232" crc="545cbbe4" sha1="9698dfa5d10509ded6952a88445e8db53c440de8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="samspir2" cloneof="samsho">
+		<description>Samurai Spirits II (Pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="samurai spirits ii (unl).bin" size="2097152" crc="2942f180" sha1="fe5a6a28542a313f142ba938956fd43187834805" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

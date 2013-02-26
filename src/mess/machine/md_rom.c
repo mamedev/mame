@@ -27,6 +27,7 @@ const device_type MD_ROM_FRAM = &device_creator<md_rom_fram_device>;
 const device_type MD_ROM_SSF2 = &device_creator<md_rom_ssf2_device>;
 const device_type MD_ROM_BUGSLIFE = &device_creator<md_rom_bugslife_device>;
 const device_type MD_ROM_SMOUSE = &device_creator<md_rom_smouse_device>;
+const device_type MD_ROM_SMW64 = &device_creator<md_rom_smw64_device>;
 const device_type MD_ROM_SMB = &device_creator<md_rom_smb_device>;
 const device_type MD_ROM_SMB2 = &device_creator<md_rom_smb2_device>;
 const device_type MD_ROM_SBUBL = &device_creator<md_rom_sbubl_device>;
@@ -98,6 +99,11 @@ md_rom_smb_device::md_rom_smb_device(const machine_config &mconfig, const char *
 
 md_rom_smb2_device::md_rom_smb2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_SMB2, "MD Super Mario Bros. 2", tag, owner, clock)
+{
+}
+
+md_rom_smw64_device::md_rom_smw64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: md_std_rom_device(mconfig, MD_ROM_SMW64, "MD Super Mario World 64", tag, owner, clock)
 {
 }
 
@@ -251,6 +257,19 @@ void md_rom_squir_device::device_start()
 {
 	m_latch = 0;
 	save_item(NAME(m_latch));
+}
+
+void md_rom_smw64_device::device_start()
+{
+	m_latch0 = 0xf;
+	m_latch1 = 0xf;
+	memset(m_reg, 0, sizeof(m_reg));
+	memset(m_ctrl, 0, sizeof(m_ctrl));
+
+	save_item(NAME(m_latch0));
+	save_item(NAME(m_latch1));
+	save_item(NAME(m_reg));
+	save_item(NAME(m_ctrl));
 }
 
 void md_rom_topf_device::device_start()
@@ -815,6 +834,121 @@ READ16_MEMBER(md_rom_smb2_device::read_a13)
 		return 0x0a;
 	else
 		return 0xffff;
+}
+
+/*-------------------------------------------------
+ SUPER MARIO WORLD 64
+ -------------------------------------------------*/
+
+READ16_MEMBER(md_rom_smw64_device::read)
+{
+	// 0x000000-0x0fffff: lower 512KB ROM (up to 0x07ffff) + mirror
+	// 0x600000-0x6fffff: internal hardware (up to 0x67ffff) + mirror
+	// Namely, 
+	//  * 60xxx = bank1 of the upper 512KB ROM
+	//  * 61xxx = bank2 of the upper 512KB ROM
+	//  * 62xxx = alternate 4KB chunks of 0x0000 ~ 0xffff
+	//  * 63xxx = same as 62xxx
+	//  * 64xxx = returns 0x0000
+	//  * 65xxx = same as 64xxx
+	//  * 66xxx = CTRL/DATA
+	//  * 67xxx = CTRL/DATA
+	if (offset < 0x100000/2)
+		return m_rom[offset & 0x3ffff];
+
+	if ((offset >= 0x600000/2) && (offset < 0x610000/2))
+		return m_rom[(m_latch0 * 0x10000)/2 + (offset & 0x7fff)];
+	if ((offset >= 0x610000/2) && (offset < 0x620000/2))
+		return m_rom[(m_latch1 * 0x10000)/2 + (offset & 0x7fff)];
+
+	if ((offset >= 0x620000/2) && (offset < 0x640000/2))
+		return (offset & 0x1000/2) ? 0x0000 : 0xffff;
+	if ((offset >= 0x640000/2) && (offset < 0x660000/2))
+		return 0x0000;
+
+	if ((offset >= 0x660000/2) && (offset < 0x670000/2))
+	{
+		offset &= 7;
+		switch (offset)
+		{
+			case 0x0:
+			case 0x2:
+			case 0x4:
+				return m_reg[offset/2];	// DATA1, DATA2, DATA3
+			case 0x1:
+			case 0x3:
+			case 0x5:
+				return m_reg[offset/2] + 1;	// DATA1+1, DATA2+1, DATA3+1
+			case 0x6:
+				return m_reg[2] + 2;	// DATA3+2
+			case 0x7:
+				return m_reg[2] + 3;	// DATA3+3
+		}
+	}
+	if ((offset >= 0x670000/2) && (offset < 0x680000/2))
+	{
+		UINT16 data = (m_ctrl[1] & 0x80) ? ((m_ctrl[2] & 0x40) ? (m_reg[4] & m_reg[5]) : (m_reg[4] ^ 0xff)) : 0x0000;
+		if (offset & 0x1)	// odd offset, return lower 7 bits of the above
+			return data & 0x7f;
+		else	// even offset, return whole data above, but also update the regs if CTRL3 has 0x80 set
+		{
+			if (m_ctrl[2] & 0x80)	// update regs if CTRL3 has bit7 set
+			{
+				if (m_ctrl[2] & 0x20)
+					m_reg[2] = (m_reg[5] << 2) & 0xfc;	// DATA3
+				else
+					m_reg[0] = ((m_reg[4] << 1) ^ m_reg[3]) & 0xfe;	// DATA1
+			}
+			return data;
+		}
+	}
+	
+	return 0xffff;
+}
+
+WRITE16_MEMBER(md_rom_smw64_device::write)
+{
+	// 0x600000-0x6fffff: internal hardware (up to 0x67ffff) + mirror
+	// Namely, 
+	//  * 62xxx/63xxx = unknown/unmapped
+	//  * 65xxx/66xxx = unknown/unmapped
+	//  * remaining ranges = CTRL/DATA
+	if ((offset >= 0x600000/2) && (offset < 0x610000/2))
+	{
+		if (offset & 1)
+		{
+			if ((m_ctrl[0] & 7) == 0)
+				m_reg[0] = ((m_reg[0] ^ m_reg[3]) ^ data) & 0xfe;	// DATA1
+			if ((m_ctrl[0] & 7) == 1)
+				m_reg[1] = data & 0xfe;	// DATA2
+			if ((m_ctrl[0] & 7) == 7)
+				m_latch1 = 8 + ((data & 0x1c) >> 2);	// ROM BANKSWITCH $61
+			m_reg[3] = data;	// DATA4
+		}
+		else
+			m_ctrl[0] = data;	// CTRL1
+	}
+	if ((offset >= 0x610000/2) && (offset < 0x620000/2))
+	{
+		if (offset & 1)
+			m_ctrl[1] = data;	// CTRL2
+	}
+	if ((offset >= 0x640000/2) && (offset < 0x650000/2))
+	{
+		if (offset & 1)
+			m_reg[5] = data;	// DATA6
+		else
+			m_reg[4] = data;	// DATA5
+	}
+	if ((offset >= 0x670000/2) && (offset < 0x680000/2))
+	{
+		if (!(offset & 1))
+		{
+			m_ctrl[2] = data;	// CTRL3
+			if (m_ctrl[1] & 0x80)
+				m_latch0 = 8 + ((data & 0x1c) >> 2);	// ROM BANKSWITCH $60
+		}
+	}
 }
 
 /*-------------------------------------------------
