@@ -672,25 +672,23 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 
 		bitmap.fill(MAKE_ARGB(0xff,pal5bit(bg_r),pal5bit(bg_g),pal5bit(bg_b)),cliprect);
 
- 		for (int y=0;y<64;y++)
+
+		UINT16 basey = scrolly>>4;
+		for (int y=0;y<25;y++)
  		{
-			for (int x=0;x<128;x++)
+			UINT16 basex = scrollx>>4;
+			for (int x=0;x<32;x++)
  			{
- 				int res_x,res_y;
-
-				res_x = (x*16)-scrollx;
- 				res_y = (y*16)-scrolly;
-
-				vram_data = (m_h1_vram[x+y*128+base_offset] & 0xffff);
+				vram_data = (m_h1_vram[(basex&0x7f)+((basey&0x3f)*0x80)+base_offset] & 0xffff);
 				color = m_color_bank + ((vram_data & 0x800) >> 11) * 4;
 				/* bike select enables bits 15-12, pretty sure one of these is tile bank (because there's a solid pen on 0x3ff / 0x7ff). */
 				tile = (vram_data & 0x7ff) | ((vram_data & 0x8000) >> 4);
 
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y,transpen_setting ? -1 : 0);
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y,transpen_setting ? -1 : 0);
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,res_x,res_y+1024,transpen_setting ? -1 : 0);
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,res_x+2048,res_y+1024,transpen_setting ? -1 : 0);
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,(x*16)-(scrollx&0xf),(y*16)-(scrolly&0xf),transpen_setting ? -1 : 0);
+
+				basex++;
 			}
+			basey++;
 		}
 	}
 
