@@ -254,6 +254,21 @@ public:
 	virtual DECLARE_READ16_MEMBER(read);
 };
 
+// ======================> md_rom_pokea_device
+
+class md_rom_pokea_device : public md_std_rom_device
+{
+public:
+	// construction/destruction
+	md_rom_pokea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "md_rom_pokea"; }
+	
+	// reading and writing
+	virtual DECLARE_READ16_MEMBER(read_a13);
+};
+
 // ======================> md_rom_pokestad_device
 
 class md_rom_pokestad_device : public md_std_rom_device
@@ -539,6 +554,7 @@ extern const device_type MD_ROM_LION2;
 extern const device_type MD_ROM_LION3;
 extern const device_type MD_ROM_MCPIR;
 extern const device_type MD_ROM_MJLOV;
+extern const device_type MD_ROM_POKEA;
 extern const device_type MD_ROM_POKESTAD;
 extern const device_type MD_ROM_REALTEC;
 extern const device_type MD_ROM_REDCL;

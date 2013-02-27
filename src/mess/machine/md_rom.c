@@ -42,6 +42,7 @@ const device_type MD_ROM_YASECH = &device_creator<md_rom_yasech_device>;
 const device_type MD_ROM_LION2 = &device_creator<md_rom_lion2_device>;
 const device_type MD_ROM_LION3 = &device_creator<md_rom_lion3_device>;
 const device_type MD_ROM_MCPIR = &device_creator<md_rom_mcpirate_device>;
+const device_type MD_ROM_POKEA = &device_creator<md_rom_pokea_device>;
 const device_type MD_ROM_POKESTAD = &device_creator<md_rom_pokestad_device>;
 const device_type MD_ROM_REALTEC = &device_creator<md_rom_realtec_device>;
 const device_type MD_ROM_REDCL = &device_creator<md_rom_redcl_device>;
@@ -115,7 +116,7 @@ md_rom_sbubl_device::md_rom_sbubl_device(const machine_config &mconfig, const ch
 }
 
 md_rom_rx3_device::md_rom_rx3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: md_std_rom_device(mconfig, MD_ROM_SMB2, "MD Rockman X3", tag, owner, clock)
+					: md_std_rom_device(mconfig, MD_ROM_RX3, "MD Rockman X3", tag, owner, clock)
 {
 }
 
@@ -130,7 +131,7 @@ md_rom_kof98_device::md_rom_kof98_device(const machine_config &mconfig, const ch
 }
 
 md_rom_kof99_device::md_rom_kof99_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-					: md_std_rom_device(mconfig, MD_ROM_KOF99, "MD KOF 99", tag, owner, clock)
+					: md_std_rom_device(mconfig, MD_ROM_KOF99, "MD KOF 99 (and others)", tag, owner, clock)
 {
 }
 
@@ -161,6 +162,11 @@ md_rom_lion2_device::md_rom_lion2_device(const machine_config &mconfig, const ch
 
 md_rom_lion3_device::md_rom_lion3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: md_std_rom_device(mconfig, MD_ROM_LION3, "MD Lion King 3", tag, owner, clock)
+{
+}
+
+md_rom_pokea_device::md_rom_pokea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+					: md_std_rom_device(mconfig, MD_ROM_POKEA, "MD Pokemon (Alt Protection)", tag, owner, clock)
 {
 }
 
@@ -766,6 +772,18 @@ WRITE16_MEMBER(md_rom_pokestad_device::write)
 {
 	if (offset >= 0x700000/2 && offset < 0x800000/2)
 		m_bank = data & 0x7f;
+}
+
+/*-------------------------------------------------
+ POKEMON ALT
+ -------------------------------------------------*/
+
+READ16_MEMBER(md_rom_pokea_device::read_a13)
+{
+	if (offset == 0x00/2)   return 0x14;
+	if (offset == 0x02/2)   return 0x01;
+	if (offset == 0x3e/2)   return 0x1f;
+	else    return 0xffff;
 }
 
 /*-------------------------------------------------

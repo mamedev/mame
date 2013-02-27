@@ -16683,11 +16683,12 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="pokemona" cloneof="pokemon" supported="no">
-		<description>Pocket Monsters (Alt)</description>
+	<software name="pokemona" cloneof="pokemon">
+		<description>Pocket Monsters (Alt Protection)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
+			<feature name="slot" value="rom_pokea" />
 			<dataarea name="rom" size="2097152">
 				<rom name="pocket monsters (unl) (alt).bin" size="2097152" crc="fb176667" sha1="3d667aea1b6fa980dddcc10e65845a6831491792" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>

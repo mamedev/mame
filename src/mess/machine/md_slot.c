@@ -272,6 +272,7 @@ static const md_slot slot_list[] =
 	{ LIONK3, "rom_lion3" },
 	{ MC_PIRATE, "rom_mcpir" },
 	{ MJLOVER, "rom_mjlov" },
+	{ POKEMONA, "rom_pokea" },
 	{ REALTEC, "rom_realtec" },
 	{ REDCL_EN, "rom_redcl" },
 	{ REDCLIFF, "rom_redcl" },
