@@ -417,6 +417,7 @@ public:
 	UINT32 m_blitterClearMode;
 	INT16 m_blitterClearCount;
 	pen_t m_tilepals[0x10000];
+	pen_t m_fadedpals[0x8000];
 
 	// store the blit params here
 	UINT32 m_spriteblit[12];
@@ -522,8 +523,6 @@ public:
 	UINT16 *m_h1_vram;
 	UINT8 *m_h1_pcg;
 	UINT16 *m_h1_pal;
-	void flush_pal_data( UINT16 offset );
-	void apply_rgb_control(int screen_num,int *r, int *g, int *b);
 	int m_gfx_index;
 	int m_color_bank;
 	struct {
@@ -886,7 +885,6 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 		bg_r = (VREG(0x3c) >> 10) & 0x1f;
 		bg_g = (VREG(0x3c) >> 5) & 0x1f;
 		bg_b = (VREG(0x3c) >> 0) & 0x1f;
-		apply_rgb_control(which,&bg_r,&bg_g,&bg_b);
 
 		bitmap.fill(VREG(0x3c),cliprect);
 
@@ -915,16 +913,85 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 
 UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
+	if(m_rgb_ctrl[which].gradient)
+	{
+		if( (m_rgb_ctrl[which].setting == 0x1240) || (m_rgb_ctrl[which].setting == 0x920) || (m_rgb_ctrl[which].setting == 0x800) ) 
+		{
+		}
+		else
+		{
+			popmessage("%08x %08x",m_rgb_ctrl[which].setting,m_rgb_ctrl[which].gradient);
+		}
+	}
+
+	// there are probably better ways to do this
+	for (int i = 0; i < 0x8000; i++)
+	{
+		int r = (i >> 10)&0x1f;
+		int g = (i >> 5)&0x1f;
+		int b = (i >> 0)&0x1f;
+
+		if(m_rgb_ctrl[which].gradient)
+		{
+			/* fade-in / outs */
+			if(m_rgb_ctrl[which].setting == 0x1240) 
+			{
+				r -= m_rgb_ctrl[which].gradient;
+				g -= m_rgb_ctrl[which].gradient;
+				b -= m_rgb_ctrl[which].gradient;
+				if(r < 0) { r = 0; }
+				if(g < 0) { g = 0; }
+				if(b < 0) { b = 0; }
+			}
+			else if(m_rgb_ctrl[which].setting == 0x920) /* at bike select / outside tunnels, addition */
+			{
+				r += m_rgb_ctrl[which].gradient;
+				g += m_rgb_ctrl[which].gradient;
+				b += m_rgb_ctrl[which].gradient;
+				if(r > 0x1f) { r = 0x1f; }
+				if(g > 0x1f) { g = 0x1f; }
+				if(b > 0x1f) { b = 0x1f; }
+			}
+			else if(m_rgb_ctrl[which].setting == 0x800) /* when you get hit TODO: algo might be different. */
+			{
+				r += m_rgb_ctrl[which].gradient;
+				g -= m_rgb_ctrl[which].gradient;
+				b -= m_rgb_ctrl[which].gradient;
+				if(r > 0x1f) { r = 0x1f; }
+				if(g < 0) { g = 0; }
+				if(b < 0) { b = 0; }
+			}
+		}
+		m_fadedpals[i] = (r<<10|g<<5|b);
+	}
+
+
 
 	if (which==0)
 	{
-		// will probably need a custom function
-		copybitmap_trans(bitmap, m_screen1_bitmap, 0, 0, 0, 0, cliprect, 0x8000);
+		for (int y=0;y<384;y++)
+		{
+			UINT16* linesrc = &m_screen1_bitmap.pix16(y);
+			UINT16* linedest = &bitmap.pix16(y);
+
+			for (int x=0;x<496;x++)
+			{
+				linedest[x] = m_fadedpals[linesrc[x]];
+			}
+		}
 	}
 	else
 	{
-		// will probably need a custom function
-		copybitmap_trans(bitmap, m_screen2_bitmap, 0, 0, 0, 0, cliprect, 0x8000);
+		for (int y=0;y<384;y++)
+		{
+			UINT16* linesrc = &m_screen2_bitmap.pix16(y);
+			UINT16* linedest = &bitmap.pix16(y);
+
+			for (int x=0;x<496;x++)
+			{
+				linedest[x] = m_fadedpals[linesrc[x]];
+			}
+		}
 	}
 
 	return 0;
@@ -2652,57 +2719,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_unk_blit_w)
 	}
 }
 
-void coolridr_state::apply_rgb_control(int screen_num,int *r, int *g, int *b)
-{
-	if(!m_rgb_ctrl[screen_num].gradient)
-		return;
 
-	if(m_rgb_ctrl[screen_num].setting == 0x1240) /* fade-in / outs */
-	{
-		*r -= m_rgb_ctrl[screen_num].gradient;
-		*g -= m_rgb_ctrl[screen_num].gradient;
-		*b -= m_rgb_ctrl[screen_num].gradient;
-		if(*r < 0) { *r = 0; }
-		if(*g < 0) { *g = 0; }
-		if(*b < 0) { *b = 0; }
-	}
-	else if(m_rgb_ctrl[screen_num].setting == 0x920) /* at bike select / outside tunnels, addition */
-	{
-		*r += m_rgb_ctrl[screen_num].gradient;
-		*g += m_rgb_ctrl[screen_num].gradient;
-		*b += m_rgb_ctrl[screen_num].gradient;
-		if(*r > 0x1f) { *r = 0x1f; }
-		if(*g > 0x1f) { *g = 0x1f; }
-		if(*b > 0x1f) { *b = 0x1f; }
-	}
-	else if(m_rgb_ctrl[screen_num].setting == 0x800) /* when you get hit TODO: algo might be different. */
-	{
-		*r += m_rgb_ctrl[screen_num].gradient;
-		*g -= m_rgb_ctrl[screen_num].gradient;
-		*b -= m_rgb_ctrl[screen_num].gradient;
-		if(*r > 0x1f) { *r = 0x1f; }
-		if(*g < 0) { *g = 0; }
-		if(*b < 0) { *b = 0; }
-	}
-	else
-	{
-		popmessage("%08x %08x",m_rgb_ctrl[screen_num].setting,m_rgb_ctrl[screen_num].gradient);
-	}
-}
-
-void coolridr_state::flush_pal_data( UINT16 offset )
-{
-	int r,g,b;
-	int screen_type = (offset & 0x200) >> 9;
-
-	r = ((m_h1_pal[offset] & 0x7c00) >> 10);
-	g = ((m_h1_pal[offset] & 0x03e0) >> 5);
-	b = ((m_h1_pal[offset] & 0x001f) >> 0);
-	apply_rgb_control(screen_type,&r,&g,&b);
-
-//	palette_set_color_rgb(machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
-	m_tilepals[offset&0xffff] = (r<<10) | (g<<5) | b;
-}
 
 void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index )
 {
@@ -2773,7 +2790,7 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				for(int i=0;i<size;i+=2)
 				{
 					m_h1_pal[dst] = space.read_word(src);
-					flush_pal_data(dst);
+					m_tilepals[dst&0xffff] = m_h1_pal[dst];
 					dst++;
 					src+=2;
 				}
@@ -2799,13 +2816,6 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 				m_rgb_ctrl[(cmd & 4) >> 2].setting = m_framebuffer_vram[(0+dma_index)/4] & 0xffffe0;
 				m_rgb_ctrl[(cmd & 4) >> 2].gradient = m_framebuffer_vram[(0+dma_index)/4] & 0x1f;
 
-				/* 0x000-0x1ff - 0x400-0x5ff screen 1 */
-				/* 0x200-0x3ff - 0x600-0x7ff screen 2 */
-				for(int i=((cmd & 4) << 7);i<((cmd & 4) << 7)+0x200;i++)
-				{
-					flush_pal_data( i );
-					flush_pal_data( i + 0x400 );
-				}
 
 				dma_index+=4;
 				break;
@@ -3596,6 +3606,16 @@ static const scsp_interface scsp2_interface =
 	NULL,
 	DEVCB_DRIVER_LINE_MEMBER(coolridr_state, scsp2_to_sh1_irq)
 };
+
+
+PALETTE_INIT( RRRRR_GGGGG_BBBBB_double )
+{
+	int i;
+
+	for (i = 0; i < 0x10000; i++)
+		palette_set_color(machine, i, MAKE_RGB( pal5bit((i >> 10)&0x1f), pal5bit(((i >> 5))&0x1f), pal5bit((i >> 0)&0x1f)));
+}
+
 
 #define MAIN_CLOCK XTAL_28_63636MHz
 
