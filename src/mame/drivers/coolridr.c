@@ -369,6 +369,7 @@ at 0xDE60.
 #define CLIPMINX_FULL (0)
 #define CLIPMINY_FULL (0)
 
+
 class coolridr_state : public driver_device
 {
 public:
@@ -404,7 +405,6 @@ public:
 		decode[0].current_object = 0;
 		decode[1].current_object = 0;
 		debug_randompal = 9;
-
 	}
 
 	// Blitter state
@@ -534,6 +534,38 @@ public:
 	osd_work_queue *    m_work_queue[2]; // work queue, one per screen
 	static void *draw_object_threaded(void *param, int threadid);
 	int m_usethreads;
+
+
+
+	struct cool_render_object
+	{
+		UINT8* indirect_tiles;
+		UINT32* indirect_zoom;
+		UINT32 spriteblit[12];
+		bitmap_ind16* drawbitmap;
+		bitmap_ind16* zbitmap;
+		UINT16 zpri;
+		UINT8 blittype;
+		coolridr_state* state;
+		UINT32 clipvals[3];
+		int screen;
+	};
+
+	static int comp_sprite_z(const void *q1, const void *q2);
+
+	struct cool_render_object **m_cool_render_object_list1;
+	struct cool_render_object **m_cool_render_object_list2;
+
+	int m_listcount1;
+	int m_listcount2;
+
+
+
+
+
+	// the decode cache mechansim is an optimization
+	// we know all gfx are in ROM, and that calling the RLE decompression every time they're used is slow, so we cache the decoded tiles
+	// and objects after they're used, for future re-use, quite handy with a driving game.
 
 #define DECODECACHE_NUMOBJECTCACHES (128)
 
@@ -1025,19 +1057,6 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 
 
 
-struct cool_render_object
-{
-	UINT8* indirect_tiles;
-	UINT32* indirect_zoom;
-	UINT32 spriteblit[12];
-	bitmap_ind16* drawbitmap;
-	bitmap_ind16* zbitmap;
-	UINT16 zpri;
-	UINT8 blittype;
-	coolridr_state* state;
-	UINT32 clipvals[3];
-	int screen;
-};
 
 #define RLE_BLOCK(writeaddrxor) \
 	/* skip the decoding if it's the same tile as last time! */ \
@@ -2388,7 +2407,9 @@ void coolridr_state::blit_current_sprite(address_space &space)
 
 	testobject->zpri = m_blitterAddr | m_blittype<<12;
 	testobject->blittype = m_blittype;
+#if 0
 	osd_work_queue *queue;
+#endif
 	// which queue, which bitmap
 	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x4f || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 	{
@@ -2399,7 +2420,9 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		testobject->clipvals[1] = m_clipvals[0][1];
 		testobject->clipvals[2] = m_clipvals[0][2];
 		testobject->screen = 0;
+#if 0
 		queue = m_work_queue[0];
+#endif
 	}
 	else // 0x90, 0xa0, 0xaf, 0xb0, 0xc0
 	{
@@ -2410,9 +2433,12 @@ void coolridr_state::blit_current_sprite(address_space &space)
 		testobject->clipvals[1] = m_clipvals[1][1];
 		testobject->clipvals[2] = m_clipvals[1][2];
 		testobject->screen = 1;
+#if 0
 		queue = m_work_queue[1];
+#endif
 	}
 
+#if 0
 	if (m_usethreads)
 	{
 		osd_work_item_queue(queue, draw_object_threaded, testobject, WORK_ITEM_FLAG_AUTO_RELEASE);
@@ -2421,6 +2447,33 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	{
 		draw_object_threaded((void*)testobject,0);
 	}
+#else
+
+	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x4f || m_blitterMode == 0x50 || m_blitterMode == 0x60)
+	{
+		if (m_listcount1<1000000)
+		{
+			m_cool_render_object_list1[m_listcount1] =  testobject;
+			m_listcount1++;
+		}
+		else
+		{
+			popmessage("m_listcount1 overflow!\n");
+		}
+	}
+	else
+	{
+		if (m_listcount2<1000000)
+		{
+			m_cool_render_object_list2[m_listcount2] =  testobject;
+			m_listcount2++;
+		}
+		else
+		{
+			popmessage("m_listcount2 overflow!\n");
+		}
+	}
+#endif
 }
 
 
@@ -2602,6 +2655,9 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_mode_w)
 	m_blitterClearCount = 0;
 }
 
+
+
+
 WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 {
 	if(m_blitterClearCount == 0)
@@ -2633,20 +2689,41 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 			{
 				// wait for our sprite rendering to finish
 				osd_work_queue_wait(m_work_queue[0], osd_ticks_per_second() * 100);
-				
+
 				// copy our old buffer to the actual screen
 				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, visarea);
 				
-				//m_temp_bitmap_sprites.fill(0xff000000, visarea);
+
+
+
+				//m_temp_bitmap_sprites2.fill(0xff000000, visarea);
 				// render the tilemap to the backbuffer, ready for having sprites drawn on it
 				draw_bg_coolridr(m_temp_bitmap_sprites, visarea, 0);
-				// wipe the z-buffer ready for the sprites		
+				// wipe the z-buffer ready for the sprites				
 				m_zbuffer_bitmap.fill(0xffff, visarea);
 				// almost certainly wrong
 				m_clipvals[0][0] = 0;
 				m_clipvals[0][1] = 0;
 				m_clipvals[0][2] = 0;
 				m_clipblitterMode[0] = 0xff;
+			
+				//qsort(m_cool_render_object_list1, m_listcount1, sizeof(struct cool_render_object *), comp_sprite_z);
+
+				for (int i=0;i<m_listcount1;i++)
+				{
+					if (m_usethreads)
+					{
+						osd_work_item_queue(m_work_queue[0], draw_object_threaded, m_cool_render_object_list1[i], WORK_ITEM_FLAG_AUTO_RELEASE);
+					}
+					else
+					{
+						draw_object_threaded((void*)m_cool_render_object_list1[i],0);
+					}
+				}	
+	
+				m_listcount1 = 0;
+			
+
 			}
 			else if(m_blitterClearMode == 0x8c800000)
 			{
@@ -2655,6 +2732,10 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 
 				// copy our old buffer to the actual screen
 				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2, 0, 0, 0, 0, visarea);
+				
+
+
+
 				//m_temp_bitmap_sprites2.fill(0xff000000, visarea);
 				// render the tilemap to the backbuffer, ready for having sprites drawn on it
 				draw_bg_coolridr(m_temp_bitmap_sprites2, visarea, 1);
@@ -2665,6 +2746,23 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				m_clipvals[1][1] = 0;
 				m_clipvals[1][2] = 0;
 				m_clipblitterMode[1] = 0xff;
+	
+				//qsort(m_cool_render_object_list2, m_listcount2, sizeof(struct cool_render_object *), comp_sprite_z);
+
+				for (int i=0;i<m_listcount2;i++)
+				{
+					if (m_usethreads)
+					{
+						osd_work_item_queue(m_work_queue[1], draw_object_threaded, m_cool_render_object_list2[i], WORK_ITEM_FLAG_AUTO_RELEASE);
+					}
+					else
+					{
+						draw_object_threaded((void*)m_cool_render_object_list2[i],0);
+					}
+				}	
+	
+				m_listcount2 = 0;
+			
 			}
 
 			//printf("frame\n");
@@ -3528,6 +3626,13 @@ void coolridr_state::machine_start()
 	m_h1_vram = auto_alloc_array_clear(machine(), UINT16, VRAM_SIZE);
 	m_h1_pcg = auto_alloc_array_clear(machine(), UINT8, VRAM_SIZE);
 	m_h1_pal = auto_alloc_array_clear(machine(), UINT16, VRAM_SIZE);
+
+	m_cool_render_object_list1 = auto_alloc_array_clear(machine(), struct cool_render_object*, 1000000);
+	m_listcount1 = 0;
+
+	m_cool_render_object_list2 = auto_alloc_array_clear(machine(), struct cool_render_object*, 1000000);
+	m_listcount2 = 0;
+
 
 	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
 	save_pointer(NAME(m_h1_pcg), VRAM_SIZE);
