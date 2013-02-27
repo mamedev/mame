@@ -463,10 +463,10 @@ WRITE16_MEMBER(md_rom_mcpirate_device::write_a13)
 
 READ16_MEMBER(md_rom_bugslife_device::read_a13)
 {
-	if (offset == 0)
-		return 0x28;
-	else
-		return 0xffff;
+	if (offset == 0x00/2)   return 0x28;
+	if (offset == 0x02/2)   return 0x01;
+	if (offset == 0x3e/2)   return 0x1f;
+	else    return 0xffff;
 }
 
 /*-------------------------------------------------
