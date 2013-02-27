@@ -27209,40 +27209,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="smario2a" cloneof="smario2" supported="no">
-		<description>Super Mario 2 (Alt?)</description>
-		<year>199?</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="super_mario_2.bin" size="2097152" crc="0da6dc4b" sha1="f6808fff565f96c0d2f619be890052c7dba3019e" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- this dump is 'double interleaved' in .smd AND .md format.. it's trash -->
-	<software name="tetris1" supported="no">
-		<description>Tetris (Pirate?)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="tetris.bin" size="524288" crc="eb024ab2" sha1="44340cd021ab9cfb0536f78d6f0d59ea0f409a40" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="virak" supported="no">
-		<description>Voina Irak (Pirate)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="voina_irak.bin" size="2097152" crc="c7177e93" sha1="017af15b93a7f2e3c9f6310fe01c234f49c47b13" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
 
 <!-- Other Dumps to be sorted -->
 
@@ -28353,6 +28319,48 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 			</dataarea>
 		</part>
 	</software>
+
+
+
+<!-- Dumps of dubious nature -->
+
+
+<!-- this dump is 'double interleaved' in .smd AND .md format.. it's trash -->
+	<software name="tetris1" supported="no">
+		<description>Tetris (Bad?)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tetris.bin" size="524288" crc="eb024ab2" sha1="44340cd021ab9cfb0536f78d6f0d59ea0f409a40" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- this dump seem to be Pele World Tournament Soccer with some weird interleave... it's probably trash -->
+	<software name="virak" supported="no">
+		<description>Voina Irak (Bad?)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="voina_irak.bin" size="2097152" crc="c7177e93" sha1="017af15b93a7f2e3c9f6310fe01c234f49c47b13" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--  super_mario_2.bin       FIXED BITS (xxxxxx1xxxxxxxxx)  -->
+	<software name="smario2a" cloneof="smario2" supported="no">
+		<description>Super Mario 2 (Bad?)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="super_mario_2.bin" size="2097152" crc="0da6dc4b" sha1="f6808fff565f96c0d2f619be890052c7dba3019e" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 
 
 <!--
