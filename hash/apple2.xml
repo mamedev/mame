@@ -432,14 +432,14 @@
 		</part>
 	</software>
 
-	<software name="acidtrap">
-		<description>Acid Trap</description>
+	<software name="acidtrip">
+		<description>Acid Trip</description>
 		<year>1982</year>
 		<publisher>Demetrius Cross</publisher>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
-				<rom name="acid trap (1982)(demetrius cross).do" size="143360" crc="42150437" sha1="48ea277c1fb432a2d2cbf40b32426027cb779514" offset="0x0000" />
+				<rom name="acid trip (1982)(demetrius cross).do" size="143360" crc="42150437" sha1="48ea277c1fb432a2d2cbf40b32426027cb779514" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
