@@ -27153,13 +27153,24 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="mbubble" supported="no">
-		<description>Magic Bubble (Pirate)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+	<software name="mbubble">
+		<description>Magic Bubble</description>
+		<year>1993</year>
+		<publisher>C&amp;E</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="magic_bubble.bin" size="524288" crc="ce4a0c46" sha1="d7e3a79064f12b953b2dec9db4d14f8bc9b2a441" offset="000000" loadflag="load16_word_swap" />
+				<rom name="magic_bubble.bin" size="524288" crc="3ec61dc1" sha1="134086c458e20eee1ab614e2df64083942311e8c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbubblea" cloneof="mbubble">
+		<description>Magic Bubble (Alt)</description>
+		<year>1993</year>
+		<publisher>C&amp;E</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="magic bubble [a1].bin" size="524288" crc="503e0718" sha1="de8037a8cea321ca3f0c03b7a4c36b9fa3b67be2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
