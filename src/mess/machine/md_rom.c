@@ -1072,50 +1072,33 @@ READ16_MEMBER(md_rom_radica_device::read_a13)
 /*-------------------------------------------------
  BEGGAR PRINCE
  This game uses cart which is the same as SEGA_SRAM 
- + bankswitch mechanism to remap some 256K chunk of
- ROM and to enable/disable SRAM (not yet fully 
- emulated)
+ + bankswitch mechanism for first 256KB of the image:
+ depending on bit7 of the value written at 0xe00/2,
+ accesses to 0x00000-0x3ffff go to the first 256KB 
+ of ROM, or to the second to last 256KB chunk (usually
+ mapped to 0x380000-0x3bffff). SRAM is mapped at 
+ the end of ROM.
  -------------------------------------------------*/
 
 READ16_MEMBER(md_rom_beggarp_device::read)
 {
-	if (m_mode & 2)
-	{
-		//000000-03ffff = ROM bank 15 x 256k
-		//040000-3bffff = ROM banks 2 to 15 x256k
-		//3c0000-3fffff = ?? SRAM ?? (32k?)
-		if (offset < 0x040000/2)
-			return m_rom[offset + 0x380000/2];
-		else if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active)
-			return m_nvram[offset & 0x3fff];
-		else if (offset < 0x400000/2)
-			return m_rom[offset & 0x1fffff];
-	}
-	else
-	{
-		// currently not supported
-		//		if (m_mode & 1)	//00-40 = unmapped (open bus?)
-		
- 		//00-40 = ROM banks 1 to 16 x256k
-		if (offset < 0x400000/2)
-			return m_rom[offset & 0x1fffff];
-	}
+	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active)
+		return m_nvram[offset & 0x3fff];
+
+	if (offset < 0x040000/2)
+		return m_mode ? m_rom[offset + 0x380000/2] : m_rom[offset];
+	else if (offset < 0x400000/2)
+		return m_rom[offset & 0x1fffff];
 	
 	return 0xffff;
 }
 
 WRITE16_MEMBER(md_rom_beggarp_device::write)
 {
-	if (offset >= 0x0e00/2 && offset < 0x0f00/2)	// it actually writes to 0xe00/2
-	{
-		if (!m_lock)
-			m_mode = (data & 0xc0) >> 6;
-		
-		m_lock = BIT(data, 5); // lock bankswitch hardware when set, until hard reset
-	}
-	
-	// SRAM is only accessible in mode 2
-	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active && !m_nvram_readonly && m_mode == 2)
+	if (offset >= 0x0e00/2 && offset < 0x0f00/2)
+		m_mode = BIT(data, 7);	
+
+	if (offset >= m_nvram_start/2 && offset <= m_nvram_end/2 && m_nvram_active && !m_nvram_readonly)
 		m_nvram[offset & 0x3fff] = data;
 }
 
@@ -1137,7 +1120,7 @@ WRITE16_MEMBER(md_rom_beggarp_device::write_a13)
 /*-------------------------------------------------
  LEGEND OF WUKONG 
  This game uses cart which is the same as SEGA_SRAM 
- + bankswitch mechanism for last 128k of the image:
+ + bankswitch mechanism for last 128KB of the image:
  first 2MB of ROM is loaded in 0-0x200000 and
  mirrored in 0x200000-0x400000, but depending on 
  bit7 of the value written at 0xe00/2 accesses to
