@@ -982,6 +982,7 @@ void sh2_exception(sh2_state *sh2, const char *message, int irqline)
 
 	/* fetch PC */
 	sh2->pc = RL( sh2, sh2->vbr + vector * 4 );
+	if(sh2->sleep_mode == 1) { sh2->sleep_mode = 2; }
 	#endif
 }
 
@@ -1066,4 +1067,5 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_ackno
 	device->save_item(NAME(sh2->dma_irq));
 	device->save_item(NAME(sh2->wtcnt));
 	device->save_item(NAME(sh2->wtcsr));
+	device->save_item(NAME(sh2->sleep_mode));
 }

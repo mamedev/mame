@@ -149,6 +149,8 @@ struct sh2_state
 	UINT16 wtcnt;
 	UINT8 wtcsr;
 
+	UINT8 sleep_mode;
+
 	int     is_slave, cpu_type;
 	int  (*dma_callback_kludge)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
 	int  (*dma_callback_fifo_data_available)(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);

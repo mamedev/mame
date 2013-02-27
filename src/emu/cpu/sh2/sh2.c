@@ -1573,9 +1573,14 @@ INLINE void SHLR16(sh2_state *sh2, UINT32 n)
 /*  SLEEP */
 INLINE void SLEEP(sh2_state *sh2)
 {
-	sh2->pc -= 2;
+	if(sh2->sleep_mode != 2)
+		sh2->pc -= 2;
 	sh2->icount -= 2;
 	/* Wait_for_exception; */
+	if(sh2->sleep_mode == 0)
+		sh2->sleep_mode = 1;
+	else if(sh2->sleep_mode == 2)
+		sh2->sleep_mode = 0;
 }
 
 /*  STC     SR,Rn */
@@ -2214,6 +2219,7 @@ static CPU_RESET( sh2 )
 	sh2->pc = RL(sh2, 0);
 	sh2->r[15] = RL(sh2, 4);
 	sh2->sr = I;
+	sh2->sleep_mode = 0;
 
 	sh2->internal_irq_level = -1;
 }
