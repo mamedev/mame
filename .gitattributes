@@ -8053,6 +8053,7 @@ src/osd/sdl/netdev.c svneol=native#text/plain
 src/osd/sdl/netdev.h svneol=native#text/plain
 src/osd/sdl/netdev_pcap.c svneol=native#text/plain
 src/osd/sdl/netdev_pcap.h svneol=native#text/plain
+src/osd/sdl/netdev_pcap_osx.c svneol=native#text/plain
 src/osd/sdl/netdev_tap.c svneol=native#text/plain
 src/osd/sdl/netdev_tap.h svneol=native#text/plain
 src/osd/sdl/osd_opengl.h svneol=native#text/plain

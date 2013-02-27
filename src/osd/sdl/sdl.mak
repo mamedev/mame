@@ -731,9 +731,13 @@ DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_TAPTUN
 endif
 
 ifeq ($(SDL_NETWORK),pcap)
-OSDOBJS += \
-	$(SDLOBJ)/netdev.o \
-	$(SDLOBJ)/netdev_pcap.o
+OSDOBJS += $(SDLOBJ)/netdev.o
+
+ifeq ($(TARGETOS),macosx)
+OSDOBJS += $(SDLOBJ)/netdev_pcap_osx.o
+else
+OSDOBJS += $(SDLOBJ)/netdev_pcap.o
+endif
 
 DEFS += -DSDLMAME_NETWORK -DSDLMAME_NET_PCAP
 ifneq ($(TARGETOS),win32)
