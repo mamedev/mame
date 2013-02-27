@@ -416,6 +416,7 @@ public:
 	UINT16 m_textOffset;
 	UINT32 m_blitterClearMode;
 	INT16 m_blitterClearCount;
+	pen_t m_tilepals[0x10000];
 
 	// store the blit params here
 	UINT32 m_spriteblit[12];
@@ -446,13 +447,17 @@ public:
 	required_ioport m_io_an7;
 	required_ioport m_io_config;
 
-	bitmap_rgb32 m_temp_bitmap_sprites[4];
-	bitmap_rgb32 m_temp_bitmap_sprites2[4];
+	bitmap_ind16 m_temp_bitmap_sprites;
+	bitmap_ind16 m_temp_bitmap_sprites2;
 	bitmap_ind16 m_zbuffer_bitmap;
 	bitmap_ind16 m_zbuffer_bitmap2;
 
-	bitmap_rgb32 m_screen1_bitmap;
-	bitmap_rgb32 m_screen2_bitmap;
+	bitmap_ind16 m_bg_bitmap;
+	bitmap_ind16 m_bg_bitmap2;
+
+
+	bitmap_ind16 m_screen1_bitmap;
+	bitmap_ind16 m_screen2_bitmap;
 	int m_scsp_last_line;
 	UINT8 an_mux_data;
 	UINT8 sound_data, sound_fifo;
@@ -493,9 +498,18 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
-	UINT32 screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which);
-	UINT32 screen_update_coolridr1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_coolridr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void coolriders_drawgfx_opaque(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty);
+
+	void coolriders_drawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
+		UINT32 transpen);
+
+	void draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
+	UINT32 screen_update_coolridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which);
+	UINT32 screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blit_current_sprite(address_space &space);
 	INTERRUPT_GEN_MEMBER(system_h1);
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_main);
@@ -598,21 +612,14 @@ void coolridr_state::video_start()
 		if (machine().gfx[m_gfx_index] == 0)
 			break;
 
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites[0]);
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2[0]);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
+	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2);
 	machine().primary_screen->register_screen_bitmap(m_zbuffer_bitmap);
 	machine().primary_screen->register_screen_bitmap(m_zbuffer_bitmap2);
+	machine().primary_screen->register_screen_bitmap(m_bg_bitmap);
+	machine().primary_screen->register_screen_bitmap(m_bg_bitmap2);
 
 
-
-
-	// testing, not right
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites[1]);
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2[1]);
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites[2]);
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2[2]);
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites[3]);
-	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2[3]);
 
 	machine().primary_screen->register_screen_bitmap(m_screen1_bitmap);
 	machine().primary_screen->register_screen_bitmap(m_screen2_bitmap);
@@ -635,17 +642,228 @@ void coolridr_state::video_start()
 	(everything else is unknown at current time)
 */
 
-UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
+
+
+
+
+#define COOLRIDERS_DRAWGFX_CORE(PIXEL_TYPE, COOL_PIXEL_OP)                               \
+do {                                                                                    \
+	do {                                                                                \
+		const UINT8 *srcdata;                                                           \
+		INT32 destendx, destendy;                                                       \
+		INT32 srcx, srcy;                                                               \
+		INT32 curx, cury;                                                               \
+		INT32 dy;                                                                       \
+																						\
+		assert(dest.valid());                                                           \
+		assert(gfx != NULL);                                                            \
+		assert(dest.cliprect().contains(cliprect));                                     \
+		assert(code < gfx->elements());                                             \
+																						\
+		/* ignore empty/invalid cliprects */                                            \
+		if (cliprect.empty())                                                           \
+			break;                                                                      \
+																						\
+		/* compute final pixel in X and exit if we are entirely clipped */              \
+		destendx = destx + gfx->width() - 1;                                                \
+		if (destx > cliprect.max_x || destendx < cliprect.min_x)                        \
+			break;                                                                      \
+																						\
+		/* apply left clip */                                                           \
+		srcx = 0;                                                                       \
+		if (destx < cliprect.min_x)                                                     \
+		{                                                                               \
+			srcx = cliprect.min_x - destx;                                              \
+			destx = cliprect.min_x;                                                     \
+		}                                                                               \
+																						\
+		/* apply right clip */                                                          \
+		if (destendx > cliprect.max_x)                                                  \
+			destendx = cliprect.max_x;                                                  \
+																						\
+		/* compute final pixel in Y and exit if we are entirely clipped */              \
+		destendy = desty + gfx->height() - 1;                                               \
+		if (desty > cliprect.max_y || destendy < cliprect.min_y)                        \
+			break;                                                                      \
+																						\
+		/* apply top clip */                                                            \
+		srcy = 0;                                                                       \
+		if (desty < cliprect.min_y)                                                     \
+		{                                                                               \
+			srcy = cliprect.min_y - desty;                                              \
+			desty = cliprect.min_y;                                                     \
+		}                                                                               \
+																						\
+		/* apply bottom clip */                                                         \
+		if (destendy > cliprect.max_y)                                                  \
+			destendy = cliprect.max_y;                                                  \
+																						\
+		/* apply X flipping */                                                          \
+		if (flipx)                                                                      \
+			srcx = gfx->width() - 1 - srcx;                                             \
+																						\
+		/* apply Y flipping */                                                          \
+		dy = gfx->rowbytes();                                                           \
+		if (flipy)                                                                      \
+		{                                                                               \
+			srcy = gfx->height() - 1 - srcy;                                                \
+			dy = -dy;                                                                   \
+		}                                                                               \
+																						\
+		/* fetch the source data */                                                     \
+		srcdata = gfx->get_data(code);                                      \
+																						\
+		/* compute how many blocks of 4 pixels we have */                           \
+		UINT32 numblocks = (destendx + 1 - destx) / 4;                              \
+		UINT32 leftovers = (destendx + 1 - destx) - 4 * numblocks;                  \
+																					\
+		/* adjust srcdata to point to the first source pixel of the row */          \
+		srcdata += srcy * gfx->rowbytes() + srcx;                                   \
+																					\
+		/* non-flipped 8bpp case */                                                 \
+		if (!flipx)                                                                 \
+		{                                                                           \
+			/* iterate over pixels in Y */                                          \
+			for (cury = desty; cury <= destendy; cury++)                            \
+			{                                                                       \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
+				const UINT8 *srcptr = srcdata;                                      \
+				srcdata += dy;                                                      \
+																					\
+				/* iterate over unrolled blocks of 4 */                             \
+				for (curx = 0; curx < numblocks; curx++)                            \
+				{                                                                   \
+					COOL_PIXEL_OP(destptr[0], srcptr[0]);                     \
+					COOL_PIXEL_OP(destptr[1], srcptr[1]);                     \
+					COOL_PIXEL_OP(destptr[2], srcptr[2]);                     \
+					COOL_PIXEL_OP(destptr[3], srcptr[3]);                     \
+																					\
+					srcptr += 4;                                                    \
+					destptr += 4;                                                   \
+				}                                                                   \
+																					\
+				/* iterate over leftover pixels */                                  \
+				for (curx = 0; curx < leftovers; curx++)                            \
+				{                                                                   \
+					COOL_PIXEL_OP(destptr[0], srcptr[0]);                     \
+					srcptr++;                                                       \
+					destptr++;                                                      \
+				}                                                                   \
+			}                                                                       \
+		}                                                                           \
+																					\
+		/* flipped 8bpp case */                                                     \
+		else                                                                        \
+		{                                                                           \
+			/* iterate over pixels in Y */                                          \
+			for (cury = desty; cury <= destendy; cury++)                            \
+			{                                                                       \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
+				const UINT8 *srcptr = srcdata;                                      \
+				srcdata += dy;                                                      \
+																					\
+				/* iterate over unrolled blocks of 4 */                             \
+				for (curx = 0; curx < numblocks; curx++)                            \
+				{                                                                   \
+					COOL_PIXEL_OP(destptr[0], srcptr[ 0]);                    \
+					COOL_PIXEL_OP(destptr[1], srcptr[-1]);                    \
+					COOL_PIXEL_OP(destptr[2], srcptr[-2]);                    \
+					COOL_PIXEL_OP(destptr[3], srcptr[-3]);                    \
+																					\
+					srcptr -= 4;                                                    \
+					destptr += 4;                                                   \
+				}                                                                   \
+																					\
+				/* iterate over leftover pixels */                                  \
+				for (curx = 0; curx < leftovers; curx++)                            \
+				{                                                                   \
+					COOL_PIXEL_OP(destptr[0], srcptr[0]);                     \
+					srcptr--;                                                       \
+					destptr++;                                                      \
+				}                                                                   \
+			}                                                                       \
+		}                                                                           \
+	} while (0);                                                                        \
+} while (0)
+
+
+#define COOLRIDERS_PIXEL_OP_REMAP_OPAQUE(DEST, SOURCE)                               \
+do                                                                                  \
+{                                                                                   \
+	(DEST) = paldata[SOURCE];                                                       \
+}                                                                                   \
+while (0)
+
+#define COOLRIDERS_PIXEL_OP_REMAP_TRANSPEN(DEST, SOURCE)                             \
+do                                                                                  \
+{                                                                                   \
+	UINT32 srcdata = (SOURCE);                                                      \
+	if (srcdata != transpen)                                                        \
+		(DEST) = paldata[srcdata];                                                  \
+}                                                                                   \
+while (0)
+
+
+
+void coolridr_state::coolriders_drawgfx_opaque(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty)
 {
+	const pen_t *paldata = &m_tilepals[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())];
+	code %= gfx->elements();
+	COOLRIDERS_DRAWGFX_CORE(UINT16, COOLRIDERS_PIXEL_OP_REMAP_OPAQUE);
+}
+
+void coolridr_state::coolriders_drawgfx_transpen(bitmap_ind16 &dest, const rectangle &cliprect, gfx_element *gfx,
+		UINT32 code, UINT32 color, int flipx, int flipy, INT32 destx, INT32 desty,
+		UINT32 transpen)
+{
+	// special case invalid pens to opaque
+	if (transpen > 0xff)
+		return coolriders_drawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty);
+
+	// use pen usage to optimize
+	code %= gfx->elements();
+	if (gfx->has_pen_usage())
+	{
+		// fully transparent; do nothing
+		UINT32 usage = gfx->pen_usage(code);
+		if ((usage & ~(1 << transpen)) == 0)
+			return;
+
+		// fully opaque; draw as such
+		if ((usage & (1 << transpen)) == 0)
+			return coolriders_drawgfx_opaque(dest, cliprect, gfx, code, color, flipx, flipy, destx, desty);
+	}
+
+	// render
+	 const pen_t *paldata = &m_tilepals[gfx->colorbase() + gfx->granularity() * (color % gfx->colors())] ;
+	COOLRIDERS_DRAWGFX_CORE(UINT16, COOLRIDERS_PIXEL_OP_REMAP_TRANSPEN);
+}
+
+void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
+{
+
 	int bg_r,bg_g,bg_b;
+
+
+
+
 
 	if(m_pen_fill[which])
 	{
-		/* logic here is a bit of a guess. */
+#if 0
+		/* logic here is a bit of a guess. - should probably be 555 like everything else.. or we are going to have to have a rgb32 bitmap? */
 		bg_r = (((m_pen_fill[which] >> 16) & 0x7f) << 1) | (((m_pen_fill[which] >> 16) & 0x80) >> 7);
 		bg_g = (((m_pen_fill[which] >> 8) & 0x7f) << 1) | (((m_pen_fill[which] >> 8) & 0x80) >> 7);
 		bg_b = (((m_pen_fill[which] >> 0) & 0x7f) << 1) | (((m_pen_fill[which] >> 0) & 0x80) >> 7);
 		bitmap.fill(MAKE_ARGB(0xff,bg_r,bg_g,bg_b),cliprect);
+#endif
+
+		bg_r = (((m_pen_fill[which] >> 16) & 0x78) >> 2) | (((m_pen_fill[which] >> 16) & 0x80) >> 7);
+		bg_g = (((m_pen_fill[which] >> 8) & 0x78) >> 2) | (((m_pen_fill[which] >> 8) & 0x80) >> 7);
+		bg_b = (((m_pen_fill[which] >> 0) & 0x78) >> 2) | (((m_pen_fill[which] >> 0) & 0x80) >> 7);
+		bitmap.fill( (bg_r<<10) | (bg_g << 5) | bg_b  ,cliprect);
+
 	}
 	else
 	{
@@ -670,9 +888,9 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 		bg_b = (VREG(0x3c) >> 0) & 0x1f;
 		apply_rgb_control(which,&bg_r,&bg_g,&bg_b);
 
-		bitmap.fill(MAKE_ARGB(0xff,pal5bit(bg_r),pal5bit(bg_g),pal5bit(bg_b)),cliprect);
+		bitmap.fill(VREG(0x3c),cliprect);
 
-
+		
 		UINT16 basey = scrolly>>4;
 		for (int y=0;y<25;y++)
  		{
@@ -684,7 +902,7 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 				/* bike select enables bits 15-12, pretty sure one of these is tile bank (because there's a solid pen on 0x3ff / 0x7ff). */
 				tile = (vram_data & 0x7ff) | ((vram_data & 0x8000) >> 4);
 
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,(x*16)-(scrollx&0xf),(y*16)-(scrolly&0xf),transpen_setting ? -1 : 0);
+				coolriders_drawgfx_transpen(bitmap,cliprect,gfx,tile,color,0,0,(x*16)-(scrollx&0xf),(y*16)-(scrolly&0xf),transpen_setting ? -1 : 0);
 
 				basex++;
 			}
@@ -692,21 +910,27 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 		}
 	}
 
+
+}
+
+UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
+{
+
 	if (which==0)
 	{
 		// will probably need a custom function
-		copybitmap_trans(bitmap, m_screen1_bitmap, 0, 0, 0, 0, cliprect, 0xff000000);
+		copybitmap_trans(bitmap, m_screen1_bitmap, 0, 0, 0, 0, cliprect, 0x8000);
 	}
 	else
 	{
 		// will probably need a custom function
-		copybitmap_trans(bitmap, m_screen2_bitmap, 0, 0, 0, 0, cliprect, 0xff000000);
+		copybitmap_trans(bitmap, m_screen2_bitmap, 0, 0, 0, 0, cliprect, 0x8000);
 	}
 
 	return 0;
 }
 
-UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #if 0
 	if (screen.machine().input().code_pressed_once(KEYCODE_W))
@@ -724,7 +948,7 @@ UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_rgb
 	return screen_update_coolridr(screen,bitmap,cliprect,0);
 }
 
-UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return screen_update_coolridr(screen,bitmap,cliprect,1);
 }
@@ -739,7 +963,7 @@ struct cool_render_object
 	UINT8* indirect_tiles;
 	UINT32* indirect_zoom;
 	UINT32 spriteblit[12];
-	bitmap_rgb32* drawbitmap;
+	bitmap_ind16* drawbitmap;
 	bitmap_ind16* zbitmap;
 	UINT16 zpri;
 	UINT8 blittype;
@@ -955,7 +1179,7 @@ struct cool_render_object
 		const int pixelOffsetnextX = ((hPositionTable) + ((h+1)* 16 * hZoomHere)) / 0x40; \
 		if (drawy>clipmaxY) { break; }; \
 		if (drawy<clipminY) { drawy++; continue; }; \
-		line = &drawbitmap->pix32(drawy); \
+		line = &drawbitmap->pix16(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
 		int blockwide = pixelOffsetnextX-pixelOffsetX; \
 		if (pixelOffsetX+blockwide <clipminX) { drawy++; continue; } \
@@ -994,7 +1218,7 @@ struct cool_render_object
 		int realy = ((y*incy)>>21); \
 		const int drawy = pixelOffsetY+y; \
 		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
-		line = &drawbitmap->pix32(drawy); \
+		line = &drawbitmap->pix16(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
 		int drawx = pixelOffsetX; \
 		for (int x = 0; x < blockwide; x++) \
@@ -1013,7 +1237,7 @@ struct cool_render_object
 	{ \
 		const int drawy = pixelOffsetY+realy; \
 		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
-		line = &drawbitmap->pix32(drawy); \
+		line = &drawbitmap->pix16(drawy); \
 		zline = &object->zbitmap->pix16(drawy); \
 		int drawx = pixelOffsetX; \
 		for (int realx = 0; realx < 16; realx++) \
@@ -1045,7 +1269,7 @@ TODO: fix anything that isn't text.
 		if (object->zpri < zline[drawx]) \
 		{ \
 			{ \
-				line[drawx] = (pal5bit((pix >> 10) & 0x1f)<<16)|(pal5bit((pix >> 5) & 0x1f)<<8)|pal5bit((pix >> 0) & 0x1f); \
+				line[drawx] = pix&0x7fff; \
 				zline[drawx] = object->zpri; \
 			} \
 		} \
@@ -1074,7 +1298,7 @@ TODO: fix anything that isn't text.
 void *coolridr_state::draw_object_threaded(void *param, int threadid)
 {
 	cool_render_object *object = reinterpret_cast<cool_render_object *>(param);
-	bitmap_rgb32* drawbitmap = object->drawbitmap;
+	bitmap_ind16* drawbitmap = object->drawbitmap;
 
 	/************* object->spriteblit[3] *************/
 
@@ -1766,7 +1990,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 			UINT32 incy = 0x8000000 / vZoom;
 
 			// DEBUG: Draw 16x16 block
-			UINT32* line;
+			UINT16* line;
 			UINT16* zline;
 
 
@@ -2079,7 +2303,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	// which queue, which bitmap
 	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x4f || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 	{
-		testobject->drawbitmap = &m_temp_bitmap_sprites[0];
+		testobject->drawbitmap = &m_temp_bitmap_sprites;
 		testobject->zbitmap = &m_zbuffer_bitmap;
 		// pass these from the type 1 writes
 		testobject->clipvals[0] = m_clipvals[0][0];
@@ -2090,7 +2314,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	}
 	else // 0x90, 0xa0, 0xaf, 0xb0, 0xc0
 	{
-		testobject->drawbitmap = &m_temp_bitmap_sprites2[0];
+		testobject->drawbitmap = &m_temp_bitmap_sprites2;
 		testobject->zbitmap = &m_zbuffer_bitmap2;
 		// pass these from the type 1 writes
 		testobject->clipvals[0] = m_clipvals[1][0];
@@ -2316,14 +2540,18 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 		{
 			const rectangle& visarea = machine().primary_screen->visible_area();
 
-			// test code
-			int i = 0;
-
 			if(m_blitterClearMode == 0x8c200000)
 			{
+				// wait for our sprite rendering to finish
 				osd_work_queue_wait(m_work_queue[0], osd_ticks_per_second() * 100);
-				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites[i], 0, 0, 0, 0, visarea);
-				m_temp_bitmap_sprites[i].fill(0xff000000, visarea);
+				
+				// copy our old buffer to the actual screen
+				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, visarea);
+				
+				//m_temp_bitmap_sprites.fill(0xff000000, visarea);
+				// render the tilemap to the backbuffer, ready for having sprites drawn on it
+				draw_bg_coolridr(m_temp_bitmap_sprites, visarea, 0);
+				// wipe the z-buffer ready for the sprites		
 				m_zbuffer_bitmap.fill(0xffff, visarea);
 				// almost certainly wrong
 				m_clipvals[0][0] = 0;
@@ -2333,9 +2561,15 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 			}
 			else if(m_blitterClearMode == 0x8c800000)
 			{
+				// wait for our sprite rendering to finish
 				osd_work_queue_wait(m_work_queue[1], osd_ticks_per_second() * 100);
-				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2[i], 0, 0, 0, 0, visarea);
-				m_temp_bitmap_sprites2[i].fill(0xff000000, visarea);
+
+				// copy our old buffer to the actual screen
+				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2, 0, 0, 0, 0, visarea);
+				//m_temp_bitmap_sprites2.fill(0xff000000, visarea);
+				// render the tilemap to the backbuffer, ready for having sprites drawn on it
+				draw_bg_coolridr(m_temp_bitmap_sprites2, visarea, 1);
+				// wipe the z-buffer ready for the sprites				
 				m_zbuffer_bitmap2.fill(0xffff, visarea);
 				// almost certainly wrong
 				m_clipvals[1][0] = 0;
@@ -2444,7 +2678,8 @@ void coolridr_state::flush_pal_data( UINT16 offset )
 	b = ((m_h1_pal[offset] & 0x001f) >> 0);
 	apply_rgb_control(screen_type,&r,&g,&b);
 
-	palette_set_color_rgb(machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
+//	palette_set_color_rgb(machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	m_tilepals[offset&0xffff] = (r<<10) | (g<<5) | b;
 }
 
 void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index )
@@ -3372,6 +3607,8 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_SCREEN_UPDATE_DRIVER(coolridr_state, screen_update_coolridr2)
 
 	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_PALETTE_INIT( RRRRR_GGGGG_BBBBB )
+
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
