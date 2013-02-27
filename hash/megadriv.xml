@@ -27103,20 +27103,6 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="dukenk3da" cloneof="dukenk3d" supported="no">
-		<description>Duke Nukem 3D (Pirate)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<feature name="slot" value="rom_sram" />
-			<dataarea name="rom" size="2097152">
-				<rom name="duke_nukem_3d.bin" size="2097152" crc="13e93c0d" sha1="14ce7438a379973c8d66b0cc365d05a04d94f7dd" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-			<dataarea name="sram" size="65536">
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="kof2k" cloneof="kof98">
 		<description>K.O.F 2000</description>
 		<year>199?</year>
