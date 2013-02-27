@@ -70,6 +70,7 @@ protected:
 		UINT8   Y0;
 		UINT8   R;
 		UINT8   M;
+		int		max_vpos;
 	} m_ef9340;
 	UINT8   m_ef934x_ram_a[1024];
 	UINT8   m_ef934x_ram_b[1024];
