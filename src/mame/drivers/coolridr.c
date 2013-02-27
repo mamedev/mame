@@ -403,6 +403,7 @@ public:
 		m_work_queue[1] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 		decode[0].current_object = 0;
 		decode[1].current_object = 0;
+		debug_randompal = 8;
 
 	}
 
@@ -501,6 +502,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
 
 	void sysh1_dma_transfer( address_space &space, UINT16 dma_index );
+
+	int debug_randompal;
 
 	UINT16 *m_h1_vram;
 	UINT8 *m_h1_pcg;
@@ -707,6 +710,19 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_rgb3
 
 UINT32 coolridr_state::screen_update_coolridr1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+#if 0
+	if (screen.machine().input().code_pressed_once(KEYCODE_W))
+	{
+		debug_randompal++;
+		popmessage("%02x",debug_randompal);
+	}
+	if (screen.machine().input().code_pressed_once(KEYCODE_Q))
+	{
+		debug_randompal--;
+		popmessage("%02x",debug_randompal);
+	}
+#endif
+
 	return screen_update_coolridr(screen,bitmap,cliprect,0);
 }
 
@@ -1022,6 +1038,9 @@ TODO: fix anything that isn't text.
 */
 
 
+
+
+
 #define DRAW_PIX \
 	if (pix != 0x8000) \
 	{ \
@@ -1142,22 +1161,43 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 	/************* object->spriteblit[4] *************/
 
-	UINT32 blit4_unused = object->spriteblit[4] & 0xf8fefefe;
-	//UINT32 blit4 = (object->spriteblit[4] & 0x07000000)>>24;
+	UINT32 blit4_unused = object->spriteblit[4] & 0xf8fefeee;
+	UINT32 blit4 = (object->spriteblit[4] & 0x07000000)>>24;
 	//object->zpri = 7-blit4;
-	// unknown bits in blit word 4 -  00000010 - australia
+	// unknown bits in blit word 4 -  00000010 - australia (and various other times)
+
 	UINT32 blit_flipx = object->spriteblit[4] & 0x00000001;
 	UINT32 blit_flipy = (object->spriteblit[4] & 0x00000100)>>8;
 	UINT32 blit_rotate = (object->spriteblit[4] & 0x00010000)>>16;
+	//UINT32 b4_unk = object->spriteblit[4] & 0x00000010;
+
 	if (blit4_unused) printf("unknown bits in blit word %d -  %08x\n", 4, blit4_unused);
 
-	// ---- -111 ---- ---r ---- ---y ---- ---x
+	// ---- -111 ---- ---r ---- ---y ---z ---x
 	// 1 = used bits? (unknown purpose.. might be object colour mode)
 	// x = x-flip
 	// y = y-flip
-	// r = unknown, not used much, occasional object - rotate
+	// r = rotate 90 degrees
+	// z = ??? set very occasionally, often at the start of stages, might relate to the clipping done at the same time?
+
+	// this might affect blending logic / amount when 0x8000 palette bit is set, and maybe even z-behavior
+	// 7 = road, player bike etc.? possibly a 'do not blend' (solid) flag of sorts because the road has 0x8000 palette bit set...
+	// 6 = smoke frome player bike, waves on west indies, waterfalls on niagra, occasional bits of road?
+	// 5 = clouds
+	// 4 = shadows and some HUD elements, occassional bit of road, some firework effects, all bg elements in the coolriders of coolriders (including reaper)
+	// 3 = front coloured jets
+	// 2 = middle coloured jets
+	// 1 = last few coloured trails from the jets at the start, occassional bit of road
+	// 0 = some HUD elements, title screen, tunnels? road during coolriders of.. (this doesn't have 0x8000 set)
 
 
+	// note the road always has 0x8000 bit set in the palette.  I *think* this is because they do a gradual blend of some kind between the road types
+	//  see the number of transitional road bits which have various values above set
+
+	if (blit4==object->state->debug_randompal)
+	{
+		b1colorNumber = object->state->machine().rand()&0xfff;
+	}
 
 
 	/************* object->spriteblit[6] *************/
