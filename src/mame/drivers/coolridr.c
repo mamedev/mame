@@ -403,7 +403,7 @@ public:
 		m_work_queue[1] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
 		decode[0].current_object = 0;
 		decode[1].current_object = 0;
-		debug_randompal = 8;
+		debug_randompal = 9;
 
 	}
 
@@ -585,7 +585,7 @@ public:
 };
 
 #define PRINT_BLIT_STUFF \
-	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x, %d, %d, %d) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", blit0, blit1_unused,b1mode,b1colorNumber, blit2_unused,b2tpen,b2colorNumber, blit3_unused,b3romoffset, blit4_unused, blit4, blit_flipy,blit_rotate, blit_flipx, blit5_unused, indirect_tile_enable, indirect_zoom_enable, vCellCount, hCellCount, vZoom, hZoom, blit10, textlookup, vPosition, hPosition); \
+	printf("type blit %08x %08x(%d, %03x) %08x(%02x, %03x) %08x(%06x) %08x(%08x, %d, %d, %d) %08x(%d,%d) %04x %04x %04x %04x %08x %08x %d %d\n", blit0, blit1_unused,b1mode,b1colorNumber, blit2_unused,b2tpen,b2colorNumber, blit3_unused,b3romoffset, blit4_unused, blit4blendlevel, blit_flipy,blit_rotate, blit_flipx, blit5_unused, indirect_tile_enable, indirect_zoom_enable, vCellCount, hCellCount, vZoom, hZoom, blit10, textlookup, vPosition, hPosition); \
 
 
 
@@ -1264,7 +1264,9 @@ TODO: fix anything that isn't text.
 
 
 #define DRAW_PIX \
-	if (pix != 0x8000) \
+	/* I think 0x8000 is ALWAYS transparent */ \
+	/* values < 0x8000 have no alpha effect to them */ \
+	if (pix < 0x8000) \
 	{ \
 		if (object->zpri < zline[drawx]) \
 		{ \
@@ -1274,12 +1276,30 @@ TODO: fix anything that isn't text.
 			} \
 		} \
 	} \
-	else \
+	/* values > 0x8000 have blending */ \
+	else if (pix > 0x8000) \
 	{ \
-		/* some alpha sprites have 0x8000 set */ \
-		/* but some regular ones text do too? */ \
-		/* how do we tell the difference between them? */ \
-		/* how would you have a black 0x0000 in an alpha sprite?? */ \
+		/* a blend level of 0x8 (real register value 0x7 but we added one so we can shift instead of divide in code below) seems to be the same as solid, it is set on most parts of the road and during the 'lovemachine' animation in attract when the heart should be hidden */ \
+		if (object->zpri < zline[drawx]) \
+		{ \
+			if (blit4blendlevelinv==0x0) \
+			{ \
+				line[drawx] = pix&0x7fff; \
+				zline[drawx] = object->zpri; \
+			} \
+			else \
+			{ \
+			  UINT16 source = line[drawx]; \
+			  int src_r = ((source>>10)&0x1f) * blit4blendlevelinv; \
+			  int src_g = ((source>>5)&0x1f)  * blit4blendlevelinv; \
+			  int src_b = ((source>>0)&0x1f)  * blit4blendlevelinv; \
+			  int dest_r = ((pix>>10)&0x1f) * blit4blendlevel; \
+			  int dest_g = ((pix>>5)&0x1f)  * blit4blendlevel; \
+			  int dest_b = ((pix>>0)&0x1f)  * blit4blendlevel; \
+			  line[drawx] = (((src_r+dest_r)>>3)<<10) | (((src_g+dest_g)>>3)<<5) | (((src_b+dest_b)>>3)<<0); \
+			  zline[drawx] = object->zpri; \
+			} \
+		} \
 	} \
 	drawx++; \
 
@@ -1384,7 +1404,9 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	/************* object->spriteblit[4] *************/
 
 	UINT32 blit4_unused = object->spriteblit[4] & 0xf8fefeee;
-	UINT32 blit4 = (object->spriteblit[4] & 0x07000000)>>24;
+	UINT16 blit4blendlevel = (object->spriteblit[4] & 0x07000000)>>24;
+	UINT16 blit4blendlevelinv = blit4blendlevel^0x7;
+	blit4blendlevel+=1; // make our maths easier later (not sure about accuracy)
 	//object->zpri = 7-blit4;
 	// unknown bits in blit word 4 -  00000010 - australia (and various other times)
 
@@ -1416,7 +1438,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	// note the road always has 0x8000 bit set in the palette.  I *think* this is because they do a gradual blend of some kind between the road types
 	//  see the number of transitional road bits which have various values above set
 
-	if (blit4==object->state->debug_randompal)
+	if (blit4blendlevel==object->state->debug_randompal)
 	{
 		b1colorNumber = object->state->machine().rand()&0xfff;
 	}
