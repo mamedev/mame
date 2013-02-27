@@ -122,6 +122,7 @@ public:
 		// setters
 		void set_value(const char *newvalue, int priority);
 		void set_default_value(const char *defvalue);
+		void set_flag(UINT32 mask, UINT32 flag);
 		void revert(int priority);
 
 	private:
@@ -186,6 +187,7 @@ public:
 	bool set_value(const char *name, const char *value, int priority, astring &error_string);
 	bool set_value(const char *name, int value, int priority, astring &error_string);
 	bool set_value(const char *name, float value, int priority, astring &error_string);
+	void set_flag(const char *name, UINT32 mask, UINT32 flags);
 
 	// misc
 	static const char *unadorned(int x = 0) { return s_option_unadorned[MIN(x, MAX_UNADORNED_OPTIONS)]; }

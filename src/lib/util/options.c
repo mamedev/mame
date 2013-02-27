@@ -153,6 +153,12 @@ void core_options::entry::set_default_value(const char *defvalue)
 }
 
 
+void core_options::entry::set_flag(UINT32 mask, UINT32 flag)
+{
+	m_flags = ( m_flags & mask ) | flag;
+}
+
+
 //-------------------------------------------------
 //  revert - revert back to our default if we are
 //  at or below the given priority
@@ -640,6 +646,17 @@ bool core_options::set_value(const char *name, float value, int priority, astrin
 	return set_value(name, tempstr.cstr(), priority, error_string);
 }
 
+
+void core_options::set_flag(const char *name, UINT32 mask, UINT32 flag)
+{
+	// find the entry first
+	entry *curentry = m_entrymap.find(name);
+	if ( curentry == NULL )
+	{
+		return;
+	}
+	curentry->set_flag(mask, flag);
+}
 
 //-------------------------------------------------
 //  reset - reset the options state, removing

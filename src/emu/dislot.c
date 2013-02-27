@@ -61,6 +61,25 @@ const bool device_slot_interface::all_internal() const
 	return TRUE;
 }
 
+
+bool device_slot_interface::is_internal_option(const char *option) const
+{
+	if ( !option )
+	{
+		return false;
+	}
+
+	for (int i = 0; m_slot_interfaces && m_slot_interfaces[i].name != NULL; i++)
+	{
+		if ( !strcmp(m_slot_interfaces[i].name, option) )
+		{
+			return m_slot_interfaces[i].internal;
+		}
+	}
+	return false;
+}
+
+
 device_slot_card_interface::device_slot_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device)
 {

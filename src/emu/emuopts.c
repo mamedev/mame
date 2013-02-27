@@ -236,7 +236,6 @@ bool emu_options::add_slot_options(bool isfirst)
 	for (const device_slot_interface *slot = iter.first(); slot != NULL; slot = iter.next())
 	{
 		if (slot->fixed()) continue;
-		bool all_internal = slot->all_internal();
 		// first device? add the header as to be pretty
 		if (first && isfirst)
 		{
@@ -253,8 +252,15 @@ bool emu_options::add_slot_options(bool isfirst)
 			// add the option
 			entry[0].name = slot->device().tag() + 1;
 			entry[0].description = NULL;
-			entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE | ( all_internal ? OPTION_FLAG_INTERNAL : 0 );
+			entry[0].flags = OPTION_STRING | OPTION_FLAG_DEVICE;
 			entry[0].defvalue = (slot->get_slot_interfaces() != NULL) ? slot->get_default_card() : NULL;
+			if ( entry[0].defvalue )
+			{
+				if ( slot->is_internal_option( entry[0].defvalue ) )
+				{
+					entry[0].flags |= OPTION_FLAG_INTERNAL;
+				}
+			}
 			add_entries(entry, true);
 
 			added = true;
@@ -285,7 +291,11 @@ void emu_options::update_slot_options()
 		if (exists(slot->device().tag()+1)) {
 			if (slot->get_slot_interfaces() != NULL) {
 				const char *def = slot->get_default_card_software(config,*this);
-				if (def) set_default_value(slot->device().tag()+1,def);
+				if (def)
+				{
+					set_default_value(slot->device().tag()+1,def);
+					set_flag(slot->device().tag()+1, ~OPTION_FLAG_INTERNAL, slot->is_internal_option(def) ? OPTION_FLAG_INTERNAL : 0 );
+				}
 			}
 		}
 	}

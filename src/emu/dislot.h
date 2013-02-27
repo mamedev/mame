@@ -60,6 +60,7 @@ public:
 	const UINT32 default_clock() const { return m_default_clock; }
 	const bool fixed() const { return m_fixed; }
 	const bool all_internal() const;
+	bool is_internal_option(const char *option) const;
 	device_t* get_card_device();
 protected:
 	const char *m_default_card;
