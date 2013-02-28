@@ -2,21 +2,20 @@
 
     System H1 (c) 1994 Sega
 
-    preliminary driver by David Haywood, Angelo Salese and Tomasz Slanina
+    Driver by David Haywood, Angelo Salese and Tomasz Slanina
     special thanks to Guru for references and HW advices
 
+	This system is interesting in that it makes use of an RLE compression scheme, which
+	is not something common for Sega hardware, there is a patent for it ( 6,141,122 )
+	http://www.google.com/patents/US6141122
+
     TODO:
-    - decode compressed GFX ROMs for "sprite" blitter (6,141,122 is the patent number)
-	  http://www.google.com/patents/US6141122
-    - DMA is still a bit of a mystery;
-    - video emulation is pratically non-existant;
-    - SCSP;
-    - Many SH-1 ports needs investigations;
+	- walk the dog
+	- improve sound emulation
     - i8237 purpose is unknown, might even not be at the right place ...
-    - IRQ generation
-    - Understand & remove the hacks at the bottom;
-    - IC1/IC10 are currently unused, might contain sprite data / music data for the SCSP / chars for the
-      text tilemap/blitter;
+	- verify zooming etc. our current algorithm is a bit ugly for text
+
+
 
 =======================================================================================================
 
@@ -274,84 +273,6 @@ another address simultaneously. Or it can drive the same address and
 read a 160-bit word at once. Regardless both addresses are restricted
 to the same bank as defined through A20.
 
-From looking at the ROMs there seem to be structures that may be
-tables. A table would be needed to associate a tile number with RLE
-data in ROM, so that would be a likely function of tables in the ROM.
-It may be that the split address design allows the chip to read table
-data from one 80-bit port while reading in graphics data from the
-other.
-
-Now this next bit is just an interpretation of what's in the patent,
-so you probably already know it:
-
-The primitive unit of graphics data is a 10-bit word (hence all the
-multiples of 10 listed above, e.g. 80 and 160-bit words) The top two
-bits define the type:
-
-0,x : $000 : Type A (3-bit color code, 5-bit run length, 1 bit "cell" flag)
-1,x : $800 : Type B (7-bit color code, 2-bit run length)
-1,1 : $C00 : Type C (8-bit color code)
-
-Because the top two bits (which identify the type) are shared with the
-color code, this limits the range of colors somewhat. E.g. one of the
-patent diagrams shows the upper 4 bits of a Type A pixel moved into
-the bottom four bits of the color RAM index, but for type A the most
-significant bit is always zero. So that 4-bit quantity is always 0-7
-which is why type A has a limit of 8 colors.
-
-This is why one of the later diagrams shows the Type B pixel ANDed
-with 7F and the Type C pixel ANDed with 3FF, to indicate the two
-indicator bits are being stripped out and the remaining value is
-somewhat truncated.
-
-We figured due to the colorful graphics in the game there would be a
-large groups of Type C pixels, but we could never find an
-rearrangement of data and address bits that yielded a large number of
-words with bits 9,8 set. Some of the data looks like it's linear, and
-some of it looks like bitplanes. Perhaps tables are linear and
-graphics are planar.
-
-We tried the usual stuff; assuming the 16-bit words from each ROM was
-a 160-pixel wide array of 10-bit elements (linear), or assuming each
-bit from each ROM was a single bit of a 10-bit word so 16 bits defined
-16 10-bit words in parallel (planar), and never got useful output.
-
-There may be some weird data/address scrambling done to put data in an
-order easiest for the hardware to process, which would be
-non-intuitive.
-
-Also the two indicator bits may have different polarities, maybe 0,0
-is Type C instead of 1,1.
-
---- CORRECTION from Charles 20/02/13
-
-I was just playing around with decoding this morning, and now I feel
-certain the ordering is to take the 16-bit output of each of the 10
-ROMs at a given address and divide that 160-bit word into sixteen
-10-bit words.
-
-When you do this, you get some kind of animation at 0x3898E0 which is
-eight sequential frames of an object with a solid color fill in the
-background. Because the size is constant it may be all Type C pixels
-(e.g. no run-length) so that could be a good place to start with
-shuffling bits/addresses to see how to get a lot of $3xx pixels.
-
-There's a similar animation at 0x73CEC0, smaller object, 32 frames.
-
-I think the 'background' data behind the object in both cases might be
-a pen number that continuously increases, maybe for flashing effect as
-you cycle through the animation. Otherwise you'd expect the background
-pixels to be the same in each frame.
-
-I also wonder if a pixel value of 0000 (type A with run length=0)
-indicates a single dot since there are a lot of 0000 words.
-
-There may be some bit/byte/address swapping needed to still get valid
-output. And the tables may be encoded differently, there's a large one
-at 0xDE60.
-
-
-
 */
 
 
@@ -400,11 +321,7 @@ public:
 		m_io_an7(*this, "AN7"),
 		m_io_config(*this, "CONFIG")
 	{
-		m_work_queue[0] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
-		m_work_queue[1] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
-		decode[0].current_object = 0;
-		decode[1].current_object = 0;
-		debug_randompal = 9;
+
 	}
 
 	// Blitter state
@@ -450,8 +367,8 @@ public:
 
 	bitmap_ind16 m_temp_bitmap_sprites;
 	bitmap_ind16 m_temp_bitmap_sprites2;
-	bitmap_ind16 m_zbuffer_bitmap;
-	bitmap_ind16 m_zbuffer_bitmap2;
+	//bitmap_ind16 m_zbuffer_bitmap;
+	//bitmap_ind16 m_zbuffer_bitmap2;
 
 	bitmap_ind16 m_bg_bitmap;
 	bitmap_ind16 m_bg_bitmap2;
@@ -543,7 +460,7 @@ public:
 		UINT32* indirect_zoom;
 		UINT32 spriteblit[12];
 		bitmap_ind16* drawbitmap;
-		bitmap_ind16* zbitmap;
+		//bitmap_ind16* zbitmap;
 		UINT16 zpri;
 		UINT8 blittype;
 		coolridr_state* state;
@@ -645,8 +562,8 @@ void coolridr_state::video_start()
 
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites);
 	machine().primary_screen->register_screen_bitmap(m_temp_bitmap_sprites2);
-	machine().primary_screen->register_screen_bitmap(m_zbuffer_bitmap);
-	machine().primary_screen->register_screen_bitmap(m_zbuffer_bitmap2);
+	//machine().primary_screen->register_screen_bitmap(m_zbuffer_bitmap);
+	//machine().primary_screen->register_screen_bitmap(m_zbuffer_bitmap2);
 	machine().primary_screen->register_screen_bitmap(m_bg_bitmap);
 	machine().primary_screen->register_screen_bitmap(m_bg_bitmap2);
 
@@ -1266,7 +1183,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 		if (drawy>clipmaxY) { break; }; \
 		if (drawy<clipminY) { drawy++; continue; }; \
 		line = &drawbitmap->pix16(drawy); \
-		zline = &object->zbitmap->pix16(drawy); \
+		/* zline = &object->zbitmap->pix16(drawy); */ \
 		int blockwide = pixelOffsetnextX-pixelOffsetX; \
 		if (pixelOffsetX+blockwide <clipminX) { drawy++; continue; } \
 		if (pixelOffsetX>clipmaxX)  { drawy++; continue; } \
@@ -1305,7 +1222,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 		const int drawy = pixelOffsetY+y; \
 		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
 		line = &drawbitmap->pix16(drawy); \
-		zline = &object->zbitmap->pix16(drawy); \
+		/* zline = &object->zbitmap->pix16(drawy); */ \
 		int drawx = pixelOffsetX; \
 		for (int x = 0; x < blockwide; x++) \
 		{ \
@@ -1324,7 +1241,7 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 		const int drawy = pixelOffsetY+realy; \
 		if ((drawy>clipmaxY) || (drawy<clipminY)) continue; \
 		line = &drawbitmap->pix16(drawy); \
-		zline = &object->zbitmap->pix16(drawy); \
+		/* zline = &object->zbitmap->pix16(drawy); */ \
 		int drawx = pixelOffsetX; \
 		for (int realx = 0; realx < 16; realx++) \
 		{ \
@@ -1354,11 +1271,11 @@ TODO: fix anything that isn't text.
 	/* values < 0x8000 have no alpha effect to them */ \
 	if (pix < 0x8000) \
 	{ \
-		if (object->zpri < zline[drawx]) \
+		/*if (object->zpri < zline[drawx])*/ \
 		{ \
 			{ \
 				line[drawx] = pix&0x7fff; \
-				zline[drawx] = object->zpri; \
+				/*zline[drawx] = object->zpri;*/ \
 			} \
 		} \
 	} \
@@ -1366,12 +1283,12 @@ TODO: fix anything that isn't text.
 	else if (pix > 0x8000) \
 	{ \
 		/* a blend level of 0x8 (real register value 0x7 but we added one so we can shift instead of divide in code below) seems to be the same as solid, it is set on most parts of the road and during the 'lovemachine' animation in attract when the heart should be hidden */ \
-		if (object->zpri < zline[drawx]) \
+		/* if (object->zpri < zline[drawx]) */ \
 		{ \
 			if (blit4blendlevelinv==0x0) \
 			{ \
 				line[drawx] = pix&0x7fff; \
-				zline[drawx] = object->zpri; \
+				/* zline[drawx] = object->zpri; */ \
 			} \
 			else \
 			{ \
@@ -1383,7 +1300,7 @@ TODO: fix anything that isn't text.
 			  int dest_g = ((pix>>5)&0x1f)  * blit4blendlevel; \
 			  int dest_b = ((pix>>0)&0x1f)  * blit4blendlevel; \
 			  line[drawx] = (((src_r+dest_r)>>3)<<10) | (((src_g+dest_g)>>3)<<5) | (((src_b+dest_b)>>3)<<0); \
-			  zline[drawx] = object->zpri; \
+			  /* zline[drawx] = object->zpri; */ \
 			} \
 		} \
 	} \
@@ -2099,7 +2016,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 
 			// DEBUG: Draw 16x16 block
 			UINT16* line;
-			UINT16* zline;
+			//UINT16* zline;
 
 
 			if (indirect_zoom_enable)
@@ -2414,7 +2331,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	if (m_blitterMode == 0x30 || m_blitterMode == 0x40 || m_blitterMode == 0x4f || m_blitterMode == 0x50 || m_blitterMode == 0x60)
 	{
 		testobject->drawbitmap = &m_temp_bitmap_sprites;
-		testobject->zbitmap = &m_zbuffer_bitmap;
+		/* testobject->zbitmap = &m_zbuffer_bitmap; */
 		// pass these from the type 1 writes
 		testobject->clipvals[0] = m_clipvals[0][0];
 		testobject->clipvals[1] = m_clipvals[0][1];
@@ -2427,7 +2344,7 @@ void coolridr_state::blit_current_sprite(address_space &space)
 	else // 0x90, 0xa0, 0xaf, 0xb0, 0xc0
 	{
 		testobject->drawbitmap = &m_temp_bitmap_sprites2;
-		testobject->zbitmap = &m_zbuffer_bitmap2;
+		/* testobject->zbitmap = &m_zbuffer_bitmap2; */
 		// pass these from the type 1 writes
 		testobject->clipvals[0] = m_clipvals[1][0];
 		testobject->clipvals[1] = m_clipvals[1][1];
@@ -2700,16 +2617,28 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				// render the tilemap to the backbuffer, ready for having sprites drawn on it
 				draw_bg_coolridr(m_temp_bitmap_sprites, visarea, 0);
 				// wipe the z-buffer ready for the sprites				
-				m_zbuffer_bitmap.fill(0xffff, visarea);
+				/* m_zbuffer_bitmap.fill(0xffff, visarea); */
 				// almost certainly wrong
 				m_clipvals[0][0] = 0;
 				m_clipvals[0][1] = 0;
 				m_clipvals[0][2] = 0;
 				m_clipblitterMode[0] = 0xff;
 			
-				//qsort(m_cool_render_object_list1, m_listcount1, sizeof(struct cool_render_object *), comp_sprite_z);
+				/* bubble sort, might be something better to use instead */
+				for (int pass = 0 ; pass < ( m_listcount1 - 1 ); pass++)
+				{
+					for (int elem2 = 0 ; elem2 < m_listcount1 - pass - 1; elem2++)
+					{
+						if (m_cool_render_object_list1[elem2]->zpri > m_cool_render_object_list1[elem2+1]->zpri)
+						{
+							cool_render_object* temp = m_cool_render_object_list1[elem2];
+							m_cool_render_object_list1[elem2]   = m_cool_render_object_list1[elem2+1];
+							m_cool_render_object_list1[elem2+1] = temp;
+						}
+					}
+				}
 
-				for (int i=0;i<m_listcount1;i++)
+				for (int i=m_listcount1-1;i>=0;i--)
 				{
 					if (m_usethreads)
 					{
@@ -2740,16 +2669,28 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 				// render the tilemap to the backbuffer, ready for having sprites drawn on it
 				draw_bg_coolridr(m_temp_bitmap_sprites2, visarea, 1);
 				// wipe the z-buffer ready for the sprites				
-				m_zbuffer_bitmap2.fill(0xffff, visarea);
+				/* m_zbuffer_bitmap2.fill(0xffff, visarea); */
 				// almost certainly wrong
 				m_clipvals[1][0] = 0;
 				m_clipvals[1][1] = 0;
 				m_clipvals[1][2] = 0;
 				m_clipblitterMode[1] = 0xff;
 	
-				//qsort(m_cool_render_object_list2, m_listcount2, sizeof(struct cool_render_object *), comp_sprite_z);
+					/* bubble sort, might be something better to use instead */
+				for (int pass = 0 ; pass < ( m_listcount2 - 1 ); pass++)
+				{
+					for (int elem2 = 0 ; elem2 < m_listcount2 - pass - 1; elem2++)
+					{
+						if (m_cool_render_object_list2[elem2]->zpri > m_cool_render_object_list2[elem2+1]->zpri)
+						{
+							cool_render_object* temp = m_cool_render_object_list2[elem2];
+							m_cool_render_object_list2[elem2]   = m_cool_render_object_list2[elem2+1];
+							m_cool_render_object_list2[elem2+1] = temp;
+						}
+					}
+				}
 
-				for (int i=0;i<m_listcount2;i++)
+				for (int i=m_listcount2-1;i>=0;i--)
 				{
 					if (m_usethreads)
 					{
@@ -3633,6 +3574,11 @@ void coolridr_state::machine_start()
 	m_cool_render_object_list2 = auto_alloc_array_clear(machine(), struct cool_render_object*, 1000000);
 	m_listcount2 = 0;
 
+	m_work_queue[0] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
+	m_work_queue[1] = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
+	decode[0].current_object = 0;
+	decode[1].current_object = 0;
+	debug_randompal = 9;
 
 	save_pointer(NAME(m_h1_vram), VRAM_SIZE);
 	save_pointer(NAME(m_h1_pcg), VRAM_SIZE);
@@ -3864,5 +3810,5 @@ DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 	sh2drc_set_options(machine().device("sub"), SH2DRC_FASTEST_OPTIONS);
 }
 
-GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // region is set in test mode, this set is for Japan, USA and Export (all regions)
+GAME( 1995, coolridr,    0, coolridr,    coolridr, coolridr_state,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_IMPERFECT_SOUND) // region is set in test mode, this set is for Japan, USA and Export (all regions)
 
