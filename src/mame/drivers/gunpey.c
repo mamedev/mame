@@ -101,6 +101,9 @@ ASM code study:
 	checks if 0x5e62 is 0 (bit 6 of 0x5c80, i/o 0x7f41)
 	...
 0x8474a: call 0xa7f53 sound init
+...
+
+
 
 =============================================================================================
 
@@ -190,11 +193,13 @@ public:
 	gunpey_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_oki(*this, "oki")
+		m_oki(*this, "oki"),
+		m_wram(*this, "wram")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
+	required_shared_ptr<UINT16> m_wram;
 
 	UINT16 *m_blit_buffer;
 	UINT16 m_blit_ram[0x10];
@@ -220,12 +225,33 @@ void gunpey_state::video_start()
 
 UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *blit_buffer = m_blit_buffer;
+	//UINT16 *blit_buffer = m_blit_buffer;
 	int x,y;
 	int count;
 
-	count = 0;
+	bitmap.fill(machine().pens[0], cliprect); //black pen
 
+	for(count = 0x1800/2;count<0x1d40/2;count+=0x10/2)
+	{
+		if(m_wram[count+0/2] == 0xc200)
+		{
+			x = (m_wram[count+6/2] >> 8) | ((m_wram[count+8/2] & 0xff) << 8);
+			y = m_wram[count+8/2] >> 8;
+
+			x-=0x1100;
+
+			for(int yi=0;yi<8;yi++)
+			{
+				for(int xi=0;xi<8;xi++)
+				{
+					if(cliprect.contains(x+xi, y+yi))
+						bitmap.pix32(y+yi, x+xi) = 0xffffff;
+				}
+			}
+		}
+	}
+
+	#if 0
 	for(y=0;y<512;y++)
 	{
 		for(x=0;x<512;x++)
@@ -244,6 +270,7 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_rgb32 &b
 			count++;
 		}
 	}
+	#endif
 
 	return 0;
 }
@@ -297,15 +324,16 @@ READ8_MEMBER(gunpey_state::gunpey_inputs_r)
 
 WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
-	UINT16 *blit_buffer = m_blit_buffer;
+//	UINT16 *blit_buffer = m_blit_buffer;
 	UINT16 *blit_ram = m_blit_ram;
-	UINT8 *blit_rom = memregion("blit_data")->base();
-	int x,y;
+//	UINT8 *blit_rom = memregion("blit_data")->base();
+//	int x,y;
 
 	//printf("gunpey_blitter_w offset %01x data %02x\n", offset,data);
 
 	blit_ram[offset] = data;
 
+	#if 0
 	if(offset == 0 && data == 2) // blitter trigger
 	{
 		int srcx = blit_ram[0x04]+(blit_ram[0x05]<<8);
@@ -315,6 +343,8 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		int xsize = blit_ram[0x0c]+1;
 		int ysize = blit_ram[0x0e]+1;
 		int color,color_offs;
+
+		printf("%d %d %d %d\n",blit_ram[0x08]+(blit_ram[0x09]<<8),blit_ram[0x0a]+(blit_ram[0x0b]<<8),xsize,ysize);
 
 		if(blit_ram[0x01] == 8) //1bpp?
 		{
@@ -348,7 +378,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
       ,blit_ram[0xc],blit_ram[0xd],blit_ram[0xe],blit_ram[0xf]);
 */
 	}
-
+	#endif
 }
 
 WRITE8_MEMBER(gunpey_state::gunpey_output_w)
@@ -362,7 +392,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_output_w)
 /***************************************************************************************/
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, gunpey_state )
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("wram")
 //  AM_RANGE(0x50000, 0x500ff) AM_RAM
 //  AM_RANGE(0x50100, 0x502ff) AM_NOP
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
