@@ -231,9 +231,9 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_rgb32 &b
 
 	bitmap.fill(machine().pens[0], cliprect); //black pen
 
-	for(count = 0x1800/2;count<0x1d40/2;count+=0x10/2)
+	for(count = 0x800/2;count<0x4800/2;count+=0x10/2)
 	{
-		if(m_wram[count+0/2] == 0xc200)
+		if(!(m_wram[count+0/2] & 1))
 		{
 			x = (m_wram[count+6/2] >> 8) | ((m_wram[count+8/2] & 0xff) << 8);
 			y = m_wram[count+8/2] >> 8;
