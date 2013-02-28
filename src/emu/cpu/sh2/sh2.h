@@ -84,7 +84,22 @@ void sh2_set_frt_input(device_t *device, int state);
 #define SH2DRC_COMPATIBLE_OPTIONS   (SH2DRC_STRICT_VERIFY | SH2DRC_FLUSH_PC | SH2DRC_STRICT_PCREL)
 #define SH2DRC_FASTEST_OPTIONS  (0)
 
+enum
+{
+	CPUINFO_INT_SH2_DRC_OPTIONS = CPUINFO_INT_CPU_SPECIFIC,
+
+	CPUINFO_INT_SH2_FASTRAM_SELECT,
+	CPUINFO_INT_SH2_FASTRAM_START,
+	CPUINFO_INT_SH2_FASTRAM_END,
+	CPUINFO_INT_SH2_FASTRAM_READONLY,
+
+	CPUINFO_PTR_SH2_FASTRAM_BASE = CPUINFO_PTR_CPU_SPECIFIC
+};
+
+#define SH2_MAX_FASTRAM       4
+
 void sh2drc_set_options(device_t *device, UINT32 options);
 void sh2drc_add_pcflush(device_t *device, offs_t address);
+void sh2drc_add_fastram(device_t *device, offs_t start, offs_t end, UINT8 readonly, void *base);
 
 #endif /* __SH2_H__ */

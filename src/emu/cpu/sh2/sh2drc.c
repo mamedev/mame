@@ -7,12 +7,6 @@
     Released for general non-commercial use under the MAME license
     Visit http://mamedev.org for licensing and usage restrictions.
 
-    ST-V status:
-    colmns97 & stress crash due to SCSP stream->machine() getting corrupted.
-
-    cottonbm w/US bios: run to 60323B4 on master, then MOV insn @ 602f5aa crashes?
-    actually crash on slave @ 6032b38 after above.  reading wrong addr for jump vector.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -128,7 +122,6 @@ static const char *log_desc_flags_to_string(UINT32 flags);
 
 static void cfunc_printf_probe(void *param);
 static void cfunc_unimplemented(void *param);
-static void cfunc_checkirqs(void *param);
 static void cfunc_fastirq(void *param);
 static void cfunc_MAC_W(void *param);
 static void cfunc_MAC_L(void *param);
@@ -281,24 +274,6 @@ static void cfunc_unimplemented(void *param)
 	sh2->irqsr = sh2->sr;
 	// claim it's an NMI, because it pretty much is
 	sh2->pending_nmi = 1;
-}
-
-/*-------------------------------------------------
-    cfunc_checkirqs - checks for pending IRQs
--------------------------------------------------*/
-static void cfunc_checkirqs(void *param)
-{
-	sh2_state *sh2 = (sh2_state *)param;
-	// if NMI is pending, evec etc are already set up
-	if (sh2->pending_nmi)
-	{
-		sh2->pending_nmi = 0;
-	}
-	else
-	{
-		sh2->evec = 0xffffffff;
-		CHECK_PENDING_IRQ("cfunc_checkirqs");
-	}
 }
 
 /*-------------------------------------------------
@@ -1196,6 +1171,66 @@ static void static_generate_memory_accessor(sh2_state *sh2, int size, int iswrit
 
 	UML_LABEL(block, label++);              // label:
 
+#if 0	// DO NOT ENABLE - SEVERE AARON DAMAGE
+	for (int ramnum = 0; ramnum < SH2_MAX_FASTRAM; ramnum++)
+	{
+		if (sh2->fastram[ramnum].base != NULL && (!iswrite || !sh2->fastram[ramnum].readonly))
+		{
+			void *fastbase = (UINT8 *)sh2->fastram[ramnum].base - sh2->fastram[ramnum].start;
+			UINT32 skip = label++;
+			if (sh2->fastram[ramnum].end != 0xffffffff)
+			{
+				UML_CMP(block, I0, sh2->fastram[ramnum].end);   // cmp     i0,end
+				UML_JMPc(block, COND_A, skip);                                      // ja      skip
+			}
+			if (sh2->fastram[ramnum].start != 0x00000000)
+			{
+				UML_CMP(block, I0, sh2->fastram[ramnum].start);// cmp     i0,fastram_start
+				UML_JMPc(block, COND_B, skip);                                      // jb      skip
+			}
+		
+			if (!iswrite)
+			{
+				if (size == 1)
+				{
+					UML_XOR(block, I0, I0, BYTE4_XOR_LE(0));
+					UML_LOAD(block, I0, fastbase, I0, SIZE_BYTE, SCALE_x1);             // load    i0,fastbase,i0,byte
+				}
+				else if (size == 2)
+				{
+					UML_XOR(block, I0, I0, WORD_XOR_LE(0));
+					UML_LOAD(block, I0, fastbase, I0, SIZE_WORD, SCALE_x1);         // load    i0,fastbase,i0,word_x1
+				}
+				else if (size == 4)
+				{
+					UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);            // load    i0,fastbase,i0,dword_x1
+				}
+				UML_RET(block);                                                     // ret
+			}
+			else
+			{
+				if (size == 1)
+				{
+					UML_XOR(block, I0, I0, BYTE4_XOR_LE(0));
+					UML_STORE(block, fastbase, I0, I1, SIZE_BYTE, SCALE_x1);// store   fastbase,i0,i1,byte
+				}
+				else if (size == 2)
+				{
+					UML_XOR(block, I0, I0, WORD_XOR_LE(0));
+					UML_STORE(block, fastbase, I0, I1, SIZE_WORD, SCALE_x1);// store   fastbase,i0,i1,word_x1
+				}
+				else if (size == 4)
+				{
+					UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i1,dword_x1
+				}
+				UML_RET(block);                                                     // ret
+			}
+		
+			UML_LABEL(block, skip);                                             // skip:
+		}
+	}
+#endif
+
 	if (iswrite)
 	{
 		switch (size)
@@ -1405,7 +1440,7 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 
 /*-------------------------------------------------
     log_add_disasm_comment - add a comment
-    including disassembly of a MIPS instruction
+    including disassembly of an SH2 instruction
 -------------------------------------------------*/
 
 static void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
@@ -1981,40 +2016,29 @@ static int generate_group_0(sh2_state *sh2, drcuml_block *block, compiler_state 
 		return TRUE;
 
 	case 0x1b: // SLEEP();
-		// inlined special version of generate_update_cycles here
-		// if an interrupt is taken, the return address is set to the next instruction
-		UML_CALLC(block, cfunc_checkirqs, sh2);
-
-		UML_MOV(block, I0, mem(&sh2->evec));            // mov r0, evec
-		UML_CMP(block, I0, 0xffffffff);         // cmp r0, 0xffffffff
-		UML_JMPc(block, COND_Z, compiler->labelnum);            // jz skip
-
-		UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
-		UML_MOV(block, I0, R32(15));                // mov r0, R15
-		UML_MOV(block, I1, mem(&sh2->irqsr));           // mov r1, irqsr
-		UML_CALLH(block, *sh2->write32);                    // call write32
-
-		UML_SUB(block, R32(15), R32(15), 4);            // sub R15, R15, #4
-		UML_MOV(block, I0, R32(15));                // mov r0, R15
-		UML_MOV(block, I1, desc->pc+2);             // mov r1, nextpc
-		UML_CALLH(block, *sh2->write32);                    // call write32
-
-		UML_HASHJMP(block, 0, mem(&sh2->evec), *sh2->nocode);       // hashjmp sh2->evec
-
-		UML_LABEL(block, compiler->labelnum++);                 // skip:
-
-		// now go "out of cycles"
-		if (compiler->cycles > 0)
 		{
-			UML_MOV(block, mem(&sh2->icount), 0);           // mov icount, #0
-			UML_MAPVAR(block, MAPVAR_CYCLES, 0);                // mapvar  cycles,0
-			UML_EXH(block, *sh2->out_of_cycles, desc->pc);      // go out of cycles
-		}
-		else
-		{
-			UML_HASHJMP(block, 0, desc->pc, *sh2->nocode);
-		}
+			int skip = compiler->labelnum+1;
+			compiler->labelnum += 3;
 
+			UML_MOV(block, I0, mem(&sh2->sleep_mode));							// mov i0, sleep_mode
+			UML_CMP(block, I0, 0x2);											// cmp i0, #2
+			UML_JMPc(block, COND_E, skip+1);	  			 			  		// beq skip + 1
+			// sleep mode != 2
+			UML_CMP(block, I0, 0x0);											// cmp i0, #0
+			UML_JMPc(block, COND_NE, skip);										// bne skip
+			UML_MOV(block, mem(&sh2->sleep_mode), 0x1);							// mov sleep_mode, #1
+																			
+			UML_LABEL(block, skip);												// skip:
+			generate_update_cycles(sh2, block, compiler, desc->pc, TRUE);		// repeat this insn
+			UML_JMP(block, skip+2);										  		// jmp skip+2
+
+			UML_LABEL(block, skip+1);									  		// skip + 1:
+			// sleep_mode == 2
+			UML_MOV(block, mem(&sh2->sleep_mode), 0x0);							// sleep_mode = 0
+			generate_update_cycles(sh2, block, compiler, desc->pc+2, TRUE);		// go to next insn
+
+			UML_LABEL(block, skip+2);	  				  				  		// skip + 2:
+		}
 		return TRUE;
 
 	case 0x22: // STCVBR(Rn);
@@ -3185,6 +3209,24 @@ void sh2drc_add_pcflush(device_t *device, offs_t address)
 		sh2->pcflushes[sh2->pcfsel++] = address;
 }
 
+
+/*-------------------------------------------------
+    sh2drc_add_fastram - add a new fastram
+    region
+-------------------------------------------------*/
+
+void sh2drc_add_fastram(device_t *device, offs_t start, offs_t end, UINT8 readonly, void *base)
+{
+	sh2_state *sh2 = get_safe_token(device);
+	if (sh2->fastram_select < ARRAY_LENGTH(sh2->fastram))
+	{
+		sh2->fastram[sh2->fastram_select].start = start;
+		sh2->fastram[sh2->fastram_select].end = end;
+		sh2->fastram[sh2->fastram_select].readonly = readonly;
+		sh2->fastram[sh2->fastram_select].base = base;
+		sh2->fastram_select++;
+	}
+}
 
 /*-------------------------------------------------
     sh2_internal_a5 - read handler for
