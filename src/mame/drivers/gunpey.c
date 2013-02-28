@@ -296,6 +296,8 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 	UINT8 *blit_rom = memregion("blit_data")->base();
 	int x,y;
 
+	//printf("gunpey_blitter_w offset %01x data %02x\n", offset,data); 
+
 	blit_ram[offset] = data;
 
 	if(offset == 0 && data == 2) // blitter trigger
@@ -332,13 +334,15 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 			}
 		}
 
-
-//      printf("%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x\n"
-//      ,blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3]
-//      ,blit_ram[4],blit_ram[5],blit_ram[6],blit_ram[7]
-//      ,blit_ram[8],blit_ram[9],blit_ram[0xa],blit_ram[0xb]
-//      ,blit_ram[0xc],blit_ram[0xd],blit_ram[0xe],blit_ram[0xf]);
+/*
+      printf("%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x\n"
+      ,blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3]
+      ,blit_ram[4],blit_ram[5],blit_ram[6],blit_ram[7]
+      ,blit_ram[8],blit_ram[9],blit_ram[0xa],blit_ram[0xb]
+      ,blit_ram[0xc],blit_ram[0xd],blit_ram[0xe],blit_ram[0xf]);
+*/
 	}
+
 }
 
 /***************************************************************************************/
@@ -353,13 +357,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
 	AM_RANGE(0x7f40, 0x7f45) AM_READ8(gunpey_inputs_r,0xffff)
 
-//  AM_RANGE(0x7f48, 0x7f48) AM_WRITE_LEGACY(output_w)
+	//AM_RANGE(0x7f48, 0x7f49) AM_RAM
 	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff)
 
 	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 
 	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8(gunpey_status_r,  gunpey_status_w, 0xffff )
 	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8(gunpey_blitter_w, 0xffff )
+	//AM_RANGE(0x7FF0, 0x7FF1) AM_RAM
+
 ADDRESS_MAP_END
 
 
@@ -452,7 +458,7 @@ static INPUT_PORTS_START( gunpey )
 	PORT_START("SYSTEM")    // IN4 - 7f44
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 ) PORT_IMPULSE(1)    // TEST!!
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )   // TEST!!
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -501,6 +507,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::gunpey_scanline)
 		gunpey_irq_check(0x54);
 }
 
+
+// this isn't a real decode as such, but the graphic data is all stored in pages 2048 bytes wide at varying BPP levelsl, some (BG data) compressed with what is likely a lossy scheme
+// palette data is in here too, the blocks at the bottom right of all this?
+static GFXLAYOUT_RAW( gunpey, 2048, 1, 2048*8, 2048*8 )
+static GFXDECODE_START( gunpey )
+	GFXDECODE_ENTRY( "blit_data", 0, gunpey,     0x0000, 0x1 )
+GFXDECODE_END
+
+
+
 /***************************************************************************************/
 static MACHINE_CONFIG_START( gunpey, gunpey_state )
 
@@ -520,6 +536,7 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 	MCFG_SCREEN_UPDATE_DRIVER(gunpey_state, screen_update_gunpey)
 
 	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_GFXDECODE(gunpey)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
