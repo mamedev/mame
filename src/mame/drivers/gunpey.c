@@ -5,6 +5,7 @@
 ASM code study:
 0x84718 main code
 0x8472c call 0x81f34 reading of dip-switches
+	0x5e62:
 0x84731 call 0x81f5c move dip-switches settings to work RAM
 0x84736 call 0x80ae4 writes to i/os 0x7fc0-0x7fff:
 	0x7fc0: 0x00
@@ -96,8 +97,10 @@ ASM code study:
 	[+0x10] 0x00
 	[+0x12] 0x0c
 	does the same with 0x5c89-0x5c9b
-0x84745: call 0x82026 (TODO)
-
+0x84745: call 0x82026
+	checks if 0x5e62 is 0 (bit 6 of 0x5c80, i/o 0x7f41)
+	...
+0x8474a: call 0xa7f53 sound init
 
 =============================================================================================
 
@@ -186,10 +189,12 @@ class gunpey_state : public driver_device
 public:
 	gunpey_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_oki(*this, "oki")
 		{ }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki;
 
 	UINT16 *m_blit_buffer;
 	UINT16 m_blit_ram[0x10];
@@ -198,6 +203,7 @@ public:
 	DECLARE_READ8_MEMBER(gunpey_status_r);
 	DECLARE_READ8_MEMBER(gunpey_inputs_r);
 	DECLARE_WRITE8_MEMBER(gunpey_blitter_w);
+	DECLARE_WRITE8_MEMBER(gunpey_output_w);
 	DECLARE_DRIVER_INIT(gunpey);
 	virtual void video_start();
 	virtual void palette_init();
@@ -296,7 +302,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 	UINT8 *blit_rom = memregion("blit_data")->base();
 	int x,y;
 
-	//printf("gunpey_blitter_w offset %01x data %02x\n", offset,data); 
+	//printf("gunpey_blitter_w offset %01x data %02x\n", offset,data);
 
 	blit_ram[offset] = data;
 
@@ -345,6 +351,14 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 
 }
 
+WRITE8_MEMBER(gunpey_state::gunpey_output_w)
+{
+	if((data & 0xf0) != 0x90)
+		printf("0x7f48 write with %02x\n",data);
+
+	downcast<okim6295_device *>(m_oki)->set_bank_base((data & 0x0f) * 0x40000);
+}
+
 /***************************************************************************************/
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, gunpey_state )
@@ -357,7 +371,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
 	AM_RANGE(0x7f40, 0x7f45) AM_READ8(gunpey_inputs_r,0xffff)
 
-	//AM_RANGE(0x7f48, 0x7f49) AM_RAM
+	AM_RANGE(0x7f48, 0x7f49) AM_WRITE8(gunpey_output_w,0x00ff)
 	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff)
 
 	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
@@ -458,7 +472,7 @@ static INPUT_PORTS_START( gunpey )
 	PORT_START("SYSTEM")    // IN4 - 7f44
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )   // TEST!!
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )   // TEST!!
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -541,8 +555,8 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_16_9344MHz / 8, OKIM6295_PIN7_LOW)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MCFG_SOUND_CONFIG(ymz280b_intf)
