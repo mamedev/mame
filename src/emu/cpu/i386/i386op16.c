@@ -3660,47 +3660,50 @@ static void I386OP(retf_i16)(i386_state *cpustate)          // Opcode 0xca
 	CYCLES(cpustate,CYCLES_RET_IMM_INTERSEG);
 }
 
-static void I386OP(load_far_pointer16)(i386_state *cpustate, int s)
+static bool I386OP(load_far_pointer16)(i386_state *cpustate, int s)
 {
 	UINT8 modrm = FETCH(cpustate);
 	UINT16 selector;
 
 	if( modrm >= 0xc0 ) {
-		fatalerror("i386: load_far_pointer16 NYI\n");
+		//logerror("i386: load_far_pointer16 NYI\n"); // don't log, NT will use this a lot
+		i386_trap(cpustate,6, 0, 0);
+		return false;
 	} else {
 		UINT32 ea = GetEA(cpustate,modrm,0);
 		STORE_REG16(modrm, READ16(cpustate,ea + 0));
 		selector = READ16(cpustate,ea + 2);
 		i386_sreg_load(cpustate,selector,s,NULL);
 	}
+	return true;
 }
 
 static void I386OP(lds16)(i386_state *cpustate)             // Opcode 0xc5
 {
-	I386OP(load_far_pointer16)(cpustate, DS);
-	CYCLES(cpustate,CYCLES_LDS);
+	if(I386OP(load_far_pointer16)(cpustate, DS))
+		CYCLES(cpustate,CYCLES_LDS);
 }
 
 static void I386OP(lss16)(i386_state *cpustate)             // Opcode 0x0f 0xb2
 {
-	I386OP(load_far_pointer16)(cpustate, SS);
-	CYCLES(cpustate,CYCLES_LSS);
+	if(I386OP(load_far_pointer16)(cpustate, SS))
+		CYCLES(cpustate,CYCLES_LSS);
 }
 
 static void I386OP(les16)(i386_state *cpustate)             // Opcode 0xc4
 {
-	I386OP(load_far_pointer16)(cpustate, ES);
-	CYCLES(cpustate,CYCLES_LES);
+	if(I386OP(load_far_pointer16)(cpustate, ES))
+		CYCLES(cpustate,CYCLES_LES);
 }
 
 static void I386OP(lfs16)(i386_state *cpustate)             // Opcode 0x0f 0xb4
 {
-	I386OP(load_far_pointer16)(cpustate, FS);
-	CYCLES(cpustate,CYCLES_LFS);
+	if(I386OP(load_far_pointer16)(cpustate, FS))
+		CYCLES(cpustate,CYCLES_LFS);
 }
 
 static void I386OP(lgs16)(i386_state *cpustate)             // Opcode 0x0f 0xb5
 {
-	I386OP(load_far_pointer16)(cpustate, GS);
-	CYCLES(cpustate,CYCLES_LGS);
+	if(I386OP(load_far_pointer16)(cpustate, GS))
+		CYCLES(cpustate,CYCLES_LGS);
 }
