@@ -2454,13 +2454,14 @@ MSX_LAYOUT_END
 
 /* MSX2 - Daewoo CPC-300E */
 
+// These roms apparently came from a hacked set, see: http://www.vik.cc/bluemsx/blueforum/viewtopic.php?t=1569&start=75
 ROM_START (cpc300e)
 	ROM_REGION (0x30000, "maincpu", 0)
-	ROM_LOAD ("300ebios.rom", 0x0000, 0x8000, CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d))
+	ROM_LOAD ("300ebios.rom", 0x0000, 0x8000, BAD_DUMP CRC(53850907) SHA1(affa3c5cd8db79a1450ad8a7f405a425b251653d))
 	/* 0x0c000 - 0x1ffff reserved for optional disk and fmpac roms from msx2 parent set */
 	ROM_FILL (0xc000, 0x14000, 0)
-	ROM_LOAD ("300eext.rom", 0x20000, 0x8000, CRC(d64da39c) SHA1(fb51c505adfbc174df94289fa894ef969f5357bc))
-	ROM_LOAD ("300ehan.rom", 0x28000, 0x4000, CRC(5afea78d) SHA1(f08c91f8c78d681e1f02eaaaaafb87ad81112b60))
+	ROM_LOAD ("300eext.rom", 0x20000, 0x8000, BAD_DUMP CRC(d64da39c) SHA1(fb51c505adfbc174df94289fa894ef969f5357bc))
+	ROM_LOAD ("300ehan.rom", 0x28000, 0x4000, BAD_DUMP CRC(5afea78d) SHA1(f08c91f8c78d681e1f02eaaaaafb87ad81112b60))
 ROM_END
 
 MSX_LAYOUT_INIT (cpc300e)
