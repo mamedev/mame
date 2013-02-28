@@ -1,3 +1,6 @@
+
+//#define USE_FAKE_ROM
+
 /********************************************************************************************
 
 	Gunpey (c) 2000 Banpresto
@@ -235,17 +238,34 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_rgb32 &b
 	{
 		if(!(m_wram[count+0/2] & 1))
 		{
-			x = (m_wram[count+6/2] >> 8) | ((m_wram[count+8/2] & 0xff) << 8);
-			y = m_wram[count+8/2] >> 8;
+			x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0xff) << 8);
+			y = m_wram[count+4] >> 8;
 
+			UINT32 col = 0xffffff;
+
+			UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
+			int letter = -1;
+
+			// these are going to be co-ordinates in the bitmap, probably not the ROM, but the one the 'blitter' (gfx unpack device?) creates
+			if (val == 0x8080a03a) { col = 0xffff00; letter ='I'; } // 18d0 - I
+			if (val == 0x4080a03b) { col = 0xff0000; letter ='O'; } //      - O
+
+#ifndef USE_FAKE_ROM
+			letter = -1;
+#endif
 			x-=0x1100;
 
-			for(int yi=0;yi<8;yi++)
+			if (letter != -1)
+				drawgfx_opaque(bitmap,cliprect,machine().gfx[1],letter,0,0,0,x,y);
+			else
 			{
-				for(int xi=0;xi<8;xi++)
+				for(int yi=0;yi<8;yi++)
 				{
-					if(cliprect.contains(x+xi, y+yi))
-						bitmap.pix32(y+yi, x+xi) = 0xffffff;
+					for(int xi=0;xi<8;xi++)
+					{
+						if(cliprect.contains(x+xi, y+yi))
+							bitmap.pix32(y+yi, x+xi) = col;
+					}
 				}
 			}
 		}
@@ -405,7 +425,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
 	AM_RANGE(0x7f48, 0x7f49) AM_WRITE8(gunpey_output_w,0x00ff)
 	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff)
 
-	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
+	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
 	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8(gunpey_status_r,  gunpey_status_w, 0xffff )
 	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8(gunpey_blitter_w, 0xffff )
@@ -555,11 +575,26 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::gunpey_scanline)
 }
 
 
+static const gfx_layout fake_layout =
+{
+	8,8,
+	RGN_FRAC(1,4),
+	4,
+	{ 0,1,2,3 },
+	{ 0*4,1*4,2*4,3*4,4*4,5*4,6*4,7*4 },
+	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32},
+	8*32
+};
+
+
+
 // this isn't a real decode as such, but the graphic data is all stored in pages 2048 bytes wide at varying BPP levelsl, some (BG data) compressed with what is likely a lossy scheme
 // palette data is in here too, the blocks at the bottom right of all this?
 static GFXLAYOUT_RAW( gunpey, 2048, 1, 2048*8, 2048*8 )
 static GFXDECODE_START( gunpey )
 	GFXDECODE_ENTRY( "blit_data", 0, gunpey,     0x0000, 0x1 )
+	GFXDECODE_ENTRY( "fakerom", 0x18000, fake_layout,   0x0, 2  ) 
+
 GFXDECODE_END
 
 
@@ -613,7 +648,14 @@ ROM_START( gunpey )
 
 	ROM_REGION( 0x400000, "oki", 0 )
 	ROM_LOAD( "gp_rom5.622",  0x000000, 0x400000,  CRC(f79903e0) SHA1(4fd50b4138e64a48ec1504eb8cd172a229e0e965)) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x20000, "fakerom", ROMREGION_ERASEFF )
+#ifdef USE_FAKE_ROM
+	ROM_LOAD( "video",  0x00000, 0x20000,  CRC(8857ec5a) SHA1(5bed14933af060cb4a1ce6a961c4ca1467a1cbc2) )
+#endif
 ROM_END
+
+
 
 DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 {
