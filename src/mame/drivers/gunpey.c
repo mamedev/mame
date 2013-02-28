@@ -333,19 +333,21 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 
 	blit_ram[offset] = data;
 
-	#if 0
-	if(offset == 0 && data == 2) // blitter trigger
+	if(offset == 0 && data == 2) // blitter trigger, 0->1 transition
 	{
 		int srcx = blit_ram[0x04]+(blit_ram[0x05]<<8);
 		int srcy = blit_ram[0x06]+(blit_ram[0x07]<<8);
-		int dstx = blit_ram[0x08]+((blit_ram[0x09] & 0x01) <<8);
-		int dsty = blit_ram[0x0a]+((blit_ram[0x0b] & 0x01) <<8);
+		int dstx = blit_ram[0x08]+(blit_ram[0x09]<<8);
+		int dsty = blit_ram[0x0a]+(blit_ram[0x0b]<<8);
 		int xsize = blit_ram[0x0c]+1;
 		int ysize = blit_ram[0x0e]+1;
-		int color,color_offs;
+//		int color,color_offs;
 
-		printf("%d %d %d %d\n",blit_ram[0x08]+(blit_ram[0x09]<<8),blit_ram[0x0a]+(blit_ram[0x0b]<<8),xsize,ysize);
+		printf("%04x %04x %04x %04x %02x %02x\n",srcx,srcy,dstx,dsty,xsize,ysize);
 
+		gunpey_irq_check(4);
+
+		#if 0
 		if(blit_ram[0x01] == 8) //1bpp?
 		{
 			// ...
@@ -369,7 +371,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 				}
 			}
 		}
-
+		#endif
 /*
       printf("%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x\n"
       ,blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3]
@@ -378,7 +380,6 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
       ,blit_ram[0xc],blit_ram[0xd],blit_ram[0xe],blit_ram[0xf]);
 */
 	}
-	#endif
 }
 
 WRITE8_MEMBER(gunpey_state::gunpey_output_w)
@@ -535,9 +536,9 @@ void gunpey_state::palette_init()
 }
 
 
-/* Four irqs:
-0x01 really an irq?
-0x04
+/*:
+0x01
+0x04 blitter ready
 0x10
 0x40 almost certainly vblank (reads inputs)
 0x80
@@ -546,9 +547,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::gunpey_scanline)
 {
 	int scanline = param;
 
-	/* TODO */
+	if(scanline == 0)
+		gunpey_irq_check(0x10);
+
 	if(scanline == 480)
-		gunpey_irq_check(0x54);
+		gunpey_irq_check(0x40);
 }
 
 
@@ -614,13 +617,13 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+//	UINT8 *rom = memregion("maincpu")->base();
 
 	/* patch SLOOOOW cycle checks ... */
-	rom[0x848b5] = 0x7e;
+//	rom[0x848b5] = 0x7e;
 //  rom[0x848b6] = 0x03;
-	rom[0x89657] = 0x75;
-	rom[0x8e628] = 0x75;
+//	rom[0x89657] = 0x75;
+//	rom[0x8e628] = 0x75;
 
 }
 
