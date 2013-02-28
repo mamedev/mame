@@ -2955,7 +2955,7 @@ static void I386OP(groupFF_16)(i386_state *cpustate)        // Opcode 0xff
 				UINT16 address, selector;
 				if( modrm >= 0xc0 )
 				{
-					fatalerror("i386: groupFF_16 /%d NYI\n", (modrm >> 3) & 0x7);
+					report_invalid_modrm(cpustate, "groupFF_16", modrm);
 				}
 				else
 				{
@@ -3002,7 +3002,7 @@ static void I386OP(groupFF_16)(i386_state *cpustate)        // Opcode 0xff
 
 				if( modrm >= 0xc0 )
 				{
-					fatalerror("i386: groupFF_16 /%d NYI\n", (modrm >> 3) & 0x7);
+					report_invalid_modrm(cpustate, "groupFF_16", modrm);
 				}
 				else
 				{
@@ -3038,11 +3038,8 @@ static void I386OP(groupFF_16)(i386_state *cpustate)        // Opcode 0xff
 				CYCLES(cpustate,CYCLES_PUSH_RM);
 			}
 			break;
-		case 7:
-			I386OP(invalid)(cpustate);
-			break;
 		default:
-			fatalerror("i386: groupFF_16 /%d unimplemented\n", (modrm >> 3) & 0x7);
+			report_invalid_modrm(cpustate, "groupFF_16", modrm);
 			break;
 	}
 }
@@ -3236,7 +3233,7 @@ static void I386OP(group0F00_16)(i386_state *cpustate)          // Opcode 0x0f 0
 			break;
 
 		default:
-			fatalerror("i386: group0F00_16 /%d unimplemented\n", (modrm >> 3) & 0x7);
+			report_invalid_modrm(cpustate, "group0F00_16", modrm);
 			break;
 	}
 }
@@ -3340,7 +3337,7 @@ static void I386OP(group0F01_16)(i386_state *cpustate)      // Opcode 0x0f 01
 				break;
 			}
 		default:
-			fatalerror("i386: unimplemented opcode 0x0f 01 /%d at %08X\n", (modrm >> 3) & 0x7, cpustate->eip - 2);
+			report_invalid_modrm(cpustate, "group0F01_16", modrm);
 			break;
 	}
 }
@@ -3460,7 +3457,7 @@ static void I386OP(group0FBA_16)(i386_state *cpustate)      // Opcode 0x0f ba
 			}
 			break;
 		default:
-			fatalerror("i386: group0FBA_16 /%d unknown\n", (modrm >> 3) & 0x7);
+			report_invalid_modrm(cpustate, "group0FBA_16", modrm);
 			break;
 	}
 }

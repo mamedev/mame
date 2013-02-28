@@ -314,7 +314,7 @@ static void I486OP(group0F01_16)(i386_state *cpustate)      // Opcode 0x0f 01
 				break;
 			}
 		default:
-			fatalerror("i486: unimplemented opcode 0x0f 01 /%d at %08X\n", (modrm >> 3) & 0x7, cpustate->eip - 2);
+			report_invalid_modrm(cpustate, "group0F01_16", modrm);
 			break;
 	}
 }
@@ -432,7 +432,7 @@ static void I486OP(group0F01_32)(i386_state *cpustate)      // Opcode 0x0f 01
 				break;
 			}
 		default:
-			fatalerror("i486: unimplemented opcode 0x0f 01 /%d at %08X\n", (modrm >> 3) & 0x7, cpustate->eip - 2);
+			report_invalid_modrm(cpustate, "group0F01_32", modrm);
 			break;
 	}
 }
@@ -492,7 +492,7 @@ static void I486OP(mov_cr_r32)(i386_state *cpustate)        // Opcode 0x0f 22
 	UINT8 modrm = FETCH(cpustate);
 	UINT8 cr = (modrm >> 3) & 0x7;
 	UINT32 oldcr = cpustate->cr[cr];
-	cpustate->cr[cr] = LOAD_RM32(modrm);
+	UINT32 data = LOAD_RM32(modrm);
 	switch(cr)
 	{
 		case 0:
@@ -507,7 +507,8 @@ static void I486OP(mov_cr_r32)(i386_state *cpustate)        // Opcode 0x0f 22
 			break;
 		case 4: CYCLES(cpustate,1); break; // TODO
 		default:
-			fatalerror("i486: mov_cr_r32 CR%d !", cr);
-			break;
+			logerror("i386: mov_cr_r32 CR%d!\n", cr);
+			return;
 	}
+	cpustate->cr[cr] = data;
 }

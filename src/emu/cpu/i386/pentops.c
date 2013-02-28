@@ -75,7 +75,7 @@ static void PENTIUMOP(cmpxchg8b_m64)(i386_state *cpustate)  // Opcode 0x0f c7
 {
 	UINT8 modm = FETCH(cpustate);
 	if( modm >= 0xc0 ) {
-		fatalerror("pentium: cmpxchg8b_m64 - invalid modm\n");
+		report_invalid_modrm(cpustate, "cmpxchg8b_m64", modm);
 	} else {
 		UINT32 ea = GetEA(cpustate, modm, 0);
 		UINT64 value = READ64(cpustate,ea);
@@ -132,10 +132,10 @@ static void SSEOP(sse_group0fae)(i386_state *cpustate)  // Opcode 0f ae
 				GetNonTranslatedEA(cpustate, modm, NULL);
 				break;
 			default:
-				fatalerror("pentium: bad/unsupported 0f ae opcode\n");
+				report_invalid_modrm(cpustate, "sse_group0fae", modm);
 		}
 	} else {
-		fatalerror("pentium: bad/unsupported 0f ae opcode\n");
+		report_invalid_modrm(cpustate, "sse_group0fae", modm);
 	}
 }
 

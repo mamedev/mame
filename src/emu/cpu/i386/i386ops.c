@@ -703,8 +703,8 @@ static void I386OP(mov_cr_r32)(i386_state *cpustate)        // Opcode 0x0f 22
 			break;
 		case 4: CYCLES(cpustate,1); break; // TODO
 		default:
-			fatalerror("i386: mov_cr_r32 CR%d!\n", cr);
-			break;
+			logerror("i386: mov_cr_r32 CR%d!\n", cr);
+			return;
 	}
 	cpustate->cr[cr] = data;
 }
@@ -730,8 +730,8 @@ static void I386OP(mov_dr_r32)(i386_state *cpustate)        // Opcode 0x0f 23
 			CYCLES(cpustate,CYCLES_MOV_DR6_7_REG);
 			break;
 		default:
-			fatalerror("i386: mov_dr_r32 DR%d!\n", dr);
-			break;
+			logerror("i386: mov_dr_r32 DR%d!\n", dr);
+			return;
 	}
 }
 
@@ -2201,7 +2201,7 @@ static void I386OP(groupFE_8)(i386_state *cpustate)         // Opcode 0xfe
 				CYCLES(cpustate,CYCLES_DEC_MEM);
 			}
 			break;
-		case 6:         /* PUSH Rm8 */
+		case 6:         /* PUSH Rm8*/
 			{
 				UINT8 value;
 				if( modrm >= 0xc0 ) {
@@ -2219,7 +2219,7 @@ static void I386OP(groupFE_8)(i386_state *cpustate)         // Opcode 0xfe
 			}
 			break;
 		default:
-			fatalerror("i386: groupFE_8 /%d unimplemented\n", (modrm >> 3) & 0x7);
+			report_invalid_modrm(cpustate, "groupFE_8", modrm);
 			break;
 	}
 }
@@ -2490,13 +2490,13 @@ static void I386OP(mov_tr_r32)(i386_state *cpustate)        // Opcode 0x0f 26
 
 static void I386OP(loadall)(i386_state *cpustate)       // Opcode 0x0f 0x07 (0x0f 0x05 on 80286), undocumented
 {
-	popmessage("LOADALL instruction hit!");
-	CYCLES(cpustate,1);     // TODO: correct cycle count
+	fatalerror("i386: LOADALL unimplemented at %08X\n", cpustate->pc - 1);
 }
 
-static void I386OP(unimplemented)(i386_state *cpustate)
+static void I386OP(rsm)(i386_state *cpustate)
 {
-	report_unimplemented_opcode(cpustate);
+	logerror("i386: Invalid RSM outside SMM at %08X\n", cpustate->pc - 1);
+	i386_trap(cpustate, 6, 0, 0);
 }
 
 static void I386OP(invalid)(i386_state *cpustate)
