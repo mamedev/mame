@@ -10,11 +10,11 @@
 	http://www.google.com/patents/US6141122
 
     TODO:
-	- walk the dog
+	- Understand what the 0x400000c reads on SH-2 really do.
+	- Remove SH-2 watchdog hack, if we ever bother about it ...
 	- improve sound emulation
-    - i8237 purpose is unknown, might even not be at the right place ...
+    - i8237 purpose is unknown (missing ROM for comms?).
 	- verify zooming etc. our current algorithm is a bit ugly for text
-
 
 
 =======================================================================================================
@@ -277,11 +277,9 @@ to the same bank as defined through A20.
 
 
 #include "emu.h"
-#include "debugger.h"
 #include "cpu/sh2/sh2.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/scsp.h"
-#include "machine/am9517a.h"
 #include "machine/nvram.h"
 #include "rendlay.h"
 
@@ -342,7 +340,6 @@ public:
 	UINT32 m_clipvals[2][3];
 	UINT8  m_clipblitterMode[2]; // hack
 
-
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
@@ -372,7 +369,6 @@ public:
 
 	bitmap_ind16 m_bg_bitmap;
 	bitmap_ind16 m_bg_bitmap2;
-
 
 	bitmap_ind16 m_screen1_bitmap;
 	bitmap_ind16 m_screen2_bitmap;
@@ -452,8 +448,6 @@ public:
 	static void *draw_object_threaded(void *param, int threadid);
 	int m_usethreads;
 
-
-
 	struct cool_render_object
 	{
 		UINT8* indirect_tiles;
@@ -475,10 +469,6 @@ public:
 
 	int m_listcount1;
 	int m_listcount2;
-
-
-
-
 
 	// the decode cache mechansim is an optimization
 	// we know all gfx are in ROM, and that calling the RLE decompression every time they're used is slow, so we cache the decoded tiles
@@ -515,7 +505,6 @@ public:
 
 	};
 
-	
 	struct objcachemanager
 	{
 		int current_object;
@@ -526,10 +515,6 @@ public:
 	};
 
 	objcachemanager decode[2];
-
-
-
-
 };
 
 #define PRINT_BLIT_STUFF \
@@ -567,18 +552,12 @@ void coolridr_state::video_start()
 	machine().primary_screen->register_screen_bitmap(m_bg_bitmap);
 	machine().primary_screen->register_screen_bitmap(m_bg_bitmap2);
 
-
-
 	machine().primary_screen->register_screen_bitmap(m_screen1_bitmap);
 	machine().primary_screen->register_screen_bitmap(m_screen2_bitmap);
 
 	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), h1_tile_layout, m_h1_pcg, 8, 0));
 }
 
-// might be a page 'map / base' setup somewhere, but it's just used for ingame backgrounds
-/* 0x00000 - 0x1ffff = screen 1 */
-/* 0x20000 - 0x3ffff = screen 2 */
-/* 0x40000 - 0xfffff = ? */
 /*
 	vregs are setted up with one of DMA commands (see below)
 	0x3e09b80 screen 1 base, 0x3e9bc0 screen 2 base
@@ -589,10 +568,6 @@ void coolridr_state::video_start()
 	[+0x3c] x--- ---- ---- ---- xxxx xxxx xxxx xxxx 0x11b8 on bike select, 0xffffffff otherwise, transparent pen value?
 	(everything else is unknown at current time)
 */
-
-
-
-
 
 #define COOLRIDERS_DRAWGFX_CORE(PIXEL_TYPE, COOL_PIXEL_OP)                               \
 do {                                                                                    \
@@ -790,12 +765,7 @@ void coolridr_state::coolriders_drawgfx_transpen(bitmap_ind16 &dest, const recta
 
 void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cliprect, int which)
 {
-
 	int bg_r,bg_g,bg_b;
-
-
-
-
 
 	if(m_pen_fill[which])
 	{
@@ -811,7 +781,6 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 		bg_g = (((m_pen_fill[which] >> 8) & 0x78) >> 2) | (((m_pen_fill[which] >> 8) & 0x80) >> 7);
 		bg_b = (((m_pen_fill[which] >> 0) & 0x78) >> 2) | (((m_pen_fill[which] >> 0) & 0x80) >> 7);
 		bitmap.fill( (bg_r<<10) | (bg_g << 5) | bg_b  ,cliprect);
-
 	}
 	else
 	{
@@ -837,7 +806,7 @@ void coolridr_state::draw_bg_coolridr(bitmap_ind16 &bitmap, const rectangle &cli
 
 		bitmap.fill(VREG(0x3c),cliprect);
 
-		
+
 		UINT16 basey = scrolly>>4;
 		for (int y=0;y<25;y++)
  		{
@@ -864,7 +833,7 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind1
 {
 	if(m_rgb_ctrl[which].gradient)
 	{
-		if( (m_rgb_ctrl[which].setting == 0x1240) || (m_rgb_ctrl[which].setting == 0x920) || (m_rgb_ctrl[which].setting == 0x800) ) 
+		if( (m_rgb_ctrl[which].setting == 0x1240) || (m_rgb_ctrl[which].setting == 0x920) || (m_rgb_ctrl[which].setting == 0x800) )
 		{
 		}
 		else
@@ -883,7 +852,7 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind1
 		if(m_rgb_ctrl[which].gradient)
 		{
 			/* fade-in / outs */
-			if(m_rgb_ctrl[which].setting == 0x1240) 
+			if(m_rgb_ctrl[which].setting == 0x1240)
 			{
 				r -= m_rgb_ctrl[which].gradient;
 				g -= m_rgb_ctrl[which].gradient;
@@ -913,8 +882,6 @@ UINT32 coolridr_state::screen_update_coolridr(screen_device &screen, bitmap_ind1
 		}
 		m_fadedpals[i] = (r<<10|g<<5|b);
 	}
-
-
 
 	if (which==0)
 	{
@@ -970,9 +937,6 @@ UINT32 coolridr_state::screen_update_coolridr2(screen_device &screen, bitmap_ind
 }
 
 /* end video */
-
-
-
 
 
 #define RLE_BLOCK(writeaddrxor) \
@@ -1380,9 +1344,6 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 	{
 	//	b1colorNumber = space.machine().rand()&0xfff;
 	}
-
-
-
 
 //	if(b1colorNumber > 0x60 || b2colorNumber)
 //		printf("%08x %08x\n",b1colorNumber,b2colorNumber);
@@ -1954,7 +1915,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		int hPosition = 0;
 
 
-		
+
 		if (!indirect_zoom_enable)
 		{
 
@@ -1990,7 +1951,7 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 		{
 
 			int current_decoded = false;
-			
+
 			if (!indirect_tile_enable && size < DECODECACHE_NUMSPRITETILES)
 			{
 				tempshape = object->state->decode[screen].objcache[use_object].tiles[v*used_hCellCount + h].tempshape_multi;
@@ -2028,13 +1989,13 @@ void *coolridr_state::draw_object_threaded(void *param, int threadid)
 				if (blit_rotate)
 				{
 					#define GET_PIX GET_PIX_ROTATED
-					YXLOOP	
+					YXLOOP
                     #undef GET_PIX
 				}
 				else // no rotate
 				{
 					#define GET_PIX GET_PIX_NORMAL
-					YXLOOP	
+					YXLOOP
                     #undef GET_PIX
 
 				}
@@ -2609,21 +2570,21 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 
 				// copy our old buffer to the actual screen
 				copybitmap(m_screen1_bitmap, m_temp_bitmap_sprites, 0, 0, 0, 0, visarea);
-				
+
 
 
 
 				//m_temp_bitmap_sprites2.fill(0xff000000, visarea);
 				// render the tilemap to the backbuffer, ready for having sprites drawn on it
 				draw_bg_coolridr(m_temp_bitmap_sprites, visarea, 0);
-				// wipe the z-buffer ready for the sprites				
+				// wipe the z-buffer ready for the sprites
 				/* m_zbuffer_bitmap.fill(0xffff, visarea); */
 				// almost certainly wrong
 				m_clipvals[0][0] = 0;
 				m_clipvals[0][1] = 0;
 				m_clipvals[0][2] = 0;
 				m_clipblitterMode[0] = 0xff;
-			
+
 				/* bubble sort, might be something better to use instead */
 				for (int pass = 0 ; pass < ( m_listcount1 - 1 ); pass++)
 				{
@@ -2648,10 +2609,10 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 					{
 						draw_object_threaded((void*)m_cool_render_object_list1[i],0);
 					}
-				}	
-	
+				}
+
 				m_listcount1 = 0;
-			
+
 
 			}
 			else if(m_blitterClearMode == 0x8c800000)
@@ -2661,21 +2622,21 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 
 				// copy our old buffer to the actual screen
 				copybitmap(m_screen2_bitmap, m_temp_bitmap_sprites2, 0, 0, 0, 0, visarea);
-				
+
 
 
 
 				//m_temp_bitmap_sprites2.fill(0xff000000, visarea);
 				// render the tilemap to the backbuffer, ready for having sprites drawn on it
 				draw_bg_coolridr(m_temp_bitmap_sprites2, visarea, 1);
-				// wipe the z-buffer ready for the sprites				
+				// wipe the z-buffer ready for the sprites
 				/* m_zbuffer_bitmap2.fill(0xffff, visarea); */
 				// almost certainly wrong
 				m_clipvals[1][0] = 0;
 				m_clipvals[1][1] = 0;
 				m_clipvals[1][2] = 0;
 				m_clipblitterMode[1] = 0xff;
-	
+
 					/* bubble sort, might be something better to use instead */
 				for (int pass = 0 ; pass < ( m_listcount2 - 1 ); pass++)
 				{
@@ -2700,10 +2661,10 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 					{
 						draw_object_threaded((void*)m_cool_render_object_list2[i],0);
 					}
-				}	
-	
+				}
+
 				m_listcount2 = 0;
-			
+
 			}
 
 			//printf("frame\n");
@@ -2719,7 +2680,7 @@ WRITE32_MEMBER(coolridr_state::sysh1_fb_data_w)
 
 READ32_MEMBER(coolridr_state::sysh1_unk_blit_r)
 {
-//	if(offset == 0x0c/4) reads
+//	if(offset == 0x0c/4) // TODO
 
 	return m_sysh1_txt_blit[offset];
 }
@@ -2770,7 +2731,6 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 
 	do{
 		cmd = (m_framebuffer_vram[(0+dma_index)/4] & 0xfc000000) >> 24;
-
 
 		switch(cmd)
 		{
@@ -2854,8 +2814,6 @@ void coolridr_state::sysh1_dma_transfer( address_space &space, UINT16 dma_index 
 			case 0x44: /* screen 2 / */
 				m_rgb_ctrl[(cmd & 4) >> 2].setting = m_framebuffer_vram[(0+dma_index)/4] & 0xffffe0;
 				m_rgb_ctrl[(cmd & 4) >> 2].gradient = m_framebuffer_vram[(0+dma_index)/4] & 0x1f;
-
-
 				dma_index+=4;
 				break;
 			default:
@@ -3046,9 +3004,8 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x03200000, 0x0327ffff) AM_READWRITE16(h1_soundram2_r, h1_soundram2_w,0xffffffff) //AM_SHARE("soundram2")
 	AM_RANGE(0x03300000, 0x03300fff) AM_DEVREADWRITE16_LEGACY("scsp2", scsp_r, scsp_w, 0xffffffff)
 
-//	AM_RANGE(0x04000000, 0x0400001f) AM_DEVREADWRITE8("i8237", am9517a_device, read, write, 0xffffffff)
 	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_sound_dma_r,sysh1_sound_dma_w) AM_SHARE("sound_dma")
-//	AM_RANGE(0x04200000, 0x0420003f) AM_RAM /* hi-word for DMA? */
+//	AM_RANGE(0x04200000, 0x0420003f) AM_RAM /* unknown */
 
 	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
 	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
@@ -3073,8 +3030,6 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(coolridr_state::sound_to_sh1_w)
 {
 	sound_fifo = data;
-//	sound_data = data;
-//	printf("%02x sound\n",data);
 }
 
 static ADDRESS_MAP_START( system_h1_sound_map, AS_PROGRAM, 16, coolridr_state )
@@ -3444,16 +3399,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_main)
 
 	if(scanline == 0)
 		m_maincpu->set_input_line(6, HOLD_LINE);
-
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
 {
 	int scanline = param;
 
-	/* 10: reads from 0x4000000 (sound irq) */
-	/* 12: reads from inputs (so presumably V-Blank) */
-	/* 14: tries to r/w to 0x62***** area (network irq?) */
+	/* 0xa: reads from 0x4000000 (sound irq) */
+	/* 0xc: reads from inputs (so presumably V-Blank) */
+	/* 0xe: tries to r/w to 0x62***** area (network irq?) */
 
 	if(scanline == 384)
 		m_subcpu->set_input_line(0xc, HOLD_LINE);
@@ -3475,8 +3429,6 @@ UINT32 coolridr_state::get_20bit_data(UINT32 romoffset, int _20bitwordnum)
 	if (_20bitwordnum&4) inc = 5;
 
 	romoffset += (_20bitwordnum>>3)*2;
-
-
 
 	if (temp==0)
 	{
@@ -3587,32 +3539,10 @@ void coolridr_state::machine_start()
 
 void coolridr_state::machine_reset()
 {
-//  machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-
-
-
-//	memcpy(m_soundram, memregion("soundcpu")->base()+0x80000, 0x80000);
-//  m_soundcpu->reset();
 
 	m_usethreads = m_io_config->read()&1;
 }
-
-#if 0
-static I8237_INTERFACE( dmac_intf )
-{
-	DEVCB_NULL, //DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dma_hrq_changed),
-	DEVCB_NULL, //DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_tc_w),
-	DEVCB_NULL, //DEVCB_DRIVER_MEMBER(coolridr_state, coolridr_dma_read_byte),
-	DEVCB_NULL,//DEVCB_DRIVER_MEMBER(coolridr_state, coolridr_dma_write_byte),
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
-	{ DEVCB_NULL /*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack0_w)*/,
-		DEVCB_NULL/*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack1_w)*/,
-		DEVCB_NULL/*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack2_w)*/,
-		DEVCB_NULL/*DEVCB_DRIVER_LINE_MEMBER(coolridr_state, coolridr_dack3_w)*/ }
-};
-#endif
 
 static void scsp_irq(device_t *device, int irq)
 {
@@ -3682,7 +3612,6 @@ static MACHINE_CONFIG_START( coolridr, coolridr_state )
 	MCFG_CPU_PROGRAM_MAP(coolridr_submap)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer2", coolridr_state, system_h1_sub, "lscreen", 0, 1)
 
-//	MCFG_I8237_ADD("i8237", 16000000, dmac_intf)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_GFXDECODE(coolridr)
@@ -3788,7 +3717,6 @@ READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 {
 	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
 
-
 	if(pc == 0x6002cba || pc == 0x6002d42)
 		return 0;
 
@@ -3804,7 +3732,6 @@ READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 DRIVER_INIT_MEMBER(coolridr_state,coolridr)
 {
 	machine().device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), this));
-
 
 	sh2drc_set_options(machine().device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 	sh2drc_set_options(machine().device("sub"), SH2DRC_FASTEST_OPTIONS);
