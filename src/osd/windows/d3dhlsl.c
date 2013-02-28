@@ -716,8 +716,6 @@ void hlsl_info::init(d3d_base *d3dintf, win_window_info *window)
 	if (!d3dintf->post_fx_available)
 		return;
 
-	g_slider_list = init_slider_list();
-
 	this->d3dintf = d3dintf;
 	this->window = window;
 
@@ -991,6 +989,8 @@ void hlsl_info::init(d3d_base *d3dintf, win_window_info *window)
 	emu_file file(window->machine().options().art_path(), OPEN_FLAG_READ);
 
 	render_load_png(shadow_bitmap, file, NULL, options->shadow_mask_texture);
+
+	g_slider_list = init_slider_list();
 }
 
 
