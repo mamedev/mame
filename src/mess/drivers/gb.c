@@ -776,6 +776,7 @@ static MACHINE_CONFIG_START( megaduck, megaduck_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
 	MCFG_MEGADUCK_CARTRIDGE_ADD("duckslot", megaduck_cart, NULL, NULL)
+	MCFG_SOFTWARE_LIST_ADD("cart_list", "megaduck")
 MACHINE_CONFIG_END
 
 /***************************************************************************
