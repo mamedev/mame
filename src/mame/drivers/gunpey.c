@@ -1,4 +1,8 @@
-/*
+/********************************************************************************************
+
+
+=============================================================================================
+
 Gunpey
 Banpresto, 2000
 
@@ -71,7 +75,7 @@ CGRAM space:                     4M-bit minimum, 32M-bit maximum
 Operating frequency:             Up to 76MHz
 Release:                         November 1999
 
-*/
+********************************************************************************************/
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
@@ -83,10 +87,15 @@ class gunpey_state : public driver_device
 {
 public:
 	gunpey_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu")
+		{ }
+
+	required_device<cpu_device> m_maincpu;
 
 	UINT16 *m_blit_buffer;
 	UINT16 m_blit_ram[0x10];
+	UINT8 m_irq_cause, m_irq_mask;
 	DECLARE_WRITE8_MEMBER(gunpey_status_w);
 	DECLARE_READ8_MEMBER(gunpey_status_r);
 	DECLARE_READ8_MEMBER(gunpey_inputs_r);
@@ -95,7 +104,8 @@ public:
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_gunpey(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gunpey_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
+	void gunpey_irq_check(UINT8 irq_type);
 };
 
 
@@ -127,7 +137,6 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_rgb32 &b
 			if(cliprect.contains(x, y))
 				bitmap.pix32(y, x) = b | (g<<8) | (r<<16);
 
-
 			count++;
 		}
 	}
@@ -135,16 +144,37 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_rgb32 &b
 	return 0;
 }
 
+void gunpey_state::gunpey_irq_check(UINT8 irq_type)
+{
+	m_irq_cause |= irq_type;
+
+	if(m_irq_cause & m_irq_mask)
+		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x200/4);
+	else
+		m_maincpu->set_input_line_and_vector(0, CLEAR_LINE, 0x200/4);
+}
+
 WRITE8_MEMBER(gunpey_state::gunpey_status_w)
 {
+	if(offset == 1)
+	{
+		m_irq_cause &= ~data;
+		gunpey_irq_check(0);
+	}
+
+	if(offset == 0)
+	{
+		m_irq_mask = data;
+		gunpey_irq_check(0);
+	}
 }
 
 READ8_MEMBER(gunpey_state::gunpey_status_r)
 {
 	if(offset == 1)
-		return 0x54;
+		return m_irq_cause;
 
-	return 0x00;
+	return m_irq_mask;
 }
 
 READ8_MEMBER(gunpey_state::gunpey_inputs_r)
@@ -356,9 +386,21 @@ void gunpey_state::palette_init()
 
 }
 
-INTERRUPT_GEN_MEMBER(gunpey_state::gunpey_interrupt)
+
+/* Four irqs:
+0x01 really an irq?
+0x04
+0x10
+0x40 almost certainly vblank (reads inputs)
+0x80
+*/
+TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::gunpey_scanline)
 {
-	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x200/4);
+	int scanline = param;
+
+	/* TODO */
+	if(scanline == 480)
+		gunpey_irq_check(0x54);
 }
 
 /***************************************************************************************/
@@ -368,18 +410,18 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 	MCFG_CPU_ADD("maincpu", V30, 57242400 / 4)
 	MCFG_CPU_PROGRAM_MAP(mem_map)
 	MCFG_CPU_IO_MAP(io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gunpey_state,  gunpey_interrupt)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gunpey_state, gunpey_scanline, "screen", 0, 1)
 
 	/* video hardware */
+	/* TODO: screen params */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(512, 512)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 512-1)
+	MCFG_SCREEN_SIZE(818, 525)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 480-1)
 	MCFG_SCREEN_UPDATE_DRIVER(gunpey_state, screen_update_gunpey)
 
 	MCFG_PALETTE_LENGTH(0x800)
-
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
