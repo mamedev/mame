@@ -1202,6 +1202,7 @@ msx    // 1983 MSX
 ax170
 canonv10
 canonv20
+pv16
 dpc100  // 1984 MSX Korea
 dpc180  // 1984 MSX Korea
 dpc200  // 1984 MSX Korea

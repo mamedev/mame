@@ -12,6 +12,7 @@ Al Alamiah AX-350 - MSX2 - ax350
 Al Alamiah AX-370 - MSX2 - ax370
 Canon V-10 - MSX1 - canonv10
 Canon V-20 - MSX1 - canonv20
+Casio PV-16 - MSX1 - pv16
 Ciel Expert 3 IDE - MSX2+ - expert3i
 Ciel Expert 3 Turbo = MSX2+ - expert3t
 ======================================
@@ -1277,6 +1278,21 @@ MSX_LAYOUT_INIT (canonv20)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, RAM, 0x10000, 0x0000)  /* 64KB RAM */
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
+MSX_LAYOUT_END
+
+/* MSX - Casio PV-16 */
+
+ROM_START (pv16)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("pv16.rom", 0x0000, 0x8000, CRC(ee229390) SHA1(302afb5d8be26c758309ca3df611ae69cced2821))
+ROM_END
+
+// TODO: The pv16 had only 1 cartridge slot
+MSX_LAYOUT_INIT(pv16)
+	MSX_LAYOUT_SLOT(0, 0, 0, 2, ROM, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT(0, 0, 3, 1, RAM, 0x4000, 0xC000)   /* 16KB RAM */
+	MSX_LAYOUT_SLOT(1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
+	MSX_LAYOUT_SLOT(2, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 MSX_LAYOUT_END
 
 /* MSX - Daewoo DPC-100 */
@@ -4217,6 +4233,7 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (ax170)
 	MSX_DRIVER (canonv10)
 	MSX_DRIVER (canonv20)
+	MSX_DRIVER (pv16)
 	MSX_DRIVER (dpc100)
 	MSX_DRIVER (dpc180)
 	MSX_DRIVER (dpc200)
@@ -4377,6 +4394,7 @@ COMP(1983, msx,       0,        0,      msx_pal,  msx, msx_state,      msx,     
 COMP(1983, ax170,     msx,      0,      msx_pal,  msx, msx_state,      msx,     "Al Alamiah", "AX-170" , 0)
 COMP(1983, canonv10,  msx,      0,      msx_pal,  msx, msx_state,      msx,     "Canon", "V-10" , 0)
 COMP(1983, canonv20,  msx,      0,      msx_pal,  msx, msx_state,      msx,     "Canon", "V-20" , 0)
+COMP(1984, pv16,      msx,      0,      msx_ntsc, msx, msx_state,      msx,     "Casio", "PV-16", 0)
 COMP(1984, dpc100,    msx,      0,      msx_ntsc, msxkr, msx_state,    msx,     "Daewoo", "IQ-1000 DPC-100 (Korea)" , 0)
 COMP(1984, dpc180,    msx,      0,      msx_ntsc, msxkr, msx_state,    msx,     "Daewoo", "IQ-1000 DPC-180 (Korea)" , 0)
 COMP(1984, dpc200,    msx,      0,      msx_ntsc, msxkr, msx_state,    msx,     "Daewoo", "IQ-1000 DPC-200 (Korea)" , 0)
