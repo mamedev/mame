@@ -220,6 +220,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
 	void gunpey_irq_check(UINT8 irq_type);
 	UINT16 m_vram_bank;
+
+	UINT16 main_vram[0x800][0x800];
 };
 
 
@@ -398,8 +400,10 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
 //	UINT16 *blit_buffer = m_blit_buffer;
 	UINT16 *blit_ram = m_blit_ram;
-//	UINT8 *blit_rom = memregion("blit_data")->base();
-//	int x,y;
+	UINT8 *blit_rom = memregion("blit_data")->base();
+	UINT8 *vram = memregion("vram")->base();
+
+	//	int x,y;
 
 	//printf("gunpey_blitter_w offset %01x data %02x\n", offset,data);
 
@@ -415,35 +419,36 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		int ysize = blit_ram[0x0e]+1;
 //		int color,color_offs;
 
-		printf("%04x %04x %04x %04x %02x %02x\n",srcx,srcy,dstx,dsty,xsize,ysize);
+/*
+	  printf("%02x %02x %02x %02x| (X SRC 4: %02x 5: %02x (val %04x))  (Y SRC 6: %02x 7: %02x (val %04x))  | (X DEST 8: %02x 9: %02x (val %04x))  (Y DEST a: %02x b: %02x (val %04x)) |  %02x %02x %02x %02x\n"
+	   ,blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3]
+
+
+	   ,blit_ram[4],blit_ram[5], srcx
+	   ,blit_ram[6],blit_ram[7], srcy
+
+	   ,blit_ram[8],blit_ram[9], dstx
+	   ,blit_ram[0xa],blit_ram[0xb], dsty
+       ,blit_ram[0xc],
+		   
+		   blit_ram[0xd],blit_ram[0xe],blit_ram[0xf]);
+*/
+		//if (srcx & 0xf800) printf("(error srcx &0xf800)");
+		//if (srcy & 0xf800) printf("(error srcy &0xf800)");
+
 
 		gunpey_irq_check(4);
 
-		#if 0
-		if(blit_ram[0x01] == 8) //1bpp?
+		for (int y=0;y<ysize;y++)
 		{
-			// ...
-		}
-		else //4bpp
-		{
-			for(y=0;y<ysize;y++)
+			for (int x=0;x<xsize;x++)
 			{
-				for(x=0;x<xsize;x+=2)
-				{
-					UINT32 src_index = ((srcy+y)*2048+(srcx+x)) & 0x3fffff;
-					UINT32 dst_index = ((dsty+y)*512+(dstx+x)) & 0x3ffff;
-
-					color_offs = ((blit_rom[src_index] & 0xf0)>>4) + 0x10;
-					color = (blit_rom[color_offs*2+0x3B1DFD]) | (blit_rom[color_offs*2+0x3B1DFD+1]<<8);
-					blit_buffer[dst_index+1] = color;
-
-					color_offs = ((blit_rom[src_index] & 0xf)>>0) + 0x10;
-					color = (blit_rom[color_offs*2+0x3B1DFD]) | (blit_rom[color_offs*2+0x3B1DFD+1]<<8);
-					blit_buffer[dst_index] = color;
-				}
+				vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
 			}
 		}
-		#endif
+
+		
+
 /*
       printf("%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x\n"
       ,blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3]
@@ -652,6 +657,7 @@ static GFXLAYOUT_RAW( gunpey, 2048, 1, 2048*8, 2048*8 )
 static GFXDECODE_START( gunpey )
 	GFXDECODE_ENTRY( "blit_data", 0, gunpey,     0x0000, 0x1 )
 	GFXDECODE_ENTRY( "fakerom", 0x18000, fake_layout,   0x0, 2  )
+	GFXDECODE_ENTRY( "vram", 0, gunpey,     0x0000, 0x1 )
 
 GFXDECODE_END
 
@@ -700,6 +706,7 @@ ROM_START( gunpey )
 
 	ROM_REGION( 0x400000, "blit_data", 0 )
 	ROM_LOAD( "gp_rom3.025",  0x00000, 0x400000,  CRC(f2d1f9f0) SHA1(0d20301fd33892074508b9d127456eae80cc3a1c) )
+	ROM_REGION( 0x400000, "vram", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x400000, "ymz", 0 )
 	ROM_LOAD( "gp_rom4.525",  0x000000, 0x400000, CRC(78dd1521) SHA1(91d2046c60e3db348f29f776def02e3ef889f2c1) ) // 11xxxxxxxxxxxxxxxxxxxx = 0xFF
