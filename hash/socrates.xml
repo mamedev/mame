@@ -60,6 +60,18 @@ Undumped:
 		</part>
 	</software>
 
+	<software name="gwizard">
+		<description>Game Wizard / Magische Spiele</description>
+		<year>1990</year>
+		<publisher>Video Technology</publisher>
+		<part name="cart" interface="socrates_cart">
+			<dataarea name="rom" size="0x20000">
+				<!-- Label: "(Vtech) LH531A34 // (C)1990 VIDEO TECHNOLOGY // 9117 D"; cart has a blue QC sticker -->
+				<rom name="lh531a34.u1" size="0x20000" crc="57440b05" sha1="35d644c217a3c951827b3ba72b498c652c9487c7" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hodgepod">
 		<description>Hodge-Podge</description>
 		<year>1989</year>
