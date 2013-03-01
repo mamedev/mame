@@ -262,8 +262,8 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 
 			//UINT32 col = 0xffffff;
 
-			UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
-
+	//		UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
+		                                        
 #ifdef USE_FAKE_ROM
 			int letter = -1;
 
@@ -318,10 +318,22 @@ SOUND TEST
 			if (val == 0xa080e03a) { letter = 'Z'; }
 
 #endif
-			int xsource = ((val & 0x000000ff) << 4) | ((val & 0xf0000000) >> 28);
-			int ysource = ((val & 0x0000f000) >> 10);
+			int xsource = ((m_wram[count+2] & 0x00ff) << 4) | ((m_wram[count+1] & 0xf000) >> 12);
+			int ysource = ((m_wram[count+2] & 0xf000) >> 12)| ((m_wram[count+3] & 0x00ff) << 4);
+
+			//printf("%08x  %04x %04x\n", val, m_wram[count+1],m_wram[count+2] );
+
+	//	UINT16 xsource = (m_wram[count+2] & 0x00ff << 4) | (m_wram[count+1] & 0xf000 >> 12);
+//			UINT16 ysource =  (m_wram[count+2] & 0xff00 >>8) | (m_wram[count+3] & 0x000f <<8);
+
+			//xsource<<=1;
+
 
 			xsource<<=1;
+			ysource <<=2;
+
+
+
 
 #ifdef USE_FAKE_ROM
 			if (letter != -1)
