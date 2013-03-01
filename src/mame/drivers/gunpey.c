@@ -287,18 +287,27 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 					for(int xi=0;xi<width/2;xi++)
 					{
 						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
-
 						UINT8 pix;
+						UINT32 col_offs;
+						UINT16 color_data;
 
 						pix = (data & 0x0f);
+						col_offs = ((pix + color*0x10) & 0xff) << 1;
+						col_offs+= ((pix + color*0x10) >> 8)*0x800;
+						color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
 
+						if(!(color_data & 0x8000))
 						if(cliprect.contains(x+(xi*2), y+yi))
-							bitmap.pix16(y+yi, x+(xi*2)) = pix + color*0x10;
+							bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
 
 						pix = (data & 0xf0)>>4;
+						col_offs = ((pix + color*0x10) & 0xff) << 1;
+						col_offs+= ((pix + color*0x10) >> 8)*0x800;
+						color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
 
+						if(!(color_data & 0x8000))
 						if(cliprect.contains(x+1+(xi*2), y+yi))
-							bitmap.pix16(y+yi, x+1+(xi*2)) = pix + color*0x10;
+							bitmap.pix16(y+yi, x+1+(xi*2)) = color_data & 0x7fff;
 					}
 				}
 			}
@@ -311,6 +320,8 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 					{
 						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
 						UINT8 pix;
+						UINT32 col_offs;
+						UINT16 color_data;
 
 						pix = (data & 0x3f);
 
@@ -328,11 +339,17 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 					{
 						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
 						UINT8 pix;
+						UINT32 col_offs;
+						UINT16 color_data;
 
 						pix = (data & 0xff);
+						col_offs = ((pix + color*0x100) & 0xff) << 1;
+						col_offs+= ((pix + color*0x100) >> 8)*0x800;
+						color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
 
+						if(!(color_data & 0x8000))
 						if(cliprect.contains(x+xi, y+yi))
-							bitmap.pix16(y+yi, x+xi) = pix + color*0x100;
+							bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
 					}
 				}
 			}
@@ -398,6 +415,8 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 {
 	gunpey_irq_check(4);
 }
+
+//flush_pal_data((dstx+x) & 0x7fe,(dsty+y) & 0x7ff);
 
 void gunpey_state::flush_pal_data(int x, int y)
 {
@@ -466,7 +485,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 			for (int x=0;x<xsize;x++)
 			{
 				vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
-				flush_pal_data((dstx+x) & 0x7fe,(dsty+y) & 0x7ff);
+				//flush_pal_data((dstx+x) & 0x7fe,(dsty+y) & 0x7ff);
 			}
 		}
 
@@ -620,34 +639,19 @@ INPUT_PORTS_END
 
 /***************************************************************************************/
 
-/* test hack */
 void gunpey_state::palette_init()
 {
-	#if 0
-	int i,r,g,b,val;
-	UINT8 *blit_rom = memregion("blit_data")->base();
+	int i;
 
-	for (i = 0; i < 512; i+=2)
-	{
-		val = (blit_rom[i+0x3B1DFD]) | (blit_rom[i+0x3B1DFD+1]<<8);
-
-		b = (val & 0x001f) >> 0;
-		b<<=3;
-		g = (val & 0x03e0) >> 5;
-		g<<=3;
-		r = (val & 0x7c00) >> 10;
-		r<<=3;
-
-		palette_set_color(machine(), i/2, MAKE_RGB(r, g, b));
-	}
-	#endif
+	for (i = 0; i < 0x8000; i++)
+		palette_set_color(machine(), i, MAKE_RGB( pal5bit((i >> 10)&0x1f), pal5bit(((i >> 5))&0x1f), pal5bit((i >> 0)&0x1f)));
 }
 
 
 /*:
 0x01
 0x04 blitter ready
-0x10 vblank too?
+0x10 vblank too? (otherwise you'll get various hangs/inputs stop to work)
 0x40 almost certainly vblank (reads inputs)
 0x80
 */
