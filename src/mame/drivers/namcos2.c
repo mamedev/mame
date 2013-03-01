@@ -737,7 +737,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_default_am, AS_PROGRAM, 8, namcos2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank6") /* banked */
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
-	AM_RANGE(0x5000, 0x6fff) AM_DEVREADWRITE_LEGACY("c140", c140_r,c140_w)
+	AM_RANGE(0x5000, 0x6fff) AM_DEVREADWRITE("c140", c140_device, c140_r,c140_w)
 	AM_RANGE(0x7000, 0x77ff) AM_READWRITE(dpram_byte_r,dpram_byte_w) AM_SHARE("dpram")
 	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(dpram_byte_r,dpram_byte_w) /* mirror */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
@@ -1640,7 +1640,7 @@ static MACHINE_CONFIG_START( default, namcos2_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
+	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_SOUND_CONFIG(c140_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
@@ -1653,7 +1653,7 @@ MACHINE_CONFIG_END
 /* adjusted machine driver start */
 static MACHINE_CONFIG_DERIVED( default2, default )
 
-	MCFG_SOUND_REPLACE("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
+	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_SOUND_CONFIG(c140_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
@@ -1667,7 +1667,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( default3, default )
 
-	MCFG_SOUND_REPLACE("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
+	MCFG_C140_REPLACE("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_SOUND_CONFIG(c140_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.45)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.45)
@@ -1714,7 +1714,7 @@ static MACHINE_CONFIG_START( gollygho, namcos2_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
+	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_SOUND_CONFIG(c140_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
@@ -1765,7 +1765,7 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
+	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_SOUND_CONFIG(c140_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
@@ -1814,7 +1814,7 @@ static MACHINE_CONFIG_START( sgunner, namcos2_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
+	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_SOUND_CONFIG(c140_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
@@ -1865,7 +1865,7 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
+	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_SOUND_CONFIG(c140_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
@@ -1914,7 +1914,7 @@ static MACHINE_CONFIG_START( metlhawk, namcos2_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_SOUND_ADD("c140", C140, C140_SOUND_CLOCK) /* 21.333kHz */
+	MCFG_C140_ADD("c140", C140_SOUND_CLOCK) /* 21.333kHz */
 	MCFG_SOUND_CONFIG(c140_config)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)

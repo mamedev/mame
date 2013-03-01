@@ -522,8 +522,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bingor_io, AS_IO, 16, bingor_state )
 //  AM_RANGE(0x0000, 0x00ff) AM_READ(test_r )
-	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
-	AM_RANGE(0x0102, 0x0103) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("saa", saa1099_device, saa1099_data_w, 0x00ff)
+	AM_RANGE(0x0102, 0x0103) AM_DEVWRITE8("saa", saa1099_device, saa1099_control_w, 0x00ff)
 //  AM_RANGE(0x0200, 0x0201) AM_READ(test_r )
 ADDRESS_MAP_END
 
@@ -644,7 +644,7 @@ static MACHINE_CONFIG_START( bingor, bingor_state )
 
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("saa", SAA1099, 6000000 )
+	MCFG_SAA1099_ADD("saa", 6000000 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

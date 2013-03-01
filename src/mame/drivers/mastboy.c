@@ -722,8 +722,8 @@ static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8, mastboy_state )
 	AM_RANGE(0xff818, 0xff81f) AM_READ_PORT("DSW2")
 
 	AM_RANGE(0xff820, 0xff827) AM_WRITE(mastboy_bank_w)
-	AM_RANGE(0xff828, 0xff828) AM_DEVWRITE_LEGACY("saa", saa1099_data_w)
-	AM_RANGE(0xff829, 0xff829) AM_DEVWRITE_LEGACY("saa", saa1099_control_w)
+	AM_RANGE(0xff828, 0xff828) AM_DEVWRITE("saa", saa1099_device, saa1099_data_w)
+	AM_RANGE(0xff829, 0xff829) AM_DEVWRITE("saa", saa1099_device, saa1099_control_w)
 	AM_RANGE(0xff830, 0xff830) AM_WRITE(mastboy_msm5205_data_w)
 	AM_RANGE(0xff838, 0xff838) AM_WRITE(mastboy_irq0_ack_w)
 	AM_RANGE(0xff839, 0xff839) AM_WRITE(msm5205_mastboy_m5205_sambit0_w)
@@ -907,7 +907,7 @@ static MACHINE_CONFIG_START( mastboy, mastboy_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("saa", SAA1099, 6000000 )
+	MCFG_SAA1099_ADD("saa", 6000000 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)

@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( g627_io, AS_IO, 8, g627_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x02) AM_WRITE(disp_w)
 	AM_RANGE(0x03, 0x07) AM_WRITE(lamp_w)
-	AM_RANGE(0x10, 0x17) AM_DEVWRITE_LEGACY("astrocade", astrocade_sound_w)
+	AM_RANGE(0x10, 0x17) AM_DEVWRITE("astrocade", astrocade_device, astrocade_sound_w)
 	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("i8156", i8155_device, io_r, io_w)
 ADDRESS_MAP_END
 

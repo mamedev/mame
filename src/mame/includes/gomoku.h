@@ -1,4 +1,3 @@
-#include "devlegcy.h"
 
 class gomoku_state : public driver_device
 {
@@ -31,28 +30,72 @@ public:
 
 /*----------- defined in audio/gomoku.c -----------*/
 
-DECLARE_WRITE8_DEVICE_HANDLER( gomoku_sound1_w );
-DECLARE_WRITE8_DEVICE_HANDLER( gomoku_sound2_w );
+/* 4 voices max */
+#define GOMOKU_MAX_VOICES 4
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+struct gomoku_sound_channel
+{
+    gomoku_sound_channel():
+	  channel(0),
+	  frequency(0),
+	  counter(0),
+	  volume(0),
+	  oneshotplaying(0) {}
+
+	int channel;
+	int frequency;
+	int counter;
+	int volume;
+	int oneshotplaying;
+};
+
+
+// ======================> gomoku_sound_device
 
 class gomoku_sound_device : public device_t,
-									public device_sound_interface
+							public device_sound_interface
 {
 public:
 	gomoku_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~gomoku_sound_device() { global_free(m_token); }
+	~gomoku_sound_device() { }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+public:
+    DECLARE_WRITE8_MEMBER( sound1_w );
+    DECLARE_WRITE8_MEMBER( sound2_w );
+
 private:
-	// internal state
-	void *m_token;
+    void make_mixer_table(int voices, int gain);
+
+private:
+	/* data about the sound system */
+	gomoku_sound_channel m_channel_list[GOMOKU_MAX_VOICES];
+	gomoku_sound_channel *m_last_channel;
+
+	/* global sound parameters */
+	const UINT8 *m_sound_rom;
+	int m_num_voices;
+	int m_sound_enable;
+	sound_stream *m_stream;
+
+	/* mixer tables and internal buffers */
+	INT16 *m_mixer_table;
+	INT16 *m_mixer_lookup;
+	short *m_mixer_buffer;
+	short *m_mixer_buffer_2;
+
+	UINT8 m_soundregs1[0x20];
+	UINT8 m_soundregs2[0x20];
 };
 
 extern const device_type GOMOKU;

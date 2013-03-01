@@ -83,8 +83,8 @@ static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16, xorworld_state )
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P2")
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW")
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
-	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("saa", saa1099_device, saa1099_data_w, 0x00ff)
+	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8("saa", saa1099_device, saa1099_control_w, 0x00ff)
 	AM_RANGE(0xa00008, 0xa00009) AM_WRITE(eeprom_chip_select_w)
 	AM_RANGE(0xa0000a, 0xa0000b) AM_WRITE(eeprom_serial_clock_w)
 	AM_RANGE(0xa0000c, 0xa0000d) AM_WRITE(eeprom_data_w)
@@ -196,7 +196,7 @@ static MACHINE_CONFIG_START( xorworld, xorworld_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("saa", SAA1099, 8000000 /* guess */)
+	MCFG_SAA1099_ADD("saa", 8000000 /* guess */)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

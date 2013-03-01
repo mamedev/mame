@@ -1994,7 +1994,7 @@ static MACHINE_CONFIG_START( maxidbl, blitz68k_state )
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("saa", SAA1099, XTAL_8MHz/2)
+	MCFG_SAA1099_ADD("saa", XTAL_8MHz/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

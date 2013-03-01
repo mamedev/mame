@@ -30,6 +30,7 @@
 
 #include "emu.h"
 #include "includes/jpmsys5.h"
+#include "sound/saa1099.h"
 #include "jpmsys5.lh"
 
 enum state { IDLE, START, DATA, STOP1, STOP2 };
@@ -325,8 +326,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 68000_awp_map_saa, AS_PROGRAM, 16, jpmsys5_state )
 	JPM_SYS5_COMMON_MAP
-	AM_RANGE(0x0460a0, 0x0460a1) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
-	AM_RANGE(0x0460a2, 0x0460a3) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0x0460a0, 0x0460a1) AM_DEVWRITE8("saa", saa1099_device, saa1099_data_w, 0x00ff)
+	AM_RANGE(0x0460a2, 0x0460a3) AM_DEVWRITE8("saa", saa1099_device, saa1099_control_w, 0x00ff)
 	AM_RANGE(0x04c100, 0x04c105) AM_READWRITE(jpm_upd7759_r, jpm_upd7759_w) // do the SAA boards have the UPD?
 ADDRESS_MAP_END
 
@@ -890,7 +891,7 @@ MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 	MCFG_SOUND_ADD("upd7759", UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MCFG_SOUND_ADD("saa", SAA1099, 4000000 /* guess */)
+	MCFG_SAA1099_ADD("saa", 4000000 /* guess */)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* 6840 PTM */

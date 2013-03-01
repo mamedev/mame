@@ -3,7 +3,6 @@
 #include "machine/6840ptm.h"
 #include "machine/6850acia.h"
 #include "sound/2413intf.h"
-#include "sound/saa1099.h"
 #include "sound/upd7759.h"
 #include "video/tms34061.h"
 #include "machine/nvram.h"

@@ -46,8 +46,6 @@ Unmapped registers:
 #include "emu.h"
 #include "c140.h"
 
-#define MAX_VOICE 24
-
 struct voice_registers
 {
 	UINT8 volume_right;
@@ -65,177 +63,14 @@ struct voice_registers
 	UINT8 reserved[4];
 };
 
-struct VOICE
-{
-	long    ptoffset;
-	long    pos;
-	long    key;
-	//--work
-	long    lastdt;
-	long    prevdt;
-	long    dltdt;
-	//--reg
-	long    rvol;
-	long    lvol;
-	long    frequency;
-	long    bank;
-	long    mode;
 
-	long    sample_start;
-	long    sample_end;
-	long    sample_loop;
-};
-
-struct c140_state
-{
-	int sample_rate;
-	sound_stream *stream;
-	int banking_type;
-	/* internal buffers */
-	INT16 *mixer_buffer_left;
-	INT16 *mixer_buffer_right;
-
-	int baserate;
-	void *pRom;
-	UINT8 REG[0x200];
-
-	INT16 pcmtbl[8];        //2000.06.26 CAB
-
-	VOICE voi[MAX_VOICE];
-};
-
-INLINE c140_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == C140);
-	return (c140_state *)downcast<c140_device *>(device)->token();
-}
+// device type definition
+const device_type C140 = &device_creator<c140_device>;
 
 
-static void init_voice( VOICE *v )
-{
-	v->key=0;
-	v->ptoffset=0;
-	v->rvol=0;
-	v->lvol=0;
-	v->frequency=0;
-	v->bank=0;
-	v->mode=0;
-	v->sample_start=0;
-	v->sample_end=0;
-	v->sample_loop=0;
-}
-READ8_DEVICE_HANDLER( c140_r )
-{
-	c140_state *info = get_safe_token(device);
-	offset&=0x1ff;
-	return info->REG[offset];
-}
-
-/*
-   find_sample: compute the actual address of a sample given it's
-   address and banking registers, as well as the board type.
-
-   I suspect in "real life" this works like the Sega MultiPCM where the banking
-   is done by a small PAL or GAL external to the sound chip, which can be switched
-   per-game or at least per-PCB revision as addressing range needs grow.
- */
-static long find_sample(c140_state *info, long adrs, long bank, int voice)
-{
-	long newadr = 0;
-
-	static const INT16 asic219banks[4] = { 0x1f7, 0x1f1, 0x1f3, 0x1f5 };
-
-	adrs=(bank<<16)+adrs;
-
-	switch (info->banking_type)
-	{
-		case C140_TYPE_SYSTEM2:
-			// System 2 banking
-			newadr = ((adrs&0x200000)>>2)|(adrs&0x7ffff);
-			break;
-
-		case C140_TYPE_SYSTEM21:
-			// System 21 banking.
-			// similar to System 2's.
-			newadr = ((adrs&0x300000)>>1)+(adrs&0x7ffff);
-			break;
-
-		case C140_TYPE_ASIC219:
-			// ASIC219's banking is fairly simple
-			newadr = ((info->REG[asic219banks[voice/4]]&0x3) * 0x20000) + adrs;
-			break;
-	}
-
-	return (newadr);
-}
-WRITE8_DEVICE_HANDLER( c140_w )
-{
-	c140_state *info = get_safe_token(device);
-	info->stream->update();
-
-	offset&=0x1ff;
-
-	// mirror the bank registers on the 219, fixes bkrtmaq (and probably xday2 based on notes in the HLE)
-	if ((offset >= 0x1f8) && (info->banking_type == C140_TYPE_ASIC219))
-	{
-		offset -= 8;
-	}
-
-	info->REG[offset]=data;
-	if( offset<0x180 )
-	{
-		VOICE *v = &info->voi[offset>>4];
-
-		if( (offset&0xf)==0x5 )
-		{
-			if( data&0x80 )
-			{
-				const struct voice_registers *vreg = (struct voice_registers *) &info->REG[offset&0x1f0];
-				v->key=1;
-				v->ptoffset=0;
-				v->pos=0;
-				v->lastdt=0;
-				v->prevdt=0;
-				v->dltdt=0;
-				v->bank = vreg->bank;
-				v->mode = data;
-
-				// on the 219 asic, addresses are in words
-				if (info->banking_type == C140_TYPE_ASIC219)
-				{
-					v->sample_loop = (vreg->loop_msb*256 + vreg->loop_lsb)*2;
-					v->sample_start = (vreg->start_msb*256 + vreg->start_lsb)*2;
-					v->sample_end = (vreg->end_msb*256 + vreg->end_lsb)*2;
-
-					#if 0
-					logerror("219: play v %d mode %02x start %x loop %x end %x\n",
-						offset>>4, v->mode,
-						find_sample(info, v->sample_start, v->bank, offset>>4),
-						find_sample(info, v->sample_loop, v->bank, offset>>4),
-						find_sample(info, v->sample_end, v->bank, offset>>4));
-					#endif
-				}
-				else
-				{
-					v->sample_loop = vreg->loop_msb*256 + vreg->loop_lsb;
-					v->sample_start = vreg->start_msb*256 + vreg->start_lsb;
-					v->sample_end = vreg->end_msb*256 + vreg->end_lsb;
-				}
-			}
-			else
-			{
-				v->key=0;
-			}
-		}
-	}
-}
-
-void c140_set_base(device_t *device, void *base)
-{
-	c140_state *info = get_safe_token(device);
-	info->pRom = base;
-}
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
 
 INLINE int limit(INT32 in)
 {
@@ -244,9 +79,72 @@ INLINE int limit(INT32 in)
 	return in;
 }
 
-static STREAM_UPDATE( update_stereo )
+
+//-------------------------------------------------
+//  c140_device - constructor
+//-------------------------------------------------
+
+c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, C140, "C140", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_sample_rate(0),
+	  m_stream(NULL),
+	  m_banking_type(0),
+	  m_mixer_buffer_left(NULL),
+	  m_mixer_buffer_right(NULL),
+	  m_baserate(0),
+	  m_pRom(NULL)
 {
-	c140_state *info = (c140_state *)param;
+	memset(m_REG, 0, sizeof(UINT8)*0x200);
+	memset(m_pcmtbl, 0, sizeof(INT16)*8);
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void c140_device::device_start()
+{
+	const c140_interface *intf = (const c140_interface *)static_config();
+
+	m_sample_rate=m_baserate=clock();
+
+	m_banking_type = intf->banking_type;
+
+	m_stream = stream_alloc(0, 2, m_sample_rate);
+
+	m_pRom=*region();
+
+	/* make decompress pcm table */     //2000.06.26 CAB
+	{
+		int i;
+		INT32 segbase=0;
+		for(i=0;i<8;i++)
+		{
+			m_pcmtbl[i]=segbase;    //segment base value
+			segbase += 16<<i;
+		}
+	}
+
+	memset(m_REG,0,sizeof(m_REG));
+	{
+		int i;
+		for(i=0;i<C140_MAX_VOICE;i++) init_voice( &m_voi[i] );
+	}
+
+	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
+	m_mixer_buffer_left = auto_alloc_array(machine(), INT16, 2 * m_sample_rate);
+	m_mixer_buffer_right = m_mixer_buffer_left + m_sample_rate;
+}
+
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
 	int     i,j;
 
 	INT32   rvol,lvol;
@@ -258,24 +156,24 @@ static STREAM_UPDATE( update_stereo )
 	INT32   frequency,delta,offset,pos;
 	INT32   cnt, voicecnt;
 	INT32   lastdt,prevdt,dltdt;
-	float   pbase=(float)info->baserate*2.0 / (float)info->sample_rate;
+	float   pbase=(float)m_baserate*2.0 / (float)m_sample_rate;
 
 	INT16   *lmix, *rmix;
 
-	if(samples>info->sample_rate) samples=info->sample_rate;
+	if(samples>m_sample_rate) samples=m_sample_rate;
 
 	/* zap the contents of the mixer buffer */
-	memset(info->mixer_buffer_left, 0, samples * sizeof(INT16));
-	memset(info->mixer_buffer_right, 0, samples * sizeof(INT16));
+	memset(m_mixer_buffer_left, 0, samples * sizeof(INT16));
+	memset(m_mixer_buffer_right, 0, samples * sizeof(INT16));
 
 	/* get the number of voices to update */
-	voicecnt = (info->banking_type == C140_TYPE_ASIC219) ? 16 : 24;
+	voicecnt = (m_banking_type == C140_TYPE_ASIC219) ? 16 : 24;
 
 	//--- audio update
 	for( i=0;i<voicecnt;i++ )
 	{
-		VOICE *v = &info->voi[i];
-		const struct voice_registers *vreg = (struct voice_registers *)&info->REG[i*16];
+		C140_VOICE *v = &m_voi[i];
+		const struct voice_registers *vreg = (struct voice_registers *)&m_REG[i*16];
 
 		if( v->key )
 		{
@@ -288,12 +186,12 @@ static STREAM_UPDATE( update_stereo )
 			delta=(long)((float)frequency * pbase);
 
 			/* Calculate left/right channel volumes */
-			lvol=(vreg->volume_left*32)/MAX_VOICE; //32ch -> 24ch
-			rvol=(vreg->volume_right*32)/MAX_VOICE;
+			lvol=(vreg->volume_left*32)/C140_MAX_VOICE; //32ch -> 24ch
+			rvol=(vreg->volume_right*32)/C140_MAX_VOICE;
 
 			/* Set mixer outputs base pointers */
-			lmix = info->mixer_buffer_left;
-			rmix = info->mixer_buffer_right;
+			lmix = m_mixer_buffer_left;
+			rmix = m_mixer_buffer_right;
 
 			/* Retrieve sample start/end and calculate size */
 			st=v->sample_start;
@@ -301,7 +199,7 @@ static STREAM_UPDATE( update_stereo )
 			sz=ed-st;
 
 			/* Retrieve base pointer to the sample data */
-			pSampleData=(signed char*)((FPTR)info->pRom + find_sample(info, st, v->bank, i));
+			pSampleData=(signed char*)((FPTR)m_pRom + find_sample(st, v->bank, i));
 
 			/* Fetch back previous data pointers */
 			offset=v->ptoffset;
@@ -311,7 +209,7 @@ static STREAM_UPDATE( update_stereo )
 			dltdt=v->dltdt;
 
 			/* Switch on data type - compressed PCM is only for C140 */
-			if ((v->mode&8) && (info->banking_type != C140_TYPE_ASIC219))
+			if ((v->mode&8) && (m_banking_type != C140_TYPE_ASIC219))
 			{
 				//compressed PCM (maybe correct...)
 				/* Loop for enough to fill sample buffer as requested */
@@ -343,8 +241,8 @@ static STREAM_UPDATE( update_stereo )
 
 						/* decompress to 13bit range */     //2000.06.26 CAB
 						sdt=dt>>3;              //signed
-						if(sdt<0)   sdt = (sdt<<(dt&7)) - info->pcmtbl[dt&7];
-						else        sdt = (sdt<<(dt&7)) + info->pcmtbl[dt&7];
+						if(sdt<0)   sdt = (sdt<<(dt&7)) - m_pcmtbl[dt&7];
+						else        sdt = (sdt<<(dt&7)) + m_pcmtbl[dt&7];
 
 						prevdt=lastdt;
 						lastdt=sdt;
@@ -387,7 +285,7 @@ static STREAM_UPDATE( update_stereo )
 					{
 						prevdt=lastdt;
 
-						if (info->banking_type == C140_TYPE_ASIC219)
+						if (m_banking_type == C140_TYPE_ASIC219)
 						{
 							lastdt = pSampleData[BYTE_XOR_BE(pos)];
 
@@ -426,8 +324,8 @@ static STREAM_UPDATE( update_stereo )
 	}
 
 	/* render to MAME's stream buffer */
-	lmix = info->mixer_buffer_left;
-	rmix = info->mixer_buffer_right;
+	lmix = m_mixer_buffer_left;
+	rmix = m_mixer_buffer_right;
 	{
 		stream_sample_t *dest1 = outputs[0];
 		stream_sample_t *dest2 = outputs[1];
@@ -439,75 +337,131 @@ static STREAM_UPDATE( update_stereo )
 	}
 }
 
-static DEVICE_START( c140 )
+
+READ8_MEMBER( c140_device::c140_r )
 {
-	const c140_interface *intf = (const c140_interface *)device->static_config();
-	c140_state *info = get_safe_token(device);
+	offset&=0x1ff;
+	return m_REG[offset];
+}
 
-	info->sample_rate=info->baserate=device->clock();
 
-	info->banking_type = intf->banking_type;
+WRITE8_MEMBER( c140_device::c140_w )
+{
+	m_stream->update();
 
-	info->stream = device->machine().sound().stream_alloc(*device,0,2,info->sample_rate,info,update_stereo);
+	offset&=0x1ff;
 
-	info->pRom=*device->region();
-
-	/* make decompress pcm table */     //2000.06.26 CAB
+	// mirror the bank registers on the 219, fixes bkrtmaq (and probably xday2 based on notes in the HLE)
+	if ((offset >= 0x1f8) && (m_banking_type == C140_TYPE_ASIC219))
 	{
-		int i;
-		INT32 segbase=0;
-		for(i=0;i<8;i++)
+		offset -= 8;
+	}
+
+	m_REG[offset]=data;
+	if( offset<0x180 )
+	{
+		C140_VOICE *v = &m_voi[offset>>4];
+
+		if( (offset&0xf)==0x5 )
 		{
-			info->pcmtbl[i]=segbase;    //segment base value
-			segbase += 16<<i;
+			if( data&0x80 )
+			{
+				const struct voice_registers *vreg = (struct voice_registers *) &m_REG[offset&0x1f0];
+				v->key=1;
+				v->ptoffset=0;
+				v->pos=0;
+				v->lastdt=0;
+				v->prevdt=0;
+				v->dltdt=0;
+				v->bank = vreg->bank;
+				v->mode = data;
+
+				// on the 219 asic, addresses are in words
+				if (m_banking_type == C140_TYPE_ASIC219)
+				{
+					v->sample_loop = (vreg->loop_msb*256 + vreg->loop_lsb)*2;
+					v->sample_start = (vreg->start_msb*256 + vreg->start_lsb)*2;
+					v->sample_end = (vreg->end_msb*256 + vreg->end_lsb)*2;
+
+					#if 0
+					logerror("219: play v %d mode %02x start %x loop %x end %x\n",
+						offset>>4, v->mode,
+						find_sample(v->sample_start, v->bank, offset>>4),
+						find_sample(v->sample_loop, v->bank, offset>>4),
+						find_sample(v->sample_end, v->bank, offset>>4));
+					#endif
+				}
+				else
+				{
+					v->sample_loop = vreg->loop_msb*256 + vreg->loop_lsb;
+					v->sample_start = vreg->start_msb*256 + vreg->start_lsb;
+					v->sample_end = vreg->end_msb*256 + vreg->end_lsb;
+				}
+			}
+			else
+			{
+				v->key=0;
+			}
 		}
 	}
+}
 
-	memset(info->REG,0,sizeof(info->REG));
+
+void c140_device::set_base(void *base)
+{
+	m_pRom = base;
+}
+
+
+void c140_device::init_voice( C140_VOICE *v )
+{
+	v->key=0;
+	v->ptoffset=0;
+	v->rvol=0;
+	v->lvol=0;
+	v->frequency=0;
+	v->bank=0;
+	v->mode=0;
+	v->sample_start=0;
+	v->sample_end=0;
+	v->sample_loop=0;
+}
+
+
+/*
+   find_sample: compute the actual address of a sample given it's
+   address and banking registers, as well as the board type.
+
+   I suspect in "real life" this works like the Sega MultiPCM where the banking
+   is done by a small PAL or GAL external to the sound chip, which can be switched
+   per-game or at least per-PCB revision as addressing range needs grow.
+ */
+long c140_device::find_sample(long adrs, long bank, int voice)
+{
+	long newadr = 0;
+
+	static const INT16 asic219banks[4] = { 0x1f7, 0x1f1, 0x1f3, 0x1f5 };
+
+	adrs=(bank<<16)+adrs;
+
+	switch (m_banking_type)
 	{
-		int i;
-		for(i=0;i<MAX_VOICE;i++) init_voice( &info->voi[i] );
+		case C140_TYPE_SYSTEM2:
+			// System 2 banking
+			newadr = ((adrs&0x200000)>>2)|(adrs&0x7ffff);
+			break;
+
+		case C140_TYPE_SYSTEM21:
+			// System 21 banking.
+			// similar to System 2's.
+			newadr = ((adrs&0x300000)>>1)+(adrs&0x7ffff);
+			break;
+
+		case C140_TYPE_ASIC219:
+			// ASIC219's banking is fairly simple
+			newadr = ((m_REG[asic219banks[voice/4]]&0x3) * 0x20000) + adrs;
+			break;
 	}
 
-	/* allocate a pair of buffers to mix into - 1 second's worth should be more than enough */
-	info->mixer_buffer_left = auto_alloc_array(device->machine(), INT16, 2 * info->sample_rate);
-	info->mixer_buffer_right = info->mixer_buffer_left + info->sample_rate;
-}
-
-const device_type C140 = &device_creator<c140_device>;
-
-c140_device::c140_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, C140, "C140", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(c140_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void c140_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void c140_device::device_start()
-{
-	DEVICE_START_NAME( c140 )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void c140_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	return (newadr);
 }

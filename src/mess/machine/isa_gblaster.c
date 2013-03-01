@@ -19,9 +19,9 @@
 */
 static MACHINE_CONFIG_FRAGMENT( game_blaster_config )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("saa1099.1", SAA1099, 4772720)
+	MCFG_SAA1099_ADD("saa1099.1", 4772720)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-	MCFG_SOUND_ADD("saa1099.2", SAA1099, 4772720)
+	MCFG_SAA1099_ADD("saa1099.2", 4772720)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
@@ -34,8 +34,8 @@ static WRITE8_DEVICE_HANDLER( saa1099_16_w )
 {
 	switch(offset)
 	{
-		case 0 : saa1099_control_w( device, space, offset, data ); break;
-		case 1 : saa1099_data_w( device, space, offset, data ); break;
+		case 0 : dynamic_cast<saa1099_device*>(device)->saa1099_control_w( space, offset, data ); break;
+		case 1 : dynamic_cast<saa1099_device*>(device)->saa1099_data_w( space, offset, data ); break;
 	}
 }
 
