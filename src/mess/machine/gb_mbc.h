@@ -189,6 +189,24 @@ public:
 	UINT8 m_protection_checked;
 };
 
+// ======================> gb_rom_digimon_device
+
+class gb_rom_digimon_device : public gb_rom_mbc5_device
+{
+public:
+	// construction/destruction
+	gb_rom_digimon_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_config_complete() { m_shortname = "gb_rom_digimon"; }
+	
+	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_ram);
+	virtual DECLARE_WRITE8_MEMBER(write_ram);
+};
+
 // ======================> gb_rom_sintax_device
 class gb_rom_sintax_device : public gb_rom_mbc_device
 {
@@ -211,6 +229,44 @@ public:
 	UINT8 m_currentxor, m_xor2, m_xor3, m_xor4, m_xor5, m_sintax_mode;
 };
 
+// ======================> gb_rom_rockman8_device
+class gb_rom_rockman8_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_rockman8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_config_complete() { m_shortname = "gb_rom_rockman8"; }
+	
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_ram);
+	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	UINT8 m_bank_mask, m_bank, m_reg;
+};
+
+// ======================> gb_rom_sm3sp_device
+class gb_rom_sm3sp_device : public gb_rom_mbc_device
+{
+public:
+	// construction/destruction
+	gb_rom_sm3sp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_config_complete() { m_shortname = "gb_rom_sm3sp"; }
+	
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_rom);
+	virtual DECLARE_WRITE8_MEMBER(write_bank);
+	virtual DECLARE_READ8_MEMBER(read_ram);
+	virtual DECLARE_WRITE8_MEMBER(write_ram);
+	UINT8 m_bank_mask, m_bank, m_reg;
+};
+
 
 
 // device type definition
@@ -225,5 +281,8 @@ extern const device_type GB_ROM_MBC7;
 extern const device_type GB_ROM_MMM01;
 extern const device_type GB_ROM_SINTAX;
 extern const device_type GB_ROM_CHONGWU;
+extern const device_type GB_ROM_DIGIMON;
+extern const device_type GB_ROM_ROCKMAN8;
+extern const device_type GB_ROM_SM3SP;
 
 #endif

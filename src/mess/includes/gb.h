@@ -205,6 +205,8 @@ public:
 	DECLARE_WRITE8_MEMBER(gb_bank_w);
 	DECLARE_READ8_MEMBER(gb_ram_r);
 	DECLARE_WRITE8_MEMBER(gb_ram_w);
+	DECLARE_READ8_MEMBER(gb_echo_r);
+	DECLARE_WRITE8_MEMBER(gb_echo_w);
 	optional_device<gb_cart_slot_device> m_cartslot;
 
 protected:

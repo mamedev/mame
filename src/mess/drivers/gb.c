@@ -522,6 +522,16 @@ WRITE8_MEMBER(gb_state::gb_ram_w)
 		m_cartslot->m_cart->write_ram(space, offset, data);
 }
 
+READ8_MEMBER(gb_state::gb_echo_r)
+{
+	return space.read_byte(0xc000 + offset);
+}
+
+WRITE8_MEMBER(gb_state::gb_echo_w)
+{
+	return space.write_byte(0xc000 + offset, data);
+}
+
 READ8_MEMBER(megaduck_state::cart_r)
 {
 	if (m_cartslot && m_cartslot->m_cart)
@@ -546,11 +556,12 @@ WRITE8_MEMBER(megaduck_state::bank2_w)
 static ADDRESS_MAP_START(gameboy_map, AS_PROGRAM, 8, gb_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w ) /* 8k VRAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w )   /* 8k switched RAM bank (cartridge) */
-	AM_RANGE(0xc000, 0xfdff) AM_RAM                     /* 8k low RAM, echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w )  /* OAM RAM */
-	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w )        /* I/O */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w )  /* 8k VRAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w )    /* 8k switched RAM bank (cartridge) */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM                               /* 8k low RAM */
+	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w )  /* echo RAM */
+	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w )    /* OAM RAM */
+	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w )      /* I/O */
 	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE_LEGACY("custom", gb_sound_r, gb_sound_w )      /* sound registers */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
 	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE_LEGACY("custom", gb_wave_r, gb_wave_w )        /* Wave ram */
@@ -562,11 +573,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(sgb_map, AS_PROGRAM, 8, gb_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(gb_cart_r, gb_bank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w ) /* 8k VRAM */
-	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w )   /* 8k switched RAM bank (cartridge) */
-	AM_RANGE(0xc000, 0xfdff) AM_RAM                     /* 8k low RAM, echo RAM */
-	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w )  /* OAM RAM */
-	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, sgb_io_w )       /* I/O */
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(gb_vram_r, gb_vram_w )  /* 8k VRAM */
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w )    /* 8k switched RAM bank (cartridge) */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM                               /* 8k low RAM */
+	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w )  /* echo RAM */
+	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w )    /* OAM RAM */
+	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, sgb_io_w )     /* I/O */
 	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE_LEGACY("custom", gb_sound_r, gb_sound_w )      /* sound registers */
 	AM_RANGE(0xff27, 0xff2f) AM_NOP                     /* unused */
 	AM_RANGE(0xff30, 0xff3f) AM_DEVREADWRITE_LEGACY("custom", gb_wave_r, gb_wave_w )        /* Wave RAM */
@@ -582,7 +594,7 @@ static ADDRESS_MAP_START(gbc_map, AS_PROGRAM, 8, gb_state )
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(gb_ram_r, gb_ram_w )   /* 8k switched RAM bank (cartridge) */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM                     /* 4k fixed RAM bank */
 	AM_RANGE(0xd000, 0xdfff) AM_RAMBANK("cgb_ram")                    /* 4k switched RAM bank */
-	AM_RANGE(0xe000, 0xfdff) AM_RAM                     /* echo RAM */
+	AM_RANGE(0xe000, 0xfdff) AM_READWRITE(gb_echo_r, gb_echo_w )  /* echo RAM */
 	AM_RANGE(0xfe00, 0xfeff) AM_READWRITE(gb_oam_r, gb_oam_w )  /* OAM RAM */
 	AM_RANGE(0xff00, 0xff0f) AM_READWRITE(gb_io_r, gb_io_w )        /* I/O */
 	AM_RANGE(0xff10, 0xff26) AM_DEVREADWRITE_LEGACY("custom", gb_sound_r, gb_sound_w )      /* sound controller */
@@ -647,6 +659,9 @@ static SLOT_INTERFACE_START(gb_cart)
 	SLOT_INTERFACE_INTERNAL("rom_camera",  GB_STD_ROM)
 	SLOT_INTERFACE_INTERNAL("rom_sintax",  GB_ROM_SINTAX)
 	SLOT_INTERFACE_INTERNAL("rom_chong",  GB_ROM_CHONGWU)
+	SLOT_INTERFACE_INTERNAL("rom_digimon",  GB_ROM_DIGIMON)
+	SLOT_INTERFACE_INTERNAL("rom_rock8",  GB_ROM_ROCKMAN8)
+	SLOT_INTERFACE_INTERNAL("rom_sm3sp",  GB_ROM_SM3SP)
 SLOT_INTERFACE_END
 
 static SLOT_INTERFACE_START(megaduck_cart)

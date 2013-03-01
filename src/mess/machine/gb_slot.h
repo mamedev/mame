@@ -29,6 +29,9 @@ enum
 	GB_MBC_CAMERA,
 	GB_MBC_SINTAX,
 	GB_MBC_CHONGWU,
+	GB_MBC_DIGIMON,
+	GB_MBC_ROCKMAN8,
+	GB_MBC_SM3SP,
 	GB_MBC_MEGADUCK,     /* MEGADUCK style banking                        */
 	GB_MBC_UNKNOWN       /* Unknown mapper                                */
 };

@@ -23500,6 +23500,20 @@
 
 <!-- Other Asian pirate carts -->
 
+	<software name="rockman8">
+		<description>Rockman 8 (Chi)</description>
+		<year>1999</year>
+		<publisher>Yong Yong</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<feature name="slot" value="rom_rock8" />
+			<dataarea name="rom" size="262144">
+				<rom name="rockman 8 (hong kong) [p1].bin" size="262144" crc="cc131a94" sha1="496575adfb1296f2f99c00e06e5ca5ee4daf1a12" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sml4" cloneof="crayon4">
 		<description>Super Mario Land 4 (Chi)</description>
 		<year>1997?</year>
@@ -23610,7 +23624,7 @@
 		</part>
 	</software>
 
-	<software name="lasama" supported="no">
+	<software name="lasama">
 		<description>La Sa Ma Chuan Qi - Story of Lasama (Tw)</description>
 		<year>19??</year>
 		<publisher>GOWIN</publisher>
@@ -23621,19 +23635,6 @@
 				<rom name="la sa ma chuan qi - story of lasama (unlicensed) [raw dump].bin" size="131072" crc="989a5fe0" sha1="00f139a63c0dd6cdaeac77c6747772ac394c0a79" offset="000000" />
 			</dataarea>
 			<dataarea name="ram" size="8192">
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lasamah" cloneof="lasama" supported="no">
-		<description>La Sa Ma Chuan Qi - Story of Lasama (Tw, Hacked)</description>
-		<year>19??</year>
-		<publisher>GOWIN</publisher>
-		<info name="serial" value="GS-04"/>
-		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
-			<dataarea name="rom" size="65536">
-				<rom name="la sa ma chuan qi - story of lasama (unlicensed) [fixed].bin" size="65536" crc="985fcc24" sha1="de0fed7673c525bbcdcc484067dddebba7684462" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
