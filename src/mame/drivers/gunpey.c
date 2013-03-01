@@ -321,7 +321,7 @@ SOUND TEST
 			int xsource = ((val & 0x000000ff) << 4) | ((val & 0xf0000000) >> 28);
 			int ysource = ((val & 0x0000f000) >> 10);
 
-
+			xsource<<=1;
 
 #ifdef USE_FAKE_ROM
 			if (letter != -1)
@@ -334,7 +334,7 @@ SOUND TEST
 				{
 					for(int xi=0;xi<width/2;xi++)
 					{
-						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x400) + ((xsource+xi)&0x3ff))];
+						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
 
 						UINT8 pix;
 
@@ -472,12 +472,15 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		//if (srcx & 0xf800) printf("(error srcx &0xf800)");
 		//if (srcy & 0xf800) printf("(error srcy &0xf800)");
 
+		// these are definitely needed for 4bpp..
+		dstx<<=1;
+		xsize<<=1;
 
 		for (int y=0;y<ysize;y++)
 		{
 			for (int x=0;x<xsize;x++)
 			{
-				vram[(((dsty+y)&0x3ff)*0x400)+((dstx+x)&0x3ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
+				vram[(((dsty+y)&0x3ff)*0x800)+((dstx+x)&0x7ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
 			}
 		}
 
@@ -689,12 +692,13 @@ static const gfx_layout fake_layout =
 // this isn't a real decode as such, but the graphic data is all stored in pages 2048 bytes wide at varying BPP levelsl, some (BG data) compressed with what is likely a lossy scheme
 // palette data is in here too, the blocks at the bottom right of all this?
 static GFXLAYOUT_RAW( gunpey, 2048, 1, 2048*8, 2048*8 )
-static GFXLAYOUT_RAW( gunpey1024, 1024, 1, 1024*8, 1024*8 )
+//static GFXLAYOUT_RAW( gunpey1024, 1024, 1, 1024*8, 1024*8 )
 
 static GFXDECODE_START( gunpey )
 	GFXDECODE_ENTRY( "blit_data", 0, gunpey,     0x0000, 0x1 )
 	GFXDECODE_ENTRY( "fakerom", 0x18000, fake_layout,   0x0, 2  )
-	GFXDECODE_ENTRY( "vram", 0, gunpey1024,     0x0000, 0x1 )
+	//GFXDECODE_ENTRY( "vram", 0, gunpey1024,     0x0000, 0x1 )
+	GFXDECODE_ENTRY( "vram", 0, gunpey,     0x0000, 0x1 )
 
 GFXDECODE_END
 
