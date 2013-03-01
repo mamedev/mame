@@ -1,6 +1,3 @@
-
-//#define USE_FAKE_ROM
-
 /********************************************************************************************
 
 	Gunpey (c) 2000 Banpresto
@@ -220,6 +217,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
 	TIMER_CALLBACK_MEMBER(blitter_end);
 	void gunpey_irq_check(UINT8 irq_type);
+	void flush_pal_data(int x, int y);
 	UINT16 m_vram_bank;
 
 	//UINT16 main_vram[0x800][0x800];
@@ -239,6 +237,7 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 	int bpp_sel;
 	int height;
 	int width;
+	int color;
 	UINT16 vram_bank = m_vram_bank & 0x7fff;
 	UINT8 *vram = memregion("vram")->base();
 
@@ -256,6 +255,7 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 			height = (m_wram[count+5] >> 8);
 			width = (m_wram[count+5] & 0xff);
 			bpp_sel = (m_wram[count+0] & 0x18);
+			color = (m_wram[count+0] >> 8);
 
 			x-=0x160;
 			y-=0x188;
@@ -263,61 +263,7 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 			//UINT32 col = 0xffffff;
 
 	//		UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
-		                                        
-#ifdef USE_FAKE_ROM
-			int letter = -1;
 
-/*
--- TEST MODE --
-I/O TEST
-MONITOR TEST
-CG-ROM VIEWER
-CHARACTER CHECK
-SOUND TEST
-*/
-			// these are going to be co-ordinates in the bitmap, probably not the ROM, but the one the 'blitter' (gfx unpack device?) creates
-			if (val == 0x2080203b) { letter = ' '; }
-			if (val == 0x0080203b) { letter = '-'; }
-			if (val == 0x4080203b) { letter = '/'; }
-			if (val == 0x6080203b) { letter = '0'; }
-			if (val == 0x8080403a) { letter = '1'; }
-			if (val == 0xa080403a) { letter = '2'; }
-			if (val == 0xc080403a) { letter = '3'; }
-			if (val == 0xe080403a) { letter = '4'; }
-			if (val == 0x0080403b) { letter = '5'; }
-			if (val == 0x2080403b) { letter = '6'; }
-			if (val == 0x4080403b) { letter = '7'; }
-			if (val == 0x6080403b) { letter = '8'; }
-			if (val == 0x8080603a) { letter = '9'; }
-
-			if (val == 0x8080803a) { letter = 'A'; }
-			if (val == 0xa080803a) { letter = 'B'; }
-			if (val == 0xc080803a) { letter = 'C'; }
-			if (val == 0xe080803a) { letter = 'D'; }
-			if (val == 0x0080803b) { letter = 'E'; }
-			if (val == 0x2080803b) { letter = 'F'; }
-			if (val == 0x4080803b) { letter = 'G'; }
-			if (val == 0x6080803b) { letter = 'H'; }
-			if (val == 0x8080a03a) { letter = 'I'; }
-			if (val == 0xa080a03a) { letter = 'J'; }
-			if (val == 0xc080a03a) { letter = 'K'; }
-			if (val == 0xe080a03a) { letter = 'L'; }
-			if (val == 0x0080a03b) { letter = 'M'; }
-			if (val == 0x2080a03b) { letter = 'N'; }
-			if (val == 0x4080a03b) { letter = 'O'; }
-			if (val == 0x6080a03b) { letter = 'P'; }
-			if (val == 0x8080c03a) { letter = 'Q'; }
-			if (val == 0xa080c03a) { letter = 'R'; }
-			if (val == 0xc080c03a) { letter = 'S'; }
-			if (val == 0xe080c03a) { letter = 'T'; }
-			if (val == 0x0080c03b) { letter = 'U'; }
-			if (val == 0x2080c03b) { letter = 'V'; }
-			if (val == 0x4080c03b) { letter = 'W'; }
-			if (val == 0x6080c03b) { letter = 'X'; }
-			if (val == 0x8080e03a) { letter = 'Y'; }
-			if (val == 0xa080e03a) { letter = 'Z'; }
-
-#endif
 			int xsource = ((m_wram[count+2] & 0x00ff) << 4) | ((m_wram[count+1] & 0xf000) >> 12);
 			int ysource = ((m_wram[count+2] & 0xf000) >> 12)| ((m_wram[count+3] & 0x00ff) << 4);
 
@@ -334,12 +280,6 @@ SOUND TEST
 
 
 
-
-#ifdef USE_FAKE_ROM
-			if (letter != -1)
-				drawgfx_opaque(bitmap,cliprect,machine().gfx[1],letter,1,0,0,x,y);
-			else
-#endif
 			if(bpp_sel == 0x00)
 			{
 				for(int yi=0;yi<height;yi++)
@@ -353,12 +293,12 @@ SOUND TEST
 						pix = (data & 0x0f);
 
 						if(cliprect.contains(x+(xi*2), y+yi))
-							bitmap.pix16(y+yi, x+(xi*2)) = pix;
+							bitmap.pix16(y+yi, x+(xi*2)) = pix + color*0x10;
 
 						pix = (data & 0xf0)>>4;
 
 						if(cliprect.contains(x+1+(xi*2), y+yi))
-							bitmap.pix16(y+yi, x+1+(xi*2)) = pix;
+							bitmap.pix16(y+yi, x+1+(xi*2)) = pix + color*0x10;
 					}
 				}
 			}
@@ -366,26 +306,6 @@ SOUND TEST
 		}
 	}
 
-	#if 0
-	for(y=0;y<512;y++)
-	{
-		for(x=0;x<512;x++)
-		{
-			UINT32 color;
-			int r,g,b;
-			color = (blit_buffer[count] & 0xffff);
-
-			b = (color & 0x001f) << 3;
-			g = (color & 0x03e0) >> 2;
-			r = (color & 0x7c00) >> 7;
-
-			if(cliprect.contains(x, y))
-				bitmap.pix32(y, x) = b | (g<<8) | (r<<16);
-
-			count++;
-		}
-	}
-	#endif
 
 	return 0;
 }
@@ -442,6 +362,22 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 	gunpey_irq_check(4);
 }
 
+void gunpey_state::flush_pal_data(int x, int y)
+{
+	if(y < 512 && x < 512)
+	{
+		UINT8 *vram = memregion("vram")->base();
+		int val = (vram[y*0x800+x]) | (vram[y*0x800+x+1]<<8);
+		int r,g,b;
+
+		b = (val & 0x001f) >> 0;
+		g = (val & 0x03e0) >> 5;
+		r = (val & 0x7c00) >> 10;
+
+		palette_set_color(machine(), y*256+x/2, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
+	}
+}
+
 WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
 //	UINT16 *blit_buffer = m_blit_buffer;
@@ -493,6 +429,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 			for (int x=0;x<xsize;x++)
 			{
 				vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
+				flush_pal_data((dstx+x) & 0x7fe,(dsty+y) & 0x7ff);
 			}
 		}
 
@@ -649,6 +586,7 @@ INPUT_PORTS_END
 /* test hack */
 void gunpey_state::palette_init()
 {
+	#if 0
 	int i,r,g,b,val;
 	UINT8 *blit_rom = memregion("blit_data")->base();
 
@@ -665,7 +603,7 @@ void gunpey_state::palette_init()
 
 		palette_set_color(machine(), i/2, MAKE_RGB(r, g, b));
 	}
-
+	#endif
 }
 
 
@@ -708,7 +646,6 @@ static GFXLAYOUT_RAW( gunpey, 2048, 1, 2048*8, 2048*8 )
 
 static GFXDECODE_START( gunpey )
 	GFXDECODE_ENTRY( "blit_data", 0, gunpey,     0x0000, 0x1 )
-	GFXDECODE_ENTRY( "fakerom", 0x18000, fake_layout,   0x0, 2  )
 	//GFXDECODE_ENTRY( "vram", 0, gunpey1024,     0x0000, 0x1 )
 	GFXDECODE_ENTRY( "vram", 0, gunpey,     0x0000, 0x1 )
 
@@ -730,7 +667,7 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 	MCFG_SCREEN_RAW_PARAMS(57242400/8, 442, 0, 320, 264, 0, 224) /* just to get ~60 Hz */
 	MCFG_SCREEN_UPDATE_DRIVER(gunpey_state, screen_update_gunpey)
 
-	MCFG_PALETTE_LENGTH(0x800)
+	MCFG_PALETTE_LENGTH(0x10000)
 	MCFG_GFXDECODE(gunpey)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
@@ -762,11 +699,6 @@ ROM_START( gunpey )
 
 	ROM_REGION( 0x400000, "oki", 0 )
 	ROM_LOAD( "gp_rom5.622",  0x000000, 0x400000,  CRC(f79903e0) SHA1(4fd50b4138e64a48ec1504eb8cd172a229e0e965)) // 1xxxxxxxxxxxxxxxxxxxxx = 0xFF
-
-	ROM_REGION( 0x20000, "fakerom", ROMREGION_ERASEFF )
-#ifdef USE_FAKE_ROM
-	ROM_LOAD( "video",  0x00000, 0x20000,  CRC(8857ec5a) SHA1(5bed14933af060cb4a1ce6a961c4ca1467a1cbc2) )
-#endif
 ROM_END
 
 
