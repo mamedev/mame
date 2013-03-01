@@ -240,7 +240,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 	UINT8 *vram = memregion("vram")->base();
 
 	// +0                    +1                    +2                    +3                    +4                    +5                    +6                    +7
-	// cccc cccc e--b b--- | xxxx ---- u--- ---- | yyyy ---- --XX XXXX | nnnn nnnn ---Y YYYY | mmmm mmmm -MMM -NNN | hhhh hhhh wwww wwww | ---- ---- ---- ---- | ---- ---- ---- ---- | 
+	// cccc cccc e--b b--- | xxxx ---- u--- ---- | yyyy yy-- --XX XXXX | nnnn nnnn ---Y YYYY | mmmm mmmm -MMM -NNN | hhhh hhhh wwww wwww | ---- ---- ---- ---- | ---- ---- ---- ---- | 
 
 	// c = color palette
 	// e = END marker
@@ -273,13 +273,13 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 		//UINT32 col = 0xffffff;
 	//		UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
 		int xsource = ((m_wram[count+2] & 0x003f) << 4) | ((m_wram[count+1] & 0xf000) >> 12);
-		int ysource = ((m_wram[count+3] & 0x001f) << 4) | ((m_wram[count+2] & 0xf000) >> 12);
+		int ysource = ((m_wram[count+3] & 0x001f) << 6) | ((m_wram[count+2] & 0xfc00) >> 10);
 		//printf("%08x  %04x %04x\n", val, m_wram[count+1],m_wram[count+2] );
 	//	UINT16 xsource = (m_wram[count+2] & 0x00ff << 4) | (m_wram[count+1] & 0xf000 >> 12);
 		//xsource<<=1;
 
 		xsource<<=1;
-		ysource <<=2;
+	//	ysource <<=2;
 
 		UINT8 testhack = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+0)&0x7ff))];
 		UINT8 testhack2 = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+1)&0x7ff))];
@@ -289,7 +289,10 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 
 
 
+		
+
 		printf("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count+0], m_wram[count+1], m_wram[count+2], m_wram[count+3], m_wram[count+4], m_wram[count+5], m_wram[count+6], m_wram[count+7]);
+		printf("unused %04x %04x %04x %04x %04x %04x %04x %04x\n\n", m_wram[count+0]&~0xff98, m_wram[count+1]&~0xf080, m_wram[count+2]&~0xfc3f, m_wram[count+3]&~0xf01f, m_wram[count+4]&~0xff77, m_wram[count+5]&~0xffff, m_wram[count+6]&~0x0000, m_wram[count+7]&~0x0000);
 
 		if ((testhack2 & 0x0f) == 0x08)
 			return m_wram[count+0] & 0x80;
@@ -687,33 +690,23 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::gunpey_scanline)
 	int scanline = param;
 
 	if(scanline == 224)
+	{
+		printf("frame\n");
 		gunpey_irq_check(0x50);
+	}
 }
 
 
-static const gfx_layout fake_layout =
-{
-	8,8,
-	RGN_FRAC(1,4),
-	4,
-	{ 0,1,2,3 },
-	{ 0*4,1*4,2*4,3*4,4*4,5*4,6*4,7*4 },
-	{ 0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32},
-	8*32
-};
 
 
 
 // this isn't a real decode as such, but the graphic data is all stored in pages 2048 bytes wide at varying BPP levelsl, some (BG data) compressed with what is likely a lossy scheme
 // palette data is in here too, the blocks at the bottom right of all this?
 static GFXLAYOUT_RAW( gunpey, 2048, 1, 2048*8, 2048*8 )
-//static GFXLAYOUT_RAW( gunpey1024, 1024, 1, 1024*8, 1024*8 )
 
 static GFXDECODE_START( gunpey )
 	GFXDECODE_ENTRY( "blit_data", 0, gunpey,     0x0000, 0x1 )
-	//GFXDECODE_ENTRY( "vram", 0, gunpey1024,     0x0000, 0x1 )
 	GFXDECODE_ENTRY( "vram", 0, gunpey,     0x0000, 0x1 )
-
 GFXDECODE_END
 
 
@@ -729,7 +722,7 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(57242400/8, 442, 0, 320, 264, 0, 224) /* just to get ~60 Hz */
+	MCFG_SCREEN_RAW_PARAMS(57242400/8, 442, 0, 320, 264, 0, 240) /* just to get ~60 Hz */
 	MCFG_SCREEN_UPDATE_DRIVER(gunpey_state, screen_update_gunpey)
 
 	MCFG_PALETTE_LENGTH(0x10000)
