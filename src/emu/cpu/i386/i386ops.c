@@ -1215,6 +1215,11 @@ static void I386OP(repeat)(i386_state *cpustate, int invert_flag)
 			CYCLES(cpustate,CYCLES_NOP);
 			return;
 
+		case 0xc2: // sigh
+		case 0xc3:
+			cpustate->pc--;
+			return;
+
 		default:
 			fatalerror("i386: Invalid REP/opcode %02X combination\n",opcode);
 			break;
