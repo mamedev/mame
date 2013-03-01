@@ -212,12 +212,14 @@ public:
 	DECLARE_READ8_MEMBER(gunpey_inputs_r);
 	DECLARE_WRITE8_MEMBER(gunpey_blitter_w);
 	DECLARE_WRITE8_MEMBER(gunpey_output_w);
+	DECLARE_WRITE16_MEMBER(gunpey_vram_bank_w);
 	DECLARE_DRIVER_INIT(gunpey);
 	virtual void video_start();
 	virtual void palette_init();
 	UINT32 screen_update_gunpey(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
 	void gunpey_irq_check(UINT8 irq_type);
+	UINT16 m_vram_bank;
 };
 
 
@@ -231,12 +233,15 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_rgb32 &b
 	//UINT16 *blit_buffer = m_blit_buffer;
 	int x,y;
 	int count;
+	UINT16 vram_bank = m_vram_bank & 0x7fff;
 
 	bitmap.fill(machine().pens[0], cliprect); //black pen
 
-	for(count = 0x800/2;count<0x4800/2;count+=0x10/2)
+	vram_bank ^= 0x2000;
+
+	for(count = vram_bank/2;count<(vram_bank+0x2000)/2;count+=0x10/2)
 	{
-		if(!(m_wram[count+0/2] & 1))
+		if(!(m_wram[count+0] & 1))
 		{
 			x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0xff) << 8);
 			y = m_wram[count+4] >> 8;
@@ -245,10 +250,55 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_rgb32 &b
 
 			UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
 			int letter = -1;
-
+/*
+-- TEST MODE --
+I/O TEST
+MONITOR TEST
+CG-ROM VIEWER
+CHARACTER CHECK
+SOUND TEST
+*/
 			// these are going to be co-ordinates in the bitmap, probably not the ROM, but the one the 'blitter' (gfx unpack device?) creates
-			if (val == 0x8080a03a) { col = 0xffff00; letter ='I'; } // 18d0 - I
-			if (val == 0x4080a03b) { col = 0xff0000; letter ='O'; } //      - O
+			if (val == 0x2080203b) { letter = ' '; }
+			if (val == 0x0080203b) { letter = '-'; }
+			if (val == 0x4080203b) { letter = '/'; }
+			if (val == 0x6080203b) { letter = '0'; }
+			if (val == 0x8080403a) { letter = '1'; }
+			if (val == 0xa080403a) { letter = '2'; }
+			if (val == 0xc080403a) { letter = '3'; }
+			if (val == 0xe080403a) { letter = '4'; }
+			if (val == 0x0080403b) { letter = '5'; }
+			if (val == 0x2080403b) { letter = '6'; }
+			if (val == 0x4080403b) { letter = '7'; }
+			if (val == 0x6080403b) { letter = '8'; }
+			if (val == 0x8080603a) { letter = '9'; }
+
+			if (val == 0x8080803a) { letter = 'A'; }
+			if (val == 0xa080803a) { letter = 'B'; }
+			if (val == 0xc080803a) { letter = 'C'; }
+			if (val == 0xe080803a) { letter = 'D'; }
+			if (val == 0x0080803b) { letter = 'E'; }
+			if (val == 0x2080803b) { letter = 'F'; }
+			if (val == 0x4080803b) { letter = 'G'; }
+			if (val == 0x6080803b) { letter = 'H'; }
+			if (val == 0x8080a03a) { letter = 'I'; }
+			if (val == 0xa080a03a) { letter = 'J'; }
+			if (val == 0xc080a03a) { letter = 'K'; }
+			if (val == 0xe080a03a) { letter = 'L'; }
+			if (val == 0x0080a03b) { letter = 'M'; }
+			if (val == 0x2080a03b) { letter = 'N'; }
+			if (val == 0x4080a03b) { letter = 'O'; }
+			if (val == 0x6080a03b) { letter = 'P'; }
+			if (val == 0x8080c03a) { letter = 'Q'; }
+			if (val == 0xa080c03a) { letter = 'R'; }
+			if (val == 0xc080c03a) { letter = 'S'; }
+			if (val == 0xe080c03a) { letter = 'T'; }
+			if (val == 0x0080c03b) { letter = 'U'; }
+			if (val == 0x2080c03b) { letter = 'V'; }
+			if (val == 0x4080c03b) { letter = 'W'; }
+			if (val == 0x6080c03b) { letter = 'X'; }
+			if (val == 0x8080e03a) { letter = 'Y'; }
+			if (val == 0xa080e03a) { letter = 'Z'; }
 
 #ifndef USE_FAKE_ROM
 			letter = -1;
@@ -256,7 +306,7 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_rgb32 &b
 			x-=0x1100;
 
 			if (letter != -1)
-				drawgfx_opaque(bitmap,cliprect,machine().gfx[1],letter,0,0,0,x,y);
+				drawgfx_opaque(bitmap,cliprect,machine().gfx[1],letter,1,0,0,x,y);
 			else
 			{
 				for(int yi=0;yi<8;yi++)
@@ -410,6 +460,11 @@ WRITE8_MEMBER(gunpey_state::gunpey_output_w)
 	downcast<okim6295_device *>(m_oki)->set_bank_base((data & 0x0f) * 0x40000);
 }
 
+WRITE16_MEMBER(gunpey_state::gunpey_vram_bank_w)
+{
+	COMBINE_DATA(&m_vram_bank);
+}
+
 /***************************************************************************************/
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, gunpey_state )
@@ -430,6 +485,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
 	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8(gunpey_status_r,  gunpey_status_w, 0xffff )
 	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8(gunpey_blitter_w, 0xffff )
 	//AM_RANGE(0x7FF0, 0x7FF1) AM_RAM
+	AM_RANGE(0x7fee, 0x7fef) AM_WRITE(gunpey_vram_bank_w)
 
 ADDRESS_MAP_END
 
@@ -593,7 +649,7 @@ static const gfx_layout fake_layout =
 static GFXLAYOUT_RAW( gunpey, 2048, 1, 2048*8, 2048*8 )
 static GFXDECODE_START( gunpey )
 	GFXDECODE_ENTRY( "blit_data", 0, gunpey,     0x0000, 0x1 )
-	GFXDECODE_ENTRY( "fakerom", 0x18000, fake_layout,   0x0, 2  ) 
+	GFXDECODE_ENTRY( "fakerom", 0x18000, fake_layout,   0x0, 2  )
 
 GFXDECODE_END
 
