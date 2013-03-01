@@ -236,6 +236,9 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 	//UINT16 *blit_buffer = m_blit_buffer;
 	int x,y;
 	int count;
+	int bpp_sel;
+	int height;
+	int width;
 	UINT16 vram_bank = m_vram_bank & 0x7fff;
 	UINT8 *vram = memregion("vram")->base();
 
@@ -243,12 +246,16 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 
 	vram_bank ^= 0x2000;
 
-	for(count = vram_bank/2;count<(vram_bank+0x2000)/2;count+=0x10/2)
+	/* last 4 entries are special, skip them for now. */
+	for(count = vram_bank/2;count<(vram_bank+0x2000-0x40)/2;count+=0x10/2)
 	{
 		if(!(m_wram[count+0] & 1))
 		{
 			x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0x03) << 8);
 			y = (m_wram[count+4] >> 8) | ((m_wram[count+4] & 0x30) << 4);
+			width = (m_wram[count+5] >> 8);
+			height = (m_wram[count+5] & 0xff);
+			bpp_sel = (m_wram[count+0] & 0x18);
 
 			x-=0x160;
 			y-=0x188;
@@ -321,10 +328,11 @@ SOUND TEST
 				drawgfx_opaque(bitmap,cliprect,machine().gfx[1],letter,1,0,0,x,y);
 			else
 #endif
+			if(bpp_sel == 0x00)
 			{
-				for(int yi=0;yi<8;yi++)
+				for(int yi=0;yi<height;yi++)
 				{
-					for(int xi=0;xi<4;xi++)
+					for(int xi=0;xi<width/2;xi++)
 					{
 						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x400) + ((xsource+xi)&0x3ff))];
 
@@ -339,11 +347,10 @@ SOUND TEST
 
 						if(cliprect.contains(x+1+(xi*2), y+yi))
 							bitmap.pix16(y+yi, x+1+(xi*2)) = pix;
-
-
 					}
 				}
 			}
+
 		}
 	}
 
@@ -446,6 +453,8 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		int ysize = blit_ram[0x0e]+1;
 //		int color,color_offs;
 
+		printf("%04x %04x %04x %04x\n",srcx,srcy,dstx,dsty);
+
 /*
 	  printf("%02x %02x %02x %02x| (X SRC 4: %02x 5: %02x (val %04x))  (Y SRC 6: %02x 7: %02x (val %04x))  | (X DEST 8: %02x 9: %02x (val %04x))  (Y DEST a: %02x b: %02x (val %04x)) |  %02x %02x %02x %02x\n"
 	   ,blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3]
@@ -468,7 +477,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		{
 			for (int x=0;x<xsize;x++)
 			{
-				vram[(((dsty+y)&0x7ff)*0x400)+((dstx+x)&0x3ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
+				vram[(((dsty+y)&0x3ff)*0x400)+((dstx+x)&0x3ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
 			}
 		}
 
