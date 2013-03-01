@@ -2867,7 +2867,7 @@ static void I386OP(group0F00_32)(i386_state *cpustate)          // Opcode 0x0f 0
 					CYCLES(cpustate,CYCLES_SLDT_REG);
 				} else {
 					ea = GetEA(cpustate,modrm,1);
-					WRITE32(cpustate, ea, cpustate->ldtr.segment);
+					WRITE16(cpustate, ea, cpustate->ldtr.segment);
 					CYCLES(cpustate,CYCLES_SLDT_MEM);
 				}
 			}
@@ -2884,7 +2884,7 @@ static void I386OP(group0F00_32)(i386_state *cpustate)          // Opcode 0x0f 0
 					CYCLES(cpustate,CYCLES_STR_REG);
 				} else {
 					ea = GetEA(cpustate,modrm,1);
-					WRITE32(cpustate, ea, cpustate->task.segment);
+					WRITE16(cpustate, ea, cpustate->task.segment);
 					CYCLES(cpustate,CYCLES_STR_MEM);
 				}
 			}
