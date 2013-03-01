@@ -454,10 +454,10 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 
 WRITE8_MEMBER(gunpey_state::gunpey_output_w)
 {
-	if((data & 0xf0) != 0x90)
-		printf("0x7f48 write with %02x\n",data);
+	//bit 0 is coin counter
+//	popmessage("%02x",data);
 
-	downcast<okim6295_device *>(m_oki)->set_bank_base((data & 0x0f) * 0x40000);
+	downcast<okim6295_device *>(m_oki)->set_bank_base(((data & 0x70)>>4) * 0x40000);
 }
 
 WRITE16_MEMBER(gunpey_state::gunpey_vram_bank_w)
