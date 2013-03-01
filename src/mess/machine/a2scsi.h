@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "machine/a2bus.h"
-#include "machine/ncr5380.h"
+#include "machine/ncr5380n.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -30,6 +30,11 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual const rom_entry *device_rom_region() const;
 
+	required_device<ncr5380n_device> m_ncr5380;
+	required_device<nscsi_bus_device> m_scsibus;
+
+	DECLARE_WRITE_LINE_MEMBER( drq_w );
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
@@ -42,12 +47,13 @@ protected:
 	virtual UINT8 read_c800(address_space &space, UINT16 offset);
 	virtual void write_c800(address_space &space, UINT16 offset, UINT8 data);
 
-	required_device<ncr5380_device> m_ncr5380;
-
 private:
 	UINT8 *m_rom;
 	UINT8 m_ram[8192];  // 8 banks of 1024 bytes
 	int m_rambank, m_rombank;
+	UINT8 m_drq;
+	UINT8 m_bank;
+	bool m_816block;
 };
 
 // device type definition

@@ -74,6 +74,7 @@
 #include "machine/a2midi.h"
 #include "machine/a2vulcan.h"
 #include "machine/a2zipdrive.h"
+//#include "machine/a2udrive.h"
 
 static const gfx_layout apple2gs_text_layout =
 {
@@ -307,8 +308,10 @@ static SLOT_INTERFACE_START(apple2_cards)
 	SLOT_INTERFACE("vulcan", A2BUS_VULCAN)  /* AE Vulcan IDE card */
 	SLOT_INTERFACE("zipdrive", A2BUS_ZIPDRIVE)  /* ZIP Technologies IDE card */
 	SLOT_INTERFACE("echoiiplus", A2BUS_ECHOPLUS)    /* Street Electronics Echo Plus (Echo II + Mockingboard clone) */
+//	SLOT_INTERFACE("mdturbo", A2BUS_UDRIVE_TURBO)  /* ///SHH Systeme MicroDrive Turbo IDE card */
+
 //    SLOT_INTERFACE("softcard", A2BUS_SOFTCARD)  /* Microsoft SoftCard */  // appears not to be IIgs compatible?
-//    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
+    SLOT_INTERFACE("scsi", A2BUS_SCSI)  /* Apple II SCSI Card */
 SLOT_INTERFACE_END
 
 static MACHINE_CONFIG_START( apple2gs, apple2gs_state )
