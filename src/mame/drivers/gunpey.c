@@ -243,8 +243,11 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_rgb32 &b
 	{
 		if(!(m_wram[count+0] & 1))
 		{
-			x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0xff) << 8);
-			y = m_wram[count+4] >> 8;
+			x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0x03) << 8);
+			y = (m_wram[count+4] >> 8) | ((m_wram[count+4] & 0x30) << 4);
+
+			x-=0x100;
+			y-=0x100;
 
 			UINT32 col = 0xffffff;
 
@@ -303,7 +306,6 @@ SOUND TEST
 #ifndef USE_FAKE_ROM
 			letter = -1;
 #endif
-			x-=0x1100;
 
 			if (letter != -1)
 				drawgfx_opaque(bitmap,cliprect,machine().gfx[1],letter,1,0,0,x,y);
