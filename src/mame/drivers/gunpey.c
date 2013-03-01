@@ -647,7 +647,7 @@ void gunpey_state::palette_init()
 /*:
 0x01
 0x04 blitter ready
-0x10
+0x10 vblank too?
 0x40 almost certainly vblank (reads inputs)
 0x80
 */
@@ -655,11 +655,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::gunpey_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 0)
-		gunpey_irq_check(0x10);
-
 	if(scanline == 224)
-		gunpey_irq_check(0x40);
+		gunpey_irq_check(0x50);
 }
 
 
