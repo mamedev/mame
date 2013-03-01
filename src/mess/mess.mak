@@ -507,6 +507,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_AUDIO)/spchroms.o    \
 	$(MESS_MACHINE)/microdrv.o  \
 	$(MESS_MACHINE)/74145.o     \
+	$(MESS_MACHINE)/68561mpcc.o \
 	$(MESS_MACHINE)/8530scc.o   \
 	$(MESS_MACHINE)/at45dbxx.o  \
 	$(MESS_MACHINE)/ay31015.o   \
@@ -2030,6 +2031,7 @@ $(MESSOBJ)/skeleton.a:          \
 	$(MESS_DRIVERS)/babbage.o   \
 	$(MESS_DRIVERS)/beehive.o   \
 	$(MESS_DRIVERS)/binbug.o    \
+	$(MESS_DRIVERS)/besta.o     \
 	$(MESS_DRIVERS)/bob85.o     \
 	$(MESS_DRIVERS)/br8641.o    \
 	$(MESS_DRIVERS)/busicom.o   \
