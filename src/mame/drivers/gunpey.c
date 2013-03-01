@@ -218,6 +218,7 @@ public:
 	virtual void palette_init();
 	UINT32 screen_update_gunpey(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
+	TIMER_CALLBACK_MEMBER(blitter_end);
 	void gunpey_irq_check(UINT8 irq_type);
 	UINT16 m_vram_bank;
 
@@ -249,8 +250,8 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 			x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0x03) << 8);
 			y = (m_wram[count+4] >> 8) | ((m_wram[count+4] & 0x30) << 4);
 
-			x-=0x100;
-			y-=0x100;
+			x-=0x160;
+			y-=0x188;
 
 			//UINT32 col = 0xffffff;
 
@@ -328,12 +329,12 @@ SOUND TEST
 						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x400) + ((xsource+xi)&0x3ff))];
 
 						UINT8 pix;
-						
+
 						pix = (data & 0x0f);
 
 						if(cliprect.contains(x+(xi*2), y+yi))
 							bitmap.pix16(y+yi, x+(xi*2)) = pix;
-				
+
 						pix = (data & 0xf0)>>4;
 
 						if(cliprect.contains(x+1+(xi*2), y+yi))
@@ -417,6 +418,11 @@ READ8_MEMBER(gunpey_state::gunpey_inputs_r)
 	return 0xff;
 }
 
+TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
+{
+	gunpey_irq_check(4);
+}
+
 WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
 //	UINT16 *blit_buffer = m_blit_buffer;
@@ -451,14 +457,12 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 	   ,blit_ram[8],blit_ram[9], dstx
 	   ,blit_ram[0xa],blit_ram[0xb], dsty
        ,blit_ram[0xc],
-		   
+
 		   blit_ram[0xd],blit_ram[0xe],blit_ram[0xf]);
 */
 		//if (srcx & 0xf800) printf("(error srcx &0xf800)");
 		//if (srcy & 0xf800) printf("(error srcy &0xf800)");
 
-
-		gunpey_irq_check(4);
 
 		for (int y=0;y<ysize;y++)
 		{
@@ -468,7 +472,8 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 			}
 		}
 
-		
+		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(xsize*ysize), timer_expired_delegate(FUNC(gunpey_state::blitter_end),this));
+
 
 /*
       printf("%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x\n"
@@ -654,7 +659,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::gunpey_scanline)
 	if(scanline == 0)
 		gunpey_irq_check(0x10);
 
-	if(scanline == 480)
+	if(scanline == 224)
 		gunpey_irq_check(0x40);
 }
 
@@ -696,12 +701,8 @@ static MACHINE_CONFIG_START( gunpey, gunpey_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", gunpey_state, gunpey_scanline, "screen", 0, 1)
 
 	/* video hardware */
-	/* TODO: screen params */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(818, 525)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 640-1, 0*8, 480-1)
+	MCFG_SCREEN_RAW_PARAMS(57242400/8, 442, 0, 320, 264, 0, 224) /* just to get ~60 Hz */
 	MCFG_SCREEN_UPDATE_DRIVER(gunpey_state, screen_update_gunpey)
 
 	MCFG_PALETTE_LENGTH(0x800)
