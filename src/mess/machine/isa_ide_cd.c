@@ -19,7 +19,18 @@ static void atapi_irq(device_t *device, int state)
 
 WRITE16_MEMBER( isa16_ide_cd_device::atapi_cmd_w )
 {
+	if(data & 4) // ide reset
+	{
+		m_atapi_regs[ATAPI_REG_CMDSTATUS] = 0x00;
+		m_atapi_regs[ATAPI_REG_ERRFEAT]   = 0x01;
+		m_atapi_regs[ATAPI_REG_INTREASON] = 0x01; // SECTOR_COUNT
+		m_atapi_regs[ATAPI_REG_SAMTAG]    = 0x01; // SECTOR_NUMBER
+		m_atapi_regs[ATAPI_REG_COUNTLOW]  = 0x14; // CYLINDER_LSB
+		m_atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb; // CYLINDER_MSB
+		m_atapi_regs[ATAPI_REG_DRIVESEL]  = 0xA0; // HEAD_NUMBER
+	}
 }
+
 READ16_MEMBER( isa16_ide_cd_device::atapi_status_r )
 {
 	UINT8 *atapi_regs = m_atapi_regs;
