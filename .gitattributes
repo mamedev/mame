@@ -5793,6 +5793,7 @@ src/mess/audio/alesis.c svneol=native#text/plain
 src/mess/audio/arcadia.c svneol=native#text/plain
 src/mess/audio/arcadia.h svneol=native#text/plain
 src/mess/audio/channelf.c svneol=native#text/plain
+src/mess/audio/channelf.h svneol=native#text/plain
 src/mess/audio/dai.c svneol=native#text/plain
 src/mess/audio/dave.c svneol=native#text/plain
 src/mess/audio/dave.h svneol=native#text/plain
