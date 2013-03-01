@@ -72,6 +72,18 @@ void nscsi_harddisk_device::scsi_put_data(int id, int pos, UINT8 data)
 
 void nscsi_harddisk_device::scsi_command()
 {
+	#if 0
+	if (scsi_cmdbuf[0] != SC_READ)
+	{
+		logerror("%s: ", tag());
+		for (int i = 0; i < 6; i++)
+		{
+			logerror("%02x ", scsi_cmdbuf[i]);
+		}
+		logerror("\n");
+	}
+	#endif
+
 	switch(scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
 		logerror("%s: command TEST UNIT READY\n", tag());
@@ -88,6 +100,19 @@ void nscsi_harddisk_device::scsi_command()
 					tag(), lba, blocks);
 
 		scsi_data_in(2, blocks*bytes_per_sector);
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	case SC_WRITE:
+		lba = ((scsi_cmdbuf[1] & 0x1f)<<16) | (scsi_cmdbuf[2]<<8) | scsi_cmdbuf[3];
+		blocks = scsi_cmdbuf[4];
+		if(!blocks)
+			blocks = 256;
+
+		logerror("%s: command WRITE start=%08x blocks=%04x\n",
+					tag(), lba, blocks);
+
+		scsi_data_out(2, blocks*bytes_per_sector);
 		scsi_status_complete(SS_GOOD);
 		break;
 
@@ -109,13 +134,31 @@ void nscsi_harddisk_device::scsi_command()
 			scsi_cmdbuf[0] = 0x00; // device is direct-access (e.g. hard disk)
 			scsi_cmdbuf[1] = 0x00; // media is not removable
 			scsi_cmdbuf[2] = 0x05; // device complies with SPC-3 standard
-			scsi_cmdbuf[3] = 0x02; // response data format = SPC-3 standard
+			scsi_cmdbuf[3] = 0x01; // response data format = CCS
 			// Apple HD SC setup utility needs to see this
 			strcpy((char *)&scsi_cmdbuf[8], " SEAGATE");
-			strcpy((char *)&scsi_cmdbuf[16], "          ST225N");
-			strcpy((char *)&scsi_cmdbuf[32], "1.0");
-			if(size > 148)
-				size = 148;
+			strcpy((char *)&scsi_cmdbuf[15], "          ST225N");
+			strcpy((char *)&scsi_cmdbuf[31], "1.00");
+			scsi_cmdbuf[36] = 0x00;	// # of extents high
+			scsi_cmdbuf[37] = 0x08;	// # of extents low
+			scsi_cmdbuf[38] = 0x00; // group 0 commands 0-1f
+			scsi_cmdbuf[39] = 0x99; // commands 0,3,4,7
+			scsi_cmdbuf[40] = 0xa0; // commands 8, a
+			scsi_cmdbuf[41] = 0x27; // commands 12,15,16,17
+			scsi_cmdbuf[42] = 0x34; // commands 1a,1b,1d
+			scsi_cmdbuf[43] = 0x01; // group 1 commands 20-3f
+			scsi_cmdbuf[44] = 0x04;
+			scsi_cmdbuf[45] = 0xa0;
+			scsi_cmdbuf[46] = 0x01;
+			scsi_cmdbuf[47] = 0x18;
+			scsi_cmdbuf[48] = 0x07; // group 7 commands e0-ff
+			scsi_cmdbuf[49] = 0x00;
+			scsi_cmdbuf[50] = 0xa0; // commands 8, a
+			scsi_cmdbuf[51] = 0x00;
+			scsi_cmdbuf[52] = 0x00;
+			scsi_cmdbuf[53] = 0xff;	// end of list
+			if(size > 54)
+				size = 54;
 			scsi_data_in(0, size);
 			break;
 		}
@@ -218,6 +261,34 @@ void nscsi_harddisk_device::scsi_command()
 				break;
 			}
 
+			case 0x30: { // Apple firmware ID page
+				scsi_cmdbuf[pos++] = 0xb0; // cPS, page id
+				scsi_cmdbuf[pos++] = 0x16; // Page length
+				scsi_cmdbuf[pos++] = 'A';
+				scsi_cmdbuf[pos++] = 'P';
+				scsi_cmdbuf[pos++] = 'P';
+				scsi_cmdbuf[pos++] = 'L';
+				scsi_cmdbuf[pos++] = 'E';
+				scsi_cmdbuf[pos++] = ' ';
+				scsi_cmdbuf[pos++] = 'C';
+				scsi_cmdbuf[pos++] = 'O';
+				scsi_cmdbuf[pos++] = 'M';
+				scsi_cmdbuf[pos++] = 'P';
+				scsi_cmdbuf[pos++] = 'U';
+				scsi_cmdbuf[pos++] = 'T';
+				scsi_cmdbuf[pos++] = 'E';
+				scsi_cmdbuf[pos++] = 'R';
+				scsi_cmdbuf[pos++] = ',';
+				scsi_cmdbuf[pos++] = ' ';
+				scsi_cmdbuf[pos++] = 'I';
+				scsi_cmdbuf[pos++] = 'N';
+				scsi_cmdbuf[pos++] = 'C';
+				scsi_cmdbuf[pos++] = ' ';
+				scsi_cmdbuf[pos++] = ' ';
+				scsi_cmdbuf[pos++] = ' ';
+				break;
+			}
+
 			default:
 				logerror("%s: mode sense page %02x unhandled\n", tag(), page);
 				break;
@@ -280,6 +351,7 @@ void nscsi_harddisk_device::scsi_command()
 		break;
 
 	default:
+		logerror("%s: command %02x ***UNKNOWN***\n", tag(), scsi_cmdbuf[0]);
 		nscsi_full_device::scsi_command();
 		break;
 	}
