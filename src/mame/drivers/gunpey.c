@@ -234,8 +234,6 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 {
 	int x,y;
 	int bpp_sel;
-	int height;
-	int width;
 	int color;
 	UINT8 *vram = memregion("vram")->base();
 
@@ -268,16 +266,16 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 	{
 		x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0x03) << 8);
 		y = (m_wram[count+4] >> 8) | ((m_wram[count+4] & 0x30) << 4);
-		height = (m_wram[count+5] >> 8);
-		width = (m_wram[count+5] & 0xff);
+		UINT8 zoomheight = (m_wram[count+5] >> 8);
+		UINT8 zoomwidth = (m_wram[count+5] & 0xff);
 		bpp_sel = (m_wram[count+0] & 0x18);
 		color = (m_wram[count+0] >> 8);
 
 		x-=0x160;
 		y-=0x188;
 
-		UINT8 zoomwidth  = (m_wram[count+6] & 0xff);
-		UINT8 zoomheight = (m_wram[count+7] >> 8);
+		UINT8 sourcewidth  = (m_wram[count+6] & 0xff);
+		UINT8 sourceheight = (m_wram[count+7] >> 8);
 
 		//UINT32 col = 0xffffff;
 	//		UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
@@ -290,11 +288,11 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 	//	xsource<<=1;
 	//	ysource <<=2;
 
-		UINT8 testhack = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+0)&0x7ff))];
-		UINT8 testhack2 = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+1)&0x7ff))];
+//		UINT8 testhack = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+0)&0x7ff))];
+//		UINT8 testhack2 = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+1)&0x7ff))];
 
-		if (m_wram[count+1] & 0x0010) 
-			color =  machine.rand()&0xf;
+		//if (m_wram[count+1] & 0x0010) 
+		//	color =  machine.rand()&0xf;
 
 
 
@@ -311,30 +309,28 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 		unused = m_wram[count+6]&~0x00ff; if (unused) printf("unused bits set in word 6 - %04x\n", unused);
 		unused = m_wram[count+7]&~0xff00; if (unused) printf("unused bits set in word 7 - %04x\n", unused);
 	
-		if ((zoomwidth != width) || (zoomheight!= height))
+		if ((zoomwidth != sourcewidth) || (zoomheight!= zoomheight))
 		{
-			printf("zoomed widths %02x %02x heights %02x %02x\n", width, zoomwidth, height, zoomheight);
+			//printf("zoomed widths %02x %02x heights %02x %02x\n", sourcewidth, zoomwidth, sourceheight, zoomheight);
 		}
 
 
 
-		if ((testhack2 & 0x0f) == 0x08)
-			return m_wram[count+0] & 0x80;
+//		if ((testhack2 & 0x0f) == 0x08)
+//			return m_wram[count+0] & 0x80;
 
-		if (debug) printf("testhack1 %02x %02x\n", testhack, testhack2);
+		//if (debug) printf("testhack1 %02x %02x\n", testhack, testhack2);
 
 		if(bpp_sel == 0x00)  // 4bpp
 		{
-			for(int yi=0;yi<height;yi++)
+			for(int yi=0;yi<sourceheight;yi++)
 			{
-				for(int xi=0;xi<width/2;xi++)
+				for(int xi=0;xi<sourcewidth/2;xi++)
 				{
 					UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
 					UINT8 pix;
 					UINT32 col_offs;
 					UINT16 color_data;
-
-			
 
 					pix = (data & 0x0f);
 					col_offs = ((pix + color*0x10) & 0xff) << 1;
@@ -342,8 +338,8 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 					color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
 
 					if(!(color_data & 0x8000))
-					if(cliprect.contains(x+(xi*2), y+yi))
-						bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
+						if(cliprect.contains(x+(xi*2), y+yi))
+							bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
 
 					pix = (data & 0xf0)>>4;
 					col_offs = ((pix + color*0x10) & 0xff) << 1;
@@ -358,10 +354,11 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 		}
 		else if(bpp_sel == 0x08) // 6bpp
 		{
+			printf("6bpp\n");
 			#if 0
-			for(int yi=0;yi<height;yi++)
+			for(int yi=0;yi<sourceheight;yi++)
 			{
-				for(int xi=0;xi<width;xi++)
+				for(int xi=0;xi<sourcewidth;xi++)
 				{
 					UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
 					UINT8 pix;
@@ -377,9 +374,9 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 		}
 		else if(bpp_sel == 0x10) // 8bpp
 		{
-			for(int yi=0;yi<height;yi++)
+			for(int yi=0;yi<sourceheight;yi++)
 			{
-				for(int xi=0;xi<width;xi++)
+				for(int xi=0;xi<sourcewidth;xi++)
 				{
 					UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
 					UINT8 pix;
@@ -399,6 +396,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 		}
 		else if(bpp_sel == 0x18) // RGB32k
 		{
+			printf("32k\n");
 			// ...
 		}
 	}
