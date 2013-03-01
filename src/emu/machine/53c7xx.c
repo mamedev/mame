@@ -80,6 +80,43 @@ void ncr53c7xx_device::device_start()
 
 	// The SCRIPTS processor runs at ~2 MIPS so approximate this
 	set_unscaled_clock(2000000);
+
+	// savestate support
+	save_item(NAME(m_scntl));
+	save_item(NAME(m_sdid));
+	save_item(NAME(m_sien));
+	save_item(NAME(m_scid));
+	save_item(NAME(m_sxfer));
+	save_item(NAME(m_sodl));
+	save_item(NAME(m_socl));
+	save_item(NAME(m_sfbr));
+	save_item(NAME(m_sidl));
+	save_item(NAME(m_sbdl));
+	save_item(NAME(m_sbcl));
+	save_item(NAME(m_dstat));
+	save_item(NAME(m_sstat));
+	save_item(NAME(m_ctest));
+	save_item(NAME(m_temp));
+	save_item(NAME(m_dfifo));
+	save_item(NAME(m_istat));
+	save_item(NAME(m_dbc));
+	save_item(NAME(m_dcmd));
+	save_item(NAME(m_dnad));
+	save_item(NAME(m_dsp));
+	save_item(NAME(m_dsps));
+	save_item(NAME(m_dmode));
+	save_item(NAME(m_dien));
+	save_item(NAME(m_dwt));
+	save_item(NAME(m_dcntl));
+
+	// other state
+	save_item(NAME(m_scsi_state));
+	save_item(NAME(m_connected));
+	save_item(NAME(m_finished));
+	save_item(NAME(m_last_data));
+	save_item(NAME(m_xfr_phase));
+
+	save_item(NAME(m_scripts_state));
 }
 
 
