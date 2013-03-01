@@ -352,8 +352,6 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 
 	bitmap.fill(machine().pens[0], cliprect); //black pen
 
-	vram_bank ^= 0x2000;
-
 	/* last 4 entries are special, skip them for now. */
 	for(count = vram_bank/2;count<(vram_bank+0x1000)/2;count+=0x10/2)
 	{
