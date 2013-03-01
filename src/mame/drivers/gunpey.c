@@ -292,7 +292,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 		
 
 		printf("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count+0], m_wram[count+1], m_wram[count+2], m_wram[count+3], m_wram[count+4], m_wram[count+5], m_wram[count+6], m_wram[count+7]);
-		printf("unused %04x %04x %04x %04x %04x %04x %04x %04x\n\n", m_wram[count+0]&~0xff98, m_wram[count+1]&~0xf080, m_wram[count+2]&~0xfc3f, m_wram[count+3]&~0xf01f, m_wram[count+4]&~0xff77, m_wram[count+5]&~0xffff, m_wram[count+6]&~0x0000, m_wram[count+7]&~0x0000);
+		printf("unused %04x %04x %04x %04x %04x %04x %04x %04x\n\n", m_wram[count+0]&~0xff98, m_wram[count+1]&~0xf080, m_wram[count+2]&~0xfc3f, m_wram[count+3]&~0xff1f, m_wram[count+4]&~0xff77, m_wram[count+5]&~0xffff, m_wram[count+6]&~0x0000, m_wram[count+7]&~0x0000);
 
 		if ((testhack2 & 0x0f) == 0x08)
 			return m_wram[count+0] & 0x80;
