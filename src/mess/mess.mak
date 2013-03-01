@@ -529,6 +529,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/msm6222b.o  \
 	$(MESS_MACHINE)/serial.o    \
 	$(MESS_MACHINE)/ncr5380.o   \
+	$(MESS_MACHINE)/ncr5380n.o   \
 	$(MESS_MACHINE)/ncr5390.o   \
 	$(MESS_MACHINE)/pc_kbdc.o   \
 	$(MESS_MACHINE)/pc_lpt.o    \
