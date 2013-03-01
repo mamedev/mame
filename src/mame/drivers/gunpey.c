@@ -217,7 +217,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
 	TIMER_CALLBACK_MEMBER(blitter_end);
 	void gunpey_irq_check(UINT8 irq_type);
-	UINT8 draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count);
+	UINT8 draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int count);
 	UINT16 m_vram_bank;
 
 
@@ -230,7 +230,7 @@ void gunpey_state::video_start()
 	m_blit_buffer = auto_alloc_array(machine(), UINT16, 512*512);
 }
 
-UINT8 gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count)
+UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int count)
 {
 	int x,y;
 	int bpp_sel;
@@ -238,6 +238,25 @@ UINT8 gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int 
 	int width;
 	int color;
 	UINT8 *vram = memregion("vram")->base();
+
+	// +0                    +1                    +2                    +3                    +4                    +5                    +6                    +7
+	// cccc cccc e--b b--- | xxxx ---- u--- ---- | yyyy ---- --XX XXXX | nnnn nnnn ---Y YYYY | mmmm mmmm -MMM -NNN | hhhh hhhh wwww wwww | ---- ---- ---- ---- | ---- ---- ---- ---- | 
+
+	// c = color palette
+	// e = END marker
+	// b = bpp select
+	// x = LSB x source
+	// X = MSB x source
+	// y = LSB y source
+	// Y = MSB y source
+	// n = LSB X DRAW position
+	// N = MSB X DRAW position
+	// m = LSB Y DRAW position
+	// M = MSB Y DRAW position
+	// h = height
+	// w = width
+	// u = unknown, set on text, maybe 'solid' ?
+
 
 	if(!(m_wram[count+0] & 1))
 	{
@@ -253,14 +272,29 @@ UINT8 gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int 
 
 		//UINT32 col = 0xffffff;
 	//		UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
-		int xsource = ((m_wram[count+2] & 0x00ff) << 4) | ((m_wram[count+1] & 0xf000) >> 12);
-		int ysource = ((m_wram[count+2] & 0xf000) >> 12)| ((m_wram[count+3] & 0x00ff) << 4);
+		int xsource = ((m_wram[count+2] & 0x003f) << 4) | ((m_wram[count+1] & 0xf000) >> 12);
+		int ysource = ((m_wram[count+3] & 0x001f) << 4) | ((m_wram[count+2] & 0xf000) >> 12);
 		//printf("%08x  %04x %04x\n", val, m_wram[count+1],m_wram[count+2] );
 	//	UINT16 xsource = (m_wram[count+2] & 0x00ff << 4) | (m_wram[count+1] & 0xf000 >> 12);
 		//xsource<<=1;
 
 		xsource<<=1;
 		ysource <<=2;
+
+		UINT8 testhack = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+0)&0x7ff))];
+		UINT8 testhack2 = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+1)&0x7ff))];
+
+		//if (m_wram[count+1] & 0x0080) // set on text 
+		//	color =  machine.rand()&0xf;
+
+
+
+		printf("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count+0], m_wram[count+1], m_wram[count+2], m_wram[count+3], m_wram[count+4], m_wram[count+5], m_wram[count+6], m_wram[count+7]);
+
+		if ((testhack2 & 0x0f) == 0x08)
+			return m_wram[count+0] & 0x80;
+
+		printf("testhack1 %02x %02x\n", testhack, testhack2);
 
 		if(bpp_sel == 0x00)  // 4bpp
 		{
@@ -272,6 +306,8 @@ UINT8 gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int 
 					UINT8 pix;
 					UINT32 col_offs;
 					UINT16 color_data;
+
+			
 
 					pix = (data & 0x0f);
 					col_offs = ((pix + color*0x10) & 0xff) << 1;
@@ -355,7 +391,7 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 	/* last 4 entries are special, skip them for now. */
 	for(count = vram_bank/2;count<(vram_bank+0x1000)/2;count+=0x10/2)
 	{
-		end_mark = draw_gfx(bitmap,cliprect,count);
+		end_mark = draw_gfx(screen.machine(), bitmap,cliprect,count);
 
 		if(end_mark == 0x80)
 			break;
@@ -363,7 +399,7 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 
 	for(count = (vram_bank+0x1000)/2;count<(vram_bank+0x2000)/2;count+=0x10/2)
 	{
-		end_mark = draw_gfx(bitmap,cliprect,count);
+		end_mark = draw_gfx(screen.machine(), bitmap,cliprect,count);
 
 		if(end_mark == 0x80)
 			break;
@@ -449,7 +485,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		int ysize = blit_ram[0x0e]+1;
 //		int color,color_offs;
 
-		printf("%04x %04x %04x %04x\n",srcx,srcy,dstx,dsty);
+//		printf("%04x %04x %04x %04x\n",srcx,srcy,dstx,dsty);
 
 /*
 	  printf("%02x %02x %02x %02x| (X SRC 4: %02x 5: %02x (val %04x))  (Y SRC 6: %02x 7: %02x (val %04x))  | (X DEST 8: %02x 9: %02x (val %04x))  (Y DEST a: %02x b: %02x (val %04x)) |  %02x %02x %02x %02x\n"
