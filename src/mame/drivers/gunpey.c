@@ -280,7 +280,7 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 
 
 
-			if(bpp_sel == 0x00)
+			if(bpp_sel == 0x00)  // 4bpp
 			{
 				for(int yi=0;yi<height;yi++)
 				{
@@ -302,7 +302,44 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 					}
 				}
 			}
+			else if(bpp_sel == 0x08) // 6bpp
+			{
+				#if 0
+				for(int yi=0;yi<height;yi++)
+				{
+					for(int xi=0;xi<width;xi++)
+					{
+						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
+						UINT8 pix;
 
+						pix = (data & 0x3f);
+
+						if(cliprect.contains(x+xi, y+yi))
+							bitmap.pix16(y+yi, x+xi) = pix + color*64;
+					}
+				}
+				#endif
+			}
+			else if(bpp_sel == 0x10) // 8bpp
+			{
+				for(int yi=0;yi<height;yi++)
+				{
+					for(int xi=0;xi<width;xi++)
+					{
+						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
+						UINT8 pix;
+
+						pix = (data & 0xff);
+
+						if(cliprect.contains(x+xi, y+yi))
+							bitmap.pix16(y+yi, x+xi) = pix + color*0x100;
+					}
+				}
+			}
+			else if(bpp_sel == 0x18) // RGB32k
+			{
+				// ...
+			}
 		}
 	}
 
