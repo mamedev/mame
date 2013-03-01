@@ -239,8 +239,11 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 	int color;
 	UINT8 *vram = memregion("vram")->base();
 
+	// there doesn't seem to be a specific bit to mark compressed sprites (we currently have a hack to look at the first byte of the data)
+	// do they get decompressed at blit time instead? of are there other registers we need to look at
+
 	// +0                    +1                    +2                    +3                    +4                    +5                    +6                    +7
-	// cccc cccc e--b b--- | xxxx ---- u--- ---- | yyyy yy-- --XX XXXX | nnnn nnnn ---Y YYYY | mmmm mmmm -MMM -NNN | hhhh hhhh wwww wwww | ---- ---- oooo oooo | pppp pppp ---- ---- | 
+	// cccc cccc e--b b--- | xxxx x--- u--t tttt | yyyy yy-- --XX XXXX | nnnn nnnn ---Y YYYY | mmmm mmmm -MMM -NNN | hhhh hhhh wwww wwww | ---- ---- oooo oooo | pppp pppp ---- ---- | 
 
 	// c = color palette
 	// e = END marker
@@ -258,6 +261,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 	// u = unknown, set on text, maybe 'solid' ?
 	// o = zoom width
 	// p = zoom height
+	// t = transparency / alpha related? (0x10 on player cursor, 0xf when swapping, other values at other times..)
 	const int debug = 0;
 
 	if(!(m_wram[count+0] & 1))
@@ -277,13 +281,13 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 
 		//UINT32 col = 0xffffff;
 	//		UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
-		int xsource = ((m_wram[count+2] & 0x003f) << 4) | ((m_wram[count+1] & 0xf000) >> 12);
+		int xsource = ((m_wram[count+2] & 0x003f) << 5) | ((m_wram[count+1] & 0xf800) >> 11);
 		int ysource = ((m_wram[count+3] & 0x001f) << 6) | ((m_wram[count+2] & 0xfc00) >> 10);
 		//printf("%08x  %04x %04x\n", val, m_wram[count+1],m_wram[count+2] );
 	//	UINT16 xsource = (m_wram[count+2] & 0x00ff << 4) | (m_wram[count+1] & 0xf000 >> 12);
 		//xsource<<=1;
 
-		xsource<<=1;
+	//	xsource<<=1;
 	//	ysource <<=2;
 
 		UINT8 testhack = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+0)&0x7ff))];
@@ -299,7 +303,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 		if (debug) printf("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count+0], m_wram[count+1], m_wram[count+2], m_wram[count+3], m_wram[count+4], m_wram[count+5], m_wram[count+6], m_wram[count+7]);
 		
 		unused = m_wram[count+0]&~0xff98; if (unused) printf("unused bits set in word 0 - %04x\n", unused);
-		unused = m_wram[count+1]&~0xf080; if (unused) printf("unused bits set in word 1 - %04x\n", unused);
+		unused = m_wram[count+1]&~0xf89f; if (unused) printf("unused bits set in word 1 - %04x\n", unused);
 		unused = m_wram[count+2]&~0xfc3f; if (unused) printf("unused bits set in word 2 - %04x\n", unused);
 		unused = m_wram[count+3]&~0xff1f; if (unused) printf("unused bits set in word 3 - %04x\n", unused);
 		unused = m_wram[count+4]&~0xff77; if (unused) printf("unused bits set in word 4 - %04x\n", unused);
