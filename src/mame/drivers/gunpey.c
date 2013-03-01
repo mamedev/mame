@@ -253,8 +253,8 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &b
 		{
 			x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0x03) << 8);
 			y = (m_wram[count+4] >> 8) | ((m_wram[count+4] & 0x30) << 4);
-			width = (m_wram[count+5] >> 8);
-			height = (m_wram[count+5] & 0xff);
+			height = (m_wram[count+5] >> 8);
+			width = (m_wram[count+5] & 0xff);
 			bpp_sel = (m_wram[count+0] & 0x18);
 
 			x-=0x160;
@@ -480,7 +480,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		{
 			for (int x=0;x<xsize;x++)
 			{
-				vram[(((dsty+y)&0x3ff)*0x800)+((dstx+x)&0x7ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
+				vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
 			}
 		}
 
@@ -743,7 +743,7 @@ ROM_START( gunpey )
 
 	ROM_REGION( 0x400000, "blit_data", 0 )
 	ROM_LOAD( "gp_rom3.025",  0x00000, 0x400000,  CRC(f2d1f9f0) SHA1(0d20301fd33892074508b9d127456eae80cc3a1c) )
-	ROM_REGION( 0x200000, "vram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x400000, "vram", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x400000, "ymz", 0 )
 	ROM_LOAD( "gp_rom4.525",  0x000000, 0x400000, CRC(78dd1521) SHA1(91d2046c60e3db348f29f776def02e3ef889f2c1) ) // 11xxxxxxxxxxxxxxxxxxxx = 0xFF
