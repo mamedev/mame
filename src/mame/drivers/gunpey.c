@@ -217,8 +217,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
 	TIMER_CALLBACK_MEMBER(blitter_end);
 	void gunpey_irq_check(UINT8 irq_type);
-	void flush_pal_data(int x, int y);
+	UINT8 draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count);
 	UINT16 m_vram_bank;
+
 
 	//UINT16 main_vram[0x800][0x800];
 };
@@ -229,137 +230,146 @@ void gunpey_state::video_start()
 	m_blit_buffer = auto_alloc_array(machine(), UINT16, 512*512);
 }
 
-UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+UINT8 gunpey_state::draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count)
 {
-	//UINT16 *blit_buffer = m_blit_buffer;
 	int x,y;
-	int count;
 	int bpp_sel;
 	int height;
 	int width;
 	int color;
-	UINT16 vram_bank = m_vram_bank & 0x7fff;
 	UINT8 *vram = memregion("vram")->base();
+
+	if(!(m_wram[count+0] & 1))
+	{
+		x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0x03) << 8);
+		y = (m_wram[count+4] >> 8) | ((m_wram[count+4] & 0x30) << 4);
+		height = (m_wram[count+5] >> 8);
+		width = (m_wram[count+5] & 0xff);
+		bpp_sel = (m_wram[count+0] & 0x18);
+		color = (m_wram[count+0] >> 8);
+
+		x-=0x160;
+		y-=0x188;
+
+		//UINT32 col = 0xffffff;
+	//		UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
+		int xsource = ((m_wram[count+2] & 0x00ff) << 4) | ((m_wram[count+1] & 0xf000) >> 12);
+		int ysource = ((m_wram[count+2] & 0xf000) >> 12)| ((m_wram[count+3] & 0x00ff) << 4);
+		//printf("%08x  %04x %04x\n", val, m_wram[count+1],m_wram[count+2] );
+	//	UINT16 xsource = (m_wram[count+2] & 0x00ff << 4) | (m_wram[count+1] & 0xf000 >> 12);
+		//xsource<<=1;
+
+		xsource<<=1;
+		ysource <<=2;
+
+		if(bpp_sel == 0x00)  // 4bpp
+		{
+			for(int yi=0;yi<height;yi++)
+			{
+				for(int xi=0;xi<width/2;xi++)
+				{
+					UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
+					UINT8 pix;
+					UINT32 col_offs;
+					UINT16 color_data;
+
+					pix = (data & 0x0f);
+					col_offs = ((pix + color*0x10) & 0xff) << 1;
+					col_offs+= ((pix + color*0x10) >> 8)*0x800;
+					color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
+
+					if(!(color_data & 0x8000))
+					if(cliprect.contains(x+(xi*2), y+yi))
+						bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
+
+					pix = (data & 0xf0)>>4;
+					col_offs = ((pix + color*0x10) & 0xff) << 1;
+					col_offs+= ((pix + color*0x10) >> 8)*0x800;
+					color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
+
+					if(!(color_data & 0x8000))
+						if(cliprect.contains(x+1+(xi*2), y+yi))
+							bitmap.pix16(y+yi, x+1+(xi*2)) = color_data & 0x7fff;
+				}
+			}
+		}
+		else if(bpp_sel == 0x08) // 6bpp
+		{
+			#if 0
+			for(int yi=0;yi<height;yi++)
+			{
+				for(int xi=0;xi<width;xi++)
+				{
+					UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
+					UINT8 pix;
+					UINT32 col_offs;
+					UINT16 color_data;
+
+					pix = (data & 0x3f);
+					if(cliprect.contains(x+xi, y+yi))
+						bitmap.pix16(y+yi, x+xi) = pix + color*64;
+				}
+			}
+			#endif
+		}
+		else if(bpp_sel == 0x10) // 8bpp
+		{
+			for(int yi=0;yi<height;yi++)
+			{
+				for(int xi=0;xi<width;xi++)
+				{
+					UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
+					UINT8 pix;
+					UINT32 col_offs;
+					UINT16 color_data;
+
+					pix = (data & 0xff);
+					col_offs = ((pix + color*0x100) & 0xff) << 1;
+					col_offs+= ((pix + color*0x100) >> 8)*0x800;
+					color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
+
+					if(!(color_data & 0x8000))
+					if(cliprect.contains(x+xi, y+yi))
+						bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
+				}
+			}
+		}
+		else if(bpp_sel == 0x18) // RGB32k
+		{
+			// ...
+		}
+	}
+
+	return m_wram[count+0] & 0x80;
+}
+
+UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	//UINT16 *blit_buffer = m_blit_buffer;
+	int count;
+	UINT16 vram_bank = m_vram_bank & 0x7fff;
+	UINT8 end_mark;
 
 	bitmap.fill(machine().pens[0], cliprect); //black pen
 
 	vram_bank ^= 0x2000;
 
 	/* last 4 entries are special, skip them for now. */
-	for(count = vram_bank/2;count<(vram_bank+0x2000-0x40)/2;count+=0x10/2)
+	for(count = vram_bank/2;count<(vram_bank+0x1000)/2;count+=0x10/2)
 	{
-		if(!(m_wram[count+0] & 1))
-		{
-			x = (m_wram[count+3] >> 8) | ((m_wram[count+4] & 0x03) << 8);
-			y = (m_wram[count+4] >> 8) | ((m_wram[count+4] & 0x30) << 4);
-			height = (m_wram[count+5] >> 8);
-			width = (m_wram[count+5] & 0xff);
-			bpp_sel = (m_wram[count+0] & 0x18);
-			color = (m_wram[count+0] >> 8);
+		end_mark = draw_gfx(bitmap,cliprect,count);
 
-			x-=0x160;
-			y-=0x188;
-
-			//UINT32 col = 0xffffff;
-
-	//		UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
-
-			int xsource = ((m_wram[count+2] & 0x00ff) << 4) | ((m_wram[count+1] & 0xf000) >> 12);
-			int ysource = ((m_wram[count+2] & 0xf000) >> 12)| ((m_wram[count+3] & 0x00ff) << 4);
-
-			//printf("%08x  %04x %04x\n", val, m_wram[count+1],m_wram[count+2] );
-
-	//	UINT16 xsource = (m_wram[count+2] & 0x00ff << 4) | (m_wram[count+1] & 0xf000 >> 12);
-//			UINT16 ysource =  (m_wram[count+2] & 0xff00 >>8) | (m_wram[count+3] & 0x000f <<8);
-
-			//xsource<<=1;
-
-
-			xsource<<=1;
-			ysource <<=2;
-
-
-
-			if(bpp_sel == 0x00)  // 4bpp
-			{
-				for(int yi=0;yi<height;yi++)
-				{
-					for(int xi=0;xi<width/2;xi++)
-					{
-						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
-						UINT8 pix;
-						UINT32 col_offs;
-						UINT16 color_data;
-
-						pix = (data & 0x0f);
-						col_offs = ((pix + color*0x10) & 0xff) << 1;
-						col_offs+= ((pix + color*0x10) >> 8)*0x800;
-						color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
-
-						if(!(color_data & 0x8000))
-						if(cliprect.contains(x+(xi*2), y+yi))
-							bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
-
-						pix = (data & 0xf0)>>4;
-						col_offs = ((pix + color*0x10) & 0xff) << 1;
-						col_offs+= ((pix + color*0x10) >> 8)*0x800;
-						color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
-
-						if(!(color_data & 0x8000))
-						if(cliprect.contains(x+1+(xi*2), y+yi))
-							bitmap.pix16(y+yi, x+1+(xi*2)) = color_data & 0x7fff;
-					}
-				}
-			}
-			else if(bpp_sel == 0x08) // 6bpp
-			{
-				#if 0
-				for(int yi=0;yi<height;yi++)
-				{
-					for(int xi=0;xi<width;xi++)
-					{
-						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
-						UINT8 pix;
-						UINT32 col_offs;
-						UINT16 color_data;
-
-						pix = (data & 0x3f);
-
-						if(cliprect.contains(x+xi, y+yi))
-							bitmap.pix16(y+yi, x+xi) = pix + color*64;
-					}
-				}
-				#endif
-			}
-			else if(bpp_sel == 0x10) // 8bpp
-			{
-				for(int yi=0;yi<height;yi++)
-				{
-					for(int xi=0;xi<width;xi++)
-					{
-						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
-						UINT8 pix;
-						UINT32 col_offs;
-						UINT16 color_data;
-
-						pix = (data & 0xff);
-						col_offs = ((pix + color*0x100) & 0xff) << 1;
-						col_offs+= ((pix + color*0x100) >> 8)*0x800;
-						color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
-
-						if(!(color_data & 0x8000))
-						if(cliprect.contains(x+xi, y+yi))
-							bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
-					}
-				}
-			}
-			else if(bpp_sel == 0x18) // RGB32k
-			{
-				// ...
-			}
-		}
+		if(end_mark == 0x80)
+			break;
 	}
 
+	for(count = (vram_bank+0x1000)/2;count<(vram_bank+0x2000)/2;count+=0x10/2)
+	{
+		end_mark = draw_gfx(bitmap,cliprect,count);
+
+		if(end_mark == 0x80)
+			break;
+	}
 
 	return 0;
 }
@@ -416,23 +426,7 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 	gunpey_irq_check(4);
 }
 
-//flush_pal_data((dstx+x) & 0x7fe,(dsty+y) & 0x7ff);
 
-void gunpey_state::flush_pal_data(int x, int y)
-{
-	if(y < 512 && x < 512)
-	{
-		UINT8 *vram = memregion("vram")->base();
-		int val = (vram[y*0x800+x]) | (vram[y*0x800+x+1]<<8);
-		int r,g,b;
-
-		b = (val & 0x001f) >> 0;
-		g = (val & 0x03e0) >> 5;
-		r = (val & 0x7c00) >> 10;
-
-		palette_set_color(machine(), y*256+x/2, MAKE_RGB(pal5bit(r), pal5bit(g), pal5bit(b)));
-	}
-}
 
 WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
@@ -485,7 +479,6 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 			for (int x=0;x<xsize;x++)
 			{
 				vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
-				//flush_pal_data((dstx+x) & 0x7fe,(dsty+y) & 0x7ff);
 			}
 		}
 
