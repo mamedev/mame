@@ -240,7 +240,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 	UINT8 *vram = memregion("vram")->base();
 
 	// +0                    +1                    +2                    +3                    +4                    +5                    +6                    +7
-	// cccc cccc e--b b--- | xxxx ---- u--- ---- | yyyy yy-- --XX XXXX | nnnn nnnn ---Y YYYY | mmmm mmmm -MMM -NNN | hhhh hhhh wwww wwww | ---- ---- ---- ---- | ---- ---- ---- ---- | 
+	// cccc cccc e--b b--- | xxxx ---- u--- ---- | yyyy yy-- --XX XXXX | nnnn nnnn ---Y YYYY | mmmm mmmm -MMM -NNN | hhhh hhhh wwww wwww | ---- ---- oooo oooo | pppp pppp ---- ---- | 
 
 	// c = color palette
 	// e = END marker
@@ -256,7 +256,9 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 	// h = height
 	// w = width
 	// u = unknown, set on text, maybe 'solid' ?
-
+	// o = zoom width
+	// p = zoom height
+	const int debug = 0;
 
 	if(!(m_wram[count+0] & 1))
 	{
@@ -269,6 +271,9 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 
 		x-=0x160;
 		y-=0x188;
+
+		UINT8 zoomwidth  = (m_wram[count+6] & 0xff);
+		UINT8 zoomheight = (m_wram[count+7] >> 8);
 
 		//UINT32 col = 0xffffff;
 	//		UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
@@ -284,20 +289,35 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 		UINT8 testhack = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+0)&0x7ff))];
 		UINT8 testhack2 = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+1)&0x7ff))];
 
-		//if (m_wram[count+1] & 0x0080) // set on text 
-		//	color =  machine.rand()&0xf;
+		if (m_wram[count+1] & 0x0010) 
+			color =  machine.rand()&0xf;
 
 
 
 		
+		UINT16 unused;
+		if (debug) printf("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count+0], m_wram[count+1], m_wram[count+2], m_wram[count+3], m_wram[count+4], m_wram[count+5], m_wram[count+6], m_wram[count+7]);
+		
+		unused = m_wram[count+0]&~0xff98; if (unused) printf("unused bits set in word 0 - %04x\n", unused);
+		unused = m_wram[count+1]&~0xf080; if (unused) printf("unused bits set in word 1 - %04x\n", unused);
+		unused = m_wram[count+2]&~0xfc3f; if (unused) printf("unused bits set in word 2 - %04x\n", unused);
+		unused = m_wram[count+3]&~0xff1f; if (unused) printf("unused bits set in word 3 - %04x\n", unused);
+		unused = m_wram[count+4]&~0xff77; if (unused) printf("unused bits set in word 4 - %04x\n", unused);
+		unused = m_wram[count+5]&~0xffff; if (unused) printf("unused bits set in word 5 - %04x\n", unused);
+		unused = m_wram[count+6]&~0x00ff; if (unused) printf("unused bits set in word 6 - %04x\n", unused);
+		unused = m_wram[count+7]&~0xff00; if (unused) printf("unused bits set in word 7 - %04x\n", unused);
+	
+		if ((zoomwidth != width) || (zoomheight!= height))
+		{
+			printf("zoomed widths %02x %02x heights %02x %02x\n", width, zoomwidth, height, zoomheight);
+		}
 
-		printf("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count+0], m_wram[count+1], m_wram[count+2], m_wram[count+3], m_wram[count+4], m_wram[count+5], m_wram[count+6], m_wram[count+7]);
-		printf("unused %04x %04x %04x %04x %04x %04x %04x %04x\n\n", m_wram[count+0]&~0xff98, m_wram[count+1]&~0xf080, m_wram[count+2]&~0xfc3f, m_wram[count+3]&~0xff1f, m_wram[count+4]&~0xff77, m_wram[count+5]&~0xffff, m_wram[count+6]&~0x0000, m_wram[count+7]&~0x0000);
+
 
 		if ((testhack2 & 0x0f) == 0x08)
 			return m_wram[count+0] & 0x80;
 
-		printf("testhack1 %02x %02x\n", testhack, testhack2);
+		if (debug) printf("testhack1 %02x %02x\n", testhack, testhack2);
 
 		if(bpp_sel == 0x00)  // 4bpp
 		{
@@ -691,7 +711,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::gunpey_scanline)
 
 	if(scanline == 224)
 	{
-		printf("frame\n");
+		//printf("frame\n");
 		gunpey_irq_check(0x50);
 	}
 }
