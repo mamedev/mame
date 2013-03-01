@@ -216,12 +216,12 @@ public:
 	DECLARE_DRIVER_INIT(gunpey);
 	virtual void video_start();
 	virtual void palette_init();
-	UINT32 screen_update_gunpey(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update_gunpey(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
 	void gunpey_irq_check(UINT8 irq_type);
 	UINT16 m_vram_bank;
 
-	UINT16 main_vram[0x800][0x800];
+	//UINT16 main_vram[0x800][0x800];
 };
 
 
@@ -230,12 +230,13 @@ void gunpey_state::video_start()
 	m_blit_buffer = auto_alloc_array(machine(), UINT16, 512*512);
 }
 
-UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//UINT16 *blit_buffer = m_blit_buffer;
 	int x,y;
 	int count;
 	UINT16 vram_bank = m_vram_bank & 0x7fff;
+	UINT8 *vram = memregion("vram")->base();
 
 	bitmap.fill(machine().pens[0], cliprect); //black pen
 
@@ -251,10 +252,13 @@ UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_rgb32 &b
 			x-=0x100;
 			y-=0x100;
 
-			UINT32 col = 0xffffff;
+			//UINT32 col = 0xffffff;
 
 			UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
+
+#ifdef USE_FAKE_ROM
 			int letter = -1;
+
 /*
 -- TEST MODE --
 I/O TEST
@@ -305,20 +309,37 @@ SOUND TEST
 			if (val == 0x8080e03a) { letter = 'Y'; }
 			if (val == 0xa080e03a) { letter = 'Z'; }
 
-#ifndef USE_FAKE_ROM
-			letter = -1;
 #endif
+			int xsource = ((val & 0x000000ff) << 4) | ((val & 0xf0000000) >> 28);
+			int ysource = ((val & 0x0000f000) >> 10);
 
+
+
+#ifdef USE_FAKE_ROM
 			if (letter != -1)
 				drawgfx_opaque(bitmap,cliprect,machine().gfx[1],letter,1,0,0,x,y);
 			else
+#endif
 			{
 				for(int yi=0;yi<8;yi++)
 				{
-					for(int xi=0;xi<8;xi++)
+					for(int xi=0;xi<4;xi++)
 					{
-						if(cliprect.contains(x+xi, y+yi))
-							bitmap.pix32(y+yi, x+xi) = col;
+						UINT8 data = vram[((((ysource+yi)&0x7ff)*0x400) + ((xsource+xi)&0x3ff))];
+
+						UINT8 pix;
+						
+						pix = (data & 0x0f);
+
+						if(cliprect.contains(x+(xi*2), y+yi))
+							bitmap.pix16(y+yi, x+(xi*2)) = pix;
+				
+						pix = (data & 0xf0)>>4;
+
+						if(cliprect.contains(x+1+(xi*2), y+yi))
+							bitmap.pix16(y+yi, x+1+(xi*2)) = pix;
+
+
 					}
 				}
 			}
@@ -443,7 +464,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		{
 			for (int x=0;x<xsize;x++)
 			{
-				vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
+				vram[(((dsty+y)&0x7ff)*0x400)+((dstx+x)&0x3ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
 			}
 		}
 
@@ -654,10 +675,12 @@ static const gfx_layout fake_layout =
 // this isn't a real decode as such, but the graphic data is all stored in pages 2048 bytes wide at varying BPP levelsl, some (BG data) compressed with what is likely a lossy scheme
 // palette data is in here too, the blocks at the bottom right of all this?
 static GFXLAYOUT_RAW( gunpey, 2048, 1, 2048*8, 2048*8 )
+static GFXLAYOUT_RAW( gunpey1024, 1024, 1, 1024*8, 1024*8 )
+
 static GFXDECODE_START( gunpey )
 	GFXDECODE_ENTRY( "blit_data", 0, gunpey,     0x0000, 0x1 )
 	GFXDECODE_ENTRY( "fakerom", 0x18000, fake_layout,   0x0, 2  )
-	GFXDECODE_ENTRY( "vram", 0, gunpey,     0x0000, 0x1 )
+	GFXDECODE_ENTRY( "vram", 0, gunpey1024,     0x0000, 0x1 )
 
 GFXDECODE_END
 
@@ -706,7 +729,7 @@ ROM_START( gunpey )
 
 	ROM_REGION( 0x400000, "blit_data", 0 )
 	ROM_LOAD( "gp_rom3.025",  0x00000, 0x400000,  CRC(f2d1f9f0) SHA1(0d20301fd33892074508b9d127456eae80cc3a1c) )
-	ROM_REGION( 0x400000, "vram", ROMREGION_ERASEFF )
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x400000, "ymz", 0 )
 	ROM_LOAD( "gp_rom4.525",  0x000000, 0x400000, CRC(78dd1521) SHA1(91d2046c60e3db348f29f776def02e3ef889f2c1) ) // 11xxxxxxxxxxxxxxxxxxxx = 0xFF
