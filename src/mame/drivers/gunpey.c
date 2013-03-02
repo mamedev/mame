@@ -210,6 +210,7 @@ public:
 	DECLARE_WRITE8_MEMBER(gunpey_blitter_w);
 	DECLARE_WRITE8_MEMBER(gunpey_output_w);
 	DECLARE_WRITE16_MEMBER(gunpey_vram_bank_w);
+	DECLARE_WRITE16_MEMBER(gunpey_vregs_addr_w);
 	DECLARE_DRIVER_INIT(gunpey);
 	virtual void video_start();
 	virtual void palette_init();
@@ -217,9 +218,9 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
 	TIMER_CALLBACK_MEMBER(blitter_end);
 	void gunpey_irq_check(UINT8 irq_type);
-	UINT8 draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int count);
+	UINT8 draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int count,UINT8 scene_gradient);
 	UINT16 m_vram_bank;
-
+	UINT16 m_vreg_addr;
 
 	//UINT16 main_vram[0x800][0x800];
 };
@@ -230,7 +231,7 @@ void gunpey_state::video_start()
 	m_blit_buffer = auto_alloc_array(machine(), UINT16, 512*512);
 }
 
-UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int count)
+UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int count,UINT8 scene_gradient)
 {
 	int x,y;
 	int bpp_sel;
@@ -241,7 +242,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 	// do they get decompressed at blit time instead? of are there other registers we need to look at
 
 	// +0                    +1                    +2                    +3                    +4                    +5                    +6                    +7
-	// cccc cccc e--b b--- | xxxx x--- u--t tttt | yyyy yy-- --XX XXXX | nnnn nnnn ---Y YYYY | mmmm mmmm -MMM -NNN | hhhh hhhh wwww wwww | ---- ---- oooo oooo | pppp pppp ---- ---- | 
+	// cccc cccc e--b b--- | xxxx x--- u--t tttt | yyyy yy-- --XX XXXX | nnnn nnnn ---Y YYYY | mmmm mmmm -MMM -NNN | hhhh hhhh wwww wwww | ---- ---- oooo oooo | pppp pppp ---- ---- |
 
 	// c = color palette
 	// e = END marker
@@ -291,15 +292,15 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 //		UINT8 testhack = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+0)&0x7ff))];
 //		UINT8 testhack2 = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+1)&0x7ff))];
 
-		//if (m_wram[count+1] & 0x0010) 
+		//if (m_wram[count+1] & 0x0010)
 		//	color =  machine.rand()&0xf;
 
 
 
-		
+
 		UINT16 unused;
 		if (debug) printf("sprite %04x %04x %04x %04x %04x %04x %04x %04x\n", m_wram[count+0], m_wram[count+1], m_wram[count+2], m_wram[count+3], m_wram[count+4], m_wram[count+5], m_wram[count+6], m_wram[count+7]);
-		
+
 		unused = m_wram[count+0]&~0xff98; if (unused) printf("unused bits set in word 0 - %04x\n", unused);
 		unused = m_wram[count+1]&~0xf89f; if (unused) printf("unused bits set in word 1 - %04x\n", unused);
 		unused = m_wram[count+2]&~0xfc3f; if (unused) printf("unused bits set in word 2 - %04x\n", unused);
@@ -308,7 +309,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 		unused = m_wram[count+5]&~0xffff; if (unused) printf("unused bits set in word 5 - %04x\n", unused);
 		unused = m_wram[count+6]&~0x00ff; if (unused) printf("unused bits set in word 6 - %04x\n", unused);
 		unused = m_wram[count+7]&~0xff00; if (unused) printf("unused bits set in word 7 - %04x\n", unused);
-	
+
 		if ((zoomwidth != sourcewidth) || (zoomheight!= zoomheight))
 		{
 			//printf("zoomed widths %02x %02x heights %02x %02x\n", sourcewidth, zoomwidth, sourceheight, zoomheight);
@@ -338,8 +339,27 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 					color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
 
 					if(!(color_data & 0x8000))
+					{
+						if(scene_gradient & 0x40)
+						{
+							int r,g,b;
+
+							r = (color_data & 0x7c00) >> 10;
+							g = (color_data & 0x03e0) >> 5;
+							b = (color_data & 0x001f) >> 0;
+							r-= (scene_gradient & 0x1f);
+							g-= (scene_gradient & 0x1f);
+							b-= (scene_gradient & 0x1f);
+							if(r < 0) r = 0;
+							if(g < 0) g = 0;
+							if(b < 0) b = 0;
+
+							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
+						}
+
 						if(cliprect.contains(x+(xi*2), y+yi))
 							bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
+					}
 
 					pix = (data & 0xf0)>>4;
 					col_offs = ((pix + color*0x10) & 0xff) << 1;
@@ -347,8 +367,27 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 					color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
 
 					if(!(color_data & 0x8000))
+					{
+						if(scene_gradient & 0x40)
+						{
+							int r,g,b;
+
+							r = (color_data & 0x7c00) >> 10;
+							g = (color_data & 0x03e0) >> 5;
+							b = (color_data & 0x001f) >> 0;
+							r-= (scene_gradient & 0x1f);
+							g-= (scene_gradient & 0x1f);
+							b-= (scene_gradient & 0x1f);
+							if(r < 0) r = 0;
+							if(g < 0) g = 0;
+							if(b < 0) b = 0;
+
+							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
+						}
+
 						if(cliprect.contains(x+1+(xi*2), y+yi))
 							bitmap.pix16(y+yi, x+1+(xi*2)) = color_data & 0x7fff;
+					}
 				}
 			}
 		}
@@ -389,8 +428,27 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 					color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
 
 					if(!(color_data & 0x8000))
-					if(cliprect.contains(x+xi, y+yi))
-						bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
+					{
+						if(scene_gradient & 0x40)
+						{
+							int r,g,b;
+
+							r = (color_data & 0x7c00) >> 10;
+							g = (color_data & 0x03e0) >> 5;
+							b = (color_data & 0x001f) >> 0;
+							r-= (scene_gradient & 0x1f);
+							g-= (scene_gradient & 0x1f);
+							b-= (scene_gradient & 0x1f);
+							if(r < 0) r = 0;
+							if(g < 0) g = 0;
+							if(b < 0) b = 0;
+
+							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
+						}
+
+						if(cliprect.contains(x+xi, y+yi))
+							bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
+					}
 				}
 			}
 		}
@@ -407,26 +465,46 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 UINT32 gunpey_state::screen_update_gunpey(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	//UINT16 *blit_buffer = m_blit_buffer;
-	int count;
 	UINT16 vram_bank = m_vram_bank & 0x7fff;
+	UINT16 vreg_addr = m_vreg_addr & 0x7fff;
 	UINT8 end_mark;
+	int count;
+	int scene_index;
 
 	bitmap.fill(machine().pens[0], cliprect); //black pen
 
-	/* last 4 entries are special, skip them for now. */
-	for(count = vram_bank/2;count<(vram_bank+0x1000)/2;count+=0x10/2)
+	if((!(m_vreg_addr & 0x8000)) || (!(m_vram_bank & 0x8000)))
+		return 0;
+
+	for(scene_index = vreg_addr/2;scene_index<(vreg_addr+0x400)/2;scene_index+=0x10/2)
 	{
-		end_mark = draw_gfx(screen.machine(), bitmap,cliprect,count);
+		UINT16 start_offs;
+		UINT16 end_offs;
+		UINT8 scene_end_mark;
+		UINT8 scene_enabled;
+		UINT8 scene_gradient;
 
-		if(end_mark == 0x80)
-			break;
-	}
+		start_offs = (vram_bank+(m_wram[scene_index+5] << 8))/2;
+		end_offs = (vram_bank+(m_wram[scene_index+5] << 8)+0x1000)/2; //safety check
+		scene_end_mark = m_wram[scene_index+0] & 0x80;
+		scene_enabled = m_wram[scene_index+0] & 0x01;
+		scene_gradient = m_wram[scene_index+1] & 0xff;
 
-	for(count = (vram_bank+0x1000)/2;count<(vram_bank+0x2000)/2;count+=0x10/2)
-	{
-		end_mark = draw_gfx(screen.machine(), bitmap,cliprect,count);
+//		printf("%08x: %08x %08x %08x %08x | %08x %08x %08x %08x\n",scene_index,m_wram[scene_index+0],m_wram[scene_index+1],m_wram[scene_index+2],m_wram[scene_index+3],
+//		                                            m_wram[scene_index+4],m_wram[scene_index+5],m_wram[scene_index+6],m_wram[scene_index+7]);
 
-		if(end_mark == 0x80)
+		if(scene_enabled)
+		{
+			for(count = start_offs;count<end_offs;count+=0x10/2)
+			{
+				end_mark = draw_gfx(screen.machine(), bitmap,cliprect,count,scene_gradient);
+
+				if(end_mark == 0x80)
+					break;
+			}
+		}
+
+		if(scene_end_mark == 0x80)
 			break;
 	}
 
@@ -567,6 +645,11 @@ WRITE16_MEMBER(gunpey_state::gunpey_vram_bank_w)
 	COMBINE_DATA(&m_vram_bank);
 }
 
+WRITE16_MEMBER(gunpey_state::gunpey_vregs_addr_w)
+{
+	COMBINE_DATA(&m_vreg_addr);
+}
+
 /***************************************************************************************/
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, gunpey_state )
@@ -587,6 +670,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
 	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8(gunpey_status_r,  gunpey_status_w, 0xffff )
 	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8(gunpey_blitter_w, 0xffff )
 	//AM_RANGE(0x7FF0, 0x7FF1) AM_RAM
+	AM_RANGE(0x7fec, 0x7fed) AM_WRITE(gunpey_vregs_addr_w)
 	AM_RANGE(0x7fee, 0x7fef) AM_WRITE(gunpey_vram_bank_w)
 
 ADDRESS_MAP_END
@@ -785,14 +869,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 {
-//	UINT8 *rom = memregion("maincpu")->base();
-
-	/* patch SLOOOOW cycle checks ... */
-//	rom[0x848b5] = 0x7e;
-//  rom[0x848b6] = 0x03;
-//	rom[0x89657] = 0x75;
-//	rom[0x8e628] = 0x75;
-
+	// ...
 }
 
-GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Banpresto", "Gunpey",GAME_NOT_WORKING)
+GAME( 2000, gunpey, 0, gunpey, gunpey, gunpey_state, gunpey,    ROT0, "Banpresto", "Gunpey (Japan)",GAME_NOT_WORKING)
