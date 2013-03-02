@@ -652,23 +652,22 @@ UINT32 socrates_state::screen_update_socrates(screen_device &screen, bitmap_ind1
 
 WRITE8_MEMBER(socrates_state::socrates_sound_w)
 {
-	device_t *socr_snd = machine().device("soc_snd");
 	switch(offset)
 	{
 		case 0:
-		socrates_snd_reg0_w(socr_snd, data);
+		m_sound->reg0_w(data);
 		break;
 		case 1:
-		socrates_snd_reg1_w(socr_snd, data);
+		m_sound->reg1_w(data);
 		break;
 		case 2:
-		socrates_snd_reg2_w(socr_snd, data);
+		m_sound->reg2_w(data);
 		break;
 		case 3:
-		socrates_snd_reg3_w(socr_snd, data);
+		m_sound->reg3_w(data);
 		break;
 		case 4: case 5: case 6: case 7: default:
-		socrates_snd_reg4_w(socr_snd, data);
+		m_sound->reg4_w(data);
 		break;
 	}
 }
@@ -942,7 +941,7 @@ static MACHINE_CONFIG_START( socrates, socrates_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("soc_snd", SOCRATES, XTAL_21_4772MHz/(512+256)) // this is correct, as strange as it sounds.
+	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL_21_4772MHz/(512+256)) // this is correct, as strange as it sounds.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CARTSLOT_ADD("cart")
@@ -976,7 +975,7 @@ static MACHINE_CONFIG_START( socrates_pal, socrates_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("soc_snd", SOCRATES, XTAL_26_601712MHz/(512+256)) // TODO: verify divider for pal mode
+	MCFG_SOUND_ADD("soc_snd", SOCRATES_SOUND, XTAL_26_601712MHz/(512+256)) // TODO: verify divider for pal mode
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_CARTSLOT_ADD("cart")
@@ -997,7 +996,7 @@ static MACHINE_CONFIG_DERIVED( socrates_pal, socrates )
     MCFG_SCREEN_SIZE(264, 256) // technically the screen size is 256x228 but super painter abuses what I suspect is a hardware bug to display repeated pixels of the very last pixel beyond this horizontal space, well into hblank
     MCFG_SCREEN_VISIBLE_AREA(0, 263, 0, 256) // the last few rows are usually cut off by the screen bottom but are indeed displayed if you mess with v-hold
     MCFG_SCREEN_UPDATE_DRIVER(socrates_state, screen_update_socrates)
-    MCFG_SOUND_REPLACE("soc_snd", SOCRATES, XTAL_26_601712MHz/(512+256)) // this is correct, as strange as it sounds.
+    MCFG_SOUND_REPLACE("soc_snd", SOCRATES_SOUND, XTAL_26_601712MHz/(512+256)) // this is correct, as strange as it sounds.
     MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 */
