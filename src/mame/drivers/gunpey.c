@@ -565,7 +565,7 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 	gunpey_irq_check(4);
 }
 
-//#define SHOW_COMPRESSED_DATA_DEBUG
+#define SHOW_COMPRESSED_DATA_DEBUG
 
 WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
@@ -615,6 +615,82 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 
 		//int color = space.machine().rand()&0x1f;
 
+
+/* the two parts of the banpresto logo have compressed data looking like this for the white fill area
+ the first part of this sprite covers the first 256 pixels of the screen, the second part covers the
+ right-most 64 pixels.  the second part reaches real data sooner because it has to compress less blank
+ bytes due to only covering a 64-pixel span.
+
+ there is clearly a repeating pattern
+
+ (srcwidth) byte just determines how the compressed data is organized in ROM and is unrelated to the
+ decompression.
+
+ left part
+data: srcwide(11) 
+	  a8 68 cd 9a 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  ...
+
+02 08 00 8c|06 06 16 05|3f 00 00 01|10 00 ef 00
+data: srcwide(05)
+	  a8 68 cd 9a 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 69
+	  d3 a6 4d 9b 36 6d da b4 e9
+	  23 95 0a 19 a6 52 8d 0c 54
+	  ce 6a b9 ac 2a 6e 53 0c 55
+	  11 b0 55 a1 ca 2b 30 81 71
+	  15 b7 1b 65 2a ae e1 02 c2
+	  ca bb 7a 03 33 58 f9 d5 d6
+	  0c 51 7e 09 08 2e bf 2c 28
+	  bf 32 ac b8 69 d3 a6 95 85
+	  29 bf 7a 13 c3 cb af e6 66
+	  90 f2 ab ad b1 e5 57 4b f3
+	  58 f9 ad cb 54 4d 5a 44 5c
+	  c5 e0 80 cc 64 15 3f d0 b0
+	  e5 98 5a 50 45 da cb aa 52
+	  c8 25 e5 21 8b 55 4a 94 09
+	  4d 9b 36 6d da b4 69 d3 a6
+	  4d 9b 36 6d da b4 69 d3 a6
+	  4d 9b 36 6d da b4 69 d3 a6
+	  4d 9b 36 6d da b4 69 d3 a6
+	  4d 9b 36 6d da b4 69 d3 a6
+	  ....
+
+*/
 
 		if(rle)
 		{
