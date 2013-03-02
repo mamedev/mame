@@ -208,6 +208,8 @@ public:
 	DECLARE_READ8_MEMBER(gunpey_status_r);
 	DECLARE_READ8_MEMBER(gunpey_inputs_r);
 	DECLARE_WRITE8_MEMBER(gunpey_blitter_w);
+	DECLARE_WRITE8_MEMBER(gunpey_blitter_upper_w);
+	DECLARE_WRITE8_MEMBER(gunpey_blitter_upper2_w);
 	DECLARE_WRITE8_MEMBER(gunpey_output_w);
 	DECLARE_WRITE16_MEMBER(gunpey_vram_bank_w);
 	DECLARE_WRITE16_MEMBER(gunpey_vregs_addr_w);
@@ -563,6 +565,8 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 	gunpey_irq_check(4);
 }
 
+#define SHOW_COMPRESSED_DATA_DEBUG
+
 WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
 //	UINT16 *blit_buffer = m_blit_buffer;
@@ -608,18 +612,55 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		dstx<<=1;
 		xsize<<=1;
 
+
+		//int color = space.machine().rand()&0x1f;
+
+
 		if(rle)
 		{
 			if(rle == 8)
 			{
+
+				// compressed stream format:
+				//
+				// byte 0 = source width   (data is often stored in fairly narrow columns)
+
+#ifdef SHOW_COMPRESSED_DATA_DEBUG
+				printf("%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x\n"
+					,blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3]
+					,blit_ram[4],blit_ram[5],blit_ram[6],blit_ram[7]
+					,blit_ram[8],blit_ram[9],blit_ram[0xa],blit_ram[0xb]
+					,blit_ram[0xc],blit_ram[0xd],blit_ram[0xe],blit_ram[0xf]);
+				int count = 0;
+				printf("data: ");
+#endif
+
+				UINT8 sourcewide = blit_rom[(((srcy)&0x7ff)*0x800)+((srcx)&0x7ff)];
+
 				for (int y=0;y<ysize;y++)
 				{
 					for (int x=0;x<xsize;x++)
 					{
-						//blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
-						vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = 0;
+						UINT8 dat = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
+						
+						// test.. (it's correct)
+						if (x>sourcewide) dat = 0;
+						
+						vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = dat;
+
+						
+#ifdef SHOW_COMPRESSED_DATA_DEBUG
+						if (count<8)
+						{
+							count++;
+							printf("%02x", dat);
+						}
+#endif
 					}
 				}
+#ifdef SHOW_COMPRESSED_DATA_DEBUG
+				printf("\n");
+#endif
 			}
 			else
 				printf("unknown RLE mode %02x\n",rle);
@@ -639,14 +680,23 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 
 
 /*
-      printf("%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x|%02x %02x %02x %02x\n"
-      ,blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3]
-      ,blit_ram[4],blit_ram[5],blit_ram[6],blit_ram[7]
-      ,blit_ram[8],blit_ram[9],blit_ram[0xa],blit_ram[0xb]
-      ,blit_ram[0xc],blit_ram[0xd],blit_ram[0xe],blit_ram[0xf]);
+
 */
 	}
 }
+
+WRITE8_MEMBER(gunpey_state::gunpey_blitter_upper_w)
+{
+	//printf("gunpey_blitter_upper_w %02x %02x\n", offset, data);
+
+}
+
+WRITE8_MEMBER(gunpey_state::gunpey_blitter_upper2_w)
+{
+	//printf("gunpey_blitter_upper2_w %02x %02x\n", offset, data);
+
+}
+
 
 WRITE8_MEMBER(gunpey_state::gunpey_output_w)
 {
@@ -685,6 +735,9 @@ static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
 
 	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8(gunpey_status_r,  gunpey_status_w, 0xffff )
 	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8(gunpey_blitter_w, 0xffff )
+	AM_RANGE(0x7fe0, 0x7fe5) AM_WRITE8(gunpey_blitter_upper_w, 0xffff )
+	AM_RANGE(0x7ff0, 0x7ff5) AM_WRITE8(gunpey_blitter_upper2_w, 0xffff )
+
 	//AM_RANGE(0x7FF0, 0x7FF1) AM_RAM
 	AM_RANGE(0x7fec, 0x7fed) AM_WRITE(gunpey_vregs_addr_w)
 	AM_RANGE(0x7fee, 0x7fef) AM_WRITE(gunpey_vram_bank_w)
