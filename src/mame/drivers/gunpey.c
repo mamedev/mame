@@ -565,7 +565,7 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 	gunpey_irq_check(4);
 }
 
-#define SHOW_COMPRESSED_DATA_DEBUG
+//#define SHOW_COMPRESSED_DATA_DEBUG
 
 WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
@@ -644,22 +644,31 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 						UINT8 dat = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
 						
 						// test.. (it's correct)
-						if (x>sourcewide) dat = 0;
-						
-						vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = dat;
-
-						
-#ifdef SHOW_COMPRESSED_DATA_DEBUG
-						if (count<8)
+						if (x<=sourcewide)
 						{
-							count++;
-							printf("%02x", dat);
+						
+							vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = dat;
+
+							#ifdef SHOW_COMPRESSED_DATA_DEBUG
+							if (count<256)
+							{
+								
+								if (count==0) printf("srcwide(%02x) ", dat);
+								else printf("%02x ", dat);
+
+								count++;
+							}
+							#endif
 						}
-#endif
+						else
+						{
+							vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = 0xff;
+						}
+
 					}
 				}
 #ifdef SHOW_COMPRESSED_DATA_DEBUG
-				printf("\n");
+				printf("\n\n");
 #endif
 			}
 			else
