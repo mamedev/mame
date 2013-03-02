@@ -627,7 +627,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
  decompression.
 
  left part
-data: srcwide(11) 
+data: srcwide(11)
 	  a8 68 cd 9a 36 6d da b4 69
 	  d3 a6 4d 9b 36 6d da b4 69
 	  d3 a6 4d 9b 36 6d da b4 69
@@ -718,17 +718,17 @@ data: srcwide(05)
 					for (int x=0;x<xsize;x++)
 					{
 						UINT8 dat = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
-						
+
 						// test.. (it's correct)
 						if (x<=sourcewide)
 						{
-						
+
 							vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = dat;
 
 							#ifdef SHOW_COMPRESSED_DATA_DEBUG
 							if (count<256)
 							{
-								
+
 								if (count==0) printf("srcwide(%02x) ", dat);
 								else printf("%02x ", dat);
 
@@ -949,7 +949,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::gunpey_scanline)
 {
 	int scanline = param;
 
-	if(scanline == 224)
+	if(scanline == 240)
 	{
 		//printf("frame\n");
 		gunpey_irq_check(0x50);
