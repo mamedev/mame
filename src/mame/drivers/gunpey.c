@@ -616,81 +616,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		//int color = space.machine().rand()&0x1f;
 
 
-/* the two parts of the banpresto logo have compressed data looking like this for the white fill area
- the first part of this sprite covers the first 256 pixels of the screen, the second part covers the
- right-most 64 pixels.  the second part reaches real data sooner because it has to compress less blank
- bytes due to only covering a 64-pixel span.
 
- there is clearly a repeating pattern
-
- (srcwidth) byte just determines how the compressed data is organized in ROM and is unrelated to the
- decompression.
-
- left part
-data: srcwide(11)
-	  a8 68 cd 9a 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  ...
-
-02 08 00 8c|06 06 16 05|3f 00 00 01|10 00 ef 00
-data: srcwide(05)
-	  a8 68 cd 9a 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 69
-	  d3 a6 4d 9b 36 6d da b4 e9
-	  23 95 0a 19 a6 52 8d 0c 54
-	  ce 6a b9 ac 2a 6e 53 0c 55
-	  11 b0 55 a1 ca 2b 30 81 71
-	  15 b7 1b 65 2a ae e1 02 c2
-	  ca bb 7a 03 33 58 f9 d5 d6
-	  0c 51 7e 09 08 2e bf 2c 28
-	  bf 32 ac b8 69 d3 a6 95 85
-	  29 bf 7a 13 c3 cb af e6 66
-	  90 f2 ab ad b1 e5 57 4b f3
-	  58 f9 ad cb 54 4d 5a 44 5c
-	  c5 e0 80 cc 64 15 3f d0 b0
-	  e5 98 5a 50 45 da cb aa 52
-	  c8 25 e5 21 8b 55 4a 94 09
-	  4d 9b 36 6d da b4 69 d3 a6
-	  4d 9b 36 6d da b4 69 d3 a6
-	  4d 9b 36 6d da b4 69 d3 a6
-	  4d 9b 36 6d da b4 69 d3 a6
-	  4d 9b 36 6d da b4 69 d3 a6
-	  ....
-
-*/
 
 		if(rle)
 		{
@@ -709,54 +635,131 @@ data: srcwide(05)
 					,blit_ram[0xc],blit_ram[0xd],blit_ram[0xe],blit_ram[0xf]);
 				int count = 0;
 				printf("data: ");
+				const int show_bytes = 1;
+				int bitspacer = 0;
+				int bitspace = 10;
 #endif
+
+				
+				int dstxbase = dstx;
+				int dstwcount = 0;
+				int dstycount = 0;
+				int srcxbase = srcx;
+				int srcwcount = 0;
+				int srcycount = 0;
 
 				UINT8 sourcewide = blit_rom[(((srcy)&0x7ff)*0x800)+((srcx)&0x7ff)];
+				srcx++;srcwcount++; // we don't want to decode the width as part of the data stream..		
+				UINT8 lastdata = 0xff; // hack so we can bail when we appear to have run out of compressed data
+				bool out_of_data = false;
 
-				for (int y=0;y<ysize;y++)
+				for (;;)
 				{
-					for (int x=0;x<xsize;x++)
+					UINT8 data = blit_rom[(((srcy)&0x7ff)*0x800)+((srcx)&0x7ff)];
+					
+					// hack, really I imagine there is exactly enough compressed data to fill the dest bitmap area when decompressed, but to stop us
+					// overrunning into reading other data we terminate on a 0000, which doesn't seem likely to be compressed data.
+					if (data==0x00 && lastdata == 0x00)
+						out_of_data = true;
+
+					lastdata = data;
+
+					if (!out_of_data)
 					{
-						UINT8 dat = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
-
-						// test.. (it's correct)
-						if (x<=sourcewide)
-						{
-
-							vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = dat;
-
-							#ifdef SHOW_COMPRESSED_DATA_DEBUG
-							if (count<256)
+						#ifdef SHOW_COMPRESSED_DATA_DEBUG
+						if (count<256)
+						{					
+							if (show_bytes)
 							{
-
-								if (count==0) printf("srcwide(%02x) ", dat);
-								else printf("%02x ", dat);
-
-								count++;
+								printf("%02x ", data);
 							}
-							#endif
+							else
+							{
+								for (int z=0;z<8;z++)
+								{
+									printf("%d", (data>>(7-z))&1);
+									bitspacer++;
+									if (bitspacer == bitspace)
+									{
+										printf(" ");
+										bitspacer = 0;
+									}
+								}
+							}
+							count++;
 						}
-						else
-						{
-							vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = 0xff;
-						}
+						#endif
 
+						vram[(((dsty)&0x7ff)*0x800)+((dstx)&0x7ff)] = data;
+					}
+					else
+						vram[(((dsty)&0x7ff)*0x800)+((dstx)&0x7ff)] = 0x44;
+
+					// increase our source counter, taking note of the width of the compressed data in
+					// source (it differs from the destination width)
+					srcx++; srcwcount++;
+					if (srcwcount==sourcewide+1) // CHECK might not be +1
+					{
+						srcwcount = 0;
+						srcx = srcxbase;
+						srcy++; srcycount++;
+					}
+
+					// increase destination counter and check if we've filled our destination rectangle
+					dstx++; dstwcount++;
+					if (dstwcount==xsize)
+					{
+						dstwcount = 0;
+						dstx = dstxbase;
+						dsty++; dstycount++;
+						if (dstycount==ysize)
+						{
+							break;
+						}
 					}
 				}
+
 #ifdef SHOW_COMPRESSED_DATA_DEBUG
-				printf("\n\n");
+				printf("\n");
 #endif
+
 			}
 			else
 				printf("unknown RLE mode %02x\n",rle);
 		}
 		else
 		{
-			for (int y=0;y<ysize;y++)
+			int dstxbase = dstx;
+			int dstwcount = 0;
+			int dstycount = 0;
+			int srcxbase = srcx;
+			int srcwcount = 0;
+			int srcycount = 0;
+
+			for (;;)
 			{
-				for (int x=0;x<xsize;x++)
+				UINT8 data = blit_rom[(((srcy)&0x7ff)*0x800)+((srcx)&0x7ff)];
+				vram[(((dsty)&0x7ff)*0x800)+((dstx)&0x7ff)] = data;
+
+				srcx++; srcwcount++;
+				if (srcwcount==xsize)
 				{
-					vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
+					srcwcount = 0;
+					srcx = srcxbase;
+					srcy++; srcycount++;
+				}
+
+				// increase destination counter and check if we've filled our destination rectangle
+				dstx++; dstwcount++;
+				if (dstwcount==xsize)
+				{
+					dstwcount = 0;
+					dstx = dstxbase;
+					dsty++; dstycount++;
+					if (dstycount==ysize)
+					{
+						break;
+					}
 				}
 			}
 		}
