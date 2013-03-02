@@ -565,7 +565,7 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 	gunpey_irq_check(4);
 }
 
-#define SHOW_COMPRESSED_DATA_DEBUG
+//#define SHOW_COMPRESSED_DATA_DEBUG
 
 WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
