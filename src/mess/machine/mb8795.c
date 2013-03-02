@@ -79,11 +79,6 @@ void mb8795_device::recv_cb(UINT8 *buf, int len)
 	receive();
 }
 
-bool mb8795_device::mcast_chk(const UINT8 *buf, int len)
-{
-	return true;
-}
-
 READ8_MEMBER(mb8795_device::txstat_r)
 {
 	//  fprintf(stderr, "mb8795: txstat_r %02x (%08x)\n", txstat, space.device().safe_pc());

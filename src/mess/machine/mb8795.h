@@ -43,7 +43,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	virtual void recv_cb(UINT8 *buf, int len);
-	virtual bool mcast_chk(const UINT8* buf, int len);
 
 private:
 	enum { TIMER_TX, TIMER_RX };

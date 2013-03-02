@@ -19,7 +19,6 @@ public:
 
 	int send(UINT8 *buf, int len);
 	virtual void recv_cb(UINT8 *buf, int len);
-	virtual bool mcast_chk(const UINT8 *buf, int len);
 
 protected:
 	bool m_promisc;

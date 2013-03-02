@@ -163,7 +163,6 @@ public:
 	static void static_set_interface(device_t &device, const threecom3c505_interface &interface);
 
 	void recv_cb(UINT8 *buf, int len);
-	bool mcast_chk(const UINT8 *buf, int len);
 
 	// device register I/O
 	UINT8 read_port(offs_t offset);

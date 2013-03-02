@@ -26,12 +26,6 @@ void device_network_interface::recv_cb(UINT8 *buf, int len)
 {
 }
 
-bool device_network_interface::mcast_chk(const UINT8 *buf, int len)
-{
-	// reject multicast packets
-	return false;
-}
-
 void device_network_interface::set_promisc(bool promisc)
 {
 	m_promisc = promisc;

@@ -33,7 +33,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dp8390_cs );
 	DECLARE_WRITE_LINE_MEMBER( dp8390_reset );
 	void recv_cb(UINT8 *buf, int len);
-	bool mcast_chk(const UINT8* buf, int len);
 
 protected:
 	// device-level overrides

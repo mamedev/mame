@@ -855,6 +855,13 @@ int threecom3c505_device::ethernet_packet_is_for_me(const UINT8 mac_address[])
 			return 1;
 		}
 	}
+	for (i = 0; i + ETHERNET_ADDR_SIZE < sizeof(m_multicast_list); i += ETHERNET_ADDR_SIZE)
+	{
+		if (memcmp(mac_address, m_multicast_list + i, ETHERNET_ADDR_SIZE) == 0)
+		{
+			return 1;
+		}
+	}
 	return  0;
 }
 
@@ -894,19 +901,6 @@ void threecom3c505_device::recv_cb(UINT8 *data, int length)
 			do_receive_command();
 		}
 	}
-}
-
-bool threecom3c505_device::mcast_chk(const UINT8 *buf, int len) {
-	int i;
-	for (i = 0; i + ETHERNET_ADDR_SIZE < sizeof(m_multicast_list); i += ETHERNET_ADDR_SIZE)
-	{
-		if (memcmp(buf, m_multicast_list + i, ETHERNET_ADDR_SIZE) == 0)
-		{
-			LOG2(("threecom3c505_device::mcast_chk: true (len=%d)", len));
-			return true;
-		}
-	}
-	return  false;
 }
 
 void threecom3c505_device::write_command_port( UINT8 data)

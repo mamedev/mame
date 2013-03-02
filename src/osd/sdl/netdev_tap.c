@@ -81,7 +81,9 @@ int netdev_tap::recv_dev(UINT8 **buf)
 {
 	int len;
 	if(m_fd == -1) return 0;
-	len = read(m_fd, m_buf, sizeof(m_buf));
+	do {
+		len = read(m_fd, m_buf, sizeof(m_buf));
+	} while(!get_promisc() && memcmp(get_mac(), m_buf, 6));
 	*buf = m_buf;
 	return (len == -1)?0:len;
 }
