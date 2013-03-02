@@ -563,8 +563,6 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 	gunpey_irq_check(4);
 }
 
-
-
 WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
 //	UINT16 *blit_buffer = m_blit_buffer;
@@ -586,9 +584,8 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		int dsty = blit_ram[0x0a]+(blit_ram[0x0b]<<8);
 		int xsize = blit_ram[0x0c]+1;
 		int ysize = blit_ram[0x0e]+1;
+		int rle = blit_ram[0x01];
 //		int color,color_offs;
-
-//		printf("%04x %04x %04x %04x\n",srcx,srcy,dstx,dsty);
 
 /*
 	  printf("%02x %02x %02x %02x| (X SRC 4: %02x 5: %02x (val %04x))  (Y SRC 6: %02x 7: %02x (val %04x))  | (X DEST 8: %02x 9: %02x (val %04x))  (Y DEST a: %02x b: %02x (val %04x)) |  %02x %02x %02x %02x\n"
@@ -611,11 +608,30 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 		dstx<<=1;
 		xsize<<=1;
 
-		for (int y=0;y<ysize;y++)
+		if(rle)
 		{
-			for (int x=0;x<xsize;x++)
+			if(rle == 8)
 			{
-				vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
+				for (int y=0;y<ysize;y++)
+				{
+					for (int x=0;x<xsize;x++)
+					{
+						//blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
+						vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = 0;
+					}
+				}
+			}
+			else
+				printf("unknown RLE mode %02x\n",rle);
+		}
+		else
+		{
+			for (int y=0;y<ysize;y++)
+			{
+				for (int x=0;x<xsize;x++)
+				{
+					vram[(((dsty+y)&0x7ff)*0x800)+((dstx+x)&0x7ff)] = blit_rom[(((srcy+y)&0x7ff)*0x800)+((srcx+x)&0x7ff)];
+				}
 			}
 		}
 
@@ -856,6 +872,7 @@ ROM_START( gunpey )
 
 	ROM_REGION( 0x400000, "blit_data", 0 )
 	ROM_LOAD( "gp_rom3.025",  0x00000, 0x400000,  CRC(f2d1f9f0) SHA1(0d20301fd33892074508b9d127456eae80cc3a1c) )
+
 	ROM_REGION( 0x400000, "vram", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x400000, "ymz", 0 )
