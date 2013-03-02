@@ -7,8 +7,7 @@
  * - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
  * - tokyowar tanks are not shootable, same for timecris helicopter, there's still a very small hitbox but almost impossible to hit
  *       (is this related to dsp? or cpu?)
- * - find out how/where vics num_sprites is determined exactly, it causes major sprite problems in airco22b
- *       dirtdash would have this issue too, if not for the current workaround
+ * - find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
  * - improve ss22 fogging:
  *       + scene changes too rapidly sometimes, eg. dirtdash snow level finish (see attract), or aquajet going down the waterfall
  *       + 100% fog if you start dirtdash at the hill level
@@ -1622,7 +1621,7 @@ static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const r
 	}
 	if (machine.input().code_pressed(KEYCODE_S))
 		popmessage("%s",msg1);
-	else popmessage("[S] shows spite/vics regs");
+	else popmessage("[S] shows sprite/vics regs");
 #endif
 	/*
 	    0x980000:   00060000 00010000 02ff0000 000007ff
@@ -1647,11 +1646,11 @@ static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const r
 	*/
 
 	/* 'enable' bits function:
-	    bit 0:      affects spritecount by 1? (alpinr2b)
+	    bit 0:      sprites on?
 	    bit 1:      ??? (always set, except in alpinr2b. it's not x-resolution)
 	    bit 2:      y-resolution? (always set, except in cybrcycc)
 	    all bits set means off (aquajet) */
-	int enable = spriteram32[0]>>16&7;
+	int enable = spriteram32[0]>>16&5;
 
 	int y_lowres = (enable & 4) ? 0 : 1;
 
@@ -1659,10 +1658,9 @@ static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const r
 	int deltay = (spriteram32[3]>>16) + (0x2a >> y_lowres);
 
 	int base = spriteram32[0] & 0xffff; // alpinesa/alpinr2b
-	int num_sprites = (spriteram32[1]>>16) - base;
-	num_sprites += (~enable & 1);
+	int num_sprites = ((spriteram32[1]>>16) - base) + 1;
 
-	if( num_sprites > 0 && num_sprites < 0x400 && enable != 7 )
+	if( num_sprites > 0 && num_sprites < 0x400 && enable != 5 )
 	{
 		pSource = &spriteram32[0x04000/4 + base*4];
 		pPal    = &spriteram32[0x20000/4 + base*2];
@@ -1690,7 +1688,8 @@ static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const r
 	num_sprites = state->m_vics_control[0x40/4] >> 4 & 0x1ff; // no +1
 
 	// dirtdash sprite list starts at xxx4, number of sprites is stored in xxx0, it doesn't use set#2
-	if (state->m_gametype == NAMCOS22_DIRT_DASH) num_sprites = (state->m_vics_data[(state->m_vics_control[0x48/4]&0x4000)/4] & 0xff) + 1;
+	if (state->m_gametype == NAMCOS22_DIRT_DASH)
+		num_sprites = (state->m_vics_data[(state->m_vics_control[0x48/4]&0x4000)/4] & 0xff) + 1;
 
 	if( num_sprites > 0 )
 	{
@@ -1700,6 +1699,17 @@ static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const r
 	}
 
 	num_sprites = state->m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
+
+	// airco22b number of sprites for set#2 is stored in set#1 - it does not use set 1, or main set for sprites
+	if (state->m_gametype == NAMCOS22_AIR_COMBAT22)
+	{
+		enable = state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4]>>16&5;
+		if (enable != 5)
+			num_sprites = (state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4+1]>>16)+1;
+		else
+			num_sprites = 0;
+	}
+
 	if( num_sprites > 0 )
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x68/4]&0xffff)/4];

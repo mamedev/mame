@@ -5257,7 +5257,7 @@ WRITE16_MEMBER(namcos22_state::mcu_speedup_w)
 	COMBINE_DATA(&m_su_82);
 }
 
-// for MCU BIOS v1.30
+// for MCU BIOS v1.20/v1.30
 READ16_MEMBER(namcos22_state::mcu130_speedup_r)
 {
 	if ((space.device().safe_pc() == 0xc12a) && (!(m_su_82 & 0xff00)))
@@ -5289,7 +5289,7 @@ static void install_c74_speedup(running_machine &machine)
 static void install_130_speedup(running_machine &machine)
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	// install speedup cheat for 1.30 MCU BIOS
+	// install speedup cheat for 1.20/1.30 MCU BIOS
 	if (MCU_SPEEDUP)
 		state->m_mcu->space(AS_PROGRAM).install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22_state::mcu130_speedup_r),state), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),state));
 }
@@ -5363,6 +5363,7 @@ DRIVER_INIT_MEMBER(namcos22_state,airco22)
 	namcos22_init(machine(), NAMCOS22_AIR_COMBAT22);
 
 	// S22-BIOS ver1.20 namco all rights reserved 94/12/21
+	install_130_speedup(machine());
 }
 
 DRIVER_INIT_MEMBER(namcos22_state,propcycl)
@@ -5511,7 +5512,7 @@ GAME( 1996, victlapw,  0,        namcos22,  victlap,   namcos22_state, victlap, 
 /* Super System22 games */
 GAME( 1994, alpinerd, 0,         namcos22s, alpiner,   namcos22_state, alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.D)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, alpinerc, alpinerd,  namcos22s, alpiner,   namcos22_state, alpiner,  ROT0, "Namco", "Alpine Racer (Rev. AR2 Ver.C)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, airco22b, 0,         namcos22s, airco22,   namcos22_state, airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)" , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // boots but missing sprite clear DMA?
+GAME( 1995, airco22b, 0,         namcos22s, airco22,   namcos22_state, airco22,  ROT0, "Namco", "Air Combat 22 (Rev. ACS1 Ver.B, Japan)" , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // various problems
 GAME( 1995, cybrcycc, 0,         namcos22s, cybrcycc,  namcos22_state, cybrcyc,  ROT0, "Namco", "Cyber Cycles (Rev. CB2 Ver.C)"          , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/04/04
 GAME( 1995, dirtdash, 0,         namcos22s, dirtdash,  namcos22_state, dirtdash, ROT0, "Namco", "Dirt Dash (Rev. DT2)"                   , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
 GAME( 1995, timecris, 0,         timecris,  timecris,  namcos22_state, timecris, ROT0, "Namco", "Time Crisis (Rev. TS2 Ver.B)"           , GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
