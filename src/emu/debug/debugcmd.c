@@ -2378,10 +2378,14 @@ static void execute_dasm(running_machine &machine, int ref, int params, const ch
 
 static void execute_trace_internal(running_machine &machine, int ref, int params, const char *param[], int trace_over)
 {
-	const char *action = NULL, *filename = param[0];
+	const char *action = NULL;
 	device_t *cpu;
 	FILE *f = NULL;
 	const char *mode;
+	astring filename = param[0];
+
+	/* replace macros */
+	filename.replace("{game}", machine.basename());
 
 	/* validate parameters */
 	if (!debug_command_parameter_cpu(machine, (params > 1) ? param[1] : NULL, &cpu))
@@ -2402,7 +2406,7 @@ static void execute_trace_internal(running_machine &machine, int ref, int params
 		if ((filename[0] == '>') && (filename[1] == '>'))
 		{
 			mode = "a";
-			filename += 2;
+			filename = filename.substr(2);
 		}
 
 		f = fopen(filename, mode);
@@ -2416,7 +2420,7 @@ static void execute_trace_internal(running_machine &machine, int ref, int params
 	/* do it */
 	cpu->debug()->trace(f, trace_over, action);
 	if (f)
-		debug_console_printf(machine, "Tracing CPU '%s' to file %s\n", cpu->tag(), filename);
+		debug_console_printf(machine, "Tracing CPU '%s' to file %s\n", cpu->tag(), filename.cstr());
 	else
 		debug_console_printf(machine, "Stopped tracing on CPU '%s'\n", cpu->tag());
 }
