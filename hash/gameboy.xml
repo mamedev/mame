@@ -12312,7 +12312,7 @@
 		<info name="release" value="19980910"/>
 		<info name="alt_title" value="モータルコンバット&amp;モータルコンバットII"/>
 		<part name="cart" interface="gameboy_cart">
-			<feature name="slot" value="rom_mbc1" />
+			<feature name="slot" value="rom_mbc1col" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mortal kombat i &amp; ii (japan).bin" size="1048576" crc="b1a8dfd0" sha1="cf6ca53e1df526c73bab62743085257119865107" offset="000000" />
 			</dataarea>
