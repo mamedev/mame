@@ -303,7 +303,7 @@ MACHINE_START( snesst )
 
 /* This function assign a 'score' to data immediately after 'offset' to measure how valid they are
 as information block (to decide if the image is HiRom, LoRom, ExLoRom or ExHiRom) */
-/* Code from bsnes, courtesy of byuu - http://byuu.cinnamonpirate.com/ */
+/* Code from bsnes, courtesy of byuu - http://byuu.org/ , based on previous code by Cowering */
 static int snes_validate_infoblock( UINT8 *infoblock, UINT32 offset )
 {
 	int score = 0;

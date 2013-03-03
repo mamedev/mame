@@ -1422,6 +1422,15 @@ $(MESSOBJ)/nintendo.a:          \
 	$(MESS_MACHINE)/nes.o       \
 	$(MESS_DRIVERS)/nes.o       \
 	$(MESS_MACHINE)/snescart.o  \
+	$(MESS_MACHINE)/sns_slot.o  \
+	$(MESS_MACHINE)/sns_rom.o   \
+	$(MESS_MACHINE)/sns_rom21.o \
+	$(MESS_MACHINE)/sns_bsx.o   \
+	$(MESS_MACHINE)/sns_sdd1.o  \
+	$(MESS_MACHINE)/sns_sfx.o   \
+	$(MESS_MACHINE)/sns_spc7110.o \
+	$(MESS_MACHINE)/sns_sufami.o \
+	$(MESS_MACHINE)/sns_upd.o   \
 	$(MESS_DRIVERS)/snes.o      \
 	$(MESS_DRIVERS)/n64.o       \
 	$(MESS_AUDIO)/gb.o          \

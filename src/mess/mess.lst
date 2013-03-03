@@ -68,6 +68,8 @@ gbpocket  // Nintendo Game Boy Pocket Handheld
 gblight   // Nintendo Game Boy Light Handheld
 gbcolor   // Nintendo Game Boy Color Handheld
 gba       // Nintendo Game Boy Advance Handheld
+snesnew      // Nintendo Super Nintendo NTSC (test driver with slots)
+snespnew      // Nintendo Super Nintendo PAL (test driver with slots)
 snes      // Nintendo Super Nintendo NTSC
 snespal   // Nintendo Super Nintendo PAL
 snessfx   // Nintendo Super Nintendo NTSC w/SuperFX CPU
