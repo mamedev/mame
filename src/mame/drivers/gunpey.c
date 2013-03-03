@@ -791,7 +791,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_output_w)
 	//bit 0 is coin counter
 //	popmessage("%02x",data);
 
-	downcast<okim6295_device *>(m_oki)->set_bank_base(((data & 0x70)>>4) * 0x40000);
+	m_oki->set_bank_base(((data & 0x70)>>4) * 0x40000);
 }
 
 WRITE16_MEMBER(gunpey_state::gunpey_vram_bank_w)
