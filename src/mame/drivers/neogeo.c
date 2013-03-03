@@ -1303,6 +1303,12 @@ DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 		}
 
 
+		/*
+		    Resetting a sound device causes the core to update() it and generate samples if it's not up to date.
+		    Thus we preemptively reset it here while the old pointers are still valid so it's up to date and
+		    doesn't generate samples below when we reset it for the new pointers.
+		*/
+		ym->reset();
 		size = image.get_software_region_length("ymsnd");
 		machine().memory().region_free(":ymsnd");
 		machine().memory().region_alloc(":ymsnd",size,1, ENDIANNESS_LITTLE);
@@ -1316,7 +1322,7 @@ DEVICE_IMAGE_LOAD_MEMBER( neogeo_state, neo_cartridge )
 		}
 		else
 			machine().memory().region_free(":ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
-		ym->reset();
+		ym->reset();	// and this makes the new pointers take effect
 		size = image.get_software_region_length("sprites");
 		machine().memory().region_free(":sprites");
 		machine().memory().region_alloc(":sprites",size,1, ENDIANNESS_LITTLE);
