@@ -4686,6 +4686,30 @@ ROM_START( mooncmw )
 	ROM_LOAD( "prom-sn74s288n-71.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
 ROM_END
 
+
+ROM_START( starfgmc )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "sei-sf-a2.bin",      0x0000, 0x0800, CRC(322859e6) SHA1(292dccb66c38c8de837ec3ac10928d092494958e) )
+	ROM_LOAD( "sei-sf-a1.bin",      0x0800, 0x0800, CRC(7fed0654) SHA1(5a0336a5fd2f34eb901da6cf703221bc2d3f954e) )
+	ROM_LOAD( "sei-sf-b2.bin",      0x1000, 0x0800, CRC(935f7435) SHA1(433304c8c6f495c1098371770dca10e5ef5750c6) )
+	ROM_LOAD( "sei-sf-c1.bin",      0x1800, 0x0800, CRC(29d54869) SHA1(71e0862f24c26a5262c76140a258388b56a9af19) )
+	ROM_LOAD( "sei-sf-d1.bin",      0x2000, 0x0800, CRC(9126cca6) SHA1(ec8ae1d55010645cc4243a1bbf8343d10194136a) )
+	ROM_LOAD( "sei-sf-e2.bin",      0x2800, 0x0800, CRC(9d394261) SHA1(e1e6d09ad0c01588d8e4b4665a62264163f80a3d) )
+	ROM_LOAD( "sei-sf-f2.bin",      0x3000, 0x0800, CRC(94f161dd) SHA1(5e5e5a35e8a1478755b5569018ebf54c513d3c64) )
+	ROM_LOAD( "sei-sf-f1.bin",      0x3800, 0x0800, CRC(6ced7f80) SHA1(4710d6a35ac38642893f2ceb27799f5caf24aa3b) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) // check loading
+	ROM_LOAD( "sei-sf-jh2.bin",  0x0000, 0x0800, CRC(8edba3cd) SHA1(296cf08ee388d1aec7388a9789ab18db54c64118) )
+	ROM_LOAD( "sei-sf-jh3.bin",  0x0800, 0x0800, CRC(f5a871a9) SHA1(6afa971ffb15b7b97a6880db26a1f599d23f8655) )
+	ROM_LOAD( "sei-sf-lk2.bin",  0x1000, 0x0800, CRC(44b0f06a) SHA1(26cb43239e9150dc867b19d3b48b5a766778ca0a) )
+	ROM_LOAD( "sei-sf-lk3.bin",  0x1800, 0x0800, CRC(773b1ee6) SHA1(6d0ca6d0d01f408a2cb1ae40a4dab903eccea528) )
+
+
+	ROM_REGION( 0x0020, "proms", 0 ) // no prom included so using the regular one
+	ROM_LOAD( "prom-sn74s288n-71.6l", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) ) /* Compatible with 82s123 prom */
+ROM_END
+
+
 ROM_START( spcdrag )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "a.bin",      0x0000, 0x0800, CRC(38cc9839) SHA1(71c5853fc14a9c0b93e3b7660b925021680a0fe1) )
@@ -6611,6 +6635,7 @@ GAME( 1981?,spctbird, mooncrst, mooncrst, eagle2, galaxian_state,   mooncrsu, RO
 GAME( 1980?,smooncrs, mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "Nichibutsu (Gremlin license)", "Super Moon Cresta", GAME_SUPPORTS_SAVE )
 GAME( 1980?,sstarcrs, mooncrst, mooncrst, mooncrsg, galaxian_state, mooncrsu, ROT90,  "Nichibutsu (Taito do Brasil license)", "Super Star Crest", GAME_SUPPORTS_SAVE )
 GAME( 198?, mooncmw,  mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "bootleg", "Moon War (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 198?, starfgmc, mooncrst, mooncrst, mooncrsa, galaxian_state, mooncrsu, ROT90,  "bootleg (Samyra Engineering)", "Starfighter (Moon Cresta bootleg)", GAME_SUPPORTS_SAVE )
 // The boards were marked 'Space Dragon' although this doesn't appear in the games.
 GAME( 1980, spcdrag,  mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, spcdraga, mooncrst, mooncrst, smooncrs, galaxian_state, mooncrsu, ROT90,  "bootleg", "Space Dragon (Moon Cresta bootleg, set 2)", GAME_SUPPORTS_SAVE )
