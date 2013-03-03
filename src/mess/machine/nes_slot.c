@@ -1107,15 +1107,27 @@ bool nes_cart_slot_device::call_load()
 
 
 /*-------------------------------------------------
- call_unloadload
+ call_unload
  -------------------------------------------------*/
 
 void nes_cart_slot_device::call_unload()
 {
-	if (m_cart && m_cart->get_battery_size())
-		battery_save(m_cart->get_battery_base(), m_cart->get_battery_size());
-	if (m_cart && m_cart->get_mapper_bram_size())
-		battery_save(m_cart->get_mapper_bram_base(), m_cart->get_mapper_bram_size());
+	if (m_cart)
+	{
+		if (m_cart->get_battery_size() || m_cart->get_mapper_bram_size())
+		{
+			UINT32 tot_size = m_cart->get_battery_size() + m_cart->get_mapper_bram_size();
+			UINT8 *temp_nvram = auto_alloc_array(machine(), UINT8, tot_size);
+			if (m_cart->get_battery_size())
+				memcpy(temp_nvram, m_cart->get_battery_base(), m_cart->get_battery_size());
+			if (m_cart->get_mapper_bram_size())
+				memcpy(temp_nvram + m_cart->get_battery_size(), m_cart->get_mapper_bram_base(), m_cart->get_mapper_bram_size());
+			
+			battery_save(temp_nvram, tot_size);
+			if (temp_nvram)
+				auto_free(machine(), temp_nvram);
+		}
+	}
 }
 
 
