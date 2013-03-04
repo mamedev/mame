@@ -180,19 +180,30 @@ READ16_MEMBER( saturn_state::saturn_vdp1_regs_r )
 	return m_vdp1_regs[offset]; //TODO: write-only regs should return open bus or zero
 }
 
+/* TODO: TVM & 1 is just a kludgy work-around, the VDP1 actually needs to be rewritten from scratch. */
+/* Daisenryaku Strong Style (daisenss) uses it */
 void saturn_state::stv_clear_framebuffer( int which_framebuffer )
 {
 	int start_x, end_x, start_y, end_y;
 
-	start_x = STV_VDP1_EWLR_X1 * 8;
+	start_x = STV_VDP1_EWLR_X1 * ((STV_VDP1_TVM & 1) ? 16 : 8);
 	start_y = STV_VDP1_EWLR_Y1 * (m_vdp1.framebuffer_double_interlace+1);
-	end_x = STV_VDP1_EWRR_X3 * 8;
+	end_x = STV_VDP1_EWRR_X3 * ((STV_VDP1_TVM & 1) ? 16 : 8);
 	end_y = (STV_VDP1_EWRR_Y3+1) * (m_vdp1.framebuffer_double_interlace+1);
-//	popmessage("%d %d %d %d",STV_VDP1_EWLR_X1,STV_VDP1_EWLR_Y1,STV_VDP1_EWRR_X3,STV_VDP1_EWRR_Y3,m_vdp1.framebuffer_double_interlace);
+//	popmessage("%d %d %d %d %d",STV_VDP1_EWLR_X1,STV_VDP1_EWLR_Y1,STV_VDP1_EWRR_X3,STV_VDP1_EWRR_Y3,m_vdp1.framebuffer_double_interlace);
 
-	for(int y=start_y;y<end_y;y++)
-		for(int x=start_x;x<end_x;x++)
-			m_vdp1.framebuffer[ which_framebuffer ][(x+y*512)] = m_vdp1.ewdr;
+	if(STV_VDP1_TVM & 1)
+	{
+		for(int y=start_y;y<end_y;y++)
+			for(int x=start_x;x<end_x;x++)
+				m_vdp1.framebuffer[ which_framebuffer ][(x+y*1024)] = m_vdp1.ewdr;
+	}
+	else
+	{
+		for(int y=start_y;y<end_y;y++)
+			for(int x=start_x;x<end_x;x++)
+				m_vdp1.framebuffer[ which_framebuffer ][(x+y*512)] = m_vdp1.ewdr;
+	}
 
 	if ( VDP1_LOG ) logerror( "Clearing %d framebuffer\n", m_vdp1.framebuffer_current_draw );
 //	memset( m_vdp1.framebuffer[ which_framebuffer ], m_vdp1.ewdr, 1024 * 256 * sizeof(UINT16) * 2 );
