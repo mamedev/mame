@@ -2673,7 +2673,7 @@ static MACHINE_CONFIG_DERIVED( janjans1, ssv )
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0f)-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
 
