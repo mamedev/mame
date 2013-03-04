@@ -81,7 +81,11 @@ int netdev_tap::recv_dev(UINT8 **buf)
 {
 	int len;
 	if(m_fd == -1) return 0;
-	len = read(m_fd, m_buf, sizeof(m_buf));
+	// exit if we didn't receive anything, got an error, got a broadcast or multicast packet,
+	// are in promiscuous mode or got a packet with our mac.
+	do {
+		len = read(m_fd, m_buf, sizeof(m_buf));
+	} while((len > 0) && memcmp(get_mac(), m_buf, 6) && !get_promisc() && !(m_buf[0] & 1));
 	*buf = m_buf;
 	return (len == -1)?0:len;
 }
