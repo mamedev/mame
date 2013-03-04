@@ -4,7 +4,7 @@
 
 
  TODO:
- - colors (missing proms?)
+ - colors (missing proms)
  - dips
  - controls (is there START button ?)
  - when a car sprite goes outside of the screen it gets stuck for a split frame on top of screen
@@ -125,7 +125,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( ssrj )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8*4 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
 static const ay8910_interface ay8910_config =
