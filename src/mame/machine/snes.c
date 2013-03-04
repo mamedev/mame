@@ -445,7 +445,7 @@ READ8_HANDLER( snes_r_io )
 	// PPU accesses are from 2100 to 213f
 	if (offset >= INIDISP && offset < APU00)
 	{
-		return state->m_ppu.read(space, offset, snes_ram);
+		return state->m_ppu.read(space, offset, snes_ram[WRIO] & 0x80);
 	}
 
 	// APU is mirrored from 2140 to 217f
@@ -501,7 +501,7 @@ READ8_HANDLER( snes_r_io )
 			state->m_wram_address &= 0x1ffff;
 			return value;
 		case OLDJOY1:   /* Data for old NES controllers (JOYSER1) */
-			if (snes_ram[offset] & 0x1)
+			if (snes_ram[OLDJOY1] & 0x1)
 				return 0 | (snes_open_bus_r(space, 0) & 0xfc); //correct?
 
 			value = state->m_oldjoy1_read(space.machine());
@@ -515,8 +515,8 @@ READ8_HANDLER( snes_r_io )
 
 			return value | 0x1c | (snes_open_bus_r(space, 0) & 0xe0); //correct?
 		case RDNMI:         /* NMI flag by v-blank and version number */
-			value = (snes_ram[offset] & 0x80) | (snes_open_bus_r(space, 0) & 0x70);
-			snes_ram[offset] &= 0x70;   /* NMI flag is reset on read */
+			value = (snes_ram[RDNMI] & 0x80) | (snes_open_bus_r(space, 0) & 0x70);
+			snes_ram[RDNMI] &= 0x70;   /* NMI flag is reset on read */
 			return value | 2; //CPU version number
 		case TIMEUP:        /* IRQ flag by H/V count timer */
 			value = (snes_open_bus_r(space, 0) & 0x7f) | (snes_ram[TIMEUP] & 0x80);
@@ -525,9 +525,9 @@ READ8_HANDLER( snes_r_io )
 			return value;
 		case HVBJOY:        /* H/V blank and joypad controller enable */
 			// electronics test says hcounter 272 is start of hblank, which is beampos 363
-//          if (space.machine().primary_screen->hpos() >= 363) snes_ram[offset] |= 0x40;
-//              else snes_ram[offset] &= ~0x40;
-			return (snes_ram[offset] & 0xc1) | (snes_open_bus_r(space, 0) & 0x3e);
+//          if (space.machine().primary_screen->hpos() >= 363) snes_ram[HVBJOY] |= 0x40;
+//              else snes_ram[HVBJOY] &= ~0x40;
+			return (snes_ram[HVBJOY] & 0xc1) | (snes_open_bus_r(space, 0) & 0x3e);
 		case RDIO:          /* Programmable I/O port - echos back what's written to WRIO */
 			return snes_ram[WRIO];
 		case JOY1L:         /* Joypad 1 status register (low) */
@@ -606,7 +606,7 @@ WRITE8_HANDLER( snes_w_io )
 	// PPU accesses are from 2100 to 213f
 	if (offset >= INIDISP && offset < APU00)
 	{
-		state->m_ppu.write(space, offset, data, snes_ram);
+		state->m_ppu.write(space, offset, data);
 		return;
 	}
 
@@ -684,7 +684,7 @@ WRITE8_HANDLER( snes_w_io )
 			state->m_wram_address &= 0x1ffff;
 			return;
 		case OLDJOY1:   /* Old NES joystick support */
-			if (((!(data & 0x1)) && (snes_ram[offset] & 0x1)))
+			if (((!(data & 0x1)) && (snes_ram[OLDJOY1] & 0x1)))
 			{
 				state->m_read_idx[0] = 0;
 				state->m_read_idx[1] = 0;

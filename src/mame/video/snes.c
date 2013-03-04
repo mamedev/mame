@@ -117,6 +117,10 @@ enum
 	SNES_COLOR_DEPTH_8BPP
 };
 
+
+#define PPU_REG(a) m_regs[a - 0x2100]
+
+
 /*****************************************
  * get_bgcolor()
  *
@@ -1536,7 +1540,7 @@ void snes_ppu_class::refresh_scanline( running_machine &machine, bitmap_rgb32 &b
 		update_obsel();
 
 #if SNES_LAYER_DEBUG
-		if (dbg_video(machine, curline, snes_ram))
+		if (dbg_video(machine, curline))
 		{
 			g_profiler.stop();
 			return;
@@ -1960,7 +1964,7 @@ WRITE8_MEMBER( snes_ppu_class::vram_write )
  writing to the 'expected' address set by
  $2102,$2103.
 
- Notice that, since snes_ram[OAMDATA] is never
+ Notice that, since PPU_REG(OAMDATA) is never
  read/written directly, we use it as an index
  to choose the high/low byte of the snes_oam word.
 *************************************************/
@@ -1980,7 +1984,7 @@ READ8_MEMBER( snes_ppu_class::oam_read )
 			offset = 0x010c;
 	}
 
-	return (m_oam_ram[offset] >> (snes_ram[OAMDATA] << 3)) & 0xff;
+	return (m_oam_ram[offset] >> (PPU_REG(OAMDATA) << 3)) & 0xff;
 }
 
 WRITE8_MEMBER( snes_ppu_class::oam_write )
@@ -1998,7 +2002,7 @@ WRITE8_MEMBER( snes_ppu_class::oam_write )
 			offset = 0x010c;
 	}
 
-	if (!(snes_ram[OAMDATA]))
+	if (!(PPU_REG(OAMDATA)))
 		m_oam_ram[offset] = (m_oam_ram[offset] & 0xff00) | (data << 0);
 	else
 		m_oam_ram[offset] = (m_oam_ram[offset] & 0x00ff) | (data << 8);
@@ -2077,7 +2081,7 @@ WRITE8_MEMBER( snes_ppu_class::cgram_write )
 	((UINT8 *)m_cgram)[offset] = data;
 }
 
-UINT8 snes_ppu_class::read(address_space &space, UINT32 offset, UINT8 *ram_ptr)
+UINT8 snes_ppu_class::read(address_space &space, UINT32 offset, UINT8 wrio_bit7)
 {
 	UINT8 value;
 
@@ -2129,8 +2133,8 @@ UINT8 snes_ppu_class::read(address_space &space, UINT32 offset, UINT8 *ram_ptr)
 			return snes_open_bus_r(space, 0);       /* Return value is meaningless */
 		case ROAMDATA:  /* Read data from OAM (DR) */
 			m_ppu1_open_bus = oam_read(space, m_oam.address);
-			ram_ptr[OAMDATA] = (ram_ptr[OAMDATA] + 1) % 2;
-			if (!ram_ptr[OAMDATA])
+			PPU_REG(OAMDATA) = (PPU_REG(OAMDATA) + 1) % 2;
+			if (!PPU_REG(OAMDATA))
 			{
 				m_oam.address++;
 				m_oam.address &= 0x1ff;
@@ -2213,7 +2217,7 @@ UINT8 snes_ppu_class::read(address_space &space, UINT32 offset, UINT8 *ram_ptr)
 		case STAT78:    /* PPU status flag and version number */
 			m_read_ophct = 0;
 			m_read_opvct = 0;
-			if(ram_ptr[WRIO] & 0x80)
+			if (wrio_bit7)
 				m_stat78 &= ~0x40; //clear ext latch if bit 7 of WRIO is set
 			m_stat78 = (m_stat78 & ~0x2f) | (m_ppu2_open_bus & 0x20) | (m_ppu2_version & 0x0f);
 			m_ppu2_open_bus = m_stat78;
@@ -2225,7 +2229,7 @@ UINT8 snes_ppu_class::read(address_space &space, UINT32 offset, UINT8 *ram_ptr)
 }
 
 
-void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT8 *ram_ptr)
+void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data)
 {
 	switch (offset)
 	{
@@ -2248,35 +2252,35 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			m_oam.saved_address_low = data;
 			m_oam.address = (m_oam.address & 0xff00) + data;
 			m_oam.first_sprite = m_oam.priority_rotation ? (m_oam.address >> 1) & 127 : 0;
-			ram_ptr[OAMDATA] = 0;
+			PPU_REG(OAMDATA) = 0;
 			break;
 		case OAMADDH:   /* Address for accessing OAM (high) */
 			m_oam.saved_address_high = data;
 			m_oam.address = (m_oam.address & 0x00ff) | ((data & 0x01) << 8);
 			m_oam.priority_rotation = BIT(data, 7);
 			m_oam.first_sprite = m_oam.priority_rotation ? (m_oam.address >> 1) & 127 : 0;
-			ram_ptr[OAMDATA] = 0;
+			PPU_REG(OAMDATA) = 0;
 			break;
 		case OAMDATA:   /* Data for OAM write (DW) */
 			if (m_oam.address >= 0x100)
 				oam_write(space, m_oam.address, data);
 			else
 			{
-				if (!ram_ptr[OAMDATA])
+				if (!PPU_REG(OAMDATA))
 					m_oam.write_latch = data;
 				else
 				{
 					// in this case, we not only write data to the upper byte of the word,
 					// but also m_oam.write_latch to the lower byte (recall that
-					// ram_ptr[OAMDATA] is used to select high/low byte)
+					// PPU_REG(OAMDATA) is used to select high/low byte)
 					oam_write(space, m_oam.address, data);
-					ram_ptr[OAMDATA] = 0;
+					PPU_REG(OAMDATA) = 0;
 					oam_write(space, m_oam.address, m_oam.write_latch);
-					ram_ptr[OAMDATA] = 1;
+					PPU_REG(OAMDATA) = 1;
 				}
 			}
-			ram_ptr[OAMDATA] = (ram_ptr[OAMDATA] + 1) % 2;
-			if (!ram_ptr[OAMDATA])
+			PPU_REG(OAMDATA) = (PPU_REG(OAMDATA) + 1) % 2;
+			if (!PPU_REG(OAMDATA))
 			{
 				m_oam.address++;
 				m_oam.address &= 0x1ff;
@@ -2458,7 +2462,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			m_cgram_address = (m_cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
 			break;
 		case W12SEL:    /* Window mask settings for BG1-2 */
-			if (data != ram_ptr[W12SEL])
+			if (data != PPU_REG(W12SEL))
 			{
 				m_layer[SNES_BG1].window1_invert  = BIT(data, 0);
 				m_layer[SNES_BG1].window1_enabled = BIT(data, 1);
@@ -2472,7 +2476,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			}
 			break;
 		case W34SEL:    /* Window mask settings for BG3-4 */
-			if (data != ram_ptr[W34SEL])
+			if (data != PPU_REG(W34SEL))
 			{
 				m_layer[SNES_BG3].window1_invert  = BIT(data, 0);
 				m_layer[SNES_BG3].window1_enabled = BIT(data, 1);
@@ -2486,7 +2490,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			}
 			break;
 		case WOBJSEL:   /* Window mask settings for objects */
-			if (data != ram_ptr[WOBJSEL])
+			if (data != PPU_REG(WOBJSEL))
 			{
 				m_layer[SNES_OAM].window1_invert  = BIT(data, 0);
 				m_layer[SNES_OAM].window1_enabled = BIT(data, 1);
@@ -2500,35 +2504,35 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			}
 			break;
 		case WH0:       /* Window 1 left position */
-			if (data != ram_ptr[WH0])
+			if (data != PPU_REG(WH0))
 			{
 				m_window1_left = data;
 				m_update_windows = 1;
 			}
 			break;
 		case WH1:       /* Window 1 right position */
-			if (data != ram_ptr[WH1])
+			if (data != PPU_REG(WH1))
 			{
 				m_window1_right = data;
 				m_update_windows = 1;
 			}
 			break;
 		case WH2:       /* Window 2 left position */
-			if (data != ram_ptr[WH2])
+			if (data != PPU_REG(WH2))
 			{
 				m_window2_left = data;
 				m_update_windows = 1;
 			}
 			break;
 		case WH3:       /* Window 2 right position */
-			if (data != ram_ptr[WH3])
+			if (data != PPU_REG(WH3))
 			{
 				m_window2_right = data;
 				m_update_windows = 1;
 			}
 			break;
 		case WBGLOG:    /* Window mask logic for BG's */
-			if (data != ram_ptr[WBGLOG])
+			if (data != PPU_REG(WBGLOG))
 			{
 				m_layer[SNES_BG1].wlog_mask = data & 0x03;
 				m_layer[SNES_BG2].wlog_mask = (data & 0x0c) >> 2;
@@ -2538,7 +2542,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			}
 			break;
 		case WOBJLOG:   /* Window mask logic for objects */
-			if (data != ram_ptr[WOBJLOG])
+			if (data != PPU_REG(WOBJLOG))
 			{
 				m_layer[SNES_OAM].wlog_mask = data & 0x03;
 				m_layer[SNES_COLOR].wlog_mask = (data & 0x0c) >> 2;
@@ -2579,7 +2583,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			m_sub_add_mode = BIT(data, 1);
 			m_direct_color = BIT(data, 0);
 #ifdef SNES_DBG_REG_W
-			if ((data & 0x2) != (ram_ptr[CGWSEL] & 0x2))
+			if ((data & 0x2) != (PPU_REG(CGWSEL) & 0x2))
 				mame_printf_debug("Add/Sub Layer: %s\n", ((data & 0x2) >> 1) ? "Subscreen" : "Fixed colour");
 #endif
 			break;
@@ -2618,13 +2622,13 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			m_mode7.extbg = BIT(data, 6);
 			dynamic_res_change(space.machine());
 #ifdef SNES_DBG_REG_W
-			if ((data & 0x8) != (ram_ptr[SETINI] & 0x8))
+			if ((data & 0x8) != (PPU_REG(SETINI) & 0x8))
 				mame_printf_debug("Pseudo 512 mode: %s\n", (data & 0x8) ? "on" : "off");
 #endif
 			break;
 		}
 
-	ram_ptr[offset] = data;
+	PPU_REG(offset) = data;
 }
 
 /***** Debug Functions *****/
@@ -2643,7 +2647,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 		popmessage MSG2;                          \
 	}
 
-static UINT8 dbg_video( running_machine &machine, UINT16 curline, UINT8 *ram_ptr )
+static UINT8 dbg_video( running_machine &machine, UINT16 curline )
 {
 	int i;
 	UINT8 toggles = machine.root_device().ioport("DEBUG1")->read_safe(0);
@@ -2678,88 +2682,88 @@ static UINT8 dbg_video( running_machine &machine, UINT16 curline, UINT8 *ram_ptr
 		logerror("%s", debug_options.windows_disabled?" ":"W");
 		logerror("%s1 %s%s%s%s%s%c%s%s%d%s %d %4X %4X",
 				debug_options.bg_disabled[0]?" ":"*",
-				(ram_ptr[TM] & 0x1)?"M":" ",
-				(ram_ptr[TS] & 0x1)?"S":" ",
-				(ram_ptr[CGADSUB] & 0x1)?"B":" ",
-				(ram_ptr[TMW] & 0x1)?"m":" ",
-				(ram_ptr[TSW] & 0x1)?"s":" ",
-				WINLOGIC[(ram_ptr[WBGLOG] & 0x3)],
-				(ram_ptr[W12SEL] & 0x2)?((ram_ptr[W12SEL] & 0x1)?"o":"i"):" ",
-				(ram_ptr[W12SEL] & 0x8)?((ram_ptr[W12SEL] & 0x4)?"o":"i"):" ",
+				(PPU_REG(TM) & 0x1)?"M":" ",
+				(PPU_REG(TS) & 0x1)?"S":" ",
+				(PPU_REG(CGADSUB) & 0x1)?"B":" ",
+				(PPU_REG(TMW) & 0x1)?"m":" ",
+				(PPU_REG(TSW) & 0x1)?"s":" ",
+				WINLOGIC[(PPU_REG(WBGLOG) & 0x3)],
+				(PPU_REG(W12SEL) & 0x2)?((PPU_REG(W12SEL) & 0x1)?"o":"i"):" ",
+				(PPU_REG(W12SEL) & 0x8)?((PPU_REG(W12SEL) & 0x4)?"o":"i"):" ",
 				m_layer[SNES_BG1].tile_size + 1,
-				(ram_ptr[MOSAIC] & 0x1)?"m":" ",
-				ram_ptr[BG1SC] & 0x3,
-				(ram_ptr[BG1SC] & 0xfc) << 9,
+				(PPU_REG(MOSAIC) & 0x1)?"m":" ",
+				PPU_REG(BG1SC) & 0x3,
+				(PPU_REG(BG1SC) & 0xfc) << 9,
 				m_layer[SNES_BG1].charmap << 13);
 		logerror("%s2 %s%s%s%s%s%c%s%s%d%s %d %4X %4X",
 				debug_options.bg_disabled[1]?" ":"*",
-				(ram_ptr[TM] & 0x2)?"M":" ",
-				(ram_ptr[TS] & 0x2)?"S":" ",
-				(ram_ptr[CGADSUB] & 0x2)?"B":" ",
-				(ram_ptr[TMW] & 0x2)?"m":" ",
-				(ram_ptr[TSW] & 0x2)?"s":" ",
-				WINLOGIC[(ram_ptr[WBGLOG] & 0xc) >> 2],
-				(ram_ptr[W12SEL] & 0x20)?((ram_ptr[W12SEL] & 0x10)?"o":"i"):" ",
-				(ram_ptr[W12SEL] & 0x80)?((ram_ptr[W12SEL] & 0x40)?"o":"i"):" ",
+				(PPU_REG(TM) & 0x2)?"M":" ",
+				(PPU_REG(TS) & 0x2)?"S":" ",
+				(PPU_REG(CGADSUB) & 0x2)?"B":" ",
+				(PPU_REG(TMW) & 0x2)?"m":" ",
+				(PPU_REG(TSW) & 0x2)?"s":" ",
+				WINLOGIC[(PPU_REG(WBGLOG) & 0xc) >> 2],
+				(PPU_REG(W12SEL) & 0x20)?((PPU_REG(W12SEL) & 0x10)?"o":"i"):" ",
+				(PPU_REG(W12SEL) & 0x80)?((PPU_REG(W12SEL) & 0x40)?"o":"i"):" ",
 				m_layer[SNES_BG2].tile_size + 1,
-				(ram_ptr[MOSAIC] & 0x2)?"m":" ",
-				ram_ptr[BG2SC] & 0x3,
-				(ram_ptr[BG2SC] & 0xfc) << 9,
+				(PPU_REG(MOSAIC) & 0x2)?"m":" ",
+				PPU_REG(BG2SC) & 0x3,
+				(PPU_REG(BG2SC) & 0xfc) << 9,
 				m_layer[SNES_BG2].charmap << 13);
 		logerror("%s3 %s%s%s%s%s%c%s%s%d%s%s%d %4X %4X",
 				debug_options.bg_disabled[2]?" ":"*",
-				(ram_ptr[TM] & 0x4)?"M":" ",
-				(ram_ptr[TS] & 0x4)?"S":" ",
-				(ram_ptr[CGADSUB] & 0x4)?"B":" ",
-				(ram_ptr[TMW] & 0x4)?"m":" ",
-				(ram_ptr[TSW] & 0x4)?"s":" ",
-				WINLOGIC[(ram_ptr[WBGLOG] & 0x30)>>4],
-				(ram_ptr[W34SEL] & 0x2)?((ram_ptr[W34SEL] & 0x1)?"o":"i"):" ",
-				(ram_ptr[W34SEL] & 0x8)?((ram_ptr[W34SEL] & 0x4)?"o":"i"):" ",
+				(PPU_REG(TM) & 0x4)?"M":" ",
+				(PPU_REG(TS) & 0x4)?"S":" ",
+				(PPU_REG(CGADSUB) & 0x4)?"B":" ",
+				(PPU_REG(TMW) & 0x4)?"m":" ",
+				(PPU_REG(TSW) & 0x4)?"s":" ",
+				WINLOGIC[(PPU_REG(WBGLOG) & 0x30)>>4],
+				(PPU_REG(W34SEL) & 0x2)?((PPU_REG(W34SEL) & 0x1)?"o":"i"):" ",
+				(PPU_REG(W34SEL) & 0x8)?((PPU_REG(W34SEL) & 0x4)?"o":"i"):" ",
 				m_layer[SNES_BG3].tile_size + 1,
-				(ram_ptr[MOSAIC] & 0x4)?"m":" ",
-				(ram_ptr[BGMODE] & 0x8)?"P":" ",
-				ram_ptr[BG3SC] & 0x3,
-				(ram_ptr[BG3SC] & 0xfc) << 9,
+				(PPU_REG(MOSAIC) & 0x4)?"m":" ",
+				(PPU_REG(BGMODE) & 0x8)?"P":" ",
+				PPU_REG(BG3SC) & 0x3,
+				(PPU_REG(BG3SC) & 0xfc) << 9,
 				m_layer[SNES_BG3].charmap << 13);
 		logerror("%s4 %s%s%s%s%s%c%s%s%d%s %d %4X %4X",
 				debug_options.bg_disabled[3]?" ":"*",
-				(ram_ptr[TM] & 0x8)?"M":" ",
-				(ram_ptr[TS] & 0x8)?"S":" ",
-				(ram_ptr[CGADSUB] & 0x8)?"B":" ",
-				(ram_ptr[TMW] & 0x8)?"m":" ",
-				(ram_ptr[TSW] & 0x8)?"s":" ",
-				WINLOGIC[(ram_ptr[WBGLOG] & 0xc0)>>6],
-				(ram_ptr[W34SEL] & 0x20)?((ram_ptr[W34SEL] & 0x10)?"o":"i"):" ",
-				(ram_ptr[W34SEL] & 0x80)?((ram_ptr[W34SEL] & 0x40)?"o":"i"):" ",
+				(PPU_REG(TM) & 0x8)?"M":" ",
+				(PPU_REG(TS) & 0x8)?"S":" ",
+				(PPU_REG(CGADSUB) & 0x8)?"B":" ",
+				(PPU_REG(TMW) & 0x8)?"m":" ",
+				(PPU_REG(TSW) & 0x8)?"s":" ",
+				WINLOGIC[(PPU_REG(WBGLOG) & 0xc0)>>6],
+				(PPU_REG(W34SEL) & 0x20)?((PPU_REG(W34SEL) & 0x10)?"o":"i"):" ",
+				(PPU_REG(W34SEL) & 0x80)?((PPU_REG(W34SEL) & 0x40)?"o":"i"):" ",
 				m_layer[SNES_BG4].tile_size + 1,
-				(ram_ptr[MOSAIC] & 0x8)?"m":" ",
-				ram_ptr[BG4SC] & 0x3,
-				(ram_ptr[BG4SC] & 0xfc) << 9,
+				(PPU_REG(MOSAIC) & 0x8)?"m":" ",
+				PPU_REG(BG4SC) & 0x3,
+				(PPU_REG(BG4SC) & 0xfc) << 9,
 				m_layer[SNES_BG4].charmap << 13 );
 		logerror("%sO %s%s%s%s%s%c%s%s       %4X",
 				debug_options.bg_disabled[4]?" ":"*",
-				(ram_ptr[TM] & 0x10)?"M":" ",
-				(ram_ptr[TS] & 0x10)?"S":" ",
-				(ram_ptr[CGADSUB] & 0x10)?"B":" ",
-				(ram_ptr[TMW] & 0x10)?"m":" ",
-				(ram_ptr[TSW] & 0x10)?"s":" ",
-				WINLOGIC[(ram_ptr[WOBJLOG] & 0x3)],
-				(ram_ptr[WOBJSEL] & 0x2)?((ram_ptr[WOBJSEL] & 0x1)?"o":"i"):" ",
-				(ram_ptr[WOBJSEL] & 0x8)?((ram_ptr[WOBJSEL] & 0x4)?"o":"i"):" ",
+				(PPU_REG(TM) & 0x10)?"M":" ",
+				(PPU_REG(TS) & 0x10)?"S":" ",
+				(PPU_REG(CGADSUB) & 0x10)?"B":" ",
+				(PPU_REG(TMW) & 0x10)?"m":" ",
+				(PPU_REG(TSW) & 0x10)?"s":" ",
+				WINLOGIC[(PPU_REG(WOBJLOG) & 0x3)],
+				(PPU_REG(WOBJSEL) & 0x2)?((PPU_REG(WOBJSEL) & 0x1)?"o":"i"):" ",
+				(PPU_REG(WOBJSEL) & 0x8)?((PPU_REG(WOBJSEL) & 0x4)?"o":"i"):" ",
 				m_layer[SNES_OAM].charmap << 13 );
 		logerror("%sB   %s  %c%s%s",
 				debug_options.colormath_disabled?" ":"*",
-				(ram_ptr[CGADSUB] & 0x20)?"B":" ",
-				WINLOGIC[(ram_ptr[WOBJLOG] & 0xc)>>2],
-				(ram_ptr[WOBJSEL] & 0x20)?((ram_ptr[WOBJSEL] & 0x10)?"o":"i"):" ",
-				(ram_ptr[WOBJSEL] & 0x80)?((ram_ptr[WOBJSEL] & 0x40)?"o":"i"):" " );
+				(PPU_REG(CGADSUB) & 0x20)?"B":" ",
+				WINLOGIC[(PPU_REG(WOBJLOG) & 0xc)>>2],
+				(PPU_REG(WOBJSEL) & 0x20)?((PPU_REG(WOBJSEL) & 0x10)?"o":"i"):" ",
+				(PPU_REG(WOBJSEL) & 0x80)?((PPU_REG(WOBJSEL) & 0x40)?"o":"i"):" " );
 		logerror("1) %3d %3d   2) %3d %3d", (m_bgd_offset.horizontal[0] & 0x3ff) >> 3, (m_bgd_offset.vertical[0] & 0x3ff) >> 3, (m_bgd_offset.horizontal[1] & 0x3ff) >> 3, (m_bgd_offset.vertical[1] & 0x3ff) >> 3 );
 		logerror("3) %3d %3d   4) %3d %3d", (m_bgd_offset.horizontal[2] & 0x3ff) >> 3, (m_bgd_offset.vertical[2] & 0x3ff) >> 3, (m_bgd_offset.horizontal[3] & 0x3ff) >> 3, (m_bgd_offset.vertical[3] & 0x3ff) >> 3 );
-		logerror("Flags: %s%s%s %s %2d", (ram_ptr[CGWSEL] & 0x2)?"S":"F", (ram_ptr[CGADSUB] & 0x80)?"-":"+", (ram_ptr[CGADSUB] & 0x40)?" 50%":"100%",(ram_ptr[CGWSEL] & 0x1)?"D":"P", (ram_ptr[MOSAIC] & 0xf0) >> 4 );
-		logerror("SetINI: %s %s %s %s %s %s", (ram_ptr[SETINI] & 0x1)?" I":"NI", (ram_ptr[SETINI] & 0x2)?"P":"R", (ram_ptr[SETINI] & 0x4)?"240":"225",(ram_ptr[SETINI] & 0x8)?"512":"256",(ram_ptr[SETINI] & 0x40)?"E":"N",(ram_ptr[SETINI] & 0x80)?"ES":"NS" );
+		logerror("Flags: %s%s%s %s %2d", (PPU_REG(CGWSEL) & 0x2)?"S":"F", (PPU_REG(CGADSUB) & 0x80)?"-":"+", (PPU_REG(CGADSUB) & 0x40)?" 50%":"100%",(PPU_REG(CGWSEL) & 0x1)?"D":"P", (PPU_REG(MOSAIC) & 0xf0) >> 4 );
+		logerror("SetINI: %s %s %s %s %s %s", (PPU_REG(SETINI) & 0x1)?" I":"NI", (PPU_REG(SETINI) & 0x2)?"P":"R", (PPU_REG(SETINI) & 0x4)?"240":"225",(PPU_REG(SETINI) & 0x8)?"512":"256",(PPU_REG(SETINI) & 0x40)?"E":"N",(PPU_REG(SETINI) & 0x80)?"ES":"NS" );
 		logerror("Mode7: A %5d B %5d", m_mode7.matrix_a, m_mode7.matrix_b );
-		logerror(" %s%s%s   C %5d D %5d", (ram_ptr[M7SEL] & 0xc0)?((ram_ptr[M7SEL] & 0x40)?"0":"C"):"R", (ram_ptr[M7SEL] & 0x1)?"H":" ", (ram_ptr[M7SEL] & 0x2)?"V":" ", m_mode7.matrix_c, m_mode7.matrix_d );
+		logerror(" %s%s%s   C %5d D %5d", (PPU_REG(M7SEL) & 0xc0)?((PPU_REG(M7SEL) & 0x40)?"0":"C"):"R", (PPU_REG(M7SEL) & 0x1)?"H":" ", (PPU_REG(M7SEL) & 0x2)?"V":" ", m_mode7.matrix_c, m_mode7.matrix_d );
 		logerror("       X %5d Y %5d", m_mode7.origin_x, m_mode7.origin_y );
 	}
 #endif

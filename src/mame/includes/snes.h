@@ -383,6 +383,8 @@ struct SNES_SCANLINE
 class snes_ppu_class  /* once all the regs are saved in this structure, it would be better to reorganize it a bit... */
 {
 public:
+	UINT8 m_regs[0x40];
+
 	SNES_SCANLINE m_scanlines[2];
 	
 	struct
@@ -532,11 +534,11 @@ public:
 	void latch_counters(running_machine &machine);
 	void dynamic_res_change(running_machine &machine);
 	inline UINT32 get_vram_address(running_machine &machine);
-	UINT8 dbg_video(running_machine &machine, UINT16 curline, UINT8 *ram_ptr);
+	UINT8 dbg_video(running_machine &machine, UINT16 curline);
 
 	void ppu_start(running_machine &machine);
-	UINT8 read(address_space &space, UINT32 offset, UINT8 *ram_ptr);
-	void write(address_space &space, UINT32 offset, UINT8 data, UINT8 *ram_ptr);
+	UINT8 read(address_space &space, UINT32 offset, UINT8 wrio_bit7);
+	void write(address_space &space, UINT32 offset, UINT8 data);
 	
 	DECLARE_READ8_MEMBER( oam_read );
 	DECLARE_WRITE8_MEMBER( oam_write );
