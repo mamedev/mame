@@ -766,6 +766,13 @@ extern DECLARE_WRITE8_HANDLER( snes_w_bank7 );
 
 extern UINT8  *snes_ram;            /* Main memory */
 
+// add-on chips IO
+void srtc_write(running_machine &machine, UINT16 addr, UINT8 data);
+UINT8 srtc_read(address_space &space, UINT16 addr);
+extern DECLARE_READ8_HANDLER(obc1_read);
+extern DECLARE_WRITE8_HANDLER(obc1_write);
+UINT8 CX4_read(UINT32 addr);
+void CX4_write(running_machine &machine, UINT32 addr, UINT8 data);
 
 
 extern struct snes_cart_info snes_cart;

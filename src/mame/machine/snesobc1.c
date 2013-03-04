@@ -22,7 +22,7 @@ struct snes_obc1_state
 static snes_obc1_state obc1_state;
 
 
-static READ8_HANDLER( obc1_read )
+READ8_HANDLER( obc1_read )
 {
 	UINT16 address = offset & 0x1fff;
 	UINT8 value;
@@ -58,7 +58,7 @@ static READ8_HANDLER( obc1_read )
 }
 
 
-static WRITE8_HANDLER( obc1_write )
+WRITE8_HANDLER( obc1_write )
 {
 	UINT16 address = offset & 0x1fff;
 	UINT8 temp;

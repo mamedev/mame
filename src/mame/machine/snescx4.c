@@ -15,11 +15,9 @@
 
 static CX4 cx4;
 
-static UINT8 CX4_read(UINT32 addr);
 static UINT16 CX4_readw(UINT16 addr);
 static UINT32 CX4_readl(UINT16 addr);
 
-static void CX4_write(running_machine &machine, UINT32 addr, UINT8 data);
 static void CX4_writew(running_machine &machine, UINT16 addr, UINT16 data);
 //static void CX4_writel(running_machine &machine, UINT16 addr, UINT32 data);
 
@@ -118,7 +116,7 @@ static void CX4_transfer_data(running_machine &machine)
 #include "cx4oam.c"
 #include "cx4ops.c"
 
-static void CX4_write(running_machine &machine, UINT32 addr, UINT8 data)
+void CX4_write(running_machine &machine, UINT32 addr, UINT8 data)
 {
 	addr &= 0x1fff;
 
@@ -214,7 +212,7 @@ void CX4_writel(running_machine &machine, UINT16 addr, UINT32 data)
 }
 #endif
 
-static UINT8 CX4_read(UINT32 addr)
+UINT8 CX4_read(UINT32 addr)
 {
 	addr &= 0x1fff;
 
