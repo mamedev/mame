@@ -2652,7 +2652,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data)
 		popmessage MSG2;                          \
 	}
 
-static UINT8 dbg_video( running_machine &machine, UINT16 curline )
+UINT8 snes_ppu_class::dbg_video( running_machine &machine, UINT16 curline )
 {
 	int i;
 	UINT8 toggles = machine.root_device().ioport("DEBUG1")->read_safe(0);
