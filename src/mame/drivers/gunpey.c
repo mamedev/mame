@@ -224,7 +224,34 @@ public:
 	UINT16 m_vram_bank;
 	UINT16 m_vreg_addr;
 
-	//UINT16 main_vram[0x800][0x800];
+	UINT8* m_blit_rom;
+	UINT8* m_vram;
+
+	// work variables for the decompression
+	int m_srcx;
+	int m_srcxbase;
+	int m_scrxcount;
+	int m_srcy;
+	int m_srcycount;
+	UINT8 m_sourcewide;
+	int m_ysize;
+	int m_xsize;
+	int m_dstx;
+	int m_dsty;
+	int m_dstxbase;
+	int m_dstxcount;
+	int m_dstycount;
+
+	int m_latched_bits_left;
+	UINT8 m_latched_byte;
+	int m_zero_bit_count;
+
+	void get_stream_next_byte(void);
+	int get_steam_bit(void);
+	UINT32 gunpey_state_get_stream_bits(int bits);
+
+	int write_dest_byte(UINT8 usedata);
+	//UINT16 main_m_vram[0x800][0x800];
 };
 
 
@@ -238,7 +265,6 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 	int x,y;
 	int bpp_sel;
 	int color;
-	UINT8 *vram = memregion("vram")->base();
 
 	// there doesn't seem to be a specific bit to mark compressed sprites (we currently have a hack to look at the first byte of the data)
 	// do they get decompressed at blit time instead? of are there other registers we need to look at
@@ -291,8 +317,8 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 	//	xsource<<=1;
 	//	ysource <<=2;
 
-//		UINT8 testhack = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+0)&0x7ff))];
-//		UINT8 testhack2 = vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+1)&0x7ff))];
+//		UINT8 testhack = m_vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+0)&0x7ff))];
+//		UINT8 testhack2 = m_vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+1)&0x7ff))];
 
 		//if (m_wram[count+1] & 0x0010)
 		//	color =  machine.rand()&0xf;
@@ -330,7 +356,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 			{
 				for(int xi=0;xi<sourcewidth/2;xi++)
 				{
-					UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
+					UINT8 data = m_vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
 					UINT8 pix;
 					UINT32 col_offs;
 					UINT16 color_data;
@@ -338,7 +364,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 					pix = (data & 0x0f);
 					col_offs = ((pix + color*0x10) & 0xff) << 1;
 					col_offs+= ((pix + color*0x10) >> 8)*0x800;
-					color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
+					color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
 
 					if(!(color_data & 0x8000))
 					{
@@ -366,7 +392,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 					pix = (data & 0xf0)>>4;
 					col_offs = ((pix + color*0x10) & 0xff) << 1;
 					col_offs+= ((pix + color*0x10) >> 8)*0x800;
-					color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
+					color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
 
 					if(!(color_data & 0x8000))
 					{
@@ -401,7 +427,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 			{
 				for(int xi=0;xi<sourcewidth;xi++)
 				{
-					UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
+					UINT8 data = m_vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
 					UINT8 pix;
 					UINT32 col_offs;
 					UINT16 color_data;
@@ -419,7 +445,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 			{
 				for(int xi=0;xi<sourcewidth;xi++)
 				{
-					UINT8 data = vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
+					UINT8 data = m_vram[((((ysource+yi)&0x7ff)*0x800) + ((xsource+xi)&0x7ff))];
 					UINT8 pix;
 					UINT32 col_offs;
 					UINT16 color_data;
@@ -427,7 +453,7 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 					pix = (data & 0xff);
 					col_offs = ((pix + color*0x100) & 0xff) << 1;
 					col_offs+= ((pix + color*0x100) >> 8)*0x800;
-					color_data = (vram[col_offs])|(vram[col_offs+1]<<8);
+					color_data = (m_vram[col_offs])|(m_vram[col_offs+1]<<8);
 
 					if(!(color_data & 0x8000))
 					{
@@ -565,14 +591,84 @@ TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
 	gunpey_irq_check(4);
 }
 
+void gunpey_state::get_stream_next_byte(void)
+{
+	// check if we need to move on to the next row of the source bitmap
+	// to get the data requested
+	if (m_scrxcount==m_sourcewide)
+	{
+		m_scrxcount = 0;
+		m_srcx = m_srcxbase;
+		m_srcy++; m_srcycount++;
+	}
+
+	m_latched_byte = m_blit_rom[(((m_srcy)&0x7ff)*0x800)+((m_srcx)&0x7ff)];
+	m_latched_bits_left = 8;
+
+	// increase counters
+	m_srcx++; m_scrxcount++;
+}
+
+int gunpey_state::get_steam_bit(void)
+{
+	if (m_latched_bits_left==0)
+	{
+		get_stream_next_byte();
+	}
+
+	m_latched_bits_left--;
+
+	int bit = (m_latched_byte >> (7-m_latched_bits_left))&1;
+	
+	if (bit==0) m_zero_bit_count++;
+	else m_zero_bit_count=0;
+
+	return bit;
+}
+
+UINT32 gunpey_state::gunpey_state_get_stream_bits(int bits)
+{
+	UINT32 output = 0;
+	for (int i=0;i<bits;i++)
+	{
+		output = output<<1;
+		output |= get_steam_bit();
+	}
+
+	return output;
+}
+
+int gunpey_state::write_dest_byte(UINT8 usedata)
+{
+	// write the byte we and to destination and increase our counters
+	m_vram[(((m_dsty)&0x7ff)*0x800)+((m_dstx)&0x7ff)] = usedata;
+
+	// increase destination counter and check if we've filled our destination rectangle
+	m_dstx++; m_dstxcount++;
+	if (m_dstxcount==m_xsize)
+	{
+		m_dstxcount = 0;
+		m_dstx = m_dstxbase;
+		m_dsty++; m_dstycount++;
+		if (m_dstycount==m_ysize)
+		{
+			return -1;
+		}
+	}
+
+	return 1;
+}
+
+
 //#define SHOW_COMPRESSED_DATA_DEBUG
+
+
 
 WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
 //	UINT16 *blit_buffer = m_blit_buffer;
 	UINT16 *blit_ram = m_blit_ram;
-	UINT8 *blit_rom = memregion("blit_data")->base();
-	UINT8 *vram = memregion("vram")->base();
+
 
 	//	int x,y;
 
@@ -582,12 +678,12 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 
 	if(offset == 0 && data == 2) // blitter trigger, 0->1 transition
 	{
-		int srcx = blit_ram[0x04]+(blit_ram[0x05]<<8);
-		int srcy = blit_ram[0x06]+(blit_ram[0x07]<<8);
-		int dstx = blit_ram[0x08]+(blit_ram[0x09]<<8);
-		int dsty = blit_ram[0x0a]+(blit_ram[0x0b]<<8);
-		int xsize = blit_ram[0x0c]+1;
-		int ysize = blit_ram[0x0e]+1;
+		m_srcx = blit_ram[0x04]+(blit_ram[0x05]<<8);
+		m_srcy = blit_ram[0x06]+(blit_ram[0x07]<<8);
+		m_dstx = blit_ram[0x08]+(blit_ram[0x09]<<8);
+		m_dsty = blit_ram[0x0a]+(blit_ram[0x0b]<<8);
+		m_xsize = blit_ram[0x0c]+1;
+		m_ysize = blit_ram[0x0e]+1;
 		int rle = blit_ram[0x01];
 //		int color,color_offs;
 
@@ -596,21 +692,21 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 	   ,blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3]
 
 
-	   ,blit_ram[4],blit_ram[5], srcx
-	   ,blit_ram[6],blit_ram[7], srcy
+	   ,blit_ram[4],blit_ram[5], m_srcx
+	   ,blit_ram[6],blit_ram[7], m_srcy
 
-	   ,blit_ram[8],blit_ram[9], dstx
-	   ,blit_ram[0xa],blit_ram[0xb], dsty
+	   ,blit_ram[8],blit_ram[9], m_dstx
+	   ,blit_ram[0xa],blit_ram[0xb], m_dsty
        ,blit_ram[0xc],
 
 		   blit_ram[0xd],blit_ram[0xe],blit_ram[0xf]);
 */
-		//if (srcx & 0xf800) printf("(error srcx &0xf800)");
-		//if (srcy & 0xf800) printf("(error srcy &0xf800)");
+		//if (m_srcx & 0xf800) printf("(error m_srcx &0xf800)");
+		//if (m_srcy & 0xf800) printf("(error m_srcy &0xf800)");
 
 		// these are definitely needed for 4bpp..
-		dstx<<=1;
-		xsize<<=1;
+		m_dstx<<=1;
+		m_xsize<<=1;
 
 
 		//int color = space.machine().rand()&0x1f;
@@ -652,6 +748,7 @@ data: 000101010 001011011 010100010 110010110 110010110 110010110 110010110 1100
 
 */
 
+
 		if(rle)
 		{
 			if(rle == 8)
@@ -672,24 +769,29 @@ data: 000101010 001011011 010100010 110010110 110010110 110010110 110010110 1100
 				const int show_bytes = 0;
 				int bitspacer = 0;
 				int bitspace = 9;
+				int linespacer = 0;
 #endif
 
 				
-				int dstxbase = dstx;
-				int dstwcount = 0;
-				int dstycount = 0;
-				int srcxbase = srcx;
-				int srcwcount = 0;
-				int srcycount = 0;
+				m_dstxbase = m_dstx;
+				m_dstxcount = 0;
+				m_dstycount = 0;
+				m_srcxbase = m_srcx;
+				m_scrxcount = 0;
+				m_srcycount = 0;
 
-				UINT8 sourcewide = blit_rom[(((srcy)&0x7ff)*0x800)+((srcx)&0x7ff)];
-				srcx++;srcwcount++; // we don't want to decode the width as part of the data stream..		
-				UINT8 lastdata = 0xff; // hack so we can bail when we appear to have run out of compressed data
+				m_sourcewide = m_blit_rom[(((m_srcy)&0x7ff)*0x800)+((m_srcx)&0x7ff)]+1;
+				m_srcx++;m_scrxcount++; // we don't want to decode the width as part of the data stream..		
+				m_latched_bits_left = 0;
+				m_zero_bit_count = 0;
+
+				int lastdata = 0xff; // hack so we can bail when we appear to have run out of compressed data
 				bool out_of_data = false;
 
 				for (;;)
 				{
-					UINT8 data = blit_rom[(((srcy)&0x7ff)*0x800)+((srcx)&0x7ff)];
+					
+					int data = gunpey_state_get_stream_bits(8);
 					
 					// hack, really I imagine there is exactly enough compressed data to fill the dest bitmap area when decompressed, but to stop us
 					// overrunning into reading other data we terminate on a 0000, which doesn't seem likely to be compressed data.
@@ -698,25 +800,30 @@ data: 000101010 001011011 010100010 110010110 110010110 110010110 110010110 1100
 
 					lastdata = data;
 
+
+					UINT8 usedata = 0xff;
 					if (!out_of_data)
 					{
 						#ifdef SHOW_COMPRESSED_DATA_DEBUG
-						if (count<256)
-						{					
+						if (count<512)
+						{				
+							
+
 							if (show_bytes)
 							{
 								printf("%02x ", data);
 							}
 							else
 							{
-								//data = BITSWAP8(data,7,6,5,4,3,2,1,0);
-								data = BITSWAP8(data,0,1,2,3,4,5,6,7);
 								for (int z=0;z<8;z++)
 								{
 									printf("%d", (data>>(7-z))&1);
 									bitspacer++;
 									if (bitspacer == bitspace)
 									{
+										linespacer++;
+										if ((linespacer%16) == 0) printf("\n");
+										
 										printf(" ");
 										bitspacer = 0;
 									}
@@ -726,33 +833,14 @@ data: 000101010 001011011 010100010 110010110 110010110 110010110 110010110 1100
 						}
 						#endif
 
-						vram[(((dsty)&0x7ff)*0x800)+((dstx)&0x7ff)] = data;
+						usedata = data;
 					}
 					else
-						vram[(((dsty)&0x7ff)*0x800)+((dstx)&0x7ff)] = 0x44;
+						usedata = 0x44;
 
-					// increase our source counter, taking note of the width of the compressed data in
-					// source (it differs from the destination width)
-					srcx++; srcwcount++;
-					if (srcwcount==sourcewide+1)
-					{
-						srcwcount = 0;
-						srcx = srcxbase;
-						srcy++; srcycount++;
-					}
+					if ((write_dest_byte(usedata))==-1)
+						break;
 
-					// increase destination counter and check if we've filled our destination rectangle
-					dstx++; dstwcount++;
-					if (dstwcount==xsize)
-					{
-						dstwcount = 0;
-						dstx = dstxbase;
-						dsty++; dstycount++;
-						if (dstycount==ysize)
-						{
-							break;
-						}
-					}
 				}
 
 #ifdef SHOW_COMPRESSED_DATA_DEBUG
@@ -765,42 +853,31 @@ data: 000101010 001011011 010100010 110010110 110010110 110010110 110010110 1100
 		}
 		else
 		{
-			int dstxbase = dstx;
-			int dstwcount = 0;
-			int dstycount = 0;
-			int srcxbase = srcx;
-			int srcwcount = 0;
-			int srcycount = 0;
+			m_dstxbase = m_dstx;
+			m_dstxcount = 0;
+			m_dstycount = 0;
+			m_srcxbase = m_srcx;
+			m_scrxcount = 0;
+			m_srcycount = 0;
 
 			for (;;)
 			{
-				UINT8 data = blit_rom[(((srcy)&0x7ff)*0x800)+((srcx)&0x7ff)];
-				vram[(((dsty)&0x7ff)*0x800)+((dstx)&0x7ff)] = data;
+				UINT8 usedata = m_blit_rom[(((m_srcy)&0x7ff)*0x800)+((m_srcx)&0x7ff)];
 
-				srcx++; srcwcount++;
-				if (srcwcount==xsize)
+				m_srcx++; m_scrxcount++;
+				if (m_scrxcount==m_xsize)
 				{
-					srcwcount = 0;
-					srcx = srcxbase;
-					srcy++; srcycount++;
+					m_scrxcount = 0;
+					m_srcx = m_srcxbase;
+					m_srcy++; m_srcycount++;
 				}
 
-				// increase destination counter and check if we've filled our destination rectangle
-				dstx++; dstwcount++;
-				if (dstwcount==xsize)
-				{
-					dstwcount = 0;
-					dstx = dstxbase;
-					dsty++; dstycount++;
-					if (dstycount==ysize)
-					{
-						break;
-					}
-				}
+				if ((write_dest_byte(usedata))==-1)
+					break;
 			}
 		}
 
-		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(xsize*ysize), timer_expired_delegate(FUNC(gunpey_state::blitter_end),this));
+		machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(m_xsize*m_ysize), timer_expired_delegate(FUNC(gunpey_state::blitter_end),this));
 
 
 /*
@@ -1063,6 +1140,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 {
+
+	m_blit_rom = memregion("blit_data")->base();
+	m_vram = memregion("vram")->base();
 	// ...
 }
 
