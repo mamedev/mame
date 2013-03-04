@@ -95,6 +95,23 @@ void st010_write_ram(snes_state *state, UINT16 addr, UINT8 data)
 	state->m_upd96050->dataram_w(addr/2, temp);
 }
 
+
+VIDEO_START( snes )
+{
+	snes_state *state = machine.driver_data<snes_state>();
+	state->m_ppu.ppu_start(machine);
+}
+
+UINT32 snes_state::snes_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	/* NTSC SNES draw range is 1-225. */
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		m_ppu.refresh_scanline(machine(), bitmap, y + 1);
+
+	return 0;
+}
+
+
 /*************************************
 
     Timers
@@ -116,7 +133,7 @@ static void snes_hirq_tick( running_machine &machine )
 
 	// latch the counters and pull IRQ
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
-	state->m_ppu.snes_latch_counters(machine, snes_ram);
+	state->m_ppu.latch_counters(machine, snes_ram);
 	snes_ram[TIMEUP] = 0x80;    /* Indicate that irq occurred */
 	state->m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
 
@@ -172,7 +189,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 		{
 			snes_ram[TIMEUP] = 0x80;    /* Indicate that irq occurred */
 			// IRQ latches the counters, do it now
-			m_ppu.snes_latch_counters(machine(), snes_ram);
+			m_ppu.latch_counters(machine(), snes_ram);
 			m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE );
 		}
 	}
@@ -193,14 +210,14 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 
 		if (setirq)
 		{
-//          printf("HIRQ @ %d, %d\n", pixel * m_htmult, m_ppu.m_beam.current_vert);
+//          printf("HIRQ @ %d, %d\n", pixel * m_ppu.m_htmult, m_ppu.m_beam.current_vert);
 			if (pixel == 0)
 			{
 				snes_hirq_tick(machine());
 			}
 			else
 			{
-				m_hirq_timer->adjust(machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert, pixel * m_htmult));
+				m_hirq_timer->adjust(machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert, pixel * m_ppu.m_htmult));
 			}
 		}
 	}
@@ -220,7 +237,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 		}
 
 		/* three lines after start of vblank we update the controllers (value from snes9x) */
-		m_io_timer->adjust(machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert + 2, m_hblank_offset * m_htmult));
+		m_io_timer->adjust(machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert + 2, m_hblank_offset * m_ppu.m_htmult));
 	}
 
 	// hdma reset happens at scanline 0, H=~6
@@ -241,7 +258,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 	}
 
 	m_scanline_timer->adjust(attotime::never);
-	m_hblank_timer->adjust(machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert, m_hblank_offset * m_htmult));
+	m_hblank_timer->adjust(machine().primary_screen->time_until_pos(m_ppu.m_beam.current_vert, m_hblank_offset * m_ppu.m_htmult));
 
 //  printf("%02x %d\n",snes_ram[HVBJOY],m_ppu.m_beam.current_vert);
 }
@@ -428,7 +445,7 @@ READ8_HANDLER( snes_r_io )
 	// PPU accesses are from 2100 to 213f
 	if (offset >= INIDISP && offset < APU00)
 	{
-		return state->m_ppu.snes_ppu_read(space, offset, snes_ram);
+		return state->m_ppu.read(space, offset, snes_ram);
 	}
 
 	// APU is mirrored from 2140 to 217f
@@ -589,7 +606,7 @@ WRITE8_HANDLER( snes_w_io )
 	// PPU accesses are from 2100 to 213f
 	if (offset >= INIDISP && offset < APU00)
 	{
-		state->m_ppu.snes_ppu_write(space, offset, data, snes_ram);
+		state->m_ppu.write(space, offset, data, snes_ram);
 		return;
 	}
 
@@ -690,7 +707,7 @@ WRITE8_HANDLER( snes_w_io )
 			if (!(snes_ram[WRIO] & 0x80) && (data & 0x80))
 			{
 				// external latch
-				state->m_ppu.snes_latch_counters(space.machine(), snes_ram);
+				state->m_ppu.latch_counters(space.machine(), snes_ram);
 			}
 			break;
 		case HTIMEL:    /* H-Count timer settings (low)  */
@@ -1574,11 +1591,6 @@ static void snes_init_ram( running_machine &machine )
 	}
 
 	/* Inititialize registers/variables */
-	state->m_cgram_address = 0;
-	state->m_vram_read_offset = 2;
-	state->m_read_ophct = 0;
-	state->m_read_opvct = 0;
-
 	state->m_joy1l = state->m_joy1h = state->m_joy2l = state->m_joy2h = state->m_joy3l = state->m_joy3h = 0;
 	state->m_data1[0] = state->m_data2[0] = state->m_data1[1] = state->m_data2[1] = 0;
 
@@ -1678,7 +1690,6 @@ DIRECT_UPDATE_MEMBER(snes_state::snes_direct)
 MACHINE_START( snes )
 {
 	snes_state *state = machine.driver_data<snes_state>();
-	int i;
 
 	state->m_maincpu = machine.device<_5a22_device>("maincpu");
 	state->m_soundcpu = machine.device<spc700_device>("soundcpu");
@@ -1712,7 +1723,7 @@ MACHINE_START( snes )
 
 	snes_init_timers(machine);
 
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		state_save_register_item(machine, "snes_dma", NULL, i, state->m_dma_channel[i].dmap);
 		state_save_register_item(machine, "snes_dma", NULL, i, state->m_dma_channel[i].dest_addr);
@@ -1727,22 +1738,10 @@ MACHINE_START( snes )
 		state_save_register_item(machine, "snes_dma", NULL, i, state->m_dma_channel[i].dma_disabled);
 	}
 
-	state->save_item(NAME(state->m_htmult));
-	state->save_item(NAME(state->m_cgram_address));
-	state->save_item(NAME(state->m_vram_read_offset));
-	state->save_item(NAME(state->m_read_ophct));
-	state->save_item(NAME(state->m_read_opvct));
 	state->save_item(NAME(state->m_hblank_offset));
-	state->save_item(NAME(state->m_vram_fgr_high));
-	state->save_item(NAME(state->m_vram_fgr_increment));
-	state->save_item(NAME(state->m_vram_fgr_count));
-	state->save_item(NAME(state->m_vram_fgr_mask));
-	state->save_item(NAME(state->m_vram_fgr_shift));
-	state->save_item(NAME(state->m_vram_read_buffer));
 	state->save_item(NAME(state->m_wram_address));
 	state->save_item(NAME(state->m_htime));
 	state->save_item(NAME(state->m_vtime));
-	state->save_item(NAME(state->m_vmadd));
 	state->save_item(NAME(state->m_hdmaen));
 	state->save_item(NAME(state->m_joy1l));
 	state->save_item(NAME(state->m_joy1h));
@@ -1756,7 +1755,7 @@ MACHINE_START( snes )
 	state->save_item(NAME(state->m_data2));
 	state->save_item(NAME(state->m_read_idx));
 
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		state_save_register_item(machine, "snes_dma", NULL, i, state->m_joypad[i].buttons);
 		state_save_register_item(machine, "snes_dma", NULL, i, state->m_mouse[i].x);
@@ -1812,7 +1811,7 @@ MACHINE_RESET( snes )
 	state->m_htime = 0x1ff;
 	state->m_vtime = 0x1ff;
 
-	state->m_htmult = 1;
+	state->m_ppu.m_htmult = 1;
 	state->m_ppu.m_interlace = 1;
 	state->m_ppu.m_obj_interlace = 1;
 }

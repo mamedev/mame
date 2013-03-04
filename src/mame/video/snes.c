@@ -130,12 +130,12 @@ enum
 };
 
 /*****************************************
- * snes_get_bgcolor()
+ * get_bgcolor()
  *
  * Get the proper color (direct or from cgram)
  *****************************************/
 
-inline UINT16 snes_ppu_class::snes_get_bgcolor( UINT8 direct_colors, UINT16 palette, UINT8 color )
+inline UINT16 snes_ppu_class::get_bgcolor( UINT8 direct_colors, UINT16 palette, UINT8 color )
 {
 	UINT16 c = 0;
 
@@ -152,14 +152,14 @@ inline UINT16 snes_ppu_class::snes_get_bgcolor( UINT8 direct_colors, UINT16 pale
 }
 
 /*****************************************
- * snes_set_scanline_pixel()
+ * set_scanline_pixel()
  *
  * Store pixel color, priority, layer and
  * color math exception (for OAM) in the
  * proper scanline
  *****************************************/
 
-inline void snes_ppu_class::snes_set_scanline_pixel( int screen, INT16 x, UINT16 color, UINT8 priority, UINT8 layer, int blend )
+inline void snes_ppu_class::set_scanline_pixel( int screen, INT16 x, UINT16 color, UINT8 priority, UINT8 layer, int blend )
 {
 	scanlines[screen].buffer[x] = color;
 	scanlines[screen].priority[x] = priority;
@@ -178,9 +178,9 @@ inline void snes_ppu_class::snes_set_scanline_pixel( int screen, INT16 x, UINT16
  *************************************************************************************************/
 
 /*****************************************
- * snes_draw_bgtile_lores()
- * snes_draw_bgtile_hires()
- * snes_draw_oamtile_()
+ * draw_bgtile_lores()
+ * draw_bgtile_hires()
+ * draw_oamtile_()
  *
  * Check if a pixel is clipped or not, and
  * copy it to the scanline buffer when
@@ -190,7 +190,7 @@ inline void snes_ppu_class::snes_set_scanline_pixel( int screen, INT16 x, UINT16
  * or lores)
  *****************************************/
 
-inline void snes_ppu_class::snes_draw_bgtile_lores( UINT8 layer, INT16 ii, UINT8 colour, UINT16 pal, UINT8 direct_colors, UINT8 priority )
+inline void snes_ppu_class::draw_bgtile_lores( UINT8 layer, INT16 ii, UINT8 colour, UINT16 pal, UINT8 direct_colors, UINT8 priority )
 {
 	int screen;
 	UINT16 c;
@@ -216,15 +216,15 @@ inline void snes_ppu_class::snes_draw_bgtile_lores( UINT8 layer, INT16 ii, UINT8
 				/* Only draw if we have a colour (0 == transparent) */
 				if (clr)
 				{
-					c = snes_get_bgcolor(direct_colors, pal, clr);
-					snes_set_scanline_pixel(screen, ii, c, priority, layer, 0);
+					c = get_bgcolor(direct_colors, pal, clr);
+					set_scanline_pixel(screen, ii, c, priority, layer, 0);
 				}
 			}
 		}
 	}
 }
 
-inline void snes_ppu_class::snes_draw_bgtile_hires( UINT8 layer, INT16 ii, UINT8 colour, UINT16 pal, UINT8 direct_colors, UINT8 priority )
+inline void snes_ppu_class::draw_bgtile_hires( UINT8 layer, INT16 ii, UINT8 colour, UINT16 pal, UINT8 direct_colors, UINT8 priority )
 {
 	int screen;
 	UINT16 c;
@@ -251,15 +251,15 @@ inline void snes_ppu_class::snes_draw_bgtile_hires( UINT8 layer, INT16 ii, UINT8
 				/* Only draw if we have a colour (0 == transparent) */
 				if (clr)
 				{
-					c = snes_get_bgcolor(direct_colors, pal, clr);
-					snes_set_scanline_pixel(screen, ii >> 1, c, priority, layer, 0);
+					c = get_bgcolor(direct_colors, pal, clr);
+					set_scanline_pixel(screen, ii >> 1, c, priority, layer, 0);
 				}
 			}
 		}
 	}
 }
 
-inline void snes_ppu_class::snes_draw_oamtile( INT16 ii, UINT8 colour, UINT16 pal, UINT8 priority )
+inline void snes_ppu_class::draw_oamtile( INT16 ii, UINT8 colour, UINT16 pal, UINT8 priority )
 {
 	int screen;
 	int blend;
@@ -287,14 +287,14 @@ inline void snes_ppu_class::snes_draw_oamtile( INT16 ii, UINT8 colour, UINT16 pa
 			{
 				c = m_cgram[(pal + clr) % FIXED_COLOUR];
 				blend = (pal + clr < 192) ? 1 : 0;
-				snes_set_scanline_pixel(screen, pos, c, priority, SNES_OAM, blend);
+				set_scanline_pixel(screen, pos, c, priority, SNES_OAM, blend);
 			}
 		}
 	}
 }
 
 /*****************************************
- * snes_draw_tile()
+ * draw_tile()
  *
  * Draw 8 pixels from the expected tile
  * by reading the color planes from vram
@@ -302,7 +302,7 @@ inline void snes_ppu_class::snes_draw_oamtile( INT16 ii, UINT8 colour, UINT16 pa
  * (depending on layer and resolution)
  *****************************************/
 
-inline void snes_ppu_class::snes_draw_tile( UINT8 planes, UINT8 layer, UINT32 tileaddr, INT16 x, UINT8 priority, UINT8 flip, UINT8 direct_colors, UINT16 pal, UINT8 hires )
+inline void snes_ppu_class::draw_tile( UINT8 planes, UINT8 layer, UINT32 tileaddr, INT16 x, UINT8 priority, UINT8 flip, UINT8 direct_colors, UINT16 pal, UINT8 hires )
 {
 	UINT8 plane[8];
 	INT16 ii, jj;
@@ -336,28 +336,28 @@ inline void snes_ppu_class::snes_draw_tile( UINT8 planes, UINT8 layer, UINT32 ti
 		}
 
 		if (layer == SNES_OAM)
-			snes_draw_oamtile(ii, colour, pal, priority);
+			draw_oamtile(ii, colour, pal, priority);
 		else if (!hires)
 		{
 			if (mosaic)
 			{
 				for (x_mos = 0; x_mos < (m_mosaic_size + 1); x_mos++)
-					snes_draw_bgtile_lores(layer, ii + x_mos, colour, pal, direct_colors, priority);
+					draw_bgtile_lores(layer, ii + x_mos, colour, pal, direct_colors, priority);
 				ii += x_mos - 1;
 			}
 			else
-				snes_draw_bgtile_lores(layer, ii, colour, pal, direct_colors, priority);
+				draw_bgtile_lores(layer, ii, colour, pal, direct_colors, priority);
 		}
 		else /* hires */
 		{
 			if (mosaic)
 			{
 				for (x_mos = 0; x_mos < (m_mosaic_size + 1); x_mos++)
-					snes_draw_bgtile_hires(layer, ii + x_mos, colour, pal, direct_colors, priority);
+					draw_bgtile_hires(layer, ii + x_mos, colour, pal, direct_colors, priority);
 				ii += x_mos - 1;
 			}
 			else
-				snes_draw_bgtile_hires(layer, ii, colour, pal, direct_colors, priority);
+				draw_bgtile_hires(layer, ii, colour, pal, direct_colors, priority);
 		}
 	}
 }
@@ -368,7 +368,7 @@ inline void snes_ppu_class::snes_draw_tile( UINT8 planes, UINT8 layer, UINT32 ti
  * BG drawing theory of each scanline is quite easy: depending on the graphics Mode (0-7), there
  * are up to 4 background layers. Pixels for each BG layer can have two different priorities.
  * Depending on the line and on the BGHOFS and BGVOFS PPU registers, we first determine the tile
- * address in m_vram (by determining x,y coord and tile size and by calling snes_get_tmap_addr).
+ * address in m_vram (by determining x,y coord and tile size and by calling get_tmap_addr).
  * Then, we load the correspondent data and we determine the tile properties: which priority to
  * use, which palette etc. Finally, for each pixel of the tile appearing on screen, we check if
  * the tile priority is higher than the BG/OAM already stored in that pixel for that line. If so
@@ -380,12 +380,12 @@ inline void snes_ppu_class::snes_draw_tile( UINT8 planes, UINT8 layer, UINT32 ti
  *************************************************************************************************/
 
 /*********************************************
- * snes_get_tmap_addr()
+ * get_tmap_addr()
  *
  * Find the address in VRAM of the tile (x,y)
  *********************************************/
 
-inline UINT32 snes_ppu_class::snes_get_tmap_addr( UINT8 layer, UINT8 tile_size, UINT32 base, UINT32 x, UINT32 y )
+inline UINT32 snes_ppu_class::get_tmap_addr( UINT8 layer, UINT8 tile_size, UINT32 base, UINT32 x, UINT32 y )
 {
 	UINT32 res = base;
 	x  >>= (3 + tile_size);
@@ -403,12 +403,12 @@ inline UINT32 snes_ppu_class::snes_get_tmap_addr( UINT8 layer, UINT8 tile_size, 
 }
 
 /*********************************************
- * snes_update_line()
+ * update_line()
  *
  * Update an entire line of tiles.
  *********************************************/
 
-inline void snes_ppu_class::snes_update_line( UINT16 curline, UINT8 layer, UINT8 priority_b, UINT8 priority_a, UINT8 color_depth, UINT8 hires, UINT8 offset_per_tile, UINT8 direct_colors )
+inline void snes_ppu_class::update_line( UINT16 curline, UINT8 layer, UINT8 priority_b, UINT8 priority_a, UINT8 color_depth, UINT8 hires, UINT8 offset_per_tile, UINT8 direct_colors )
 {
 	UINT32 tmap, tile, xoff, yoff, charaddr, addr;
 	UINT16 ii = 0, vflip, hflip, pal, pal_direct, tilemap;
@@ -473,8 +473,8 @@ inline void snes_ppu_class::snes_update_line( UINT16 curline, UINT8 layer, UINT8
 				{
 				case SNES_OPT_MODE2:
 				case SNES_OPT_MODE6:
-					haddr = snes_get_tmap_addr(SNES_BG3, m_layer[SNES_BG3].tile_size, m_layer[SNES_BG3].tilemap << 9, (opt_x - 8) + ((m_layer[SNES_BG3].hoffs & 0x3ff) & ~7), (m_layer[SNES_BG3].voffs & 0x3ff));
-					vaddr = snes_get_tmap_addr(SNES_BG3, m_layer[SNES_BG3].tile_size, m_layer[SNES_BG3].tilemap << 9, (opt_x - 8) + ((m_layer[SNES_BG3].hoffs & 0x3ff) & ~7), (m_layer[SNES_BG3].voffs & 0x3ff) + 8);
+					haddr = get_tmap_addr(SNES_BG3, m_layer[SNES_BG3].tile_size, m_layer[SNES_BG3].tilemap << 9, (opt_x - 8) + ((m_layer[SNES_BG3].hoffs & 0x3ff) & ~7), (m_layer[SNES_BG3].voffs & 0x3ff));
+					vaddr = get_tmap_addr(SNES_BG3, m_layer[SNES_BG3].tile_size, m_layer[SNES_BG3].tilemap << 9, (opt_x - 8) + ((m_layer[SNES_BG3].hoffs & 0x3ff) & ~7), (m_layer[SNES_BG3].voffs & 0x3ff) + 8);
 					hval = m_vram[haddr % SNES_VRAM_SIZE] | (m_vram[(haddr + 1) % SNES_VRAM_SIZE] << 8);
 					vval = m_vram[vaddr % SNES_VRAM_SIZE] | (m_vram[(vaddr + 1) % SNES_VRAM_SIZE] << 8);
 					if (BIT(hval, opt_bit))
@@ -483,7 +483,7 @@ inline void snes_ppu_class::snes_update_line( UINT16 curline, UINT8 layer, UINT8
 						ypos = curline + vval;
 					break;
 				case SNES_OPT_MODE4:
-					haddr = snes_get_tmap_addr(SNES_BG3, m_layer[SNES_BG3].tile_size, m_layer[SNES_BG3].tilemap << 9, (opt_x - 8) + ((m_layer[SNES_BG3].hoffs & 0x3ff) & ~7), (m_layer[SNES_BG3].voffs & 0x3ff));
+					haddr = get_tmap_addr(SNES_BG3, m_layer[SNES_BG3].tile_size, m_layer[SNES_BG3].tilemap << 9, (opt_x - 8) + ((m_layer[SNES_BG3].hoffs & 0x3ff) & ~7), (m_layer[SNES_BG3].voffs & 0x3ff));
 					hval = m_vram[haddr % SNES_VRAM_SIZE] | (m_vram[(haddr + 1) % SNES_VRAM_SIZE] << 8);
 					if (BIT(hval, opt_bit))
 					{
@@ -497,7 +497,7 @@ inline void snes_ppu_class::snes_update_line( UINT16 curline, UINT8 layer, UINT8
 			}
 		}
 
-		addr = snes_get_tmap_addr(layer, tile_size, tmap, xpos, ypos);
+		addr = get_tmap_addr(layer, tile_size, tmap, xpos, ypos);
 
 		/*
 		Tilemap format
@@ -566,18 +566,18 @@ inline void snes_ppu_class::snes_update_line( UINT16 curline, UINT8 layer, UINT8
 		if (hires)
 		{
 			/* draw 16 pixels (the routine will automatically send half of them to the mainscreen scanline and half to the subscreen one) */
-			snes_draw_tile(color_planes, layer, charaddr + (((tile + 0)         & 0x3ff) * 8 * color_planes) + yscroll, (ii - xscroll) * 2,     priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
-			snes_draw_tile(color_planes, layer, charaddr + (((tile + tile_incr) & 0x3ff) * 8 * color_planes) + yscroll, (ii - xscroll) * 2 + 8, priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
+			draw_tile(color_planes, layer, charaddr + (((tile + 0)         & 0x3ff) * 8 * color_planes) + yscroll, (ii - xscroll) * 2,     priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
+			draw_tile(color_planes, layer, charaddr + (((tile + tile_incr) & 0x3ff) * 8 * color_planes) + yscroll, (ii - xscroll) * 2 + 8, priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
 			ii += 8;
 		}
 		else
 		{
-			snes_draw_tile(color_planes, layer, charaddr + ((tile & 0x3ff) * 8 * color_planes) + yscroll, ii - xscroll, priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
+			draw_tile(color_planes, layer, charaddr + ((tile & 0x3ff) * 8 * color_planes) + yscroll, ii - xscroll, priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
 			ii += 8;
 
 			if (tile_size)
 			{
-				snes_draw_tile(color_planes, layer, charaddr + (((tile + tile_incr) & 0x3ff) * 8 * color_planes) + yscroll, ii - xscroll, priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
+				draw_tile(color_planes, layer, charaddr + (((tile + tile_incr) & 0x3ff) * 8 * color_planes) + yscroll, ii - xscroll, priority, hflip, direct_colors, direct_colors ? pal_direct : pal, hires);
 				ii += 8;
 			}
 		}
@@ -586,14 +586,14 @@ inline void snes_ppu_class::snes_update_line( UINT16 curline, UINT8 layer, UINT8
 
 
 /*********************************************
- * snes_update_line_mode7()
+ * update_line_mode7()
  *
  * Update an entire line of mode7 tiles.
  *********************************************/
 
 #define MODE7_CLIP(x) (((x) & 0x2000) ? ((x) | ~0x03ff) : ((x) & 0x03ff))
 
-void snes_ppu_class::snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 priority_b, UINT8 priority_a )
+void snes_ppu_class::update_line_mode7( UINT16 curline, UINT8 layer, UINT8 priority_b, UINT8 priority_a )
 {
 	UINT32 tiled;
 	INT16 ma, mb, mc, md;
@@ -748,8 +748,8 @@ void snes_ppu_class::snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 
 					/* Direct select, but only outside EXTBG! */
 					// Direct color format is: 0 | BB000 | GGG00 | RRR00, HW confirms that the data is zero padded.
 					// In other words, like normal direct color, with pal = 0
-					c = snes_get_bgcolor(m_direct_color && layer == SNES_BG1, 0, clr);
-					snes_set_scanline_pixel(screen, xpos, c, priority, layer, 0);
+					c = get_bgcolor(m_direct_color && layer == SNES_BG1, 0, clr);
+					set_scanline_pixel(screen, xpos, c, priority, layer, 0);
 				}
 			}
 		}
@@ -761,11 +761,11 @@ void snes_ppu_class::snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 
  *
  * 1. First of all: sprites are drawn one line in advance. We emulate this by caching the
  * starting vram address, the sprite size and the "name select" at each line, and by using
- * them the next line to output the proper sprites - see snes_update_obsel.
+ * them the next line to output the proper sprites - see update_obsel.
  *
  * 2. Each line can select its sprites among 128 available ones in oam_ram, hence we start
  * by creating a list of the available objects (each one with its x,y coordinate, its size,
- * its tile address, etc.) - see snes_oam_list_build.
+ * its tile address, etc.) - see oam_list_build.
  *
  * 3. Next, we start finding out which sprites will appear in the line: starting from
  * FirstSprite, we count 32 OBJs which intersect our line and we store their indexes in the
@@ -778,7 +778,7 @@ void snes_ppu_class::snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 
  * item which intersects the scanline), towards oam_itemlist[0], i.e. the higher tiles (say
  * oam_tilelist[34], or the last tile which appear on screen) will contain FirstSprite object,
  * or the sprites with closer index to FirstSprite which get displayed. This will play an
- * important role for sprite priority - see snes_update_objects_rto.
+ * important role for sprite priority - see update_objects_rto.
  *
  * 4. All the above happens at the beginning of each VIDEO_UPDATE. When we finally draw the
  * scanline, we pass through the oam_tilelist and we store the displayed pixels in our scanline
@@ -789,7 +789,7 @@ void snes_ppu_class::snes_update_line_mode7( UINT16 curline, UINT8 layer, UINT8 
  * priorities are (differently from what we did with BGs): in the end, we will have in each pixel z
  * its topmost sprite and scanline.priority[z] will be the topmost sprite priority as expected.
  * Of course, sprite drawing must happen before BG drawing, so that afterwords BG pixels properly
- * test their priority with the one of the correct sprite - see snes_update_objects.
+ * test their priority with the one of the correct sprite - see update_objects.
  *************************************************************************************************/
 
 struct OAM
@@ -813,12 +813,12 @@ struct TILELIST {
 static struct TILELIST oam_tilelist[34];
 
 /*********************************************
- * snes_update_obsel()
+ * update_obsel()
  *
  * Update sprite settings for next line.
  *********************************************/
 
-void snes_ppu_class::snes_update_obsel( void )
+void snes_ppu_class::update_obsel( void )
 {
 	m_layer[SNES_OAM].charmap = m_oam.next_charmap;
 	m_oam.name_select = m_oam.next_name_select;
@@ -831,12 +831,12 @@ void snes_ppu_class::snes_update_obsel( void )
 }
 
 /*********************************************
- * snes_oam_list_build()
+ * oam_list_build()
  *
  * Build a list of the available obj in OAM ram.
  *********************************************/
 
-void snes_ppu_class::snes_oam_list_build( void )
+void snes_ppu_class::oam_list_build( void )
 {
 	UINT8 *oamram = (UINT8 *)m_oam_ram;
 	INT16 oam = 0x1ff;
@@ -942,13 +942,13 @@ int snes_ppu_class::is_sprite_on_scanline( UINT16 curline, UINT8 sprite )
 }
 
 /*********************************************
- * snes_update_objects_rto()
+ * update_objects_rto()
  *
  * Determine which OBJs will be drawn on this
  * scanline.
  *********************************************/
 
-void snes_ppu_class::snes_update_objects_rto( UINT16 curline )
+void snes_ppu_class::update_objects_rto( UINT16 curline )
 {
 	int ii, jj, active_sprite;
 	UINT8 range_over, time_over;
@@ -959,7 +959,7 @@ void snes_ppu_class::snes_update_objects_rto( UINT16 curline )
 	INT16 x, y;
 	UINT32 name_sel = 0;
 
-	snes_oam_list_build();
+	oam_list_build();
 
 	/* initialize counters */
 	range_over = 0;
@@ -1057,12 +1057,12 @@ void snes_ppu_class::snes_update_objects_rto( UINT16 curline )
 }
 
 /*********************************************
- * snes_update_objects()
+ * update_objects()
  *
  * Update an entire line of sprites.
  *********************************************/
 
-void snes_ppu_class::snes_update_objects( UINT8 priority_oam0, UINT8 priority_oam1, UINT8 priority_oam2, UINT8 priority_oam3 )
+void snes_ppu_class::update_objects( UINT8 priority_oam0, UINT8 priority_oam1, UINT8 priority_oam2, UINT8 priority_oam3 )
 {
 	UINT8 pri, priority[4];
 	UINT32 charaddr;
@@ -1112,7 +1112,7 @@ void snes_ppu_class::snes_update_objects( UINT8 priority_oam0, UINT8 priority_oa
 #endif /* SNES_LAYER_DEBUG */
 
 		/* OAM tiles have fixed planes (4), no direct color and no hires, but otherwise work the same as BG ones */
-		snes_draw_tile(4, SNES_OAM, charaddr + oam_tilelist[tile].tileaddr, oam_tilelist[tile].x, pri, oam_tilelist[tile].hflip, 0, oam_tilelist[tile].pal, 0);
+		draw_tile(4, SNES_OAM, charaddr + oam_tilelist[tile].tileaddr, oam_tilelist[tile].x, pri, oam_tilelist[tile].hflip, 0, oam_tilelist[tile].pal, 0);
 	}
 }
 
@@ -1123,21 +1123,21 @@ void snes_ppu_class::snes_update_objects( UINT8 priority_oam0, UINT8 priority_oa
  * Update Mode X line.
  *********************************************/
 
-void snes_ppu_class::snes_update_mode_0( UINT16 curline )
+void snes_ppu_class::update_mode_0( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[0])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	snes_update_objects(3, 6, 9, 12);
-	snes_update_line(curline, SNES_BG1, 8, 11, SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_NONE, 0);
-	snes_update_line(curline, SNES_BG2, 7, 10, SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_NONE, 0);
-	snes_update_line(curline, SNES_BG3, 2, 5,  SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_NONE, 0);
-	snes_update_line(curline, SNES_BG4, 1, 4,  SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_NONE, 0);
+	update_objects(3, 6, 9, 12);
+	update_line(curline, SNES_BG1, 8, 11, SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_NONE, 0);
+	update_line(curline, SNES_BG2, 7, 10, SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_NONE, 0);
+	update_line(curline, SNES_BG3, 2, 5,  SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_NONE, 0);
+	update_line(curline, SNES_BG4, 1, 4,  SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_NONE, 0);
 }
 
-void snes_ppu_class::snes_update_mode_1( UINT16 curline )
+void snes_ppu_class::update_mode_1( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[1])
@@ -1146,80 +1146,80 @@ void snes_ppu_class::snes_update_mode_1( UINT16 curline )
 
 	if (!m_bg3_priority_bit)
 	{
-		snes_update_objects(2, 4, 7, 10);
-		snes_update_line(curline, SNES_BG1, 6, 9, SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_NONE, 0);
-		snes_update_line(curline, SNES_BG2, 5, 8, SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_NONE, 0);
-		snes_update_line(curline, SNES_BG3, 1, 3, SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_NONE, 0);
+		update_objects(2, 4, 7, 10);
+		update_line(curline, SNES_BG1, 6, 9, SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_NONE, 0);
+		update_line(curline, SNES_BG2, 5, 8, SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_NONE, 0);
+		update_line(curline, SNES_BG3, 1, 3, SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_NONE, 0);
 	}
 	else
 	{
-		snes_update_objects(2, 3, 6, 9);
-		snes_update_line(curline, SNES_BG1, 5, 8,  SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_NONE, 0);
-		snes_update_line(curline, SNES_BG2, 4, 7,  SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_NONE, 0);
-		snes_update_line(curline, SNES_BG3, 1, 10, SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_NONE, 0);
+		update_objects(2, 3, 6, 9);
+		update_line(curline, SNES_BG1, 5, 8,  SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_NONE, 0);
+		update_line(curline, SNES_BG2, 4, 7,  SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_NONE, 0);
+		update_line(curline, SNES_BG3, 1, 10, SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_NONE, 0);
 	}
 }
 
-void snes_ppu_class::snes_update_mode_2( UINT16 curline )
+void snes_ppu_class::update_mode_2( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[2])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	snes_update_objects(2, 4, 6, 8);
-	snes_update_line(curline, SNES_BG1, 3, 7, SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_MODE2, 0);
-	snes_update_line(curline, SNES_BG2, 1, 5, SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_MODE2, 0);
+	update_objects(2, 4, 6, 8);
+	update_line(curline, SNES_BG1, 3, 7, SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_MODE2, 0);
+	update_line(curline, SNES_BG2, 1, 5, SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_MODE2, 0);
 }
 
-void snes_ppu_class::snes_update_mode_3( UINT16 curline )
+void snes_ppu_class::update_mode_3( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[3])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	snes_update_objects(2, 4, 6, 8);
-	snes_update_line(curline, SNES_BG1, 3, 7, SNES_COLOR_DEPTH_8BPP, 0, SNES_OPT_NONE, m_direct_color);
-	snes_update_line(curline, SNES_BG2, 1, 5, SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_NONE, 0);
+	update_objects(2, 4, 6, 8);
+	update_line(curline, SNES_BG1, 3, 7, SNES_COLOR_DEPTH_8BPP, 0, SNES_OPT_NONE, m_direct_color);
+	update_line(curline, SNES_BG2, 1, 5, SNES_COLOR_DEPTH_4BPP, 0, SNES_OPT_NONE, 0);
 }
 
-void snes_ppu_class::snes_update_mode_4( UINT16 curline )
+void snes_ppu_class::update_mode_4( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[4])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	snes_update_objects(2, 4, 6, 8);
-	snes_update_line(curline, SNES_BG1, 3, 7, SNES_COLOR_DEPTH_8BPP, 0, SNES_OPT_MODE4, m_direct_color);
-	snes_update_line(curline, SNES_BG2, 1, 5, SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_MODE4, 0);
+	update_objects(2, 4, 6, 8);
+	update_line(curline, SNES_BG1, 3, 7, SNES_COLOR_DEPTH_8BPP, 0, SNES_OPT_MODE4, m_direct_color);
+	update_line(curline, SNES_BG2, 1, 5, SNES_COLOR_DEPTH_2BPP, 0, SNES_OPT_MODE4, 0);
 }
 
-void snes_ppu_class::snes_update_mode_5( UINT16 curline )
+void snes_ppu_class::update_mode_5( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[5])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	snes_update_objects(2, 4, 6, 8);
-	snes_update_line(curline, SNES_BG1, 3, 7, SNES_COLOR_DEPTH_4BPP, 1, SNES_OPT_NONE, 0);
-	snes_update_line(curline, SNES_BG2, 1, 5, SNES_COLOR_DEPTH_2BPP, 1, SNES_OPT_NONE, 0);
+	update_objects(2, 4, 6, 8);
+	update_line(curline, SNES_BG1, 3, 7, SNES_COLOR_DEPTH_4BPP, 1, SNES_OPT_NONE, 0);
+	update_line(curline, SNES_BG2, 1, 5, SNES_COLOR_DEPTH_2BPP, 1, SNES_OPT_NONE, 0);
 }
 
-void snes_ppu_class::snes_update_mode_6( UINT16 curline )
+void snes_ppu_class::update_mode_6( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[6])
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	snes_update_objects(1, 3, 4, 6);
-	snes_update_line(curline, SNES_BG1, 2, 5, SNES_COLOR_DEPTH_4BPP, 1, SNES_OPT_MODE6, 0);
+	update_objects(1, 3, 4, 6);
+	update_line(curline, SNES_BG1, 2, 5, SNES_COLOR_DEPTH_4BPP, 1, SNES_OPT_MODE6, 0);
 }
 
-void snes_ppu_class::snes_update_mode_7( UINT16 curline )
+void snes_ppu_class::update_mode_7( UINT16 curline )
 {
 #if SNES_LAYER_DEBUG
 	if (debug_options.mode_disabled[7])
@@ -1228,14 +1228,14 @@ void snes_ppu_class::snes_update_mode_7( UINT16 curline )
 
 	if (!m_mode7.extbg)
 	{
-		snes_update_objects(1, 3, 4, 5);
-		snes_update_line_mode7(curline, SNES_BG1, 2, 2);
+		update_objects(1, 3, 4, 5);
+		update_line_mode7(curline, SNES_BG1, 2, 2);
 	}
 	else
 	{
-		snes_update_objects(2, 4, 6, 7);
-		snes_update_line_mode7(curline, SNES_BG1, 3, 3);
-		snes_update_line_mode7(curline, SNES_BG2, 1, 5);
+		update_objects(2, 4, 6, 7);
+		update_line_mode7(curline, SNES_BG1, 3, 3);
+		update_line_mode7(curline, SNES_BG2, 1, 5);
 	}
 }
 
@@ -1245,23 +1245,23 @@ void snes_ppu_class::snes_update_mode_7( UINT16 curline )
  * Draw the whole screen (Mode 0 -> 7).
  *********************************************/
 
-void snes_ppu_class::snes_draw_screens( UINT16 curline )
+void snes_ppu_class::draw_screens( UINT16 curline )
 {
 	switch (m_mode)
 	{
-		case 0: snes_update_mode_0(curline); break;     /* Mode 0 */
-		case 1: snes_update_mode_1(curline); break;     /* Mode 1 */
-		case 2: snes_update_mode_2(curline); break;     /* Mode 2 - Supports offset per tile */
-		case 3: snes_update_mode_3(curline); break;     /* Mode 3 - Supports direct colour */
-		case 4: snes_update_mode_4(curline); break;     /* Mode 4 - Supports offset per tile and direct colour */
-		case 5: snes_update_mode_5(curline); break;     /* Mode 5 - Supports hires */
-		case 6: snes_update_mode_6(curline); break;     /* Mode 6 - Supports offset per tile and hires */
-		case 7: snes_update_mode_7(curline); break;     /* Mode 7 - Supports direct colour */
+		case 0: update_mode_0(curline); break;     /* Mode 0 */
+		case 1: update_mode_1(curline); break;     /* Mode 1 */
+		case 2: update_mode_2(curline); break;     /* Mode 2 - Supports offset per tile */
+		case 3: update_mode_3(curline); break;     /* Mode 3 - Supports direct colour */
+		case 4: update_mode_4(curline); break;     /* Mode 4 - Supports offset per tile and direct colour */
+		case 5: update_mode_5(curline); break;     /* Mode 5 - Supports hires */
+		case 6: update_mode_6(curline); break;     /* Mode 6 - Supports offset per tile and hires */
+		case 7: update_mode_7(curline); break;     /* Mode 7 - Supports direct colour */
 	}
 }
 
 /*********************************************
- * snes_update_windowmasks()
+ * update_windowmasks()
  *
  * An example of how windows work:
  * Win1: ...#####......
@@ -1273,7 +1273,7 @@ void snes_ppu_class::snes_draw_screens( UINT16 curline )
  * XNOR: ###...##...###     ...###..###...
  *********************************************/
 
-void snes_ppu_class::snes_update_windowmasks( void )
+void snes_ppu_class::update_windowmasks( void )
 {
 	UINT16 ii, jj;
 	INT8 w1, w2;
@@ -1340,14 +1340,14 @@ void snes_ppu_class::snes_update_windowmasks( void )
 }
 
 /*********************************************
- * snes_update_offsets()
+ * update_offsets()
  *
  * Update the offsets with the latest changes.
  * This is currently unused, but it could
  * possibly be handy for some minor optimization
  *********************************************/
 
-void snes_ppu_class::snes_update_offsets( void )
+void snes_ppu_class::update_offsets( void )
 {
 	int ii;
 	for (ii = 0; ii < 4; ii++)
@@ -1357,14 +1357,14 @@ void snes_ppu_class::snes_update_offsets( void )
 }
 
 /*****************************************
- * snes_draw_blend()
+ * draw_blend()
  *
  * Routine for additive/subtractive blending
  * between the main and sub screens, i.e.
  * color math.
  *****************************************/
 
-inline void snes_ppu_class::snes_draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens )
+inline void snes_ppu_class::draw_blend( UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens )
 {
 #if SNES_LAYER_DEBUG
 	if (debug_options.colormath_disabled)
@@ -1372,7 +1372,7 @@ inline void snes_ppu_class::snes_draw_blend( UINT16 offset, UINT16 *colour, UINT
 #endif /* SNES_LAYER_DEBUG */
 
 	/* when color math is applied to subscreen pixels, the blending depends on the blending used by the previous mainscreen
-	pixel, except for subscreen pixel 0 which has no previous mainscreen pixel, see comments in snes_refresh_scanline */
+	pixel, except for subscreen pixel 0 which has no previous mainscreen pixel, see comments in refresh_scanline */
 	if (switch_screens && offset > 0)
 		offset -= 1;
 
@@ -1474,7 +1474,7 @@ inline void snes_ppu_class::snes_draw_blend( UINT16 offset, UINT16 *colour, UINT
 }
 
 /*********************************************
- * snes_refresh_scanline()
+ * refresh_scanline()
  *
  * Redraw the current line.
  *********************************************/
@@ -1492,7 +1492,7 @@ inline void snes_ppu_class::snes_draw_blend( UINT16 offset, UINT16 *colour, UINT
  * the optimized averaging algorithm.
  *********************************************/
 
-void snes_ppu_class::snes_refresh_scanline( running_machine &machine, bitmap_rgb32 &bitmap, UINT16 curline )
+void snes_ppu_class::refresh_scanline( running_machine &machine, bitmap_rgb32 &bitmap, UINT16 curline )
 {
 	UINT16 ii;
 	int x;
@@ -1511,10 +1511,10 @@ void snes_ppu_class::snes_refresh_scanline( running_machine &machine, bitmap_rgb
 	{
 		/* Update clip window masks if necessary */
 		if (m_update_windows)
-			snes_update_windowmasks();
+			update_windowmasks();
 		/* Update the offsets if necessary */
 		if (m_update_offsets)
-			snes_update_offsets();
+			update_offsets();
 
 		/* Clear priority */
 		memset(scanlines[SNES_MAINSCREEN].priority, 0, SNES_SCR_WIDTH);
@@ -1540,15 +1540,15 @@ void snes_ppu_class::snes_refresh_scanline( running_machine &machine, bitmap_rgb
 		}
 
 		/* Prepare OAM for this scanline */
-		snes_update_objects_rto(curline);
+		update_objects_rto(curline);
 
 		/* Draw scanline */
-		snes_draw_screens(curline);
+		draw_screens(curline);
 
-		snes_update_obsel();
+		update_obsel();
 
 #if SNES_LAYER_DEBUG
-		if (snes_dbg_video(machine, curline, snes_ram))
+		if (dbg_video(machine, curline, snes_ram))
 		{
 			g_profiler.stop();
 			return;
@@ -1584,7 +1584,7 @@ void snes_ppu_class::snes_refresh_scanline( running_machine &machine, bitmap_rgb
 
 				/* perform color math if the layer wants it (except if it's an object > 192) */
 				if (!scanline1->blend_exception[x] && m_layer[scanline1->layer[x]].color_math)
-					snes_draw_blend(x, &c, m_prevent_color_math, m_clip_to_black, 0);
+					draw_blend(x, &c, m_prevent_color_math, m_clip_to_black, 0);
 
 				r = ((c & 0x1f) * fade) >> 4;
 				g = (((c & 0x3e0) >> 5) * fade) >> 4;
@@ -1600,7 +1600,7 @@ void snes_ppu_class::snes_refresh_scanline( running_machine &machine, bitmap_rgb
 
 				/* perform color math if the layer wants it (except if it's an object > 192) */
 				if (!scanline1->blend_exception[x] && m_layer[scanline1->layer[x]].color_math)
-					snes_draw_blend(x, &c, m_prevent_color_math, m_clip_to_black, 0);
+					draw_blend(x, &c, m_prevent_color_math, m_clip_to_black, 0);
 
 				tmp_col[1] = c;
 
@@ -1613,9 +1613,9 @@ void snes_ppu_class::snes_refresh_scanline( running_machine &machine, bitmap_rgb
 				apply to it the same color math as the *next* mainscreen pixel (i.e. mainscreen pixel 0), which seems as good as
 				any other choice */
 				if (x == 0 && !scanline1->blend_exception[0] && m_layer[scanline1->layer[0]].color_math)
-					snes_draw_blend(0, &c, m_prevent_color_math, m_clip_to_black, 1);
+					draw_blend(0, &c, m_prevent_color_math, m_clip_to_black, 1);
 				else if (x > 0  && !scanline1->blend_exception[x - 1] && m_layer[scanline1->layer[x - 1]].color_math)
-					snes_draw_blend(x, &c, m_prevent_color_math, m_clip_to_black, 1);
+					draw_blend(x, &c, m_prevent_color_math, m_clip_to_black, 1);
 
 				tmp_col[0] = c;
 
@@ -1652,7 +1652,11 @@ void snes_ppu_class::snes_refresh_scanline( running_machine &machine, bitmap_rgb
 }
 
 void snes_ppu_class::ppu_start(running_machine &machine)
-{
+{	
+#if SNES_LAYER_DEBUG
+	memset(&debug_options, 0, sizeof(debug_options));
+#endif
+
 	m_vram = auto_alloc_array(machine, UINT8, SNES_VRAM_SIZE);
 	m_cgram = auto_alloc_array(machine, UINT16, SNES_CGRAM_SIZE/2);
 	m_oam_ram = auto_alloc_array(machine, UINT16, SNES_OAM_SIZE/2);
@@ -1668,7 +1672,10 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 	m_ppu1_version = 1;  // 5C77 chip version number, read by STAT77, only '1' is known
 	m_ppu2_version = 3;  // 5C78 chip version number, read by STAT78, only '2' & '3' encountered so far.
 	
-	
+	m_cgram_address = 0;
+	m_read_ophct = 0;
+	m_read_opvct = 0;
+
 	/* Inititialize mosaic table */
 	for (int j = 0; j < 16; j++)
 	{
@@ -1772,34 +1779,22 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 	state_save_register_global(machine, m_pseudo_hires);
 	state_save_register_global(machine, m_color_modes);
 	state_save_register_global(machine, m_stat77_flags);
+
+	state_save_register_global(machine, m_htmult);
+	state_save_register_global(machine, m_cgram_address);
+	state_save_register_global(machine, m_read_ophct);
+	state_save_register_global(machine, m_read_opvct);
+	state_save_register_global(machine, m_vram_fgr_high);
+	state_save_register_global(machine, m_vram_fgr_increment);
+	state_save_register_global(machine, m_vram_fgr_count);
+	state_save_register_global(machine, m_vram_fgr_mask);
+	state_save_register_global(machine, m_vram_fgr_shift);
+	state_save_register_global(machine, m_vram_read_buffer);
+	state_save_register_global(machine, m_vmadd);
 	
 	state_save_register_global_pointer(machine, m_vram, SNES_VRAM_SIZE);
 	state_save_register_global_pointer(machine, m_cgram, SNES_CGRAM_SIZE/2);
 	state_save_register_global_pointer(machine, m_oam_ram, SNES_OAM_SIZE/2);	
-}
-
-VIDEO_START( snes )
-{
-	snes_state *state = machine.driver_data<snes_state>();
-
-#if SNES_LAYER_DEBUG
-	memset(&debug_options, 0, sizeof(debug_options));
-#endif
-
-	state->m_ppu.ppu_start(machine);
-}
-
-UINT32 snes_state::snes_screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	snes_state *state = machine().driver_data<snes_state>();
-	int y;
-
-	/*NTSC SNES draw range is 1-225. */
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		state->m_ppu.snes_refresh_scanline(machine(), bitmap, y + 1);
-	}
-	return 0;
 }
 
 
@@ -1811,22 +1806,19 @@ static const UINT16 vram_fgr_inccnts[4] = { 0, 32, 64, 128 };
 static const UINT16 vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
 
 // utility function - latches the H/V counters.  Used by IRQ, writes to WRIO, etc.
-void snes_ppu_class::snes_latch_counters( running_machine &machine, UINT8 *ram_ptr )
+void snes_ppu_class::latch_counters( running_machine &machine, UINT8 *ram_ptr )
 {
-	snes_state *state = machine.driver_data<snes_state>();
-
-	m_beam.current_horz = machine.primary_screen->hpos() / state->m_htmult;
+	m_beam.current_horz = machine.primary_screen->hpos() / m_htmult;
 	m_beam.latch_vert = machine.primary_screen->vpos();
 	m_beam.latch_horz = m_beam.current_horz;
 	ram_ptr[STAT78] |= 0x40;   // indicate we latched
-//  state->m_read_ophct = state->m_read_opvct = 0;    // clear read flags - 2009-08: I think we must clear these when STAT78 is read...
+//  m_read_ophct = m_read_opvct = 0;    // clear read flags - 2009-08: I think we must clear these when STAT78 is read...
 
 //  printf("latched @ H %d V %d\n", m_beam.latch_horz, m_beam.latch_vert);
 }
 
-void snes_ppu_class::snes_dynamic_res_change( running_machine &machine, UINT8 *ram_ptr )
+void snes_ppu_class::dynamic_res_change( running_machine &machine, UINT8 *ram_ptr )
 {
-	snes_state *state = machine.driver_data<snes_state>();
 	rectangle visarea = machine.primary_screen->visible_area();
 	attoseconds_t refresh;
 
@@ -1836,9 +1828,9 @@ void snes_ppu_class::snes_dynamic_res_change( running_machine &machine, UINT8 *r
 
 	// fixme: should compensate for SNES_DBG_VIDEO
 	if (m_mode == 5 || m_mode == 6 || m_pseudo_hires)
-		state->m_htmult = 2;
+		m_htmult = 2;
 	else
-		state->m_htmult = 1;
+		m_htmult = 1;
 
 	/* FIXME: does the timing changes when the gfx mode is equal to 5 or 6? */
 	if ((ram_ptr[STAT78] & 0x10) == SNES_NTSC)
@@ -1868,22 +1860,21 @@ void snes_ppu_class::snes_dynamic_res_change( running_machine &machine, UINT8 *r
  when interlace is active.
 *************************************************/
 
-inline UINT32 snes_ppu_class::snes_get_vram_address( running_machine &machine )
+inline UINT32 snes_ppu_class::get_vram_address( running_machine &machine )
 {
-	snes_state *state = machine.driver_data<snes_state>();
-	UINT32 addr = state->m_vmadd;
+	UINT32 addr = m_vmadd;
 
-	if (state->m_vram_fgr_count)
+	if (m_vram_fgr_count)
 	{
-		UINT32 rem = addr & state->m_vram_fgr_mask;
-		UINT32 faddr = (addr & ~state->m_vram_fgr_mask) + (rem >> state->m_vram_fgr_shift) + ((rem & (state->m_vram_fgr_count - 1)) << 3);
+		UINT32 rem = addr & m_vram_fgr_mask;
+		UINT32 faddr = (addr & ~m_vram_fgr_mask) + (rem >> m_vram_fgr_shift) + ((rem & (m_vram_fgr_count - 1)) << 3);
 		return faddr << 1;
 	}
 
 	return addr << 1;
 }
 
-READ8_MEMBER( snes_ppu_class::snes_vram_read )
+READ8_MEMBER( snes_ppu_class::vram_read )
 {
 	UINT8 res = 0;
 	offset &= 0xffff; // only 64KB are present on SNES
@@ -1919,7 +1910,7 @@ READ8_MEMBER( snes_ppu_class::snes_vram_read )
 	return res;
 }
 
-WRITE8_MEMBER( snes_ppu_class::snes_vram_write )
+WRITE8_MEMBER( snes_ppu_class::vram_write )
 {
 	offset &= 0xffff; // only 64KB are present on SNES, Robocop 3 relies on this
 
@@ -1984,7 +1975,7 @@ WRITE8_MEMBER( snes_ppu_class::snes_vram_write )
  to choose the high/low byte of the snes_oam word.
 *************************************************/
 
-READ8_MEMBER( snes_ppu_class::snes_oam_read )
+READ8_MEMBER( snes_ppu_class::oam_read )
 {
 	offset &= 0x1ff;
 
@@ -2002,7 +1993,7 @@ READ8_MEMBER( snes_ppu_class::snes_oam_read )
 	return (m_oam_ram[offset] >> (snes_ram[OAMDATA] << 3)) & 0xff;
 }
 
-WRITE8_MEMBER( snes_ppu_class::snes_oam_write )
+WRITE8_MEMBER( snes_ppu_class::oam_write )
 {
 	offset &= 0x1ff;
 
@@ -2044,7 +2035,7 @@ WRITE8_MEMBER( snes_ppu_class::snes_oam_write )
  solution adopted by BSNES without enabling it.
 *************************************************/
 
-READ8_MEMBER( snes_ppu_class::snes_cgram_read )
+READ8_MEMBER( snes_ppu_class::cgram_read )
 {
 	UINT8 res = 0;
 	offset &= 0x1ff;
@@ -2070,7 +2061,7 @@ READ8_MEMBER( snes_ppu_class::snes_cgram_read )
 	return res;
 }
 
-WRITE8_MEMBER( snes_ppu_class::snes_cgram_write )
+WRITE8_MEMBER( snes_ppu_class::cgram_write )
 {
 	offset &= 0x1ff;
 
@@ -2096,9 +2087,8 @@ WRITE8_MEMBER( snes_ppu_class::snes_cgram_write )
 	((UINT8 *)m_cgram)[offset] = data;
 }
 
-UINT8 snes_ppu_class::snes_ppu_read(address_space &space, UINT32 offset, UINT8 *ram_ptr)
+UINT8 snes_ppu_class::read(address_space &space, UINT32 offset, UINT8 *ram_ptr)
 {
-	snes_state *state = space.machine().driver_data<snes_state>();
 	UINT8 value;
 
 	switch (offset)
@@ -2145,10 +2135,10 @@ UINT8 snes_ppu_class::snes_ppu_read(address_space &space, UINT32 offset, UINT8 *
 				return m_ppu1_open_bus;
 			}
 		case SLHV:      /* Software latch for H/V counter */
-			snes_latch_counters(space.machine(), ram_ptr);
+			latch_counters(space.machine(), ram_ptr);
 			return snes_open_bus_r(space, 0);       /* Return value is meaningless */
 		case ROAMDATA:  /* Read data from OAM (DR) */
-			m_ppu1_open_bus = snes_oam_read(space, m_oam.address);
+			m_ppu1_open_bus = oam_read(space, m_oam.address);
 			ram_ptr[OAMDATA] = (ram_ptr[OAMDATA] + 1) % 2;
 			if (!ram_ptr[OAMDATA])
 			{
@@ -2159,47 +2149,47 @@ UINT8 snes_ppu_class::snes_ppu_read(address_space &space, UINT32 offset, UINT8 *
 			return m_ppu1_open_bus;
 		case RVMDATAL:  /* Read data from VRAM (low) */
 			{
-				UINT32 addr = snes_get_vram_address(space.machine());
-				m_ppu1_open_bus = state->m_vram_read_buffer & 0xff;
+				UINT32 addr = get_vram_address(space.machine());
+				m_ppu1_open_bus = m_vram_read_buffer & 0xff;
 
-				if (!state->m_vram_fgr_high)
+				if (!m_vram_fgr_high)
 				{
-					state->m_vram_read_buffer = snes_vram_read(space, addr);
-					state->m_vram_read_buffer |= (snes_vram_read(space, addr + 1) << 8);
+					m_vram_read_buffer = vram_read(space, addr);
+					m_vram_read_buffer |= (vram_read(space, addr + 1) << 8);
 
-					state->m_vmadd = (state->m_vmadd + state->m_vram_fgr_increment) & 0xffff;
+					m_vmadd = (m_vmadd + m_vram_fgr_increment) & 0xffff;
 				}
 
 				return m_ppu1_open_bus;
 			}
 		case RVMDATAH:  /* Read data from VRAM (high) */
 			{
-				UINT32 addr = snes_get_vram_address(space.machine());
-				m_ppu1_open_bus = (state->m_vram_read_buffer >> 8) & 0xff;
+				UINT32 addr = get_vram_address(space.machine());
+				m_ppu1_open_bus = (m_vram_read_buffer >> 8) & 0xff;
 
-				if (state->m_vram_fgr_high)
+				if (m_vram_fgr_high)
 				{
-					state->m_vram_read_buffer = snes_vram_read(space, addr);
-					state->m_vram_read_buffer |= (snes_vram_read(space, addr + 1) << 8);
+					m_vram_read_buffer = vram_read(space, addr);
+					m_vram_read_buffer |= (vram_read(space, addr + 1) << 8);
 
-					state->m_vmadd = (state->m_vmadd + state->m_vram_fgr_increment) & 0xffff;
+					m_vmadd = (m_vmadd + m_vram_fgr_increment) & 0xffff;
 				}
 
 				return m_ppu1_open_bus;
 			}
 		case RCGDATA:   /* Read data from CGRAM */
-			if (!(state->m_cgram_address & 0x01))
-				m_ppu2_open_bus = snes_cgram_read(space, state->m_cgram_address);
+			if (!(m_cgram_address & 0x01))
+				m_ppu2_open_bus = cgram_read(space, m_cgram_address);
 			else
 			{
 				m_ppu2_open_bus &= 0x80;
-				m_ppu2_open_bus |= snes_cgram_read(space, state->m_cgram_address) & 0x7f;
+				m_ppu2_open_bus |= cgram_read(space, m_cgram_address) & 0x7f;
 			}
 
-			state->m_cgram_address = (state->m_cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
+			m_cgram_address = (m_cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
 			return m_ppu2_open_bus;
 		case OPHCT:     /* Horizontal counter data by ext/soft latch */
-			if (state->m_read_ophct)
+			if (m_read_ophct)
 			{
 				m_ppu2_open_bus &= 0xfe;
 				m_ppu2_open_bus |= (m_beam.latch_horz >> 8) & 0x01;
@@ -2208,10 +2198,10 @@ UINT8 snes_ppu_class::snes_ppu_read(address_space &space, UINT32 offset, UINT8 *
 			{
 				m_ppu2_open_bus = m_beam.latch_horz & 0xff;
 			}
-			state->m_read_ophct ^= 1;
+			m_read_ophct ^= 1;
 			return m_ppu2_open_bus;
 		case OPVCT:     /* Vertical counter data by ext/soft latch */
-			if (state->m_read_opvct)
+			if (m_read_opvct)
 			{
 				m_ppu2_open_bus &= 0xfe;
 				m_ppu2_open_bus |= (m_beam.latch_vert >> 8) & 0x01;
@@ -2220,7 +2210,7 @@ UINT8 snes_ppu_class::snes_ppu_read(address_space &space, UINT32 offset, UINT8 *
 			{
 				m_ppu2_open_bus = m_beam.latch_vert & 0xff;
 			}
-			state->m_read_opvct ^= 1;
+			m_read_opvct ^= 1;
 			return m_ppu2_open_bus;
 		case STAT77:    /* PPU status flag and version number */
 			value = m_stat77_flags & 0xc0; // 0x80 & 0x40 are Time Over / Range Over Sprite flags, set by the video code
@@ -2231,8 +2221,8 @@ UINT8 snes_ppu_class::snes_ppu_read(address_space &space, UINT32 offset, UINT8 *
 			m_ppu1_open_bus = value;
 			return m_ppu1_open_bus;
 		case STAT78:    /* PPU status flag and version number */
-			state->m_read_ophct = 0;
-			state->m_read_opvct = 0;
+			m_read_ophct = 0;
+			m_read_opvct = 0;
 			if(ram_ptr[WRIO] & 0x80)
 				ram_ptr[STAT78] &= ~0x40; //clear ext latch if bit 7 of WRIO is set
 			ram_ptr[STAT78] = (ram_ptr[STAT78] & ~0x2f) | (m_ppu2_open_bus & 0x20) | (m_ppu2_version & 0x0f);
@@ -2245,10 +2235,8 @@ UINT8 snes_ppu_class::snes_ppu_read(address_space &space, UINT32 offset, UINT8 *
 }
 
 
-void snes_ppu_class::snes_ppu_write(address_space &space, UINT32 offset, UINT8 data, UINT8 *ram_ptr)
+void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT8 *ram_ptr)
 {
-	snes_state *state = space.machine().driver_data<snes_state>();
-
 	switch (offset)
 	{
 		case INIDISP:   /* Initial settings for screen */
@@ -2281,7 +2269,7 @@ void snes_ppu_class::snes_ppu_write(address_space &space, UINT32 offset, UINT8 d
 			break;
 		case OAMDATA:   /* Data for OAM write (DW) */
 			if (m_oam.address >= 0x100)
-				snes_oam_write(space, m_oam.address, data);
+				oam_write(space, m_oam.address, data);
 			else
 			{
 				if (!ram_ptr[OAMDATA])
@@ -2291,9 +2279,9 @@ void snes_ppu_class::snes_ppu_write(address_space &space, UINT32 offset, UINT8 d
 					// in this case, we not only write data to the upper byte of the word,
 					// but also m_oam.write_latch to the lower byte (recall that
 					// ram_ptr[OAMDATA] is used to select high/low byte)
-					snes_oam_write(space, m_oam.address, data);
+					oam_write(space, m_oam.address, data);
 					ram_ptr[OAMDATA] = 0;
-					snes_oam_write(space, m_oam.address, m_oam.write_latch);
+					oam_write(space, m_oam.address, m_oam.write_latch);
 					ram_ptr[OAMDATA] = 1;
 				}
 			}
@@ -2307,7 +2295,7 @@ void snes_ppu_class::snes_ppu_write(address_space &space, UINT32 offset, UINT8 d
 			return;
 		case BGMODE:    /* BG mode and character size settings */
 			m_mode = data & 0x07;
-			snes_dynamic_res_change(space.machine(), ram_ptr);
+			dynamic_res_change(space.machine(), ram_ptr);
 			m_bg3_priority_bit = BIT(data, 3);
 			m_layer[SNES_BG1].tile_size = BIT(data, 4);
 			m_layer[SNES_BG2].tile_size = BIT(data, 5);
@@ -2388,57 +2376,57 @@ void snes_ppu_class::snes_ppu_write(address_space &space, UINT32 offset, UINT8 d
 			m_update_offsets = 1;
 			return;
 		case VMAIN:     /* VRAM address increment value designation */
-			state->m_vram_fgr_high = (data & 0x80);
-			state->m_vram_fgr_increment = vram_fgr_inctab[data & 3];
+			m_vram_fgr_high = (data & 0x80);
+			m_vram_fgr_increment = vram_fgr_inctab[data & 3];
 
 			if (data & 0xc)
 			{
 				int md = (data & 0xc) >> 2;
 
-				state->m_vram_fgr_count = vram_fgr_inccnts[md];         // 0x20, 0x40, 0x80
-				state->m_vram_fgr_mask = (state->m_vram_fgr_count * 8) - 1; // 0xff, 0x1ff, 0x2ff
-				state->m_vram_fgr_shift = vram_fgr_shiftab[md];         // 5, 6, 7
+				m_vram_fgr_count = vram_fgr_inccnts[md];         // 0x20, 0x40, 0x80
+				m_vram_fgr_mask = (m_vram_fgr_count * 8) - 1; // 0xff, 0x1ff, 0x2ff
+				m_vram_fgr_shift = vram_fgr_shiftab[md];         // 5, 6, 7
 			}
 			else
 			{
-				state->m_vram_fgr_count = 0;
+				m_vram_fgr_count = 0;
 			}
-//          printf("VMAIN: high %x inc %x count %x mask %x shift %x\n", state->m_vram_fgr_high, state->m_vram_fgr_increment, state->m_vram_fgr_count, state->m_vram_fgr_mask, state->m_vram_fgr_shift);
+//          printf("VMAIN: high %x inc %x count %x mask %x shift %x\n", m_vram_fgr_high, m_vram_fgr_increment, m_vram_fgr_count, m_vram_fgr_mask, m_vram_fgr_shift);
 			break;
 		case VMADDL:    /* Address for VRAM read/write (low) */
 			{
 				UINT32 addr;
-				state->m_vmadd = (state->m_vmadd & 0xff00) | (data << 0);
-				addr = snes_get_vram_address(space.machine());
-				state->m_vram_read_buffer = snes_vram_read(space, addr);
-				state->m_vram_read_buffer |= (snes_vram_read(space, addr + 1) << 8);
+				m_vmadd = (m_vmadd & 0xff00) | (data << 0);
+				addr = get_vram_address(space.machine());
+				m_vram_read_buffer = vram_read(space, addr);
+				m_vram_read_buffer |= (vram_read(space, addr + 1) << 8);
 			}
 			break;
 		case VMADDH:    /* Address for VRAM read/write (high) */
 			{
 				UINT32 addr;
-				state->m_vmadd = (state->m_vmadd & 0x00ff) | (data << 8);
-				addr = snes_get_vram_address(space.machine());
-				state->m_vram_read_buffer = snes_vram_read(space, addr);
-				state->m_vram_read_buffer |= (snes_vram_read(space, addr + 1) << 8);
+				m_vmadd = (m_vmadd & 0x00ff) | (data << 8);
+				addr = get_vram_address(space.machine());
+				m_vram_read_buffer = vram_read(space, addr);
+				m_vram_read_buffer |= (vram_read(space, addr + 1) << 8);
 			}
 			break;
 		case VMDATAL:   /* 2118: Data for VRAM write (low) */
 			{
-				UINT32 addr = snes_get_vram_address(space.machine());
-				snes_vram_write(space, addr, data);
+				UINT32 addr = get_vram_address(space.machine());
+				vram_write(space, addr, data);
 
-				if (!state->m_vram_fgr_high)
-					state->m_vmadd = (state->m_vmadd + state->m_vram_fgr_increment) & 0xffff;
+				if (!m_vram_fgr_high)
+					m_vmadd = (m_vmadd + m_vram_fgr_increment) & 0xffff;
 			}
 			return;
 		case VMDATAH:   /* 2119: Data for VRAM write (high) */
 			{
-				UINT32 addr = snes_get_vram_address(space.machine());
-				snes_vram_write(space, addr + 1, data);
+				UINT32 addr = get_vram_address(space.machine());
+				vram_write(space, addr + 1, data);
 
-				if (state->m_vram_fgr_high)
-					state->m_vmadd = (state->m_vmadd + state->m_vram_fgr_increment) & 0xffff;
+				if (m_vram_fgr_high)
+					m_vmadd = (m_vmadd + m_vram_fgr_increment) & 0xffff;
 			}
 			return;
 		case M7SEL:     /* Mode 7 initial settings */
@@ -2473,11 +2461,11 @@ void snes_ppu_class::snes_ppu_write(address_space &space, UINT32 offset, UINT8 d
 			break;
 		case CGADD:     /* Initial address for colour RAM writing */
 			/* CGRAM is 16-bit, but when reading/writing we treat it as 8-bit, so we need to double the address */
-			state->m_cgram_address = data << 1;
+			m_cgram_address = data << 1;
 			break;
 		case CGDATA:    /* Data for colour RAM */
-			snes_cgram_write(space, state->m_cgram_address, data);
-			state->m_cgram_address = (state->m_cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
+			cgram_write(space, m_cgram_address, data);
+			m_cgram_address = (m_cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
 			break;
 		case W12SEL:    /* Window mask settings for BG1-2 */
 			if (data != ram_ptr[offset])
@@ -2638,7 +2626,7 @@ void snes_ppu_class::snes_ppu_write(address_space &space, UINT32 offset, UINT8 d
 			m_beam.last_visible_line = (data & 0x04) ? 240 : 225;
 			m_pseudo_hires = BIT(data, 3);
 			m_mode7.extbg = BIT(data, 6);
-			snes_dynamic_res_change(space.machine(), ram_ptr);
+			dynamic_res_change(space.machine(), ram_ptr);
 #ifdef SNES_DBG_REG_W
 			if ((data & 0x8) != (ram_ptr[SETINI] & 0x8))
 				mame_printf_debug("Pseudo 512 mode: %s\n", (data & 0x8) ? "on" : "off");
@@ -2665,7 +2653,7 @@ void snes_ppu_class::snes_ppu_write(address_space &space, UINT32 offset, UINT8 d
 		popmessage MSG2;                          \
 	}
 
-static UINT8 snes_dbg_video( running_machine &machine, UINT16 curline, UINT8 *ram_ptr )
+static UINT8 dbg_video( running_machine &machine, UINT16 curline, UINT8 *ram_ptr )
 {
 	int i;
 	UINT8 toggles = machine.root_device().ioport("DEBUG1")->read_safe(0);
