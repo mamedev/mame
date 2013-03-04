@@ -58,6 +58,89 @@ static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
 }
 
 
+static READ8_HANDLER( snes_lo_r )
+{
+	if (offset < 0x300000)
+		return snes_r_bank1(space, offset, 0xff);
+	else if (offset < 0x400000)
+		return snes_r_bank2(space, offset - 0x300000, 0xff);
+	else if (offset < 0x600000)
+		return snes_r_bank3(space, offset - 0x400000, 0xff);
+	else if (offset < 0x700000)
+		return snes_r_bank4(space, offset - 0x600000, 0xff);
+	else
+		return snes_r_bank5(space, offset - 0x700000, 0xff);
+}	
+
+static READ8_HANDLER( snes_hi_r )
+{
+	if (offset < 0x400000)
+		return snes_r_bank6(space, offset, 0xff);
+	else
+		return snes_r_bank7(space, offset - 0x400000, 0xff);
+}	
+
+static WRITE8_HANDLER( snes_lo_w )
+{
+	if (offset < 0x300000)
+		snes_w_bank1(space, offset, data, 0xff);
+	else if (offset < 0x400000)
+		snes_w_bank2(space, offset - 0x300000, data, 0xff);
+	else if (offset < 0x600000)
+		return;
+	else if (offset < 0x700000)
+		snes_w_bank4(space, offset - 0x600000, data, 0xff);
+	else
+		snes_w_bank5(space, offset - 0x700000, data, 0xff);
+}	
+
+static WRITE8_HANDLER( snes_hi_w )
+{
+	if (offset < 0x400000)
+		snes_w_bank6(space, offset, data, 0xff);
+	else
+		snes_w_bank7(space, offset, data - 0x400000, 0xff);
+}	
+
+static READ8_HANDLER( superfx_r_bank1 )
+{
+	return snes_ram[offset | 0x8000];
+}
+
+static READ8_HANDLER( superfx_r_bank2 )
+{
+	return snes_ram[0x400000 + offset];
+}
+
+static READ8_HANDLER( superfx_r_bank3 )
+{
+	/* IMPORTANT: SFX RAM sits in 0x600000-0x7fffff, and it's mirrored in 0xe00000-0xffffff. However, SNES
+	 has only access to 0x600000-0x7dffff (because there is WRAM after that), hence we directly use the mirror
+	 as the place where to write & read SFX RAM. SNES handlers have been setup accordingly. */
+	//printf("superfx_r_bank3: %08x = %02x\n", offset, snes_ram[0xe00000 + offset]);
+	return snes_ram[0xe00000 + offset];
+}
+
+static WRITE8_HANDLER( superfx_w_bank1 )
+{
+	printf("Attempting to write to cart ROM: %08x = %02x\n", offset, data);
+	// Do nothing; can't write to cart ROM.
+}
+
+static WRITE8_HANDLER( superfx_w_bank2 )
+{
+	printf("Attempting to write to cart ROM: %08x = %02x\n", 0x400000 + offset, data);
+	// Do nothing; can't write to cart ROM.
+}
+
+static WRITE8_HANDLER( superfx_w_bank3 )
+{
+	/* IMPORTANT: SFX RAM sits in 0x600000-0x7fffff, and it's mirrored in 0xe00000-0xffffff. However, SNES
+	 has only access to 0x600000-0x7dffff (because there is WRAM after that), hence we directly use the mirror
+	 as the place where to write & read SFX RAM. SNES handlers have been setup accordingly. */
+	//printf("superfx_w_bank3: %08x = %02x\n", offset, data);
+	snes_ram[0xe00000 + offset] = data;
+}
 
 /*************************************
  *
@@ -66,14 +149,9 @@ static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
  *************************************/
 
 static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, snes_state )
-	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE_LEGACY(snes_r_bank1, snes_w_bank1)    /* I/O and ROM (repeats for each bank) */
-	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE_LEGACY(snes_r_bank2, snes_w_bank2)    /* I/O and ROM (repeats for each bank) */
-	AM_RANGE(0x400000, 0x5fffff) AM_READ_LEGACY(snes_r_bank3)       /* ROM (and reserved in Mode 20) */
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(snes_r_bank4, snes_w_bank4)    /* used by Mode 20 DSP-1 */
-	AM_RANGE(0x700000, 0x7dffff) AM_READWRITE_LEGACY(snes_r_bank5, snes_w_bank5)
+	AM_RANGE(0x000000, 0x7dffff) AM_READWRITE_LEGACY(snes_lo_r, snes_lo_w)
 	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE_LEGACY(snes_r_bank6, snes_w_bank6)    /* Mirror and ROM */
-	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE_LEGACY(snes_r_bank7, snes_w_bank7)    /* Mirror and ROM */
+	AM_RANGE(0x800000, 0xffffff) AM_READWRITE_LEGACY(snes_hi_r, snes_hi_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superfx_map, AS_PROGRAM, 8, snes_state )
