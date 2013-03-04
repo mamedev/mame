@@ -369,9 +369,22 @@
 #define DSP_FIR_C7      0x7F
 
 /* (PPU) Video related */
+
+struct SNES_SCANLINE
+{
+	int enable, clip;
+	
+	UINT16 buffer[SNES_SCR_WIDTH];
+	UINT8  priority[SNES_SCR_WIDTH];
+	UINT8  layer[SNES_SCR_WIDTH];
+	UINT8  blend_exception[SNES_SCR_WIDTH];
+};
+
 class snes_ppu_class  /* once all the regs are saved in this structure, it would be better to reorganize it a bit... */
 {
 public:
+	SNES_SCANLINE m_scanlines[2];
+	
 	struct
 	{
 		/* clipmasks */
@@ -473,7 +486,8 @@ public:
 	UINT8 m_screen_disabled;
 	UINT8 m_pseudo_hires;
 	UINT8 m_color_modes;
-	UINT8 m_stat77_flags;
+	UINT8 m_stat77;
+	UINT8 m_stat78;
 
 	UINT16                m_htmult;     /* in 512 wide, we run HTOTAL double and halve it on latching */
 	UINT16                m_cgram_address;  /* CGRAM address */
@@ -515,8 +529,8 @@ public:
 	inline void draw_blend(UINT16 offset, UINT16 *colour, UINT8 prevent_color_math, UINT8 black_pen_clip, int switch_screens);
 	void refresh_scanline(running_machine &machine, bitmap_rgb32 &bitmap, UINT16 curline);
 
-	void latch_counters(running_machine &machine, UINT8 *ram_ptr);
-	void dynamic_res_change(running_machine &machine, UINT8 *ram_ptr);
+	void latch_counters(running_machine &machine);
+	void dynamic_res_change(running_machine &machine);
 	inline UINT32 get_vram_address(running_machine &machine);
 	UINT8 dbg_video(running_machine &machine, UINT16 curline, UINT8 *ram_ptr);
 

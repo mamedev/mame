@@ -133,7 +133,7 @@ static void snes_hirq_tick( running_machine &machine )
 
 	// latch the counters and pull IRQ
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
-	state->m_ppu.latch_counters(machine, snes_ram);
+	state->m_ppu.latch_counters(machine);
 	snes_ram[TIMEUP] = 0x80;    /* Indicate that irq occurred */
 	state->m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
 
@@ -189,7 +189,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 		{
 			snes_ram[TIMEUP] = 0x80;    /* Indicate that irq occurred */
 			// IRQ latches the counters, do it now
-			m_ppu.latch_counters(machine(), snes_ram);
+			m_ppu.latch_counters(machine());
 			m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE );
 		}
 	}
@@ -251,8 +251,8 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 	{   /* VBlank is over, time for a new frame */
 		snes_ram[HVBJOY] &= 0x7f;       /* Clear vblank bit */
 		snes_ram[RDNMI]  &= 0x7f;       /* Clear nmi occurred bit */
-		snes_ram[STAT78] ^= 0x80;       /* Toggle field flag */
-		m_ppu.m_stat77_flags &= 0x3f;  /* Clear Time Over and Range Over bits */
+		m_ppu.m_stat78 ^= 0x80;       /* Toggle field flag */
+		m_ppu.m_stat77 &= 0x3f;  /* Clear Time Over and Range Over bits */
 
 		m_maincpu->set_input_line(G65816_LINE_NMI, CLEAR_LINE );
 	}
@@ -292,7 +292,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 
 	/* kick off the start of scanline timer */
 	nextscan = m_ppu.m_beam.current_vert + 1;
-	if (nextscan >= (((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC : SNES_VTOTAL_PAL))
+	if (nextscan >= (((m_ppu.m_stat78 & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC : SNES_VTOTAL_PAL))
 	{
 		nextscan = 0;
 	}
@@ -707,7 +707,7 @@ WRITE8_HANDLER( snes_w_io )
 			if (!(snes_ram[WRIO] & 0x80) && (data & 0x80))
 			{
 				// external latch
-				state->m_ppu.latch_counters(space.machine(), snes_ram);
+				state->m_ppu.latch_counters(space.machine());
 			}
 			break;
 		case HTIMEL:    /* H-Count timer settings (low)  */
@@ -1574,7 +1574,7 @@ static void snes_init_timers( running_machine &machine )
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
 	state->m_hblank_offset = 274;
-	state->m_hblank_timer->adjust(machine.primary_screen->time_until_pos(((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC - 1 : SNES_VTOTAL_PAL - 1, state->m_hblank_offset));
+	state->m_hblank_timer->adjust(machine.primary_screen->time_until_pos(((state->m_ppu.m_stat78 & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC - 1 : SNES_VTOTAL_PAL - 1, state->m_hblank_offset));
 }
 
 static void snes_init_ram( running_machine &machine )
@@ -1802,9 +1802,9 @@ MACHINE_RESET( snes )
 
 	/* Set STAT78 to NTSC or PAL */
 	if (ATTOSECONDS_TO_HZ(machine.primary_screen->frame_period().attoseconds) >= 59.0f)
-		snes_ram[STAT78] = SNES_NTSC;
+		state->m_ppu.m_stat78 = SNES_NTSC;
 	else /* if (ATTOSECONDS_TO_HZ(machine.primary_screen->frame_period().attoseconds) == 50.0f) */
-		snes_ram[STAT78] = SNES_PAL;
+		state->m_ppu.m_stat78 = SNES_PAL;
 
 	// reset does this to these registers
 	snes_ram[NMITIMEN] = 0;

@@ -391,7 +391,7 @@ static void snes_gun_latch( running_machine &machine, INT16 x, INT16 y )
 
 	state->m_ppu.m_beam.latch_horz = x;
 	state->m_ppu.m_beam.latch_vert = y;
-	snes_ram[STAT78] |= 0x40;
+	state->m_ppu.m_stat78 |= 0x40;
 }
 
 static void snes_input_read_joy( running_machine &machine, int port )

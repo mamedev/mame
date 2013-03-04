@@ -109,18 +109,6 @@ static const UINT16 table_obj_offset[8][8] =
 	{ (112*32), (112*32)+32, (112*32)+64, (112*32)+96, (112*32)+128, (112*32)+160, (112*32)+192, (112*32)+224 }
 };
 
-struct SCANLINE
-{
-	int enable, clip;
-
-	UINT16 buffer[SNES_SCR_WIDTH];
-	UINT8  priority[SNES_SCR_WIDTH];
-	UINT8  layer[SNES_SCR_WIDTH];
-	UINT8  blend_exception[SNES_SCR_WIDTH];
-};
-
-static struct SCANLINE scanlines[2];
-//struct SNES_PPU_STRUCT snes_ppu;
 
 enum
 {
@@ -161,10 +149,10 @@ inline UINT16 snes_ppu_class::get_bgcolor( UINT8 direct_colors, UINT16 palette, 
 
 inline void snes_ppu_class::set_scanline_pixel( int screen, INT16 x, UINT16 color, UINT8 priority, UINT8 layer, int blend )
 {
-	scanlines[screen].buffer[x] = color;
-	scanlines[screen].priority[x] = priority;
-	scanlines[screen].layer[x] = layer;
-	scanlines[screen].blend_exception[x] = blend;
+	m_scanlines[screen].buffer[x] = color;
+	m_scanlines[screen].priority[x] = priority;
+	m_scanlines[screen].layer[x] = layer;
+	m_scanlines[screen].blend_exception[x] = blend;
 }
 
 /*************************************************************************************************
@@ -197,9 +185,9 @@ inline void snes_ppu_class::draw_bgtile_lores( UINT8 layer, INT16 ii, UINT8 colo
 
 	for (screen = SNES_MAINSCREEN; screen <= SNES_SUBSCREEN; screen++)
 	{
-		if (ii >= 0 && ii < SNES_SCR_WIDTH && scanlines[screen].enable)
+		if (ii >= 0 && ii < SNES_SCR_WIDTH && m_scanlines[screen].enable)
 		{
-			if (scanlines[screen].priority[ii] <= priority)
+			if (m_scanlines[screen].priority[ii] <= priority)
 			{
 				UINT8 clr = colour;
 				UINT8 clipmask = m_clipmasks[layer][ii];
@@ -210,7 +198,7 @@ inline void snes_ppu_class::draw_bgtile_lores( UINT8 layer, INT16 ii, UINT8 colo
 #endif /* SNES_LAYER_DEBUG */
 
 				/* Clip to windows */
-				if (scanlines[screen].clip)
+				if (m_scanlines[screen].clip)
 					clr &= clipmask;
 
 				/* Only draw if we have a colour (0 == transparent) */
@@ -232,9 +220,9 @@ inline void snes_ppu_class::draw_bgtile_hires( UINT8 layer, INT16 ii, UINT8 colo
 	for (screen = SNES_MAINSCREEN; screen <= SNES_SUBSCREEN; screen++)
 	{
 		// odd pixels to main screen, even pixels to sub screen
-		if (ii >= 0 && ii < (SNES_SCR_WIDTH << 1) && ((ii & 1) ^ screen) && scanlines[screen].enable)
+		if (ii >= 0 && ii < (SNES_SCR_WIDTH << 1) && ((ii & 1) ^ screen) && m_scanlines[screen].enable)
 		{
-			if (scanlines[screen].priority[ii >> 1] <= priority)
+			if (m_scanlines[screen].priority[ii >> 1] <= priority)
 			{
 				UINT8 clr = colour;
 				UINT8 clipmask = m_clipmasks[layer][ii >> 1];
@@ -245,7 +233,7 @@ inline void snes_ppu_class::draw_bgtile_hires( UINT8 layer, INT16 ii, UINT8 colo
 #endif /* SNES_LAYER_DEBUG */
 
 				/* Clip to windows */
-				if (scanlines[screen].clip)
+				if (m_scanlines[screen].clip)
 					clr &= clipmask;
 
 				/* Only draw if we have a colour (0 == transparent) */
@@ -268,7 +256,7 @@ inline void snes_ppu_class::draw_oamtile( INT16 ii, UINT8 colour, UINT16 pal, UI
 
 	for (screen = SNES_MAINSCREEN; screen <= SNES_SUBSCREEN; screen++)
 	{
-		if (pos >= 0 && pos < SNES_SCR_WIDTH && scanlines[screen].enable)
+		if (pos >= 0 && pos < SNES_SCR_WIDTH && m_scanlines[screen].enable)
 		{
 			UINT8 clr = colour;
 			UINT8 clipmask = m_clipmasks[SNES_OAM][pos];
@@ -279,7 +267,7 @@ inline void snes_ppu_class::draw_oamtile( INT16 ii, UINT8 colour, UINT16 pal, UI
 #endif /* SNES_LAYER_DEBUG */
 
 			/* Clip to windows */
-			if (scanlines[screen].clip)
+			if (m_scanlines[screen].clip)
 				clr &= clipmask;
 
 			/* Only draw if we have a colour (0 == transparent) */
@@ -427,12 +415,12 @@ inline void snes_ppu_class::update_line( UINT16 curline, UINT8 layer, UINT8 prio
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	scanlines[SNES_MAINSCREEN].enable = m_layer[layer].main_bg_enabled;
-	scanlines[SNES_SUBSCREEN].enable = m_layer[layer].sub_bg_enabled;
-	scanlines[SNES_MAINSCREEN].clip = m_layer[layer].main_window_enabled;
-	scanlines[SNES_SUBSCREEN].clip = m_layer[layer].sub_window_enabled;
+	m_scanlines[SNES_MAINSCREEN].enable = m_layer[layer].main_bg_enabled;
+	m_scanlines[SNES_SUBSCREEN].enable = m_layer[layer].sub_bg_enabled;
+	m_scanlines[SNES_MAINSCREEN].clip = m_layer[layer].main_window_enabled;
+	m_scanlines[SNES_SUBSCREEN].clip = m_layer[layer].sub_window_enabled;
 
-	if (!scanlines[SNES_MAINSCREEN].enable && !scanlines[SNES_SUBSCREEN].enable)
+	if (!m_scanlines[SNES_MAINSCREEN].enable && !m_scanlines[SNES_SUBSCREEN].enable)
 		return;
 
 	/* Handle Mosaic effects */
@@ -609,12 +597,12 @@ void snes_ppu_class::update_line_mode7( UINT16 curline, UINT8 layer, UINT8 prior
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	scanlines[SNES_MAINSCREEN].enable = m_layer[layer].main_bg_enabled;
-	scanlines[SNES_SUBSCREEN].enable = m_layer[layer].sub_bg_enabled;
-	scanlines[SNES_MAINSCREEN].clip = m_layer[layer].main_window_enabled;
-	scanlines[SNES_SUBSCREEN].clip = m_layer[layer].sub_window_enabled;
+	m_scanlines[SNES_MAINSCREEN].enable = m_layer[layer].main_bg_enabled;
+	m_scanlines[SNES_SUBSCREEN].enable = m_layer[layer].sub_bg_enabled;
+	m_scanlines[SNES_MAINSCREEN].clip = m_layer[layer].main_window_enabled;
+	m_scanlines[SNES_SUBSCREEN].clip = m_layer[layer].sub_window_enabled;
 
-	if (!scanlines[SNES_MAINSCREEN].enable && !scanlines[SNES_SUBSCREEN].enable)
+	if (!m_scanlines[SNES_MAINSCREEN].enable && !m_scanlines[SNES_SUBSCREEN].enable)
 		return;
 
 	ma = m_mode7.matrix_a;
@@ -728,7 +716,7 @@ void snes_ppu_class::update_line_mode7( UINT16 curline, UINT8 layer, UINT8 prior
 
 		for (screen = SNES_MAINSCREEN; screen <= SNES_SUBSCREEN; screen++)
 		{
-			if (scanlines[screen].enable)
+			if (m_scanlines[screen].enable)
 			{
 				UINT8 clr = colour;
 				UINT8 clipmask = m_clipmasks[layer][xpos];
@@ -739,11 +727,11 @@ void snes_ppu_class::update_line_mode7( UINT16 curline, UINT8 layer, UINT8 prior
 #endif /* SNES_LAYER_DEBUG */
 
 				/* Clip to windows */
-				if (scanlines[screen].clip)
+				if (m_scanlines[screen].clip)
 					clr &= clipmask;
 
 				/* Draw pixel if appropriate */
-				if (scanlines[screen].priority[xpos] <= priority && clr > 0)
+				if (m_scanlines[screen].priority[xpos] <= priority && clr > 0)
 				{
 					/* Direct select, but only outside EXTBG! */
 					// Direct color format is: 0 | BB000 | GGG00 | RRR00, HW confirms that the data is zero padded.
@@ -1049,11 +1037,11 @@ void snes_ppu_class::update_objects_rto( UINT16 curline )
 
 	/* set Range Over flag if necessary */
 	if (range_over > 32)
-		m_stat77_flags |= 0x40;
+		m_stat77 |= 0x40;
 
 	/* set Time Over flag if necessary */
 	if (time_over > 34)
-		m_stat77_flags |= 0x80;
+		m_stat77 |= 0x80;
 }
 
 /*********************************************
@@ -1073,12 +1061,12 @@ void snes_ppu_class::update_objects( UINT8 priority_oam0, UINT8 priority_oam1, U
 		return;
 #endif /* SNES_LAYER_DEBUG */
 
-	scanlines[SNES_MAINSCREEN].enable = m_layer[SNES_OAM].main_bg_enabled;
-	scanlines[SNES_SUBSCREEN].enable = m_layer[SNES_OAM].sub_bg_enabled;
-	scanlines[SNES_MAINSCREEN].clip = m_layer[SNES_OAM].main_window_enabled;
-	scanlines[SNES_SUBSCREEN].clip = m_layer[SNES_OAM].sub_window_enabled;
+	m_scanlines[SNES_MAINSCREEN].enable = m_layer[SNES_OAM].main_bg_enabled;
+	m_scanlines[SNES_SUBSCREEN].enable = m_layer[SNES_OAM].sub_bg_enabled;
+	m_scanlines[SNES_MAINSCREEN].clip = m_layer[SNES_OAM].main_window_enabled;
+	m_scanlines[SNES_SUBSCREEN].clip = m_layer[SNES_OAM].sub_window_enabled;
 
-	if (!scanlines[SNES_MAINSCREEN].enable && !scanlines[SNES_SUBSCREEN].enable)
+	if (!m_scanlines[SNES_MAINSCREEN].enable && !m_scanlines[SNES_SUBSCREEN].enable)
 		return;
 
 	charaddr = m_layer[SNES_OAM].charmap << 13;
@@ -1389,19 +1377,19 @@ inline void snes_ppu_class::draw_blend( UINT16 offset, UINT16 *colour, UINT8 pre
 		(prevent_color_math == SNES_CLIP_OUT && m_clipmasks[SNES_COLOR][offset]))
 	{
 		UINT16 r, g, b;
-		struct SCANLINE *subscreen;
+		struct SNES_SCANLINE *subscreen;
 		int clip_max = 0;   // if add then clip to 0x1f, if sub then clip to 0
 
 #if SNES_LAYER_DEBUG
 		/* Toggle drawing of SNES_SUBSCREEN or SNES_MAINSCREEN */
 		if (debug_options.draw_subscreen)
 		{
-			subscreen = switch_screens ? &scanlines[SNES_SUBSCREEN] : &scanlines[SNES_MAINSCREEN];
+			subscreen = switch_screens ? &m_scanlines[SNES_SUBSCREEN] : &m_scanlines[SNES_MAINSCREEN];
 		}
 		else
 #endif /* SNES_LAYER_DEBUG */
 		{
-			subscreen = switch_screens ? &scanlines[SNES_MAINSCREEN] : &scanlines[SNES_SUBSCREEN];
+			subscreen = switch_screens ? &m_scanlines[SNES_MAINSCREEN] : &m_scanlines[SNES_SUBSCREEN];
 		}
 
 		if (m_sub_add_mode) /* SNES_SUBSCREEN*/
@@ -1497,7 +1485,7 @@ void snes_ppu_class::refresh_scanline( running_machine &machine, bitmap_rgb32 &b
 	UINT16 ii;
 	int x;
 	int fade;
-	struct SCANLINE *scanline1, *scanline2;
+	struct SNES_SCANLINE *scanline1, *scanline2;
 	UINT16 c;
 	UINT16 prev_colour = 0;
 	int blurring = machine.root_device().ioport("OPTIONS")->read_safe(0) & 0x01;
@@ -1517,26 +1505,26 @@ void snes_ppu_class::refresh_scanline( running_machine &machine, bitmap_rgb32 &b
 			update_offsets();
 
 		/* Clear priority */
-		memset(scanlines[SNES_MAINSCREEN].priority, 0, SNES_SCR_WIDTH);
-		memset(scanlines[SNES_SUBSCREEN].priority, 0, SNES_SCR_WIDTH);
+		memset(m_scanlines[SNES_MAINSCREEN].priority, 0, SNES_SCR_WIDTH);
+		memset(m_scanlines[SNES_SUBSCREEN].priority, 0, SNES_SCR_WIDTH);
 
 		/* Clear layers */
-		memset(scanlines[SNES_MAINSCREEN].layer, SNES_COLOR, SNES_SCR_WIDTH);
-		memset(scanlines[SNES_SUBSCREEN].layer, SNES_COLOR, SNES_SCR_WIDTH);
+		memset(m_scanlines[SNES_MAINSCREEN].layer, SNES_COLOR, SNES_SCR_WIDTH);
+		memset(m_scanlines[SNES_SUBSCREEN].layer, SNES_COLOR, SNES_SCR_WIDTH);
 
 		/* Clear blend_exception (only used for OAM) */
-		memset(scanlines[SNES_MAINSCREEN].blend_exception, 0, SNES_SCR_WIDTH);
-		memset(scanlines[SNES_SUBSCREEN].blend_exception, 0, SNES_SCR_WIDTH);
+		memset(m_scanlines[SNES_MAINSCREEN].blend_exception, 0, SNES_SCR_WIDTH);
+		memset(m_scanlines[SNES_SUBSCREEN].blend_exception, 0, SNES_SCR_WIDTH);
 
 		/* Draw back colour */
 		for (ii = 0; ii < SNES_SCR_WIDTH; ii++)
 		{
 			if (m_mode == 5 || m_mode == 6 || m_pseudo_hires)
-				scanlines[SNES_SUBSCREEN].buffer[ii] = m_cgram[0];
+				m_scanlines[SNES_SUBSCREEN].buffer[ii] = m_cgram[0];
 			else
-				scanlines[SNES_SUBSCREEN].buffer[ii] = m_cgram[FIXED_COLOUR];
+				m_scanlines[SNES_SUBSCREEN].buffer[ii] = m_cgram[FIXED_COLOUR];
 
-			scanlines[SNES_MAINSCREEN].buffer[ii] = m_cgram[0];
+			m_scanlines[SNES_MAINSCREEN].buffer[ii] = m_cgram[0];
 		}
 
 		/* Prepare OAM for this scanline */
@@ -1557,14 +1545,14 @@ void snes_ppu_class::refresh_scanline( running_machine &machine, bitmap_rgb32 &b
 		/* Toggle drawing of SNES_SUBSCREEN or SNES_MAINSCREEN */
 		if (debug_options.draw_subscreen)
 		{
-			scanline1 = &scanlines[SNES_SUBSCREEN];
-			scanline2 = &scanlines[SNES_MAINSCREEN];
+			scanline1 = &m_scanlines[SNES_SUBSCREEN];
+			scanline2 = &m_scanlines[SNES_MAINSCREEN];
 		}
 		else
 #endif /* SNES_LAYER_DEBUG */
 		{
-			scanline1 = &scanlines[SNES_MAINSCREEN];
-			scanline2 = &scanlines[SNES_SUBSCREEN];
+			scanline1 = &m_scanlines[SNES_MAINSCREEN];
+			scanline2 = &m_scanlines[SNES_SUBSCREEN];
 		}
 
 		/* Draw the scanline to screen */
@@ -1778,7 +1766,8 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 	state_save_register_global(machine, m_screen_disabled);
 	state_save_register_global(machine, m_pseudo_hires);
 	state_save_register_global(machine, m_color_modes);
-	state_save_register_global(machine, m_stat77_flags);
+	state_save_register_global(machine, m_stat77);
+	state_save_register_global(machine, m_stat78);
 
 	state_save_register_global(machine, m_htmult);
 	state_save_register_global(machine, m_cgram_address);
@@ -1806,18 +1795,18 @@ static const UINT16 vram_fgr_inccnts[4] = { 0, 32, 64, 128 };
 static const UINT16 vram_fgr_shiftab[4] = { 0, 5, 6, 7 };
 
 // utility function - latches the H/V counters.  Used by IRQ, writes to WRIO, etc.
-void snes_ppu_class::latch_counters( running_machine &machine, UINT8 *ram_ptr )
+void snes_ppu_class::latch_counters( running_machine &machine )
 {
 	m_beam.current_horz = machine.primary_screen->hpos() / m_htmult;
 	m_beam.latch_vert = machine.primary_screen->vpos();
 	m_beam.latch_horz = m_beam.current_horz;
-	ram_ptr[STAT78] |= 0x40;   // indicate we latched
+	m_stat78 |= 0x40;   // indicate we latched
 //  m_read_ophct = m_read_opvct = 0;    // clear read flags - 2009-08: I think we must clear these when STAT78 is read...
 
 //  printf("latched @ H %d V %d\n", m_beam.latch_horz, m_beam.latch_vert);
 }
 
-void snes_ppu_class::dynamic_res_change( running_machine &machine, UINT8 *ram_ptr )
+void snes_ppu_class::dynamic_res_change( running_machine &machine )
 {
 	rectangle visarea = machine.primary_screen->visible_area();
 	attoseconds_t refresh;
@@ -1833,15 +1822,16 @@ void snes_ppu_class::dynamic_res_change( running_machine &machine, UINT8 *ram_pt
 		m_htmult = 1;
 
 	/* FIXME: does the timing changes when the gfx mode is equal to 5 or 6? */
-	if ((ram_ptr[STAT78] & 0x10) == SNES_NTSC)
+	if ((m_stat78 & 0x10) == SNES_NTSC)
+	{
 		refresh = HZ_TO_ATTOSECONDS(DOTCLK_NTSC) * SNES_HTOTAL * SNES_VTOTAL_NTSC;
-	else
-		refresh = HZ_TO_ATTOSECONDS(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
-
-	if ((ram_ptr[STAT78] & 0x10) == SNES_NTSC)
 		machine.primary_screen->configure(SNES_HTOTAL * 2, SNES_VTOTAL_NTSC * m_interlace, visarea, refresh);
+	}
 	else
+	{
+		refresh = HZ_TO_ATTOSECONDS(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
 		machine.primary_screen->configure(SNES_HTOTAL * 2, SNES_VTOTAL_PAL * m_interlace, visarea, refresh);
+	}
 }
 
 /*************************************************
@@ -1885,7 +1875,7 @@ READ8_MEMBER( snes_ppu_class::vram_read )
 	{
 		UINT16 v = space.machine().primary_screen->vpos();
 		UINT16 h = space.machine().primary_screen->hpos();
-		UINT16 ls = (((snes_ram[STAT78] & 0x10) == SNES_NTSC ? 525 : 625) >> 1) - 1;
+		UINT16 ls = (((m_stat78 & 0x10) == SNES_NTSC ? 525 : 625) >> 1) - 1;
 
 		if (m_interlace == 2)
 			ls++;
@@ -2135,7 +2125,7 @@ UINT8 snes_ppu_class::read(address_space &space, UINT32 offset, UINT8 *ram_ptr)
 				return m_ppu1_open_bus;
 			}
 		case SLHV:      /* Software latch for H/V counter */
-			latch_counters(space.machine(), ram_ptr);
+			latch_counters(space.machine());
 			return snes_open_bus_r(space, 0);       /* Return value is meaningless */
 		case ROAMDATA:  /* Read data from OAM (DR) */
 			m_ppu1_open_bus = oam_read(space, m_oam.address);
@@ -2213,20 +2203,20 @@ UINT8 snes_ppu_class::read(address_space &space, UINT32 offset, UINT8 *ram_ptr)
 			m_read_opvct ^= 1;
 			return m_ppu2_open_bus;
 		case STAT77:    /* PPU status flag and version number */
-			value = m_stat77_flags & 0xc0; // 0x80 & 0x40 are Time Over / Range Over Sprite flags, set by the video code
+			value = m_stat77 & 0xc0; // 0x80 & 0x40 are Time Over / Range Over Sprite flags, set by the video code
 			// 0x20 - Master/slave mode select. Little is known about this bit. We always seem to read back 0 here.
 			value |= (m_ppu1_open_bus & 0x10);
 			value |= (m_ppu1_version & 0x0f);
-			m_stat77_flags = value;  // not sure if this is needed...
+			m_stat77 = value;  // not sure if this is needed...
 			m_ppu1_open_bus = value;
 			return m_ppu1_open_bus;
 		case STAT78:    /* PPU status flag and version number */
 			m_read_ophct = 0;
 			m_read_opvct = 0;
 			if(ram_ptr[WRIO] & 0x80)
-				ram_ptr[STAT78] &= ~0x40; //clear ext latch if bit 7 of WRIO is set
-			ram_ptr[STAT78] = (ram_ptr[STAT78] & ~0x2f) | (m_ppu2_open_bus & 0x20) | (m_ppu2_version & 0x0f);
-			m_ppu2_open_bus = ram_ptr[STAT78];
+				m_stat78 &= ~0x40; //clear ext latch if bit 7 of WRIO is set
+			m_stat78 = (m_stat78 & ~0x2f) | (m_ppu2_open_bus & 0x20) | (m_ppu2_version & 0x0f);
+			m_ppu2_open_bus = m_stat78;
 			return m_ppu2_open_bus;
 	}
 
@@ -2295,7 +2285,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			return;
 		case BGMODE:    /* BG mode and character size settings */
 			m_mode = data & 0x07;
-			dynamic_res_change(space.machine(), ram_ptr);
+			dynamic_res_change(space.machine());
 			m_bg3_priority_bit = BIT(data, 3);
 			m_layer[SNES_BG1].tile_size = BIT(data, 4);
 			m_layer[SNES_BG2].tile_size = BIT(data, 5);
@@ -2468,7 +2458,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			m_cgram_address = (m_cgram_address + 1) % (SNES_CGRAM_SIZE - 2);
 			break;
 		case W12SEL:    /* Window mask settings for BG1-2 */
-			if (data != ram_ptr[offset])
+			if (data != ram_ptr[W12SEL])
 			{
 				m_layer[SNES_BG1].window1_invert  = BIT(data, 0);
 				m_layer[SNES_BG1].window1_enabled = BIT(data, 1);
@@ -2482,7 +2472,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			}
 			break;
 		case W34SEL:    /* Window mask settings for BG3-4 */
-			if (data != ram_ptr[offset])
+			if (data != ram_ptr[W34SEL])
 			{
 				m_layer[SNES_BG3].window1_invert  = BIT(data, 0);
 				m_layer[SNES_BG3].window1_enabled = BIT(data, 1);
@@ -2496,7 +2486,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			}
 			break;
 		case WOBJSEL:   /* Window mask settings for objects */
-			if (data != ram_ptr[offset])
+			if (data != ram_ptr[WOBJSEL])
 			{
 				m_layer[SNES_OAM].window1_invert  = BIT(data, 0);
 				m_layer[SNES_OAM].window1_enabled = BIT(data, 1);
@@ -2510,35 +2500,35 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			}
 			break;
 		case WH0:       /* Window 1 left position */
-			if (data != ram_ptr[offset])
+			if (data != ram_ptr[WH0])
 			{
 				m_window1_left = data;
 				m_update_windows = 1;
 			}
 			break;
 		case WH1:       /* Window 1 right position */
-			if (data != ram_ptr[offset])
+			if (data != ram_ptr[WH1])
 			{
 				m_window1_right = data;
 				m_update_windows = 1;
 			}
 			break;
 		case WH2:       /* Window 2 left position */
-			if (data != ram_ptr[offset])
+			if (data != ram_ptr[WH2])
 			{
 				m_window2_left = data;
 				m_update_windows = 1;
 			}
 			break;
 		case WH3:       /* Window 2 right position */
-			if (data != ram_ptr[offset])
+			if (data != ram_ptr[WH3])
 			{
 				m_window2_right = data;
 				m_update_windows = 1;
 			}
 			break;
 		case WBGLOG:    /* Window mask logic for BG's */
-			if (data != ram_ptr[offset])
+			if (data != ram_ptr[WBGLOG])
 			{
 				m_layer[SNES_BG1].wlog_mask = data & 0x03;
 				m_layer[SNES_BG2].wlog_mask = (data & 0x0c) >> 2;
@@ -2548,7 +2538,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			}
 			break;
 		case WOBJLOG:   /* Window mask logic for objects */
-			if (data != ram_ptr[offset])
+			if (data != ram_ptr[WOBJLOG])
 			{
 				m_layer[SNES_OAM].wlog_mask = data & 0x03;
 				m_layer[SNES_COLOR].wlog_mask = (data & 0x0c) >> 2;
@@ -2626,7 +2616,7 @@ void snes_ppu_class::write(address_space &space, UINT32 offset, UINT8 data, UINT
 			m_beam.last_visible_line = (data & 0x04) ? 240 : 225;
 			m_pseudo_hires = BIT(data, 3);
 			m_mode7.extbg = BIT(data, 6);
-			dynamic_res_change(space.machine(), ram_ptr);
+			dynamic_res_change(space.machine());
 #ifdef SNES_DBG_REG_W
 			if ((data & 0x8) != (ram_ptr[SETINI] & 0x8))
 				mame_printf_debug("Pseudo 512 mode: %s\n", (data & 0x8) ? "on" : "off");
