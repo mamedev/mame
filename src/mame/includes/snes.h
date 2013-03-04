@@ -635,14 +635,6 @@ public:
 	UINT8                 m_oldjoy1_latch;
 
 	/* input-related */
-	UINT8                 m_joy1l;
-	UINT8                 m_joy1h;
-	UINT8                 m_joy2l;
-	UINT8                 m_joy2h;
-	UINT8                 m_joy3l;
-	UINT8                 m_joy3h;
-	UINT8                 m_joy4l;
-	UINT8                 m_joy4h;
 	UINT16                m_data1[2];
 	UINT16                m_data2[2];
 	UINT8                 m_read_idx[2];

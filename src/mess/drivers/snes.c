@@ -591,14 +591,14 @@ static void snes_input_read( running_machine &machine )
 	// this actually works like reading the first 16bits from oldjoy1/2 in reverse order
 	if (SNES_CPU_REG_STATE(NMITIMEN) & 1)
 	{
-		state->m_joy1l = (state->m_data1[0] & 0x00ff) >> 0;
-		state->m_joy1h = (state->m_data1[0] & 0xff00) >> 8;
-		state->m_joy2l = (state->m_data1[1] & 0x00ff) >> 0;
-		state->m_joy2h = (state->m_data1[1] & 0xff00) >> 8;
-		state->m_joy3l = (state->m_data2[0] & 0x00ff) >> 0;
-		state->m_joy3h = (state->m_data2[0] & 0xff00) >> 8;
-		state->m_joy4l = (state->m_data2[1] & 0x00ff) >> 0;
-		state->m_joy4h = (state->m_data2[1] & 0xff00) >> 8;
+		SNES_CPU_REG_STATE(JOY1L) = (state->m_data1[0] & 0x00ff) >> 0;
+		SNES_CPU_REG_STATE(JOY1H) = (state->m_data1[0] & 0xff00) >> 8;
+		SNES_CPU_REG_STATE(JOY2L) = (state->m_data1[1] & 0x00ff) >> 0;
+		SNES_CPU_REG_STATE(JOY2H) = (state->m_data1[1] & 0xff00) >> 8;
+		SNES_CPU_REG_STATE(JOY3L) = (state->m_data2[0] & 0x00ff) >> 0;
+		SNES_CPU_REG_STATE(JOY3H) = (state->m_data2[0] & 0xff00) >> 8;
+		SNES_CPU_REG_STATE(JOY4L) = (state->m_data2[1] & 0x00ff) >> 0;
+		SNES_CPU_REG_STATE(JOY4H) = (state->m_data2[1] & 0xff00) >> 8;
 
 		// make sure read_idx starts returning all 1s because the auto-read reads it :-)
 		state->m_read_idx[0] = 16;

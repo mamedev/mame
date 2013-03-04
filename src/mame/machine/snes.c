@@ -527,45 +527,16 @@ READ8_HANDLER( snes_r_io )
 		case RDIO:          /* Programmable I/O port - echos back what's written to WRIO */
 			return SNES_CPU_REG_STATE(WRIO);
 		case JOY1L:         /* Joypad 1 status register (low) */
-			if(state->m_is_nss && state->m_input_disabled)
-				return 0;
-
-			return state->m_joy1l;
 		case JOY1H:         /* Joypad 1 status register (high) */
-			if(state->m_is_nss && state->m_input_disabled)
-				return 0;
-
-			return state->m_joy1h;
 		case JOY2L:         /* Joypad 2 status register (low) */
-			if(state->m_is_nss && state->m_input_disabled)
-				return 0;
-
-			return state->m_joy2l;
 		case JOY2H:         /* Joypad 2 status register (high) */
-			if(state->m_is_nss && state->m_input_disabled)
-				return 0;
-
-			return state->m_joy2h;
 		case JOY3L:         /* Joypad 3 status register (low) */
-			if(state->m_is_nss && state->m_input_disabled)
-				return 0;
-
-			return state->m_joy3l;
 		case JOY3H:         /* Joypad 3 status register (high) */
-			if(state->m_is_nss && state->m_input_disabled)
-				return 0;
-
-			return state->m_joy3h;
 		case JOY4L:         /* Joypad 4 status register (low) */
-			if(state->m_is_nss && state->m_input_disabled)
-				return 0;
-
-			return state->m_joy4l;
 		case JOY4H:         /* Joypad 4 status register (high) */
 			if(state->m_is_nss && state->m_input_disabled)
 				return 0;
-
-			return state->m_joy4h;
+			return SNES_CPU_REG_STATE(offset);
 
 		case 0x4100:        /* NSS Dip-Switches */
 			{
@@ -1499,14 +1470,14 @@ static void nss_io_read( running_machine &machine )
 	// this actually works like reading the first 16bits from oldjoy1/2 in reverse order
 	if (SNES_CPU_REG_STATE(NMITIMEN) & 1)
 	{
-		state->m_joy1l = (state->m_data1[0] & 0x00ff) >> 0;
-		state->m_joy1h = (state->m_data1[0] & 0xff00) >> 8;
-		state->m_joy2l = (state->m_data1[1] & 0x00ff) >> 0;
-		state->m_joy2h = (state->m_data1[1] & 0xff00) >> 8;
-		state->m_joy3l = (state->m_data2[0] & 0x00ff) >> 0;
-		state->m_joy3h = (state->m_data2[0] & 0xff00) >> 8;
-		state->m_joy4l = (state->m_data2[1] & 0x00ff) >> 0;
-		state->m_joy4h = (state->m_data2[1] & 0xff00) >> 8;
+		SNES_CPU_REG_STATE(JOY1L) = (state->m_data1[0] & 0x00ff) >> 0;
+		SNES_CPU_REG_STATE(JOY1H) = (state->m_data1[0] & 0xff00) >> 8;
+		SNES_CPU_REG_STATE(JOY2L) = (state->m_data1[1] & 0x00ff) >> 0;
+		SNES_CPU_REG_STATE(JOY2H) = (state->m_data1[1] & 0xff00) >> 8;
+		SNES_CPU_REG_STATE(JOY3L) = (state->m_data2[0] & 0x00ff) >> 0;
+		SNES_CPU_REG_STATE(JOY3H) = (state->m_data2[0] & 0xff00) >> 8;
+		SNES_CPU_REG_STATE(JOY4L) = (state->m_data2[1] & 0x00ff) >> 0;
+		SNES_CPU_REG_STATE(JOY4H) = (state->m_data2[1] & 0xff00) >> 8;
 
 		// make sure read_idx starts returning all 1s because the auto-read reads it :-)
 		state->m_read_idx[0] = 16;
@@ -1591,7 +1562,10 @@ static void snes_init_ram( running_machine &machine )
 	}
 
 	/* Inititialize registers/variables */
-	state->m_joy1l = state->m_joy1h = state->m_joy2l = state->m_joy2h = state->m_joy3l = state->m_joy3h = 0;
+	SNES_CPU_REG_STATE(JOY1L) = SNES_CPU_REG_STATE(JOY1H) = 0;
+	SNES_CPU_REG_STATE(JOY2L) = SNES_CPU_REG_STATE(JOY2H) = 0;
+	SNES_CPU_REG_STATE(JOY3L) = SNES_CPU_REG_STATE(JOY3H) = 0;
+	SNES_CPU_REG_STATE(JOY4L) = SNES_CPU_REG_STATE(JOY4H) = 0;
 	state->m_data1[0] = state->m_data2[0] = state->m_data1[1] = state->m_data2[1] = 0;
 
 	state->m_io_read = nss_io_read;
@@ -1742,14 +1716,6 @@ MACHINE_START( snes )
 	state->save_item(NAME(state->m_htime));
 	state->save_item(NAME(state->m_vtime));
 	state->save_item(NAME(state->m_hdmaen));
-	state->save_item(NAME(state->m_joy1l));
-	state->save_item(NAME(state->m_joy1h));
-	state->save_item(NAME(state->m_joy2l));
-	state->save_item(NAME(state->m_joy2h));
-	state->save_item(NAME(state->m_joy3l));
-	state->save_item(NAME(state->m_joy3h));
-	state->save_item(NAME(state->m_joy4l));
-	state->save_item(NAME(state->m_joy4h));
 	state->save_item(NAME(state->m_data1));
 	state->save_item(NAME(state->m_data2));
 	state->save_item(NAME(state->m_read_idx));
