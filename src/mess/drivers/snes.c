@@ -724,7 +724,7 @@ static MACHINE_CONFIG_START( snes_base, snes_state )
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
-	MCFG_SCREEN_UPDATE_DRIVER( snes_state, snes_screen_update )
+	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

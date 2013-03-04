@@ -793,31 +793,6 @@ static INPUT_PORTS_START( snes )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( snes, nss_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68Mhz, also 3.58Mhz */
-	MCFG_CPU_PROGRAM_MAP(snes_map)
-
-	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2) /* 2.048 Mhz, but internal divider */
-	MCFG_CPU_PROGRAM_MAP(spc_mem)
-
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
-	/* video hardware */
-	MCFG_VIDEO_START( snes )
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
-	MCFG_SCREEN_UPDATE_DRIVER( snes_state, snes_screen_update )
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("spc700", SNES, 0)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
-MACHINE_CONFIG_END
-
 INTERRUPT_GEN_MEMBER(nss_state::nss_vblank_irq)
 {
 	if(m_nmi_enable)
@@ -841,8 +816,18 @@ static M50458_INTERFACE( m50458_intf )
 	"osd"
 };
 
-static MACHINE_CONFIG_DERIVED( nss, snes )
+static MACHINE_CONFIG_START( nss, nss_state )
 
+	/* base snes hardware */
+	MCFG_CPU_ADD("maincpu", _5A22, MCLK_NTSC)   /* 2.68Mhz, also 3.58Mhz */
+	MCFG_CPU_PROGRAM_MAP(snes_map)
+
+	MCFG_CPU_ADD("soundcpu", SPC700, 2048000/2) /* 2.048 Mhz, but internal divider */
+	MCFG_CPU_PROGRAM_MAP(spc_mem)
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
+
+	/* nss hardware */
 	MCFG_CPU_ADD("bios", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(bios_map)
 	MCFG_CPU_IO_MAP(bios_io_map)
@@ -853,9 +838,24 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 	MCFG_RP5H01_ADD("rp5h01")
 	MCFG_M6M80011AP_ADD("m6m80011ap")
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("spc700", SNES, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+
+	/* video hardware */
+	MCFG_VIDEO_START( snes )
+
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
+	// SNES PPU
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
+	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )
+
+	// NSS
 	MCFG_SCREEN_ADD("osd", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

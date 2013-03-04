@@ -660,7 +660,7 @@ public:
 	snes_cart_info m_cart[2];   // the second one is used by MESS for Sufami Turbo and, eventually, BS-X
 
 	snes_ppu_class        m_ppu;
-	UINT32 snes_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	/* devices */
 	_5a22_device *m_maincpu;
@@ -677,6 +677,17 @@ public:
 	DECLARE_DRIVER_INIT(snes_mess);
 	DECLARE_DRIVER_INIT(snesst);
 
+	inline int dma_abus_valid(UINT32 address);
+	inline UINT8 abus_read(address_space &space, UINT32 abus);
+	inline void dma_transfer(address_space &space, UINT8 dma, UINT32 abus, UINT16 bbus);
+	inline int is_last_active_channel(int dma);
+	inline UINT32 get_hdma_addr(int dma);
+	inline UINT32 get_hdma_iaddr(int dma);
+	void dma(address_space &space, UINT8 channels);
+	void hdma(address_space &space);
+	void hdma_init(address_space &space);
+	void hdma_update(address_space &space, int dma);
+	void hirq_tick();
 
 	TIMER_CALLBACK_MEMBER(snes_nmi_tick);
 	TIMER_CALLBACK_MEMBER(snes_hirq_tick_callback);

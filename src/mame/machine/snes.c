@@ -31,10 +31,6 @@
 /* -- Globals -- */
 UINT8  *snes_ram = NULL;        /* 65816 ram */
 
-static void snes_dma(address_space &space, UINT8 channels);
-static void snes_hdma_init(address_space &space);
-static void snes_hdma(address_space &space);
-
 static DECLARE_READ8_HANDLER(snes_io_dma_r);
 static DECLARE_WRITE8_HANDLER(snes_io_dma_w);
 
@@ -102,7 +98,7 @@ VIDEO_START( snes )
 	state->m_ppu.ppu_start(machine);
 }
 
-UINT32 snes_state::snes_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+UINT32 snes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* NTSC SNES draw range is 1-225. */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -127,23 +123,21 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_nmi_tick)
 	m_nmi_timer->adjust(attotime::never);
 }
 
-static void snes_hirq_tick( running_machine &machine )
+void snes_state::hirq_tick()
 {
-	snes_state *state = machine.driver_data<snes_state>();
-
 	// latch the counters and pull IRQ
 	// (don't need to switch to the 65816 context, we don't do anything dependant on it)
-	state->m_ppu.latch_counters(machine);
+	m_ppu.latch_counters(machine());
 	snes_ram[TIMEUP] = 0x80;    /* Indicate that irq occurred */
-	state->m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
+	m_maincpu->set_input_line(G65816_LINE_IRQ, ASSERT_LINE);
 
 	// don't happen again
-	state->m_hirq_timer->adjust(attotime::never);
+	m_hirq_timer->adjust(attotime::never);
 }
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_hirq_tick_callback)
 {
-	snes_hirq_tick(machine());
+	hirq_tick();
 }
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_reset_oam_address)
@@ -162,7 +156,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_reset_oam_address)
 TIMER_CALLBACK_MEMBER(snes_state::snes_reset_hdma)
 {
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
-	snes_hdma_init(cpu0space);
+	hdma_init(cpu0space);
 }
 
 TIMER_CALLBACK_MEMBER(snes_state::snes_update_io)
@@ -213,7 +207,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 //          printf("HIRQ @ %d, %d\n", pixel * m_ppu.m_htmult, m_ppu.m_beam.current_vert);
 			if (pixel == 0)
 			{
-				snes_hirq_tick(machine());
+				hirq_tick();
 			}
 			else
 			{
@@ -244,7 +238,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 	if (m_ppu.m_beam.current_vert == 0)
 	{
 		address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
-		snes_hdma_init(cpu0space);
+		hdma_init(cpu0space);
 	}
 
 	if (m_ppu.m_beam.current_vert == 0)
@@ -281,7 +275,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 		{
 			/* Do HDMA */
 			if (snes_ram[HDMAEN])
-				snes_hdma(cpu0space);
+				hdma(cpu0space);
 
 			machine().primary_screen->update_partial((m_ppu.m_interlace == 2) ? (m_ppu.m_beam.current_vert * m_ppu.m_interlace) : m_ppu.m_beam.current_vert - 1);
 		}
@@ -727,7 +721,7 @@ WRITE8_HANDLER( snes_w_io )
 			state->m_vtime &= 0x1ff;
 			return;
 		case MDMAEN:    /* DMA channel designation and trigger */
-			snes_dma(space, data);
+			state->dma(space, data);
 			data = 0;   /* Once DMA is done we need to reset all bits to 0 */
 			break;
 		case HDMAEN:    /* HDMA channel designation */
@@ -1949,7 +1943,7 @@ DRIVER_INIT_MEMBER(snes_state,snes_hirom)
 
 *************************************/
 
-INLINE int dma_abus_valid( UINT32 address )
+inline int snes_state::dma_abus_valid( UINT32 address )
 {
 	if((address & 0x40ff00) == 0x2100) return 0;  //$[00-3f|80-bf]:[2100-21ff]
 	if((address & 0x40fe00) == 0x4000) return 0;  //$[00-3f|80-bf]:[4000-41ff]
@@ -1959,7 +1953,7 @@ INLINE int dma_abus_valid( UINT32 address )
 	return 1;
 }
 
-INLINE UINT8 snes_abus_read( address_space &space, UINT32 abus )
+inline UINT8 snes_state::abus_read( address_space &space, UINT32 abus )
 {
 	if (!dma_abus_valid(abus))
 		return 0;
@@ -1967,11 +1961,9 @@ INLINE UINT8 snes_abus_read( address_space &space, UINT32 abus )
 	return space.read_byte(abus);
 }
 
-INLINE void snes_dma_transfer( address_space &space, UINT8 dma, UINT32 abus, UINT16 bbus )
+inline void snes_state::dma_transfer( address_space &space, UINT8 dma, UINT32 abus, UINT16 bbus )
 {
-	snes_state *state = space.machine().driver_data<snes_state>();
-
-	if (state->m_dma_channel[dma].dmap & 0x80)  /* PPU->CPU */
+	if (m_dma_channel[dma].dmap & 0x80)  /* PPU->CPU */
 	{
 		if (bbus == 0x2180 && ((abus & 0xfe0000) == 0x7e0000 || (abus & 0x40e000) == 0x0000))
 		{
@@ -2000,7 +1992,7 @@ INLINE void snes_dma_transfer( address_space &space, UINT8 dma, UINT32 abus, UIN
 		}
 		else
 		{
-			space.write_byte(bbus, snes_abus_read(space, abus));
+			space.write_byte(bbus, abus_read(space, abus));
 			return;
 		}
 	}
@@ -2008,26 +2000,21 @@ INLINE void snes_dma_transfer( address_space &space, UINT8 dma, UINT32 abus, UIN
 
 /* WIP: These have the advantage to automatically update the address, but then we would need to
 check again if the transfer is direct/indirect at each step... is it worth? */
-INLINE UINT32 snes_get_hdma_addr( running_machine &machine, int dma )
+inline UINT32 snes_state::get_hdma_addr( int dma )
 {
-	snes_state *state = machine.driver_data<snes_state>();
-	return (state->m_dma_channel[dma].bank << 16) | (state->m_dma_channel[dma].hdma_addr++);
+	return (m_dma_channel[dma].bank << 16) | (m_dma_channel[dma].hdma_addr++);
 }
 
-INLINE UINT32 snes_get_hdma_iaddr( running_machine &machine, int dma )
+inline UINT32 snes_state::get_hdma_iaddr( int dma )
 {
-	snes_state *state = machine.driver_data<snes_state>();
-	return (state->m_dma_channel[dma].ibank << 16) | (state->m_dma_channel[dma].trans_size++);
+	return (m_dma_channel[dma].ibank << 16) | (m_dma_channel[dma].trans_size++);
 }
 
-INLINE int is_last_active_channel( running_machine &machine, int dma )
+inline int snes_state::is_last_active_channel( int dma )
 {
-	snes_state *state = machine.driver_data<snes_state>();
-	int i;
-
-	for (i = dma + 1; i < 8; i++)
+	for (int i = dma + 1; i < 8; i++)
 	{
-		if (BIT(state->m_hdmaen, i) && state->m_dma_channel[i].hdma_line_counter)
+		if (BIT(m_hdmaen, i) && m_dma_channel[i].hdma_line_counter)
 			return 0;   // there is still at least another channel with incomplete HDMA
 	}
 
@@ -2035,141 +2022,133 @@ INLINE int is_last_active_channel( running_machine &machine, int dma )
 	return 1;
 }
 
-static void snes_hdma_update( address_space &space, int dma )
+void snes_state::hdma_update( address_space &space, int dma )
 {
-	snes_state *state = space.machine().driver_data<snes_state>();
-	UINT32 abus = snes_get_hdma_addr(space.machine(), dma);
+	UINT32 abus = get_hdma_addr(dma);
 
-	state->m_dma_channel[dma].hdma_line_counter = snes_abus_read(space, abus);
+	m_dma_channel[dma].hdma_line_counter = abus_read(space, abus);
 
-	if (state->m_dma_channel[dma].dmap & 0x40)
+	if (m_dma_channel[dma].dmap & 0x40)
 	{
 		/* One oddity: if $43xA is 0 and this is the last active HDMA channel for this scanline, only load
 		one byte for Address, and use the $00 for the low byte. So Address ends up incremented one less than
 		otherwise expected */
 
-		abus = snes_get_hdma_addr(space.machine(), dma);
-		state->m_dma_channel[dma].trans_size = snes_abus_read(space, abus) << 8;
+		abus = get_hdma_addr(dma);
+		m_dma_channel[dma].trans_size = abus_read(space, abus) << 8;
 
-		if (state->m_dma_channel[dma].hdma_line_counter || !is_last_active_channel(space.machine(), dma))
+		if (m_dma_channel[dma].hdma_line_counter || !is_last_active_channel(dma))
 		{
 			// we enter here if we have more transfers to be done or if there are other active channels after this one
-			abus = snes_get_hdma_addr(space.machine(), dma);
-			state->m_dma_channel[dma].trans_size >>= 8;
-			state->m_dma_channel[dma].trans_size |= snes_abus_read(space, abus) << 8;
+			abus = get_hdma_addr(dma);
+			m_dma_channel[dma].trans_size >>= 8;
+			m_dma_channel[dma].trans_size |= abus_read(space, abus) << 8;
 		}
 	}
 
-	if (!state->m_dma_channel[dma].hdma_line_counter)
-		state->m_hdmaen &= ~(1 << dma);
+	if (!m_dma_channel[dma].hdma_line_counter)
+		m_hdmaen &= ~(1 << dma);
 
-	state->m_dma_channel[dma].do_transfer = 1;
+	m_dma_channel[dma].do_transfer = 1;
 }
 
-static void snes_hdma_init( address_space &space )
+void snes_state::hdma_init( address_space &space )
 {
-	snes_state *state = space.machine().driver_data<snes_state>();
-	int i;
-
-	state->m_hdmaen = snes_ram[HDMAEN];
-	for (i = 0; i < 8; i++)
+	m_hdmaen = snes_ram[HDMAEN];
+	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(state->m_hdmaen, i))
+		if (BIT(m_hdmaen, i))
 		{
-			state->m_dma_channel[i].hdma_addr = state->m_dma_channel[i].src_addr;
-			snes_hdma_update(space, i);
+			m_dma_channel[i].hdma_addr = m_dma_channel[i].src_addr;
+			hdma_update(space, i);
 		}
 	}
 }
 
-static void snes_hdma( address_space &space )
+void snes_state::hdma( address_space &space )
 {
-	snes_state *state = space.machine().driver_data<snes_state>();
 	UINT16 bbus;
 	UINT32 abus;
-	int i;
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(state->m_hdmaen, i))
+		if (BIT(m_hdmaen, i))
 		{
-			if (state->m_dma_channel[i].do_transfer)
+			if (m_dma_channel[i].do_transfer)
 			{
 				/* Get transfer addresses */
-				if (state->m_dma_channel[i].dmap & 0x40)    /* Indirect */
-					abus = (state->m_dma_channel[i].ibank << 16) + state->m_dma_channel[i].trans_size;
+				if (m_dma_channel[i].dmap & 0x40)    /* Indirect */
+					abus = (m_dma_channel[i].ibank << 16) + m_dma_channel[i].trans_size;
 				else                                    /* Absolute */
-					abus = (state->m_dma_channel[i].bank << 16) + state->m_dma_channel[i].hdma_addr;
+					abus = (m_dma_channel[i].bank << 16) + m_dma_channel[i].hdma_addr;
 
-				bbus = state->m_dma_channel[i].dest_addr + 0x2100;
+				bbus = m_dma_channel[i].dest_addr + 0x2100;
 
 
 
-				switch (state->m_dma_channel[i].dmap & 0x07)
+				switch (m_dma_channel[i].dmap & 0x07)
 				{
 				case 0:     /* 1 register write once             (1 byte:  p               ) */
-					snes_dma_transfer(space, i, abus++, bbus);
+					dma_transfer(space, i, abus++, bbus);
 					break;
 				case 5:     /* 2 registers write twice alternate (4 bytes: p, p+1, p,   p+1) */
-					snes_dma_transfer(space, i, abus++, bbus);
-					snes_dma_transfer(space, i, abus++, bbus + 1);
-					snes_dma_transfer(space, i, abus++, bbus);
-					snes_dma_transfer(space, i, abus++, bbus + 1);
+					dma_transfer(space, i, abus++, bbus);
+					dma_transfer(space, i, abus++, bbus + 1);
+					dma_transfer(space, i, abus++, bbus);
+					dma_transfer(space, i, abus++, bbus + 1);
 					break;
 				case 1:     /* 2 registers write once            (2 bytes: p, p+1          ) */
-					snes_dma_transfer(space, i, abus++, bbus);
-					snes_dma_transfer(space, i, abus++, bbus + 1);
+					dma_transfer(space, i, abus++, bbus);
+					dma_transfer(space, i, abus++, bbus + 1);
 					break;
 				case 2:     /* 1 register write twice            (2 bytes: p, p            ) */
 				case 6:
-					snes_dma_transfer(space, i, abus++, bbus);
-					snes_dma_transfer(space, i, abus++, bbus);
+					dma_transfer(space, i, abus++, bbus);
+					dma_transfer(space, i, abus++, bbus);
 					break;
 				case 3:     /* 2 registers write twice each      (4 bytes: p, p,   p+1, p+1) */
 				case 7:
-					snes_dma_transfer(space, i, abus++, bbus);
-					snes_dma_transfer(space, i, abus++, bbus);
-					snes_dma_transfer(space, i, abus++, bbus + 1);
-					snes_dma_transfer(space, i, abus++, bbus + 1);
+					dma_transfer(space, i, abus++, bbus);
+					dma_transfer(space, i, abus++, bbus);
+					dma_transfer(space, i, abus++, bbus + 1);
+					dma_transfer(space, i, abus++, bbus + 1);
 					break;
 				case 4:     /* 4 registers write once            (4 bytes: p, p+1, p+2, p+3) */
-					snes_dma_transfer(space, i, abus++, bbus);
-					snes_dma_transfer(space, i, abus++, bbus + 1);
-					snes_dma_transfer(space, i, abus++, bbus + 2);
-					snes_dma_transfer(space, i, abus++, bbus + 3);
+					dma_transfer(space, i, abus++, bbus);
+					dma_transfer(space, i, abus++, bbus + 1);
+					dma_transfer(space, i, abus++, bbus + 2);
+					dma_transfer(space, i, abus++, bbus + 3);
 					break;
 				default:
 #ifdef MAME_DEBUG
-					mame_printf_debug( "  HDMA of unsupported type: %d\n", state->m_dma_channel[i].dmap & 0x07);
+					mame_printf_debug( "  HDMA of unsupported type: %d\n", m_dma_channel[i].dmap & 0x07);
 #endif
 					break;
 				}
 
-				if (state->m_dma_channel[i].dmap & 0x40)    /* Indirect */
-					state->m_dma_channel[i].trans_size = abus;
+				if (m_dma_channel[i].dmap & 0x40)    /* Indirect */
+					m_dma_channel[i].trans_size = abus;
 				else                                    /* Absolute */
-					state->m_dma_channel[i].hdma_addr = abus;
+					m_dma_channel[i].hdma_addr = abus;
 
 			}
 		}
 	}
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
-		if (BIT(state->m_hdmaen, i))
+		if (BIT(m_hdmaen, i))
 		{
-			state->m_dma_channel[i].do_transfer = (--state->m_dma_channel[i].hdma_line_counter) & 0x80;
+			m_dma_channel[i].do_transfer = (--m_dma_channel[i].hdma_line_counter) & 0x80;
 
-			if (!(state->m_dma_channel[i].hdma_line_counter & 0x7f))
-				snes_hdma_update(space, i);
+			if (!(m_dma_channel[i].hdma_line_counter & 0x7f))
+				hdma_update(space, i);
 		}
 	}
 }
 
-static void snes_dma( address_space &space, UINT8 channels )
+void snes_state::dma( address_space &space, UINT8 channels )
 {
-	snes_state *state = space.machine().driver_data<snes_state>();
-	int i;
 	INT8 increment;
 	UINT16 bbus;
 	UINT32 abus, abus_bank;
@@ -2178,113 +2157,113 @@ static void snes_dma( address_space &space, UINT8 channels )
 	/* FIXME: we also need to round to the nearest 8 master cycles */
 
 	/* Assume priority of the 8 DMA channels is 0-7 */
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		if (BIT(channels, i))
 		{
 			/* FIXME: the following should be used to stop DMA if the same channel is used by HDMA (being set to 1 in snes_hdma)
 			 However, this cannot be implemented as is atm, because currently DMA transfers always happen as soon as they are enabled... */
-			state->m_dma_channel[i].dma_disabled = 0;
+			m_dma_channel[i].dma_disabled = 0;
 
 			//printf( "Making a transfer on channel %d\n", i );
 			/* Find transfer addresses */
-			abus = state->m_dma_channel[i].src_addr;
-			abus_bank = state->m_dma_channel[i].bank << 16;
-			bbus = state->m_dma_channel[i].dest_addr + 0x2100;
+			abus = m_dma_channel[i].src_addr;
+			abus_bank = m_dma_channel[i].bank << 16;
+			bbus = m_dma_channel[i].dest_addr + 0x2100;
 
 			//printf("Address: %06x\n", abus | abus_bank);
 			/* Auto increment */
-			if (state->m_dma_channel[i].dmap & 0x8)
+			if (m_dma_channel[i].dmap & 0x8)
 				increment = 0;
 			else
 			{
-				if (state->m_dma_channel[i].dmap & 0x10)
+				if (m_dma_channel[i].dmap & 0x10)
 					increment = -1;
 				else
 					increment = 1;
 			}
 
 			/* Number of bytes to transfer */
-			length = state->m_dma_channel[i].trans_size;
+			length = m_dma_channel[i].trans_size;
 
-//          printf( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus | abus_bank, bbus, increment, state->m_dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", state->m_dma_channel[i].dmap & 0x07);
+//          printf( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus | abus_bank, bbus, increment, m_dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", m_dma_channel[i].dmap & 0x07);
 
 #ifdef SNES_DBG_DMA
-			mame_printf_debug( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus | abus_bank, bbus, increment, state->m_dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", state->m_dma_channel[i].dmap & 0x07);
+			mame_printf_debug( "DMA-Ch %d: len: %X, abus: %X, bbus: %X, incr: %d, dir: %s, type: %d\n", i, length, abus | abus_bank, bbus, increment, m_dma_channel[i].dmap & 0x80 ? "PPU->CPU" : "CPU->PPU", m_dma_channel[i].dmap & 0x07);
 #endif
 
-			switch (state->m_dma_channel[i].dmap & 0x07)
+			switch (m_dma_channel[i].dmap & 0x07)
 			{
 				case 0:     /* 1 register write once */
 				case 2:     /* 1 register write twice */
 				case 6:     /* 1 register write twice */
 					do
 					{
-						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
+						dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
 						abus += increment;
-					} while (--length && !state->m_dma_channel[i].dma_disabled);
+					} while (--length && !m_dma_channel[i].dma_disabled);
 					break;
 				case 1:     /* 2 registers write once */
 				case 5:     /* 2 registers write twice alternate */
 					do
 					{
-						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
+						dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
 						abus += increment;
-						if (!(--length) || state->m_dma_channel[i].dma_disabled)
+						if (!(--length) || m_dma_channel[i].dma_disabled)
 							break;
-						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
+						dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
 						abus += increment;
-					} while (--length && !state->m_dma_channel[i].dma_disabled);
+					} while (--length && !m_dma_channel[i].dma_disabled);
 					break;
 				case 3:     /* 2 registers write twice each */
 				case 7:     /* 2 registers write twice each */
 					do
 					{
-						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
+						dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
 						abus += increment;
-						if (!(--length) || state->m_dma_channel[i].dma_disabled)
+						if (!(--length) || m_dma_channel[i].dma_disabled)
 							break;
-						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
+						dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
 						abus += increment;
-						if (!(--length) || state->m_dma_channel[i].dma_disabled)
+						if (!(--length) || m_dma_channel[i].dma_disabled)
 							break;
-						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
+						dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
 						abus += increment;
-						if (!(--length) || state->m_dma_channel[i].dma_disabled)
+						if (!(--length) || m_dma_channel[i].dma_disabled)
 							break;
-						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
+						dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
 						abus += increment;
-					} while (--length && !state->m_dma_channel[i].dma_disabled);
+					} while (--length && !m_dma_channel[i].dma_disabled);
 					break;
 				case 4:     /* 4 registers write once */
 					do
 					{
-						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
+						dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus);
 						abus += increment;
-						if (!(--length) || state->m_dma_channel[i].dma_disabled)
+						if (!(--length) || m_dma_channel[i].dma_disabled)
 							break;
-						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
+						dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 1);
 						abus += increment;
-						if (!(--length) || state->m_dma_channel[i].dma_disabled)
+						if (!(--length) || m_dma_channel[i].dma_disabled)
 							break;
-						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 2);
+						dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 2);
 						abus += increment;
-						if (!(--length) || state->m_dma_channel[i].dma_disabled)
+						if (!(--length) || m_dma_channel[i].dma_disabled)
 							break;
-						snes_dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 3);
+						dma_transfer(space, i, (abus & 0xffff) | abus_bank, bbus + 3);
 						abus += increment;
-					} while (--length && !state->m_dma_channel[i].dma_disabled);
+					} while (--length && !m_dma_channel[i].dma_disabled);
 					break;
 				default:
 #ifdef MAME_DEBUG
-					mame_printf_debug("  DMA of unsupported type: %d\n", state->m_dma_channel[i].dmap & 0x07);
+					mame_printf_debug("  DMA of unsupported type: %d\n", m_dma_channel[i].dmap & 0x07);
 #endif
 					break;
 			}
 
 			/* We're done, so write the new abus back to the registers */
-			state->m_dma_channel[i].src_addr = abus;
-			state->m_dma_channel[i].trans_size = 0;
+			m_dma_channel[i].src_addr = abus;
+			m_dma_channel[i].trans_size = 0;
 		}
 	}
 
