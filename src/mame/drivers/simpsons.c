@@ -67,7 +67,7 @@ Custom ICs - 053260        - sound chip (QFP80)
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
+#include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
 #include "cpu/z80/z80.h"
 #include "video/konicdev.h"
 #include "machine/eeprom.h"

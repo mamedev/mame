@@ -116,6 +116,21 @@ union PAIR
 };
 
 
+// PAIR16 is a 16-bit extension of a PAIR
+union PAIR16
+{
+#ifdef LSB_FIRST
+	struct { UINT8 l,h; } b;
+	struct { INT8 l,h; } sb;
+#else
+	struct { UINT8 h,l; } b;
+	struct { INT8 h,l; } sb;
+#endif
+	UINT16 w;
+	INT16 sw;
+};
+
+
 // PAIR64 is a 64-bit extension of a PAIR
 union PAIR64
 {

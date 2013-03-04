@@ -443,22 +443,6 @@ $(CPUOBJ)/g65816/g65816o4.o:    $(CPUSRC)/g65816/g65816o4.c \
 
 
 #-------------------------------------------------
-# Hitachi 6309
-#-------------------------------------------------
-
-ifneq ($(filter HD6309,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/hd6309
-CPUOBJS += $(CPUOBJ)/hd6309/hd6309.o
-DASMOBJS += $(CPUOBJ)/hd6309/6309dasm.o
-endif
-
-$(CPUOBJ)/hd6309/hd6309.o:  $(CPUSRC)/hd6309/hd6309.c \
-							$(CPUSRC)/hd6309/hd6309.h \
-							$(CPUSRC)/hd6309/6309ops.c \
-							$(CPUSRC)/hd6309/6309tbl.c
-
-
-#-------------------------------------------------
 # Hitachi H8/30xx (16/32-bit H8/3xx series)
 #-------------------------------------------------
 
@@ -830,23 +814,6 @@ endif
 
 $(CPUOBJ)/i960/i960.o:  $(CPUSRC)/i960/i960.c \
 						$(CPUSRC)/i960/i960.h
-
-
-
-#-------------------------------------------------
-# Konami custom CPU (6809-based)
-#-------------------------------------------------
-
-ifneq ($(filter KONAMI,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/konami
-CPUOBJS += $(CPUOBJ)/konami/konami.o
-DASMOBJS += $(CPUOBJ)/konami/knmidasm.o
-endif
-
-$(CPUOBJ)/konami/konami.o:  $(CPUSRC)/konami/konami.c \
-							$(CPUSRC)/konami/konami.h \
-							$(CPUSRC)/konami/konamops.c \
-							$(CPUSRC)/konami/konamtbl.c
 
 
 
@@ -1229,14 +1196,39 @@ $(CPUOBJ)/m6805/m6805.o:    $(CPUSRC)/m6805/m6805.c \
 
 ifneq ($(filter M6809,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/m6809
-CPUOBJS += $(CPUOBJ)/m6809/m6809.o
-DASMOBJS += $(CPUOBJ)/m6809/6809dasm.o
+CPUOBJS += $(CPUOBJ)/m6809/m6809.o $(CPUOBJ)/m6809/hd6309.o $(CPUOBJ)/m6809/konami.o
+DASMOBJS += $(CPUOBJ)/m6809/6809dasm.o $(CPUOBJ)/m6809/6309dasm.o $(CPUOBJ)/m6809/knmidasm.o
 endif
 
 $(CPUOBJ)/m6809/m6809.o:    $(CPUSRC)/m6809/m6809.c \
 							$(CPUSRC)/m6809/m6809.h \
-							$(CPUSRC)/m6809/6809ops.c \
-							$(CPUSRC)/m6809/6809tbl.c
+							$(CPUSRC)/m6809/m6809inl.h \
+							$(CPUOBJ)/m6809/m6809.inc
+
+$(CPUOBJ)/m6809/hd6309.o:   $(CPUSRC)/m6809/hd6309.c \
+							$(CPUSRC)/m6809/hd6309.h \
+							$(CPUSRC)/m6809/m6809.h \
+							$(CPUSRC)/m6809/m6809inl.h \
+							$(CPUOBJ)/m6809/hd6309.inc
+
+
+$(CPUOBJ)/m6809/konami.o:   $(CPUSRC)/m6809/konami.c \
+							$(CPUSRC)/m6809/konami.h \
+							$(CPUSRC)/m6809/m6809.h \
+							$(CPUSRC)/m6809/m6809inl.h \
+							$(CPUOBJ)/m6809/konami.inc
+
+$(CPUOBJ)/m6809/m6809.inc:	$(CPUSRC)/m6809/m6809make.py $(CPUSRC)/m6809/m6809.ops $(CPUSRC)/m6809/base6x09.ops
+	@echo Generating m6809 source file...
+	@gcc -x c -P -E $(CPUSRC)/m6809/m6809.ops | $(PYTHON) $(CPUSRC)/m6809/m6809make.py > $@
+
+$(CPUOBJ)/m6809/hd6309.inc:	$(CPUSRC)/m6809/m6809make.py $(CPUSRC)/m6809/hd6309.ops $(CPUSRC)/m6809/base6x09.ops
+	@echo Generating hd6309 source file...
+	@gcc -x c -P -E $(CPUSRC)/m6809/hd6309.ops | $(PYTHON) $(CPUSRC)/m6809/m6809make.py > $@
+
+$(CPUOBJ)/m6809/konami.inc:	$(CPUSRC)/m6809/m6809make.py $(CPUSRC)/m6809/konami.ops $(CPUSRC)/m6809/base6x09.ops
+	@echo Generating konami source file...
+	@gcc -x c -P -E $(CPUSRC)/m6809/konami.ops | $(PYTHON) $(CPUSRC)/m6809/m6809make.py > $@
 
 
 

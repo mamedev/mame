@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "cpu/hd6309/hd6309.h"
+#include "cpu/m6809/hd6309.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
 #include "video/konicdev.h"

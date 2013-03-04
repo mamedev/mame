@@ -604,7 +604,7 @@ static const char *const hd6309_tfmregs[16] = {
 
 static const char *const tfm_s[] = { "%s+,%s+", "%s-,%s-", "%s+,%s", "%s,%s+" };
 
-CPU_DISASSEMBLE( hd6309 )
+offs_t hd6309_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	UINT8 opcode, mode, pb, pbm, reg;
 	const UINT8 *operandarray;

@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
-#include "cpu/konami/konami.h"
+#include "cpu/m6809/konami.h"
 #include "video/konicdev.h"
 #include "includes/ajax.h"
 

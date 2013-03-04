@@ -120,7 +120,7 @@ Dip location and recommended settings verified with the US manual
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/hd6309/hd6309.h"
+#include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/upd7759.h"

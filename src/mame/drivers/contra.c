@@ -17,7 +17,7 @@ Dip locations and factory settings verified with manual
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/hd6309/hd6309.h"
+#include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "video/konicdev.h"

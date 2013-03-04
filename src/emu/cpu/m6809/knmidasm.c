@@ -1860,7 +1860,7 @@ static const konami_opcode_def op_table[256] = {
 	/* ff */    { illegal, 0 }
 };
 
-CPU_DISASSEMBLE( konami )
+offs_t konami_cpu_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	buffer[0] = '\0';
 

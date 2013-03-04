@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/konami/konami.h"
+#include "cpu/m6809/konami.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/k007232.h"

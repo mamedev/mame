@@ -40,7 +40,7 @@ To do:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/hd6309/hd6309.h"
+#include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/mcs51/mcs51.h"

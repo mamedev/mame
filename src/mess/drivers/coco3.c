@@ -12,7 +12,7 @@
 
 #include "includes/coco3.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/hd6309/hd6309.h"
+#include "cpu/m6809/hd6309.h"
 #include "coco3.lh"
 
 

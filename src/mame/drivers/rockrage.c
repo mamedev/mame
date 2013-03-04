@@ -49,7 +49,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/hd6309/hd6309.h"
+#include "cpu/m6809/hd6309.h"
 #include "sound/2151intf.h"
 #include "sound/vlm5030.h"
 #include "video/konicdev.h"
