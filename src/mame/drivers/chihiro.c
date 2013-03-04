@@ -1120,11 +1120,11 @@ UINT32 convert_a4r4g4b4_a8r8g8b8(UINT32 a4r4g4b4)
 	UINT32 a8r8g8b8;
 	int ca,cr,cg,cb;
 
-	cb=(a4r4g4b4 & 0xf)*17; // ((a4r4g4b4 & 0xf)*255)/15
-	cg=((a4r4g4b4 & 0xf0)*816)/3; // (((a4r4g4b4 & 0xf0) >> 4)*255)/15) << 8 
-	cr=(a4r4g4b4 & 0xf00)*17*256; // (((a4r4g4b4 & 0xf00) >> 8)*255)/15) << 16
-	ca=(a4r4g4b4 & 0xf000)*4096*17; //((a4r4g4b4 & 0xf000) >> 12)*255/15 << 24
-	a8r8g8b8=ca+cb+cg+cr; // color converted to 8 bits per component
+	cb=pal4bit(a4r4g4b4 & 0x000f);//(a4r4g4b4 & 0xf)*17; // ((a4r4g4b4 & 0xf)*255)/15
+	cg=pal4bit((a4r4g4b4 & 0x00f0) >> 4);//((a4r4g4b4 & 0xf0)*816)/3; // (((a4r4g4b4 & 0xf0) >> 4)*255)/15) << 8
+	cr=pal4bit((a4r4g4b4 & 0x0f00) >> 8);//(a4r4g4b4 & 0xf00)*17*256; // (((a4r4g4b4 & 0xf00) >> 8)*255)/15) << 16
+	ca=pal4bit((a4r4g4b4 & 0xf000) >> 12);//(a4r4g4b4 & 0xf000)*4096*17; //((a4r4g4b4 & 0xf000) >> 12)*255/15 << 24
+	a8r8g8b8=(ca<<24)|(cr<<16)|(cg<<8)|(cr); // color converted to 8 bits per component
 	return a8r8g8b8;
 }
 
@@ -1480,7 +1480,7 @@ void nv2a_renderer::geforce_exec_method(address_space & space,UINT32 chanel,UINT
 				float z[4],w[4];
 				UINT32 c[4];
 
-				printf("draw quad\n\r");
+				//printf("draw quad\n\r");
 				for (m=0;m < 4;m++) {
 					*((UINT32 *)(&xy[m].x))=space.read_dword(vtxbuf_address[0]+(n+m+offset)*vtxbuf_stride[0]+0);
 					*((UINT32 *)(&xy[m].y))=space.read_dword(vtxbuf_address[0]+(n+m+offset)*vtxbuf_stride[0]+4);
