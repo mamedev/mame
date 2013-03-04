@@ -1037,7 +1037,7 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/omegrace.o \
 	$(DRIVERS)/seattle.o \
 	$(DRIVERS)/tmaster.o \
-	$(DRIVERS)/vegas.o \
+	$(DRIVERS)/vegas.o $(DRIVERS)/wmg.o \
 	$(DRIVERS)/williams.o $(MACHINE)/williams.o $(AUDIO)/williams.o $(VIDEO)/williams.o \
 	$(MACHINE)/midwayic.o \
 	$(AUDIO)/dcs.o \

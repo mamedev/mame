@@ -3757,6 +3757,7 @@ src/mame/drivers/wink.c svneol=native#text/plain
 src/mame/drivers/wiping.c svneol=native#text/plain
 src/mame/drivers/witch.c svneol=native#text/plain
 src/mame/drivers/wiz.c svneol=native#text/plain
+src/mame/drivers/wmg.c svneol=native#text/plain
 src/mame/drivers/wms.c svneol=native#text/plain
 src/mame/drivers/wolfpack.c svneol=native#text/plain
 src/mame/drivers/wpc_95.c svneol=native#text/plain
