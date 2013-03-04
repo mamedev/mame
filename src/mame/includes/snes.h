@@ -368,6 +368,10 @@
 #define DSP_FIR_C6      0x6F
 #define DSP_FIR_C7      0x7F
 
+
+#define SNES_CPU_REG(a) m_cpu_regs[a - 0x4200]	// regs 0x4200-0x421f
+#define SNES_CPU_REG_STATE(a) state->m_cpu_regs[a - 0x4200]	// regs 0x4200-0x421f
+
 /* (PPU) Video related */
 
 struct SNES_SCANLINE
@@ -429,12 +433,6 @@ public:
 		UINT8 flip;
 		UINT16 write_latch;
 	} m_oam;
-	
-	struct
-	{
-		UINT16 horizontal[4];
-		UINT16 vertical[4];
-	} m_bgd_offset;
 	
 	struct
 	{
@@ -630,8 +628,11 @@ public:
 		int    do_transfer;
 
 		int    dma_disabled;    // used to stop DMA if HDMA is enabled (currently not implemented, see machine/snes.c)
-	}m_dma_channel[8];
+	} m_dma_channel[8];
 	UINT8                 m_hdmaen; /* channels enabled for HDMA */
+	UINT8                 m_dma_regs[0x80];
+	UINT8                 m_cpu_regs[0x20];
+	UINT8                 m_oldjoy1_latch;
 
 	/* input-related */
 	UINT8                 m_joy1l;

@@ -209,9 +209,9 @@ WRITE8_MEMBER( sfcbox_state::port_80_w )
     ---- --x-   SNES Transfer CLOCK to SNES (Bit5 of WRIO/RDIO on SNES side)
     ---- ---x   SNES Transfer STAT to SNES  (Bit2 of WRIO/RDIO on SNES side)
 */
-	snes_ram[WRIO] = ((data & 4) >> 1) | (snes_ram[WRIO] & ~0x02); // DATA
-	snes_ram[WRIO] = ((data & 2) << 4) | (snes_ram[WRIO] & ~0x20); // CLOCK
-	snes_ram[WRIO] = ((data & 1) << 2) | (snes_ram[WRIO] & ~0x04); // STAT
+	SNES_CPU_REG(WRIO) = ((data & 4) >> 1) | (SNES_CPU_REG(WRIO) & ~0x02); // DATA
+	SNES_CPU_REG(WRIO) = ((data & 2) << 4) | (SNES_CPU_REG(WRIO) & ~0x20); // CLOCK
+	SNES_CPU_REG(WRIO) = ((data & 1) << 2) | (SNES_CPU_REG(WRIO) & ~0x04); // STAT
 }
 
 
@@ -234,8 +234,8 @@ READ8_MEMBER( sfcbox_state::port_81_r )
 	res = 0 << 5;
 	res = 0 << 4;
 	res = 0 << 3;
-	res |= ((snes_ram[WRIO] & 0x10) >> 4) << 2; // DATA to main
-	res |= ((snes_ram[WRIO] & 0x08) >> 3) << 1; // ACK to main
+	res |= ((SNES_CPU_REG(WRIO) & 0x10) >> 4) << 2; // DATA to main
+	res |= ((SNES_CPU_REG(WRIO) & 0x08) >> 3) << 1; // ACK to main
 	res = 1 << 0;
 
 	return res;

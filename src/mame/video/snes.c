@@ -1663,10 +1663,13 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 	m_mode = 0;
 	m_ppu1_version = 1;  // 5C77 chip version number, read by STAT77, only '1' is known
 	m_ppu2_version = 3;  // 5C78 chip version number, read by STAT78, only '2' & '3' encountered so far.
-	
+
 	m_cgram_address = 0;
 	m_read_ophct = 0;
 	m_read_opvct = 0;
+
+	PPU_REG(VMAIN) = 0x80;
+	// what about other regs?
 
 	/* Inititialize mosaic table */
 	for (int j = 0; j < 16; j++)
@@ -1784,7 +1787,9 @@ void snes_ppu_class::ppu_start(running_machine &machine)
 	state_save_register_global(machine, m_vram_fgr_shift);
 	state_save_register_global(machine, m_vram_read_buffer);
 	state_save_register_global(machine, m_vmadd);
-	
+
+	state_save_register_global_array(machine, m_regs);
+
 	state_save_register_global_pointer(machine, m_vram, SNES_VRAM_SIZE);
 	state_save_register_global_pointer(machine, m_cgram, SNES_CGRAM_SIZE/2);
 	state_save_register_global_pointer(machine, m_oam_ram, SNES_OAM_SIZE/2);	
@@ -2758,8 +2763,6 @@ static UINT8 dbg_video( running_machine &machine, UINT16 curline )
 				WINLOGIC[(PPU_REG(WOBJLOG) & 0xc)>>2],
 				(PPU_REG(WOBJSEL) & 0x20)?((PPU_REG(WOBJSEL) & 0x10)?"o":"i"):" ",
 				(PPU_REG(WOBJSEL) & 0x80)?((PPU_REG(WOBJSEL) & 0x40)?"o":"i"):" " );
-		logerror("1) %3d %3d   2) %3d %3d", (m_bgd_offset.horizontal[0] & 0x3ff) >> 3, (m_bgd_offset.vertical[0] & 0x3ff) >> 3, (m_bgd_offset.horizontal[1] & 0x3ff) >> 3, (m_bgd_offset.vertical[1] & 0x3ff) >> 3 );
-		logerror("3) %3d %3d   4) %3d %3d", (m_bgd_offset.horizontal[2] & 0x3ff) >> 3, (m_bgd_offset.vertical[2] & 0x3ff) >> 3, (m_bgd_offset.horizontal[3] & 0x3ff) >> 3, (m_bgd_offset.vertical[3] & 0x3ff) >> 3 );
 		logerror("Flags: %s%s%s %s %2d", (PPU_REG(CGWSEL) & 0x2)?"S":"F", (PPU_REG(CGADSUB) & 0x80)?"-":"+", (PPU_REG(CGADSUB) & 0x40)?" 50%":"100%",(PPU_REG(CGWSEL) & 0x1)?"D":"P", (PPU_REG(MOSAIC) & 0xf0) >> 4 );
 		logerror("SetINI: %s %s %s %s %s %s", (PPU_REG(SETINI) & 0x1)?" I":"NI", (PPU_REG(SETINI) & 0x2)?"P":"R", (PPU_REG(SETINI) & 0x4)?"240":"225",(PPU_REG(SETINI) & 0x8)?"512":"256",(PPU_REG(SETINI) & 0x40)?"E":"N",(PPU_REG(SETINI) & 0x80)?"ES":"NS" );
 		logerror("Mode7: A %5d B %5d", m_mode7.matrix_a, m_mode7.matrix_b );

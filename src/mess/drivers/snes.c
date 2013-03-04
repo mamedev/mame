@@ -118,7 +118,7 @@ static CUSTOM_INPUT( snes_mouse_speed_input )
 	snes_state *state = field.machine().driver_data<snes_state>();
 	int port = (FPTR)param;
 
-	if (snes_ram[OLDJOY1] & 0x1)
+	if (state->m_oldjoy1_latch & 0x1)
 	{
 		state->m_mouse[port].speed++;
 		if ((state->m_mouse[port].speed & 0x03) == 0x03)
@@ -589,7 +589,7 @@ static void snes_input_read( running_machine &machine )
 
 	// is automatic reading on? if so, copy port data1/data2 to joy1l->joy4h
 	// this actually works like reading the first 16bits from oldjoy1/2 in reverse order
-	if (snes_ram[NMITIMEN] & 1)
+	if (SNES_CPU_REG_STATE(NMITIMEN) & 1)
 	{
 		state->m_joy1l = (state->m_data1[0] & 0x00ff) >> 0;
 		state->m_joy1h = (state->m_data1[0] & 0xff00) >> 8;
