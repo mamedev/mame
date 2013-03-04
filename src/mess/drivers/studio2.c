@@ -234,10 +234,10 @@ struct st2_header
 ***************************************************************************/
 
 /*-------------------------------------------------
-    DEVICE_IMAGE_LOAD( st2_cartslot_load )
+    DEVICE_IMAGE_LOAD_MEMBER( studio2_state, st2_cartslot_load )
 -------------------------------------------------*/
 
-DEVICE_IMAGE_LOAD_LEGACY( st2_cartslot_load )
+DEVICE_IMAGE_LOAD_MEMBER( studio2_state, st2_cartslot_load )
 {
 	st2_header header;
 
@@ -512,7 +512,7 @@ void mpt02_state::machine_reset()
 DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
 {
 	if (image.software_entry() == NULL)
-		return device_load_st2_cartslot_load(image);
+		return DEVICE_IMAGE_LOAD_MEMBER_NAME(st2_cartslot_load)(image);
 	else
 	{
 		// WARNING: list code currently assume that cart mapping starts at 0x400.
