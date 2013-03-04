@@ -142,7 +142,7 @@ static CUSTOM_INPUT( snes_superscope_offscreen_input )
 	INT16 y = field.machine().root_device().ioport(portnames[port][2])->read();
 
 	/* these are the theoretical boundaries, but we currently are always onscreen... */
-	if (x < 0 || x >= SNES_SCR_WIDTH || y < 0 || y >= snes_ppu.beam.last_visible_line)
+	if (x < 0 || x >= SNES_SCR_WIDTH || y < 0 || y >= state->m_ppu.m_beam.last_visible_line)
 		state->m_scope[port].offscreen = 1;
 	else
 		state->m_scope[port].offscreen = 0;
@@ -377,6 +377,7 @@ INPUT_PORTS_END
 
 static void snes_gun_latch( running_machine &machine, INT16 x, INT16 y )
 {
+	snes_state *state = machine.driver_data<snes_state>();
 	/* these are the theoretical boundaries */
 	if (x < 0)
 		x = 0;
@@ -385,11 +386,11 @@ static void snes_gun_latch( running_machine &machine, INT16 x, INT16 y )
 
 	if (y < 0)
 		y = 0;
-	if (y > (snes_ppu.beam.last_visible_line - 1))
-		y = snes_ppu.beam.last_visible_line - 1;
+	if (y > (state->m_ppu.m_beam.last_visible_line - 1))
+		y = state->m_ppu.m_beam.last_visible_line - 1;
 
-	snes_ppu.beam.latch_horz = x;
-	snes_ppu.beam.latch_vert = y;
+	state->m_ppu.m_beam.latch_horz = x;
+	state->m_ppu.m_beam.latch_vert = y;
 	snes_ram[STAT78] |= 0x40;
 }
 
