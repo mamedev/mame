@@ -767,8 +767,8 @@ data: 000101010 001011011 010100010 110010110 110010110 110010110 110010110 1100
 				int count = 0;
 				printf("data: ");
 				const int show_bytes = 0;
-				int bitspacer = 0;
-				int bitspace = 9;
+				//int bitspacer = 0;
+				//int bitspace = 9;
 				int linespacer = 0;
 #endif
 
@@ -791,8 +791,28 @@ data: 000101010 001011011 010100010 110010110 110010110 110010110 110010110 1100
 				for (;;)
 				{
 					
-					int data = gunpey_state_get_stream_bits(8);
-					
+					int test = gunpey_state_get_stream_bits(2);
+					int data;
+					int getbits;
+					// don't think this is right.. just keeps some streams in alignment, see 959 in char test for example
+					if (test==0x0)
+					{
+						getbits = 7;
+					}
+					else if (test==0x1)
+					{
+						getbits = 5;
+					}
+					else if (test==0x2)
+					{
+						getbits = 5;
+					}
+					else if (test==0x3)
+					{
+						getbits = 7;
+					}
+					data = gunpey_state_get_stream_bits(getbits);
+
 					// hack, really I imagine there is exactly enough compressed data to fill the dest bitmap area when decompressed, but to stop us
 					// overrunning into reading other data we terminate on a 0000, which doesn't seem likely to be compressed data.
 					if (data==0x00 && lastdata == 0x00)
@@ -815,19 +835,19 @@ data: 000101010 001011011 010100010 110010110 110010110 110010110 110010110 1100
 							}
 							else
 							{
-								for (int z=0;z<8;z++)
+
+								printf("%1x-", test);
+
+								for (int z=0;z<getbits;z++)
 								{
-									printf("%d", (data>>(7-z))&1);
-									bitspacer++;
-									if (bitspacer == bitspace)
-									{
-										linespacer++;
-										if ((linespacer%16) == 0) printf("\n");
-										
-										printf(" ");
-										bitspacer = 0;
-									}
+									printf("%d", (data>>((getbits-1)-z))&1);
 								}
+	
+								linespacer++;
+								if ((linespacer%16) == 0) printf("\n");
+										
+								printf(" ");
+
 							}
 							count++;
 						}
