@@ -363,7 +363,6 @@ void saturn_state::cd_exec_command( void )
 					}
 
 					printf("track mode %d\n",cur_track);
-
 				}
 
 				if (end_pos & 0x800000)
@@ -376,7 +375,7 @@ void saturn_state::cd_exec_command( void )
 					UINT8 end_track;
 
 					end_track = (end_pos)>>8;
-					fadstoplay = cdrom_get_track_start(cdrom, end_track) - cd_curfad;
+					fadstoplay = cdrom_get_track_start(cdrom, end_track) - cd_fad_seek;
 				}
 			}
 			else    // play until the end of the disc

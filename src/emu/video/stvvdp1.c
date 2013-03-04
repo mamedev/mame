@@ -16,7 +16,7 @@ Framebuffer todo:
 #include "emu.h"
 #include "includes/stv.h"
 
-#define VDP1_LOG 1
+#define VDP1_LOG 0
 
 
 enum { FRAC_SHIFT = 16 };
