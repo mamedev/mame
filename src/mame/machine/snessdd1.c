@@ -554,14 +554,9 @@ static void sdd1_init(running_machine& machine)
 	snes_sdd1.buffer.ready = 0;
 }
 
-static UINT8 sdd1_mmio_read(address_space &space, UINT32 addr)
+UINT8 sdd1_mmio_read(address_space &space, UINT32 addr)
 {
 	addr &= 0xffff;
-
-	if ((addr & 0x4380) == 0x4300)
-	{
-		return snes_r_io(space, addr & 0x7f);
-	}
 
 	switch(addr)
 	{
@@ -578,7 +573,7 @@ static UINT8 sdd1_mmio_read(address_space &space, UINT32 addr)
 	return snes_open_bus_r(space, 0);
 }
 
-static void sdd1_mmio_write(address_space &space, UINT32 addr, UINT8 data)
+void sdd1_mmio_write(address_space &space, UINT32 addr, UINT8 data)
 {
 	addr &= 0xffff;
 
@@ -604,8 +599,6 @@ static void sdd1_mmio_write(address_space &space, UINT32 addr, UINT8 data)
 				snes_sdd1.dma[channel].size = (snes_sdd1.dma[channel].size &   0x00ff) + (data <<  8);
 				break;
 		}
-		snes_ram[addr] = data;
-		snes_io_dma_w(space, addr, data);
 		return;
 	}
 
@@ -633,7 +626,7 @@ static void sdd1_mmio_write(address_space &space, UINT32 addr, UINT8 data)
 	}
 }
 
-static UINT8 sdd1_read(running_machine& machine, UINT32 addr)
+UINT8 sdd1_read(running_machine& machine, UINT32 addr)
 {
 	unsigned char *ROM = machine.root_device().memregion("cart")->base();
 

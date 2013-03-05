@@ -141,6 +141,9 @@ static READ8_HANDLER( snes_lo_r )
 	if (state->m_has_addon_chip == HAS_DSP4 
 		&& (offset >= 0x300000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
 		return ((offset & 0xffff) < 0xc000) ? dsp_get_dr() : dsp_get_sr();
+	if (state->m_has_addon_chip == HAS_SDD1
+		&& (offset < 0x400000 && (offset & 0xffff) >= 0x4800 && (offset & 0xffff) < 0x4808))
+		return sdd1_mmio_read(space, (UINT32)(offset & 0xffff));
 	
 	// base cart access
 	if (offset < 0x300000)
@@ -191,6 +194,11 @@ static READ8_HANDLER( snes_hi_r )
 	if (state->m_has_addon_chip == HAS_DSP4 
 		&& (offset >= 0x300000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
 		return ((offset & 0xffff) < 0xc000) ? dsp_get_dr() : dsp_get_sr();
+	if (state->m_has_addon_chip == HAS_SDD1
+		&& (offset < 0x400000 && (offset & 0xffff) >= 0x4800 && (offset & 0xffff) < 0x4808))
+		return sdd1_mmio_read(space, (UINT32)(offset & 0xffff));
+	if (state->m_has_addon_chip == HAS_SDD1 && offset >= 0x400000)
+		return sdd1_read(space.machine(), offset - 0x400000);;
 	
 	// base cart access
 	if (offset < 0x400000)
@@ -258,6 +266,15 @@ static WRITE8_HANDLER( snes_lo_w )
 		{	dsp_set_dr(data);	return;	}
 		else
 		{	dsp_set_sr(data);	return;	}
+	}
+	if (state->m_has_addon_chip == HAS_SDD1 && offset < 0x400000)
+	{
+		if (((offset & 0xffff) >= 0x4300 && (offset & 0xffff) < 0x4380) ||
+			((offset & 0xffff) >= 0x4800 && (offset & 0xffff) < 0x4808))
+		{
+				sdd1_mmio_write(space, (UINT32)(offset & 0xffff), data);
+				// here we don't return, but we let the w_io happen...
+		}
 	}
 	
 	// base cart access
@@ -332,6 +349,15 @@ static WRITE8_HANDLER( snes_hi_w )
 		{	dsp_set_dr(data);	return;	}
 		else
 		{	dsp_set_sr(data);	return;	}
+	}
+	if (state->m_has_addon_chip == HAS_SDD1 && offset < 0x400000)
+	{
+		if (((offset & 0xffff) >= 0x4300 && (offset & 0xffff) < 0x4380) ||
+			((offset & 0xffff) >= 0x4800 && (offset & 0xffff) < 0x4808))
+		{
+			sdd1_mmio_write(space, (UINT32)(offset & 0xffff), data);
+			// here we don't return, but we let the w_io happen...
+		}
 	}
 	
 	// base cart access

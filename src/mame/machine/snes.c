@@ -410,17 +410,6 @@ READ8_HANDLER( snes_r_io )
 			return superfx_mmio_read(state->m_superfx, offset);
 		}
 	}
-	else if (state->m_has_addon_chip == HAS_SDD1)
-	{
-		if (offset >= 0x4800 && offset < 0x4808)
-		{
-			return sdd1_mmio_read(space, (UINT32)offset);
-		}
-		if (offset < 0x80)
-		{
-			offset += 0x4300;
-		}
-	}
 	else if (state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
 	{
 		UINT16 limit = (state->m_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
@@ -538,19 +527,6 @@ WRITE8_HANDLER( snes_w_io )
 		{
 			superfx_mmio_write(state->m_superfx, offset, data);
 			return;
-		}
-	}
-	else if (state->m_has_addon_chip == HAS_SDD1)
-	{
-		if ((offset >= 0x4300 && offset < 0x4380) ||
-			(offset >= 0x4800 && offset < 0x4808))
-		{
-			sdd1_mmio_write(space, (UINT32)offset, data);
-			return;
-		}
-		if (offset < 0x80)
-		{
-			offset += 0x4300;
 		}
 	}
 	else if (state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
@@ -1021,8 +997,6 @@ READ8_HANDLER( snes_r_bank7 )
 	}
 	else if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC) && offset >= 0x100000)
 		value = spc7110_bank7_read(space, offset);
-	else if (state->m_has_addon_chip == HAS_SDD1)
-		value = sdd1_read(space.machine(), offset);
 	else if ((state->m_cart[0].mode & 5) && !(state->m_has_addon_chip == HAS_SUPERFX))      /* Mode 20 & 22 */
 	{
 		if (address < 0x8000)

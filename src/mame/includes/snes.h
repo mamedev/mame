@@ -773,6 +773,9 @@ extern DECLARE_READ8_HANDLER(obc1_read);
 extern DECLARE_WRITE8_HANDLER(obc1_write);
 UINT8 CX4_read(UINT32 addr);
 void CX4_write(running_machine &machine, UINT32 addr, UINT8 data);
+UINT8 sdd1_mmio_read(address_space &space, UINT32 addr);
+void sdd1_mmio_write(address_space &space, UINT32 addr, UINT8 data);
+UINT8 sdd1_read(running_machine& machine, UINT32 addr);
 
 
 extern struct snes_cart_info snes_cart;
