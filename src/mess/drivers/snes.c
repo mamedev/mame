@@ -2373,8 +2373,9 @@ static MACHINE_START( snesnew )
 		case SNES_MODE21:
 		case SNES_MODE25:
 		case SNES_DSP_MODE21:
-//			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x000000, 0x7dffff, FUNC(snes21_lo_r), FUNC(snes21_lo_w));
-//			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x800000, 0xffffff, FUNC(snes21_hi_r), FUNC(snes21_hi_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x000000, 0x7dffff, FUNC(snes21_lo_r), FUNC(snes21_lo_w));
+			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x800000, 0xffffff, FUNC(snes21_hi_r), FUNC(snes21_hi_w));
+			set_5a22_map(*state->m_maincpu);
 			break;
 	}
 }

@@ -674,6 +674,22 @@ static ADDRESS_MAP_START(_5a22_map, AS_PROGRAM, 8, legacy_cpu_device)
 
 ADDRESS_MAP_END
 
+void set_5a22_map(legacy_cpu_device &cpu)
+{
+	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4202, 0x4202, 0, 0x3f0000, FUNC(wrmpya_w));
+	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4203, 0x4203, 0, 0x3f0000, FUNC(wrmpyb_w));
+	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4204, 0x4204, 0, 0x3f0000, FUNC(wrdivl_w));
+	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4205, 0x4205, 0, 0x3f0000, FUNC(wrdivh_w));
+	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4206, 0x4206, 0, 0x3f0000, FUNC(wrdvdd_w));
+	
+	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x420d, 0x420d, 0, 0x3f0000, FUNC(memsel_w));
+	
+	cpu.space(AS_PROGRAM).install_legacy_read_handler(0x4214, 0x4214, 0, 0x3f0000, FUNC(rddivl_r));
+	cpu.space(AS_PROGRAM).install_legacy_read_handler(0x4215, 0x4215, 0, 0x3f0000, FUNC(rddivh_r));
+	cpu.space(AS_PROGRAM).install_legacy_read_handler(0x4216, 0x4216, 0, 0x3f0000, FUNC(rdmpyl_r));
+	cpu.space(AS_PROGRAM).install_legacy_read_handler(0x4217, 0x4217, 0, 0x3f0000, FUNC(rdmpyh_r));
+}
+
 CPU_SET_INFO( _5a22 )
 {
 	g65816i_cpu_struct *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
