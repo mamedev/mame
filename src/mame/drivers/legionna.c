@@ -2241,12 +2241,10 @@ ROM_START( cupsocsb )
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
 
 
-	/* what are these, they're not gfx... */
+	/* these are maths tables, for whatever COP replacement the bootlegs use */
 	ROM_REGION( 0x500000, "unknown0", 0 )
 	ROM_LOAD16_BYTE( "sc_13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
 	ROM_LOAD16_BYTE( "sc_12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
-
-	/* what are these, they're not gfx... */
 	ROM_REGION( 0x500000, "unknown1", 0 )
 	ROM_LOAD16_BYTE( "sc_15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
 	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
@@ -2306,16 +2304,76 @@ ROM_START( cupsocsb2 )
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
 
 
-	/* what are these, they're not gfx... */
+	/* these are maths tables, for whatever COP replacement the bootlegs use */
 	ROM_REGION( 0x500000, "unknown0", 0 )
 	ROM_LOAD16_BYTE( "sc_13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
 	ROM_LOAD16_BYTE( "sc_12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
-
-	/* what are these, they're not gfx... */
 	ROM_REGION( 0x500000, "unknown1", 0 )
 	ROM_LOAD16_BYTE( "sc_15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
 	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
 ROM_END
+
+ROM_START( cupsocsb3 )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "4.bin", 0x00001, 0x80000, CRC(f615058f) SHA1(f7c0eb6b9f8dcdc8b13f8e5b03f46252a87a6c0f) )
+	ROM_LOAD16_BYTE( "5.bin", 0x00000, 0x80000, CRC(6500edf2) SHA1(1a617b18b4997c24af53601c98e9a0efbe637a4b) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* Z80 code */
+	ROM_LOAD( "sc_01.bin",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) )
+	ROM_CONTINUE(             0x000000, 0x08000 )
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_INVERT ) /* bootleg sprite gfx */
+	ROM_LOAD( "sc_07.bin", 0x000000, 0x080000, CRC(dcb29d01) SHA1(72b4234622605f0ab03f21fdb6a61c6dac36000d) )
+	ROM_LOAD( "sc_06.bin", 0x080000, 0x080000, CRC(2dc70e05) SHA1(f1d0beb8428a7e1d7c7818e6719abdc543b2fa80) )
+	ROM_COPY( "gfx2", 0x00000, 0x100000, 0x100000 )
+
+	ROM_REGION( 0x200000, "test1", 0 ) /* bootleg tile gfx */
+	ROM_LOAD16_BYTE( "sc_09.bin", 0x000000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) )
+	ROM_LOAD16_BYTE( "sc_10.bin", 0x000001, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) )
+	ROM_LOAD16_BYTE( "sc_08.bin", 0x100000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) )
+	ROM_LOAD16_BYTE( "sc_11.bin", 0x100001, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) )
+
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_INVERT )
+	ROM_COPY( "test1", 0x080000, 0x00000, 0x020000 )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )    /* MBK tiles */
+	ROM_COPY( "test1", 0x000000, 0x00000, 0x080000 )
+	ROM_COPY( "test1", 0x100000, 0x80000, 0x080000 )
+
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT )    /* not used */
+	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
+
+	ROM_REGION( 0x080000, "gfx5", ROMREGION_INVERT )    /* BK3 tiles */
+	ROM_COPY( "test1", 0x180000, 0x00000, 0x080000 )
+
+	ROM_REGION( 0x080000, "gfx6", ROMREGION_INVERT )    /* LBK tiles */
+	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+
+	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )  /* ADPCM samples */
+	ROM_LOAD( "sc_02.bin",    0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) )
+	ROM_LOAD( "sc_03.bin",    0x080000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) )
+
+	ROM_REGION( 0x200000, "oki", ROMREGION_ERASEFF )
+	ROM_COPY( "adpcm", 0x00000, 0x000000, 0x20000 ) //bank 0
+	ROM_COPY( "adpcm", 0x00000, 0x020000, 0x20000 )
+	ROM_COPY( "adpcm", 0x00000, 0x100000, 0x20000 ) //bank 4
+	ROM_COPY( "adpcm", 0x80000, 0x120000, 0x20000 )
+	ROM_COPY( "adpcm", 0x00000, 0x140000, 0x20000 ) //bank 5
+	ROM_COPY( "adpcm", 0xa0000, 0x160000, 0x20000 )
+	ROM_COPY( "adpcm", 0x00000, 0x180000, 0x20000 ) //bank 6
+	ROM_COPY( "adpcm", 0xc0000, 0x1a0000, 0x20000 )
+	ROM_COPY( "adpcm", 0x00000, 0x1c0000, 0x20000 ) //bank 7
+	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
+
+	/* these are maths tables, for whatever COP replacement the bootlegs use */
+	ROM_REGION( 0x500000, "unknown0", 0 )
+	ROM_LOAD16_BYTE( "sc_13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
+	ROM_LOAD16_BYTE( "sc_12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
+	ROM_REGION( 0x500000, "unknown1", 0 )
+	ROM_LOAD16_BYTE( "sc_15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
+	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
+ROM_END
+
 
 #define CUPSOC_DEBUG_MODE 0
 
@@ -2365,5 +2423,6 @@ GAME( 1992, cupsocs,  cupsoc,   cupsocs,  cupsoc, driver_device,   0,         RO
 GAME( 1992, cupsocs2, cupsoc,   cupsocs,  cupsoc, driver_device,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc, legionna_state,  cupsoc,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc, legionna_state,  cupsoc,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, cupsocsb3,cupsoc,   cupsocbl, cupsoc, legionna_state,  cupsoc,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 3)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, olysoc92, cupsoc,   cupsoc,   cupsoc, driver_device,   0,         ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, olysoc92a,cupsoc,   cupsoc,   cupsoc, driver_device,   0,         ROT0, "Seibu Kaihatsu", "Olympic Soccer '92 (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
