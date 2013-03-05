@@ -144,6 +144,20 @@ static READ8_HANDLER( snes_lo_r )
 	if (state->m_has_addon_chip == HAS_SDD1
 		&& (offset < 0x400000 && (offset & 0xffff) >= 0x4800 && (offset & 0xffff) < 0x4808))
 		return sdd1_mmio_read(space, (UINT32)(offset & 0xffff));
+	if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
+		&& offset < 0x400000)
+	{	
+		UINT16 limit = (state->m_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
+		if ((offset & 0xffff) >= 0x4800 && (offset & 0xffff) <= limit)
+			return spc7110_mmio_read(space, (UINT32)(offset & 0xffff));
+		if (offset < 0x10000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
+			return snes_ram[0x306000 + (offset & 0x1fff)];
+		if (offset >= 0x300000 && offset < 0x310000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
+			return snes_ram[0x306000 + (offset & 0x1fff)];
+	}
+	if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
+		&& offset >= 0x500000 && offset < 0x510000)
+		return spc7110_mmio_read(space, 0x4800);
 	
 	// base cart access
 	if (offset < 0x300000)
@@ -198,7 +212,21 @@ static READ8_HANDLER( snes_hi_r )
 		&& (offset < 0x400000 && (offset & 0xffff) >= 0x4800 && (offset & 0xffff) < 0x4808))
 		return sdd1_mmio_read(space, (UINT32)(offset & 0xffff));
 	if (state->m_has_addon_chip == HAS_SDD1 && offset >= 0x400000)
-		return sdd1_read(space.machine(), offset - 0x400000);;
+		return sdd1_read(space.machine(), offset - 0x400000);
+	if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
+		&& offset < 0x400000)
+	{	
+		UINT16 limit = (state->m_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
+		if ((offset & 0xffff) >= 0x4800 && (offset & 0xffff) <= limit)
+			return spc7110_mmio_read(space, (UINT32)(offset & 0xffff));
+		if (offset < 0x10000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
+			return snes_ram[0x306000 + (offset & 0x1fff)];
+		if (offset >= 0x300000 && offset < 0x310000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
+			return snes_ram[0x306000 + (offset & 0x1fff)];
+	}
+	if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC) 
+		&& offset >= 0x500000)
+		return spc7110_bank7_read(space, offset - 0x400000);
 	
 	// base cart access
 	if (offset < 0x400000)
@@ -275,6 +303,16 @@ static WRITE8_HANDLER( snes_lo_w )
 				sdd1_mmio_write(space, (UINT32)(offset & 0xffff), data);
 				// here we don't return, but we let the w_io happen...
 		}
+	}
+	if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC) && offset < 0x400000)
+	{	
+		UINT16 limit = (state->m_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
+		if ((offset & 0xffff) >= 0x4800 && (offset & 0xffff) <= limit)
+		{	spc7110_mmio_write(space.machine(), (UINT32)(offset & 0xffff), data);	return;	}
+		if (offset < 0x10000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
+		{	snes_ram[0x306000 + (offset & 0x1fff)] = data;	return;	}
+		if (offset >= 0x300000 && offset < 0x310000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
+		{	snes_ram[0x306000 + (offset & 0x1fff)] = data;	return;	}
 	}
 	
 	// base cart access
@@ -358,6 +396,16 @@ static WRITE8_HANDLER( snes_hi_w )
 			sdd1_mmio_write(space, (UINT32)(offset & 0xffff), data);
 			// here we don't return, but we let the w_io happen...
 		}
+	}
+	if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC) && offset < 0x400000)
+	{	
+		UINT16 limit = (state->m_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
+		if ((offset & 0xffff) >= 0x4800 && (offset & 0xffff) <= limit)
+		{	spc7110_mmio_write(space.machine(), (UINT32)(offset & 0xffff), data);	return;	}
+		if (offset < 0x10000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
+		{	snes_ram[0x306000 + (offset & 0x1fff)] = data;	return;	}
+		if (offset >= 0x300000 && offset < 0x310000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
+		{	snes_ram[0x306000 + (offset & 0x1fff)] = data;	return;	}
 	}
 	
 	// base cart access

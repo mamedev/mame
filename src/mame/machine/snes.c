@@ -410,14 +410,6 @@ READ8_HANDLER( snes_r_io )
 			return superfx_mmio_read(state->m_superfx, offset);
 		}
 	}
-	else if (state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
-	{
-		UINT16 limit = (state->m_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
-		if (offset >= 0x4800 && offset <= limit)
-		{
-			return spc7110_mmio_read(space, offset);
-		}
-	}
 
 	if (offset >= DMAP0 && offset < 0x4380)
 	{
@@ -526,15 +518,6 @@ WRITE8_HANDLER( snes_w_io )
 		if (offset >= 0x3000 && offset < 0x3300)
 		{
 			superfx_mmio_write(state->m_superfx, offset, data);
-			return;
-		}
-	}
-	else if (state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
-	{
-		UINT16 limit = (state->m_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
-		if (offset >= 0x4800 && offset <= limit)
-		{
-			spc7110_mmio_write(space.machine(), (UINT32)offset, data);
 			return;
 		}
 	}
@@ -755,11 +738,6 @@ READ8_HANDLER( snes_r_bank1 )
 			else
 				value = snes_open_bus_r(space, 0);
 		}
-		else if (state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
-		{
-			if (offset < 0x10000)
-				value = snes_ram[0x306000 + (offset & 0x1fff)];
-		}
 		else
 		{
 			logerror("(PC=%06x) snes_r_bank1: Unmapped external chip read: %04x\n",space.device().safe_pc(),address);
@@ -796,11 +774,6 @@ READ8_HANDLER( snes_r_bank2 )
 				value = snes_ram[0xf00000 + (offset & 0x1fff)]; // here it should be 0xe00000 but there are mirroring issues
 			else
 				value = snes_open_bus_r(space, 0);
-		}
-		else if (state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
-		{
-			if (offset < 0x10000)
-				value = snes_ram[0x306000 + (offset & 0x1fff)];
 		}
 		else if ((state->m_cart[0].mode == SNES_MODE_21) && (state->m_cart[0].sram > 0))
 		{
@@ -840,11 +813,6 @@ READ8_HANDLER( snes_r_bank3 )
 			};
 			return sfx_data[offset & 0x0f];
 		}
-	}
-	else if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC))
-	{
-		if (offset >= 0x100000 && offset < 0x110000)
-			value = spc7110_mmio_read(space, 0x4800);
 	}
 	else if ((state->m_cart[0].mode & 5) && !(state->m_has_addon_chip == HAS_SUPERFX))  /* Mode 20 & 22 */
 	{
@@ -995,8 +963,6 @@ READ8_HANDLER( snes_r_bank7 )
 				value = snes_open_bus_r(space, 0);
 		}
 	}
-	else if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC) && offset >= 0x100000)
-		value = spc7110_bank7_read(space, offset);
 	else if ((state->m_cart[0].mode & 5) && !(state->m_has_addon_chip == HAS_SUPERFX))      /* Mode 20 & 22 */
 	{
 		if (address < 0x8000)
@@ -1030,11 +996,6 @@ WRITE8_HANDLER( snes_w_bank1 )
 	{
 		if (state->m_has_addon_chip == HAS_SUPERFX)
 			snes_ram[0xf00000 + (offset & 0x1fff)] = data;  // here it should be 0xe00000 but there are mirroring issues
-		else if (state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
-		{
-			if (offset < 0x10000)
-				snes_ram[0x306000 + (offset & 0x1fff)] = data;
-		}
 		else
 			logerror("snes_w_bank1: Attempt to write to reserved address: %x = %02x\n", offset, data);
 	}
@@ -1061,11 +1022,6 @@ WRITE8_HANDLER( snes_w_bank2 )
 	{
 		if (state->m_has_addon_chip == HAS_SUPERFX)
 			snes_ram[0xf00000 + (offset & 0x1fff)] = data;  // here it should be 0xe00000 but there are mirroring issues
-		else if (state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
-		{
-			if (offset < 0x10000)
-				snes_ram[0x306000 + (offset & 0x1fff)] = data;
-		}
 		else if ((state->m_cart[0].mode == SNES_MODE_21) && (state->m_cart[0].sram > 0))
 		{
 			/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */

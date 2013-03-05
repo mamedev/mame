@@ -758,8 +758,6 @@ UINT32 SPC7110Decomp::morton_4x8(UINT32 data)
 		+ m_morton32[2][(data >> 16) & 255] + m_morton32[3][(data >> 24) & 255];
 }
 
-static void spc7110_mmio_write(running_machine &machine, UINT32 addr, UINT8 data);
-static UINT8 spc7110_mmio_read(address_space &space, UINT32 addr);
 static void spc7110_update_time(running_machine &machine, UINT8 offset);
 
 enum RTC_State
@@ -1058,7 +1056,7 @@ static void spc7110_update_time(running_machine &machine, UINT8 offset)
 	}
 }
 
-static UINT8 spc7110_mmio_read(address_space &space, UINT32 addr)
+UINT8 spc7110_mmio_read(address_space &space, UINT32 addr)
 {
 	running_machine &machine = space.machine();
 	UINT8 *ROM = machine.root_device().memregion("cart")->base();
@@ -1245,7 +1243,7 @@ static UINT8 spc7110_mmio_read(address_space &space, UINT32 addr)
 	return snes_open_bus_r(space, 0);
 }
 
-static void spc7110_mmio_write(running_machine &machine, UINT32 addr, UINT8 data)
+void spc7110_mmio_write(running_machine &machine, UINT32 addr, UINT8 data)
 {
 	UINT8 *ROM = machine.root_device().memregion("cart")->base();
 
@@ -1631,7 +1629,7 @@ static void spc7110_mmio_write(running_machine &machine, UINT32 addr, UINT8 data
 	}
 }
 
-static UINT8 spc7110_bank7_read(address_space &space, UINT32 offset)
+UINT8 spc7110_bank7_read(address_space &space, UINT32 offset)
 {
 	UINT8 *ROM = space.machine().root_device().memregion("cart")->base();
 	UINT32 addr = offset & 0x0fffff;
