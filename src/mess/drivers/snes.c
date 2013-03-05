@@ -70,7 +70,7 @@ public:
 	DECLARE_READ8_MEMBER(snes_oldjoy1_read);
 	DECLARE_READ8_MEMBER(snes_oldjoy2_read);
 
-	UINT8 m_sfx_ram[0x200000];	// or 0x100000? 
+	UINT8 m_sfx_ram[0x200000];  // or 0x100000?
 };
 
 /*************************************
@@ -191,31 +191,8 @@ READ8_MEMBER( snes_console_state::snes_lo_r )
 	if ((m_has_addon_chip == HAS_SPC7110 || m_has_addon_chip == HAS_SPC7110_RTC)
 		&& offset >= 0x500000 && offset < 0x510000)
 		return spc7110_mmio_read(space, 0x4800);
-	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
-		&& offset < 0x400000)
-	{
-		if (address >= 0x3000 && address < 0x3300)
-			return superfx_mmio_read(m_superfx, address);
-		if (address >= 0x6000 && address < 0x8000)
-			return superfx_access_ram(m_superfx) ? m_sfx_ram[offset & 0x1fff] : snes_open_bus_r(space, 0);
-	}
-	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
-		&& offset >= 0x400000 && offset < 0x600000)
-	{
-		if (superfx_access_rom(m_superfx))
-			return snes_ram[offset];
-		else
-		{
-			static const UINT8 sfx_data[16] = {
-				0x00, 0x01, 0x00, 0x01, 0x04, 0x01, 0x00, 0x01,
-				0x00, 0x01, 0x08, 0x01, 0x00, 0x01, 0x0c, 0x01,
-			};
-			return sfx_data[offset & 0x0f];
-		}
-	}
-	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
-		&& offset >= 0x600000)
-		return superfx_access_ram(m_superfx) ? m_sfx_ram[offset & 0xfffff] : snes_open_bus_r(space, 0);
+	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL)
+		return space.read_byte(offset + 0x800000);     // [00-7f] same as [80-ff]
 
 	// base cart access
 	if (offset < 0x300000)
@@ -286,8 +263,31 @@ READ8_MEMBER( snes_console_state::snes_hi_r )
 	if ((m_has_addon_chip == HAS_SPC7110 || m_has_addon_chip == HAS_SPC7110_RTC)
 		&& offset >= 0x500000)
 		return spc7110_bank7_read(space, offset - 0x400000);
-	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL)
-		return space.read_byte(offset);     // [80-ff] same as [00-7f]
+	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
+		&& offset < 0x400000)
+	{
+		if (address >= 0x3000 && address < 0x3300)
+			return superfx_mmio_read(m_superfx, address);
+		if (address >= 0x6000 && address < 0x8000)
+			return superfx_access_ram(m_superfx) ? m_sfx_ram[offset & 0x1fff] : snes_open_bus_r(space, 0);
+	}
+	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
+		&& offset >= 0x400000 && offset < 0x600000)
+	{
+		if (superfx_access_rom(m_superfx))
+			return snes_ram[offset];
+		else
+		{
+			static const UINT8 sfx_data[16] = {
+				0x00, 0x01, 0x00, 0x01, 0x04, 0x01, 0x00, 0x01,
+				0x00, 0x01, 0x08, 0x01, 0x00, 0x01, 0x0c, 0x01,
+			};
+			return sfx_data[offset & 0x0f];
+		}
+	}
+	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
+		&& offset >= 0x600000)
+		return superfx_access_ram(m_superfx) ? m_sfx_ram[offset & 0xfffff] : snes_open_bus_r(space, 0);
 
 	// base cart access
 	if (offset < 0x400000)
@@ -363,17 +363,8 @@ WRITE8_MEMBER( snes_console_state::snes_lo_w )
 		if (offset >= 0x300000 && offset < 0x310000 && address >= 0x6000 && address < 0x8000)
 		{   snes_ram[0x306000 + (address & 0x1fff)] = data; return; }
 	}
-	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
-			&& offset < 0x400000)
-	{
-		if (address >= 0x3000 && address < 0x3300)
-		{   superfx_mmio_write(m_superfx, address, data);   return; }
-		if (address >= 0x6000 && address < 0x8000)
-		{   m_sfx_ram[offset & 0x1fff] = data;  return; }
-	}
-	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
-		&& offset >= 0x600000)
-	{   m_sfx_ram[offset & 0xfffff] = data; return; }
+	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL)
+	{   space.write_byte(offset + 0x800000, data); return; }       // [00-7f] same as [80-ff]
 
 	// base cart access
 	if (offset < 0x300000)
@@ -455,8 +446,17 @@ WRITE8_MEMBER( snes_console_state::snes_hi_w )
 		if (offset >= 0x300000 && offset < 0x310000 && address >= 0x6000 && address < 0x8000)
 		{   snes_ram[0x306000 + (address & 0x1fff)] = data; return; }
 	}
-	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL)
-	{   space.write_byte(offset, data); return; }       // [80-ff] same as [00-7f]
+	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
+		&& offset < 0x400000)
+	{
+		if (address >= 0x3000 && address < 0x3300)
+		{   superfx_mmio_write(m_superfx, address, data);   return; }
+		if (address >= 0x6000 && address < 0x8000)
+		{   m_sfx_ram[offset & 0x1fff] = data;  return; }
+	}
+	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
+		&& offset >= 0x600000)
+	{   m_sfx_ram[offset & 0xfffff] = data; return; }
 
 	// base cart access
 	if (offset < 0x400000)
