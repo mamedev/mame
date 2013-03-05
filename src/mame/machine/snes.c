@@ -403,14 +403,7 @@ READ8_HANDLER( snes_r_io )
 		return spc_port_out(state->m_spc700, space, offset & 0x3);
 	}
 
-	if (state->m_has_addon_chip == HAS_SUPERFX && state->m_superfx != NULL)
-	{
-		if (offset >= 0x3000 && offset < 0x3300)
-		{
-			return superfx_mmio_read(state->m_superfx, offset);
-		}
-	}
-
+	// DMA accesses are from 4300 to 437f
 	if (offset >= DMAP0 && offset < 0x4380)
 	{
 		return snes_io_dma_r(space, offset);
@@ -513,15 +506,7 @@ WRITE8_HANDLER( snes_w_io )
 		return;
 	}
 
-	if (state->m_has_addon_chip == HAS_SUPERFX && state->m_superfx != NULL)
-	{
-		if (offset >= 0x3000 && offset < 0x3300)
-		{
-			superfx_mmio_write(state->m_superfx, offset, data);
-			return;
-		}
-	}
-
+	// DMA accesses are from 4300 to 437f
 	if (offset >= DMAP0 && offset < 0x4380)
 	{
 		snes_io_dma_w(space, offset, data);
@@ -731,18 +716,8 @@ READ8_HANDLER( snes_r_bank1 )
 	}
 	else if (address < 0x8000)
 	{
-		if (state->m_has_addon_chip == HAS_SUPERFX && state->m_superfx != NULL)
-		{
-			if (superfx_access_ram(state->m_superfx))
-				value = snes_ram[0xf00000 + (offset & 0x1fff)]; // here it should be 0xe00000 but there are mirroring issues
-			else
-				value = snes_open_bus_r(space, 0);
-		}
-		else
-		{
-			logerror("(PC=%06x) snes_r_bank1: Unmapped external chip read: %04x\n",space.device().safe_pc(),address);
-			value = snes_open_bus_r(space, 0);                              /* Reserved */
-		}
+		logerror("(PC=%06x) snes_r_bank1: Unmapped external chip read: %04x\n",space.device().safe_pc(),address);
+		value = snes_open_bus_r(space, 0);                              /* Reserved */
 	}
 	else
 		value = snes_ram[offset];
@@ -768,14 +743,7 @@ READ8_HANDLER( snes_r_bank2 )
 	}
 	else if (address < 0x8000)                                      /* SRAM for mode_21, Reserved othewise */
 	{
-		if (state->m_has_addon_chip == HAS_SUPERFX && state->m_superfx != NULL)
-		{
-			if (superfx_access_ram(state->m_superfx))
-				value = snes_ram[0xf00000 + (offset & 0x1fff)]; // here it should be 0xe00000 but there are mirroring issues
-			else
-				value = snes_open_bus_r(space, 0);
-		}
-		else if ((state->m_cart[0].mode == SNES_MODE_21) && (state->m_cart[0].sram > 0))
+		if (state->m_cart[0].mode == SNES_MODE_21 && state->m_cart[0].sram > 0)
 		{
 			/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
 			/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
@@ -801,27 +769,14 @@ READ8_HANDLER( snes_r_bank3 )
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
-	if (state->m_has_addon_chip == HAS_SUPERFX && state->m_superfx != NULL)
-	{
-		if (superfx_access_rom(state->m_superfx))
-			value = snes_ram[0x400000 + offset];
-		else
-		{
-			static const UINT8 sfx_data[16] = {
-				0x00, 0x01, 0x00, 0x01, 0x04, 0x01, 0x00, 0x01,
-				0x00, 0x01, 0x08, 0x01, 0x00, 0x01, 0x0c, 0x01,
-			};
-			return sfx_data[offset & 0x0f];
-		}
-	}
-	else if ((state->m_cart[0].mode & 5) && !(state->m_has_addon_chip == HAS_SUPERFX))  /* Mode 20 & 22 */
+	if (state->m_cart[0].mode & 5)  /* Mode 20 & 22 */
 	{
 		if ((address < 0x8000) && (state->m_cart[0].mode == SNES_MODE_20))
 			value = snes_open_bus_r(space, 0);                          /* Reserved */
 		else
 			value = snes_ram[0x400000 + offset];
 	}
-	else                                            /* Mode 21 & 25 + SuperFX games */
+	else                                            /* Mode 21 & 25 */
 		value = snes_ram[0x400000 + offset];
 
 	return value;
@@ -834,14 +789,7 @@ READ8_HANDLER( snes_r_bank4 )
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
-	if (state->m_has_addon_chip == HAS_SUPERFX && state->m_superfx != NULL)
-	{
-		if (superfx_access_ram(state->m_superfx))
-			value = snes_ram[0xe00000 + offset];
-		else
-			value = snes_open_bus_r(space, 0);
-	}
-	else if (state->m_cart[0].mode & 5)                         /* Mode 20 & 22 */
+	if (state->m_cart[0].mode & 5)                         /* Mode 20 & 22 */
 	{
 		if (address >= 0x8000)
 			value = snes_ram[0x600000 + offset];
@@ -864,14 +812,7 @@ READ8_HANDLER( snes_r_bank5 )
 	UINT8 value;
 	UINT16 address = offset & 0xffff;
 
-	if (state->m_has_addon_chip == HAS_SUPERFX && state->m_superfx != NULL)
-	{
-		if (superfx_access_ram(state->m_superfx))
-			value = snes_ram[0xf00000 + offset];
-		else
-			value = snes_open_bus_r(space, 0);
-	}
-	else if ((state->m_cart[0].mode & 5) && (address < 0x8000))     /* Mode 20 & 22 */
+	if ((state->m_cart[0].mode & 5) && (address < 0x8000))     /* Mode 20 & 22 */
 	{
 		if (state->m_cart[0].sram > 0x8000)
 		{
@@ -904,9 +845,7 @@ READ8_HANDLER( snes_r_bank6 )
 	UINT8 value = 0;
 	UINT16 address = offset & 0xffff;
 
-	if (state->m_has_addon_chip == HAS_SUPERFX)
-		value = space.read_byte(offset);
-	else if (address < 0x8000)
+	if (address < 0x8000)
 	{
 		if (state->m_cart[0].mode != SNES_MODE_25)
 			value = space.read_byte(offset);
@@ -939,38 +878,14 @@ READ8_HANDLER( snes_r_bank7 )
 	UINT8 value = 0;
 	UINT16 address = offset & 0xffff;
 
-	if (state->m_has_addon_chip == HAS_SUPERFX && state->m_superfx != NULL)
-	{
-		if (offset < 0x200000)  // ROM
-		{
-			if (superfx_access_rom(state->m_superfx))
-				value = snes_ram[0xc00000 + offset];
-			else
-			{
-				static const UINT8 sfx_data[16] = {
-					0x00, 0x01, 0x00, 0x01, 0x04, 0x01, 0x00, 0x01,
-					0x00, 0x01, 0x08, 0x01, 0x00, 0x01, 0x0c, 0x01,
-				};
-				return sfx_data[offset & 0x0f];
-			}
-		}
-		else    // RAM
-		{
-			offset -= 0x200000;
-			if (superfx_access_ram(state->m_superfx))
-				value = snes_ram[0xe00000 + offset];
-			else
-				value = snes_open_bus_r(space, 0);
-		}
-	}
-	else if ((state->m_cart[0].mode & 5) && !(state->m_has_addon_chip == HAS_SUPERFX))      /* Mode 20 & 22 */
+	if (state->m_cart[0].mode & 5)      /* Mode 20 & 22 */
 	{
 		if (address < 0x8000)
 			value = space.read_byte(0x400000 + offset);
 		else
 			value = snes_ram[0xc00000 + offset];
 	}
-	else                                /* Mode 21 & 25 + SuperFX Games */
+	else                                /* Mode 21 & 25 */
 		value = snes_ram[0xc00000 + offset];
 
 	return value;
@@ -993,12 +908,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 			snes_w_io(space, address, data);
 	}
 	else if (address < 0x8000)
-	{
-		if (state->m_has_addon_chip == HAS_SUPERFX)
-			snes_ram[0xf00000 + (offset & 0x1fff)] = data;  // here it should be 0xe00000 but there are mirroring issues
-		else
-			logerror("snes_w_bank1: Attempt to write to reserved address: %x = %02x\n", offset, data);
-	}
+		logerror("snes_w_bank1: Attempt to write to reserved address: %x = %02x\n", offset, data);
 	else
 		logerror( "(PC=%06x) Attempt to write to ROM address: %X\n",space.device().safe_pc(),offset );
 }
@@ -1020,9 +930,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 	}
 	else if (address < 0x8000)                      /* SRAM for mode_21, Reserved othewise */
 	{
-		if (state->m_has_addon_chip == HAS_SUPERFX)
-			snes_ram[0xf00000 + (offset & 0x1fff)] = data;  // here it should be 0xe00000 but there are mirroring issues
-		else if ((state->m_cart[0].mode == SNES_MODE_21) && (state->m_cart[0].sram > 0))
+		if ((state->m_cart[0].mode == SNES_MODE_21) && (state->m_cart[0].sram > 0))
 		{
 			/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
 			/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
@@ -1042,9 +950,7 @@ WRITE8_HANDLER( snes_w_bank4 )
 	snes_state *state = space.machine().driver_data<snes_state>();
 	UINT16 address = offset & 0xffff;
 
-	if (state->m_has_addon_chip == HAS_SUPERFX)
-		snes_ram[0xe00000 + offset] = data;
-	else if (state->m_cart[0].mode & 5)                 /* Mode 20 & 22 */
+	if (state->m_cart[0].mode & 5)                 /* Mode 20 & 22 */
 	{
 		if (address >= 0x8000)
 			logerror("(PC=%06x) Attempt to write to ROM address: %X\n",space.device().safe_pc(),offset + 0x600000);
@@ -1061,9 +967,7 @@ WRITE8_HANDLER( snes_w_bank5 )
 	snes_state *state = space.machine().driver_data<snes_state>();
 	UINT16 address = offset & 0xffff;
 
-	if (state->m_has_addon_chip == HAS_SUPERFX)
-		snes_ram[0xf00000 + offset] = data;
-	else if ((state->m_cart[0].mode & 5) && (address < 0x8000))         /* Mode 20 & 22 */
+	if ((state->m_cart[0].mode & 5) && (address < 0x8000))         /* Mode 20 & 22 */
 	{
 		if (state->m_cart[0].sram > 0x8000)
 		{
@@ -1091,9 +995,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 	snes_state *state = space.machine().driver_data<snes_state>();
 	UINT16 address = offset & 0xffff;
 
-	if (state->m_has_addon_chip == HAS_SUPERFX)
-		space.write_byte(offset, data);
-	else if (address < 0x8000)
+	if (address < 0x8000)
 	{
 		if (state->m_cart[0].mode != SNES_MODE_25)
 			space.write_byte(offset, data);
@@ -1121,17 +1023,7 @@ WRITE8_HANDLER( snes_w_bank7 )
 	snes_state *state = space.machine().driver_data<snes_state>();
 	UINT16 address = offset & 0xffff;
 
-	if (state->m_has_addon_chip == HAS_SUPERFX)
-	{
-		if (offset >= 0x200000)
-		{
-			offset -= 0x200000;
-			snes_ram[0xe00000 + offset] = data;     // SFX RAM
-		}
-		else
-			logerror("(PC=%06x) Attempt to write to ROM address: %X\n",space.device().safe_pc(),offset + 0xc00000);
-	}
-	else if (state->m_cart[0].mode & 5)             /* Mode 20 & 22 */
+	if (state->m_cart[0].mode & 5)             /* Mode 20 & 22 */
 	{
 		if (address < 0x8000)
 		{
