@@ -79,11 +79,14 @@ protected:
 	virtual void state_string_export(const device_state_entry &entry, astring &string);
 	
 	// addressing modes
-	static const int ADDRESSING_MODE_IMMEDIATE	= 0;
-	static const int ADDRESSING_MODE_EA			= 1;
-	static const int ADDRESSING_MODE_REGISTER_A	= 2;
-	static const int ADDRESSING_MODE_REGISTER_B	= 3;
-	static const int ADDRESSING_MODE_REGISTER_D = 4;
+	enum
+	{
+		ADDRESSING_MODE_IMMEDIATE	= 0,
+		ADDRESSING_MODE_EA			= 1,
+		ADDRESSING_MODE_REGISTER_A	= 2,
+		ADDRESSING_MODE_REGISTER_B	= 3,
+		ADDRESSING_MODE_REGISTER_D = 4
+	};
 
 	// register transfer
 	struct exgtfr_register
@@ -93,32 +96,41 @@ protected:
 	};
 
 	// flag bits in the cc register
-	static const UINT8 CC_C		= 0x01;			// Carry
-	static const UINT8 CC_V		= 0x02;			// Overflow
-	static const UINT8 CC_Z		= 0x04;			// Zero
-	static const UINT8 CC_N		= 0x08;			// Negative
-	static const UINT8 CC_I		= 0x10;			// Inhibit IRQ
-	static const UINT8 CC_H		= 0x20;			// Half (auxiliary) carry
-	static const UINT8 CC_F		= 0x40;			// Inhibit FIRQ
-	static const UINT8 CC_E		= 0x80;			// Entire state pushed
+	enum
+	{
+		CC_C		= 0x01,			// Carry
+		CC_V		= 0x02,			// Overflow
+		CC_Z		= 0x04,			// Zero
+		CC_N		= 0x08,			// Negative
+		CC_I		= 0x10,			// Inhibit IRQ
+		CC_H		= 0x20,			// Half (auxiliary) carry
+		CC_F		= 0x40,			// Inhibit FIRQ
+		CC_E		= 0x80			// Entire state pushed
+	};
 
 	// flag combinations
-	static const UINT8 CC_VC	= CC_V | CC_C;
-	static const UINT8 CC_ZC	= CC_Z | CC_C;
-	static const UINT8 CC_NZ	= CC_N | CC_Z;
-	static const UINT8 CC_NZC	= CC_N | CC_Z | CC_C;
-	static const UINT8 CC_NZV	= CC_N | CC_Z | CC_V;
-	static const UINT8 CC_NZVC	= CC_N | CC_Z | CC_V | CC_C;
-	static const UINT8 CC_HNZVC = CC_H | CC_N | CC_Z | CC_V | CC_C;
+	enum
+	{
+		CC_VC	= CC_V | CC_C,
+		CC_ZC	= CC_Z | CC_C,
+		CC_NZ	= CC_N | CC_Z,
+		CC_NZC	= CC_N | CC_Z | CC_C,
+		CC_NZV	= CC_N | CC_Z | CC_V,
+		CC_NZVC	= CC_N | CC_Z | CC_V | CC_C,
+		CC_HNZVC = CC_H | CC_N | CC_Z | CC_V | CC_C
+	};
 
 	// interrupt vectors
-	static const UINT16 VECTOR_SWI3			= 0xFFF2;
-	static const UINT16 VECTOR_SWI2			= 0xFFF4;
-	static const UINT16 VECTOR_FIRQ			= 0xFFF6;
-	static const UINT16 VECTOR_IRQ			= 0xFFF8;
-	static const UINT16 VECTOR_SWI			= 0xFFFA;
-	static const UINT16 VECTOR_NMI			= 0xFFFC;
-	static const UINT16 VECTOR_RESET_FFFE	= 0xFFFE;
+	enum
+	{
+		VECTOR_SWI3			= 0xFFF2,
+		VECTOR_SWI2			= 0xFFF4,
+		VECTOR_FIRQ			= 0xFFF6,
+		VECTOR_IRQ			= 0xFFF8,
+		VECTOR_SWI			= 0xFFFA,
+		VECTOR_NMI			= 0xFFFC,
+		VECTOR_RESET_FFFE	= 0xFFFE
+	};
 
 	// CPU registers
 	PAIR16						m_pc; 				// program counter

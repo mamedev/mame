@@ -46,22 +46,28 @@ private:
 	typedef m6809_base_device super;
 
 	// addressing modes
-	static const int ADDRESSING_MODE_REGISTER_E = 5;
-	static const int ADDRESSING_MODE_REGISTER_F = 6;
-	static const int ADDRESSING_MODE_REGISTER_W = 7;
-	static const int ADDRESSING_MODE_REGISTER_X = 8;
-	static const int ADDRESSING_MODE_REGISTER_Y = 9;
-	static const int ADDRESSING_MODE_REGISTER_U = 10;
-	static const int ADDRESSING_MODE_REGISTER_S = 11;
-	static const int ADDRESSING_MODE_REGISTER_CC = 12;
-	static const int ADDRESSING_MODE_REGISTER_DP = 13;
-	static const int ADDRESSING_MODE_REGISTER_PC = 14;
-	static const int ADDRESSING_MODE_REGISTER_V = 15;
-	static const int ADDRESSING_MODE_ZERO = 16;
+	enum
+	{
+		ADDRESSING_MODE_REGISTER_E = 5,
+		ADDRESSING_MODE_REGISTER_F = 6,
+		ADDRESSING_MODE_REGISTER_W = 7,
+		ADDRESSING_MODE_REGISTER_X = 8,
+		ADDRESSING_MODE_REGISTER_Y = 9,
+		ADDRESSING_MODE_REGISTER_U = 10,
+		ADDRESSING_MODE_REGISTER_S = 11,
+		ADDRESSING_MODE_REGISTER_CC = 12,
+		ADDRESSING_MODE_REGISTER_DP = 13,
+		ADDRESSING_MODE_REGISTER_PC = 14,
+		ADDRESSING_MODE_REGISTER_V = 15,
+		ADDRESSING_MODE_ZERO = 16
+	};
 
 	// interrupt vectors
-	static const UINT16 VECTOR_ILLEGAL = 0xFFF0;
-
+	enum
+	{
+		VECTOR_ILLEGAL = 0xFFF0
+	};
+	
 	// CPU registers
 	PAIR16	m_w;
 	PAIR16	m_v;
