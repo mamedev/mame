@@ -108,52 +108,54 @@ void st010_write_ram(snes_state *state, UINT16 addr, UINT8 data)
 static READ8_HANDLER( snes_lo_r )
 {
 	snes_state *state = space.machine().driver_data<snes_state>();
+	UINT16 address = offset & 0xffff;
+
 	// take care of add-on chip access
 	if (state->m_has_addon_chip == HAS_OBC1 
-		&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
+		&& (offset < 0x400000 && address >= 0x6000 && address < 0x8000))
 		return obc1_read(space, offset, mem_mask);
 	if (state->m_has_addon_chip == HAS_CX4 
-		&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-		return CX4_read((offset & 0xffff) - 0x6000);
+		&& (offset < 0x400000 && address >= 0x6000 && address < 0x8000))
+		return CX4_read(address - 0x6000);
 	if (state->m_has_addon_chip == HAS_RTC
-		&& (offset < 0x400000 && ((offset & 0xffff) == 0x2800 || (offset & 0xffff) == 0x2801)))
+		&& (offset < 0x400000 && (address == 0x2800 || address == 0x2801)))
 		return srtc_read(space, offset);
 	if (state->m_has_addon_chip == HAS_ST010 || state->m_has_addon_chip == HAS_ST011)
 	{
-		if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x1000)
-			return st010_read_ram(state, (offset & 0xffff));
+		if (offset >= 0x680000 && offset < 0x700000 && address < 0x1000)
+			return st010_read_ram(state, address);
 		if (offset == 0x600000 || offset == 0x600001)
 			return (offset & 1) ? st010_get_sr() : st010_get_dr();
 	}
 	if (state->m_cart[0].mode == SNES_MODE_21 && state->m_has_addon_chip == HAS_DSP1 
-		&& (offset < 0x200000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-		return ((offset & 0xffff) < 0x7000) ? dsp_get_dr() : dsp_get_sr();
+		&& (offset < 0x200000 && address >= 0x6000 && address < 0x8000))
+		return (address < 0x7000) ? dsp_get_dr() : dsp_get_sr();
 	if (state->m_cart[0].mode == SNES_MODE_20 && state->m_has_addon_chip == HAS_DSP1)
 	{
 		if (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000)
-			return ((offset & 0xffff) < 0xc000) ? dsp_get_dr() : dsp_get_sr();
+			return (address < 0xc000) ? dsp_get_dr() : dsp_get_sr();
 		if (offset >= 0x600000 && offset < 0x700000 && (offset & 0x8000) == 0x0000)
-			return ((offset & 0xffff) < 0x4000) ? dsp_get_dr() : dsp_get_sr();
+			return (address < 0x4000) ? dsp_get_dr() : dsp_get_sr();
 	}	
 	if ((state->m_has_addon_chip == HAS_DSP2 || state->m_has_addon_chip == HAS_DSP3)
 		&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
-		return ((offset & 0xffff) < 0xc000) ? dsp_get_dr() : dsp_get_sr();
+		return (address < 0xc000) ? dsp_get_dr() : dsp_get_sr();
 	if (state->m_has_addon_chip == HAS_DSP4 
 		&& (offset >= 0x300000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
-		return ((offset & 0xffff) < 0xc000) ? dsp_get_dr() : dsp_get_sr();
+		return (address < 0xc000) ? dsp_get_dr() : dsp_get_sr();
 	if (state->m_has_addon_chip == HAS_SDD1
-		&& (offset < 0x400000 && (offset & 0xffff) >= 0x4800 && (offset & 0xffff) < 0x4808))
-		return sdd1_mmio_read(space, (UINT32)(offset & 0xffff));
+		&& (offset < 0x400000 && address >= 0x4800 && address < 0x4808))
+		return sdd1_mmio_read(space, (UINT32)address);
 	if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
 		&& offset < 0x400000)
 	{	
 		UINT16 limit = (state->m_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
-		if ((offset & 0xffff) >= 0x4800 && (offset & 0xffff) <= limit)
-			return spc7110_mmio_read(space, (UINT32)(offset & 0xffff));
-		if (offset < 0x10000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
-			return snes_ram[0x306000 + (offset & 0x1fff)];
-		if (offset >= 0x300000 && offset < 0x310000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
-			return snes_ram[0x306000 + (offset & 0x1fff)];
+		if (address >= 0x4800 && address <= limit)
+			return spc7110_mmio_read(space, (UINT32)address);
+		if (offset < 0x10000 && address >= 0x6000 && address < 0x8000)
+			return snes_ram[0x306000 + (address & 0x1fff)];
+		if (offset >= 0x300000 && offset < 0x310000 && address >= 0x6000 && address < 0x8000)
+			return snes_ram[0x306000 + (address & 0x1fff)];
 	}
 	if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
 		&& offset >= 0x500000 && offset < 0x510000)
@@ -175,54 +177,56 @@ static READ8_HANDLER( snes_lo_r )
 static READ8_HANDLER( snes_hi_r )
 {
 	snes_state *state = space.machine().driver_data<snes_state>();
+	UINT16 address = offset & 0xffff;
+	
 	// take care of add-on chip access
 	if (state->m_has_addon_chip == HAS_OBC1 
-		&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
+		&& (offset < 0x400000 && address >= 0x6000 && address < 0x8000))
 		return obc1_read(space, offset, mem_mask);
 	if (state->m_has_addon_chip == HAS_CX4 
-		&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-		return CX4_read((offset & 0xffff) - 0x6000);
+		&& (offset < 0x400000 && address >= 0x6000 && address < 0x8000))
+		return CX4_read(address - 0x6000);
 	if (state->m_has_addon_chip == HAS_RTC
-		&& (offset < 0x400000 && ((offset & 0xffff) == 0x2800 || (offset & 0xffff) == 0x2801)))
+		&& (offset < 0x400000 && (address == 0x2800 || address == 0x2801)))
 		return srtc_read(space, offset);
 	if (state->m_has_addon_chip == HAS_ST010 || state->m_has_addon_chip == HAS_ST011)
 	{
-		if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x1000)
-			return st010_read_ram(state, (offset & 0xffff));
+		if (offset >= 0x680000 && offset < 0x700000 && address < 0x1000)
+			return st010_read_ram(state, address);
 		if (offset == 0x600000 || offset == 0x600001)
 			return (offset & 1) ? st010_get_sr() : st010_get_dr();
 	}
 	if (state->m_cart[0].mode == SNES_MODE_21 && state->m_has_addon_chip == HAS_DSP1 
-		&& (offset < 0x200000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-		return ((offset & 0xffff) < 0x7000) ? dsp_get_dr() : dsp_get_sr();
+		&& (offset < 0x200000 && address >= 0x6000 && address < 0x8000))
+		return (address < 0x7000) ? dsp_get_dr() : dsp_get_sr();
 	if (state->m_cart[0].mode == SNES_MODE_20 && state->m_has_addon_chip == HAS_DSP1)
 	{
 		if (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000)
-			return ((offset & 0xffff) < 0xc000) ? dsp_get_dr() : dsp_get_sr();
+			return (address < 0xc000) ? dsp_get_dr() : dsp_get_sr();
 		if (offset >= 0x600000 && offset < 0x700000 && (offset & 0x8000) == 0x0000)
-			return ((offset & 0xffff) < 0x4000) ? dsp_get_dr() : dsp_get_sr();
+			return (address < 0x4000) ? dsp_get_dr() : dsp_get_sr();
 	}
 	if ((state->m_has_addon_chip == HAS_DSP2 || state->m_has_addon_chip == HAS_DSP3)
 		&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
-		return ((offset & 0xffff) < 0xc000) ? dsp_get_dr() : dsp_get_sr();
+		return (address < 0xc000) ? dsp_get_dr() : dsp_get_sr();
 	if (state->m_has_addon_chip == HAS_DSP4 
 		&& (offset >= 0x300000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
-		return ((offset & 0xffff) < 0xc000) ? dsp_get_dr() : dsp_get_sr();
+		return (address < 0xc000) ? dsp_get_dr() : dsp_get_sr();
 	if (state->m_has_addon_chip == HAS_SDD1
-		&& (offset < 0x400000 && (offset & 0xffff) >= 0x4800 && (offset & 0xffff) < 0x4808))
-		return sdd1_mmio_read(space, (UINT32)(offset & 0xffff));
+		&& (offset < 0x400000 && address >= 0x4800 && address < 0x4808))
+		return sdd1_mmio_read(space, (UINT32)address);
 	if (state->m_has_addon_chip == HAS_SDD1 && offset >= 0x400000)
 		return sdd1_read(space.machine(), offset - 0x400000);
 	if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC)
 		&& offset < 0x400000)
 	{	
 		UINT16 limit = (state->m_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
-		if ((offset & 0xffff) >= 0x4800 && (offset & 0xffff) <= limit)
-			return spc7110_mmio_read(space, (UINT32)(offset & 0xffff));
-		if (offset < 0x10000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
-			return snes_ram[0x306000 + (offset & 0x1fff)];
-		if (offset >= 0x300000 && offset < 0x310000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
-			return snes_ram[0x306000 + (offset & 0x1fff)];
+		if (address >= 0x4800 && address <= limit)
+			return spc7110_mmio_read(space, (UINT32)address);
+		if (offset < 0x10000 && address >= 0x6000 && address < 0x8000)
+			return snes_ram[0x306000 + (address & 0x1fff)];
+		if (offset >= 0x300000 && offset < 0x310000 && address >= 0x6000 && address < 0x8000)
+			return snes_ram[0x306000 + (address & 0x1fff)];
 	}
 	if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC) 
 		&& offset >= 0x500000)
@@ -238,40 +242,30 @@ static READ8_HANDLER( snes_hi_r )
 static WRITE8_HANDLER( snes_lo_w )
 {
 	snes_state *state = space.machine().driver_data<snes_state>();
+	UINT16 address = offset & 0xffff;
+	
 	// take care of add-on chip access
 	if (state->m_has_addon_chip == HAS_OBC1 
-		&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-	{
-		obc1_write(space, offset, data, mem_mask);
-		return;
-	}
+		&& (offset < 0x400000 && address >= 0x6000 && address < 0x8000))
+	{	obc1_write(space, offset, data, mem_mask);	return;	}
 	if (state->m_has_addon_chip == HAS_CX4 
-		&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-	{
-		CX4_write(space.machine(), (offset & 0xffff) - 0x6000, data);
-		return;
-	}
+		&& (offset < 0x400000 && address >= 0x6000 && address < 0x8000))
+	{	CX4_write(space.machine(), address - 0x6000, data);	return;	}
 	if (state->m_has_addon_chip == HAS_RTC
-		&& (offset < 0x400000 && ((offset & 0xffff) == 0x2800 || (offset & 0xffff) == 0x2801)))
-	{
-		srtc_write(space.machine(), offset, data);
-		return;
-	}
+		&& (offset < 0x400000 && (address == 0x2800 || address == 0x2801)))
+	{	srtc_write(space.machine(), offset, data);	return;	}
 	if (state->m_has_addon_chip == HAS_ST010 || state->m_has_addon_chip == HAS_ST011)
 	{
-		if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x1000)
-		{	st010_write_ram(state, (offset & 0xffff), data);	return;	}
+		if (offset >= 0x680000 && offset < 0x700000 && address < 0x1000)
+		{	st010_write_ram(state, address, data);	return;	}
 		if (offset == 0x600000)
 		{	st010_set_dr(data);	return;	}
 		if (offset == 0x600001)
 		{	st010_set_sr(data);	return;	}
 	}
 	if (state->m_cart[0].mode == SNES_MODE_21 && state->m_has_addon_chip == HAS_DSP1 
-		&& (offset < 0x200000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-	{	
-		dsp_set_dr(data);
-		return;
-	}
+		&& (offset < 0x200000 && address >= 0x6000 && address < 0x8000))
+	{	dsp_set_dr(data);	return;	}
 	if (state->m_cart[0].mode == SNES_MODE_20 && state->m_has_addon_chip == HAS_DSP1)
 	{
 		if (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000)
@@ -282,7 +276,7 @@ static WRITE8_HANDLER( snes_lo_w )
 	if ((state->m_has_addon_chip == HAS_DSP2 || state->m_has_addon_chip == HAS_DSP3)
 		&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
 	{
-		if ((offset & 0xffff) < 0xc000)
+		if (address < 0xc000)
 		{	dsp_set_dr(data);	return;	}
 		else
 		{	dsp_set_sr(data);	return;	}
@@ -290,29 +284,28 @@ static WRITE8_HANDLER( snes_lo_w )
 	if (state->m_has_addon_chip == HAS_DSP4 
 		&& (offset >= 0x300000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
 	{
-		if ((offset & 0xffff) < 0xc000)
+		if (address < 0xc000)
 		{	dsp_set_dr(data);	return;	}
 		else
 		{	dsp_set_sr(data);	return;	}
 	}
 	if (state->m_has_addon_chip == HAS_SDD1 && offset < 0x400000)
 	{
-		if (((offset & 0xffff) >= 0x4300 && (offset & 0xffff) < 0x4380) ||
-			((offset & 0xffff) >= 0x4800 && (offset & 0xffff) < 0x4808))
+		if ((address >= 0x4300 && address < 0x4380) || (address >= 0x4800 && address < 0x4808))
 		{
-				sdd1_mmio_write(space, (UINT32)(offset & 0xffff), data);
+				sdd1_mmio_write(space, (UINT32)address, data);
 				// here we don't return, but we let the w_io happen...
 		}
 	}
 	if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC) && offset < 0x400000)
 	{	
 		UINT16 limit = (state->m_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
-		if ((offset & 0xffff) >= 0x4800 && (offset & 0xffff) <= limit)
-		{	spc7110_mmio_write(space.machine(), (UINT32)(offset & 0xffff), data);	return;	}
-		if (offset < 0x10000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
-		{	snes_ram[0x306000 + (offset & 0x1fff)] = data;	return;	}
-		if (offset >= 0x300000 && offset < 0x310000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
-		{	snes_ram[0x306000 + (offset & 0x1fff)] = data;	return;	}
+		if (address >= 0x4800 && address <= limit)
+		{	spc7110_mmio_write(space.machine(), (UINT32)address, data);	return;	}
+		if (offset < 0x10000 && address >= 0x6000 && address < 0x8000)
+		{	snes_ram[0x306000 + (address & 0x1fff)] = data;	return;	}
+		if (offset >= 0x300000 && offset < 0x310000 && address >= 0x6000 && address < 0x8000)
+		{	snes_ram[0x306000 + (address & 0x1fff)] = data;	return;	}
 	}
 	
 	// base cart access
@@ -331,40 +324,30 @@ static WRITE8_HANDLER( snes_lo_w )
 static WRITE8_HANDLER( snes_hi_w )
 {
 	snes_state *state = space.machine().driver_data<snes_state>();
+	UINT16 address = offset & 0xffff;
+	
 	// take care of add-on chip access
 	if (state->m_has_addon_chip == HAS_OBC1 
-		&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-	{
-		obc1_write(space, offset, data, mem_mask);
-		return;
-	}
+		&& (offset < 0x400000 && address >= 0x6000 && address < 0x8000))
+	{	obc1_write(space, offset, data, mem_mask);	return;	}
 	if (state->m_has_addon_chip == HAS_CX4 
-		&& (offset < 0x400000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-	{
-		CX4_write(space.machine(), (offset & 0xffff) - 0x6000, data);
-		return;
-	}
+		&& (offset < 0x400000 && address >= 0x6000 && address < 0x8000))
+	{	CX4_write(space.machine(), address - 0x6000, data);	return;	}
 	if (state->m_has_addon_chip == HAS_RTC
-		&& (offset < 0x400000 && ((offset & 0xffff) == 0x2800 || (offset & 0xffff) == 0x2801)))
-	{
-		srtc_write(space.machine(), offset, data);
-		return;
-	}
+		&& (offset < 0x400000 && (address == 0x2800 || address == 0x2801)))
+	{	srtc_write(space.machine(), offset, data);	return;	}
 	if (state->m_has_addon_chip == HAS_ST010 || state->m_has_addon_chip == HAS_ST011)
 	{
-		if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x1000)
-		{	st010_write_ram(state, (offset & 0xffff), data);	return;	}
+		if (offset >= 0x680000 && offset < 0x700000 && address < 0x1000)
+		{	st010_write_ram(state, address, data);	return;	}
 		if (offset == 0x600000)
 		{	st010_set_dr(data);	return;	}
 		if (offset == 0x600001)
 		{	st010_set_sr(data);	return;	}
 	}
 	if (state->m_cart[0].mode == SNES_MODE_21 && state->m_has_addon_chip == HAS_DSP1 
-		&& (offset < 0x200000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
-	{	
-		dsp_set_dr(data);
-		return;
-	}
+		&& (offset < 0x200000 && address >= 0x6000 && address < 0x8000))
+	{	dsp_set_dr(data);	return;	}
 	if (state->m_cart[0].mode == SNES_MODE_20 && state->m_has_addon_chip == HAS_DSP1)
 	{
 		if (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000)
@@ -375,7 +358,7 @@ static WRITE8_HANDLER( snes_hi_w )
 	if ((state->m_has_addon_chip == HAS_DSP2 || state->m_has_addon_chip == HAS_DSP3)
 		&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
 	{
-		if ((offset & 0xffff) < 0xc000)
+		if (address < 0xc000)
 		{	dsp_set_dr(data);	return;	}
 		else
 		{	dsp_set_sr(data);	return;	}
@@ -383,29 +366,28 @@ static WRITE8_HANDLER( snes_hi_w )
 	if (state->m_has_addon_chip == HAS_DSP4 
 		&& (offset >= 0x300000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
 	{
-		if ((offset & 0xffff) < 0xc000)
+		if (address < 0xc000)
 		{	dsp_set_dr(data);	return;	}
 		else
 		{	dsp_set_sr(data);	return;	}
 	}
 	if (state->m_has_addon_chip == HAS_SDD1 && offset < 0x400000)
 	{
-		if (((offset & 0xffff) >= 0x4300 && (offset & 0xffff) < 0x4380) ||
-			((offset & 0xffff) >= 0x4800 && (offset & 0xffff) < 0x4808))
+		if ((address >= 0x4300 && address < 0x4380) || (address >= 0x4800 && address < 0x4808))
 		{
-			sdd1_mmio_write(space, (UINT32)(offset & 0xffff), data);
+			sdd1_mmio_write(space, (UINT32)address, data);
 			// here we don't return, but we let the w_io happen...
 		}
 	}
 	if ((state->m_has_addon_chip == HAS_SPC7110 || state->m_has_addon_chip == HAS_SPC7110_RTC) && offset < 0x400000)
 	{	
 		UINT16 limit = (state->m_has_addon_chip == HAS_SPC7110_RTC) ? 0x4842 : 0x483f;
-		if ((offset & 0xffff) >= 0x4800 && (offset & 0xffff) <= limit)
-		{	spc7110_mmio_write(space.machine(), (UINT32)(offset & 0xffff), data);	return;	}
-		if (offset < 0x10000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
-		{	snes_ram[0x306000 + (offset & 0x1fff)] = data;	return;	}
-		if (offset >= 0x300000 && offset < 0x310000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000)
-		{	snes_ram[0x306000 + (offset & 0x1fff)] = data;	return;	}
+		if (address >= 0x4800 && address <= limit)
+		{	spc7110_mmio_write(space.machine(), (UINT32)address, data);	return;	}
+		if (offset < 0x10000 && address >= 0x6000 && address < 0x8000)
+		{	snes_ram[0x306000 + (address & 0x1fff)] = data;	return;	}
+		if (offset >= 0x300000 && offset < 0x310000 && address >= 0x6000 && address < 0x8000)
+		{	snes_ram[0x306000 + (address & 0x1fff)] = data;	return;	}
 	}
 	
 	// base cart access
