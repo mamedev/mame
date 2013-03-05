@@ -17,6 +17,7 @@ struct snes_obc1_state
 	int address;
 	int offset;
 	int shift;
+	UINT8 ram[0x2000];
 };
 
 static snes_obc1_state obc1_state;
@@ -30,27 +31,27 @@ READ8_HANDLER( obc1_read )
 	switch (address)
 	{
 		case 0x1ff0:
-			value = snes_ram[obc1_state.offset + (obc1_state.address << 2) + 0];
+			value = obc1_state.ram[obc1_state.offset + (obc1_state.address << 2) + 0];
 			break;
 
 		case 0x1ff1:
-			value = snes_ram[obc1_state.offset + (obc1_state.address << 2) + 1];
+			value = obc1_state.ram[obc1_state.offset + (obc1_state.address << 2) + 1];
 			break;
 
 		case 0x1ff2:
-			value = snes_ram[obc1_state.offset + (obc1_state.address << 2) + 2];
+			value = obc1_state.ram[obc1_state.offset + (obc1_state.address << 2) + 2];
 			break;
 
 		case 0x1ff3:
-			value = snes_ram[obc1_state.offset + (obc1_state.address << 2) + 3];
+			value = obc1_state.ram[obc1_state.offset + (obc1_state.address << 2) + 3];
 			break;
 
 		case 0x1ff4:
-			value = snes_ram[obc1_state.offset + (obc1_state.address >> 2) + 0x200];
+			value = obc1_state.ram[obc1_state.offset + (obc1_state.address >> 2) + 0x200];
 			break;
 
 		default:
-			value = snes_ram[address];
+			value = obc1_state.ram[address];
 			break;
 	}
 
@@ -66,51 +67,53 @@ WRITE8_HANDLER( obc1_write )
 	switch(address)
 	{
 		case 0x1ff0:
-			snes_ram[obc1_state.offset + (obc1_state.address << 2) + 0] = data;
+			obc1_state.ram[obc1_state.offset + (obc1_state.address << 2) + 0] = data;
 			break;
 
 		case 0x1ff1:
-			snes_ram[obc1_state.offset + (obc1_state.address << 2) + 1] = data;
+			obc1_state.ram[obc1_state.offset + (obc1_state.address << 2) + 1] = data;
 			break;
 
 		case 0x1ff2:
-			snes_ram[obc1_state.offset + (obc1_state.address << 2) + 2] = data;
+			obc1_state.ram[obc1_state.offset + (obc1_state.address << 2) + 2] = data;
 			break;
 
 		case 0x1ff3:
-			snes_ram[obc1_state.offset + (obc1_state.address << 2) + 3] = data;
+			obc1_state.ram[obc1_state.offset + (obc1_state.address << 2) + 3] = data;
 			break;
 
 		case 0x1ff4:
-			temp = snes_ram[obc1_state.offset + (obc1_state.address >> 2) + 0x200];
+			temp = obc1_state.ram[obc1_state.offset + (obc1_state.address >> 2) + 0x200];
 			temp = (temp & ~(3 << obc1_state.shift)) | ((data & 0x03) << obc1_state.shift);
-			snes_ram[obc1_state.offset + (obc1_state.address >> 2) + 0x200] = temp;
+			obc1_state.ram[obc1_state.offset + (obc1_state.address >> 2) + 0x200] = temp;
 			break;
 
 		case 0x1ff5:
 			obc1_state.offset = (data & 0x01) ? 0x1800 : 0x1c00;
-			snes_ram[address & 0x1fff] = data;
+			obc1_state.ram[address & 0x1fff] = data;
 			break;
 
 		case 0x1ff6:
 			obc1_state.address = data & 0x7f;
 			obc1_state.shift = (data & 0x03) << 1;
-			snes_ram[address & 0x1fff] = data;
+			obc1_state.ram[address & 0x1fff] = data;
 			break;
 
 		default:
-			snes_ram[address & 0x1fff] = data;
+			obc1_state.ram[address & 0x1fff] = data;
 			break;
 	}
 }
 
 void obc1_init( running_machine &machine )
 {
-	obc1_state.offset  = (snes_ram[0x1ff5] & 0x01) ? 0x1800 : 0x1c00;
-	obc1_state.address = (snes_ram[0x1ff6] & 0x7f);
-	obc1_state.shift   = (snes_ram[0x1ff6] & 0x03) << 1;
+	memset(obc1_state.ram, 0x00, sizeof(obc1_state.ram));
+	obc1_state.offset  = (obc1_state.ram[0x1ff5] & 0x01) ? 0x1800 : 0x1c00;
+	obc1_state.address = (obc1_state.ram[0x1ff6] & 0x7f);
+	obc1_state.shift   = (obc1_state.ram[0x1ff6] & 0x03) << 1;
 
 	state_save_register_global(machine, obc1_state.offset);
 	state_save_register_global(machine, obc1_state.address);
 	state_save_register_global(machine, obc1_state.shift);
+	state_save_register_global_array(machine, obc1_state.ram);
 }
