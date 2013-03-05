@@ -579,9 +579,6 @@ struct snes_superscope
 	int offscreen;
 };
 
-typedef void (*snes_io_read)(running_machine &machine);
-typedef UINT8 (*snes_oldjoy_read)(running_machine &machine);
-
 class snes_state : public driver_device
 {
 public:
@@ -643,9 +640,9 @@ public:
 	snes_superscope       m_scope[2];
 
 	/* input callbacks (to allow MESS to have its own input handlers) */
-	snes_io_read          m_io_read;
-	snes_oldjoy_read      m_oldjoy1_read;
-	snes_oldjoy_read      m_oldjoy2_read;
+	write8_delegate     m_io_read;
+	read8_delegate      m_oldjoy1_read;
+	read8_delegate      m_oldjoy2_read;
 
 	/* cart related */
 	UINT8 m_has_addon_chip;
@@ -681,6 +678,12 @@ public:
 	void hdma_init(address_space &space);
 	void hdma_update(address_space &space, int dma);
 	void hirq_tick();
+	
+	void snes_init_ram();
+	
+	DECLARE_WRITE8_MEMBER(nss_io_read);
+	DECLARE_READ8_MEMBER(nss_oldjoy1_read);
+	DECLARE_READ8_MEMBER(nss_oldjoy2_read);
 
 	DECLARE_READ8_MEMBER(snes_io_dma_r);
 	DECLARE_WRITE8_MEMBER(snes_io_dma_w);
@@ -694,6 +697,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(snes_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sufami_cart);
+	DECLARE_READ8_MEMBER( snes_r_io );
+	DECLARE_WRITE8_MEMBER( snes_w_io );	
 };
 
 /* Special chips, checked at init and used in memory handlers */
@@ -746,9 +751,6 @@ extern MACHINE_START( snes );
 extern MACHINE_RESET( snes );
 
 DECLARE_READ8_HANDLER( snes_open_bus_r );
-
-extern DECLARE_READ8_HANDLER( snes_r_io );
-extern DECLARE_WRITE8_HANDLER( snes_w_io );
 
 extern DECLARE_READ8_HANDLER( snes_r_bank1 );
 extern DECLARE_READ8_HANDLER( snes_r_bank2 );
