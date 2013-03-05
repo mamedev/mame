@@ -2387,15 +2387,15 @@ static MACHINE_START( snesnew )
 		case SNES_DSP_MODE21:
 //			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x000000, 0x7dffff, FUNC(snes21_lo_r), FUNC(snes21_lo_w));
 //			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x800000, 0xffffff, FUNC(snes21_hi_r), FUNC(snes21_hi_w));
-//			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x006000, 0x007fff, 0x1f0000, 0, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
-//			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x006000, 0x007fff, 0x1f0000, 0, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
+//			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x006000, 0x007fff, 0x9f0000, 0, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
+//			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x006000, 0x007fff, 0x9f0000, 0, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
 //			set_5a22_map(*state->m_maincpu);
 			break;
 		case SNES_SRTC:
 //			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x000000, 0x7dffff, FUNC(snes21_lo_r), FUNC(snes21_lo_w));
 //			machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x800000, 0xffffff, FUNC(snes21_hi_r), FUNC(snes21_hi_w));
-//			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x002800, 0x002800, 0x3f0000, 0, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
-//			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x002801, 0x002801, 0x3f0000, 0, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
+//			machine.device("maincpu")->memory().space(AS_PROGRAM).install_read_handler(0x002800, 0x002800, 0xbf0000, 0, read8_delegate(FUNC(device_sns_cart_interface::chip_read),state->m_slotcart->m_cart));
+//			machine.device("maincpu")->memory().space(AS_PROGRAM).install_write_handler(0x002801, 0x002801, 0xbf0000, 0, write8_delegate(FUNC(device_sns_cart_interface::chip_write),state->m_slotcart->m_cart));
 //			set_5a22_map(*state->m_maincpu);
 			break;
 	}
