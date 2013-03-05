@@ -2082,7 +2082,7 @@ ROM_START( cbm8296ed )
 	ROM_LOAD( "324746-01.ue7", 0x0000, 0x4000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )   // BASIC 4
 
 	ROM_REGION( 0x1000, "editor", 0 )
-	ROM_LOAD( "execudesk.ue8", 0x000, 0x800, CRC(bef0eaa1) SHA1(7ea63a2d651f516e96b8725195c13542ea495ebd) )
+	ROM_LOAD( "execudesk.ue8", 0x0000, 0x1000, CRC(bef0eaa1) SHA1(7ea63a2d651f516e96b8725195c13542ea495ebd) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
