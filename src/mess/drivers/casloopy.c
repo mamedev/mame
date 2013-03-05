@@ -161,27 +161,126 @@ public:
 		m_bios_rom(*this, "bios_rom"){ }
 
 	required_shared_ptr<UINT32> m_bios_rom;
+	UINT16 *m_paletteram;
+	UINT8 *m_vram;
+	int m_gfx_index;
 	DECLARE_DRIVER_INIT(casloopy);
 	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_READ16_MEMBER(casloopy_vregs_r);
+	DECLARE_WRITE16_MEMBER(casloopy_vregs_w);
+	DECLARE_READ16_MEMBER(casloopy_pal_r);
+	DECLARE_WRITE16_MEMBER(casloopy_pal_w);
+	DECLARE_READ8_MEMBER(casloopy_vram_r);
+	DECLARE_WRITE8_MEMBER(casloopy_vram_w);
 };
 
 
+static const gfx_layout casloopy_tile_layout =
+{
+	8,8,
+	0x400,
+	4,
+	{ 0, 1, 2, 3 },
+	{ STEP8(0, 4) },
+	{ STEP8(0, 4*8) },
+	4*8*8
+};
 
 void casloopy_state::video_start()
 {
+	/* TODO: proper sizes */
+	m_paletteram = auto_alloc_array(machine(), UINT16, 0x1000);
+	m_vram = auto_alloc_array(machine(), UINT8, 0x4000);
+
+	for (m_gfx_index = 0; m_gfx_index < MAX_GFX_ELEMENTS; m_gfx_index++)
+		if (machine().gfx[m_gfx_index] == 0)
+			break;
+
+	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), casloopy_tile_layout, m_vram, 0x10, 0));
 }
 
 UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	gfx_element *gfx = machine().gfx[m_gfx_index];
+	int x,y;
+	int count;
+
+	count = 0;
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			UINT16 tile = (m_vram[count+1])|(m_vram[count]<<8);
+
+			tile &= 0x3ff; //???
+			tile |= 0x100;
+
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,7,0,0,x*8,y*8);
+
+			count+=2;
+		}
+	}
+
 	return 0;
 }
+
+READ16_MEMBER(casloopy_state::casloopy_vregs_r)
+{
+	if(offset == 4/2)
+	{
+		return (machine().primary_screen->vblank() << 8); /*| (machine().primary_screen->vpos() & 0xff);*/
+	}
+
+	printf("%08x\n",offset*2);
+
+	return 0xffff;
+}
+
+WRITE16_MEMBER(casloopy_state::casloopy_vregs_w)
+{
+	printf("%08x %08x\n",offset*2,data);
+}
+
+READ16_MEMBER(casloopy_state::casloopy_pal_r)
+{
+	return m_paletteram[offset];
+}
+
+WRITE16_MEMBER(casloopy_state::casloopy_pal_w)
+{
+	int r,g,b;
+	COMBINE_DATA(&m_paletteram[offset]);
+
+	b = ((m_paletteram[offset])&0x001f)>>0;
+	g = ((m_paletteram[offset])&0x03e0)>>5;
+	r = ((m_paletteram[offset])&0x7c00)>>10;
+
+	palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+}
+
+READ8_MEMBER(casloopy_state::casloopy_vram_r)
+{
+	return m_vram[offset];
+}
+
+WRITE8_MEMBER(casloopy_state::casloopy_vram_w)
+{
+	m_vram[offset] = data;
+
+	machine().gfx[m_gfx_index]->mark_dirty(offset/256);
+}
+
 
 static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
 	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("bios_rom")
 	AM_RANGE(0x01000000, 0x0107ffff) AM_RAM // stack pointer points here
+	AM_RANGE(0x04040000, 0x04043fff) AM_READWRITE8(casloopy_vram_r,casloopy_vram_w,0xffffffff) // tilemap + PCG
+	AM_RANGE(0x04051000, 0x040510ff) AM_READWRITE16(casloopy_pal_r,casloopy_pal_w,0xffffffff)
+	AM_RANGE(0x04058000, 0x04058007) AM_READWRITE16(casloopy_vregs_r,casloopy_vregs_w,0xffffffff)
 //	AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
 	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("rom_cart",0)
 	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
@@ -233,7 +332,7 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update_casloopy)
