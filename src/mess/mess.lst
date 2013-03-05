@@ -79,7 +79,6 @@ snespdsp  // Nintendo Super Nintendo PAL w/DSP-x CPU
 snesst10  // Nintendo Super Nintendo NTSC w/ST-010 CPU
 snesst11  // Nintendo Super Nintendo NTSC w/ST-011 CPU
 snesst    // Nintendo Super Nintendo NTSC w/Sufami Turbo base cart
-snesbsx   // Nintendo Super Nintendo NTSC w/BS-X compatible cart
 n64       // Nintendo N64
 n64dd     // Nintendo N64 (64DD Attachment)
 pokemini  // Nintendo Pokemon Mini

@@ -14,6 +14,5 @@ void sufami_machine_stop(running_machine &machine);
 MACHINE_CONFIG_EXTERN( snes_cartslot );
 MACHINE_CONFIG_EXTERN( snesp_cartslot );
 MACHINE_CONFIG_EXTERN( sufami_cartslot );
-MACHINE_CONFIG_EXTERN( bsx_cartslot );
 
 #endif /* _SNESCART_H */

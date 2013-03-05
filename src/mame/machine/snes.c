@@ -41,7 +41,6 @@ struct snes_cart_info snes_cart;
 #include "machine/snesrtc.c"
 #include "machine/snessdd1.c"
 #include "machine/snes7110.c"
-#include "machine/snesbsx.c"
 
 
 VIDEO_START( snes )
@@ -694,19 +693,13 @@ address               |         |          |       |     |         |        |   
 /* 0x000000 - 0x2fffff */
 READ8_HANDLER( snes_r_bank1 )
 {
-	snes_state *state = space.machine().driver_data<snes_state>();
 	UINT8 value = 0xff;
 	UINT16 address = offset & 0xffff;
 
 	if (address < 0x2000)                                           /* Mirror of Low RAM */
 		value = space.read_byte(0x7e0000 + address);
 	else if (address < 0x6000)                                      /* I/O */
-	{
-		if (state->m_cart[0].mode == SNES_MODE_BSX && address >= 0x5000)
-			value = bsx_read(space, offset, mem_mask);
-		else
-			value = snes_r_io(space, address);
-	}
+		value = snes_r_io(space, address);
 	else if (address < 0x8000)
 	{
 		logerror("(PC=%06x) snes_r_bank1: Unmapped external chip read: %04x\n",space.device().safe_pc(),address);
@@ -728,12 +721,7 @@ READ8_HANDLER( snes_r_bank2 )
 	if (address < 0x2000)                                           /* Mirror of Low RAM */
 		value = space.read_byte(0x7e0000 + address);
 	else if (address < 0x6000)                                      /* I/O */
-	{
-		if (state->m_cart[0].mode == SNES_MODE_BSX && address >= 0x5000)
-			value = bsx_read(space, 0x300000 + offset, mem_mask);
-		else
-			value = snes_r_io(space, address);
-	}
+		value = snes_r_io(space, address);
 	else if (address < 0x8000)                                      /* SRAM for mode_21, Reserved othewise */
 	{
 		if (state->m_cart[0].mode == SNES_MODE_21 && state->m_cart[0].sram > 0)
@@ -834,30 +822,10 @@ READ8_HANDLER( snes_r_bank5 )
 /* 0x800000 - 0xbfffff */
 READ8_HANDLER( snes_r_bank6 )
 {
-	snes_state *state = space.machine().driver_data<snes_state>();
 	UINT8 value = 0;
-	UINT16 address = offset & 0xffff;
 
-	if (address < 0x8000)
-	{
-		if (state->m_cart[0].mode != SNES_MODE_25)
-			value = space.read_byte(offset);
-		else                            /* Mode 25 has SRAM not mirrored from lower banks */
-		{
-			if (address < 0x6000)
-				value = space.read_byte(offset);
-			else if ((offset >= 0x300000) && (state->m_cart[0].sram > 0))
-			{
-				int mask = (state->m_cart[0].sram - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
-				value = snes_ram[0xb06000 + ((offset - 0x6000) & mask)];
-			}
-			else                        /* Area 0x6000-0x8000 with offset < 0x300000 is reserved */
-			{
-				logerror("(PC=%06x) snes_r_bank6: Unmapped external chip read: %04x\n",space.device().safe_pc(),address);
-				value = snes_open_bus_r(space, 0);
-			}
-		}
-	}
+	if ((offset & 0xffff) < 0x8000)
+		value = space.read_byte(offset);
 	else
 		value = snes_ram[0x800000 + offset];
 
@@ -888,18 +856,12 @@ READ8_HANDLER( snes_r_bank7 )
 /* 0x000000 - 0x2fffff */
 WRITE8_HANDLER( snes_w_bank1 )
 {
-	snes_state *state = space.machine().driver_data<snes_state>();
 	UINT16 address = offset & 0xffff;
 
 	if (address < 0x2000)                           /* Mirror of Low RAM */
 		space.write_byte(0x7e0000 + address, data);
 	else if (address < 0x6000)                      /* I/O */
-	{
-		if (state->m_cart[0].mode == SNES_MODE_BSX && address >= 0x5000)
-			bsx_write(space, offset, data, mem_mask);
-		else
-			snes_w_io(space, address, data);
-	}
+		snes_w_io(space, address, data);
 	else if (address < 0x8000)
 		logerror("snes_w_bank1: Attempt to write to reserved address: %x = %02x\n", offset, data);
 	else
@@ -915,12 +877,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 	if (address < 0x2000)                           /* Mirror of Low RAM */
 		space.write_byte(0x7e0000 + address, data);
 	else if (address < 0x6000)                      /* I/O */
-	{
-		if (state->m_cart[0].mode == SNES_MODE_BSX && address >= 0x5000)
-			bsx_write(space, 0x300000 + offset, data, mem_mask);
-		else
-			snes_w_io(space, address, data);
-	}
+		snes_w_io(space, address, data);
 	else if (address < 0x8000)                      /* SRAM for mode_21, Reserved othewise */
 	{
 		if ((state->m_cart[0].mode == SNES_MODE_21) && (state->m_cart[0].sram > 0))
@@ -985,26 +942,8 @@ WRITE8_HANDLER( snes_w_bank5 )
 /* 0x800000 - 0xbfffff */
 WRITE8_HANDLER( snes_w_bank6 )
 {
-	snes_state *state = space.machine().driver_data<snes_state>();
-	UINT16 address = offset & 0xffff;
-
-	if (address < 0x8000)
-	{
-		if (state->m_cart[0].mode != SNES_MODE_25)
-			space.write_byte(offset, data);
-		else    /* Mode 25 has SRAM not mirrored from lower banks */
-		{
-			if (address < 0x6000)
-				space.write_byte(offset, data);
-			else if ((offset >= 0x300000) && (state->m_cart[0].sram > 0))
-			{
-				int mask = (state->m_cart[0].sram - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
-				snes_ram[0xb06000 + ((offset - 0x6000) & mask)] = data;
-			}
-			else    /* Area in 0x6000-0x8000 && offset < 0x300000 is Reserved! */
-				logerror("snes_w_bank6: Attempt to write to reserved address: %X = %02x\n", offset + 0x800000, data);
-		}
-	}
+	if ((offset & 0xffff) < 0x8000)
+		space.write_byte(offset, data);
 	else
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",space.device().safe_pc(),offset + 0x800000);
 }
@@ -1214,9 +1153,6 @@ MACHINE_START( snes )
 //  SNES_CPU_REG_STATE(WRMPYA) = 0xff;
 //  SNES_CPU_REG_STATE(WRDIVL) = 0xff;
 //  SNES_CPU_REG_STATE(WRDIVH) = 0xff;
-
-	if (state->m_cart[0].mode == SNES_MODE_BSX)
-		bsx_init(machine);
 
 	snes_init_timers(machine);
 

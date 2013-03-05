@@ -1017,16 +1017,9 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 		case SNES_MODE_BSHI:
 			/* not handled yet */
 			mame_printf_error("This is a BS-X Satellaview image: MESS does not support these yet, sorry.\n");
-#if 0
-			// shall we force incompatibility of flash carts without a base unit?
-			if (!has_bsx_slot)
-			{
-				mame_printf_error("This is a BS-X flash cart and cannot be loaded in snes/snespal.\n");
-//              mame_printf_error("Please use snesbsx driver to load it, instead.\n");
-				return IMAGE_INIT_FAIL;
-			}
-#endif
-			break;
+			/* so treat it like MODE_20 */
+			state->m_cart[0].mode = SNES_MODE_20;
+			/* and load it as such... */
 
 		default:
 		case SNES_MODE_20:
@@ -1237,162 +1230,6 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 	return IMAGE_INIT_PASS;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( snes_state,bsx_cart )
-{
-	running_machine &machine = image.device().machine();
-	snes_state *state = machine.driver_data<snes_state>();
-	int total_blocks, read_blocks;
-	int has_bsx_slot = 0;
-	UINT32 offset, int_header_offs;
-	UINT8 *ROM = state->memregion("cart")->base();
-
-	if (image.software_entry() == NULL)
-		state->m_cart_size = image.length();
-	else
-		state->m_cart_size = image.get_software_region_length("rom");
-
-	/* Check for a header (512 bytes), and skip it if found */
-	offset = snes_skip_header(image, state->m_cart_size);
-
-	if (image.software_entry() == NULL)
-	{
-		image.fseek(offset, SEEK_SET);
-		image.fread( ROM, state->m_cart_size - offset);
-	}
-	else
-		memcpy(ROM, image.get_software_region("rom") + offset, state->m_cart_size - offset);
-
-	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", state->m_cart_size - offset);
-
-	/* First, look if the cart is HiROM or LoROM (and set snes_cart accordingly) */
-	int_header_offs = snes_find_hilo_mode(image, ROM, offset, 0);
-
-	// Detect presence of BS-X flash cartridge connector
-	if ((ROM[int_header_offs - 14] == 'Z') && (ROM[int_header_offs - 11] == 'J'))
-	{
-		UINT8 n13 = ROM[int_header_offs - 13];
-		if ((n13 >= 'A' && n13 <= 'Z') || (n13 >= '0' && n13 <= '9'))
-		{
-			if (ROM[int_header_offs + 0x1a] == 0x33 ||
-				(ROM[int_header_offs - 10] == 0x00 && ROM[int_header_offs - 4] == 0x00))
-			{
-				has_bsx_slot = 1;
-			}
-		}
-	}
-
-	// If there is a BS-X connector, detect if it is the Base Cart or a compatible slotted cart
-	if (has_bsx_slot)
-	{
-		if (!memcmp(ROM + int_header_offs, "Satellaview BS-X     ", 21))
-		{
-			//BS-X Base Cart
-			state->m_cart[0].mode = SNES_MODE_BSX;
-			// handle RAM
-		}
-		else
-		{
-			state->m_cart[0].mode = (int_header_offs ==0x007fc0) ? SNES_MODE_BSLO : SNES_MODE_BSHI;
-			// handle RAM?
-		}
-	}
-	else
-	{
-		mame_printf_error("This is not a BS-X compatible cart.\n");
-		mame_printf_error("This image cannot be loaded in the first cartslot of snesbsx.\n");
-		return IMAGE_INIT_FAIL;
-	}
-
-
-	/* FIXME: Insert crc check here? */
-
-	/* How many blocks of data are available to be loaded? */
-	total_blocks = (state->m_cart_size - offset) / 0x8000;
-	read_blocks = 0;
-
-	if (SNES_CART_DEBUG) mame_printf_error("blocks %d\n", total_blocks);
-
-	// actually load the cart
-	while (read_blocks < 64 && read_blocks < total_blocks)
-	{
-		/* Loading data */
-		memcpy(&snes_ram[0x008000 + read_blocks * 0x10000], &ROM[0x000000 + read_blocks * 0x8000], 0x8000);
-		/* Mirroring */
-		memcpy(&snes_ram[0x808000 + read_blocks * 0x10000], &snes_ram[0x8000 + (read_blocks * 0x10000)], 0x8000);
-
-		read_blocks++;
-	}
-
-	/* Filling banks up to 0x3f and their mirrors */
-	while (read_blocks % 64)
-	{
-		int j = 0, repeat_blocks;
-		while ((read_blocks % (64 >> j)) && j < 6)
-			j++;
-		repeat_blocks = read_blocks % (64 >> (j - 1));
-
-		memcpy(&snes_ram[read_blocks * 0x10000], &snes_ram[(read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
-		memcpy(&snes_ram[0x800000 + read_blocks * 0x10000], &snes_ram[(read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
-		read_blocks += repeat_blocks;
-	}
-
-	return IMAGE_INIT_PASS;
-}
-
-DEVICE_IMAGE_LOAD_MEMBER( snes_state,bsx2slot_cart )
-{
-	running_machine &machine = image.device().machine();
-	snes_state *state = machine.driver_data<snes_state>();
-	UINT32 offset, int_header_offs;
-	UINT8 *ROM = state->memregion("flash")->base();
-
-	if (image.software_entry() == NULL)
-		state->m_cart_size = image.length();
-	else
-		state->m_cart_size = image.get_software_region_length("rom");
-
-	/* Check for a header (512 bytes), and skip it if found */
-	offset = snes_skip_header(image, state->m_cart_size);
-
-	if (image.software_entry() == NULL)
-	{
-		image.fseek(offset, SEEK_SET);
-		image.fread( ROM, state->m_cart_size - offset);
-	}
-	else
-		memcpy(ROM, image.get_software_region("rom") + offset, state->m_cart_size - offset);
-
-	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", state->m_cart_size - offset);
-
-	/* First, look if the cart is HiROM or LoROM (and set snes_cart accordingly) */
-	int_header_offs = snes_find_hilo_mode(image, ROM, offset, 1);
-
-	// Detect presence of BS-X Flash Cart
-	if ((ROM[int_header_offs + 0x13] == 0x00 || ROM[int_header_offs + 0x13] == 0xff) &&
-		ROM[int_header_offs + 0x14] == 0x00)
-	{
-		UINT8 n15 = ROM[int_header_offs + 0x15];
-		if (n15 == 0x00 || n15 == 0x80 || n15 == 0x84 || n15 == 0x9c || n15 == 0xbc || n15 == 0xfc)
-		{
-			if (ROM[int_header_offs + 0x1a] == 0x33 || ROM[int_header_offs + 0x1a] == 0xff)
-			{
-				// BS-X Flash Cart
-				state->m_cart[1].mode = SNES_MODE_BSX;
-			}
-		}
-	}
-
-	if (state->m_cart[1].mode != SNES_MODE_BSX)
-	{
-		mame_printf_error("This is not a BS-X flash cart.\n");
-		mame_printf_error("This image cannot be loaded in the second cartslot of snesbsx.\n");
-		return IMAGE_INIT_FAIL;
-	}
-
-	// actually load the cart
-	return IMAGE_INIT_PASS;
-}
-
 MACHINE_CONFIG_FRAGMENT( snes_cartslot )
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("sfc,smc,fig,swc,bin")
@@ -1433,25 +1270,6 @@ MACHINE_CONFIG_FRAGMENT( sufami_cartslot )
 //  MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
 MACHINE_CONFIG_END
 
-// This (hackily) emulates a SNES unit where you want to load a BS-X compatible cart:
-// hence, the user can mount a SNES cart in the first slot (either a BS-X BIOS cart, or a
-// BS-X compatible one, e.g. Same Game), and there is a second slot for the 8M data pack
-// (in a real SNES this would have been inserted in the smaller slot on the cart itself)
-MACHINE_CONFIG_FRAGMENT( bsx_cartslot )
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("sfc,smc,fig,swc,bin")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("snes_cart")
-	MCFG_CARTSLOT_LOAD(snes_state,bsx_cart)
-
-	MCFG_CARTSLOT_ADD("slot2")
-	MCFG_CARTSLOT_EXTENSION_LIST("bs,sfc")
-	MCFG_CARTSLOT_NOT_MANDATORY
-	MCFG_CARTSLOT_INTERFACE("bsx_cart")
-	MCFG_CARTSLOT_LOAD(snes_state,bsx2slot_cart)
-
-//  MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
-MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(snes_state,snes_mess)
 {

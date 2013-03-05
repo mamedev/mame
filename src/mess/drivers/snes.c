@@ -1283,11 +1283,6 @@ static MACHINE_CONFIG_DERIVED( snesst, snes_base )
 	MCFG_FRAGMENT_ADD(sufami_cartslot)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( snesbsx, snes_base )
-
-	MCFG_FRAGMENT_ADD(bsx_cartslot)
-MACHINE_CONFIG_END
-
 
 /*************************************
  *
@@ -1428,25 +1423,6 @@ ROM_START( snesst )
 	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
 ROM_END
 
-ROM_START( snesbsx )
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x100, "sound_ipl", 0 )     /* IPL ROM */
-	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) ) /* boot rom */
-
-	ROM_REGION( 0x10000, "addons", 0 )      /* add-on chip ROMs (DSP, SFX, etc) */
-	ROM_LOAD( "dsp1b.bin", SNES_DSP1B_OFFSET, 0x002800, CRC(453557e0) SHA1(3a218b0e4572a8eba6d0121b17fdac9529609220) )
-	ROM_LOAD( "dsp1.bin",  SNES_DSP1_OFFSET,  0x002800, CRC(2838f9f5) SHA1(0a03ccb1fd2bea91151c745a4d1f217ae784f889) )
-	ROM_LOAD( "dsp2.bin",  SNES_DSP2_OFFSET,  0x002800, CRC(8e9fbd9b) SHA1(06dd9fcb118d18f6bbe234e013cb8780e06d6e63) )
-	ROM_LOAD( "dsp3.bin",  SNES_DSP3_OFFSET,  0x002800, CRC(6b86728a) SHA1(1b133741fad810eb7320c21ecfdd427d25a46da1) )
-	ROM_LOAD( "dsp4.bin",  SNES_DSP4_OFFSET,  0x002800, CRC(ce0c7783) SHA1(76fd25f7dc26c3b3f7868a3aa78c7684068713e5) )
-
-	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
-	ROM_REGION( MAX_SNES_CART_SIZE, "flash", ROMREGION_ERASE00 )
-	ROM_REGION( 0x2000, "dspprg", ROMREGION_ERASEFF)
-	ROM_REGION( 0x800, "dspdata", ROMREGION_ERASEFF)
-ROM_END
-
 
 
 /*************************************
@@ -1473,7 +1449,6 @@ CONS( 1989, snesst11,  snes,   0,      snesst11,  snes, snes_state,  snes_mess, 
 
 // These would require cartslot to be added/removed depending on the cart which is loaded
 CONS( 1989, snesst,   snes,   0,      snesst,  snes, snes_state,  snesst,       "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC, w/Sufami Turbo)", GAME_NOT_WORKING )
-CONS( 1989, snesbsx,  snes,   0,      snesbsx, snes, snes_state,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC, w/BS-X Satellaview slotted cart)",  GAME_NOT_WORKING )
 
 
 

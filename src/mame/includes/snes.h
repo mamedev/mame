@@ -694,8 +694,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(snes_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sufami_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bsx_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bsx2slot_cart);
 };
 
 /* Special chips, checked at init and used in memory handlers */
