@@ -307,25 +307,10 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 
 		UINT8 sourcewidth  = (m_wram[count+6] & 0xff);
 		UINT8 sourceheight = (m_wram[count+7] >> 8);
-
-		//UINT32 col = 0xffffff;
-	//		UINT32 val = (m_wram[count+1] << 16) | ((m_wram[count+2]));
 		int xsource = ((m_wram[count+2] & 0x003f) << 5) | ((m_wram[count+1] & 0xf800) >> 11);
 		int ysource = ((m_wram[count+3] & 0x001f) << 6) | ((m_wram[count+2] & 0xfc00) >> 10);
-		//printf("%08x  %04x %04x\n", val, m_wram[count+1],m_wram[count+2] );
-	//	UINT16 xsource = (m_wram[count+2] & 0x00ff << 4) | (m_wram[count+1] & 0xf000 >> 12);
-		//xsource<<=1;
 
-	//	xsource<<=1;
-	//	ysource <<=2;
-
-//		UINT8 testhack = m_vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+0)&0x7ff))];
-//		UINT8 testhack2 = m_vram[((((ysource+0)&0x7ff)*0x800) + ((xsource+1)&0x7ff))];
-
-		//if (m_wram[count+1] & 0x0010)
-		//	color =  machine.rand()&0xf;
-
-
+		int alpha =  m_wram[count+1] & 0x1f;
 
 
 		UINT16 unused;
@@ -344,13 +329,6 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 		{
 			//printf("zoomed widths %02x %02x heights %02x %02x\n", sourcewidth, zoomwidth, sourceheight, zoomheight);
 		}
-
-
-
-//		if ((testhack2 & 0x0f) == 0x08)
-//			return m_wram[count+0] & 0x80;
-
-		//if (debug) printf("testhack1 %02x %02x\n", testhack, testhack2);
 
 		if(bpp_sel == 0x00)  // 4bpp
 		{
@@ -388,7 +366,27 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 						}
 
 						if(cliprect.contains(x+(xi*2), y+yi))
-							bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
+						{
+							if (alpha==0x00) // a value of 0x00 is solid
+							{	
+								bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
+							}
+							else
+							{
+								UINT16 basecolor = bitmap.pix16(y+yi, x+(xi*2));
+								int base_r = ((basecolor >> 10)&0x1f)*alpha;
+								int base_g = ((basecolor >> 5)&0x1f)*alpha;
+								int base_b = ((basecolor >> 0)&0x1f)*alpha;
+								int r = ((color_data & 0x7c00) >> 10)*(0x1f-alpha);
+								int g = ((color_data & 0x03e0) >> 5)*(0x1f-alpha);
+								int b = ((color_data & 0x001f) >> 0)*(0x1f-alpha);
+								r = (base_r+r)/0x1f;
+								g = (base_g+g)/0x1f;
+								b = (base_b+b)/0x1f;
+								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
+								bitmap.pix16(y+yi, x+(xi*2)) = color_data & 0x7fff;
+							}
+						}
 					}
 
 					pix = (data & 0xf0)>>4;
@@ -415,8 +413,30 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
 						}
 
-						if(cliprect.contains(x+1+(xi*2), y+yi))
-							bitmap.pix16(y+yi, x+1+(xi*2)) = color_data & 0x7fff;
+						if(cliprect.contains(x+1+(xi*2),y+yi))
+						{
+							if (alpha==0x00) // a value of 0x00 is solid
+							{	
+								bitmap.pix16(y+yi, x+1+(xi*2)) = color_data & 0x7fff;
+							}
+							else
+							{
+								UINT16 basecolor = bitmap.pix16(y+yi, x+1+(xi*2));
+								int base_r = ((basecolor >> 10)&0x1f)*alpha;
+								int base_g = ((basecolor >> 5)&0x1f)*alpha;
+								int base_b = ((basecolor >> 0)&0x1f)*alpha;
+								int r = ((color_data & 0x7c00) >> 10)*(0x1f-alpha);
+								int g = ((color_data & 0x03e0) >> 5)*(0x1f-alpha);
+								int b = ((color_data & 0x001f) >> 0)*(0x1f-alpha);
+								r = (base_r+r)/0x1f;
+								g = (base_g+g)/0x1f;
+								b = (base_b+b)/0x1f;
+								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
+								bitmap.pix16(y+yi, x+1+(xi*2)) = color_data & 0x7fff;
+							}
+
+						}
+							
 					}
 				}
 			}
@@ -476,8 +496,32 @@ UINT8 gunpey_state::draw_gfx(running_machine &machine, bitmap_ind16 &bitmap,cons
 							color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
 						}
 
-						if(cliprect.contains(x+xi, y+yi))
-							bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
+
+
+						if(cliprect.contains(x+xi,y+yi))
+						{
+							if (alpha==0x00) // a value of 0x00 is solid
+							{	
+								bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
+							}
+							else
+							{
+								UINT16 basecolor = bitmap.pix16(y+yi, x+xi);
+								int base_r = ((basecolor >> 10)&0x1f)*alpha;
+								int base_g = ((basecolor >> 5)&0x1f)*alpha;
+								int base_b = ((basecolor >> 0)&0x1f)*alpha;
+								int r = ((color_data & 0x7c00) >> 10)*(0x1f-alpha);
+								int g = ((color_data & 0x03e0) >> 5)*(0x1f-alpha);
+								int b = ((color_data & 0x001f) >> 0)*(0x1f-alpha);
+								r = (base_r+r)/0x1f;
+								g = (base_g+g)/0x1f;
+								b = (base_b+b)/0x1f;
+								color_data = (color_data & 0x8000) | (r << 10) | (g << 5) | (b << 0);
+								bitmap.pix16(y+yi, x+xi) = color_data & 0x7fff;
+							}
+
+						}
+							 
 					}
 				}
 			}
