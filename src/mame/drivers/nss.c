@@ -845,8 +845,6 @@ static MACHINE_CONFIG_START( nss, nss_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
 
 	/* video hardware */
-	MCFG_VIDEO_START( snes )
-
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
 	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 

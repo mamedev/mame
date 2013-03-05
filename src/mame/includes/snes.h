@@ -699,6 +699,7 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sufami_cart);
 	DECLARE_READ8_MEMBER( snes_r_io );
 	DECLARE_WRITE8_MEMBER( snes_w_io );	
+	virtual void video_start();	
 };
 
 /* Special chips, checked at init and used in memory handlers */
@@ -767,13 +768,5 @@ extern DECLARE_WRITE8_HANDLER( snes_w_bank6 );
 extern DECLARE_WRITE8_HANDLER( snes_w_bank7 );
 
 extern UINT8  *snes_ram;            /* Main memory */
-
-extern struct snes_cart_info snes_cart;
-
-/*----------- defined in video/snes.c -----------*/
-
-extern VIDEO_START( snes );
-extern SCREEN_UPDATE_RGB32( snes );
-
 
 #endif /* _SNES_H_ */

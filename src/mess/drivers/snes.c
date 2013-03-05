@@ -1217,8 +1217,6 @@ static MACHINE_CONFIG_START( snes_base, snes_console_state )
 	MCFG_MACHINE_RESET(snes_mess)
 
 	/* video hardware */
-	MCFG_VIDEO_START(snes)
-
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC)
 	MCFG_SCREEN_UPDATE_DRIVER( snes_state, screen_update )

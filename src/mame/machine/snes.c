@@ -31,15 +31,12 @@
 /* -- Globals -- */
 UINT8  *snes_ram = NULL;        /* 65816 ram */
 
-struct snes_cart_info snes_cart;
-
 #define DMA_REG(a) m_dma_regs[a - 0x4300]   // regs 0x4300-0x437f
 
 
-VIDEO_START( snes )
+void snes_state::video_start()
 {
-	snes_state *state = machine.driver_data<snes_state>();
-	state->m_ppu.ppu_start(machine);
+	m_ppu.ppu_start(machine());
 }
 
 UINT32 snes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
