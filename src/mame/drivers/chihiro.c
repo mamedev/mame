@@ -1161,6 +1161,8 @@ void nv2a_renderer::render_register_combiners(INT32 scanline, const extent_t &ex
 	UINT32 a8r8g8b8;
 	int n;//,m,i,j,k;
 
+	color[0] = color[1] = color[2] = color[3] = color[4] = color[5] = 0;
+
 	osd_lock_acquire(combiner.lock); // needed since multithreading is not supported yet
 	x=extent.stopx-extent.startx; // number of pixels to draw
 	while (x >= 0) {
