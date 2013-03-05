@@ -173,6 +173,7 @@ SLOT_INTERFACE_EXTERN( sx1541_iec_devices );
 SLOT_INTERFACE_EXTERN( c128dcr_iec_devices );
 SLOT_INTERFACE_EXTERN( c128d81_iec_devices );
 SLOT_INTERFACE_EXTERN( cbm_ieee488_devices );
+SLOT_INTERFACE_EXTERN( cbm8296d_ieee488_devices );
 SLOT_INTERFACE_EXTERN( vic20_control_port_devices );
 SLOT_INTERFACE_EXTERN( vic20_expansion_cards );
 SLOT_INTERFACE_EXTERN( vic20_user_port_cards );

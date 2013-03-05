@@ -13,6 +13,7 @@
 #include "machine/petcass.h"
 #include "machine/petexp.h"
 #include "machine/petuser.h"
+#include "machine/pla.h"
 #include "machine/ram.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
@@ -23,6 +24,8 @@
 #define M6520_2_TAG     "b8"
 #define MC6845_TAG      "ub13"
 #define SCREEN_TAG      "screen"
+#define PLA1_TAG		"ue6"
+#define PLA2_TAG		"ue5"
 
 class pet_state : public driver_device
 {
@@ -107,6 +110,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
+	DECLARE_WRITE8_MEMBER( via_pa_w );
 	DECLARE_READ8_MEMBER( via_pb_r );
 	DECLARE_WRITE8_MEMBER( via_pb_w );
 	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
@@ -157,6 +161,8 @@ public:
 	// sound state
 	int m_via_cb2;
 	int m_pia1_pa7;
+
+	UINT8 m_via_pa;
 
 	// interrupt state
 	int m_via_irq;
@@ -213,8 +219,33 @@ class cbm8296_state : public pet80_state
 {
 public:
 	cbm8296_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pet80_state(mconfig, type, tag)
+		: pet80_state(mconfig, type, tag),
+			m_basic_rom(*this, "basic"),
+			m_editor_rom(*this, "editor"),
+			m_ue5_rom(*this, "ue5hack"),
+			m_ue6_rom(*this, "ue6hack"),
+			m_pla1(*this, PLA1_TAG),
+			m_pla2(*this, PLA2_TAG)
 	{ }
+
+	required_memory_region m_basic_rom;
+	required_memory_region m_editor_rom;
+	required_memory_region m_ue5_rom;
+	required_memory_region m_ue6_rom;
+	required_device<pls100_device> m_pla1;
+	required_device<pls100_device> m_pla2;
+
+	DECLARE_MACHINE_START( cbm8296 );
+	DECLARE_MACHINE_RESET( cbm8296 );
+
+	void read_pla1(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
+		int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
+	void read_pla2(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	UINT8 m_cr;
 };
 
 

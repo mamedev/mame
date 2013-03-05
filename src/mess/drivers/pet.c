@@ -141,12 +141,9 @@ ROM sockets:  UA3   2K or 4K character
     - SuperPET
         - 6809
         - OS/9 MMU
-    - 8096
-        - 64k expansion
     - 8296
         - PLA dumps
         - high resolution graphics
-        - rom software list
 
 */
 
@@ -321,6 +318,186 @@ WRITE8_MEMBER( pet_state::write )
 }
 
 
+//-------------------------------------------------
+//  read_pla1 -
+//-------------------------------------------------
+
+void cbm8296_state::read_pla1(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
+	int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1)
+{
+	UINT32 input = (offset & 0xff00) | phi2 << 7 | brw << 6 | noscreen << 5 | noio << 4 | ramsela << 3 | ramsel9 << 2 | ramon << 1 | norom;
+	//UINT32 data = m_pla1->read(input);
+	input = BITSWAP16(input,0,10,15,11,9,8,13,14,12,7,6,5,4,3,2,1);
+	UINT8 data = m_ue6_rom->base()[input];
+	data = BITSWAP8(data,7,0,1,2,3,4,5,6);
+
+	cswff = BIT(data, 0);
+	cs9 = BIT(data, 1);
+	csa = BIT(data, 2);
+	csio = BIT(data, 3);
+	cse = BIT(data, 4);
+	cskb = BIT(data, 5);
+	fa12 = BIT(data, 6);
+	casena1 = BIT(data, 7);
+}
+
+
+//-------------------------------------------------
+//  read_pla2 -
+//-------------------------------------------------
+
+void cbm8296_state::read_pla2(offs_t offset, int phi2, int brw, int casena1, int &endra, int &noscreen, int &casena2, int &fa15)
+{
+	UINT32 input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
+	//UINT32 data = m_pla2->read(input);
+	input = BITSWAP16(input,0,10,15,11,9,8,13,14,12,7,6,5,4,3,2,1);
+	UINT8 data = m_ue5_rom->base()[input];
+	data = BITSWAP8(data,7,0,1,2,3,4,5,6);
+
+	endra = BIT(data, 4);
+	noscreen = BIT(data, 5);
+	casena2 = BIT(data, 6);
+	fa15 = BIT(data, 7);
+}
+
+
+//-------------------------------------------------
+//  read -
+//-------------------------------------------------
+
+READ8_MEMBER( cbm8296_state::read )
+{
+	int norom = m_exp->norom_r(space, offset, offset >> 12) && !BIT(m_cr, 7);
+	int phi2 = 1, brw = 1, noscreen = 1, noio = BIT(m_cr, 6);
+	int ramsela = BIT(m_via_pa, 0), ramsel9 = BIT(m_via_pa, 1), ramon = BIT(m_via_pa, 2);
+	int cswff = 1, cs9 = 1, csa = 1, csio = 1, cse = 1, cskb = 1, fa12 = 1, fa15 = 1, casena1 = 1, casena2 = 1, endra = 1;
+
+	read_pla1(offset, phi2, brw, noscreen, noio, ramsela, ramsel9, ramon, norom,
+		cswff, cs9, csa, csio, cse, cskb, fa12, casena1);
+
+	read_pla2(offset, phi2, brw, casena1, endra, noscreen, casena2, fa15);
+
+	read_pla1(offset, phi2, brw, noscreen, noio, ramsela, ramsel9, ramon, norom,
+		cswff, cs9, csa, csio, cse, cskb, fa12, casena1);
+
+	//printf("%04x : cswff %u cs9 %u csa %u csio %u cse %u cskb %u fa12 %u casena1 %u endra %u noscreen %u casena2 %u fa15 %u\n",offset,cswff,cs9,csa,csio,cse,cskb,fa12,casena1,endra,noscreen,casena2,fa15);
+
+	UINT8 data = 0;
+
+	if (!endra)
+	{
+		if (!casena1)
+		{
+			data = m_ram->pointer()[offset & 0xffff];
+		}
+		if (!casena2)
+		{
+			data = m_ram->pointer()[0x10000 | fa15 << 15 | (offset & 0x7fff)];
+		}
+	}
+	if (!cs9)
+	{
+		data = m_rom->base()[offset & 0xfff];
+	}
+	if (!csa)
+	{
+		data = m_rom->base()[0x1000 | (offset & 0xfff)];
+	}
+	if (!cse)
+	{
+		data = m_editor_rom->base()[offset & 0xfff];
+	}
+	if (!cskb)
+	{
+		data = m_basic_rom->base()[(offset & 0x2fff) | fa12 << 12];
+	}
+	if (!csio)
+	{
+		if (BIT(offset, 4))
+		{
+			data = m_pia1->read(space, offset & 0x03);
+		}
+		if (BIT(offset, 5))
+		{
+			data = m_pia2->read(space, offset & 0x03);
+		}
+		if (BIT(offset, 6))
+		{
+			data = m_via->read(space, offset & 0x0f);
+		}
+		if (BIT(offset, 7) && BIT(offset, 0))
+		{
+			data = m_crtc->register_r(space, 0);
+		}
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write -
+//-------------------------------------------------
+
+WRITE8_MEMBER( cbm8296_state::write )
+{
+	int norom = m_exp->norom_r(space, offset, offset >> 12) && !BIT(m_cr, 7);
+	int phi2 = 1, brw = 0, noscreen = 1, noio = BIT(m_cr, 6);
+	int ramsela = BIT(m_via_pa, 0), ramsel9 = BIT(m_via_pa, 1), ramon = BIT(m_via_pa, 2);
+	int cswff = 1, cs9 = 1, csa = 1, csio = 1, cse = 1, cskb = 1, fa12 = 1, fa15 = 1, casena1 = 1, casena2 = 1, endra = 1;
+
+	read_pla1(offset, phi2, brw, noscreen, noio, ramsela, ramsel9, ramon, norom,
+		cswff, cs9, csa, csio, cse, cskb, fa12, casena1);
+
+	read_pla2(offset, phi2, brw, casena1, endra, noscreen, casena2, fa15);
+
+	read_pla1(offset, phi2, brw, noscreen, noio, ramsela, ramsel9, ramon, norom,
+		cswff, cs9, csa, csio, cse, cskb, fa12, casena1);
+
+	if (!endra)
+	{
+		if (!casena1)
+		{
+			m_ram->pointer()[offset & 0xffff] = data;
+		}
+		if (!casena2)
+		{
+			m_ram->pointer()[0x10000 | fa15 << 15 | (offset & 0x7fff)] = data;
+		}
+	}
+	if (!csio)
+	{
+		if (BIT(offset, 4))
+		{
+			m_pia1->write(space, offset & 0x03, data);
+		}
+		if (BIT(offset, 5))
+		{
+			m_pia2->write(space, offset & 0x03, data);
+		}
+		if (BIT(offset, 6))
+		{
+			m_via->write(space, offset & 0x0f, data);
+		}
+		if (m_crtc && BIT(offset, 7))
+		{
+			if (BIT(offset, 0))
+			{
+				m_crtc->register_w(space, 0, data);
+			}
+			else
+			{
+				m_crtc->address_w(space, 0, data);
+			}
+		}
+	}
+	if (!cswff && ((offset & 0xff) == 0xf0))
+	{
+		m_cr = data;
+	}
+}
+
+
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -331,6 +508,15 @@ WRITE8_MEMBER( pet_state::write )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( pet2001_mem, AS_PROGRAM, 8, pet_state )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
+ADDRESS_MAP_END
+
+
+//-------------------------------------------------
+//  ADDRESS_MAP( cbm8296_mem )
+//-------------------------------------------------
+
+static ADDRESS_MAP_START( cbm8296_mem, AS_PROGRAM, 8, cbm8296_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
@@ -596,6 +782,13 @@ WRITE_LINE_MEMBER( pet_state::via_irq_w )
 	check_interrupts();
 }
 
+WRITE8_MEMBER( pet_state::via_pa_w )
+{
+	m_user->pa_w(space, 0, data);
+
+	m_via_pa = data;
+}
+
 READ8_MEMBER( pet_state::via_pb_r )
 {
 	/*
@@ -674,7 +867,7 @@ const via6522_interface via_intf =
 	DEVCB_DEVICE_LINE_MEMBER(PET_DATASSETTE_PORT2_TAG, pet_datassette_port_device, read),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DEVICE_MEMBER(PET_USER_PORT_TAG, pet_user_port_device, pa_w),
+	DEVCB_DRIVER_MEMBER(pet_state, via_pa_w),
 	DEVCB_DRIVER_MEMBER(pet_state, via_pb_w),
 	DEVCB_DEVICE_LINE_MEMBER(PET_USER_PORT_TAG, pet_user_port_device, ca1_w),
 	DEVCB_DRIVER_LINE_MEMBER(pet_state, via_ca2_w),
@@ -1101,6 +1294,33 @@ MACHINE_RESET_MEMBER( pet80_state, pet80 )
 }
 
 
+//-------------------------------------------------
+//  MACHINE_START( cbm8296 )
+//-------------------------------------------------
+
+MACHINE_START_MEMBER( cbm8296_state, cbm8296 )
+{
+	MACHINE_START_CALL_MEMBER(pet80);
+
+	// state saving
+	save_item(NAME(m_cr));
+	save_item(NAME(m_via_pa));
+}
+
+
+//-------------------------------------------------
+//  MACHINE_RESET( cbm8296 )
+//-------------------------------------------------
+
+MACHINE_RESET_MEMBER( cbm8296_state, cbm8296 )
+{
+	MACHINE_RESET_CALL_MEMBER(pet80);
+
+	m_cr = 0;
+	m_via_pa = 0xff;
+}
+
+
 
 //**************************************************************************
 //  MACHINE DRIVERS
@@ -1512,6 +1732,18 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED_CLASS( cbm8296, pet80, cbm8296_state )
+	MCFG_MACHINE_START_OVERRIDE(cbm8296_state, cbm8296)
+	MCFG_MACHINE_RESET_OVERRIDE(cbm8296_state, cbm8296)
+	
+	MCFG_CPU_MODIFY(M6502_TAG)
+	MCFG_CPU_PROGRAM_MAP(cbm8296_mem)
+
+	MCFG_PLS100_ADD(PLA1_TAG)
+	MCFG_PLS100_ADD(PLA2_TAG)
+
+	MCFG_DEVICE_REMOVE("ieee8")
+	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, "c8250", NULL)
+
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("128K")
 
@@ -1524,6 +1756,8 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( cbm8296d, cbm8296 )
+	MCFG_DEVICE_REMOVE("ieee8")
+	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm8296d_ieee488_devices, "c8250lp", NULL)
 MACHINE_CONFIG_END
 
 
@@ -1805,12 +2039,15 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( cbm8296 )
-	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_LOAD( "324992-02.ue10", 0x0000, 0x1000, CRC(2bac5baf) SHA1(03aa866e4bc4e38e95983a6a82ba925e710bede8) ) // HiRes Emulator
-	ROM_LOAD( "324993-02.ue9", 0x1000, 0x1000, CRC(57444531) SHA1(74aa39888a6bc95762de767fce883203daca0d34) ) // HiRes BASIC
-	ROM_LOAD( "324746-01.ue7", 0x2000, 0x3000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )   // BASIC 4
-	ROM_CONTINUE(              0x6000, 0x1000 )
-	ROM_LOAD( "8296.ue8", 0x5000, 0x800, CRC(a3475de6) SHA1(b715db83fd26458dfd254bef5c4aae636753f7f5) )
+	ROM_REGION( 0x2000, M6502_TAG, 0 )
+	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
+
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "324746-01.ue7", 0x0000, 0x4000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )   // BASIC 4
+
+	ROM_REGION( 0x1000, "editor", 0 )
+	ROM_LOAD( "8296.ue8", 0x000, 0x800, CRC(a3475de6) SHA1(b715db83fd26458dfd254bef5c4aae636753f7f5) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
@@ -1818,10 +2055,51 @@ ROM_START( cbm8296 )
 	ROM_REGION( 0x20, "prom", 0 )
 	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing
 
-	ROM_REGION( 0xf5, "pla1", 0 )
+	ROM_REGION( 0x10000, "ue5hack", 0 )
+	ROM_LOAD( "ue5.bin", 0x00000, 0x10000, BAD_DUMP CRC(f70b7b37) SHA1(fe0fbb0fa71775f3780134aa11dac5b761526148) )
+
+	ROM_REGION( 0x10000, "ue6hack", 0 )
+	ROM_LOAD( "ue6.bin", 0x00000, 0x10000, BAD_DUMP CRC(36952256) SHA1(e94d3e744a6aaff553bf260f25da0286436265d1) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
 	ROM_LOAD( "324744-01.ue6", 0x00, 0xf5, NO_DUMP ) // 8700-009
 
-	ROM_REGION( 0xf5, "pla2", 0 )
+	ROM_REGION( 0xf5, PLA2_TAG, 0 )
+	ROM_LOAD( "324745-01.ue5", 0x00, 0xf5, NO_DUMP ) // 8700-008
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( cbm8296ed )
+//-------------------------------------------------
+
+ROM_START( cbm8296ed )
+	ROM_REGION( 0x2000, M6502_TAG, 0 )
+	ROM_LOAD( "oracle.ue10", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "paperclip.ue9", 0x1000, 0x1000, CRC(8fb11d4b) SHA1(1c0f883cd3b8ded42ec00d83f7e7f0887f91fec0) )
+
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "324746-01.ue7", 0x0000, 0x4000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )   // BASIC 4
+
+	ROM_REGION( 0x1000, "editor", 0 )
+	ROM_LOAD( "execudesk.ue8", 0x000, 0x800, CRC(bef0eaa1) SHA1(7ea63a2d651f516e96b8725195c13542ea495ebd) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
+
+	ROM_REGION( 0x20, "prom", 0 )
+	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing
+
+	ROM_REGION( 0x10000, "ue5hack", 0 )
+	ROM_LOAD( "ue5.bin", 0x00000, 0x10000, BAD_DUMP CRC(f70b7b37) SHA1(fe0fbb0fa71775f3780134aa11dac5b761526148) )
+
+	ROM_REGION( 0x10000, "ue6hack", 0 )
+	ROM_LOAD( "ue6.bin", 0x00000, 0x10000, BAD_DUMP CRC(36952256) SHA1(e94d3e744a6aaff553bf260f25da0286436265d1) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
+	ROM_LOAD( "324744-01.ue6", 0x00, 0xf5, NO_DUMP ) // 8700-009
+
+	ROM_REGION( 0xf5, PLA2_TAG, 0 )
 	ROM_LOAD( "324745-01.ue5", 0x00, 0xf5, NO_DUMP ) // 8700-008
 ROM_END
 
@@ -1831,12 +2109,15 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( cbm8296d )
-	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_LOAD( "324992-02.ue10", 0x0000, 0x1000, CRC(2bac5baf) SHA1(03aa866e4bc4e38e95983a6a82ba925e710bede8) ) // HiRes Emulator
-	ROM_LOAD( "324993-02.ue9", 0x1000, 0x1000, CRC(57444531) SHA1(74aa39888a6bc95762de767fce883203daca0d34) ) // HiRes BASIC
-	ROM_LOAD( "324746-01.ue7", 0x2000, 0x3000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )   // BASIC 4
-	ROM_CONTINUE(              0x6000, 0x1000 )
-	ROM_LOAD( "324243-01.ue8", 0x5000, 0x1000, CRC(4000e833) SHA1(dafbdf8ba0a1fe7d7b9586ffbfc9e5390c0fcf6f) )
+	ROM_REGION( 0x2000, M6502_TAG, 0 )
+	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
+
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "324746-01.ue7", 0x0000, 0x4000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )   // BASIC 4
+
+	ROM_REGION( 0x1000, "editor", 0 )
+	ROM_LOAD( "324243-01.ue8", 0x0000, 0x1000, CRC(4000e833) SHA1(dafbdf8ba0a1fe7d7b9586ffbfc9e5390c0fcf6f) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
@@ -1844,10 +2125,16 @@ ROM_START( cbm8296d )
 	ROM_REGION( 0x20, "prom", 0 )
 	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing
 
-	ROM_REGION( 0xf5, "pla1", 0 )
+	ROM_REGION( 0x10000, "ue5hack", 0 )
+	ROM_LOAD( "ue5.bin", 0x00000, 0x10000, BAD_DUMP CRC(f70b7b37) SHA1(fe0fbb0fa71775f3780134aa11dac5b761526148) )
+
+	ROM_REGION( 0x10000, "ue6hack", 0 )
+	ROM_LOAD( "ue6.bin", 0x00000, 0x10000, BAD_DUMP CRC(36952256) SHA1(e94d3e744a6aaff553bf260f25da0286436265d1) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
 	ROM_LOAD( "324744-01.ue6", 0x00, 0xf5, NO_DUMP ) // 8700-009
 
-	ROM_REGION( 0xf5, "pla2", 0 )
+	ROM_REGION( 0xf5, PLA2_TAG, 0 )
 	ROM_LOAD( "324745-01.ue5", 0x00, 0xf5, NO_DUMP ) // 8700-008
 ROM_END
 
@@ -1857,12 +2144,15 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( cbm8296d_de )
-	ROM_REGION( 0x7000, M6502_TAG, 0 )
-	ROM_LOAD( "324992-02.ue10", 0x0000, 0x1000, CRC(2bac5baf) SHA1(03aa866e4bc4e38e95983a6a82ba925e710bede8) ) // HiRes Emulator
-	ROM_LOAD( "324993-02.ue9", 0x1000, 0x1000, CRC(57444531) SHA1(74aa39888a6bc95762de767fce883203daca0d34) ) // HiRes BASIC
-	ROM_LOAD( "324746-01.ue7", 0x2000, 0x3000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )
-	ROM_CONTINUE(              0x6000, 0x1000 )
-	ROM_LOAD( "324243-04.ue8", 0x5000, 0x1000, CRC(3fe48897) SHA1(c218ff3168514f1d5e7822ae1b1ac3e161523b33) )
+	ROM_REGION( 0x2000, M6502_TAG, 0 )
+	ROM_CART_LOAD( "9000", 0x0000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a000", 0x1000, 0x1000, ROM_MIRROR )
+
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "324746-01.ue7", 0x0000, 0x4000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )   // BASIC 4
+
+	ROM_REGION( 0x1000, "editor", 0 )
+	ROM_LOAD( "324243-04.ue8", 0x0000, 0x1000, CRC(3fe48897) SHA1(c218ff3168514f1d5e7822ae1b1ac3e161523b33) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "324242-10.uc5", 0x0000, 0x1000, CRC(a5632a0f) SHA1(9616f7f18757cccefb702a945f954b644d5b17d1) )
@@ -1870,10 +2160,51 @@ ROM_START( cbm8296d_de )
 	ROM_REGION( 0x20, "prom", 0 )
 	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing
 
-	ROM_REGION( 0xf5, "pla1", 0 )
+	ROM_REGION( 0x10000, "ue5hack", 0 )
+	ROM_LOAD( "ue5.bin", 0x00000, 0x10000, BAD_DUMP CRC(f70b7b37) SHA1(fe0fbb0fa71775f3780134aa11dac5b761526148) )
+
+	ROM_REGION( 0x10000, "ue6hack", 0 )
+	ROM_LOAD( "ue6.bin", 0x00000, 0x10000, BAD_DUMP CRC(36952256) SHA1(e94d3e744a6aaff553bf260f25da0286436265d1) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
 	ROM_LOAD( "324744-01.ue6", 0x00, 0xf5, NO_DUMP ) // 8700-009
 
-	ROM_REGION( 0xf5, "pla2", 0 )
+	ROM_REGION( 0xf5, PLA2_TAG, 0 )
+	ROM_LOAD( "324745-01.ue5", 0x00, 0xf5, NO_DUMP ) // 8700-008
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( cbm8296gd )
+//-------------------------------------------------
+
+ROM_START( cbm8296gd )
+	ROM_REGION( 0x2000, M6502_TAG, 0 )
+	ROM_LOAD( "324992-02.ue10", 0x0000, 0x1000, CRC(2bac5baf) SHA1(03aa866e4bc4e38e95983a6a82ba925e710bede8) ) // HiRes Emulator
+	ROM_LOAD( "324993-02.ue9", 0x1000, 0x1000, CRC(57444531) SHA1(74aa39888a6bc95762de767fce883203daca0d34) ) // HiRes BASIC
+
+	ROM_REGION( 0x4000, "basic", 0 )
+	ROM_LOAD( "324746-01.ue7", 0x0000, 0x4000, CRC(7935b528) SHA1(5ab17ee70467152bf2130e3f48a2aa81e9df93c9) )   // BASIC 4
+
+	ROM_REGION( 0x1000, "editor", 0 )
+	ROM_LOAD( "324243-01.ue8", 0x0000, 0x1000, CRC(4000e833) SHA1(dafbdf8ba0a1fe7d7b9586ffbfc9e5390c0fcf6f) )
+
+	ROM_REGION( 0x1000, "charom", 0 )
+	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
+
+	ROM_REGION( 0x20, "prom", 0 )
+	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing
+
+	ROM_REGION( 0x10000, "ue5hack", 0 )
+	ROM_LOAD( "ue5.bin", 0x00000, 0x10000, BAD_DUMP CRC(f70b7b37) SHA1(fe0fbb0fa71775f3780134aa11dac5b761526148) )
+
+	ROM_REGION( 0x10000, "ue6hack", 0 )
+	ROM_LOAD( "ue6.bin", 0x00000, 0x10000, BAD_DUMP CRC(36952256) SHA1(e94d3e744a6aaff553bf260f25da0286436265d1) )
+
+	ROM_REGION( 0xf5, PLA1_TAG, 0 )
+	ROM_LOAD( "324744-01.ue6", 0x00, 0xf5, NO_DUMP ) // 8700-009
+
+	ROM_REGION( 0xf5, PLA2_TAG, 0 )
 	ROM_LOAD( "324745-01.ue5", 0x00, 0xf5, NO_DUMP ) // 8700-008
 ROM_END
 
@@ -1911,5 +2242,7 @@ COMP( 1981, mmf9000,    pet8032,    0,      superpet,   petb,       driver_devic
 COMP( 1981, mmf9000_se, pet8032,    0,      superpet,   petb_se,    driver_device,  0,  "Commodore Business Machines",  "MicroMainFrame 9000 (Sweden/Finland)",         GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 COMP( 1981, cbm8096,    pet8032,    0,      cbm8096,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8096",                     GAME_SUPPORTS_SAVE )
 COMP( 1984, cbm8296,    0,          0,      cbm8296,    petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296",                     GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1984, cbm8296d,   cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296D",                    GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-COMP( 1984, cbm8296d_de,cbm8296,    0,      cbm8296d,   petb_de,    driver_device,  0,  "Commodore Business Machines",  "CBM 8296D (Germany)",          GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1984, cbm8296ed,  cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296 ExecuDesk",           GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1984, cbm8296d,   cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D",                   GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1984, cbm8296d_de,cbm8296,    0,      cbm8296d,   petb_de,    driver_device,  0,  "Commodore Business Machines",  "CBM 8296-D (Germany)",         GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1984, cbm8296gd,  cbm8296,    0,      cbm8296d,   petb,       driver_device,  0,  "Commodore Business Machines",  "CBM 8296GD",                   GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

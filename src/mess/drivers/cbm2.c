@@ -161,7 +161,7 @@ void cbm2_state::bankswitch(offs_t offset, int eras, int ecas, int refen, int ca
 
 READ8_MEMBER( cbm2_state::read )
 {
-	int eras = 1, ecas = 0, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
+	int eras = 1, ecas = 1, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
 	int diskromcs = 1, csbank1 = 1, csbank2 = 1, csbank3 = 1, basiccs = 1, knbcs = 1, kernalcs = 1;
 	int crtccs = 1, cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
@@ -264,7 +264,7 @@ READ8_MEMBER( cbm2_state::read )
 
 WRITE8_MEMBER( cbm2_state::write )
 {
-	int eras = 1, ecas = 0, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
+	int eras = 1, ecas = 1, refen = 0, cas = 0, ras = 1, sysioen = 1, dramen = 1;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, buframcs = 1, extbufcs = 1, vidramcs = 1;
 	int diskromcs = 1, csbank1 = 1, csbank2 = 1, csbank3 = 1, basiccs = 1, knbcs = 1, kernalcs = 1;
 	int crtccs = 1, cs1 = 1, sidcs = 1, extprtcs = 1, ciacs = 1, aciacs = 1, tript1cs = 1, tript2cs = 1;
@@ -355,16 +355,14 @@ WRITE8_MEMBER( cbm2_state::write )
 
 READ8_MEMBER( cbm2_state::ext_read )
 {
-	/*int ras = 1, cas = 1, refen = 1, eras = 1, ecas = 0;
+#ifdef USE_PLA_DECODE
+	int ras = 1, cas = 1, refen = 0, eras = 1, ecas = 0;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
 
-	this->read_pla(offset, ras, cas, refen, eras, ecas, &casseg1, &casseg2, &casseg3, &casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);*/
+	this->read_pla(offset, ras, cas, refen, eras, ecas, &casseg1, &casseg2, &casseg3, &casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
 	UINT8 data = 0xff;
 
-	if (offset < 0x40000)
-	data = m_ram->pointer()[offset];
-
-	/*if (!casseg1)
+	if (!casseg1)
 	{
 	    data = m_ram->pointer()[offset & 0xffff];
 	}
@@ -379,8 +377,13 @@ READ8_MEMBER( cbm2_state::ext_read )
 	if (!casseg4 && (m_ram->size() > 0x30000))
 	{
 	    data = m_ram->pointer()[0x30000 | (offset & 0xffff)];
-	}*/
+	}
 
+	return data;
+#endif
+
+	UINT8 data = 0;
+	if (offset < 0x40000) data = m_ram->pointer()[offset];
 	return data;
 }
 
@@ -391,7 +394,8 @@ READ8_MEMBER( cbm2_state::ext_read )
 
 WRITE8_MEMBER( cbm2_state::ext_write )
 {
-	/*int ras = 1, cas = 1, refen = 1, eras = 1, ecas = 0;
+#ifdef USE_PLA_DECODE
+	int ras = 1, cas = 1, refen = 0, eras = 1, ecas = 0;
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
 
 	this->read_pla(offset, ras, cas, refen, eras, ecas, &casseg1, &casseg2, &casseg3, &casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
@@ -411,10 +415,10 @@ WRITE8_MEMBER( cbm2_state::ext_write )
 	if (!casseg4 && (m_ram->size() > 0x30000))
 	{
 	    m_ram->pointer()[0x30000 | (offset & 0xffff)] = data;
-	}*/
+	}
+#endif
 
-	if (offset < 0x40000)
-	m_ram->pointer()[offset] = data;
+	if (offset < 0x40000) m_ram->pointer()[offset] = data;
 }
 
 
@@ -1702,10 +1706,14 @@ void cbm2_state::set_busy2(int state)
 
 	if (m_busy2)
 	{
+		//m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+
 		m_busen1 = m_dramon;
 	}
 	else
 	{
+		//m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+
 		m_busen1 = 0;
 	}
 }
