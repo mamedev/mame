@@ -52,7 +52,7 @@ Games on this system include....
 | |Sega Network Taisen Mahjong MJ 3 Evolution         | Sega, 2006      | GDROM  GDX-0021   |              |
 | |Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) | Sega, 2006      | GDROM  GDX-0021A  |              |
 | |Firmware Update For Compact Flash Box              | Sega, 200x      | GDROM  GDX-0024   |              |
-| |Firmware Update For Compact Flash Box (Rev A)      | Sega, 200x      | GDROM  GDX-0024A  |              |
+|*|Firmware Update For Compact Flash Box (Rev A)      | Sega, 200x      | GDROM  GDX-0024A  | 317-0567-EXP |
 |*|Quest Of D (Ver.1.01C)                             | Sega, 2004      | CDROM  CDV-10005C |              |
 |*|Sangokushi Taisen (Ver.1.002)                      | Sega, 2005      | DVDROM CDV-10009D |              |
 |*|Sangokushi Taisen 2 (Ver.2.007)                    | Sega, 2006      | DVDROM CDV-10019A |              |

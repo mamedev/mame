@@ -4993,9 +4993,9 @@ virnbao         // 2000.02 Virtua NBA (original)
 virnbap         // 2000.02 Virtua NBA (prototype)
 mvsc2           // 2000.03 Marvel Vs. Capcom 2 New Age of Heroes (Rev A)
 smarinef        // 2000.03 Sega Marine Fishing
-wldkicks        // 2000.03 World Kicks
+wldkicks        // 2000.03 World Kicks (WK2 Ver. A)
 pstone2         // 2000.04 Power Stone 2
-toukon4         // 2000.04 Shin Nihon Prowrestling Toukon Retsuden 4 Arcade Edition
+toukon4         // 2000.04 Shin Nihon Prowrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)
 qmegamis        // 2000.05 Quiz Ah Megamisama
 derbyo2k        // 2000.06 Derby Owners Club 2000 Ver.2 (Rev A)
 vonot           // 2000.06 Virtual-on Oratorio Tangram M.S.B.S. Ver.5.66 2000 Edition
@@ -5011,8 +5011,10 @@ deathcox        // 2000.10 Death Crimson OX
 cspike          // 2000.10 Gun Spike / Cannon Spike
 sstrkfgt        // 2000.10 Sega Strike Fighter (Rev A)
 confmiss        // 2000.11 Confidential Mission         // First GD-ROM game?
-ninjaslt        // 2000.11 Ninja Assault NJA3
-ninjaslt4       // 2000.11 Ninja Assault NJA4
+				// 2000.11 Ninja Assault (NJA1 Ver. A)
+				// 2000.11 Ninja Assault (NJA2 Ver. A)
+ninjaslt		// 2000.11 Ninja Assault (NJA3 Ver. A)
+ninjaslt4		// 2000.11 Ninja Assault (NJA4 Ver. A)
 				// 2000.11 Shakatto Tambourine
 wwfroyal        // 2000.11 WWF Royal Rumble
 pjustic         // 2000.12 Moero Justice Gakuen / Project Justice
@@ -5023,17 +5025,18 @@ csmash          // 2000.?? Cosmic Smash
 csmasho         // 2000.?? Cosmic Smash (original)
 gwing2          // 2000.?? Giga Wing 2
 slashout        // 2000.?? Slashout
-				// 2000.?? Star Horse
 f355twn2        // 2001.01 F355 Challenge 2 Twin
 sfz3ugd         // 2001.02 Street Fighter ZERO3 Upper
 gundmgd         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (GD-ROM)
 gundmct         // 2001.03 Mobile Suit Gundam: Federation Vs. Zeon (cartridge)
+				// 2001.03 Star Horse Progress (Rev A)
 dygolf          // 2001.04 Dynamic Golf / Virtua Golf (Rev A)
 				// 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
 monkeyba        // 2001.05 Monkey Ball
 zerogu2         // 2001.05 Zero Gunner 2
 cvsgd           // 2001.06 Capcom Vs. SNK Millennium Fight 2000 Pro
 				// 2001.06 Crackin' DJ Part 2
+hmgeo           // 2001.06 Heavy Metal Geomatrix (Rev A)
 wsbbgd          // 2001.06 Super Major League / World Series Baseball
 starseek        // 2001.07 Dokidoki Idol Star Seeker
 gunsur2         // 2001.07 Gun Survivor 2 Biohazard Code: Veronica (BHF1)
@@ -5043,14 +5046,13 @@ cvs2gd          // 2001.08 Capcom Vs. SNK 2 Millionaire Fighting 2001 (Rev A)
 wrungp          // 2001.08 Wave Runner GP
 alienfnt        // 2001.09 Alien Front (Rev T)
 alienfnta       // 2001.09 Alien Front (Rev A)
-hmgeo           // 2001.09 Heavy Metal Geomatrix (Rev A)
 gundmxgd        // 2001.09 Mobile Suit Gundam: Federation Vs. Zeon DX
 derbyoc2        // 2001.10 Derby Owners Club II (Rev B)
 inunoos         // 2001.10 Inu No Osanpo / Dog Walking (Rev A)
 vtennis2        // 2001.10 Virtua Tennis 2 / Power Smash 2 (GD-ROM)
 vtenis2c        // 2001.10 Virtua Tennis 2 / Power Smash 2 (cartridge)
 keyboard        // 2001.11 La Keyboard
-shaktamb        // 2001.11 Shakatto Tambourine Cho Powerup Chu
+shaktamb        // 2001.11 Shakatto Tambourine Cho Powerup Chu 2K1 AUT
 ikaruga         // 2001.12 Ikaruga
 lupinsho        // 2001.12 Lupin the Third: the Shooting
 drbyocwc        // 2001.?? Derby Owners Club World Edition (Rev. C)
@@ -5064,7 +5066,8 @@ cleoftp         // 2002.05 Cleopatra Fortune Plus
 ggxx            // 2002.05 Guilty Gear XX
 mok             // 2002.05 The Maze of the Kings
 chocomk         // 2002.06 Musapey's Choco Marker (Rev A)
-mazan           // 2002.07 Mazan : Flash of the Blade
+mazan           // 2002.07 Mazan : Flash of the Blade (MAZ2 Ver. A)
+                // 2002.07 Mazan : Flash of the Blade (MAZ3 Ver. A)
 				// 2002.09 Yonin Uchi Mahjong MJ
 azumanga        // 2002.12 Azumanga Daiou Puzzle Bobble
 moeru           // 2002.12 Moeru Casinyo
@@ -5263,6 +5266,7 @@ vs42006         // 2006.05 Virtua Striker 4 Ver.2006
 
 // Chihiro (X-Box based)
 chihiro         // 2002.?? Chihiro BIOS
+				// 200?.?? Firmware Update For Compact Flash Box (Rev A)
 hotd3           // 2002.12 The House of the Dead III
 				// 2003.03 Crazy Taxi High Roller
 				// 2003.03 Crazy Taxi High Roller (Rev A)
