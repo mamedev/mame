@@ -1124,7 +1124,7 @@ UINT32 convert_a4r4g4b4_a8r8g8b8(UINT32 a4r4g4b4)
 	cg=pal4bit((a4r4g4b4 & 0x00f0) >> 4);//((a4r4g4b4 & 0xf0)*816)/3; // (((a4r4g4b4 & 0xf0) >> 4)*255)/15) << 8
 	cr=pal4bit((a4r4g4b4 & 0x0f00) >> 8);//(a4r4g4b4 & 0xf00)*17*256; // (((a4r4g4b4 & 0xf00) >> 8)*255)/15) << 16
 	ca=pal4bit((a4r4g4b4 & 0xf000) >> 12);//(a4r4g4b4 & 0xf000)*4096*17; //((a4r4g4b4 & 0xf000) >> 12)*255/15 << 24
-	a8r8g8b8=(ca<<24)|(cr<<16)|(cg<<8)|(cr); // color converted to 8 bits per component
+	a8r8g8b8=(ca<<24)|(cr<<16)|(cg<<8)|(cb); // color converted to 8 bits per component
 	return a8r8g8b8;
 }
 
