@@ -1,15 +1,15 @@
 /***********************************************************************************************************
- 
+
  Bandai Sufami Turbo cartridge emulation (for SNES/SFC)
- 
+
  Copyright MESS Team.
  Visit http://mamedev.org for licensing and usage restrictions.
- 
+
  This is basically a standard LoROM cart with two slots for ST minicarts
  The content of each slot (with ROM and RAM) is mapped to a separate memory range
  Slot 1: ROM [20-3f][8000-ffff], RAM [60-63][8000-ffff]
  Slot 2: ROM [40-5f][8000-ffff], RAM [70-73][8000-ffff]
- 
+
  ***********************************************************************************************************/
 
 
@@ -81,32 +81,32 @@ READ8_MEMBER(sns_rom_sufami_device::read_l)
 
 READ8_MEMBER(sns_rom_sufami_device::read_h)
 {
-	if (offset < 0x200000)		// SUFAMI TURBO ROM
+	if (offset < 0x200000)      // SUFAMI TURBO ROM
 	{
 		int bank = offset / 0x10000;
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
-	if (offset >= 0x200000 && offset < 0x400000)	// SLOT1 STROM
+	if (offset >= 0x200000 && offset < 0x400000)    // SLOT1 STROM
 	{
 		if (m_slot1->m_cart)
 			return m_slot1->m_cart->read_l(space, offset - 0x200000);
 	}
-	if (offset >= 0x400000 && offset < 0x600000)	// SLOT2 STROM
+	if (offset >= 0x400000 && offset < 0x600000)    // SLOT2 STROM
 	{
 		if (m_slot2->m_cart)
 			return m_slot2->m_cart->read_l(space, offset - 0x400000);
 	}
-	if (offset >= 0x600000 && offset < 0x640000)	// SLOT1 RAM
+	if (offset >= 0x600000 && offset < 0x640000)    // SLOT1 RAM
 	{
 		if (m_slot1->m_cart && (offset & 0xffff) > 0x8000)
 			return m_slot1->m_cart->read_h(space, offset - 0x600000);
 	}
-	if (offset >= 0x700000 && offset < 0x740000)	// SLOT2 RAM
+	if (offset >= 0x700000 && offset < 0x740000)    // SLOT2 RAM
 	{
 		if (m_slot2->m_cart && (offset & 0xffff) > 0x8000)
 			return m_slot2->m_cart->read_h(space, offset - 0x700000);
 	}
-	
+
 	return 0xff;
 }
 
@@ -117,18 +117,18 @@ WRITE8_MEMBER(sns_rom_sufami_device::write_l)
 
 WRITE8_MEMBER(sns_rom_sufami_device::write_h)
 {
-	if (offset >= 0x600000 && offset < 0x640000)	// SLOT1 RAM
+	if (offset >= 0x600000 && offset < 0x640000)    // SLOT1 RAM
 	{
 		if (m_slot1->m_cart && (offset & 0xffff) > 0x8000)
 			return m_slot1->m_cart->write_h(space, offset - 0x600000, data);
 	}
-	
-	if (offset >= 0x700000 && offset < 0x740000)	// SLOT2 RAM
+
+	if (offset >= 0x700000 && offset < 0x740000)    // SLOT2 RAM
 	{
 		if (m_slot2->m_cart && (offset & 0xffff) > 0x8000)
 			return m_slot2->m_cart->write_h(space, offset - 0x700000, data);
 	}
-	
+
 }
 
 /*-------------------------------------------------
@@ -172,5 +172,3 @@ WRITE8_MEMBER(sns_rom_strom_device::write_h)
 		m_nvram[bank * 0x8000 + (offset & 0x7fff)] = data;
 	}
 }
-
-

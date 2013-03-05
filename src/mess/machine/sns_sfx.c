@@ -1,10 +1,10 @@
 /***********************************************************************************************************
- 
+
  SuperFX add-on chip emulation (for SNES/SFC)
- 
+
  Copyright MESS Team.
  Visit http://mamedev.org for licensing and usage restrictions.
- 
+
  ***********************************************************************************************************/
 
 
@@ -110,13 +110,13 @@ WRITE8_MEMBER( sns_rom_superfx_device::chip_write )
 READ8_MEMBER( sns_rom_superfx_device::read_l )
 {
 	UINT16 address = offset & 0xffff;
-	
+
 	if (offset < 0x400000)
 	{
 		if (address >= 0x6000 && address < 0x8000)
 		{
 			if (superfx_access_ram(m_superfx))
-				return 	sfx_ram[offset & 0x1fff];
+				return  sfx_ram[offset & 0x1fff];
 		}
 		if (address >= 0x8000)
 			return m_rom[rom_bank_map[offset / 0x10000] * 0x8000 + (offset & 0x7fff)];
@@ -139,10 +139,10 @@ READ8_MEMBER( sns_rom_superfx_device::read_l )
 	else
 	{
 		if (superfx_access_ram(m_superfx))
-			return 	sfx_ram[offset & 0xfffff];
+			return  sfx_ram[offset & 0xfffff];
 	}
-	
-	return 0xff;	// should be open bus...
+
+	return 0xff;    // should be open bus...
 }
 
 
@@ -167,13 +167,13 @@ WRITE8_MEMBER( sns_rom_superfx_device::write_l )
 READ8_MEMBER(sns_rom_superfx_device::read_h)
 {
 	UINT16 address = offset & 0xffff;
-	
+
 	if (offset < 0x400000)
 	{
 		if (address >= 0x6000 && address < 0x8000)
 		{
 			if (superfx_access_ram(m_superfx))
-				return 	sfx_ram[offset & 0x1fff];
+				return  sfx_ram[offset & 0x1fff];
 		}
 		if (address >= 0x8000)
 			return m_rom[rom_bank_map[offset / 0x10000] * 0x8000 + (offset & 0x7fff)];
@@ -196,10 +196,10 @@ READ8_MEMBER(sns_rom_superfx_device::read_h)
 	else
 	{
 		if (superfx_access_ram(m_superfx))
-			return 	sfx_ram[offset & 0xfffff];
+			return  sfx_ram[offset & 0xfffff];
 	}
-	
-	return 0xff;	// should be open bus...
+
+	return 0xff;    // should be open bus...
 }
 
 WRITE8_MEMBER( sns_rom_superfx_device::write_h )
@@ -219,4 +219,3 @@ WRITE8_MEMBER( sns_rom_superfx_device::write_h )
 			sfx_ram[offset & 0xfffff] = data;
 	}
 }
-

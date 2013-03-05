@@ -7,13 +7,13 @@
 // ======================> sns_rom21_device
 
 class sns_rom21_device : public device_t,
-					  public device_sns_cart_interface
+						public device_sns_cart_interface
 {
 public:
 	// construction/destruction
 	sns_rom21_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	sns_rom21_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "sns_rom21"; }
@@ -32,11 +32,11 @@ class sns_rom21_srtc_device : public sns_rom21_device
 public:
 	// construction/destruction
 	sns_rom21_srtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "sns_rom21_srtc"; }
-	
+
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(chip_read);
 	virtual DECLARE_WRITE8_MEMBER(chip_write);
@@ -49,10 +49,10 @@ public:
 		RTCM_Read,
 		RTCM_Write
 	};
-	
+
 	void update_time();
 	UINT8 srtc_weekday(UINT32 year, UINT32 month, UINT32 day);
-	
+
 	//this is now allocated in the main snes cart class, to allow saving to nvram
 	//UINT8  m_rtc_ram[13];
 	INT32  m_mode;

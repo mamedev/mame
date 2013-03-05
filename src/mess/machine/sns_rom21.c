@@ -1,10 +1,10 @@
 /***********************************************************************************************************
- 
+
  Super NES/Famicom (HiROM) cartridge emulation (for SNES/SFC)
- 
+
  Copyright MESS Team.
  Visit http://mamedev.org for licensing and usage restrictions.
- 
+
  ***********************************************************************************************************/
 
 
@@ -51,7 +51,7 @@ void sns_rom21_srtc_device::device_start()
 	m_index = -1;
 
 // at this stage, rtc_ram is not yet allocated. this will be fixed when converting RTC to be a separate device.
-//	update_time();
+//  update_time();
 
 	save_item(NAME(m_mode));
 	save_item(NAME(m_index));
@@ -66,7 +66,7 @@ void sns_rom21_srtc_device::device_start()
 READ8_MEMBER(sns_rom21_device::read_l)
 {
 	UINT16 address = offset & 0xffff;
-	
+
 	if (offset >= 0x300000 && offset < 0x400000 && address < 0x8000)
 	{
 		if (m_nvram_size > 0)
@@ -77,7 +77,7 @@ READ8_MEMBER(sns_rom21_device::read_l)
 			return m_nvram[(offset - 0x6000) & mask];
 		}
 	}
-	
+
 	// here ROM banks from 128 to 255, mirrored twice
 	int bank = (offset & 0x3fffff) / 0x8000;
 	return m_rom[rom_bank_map[bank + 0x80] * 0x8000 + (offset & 0x7fff)];
@@ -86,7 +86,7 @@ READ8_MEMBER(sns_rom21_device::read_l)
 READ8_MEMBER(sns_rom21_device::read_h)
 {
 	UINT16 address = offset & 0xffff;
-	
+
 	if (offset >= 0x300000 && offset < 0x400000 && address < 0x8000)
 	{
 		if (m_nvram_size > 0)
@@ -97,7 +97,7 @@ READ8_MEMBER(sns_rom21_device::read_h)
 			return m_nvram[(offset - 0x6000) & mask];
 		}
 	}
-	
+
 	// here ROM banks from 0 to 127, mirrored twice
 	int bank = (offset & 0x3fffff) / 0x8000;
 	return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
@@ -111,7 +111,7 @@ WRITE8_MEMBER(sns_rom21_device::write_l)
 WRITE8_MEMBER(sns_rom21_device::write_h)
 {
 	UINT16 address = offset & 0xffff;
-	
+
 	if (offset >= 0x300000 && offset < 0x400000 && address < 0x8000)
 	{
 		if (m_nvram_size > 0)
@@ -127,18 +127,18 @@ WRITE8_MEMBER(sns_rom21_device::write_h)
 // Hi-ROM + S-RTC (used by Daikaijuu Monogatari II)
 // same as above but additional read/write handling for the RTC
 /***************************************************************************
- 
+
  Based on C++ implementation by Byuu in BSNES.
- 
+
  Byuu's code is released under GNU General Public License
  version 2 as published by the Free Software Foundation.
- 
+
  The implementation below is released under the MAME license
  for use in MAME, MESS and derivatives by permission of Byuu
- 
+
  Copyright (for the implementation below) MESS Team.
  Visit http://mamedev.org for licensing and usage restrictions.
- 
+
  ***************************************************************************/
 
 static const UINT8 srtc_months[12] =
@@ -175,11 +175,11 @@ UINT8 sns_rom21_srtc_device::srtc_weekday( UINT32 year, UINT32 month, UINT32 day
 {
 	UINT32 y = 1900, m = 1; // Epoch is 1900-01-01
 	UINT32 sum = 0;         // Number of days passed since epoch
-	
+
 	year = MAX(1900, year);
 	month = MAX(1, MIN(12, month));
 	day = MAX(1, MIN(31, day));
-	
+
 	while (y < year)
 	{
 		UINT8 leapyear = 0;
@@ -194,7 +194,7 @@ UINT8 sns_rom21_srtc_device::srtc_weekday( UINT32 year, UINT32 month, UINT32 day
 		sum += leapyear ? 366 : 365;
 		y++;
 	}
-	
+
 	while (m < month)
 	{
 		UINT32 days = srtc_months[m - 1];
@@ -214,19 +214,19 @@ UINT8 sns_rom21_srtc_device::srtc_weekday( UINT32 year, UINT32 month, UINT32 day
 		sum += days;
 		m++;
 	}
-	
+
 	sum += day - 1;
 	return (sum + 1) % 7; // 1900-01-01 was a Monday
 }
 
 
 // this gets called only for accesses at 0x2800,
-// because for 0x2801 open bus gets returned...	
+// because for 0x2801 open bus gets returned...
 READ8_MEMBER(sns_rom21_srtc_device::chip_read)
 {
 	if (m_mode != RTCM_Read)
 		return 0x00;
-		
+
 	if (m_index < 0)
 	{
 		update_time();
@@ -246,29 +246,29 @@ READ8_MEMBER(sns_rom21_srtc_device::chip_read)
 WRITE8_MEMBER(sns_rom21_srtc_device::chip_write)
 {
 	data &= 0x0f;   // Only the low four bits are used
-	
+
 	if (data == 0x0d)
 	{
 		m_mode = RTCM_Read;
 		m_index = -1;
 		return;
 	}
-	
+
 	if (data == 0x0e)
 	{
 		m_mode = RTCM_Command;
 		return;
 	}
-	
+
 	if (data == 0x0f)
 		return; // Unknown behaviour
-	
+
 	if (m_mode == RTCM_Write)
 	{
 		if (m_index >= 0 && m_index < 12)
 		{
 			m_rtc_ram[m_index++] = data;
-			
+
 			if (m_index == 12)
 			{
 				// Day of week is automatically calculated and written
@@ -276,7 +276,7 @@ WRITE8_MEMBER(sns_rom21_srtc_device::chip_write)
 				UINT32 month = m_rtc_ram[8];
 				UINT32 year  = m_rtc_ram[9] + m_rtc_ram[10] * 10 + m_rtc_ram[11] * 100;
 				year += 1000;
-				
+
 				m_rtc_ram[m_index++] = srtc_weekday(year, month, day);
 			}
 		}
@@ -303,4 +303,3 @@ WRITE8_MEMBER(sns_rom21_srtc_device::chip_write)
 		}
 	}
 }
-

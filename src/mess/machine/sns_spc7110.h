@@ -23,18 +23,18 @@ class SPC7110_Decomp
 {
 public:
 	SPC7110_Decomp(running_machine &machine);
-	
+
 	running_machine &machine() const { return m_machine; }
-	
+
 	void init(running_machine &machine, UINT8 *ROM, UINT32 len, UINT32 mode, UINT32 offset, UINT32 index);
 	void reset();
-	
+
 	UINT8 read(UINT8 *ROM, UINT32 len);
 	void write(UINT8 data);
 	void mode0(UINT8 init, UINT8 *ROM, UINT32 len);
 	void mode1(UINT8 init, UINT8 *ROM, UINT32 len);
 	void mode2(UINT8 init, UINT8 *ROM, UINT32 len);
-	
+
 	UINT8 dataread(UINT8 *ROM, UINT32 len);
 	UINT8 probability(UINT32 n);
 	UINT8 next_lps(UINT32 n);
@@ -42,25 +42,25 @@ public:
 	UINT8 toggle_invert(UINT32 n);
 	UINT32 morton_2x8(UINT32 data);
 	UINT32 morton_4x8(UINT32 data);
-	
+
 	UINT32 m_decomp_mode;
 	UINT32 m_decomp_offset;
-	
+
 	UINT8 *m_decomp_buffer;
 	UINT32 m_decomp_buffer_rdoffset;
 	UINT32 m_decomp_buffer_wroffset;
 	UINT32 m_decomp_buffer_length;
-	
+
 	struct ContextState
 	{
 		UINT8 index;
 		UINT8 invert;
 	} m_context[32];
-	
+
 	UINT32 m_morton16[2][256];
 	UINT32 m_morton32[4][256];
-	
-	
+
+
 private:
 	running_machine& m_machine;
 	UINT32 m_rom_size;
@@ -74,7 +74,7 @@ public:
 	// construction/destruction
 	sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	sns_rom_spc7110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "sns_rom_spc7110"; }
@@ -95,7 +95,7 @@ public:
 	void spc7110_set_data_pointer(UINT32 addr);
 	void spc7110_set_data_adjust(UINT32 addr);
 	void spc7110_update_time(UINT8 offset);
-	
+
 
 	//==================
 	//decompression unit
@@ -112,9 +112,9 @@ public:
 	UINT8 m_r480a;        // compression length high
 	UINT8 m_r480b;        // decompression control register
 	UINT8 m_r480c;        // decompression status
-	
+
 	SPC7110_Decomp* m_decomp;
-	
+
 	UINT8 m_r4811;        // data pointer low
 	UINT8 m_r4812;        // data pointer high
 	UINT8 m_r4813;        // data pointer bank
@@ -123,12 +123,12 @@ public:
 	UINT8 m_r4816;        // data increment low
 	UINT8 m_r4817;        // data increment high
 	UINT8 m_r4818;        // data port control register
-	
+
 	UINT8 m_r481x;
-	
+
 	UINT8 m_r4814_latch;
 	UINT8 m_r4815_latch;
-	
+
 	//=========
 	//math unit
 	//=========
@@ -148,7 +148,7 @@ public:
 	UINT8 m_r482d;        // 16-bit remainder B1
 	UINT8 m_r482e;        // math control register
 	UINT8 m_r482f;        // math status
-	
+
 	//===================
 	//memory mapping unit
 	//===================
@@ -157,27 +157,27 @@ public:
 	UINT8 m_r4832;        // $[e0-ef]:[0000-ffff] mapping
 	UINT8 m_r4833;        // $[f0-ff]:[0000-ffff] mapping
 	UINT8 m_r4834;        // ???
-	
+
 	UINT32 m_dx_offset;
 	UINT32 m_ex_offset;
 	UINT32 m_fx_offset;
-	
+
 	//====================
 	//real-time clock unit
 	//====================
 	UINT8 m_r4840;        // RTC latch
 	UINT8 m_r4841;        // RTC index/data port
 	UINT8 m_r4842;        // RTC status
-	
+
 	UINT32 m_rtc_state;
 	UINT32 m_rtc_mode;
 	UINT32 m_rtc_index;
-	
+
 	UINT64 m_rtc_offset;
 
 	//this is now allocated in the main snes cart class, to allow saving to nvram
 	//UINT8 m_rtc_ram[16];  // 0-12 secs, min, hrs, etc.; 13-14-15 control registers
-	
+
 	UINT8 m_ram[0x2000];
 };
 
@@ -188,22 +188,22 @@ class sns_rom_spc7110rtc_device : public sns_rom_spc7110_device
 public:
 	// construction/destruction
 	sns_rom_spc7110rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "sns_rom_spc7110rtc"; }
-	
+
 	// reading and writing
 
 // we just use the spc7110 ones for the moment, pending the split of regs 0x4840-0x4842 (RTC) from the base add-on
-//	virtual DECLARE_READ8_MEMBER(read_l);
-//	virtual DECLARE_READ8_MEMBER(read_h);
-//	virtual DECLARE_WRITE8_MEMBER(write_l);
-	
-//	virtual DECLARE_READ8_MEMBER(chip_read);
-//	virtual DECLARE_WRITE8_MEMBER(chip_write);
+//  virtual DECLARE_READ8_MEMBER(read_l);
+//  virtual DECLARE_READ8_MEMBER(read_h);
+//  virtual DECLARE_WRITE8_MEMBER(write_l);
+
+//  virtual DECLARE_READ8_MEMBER(chip_read);
+//  virtual DECLARE_WRITE8_MEMBER(chip_write);
 };
-	
+
 // device type definition
 extern const device_type SNS_HIROM_SPC7110;
 extern const device_type SNS_HIROM_SPC7110_RTC;

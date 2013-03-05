@@ -9,10 +9,10 @@ class SDD1__IM //Input Manager
 {
 public:
 	SDD1__IM() {}
-	
+
 	UINT32 m_byte_ptr;
 	UINT8 m_bit_count;
-	
+
 	void IM_prepareDecomp(UINT32 in_buf);
 	UINT8 IM_getCodeword(UINT8 *ROM, UINT32 *mmc, const UINT8 code_len);
 };
@@ -22,9 +22,9 @@ class SDD1__GCD //Golomb-Code Decoder
 public:
 	SDD1__GCD(SDD1__IM* associatedIM)
 	: m_IM(associatedIM) { }
-	
+
 	SDD1__IM* m_IM;
-	
+
 	void GCD_getRunCount(UINT8 *ROM, UINT32 *mmc, UINT8 code_num, UINT8* MPScount, UINT8* LPSind);
 };
 
@@ -34,12 +34,12 @@ public:
 	SDD1__BG(SDD1__GCD* associatedGCD, UINT8 code)
 	: m_code_num(code),
 	m_GCD(associatedGCD) { }
-	
+
 	UINT8 m_code_num;
 	UINT8 m_MPScount;
 	UINT8 m_LPSind;
 	SDD1__GCD* m_GCD;
-	
+
 	void BG_prepareDecomp();
 	UINT8 BG_getBit(UINT8 *ROM, UINT32 *mmc, UINT8* endOfRun);
 } ;
@@ -54,10 +54,10 @@ class SDD1__PEM //Probability Estimation Module
 {
 public:
 	SDD1__PEM(
-			 SDD1__BG* associatedBG0, SDD1__BG* associatedBG1,
-			 SDD1__BG* associatedBG2, SDD1__BG* associatedBG3,
-			 SDD1__BG* associatedBG4, SDD1__BG* associatedBG5,
-			 SDD1__BG* associatedBG6, SDD1__BG* associatedBG7)
+				SDD1__BG* associatedBG0, SDD1__BG* associatedBG1,
+				SDD1__BG* associatedBG2, SDD1__BG* associatedBG3,
+				SDD1__BG* associatedBG4, SDD1__BG* associatedBG5,
+				SDD1__BG* associatedBG6, SDD1__BG* associatedBG7)
 	{
 		m_BG[0] = associatedBG0;
 		m_BG[1] = associatedBG1;
@@ -68,10 +68,10 @@ public:
 		m_BG[6] = associatedBG6;
 		m_BG[7] = associatedBG7;
 	}
-	
+
 	SDD1__PEM_ContextInfo m_contextInfo[32];
 	SDD1__BG* m_BG[8];
-	
+
 	void PEM_prepareDecomp();
 	UINT8 PEM_getBit(UINT8 *ROM, UINT32 *mmc, UINT8 context);
 } ;
@@ -82,14 +82,14 @@ class SDD1__CM
 public:
 	SDD1__CM(SDD1__PEM* associatedPEM)
 	: m_PEM(associatedPEM) { }
-	
+
 	UINT8 m_bitplanesInfo;
 	UINT8 m_contextBitsInfo;
 	UINT8 m_bit_number;
 	UINT8 m_currBitplane;
 	UINT16 m_prevBitplaneBits[8];
 	SDD1__PEM* m_PEM;
-	
+
 	void CM_prepareDecomp(UINT8 *ROM, UINT32 *mmc, UINT32 first_byte);
 	UINT8 CM_getBit(UINT8 *ROM, UINT32 *mmc);
 } ;
@@ -100,12 +100,12 @@ class SDD1__OL
 public:
 	SDD1__OL(SDD1__CM* associatedCM)
 	: m_CM(associatedCM) { }
-	
+
 	UINT8 m_bitplanesInfo;
 	UINT16 m_length;
 	UINT8* m_buffer;
 	SDD1__CM* m_CM;
-	
+
 	void OL_prepareDecomp(UINT8 *ROM, UINT32 *mmc, UINT32 first_byte, UINT16 out_len, UINT8 *out_buf);
 	void OL_launch(UINT8 *ROM, UINT32 *mmc);
 } ;
@@ -114,9 +114,9 @@ class SDD1__emu
 {
 public:
 	SDD1__emu(running_machine &machine);
-	
+
 	running_machine &machine() const { return m_machine; }
-	
+
 	SDD1__IM* m_IM;
 	SDD1__GCD* m_GCD;
 	SDD1__BG* m_BG0;   SDD1__BG* m_BG1;   SDD1__BG* m_BG2;   SDD1__BG* m_BG3;
@@ -124,9 +124,9 @@ public:
 	SDD1__PEM* m_PEM;
 	SDD1__CM* m_CM;
 	SDD1__OL* m_OL;
-	
+
 	void SDD1emu_decompress(UINT8 *ROM, UINT32 *mmc, UINT32 in_buf, UINT16 out_len, UINT8 *out_buf);
-	
+
 private:
 	running_machine& m_machine;
 };
@@ -136,13 +136,13 @@ private:
 // ======================> sns_rom_sdd1_device
 
 class sns_rom_sdd1_device : public device_t,
-					  public device_sns_cart_interface
+						public device_sns_cart_interface
 {
 public:
 	// construction/destruction
 	sns_rom_sdd1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	sns_rom_sdd1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "sns_rom_sdd1"; }
@@ -159,13 +159,13 @@ public:
 	UINT8 m_sdd1_enable;  // channel bit-mask
 	UINT8 m_xfer_enable;  // channel bit-mask
 	UINT32 m_mmc[4];      // memory map controller ROM indices
-	
+
 	struct
 	{
 		UINT32 addr;    // $43x2-$43x4 -- DMA transfer address
 		UINT16 size;    // $43x5-$43x6 -- DMA transfer size
 	} m_dma[8];
-	
+
 	SDD1__emu* m_sdd1emu;
 
 	struct

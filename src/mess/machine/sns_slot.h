@@ -11,8 +11,8 @@ enum
 {
 	SNES_MODE20 = 0,
 	SNES_MODE21,
-	SNES_MODE22,	// ExLoROM - not used anymore in emulation (only to log info), will be removed
-	SNES_MODE25,	// ExHiROM - not used anymore in emulation (only to log info), will be removed
+	SNES_MODE22,    // ExLoROM - not used anymore in emulation (only to log info), will be removed
+	SNES_MODE25,    // ExHiROM - not used anymore in emulation (only to log info), will be removed
 	SNES_CX4,
 	SNES_DSP,
 	SNES_DSP_MODE21,
@@ -36,8 +36,8 @@ enum
 	SNES_STROM,
 	// pirate carts
 	SNES_POKEMON,
-	SNES_BANANA,	// wip
-	SNES_SOULBLAD	// wip
+	SNES_BANANA,    // wip
+	SNES_SOULBLAD   // wip
 };
 
 
@@ -79,18 +79,18 @@ public:
 	virtual UINT32 get_rtc_ram_size() { return m_rtc_ram_size; };
 
 	virtual void rom_map_setup(UINT32 size);
-	
+
 	// internal state
 	UINT8      *m_rom;
 	UINT8      *m_nvram;
 	UINT8      *m_bios;
-	UINT8      *m_rtc_ram;	// temp pointer to save RTC ram to nvram (will disappear when RTCs become devices)
+	UINT8      *m_rtc_ram;  // temp pointer to save RTC ram to nvram (will disappear when RTCs become devices)
 	UINT32 m_rom_size;
 	UINT32 m_nvram_size;
 	UINT32 m_bios_size;
-	UINT32 m_rtc_ram_size;	// temp
+	UINT32 m_rtc_ram_size;  // temp
 
-	UINT8 rom_bank_map[256];	// 32K chunks of rom
+	UINT8 rom_bank_map[256];    // 32K chunks of rom
 };
 
 
@@ -105,11 +105,11 @@ public:
 	// construction/destruction
 	base_sns_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~base_sns_cart_slot_device();
-	
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_config_complete();
-	
+
 	// image-level overrides
 	virtual bool call_load();
 	virtual void call_unload();
@@ -146,8 +146,8 @@ public:
 // this should be private, but then there is some problem installing delegates in the driver...
 //private:
 
-	device_sns_cart_interface*		m_cart;
-	
+	device_sns_cart_interface*      m_cart;
+
 	int m_type;
 };
 

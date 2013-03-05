@@ -1,11 +1,11 @@
 /***********************************************************************************************************
- 
+
 
     SNES cart emulation
     (through slot devices)
 
 
- 
+
  ***********************************************************************************************************/
 
 
@@ -96,7 +96,7 @@ void device_sns_cart_interface::rtc_ram_alloc(running_machine &machine, UINT32 s
 
 
 //-------------------------------------------------
-//  addon_bios_alloc - alloc the space for the 
+//  addon_bios_alloc - alloc the space for the
 //  (optional) add-on CPU bios
 //-------------------------------------------------
 
@@ -111,17 +111,17 @@ void device_sns_cart_interface::addon_bios_alloc(running_machine &machine, UINT3
 
 
 //-------------------------------------------------
-//  rom_map_setup - setup map of rom banks in 32K 
+//  rom_map_setup - setup map of rom banks in 32K
 //  blocks, so to simplify ROM access
 //-------------------------------------------------
 
 void device_sns_cart_interface::rom_map_setup(UINT32 size)
 {
 	int i;
-	// setup the rom_bank_map array to faster ROM read 
+	// setup the rom_bank_map array to faster ROM read
 	for (i = 0; i < size / 0x8000; i++)
 		rom_bank_map[i] = i;
-	
+
 	// fill up remaining blocks with mirrors
 	while (i % 256)
 	{
@@ -135,12 +135,12 @@ void device_sns_cart_interface::rom_map_setup(UINT32 size)
 	}
 
 // check bank map!
-//	for (i = 0; i < 256; i++)
-//	{
-//		printf("bank %3d = %3d\t", i, rom_bank_map[i]);
-//		if ((i%8) == 7)
-//			printf("\n");
-//	}
+//  for (i = 0; i < 256; i++)
+//  {
+//      printf("bank %3d = %3d\t", i, rom_bank_map[i]);
+//      if ((i%8) == 7)
+//          printf("\n");
+//  }
 }
 
 //**************************************************************************
@@ -244,8 +244,8 @@ static const sns_slot slot_list[] =
 	{ SNES_STROM,       "strom"},
 	// pirate carts
 	{ SNES_POKEMON,     "lorom_poke"},
-	{ SNES_BANANA,      "lorom_paja"},	// wip
-	{ SNES_SOULBLAD,    "lorom_sbld"}	// wip
+	{ SNES_BANANA,      "lorom_paja"},  // wip
+	{ SNES_SOULBLAD,    "lorom_sbld"}   // wip
 };
 
 static int sns_get_pcb_id(const char *slot)
@@ -255,7 +255,7 @@ static int sns_get_pcb_id(const char *slot)
 		if (!mame_stricmp(slot_list[i].slot_option, slot))
 			return slot_list[i].pcb_id;
 	}
-	
+
 	return 0;
 }
 
@@ -266,7 +266,7 @@ static const char *sns_get_slot(int type)
 		if (slot_list[i].pcb_id == type)
 			return slot_list[i].slot_option;
 	}
-	
+
 	return "lorom";
 }
 
@@ -285,10 +285,10 @@ UINT32 base_sns_cart_slot_device::snes_skip_header( UINT8 *ROM, UINT32 rom_size 
 {
 	UINT8 header[512];
 	UINT32 offset = 512;
-	
+
 	/* Check for a header (512 bytes) */
 	memcpy(header, ROM, 512);
-	
+
 	if ((header[8] == 0xaa) && (header[9] == 0xbb) && (header[10] == 0x04))
 	{
 		/* Found an SWC identifier */
@@ -310,7 +310,7 @@ UINT32 base_sns_cart_slot_device::snes_skip_header( UINT8 *ROM, UINT32 rom_size 
 		logerror("No header found.\n");
 		offset = 0;
 	}
-	
+
 	return offset;
 }
 
@@ -326,17 +326,17 @@ static int snes_validate_infoblock( UINT8 *infoblock, UINT32 offset )
 	UINT16 ichecksum    = infoblock[offset + 0x1c] | (infoblock[offset + 0x1d] << 8);
 	UINT8 reset_opcode  = infoblock[(offset & ~0x7fff) | (reset_vector & 0x7fff)];  //first opcode executed upon reset
 	UINT8 mapper        = infoblock[offset + 0x15] & ~0x10;                         //mask off irrelevant FastROM-capable bit
-	
+
 	/* $00:[000-7fff] contains uninitialized RAM and MMIO.
 	 reset vector must point to ROM at $00:[8000-ffff] to be considered valid. */
 	if (reset_vector < 0x8000)
 		return 0;
-	
+
 	/* some images duplicate the header in multiple locations, and others have completely
 	 invalid header information that cannot be relied upon. The code below will analyze
 	 the first opcode executed at the specified reset vector to determine the probability
 	 that this is the correct header. Score is assigned accordingly. */
-	
+
 	/* most likely opcodes */
 	if (reset_opcode == 0x78        //sei
 		|| reset_opcode == 0x18     //clc (clc; xce)
@@ -346,7 +346,7 @@ static int snes_validate_infoblock( UINT8 *infoblock, UINT32 offset )
 		|| reset_opcode == 0x5c     //jml $nnnnnn
 		)
 		score += 8;
-	
+
 	/* plausible opcodes */
 	if (reset_opcode == 0xc2        //rep #$nn
 		|| reset_opcode == 0xe2     //sep #$nn
@@ -361,7 +361,7 @@ static int snes_validate_infoblock( UINT8 *infoblock, UINT32 offset )
 		|| reset_opcode == 0x22     //jsl $nnnnnn
 		)
 		score += 4;
-	
+
 	/* implausible opcodes */
 	if (reset_opcode == 0x40        //rti
 		|| reset_opcode == 0x60     //rts
@@ -371,7 +371,7 @@ static int snes_validate_infoblock( UINT8 *infoblock, UINT32 offset )
 		|| reset_opcode == 0xcc     //cpy $nnnn
 		)
 		score -= 4;
-	
+
 	/* least likely opcodes */
 	if (reset_opcode == 0x00        //brk #$nn
 		|| reset_opcode == 0x02     //cop #$nn
@@ -380,47 +380,47 @@ static int snes_validate_infoblock( UINT8 *infoblock, UINT32 offset )
 		|| reset_opcode == 0xff     //sbc $nnnnnn,x
 		)
 		score -= 8;
-	
+
 	/* Sometimes, both the header and reset vector's first opcode will match ...
 	 fallback and rely on info validity in these cases to determine more likely header. */
-	
+
 	/* a valid checksum is the biggest indicator of a valid header. */
 	if ((checksum + ichecksum) == 0xffff && (checksum != 0) && (ichecksum != 0))
 		score += 4;
-	
+
 	/* then there are the expected mapper values */
 	if (offset == 0x007fc0 && mapper == 0x20)   // 0x20 is usually LoROM
 		score += 2;
-	
+
 	if (offset == 0x00ffc0 && mapper == 0x21)   // 0x21 is usually HiROM
 		score += 2;
-	
+
 	if (offset == 0x007fc0 && mapper == 0x22)   // 0x22 is usually ExLoROM
 		score += 2;
-	
+
 	if (offset == 0x40ffc0 && mapper == 0x25)   // 0x25 is usually ExHiROM
 		score += 2;
-	
+
 	/* finally, there are valid values in the Company, Region etc. fields */
 	if (infoblock[offset + 0x1a] == 0x33)           // Company field: 0x33 indicates extended header
 		score += 2;
-	
+
 	if (infoblock[offset + 0x16] < 0x08)            // ROM Type field
 		score++;
-	
+
 	if (infoblock[offset + 0x17] < 0x10)            // ROM Size field
 		score++;
-	
+
 	if (infoblock[offset + 0x18] < 0x08)            // SRAM Size field
 		score++;
-	
+
 	if (infoblock[offset + 0x19] < 14)              // Region field
 		score++;
-	
+
 	/* do we still have a positive score? */
 	if (score < 0)
 		score = 0;
-	
+
 	return score;
 }
 
@@ -445,20 +445,20 @@ static UINT32 snes_find_hilo_mode( UINT8 *buffer, UINT32 buf_len )
 	/* Images larger than 32mbits are likely ExHiRom */
 	if (valid_mode25)
 		valid_mode25 += 4;
-	
+
 	if ((valid_mode20 >= valid_mode21) && (valid_mode20 >= valid_mode25))
-		retvalue = 0x007fc0;		
+		retvalue = 0x007fc0;
 	else if (valid_mode21 >= valid_mode25)
 		retvalue = 0x00ffc0;
 	else
 		retvalue = 0x40ffc0;
-	
+
 	logerror( "\t HiROM/LoROM id: %s (LoROM: %d , HiROM: %d, ExHiROM: %d)\n",
-			 (retvalue == 0x007fc0) ? "LoROM" :
-			 (retvalue == 0x00ffc0) ? "HiROM" :
-			 (retvalue == 0x40ffc0) ? "ExHiROM" : "Other",
-			 valid_mode20, valid_mode21, valid_mode25);
-	
+				(retvalue == 0x007fc0) ? "LoROM" :
+				(retvalue == 0x00ffc0) ? "HiROM" :
+				(retvalue == 0x40ffc0) ? "ExHiROM" : "Other",
+				valid_mode20, valid_mode21, valid_mode25);
+
 	return retvalue;
 }
 
@@ -472,23 +472,23 @@ static int snes_find_addon_chip( UINT8 *buffer, UINT32 start_offs )
 		case 0x01:
 		case 0x02:
 			break;
-			
+
 		case 0x03:
 			if (buffer[start_offs + 0x15] == 0x30)
 				return SNES_DSP4;
 			else
 				return SNES_DSP;
-			
+
 		case 0x04:
 			return SNES_DSP;
-			
+
 		case 0x05:
 			// DSP2 can be detected by (buffer[start_offs + 0x15] == 0x20)
-			// DSP3 is harder to detect, and one has to rely on the manufacturer (Bandai) 
+			// DSP3 is harder to detect, and one has to rely on the manufacturer (Bandai)
 			//      by checking (buffer[start_offs + 0x15] == 0x30) && (buffer[start_offs + 0x1a] == 0xb2)
 			// in other cases is DSP1, but we do treat all these together...
 			return SNES_DSP;
-			
+
 		case 0x13:  // Mario Chip 1
 		case 0x14:  // GSU-x
 		case 0x15:  // GSU-x
@@ -496,41 +496,41 @@ static int snes_find_addon_chip( UINT8 *buffer, UINT32 start_offs )
 			if (buffer[start_offs + 0x15] == 0x20)
 				return SNES_SFX;
 			break;
-			
+
 		case 0x25:
 			return SNES_OBC1;
-			
+
 		case 0x32:  // needed by a Sample game (according to ZSNES)
 		case 0x34:
 		case 0x35:
 			if (buffer[start_offs + 0x15] == 0x23)
 				return SNES_SA1;
 			break;
-			
+
 		case 0x43:
 		case 0x45:
 			if (buffer[start_offs + 0x15] == 0x32)
 				return SNES_SDD1;
 			break;
-			
+
 		case 0x55:
 			if (buffer[start_offs + 0x15] == 0x35)
 				return SNES_SRTC;
 			break;
-			
+
 		case 0xe3:
 			return SNES_Z80GB;
-			
+
 		case 0xf3:
 			return SNES_CX4;
-			
+
 		case 0xf5:
 			if (buffer[start_offs + 0x15] == 0x30)
 				return SNES_ST018;
 			else if (buffer[start_offs + 0x15] == 0x3a)
 				return SNES_SPC7110;
 			break;
-			
+
 		case 0xf6:
 			/* These Seta ST-01X chips have both 0x30 at 0xffd5,
 			 they only differ for the 'size' at 0xffd7 */
@@ -538,12 +538,12 @@ static int snes_find_addon_chip( UINT8 *buffer, UINT32 start_offs )
 				return SNES_ST011;
 			else
 				return SNES_ST010;
-			
+
 		case 0xf9:
 			if (buffer[start_offs + 0x15] == 0x3a)
 				return SNES_SPC7110_RTC;
 			break;
-			
+
 		default:
 			break;
 	}
@@ -585,7 +585,7 @@ bool base_sns_cart_slot_device::call_load()
 
 		m_cart->rom_map_setup(len);
 
-		// check for on-cart CPU bios 
+		// check for on-cart CPU bios
 		if (software_entry() != NULL)
 		{
 			if (get_software_region("addon"))
@@ -605,10 +605,10 @@ bool base_sns_cart_slot_device::call_load()
 			else
 				m_type = sns_get_pcb_id(slot_name);
 		}
-		
+
 
 		setup_custom_mappers();
-			
+
 		setup_nvram();
 
 		if (m_cart->get_nvram_size() || m_cart->get_rtc_ram_size())
@@ -620,18 +620,18 @@ bool base_sns_cart_slot_device::call_load()
 				memcpy(m_cart->get_nvram_base(), temp_nvram, m_cart->get_nvram_size());
 			if (m_cart->get_rtc_ram_size())
 				memcpy(m_cart->get_rtc_ram_base(), temp_nvram + m_cart->get_nvram_size(), m_cart->get_rtc_ram_size());
-			
+
 			if (temp_nvram)
 				auto_free(machine(), temp_nvram);
 		}
-		
+
 		printf("Type %d\n", m_type);
 
 		internal_header_logging(ROM, len);
 
 		return IMAGE_INIT_PASS;
 	}
-	
+
 	return IMAGE_INIT_PASS;
 }
 
@@ -652,7 +652,7 @@ void base_sns_cart_slot_device::call_unload()
 				memcpy(temp_nvram, m_cart->get_nvram_base(), m_cart->get_nvram_size());
 			if (m_cart->get_rtc_ram_size())
 				memcpy(temp_nvram + m_cart->get_nvram_size(), m_cart->get_rtc_ram_base(), m_cart->get_rtc_ram_size());
-			
+
 			battery_save(temp_nvram, tot_size);
 			if (temp_nvram)
 				auto_free(machine(), temp_nvram);
@@ -676,7 +676,7 @@ void base_sns_cart_slot_device::setup_nvram()
 		UINT8 sram_size = (m_type == SNES_SFX) ? (ROM[0x00ffbd] & 0x07) : (ROM[hilo_mode + 0x18] & 0x07);
 		if (sram_size)
 		{
-			UINT32 max = (hilo_mode == 0x007fc0) ? 0x80000 : 0x20000;	// MODE20 vs MODE21
+			UINT32 max = (hilo_mode == 0x007fc0) ? 0x80000 : 0x20000;   // MODE20 vs MODE21
 			size = 1024 << (ROM[0x00ffbd] & 0x07);
 			if (size > max)
 				size = max;
@@ -729,12 +729,12 @@ int base_sns_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			break;
 		case 0x00ffc0: // HiRom
 		case 0x40ffc0: // ExHiRom
-			type = SNES_MODE21; 
+			type = SNES_MODE21;
 			break;
 		default:
 			break;
 	}
-	
+
 	// detect Sufami Turbo...
 	if (type == SNES_MODE20 && !memcmp(ROM, "BANDAI SFC-ADX", 14))
 	{
@@ -757,7 +757,7 @@ int base_sns_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 				type = SNES_BSMEMPAK;
 		}
 	}
-	
+
 	// check for add-on chips...
 	if (len >= hilo_mode + 0x1a)
 	{
@@ -808,13 +808,13 @@ const char * base_sns_cart_slot_device::get_default_card_software(const machine_
 		int type;
 
 		core_fread(m_file, ROM, len);
-		
+
 		type = get_cart_type(ROM, len);
 		slot_string = sns_get_slot(type);
-		
+
 		global_free(ROM);
 		clear();
-	
+
 		return slot_string;
 	}
 
@@ -882,7 +882,7 @@ WRITE8_MEMBER(base_sns_cart_slot_device::chip_write)
 static int char_to_int_conv( char id )
 {
 	int value;
-	
+
 	if (id == '1') value = 0x01;
 	else if (id == '2') value = 0x02;
 	else if (id == '3') value = 0x03;
@@ -899,7 +899,7 @@ static int char_to_int_conv( char id )
 	else if (id == 'E') value = 0x0e;
 	else if (id == 'F') value = 0x0f;
 	else value = 0x00;
-	
+
 	return value;
 }
 
@@ -939,7 +939,7 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 		UNK,
 		UNK
 	};
-	
+
 	/* Some known countries */
 	static const char *const countries[] =
 	{
@@ -948,7 +948,7 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 		/* 8*/  "Spain (PAL)", "Germany, Austria & Switzerland (PAL)", "Italy (PAL)", "Hong Kong & China (PAL)",
 		/* c*/  "Indonesia (PAL)", "South Korea (NTSC)", UNK, UNK,
 	};
-	
+
 	/* Some known companies (integrations to the list from Snes9x) */
 	static const char *const companies[] =
 	{
@@ -1007,7 +1007,7 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 		default:
 			break;
 	}
-	
+
 	// detect Sufami Turbo...
 	if (type == SNES_MODE20 && !memcmp(ROM, "BANDAI SFC-ADX", 14))
 	{
@@ -1016,7 +1016,7 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 		else
 			type = SNES_STROM;
 	}
-	
+
 	// detect BS-X Base Cart
 	if (!memcmp(ROM + hilo_mode, "Satellaview BS-X     ", 21))
 		type = SNES_BSX;
@@ -1030,7 +1030,7 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 				type = SNES_BSMEMPAK;
 		}
 	}
-	
+
 	addon = snes_find_addon_chip(ROM, hilo_mode);
 	if (addon != -1)
 	{
@@ -1041,59 +1041,59 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 		else
 			type = addon;
 	}
-	
+
 	/* Company */
 	for (int i = 0; i < 2; i++)
 		company_id[i] = ROM[hilo_mode - 0x10 + i];
 	company = (char_to_int_conv(company_id[0]) << 4) + char_to_int_conv(company_id[1]);
 	if (company == 0)
 		company = ROM[hilo_mode + 0x1a];
-	
+
 	/* ROM ID */
 	for(int i = 0; i < 4; i++ )
 		rom_id[i] = ROM[hilo_mode - 0x0d + i];
-	
+
 	/* Title */
 	for(int i = 0; i < 21; i++ )
 		title[i] = ROM[hilo_mode + i];
-	
+
 	/* RAM */
 	if (((ROM[hilo_mode + 0x16] & 0xf) == 1) ||
 		((ROM[hilo_mode + 0x16] & 0xf) == 2) ||
 		((ROM[hilo_mode + 0x16] & 0xf) == 4) ||
 		((ROM[hilo_mode + 0x16] & 0xf) == 5))
 		has_ram = 1;
-	
+
 	/* SRAM */
 	if (((ROM[hilo_mode + 0x16] & 0xf) == 2) ||
 		((ROM[hilo_mode + 0x16] & 0xf) == 5) ||
 		((ROM[hilo_mode + 0x16] & 0xf) == 6))
 		has_sram = 1;
-	
+
 	logerror( "ROM DETAILS\n" );
 	logerror( "===========\n\n" );
 	logerror( "\tTotal blocks:  0x%x\n", len);
 	logerror( "\tROM bank size: %s \n",
-			 (type == SNES_MODE20) ? "LoROM" :
-			 (type == SNES_MODE21) ? "HiROM" :
-			 (type == SNES_MODE22) ? "ExLoROM" :
-			 (type == SNES_MODE25) ? "ExHiROM" : "Other (BSX or ST)" );
+				(type == SNES_MODE20) ? "LoROM" :
+				(type == SNES_MODE21) ? "HiROM" :
+				(type == SNES_MODE22) ? "ExLoROM" :
+				(type == SNES_MODE25) ? "ExHiROM" : "Other (BSX or ST)" );
 	logerror( "\tCompany:       %s [%.2s]\n", companies[company], company_id );
 	logerror( "\tROM ID:        %.4s\n\n", rom_id );
-	
+
 	logerror( "HEADER DETAILS\n" );
 	logerror( "==============\n\n" );
 	logerror( "\tName:          %.21s\n", title );
 	logerror( "\tSpeed:         %s [%d]\n", (ROM[hilo_mode + 0x15] & 0xf0) ? "FastROM" : "SlowROM", (ROM[hilo_mode + 0x15] & 0xf0) >> 4);
 	logerror( "\tBank size:     %s [%d]\n", (ROM[hilo_mode + 0x15] & 0xf) ? "HiROM" : "LoROM", ROM[hilo_mode + 0x15] & 0xf);
-	
+
 	logerror( "\tType:          %s", cart_types[type]);
 	if (has_ram)
 		logerror( ", RAM");
 	if (has_sram)
 		logerror( ", SRAM");
 	logerror( " [%d]\n", ROM[hilo_mode + 0x16]);
-	
+
 	logerror( "\tSize:          %d megabits [%d]\n", 1 << (ROM[hilo_mode + 0x17] - 7), ROM[hilo_mode + 0x17]);
 	logerror( "\tSRAM:          %d kilobits [%d]\n", ROM[hilo_mode + 0x18] * 8, ROM[hilo_mode + 0x18] );
 	logerror( "\tCountry:       %s [%d]\n", countries[ROM[hilo_mode + 0x19]], ROM[hilo_mode + 0x19]);
@@ -1103,6 +1103,6 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	logerror( "\tChecksum:      %X %X\n", ROM[hilo_mode + 0x1f], ROM[hilo_mode + 0x1e]);
 	logerror( "\tNMI Address:   %2X%2Xh\n", ROM[hilo_mode + 0x2b], ROM[hilo_mode + 0x2a]);
 	logerror( "\tStart Address: %2X%2Xh\n\n", ROM[hilo_mode + 0x2d], ROM[hilo_mode + 0x2c]);
-	
+
 	logerror( "\tMode: %d\n", type);
 }

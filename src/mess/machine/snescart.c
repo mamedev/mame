@@ -1312,4 +1312,3 @@ DRIVER_INIT_MEMBER(snes_state,snesst)
 #include "machine/snesrtc.c"
 #include "machine/snessdd1.c"
 #include "machine/snes7110.c"
-

@@ -1,7 +1,7 @@
 /***********************************************************************************************************
- 
+
  BS-X Satellaview cartridge emulation (for SNES/SFC)
- 
+
  Copyright MESS Team.
  Visit http://mamedev.org for licensing and usage restrictions.
 
@@ -89,7 +89,7 @@ void sns_rom_bsmempak_device::device_start()
 	m_command = 0;
 	m_write_old = 0;
 	m_write_new = 0;
-	
+
 	m_flash_enable = 0;
 	m_read_enable = 0;
 	m_write_enable = 0;
@@ -129,26 +129,26 @@ UINT8 BSX_base::read(UINT32 offset)
 		mame_printf_debug("BS-X Base Unit reg read outside correct range!\n");
 		return 0x00;
 	}
-	
-	switch (offset) 
-	{			
+
+	switch (offset)
+	{
 		// no 218b? no 218d? no 2191? no 2195? no 219a-219f?
-		case 0x2192: 
+		case 0x2192:
 		{
 			UINT8 counter = r2192_counter++;
-			if (r2192_counter >= 18) 
+			if (r2192_counter >= 18)
 				r2192_counter = 0;
-			
-			if (counter == 0) 
+
+			if (counter == 0)
 			{
 				system_time curtime, *systime = &curtime;
-				m_machine.current_datetime(curtime);				
+				m_machine.current_datetime(curtime);
 				r2192_hour   = systime->local_time.hour;
 				r2192_minute = systime->local_time.minute;
 				r2192_second = systime->local_time.second;
 			}
-			
-			switch (counter) 
+
+			switch (counter)
 			{
 				case  0: return 0x00;  //???
 				case  1: return 0x00;  //???
@@ -169,7 +169,7 @@ UINT8 BSX_base::read(UINT32 offset)
 				case 16: return 0x00;  //???
 				case 17: return 0x00;  //???
 			}
-		} 
+		}
 			break;
 
 		case 0x2193:
@@ -191,25 +191,25 @@ void BSX_base::write(UINT32 offset, UINT8 data)
 		mame_printf_debug("BS-X Base Unit reg write outside correct range!\n");
 		return;
 	}
-	
-	switch(offset) 
+
+	switch(offset)
 	{
 		// no 218d? no 2190? no 2195? no 2196? no 2198? no 219a-219f?
 		case 0x218f:
-			regs[6] >>= 1;	// 0x218e
-			regs[6] = regs[7] - regs[6];	// 0x218f - 0x218e
-			regs[7] >>= 1;	// 0x218f
+			regs[6] >>= 1;  // 0x218e
+			regs[6] = regs[7] - regs[6];    // 0x218f - 0x218e
+			regs[7] >>= 1;  // 0x218f
 			break;
-			
+
 		case 0x2191:
 			regs[offset - 0x2188] = data;
 			r2192_counter = 0;
 			break;
-			
+
 		case 0x2192:
-			regs[8] = data;	// sets 0x2190
+			regs[8] = data; // sets 0x2190
 			break;
-			
+
 		default:
 			regs[offset - 0x2188] = data;
 			break;
@@ -266,8 +266,8 @@ void sns_rom_bsx_device::access_update()
 		rom_access = 0;
 	else
 	{
-//		rom_access = BIT(m_cart_regs[0x02], 7) + 1;
-		rom_access = 1;	// for whatever reason bsxsore changes access mode here and then fails to read the ROM properly!
+//      rom_access = BIT(m_cart_regs[0x02], 7) + 1;
+		rom_access = 1; // for whatever reason bsxsore changes access mode here and then fails to read the ROM properly!
 		printf("rom_access %s\n", !BIT(m_cart_regs[0x02], 7) ? "Lo" : "Hi");
 	}
 }
@@ -317,7 +317,7 @@ READ8_MEMBER(sns_rom_bsx_device::read_l)
 		int bank = (rom_access == 1) ? (offset / 0x10000) : (offset / 0x8000);
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
-	
+
 	return 0x00;
 }
 
@@ -330,7 +330,7 @@ READ8_MEMBER(sns_rom_bsx_device::read_h)
 		if (m_slot->m_cart && m_slot->m_cart->get_rom_size())
 			return m_slot->m_cart->read_l(space, offset);
 	}
-	
+
 	// if not in any of the cases above...
 	//$00-3f|80-bf:8000-ffff
 	//$40-7f|c0-ff:0000-ffff
@@ -341,7 +341,7 @@ READ8_MEMBER(sns_rom_bsx_device::read_h)
 		int bank = (rom_access == 1) ? (offset / 0x10000) : (offset / 0x8000);
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
-	
+
 	return 0x00;
 }
 
@@ -378,7 +378,7 @@ WRITE8_MEMBER(sns_rom_bsx_device::write_l)
 		// 0x70-0x77:0x0000-0xffff -> PRAM
 		m_pram[offset & 0x7ffff] = data;
 	}
-	
+
 	// if not in any of the cases above...
 	//$00-3f|80-bf:8000-ffff
 	//$40-7f|c0-ff:0000-ffff
@@ -394,7 +394,7 @@ WRITE8_MEMBER(sns_rom_bsx_device::write_h)
 		// write to cart...
 		return;
 	}
-	
+
 	// if not in any of the cases above...
 	//$00-3f|80-bf:8000-ffff
 	//$40-7f|c0-ff:0000-ffff
@@ -407,18 +407,18 @@ READ8_MEMBER(sns_rom_bsx_device::chip_read)
 {
 	if ((offset & 0xffff) >= 0x2188 && (offset & 0xffff) < 0x21a0)
 		return m_base_unit->read(offset & 0xffff);
-	
-	if ((offset & 0xf0ffff) == 0x005000)	//$[00-0f]:5000 reg access
+
+	if ((offset & 0xf0ffff) == 0x005000)    //$[00-0f]:5000 reg access
 	{
 		UINT8 n = (offset >> 16) & 0x0f;
 		return m_cart_regs[n];
 	}
-	
-	if ((offset & 0xf8f000) == 0x105000)	//$[10-17]:[5000-5fff] SRAM access
+
+	if ((offset & 0xf8f000) == 0x105000)    //$[10-17]:[5000-5fff] SRAM access
 	{
 		return m_nvram[((offset >> 16) & 7) * 0x1000 + (offset & 0xfff)];
 	}
-	
+
 	return 0x00;
 }
 
@@ -426,16 +426,16 @@ WRITE8_MEMBER(sns_rom_bsx_device::chip_write)
 {
 	if ((offset & 0xffff) >= 0x2188 && (offset & 0xffff) < 0x21a0)
 		m_base_unit->write(offset & 0xffff, data);
-	
-	if ((offset & 0xf0ffff) == 0x005000)	//$[00-0f]:5000 reg access
+
+	if ((offset & 0xf0ffff) == 0x005000)    //$[00-0f]:5000 reg access
 	{
 		UINT8 n = (offset >> 16) & 0x0f;
 		m_cart_regs[n] = data;
 		if (n == 0x0e && data & 0x80)
 			access_update();
 	}
-	
-	if ((offset & 0xf8f000) == 0x105000)	//$[10-17]:[5000-5fff] SRAM access
+
+	if ((offset & 0xf8f000) == 0x105000)    //$[10-17]:[5000-5fff] SRAM access
 	{
 		m_nvram[((offset >> 16) & 7) * 0x1000 + (offset & 0xfff)] = data;
 	}
@@ -583,4 +583,3 @@ READ8_MEMBER(sns_rom_bsmempak_device::read_h)
 WRITE8_MEMBER(sns_rom_bsmempak_device::write_l)
 {
 }
-

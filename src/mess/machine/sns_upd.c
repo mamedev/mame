@@ -1,11 +1,11 @@
 /***********************************************************************************************************
- 
+
  UPD7725 / UPD96050 add-on chip emulation (for SNES/SFC)
  used in carts with DSP-1, DSP-1A, DSP-1B, DSP-2, DSP-3, DSP-4, ST-010 & ST-011 add-on chips
- 
+
  Copyright MESS Team.
  Visit http://mamedev.org for licensing and usage restrictions.
- 
+
  ***********************************************************************************************************/
 
 
@@ -24,19 +24,19 @@ const device_type SNS_LOROM_SETA11 = &device_creator<sns_rom_seta11dsp_device>;
 
 sns_rom20_necdsp_device::sns_rom20_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: sns_rom_device(mconfig, SNS_LOROM_NECDSP, "SNES Cart (LoROM) + NEC DSP", tag, owner, clock),
-					  m_upd7725(*this, "dsp")
+						m_upd7725(*this, "dsp")
 {
 }
 
 sns_rom21_necdsp_device::sns_rom21_necdsp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 					: sns_rom21_device(mconfig, SNS_HIROM_NECDSP, "SNES Cart (HiROM) + NEC DSP", tag, owner, clock),
-					  m_upd7725(*this, "dsp")
+						m_upd7725(*this, "dsp")
 {
 }
 
 sns_rom_setadsp_device::sns_rom_setadsp_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock)
 					: sns_rom_device(mconfig, type, name, tag, owner, clock),
-					  m_upd96050(*this, "dsp")
+						m_upd96050(*this, "dsp")
 {
 }
 
@@ -223,6 +223,9 @@ READ8_MEMBER( sns_rom_setadsp_device::chip_read )
 		else
 			return temp & 0xff;
 	}
+	if (offset == 0x600000 || offset == 0x600001)
+		return (offset & 1) ? m_upd96050->snesdsp_read(FALSE) : m_upd96050->snesdsp_read(TRUE);
+
 	return 0xff;
 }
 
@@ -233,7 +236,7 @@ WRITE8_MEMBER( sns_rom_setadsp_device::chip_write )
 	{
 		UINT16 address = offset & 0xffff;
 		UINT16 temp = m_upd96050->dataram_r(address/2);
-		
+
 		if (offset & 1)
 		{
 			temp &= 0xff;
@@ -244,10 +247,14 @@ WRITE8_MEMBER( sns_rom_setadsp_device::chip_write )
 			temp &= 0xff00;
 			temp |= data;
 		}
-		
+
 		m_upd96050->dataram_w(address/2, temp);
 		return;
 	}
+	if (offset == 0x600000)
+		m_upd96050->snesdsp_write(TRUE, data);
+	if (offset == 0x600001)
+		m_upd96050->snesdsp_write(FALSE, data);
 }
 
 
@@ -316,4 +323,3 @@ machine_config_constructor sns_rom_seta11dsp_device::device_mconfig_additions() 
 {
 	return MACHINE_CONFIG_NAME( snes_st011 );
 }
-
