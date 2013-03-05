@@ -210,11 +210,17 @@ MAIN:
 		case 0xBF:										%INDEXED;	%ASLD;		return;
 
 		case 0xC0:													%ROLD;		return;
+		case 0xC1:										%INDEXED;	%ROL16;		return;
 		case 0xC2:										set_d();	%CLR16;		return;
+		case 0xC3:										%INDEXED;	%CLR16;		return;
 		case 0xC4:										set_d();	%NEG16;		return;
+		case 0xC5:										%INDEXED;	%NEG16;		return;
 		case 0xC6:										set_d();	%INC16;		return;
+		case 0xC7:										%INDEXED;	%INC16;		return;
 		case 0xC8:										set_d();	%DEC16;		return;
+		case 0xC9:										%INDEXED;	%DEC16;		return;
 		case 0xCA:										set_d();	%TST16;		return;
+		case 0xCB:										%INDEXED;	%TST16;		return;
 		case 0xCC:										set_a();	%ABS8;		return;
 		case 0xCD:										set_b();	%ABS8;		return;
 		case 0xCE:										set_d();	%ABS16;		return;
@@ -419,6 +425,28 @@ INDEXED:
 	}
 
 	set_ea(m_temp.w);
+	return;
+
+EXG:
+	{
+		// konami's TFR instruction differs enough from 6809 to fork the code
+		UINT8 param = read_opcode_arg();
+		exgtfr_register reg1 = read_exgtfr_register(param >> 0);
+		exgtfr_register reg2 = read_exgtfr_register(param >> 4);
+		write_exgtfr_register(param >> 4, reg2);
+		write_exgtfr_register(param >> 0, reg1);
+	}
+	eat(hd6309_native_mode() ? 3 : 6);
+	return;
+
+TFR:
+	{
+		// konami's TFR instruction differs enough from 6809 to fork the code
+		UINT8 param = read_opcode_arg();
+		exgtfr_register reg = read_exgtfr_register(param >> 0);
+		write_exgtfr_register((param >> 4) & 0x07, reg);
+	}
+	eat(hd6309_native_mode() ? 2 : 4);
 	return;
 
 SETLINE:

@@ -52,8 +52,14 @@ private:
 	// incidentals
 	konami_set_lines_func m_set_lines;
 
-	// index reg
+	// konami-specific addressing modes
 	UINT16 &ireg();
+	UINT8 read_operand();
+	UINT8 read_operand(int ordinal);
+	void write_operand(UINT8 data);
+	void write_operand(int ordinal, UINT8 data);
+	exgtfr_register read_exgtfr_register(UINT8 reg);
+	void write_exgtfr_register(UINT8 reg, exgtfr_register value);
 
 	// instructions
 	void lmul();

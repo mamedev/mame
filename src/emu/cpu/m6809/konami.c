@@ -116,6 +116,59 @@ offs_t konami_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 
 
 //-------------------------------------------------
+//  read_operand
+//-------------------------------------------------
+
+inline ATTR_FORCE_INLINE UINT8 konami_cpu_device::read_operand()
+{
+	return super::read_operand();
+}
+
+
+//-------------------------------------------------
+//  read_operand
+//-------------------------------------------------
+
+inline ATTR_FORCE_INLINE UINT8 konami_cpu_device::read_operand(int ordinal)
+{
+	switch(m_addressing_mode)
+	{
+		case ADDRESSING_MODE_EA:			return read_memory(m_ea.w + ordinal);
+		case ADDRESSING_MODE_IMMEDIATE:		return read_opcode_arg();
+		case ADDRESSING_MODE_REGISTER_D:	return (ordinal & 1) ? m_d.b.l : m_d.b.h;
+		default:							fatalerror("Unexpected");	return 0x00;
+	}
+}
+
+
+//-------------------------------------------------
+//  write_operand
+//-------------------------------------------------
+
+ATTR_FORCE_INLINE void konami_cpu_device::write_operand(UINT8 data)
+{
+	super::write_operand(data);
+}
+
+
+
+//-------------------------------------------------
+//  write_operand
+//-------------------------------------------------
+
+ATTR_FORCE_INLINE void konami_cpu_device::write_operand(int ordinal, UINT8 data)
+{
+	switch(m_addressing_mode)
+	{
+		case ADDRESSING_MODE_IMMEDIATE:		/* do nothing */								break;
+		case ADDRESSING_MODE_EA:			write_memory(m_ea.w + ordinal, data);			break;
+		case ADDRESSING_MODE_REGISTER_D:	*((ordinal & 1) ? &m_d.b.l : &m_d.b.h) = data;	break;
+		default:							fatalerror("Unexpected");						break;
+	}
+}
+
+
+//-------------------------------------------------
 //  ireg
 //-------------------------------------------------
 
@@ -131,6 +184,47 @@ ATTR_FORCE_INLINE UINT16 &konami_cpu_device::ireg()
 		default:
 			fatalerror("Should not get here");
 			return m_x.w;
+	}
+}
+
+
+//-------------------------------------------------
+//  read_exgtfr_register
+//-------------------------------------------------
+
+ATTR_FORCE_INLINE m6809_base_device::exgtfr_register konami_cpu_device::read_exgtfr_register(UINT8 reg)
+{
+	exgtfr_register result;
+	result.word_value = 0x00FF;
+
+	switch(reg & 0x0F)
+	{
+		case  0: result.word_value = m_d.b.h;	break;	// A
+		case  1: result.word_value = m_d.b.l;	break;	// B
+		case  2: result.word_value = m_x.w;		break;	// X
+		case  3: result.word_value = m_y.w;		break;	// Y
+		case  4: result.word_value = m_s.w;		break;	// S
+		case  5: result.word_value = m_u.w;		break;	// U
+	}
+	result.byte_value = (UINT8) result.word_value;
+	return result;
+}
+
+
+//-------------------------------------------------
+//  write_exgtfr_register
+//-------------------------------------------------
+
+ATTR_FORCE_INLINE void konami_cpu_device::write_exgtfr_register(UINT8 reg, m6809_base_device::exgtfr_register value)
+{
+	switch(reg & 0x0F)
+	{
+		case  0: m_d.b.h = value.byte_value;	break;	// A
+		case  1: m_d.b.l = value.byte_value;	break;	// B
+		case  2: m_x.w   = value.word_value;	break;	// X
+		case  3: m_y.w   = value.word_value;	break;	// Y
+		case  4: m_s.w   = value.word_value;	break;	// S
+		case  5: m_u.w   = value.word_value;	break;	// U
 	}
 }
 

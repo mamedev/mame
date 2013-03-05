@@ -202,7 +202,7 @@ protected:
 	UINT8 &regop8()									{ assert(m_reg8 != NULL); return *m_reg8; }
 	PAIR16 &regop16()								{ assert(m_reg16 != NULL); return *m_reg16; }
 	bool is_register_register_op_16_bit()			{ return m_reg16 != NULL; }
-	bool add8_sets_h()								{ return false; }
+	bool add8_sets_h()								{ return true; }
 	bool hd6309_native_mode()						{ return false; }
 
 	// index reg

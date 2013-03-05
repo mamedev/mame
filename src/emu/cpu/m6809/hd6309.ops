@@ -796,6 +796,26 @@ INDEXED:
 	@set_ea(m_temp.w);
 	return;
 
+EXG:
+	{
+		UINT8 param = read_opcode_arg();
+		exgtfr_register reg1 = read_exgtfr_register(param >> 4);
+		exgtfr_register reg2 = read_exgtfr_register(param >> 0);
+		write_exgtfr_register(param >> 4, reg2);
+		write_exgtfr_register(param >> 0, reg1);
+	}
+	eat(hd6309_native_mode() ? 3 : 6);
+	return;
+
+TFR:
+	{
+		UINT8 param = read_opcode_arg();
+		exgtfr_register reg = read_exgtfr_register(param >> 4);
+		write_exgtfr_register(param >> 0, reg);
+	}
+	eat(hd6309_native_mode() ? 2 : 4);
+	return;
+
 ILLEGAL:
 	m_md |= 0x40;		// illegal op flag
 	set_ea(VECTOR_ILLEGAL);
