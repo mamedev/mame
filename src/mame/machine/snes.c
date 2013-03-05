@@ -33,14 +33,7 @@ UINT8  *snes_ram = NULL;        /* 65816 ram */
 
 struct snes_cart_info snes_cart;
 
-#define DMA_REG(a) m_dma_regs[a - 0x4300]	// regs 0x4300-0x437f
-
-// add-on chip emulators
-#include "machine/snesobc1.c"
-#include "machine/snescx4.c"
-#include "machine/snesrtc.c"
-#include "machine/snessdd1.c"
-#include "machine/snes7110.c"
+#define DMA_REG(a) m_dma_regs[a - 0x4300]   // regs 0x4300-0x437f
 
 
 VIDEO_START( snes )

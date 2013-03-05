@@ -2380,15 +2380,6 @@ $(MACHINE)/megacd.o:  $(LAYOUT)/megacd.lh
 
 $(DRIVERS)/galaxian.o:  $(MAMESRC)/drivers/galdrvr.c
 $(DRIVERS)/neogeo.o:    $(MAMESRC)/drivers/neodrvr.c
-$(MACHINE)/snes.o:      $(MAMESRC)/machine/snesobc1.c \
-			$(MAMESRC)/machine/snescx4.c \
-			$(MAMESRC)/machine/cx4ops.c \
-			$(MAMESRC)/machine/cx4oam.c \
-			$(MAMESRC)/machine/cx4fn.c \
-			$(MAMESRC)/machine/cx4data.c \
-			$(MAMESRC)/machine/snesrtc.c \
-			$(MAMESRC)/machine/snessdd1.c \
-			$(MAMESRC)/machine/snes7110.c
 $(MACHINE)/nes_mmc.o:   $(MAMESRC)/machine/nes_ines.c \
 			$(MAMESRC)/machine/nes_pcb.c \
 			$(MAMESRC)/machine/nes_unif.c

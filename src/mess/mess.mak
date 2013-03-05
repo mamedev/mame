@@ -2137,15 +2137,15 @@ $(MESSOBJ)/skeleton.a:          \
 # miscellaneous dependencies
 #-------------------------------------------------
 
-$(MAME_MACHINE)/snes.o: $(MAMESRC)/machine/snesobc1.c \
-				$(MAMESRC)/machine/snescx4.c \
-				$(MAMESRC)/machine/cx4ops.c \
-				$(MAMESRC)/machine/cx4oam.c \
-				$(MAMESRC)/machine/cx4fn.c \
-				$(MAMESRC)/machine/cx4data.c \
-				$(MAMESRC)/machine/snesrtc.c \
-				$(MAMESRC)/machine/snessdd1.c \
-				$(MAMESRC)/machine/snes7110.c \
+$(MESS_MACHINE)/snescart.o: $(MESSSRC)/machine/snesobc1.c \
+				$(MESSSRC)/machine/snescx4.c \
+				$(MESSSRC)/machine/cx4ops.c \
+				$(MESSSRC)/machine/cx4oam.c \
+				$(MESSSRC)/machine/cx4fn.c \
+				$(MESSSRC)/machine/cx4data.c \
+				$(MESSSRC)/machine/snesrtc.c \
+				$(MESSSRC)/machine/snessdd1.c \
+				$(MESSSRC)/machine/snes7110.c \
 
 $(MESS_VIDEO)/gba.o:        $(MESSSRC)/video/gbamode0.c \
 				$(MESSSRC)/video/gbamode1.c \
