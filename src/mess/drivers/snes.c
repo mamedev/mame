@@ -69,6 +69,8 @@ public:
 	DECLARE_WRITE8_MEMBER(snes_input_read);
 	DECLARE_READ8_MEMBER(snes_oldjoy1_read);
 	DECLARE_READ8_MEMBER(snes_oldjoy2_read);
+
+	UINT8 m_sfx_ram[0x200000];	// or 0x100000? 
 };
 
 /*************************************
@@ -194,8 +196,8 @@ READ8_MEMBER( snes_console_state::snes_lo_r )
 	{
 		if (address >= 0x3000 && address < 0x3300)
 			return superfx_mmio_read(m_superfx, address);
-		if (address >= 0x6000 && address < 0x8000)   // here it should be snes_ram[0xe00000+...] but there are mirroring issues
-			return superfx_access_ram(m_superfx) ? snes_ram[0xf00000 + (offset & 0x1fff)] : snes_open_bus_r(space, 0);
+		if (address >= 0x6000 && address < 0x8000)
+			return superfx_access_ram(m_superfx) ? m_sfx_ram[offset & 0x1fff] : snes_open_bus_r(space, 0);
 	}
 	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
 		&& offset >= 0x400000 && offset < 0x600000)
@@ -213,7 +215,7 @@ READ8_MEMBER( snes_console_state::snes_lo_r )
 	}
 	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
 		&& offset >= 0x600000)
-		return superfx_access_ram(m_superfx) ? snes_ram[0x800000 + offset] : snes_open_bus_r(space, 0);
+		return superfx_access_ram(m_superfx) ? m_sfx_ram[offset & 0xfffff] : snes_open_bus_r(space, 0);
 
 	// base cart access
 	if (offset < 0x300000)
@@ -366,12 +368,12 @@ WRITE8_MEMBER( snes_console_state::snes_lo_w )
 	{
 		if (address >= 0x3000 && address < 0x3300)
 		{   superfx_mmio_write(m_superfx, address, data);   return; }
-		if (address >= 0x6000 && address < 0x8000)   // here it should be snes_ram[0xe00000+...] but there are mirroring issues
-		{   snes_ram[0xf00000 + (offset & 0x1fff)] = data;  return; }
+		if (address >= 0x6000 && address < 0x8000)
+		{   m_sfx_ram[offset & 0x1fff] = data;  return; }
 	}
 	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
 		&& offset >= 0x600000)
-	{   snes_ram[0x800000 + offset] = data; return; }
+	{   m_sfx_ram[offset & 0xfffff] = data; return; }
 
 	// base cart access
 	if (offset < 0x300000)
@@ -476,19 +478,17 @@ READ8_MEMBER( snes_console_state::superfx_r_bank2 )
 READ8_MEMBER( snes_console_state::superfx_r_bank3 )
 {
 	/* IMPORTANT: SFX RAM sits in 0x600000-0x7fffff, and it's mirrored in 0xe00000-0xffffff. However, SNES
-	 has only access to 0x600000-0x7dffff (because there is WRAM after that), hence we directly use the mirror
-	 as the place where to write & read SFX RAM. SNES handlers have been setup accordingly. */
+	 has only access to 0x600000-0x7dffff (because there is WRAM after that). */
 	//printf("superfx_r_bank3: %08x = %02x\n", offset, snes_ram[0xe00000 + offset]);
-	return snes_ram[0xe00000 + offset];
+	return m_sfx_ram[offset & 0xfffff];
 }
 
 WRITE8_MEMBER( snes_console_state::superfx_w_bank3 )
 {
 	/* IMPORTANT: SFX RAM sits in 0x600000-0x7fffff, and it's mirrored in 0xe00000-0xffffff. However, SNES
-	 has only access to 0x600000-0x7dffff (because there is WRAM after that), hence we directly use the mirror
-	 as the place where to write & read SFX RAM. SNES handlers have been setup accordingly. */
+	 has only access to 0x600000-0x7dffff (because there is WRAM after that). */
 	//printf("superfx_w_bank3: %08x = %02x\n", offset, data);
-	snes_ram[0xe00000 + offset] = data;
+	m_sfx_ram[offset & 0xfffff] = data;
 }
 
 /*************************************
