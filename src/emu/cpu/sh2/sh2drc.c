@@ -1188,7 +1188,7 @@ static void static_generate_memory_accessor(sh2_state *sh2, int size, int iswrit
 				UML_CMP(block, I0, sh2->fastram[ramnum].start);// cmp     i0,fastram_start
 				UML_JMPc(block, COND_B, skip);                                      // jb      skip
 			}
-		
+
 			if (!iswrite)
 			{
 				if (size == 1)
@@ -1225,7 +1225,7 @@ static void static_generate_memory_accessor(sh2_state *sh2, int size, int iswrit
 				}
 				UML_RET(block);                                                     // ret
 			}
-		
+
 			UML_LABEL(block, skip);                                             // skip:
 		}
 	}
@@ -2027,7 +2027,7 @@ static int generate_group_0(sh2_state *sh2, drcuml_block *block, compiler_state 
 			UML_CMP(block, I0, 0x0);											// cmp i0, #0
 			UML_JMPc(block, COND_NE, skip);										// bne skip
 			UML_MOV(block, mem(&sh2->sleep_mode), 0x1);							// mov sleep_mode, #1
-																			
+
 			UML_LABEL(block, skip);												// skip:
 			generate_update_cycles(sh2, block, compiler, desc->pc, TRUE);		// repeat this insn
 			UML_JMP(block, skip+2);										  		// jmp skip+2

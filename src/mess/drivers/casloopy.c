@@ -153,6 +153,7 @@ public:
 
 	required_shared_ptr<UINT32> m_bios_rom;
 	DECLARE_DRIVER_INIT(casloopy);
+	virtual void machine_start();
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -172,7 +173,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
 	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_SHARE("bios_rom")
 //  AM_RANGE(0x01000000, 0x017fffff) - i/o?
-	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("cart",0) // wrong?
+	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("rom_cart",0) // wrong?
 	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -184,6 +185,24 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( casloopy )
 INPUT_PORTS_END
+
+/* TODO: move this into DEVICE_IMAGE_LOAD_MEMBER */
+void casloopy_state::machine_start()
+{
+	UINT8 *SRC = memregion("cart")->base();
+	UINT8 *DST = memregion("rom_cart")->base();
+
+	// fix endianness
+	for (int i=0;i<0x200000;i+=4)
+	{
+		UINT8 tempa = SRC[i+0];
+		UINT8 tempb = SRC[i+1];
+		DST[i+0] = SRC[i+2];
+		DST[i+1] = SRC[i+3];
+		DST[i+2] = tempa;
+		DST[i+3] = tempb;
+	}
+}
 
 void casloopy_state::machine_reset()
 {
@@ -200,7 +219,6 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 //  MCFG_CPU_ADD("subcpu",V60,8000000)
 //  MCFG_CPU_PROGRAM_MAP(casloopy_sub_map)
 
-
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -210,7 +228,6 @@ static MACHINE_CONFIG_START( casloopy, casloopy_state )
 	MCFG_SCREEN_UPDATE_DRIVER(casloopy_state, screen_update_casloopy)
 
 	MCFG_PALETTE_LENGTH(512)
-
 
 	MCFG_CARTSLOT_ADD("cart")
 	MCFG_CARTSLOT_EXTENSION_LIST("ic1,bin")
@@ -232,13 +249,15 @@ MACHINE_CONFIG_END
 
 ROM_START( casloopy )
 	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "bios1", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "bios1", 0x0000, 0x8000, NO_DUMP ) // SH7021 uses 32 KB
 
 	ROM_REGION( 0x80000, "subcpu", 0) //NEC CDT-109
 	ROM_LOAD( "bios2.lsi352", 0x0000, 0x80000, CRC(8f51fa17) SHA1(99f50be06b083fdb07e08f30b0b26d9037afc869) )
 
 	ROM_REGION( 0x200000, "cart", 0 )
 	ROM_CART_LOAD("cart",    0x00000, 0x200000, ROM_NOMIRROR)
+
+	ROM_REGION( 0x200000, "rom_cart", ROMREGION_ERASE00 )
 ROM_END
 
 DRIVER_INIT_MEMBER(casloopy_state,casloopy)
