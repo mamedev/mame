@@ -29,8 +29,6 @@
  *        $1000-$19ff   - $00, huh!? (it's specifically cleared, memsetting czram at boot does not fix the issue)
  *        $1a00-$0dff   - $77
  *        $1e00-$1fff   - $78
- * - using rgbint to set brightness may cause problems if a color channel is 00 (eg. victlapw attract)
- *       (probably a bug in rgbint, not here?)
  *
  * - lots of smaller issues
  *
@@ -2046,6 +2044,10 @@ static void namcos22_mix_textlayer( running_machine &machine, bitmap_rgb32 &bitm
 
 				if (fade_enabled)
 					rgbint_scale_channel_and_clamp(&rgb, &fade_color);
+
+				// BTANB note: fading to white does not affect color channels set to 00,
+				// eg. a rr-gg-bb of 3f-7f-00 will fade to ff-ff-00 and not ff-ff-ff
+				// seen in victlapw attract mode
 
 				dest[x] = rgbint_to_rgb(&rgb);
 			}
