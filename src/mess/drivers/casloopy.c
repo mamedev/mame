@@ -13,6 +13,15 @@
       the idea is to understand the HW enough to extract the SH-1 internal BIOS
       data via a trojan;
 
+	ASM notes:
+	- first vector is almost certainly VBR value.
+	- [VBR + 0x2c] irq for i/o?
+	- [VBR + 0x140] points to an internal BIOS routine, at 0x6238
+	  (Nigaoe Artist has a direct 0x648c instead)
+	- 0x0604 is probably a BRA -2 / NOP (some games puts that as a null irq vector)
+	- Nigaoe Artist jumps to 0x668 at some point.
+
+
 ===============================================================================
 
 Casio Loopy PCB Layout
@@ -171,10 +180,12 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 }
 
 static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
-	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_SHARE("bios_rom")
-//  AM_RANGE(0x01000000, 0x017fffff) - i/o?
-	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("rom_cart",0) // wrong?
+	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_SHARE("bios_rom")
+	AM_RANGE(0x01000000, 0x0107ffff) AM_RAM // stack pointer points here
+//	AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
+	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("rom_cart",0)
 	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
+	AM_RANGE(0x0e000000, 0x0e1fffff) AM_ROM AM_REGION("rom_cart",0)
 ADDRESS_MAP_END
 
 #if 0
@@ -263,8 +274,11 @@ ROM_END
 DRIVER_INIT_MEMBER(casloopy_state,casloopy)
 {
 	/* load hand made bios data*/
-	m_bios_rom[0/4] = 0x6000964; //SPC
-	m_bios_rom[4/4] = 0xffffff0; //SSP
+	m_bios_rom[0/4] = 0x6000480;//0x600af3c;//0x6000964; //SPC
+	m_bios_rom[4/4] = 0x0000000; //SSP
+
+	for(int i=0x400/4;i<0x8000/4;i++)
+		m_bios_rom[i] = 0x000b0009; // RTS + NOP
 }
 
 GAME( 1995, casloopy,  0,   casloopy,  casloopy, casloopy_state,  casloopy, ROT0, "Casio", "Loopy", GAME_NOT_WORKING | GAME_NO_SOUND )
