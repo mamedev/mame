@@ -8,8 +8,8 @@
 
 #include "imagedev/cartslot.h"
 
-MACHINE_START( snes_mess );
-MACHINE_START( snesst );
+void snes_machine_stop(running_machine &machine);
+void sufami_machine_stop(running_machine &machine);
 
 MACHINE_CONFIG_EXTERN( snes_cartslot );
 MACHINE_CONFIG_EXTERN( snesp_cartslot );

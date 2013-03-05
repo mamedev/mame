@@ -211,19 +211,13 @@ static void snes_save_sram(running_machine &machine)
 	free(battery_ram);
 }
 
-static void snes_machine_stop(running_machine &machine)
+void snes_machine_stop(running_machine &machine)
 {
 	snes_state *state = machine.driver_data<snes_state>();
 
 	/* Save SRAM */
 	if (state->m_cart[0].sram > 0)
 		snes_save_sram(machine);
-}
-
-MACHINE_START( snes_mess )
-{
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(snes_machine_stop),&machine));
-	MACHINE_START_CALL(snes);
 }
 
 
@@ -256,7 +250,7 @@ static void sufami_load_sram(running_machine &machine, const char *cart_tag)
 	free(battery_ram);
 }
 
-static void sufami_machine_stop(running_machine &machine)
+void sufami_machine_stop(running_machine &machine)
 {
 	snes_state *state = machine.driver_data<snes_state>();
 	UINT8 ii;
@@ -286,12 +280,6 @@ static void sufami_machine_stop(running_machine &machine)
 	}
 
 	free(battery_ram);
-}
-
-MACHINE_START( snesst )
-{
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sufami_machine_stop),&machine));
-	MACHINE_START_CALL(snes);
 }
 
 

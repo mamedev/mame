@@ -863,7 +863,7 @@ struct snes_spc7110_t
 
 static snes_spc7110_t snes_spc7110;
 
-static void spc7110_init(running_machine& machine)
+void spc7110_init(running_machine& machine)
 {
 	snes_state *state = machine.driver_data<snes_state>();
 
@@ -925,7 +925,7 @@ static void spc7110_init(running_machine& machine)
 	snes_spc7110.decomp = auto_alloc(machine, SPC7110Decomp(machine, snes_spc7110.size));
 }
 
-static void spc7110rtc_init(running_machine& machine)
+void spc7110rtc_init(running_machine& machine)
 {
 	spc7110_init(machine);
 

@@ -210,7 +210,7 @@ void srtc_write( running_machine &machine, UINT16 addr, UINT8 data )
 	}
 }
 
-static void srtc_init( running_machine &machine )
+void srtc_init( running_machine &machine )
 {
 	rtc_state.mode = RTCM_Read;
 	rtc_state.index = -1;

@@ -1183,70 +1183,6 @@ static void snes_init_ram( running_machine &machine )
 	// set up some known register power-up defaults
 	SNES_CPU_REG_STATE(WRIO) = 0xff;
 
-	// see if there's a uPD7725 DSP in the machine config
-	state->m_upd7725 = machine.device<upd7725_device>("dsp");
-
-	// if we have a DSP, halt it for the moment
-	if (state->m_upd7725)
-	{
-		machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
-
-	// ditto for a uPD96050 (Seta ST-010 or ST-011)
-	state->m_upd96050 = machine.device<upd96050_device>("setadsp");
-	if (state->m_upd96050)
-	{
-		machine.device("setadsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	}
-
-	switch (state->m_has_addon_chip)
-	{
-		case HAS_DSP1:
-		case HAS_DSP2:
-		case HAS_DSP3:
-		case HAS_DSP4:
-			// cartridge uses the DSP, let 'er rip
-			if (state->m_upd7725)
-			{
-				machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-			}
-			else
-			{
-				logerror("SNES: Game uses a DSP, but the machine driver is missing the uPD7725!\n");
-				state->m_has_addon_chip = HAS_NONE; // prevent crash trying to access NULL device
-			}
-			break;
-
-		case HAS_RTC:
-			srtc_init(machine);
-			break;
-
-		case HAS_SDD1:
-			sdd1_reset(machine);
-			break;
-
-		case HAS_OBC1:
-			obc1_init(machine);
-			break;
-
-		case HAS_ST010:
-		case HAS_ST011:
-			// cartridge uses the DSP, let 'er rip
-			if (state->m_upd96050)
-			{
-				machine.device("setadsp")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-			}
-			else
-			{
-				logerror("SNES: Game uses a Seta DSP, but the machine driver is missing the uPD96050!\n");
-				state->m_has_addon_chip = HAS_NONE; // prevent crash trying to access NULL device
-			}
-			break;
-
-		default:
-			break;
-	}
-
 	// init frame counter so first line is 0
 	if (ATTOSECONDS_TO_HZ(machine.primary_screen->frame_period().attoseconds) >= 59)
 		state->m_ppu.m_beam.current_vert = SNES_VTOTAL_NTSC;
@@ -1285,19 +1221,6 @@ MACHINE_START( snes )
 //  SNES_CPU_REG_STATE(WRMPYA) = 0xff;
 //  SNES_CPU_REG_STATE(WRDIVL) = 0xff;
 //  SNES_CPU_REG_STATE(WRDIVH) = 0xff;
-
-	switch (state->m_has_addon_chip)
-	{
-		case HAS_SDD1:
-			sdd1_init(machine);
-			break;
-		case HAS_SPC7110:
-			spc7110_init(machine);
-			break;
-		case HAS_SPC7110_RTC:
-			spc7110rtc_init(machine);
-			break;
-	}
 
 	if (state->m_cart[0].mode == SNES_MODE_BSX)
 		bsx_init(machine);

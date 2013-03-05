@@ -532,7 +532,7 @@ struct snes_sdd1_t
 
 static snes_sdd1_t snes_sdd1;
 
-static void sdd1_init(running_machine& machine)
+void sdd1_init(running_machine& machine)
 {
 	snes_sdd1.sdd1_enable = 0x00;
 	snes_sdd1.xfer_enable = 0x00;
@@ -674,8 +674,4 @@ UINT8 sdd1_read(running_machine& machine, UINT32 addr)
 	} // S-DD1 decompressor enabled
 
 	return ROM[snes_sdd1.mmc[(addr >> 20) & 3] + (addr & 0x0fffff)];
-}
-
-static void sdd1_reset(running_machine &machine)
-{
 }

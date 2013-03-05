@@ -1094,6 +1094,33 @@ static UINT8 snes_oldjoy2_read( running_machine &machine )
  *
  *************************************/
 
+static MACHINE_START( snes_mess )
+{
+	snes_state *state = machine.driver_data<snes_state>();
+
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(snes_machine_stop),&machine));
+	MACHINE_START_CALL(snes);
+	
+	switch (state->m_has_addon_chip)
+	{
+		case HAS_SDD1:
+			sdd1_init(machine);
+			break;
+		case HAS_SPC7110:
+			spc7110_init(machine);
+			break;
+		case HAS_SPC7110_RTC:
+			spc7110rtc_init(machine);
+			break;
+	}
+}
+
+static MACHINE_START( snesst )
+{
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sufami_machine_stop),&machine));
+	MACHINE_START_CALL(snes);
+}
+
 static MACHINE_RESET( snes_mess )
 {
 	snes_state *state = machine.driver_data<snes_state>();
@@ -1103,6 +1130,58 @@ static MACHINE_RESET( snes_mess )
 	state->m_io_read = snes_input_read;
 	state->m_oldjoy1_read = snes_oldjoy1_read;
 	state->m_oldjoy2_read = snes_oldjoy2_read;
+
+	// see if there's a uPD7725 DSP in the machine config
+	state->m_upd7725 = machine.device<upd7725_device>("dsp");
+	
+	// if we have a DSP, halt it for the moment
+	if (state->m_upd7725)
+		machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	
+	// ditto for a uPD96050 (Seta ST-010 or ST-011)
+	state->m_upd96050 = machine.device<upd96050_device>("setadsp");
+	if (state->m_upd96050)
+		machine.device("setadsp")->execute().set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	
+	switch (state->m_has_addon_chip)
+	{
+		case HAS_DSP1:
+		case HAS_DSP2:
+		case HAS_DSP3:
+		case HAS_DSP4:
+			// cartridge uses the DSP, let 'er rip
+			if (state->m_upd7725)
+				machine.device("dsp")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			else
+			{
+				logerror("SNES: Game uses a DSP, but the machine driver is missing the uPD7725!\n");
+				state->m_has_addon_chip = HAS_NONE; // prevent crash trying to access NULL device
+			}
+			break;
+			
+		case HAS_RTC:
+			srtc_init(machine);
+			break;
+			
+		case HAS_OBC1:
+			obc1_init(machine);
+			break;
+			
+		case HAS_ST010:
+		case HAS_ST011:
+			// cartridge uses the DSP, let 'er rip
+			if (state->m_upd96050)
+				machine.device("setadsp")->execute().set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+			else
+			{
+				logerror("SNES: Game uses a Seta DSP, but the machine driver is missing the uPD96050!\n");
+				state->m_has_addon_chip = HAS_NONE; // prevent crash trying to access NULL device
+			}
+			break;
+			
+		default:
+			break;
+	}
 }
 
 static MACHINE_CONFIG_START( snes_base, snes_state )
