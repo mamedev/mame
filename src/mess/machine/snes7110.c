@@ -859,6 +859,7 @@ struct snes_spc7110_t
 	UINT8 rtc_ram[16];  // 0-12 secs, min, hrs, etc.; 13-14-15 control registers
 
 	UINT32 size;
+	UINT8 ram[0x2000];
 };
 
 static snes_spc7110_t snes_spc7110;
@@ -1646,4 +1647,14 @@ UINT8 spc7110_bank7_read(address_space &space, UINT32 offset)
 		break;
 	}
 	return snes_open_bus_r(space, 0);
+}
+
+UINT8 spc7110_ram_read(UINT32 offset)
+{
+	return snes_spc7110.ram[offset & 0x1fff];
+}
+
+void spc7110_ram_write(UINT32 offset, UINT8 data)
+{
+	snes_spc7110.ram[offset & 0x1fff] = data;
 }

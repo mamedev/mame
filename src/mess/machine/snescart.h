@@ -32,7 +32,8 @@ void spc7110_mmio_write(running_machine &machine, UINT32 addr, UINT8 data);
 UINT8 spc7110_bank7_read(address_space &space, UINT32 offset);
 void spc7110_init(running_machine& machine);
 void spc7110rtc_init(running_machine& machine);
-
+UINT8 spc7110_ram_read(UINT32 offset);
+void spc7110_ram_write(UINT32 offset, UINT8 data);
 
 
 #endif /* _SNESCART_H */

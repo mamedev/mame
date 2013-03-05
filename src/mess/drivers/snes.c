@@ -184,9 +184,9 @@ READ8_MEMBER( snes_console_state::snes_lo_r )
 		if (address >= 0x4800 && address <= limit)
 			return spc7110_mmio_read(space, (UINT32)address);
 		if (offset < 0x10000 && address >= 0x6000 && address < 0x8000)
-			return snes_ram[0x306000 + (address & 0x1fff)];
+			return spc7110_ram_read(address & 0x1fff);
 		if (offset >= 0x300000 && offset < 0x310000 && address >= 0x6000 && address < 0x8000)
-			return snes_ram[0x306000 + (address & 0x1fff)];
+			return spc7110_ram_read(address & 0x1fff);
 	}
 	if ((m_has_addon_chip == HAS_SPC7110 || m_has_addon_chip == HAS_SPC7110_RTC)
 		&& offset >= 0x500000 && offset < 0x510000)
@@ -256,9 +256,9 @@ READ8_MEMBER( snes_console_state::snes_hi_r )
 		if (address >= 0x4800 && address <= limit)
 			return spc7110_mmio_read(space, (UINT32)address);
 		if (offset < 0x10000 && address >= 0x6000 && address < 0x8000)
-			return snes_ram[0x306000 + (address & 0x1fff)];
+			return spc7110_ram_read(address & 0x1fff);
 		if (offset >= 0x300000 && offset < 0x310000 && address >= 0x6000 && address < 0x8000)
-			return snes_ram[0x306000 + (address & 0x1fff)];
+			return spc7110_ram_read(address & 0x1fff);
 	}
 	if ((m_has_addon_chip == HAS_SPC7110 || m_has_addon_chip == HAS_SPC7110_RTC)
 		&& offset >= 0x500000)
@@ -359,9 +359,9 @@ WRITE8_MEMBER( snes_console_state::snes_lo_w )
 		if (address >= 0x4800 && address <= limit)
 		{   spc7110_mmio_write(space.machine(), (UINT32)address, data); return; }
 		if (offset < 0x10000 && address >= 0x6000 && address < 0x8000)
-		{   snes_ram[0x306000 + (address & 0x1fff)] = data; return; }
+		{   spc7110_ram_write(address & 0x1fff, data); return; }
 		if (offset >= 0x300000 && offset < 0x310000 && address >= 0x6000 && address < 0x8000)
-		{   snes_ram[0x306000 + (address & 0x1fff)] = data; return; }
+		{   spc7110_ram_write(address & 0x1fff, data); return; }
 	}
 	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL)
 	{   space.write_byte(offset + 0x800000, data); return; }       // [00-7f] same as [80-ff]
@@ -442,9 +442,9 @@ WRITE8_MEMBER( snes_console_state::snes_hi_w )
 		if (address >= 0x4800 && address <= limit)
 		{   spc7110_mmio_write(space.machine(), (UINT32)address, data); return; }
 		if (offset < 0x10000 && address >= 0x6000 && address < 0x8000)
-		{   snes_ram[0x306000 + (address & 0x1fff)] = data; return; }
+		{   spc7110_ram_write(address & 0x1fff, data); return; }
 		if (offset >= 0x300000 && offset < 0x310000 && address >= 0x6000 && address < 0x8000)
-		{   snes_ram[0x306000 + (address & 0x1fff)] = data; return; }
+		{   spc7110_ram_write(address & 0x1fff, data); return; }
 	}
 	if (m_has_addon_chip == HAS_SUPERFX && m_superfx != NULL
 		&& offset < 0x400000)
