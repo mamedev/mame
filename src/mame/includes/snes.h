@@ -682,6 +682,8 @@ public:
 	void hdma_update(address_space &space, int dma);
 	void hirq_tick();
 
+	DECLARE_READ8_MEMBER(snes_io_dma_r);
+	DECLARE_WRITE8_MEMBER(snes_io_dma_w);
 	TIMER_CALLBACK_MEMBER(snes_nmi_tick);
 	TIMER_CALLBACK_MEMBER(snes_hirq_tick_callback);
 	TIMER_CALLBACK_MEMBER(snes_reset_oam_address);
