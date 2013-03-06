@@ -206,8 +206,8 @@ UINT32 hd6309_device::disasm_max_opcode_bytes() const
 
 offs_t hd6309_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	extern offs_t hd6309_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options);
-	return hd6309_disassemble(buffer, pc, oprom, opram, options);
+	extern CPU_DISASSEMBLE( hd6309 );
+	return CPU_DISASSEMBLE_NAME(hd6309)(NULL, buffer, pc, oprom, opram, options);
 }
 
 
