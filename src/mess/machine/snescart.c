@@ -1047,7 +1047,8 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	snes_cart_log_info(machine, ROM, total_blocks, supported_type);
 
 	/* Load SRAM */
-	snes_load_sram(machine);
+	if (m_cart[0].m_nvram_size > 0)
+		snes_load_sram(machine);
 
 	/* All done */
 	return IMAGE_INIT_PASS;
