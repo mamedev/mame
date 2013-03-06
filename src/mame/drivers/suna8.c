@@ -2383,6 +2383,36 @@ ROM_START( srangerb )
 	ROM_LOAD( "13",  0x38000, 0x8000, CRC(9809fee8) SHA1(b7e0664702d0c1f77247d7c76a381b24687a09ea) )
 ROM_END
 
+
+
+ROM_START( srangero )
+	ROM_REGION( 0x48000, "maincpu", 0 )     /* Main Z80 Code */
+	ROM_LOAD( "1.e2", 0x00000, 0x8000, CRC(2287d3fc) SHA1(cc2dab587ca50fc4371d2861ac842cd81370f868) )
+	ROM_LOAD( "2.g2", 0x10000, 0x8000, CRC(ff65af29) SHA1(90f9a0c862e2a9da0343446a325961ab29d26b4b) )
+	ROM_LOAD( "3.h2", 0x18000, 0x8000, CRC(64e09436) SHA1(077f0d38d489562532d5f7678434a85ca04d373c) )
+	ROM_LOAD( "4.i2", 0x30000, 0x8000, CRC(4346fae6) SHA1(a9f000e4427a1e9902627402dce14dc8ee04dbf8) )
+	ROM_CONTINUE(  0x20000, 0x8000             )
+	ROM_LOAD( "5.k2", 0x38000, 0x8000, CRC(6a7ca1c3) SHA1(0f0b508e9b20909e9efa07b42d67732082b6940b) )
+	ROM_CONTINUE(  0x28000, 0x8000             )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound Z80 Code */
+	ROM_LOAD( "14.j13", 0x0000, 0x8000, CRC(11c83aa1) SHA1(d1f75096528b220a3f858eac62e3b4111fa013de) )
+
+	ROM_REGION( 0x8000, "samples", 0 )  /* Samples */
+	ROM_LOAD( "15.e13", 0x0000, 0x8000, CRC(28c2c87e) SHA1(ec0d92140ef44df822f2229e79b915e051caa033) )
+
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT ) /* Sprites */
+	ROM_LOAD( "6.q5",  0x00000, 0x8000, CRC(ffe13cc4) SHA1(811a749fcb4f9a575374af593b79d3927f74d301) )
+	ROM_LOAD( "7.q6",  0x08000, 0x8000, CRC(9f35dbfa) SHA1(8a8f158ad7f0bc6b43eaa95959af3ab58cf14d6d) )
+	ROM_LOAD( "8.q7",  0x10000, 0x8000, CRC(f400db89) SHA1(a07b226af40cac5a20739bb8f4226909724fda86) )
+	ROM_LOAD( "9.q8",  0x18000, 0x8000, CRC(fa2a11ea) SHA1(ea29ade1254caa2a3bd4b4816fe338f238025284) )
+	ROM_LOAD( "10.q9", 0x20000, 0x8000, CRC(13f1faab) SHA1(901df4bd1d42483679edae5e1a0b2b8b3a429d05) )
+	ROM_LOAD( "11.q10", 0x28000, 0x8000, CRC(19037a7b) SHA1(a6843b0220bab5c47307a0c761d5bd638716aef0) )
+	ROM_LOAD( "12.q11", 0x30000, 0x8000, CRC(c59c0ec7) SHA1(80003f3e33610a84f6e194918276d5f60145b00e) )
+	ROM_LOAD( "13.q12", 0x38000, 0x8000, CRC(9809fee8) SHA1(b7e0664702d0c1f77247d7c76a381b24687a09ea) )
+ROM_END
+
+// same program as srangero, 2 different gfx roms
 ROM_START( srangerw )
 	ROM_REGION( 0x48000, "maincpu", 0 )     /* Main Z80 Code */
 	ROM_LOAD( "w1", 0x00000, 0x8000, CRC(2287d3fc) SHA1(cc2dab587ca50fc4371d2861ac842cd81370f868) ) // 88,2,28 RANGER
@@ -2400,11 +2430,11 @@ ROM_START( srangerw )
 	ROM_LOAD( "15", 0x0000, 0x8000, CRC(28c2c87e) SHA1(ec0d92140ef44df822f2229e79b915e051caa033) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT ) /* Sprites */
-	ROM_LOAD( "w6",  0x00000, 0x8000, CRC(312ecda6) SHA1(db11259e10da5f7f2b7b306482a08835597dbde4) )
+	ROM_LOAD( "w6",  0x00000, 0x8000, CRC(312ecda6) SHA1(db11259e10da5f7f2b7b306482a08835597dbde4) ) // WDK license
 	ROM_LOAD( "7",   0x08000, 0x8000, CRC(9f35dbfa) SHA1(8a8f158ad7f0bc6b43eaa95959af3ab58cf14d6d) )
 	ROM_LOAD( "8",   0x10000, 0x8000, CRC(f400db89) SHA1(a07b226af40cac5a20739bb8f4226909724fda86) )
 	ROM_LOAD( "9",   0x18000, 0x8000, CRC(fa2a11ea) SHA1(ea29ade1254caa2a3bd4b4816fe338f238025284) )
-	ROM_LOAD( "w10", 0x20000, 0x8000, CRC(8731abc6) SHA1(05c13b359106b4ead1326f2e53d0585a2f0019ac) )
+	ROM_LOAD( "w10", 0x20000, 0x8000, CRC(8731abc6) SHA1(05c13b359106b4ead1326f2e53d0585a2f0019ac) ) // WDK license
 	ROM_LOAD( "11",  0x28000, 0x8000, CRC(19037a7b) SHA1(a6843b0220bab5c47307a0c761d5bd638716aef0) )
 	ROM_LOAD( "12",  0x30000, 0x8000, CRC(c59c0ec7) SHA1(80003f3e33610a84f6e194918276d5f60145b00e) )
 	ROM_LOAD( "13",  0x38000, 0x8000, CRC(9809fee8) SHA1(b7e0664702d0c1f77247d7c76a381b24687a09ea) )
@@ -2435,9 +2465,10 @@ SRNOVA6_P5   32768  0xaf534075  27c256
 
 ***************************************************************************/
 
+// same program as srangero, 2 different gfx roms
 ROM_START( srangern )
 	ROM_REGION( 0x48000, "maincpu", 0 )     /* Main Z80 Code */
-	ROM_LOAD( "1", 0x00000, 0x8000, CRC(2287d3fc) SHA1(cc2dab587ca50fc4371d2861ac842cd81370f868) )  // 1 @ e2: 88,2,28 RANGER (same as w1 in srangerw)
+	ROM_LOAD( "1", 0x00000, 0x8000, CRC(2287d3fc) SHA1(cc2dab587ca50fc4371d2861ac842cd81370f868) )  // 1 @ e2: 88,2,28 RANGER
 	ROM_LOAD( "2", 0x10000, 0x8000, CRC(ff65af29) SHA1(90f9a0c862e2a9da0343446a325961ab29d26b4b) )
 	ROM_LOAD( "3", 0x18000, 0x8000, CRC(64e09436) SHA1(077f0d38d489562532d5f7678434a85ca04d373c) )
 	ROM_LOAD( "4", 0x30000, 0x8000, CRC(4346fae6) SHA1(a9f000e4427a1e9902627402dce14dc8ee04dbf8) )
@@ -2452,15 +2483,18 @@ ROM_START( srangern )
 	ROM_LOAD( "15", 0x0000, 0x8000, CRC(28c2c87e) SHA1(ec0d92140ef44df822f2229e79b915e051caa033) )
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_INVERT ) /* Sprites */
-	ROM_LOAD( "6",  0x00000, 0x8000, CRC(af534075) SHA1(ce6e927702666d2588d6cdb3991463065a4e8084) ) // 6 @ p5
+	ROM_LOAD( "6",  0x00000, 0x8000, CRC(af534075) SHA1(ce6e927702666d2588d6cdb3991463065a4e8084) ) // 6 @ p5 (NOVA license)
 	ROM_LOAD( "7",  0x08000, 0x8000, CRC(9f35dbfa) SHA1(8a8f158ad7f0bc6b43eaa95959af3ab58cf14d6d) )
 	ROM_LOAD( "8",  0x10000, 0x8000, CRC(f400db89) SHA1(a07b226af40cac5a20739bb8f4226909724fda86) )
 	ROM_LOAD( "9",  0x18000, 0x8000, CRC(fa2a11ea) SHA1(ea29ade1254caa2a3bd4b4816fe338f238025284) )
-	ROM_LOAD( "10", 0x20000, 0x8000, CRC(a4916537) SHA1(9defc8b22ba5119d8c3efb3eb1e28e835adffec2) ) // 10 @ p9
+	ROM_LOAD( "10", 0x20000, 0x8000, CRC(a4916537) SHA1(9defc8b22ba5119d8c3efb3eb1e28e835adffec2) ) // 10 @ p9 (NOVA license)
 	ROM_LOAD( "11", 0x28000, 0x8000, CRC(19037a7b) SHA1(a6843b0220bab5c47307a0c761d5bd638716aef0) )
 	ROM_LOAD( "12", 0x30000, 0x8000, CRC(c59c0ec7) SHA1(80003f3e33610a84f6e194918276d5f60145b00e) )
 	ROM_LOAD( "13", 0x38000, 0x8000, CRC(9809fee8) SHA1(b7e0664702d0c1f77247d7c76a381b24687a09ea) )
 ROM_END
+
+
+
 
 /***************************************************************************
 
@@ -2775,17 +2809,23 @@ DRIVER_INIT_MEMBER(suna8_state,suna8)
 	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-GAME( 1988, sranger,   0,        rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA",               "Super Ranger (v2.0)",         0 )
-GAME( 1988, rranger,   sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0, unprotected, bootleg?)", 0) // protection is patched out in this.
-GAME( 1988, srangerb,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "bootleg",            "Super Ranger (bootleg)",      0 )
-GAME( 1988, srangern,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (NOVA license)","Super Ranger (NOVA)",         0 )
-GAME( 1988, srangerw,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (WDK license)", "Super Ranger (WDK)",          0 )
-GAME( 1988, hardhead,  0,        hardhead, hardhead, suna8_state, hardhead,  ROT0,  "SunA",               "Hard Head",                   0 )
-GAME( 1988, hardheadb, hardhead, hardhead, hardhead, suna8_state, hardhedb,  ROT0,  "bootleg",            "Hard Head (bootleg)",         0 )
-GAME( 1988, pop_hh,    hardhead, hardhead, hardhead, suna8_state, hardhedb,  ROT0,  "bootleg",            "Popper (Hard Head bootleg)",  0 )
-GAME( 1989, sparkman,  0,        sparkman, sparkman, suna8_state, sparkman,  ROT0,  "SunA",               "Spark Man (v2.0, set 1)",     0 )
-GAME( 1989, sparkmana, sparkman, sparkman, sparkman, suna8_state, sparkman,  ROT0,  "SunA",               "Spark Man (v2.0, set 2)",     0 )
-GAME( 1990, starfigh,  0,        starfigh, starfigh, suna8_state, starfigh,  ROT90, "SunA",               "Star Fighter (v1)",           0 )
-GAME( 1991, hardhea2,  0,        hardhea2, hardhea2, suna8_state, hardhea2,  ROT0,  "SunA",               "Hard Head 2 (v2.0)",          0 )
-GAME( 1992, brickzn,   0,        brickzn,  brickzn,  suna8_state, brickzn,   ROT90, "SunA",               "Brick Zone (v5.0, Joystick)", 0 )
-GAME( 1992, brickznv4, brickzn,  brickzn,  brickzn,  suna8_state, brickznv4, ROT90, "SunA",               "Brick Zone (v4.0, Spinner)",  0 )
+GAME( 1988, sranger,   0,        rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA",                       "Super Ranger (v2.0)",                        0 )
+GAME( 1988, rranger,   sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (Sharp Image license)", "Rough Ranger (v2.0, unprotected, bootleg?)", 0 ) // protection is patched out in this.
+GAME( 1988, srangero,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA",                       "Super Ranger (older)",                       0 )
+GAME( 1988, srangern,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (NOVA license)",        "Super Ranger (older, NOVA license)",         0 )
+GAME( 1988, srangerw,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "SunA (WDK license)",         "Super Ranger (older, WDK license)",          0 )
+GAME( 1988, srangerb,  sranger,  rranger,  rranger,  suna8_state, suna8,     ROT0,  "bootleg (NYWA)",             "Super Ranger (older, bootleg)",              0 )
+
+GAME( 1988, hardhead,  0,        hardhead, hardhead, suna8_state, hardhead,  ROT0,  "SunA",                       "Hard Head",                   0 )
+GAME( 1988, hardheadb, hardhead, hardhead, hardhead, suna8_state, hardhedb,  ROT0,  "bootleg",                    "Hard Head (bootleg)",         0 )
+GAME( 1988, pop_hh,    hardhead, hardhead, hardhead, suna8_state, hardhedb,  ROT0,  "bootleg",                    "Popper (Hard Head bootleg)",  0 )
+
+GAME( 1989, sparkman,  0,        sparkman, sparkman, suna8_state, sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 1)",     0 )
+GAME( 1989, sparkmana, sparkman, sparkman, sparkman, suna8_state, sparkman,  ROT0,  "SunA",                       "Spark Man (v2.0, set 2)",     0 )
+
+GAME( 1990, starfigh,  0,        starfigh, starfigh, suna8_state, starfigh,  ROT90, "SunA",                       "Star Fighter (v1)",           0 )
+
+GAME( 1991, hardhea2,  0,        hardhea2, hardhea2, suna8_state, hardhea2,  ROT0,  "SunA",                       "Hard Head 2 (v2.0)",          0 )
+
+GAME( 1992, brickzn,   0,        brickzn,  brickzn,  suna8_state, brickzn,   ROT90, "SunA",                       "Brick Zone (v5.0, Joystick)", 0 )
+GAME( 1992, brickznv4, brickzn,  brickzn,  brickzn,  suna8_state, brickznv4, ROT90, "SunA",                       "Brick Zone (v4.0, Spinner)",  0 )
