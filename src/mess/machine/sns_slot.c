@@ -1051,7 +1051,7 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 
 	/* ROM ID */
 	for(int i = 0; i < 4; i++ )
-		rom_id[i] = ROM[hilo_mode - 0x0d + i];
+		rom_id[i] = ROM[hilo_mode - 0x0e + i];
 
 	/* Title */
 	for(int i = 0; i < 21; i++ )
