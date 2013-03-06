@@ -119,6 +119,8 @@ nmc9306_device::nmc9306_device(const machine_config &mconfig, const char *tag, d
 
 void nmc9306_device::device_start()
 {
+	memset(m_register, 0, sizeof(m_register));
+
 	// state saving
 	save_item(NAME(m_bits));
 	save_item(NAME(m_state));
