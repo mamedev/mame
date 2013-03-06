@@ -1460,7 +1460,8 @@ if ((daddr & (BITS_PER_PIXEL - 1)) != 0) mame_printf_debug("PIXBLT_R%d with odd 
 		for (y = 0; y < dy; y++)
 		{
 			int left_partials, right_partials, full_words, bitshift, bitshift_alt;
-			UINT16 srcword, srcmask, dstword, dstmask, pixel;
+			UINT16 srcword, dstword, pixel;
+			UINT32 srcmask, dstmask;
 			UINT32 swordaddr, dwordaddr;
 
 			/* determine the bit shift to get from source to dest */
@@ -1719,7 +1720,8 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 		/* loop over rows */
 		for (y = 0; y < dy; y++)
 		{
-			UINT16 srcword, srcmask, dstword, dstmask, pixel;
+			UINT16 srcword, dstword, pixel;
+			UINT32 srcmask, dstmask;
 			UINT32 swordaddr, dwordaddr;
 
 			/* use byte addresses each row */
