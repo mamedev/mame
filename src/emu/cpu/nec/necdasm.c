@@ -1605,7 +1605,7 @@ int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config
 	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;
 }
 
-CPU_DISASSEMBLE( nec_generic )
+CPU_DISASSEMBLE( nec )
 {
 	return necv_dasm_one(buffer, pc, oprom, NULL);
 }

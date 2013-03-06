@@ -1292,9 +1292,8 @@ void v30mz_cpu_device::execute_set_input( int inptnum, int state )
 
 offs_t v30mz_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config *config);
-
-	return necv_dasm_one(buffer, pc, oprom, NULL);
+	extern CPU_DISASSEMBLE( nec );
+	return CPU_DISASSEMBLE_NAME(nec)(this, buffer, pc, oprom, opram, options);
 }
 
 
