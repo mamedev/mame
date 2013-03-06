@@ -236,6 +236,7 @@ ToDo:
 #undef DEBUG_DUART_OUTPUT_LINES
 #undef DEBUG_DUART_INPUT_LINES
 #undef DEBUG_DUART_TXD
+// TODO: the duart irq handler doesn't work becuase there is no easy way to strobe the duart to force it to check its inputs yet
 #undef DEBUG_DUART_IRQ_HANDLER
 
 #undef DEBUG_TEST_W
@@ -804,12 +805,6 @@ static INPUT_PORTS_START( swyft )
 INPUT_PORTS_END
 
 
-TIMER_CALLBACK_MEMBER(cat_state::keyboard_callback)
-{
-	machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, ASSERT_LINE);
-}
-
-
 TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 {
 	// This is effectively also the KTOBF line 'clock' output to the d-latch before the duart
@@ -817,6 +812,7 @@ TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 	// is there some way to 'strobe' the duart to tell it that its input ports just changed?
 	m_duart_inp ^= 0x04;
 	m_6ms_counter++;
+	machine().device("maincpu")->execute().set_input_line(M68K_IRQ_1, ASSERT_LINE); // hack until duart ints work; as of march 2013 they do not work correctly here (they fire at the wrong rate)
 }
 
 IRQ_CALLBACK_MEMBER(cat_state::cat_int_ack)
@@ -831,7 +827,6 @@ MACHINE_START_MEMBER(cat_state,cat)
 	m_6ms_counter = 0;
 	m_video_enable = 1;
 	m_video_invert = 0;
-	m_keyboard_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cat_state::keyboard_callback),this));
 	m_6ms_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(cat_state::counter_6ms_callback),this));
 	machine().device<nvram_device>("nvram")->set_base(m_svram, 0x4000);
 }
@@ -842,7 +837,6 @@ MACHINE_RESET_MEMBER(cat_state,cat)
 	m_duart_inp = 0;
 	m_6ms_counter = 0;
 	m_floppy_control = 0;
-	m_keyboard_timer->adjust(attotime::zero, 0, attotime::from_hz(120));
 	m_6ms_timer->adjust(attotime::zero, 0, attotime::from_hz((XTAL_19_968MHz/2)/65536));
 }
 
@@ -925,8 +919,9 @@ UINT32 cat_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bitma
 static void duart_irq_handler(device_t *device, int state, UINT8 vector)
 {
 #ifdef DEBUG_DUART_IRQ_HANDLER
-	fprintf(stderr, "Duart IRQ handler called; vector: %06X\n", vector);
+	fprintf(stderr, "Duart IRQ handler called: state: %02X, vector: %06X\n", state, vector);
 #endif
+	//device->machine().device("maincpu")->execute().set_input_line_and_vector(M68K_IRQ_1, state, vector);
 }
 
 static void duart_tx(device_t *device, int channel, UINT8 data)
