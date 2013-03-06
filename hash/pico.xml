@@ -101,7 +101,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * クレヨンしんちゃんのオラといっしょにあそぼうよ! - Crayon Shin-chan no Ora to Issho ni Asobou yo! (Bandai - ???? - T-133020)
 * 美少女戦士セーラームーンS - Bishoujo Senshi Sailor Moon S (Bandai - ???? - T-133040)
 * 楽しく遊んで能力アップ!!たのしい幼稚園 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien (Bandai - 1994xxxx - T-133050)
-* きかんしゃトーマスにのって - Kikansha Thomas ni Notte (Bandai - 1994xxxx - T-133060)
 * クレヨンしんちゃんの おえかきノート - Crayon Shin-chan Oekaki Note (Bandai - ???? - T-133080)
 * NHKおかあさんといっしょドレミファど～なっつ! あそびいっぱい うたいっぱい! - NHK Okaasan to Issho Doremifa Donuts! Asobi Ippai Utaippai! (Bandai - ???? - T-133090)
 * 楽しく遊んで能力アップ!! たのしい幼稚園 '95年度版 - Tanoshi ku Asonde Nouryoku Appu!! Tanoshii Youchien '95-nendo Han (Bandai - 19950725 - T-133100)
@@ -135,7 +134,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * 学研はじめての もじ･ことば - Gakken Hajimete no Moji-Kotoba (Gakken - ???? - T-169080)
 * 学研ピコで学習 1年生 - Gakken Pico de Gakushuu 1-nensei (Gakken - 20020112 - T-169100)
 * 平成天才バカボン みんなでファミリーレストランにいくのだ! - Heisei Tensai Bakabon Minna de Family Resturant ni Ikunoda! (GE - ???? - T-170010)
-* 児童英検対応ソフト ムーミンとえいご たんじょうびのおくりもの - Jidou Eiken Taiou Soft Muumin to Eigo Tanjoubi no Okurimono (Obunsha - 19950624 - T-181010)
 * はたらくくるま ダイヤペットだいしゅうごう - Hataraku Kuruma Daiya Pet Daishuugou (Yonezawa - 19950925 - T-193010)
 * でんしゃ だいしゅうごう! - Densha Daishuugou! (Yonezawa - ???? - T-193020)
 * シルバニアファミリー もりのなかまとたのしいおたんじょうびかい - Silvanian Family - Mori no Nakama to Tanoshii Otanjoubikai (Epoch - 2001xxxx - T-198010)
@@ -1174,6 +1172,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		</part>
 	</software>
 
+	<software name="moomin">
+		<description>Jidou Eiken Taiou Soft Moomin to Eigo Tanjoubi no Okurimono (Jpn)</description>
+		<year>1995</year>
+		<publisher>Obunsha</publisher>
+		<info name="serial" value="T-181010"/>
+		<info name="release" value="19950624"/>
+		<info name="alt_title" value="児童英検対応ソフト ムーミンとえいご たんじょうびのおくりもの"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18011 J10" />
+			<dataarea name="rom" size="1048576">
+				<rom name="mpr-18011 j10.ic1" size="1048576" crc="5ced9954" sha1="0c7fdafefac1cf2b536faaac8a551529ab171b29" offset="0" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kamenrid">
 		<description>Kamen Rider Agito &amp; Kuuga - Wild Battle (Jpn)</description>
 		<year>2001</year>
@@ -1246,6 +1260,22 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 			<feature name="ic1" value="MPR-18013 J11" />
 			<dataarea name="rom" size="1048576">
 				<rom name="mpr-18013 j11.ic1" size="1048576" crc="37dae2f5" sha1="874e8d0466e0585fa7db3b70df871875ddf29cb2" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This same file had also been released as Prototype, but it just means it was a final build... -->
+	<software name="thomas">
+		<description>Kikansha Thomas ni Notte (Jpn)</description>
+		<year>1994</year>
+		<publisher>Bandai</publisher>
+		<info name="serial" value="T-133060"/>
+		<info name="alt_title" value="きかんしゃトーマスにのって"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17817-H" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-17817-h.ic1" size="524288" crc="32f926ac" sha1="cf7cce404c013c57bfb0e80c5da3213af64dd505" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -3129,17 +3159,6 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="667784">
 				<rom name="huckle and lowly's busiest day ever rev 19940502 (1994)(realtime associates - sega)(beta).bin" size="667784" crc="265ad2d0" sha1="de457d6e1c6037a2c165c0f65037aadd9c73042c" offset="000000" loadflag="load16_word_swap" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="kikansha">
-		<description>Kikansha Thomas ni Notte (Jpn, Prototype)</description>
-		<year>1995</year>
-		<publisher>Bandai</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="kikansha thomas ni notte (1995)(bandai)(jp)(beta).bin" size="524288" crc="32f926ac" sha1="cf7cce404c013c57bfb0e80c5da3213af64dd505" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
