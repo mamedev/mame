@@ -1313,6 +1313,7 @@ void mc6845_device::device_reset()
 	m_horiz_disp = 0;
 	m_cursor_x = 0;
 	m_mode_control = 0;
+	m_register_address_latch = 0;
 }
 
 
