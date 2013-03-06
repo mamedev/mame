@@ -149,6 +149,7 @@ void acia6850_device::device_reset()
 
 	TXD(1);
 	m_overrun = 0;
+	m_reset = 0;
 	m_status_read = 0;
 	m_brk = 0;
 
