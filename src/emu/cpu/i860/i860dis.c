@@ -646,16 +646,20 @@ static void i860_dasm_tab_replacer(char* buf, int tab_size)
 }
 
 
-/* Entry point for disassembler.  */
-unsigned disasm_i860(char *buf, unsigned pc, UINT32 insn)
+CPU_DISASSEMBLE( i860 )
 {
+	UINT32 insn = (oprom[0] << 0) |
+		(oprom[1] << 8)  |
+		(oprom[2] << 16) |
+		(oprom[3] << 24);
+
 	int unrecognized_op = 1;
 	int upper_6bits = (insn >> 26) & 0x3f;
 	char flags = decode_tbl[upper_6bits].flags;
 	if (flags & DEC_DECODED)
 	{
 		const char *s = decode_tbl[upper_6bits].mnemonic;
-		decode_tbl[upper_6bits].insn_dis (buf, (char *)s, pc, insn);
+		decode_tbl[upper_6bits].insn_dis (buffer, (char *)s, pc, insn);
 		unrecognized_op = 0;
 	}
 	else if (flags & DEC_MORE)
@@ -667,7 +671,7 @@ unsigned disasm_i860(char *buf, unsigned pc, UINT32 insn)
 			const char *s = fp_decode_tbl[insn & 0x7f].mnemonic;
 			if (fp_flags & DEC_DECODED)
 			{
-				fp_decode_tbl[insn & 0x7f].insn_dis (buf, (char *)s, pc, insn);
+				fp_decode_tbl[insn & 0x7f].insn_dis (buffer, (char *)s, pc, insn);
 				unrecognized_op = 0;
 			}
 		}
@@ -678,17 +682,17 @@ unsigned disasm_i860(char *buf, unsigned pc, UINT32 insn)
 			const char *s = core_esc_decode_tbl[insn & 0x3].mnemonic;
 			if (esc_flags & DEC_DECODED)
 			{
-				core_esc_decode_tbl[insn & 0x3].insn_dis (buf, (char *)s, pc, insn);
+				core_esc_decode_tbl[insn & 0x3].insn_dis (buffer, (char *)s, pc, insn);
 				unrecognized_op = 0;
 			}
 		}
 	}
 
 	if (unrecognized_op)
-		sprintf (buf, ".long\t%#08x", insn);
+		sprintf (buffer, ".long\t%#08x", insn);
 
 	/* Replace tabs with spaces */
-	i860_dasm_tab_replacer(buf, 10);
+	i860_dasm_tab_replacer(buffer, 10);
 
 	/* Return number of bytes disassembled.  */
 	/* MAME dasm flags haven't been added yet */

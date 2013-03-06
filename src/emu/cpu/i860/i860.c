@@ -49,21 +49,7 @@ static CPU_RESET( i860 )
 }
 
 
-/***************************************************************************
- *  Disassembler hook
- ***************************************************************************/
-
-static CPU_DISASSEMBLE( i860 )
-{
-	extern unsigned disasm_i860(char*, unsigned, UINT32);
-
-	/* Hard-coded little endian for now.  */
-	return disasm_i860(buffer, pc, (oprom[0] << 0)  |
-									(oprom[1] << 8)  |
-									(oprom[2] << 16) |
-									(oprom[3] << 24));
-}
-
+extern CPU_DISASSEMBLE( i860 );
 
 /**************************************************************************
  * The actual decode and execute code.
