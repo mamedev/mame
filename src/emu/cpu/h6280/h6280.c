@@ -360,7 +360,7 @@ UINT32 h6280_device::disasm_max_opcode_bytes() const
 offs_t h6280_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	extern CPU_DISASSEMBLE( h6280 );
-	return cpu_disassemble_h6280(NULL, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(h6280)(this, buffer, pc, oprom, opram, options);
 }
 
 
