@@ -639,6 +639,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/decocass.o $(MACHINE)/decocass.o $(MACHINE)/decocass_tape.o $(VIDEO)/decocass.o \
 	$(DRIVERS)/deshoros.o \
 	$(DRIVERS)/dietgo.o $(VIDEO)/dietgo.o \
+	$(DRIVERS)/dreambal.o \
 	$(DRIVERS)/exprraid.o $(VIDEO)/exprraid.o \
 	$(DRIVERS)/firetrap.o $(VIDEO)/firetrap.o \
 	$(DRIVERS)/funkyjet.o $(VIDEO)/funkyjet.o \

@@ -2828,6 +2828,7 @@ src/mame/drivers/dooyong.c svneol=native#text/plain
 src/mame/drivers/dorachan.c svneol=native#text/plain
 src/mame/drivers/dotrikun.c svneol=native#text/plain
 src/mame/drivers/dragrace.c svneol=native#text/plain
+src/mame/drivers/dreambal.c svneol=native#text/plain
 src/mame/drivers/dreamwld.c svneol=native#text/plain
 src/mame/drivers/drgnmst.c svneol=native#text/plain
 src/mame/drivers/dribling.c svneol=native#text/plain
