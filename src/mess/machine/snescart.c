@@ -750,29 +750,28 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 {
 	int supported_type = 1;
 	running_machine &machine = image.device().machine();
-	snes_state *state = machine.driver_data<snes_state>();
 	address_space &space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 	int total_blocks, read_blocks, has_bsx_slot = 0, st_bios = 0;
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = state->memregion("cart")->base();
+	UINT8 *ROM = memregion("cart")->base();
 
 	if (image.software_entry() == NULL)
-		state->m_cart_size = image.length();
+		m_cart_size = image.length();
 	else
-		state->m_cart_size = image.get_software_region_length("rom");
+		m_cart_size = image.get_software_region_length("rom");
 
 	/* Check for a header (512 bytes), and skip it if found */
-	offset = snes_skip_header(image, state->m_cart_size);
+	offset = snes_skip_header(image, m_cart_size);
 
 	if (image.software_entry() == NULL)
 	{
 		image.fseek(offset, SEEK_SET);
-		image.fread( ROM, state->m_cart_size - offset);
+		image.fread(ROM, m_cart_size - offset);
 	}
 	else
-		memcpy(ROM, image.get_software_region("rom") + offset, state->m_cart_size - offset);
+		memcpy(ROM, image.get_software_region("rom") + offset, m_cart_size - offset);
 
-	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", state->m_cart_size - offset);
+	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", m_cart_size - offset);
 
 	/* First, look if the cart is HiROM or LoROM (and set snes_cart accordingly) */
 	int_header_offs = snes_find_hilo_mode(image, ROM, offset, 0);
@@ -788,7 +787,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 			if (ROM[int_header_offs + 0x1a] == 0x33 || ROM[int_header_offs + 0x1a] == 0xff)
 			{
 				// BS-X Flash Cart
-				state->m_cart[0].mode = SNES_MODE_BSX;
+				m_cart[0].mode = SNES_MODE_BSX;
 			}
 		}
 	}
@@ -813,12 +812,12 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 		if (!memcmp(ROM + int_header_offs, "Satellaview BS-X     ", 21))
 		{
 			//BS-X Base Cart
-			state->m_cart[0].mode = SNES_MODE_BSX;
+			m_cart[0].mode = SNES_MODE_BSX;
 			// handle RAM
 		}
 		else
 		{
-			state->m_cart[0].mode = (int_header_offs ==0x007fc0) ? SNES_MODE_BSLO : SNES_MODE_BSHI;
+			m_cart[0].mode = (int_header_offs ==0x007fc0) ? SNES_MODE_BSLO : SNES_MODE_BSHI;
 			// handle RAM?
 		}
 	}
@@ -826,17 +825,17 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	/* Then, detect Sufami Turbo carts */
 	if (!memcmp(ROM, "BANDAI SFC-ADX", 14))
 	{
-		state->m_cart[0].mode = SNES_MODE_ST;
+		m_cart[0].mode = SNES_MODE_ST;
 		if (!memcmp(ROM + 16, "SFC-ADX BACKUP", 14))
 			st_bios = 1;
 	}
 
-	if (SNES_CART_DEBUG) mame_printf_error("mode %d\n", state->m_cart[0].mode);
+	if (SNES_CART_DEBUG) mame_printf_error("mode %d\n", m_cart[0].mode);
 
 	/* FIXME: Insert crc check here? */
 
 	/* How many blocks of data are available to be loaded? */
-	total_blocks = ((state->m_cart_size - offset) / (state->m_cart[0].mode & 0xa5 ? 0x8000 : 0x10000));
+	total_blocks = ((m_cart_size - offset) / (m_cart[0].mode & 0xa5 ? 0x8000 : 0x10000));
 	read_blocks = 0;
 
 	if (SNES_CART_DEBUG) mame_printf_error("blocks %d\n", total_blocks);
@@ -852,7 +851,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	 * This is likely what happens in the real SNES as well, because the unit cannot be aware of the exact
 	 * size of data in the cart (procedure confirmed by byuu)
 	 */
-	switch (state->m_cart[0].mode)
+	switch (m_cart[0].mode)
 	{
 		case SNES_MODE_21:
 		/* HiROM carts load data in banks 0xc0 to 0xff. Each bank is fully mirrored in banks 0x40 to 0x7f
@@ -1018,7 +1017,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 			/* not handled yet */
 			mame_printf_error("This is a BS-X Satellaview image: MESS does not support these yet, sorry.\n");
 			/* so treat it like MODE_20 */
-			state->m_cart[0].mode = SNES_MODE_20;
+			m_cart[0].mode = SNES_MODE_20;
 			/* and load it as such... */
 
 		default:
@@ -1081,39 +1080,39 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	/* Find the amount of cart ram (even if we call it sram...) */
 	if (image.software_entry() == NULL)
 	{
-		if ((state->m_has_addon_chip != HAS_SUPERFX))
-			state->m_cart[0].sram = snes_r_bank1(space, 0x00ffd8);
+		if ((m_has_addon_chip != HAS_SUPERFX))
+			m_cart[0].sram = snes_r_bank1(space, 0x00ffd8);
 		else
-			state->m_cart[0].sram = (snes_r_bank1(space, 0x00ffbd) & 0x07);
+			m_cart[0].sram = (snes_r_bank1(space, 0x00ffbd) & 0x07);
 
-		if (state->m_cart[0].sram > 0)
+		if (m_cart[0].sram > 0)
 		{
-			state->m_cart[0].sram = (1024 << state->m_cart[0].sram);
-			if (state->m_cart[0].sram > state->m_cart[0].sram_max)
-				state->m_cart[0].sram = state->m_cart[0].sram_max;
+			m_cart[0].sram = (1024 << m_cart[0].sram);
+			if (m_cart[0].sram > m_cart[0].sram_max)
+				m_cart[0].sram = m_cart[0].sram_max;
 		}
-//      printf("size %x\n", state->m_cart[0].sram);
+//      printf("size %x\n", m_cart[0].sram);
 	}
 	else
 	{
 		// if we are loading from softlist, take memory length from the xml
-		state->m_cart[0].sram = image.get_software_region("nvram") ? image.get_software_region_length("nvram") : 0;
+		m_cart[0].sram = image.get_software_region("nvram") ? image.get_software_region_length("nvram") : 0;
 
-		if (state->m_cart[0].sram > 0)
+		if (m_cart[0].sram > 0)
 		{
-			if (state->m_cart[0].sram > state->m_cart[0].sram_max)
-				fatalerror("Found more memory than max allowed (found: %x, max: %x), check xml file!\n", state->m_cart[0].sram, state->m_cart[0].sram_max);
+			if (m_cart[0].sram > m_cart[0].sram_max)
+				fatalerror("Found more memory than max allowed (found: %x, max: %x), check xml file!\n", m_cart[0].sram, m_cart[0].sram_max);
 		}
 		// TODO: Eventually sram handlers should point to the allocated cart:sram region!
 		// For now, we only use the region as a placeholder to carry size info...
-//      printf("size %x\n", state->m_cart[0].sram);
+//      printf("size %x\n", m_cart[0].sram);
 	}
 
 	/* adjust size for very large carts */
-	if (state->m_cart[0].mode == SNES_MODE_20 && ((state->m_cart_size - offset) > 0x200000 || state->m_cart[0].sram > (32 * 1024)))
-		state->m_cart[0].small_sram = 1;
+	if (m_cart[0].mode == SNES_MODE_20 && ((m_cart_size - offset) > 0x200000 || m_cart[0].sram > (32 * 1024)))
+		m_cart[0].small_sram = 1;
 	else
-		state->m_cart[0].small_sram = 0;
+		m_cart[0].small_sram = 0;
 
 	/* Log snes_cart information */
 	snes_cart_log_info(machine, total_blocks, supported_type);
@@ -1128,13 +1127,12 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 {
 	running_machine &machine = image.device().machine();
-	snes_state *state = machine.driver_data<snes_state>();
 	int total_blocks, read_blocks;
 	int st_bios = 0, slot_id = 0;
 	UINT32 offset, st_data_offset = 0;
 	UINT8 *ROM = image.device().machine().root_device().memregion(image.device().tag())->base();
 
-	snes_ram = state->memregion("maincpu")->base();
+	snes_ram = memregion("maincpu")->base();
 
 	if (strcmp(image.device().tag(), ":slot_a") == 0)
 	{
@@ -1149,27 +1147,27 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 	}
 
 	if (image.software_entry() == NULL)
-		state->m_cart_size = image.length();
+		m_cart_size = image.length();
 	else
-		state->m_cart_size = image.get_software_region_length("rom");
+		m_cart_size = image.get_software_region_length("rom");
 
 	/* Check for a header (512 bytes), and skip it if found */
-	offset = snes_skip_header(image, state->m_cart_size);
+	offset = snes_skip_header(image, m_cart_size);
 
 	if (image.software_entry() == NULL)
 	{
 		image.fseek(offset, SEEK_SET);
-		image.fread( ROM, state->m_cart_size - offset);
+		image.fread(ROM, m_cart_size - offset);
 	}
 	else
-		memcpy(ROM, image.get_software_region("rom") + offset, state->m_cart_size - offset);
+		memcpy(ROM, image.get_software_region("rom") + offset, m_cart_size - offset);
 
-	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", state->m_cart_size - offset);
+	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", m_cart_size - offset);
 
 	/* Detect Sufami Turbo carts */
 	if (!memcmp(ROM, "BANDAI SFC-ADX", 14))
 	{
-		state->m_cart[slot_id].mode = SNES_MODE_ST;
+		m_cart[slot_id].mode = SNES_MODE_ST;
 		if (!memcmp(ROM + 16, "SFC-ADX BACKUP", 14))
 			st_bios = 1;
 	}
@@ -1190,7 +1188,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 	/* FIXME: Insert crc check here? */
 
 	/* How many blocks of data are available to be loaded? */
-	total_blocks = (state->m_cart_size - offset) / 0x8000;
+	total_blocks = (m_cart_size - offset) / 0x8000;
 	read_blocks = 0;
 
 	if (SNES_CART_DEBUG)
@@ -1223,7 +1221,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 
 	sufami_load_sram(machine, image.device().tag());
 
-	state->m_cart[slot_id].slot_in_use = 1; // aknowledge the cart in this slot, for saving sram at exit
+	m_cart[slot_id].slot_in_use = 1; // aknowledge the cart in this slot, for saving sram at exit
 
 	auto_free(image.device().machine(), ROM);
 
