@@ -125,6 +125,7 @@ void esqvfd_t::device_reset()
 {
 	m_cursx = m_cursy = 0;
 	m_curattr = AT_NORMAL;
+	m_lastchar = 0;
 	memset(m_chars, 0, sizeof(m_chars));
 	memset(m_attrs, 0, sizeof(m_attrs));
 	memset(m_dirty, 1, sizeof(m_attrs));
