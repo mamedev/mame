@@ -40,6 +40,8 @@
 #include "emu.h"
 #include <ctype.h>
 
+class m6809_base_device; 
+
 enum display_type
 {
 	_8bit,
@@ -111,7 +113,7 @@ CPU_DISASSEMBLE( f8 );
 CPU_DISASSEMBLE( g65816_generic );
 CPU_DISASSEMBLE( h6280 );
 CPU_DISASSEMBLE( h8 );
-CPU_DISASSEMBLE( hd6309 );
+CPU_DISASSEMBLE( hd6309 )  { extern offs_t hd6309_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options); return hd6309_disassemble(buffer, pc, oprom, opram, 0); }
 CPU_DISASSEMBLE( i4004 );
 CPU_DISASSEMBLE( i8008 );
 CPU_DISASSEMBLE( i8085 );
@@ -121,7 +123,7 @@ CPU_DISASSEMBLE( x86_64 );
 CPU_DISASSEMBLE( i960 );
 CPU_DISASSEMBLE( jaguargpu );
 CPU_DISASSEMBLE( jaguardsp );
-CPU_DISASSEMBLE( konami );
+CPU_DISASSEMBLE( konami ) { extern offs_t konami_cpu_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options); return konami_cpu_disassemble(buffer, pc, oprom, opram, 0); }
 CPU_DISASSEMBLE( lh5801 );
 CPU_DISASSEMBLE( lr35902 );
 CPU_DISASSEMBLE( m37710_generic );
@@ -138,7 +140,7 @@ CPU_DISASSEMBLE( m68020 );
 CPU_DISASSEMBLE( m68030 );
 CPU_DISASSEMBLE( m68040 );
 CPU_DISASSEMBLE( m6805 );
-CPU_DISASSEMBLE( m6809 );
+CPU_DISASSEMBLE( m6809 ) { extern offs_t m6809_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options, m6809_base_device *m6809); return m6809_disassemble(buffer, pc, oprom, opram, 0, NULL); }
 CPU_DISASSEMBLE( mb86233 );
 CPU_DISASSEMBLE( mb88 );
 CPU_DISASSEMBLE( mcs48 );
