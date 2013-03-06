@@ -348,6 +348,8 @@ void gime_base_device::device_reset(void)
 
 	m_legacy_video = false;
 
+	m_displayed_rgb = false;
+
 	update_memory();
 	reset_timer();
 }
