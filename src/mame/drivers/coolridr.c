@@ -408,6 +408,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
 	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
 	DECLARE_WRITE8_MEMBER(sound_to_sh1_w);
+	DECLARE_READ16_MEMBER(sh7032_r);
+	DECLARE_WRITE16_MEMBER(sh7032_w);
+	UINT16 m_sh7032_regs[0x200];
 	DECLARE_DRIVER_INIT(coolridr);
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -2993,9 +2996,19 @@ WRITE32_MEMBER(coolridr_state::sysh1_sound_dma_w)
 	COMBINE_DATA(&m_sound_dma[offset]);
 }
 
+/* TODO: place-holder, to be moved in the SH core ... */
+READ16_MEMBER(coolridr_state::sh7032_r)
+{
+	return m_sh7032_regs[offset];
+}
+
+WRITE16_MEMBER(coolridr_state::sh7032_w)
+{
+	COMBINE_DATA(&m_sh7032_regs[offset]);
+}
 
 static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_SHARE("share2")
+	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_SHARE("share2") // note: SH7032 only supports 64KB
 
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM //communication RAM
 
@@ -3010,7 +3023,7 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
 	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
 	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-	AM_RANGE(0x05ff0000, 0x05ffffff) AM_RAM /*???*/
+	AM_RANGE(0x05fffe00, 0x05ffffff) AM_READWRITE16(sh7032_r,sh7032_w,0xffffffff) // SH-7032H internal i/o
 	AM_RANGE(0x06000000, 0x060001ff) AM_RAM AM_SHARE("nvram") // backup RAM
 	AM_RANGE(0x06100000, 0x06100003) AM_READ_PORT("IN0") AM_WRITE8(lamps_w,0x000000ff)
 	AM_RANGE(0x06100004, 0x06100007) AM_READ_PORT("IN1")
@@ -3020,7 +3033,7 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x06100014, 0x06100017) AM_READ_PORT("IN3")
 	AM_RANGE(0x0610001c, 0x0610001f) AM_READWRITE8(analog_mux_r,analog_mux_w,0x000000ff) //AM_WRITENOP
 	AM_RANGE(0x06200000, 0x06200fff) AM_RAM //network related?
-	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
+	AM_RANGE(0x07ffe000, 0x07ffffff) AM_RAM // On-Chip RAM (actually mapped at 0x0fffe000-0x0fffffff)
 	AM_RANGE(0x20000000, 0x2001ffff) AM_ROM AM_SHARE("share2")
 
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
