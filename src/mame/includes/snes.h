@@ -757,17 +757,8 @@ DECLARE_READ8_HANDLER( snes_open_bus_r );
 
 extern DECLARE_READ8_HANDLER( snes_r_bank1 );
 extern DECLARE_READ8_HANDLER( snes_r_bank2 );
-extern DECLARE_READ8_HANDLER( snes_r_bank3 );
-extern DECLARE_READ8_HANDLER( snes_r_bank4 );
-extern DECLARE_READ8_HANDLER( snes_r_bank5 );
-extern DECLARE_READ8_HANDLER( snes_r_bank6 );
-extern DECLARE_READ8_HANDLER( snes_r_bank7 );
 extern DECLARE_WRITE8_HANDLER( snes_w_bank1 );
 extern DECLARE_WRITE8_HANDLER( snes_w_bank2 );
-extern DECLARE_WRITE8_HANDLER( snes_w_bank4 );
-extern DECLARE_WRITE8_HANDLER( snes_w_bank5 );
-extern DECLARE_WRITE8_HANDLER( snes_w_bank6 );
-extern DECLARE_WRITE8_HANDLER( snes_w_bank7 );
 
 extern UINT8  *snes_ram;            /* Main memory */
 
