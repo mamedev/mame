@@ -2084,3 +2084,16 @@ endif
 
 $(CPUOBJ)/lc8670/lc8670.o:  $(CPUSRC)/lc8670/lc8670.c \
 							$(CPUSRC)/lc8670/lc8670.h
+
+#-------------------------------------------------
+# Sega SCU DSP
+#-------------------------------------------------
+
+ifneq ($(filter SCUDSP,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/scudsp
+DASMOBJS += $(CPUOBJ)/scudsp/scudspdasm.o
+endif
+
+$(CPUOBJ)/scudsp/scudspdasm.o: CPUOBJS += $(CPUOBJ)/scudsp/scudspdasm.c
+
+

@@ -133,6 +133,7 @@ CPUS += HCD62121
 CPUS += PPS4
 CPUS += UPD7725
 CPUS += HD61700
+CPUS += SCUDSP
 
 #-------------------------------------------------
 # specify available sound cores

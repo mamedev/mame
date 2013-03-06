@@ -58,7 +58,7 @@ CPUS += TMS57002
 CPUS += CCPU
 CPUS += ADSP21XX
 CPUS += ASAP
-#CPUS += AM29000
+CPUS += AM29000
 CPUS += UPD7810
 CPUS += ARM
 CPUS += ARM7
@@ -114,7 +114,7 @@ CPUS += SUPERFX
 CPUS += Z8
 CPUS += I8008
 CPUS += SCMP
-#CPUS += MN10200
+CPUS += MN10200
 CPUS += COSMAC
 CPUS += UNSP
 CPUS += HCD62121
@@ -123,6 +123,7 @@ CPUS += UPD7725
 CPUS += HD61700
 CPUS += LC8670
 CPUS += ES5510
+CPUS += SCUDSP
 
 #-------------------------------------------------
 # specify available sound cores; some of these are
