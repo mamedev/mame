@@ -206,10 +206,10 @@ INPUT_CHANGED_MEMBER(ex800_state::online_switch)
 void ex800_state::machine_start()
 {
 	m_irq_state = ASSERT_LINE;
-	device_t *speaker = machine().device(BEEPER_TAG);
+	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
 	/* Setup beep */
-	beep_set_state(speaker, 0);
-	beep_set_frequency(speaker, 4000); /* measured at 4000 Hz */
+	speaker->set_state(0);
+	speaker->set_frequency(4000); /* measured at 4000 Hz */
 }
 
 
@@ -265,11 +265,11 @@ WRITE8_MEMBER(ex800_state::ex800_portb_w)
 
 WRITE8_MEMBER(ex800_state::ex800_portc_w)
 {
-	device_t *speaker = machine().device(BEEPER_TAG);
+	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
 	if (data & 0x80)
-		beep_set_state(speaker, 0);
+		speaker->set_state(0);
 	else
-		beep_set_state(speaker, 1);
+		speaker->set_state(1);
 
 	logerror("PC W %x @%x\n", data, space.device().safe_pc());
 }

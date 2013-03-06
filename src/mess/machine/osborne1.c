@@ -389,11 +389,11 @@ TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 
 	if ( (ra==2) || (ra== 6) )
 	{
-		beep_set_state( m_beep, m_beep_state );
+		m_beep->set_state( m_beep_state );
 	}
 	else
 	{
-		beep_set_state( m_beep, 0 );
+		m_beep->set_state( 0 );
 	}
 
 	m_video_timer->adjust(machine().primary_screen->time_until_pos(y + 1, 0 ));
@@ -401,8 +401,8 @@ TIMER_CALLBACK_MEMBER(osborne1_state::osborne1_video_callback)
 
 TIMER_CALLBACK_MEMBER(osborne1_state::setup_osborne1)
 {
-	beep_set_state( m_beep, 0 );
-	beep_set_frequency( m_beep, 300 /* 60 * 240 / 2 */ );
+	m_beep->set_state( 0 );
+	m_beep->set_frequency( 300 /* 60 * 240 / 2 */ );
 	m_pia1->ca1_w(0);
 }
 

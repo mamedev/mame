@@ -667,7 +667,7 @@ WRITE8_MEMBER( fidelz80_state::fidelz80_portc_w )
 
 WRITE8_MEMBER( fidelz80_state::cc10_porta_w )
 {
-	beep_set_state(m_beep, (data & 0x80) ? 0 : 1);
+	m_beep->set_state((data & 0x80) ? 0 : 1);
 
 	m_digit_data = data;
 

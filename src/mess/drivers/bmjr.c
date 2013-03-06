@@ -133,7 +133,7 @@ WRITE8_MEMBER( bmjr_state::tape_w )
 {
 	if(!m_tape_switch)
 	{
-		beep_set_state(m_beep, !BIT(data, 7));
+		m_beep->set_state(!BIT(data, 7));
 	}
 	else
 	{
@@ -333,8 +333,8 @@ void bmjr_state::palette_init()
 
 void bmjr_state::machine_start()
 {
-	beep_set_frequency(m_beep, 1200); //guesswork
-	beep_set_state(m_beep, 0);
+	m_beep->set_frequency(1200); //guesswork
+	m_beep->set_state(0);
 }
 
 void bmjr_state::machine_reset()

@@ -1806,8 +1806,8 @@ void mz2500_state::machine_reset()
 
 	m_cg_clear_flag = 0;
 
-	beep_set_frequency(machine().device(BEEPER_TAG),4096);
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	machine().device<beep_device>(BEEPER_TAG)->set_frequency(4096);
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 
 //  m_monitor_type = machine().root_device().ioport("DSW1")->read() & 0x40 ? 1 : 0;
 }
@@ -1921,7 +1921,7 @@ WRITE8_MEMBER(mz2500_state::mz2500_portc_w)
 
 	m_old_portc = data;
 
-	beep_set_state(machine().device(BEEPER_TAG),data & 0x04);
+	machine().device<beep_device>(BEEPER_TAG)->set_state(data & 0x04);
 
 	m_screen_enable = data & 1;
 

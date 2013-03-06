@@ -73,7 +73,7 @@ public:
 
 TIMER_CALLBACK_MEMBER(h19_state::h19_beepoff)
 {
-	beep_set_state(m_beep, 0);
+	m_beep->set_state(0);
 }
 
 READ8_MEMBER( h19_state::h19_80_r )
@@ -99,7 +99,7 @@ WRITE8_MEMBER( h19_state::h19_c0_w )
     offset 20-3F = terminal bell */
 
 	UINT8 length = (offset & 0x20) ? 200 : 4;
-	beep_set_state(m_beep, 1);
+	m_beep->set_state(1);
 	machine().scheduler().timer_set(attotime::from_msec(length), timer_expired_delegate(FUNC(h19_state::h19_beepoff),this));
 }
 
@@ -291,7 +291,7 @@ INPUT_PORTS_END
 
 void h19_state::machine_reset()
 {
-	beep_set_frequency(m_beep, H19_BEEP_FRQ);
+	m_beep->set_frequency(H19_BEEP_FRQ);
 }
 
 void h19_state::video_start()

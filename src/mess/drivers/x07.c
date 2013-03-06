@@ -1185,13 +1185,13 @@ WRITE8_MEMBER( x07_state::x07_io_w )
 #if(1)
 		if((data & 0x0e) == 0x0e)
 		{
-			beep_set_state(m_beep, 1);
-			beep_set_frequency(m_beep, 192000 / ((m_regs_w[2] | (m_regs_w[3] << 8)) & 0x0fff));
+			m_beep->set_state(1);
+			m_beep->set_frequency(192000 / ((m_regs_w[2] | (m_regs_w[3] << 8)) & 0x0fff));
 
 			m_beep_stop->adjust(attotime::from_msec(m_ram->pointer()[0x450] * 0x20));
 		}
 		else
-			beep_set_state(m_beep, 0);
+			m_beep->set_state(0);
 #endif
 		break;
 
@@ -1374,7 +1374,7 @@ TIMER_CALLBACK_MEMBER(x07_state::rstb_clear)
 
 TIMER_CALLBACK_MEMBER(x07_state::beep_stop)
 {
-	beep_set_state(m_beep, 0);
+	m_beep->set_state(0);
 }
 
 static const gfx_layout x07_charlayout =

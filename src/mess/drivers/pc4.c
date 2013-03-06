@@ -52,7 +52,7 @@ WRITE8_MEMBER( pc4_state::bank_w )
 
 WRITE8_MEMBER( pc4_state::beep_w )
 {
-	beep_set_state(m_beep, data&0x40);
+	m_beep->set_state(data&0x40);
 }
 
 static ADDRESS_MAP_START(pc4_mem, AS_PROGRAM, 8, pc4_state)

@@ -102,7 +102,7 @@ WRITE8_MEMBER( h8_state::h8_f0_w )
 	if (m_digit) output_set_digit_value(m_digit, m_segment);
 
 	output_set_value("mon_led",(data & 0x20) ? 0 : 1);
-	beep_set_state(m_beep, (data & 0x80) ? 0 : 1);
+	m_beep->set_state((data & 0x80) ? 0 : 1);
 
 	machine().device("maincpu")->execute().set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	m_irq_ctl &= 0xf0;
@@ -167,7 +167,7 @@ INPUT_PORTS_END
 
 void h8_state::machine_reset()
 {
-	beep_set_frequency(m_beep, H8_BEEP_FRQ);
+	m_beep->set_frequency(H8_BEEP_FRQ);
 	output_set_value("pwr_led", 0);
 	m_irq_ctl = 1;
 }

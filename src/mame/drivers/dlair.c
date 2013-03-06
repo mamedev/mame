@@ -286,8 +286,8 @@ INTERRUPT_GEN_MEMBER(dlair_state::vblank_callback)
 	if (beep != NULL)
 	{
 		z80ctc_device *ctc = machine().device<z80ctc_device>("ctc");
-		beep_set_state(beep, 1);
-		beep_set_frequency(beep, ATTOSECONDS_TO_HZ(ctc->period(0).attoseconds));
+		beep->set_state(1);
+		beep->set_frequency(ATTOSECONDS_TO_HZ(ctc->period(0).attoseconds));
 	}
 }
 

@@ -71,8 +71,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, volfied_state )
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(volfied_video_mask_w)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(volfied_sprite_ctrl_w)
 	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(volfied_video_ctrl_r, volfied_video_ctrl_w)
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
+	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0xf00000, 0xf007ff) AM_READWRITE(volfied_cchip_ram_r, volfied_cchip_ram_w)
 	AM_RANGE(0xf00802, 0xf00803) AM_READWRITE(volfied_cchip_ctrl_r, volfied_cchip_ctrl_w)
 	AM_RANGE(0xf00c00, 0xf00c01) AM_WRITE(volfied_cchip_bank_w)
@@ -81,8 +81,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, volfied_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
-	AM_RANGE(0x8801, 0x8801) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0x8800, 0x8800) AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
+	AM_RANGE(0x8801, 0x8801) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITENOP    /* ? */
 ADDRESS_MAP_END

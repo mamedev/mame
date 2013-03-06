@@ -5,6 +5,7 @@
 
 *************************************************************************/
 
+#include <audio/taitosnd.h>
 #include "machine/eeprom.h"
 
 class taitoz_state : public driver_device
@@ -38,7 +39,7 @@ public:
 	device_t *m_tc0150rod;
 	device_t *m_tc0100scn;
 	device_t *m_tc0220ioc;
-	device_t *m_tc0140syt;
+	tc0140syt_device *m_tc0140syt;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);

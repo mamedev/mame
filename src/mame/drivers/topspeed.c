@@ -419,9 +419,9 @@ WRITE8_MEMBER(topspeed_state::sound_bankswitch_w)/* assumes Z80 sandwiched betwe
 
 WRITE8_MEMBER(topspeed_state::topspeed_tc0140syt_comm_w)
 {
-	device_t *device = machine().device("tc0140syt");
+	tc0140syt_device *device = machine().device<tc0140syt_device>("tc0140syt");
 	machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	tc0140syt_comm_w(device, space, 0, data);
+	device->tc0140syt_comm_w(space, 0, data);
 }
 
 static void topspeed_msm5205_clock( device_t *device, int chip )
@@ -502,8 +502,8 @@ static ADDRESS_MAP_START( topspeed_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600002, 0x600003) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREAD8_LEGACY("tc0140syt", tc0140syt_comm_r, 0x00ff) AM_WRITE8(topspeed_tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, tc0140syt_port_w, 0x00ff)
+	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREAD8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, 0x00ff) AM_WRITE8(topspeed_tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_SHARE("raster_ctrl")
 	AM_RANGE(0x800400, 0x80ffff) AM_RAM
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE_LEGACY("pc080sn_1", pc080sn_word_r, pc080sn_word_w)
@@ -534,8 +534,8 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, topspeed_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xb000, 0xd3ff) AM_WRITE(topspeed_msm5205_command_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITENOP // ym2151 volume
 	AM_RANGE(0xd600, 0xd600) AM_WRITENOP // ym2151 volume

@@ -376,7 +376,7 @@ READ8_MEMBER( pce220_state::port18_r )
 
 WRITE8_MEMBER( pce220_state::port18_w )
 {
-	beep_set_state(m_beep, BIT(data, 7));
+	m_beep->set_state(BIT(data, 7));
 
 	m_serial->out_busy(BIT(data, 0));
 	m_serial->out_dout(BIT(data, 1));

@@ -185,7 +185,7 @@ void apollo_kbd_device::beeper::start(apollo_kbd_device *device)
 {
 	m_device = device;
 	LOG2(("start apollo_kbd::beeper"));
-	m_beeper = m_device->machine().device("beep");
+	m_beeper = m_device->machine().device<beep_device>("beep");
 	m_timer = m_device->machine().scheduler().timer_alloc(FUNC(static_beeper_callback), this);
 }
 
@@ -197,15 +197,15 @@ void apollo_kbd_device::beeper::reset()
 
 void apollo_kbd_device::beeper::off()
 {
-	beep_set_state(m_beeper, 0);
+	m_beeper->set_state(0);
 }
 
 void apollo_kbd_device::beeper::on()
 {
 	if (keyboard_has_beeper())
 	{
-		beep_set_frequency(m_beeper, 1000);
-		beep_set_state(m_beeper, 1);
+		m_beeper->set_frequency(1000);
+		m_beeper->set_state(1);
 		m_timer->adjust( attotime::from_msec(10), 0, attotime::zero);
 	}
 }
@@ -223,7 +223,7 @@ void apollo_kbd_device::beeper::beeper_callback()
 
 TIMER_CALLBACK( apollo_kbd_device::beeper::static_beeper_callback )
 {
-	reinterpret_cast<beeper *> (ptr)->beeper_callback();
+	reinterpret_cast<beeper*>(ptr)->beeper_callback();
 }
 
 //**************************************************************************

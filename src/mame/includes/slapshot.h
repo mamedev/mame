@@ -4,6 +4,8 @@
 
 *************************************************************************/
 
+#include <audio/taitosnd.h>
+
 struct slapshot_tempsprite
 {
 	int gfx;
@@ -49,7 +51,7 @@ public:
 	/* devices */
 	cpu_device *m_maincpu;
 	cpu_device *m_audiocpu;
-	device_t *m_tc0140syt;
+	tc0140syt_device *m_tc0140syt;
 	device_t *m_tc0480scp;
 	device_t *m_tc0360pri;
 	device_t *m_tc0640fio;

@@ -528,7 +528,7 @@ WRITE8_MEMBER(smc777_state::system_output_w)
 			m_raminh_prefetch = (UINT8)(space.device().state().state_int(Z80_R)) & 0x7f;
 			break;
 		case 0x02: printf("Interlace %s\n",data & 0x10 ? "on" : "off"); break;
-		case 0x05: beep_set_state(machine().device(BEEPER_TAG),data & 0x10); break;
+		case 0x05: machine().device<beep_device>(BEEPER_TAG)->set_state(data & 0x10); break;
 		default: printf("System FF W %02x\n",data); break;
 	}
 }
@@ -990,8 +990,8 @@ void smc777_state::machine_reset()
 	m_raminh_prefetch = 0xff;
 	m_pal_mode = 0x10;
 
-	beep_set_frequency(machine().device(BEEPER_TAG),300); //TODO: correct frequency
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	machine().device<beep_device>(BEEPER_TAG)->set_frequency(300); //TODO: correct frequency
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 }
 
 

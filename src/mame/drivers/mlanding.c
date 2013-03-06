@@ -346,25 +346,25 @@ WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 
 WRITE16_MEMBER(mlanding_state::ml_to_sound_w)
 {
-	device_t *tc0140syt = machine().device("tc0140syt");
+	tc0140syt_device *tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
 	if (offset == 0)
-		tc0140syt_port_w(tc0140syt, space, 0, data & 0xff);
+		tc0140syt->tc0140syt_port_w(space, 0, data & 0xff);
 	else if (offset == 1)
 	{
 		//machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		tc0140syt_comm_w(tc0140syt, space, 0, data & 0xff);
+		tc0140syt->tc0140syt_comm_w(space, 0, data & 0xff);
 	}
 }
 
 WRITE8_MEMBER(mlanding_state::ml_sound_to_main_w)
 {
-	device_t *tc0140syt = machine().device("tc0140syt");
+	tc0140syt_device *tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
 	if (offset == 0)
-		tc0140syt_slave_port_w(tc0140syt, space, 0, data & 0xff);
+		tc0140syt->tc0140syt_slave_port_w(space, 0, data & 0xff);
 	else if (offset == 1)
 	{
 		//machine().device("audiocpu")->execute().set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		tc0140syt_slave_comm_w(tc0140syt, space, 0, data & 0xff);
+		tc0140syt->tc0140syt_slave_comm_w(space, 0, data & 0xff);
 	}
 }
 
@@ -489,7 +489,7 @@ static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 
 	AM_RANGE(0x2d0000, 0x2d0003) AM_WRITE(ml_to_sound_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP
-	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREAD8_LEGACY("tc0140syt", tc0140syt_comm_r, 0x00ff)
+	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREAD8("tc0140syt", tc0140syt_device, tc0140syt_comm_r, 0x00ff)
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(ml_mecha_ram_r,ml_mecha_ram_w)
@@ -542,7 +542,7 @@ static ADDRESS_MAP_START( mlanding_z80_mem, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xa000, 0xa001) AM_WRITE(ml_sound_to_main_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD_LEGACY("tc0140syt", tc0140syt_slave_comm_r)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r)
 
 //  AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(ml_msm5205_address_w) //guess
 //  AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("msm", ml_msm5205_start_w)

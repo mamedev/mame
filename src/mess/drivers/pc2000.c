@@ -122,7 +122,7 @@ READ8_MEMBER( pc2000_state::beep_r )
 
 WRITE8_MEMBER( pc2000_state::beep_w )
 {
-	beep_set_state(m_beep, BIT(data, 3));
+	m_beep->set_state(BIT(data, 3));
 	m_beep_state = data;
 }
 

@@ -158,7 +158,7 @@ INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
 WRITE8_MEMBER(destiny_state::sound_w)
 {
 	// a0: sound on/off
-	beep_set_state(machine().device(BEEPER_TAG), ~offset & 1);
+	machine().device<beep_device>(BEEPER_TAG)->set_state(~offset & 1);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, destiny_state )
@@ -247,8 +247,8 @@ INPUT_PORTS_END
 
 void destiny_state::machine_start()
 {
-	beep_set_frequency(machine().device(BEEPER_TAG),800); // TODO: determine exact frequency thru schematics
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	machine().device<beep_device>(BEEPER_TAG)->set_frequency(800); // TODO: determine exact frequency thru schematics
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 }
 
 void destiny_state::machine_reset()

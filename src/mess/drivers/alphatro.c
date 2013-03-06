@@ -76,7 +76,7 @@ private:
 
 TIMER_CALLBACK_MEMBER(alphatro_state::alphatro_beepoff)
 {
-	beep_set_state(m_beep, 0);
+	m_beep->set_state(0);
 }
 
 READ8_MEMBER( alphatro_state::port10_r )
@@ -102,7 +102,7 @@ WRITE8_MEMBER( alphatro_state::port10_w )
 	if (length)
 	{
 		machine().scheduler().timer_set(attotime::from_msec(length), timer_expired_delegate(FUNC(alphatro_state::alphatro_beepoff),this));
-		beep_set_state(m_beep, 1);
+		m_beep->set_state(1);
 	}
 
 	m_cass->change_state( BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -360,8 +360,8 @@ void alphatro_state::machine_reset()
 	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));
 	m_serial_timer->adjust(attotime::from_hz(500),0,attotime::from_hz(500));  // USART clock - this is a guesstimate
 	m_timer_bit = 0;
-	beep_set_state(m_beep, 0);
-	beep_set_frequency(m_beep, 950);    /* piezo-device needs to be measured */
+	m_beep->set_state(0);
+	m_beep->set_frequency(950);    /* piezo-device needs to be measured */
 }
 
 void alphatro_state::palette_init()

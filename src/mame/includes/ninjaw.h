@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include <sound/flt_vol.h>
+#include <audio/taitosnd.h>
 
 class ninjaw_state : public driver_device
 {
@@ -25,7 +26,7 @@ public:
 	cpu_device *m_maincpu;
 	cpu_device *m_audiocpu;
 	cpu_device *m_subcpu;
-	device_t *m_tc0140syt;
+	tc0140syt_device *m_tc0140syt;
 	device_t *m_tc0100scn_1;
 	device_t *m_tc0100scn_2;
 	device_t *m_tc0100scn_3;

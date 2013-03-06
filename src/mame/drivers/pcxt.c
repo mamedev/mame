@@ -332,13 +332,13 @@ WRITE8_MEMBER(pcxt_state::port_b_w)
 	pit8253_gate2_w(m_pit8253, BIT(data, 0));
 	pcxt_speaker_set_spkrdata( data & 0x02 );
 	m_port_b_data = data;
-// device_t *beep = machine().device("beep");
+// device_t *beep = machine().device<beep_device>("beep");
 // device_t *cvsd = machine().device("cvsd");
 //  hc55516_digit_w(cvsd, data);
 //  popmessage("%02x\n",data);
-//  beep_set_state(beep, 0);
-//  beep_set_state(beep, 1);
-//  beep_set_frequency(beep, m_port_b_data);
+//  beep->beep_set_state(0);
+//  beep->beep_set_state(1);
+//  beep->beep_set_frequency(m_port_b_data);
 }
 
 WRITE8_MEMBER(pcxt_state::wss_1_w)

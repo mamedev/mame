@@ -174,7 +174,7 @@ READ16_MEMBER(darius_state::darius_ioc_r)
 	switch (offset)
 	{
 		case 0x01:
-			return (tc0140syt_comm_r(m_tc0140syt, space, 0) & 0xff);    /* sound interface read */
+			return (m_tc0140syt->tc0140syt_comm_r(space, 0) & 0xff);    /* sound interface read */
 
 		case 0x04:
 			return ioport("P1")->read();
@@ -203,12 +203,12 @@ WRITE16_MEMBER(darius_state::darius_ioc_w)
 	{
 		case 0x00:  /* sound interface write */
 
-			tc0140syt_port_w(m_tc0140syt, space, 0, data & 0xff);
+			m_tc0140syt->tc0140syt_port_w(space, 0, data & 0xff);
 			return;
 
 		case 0x01:  /* sound interface write */
 
-			tc0140syt_comm_w(m_tc0140syt, space, 0, data & 0xff);
+			m_tc0140syt->tc0140syt_comm_w(space, 0, data & 0xff);
 			return;
 
 		case 0x28:  /* unknown, written by both cpus - always 0? */
@@ -466,8 +466,8 @@ static ADDRESS_MAP_START( darius_sound_map, AS_PROGRAM, 8, darius_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(darius_fm1_pan)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(darius_psg0_pan)
@@ -830,7 +830,7 @@ void darius_state::machine_start()
 	m_cpub = machine().device("cpub");
 	m_adpcm = machine().device("adpcm");
 	m_pc080sn = machine().device("pc080sn");
-	m_tc0140syt = machine().device("tc0140syt");
+	m_tc0140syt = machine().device<tc0140syt_device>("tc0140syt");
 
 	m_lscreen = machine().device("lscreen");
 	m_mscreen = machine().device("mscreen");

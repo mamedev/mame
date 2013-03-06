@@ -842,14 +842,14 @@ WRITE8_MEMBER(pcw16_state::pcw16_system_control_w)
 		/* bleeper on */
 		case 0x0b:
 		{
-			beep_set_state(m_speaker,1);
+			m_speaker->set_state(1);
 		}
 		break;
 
 		/* bleeper off */
 		case 0x0c:
 		{
-			beep_set_state(m_speaker,0);
+			m_speaker->set_state(0);
 		}
 		break;
 
@@ -1005,7 +1005,7 @@ void pcw16_state::machine_reset()
 
 void pcw16_state::machine_start()
 {
-	device_t *speaker = machine().device(BEEPER_TAG);
+	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
 	m_system_status = 0;
 	m_interrupt_counter = 0;
 
@@ -1015,8 +1015,8 @@ void pcw16_state::machine_start()
 	at_keyboard_init(machine(), AT_KEYBOARD_TYPE_AT);
 	at_keyboard_set_scan_code_set(3);
 
-	beep_set_state(speaker,0);
-	beep_set_frequency(speaker,3750);
+	speaker->set_state(0);
+	speaker->set_frequency(3750);
 }
 
 static INPUT_PORTS_START(pcw16)

@@ -233,16 +233,16 @@ WRITE8_MEMBER( rex6000_state::beep_w )
 		case 1:     //tone mode control
 			if (m_beep_mode)
 			{
-				beep_set_state(m_beep, BIT(data, 0));
+				m_beep->set_state(BIT(data, 0));
 
 				//the beeper frequency is update only if the bit 1 is set
 				if (BIT(data, 1))
-					beep_set_frequency(m_beep, 16384 / (((m_beep_io[2] | (m_beep_io[3]<<8)) & 0x0fff) + 2));
+					m_beep->set_frequency(16384 / (((m_beep_io[2] | (m_beep_io[3]<<8)) & 0x0fff) + 2));
 			}
 			break;
 		case 4:     //select alarm/tone mode
 			if (m_beep_mode != BIT(data, 0))
-				beep_set_state(m_beep, 0);      //turned off when mode changes
+				m_beep->set_state(0);      //turned off when mode changes
 
 			m_beep_mode = BIT(data, 0);
 			break;

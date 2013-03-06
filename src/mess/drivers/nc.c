@@ -672,15 +672,15 @@ static void nc_sound_update(running_machine &machine, int channel)
 	int on;
 	int frequency;
 	int period;
-	const char *beep_device = NULL;
+	const char *beeper_device = NULL;
 
 	switch(channel)
 	{
 		case 0:
-			beep_device = "beep.1";
+			beeper_device = "beep.1";
 			break;
 		case 1:
-			beep_device = "beep.2";
+			beeper_device = "beep.2";
 			break;
 	}
 
@@ -693,9 +693,9 @@ static void nc_sound_update(running_machine &machine, int channel)
 	frequency = (int)(1000000.0f/((float)((period & 0x07fff)<<1) * 1.6276f));
 
 	/* set state */
-	beep_set_state(machine.device(beep_device), on);
+	machine.device<beep_device>(beeper_device)->set_state(on);
 	/* set frequency */
-	beep_set_frequency(machine.device(beep_device), frequency);
+	machine.device<beep_device>(beeper_device)->set_frequency(frequency);
 }
 
 WRITE8_MEMBER(nc_state::nc_sound_w)

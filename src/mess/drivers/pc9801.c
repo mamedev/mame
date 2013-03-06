@@ -3109,7 +3109,7 @@ READ8_MEMBER(pc9801_state::ppi_prn_portb_r){ return machine().root_device().iopo
 
 WRITE8_MEMBER(pc9801_state::ppi_sys_portc_w)
 {
-	beep_set_state(machine().device(BEEPER_TAG),!(data & 0x08));
+	machine().device<beep_device>(BEEPER_TAG)->set_state(!(data & 0x08));
 }
 
 static I8255A_INTERFACE( ppi_system_intf )
@@ -3426,8 +3426,8 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 			m_tvram[(0x3fe0)+i*2] = default_memsw_data[i];
 	}
 
-	beep_set_frequency(machine().device(BEEPER_TAG),2400);
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	machine().device<beep_device>(BEEPER_TAG)->set_frequency(2400);
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 
 	m_nmi_ff = 0;
 	m_mouse.control = 0xff;

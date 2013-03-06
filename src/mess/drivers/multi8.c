@@ -629,7 +629,7 @@ static I8255_INTERFACE( ppi8255_intf_0 )
 
 WRITE8_MEMBER( multi8_state::ym2203_porta_w )
 {
-	beep_set_state(m_beep, (data & 0x08));
+	m_beep->set_state((data & 0x08));
 }
 
 static const ym2203_interface ym2203_config =
@@ -655,8 +655,8 @@ void multi8_state::machine_start()
 
 void multi8_state::machine_reset()
 {
-	beep_set_frequency(machine().device(BEEPER_TAG),1200); //guesswork
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	machine().device<beep_device>(BEEPER_TAG)->set_frequency(1200); //guesswork
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 	m_mcu_init = 0;
 }
 

@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include <sound/flt_vol.h>
+#include <audio/taitosnd.h>
 
 #define DARIUS_VOL_MAX    (3*2 + 2)
 #define DARIUS_PAN_MAX    (2 + 2 + 1)   /* FM 2port + PSG 2port + DA 1port */
@@ -39,7 +40,7 @@ public:
 	cpu_device *m_audiocpu;
 	device_t *m_cpub;
 	device_t *m_adpcm;
-	device_t *m_tc0140syt;
+	tc0140syt_device *m_tc0140syt;
 	device_t *m_pc080sn;
 
 	device_t *m_lscreen;

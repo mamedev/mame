@@ -443,7 +443,7 @@ static UINT8 pb2000c_port_r(hd61700_cpu_device &device)
 
 static void port_w(hd61700_cpu_device &device, UINT8 data)
 {
-	beep_set_state(device.machine().device(BEEPER_TAG), (BIT(data,7) ^ BIT(data,6)));
+	device.machine().device<beep_device>(BEEPER_TAG)->set_state((BIT(data,7) ^ BIT(data,6)));
 	//printf("%x\n", data);
 }
 

@@ -45,7 +45,7 @@ READ8_MEMBER( sc2_state::sc2_beep )
 	{
 		m_beep_state = ~m_beep_state;
 
-		beep_set_state(m_beep, m_beep_state);
+		m_beep->set_state(m_beep_state);
 	}
 
 	return 0xff;

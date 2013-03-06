@@ -66,7 +66,7 @@
 
 struct kay_kbd_t
 {
-	device_t *beeper;
+	beep_device *beeper;
 	UINT8 buff[16];
 	UINT8 head;
 	UINT8 tail;
@@ -287,11 +287,11 @@ MACHINE_RESET_MEMBER(kaypro_state,kay_kbd)
 	/* disable CapsLock LED initially */
 	set_led_status(machine(), 1, 1);
 	set_led_status(machine(), 1, 0);
-	kbd->beeper = machine().device(BEEPER_TAG);
+	kbd->beeper = machine().device<beep_device>(BEEPER_TAG);
 	kbd->beep_on = 1;
 	kbd->control_status = 0x14;
-	beep_set_state(kbd->beeper, 0);
-	beep_set_frequency(kbd->beeper, 950);   /* piezo-device needs to be measured */
+	kbd->beeper->set_state(0);
+	kbd->beeper->set_frequency(950);   /* piezo-device needs to be measured */
 	kbd->head = kbd->tail = 0;          /* init buffer */
 }
 
@@ -471,7 +471,7 @@ static TIMER_CALLBACK( kay_kbd_beepoff )
 {
 	kaypro_state *state = machine.driver_data<kaypro_state>();
 	kay_kbd_t *kbd = state->m_kbd;
-	beep_set_state(kbd->beeper, 0);
+	kbd->beeper->set_state(0);
 	kbd->control_status |= 4;
 }
 
@@ -509,7 +509,7 @@ void kay_kbd_d_w( running_machine &machine, UINT8 data )
 		{
 			kbd->control_status &= 0xfb;
 			machine.scheduler().timer_set(attotime::from_msec(length), FUNC(kay_kbd_beepoff));
-			beep_set_state(kbd->beeper, 1);
+			kbd->beeper->set_state(1);
 		}
 	}
 }

@@ -153,10 +153,10 @@ void psion_state::io_rw(address_space &space, UINT16 offset)
 		m_kb_counter = 0;
 		break;
 	case 0x180:
-		beep_set_state(m_beep, 1);
+		m_beep->set_state(1);
 		break;
 	case 0x1c0:
-		beep_set_state(m_beep, 0);
+		m_beep->set_state(0);
 		break;
 	case 0x240:
 		if (offset == 0x260 && (m_rom_bank_count || m_ram_bank_count))

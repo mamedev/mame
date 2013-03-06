@@ -393,20 +393,20 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi)
 		m_allowNMI = 0;
 		m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	}
-	beep_set_state(m_beep, m_led_status&64?1:0);
+	m_beep->set_state(m_led_status&64?1:0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi_r5)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
-	beep_set_state(m_beep, m_led_status&64?1:0);
+	m_beep->set_state(m_led_status&64?1:0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_irq)//only mm2
 {
 	m_maincpu->set_input_line(M65C02_IRQ_LINE, HOLD_LINE);
 
-	beep_set_state(m_beep, m_led_status&64?1:0);
+	m_beep->set_state(m_led_status&64?1:0);
 }
 
 void mephisto_state::machine_start()

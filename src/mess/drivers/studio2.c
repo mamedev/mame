@@ -446,7 +446,7 @@ READ_LINE_MEMBER( studio2_state::ef4_r )
 
 WRITE_LINE_MEMBER( studio2_state::q_w )
 {
-	beep_set_state(m_speaker, state);
+	m_speaker->set_state(state);
 }
 
 static COSMAC_INTERFACE( studio2_cosmac_intf )
@@ -629,9 +629,9 @@ ROM_END
 
 TIMER_CALLBACK_MEMBER(studio2_state::setup_beep)
 {
-	device_t *speaker = machine().device(BEEPER_TAG);
-	beep_set_state(speaker, 0);
-	beep_set_frequency(speaker, 300);
+	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
+	speaker->set_state(0);
+	speaker->set_frequency(300);
 }
 
 DRIVER_INIT_MEMBER(studio2_state,studio2)

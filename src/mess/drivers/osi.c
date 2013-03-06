@@ -339,12 +339,12 @@ WRITE8_MEMBER( c1p_state::osi630_ctrl_w )
 
 	*/
 
-	beep_set_state(m_beep, BIT(data, 1));
+	m_beep->set_state(BIT(data, 1));
 }
 
 WRITE8_MEMBER( c1p_state::osi630_sound_w )
 {
-	if (data) beep_set_frequency(m_beep, 49152 / data);
+	if (data) m_beep->set_frequency(49152 / data);
 }
 
 /* Disk Drive */
@@ -933,9 +933,9 @@ ROM_END
 
 TIMER_CALLBACK_MEMBER(sb2m600_state::setup_beep)
 {
-	device_t *speaker = machine().device(BEEPER_TAG);
-	beep_set_state(speaker, 0);
-	beep_set_frequency(speaker, 300);
+	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
+	speaker->set_state(0);
+	speaker->set_frequency(300);
 }
 
 DRIVER_INIT_MEMBER(c1p_state,c1p)

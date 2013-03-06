@@ -177,7 +177,7 @@ static const UINT16 electron_screen_base[8] = { 0x3000, 0x3000, 0x3000, 0x4000, 
 
 WRITE8_MEMBER(electron_state::electron_ula_w)
 {
-	device_t *speaker = machine().device(BEEPER_TAG);
+	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
 	int i = electron_palette_offset[(( offset >> 1 ) & 0x03)];
 	logerror( "ULA: write offset %02x <- %02x\n", offset & 0x0f, data );
 	switch( offset & 0x0f )
@@ -237,7 +237,7 @@ WRITE8_MEMBER(electron_state::electron_ula_w)
 	case 0x06:  /* Counter divider */
 		if ( m_ula.communication_mode == 0x01)
 		{
-			beep_set_frequency( speaker, 1000000 / ( 16 * ( data + 1 ) ) );
+			speaker->set_frequency( 1000000 / ( 16 * ( data + 1 ) ) );
 		}
 		break;
 	case 0x07:  /* Misc. */
@@ -245,19 +245,19 @@ WRITE8_MEMBER(electron_state::electron_ula_w)
 		switch( m_ula.communication_mode )
 		{
 		case 0x00:  /* cassette input */
-			beep_set_state( speaker, 0 );
+			speaker->set_state( 0 );
 			electron_tape_start();
 			break;
 		case 0x01:  /* sound generation */
-			beep_set_state( speaker, 1 );
+			speaker->set_state( 1 );
 			electron_tape_stop();
 			break;
 		case 0x02:  /* cassette output */
-			beep_set_state( speaker, 0 );
+			speaker->set_state( 0 );
 			electron_tape_stop();
 			break;
 		case 0x03:  /* not used */
-			beep_set_state( speaker, 0 );
+			speaker->set_state( 0 );
 			electron_tape_stop();
 			break;
 		}
@@ -316,9 +316,9 @@ void electron_interrupt_handler(running_machine &machine, int mode, int interrup
 
 TIMER_CALLBACK_MEMBER(electron_state::setup_beep)
 {
-	device_t *speaker = machine().device(BEEPER_TAG);
-	beep_set_state( speaker, 0 );
-	beep_set_frequency( speaker, 300 );
+	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
+	speaker->set_state( 0 );
+	speaker->set_frequency( 300 );
 }
 
 void electron_state::machine_reset()

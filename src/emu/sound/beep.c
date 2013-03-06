@@ -14,49 +14,65 @@
 #include "emu.h"
 #include "sound/beep.h"
 
+#define BEEP_RATE (48000)
 
-#define BEEP_RATE           48000
 
-struct beep_state
+// device type definition
+const device_type BEEP = &device_creator<beep_device>;
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  beep_device - constructor
+//-------------------------------------------------
+
+beep_device::beep_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, BEEP, "Beep", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_stream(NULL),
+	  m_enable(0),
+	  m_frequency(0),
+	  m_incr(0),
+	  m_signal(0)
 {
-	sound_stream *stream;   /* stream number */
-	int enable;             /* enable beep */
-	int frequency;          /* set frequency - this can be changed using the appropiate function */
-	int incr;               /* initial wave state */
-	INT16 signal;           /* current signal */
-};
-
-
-INLINE beep_state *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == BEEP);
-	return (beep_state *)downcast<beep_device *>(device)->token();
 }
 
 
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-/*************************************
- *
- *  Stream updater
- *
- *************************************/
-
-static STREAM_UPDATE( beep_sound_update )
+void beep_device::device_start()
 {
-	beep_state *bs = (beep_state *) param;
+	m_stream = stream_alloc(0, 1, BEEP_RATE);
+	m_enable = 0;
+	m_frequency = 3250;
+	m_incr = 0;
+	m_signal = 0x07fff;
+}
+
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
 	stream_sample_t *buffer = outputs[0];
-	INT16 signal = bs->signal;
+	INT16 signal = m_signal;
 	int clock = 0, rate = BEEP_RATE / 2;
 
 	/* get progress through wave */
-	int incr = bs->incr;
+	int incr = m_incr;
 
-	if (bs->frequency > 0)
-		clock = bs->frequency;
+	if (m_frequency > 0)
+		clock = m_frequency;
 
 	/* if we're not enabled, just fill with 0 */
-	if ( !bs->enable || clock == 0 )
+	if ( !m_enable || clock == 0 )
 	{
 		memset( buffer, 0, samples * sizeof(*buffer) );
 		return;
@@ -75,127 +91,55 @@ static STREAM_UPDATE( beep_sound_update )
 	}
 
 	/* store progress through wave */
-	bs->incr = incr;
-	bs->signal = signal;
+	m_incr = incr;
+	m_signal = signal;
 }
 
 
+//-------------------------------------------------
+//  changing state to on from off will restart tone
+//-------------------------------------------------
 
-/*************************************
- *
- *  Sound handler start
- *
- *************************************/
-
-static DEVICE_START( beep )
+void beep_device::set_state(int on)
 {
-	beep_state *pBeep = get_safe_token(device);
-
-	pBeep->stream = device->machine().sound().stream_alloc(*device, 0, 1, BEEP_RATE, pBeep, beep_sound_update );
-	pBeep->enable = 0;
-	pBeep->frequency = 3250;
-	pBeep->incr = 0;
-	pBeep->signal = 0x07fff;
-}
-
-
-
-/*************************************
- *
- *  changing state to on from off will restart tone
- *
- *************************************/
-
-void beep_set_state(device_t *device, int on)
-{
-	beep_state *info = get_safe_token(device);
-
 	/* only update if new state is not the same as old state */
-	if (info->enable == on)
+	if (m_enable == on)
 		return;
 
-	info->stream->update();
+	m_stream->update();
+	m_enable = on;
 
-	info->enable = on;
 	/* restart wave from beginning */
-	info->incr = 0;
-	info->signal = 0x07fff;
+	m_incr = 0;
+	m_signal = 0x07fff;
 }
 
 
 
-/*************************************
- *
- *  setting new frequency starts from beginning
- *
- *************************************/
+//-------------------------------------------------
+//  setting new frequency starts from beginning
+//-------------------------------------------------
 
-void beep_set_frequency(device_t *device,int frequency)
+void beep_device::set_frequency(int frequency)
 {
-	beep_state *info = get_safe_token(device);
-
-	if (info->frequency == frequency)
+	if (m_frequency == frequency)
 		return;
 
-	info->stream->update();
-	info->frequency = frequency;
-	info->signal = 0x07fff;
-	info->incr = 0;
+	m_stream->update();
+	m_frequency = frequency;
+	m_signal = 0x07fff;
+	m_incr = 0;
 }
 
 
 
-/*************************************
- *
- *  change a channel volume
- *
- *************************************/
+//-------------------------------------------------
+//  change a channel volume
+//-------------------------------------------------
 
-void beep_set_volume(device_t *device, int volume)
+void beep_device::set_volume(int volume)
 {
-	beep_state *info = get_safe_token(device);
-
-	info->stream->update();
-
+	m_stream->update();
 	volume = 100 * volume / 7;
-
-	downcast<beep_device *>(device)->set_output_gain(0, volume);
-}
-
-const device_type BEEP = &device_creator<beep_device>;
-
-beep_device::beep_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, BEEP, "Beep", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
-{
-	m_token = global_alloc_clear(beep_state);
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void beep_device::device_config_complete()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void beep_device::device_start()
-{
-	DEVICE_START_NAME( beep )(this);
-}
-
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
-
-void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
-{
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	set_output_gain(0, volume);
 }

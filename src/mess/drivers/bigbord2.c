@@ -285,7 +285,7 @@ WRITE8_MEMBER( bigbord2_state::portc8_w )
 			break;
 		case 7:
 			// beeper
-			beep_set_state(m_beeper, m_c8[7]);
+			m_beeper->set_state(m_c8[7]);
 			break;
 	}
 }
@@ -556,8 +556,8 @@ void bigbord2_state::machine_reset()
 	UINT8 i;
 	for (i = 0; i < 8; i++)
 		m_c8[i] = 0;
-	beep_set_state(m_beeper, 0);
-	beep_set_frequency(m_beeper, 950); // actual frequency is unknown
+	m_beeper->set_state(0);
+	m_beeper->set_frequency(950); // actual frequency is unknown
 	membank("bankr")->set_entry(0);
 	membank("bankv")->set_entry(0);
 	membank("banka")->set_entry(0);

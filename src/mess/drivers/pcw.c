@@ -407,7 +407,7 @@ WRITE8_MEMBER(pcw_state::pcw_vdu_video_control_register_w)
 WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 {
 	upd765a_device *fdc = machine().device<upd765a_device>("upd765");
-	device_t *speaker = machine().device(BEEPER_TAG);
+	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
@@ -545,14 +545,14 @@ WRITE8_MEMBER(pcw_state::pcw_system_control_w)
 		/* beep on */
 		case 11:
 		{
-			beep_set_state(speaker,1);
+			speaker->set_state(1);
 		}
 		break;
 
 		/* beep off */
 		case 12:
 		{
-			beep_set_state(speaker,0);
+			speaker->set_state(0);
 		}
 		break;
 
@@ -996,9 +996,9 @@ ADDRESS_MAP_END
 
 TIMER_CALLBACK_MEMBER(pcw_state::setup_beep)
 {
-	device_t *speaker = machine().device(BEEPER_TAG);
-	beep_set_state(speaker, 0);
-	beep_set_frequency(speaker, 3750);
+	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
+	speaker->set_state(0);
+	speaker->set_frequency(3750);
 }
 
 

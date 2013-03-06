@@ -500,7 +500,7 @@ WRITE8_MEMBER(vk100_state::KBDW)
 #ifdef LED_VERBOSE
 	if (BIT(data, 6)) logerror("kb keyclick bit 6 set: not emulated yet (multivibrator)!\n");
 #endif
-	beep_set_state( m_speaker, BIT(data, 7));
+	m_speaker->set_state(BIT(data, 7));
 #ifdef LED_VERBOSE
 	logerror("LED state: %02X: %s %s %s %s %s %s\n", data&0xFF, (data&0x20)?"------- LOCAL ":"ON LINE ----- ", (data&0x10)?"--------- ":"NO SCROLL ", (data&0x8)?"----- ":"BASIC ", (data&0x4)?"--------- ":"HARD-COPY ", (data&0x2)?"-- ":"L1 ", (data&0x1)?"-- ":"L2 ");
 #endif
@@ -865,7 +865,7 @@ INPUT_PORTS_END
 
 void vk100_state::machine_start()
 {
-	beep_set_frequency( m_speaker, 116 ); //116 hz (page 172 of TM), but duty cycle is wrong here!
+	m_speaker->set_frequency(116); //116 hz (page 172 of TM), but duty cycle is wrong here!
 	output_set_value("online_led",1);
 	output_set_value("local_led", 0);
 	output_set_value("noscroll_led",1);

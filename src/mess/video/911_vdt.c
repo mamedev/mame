@@ -91,7 +91,7 @@ struct vdt_t
 	unsigned int cursor_address;        /* current cursor address (controlled by the computer, affects both display and I/O protocol) */
 	unsigned int cursor_address_mask;   /* 1023 for 960-char model, 2047 for 1920-char model */
 
-	emu_timer *beep_timer;                  /* beep clock (beeps ends when timer times out) */
+	emu_timer *beep_timer;              /* beep clock (beeps ends when timer times out) */
 	/*void *blink_clock;*/              /* cursor blink clock */
 
 	UINT8 keyboard_data;                /* last code pressed on keyboard */
@@ -230,7 +230,7 @@ void vdt911_init(running_machine &machine)
 
 static TIMER_CALLBACK(setup_beep)
 {
-	beep_set_frequency(machine.device(BEEPER_TAG), 2000);
+	machine.device<beep_device>(BEEPER_TAG)->set_frequency(2000);
 }
 
 
@@ -311,7 +311,7 @@ static TIMER_CALLBACK(blink_callback)
 */
 static TIMER_CALLBACK(beep_callback)
 {
-	beep_set_state(machine.device(BEEPER_TAG), 0);
+	machine.device<beep_device>(BEEPER_TAG)->set_state(0);
 }
 
 /*
@@ -485,7 +485,7 @@ WRITE8_DEVICE_HANDLER( vdt911_cru_w )
 
 		case 0xe:
 			/* beep enable strobe - not tested */
-			beep_set_state(space.machine().device(BEEPER_TAG), 1);
+			space.machine().device<beep_device>(BEEPER_TAG)->set_state(1);
 
 			vdt->beep_timer->adjust(attotime::from_usec(300));
 			break;

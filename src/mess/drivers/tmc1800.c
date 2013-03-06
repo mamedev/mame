@@ -112,6 +112,7 @@ Notes:
 */
 
 #include "includes/tmc1800.h"
+#include "sound/beep.h"
 
 /* Read/Write Handlers */
 
@@ -907,9 +908,9 @@ ROM_END
 
 TIMER_CALLBACK_MEMBER(tmc1800_state::setup_beep)
 {
-	device_t *speaker = machine().device(BEEPER_TAG);
-	beep_set_state(speaker, 0);
-	beep_set_frequency( speaker, 0 );
+	beep_device *speaker = machine().device<beep_device>(BEEPER_TAG);
+	speaker->set_state(0);
+	speaker->set_frequency(0);
 }
 
 DRIVER_INIT_MEMBER(tmc1800_state,tmc1800)

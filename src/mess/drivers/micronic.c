@@ -157,8 +157,8 @@ WRITE8_MEMBER( micronic_state::beep_w )
 		500,  444,  400,  364,  333, 308, 286, 267
 	};
 
-	beep_set_frequency(m_beep, frequency[data & 0x0f]);
-	beep_set_state(m_beep, (data & 0x0f) ? 1 : 0);
+	m_beep->set_frequency(frequency[data & 0x0f]);
+	m_beep->set_state((data & 0x0f) ? 1 : 0);
 }
 
 READ8_MEMBER( micronic_state::irq_flag_r )

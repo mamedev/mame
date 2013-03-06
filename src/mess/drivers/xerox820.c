@@ -199,7 +199,7 @@ INPUT_PORTS_END
 
 TIMER_CALLBACK_MEMBER( bigboard_state::bigboard_beepoff )
 {
-	beep_set_state(m_beeper, 0);
+	m_beeper->set_state(0);
 }
 
 /* Z80 PIO */
@@ -291,7 +291,7 @@ WRITE8_MEMBER( bigboard_state::kbpio_pa_w )
 	if (BIT(data, 5) & (!m_bit5))
 	{
 		machine().scheduler().timer_set(attotime::from_msec(40), timer_expired_delegate(FUNC(bigboard_state::bigboard_beepoff),this));
-		beep_set_state(m_beeper, 1);
+		m_beeper->set_state(1);
 	}
 	m_bit5 = BIT(data, 5);
 }
@@ -599,8 +599,8 @@ void bigboard_state::machine_reset()
 	bankswitch(1);
 
 	/* bigboard has a one-pulse output to drive a user-supplied beeper */
-	beep_set_state(m_beeper, 0);
-	beep_set_frequency(m_beeper, 950);
+	m_beeper->set_state(0);
+	m_beeper->set_frequency(950);
 
 	m_fdc->reset();
 }

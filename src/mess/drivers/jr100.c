@@ -68,7 +68,7 @@ public:
 protected:
 	required_device<via6522_device> m_via;
 	required_device<cassette_image_device> m_cassette;
-	required_device<device_t> m_beeper;
+	required_device<beep_device> m_beeper;
 	required_device<device_t> m_speaker;
 	required_memory_region m_region_maincpu;
 	required_ioport m_line0;
@@ -94,7 +94,7 @@ WRITE8_MEMBER(jr100_state::jr100_via_w)
 		m_beep_en = ((data & 0xe0) == 0xe0);
 
 		if(!m_beep_en)
-			beep_set_state(m_beeper,0);
+			m_beeper->set_state(0);
 	}
 
 	/* T1L-L */
@@ -113,8 +113,8 @@ WRITE8_MEMBER(jr100_state::jr100_via_w)
 		/* writing here actually enables the beeper, if above masking condition is satisfied */
 		if(m_beep_en)
 		{
-			beep_set_state(m_beeper,1);
-			beep_set_frequency(m_beeper,894886.25 / (double)(m_t1latch) / 2.0);
+			m_beeper->set_state(1);
+			m_beeper->set_frequency(894886.25 / (double)(m_t1latch) / 2.0);
 		}
 	}
 	m_via->write(space,offset,data);
@@ -198,8 +198,8 @@ INPUT_PORTS_END
 
 void jr100_state::machine_start()
 {
-	beep_set_frequency(m_beeper,0);
-	beep_set_state(m_beeper,0);
+	m_beeper->set_frequency(0);
+	m_beeper->set_state(0);
 }
 
 void jr100_state::machine_reset()

@@ -58,19 +58,19 @@ READ8_MEMBER( zrt80_state::zrt80_10_r )
 
 TIMER_CALLBACK_MEMBER(zrt80_state::zrt80_beepoff)
 {
-	beep_set_state(m_beep, 0);
+	m_beep->set_state(0);
 }
 
 WRITE8_MEMBER(zrt80_state::zrt80_30_w)
 {
 	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(zrt80_state::zrt80_beepoff),this));
-	beep_set_state(m_beep, 1);
+	m_beep->set_state(1);
 }
 
 WRITE8_MEMBER(zrt80_state::zrt80_38_w)
 {
 	machine().scheduler().timer_set(attotime::from_msec(400), timer_expired_delegate(FUNC(zrt80_state::zrt80_beepoff),this));
-	beep_set_state(m_beep, 1);
+	m_beep->set_state(1);
 }
 
 static ADDRESS_MAP_START(zrt80_mem, AS_PROGRAM, 8, zrt80_state)
@@ -181,7 +181,7 @@ INPUT_PORTS_END
 
 void zrt80_state::machine_reset()
 {
-	beep_set_frequency(m_beep, 800);
+	m_beep->set_frequency(800);
 	m_term_data = 0;
 }
 

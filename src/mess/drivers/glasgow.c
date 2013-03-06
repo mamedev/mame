@@ -106,7 +106,7 @@ WRITE16_MEMBER( glasgow_state::glasgow_lcd_flag_w )
 {
 	UINT16 lcd_flag = data & 0x8100;
 
-	beep_set_state(m_beep, BIT(lcd_flag, 8));
+	m_beep->set_state(BIT(lcd_flag, 8));
 
 	if (lcd_flag)
 		m_led7 = 255;
@@ -153,7 +153,7 @@ WRITE16_MEMBER( glasgow_state::write_lcd_flag )
 //  UINT8 lcd_flag;
 	mboard_lcd_invert = 0;
 //  lcd_flag=data >> 8;
-	//beep_set_state(0, (data >> 8) & 1 ? 1 : 0);
+	//m_beep->set_state((data >> 8) & 1 ? 1 : 0);
 	if ((data >> 8) == 0)
 	{
 		mboard_key_selector = 1;
@@ -175,7 +175,7 @@ WRITE16_MEMBER( glasgow_state::write_lcd_flag )
 
 WRITE16_MEMBER( glasgow_state::write_irq_flag )
 {
-	beep_set_state(m_beep, data & 0x100);
+	m_beep->set_state(data & 0x100);
 	logerror("Write 0x800004 = %x \n", data);
 	m_irq_flag = 1;
 	m_beeper = data;
@@ -236,7 +236,7 @@ WRITE32_MEMBER( glasgow_state::write_lcd_flag32 )
 
 
 	//logerror("LCD Flag 32 = %x \n", data >> 24);
-	//beep_set_state(0, (data >> 24) & 1 ? 1 : 0);
+	//m_beep->set_state((data >> 24) & 1 ? 1 : 0);
 
 //  if (lcd_flag != 0)
 //      m_led7 = 255;
@@ -269,7 +269,7 @@ READ16_MEMBER(glasgow_state::read_board_amsterd)
 
 WRITE32_MEMBER( glasgow_state::write_beeper32 )
 {
-	beep_set_state(m_beep, data & 0x01000000);
+	m_beep->set_state(data & 0x01000000);
 	logerror("Write 0x8000004 = %x \n", data);
 	m_irq_flag = 1;
 	m_beeper = data;
@@ -290,7 +290,7 @@ void glasgow_state::machine_start()
 	mboard_key_selector = 0;
 	m_irq_flag = 0;
 	m_lcd_shift_counter = 3;
-	beep_set_frequency(m_beep, 44);
+	m_beep->set_frequency(44);
 
 	mboard_savestate_register();
 }
@@ -299,7 +299,7 @@ void glasgow_state::machine_start()
 MACHINE_START_MEMBER(glasgow_state,dallas32)
 {
 	m_lcd_shift_counter = 3;
-	beep_set_frequency(m_beep, 44);
+	m_beep->set_frequency(44);
 
 	mboard_savestate_register();
 }

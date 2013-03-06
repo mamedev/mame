@@ -120,7 +120,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_mb8877a;
 	required_device<device_t> m_pit8253;
-	required_device<device_t> m_beeper;
+	required_device<beep_device> m_beeper;
 	required_memory_region m_region_tvram;
 	required_memory_region m_region_gvram;
 	required_memory_region m_region_chargen;
@@ -555,8 +555,8 @@ void mz2000_state::machine_reset()
 	m_tvram_enable = 0;
 	m_gvram_enable = 0;
 
-	beep_set_frequency(m_beeper,4096);
-	beep_set_state(m_beeper,0);
+	m_beeper->set_frequency(4096);
+	m_beeper->set_state(0);
 
 	m_color_mode = m_io_config->read() & 1;
 	m_has_fdc = (m_io_config->read() & 2) >> 1;
@@ -732,7 +732,7 @@ WRITE8_MEMBER(mz2000_state::mz2000_portc_w)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 	}
 
-	beep_set_state(m_beeper,data & 0x04);
+	m_beeper->set_state(data & 0x04);
 
 	m_old_portc = data;
 }

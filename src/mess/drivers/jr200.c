@@ -73,7 +73,7 @@ public:
 
 protected:
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_beeper;
+	required_device<beep_device> m_beeper;
 	required_memory_region m_pcg;
 	required_memory_region m_gfx_rom;
 	required_memory_region m_gfx_ram;
@@ -297,7 +297,7 @@ READ8_MEMBER(jr200_state::mcu_keyb_r)
 WRITE8_MEMBER(jr200_state::jr200_beep_w)
 {
 	/* writing 0x0e enables the beeper, writing anything else disables it */
-	beep_set_state(m_beeper,((data & 0xf) == 0x0e) ? 1 : 0);
+	m_beeper->set_state(((data & 0xf) == 0x0e) ? 1 : 0);
 }
 
 WRITE8_MEMBER(jr200_state::jr200_beep_freq_w)
@@ -308,7 +308,7 @@ WRITE8_MEMBER(jr200_state::jr200_beep_freq_w)
 
 	beep_freq = ((m_freq_reg[0]<<8) | (m_freq_reg[1] & 0xff)) + 1;
 
-	beep_set_frequency(m_beeper,84000 / beep_freq);
+	m_beeper->set_frequency(84000 / beep_freq);
 }
 
 WRITE8_MEMBER(jr200_state::jr200_border_col_w)
@@ -516,8 +516,8 @@ GFXDECODE_END
 
 void jr200_state::machine_start()
 {
-	beep_set_frequency(m_beeper,0);
-	beep_set_state(m_beeper,0);
+	m_beeper->set_frequency(0);
+	m_beeper->set_state(0);
 	m_timer_d = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(jr200_state::timer_d_callback),this));
 }
 

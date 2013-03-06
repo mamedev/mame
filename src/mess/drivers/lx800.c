@@ -108,7 +108,7 @@ WRITE8_MEMBER( lx800_state::lx800_portc_w )
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
 
 	output_set_value("online_led", !BIT(data, 2));
-	beep_set_state(m_beep, !BIT(data, 7));
+	m_beep->set_state(!BIT(data, 7));
 }
 
 
@@ -146,8 +146,8 @@ WRITE_LINE_MEMBER( lx800_state::lx800_reset_w )
 
 void lx800_state::machine_start()
 {
-	beep_set_state(m_beep, 0);
-	beep_set_frequency(m_beep, 4000); /* ? */
+	m_beep->set_state(0);
+	m_beep->set_frequency(4000); /* ? */
 }
 
 

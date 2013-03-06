@@ -217,7 +217,7 @@ WRITE8_MEMBER( pc100_state::pc100_output_w )
 	if(offset == 0)
 	{
 		m_timer_mode = (data & 0x18) >> 3;
-		beep_set_state(machine().device(BEEPER_TAG),((data & 0x40) >> 6) ^ 1);
+		machine().device<beep_device>(BEEPER_TAG)->set_state(((data & 0x40) >> 6) ^ 1);
 		printf("%02x\n",data & 0xc0);
 	}
 }
@@ -427,8 +427,8 @@ void pc100_state::machine_start()
 
 void pc100_state::machine_reset()
 {
-	beep_set_frequency(machine().device(BEEPER_TAG),2400);
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	machine().device<beep_device>(BEEPER_TAG)->set_frequency(2400);
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 }
 
 INTERRUPT_GEN_MEMBER(pc100_state::pc100_vblank_irq)

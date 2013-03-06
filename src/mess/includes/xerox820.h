@@ -114,7 +114,7 @@ class bigboard_state : public xerox820_state
 public:
 	bigboard_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xerox820_state(mconfig, type, tag),
-			m_beeper(*this, BEEPER_TAG)
+		  m_beeper(*this, BEEPER_TAG)
 	{ }
 
 	required_device<beep_device> m_beeper;

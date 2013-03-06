@@ -1184,10 +1184,10 @@ WRITE8_MEMBER(pc8801_state::pc8801_ctrl_w)
 	m_rtc->clk_w((data & 4) >> 2);
 
 	if(((m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
-		beep_set_state(machine().device(BEEPER_TAG),1);
+		machine().device<beep_device>(BEEPER_TAG)->set_state(1);
 
 	if(((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
-		beep_set_state(machine().device(BEEPER_TAG),0);
+		machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 
 	if((m_device_ctrl_data & 0x40) != (data & 0x40))
 	{
@@ -1214,7 +1214,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_ctrl_w)
 
 	/* TODO: is SING a buzzer mask? Bastard Special relies on this ... */
 	if(m_device_ctrl_data & 0x80)
-		beep_set_state(machine().device(BEEPER_TAG),0);
+		machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 
 	m_device_ctrl_data = data;
 }
@@ -2475,8 +2475,8 @@ void pc8801_state::machine_reset()
 		m_crtc.status = 0;
 	}
 
-	beep_set_frequency(machine().device(BEEPER_TAG),2400);
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	machine().device<beep_device>(BEEPER_TAG)->set_frequency(2400);
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 
 	#ifdef USE_PROPER_I8214
 	{

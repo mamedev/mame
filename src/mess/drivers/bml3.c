@@ -364,7 +364,7 @@ READ8_MEMBER( bml3_state::bml3_beep_r)
 
 WRITE8_MEMBER( bml3_state::bml3_beep_w)
 {
-	beep_set_state(m_beep,!BIT(data, 7));
+	m_beep->set_state(!BIT(data, 7));
 }
 
 READ8_MEMBER( bml3_state::bml3_a000_r) { return m_extram[offset + 0xa000]; }
@@ -632,8 +632,8 @@ void bml3_state::palette_init()
 
 void bml3_state::machine_start()
 {
-	beep_set_frequency(machine().device(BEEPER_TAG),1200); //guesswork
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	m_beep->set_frequency(1200); //guesswork
+	m_beep->set_state(0);
 	m_extram = auto_alloc_array(machine(),UINT8,0x10000);
 }
 

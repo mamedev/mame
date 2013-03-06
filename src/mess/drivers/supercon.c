@@ -566,11 +566,11 @@ WRITE8_MEMBER( supercon_state::supercon_port4_w )
 
 	if ( m_data_1F00 & 0x80 )
 	{
-		beep_set_state(m_beep, 1);
+		m_beep->set_state(1);
 		m_emu_started=TRUE;
 	}
 	else
-		beep_set_state(m_beep ,0);
+		m_beep->set_state(0);
 }
 
 TIMER_CALLBACK_MEMBER(supercon_state::mouse_click)

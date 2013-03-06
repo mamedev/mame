@@ -236,7 +236,7 @@ READ8_MEMBER(fm7_state::fm7_irq_cause_r)
 
 TIMER_CALLBACK_MEMBER(fm7_state::fm7_beeper_off)
 {
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 	logerror("timed beeper off\n");
 }
 
@@ -246,23 +246,23 @@ WRITE8_MEMBER(fm7_state::fm7_beeper_w)
 
 	if(!m_speaker_active)  // speaker not active, disable all beeper sound
 	{
-		beep_set_state(machine().device(BEEPER_TAG),0);
+		machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 		return;
 	}
 
 	if(data & 0x80)
 	{
 		if(m_speaker_active)
-			beep_set_state(machine().device(BEEPER_TAG),1);
+			machine().device<beep_device>(BEEPER_TAG)->set_state(1);
 	}
 	else
-		beep_set_state(machine().device(BEEPER_TAG),0);
+		machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 
 	if(data & 0x40)
 	{
 		if(m_speaker_active)
 		{
-			beep_set_state(machine().device(BEEPER_TAG),1);
+			machine().device<beep_device>(BEEPER_TAG)->set_state(1);
 			logerror("timed beeper on\n");
 			machine().scheduler().timer_set(attotime::from_msec(205), timer_expired_delegate(FUNC(fm7_state::fm7_beeper_off),this));
 		}
@@ -279,7 +279,7 @@ READ8_MEMBER(fm7_state::fm7_sub_beeper_r)
 {
 	if(m_speaker_active)
 	{
-		beep_set_state(machine().device(BEEPER_TAG),1);
+		machine().device<beep_device>(BEEPER_TAG)->set_state(1);
 		logerror("timed beeper on\n");
 		machine().scheduler().timer_set(attotime::from_msec(205), timer_expired_delegate(FUNC(fm7_state::fm7_beeper_off),this));
 	}
@@ -1848,8 +1848,8 @@ MACHINE_START_MEMBER(fm7_state,fm7)
 	memset(m_shared_ram,0xff,0x80);
 	m_type = SYS_FM7;
 
-	beep_set_frequency(machine().device(BEEPER_TAG),1200);
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	machine().device<beep_device>(BEEPER_TAG)->set_frequency(1200);
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 }
 
 MACHINE_START_MEMBER(fm7_state,fm77av)
@@ -1869,8 +1869,8 @@ MACHINE_START_MEMBER(fm7_state,fm77av)
 	membank("bank21")->set_base(RAM+0x800);
 
 	m_type = SYS_FM77AV;
-	beep_set_frequency(machine().device(BEEPER_TAG),1200);
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	machine().device<beep_device>(BEEPER_TAG)->set_frequency(1200);
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 }
 
 MACHINE_START_MEMBER(fm7_state,fm11)
@@ -1880,8 +1880,8 @@ MACHINE_START_MEMBER(fm7_state,fm11)
 
 	memset(m_shared_ram,0xff,0x80);
 	m_type = SYS_FM11;
-	beep_set_frequency(machine().device(BEEPER_TAG),1200);
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	machine().device<beep_device>(BEEPER_TAG)->set_frequency(1200);
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 	// last part of Initiate ROM is visible at the end of RAM too (interrupt vectors)
 	memcpy(RAM+0x3fff0,ROM+0x0ff0,16);
 }
@@ -1889,8 +1889,8 @@ MACHINE_START_MEMBER(fm7_state,fm11)
 MACHINE_START_MEMBER(fm7_state,fm16)
 {
 	m_type = SYS_FM16;
-	beep_set_frequency(machine().device(BEEPER_TAG),1200);
-	beep_set_state(machine().device(BEEPER_TAG),0);
+	machine().device<beep_device>(BEEPER_TAG)->set_frequency(1200);
+	machine().device<beep_device>(BEEPER_TAG)->set_state(0);
 }
 
 void fm7_state::machine_reset()

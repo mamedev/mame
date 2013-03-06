@@ -151,8 +151,8 @@ static ADDRESS_MAP_START( cpub_map, AS_PROGRAM, 8, exzisus_state )
 	AM_RANGE(0xc000, 0xc5ff) AM_READWRITE(exzisus_objectram_0_r, exzisus_objectram_0_w) AM_SHARE("objectram0")
 	AM_RANGE(0xc600, 0xdfff) AM_READWRITE(exzisus_videoram_0_r, exzisus_videoram_0_w) AM_SHARE("videoram0")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_port_w)
-	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
+	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_port_w)
+	AM_RANGE(0xf001, 0xf001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_comm_r, tc0140syt_comm_w)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("P1")
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(exzisus_cpub_bankswitch_w)
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("P2")
@@ -176,8 +176,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, exzisus_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 ADDRESS_MAP_END
 
 
