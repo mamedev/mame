@@ -640,6 +640,10 @@ void mos6526_device::device_start()
 	// set our instruction counter
 	m_icountptr = &m_icount;
 
+	m_flag = 1;
+	m_cnt = 1;
+	m_cra = 0;
+
 	// resolve callbacks
 	m_write_irq.resolve_safe();
 	m_write_pc.resolve_safe();
