@@ -263,6 +263,7 @@ i8255_device::i8255_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, I8255, "I8255", tag, owner, clock)
 {
 	m_intr[PORT_A] = m_intr[PORT_B] = 0;
+	m_control = 0;
 }
 
 
