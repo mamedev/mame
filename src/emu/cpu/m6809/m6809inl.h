@@ -201,8 +201,8 @@ inline ATTR_FORCE_INLINE void m6809_base_device::write_exgtfr_register(UINT8 reg
 inline ATTR_FORCE_INLINE void m6809_base_device::daa()
 {
 	UINT16 t, cf = 0;
-	UINT8 msn = m_d.b.h & 0xf0;
-	UINT8 lsn = m_d.b.l & 0x0f;
+	UINT8 msn = m_d.b.h & 0xF0;
+	UINT8 lsn = m_d.b.h & 0x0F;
 
 	// compute the carry
 	if (lsn > 0x09 || m_cc & CC_H)	cf |= 0x06;
