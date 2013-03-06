@@ -844,6 +844,22 @@ UINT32 tms57002_device::execute_input_lines() const
 	return 0;
 }
 
+UINT32 tms57002_device::disasm_min_opcode_bytes() const
+{
+	return 4;
+}
+
+UINT32 tms57002_device::disasm_max_opcode_bytes() const
+{
+	return 4;
+}
+
+offs_t tms57002_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+{
+	extern CPU_DISASSEMBLE( tms57002 );
+	return CPU_DISASSEMBLE_NAME(tms57002)(this, buffer, pc, oprom, opram, options);
+}
+
 const address_space_config *tms57002_device::memory_space_config(address_spacenum spacenum) const
 {
 	switch(spacenum) {
