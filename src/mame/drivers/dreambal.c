@@ -27,8 +27,6 @@ public:
 
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf2_rowscroll(*this, "pf2_rowscroll"),
-		m_spriteram(*this, "spriteram"),
-		m_sprgen(*this, "spritegen")
 */
 	{ }
 
@@ -37,7 +35,6 @@ public:
 	required_shared_ptr<UINT16> m_pf1_rowscroll;
 	required_shared_ptr<UINT16> m_pf2_rowscroll;
 	required_shared_ptr<UINT16> m_spriteram;
-	optional_device<decospr_device> m_sprgen;
 	*/
 
 	/* devices */
@@ -50,45 +47,35 @@ public:
 	UINT32 screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-#if 0
-UINT16 dreambal_pri_callback(UINT16 x)
-{
-	UINT16 pri = (x & 0xc000); // 2 bits or 1?
-	switch (pri & 0xc000)
-	{
-		case 0x0000: pri = 0; break;
-		case 0x4000: pri = 0xf0; break;
-		case 0x8000: pri = 0xf0 | 0xcc; break;
-		case 0xc000: pri = 0xf0 | 0xcc; break; /*  or 0xf0|0xcc|0xaa ? */
-	}
-
-	return pri;
-}
-#endif
-
 
 UINT32 dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#if 0
+
 	address_space &space = generic_space();
 	UINT16 flip = deco16ic_pf_control_r(m_deco_tilegen1, space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
-	deco16ic_pf_update(m_deco_tilegen1, m_pf1_rowscroll, m_pf2_rowscroll);
+	deco16ic_pf_update(m_deco_tilegen1, NULL, NULL);
 
 	bitmap.fill(0, cliprect); /* not Confirmed */
 	machine().priority_bitmap.fill(0);
 
 	deco16ic_tilemap_2_draw(m_deco_tilegen1, bitmap, cliprect, 0, 2);
 	deco16ic_tilemap_1_draw(m_deco_tilegen1, bitmap, cliprect, 0, 4);
-	m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
-#endif
 	return 0;
 }
 
 
 static ADDRESS_MAP_START( dreambal_map, AS_PROGRAM, 16, dreambal_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM
+	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x103000, 0x103fff) AM_RAM
+
+	AM_RANGE(0x120000, 0x123fff) AM_RAM
+	AM_RANGE(0x140000, 0x1403ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x161000, 0x16100f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w) 
 ADDRESS_MAP_END
 
 
@@ -114,24 +101,10 @@ static const gfx_layout tile_16x16_layout =
 	32*16
 };
 
-/*
-static const gfx_layout spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 24,8,16,0 },
-	{ 512,513,514,515,516,517,518,519, 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-		8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32},
-	32*32
-};
-*/
 
 static GFXDECODE_START( dreambal )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8_layout,     0x000, 32 )    /* Tiles (8x8) */
 	GFXDECODE_ENTRY( "gfx1", 0, tile_16x16_layout,   0x000, 32 )    /* Tiles (16x16) */
-//	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,        0x200, 32 )    /* Sprites (16x16) */
 GFXDECODE_END
 
 static INPUT_PORTS_START( dreambal )
@@ -222,7 +195,7 @@ static MACHINE_CONFIG_START( dreambal, dreambal_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 28000000/2)
 	MCFG_CPU_PROGRAM_MAP(dreambal_map)
-//	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreambal_state,  irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", dreambal_state,  irq6_line_hold) // 5 valid too?
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -232,15 +205,11 @@ static MACHINE_CONFIG_START( dreambal, dreambal_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(dreambal_state, screen_update_dreambal)
 
-	MCFG_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_LENGTH(0x400/2)
 	MCFG_GFXDECODE(dreambal)
 
 	MCFG_DECO16IC_ADD("tilegen1", dreambal_deco16ic_tilegen1_intf)
-/*
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 2);
-	decospr_device::set_pri_callback(*device, dreambal_pri_callback);
-*/
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -253,7 +222,7 @@ MACHINE_CONFIG_END
 
 ROM_START( dreambal )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "mm_00-2.1c",    0x000001, 0x020000, CRC(257f6ad1) SHA1(7b232ce2d503e6f21286176974f6b74052f76d07) )
+	ROM_LOAD16_WORD_SWAP( "mm_00-2.1c",    0x000000, 0x020000, CRC(257f6ad1) SHA1(7b232ce2d503e6f21286176974f6b74052f76d07) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "mm_01-1.12b",    0x00000, 0x80000, CRC(dc9cc708) SHA1(03b8e6aa37e0107514a2498849208d2bd51a4163) )
@@ -271,5 +240,5 @@ DRIVER_INIT_MEMBER(dreambal_state,dreambal)
 	deco56_decrypt_gfx(machine(), "gfx1");
 }
 
-
-GAME( 199?, dreambal, 0,     dreambal, dreambal, dreambal_state,  dreambal,  ROT0, "Data East", "Dream Ball", GAME_NOT_WORKING )
+// Ver 2.4 JPN 93.12.02
+GAME( 1993, dreambal, 0,     dreambal, dreambal, dreambal_state,  dreambal,  ROT0, "Data East", "Dream Ball (Japan V2.4)", GAME_NOT_WORKING )
