@@ -123,92 +123,16 @@ static int char_to_int_conv( char id )
 static void snes_load_sram(running_machine &machine)
 {
 	snes_state *state = machine.driver_data<snes_state>();
-	UINT8 ii;
-	UINT8 *battery_ram, *ptr;
-
-	battery_ram = (UINT8*)malloc(state->m_cart[0].sram_max);
-	ptr = battery_ram;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
-	image->battery_load(battery_ram, state->m_cart[0].sram_max, 0xff);
-
-	if (state->m_cart[0].mode == SNES_MODE_20)
-	{
-		UINT32 size = state->m_cart[0].small_sram ? 0x8000 : 0x10000;
-
-		/* There could be some larger image needing banks 0x70 to 0x7f at address 0x8000 for ROM
-		 * mirroring. These should be treated separately or data would be overwritten by SRAM */
-		for (ii = 0; ii < 16; ii++)
-		{
-			/* loading */
-			memmove(&snes_ram[0x700000 + (ii * 0x010000)], ptr, size);
-			/* mirroring */
-			memcpy(&snes_ram[0xf00000 + (ii * 0x010000)], &snes_ram[0x700000 + (ii * 0x010000)], size);
-			ptr += size;
-		}
-	}
-	else if (state->m_cart[0].mode == SNES_MODE_21)
-	{
-		for (ii = 0; ii < 16; ii++)
-		{
-			/* loading */
-			memmove(&snes_ram[0x306000 + (ii * 0x010000)], ptr, 0x2000);
-			/* mirroring */
-			memcpy(&snes_ram[0xb06000 + (ii * 0x010000)], &snes_ram[0x306000 + (ii * 0x010000)], 0x2000);
-			ptr += 0x2000;
-		}
-	}
-	else if (state->m_cart[0].mode == SNES_MODE_25)
-	{
-		for (ii = 0; ii < 16; ii++)
-		{
-			memmove(&snes_ram[0xb06000 + (ii * 0x010000)], ptr, 0x2000);
-			ptr += 0x2000;
-		}
-	}
-
-	free(battery_ram);
+	image->battery_load(state->m_cart[0].m_nvram, state->m_cart[0].m_nvram_size, 0xff);
 }
 
 /* Saves the battery backed RAM from the appropriate memory area */
 static void snes_save_sram(running_machine &machine)
 {
 	snes_state *state = machine.driver_data<snes_state>();
-	UINT8 ii;
-	UINT8 *battery_ram, *ptr;
-
-	battery_ram = (UINT8*)malloc(state->m_cart[0].sram_max);
-	ptr = battery_ram;
-
-	if (state->m_cart[0].mode == SNES_MODE_20)
-	{
-		UINT32 size = state->m_cart[0].small_sram ? 0x8000 : 0x10000;
-
-		for (ii = 0; ii < 16; ii++)
-		{
-			memmove(ptr, &snes_ram[0x700000 + (ii * 0x010000)], size);
-			ptr += size;
-		}
-	}
-	else if (state->m_cart[0].mode == SNES_MODE_21)
-	{
-		for (ii = 0; ii < 16; ii++)
-		{
-			memmove(ptr, &snes_ram[0x306000 + (ii * 0x010000)], 0x2000);
-			ptr += 0x2000;
-		}
-	}
-	else if (state->m_cart[0].mode == SNES_MODE_25)
-	{
-		for (ii = 0; ii < 16; ii++)
-		{
-			memmove(ptr, &snes_ram[0xb06000 + (ii * 0x010000)], 0x2000);
-			ptr += 0x2000;
-		}
-	}
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
-	image->battery_save(battery_ram, state->m_cart[0].sram_max);
-
-	free(battery_ram);
+	image->battery_save(state->m_cart[0].m_nvram, state->m_cart[0].m_nvram_size);
 }
 
 void snes_machine_stop(running_machine &machine)
@@ -216,7 +140,7 @@ void snes_machine_stop(running_machine &machine)
 	snes_state *state = machine.driver_data<snes_state>();
 
 	/* Save SRAM */
-	if (state->m_cart[0].sram > 0)
+	if (state->m_cart[0].m_nvram_size > 0)
 		snes_save_sram(machine);
 }
 
@@ -437,8 +361,8 @@ static UINT32 snes_skip_header( device_image_interface &image, UINT32 snes_rom_s
 
 
 /* This determines if a cart is in Mode 20, 21, 22 or 25; sets state->m_cart[0].mode and
- state->m_cart[0].sram accordingly; and returns the offset of the internal header (needed to
- detect BSX and ST carts) */
+ state->m_cart[0].sram_max accordingly; and returns the offset of the internal header
+ (needed to detect BSX and ST carts) */
 static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer, UINT32 offset, int cartid )
 {
 	snes_state *state = image.device().machine().driver_data<snes_state>();
@@ -731,7 +655,7 @@ static void snes_cart_log_info( running_machine &machine, int total_blocks, int 
 	logerror( " [%d]\n", snes_r_bank1(space, 0x00ffd6) );
 
 	logerror( "\tSize:          %d megabits [%d]\n", 1 << (snes_r_bank1(space, 0x00ffd7) - 7), snes_r_bank1(space, 0x00ffd7) );
-	logerror( "\tSRAM:          %d kilobits [%d]\n", state->m_cart[0].sram * 8, snes_ram[0xffd8] );
+	logerror( "\tSRAM:          %d kilobits [%d]\n", state->m_cart[0].m_nvram_size * 8, snes_ram[0xffd8] );
 	logerror( "\tCountry:       %s [%d]\n", countries[snes_r_bank1(space, 0x00ffd9)], snes_r_bank1(space, 0x00ffd9) );
 	logerror( "\tLicense:       %s [%X]\n", companies[snes_r_bank1(space, 0x00ffda)], snes_r_bank1(space, 0x00ffda) );
 	logerror( "\tVersion:       1.%d\n", snes_r_bank1(space, 0x00ffdb) );
@@ -772,6 +696,10 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 		memcpy(ROM, image.get_software_region("rom") + offset, m_cart_size - offset);
 
 	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", m_cart_size - offset);
+
+	m_cart[0].m_rom_size = m_cart_size;
+	m_cart[0].m_rom = auto_alloc_array_clear(machine, UINT8, m_cart[0].m_rom_size);
+	memcpy(m_cart[0].m_rom, ROM, m_cart[0].m_rom_size - offset);
 
 	/* First, look if the cart is HiROM or LoROM (and set snes_cart accordingly) */
 	int_header_offs = snes_find_hilo_mode(image, ROM, offset, 0);
@@ -914,7 +842,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 				/* Loading data */
 				memcpy(&snes_ram[0xc00000 + read_blocks * 0x10000], &ROM[0x000000 + read_blocks * 0x10000], 0x10000);
 				/* Mirroring */
-				memcpy( &snes_ram[0x808000 + read_blocks * 0x10000], &snes_ram[0xc08000 + read_blocks * 0x10000], 0x8000);
+				memcpy(&snes_ram[0x808000 + read_blocks * 0x10000], &snes_ram[0xc08000 + read_blocks * 0x10000], 0x8000);
 				read_blocks++;
 			}
 			/* ExHiROMs are supposed to be larger than 32Mbits! */
@@ -1066,8 +994,8 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 						j++;
 					repeat_blocks = read_blocks % (128 >> (j - 1));
 
-					memcpy( &snes_ram[read_blocks * 0x10000], &snes_ram[(read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
-					memcpy( &snes_ram[0x800000 + read_blocks * 0x10000], &snes_ram[(read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
+					memcpy(&snes_ram[read_blocks * 0x10000], &snes_ram[(read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
+					memcpy(&snes_ram[0x800000 + read_blocks * 0x10000], &snes_ram[(read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
 					read_blocks += repeat_blocks;
 				}
 			}
@@ -1077,42 +1005,43 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	/* Detect special chips */
 	supported_type = snes_find_addon_chip(machine);
 
-	/* Find the amount of cart ram (even if we call it sram...) */
+	/* Find the amount of cart ram */
+	m_cart[0].m_nvram_size = 0;
 	if (image.software_entry() == NULL)
 	{
+		UINT32 nvram_size;
 		if ((m_has_addon_chip != HAS_SUPERFX))
-			m_cart[0].sram = snes_r_bank1(space, 0x00ffd8);
+			nvram_size = snes_r_bank1(space, 0x00ffd8);
 		else
-			m_cart[0].sram = (snes_r_bank1(space, 0x00ffbd) & 0x07);
+			nvram_size = (snes_r_bank1(space, 0x00ffbd) & 0x07);
 
-		if (m_cart[0].sram > 0)
+		if (nvram_size > 0)
 		{
-			m_cart[0].sram = (1024 << m_cart[0].sram);
-			if (m_cart[0].sram > m_cart[0].sram_max)
-				m_cart[0].sram = m_cart[0].sram_max;
+			nvram_size = (1024 << nvram_size);
+			if (nvram_size > m_cart[0].sram_max)
+				nvram_size = m_cart[0].sram_max;
+
+			m_cart[0].m_nvram_size = nvram_size;
 		}
-//      printf("size %x\n", m_cart[0].sram);
+//      printf("size %x\n", m_cart[0].m_nvram_size);
 	}
 	else
 	{
 		// if we are loading from softlist, take memory length from the xml
-		m_cart[0].sram = image.get_software_region("nvram") ? image.get_software_region_length("nvram") : 0;
+		m_cart[0].m_nvram_size = image.get_software_region("nvram") ? image.get_software_region_length("nvram") : 0;
 
-		if (m_cart[0].sram > 0)
+		if (m_cart[0].m_nvram_size > 0)
 		{
-			if (m_cart[0].sram > m_cart[0].sram_max)
-				fatalerror("Found more memory than max allowed (found: %x, max: %x), check xml file!\n", m_cart[0].sram, m_cart[0].sram_max);
+			if (m_cart[0].m_nvram_size > m_cart[0].sram_max)
+				fatalerror("Found more memory than max allowed (found: %x, max: %x), check xml file!\n", m_cart[0].m_nvram_size, m_cart[0].sram_max);
 		}
 		// TODO: Eventually sram handlers should point to the allocated cart:sram region!
 		// For now, we only use the region as a placeholder to carry size info...
-//      printf("size %x\n", m_cart[0].sram);
+//      printf("size %x\n", m_cart[0].m_nvram_size);
 	}
 
-	/* adjust size for very large carts */
-	if (m_cart[0].mode == SNES_MODE_20 && ((m_cart_size - offset) > 0x200000 || m_cart[0].sram > (32 * 1024)))
-		m_cart[0].small_sram = 1;
-	else
-		m_cart[0].small_sram = 0;
+	if (m_cart[0].m_nvram_size > 0)
+		m_cart[0].m_nvram = auto_alloc_array_clear(machine, UINT8, m_cart[0].m_nvram_size);
 
 	/* Log snes_cart information */
 	snes_cart_log_info(machine, total_blocks, supported_type);
@@ -1218,6 +1147,11 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 		memcpy(&snes_ram[0x800000 + st_data_offset + read_blocks * 0x10000], &snes_ram[st_data_offset + (read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
 		read_blocks += repeat_blocks;
 	}
+
+	// currently we still use snes_ram for STROM ram...
+//  m_cart[slot_id].m_nvram_size = 0x20000;
+//  m_cart[slot_id].m_nvram = auto_alloc_array_clear(machine, UINT8, m_cart[slot_id].m_nvram_size);
+	m_cart[slot_id].m_nvram_size = 0;
 
 	sufami_load_sram(machine, image.device().tag());
 

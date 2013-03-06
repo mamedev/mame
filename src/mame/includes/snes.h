@@ -551,10 +551,12 @@ public:
 
 struct snes_cart_info
 {
+	UINT8 *m_rom;
+	UINT32 m_rom_size;
+	UINT8 *m_nvram;
+	UINT32 m_nvram_size;
 	UINT8  mode;        /* ROM memory mode */
-	UINT32 sram;        /* Amount of sram in cart */
 	UINT32 sram_max;    /* Maximum amount sram in cart (based on ROM mode) */
-	int    small_sram;
 	int    slot_in_use; /* this is needed by Sufami Turbo slots (to check if SRAM has to be saved) */
 };
 

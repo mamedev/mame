@@ -693,7 +693,7 @@ READ8_HANDLER( snes_r_bank1 )
 		value = snes_open_bus_r(space, 0);                              /* Reserved */
 	}
 	else
-		value = snes_ram[offset];
+		value = snes_ram[offset];   //ROM
 
 	return value;
 }
@@ -711,12 +711,12 @@ READ8_HANDLER( snes_r_bank2 )
 		value = state->snes_r_io(space, address);
 	else if (address < 0x8000)                                      /* SRAM for mode_21, Reserved othewise */
 	{
-		if (state->m_cart[0].mode == SNES_MODE_21 && state->m_cart[0].sram > 0)
+		if (state->m_cart[0].mode == SNES_MODE_21 && state->m_cart[0].m_nvram_size > 0)
 		{
 			/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
 			/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
-			int mask = (state->m_cart[0].sram - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
-			value = snes_ram[0x306000 + ((offset - 0x6000) & mask)];
+			int mask = (state->m_cart[0].m_nvram_size - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
+			value = state->m_cart[0].m_nvram[(offset - 0x6000) & mask];
 		}
 		else
 		{
@@ -725,7 +725,7 @@ READ8_HANDLER( snes_r_bank2 )
 		}
 	}
 	else
-		value = snes_ram[0x300000 + offset];
+		value = snes_ram[0x300000 + offset];    //ROM
 
 	return value;
 }
@@ -742,10 +742,10 @@ READ8_HANDLER( snes_r_bank3 )
 		if ((address < 0x8000) && (state->m_cart[0].mode == SNES_MODE_20))
 			value = snes_open_bus_r(space, 0);                          /* Reserved */
 		else
-			value = snes_ram[0x400000 + offset];
+			value = snes_ram[0x400000 + offset];    //ROM
 	}
 	else                                            /* Mode 21 & 25 */
-		value = snes_ram[0x400000 + offset];
+		value = snes_ram[0x400000 + offset];    //ROM
 
 	return value;
 }
@@ -760,7 +760,7 @@ READ8_HANDLER( snes_r_bank4 )
 	if (state->m_cart[0].mode & 5)                         /* Mode 20 & 22 */
 	{
 		if (address >= 0x8000)
-			value = snes_ram[0x600000 + offset];
+			value = snes_ram[0x600000 + offset];    //ROM
 		else
 		{
 			logerror("(PC=%06x) snes_r_bank4: Unmapped external chip read: %04x\n",space.device().safe_pc(),address);
@@ -768,7 +768,7 @@ READ8_HANDLER( snes_r_bank4 )
 		}
 	}
 	else if (state->m_cart[0].mode & 0x0a)                  /* Mode 21 & 25 */
-		value = snes_ram[0x600000 + offset];
+		value = snes_ram[0x600000 + offset];    //ROM
 
 	return value;
 }
@@ -782,17 +782,17 @@ READ8_HANDLER( snes_r_bank5 )
 
 	if ((state->m_cart[0].mode & 5) && (address < 0x8000))     /* Mode 20 & 22 */
 	{
-		if (state->m_cart[0].sram > 0x8000)
+		if (state->m_cart[0].m_nvram_size > 0x8000)
 		{
 			// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
-			int mask = (state->m_cart[0].sram << 1) - 1;
-			mask &= ~0x8000;
-			value = snes_ram[0x700000 + (offset & mask)];
+			int mask = state->m_cart[0].m_nvram_size - 1;
+			offset = (offset / 0x10000) * 0x8000 + (offset & 0x7fff);
+			value = state->m_cart[0].m_nvram[offset & mask];
 		}
-		else if (state->m_cart[0].sram > 0)
+		else if (state->m_cart[0].m_nvram_size > 0)
 		{
-			int mask = state->m_cart[0].sram - 1;   /* Limit SRAM size to what's actually present */
-			value = snes_ram[0x700000 + (offset & mask)];
+			int mask = state->m_cart[0].m_nvram_size - 1;   /* Limit SRAM size to what's actually present */
+			value = state->m_cart[0].m_nvram[offset & mask];
 		}
 		else
 		{
@@ -801,7 +801,7 @@ READ8_HANDLER( snes_r_bank5 )
 		}
 	}
 	else
-		value = snes_ram[0x700000 + offset];
+		value = snes_ram[0x700000 + offset];    //ROM
 
 	return value;
 }
@@ -814,7 +814,7 @@ READ8_HANDLER( snes_r_bank6 )
 	if ((offset & 0xffff) < 0x8000)
 		value = space.read_byte(offset);
 	else
-		value = snes_ram[0x800000 + offset];
+		value = snes_ram[0x800000 + offset];    //ROM
 
 	return value;
 }
@@ -826,15 +826,28 @@ READ8_HANDLER( snes_r_bank7 )
 	UINT8 value = 0;
 	UINT16 address = offset & 0xffff;
 
-	if (state->m_cart[0].mode & 5)      /* Mode 20 & 22 */
+	if (state->m_cart[0].mode & 5 && address < 0x8000)      /* Mode 20 & 22 in 0x0000-0x7fff */
 	{
-		if (address < 0x8000)
+		if (offset < 0x300000)
 			value = space.read_byte(0x400000 + offset);
 		else
-			value = snes_ram[0xc00000 + offset];
+		{
+			if (state->m_cart[0].m_nvram_size > 0x8000)
+			{
+				// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
+				int mask = state->m_cart[0].m_nvram_size - 1;
+				offset = (offset / 0x10000) * 0x8000 + (offset & 0x7fff);
+				value = state->m_cart[0].m_nvram[offset & mask];
+			}
+			else if (state->m_cart[0].m_nvram_size > 0)
+			{
+				int mask = state->m_cart[0].m_nvram_size - 1;   /* Limit SRAM size to what's actually present */
+				value = state->m_cart[0].m_nvram[offset & mask];
+			}
+		}
 	}
-	else                                /* Mode 21 & 25 */
-		value = snes_ram[0xc00000 + offset];
+	else
+		value = snes_ram[0xc00000 + offset];    //ROM
 
 	return value;
 }
@@ -868,12 +881,12 @@ WRITE8_HANDLER( snes_w_bank2 )
 		state->snes_w_io(space, address, data);
 	else if (address < 0x8000)                      /* SRAM for mode_21, Reserved othewise */
 	{
-		if ((state->m_cart[0].mode == SNES_MODE_21) && (state->m_cart[0].sram > 0))
+		if (state->m_cart[0].mode == SNES_MODE_21 && state->m_cart[0].m_nvram_size > 0)
 		{
 			/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
 			/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
-			int mask = (state->m_cart[0].sram - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
-			snes_ram[0x306000 + ((offset - 0x6000) & mask)] = data;
+			int mask = (state->m_cart[0].m_nvram_size - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
+			state->m_cart[0].m_nvram[(offset - 0x6000) & mask] = data;
 		}
 		else
 			logerror("snes_w_bank2: Attempt to write to reserved address: %X = %02x\n", offset + 0x300000, data);
@@ -907,17 +920,17 @@ WRITE8_HANDLER( snes_w_bank5 )
 
 	if ((state->m_cart[0].mode & 5) && (address < 0x8000))         /* Mode 20 & 22 */
 	{
-		if (state->m_cart[0].sram > 0x8000)
+		if (state->m_cart[0].m_nvram_size > 0x8000)
 		{
 			// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
-			int mask = (state->m_cart[0].sram << 1) - 1;
-			mask &= ~0x8000;
-			snes_ram[0x700000 + (offset & mask)] = data;
+			int mask = state->m_cart[0].m_nvram_size - 1;
+			offset = (offset / 0x10000) * 0x8000 + (offset & 0x7fff);
+			state->m_cart[0].m_nvram[offset & mask] = data;
 		}
-		else if (state->m_cart[0].sram > 0)
+		else if (state->m_cart[0].m_nvram_size > 0)
 		{
-			int mask = state->m_cart[0].sram - 1;   /* Limit SRAM size to what's actually present */
-			snes_ram[0x700000 + (offset & mask)] = data;
+			int mask = state->m_cart[0].m_nvram_size - 1;   /* Limit SRAM size to what's actually present */
+			state->m_cart[0].m_nvram[offset & mask] = data;
 		}
 		else
 			logerror("snes_w_bank5: Attempt to write to reserved address: %X = %02x\n", offset + 0x700000, data);
@@ -943,19 +956,26 @@ WRITE8_HANDLER( snes_w_bank7 )
 	snes_state *state = space.machine().driver_data<snes_state>();
 	UINT16 address = offset & 0xffff;
 
-	if (state->m_cart[0].mode & 5)             /* Mode 20 & 22 */
+	if (state->m_cart[0].mode & 5 && address < 0x8000)      /* Mode 20 & 22 in 0x0000-0x7fff */
 	{
-		if (address < 0x8000)
+		if (offset >= 0x300000)
 		{
-			if (offset >= 0x3e0000)
-				logerror("Attempt to write to banks 0xfe - 0xff address: %X\n", offset);
-			else if (offset >= 0x300000)
-				snes_w_bank5(space, offset - 0x300000, data);
-			else if (offset >= 0x200000)
-				snes_w_bank4(space, offset - 0x200000, data);
+			if (state->m_cart[0].m_nvram_size > 0x8000)
+			{
+				// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
+				int mask = state->m_cart[0].m_nvram_size - 1;
+				offset = (offset / 0x10000) * 0x8000 + (offset & 0x7fff);
+				state->m_cart[0].m_nvram[offset & mask] = data;
+				return;
+			}
+			else if (state->m_cart[0].m_nvram_size > 0)
+			{
+				int mask = state->m_cart[0].m_nvram_size - 1;   /* Limit SRAM size to what's actually present */
+				state->m_cart[0].m_nvram[offset & mask] = data;
+				return;
+			}
 		}
-		else
-			logerror("(PC=%06x) snes_w_bank7: Attempt to write to ROM address: %X = %02x\n",space.device().safe_pc(),offset + 0xc00000, data);
+		logerror("(PC=%06x) snes_w_bank7: Attempt to write to ROM address: %X = %02x\n",space.device().safe_pc(),offset + 0xc00000, data);
 	}
 	else if (state->m_cart[0].mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",space.device().safe_pc(),offset + 0xc00000);
@@ -1232,16 +1252,29 @@ MACHINE_RESET( snes )
 /* for mame we use an init, maybe we will need more for the different games */
 DRIVER_INIT_MEMBER(snes_state,snes)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8 *rom;
 
 	rom = memregion("user3")->base();
 	snes_ram = auto_alloc_array_clear(machine(), UINT8, 0x1400000);
 
+	m_cart[0].m_rom_size = memregion("user3")->bytes();
+	m_cart[0].m_rom = auto_alloc_array_clear(machine(), UINT8, m_cart[0].m_rom_size);
+	memcpy(m_cart[0].m_rom, rom, m_cart[0].m_rom_size);
+
+	m_cart[0].m_nvram_size = 0;
+	if (rom[0x7fd8] > 0)
+	{
+		UINT32 nvram_size = (1024 << rom[0x7fd8]);
+		if (nvram_size > 0x40000)
+			nvram_size = 0x40000;
+
+		m_cart[0].m_nvram = auto_alloc_array_clear(machine(), UINT8, nvram_size);
+		m_cart[0].m_nvram_size = nvram_size;
+	}
+
 	/* all NSS games seem to use MODE 20 */
 	m_cart[0].mode = SNES_MODE_20;
-	m_cart[0].sram_max = 0x40000;
 	m_has_addon_chip = HAS_NONE;
 
 	/* Find the number of blocks in this ROM */
@@ -1284,20 +1317,10 @@ DRIVER_INIT_MEMBER(snes_state,snes)
 
 		read_blocks += repeat_blocks;
 	}
-
-	/* Find the amount of sram */
-	m_cart[0].sram = snes_r_bank1(space, 0x00ffd8);
-	if (m_cart[0].sram > 0)
-	{
-		m_cart[0].sram = (1024 << m_cart[0].sram);
-		if (m_cart[0].sram > m_cart[0].sram_max)
-			m_cart[0].sram = m_cart[0].sram_max;
-	}
 }
 
 DRIVER_INIT_MEMBER(snes_state,snes_hirom)
 {
-	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 
@@ -1305,8 +1328,22 @@ DRIVER_INIT_MEMBER(snes_state,snes_hirom)
 	snes_ram = auto_alloc_array(machine(), UINT8, 0x1400000);
 	memset(snes_ram, 0, 0x1400000);
 
+	m_cart[0].m_rom_size = memregion("user3")->bytes();
+	m_cart[0].m_rom = auto_alloc_array_clear(machine(), UINT8, m_cart[0].m_rom_size);
+	memcpy(m_cart[0].m_rom, rom, m_cart[0].m_rom_size);
+
+	m_cart[0].m_nvram_size = 0;
+	if (rom[0xffd8] > 0)
+	{
+		UINT32 nvram_size = (1024 << rom[0xffd8]);
+		if (nvram_size > 0x40000)
+			nvram_size = 0x40000;
+
+		m_cart[0].m_nvram = auto_alloc_array_clear(machine(), UINT8, nvram_size);
+		m_cart[0].m_nvram_size = nvram_size;
+	}
+
 	m_cart[0].mode = SNES_MODE_21;
-	m_cart[0].sram_max = 0x40000;
 	m_has_addon_chip = HAS_NONE;
 
 	/* Find the number of blocks in this ROM */
@@ -1342,15 +1379,6 @@ DRIVER_INIT_MEMBER(snes_state,snes_hirom)
 		memcpy(&snes_ram[0x400000 + read_blocks * 0x10000], &snes_ram[0x400000 + (read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
 		memcpy(&snes_ram[0x800000 + read_blocks * 0x10000], &snes_ram[0x800000 + (read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
 		read_blocks += repeat_blocks;
-	}
-
-	/* Find the amount of sram */
-	m_cart[0].sram = snes_r_bank1(space, 0x00ffd8);
-	if (m_cart[0].sram > 0)
-	{
-		m_cart[0].sram = (1024 << m_cart[0].sram);
-		if (m_cart[0].sram > m_cart[0].sram_max)
-			m_cart[0].sram = m_cart[0].sram_max;
 	}
 }
 
