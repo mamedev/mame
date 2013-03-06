@@ -145,6 +145,8 @@ void acia6850_device::device_reset()
 	m_tx_counter = 0;
 	m_rx_counter = 0;
 
+	m_divide = 0;
+
 	TXD(1);
 	m_overrun = 0;
 	m_status_read = 0;
@@ -155,6 +157,9 @@ void acia6850_device::device_reset()
 	m_irq = 0;
 	m_rts = 0;
 	m_ctrl = 0;
+
+	m_bits = 0;
+	m_tx_int = 0;
 
 	m_out_irq_func(CLEAR_LINE);
 
