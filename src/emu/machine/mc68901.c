@@ -855,6 +855,8 @@ void mc68901_device::device_reset()
 	// Avoid read-before-write
 	m_ipr = m_imr = 0;
 
+	m_next_rsr = 0;
+
 	memset(m_tmc, 0, sizeof(m_tmc));
 	memset(m_ti, 0, sizeof(m_ti));
 	memset(m_to, 0, sizeof(m_to));
