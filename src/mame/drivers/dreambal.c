@@ -60,8 +60,8 @@ public:
 
 		if (mem_mask&0x00ff)
 		{
-			m_eeprom->set_clock_line(data &0x1 ? ASSERT_LINE : CLEAR_LINE);
-			m_eeprom->write_bit(data &0x2);
+			m_eeprom->set_clock_line(data &0x2 ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->write_bit(data &0x1);
 			m_eeprom->set_cs_line(data&0x4 ? CLEAR_LINE : ASSERT_LINE);
 		}
 	}
