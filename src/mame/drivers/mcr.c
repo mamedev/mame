@@ -1760,6 +1760,15 @@ static INPUT_PORTS_START( demoderb )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( demoderbc )
+	PORT_INCLUDE(demoderb)
+
+	PORT_MODIFY("ssio:IP3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 
 /*************************************
@@ -2716,31 +2725,60 @@ ROM_START( nflfoot )
 ROM_END
 
 
-ROM_START( demoderb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dd_pro",       0x00000, 0x4000, CRC(8781b367) SHA1(52fe4f4e3fa0370284845d88bc7b30a95c962b22) )
-	ROM_LOAD( "dd_pro1",      0x04000, 0x4000, CRC(4c713bfe) SHA1(493b6ba01e86e7586ad123c53cf7f0a0c191d670) )
-	ROM_LOAD( "dd_pro2",      0x08000, 0x4000, CRC(c2cbd2a4) SHA1(fa642b2f61ff5529ab688a43c1dc14357a4eba6f) )
+ROM_START( demoderb ) /* Dipswitch selectable 2 player Upright / 4 player Cocktail */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Actually used "DRBY" for program roms, all others used full "DERBY" */
+	ROM_LOAD( "demo_drby_pro_0", 0x00000, 0x4000, CRC(be7da2f3) SHA1(6c43a7e4334d80829a333841ccd9fdc5824c915d) ) /* Dated 6/12/85 */
+	ROM_LOAD( "demo_drby_pro_1", 0x04000, 0x4000, CRC(c6f6604c) SHA1(69ce86e762ccfd9d15accf5ddcb2406eb1b11132) ) /* Dated 6/12/85 */
+	ROM_LOAD( "demo_drby_pro_2", 0x08000, 0x4000, CRC(fa93b9d9) SHA1(61891b7850da93c16d11cd6d20a72e1b371f47d3) ) /* Dated 6/12/85 */
+	ROM_LOAD( "demo_drby_pro_3", 0x0c000, 0x4000, CRC(4e964883) SHA1(a1cb4e07c7417abc8a08bdae31de2bda8063dedc) ) /* Dated 6/12/85 */
 
 	ROM_REGION( 0x10000, "ssio:cpu", ROMREGION_ERASE00 )    /* 64k for the audio CPU, not populated */
 
 	ROM_REGION( 0x10000, "tcs:cpu", 0 ) /* 64k for the Turbo Cheap Squeak */
-	ROM_LOAD( "tcs_u5.bin",   0x0c000, 0x2000, CRC(eca33b2c) SHA1(938b021ea3b0f23aed7a98a930a58af371a02303) )
-	ROM_LOAD( "tcs_u4.bin",   0x0e000, 0x2000, CRC(3490289a) SHA1(a9d56ea60bb901267da41ab408f8e1ed3742b0ac) )
+	ROM_LOAD( "tcs_u5.bin", 0x0c000, 0x2000, CRC(eca33b2c) SHA1(938b021ea3b0f23aed7a98a930a58af371a02303) )
+	ROM_LOAD( "tcs_u4.bin", 0x0e000, 0x2000, CRC(3490289a) SHA1(a9d56ea60bb901267da41ab408f8e1ed3742b0ac) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
-	ROM_LOAD( "dd_bg0.6f",    0x00000, 0x2000, CRC(cf80be19) SHA1(a2ab09ee2dc76fab472fec7520ed972ccc10e826) )
-	ROM_LOAD( "dd_bg1.5f",    0x02000, 0x2000, CRC(4e173e52) SHA1(ac5ae8007a63f9c074444783c1058109327dd118) )
+	ROM_LOAD( "demo_derby_bg_06f.6f", 0x00000, 0x2000, CRC(cf80be19) SHA1(a2ab09ee2dc76fab472fec7520ed972ccc10e826) ) /* Dated 2/7/85 */
+	ROM_LOAD( "demo_derby_bg_15f.5f", 0x02000, 0x2000, CRC(4e173e52) SHA1(ac5ae8007a63f9c074444783c1058109327dd118) ) /* Dated 2/7/85 */
 
 	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "dd_fg-0.a4",   0x00000, 0x4000, CRC(e57a4de6) SHA1(d1b2396a85b984e171d751ef8e1cf970ac4ff9fb) )
-	ROM_LOAD( "dd_fg-4.a3",   0x04000, 0x4000, CRC(55aa667f) SHA1(d611dbf9e8ef383d02514b0edb9ea36670193bf0) )
-	ROM_LOAD( "dd_fg-1.a6",   0x08000, 0x4000, CRC(70259651) SHA1(55967aaf2a7617c8f5a199d1e07128d79ce16970) )
-	ROM_LOAD( "dd_fg-5.a5",   0x0c000, 0x4000, CRC(5fe99007) SHA1(9d640b4715333efdc6300dc353991d6934929399) )
-	ROM_LOAD( "dd_fg-2.a8",   0x10000, 0x4000, CRC(6cab7b95) SHA1(8faff7458ab5ff2dd096dd78b1449a4096cc6345) )
-	ROM_LOAD( "dd_fg-6.a7",   0x14000, 0x4000, CRC(abfb9a8b) SHA1(14ab416bc76db25ad97353c9072048c64ec95344) )
-	ROM_LOAD( "dd_fg-3.a10",  0x18000, 0x4000, CRC(801d9b86) SHA1(5a8c72d1060eea1a3ad67b98aa6eff13f6837af6) )
-	ROM_LOAD( "dd_fg-7.a9",   0x1c000, 0x4000, CRC(0ec3f60a) SHA1(4176b246b0ea7bce9498c20e12678f16f7173529) )
+	ROM_LOAD( "demo_derby_fg0_a4.a4",   0x00000, 0x4000, CRC(e57a4de6) SHA1(d1b2396a85b984e171d751ef8e1cf970ac4ff9fb) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg4_a3.a3",   0x04000, 0x4000, CRC(55aa667f) SHA1(d611dbf9e8ef383d02514b0edb9ea36670193bf0) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg1_a6.a6",   0x08000, 0x4000, CRC(70259651) SHA1(55967aaf2a7617c8f5a199d1e07128d79ce16970) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg5_a5.a5",   0x0c000, 0x4000, CRC(5fe99007) SHA1(9d640b4715333efdc6300dc353991d6934929399) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg2_a8.a8",   0x10000, 0x4000, CRC(6cab7b95) SHA1(8faff7458ab5ff2dd096dd78b1449a4096cc6345) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg6_a7.a7",   0x14000, 0x4000, CRC(abfb9a8b) SHA1(14ab416bc76db25ad97353c9072048c64ec95344) ) /* Dated 3/11/85  - Mislabeled as DEMO DERBY FG1 A7 */
+	ROM_LOAD( "demo_derby_fg3_a10.a10", 0x18000, 0x4000, CRC(801d9b86) SHA1(5a8c72d1060eea1a3ad67b98aa6eff13f6837af6) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg7_a9.a9",   0x1c000, 0x4000, CRC(0ec3f60a) SHA1(4176b246b0ea7bce9498c20e12678f16f7173529) ) /* Dated 3/11/85 */
+ROM_END
+
+
+ROM_START( demoderbc ) /* Only supports 4 player cocktail mode! */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dd_pro0", 0x00000, 0x4000, CRC(8781b367) SHA1(52fe4f4e3fa0370284845d88bc7b30a95c962b22) )
+	ROM_LOAD( "dd_pro1", 0x04000, 0x4000, CRC(4c713bfe) SHA1(493b6ba01e86e7586ad123c53cf7f0a0c191d670) )
+	ROM_LOAD( "dd_pro2", 0x08000, 0x4000, CRC(c2cbd2a4) SHA1(fa642b2f61ff5529ab688a43c1dc14357a4eba6f) )
+
+	ROM_REGION( 0x10000, "ssio:cpu", ROMREGION_ERASE00 )    /* 64k for the audio CPU, not populated */
+
+	ROM_REGION( 0x10000, "tcs:cpu", 0 ) /* 64k for the Turbo Cheap Squeak */
+	ROM_LOAD( "tcs_u5.bin", 0x0c000, 0x2000, CRC(eca33b2c) SHA1(938b021ea3b0f23aed7a98a930a58af371a02303) )
+	ROM_LOAD( "tcs_u4.bin", 0x0e000, 0x2000, CRC(3490289a) SHA1(a9d56ea60bb901267da41ab408f8e1ed3742b0ac) )
+
+	ROM_REGION( 0x04000, "gfx1", 0 )
+	ROM_LOAD( "demo_derby_bg_06f.6f", 0x00000, 0x2000, CRC(cf80be19) SHA1(a2ab09ee2dc76fab472fec7520ed972ccc10e826) ) /* Dated 2/7/85 */
+	ROM_LOAD( "demo_derby_bg_15f.5f", 0x02000, 0x2000, CRC(4e173e52) SHA1(ac5ae8007a63f9c074444783c1058109327dd118) ) /* Dated 2/7/85 */
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "demo_derby_fg0_a4.a4",   0x00000, 0x4000, CRC(e57a4de6) SHA1(d1b2396a85b984e171d751ef8e1cf970ac4ff9fb) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg4_a3.a3",   0x04000, 0x4000, CRC(55aa667f) SHA1(d611dbf9e8ef383d02514b0edb9ea36670193bf0) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg1_a6.a6",   0x08000, 0x4000, CRC(70259651) SHA1(55967aaf2a7617c8f5a199d1e07128d79ce16970) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg5_a5.a5",   0x0c000, 0x4000, CRC(5fe99007) SHA1(9d640b4715333efdc6300dc353991d6934929399) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg2_a8.a8",   0x10000, 0x4000, CRC(6cab7b95) SHA1(8faff7458ab5ff2dd096dd78b1449a4096cc6345) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg6_a7.a7",   0x14000, 0x4000, CRC(abfb9a8b) SHA1(14ab416bc76db25ad97353c9072048c64ec95344) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg3_a10.a10", 0x18000, 0x4000, CRC(801d9b86) SHA1(5a8c72d1060eea1a3ad67b98aa6eff13f6837af6) ) /* Dated 3/11/85 */
+	ROM_LOAD( "demo_derby_fg7_a9.a9",   0x1c000, 0x4000, CRC(0ec3f60a) SHA1(4176b246b0ea7bce9498c20e12678f16f7173529) ) /* Dated 3/11/85 */
 ROM_END
 
 
@@ -2956,3 +2994,4 @@ GAME( 1983, nflfoot,  0,        mcr_91490_ipu, nflfoot, mcr_state,  nflfoot,   R
 
 /* 91490 CPU board + 91464 video gen + 90913 sound I/O + Turbo Chip Squeak */
 GAME( 1984, demoderb, 0,        mcr_91490_tcs, demoderb, mcr_state, demoderb,  ROT0,  "Bally Midway", "Demolition Derby", GAME_SUPPORTS_SAVE )
+GAME( 1984, demoderbc,demoderb, mcr_91490_tcs, demoderbc,mcr_state, demoderb,  ROT0,  "Bally Midway", "Demolition Derby (cocktail)", GAME_SUPPORTS_SAVE )
