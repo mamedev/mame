@@ -189,7 +189,6 @@ static INPUT_PORTS_START( dreambal )
 
 	PORT_START("UNK2")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	//PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -409,10 +408,6 @@ ROM_START( dreambal )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "mm_01-1.12f",    0x00000, 0x20000, CRC(4f134be7) SHA1(b83230cc62bde55be736fd604af23f927706a770) )
-
-	ROM_REGION( 0x80, "eeprom", 0 ) /* EEPROM */
-	ROM_LOAD16_WORD_SWAP( "93lc46b.8f",    0x00, 0x80, CRC(5ba5403f) SHA1(cad63d704d81db5c45826d485c5e3a0679fba152) )
-	
 ROM_END
 
 DRIVER_INIT_MEMBER(dreambal_state,dreambal)
