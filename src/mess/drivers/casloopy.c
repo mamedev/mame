@@ -158,9 +158,12 @@ class casloopy_state : public driver_device
 public:
 	casloopy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) ,
-		m_bios_rom(*this, "bios_rom"){ }
+		m_bios_rom(*this, "bios_rom"),
+		m_vregs(*this, "vregs")
+		{ }
 
 	required_shared_ptr<UINT32> m_bios_rom;
+	required_shared_ptr<UINT32> m_vregs;
 	UINT16 *m_paletteram;
 	UINT8 *m_vram;
 	UINT8 *m_bitmap_vram;
@@ -228,22 +231,6 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 	int x,y;
 	int count;
 
-	count = 0;
-
-	for (y=0;y<32;y++)
-	{
-		for (x=0;x<32;x++)
-		{
-			UINT16 tile = (m_vram[count+1])|(m_vram[count]<<8);
-
-			tile &= 0x3ff; //???
-
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,7,0,0,x*8,y*8);
-
-			count+=2;
-		}
-	}
-
 	static int test;
 
 	if(machine().input().code_pressed(KEYCODE_Z))
@@ -253,6 +240,31 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 		test-=0x100;
 
 	popmessage("%08x",test);
+
+	#if 0
+	int r,g,b;
+
+	r = pal5bit((m_vregs[0x4/4] >> 10) & 0x1f);
+	g = pal5bit((m_vregs[0x4/4] >> 5) & 0x1f);
+	b = pal5bit((m_vregs[0x4/4] >> 0) & 0x1f);
+	palette_set_color(machine(),0x100,MAKE_RGB(r^0xff,g^0xff,b^0xff));
+	bitmap.fill( 0x100 ,cliprect);
+	#endif
+
+	count = test;
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			UINT16 tile = (m_vram[count+1])|(m_vram[count]<<8);
+
+			tile &= 0x3ff; //???
+
+			drawgfx_transpen(bitmap,cliprect,gfx,tile,7,0,0,x*8,y*8,-1);
+
+			count+=2;
+		}
+	}
 
 	count = test;
 
@@ -360,7 +372,7 @@ WRITE16_MEMBER(casloopy_state::sh7021_w)
 		size = (sh7021_regs[0x7a/2]&0xffff);
 		type = (sh7021_regs[0x7e/2]&0xffff);
 
-		printf("%08x %08x %04x %04x\n",src & 0x7ffffff,dst & 0x7ffffff,size,type);
+		printf("3 %08x %08x %04x %04x\n",src & 0x7ffffff,dst & 0x7ffffff,size,type);
 
 		sh7021_regs[0x7e/2]&=0xfffe;
 	}
@@ -383,9 +395,10 @@ static ADDRESS_MAP_START( casloopy_map, AS_PROGRAM, 32, casloopy_state )
 	AM_RANGE(0x01000000, 0x0107ffff) AM_RAM AM_SHARE("wram")// stack pointer points here
 	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE8(casloopy_bitmap_r,casloopy_bitmap_w,0xffffffff)
 	AM_RANGE(0x04040000, 0x0404ffff) AM_READWRITE8(casloopy_vram_r,casloopy_vram_w,0xffffffff) // tilemap + PCG
-	AM_RANGE(0x04051000, 0x040510ff) AM_READWRITE16(casloopy_pal_r,casloopy_pal_w,0xffffffff)
+	AM_RANGE(0x04050000, 0x040503ff) AM_RAM // ???
+	AM_RANGE(0x04051000, 0x040511ff) AM_READWRITE16(casloopy_pal_r,casloopy_pal_w,0xffffffff)
 	AM_RANGE(0x04058000, 0x04058007) AM_READWRITE16(casloopy_vregs_r,casloopy_vregs_w,0xffffffff)
-	AM_RANGE(0x0405b000, 0x0405b00f) AM_RAM // RGB brightness plus scrolling
+	AM_RANGE(0x0405b000, 0x0405b00f) AM_RAM AM_SHARE("vregs") // RGB555 brightness control plus scrolling
 	AM_RANGE(0x05ffff00, 0x05ffffff) AM_READWRITE16(sh7021_r,sh7021_w,0xffffffff)
 //	AM_RANGE(0x05ffff00, 0x05ffffff) - SH7021 internal i/o
 	AM_RANGE(0x06000000, 0x061fffff) AM_ROM AM_REGION("rom_cart",0)
@@ -427,6 +440,32 @@ void casloopy_state::machine_reset()
 	//machine().device("maincpu")->execute().set_input_line(INPUT_LINE_HALT, ASSERT_LINE); //halt the CPU until we find enough data to proceed
 
 }
+
+
+static const gfx_layout casloopy_4bpp_layoutROM =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0, 1) },
+	{ STEP8(0, 4) },
+	{ STEP8(0, 4*8) },
+	4*8*8
+};
+
+static const gfx_layout casloopy_8bpp_layoutROM =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	{ STEP8(0, 8*8) },
+	8*8*8
+};
+
+
+
 
 static MACHINE_CONFIG_START( casloopy, casloopy_state )
 
