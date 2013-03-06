@@ -11,14 +11,31 @@ text = ""
 dispatch_to_states = { "MAIN" : 0 }
 states_to_dispatch = { 0 : "MAIN" }
 
+def load_file(fname, lines):
+	path = fname.rpartition('/')[0]
+	if path != "":
+		path = path + '/'
+	try:
+		f = open(fname, "r")
+	except Exception, err:
+		print "Cannot read opcodes file %s [%s]" % (fname, err)
+		sys.exit(1)
+	
+	rawlines = re.split('(\n|; *\n?)', f.read())
+	count = 0
+	while count < len(rawlines)-1:
+		line = rawlines[count+0] + rawlines[count+1]
+		if line.startswith("#include"):
+			load_file(path + line.split('"')[1], lines)
+		else:
+			lines.append(line)
+		count = count + 2
+	
+	f.close()
+
 # Get lines
 lines = []
-rawlines = re.split('(\n|; *\n?)', sys.stdin.read())
-count = 0
-while count < len(rawlines)-1:
-	line = rawlines[count+0] + rawlines[count+1]
-	lines.append(line)
-	count = count + 2
+load_file(sys.argv[1], lines)
 
 count = 0
 while count < len(lines):

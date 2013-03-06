@@ -1218,26 +1218,17 @@ $(CPUOBJ)/m6809/konami.o:   $(CPUSRC)/m6809/konami.c \
 							$(CPUSRC)/m6809/m6809inl.h \
 							$(CPUOBJ)/m6809/konami.inc
 
-$(CPUOBJ)/m6809/m6809.inc.pre:
-	@gcc -x c -P -E $(CPUSRC)/m6809/m6809.ops > $@
-
-$(CPUOBJ)/m6809/m6809.inc:	$(CPUSRC)/m6809/m6809make.py $(CPUSRC)/m6809/m6809.ops $(CPUSRC)/m6809/base6x09.ops $(CPUOBJ)/m6809/m6809.inc.pre
+$(CPUOBJ)/m6809/m6809.inc:	$(CPUSRC)/m6809/m6809make.py $(CPUSRC)/m6809/m6809.ops $(CPUSRC)/m6809/base6x09.ops
 	@echo Generating m6809 source file...
-	$(PYTHON) $(CPUSRC)/m6809/m6809make.py < $(CPUOBJ)/m6809/m6809.inc.pre > $@
+	$(PYTHON) $(CPUSRC)/m6809/m6809make.py $(CPUSRC)/m6809/m6809.ops > $@
 
-$(CPUOBJ)/m6809/hd6309.inc.pre:
-	@gcc -x c -P -E $(CPUSRC)/m6809/hd6309.ops > $@
-
-$(CPUOBJ)/m6809/hd6309.inc:	$(CPUSRC)/m6809/m6809make.py $(CPUSRC)/m6809/hd6309.ops $(CPUSRC)/m6809/base6x09.ops $(CPUOBJ)/m6809/hd6309.inc.pre
+$(CPUOBJ)/m6809/hd6309.inc:	$(CPUSRC)/m6809/m6809make.py $(CPUSRC)/m6809/hd6309.ops $(CPUSRC)/m6809/base6x09.ops
 	@echo Generating hd6309 source file...
-	$(PYTHON) $(CPUSRC)/m6809/m6809make.py < $(CPUOBJ)/m6809/hd6309.inc.pre > $@
+	$(PYTHON) $(CPUSRC)/m6809/m6809make.py $(CPUSRC)/m6809/hd6309.ops > $@
 
-$(CPUOBJ)/m6809/konami.inc.pre:
-	@gcc -x c -P -E $(CPUSRC)/m6809/konami.ops > $@
-
-$(CPUOBJ)/m6809/konami.inc:	$(CPUSRC)/m6809/m6809make.py $(CPUSRC)/m6809/konami.ops $(CPUSRC)/m6809/base6x09.ops $(CPUOBJ)/m6809/konami.inc.pre
+$(CPUOBJ)/m6809/konami.inc:	$(CPUSRC)/m6809/m6809make.py $(CPUSRC)/m6809/konami.ops $(CPUSRC)/m6809/base6x09.ops
 	@echo Generating konami source file...
-	$(PYTHON) $(CPUSRC)/m6809/m6809make.py < $(CPUOBJ)/m6809/konami.inc.pre > $@
+	$(PYTHON) $(CPUSRC)/m6809/m6809make.py $(CPUSRC)/m6809/konami.ops > $@
 
 
 
