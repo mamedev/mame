@@ -427,19 +427,19 @@ WRITE32_MEMBER(namcos10_state::nand_address1_w )
 WRITE32_MEMBER(namcos10_state::nand_address2_w )
 {
 	logerror("nand_a2_w %08x (%08x)\n", data, space.device().safe_pc());
-	nand_address = ( nand_address & 0xfffffc03 ) | ( ( data & 0xff ) <<  2 );
+	nand_address = ( nand_address & 0xfffffe01 ) | ( ( data & 0xff ) <<  1 );
 }
 
 WRITE32_MEMBER(namcos10_state::nand_address3_w )
 {
 	logerror("nand_a3_w %08x (%08x)\n", data, space.device().safe_pc());
-	nand_address = ( nand_address & 0xfffc03ff ) | ( ( data & 0xff ) << 10 );
+	nand_address = ( nand_address & 0xfffe01ff ) | ( ( data & 0xff ) <<  9 );
 }
 
 WRITE32_MEMBER(namcos10_state::nand_address4_w )
 {
 	logerror("nand_a4_w %08x (%08x)\n", data, space.device().safe_pc());
-	nand_address = ( nand_address & 0xfc03ffff ) | ( ( data & 0xff ) << 18 );
+	nand_address = ( nand_address & 0xfe01ffff ) | ( ( data & 0xff ) << 17 );
 }
 
 UINT16 namcos10_state::nand_read( UINT32 address )
