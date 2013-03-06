@@ -214,6 +214,9 @@ void via6522_device::device_start()
 	m_t2 = timer_alloc(TIMER_T2);
 	m_ca2_timer = timer_alloc(TIMER_CA2);
 	m_shift_timer = timer_alloc(TIMER_SHIFT);
+	m_pcr = 0;
+	m_in_ca1 = 0;
+	m_in_ca2 = 0;
 
 	/* Default clock is from CPU1 */
 	if (clock() == 0)
