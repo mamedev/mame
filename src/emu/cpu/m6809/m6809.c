@@ -359,8 +359,8 @@ UINT32 m6809_base_device::disasm_max_opcode_bytes() const
 
 offs_t m6809_base_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	extern offs_t m6809_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options, m6809_base_device *m6809);
-	return m6809_disassemble(buffer, pc, oprom, opram, options, this);
+	extern CPU_DISASSEMBLE( m6809 );
+	return CPU_DISASSEMBLE_NAME(m6809)(this, buffer, pc, oprom, opram, options);
 }
 
 

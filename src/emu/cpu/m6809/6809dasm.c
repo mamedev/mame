@@ -364,13 +364,14 @@ static const char *const m6809_regs_te[16] =
 	"A", "B", "CC", "DP", "inv", "inv", "inv", "inv"
 };
 
-offs_t m6809_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options, m6809_base_device *m6809)
+CPU_DISASSEMBLE( m6809 )
 {
 	UINT8 opcode, mode, pb, pbm, reg;
 	const UINT8 *operandarray;
 	unsigned int ea, flags;
 	int numoperands, offset, indirect;
 	bool encrypt_only_first_byte = false;
+	m6809_base_device *m6809 = static_cast<m6809_base_device *>(device);
 	if (m6809 != NULL)
 	{
 		m6809_config &config = static_cast<m6809_config &>(*m6809);

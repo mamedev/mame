@@ -146,7 +146,7 @@ enum
 		CPUINFO_FCT_EXIT,                                   // R/O: void (*exit)(legacy_cpu_device *device)
 		CPUINFO_FCT_EXECUTE,                                // R/O: int (*execute)(legacy_cpu_device *device, int cycles)
 		CPUINFO_FCT_BURN,                                   // R/O: void (*burn)(legacy_cpu_device *device, int cycles)
-		CPUINFO_FCT_DISASSEMBLE,                            // R/O: offs_t (*disassemble)(legacy_cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+		CPUINFO_FCT_DISASSEMBLE,                            // R/O: offs_t (*disassemble)(cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
 		CPUINFO_FCT_TRANSLATE,                              // R/O: int (*translate)(legacy_cpu_device *device, address_spacenum space, int intention, offs_t *address)
 		CPUINFO_FCT_READ,                                   // R/O: int (*read)(legacy_cpu_device *device, address_spacenum space, UINT32 offset, int size, UINT64 *value)
 		CPUINFO_FCT_WRITE,                                  // R/O: int (*write)(legacy_cpu_device *device, address_spacenum space, UINT32 offset, int size, UINT64 value)
@@ -278,7 +278,7 @@ const device_type name = &legacy_device_creator<basename##_device>
 #define CPU_DEBUG_INIT_CALL(name)       CPU_DEBUG_INIT_NAME(name)(device)
 
 #define CPU_DISASSEMBLE_NAME(name)      cpu_disassemble_##name
-#define CPU_DISASSEMBLE(name)           offs_t CPU_DISASSEMBLE_NAME(name)(legacy_cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
+#define CPU_DISASSEMBLE(name)           offs_t CPU_DISASSEMBLE_NAME(name)(cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
 #define CPU_DISASSEMBLE_CALL(name)      CPU_DISASSEMBLE_NAME(name)(device, buffer, pc, oprom, opram, options)
 
 #define CPU_IMPORT_STATE_NAME(name)     cpu_state_import_##name
@@ -324,7 +324,7 @@ typedef int (*cpu_read_func)(legacy_cpu_device *device, address_spacenum space, 
 typedef int (*cpu_write_func)(legacy_cpu_device *device, address_spacenum space, UINT32 offset, int size, UINT64 value);
 typedef int (*cpu_readop_func)(legacy_cpu_device *device, UINT32 offset, int size, UINT64 *value);
 typedef void (*cpu_debug_init_func)(legacy_cpu_device *device);
-typedef offs_t (*cpu_disassemble_func)(legacy_cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+typedef offs_t (*cpu_disassemble_func)(cpu_device *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 typedef void (*cpu_state_io_func)(legacy_cpu_device *device, const device_state_entry &entry);
 typedef void (*cpu_string_io_func)(legacy_cpu_device *device, const device_state_entry &entry, astring &string);
 
