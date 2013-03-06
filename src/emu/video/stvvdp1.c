@@ -196,13 +196,13 @@ void saturn_state::stv_clear_framebuffer( int which_framebuffer )
 	{
 		for(int y=start_y;y<end_y;y++)
 			for(int x=start_x;x<end_x;x++)
-				m_vdp1.framebuffer[ which_framebuffer ][(x+y*1024)] = m_vdp1.ewdr;
+				m_vdp1.framebuffer[ which_framebuffer ][((x&1023)+(y&511)*1024)] = m_vdp1.ewdr;
 	}
 	else
 	{
 		for(int y=start_y;y<end_y;y++)
 			for(int x=start_x;x<end_x;x++)
-				m_vdp1.framebuffer[ which_framebuffer ][(x+y*512)] = m_vdp1.ewdr;
+				m_vdp1.framebuffer[ which_framebuffer ][((x&511)+(y&511)*512)] = m_vdp1.ewdr;
 	}
 
 	if ( VDP1_LOG ) logerror( "Clearing %d framebuffer\n", m_vdp1.framebuffer_current_draw );
