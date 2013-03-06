@@ -231,7 +231,7 @@ void lr35902_cpu_device::device_reset()
 offs_t lr35902_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	extern CPU_DISASSEMBLE( lr35902 );
-	return CPU_DISASSEMBLE_NAME( lr35902 )(NULL, buffer, pc, oprom, opram, 0);
+	return CPU_DISASSEMBLE_NAME(lr35902)(this, buffer, pc, oprom, opram, options);
 }
 
 

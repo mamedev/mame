@@ -357,7 +357,7 @@ UINT32 asap_device::disasm_max_opcode_bytes() const
 offs_t asap_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	extern CPU_DISASSEMBLE( asap );
-	return CPU_DISASSEMBLE_NAME(asap)(NULL, buffer, pc, oprom, opram, 0);
+	return CPU_DISASSEMBLE_NAME(asap)(this, buffer, pc, oprom, opram, options);
 }
 
 

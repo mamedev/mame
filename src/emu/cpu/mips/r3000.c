@@ -486,9 +486,9 @@ offs_t r3000_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 	extern CPU_DISASSEMBLE( r3000be );
 
 	if (m_endianness == ENDIANNESS_BIG)
-		return CPU_DISASSEMBLE_NAME(r3000be)(NULL, buffer, pc, oprom, opram, 0);
+		return CPU_DISASSEMBLE_NAME(r3000be)(this, buffer, pc, oprom, opram, options);
 	else
-		return CPU_DISASSEMBLE_NAME(r3000le)(NULL, buffer, pc, oprom, opram, 0);
+		return CPU_DISASSEMBLE_NAME(r3000le)(this, buffer, pc, oprom, opram, options);
 }
 
 

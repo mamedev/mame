@@ -341,7 +341,7 @@ void sm8500_cpu_device::process_interrupts()
 offs_t sm8500_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	extern CPU_DISASSEMBLE( sm8500 );
-	return CPU_DISASSEMBLE_NAME( sm8500 )(NULL, buffer, pc, oprom, opram, 0);
+	return CPU_DISASSEMBLE_NAME(sm8500)(this, buffer, pc, oprom, opram, options);
 }
 
 

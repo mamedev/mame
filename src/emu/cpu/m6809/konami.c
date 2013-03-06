@@ -111,7 +111,7 @@ void konami_cpu_device::device_start()
 offs_t konami_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
 	extern CPU_DISASSEMBLE( konami );
-	return CPU_DISASSEMBLE_NAME(konami)(NULL, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(konami)(this, buffer, pc, oprom, opram, options);
 }
 
 
