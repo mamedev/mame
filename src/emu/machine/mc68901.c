@@ -857,6 +857,7 @@ void mc68901_device::device_reset()
 
 	memset(m_tmc, 0, sizeof(m_tmc));
 	memset(m_ti, 0, sizeof(m_ti));
+	memset(m_to, 0, sizeof(m_to));
 
 	register_w(REGISTER_GPIP, 0);
 	register_w(REGISTER_AER, 0);
