@@ -184,15 +184,26 @@ public:
 };
 
 
-static const gfx_layout casloopy_tile_layout =
+static const gfx_layout casloopy_4bpp_layout =
 {
 	8,8,
 	0x10000/32,
 	4,
-	{ 0, 1, 2, 3 },
+	{ STEP4(0, 1) },
 	{ STEP8(0, 4) },
 	{ STEP8(0, 4*8) },
 	4*8*8
+};
+
+static const gfx_layout casloopy_8bpp_layout =
+{
+	8,8,
+	0x10000/64,
+	8,
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
+	{ STEP8(0, 8*8) },
+	8*8*8
 };
 
 void casloopy_state::video_start()
@@ -206,7 +217,9 @@ void casloopy_state::video_start()
 		if (machine().gfx[m_gfx_index] == 0)
 			break;
 
-	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), casloopy_tile_layout, m_vram, 0x10, 0));
+	machine().gfx[m_gfx_index] = auto_alloc(machine(), gfx_element(machine(), casloopy_4bpp_layout, m_vram, 0x10, 0));
+	machine().gfx[m_gfx_index+1] = auto_alloc(machine(), gfx_element(machine(), casloopy_8bpp_layout, m_vram, 0x10, 0));
+
 }
 
 UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -251,7 +264,7 @@ UINT32 casloopy_state::screen_update_casloopy(screen_device &screen, bitmap_ind1
 
 			pix = m_bitmap_vram[count];
 			if(pix)
-				bitmap.pix16(y, x) = pix;
+				bitmap.pix16(y, x) = pix + 0x100;
 
 			count++;
 		}
@@ -269,6 +282,9 @@ READ16_MEMBER(casloopy_state::casloopy_vregs_r)
 
 	if(offset == 2/2)
 		return machine().rand();/*(machine().primary_screen->hblank() << 8) | (machine().primary_screen->hpos() & 0xff);*/ // hblank + hpos?
+
+	if(offset == 0/2)
+		return machine().rand(); // pccllect
 
 	printf("%08x\n",offset*2);
 
@@ -308,6 +324,7 @@ WRITE8_MEMBER(casloopy_state::casloopy_vram_w)
 	m_vram[offset] = data;
 
 	machine().gfx[m_gfx_index]->mark_dirty(offset/32);
+	machine().gfx[m_gfx_index+1]->mark_dirty(offset/64);
 }
 
 /* TODO: all of this should be internal to the SH core, this is just to check what it enables. */
@@ -329,9 +346,23 @@ WRITE16_MEMBER(casloopy_state::sh7021_w)
 		size = (sh7021_regs[0x4a/2]&0xffff);
 		type = (sh7021_regs[0x4e/2]&0xffff);
 
-		printf("%08x %08x %04x %04x\n",src & 0x7ffffff,dst & 0x7ffffff,size,type);
+		printf("0 %08x %08x %04x %04x\n",src & 0x7ffffff,dst & 0x7ffffff,size,type);
 
 		sh7021_regs[0x4e/2]&=0xfffe;
+	}
+
+	if(offset == 0x7e/2)
+	{
+		UINT32 src,dst,size,type;
+
+		src = (sh7021_regs[0x70/2]<<16)|(sh7021_regs[0x72/2]&0xffff);
+		dst = (sh7021_regs[0x74/2]<<16)|(sh7021_regs[0x76/2]&0xffff);
+		size = (sh7021_regs[0x7a/2]&0xffff);
+		type = (sh7021_regs[0x7e/2]&0xffff);
+
+		printf("%08x %08x %04x %04x\n",src & 0x7ffffff,dst & 0x7ffffff,size,type);
+
+		sh7021_regs[0x7e/2]&=0xfffe;
 	}
 
 //	printf("%08x %04x\n",sh7021_regs[offset],0x05ffff00+offset*2);
