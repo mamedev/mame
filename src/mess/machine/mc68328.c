@@ -9,8 +9,8 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "includes/mc68328.h"
 #include "mc68328.h"
-#include "mc68328p.h"
 
 #define VERBOSE_LEVEL   (0)
 
