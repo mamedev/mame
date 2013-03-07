@@ -201,6 +201,9 @@ CPU_DISASSEMBLE( tms34010 );
 CPU_DISASSEMBLE( tms34020 );
 CPU_DISASSEMBLE( tms57002 );
 CPU_DISASSEMBLE( tms7000 );
+CPU_DISASSEMBLE( tms9900 );
+CPU_DISASSEMBLE( tms9980 );
+CPU_DISASSEMBLE( tms9995 );
 CPU_DISASSEMBLE( tx0_64kw );
 CPU_DISASSEMBLE( tx0_8kw );
 CPU_DISASSEMBLE( unsp );
@@ -340,6 +343,9 @@ static const dasm_table_entry dasm_table[] =
 	{ "tms34020",   _8bit,  3, CPU_DISASSEMBLE_NAME(tms34020) },
 	{ "tms57002",   _32le, -2, CPU_DISASSEMBLE_NAME(tms57002) },
 	{ "tms7000",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms7000) },
+	{ "tms9900",    _16be,  0, CPU_DISASSEMBLE_NAME(tms9900) },
+	{ "tms9980",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms9980) },
+	{ "tms9995",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms9995) },
 	{ "tx0_64kw",   _32be, -2, CPU_DISASSEMBLE_NAME(tx0_64kw) },
 	{ "tx0_8kw",    _32be, -2, CPU_DISASSEMBLE_NAME(tx0_8kw) },
 	{ "unsp",       _16be,  0, CPU_DISASSEMBLE_NAME(unsp) },

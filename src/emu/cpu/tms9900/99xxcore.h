@@ -1920,6 +1920,7 @@ static void field_interrupt(tms99xx_state *cpustate)
 
 static CPU_DISASSEMBLE( tms99xx )
 {
+	extern unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, const UINT8 *opram);
 	return Dasm9900(buffer, pc, TMS99XX_MODEL, oprom, opram);
 }
 

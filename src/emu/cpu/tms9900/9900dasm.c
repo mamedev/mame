@@ -794,3 +794,18 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, 
 
 	return (PC - pc) | DASMFLAG_SUPPORTED | dasmflags;
 }
+
+CPU_DISASSEMBLE( tms9900 )
+{
+	return Dasm9900(buffer, pc, TMS9900_ID, oprom, opram);
+}
+
+CPU_DISASSEMBLE( tms9980 )
+{
+	return Dasm9900(buffer, pc, TMS9980_ID, oprom, opram);
+}
+
+CPU_DISASSEMBLE( tms9995 )
+{
+	return Dasm9900(buffer, pc, TMS9995_ID, oprom, opram);
+}

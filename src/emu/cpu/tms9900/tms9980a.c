@@ -239,7 +239,8 @@ UINT32 tms9980a_device::disasm_max_opcode_bytes() const
 
 offs_t tms9980a_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	return Dasm9900(buffer, pc, TMS9980_ID, oprom, opram);
+	extern CPU_DISASSEMBLE( tms9980 );
+	return CPU_DISASSEMBLE_NAME(tms9980)(this, buffer, pc, oprom, opram, options);
 }
 
 const device_type TMS9980A = &device_creator<tms9980a_device>;

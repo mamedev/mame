@@ -441,8 +441,6 @@ private:
 	devcb_resolved_write_line   m_holda_line;
 };
 
-unsigned Dasm9900(char *buffer, unsigned pc, int model_id, const UINT8 *oprom, const UINT8 *opram);
-
 // device type definition
 extern const device_type TMS9995;
 
