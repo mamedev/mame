@@ -662,8 +662,8 @@ static void snes_cart_log_info( running_machine &machine, UINT8* ROM, int total_
 	logerror( "\tVersion:       1.%d\n", ROM[hilo_mode + 0x1b] );
 	logerror( "\tInv Checksum:  %X %X\n", ROM[hilo_mode + 0x1d], ROM[hilo_mode + 0x1c] );
 	logerror( "\tChecksum:      %X %X\n", ROM[hilo_mode + 0x1f], ROM[hilo_mode + 0x1e] );
-	logerror( "\tNMI Address:   %2X%2Xh\n", ROM[hilo_mode + 0x2b], ROM[hilo_mode + 0x2a] );
-	logerror( "\tStart Address: %2X%2Xh\n\n", ROM[hilo_mode + 0x2d], ROM[hilo_mode + 0x2c] );
+	logerror( "\tNMI Address:   %2X%2Xh\n", ROM[hilo_mode + 0x3b], ROM[hilo_mode + 0x3a]);
+	logerror( "\tStart Address: %2X%2Xh\n\n", ROM[hilo_mode + 0x3d], ROM[hilo_mode + 0x3c]);
 
 	logerror( "\tMode: %d\n", state->m_cart[0].mode);
 

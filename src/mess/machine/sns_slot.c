@@ -584,6 +584,7 @@ bool base_sns_cart_slot_device::call_load()
 		{
 			UINT32 tmplen = length();
 			UINT8 *tmpROM = global_alloc_array(UINT8, tmplen);
+			fread(tmpROM, tmplen);
 			offset = snes_skip_header(tmpROM, tmplen);
 			fseek(offset, SEEK_SET);
 			global_free(tmpROM);
@@ -620,7 +621,6 @@ bool base_sns_cart_slot_device::call_load()
 			else
 				m_type = sns_get_pcb_id(slot_name);
 		}
-
 
 		setup_custom_mappers();
 
@@ -1130,8 +1130,8 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	logerror( "\tVersion:       1.%d\n", ROM[hilo_mode + 0x1b]);
 	logerror( "\tInv Checksum:  %X %X\n", ROM[hilo_mode + 0x1d], ROM[hilo_mode + 0x1c]);
 	logerror( "\tChecksum:      %X %X\n", ROM[hilo_mode + 0x1f], ROM[hilo_mode + 0x1e]);
-	logerror( "\tNMI Address:   %2X%2Xh\n", ROM[hilo_mode + 0x2b], ROM[hilo_mode + 0x2a]);
-	logerror( "\tStart Address: %2X%2Xh\n\n", ROM[hilo_mode + 0x2d], ROM[hilo_mode + 0x2c]);
+	logerror( "\tNMI Address:   %2X%2Xh\n", ROM[hilo_mode + 0x3b], ROM[hilo_mode + 0x3a]);
+	logerror( "\tStart Address: %2X%2Xh\n\n", ROM[hilo_mode + 0x3d], ROM[hilo_mode + 0x3c]);
 
 	logerror( "\tMode: %d\n", type);
 }
