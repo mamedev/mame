@@ -81,9 +81,11 @@ READ8_MEMBER(sns_rom_sufami_device::read_l)
 
 READ8_MEMBER(sns_rom_sufami_device::read_h)
 {
+	int bank;
+
 	if (offset < 0x200000)      // SUFAMI TURBO ROM
 	{
-		int bank = offset / 0x10000;
+		bank = offset / 0x10000;
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
 	if (offset >= 0x200000 && offset < 0x400000)    // SLOT1 STROM
@@ -98,13 +100,21 @@ READ8_MEMBER(sns_rom_sufami_device::read_h)
 	}
 	if (offset >= 0x600000 && offset < 0x640000)    // SLOT1 RAM
 	{
-		if (m_slot1->m_cart && (offset & 0xffff) > 0x8000)
-			return m_slot1->m_cart->read_h(space, offset - 0x600000);
+		if (m_slot1->m_cart && (offset & 0xffff) >= 0x8000)
+		{
+			offset -= 0x600000;
+			bank = offset / 0x10000;
+			return m_slot1->m_cart->read_ram(space, bank * 0x8000 + (offset & 0x7fff));
+		}
 	}
 	if (offset >= 0x700000 && offset < 0x740000)    // SLOT2 RAM
 	{
-		if (m_slot2->m_cart && (offset & 0xffff) > 0x8000)
-			return m_slot2->m_cart->read_h(space, offset - 0x700000);
+		if (m_slot2->m_cart && (offset & 0xffff) >= 0x8000)
+		{
+			offset -= 0x700000;
+			bank = offset / 0x10000;
+			return m_slot2->m_cart->read_ram(space, bank * 0x8000 + (offset & 0x7fff));
+		}
 	}
 
 	return 0xff;
@@ -117,16 +127,25 @@ WRITE8_MEMBER(sns_rom_sufami_device::write_l)
 
 WRITE8_MEMBER(sns_rom_sufami_device::write_h)
 {
+	int bank;
 	if (offset >= 0x600000 && offset < 0x640000)    // SLOT1 RAM
 	{
-		if (m_slot1->m_cart && (offset & 0xffff) > 0x8000)
-			return m_slot1->m_cart->write_h(space, offset - 0x600000, data);
+		if (m_slot1->m_cart && (offset & 0xffff) >= 0x8000)
+		{
+			offset -= 0x600000;
+			bank = offset / 0x10000;
+			m_slot1->m_cart->write_ram(space, bank * 0x8000 + (offset & 0x7fff), data);
+		}
 	}
 
 	if (offset >= 0x700000 && offset < 0x740000)    // SLOT2 RAM
 	{
-		if (m_slot2->m_cart && (offset & 0xffff) > 0x8000)
-			return m_slot2->m_cart->write_h(space, offset - 0x700000, data);
+		if (m_slot2->m_cart && (offset & 0xffff) >= 0x8000)
+		{
+			offset -= 0x700000;
+			bank = offset / 0x10000;
+			m_slot2->m_cart->write_ram(space, bank * 0x8000 + (offset & 0x7fff), data);
+		}
 	}
 
 }
@@ -134,11 +153,6 @@ WRITE8_MEMBER(sns_rom_sufami_device::write_h)
 /*-------------------------------------------------
  Sufami Turbo 'minicart' emulation
  -------------------------------------------------*/
-
-// Here we're cheating a bit, for the moment, to avoid the need of ST carts as a completely different device
-// which would require separate loading routines
-// Hence, we use low r/w handlers for ROM access and hi r/w handlers for RAM access...
-// Eventually, it might be better to create a separate device for these, with rom_r and ram_r/ram_w handlers
 
 READ8_MEMBER(sns_rom_strom_device::read_l)
 {
@@ -148,27 +162,4 @@ READ8_MEMBER(sns_rom_strom_device::read_l)
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
 	return 0xff;
-}
-
-READ8_MEMBER(sns_rom_strom_device::read_h)
-{
-	if (offset < 0x40000)
-	{
-		int bank = offset / 0x10000;
-		return m_nvram[bank * 0x8000 + (offset & 0x7fff)];
-	}
-	return 0xff;
-}
-
-WRITE8_MEMBER(sns_rom_strom_device::write_l)
-{
-}
-
-WRITE8_MEMBER(sns_rom_strom_device::write_h)
-{
-	if (offset < 0x40000)
-	{
-		int bank = offset / 0x10000;
-		m_nvram[bank * 0x8000 + (offset & 0x7fff)] = data;
-	}
 }

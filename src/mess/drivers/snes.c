@@ -1513,11 +1513,11 @@ READ8_MEMBER( snsnew_state::snes20_hi_r )
 	{
 		if (address < 0x2000)
 			return space.read_byte(0x7e0000 + address);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 			return snes_r_io(space, address);
-		if (address >= 0x6000 && address < 0x8000)
+		else if (address < 0x8000)
 			return snes_open_bus_r(space, 0);
-		if (address >= 0x8000)
+		else
 			return m_slotcart->m_cart->read_h(space, offset);
 	}
 	else if (offset < 0x700000)
@@ -1527,24 +1527,54 @@ READ8_MEMBER( snsnew_state::snes20_hi_r )
 		else
 			return m_slotcart->m_cart->read_h(space, offset);
 	}
+	else
+	{
+		if (m_type == SNES_SUFAMITURBO && address >= 0x8000 && offset < 0x740000)
+			return m_slotcart->m_cart->read_h(space, offset);
 
-	// ROM & NVRAM access
-	return m_slotcart->m_cart->read_h(space, offset);
+		// here usually there is SRAM mirrored in the whole range, but if ROM is very large then arrives here too (see tokimeki and wizardg4)
+		if (m_slotcart->m_cart->get_rom_size() > 0x200000 && address >= 0x8000)
+			return m_slotcart->m_cart->read_h(space, offset);
+		else
+		{
+			if (m_slotcart->m_cart->get_nvram_size() > 0x8000)
+			{
+				// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
+				offset = ((offset - 0x700000) / 0x10000) * 0x8000 + (offset & 0x7fff);
+				return m_slotcart->m_cart->read_ram(space, offset);
+			}
+			else if (m_slotcart->m_cart->get_nvram_size() > 0)
+				return m_slotcart->m_cart->read_ram(space, offset);
+			else
+				return snes_open_bus_r(space, 0);
+		}
+	}
 }
 
 WRITE8_MEMBER( snsnew_state::snes20_hi_w )
 {
 	UINT16 address = offset & 0xffff;
+
+	if (m_type == SNES_SUFAMITURBO && address >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
+	{ m_slotcart->m_cart->write_h(space, offset, data); return; }
+	
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
 			space.write_byte(0x7e0000 + address, data);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 			snes_w_io(space, address, data);
 	}
-	else if (offset >= 0x700000)    // NVRAM access
+	else if (offset >= 0x700000 && (m_slotcart->m_cart->get_rom_size() <= 0x200000 || address < 0x8000))    // NVRAM access
 	{
-		m_slotcart->m_cart->write_h(space, offset, data);
+		if (m_slotcart->m_cart->get_nvram_size() > 0x8000)
+		{
+			// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
+			offset = ((offset - 0x700000) / 0x10000) * 0x8000 + (offset & 0x7fff);
+			m_slotcart->m_cart->write_ram(space, offset, data);
+		}
+		else if (m_slotcart->m_cart->get_nvram_size() > 0)
+			m_slotcart->m_cart->write_ram(space, offset, data);
 	}
 }
 
@@ -1556,11 +1586,11 @@ READ8_MEMBER( snsnew_state::snes20_lo_r )
 	{
 		if (address < 0x2000)
 			return space.read_byte(0x7e0000 + address);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 			return snes_r_io(space, address);
-		if (address >= 0x6000 && address < 0x8000)
+		else if (address < 0x8000)
 			return snes_open_bus_r(space, 0);
-		if (address >= 0x8000)
+		else
 			return m_slotcart->m_cart->read_l(space, offset);
 	}
 	else if (offset < 0x700000)
@@ -1570,13 +1600,35 @@ READ8_MEMBER( snsnew_state::snes20_lo_r )
 		else
 			return m_slotcart->m_cart->read_l(space, offset);
 	}
-
-	// ROM & NVRAM access
-	return m_slotcart->m_cart->read_l(space, offset);
+	else
+	{
+		if (m_type == SNES_SUFAMITURBO && address >= 0x8000 && offset < 0x740000)
+			return m_slotcart->m_cart->read_l(space, offset);
+		
+		// here usually there is SRAM mirrored in the whole range, but if ROM is very large then arrives here too (see tokimeki and wizardg4)
+		if (m_slotcart->m_cart->get_rom_size() > 0x200000 && address >= 0x8000)
+			return m_slotcart->m_cart->read_l(space, offset);
+		else
+		{
+			if (m_slotcart->m_cart->get_nvram_size() > 0x8000)
+			{
+				// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
+				offset = ((offset - 0x700000) / 0x10000) * 0x8000 + (offset & 0x7fff);
+				return m_slotcart->m_cart->read_ram(space, offset);
+			}
+			else if (m_slotcart->m_cart->get_nvram_size() > 0)
+				return m_slotcart->m_cart->read_ram(space, offset);
+			else
+				return snes_open_bus_r(space, 0);
+		}
+	}
 }
 
 WRITE8_MEMBER( snsnew_state::snes20_lo_w )
 {
+	if (m_type == SNES_SUFAMITURBO && (offset & 0xffff) >= 0x8000 && ((offset >= 0x600000 && offset < 0x640000) || (offset >= 0x700000 && offset < 0x740000)))
+	{ m_slotcart->m_cart->write_l(space, offset, data); return; }
+
 	snes20_hi_w(space, offset, data, 0xff);
 }
 
@@ -1587,102 +1639,124 @@ READ8_MEMBER( snsnew_state::snes21_lo_r )
 {
 	UINT16 address = offset & 0xffff;
 
-	if (offset < 0x400000)
+	if (offset < 0x400000 && address < 0x8000)
 	{
 		if (address < 0x2000)
 			return space.read_byte(0x7e0000 + address);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 			return snes_r_io(space, address);
-		if (address >= 0x6000 && address < 0x8000)
+		else if (address < 0x8000)
 		{
-			if (m_slotcart->m_cart->get_nvram_size())
+			if (m_type == SNES_BSXHI && m_slotcart->m_cart->get_nvram_size() && offset >= 0x200000)
 			{
-				// read NVRAM, instead
-				if (offset >= 0x300000)
-					return m_slotcart->m_cart->read_l(space, offset);
+				int mask = (m_slotcart->m_cart->get_nvram_size() - 1) & 0x7fff;
+				return m_slotcart->m_cart->read_ram(space, (offset - 0x6000) & mask);
 			}
-			return snes_open_bus_r(space, 0);
+
+			if (m_slotcart->m_cart->get_nvram_size() && offset >= 0x300000)
+			{
+				/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
+				/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
+				int mask = (m_slotcart->m_cart->get_nvram_size() - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
+				return m_slotcart->m_cart->read_ram(space, (offset - 0x6000) & mask);
+			}
+			else
+				return snes_open_bus_r(space, 0);
 		}
-		if (address >= 0x8000)
-			return m_slotcart->m_cart->read_l(space, offset);
 	}
 
-	// ROM & NVRAM access
+	// ROM access
 	return m_slotcart->m_cart->read_l(space, offset);
 }
 
 WRITE8_MEMBER( snsnew_state::snes21_lo_w )
 {
 	UINT16 address = offset & 0xffff;
-	if (offset < 0x400000)
+	if (offset < 0x400000 && address < 0x8000)
 	{
 		if (address < 0x2000)
 			space.write_byte(0x7e0000 + address, data);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 			snes_w_io(space, address, data);
-		if (address >= 0x6000 && address < 0x8000)
+		else if (address < 0x8000)
 		{
-			if (m_slotcart->m_cart->get_nvram_size())
+			if (m_type == SNES_BSXHI && m_slotcart->m_cart->get_nvram_size() && offset >= 0x200000)
 			{
-				// write to NVRAM, in this case
-				if (offset >= 0x300000)
-					m_slotcart->m_cart->write_l(space, offset, data);
+				int mask = (m_slotcart->m_cart->get_nvram_size() - 1) & 0x7fff;
+				m_slotcart->m_cart->write_ram(space, (offset - 0x6000) & mask, data);
+				return;
+			}
+			if (m_slotcart->m_cart->get_nvram_size() && offset >= 0x300000)
+			{
+				/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
+				/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
+				int mask = (m_slotcart->m_cart->get_nvram_size() - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
+				m_slotcart->m_cart->write_ram(space, (offset - 0x6000) & mask, data);
 			}
 		}
 	}
-	else if (offset >= 0x700000)    // NVRAM access
-		m_slotcart->m_cart->write_l(space, offset, data);
 }
 
 READ8_MEMBER( snsnew_state::snes21_hi_r )
 {
 	UINT16 address = offset & 0xffff;
 
-	if (offset < 0x400000)
+	if (offset < 0x400000 && address < 0x8000)
 	{
 		if (address < 0x2000)
 			return space.read_byte(0x7e0000 + address);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 			return snes_r_io(space, address);
-		if (address >= 0x6000 && address < 0x8000)
+		else if (address < 0x8000)
 		{
-			if (m_slotcart->m_cart->get_nvram_size())
+			if (m_type == SNES_BSXHI && m_slotcart->m_cart->get_nvram_size() && offset >= 0x200000)
 			{
-				// read NVRAM, instead
-				if (offset >= 0x300000)
-					return  m_slotcart->m_cart->read_h(space, offset);
+				int mask = (m_slotcart->m_cart->get_nvram_size() - 1) & 0x7fff;
+				return m_slotcart->m_cart->read_ram(space, (offset - 0x6000) & mask);
 			}
-			return snes_open_bus_r(space, 0);
+			
+			if (m_slotcart->m_cart->get_nvram_size() && offset >= 0x300000)
+			{
+				/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
+				/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
+				int mask = (m_slotcart->m_cart->get_nvram_size() - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
+				return m_slotcart->m_cart->read_ram(space, (offset - 0x6000) & mask);
+			}
+			else
+				return snes_open_bus_r(space, 0);
 		}
-		if (address >= 0x8000)
-			return m_slotcart->m_cart->read_h(space, offset);
 	}
 
-	// ROM & NVRAM access
+	// ROM access
 	return m_slotcart->m_cart->read_h(space, offset);
 }
 
 WRITE8_MEMBER( snsnew_state::snes21_hi_w )
 {
 	UINT16 address = offset & 0xffff;
-	if (offset < 0x400000)
+	if (offset < 0x400000 && address < 0x8000)
 	{
 		if (address < 0x2000)
 			space.write_byte(0x7e0000 + address, data);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 			snes_w_io(space, address, data);
-		if (address >= 0x6000 && address < 0x8000)
+		else if (address < 0x8000)
 		{
-			if (m_slotcart->m_cart->get_nvram_size())
+			if (m_type == SNES_BSXHI && m_slotcart->m_cart->get_nvram_size() && offset >= 0x200000)
 			{
-				// write to NVRAM, in this case
-				if (offset >= 0x300000)
-					m_slotcart->m_cart->write_h(space, offset, data);
+				int mask = (m_slotcart->m_cart->get_nvram_size() - 1) & 0x7fff;
+				m_slotcart->m_cart->write_ram(space, (offset - 0x6000) & mask, data);
+				return;
+			}
+			if (m_slotcart->m_cart->get_nvram_size() && offset >= 0x300000)
+			{
+				/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
+				/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
+				int mask = (m_slotcart->m_cart->get_nvram_size() - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
+				m_slotcart->m_cart->write_ram(space, (offset - 0x6000) & mask, data);
 			}
 		}
 	}
-	else if (offset >= 0x700000)    // NVRAM access
-		m_slotcart->m_cart->write_h(space, offset, data);
 }
 
 // SuperFX / GSU
@@ -1695,24 +1769,22 @@ READ8_MEMBER( snsnew_state::snesfx_hi_r )
 	{
 		if (address < 0x2000)
 			return space.read_byte(0x7e0000 + address);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 		{
 			if (address >= 0x3000 && address < 0x3300)
 				return m_slotcart->m_cart->chip_read(space, offset);
 			else
 				return snes_r_io(space, address);
 		}
-		if (address >= 0x6000 && address < 0x8000)
-		{
-			return m_slotcart->m_cart->read_h(space, offset);   //RAM
-		}
-		if (address >= 0x8000)
-			return m_slotcart->m_cart->read_h(space, offset);   //ROM
+		else if (address < 0x8000)
+			return m_slotcart->m_cart->read_ram(space, offset & 0x1fff);
+		else 
+			return m_slotcart->m_cart->read_h(space, offset);
 	}
 	else if (offset < 0x600000)
-		return m_slotcart->m_cart->read_h(space, offset);   //ROM
-
-	return m_slotcart->m_cart->read_h(space, offset);   //RAM
+		return m_slotcart->m_cart->read_h(space, offset);
+	else
+		return m_slotcart->m_cart->read_ram(space, offset);
 }
 
 READ8_MEMBER( snsnew_state::snesfx_lo_r )
@@ -1723,24 +1795,22 @@ READ8_MEMBER( snsnew_state::snesfx_lo_r )
 	{
 		if (address < 0x2000)
 			return space.read_byte(0x7e0000 + address);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 		{
 			if (address >= 0x3000 && address < 0x3300)
 				return m_slotcart->m_cart->chip_read(space, offset);
 			else
 				return snes_r_io(space, address);
 		}
-		if (address >= 0x6000 && address < 0x8000)
-		{
-			return m_slotcart->m_cart->read_l(space, offset);   //RAM
-		}
-		if (address >= 0x8000)
-			return m_slotcart->m_cart->read_l(space, offset);   //ROM
+		else if (address < 0x8000)
+			return m_slotcart->m_cart->read_ram(space, offset & 0x1fff);
+		else
+			return m_slotcart->m_cart->read_l(space, offset);
 	}
 	else if (offset < 0x600000)
-		return m_slotcart->m_cart->read_l(space, offset);   //ROM
-
-	return m_slotcart->m_cart->read_l(space, offset);   //RAM
+		return m_slotcart->m_cart->read_l(space, offset);
+	else
+		return m_slotcart->m_cart->read_ram(space, offset);
 }
 
 WRITE8_MEMBER( snsnew_state::snesfx_hi_w )
@@ -1750,39 +1820,23 @@ WRITE8_MEMBER( snsnew_state::snesfx_hi_w )
 	{
 		if (address < 0x2000)
 			space.write_byte(0x7e0000 + address, data);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 		{
 			if (address >= 0x3000 && address < 0x3300)
 				m_slotcart->m_cart->chip_write(space, offset, data);
 			else
 				snes_w_io(space, address, data);
 		}
-		if (address >= 0x6000 && address < 0x8000)
-			m_slotcart->m_cart->write_h(space, offset, data);
+		else if (address < 0x8000)
+			m_slotcart->m_cart->write_ram(space, offset & 0x1fff, data);
 	}
-	else
-		m_slotcart->m_cart->write_h(space, offset, data);
+	else if (offset >= 0x600000)
+		m_slotcart->m_cart->write_ram(space, offset, data);
 }
 
 WRITE8_MEMBER( snsnew_state::snesfx_lo_w )
 {
-	UINT16 address = offset & 0xffff;
-	if (offset < 0x400000)
-	{
-		if (address < 0x2000)
-			space.write_byte(0x7e0000 + address, data);
-		if (address >= 0x2000 && address < 0x6000)
-		{
-			if (address >= 0x3000 && address < 0x3300)
-				m_slotcart->m_cart->chip_write(space, offset, data);
-			else
-				snes_w_io(space, address, data);
-		}
-		if (address >= 0x6000 && address < 0x8000)
-			m_slotcart->m_cart->write_l(space, offset, data);
-	}
-	else
-		m_slotcart->m_cart->write_l(space, offset, data);
+	snesfx_hi_w(space, offset, data, 0xff);
 }
 
 // SPC-7110
@@ -1795,7 +1849,7 @@ READ8_MEMBER( snsnew_state::snespc7110_hi_r )
 	{
 		if (address < 0x2000)
 			return space.read_byte(0x7e0000 + address);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 		{
 			UINT16 limit = (m_slotcart->get_type() == SNES_SPC7110_RTC) ? 0x4843 : 0x4840;
 			if (address >= 0x4800 && address < limit)
@@ -1803,14 +1857,14 @@ READ8_MEMBER( snsnew_state::snespc7110_hi_r )
 
 			return snes_r_io(space, address);
 		}
-		if (address >= 0x6000 && address < 0x8000)
+		else if (address < 0x8000)
 		{
 			if (offset < 0x10000)
-				return m_slotcart->m_cart->read_h(space, offset);
+				return m_slotcart->m_cart->read_ram(space, offset);
 			if (offset >= 0x300000 && offset < 0x310000)
-				return m_slotcart->m_cart->read_h(space, offset);
+				return m_slotcart->m_cart->read_ram(space, offset);
 		}
-		if (address >= 0x8000)
+		else
 			return m_slotcart->m_cart->read_h(space, offset);
 	}
 	return m_slotcart->m_cart->read_h(space, offset);
@@ -1824,7 +1878,7 @@ READ8_MEMBER( snsnew_state::snespc7110_lo_r )
 	{
 		if (address < 0x2000)
 			return space.read_byte(0x7e0000 + address);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 		{
 			UINT16 limit = (m_slotcart->get_type() == SNES_SPC7110_RTC) ? 0x4843 : 0x4840;
 			if (address >= 0x4800 && address < limit)
@@ -1832,14 +1886,14 @@ READ8_MEMBER( snsnew_state::snespc7110_lo_r )
 
 			return snes_r_io(space, address);
 		}
-		if (address >= 0x6000 && address < 0x8000)
+		else if (address < 0x8000)
 		{
 			if (offset < 0x10000)
-				return m_slotcart->m_cart->read_l(space, offset);
+				return m_slotcart->m_cart->read_ram(space, offset);
 			if (offset >= 0x300000 && offset < 0x310000)
-				return m_slotcart->m_cart->read_l(space, offset);
+				return m_slotcart->m_cart->read_ram(space, offset);
 		}
-		if (address >= 0x8000)
+		else
 			return m_slotcart->m_cart->read_l(space, offset);
 	}
 	if (offset >= 0x500000 && offset < 0x510000)
@@ -1850,29 +1904,7 @@ READ8_MEMBER( snsnew_state::snespc7110_lo_r )
 
 WRITE8_MEMBER( snsnew_state::snespc7110_hi_w )
 {
-	UINT16 address = offset & 0xffff;
-	if (offset < 0x400000)
-	{
-		if (address < 0x2000)
-			space.write_byte(0x7e0000 + address, data);
-		if (address >= 0x2000 && address < 0x6000)
-		{
-			UINT16 limit = (m_slotcart->get_type() == SNES_SPC7110_RTC) ? 0x4843 : 0x4840;
-			if (address >= 0x4800 && address < limit)
-			{
-				m_slotcart->m_cart->chip_write(space, address, data);
-				return;
-			}
-			snes_w_io(space, address, data);
-		}
-		if (address >= 0x6000 && address < 0x8000)
-		{
-			if (offset < 0x10000)
-				m_slotcart->m_cart->write_l(space, offset, data);
-			if (offset >= 0x300000 && offset < 0x310000)
-				m_slotcart->m_cart->write_l(space, offset, data);
-		}
-	}
+	snespc7110_lo_w(space, offset, data, 0xff);
 }
 
 WRITE8_MEMBER( snsnew_state::snespc7110_lo_w )
@@ -1882,7 +1914,7 @@ WRITE8_MEMBER( snsnew_state::snespc7110_lo_w )
 	{
 		if (address < 0x2000)
 			space.write_byte(0x7e0000 + address, data);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 		{
 			UINT16 limit = (m_slotcart->get_type() == SNES_SPC7110_RTC) ? 0x4843 : 0x4840;
 			if (address >= 0x4800 && address < limit)
@@ -1892,12 +1924,12 @@ WRITE8_MEMBER( snsnew_state::snespc7110_lo_w )
 			}
 			snes_w_io(space, address, data);
 		}
-		if (address >= 0x6000 && address < 0x8000)
+		else if (address < 0x8000)
 		{
 			if (offset < 0x10000)
-				m_slotcart->m_cart->write_l(space, offset, data);
+				m_slotcart->m_cart->write_ram(space, offset, data);
 			if (offset >= 0x300000 && offset < 0x310000)
-				m_slotcart->m_cart->write_l(space, offset, data);
+				m_slotcart->m_cart->write_ram(space, offset, data);
 		}
 	}
 }
@@ -1913,31 +1945,45 @@ READ8_MEMBER( snsnew_state::snesdd1_lo_r )
 	{
 		if (address < 0x2000)
 			return space.read_byte(0x7e0000 + address);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 		{
 			if (address >= 0x4800 && address < 0x4808)
 				return m_slotcart->m_cart->chip_read(space, address);
 
 			return snes_r_io(space, address);
 		}
-		if (address >= 0x6000 && address < 0x8000)
+		else if (address < 0x8000)
 			return snes_open_bus_r(space, 0);
-		if (address >= 0x8000)
+		else
 			return m_slotcart->m_cart->read_l(space, offset);
 	}
+	else if (offset >= 0x700000 && address < 0x8000 && m_slotcart->m_cart->get_nvram_size())    // NVRAM access
+		return m_slotcart->m_cart->read_ram(space, offset);
+	else	// ROM access
+		return m_slotcart->m_cart->read_l(space, offset);
+}
 
-	// ROM & NVRAM access
-	return m_slotcart->m_cart->read_l(space, offset);
+READ8_MEMBER( snsnew_state::snesdd1_hi_r )
+{
+	if (offset >= 0x400000)
+		return m_slotcart->m_cart->read_h(space, offset);
+	else
+		return snesdd1_lo_r(space, offset, 0xff);
 }
 
 WRITE8_MEMBER( snsnew_state::snesdd1_lo_w )
+{
+	snesdd1_hi_w(space, offset, data, 0xff);
+}
+
+WRITE8_MEMBER( snsnew_state::snesdd1_hi_w )
 {
 	UINT16 address = offset & 0xffff;
 	if (offset < 0x400000)
 	{
 		if (address < 0x2000)
 			space.write_byte(0x7e0000 + address, data);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 		{
 			if (address >= 0x4300 && address < 0x4380)
 			{
@@ -1953,24 +1999,11 @@ WRITE8_MEMBER( snsnew_state::snesdd1_lo_w )
 		}
 	}
 	if (offset >= 0x700000 && address < 0x8000 && m_slotcart->m_cart->get_nvram_size())
-		return m_slotcart->m_cart->write_l(space, offset, data);
-}
-
-READ8_MEMBER( snsnew_state::snesdd1_hi_r )
-{
-	if (offset >= 0x400000)
-		return m_slotcart->m_cart->read_h(space, offset);
-	else
-		return snesdd1_lo_r(space, offset, 0xff);
-}
-
-WRITE8_MEMBER( snsnew_state::snesdd1_hi_w )
-{
-	snesdd1_lo_w(space, offset, data, 0xff);
+		return m_slotcart->m_cart->write_ram(space, offset, data);
 }
 
 
-// BS-X
+// BS-X (Base unit)
 
 READ8_MEMBER( snsnew_state::snesbsx_hi_r )
 {
@@ -1980,7 +2013,7 @@ READ8_MEMBER( snsnew_state::snesbsx_hi_r )
 	{
 		if (address < 0x2000)
 			return space.read_byte(0x7e0000 + address);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 		{
 			if (address >= 0x2188 && address < 0x21a0)
 				return m_slotcart->m_cart->chip_read(space, offset);
@@ -1988,17 +2021,17 @@ READ8_MEMBER( snsnew_state::snesbsx_hi_r )
 				return m_slotcart->m_cart->chip_read(space, offset);
 			return snes_r_io(space, address);
 		}
-		if (address >= 0x6000 && address < 0x8000)
+		else if (address < 0x8000)
 		{
 			if (offset >= 0x200000)
-				return m_slotcart->m_cart->read_l(space, offset);
+				return m_slotcart->m_cart->read_h(space, offset);
 			else
 				return snes_open_bus_r(space, 0);
 		}
-		if (address >= 0x8000)
-			return m_slotcart->m_cart->read_l(space, offset);
+		else
+			return m_slotcart->m_cart->read_h(space, offset);
 	}
-	return m_slotcart->m_cart->read_l(space, offset);
+	return m_slotcart->m_cart->read_h(space, offset);
 }
 
 WRITE8_MEMBER( snsnew_state::snesbsx_hi_w )
@@ -2008,7 +2041,7 @@ WRITE8_MEMBER( snsnew_state::snesbsx_hi_w )
 	{
 		if (address < 0x2000)
 			space.write_byte(0x7e0000 + address, data);
-		if (address >= 0x2000 && address < 0x6000)
+		else if (address < 0x6000)
 		{
 			if (address >= 0x2188 && address < 0x21a0)
 			{
@@ -2022,12 +2055,12 @@ WRITE8_MEMBER( snsnew_state::snesbsx_hi_w )
 			}
 			snes_w_io(space, address, data);
 		}
-		if (address >= 0x6000 && address < 0x8000)
+		else if (address < 0x8000)
 		{
 			if (offset >= 0x200000)
 				return m_slotcart->m_cart->write_l(space, offset, data);
 		}
-		if (address >= 0x8000)
+		else
 			return m_slotcart->m_cart->write_l(space, offset, data);
 	}
 	return m_slotcart->m_cart->write_l(space, offset, data);
@@ -2035,7 +2068,31 @@ WRITE8_MEMBER( snsnew_state::snesbsx_hi_w )
 
 READ8_MEMBER( snsnew_state::snesbsx_lo_r )
 {
-	return snesbsx_hi_r(space, offset, 0xff);
+	UINT16 address = offset & 0xffff;
+	
+	if (offset < 0x400000)
+	{
+		if (address < 0x2000)
+			return space.read_byte(0x7e0000 + address);
+		else if (address < 0x6000)
+		{
+			if (address >= 0x2188 && address < 0x21a0)
+				return m_slotcart->m_cart->chip_read(space, offset);
+			if (address >= 0x5000)
+				return m_slotcart->m_cart->chip_read(space, offset);
+			return snes_r_io(space, address);
+		}
+		else if (address < 0x8000)
+		{
+			if (offset >= 0x200000)
+				return m_slotcart->m_cart->read_l(space, offset);
+			else
+				return snes_open_bus_r(space, 0);
+		}
+		else
+			return m_slotcart->m_cart->read_l(space, offset);
+	}
+	return m_slotcart->m_cart->read_l(space, offset);
 }
 
 WRITE8_MEMBER( snsnew_state::snesbsx_lo_w )

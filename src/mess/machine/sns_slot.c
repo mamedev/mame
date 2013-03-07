@@ -5,6 +5,21 @@
     (through slot devices)
 
 
+    Carts can be mapped in memory in several different ways and accesses to carts depend
+    on the presence of add-on chips (which map their I/O to diff memory areas)
+
+    Hence, carts can interface with the main system through the following handlers
+    * read_l : typically used to read ROM from memory range [00-7f][0000-ffff]
+    * read_h : typically used to read ROM from memory range [80-ff][0000-ffff]
+    * read_ram : used to read (NV)RAM at the appropriate offset (masks has to be applied
+                 *before* calling it, if dealing with >32K RAM)
+    * write_ram : used to write (NV)RAM at the appropriate offset
+    * read_chip : used to read add-on chip registers
+    * write_chip : used to write to add-on chip registers
+
+    Also, we define two additional ROM access handlers, write_l & write_h for carts with
+    subslots (e.g. BS-X compatible ones), that need to write to subslot (NV)RAM independently
+    to accesses to their own (NV)RAM.
 
  ***********************************************************************************************************/
 
@@ -843,6 +858,14 @@ READ8_MEMBER(base_sns_cart_slot_device::read_h)
 		return 0xff;
 }
 
+READ8_MEMBER(base_sns_cart_slot_device::read_ram)
+{
+	if (m_cart)
+		return m_cart->read_ram(space, offset);
+	else
+		return 0xff;
+}
+
 READ8_MEMBER(base_sns_cart_slot_device::chip_read)
 {
 	if (m_cart)
@@ -865,6 +888,12 @@ WRITE8_MEMBER(base_sns_cart_slot_device::write_h)
 {
 	if (m_cart)
 		m_cart->write_h(space, offset, data);
+}
+
+WRITE8_MEMBER(base_sns_cart_slot_device::write_ram)
+{
+	if (m_cart)
+		m_cart->write_ram(space, offset, data);
 }
 
 WRITE8_MEMBER(base_sns_cart_slot_device::chip_write)

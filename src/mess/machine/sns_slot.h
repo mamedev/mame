@@ -58,10 +58,12 @@ public:
 	virtual ~device_sns_cart_interface();
 
 	// reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l) { return 0xff; }
-	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }
-	virtual DECLARE_WRITE8_MEMBER(write_l) {}
-	virtual DECLARE_WRITE8_MEMBER(write_h) {}
+	virtual DECLARE_READ8_MEMBER(read_l) { return 0xff; }	// ROM access in range [00-7f]
+	virtual DECLARE_READ8_MEMBER(read_h) { return 0xff; }	// ROM access in range [80-ff]
+	virtual DECLARE_READ8_MEMBER(read_ram) { UINT32 mask = m_nvram_size - 1; return m_nvram[offset & mask]; }	// NVRAM access
+	virtual DECLARE_WRITE8_MEMBER(write_l) {}	// used by carts with subslots
+	virtual DECLARE_WRITE8_MEMBER(write_h) {}	// used by carts with subslots
+	virtual DECLARE_WRITE8_MEMBER(write_ram) { UINT32 mask = m_nvram_size - 1; m_nvram[offset & mask] = data; return; }	// NVRAM access
 	virtual DECLARE_READ8_MEMBER(chip_read) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(chip_write) {}
 
@@ -137,8 +139,10 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_h);
+	virtual DECLARE_READ8_MEMBER(read_ram);
 	virtual DECLARE_WRITE8_MEMBER(write_l);
 	virtual DECLARE_WRITE8_MEMBER(write_h);
+	virtual DECLARE_WRITE8_MEMBER(write_ram);
 	virtual DECLARE_READ8_MEMBER(chip_read);
 	virtual DECLARE_WRITE8_MEMBER(chip_write);
 

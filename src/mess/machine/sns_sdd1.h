@@ -150,7 +150,8 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
+	virtual DECLARE_READ8_MEMBER(read_ram);
+	virtual DECLARE_WRITE8_MEMBER(write_ram);
 	virtual DECLARE_READ8_MEMBER(chip_read);
 	virtual DECLARE_WRITE8_MEMBER(chip_write);
 

@@ -107,77 +107,16 @@ WRITE8_MEMBER( sns_rom_superfx_device::chip_write )
 	superfx_mmio_write(m_superfx, offset, data);
 }
 
+
 READ8_MEMBER( sns_rom_superfx_device::read_l )
 {
-	UINT16 address = offset & 0xffff;
-
-	if (offset < 0x400000)
-	{
-		if (address >= 0x6000 && address < 0x8000)
-		{
-			if (superfx_access_ram(m_superfx))
-				return  sfx_ram[offset & 0x1fff];
-		}
-		if (address >= 0x8000)
-			return m_rom[rom_bank_map[offset / 0x10000] * 0x8000 + (offset & 0x7fff)];
-	}
-	else if (offset < 0x600000)
-	{
-		if (superfx_access_rom(m_superfx))
-		{
-			return m_rom[rom_bank_map[(offset - 0x400000) / 0x8000] * 0x8000 + (offset & 0x7fff)];
-		}
-		else
-		{
-			static const UINT8 sfx_data[16] = {
-				0x00, 0x01, 0x00, 0x01, 0x04, 0x01, 0x00, 0x01,
-				0x00, 0x01, 0x08, 0x01, 0x00, 0x01, 0x0c, 0x01,
-			};
-			return sfx_data[offset & 0x0f];
-		}
-	}
-	else
-	{
-		if (superfx_access_ram(m_superfx))
-			return  sfx_ram[offset & 0xfffff];
-	}
-
-	return 0xff;    // should be open bus...
-}
-
-
-WRITE8_MEMBER( sns_rom_superfx_device::write_l )
-{
-	UINT16 address = offset & 0xffff;
-	if (offset < 0x400000)
-	{
-		if (address >= 0x6000 && address < 0x8000)
-		{
-			if (superfx_access_ram(m_superfx))
-				sfx_ram[offset & 0x1fff] = data;
-		}
-	}
-	else if (offset >= 0x600000)
-	{
-		if (superfx_access_ram(m_superfx))
-			sfx_ram[offset & 0xfffff] = data;
-	}
+	return read_h(space, offset);
 }
 
 READ8_MEMBER(sns_rom_superfx_device::read_h)
 {
-	UINT16 address = offset & 0xffff;
-
 	if (offset < 0x400000)
-	{
-		if (address >= 0x6000 && address < 0x8000)
-		{
-			if (superfx_access_ram(m_superfx))
-				return  sfx_ram[offset & 0x1fff];
-		}
-		if (address >= 0x8000)
-			return m_rom[rom_bank_map[offset / 0x10000] * 0x8000 + (offset & 0x7fff)];
-	}
+		return m_rom[rom_bank_map[offset / 0x10000] * 0x8000 + (offset & 0x7fff)];
 	else if (offset < 0x600000)
 	{
 		if (superfx_access_rom(m_superfx))
@@ -193,29 +132,19 @@ READ8_MEMBER(sns_rom_superfx_device::read_h)
 			return sfx_data[offset & 0x0f];
 		}
 	}
-	else
-	{
-		if (superfx_access_ram(m_superfx))
-			return  sfx_ram[offset & 0xfffff];
-	}
+	return 0xff;    // this handler should never be called for [60-7f]/[e0-ff] ranges
+}
 
+READ8_MEMBER( sns_rom_superfx_device::read_ram )
+{
+	if (superfx_access_ram(m_superfx))
+		return sfx_ram[offset & 0xfffff];
 	return 0xff;    // should be open bus...
 }
 
-WRITE8_MEMBER( sns_rom_superfx_device::write_h )
+WRITE8_MEMBER( sns_rom_superfx_device::write_ram )
 {
-	UINT16 address = offset & 0xffff;
-	if (offset < 0x400000)
-	{
-		if (address >= 0x6000 && address < 0x8000)
-		{
-			if (superfx_access_ram(m_superfx))
-				sfx_ram[offset & 0x1fff] = data;
-		}
-	}
-	else if (offset >= 0x600000)
-	{
-		if (superfx_access_ram(m_superfx))
-			sfx_ram[offset & 0xfffff] = data;
-	}
+	if (superfx_access_ram(m_superfx))
+		sfx_ram[offset & 0xfffff] = data;
 }
+

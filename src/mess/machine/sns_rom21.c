@@ -65,19 +65,6 @@ void sns_rom21_srtc_device::device_start()
 
 READ8_MEMBER(sns_rom21_device::read_l)
 {
-	UINT16 address = offset & 0xffff;
-
-	if (offset >= 0x300000 && offset < 0x400000 && address < 0x8000)
-	{
-		if (m_nvram_size > 0)
-		{
-			/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
-			/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
-			int mask = (m_nvram_size - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
-			return m_nvram[(offset - 0x6000) & mask];
-		}
-	}
-
 	// here ROM banks from 128 to 255, mirrored twice
 	int bank = (offset & 0x3fffff) / 0x8000;
 	return m_rom[rom_bank_map[bank + 0x80] * 0x8000 + (offset & 0x7fff)];
@@ -85,44 +72,11 @@ READ8_MEMBER(sns_rom21_device::read_l)
 
 READ8_MEMBER(sns_rom21_device::read_h)
 {
-	UINT16 address = offset & 0xffff;
-
-	if (offset >= 0x300000 && offset < 0x400000 && address < 0x8000)
-	{
-		if (m_nvram_size > 0)
-		{
-			/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
-			/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
-			int mask = (m_nvram_size - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
-			return m_nvram[(offset - 0x6000) & mask];
-		}
-	}
-
 	// here ROM banks from 0 to 127, mirrored twice
 	int bank = (offset & 0x3fffff) / 0x8000;
 	return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 }
 
-WRITE8_MEMBER(sns_rom21_device::write_l)
-{
-	write_h(space, offset, data);
-}
-
-WRITE8_MEMBER(sns_rom21_device::write_h)
-{
-	UINT16 address = offset & 0xffff;
-
-	if (offset >= 0x300000 && offset < 0x400000 && address < 0x8000)
-	{
-		if (m_nvram_size > 0)
-		{
-			/* Donkey Kong Country checks this and detects a copier if 0x800 is not masked out due to sram size */
-			/* OTOH Secret of Mana does not work properly if sram is not mirrored on later banks */
-			int mask = (m_nvram_size - 1) & 0x7fff; /* Limit SRAM size to what's actually present */
-			m_nvram[(offset - 0x6000) & mask] = data;
-		}
-	}
-}
 
 // Hi-ROM + S-RTC (used by Daikaijuu Monogatari II)
 // same as above but additional read/write handling for the RTC

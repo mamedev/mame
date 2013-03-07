@@ -581,8 +581,6 @@ READ8_MEMBER(sns_rom_sdd1_device::read_l)
 {
 	if (offset < 0x400000)
 		return m_rom[rom_bank_map[offset / 0x10000] * 0x8000 + (offset & 0x7fff)];
-	else if (offset >= 0x700000 && (offset & 0xffff) < 0x8000 && m_nvram_size > 0)
-		return m_nvram[offset & 0x1fff];
 	else
 		return m_rom[rom_bank_map[(offset - 0x400000) / 0x8000] * 0x8000 + (offset & 0x7fff)];
 }
@@ -595,8 +593,14 @@ READ8_MEMBER(sns_rom_sdd1_device::read_h)
 		return read_l(space, offset);
 }
 
-WRITE8_MEMBER(sns_rom_sdd1_device::write_l)
+
+READ8_MEMBER( sns_rom_sdd1_device::read_ram )
 {
-	if (offset >= 0x700000 && (offset & 0xffff) < 0x8000 && m_nvram_size > 0)   // SRAM
-		m_nvram[offset & 0x1fff] = data;
+	return m_nvram[offset & 0x1fff];
 }
+
+WRITE8_MEMBER( sns_rom_sdd1_device::write_ram )
+{
+	m_nvram[offset & 0x1fff] = data;
+}
+

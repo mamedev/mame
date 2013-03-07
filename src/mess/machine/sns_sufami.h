@@ -42,10 +42,7 @@ public:
 	virtual void device_config_complete() { m_shortname = "sns_strom"; }
 
 	// additional reading and writing
-	virtual DECLARE_READ8_MEMBER(read_l);   // used for ROM
-	virtual DECLARE_READ8_MEMBER(read_h);   // used for ROM
-	virtual DECLARE_WRITE8_MEMBER(write_l); // used for RAM
-	virtual DECLARE_WRITE8_MEMBER(write_h); // used for RAM
+	virtual DECLARE_READ8_MEMBER(read_l);
 };
 
 

@@ -21,8 +21,6 @@ public:
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_l);
 	virtual DECLARE_READ8_MEMBER(read_h);
-	virtual DECLARE_WRITE8_MEMBER(write_l);
-	virtual DECLARE_WRITE8_MEMBER(write_h);
 };
 
 // ======================> sns_rom21_srtc_device

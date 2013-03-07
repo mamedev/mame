@@ -1008,67 +1008,6 @@ void sns_rom_spc7110_device::spc7110_update_time(UINT8 offset)
 	}
 }
 
-READ8_MEMBER(sns_rom_spc7110_device::read_l)
-{
-	UINT16 address = offset & 0xffff;
-	if (offset < 0x400000)
-	{
-		if (address >= 0x6000 && address < 0x8000)
-		{
-			if (offset < 0x10000)
-				return m_ram[offset & 0x1fff];
-			if (offset >= 0x300000 && offset < 0x310000)
-				return m_ram[offset & 0x1fff];
-		}
-		if (address >= 0x8000)
-			return m_rom[rom_bank_map[offset / 0x8000] * 0x8000 + (offset & 0x7fff)];
-	}
-
-	return 0xff;
-}
-
-READ8_MEMBER(sns_rom_spc7110_device::read_h)
-{
-	UINT16 address = offset & 0xfffff;
-
-	if (offset < 0x400000)
-	{
-		if (address >= 0x6000 && address < 0x8000)
-		{
-			if (offset < 0x10000)
-				return m_ram[offset & 0x1fff];
-			if (offset >= 0x300000 && offset < 0x310000)
-				return m_ram[offset & 0x1fff];
-		}
-		if (address >= 0x8000)
-			return m_rom[rom_bank_map[offset / 0x8000] * 0x8000 + (offset & 0x7fff)];
-	}
-	else
-	{
-		switch (offset & 0x300000)
-		{
-			case 0x000000:
-				return m_rom[rom_bank_map[(offset - 0x400000) / 0x8000] * 0x8000 + (offset & 0x7fff)];
-			case 0x100000:
-				return m_rom[m_dx_offset + address];
-			case 0x200000:
-				return m_rom[m_ex_offset + address];
-			case 0x300000:
-				return m_rom[m_fx_offset + address];
-			default:
-				break;
-		}
-	}
-
-	return 0xff;
-}
-
-WRITE8_MEMBER(sns_rom_spc7110_device::write_l)
-{
-	m_ram[offset & 0x1fff] = data;
-}
-
-
 READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 {
 	UINT8 *ROM = get_rom_base();
@@ -1640,3 +1579,49 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 			break;
 	}
 }
+
+READ8_MEMBER(sns_rom_spc7110_device::read_l)
+{
+	if (offset < 0x400000)
+		return m_rom[rom_bank_map[offset / 0x8000] * 0x8000 + (offset & 0x7fff)];
+	
+	return 0xff;
+}
+
+READ8_MEMBER(sns_rom_spc7110_device::read_h)
+{
+	UINT16 address = offset & 0xfffff;
+	
+	if (offset < 0x400000)
+		return m_rom[rom_bank_map[offset / 0x8000] * 0x8000 + (offset & 0x7fff)];
+	else
+	{
+		switch (offset & 0x300000)
+		{
+			case 0x000000:
+				return m_rom[rom_bank_map[(offset - 0x400000) / 0x8000] * 0x8000 + (offset & 0x7fff)];
+			case 0x100000:
+				return m_rom[m_dx_offset + address];
+			case 0x200000:
+				return m_rom[m_ex_offset + address];
+			case 0x300000:
+				return m_rom[m_fx_offset + address];
+			default:
+				break;
+		}
+	}
+	
+	return 0xff;
+}
+
+
+READ8_MEMBER( sns_rom_spc7110_device::read_ram )
+{
+	return m_ram[offset & 0x1fff];
+}
+
+WRITE8_MEMBER( sns_rom_spc7110_device::write_ram )
+{
+	m_ram[offset & 0x1fff] = data;
+}
+

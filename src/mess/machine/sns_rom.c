@@ -82,64 +82,8 @@ READ8_MEMBER(sns_rom_device::read_l)
 
 READ8_MEMBER(sns_rom_device::read_h)
 {
-	UINT8 value = 0xff;
-	UINT16 address = offset & 0xffff;
-
-	if (offset < 0x700000)
-	{
-		int bank = offset / 0x10000;
-		value = m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
-	}
-	else
-	{
-		if (address < 0x8000)
-		{
-			if (m_nvram_size > 0x8000)
-			{
-				// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
-				int mask = m_nvram_size - 1;
-				offset = ((offset - 0x700000) / 0x10000) * 0x8000 + (offset & 0x7fff);
-				value = m_nvram[offset & mask];
-			}
-			else if (m_nvram_size > 0)
-			{
-				int mask = m_nvram_size - 1;   /* Limit SRAM size to what's actually present */
-				value = m_nvram[offset & mask];
-			}
-			else
-				value = 0xff;   // this should never happened...
-		}
-		else
-		{
-			int bank = offset / 0x10000;
-			value = m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
-		}
-	}
-	return value;
-}
-
-WRITE8_MEMBER(sns_rom_device::write_l)
-{
-	write_h(space, offset, data);
-}
-
-WRITE8_MEMBER(sns_rom_device::write_h)
-{
-	if (offset >= 0x700000) // SRAM
-	{
-		if (m_nvram_size > 0x8000)
-		{
-			// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
-			int mask = m_nvram_size - 1;
-			offset = ((offset - 0x700000) / 0x10000) * 0x8000 + (offset & 0x7fff);
-			m_nvram[offset & mask] = data;
-		}
-		else if (m_nvram_size > 0)
-		{
-			int mask = m_nvram_size - 1;   /* Limit SRAM size to what's actually present */
-			m_nvram[offset & mask] = data;
-		}
-	}
+	int bank = offset / 0x10000;
+	return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 }
 
 

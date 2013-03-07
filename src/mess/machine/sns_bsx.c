@@ -451,21 +451,8 @@ READ8_MEMBER(sns_rom_bsxlo_device::read_l)
 		int bank = offset / 0x10000;
 		return m_rom[rom_bank_map[bank] * 0x8000 + (offset & 0x7fff)];
 	}
-	if (offset >= 0x700000 && (offset & 0xffff) < 0x8000)
-	{
-		if (m_nvram_size > 0x8000)
-		{
-			// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
-			int mask = (m_nvram_size << 1) - 1;
-			mask &= ~0x8000;
-			return m_nvram[offset & mask];
-		}
-		else if (m_nvram_size > 0)
-		{
-			int mask = m_nvram_size - 1;   /* Limit SRAM size to what's actually present */
-			return m_nvram[offset & mask];
-		}
-	}
+	// nothing [40-6f]
+	// RAM [70-7f]
 	return 0x00;
 }
 
@@ -483,22 +470,7 @@ READ8_MEMBER(sns_rom_bsxlo_device::read_h)
 		if (m_slot->m_cart && m_slot->m_cart->get_rom_size())
 			return m_slot->m_cart->read_h(space, offset);
 	}
-
-	if (offset >= 0x700000 && (offset & 0xffff) < 0x8000)
-	{
-		if (m_nvram_size > 0x8000)
-		{
-			// In this case, SRAM is mapped in 0x8000 chunks at diff offsets: 0x700000-0x707fff, 0x710000-0x717fff, etc.
-			int mask = (m_nvram_size << 1) - 1;
-			mask &= ~0x8000;
-			return m_nvram[offset & mask];
-		}
-		else if (m_nvram_size > 0)
-		{
-			int mask = m_nvram_size - 1;   /* Limit SRAM size to what's actually present */
-			return m_nvram[offset & mask];
-		}
-	}
+	// RAM [70-7f]
 	return 0x00;
 }
 
@@ -519,11 +491,6 @@ READ8_MEMBER(sns_rom_bsxhi_device::read_h)
 	}
 	if (offset >= 0x200000 && offset < 0x400000)
 	{
-		if ((offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000 && m_nvram_size > 0)
-		{
-			int mask = (m_nvram_size - 1) & 0x7fff;
-			return m_nvram[(offset - 0x6000) & mask];
-		}
 		if ((offset & 0xffff) >= 0x8000 && m_slot->m_cart && m_slot->m_cart->get_rom_size())
 			return m_slot->m_cart->read_h(space, offset);
 	}
@@ -540,24 +507,6 @@ READ8_MEMBER(sns_rom_bsxhi_device::read_h)
 	}
 	return 0xff;
 }
-
-WRITE8_MEMBER(sns_rom_bsxhi_device::write_l)
-{
-	write_h(space, offset, data);
-}
-
-WRITE8_MEMBER(sns_rom_bsxhi_device::write_h)
-{
-	if (offset >= 0x200000 && offset < 0x400000)
-	{
-		if ((offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000 && m_nvram_size > 0)
-		{
-			int mask = (m_nvram_size - 1) & 0x7fff;
-			m_nvram[(offset - 0x6000) & mask] = data;
-		}
-	}
-}
-
 
 /*-------------------------------------------------
  BS-X Memory Packs
