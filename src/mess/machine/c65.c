@@ -9,7 +9,6 @@
 
 #include "includes/cbm.h"
 #include "includes/c65.h"
-#include "includes/c64_legacy.h"
 #include "cpu/m6502/m4510.h"
 #include "sound/mos6581.h"
 #include "machine/6526cia.h"
@@ -994,14 +993,12 @@ static void c65_common_driver_init( running_machine &machine )
 DRIVER_INIT_MEMBER(c65_state,c65)
 {
 	m_dma.version = 2;
-	c64_legacy_driver_init();
 	c65_common_driver_init(machine());
 }
 
 DRIVER_INIT_MEMBER(c65_state,c65pal)
 {
 	m_dma.version = 1;
-	c64_legacy_driver_init();
 	c65_common_driver_init(machine());
 	m_pal = 1;
 }
