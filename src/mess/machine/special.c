@@ -182,17 +182,17 @@ WRITE8_MEMBER( special_state::specimx_select_bank )
 
 WRITE_LINE_MEMBER( special_state::specimx_pit8253_out0_changed )
 {
-	specimx_set_input( m_specimx_audio, 0, state );
+	m_specimx_audio->set_input( 0, state );
 }
 
 WRITE_LINE_MEMBER( special_state::specimx_pit8253_out1_changed )
 {
-	specimx_set_input( m_specimx_audio, 1, state );
+	m_specimx_audio->set_input( 1, state );
 }
 
 WRITE_LINE_MEMBER( special_state::specimx_pit8253_out2_changed )
 {
-	specimx_set_input( m_specimx_audio, 2, state );
+	m_specimx_audio->set_input( 2, state );
 }
 
 
@@ -220,7 +220,7 @@ const struct pit8253_config specimx_pit8253_intf =
 
 MACHINE_START_MEMBER(special_state,specimx)
 {
-	m_specimx_audio = machine().device("custom");
+	m_specimx_audio = machine().device<specimx_sound_device>("custom");
 	m_drive = 0;
 	m_fdc->setup_drq_cb(fd1793_t::line_cb(FUNC(special_state::fdc_drq), this));
 }

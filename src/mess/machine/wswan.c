@@ -846,7 +846,7 @@ WRITE8_MEMBER( wswan_state::wswan_port_w )
                    Bit 0-3 - Master volume
                    Bit 4-7 - Unknown
                 */
-			wswan_sound_port_w( machine().device("custom"), space, offset, data );
+			machine().device<wswan_sound_device>("custom")->wswan_sound_port_w( space, offset, data );
 			break;
 		case 0xa0:  /* Hardware type - this is probably read only
                    Bit 0   - Enable cartridge slot and/or disable bios

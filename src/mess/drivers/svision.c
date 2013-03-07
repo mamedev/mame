@@ -166,19 +166,19 @@ WRITE8_MEMBER(svision_state::svision_w)
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13:
-			svision_soundport_w(m_sound, 0, offset & 3, data);
+			m_sound->soundport_w(0, offset & 3, data);
 			break;
 
 		case 0x14: case 0x15: case 0x16: case 0x17:
-			svision_soundport_w(m_sound, 1, offset & 3, data);
+			m_sound->soundport_w(1, offset & 3, data);
 			break;
 
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c:
-			svision_sounddma_w(m_sound, space, offset - 0x18, data);
+			m_sound->svision_sounddma_w(space, offset - 0x18, data);
 			break;
 
 		case 0x28: case 0x29: case 0x2a:
-			svision_noise_w(m_sound, space, offset - 0x28, data);
+			m_sound->svision_noise_w(space, offset - 0x28, data);
 			break;
 
 		default:
@@ -443,14 +443,14 @@ INTERRUPT_GEN_MEMBER(svision_state::svision_frame_int)
 	if (BANK&1)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
-	svision_sound_decrement(m_sound);
+	m_sound->sound_decrement();
 }
 
 DRIVER_INIT_MEMBER(svision_state,svision)
 {
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
-	m_sound = machine().device("custom");
-	m_dma_finished = svision_dma_finished(m_sound);
+	m_sound = machine().device<svision_sound_device>("custom");
+	m_dma_finished = m_sound->dma_finished();
 	m_pet.on = FALSE;
 	m_user1 = memregion("user1");
 	m_bank1 = membank("bank1");
@@ -461,8 +461,8 @@ DRIVER_INIT_MEMBER(svision_state,svision)
 DRIVER_INIT_MEMBER(svision_state,svisions)
 {
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
-	m_sound = machine().device("custom");
-	m_dma_finished = svision_dma_finished(m_sound);
+	m_sound = machine().device<svision_sound_device>("custom");
+	m_dma_finished = m_sound->dma_finished();
 	m_user1 = memregion("user1");
 	m_bank1 = membank("bank1");
 	m_bank2 = membank("bank2");

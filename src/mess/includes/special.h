@@ -21,6 +21,8 @@
 #include "machine/ram.h"
 
 
+class specimx_sound_device; // defined below
+
 class special_state : public driver_device
 {
 public:
@@ -83,7 +85,7 @@ public:
 	UINT8 m_erik_color_2;
 	UINT8 m_erik_background;
 	UINT8 m_specimx_color;
-	device_t *m_specimx_audio;
+	specimx_sound_device *m_specimx_audio;
 	int m_specialist_8255_porta;
 	int m_specialist_8255_portb;
 	int m_specialist_8255_portc;
@@ -148,56 +150,35 @@ extern const struct pit8253_config specimx_pit8253_intf;
 extern const i8255_interface specialist_ppi8255_interface;
 
 
-
-
-
-
-
-
 /*----------- defined in video/special.c -----------*/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 extern const rgb_t specimx_palette[16];
+
 
 /*----------- defined in audio/special.c -----------*/
 
 class specimx_sound_device : public device_t,
-									public device_sound_interface
+							 public device_sound_interface
 {
 public:
 	specimx_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	~specimx_sound_device() { global_free(m_token); }
+	~specimx_sound_device() { }
 
-	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device-level overrides
-	virtual void device_config_complete();
 	virtual void device_start();
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+
+public:
+    void set_input(int index, int state);
+
 private:
-	// internal state
-	void *m_token;
+   	sound_stream *m_mixer_channel;
+	int m_specimx_input[3];
 };
 
 extern const device_type SPECIMX;
-
-
-void specimx_set_input(device_t *device, int index, int state);
 
 #endif /* SPECIAL_H_ */

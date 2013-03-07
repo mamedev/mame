@@ -7,176 +7,47 @@
 #include "emu.h"
 #include "includes/svision.h"
 
-enum SVISION_NOISE_Type
-{
-	SVISION_NOISE_Type7Bit,
-	SVISION_NOISE_Type14Bit
-};
 
-struct SVISION_NOISE
-{
-	UINT8 reg[3];
-	int on, right, left, play;
-	SVISION_NOISE_Type type;
-	int state;
-	int volume;
-	int count;
-	double step, pos;
-	int value; // currently simple random function
-};
-
-struct SVISION_DMA
-{
-	UINT8 reg[5];
-	int on, right, left;
-	int ca14to16;
-	int start,size;
-	double pos, step;
-	int finished;
-};
-
-struct SVISION_CHANNEL
-{
-	UINT8 reg[4];
-	int on;
-	int waveform, volume;
-	int pos;
-	int size;
-	int count;
-};
-
-struct svision_sound_state
-{
-	sound_stream *mixer_channel;
-	SVISION_DMA dma;
-	SVISION_NOISE noise;
-	SVISION_CHANNEL channel[2];
-};
+// device type definition
+const device_type SVISION = &device_creator<svision_sound_device>;
 
 
-INLINE svision_sound_state *get_safe_token(device_t *device)
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  svision_sound_device - constructor
+//-------------------------------------------------
+
+svision_sound_device::svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+	: device_t(mconfig, SVISION, "Super Vision Custom", tag, owner, clock),
+	  device_sound_interface(mconfig, *this),
+	  m_mixer_channel(NULL)
 {
-	assert(device != NULL);
-	assert(device->type() == SVISION);
-	return (svision_sound_state *)downcast<svision_sound_device *>(device)->token();
 }
 
-int *svision_dma_finished(device_t *device)
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void svision_sound_device::device_start()
 {
-	svision_sound_state *state = get_safe_token(device);
-	return &state->dma.finished;
+	memset(&m_dma, 0, sizeof(m_dma));
+	memset(&m_noise, 0, sizeof(m_noise));
+	memset(m_channel, 0, sizeof(m_channel));
+
+	m_mixer_channel = stream_alloc(0, 2, machine().sample_rate());
 }
 
-void svision_sound_decrement(device_t *device)
+
+//-------------------------------------------------
+//  sound_stream_update - handle a stream update
+//-------------------------------------------------
+
+void svision_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	svision_sound_state *state = get_safe_token(device);
-
-	if (state->channel[0].count > 0)
-		state->channel[0].count--;
-	if (state->channel[1].count > 0)
-		state->channel[1].count--;
-	if (state->noise.count > 0)
-		state->noise.count--;
-}
-
-WRITE8_DEVICE_HANDLER( svision_sounddma_w )
-{
-	svision_sound_state *state = get_safe_token(device);
-	logerror("%.6f svision snddma write %04x %02x\n", space.machine().time().as_double(),offset+0x18,data);
-	state->dma.reg[offset] = data;
-	switch (offset)
-	{
-		case 0:
-		case 1:
-			state->dma.start = (state->dma.reg[0] | (state->dma.reg[1] << 8));
-			break;
-		case 2:
-			state->dma.size = (data ? data : 0x100) * 32;
-			break;
-		case 3:
-			state->dma.step = space.machine().device("maincpu")->unscaled_clock() / (256.0 * space.machine().sample_rate() * (1 + (data & 3)));
-			state->dma.right = data & 4;
-			state->dma.left = data & 8;
-			state->dma.ca14to16 = ((data & 0x70) >> 4) << 14;
-			break;
-		case 4:
-			state->dma.on = data & 0x80;
-			if (state->dma.on)
-			{
-				state->dma.pos = 0.0;
-			}
-			break;
-	}
-}
-
-WRITE8_DEVICE_HANDLER( svision_noise_w )
-{
-	svision_sound_state *state = get_safe_token(device);
-	//  logerror("%.6f svision noise write %04x %02x\n",machine.time(),offset+0x28,data);
-	state->noise.reg[offset]=data;
-	switch (offset)
-	{
-		case 0:
-			state->noise.volume=data&0xf;
-			state->noise.step= space.machine().device("maincpu")->unscaled_clock() / (256.0*space.machine().sample_rate()*(1+(data>>4)));
-			break;
-		case 1:
-			state->noise.count = data + 1;
-			break;
-		case 2:
-			state->noise.type = (SVISION_NOISE_Type) (data & 1);
-			state->noise.play = data & 2;
-			state->noise.right = data & 4;
-			state->noise.left = data & 8;
-			state->noise.on = data & 0x10; /* honey bee start */
-			state->noise.state = 1;
-			break;
-	}
-	state->noise.pos=0.0;
-}
-
-void svision_soundport_w(device_t *device, int which, int offset, int data)
-{
-	svision_sound_state *state = get_safe_token(device);
-	SVISION_CHANNEL *channel = &state->channel[which];
-	UINT16 size;
-
-	state->mixer_channel->update();
-	channel->reg[offset] = data;
-
-	switch (offset)
-	{
-		case 0:
-		case 1:
-			size = channel->reg[0] | ((channel->reg[1] & 7) << 8);
-			if (size)
-			{
-				//  channel->size=(int)(device->machine().sample_rate()*(size<<5)/4e6);
-				channel->size= (int) (device->machine().sample_rate() * (size << 5) / device->machine().device("maincpu")->unscaled_clock());
-			}
-			else
-			{
-				channel->size = 0;
-			}
-			channel->pos = 0;
-			break;
-		case 2:
-			channel->on = data & 0x40;
-			channel->waveform = (data & 0x30) >> 4;
-			channel->volume = data & 0xf;
-			break;
-		case 3:
-			channel->count = data + 1;
-			break;
-	}
-}
-
-/************************************/
-/* Sound handler update             */
-/************************************/
-static STREAM_UPDATE( svision_update )
-{
-	svision_sound_state *state = get_safe_token(device);
 	stream_sample_t *left=outputs[0], *right=outputs[1];
 	int i, j;
 	SVISION_CHANNEL *channel;
@@ -185,7 +56,7 @@ static STREAM_UPDATE( svision_update )
 	{
 		*left = 0;
 		*right = 0;
-		for (channel=state->channel, j=0; j<ARRAY_LENGTH(state->channel); j++, channel++)
+		for (channel=m_channel, j=0; j<ARRAY_LENGTH(m_channel); j++, channel++)
 		{
 			if (channel->size != 0)
 			{
@@ -221,117 +92,175 @@ static STREAM_UPDATE( svision_update )
 					channel->pos = 0;
 			}
 		}
-		if (state->noise.on && (state->noise.play || state->noise.count))
+		if (m_noise.on && (m_noise.play || m_noise.count))
 		{
-			INT16 s = (state->noise.value ? 1 << 8: 0) * state->noise.volume;
+			INT16 s = (m_noise.value ? 1 << 8: 0) * m_noise.volume;
 			int b1, b2;
-			if (state->noise.left)
+			if (m_noise.left)
 				*left += s;
-			if (state->noise.right)
+			if (m_noise.right)
 				*right += s;
-			state->noise.pos += state->noise.step;
-			if (state->noise.pos >= 1.0)
+			m_noise.pos += m_noise.step;
+			if (m_noise.pos >= 1.0)
 			{
-				switch (state->noise.type)
+				switch (m_noise.type)
 				{
 					case SVISION_NOISE_Type7Bit:
-						state->noise.value = state->noise.state & 0x40 ? 1 : 0;
-						b1 = (state->noise.state & 0x40) != 0;
-						b2 = (state->noise.state & 0x20) != 0;
-						state->noise.state=(state->noise.state<<1)+(b1!=b2?1:0);
+						m_noise.value = m_noise.state & 0x40 ? 1 : 0;
+						b1 = (m_noise.state & 0x40) != 0;
+						b2 = (m_noise.state & 0x20) != 0;
+						m_noise.state=(m_noise.state<<1)+(b1!=b2?1:0);
 						break;
 					case SVISION_NOISE_Type14Bit:
 					default:
-						state->noise.value = state->noise.state & 0x2000 ? 1 : 0;
-						b1 = (state->noise.state & 0x2000) != 0;
-						b2 = (state->noise.state & 0x1000) != 0;
-						state->noise.state = (state->noise.state << 1) + (b1 != b2 ? 1 : 0);
+						m_noise.value = m_noise.state & 0x2000 ? 1 : 0;
+						b1 = (m_noise.state & 0x2000) != 0;
+						b2 = (m_noise.state & 0x1000) != 0;
+						m_noise.state = (m_noise.state << 1) + (b1 != b2 ? 1 : 0);
 				}
-				state->noise.pos -= 1;
+				m_noise.pos -= 1;
 			}
 		}
-		if (state->dma.on)
+		if (m_dma.on)
 		{
 			UINT8 sample;
 			INT16 s;
-			UINT16 addr = state->dma.start + (unsigned) state->dma.pos / 2;
+			UINT16 addr = m_dma.start + (unsigned) m_dma.pos / 2;
 			if (addr >= 0x8000 && addr < 0xc000)
 			{
-				sample = device->machine().root_device().memregion("user1")->base()[(addr & 0x3fff) | state->dma.ca14to16];
+				sample = machine().root_device().memregion("user1")->base()[(addr & 0x3fff) | m_dma.ca14to16];
 			}
 			else
 			{
-				sample = device->machine().device("maincpu")->memory().space(AS_PROGRAM).read_byte(addr);
+				sample = machine().device("maincpu")->memory().space(AS_PROGRAM).read_byte(addr);
 			}
-			if (((unsigned)state->dma.pos) & 1)
+			if (((unsigned)m_dma.pos) & 1)
 				s = (sample & 0xf);
 			else
 				s = (sample & 0xf0) >> 4;
 			s <<= 8;
-			if (state->dma.left)
+			if (m_dma.left)
 				*left += s;
-			if (state->dma.right)
+			if (m_dma.right)
 				*right += s;
-			state->dma.pos += state->dma.step;
-			if (state->dma.pos >= state->dma.size)
+			m_dma.pos += m_dma.step;
+			if (m_dma.pos >= m_dma.size)
 			{
-				svision_state *sv_state = device->machine().driver_data<svision_state>();
-				state->dma.finished = TRUE;
-				state->dma.on = FALSE;
+				svision_state *sv_state = machine().driver_data<svision_state>();
+				m_dma.finished = TRUE;
+				m_dma.on = FALSE;
 				sv_state->svision_irq();
 			}
 		}
 	}
 }
 
-/************************************/
-/* Sound handler start              */
-/************************************/
 
-static DEVICE_START( svision_sound )
+WRITE8_MEMBER( svision_sound_device::svision_sounddma_w )
 {
-	svision_sound_state *state = get_safe_token(device);
-	memset(&state->dma, 0, sizeof(state->dma));
-	memset(&state->noise, 0, sizeof(state->noise));
-	memset(state->channel, 0, sizeof(state->channel));
-
-	state->mixer_channel = device->machine().sound().stream_alloc(*device, 0, 2, device->machine().sample_rate(), 0, svision_update);
+	logerror("%.6f svision snddma write %04x %02x\n", space.machine().time().as_double(),offset+0x18,data);
+	m_dma.reg[offset] = data;
+	switch (offset)
+	{
+		case 0:
+		case 1:
+			m_dma.start = (m_dma.reg[0] | (m_dma.reg[1] << 8));
+			break;
+		case 2:
+			m_dma.size = (data ? data : 0x100) * 32;
+			break;
+		case 3:
+			m_dma.step = space.machine().device("maincpu")->unscaled_clock() / (256.0 * space.machine().sample_rate() * (1 + (data & 3)));
+			m_dma.right = data & 4;
+			m_dma.left = data & 8;
+			m_dma.ca14to16 = ((data & 0x70) >> 4) << 14;
+			break;
+		case 4:
+			m_dma.on = data & 0x80;
+			if (m_dma.on)
+			{
+				m_dma.pos = 0.0;
+			}
+			break;
+	}
 }
 
-const device_type SVISION = &device_creator<svision_sound_device>;
 
-svision_sound_device::svision_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, SVISION, "Super Vision Custom", tag, owner, clock),
-		device_sound_interface(mconfig, *this)
+WRITE8_MEMBER( svision_sound_device::svision_noise_w )
 {
-	m_token = global_alloc_clear(svision_sound_state);
+	//  logerror("%.6f svision noise write %04x %02x\n",machine.time(),offset+0x28,data);
+	m_noise.reg[offset]=data;
+	switch (offset)
+	{
+		case 0:
+			m_noise.volume=data&0xf;
+			m_noise.step= space.machine().device("maincpu")->unscaled_clock() / (256.0*space.machine().sample_rate()*(1+(data>>4)));
+			break;
+		case 1:
+			m_noise.count = data + 1;
+			break;
+		case 2:
+			m_noise.type = (SVISION_NOISE_Type) (data & 1);
+			m_noise.play = data & 2;
+			m_noise.right = data & 4;
+			m_noise.left = data & 8;
+			m_noise.on = data & 0x10; /* honey bee start */
+			m_noise.state = 1;
+			break;
+	}
+	m_noise.pos=0.0;
 }
 
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
 
-void svision_sound_device::device_config_complete()
+int *svision_sound_device::dma_finished()
 {
+	return &m_dma.finished;
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
-void svision_sound_device::device_start()
+void svision_sound_device::sound_decrement()
 {
-	DEVICE_START_NAME( svision_sound )(this);
+	if (m_channel[0].count > 0)
+		m_channel[0].count--;
+	if (m_channel[1].count > 0)
+		m_channel[1].count--;
+	if (m_noise.count > 0)
+		m_noise.count--;
 }
 
-//-------------------------------------------------
-//  sound_stream_update - handle a stream update
-//-------------------------------------------------
 
-void svision_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+void svision_sound_device::soundport_w(int which, int offset, int data)
 {
-	// should never get here
-	fatalerror("sound_stream_update called; not applicable to legacy sound devices\n");
+	SVISION_CHANNEL *channel = &m_channel[which];
+	UINT16 size;
+
+	m_mixer_channel->update();
+	channel->reg[offset] = data;
+
+	switch (offset)
+	{
+		case 0:
+		case 1:
+			size = channel->reg[0] | ((channel->reg[1] & 7) << 8);
+			if (size)
+			{
+				//  channel->size=(int)(device->machine().sample_rate()*(size<<5)/4e6);
+				channel->size= (int) (machine().sample_rate() * (size << 5) / machine().device("maincpu")->unscaled_clock());
+			}
+			else
+			{
+				channel->size = 0;
+			}
+			channel->pos = 0;
+			break;
+		case 2:
+			channel->on = data & 0x40;
+			channel->waveform = (data & 0x30) >> 4;
+			channel->volume = data & 0xf;
+			break;
+		case 3:
+			channel->count = data + 1;
+			break;
+	}
 }
+
