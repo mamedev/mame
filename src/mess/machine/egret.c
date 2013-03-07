@@ -433,6 +433,8 @@ void egret_device::device_reset()
 	timer_ctrl = 0;
 	timer_counter = 0;
 	last_adb_time = m_maincpu->total_cycles();
+	onesec = 0;
+	last_adb = 0;
 }
 
 void egret_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
