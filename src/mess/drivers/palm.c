@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/mc68328.h"
+#include "machine/mc68328.h"
 #include "sound/dac.h"
 #include "debugger.h"
 #include "machine/ram.h"
