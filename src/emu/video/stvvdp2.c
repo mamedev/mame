@@ -5455,9 +5455,9 @@ void saturn_state::stv_vdp2_draw_rotation_screen(bitmap_rgb32 &bitmap, const rec
 		if ( stv2_current_tilemap.window_control.enabled[0] || stv2_current_tilemap.window_control.enabled[1] )
 		{
 			//popmessage("Window control for RBG");
+			stv_vdp2_apply_window_on_layer(mycliprect);
 			stv2_current_tilemap.window_control.enabled[0] = 0;
 			stv2_current_tilemap.window_control.enabled[1] = 0;
-			stv_vdp2_apply_window_on_layer(mycliprect);
 		}
 
 		stv2_current_tilemap.fade_control = fade_control;
@@ -6341,7 +6341,7 @@ int saturn_state::stv_vdp2_apply_window_on_layer(rectangle &cliprect)
 {
 	int s_x=0,e_x=0,s_y=0,e_y=0;
 
-	if ( stv2_current_tilemap.window_control.enabled[0] && stv2_current_tilemap.window_control.area[0])
+	if ( stv2_current_tilemap.window_control.enabled[0] && (!stv2_current_tilemap.window_control.area[0]))
 	{
 		/* w0, transparent outside supported */
 		stv_vdp2_get_window0_coordinates(&s_x, &e_x, &s_y, &e_y);
@@ -6353,7 +6353,7 @@ int saturn_state::stv_vdp2_apply_window_on_layer(rectangle &cliprect)
 
 		return 1;
 	}
-	else if (  stv2_current_tilemap.window_control.enabled[1] && stv2_current_tilemap.window_control.area[1] )
+	else if (  stv2_current_tilemap.window_control.enabled[1] && (!stv2_current_tilemap.window_control.area[1]) )
 	{
 		/* w1, transparent outside supported */
 		stv_vdp2_get_window1_coordinates(&s_x, &e_x, &s_y, &e_y);
