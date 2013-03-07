@@ -130,6 +130,7 @@ void jmfb_device::device_reset()
 	m_base = 0;
 	m_xres = 640;
 	m_yres = 480;
+	m_mode = 0;
 	memset(m_vram, 0, VRAM_SIZE);
 }
 
