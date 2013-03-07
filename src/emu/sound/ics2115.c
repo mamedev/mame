@@ -109,10 +109,13 @@ void ics2115_device::device_reset()
 	m_reg_select = 0;
 	m_vmode = 0;
 	memset(m_voice, 0, sizeof(m_voice));
-	m_timer[0].timer->adjust(attotime::never);
-	m_timer[1].timer->adjust(attotime::never);
-	m_timer[0].period = 0;
-	m_timer[1].period = 0;
+	for(int i = 0; i < 2; ++i)
+	{
+		m_timer[i].timer->adjust(attotime::never);
+		m_timer[i].period = 0;
+		m_timer[i].scale = 0;
+		m_timer[i].preset = 0;
+	}
 	for(int i = 0; i < 32; i++) {
 		m_voice[i].osc_conf.value = 2;
 		m_voice[i].osc.fc = 0;

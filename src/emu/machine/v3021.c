@@ -109,6 +109,7 @@ void v3021_device::device_start()
 
 void v3021_device::device_reset()
 {
+	m_cal_cnt = 0;
 }
 
 
