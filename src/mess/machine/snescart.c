@@ -643,7 +643,6 @@ static void snes_cart_log_info( running_machine &machine, UINT8* ROM, int suppor
 DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 {
 	int supported_type = 1;
-	running_machine &machine = image.device().machine();
 	int has_bsx_slot = 0, st_bios = 0;
 	UINT32 offset, int_header_offs;
 	UINT8 *ROM = memregion("cart")->base();
@@ -667,7 +666,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", m_cart_size - offset);
 
 	m_cart[0].m_rom_size = m_cart_size;
-	m_cart[0].m_rom = auto_alloc_array_clear(machine, UINT8, m_cart[0].m_rom_size);
+	m_cart[0].m_rom = auto_alloc_array_clear(machine(), UINT8, m_cart[0].m_rom_size);
 	memcpy(m_cart[0].m_rom, ROM, m_cart[0].m_rom_size - offset);
 	rom_map_setup(m_cart[0].m_rom_size);
 
@@ -731,7 +730,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	if (SNES_CART_DEBUG) mame_printf_error("mode %d\n", m_cart[0].mode);
 
 	/* Detect special chips */
-	supported_type = snes_find_addon_chip(machine, ROM, int_header_offs);
+	supported_type = snes_find_addon_chip(machine(), ROM, int_header_offs);
 
 	/* Find the amount of cart ram */
 	m_cart[0].m_nvram_size = 0;
@@ -769,14 +768,14 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	}
 
 	if (m_cart[0].m_nvram_size > 0)
-		m_cart[0].m_nvram = auto_alloc_array_clear(machine, UINT8, m_cart[0].m_nvram_size);
+		m_cart[0].m_nvram = auto_alloc_array_clear(machine(), UINT8, m_cart[0].m_nvram_size);
 
 	/* Log snes_cart information */
-	snes_cart_log_info(machine, ROM, supported_type);
+	snes_cart_log_info(machine(), ROM, supported_type);
 
 	/* Load SRAM */
 	if (m_cart[0].m_nvram_size > 0)
-		snes_load_sram(machine);
+		snes_load_sram(machine());
 
 	/* All done */
 	return IMAGE_INIT_PASS;
@@ -784,10 +783,9 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 
 DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 {
-	running_machine &machine = image.device().machine();
 	int st_bios = 0, slot_id = 0;
 	UINT32 offset;
-	UINT8 *ROM = image.device().machine().root_device().memregion(image.device().tag())->base();
+	UINT8 *ROM = machine().root_device().memregion(image.device().tag())->base();
 
 	if (strcmp(image.device().tag(), ":slot_a") == 0)
 		slot_id = 0;
@@ -836,14 +834,14 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 
 
 	m_cart[slot_id].m_rom_size = m_cart_size;
-	m_cart[slot_id].m_rom = auto_alloc_array_clear(machine, UINT8, m_cart[0].m_rom_size);
+	m_cart[slot_id].m_rom = auto_alloc_array_clear(machine(), UINT8, m_cart[0].m_rom_size);
 	memcpy(m_cart[slot_id].m_rom, ROM, m_cart[slot_id].m_rom_size - offset);
 	rom_map_setup(m_cart[slot_id].m_rom_size);
 
 	m_cart[slot_id].m_nvram_size = 0x20000;
-	m_cart[slot_id].m_nvram = auto_alloc_array_clear(machine, UINT8, m_cart[slot_id].m_nvram_size);
+	m_cart[slot_id].m_nvram = auto_alloc_array_clear(machine(), UINT8, m_cart[slot_id].m_nvram_size);
 
-	sufami_load_sram(machine, image.device().tag());
+	sufami_load_sram(machine(), image.device().tag());
 
 	m_cart[slot_id].slot_in_use = 1; // aknowledge the cart in this slot, for saving sram at exit
 
