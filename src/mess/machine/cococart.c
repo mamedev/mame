@@ -68,6 +68,7 @@ void cococart_slot_device::device_start()
 	m_cart_line.timer_index     = 0;
 	m_cart_line.delay           = 0;
 	m_cart_line.value           = COCOCART_LINE_VALUE_CLEAR;
+	m_cart_line.line            = 0;
 	m_cart_line.q_count         = 0;
 	m_cart_line.callback.resolve(m_cart_callback, *this);
 
@@ -75,6 +76,7 @@ void cococart_slot_device::device_start()
 	/* 12 allowed one more instruction to finished after the line is pulled */
 	m_nmi_line.delay            = 12;
 	m_nmi_line.value            = COCOCART_LINE_VALUE_CLEAR;
+	m_nmi_line.line             = 0;
 	m_nmi_line.q_count          = 0;
 	m_nmi_line.callback.resolve(m_nmi_callback, *this);
 
@@ -82,6 +84,7 @@ void cococart_slot_device::device_start()
 	/* 6 allowed one more instruction to finished after the line is pulled */
 	m_halt_line.delay           = 6;
 	m_halt_line.value           = COCOCART_LINE_VALUE_CLEAR;
+	m_halt_line.line            = 0;
 	m_halt_line.q_count         = 0;
 	m_halt_line.callback.resolve(m_halt_callback, *this);
 
