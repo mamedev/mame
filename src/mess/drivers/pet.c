@@ -327,7 +327,7 @@ void cbm8296_state::read_pla1(offs_t offset, int phi2, int brw, int noscreen, in
 {
 	UINT32 input = (offset & 0xff00) | phi2 << 7 | brw << 6 | noscreen << 5 | noio << 4 | ramsela << 3 | ramsel9 << 2 | ramon << 1 | norom;
 	//UINT32 data = m_pla1->read(input);
-	input = BITSWAP16(input,0,10,15,11,9,8,13,14,12,7,6,5,4,3,2,1);
+	input = BITSWAP16(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
 	UINT8 data = m_ue6_rom->base()[input];
 	data = BITSWAP8(data,7,0,1,2,3,4,5,6);
 
@@ -350,7 +350,7 @@ void cbm8296_state::read_pla2(offs_t offset, int phi2, int brw, int casena1, int
 {
 	UINT32 input = BITSWAP8(m_cr, 0,1,2,3,4,5,6,7) << 8 | ((offset >> 8) & 0xf8) | brw << 2 | phi2 << 1 | casena1;
 	//UINT32 data = m_pla2->read(input);
-	input = BITSWAP16(input,0,10,15,11,9,8,13,14,12,7,6,5,4,3,2,1);
+	input = BITSWAP16(input,13,8,9,7,12,14,11,10,6,5,4,3,2,1,0,15);
 	UINT8 data = m_ue5_rom->base()[input];
 	data = BITSWAP8(data,7,0,1,2,3,4,5,6);
 
@@ -380,7 +380,7 @@ READ8_MEMBER( cbm8296_state::read )
 	read_pla1(offset, phi2, brw, noscreen, noio, ramsela, ramsel9, ramon, norom,
 		cswff, cs9, csa, csio, cse, cskb, fa12, casena1);
 
-	//printf("%04x : cswff %u cs9 %u csa %u csio %u cse %u cskb %u fa12 %u casena1 %u endra %u noscreen %u casena2 %u fa15 %u\n",offset,cswff,cs9,csa,csio,cse,cskb,fa12,casena1,endra,noscreen,casena2,fa15);
+	//logerror("%04x : cswff %u cs9 %u csa %u csio %u cse %u cskb %u fa12 %u casena1 %u endra %u noscreen %u casena2 %u fa15 %u\n",offset,cswff,cs9,csa,csio,cse,cskb,fa12,casena1,endra,noscreen,casena2,fa15);
 
 	UINT8 data = 0;
 
@@ -390,7 +390,7 @@ READ8_MEMBER( cbm8296_state::read )
 		{
 			data = m_ram->pointer()[offset & 0xffff];
 		}
-		if (!casena2)
+		if (casena2)
 		{
 			data = m_ram->pointer()[0x10000 | fa15 << 15 | (offset & 0x7fff)];
 		}
@@ -460,7 +460,7 @@ WRITE8_MEMBER( cbm8296_state::write )
 		{
 			m_ram->pointer()[offset & 0xffff] = data;
 		}
-		if (!casena2)
+		if (casena2)
 		{
 			m_ram->pointer()[0x10000 | fa15 << 15 | (offset & 0x7fff)] = data;
 		}
@@ -491,7 +491,7 @@ WRITE8_MEMBER( cbm8296_state::write )
 			}
 		}
 	}
-	if (!cswff && ((offset & 0xff) == 0xf0))
+	if (cswff && ((offset & 0xff) == 0xf0))
 	{
 		m_cr = data;
 	}
@@ -1197,6 +1197,67 @@ static MC6845_INTERFACE( crtc_intf )
 };
 
 
+//-------------------------------------------------
+//  MC6845_INTERFACE( cbm8296_crtc_intf )
+//-------------------------------------------------
+
+static MC6845_UPDATE_ROW( cbm8296_update_row )
+{
+	pet80_state *state = device->machine().driver_data<pet80_state>();
+	int x = 0;
+	int char_rom_mask = state->m_char_rom->bytes() - 1;
+
+	for (int column = 0; column < x_count; column++)
+	{
+		UINT8 lsd = 0, data = 0;
+		UINT8 rra = ra & 0x07;
+		int no_row = !BIT(ra, 3);
+		int chr_option = BIT(ma, 13);
+
+		// even character
+
+		lsd = state->m_ram->pointer()[0x8000 | (((ma + column) << 1) & 0x1fff)];
+
+		offs_t char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
+		data = state->m_char_rom->base()[char_addr & char_rom_mask];
+
+		for (int bit = 0; bit < 8; bit++, data <<= 1)
+		{
+			int video = ((BIT(data, 7) ^ BIT(lsd, 7)) && no_row);
+			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[video];
+		}
+
+		// odd character
+
+		lsd = state->m_ram->pointer()[0x8000 | ((((ma + column) << 1) + 1) & 0x1fff)];
+
+		char_addr = (chr_option << 11) | (state->m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
+		data = state->m_char_rom->base()[char_addr & char_rom_mask];
+
+		for (int bit = 0; bit < 8; bit++, data <<= 1)
+		{
+			int video = ((BIT(data, 7) ^ BIT(lsd, 7)) && no_row);
+			bitmap.pix32(y, x++) = RGB_MONOCHROME_GREEN[video];
+		}
+	}
+}
+
+static MC6845_INTERFACE( cbm8296_crtc_intf )
+{
+	SCREEN_TAG,
+	false,
+	2*8,
+	NULL,
+	cbm8296_update_row,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE_MEMBER(M6520_1_TAG, pia6821_device, cb1_w),
+	NULL
+};
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -1740,6 +1801,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( cbm8296, pet80, cbm8296_state )
 
 	MCFG_PLS100_ADD(PLA1_TAG)
 	MCFG_PLS100_ADD(PLA2_TAG)
+
+	MCFG_DEVICE_MODIFY(MC6845_TAG)
+	MCFG_DEVICE_CONFIG(cbm8296_crtc_intf)
 
 	MCFG_DEVICE_REMOVE("ieee8")
 	MCFG_IEEE488_SLOT_ADD("ieee8", 8, cbm_ieee488_devices, "c8250", NULL)
