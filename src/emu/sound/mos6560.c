@@ -860,6 +860,8 @@ void mos6560_device::device_reset()
 	m_multiinverted[2] = 0;
 	m_multiinverted[3] = 0;
 
+	m_last_data = 0;
+
 	m_tone1pos = 0;
 	m_tone2pos = 0;
 	m_tone3pos = 0;
