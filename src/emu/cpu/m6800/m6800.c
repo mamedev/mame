@@ -4,7 +4,7 @@
 
     References:
 
-        6809 Simulator V09, By L.C. Benschop, Eidnhoven The Netherlands.
+        6809 Simulator V09, By L.C. Benschop, Eindhoven The Netherlands.
 
         m6809: Portable 6809 emulator, DS (6809 code in MAME, derived from
             the 6809 Simulator V09)

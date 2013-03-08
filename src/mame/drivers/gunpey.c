@@ -252,7 +252,7 @@ public:
 	int m_zero_bit_count;
 
 	void get_stream_next_byte(void);
-	int get_steam_bit(void);
+	int get_stream_bit(void);
 	UINT32 gunpey_state_get_stream_bits(int bits);
 
 	int write_dest_byte(UINT8 usedata);
@@ -661,7 +661,7 @@ void gunpey_state::get_stream_next_byte(void)
 	m_srcx++; m_scrxcount++;
 }
 
-int gunpey_state::get_steam_bit(void)
+int gunpey_state::get_stream_bit(void)
 {
 	if (m_latched_bits_left==0)
 	{
@@ -684,7 +684,7 @@ UINT32 gunpey_state::gunpey_state_get_stream_bits(int bits)
 	for (int i=0;i<bits;i++)
 	{
 		output = output<<1;
-		output |= get_steam_bit();
+		output |= get_stream_bit();
 	}
 
 	return output;
