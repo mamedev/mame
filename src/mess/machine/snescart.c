@@ -643,7 +643,7 @@ static void snes_cart_log_info( running_machine &machine, UINT8* ROM, int suppor
 DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 {
 	int supported_type = 1;
-	int has_bsx_slot = 0, st_bios = 0;
+	int has_bsx_slot = 0;//, st_bios = 0;
 	UINT32 offset, int_header_offs;
 	UINT8 *ROM = memregion("cart")->base();
 
@@ -723,8 +723,8 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	if (!memcmp(ROM, "BANDAI SFC-ADX", 14))
 	{
 		m_cart[0].mode = SNES_MODE_ST;
-		if (!memcmp(ROM + 16, "SFC-ADX BACKUP", 14))
-			st_bios = 1;
+		//if (!memcmp(ROM + 16, "SFC-ADX BACKUP", 14))
+			//st_bios = 1;
 	}
 
 	if (SNES_CART_DEBUG) mame_printf_error("mode %d\n", m_cart[0].mode);
