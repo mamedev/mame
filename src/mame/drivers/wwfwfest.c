@@ -292,6 +292,15 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_DIPSETTING(    0x80, "5th" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( wwfwfesta )
+	PORT_INCLUDE(wwfwfest)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x80, 0x00, "FBI Logo" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
 /*******************************************************************************
  Graphic Decoding
 *******************************************************************************/
@@ -407,9 +416,11 @@ MACHINE_CONFIG_END
 /*******************************************************************************
  Rom Loaders / Game Drivers
 ********************************************************************************
- 2 sets supported,
- wwfwfest - US? Set (Tecmo License / Distribution?)
- wwfwfstj - Japan? Set
+ 5 sets supported,
+ wwfwfest  - US Set (Technos only copyright for US distribution?)
+ wwfwfesta - World? Set (Tecmo License / Distribution for outside the US?)
+ wwfwfestj - Japan Set (Japanese text at "Game Select" screen)
+ wwfwfestk - Korean Set (Shows "KOREA ONLY" on manufacturer's screen)
 
  readme / info files below
 
@@ -493,7 +504,7 @@ ROM_START( wwfwfesta )
 	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
-	ROM_LOAD( "wf_33.rom",    0x00000, 0x20000, CRC(06f22615) SHA1(2e9418e372da85ea597977d912d8b35753655f4e) )
+	ROM_LOAD( "31e12-0.ic33", 0x00000, 0x20000, CRC(06f22615) SHA1(2e9418e372da85ea597977d912d8b35753655f4e) )
 
 	ROM_REGION( 0x800000, "gfx2", 0 ) /* SPR Tiles (16x16), 27080 Mask ROM's */
 	ROM_LOAD( "31j3.ic9",     0x000000, 0x100000, CRC(e395cf1d) SHA1(241f98145e295993c9b6a44dc087a9b61fbc9a6f) ) /* Tiles 0 */
@@ -570,7 +581,37 @@ ROM_START( wwfwfestj )
 	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
 ROM_END
 
-GAME( 1991, wwfwfest,  0,        wwfwfest, wwfwfest, driver_device, 0, ROT0, "Technos Japan",                 "WWF WrestleFest (US set 1)",   GAME_SUPPORTS_SAVE )
-GAME( 1991, wwfwfesta, wwfwfest, wwfwfest, wwfwfest, driver_device, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (US Tecmo)",   GAME_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestb, wwfwfest, wwfwfstb, wwfwfest, driver_device, 0, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1991, wwfwfestj, wwfwfest, wwfwfest, wwfwfest, driver_device, 0, ROT0, "Technos Japan",                 "WWF WrestleFest (Japan)",      GAME_SUPPORTS_SAVE )
+ROM_START( wwfwfestk )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Main CPU  (68000) */
+	ROM_LOAD16_BYTE( "31e13-0.ic19", 0x00001, 0x40000, CRC(774a26a7) SHA1(30e00bff9027a0ae971f8820ca6c3e4cdea82994) )
+	ROM_LOAD16_BYTE( "31e14-0.ic18", 0x00000, 0x40000, CRC(05bbb807) SHA1(1dc2ddd9ae498468a97e002f78e7f3a331d802d1) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
+	ROM_LOAD( "31a11-2.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
+	ROM_LOAD( "31e12-0.ic33", 0x00000, 0x20000, CRC(06f22615) SHA1(2e9418e372da85ea597977d912d8b35753655f4e) )
+
+	ROM_REGION( 0x800000, "gfx2", 0 ) /* SPR Tiles (16x16), 27080 Mask ROM's */
+	ROM_LOAD( "31j3.ic9",     0x000000, 0x100000, CRC(e395cf1d) SHA1(241f98145e295993c9b6a44dc087a9b61fbc9a6f) ) /* Tiles 0 */
+	ROM_LOAD( "31j2.ic8",     0x100000, 0x100000, CRC(b5a97465) SHA1(08d82c29a5c02b83fdbd0bad649b74eb35ab7e54) ) /* Tiles 1 */
+	ROM_LOAD( "31j5.ic11",    0x200000, 0x100000, CRC(2ce545e8) SHA1(82173e58a8476a6fe9d2c990fce1f71af117a0ea) ) /* Tiles 0 */
+	ROM_LOAD( "31j4.ic10",    0x300000, 0x100000, CRC(00edb66a) SHA1(926606d1923936b6e75391b1ab03b369d9822d13) ) /* Tiles 1 */
+	ROM_LOAD( "31j6.ic12",    0x400000, 0x100000, CRC(79956cf8) SHA1(52207263620a6b6dde66d3f8749b772577899ea5) ) /* Tiles 0 */
+	ROM_LOAD( "31j7.ic13",    0x500000, 0x100000, CRC(74d774c3) SHA1(a723ac5d481bf91b12e17652fbb2d869c886dec0) ) /* Tiles 1 */
+	ROM_LOAD( "31j9.ic15",    0x600000, 0x100000, CRC(dd387289) SHA1(2cad42d4e7cd1a49346f844058ae18c38bc686a8) ) /* Tiles 0 */
+	ROM_LOAD( "31j8.ic14",    0x700000, 0x100000, CRC(44abe127) SHA1(c723e1dea117534e976d2d383e634faf073cd57b) ) /* Tiles 1 */
+
+	ROM_REGION( 0x80000, "gfx3", 0 ) /* BG0 / BG1 Tiles (16x16) */
+	ROM_LOAD( "31j0.ic1",     0x40000, 0x40000, CRC(8a12b450) SHA1(2e15c949efcda8bb6f11afe3ff07ba1dee9c771c) ) /* 0,1 */
+	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
+ROM_END
+
+GAME( 1991, wwfwfest,  0,        wwfwfest, wwfwfest,  driver_device, 0, ROT0, "Technos Japan",                 "WWF WrestleFest (US set 1)",   GAME_SUPPORTS_SAVE )
+GAME( 1991, wwfwfesta, wwfwfest, wwfwfest, wwfwfest,  driver_device, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (US Tecmo)",   GAME_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestb, wwfwfest, wwfwfstb, wwfwfest,  driver_device, 0, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestj, wwfwfest, wwfwfest, wwfwfesta, driver_device, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Japan)",      GAME_SUPPORTS_SAVE )
+GAME( 1991, wwfwfestk, wwfwfest, wwfwfest, wwfwfesta, driver_device, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Korea)",      GAME_SUPPORTS_SAVE )
