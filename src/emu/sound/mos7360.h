@@ -194,8 +194,6 @@ protected:
 	m_noisepos,         /* pos of tone */
 	m_noisesamples;   /* count of samples to give out per tone */
 
-	int m_variant;
-
 	emu_timer *m_line_timer;
 	emu_timer *m_frame_timer;
 };
