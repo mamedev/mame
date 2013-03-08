@@ -227,6 +227,8 @@ public:
 	UINT16 m_vreg_addr;
 
 	UINT8* m_blit_rom;
+	UINT8* m_blit_rom2;
+
 	UINT8* m_vram;
 
 	// work variables for the decompression
@@ -243,6 +245,7 @@ public:
 	int m_dstxbase;
 	int m_dstxcount;
 	int m_dstycount;
+	bool m_out_of_data;
 
 	int m_latched_bits_left;
 	UINT8 m_latched_byte;
@@ -641,6 +644,7 @@ void gunpey_state::get_stream_next_byte(void)
 {
 	// check if we need to move on to the next row of the source bitmap
 	// to get the data requested
+
 	if (m_scrxcount==m_sourcewide)
 	{
 		m_scrxcount = 0;
@@ -649,6 +653,8 @@ void gunpey_state::get_stream_next_byte(void)
 	}
 
 	m_latched_byte = m_blit_rom[(((m_srcy)&0x7ff)*0x800)+((m_srcx)&0x7ff)];
+	if (!m_out_of_data) m_blit_rom2[(((m_srcy)&0x7ff)*0x800)+((m_srcx)&0x7ff)] = 0x77; // debug
+
 	m_latched_bits_left = 8;
 
 	// increase counters
@@ -1054,7 +1060,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 				m_latched_bits_left = 0;
 				m_zero_bit_count = 0;
 
-				bool out_of_data = false;
+				m_out_of_data = false;
 
 				for (;;)
 				{
@@ -1084,12 +1090,12 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 					// hack, really I imagine there is exactly enough compressed data to fill the dest bitmap area when decompressed, but to stop us
 					// overrunning into reading other data we terminate on a 0000, which doesn't seem likely to be compressed data.
 					if (m_zero_bit_count>=16)
-						out_of_data = true;
+						m_out_of_data = true;
 
 
 
 					UINT8 usedata = 0xff;
-					if (!out_of_data)
+					if (!m_out_of_data)
 					{
 						#ifdef SHOW_COMPRESSED_DATA_DEBUG
 						//if (count<512)
@@ -1158,7 +1164,7 @@ WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 			for (;;)
 			{
 				UINT8 usedata = m_blit_rom[(((m_srcy)&0x7ff)*0x800)+((m_srcx)&0x7ff)];
-
+				m_blit_rom2[(((m_srcy)&0x7ff)*0x800)+((m_srcx)&0x7ff)] = 0x44; // debug
 				m_srcx++; m_scrxcount++;
 				if (m_scrxcount==m_xsize)
 				{
@@ -1377,6 +1383,7 @@ static GFXLAYOUT_RAW( gunpey, 2048, 1, 2048*8, 2048*8 )
 
 static GFXDECODE_START( gunpey )
 	GFXDECODE_ENTRY( "blit_data", 0, gunpey,     0x0000, 0x1 )
+	GFXDECODE_ENTRY( "blit_data2", 0, gunpey,     0x0000, 0x1 )
 	GFXDECODE_ENTRY( "vram", 0, gunpey,     0x0000, 0x1 )
 GFXDECODE_END
 
@@ -1421,6 +1428,9 @@ ROM_START( gunpey )
 
 	ROM_REGION( 0x400000, "blit_data", 0 )
 	ROM_LOAD( "gp_rom3.025",  0x00000, 0x400000,  CRC(f2d1f9f0) SHA1(0d20301fd33892074508b9d127456eae80cc3a1c) )
+	ROM_REGION( 0x400000, "blit_data2", 0 ) // debug test
+	ROM_COPY( "blit_data", 0x00000, 0x00000, 0x400000 )
+
 
 	ROM_REGION( 0x400000, "vram", ROMREGION_ERASEFF )
 
@@ -1437,6 +1447,8 @@ DRIVER_INIT_MEMBER(gunpey_state,gunpey)
 {
 
 	m_blit_rom = memregion("blit_data")->base();
+	m_blit_rom2 = memregion("blit_data2")->base();
+
 	m_vram = memregion("vram")->base();
 	// ...
 }
