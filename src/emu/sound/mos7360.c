@@ -345,7 +345,8 @@ void mos7360_device::device_start()
 
 void mos7360_device::device_reset()
 {
-	memset(m_reg, 0, ARRAY_LENGTH(m_reg));
+	memset(m_reg, 0, sizeof(m_reg));
+	m_last_data = 0;
 
 	m_rom = 1;  // FIXME: at start should be RAM or ROM? old c16 code set it to ROM at init: is it correct?
 
@@ -366,13 +367,13 @@ void mos7360_device::device_reset()
 	m_y_begin = 0;
 	m_y_end = 0;
 
-	memset(m_c16_bitmap, 0, ARRAY_LENGTH(m_c16_bitmap));
-	memset(m_bitmapmulti, 0, ARRAY_LENGTH(m_bitmapmulti));
-	memset(m_mono, 0, ARRAY_LENGTH(m_mono));
-	memset(m_monoinversed, 0, ARRAY_LENGTH(m_monoinversed));
-	memset(m_multi, 0, ARRAY_LENGTH(m_multi));
-	memset(m_ecmcolor, 0, ARRAY_LENGTH(m_ecmcolor));
-	memset(m_colors, 0, ARRAY_LENGTH(m_colors));
+	memset(m_c16_bitmap, 0, sizeof(m_c16_bitmap));
+	memset(m_bitmapmulti, 0, sizeof(m_bitmapmulti));
+	memset(m_mono, 0, sizeof(m_mono));
+	memset(m_monoinversed, 0, sizeof(m_monoinversed));
+	memset(m_multi, 0, sizeof(m_multi));
+	memset(m_ecmcolor, 0, sizeof(m_ecmcolor));
+	memset(m_colors, 0, sizeof(m_colors));
 
 	m_tone1pos = 0;
 	m_tone2pos = 0;
