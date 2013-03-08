@@ -138,6 +138,7 @@ void upd1990a_rtc_device::device_start()
 
 void upd1990a_rtc_device::device_reset()
 {
+	m_tp = 0;
 	set_current_time(machine());
 }
 
