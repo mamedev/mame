@@ -586,9 +586,7 @@ DEVICE_IMAGE_LOAD_MEMBER( mtech_state, megatech_cart )
 	if (image.software_entry() == NULL)
 		return IMAGE_INIT_FAIL;
 
-	//printf("load list\n");
-	UINT8 *ROM = image.device().memregion(this_cart->region)->base();
-	//printf("load list2\n");
+	UINT8 *ROM = image.device().machine().root_device().memregion(this_cart->region)->base();
 	UINT32 length = image.get_software_region_length("rom");
 	memcpy(ROM, image.get_software_region("rom"), length);
 
