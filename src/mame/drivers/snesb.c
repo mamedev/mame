@@ -215,7 +215,7 @@ READ8_MEMBER(snesb_state::sb2b_6a6xxx_r)
 
 READ8_MEMBER(snesb_state::sb2b_7xxx_r)
 {
-	return snes_ram[0xc07000 + offset];
+	return space.read_byte(0xc07000 + offset);
 }
 
 
@@ -806,8 +806,8 @@ DRIVER_INIT_MEMBER(snesb_state,sblast2b)
 
 	for (i =0; i < 0x80000 * 3; i++)
 	{
-			cipherText = src[i];
-			plainText = data_substitution0[cipherText & 0xf] | data_substitution1[cipherText >> 4];
+		cipherText = src[i];
+		plainText = data_substitution0[cipherText & 0xf] | data_substitution1[cipherText >> 4];
 		newAddress = (address_substitution_high[i >> 15] << 15) | (i & 0x7fc0) | (address_substitution_low[i & 0x3f]);
 
 		if (newAddress < 0x10000)

@@ -558,6 +558,7 @@ struct snes_cart_info
 	UINT8  mode;        /* ROM memory mode */
 	UINT32 sram_max;    /* Maximum amount sram in cart (based on ROM mode) */
 	int    slot_in_use; /* this is needed by Sufami Turbo slots (to check if SRAM has to be saved) */
+	UINT8 rom_bank_map[0x100];
 };
 
 struct snes_joypad
@@ -650,6 +651,7 @@ public:
 	UINT8 m_has_addon_chip;
 	UINT32 m_cart_size;
 	snes_cart_info m_cart[2];   // the second one is used by MESS for Sufami Turbo and, eventually, BS-X
+	void rom_map_setup(UINT32 size);
 
 	snes_ppu_class        m_ppu;
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
