@@ -1040,9 +1040,7 @@ MACHINE_RESET_MEMBER(stv_state,stv)
 
 DEVICE_IMAGE_LOAD_MEMBER( stv_state, stv_cart )
 {
-//  stv_state *state = image.device().machine().driver_data<stv_state>();
 	const struct stv_cart_region *stv_cart = &stv_cart_table[0], *this_cart;
-	//const char    *pcb_name;
 
 	/* First, determine where this cart has to be loaded */
 	while (stv_cart->tag)
@@ -1058,7 +1056,7 @@ DEVICE_IMAGE_LOAD_MEMBER( stv_state, stv_cart )
 	if (image.software_entry() == NULL)
 		return IMAGE_INIT_FAIL;
 
-	UINT8 *ROM = image.device().memregion(this_cart->region)->base();
+	UINT8 *ROM = image.device().machine().root_device().memregion(this_cart->region)->base();
 	UINT32 length = image.get_software_region_length("rom");
 
 	memcpy(ROM, image.get_software_region("rom"), length);
@@ -1080,9 +1078,6 @@ DEVICE_IMAGE_LOAD_MEMBER( stv_state, stv_cart )
 			ROM[i+3] = j[0];
 		}
 	}
-
-	//if ((pcb_name = image.get_feature("pcb_type")) == NULL)
-	//  return IMAGE_INIT_FAIL;
 
 	return IMAGE_INIT_PASS;
 }
