@@ -643,7 +643,7 @@ static void snes_cart_log_info( running_machine &machine, UINT8* ROM, int suppor
 DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 {
 	int supported_type = 1;
-	int has_bsx_slot = 0;//, st_bios = 0;
+	int has_bsx_slot = 0, st_bios = 0;
 	UINT32 offset, int_header_offs;
 	UINT8 *ROM = memregion("cart")->base();
 
@@ -684,6 +684,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 			if (ROM[int_header_offs + 0x1a] == 0x33 || ROM[int_header_offs + 0x1a] == 0xff)
 			{
 				// BS-X Flash Cart
+				mame_printf_error("This is a game with BS-X slot: MESS does not support these yet, sorry.\n");
 				m_cart[0].mode = SNES_MODE_BSX;
 			}
 		}
@@ -706,15 +707,16 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	// If there is a BS-X connector, detect if it is the Base Cart or a compatible slotted cart
 	if (has_bsx_slot)
 	{
+		mame_printf_error("This is a game with BS-X slot: MESS does not support these yet, sorry.\n");
 		if (!memcmp(ROM + int_header_offs, "Satellaview BS-X     ", 21))
 		{
 			//BS-X Base Cart
-			m_cart[0].mode = SNES_MODE_BSX;
+			m_cart[0].mode = SNES_MODE_20; //SNES_MODE_BSX;
 			// handle RAM
 		}
 		else
 		{
-			m_cart[0].mode = (int_header_offs ==0x007fc0) ? SNES_MODE_BSLO : SNES_MODE_BSHI;
+			m_cart[0].mode = (int_header_offs == 0x007fc0) ? SNES_MODE_20 : SNES_MODE_21; //SNES_MODE_BSLO : SNES_MODE_BSHI;
 			// handle RAM?
 		}
 	}
@@ -723,10 +725,19 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	if (!memcmp(ROM, "BANDAI SFC-ADX", 14))
 	{
 		m_cart[0].mode = SNES_MODE_ST;
-		//if (!memcmp(ROM + 16, "SFC-ADX BACKUP", 14))
-			//st_bios = 1;
+		if (!memcmp(ROM + 16, "SFC-ADX BACKUP", 14))
+			st_bios = 1;
+	}
+	if (st_bios)
+		mame_printf_error("This is the Sufami Turbo base cart. MESS does not fully support this game in snes/snespal yet, sorry.\nYou might want to try the snesst driver.\n");
+	else if (m_cart[0].mode == SNES_MODE_ST)
+	{
+		mame_printf_error("This is a Sufami Turbo data cart and cannot be loaded for snes/snespal in MESS.\n");
+		mame_printf_error("Please use snesst driver to load it, instead.\n");
+		return IMAGE_INIT_FAIL;
 	}
 
+	
 	if (SNES_CART_DEBUG) mame_printf_error("mode %d\n", m_cart[0].mode);
 
 	/* Detect special chips */
