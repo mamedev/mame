@@ -134,7 +134,7 @@ CLR8:
 NEG16:
 	m_temp.b.h = read_operand(0);
 	m_temp.b.l = read_operand(1);
-	m_temp.b.l = set_flags(CC_NZVC, (UINT16)0, m_temp.w, -m_temp.w);
+	m_temp.w = set_flags(CC_NZVC, (UINT16)0, m_temp.w, -m_temp.w);
 	eat(hd6309_native_mode() ? 0 : 1);
 	write_operand(0, m_temp.b.h);
 	write_operand(1, m_temp.b.l);
