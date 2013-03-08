@@ -621,6 +621,8 @@ public:
 	int cddevicenum;
 
 	UINT16 cr1, cr2, cr3, cr4;
+	UINT16 prev_cr1, prev_cr2, prev_cr3, prev_cr4;
+	UINT8 status_type;
 	UINT16 hirqmask, hirqreg;
 	UINT16 cd_stat;
 	UINT32 cd_curfad;// = 0;

@@ -118,7 +118,6 @@ void saturn_state::cr_standard_return(UINT16 cur_status)
 		cr3 = (get_track_index(cd_curfad)<<8) | (cd_curfad>>16); //index & 0xff00
 		cr4 = cd_curfad;
 	}
-	cd_stat |= CD_STAT_PERI;
 }
 
 void saturn_state::cd_exec_command( void )
@@ -137,7 +136,15 @@ void saturn_state::cd_exec_command( void )
 		case 0x00:
 			//CDROM_LOG(("%s:CD: Get Status\n", machine().describe_context()))
 			hirqreg |= CMOK;
-			cr_standard_return(cd_stat);
+			if(status_type == 0)
+				cr_standard_return(cd_stat);
+			else
+			{
+				cr1 = prev_cr1;
+				cr2 = prev_cr2;
+				cr3 = prev_cr3;
+				cr4 = prev_cr4;
+			}
 			//CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 			break;
 
@@ -148,6 +155,7 @@ void saturn_state::cd_exec_command( void )
 			cr2 = 0x0201;
 			cr3 = 0x0000;
 			cr4 = 0x0400;
+			status_type = 0;
 			break;
 
 		case 0x02:    // Get TOC
@@ -160,6 +168,7 @@ void saturn_state::cd_exec_command( void )
 			cr4 = 0;
 			xferdnum = 0;
 			hirqreg |= (CMOK|DRDY);
+			status_type = 0;
 			break;
 
 		case 0x03:    // get session info (lower byte = session # to get?)
@@ -196,6 +205,7 @@ void saturn_state::cd_exec_command( void )
 			}
 
 			hirqreg |= (CMOK);
+			status_type = 0;
 			break;
 
 		/* TODO: double check this */
@@ -245,6 +255,7 @@ void saturn_state::cd_exec_command( void )
 
 			hirqreg |= (CMOK|ESEL);
 			cr_standard_return(cd_stat);
+			status_type = 0;
 			break;
 
 		case 0x06:    // end data transfer (TODO: needs to be worked on!)
@@ -319,6 +330,7 @@ void saturn_state::cd_exec_command( void )
 			hirqreg |= CMOK;
 
 			CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
+			status_type = 0;
 			break;
 
 		case 0x10: // Play Disc.  FAD is in lowest 7 bits of cr1 and all of cr2.
@@ -435,7 +447,7 @@ void saturn_state::cd_exec_command( void )
 				cdda_maxrepeat = 0;
 
 			cdda_repeat_count = 0;
-
+			status_type = 0;
 			break;
 
 		case 0x11: // disc seek
@@ -482,6 +494,7 @@ void saturn_state::cd_exec_command( void )
 
 			hirqreg |= CMOK;
 			cr_standard_return(cd_stat);
+			status_type = 0;
 			break;
 
 		case 0x12: // FFWD / REW
@@ -558,6 +571,7 @@ void saturn_state::cd_exec_command( void )
 					break;
 			}
 			hirqreg |= CMOK|DRDY;
+			status_type = 0;
 			break;
 
 		case 0x30:    // Set CD Device connection
@@ -586,6 +600,7 @@ void saturn_state::cd_exec_command( void )
 
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
+				status_type = 0;
 			}
 			break;
 
@@ -600,6 +615,7 @@ void saturn_state::cd_exec_command( void )
 			cr3 = lastbuf << 8;
 			cr4 = 0;
 			hirqreg |= (CMOK);
+			status_type = 0;
 			break;
 
 		case 0x40:    // Set Filter Range
@@ -617,6 +633,7 @@ void saturn_state::cd_exec_command( void )
 
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
+				status_type = 0;
 			}
 			break;
 
@@ -640,6 +657,7 @@ void saturn_state::cd_exec_command( void )
 
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
+				status_type = 0;
 			}
 			break;
 
@@ -655,6 +673,7 @@ void saturn_state::cd_exec_command( void )
 				cr4 = (filters[fnum].smval << 8) | (filters[fnum].cival & 0xff);
 
 				hirqreg |= (CMOK|ESEL);
+				status_type = 0;
 			}
 			break;
 
@@ -676,6 +695,7 @@ void saturn_state::cd_exec_command( void )
 				CDROM_LOG(("%s:CD: Set Filter Mode filt %x mode %x\n", machine().describe_context(), fnum, mode))
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
+				status_type = 0;
 			}
 			break;
 
@@ -689,6 +709,7 @@ void saturn_state::cd_exec_command( void )
 				cr4 = 0;
 
 				hirqreg |= (CMOK|ESEL);
+				status_type = 0;
 			}
 			break;
 
@@ -707,6 +728,7 @@ void saturn_state::cd_exec_command( void )
 
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
+				status_type = 0;
 			}
 			break;
 
@@ -739,6 +761,7 @@ void saturn_state::cd_exec_command( void )
 
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
+				status_type = 0;
 				return;
 			}
 
@@ -795,6 +818,7 @@ void saturn_state::cd_exec_command( void )
 
 			hirqreg |= (CMOK|ESEL);
 			cr_standard_return(cd_stat);
+			status_type = 0;
 			}
 			break;
 
@@ -805,6 +829,7 @@ void saturn_state::cd_exec_command( void )
 			cr4 = 200;
 			CDROM_LOG(("CD: Get Buffer Size = %d\n", cr2))
 			hirqreg |= (CMOK);
+			status_type = 0;
 			break;
 
 		case 0x51:    // get # sectors used in a buffer
@@ -830,6 +855,7 @@ void saturn_state::cd_exec_command( void )
 				}
 
 				hirqreg |= (CMOK|DRDY);
+				status_type = 1;
 			}
 			break;
 
@@ -857,6 +883,7 @@ void saturn_state::cd_exec_command( void )
 
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
+				status_type = 1;
 			}
 			break;
 
@@ -867,6 +894,7 @@ void saturn_state::cd_exec_command( void )
 			cr3 = 0;
 			cr4 = 0;
 			hirqreg |= (CMOK|ESEL);
+			status_type = 1;
 			break;
 
 		case 0x54:    // get sector info
@@ -888,6 +916,8 @@ void saturn_state::cd_exec_command( void )
 					cr4 = ((partitions[bufnum].blocks[sectoffs]->subm & 0xff) << 8) | (partitions[bufnum].blocks[sectoffs]->cinf & 0xff);
 					hirqreg |= (CMOK|ESEL);
 				}
+
+				status_type = 0;
 			}
 			break;
 
@@ -927,6 +957,7 @@ void saturn_state::cd_exec_command( void )
 			}
 			hirqreg |= (CMOK|ESEL);
 			cr_standard_return(cd_stat);
+			status_type = 0;
 			break;
 
 		case 0x61:    // get sector data
@@ -967,6 +998,7 @@ void saturn_state::cd_exec_command( void )
 				cd_stat |= CD_STAT_TRANS;
 				cr_standard_return(cd_stat);
 				hirqreg |= (CMOK|EHST|DRDY);
+				status_type = 0;
 			}
 			break;
 
@@ -1019,6 +1051,7 @@ void saturn_state::cd_exec_command( void )
 				cd_stat &= ~CD_STAT_TRANS;
 				cr_standard_return(cd_stat);
 				hirqreg |= (CMOK|EHST);
+				status_type = 0;
 			}
 			break;
 
@@ -1061,6 +1094,7 @@ void saturn_state::cd_exec_command( void )
 				cd_stat |= CD_STAT_TRANS;
 				cr_standard_return(cd_stat);
 				hirqreg |= (CMOK|EHST|DRDY);
+				status_type = 0;
 			}
 			break;
 
@@ -1099,6 +1133,7 @@ void saturn_state::cd_exec_command( void )
 
 			hirqreg |= (CMOK|DRDY);
 			cr_standard_return(cd_stat);
+			status_type = 0;
 			break;
 
 		case 0x65:
@@ -1140,6 +1175,7 @@ void saturn_state::cd_exec_command( void )
 
 			hirqreg |= (CMOK|ECPY);
 			cr_standard_return(cd_stat);
+			status_type = 0;
 			break;
 
 
@@ -1151,6 +1187,7 @@ void saturn_state::cd_exec_command( void )
 			cr3 = 0;
 			cr4 = 0;
 			hirqreg |= (CMOK);
+			status_type = 0;
 			break;
 
 		case 0x70:    // change directory
@@ -1162,6 +1199,7 @@ void saturn_state::cd_exec_command( void )
 
 			read_new_dir(temp);
 			cr_standard_return(cd_stat);
+			status_type = 0;
 			break;
 
 		case 0x71:    // Read directory entry
@@ -1180,6 +1218,7 @@ void saturn_state::cd_exec_command( void )
 
 			cr_standard_return(cd_stat);
 			hirqreg |= (CMOK|EFLS);
+			status_type = 0;
 			break;
 
 		case 0x72:    // Get file system scope
@@ -1190,6 +1229,7 @@ void saturn_state::cd_exec_command( void )
 			cr3 = 0x0100;   // report directory held
 			cr4 = firstfile;    // first file id
 			printf("%04x %04x %04x %04x\n",cr1,cr2,cr3,cr4);
+			status_type = 0;
 			break;
 
 		case 0x73:    // Get File Info
@@ -1248,6 +1288,7 @@ void saturn_state::cd_exec_command( void )
 				xfercount = 0;
 			}
 			CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
+			status_type = 0;
 			break;
 
 		case 0x74:    // Read File
@@ -1277,7 +1318,7 @@ void saturn_state::cd_exec_command( void )
 			playtype = 1;
 
 			hirqreg |= (CMOK|EHST);
-
+			status_type = 0;
 			break;
 
 		case 0x75:
@@ -1290,6 +1331,7 @@ void saturn_state::cd_exec_command( void )
 			if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 				cd_stat = CD_STAT_PAUSE;    // force to pause
 			cr_standard_return(cd_stat);
+			status_type = 0;
 			break;
 
 		case 0xe0:    // appears to be copy protection check.  needs only to return OK.
@@ -1302,6 +1344,7 @@ void saturn_state::cd_exec_command( void )
 			sectorstore = 1;
 			hirqreg = 0xfc5;
 			cr_standard_return(cd_stat);
+			status_type = 0;
 			break;
 
 		case 0xe1:    // get disc region
@@ -1314,6 +1357,7 @@ void saturn_state::cd_exec_command( void )
 			cr4 = 0;
 			hirqreg |= (CMOK);
 //          cr_standard_return(cd_stat);
+			status_type = 0;
 			break;
 
 		default:
@@ -1322,6 +1366,11 @@ void saturn_state::cd_exec_command( void )
 			hirqreg |= (CMOK);
 			break;
 	}
+
+	prev_cr1 = cr1;
+	prev_cr2 = cr2;
+	prev_cr3 = cr3;
+	prev_cr4 = cr4;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( saturn_state::stv_sh1_sim )
