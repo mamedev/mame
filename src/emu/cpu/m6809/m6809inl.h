@@ -146,55 +146,6 @@ inline ATTR_FORCE_INLINE void m6809_base_device::burn_any_delay_loops()
 
 
 //-------------------------------------------------
-//  read_exgtfr_register
-//-------------------------------------------------
-
-inline ATTR_FORCE_INLINE m6809_base_device::exgtfr_register m6809_base_device::read_exgtfr_register(UINT8 reg)
-{
-	exgtfr_register result;
-	result.byte_value = 0xFF;
-	result.word_value = 0x00FF;
-
-	switch(reg & 0x0F)
-	{
-		case  0: result.word_value = m_d.w;		break;	// D
-		case  1: result.word_value = m_x.w;		break;	// X
-		case  2: result.word_value = m_y.w;		break;	// Y
-		case  3: result.word_value = m_u.w;		break;	// U
-		case  4: result.word_value = m_s.w;		break;	// S
-		case  5: result.word_value = m_pc.w;	break;	// PC
-		case  8: result.byte_value = m_d.b.h;	break;	// A
-		case  9: result.byte_value = m_d.b.l;	break;	// B
-		case 10: result.byte_value = m_cc;		break;	// CC
-		case 11: result.byte_value = m_dp;		break;	// DP
-	}
-	return result;
-}
-
-
-//-------------------------------------------------
-//  write_exgtfr_register
-//-------------------------------------------------
-
-inline ATTR_FORCE_INLINE void m6809_base_device::write_exgtfr_register(UINT8 reg, m6809_base_device::exgtfr_register value)
-{
-	switch(reg & 0x0F)
-	{
-		case  0: m_d.w   = value.word_value;	break;	// D
-		case  1: m_x.w   = value.word_value;	break;	// X
-		case  2: m_y.w   = value.word_value;	break;	// Y
-		case  3: m_u.w   = value.word_value;	break;	// U
-		case  4: m_s.w   = value.word_value;	break;	// S
-		case  5: m_pc.w  = value.word_value;	break;	// PC
-		case  8: m_d.b.h = value.byte_value;	break;	// A
-		case  9: m_d.b.l = value.byte_value;	break;	// B
-		case 10: m_cc    = value.byte_value;	break;	// CC
-		case 11: m_dp    = value.byte_value;	break;	// DP
-	}
-}
-
-
-//-------------------------------------------------
 //  daa - decimal arithmetic adjustment instruction
 //-------------------------------------------------
 
