@@ -1623,7 +1623,7 @@ static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const r
 #endif
 	/*
 	    0x980000:   00060000 00010000 02ff0000 000007ff
-	                   ^                                 enable bits, 7 = disable
+	                   ^                                 misc control
 	                    ^^^^                             base
 	                         ^^^^                        base + num sprites
 	                             ^^^^     ^^^^           deltax
@@ -1643,14 +1643,13 @@ static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const r
 	    additional sorting/color data for sprite at 0x9a0000
 	*/
 
-	/* 'enable' bits function:
-	    bit 0:      sprites on?
+	/* misc control bits function:
+	    bit 0:      sprites on
 	    bit 1:      ??? (always set, except in alpinr2b. it's not x-resolution)
 	    bit 2:      y-resolution? (always set, except in cybrcycc)
-	    all bits set means off (aquajet) */
-	int enable = spriteram32[0]>>16&5;
-
-	int y_lowres = (enable & 4) ? 0 : 1;
+	*/
+	int sprites_on = (spriteram32[0]>>16 & 1) ? 0 : 1;
+	int y_lowres = (spriteram32[0]>>16 & 4) ? 0 : 1;
 
 	int deltax = (spriteram32[1]&0xffff) + (spriteram32[2]&0xffff) + 0x2d;
 	int deltay = (spriteram32[3]>>16) + (0x2a >> y_lowres);
@@ -1658,7 +1657,7 @@ static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const r
 	int base = spriteram32[0] & 0xffff; // alpinesa/alpinr2b
 	int num_sprites = ((spriteram32[1]>>16) - base) + 1;
 
-	if( num_sprites > 0 && num_sprites < 0x400 && enable != 5 )
+	if( sprites_on && num_sprites > 0 && num_sprites < 0x400 )
 	{
 		pSource = &spriteram32[0x04000/4 + base*4];
 		pPal    = &spriteram32[0x20000/4 + base*2];
@@ -1670,7 +1669,7 @@ static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const r
 	0x940000 -x------       sprite chip busy?
 	0x940018 xxxx----       clr.w   $940018.l
 
-	0x940030 xxxxxxxx       0x0600000 - enable bits?
+	0x940030 xxxxxxxx       0x0600000 - misc control
 	0x940034 xxxxxxxx       0x3070b0f
 
 	0x940040 xxxxxxxx       sprite attribute size             high bit means busy?
@@ -1681,6 +1680,9 @@ static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const r
 	0x940060..0x94007c      set#2
 	*/
 
+	sprites_on = (state->m_vics_control[0x30/4]>>24 & 1) ? 0 : 1;
+	y_lowres = (state->m_vics_control[0x30/4]>>24 & 4) ? 0 : 1;
+
 	// where do the games store the number of sprites to be processed by vics???
 	// the current default implementation (using spritelist size) is clearly wrong and causes problems in dirtdash and airco22b
 	num_sprites = state->m_vics_control[0x40/4] >> 4 & 0x1ff; // no +1
@@ -1689,7 +1691,7 @@ static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const r
 	if (state->m_gametype == NAMCOS22_DIRT_DASH)
 		num_sprites = (state->m_vics_data[(state->m_vics_control[0x48/4]&0x4000)/4] & 0xff) + 1;
 
-	if( num_sprites > 0 )
+	if( sprites_on && num_sprites > 0 )
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x58/4]&0xffff)/4];
@@ -1701,14 +1703,11 @@ static void DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const r
 	// airco22b number of sprites for set#2 is stored in set#1 - it does not use set 1, or main set for sprites
 	if (state->m_gametype == NAMCOS22_AIR_COMBAT22)
 	{
-		enable = state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4]>>16&5;
-		if (enable != 5)
-			num_sprites = (state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4+1]>>16)+1;
-		else
-			num_sprites = 0;
+		sprites_on = (state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4]>>16&1) ? 0 : 1;
+		num_sprites = (state->m_vics_data[(state->m_vics_control[0x48/4]&0xffff)/4+1]>>16)+1;
 	}
 
-	if( num_sprites > 0 )
+	if( sprites_on && num_sprites > 0 )
 	{
 		pSource = &state->m_vics_data[(state->m_vics_control[0x68/4]&0xffff)/4];
 		pPal    = &state->m_vics_data[(state->m_vics_control[0x78/4]&0xffff)/4];
