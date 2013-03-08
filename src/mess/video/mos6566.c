@@ -774,7 +774,7 @@ void mos6566_device::device_start()
 
 void mos6566_device::device_reset()
 {
-	memset(m_reg, 0, ARRAY_LENGTH(m_reg));
+	memset(m_reg, 0, sizeof(m_reg));
 
 	for (int i = 0; i < ARRAY_LENGTH(m_mc); i++)
 		m_mc[i] = 63;
@@ -785,8 +785,11 @@ void mos6566_device::device_reset()
 	m_cycle = 14;
 	m_raster_x = 0x004;
 	m_graphic_x = 0;
+	m_last_data = 0;
 
 	m_on = 1;
+
+	m_chargenaddr = m_videoaddr = m_bitmapaddr = 0;
 
 	m_dy_start = ROW24_YSTART;
 	m_dy_stop = ROW24_YSTOP;
@@ -818,13 +821,13 @@ void mos6566_device::device_reset()
 	m_first_ba_cycle = 0;
 	m_device_suspended = 0;
 
-	memset(m_matrix_line, 0, ARRAY_LENGTH(m_matrix_line));
-	memset(m_color_line, 0, ARRAY_LENGTH(m_color_line));
+	memset(m_matrix_line, 0, sizeof(m_matrix_line));
+	memset(m_color_line, 0, sizeof(m_color_line));
 
-	memset(m_spr_coll_buf, 0, ARRAY_LENGTH(m_spr_coll_buf));
-	memset(m_fore_coll_buf, 0, ARRAY_LENGTH(m_fore_coll_buf));
-	memset(m_border_on_sample, 0, ARRAY_LENGTH(m_border_on_sample));
-	memset(m_border_color_sample, 0, ARRAY_LENGTH(m_border_color_sample));
+	memset(m_spr_coll_buf, 0, sizeof(m_spr_coll_buf));
+	memset(m_fore_coll_buf, 0, sizeof(m_fore_coll_buf));
+	memset(m_border_on_sample, 0, sizeof(m_border_on_sample));
+	memset(m_border_color_sample, 0, sizeof(m_border_color_sample));
 
 	for (int i = 0; i < 8; i++)
 	{
