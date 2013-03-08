@@ -118,16 +118,18 @@ enum flash_state
 };
 
 
-class ngp_state : public driver_device
+class ngp_state : public driver_device, public device_nvram_interface
 {
 public:
 	ngp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, device_nvram_interface(mconfig, *this)
 		, m_tlcs900( *this, "maincpu" )
 		, m_z80( *this, "soundcpu" )
 		, m_t6w28( *this, "t6w28" )
 		, m_dac_l( *this, "dac_l" )
 		, m_dac_r( *this, "dac_r" )
+		, m_mainram( *this, "mainram" )
 	{
 		m_flash_chip[0].present = 0;
 		m_flash_chip[0].state = F_READ;
@@ -136,6 +138,8 @@ public:
 		m_flash_chip[1].present = 0;
 		m_flash_chip[1].state = F_READ;
 		m_flash_chip[1].data = NULL;
+
+		m_nvram_loaded = false;
 	}
 
 	virtual void machine_start();
@@ -160,6 +164,7 @@ public:
 	required_device<t6w28_device> m_t6w28;
 	required_device<dac_device> m_dac_l;
 	required_device<dac_device> m_dac_r;
+	required_shared_ptr<UINT8> m_mainram;
 	device_t *m_k1ge;
 
 	DECLARE_READ8_MEMBER( ngp_io_r );
@@ -184,6 +189,13 @@ public:
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ngp_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ngp_cart );
+
+protected:
+	bool m_nvram_loaded;
+
+	virtual void nvram_default();
+	virtual void nvram_read(emu_file &file);
+	virtual void nvram_write(emu_file &file);
 };
 
 
@@ -521,9 +533,9 @@ WRITE8_MEMBER( ngp_state::flash1_w )
 
 static ADDRESS_MAP_START( ngp_mem, AS_PROGRAM, 8, ngp_state )
 	AM_RANGE( 0x000080, 0x0000bf )  AM_READWRITE(ngp_io_r, ngp_io_w)                            /* ngp/c specific i/o */
-	AM_RANGE( 0x004000, 0x006fff )  AM_RAM                                                      /* work ram */
+	AM_RANGE( 0x004000, 0x006fff )  AM_RAM AM_SHARE("mainram")                                  /* work ram */
 	AM_RANGE( 0x007000, 0x007fff )  AM_RAM AM_SHARE("share1")                                   /* shared with sound cpu */
-	AM_RANGE( 0x008000, 0x0087ff )  AM_DEVREADWRITE_LEGACY("k1ge", k1ge_r, k1ge_w)                      /* video registers */
+	AM_RANGE( 0x008000, 0x0087ff )  AM_DEVREADWRITE_LEGACY("k1ge", k1ge_r, k1ge_w)              /* video registers */
 	AM_RANGE( 0x008800, 0x00bfff )  AM_RAM AM_REGION("vram", 0x800 )                            /* Video RAM area */
 	AM_RANGE( 0x200000, 0x3fffff )  AM_ROM AM_WRITE(flash0_w) AM_REGION("cart", 0)              /* cart area #1 */
 	AM_RANGE( 0x800000, 0x9fffff )  AM_ROM AM_WRITE(flash1_w) AM_REGION("cart", 0x200000)       /* cart area #2 */
@@ -669,6 +681,11 @@ void ngp_state::machine_reset()
 
 	m_z80->suspend(SUSPEND_REASON_HALT, 1 );
 	m_z80->set_input_line(0, CLEAR_LINE );
+
+	if ( m_nvram_loaded )
+	{
+		m_tlcs900->set_state_int(TLCS900_PC, 0xFF1800);
+	}
 }
 
 
@@ -744,6 +761,24 @@ DEVICE_IMAGE_UNLOAD_MEMBER( ngp_state, ngp_cart )
 
 	m_flash_chip[1].present = 0;
 	m_flash_chip[1].state = F_READ;
+}
+
+
+void ngp_state::nvram_default()
+{
+}
+
+
+void ngp_state::nvram_read(emu_file &file)
+{
+	file.read(m_mainram, 0x3000);
+	m_nvram_loaded = true;
+}
+
+
+void ngp_state::nvram_write(emu_file &file)
+{
+	file.write(m_mainram, 0x3000);
 }
 
 

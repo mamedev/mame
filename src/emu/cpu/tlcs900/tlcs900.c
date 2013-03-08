@@ -1148,6 +1148,10 @@ static CPU_SET_INFO( tlcs900 )
 
 	switch ( state )
 	{
+	case CPUINFO_INT_PC:
+	case CPUINFO_INT_REGISTER + TLCS900_PC:
+		cpustate->pc.d = info->i; break;
+
 	case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:
 	case CPUINFO_INT_INPUT_STATE + TLCS900_NMI:
 	case CPUINFO_INT_INPUT_STATE + TLCS900_INTWD:
