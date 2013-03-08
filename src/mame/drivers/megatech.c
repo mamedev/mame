@@ -555,14 +555,14 @@ struct megatech_cart_region
 // we keep old region tags for compatibility with older macros... this might be changed at a later stage
 static const struct megatech_cart_region megatech_cart_table[] =
 {
-	{ ":cart1", 0, "game0" },
-	{ ":cart2", 1, "game1" },
-	{ ":cart3", 2, "game2" },
-	{ ":cart4", 3, "game3" },
-	{ ":cart5", 4, "game4" },
-	{ ":cart6", 5, "game5" },
-	{ ":cart7", 6, "game6" },
-	{ ":cart8", 7, "game7" },
+	{ ":cart1", 0, ":game0" },
+	{ ":cart2", 1, ":game1" },
+	{ ":cart3", 2, ":game2" },
+	{ ":cart4", 3, ":game3" },
+	{ ":cart5", 4, ":game4" },
+	{ ":cart6", 5, ":game5" },
+	{ ":cart7", 6, ":game6" },
+	{ ":cart8", 7, ":game7" },
 	{ 0 }
 };
 
@@ -586,7 +586,7 @@ DEVICE_IMAGE_LOAD_MEMBER( mtech_state, megatech_cart )
 	if (image.software_entry() == NULL)
 		return IMAGE_INIT_FAIL;
 
-	UINT8 *ROM = image.device().machine().root_device().memregion(this_cart->region)->base();
+	UINT8 *ROM = image.device().memregion(this_cart->region)->base();
 	UINT32 length = image.get_software_region_length("rom");
 	memcpy(ROM, image.get_software_region("rom"), length);
 

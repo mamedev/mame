@@ -1004,10 +1004,10 @@ struct stv_cart_region
 
 static const struct stv_cart_region stv_cart_table[] =
 {
-	{ ":cart1", 0, "game0" },
-	{ ":cart2", 1, "game1" },
-	{ ":cart3", 2, "game2" },
-	{ ":cart4", 3, "game3" },
+	{ ":cart1", 0, ":game0" },
+	{ ":cart2", 1, ":game1" },
+	{ ":cart3", 2, ":game2" },
+	{ ":cart4", 3, ":game3" },
 	{ 0 }
 };
 
@@ -1056,7 +1056,7 @@ DEVICE_IMAGE_LOAD_MEMBER( stv_state, stv_cart )
 	if (image.software_entry() == NULL)
 		return IMAGE_INIT_FAIL;
 
-	UINT8 *ROM = image.device().machine().root_device().memregion(this_cart->region)->base();
+	UINT8 *ROM = image.device().memregion(this_cart->region)->base();
 	UINT32 length = image.get_software_region_length("rom");
 
 	memcpy(ROM, image.get_software_region("rom"), length);
