@@ -682,6 +682,7 @@ public:
 	void hdma_init(address_space &space);
 	void hdma_update(address_space &space, int dma);
 	void hirq_tick();
+	inline UINT8 snes_rom_access(UINT32 offset);
 	
 	void snes_init_ram();
 	
@@ -689,8 +690,14 @@ public:
 	DECLARE_READ8_MEMBER(nss_oldjoy1_read);
 	DECLARE_READ8_MEMBER(nss_oldjoy2_read);
 
+	DECLARE_READ8_MEMBER(snes_r_io);
+	DECLARE_WRITE8_MEMBER(snes_w_io);	
 	DECLARE_READ8_MEMBER(snes_io_dma_r);
 	DECLARE_WRITE8_MEMBER(snes_io_dma_w);
+	DECLARE_READ8_MEMBER(snes_r_bank1);
+	DECLARE_READ8_MEMBER(snes_r_bank2);
+	DECLARE_WRITE8_MEMBER(snes_w_bank1);
+	DECLARE_WRITE8_MEMBER(snes_w_bank2);
 	TIMER_CALLBACK_MEMBER(snes_nmi_tick);
 	TIMER_CALLBACK_MEMBER(snes_hirq_tick_callback);
 	TIMER_CALLBACK_MEMBER(snes_reset_oam_address);
@@ -701,8 +708,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(snes_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sufami_cart);
-	DECLARE_READ8_MEMBER( snes_r_io );
-	DECLARE_WRITE8_MEMBER( snes_w_io );	
 	virtual void video_start();	
 };
 
@@ -756,11 +761,6 @@ extern MACHINE_START( snes );
 extern MACHINE_RESET( snes );
 
 DECLARE_READ8_HANDLER( snes_open_bus_r );
-
-extern DECLARE_READ8_HANDLER( snes_r_bank1 );
-extern DECLARE_READ8_HANDLER( snes_r_bank2 );
-extern DECLARE_WRITE8_HANDLER( snes_w_bank1 );
-extern DECLARE_WRITE8_HANDLER( snes_w_bank2 );
 
 extern UINT8  *snes_ram;            /* Main memory */
 

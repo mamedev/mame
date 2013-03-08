@@ -161,9 +161,9 @@ UINT32 sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap,
 }
 
 static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, sfcbox_state )
-	AM_RANGE(0x000000, 0x7dffff) AM_READWRITE_LEGACY(snes_r_bank1, snes_w_bank1)
+	AM_RANGE(0x000000, 0x7dffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)
 	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM                 /* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	AM_RANGE(0x800000, 0xffffff) AM_READWRITE_LEGACY(snes_r_bank2, snes_w_bank2)    /* Mirror and ROM */
+	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)    /* Mirror and ROM */
 ADDRESS_MAP_END
 
 READ8_MEMBER(sfcbox_state::spc_ram_100_r)
