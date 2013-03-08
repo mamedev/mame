@@ -907,6 +907,8 @@ ROM_END
 
                        Bomb Kick  -  Yun Sung, 1998
 
+   Title screen shows 1998, but service mode shows 1997 for both sets.
+
 ***************************************************************************/
 
 ROM_START( bombkick )
@@ -933,7 +935,7 @@ ROM_START( bombkick )
 
 ROM_END
 
-ROM_START( bombkicka )
+ROM_START( bombkicka ) // marked 'Bomb Kick 98'
 
 	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_BYTE( "u33.bin", 0x000000, 0x040000, CRC(4624d618) SHA1(4d9862740e1f759860eeedf56efd16e4bfdc3376) )
@@ -967,8 +969,8 @@ ROM_END
 
 GAME( 199?, magicbub,  0,        magicbub, magicbub, yunsun16_state, magicbub, ROT0,   "Yun Sung", "Magic Bubble",                 GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 199?, magicbuba, magicbub, magicbub, magicbua, yunsun16_state, magicbub, ROT0,   "Yun Sung", "Magic Bubble (Adult version)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1996, paprazzi,  0,        shocking, paprazzi, driver_device, 0,        ROT270, "Yun Sung", "Paparazzi",                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1997, shocking,  0,        shocking, shocking, driver_device, 0,        ROT0,   "Yun Sung", "Shocking",                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1997, shockingk, shocking, shocking, shocking, driver_device, 0,        ROT0,   "Yun Sung", "Shocking (Korea)",             GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1998, bombkick,  0,        shocking, bombkick, driver_device, 0,        ROT0,   "Yun Sung", "Bomb Kick (set 1)",                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1998, bombkicka, bombkick, shocking, bombkick, driver_device, 0,        ROT0,   "Yun Sung", "Bomb Kick (set 2)",                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE ) // marked 'Bomb Kick 98'
+GAME( 1996, paprazzi,  0,        shocking, paprazzi, driver_device,  0,        ROT270, "Yun Sung", "Paparazzi",                    GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1997, shocking,  0,        shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking",                     GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1997, shockingk, shocking, shocking, shocking, driver_device,  0,        ROT0,   "Yun Sung", "Shocking (Korea)",             GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1998, bombkick,  0,        shocking, bombkick, driver_device,  0,        ROT0,   "Yun Sung", "Bomb Kick (set 1)",            GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1998, bombkicka, bombkick, shocking, bombkick, driver_device,  0,        ROT0,   "Yun Sung", "Bomb Kick (set 2)",            GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
