@@ -16,7 +16,6 @@
  */
 
 #include "machine/3c505.h"
-#include <endian.h>
 
 #define VERBOSE 0
 

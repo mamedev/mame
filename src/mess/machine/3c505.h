@@ -64,6 +64,8 @@ struct threecom3c505_interface
 
 // ======================> PCB data structure
 
+#pragma pack(1)
+
 struct Memconf
 {
 	UINT16 cmd_q, rcv_q, mcast, frame, rcv_b, progs;
@@ -138,7 +140,7 @@ struct pcb_struct
 		struct Xmit_pkt xmit_pkt;
 		UINT8 multicast[10][6];
 		UINT8 eth_addr[6];
-		UINT8 failed;
+		INT16 failed;
 		struct Rcv_resp rcv_resp;
 		struct Xmit_resp xmit_resp;
 		struct Netstat netstat;
@@ -148,6 +150,8 @@ struct pcb_struct
 		UINT8 raw[62];
 	} data;
 };
+
+#pragma pack()
 
 // ======================> threecom3c505_device
 
@@ -213,6 +217,8 @@ private:
 		void reset();
 		int put(const UINT8 data[], const int length);
 		int get(data_buffer *db);
+		int is_empty () { return m_get_index == m_put_index; }
+		int is_full () { return ((m_put_index + 1) % m_size) == m_get_index; }
 	private:
 		threecom3c505_device *m_device; // pointer back to our device
 		UINT16 m_size;
@@ -224,7 +230,8 @@ private:
 
 	void set_filter_list();
 	void set_interrupt(enum line_state state);
-	static TIMER_CALLBACK( static_set_interrupt );
+
+	static TIMER_CALLBACK( static_do_command );
 
 	void log_command();
 	void log_response();
@@ -255,8 +262,8 @@ private:
 	UINT8 m_command_buffer[CMD_BUFFER_SIZE];
 	int m_command_index;
 	int m_command_pending;
-	int m_mc_f9_pending;
 	int m_wait_for_ack;
+	int m_wait_for_nak;
 
 	data_buffer_fifo m_rx_fifo;
 
@@ -274,6 +281,8 @@ private:
 	int m_response_length;
 	int m_response_index;
 
+	pcb_struct m_rcv_response;
+
 	UINT16 m_microcode_version;
 	UINT16 m_microcode_running;
 
@@ -287,7 +296,7 @@ private:
 
 	enum line_state irq_state;
 
-	emu_timer * m_timer; // timer to delay interrupts
+	emu_timer * m_do_command_timer; // timer to delay command execution
 };
 
 // device type definition
