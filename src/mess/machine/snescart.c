@@ -795,7 +795,6 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 {
 	int st_bios = 0, slot_id = 0;
 	UINT32 offset;
-	UINT8 *ROM = machine().root_device().memregion(image.device().tag())->base();
 
 	if (strcmp(image.device().tag(), ":slot_a") == 0)
 		slot_id = 0;
@@ -808,24 +807,31 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 	else
 		m_cart_size = image.get_software_region_length("rom");
 
-	/* Check for a header (512 bytes), and skip it if found */
+	// Check for a header (512 bytes), and skip it if found
 	offset = snes_skip_header(image, m_cart_size);
+
+	// Allocate rom pointer
+	m_cart[slot_id].m_rom_size = m_cart_size;
+	m_cart[slot_id].m_rom = auto_alloc_array_clear(machine(), UINT8, m_cart[0].m_rom_size);
 
 	if (image.software_entry() == NULL)
 	{
 		image.fseek(offset, SEEK_SET);
-		image.fread(ROM, m_cart_size - offset);
+		image.fread(m_cart[slot_id].m_rom, m_cart_size - offset);
 	}
 	else
-		memcpy(ROM, image.get_software_region("rom") + offset, m_cart_size - offset);
+		memcpy(m_cart[slot_id].m_rom, image.get_software_region("rom") + offset, m_cart_size - offset);
 
 	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", m_cart_size - offset);
 
-	/* Detect Sufami Turbo carts */
-	if (!memcmp(ROM, "BANDAI SFC-ADX", 14))
+	// Setup the bank map to handle mirroring of ROM
+	rom_map_setup(m_cart[slot_id].m_rom_size);
+
+	// Detect Sufami Turbo carts
+	if (!memcmp(m_cart[slot_id].m_rom, "BANDAI SFC-ADX", 14))
 	{
 		m_cart[slot_id].mode = SNES_MODE_ST;
-		if (!memcmp(ROM + 16, "SFC-ADX BACKUP", 14))
+		if (!memcmp(m_cart[slot_id].m_rom + 16, "SFC-ADX BACKUP", 14))
 			st_bios = 1;
 	}
 	else
@@ -842,18 +848,12 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 		return IMAGE_INIT_FAIL;
 	}
 
-
-	m_cart[slot_id].m_rom_size = m_cart_size;
-	m_cart[slot_id].m_rom = auto_alloc_array_clear(machine(), UINT8, m_cart[0].m_rom_size);
-	memcpy(m_cart[slot_id].m_rom, ROM, m_cart[slot_id].m_rom_size - offset);
-	rom_map_setup(m_cart[slot_id].m_rom_size);
-
 	m_cart[slot_id].m_nvram_size = 0x20000;
 	m_cart[slot_id].m_nvram = auto_alloc_array_clear(machine(), UINT8, m_cart[slot_id].m_nvram_size);
 
 	sufami_load_sram(machine(), image.device().tag());
 
-	m_cart[slot_id].slot_in_use = 1; // aknowledge the cart in this slot, for saving sram at exit
+	m_cart[slot_id].slot_in_use = 1; // acknowledge the cart in this slot
 
 	return IMAGE_INIT_PASS;
 }
