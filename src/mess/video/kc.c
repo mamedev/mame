@@ -145,6 +145,7 @@ void kc_state::video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, UINT8 col
 void kc85_4_state::video_start()
 {
 	m_video_ram = machine().memory().region_alloc("videoram", (KC85_4_SCREEN_COLOUR_RAM_SIZE*2) + (KC85_4_SCREEN_PIXEL_RAM_SIZE*2), 1, ENDIANNESS_LITTLE)->base();
+	memset(m_video_ram, 0, (KC85_4_SCREEN_COLOUR_RAM_SIZE*2) + (KC85_4_SCREEN_PIXEL_RAM_SIZE*2));
 	m_display_video_ram = m_video_ram;
 
 	m_kc85_blink_state = 0;
