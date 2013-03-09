@@ -195,6 +195,7 @@ protected:
 	void write_operand(int ordinal, UINT8 data);
 
 	// delay loops
+	bool match_target_bytes(UINT16 address, const UINT8 *bytes, int length);
 	void burn_any_delay_loops();
 
 	// instructions
