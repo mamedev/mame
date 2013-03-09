@@ -81,7 +81,9 @@ DRIVER_INIT_MEMBER(mz_state,mz700)
 	m_mz700_mode = TRUE;
 
 	m_videoram = auto_alloc_array(machine(), UINT8, 0x800);
+	memset(m_videoram, 0, sizeof(UINT8) * 0x800);
 	m_colorram = auto_alloc_array(machine(), UINT8, 0x800);
+	memset(m_colorram, 0, sizeof(UINT8) * 0x800);
 }
 
 DRIVER_INIT_MEMBER(mz_state,mz800)
@@ -91,10 +93,12 @@ DRIVER_INIT_MEMBER(mz_state,mz800)
 
 	/* video ram */
 	m_videoram = auto_alloc_array(machine(), UINT8, 0x4000);
+	memset(m_videoram, 0, sizeof(UINT8) * 0x4000);
 	m_colorram = m_videoram + 0x800;
 
 	/* character generator ram */
 	m_cgram = auto_alloc_array(machine(), UINT8, 0x1000);
+	memset(m_cgram, 0, sizeof(UINT8) * 0x1000);
 }
 
 void mz_state::machine_start()
