@@ -445,6 +445,7 @@ CWAI:
 	if (m_nmi_asserted)
 		m_nmi_asserted = false;
 
+	set_ea(m_ea.w);	// need to do this to set the addressing mode
 	m_cc |= CC_I | (m_ea.w != VECTOR_IRQ ? CC_F : 0);
 	goto INTERRUPT_VECTOR;
 
