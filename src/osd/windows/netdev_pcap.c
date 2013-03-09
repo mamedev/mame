@@ -33,7 +33,7 @@ netdev_pcap::netdev_pcap(const char *name, class device_network_interface *ifdev
 	: netdev(ifdev, rate)
 {
 	char errbuf[PCAP_ERRBUF_SIZE];
-	m_p = pcap_open_live_dl(name, 65535, 1, 1, errbuf);
+	m_p = pcap_open_live_dl(name, 65535, 1, -1, errbuf);
 	if(!m_p)
 	{
 		logerror("Unable to open %s: %s\n", name, errbuf);
