@@ -297,7 +297,7 @@ static UINT32 snes_skip_header( device_image_interface &image, UINT32 snes_rom_s
 
 	/* Check for a header (512 bytes) */
 	if (image.software_entry() == NULL)
-		image.fread( header, 512);
+		image.fread(header, 512);
 	else
 		memcpy(header, image.get_software_region("rom"), 512);
 
@@ -330,7 +330,7 @@ static UINT32 snes_skip_header( device_image_interface &image, UINT32 snes_rom_s
 /* This determines if a cart is in Mode 20, 21, 22 or 25; sets state->m_cart[0].mode and
  state->m_cart[0].sram_max accordingly; and returns the offset of the internal header
  (needed to detect BSX and ST carts) */
-static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer, UINT32 offset, int cartid )
+static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer, UINT32 len, UINT32 offset, int cartid )
 {
 	snes_state *state = image.device().machine().driver_data<snes_state>();
 	UINT8 valid_mode20, valid_mode21, valid_mode25;
@@ -339,7 +339,7 @@ static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer,
 	/* Now to determine if this is a lo-ROM, a hi-ROM or an extended lo/hi-ROM */
 	valid_mode20 = snes_validate_infoblock(buffer, 0x007fc0);
 	valid_mode21 = snes_validate_infoblock(buffer, 0x00ffc0);
-	valid_mode25 = snes_validate_infoblock(buffer, 0x40ffc0);
+	valid_mode25 = (len > 0x40ffc0) ? snes_validate_infoblock(buffer, 0x40ffc0) : 0;
 
 	/* Images larger than 32mbits are likely ExHiRom */
 	if (valid_mode25)
@@ -561,14 +561,14 @@ static int snes_find_addon_chip( running_machine &machine, UINT8 *buffer, UINT32
 	return supported_type;
 }
 
-static void snes_cart_log_info( running_machine &machine, UINT8* ROM, int supported )
+static void snes_cart_log_info( running_machine &machine, UINT8* ROM, UINT32 len, int supported )
 {
 	snes_state *state = machine.driver_data<snes_state>();
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
 	char title[21], rom_id[4], company_id[2];
 	int i, company, has_ram = 0, has_sram = 0;
 	UINT32 offset = snes_skip_header(*image, state->m_cart_size);
-	UINT32 hilo_mode = snes_find_hilo_mode(*image, ROM, offset, 0);
+	UINT32 hilo_mode = snes_find_hilo_mode(*image, ROM, len, offset, 0);
 
 	/* Company */
 	for (i = 0; i < 2; i++)
@@ -645,43 +645,44 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	int supported_type = 1;
 	int has_bsx_slot = 0, st_bios = 0;
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = memregion("cart")->base();
 
 	if (image.software_entry() == NULL)
 		m_cart_size = image.length();
 	else
 		m_cart_size = image.get_software_region_length("rom");
 
-	/* Check for a header (512 bytes), and skip it if found */
+	// Check for a header (512 bytes), and skip it if found
 	offset = snes_skip_header(image, m_cart_size);
+
+	// Allocate rom pointer
+	m_cart[0].m_rom_size = m_cart_size - offset;
+	m_cart[0].m_rom = auto_alloc_array_clear(machine(), UINT8, m_cart[0].m_rom_size);
 
 	if (image.software_entry() == NULL)
 	{
 		image.fseek(offset, SEEK_SET);
-		image.fread(ROM, m_cart_size - offset);
+		image.fread(m_cart[0].m_rom, m_cart_size - offset);
 	}
 	else
-		memcpy(ROM, image.get_software_region("rom") + offset, m_cart_size - offset);
+		memcpy(m_cart[0].m_rom, image.get_software_region("rom") + offset, m_cart_size - offset);
 
 	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", m_cart_size - offset);
 
-	m_cart[0].m_rom_size = m_cart_size;
-	m_cart[0].m_rom = auto_alloc_array_clear(machine(), UINT8, m_cart[0].m_rom_size);
-	memcpy(m_cart[0].m_rom, ROM, m_cart[0].m_rom_size - offset);
+	// Setup the bank map to handle mirroring of ROM up to 8MB of accessible memory
 	rom_map_setup(m_cart[0].m_rom_size);
 
-	/* First, look if the cart is HiROM or LoROM (and set snes_cart accordingly) */
-	int_header_offs = snes_find_hilo_mode(image, ROM, offset, 0);
+	// Check if the cart is HiROM or LoROM (and set variables accordingly)
+	int_header_offs = snes_find_hilo_mode(image, m_cart[0].m_rom, m_cart[0].m_rom_size, offset, 0);
 
-	/* Then, detect BS-X carts */
-	// Detect presence of BS-X Flash Cart
-	if ((ROM[int_header_offs + 0x13] == 0x00 || ROM[int_header_offs + 0x13] == 0xff) &&
-			ROM[int_header_offs + 0x14] == 0x00)
+	// Detect BS-X carts:
+	// 1. Detect BS-X Flash Cart
+	if ((m_cart[0].m_rom[int_header_offs + 0x13] == 0x00 || m_cart[0].m_rom[int_header_offs + 0x13] == 0xff) &&
+			m_cart[0].m_rom[int_header_offs + 0x14] == 0x00)
 	{
-		UINT8 n15 = ROM[int_header_offs + 0x15];
+		UINT8 n15 = m_cart[0].m_rom[int_header_offs + 0x15];
 		if (n15 == 0x00 || n15 == 0x80 || n15 == 0x84 || n15 == 0x9c || n15 == 0xbc || n15 == 0xfc)
 		{
-			if (ROM[int_header_offs + 0x1a] == 0x33 || ROM[int_header_offs + 0x1a] == 0xff)
+			if (m_cart[0].m_rom[int_header_offs + 0x1a] == 0x33 || m_cart[0].m_rom[int_header_offs + 0x1a] == 0xff)
 			{
 				// BS-X Flash Cart
 				mame_printf_error("This is a game with BS-X slot: MESS does not support these yet, sorry.\n");
@@ -690,14 +691,14 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 		}
 	}
 
-	// Detect presence of BS-X flash cartridge connector
-	if ((ROM[int_header_offs - 14] == 'Z') && (ROM[int_header_offs - 11] == 'J'))
+	// 2. Detect presence of BS-X flash cartridge connector
+	if ((m_cart[0].m_rom[int_header_offs - 14] == 'Z') && (m_cart[0].m_rom[int_header_offs - 11] == 'J'))
 	{
-		UINT8 n13 = ROM[int_header_offs - 13];
+		UINT8 n13 = m_cart[0].m_rom[int_header_offs - 13];
 		if ((n13 >= 'A' && n13 <= 'Z') || (n13 >= '0' && n13 <= '9'))
 		{
-			if (ROM[int_header_offs + 0x1a] == 0x33 ||
-				(ROM[int_header_offs - 10] == 0x00 && ROM[int_header_offs - 4] == 0x00))
+			if (m_cart[0].m_rom[int_header_offs + 0x1a] == 0x33 ||
+				(m_cart[0].m_rom[int_header_offs - 10] == 0x00 && m_cart[0].m_rom[int_header_offs - 4] == 0x00))
 			{
 				has_bsx_slot = 1;
 			}
@@ -708,24 +709,22 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	if (has_bsx_slot)
 	{
 		mame_printf_error("This is a game with BS-X slot: MESS does not support these yet, sorry.\n");
-		if (!memcmp(ROM + int_header_offs, "Satellaview BS-X     ", 21))
+		if (!memcmp(m_cart[0].m_rom + int_header_offs, "Satellaview BS-X     ", 21))
 		{
 			//BS-X Base Cart
 			m_cart[0].mode = SNES_MODE_20; //SNES_MODE_BSX;
-			// handle RAM
 		}
 		else
 		{
 			m_cart[0].mode = (int_header_offs == 0x007fc0) ? SNES_MODE_20 : SNES_MODE_21; //SNES_MODE_BSLO : SNES_MODE_BSHI;
-			// handle RAM?
 		}
 	}
 
 	/* Then, detect Sufami Turbo carts */
-	if (!memcmp(ROM, "BANDAI SFC-ADX", 14))
+	if (!memcmp(m_cart[0].m_rom, "BANDAI SFC-ADX", 14))
 	{
 		m_cart[0].mode = SNES_MODE_ST;
-		if (!memcmp(ROM + 16, "SFC-ADX BACKUP", 14))
+		if (!memcmp(m_cart[0].m_rom + 16, "SFC-ADX BACKUP", 14))
 			st_bios = 1;
 	}
 	if (st_bios)
@@ -741,7 +740,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	if (SNES_CART_DEBUG) mame_printf_error("mode %d\n", m_cart[0].mode);
 
 	/* Detect special chips */
-	supported_type = snes_find_addon_chip(machine(), ROM, int_header_offs);
+	supported_type = snes_find_addon_chip(machine(), m_cart[0].m_rom, int_header_offs);
 
 	/* Find the amount of cart ram */
 	m_cart[0].m_nvram_size = 0;
@@ -749,9 +748,9 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	{
 		UINT32 nvram_size;
 		if ((m_has_addon_chip != HAS_SUPERFX))
-			nvram_size = ROM[int_header_offs + 0x18];
+			nvram_size = m_cart[0].m_rom[int_header_offs + 0x18];
 		else
-			nvram_size = (ROM[0x007fbd] & 0x07);
+			nvram_size = (m_cart[0].m_rom[0x007fbd] & 0x07);
 
 		if (nvram_size > 0)
 		{
@@ -782,7 +781,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 		m_cart[0].m_nvram = auto_alloc_array_clear(machine(), UINT8, m_cart[0].m_nvram_size);
 
 	/* Log snes_cart information */
-	snes_cart_log_info(machine(), ROM, supported_type);
+	snes_cart_log_info(machine(), m_cart[0].m_rom, m_cart[0].m_rom_size, supported_type);
 
 	/* Load SRAM */
 	if (m_cart[0].m_nvram_size > 0)
