@@ -190,6 +190,7 @@ UINT32 kc85_4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 void kc_state::video_start()
 {
 	m_video_ram = machine().memory().region_alloc("videoram", 0x4000, 1, ENDIANNESS_LITTLE)->base();
+	memset(m_video_ram, 0, 0x4000);
 
 	m_kc85_blink_state = 0;
 }
