@@ -35,7 +35,7 @@ static UINT16 uint16_to_le(UINT16 value)
 
 static UINT16 uint16_from_le(UINT16 value)
 {
-	return ((value&0x00ff)<<8)|((value&0xff00)>>8);
+	return value;
 }
 #else
 static UINT16 uint16_to_le(UINT16 value)
@@ -45,7 +45,7 @@ static UINT16 uint16_to_le(UINT16 value)
 
 static UINT16 uint16_from_le(UINT16 value)
 {
-	return value;
+	return ((value&0x00ff)<<8)|((value&0xff00)>>8);
 }
 #endif
 
