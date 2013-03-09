@@ -149,6 +149,11 @@ void hd61700_cpu_device::device_start()
 	save_item(NAME(m_regmain));
 	save_item(NAME(m_lines_status));
 
+	memset(m_regsir, 0, sizeof(m_regsir));
+	memset(m_reg8bit, 0, sizeof(m_reg8bit));
+	memset(m_reg16bit, 0, sizeof(m_reg16bit));
+	memset(m_regmain, 0, sizeof(m_regmain));
+
 	// register state for debugger
 	state_add(HD61700_PC, "pc",   m_pc).callimport().callexport().formatstr("%04X");
 	state_add(HD61700_F,  "f", m_flags).callimport().callexport().formatstr("%02X");
@@ -201,10 +206,10 @@ void hd61700_cpu_device::device_reset()
 	m_irq_status = 0;
 	prev_ua = 0;
 
-	memset(m_regsir, 0, ARRAY_LENGTH(m_regsir));
-	memset(m_reg8bit, 0, ARRAY_LENGTH(m_reg8bit));
-	memset(m_reg16bit, 0, ARRAY_LENGTH(m_reg16bit) * sizeof(UINT16));
-	memset(m_regmain, 0, ARRAY_LENGTH(m_regmain));
+	memset(m_regsir, 0, sizeof(m_regsir));
+	memset(m_reg8bit, 0, sizeof(m_reg8bit));
+	memset(m_reg16bit, 0, sizeof(m_reg16bit));
+	memset(m_regmain, 0, sizeof(m_regmain));
 
 	for (int i=0;i<6; i++)
 		m_lines_status[i] = CLEAR_LINE;
