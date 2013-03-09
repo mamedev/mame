@@ -850,7 +850,7 @@ int apollo_netserver_receive(device_t *device, const UINT8 rx_data_buffer[],
 	}
 	else if (current_rx_data_length > 0)
 	{
-		LOG(("!!!! apollo_netserver_receive: busy - skipped data with length %02x",rx_data_length));
+		LOG1(("apollo_netserver_receive: busy - skipped data with length %02x",rx_data_length));
 		return 0;
 	}
 	else
@@ -859,7 +859,7 @@ int apollo_netserver_receive(device_t *device, const UINT8 rx_data_buffer[],
 		current_rx_data_length = rx_data_length;
 
 		// delay response to multicast requests
-		int ms = is_apollo_multicast_address(rx_data_buffer) ? 100 : 1;
+		int ms = is_apollo_multicast_address(rx_data_buffer) ? 1000 : 1;
 		device->machine().scheduler().timer_set(attotime::from_msec(ms), FUNC(receive_interrupt), 0, device);
 		return 1;
 	}

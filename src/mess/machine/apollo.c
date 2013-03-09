@@ -440,7 +440,7 @@ READ8_MEMBER(apollo_state::apollo_dma_read_byte){
 	{
 		SLOG1(("dma read byte at offset %x+%03x = %02x", page_offset, offset, data));
 	}
-
+//	logerror(" %02x", data);
 	return data;
 }
 
@@ -460,6 +460,7 @@ WRITE8_MEMBER(apollo_state::apollo_dma_write_byte){
 	{
 		SLOG1(("dma write byte at offset %x+%03x = %02x", page_offset, offset , data));
 	}
+//	logerror(" %02x", data);
 }
 
 READ8_MEMBER(apollo_state::apollo_dma_read_word){
@@ -1408,6 +1409,9 @@ MACHINE_START_MEMBER(apollo_state,apollo)
 	pc_fdc_at_device *fdc = machine().device<pc_fdc_at_device>(APOLLO_FDC_TAG);
 	fdc->setup_intrq_cb(pc_fdc_at_device::line_cb(FUNC(apollo_state::fdc_interrupt), this));
 	fdc->setup_drq_cb(pc_fdc_at_device::line_cb(FUNC(apollo_state::fdc_dma_drq), this));
+
+	// motor is on, floppy disk is ready
+	fdc->fdc->ready_w(1);
 
 	device_start_apollo_ptm (machine().device(APOLLO_PTM_TAG) );
 	device_start_apollo_sio(machine().device(APOLLO_SIO_TAG));
