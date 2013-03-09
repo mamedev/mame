@@ -1956,4 +1956,7 @@ void tia_video_device::device_reset()
 	skipclipP1 = 0;
 	horzBL = 0;
 	VSYNC = 0;
+	CXM0P = 0;
+	COLUBK = 0;
+	COLUPF = 0;
 }
