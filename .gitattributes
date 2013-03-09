@@ -4850,6 +4850,7 @@ src/mame/machine/dc-ctrl.c svneol=native#text/plain
 src/mame/machine/dc-ctrl.h svneol=native#text/plain
 src/mame/machine/dc.c svneol=native#text/plain
 src/mame/machine/dec0.c svneol=native#text/plain
+src/mame/machine/decathlt.c svneol=native#text/plain
 src/mame/machine/deco102.c svneol=native#text/plain
 src/mame/machine/deco156.c svneol=native#text/plain
 src/mame/machine/deco222.c svneol=native#text/plain

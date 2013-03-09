@@ -1707,6 +1707,14 @@ ROM_START( decathlt )
 	ROM_LOAD16_WORD_SWAP( "mpr18970.4",    0x0c00000, 0x0400000, CRC(8b7a509e) SHA1(8f4d36a858231764ed09b26a1141d1f055eee092) ) // good (was .3)
 	ROM_LOAD16_WORD_SWAP( "mpr18971.5",    0x1000000, 0x0400000, CRC(c87c443b) SHA1(f2fedb35c80e5c4855c7aebff88186397f4d51bc) ) // good (was .4)
 	ROM_LOAD16_WORD_SWAP( "mpr18972.6",    0x1400000, 0x0400000, CRC(45c64fca) SHA1(ae2f678b9885426ce99b615b7f62a451f9ef83f9) ) // good (was .5)
+
+#if 0
+	// these are VDP2RAM dumps from the JPN Saturn version running in UME, saved from the debugger
+	ROM_REGION32_BE( 0x3000000, "fake0", ROMREGION_ERASE00 )
+	ROM_LOAD( "dec",    0x0000000, 0x80000,  CRC(5c8c4353) SHA1(18f317c8f0beac4ff3c9e56639b8e990e31f53ff) ) // on title screen
+	ROM_REGION( 0x3000000, "fake1", ROMREGION_ERASE00 )
+	ROM_LOAD( "dec2",    0x0000000, 0x80000, CRC(d1e08bc9) SHA1(3c5867de81a380bfc181d57214b86ce891b05f06) ) // on select char screen
+#endif
 ROM_END
 
 ROM_START( decathlto )
