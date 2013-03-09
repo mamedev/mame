@@ -642,23 +642,47 @@ void threecom3c505_device::do_receive_command()
 //			m_response.data.rcv_resp.buf_ofs = htole16(0);
 //			m_response.data.rcv_resp.buf_seg = htole16(0);
 //			m_response.data.rcv_resp.buf_len = htole16(buf_len);
-			m_response.data.rcv_resp.pkt_len = htole16(m_rx_data_buffer.get_length());
-			m_response.data.rcv_resp.timeout = htole16(0); // successful completion
-			m_response.data.rcv_resp.status  = htole16(m_rx_data_buffer.get_length() > 0 ? 0 : 0xffff);
-			m_response.data.rcv_resp.timetag = htole32(0); // TODO: time tag
+
+			// htole16 and friends are not portable beyond Linux.  It's named differently on *BSD and differently again on OS X.  Avoid!
+			#ifdef LSB_FIRST
+			m_response.data.rcv_resp.pkt_len = m_rx_data_buffer.get_length();
+			m_response.data.rcv_resp.timeout = 0; // successful completion
+			m_response.data.rcv_resp.status  = m_rx_data_buffer.get_length() > 0 ? 0 : 0xffff;
+			m_response.data.rcv_resp.timetag = 0; // TODO: time tag
+			#else
+			UINT16 temp;
+			temp = m_rx_data_buffer.get_length();
+			m_response.data.rcv_resp.pkt_len = (temp << 8) | (temp>>8);
+			m_response.data.rcv_resp.timeout = 0; // successful completion
+			temp  = m_rx_data_buffer.get_length() > 0 ? 0 : 0xffff;
+			m_response.data.rcv_resp.status = (temp << 8) | (temp>>8);                                                                              
+			m_response.data.rcv_resp.timetag = 0; // TODO: time tag
+			#endif
 
 			// compute and check no of bytes to be DMA'ed (must be even)
-			UINT16 buf_len = le16toh(m_response.data.rcv_resp.buf_len) & ~1;
+			#ifdef LSB_FIRST
+			UINT16 buf_len = m_response.data.rcv_resp.buf_len & ~1;
+			#else
+			UINT16 buf_len = ((m_response.data.rcv_resp.buf_len&0xff)<<8) || ((m_response.data.rcv_resp.buf_len&0xff00)>>8) & ~1;
+			#endif
 			if (m_rx_data_buffer.get_length() > buf_len)
 			{
 				LOG1(("do_receive_command !!! buffer size too small (%d < %d)", buf_len, m_rx_data_buffer.get_length()));
-				m_response.data.rcv_resp.pkt_len = htole16(buf_len);
+				#ifdef LSB_FIRST
+				m_response.data.rcv_resp.pkt_len = buf_len;
+				#else
+				m_response.data.rcv_resp.pkt_len = ((buf_len & 0xff)<<8) | ((buf_len & 0xff00)>>8);
+				#endif
 				m_response.data.rcv_resp.status = 0xffff;
 			}
 			else
 			{
 				buf_len = (m_rx_data_buffer.get_length() + 1) & ~1;
-				m_response.data.rcv_resp.buf_len = htole16(buf_len);
+				#ifdef LSB_FIRST
+				m_response.data.rcv_resp.pkt_len = buf_len;
+				#else
+				m_response.data.rcv_resp.pkt_len = ((buf_len & 0xff)<<8) | ((buf_len & 0xff00)>>8);
+				#endif
 			}
 
 			m_response_length = m_response.length + 2;
