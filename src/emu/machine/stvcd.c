@@ -140,10 +140,11 @@ void saturn_state::cd_exec_command( void )
 				cr_standard_return(cd_stat);
 			else
 			{
-				cr1 = prev_cr1;
+				cr1 = (cd_stat) | (prev_cr1 & 0xff);
 				cr2 = prev_cr2;
 				cr3 = prev_cr3;
 				cr4 = prev_cr4;
+				status_type = 0; /* Road Blaster and friends needs this. */
 			}
 			//CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
 			break;
@@ -330,7 +331,7 @@ void saturn_state::cd_exec_command( void )
 			hirqreg |= CMOK;
 
 			CDROM_LOG(("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4))
-			status_type = 0;
+			status_type = 1;
 			break;
 
 		case 0x10: // Play Disc.  FAD is in lowest 7 bits of cr1 and all of cr2.
@@ -883,7 +884,7 @@ void saturn_state::cd_exec_command( void )
 
 				hirqreg |= (CMOK|ESEL);
 				cr_standard_return(cd_stat);
-				status_type = 1;
+				status_type = 0;
 			}
 			break;
 
@@ -1367,10 +1368,13 @@ void saturn_state::cd_exec_command( void )
 			break;
 	}
 
-	prev_cr1 = cr1;
-	prev_cr2 = cr2;
-	prev_cr3 = cr3;
-	prev_cr4 = cr4;
+	if(status_type == 1)
+	{
+		prev_cr1 = cr1;
+		prev_cr2 = cr2;
+		prev_cr3 = cr3;
+		prev_cr4 = cr4;
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( saturn_state::stv_sh1_sim )
