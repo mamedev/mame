@@ -1314,6 +1314,8 @@ void mc6845_device::device_reset()
 	m_cursor_x = 0;
 	m_mode_control = 0;
 	m_register_address_latch = 0;
+	m_update_addr = 0;
+	m_light_pen_addr = 0;
 }
 
 

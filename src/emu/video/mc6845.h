@@ -189,7 +189,6 @@ protected:
 	devcb_resolved_write_line   m_res_out_hsync_func;
 	devcb_resolved_write_line   m_res_out_vsync_func;
 
-	int m_device_type;
 	screen_device *m_screen;
 
 	/* register file */
