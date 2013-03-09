@@ -651,6 +651,7 @@ void nakajies_state::machine_reset()
 	{
 		m_bank[i] = 0;
 	}
+	memset(m_ram_base, 0, m_ram_size);
 	update_banks();
 }
 
