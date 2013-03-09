@@ -78,7 +78,7 @@ void at45db041_device::device_start()
 	m_size = num_pages() * page_size();
 	m_data = auto_alloc_array(machine(), UINT8, m_size);
 	m_buffer1 = auto_alloc_array(machine(), UINT8, page_size());
-	m_buffer2 = auto_alloc_array(machine(), UINT8, page_size());
+	//m_buffer2 = auto_alloc_array(machine(), UINT8, page_size());
 
 	// data
 	save_pointer(NAME(m_data), m_size);
@@ -102,6 +102,7 @@ void at45db041_device::device_reset()
 	_logerror( 1, ("at45dbxx_reset\n"));
 	// mode
 	m_mode = FLASH_MODE_SI;
+	m_status = 0;
 	// command
 	memset(&m_cmd.data[0], 0, sizeof(m_cmd.data));
 	m_cmd.size = 0;

@@ -73,7 +73,7 @@ protected:
 	UINT8       m_mode;
 	UINT8       m_status;
 	UINT8 *     m_buffer1;
-	UINT8 *     m_buffer2;
+	//UINT8 *     m_buffer2;
 	UINT8       m_si_byte;
 	UINT8       m_si_bits;
 	UINT8       m_so_byte;
