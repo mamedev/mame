@@ -304,6 +304,7 @@ void i8251_device::device_reset()
 
 	transmit_register_reset();
 	receive_register_reset();
+	m_flags = 0;
 	/* expecting mode byte */
 	m_flags |= I8251_EXPECTING_MODE;
 	/* not expecting a sync byte */
@@ -314,6 +315,7 @@ void i8251_device::device_reset()
 	m_status = I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY;
 	m_mode_byte = 0;
 	m_command = 0;
+	m_data = 0;
 
 	/* update tx empty pin output */
 	update_tx_empty();
