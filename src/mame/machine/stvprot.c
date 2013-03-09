@@ -102,10 +102,17 @@ For now I'm writing this function with a command basis so I can work better with
 #include "stvprot.h"
 #include "includes/stv.h"
 
+// these should become member variables!
+UINT32 m_abus_protenable;
+UINT32 m_abus_prot_addr;
+UINT32 m_abus_protkey;
+
 static UINT32 a_bus[4];
 static UINT32 ctrl_index;
 static UINT32 internal_counter;
 static UINT8 char_offset; //helper to jump the decoding of the NULL chars.
+
+
 
 /************************
 *
@@ -123,6 +130,12 @@ static UINT8 char_offset; //helper to jump the decoding of the NULL chars.
  with 0x60651f8
  */
 
+
+//MAIN : 12120000  DATA : 0ad20069 Tecmo logo
+//MAIN : 12120000  DATA : e332006b title screen
+// TODO: encrypted / compressed data.
+// Both points to a section that has a string ("TECMO" / "TITLE")
+
 static UINT32 twcup_prot_data[8] =
 {
 	0x23232323, 0x23232323, 0x4c4c4c4c, 0x4c156301
@@ -132,16 +145,16 @@ static READ32_HANDLER( twcup98_prot_r )
 {
 	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
 
-	if(a_bus[0] & 0x00010000)//protection calculation is activated
+	if(m_abus_protenable & 0x00010000)
 	{
 		if(offset == 3)
 		{
 			UINT32 res;
-			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),m_abus_protkey);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),m_abus_protkey);
 			#endif
-			switch(a_bus[3] >> 16)
+			switch(m_abus_protkey >> 16)
 			{
 				case 0x1212:
 					if(ctrl_index & 2)
@@ -172,42 +185,7 @@ static READ32_HANDLER( twcup98_prot_r )
 	}
 }
 
-static WRITE32_HANDLER ( twcup98_prot_w )
-{
-	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
 
-	if(offset == 3)
-	{
-		int a_bus_vector;
-
-		a_bus_vector = a_bus[2] >> 16;
-		a_bus_vector|= (a_bus[2] & 0xffff) << 16;
-		a_bus_vector<<= 1;
-
-		//MAIN : 12120000  DATA : 0ad20069 Tecmo logo
-		//MAIN : 12120000  DATA : e332006b title screen
-
-		/* TODO: encrypted / compressed data.
-		   Both points to a section that has a string ("TECMO" / "TITLE") */
-
-		//printf("MAIN : %08x  DATA : %08x %08x\n",a_bus[3],a_bus[2],a_bus_vector);
-
-		switch(a_bus[3] >> 16)
-		{
-			case 0x1212:
-				ctrl_index = a_bus_vector;
-				break;
-		}
-
-	}
-	//popmessage("%04x %04x",data,offset/4);
-}
-
-void install_twcup98_protection(running_machine &machine)
-{
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(twcup98_prot_r), FUNC(twcup98_prot_w));
-}
 
 /**************************
 *
@@ -219,34 +197,53 @@ static READ32_HANDLER( sss_prot_r )
 {
 	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
 
-	if(a_bus[0] & 0x00010000)//protection calculation is activated
+	if(m_abus_protenable & 0x00010000)//protection calculation is activated
 	{
 		if(offset == 3)
 		{
 			UINT32 res;
 
-			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),m_abus_protkey);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),m_abus_protkey);
 			#endif
-			switch(a_bus[3]>>16)
+			int read_offset_hack = 0;
+			
+			/*
+				MAIN : 2c5b0000  DATA : 000000a6 014c0000
+				MAIN : 47f10000  DATA : 0f9800a6 014c1f30
+				MAIN : fcda0000  DATA : 1d4800a6 014c3a90
+				MAIN : b5e60000  DATA : 29e300a6 014c53c6
+				MAIN : 392c0000  DATA : 38e900a6 014c71d2
+				MAIN : 77c30000  DATA : 462500a6 014c8c4a
+				MAIN : 8a620000  DATA : 555c00a6 014caab8
+			*/
+
+			// I have a feeling rather than the offsets being scrambled they were lazy
+			// and left unencrypted copies in the ROM... but this still needs verification
+			switch(m_abus_protkey>>16)
 			{
-				case 0x2c5b:
-				case 0x47f1:
-				case 0xfcda:
-				case 0xb5e6:
-				case 0x392c:
-				case 0x77c3:
-				case 0x8a62:
+				case 0x2c5b: read_offset_hack = 0x60054; break;
+				case 0x47f1: read_offset_hack = 0x56498; break;
+				case 0xfcda: read_offset_hack = 0x50b0c; break;
+				case 0xb5e6: read_offset_hack = 0x4af56; break;
+				case 0x392c: read_offset_hack = 0x45876; break;
+				case 0x77c3: read_offset_hack = 0x3fe02; break;
+				case 0x8a62: read_offset_hack = 0x3a784; break;
+			}
+
+			switch(m_abus_protkey>>16)
+			{
+				default:
 					if(ctrl_index & 2)
 					{
-						res = (ROM[ctrl_index / 4] & 0xffff) << 16;
-						res |= (ROM[(ctrl_index+4) / 4] & 0xffff0000) >> 16;
+						res = (ROM[(ctrl_index-read_offset_hack) / 4] & 0xffff) << 16;
+						res |= (ROM[((ctrl_index-read_offset_hack)+4) / 4] & 0xffff0000) >> 16;
 					}
 					else
 					{
-						res = ROM[ctrl_index / 4] & 0xffff0000;
-						res |= ROM[ctrl_index / 4] & 0xffff;
+						res = ROM[(ctrl_index-read_offset_hack) / 4] & 0xffff0000;
+						res |= ROM[(ctrl_index-read_offset_hack) / 4] & 0xffff;
 					}
 					ctrl_index+=4;
 					return res;
@@ -261,54 +258,8 @@ static READ32_HANDLER( sss_prot_r )
 	}
 }
 
-static WRITE32_HANDLER ( sss_prot_w )
-{
-	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
-	if(offset == 3)
-	{
-		int a_bus_vector;
 
-		a_bus_vector = a_bus[2] >> 16;
-		a_bus_vector|= (a_bus[2] & 0xffff) << 16;
-		a_bus_vector<<= 1;
 
-		/*
-MAIN : 2c5b0000  DATA : 000000a6 014c0000
-MAIN : 47f10000  DATA : 0f9800a6 014c1f30
-MAIN : fcda0000  DATA : 1d4800a6 014c3a90
-MAIN : b5e60000  DATA : 29e300a6 014c53c6
-MAIN : 392c0000  DATA : 38e900a6 014c71d2
-MAIN : 77c30000  DATA : 462500a6 014c8c4a
-MAIN : 8a620000  DATA : 555c00a6 014caab8
-		*/
-
-//		printf("MAIN : %08x  DATA : %08x %08x\n",a_bus[3],a_bus[2],a_bus_vector);
-		switch(a_bus[3] >> 16)
-		{
-			/* Note: only the first value is TRUSTED (because it's tested in the code).
-			   Others are hand-tuned by checking if there isn't any garbage during display. */
-			case 0x2c5b: ctrl_index = (a_bus_vector-0x60054); break;
-			case 0x47f1: ctrl_index = (a_bus_vector-0x56498); break;
-			case 0xfcda: ctrl_index = (a_bus_vector-0x50b0c); break;
-			case 0xb5e6: ctrl_index = (a_bus_vector-0x4af56); break;
-			case 0x392c: ctrl_index = (a_bus_vector-0x45876); break;
-			case 0x77c3: ctrl_index = (a_bus_vector-0x3fe02); break;
-			case 0x8a62: ctrl_index = (a_bus_vector-0x3a784); break;
-			default:
-				ctrl_index = 0;
-				popmessage("Unknown SSS seed %04x, contact MAMEdev",a_bus[3] >> 16);
-				break;
-		}
-
-//		printf("%08x\n",ctrl_index);
-	}
-}
-
-void install_sss_protection(running_machine &machine)
-{
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(sss_prot_r), FUNC(sss_prot_w));
-}
 
 /*************************************
 *
@@ -320,15 +271,15 @@ static READ32_HANDLER( rsgun_prot_r )
 {
 	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
 
-	if(a_bus[0] & 0x00010000)//protection calculation is activated
+	if(m_abus_protenable & 0x00010000)//protection calculation is activated
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),m_abus_protkey);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),m_abus_protkey);
 			#endif
-			switch(a_bus[3])
+			switch(m_abus_protkey)
 			{
 				case 0x77770000: {//rsgun
 					UINT32 val =
@@ -359,15 +310,25 @@ static WRITE32_HANDLER ( rsgun_prot_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
 	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
-	if(offset == 3)
+
+	if (offset == 0)
 	{
+		COMBINE_DATA(&m_abus_protenable);
+	}
+	else if(offset == 2)
+	{
+		COMBINE_DATA(&m_abus_prot_addr);
+	}
+	else if(offset == 3)
+	{
+		COMBINE_DATA(&m_abus_protkey);
 //		int a_bus_vector;
 
-//		a_bus_vector = a_bus[2] >> 16;
-//		a_bus_vector|= (a_bus[2] & 0xffff) << 16;
+//		a_bus_vector = m_abus_prot_addr >> 16;
+//		a_bus_vector|= (m_abus_prot_addr & 0xffff) << 16;
 //		a_bus_vector<<= 1;
-//		printf("MAIN : %08x  DATA : %08x %08x\n",a_bus[3],a_bus[2],a_bus_vector);
-		switch(a_bus[3])
+//		printf("MAIN : %08x  DATA : %08x %08x\n",m_abus_protkey,m_abus_prot_addr,a_bus_vector);
+		switch(m_abus_protkey)
 		{
 			case 0x77770000: ctrl_index = 0; break;
 		}
@@ -375,10 +336,8 @@ static WRITE32_HANDLER ( rsgun_prot_w )
 	//popmessage("%04x %04x",data,offset/4);
 }
 
-void install_rsgun_protection(running_machine &machine)
-{
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(rsgun_prot_r), FUNC(rsgun_prot_w));
-}
+
+
 
 /*************************
 *
@@ -390,16 +349,16 @@ static READ32_HANDLER( elandore_prot_r )
 {
 	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
 
-	if(a_bus[0] & 0x00010000)//protection calculation is activated
+	if(m_abus_protenable & 0x00010000)//protection calculation is activated
 	{
 		if(offset == 3)
 		{
 			UINT32 res;
-			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),m_abus_protkey);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",space.device().safe_pc(),m_abus_protkey);
 			#endif
-			switch(a_bus[3] >> 16)
+			switch(m_abus_protkey >> 16)
 			{
 				default:
 					if(ctrl_index & 2)
@@ -425,33 +384,7 @@ static READ32_HANDLER( elandore_prot_r )
 	}
 }
 
-static WRITE32_HANDLER ( elandore_prot_w )
-{
-	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
-	if(offset == 3)
-	{
-		int a_bus_vector;
 
-		a_bus_vector = a_bus[2] >> 16;
-		a_bus_vector|= (a_bus[2] & 0xffff) << 16;
-		a_bus_vector<<= 1;
-
-		//printf("MAIN : %08x  DATA : %08x %08x\n",a_bus[3],a_bus[2],a_bus_vector);
-		switch(a_bus[3] >> 16)
-		{
-			default:
-				ctrl_index = a_bus_vector;
-				break;
-		}
-	}
-	//popmessage("%04x %04x",data,offset/4);
-}
-
-void install_elandore_protection(running_machine &machine)
-{
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(elandore_prot_r), FUNC(elandore_prot_w));
-}
 
 /*************************
 *
@@ -724,15 +657,15 @@ static READ32_HANDLER( ffreveng_prot_r )
 {
 	UINT32 *ROM = (UINT32 *)space.machine().root_device().memregion("abus")->base();
 
-	if(a_bus[0] & 0x00010000)//protection calculation is activated
+	if(m_abus_protenable & 0x00010000)//protection calculation is activated
 	{
 		if(offset == 3)
 		{
 			#if 0
 			UINT32 res;
 			#endif
-			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),a_bus[3]);
-			switch(a_bus[3] >> 16)
+			logerror("A-Bus control protection read at %06x with data = %08x\n",space.device().safe_pc(),m_abus_protkey);
+			switch(m_abus_protkey >> 16)
 			{
 				case 0x10da://ffreveng, boot vectors at $6080000,test mode
 				case 0x10d7://ffreveng, boot vectors at $6080000,attract mode
@@ -761,34 +694,7 @@ static READ32_HANDLER( ffreveng_prot_r )
 	}
 }
 
-static WRITE32_HANDLER ( ffreveng_prot_w )
-{
-	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
-	if(offset == 3)
-	{
-		int a_bus_vector;
 
-		a_bus_vector = a_bus[2] >> 16;
-		a_bus_vector|= (a_bus[2] & 0xffff) << 16;
-		a_bus_vector<<= 1;
-
-		printf("MAIN : %08x  DATA : %08x %08x\n",a_bus[3],a_bus[2],a_bus_vector);
-		switch(a_bus[3] >> 16)
-		{
-			case 0x10d7: ctrl_index = a_bus_vector; break;
-			case 0x10da: ctrl_index = a_bus_vector; break;
-			default:
-				ctrl_index = 0;
-		}
-	}
-	//popmessage("%04x %04x",data,offset/4);
-}
-
-void install_ffreveng_protection(running_machine &machine)
-{
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(ffreveng_prot_r), FUNC(ffreveng_prot_w));
-}
 
 /************************
 *
@@ -798,37 +704,105 @@ void install_ffreveng_protection(running_machine &machine)
 
 static READ32_HANDLER(astrass_prot_r)
 {
-	if ( offset == 3 && ctrl_index != -1 )
+	if(m_abus_protenable & 0x00010000)
 	{
-		UINT32 data = 0;
-		UINT32 *prot_data = (UINT32 *)space.machine().root_device().memregion("user2")->base();
-
-		data = prot_data[ctrl_index++];
-
-		if ( ctrl_index >= space.machine().root_device().memregion("user2")->bytes()/4 )
+		if(offset == 3)
 		{
-			ctrl_index = -1;
-		}
 
-		return data;
+			/* we're reading from a custom region, NOT the rom address, so we're based at 0, the real data likely exists at this address */
+			int read_offset_hack = 0x4ec260;
+
+			UINT32 data = 0;
+			UINT32 *prot_data = (UINT32 *)space.machine().root_device().memregion("user2")->base();
+
+			data = prot_data[(ctrl_index-read_offset_hack)];
+			ctrl_index++;
+
+			if ( (ctrl_index-read_offset_hack) >= space.machine().root_device().memregion("user2")->bytes()/4 )
+			{
+				ctrl_index = -1;
+			}
+
+			return data;
+		}
+		
 	}
 	return a_bus[offset];
 }
 
-static WRITE32_HANDLER(astrass_prot_w)
+
+
+static WRITE32_HANDLER ( common_prot_w )
 {
-	COMBINE_DATA(&a_bus[0 + offset]);
-	if ( offset == 3 )
+	COMBINE_DATA(&a_bus[offset]);
+	//printf("A-Bus control protection write at %06x: [%02x] <- %08x\n",space.device().safe_pc(),offset,data);
+	
+	if (offset == 0)
 	{
-		ctrl_index = 0;
+		COMBINE_DATA(&m_abus_protenable);
 	}
+	else if(offset == 2)
+	{
+		COMBINE_DATA(&m_abus_prot_addr);
+	}
+	else if(offset == 3)
+	{
+		COMBINE_DATA(&m_abus_protkey);
+		int a_bus_vector;
+		a_bus_vector = m_abus_prot_addr >> 16;
+		a_bus_vector|= (m_abus_prot_addr & 0xffff) << 16;
+		a_bus_vector<<= 1;
+		//printf("MAIN : %08x  DATA : %08x %08x\n",m_abus_protkey,m_abus_prot_addr,a_bus_vector);
+		
+		// if you look at the first transfer in ffreveng this is clearly a ROM address from a table |  MAIN : 10d70000  DATA : 0b780013 002616f0
+		// (opr21872.7, offset 0x616f0, which happens to be 0x2616f0 in the ROM region "game0")
+		// the values sent by the CPU are plucked from a table above where the data is, located at 0x60000
+		// Offset      0  1  2  3  4  5  6  7   8  9  A  B  C  D  E  F
+		// 00060000   00 00 16 F0 00 00 2F A0  00 00 46 90 00 00 4D 04
+		// this is the first entry in the table, 0x16f0 is the address, 0x2fa0 is the length.
+		// the next entry is address 0x4690, length 0x4d04.  0x16f0 + 0x2fa0 == 0x4690 so that entry is located straight after the first one
+		// the game reads the number of bytes specified in the length via the protection device, writing them to RAM.  This suggests there
+		// is no compression going on, only some form of encryption.
+
+		ctrl_index = a_bus_vector;
+	}
+}
+
+
+
+
+void install_sss_protection(running_machine &machine)
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(sss_prot_r), FUNC(common_prot_w));
 }
 
 void install_astrass_protection(running_machine &machine)
 {
 	ctrl_index = -1;
-	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(astrass_prot_r), FUNC(astrass_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(astrass_prot_r), FUNC(common_prot_w));
 }
+
+void install_ffreveng_protection(running_machine &machine)
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(ffreveng_prot_r), FUNC(common_prot_w));
+}
+
+void install_elandore_protection(running_machine &machine)
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(elandore_prot_r), FUNC(common_prot_w));
+}
+
+void install_rsgun_protection(running_machine &machine)
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(rsgun_prot_r), FUNC(rsgun_prot_w));
+}
+
+void install_twcup98_protection(running_machine &machine)
+{
+	machine.device("maincpu")->memory().space(AS_PROGRAM).install_legacy_readwrite_handler(0x4fffff0, 0x4ffffff, FUNC(twcup98_prot_r), FUNC(common_prot_w));
+}
+
+
 
 void stv_register_protection_savestates(running_machine &machine)
 {
