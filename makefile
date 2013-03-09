@@ -523,7 +523,8 @@ CCOMFLAGS += \
 	-Wno-cast-align \
 	-Wno-tautological-compare \
 	-Wno-constant-logical-operand \
-	-Wno-format-security
+	-Wno-format-security \
+	-Wno-shift-count-overflow
 endif
 
 
