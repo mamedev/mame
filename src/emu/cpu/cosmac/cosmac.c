@@ -305,6 +305,9 @@ void cosmac_device::device_start()
 void cosmac_device::device_reset()
 {
 	m_ie = 0;
+	m_q = 0;
+	m_df = 0;
+	memset(m_r, 0, sizeof(m_r));
 }
 
 
