@@ -135,6 +135,7 @@ void upd765_family_device::device_start()
 			floppy_connector *con = subdevice<floppy_connector>(name);
 			if(con) {
 				flopi[i].dev = con->get_device();
+				assert(flopi[i].dev != NULL);
 				flopi[i].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(upd765_family_device::index_callback), this));
 			} else
 				flopi[i].dev = NULL;
