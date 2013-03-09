@@ -761,7 +761,7 @@ void amstrad_state::amstrad_plus_update_video()
 			m_gate_array.draw_p++;
 			cycles_passed--;
 			m_gate_array.line_ticks++;
-			if ( m_gate_array.line_ticks > m_gate_array.bitmap->width() )
+			if ( m_gate_array.line_ticks >= m_gate_array.bitmap->width() )
 			{
 				m_gate_array.draw_p = NULL;
 				cycles_passed = 0;
