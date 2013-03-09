@@ -1963,6 +1963,8 @@ void fm7_state::machine_reset()
 		// Probably best to halt the 8088, I'm pretty sure it and the main 6809 should not be running at the same time
 		machine().device("x86")->execute().set_input_line(INPUT_LINE_HALT,ASSERT_LINE);
 	}
+
+	memset(m_video_ram, 0, sizeof(UINT8) * 0x18000);
 }
 
 static const wd17xx_interface fm7_mb8877a_interface =
