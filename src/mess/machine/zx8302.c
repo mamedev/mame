@@ -307,6 +307,7 @@ zx8302_device::zx8302_device(const machine_config &mconfig, const char *tag, dev
 		m_ipc_state(0),
 		m_ipc_rx(0),
 		m_ipc_busy(0),
+		m_baudx4(0),
 		m_tx_bits(0),
 		m_track(0)
 {
