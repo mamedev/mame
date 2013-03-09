@@ -489,6 +489,7 @@ SWI:
 	// doesn't use SOFTWARE_INTERRUPT label because SWI will
 	// inhibit IRQ/FIRQ
 	set_ea(VECTOR_SWI);
+	m_cc |= CC_E;
 	set_regop16(m_s);
 	m_temp.w = entire_state_registers();
 	%PUSH_REGISTERS;
