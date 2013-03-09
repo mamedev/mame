@@ -13,6 +13,7 @@ class ne1000_device: public device_t,
 public:
 	ne1000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	void ne1000_irq_w(int state);
 	DECLARE_READ8_MEMBER(ne1000_mem_read);
@@ -25,6 +26,7 @@ protected:
 	virtual void device_config_complete() { m_shortname = "ne1000"; }
 private:
 	required_device<dp8390d_device> m_dp8390;
+	UINT8 m_irq;
 	UINT8 m_board_ram[8*1024];
 	UINT8 m_prom[16];
 };
