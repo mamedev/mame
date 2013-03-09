@@ -628,7 +628,8 @@ void sdd1_mmio_write(address_space &space, UINT32 addr, UINT8 data)
 
 UINT8 sdd1_read(running_machine& machine, UINT32 addr)
 {
-	unsigned char *ROM = machine.root_device().memregion("cart")->base();
+	snes_state *state = machine.driver_data<snes_state>();
+	UINT8 *ROM = state->m_cart[0].m_rom;
 
 	if (snes_sdd1.sdd1_enable & snes_sdd1.xfer_enable)
 	{

@@ -1060,7 +1060,8 @@ static void spc7110_update_time(running_machine &machine, UINT8 offset)
 UINT8 spc7110_mmio_read(address_space &space, UINT32 addr)
 {
 	running_machine &machine = space.machine();
-	UINT8 *ROM = machine.root_device().memregion("cart")->base();
+	snes_state *state = machine.driver_data<snes_state>();
+	UINT8 *ROM = state->m_cart[0].m_rom;
 
 	addr &= 0xffff;
 
@@ -1246,7 +1247,8 @@ UINT8 spc7110_mmio_read(address_space &space, UINT32 addr)
 
 void spc7110_mmio_write(running_machine &machine, UINT32 addr, UINT8 data)
 {
-	UINT8 *ROM = machine.root_device().memregion("cart")->base();
+	snes_state *state = machine.driver_data<snes_state>();
+	UINT8 *ROM = state->m_cart[0].m_rom;
 
 	addr &= 0xffff;
 
@@ -1632,7 +1634,8 @@ void spc7110_mmio_write(running_machine &machine, UINT32 addr, UINT8 data)
 
 UINT8 spc7110_bank7_read(address_space &space, UINT32 offset)
 {
-	UINT8 *ROM = space.machine().root_device().memregion("cart")->base();
+	snes_state *state = space.machine().driver_data<snes_state>();
+	UINT8 *ROM = state->m_cart[0].m_rom;
 	UINT32 addr = offset & 0x0fffff;
 
 	switch (offset & 0xf00000)
