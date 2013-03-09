@@ -3413,6 +3413,7 @@ MACHINE_START_MEMBER(pc9801_state,pc9821)
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9801_common)
 {
+	memset(m_tvram, 0, sizeof(UINT8) * 0x4000);
 	/* this looks like to be some kind of backup ram, system will boot with green colors otherwise */
 	{
 		int i;
@@ -3478,6 +3479,7 @@ MACHINE_RESET_MEMBER(pc9801_state,pc9801rs)
 	m_access_ctrl = 0;
 	m_keyb_press = 0xff; // temp kludge, for PC-9821 booting
 //  m_has_opna = machine().root_device().ioport("SOUND_CONFIG")->read() & 1;
+	memset(m_work_ram, 0, sizeof(UINT8) * 0xa0000);
 }
 
 MACHINE_RESET_MEMBER(pc9801_state,pc9821)
