@@ -156,6 +156,9 @@ void i82371sb_device::device_start()
 void i82371sb_device::device_reset()
 {
 	southbridge_device::device_reset();
+
+	memset(m_regs, 0, sizeof(m_regs));
+
 	/* isa */
 	m_regs[0][0x00] = 0x70008086;
 	m_regs[0][0x04] = 0x00000000;
@@ -173,5 +176,4 @@ void i82371sb_device::device_reset()
 	m_regs[2][0x04] = 0x02800000;
 	m_regs[2][0x08] = 0x0c030000;
 	m_regs[2][0x0c] = 0x00000000;
-
 }
