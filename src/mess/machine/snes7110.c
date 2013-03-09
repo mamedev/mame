@@ -921,7 +921,7 @@ void spc7110_init(running_machine& machine)
 	snes_spc7110.r4841 = 0x00;
 	snes_spc7110.r4842 = 0x00;
 
-	snes_spc7110.size = state->m_cart_size;
+	snes_spc7110.size = state->m_cart[0].m_rom_size;
 
 	snes_spc7110.decomp = auto_alloc(machine, SPC7110Decomp(machine, snes_spc7110.size));
 }

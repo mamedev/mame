@@ -330,7 +330,7 @@ static UINT32 snes_skip_header( device_image_interface &image, UINT32 snes_rom_s
 /* This determines if a cart is in Mode 20, 21, 22 or 25; sets state->m_cart[0].mode and
  state->m_cart[0].sram_max accordingly; and returns the offset of the internal header
  (needed to detect BSX and ST carts) */
-static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer, UINT32 len, UINT32 offset, int cartid )
+static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer, UINT32 len, int cartid )
 {
 	snes_state *state = image.device().machine().driver_data<snes_state>();
 	UINT8 valid_mode20, valid_mode21, valid_mode25;
@@ -347,7 +347,7 @@ static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer,
 
 	if ((valid_mode20 >= valid_mode21) && (valid_mode20 >= valid_mode25))
 	{
-		if ((buffer[0x007fd5] == 0x32) || ((state->m_cart_size - offset) > 0x401000))
+		if (buffer[0x007fd5] == 0x32 || len > 0x401000)
 			state->m_cart[cartid].mode = SNES_MODE_22;  // ExLoRom
 		else
 			state->m_cart[cartid].mode = SNES_MODE_20;  // LoRom
@@ -567,8 +567,7 @@ static void snes_cart_log_info( running_machine &machine, UINT8* ROM, UINT32 len
 	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
 	char title[21], rom_id[4], company_id[2];
 	int i, company, has_ram = 0, has_sram = 0;
-	UINT32 offset = snes_skip_header(*image, state->m_cart_size);
-	UINT32 hilo_mode = snes_find_hilo_mode(*image, ROM, len, offset, 0);
+	UINT32 hilo_mode = snes_find_hilo_mode(*image, ROM, len, 0);
 
 	/* Company */
 	for (i = 0; i < 2; i++)
@@ -598,7 +597,7 @@ static void snes_cart_log_info( running_machine &machine, UINT8* ROM, UINT32 len
 		((ROM[hilo_mode + 0x16] & 0xf) == 6))
 		has_sram = 1;
 
-	int total_blocks = (state->m_cart[0].m_rom_size - offset) / (state->m_cart[0].mode & 0xa5 ? 0x8000 : 0x10000);
+	int total_blocks = len / (state->m_cart[0].mode & 0xa5 ? 0x8000 : 0x10000);
 
 	logerror( "ROM DETAILS\n" );
 	logerror( "===========\n\n" );
@@ -647,32 +646,32 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	UINT32 offset, int_header_offs;
 
 	if (image.software_entry() == NULL)
-		m_cart_size = image.length();
+		m_cart[0].m_rom_size = image.length();
 	else
-		m_cart_size = image.get_software_region_length("rom");
+		m_cart[0].m_rom_size = image.get_software_region_length("rom");
 
 	// Check for a header (512 bytes), and skip it if found
-	offset = snes_skip_header(image, m_cart_size);
+	offset = snes_skip_header(image, m_cart[0].m_rom_size);
+	m_cart[0].m_rom_size -= offset;
 
 	// Allocate rom pointer
-	m_cart[0].m_rom_size = m_cart_size - offset;
 	m_cart[0].m_rom = auto_alloc_array_clear(machine(), UINT8, m_cart[0].m_rom_size);
 
 	if (image.software_entry() == NULL)
 	{
 		image.fseek(offset, SEEK_SET);
-		image.fread(m_cart[0].m_rom, m_cart_size - offset);
+		image.fread(m_cart[0].m_rom, m_cart[0].m_rom_size);
 	}
 	else
-		memcpy(m_cart[0].m_rom, image.get_software_region("rom") + offset, m_cart_size - offset);
+		memcpy(m_cart[0].m_rom, image.get_software_region("rom") + offset, m_cart[0].m_rom_size);
 
-	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", m_cart_size - offset);
+	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", m_cart[0].m_rom_size);
 
 	// Setup the bank map to handle mirroring of ROM up to 8MB of accessible memory
 	rom_map_setup(m_cart[0].m_rom_size);
 
 	// Check if the cart is HiROM or LoROM (and set variables accordingly)
-	int_header_offs = snes_find_hilo_mode(image, m_cart[0].m_rom, m_cart[0].m_rom_size, offset, 0);
+	int_header_offs = snes_find_hilo_mode(image, m_cart[0].m_rom, m_cart[0].m_rom_size, 0);
 
 	// Detect BS-X carts:
 	// 1. Detect BS-X Flash Cart
@@ -803,26 +802,26 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 		slot_id = 1;
 
 	if (image.software_entry() == NULL)
-		m_cart_size = image.length();
+		m_cart[slot_id].m_rom_size = image.length();
 	else
-		m_cart_size = image.get_software_region_length("rom");
+		m_cart[slot_id].m_rom_size = image.get_software_region_length("rom");
 
 	// Check for a header (512 bytes), and skip it if found
-	offset = snes_skip_header(image, m_cart_size);
+	offset = snes_skip_header(image, m_cart[slot_id].m_rom_size);
+	m_cart[slot_id].m_rom_size -= offset;
 
 	// Allocate rom pointer
-	m_cart[slot_id].m_rom_size = m_cart_size;
 	m_cart[slot_id].m_rom = auto_alloc_array_clear(machine(), UINT8, m_cart[slot_id].m_rom_size);
 
 	if (image.software_entry() == NULL)
 	{
 		image.fseek(offset, SEEK_SET);
-		image.fread(m_cart[slot_id].m_rom, m_cart_size - offset);
+		image.fread(m_cart[slot_id].m_rom, m_cart[slot_id].m_rom_size);
 	}
 	else
-		memcpy(m_cart[slot_id].m_rom, image.get_software_region("rom") + offset, m_cart_size - offset);
+		memcpy(m_cart[slot_id].m_rom, image.get_software_region("rom") + offset, m_cart[slot_id].m_rom_size);
 
-	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", m_cart_size - offset);
+	if (SNES_CART_DEBUG) mame_printf_error("size %08X\n", m_cart[slot_id].m_rom_size);
 
 	// Setup the bank map to handle mirroring of ROM
 	rom_map_setup(m_cart[slot_id].m_rom_size);
