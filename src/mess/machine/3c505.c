@@ -27,6 +27,28 @@ static int verbose = VERBOSE;
 
 #define  MAINCPU "maincpu"
 
+#ifdef LSB_FIRST
+static UINT16 uint16_to_le(UINT16 value)
+{
+	return value;
+}
+
+static UINT16 uint16_from_le(UINT16 value)
+{
+	return ((value&0x00ff)<<8)|((value&0xff00)>>8);
+}
+#else
+static UINT16 uint16_to_le(UINT16 value)
+{
+	return ((value&0x00ff)<<8)|((value&0xff00)>>8);
+}
+
+static UINT16 uint16_from_le(UINT16 value)
+{
+	return value;
+}
+#endif
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -644,45 +666,23 @@ void threecom3c505_device::do_receive_command()
 //			m_response.data.rcv_resp.buf_len = htole16(buf_len);
 
 			// htole16 and friends are not portable beyond Linux.  It's named differently on *BSD and differently again on OS X.  Avoid!
-			#ifdef LSB_FIRST
-			m_response.data.rcv_resp.pkt_len = m_rx_data_buffer.get_length();
+			m_response.data.rcv_resp.pkt_len = uint16_to_le(m_rx_data_buffer.get_length());
 			m_response.data.rcv_resp.timeout = 0; // successful completion
-			m_response.data.rcv_resp.status  = m_rx_data_buffer.get_length() > 0 ? 0 : 0xffff;
+			m_response.data.rcv_resp.status  = uint16_to_le(m_rx_data_buffer.get_length() > 0 ? 0 : 0xffff);
 			m_response.data.rcv_resp.timetag = 0; // TODO: time tag
-			#else
-			UINT16 temp;
-			temp = m_rx_data_buffer.get_length();
-			m_response.data.rcv_resp.pkt_len = (temp << 8) | (temp>>8);
-			m_response.data.rcv_resp.timeout = 0; // successful completion
-			temp  = m_rx_data_buffer.get_length() > 0 ? 0 : 0xffff;
-			m_response.data.rcv_resp.status = (temp << 8) | (temp>>8);                                                                              
-			m_response.data.rcv_resp.timetag = 0; // TODO: time tag
-			#endif
 
 			// compute and check no of bytes to be DMA'ed (must be even)
-			#ifdef LSB_FIRST
-			UINT16 buf_len = m_response.data.rcv_resp.buf_len & ~1;
-			#else
-			UINT16 buf_len = ((m_response.data.rcv_resp.buf_len&0xff)<<8) || ((m_response.data.rcv_resp.buf_len&0xff00)>>8) & ~1;
-			#endif
+			UINT16 buf_len = uint16_from_le(m_response.data.rcv_resp.buf_len) & ~1;
 			if (m_rx_data_buffer.get_length() > buf_len)
 			{
 				LOG1(("do_receive_command !!! buffer size too small (%d < %d)", buf_len, m_rx_data_buffer.get_length()));
-				#ifdef LSB_FIRST
-				m_response.data.rcv_resp.pkt_len = buf_len;
-				#else
-				m_response.data.rcv_resp.pkt_len = ((buf_len & 0xff)<<8) | ((buf_len & 0xff00)>>8);
-				#endif
+				m_response.data.rcv_resp.pkt_len = uint16_to_le(buf_len);
 				m_response.data.rcv_resp.status = 0xffff;
 			}
 			else
 			{
 				buf_len = (m_rx_data_buffer.get_length() + 1) & ~1;
-				#ifdef LSB_FIRST
-				m_response.data.rcv_resp.pkt_len = buf_len;
-				#else
-				m_response.data.rcv_resp.pkt_len = ((buf_len & 0xff)<<8) | ((buf_len & 0xff00)>>8);
-				#endif
+				m_response.data.rcv_resp.pkt_len = uint16_to_le(buf_len);
 			}
 
 			m_response_length = m_response.length + 2;
@@ -815,12 +815,12 @@ void threecom3c505_device::do_command()
 
 	case CMD_NETWORK_STATISTICS: // 0x0a
 		m_response.length = sizeof(struct Netstat);
-		m_response.data.netstat.tot_recv = htole16(m_netstat.tot_recv);
-		m_response.data.netstat.tot_xmit = htole16(m_netstat.tot_xmit);
-		m_response.data.netstat.err_CRC = htole16(m_netstat.err_CRC);
-		m_response.data.netstat.err_align = htole16(m_netstat.err_align);
-		m_response.data.netstat.err_res = htole16(m_netstat.err_res);
-		m_response.data.netstat.err_ovrrun = htole16(m_netstat.err_ovrrun);
+		m_response.data.netstat.tot_recv = uint16_to_le(m_netstat.tot_recv);
+		m_response.data.netstat.tot_xmit = uint16_to_le(m_netstat.tot_xmit);
+		m_response.data.netstat.err_CRC = uint16_to_le(m_netstat.err_CRC);
+		m_response.data.netstat.err_align = uint16_to_le(m_netstat.err_align);
+		m_response.data.netstat.err_res = uint16_to_le(m_netstat.err_res);
+		m_response.data.netstat.err_ovrrun = uint16_to_le(m_netstat.err_ovrrun);
 		break;
 
 	case CMD_ADAPTER_INFO: // 0x11
@@ -828,10 +828,10 @@ void threecom3c505_device::do_command()
 		// FIXME: using demo data
 		m_response.data.info.minor_vers = 1;
 		m_response.data.info.major_vers = 2;
-		m_response.data.info.ROM_cksum = htole16(3);
-		m_response.data.info.RAM_sz = htole16(4);
-		m_response.data.info.free_ofs = htole16(5);
-		m_response.data.info.free_seg = htole16(6);
+		m_response.data.info.ROM_cksum = uint16_to_le(3);
+		m_response.data.info.RAM_sz = uint16_to_le(4);
+		m_response.data.info.free_ofs = uint16_to_le(5);
+		m_response.data.info.free_seg = uint16_to_le(6);
 		break;
 
 	case CMD_LOAD_MULTICAST_LIST:// 0x0b
