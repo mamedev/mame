@@ -812,7 +812,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,sufami_cart )
 
 	// Allocate rom pointer
 	m_cart[slot_id].m_rom_size = m_cart_size;
-	m_cart[slot_id].m_rom = auto_alloc_array_clear(machine(), UINT8, m_cart[0].m_rom_size);
+	m_cart[slot_id].m_rom = auto_alloc_array_clear(machine(), UINT8, m_cart[slot_id].m_rom_size);
 
 	if (image.software_entry() == NULL)
 	{
