@@ -2555,6 +2555,7 @@ void towns_state::driver_start()
 	m_towns_vram = auto_alloc_array(machine(),UINT32,0x20000);
 	m_towns_gfxvram = auto_alloc_array(machine(),UINT8,0x80000);
 	m_towns_txtvram = auto_alloc_array(machine(),UINT8,0x20000);
+	memset(m_towns_txtvram, 0, sizeof(UINT8)*0x20000);
 	//towns_sprram = auto_alloc_array(machine(),UINT8,0x20000);
 	m_towns_serial_rom = auto_alloc_array(machine(),UINT8,256/8);
 	init_serial_rom(machine());

@@ -314,6 +314,8 @@ void i82439tx_device::device_reset()
 	m_regs[0x06] = 0x00000000;
 	m_regs[0x07] = 0x00000000;
 
+	memset(m_bios_ram, 0, sizeof(m_bios_ram));
+
 	/* configure initial memory state */
 	i82439tx_configure_memory(0, 0xf0000, 0xfffff);
 	i82439tx_configure_memory(0, 0xc0000, 0xc3fff);

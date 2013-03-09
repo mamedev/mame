@@ -612,9 +612,13 @@ void isa8_ega_device::device_start()
 
 	m_videoram = m_vram->base();
 	m_plane[0] = m_videoram + 0x00000;
+	memset(m_plane[0], 0, sizeof(UINT8) * 0x10000);
 	m_plane[1] = m_videoram + 0x10000;
+	memset(m_plane[1], 0, sizeof(UINT8) * 0x10000);
 	m_plane[2] = m_videoram + 0x20000;
+	memset(m_plane[2], 0, sizeof(UINT8) * 0x10000);
 	m_plane[3] = m_videoram + 0x30000;
+	memset(m_plane[3], 0, sizeof(UINT8) * 0x10000);
 
 	m_crtc_ega = subdevice<crtc_ega_device>(EGA_CRTC_NAME);
 

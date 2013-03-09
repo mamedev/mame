@@ -61,6 +61,9 @@ void ef9340_1_device::device_start()
 
 void ef9340_1_device::device_reset()
 {
+	memset(m_ef934x_ram_a, 0, sizeof(m_ef934x_ram_a));
+	memset(m_ef934x_ram_b, 0, sizeof(m_ef934x_ram_b));
+
 	m_ef9340.X = 0;
 	m_ef9340.Y = 0;
 	m_ef9340.Y0 = 0;

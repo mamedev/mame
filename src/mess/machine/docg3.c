@@ -776,8 +776,11 @@ void diskonchip_g3_device::device_start()
 	memset(m_sec_2, 0, sizeof(m_sec_2));
 
 	m_data[0] = auto_alloc_array( machine(), UINT8, m_data_size[0]);
+	memset(m_data[0], 0, sizeof(UINT8) * m_data_size[0]);
 	m_data[1] = auto_alloc_array( machine(), UINT8, m_data_size[1]);
+	memset(m_data[1], 0, sizeof(UINT8) * m_data_size[1]);
 	m_data[2] = auto_alloc_array( machine(), UINT8, m_data_size[2]);
+	memset(m_data[2], 0, sizeof(UINT8) * m_data_size[2]);
 
 //  diskonchip_load( device, "diskonchip");
 

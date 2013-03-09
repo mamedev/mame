@@ -1550,6 +1550,7 @@ void thomson_state::thmfc_floppy_init()
 	LOG(( "thmfc_floppy_init: THMFC1 controller\n" ));
 
 	thmfc1 = auto_alloc(machine(), thmfc1_t);
+	memset(thmfc1, 0, sizeof(thmfc1_t));
 
 	thmfc_floppy_cmd = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(thomson_state::thmfc_floppy_cmd_complete_cb),this));
 

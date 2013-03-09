@@ -236,6 +236,7 @@ void vboy_state::video_start()
 
 	m_font  = auto_alloc_array_clear(machine(), UINT16, (0x8000 >> 1)*4 * 2);
 	m_bgmap = auto_alloc_array(machine(), UINT16, 0x20000 >> 1);
+	memset(m_bgmap, 0, sizeof(UINT16) * (0x20000 >> 1));
 }
 
 void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, UINT16 code, UINT8 pal)

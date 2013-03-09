@@ -2138,8 +2138,10 @@ MACHINE_START_MEMBER(apple2_state,apple2)
 	/* there appears to be some hidden RAM that is swapped in on the Apple
 	 * IIc plus; I have not found any official documentation but the BIOS
 	 * clearly uses this area as writeable memory */
-	if (!strcmp(machine().system().name, "apple2cp"))
+	if (!strcmp(machine().system().name, "apple2cp")) {
 		apple2cp_ce00_ram = auto_alloc_array(machine(), UINT8, 0x200);
+		memset(apple2cp_ce00_ram, 0, sizeof(UINT8) * 0x200);
+	}
 
 	m_machinetype = APPLE_IIEPLUS;
 
@@ -2163,8 +2165,10 @@ MACHINE_START_MEMBER(apple2_state,apple2e)
 	/* there appears to be some hidden RAM that is swapped in on the Apple
 	 * IIc plus; I have not found any official documentation but the BIOS
 	 * clearly uses this area as writeable memory */
-	if (!strcmp(machine().system().name, "apple2cp"))
+	if (!strcmp(machine().system().name, "apple2cp")) {
 		apple2cp_ce00_ram = auto_alloc_array(machine(), UINT8, 0x200);
+		memset(apple2cp_ce00_ram, 0, sizeof(UINT8) * 0x200);
+	}
 
 	m_machinetype = APPLE_IIE;
 
