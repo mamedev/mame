@@ -200,13 +200,13 @@ MAIN:
 		case 0xB5:													%DIVX;		return;
 		case 0xB6:													%BMOVE;		return;
 		case 0xB7:													%MOVE;		return;
-		case 0xB8:													%LSRD;		return;
+		case 0xB8:										set_imm();	%LSRD;		return;
 		case 0xB9:										%INDEXED;	%LSRD;		return;
-		case 0xBA:													%RORD;		return;
+		case 0xBA:										set_imm();	%RORD;		return;
 		case 0xBB:										%INDEXED;	%RORD;		return;
-		case 0xBC:													%ASRD;		return;
+		case 0xBC:										set_imm();	%ASRD;		return;
 		case 0xBD:										%INDEXED;	%ASRD;		return;
-		case 0xBE:													%ASLD;		return;
+		case 0xBE:										set_imm();	%ASLD;		return;
 		case 0xBF:										%INDEXED;	%ASLD;		return;
 
 		case 0xC0:													%ROLD;		return;
