@@ -362,6 +362,7 @@ static VIDEO_START( pc_cga )
 	internal_pc_cga_video_start(machine);
 	cga.videoram_size = 0x4000;
 	cga.videoram = auto_alloc_array(machine, UINT8, 0x4000);
+	memset(cga.videoram, 0, sizeof(UINT8) * 0x4000);
 	cga.is_superimpose = 0;
 
 	machine.root_device().membank("bank11")->set_base(cga.videoram);
