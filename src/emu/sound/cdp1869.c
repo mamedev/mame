@@ -399,6 +399,9 @@ void cdp1869_device::device_start()
 	m_col = 0;
 	m_incr = 0;
 	m_signal = 0;
+	m_cfc = 0;
+	m_toneoff = 0;
+	m_cmem = 0;
 
 	// register for state saving
 	save_item(NAME(m_prd));
