@@ -90,7 +90,7 @@ READ8_MEMBER( a6809_state::videoram_r )
 static SAA5050_INTERFACE( a6809_saa5050_intf )
 {
 	DEVCB_DRIVER_MEMBER(a6809_state, videoram_r),
-	40, 25, 40  /* x, y, size */
+	40, 24, 40  /* x, y, size */
 };
 
 READ8_MEMBER( a6809_state::via_pb_r )
