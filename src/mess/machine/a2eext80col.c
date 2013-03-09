@@ -46,6 +46,7 @@ a2eaux_ext80col_device::a2eaux_ext80col_device(const machine_config &mconfig, de
 void a2eaux_ext80col_device::device_start()
 {
 	set_a2eauxslot_device();
+	memset(m_ram, 0, sizeof(m_ram));
 	save_item(NAME(m_ram));
 }
 
