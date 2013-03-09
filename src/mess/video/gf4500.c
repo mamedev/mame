@@ -42,6 +42,7 @@ static struct {
 static void gf4500_init( running_machine &machine)
 {
 	gf4500.data = auto_alloc_array( machine, UINT32, 0x140000 / 4);
+	memset(gf4500.data, 0, sizeof(UINT32) * 0x140000 / 4);
 	gf4500.screen_x = gf4500.screen_y = 0;
 	gf4500.screen_x_max = gf4500.screen_y_max = gf4500.screen_x_min = gf4500.screen_y_min = 0;
 	machine.primary_screen->register_screen_bitmap(gf4500.bitmap);
