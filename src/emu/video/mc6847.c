@@ -844,7 +844,7 @@ UINT32 mc6847_base_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		}
 	}
 
-	for (y = MAX(0, min_y - base_y); y <= MIN(192, max_y - base_y); y++)
+	for (y = MAX(0, min_y - base_y); y < MIN(192, max_y - base_y); y++)
 	{
 		/* left border */
 		for (x = min_x; x < base_x; x++)
