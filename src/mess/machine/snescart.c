@@ -330,9 +330,9 @@ static UINT32 snes_skip_header( device_image_interface &image, UINT32 snes_rom_s
 /* This determines if a cart is in Mode 20, 21, 22 or 25; sets state->m_cart[0].mode and
  state->m_cart[0].sram_max accordingly; and returns the offset of the internal header
  (needed to detect BSX and ST carts) */
-static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer, UINT32 len, int cartid )
+static UINT32 snes_find_hilo_mode( running_machine &machine, UINT8 *buffer, UINT32 len, int cartid )
 {
-	snes_state *state = image.device().machine().driver_data<snes_state>();
+	snes_state *state = machine.driver_data<snes_state>();
 	UINT8 valid_mode20, valid_mode21, valid_mode25;
 	UINT32 retvalue;
 
@@ -564,10 +564,9 @@ static int snes_find_addon_chip( running_machine &machine, UINT8 *buffer, UINT32
 static void snes_cart_log_info( running_machine &machine, UINT8* ROM, UINT32 len, int supported )
 {
 	snes_state *state = machine.driver_data<snes_state>();
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
 	char title[21], rom_id[4], company_id[2];
 	int i, company, has_ram = 0, has_sram = 0;
-	UINT32 hilo_mode = snes_find_hilo_mode(*image, ROM, len, 0);
+	UINT32 hilo_mode = snes_find_hilo_mode(machine, ROM, len, 0);
 
 	/* Company */
 	for (i = 0; i < 2; i++)
@@ -671,7 +670,7 @@ DEVICE_IMAGE_LOAD_MEMBER( snes_state,snes_cart )
 	rom_map_setup(m_cart[0].m_rom_size);
 
 	// Check if the cart is HiROM or LoROM (and set variables accordingly)
-	int_header_offs = snes_find_hilo_mode(image, m_cart[0].m_rom, m_cart[0].m_rom_size, 0);
+	int_header_offs = snes_find_hilo_mode(machine(), m_cart[0].m_rom, m_cart[0].m_rom_size, 0);
 
 	// Detect BS-X carts:
 	// 1. Detect BS-X Flash Cart
