@@ -401,6 +401,7 @@ void psion_state::machine_start()
 	if (m_ram_bank_count)
 	{
 		m_paged_ram = auto_alloc_array(machine(), UINT8, m_ram_bank_count * 0x4000);
+		memset(m_paged_ram, 0, sizeof(UINT8) * (m_ram_bank_count * 0x4000));
 		membank("rambank")->configure_entries(0, m_ram_bank_count, m_paged_ram, 0x4000);
 		membank("rambank")->set_entry(0);
 	}
