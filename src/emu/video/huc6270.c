@@ -817,6 +817,7 @@ void huc6270_device::device_start()
 	assert( ! m_irq_changed.isnull() );
 
 	m_vram = (UINT16 *)machine().memory().region_alloc( tag(), vram_size, 1, ENDIANNESS_LITTLE )->base();
+	memset(m_vram, 0, vram_size);
 	m_vram_mask = ( vram_size >> 1 ) - 1;
 }
 
@@ -854,6 +855,7 @@ void huc6270_device::device_reset()
 	m_hsync = 0;
 	m_vsync = 0;
 	m_dma_enabled = 0;
+	m_byr_latched = 0;
 
 	memset(m_sat, 0, sizeof(m_sat));
 }
