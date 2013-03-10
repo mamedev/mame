@@ -749,6 +749,7 @@ VIDEO_START( pc200 )
 	aga.mda_chr_gen = machine.root_device().memregion("gfx1")->base();
 	aga.cga_chr_gen = machine.root_device().memregion("gfx1")->base() + 0x1000;
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
+	memset(aga.videoram, 0, sizeof(UINT8) * 0x10000);
 }
 
 
