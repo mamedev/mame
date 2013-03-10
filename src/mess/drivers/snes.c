@@ -2204,8 +2204,11 @@ READ8_MEMBER( snsnew_state::snesnew_lo_r )
 {
 	// take care of add-on IO
 	if (m_slotcart->get_type() == SNES_DSP
-		&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
+				&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
 		return m_slotcart->m_cart->chip_read(space, offset & 0x7fff);
+	else if (m_slotcart->get_type() == SNES_DSP_2MB
+				&& (offset >= 0x600000 && offset < 0x700000 && (offset & 0x8000) == 0x0000))
+		return m_slotcart->m_cart->chip_read(space, offset & 0x7fff);	
 	else if (m_slotcart->get_type() == SNES_DSP_MODE21
 				&& (offset < 0x200000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
 		return m_slotcart->m_cart->chip_read(space, offset & 0x1fff);
@@ -2232,6 +2235,7 @@ READ8_MEMBER( snsnew_state::snesnew_lo_r )
 			case SNES_ST010:
 			case SNES_ST011:
 			case SNES_DSP:
+			case SNES_DSP_2MB:
 			case SNES_DSP4:
 			case SNES_OBC1:
 			case SNES_SUFAMITURBO:
@@ -2268,8 +2272,11 @@ READ8_MEMBER( snsnew_state::snesnew_hi_r )
 {
 	// take care of add-on IO
 	if (m_slotcart->get_type() == SNES_DSP
-		&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
+				&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
 		return m_slotcart->m_cart->chip_read(space, offset & 0x7fff);
+	else if (m_slotcart->get_type() == SNES_DSP_2MB
+				&& (offset >= 0x600000 && offset < 0x700000 && (offset & 0x8000) == 0x0000))
+		return m_slotcart->m_cart->chip_read(space, offset & 0x7fff);	
 	else if (m_slotcart->get_type() == SNES_DSP_MODE21
 				&& (offset < 0x200000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
 		return m_slotcart->m_cart->chip_read(space, offset & 0x1fff);
@@ -2302,6 +2309,7 @@ READ8_MEMBER( snsnew_state::snesnew_hi_r )
 			case SNES_ST010:
 			case SNES_ST011:
 			case SNES_DSP:
+			case SNES_DSP_2MB:
 			case SNES_DSP4:
 			case SNES_OBC1:
 			case SNES_SUFAMITURBO:
@@ -2338,7 +2346,10 @@ WRITE8_MEMBER( snsnew_state::snesnew_lo_w )
 {
 	// take care of add-on IO
 	if (m_slotcart->get_type() == SNES_DSP
-		&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
+				&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
+		m_slotcart->m_cart->chip_write(space, offset & 0x7fff, data);
+	else if (m_slotcart->get_type() == SNES_DSP_2MB
+				&& (offset >= 0x600000 && offset < 0x700000 && (offset & 0x8000) == 0x0000))
 		m_slotcart->m_cart->chip_write(space, offset & 0x7fff, data);
 	else if (m_slotcart->get_type() == SNES_DSP_MODE21
 				&& (offset < 0x200000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
@@ -2372,6 +2383,7 @@ WRITE8_MEMBER( snsnew_state::snesnew_lo_w )
 			case SNES_ST010:
 			case SNES_ST011:
 			case SNES_DSP:
+			case SNES_DSP_2MB:
 			case SNES_DSP4:
 			case SNES_OBC1:
 			case SNES_SUFAMITURBO:
@@ -2413,7 +2425,10 @@ WRITE8_MEMBER( snsnew_state::snesnew_hi_w )
 {
 	// take care of add-on IO
 	if (m_slotcart->get_type() == SNES_DSP
-		&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
+				&& (offset >= 0x200000 && offset < 0x400000 && (offset & 0x8000) == 0x8000))
+		m_slotcart->m_cart->chip_write(space, offset & 0x7fff, data);
+	else if (m_slotcart->get_type() == SNES_DSP_2MB
+				&& (offset >= 0x600000 && offset < 0x700000 && (offset & 0x8000) == 0x0000))
 		m_slotcart->m_cart->chip_write(space, offset & 0x7fff, data);
 	else if (m_slotcart->get_type() == SNES_DSP_MODE21
 				&& (offset < 0x200000 && (offset & 0xffff) >= 0x6000 && (offset & 0xffff) < 0x8000))
@@ -2447,6 +2462,7 @@ WRITE8_MEMBER( snsnew_state::snesnew_hi_w )
 			case SNES_ST010:
 			case SNES_ST011:
 			case SNES_DSP:
+			case SNES_DSP_2MB:
 			case SNES_DSP4:
 			case SNES_OBC1:
 			case SNES_SUFAMITURBO:

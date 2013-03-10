@@ -620,6 +620,9 @@ bool base_sns_cart_slot_device::call_load()
 				m_type = SNES_MODE20;
 			else
 				m_type = sns_get_pcb_id(slot_name);
+
+			if (m_type == SNES_DSP && len > 0x100000)
+					m_type = SNES_DSP_2MB;
 		}
 
 		setup_custom_mappers();
@@ -780,7 +783,12 @@ int base_sns_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 		if (addon != -1)
 		{
 			if (type == SNES_MODE20 && addon == SNES_DSP)
-				type = SNES_DSP;
+			{
+				if (len > 0x100000)
+					type = SNES_DSP_2MB;
+				else
+					type = SNES_DSP;
+			}
 			else if (type == SNES_MODE21 && addon == SNES_DSP)
 				type = SNES_DSP_MODE21;
 			else
@@ -791,6 +799,7 @@ int base_sns_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 	switch (type)
 	{
 		case SNES_DSP:
+		case SNES_DSP_2MB:
 		case SNES_DSP4:
 		case SNES_ST010:
 		case SNES_ST011:
@@ -944,6 +953,7 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 		"ROM (ExHiROM)",
 		"ROM, CX4",
 		"ROM, DSP-1,2,3 (LoROM)",
+		"ROM, DSP-1 (LoROM 2MB)",
 		"ROM, DSP-1 (HiROM)",
 		"ROM, DSP-4",
 		"ROM, OBC-1",
@@ -1064,7 +1074,12 @@ void base_sns_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	if (addon != -1)
 	{
 		if (type == SNES_MODE20 && addon == SNES_DSP)
-			type = SNES_DSP;
+		{
+			if (len > 0x100000)
+				type = SNES_DSP_2MB;
+			else
+				type = SNES_DSP;
+		}
 		else if (type == SNES_MODE21 && addon == SNES_DSP)
 			type = SNES_DSP_MODE21;
 		else

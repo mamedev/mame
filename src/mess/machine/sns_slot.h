@@ -15,6 +15,7 @@ enum
 	SNES_MODE25,    // ExHiROM - not used anymore in emulation (only to log info), will be removed
 	SNES_CX4,
 	SNES_DSP,
+	SNES_DSP_2MB,
 	SNES_DSP_MODE21,
 	SNES_DSP4,
 	SNES_OBC1,
