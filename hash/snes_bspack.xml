@@ -2659,7 +2659,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
 
-			<feature name="slot" value="lorom" />
+			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
 				<rom name="sonic blastman (bs).bs" size="1048576" crc="86bb53e5" sha1="e8411f5e0ea2b2922416710c9b463023fe1e5f39" offset="0x000000" />
 			</dataarea>
@@ -2672,7 +2672,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="bspack">
 
-			<feature name="slot" value="hirom" />
+			<feature name="slot" value="bsmempak" />
 			<dataarea name="rom" size="1048576">
 				<rom name="table game daisyugo (bs).bs" size="1048576" crc="47e3047e" sha1="00ddbd9471f9b22b927a2361c672d7e4081fb69d" offset="0x000000" />
 			</dataarea>
