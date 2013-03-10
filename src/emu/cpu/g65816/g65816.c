@@ -659,35 +659,35 @@ static READ8_HANDLER( rdmpyh_r )
 
 
 static ADDRESS_MAP_START(_5a22_map, AS_PROGRAM, 8, legacy_cpu_device)
-	AM_RANGE(0x4202, 0x4202) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrmpya_w)
-	AM_RANGE(0x4203, 0x4203) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrmpyb_w)
-	AM_RANGE(0x4204, 0x4204) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrdivl_w)
-	AM_RANGE(0x4205, 0x4205) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrdivh_w)
-	AM_RANGE(0x4206, 0x4206) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(wrdvdd_w)
+	AM_RANGE(0x4202, 0x4202) AM_MIRROR(0xbf0000) AM_WRITE_LEGACY(wrmpya_w)
+	AM_RANGE(0x4203, 0x4203) AM_MIRROR(0xbf0000) AM_WRITE_LEGACY(wrmpyb_w)
+	AM_RANGE(0x4204, 0x4204) AM_MIRROR(0xbf0000) AM_WRITE_LEGACY(wrdivl_w)
+	AM_RANGE(0x4205, 0x4205) AM_MIRROR(0xbf0000) AM_WRITE_LEGACY(wrdivh_w)
+	AM_RANGE(0x4206, 0x4206) AM_MIRROR(0xbf0000) AM_WRITE_LEGACY(wrdvdd_w)
 
-	AM_RANGE(0x420d, 0x420d) AM_MIRROR(0x3f0000) AM_WRITE_LEGACY(memsel_w)
+	AM_RANGE(0x420d, 0x420d) AM_MIRROR(0xbf0000) AM_WRITE_LEGACY(memsel_w)
 
-	AM_RANGE(0x4214, 0x4214) AM_MIRROR(0x3f0000) AM_READ_LEGACY(rddivl_r)
-	AM_RANGE(0x4215, 0x4215) AM_MIRROR(0x3f0000) AM_READ_LEGACY(rddivh_r)
-	AM_RANGE(0x4216, 0x4216) AM_MIRROR(0x3f0000) AM_READ_LEGACY(rdmpyl_r)
-	AM_RANGE(0x4217, 0x4217) AM_MIRROR(0x3f0000) AM_READ_LEGACY(rdmpyh_r)
+	AM_RANGE(0x4214, 0x4214) AM_MIRROR(0xbf0000) AM_READ_LEGACY(rddivl_r)
+	AM_RANGE(0x4215, 0x4215) AM_MIRROR(0xbf0000) AM_READ_LEGACY(rddivh_r)
+	AM_RANGE(0x4216, 0x4216) AM_MIRROR(0xbf0000) AM_READ_LEGACY(rdmpyl_r)
+	AM_RANGE(0x4217, 0x4217) AM_MIRROR(0xbf0000) AM_READ_LEGACY(rdmpyh_r)
 
 ADDRESS_MAP_END
 
 void set_5a22_map(legacy_cpu_device &cpu)
 {
-	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4202, 0x4202, 0, 0x3f0000, FUNC(wrmpya_w));
-	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4203, 0x4203, 0, 0x3f0000, FUNC(wrmpyb_w));
-	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4204, 0x4204, 0, 0x3f0000, FUNC(wrdivl_w));
-	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4205, 0x4205, 0, 0x3f0000, FUNC(wrdivh_w));
-	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4206, 0x4206, 0, 0x3f0000, FUNC(wrdvdd_w));
+	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4202, 0x4202, 0, 0xbf0000, FUNC(wrmpya_w));
+	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4203, 0x4203, 0, 0xbf0000, FUNC(wrmpyb_w));
+	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4204, 0x4204, 0, 0xbf0000, FUNC(wrdivl_w));
+	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4205, 0x4205, 0, 0xbf0000, FUNC(wrdivh_w));
+	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x4206, 0x4206, 0, 0xbf0000, FUNC(wrdvdd_w));
 	
-	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x420d, 0x420d, 0, 0x3f0000, FUNC(memsel_w));
+	cpu.space(AS_PROGRAM).install_legacy_write_handler(0x420d, 0x420d, 0, 0xbf0000, FUNC(memsel_w));
 	
-	cpu.space(AS_PROGRAM).install_legacy_read_handler(0x4214, 0x4214, 0, 0x3f0000, FUNC(rddivl_r));
-	cpu.space(AS_PROGRAM).install_legacy_read_handler(0x4215, 0x4215, 0, 0x3f0000, FUNC(rddivh_r));
-	cpu.space(AS_PROGRAM).install_legacy_read_handler(0x4216, 0x4216, 0, 0x3f0000, FUNC(rdmpyl_r));
-	cpu.space(AS_PROGRAM).install_legacy_read_handler(0x4217, 0x4217, 0, 0x3f0000, FUNC(rdmpyh_r));
+	cpu.space(AS_PROGRAM).install_legacy_read_handler(0x4214, 0x4214, 0, 0xbf0000, FUNC(rddivl_r));
+	cpu.space(AS_PROGRAM).install_legacy_read_handler(0x4215, 0x4215, 0, 0xbf0000, FUNC(rddivh_r));
+	cpu.space(AS_PROGRAM).install_legacy_read_handler(0x4216, 0x4216, 0, 0xbf0000, FUNC(rdmpyl_r));
+	cpu.space(AS_PROGRAM).install_legacy_read_handler(0x4217, 0x4217, 0, 0xbf0000, FUNC(rdmpyh_r));
 }
 
 CPU_SET_INFO( _5a22 )
